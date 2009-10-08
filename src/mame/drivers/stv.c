@@ -3558,6 +3558,22 @@ ROM_START( danchih )
 	ROM_LOAD16_WORD_SWAP( "mpr21973.5",    0x1000000, 0x0400000, CRC(b0f23f14) SHA1(4e7076c29fd57bb3ef9af50a6104e39ecda94e06) )// good
 ROM_END
 
+ROM_START( danchiq )
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "user1", ROMREGION_ERASE00 ) /* SH2 code */
+	ROM_LOAD16_WORD_SWAP( "ic22",    0x0200000, 0x0200000, CRC(e216bfc8) SHA1(7a08fa32281e272dbf5e7daea50a1800cc225c1b) )//ic 7
+	ROM_LOAD16_WORD_SWAP( "ic24",    0x0400000, 0x0200000, CRC(b95aa5ac) SHA1(2766c5414643034a0f6d746050557516bd3753df) )//ic 2
+	ROM_LOAD16_WORD_SWAP( "ic26",    0x0600000, 0x0200000, CRC(df6ebd48) SHA1(fcccafbee1b8b952b07ed0e7e86219eed9cf4a93) )
+	ROM_LOAD16_WORD_SWAP( "ic28",    0x0800000, 0x0200000, CRC(cf6a2b76) SHA1(1f7522d446d57b78d099bae553133d5e7e54ff70) )//ic 3
+	ROM_LOAD16_WORD_SWAP( "ic30",    0x0a00000, 0x0200000, CRC(0b6a9901) SHA1(b4c335199d3e49a9ae5d474b10130abc4718cdf9) )
+	ROM_LOAD16_WORD_SWAP( "ic32",    0x0c00000, 0x0200000, CRC(0b4604f5) SHA1(547cba4a80baf126e87f87529aa933587643d359) )//ic 4
+	ROM_LOAD16_WORD_SWAP( "ic34",    0x0e00000, 0x0200000, CRC(616e20fa) SHA1(45c175e79b5701db9726d157ff92eee368f4bbf9) )
+	ROM_LOAD16_WORD_SWAP( "ic36",    0x1000000, 0x0200000, CRC(43474e08) SHA1(30b3ede287d5de93c6e0219bfd0a5d7ed5b6a958) )//ic 5
+	ROM_LOAD16_WORD_SWAP( "ic23",    0x1200000, 0x0200000, CRC(d080eb71) SHA1(9c39b887697c8872f0cb655cff24282ad3b90e9b) )
+	ROM_LOAD16_WORD_SWAP( "ic25",    0x1400000, 0x0200000, CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) )//(Untested)
+ROM_END
+
 ROM_START( mausuke )
 	STV_BIOS
 
@@ -3807,6 +3823,7 @@ GAME( 1997, cotton2,   stvbios, stv, stv,  		cotton2,   	ROT0,   "Success",  			
 GAME( 1998, cottonbm,  stvbios, stv, stv,  		cottonbm,  	ROT0,   "Success",  				  	"Cotton Boomerang (JUET 980709 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, critcrsh,  stvbios, stv, critcrsh,	stv,   		ROT0,   "Sega", 	     			  	"Critter Crusher (EA 951204 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, danchih,   stvbios, stv, stvmp,		danchih,   	ROT0,   "Altron (Tecmo license)",     	"Danchi de Hanafuda (J 990607 V1.400)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, danchiq,   stvbios, stv, stvmp,		danchih,   	ROT0,   "Altron (Tecmo license)",     	"Danchi de Quiz (J 001128 V1.200)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, diehard,   stvbios, stv, stv,  		diehard,   	ROT0,   "Sega", 	 				  	"Die Hard Arcade (UET 960515 V1.000)", GAME_IMPERFECT_SOUND  )
 GAME( 1996, dnmtdeka,  diehard, stv, stv, 		dnmtdeka,  	ROT0,   "Sega", 	 				  	"Dynamite Deka (J 960515 V1.000)", GAME_IMPERFECT_SOUND  )
 GAME( 1995, ejihon,    stvbios, stv, stv,  		stv,       	ROT0,   "Sega", 	 				  	"Ejihon Tantei Jimusyo (J 950613 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
