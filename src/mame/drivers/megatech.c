@@ -92,14 +92,12 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 #include "rendlay.h"
 
 #include "segamsys.h"
-#include "genesis.h"
 #include "megadriv.h"
 
+static struct _mtech_bios mtech_bios;
+
 /* Megatech BIOS specific */
-static UINT32 bios_port_ctrl;
 static UINT8* megatech_banked_ram;
-static int current_game_is_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
-UINT32 bios_ctrl_inputs;
 
 #define MASTER_CLOCK		53693100
 
@@ -108,25 +106,25 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_INCLUDE(megadriv)
 
 	PORT_START("BIOS_IN0") // port 6
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Select") PORT_CODE(KEYCODE_0)
-    PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Select") PORT_CODE(KEYCODE_0)
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("BIOS_IN1") // port 6
@@ -141,11 +139,11 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 
 	PORT_START("BIOS_DSW0")
 	PORT_DIPNAME( 0x02, 0x02, "Coin slot 3" )
-	PORT_DIPSETTING (   0x00, "Inhibit" )
-	PORT_DIPSETTING (   0x02, "Accept" )
+	PORT_DIPSETTING(    0x00, "Inhibit" )
+	PORT_DIPSETTING(    0x02, "Accept" )
 	PORT_DIPNAME( 0x01, 0x01, "Coin slot 4" )
-	PORT_DIPSETTING (   0x00, "Inhibit" )
-	PORT_DIPSETTING (   0x01, "Accept" )
+	PORT_DIPSETTING(    0x00, "Inhibit" )
+	PORT_DIPSETTING(    0x01, "Accept" )
 	PORT_DIPNAME( 0x1c, 0x1c, "Coin slot 3/4 value" )
 	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
@@ -203,49 +201,47 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 
 
 	PORT_START("BIOS_J1")
-    PORT_DIPNAME( 0x0001, 0x0001, "5" )
-    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0001, 0x0001, "5" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 INPUT_PORTS_END
 
 /* MEGATECH specific */
 
-static UINT8 mt_cart_select_reg;
-
 static READ8_HANDLER( megatech_instr_r )
 {
-	UINT8* instr = memory_region(space->machine, "mtbios")+0x8000;
+	UINT8* instr = memory_region(space->machine, "mtbios") + 0x8000;
 
-	return instr[offset/2];
+	return instr[offset / 2];
 //  else
 //      return 0xff;
 }
 
 static READ8_HANDLER( megatech_cart_select_r )
 {
-	return (mt_cart_select_reg);
+	return mtech_bios.mt_cart_select_reg;
 }
 
 #ifdef UNUSED_FUNCTION
@@ -298,7 +294,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 		if (bios_region[0x8000]==2)
 		{
 			printf("SMS cart!!, CPU not running\n");
-			current_game_is_sms = 1;
+			mtech_bios.current_game_is_sms = 1;
 			megatech_set_genz80_as_sms_standard_map(machine, "genesis_snd_z80", MAPPER_STANDARD);
 			cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, CLEAR_LINE);
 			cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, CLEAR_LINE);
@@ -308,7 +304,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 		else if (bios_region[0x8000]==1)
 		{
 			printf("Genesis Cart, CPU0 running\n");
-			current_game_is_sms = 0;
+			mtech_bios.current_game_is_sms = 0;
 			megatech_set_megadrive_z80_as_megadrive_z80(machine, "genesis_snd_z80");
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
 			cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
@@ -326,7 +322,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	//  cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* no cart.. */
-		memset(memory_region(machine, "mtbios")+0x8000, 0x00, 0x8000);
+		memset(memory_region(machine, "mtbios") + 0x8000, 0x00, 0x8000);
 		memset(memory_region(machine, "maincpu"), 0x00, 0x300000);
 	}
 
@@ -342,30 +338,30 @@ static WRITE8_HANDLER( megatech_cart_select_w )
 
 //  printf("megatech_instr_w %02x\n",data);
 
-	mt_cart_select_reg = data;
+	mtech_bios.mt_cart_select_reg = data;
 
 
-	megatech_select_game(space->machine, mt_cart_select_reg);
+	megatech_select_game(space->machine, mtech_bios.mt_cart_select_reg);
 
 /*
-    if (mt_cart_select_reg==2)
+    if (mtech_bios.mtech_bios.mt_cart_select_reg == 2)
     {
         printf("game 2 selected\n");
-        memcpy(memory_region(space->machine, "mtbios")+0x8000, memory_region(space->machine, "inst0"), 0x8000);
+        memcpy(memory_region(space->machine, "mtbios") + 0x8000, memory_region(space->machine, "inst0"), 0x8000);
     }
-//  else if (mt_cart_select_reg==0)
+//  else if (mtech_bios.mt_cart_select_reg == 0)
 //  {
 //      printf("game 0 selected\n");
-//      memcpy(memory_region(space->machine, "mtbios")+0x8000, memory_region(space->machine, "inst2"), 0x8000);
+//      memcpy(memory_region(space->machine, "mtbios") + 0x8000, memory_region(space->machine, "inst2"), 0x8000);
 //  }
-    else if (mt_cart_select_reg==6)
+    else if (mtech_bios.mt_cart_select_reg == 6)
     {
         printf("game 6 selected\n");
-        memcpy(memory_region(space->machine, "mtbios")+0x8000, memory_region(space->machine, "user6"), 0x8000);
+        memcpy(memory_region(space->machine, "mtbios") + 0x8000, memory_region(space->machine, "user6"), 0x8000);
     }
     else
     {
-        memset(memory_region(space->machine, "mtbios")+0x8000, 0x00, 0x8000);
+        memset(memory_region(space->machine, "mtbios" )+ 0x8000, 0x00, 0x8000);
     }
 */
 
@@ -378,54 +374,50 @@ static READ8_HANDLER( bios_ctrl_r )
 	if(offset == 0)
 		return 0;
 	if(offset == 2)
-		return bios_ctrl[offset] & 0xfe;
+		return mtech_bios.bios_ctrl[offset] & 0xfe;
 
-	return bios_ctrl[offset];
+	return mtech_bios.bios_ctrl[offset];
 }
 
 static WRITE8_HANDLER( bios_ctrl_w )
 {
 	if(offset == 1)
 	{
-		bios_ctrl_inputs = data & 0x04;  // Genesis/SMS input ports disable bit
+		mtech_bios.bios_ctrl_inputs = data & 0x04;  // Genesis/SMS input ports disable bit
 	}
-	bios_ctrl[offset] = data;
+	mtech_bios.bios_ctrl[offset] = data;
 }
 
-
-static int mt_bank_bank_pos = 0;
-static int mt_bank_partial = 0;
-static int mt_bank_addr = 0;
 
 /* this sets 0x300000 which may indicate that the 68k can see the instruction rom
    there, this limiting the max game rom capacity to 3meg. */
 static WRITE8_HANDLER (mt_z80_bank_w)
 {
-	mt_bank_partial |= (data & 0x01)<<23; // add new bit to partial address
-	mt_bank_bank_pos++;
+	mtech_bios.mt_bank_partial |= (data & 0x01) << 23; // add new bit to partial address
+	mtech_bios.mt_bank_bank_pos++;
 
-	if (mt_bank_bank_pos<9)
+	if (mtech_bios.mt_bank_bank_pos < 9)
 	{
-		mt_bank_partial >>= 1;
+		mtech_bios.mt_bank_partial >>= 1;
 	}
 	else
 	{
-		mt_bank_bank_pos = 0;
-		mt_bank_addr = mt_bank_partial;
-		mt_bank_partial = 0;
-		printf("MT z80 bank set to %08x\n",mt_bank_addr);
+		mtech_bios.mt_bank_bank_pos = 0;
+		mtech_bios.mt_bank_addr = mtech_bios.mt_bank_partial;
+		mtech_bios.mt_bank_partial = 0;
+		printf("MT z80 bank set to %08x\n", mtech_bios.mt_bank_addr);
 
 	}
 }
 
 static READ8_HANDLER( megatech_banked_ram_r )
 {
-	return megatech_banked_ram[offset + 0x1000 * (mt_cart_select_reg&0x7) ];
+	return megatech_banked_ram[offset + 0x1000 * (mtech_bios.mt_cart_select_reg & 0x07)];
 }
 
 static WRITE8_HANDLER( megatech_banked_ram_w )
 {
-	megatech_banked_ram[offset + 0x1000 * (mt_cart_select_reg&0x7) ] = data;
+	megatech_banked_ram[offset + 0x1000 * (mtech_bios.mt_cart_select_reg & 0x07)] = data;
 }
 
 
@@ -450,19 +442,19 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER (megatech_bios_port_ctrl_w)
 {
-	bios_port_ctrl = data;
+	mtech_bios.bios_port_ctrl = data;
 }
 
 static READ8_HANDLER (megatech_bios_joypad_r)
 {
-	return megatech_bios_port_cc_dc_r(space->machine,offset,bios_port_ctrl);
+	return megatech_bios_port_cc_dc_r(space->machine, offset, mtech_bios.bios_port_ctrl);
 }
 
 
 
 static WRITE8_HANDLER (megatech_bios_port_7f_w)
 {
-//  popmessage("CPU #3: I/O port 0x7F write, data %02x",data);
+//  popmessage("CPU #3: I/O port 0x7F write, data %02x", data);
 }
 
 
@@ -501,7 +493,7 @@ static VIDEO_UPDATE(mtnew)
 	if (screen == megadriv_screen)
 	{
 		/* if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip */
-		if (!current_game_is_sms) VIDEO_UPDATE_CALL(megadriv);
+		if (!mtech_bios.current_game_is_sms) VIDEO_UPDATE_CALL(megadriv);
 		else VIDEO_UPDATE_CALL(megatech_md_sms);
 	}
 	else if (screen == menu_screen) VIDEO_UPDATE_CALL(megatech_bios);
@@ -510,13 +502,17 @@ static VIDEO_UPDATE(mtnew)
 
 static VIDEO_EOF(mtnew)
 {
-	if (!current_game_is_sms) VIDEO_EOF_CALL(megadriv);
+	if (!mtech_bios.current_game_is_sms) VIDEO_EOF_CALL(megadriv);
 	else VIDEO_EOF_CALL(megatech_md_sms);
 	VIDEO_EOF_CALL(megatech_bios);
 }
 
 static MACHINE_RESET(mtnew)
 {
+	mtech_bios.mt_bank_bank_pos = 0;
+	mtech_bios.mt_bank_partial = 0;
+	mtech_bios.mt_bank_addr = 0;
+
 	MACHINE_RESET_CALL(megadriv);
 	MACHINE_RESET_CALL(megatech_bios);
 	MACHINE_RESET_CALL(megatech_md_sms);

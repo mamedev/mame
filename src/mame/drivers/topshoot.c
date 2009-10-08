@@ -142,6 +142,82 @@ connector, but of course, I can be wrong.
 #include "genesis.h"
 
 
+/* This should be replaced by the implementation in megadriv.c or by specific input code */
+static UINT16 *genesis_io_ram;
+static int z80running;
+
+static WRITE16_HANDLER( genesis_io_w )
+{
+//  logerror ("write io offset :%02x data %04x PC: 0x%06x\n",offset,data,cpu_get_previouspc(space->cpu));
+	switch (offset)
+	{
+		case 0x00:
+		/*??*/
+		break;
+
+		case 0x01:/* port A data */
+		case 0x02: /* port B data */
+		case 0x03: /* port C data */
+			genesis_io_ram[offset] = (data & (genesis_io_ram[offset + 3])) | (genesis_io_ram[offset] & ~(genesis_io_ram[offset + 3]));
+			break;
+
+		case 0x04: /* port A control */
+		case 0x05: /* port B control */
+		case 0x06: /* port C control */
+		case 0x07: /* port A TxData */
+			genesis_io_ram[offset] = data;
+			break;
+
+		default:
+			genesis_io_ram[offset] = data;
+	}
+}
+
+static WRITE16_HANDLER( genesis_ctrl_w )
+{
+	data &= mem_mask;
+
+/*  logerror("genesis_ctrl_w %x, %x\n", offset, data); */
+
+	switch (offset)
+	{
+	case 0:							/* set DRAM mode... we have to ignore this for production cartridges */
+		return;
+	case 0x80:						/* Z80 BusReq */
+		if (data == 0x100)
+		{
+			z80running = 0;
+			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);	/* halt Z80 */
+			/* logerror("z80 stopped by 68k BusReq\n"); */
+		}
+		else
+		{
+			z80running = 1;
+
+			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, CLEAR_LINE);
+			/* logerror("z80 started, BusReq ends\n"); */
+		}
+		return;
+	case 0x100:						/* Z80 CPU Reset */
+		if (data == 0x00)
+		{
+			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
+			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_RESET, PULSE_LINE);
+
+			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
+			/* logerror("z80 reset, ram is %p\n", &genesis_z80_ram[0]); */
+			z80running = 0;
+			return;
+		}
+		else
+		{
+			/* logerror("z80 out of reset\n"); */
+		}
+		return;
+	}
+}
+
+
 static INPUT_PORTS_START( topshoot ) /* Top Shooter Input Ports */
 	PORT_START("IN0")	/* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) )

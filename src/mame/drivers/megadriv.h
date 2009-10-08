@@ -3,17 +3,19 @@ extern DRIVER_INIT( megadrie );
 extern DRIVER_INIT( megadriv );
 extern DRIVER_INIT( megadrij );
 extern DRIVER_INIT( _32x );
+extern DRIVER_INIT( mpnew );
 
-INPUT_PORTS_EXTERN(megadriv);
-INPUT_PORTS_EXTERN(aladbl);
-INPUT_PORTS_EXTERN(megadri6);
-INPUT_PORTS_EXTERN(ssf2ghw);
-INPUT_PORTS_EXTERN(megdsvp);
+INPUT_PORTS_EXTERN( md_common );
+INPUT_PORTS_EXTERN( megadriv );
+INPUT_PORTS_EXTERN( aladbl );
+INPUT_PORTS_EXTERN( megadri6 );
+INPUT_PORTS_EXTERN( ssf2ghw );
+INPUT_PORTS_EXTERN( megdsvp );
 
 MACHINE_DRIVER_EXTERN( megdsvppal );
-MACHINE_DRIVER_EXTERN(megadriv);
-MACHINE_DRIVER_EXTERN(megadpal);
-MACHINE_DRIVER_EXTERN(megdsvp);
+MACHINE_DRIVER_EXTERN( megadriv );
+MACHINE_DRIVER_EXTERN( megadpal );
+MACHINE_DRIVER_EXTERN( megdsvp );
 MACHINE_DRIVER_EXTERN( genesis_32x );
 MACHINE_DRIVER_EXTERN( genesis_32x_pal );
 MACHINE_DRIVER_EXTERN( genesis_scd );
@@ -32,6 +34,7 @@ extern READ8_HANDLER (megatech_sms_ioport_dd_r);
 
 extern READ16_HANDLER( megadriv_vdp_r );
 extern WRITE16_HANDLER( megadriv_vdp_w );
+
 
 MACHINE_RESET( megadriv );
 VIDEO_START( megadriv );
@@ -56,3 +59,49 @@ extern int segac2_sp_pal_lookup[4];
 extern int genvdp_use_cram;
 extern int genesis_always_irq6;
 extern int genesis_other_hacks;
+
+
+// megaplay & megatech
+
+READ8_HANDLER( megaplay_bios_6402_r );
+WRITE8_HANDLER( megaplay_bios_6402_w );
+READ8_HANDLER( megaplay_bios_6204_r );
+WRITE8_HANDLER( megaplay_bios_width_w );
+WRITE16_HANDLER( megaplay_io_write );
+READ16_HANDLER( megaplay_io_read );
+
+/* Megaplay BIOS specific */
+#define MP_ROM  0x10
+#define MP_GAME 0
+
+struct _mplay_bios	/* once all the regs are saved in this structure, it would be better to reorganize it a bit... */
+{
+	UINT32 bios_mode;  // determines whether ROM banks or Game data
+								   // is to read from 0x8000-0xffff
+
+	UINT32 bios_bank; // ROM bank selection
+	UINT16 game_banksel;  // Game bank selection
+	UINT32 readpos;  // serial bank selection position (9-bit)
+	UINT32 mp_bios_bank_addr;
+
+	UINT32 bios_width;  // determines the way the game info ROM is read
+	UINT8 bios_ctrl[6];
+	UINT8 bios_6600;
+	UINT8 bios_6403;
+	UINT8 bios_6404;
+};
+
+extern struct _mplay_bios mplay_bios;	// defined in megaplay.c
+
+struct _mtech_bios	/* once all the regs are saved in this structure, it would be better to reorganize it a bit... */
+{
+	UINT8 mt_cart_select_reg;
+	UINT32 bios_port_ctrl;
+	int current_game_is_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
+	UINT32 bios_ctrl_inputs;
+	UINT8 bios_ctrl[6];
+
+	int mt_bank_bank_pos;
+	int mt_bank_partial;
+	int mt_bank_addr;
+};

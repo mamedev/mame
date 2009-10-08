@@ -172,73 +172,6 @@ MACHINE_RESET( genesis )
 	timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 320), 0);
 }
 
-
-/* from MESS */
-READ16_HANDLER(genesis_ctrl_r)
-{
-/*  int returnval; */
-
-/*  logerror("genesis_ctrl_r %x\n", offset); */
-	switch (offset)
-	{
-	case 0:							/* DRAM mode is write only */
-		return 0xffff;
-	case 0x80:						/* return Z80 CPU Function Stop Accessible or not */
-		/* logerror("Returning z80 state\n"); */
-		return (z80running ? 0x0100 : 0x0);
-	case 0x100:						/* Z80 CPU Reset - write only */
-		return 0xffff;
-	}
-	return 0x00;
-
-}
-
-/* from MESS */
-WRITE16_HANDLER(genesis_ctrl_w)
-{
-	data &= mem_mask;
-
-/*  logerror("genesis_ctrl_w %x, %x\n", offset, data); */
-
-	switch (offset)
-	{
-	case 0:							/* set DRAM mode... we have to ignore this for production cartridges */
-		return;
-	case 0x80:						/* Z80 BusReq */
-		if (data == 0x100)
-		{
-			z80running = 0;
-			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);	/* halt Z80 */
-			/* logerror("z80 stopped by 68k BusReq\n"); */
-		}
-		else
-		{
-			z80running = 1;
-//          memory_set_bankptr(space->machine, 1, &genesis_z80_ram[0]);
-
-			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, CLEAR_LINE);
-			/* logerror("z80 started, BusReq ends\n"); */
-		}
-		return;
-	case 0x100:						/* Z80 CPU Reset */
-		if (data == 0x00)
-		{
-			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
-			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_RESET, PULSE_LINE);
-
-			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
-			/* logerror("z80 reset, ram is %p\n", &genesis_z80_ram[0]); */
-			z80running = 0;
-			return;
-		}
-		else
-		{
-			/* logerror("z80 out of reset\n"); */
-		}
-		return;
-	}
-}
-
 READ16_HANDLER ( genesis_68k_to_z80_r )
 {
 	offset *= 2;
@@ -250,58 +183,6 @@ READ16_HANDLER ( genesis_68k_to_z80_r )
 		offset &=0x1fff;
 //      logerror("soundram_r returning %x\n",(gen_z80_shared[offset] << 8) + gen_z80_shared[offset+1]);
 		return (genesis_z80_ram[offset] << 8) + genesis_z80_ram[offset+1];
-	}
-
-
-	/* YM2610 */
-	if ((offset >= 0x4000) && (offset <= 0x5fff))
-	{
-		if (ACCESSING_BITS_0_7)
-			offset += 1;
-		return ym3438_r(devtag_get_device(space->machine, "ym"), offset);
-	}
-
-	/* Bank Register */
-	if ((offset >= 0x6000) && (offset <= 0x60ff))
-	{
-
-	}
-
-	/* Unused / Illegal */
-	if ((offset >= 0x6100) && (offset <= 0x7eff))
-	{
-		/* nothing */
-	}
-
-	/* VDP */
-	if ((offset >= 0x7f00) && (offset <= 0x7fff))
-	{
-
-	}
-
-	return 0x0000;
-}
-
-
-READ16_HANDLER ( megaplay_68k_to_z80_r )
-{
-	offset *= 2;
-	offset &= 0x7fff;
-
-	/* Shared Ram */
-	if ((offset >= 0x0000) && (offset <= 0x1fff))
-	{
-		offset &=0x1fff;
-//      logerror("soundram_r returning %x\n",(gen_z80_shared[offset] << 8) + gen_z80_shared[offset+1]);
-		return (genesis_z80_ram[offset] << 8) + genesis_z80_ram[offset+1];
-	}
-
-	if ((offset >= 0x2000) && (offset <= 0x3fff))
-	{
-		offset &=0x1fff;
-//      if(offset == 0)     /* this read handler was used around MAME0.82 to read DSWB. Now it's (DSW0 & 0xff) */
-//          return (input_port_read(space->machine, "DSW0") << 8) ^ 0xff00;
-		return (ic36_ram[offset] << 8) + ic36_ram[offset+1];
 	}
 
 
@@ -416,55 +297,6 @@ $A1001D Port C RxData
 $A1001F Port C serial control
 
 */
-
-UINT16 *genesis_io_ram;
-
-/* This handler is still used in hshavoc.c & topshoot.c ;   */
-/* megaplay.c uses a local copy 'OLD_megaplay_genesis_io_w' */
-WRITE16_HANDLER ( genesis_io_w )
-{
-//  logerror ("write io offset :%02x data %04x PC: 0x%06x\n",offset,data,cpu_get_previouspc(space->cpu));
-
-	switch (offset)
-	{
-		case 0x00:
-		/*??*/
-		break;
-
-		case 0x01:/* port A data */
-		genesis_io_ram[offset] = (data & (genesis_io_ram[0x04])) | (genesis_io_ram[offset] & ~(genesis_io_ram[0x04]));
-		break;
-
-		case 0x02: /* port B data */
-		genesis_io_ram[offset] = (data & (genesis_io_ram[0x05])) | (genesis_io_ram[offset] & ~(genesis_io_ram[0x05]));
-		break;
-
-		case 0x03: /* port C data */
-		genesis_io_ram[offset] = (data & (genesis_io_ram[0x06])) | (genesis_io_ram[offset] & ~(genesis_io_ram[0x06]));
-		bios_6204 = data & 0x07;
-		break;
-
-		case 0x04: /* port A control */
-		genesis_io_ram[offset] = data;
-		break;
-
-		case 0x05: /* port B control */
-		genesis_io_ram[offset] = data;
-		break;
-
-		case 0x06: /* port C control */
-		genesis_io_ram[offset] = data;
-		break;
-
-		case 0x07: /* port A TxData */
-		genesis_io_ram[offset] = data;
-		break;
-
-		default:
-		genesis_io_ram[offset] = data;
-	}
-
-}
 
 #if 0
 static ADDRESS_MAP_START( genesis_map, ADDRESS_SPACE_PROGRAM, 16 )

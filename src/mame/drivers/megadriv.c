@@ -1484,7 +1484,7 @@ void (*megadrive_io_write_data_port_ptr)(running_machine *machine, int offset, U
 
 */
 
-static INPUT_PORTS_START( md_common )
+INPUT_PORTS_START( md_common )
 	PORT_START("PAD1")		/* Joypad 1 (3 button + start) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -1920,7 +1920,6 @@ static void megadrive_io_write_sctrl_port(running_machine *machine, int portnum,
 }
 
 
-
 static WRITE16_HANDLER( megadriv_68k_io_write )
 {
 //  mame_printf_debug("IO Write #%02x data %04x mem_mask %04x\n",offset,data,mem_mask);
@@ -2326,6 +2325,51 @@ static ADDRESS_MAP_START( megadriv_z80_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000 , 0xff) AM_NOP
 ADDRESS_MAP_END
+
+
+/***************************** Megaplay *****************************/
+/* Megaplay BIOS handles regs[2] at start in a different way.       */
+/* other io data/ctrl regs are dealt with exactly like in megadrive */
+
+READ8_HANDLER( megaplay_bios_6402_r )
+{
+	return megadrive_io_data_regs[2];// & 0xfe;
+}
+
+WRITE8_HANDLER( megaplay_bios_6402_w )
+{
+	megadrive_io_data_regs[2] = (megadrive_io_data_regs[2] & 0x07) | ((data & 0x70) >> 1);
+//  logerror("BIOS: 0x6402 write: 0x%02x\n", data);
+}
+
+READ8_HANDLER( megaplay_bios_6204_r )
+{
+	return (megadrive_io_data_regs[2]);
+//  return (mplay_bios.bios_width & 0xf8) + (mplay_bios.bios_6204 & 0x07);
+}
+
+WRITE8_HANDLER( megaplay_bios_width_w )
+{
+	mplay_bios.bios_width = data;
+	megadrive_io_data_regs[2] = (megadrive_io_data_regs[2] & 0x07) | ((data & 0xf8));
+//  logerror("BIOS: 0x6204 - Width write: %02x\n", data);
+}
+
+WRITE16_HANDLER( megaplay_io_write )
+{
+	if (offset == 0x03)
+		megadrive_io_data_regs[2] = (data & megadrive_io_ctrl_regs[2]) | (megadrive_io_data_regs[2] & ~megadrive_io_ctrl_regs[2]);
+	else
+		megadriv_68k_io_write(space, offset & 0x1f, data, 0xffff);
+}
+
+READ16_HANDLER( megaplay_io_read )
+{
+	if (offset == 0x03)
+		return megadrive_io_data_regs[2];
+	else
+		return megadriv_68k_io_read(space, offset & 0x1f, 0xffff);
+}
 
 /****************************************** 32X related ******************************************/
 
@@ -6344,6 +6388,12 @@ DRIVER_INIT( megadrie )
 	hazemdchoice_megadriv_framerate = 50;
 }
 
+DRIVER_INIT( mpnew )
+{
+	DRIVER_INIT_CALL(megadrij);
+	megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_3button;
+	megadrive_io_write_data_port_ptr = megadrive_io_write_data_port_3button;
+}
 
 /* used by megatech */
 static READ8_HANDLER( z80_unmapped_port_r )
