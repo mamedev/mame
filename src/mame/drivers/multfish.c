@@ -1,13 +1,70 @@
-/* 'Multifish' hardware
+/*
 
-  four ALTERA chips - they are probably video processors
-  main CPU is z80 for sure, ROM is placed near it
-  there are banked ROMs 8kb each, consisted of several banks
+   Igrosoft gambling hardware
+
+   +--+ +-----+ +-----------------------------------+
++--+  +-+PRINT+-+                                   |
+|            +--------------+                       |
+|            |     Z80B     |                       |
+|      VOL   +----+---------+                       |
++-+ +-----------+ | PRG ROM |                       |
+  | |  KC89C72  | +---------+                       |
++-+ +-----------+ | M48T35Y |  24MHz                -+
+|                 +---------+                ADM690 V|
+|                |---Connector------------------|   G|
+|E                                                  A|
+|d                                                  -+
+|g                                                  |
+|e                                                  |
+|                                                   |
+|C                                                  |
+|o                                                  |
+|n                                                  |
+|n                                                  |
+|e                                                  |
+|c                           Connector              |
+|t               |---Connector------------------|   |
+|o           +------+ +------+ +------+ +------+    |
+|r           |ALTERA| |ALTERA| |ALTERA| |ALTERA| R  |
+|            | EPM  | | EPM  | | EPM  | | EPM  | A  |
+|            | 3032 | | 3032 | | 3032 | | 3032 | M  |
+|            +------+ +------+ +------+ +------+    |
++-+ +---+ +---+ +---+ +---+ +---+ +---+ +---+ +---+ |
+  | |   | |   | |   | |   | |   | |   | |   | |   | |
++-+ | 8 | | 7 | | 6 | | 5 | | 4 | | 3 | | 2 | | 1 | |
+|   |   | |   | |   | |   | |   | |   | |   | |   | |
+|   |   | |   | |   | |   | |   | |   | |   | |   | |
+|   +---+ +---+ +---+ +---+ +---+ +---+ +---+ +---+ |
++---------------------------------------------------+
+
+"Head" sub board:
++------------------------------+
+||--Connector-----------------||
+|            61256AK-15        |
+|                              |
+|          +---------+         |
+|          | ALTERA  |         |
+|          |   MAX   |         |
+|          | EPM3256 |         |
+|          |         |         |
+|          +---------+         |
+|                              |
+|           Connector          |
+||--Connector-----------------||
++------------------------------+
+
+  CPU: Z80
+Video: ALTERA EPM3032ALC44-10 (x4) + ALTERA MAX EPM3256AOC208-10 (on the HEAD sub board)
+Sound: File KC98C72 (compatible to YM2149 / AY3-9810)
+  OSC: 24MHz
+  RAM: UMC UM61256AK-15 (x2 on mainboard, one on the HEAD)
+NVRAM: Timekeeper M48T35-70PC1
+Other: ADM ADM690AN (Microprocessor Supervisory Circuit AKA Watchdog timer)
+       VGA connector for video output
+
+Edge Connector is 36 count dual (IE: both sides) JAMMA-like connection (standard 8-liner??)
+
   RAM has E000 address
-  the sound is PSG - AY3-8910 analog (http://pt.wikipedia.org/wiki/KC89C72)
-  z80 CPU is complete with indexed registers
-  video - VGA
-  RTC+NVRAM - M48T35Y Timekeeper
 
   To Init the games
 
