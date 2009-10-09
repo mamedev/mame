@@ -551,10 +551,11 @@ static ADDRESS_MAP_START( multfish_portmap, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0x90, 0x90) AM_READ(ray_r)
 
-	AM_RANGE(0xe1, 0xe1)  AM_WRITE(multfish_bank_w)
-	AM_RANGE(0xe5, 0xe5)  AM_WRITE(multfish_bank_w)
-	AM_RANGE(0xe8, 0xe8)  AM_WRITE(multfish_bank_w) // mirror banking for some games
-	AM_RANGE(0xea, 0xea)  AM_WRITE(multfish_bank_w) // mirror banking for some games
+	AM_RANGE(0xd0, 0xd0)  AM_WRITE(multfish_bank_w) // rollfr_3a banking
+	AM_RANGE(0xe1, 0xe1)  AM_WRITE(multfish_bank_w) // Island 2 banking
+	AM_RANGE(0xe5, 0xe5)  AM_WRITE(multfish_bank_w) // Gnome banking
+	AM_RANGE(0xe8, 0xe8)  AM_WRITE(multfish_bank_w) // Sweet Life 2 banking
+	AM_RANGE(0xea, 0xea)  AM_WRITE(multfish_bank_w) // Fruit Cocktail 2 banking
 
 	AM_RANGE(0xf1, 0xf1)  AM_WRITE(multfish_rambank_w)
 	AM_RANGE(0xf3, 0xf3)  AM_WRITE(multfish_f3_w) // from 00->01 at startup, irq enable maybe?
@@ -686,7 +687,7 @@ ROM_START( mfish_3 ) // 021124
 	ROM_LOAD( "8", 0x380000, 0x80000, CRC(29f1a326) SHA1(5e268411cab888c0727aaf8ae7d0b435d2efd189) )
 ROM_END
 
-ROM_START( mfish_3a ) // 021124
+ROM_START( mfish_3a ) // 021124 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf021124a.rom", 0x00000, 0x40000, CRC(31344b4e) SHA1(33c7f30b55d22c087a02e840456d475177df8bf1) ) /* Not officially listed on Igrosoft's web site hash page */
 
@@ -838,7 +839,7 @@ ROM_START( mfish_12 ) // 040308
 	ROM_LOAD( "8", 0x380000, 0x80000, CRC(29f1a326) SHA1(5e268411cab888c0727aaf8ae7d0b435d2efd189) )
 ROM_END
 
-ROM_START( mfish_12a ) // 040308
+ROM_START( mfish_12a ) // 040308 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf040308a.rom", 0x00000, 0x40000, CRC(44537648) SHA1(7bce6085778ff0b21c052ae91703de3b78b8eed0) ) /* Not officially listed on Igrosoft's web site hash page */
 
@@ -873,7 +874,7 @@ ROM_END
 /*********************************************************
    Crazy Monkey
 
-    Roms 1-4 were changed after the 070315 update.
+	Roms 1-4 were changed after the 070315 update.
         The official list of hashes shows the 070315 updated roms.
 
 **********************************************************/
@@ -985,7 +986,7 @@ ROM_START( crzmon_7 ) // 031110
 	ROM_LOAD( "8",  0x380000, 0x80000, CRC(6fdb6fd5) SHA1(f40916112365de258956ec033aff79aae1f58690) )
 ROM_END
 
-ROM_START( crzmon_7a ) // 031110
+ROM_START( crzmon_7a ) // 031110 backdoor
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "cm031110a.rom", 0x00000, 0x40000, CRC(80666246) SHA1(e15a210b11ba769ca4fd637c962932417555dc0e) ) /* Not officially listed on Igrosoft's web site hash page */
 
@@ -1000,7 +1001,7 @@ ROM_START( crzmon_7a ) // 031110
 	ROM_LOAD( "8",  0x380000, 0x80000, CRC(6fdb6fd5) SHA1(f40916112365de258956ec033aff79aae1f58690) )
 ROM_END
 
-ROM_START( crzmon_7b ) // 031110
+ROM_START( crzmon_7b ) // 031110 backdoor
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "cm031110b.rom", 0x00000, 0x40000, CRC(bb6f4f85) SHA1(a2f44632f857392eb422412b55a19decae4c8620) ) /* Not officially listed on Igrosoft's web site hash page */
 
@@ -1030,9 +1031,24 @@ ROM_START( crzmon_8 ) // 050120
 	ROM_LOAD( "8",  0x380000, 0x80000, CRC(6fdb6fd5) SHA1(f40916112365de258956ec033aff79aae1f58690) )
 ROM_END
 
-ROM_START( crzmon_8a ) // 050120
+ROM_START( crzmon_8a ) // 050120 backdoor
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "cm050120a.rom", 0x00000, 0x40000, CRC(e20a6997) SHA1(50e0f0f354dd6db2be64d42e36b4043915c4276b) ) /* Not officially listed on Igrosoft's web site hash page */
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1a", 0x000000, 0x80000, CRC(683f2be3) SHA1(6fdba4ec07752bf049787a11638895352e9d5f10) )
+	ROM_LOAD( "2a", 0x100000, 0x80000, CRC(e21ce6a4) SHA1(942ffe323ddbcaaad887cb5bc9f356550926083b) )
+	ROM_LOAD( "3a", 0x200000, 0x80000, CRC(c3d0e3d5) SHA1(5b0cb436c6b0bac1213c1df56702fa7f16856106) )
+	ROM_LOAD( "4a", 0x300000, 0x80000, CRC(f79df52c) SHA1(b99fa9f61849b62668bf9edff1c80212a9108b15) )
+	ROM_LOAD( "5",  0x080000, 0x80000, CRC(9d4d2a94) SHA1(c714e110de628b343dfc7fff23befaa1276056a9) )
+	ROM_LOAD( "6",  0x180000, 0x80000, CRC(a15f0fee) SHA1(3f06d5a1a41e1335bcc7586a5ea95b9b734155c0) )
+	ROM_LOAD( "7",  0x280000, 0x80000, CRC(715a2528) SHA1(6c4c72592568ecbaa9518fb7271d2714dd22dbbb) )
+	ROM_LOAD( "8",  0x380000, 0x80000, CRC(6fdb6fd5) SHA1(f40916112365de258956ec033aff79aae1f58690) )
+ROM_END
+
+ROM_START( crzmon_8b ) // 050120 changed version text to 070315
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "cm050120b.rom", 0x00000, 0x40000, CRC(9350d184) SHA1(ccb79bb6c5e9025d64fe07c02334c43d75ee3334) ) /* Not officially listed on Igrosoft's web site hash page */
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "1a", 0x000000, 0x80000, CRC(683f2be3) SHA1(6fdba4ec07752bf049787a11638895352e9d5f10) )
@@ -1145,7 +1161,7 @@ ROM_START( fcockt_6 ) // 040216
 	ROM_LOAD( "8b", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
 ROM_END
 
-ROM_START( fcockt_6a ) // 040216
+ROM_START( fcockt_6a ) // 040216 bank F8
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "fc040216a.rom", 0x00000, 0x40000, CRC(58e7a0c6) SHA1(8022f92af05e9ff6999ff936bad6048d6c264086) ) /* Not officially listed on Igrosoft's web site hash page */
 
@@ -1160,7 +1176,7 @@ ROM_START( fcockt_6a ) // 040216
 	ROM_LOAD( "8b", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
 ROM_END
 
-ROM_START( fcockt_6b ) // 040216
+ROM_START( fcockt_6b ) // 040216 backdoor
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "fc040216b.rom", 0x00000, 0x40000, CRC(0f6bcf03) SHA1(6c8765f836f1d899aec3be9c842d5064fd70a435) ) /* Not officially listed on Igrosoft's web site hash page */
 
@@ -1190,7 +1206,7 @@ ROM_START( fcockt_7 ) // 050118
 	ROM_LOAD( "8b", 0x380000, 0x80000, CRC(d282e42e) SHA1(eac9c3eaef39b1805f863ade5da47d6274d20a55) )
 ROM_END
 
-ROM_START( fcockt_7a ) // 050118
+ROM_START( fcockt_7a ) // 050118 backdoor
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "fc050118a.rom", 0x00000, 0x40000, CRC(eb2bd908) SHA1(b8e9ef469767fb9e95ff181876ffeaee4b7b9361) ) /* Not officially listed on Igrosoft's web site hash page */
 
@@ -1290,7 +1306,7 @@ ROM_START( lhaunt_4 ) // 031111
 	ROM_LOAD( "8",  0x380000, 0x80000, CRC(1bdf6252) SHA1(7b5ae82a95a744b236e109024d47b526dccf9c14) )
 ROM_END
 
-ROM_START( lhaunt_4a ) // 031111
+ROM_START( lhaunt_4a ) // 031111 backdoor
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "lh031111a.rom", 0x00000, 0x40000, CRC(83d487c9) SHA1(5b88745d06acba542e2d0660298c9058f2bdfa3f) ) /* Not officially listed on Igrosoft's web site hash page */
 
@@ -1320,7 +1336,7 @@ ROM_START( lhaunt_5 ) // 040216
 	ROM_LOAD( "8",  0x380000, 0x80000, CRC(1bdf6252) SHA1(7b5ae82a95a744b236e109024d47b526dccf9c14) )
 ROM_END
 
-ROM_START( lhaunt_5a ) // 040216
+ROM_START( lhaunt_5a ) // 040216 backdoor
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "lh040216a.rom", 0x00000, 0x40000, CRC(2a6c7ff9) SHA1(4a0137c7df5003e8fd843d5489d416d15f001f46) ) /* Not officially listed on Igrosoft's web site hash page */
 
@@ -1350,7 +1366,7 @@ ROM_START( lhaunt_6 ) // 040825
 	ROM_LOAD( "8",  0x380000, 0x80000, CRC(1bdf6252) SHA1(7b5ae82a95a744b236e109024d47b526dccf9c14) )
 ROM_END
 
-ROM_START( lhaunt_6a ) // 040825
+ROM_START( lhaunt_6a ) // 040825 backdoor
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "lh040825a.rom", 0x00000, 0x40000, CRC(18ba5704) SHA1(3c77ed129db0e5181217167b76292f8e4ee78728) ) /* Not officially listed on Igrosoft's web site hash page */
 
@@ -1435,7 +1451,7 @@ ROM_START( garage_4 ) // 040219.
 	ROM_LOAD( "8",  0x380000, 0x80000, CRC(90c5416b) SHA1(583bfb517bc2e30d7b7903aa19fc3b4b5188d7d2) )
 ROM_END
 
-ROM_START( garage_4a ) // 040219.
+ROM_START( garage_4a ) // 040219 backdoor
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "gg040219a.rom", 0x00000, 0x40000, CRC(e16b213a) SHA1(af0d78116d985efe5f09eb86eb67df2535765527) ) /* Not officially listed on Igrosoft's web site hash page */
 
@@ -1450,7 +1466,22 @@ ROM_START( garage_4a ) // 040219.
 	ROM_LOAD( "8",  0x380000, 0x80000, CRC(90c5416b) SHA1(583bfb517bc2e30d7b7903aa19fc3b4b5188d7d2) )
 ROM_END
 
-ROM_START( garage_5 ) // 050311.
+ROM_START( garage_4b ) // 040219 changed version text to 070329
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "gg040219b.rom", 0x00000, 0x40000, CRC(b8ebf3b6) SHA1(14c5263571123d251125723b32861bef578de67b) ) /* Not officially listed on Igrosoft's web site hash page */
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1a", 0x000000, 0x80000, CRC(57acd4bc) SHA1(8796f463787c359cce6ac09c1b6895f871bbb7c9) )
+	ROM_LOAD( "2a", 0x100000, 0x80000, CRC(6d591fa3) SHA1(ddbdf87e0e88dc848b963fbfcb6e14d7b3b9efdc) )
+	ROM_LOAD( "3a", 0x200000, 0x80000, CRC(6a15eeda) SHA1(ac35a20893b0518a159207401f6b7f58e3de45fa) )
+	ROM_LOAD( "4a", 0x300000, 0x80000, CRC(38f2cd3c) SHA1(5a4463ac352e4e340c6aaa61102841541e9f4c48) )
+	ROM_LOAD( "5",  0x080000, 0x80000, CRC(5bf85bc5) SHA1(ff9d2b9cbcd2af6f5fda972e387820d830c196a9) )
+	ROM_LOAD( "6",  0x180000, 0x80000, CRC(e5082b26) SHA1(6547409d39dd51498ce8e3f82ff813a8ac3c6522) )
+	ROM_LOAD( "7",  0x280000, 0x80000, CRC(dfa2ceb1) SHA1(ec7de8a8f6e7785a563df973841cc1f1603f79fc) )
+	ROM_LOAD( "8",  0x380000, 0x80000, CRC(90c5416b) SHA1(583bfb517bc2e30d7b7903aa19fc3b4b5188d7d2) )
+ROM_END
+
+ROM_START( garage_5 ) // 050311
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "gg050311.rom", 0x00000, 0x40000, CRC(405aee88) SHA1(356a8c309434ae4ad6b6fab97aeaece8aa60a730) )
 
@@ -1465,7 +1496,7 @@ ROM_START( garage_5 ) // 050311.
 	ROM_LOAD( "8",  0x380000, 0x80000, CRC(90c5416b) SHA1(583bfb517bc2e30d7b7903aa19fc3b4b5188d7d2) )
 ROM_END
 
-ROM_START( garage_5a ) // 050311.
+ROM_START( garage_5a ) // 050311 backdoor
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "gg050311a.rom", 0x00000, 0x40000, CRC(874a2c27) SHA1(9bf586314f375c2c6f7d79557cc777ac3559cb64) ) /* Not officially listed on Igrosoft's web site hash page */
 
@@ -1587,6 +1618,21 @@ ROM_END
 ROM_START( sweetla ) // 041220
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "sl041220a.rom", 0x00000, 0x40000, CRC(920fd9fe) SHA1(0b5ad099ae4c8e3ba0f99baf8fc9322cae24e9d2) ) /* Not officially listed on Igrosoft's web site hash page */
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1", 0x000000, 0x80000, CRC(a096c786) SHA1(81f6b083cb089e9412a8506889196354c670d945) )
+	ROM_LOAD( "2", 0x100000, 0x80000, CRC(c5e1e22c) SHA1(973ad27681a0f3beee7084b1b85fc9deb79d638e) )
+	ROM_LOAD( "3", 0x200000, 0x80000, CRC(af335323) SHA1(b8afdce231a8ec0f313cc47e00a27f05461bbbc4) )
+	ROM_LOAD( "4", 0x300000, 0x80000, CRC(a35c7503) SHA1(78f7a868660bbaa066e8e9e341db52018aaf3af1) )
+	ROM_LOAD( "5", 0x080000, 0x80000, CRC(e2d6b632) SHA1(65d05e55671b8c335cae2dfbf6a6f5bd8cc90e2c) )
+	ROM_LOAD( "6", 0x180000, 0x80000, CRC(d34e0905) SHA1(cc4afe64fb9052a31f759be41ff07a727e0a9093) )
+	ROM_LOAD( "7", 0x280000, 0x80000, CRC(978b67bb) SHA1(87357d5832588f00272bd76df736c06c599f3853) )
+	ROM_LOAD( "8", 0x380000, 0x80000, CRC(75954355) SHA1(e6ef2b70d859b61e8e3d1751de8558b8778e502d) )
+ROM_END
+
+ROM_START( sweetlb ) // 041220 bank F9, changed version text to 070412
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "sl041220b.rom", 0x00000, 0x40000, CRC(53f1a0e1) SHA1(a00a8e8d95bd2be27313c1421d40120ee79ff29d) ) /* Not officially listed on Igrosoft's web site hash page */
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "1", 0x000000, 0x80000, CRC(a096c786) SHA1(81f6b083cb089e9412a8506889196354c670d945) )
@@ -1833,6 +1879,81 @@ ROM_START( pirate2 ) // 061005
 	ROM_LOAD( "8", 0x380000, 0x80000, CRC(40c59448) SHA1(774af0f376864ec5948904df338bc7493eaed392) )
 ROM_END
 
+ROM_START( pirate2a ) // 061005 bank F9
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "pr2_061005a.rom", 0x00000, 0x40000, CRC(2271eb23) SHA1(6a3e01b59df08a23e5f53ee9b9e473b9f5f5e3b6) ) /* Not officially listed on Igrosoft's web site hash page */
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1", 0x000000, 0x80000, CRC(106e7cba) SHA1(289a3ae38b895c83600c920bee0c2dd46e941eac) )
+	ROM_LOAD( "2", 0x100000, 0x80000, CRC(076a290f) SHA1(2f9bb74e081262e535c8ed9a31589d6a919f5d15) )
+	ROM_LOAD( "3", 0x200000, 0x80000, CRC(13a91fe7) SHA1(6e127b3827a9271ad19986714747be9367125f62) )
+	ROM_LOAD( "4", 0x300000, 0x80000, CRC(5ac8c531) SHA1(1da91b9a71a9a8681577342660bfa85e5bbc99bc) )
+	ROM_LOAD( "5", 0x080000, 0x80000, CRC(98012c74) SHA1(2a5b466353eef3a5cfc9f98eceb7523b00d0204a) )
+	ROM_LOAD( "6", 0x180000, 0x80000, CRC(366e1465) SHA1(440230d5306c4b424f27839b7fb9c8a5bb922dcc) )
+	ROM_LOAD( "7", 0x280000, 0x80000, CRC(21fb963e) SHA1(e3f7fb13f326699e34aebcc3ee07016f7cfe6e46) )
+	ROM_LOAD( "8", 0x380000, 0x80000, CRC(40c59448) SHA1(774af0f376864ec5948904df338bc7493eaed392) )
+ROM_END
+
+ROM_START( pirate2b ) // 061005 bank F9, skip raster beam position check
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "pr2_061005b.rom", 0x00000, 0x40000, CRC(379f890e) SHA1(0fd05c1bf08fd3e6694f18ffe2ea9741cf465617) ) /* Not officially listed on Igrosoft's web site hash page */
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1", 0x000000, 0x80000, CRC(106e7cba) SHA1(289a3ae38b895c83600c920bee0c2dd46e941eac) )
+	ROM_LOAD( "2", 0x100000, 0x80000, CRC(076a290f) SHA1(2f9bb74e081262e535c8ed9a31589d6a919f5d15) )
+	ROM_LOAD( "3", 0x200000, 0x80000, CRC(13a91fe7) SHA1(6e127b3827a9271ad19986714747be9367125f62) )
+	ROM_LOAD( "4", 0x300000, 0x80000, CRC(5ac8c531) SHA1(1da91b9a71a9a8681577342660bfa85e5bbc99bc) )
+	ROM_LOAD( "5", 0x080000, 0x80000, CRC(98012c74) SHA1(2a5b466353eef3a5cfc9f98eceb7523b00d0204a) )
+	ROM_LOAD( "6", 0x180000, 0x80000, CRC(366e1465) SHA1(440230d5306c4b424f27839b7fb9c8a5bb922dcc) )
+	ROM_LOAD( "7", 0x280000, 0x80000, CRC(21fb963e) SHA1(e3f7fb13f326699e34aebcc3ee07016f7cfe6e46) )
+	ROM_LOAD( "8", 0x380000, 0x80000, CRC(40c59448) SHA1(774af0f376864ec5948904df338bc7493eaed392) )
+ROM_END
+
+ROM_START( pirate2c ) // 061005 bank F9, changed version text to 070126
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "pr2_061005c.rom", 0x00000, 0x40000, CRC(7c4339df) SHA1(80e2f97629bc963f044c1697c65777a3fd038edc) ) /* Not officially listed on Igrosoft's web site hash page */
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1", 0x000000, 0x80000, CRC(106e7cba) SHA1(289a3ae38b895c83600c920bee0c2dd46e941eac) )
+	ROM_LOAD( "2", 0x100000, 0x80000, CRC(076a290f) SHA1(2f9bb74e081262e535c8ed9a31589d6a919f5d15) )
+	ROM_LOAD( "3", 0x200000, 0x80000, CRC(13a91fe7) SHA1(6e127b3827a9271ad19986714747be9367125f62) )
+	ROM_LOAD( "4", 0x300000, 0x80000, CRC(5ac8c531) SHA1(1da91b9a71a9a8681577342660bfa85e5bbc99bc) )
+	ROM_LOAD( "5", 0x080000, 0x80000, CRC(98012c74) SHA1(2a5b466353eef3a5cfc9f98eceb7523b00d0204a) )
+	ROM_LOAD( "6", 0x180000, 0x80000, CRC(366e1465) SHA1(440230d5306c4b424f27839b7fb9c8a5bb922dcc) )
+	ROM_LOAD( "7", 0x280000, 0x80000, CRC(21fb963e) SHA1(e3f7fb13f326699e34aebcc3ee07016f7cfe6e46) )
+	ROM_LOAD( "8", 0x380000, 0x80000, CRC(40c59448) SHA1(774af0f376864ec5948904df338bc7493eaed392) )
+ROM_END
+
+ROM_START( pirate2d ) // 061005 bank F9, changed version text to 070126
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "pr2_061005d.rom", 0x00000, 0x40000, CRC(16620bb2) SHA1(bf3a26b06595e51fa37f2f8099a12e906a6ca439) ) /* Not officially listed on Igrosoft's web site hash page */
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1", 0x000000, 0x80000, CRC(106e7cba) SHA1(289a3ae38b895c83600c920bee0c2dd46e941eac) )
+	ROM_LOAD( "2", 0x100000, 0x80000, CRC(076a290f) SHA1(2f9bb74e081262e535c8ed9a31589d6a919f5d15) )
+	ROM_LOAD( "3", 0x200000, 0x80000, CRC(13a91fe7) SHA1(6e127b3827a9271ad19986714747be9367125f62) )
+	ROM_LOAD( "4", 0x300000, 0x80000, CRC(5ac8c531) SHA1(1da91b9a71a9a8681577342660bfa85e5bbc99bc) )
+	ROM_LOAD( "5", 0x080000, 0x80000, CRC(98012c74) SHA1(2a5b466353eef3a5cfc9f98eceb7523b00d0204a) )
+	ROM_LOAD( "6", 0x180000, 0x80000, CRC(366e1465) SHA1(440230d5306c4b424f27839b7fb9c8a5bb922dcc) )
+	ROM_LOAD( "7", 0x280000, 0x80000, CRC(21fb963e) SHA1(e3f7fb13f326699e34aebcc3ee07016f7cfe6e46) )
+	ROM_LOAD( "8", 0x380000, 0x80000, CRC(40c59448) SHA1(774af0f376864ec5948904df338bc7493eaed392) )
+ROM_END
+
+ROM_START( pirate2e ) // 061005 bank F9, changed version text to 070126, skip some start tests
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "pr2_061005e.rom", 0x00000, 0x40000, CRC(f36edf02) SHA1(25ff61eb80b54298037b4a90d7fc93e8530e0815) ) /* Not officially listed on Igrosoft's web site hash page */
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1", 0x000000, 0x80000, CRC(106e7cba) SHA1(289a3ae38b895c83600c920bee0c2dd46e941eac) )
+	ROM_LOAD( "2", 0x100000, 0x80000, CRC(076a290f) SHA1(2f9bb74e081262e535c8ed9a31589d6a919f5d15) )
+	ROM_LOAD( "3", 0x200000, 0x80000, CRC(13a91fe7) SHA1(6e127b3827a9271ad19986714747be9367125f62) )
+	ROM_LOAD( "4", 0x300000, 0x80000, CRC(5ac8c531) SHA1(1da91b9a71a9a8681577342660bfa85e5bbc99bc) )
+	ROM_LOAD( "5", 0x080000, 0x80000, CRC(98012c74) SHA1(2a5b466353eef3a5cfc9f98eceb7523b00d0204a) )
+	ROM_LOAD( "6", 0x180000, 0x80000, CRC(366e1465) SHA1(440230d5306c4b424f27839b7fb9c8a5bb922dcc) )
+	ROM_LOAD( "7", 0x280000, 0x80000, CRC(21fb963e) SHA1(e3f7fb13f326699e34aebcc3ee07016f7cfe6e46) )
+	ROM_LOAD( "8", 0x380000, 0x80000, CRC(40c59448) SHA1(774af0f376864ec5948904df338bc7493eaed392) )
+ROM_END
+
 /*********************************************************
    Keks
 
@@ -1846,44 +1967,59 @@ ROM_START( keks ) // 060328
 	ROM_LOAD( "ks060328.rom", 0x00000, 0x40000, CRC(bcf77f77) SHA1(26b09994907c41be957a0b7442cfb1807b27d7be) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "1", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
-	ROM_LOAD( "2", 0x100000, 0x80000, CRC(b7ec3fac) SHA1(c3c62690487a6056415c46888bde8254efca836f) )
-	ROM_LOAD( "3", 0x200000, 0x80000, CRC(5b6e8568) SHA1(003297e9cd080d91fe6751286eabd3a2f37ceb76) )
-	ROM_LOAD( "4", 0x300000, 0x80000, CRC(9dc32736) SHA1(7b2091ae802431d1c959b859a58e0076d32abef0) )
-	ROM_LOAD( "5", 0x080000, 0x80000, CRC(c5b09267) SHA1(7fd0988e63752fdbb31fde60b4726cfd63149622) )
-	ROM_LOAD( "6", 0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
-	ROM_LOAD( "7", 0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
-	ROM_LOAD( "8", 0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+	ROM_LOAD( "1a", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
+	ROM_LOAD( "2a", 0x100000, 0x80000, CRC(b7ec3fac) SHA1(c3c62690487a6056415c46888bde8254efca836f) )
+	ROM_LOAD( "3a", 0x200000, 0x80000, CRC(5b6e8568) SHA1(003297e9cd080d91fe6751286eabd3a2f37ceb76) )
+	ROM_LOAD( "4a", 0x300000, 0x80000, CRC(9dc32736) SHA1(7b2091ae802431d1c959b859a58e0076d32abef0) )
+	ROM_LOAD( "5",  0x080000, 0x80000, CRC(c5b09267) SHA1(7fd0988e63752fdbb31fde60b4726cfd63149622) )
+	ROM_LOAD( "6",  0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
+	ROM_LOAD( "7",  0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
+	ROM_LOAD( "8",  0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
 ROM_END
 
-ROM_START( keksa ) // 060328
+ROM_START( keksa ) // 060328 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "ks060328a.rom", 0x00000, 0x40000, CRC(7b387386) SHA1(d6bfc3b0d1f74723902d96dbcb69865cb5274cd0) ) /* Not officially listed on Igrosoft's web site hash page */
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "1", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
-	ROM_LOAD( "2", 0x100000, 0x80000, CRC(b7ec3fac) SHA1(c3c62690487a6056415c46888bde8254efca836f) )
-	ROM_LOAD( "3", 0x200000, 0x80000, CRC(5b6e8568) SHA1(003297e9cd080d91fe6751286eabd3a2f37ceb76) )
-	ROM_LOAD( "4", 0x300000, 0x80000, CRC(9dc32736) SHA1(7b2091ae802431d1c959b859a58e0076d32abef0) )
-	ROM_LOAD( "5", 0x080000, 0x80000, CRC(c5b09267) SHA1(7fd0988e63752fdbb31fde60b4726cfd63149622) )
-	ROM_LOAD( "6", 0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
-	ROM_LOAD( "7", 0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
-	ROM_LOAD( "8", 0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+	ROM_LOAD( "1a", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
+	ROM_LOAD( "2a", 0x100000, 0x80000, CRC(b7ec3fac) SHA1(c3c62690487a6056415c46888bde8254efca836f) )
+	ROM_LOAD( "3a", 0x200000, 0x80000, CRC(5b6e8568) SHA1(003297e9cd080d91fe6751286eabd3a2f37ceb76) )
+	ROM_LOAD( "4a", 0x300000, 0x80000, CRC(9dc32736) SHA1(7b2091ae802431d1c959b859a58e0076d32abef0) )
+	ROM_LOAD( "5",  0x080000, 0x80000, CRC(c5b09267) SHA1(7fd0988e63752fdbb31fde60b4726cfd63149622) )
+	ROM_LOAD( "6",  0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
+	ROM_LOAD( "7",  0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
+	ROM_LOAD( "8",  0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
 ROM_END
 
-ROM_START( keksb ) // 060328
+ROM_START( keksb ) // 060328 backdoor
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "ks060328b.rom", 0x00000, 0x40000, CRC(661c7ee9) SHA1(f07902c4a3ba5fce5bc7fe666d90deb852e40b4c) ) /* Not officially listed on Igrosoft's web site hash page */
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "1", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
-	ROM_LOAD( "2", 0x100000, 0x80000, CRC(b7ec3fac) SHA1(c3c62690487a6056415c46888bde8254efca836f) )
-	ROM_LOAD( "3", 0x200000, 0x80000, CRC(5b6e8568) SHA1(003297e9cd080d91fe6751286eabd3a2f37ceb76) )
-	ROM_LOAD( "4", 0x300000, 0x80000, CRC(9dc32736) SHA1(7b2091ae802431d1c959b859a58e0076d32abef0) )
-	ROM_LOAD( "5", 0x080000, 0x80000, CRC(c5b09267) SHA1(7fd0988e63752fdbb31fde60b4726cfd63149622) )
-	ROM_LOAD( "6", 0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
-	ROM_LOAD( "7", 0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
-	ROM_LOAD( "8", 0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+	ROM_LOAD( "1a", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
+	ROM_LOAD( "2a", 0x100000, 0x80000, CRC(b7ec3fac) SHA1(c3c62690487a6056415c46888bde8254efca836f) )
+	ROM_LOAD( "3a", 0x200000, 0x80000, CRC(5b6e8568) SHA1(003297e9cd080d91fe6751286eabd3a2f37ceb76) )
+	ROM_LOAD( "4a", 0x300000, 0x80000, CRC(9dc32736) SHA1(7b2091ae802431d1c959b859a58e0076d32abef0) )
+	ROM_LOAD( "5",  0x080000, 0x80000, CRC(c5b09267) SHA1(7fd0988e63752fdbb31fde60b4726cfd63149622) )
+	ROM_LOAD( "6",  0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
+	ROM_LOAD( "7",  0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
+	ROM_LOAD( "8",  0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+ROM_END
+
+ROM_START( keksc ) // 060328 bank F9, changed version text to 070119
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "ks060328c.rom", 0x00000, 0x40000, CRC(fc70d26e) SHA1(0430ad20b797412967c2e82779eb7f0e9170f77c) ) /* Not officially listed on Igrosoft's web site hash page */
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1a", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
+	ROM_LOAD( "2a", 0x100000, 0x80000, CRC(b7ec3fac) SHA1(c3c62690487a6056415c46888bde8254efca836f) )
+	ROM_LOAD( "3a", 0x200000, 0x80000, CRC(5b6e8568) SHA1(003297e9cd080d91fe6751286eabd3a2f37ceb76) )
+	ROM_LOAD( "4a", 0x300000, 0x80000, CRC(9dc32736) SHA1(7b2091ae802431d1c959b859a58e0076d32abef0) )
+	ROM_LOAD( "5",  0x080000, 0x80000, CRC(c5b09267) SHA1(7fd0988e63752fdbb31fde60b4726cfd63149622) )
+	ROM_LOAD( "6",  0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
+	ROM_LOAD( "7",  0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
+	ROM_LOAD( "8",  0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
 ROM_END
 
 ROM_START( keks_2 ) // 060403
@@ -1891,29 +2027,44 @@ ROM_START( keks_2 ) // 060403
 	ROM_LOAD( "ks060403.rom", 0x00000, 0x40000, CRC(7abb9392) SHA1(f7a0ba5bcc7566f706e911486fa9cf3e62b86b8b) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "1", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
-	ROM_LOAD( "2", 0x100000, 0x80000, CRC(b7ec3fac) SHA1(c3c62690487a6056415c46888bde8254efca836f) )
-	ROM_LOAD( "3", 0x200000, 0x80000, CRC(5b6e8568) SHA1(003297e9cd080d91fe6751286eabd3a2f37ceb76) )
-	ROM_LOAD( "4", 0x300000, 0x80000, CRC(9dc32736) SHA1(7b2091ae802431d1c959b859a58e0076d32abef0) )
-	ROM_LOAD( "5", 0x080000, 0x80000, CRC(c5b09267) SHA1(7fd0988e63752fdbb31fde60b4726cfd63149622) )
-	ROM_LOAD( "6", 0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
-	ROM_LOAD( "7", 0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
-	ROM_LOAD( "8", 0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+	ROM_LOAD( "1a", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
+	ROM_LOAD( "2a", 0x100000, 0x80000, CRC(b7ec3fac) SHA1(c3c62690487a6056415c46888bde8254efca836f) )
+	ROM_LOAD( "3a", 0x200000, 0x80000, CRC(5b6e8568) SHA1(003297e9cd080d91fe6751286eabd3a2f37ceb76) )
+	ROM_LOAD( "4a", 0x300000, 0x80000, CRC(9dc32736) SHA1(7b2091ae802431d1c959b859a58e0076d32abef0) )
+	ROM_LOAD( "5",  0x080000, 0x80000, CRC(c5b09267) SHA1(7fd0988e63752fdbb31fde60b4726cfd63149622) )
+	ROM_LOAD( "6",  0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
+	ROM_LOAD( "7",  0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
+	ROM_LOAD( "8",  0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
 ROM_END
 
-ROM_START( keks_2a ) // 060403
+ROM_START( keks_2a ) // 060403 bank F9
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "ks060403a.rom", 0x00000, 0x40000, CRC(bd749f63) SHA1(dc3ba624b186370896d3ecf5968a82a17aa019d0) ) /* Not officially listed on Igrosoft's web site hash page */
 
 	ROM_REGION( 0x400000, "gfx", 0 )
-	ROM_LOAD( "1", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
-	ROM_LOAD( "2", 0x100000, 0x80000, CRC(b7ec3fac) SHA1(c3c62690487a6056415c46888bde8254efca836f) )
-	ROM_LOAD( "3", 0x200000, 0x80000, CRC(5b6e8568) SHA1(003297e9cd080d91fe6751286eabd3a2f37ceb76) )
-	ROM_LOAD( "4", 0x300000, 0x80000, CRC(9dc32736) SHA1(7b2091ae802431d1c959b859a58e0076d32abef0) )
-	ROM_LOAD( "5", 0x080000, 0x80000, CRC(c5b09267) SHA1(7fd0988e63752fdbb31fde60b4726cfd63149622) )
-	ROM_LOAD( "6", 0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
-	ROM_LOAD( "7", 0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
-	ROM_LOAD( "8", 0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+	ROM_LOAD( "1a", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
+	ROM_LOAD( "2a", 0x100000, 0x80000, CRC(b7ec3fac) SHA1(c3c62690487a6056415c46888bde8254efca836f) )
+	ROM_LOAD( "3a", 0x200000, 0x80000, CRC(5b6e8568) SHA1(003297e9cd080d91fe6751286eabd3a2f37ceb76) )
+	ROM_LOAD( "4a", 0x300000, 0x80000, CRC(9dc32736) SHA1(7b2091ae802431d1c959b859a58e0076d32abef0) )
+	ROM_LOAD( "5",  0x080000, 0x80000, CRC(c5b09267) SHA1(7fd0988e63752fdbb31fde60b4726cfd63149622) )
+	ROM_LOAD( "6",  0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
+	ROM_LOAD( "7",  0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
+	ROM_LOAD( "8",  0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
+ROM_END
+
+ROM_START( keks_2b ) // 060403 bank F9, changed version text to 070119
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "ks060403b.rom", 0x00000, 0x40000, CRC(d089de90) SHA1(9208f411cd97fef89b52019f9655e7d006f91303) ) /* Not officially listed on Igrosoft's web site hash page */
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1a", 0x000000, 0x80000, CRC(f4c20f66) SHA1(bed42ef01dfaa9d5d6ebb703e44ce7c11b8a373c) )
+	ROM_LOAD( "2a", 0x100000, 0x80000, CRC(b7ec3fac) SHA1(c3c62690487a6056415c46888bde8254efca836f) )
+	ROM_LOAD( "3a", 0x200000, 0x80000, CRC(5b6e8568) SHA1(003297e9cd080d91fe6751286eabd3a2f37ceb76) )
+	ROM_LOAD( "4a", 0x300000, 0x80000, CRC(9dc32736) SHA1(7b2091ae802431d1c959b859a58e0076d32abef0) )
+	ROM_LOAD( "5",  0x080000, 0x80000, CRC(c5b09267) SHA1(7fd0988e63752fdbb31fde60b4726cfd63149622) )
+	ROM_LOAD( "6",  0x180000, 0x80000, CRC(583da5fd) SHA1(645228db20cdaacb53bfc68731fd1a66a6a8cf56) )
+	ROM_LOAD( "7",  0x280000, 0x80000, CRC(311c166a) SHA1(5f0ad8d755a6141964d818b98b3f156cbda8fb0d) )
+	ROM_LOAD( "8",  0x380000, 0x80000, CRC(f69b0831) SHA1(75392349ef02a39cf883206938e2c615445065fc) )
 ROM_END
 
 /*
@@ -1927,6 +2078,10 @@ Note:
      Software exists to automatic modify any program rom's banking address for any PCB.
      This has resulted in dozens of different bootleg versions floating around the net.
 
+   Some sets simply changed the version text to show a newer version.  This was likely done
+     so the opperator appears to be running a version that meets the standards of the changed
+     gambling law (see below).
+
    Sets marked as "backdoor" are identical to originals, but have added code.  This code is
      activated by a secret sequence of actions that leads to a guaranteed win, or dramatically
      increases odds for winning. These backdoor version were commonly used by administrators
@@ -1935,11 +2090,10 @@ Note:
      sequences.  As a result of this, there is also software to dectect the backdoor code
      in program roms.
 
-
 Most games had a revision in early 2007 to meet the standards of the "Government gambling control"
    law of The Russian Federation No 244-03 of Dec 29, 2006
 
-From Igrosoft's web site about version types (IE: some version have "M" in them):
+   From Igrosoft's web site about version types (IE: some version have "M" in them):
 
    * Two software versions are shown, one of them corresponds to Russian legislation,
      the other one (with the letter m) is for the countries without such restrictions.
@@ -1948,110 +2102,119 @@ From Igrosoft's web site about version types (IE: some version have "M" in them)
 
 GAME( 2002, mfish_3,     0,        multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021124, set 1)",  0 )
 GAME( 2002, mfish_3a,    mfish_3,  multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021124, set 2)",  0 )
-GAME( 2002, mfish_12,    mfish_3,  multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040308, set 1)",  0 )
-GAME( 2002, mfish_12a,   mfish_3,  multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040308, set 2)",  0 )
+GAME( 2002, mfish_12,    mfish_3,  multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040308)",  0 ) /* World */
+GAME( 2002, mfish_12a,   mfish_3,  multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040308, banking address hack)",  0 ) // bank F9
 #if ALL_REVISIONS
-GAME( 2002, mfish,       0,        multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021120)",  0 )
-GAME( 2002, mfish_2,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021121)",  0 )
-GAME( 2002, mfish_4,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021219)",  0 )
-GAME( 2002, mfish_5,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021227)",  0 )
-GAME( 2002, mfish_6,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (030124)",  0 )
-GAME( 2002, mfish_7,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (030511)",  0 )
-GAME( 2002, mfish_8,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (030522)",  0 )
-GAME( 2002, mfish_9,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (031026)",  0 )
-GAME( 2002, mfish_10,    mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (031117)",  0 )
-GAME( 2002, mfish_11,    mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (031124)",  0 )
-GAME( 2002, mfish_13,    mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040316)",  0 )
+GAME( 2002, mfish,       0,        multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021120)",  0 ) /* World */
+GAME( 2002, mfish_2,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021121)",  0 ) /* World */
+GAME( 2002, mfish_4,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021219)",  0 ) /* World */
+GAME( 2002, mfish_5,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021227)",  0 ) /* World */
+GAME( 2002, mfish_6,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (030124)",  0 ) /* World */
+GAME( 2002, mfish_7,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (030511)",  0 ) /* World */
+GAME( 2002, mfish_8,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (030522)",  0 ) /* World */
+GAME( 2002, mfish_9,     mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (031026)",  0 ) /* World */
+GAME( 2002, mfish_10,    mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (031117)",  0 ) /* World */
+GAME( 2002, mfish_11,    mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (031124)",  0 ) /* World */
+GAME( 2002, mfish_13,    mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040316)",  0 ) /* World */
 #endif
 
-GAME( 2003, crzmon_7,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110)",  0 )
-GAME( 2003, crzmon_7a,   crzmon_7, multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110, backdoor set 1)",  0 )
-GAME( 2003, crzmon_7b,   crzmon_7, multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110, backdoor set 2)",  0 )
-GAME( 2003, crzmon_8,    crzmon_7, multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (050120, set 1)",  0 )
-GAME( 2003, crzmon_8a,   crzmon_7, multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (050120, backdoor)",  0 )
+GAME( 2003, crzmon_7,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110)",  0 ) /* World */
+GAME( 2003, crzmon_7a,   crzmon_7, multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110, backdoor set 1)",  0 ) // backdoor
+GAME( 2003, crzmon_7b,   crzmon_7, multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031110, backdoor set 2)",  0 ) // backdoor
+GAME( 2003, crzmon_8,    crzmon_7, multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (050120)",  0 ) /* World */
+GAME( 2003, crzmon_8a,   crzmon_7, multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (050120, backdoor)",  0 ) // backdoor
+GAME( 2003, crzmon_8b,   crzmon_7, multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (050120, changed version text)",  0 ) // changed version text to 070315
 #if ALL_REVISIONS
-GAME( 2003, crzmon,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (030217)",  0 )
-GAME( 2003, crzmon_2,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (030225)",  0 )
-GAME( 2003, crzmon_3,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (030227)",  0 )
-GAME( 2003, crzmon_4,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (030404)",  0 )
-GAME( 2003, crzmon_5,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (030421)",  0 )
-GAME( 2003, crzmon_6,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031016)",  0 )
+GAME( 2003, crzmon,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (030217)",  0 ) /* World */
+GAME( 2003, crzmon_2,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (030225)",  0 ) /* World */
+GAME( 2003, crzmon_3,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (030227)",  0 ) /* World */
+GAME( 2003, crzmon_4,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (030404)",  0 ) /* World */
+GAME( 2003, crzmon_5,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (030421)",  0 ) /* World */
+GAME( 2003, crzmon_6,    crzmon,   multfish, multfish,  0, ROT0, "Igrosoft", "Crazy Monkey (031016)",  0 ) /* World */
 #endif
 
-GAME( 2003, fcockt_6,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216)",  0 )
-GAME( 2003, fcockt_6a,   fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216, banking address hack)",  0 )
-GAME( 2003, fcockt_6b,   fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216, backdoor)",  0 )
-GAME( 2003, fcockt_7,    fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (050118)",  0 )
-GAME( 2003, fcockt_7a,   fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (050118, backdoor)",  0 )
-GAME( 2003, fcockt_8,    fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (060111)",  0 )
+GAME( 2003, fcockt_6,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216)",  0 ) /* World */
+GAME( 2003, fcockt_6a,   fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216, banking address hack)",  0 ) // bank F8
+GAME( 2003, fcockt_6b,   fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (040216, backdoor)",  0 ) // backdoor
+GAME( 2003, fcockt_7,    fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (050118)",  0 ) /* World */
+GAME( 2003, fcockt_7a,   fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (050118, backdoor)",  0 ) // backdoor
+GAME( 2003, fcockt_8,    fcockt_6, multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (060111)",  0 ) /* World */
 #if ALL_REVISIONS
-GAME( 2003, fcockt,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (030505)",  0 )
-GAME( 2003, fcockt_2,    fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (030512)",  0 )
-GAME( 2003, fcockt_3,    fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (030623)",  0 )
-GAME( 2003, fcockt_4,    fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (031028)",  0 )
-GAME( 2003, fcockt_5,    fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (031111)",  0 )
+GAME( 2003, fcockt,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (030505)",  0 ) /* World */
+GAME( 2003, fcockt_2,    fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (030512)",  0 ) /* World */
+GAME( 2003, fcockt_3,    fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (030623)",  0 ) /* World */
+GAME( 2003, fcockt_4,    fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (031028)",  0 ) /* World */
+GAME( 2003, fcockt_5,    fcockt,   multfish, multfish,  0, ROT0, "Igrosoft", "Fruit Cocktail (031111)",  0 ) /* World */
 #endif
 
-GAME( 2003, lhaunt_4,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (031111)",  0 )
-GAME( 2003, lhaunt_4a,   lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (031111, backdoor)",  0 )
-GAME( 2003, lhaunt_5,    lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040216)",  0 )
-GAME( 2003, lhaunt_5a,   lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040216, backdoor)",  0 )
-GAME( 2003, lhaunt_6,    lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040825)",  0 )
-GAME( 2003, lhaunt_6a,   lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040825, backdoor)",  0 )
+GAME( 2003, lhaunt_4,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (031111)",  0 ) /* World */
+GAME( 2003, lhaunt_4a,   lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (031111, backdoor)",  0 ) // backdoor
+GAME( 2003, lhaunt_5,    lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040216)",  0 ) /* World */
+GAME( 2003, lhaunt_5a,   lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040216, backdoor)",  0 ) // backdoor
+GAME( 2003, lhaunt_6,    lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040825)",  0 ) /* World */
+GAME( 2003, lhaunt_6a,   lhaunt_4, multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (040825, backdoor)",  0 ) // backdoor
 #if ALL_REVISIONS
-GAME( 2003, lhaunt,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (030707)",  0 )
-GAME( 2003, lhaunt_2,    lhaunt,   multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (030804)",  0 )
-GAME( 2003, lhaunt_3,    lhaunt,   multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (031027)",  0 )
+GAME( 2003, lhaunt,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (030707)",  0 ) /* World */
+GAME( 2003, lhaunt_2,    lhaunt,   multfish, multfish,  0, ROT0, "Igrosoft", "Lucky Haunter (030804)",  0 ) /* World */
 #endif
 
 #if ALL_REVISIONS
-GAME( 2003, rollfr,      0,        multfish, rollfr,    0, ROT0, "Igrosoft", "Roll Fruit (030821)",  0 )
+GAME( 2003, rollfr,      0,        multfish, rollfr,    0, ROT0, "Igrosoft", "Roll Fruit (030821)",  0 ) /* World */
 #endif
-GAME( 2003, rollfr_2,    0,        multfish, rollfr,    0, ROT0, "Igrosoft", "Roll Fruit (040318)",  0 )
+GAME( 2003, rollfr_2,    0,        multfish, rollfr,    0, ROT0, "Igrosoft", "Roll Fruit (040318)",  0 ) /* World */
 
-GAME( 2004, garage_4,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219)",  0 )
-GAME( 2004, garage_4a,   garage_4, multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219, backdoor)",  0 )
-GAME( 2004, garage_5,    garage_4, multfish, multfish,  0, ROT0, "Igrosoft", "Garage (050311)",  0 )
-GAME( 2004, garage_5a,   garage_4, multfish, multfish,  0, ROT0, "Igrosoft", "Garage (050311, backdoor)",  0 )
+GAME( 2004, garage_4,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219)",  0 ) /* World */
+GAME( 2004, garage_4a,   garage_4, multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219, backdoor)",  0 ) // backdoor
+GAME( 2004, garage_4b,   garage,   multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219, changed version text)",  0 ) // changed version text to 070329
+GAME( 2004, garage_5,    garage_4, multfish, multfish,  0, ROT0, "Igrosoft", "Garage (050311)",  0 ) /* World */
+GAME( 2004, garage_5a,   garage_4, multfish, multfish,  0, ROT0, "Igrosoft", "Garage (050311, backdoor)",  0 ) // backdoor
 #if ALL_REVISIONS
-GAME( 2004, garage,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040122)",  0 )
-GAME( 2004, garage_2,    garage,   multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040123)",  0 )
-GAME( 2004, garage_3,    garage,   multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040216)",  0 )
+GAME( 2004, garage,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040122)",  0 ) /* World */
+GAME( 2004, garage_2,    garage,   multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040123)",  0 ) /* World */
+GAME( 2004, garage_3,    garage,   multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040216)",  0 ) /* World */
 #endif
 
-GAME( 2004, rclimb_3,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827)", 0 )
-GAME( 2004, rclimb_3a,   rclimb_3, multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827, backdoor)", 0 )
-GAME( 2004, rclimb_3b,   rclimb_3, multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827, bootleg)", 0 ) // new service menu
+GAME( 2004, rclimb_3,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827)", 0 ) /* World */
+GAME( 2004, rclimb_3a,   rclimb_3, multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827, backdoor)", 0 ) // backdoor
+GAME( 2004, rclimb_3b,   rclimb_3, multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040827, new service menu)", 0 ) // new service menu
 #if ALL_REVISIONS
-GAME( 2004, rclimb,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040815)", 0 )
-GAME( 2004, rclimb_2,    rclimb,   multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040823)", 0 )
+GAME( 2004, rclimb,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040815)", 0 ) /* World */
+GAME( 2004, rclimb_2,    rclimb,   multfish, multfish,  0, ROT0, "Igrosoft", "Rock Climber (040823)", 0 ) /* World */
 #endif
 
 GAME( 2004, sweetl,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Sweet Life (041220)",  0 )
-GAME( 2004, sweetla,     sweetl,   multfish, multfish,  0, ROT0, "Igrosoft", "Sweet Life (041220, backdoor)",  0 )
+GAME( 2004, sweetla,     sweetl,   multfish, multfish,  0, ROT0, "Igrosoft", "Sweet Life (041220, backdoor)",  0 ) // backdoor
+GAME( 2004, sweetlb,     sweetl,   multfish, multfish,  0, ROT0, "Igrosoft", "Sweet Life (041220, banking address hack, changed version text)",  0 ) // bank F9, changed version text to 070412
 
 #if ALL_REVISIONS
-GAME( 2004, resdnt,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040415)",  0 )
+GAME( 2004, resdnt,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040415)",  0 ) /* World */
 #endif
-GAME( 2004, resdnt_2,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040513)",  0 )
-GAME( 2004, resdnt_2a,   resdnt_2, multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040513, backdoor)",  0 )
+GAME( 2004, resdnt_2,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040513)",  0 ) /* World */
+GAME( 2004, resdnt_2a,   resdnt_2, multfish, multfish,  0, ROT0, "Igrosoft", "Resident (040513, backdoor)",  0 ) // backdoor
 
-GAME( 2005, island,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Island (050713)",  0 )
-GAME( 2005, islanda,     island,   multfish, multfish,  0, ROT0, "Igrosoft", "Island (050713, backdoor)",  0 )
+GAME( 2005, island,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Island (050713)",  0 ) /* World */
+GAME( 2005, islanda,     island,   multfish, multfish,  0, ROT0, "Igrosoft", "Island (050713, backdoor)",  0 ) // backdoor
 
-GAME( 2005, pirate_2,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Pirate (060210)",  0 )
-GAME( 2005, pirate_3,    pirate_2, multfish, multfish,  0, ROT0, "Igrosoft", "Pirate (060803)",  0 )
+GAME( 2005, pirate_2,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Pirate (060210)",  0 ) /* World */
+GAME( 2005, pirate_3,    pirate_2, multfish, multfish,  0, ROT0, "Igrosoft", "Pirate (060803)",  0 ) /* World */
 #if ALL_REVISIONS
-GAME( 2005, pirate,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Pirate (051229)",  0 )
+GAME( 2005, pirate,      0,        multfish, multfish,  0, ROT0, "Igrosoft", "Pirate (051229)",  0 ) /* World */
 #endif
 
-GAME( 2006, pirate2,     0,        multfish, multfish,  0, ROT0, "Igrosoft", "Pirate 2 (061005)",  0 )
+GAME( 2006, pirate2,     0,        multfish, multfish,  0, ROT0, "Igrosoft", "Pirate 2 (061005)",  0 ) /* World */
+GAME( 2006, pirate2a,    pirate2,  multfish, multfish,  0, ROT0, "Igrosoft", "Pirate 2 (061005, banking address hack set 1)",  0 ) // bank F9
+GAME( 2006, pirate2b,    pirate2,  multfish, multfish,  0, ROT0, "Igrosoft", "Pirate 2 (061005, banking address hack set 2)",  0 ) // bank F9, skip raster beam position check
+GAME( 2006, pirate2c,    pirate2,  multfish, multfish,  0, ROT0, "Igrosoft", "Pirate 2 (061005, banking address hack, changed version text set 1)",  0 ) // bank F9, changed version text to 070126
+GAME( 2006, pirate2d,    pirate2,  multfish, multfish,  0, ROT0, "Igrosoft", "Pirate 2 (061005, banking address hack, changed version text set 2)",  0 ) // bank F9, changed version text to 070126
+GAME( 2006, pirate2e,    pirate2,  multfish, multfish,  0, ROT0, "Igrosoft", "Pirate 2 (061005, banking address hack, changed version text set 3)",  0 ) // bank F9, changed version text to 070126, skip some start tests
 
-GAME( 2006, island2,     0,        multfish, multfish,  0, ROT0, "Igrosoft", "Island 2 (060529)",  0 )
-GAME( 2006, island2a,    island2,  multfish, multfish,  0, ROT0, "Igrosoft", "Island 2 (060529, banking address hack)",  0 )
+GAME( 2006, island2,     0,        multfish, multfish,  0, ROT0, "Igrosoft", "Island 2 (060529)",  0 ) /* World */
+GAME( 2006, island2a,    island2,  multfish, multfish,  0, ROT0, "Igrosoft", "Island 2 (060529, banking address hack)",  0 ) // bank F9 (not standart, game does not work)
 
-GAME( 2006, keks,        0,        multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328)",  0 )
-GAME( 2006, keksa,       keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328, banking address hack)",  0 )
-GAME( 2006, keksb,       keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328, backdoor)",  0 )
-GAME( 2006, keks_2,      keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060403)",  0 )
-GAME( 2006, keks_2a,     keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060403, banking address hack)",  0 )
+GAME( 2006, keks,        0,        multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328)",  0 ) /* World */
+GAME( 2006, keksa,       keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328, banking address hack)",  0 ) // bank F9
+GAME( 2006, keksb,       keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328, backdoor)",  0 ) // backdoor
+GAME( 2006, keksc,       keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060328, banking address hack, changed version text)",  0 ) // bank F9, changed version text to 070119
+GAME( 2006, keks_2,      keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060403)",  0 ) /* World */
+GAME( 2006, keks_2a,     keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060403, banking address hack)",  0 ) // bank F9
+GAME( 2006, keks_2b,     keks,     multfish, multfish,  0, ROT0, "Igrosoft", "Keks (060403, banking address hack, changed version text)",  0 ) // bank F9, changed version text to 070119
