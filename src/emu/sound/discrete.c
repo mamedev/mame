@@ -320,6 +320,16 @@ INLINE void step_nodes_in_list(const linked_list_entry *list)
 
 	if (EXPECTED(!profiling))
 	{
+		for (entry = list; entry != NULL; entry = entry->next)
+		{
+			node_description *node = (node_description *) entry->ptr;
+
+			/* Now step the node */
+			(*node->step)(node);
+		}
+	}
+	else
+	{
 		osd_ticks_t last = get_profile_ticks();
 
 		for (entry = list; entry != NULL; entry = entry->next)
@@ -330,16 +340,6 @@ INLINE void step_nodes_in_list(const linked_list_entry *list)
 			(*node->step)(node);
 			last = get_profile_ticks();
 			node->run_time += last;
-		}
-	}
-	else
-	{
-		for (entry = list; entry != NULL; entry = entry->next)
-		{
-			node_description *node = (node_description *) entry->ptr;
-
-			/* Now step the node */
-			(*node->step)(node);
 		}
 	}
 }
