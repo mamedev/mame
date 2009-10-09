@@ -448,6 +448,9 @@ static DISCRETE_SOUND_START(dkong2b)
 	/************************************************/
 
 	DISCRETE_TASK_START(1)
+	/* Mixing - DAC */
+	DISCRETE_ADJUSTMENT_TAG(DS_ADJ_DAC, 0, 1, DISC_LINADJ, "VR2")
+
 	/* Buffer DAC first to input stream 0 */
 	DISCRETE_INPUT_BUFFER(DS_DAC, 0)
 	//DISCRETE_INPUT_DATA(DS_DAC)
@@ -467,7 +470,7 @@ static DISCRETE_SOUND_START(dkong2b)
 
 	/* Adjustment VR2 */
 #if DK_NO_FILTERS
-	DISCRETE_MULTIPLY(DS_OUT_DAC, 1, NODE_71, DS_ADJ_DAC)
+	DISCRETE_MULTIPLY(DS_OUT_DAC, NODE_71, DS_ADJ_DAC)
 #else
 	DISCRETE_MULTIPLY(DS_OUT_DAC, NODE_73, DS_ADJ_DAC)
 #endif
@@ -478,8 +481,6 @@ static DISCRETE_SOUND_START(dkong2b)
 	/************************************************/
 
 	DISCRETE_TASK_START(2)
-	/* Mixing - DAC */
-	DISCRETE_ADJUSTMENT_TAG(DS_ADJ_DAC, 0, 1, DISC_LINADJ, "VR2")
 
 	DISCRETE_MIXER4(NODE_288, 1, DS_OUT_SOUND0, DS_OUT_SOUND1, DS_OUT_DAC, DS_OUT_SOUND2, &dkong_mixer_desc)
 
