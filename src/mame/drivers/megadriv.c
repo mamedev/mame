@@ -78,12 +78,6 @@ On SegaC2 the VDP never turns on the IRQ6 enable register
 
 #define MEGADRIV_VDP_VRAM(address) megadrive_vdp_vram[(address)&0x7fff]
 
-/* the same on all systems? */
-#define MASTER_CLOCK_NTSC 53693175
-#define MASTER_CLOCK_PAL  53203424
-
-#define SEGACD_CLOCK      12500000
-
 #define HAZE_MD 0 // to make appear / disappear the Region DipSwitch
 
 /* timing details */
@@ -1390,7 +1384,7 @@ READ16_HANDLER( megadriv_vdp_r )
 	return retvalue;
 }
 
-static READ8_DEVICE_HANDLER( megadriv_68k_YM2612_read)
+READ8_DEVICE_HANDLER( megadriv_68k_YM2612_read)
 {
 	//mame_printf_debug("megadriv_68k_YM2612_read %02x %04x\n",offset,mem_mask);
 	if ( (genz80.z80_has_bus==0) && (genz80.z80_is_reset==0) )
@@ -1408,7 +1402,7 @@ static READ8_DEVICE_HANDLER( megadriv_68k_YM2612_read)
 
 
 
-static WRITE8_DEVICE_HANDLER( megadriv_68k_YM2612_write)
+WRITE8_DEVICE_HANDLER( megadriv_68k_YM2612_write)
 {
 	//mame_printf_debug("megadriv_68k_YM2612_write %02x %04x %04x\n",offset,data,mem_mask);
 	if ( (genz80.z80_has_bus==0) && (genz80.z80_is_reset==0) )
@@ -1802,7 +1796,7 @@ static UINT8 megadrive_io_read_sctrl_port(int portnum)
 }
 
 
-static READ16_HANDLER( megadriv_68k_io_read )
+READ16_HANDLER( megadriv_68k_io_read )
 {
 	UINT8 retdata;
 
@@ -1920,7 +1914,7 @@ static void megadrive_io_write_sctrl_port(running_machine *machine, int portnum,
 }
 
 
-static WRITE16_HANDLER( megadriv_68k_io_write )
+WRITE16_HANDLER( megadriv_68k_io_write )
 {
 //  mame_printf_debug("IO Write #%02x data %04x mem_mask %04x\n",offset,data,mem_mask);
 
@@ -1969,30 +1963,30 @@ static WRITE16_HANDLER( megadriv_68k_io_write )
 
 
 static ADDRESS_MAP_START( megadriv_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000 , 0x3fffff) AM_ROM
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	/*      (0x000000 - 0x3fffff) == GAME ROM (4Meg Max, Some games have special banking too) */
 
-	AM_RANGE(0xa00000 , 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram,megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa02000 , 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa04000 , 0xa04003) AM_DEVREADWRITE8("ym", megadriv_68k_YM2612_read,megadriv_68k_YM2612_write, 0xffff)
+	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram,megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8("ym", megadriv_68k_YM2612_read,megadriv_68k_YM2612_write, 0xffff)
 
-	AM_RANGE(0xa06000 , 0xa06001) AM_WRITE(megadriv_68k_z80_bank_write)
+	AM_RANGE(0xa06000, 0xa06001) AM_WRITE(megadriv_68k_z80_bank_write)
 
-	AM_RANGE(0xa10000 , 0xa1001f) AM_READWRITE(megadriv_68k_io_read,megadriv_68k_io_write)
+	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE(megadriv_68k_io_read,megadriv_68k_io_write)
 
-	AM_RANGE(0xa11100 , 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus,megadriv_68k_req_z80_bus)
-	AM_RANGE(0xa11200 , 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
+	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus,megadriv_68k_req_z80_bus)
+	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
 
 	/* these are fake - remove allocs in VIDEO_START to use these to view ram instead */
-//  AM_RANGE(0xb00000 , 0xb0ffff) AM_RAM AM_BASE(&megadrive_vdp_vram)
-//  AM_RANGE(0xb10000 , 0xb1007f) AM_RAM AM_BASE(&megadrive_vdp_vsram)
-//  AM_RANGE(0xb10100 , 0xb1017f) AM_RAM AM_BASE(&megadrive_vdp_cram)
+//  AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE(&megadrive_vdp_vram)
+//  AM_RANGE(0xb10000, 0xb1007f) AM_RAM AM_BASE(&megadrive_vdp_vsram)
+//  AM_RANGE(0xb10100, 0xb1017f) AM_RAM AM_BASE(&megadrive_vdp_cram)
 
-	AM_RANGE(0xc00000 , 0xc0001f) AM_READWRITE(megadriv_vdp_r,megadriv_vdp_w)
-	AM_RANGE(0xd00000 , 0xd0001f) AM_READWRITE(megadriv_vdp_r,megadriv_vdp_w) // the earth defend
+	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(megadriv_vdp_r,megadriv_vdp_w)
+	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE(megadriv_vdp_r,megadriv_vdp_w) // the earth defend
 
-	AM_RANGE(0xe00000 , 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
-//  AM_RANGE(0xff0000 , 0xffffff) AM_READ(SMH_RAM)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
+//  AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)
 	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
 ADDRESS_MAP_END
 
@@ -2308,68 +2302,54 @@ static READ8_HANDLER( megadriv_z80_unmapped_read )
 }
 
 static ADDRESS_MAP_START( megadriv_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000 , 0x1fff) AM_RAMBANK(1) AM_MIRROR(0x2000) // RAM can be accessed by the 68k
-	AM_RANGE(0x4000 , 0x4003) AM_DEVREADWRITE("ym", ym2612_r,ym2612_w)
+	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK(1) AM_MIRROR(0x2000) // RAM can be accessed by the 68k
+	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("ym", ym2612_r,ym2612_w)
 
-	AM_RANGE(0x6000 , 0x6000) AM_WRITE(megadriv_z80_z80_bank_w)
-	AM_RANGE(0x6001 , 0x6001) AM_WRITE(megadriv_z80_z80_bank_w) // wacky races uses this address
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(megadriv_z80_z80_bank_w)
+	AM_RANGE(0x6001, 0x6001) AM_WRITE(megadriv_z80_z80_bank_w) // wacky races uses this address
 
-	AM_RANGE(0x6100 , 0x7eff) AM_READ(megadriv_z80_unmapped_read)
+	AM_RANGE(0x6100, 0x7eff) AM_READ(megadriv_z80_unmapped_read)
 
-	AM_RANGE(0x7f00 , 0x7fff) AM_READWRITE(megadriv_z80_vdp_read,megadriv_z80_vdp_write)
+	AM_RANGE(0x7f00, 0x7fff) AM_READWRITE(megadriv_z80_vdp_read,megadriv_z80_vdp_write)
 
-	AM_RANGE(0x8000 , 0xffff) AM_READWRITE(z80_read_68k_banked_data,z80_write_68k_banked_data) // The Z80 can read the 68k address space this way
+	AM_RANGE(0x8000, 0xffff) AM_READWRITE(z80_read_68k_banked_data,z80_write_68k_banked_data) // The Z80 can read the 68k address space this way
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megadriv_z80_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000 , 0xff) AM_NOP
+	AM_RANGE(0x0000, 0xff) AM_NOP
 ADDRESS_MAP_END
 
 
-/***************************** Megaplay *****************************/
-/* Megaplay BIOS handles regs[2] at start in a different way.       */
-/* other io data/ctrl regs are dealt with exactly like in megadrive */
+/************************************ Megadrive Bootlegs *************************************/
 
-READ8_HANDLER( megaplay_bios_6402_r )
-{
-	return megadrive_io_data_regs[2];// & 0xfe;
-}
+// smaller ROM region because some bootlegs check for RAM there 
+static ADDRESS_MAP_START( md_bootleg_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM	/* Cartridge Program Rom */
+	AM_RANGE(0x200000, 0x2023ff) AM_RAM // tested
 
-WRITE8_HANDLER( megaplay_bios_6402_w )
-{
-	megadrive_io_data_regs[2] = (megadrive_io_data_regs[2] & 0x07) | ((data & 0x70) >> 1);
-//  logerror("BIOS: 0x6402 write: 0x%02x\n", data);
-}
+	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram, megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8("ym", megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
+	AM_RANGE(0xa06000, 0xa06001) AM_WRITE(megadriv_68k_z80_bank_write)
 
-READ8_HANDLER( megaplay_bios_6204_r )
-{
-	return (megadrive_io_data_regs[2]);
-//  return (mplay_bios.bios_width & 0xf8) + (mplay_bios.bios_6204 & 0x07);
-}
+	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE(megadriv_68k_io_read, megadriv_68k_io_write)
+	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus, megadriv_68k_req_z80_bus)
+	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
 
-WRITE8_HANDLER( megaplay_bios_width_w )
-{
-	mplay_bios.bios_width = data;
-	megadrive_io_data_regs[2] = (megadrive_io_data_regs[2] & 0x07) | ((data & 0xf8));
-//  logerror("BIOS: 0x6204 - Width write: %02x\n", data);
-}
+	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w)
+	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w) // the earth defend
 
-WRITE16_HANDLER( megaplay_io_write )
-{
-	if (offset == 0x03)
-		megadrive_io_data_regs[2] = (data & megadrive_io_ctrl_regs[2]) | (megadrive_io_data_regs[2] & ~megadrive_io_ctrl_regs[2]);
-	else
-		megadriv_68k_io_write(space, offset & 0x1f, data, 0xffff);
-}
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
+ADDRESS_MAP_END
 
-READ16_HANDLER( megaplay_io_read )
-{
-	if (offset == 0x03)
-		return megadrive_io_data_regs[2];
-	else
-		return megadriv_68k_io_read(space, offset & 0x1f, 0xffff);
-}
+MACHINE_DRIVER_START( md_bootleg )
+	MDRV_IMPORT_FROM(megadriv)
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(md_bootleg_map)
+MACHINE_DRIVER_END
+
 
 /****************************************** 32X related ******************************************/
 
@@ -3377,7 +3357,7 @@ static ADDRESS_MAP_START( sh2_slave_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000000 , 0x0003fff) AM_RAM
+	AM_RANGE(0x0000000, 0x0003fff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -3679,19 +3659,19 @@ static READ16_HANDLER( svp_68k_cell2_r )
 }
 
 static ADDRESS_MAP_START( svp_ssp_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000 , 0x03ff) AM_ROMBANK(3)
-	AM_RANGE(0x0400 , 0xffff) AM_ROMBANK(4)
+	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK(3)
+	AM_RANGE(0x0400, 0xffff) AM_ROMBANK(4)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( svp_ext_map, ADDRESS_SPACE_IO, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xf)
-	AM_RANGE(0*2 , 0*2+1) AM_READWRITE(read_PM0, write_PM0)
-	AM_RANGE(1*2 , 1*2+1) AM_READWRITE(read_PM1, write_PM1)
-	AM_RANGE(2*2 , 2*2+1) AM_READWRITE(read_PM2, write_PM2)
-	AM_RANGE(3*2 , 3*2+1) AM_READWRITE(read_XST, write_XST)
-	AM_RANGE(4*2 , 4*2+1) AM_READWRITE(read_PM4, write_PM4)
-	AM_RANGE(6*2 , 6*2+1) AM_READWRITE(read_PMC, write_PMC)
-	AM_RANGE(7*2 , 7*2+1) AM_READWRITE(read_AL, write_AL)
+	AM_RANGE(0*2, 0*2+1) AM_READWRITE(read_PM0, write_PM0)
+	AM_RANGE(1*2, 1*2+1) AM_READWRITE(read_PM1, write_PM1)
+	AM_RANGE(2*2, 2*2+1) AM_READWRITE(read_PM2, write_PM2)
+	AM_RANGE(3*2, 3*2+1) AM_READWRITE(read_XST, write_XST)
+	AM_RANGE(4*2, 4*2+1) AM_READWRITE(read_PM4, write_PM4)
+	AM_RANGE(6*2, 6*2+1) AM_READWRITE(read_PMC, write_PMC)
+	AM_RANGE(7*2, 7*2+1) AM_READWRITE(read_AL, write_AL)
 ADDRESS_MAP_END
 
 
@@ -6640,8 +6620,8 @@ GAME( 1994, 32x_bios,    0,        genesis_32x,        megadriv,    _32x,    ROT
 GAME( 1994, segacd,      0,        genesis_scd,        megadriv,    megadriv,ROT0,   "Sega", "Sega-CD Model 2 BIOS V2.11 (U)", GAME_NOT_WORKING )
 GAME( 1994, 32x_scd,     0,        genesis_32x_scd,    megadriv,    _32x,    ROT0,   "Sega", "Sega-CD Model 2 BIOS V2.11 (U) (with 32X)", GAME_NOT_WORKING )
 GAME( 1994, g_virr,      0,        megdsvp,            megadriv,   megadriv, ROT0,   "Sega", "Virtua Racing (U) [!]", 0 )
-GAME( 1994, g_virrj ,    g_virr,   megdsvp,            megadriv,   megadrij, ROT0,   "Sega", "Virtua Racing (J) [!]", 0 )
-GAME( 1994, g_virre ,    g_virr,   megdsvppal,         megadriv,   megadrie, ROT0,   "Sega", "Virtua Racing (E) [!]", 0 )
+GAME( 1994, g_virrj,     g_virr,   megdsvp,            megadriv,   megadrij, ROT0,   "Sega", "Virtua Racing (J) [!]", 0 )
+GAME( 1994, g_virre,     g_virr,   megdsvppal,         megadriv,   megadrie, ROT0,   "Sega", "Virtua Racing (E) [!]", 0 )
 GAME( 1994, g_virrea,    g_virr,   megdsvppal,         megadriv,   megadrie, ROT0,   "Sega", "Virtua Racing (E) [a1]", 0 )
 #endif
 

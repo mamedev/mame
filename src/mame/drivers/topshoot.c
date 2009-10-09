@@ -1,4 +1,3 @@
-
 /*
 
 Sun Mixing board, looks like a hacked up Genesis clone.
@@ -139,84 +138,7 @@ connector, but of course, I can be wrong.
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"
 
-#include "genesis.h"
-
-
-/* This should be replaced by the implementation in megadriv.c or by specific input code */
-static UINT16 *genesis_io_ram;
-static int z80running;
-
-static WRITE16_HANDLER( genesis_io_w )
-{
-//  logerror ("write io offset :%02x data %04x PC: 0x%06x\n",offset,data,cpu_get_previouspc(space->cpu));
-	switch (offset)
-	{
-		case 0x00:
-		/*??*/
-		break;
-
-		case 0x01:/* port A data */
-		case 0x02: /* port B data */
-		case 0x03: /* port C data */
-			genesis_io_ram[offset] = (data & (genesis_io_ram[offset + 3])) | (genesis_io_ram[offset] & ~(genesis_io_ram[offset + 3]));
-			break;
-
-		case 0x04: /* port A control */
-		case 0x05: /* port B control */
-		case 0x06: /* port C control */
-		case 0x07: /* port A TxData */
-			genesis_io_ram[offset] = data;
-			break;
-
-		default:
-			genesis_io_ram[offset] = data;
-	}
-}
-
-static WRITE16_HANDLER( genesis_ctrl_w )
-{
-	data &= mem_mask;
-
-/*  logerror("genesis_ctrl_w %x, %x\n", offset, data); */
-
-	switch (offset)
-	{
-	case 0:							/* set DRAM mode... we have to ignore this for production cartridges */
-		return;
-	case 0x80:						/* Z80 BusReq */
-		if (data == 0x100)
-		{
-			z80running = 0;
-			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);	/* halt Z80 */
-			/* logerror("z80 stopped by 68k BusReq\n"); */
-		}
-		else
-		{
-			z80running = 1;
-
-			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, CLEAR_LINE);
-			/* logerror("z80 started, BusReq ends\n"); */
-		}
-		return;
-	case 0x100:						/* Z80 CPU Reset */
-		if (data == 0x00)
-		{
-			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
-			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_RESET, PULSE_LINE);
-
-			cputag_set_input_line(space->machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
-			/* logerror("z80 reset, ram is %p\n", &genesis_z80_ram[0]); */
-			z80running = 0;
-			return;
-		}
-		else
-		{
-			/* logerror("z80 out of reset\n"); */
-		}
-		return;
-	}
-}
-
+#include "megadriv.h"
 
 static INPUT_PORTS_START( topshoot ) /* Top Shooter Input Ports */
 	PORT_START("IN0")	/* 16bit */
@@ -270,82 +192,6 @@ static INPUT_PORTS_START( topshoot ) /* Top Shooter Input Ports */
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( topshoot_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM					/* Cartridge Program Rom */
-//  AM_RANGE(0x200000, 0x20007f) AM_RAM
-	AM_RANGE(0x200000, 0x2023ff) AM_RAM // tested
-	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("IN0")		// ??
-	AM_RANGE(0xa10000, 0xa1001f) AM_WRITE(genesis_io_w) AM_BASE(&genesis_io_ram)				/* Genesis Input */
-	AM_RANGE(0xa11000, 0xa11203) AM_WRITE(genesis_ctrl_w)
-	AM_RANGE(0xa10000, 0xa1001f) AM_READ_PORT("IN0")
-	AM_RANGE(0xa11100, 0xa11101) AM_READ_PORT("IN0")		// ??
-	AM_RANGE(0xa00000, 0xa0ffff) AM_READWRITE(genesis_68k_to_z80_r, genesis_68k_to_z80_w)
-	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(genesis_vdp_r, genesis_vdp_w)				/* VDP Access */
-	AM_RANGE(0xe00000, 0xe1ffff) AM_ROMBANK(3)
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAMBANK(4)
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_BASE(&genesis_68k_ram)/* Main Ram */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( genesis_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK(1) AM_BASE(&genesis_z80_ram)
- 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK(2) /* mirror */
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(genesis_z80_r, genesis_z80_w)
-	AM_RANGE(0x8000, 0xffff) AM_READ(genesis_z80_bank_r) //AM_WRITE(genesis_z80_bank_w)
-ADDRESS_MAP_END
-
-
-static MACHINE_DRIVER_START( genesis_base )
-	/*basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 7)
-	MDRV_CPU_VBLANK_INT("screen", genesis_vblank_interrupt)
-
-	MDRV_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK / 15)
-	MDRV_CPU_PROGRAM_MAP(genesis_z80_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* from vdp at scanline 0xe0 */
-
-	MDRV_QUANTUM_TIME(HZ(6000))
-
-	MDRV_MACHINE_START(genesis)
-	MDRV_MACHINE_RESET(genesis)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
-
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(342,262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
-
-	MDRV_PALETTE_LENGTH(64)
-
-	MDRV_VIDEO_START(genesis)
-	MDRV_VIDEO_UPDATE(genesis)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("ym", YM3438, MASTER_CLOCK/7)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( topshoot )
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM( genesis_base )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(topshoot_map)
-
-	/* video hardware */
-	MDRV_VIDEO_START(genesis)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
-
-	/* sound hardware */
-	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
 
 ROM_START( topshoot ) /* Top Shooter (c)1995 Sun Mixing */
 	ROM_REGION( 0x200000, "maincpu", 0 )
@@ -353,20 +199,15 @@ ROM_START( topshoot ) /* Top Shooter (c)1995 Sun Mixing */
 	ROM_LOAD16_BYTE( "tc574000ad_u12_1.bin", 0x000001, 0x080000, CRC(e826f6ad) SHA1(23ec8bb608f954d3b915f061e7076c0c63b8259e) )
 ROM_END
 
-static READ16_HANDLER( vdp_fake_r )
-{
-	return mame_rand(space->machine);
-}
-
 static DRIVER_INIT(topshoot)
 {
-	/* hack -- fix vdp emulation instead */
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xC00004, 0xC00005, 0, 0, vdp_fake_r);
+	/* set up preliminary input ports (not working yet!) */
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, "IN0");	//correct?
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa11100, 0xa11101, 0, 0, "IN0");	//correct?
 
-	memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") );
-	memory_set_bankptr(machine, 4, genesis_68k_ram );
+	DRIVER_INIT_CALL(megadriv);
 }
 
 
 /* Sun Mixing Hardware, very close to actual Genesis */
-GAME( 1995, topshoot,  0,        topshoot, topshoot, topshoot, ROT0, "Sun Mixing",                  "Top Shooter",GAME_NOT_WORKING )
+GAME( 1995, topshoot,  0,        md_bootleg, topshoot, topshoot, ROT0, "Sun Mixing",                  "Top Shooter",GAME_NOT_WORKING )

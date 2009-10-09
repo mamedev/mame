@@ -417,6 +417,21 @@ static WRITE8_HANDLER( megaplay_bios_gamesel_w )
 	mplay_bios.bios_mode = data & 0x10;
 }
 
+static WRITE16_HANDLER( megaplay_io_write )
+{
+	if (offset == 0x03)
+		megadrive_io_data_regs[2] = (data & megadrive_io_ctrl_regs[2]) | (megadrive_io_data_regs[2] & ~megadrive_io_ctrl_regs[2]);
+	else
+		megadriv_68k_io_write(space, offset & 0x1f, data, 0xffff);
+}
+
+static READ16_HANDLER( megaplay_io_read )
+{
+	if (offset == 0x03)
+		return megadrive_io_data_regs[2];
+	else
+		return megadriv_68k_io_read(space, offset & 0x1f, 0xffff);
+}
 
 static READ8_HANDLER( bank_r )
 {
@@ -489,6 +504,33 @@ static WRITE8_HANDLER( bank_w )
 	}
 }
 
+
+/* Megaplay BIOS handles regs[2] at start in a different way compared to megadrive */
+/* other io data/ctrl regs are dealt with exactly like in the console              */
+
+static READ8_HANDLER( megaplay_bios_6402_r )
+{
+	return megadrive_io_data_regs[2];// & 0xfe;
+}
+
+static WRITE8_HANDLER( megaplay_bios_6402_w )
+{
+	megadrive_io_data_regs[2] = (megadrive_io_data_regs[2] & 0x07) | ((data & 0x70) >> 1);
+//  logerror("BIOS: 0x6402 write: 0x%02x\n", data);
+}
+
+static READ8_HANDLER( megaplay_bios_6204_r )
+{
+	return (megadrive_io_data_regs[2]);
+//  return (mplay_bios.bios_width & 0xf8) + (mplay_bios.bios_6204 & 0x07);
+}
+
+static WRITE8_HANDLER( megaplay_bios_width_w )
+{
+	mplay_bios.bios_width = data;
+	megadrive_io_data_regs[2] = (megadrive_io_data_regs[2] & 0x07) | ((data & 0xf8));
+//  logerror("BIOS: 0x6204 - Width write: %02x\n", data);
+}
 
 static READ8_HANDLER( megaplay_bios_6404_r )
 {

@@ -1103,7 +1103,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/coolridr.o \
 	$(DRIVERS)/deniam.o $(VIDEO)/deniam.o \
 	$(DRIVERS)/dotrikun.o $(VIDEO)/dotrikun.o \
-	$(DRIVERS)/genesis.o $(VIDEO)/genesis.o \
+	$(VIDEO)/genesis.o \
 	$(DRIVERS)/gpworld.o \
 	$(DRIVERS)/hikaru.o \
 	$(DRIVERS)/hshavoc.o \

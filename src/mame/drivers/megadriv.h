@@ -1,3 +1,8 @@
+#define MASTER_CLOCK_NTSC 53693175
+#define MASTER_CLOCK_PAL  53203424
+#define SEGACD_CLOCK      12500000
+
+
 extern DRIVER_INIT( megadriv_c2 );
 extern DRIVER_INIT( megadrie );
 extern DRIVER_INIT( megadriv );
@@ -20,6 +25,7 @@ MACHINE_DRIVER_EXTERN( genesis_32x );
 MACHINE_DRIVER_EXTERN( genesis_32x_pal );
 MACHINE_DRIVER_EXTERN( genesis_scd );
 MACHINE_DRIVER_EXTERN( genesis_32x_scd );
+MACHINE_DRIVER_EXTERN( md_bootleg );	// for topshoot.c & hshavoc.c
 
 extern UINT16* megadriv_backupram;
 extern int megadriv_backupram_length;
@@ -29,24 +35,32 @@ extern void megadriv_stop_scanline_timer(void);
 
 void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine, const char* tag);
 
-extern READ8_HANDLER (megatech_sms_ioport_dc_r);
-extern READ8_HANDLER (megatech_sms_ioport_dd_r);
+extern READ8_HANDLER( megatech_sms_ioport_dc_r );
+extern READ8_HANDLER( megatech_sms_ioport_dd_r );
 
 extern READ16_HANDLER( megadriv_vdp_r );
 extern WRITE16_HANDLER( megadriv_vdp_w );
 
+/* These handlers are needed by megaplay.c */
+extern READ16_HANDLER( megadriv_68k_io_read );
+extern WRITE16_HANDLER( megadriv_68k_io_write );
+
+/* These handlers are needed by puckpkmn.c for his memory map */
+extern READ8_DEVICE_HANDLER( megadriv_68k_YM2612_read);
+extern WRITE8_DEVICE_HANDLER( megadriv_68k_YM2612_write);
+
+/* These are needed to create external input handlers (see e.g. MESS) */
+/* Regs are also used by Megaplay! */
+extern UINT8 (*megadrive_io_read_data_port_ptr)(running_machine *machine, int offset);
+extern void (*megadrive_io_write_data_port_ptr)(running_machine *machine, int offset, UINT16 data);
+extern UINT8 megadrive_io_data_regs[3];
+extern UINT8 megadrive_io_ctrl_regs[3];
 
 MACHINE_RESET( megadriv );
 VIDEO_START( megadriv );
 VIDEO_UPDATE( megadriv );
 VIDEO_EOF( megadriv );
 
-/* Needed to create external input handlers (see e.g. MESS) */
-
-extern UINT8 (*megadrive_io_read_data_port_ptr)(running_machine *machine, int offset);
-extern void (*megadrive_io_write_data_port_ptr)(running_machine *machine, int offset, UINT16 data);
-extern UINT8 megadrive_io_data_regs[3];
-extern UINT8 megadrive_io_ctrl_regs[3];
 
 extern UINT16* megadrive_vdp_palette_lookup;
 extern UINT16* megadrive_vdp_palette_lookup_sprite; // for C2
@@ -61,16 +75,9 @@ extern int genesis_always_irq6;
 extern int genesis_other_hacks;
 
 
-// megaplay & megatech
+/* Megaplay - Megatech specific */
+/* It might be possible to move the following structs in the drivers */
 
-READ8_HANDLER( megaplay_bios_6402_r );
-WRITE8_HANDLER( megaplay_bios_6402_w );
-READ8_HANDLER( megaplay_bios_6204_r );
-WRITE8_HANDLER( megaplay_bios_width_w );
-WRITE16_HANDLER( megaplay_io_write );
-READ16_HANDLER( megaplay_io_read );
-
-/* Megaplay BIOS specific */
 #define MP_ROM  0x10
 #define MP_GAME 0
 

@@ -48,14 +48,10 @@ Notes:
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"
 
-#include "genesis.h"
+#include "megadriv.h"
 
-#define MASTER_CLOCK		53693100
-
-static UINT16* main_ram;
 
 /* Puckman Pockimon Input Ports */
-
 static INPUT_PORTS_START( puckpkmn )
 	PORT_START("P2")	/* $700011.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -131,73 +127,40 @@ INPUT_PORTS_END
 
 
 static ADDRESS_MAP_START( puckpkmn_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM													/* Main 68k Program Roms */
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM								/* Main 68k Program Roms */
 	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("P2")
 	AM_RANGE(0x700012, 0x700013) AM_READ_PORT("P1")
 	AM_RANGE(0x700014, 0x700015) AM_READ_PORT("UNK")
 	AM_RANGE(0x700016, 0x700017) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700018, 0x700019) AM_READ_PORT("DSW2")
-	AM_RANGE(0x700022, 0x700023) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)	/* M6295 Sound Chip Status Register/Writes */
-	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8("ym", ym3438_r,ym3438_w, 0xffff)		/* Ym3438 Sound Chip Status Register */
-	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(genesis_vdp_r,genesis_vdp_w)				/* VDP Access */
-	AM_RANGE(0xe00000, 0xe1ffff) AM_ROMBANK(1)											/* VDP sees the roms here */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAMBANK(2)											/* VDP sees the ram here */
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_BASE(&main_ram)								/* Main Ram */
+	AM_RANGE(0x700022, 0x700023) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8("ym", megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
+	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
 
 	/* Unknown reads/writes: */
-	AM_RANGE(0xa00000, 0xa00551) AM_WRITENOP											/* ? */
+	AM_RANGE(0xa00000, 0xa00551) AM_WRITENOP							/* ? */
 //  AM_RANGE(0xa10000, 0xa10001) AM_READNOP                                             /* ? once */
-	AM_RANGE(0xa10002, 0xa10005) AM_NOP													/* ? alternative way of reading inputs ? */
-	AM_RANGE(0xa11100, 0xa11101) AM_NOP													/* ? */
+	AM_RANGE(0xa10002, 0xa10005) AM_NOP								/* ? alternative way of reading inputs ? */
+	AM_RANGE(0xa11100, 0xa11101) AM_NOP								/* ? */
 //  AM_RANGE(0xa10008, 0xa1000d) AM_WRITENOP                                            /* ? once */
 //  AM_RANGE(0xa14000, 0xa14003) AM_WRITENOP                                            /* ? once */
-	AM_RANGE(0xa11200, 0xa11201) AM_WRITENOP											/* ? */
+	AM_RANGE(0xa11200, 0xa11201) AM_WRITENOP							/* ? */
 ADDRESS_MAP_END
 
 
-static const ym3438_interface ym3438_intf =
-{
-	genesis_irq2_interrupt		/* IRQ handler */
-};
-
 static MACHINE_DRIVER_START( puckpkmn )
+	MDRV_IMPORT_FROM( megadriv )
 
-	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",M68000, MASTER_CLOCK/7) 		/*???*/
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(puckpkmn_map)
-	MDRV_CPU_VBLANK_INT("screen", genesis_vblank_interrupt)
 
-	MDRV_MACHINE_START(genesis)
-	MDRV_MACHINE_RESET(genesis)
+	MDRV_DEVICE_REMOVE("genesis_snd_z80")
 
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
-
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(342,262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
-	MDRV_PALETTE_LENGTH(64)
-
-	MDRV_VIDEO_START(genesis)
-	MDRV_VIDEO_UPDATE(genesis)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("ym", YM3438, MASTER_CLOCK/7)
-	MDRV_SOUND_CONFIG(ym3438_intf)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-
-	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	/* sound hardware */
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 MACHINE_DRIVER_END
 
 /* Genie's Hardware (contains no real sega parts) */
@@ -283,8 +246,7 @@ static DRIVER_INIT( puckpkmn )
 	for (i = 0; i < len; i++)
 		rom[i] = BITSWAP8(rom[i],1,4,2,0,7,5,3,6);
 
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") );	// VDP reads the roms from here
-	memory_set_bankptr(machine, 2, main_ram );						// VDP reads the ram from here
+	DRIVER_INIT_CALL(megadriv);
 }
 
 ROM_START( puckpkmn ) /* Puckman Pockimon  (c)2000 Genie */
