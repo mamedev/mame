@@ -2102,7 +2102,7 @@ Most games had a revision in early 2007 to meet the standards of the "Government
 
 GAME( 2002, mfish_3,     0,        multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021124, set 1)",  0 )
 GAME( 2002, mfish_3a,    mfish_3,  multfish, multfish,  0, ROT0, "Igro", "Multi Fish (021124, set 2)",  0 )
-GAME( 2002, mfish_11,    mfish,    multfish, multfish,  0, ROT0, "Igro", "Multi Fish (031124)",  0 ) /* World */
+GAME( 2002, mfish_11,    mfish_3,  multfish, multfish,  0, ROT0, "Igro", "Multi Fish (031124)",  0 ) /* World */
 GAME( 2002, mfish_12,    mfish_3,  multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040308)",  0 ) /* World */
 GAME( 2002, mfish_12a,   mfish_3,  multfish, multfish,  0, ROT0, "Igro", "Multi Fish (040308, banking address hack)",  0 ) // bank F9
 #if ALL_REVISIONS
