@@ -9591,7 +9591,7 @@ Other Sun games
 	//DRIVER( mfish_8 )	/* (c) 2002 */
 	//DRIVER( mfish_9 )	/* (c) 2002 */
 	//DRIVER( mfish_10 )    /* (c) 2002 */
-	//DRIVER( mfish_11 )    /* (c) 2002 */
+	DRIVER( mfish_11 )	/* (c) 2002 */
 	DRIVER( mfish_12 )	/* (c) 2002 */
 	DRIVER( mfish_12a )	/* (c) 2002 */
 	//DRIVER( mfish_13 )    /* (c) 2002 */
