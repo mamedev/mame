@@ -199,7 +199,7 @@ static DISCRETE_STEP(dss_counter)
 		max = DSS_COUNTER__MAX;
 
 	ds_clock = DSS_COUNTER__CLOCK;
-	if (context->clock_type == DISC_CLK_IS_FREQ)
+	if (UNEXPECTED(context->clock_type == DISC_CLK_IS_FREQ))
 	{
 		/* We need to keep clocking the internal clock even if disabled. */
 		cycles = (context->t_left + node->info->sample_time) * ds_clock;
@@ -215,7 +215,7 @@ static DISCRETE_STEP(dss_counter)
 
 
 	/* If reset enabled then set output to the reset value.  No x_time in reset. */
-	if (DSS_COUNTER__RESET)
+	if (UNEXPECTED(DSS_COUNTER__RESET))
 	{
 		context->count = DSS_COUNTER__INIT;
 		node->output[0] = context->count;
@@ -226,7 +226,7 @@ static DISCRETE_STEP(dss_counter)
      * Only count if module is enabled.
      * This has the effect of holding the output at it's current value.
      */
-	if (DSS_COUNTER__ENABLE)
+	if (EXPECTED(DSS_COUNTER__ENABLE))
 	{
 		last_count = context->count;
 
@@ -260,7 +260,7 @@ static DISCRETE_STEP(dss_counter)
 
 		node->output[0] = context->is_7492 ? disc_7492_count[context->count] : context->count;
 
-		if (context->count != last_count)
+		if (EXPECTED(context->count != last_count))
 		{
 			/* the x_time is only output if the output changed. */
 			switch (context->out_type)

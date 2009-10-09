@@ -3452,7 +3452,7 @@
 #define DISCRETE_MAX_INPUTS					10
 #define DISCRETE_MAX_OUTPUTS			 	8
 #define DISCRETE_MAX_TASK_OUTPUTS			8
-#define DISCRETE_MAX_TASK_GROUPS			8
+#define DISCRETE_MAX_TASK_GROUPS			10
 
 
 /*************************************
@@ -3720,17 +3720,19 @@ struct _discrete_module
 
 struct _node_description
 {
-	const discrete_module *module;							/* Node's module info */
-
+	/* this declaration order seems to be optimal */
 	double				output[DISCRETE_MAX_OUTPUTS];		/* The node's last output value */
 
+	DISCRETE_FUNC((*step));									/* Called to execute one time delta of output update */
+	void *				context;							/* Contextual information specific to this node type */
+
+	const double *		input[DISCRETE_MAX_INPUTS];			/* Addresses of Input values */
 	int					active_inputs;						/* Number of active inputs on this node type */
 	int					input_is_node;						/* Bit Flags.  1 in bit location means input_is_node */
-	const double *		input[DISCRETE_MAX_INPUTS];			/* Addresses of Input values */
 
-	void *				context;							/* Contextual information specific to this node type */
 	const void *		custom;								/* Custom function specific initialisation data */
 
+	const discrete_module *module;							/* Node's module info */
 	const discrete_info *info;								/* Points to the parent */
 	const discrete_sound_block *block;						/* Points to the node's setup block. */
 
@@ -3759,16 +3761,20 @@ typedef struct _discrete_task discrete_task;
 struct _discrete_task
 {
 	const linked_list_entry *list;
+	
+	volatile INT32			threadid;
+	volatile int			samples;
+
+	/* list of source nodes */
+	linked_list_entry		*source_list;		/* discrete_source_node */
 
 	int						task_group;
 	int 					numbuffered;
 	double					*ptr[DISCRETE_MAX_TASK_OUTPUTS];
-	double					*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
-	const node_description	*nodes[DISCRETE_MAX_TASK_OUTPUTS];
 	const double 			*source[DISCRETE_MAX_TASK_OUTPUTS];
 
-	/* list of source nodes */
-	linked_list_entry		*source_list;		/* discrete_source_node */
+	double					*node_buf[DISCRETE_MAX_TASK_OUTPUTS];
+	const node_description	*nodes[DISCRETE_MAX_TASK_OUTPUTS];
 };
 
 typedef struct _discrete_source_node discrete_source_node;
