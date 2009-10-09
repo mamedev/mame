@@ -1091,11 +1091,11 @@ static DISCRETE_STEP(dst_mixer)
 	double	v_ref = info->vRef;
 	double	rI = info->rI;
 
-	if (DST_MIXER__ENABLE)
+	if (EXPECTED(DST_MIXER__ENABLE))
 	{
 		r_total = context->r_total;
 
-		if (context->r_node_bit_flag != 0)
+		if (UNEXPECTED(context->r_node_bit_flag != 0))
 		{
 			/* loop and do any high pass filtering for connected caps */
 			/* but first see if there is an r_node for the current path */
@@ -1161,7 +1161,7 @@ static DISCRETE_STEP(dst_mixer)
 			bit_mask = bit_mask << 1;
 			}
 		}
-		else if (c_bit_flag != 0)
+		else if (UNEXPECTED(c_bit_flag != 0))
 		{
 			/* no r_nodes, so just do high pass filtering */
 			for (bit = 0; bit < context->size; bit++)
@@ -1180,7 +1180,7 @@ static DISCRETE_STEP(dst_mixer)
 		else
 		{
 			/* no r_nodes or c_nodes, mixing only */
-			if (type == DISC_MIXER_IS_OP_AMP)
+			if (UNEXPECTED(type == DISC_MIXER_IS_OP_AMP))
 			{
 				for (bit = 0; bit < context->size; bit++)
 					i += ( v_ref - DST_MIXER__IN(bit) ) / info->r[bit];
@@ -1192,7 +1192,7 @@ static DISCRETE_STEP(dst_mixer)
 			}
 		}
 
-		if (type == DISC_MIXER_IS_OP_AMP_WITH_RI)
+		if (UNEXPECTED(type == DISC_MIXER_IS_OP_AMP_WITH_RI))
 			i += v_ref / rI;
 
 		r_total = 1.0 / r_total;
@@ -1201,13 +1201,13 @@ static DISCRETE_STEP(dst_mixer)
          * If op-amp then summing formula is used. */
 		v = i * ((type == DISC_MIXER_IS_OP_AMP) ? info->rF : r_total);
 
-		if (type == DISC_MIXER_IS_OP_AMP_WITH_RI)
+		if (UNEXPECTED(type == DISC_MIXER_IS_OP_AMP_WITH_RI))
 			v = v_ref + (context->gain * (v_ref - v));
 
 		/* Do the low pass filtering for cF */
-		if (info->cF != 0)
+		if (EXPECTED(info->cF != 0))
 		{
-			if (r_node_bit_flag != 0)
+			if (UNEXPECTED(r_node_bit_flag != 0))
 			{
 				/* Re-calculate exponent if resistor nodes are used */
 				context->exponent_c_f =  RC_CHARGE_EXP(r_total * info->cF);
@@ -1217,7 +1217,7 @@ static DISCRETE_STEP(dst_mixer)
 		}
 
 		/* Do the high pass filtering for cAmp */
-		if (info->cAmp != 0)
+		if (EXPECTED(info->cAmp != 0))
 		{
 			context->v_cap_amp += (v - context->v_cap_amp) * context->exponent_c_amp;
 			v -= context->v_cap_amp;

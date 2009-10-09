@@ -137,7 +137,7 @@ static DISCRETE_STEP( dso_task_start )
 	const linked_list_entry *entry;
 
 	/* update source node buffer */
-	for (entry = task->source_list; entry != 0; entry = entry->next)
+	for (entry = task->source_list; entry != NULL; entry = entry->next)
 	{
 		discrete_source_node *sn = (discrete_source_node *) entry->ptr;
 		sn->buffer = *sn->ptr++;
