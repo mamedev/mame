@@ -2392,23 +2392,26 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 	astring *tempstring = astring_alloc();
 	memory_subview_item *head = NULL;
 	memory_subview_item **tailptr = &head;
-	const device_config *cpu;
+	const device_config *device;
 	int spacenum;
 	const char *rgntag;
 	int curindex = 0;
 	int itemnum;
 
-	/* first add all the CPUs' address spaces */
-	for (cpu = machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
+	/* first add all the device's address spaces */
+	for (device = machine->config->devicelist; device != NULL; device = device->next)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
-			const address_space *space = cpu_get_address_space(cpu, spacenum);
+			const address_space *space = memory_find_address_space(device, spacenum);
 			if (space != NULL)
 			{
 				memory_subview_item *subview;
 
 				/* determine the string and allocate a subview large enough */
-				astring_printf(tempstring, "CPU '%s' (%s) %s memory", cpu->tag, cpu_get_name(cpu), space->name);
+				if (device->type == CPU)
+					astring_printf(tempstring, "CPU '%s' (%s) %s memory", device->tag, device_get_name(device), space->name);
+				else
+					astring_printf(tempstring, "%s '%s' space #%d memory", device_get_name(device), device->tag, spacenum);
 				subview = (memory_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + astring_len(tempstring));
 
 				/* populate the subview */
@@ -2886,7 +2889,7 @@ static int memory_view_needs_recompute(debug_view *view)
 	int recompute = view->recompute;
 
 	/* handle expression changes */
-	if (debug_view_expression_changed_value(view, &memdata->expression, (space != NULL) ? space->cpu : NULL))
+	if (debug_view_expression_changed_value(view, &memdata->expression, (space != NULL && space->cpu != NULL && space->cpu->type == CPU) ? space->cpu : NULL))
 	{
 		recompute = TRUE;
 		view->topleft.y = (memdata->expression.result - memdata->byte_offset) / memdata->bytes_per_row;
