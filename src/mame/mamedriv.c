@@ -1892,6 +1892,7 @@ const game_driver * const drivers[] =
 	/* Taito H-System games */
 	DRIVER( syvalion )	/* B51 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( recordbr )	/* B56 (c) 1988 Taito Corporation Japan (World) */
+	DRIVER( gogold )	/* B56 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( dleague )	/* C02 (c) 1990 Taito Corporation (Japan) */
 
 	/* Taito B-System games */
