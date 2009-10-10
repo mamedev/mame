@@ -83,6 +83,11 @@ Stephh's notes (based on the game M68000 code and some tests) :
         0x0007 (licenced to PHOENIX ELECTRONICS CO.) use TAITO_COINAGE_WORLD
   - Notice screen only if region = 0x0000 or region = 0x0001
 
+  - Debug Mode (from Shimapong)
+    1. Hold Service Switch at boot (key "9")
+    2. Input the following sequence at the "Service Switch Error" message screen:
+	1P Start, 1P Start, 1P Start, Service Switch, 1P Start
+
 
 3) 'dleague'
 
@@ -127,7 +132,7 @@ flipscreen.
 Recordbr: missing hand of opponent when he ends in swimming
 race and you're still on the blocks. Bug?
 
-Recordbr: loads of unmapped IOC reads and writes.
+Recordbr: loads of unmapped IOC reads and writes. Need to map Player 3 & 4 controls.
 
 what is the rom loaded into region user1? (see go gold / dynamite league)
 some kind of zoom table?
