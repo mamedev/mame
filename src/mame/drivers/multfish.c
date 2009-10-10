@@ -2165,7 +2165,7 @@ GAME( 2003, rollfr_2,    0,        multfish, rollfr,    0, ROT0, "Igrosoft", "Ro
 
 GAME( 2004, garage_4,    0,        multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219)",  0 ) /* World */
 GAME( 2004, garage_4a,   garage_4, multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219, backdoor)",  0 ) // backdoor
-GAME( 2004, garage_4b,   garage,   multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219, changed version text)",  0 ) // changed version text to 070329
+GAME( 2004, garage_4b,   garage_4, multfish, multfish,  0, ROT0, "Igrosoft", "Garage (040219, changed version text)",  0 ) // changed version text to 070329
 GAME( 2004, garage_5,    garage_4, multfish, multfish,  0, ROT0, "Igrosoft", "Garage (050311)",  0 ) /* World */
 GAME( 2004, garage_5a,   garage_4, multfish, multfish,  0, ROT0, "Igrosoft", "Garage (050311, backdoor)",  0 ) // backdoor
 #if ALL_REVISIONS
