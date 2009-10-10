@@ -422,6 +422,14 @@ static INPUT_PORTS_START( recordbr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )                 /* IPT_BUTTON4 (PL2) in service mode */
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( gogold )
+	PORT_INCLUDE(recordbr)
+
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_JAPAN_OLD
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( dleague )
 	/* 0x200000 -> 0x100526.b ($526,A5) */
 	PORT_START("DSWA")
@@ -791,5 +799,5 @@ ROM_END
 /*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT     MONITOR  COMPANY  FULLNAME */
 GAME( 1988, syvalion, 0,        syvalion, syvalion, 0,       ROT0,    "Taito Corporation", "Syvalion (Japan)", 0 )
 GAME( 1988, recordbr, 0,        recordbr, recordbr, 0,       ROT0,    "Taito Corporation Japan", "Recordbreaker (World)", 0 )
-GAME( 1988, gogold,   recordbr, recordbr, recordbr, 0,       ROT0,    "Taito Corporation", "Go For The Gold (Japan)", 0 )
+GAME( 1988, gogold,   recordbr, recordbr, gogold,   0,       ROT0,    "Taito Corporation", "Go For The Gold (Japan)", 0 )
 GAME( 1990, dleague,  0,        dleague,  dleague,  0,       ROT0,    "Taito Corporation", "Dynamite League (Japan)", 0 )
