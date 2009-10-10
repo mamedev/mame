@@ -74,6 +74,7 @@ enum
 	XTAL_8_664MHz		= 8664000,		/* Touchmaster */
 	XTAL_8_945MHz		= 8945000,		/* Hit Me */
 	XTAL_9_828MHz		= 9828000,		/* Universal PCBs */
+	XTAL_9_8304MHz		= 9830400,		/* Epson PX-8 */
 	XTAL_9_987MHz		= 9987000,		/* Crazy Balloon */
 	XTAL_10MHz   		= 10000000,
 	XTAL_10_595MHz  	= 10595000,		/* Mad Alien */
