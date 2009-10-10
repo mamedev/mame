@@ -12,9 +12,9 @@ Yasuhiro Ogawa. Thank you, Yasu.
 
 Supported games :
 ==================
- Syvalion          (C) 1988 Taito
- Record Breaker    (C) 1988 Taito
- Dynamite League   (C) 1990 Taito
+ Syvalion                           (C) 1988 Taito
+ Record Breaker / Go For The Gold   (C) 1988 Taito
+ Dynamite League                    (C) 1990 Taito
 
 
 System specs :
@@ -67,16 +67,21 @@ Stephh's notes (based on the game M68000 code and some tests) :
     (see code at 0x002af8). Another write to this address is done at 0x002a96.
 
 
-2) 'recordbr'
+2) 'recordbr' and 'gogold'
 
   - Region stored at 0x07fffe.w
+  - Title stored at 0x07ff9a.w :
+      * 0x0000 : "Go For The Gold"
+      * 0x0001 : "Recordbreaker"
   - Sets :
-      * 'recordbr' : region = 0x0003
+      * 'recordbr' : region = 0x0003 and title = 0x0001
+      * 'gogold'   : region = 0x0001 and title = 0x0000
   - Coinage relies on the region (code at 0x00144a) :
-      * 0x0001 (Japan), 0x0002 (US), 0x0005 (US, Romstar licence) use TAITO_COINAGE_JAPAN_OLD
+      * 0x0001 (Japan), 0x0002 (US), 0x0005 (World, Romstar licence) and 
+        0x0006 (US, Romstar licence) use TAITO_COINAGE_JAPAN_OLD
       * 0x0003 (World), 0x0004 (licenced to xxx) and
         0x0007 (licenced to PHOENIX ELECTRONICS CO.) use TAITO_COINAGE_WORLD
-  - Notice screen only if region = 0x0001
+  - Notice screen only if region = 0x0000 or region = 0x0001
 
 
 3) 'dleague'
