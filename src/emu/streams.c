@@ -222,7 +222,7 @@ void streams_init(running_machine *machine)
 
 	/* reset globals */
 	strdata->stream_tailptr = &strdata->stream_head;
-	strdata->update_attoseconds = STREAMS_UPDATE_FREQUENCY.attoseconds;
+	strdata->update_attoseconds = STREAMS_UPDATE_ATTOTIME.attoseconds;
 
 	/* set the global pointer */
 	machine->streams_data = strdata;

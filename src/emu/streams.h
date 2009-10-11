@@ -19,7 +19,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define STREAMS_UPDATE_FREQUENCY	ATTOTIME_IN_HZ(50)
+#define STREAMS_UPDATE_FREQUENCY	(50)
+#define STREAMS_UPDATE_ATTOTIME		ATTOTIME_IN_HZ(STREAMS_UPDATE_FREQUENCY)
 
 
 

@@ -209,7 +209,7 @@ void sound_init(running_machine *machine)
 
 	/* allocate a global timer for sound timing */
 	global->update_timer = timer_alloc(machine, sound_update, NULL);
-	timer_adjust_periodic(global->update_timer, STREAMS_UPDATE_FREQUENCY, 0, STREAMS_UPDATE_FREQUENCY);
+	timer_adjust_periodic(global->update_timer, STREAMS_UPDATE_ATTOTIME, 0, STREAMS_UPDATE_ATTOTIME);
 
 	/* finally, do all the routing */
 	VPRINTF(("route_sound\n"));
