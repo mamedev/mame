@@ -34,9 +34,9 @@ struct dss_adjustment_context
 struct dss_input_context
 {
 	stream_sample_t *ptr;			/* current in ptr for stream */
-	UINT8		data;				/* data written */
 	double 		gain;				/* node gain */
 	double		offset;				/* node offset */
+	UINT8		data;				/* data written */
 	UINT8		is_stream;
 	UINT8		is_buffered;
 	UINT32		stream_in_number;
@@ -302,7 +302,7 @@ static DISCRETE_RESET(dss_input_stream)
 	struct dss_input_context *context = (struct dss_input_context *)node->context;
 
 	context->ptr = NULL;
-	//context->data = 0;
+	context->data = 0;
 }
 
 static DISCRETE_START(dss_input_stream)
