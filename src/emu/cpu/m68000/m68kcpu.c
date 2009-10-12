@@ -5,7 +5,7 @@
 #if 0
 static const char copyright_notice[] =
 "MUSASHI\n"
-"Version 4.10 (2009-09-27)\n"
+"Version 4.5 (2009-10-09)\n"
 "A portable Motorola M680x0 processor emulation engine.\n"
 "Copyright Karl Stenerud.  All rights reserved.\n"
 "\n"
@@ -37,6 +37,8 @@ static const char copyright_notice[] =
 #include "m68kops.h"
 #include "m68kfpu.c"
 #include "debugger.h"
+
+#include "m68kmmu.h"
 
 extern void m68040_fpu_op0(m68ki_cpu_core *m68k);
 extern void m68040_fpu_op1(m68ki_cpu_core *m68k);
@@ -611,6 +613,21 @@ static void m68k_postload(running_machine *machine, void *param)
 	m68ki_jump(m68k, REG_PC);
 }
 
+/* translate logical to physical addresses */
+static CPU_TRANSLATE( m68k )
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+
+	/* only applies to the program address space and only does something if the MMU's enabled */
+	if (m68k)
+	{
+		if ((space == ADDRESS_SPACE_PROGRAM) && (m68k->pmmu_enabled))
+		{
+			*address = pmmu_translate_addr(m68k, *address);
+		}
+	}
+	return TRUE;
+}
 
 /* Execute some instructions until we use up cycles clock cycles */
 static CPU_EXECUTE( m68k )
@@ -717,6 +734,9 @@ static CPU_INIT( m68k )
 static CPU_RESET( m68k )
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
+
+	/* Disable the PMMU on reset */
+	m68k->pmmu_enabled = 0;
 
 	/* Clear all stop levels and eat up all remaining cycles */
 	m68k->stopped = 0;
@@ -890,6 +910,7 @@ static CPU_GET_INFO( m68k )
 		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(m68k);			break;
 		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(m68k);		break;
 		case CPUINFO_FCT_EXPORT_STATE:	info->export_state = CPU_EXPORT_STATE_NAME(m68k);		break;
+		case CPUINFO_FCT_TRANSLATE:	       	info->translate = CPU_TRANSLATE_NAME(m68k);		break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68k->remaining_cycles;	break;
@@ -898,7 +919,7 @@ static CPU_GET_INFO( m68k )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							/* set per-core */						break;
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Motorola 68K");		break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "4.00");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "4.50");				break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB)"); break;
 
@@ -1062,7 +1083,139 @@ static const m68k_memory_interface interface_d32 =
 	writelong_d32
 };
 
+/* interface for 32-bit data bus with PMMU (68EC020, 68020) */
+static UINT8 read_byte_32_mmu(const address_space *space, offs_t address)
+{
+	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
+	
+	if (m68k->pmmu_enabled)
+	{
+		address = pmmu_translate_addr(m68k, address);
+	}
 
+	return memory_read_byte_32be(space, address);
+}
+
+static void write_byte_32_mmu(const address_space *space, offs_t address, UINT8 data)
+{
+	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
+	
+	if (m68k->pmmu_enabled)
+	{
+		address = pmmu_translate_addr(m68k, address);
+	}
+
+	memory_write_byte_32be(space, address, data);
+}
+
+static UINT16 read_immediate_16_mmu(const address_space *space, offs_t address)
+{
+	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
+	
+	if (m68k->pmmu_enabled)
+	{
+		address = pmmu_translate_addr(m68k, address);
+	}
+
+	return memory_decrypted_read_word(space, (address) ^ m68k->memory.opcode_xor);
+}
+
+/* potentially misaligned 16-bit reads with a 32-bit data bus (and 24-bit address bus) */
+static UINT16 readword_d32_mmu(const address_space *space, offs_t address)
+{
+	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
+	UINT16 result;
+
+	if (m68k->pmmu_enabled)
+	{
+		address = pmmu_translate_addr(m68k, address);
+	}
+
+	if (!(address & 1))
+		return memory_read_word_32be(space, address);
+	result = memory_read_byte_32be(space, address) << 8;
+	return result | memory_read_byte_32be(space, address + 1);
+}
+
+/* potentially misaligned 16-bit writes with a 32-bit data bus (and 24-bit address bus) */
+static void writeword_d32_mmu(const address_space *space, offs_t address, UINT16 data)
+{
+	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
+
+	if (m68k->pmmu_enabled)
+	{
+		address = pmmu_translate_addr(m68k, address);
+	}
+
+	if (!(address & 1))
+	{
+		memory_write_word_32be(space, address, data);
+		return;
+	}
+	memory_write_byte_32be(space, address, data >> 8);
+	memory_write_byte_32be(space, address + 1, data);
+}
+
+/* potentially misaligned 32-bit reads with a 32-bit data bus (and 24-bit address bus) */
+static UINT32 readlong_d32_mmu(const address_space *space, offs_t address)
+{
+	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
+	UINT32 result;
+
+	if (m68k->pmmu_enabled)
+	{
+		address = pmmu_translate_addr(m68k, address);
+	}
+
+	if (!(address & 3))
+		return memory_read_dword_32be(space, address);
+	else if (!(address & 1))
+	{
+		result = memory_read_word_32be(space, address) << 16;
+		return result | memory_read_word_32be(space, address + 2);
+	}
+	result = memory_read_byte_32be(space, address) << 24;
+	result |= memory_read_word_32be(space, address + 1) << 8;
+	return result | memory_read_byte_32be(space, address + 3);
+}
+
+/* potentially misaligned 32-bit writes with a 32-bit data bus (and 24-bit address bus) */
+static void writelong_d32_mmu(const address_space *space, offs_t address, UINT32 data)
+{
+	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
+
+	if (m68k->pmmu_enabled)
+	{
+		address = pmmu_translate_addr(m68k, address);
+	}
+
+	if (!(address & 3))
+	{
+		memory_write_dword_32be(space, address, data);
+		return;
+	}
+	else if (!(address & 1))
+	{
+		memory_write_word_32be(space, address, data >> 16);
+		memory_write_word_32be(space, address + 2, data);
+		return;
+	}
+	memory_write_byte_32be(space, address, data >> 24);
+	memory_write_word_32be(space, address + 1, data >> 8);
+	memory_write_byte_32be(space, address + 3, data);
+}
+
+static const m68k_memory_interface interface_d32_mmu =
+{
+	WORD_XOR_BE(0),
+	read_immediate_16_mmu,
+	read_byte_32_mmu,
+	readword_d32_mmu,
+	readlong_d32_mmu,
+	write_byte_32_mmu,
+	writeword_d32_mmu,
+	writelong_d32_mmu
+};
 
 
 void m68k_set_reset_callback(const device_config *device, m68k_reset_func callback)
@@ -1301,6 +1454,30 @@ CPU_GET_INFO( m68020 )
 	}
 }
 
+// 68020 with 68851 PMMU
+static CPU_INIT( m68020pmmu )
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+
+	CPU_INIT_CALL(m68020);
+
+	m68k->has_pmmu	       = 1;
+	m68k->memory           = interface_d32_mmu;
+}
+
+CPU_GET_INFO( m68020pmmu )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68020pmmu);						break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "68020, 68851");				break;
+
+		default:										CPU_GET_INFO_CALL(m68020);				break;
+	}
+}
 
 /****************************************************************************
  * M680EC20 section
@@ -1361,7 +1538,7 @@ static CPU_INIT( m68030 )
 	m68k->cpu_type         = CPU_TYPE_030;
 	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68030;
-	m68k->memory           = interface_d32;
+	m68k->memory           = interface_d32_mmu;
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m68k->cyc_instruction  = m68ki_cycles[3];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[3];
@@ -1480,7 +1657,7 @@ static CPU_INIT( m68040 )
 	m68k->cpu_type         = CPU_TYPE_040;
 	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68040;
-	m68k->memory           = interface_d32;
+	m68k->memory           = interface_d32_mmu;
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m68k->cyc_instruction  = m68ki_cycles[4];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[4];
@@ -1568,7 +1745,7 @@ static CPU_INIT( m68ec040 )
 	m68k->cyc_movem_l      = 2;
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
-	m68k->has_pmmu	       = 1;
+	m68k->has_pmmu	       = 0;
 }
 
 CPU_GET_INFO( m68ec040 )

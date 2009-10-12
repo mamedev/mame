@@ -241,6 +241,7 @@ src/emu/cpu/m68000/m68kcpu.h svneol=native#text/plain
 src/emu/cpu/m68000/m68kdasm.c svneol=native#text/plain
 src/emu/cpu/m68000/m68kfpu.c svneol=native#text/plain
 src/emu/cpu/m68000/m68kmake.c svneol=native#text/plain
+src/emu/cpu/m68000/m68kmmu.h svneol=native#text/plain
 src/emu/cpu/m6805/6805dasm.c svneol=native#text/plain
 src/emu/cpu/m6805/6805ops.c svneol=native#text/plain
 src/emu/cpu/m6805/m6805.c svneol=native#text/plain

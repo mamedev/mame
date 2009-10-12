@@ -3,7 +3,7 @@
 /* ======================================================================== */
 /*
  *                                  MUSASHI
- *                                Version 4.00
+ *                                Version 4.50
  *
  * A portable Motorola M680x0 processor emulation engine.
  * Copyright Karl Stenerud.  All rights reserved.
@@ -581,6 +581,7 @@ struct _m68ki_cpu_core
 	UINT32 instr_mode;   /* Stores whether we are in instruction mode or group 0/1 exception mode */
 	UINT32 run_mode;     /* Stores whether we are processing a reset, bus error, address error, or something else */
 	int    has_pmmu;     /* Indicates if a PMMU available (yes on 030, 040, no on EC030) */
+	int    pmmu_enabled; /* Indicates if the PMMU is enabled */
 
 	/* Clocks required for instructions / exceptions */
 	UINT32 cyc_bcc_notake_b;
@@ -635,6 +636,12 @@ struct _m68ki_cpu_core
 	UINT16 save_sr;
 	UINT8 save_stopped;
 	UINT8 save_halted;
+
+	/* PMMU registers */
+	UINT32 mmu_crp_aptr, mmu_crp_limit;
+	UINT32 mmu_srp_aptr, mmu_srp_limit;
+	UINT32 mmu_tc;
+	UINT16 mmu_sr;
 };
 
 
