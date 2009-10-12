@@ -9553,14 +9553,18 @@ Other Sun games
 	/* Hi-Soft */
 	DRIVER( himesiki )	/* (c) 1989 Hi-Soft */
 
-	/* Hi-Lo Poker-based */
-	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
+	/* Draw Poker Hi-Lo based */
 	DRIVER( norautp )	/* (c) 1988? Noraut Ltd */
 	DRIVER( norautjp )	/* (c) 1988? Noraut Ltd */
 	DRIVER( norautrh )	/* (c) 1988? Noraut Ltd */
 	DRIVER( norautu )	/* (c) 1988? Noraut Ltd */
 	DRIVER( norautv3 )	/* (c) 1988? Noraut Ltd */
 	DRIVER( norautpn )	/* (c) 1990? unknown */
+	DRIVER( pma )		/* PMA */
+	DRIVER( dphl )		/* (c) M. Kramer Inc. 1983 */
+	DRIVER( dphla )		/* unknown */
+	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
+	DRIVER( tpoker2 )	/* (c) 1993 Micro Manufacturing, Inc. */
 
 	/* Sanki Denshi Kogyo */
 	DRIVER( pachifev )	/* (c) 1983? */

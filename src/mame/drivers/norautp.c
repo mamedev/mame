@@ -8,17 +8,30 @@
 
   Games running on this hardware:
 
+  -- Z80 based --
+
    * Noraut Poker,                 1988,  Noraut Ltd.
    * Noraut Joker Poker,           1988,  Noraut Ltd.
    * Noraut Red Hot Joker Poker,   1988,  Noraut Ltd.
    * Noraut Poker (NTX10A),        1988,  Noraut Ltd.
    * Noraut Joker Poker (V3.010a), 1988,  Noraut Ltd.
-   * GTI Poker,                    1983,  GTI Inc.
    * Noraut Poker (bootleg),       198?,  Unknown.
+   * PMA Poker,                    198?,  PMA.
 
+  -- 8080A based --
+
+   * Draw Poker Hi-Lo,             1983,  M. Kramer Manufacturing.
+   * Draw Poker Hi-Lo (alt),       1983,  Unknown.
+   * GTI Poker,                    1983,  GTI Inc.
+   * Turbo Poker 2,                1993,  Micro Manufacturing, Inc.
+
+
+  This hardware emulation opened a big can of worms. :)
+  You can see the legal issues in the following link:
+  http://www.altlaw.org/v1/cases/533481
 
   Special thanks to Alan Griffin, that kindly helped providing good references
-  that allowed me to improve the system emulation.
+  that allowed me to improve the Noraut system emulation.
 
 
 *******************************************************************************
@@ -389,6 +402,315 @@
 
 
 *******************************************************************************
+*******************************************************************************
+
+
+  Draw Poker Hi-Lo (1983).
+  "NYMF O II" hardware.
+  M. Kramer Inc.
+
+  PCB layout (Draw Poker Hi-Lo)
+   ___________________________________________________________________________
+  |  _________                       ______                                   |
+  | |HCF4093BE|           SN74174N  | U51  |  NE555P  916C472X2PE  ULN2003A   |
+  | |         |                     |______|                                  |
+  | |         |                                                               |
+  | |MC14040  |  74123N   SN74157N            74161N  SN7486N      ULN2003A   |
+  | |         |                                                               |
+  | |         |                                                               |
+  | |MWS5101  |  SN7404N  SN74166N  898-1-R   74161N               ULN2003A   |__
+  | |         |                                                                __|
+  | |         |            ______    _______                     ___________   __|
+  | |5101E-1  |           | U31  |  |DIP-SW | 74161N  SN74157N  |AM8255 APC |  __|
+  | |_________|           |______|  |_______|                   |___________|  __|
+  |   ______                                                     ___________   __|
+  |  | U26  |             2111A-2   2111A-2   74161N  SN74157N  | U20       |  __|
+  |  |______|                                                   |___________|  __|
+  |   ______     ______    ___________                                         __|
+  |  | U19  |   | U18  |  |AM8255 APC |       74161N  SN74157N     898-1-R     __|
+  |  |______|   |______|  |___________|                                        __|
+  |              ______    __________                                         |
+  |  74LS541N   | U12  |  |i D8228   |   OSC  74161N  SN7486N      SN7404N    |
+  |             |______|  |__________|                                        |
+  |              __________                                                   |
+  |  DM7405N    |i P8080A  |     SN74LS155AN  iP8224  SN74157N 7411N 7474PC   |
+  |             |__________|                                                  |
+  |___________________________________________________________________________|
+
+  OSC = 18.14 MHz
+
+  U12 = AM2732
+  U18 = AM2732
+  U31 = AM2732A
+  U51 = N82S129N
+
+  U26, U19, U20 = unpopulated
+
+  Edge connector is not JAMMA
+
+
+*******************************************************************************
+
+
+  Hardware Layout (Draw Poker Hi-Lo (alt)):
+
+  Board layout/pcb tracks almost Identical to NORAUT boards.
+
+  - CPU:             1x INTEL P8080A : L1087022 : INTEL '79.
+  - RAM:             4x 2111A-2 Static Random Access Memory 256 x 4 bit.
+  - I/O:             3x 8255 Peripeheral Interface Adapter.
+  - Prg ROMs:        2x 2716 U11,U16 Eprom.
+  - Gfx ROMs:        1x 2716 U27 Eprom :EXACT MATCH WITH NORAUT V3010A CHAR ROM.
+  - Sound:           Discrete.
+  - Crystal:         1x 18.000 MHz.
+
+  PCB silksceened: REV A.
+  PCB MARKED: Solderside "81 16".
+  Component side "J3 018".
+
+  U11 2716 EPROM MARKED:"2B27".
+  U16 2716 EPROM MARKED:"4D30".
+
+  Frequency measured on CPU P8080A (pins 15 & 22) = 2.00056 MHz.
+
+  No date information found on PCB or in Roms.
+  Some dates found on some of the IC's
+  U6: 1979 :SOLDERED TO BOARD
+  U10:1975 :SOLDERED TO BOARD
+  U15:1979 :SOLDERED TO BOARD
+  U23:1981 :IN SOCKET
+  U27:1977 :IN SOCKET
+
+
+
+  PCB Layout (Draw Poker Hi-Lo (alt)):                                        Edge Connector 36x2
+   ______________________________________________________________________________________________
+  |                         _________    _________    _____        .........     _________       |
+  |                        |74LS174N |  |74LS153N |  |NE555|       .........    |ULN2003A |      |
+  |       NO IC            |_________|  |_________|  |_____|       16-2-472     |_________|      |
+  |        U46                 U45          U44        U43            U42          U41           |
+  |                                                                                              |
+  |                                                                                              |
+  |                         _________    _________    _________    _________     _________       |
+  |                        |74LS157N |  | 74153N  |  | 74161N  |  |  7486N  |   |ULN2003A |      |
+  |       NO IC            |_________|  |_________|  |_________|  |_________|   |_________|      |
+  |        U40                 U39          U38          U37          U36           U35          |
+  |                                                                                              |
+  |                                                                                              | 36
+  |  _________              _________   916C471X2PE   _________    _________     _________       |___
+  | |  7404N  |            | 74166N  |   .........   | 74161N  |  | 74153N  |   |ULN2003A |       ___|
+  | |_________|            |_________|   .........   |_________|  |_________|   |_________|       ___|
+  |     U34                    U33          U32          U31          U30           U29           ___|
+  |                                   DIP SW x 8                               ________________   ___|
+  |               _____________    _______________    _________    _________  |                |  ___|
+  |  _________   |             |  |1|2|3|4|5|6|7|8|  | 74161N  |  | 74157N  | |    P8255A-5    |  ___|
+  | | 2111A-2 |  |    2716     |  |_|_|_|_|_|_|_|_|  |_________|  |_________| |________________|  ___|
+  | |_________|  |_____________|         U26             U25          U24            U23          ___|
+  |     U28            U27                                                                        ___|
+  |                                                                            ________________   ___|
+  |                                                                           |                |  ___|
+  |  _________        _________       _________       _________    _________  |    D8255AC-5   |  ___|
+  | | 2111A-2 |      | 2111A-2 |     | 2111A-2 |     | 74161N  |  | 74157N  | |________________|  ___|
+  | |_________|      |_________|     |_________|     |_________|  |_________|        U17          ___|
+  |     U22              U21             U20             U19          U18                         ___|
+  |                                                                                               ___|
+  |  ______________       ________________                                                        ___|
+  | |              |     |                |           _________    _________     916C471X2PE      ___|
+  | |     2716     |     |   AM8255A PC   |          | 74161N  |  | 74157N  |     .........       ___|
+  | |______________|     |________________|          |_________|  |_________|     .........       ___|
+  |       U16                   U15                      U14          U13            U12          ___|
+  |                                                                                              |
+  |  ______________         ____________       _________       _________        _________        | 01
+  | |              |       |            |     | 74161N  |     | 7486N   |      |  7404N  |       |
+  | |     2716     |       |  i P8228   |     |_________|     |_________|      |_________|       |
+  | |______________|       |____________|         U9              U8               U7            |
+  |       U11                   U10           XTAL                                               |
+  |                                          .----. 18Mhz                                        |
+  |  ____________________     __________      _________    _________    _________    _________   |
+  | |                    |   |  74155N  |    | i P8224 |  | 74157N  |  |  7411N  |  |  7474N  |  |
+  | |     i P8080A       |   |__________|    |_________|  |_________|  |_________|  |_________|  |
+  | |____________________|        U5              U4           U3           U2           U1      |
+  |           U6                                                                                 |
+  |______________________________________________________________________________________________|
+
+
+
+  Noraut old Draw Poker Hi-Lo discrete audio circuitry
+  ----------------------------------------------------
+
+  3x ULN2003A (Darlington transistor array)
+  1x NE555P   (Timer)
+  1x F 2N4401 (NPN General Purpose Amplifier)
+ 
+
+  .------.                              .------------.              .-------.
+  |  U17 |                              |   NE555P   |              |2N4401 |
+  |      |                             4|            |3     R3      |       |
+  |   PC7|------------------------------|RST      OUT|-----ZZZZ-----|B     E|-------> Audio Out.
+  |   PC6|----------.                  6|            |8             |   C   |
+  |   PC5|-----.    |3-in         .-----|THR      VCC|-----------.  '---+---'  .----> Audio Out.
+  |   PC4|--.  |  .-+------.      |    5|            |7          |      |      |
+  |      |  |  |  |ULN2003A|      |  .--|CVOLT   DISC|--.        |      |      |
+  |      |  |  |  '-+------'      |  |  |            |  |        +------'    --+--
+  |      |  |  |    |3-out   C1   |  |  |    GND     |  |        |            GND
+  | 8255 |  |  |    '--------||---+  |  '-----+------'  |        |             -
+  |      |  |  '--.               |  |        |1        |        |             '
+  |      |  |     |2-in           |  |        |         |        |
+  '------'  |  .--+-----.         |  |   C5   |         |        |
+            |  |ULN2003A|         |  '---||---+         |        |   +5V
+            |  '--+-----'         |           |         |        |   -+-
+            |     |2-out     C2   |      C4   |         |    C6  |    |
+            |     '----------||---+------||---+-------. | .--||--+----'
+            |2-in                 |           |       | | |      |
+          .-+------.              |         --+--      '-'       |
+          |ULN2003A|              |          GND        |        |
+          '-+------'              |           -         |        |
+            |2-out           C3   |     R1    '         |   R2   |
+            '----------------||---+----ZZZZ-------------+--ZZZZ--'
+
+
+
+  R1 = 120 K ; Tolerance +/- 5%
+  R2 = 1 K   ; Tolerance +/- 5%
+  R3 = 1 K   ; Tolerance +/- 5%
+
+  C1 = .01 Z
+  C2 = .022 Z
+  C3 = 503   ; 50.000 pf = 50 nf = 0.05 uf.
+  C4 = .01 Z
+  C5 = .01 Z
+  C6 = .1 Z 
+
+
+  All Capacitors are Ceramic Disc.
+
+  ----------------------------------------------------------------------------
+
+  Ports Map:
+  ----------
+
+  U23:
+  PPI-0 (); PortA IN.
+  DIP Switches bank:
+  
+  7654 3210
+  ---- ---x  * DIP switch 8
+  ---- --x-  * DIP switch 7
+  ---- -x--  * DIP switch 6
+  ---- x---  * DIP switch 5
+  ---x ----  * DIP switch 4
+  --x- ----  * DIP switch 3
+  -x-- ----  * DIP switch 2
+  x--- ----  * DIP switch 1
+
+
+*******************************************************************************
+
+
+  Hardware Layout (Turbo Poker 2 by Micro MFG):
+
+
+  - CPU:             1x NEC D8080AFC-1 (U42).
+  - BUS:             1x 8224 (U43)
+  - RAM:             2x 2111-1 Static Random Access Memory 256 x 4 bit (U33 & U34).
+  - I/O:             3x Intel P8255A Peripeheral Interface Adapter (U31, U36 & U38).
+  - Prg ROMs:        1x 27256 (U39).
+  - Gfx ROMs:        1x 2732 (U30).
+  - Sound:           Discrete.
+  - Crystal:         1x 18.000 MHz.
+
+
+  Etched in copper on board:	TP2
+
+  .U30  2732a    ; stickered  (c) 1993 MICRO MFG TURBO POKER CHAR, ROM.
+
+  .U35  unknown  ; stickered  (c) 1993 MICRO MFG TP2#01 U35\IC4 16228 022194.
+
+   Continuity errors when trying to read as a standard eprom.
+   Silkscreened below the chip 'CUSTOM I.C.'. Looks like a normal EPROM.
+
+  .U39  27256    ; stickered  (c) 1993 MICRO MFG TURBO-2 U39-014 US UTBK 022190.
+
+  .U38  8255     ; stickered  MICRO MANUFACTURING, INC.  DATE: 02-24-1994  SER# LKY-PCB-142728.
+
+  .U37  MMI PAL12L6-2  ; Blue dot on it. Saved in Jedec format.
+
+  .U44  DS1220AD-150   ; Dallas 2K x 8 CMOS nonvolatile SRAM.
+
+  .U23  82S131         ; Bipolar PROM.
+
+
+
+        27256 @U39                               Estimated U35 pinouts
+
+       .----------.                                   .----------.
+  VPP -|01      28|- VCC                         GND -|01      28|- Pin 10 of U14 (7404)
+  A12 -|02      27|- A14                         VCC -|02      27|- A7
+   A7 -|03      26|- A13                         VCC -|03      26|- A6
+   A6 -|04      25|- A8                          N/C -|04      25|- A5
+   A5 -|05      24|- A9            Pull-up to pin 02 -|05      24|- A4
+   A4 -|06      23|- A11                         VCC -|06      23|- A3
+   A3 -|07      22|- /OE                         N/C -|07      22|- A2
+   A2 -|08      21|- A10            Pin 9 of U37 PAL -|08      21|- A1
+   A1 -|09      20|- /CE            Pin 8 of U37 PAL -|09      20|- A0
+   A0 -|10      19|- D7         Pin 24 of U42 (8080) -|10      19|- D7
+   D0 -|11      18|- D6             Pin 7 of U37 PAL -|11      18|- D6
+   D1 -|12      17|- D5                           D0 -|12      17|- D5
+   D2 -|13      16|- D4                           D1 -|13      16|- D4
+  GND -|14      15|- D3                           D2 -|14      15|- D3
+       '----------'                                   '----------'
+
+
+  PCB Layout (Turbo Poker 2 by Micro MFG):                                         Edge Connector 36x2
+   ___________________________________________________________________________________________________
+  |  _________    _________    _________    _________    _________       _____      ________     _    |
+  | | 74LS161 |  | 74LS161 |  | 74LS161 |  | 74LS161 |  | 74LS161 |     | 555 |    | KA2657 |  /   \  |
+  | |_________|  |_________|  |_________|  |_________|  |_________|     |_____|    |________! | VR1 | |
+  |     U1           U2           U3           U4           U5            U6           U7      \ _ /  |
+  |                                                                                                   |
+  |  _________    _________    _________    _________    _________                  ________          |
+  | | 74LS161 |  | 74LS157 |  | 74LS157 |  | 74LS157 |  | 74LS157 |                | KA2657 |         |
+  | |_________|  |_________|  |_________|  |_________|  |_________|                |________!         |
+  |     U8           U9           U10          U11          U12                       U13             |
+  |                                                                                                   |
+  |  _________    _________    _________    _________    _________     _________    ________          | 36
+  | | 74LS04P |  | 74LS11N |  | 74LS04P |  | DV7486N |  | DV7486N |   | CTS8427 |  | KA2657 |         |___
+  | |_________|  |_________|  |_________|  |_________|  |_________|   |_________|  |________!          ___|
+  |     U14          U15          U16          U17          U18       U19 (resnet)    U20              ___|
+  |                                                                                                    ___|
+  |  _________    _________    _________       _________________       _________    _______________    ___|
+  | |  74123  |  | 74LS174 |  | 82S131N |     | PLD ?? (R dot)  |     | CTS8427 |  |1|2|3|4|5|6|7|8|   ___|
+  | |_________|  |_________|  |_________|     |_________________|     |_________|  |_|_|_|_|_|_|_|_|   ___|
+  |     U21          U22          U23                 U24             U25 (resnet)  U26 (DIP SW x 8)   ___|
+  |                                                                                                    ___|
+  |  _________    _________    _________       __________________        ________________________      ___|
+  | |  7474N  |  | 74LS157 |  | 74LS166 |     |                  |      |                        |     ___|
+  | |_________|  |_________|  |_________|     | 2732A (char ROM) |      |     Intel  P8255A      |     ___|
+  |     U27          U28          U29         |__________________|      |________________________|     ___|
+  |                                                   U30                          U31                 ___|
+  |  _________    __________   __________      ____________________      ________________________      ___|
+  | |  7474N  |  | SY2111-1 | | SY2111-1 |    |                    |    |                        |     ___|
+  | |_________|  |__________| |__________|    | Unknown custom ROM |    |     Intel  P8255A      |     ___|
+  |     U32          U33          U34         |____________________|    |________________________|     ___|
+  |                                                    U35                         U36                 ___|
+  |  _______________   ____________________    ____________________                                    ___|
+  | |PAL12L6 (B dot)| |                    |  |                    |                                   ___|
+  | |_______________| |  8255 (stickered)  |  |     27256 ROM      |                                  |
+  |       U37         |____________________|  |____________________|                  __________      | 01
+  |                           U38                    U39                             | TRW 8022 |     |
+  |  ____________     _____________________    ____________________                  |__________|     |
+  | | Intel 8224 |   |                     |  |                    |                     U45          |
+  | |____________|   |   NEC  D8080AFC-1   |  |   8224 Clock GEN   |     ___________________          |
+  |      U41         |_____________________|  |____________________|    |  Dallas DS1220AD  |         |
+  |  ______                   U42                    U43                | Non Volatile SRAM |         |
+  | | Xtal |                                                            |___________________|         |
+  | | 18MHz|                                                                     U44                  |
+  | |______|                                                                                          |
+  |___________________________________________________________________________________________________|
+
+
+
+*******************************************************************************
 
 
   *** Game Notes ***
@@ -414,12 +736,25 @@
   ***  Memory Map  ***
   --------------------
 
+
+  Noraut HW:
+
   0x0000 - 0x1FFF    ; ROM space.
-  0x6000 - 0x63FF    ; NVRAM.
+  0x2000 - 0x23FF    ; NVRAM.
 
   0x60 - 0x63        ; PPI 8255 0 - DIP Switches, lamps & counters.
   0xA0 - 0xA3        ; PPI 8255 1 - Regular Inputs, sound lines & remaining lamps.
   0xC0 - 0xC3        ; PPI 8255 2 - Video RAM access & other stuff.
+
+
+  DPHL HW:
+
+  0x0000 - 0x1FFF    ; ROM space.
+  0x5000 - 0x53FF    ; NVRAM.
+
+  0x7C - 0x7F        ; PPI 8255 0 - DIP Switches, lamps & counters.
+  0xBC - 0xBF        ; PPI 8255 1 - Regular Inputs, sound lines & remaining lamps.
+  0xDC - 0xDF        ; PPI 8255 2 - Video RAM access & other stuff.
 
 
 *******************************************************************************
@@ -524,9 +859,26 @@
   - Fixed the discrete sound system diagram, based on real sound references.
 
 
+  [2009-10-12]
+
+  - Added Draw Poker Hi-Lo hardware support, based on 8080A CPU.
+  - Mirrored the PPI's offsets to simplify/merge the hardware emulation.
+  - Added hardware documentation and PCB layouts from both DPHL sets.
+  - Added DPHL discrete sound circuitry scheme/documentation.
+  - Added Turbo Poker 2 from Micro Manufacturing.
+  - Added PMA poker.
+  - Documented the Turbo Poker 2 hardware.
+  - Added Turbo Poker 2 PCB layout from hi-res picture.
+  - Switched to the new PPI core.
+  - Commented out the 3rd PPI device till handshaked strobe lines can be
+    properly emulated. For now, all VRAM access is through direct handlers.
+    This allow to remove the hacks per set needed to boot the games.
+
+
   TODO:
 
   - Analize PPI-2 at 0xc0-0xc3. OBF handshake line (PC7) doesn't seems to work properly.
+  - Discrete sound to DPHL sets.
   - Find if wide chars are hardcoded or tied to a bit.
   - Save support.
 
@@ -534,12 +886,15 @@
 *******************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_18_432MHz
-#define CPU_CLOCK		MASTER_CLOCK / 8	/* 2.30275 MHz - Measured: 2.305 MHz */
+#define NORAUT_MASTER_CLOCK		XTAL_18_432MHz
+#define DPHL_MASTER_CLOCK		XTAL_18MHz
+#define NORAUT_CPU_CLOCK		NORAUT_MASTER_CLOCK / 8		/* 2.30275 MHz - Measured: 2.305 MHz */
+#define DPHL_CPU_CLOCK			DPHL_MASTER_CLOCK / 9		/* 2 MHz (from 8224) */
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "machine/8255ppi.h"
+#include "cpu/i8085/i8085.h"
+#include "machine/i8255a.h"
 #include "norautp.h"
 
 #include "noraut11.lh"
@@ -697,33 +1052,50 @@ static WRITE8_DEVICE_HANDLER( counterlamps_w )
    PC0-PC2 could be set as input or output.
 */
 
-static READ8_DEVICE_HANDLER( ppi2_portc_r )
-{
-	UINT8 ppi2_pcmix = 0;
-	UINT8 hndshk = 0x80;	/* simulating the handshake lines (bits 3-7) */
-	ppi2_pcmix = (hndshk | (input_port_read(device->machine, "IN2") & 0x07));
+//static READ8_DEVICE_HANDLER( ppi2_portc_r )
+//{
+//	UINT8 ppi2_pcmix = 0;
+//	UINT8 hndshk = 0x80;	/* simulating the handshake lines (bits 3-7) */
+//	ppi2_pcmix = (hndshk | (input_port_read(device->machine, "IN2") & 0x07));
 //  popmessage("portc read: %02x", ppi2_pcmix);
 
-	return ppi2_pcmix;
-}
+//	return ppi2_pcmix;
 
-static WRITE8_DEVICE_HANDLER( ppi2_portc_w )
-{
-	/* PC0-PC2 don't seems to be connected to any output */
+//	return (devtag_get_device(device->machine, "ppi8255_2") || (input_port_read(device->machine, "IN2") & 0x07));
+//}
+
+//static WRITE8_DEVICE_HANDLER( ppi2_portc_w )
+//{
+//	/* PC0-PC2 don't seems to be connected to any output */
 //  popmessage("portc write: %02x", data);
+//}
+
+
+/*game waits for /OBF signal (bit 7) to be set.*/
+static READ8_HANDLER( test_r )
+{
+	return 0xff;
 }
 
-static READ8_DEVICE_HANDLER( vram_data_r )
+static READ8_HANDLER( vram_data_r )
+//static READ8_DEVICE_HANDLER( vram_data_r )
 {
 	return np_vram[np_addr];
 }
 
-static WRITE8_DEVICE_HANDLER( vram_data_w )
+static WRITE8_HANDLER( vram_data_w )
+//static WRITE8_DEVICE_HANDLER( vram_data_w )
 {
 	np_vram[np_addr] = data & 0xff;
+
+	/* trigger 8255-2 port C bit 7 (/OBF) */
+//	i8255a_pc7_w(devtag_get_device(device->machine, "ppi8255_2"), 0);
+//	i8255a_pc7_w(devtag_get_device(device->machine, "ppi8255_2"), 1);
+
 }
 
-static WRITE8_DEVICE_HANDLER( vram_addr_w )
+static WRITE8_HANDLER( vram_addr_w )
+//static WRITE8_DEVICE_HANDLER( vram_addr_w )
 {
 	np_addr = data;
 }
@@ -738,28 +1110,73 @@ static READ8_HANDLER( test2_r )
 /*************************
 * Memory Map Information *
 *************************/
+/*
 
+  CPU & PPI settings by set...
+
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  |   Set    |   CPU   | PPI-0 offset | config | PPI-1 offset | config | PPI-2 offset |         config         |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | norautp  |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |  0xC1 (PC0-2 as input) |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | norautjp |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |  0xC1 (PC0-2 as input) |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | norautrh |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | norautu  | unknown |   unknown    |        |   unknown    |        |   unknown    |                        |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | norautv3 |   Z80   |   unknown    |        |   unknown    |        |   unknown    |                        |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | gtipoker |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | norautpn |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | dphl     |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | dphla    |  8080A  |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | pma      |   Z80   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | tpoker2  |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+
+*/
 static ADDRESS_MAP_START( norautp_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( norautp_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
+	AM_RANGE(0xa0, 0xa3) AM_MIRROR(0x1c) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
+//	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3c) AM_READWRITE(vram_data_r, vram_data_w)
+	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x3c) AM_WRITE(vram_addr_w)
+	AM_RANGE(0xc2, 0xc2) AM_MIRROR(0x3c) AM_READ(test_r)
+	AM_RANGE(0xef, 0xef) AM_READ(test2_r)
 ADDRESS_MAP_END
 
 /*
   Video RAM R/W:
 
-  c0 --> W  ; data
+  c0 --> W  ; data (hanshaked)
   c1 --> W  ; addressing
-  c2 --> R  ; status
-  c3 --> W  ; alternate 00 & 01 (control?)
+  c2 --> R  ; status (handshaking lines) + input (PC0-2)
+  c3 --> W  ; PPI control + alternate 00 & 01 (PC1 out?)
+
+  PPI Mirror isn't accurate.
+  There are writes to 0xF7 and reads + compare to 0xEF.
+  Don't know what's supposed to be mirrored there.
 
 */
+
+static ADDRESS_MAP_START( nortest1_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( norautxp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM	/* need to be checked */
@@ -768,24 +1185,50 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( norautxp_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
-//  AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
-//  AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
+ADDRESS_MAP_END
+
+
+/***** 8080 based ****/
+
+static ADDRESS_MAP_START( dphl_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 not connected */
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dphla_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gtipoker_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* similar to DPHL */
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gtipoker_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7c, 0x7f) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xbc, 0xbf) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xef, 0xef) AM_READ(test2_r)
+static ADDRESS_MAP_START( dphltest_map, ADDRESS_SPACE_PROGRAM, 8 )
+//	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 not connected */
+	AM_RANGE(0x0000, 0x6fff) AM_ROM
+	AM_RANGE(0x7000, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 ADDRESS_MAP_END
 
+/*
+DPHL
+
+  7F -> 90
+  BF -> 92
+  DF -> C0 (hndshk)
+
+DPHLA
+
+  63 -> 90
+  A3 -> 92
+  C3 -> C0 (hndshk)
+
+*/
 
 /*************************
 *      Input Ports       *
@@ -1004,38 +1447,44 @@ GFXDECODE_END
 *      PPI 8255 (x3) Interface      *
 ************************************/
 
-static const ppi8255_interface ppi8255_intf[3] =
+static I8255A_INTERFACE (ppi8255_intf_0)
 {
-	{	/* (60-63) Mode 0 - Port A set as input */
-		DEVCB_INPUT_PORT("DSW1"),		/* Port A read */
-		DEVCB_NULL,						/* Port B read */
-		DEVCB_NULL,						/* Port C read */
-		DEVCB_NULL,						/* Port A write */
-		DEVCB_HANDLER(mainlamps_w),		/* Port B write */
-		DEVCB_HANDLER(counterlamps_w)	/* Port C write */
-	},
-	{	/* (a0-a3) Mode 0 - Ports A & B set as input */
-		DEVCB_INPUT_PORT("IN0"),		/* Port A read */
-		DEVCB_INPUT_PORT("IN1"),		/* Port B read */
-		DEVCB_NULL,						/* Port C read */
-		DEVCB_NULL,						/* Port A write */
-		DEVCB_NULL,						/* Port B write */
-		DEVCB_HANDLER(soundlamps_w)		/* Port C write */
-	},
-	{	/* (c0-c3) Group A Mode 2 (5-handshacked bidirectional port)
-                   Group B Mode 0, output;  (see below for lines PC0-PC2) */
-		DEVCB_HANDLER(vram_data_r),		/* Port A read */
-		DEVCB_NULL,						/* Port B read */
-		DEVCB_HANDLER(ppi2_portc_r),	/* Port C read */
-		DEVCB_HANDLER(vram_data_w),		/* Port A write (vram_data_w tied) */
-		DEVCB_HANDLER(vram_addr_w),		/* Port B write (vram_addr_w tied) */
-		DEVCB_HANDLER(ppi2_portc_w)		/* Port C write */
-	}
+	/* (60-63) Mode 0 - Port A set as input */
+	DEVCB_INPUT_PORT("DSW1"),		/* Port A read */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_HANDLER(mainlamps_w),		/* Port B write */
+	DEVCB_HANDLER(counterlamps_w)	/* Port C write */
+};
+
+static I8255A_INTERFACE (ppi8255_intf_1)
+{
+	/* (a0-a3) Mode 0 - Ports A & B set as input */
+	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
+	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_HANDLER(soundlamps_w)		/* Port C write */
+};
+
+//static I8255A_INTERFACE (ppi8255_intf_2)
+//{
+    /* (c0-c3) Group A Mode 2 (5-lines handshacked bidirectional port)
+               Group B Mode 0, output;  (see below for lines PC0-PC2) */
+//	DEVCB_HANDLER(vram_data_r),		/* Port A read (VRAM data read)*/
+//	DEVCB_NULL,						/* Port B read */
+//	DEVCB_HANDLER(ppi2_portc_r),	/* Port C read */
+//	DEVCB_HANDLER(vram_data_w),		/* Port A write (VRAM data write) */
+//	DEVCB_HANDLER(vram_addr_w),		/* Port B write (VRAM address write) */
+//	DEVCB_HANDLER(ppi2_portc_w)		/* Port C write */
+
 	/*  PPI-2 is configured as mixed mode2 and mode0 output.
         It means that port A should be bidirectional and port B just as output.
-        Port C as hshk regs, and P0-P2 as output (noraut11) or input (noraut12).
+        Port C as hshk regs, and P0-P2 as input (norautp, norautjp) or output (other sets).
     */
-};
+//};
 
 
 /*************************
@@ -1045,7 +1494,7 @@ static const ppi8255_interface ppi8255_intf[3] =
 static MACHINE_DRIVER_START( norautp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, NORAUT_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(norautp_map)
 	MDRV_CPU_IO_MAP(norautp_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -1053,9 +1502,9 @@ static MACHINE_DRIVER_START( norautp )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* 3x 8255 */
-	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
-	MDRV_PPI8255_ADD( "ppi8255_2", ppi8255_intf[2] )
+	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
+	MDRV_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
+//	MDRV_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1084,16 +1533,82 @@ static MACHINE_DRIVER_START( norautxp )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(norautxp_map)
-	MDRV_CPU_IO_MAP(norautxp_portmap)
+	MDRV_CPU_IO_MAP(norautp_portmap)
 
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( gtipoker )
+static MACHINE_DRIVER_START( nortest1 )
 	MDRV_IMPORT_FROM(norautp)
 
 	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(nortest1_map)
+	MDRV_CPU_IO_MAP(norautp_portmap)
+
+MACHINE_DRIVER_END
+
+
+/**** 8080A based ****/
+
+static MACHINE_DRIVER_START( dphl )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", 8080, DPHL_CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(dphl_map)
+	MDRV_CPU_IO_MAP(norautp_portmap)
+
+	/* 3x 8255 */
+	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
+	MDRV_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
+//	MDRV_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(32*16, 32*16)
+	MDRV_SCREEN_VISIBLE_AREA(3*16, 31*16-1, (0*16) + 8, 16*16-1)
+
+	MDRV_GFXDECODE(norautp)
+
+	MDRV_PALETTE_INIT(norautp)
+	MDRV_PALETTE_LENGTH(8)
+	MDRV_VIDEO_START(norautp)
+	MDRV_VIDEO_UPDATE(norautp)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(norautp)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( gtipoker )
+	MDRV_IMPORT_FROM(dphl)
+
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gtipoker_map)
-	MDRV_CPU_IO_MAP(gtipoker_portmap)
+	MDRV_CPU_IO_MAP(norautp_portmap)
+//	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( dphla )
+	MDRV_IMPORT_FROM(dphl)
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(dphla_map)
+	MDRV_CPU_IO_MAP(norautp_portmap)
+
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( dphltest )
+	MDRV_IMPORT_FROM(dphl)
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(dphltest_map)
+	MDRV_CPU_IO_MAP(norautp_portmap)
+
+	MDRV_NVRAM_HANDLER(generic_0fill)
 
 MACHINE_DRIVER_END
 
@@ -1292,6 +1807,98 @@ ROM_START( norautv3 )
 	ROM_LOAD( "gu27.bin",  0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
 ROM_END
 
+/*
+
+  Draw Poker Hi-Lo (1983).
+  "NYMF O II" hardware.
+  M. Kramer Inc.
+
+*/
+
+ROM_START( dphl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dphl_6468.u12", 0x0000, 0x1000, CRC(d8c4fe5c) SHA1(6bc745fefb8a3a21ca281d519895828047526de7) )
+	ROM_LOAD( "dphl_36e3.u18", 0x1000, 0x1000, CRC(06cf6789) SHA1(587d883c399348b518e3be4d1dc2581824055328) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+//	ROM_FILL(              0x0000, 0x0800, 0xff )
+	ROM_LOAD( "dphl_model_2_cgi_3939.u31",  0x0000, 0x1000, CRC(2028db2c) SHA1(0f81bb71e88c60df3817f58c28715ce2ea01ad4d) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "98ce.u51",  0x0000, 0x0100, CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
+ROM_END
+
+ROM_START( dphla )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2b27.u11", 0x0000, 0x0800, CRC(3a7ece95) SHA1(bc7c89e3f490da0723b3a7617ab9a747f8db7ea7) )
+	ROM_LOAD( "4d30.u16", 0x0800, 0x0800, CRC(32594684) SHA1(cda1ed09ec30082d23e690058261523e0d34938e) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(              0x0000, 0x0800, 0xff )
+	ROM_LOAD( "char.u27",  0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
+ROM_END
+
+/*
+
+  PCB silkscreened PMA-32-C.
+  Someone had written "poker" on it.
+
+  CPU:   LH0080 (Sharp Z80).
+  I/O:   3x PPI 8255.
+  Xtal:  18 MHz.
+  NVRAM: Yes, battery attached.
+
+  ROMs: 2x 2732 (E4 & E5).
+        1x 2716 (J2).
+
+  PROM: tb24s10n (D3) read as 82s129.
+
+*/
+ROM_START( pma )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pma.e5", 0x0000, 0x1000, CRC(e05ab5b9) SHA1(8bd13e8ed723ac256545f19bef4fa3fe507ab9d5) )
+	ROM_RELOAD(			0x1000, 0x1000 )
+	ROM_LOAD( "pma.e4", 0x2000, 0x1000, CRC(0f8b11fc) SHA1(7292b0ac368c469ff2e1ede1765c08f1ccc1a36c) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(           0x0000, 0x0800, 0xff )
+	ROM_LOAD( "pma.j2", 0x0800, 0x0800, CRC(412fc492) SHA1(094ea0ffd0c22274cfe164f07c009ffe022331fd) )
+
+	ROM_REGION( 0x0200,  "proms", 0 )
+	ROM_LOAD( "pma.d3",  0x0000, 0x0200, CRC(6e172c11) SHA1(b52439a5075cc68ae2792946a5ce973d9f8e4104) )
+ROM_END
+
+/*
+
+  Turbo Poker 2 by Micro MFG.
+
+  - CPU:             1x NEC D8080AFC-1 (U42).
+  - BUS:             1x 8224 (U43)
+  - RAM:             2x 2111-1 Static Random Access Memory 256 x 4 bit (U33 & U34).
+  - I/O:             3x Intel P8255A Peripeheral Interface Adapter (U31, U36 & U38).
+  - Prg ROMs:        1x 27256 (U39).
+  - Gfx ROMs:        1x 2732 (U30).
+  - Sound:           Discrete.
+  - Crystal:         1x 18.000 MHz.
+
+*/
+ROM_START( tpoker2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tp2.u39", 0x0000, 0x8000, CRC(543149fe) SHA1(beb61a27c2797341e23e020e754d63fde3b4fbb2) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "tp2.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
+
+	ROM_REGION( 0x0800,  "other", 0 )
+	ROM_LOAD( "tp2.u44", 0x0000, 0x0800, CRC(6b5453b7) SHA1(6793952800de067fd76b889f4f7c62c8474b8c3a) )
+
+	ROM_REGION( 0x0400,  "proms", 0 )
+	ROM_LOAD( "tp2.u23", 0x0000, 0x0400, CRC(0222124f) SHA1(5cd8d24ee8e6525a5f9e6a93fa8854f36f4319ee) )
+
+	ROM_REGION( 0x0034,  "plds", 0 )
+	ROM_LOAD( "tp2_pld.u37",  0x0000, 0x0034, CRC(25651948) SHA1(62cd4d73c6ca8ea5d4beb9ae262d1383f8149462) )
+ROM_END
+
 
 /**************************
 *       Driver Init       *
@@ -1307,23 +1914,51 @@ ROM_END
 */
 static DRIVER_INIT( norautrh )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
-	ROM[0x1110] = 0x00;
-	ROM[0x1111] = 0x00;
+//	UINT8 *ROM = memory_region(machine, "maincpu");
+//	ROM[0x1110] = 0x00;
+//	ROM[0x1111] = 0x00;
 }
 
 static DRIVER_INIT( norautpn )
 {
-	UINT8 *ROM = memory_region(machine, "maincpu");
-	ROM[0x0827] = 0x00;
-	ROM[0x0828] = 0x00;
+//	UINT8 *ROM = memory_region(machine, "maincpu");
+//	ROM[0x0827] = 0x00;
+//	ROM[0x0828] = 0x00;
+}
+
+static DRIVER_INIT( norautu )
+{
+//	UINT8 *ROM = memory_region(machine, "maincpu");
+//	ROM[0x083c] = 0x00;
+//	ROM[0x083d] = 0x00;
+//	ROM[0x083e] = 0x00;
 }
 
 static DRIVER_INIT( gtipoker )
 {
-//  UINT8 *ROM = memory_region(machine, "maincpu");
-//  ROM[0x0cc6] = 0x00;
-//  ROM[0x0cc7] = 0x00;
+//	UINT8 *ROM = memory_region(machine, "maincpu");
+//	ROM[0x0cc6] = 0x00;
+//	ROM[0x0cc7] = 0x00;
+//	ROM[0x0cc8] = 0x00;
+//	ROM[0x10a5] = 0x00;
+//	ROM[0x10a6] = 0x00;
+//	ROM[0x10a7] = 0x00;
+}
+
+static DRIVER_INIT( dphl )
+{
+//	UINT8 *ROM = memory_region(machine, "maincpu");
+//	ROM[0x1510] = 0x00;
+//	ROM[0x1511] = 0x00;
+//	ROM[0x1512] = 0x00;
+}
+
+static DRIVER_INIT( dphla )
+{
+//	UINT8 *ROM = memory_region(machine, "maincpu");
+//	ROM[0x0b09] = 0x00;
+//	ROM[0x0b0a] = 0x00;
+//	ROM[0x0b0b] = 0x00;
 }
 
 
@@ -1331,13 +1966,20 @@ static DRIVER_INIT( gtipoker )
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT      ROT    COMPANY        FULLNAME                       FLAGS                              LAYOUT */
-GAMEL( 1988, norautp,  0,       norautp,  norautp,  0,        ROT0, "Noraut Ltd.", "Noraut Poker",                 0,                     layout_noraut11 )
-GAMEL( 1988, norautjp, norautp, norautp,  norautp,  0,        ROT0, "Noraut Ltd.", "Noraut Joker Poker",           0,                     layout_noraut11 )
-GAMEL( 1988, norautrh, 0,       norautp,  norautrh, norautrh, ROT0, "Noraut Ltd.", "Noraut Red Hot Joker Poker",   0,                     layout_noraut12 )
-GAME(  1988, norautu,  0,       norautxp, norautp,  0,        ROT0, "Noraut Ltd.", "Noraut Poker (NTX10A)",        GAME_NOT_WORKING )
-GAME(  1988, norautv3, 0,       norautxp, norautp,  0,        ROT0, "Noraut Ltd.", "Noraut Joker Poker (V3.010a)", GAME_NOT_WORKING )
-GAME(  1983, gtipoker, 0,       gtipoker, norautpn, gtipoker, ROT0, "GTI Inc",     "GTI Poker",                    GAME_NOT_WORKING )
+/*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT      ROT    COMPANY                      FULLNAME                       FLAGS                              LAYOUT */
+GAMEL( 1988, norautp,  0,       norautp,  norautp,  0,        ROT0, "Noraut Ltd.",               "Noraut Poker",                 0,                     layout_noraut11 )
+GAMEL( 1988, norautjp, norautp, norautp,  norautp,  0,        ROT0, "Noraut Ltd.",               "Noraut Joker Poker",           0,                     layout_noraut11 )
+GAMEL( 1988, norautrh, 0,       norautp,  norautrh, norautrh, ROT0, "Noraut Ltd.",               "Noraut Red Hot Joker Poker",   0,                     layout_noraut12 )
+GAME(  1988, norautu,  0,       norautxp, norautp,  norautu,  ROT0, "Noraut Ltd.",               "Noraut Poker (NTX10A)",        GAME_NOT_WORKING )
+GAME(  1988, norautv3, 0,       norautxp, norautp,  0,        ROT0, "Noraut Ltd.",               "Noraut Joker Poker (V3.010a)", GAME_NOT_WORKING )
+GAME(  1983, pma,      0,       nortest1, norautp,  0,        ROT0, "PMA",                       "PMA Poker",                    GAME_NOT_WORKING )
 
 /*The following has everything uncertain, seems a bootleg/hack and doesn't have any identification strings in program rom. */
-GAMEL( 198?, norautpn, norautp, norautp,  norautpn, norautpn, ROT0, "bootleg?",    "Noraut Poker (bootleg)",       0,                     layout_noraut12 )
+GAMEL( 198?, norautpn, norautp, norautp,  norautpn, norautpn, ROT0, "bootleg?",                  "Noraut Poker (bootleg)",       0,                     layout_noraut12 )
+
+/* The following ones are 'Draw Poker Hi-Lo', running in a i8080a based hardware */
+GAME(  1983, dphl,     0,       dphl,     norautp,  dphl,     ROT0, "M. Kramer Manufacturing.",  "Draw Poker Hi-Lo (M.Kramer)",  GAME_NOT_WORKING )
+GAME(  1983, dphla,    0,       dphla,    norautp,  dphla,    ROT0, "Unknown",                   "Draw Poker Hi-Lo (alt)",       GAME_NOT_WORKING )
+
+GAME(  1983, gtipoker, 0,       gtipoker, norautpn, gtipoker, ROT0, "GTI Inc",                   "GTI Poker",                    GAME_NOT_WORKING )
+GAME(  1993, tpoker2,  0,       dphltest, norautp,  0,        ROT0, "Micro Manufacturing, Inc.", "Turbo Poker 2",                GAME_NOT_WORKING )
