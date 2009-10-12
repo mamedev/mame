@@ -3663,6 +3663,7 @@ src/osd/osdcore.h svneol=native#text/plain
 src/osd/osdepend.h svneol=native#text/plain
 src/osd/osdmini/minidir.c svneol=native#text/plain
 src/osd/osdmini/minifile.c svneol=native#text/plain
+src/osd/osdmini/minimain.c svneol=native#text/plain
 src/osd/osdmini/minimisc.c svneol=native#text/plain
 src/osd/osdmini/minisync.c svneol=native#text/plain
 src/osd/osdmini/minitime.c svneol=native#text/plain
