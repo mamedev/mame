@@ -1,4 +1,7 @@
-Copyright (c) 1997-2007, Nicola Salmoria and the MAME team
+Unless otherwise explicitly stated, all code in MAME is released under the
+following license:
+
+Copyright Nicola Salmoria and the MAME team
 All rights reserved.
 
 Redistribution and use of this code or any derivative works are permitted
