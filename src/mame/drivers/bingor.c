@@ -1,4 +1,125 @@
-/* Bingo Roll */
+/****************************************************
+
+  Bingo Roll / Bell Star
+
+
+*****************************************************
+
+
+  PCB Layout (Bell Star V3):
+
+                        ___________________________________________
+   ____________________| | | | | | | | | | | | | | | | | | | | | | |____________________
+  |                                  22x2 edge connector                                |
+  |                     ___________   ___________   ___________                         |
+  |                    |  9CANH1M  | |  9CANH1M  | |  9CANH1M  |                        |
+  |                    | ULN2003AN | | ULN2003AN | | ULN2003AN |                        |
+  |                    |___________| |___________| |___________|                        |
+  |                                                                                     |
+  |       _______       ______________________________                                  |
+  |      |JM04AB |     |                              |                                 |
+  |      |LM/386N|     |      P8256AH  L6140860       |                                 |
+  |      |_______|     |                              |                                 |
+  |                    |         Intel 1975           |                                 |
+  |                    |______________________________|                                 |
+  |                                                                                     |
+  |         ____________    ___________     ____________    ____________                |
+  |        |  9BARTCK   |  | YMZ284-D  |   | 898-3-R10K |  | 898-3-R10K |               |
+  |        | SN74HCTD0N |  | 9814QAAA  |   |            |  |            |               |
+  |        |____________|  |___________|   |____________|  |____________|               |
+  |                                                                                     |
+  | _____   _______________                                                             |
+  ||     | |               |                _____________   _____________               |
+  ||     | | MHS E         |               |   86AEY4K   | |   86AEY4K   |              |
+  ||     | | S-82716-4     |               | SN74HCT540N | | SN74HCT540N |              |
+  || (1) | | 8944          |               |_____________| |_____________|              |
+  ||     | |               |                _____________   _____________    _________  |
+  ||     | |               |               |   83C931K   | |   83C931K   |  | 88A59LM | |
+  ||     | |               |               | SN74HCT573N | | SN74HCT573N |  | LM339N  | |
+  ||     | |               |               |_____________| |_____________|  |_________| |
+  ||_____| |_______________|                                                            |
+  |                                                                                     |
+  |         _______________                 ________________    ________________        |
+  |        |               |               |  Bell Star V3  |  |  Bell Star V3  |       |
+  |        | N800186-12    |               |  V.3.6.02 L    |  |  V.3.6.02 H    |       |
+  |        | 9941GPA BR    |               |  TMS27C256-10  |  |  TMS27C256-10  |       |
+  |        | 8944          |               |________________|  |________________|       |
+  |        | AMD           |                ________________    ________________        |
+  |        | INTEL '78 '82 |               |  B.S. Grafik   |  |  B.S. Grafik   |       |
+  |        |               |               |  11.10.02 L    |  |  11.10.02 H    |       |
+  |        |               |               |   M27C256B     |  |   M27C256B     |       |
+  |        |_______________|               |________________|  |________________|       |
+  |                                                                                     |
+  |                                         ________________    ________________        |
+  |           _____________                |    HY62256B    |  |   HY62256B     |       |
+  |          |   83C931K   |               |     LP-70      |  |    LP-70       |       |
+  |          | SN74HCT573N |               |  9846B KOREA   |  |   9846B KOREA  |       |
+  |          |_____________|               |________________|  |________________|       |
+  |                                                                                     |
+  |         _____________________                                                       |
+  |        |      74HCT540N      |        __________   ________   __________   _______  |
+  |        | C5944ME / Hnn9931 D |       |  86A4CY  | |74HCT08N| | 06F6L9K  | |ADM690 | |
+  |        |_____________________|       |SN74HCT02N| |D0945PS | |SN74HCT32N| |AN/9927| |
+  |                                      |__________| |________| |__________| |_______| |
+  |                                                                                     |
+  |            ______________             __________    ________________                |
+  |           |  PIC 16C54C  |           |          |  |                |               |
+  |           |    04/P      |           |  24C04A  |  | 3.6 V. BATTERY |               |
+  |           |______________|           |__________|  |________________|               |
+  |                                                                                     |
+  |_____________________________________________________________________________________|
+
+
+  (1) Siemens HYB5141758J-60 (Germany).
+
+  - 1x Xtal 16 MHz.
+  - 1x Xtal ?? MHz.
+
+
+  Etched in copper:
+
+  "VIP-3 PALOMA ELEKTRONIK"
+  "gruber electronic gmbh"
+  "KMG-Layout 007051"
+  "Rev 1.0"
+  "0103 VIP 3"
+
+
+*****************************************************
+
+  Pinout:
+
+  ROLLING JOKER+ / BELL STAR+
+
+  +--------------------+----------------------+
+  |        Solder      |       Component      |
+  +----------------+---+----+-----------------+
+  |           GND  | A |  1 |  GND            |
+  |           GND  | B |  2 |  GND            |
+  |           GND  | C |  3 |  GND            |
+  |       +5 Volt  | D |  4 |  +5 Volt        |
+  |      +12 Volt  | E |  5 |  +12 Volt       |
+  |    Lamp Hold1  | F |  6 |  Lamp Start     |
+  |    Lamp Hold2  | H |  7 |  Lamp Hold5     |
+  |    Lamp Clear  | J |  8 |  Lamp Hold4     |
+  |        Coin 1  | K |  9 |  Lamp Hold3     |
+  |    Counter In  | L | 10 |  Remote         |
+  |   Counter Out  | M | 11 |  Button Hold1   |
+  |Counter Remote  | N | 12 |  Button Clear   |
+  |  Button Hold5  | P | 13 |  Button Start   |
+  |  Owner Bookk.  | R | 14 |  Rental Bookk.  |
+  |  Button Hold2  | S | 15 |  Button Hold4   |
+  |        Coin 2  | T | 16 |  Button Hold3   |
+  |            nc  | U | 17 |  Hopper Count   |
+  |            nc  | V | 18 |  Hopper Drive   |
+  |   Video Green  | W | 19 |  Video Red      |
+  |    Video Sync  | X | 20 |  Video Blue     |
+  |  Speaker 1(+)  | Y | 21 |  Video Ground   |
+  |  Credit Clear  | Z | 22 |  Speaker 1(-)   |
+  +----------------+---+----+-----------------+
+
+****************************************************/
+
 
 #include "driver.h"
 #include "cpu/i86/i86.h"
@@ -266,7 +387,33 @@ ROM_START( bingor4 )
 	ROM_LOAD( "bingor4_24c04a.bin", 0x000000, 0x200,  CRC(38cf70a9) SHA1(ba9a1640200963e2d58d761edc13a24fa5ef44c2) )
 ROM_END
 
-GAME( 199?, bingor1,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bellstar? (set 1)",     GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, bingor2,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bellstar? (set 2)",     GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, bingor3,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bellstar? (set 3)",     GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 199?, bingor4,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bellstar? (set 4)",     GAME_NOT_WORKING | GAME_NO_SOUND )
+/*
+
+  BellStar V3
+  Same as bingor3, but with different program ROMs
+
+*/
+
+ROM_START( bingor5 )	/* BellStar V3 */
+	ROM_REGION( 0x20000, "boot_prg", ROMREGION_ERASE00 ) /* i186 code */
+	ROM_LOAD16_BYTE( "bellstar_v3_v.3.6.02_l.bin", 0x010000, 0x08000, CRC(56b84a5d) SHA1(1bda4fb972b4f0f0575089b545bf15dfea859948) )
+	ROM_LOAD16_BYTE( "bellstar_v3_v.3.6.02_h.bin", 0x010001, 0x08000, CRC(d6945bb8) SHA1(b620f1b547be03c4609bff8d06111d0ea425bae8) )
+
+	ROM_REGION( 0x20000, "gfx", ROMREGION_ERASE00 ) /* blitter data? */
+	ROM_LOAD16_BYTE( "b.s.grafik_11.10.02_l.bin", 0x000000, 0x08000, CRC(a8b22477) SHA1(92d638f0f188a43f14487989cf42195311fb2c35) ) //half size?
+	ROM_LOAD16_BYTE( "b.s.grafik_11.10.02_h.bin", 0x000001, 0x08000, CRC(969d201c) SHA1(7705ceb383ef122538ebf8046041d1c24ec9b9a4) )
+
+	ROM_REGION( 0x20000, "pic", 0 ) /* protection? */
+	ROM_LOAD( "pic16c54c.bin", 0x000, 0x400, CRC(5a507be6) SHA1(f4fbfb7e7516eecab32d96b3a34ad88395edac9e) )
+
+	ROM_REGION( 0x20000, "eeprom", 0 ) /* eeprom */
+	ROM_LOAD( "bingor5_24c04a.bin", 0x000000, 0x200,  CRC(fcff2d26) SHA1(aec1ddd38149404741a057c74bf84bfb4a8e4aa1) )
+ROM_END
+
+
+
+GAME( 2002, bingor1,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 1)",     GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2002, bingor2,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 2)",     GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2002, bingor3,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 3)",     GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2002, bingor4,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star? (set 4)",     GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2002, bingor5,    0,      bingor,   bingor,   0,       ROT0,  "<unknown>", "Bingo Roll / Bell Star V3? (set 5)",  GAME_NOT_WORKING | GAME_NO_SOUND )

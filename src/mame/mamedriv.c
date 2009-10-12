@@ -9157,10 +9157,11 @@ Other Sun games
 	DRIVER( 4roses )	/* (c) 1999 Unknown */
 	DRIVER( 4rosesa )	/* (c) 1999 Unknown */
 	DRIVER( big10 )		/* (c) 198? Unknown */
-	DRIVER( bingor1 )	/* (c) 198? Unknown */
-	DRIVER( bingor2 )	/* (c) 198? Unknown */
-	DRIVER( bingor3 )	/* (c) 198? Unknown */
-	DRIVER( bingor4 )	/* (c) 198? Unknown */
+	DRIVER( bingor1 )	/* (c) 2002 Unknown */
+	DRIVER( bingor2 )	/* (c) 2002 Unknown */
+	DRIVER( bingor3 )	/* (c) 2002 Unknown */
+	DRIVER( bingor4 )	/* (c) 2002 Unknown */
+	DRIVER( bingor5 )	/* (c) 2002 Unknown */
 
 	/* InterFlip / Recreativos Franco */
 	DRIVER( videopkr )	/* (c) 1984 InterFlip */
