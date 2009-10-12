@@ -4,7 +4,6 @@
 #define __TMS57002_H__
 
 #include "cpuintrf.h"
-#include "osd_cpu.h"
 #include "driver.h"
 
 enum {

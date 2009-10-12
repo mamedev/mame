@@ -5300,8 +5300,8 @@ static void ZB1_dddd_0000(z8000_state *cpustate)
 static void ZB1_dddd_0111(z8000_state *cpustate)
 {
 	GET_DST(OP0,NIB2);
-	cpustate->RQ(dst) = COMBINE_U64_U32_U32((cpustate->RQ(dst) & S32) ?
-		0xfffffffful : 0, LO32_U32_U64(cpustate->RQ(dst)));
+	cpustate->RQ(dst) = CONCAT_64((cpustate->RQ(dst) & S32) ?
+		0xfffffffful : 0, EXTRACT_64LO(cpustate->RQ(dst)));
 }
 
 /******************************************

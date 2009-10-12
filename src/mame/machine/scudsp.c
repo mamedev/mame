@@ -51,7 +51,6 @@ Changelog:
 ******************************************************************************************/
 #include "driver.h"
 #include "machine/scudsp.h"
-#include "osd_cpu.h"
 #include "sound/scsp.h"
 
 /*DSP macros*/
@@ -420,8 +419,8 @@ static void dsp_operation(void)
 			SET_V(((dsp_reg.pl.si) ^ (dsp_reg.acl.si)) & ((dsp_reg.pl.si) ^ (i3)) & 0x80000000);
 			break;
 		case 0x6:	/* AD2 */
-			i1 = COMBINE_64_32_32((INT32)dsp_reg.ph.si,dsp_reg.pl.si);
-			i2 = COMBINE_64_32_32((INT32)dsp_reg.ach.si,dsp_reg.acl.si);
+			i1 = CONCAT_64((INT32)dsp_reg.ph.si,dsp_reg.pl.si);
+			i2 = CONCAT_64((INT32)dsp_reg.ach.si,dsp_reg.acl.si);
 			dsp_reg.alu = i1 + i2;
 			SET_Z((dsp_reg.alu & S64(0xffffffffffff)) == 0);
 			SET_S((dsp_reg.alu & S64(0x800000000000)) > 0);

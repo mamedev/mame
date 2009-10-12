@@ -516,11 +516,11 @@ static void dint(tms34010_state *tms, UINT16 op)
 		else												\
 		{													\
 			INT32 *rd2 = &R##REG(tms,DSTREG(op)+1);					\
-			INT64 dividend  = COMBINE_64_32_32(*rd1, *rd2); \
-			INT64 quotient  = DIV_64_64_32(dividend, *rs); 	\
-			INT32 remainder = MOD_32_64_32(dividend, *rs); 	\
+			INT64 dividend = ((UINT64)*rd1 << 32) | (UINT32)*rd2; \
+			INT64 quotient = dividend / *rs;				\
+			INT32 remainder = dividend % *rs;				\
 			UINT32 signbits = (INT32)quotient >> 31;	 	\
-			if (HI32_32_64(quotient) != signbits)			\
+			if (EXTRACT_64HI(quotient) != signbits)			\
 			{												\
 				SET_V_LOG(tms, 1);								\
 			}												\
@@ -564,10 +564,10 @@ static void divs_b(tms34010_state *tms, UINT16 op) { DIVS(B); }
 		else												\
 		{													\
 			INT32 *rd2 = &R##REG(tms,DSTREG(op)+1);					\
-			UINT64 dividend  = COMBINE_U64_U32_U32(*rd1, *rd2);	\
-			UINT64 quotient  = DIV_U64_U64_U32(dividend, *rs);	\
-			UINT32 remainder = MOD_U32_U64_U32(dividend, *rs); 	\
-			if (HI32_U32_U64(quotient) != 0)				\
+			UINT64 dividend  = ((UINT64)*rd1 << 32) | (UINT32)*rd2;	\
+			UINT64 quotient  = dividend / (UINT32)*rs;		\
+			UINT32 remainder = dividend % (UINT32)*rs;	 	\
+			if (EXTRACT_64HI(quotient) != 0)				\
 			{												\
 				SET_V_LOG(tms, 1);								\
 			}												\
@@ -730,12 +730,12 @@ static void modu_b(tms34010_state *tms, UINT16 op) { MODU(B); }
 																\
 	SEXTEND(m1, FW(tms,1));											\
 	CLR_NZ(tms);														\
-	product = MUL_64_32_32(m1, *rd1);							\
+	product = mul_32x32(m1, *rd1);							\
 	SET_Z_LOG(tms, product == 0);									\
 	SET_N_BIT(tms, product >> 32, 31);								\
 																\
-	*rd1             = HI32_32_64(product);						\
-	R##REG(tms,DSTREG(op)|1) = LO32_32_64(product);						\
+	*rd1             = EXTRACT_64HI(product);						\
+	R##REG(tms,DSTREG(op)|1) = EXTRACT_64LO(product);						\
 																\
 	COUNT_CYCLES(tms,20);											\
 }
@@ -750,11 +750,11 @@ static void mpys_b(tms34010_state *tms, UINT16 op) { MPYS(B); }
 																\
 	ZEXTEND(m1, FW(tms,1));											\
 	CLR_Z(tms);														\
-	product = MUL_U64_U32_U32(m1, *rd1);						\
+	product = mulu_32x32(m1, *rd1);						\
 	SET_Z_LOG(tms, product == 0);									\
 																\
-	*rd1             = HI32_32_64(product);						\
-	R##REG(tms,DSTREG(op)|1) = LO32_32_64(product);						\
+	*rd1             = EXTRACT_64HI(product);						\
+	R##REG(tms,DSTREG(op)|1) = EXTRACT_64LO(product);						\
 																\
 	COUNT_CYCLES(tms,21);											\
 }

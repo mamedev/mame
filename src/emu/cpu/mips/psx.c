@@ -64,7 +64,6 @@
  */
 
 #include "debugger.h"
-#include "osd_cpu.h"
 #include "psx.h"
 
 #define LOG_BIOSCALL ( 0 )
@@ -1146,17 +1145,17 @@ static void multiplier_update( psxcpu_state *psxcpu )
 	{
 	case MULTIPLIER_OPERATION_MULT:
 		{
-			INT64 result = MUL_64_32_32( (INT32)psxcpu->multiplier_operand1, (INT32)psxcpu->multiplier_operand2 );
-			psxcpu->lo = LO32_32_64( result );
-			psxcpu->hi = HI32_32_64( result );
+			INT64 result = mul_32x32( (INT32)psxcpu->multiplier_operand1, (INT32)psxcpu->multiplier_operand2 );
+			psxcpu->lo = EXTRACT_64LO( result );
+			psxcpu->hi = EXTRACT_64HI( result );
 		}
 		break;
 
 	case MULTIPLIER_OPERATION_MULTU:
 		{
-			UINT64 result = MUL_U64_U32_U32( psxcpu->multiplier_operand1, psxcpu->multiplier_operand2 );
-			psxcpu->lo = LO32_U32_U64( result );
-			psxcpu->hi = HI32_U32_U64( result );
+			UINT64 result = mulu_32x32( psxcpu->multiplier_operand1, psxcpu->multiplier_operand2 );
+			psxcpu->lo = EXTRACT_64LO( result );
+			psxcpu->hi = EXTRACT_64HI( result );
 		}
 		break;
 

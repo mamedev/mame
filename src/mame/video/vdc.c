@@ -7,7 +7,7 @@
 #define STATE_VDW		2
 #define STATE_VCR		3
 
-/* todo: replace this with the PAIR structure from 'osd_cpu.h' */
+/* todo: replace this with the PAIR structure */
 typedef union
 {
 #ifdef LSB_FIRST

@@ -189,6 +189,12 @@ __extension__ typedef signed long long		INT64;
 #endif
 
 
+/* Concatenate/extract 32-bit halves of 64-bit values */
+#define CONCAT_64(hi,lo)	(((UINT64)(hi) << 32) | (UINT32)(lo))
+#define EXTRACT_64HI(val)	((UINT32)((val) >> 32))
+#define EXTRACT_64LO(val)	((UINT32)(val))
+
+
 /* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 */
 #if (defined(__MINGW32__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4))) || defined(_MSVC_VER)
 #define I64FMT   "I64"

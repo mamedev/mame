@@ -5,7 +5,6 @@
 
 
 #include "cpuintrf.h"
-#include "osd_cpu.h"
 #include "driver.h"
 
 enum

@@ -12,7 +12,7 @@
 */
 INLINE UINT32 pmmu_translate_addr(m68ki_cpu_core *m68k, UINT32 addr_in)
 {
-	UINT32 addr_out, tbl_entry, tbl_entry2, tamode, tbmode;
+	UINT32 addr_out, tbl_entry = 0, tbl_entry2, tamode = 0, tbmode = 0;
 	UINT32 root_aptr, root_limit, tofs, is, abits, bbits, cbits;
 	UINT32 resolved, tptr, shift;
 

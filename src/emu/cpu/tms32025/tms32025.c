@@ -147,7 +147,7 @@ struct _tms32025_state
 	UINT16	STR0, STR1;
 	UINT8	IFR;
 	UINT8	RPTC;
-	PAIR	ACC;		/* PAIR defined in os/osd_cpu.h */
+	PAIR	ACC;
 	PAIR	Preg;
 	UINT16	Treg;
 	UINT16	AR[8];

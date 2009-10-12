@@ -12,8 +12,6 @@
 #ifndef __TEXTBUF_H__
 #define __TEXTBUF_H__
 
-#include "osd_cpu.h"
-
 
 /***************************************************************************
     TYPE DEFINITIONS

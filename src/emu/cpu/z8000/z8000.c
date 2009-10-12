@@ -45,7 +45,6 @@
 
 #include "debugger.h"
 #include "z8000.h"
-#include "osd_cpu.h"
 
 #define VERBOSE 0
 

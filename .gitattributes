@@ -3668,7 +3668,6 @@ src/osd/osdmini/minimisc.c svneol=native#text/plain
 src/osd/osdmini/minisync.c svneol=native#text/plain
 src/osd/osdmini/minitime.c svneol=native#text/plain
 src/osd/osdmini/miniwork.c svneol=native#text/plain
-src/osd/osdmini/osd_cpu.h svneol=native#text/plain
 src/osd/osdmini/osdmini.mak svneol=native#text/plain
 src/osd/windows/d3d8intf.c svneol=native#text/plain
 src/osd/windows/d3d9intf.c svneol=native#text/plain
@@ -3688,7 +3687,6 @@ src/osd/windows/main.c svneol=native#text/plain
 src/osd/windows/mame.man svneol=CRLF#text/plain eol=crlf
 src/osd/windows/mame.rc svneol=CRLF#text/plain eol=crlf
 src/osd/windows/multidef.h svneol=native#text/plain
-src/osd/windows/osd_cpu.h svneol=native#text/plain
 src/osd/windows/osinline.h svneol=native#text/plain
 src/osd/windows/output.c svneol=native#text/plain
 src/osd/windows/output.h svneol=native#text/plain
