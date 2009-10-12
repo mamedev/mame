@@ -89,7 +89,7 @@ static DEVICE_RESET( discrete );
 static STREAM_UPDATE( discrete_stream_update );
 static STREAM_UPDATE( buffer_stream_update );
 
-static int profiling = DISCRETE_PROFILING;
+static int profiling = 0;
 
 /*************************************
  *
@@ -498,6 +498,10 @@ static DEVICE_START( discrete )
 	sprintf(name, "discrete%s.log", device->tag);
 	if (DISCRETE_DEBUGLOG)
 		info->disclogfile = fopen(name, "w");
+	
+	/* enable profiling */
+	if (getenv("DISCRETE_PROFILING"))
+		profiling = atoi(getenv("DISCRETE_PROFILING"));
 
 	/* Build the final block list */
 	info->block_list = NULL;
@@ -692,11 +696,13 @@ static void *task_callback(void *param, int threadid)
 					int avail;
 
 					avail = sn->task->ptr[sn->output_node] - sn->ptr;
+					assert_always(avail >= 0, "task_callback: available samples are negative");
 					if (avail < samples)
 						samples = avail;
 				}
 
 				task->samples -= samples;
+				assert_always(task->samples >=0, "task_callback: task_samples got negative");
 				while (samples > 0)
 				{
 					/* step */
