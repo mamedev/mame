@@ -19,7 +19,7 @@
 #define MAX_FILES 100
 
 #ifndef MAX_FILENAME_LEN
-#define MAX_FILENAME_LEN 12	/* increase this if you are using a real OS... */
+#define MAX_FILENAME_LEN 255
 #endif
 
 #ifndef PATH_DELIM
