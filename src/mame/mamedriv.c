@@ -8463,6 +8463,7 @@ Other Sun games
 	DRIVER( guab7 )		/* (c) 1986 */
 	DRIVER( guab21 )	/* (c) 1986 */
 	DRIVER( guab43 )	/* (c) 1986 */
+	DRIVER( crisscrs )	/* (c) 1986 */
 	DRIVER( tenup )		/* (c) 1988 */
 	DRIVER( tenup3 )	/* (c) 1988 */
 

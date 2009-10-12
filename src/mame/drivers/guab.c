@@ -6,6 +6,7 @@
 
     Games supported:
         * Give us a Break [8 sets]
+        * Criss Cross (Sweden) [non-working - need disk image]
         * Ten Up [2 sets]
 
     Looking for:
@@ -885,6 +886,15 @@ ROM_START( guab43 )
 	ROM_LOAD( "guab43.dsk", 0x00000, 0xb3f00, CRC(96167357) SHA1(9d5f66e05ed1086be9699c4149071038f6986e0c) )
 ROM_END
 
+ROM_START( crisscrs )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "crisscross_swe_2a1.ic49", 0x00000, 0x8000, CRC(a7ca8828) SHA1(a28482bb2bc1248a9b5c0b57904c382246a632cc) )
+	ROM_LOAD16_BYTE( "crisscross_swe_2b1.ic48", 0x00001, 0x8000, CRC(7e280cae) SHA1(18c76459e39549ddba5f0cd7921013ef4f816826) )
+
+	ROM_REGION( 0xb4000, "user1", 0 )
+	ROM_LOAD( "crisscrs.dsk", 0x00000, 0xb4000, NO_DUMP )
+ROM_END
+
 ROM_START( tenup )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "tu-11.bin", 0x00000, 0x8000, CRC(01843086) SHA1(106a226900e8cf929f89edf801c627f02e4afce3) )
@@ -914,13 +924,14 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, guab,   0,     guab, guab,  0, ROT0, "JPM", "Give us a Break (3rd edition)",      0 )
-GAME( 1986, guab3a, guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (3rd edition alt?)", 0 )
-GAME( 1986, guab4,  guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (4th edition)",      0 )
-GAME( 1986, guab6,  guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (6th edition)",      0 )
-GAME( 1986, guab6a, guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (6th edition alt?)", 0 )
-GAME( 1986, guab7,  guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (7th edition)",      0 )
-GAME( 1986, guab21, guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (21st edition)",     0 )
-GAME( 1986, guab43, guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (43rd edition)",     0 )
-GAME( 1988, tenup,  0,     guab, tenup, 0, ROT0, "JPM", "Ten Up (compendium 17)",             0 )
-GAME( 1988, tenup3, tenup, guab, tenup, 0, ROT0, "JPM", "Ten Up (compendium 3)",              0 )
+GAME( 1986, guab,     0,     guab, guab,  0, ROT0, "JPM", "Give us a Break (3rd edition)",      0 )
+GAME( 1986, guab3a,   guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (3rd edition alt?)", 0 )
+GAME( 1986, guab4,    guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (4th edition)",      0 )
+GAME( 1986, guab6,    guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (6th edition)",      0 )
+GAME( 1986, guab6a,   guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (6th edition alt?)", 0 )
+GAME( 1986, guab7,    guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (7th edition)",      0 )
+GAME( 1986, guab21,   guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (21st edition)",     0 )
+GAME( 1986, guab43,   guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (43rd edition)",     0 )
+GAME( 1986, crisscrs, 0,     guab, guab,  0, ROT0, "JPM", "Criss Cross (Sweden)",               GAME_NOT_WORKING )
+GAME( 1988, tenup,    0,     guab, tenup, 0, ROT0, "JPM", "Ten Up (compendium 17)",             0 )
+GAME( 1988, tenup3,   tenup, guab, tenup, 0, ROT0, "JPM", "Ten Up (compendium 3)",              0 )
