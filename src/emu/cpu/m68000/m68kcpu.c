@@ -1087,7 +1087,7 @@ static const m68k_memory_interface interface_d32 =
 static UINT8 read_byte_32_mmu(const address_space *space, offs_t address)
 {
 	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
-	
+
 	if (m68k->pmmu_enabled)
 	{
 		address = pmmu_translate_addr(m68k, address);
@@ -1099,7 +1099,7 @@ static UINT8 read_byte_32_mmu(const address_space *space, offs_t address)
 static void write_byte_32_mmu(const address_space *space, offs_t address, UINT8 data)
 {
 	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
-	
+
 	if (m68k->pmmu_enabled)
 	{
 		address = pmmu_translate_addr(m68k, address);
@@ -1111,7 +1111,7 @@ static void write_byte_32_mmu(const address_space *space, offs_t address, UINT8 
 static UINT16 read_immediate_16_mmu(const address_space *space, offs_t address)
 {
 	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
-	
+
 	if (m68k->pmmu_enabled)
 	{
 		address = pmmu_translate_addr(m68k, address);

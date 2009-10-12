@@ -424,7 +424,7 @@ WRITE8_HANDLER( arkanoid_bootleg_d018_w )
 					break;
 				default:
 					arkanoid_bootleg_cmd = 0x00;
-					break;		
+					break;
 			}
 			LOG_D018_W
 			break;
@@ -575,7 +575,7 @@ WRITE8_HANDLER( arkanoid_bootleg_d018_w )
 			}
 			LOG_D018_W
 			break;
-			
+
 		default:
 			logerror("%04x: arkanoid_bootleg_d018_w - data = %02x - unknown bootleg !\n",cpu_get_pc(space->cpu),data);
 			break;

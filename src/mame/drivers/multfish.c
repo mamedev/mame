@@ -76,7 +76,7 @@ Edge Connector is 36 count dual (IE: both sides) JAMMA-like connection (standard
   Turn Service Mode OFF (press 'F2')
   Reset the game (press 'F3')
 
-  To Init Roll Fruit 
+  To Init Roll Fruit
 
   Turn Service Mode ON (press 'F2')
   Press and hold Service 1 ('9')
@@ -297,7 +297,7 @@ static UINT8 multfish_hopper = 0;
 
 static CUSTOM_INPUT( multfish_hopper_r )
 {
-	if ( multfish_hopper_motor != 0 ) 
+	if ( multfish_hopper_motor != 0 )
 	{
 			multfish_hopper++;
 			return multfish_hopper>>4;
@@ -874,7 +874,7 @@ ROM_END
 /*********************************************************
    Crazy Monkey
 
-	Roms 1-4 were changed after the 070315 update.
+    Roms 1-4 were changed after the 070315 update.
         The official list of hashes shows the 070315 updated roms.
 
 **********************************************************/
@@ -2073,7 +2073,7 @@ Note:
 
    Only the first set of a given revision is listed in Igrosoft's official hashes list.
 
-   The sets which differs from the originals by 5-6 bytes are bootlegs that simply change 
+   The sets which differs from the originals by 5-6 bytes are bootlegs that simply change
      the banking address. Usually to convert a Crazy Monkey PCB which use the address "F9".
      Software exists to automatic modify any program rom's banking address for any PCB.
      This has resulted in dozens of different bootleg versions floating around the net.

@@ -46,14 +46,14 @@
  *
  *************************************/
 
-/* 
+/*
  * Normally, the discrete core processes 960 samples per update.
- * With the various buffers involved, this on a Core2 is not as 
+ * With the various buffers involved, this on a Core2 is not as
  * performant as processing 240 samples 4 times.
  * The setting most probably depends on CPU and which modules are
- * run and how many tasks are defined. 
- * 
- * Values < 32 exhibit poor performance (too much overhead) while 
+ * run and how many tasks are defined.
+ *
+ * Values < 32 exhibit poor performance (too much overhead) while
  * Values > 500 have a slightly worse performace (too much cache misses?).
  */
 
@@ -676,7 +676,7 @@ static void *task_callback(void *param, int threadid)
 		{
 			discrete_task 		*task = (discrete_task *) entry->ptr;
 			INT32				prev_id;
-			
+
 			/* try to lock */
 			prev_id = compare_exchange32(&task->threadid, -1, threadid);
 			if (prev_id == -1 && task->threadid == threadid)
@@ -690,12 +690,12 @@ static void *task_callback(void *param, int threadid)
 				{
 					discrete_source_node *sn = (discrete_source_node *) src_entry->ptr;
 					int avail;
-					
+
 					avail = sn->task->ptr[sn->output_node] - sn->ptr;
 					if (avail < samples)
 						samples = avail;
 				}
-				
+
 				task->samples -= samples;
 				while (samples > 0)
 				{
@@ -711,7 +711,7 @@ static void *task_callback(void *param, int threadid)
 			}
 		}
 	} while (1);
-	
+
 	return NULL;
 }
 
@@ -758,7 +758,7 @@ static STREAM_UPDATE( discrete_stream_update )
 		discrete_task 		*task = (discrete_task *) entry->ptr;
 		linked_list_entry	*src_entry;
 		int					i;
-		
+
 		task->samples = samples;
 		task->threadid = -1;
 
@@ -857,7 +857,7 @@ static void init_nodes(discrete_info *info, const linked_list_entry *block_list,
 			node->module = &custom->module;
 			node->custom = custom->custom;
 		}
-		
+
 		/* copy initial / default step function */
 		node->step = node->module->step;
 

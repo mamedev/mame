@@ -1027,7 +1027,7 @@ ROM_START( block2 )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "1.bin",         0x00000, 0x8000, CRC(2b026cae) SHA1(73d1d5d3e6d65fbe378ce85ff501610573ae5e95) )
 	ROM_LOAD( "2.bin",         0x08000, 0x8000, CRC(e3843fea) SHA1(8c654dcf78d9e4f4c6a7a7d384fdf622536234c1) )
-	
+
 	ROM_REGION( 0x8000, "unknown", 0 )	/* is it more data or something else like sound or palette ? not Z80 code nor levels anyway */
 	ROM_LOAD( "3.bin",         0x00000, 0x8000, CRC(e336c219) SHA1(e1dce37727e7084a83e73f15a138312ab6224061) )
 
@@ -1035,7 +1035,7 @@ ROM_START( block2 )
 	ROM_LOAD( "4.bin",   0x00000, 0x8000, CRC(6d2c6123) SHA1(26f32099d363ab2c8505722513638b827e49a8fc) )
 	ROM_LOAD( "5.bin",   0x08000, 0x8000, CRC(09a1f9d9) SHA1(c7e21aba6efb51c5501aa1428f6d9a817cb86555) )
 	ROM_LOAD( "6.bin",   0x10000, 0x8000, CRC(dfb9f7e2) SHA1(8d938ee6f8dcac0a564d5fa7cd5da34e0db07c71) )
-	
+
 	// no proms were present in this set.. assumed to be the same
 	ROM_REGION( 0x0600, "proms", 0 )
 	ROM_LOAD( "a75-07.bpr",    0x0000, 0x0200, CRC(0af8b289) SHA1(6bc589e8a609b4cf450aebedc8ce02d5d45c970f) )	/* red component */
@@ -1211,27 +1211,27 @@ static DRIVER_INIT( block2 )
 	int tile;
 	UINT8* srcgfx = memory_region(machine,"gfx1");
 	UINT8* buffer = alloc_array_or_die(UINT8, 0x18000);
-	
+
 	for (tile=0;tile<0x3000;tile++)
 	{
 		int srctile;
-		
+
 		// combine these into a single swap..
 		srctile = BITSWAP16(tile,15,14,13,12,
 		             11,10,9,8,
 		             7,5,6,3,
 	                 1,2,4,0);
-		
+
 		srctile = BITSWAP16(srctile,15,14,13,12,
 		             11,9,10,5,
 					 7,6,8,4,
-	                 3,2,1,0);					 
-		
+	                 3,2,1,0);
+
 		srctile = srctile^0xd4;
-		
+
 		memcpy(&buffer[tile*8], &srcgfx[srctile*8], 8);
 	}
-	
+
 	memcpy(srcgfx,buffer,0x18000);
 
 	arkanoid_bootleg_id = BLOCK2;

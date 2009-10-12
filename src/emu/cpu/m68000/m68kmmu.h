@@ -8,7 +8,7 @@
 */
 
 /*
-	pmmu_translate_addr: perform 68851/68030-style PMMU address translation
+    pmmu_translate_addr: perform 68851/68030-style PMMU address translation
 */
 INLINE UINT32 pmmu_translate_addr(m68ki_cpu_core *m68k, UINT32 addr_in)
 {
@@ -37,12 +37,12 @@ INLINE UINT32 pmmu_translate_addr(m68ki_cpu_core *m68k, UINT32 addr_in)
 	bbits = (m68k->mmu_tc>>8)&0xf;
 	cbits = (m68k->mmu_tc>>4)&0xf;
 
-//	logerror("PMMU: tcr %08x limit %08x aptr %08x is %x abits %d bbits %d cbits %d\n", m68k->mmu_tc, root_limit, root_aptr, is, abits, bbits, cbits);
+//  logerror("PMMU: tcr %08x limit %08x aptr %08x is %x abits %d bbits %d cbits %d\n", m68k->mmu_tc, root_limit, root_aptr, is, abits, bbits, cbits);
 
 	// get table A offset
 	tofs = (addr_in<<is)>>(32-abits);
-	
-	// find out what format table A is	
+
+	// find out what format table A is
 	switch (root_limit & 3)
 	{
 		case 0:	// invalid, should cause MMU exception
@@ -52,19 +52,19 @@ INLINE UINT32 pmmu_translate_addr(m68ki_cpu_core *m68k, UINT32 addr_in)
 
 		case 2:	// valid 4 byte descriptors
 			tofs *= 4;
-//			logerror("PMMU: reading table A entry at %08x\n", tofs + (root_aptr & 0xfffffffc));
+//          logerror("PMMU: reading table A entry at %08x\n", tofs + (root_aptr & 0xfffffffc));
 			tbl_entry = memory_read_dword_32be(m68k->program, tofs + (root_aptr & 0xfffffffc));
 			tamode = tbl_entry & 3;
-//			logerror("PMMU: addr %08x entry %08x mode %x tofs %x\n", addr_in, tbl_entry, tamode, tofs);
+//          logerror("PMMU: addr %08x entry %08x mode %x tofs %x\n", addr_in, tbl_entry, tamode, tofs);
 			break;
 
 		case 3: // valid 8 byte descriptors
 			tofs *= 8;
-//			logerror("PMMU: reading table A entries at %08x\n", tofs + (root_aptr & 0xfffffffc));
+//          logerror("PMMU: reading table A entries at %08x\n", tofs + (root_aptr & 0xfffffffc));
 			tbl_entry2 = memory_read_dword_32be(m68k->program, tofs + (root_aptr & 0xfffffffc));
 			tbl_entry = memory_read_dword_32be(m68k->program, tofs + (root_aptr & 0xfffffffc)+4);
 			tamode = tbl_entry2 & 3;
-//			logerror("PMMU: addr %08x entry %08x entry2 %08x mode %x tofs %x\n", addr_in, tbl_entry, tbl_entry2, tamode, tofs);
+//          logerror("PMMU: addr %08x entry %08x entry2 %08x mode %x tofs %x\n", addr_in, tbl_entry, tbl_entry2, tamode, tofs);
 			break;
 	}
 
@@ -78,22 +78,22 @@ INLINE UINT32 pmmu_translate_addr(m68ki_cpu_core *m68k, UINT32 addr_in)
 		case 0: // invalid, should cause MMU exception
 			fatalerror("680x0 PMMU: Unhandled Table A mode %d (addr_in %08x)\n", tamode, addr_in);
 			break;
-		
+
 		case 2: // 4-byte table B descriptor
 			tofs *= 4;
-//			logerror("PMMU: reading table B entry at %08x\n", tofs + tptr);
+//          logerror("PMMU: reading table B entry at %08x\n", tofs + tptr);
 			tbl_entry = memory_read_dword_32be(m68k->program, tofs + tptr);
 			tbmode = tbl_entry & 3;
-//			logerror("PMMU: addr %08x entry %08x mode %x tofs %x\n", addr_in, tbl_entry, tbmode, tofs);
+//          logerror("PMMU: addr %08x entry %08x mode %x tofs %x\n", addr_in, tbl_entry, tbmode, tofs);
 			break;
 
 		case 3: // 8-byte table B descriptor
 			tofs *= 8;
-//			logerror("PMMU: reading table B entries at %08x\n", tofs + tptr);
+//          logerror("PMMU: reading table B entries at %08x\n", tofs + tptr);
 			tbl_entry2 = memory_read_dword_32be(m68k->program, tofs + tptr);
 			tbl_entry = memory_read_dword_32be(m68k->program, tofs + tptr + 4);
 			tbmode = tbl_entry2 & 3;
-//			logerror("PMMU: addr %08x entry %08x entry2 %08x mode %x tofs %x\n", addr_in, tbl_entry, tbl_entry2, tbmode, tofs);
+//          logerror("PMMU: addr %08x entry %08x entry2 %08x mode %x tofs %x\n", addr_in, tbl_entry, tbl_entry2, tbmode, tofs);
 			break;
 
 		case 1:	// early termination descriptor
@@ -126,7 +126,7 @@ INLINE UINT32 pmmu_translate_addr(m68ki_cpu_core *m68k, UINT32 addr_in)
 		}
 	}
 
-//	if ((addr_in < 0x40000000) || (addr_in > 0x4fffffff)) printf("PMMU: [%08x] => [%08x]\n", addr_in, addr_out);
+//  if ((addr_in < 0x40000000) || (addr_in > 0x4fffffff)) printf("PMMU: [%08x] => [%08x]\n", addr_in, addr_out);
 
 	return addr_out;
 }
@@ -144,13 +144,13 @@ enable, PS = f
 tblA @ 043ffcc0:
 
 043ffcc0 0001fc0a 043ffcb0  =>  00000019 04000019
-043ffcc8 7ffffc18 00000000     
-043ffcd0 7ffffc18 00000000     
-043ffcd8 7ffffc18 00000000     
-043ffce0 7ffffc18 00000000     
-043ffce8 7ffffc18 00000000     
-043ffcf0 7ffffc18 00000000     
-043ffcf8 7ffffc18 00000000     
+043ffcc8 7ffffc18 00000000
+043ffcd0 7ffffc18 00000000
+043ffcd8 7ffffc18 00000000
+043ffce0 7ffffc18 00000000
+043ffce8 7ffffc18 00000000
+043ffcf0 7ffffc18 00000000
+043ffcf8 7ffffc18 00000000
 043ffd00 7ffffc19 40000000
 043ffd08 7ffffc19 48000000
 043ffd10 7ffffc59 50000000

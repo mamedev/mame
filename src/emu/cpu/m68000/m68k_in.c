@@ -8014,7 +8014,7 @@ M68KMAKE_OP(pmove, 32, ., .)
 	{
 		modes = m68ki_read_imm_16(m68k);
 		ea = M68KMAKE_GET_EA_AY_32;
-		
+
 		if ((modes & 0xfde0) == 0x2000)	// PLOAD
 		{
 			logerror("680x0: unhandled PLOAD\n");

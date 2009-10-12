@@ -144,18 +144,18 @@ static DRIVER_INIT(hshavoc)
                                 11,0, 8, 9 );
 
 
-		if (typedat[x & 0xf] == 1) 
+		if (typedat[x & 0xf] == 1)
 			src[x] = src[x] ^ 0x0501;
-		else 
+		else
 			src[x] = src[x] ^ 0x0406;
 
 
-		if (src[x] & 0x0400) 
+		if (src[x] & 0x0400)
 			src[x] ^= 0x0200;
 
 		if (typedat[x & 0xf] == 0)
 		{
-			if (src[x] & 0x0100) 
+			if (src[x] & 0x0100)
 				src[x] ^= 0x0004;
 
 			src[x] = BITSWAP16(src[x], 15,14,13,12,

@@ -77,7 +77,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
       * 'recordbr' : region = 0x0003 and title = 0x0001
       * 'gogold'   : region = 0x0001 and title = 0x0000
   - Coinage relies on the region (code at 0x00144a) :
-      * 0x0001 (Japan), 0x0002 (US), 0x0005 (World, Romstar licence) and 
+      * 0x0001 (Japan), 0x0002 (US), 0x0005 (World, Romstar licence) and
         0x0006 (US, Romstar licence) use TAITO_COINAGE_JAPAN_OLD
       * 0x0003 (World), 0x0004 (licenced to xxx) and
         0x0007 (licenced to PHOENIX ELECTRONICS CO.) use TAITO_COINAGE_WORLD
@@ -86,7 +86,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - Debug Mode (from Shimapong)
     1. Hold Service Switch at boot (key "9")
     2. Input the following sequence at the "Service Switch Error" message screen:
-	1P Start, 1P Start, 1P Start, Service Switch, 1P Start
+    1P Start, 1P Start, 1P Start, Service Switch, 1P Start
 
 
 3) 'dleague'

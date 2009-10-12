@@ -3761,7 +3761,7 @@ typedef struct _discrete_task discrete_task;
 struct _discrete_task
 {
 	const linked_list_entry *list;
-	
+
 	volatile INT32			threadid;
 	volatile int			samples;
 

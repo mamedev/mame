@@ -2323,7 +2323,7 @@ ADDRESS_MAP_END
 
 /************************************ Megadrive Bootlegs *************************************/
 
-// smaller ROM region because some bootlegs check for RAM there 
+// smaller ROM region because some bootlegs check for RAM there
 static ADDRESS_MAP_START( md_bootleg_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	/* Cartridge Program Rom */
 	AM_RANGE(0x200000, 0x2023ff) AM_RAM // tested

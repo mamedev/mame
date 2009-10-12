@@ -76,7 +76,7 @@ static void task_check(discrete_task *task, discrete_task *dest_task)
 							if (task->numbuffered >= DISCRETE_MAX_TASK_OUTPUTS)
 								fatalerror("dso_task_start - Number of maximum buffered nodes exceeded");
 
-							task->node_buf[task->numbuffered] = auto_alloc_array(task_node->info->device->machine, double, 
+							task->node_buf[task->numbuffered] = auto_alloc_array(task_node->info->device->machine, double,
 									((task_node->info->sample_rate + STREAMS_UPDATE_FREQUENCY) / STREAMS_UPDATE_FREQUENCY));
 							task->source[task->numbuffered] = (double *) dest_node->input[inputnum];
 							task->nodes[task->numbuffered] = discrete_find_node(task_node->info, inputnode);
