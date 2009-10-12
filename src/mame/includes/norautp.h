@@ -9,3 +9,4 @@
 /*----------- defined in audio/norautp.c -----------*/
 
 DISCRETE_SOUND_EXTERN( norautp );
+DISCRETE_SOUND_EXTERN( dphl );
