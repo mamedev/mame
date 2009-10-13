@@ -4134,12 +4134,11 @@ WRITE8_DEVICE_HANDLER( invaders_audio_2_w )
  *
  *  Blue Shark
  *
- *  Discrete sound emulation: Jan 2007, D.R.
+ *  Discrete sound emulation:
+ *   Jan 2007, D.R.
+ *   Oct 2009, D.R.
  *
  *************************************/
-
-/* Noise clock was breadboarded and measured at 7700Hz */
-
 
 /* nodes - inputs */
 #define BLUESHRK_OCTOPUS_EN		NODE_01
@@ -4188,7 +4187,37 @@ WRITE8_DEVICE_HANDLER( invaders_audio_2_w )
 #define BLUESHRK_R603	RES_K(39)
 #define BLUESHRK_R604	RES_K(1)
 #define BLUESHRK_R605	RES_M(1)
+#define BLUESHRK_R700	RES_K(68)
+#define BLUESHRK_R701	RES_K(470)
+#define BLUESHRK_R702	RES_M(1.2)
+#define BLUESHRK_R703	RES_M(1.5)
+#define BLUESHRK_R704	RES_K(22)
+#define BLUESHRK_R705	RES_K(100)
+#define BLUESHRK_R706	RES_K(470)
+#define BLUESHRK_R707	RES_M(1.2)
+#define BLUESHRK_R708	RES_M(1.5)
+#define BLUESHRK_R709	RES_K(22)
+#define BLUESHRK_R710	RES_K(470)
+#define BLUESHRK_R711	RES_K(39)
+#define BLUESHRK_R712	RES_M(1.2)
+#define BLUESHRK_R713	RES_M(1.5)
+#define BLUESHRK_R714	RES_K(22)
+#define BLUESHRK_R715	RES_K(47)
+#define BLUESHRK_R716	RES_K(75)
+#define BLUESHRK_R717	RES_M(1.5)
+#define BLUESHRK_R718	RES_M(2.2)
+#define BLUESHRK_R719	RES_K(560)
+#define BLUESHRK_R720	RES_M(1.5)
+#define BLUESHRK_R721	RES_M(2.2)
+#define BLUESHRK_R722	RES_M(2.2)
+#define BLUESHRK_R723	RES_K(560)
+#define BLUESHRK_R724	RES_K(12)
+#define BLUESHRK_R725	RES_K(68)
+#define BLUESHRK_R726	RES_K(330)
+#define BLUESHRK_R727	RES_M(2.2)
+#define BLUESHRK_R728	RES_M(1)
 #define BLUESHRK_R730	RES_K(56)
+#define BLUESHRK_R1000	RES_K(1)
 
 /* Parts List - Capacitors */
 #define BLUESHRK_C300	CAP_U(0.1)
@@ -4203,25 +4232,33 @@ WRITE8_DEVICE_HANDLER( invaders_audio_2_w )
 #define BLUESHRK_C603	CAP_U(0.01)
 #define BLUESHRK_C604	CAP_U(0.015)
 #define BLUESHRK_C606	CAP_U(1)
-#define BLUESHRK_C704	CAP_U(1)
+#define BLUESHRK_C700	CAP_U(22)
+#define BLUESHRK_C701	CAP_U(22)
+#define BLUESHRK_C702	CAP_U(10)
+#define BLUESHRK_C703	CAP_U(0.033)
+#define BLUESHRK_C704	CAP_U(0.015)
+#define BLUESHRK_C705	CAP_U(0.015)
+#define BLUESHRK_C706	CAP_U(0.033)
+#define BLUESHRK_C707	CAP_U(2.2)
+#define BLUESHRK_C708	CAP_U(1)
 #define BLUESHRK_C900	CAP_U(10)
 
 
-static const discrete_op_amp_osc_info blueshark_octopus_osc =
+static const discrete_op_amp_osc_info blueshrk_octopus_osc =
 {
 	DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_CAP,
 	BLUESHRK_R300, BLUESHRK_R303, BLUESHRK_R301, BLUESHRK_R304, BLUESHRK_R302, 0, 0, 0,	/* r1, r2, r3, r4, r5, r6, r7, r8 */
 	BLUESHRK_C300, 12				/*c, vP */
 };
 
-static const discrete_op_amp_osc_info blueshark_octopus_vco =
+static const discrete_op_amp_osc_info blueshrk_octopus_vco =
 {
 	DISC_OP_AMP_OSCILLATOR_VCO_1 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_SQW,
 	BLUESHRK_R305, BLUESHRK_R306, BLUESHRK_R307, BLUESHRK_R309, BLUESHRK_R308, 0, 0, 0,	/* r1, r2, r3, r4, r5, r6, r7, r8 */
 	BLUESHRK_C301, 12				/*c, vP */
 };
 
-static const discrete_op_amp_1sht_info blueshark_octopus_oneshot =
+static const discrete_op_amp_1sht_info blueshrk_octopus_oneshot =
 {
 	DISC_OP_AMP_1SHT_1 | DISC_OP_AMP_IS_NORTON,
 	BLUESHRK_R315, BLUESHRK_R312, BLUESHRK_R314, BLUESHRK_R313, BLUESHRK_R316,	/* r1, r2, r3, r4, r5 */
@@ -4229,7 +4266,7 @@ static const discrete_op_amp_1sht_info blueshark_octopus_oneshot =
 	0, 12																		/* vN, vP */
 };
 
-static const discrete_integrate_info blueshark_octopus_integrate =
+static const discrete_integrate_info blueshrk_octopus_integrate =
 {
 	DISC_INTEGRATE_OP_AMP_1 | DISC_OP_AMP_IS_NORTON,
 	BLUESHRK_R318, BLUESHRK_R317, 0, BLUESHRK_C304,		/* r1, r2, r3, c */
@@ -4237,11 +4274,28 @@ static const discrete_integrate_info blueshark_octopus_integrate =
 	0, 0, 0												/* f0, f1, f2 */
 };
 
-static const discrete_op_amp_info blueshark_octopus_amp =
+static const discrete_op_amp_info blueshrk_octopus_amp =
 {
 	DISC_OP_AMP_IS_NORTON,
 	BLUESHRK_R310, BLUESHRK_R319, BLUESHRK_R320, BLUESHRK_R321,	/* r1, r2, r3, r4 */
 	0, 0, 12														/* c, vN, vP */
+};
+
+static const discrete_lfsr_desc blueshrk_lfsr =
+{
+	DISC_CLK_IS_FREQ,
+	17,					/* bit length */
+						/* the RC network fed into pin 4, has the effect
+                           of presetting all bits high at power up */
+	0x1ffff,			/* reset value */
+	4,					/* use bit 4 as XOR input 0 */
+	16,					/* use bit 16 as XOR input 1 */
+	DISC_LFSR_XOR,		/* feedback stage1 is XOR */
+	DISC_LFSR_OR,		/* feedback stage2 is just stage 1 output OR with external feed */
+	DISC_LFSR_REPLACE,	/* feedback stage3 replaces the shifted register contents */
+	0x000001,			/* everything is shifted into the first bit only */
+	DISC_LFSR_FLAG_OUTPUT_SR_SN1,		/* output is not inverted */
+	12					/* output bit */
 };
 
 static const discrete_555_desc blueshrk_555_H1B =
@@ -4252,13 +4306,63 @@ static const discrete_555_desc blueshrk_555_H1B =
 	12				/* the OC buffer H2 converts the output voltage to 12V. */
 };
 
+static const discrete_op_amp_osc_info blueshrk_shark_osc1 =
+{
+	DISC_OP_AMP_OSCILLATOR_2 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_ENERGY,
+	0, BLUESHRK_R701, BLUESHRK_R703, BLUESHRK_R702, 0, BLUESHRK_R700, 0, 0,	/* r1, r2, r3, r4, r5, r6, r7, r8 */
+	BLUESHRK_C700, 12				/*c, vP */
+};
+
+static const discrete_op_amp_osc_info blueshrk_shark_osc2 =
+{
+	DISC_OP_AMP_OSCILLATOR_2 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_ENERGY,
+	0, BLUESHRK_R706, BLUESHRK_R708, BLUESHRK_R707, 0, BLUESHRK_R705, 0, 0,	/* r1, r2, r3, r4, r5, r6, r7, r8 */
+	BLUESHRK_C700, 12				/*c, vP */
+};
+
+static const discrete_op_amp_osc_info blueshrk_shark_osc3 =
+{
+	DISC_OP_AMP_OSCILLATOR_2 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_ENERGY,
+	0, BLUESHRK_R711, BLUESHRK_R713, BLUESHRK_R712, 0, BLUESHRK_R710, 0, 0,	/* r1, r2, r3, r4, r5, r6, r7, r8 */
+	BLUESHRK_C700, 12				/*c, vP */
+};
+
+static const discrete_mixer_desc blueshrk_shark_mixer =
+{
+	DISC_MIXER_IS_RESISTOR,
+	{BLUESHRK_R704, BLUESHRK_R709, BLUESHRK_R714},
+	{0}, {0}, 0, 0, 0, 0, 0, 1	/* r_node, c, rI, rF, cF, cAmp, vRef, gain */
+};
+
+static const discrete_op_amp_info blueshrk_shark_amp_m3 =
+{
+	DISC_OP_AMP_IS_NORTON,
+	0, BLUESHRK_R715 + RES_3_PARALLEL(BLUESHRK_R704, BLUESHRK_R709, BLUESHRK_R714), BLUESHRK_R716, 0,		/* r1, r2, r3, r4 */
+	0, 0, 12								/* c, vN, vP */
+};
+
+static const discrete_op_amp_osc_info blueshrk_shark_vco =
+{
+	DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON | DISC_OP_AMP_OSCILLATOR_OUT_ENERGY,
+	BLUESHRK_R717, BLUESHRK_R722, BLUESHRK_R719, BLUESHRK_R721, BLUESHRK_R720,	/* r1, r2, r3, r4, r5 */
+	0, 0, BLUESHRK_R718,	/* r6, r7, r8 */
+	BLUESHRK_C703, 12					/*c, vP */
+};
+
+static const discrete_op_amp_info blueshrk_shark_amp_k3 =
+{
+	DISC_OP_AMP_IS_NORTON,
+	BLUESHRK_R724 + BLUESHRK_R725 + BLUESHRK_R726,		/* r1 */
+	BLUESHRK_R723 , BLUESHRK_R727, BLUESHRK_R728,		/* r2, r3, r4 */
+	0, 0, 12											/* c, vN, vP */
+};
 
 static const discrete_mixer_desc blueshrk_mixer =
 {
 	DISC_MIXER_IS_RESISTOR,
 	{BLUESHRK_R324, RES_2_PARALLEL(BLUESHRK_R520, BLUESHRK_R521) + BLUESHRK_R529, BLUESHRK_R604 + BLUESHRK_R605, BLUESHRK_R730},
 	{0},	/* r_node */
-	{BLUESHRK_C305, BLUESHRK_C508, BLUESHRK_C606, BLUESHRK_C704},
+	{BLUESHRK_C305, BLUESHRK_C508, BLUESHRK_C606, BLUESHRK_C708},
 	0, 0, 0, BLUESHRK_C900, 0, 1	/* rI, rF, cF, cAmp, vRef, gain */
 };
 
@@ -4278,20 +4382,30 @@ static DISCRETE_SOUND_START(blueshrk)
      ************************************************/
 	DISCRETE_OP_AMP_OSCILLATOR(NODE_20,			/* IC M5, pin 5 */
 		1,										/* ENAB */
-		&blueshark_octopus_osc)
+		&blueshrk_octopus_osc)
 	DISCRETE_OP_AMP_VCO1(NODE_21,				/* IC M5, pin 10 */
 		1,										/* ENAB */
 		NODE_20,								/* VMOD1 */
-		&blueshark_octopus_vco)
+		&blueshrk_octopus_vco)
 	DISCRETE_OP_AMP_ONESHOT(NODE_22,			/* IC J5, pin 10 */
-		BLUESHRK_OCTOPUS_EN, &blueshark_octopus_oneshot)
+		BLUESHRK_OCTOPUS_EN, &blueshrk_octopus_oneshot)
 	DISCRETE_INTEGRATE(NODE_23,					/* IC J5, pin 5 */
 		NODE_22, 0,								/* TRG0,TRG1 */
-		&blueshark_octopus_integrate)
+		&blueshrk_octopus_integrate)
 	DISCRETE_OP_AMP(BLUESHRK_OCTOPUS_SND,		/* IC J5, pin 4 */
 		1,										/* ENAB */
 		NODE_21, NODE_23,						/* IN0,IN1 */
-		&blueshark_octopus_amp)
+		&blueshrk_octopus_amp)
+
+	/************************************************
+     * Noise
+     ************************************************/
+	/* Noise clock was breadboarded and measured at 7700Hz */
+	DISCRETE_LFSR_NOISE(BLUESHRK_NOISE_1,			/* IC N5, pin 10 (NODE_11) */
+		1, 1,										/* ENAB, RESET */
+		7700, 12.0, 0, 12.0 / 2, &blueshrk_lfsr)	/* CLK,AMPL,FEED,BIAS,LFSRTB */
+	DISCRETE_BIT_DECODE(BLUESHRK_NOISE_2,			/* IC N5, pin 13 */
+		NODE_SUB(11, 1), 8, 12)						/* INP,BIT_N,VOUT */
 
 	/************************************************
      * Shot sound
@@ -4303,7 +4417,7 @@ static DISCRETE_SOUND_START(blueshrk)
      ************************************************/
 	DISCRETE_COUNTER(NODE_40,							/* IC H3, pin 5 */
 		1, BLUESHRK_HIT_EN,								/* ENAB,RESET */
-		FREQ_OF_555(BLUESHRK_R601, 0, BLUESHRK_C600),	/* CLK */
+		FREQ_OF_555(BLUESHRK_R601, 0, BLUESHRK_C600),	/* CLK - IC H1, pin 9 */
 		1, DISC_COUNT_UP, 0,							/* MAX,DIR,INIT0 */
 		DISC_CLK_IS_FREQ)
 	DISCRETE_SWITCH(NODE_41,					/* value of toggled caps */
@@ -4319,7 +4433,49 @@ static DISCRETE_SOUND_START(blueshrk)
 	/************************************************
      * Shark sound
      ************************************************/
-	DISCRETE_CONSTANT(BLUESHRK_SHARK_SND, 0)	/* paceholder for incomplete sound */
+	DISCRETE_OP_AMP_OSCILLATOR(NODE_50,			/* IC M3, pin 4 */
+		1,										/* ENAB */
+		&blueshrk_shark_osc1)
+	DISCRETE_OP_AMP_OSCILLATOR(NODE_51,			/* IC M3, pin 5 */
+		1,										/* ENAB */
+		&blueshrk_shark_osc2)
+	DISCRETE_OP_AMP_OSCILLATOR(NODE_52,			/* IC M3, pin 9 */
+		1,										/* ENAB */
+		&blueshrk_shark_osc3)
+	DISCRETE_MIXER3(NODE_53,
+		1,										/* ENAB */
+		NODE_50, NODE_51, NODE_52, &blueshrk_shark_mixer)
+	/* threshold detector */
+	/* if any of the above oscillators are low, then the output is low */
+	DISCRETE_OP_AMP(NODE_54,					/* IC M3, pin 10 */
+		1,										/* ENAB */
+		0, NODE_53,								/* IN0,IN1 */
+		&blueshrk_shark_amp_m3)
+	DISCRETE_ADDER2(NODE_55,					/* diode drops voltage */
+		1, NODE_54, -0.7)						/* ENAB,IN0,IN1 */
+	DISCRETE_CLAMP(NODE_56, NODE_55, 0, 12)		/* IN0,MIN,MAX */
+	/* VCO disabled if any of the above oscillators or enable are low */
+	DISCRETE_OP_AMP_VCO1(NODE_57,				/* IC K3, pin 5 */
+		BLUESHRK_SHARK_EN, NODE_56,				/* ENAB,VMOD1 */
+		&blueshrk_shark_vco)
+	DISCRETE_RCFILTER(NODE_58,
+		BLUESHRK_NOISE_1,						/* IN0 */
+		BLUESHRK_R724, BLUESHRK_C704)
+	DISCRETE_RCFILTER(NODE_59,
+		NODE_58,								/* IN0 */
+		BLUESHRK_R724 + BLUESHRK_R725, BLUESHRK_C704)
+	DISCRETE_RCFILTER(NODE_60,
+		NODE_59,								/* IN0 */
+		BLUESHRK_R724 + BLUESHRK_R725 + BLUESHRK_R726, BLUESHRK_C704)
+	DISCRETE_OP_AMP(NODE_61,					/* IC K3, pin 10 */
+		1,										/* ENAB */
+		NODE_60, NODE_57,						/* IN0,IN1 */
+		&blueshrk_shark_amp_k3)
+	/* the opamp output is connected directly to a capacitor */
+	/* we will simulate this using a 1 ohm resistor */
+	DISCRETE_RCFILTER(BLUESHRK_SHARK_SND,
+		NODE_61,								/* IN0 */
+		1, BLUESHRK_C707)
 
 	/************************************************
      * Combine all sound sources.
@@ -4332,7 +4488,7 @@ static DISCRETE_SOUND_START(blueshrk)
 		BLUESHRK_SHARK_SND,
 		&blueshrk_mixer)
 
-	DISCRETE_OUTPUT(NODE_91, 240000)
+	DISCRETE_OUTPUT(NODE_91, 90000)
 DISCRETE_SOUND_END
 
 

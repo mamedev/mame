@@ -56,8 +56,11 @@
         * Space Encounters: verify trench colors
         * Space Encounters: verify strobe light frequency
         * Phantom II: cloud generator is implemented according to the schematics,
-          but it doesn't look right.  Cloud color mixing to be verified as well
+           but it doesn't look right.  Cloud color mixing to be verified as well
         * Dog Patch: find schematics and verify all assumptions
+        * Blue Shark - all sounds are suspicious.  Why is there no diver kill sound?
+           Why does the shark sound so bad and appear rarely?
+           Schematics need to be verified against real board.
 
 
 ****************************************************************************

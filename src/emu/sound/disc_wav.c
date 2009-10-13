@@ -101,18 +101,21 @@ struct dss_op_amp_osc_context
 	UINT8	flip_flop;		/* flip/flop output state */
 	UINT8	flip_flop_xor;	/* flip_flop ^ flip_flop_xor, 0 = discharge, 1 = charge */
 	UINT8	output_type;
+	UINT8	has_enable;
 	double	v_out_high;
 	double	threshold_low;	/* falling threshold */
 	double	threshold_high;	/* rising threshold */
 	double	v_cap;			/* current capacitor voltage */
 	double	r_total;		/* all input resistors in parallel */
 	double	i_fixed;		/* fixed current at the input */
+	double	i_enable;		/* fixed current at the input if enabled */
 	double	temp1;			/* Multi purpose */
 	double	temp2;			/* Multi purpose */
 	double	temp3;			/* Multi purpose */
 	double	is_linear_charge;
-	double	charge_rc;
-	double	charge_exp;
+	double	charge_rc[2];
+	double	charge_exp[2];
+	double	charge_v[2];
 };
 
 struct dss_sawtoothwave_context
@@ -748,7 +751,7 @@ static DISCRETE_STEP(dss_op_amp_osc)
 	struct dss_op_amp_osc_context   *context = (struct dss_op_amp_osc_context *)node->context;
 
 
-	double i;				/* Charging current created by vIn */
+	double i = 0;				/* Charging current created by vIn */
 	double v = 0;			/* all input voltages mixed */
 	double dt;				/* change in time */
 	double v_cap;			/* Current voltage on capacitor, before dt */
@@ -781,8 +784,15 @@ static DISCRETE_STEP(dss_op_amp_osc)
 		{
 			/* resistors can be nodes, so everything needs updating */
 			double i1, i2;
+			/* add in enable current if using real enable */
+			if (context->has_enable)
+			{
+				if (enable)
+					i = context->i_enable;
+				enable = 1;
+			}
 			/* Work out the charge rates. */
-			charge[0] = DSS_OP_AMP_OSC_NORTON_VP_IN / *context->r1;
+			charge[0] = DSS_OP_AMP_OSC_NORTON_VP_IN / *context->r1 - i;
 			charge[1] = (context->v_out_high - OP_AMP_NORTON_VBE) / *context->r2 - charge[0];
 			/* Work out the Inverting Schmitt thresholds. */
 			i1 = DSS_OP_AMP_OSC_NORTON_VP_IN / *context->r5;
@@ -835,8 +845,16 @@ static DISCRETE_STEP(dss_op_amp_osc)
 			break;
 
 		case DISC_OP_AMP_OSCILLATOR_VCO_3 | DISC_OP_AMP_IS_NORTON:
-			/* we need to mix any bias and all modulation voltages together. */
+			/* start with fixed bias */
 			charge[0] = context->i_fixed;
+			/* add in enable current if using real enable */
+			if (context->has_enable)
+			{
+				if (enable)
+					charge[0] -= context->i_enable;
+				enable = 1;
+			}
+			/* we need to mix any bias and all modulation voltages together. */
 			v = DSS_OP_AMP_OSC__VMOD1 - OP_AMP_NORTON_VBE;
 			if (v < 0) v = 0;
 			charge[0] += v / info->r1;
@@ -915,22 +933,20 @@ static DISCRETE_STEP(dss_op_amp_osc)
 		else	/* non-linear charge */
 		{
 			if (update_exponent)
-				exponent = RC_CHARGE_EXP_DT(context->charge_rc, dt);
+				exponent = RC_CHARGE_EXP_DT(context->charge_rc[flip_flop], dt);
 			else
-				exponent = context->charge_exp;
+				exponent = context->charge_exp[flip_flop];
+
+			v_cap_next = v_cap + ((context->charge_v[flip_flop] - v_cap) * exponent);
+			dt = 0;
 
 			if (flip_flop)
 			{
-				/* Charging */
-				v_cap_next = v_cap + ((context->v_out_high - v_cap) * exponent);
-				dt = 0;
-
 				/* Has it charged past upper limit? */
 				if (v_cap_next > context->threshold_high)
 				{
-					dt = context->charge_rc  * log(1.0 / (1.0 - ((v_cap_next - context->threshold_high) / (context->v_out_high - v_cap))));
+					dt = context->charge_rc[1]  * log(1.0 / (1.0 - ((v_cap_next - context->threshold_high) / (context->v_out_high - v_cap))));
 					x_time = dt;
-					v_cap_next = 0;
 					v_cap_next = context->threshold_high;
 					flip_flop = 0;
 					count_f++;
@@ -939,14 +955,10 @@ static DISCRETE_STEP(dss_op_amp_osc)
 			}
 			else
 			{
-				/* Discharging */
-				v_cap_next = v_cap - (v_cap * exponent);
-				dt = 0;
-
 				/* has it discharged past lower limit? */
 				if (v_cap_next < context->threshold_low)
 				{
-					dt = context->charge_rc * log(1.0 / (1.0 - ((context->threshold_low - v_cap_next) / v_cap)));
+					dt = context->charge_rc[0] * log(1.0 / (1.0 - ((context->threshold_low - v_cap_next) / v_cap)));
 					x_time = dt;
 					v_cap_next = context->threshold_low;
 					flip_flop = 1;
@@ -957,6 +969,10 @@ static DISCRETE_STEP(dss_op_amp_osc)
 		}
 		v_cap = v_cap_next;
 	} while(dt);
+	if (v_cap > context->v_out_high)
+		v_cap = context->v_out_high;
+	if (v_cap < 0)
+		v_cap = 0;
 	context->v_cap = v_cap;
 
 	x_time = dt / node->info->sample_time;
@@ -990,6 +1006,8 @@ static DISCRETE_STEP(dss_op_amp_osc)
 	context->flip_flop = flip_flop;
 }
 
+#define DIODE_DROP	0.7
+
 static DISCRETE_RESET(dss_op_amp_osc)
 {
 	const discrete_op_amp_osc_info *info = (const discrete_op_amp_osc_info *)node->custom;
@@ -1021,6 +1039,12 @@ static DISCRETE_RESET(dss_op_amp_osc)
 	context->is_linear_charge = 1;
 	context->output_type = info->type & DISC_OP_AMP_OSCILLATOR_OUT_MASK;
 	context->type        = info->type & DISC_OP_AMP_OSCILLATOR_TYPE_MASK;
+	context->charge_rc[0] = 0;
+	context->charge_rc[1] = 0;
+	context->charge_v[0] = 0;
+	context->charge_v[1] = 0;
+	context->i_fixed = 0;
+	context->has_enable = 0;
 
 	switch (context->type)
 	{
@@ -1042,19 +1066,59 @@ static DISCRETE_RESET(dss_op_amp_osc)
 			context->temp3 = 1.0 / (1.0 / info->r1 + 1.0 / info->r6);	/* input resistance when r6 switched in */
 			break;
 
-		case DISC_OP_AMP_OSCILLATOR_2 | DISC_OP_AMP_IS_NORTON:
-			context->is_linear_charge = 0;
-			context->charge_rc = info->r1 * info->c;
-			context->charge_exp = RC_CHARGE_EXP(context->charge_rc);
-			context->threshold_low  = (info->vP - OP_AMP_NORTON_VBE) / info->r4;
-			context->threshold_high = context->threshold_low + (info->vP - OP_AMP_VP_RAIL_OFFSET - OP_AMP_VP_RAIL_OFFSET) / info->r3;;
-			context->threshold_low  = context->threshold_low * info->r2 + OP_AMP_NORTON_VBE;
-			context->threshold_high = context->threshold_high * info->r2 + OP_AMP_NORTON_VBE;
-			/* fall through */
-
 		case DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON:
 			/* Charges while FlipFlop High */
 			context->flip_flop_xor = 0;
+			/* There is no charge on the cap so the schmitt inverter goes high at init. */
+			context->flip_flop = 1;
+			/* setup current if using real enable */
+			if (info->r6 > 0)
+			{
+				context->has_enable = 1;
+				context->i_enable = (info->vP - OP_AMP_NORTON_VBE) / (info->r6 + RES_K(1));
+			}
+			break;
+
+		case DISC_OP_AMP_OSCILLATOR_2 | DISC_OP_AMP_IS_NORTON:
+			context->is_linear_charge = 0;
+			/* First calculate the parallel charge resistors and volatges. */
+			/* We can cheat and just calcuate the charges in the working area. */
+			/* The thresholds are well past the effect of the voltage drop */
+			/* and the component tolerances far exceed the .5V charge difference */
+			if (info->r1 != 0)
+			{
+				context->charge_rc[0] = 1.0 / info->r1;
+				context->charge_rc[1] = 1.0 / info->r1;
+				context->charge_v[1] = (info->vP - OP_AMP_NORTON_VBE) / info->r1;
+			}
+			if (info->r5 != 0)
+			{
+				context->charge_rc[0] += 1.0 / info->r5;
+				context->charge_v[0] = DIODE_DROP / info->r5;
+			}
+			if (info->r6 != 0)
+			{
+				context->charge_rc[1] += 1.0 / info->r6;
+				context->charge_v[1] += (info->vP - OP_AMP_NORTON_VBE - DIODE_DROP) / info->r6;
+			}
+			context->charge_rc[0] += 1.0 / info->r2;
+			context->charge_rc[0] = 1.0 / context->charge_rc[0];
+			context->charge_v[0] += OP_AMP_NORTON_VBE / info->r2;
+			context->charge_v[0] *= context->charge_rc[0];
+			context->charge_rc[1] += 1.0 / info->r2;
+			context->charge_rc[1] = 1.0 / context->charge_rc[1];
+			context->charge_v[1] += OP_AMP_NORTON_VBE / info->r2;
+			context->charge_v[1] *= context->charge_rc[1];
+
+			context->charge_rc[0] *= info->c;
+			context->charge_rc[1] *= info->c;
+			context->charge_exp[0] = RC_CHARGE_EXP(context->charge_rc[0]);
+			context->charge_exp[1] = RC_CHARGE_EXP(context->charge_rc[1]);
+			context->threshold_low  = (info->vP - OP_AMP_NORTON_VBE) / info->r4;
+			context->threshold_high = context->threshold_low + (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r3;;
+			context->threshold_low  = context->threshold_low * info->r2 + OP_AMP_NORTON_VBE;
+			context->threshold_high = context->threshold_high * info->r2 + OP_AMP_NORTON_VBE;
+
 			/* There is no charge on the cap so the schmitt inverter goes high at init. */
 			context->flip_flop = 1;
 			break;
@@ -1066,7 +1130,6 @@ static DISCRETE_RESET(dss_op_amp_osc)
 			context->flip_flop = 0;
 			/* The charge rates vary depending on vMod so they are not precalculated. */
 			/* But we can precalculate the fixed currents. */
-			context->i_fixed = 0;
 			if (info->r6 != 0) context->i_fixed += info->vP / info->r6;
 			context->i_fixed += OP_AMP_NORTON_VBE / info->r1;
 			context->i_fixed += OP_AMP_NORTON_VBE / info->r2;
@@ -1104,6 +1167,12 @@ static DISCRETE_RESET(dss_op_amp_osc)
 			context->flip_flop_xor = 0;
 			/* There is no charge on the cap so the schmitt inverter goes high at init. */
 			context->flip_flop = 1;
+			/* setup current if using real enable */
+			if (info->r8 > 0)
+			{
+				context->has_enable = 1;
+				context->i_enable = (info->vP - OP_AMP_NORTON_VBE) / (info->r8 + RES_K(1));
+			}
 			/* Work out the charge rates. */
 			/* The charge rates vary depending on vMod so they are not precalculated. */
 			/* But we can precalculate the fixed currents. */
@@ -1661,7 +1730,7 @@ static DISCRETE_STEP(dss_inverter_osc)
 		default:
 			fatalerror("DISCRETE_INVERTER_OSC - Wrong type on NODE_%02d", NODE_BLOCKINDEX(node));
 	}
-	
+
 	clamped = 0;
 	if (info->clamp >= 0.0)
 	{
@@ -1676,7 +1745,7 @@ static DISCRETE_STEP(dss_inverter_osc)
 			clamped = 1;
 		}
 	}
-	
+
 	switch (info->options & DISC_OSC_INVERTER_TYPE_MASK)
 	{
 		case DISC_OSC_INVERTER_IS_TYPE1:
@@ -1684,7 +1753,7 @@ static DISCRETE_STEP(dss_inverter_osc)
 		case DISC_OSC_INVERTER_IS_TYPE3:
 			if (clamped)
 			{
-				double ratio = context->rp / (context->rp + context->r1); 
+				double ratio = context->rp / (context->rp + context->r1);
 				diff = vG3 * (ratio)
 				     - (context->v_cap + vG2)
 				     + vI * (1.0 - ratio);
@@ -1718,7 +1787,7 @@ static DISCRETE_STEP(dss_inverter_osc)
 			{
 				rMix = 1.0 / rMix + 1.0 / context->rp;
 				rMix = 1.0 / rMix;
-				vMix = rMix * ( (vG3 - vG2) / context->r1 + (DSS_INVERTER_OSC__MOD - vG2) / context->r2 
+				vMix = rMix * ( (vG3 - vG2) / context->r1 + (DSS_INVERTER_OSC__MOD - vG2) / context->r2
 						+ (vI + 0.7 - vG2) / context->rp);
 			}
 			diff = vMix - context->v_cap;

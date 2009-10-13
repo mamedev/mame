@@ -1822,7 +1822,14 @@ static DISCRETE_STEP(dst_op_amp)
 					node->output[0] = context->v_cap;
 				}
 				else
-					node->output[0] = i * info->r4;
+					if (context->has_r4)
+						node->output[0] = i * info->r4;
+					else
+						/* output just swings to rail when there is no r4 */
+						if (i > 0)
+							node->output[0] = context->v_max;
+						else
+							node->output[0] = 0;
 
 				/* clamp output */
 				if (node->output[0] > context->v_max) node->output[0] = context->v_max;

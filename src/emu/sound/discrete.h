@@ -221,7 +221,7 @@
  * DISCRETE_ADDER2(NODE,ENAB,IN0,IN1)
  * DISCRETE_ADDER3(NODE,ENAB,IN0,IN1,IN2)
  * DISCRETE_ADDER4(NODE,ENAB,IN0,IN1,IN2,IN3)
- * DISCRETE_CLAMP(NODE,ENAB,IN0,MIN,MAX,CLAMP)
+ * DISCRETE_CLAMP(NODE,IN0,MIN,MAX)
  * DISCRETE_DIVIDE(NODE,ENAB,IN0,IN1)
  * DISCRETE_GAIN(NODE,IN0,GAIN)
  * DISCRETE_INVERT(NODE,IN0)
@@ -820,24 +820,25 @@
  *     DISC_OP_AMP_OSCILLATOR_1 | DISC_OP_AMP_IS_NORTON
  *          Basic Norton Op Amp Oscillator circuit.
  *
- *  vP >-.
- *       |         c
- *       Z     .---||----+---------------------------> DISC_OP_AMP_OSCILLATOR_OUT_CAP
- *       Z r1  |         |
- *       Z     |   |\    |
- *       |     |   | \   |            |\
- *       '-----+---|- \  |     r3     | \
- *                 |   >-+----ZZZZ----|- \
- *                 |+ /               |   >--+-------> DISC_OP_AMP_OSCILLATOR_OUT_SQW
- *             .---| /             .--|+ /   |
- *             |   |/        r5    |  | /    |
- *             |      vP >--ZZZZ---+  |/     |
- *             Z                   |         |
- *             Z r2                |   r4    |
- *             Z                   '--ZZZZ---+
- *             |                             |
- *             |                             |
- *             '-----------------------------'
+ *              vP >-.
+ *                   |         c
+ *                   Z     .---||----+-------------------------> DISC_OP_AMP_OSCILLATOR_OUT_CAP
+ *                   Z r1  |         |
+ *                   Z     |   |\    |
+ *                   |     |   | \   |            |\
+ *                   '-----+---|- \  |     r3     | \
+ *                             |   >-+----ZZZZ----|- \
+ *                             |+ /               |   >--+-----> DISC_OP_AMP_OSCILLATOR_OUT_SQW
+ *                         .---| /             .--|+ /   |
+ *                         |   |/        r5    |  | /    |
+ *           vP >-.        |      vP >--ZZZZ---+  |/     |
+ *                |        Z                   |         |
+ *                Z        Z r2                |   r4    |
+ *                Z 1k     Z                   '--ZZZZ---+
+ *                Z        |                             |
+ *            |\  |  r6    |                             |
+ * Enable >---| >-+-ZZZZ---+-----------------------------'
+ *            |/ O.C.
  *
  * Note: R1 - R5 can be nodes.
  *
@@ -852,6 +853,12 @@
  *       |
  *       |       r1
  *       +------ZZZZ-----.
+ *       |               |
+ *       |   r5          |
+ *       +--ZZZZ---|>|---.
+ *       |               |
+ *       |   r6          |
+ *       +--ZZZZ---|<|---.
  *       |               |
  *       |         |\    |
  *       |    r2   | \   |
@@ -873,7 +880,7 @@
  *
  * Note: All values are static.
  *
- * EXAMPLES: see Space Walk
+ * EXAMPLES: see Space Walk, Blue Shark
  *
  ***********************************************************************
  *
@@ -994,15 +1001,16 @@
  *              r6    |             |+ /               |   >--+-------> DISC_OP_AMP_OSCILLATOR_OUT_SQW
  *    vMod2 >--ZZZZ---'         .---| /             .--|+ /   |
  *                              |   |/        r5    |  | /    |
- *                              |      vP >--ZZZZ---+  |/     |
- *                              Z                   |         |
- *                              Z r2                |   r4    |
- *                              Z                   '--ZZZZ---+
- *                              |                             |
- *                              |                             |
- *                              '-----------------------------'
+ *                vP >-.        |      vP >--ZZZZ---+  |/     |
+ *                     |        Z                   |         |
+ *                     Z        Z r2                |   r4    |
+ *                     Z 1k     Z                   '--ZZZZ---+
+ *                     Z        |                             |
+ *                 |\  |  r8    |                             |
+ *      Enable >---| >-+-ZZZZ---+-----------------------------'
+ *                 |/ O.C.
  *
- * EXAMPLES: see Space Encounter
+ * EXAMPLES: see Space Encounter, Blue Shark
  *
  ***********************************************************************
  *
