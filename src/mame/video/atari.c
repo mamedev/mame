@@ -1512,9 +1512,12 @@ static void generic_atari_interrupt(running_machine *machine, void (*handle_keyb
 			gtia.r.but[i] &= (button_port >> i) & 1;
 		}
 
-		/* specify buttons not relevant to this Atari variant */
-		for (i = button_count; i < 4; i++)
-			gtia.r.but[i] = 1;
+		/* button registers for xl/xe */
+		if (button_count == 2)
+		{
+			gtia.r.but[2] = 1; /* not used on xl/xe */
+			gtia.r.but[3] = 0; /* 1 if external cartridge is inserted */
+		}
 
 		handle_keyboard(machine);
 
