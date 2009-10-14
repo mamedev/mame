@@ -3685,7 +3685,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( shangupb )	/* (c) 1992 (but bootleg, hangon hw?) */
 
 	/* Pre-16 */
-	DRIVER( aliensyn1 )	/* (c) 1987 (FD1089A, decrypted) */
+	DRIVER( aliensynjo )	/* (c) 1987 (FD1089A, decrypted) */
 	DRIVER( aliensyn2 )	/* (c) 1987 (FD1089A, decrypted) */
 	DRIVER( aliensyn5 )	/* (c) 1987 (FD1089B) */
 	DRIVER( bodyslam )	/* (c) 1986 (8751) */
