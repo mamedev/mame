@@ -9567,6 +9567,7 @@ Other Sun games
 	DRIVER( dphl )		/* (c) M. Kramer Inc. 1983 */
 	DRIVER( dphla )		/* unknown */
 	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
+	DRIVER( dphljp )	/* unknown */
 	DRIVER( tpoker2 )	/* (c) 1993 Micro Manufacturing, Inc. */
 
 	/* Sanki Denshi Kogyo */
