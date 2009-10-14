@@ -4446,6 +4446,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2001.10 Inu no Osanpo */
 	DRIVER( derbyoc2 )	/* 2001.10 Derby Owners Club 2 */
 	DRIVER( vtennis2 )  /* 2001.10 Power Smash 2 / Virtua Tennis 2 */
+	DRIVER( vtenis2c )	/* Power Smash 2 / Virtua Tennis 2 (cartridge) */
 						/* 2001.11 Shakatto Tambourine Cho Powerup Chu */
 	DRIVER( keyboard )	/* 2001.11 La Keyboardxyu */
 	DRIVER( ikaruga )	/* 2001.12 Ikaruga */
@@ -4469,6 +4470,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2003.07 Yonin Uchi Mahjong MJ Network Taisen ver. NEW */
 	DRIVER( psyvar2 )	/* 2003.11 Psyvariar 2 */
 	DRIVER( puyofev )	/* 2003.11 Puyopuyo Fever */
+	DRIVER( shootopl )	/* Shootout Pool */
 	DRIVER( shootpl )	/* 2003.xx Shootout Pool / Shootout Pool Prize */
 	DRIVER( tetkiwam )	/* 2004.06 Tetris Kiwamemichi (Arcade TV Game List - P.88, Right, 11 from bottom) */
 	DRIVER( cfield )	/* 2004.06 Chaos Field */
