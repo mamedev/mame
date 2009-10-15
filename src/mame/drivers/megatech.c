@@ -1098,6 +1098,18 @@ ROM_START( mt_kcham ) /* Kid Chameleon */
 	MEGATECH_GAME60("game0", "inst0")
 ROM_END
 
+/* Game 61 - Turbo Outrun */
+#define MEGATECH_GAME61(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "epr-14674.ic1", 0x000000, 0x080000, CRC(c2b9a802) SHA1(108cc844c944125f9d271a2f2db094301294e8c2) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "epr-12368-61.ic2", 0x000000, 0x08000, CRC(4aa0b2a2) SHA1(bce03f88d6cfd02683d51c28058f6229fda13b49) ) \
+
+ROM_START( mt_tout ) /* Sonic The Hedgehog 2 */
+	MEGATECH_BIOS
+	MEGATECH_GAME61("game0", "inst0")
+ROM_END
+
 /* Game 62 - Sonic The Hedgehog 2 */
 #define MEGATECH_GAME62(GAME_REGION, INSTRUCTION_REGION) \
 	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
@@ -1201,7 +1213,7 @@ ROM_END
 /* 58 */ GAME( 1991, mt_stf,   megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Joe Montana II: Sports Talk Football (Mega-Tech)", GAME_NOT_WORKING )
 /* 59 */ GAME( 1991, mt_mlh,   megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Mario Lemieux Hockey (Mega-Tech)", GAME_NOT_WORKING )
 /* 60 */ GAME( 1992, mt_kcham, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Kid Chameleon (Mega-Tech)", GAME_NOT_WORKING )
-/* 61 */ // Turbo Outrun
+/* 61 */ GAME( 1992, mt_tout,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Turbo Outrun (Mega-Tech)", GAME_NOT_WORKING )
 /* 62 */ GAME( 1992, mt_soni2, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega-Tech)", GAME_NOT_WORKING )
 
 /* more? */
