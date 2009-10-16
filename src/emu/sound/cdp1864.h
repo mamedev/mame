@@ -89,11 +89,11 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef enum _cdp1864_format cdp1864_format;
 enum _cdp1864_format {
 	CDP1864_NON_INTERLACED = 0,
 	CDP1864_INTERLACED
 };
+typedef enum _cdp1864_format cdp1864_format;
 
 typedef struct _cdp1864_interface cdp1864_interface;
 struct _cdp1864_interface
