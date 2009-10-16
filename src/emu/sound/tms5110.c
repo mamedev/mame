@@ -1127,7 +1127,7 @@ READ8_DEVICE_HANDLER( m58817_status_r )
 
 static TIMER_CALLBACK( romclk_timer_cb )
 {
-	tms5110_state *tms = get_safe_token(ptr);
+	tms5110_state *tms = get_safe_token((const device_config *) ptr);
 	tms->romclk_state = !tms->romclk_state;
 }
 
