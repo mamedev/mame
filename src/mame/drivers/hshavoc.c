@@ -218,7 +218,10 @@ static DRIVER_INIT(hshavoc)
     }
 */
 
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x201fff, 0, 0, SMH_NOP);
+	{
+		const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		memory_install_write16_handler(space, 0x200000, 0x201fff, 0, 0, (write16_space_func) SMH_NOP);
+	}
 
 	DRIVER_INIT_CALL(megadriv);
 
