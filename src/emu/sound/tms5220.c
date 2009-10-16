@@ -1332,16 +1332,16 @@ static TIMER_CALLBACK( io_ready_cb )
 WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 {
 	tms5220_state *tms = get_safe_token(device);
-	UINT8 new;
+	UINT8 new_val;
 
 	tms->true_timing = 1;
 	state &= 0x01;
 
-	new = (tms->rs_ws & 0x01) | (state<<1);
-	if (new != tms->rs_ws)
+	new_val = (tms->rs_ws & 0x01) | (state<<1);
+	if (new_val != tms->rs_ws)
 	{
-		tms->rs_ws = new;
-		if (new == 0)
+		tms->rs_ws = new_val;
+		if (new_val == 0)
 		{
 			if (tms->variant == variant_tms5220c)
 				device_reset(device);
@@ -1350,7 +1350,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 				LOG(("tms5220_rs_w: illegal\n"));
 			return;
 		}
-		else if ( new == 3)
+		else if ( new_val == 3)
 		{
 			/* high impedance */
 			tms->read_latch = 0xff;
@@ -1376,15 +1376,15 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 {
 	tms5220_state *tms = get_safe_token(device);
-	UINT8 new;
+	UINT8 new_val;
 
 	tms->true_timing = 1;
 	state &= 0x01;
-	new = (tms->rs_ws & 0x02) | (state<<0);
-	if (new != tms->rs_ws)
+	new_val = (tms->rs_ws & 0x02) | (state<<0);
+	if (new_val != tms->rs_ws)
 	{
-		tms->rs_ws = new;
-		if (new == 0)
+		tms->rs_ws = new_val;
+		if (new_val == 0)
 		{
 			if (tms->variant == variant_tms5220c)
 				device_reset(device);
@@ -1393,7 +1393,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 				LOG(("tms5220_ws_w: illegal\n"));
 			return;
 		}
-		else if ( new == 3)
+		else if ( new_val == 3)
 		{
 			/* high impedance */
 			tms->read_latch = 0xff;
