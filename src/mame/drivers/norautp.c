@@ -24,6 +24,7 @@
    * Draw Poker Hi-Lo (alt),       1983,  Unknown.
    * GTI Poker,                    1983,  GTI Inc.
    * Draw Poker Hi-Lo (Japanese),  198?,  Unknown.
+   * Hi-Lo Double Up Joker Poker,  1983,  SMS Manufacturing Corp.
    * Turbo Poker 2,                1993,  Micro Manufacturing, Inc.
 
 
@@ -880,6 +881,9 @@
 
   - Added Draw Poker Hi-Lo (japanese), based on 8080A CPU.
   - Merged the gtipoker memory map and machine driver with dphl.
+  - Created a base machine driver and then derivatives by hardware.
+  - Splitted the regular RAM and NVRAM systems.
+  - Added 'Hi-Lo Double Up Joker Poker' from SMS Manufacturing.
 
 
   TODO:
@@ -1060,20 +1064,12 @@ static WRITE8_DEVICE_HANDLER( counterlamps_w )
 
 //static READ8_DEVICE_HANDLER( ppi2_portc_r )
 //{
-//	UINT8 ppi2_pcmix = 0;
-//	UINT8 hndshk = 0x80;	/* simulating the handshake lines (bits 3-7) */
-//	ppi2_pcmix = (hndshk | (input_port_read(device->machine, "IN2") & 0x07));
-//  popmessage("portc read: %02x", ppi2_pcmix);
-
-//	return ppi2_pcmix;
-
-//	return (devtag_get_device(device->machine, "ppi8255_2") || (input_port_read(device->machine, "IN2") & 0x07));
+//	return;
 //}
 
 //static WRITE8_DEVICE_HANDLER( ppi2_portc_w )
 //{
 //	/* PC0-PC2 don't seems to be connected to any output */
-//  popmessage("portc write: %02x", data);
 //}
 
 
@@ -1145,6 +1141,8 @@ static READ8_HANDLER( test2_r )
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | dphljp   |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | smshilo  |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | tpoker2  |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
 
@@ -1201,13 +1199,19 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dphl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 not connected */
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x5000, 0x53ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dphlnv_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 not connected */
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dphla_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dphltest_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1493,15 +1497,12 @@ static I8255A_INTERFACE (ppi8255_intf_1)
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_DRIVER_START( norautp )
+static MACHINE_DRIVER_START( noraut_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, NORAUT_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(norautp_map)
 	MDRV_CPU_IO_MAP(norautp_portmap)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-
-	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* 3x 8255 */
 	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
@@ -1530,78 +1531,92 @@ static MACHINE_DRIVER_START( norautp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( norautxp )
-	MDRV_IMPORT_FROM(norautp)
+static MACHINE_DRIVER_START( norautp )
+	MDRV_IMPORT_FROM(noraut_base)
 
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_NVRAM_HANDLER(generic_0fill)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( norautxp )
+	MDRV_IMPORT_FROM(noraut_base)
+
+	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(norautxp_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+	MDRV_NVRAM_HANDLER(generic_0fill)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( nortest1 )
-	MDRV_IMPORT_FROM(norautp)
+	MDRV_IMPORT_FROM(noraut_base)
 
+	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(nortest1_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+	MDRV_NVRAM_HANDLER(generic_0fill)
 MACHINE_DRIVER_END
 
 
 /**** 8080A based ****/
 
+
 static MACHINE_DRIVER_START( dphl )
+	MDRV_IMPORT_FROM(noraut_base)
+
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, DPHL_CPU_CLOCK)
+	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(dphl_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
-
-	/* 3x 8255 */
-	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
-	MDRV_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
-//	MDRV_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*16, 32*16)
-	MDRV_SCREEN_VISIBLE_AREA(3*16, 31*16-1, (0*16) + 8, 16*16-1)
-
-	MDRV_GFXDECODE(norautp)
-
-	MDRV_PALETTE_INIT(norautp)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_VIDEO_START(norautp)
-	MDRV_VIDEO_UPDATE(norautp)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_MODIFY("discrete")
 	MDRV_SOUND_CONFIG_DISCRETE(dphl)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dphla )
-	MDRV_IMPORT_FROM(dphl)
+	MDRV_IMPORT_FROM(noraut_base)
 
-	MDRV_CPU_MODIFY("maincpu")
+	/* basic machine hardware */
+	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(dphla_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
 
+	/* sound hardware */
+	MDRV_SOUND_MODIFY("discrete")
+	MDRV_SOUND_CONFIG_DISCRETE(dphl)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( dphltest )
-	MDRV_IMPORT_FROM(dphl)
+static MACHINE_DRIVER_START( dphlnv )
+	MDRV_IMPORT_FROM(noraut_base)
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dphltest_map)
-	MDRV_CPU_IO_MAP(norautp_portmap)
+	/* basic machine hardware */
+	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(dphlnv_map)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
+	/* sound hardware */
+	MDRV_SOUND_MODIFY("discrete")
+	MDRV_SOUND_CONFIG_DISCRETE(dphl)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( dphltest )
+	MDRV_IMPORT_FROM(noraut_base)
+
+	/* basic machine hardware */
+	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(dphltest_map)
+
+	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	/* sound hardware */
+	MDRV_SOUND_MODIFY("discrete")
+	MDRV_SOUND_CONFIG_DISCRETE(dphl)
 MACHINE_DRIVER_END
 
 
@@ -1862,6 +1877,29 @@ ROM_END
 
 /*
 
+Hi-Lo Double Up Joker Poker 
+SMS Manufacturing Corp., 1983.
+
+almost identical to DPHL.
+Only one different program rom.
+Seems to be patched with 2 extra subroutines.
+
+*/
+ROM_START( smshilo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u12.bin", 0x0000, 0x1000, CRC(bd9acce8) SHA1(33e7e1805c03a704f9c8785b8e858310bfdc8b10) )
+	ROM_LOAD( "u18.bin", 0x1000, 0x1000, CRC(06cf6789) SHA1(587d883c399348b518e3be4d1dc2581824055328) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(            0x0000, 0x0800, 0xff )
+	ROM_LOAD( "u31.bin", 0x0800, 0x0800, CRC(412fc492) SHA1(094ea0ffd0c22274cfe164f07c009ffe022331fd) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "u51.bin", 0x0000, 0x0100, CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
+ROM_END
+
+/*
+
   Turbo Poker 2 by Micro MFG.
 
   - CPU:             1x NEC D8080AFC-1 (U42).
@@ -2016,4 +2054,5 @@ GAME(  1983, dphla,    0,       dphla,    norautp,  dphla,    ROT0, "Unknown",  
 
 GAME(  1983, gtipoker, 0,       dphl,     norautp,  gtipoker, ROT0, "GTI Inc",                   "GTI Poker",                    GAME_NOT_WORKING )
 GAME(  1983, dphljp,   0,       dphl,     norautp,  0,        ROT0, "Unknown",                   "Draw Poker Hi-Lo (Japanese)",  GAME_NOT_WORKING )
+GAME(  1983, smshilo,  0,       dphlnv,   norautp,  0,        ROT0, "SMS Manufacturing Corp.",   "Hi-Lo Double Up Joker Poker ", GAME_NOT_WORKING )
 GAME(  1993, tpoker2,  0,       dphltest, norautp,  0,        ROT0, "Micro Manufacturing, Inc.", "Turbo Poker 2",                GAME_NOT_WORKING )
