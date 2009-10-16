@@ -99,7 +99,7 @@ INLINE cdp1864_t *get_safe_token(const device_config *device)
 
 static TIMER_CALLBACK( cdp1864_int_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *) ptr;
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
 	int scanline = video_screen_get_vpos(cdp1864->screen);
@@ -130,7 +130,7 @@ static TIMER_CALLBACK( cdp1864_int_tick )
 
 static TIMER_CALLBACK( cdp1864_efx_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *) ptr;
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
 	int scanline = video_screen_get_vpos(cdp1864->screen);
@@ -165,7 +165,7 @@ static TIMER_CALLBACK( cdp1864_efx_tick )
 
 static TIMER_CALLBACK( cdp1864_dma_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *) ptr;
 	cdp1864_t *cdp1864 = get_safe_token(device);
 
 	int scanline = video_screen_get_vpos(cdp1864->screen);
