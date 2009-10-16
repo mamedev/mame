@@ -288,6 +288,15 @@ static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static INPUT_CHANGED( coin_inserted_deco16 )
+{
+	cputag_set_input_line(field->port->machine, "maincpu", DECO16_IRQ_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
+static INPUT_CHANGED( coin_inserted_nmi )
+{
+	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+}
 
 static INPUT_PORTS_START( exprraid )
 	PORT_START("IN0")	/* IN 0 - 0x3800 */
@@ -340,8 +349,8 @@ static INPUT_PORTS_START( exprraid )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted_deco16, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted_deco16, 0)
 
 	PORT_START("DSW1")	/* DSW 1 - 0x1803 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:1,2")
@@ -366,7 +375,12 @@ static INPUT_PORTS_START( exprraid )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" )
 INPUT_PORTS_END
 
-
+static INPUT_PORTS_START( exprboot )
+	PORT_INCLUDE( exprraid )
+	PORT_MODIFY("IN2")	/* IN 2 - 0x1802 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted_nmi, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted_nmi, 0)
+INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
@@ -443,6 +457,7 @@ static const ym3526_interface ym3526_config =
 	irqhandler
 };
 
+#if 0
 static INTERRUPT_GEN( exprraid_interrupt )
 {
 	static int coin = 0;
@@ -452,12 +467,17 @@ static INTERRUPT_GEN( exprraid_interrupt )
 		if ( coin == 0 )
 		{
 			coin = 1;
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			//cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device, DECO16_IRQ_LINE, ASSERT_LINE);
 		}
 	}
 	else
+	{
+		cpu_set_input_line(device, DECO16_IRQ_LINE, CLEAR_LINE);
 		coin = 0;
+	}
 }
+#endif
 
 static MACHINE_DRIVER_START( exprraid )
 
@@ -465,7 +485,6 @@ static MACHINE_DRIVER_START( exprraid )
 	MDRV_CPU_ADD("maincpu", DECO16, 4000000)        /* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(master_map)
 	MDRV_CPU_IO_MAP(master_io_map)
-	MDRV_CPU_VBLANK_INT("screen", exprraid_interrupt)
 
 	MDRV_CPU_ADD("slave", M6809, 2000000)        /* 2 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(slave_map)
@@ -756,8 +775,8 @@ static DRIVER_INIT( wexpresc )
 }
 
 
-GAME( 1986, exprraid, 0,        exprraid, exprraid, exprraid, ROT0, "Data East USA", "Express Raider (US set 1)", 0 )
-GAME( 1986, exprraida,exprraid, exprraid, exprraid, exprraid, ROT0, "Data East USA", "Express Raider (US set 2)", 0 )
-GAME( 1986, wexpress, exprraid, exprraid, exprraid, wexpress, ROT0, "Data East Corporation", "Western Express (World?)", 0 )
-GAME( 1986, wexpressb, exprraid, exprboot, exprraid, wexpresb, ROT0, "bootleg", "Western Express (bootleg set 1)", 0 )
-GAME( 1986, wexpressb2,exprraid, exprboot, exprraid, wexpresc, ROT0, "bootleg", "Western Express (bootleg set 2)", 0 )
+GAME( 1986, exprraid,  0,        exprraid, exprraid, exprraid, ROT0, "Data East USA", "Express Raider (US set 1)", 0 )
+GAME( 1986, exprraida, exprraid, exprraid, exprraid, exprraid, ROT0, "Data East USA", "Express Raider (US set 2)", 0 )
+GAME( 1986, wexpress,  exprraid, exprraid, exprraid, wexpress, ROT0, "Data East Corporation", "Western Express (World?)", 0 )
+GAME( 1986, wexpressb, exprraid, exprboot, exprboot, wexpresb, ROT0, "bootleg", "Western Express (bootleg set 1)", 0 )
+GAME( 1986, wexpressb2,exprraid, exprboot, exprboot, wexpresc, ROT0, "bootleg", "Western Express (bootleg set 2)", 0 )
