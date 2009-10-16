@@ -156,13 +156,13 @@ static const int S2650_relative[0x100] =
 
 static void s2650_set_sense(s2650_regs *s2650c, int state);
 
-INLINE void set_psu(s2650_regs *s2650c, UINT8 new)
+INLINE void set_psu(s2650_regs *s2650c, UINT8 new_val)
 {
 	UINT8 old = s2650c->psu;
 
-    s2650c->psu = new;
-    if ((new ^ old) & FO)
-    	memory_write_byte_8le(s2650c->io, S2650_FO_PORT, (new & FO) ? 1 : 0);
+    s2650c->psu = new_val;
+    if ((new_val ^ old) & FO)
+    	memory_write_byte_8le(s2650c->io, S2650_FO_PORT, (new_val & FO) ? 1 : 0);
 }
 
 INLINE UINT8 get_sp(s2650_regs *s2650c)
