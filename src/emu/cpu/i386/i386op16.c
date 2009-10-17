@@ -2775,6 +2775,42 @@ static void I386OP(group0F00_16)(i386_state *cpustate)			// Opcode 0x0f 00
 
 	switch( (modrm >> 3) & 0x7 )
 	{
+		case 0:			/* SLDT */
+			if ( PROTECTED_MODE && !V8086_MODE )
+			{
+				if( modrm >= 0xc0 ) {
+					address = LOAD_RM16(modrm);
+					STORE_RM16(address, cpustate->ldtr.segment);
+					CYCLES(cpustate,CYCLES_SLDT_REG);
+				} else {
+					ea = GetEA(cpustate,modrm);
+					WRITE16(cpustate, ea, cpustate->ldtr.segment);
+					CYCLES(cpustate,CYCLES_SLDT_MEM);
+				}
+			}
+			else
+			{
+				i386_trap(cpustate,6, 0);
+			}
+			break;
+		case 1: 		/* STR */
+			if ( PROTECTED_MODE && !V8086_MODE )
+			{
+				if( modrm >= 0xc0 ) {
+					address = LOAD_RM16(modrm);
+					STORE_RM16(address, cpustate->task.segment);
+					CYCLES(cpustate,CYCLES_STR_REG);
+				} else {
+					ea = GetEA(cpustate,modrm);
+					WRITE16(cpustate, ea, cpustate->task.segment);
+					CYCLES(cpustate,CYCLES_STR_MEM);
+				}
+			}
+			else
+			{
+				i386_trap(cpustate,6, 0);
+			}
+			break;
 		case 2:			/* LLDT */
 			if ( PROTECTED_MODE && !V8086_MODE )
 			{
