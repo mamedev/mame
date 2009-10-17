@@ -4371,6 +4371,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 1999.06 Ringout 4x4 */
 	DRIVER( f355bios )	/* 1999.07 F355 Challenge */
 	DRIVER( f355 )
+	DRIVER( f355twin )	/* 1999.07 F355 Challenge Twin */
 	DRIVER( shangril )	/* 1999.08 Dengen Tenshi Taisen Janshi Shangri-la */
 						/* 1999.08 Unou Nouryoku Check Machine Touch de UNO! */
 	DRIVER( vs2_2k )	/* 1999.08 Virtua Striker 2 version 2000 */
@@ -4424,7 +4425,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sprtjam )	/* 2000.12 Sports Jam */
 						/* 2000.12 Derby Owners Club 2000 ver.2 */
 						/* 2000.?? World Kicks New ver. */
-						/* 2001.01 F355 Challenge 2 */
+	DRIVER( f355twn2 )	/* 2001.01 F355 Challenge 2 */
 	DRIVER( gwing2 )	/* 2001.01 Giga Wing 2 */
 	DRIVER( csmash )	/* 2001.01 Cosmic Smash */
 	DRIVER( csmasho )
