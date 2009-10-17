@@ -267,7 +267,7 @@ static UINT8 moonwar_port_select;
 static UINT8 irq_enabled;
 static int irq_line;
 
-
+static int tenspot_current_game;
 
 /*************************************
  *
@@ -283,6 +283,18 @@ static INTERRUPT_GEN( interrupt_gen )
 		cpu_set_input_line(device, irq_line, ASSERT_LINE);
 }
 
+static INTERRUPT_GEN( fakechange_interrupt_gen )
+{
+	interrupt_gen(device);
+
+	if (input_port_read_safe(device->machine, "FAKE_SELECT", 0x00))
+	{
+		tenspot_current_game++;
+		tenspot_current_game%=10;
+		tenspot_set_game_bank(device->machine, tenspot_current_game, 1);
+		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+	}
+}
 
 static WRITE8_HANDLER( irq_enable_w )
 {
@@ -293,8 +305,6 @@ static WRITE8_HANDLER( irq_enable_w )
 	if (!irq_enabled)
 		cpu_set_input_line(space->cpu, irq_line, CLEAR_LINE);
 }
-
-
 
 /*************************************
  *
@@ -834,7 +844,7 @@ static INPUT_CHANGED( gmgalax_game_changed )
 	memory_set_bank(field->port->machine, 1, gmgalax_selected_game);
 	galaxian_gfxbank_w(space, 0, gmgalax_selected_game);
 
-	/* reset the starts */
+	/* reset the stars */
 	galaxian_stars_enable_w(space, 0, 0);
 
 	/* reset the CPU */
@@ -1438,6 +1448,32 @@ static ADDRESS_MAP_START( mshuttle_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
+static WRITE8_HANDLER( tenspot_unk_6000_w )
+{
+	logerror("tenspot_unk_6000_w %02x\n",data);
+}
+
+static WRITE8_HANDLER( tenspot_unk_8000_w )
+{
+	logerror("tenspot_unk_8000_w %02x\n",data);
+}
+
+static WRITE8_HANDLER( tenspot_unk_e000_w )
+{
+	logerror("tenspot_unk_e000_w %02x\n",data);
+}
+
+static ADDRESS_MAP_START( tenspot_select_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("SELECT2")
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(tenspot_unk_6000_w)
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SELECT")
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(tenspot_unk_8000_w)
+	AM_RANGE(0xa000, 0xa03f) AM_RAM
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(tenspot_unk_e000_w)
+ADDRESS_MAP_END
 
 /*************************************
  *
@@ -1554,7 +1590,27 @@ static const gfx_layout galaxian_spritelayout =
 	16*16
 };
 
+static const gfx_layout galaxian_charlayout_0x200 =
+{
+	8,8,
+	0x200,
+	2,
+	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
+};
 
+static const gfx_layout galaxian_spritelayout_0x80 =
+{
+	16,16,
+	0x80,
+	2,
+	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
+	{ STEP8(0,1), STEP8(8*8,1) },
+	{ STEP8(0,8), STEP8(16*8,8) },
+	16*16
+};
 
 /*************************************
  *
@@ -1578,6 +1634,10 @@ static GFXDECODE_START(pacmanbl)
 	GFXDECODE_SCALE("gfx2", 0x0000, galaxian_spritelayout, 0, 8, GALAXIAN_XSCALE,1)
 GFXDECODE_END
 
+static GFXDECODE_START(tenspot)
+	GFXDECODE_SCALE("gfx1", 0x0000, galaxian_charlayout_0x200,   0, 8, GALAXIAN_XSCALE,1)
+	GFXDECODE_SCALE("gfx2", 0x0000, galaxian_spritelayout_0x80, 0, 8, GALAXIAN_XSCALE,1)
+GFXDECODE_END
 
 
 /*************************************
@@ -1827,6 +1887,20 @@ static MACHINE_DRIVER_START( pacmanbl )
 	MDRV_GFXDECODE(pacmanbl)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( tenspot )
+	MDRV_IMPORT_FROM(galaxian)
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_VBLANK_INT("screen", fakechange_interrupt_gen)
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("selectcpu", Z80, GALAXIAN_PIXEL_CLOCK/3/2) // ?? mhz
+	MDRV_CPU_PROGRAM_MAP(tenspot_select_map)
+	//MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+
+	/* separate tile/sprite ROMs */
+	MDRV_GFXDECODE(tenspot)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( zigzag )
 	MDRV_IMPORT_FROM(galaxian_base)
@@ -2505,6 +2579,10 @@ static DRIVER_INIT( moonqsr )
 	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
 }
 
+static WRITE8_HANDLER( artic_gfxbank_w )
+{
+//	printf("artic_gfxbank_w %02x\n",data);
+}
 
 static DRIVER_INIT( pacmanbl )
 {
@@ -2514,12 +2592,89 @@ static DRIVER_INIT( pacmanbl )
 	DRIVER_INIT_CALL(galaxian);
 
 	/* ...but coin lockout disabled/disconnected */
-	memory_install_write8_handler(space, 0x6002, 0x6002, 0, 0x7f8, (write8_space_func)SMH_UNMAP);
+	memory_install_write8_handler(space, 0x6002, 0x6002, 0, 0x7f8, (write8_space_func)artic_gfxbank_w);
 
 	/* also shift the sprite clip offset */
 	galaxian_sprite_clip_start = 7;
 	galaxian_sprite_clip_end = 246;
 }
+
+static READ8_HANDLER( tenspot_dsw_read )
+{
+	char tmp[64];
+	sprintf(tmp,"IN2_GAME%d", tenspot_current_game);
+	return input_port_read_safe(space->machine, tmp, 0x00);
+}
+
+
+void tenspot_set_game_bank(running_machine* machine, int bank, int from_game)
+{
+	char tmp[64];
+	UINT8* srcregion;
+	UINT8* dstregion;
+	UINT8* color_prom;
+	int x;
+
+	sprintf(tmp,"game_%d_cpu", bank);
+	srcregion = memory_region(machine,tmp);
+	dstregion = memory_region(machine,"maincpu");
+	memcpy(dstregion, srcregion, 0x4000);
+
+	sprintf(tmp,"game_%d_temp", bank);
+	srcregion = memory_region(machine,tmp);
+	dstregion = memory_region(machine,"gfx1");
+	memcpy(dstregion, srcregion, 0x2000);
+	dstregion = memory_region(machine,"gfx2");
+	memcpy(dstregion, srcregion, 0x2000);
+
+	if (from_game)
+	{
+
+		for (x=0;x<0x200;x++)
+		{
+			gfx_element_mark_dirty(machine->gfx[0], x);
+		}
+
+		for (x=0;x<0x80;x++)
+		{
+			gfx_element_mark_dirty(machine->gfx[1], x);
+		}
+	}
+
+	sprintf(tmp,"game_%d_prom", bank);
+	srcregion = memory_region(machine,tmp);
+	dstregion = memory_region(machine,"proms");
+	memcpy(dstregion, srcregion, 0x20);
+	
+	color_prom = dstregion;
+	PALETTE_INIT_CALL(galaxian);
+}
+
+static DRIVER_INIT( tenspot )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	/* these are needed for batman part 2 to work properly, this banking is probably a property of the artic board,
+	   which tenspot appears to have copied */
+
+	/* video extensions */
+	//common_init(machine, galaxian_draw_bullet, galaxian_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
+
+	/* coin lockout replaced by graphics bank */
+	//memory_install_write8_handler(space, 0x6002, 0x6002, 0, 0x7f8, galaxian_gfxbank_w);
+
+
+	DRIVER_INIT_CALL(galaxian);
+
+	memory_install_write8_handler(space, 0x6002, 0x6002, 0, 0x7f8, (write8_space_func)artic_gfxbank_w);
+
+	tenspot_current_game = 0;
+
+	tenspot_set_game_bank(machine, tenspot_current_game, 0);
+
+	memory_install_read8_handler(space, 0x7000, 0x7000, 0, 0, tenspot_dsw_read);
+}
+
 
 
 static DRIVER_INIT( devilfsg )

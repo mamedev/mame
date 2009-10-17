@@ -176,6 +176,7 @@ const game_driver * const drivers[] =
 	DRIVER( pacmanbla )	/* bootleg */
 	DRIVER( phoenxp2 )	/* bootleg */
 	DRIVER( atlantisb )	/* bootleg */
+	DRIVER( tenspot )	/* (c) 1982 Thomas Automatics */
 	DRIVER( devilfsg )	/* (c) 1984 Vision / Artic (bootleg?) */
 	DRIVER( zigzag )	/* (c) 1982 LAX */
 	DRIVER( zigzag2 )	/* (c) 1982 LAX */

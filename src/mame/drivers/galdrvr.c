@@ -626,6 +626,183 @@ static INPUT_PORTS_START( pacmanbl )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tenspot )
+	PORT_INCLUDE(articms)
+
+	PORT_START("SELECT") /* inputs? read by select CPU - unknown */
+	PORT_DIPUNKNOWN( 0x01, 0x01 )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START("SELECT2") /* inputs? read by select CPU - unknown */
+	PORT_DIPUNKNOWN( 0x01, 0x01 )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START("FAKE_SELECT") /* fake button to move onto next game - until select rom is understood! */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Next Game (Fake)") PORT_IMPULSE(1)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+
+
+	PORT_MODIFY("IN2") // ignored
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// yes, the board has 10 banks of dipswitches...
+	PORT_START("IN2_GAME0")
+	PORT_DIPNAME( 0x01, 0x01, "Survivor DSW0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2_GAME1")
+	PORT_DIPNAME( 0x01, 0x01, "Moon Cresta DSW0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START("IN2_GAME2")
+	PORT_DIPNAME( 0x01, 0x01, "Space Cruiser DSW0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START("IN2_GAME3")
+	PORT_DIPNAME( 0x01, 0x01, "Mission Rescue DSW0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START("IN2_GAME4")
+	PORT_DIPNAME( 0x01, 0x01, "Uniwars DSW0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START("IN2_GAME5")
+	PORT_DIPNAME( 0x01, 0x01, "Batman Pt.2 DSW0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START("IN2_GAME6")
+	PORT_DIPNAME( 0x01, 0x01, "Defend UFO DSW0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START("IN2_GAME7")
+	PORT_DIPNAME( 0x01, 0x01, "King and Balloon DSW0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START("IN2_GAME8")
+	PORT_DIPNAME( 0x01, 0x01, "Omega DSW0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START("IN2_GAME9")
+	PORT_DIPNAME( 0x01, 0x01, "Battle of Atlantis DSW0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( phoenxp2 )
 	PORT_INCLUDE(articms)
@@ -3130,27 +3307,6 @@ ROM_START( skyraidr )
 ROM_END
 
 
-ROM_START( batman2 )
-	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD( "01.bin",    	  0x0000, 0x0800, CRC(150fbca5) SHA1(a5dc104169eb3225c6200e7e07102f8a9bee6861) )
-	ROM_LOAD( "02.bin",       0x0800, 0x0800, CRC(b1624fd0) SHA1(ca4678cf7a8b935be2f68d6e342c1f961bf6f1a2) )
-	ROM_LOAD( "03.bin",       0x1000, 0x0800, CRC(93774188) SHA1(8bdd3290db43459c56b932b582f555d89df30bd1) )
-	ROM_LOAD( "04.bin",       0x1800, 0x0800, CRC(8a94ec6c) SHA1(dacadab9a05ddee2de188b368f795d74213e020d) )
-	ROM_LOAD( "05.bin",       0x2000, 0x0800, CRC(a3669461) SHA1(11ea7aa9b55f5790cc2451d80d0eb84388cf47eb) )
-	ROM_LOAD( "06.bin",       0x2800, 0x0800, CRC(fa1efbfe) SHA1(f7222dd21e0810d0c8c32919ebb6e0e7bbb4c68e) )
-	ROM_LOAD( "07.bin",       0x3000, 0x0800, CRC(9b77debd) SHA1(1f5521bc0f701d86e61219ad3b9516aaa71a68da) )
-	ROM_LOAD( "08.bin",       0x3800, 0x0800, CRC(6466177e) SHA1(fc359eadee34586576c557ff7c1dd2c8d49bdf3f) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "09.bin",       0x0000, 0x0800, CRC(1a657b1f) SHA1(42149dafdde7d9104f0bddda2223bfc211d0154a) )
-	ROM_LOAD( "11.bin",       0x0800, 0x0800, CRC(7a2b48e5) SHA1(f559799c685dd2cb9de06a356bee95b7d6ffadfc) )
-	ROM_LOAD( "10.bin",       0x1000, 0x0800, CRC(9b570016) SHA1(44fd2b1caeecdc5200d63c35636f0a605943d30c) )
-	ROM_LOAD( "12.bin",       0x1800, 0x0800, CRC(73956244) SHA1(e464b587b5ed636816cc9688593f5b6005cb5216) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "l06_prom.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
-ROM_END
-
 ROM_START( devilfsg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dfish1.7f",    0x2000, 0x0800, CRC(2ab19698) SHA1(8450981d3cf3fa8abf2fb5487aa98b03a4cf03a1) )
@@ -3329,8 +3485,8 @@ ROM_START( pacmanbla ) /* content is the same as the above bootleg, but arranged
 	ROM_LOAD( "sn74s288n.6l", 0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) ) /* same as pisces */
 ROM_END
 
+
 ROM_START( phoenxp2 ) /* Artic Multi-System */
-	/* Large birds never appeared 'whole' even when they were displayed correctly on real hardware, this may be a rom error, or something else. */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1",  0x0000, 0x0800, CRC(f6dcfd51) SHA1(8475726dbbf0dd13581f457a5379956424dc2862) )
 	ROM_LOAD( "2",  0x0800, 0x0800, CRC(de951936) SHA1(657d2c595a5864d8c9a51926ab7bfa0a7068e2b2) )
@@ -3341,16 +3497,35 @@ ROM_START( phoenxp2 ) /* Artic Multi-System */
 	ROM_LOAD( "7",  0x3000, 0x0800, CRC(d3a480c1) SHA1(d1e4fe83b49f918285009f09df38c6555a686823) )
 	ROM_LOAD( "8",  0x3800, 0x0800, CRC(edf9779e) SHA1(c1e7307c59f15bebac3e29b41135fe9f18fc9a06) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "10",  0x0000, 0x0800, CRC(9b570016) SHA1(44fd2b1caeecdc5200d63c35636f0a605943d30c) )
-	ROM_LOAD( "9",   0x0800, 0x0800, CRC(1a657b1f) SHA1(42149dafdde7d9104f0bddda2223bfc211d0154a) )
-
-	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "12",  0x0000, 0x0800, BAD_DUMP CRC(73956244) SHA1(e464b587b5ed636816cc9688593f5b6005cb5216) ) /* possible bad_dump... seems to be missing graphics */
-	ROM_LOAD( "11",  0x0800, 0x0800, CRC(7a2b48e5) SHA1(f559799c685dd2cb9de06a356bee95b7d6ffadfc) )
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "09",       0x0000, 0x0800, CRC(1a657b1f) SHA1(42149dafdde7d9104f0bddda2223bfc211d0154a) )
+	ROM_LOAD( "11",       0x0800, 0x0800, CRC(7a2b48e5) SHA1(f559799c685dd2cb9de06a356bee95b7d6ffadfc) )
+	ROM_LOAD( "10",       0x1000, 0x0800, CRC(9b570016) SHA1(44fd2b1caeecdc5200d63c35636f0a605943d30c) )
+	ROM_LOAD( "12",       0x1800, 0x0800, CRC(73956244) SHA1(e464b587b5ed636816cc9688593f5b6005cb5216) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "sn74s288n.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* same as 'Omega' */
+ROM_END
+
+ROM_START( batman2 ) /* wasn't marked as artic multi-system, but it's basically the same as the above phoenixp2 */
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "01.bin",    	  0x0000, 0x0800, CRC(150fbca5) SHA1(a5dc104169eb3225c6200e7e07102f8a9bee6861) )
+	ROM_LOAD( "02.bin",       0x0800, 0x0800, CRC(b1624fd0) SHA1(ca4678cf7a8b935be2f68d6e342c1f961bf6f1a2) )
+	ROM_LOAD( "03.bin",       0x1000, 0x0800, CRC(93774188) SHA1(8bdd3290db43459c56b932b582f555d89df30bd1) )
+	ROM_LOAD( "04.bin",       0x1800, 0x0800, CRC(8a94ec6c) SHA1(dacadab9a05ddee2de188b368f795d74213e020d) )
+	ROM_LOAD( "05.bin",       0x2000, 0x0800, CRC(a3669461) SHA1(11ea7aa9b55f5790cc2451d80d0eb84388cf47eb) )
+	ROM_LOAD( "06.bin",       0x2800, 0x0800, CRC(fa1efbfe) SHA1(f7222dd21e0810d0c8c32919ebb6e0e7bbb4c68e) )
+	ROM_LOAD( "07.bin",       0x3000, 0x0800, CRC(9b77debd) SHA1(1f5521bc0f701d86e61219ad3b9516aaa71a68da) )
+	ROM_LOAD( "08.bin",       0x3800, 0x0800, CRC(6466177e) SHA1(fc359eadee34586576c557ff7c1dd2c8d49bdf3f) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "09.bin",       0x0000, 0x0800, CRC(1a657b1f) SHA1(42149dafdde7d9104f0bddda2223bfc211d0154a) )
+	ROM_LOAD( "11.bin",       0x0800, 0x0800, CRC(7a2b48e5) SHA1(f559799c685dd2cb9de06a356bee95b7d6ffadfc) )
+	ROM_LOAD( "10.bin",       0x1000, 0x0800, CRC(9b570016) SHA1(44fd2b1caeecdc5200d63c35636f0a605943d30c) )
+	ROM_LOAD( "12.bin",       0x1800, 0x0800, CRC(73956244) SHA1(e464b587b5ed636816cc9688593f5b6005cb5216) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "l06_prom.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( atlantisb ) /* Artic Multi-System */
@@ -3368,7 +3543,7 @@ ROM_START( atlantisb ) /* Artic Multi-System */
 	ROM_LOAD( "8",  0x0000, 0x0800, CRC(55cd5acd) SHA1(b3e2ce71d4e48255d44cd451ee015a7234a108c8) )
 	ROM_LOAD( "7",  0x0800, 0x0800, CRC(72e773b8) SHA1(6ce178df3bd6a4177c68761572a13a56d222c48f) )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "gfx2", ROMREGION_ERASEFF )
 	/* 0x000, 0x0800 not populated */
 	/* 0x000, 0x0800 not populated */
 
@@ -3376,6 +3551,157 @@ ROM_START( atlantisb ) /* Artic Multi-System */
 	ROM_LOAD( "sn74s288n.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
+
+ROM_START( tenspot )	
+	/* Game A - Survivor */
+	ROM_REGION( 0x4000, "game_0_cpu", 0 )
+	ROM_LOAD( "svt1-a.a1",    0x0000, 0x1000, CRC(5806d0e6) SHA1(887ff2985578faa9535387a5ce3953452e7a3171) )
+	ROM_LOAD( "svt2-a.a2",    0x1000, 0x1000, CRC(847c16d0) SHA1(7ac65e5f47153f7e1e70c701b16d537774f60982) )
+	ROM_LOAD( "svt3-a.a3",    0x2000, 0x1000, CRC(63a6990b) SHA1(901772e2ed8536c3031a66204889e1cac60011c5) )
+
+ 	ROM_REGION( 0x2000, "game_0_temp", 0 )
+	ROM_LOAD( "syt5-a.a5",       0x0000, 0x1000, CRC(7f804605) SHA1(898f7de488ca79b5b29dbdb93233c63ed20df354) )
+	ROM_LOAD( "svt5-a.a6",       0x1000, 0x1000, CRC(fff07c86) SHA1(a37034fb7fcf60ee5f098d405ee3277616c8aceb) )
+
+	ROM_REGION( 0x0020, "game_0_prom", 0 )
+	ROM_LOAD( "clr3.a7",       0x0000, 0x0020, CRC(aefcf6b1) SHA1(10cde93e23fe8720f5af9039c4f68999f7cfce67) )
+	
+	/* Game B - Moon Cresta */
+	ROM_REGION( 0x4000, "game_1_cpu", 0 )
+	ROM_LOAD( "mct1-a.b1",    0x0000, 0x1000, CRC(90a74a0b) SHA1(a1fb24aa621611c18bf6188f380640e5576ac248) )
+	ROM_LOAD( "mct2-a.b2",    0x1000, 0x1000, CRC(9bb1e8e8) SHA1(0a8567c7efb6511360a786c18a09966966c253a2) )
+	ROM_LOAD( "mct3-a.b3",    0x2000, 0x1000, CRC(6d19c439) SHA1(39a5d78c7d42981e1fa12bc6c794b915f738faf7) )
+	ROM_LOAD( "mct4-a.b4",    0x3000, 0x1000, CRC(dd029a6e) SHA1(e6035a6981e22565a2af3a3ecac16676cb3b3500) )
+
+ 	ROM_REGION( 0x2000, "game_1_temp", 0 )
+	ROM_LOAD( "mct5-a.b5",       0x0000, 0x1000, CRC(ac1a6a62) SHA1(febfcdbf1afe9a5352d8d96b454a6c8fc7818ef0) )
+	ROM_LOAD( "mct6-a.b6",       0x1000, 0x1000, CRC(dc19ec73) SHA1(19a3295597a8eff2587ff838a3b8f7e3817f22f0) )
+
+	ROM_REGION( 0x0020, "game_1_prom", 0 )
+	ROM_LOAD( "clr2.b7",       0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+	
+	/* Game C - Space Cruiser */
+	ROM_REGION( 0x4000, "game_2_cpu", 0 )
+	ROM_LOAD( "sct1-a.c1",    0x0000, 0x1000, CRC(5068e89c) SHA1(539fe47ec846ec038ee6ffd2d3578d7cf25d4219) )
+	ROM_LOAD( "sct2-a.c2",    0x1000, 0x1000, CRC(96013308) SHA1(756ad5592acbe68c923a810eba2ff4eda4a9a51c) )
+	ROM_LOAD( "sct3-a.c3",    0x2000, 0x1000, CRC(3c6ef851) SHA1(a2c5dd8cca60b7340c9c3973137415621f5b1a11) )
+
+ 	ROM_REGION( 0x2000, "game_2_temp", 0 )
+	ROM_LOAD( "sct5-a.c5",       0x0000, 0x1000, CRC(272a0037) SHA1(48dcb9da66db75721668c3708ed1a55a0ee65238) )
+	ROM_LOAD( "sct6-a.c6",       0x1000, 0x1000, CRC(d6b35f01) SHA1(e16a7400901e2b0ad4ce70dce8092741d85b6a43) )
+
+	ROM_REGION( 0x0020, "game_2_prom", 0 )
+	ROM_LOAD( "clr1.c7",       0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+	
+	/* Game D - Mission Rescue (Black Hole) */
+	ROM_REGION( 0x4000, "game_3_cpu", 0 )
+	ROM_LOAD( "mrt1-a.d1",    0x0000, 0x1000, CRC(eb63c4e0) SHA1(29a59fa8616e36dd098ff9f6e520128db3b66ed9) )
+	ROM_LOAD( "mrt2-a.d2",    0x1000, 0x1000, CRC(e4ba463a) SHA1(b5370bc33275f6aa52c96304db4be086b5f6d18c) )
+	ROM_LOAD( "mrt3-a.d3",    0x2000, 0x1000, CRC(62d7b1ce) SHA1(5243d053ea53dcfe4110fdf04077e818237121c8) )
+
+ 	ROM_REGION( 0x2000, "game_3_temp", 0 )
+	ROM_LOAD( "mrt5-a.d5",       0x0000, 0x1000, CRC(cc6bb4bc) SHA1(f81f671d2865a43849f10a48c0cc9f6c5bbe0f9e) )
+	ROM_LOAD( "mrt6-a.d6",       0x1000, 0x1000, CRC(4b4e6c62) SHA1(86ea8436d631a30461f0ba708c0b597f15ebdd47) )
+
+	ROM_REGION( 0x0020, "game_3_prom", 0 )
+	ROM_LOAD( "clr1.d7",       0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+
+	/* Game E - Uniwars */
+	ROM_REGION( 0x4000, "game_4_cpu", 0 )
+	ROM_LOAD( "uwt1-a.e1",    0x0000, 0x1000, CRC(1379be84) SHA1(e280e0402c7cfa52f2a04801634f8c3aa85bf02f) )
+	ROM_LOAD( "uwt2-a.e2",    0x1000, 0x1000, CRC(ed8e5260) SHA1(a2ebc8aa9b5da6ff689847de8973a512f9d96128) )
+	ROM_LOAD( "uwt3-a.e3",    0x2000, 0x1000, CRC(9abd1570) SHA1(74f82ac2c3a1822f1e5575e7e72c017d24c43dc1) )
+	ROM_LOAD( "uwt4-b.e4",    0x3000, 0x1000, CRC(daea5232) SHA1(cdb2a1a14188e971e2c98c625e0b577f688a753a) )
+
+ 	ROM_REGION( 0x2000, "game_4_temp", 0 )
+	ROM_LOAD( "uwt5-a.e5",       0x0000, 0x1000, CRC(49a1c892) SHA1(b6b1be0d8fa6909ed8e6f36d3f75dadd8f5cafbe) )
+	ROM_LOAD( "uwt6-a.e6",       0x1000, 0x1000, CRC(9d27e53d) SHA1(ef41c8b586545207a0e2021c8634df4ffe4b7b8a) )
+
+	ROM_REGION( 0x0020, "game_4_prom", 0 )
+	ROM_LOAD( "clr1.e7",       0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+	
+	/* Game F - Batman Pt.2 (Phoenix) - this needs custom video banking like the standalone version.... */
+	ROM_REGION( 0x4000, "game_5_cpu", 0 )
+	ROM_LOAD( "bmt1-a.f1",    0x0000, 0x1000, CRC(2aecaaa0) SHA1(07c35f34eebbe65247a412c828328a558936d03c) )
+	ROM_LOAD( "bmt2-a.f2",    0x1000, 0x1000, CRC(1972ff4c) SHA1(262db6caba201fa1f2f7b04f36f4d6084283d841) )
+	ROM_LOAD( "bmt3-a.f3",    0x2000, 0x1000, CRC(34c0728d) SHA1(54f76368a387b42010258fa549465a430dd6ecf7) )
+	ROM_LOAD( "bmt4-a.f4",    0x3000, 0x1000, CRC(fc2e8de1) SHA1(683815035054669a845ce440d66c023cf54dbdcc) )
+
+ 	ROM_REGION( 0x2000, "game_5_temp", 0 )
+	ROM_LOAD( "bmt5-a.f5",       0x0000, 0x1000, CRC(ee71a2de) SHA1(c41b8c705ec697ab2a37fbde0fc2bbcd3259ec98) )
+	ROM_LOAD( "bmt6-a.f6",       0x1000, 0x1000, CRC(ea538ab9) SHA1(310052358fca96bba5b69366f7bd47c446287783) )
+
+ 	ROM_REGION( 0x0020, "game_5_prom", 0 )
+	ROM_LOAD( "clr1.f7",       0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+
+	/* Game H - Defend UFO */
+ 	ROM_REGION( 0x4000, "game_6_cpu", 0 )
+	ROM_LOAD( "rut1-a.h1",    0x0000, 0x1000, CRC(364b0689) SHA1(d39c1ca5774b21c9e045f2234c2256f56ff36a2a) )
+	ROM_LOAD( "rut2-a.h2",    0x1000, 0x1000, CRC(ed448821) SHA1(33c983b8cfa17299728363870f906477bce14dbf) )
+	ROM_LOAD( "rut3-a.h3",    0x2000, 0x1000, CRC(312d5d37) SHA1(772a5e7ea94dd6b9744f4eef7d7ac26cb58d58ab) )
+	ROM_LOAD( "rut4-a.h4",    0x3000, 0x1000, CRC(2281b279) SHA1(c6cfb14b6656de185f38a5c73cf042f2f8b4cc6e) )
+
+ 	ROM_REGION( 0x2000, "game_6_temp", 0 )
+	ROM_LOAD( "rut5-a.h5",       0x0000, 0x1000, CRC(6fb16866) SHA1(e1a1ac17ef9c08ac2f4c7b15a13932f542aed95d) )
+	ROM_LOAD( "rut6-a.h6",       0x1000, 0x1000, CRC(5ae0dc50) SHA1(d4ec2179d5181b71171bac5098a6f7f1c96e63b3) )
+
+	ROM_REGION( 0x0020, "game_6_prom", 0 )
+	ROM_LOAD( "clr1.h7",       0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+	
+	/* Game J - King and Balloon */
+	ROM_REGION( 0x4000, "game_7_cpu", 0 )
+	ROM_LOAD( "kbt1-a.j1",    0x0000, 0x1000, CRC(6bcdfaef) SHA1(5f3d57a91d57c8758f1fa39a44be6082fff52406) )
+	ROM_LOAD( "kbt2-a.j2",    0x1000, 0x1000, CRC(3652c64b) SHA1(7cb2a51e1830d48d5d3a62d521dfef1779dd5222) )
+	ROM_LOAD( "kbt3-a.j3",    0x2000, 0x1000, CRC(946447c6) SHA1(0759f7d8b538d5e489a85bc6551cde76e6b3ed71) )
+	
+ 	ROM_REGION( 0x2000, "game_7_temp", 0 )
+	ROM_LOAD( "kbt5-a.j5",       0x0000, 0x1000, CRC(ea36f825) SHA1(20e26c97d780fb1fd15ad4c33c097a5b3539d43d) )
+	ROM_LOAD( "kbt6-a.j6",       0x1000, 0x1000, CRC(2b8b46bc) SHA1(48a7a65fc5c174d0cc654557b3a1166df7fea4da) )
+
+ 	ROM_REGION( 0x0020, "game_7_prom", 0 )
+	ROM_LOAD( "clr1.j7",       0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+
+	/* Game K - Omega (The End) */
+	ROM_REGION( 0x4000, "game_8_cpu", 0 )
+	ROM_LOAD( "omt1-a.k1",    0x0000, 0x1000, CRC(8fc41a53) SHA1(c1bb4018bad12b83954cf8da8eba49f23618139a) )
+	ROM_LOAD( "omt2-a.k2",    0x1000, 0x1000, CRC(a3073430) SHA1(200b15c572d7cff9be39439a247c9be742f17a61) )
+	ROM_LOAD( "omt3-a.k3",    0x2000, 0x1000, CRC(b0de1fa2) SHA1(71cf8303b7ddc5813d6b92a71bd53f83272f5f22) )
+	
+ 	ROM_REGION( 0x2000, "game_8_temp", 0 )
+	ROM_LOAD( "omt5-a.k5",       0x0000, 0x1000, CRC(5ab402c8) SHA1(c0640d9907d7dcd34cd7105d21b99fc15fcbac6e) )
+	ROM_LOAD( "omt6-a.k6",       0x1000, 0x1000, CRC(2552e470) SHA1(ba5fba8047e4bb23442b0c2d45c858ec9da63945) )
+
+ 	ROM_REGION( 0x0020, "game_8_prom", 0 )
+	ROM_LOAD( "clr1.k7",       0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+
+	/* Game L - Battle of Atlantis */
+	ROM_REGION( 0x4000, "game_9_cpu", 0 )
+	ROM_LOAD( "bat1-a.l1",    0x0000, 0x1000, CRC(5849dd36) SHA1(c69bf6119ae63a3c855d58bbadb5b358f7b25ad0) )
+	ROM_LOAD( "bat2-a.l2",    0x1000, 0x1000, CRC(adc2ce4b) SHA1(36f477a48b3df9cb2456460048b2fdd0d3e8b73e) )
+	ROM_LOAD( "bat3-a.l3",    0x2000, 0x1000, CRC(81270ace) SHA1(0385fedacbbda4ed750c5a64d51a60ed98c3ed65) )
+	ROM_LOAD( "bat4-a.l4",    0x3000, 0x1000, CRC(bd751ba9) SHA1(dbdc8972b0236755d5a8ea90e2de2d16585f5e02) )
+	
+ 	ROM_REGION( 0x2000, "game_9_temp", 0 )
+	ROM_LOAD( "bat5-a.l5",       0x0000, 0x1000, CRC(b9701513) SHA1(d8bc7b36a6d0b1e73aa7b6a5dab7b36ce111a04c) )
+	ROM_LOAD( "bat6-a.l6",       0x1000, 0x1000, CRC(54b423b7) SHA1(31eec49b4e9c8b56668b9037dd47e66659ce64cb) )
+
+ 	ROM_REGION( 0x0020, "game_9_prom", 0 )
+	ROM_LOAD( "clr1.l7",       0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+
+
+ 	ROM_REGION( 0x4000, "selectcpu", 0 ) // probably related to game selection
+	ROM_LOAD( "tenu2-d.u2",    0x0000, 0x800, CRC(58c7fe3b) SHA1(a4faa8e669a81fe01696d6df9c8ebd5c17be0f00) )
+
+  	ROM_REGION( 0x4000, "unknown", 0 ) // ?? no idea
+	ROM_LOAD( "u1.u1",    0x0000, 0x100, CRC(f18006f7) SHA1(f9a3541cd7f2b75816227d8befc03d2e33eeebac) )
+
+
+	/* temporary - replace game_x with the game number you want to test. */
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
+ 	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "gfx2", ROMREGION_ERASEFF )
+	ROM_REGION( 0x0020, "proms", ROMREGION_ERASEFF )
+ ROM_END
 
 /*************************************
  *
@@ -5268,15 +5594,15 @@ GAME( 1980, spacbat2, uniwars,  galaxian, spacbatt, pisces,   ROT90,  "bootleg",
 GAME( 1980, spacempr, uniwars,  galaxian, spacbatt, pisces,   ROT90,  "bootleg", "Space Empire (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, skyraidr, uniwars,  galaxian, superg,   pisces,   ROT90,  "bootleg", "Sky Raiders", GAME_SUPPORTS_SAVE )
 
-/* similar to pisces, but with different video banking characteristics */
-GAME( 1981, batman2,  phoenix,  galaxian, batman2,  batman2,  ROT270, "bootleg", "Batman Part 2", GAME_SUPPORTS_SAVE )
 
 /* Artic Multi-System games - separate tile/sprite ROMs */
 GAME( 1981, streakng, 0,        pacmanbl, streakng, galaxian, ROT90,  "Shoei", "Streaking", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1981, pacmanbl, puckman,  pacmanbl, pacmanbl, pacmanbl, ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, pacmanbla,puckman,  pacmanbl, pacmanbl, pacmanbl, ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, phoenxp2, 0,        pacmanbl, phoenxp2, galaxian, ROT270, "bootleg", "Phoenix Part 2", GAME_SUPPORTS_SAVE )
+GAME( 1981, phoenxp2, phoenix,  galaxian, phoenxp2, batman2,  ROT270, "bootleg", "Phoenix Part 2", GAME_SUPPORTS_SAVE )
+GAME( 1981, batman2,  phoenix,  galaxian, batman2,  batman2,  ROT270, "bootleg", "Batman Part 2", GAME_SUPPORTS_SAVE ) /* similar to pisces, but with different video banking characteristics */
 GAME( 1981, atlantisb,atlantis, galaxian, atlantib, galaxian, ROT270, "bootleg", "Battle of Atlantis (bootleg)", GAME_SUPPORTS_SAVE ) // I don't know if this should have a starfield...
+GAME( 1982, tenspot,  0,        tenspot,  tenspot,  tenspot,  ROT270, "Thomas Automatics", "Ten Spot", GAME_NOT_WORKING ) // work out how menu works 
 
 /* separate tile/sprite ROMs, plus INT instead of NMI */
 GAME( 1984, devilfsg, devilfsh, pacmanbl, devilfsg, devilfsg, ROT270, "Vision / Artic", "Devil Fish (Galaxian hardware, bootleg?)", GAME_SUPPORTS_SAVE )
