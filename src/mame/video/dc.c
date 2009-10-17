@@ -1994,6 +1994,29 @@ static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, in
 		}
 		break;
 
+		case 0x06: // 8888 ARGB 32 bit (HACK! should not downconvert and pvr_drawframebuffer should change accordingly)
+		{
+			int xcnt,ycnt;
+			for (ycnt=0;ycnt<32;ycnt++)
+			{
+				UINT32 realwriteoffs = 0x05000000 + writeoffs + (y+ycnt) * (stride<<3) + (x*2);
+				src = BITMAP_ADDR32(fake_accumulationbuffer_bitmap, y+ycnt, x);
+
+
+				for (xcnt=0;xcnt<32;xcnt++)
+				{
+					// data is 8888 format
+					UINT32 data = src[xcnt];
+					UINT16 newdat = ((((data & 0x000000f8) >> 3)) << 0)   |
+					                ((((data & 0x0000fc00) >> 10)) << 5)  |
+									((((data & 0x00f80000) >> 19)) << 11);
+
+					memory_write_word(space,realwriteoffs+xcnt*2, newdat);
+				}
+			}
+		}
+		break;
+
 
 		case 0x00:
 
@@ -2001,7 +2024,6 @@ static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, in
 		case 0x03:
 		case 0x04:
 		case 0x05:
-		case 0x06:
 		case 0x07:
 		default:
 
