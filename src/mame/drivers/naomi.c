@@ -3272,6 +3272,75 @@ ROM_START( toyfight )
 	ROM_COPY("user1", 0, 0, 0x400000)
 ROM_END
 
+/* Crazy Taxi */
+/* protection: crypt data at 0x3ff000, key 0x0219, feed 0x504, read 0x500 */
+ROM_START( crzytaxi )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	NAOMI_BIOS
+
+	ROM_REGION( 0x8800000, "user1", ROMREGION_ERASEFF)
+        ROM_LOAD( "epr21684.bin",   0x0000000, 0x400000, CRC(f1de77b7) SHA1(4490b828534db6676b2d0129498fd7694eb9e5ff) )
+        ROM_LOAD( "mpr21671.ic1",   0x0800000, 0x800000, CRC(2d362137) SHA1(ed6eb45eadb784910eee44d0273534ab68ad6937) )
+        ROM_LOAD( "mpr21672.ic2",   0x1000000, 0x800000, CRC(72c7da8e) SHA1(0ed3d71c052a2cccbbf0f7b20e2ec688316c7247) )
+        ROM_LOAD( "mpr21673.ic3",   0x1800000, 0x800000, CRC(27481c0d) SHA1(08779e33eda1a45cb06319327cb4254dc3e4460f) )
+        ROM_LOAD( "mpr21674.ic4",   0x2000000, 0x800000, CRC(c2e2a98c) SHA1(9a40456ca025c2a6314cef705f7d147bbf95c0f0) )
+        ROM_LOAD( "mpr21675.ic5",   0x2800000, 0x800000, CRC(6b755510) SHA1(3fa967587e05c5bd45db3fe8a2cbc56f44166ef6) )
+        ROM_LOAD( "mpr21676.ic6",   0x3000000, 0x800000, CRC(f33d1f39) SHA1(b1d589a9ab7ec4988e63bfb458ef006308e1de70) )
+        ROM_LOAD( "mpr21677.ic7",   0x3800000, 0x800000, CRC(ab4dc61b) SHA1(d92ff434e7a2b9d3598f9d7004aa717b9bd21980) )
+        ROM_LOAD( "mpr21678.ic10",  0x5000000, 0x800000, CRC(297c778a) SHA1(67e5685cd03a3aaaac1c47f15c7b3f3e341d34b1) )
+        ROM_LOAD( "mpr21679.ic11",  0x5800000, 0x800000, CRC(6b540c4a) SHA1(9877c31b41110230182c0ee8d40753907981c7f9) )
+        ROM_LOAD( "mpr21680.ic12s", 0x6000000, 0x800000, CRC(e76f03f9) SHA1(ea20aa86d02a77315cca8cb6be75ca4ca9cc7484) )
+        ROM_LOAD( "mpr21681.ic13s", 0x6800000, 0x800000, CRC(e5dcde7d) SHA1(8a90d9fb4ce0d2ceb609fcf4c54cf5b55c266c50) )
+        ROM_LOAD( "mpr21682.ic14s", 0x7000000, 0x800000, CRC(54c0290e) SHA1(6e07ab6e95c29a2aabed0ba1a7af0d7d605e0309) )
+        ROM_LOAD( "mpr21683.ic15s", 0x7800000, 0x800000, CRC(ac8a27e0) SHA1(8e71d853a102dd6c164d5326e6d157ccfb8c7b36) )
+ROM_END
+
+/* Jambo! Safari - demands beefier I/O board */ 
+ROM_START( jambo )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	NAOMI_BIOS
+
+	ROM_REGION( 0x8800000, "user1", ROMREGION_ERASEFF)
+        ROM_LOAD( "epr22826a.bin", 0x0000000, 0x400000, CRC(18f8f3bc) SHA1(417f2282c9970775e51b56d2eeb671a50ca293a7) )
+        ROM_LOAD( "mpr22818.ic1",  0x0800000, 0x800000, CRC(3a709e11) SHA1(e7dd71dd244e872c35595456bd428dd79a81f081) )
+        ROM_LOAD( "mpr22819.ic2",  0x1000000, 0x800000, CRC(57b2d565) SHA1(be5e6404c8187dc75cd6f033a36af413bf28bdee) )
+        ROM_LOAD( "mpr22820.ic3",  0x1800000, 0x800000, CRC(3284e16b) SHA1(bdf9249f19c0a444a9f00e831563e91c576a7cca) )
+        ROM_LOAD( "mpr22821.ic4",  0x2000000, 0x800000, CRC(5ca54154) SHA1(7bb1ba3fae71368145fd68d31bdce0588f641f78) )
+        ROM_LOAD( "mpr22822.ic5",  0x2800000, 0x800000, CRC(8bc0c4d5) SHA1(b250ddeaab904b15737f1348b62d7b3f11103609) )
+        ROM_LOAD( "mpr22823.ic6",  0x3000000, 0x800000, CRC(00c33e51) SHA1(c55646a146ed259e6c61fd912c93fa784b5e6910) )
+        ROM_LOAD( "mpr22824.ic7",  0x3800000, 0x800000, CRC(cc55304a) SHA1(e548d8de83469e5816c55dbbb00afbb894282fd6) )
+        ROM_LOAD( "mpr22825.ic8",  0x4000000, 0x800000, CRC(85bada10) SHA1(b6e15d8f1d6bca12ffa4816ed0393c04ca500fba) )
+ROM_END
+
+/* 18 Wheeler - demands beefier I/O board  */
+ROM_START( 18wheelr )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	NAOMI_BIOS
+
+	ROM_REGION( 0xa800000, "user1", ROMREGION_ERASEFF)
+        ROM_LOAD( "epr22185.bin",   0x0000000, 0x400000, CRC(219b29b0) SHA1(2f32caf3906fc1408fd8126a500e74c682ff20fa) )
+        ROM_LOAD( "mpr22164.ic1",   0x0800000, 0x800000, CRC(ca045315) SHA1(0c5becb5220659fa86f1e7901032f8c9a1329a51) )
+        ROM_LOAD( "mpr22165.ic2",   0x1000000, 0x800000, CRC(e43f4ba8) SHA1(768159bccae6a72c809e9f374538df304c92fbfe) )
+        ROM_LOAD( "mpr22166.ic3",   0x1800000, 0x800000, CRC(ea67edb1) SHA1(1214fdbfd8ce9f7a2b33e97f7c4e22ebb3eee988) )
+        ROM_LOAD( "mpr22167.ic4",   0x2000000, 0x800000, CRC(df6125e2) SHA1(7244278cf89b88dbc7b8b1e3a537bf0b3f521c3a) )
+        ROM_LOAD( "mpr22168.ic5",   0x2800000, 0x800000, CRC(8a919f9c) SHA1(28f1f9d8943e0a0b7bc186808cdab5d21d914e05) )
+        ROM_LOAD( "mpr22169.ic6",   0x3000000, 0x800000, CRC(a0fa7d68) SHA1(010fc87f0df3cf9e3d01a5ca4d4aa7e84728652d) )
+        ROM_LOAD( "mpr22170.ic7",   0x3800000, 0x800000, CRC(1f407049) SHA1(3c11b25168715d200f8d78a3db7bfc8cb3c29897) )
+        ROM_LOAD( "mpr22171.ic8",   0x4000000, 0x800000, CRC(03ce8dcd) SHA1(9bf1eb0a2628317bea5d8899e34f6f4363729c52) )
+        ROM_LOAD( "mpr22172.ic9",   0x4800000, 0x800000, CRC(c3e8c978) SHA1(96cbaa0f13e22365b04818cb5cad2ddc2027e38a) )
+        ROM_LOAD( "mpr22173.ic10",  0x5000000, 0x800000, CRC(3caec8fc) SHA1(88ee6b0a1735788570d0a6507eec14a31ebabb9a) )
+        ROM_LOAD( "mpr22174.ic11",  0x5800000, 0x800000, CRC(17245a27) SHA1(b3701155b1bbdbcbfb5ea686470c3c432d2573b7) )
+        ROM_LOAD( "mpr22175.ic12s", 0x6000000, 0x800000, CRC(4d984682) SHA1(60270d6caa3bbc0025a0c01cf4d7b10783216e0b) )
+        ROM_LOAD( "mpr22176.ic13s", 0x6800000, 0x800000, CRC(3ea2403f) SHA1(efde74c621a8fe17d8aa3a24da35e2ca6bc0bd9a) )
+        ROM_LOAD( "mpr22177.ic14s", 0x7000000, 0x800000, CRC(15514cbc) SHA1(0171d67560b8d72ca3f718dcce301acc60dee1fa) )
+        ROM_LOAD( "mpr22178.ic15s", 0x7800000, 0x800000, CRC(9ea0552f) SHA1(4b282110ef9f60f942518f3849acfff4a5faf4bd) )
+        ROM_LOAD( "mpr22179.ic16s", 0x8000000, 0x800000, CRC(6915c4e6) SHA1(b44d49edcfdc0f2958bf1a3856b09b5442e8f1a3) )
+        ROM_LOAD( "mpr22180.ic17s", 0x8800000, 0x800000, CRC(744c3a40) SHA1(56fba6ebc45d542ba6e4f4dd205194344f127ac2) )
+        ROM_LOAD( "mpr22181.ic18s", 0x9000000, 0x800000, CRC(5a39b68e) SHA1(0f81ed1116b1829262f320fc82f93df107b6f848) )
+        ROM_LOAD( "mpr22182.ic19s", 0x9800000, 0x800000, CRC(c5606c42) SHA1(5871104ff1c7acde0493e13b9a4d0abdf8a40728) )
+        ROM_LOAD( "mpr22183.ic20s", 0xa000000, 0x800000, CRC(776af308) SHA1(7d29cb4dce75d34c622549fea7e102868d0da60a) )
+ROM_END
+
 
 /*
 
@@ -4275,9 +4344,12 @@ GAME( 1998, naomi,    0,        naomi,    naomi,    naomi, ROT0, "Sega",        
 /* 00??C */ GAME( 1999, smlg99,   naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Super Major League '99", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0020C */ GAME( 1999, samba,    naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Samba De Amigo (JPN)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0083C */ GAME( 1999, derbyoc2, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Derby Owners Club II (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* ????? */ GAME( 1999, crzytaxi, naomi,    naomi,    naomi,    naomi, ROT0, "Sega", 		"Crazy Taxi (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) 
+/* ????? */ GAME( 1999, jambo,    naomi,    naomi,    naomi,    naomi, ROT0, "Sega", 		"Jambo! Safari (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) 
 /* 0021C */ GAME( 2000, virnba,   naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Virtua NBA (JPN, USA, EXP, KOR, AUS)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0021C */ GAME( 2000, virnbao,  virnba,   naomi,    naomi,    naomi, ROT0, "Sega",            "Virtua NBA (JPN, USA, EXP, KOR, AUS) (original)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0026C */ GAME( 2000, totd,     naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "The Typing of the Dead (JPN, USA, EXP, KOR, AUS)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* ????? */ GAME( 2000, 18wheelr, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "18 Wheeler (JPN)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0027C */ GAME( 2000, smarinef, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Sega Marine Fishing", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0030C */ GAME( 2000, qmegamis, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Quiz Ah Megamisama (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0039C */ GAME( 2000, gram2000, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Giant Gram 2000 (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )

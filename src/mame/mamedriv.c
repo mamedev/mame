@@ -4363,7 +4363,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( dybbnao )	/* 1998.12 Dynamite Baseball NAOMI */
 	DRIVER( smlg99 )        /* 1999.?? Super Major League '99 */
 	DRIVER( pstone )	/* 1999.02 Power Stone */
-						/* 1999.02 Crazy Taxi */
+	DRIVER( crzytaxi )	/* 1999.02 Crazy Taxi */
 	DRIVER( zombrvn )	/* 1999.02 Zombie Revenge */
 						/* 1999.03 Airline Pilots */
 	DRIVER( ggram2 )	/* 1999.04 Giant Gram Zen Nippon Pro-wres 2 */
@@ -4376,7 +4376,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vs2_2k )	/* 1999.08 Virtua Striker 2 version 2000 */
 	DRIVER( suchie3 )	/* 1999.09 Idol Janshi Su-Chi-Pi 3 */
 	DRIVER( toyfight )	/* 1999.09 Toy Fighter */
-						/* 1999.09 Jumbo! Safari */
+	DRIVER( jambo )		/* 1999.09 Jambo! Safari */
 						/* 1999.09 Super Major League 99 */
 						/* 1999.10 Sega Tetris */
 	DRIVER( derbyoc )	/* 1999.10 Derby Owners Club */
@@ -4388,7 +4388,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vtennis )	/* 1999.12 Virtua Tennis / Power Smash (ROM) */
 	DRIVER( vtennisg )	/* 1999.12 Virtua Tennis / Power Smash (GD-ROM) */
 						/* 1999.12 Puyopuyo DA! */
-						/* 2000.01 18 Wheeler */
+	DRIVER( 18wheelr )	/* 2000.01 18 Wheeler */
 	DRIVER( totd )		/* 2000.01 The Typing of the Dead */
 	DRIVER( spawn )		/* 2000.01 Spawn */
 	DRIVER( doa2m )		/* 2000.01 Dead or Alive 2 Millenium */
