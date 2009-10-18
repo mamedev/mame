@@ -294,6 +294,8 @@ static const naomibd_config_table naomibd_translate_tbl[] =
 			  0x2924, 0, 0x080000, 0x3222, 0, 0x090000, 0x7954, 0, 0x0a0000, 0x5acd, 0, 0x0b0000,
 			  0xdd19, 0, 0x0c0000, 0x2428, 0, 0x0d0000, 0x3329, 0, 0x0e0000, 0x2142, 0, 0x0f0000,
 		          0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "crzytaxi", 0,{ 0x0219, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
+	{ "jambo",    0,{ 0x0223, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } }, 
 };
 
 /***************************************************************************

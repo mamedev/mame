@@ -300,7 +300,7 @@ static int jvsboard_init(int pos)
 	maple0x86data2[pos+17]=0;
 	//3 ad stick
 	maple0x86data2[pos+18]=3;
-	maple0x86data2[pos+19]=2; // analog channels
+	maple0x86data2[pos+19]=4; // analog channels
 	maple0x86data2[pos+20]=8; // bits per channel
 	maple0x86data2[pos+21]=0;
 	//4 rotary

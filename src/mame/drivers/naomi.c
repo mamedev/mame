@@ -3350,9 +3350,12 @@ ROM_START( crzytaxi )
         ROM_LOAD( "mpr21681.ic13s", 0x6800000, 0x800000, CRC(e5dcde7d) SHA1(8a90d9fb4ce0d2ceb609fcf4c54cf5b55c266c50) )
         ROM_LOAD( "mpr21682.ic14s", 0x7000000, 0x800000, CRC(54c0290e) SHA1(6e07ab6e95c29a2aabed0ba1a7af0d7d605e0309) )
         ROM_LOAD( "mpr21683.ic15s", 0x7800000, 0x800000, CRC(ac8a27e0) SHA1(8e71d853a102dd6c164d5326e6d157ccfb8c7b36) )
+
+	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
+        ROM_LOAD( "a03ff000.bin", 0x000000, 0x000500, CRC(be5e415d) SHA1(baf87191236f332c8df7674a080c2be4824a4bcb) )
 ROM_END
 
-/* Jambo! Safari - demands beefier I/O board */ 
+/* Jambo! Safari */ 
 ROM_START( jambo )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
@@ -3367,9 +3370,12 @@ ROM_START( jambo )
         ROM_LOAD( "mpr22823.ic6",  0x3000000, 0x800000, CRC(00c33e51) SHA1(c55646a146ed259e6c61fd912c93fa784b5e6910) )
         ROM_LOAD( "mpr22824.ic7",  0x3800000, 0x800000, CRC(cc55304a) SHA1(e548d8de83469e5816c55dbbb00afbb894282fd6) )
         ROM_LOAD( "mpr22825.ic8",  0x4000000, 0x800000, CRC(85bada10) SHA1(b6e15d8f1d6bca12ffa4816ed0393c04ca500fba) )
+
+	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
+        ROM_LOAD( "a03ff000.bin", 0x000000, 0x000500, CRC(74ffc580) SHA1(8de297303b14a6773c0d944de1bc1dcc3b1d042e) )
 ROM_END
 
-/* 18 Wheeler - demands beefier I/O board  */
+/* 18 Wheeler */
 ROM_START( 18wheelr )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
@@ -4252,6 +4258,9 @@ ROM_START( vtenis2c )
         ROM_LOAD32_WORD( "mpr22322.32",   0x7800002, 0x800000, CRC(21bf1caf) SHA1(bc1828db2f5f71ef87153a81b49b2ba72ba176e1) )
         ROM_LOAD32_WORD( "mpr22323.33s",  0x8800000, 0x800000, CRC(0bd632ab) SHA1(21acab5336dd0ba317839176f2557df95917729e) )
         ROM_LOAD32_WORD( "mpr22324.34",   0x8800002, 0x800000, CRC(ff2571d4) SHA1(c2cbb2345163bbf1973e63cefb9a952e5a52a6cf) )
+
+	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
+        ROM_LOAD( "01f169c0.bin", 0x000000, 0x000100, CRC(b0a330f4) SHA1(10c7a7f4d6c7f265a32887beaca73686c4cb1e03) )
 ROM_END
 
 
