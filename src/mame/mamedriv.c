@@ -7988,6 +7988,7 @@ Other Sun games
 	DRIVER( drgpunch )	/* "24" (c) 1989 Dynax */
 	DRIVER( mjfriday )	/* "26" (c) [1989] Dynax */
 	DRIVER( jantouki )	/* "27" Jantouki 1989 Dynax */
+	DRIVER( gekisha )	/* "28" 1989 Dynax */
 	DRIVER( mjifb )		/* "29" 1990 Dynax */
 	DRIVER( mjifb2 )	/* "29" 1990 Dynax */
 	DRIVER( mjifb3 )	/* "29" 1990 Dynax */
@@ -8058,7 +8059,7 @@ Other Sun games
 	DRIVER( pkgnsh )	/* "505" Pachinko Gindama Shoubu 1998 (Japan) */
 	DRIVER( pkgnshdx )	/* "522" Pachinko Gindama Shoubu DX 1998 (Japan) */
 
-	DRIVER( hjingi )	/* "???" */
+	DRIVER( hjingi )	/* "???" 1990 Dynax */
 	DRIVER( hanayara )	/* "???" */
 	DRIVER( mjelctrn )	/* "???" Mahjong Electron Base parts 2 & 4 */
 	DRIVER( mjelct3 )	/* "???" Mahjong Electron Base parts 2 & 3 */

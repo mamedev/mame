@@ -2295,7 +2295,8 @@ static READ8_HANDLER( t90_internal_registers_r )
 		case T90_P3:	// 7,4,1,0
 			return (data & 0x6c) | (RIO & 0x93);
 
-//      case T90_P4:    // only output
+		case T90_P4:	// only output
+			return data & 0x0f;
 
 		case T90_P5:
 			return (RIO & 0x3f);
