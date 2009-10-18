@@ -2018,6 +2018,31 @@ static INPUT_PORTS_START( aliensyn )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( aliensynj )
+	PORT_INCLUDE( system16b_generic )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x0c, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x30, 0x30, "Timer" ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x00, "150" )
+	PORT_DIPSETTING(    0x10, "160" )
+	PORT_DIPSETTING(    0x20, "170" )
+	PORT_DIPSETTING(    0x30, "180" )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( altbeast )
 	PORT_INCLUDE( system16b_generic )
 
@@ -3388,6 +3413,46 @@ ROM_START( aliensyn3 )
 	ROM_LOAD16_BYTE( "epr-10815.a2",  0x10001, 0x8000, CRC(bdcf4a30) SHA1(e11264999f15cef7c35b6569407bb3dd8e2dd236) )
 	ROM_LOAD16_BYTE( "epr-10822a.a6", 0x20000, 0x8000, CRC(1d0790aa) SHA1(c141b12aa7e4f86b96eabeb3f827ee26ddacde34) )
 	ROM_LOAD16_BYTE( "epr-10819a.a3", 0x20001, 0x8000, CRC(1e7586b7) SHA1(be4c2c03119aee1b8f26f3dd79c99ce431a43b28) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) /* tiles */
+	ROM_LOAD( "epr-10702.b9",  0x00000, 0x10000, CRC(393bc813) SHA1(672782c8fb2a6e454b27e073acc26130cacf3e50) )
+	ROM_LOAD( "epr-10703.b10", 0x10000, 0x10000, CRC(6b6dd9f5) SHA1(964409c6630caa13caf7d644d0c6fb071860b61b) )
+	ROM_LOAD( "epr-10704.b11", 0x20000, 0x10000, CRC(911e7ebc) SHA1(f03d3d3a09d19f7b705f9cb29f73140a3073463f) )
+
+	ROM_REGION16_BE( 0x080000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "epr-10709.b1", 0x00001, 0x10000, CRC(addf0a90) SHA1(a92c9531f1817763773471ce63f566b9e88360a0) )
+	ROM_LOAD16_BYTE( "epr-10713.b5", 0x00000, 0x10000, CRC(ececde3a) SHA1(9c12d4665179bf433c42f5ddc8a043ad592aa90e) )
+	ROM_LOAD16_BYTE( "epr-10710.b2", 0x20001, 0x10000, CRC(992369eb) SHA1(c6796acf6807e9ba4c3d241903653f91adf4764e) )
+	ROM_LOAD16_BYTE( "epr-10714.b6", 0x20000, 0x10000, CRC(91bf42fb) SHA1(4b9d3e97768323dee01e92378adafecb26bcc094) )
+	ROM_LOAD16_BYTE( "epr-10711.b3", 0x40001, 0x10000, CRC(29166ef6) SHA1(99a7cfd7d811537c821412a320beadb5a9c09af3) )
+	ROM_LOAD16_BYTE( "epr-10715.b7", 0x40000, 0x10000, CRC(a7c57384) SHA1(46f8efa691d7bbb0a18119c0ff12cff7c0d129e1) )
+	ROM_LOAD16_BYTE( "epr-10712.b4", 0x60001, 0x10000, CRC(876ad019) SHA1(39973ddb5a5746e0e094c759447bff1130c72c84) )
+	ROM_LOAD16_BYTE( "epr-10716.b8", 0x60000, 0x10000, CRC(40ba1d48) SHA1(e2d4d2689bb9b9bdc85e7f72a6665e5fd4c583aa) )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD( "epr-10723.a7",  0x00000, 0x8000, CRC(99953526) SHA1(4a980370923fd5d3dc9e25d42a032c9e78c7ff47) )
+	ROM_LOAD( "epr-10724.a8",  0x10000, 0x8000, CRC(f971a817) SHA1(502c95638e4fd5f87e5fc837cb44b39a5d62f4e4) )
+	ROM_LOAD( "epr-10725.a9",  0x20000, 0x8000, CRC(6a50e08f) SHA1(d34b2ccadb8b07d5ad99cab5c5b5b79642c65574) )
+	ROM_LOAD( "epr-10726.a10", 0x30000, 0x8000, CRC(d50b7736) SHA1(b1f8e3b0cf2ffee5382098100cfabe21b383cd51) )
+
+	ROM_REGION( 0x2000, "fd1089a", 0 ) /* decryption key */
+	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(49e882e5) SHA1(29d87af8fc775b22a9a546c112f8f5e7f700ac1a) )
+ROM_END
+
+
+/**************************************************************************************************************************
+    Alien Syndrome, Sega System 16B
+    CPU: FD1089A (317-0033)
+    ROM Board: 171-5358
+*/
+ROM_START( aliensynj )
+	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "epr-10720a.a4", 0x00000, 0x8000, CRC(1b920893) SHA1(f40ace9cd69c7f7910440a20bf8a3249351d28af) )
+	ROM_LOAD16_BYTE( "epr-10717a.a1", 0x00001, 0x8000, CRC(972ae358) SHA1(dd64427d8c90ff8c6a43af2bbc3a04de6fc27f68) )
+	ROM_LOAD16_BYTE( "epr-10721a.a5", 0x10000, 0x8000, CRC(f4d2d1c3) SHA1(93503cab11c8eb84059ef86ea6fbf39035dbd914) )
+	ROM_LOAD16_BYTE( "epr-10718a.a2", 0x10001, 0x8000, CRC(c79bf61b) SHA1(b7379bfc0b5482c81f420fc84e93f9edd9bd003c) )
+	ROM_LOAD16_BYTE( "epr-10722a.a6", 0x20000, 0x8000, CRC(1d0790aa) SHA1(c141b12aa7e4f86b96eabeb3f827ee26ddacde34) )
+	ROM_LOAD16_BYTE( "epr-10719a.a3", 0x20001, 0x8000, CRC(1e7586b7) SHA1(be4c2c03119aee1b8f26f3dd79c99ce431a43b28) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) /* tiles */
 	ROM_LOAD( "epr-10702.b9",  0x00000, 0x10000, CRC(393bc813) SHA1(672782c8fb2a6e454b27e073acc26130cacf3e50) )
@@ -6315,6 +6380,7 @@ GAME( 1988, aceattac,   0,        system16b,      aceattac, generic_5358,       
 
 GAME( 1987, aliensyn,   0,        system16b,      aliensyn, generic_5358,       ROT0,   "Sega",           "Alien Syndrome (set 4, System 16B, unprotected)", 0 )
 GAME( 1987, aliensyn3,  aliensyn, system16b,      aliensyn, aliensy3_5358,      ROT0,   "Sega",           "Alien Syndrome (set 3, System 16B, FD1089A 317-0033)", 0 )
+GAME( 1987, aliensynj,  aliensyn, system16b,      aliensynj,aliensy3_5358,      ROT0,   "Sega",           "Alien Syndrome (set 6, Japan, new, System 16B, FD1089A 317-0033)", 0 )
 
 GAME( 1988, altbeast,   0,        system16b_8751, altbeast, altbeast_5521,      ROT0,   "Sega",           "Altered Beast (set 7, 8751 317-0078)", 0 )
 GAME( 1988, altbeastj,  altbeast, system16b_8751, altbeast, altbeasj_5521,      ROT0,   "Sega",           "Juuouki (set 6, Japan, 8751 317-0077)", 0 )

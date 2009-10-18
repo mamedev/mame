@@ -3720,6 +3720,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( aceattac )	/* (c) 1988 (protected) */
 	DRIVER( aliensyn )	/* (c) 1987 */
 	DRIVER( aliensyn3 )	/* (c) 1987 (FD1089A, decrypted) */
+	DRIVER( aliensynj )	/* (c) 1987 (FD1089A, decrypted) */
 	DRIVER( altbeast )	/* (c) 1988 (8751) */
 	DRIVER( altbeastj )	/* (c) 1988 (8751) */
 	DRIVER( altbeast5 )	/* (c) 1988 (8751) */
