@@ -4405,7 +4405,7 @@ static DISCRETE_SOUND_START(blueshrk)
 		1, 1,										/* ENAB, RESET */
 		7700, 12.0, 0, 12.0 / 2, &blueshrk_lfsr)	/* CLK,AMPL,FEED,BIAS,LFSRTB */
 	DISCRETE_BIT_DECODE(BLUESHRK_NOISE_2,			/* IC N5, pin 13 */
-		NODE_SUB(11, 1), 8, 12)						/* INP,BIT_N,VOUT */
+		NODE_SUB(BLUESHRK_NOISE_1, 1), 8, 12)		/* INP,BIT_N,VOUT */
 
 	/************************************************
      * Shot sound

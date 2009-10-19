@@ -310,6 +310,7 @@ static const discrete_module module_list[] =
 	{ DSD_555_VCO1    ,"DSD_555_VCO1"    , 1 ,sizeof(struct dsd_555_vco1_context)    ,dsd_555_vco1_reset    ,dsd_555_vco1_step    ,NULL                  ,NULL                 },
 	{ DSD_566         ,"DSD_566"         , 1 ,sizeof(struct dsd_566_context)         ,dsd_566_reset         ,dsd_566_step         ,NULL                  ,NULL                 },
 	{ DSD_LS624       ,"DSD_LS624"       , 1 ,sizeof(struct dsd_ls624_context)       ,dsd_ls624_reset       ,dsd_ls624_step       ,NULL                  ,NULL                 },
+	{ DSD_LS629       ,"DSD_LS629"       , 1 ,sizeof(struct dsd_ls629_context)       ,dsd_ls629_reset       ,dsd_ls629_step       ,NULL                  ,NULL                 },
 	/* must be the last one */
 	{ DSS_NULL        ,"DSS_NULL"        , 0 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 }
 };
@@ -498,7 +499,7 @@ static DEVICE_START( discrete )
 	sprintf(name, "discrete%s.log", device->tag);
 	if (DISCRETE_DEBUGLOG)
 		info->disclogfile = fopen(name, "w");
-	
+
 	/* enable profiling */
 	if (getenv("DISCRETE_PROFILING"))
 		profiling = atoi(getenv("DISCRETE_PROFILING"));

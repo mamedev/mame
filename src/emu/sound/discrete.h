@@ -56,9 +56,10 @@
  *
  * You may also access nodes with a macros:
  *
- *     NODE_XXX = NODE_SUB(XXX, 0)
+ *     NODE_XXX = NODE_SUB(NODE_XXX, 0)
+ *     NODE_XXX = NODE_XXX_00
  *     NODE_XXX = NODE(XXX)
- *     NODE_XXX_YY = NODE_SUB(XXX, YY) with YY != 00
+ *     NODE_XXX_YY = NODE_SUB(NODE_XXX, YY)
  *
  * One node point may feed a number of inputs, for example you could
  * connect the output of a DISCRETE_SINEWAVE to the AMPLITUDE input
@@ -306,6 +307,7 @@
  * DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)
  * DISCRETE_566(NODE,VMOD,R,C,VPOS,VNEG,VCHARGE,OPTIONS)
  * DISCRETE_74LS624(NODE,VMOD,VRNG,C,OUTTYPE)
+ * DISCRETE_74LS629(NODE,ENAB,VMOD,VRNG,C,R_FREQ_IN,OUTTYPE)
  *
  * DISCRETE_CUSTOM1(NODE,IN0,INFO)
  * DISCRETE_CUSTOM2(NODE,IN0,IN1,INFO)
@@ -3238,6 +3240,7 @@
  *
  *  Waveform Types:
  *     DISC_566_OUT_SQUARE   - Pin 3 Square Wave Output (DEFAULT)
+ *     DISC_566_OUT_ENERGY   - Pin 3 anti-alaised Square Wave Output
  *     DISC_566_OUT_TRIANGLE - Pin 4 Triangle Wave Output
  *     DISC_566_OUT_LOGIC    - Internal Flip/Flop Output
  *     DISC_566_COUNT_F      - # of falling edges
@@ -3642,23 +3645,27 @@ enum
 
 /* 566 output flags */
 #define DISC_566_OUT_DC						0x00
-#define DISC_566_OUT_AC						0x01
+#define DISC_566_OUT_AC						0x10
 
 #define DISC_566_OUT_SQUARE					0x00	/* Squarewave */
-#define DISC_566_OUT_TRIANGLE				0x10	/* Triangle waveform */
-#define DISC_566_OUT_LOGIC					0x20	/* 0/1 logic output */
-#define DISC_566_OUT_COUNT_F				0x30
-#define DISC_566_OUT_COUNT_R				0x40
-#define DISC_566_OUT_COUNT_F_X				0x50
-#define DISC_566_OUT_COUNT_R_X				0x60
-#define DISC_566_OUT_MASK					0x70	/* Bits that define output type.
+#define DISC_566_OUT_ENERGY					0x01	/* anti-alaised Squarewave */
+#define DISC_566_OUT_TRIANGLE				0x02	/* Triangle waveform */
+#define DISC_566_OUT_LOGIC					0x03	/* 0/1 logic output */
+#define DISC_566_OUT_COUNT_F				0x04
+#define DISC_566_OUT_COUNT_R				0x05
+#define DISC_566_OUT_COUNT_F_X				0x06
+#define DISC_566_OUT_COUNT_R_X				0x07
+#define DISC_566_OUT_MASK					0x07	/* Bits that define output type.
                                                      * Used only internally in module. */
 
 /* LS624 output flags */
-#define DISC_LS624_OUT_ENERGY				0x01
-#define DISC_LS624_OUT_LOGIC				0x02
-#define DISC_LS624_OUT_COUNT_F				0x03
-#define DISC_LS624_OUT_COUNT_R				0x04
+#define DISC_LS624_OUT_SQUARE				0x01
+#define DISC_LS624_OUT_ENERGY				0x02
+#define DISC_LS624_OUT_LOGIC				0x03
+#define DISC_LS624_OUT_COUNT_F				0x04
+#define DISC_LS624_OUT_COUNT_R				0x05
+#define DISC_LS624_OUT_COUNT_F_X			0x06
+#define DISC_LS624_OUT_COUNT_R_X			0x07
 
 /* Oneshot types */
 #define DISC_ONESHOT_FEDGE					0x00
@@ -4124,11 +4131,11 @@ struct _discrete_inverter_osc_desc
  *************************************/
 
 #define NODE0_DEF(_x) NODE_ ## 0 ## _x = (0x40000000 + (_x) * DISCRETE_MAX_OUTPUTS), \
-	NODE_ ## 0 ## _x ## _01, NODE_ ## 0 ## _x ## _02, NODE_ ## 0 ## _x ## _03, NODE_ ## 0 ## _x ## _04, \
-	NODE_ ## 0 ## _x ## _05, NODE_ ## 0 ## _x ## _06, NODE_ ## 0 ## _x ## _07
+	NODE_ ## 0 ## _x ## _00 = NODE_ ## 0 ## _x, NODE_ ## 0 ## _x ## _01, NODE_ ## 0 ## _x ## _02, NODE_ ## 0 ## _x ## _03, \
+	NODE_ ## 0 ## _x ## _04, NODE_ ## 0 ## _x ## _05, NODE_ ## 0 ## _x ## _06, NODE_ ## 0 ## _x ## _07
 #define NODE_DEF(_x) NODE_ ## _x = (0x40000000 + (_x) * DISCRETE_MAX_OUTPUTS), \
-	NODE_ ## _x ## _01, NODE_ ## _x ## _02, NODE_ ## _x ## _03, NODE_ ## _x ## _04, \
-	NODE_ ## _x ## _05, NODE_ ## _x ## _06, NODE_ ## _x ## _07
+	NODE_ ## _x ## _00 = NODE_ ## _x, NODE_ ## _x ## _01, NODE_ ## _x ## _02, NODE_ ## _x ## _03, \
+	NODE_ ## _x ## _04, NODE_ ## _x ## _05, NODE_ ## _x ## _06, NODE_ ## _x ## _07
 
 enum {
 	NODE0_DEF(0), NODE0_DEF(1), NODE0_DEF(2), NODE0_DEF(3), NODE0_DEF(4), NODE0_DEF(5), NODE0_DEF(6), NODE0_DEF(7), NODE0_DEF(8), NODE0_DEF(9),
@@ -4166,7 +4173,7 @@ enum {
 /* Some Pre-defined nodes for convenience */
 
 #define NODE(_x)	(NODE_00 + (_x) * DISCRETE_MAX_OUTPUTS)
-#define NODE_SUB(_x, _y) (NODE(_x) + (_y))
+#define NODE_SUB(_x, _y) ((_x) + (_y))
 
 #if DISCRETE_MAX_OUTPUTS == 8
 #define NODE_CHILD_NODE_NUM(_x)		((int)(_x) & 7)
@@ -4304,6 +4311,7 @@ enum
 	DSD_555_VCO1,		/* Op-Amp linear ramp based 555 VCO */
 	DSD_566,			/* NE566 Emulation */
 	DSD_LS624,			/* 74LS624 Emulation */
+	DSD_LS629,			/* 74LS624 Emulation - new */
 
 	/* Custom */
 	DST_CUSTOM,			/* whatever you want */
@@ -4495,6 +4503,7 @@ enum
 #define DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)              { NODE, DSD_555_VCO1    , 3, { RESET,VIN,CTRLV }, { RESET,VIN,CTRLV }, OPTIONS, "DISCRETE_555_VCO1_CV" },
 #define DISCRETE_566(NODE,VMOD,R,C,VPOS,VNEG,VCHARGE,OPTIONS)           { NODE, DSD_566         , 7, { VMOD,R,C,NODE_NC,NODE_NC,VCHARGE,NODE_NC }, { VMOD,R,C,VPOS,VNEG,VCHARGE,OPTIONS }, NULL, "DISCRETE_566" },
 #define DISCRETE_74LS624(NODE,VMOD,VRNG,C,OUTTYPE)                      { NODE, DSD_LS624       , 4, { VMOD,NODE_NC,NODE_NC,NODE_NC }, { VMOD,VRNG,C,OUTTYPE }, NULL, "DISCRETE_74LS624" },
+#define DISCRETE_74LS629(NODE,ENAB,VMOD,VRNG,C,R_FREQ_IN,OUTTYPE)       { NODE, DSD_LS629       , 6, { ENAB,VMOD,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,VMOD,VRNG,C,R_FREQ_IN,OUTTYPE }, NULL, "DISCRETE_74LS629" },
 
 /* NOP */
 #define DISCRETE_NOP(NODE)                                              { NODE, DSS_NOP         , 0, { 0 }, { 0 }, NULL, "DISCRETE_NOP" },

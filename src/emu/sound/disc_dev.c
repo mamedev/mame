@@ -113,11 +113,14 @@ struct dsd_566_context
 	double		cap_voltage;		/* voltage on cap */
 	double		v_sqr_low;			/* voltage for a squarewave at low */
 	double		v_sqr_high;			/* voltage for a squarewave at high */
+	double		v_sqr_diff;
 	double		threshold_low;		/* falling threshold */
 	double		threshold_high;		/* rising threshold */
-	double		triangle_ac_offset;	/* used to shift a triangle to AC */
+	double		ac_shift;			/* used to fake AC */
 	double		v_osc_stable;
 	double		v_osc_stop;
+	int			fake_ac;
+	int			out_type;
 };
 
 struct dsd_ls624_context
@@ -128,6 +131,17 @@ struct dsd_ls624_context
 	double		k1;				/* precalculated cap part of formula */
 	double		k2;				/* precalculated ring part of formula */
 	double		dt_vmod_at_0;
+};
+
+struct dsd_ls629_context
+{
+	double	v_bias;
+	double	v_cap;
+	double	v_peak;
+	double	v_threshold;
+	double	k_vmod_to_i;
+	int		flip_flop;
+	int		out_type;
 };
 
 
@@ -1517,16 +1531,13 @@ static DISCRETE_STEP(dsd_566)
 	double	dt;				/* change in time */
 	double	x_time = 0;
 	double	v_cap;			/* Current voltage on capacitor, before dt */
-	double	v_cap_next = 0;	/* Voltage on capacitor, after dt */
 	int		count_f = 0, count_r = 0;
-	int		options = (int)DSD_566__OPTIONS;
 
 	dt    = node->info->sample_time;	/* Change in time */
 	v_cap = context->cap_voltage;	/* Set to voltage before change */
 
-
 	/* Calculate charging current if it is in range */
-	if (DSD_566__VMOD > context->v_osc_stop)
+	if (EXPECTED(DSD_566__VMOD > context->v_osc_stop))
 	{
 		double v_charge = DSD_566__VCHARGE - DSD_566__VMOD - 0.1;
 		if (v_charge > 0)
@@ -1552,17 +1563,14 @@ static DISCRETE_STEP(dsd_566)
 		if (context->flip_flop)
 		{
 			/* Discharging */
-			v_cap_next = v_cap - (i * dt / DSD_566__C);
-			dt         = 0;
+			v_cap -= i * dt / DSD_566__C;
+			dt     = 0;
 
 			/* has it discharged past lower limit? */
-			if (v_cap_next <= context->threshold_low)
+			if (UNEXPECTED(v_cap < context->threshold_low))
 			{
-				if (v_cap_next < context->threshold_low)
-				{
-					/* calculate the overshoot time */
-					dt = DSD_566__C * (context->threshold_low - v_cap_next) / i;
-				}
+				/* calculate the overshoot time */
+				dt = DSD_566__C * (context->threshold_low - v_cap) / i;
 				v_cap = context->threshold_low;
 				context->flip_flop = 0;
 				count_f++;
@@ -1573,23 +1581,20 @@ static DISCRETE_STEP(dsd_566)
 		{
 			/* Charging */
 			/* iC=C*dv/dt  works out to dv=iC*dt/C */
-			v_cap_next = v_cap + (i_rise * dt / DSD_566__C);
-			dt         = 0;
+			v_cap += i_rise * dt / DSD_566__C;
+			dt     = 0;
 			/* Yes, if the cap voltage has reached the max voltage it can,
              * and the 566 threshold has not been reached, then oscillation stops.
              * This is the way the actual electronics works.
              * This is why you never play with the pots after being factory adjusted
              * to work in the proper range. */
-			if (v_cap_next > DSD_566__VMOD) v_cap_next = DSD_566__VMOD;
+			if (UNEXPECTED(v_cap > DSD_566__VMOD)) v_cap = DSD_566__VMOD;
 
 			/* has it charged past upper limit? */
-			if (v_cap_next >= context->threshold_high)
+			if (UNEXPECTED(v_cap > context->threshold_high))
 			{
-				if (v_cap_next > context->threshold_high)
-				{
-					/* calculate the overshoot time */
-					dt = DSD_566__C * (v_cap_next - context->threshold_high) / i;
-				}
+				/* calculate the overshoot time */
+				dt = DSD_566__C * (v_cap - context->threshold_high) / i;
 				v_cap = context->threshold_high;
 				context->flip_flop = 1;
 				count_r++;
@@ -1598,22 +1603,31 @@ static DISCRETE_STEP(dsd_566)
 		}
 	} while(dt);
 
-	context->cap_voltage = v_cap_next;
+	context->cap_voltage = v_cap;
 
-	switch (options & DISC_566_OUT_MASK)
+	/* Convert last switch time to a ratio */
+	x_time /= node->info->sample_time;
+
+	switch (context->out_type)
 	{
 		case DISC_566_OUT_SQUARE:
+			node->output[0] = context->flip_flop ? context->v_sqr_high : context->v_sqr_low;
+			if (context->fake_ac)
+				node->output[0] += context->ac_shift;
+			break;
+		case DISC_566_OUT_ENERGY:
+			if (x_time == 0) x_time = 1.0;
+			node->output[0]  = context->v_sqr_low + context->v_sqr_diff * (context->flip_flop ? x_time : (1.0 - x_time));
+			if (context->fake_ac)
+				node->output[0] += context->ac_shift;
+			break;
 		case DISC_566_OUT_LOGIC:
 				node->output[0] = context->flip_flop;
-			if ((options & DISC_566_OUT_MASK) != DISC_566_OUT_LOGIC)
-				node->output[0] = context->flip_flop ? context->v_sqr_high : context->v_sqr_low;
 			break;
 		case DISC_566_OUT_TRIANGLE:
-			/* we can ignore any unused states when
-             * outputting the cap voltage */
-			node->output[0] = v_cap_next + 1.35;
-			if (options & DISC_566_OUT_AC)
-				node->output[0] -= context->triangle_ac_offset;
+			node->output[0] = v_cap;
+			if (context->fake_ac)
+				node->output[0] += context->ac_shift;
 			break;
 		case DISC_566_OUT_COUNT_F_X:
 			node->output[0] = count_f ? count_f + x_time : count_f;
@@ -1634,9 +1648,11 @@ static DISCRETE_RESET(dsd_566)
 {
 	struct dsd_566_context   *context = (struct dsd_566_context *)node->context;
 
-	double	temp;
 	int		v_int;
 	double	v_float;
+
+	context->out_type = (int)DSD_566__OPTIONS & DISC_566_OUT_MASK;
+	context->fake_ac =  (int)DSD_566__OPTIONS & DISC_566_OUT_AC;
 
 	if (DSD_566__VNEG >= DSD_566__VPOS)
 		fatalerror("[v_neg >= v_pos] in NODE_%d!\n", NODE_BLOCKINDEX(node));
@@ -1657,15 +1673,17 @@ static DISCRETE_RESET(dsd_566)
 	context->threshold_low  = ne566.c_low[v_int] + DSD_566__VNEG;
 	context->v_sqr_high     = DSD_566__VPOS - 1;
 	context->v_sqr_low      = ne566.sqr_low[v_int] + DSD_566__VNEG;
+	context->v_sqr_diff     = context->v_sqr_high - context->v_sqr_low;
 	context->v_osc_stable	= ne566.osc_stable[v_int] + DSD_566__VNEG;
 	context->v_osc_stop		= ne566.osc_stop[v_int] + DSD_566__VNEG;
 
-	if ((int)DSD_566__OPTIONS & DISC_566_OUT_AC)
+	context->ac_shift = 0;
+	if (context->fake_ac)
 	{
-		temp = (context->v_sqr_high - context->v_sqr_low) / 2;
-		context->v_sqr_high =  temp;
-		context->v_sqr_low  = -temp;
-		context->triangle_ac_offset = context->threshold_high - (0.1 * v_float) + 1.35/2;
+		if (context->out_type == DISC_566_OUT_TRIANGLE)
+			context->ac_shift = (context->threshold_high - context->threshold_low) / 2 - context->threshold_high;
+		else
+			context->ac_shift = context->v_sqr_diff / 2 - context->v_sqr_high;
 	}
 
 	/* Step the output */
@@ -1780,4 +1798,182 @@ static DISCRETE_RESET(dsd_ls624)
 
 	/* Step the output */
 	DISCRETE_STEP_CALL(dsd_ls624);
+}
+
+
+/************************************************************************
+ *
+ * DSD_LS629 - Usage of node_description values
+ *
+ * Dec 2007, Couriersud based on data sheet
+ * Oct 2009, complete re-write based on IC testing
+ ************************************************************************/
+#define DSD_LS629__ENABLE		DISCRETE_INPUT(0)
+#define DSD_LS629__VMOD			DISCRETE_INPUT(1)
+#define DSD_LS629__VRNG			DISCRETE_INPUT(2)
+#define DSD_LS629__C			DISCRETE_INPUT(3)
+#define DSD_LS629__R_FREQ_IN	DISCRETE_INPUT(4)
+#define DSD_LS629__OUTTYPE		DISCRETE_INPUT(5)
+
+#define LS624_R_EXT			600.0		/* as specified in data sheet */
+#define LS624_OUT_HIGH		4.5			/* measured */
+#define LS624_FREQ_R_IN		RES_K(95)	/* measured */
+
+/*
+ * The 74LS624 series are constant current based VCOs.  The Freq Control voltage
+ * modulates the current source.  The current is created from Rext, which is
+ * internally fixed at 600 ohms for all devices except the 74LS628 which has
+ * external connections.  The current source linearly discharges the cap voltage.
+ * The cap starts with 0V charge across it.  One side is connected to a fixed voltage
+ * bias circuit.  The other side is charged negatively from the current source until
+ * a certain low threshold is reached.  Once this threshold is reached, the output
+ * toggles state and the pins on the cap reverse in respect to the charge/bias hookup.
+ * This starts the one side of the cap to be at bias, and the other side of the cap is
+ * now at bias + the charge on the cap which is bias - threshold.
+ * Y = 0;  CX1 = bias;    CX2 = charge
+ * Y = 1;  CX1 = charge;  CX2 = bias
+ * The Range voltage adjusts the threshold voltage.  The higher the Range voltage,
+ * the lower the threshold voltage, the longer the cap can charge, the lower the frequency.
+ *
+ * The current is based on the mysterious Rext mentioned in the data sheet.
+ * I = (VfreqControl / 5) / Rext
+ * where Rext = 600 ohms or external Rext on a 74LS628
+ * The Freq Control has an input impedance of approximately 100k, so any input resistance
+ * connected to the Freq Control pin works as a voltage divider.
+ * I = (VfreqControl / 5 * 100000 / (RfreqControl + 100000)) / Rext
+ * That gives us a change in voltage on the cap of
+ * dV = I / sampleRate / C_inFarads
+ */
+
+/* The range to bias and threshold routines were created from testing a real chip.
+ * This data was entered into the function finder routine at www.zunzun.com
+ * to create the following 2 routines
+ */
+
+double range_to_bias(double range)
+{
+	/* Quadratic2D_model */
+	double bias;
+
+	// coefficients
+	const double a =  2.3107142857142846E+00;
+	const double b = -1.0714285714278806E-03;
+	const double c = -1.7857142857144002E-03;
+
+	bias  = a;
+	bias += b * range;
+	bias += c * pow(range, 2.0);
+	return bias;
+}
+
+double range_to_threshold(double range)
+{
+	/* Polyfunctional2D_model */
+	double threshold;
+
+	// coefficients
+	const double a = -1.6124587587173614E-01;
+	const double b = -1.3501987413150401E-01;
+	const double offset = 2.2550390868489893E+00;
+
+	threshold  = a * range;
+	threshold += b * exp(-1.0 * range);
+	threshold += offset;
+	return threshold;
+}
+
+
+static DISCRETE_STEP(dsd_ls629)
+{
+	struct dsd_ls629_context *context = (struct dsd_ls629_context *)node->context;
+
+	double	i;			/* Charging current created by Freq Control */
+	double	dt;				/* change in time */
+	double	x_time = 0;
+	double	v_cap;			/* Current voltage on capacitor, before dt */
+	int		count_f = 0, count_r = 0;
+
+	if (UNEXPECTED(DSD_LS629__ENABLE == 0))
+		return;
+
+	dt    = node->info->sample_time;	/* Change in time */
+	v_cap = context->v_cap;				/* Set to voltage before change */
+
+
+	/* Calculate charging current */
+	i = DSD_LS629__VMOD * context->k_vmod_to_i;
+
+	/* Keep looping until all toggling in this time sample is used up. */
+	do
+	{
+		/* Always Discharging */
+		v_cap -= i * dt / DSD_LS629__C;
+		dt     = 0;
+
+		/* has it discharged past lower limit? */
+		if (UNEXPECTED(v_cap < context->v_threshold))
+		{
+			/* calculate the overshoot time */
+			dt = DSD_LS629__C * (context->v_threshold - v_cap) / i;
+			v_cap = context->v_peak;
+			context->flip_flop ^= 1;
+			if (context->flip_flop)
+				count_r++;
+			else
+				count_f++;
+			x_time = dt;
+		}
+	} while(dt);
+
+	context->v_cap = v_cap;
+
+	/* Convert last switch time to a ratio */
+	x_time = x_time / node->info->sample_time;
+
+	switch (context->out_type)
+	{
+		case DISC_LS624_OUT_SQUARE:
+			node->output[0] = context->flip_flop ? LS624_OUT_HIGH : 0;
+			break;
+		case DISC_LS624_OUT_ENERGY:
+			if (x_time == 0) x_time = 1.0;
+			node->output[0]  = LS624_OUT_HIGH * (context->flip_flop ? x_time : (1.0 - x_time));
+			break;
+		case DISC_LS624_OUT_LOGIC:
+				node->output[0] = context->flip_flop;
+			break;
+		case DISC_LS624_OUT_COUNT_F_X:
+			node->output[0] = count_f ? count_f + x_time : count_f;
+			break;
+		case DISC_LS624_OUT_COUNT_R_X:
+			node->output[0] =  count_r ? count_r + x_time : count_r;
+			break;
+		case DISC_LS624_OUT_COUNT_F:
+			node->output[0] = count_f;
+			break;
+		case DISC_LS624_OUT_COUNT_R:
+			node->output[0] = count_r;
+			break;
+	}
+}
+
+#define LS624_LOSS_FACTOR	0.92
+
+static DISCRETE_RESET(dsd_ls629)
+{
+	struct dsd_ls629_context *context = (struct dsd_ls629_context *)node->context;
+
+	context->out_type = (int)DSD_LS629__OUTTYPE;
+
+	context->v_bias = range_to_bias(DSD_LS629__VRNG);
+	context->v_cap = context->v_bias;
+	context->v_threshold = range_to_threshold(DSD_LS629__VRNG);
+	/* The voltage at the current charge pin after a state change */
+	context->v_peak = context->v_bias * 2 - context->v_threshold;
+	context->flip_flop = 0;
+	/* precalulate the voltage to current formula */
+	context->k_vmod_to_i  = 1.0 / 5 * LS624_FREQ_R_IN / (DSD_LS629__R_FREQ_IN + LS624_FREQ_R_IN) / LS624_R_EXT;
+	context->k_vmod_to_i *= LS624_LOSS_FACTOR;
+
+	node->output[0] = 0;
 }

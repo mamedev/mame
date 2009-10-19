@@ -34,14 +34,14 @@ D0  explosion enable        gates a noise generator
  *************************************/
 
 #define BZ_INPUT			NODE_01		/* at M2 LS273 */
-#define BZ_INP_EXPLO		NODE_SUB(10, 0)
-#define BZ_INP_EXPLOLS		NODE_SUB(10, 1)
-#define BZ_INP_SHELL		NODE_SUB(10, 2)
-#define BZ_INP_SHELLLS		NODE_SUB(10, 3)
-#define BZ_INP_ENGREV		NODE_SUB(10, 4)
-#define BZ_INP_SOUNDEN		NODE_SUB(10, 5)
-#define BZ_INP_STARTLED		NODE_SUB(10, 6)
-#define BZ_INP_MOTEN		NODE_SUB(10, 7)
+#define BZ_INP_EXPLO		NODE_10_00
+#define BZ_INP_EXPLOLS		NODE_10_01
+#define BZ_INP_SHELL		NODE_10_02
+#define BZ_INP_SHELLLS		NODE_10_03
+#define BZ_INP_ENGREV		NODE_10_04
+#define BZ_INP_SOUNDEN		NODE_10_05
+#define BZ_INP_STARTLED		NODE_10_06
+#define BZ_INP_MOTEN		NODE_10_07
 
 #define TTL_OUT 5
 
@@ -205,9 +205,9 @@ static DISCRETE_SOUND_START(bzone)
 	/* divide by 2 */
 	DISCRETE_COUNTER(NODE_31, 1, 0, NODE_30, 1, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)
 
-	DISCRETE_BITS_DECODE(NODE_32, NODE_SUB(30,1), 11, 14, 1)		/* to NAND LS20, J4 */
+	DISCRETE_BITS_DECODE(NODE_32_00, NODE_30_01, 11, 14, 1)		/* to NAND LS20, J4 */
 	/* 11-14 */
-	DISCRETE_LOGIC_NAND4(NODE_33,NODE_SUB(32,0),NODE_SUB(32,1),NODE_SUB(32,2),NODE_SUB(32,3))
+	DISCRETE_LOGIC_NAND4(NODE_33, NODE_32_00, NODE_32_01, NODE_32_02, NODE_32_03)
 	/* divide by 2 */
 	DISCRETE_COUNTER(NODE_34, 1, 0, NODE_33, 1, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)
 
@@ -270,12 +270,11 @@ static DISCRETE_SOUND_START(bzone)
 	/* FINAL MIX                                    */
 	/************************************************/
 
-	/* not sure about pokey output levels - bleow is just a estimate */
+	/* not sure about pokey output levels - below is just a estimate */
 	DISCRETE_INPUTX_STREAM(NODE_85, 0, 5.0/32767.0 * 4, 0)
 
 	DISCRETE_MIXER4(NODE_280, 1, NODE_45, NODE_55, NODE_75, NODE_85, &bzone_final_mixer_desc)
-	DISCRETE_OUTPUT(NODE_280, 32767.0/5.0 * 2)
-	//DISCRETE_WAVELOG1(NODE_55, 32767.0/22)
+	DISCRETE_OUTPUT(NODE_280, 32767.0/1.75)
 	//DISCRETE_WAVELOG2(NODE_30, 32767.0/5.0, NODE_31, 32767.0/5.0)
 
 DISCRETE_SOUND_END

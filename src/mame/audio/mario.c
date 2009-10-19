@@ -19,6 +19,8 @@
 /* as connected to +5V on schematics. This does not match      */
 /* recordings                                                  */
 
+#define USE_LS629	(0)		/* set to use new LS624 code */
+
 #define RUN_VCO_VOLTAGE		(0.0)	/* 5 in schematics */
 
 #define USE_8039	(0)			/* set to 1 to try 8039 hack */
@@ -80,9 +82,7 @@
  *
  * Mario Discrete Sound Interface
  *
- * verified against picture of a TMA1-04-CPU Board. Some
- * of the values were hard to read, though.
- *
+ * Parts verified against a real TMA1-04-CPU Board.
  ****************************************************************/
 
 #define MR_R6		RES_K(4.7)		/* verified                             */
@@ -94,28 +94,27 @@
 #define MR_R19		RES_K(22)		/* verified                             */
 #define MR_R20		RES_K(22)		/* verified                             */
 #define MR_R40		RES_K(22)		/* verified                             */
-#define MR_R41		RES_K(100)		/* verified, hard to read               */
-#define MR_R42		RES_K(43)
-#define MR_R43		RES_K(100)
-#define MR_R61		RES_K(47)		/* verified, hard to read               */
+#define MR_R41		RES_K(100)		/* verified                             */
+#define MR_R42		RES_K(43)		/* verified                             */
+#define MR_R43		RES_K(100)		/* verified                             */
+#define MR_R61		RES_K(47)		/* verified                             */
 #define MR_R64		RES_K(20)		/* verified                             */
 #define MR_R65		RES_K(10)		/* verified                             */
 
 #define MR_C3		CAP_U(10)		/* verified                             */
-#define MR_C4		CAP_U(4.7)		/* illegible, 4.7 or 47 pcb/schematics  */
-									/* 4.7 in parts list                    */
-#define MR_C5		CAP_N(39)		/* illegible on pcb                     */
-#define MR_C6		CAP_N(3.9)		/* illegible on pcb                     */
+#define MR_C4		CAP_U(4.7)		/* verified                             */
+#define MR_C5		CAP_N(39)		/* verified                             */
+#define MR_C6		CAP_N(3.9)		/* verified                             */
 #define MR_C14		CAP_U(4.7)		/* verified                             */
 #define MR_C15		CAP_U(4.7)		/* verified                             */
 #define MR_C16		CAP_N(6.8)		/* verified                             */
-#define MR_C17		CAP_N(22)		/* illegible on pcb                     */
-#define MR_C31		CAP_U(0.022)	/* not found                            */
-#define MR_C32		CAP_U(1)		/* illegible on pcb                     */
-#define MR_C39		CAP_N(4.7)		/* not found                            */
+#define MR_C17		CAP_N(22)		/* verified                             */
+#define MR_C30		CAP_P(100)		/* verified                             */
+#define MR_C31		CAP_U(0.022)	/* verified                             */
+#define MR_C32		CAP_U(1)		/* verified                             */
+#define MR_C39		CAP_N(4.7)		/* verified                             */
 #define MR_C40		CAP_N(22)		/* verified                             */
-//#define MR_C41        CAP_U(4.7)      /* verified, hard to read           */
-#define MR_C41		CAP_U(4.7)
+#define MR_C41		CAP_U(4.7)		/* verified                             */
 #define MR_C43		CAP_U(3.3)		/* verified                             */
 #define MR_C44		CAP_U(3.3)		/* verified                             */
 
@@ -297,6 +296,15 @@ static const discrete_custom_info mario_custom_run_info =
 	NULL
 };
 
+static const discrete_mixer_desc mario_mixer =
+{
+	DISC_MIXER_IS_RESISTOR,
+	{MR_R20, MR_R19, MR_R41, MR_R40},
+	{0}, {0}, 0, 0, MR_C31, MR_C32, 0, 1	/* r_node{}, c{}, rI, rF, cF, cAmp, vRef, gain*/
+};
+
+#define LS629_FREQ_R_IN		RES_K(95)
+
 static DISCRETE_SOUND_START(mario)
 
 	/************************************************/
@@ -314,9 +322,26 @@ static DISCRETE_SOUND_START(mario)
     DISCRETE_INPUT_PULSE(DS_SOUND0_INV, 1)
 	DISCRETE_LS123(NODE_10, DS_SOUND0_INV, MR_R17, MR_C14)
 	DISCRETE_RCFILTER(NODE_11, NODE_10, MR_R6, MR_C3 )
-	DISCRETE_CUSTOM7(NODE_12, NODE_10, NODE_11, NODE_11, MR_C6, MR_C17,
+#if (USE_LS629)
+	DISCRETE_74LS629(NODE_12,						/* IC 1J, pin 10 */
+		1,											/* ENAB */
+		NODE_11, 5,									/* VMOD, VRNG */
+		MR_C6, RES_2_PARALLEL(MR_R6, LS629_FREQ_R_IN),		/* C, R_FREQ_IN */
+		DISC_LS624_OUT_SQUARE)
+	DISCRETE_74LS629(NODE_13,						/* IC 2J, pin 10 */
+		1,											/* ENAB */
+		NODE_11, 5,									/* VMOD, VRNG */
+		MR_C17, RES_2_PARALLEL(MR_R6, LS629_FREQ_R_IN),		/* C, R_FREQ_IN */
+		DISC_LS624_OUT_SQUARE)
+	DISCRETE_LOGIC_XOR(NODE_14,						/* IC 1K, pin 6 */
+		NODE_12, NODE_13)
+	DISCRETE_SWITCH(DS_OUT_SOUND0,					/* IC 2K, pin 3 */
+		NODE_10, NODE_14,							/* ENAB, SWITCH */
+		0, TTL_HIGH)								/* INP0,INP1 */
+#else
+	DISCRETE_CUSTOM7(DS_OUT_SOUND0, NODE_10, NODE_11, NODE_11, MR_C6, MR_C17,
 			MR_MIXER_RPAR, MR_C31, &mario_custom_run_info)
-	DISCRETE_MULTIPLY(DS_OUT_SOUND0, NODE_12, MR_MIXER_RPAR / MR_R20)
+#endif
 	DISCRETE_TASK_END()
 
 	/************************************************/
@@ -327,9 +352,26 @@ static DISCRETE_SOUND_START(mario)
 	DISCRETE_INPUT_PULSE(DS_SOUND1_INV, 1)
 	DISCRETE_LS123(NODE_20, DS_SOUND1_INV, MR_R18, MR_C15)
 	DISCRETE_RCFILTER(NODE_21, NODE_20, MR_R7, MR_C4 )
-	DISCRETE_CUSTOM7(NODE_22, NODE_20, NODE_21, NODE_21, MR_C5, MR_C16,
+#if (USE_LS629)
+	DISCRETE_74LS629(NODE_22,						/* IC 1J, pin 7 */
+		1,											/* ENAB */
+		NODE_21, 5,									/* VMOD, VRNG */
+		MR_C5, RES_2_PARALLEL(MR_R7, LS629_FREQ_R_IN),		/* C, R_FREQ_IN */
+		DISC_LS624_OUT_SQUARE)
+	DISCRETE_74LS629(NODE_23,						/* IC 2J, pin 7 */
+		1,											/* ENAB */
+		NODE_21, 5,									/* VMOD, VRNG */
+		MR_C16, RES_2_PARALLEL(MR_R7, LS629_FREQ_R_IN),		/* C, R_FREQ_IN */
+		DISC_LS624_OUT_SQUARE)
+	DISCRETE_LOGIC_XOR(NODE_24,						/* IC 1K, pin 3 */
+		NODE_22, NODE_23)
+	DISCRETE_SWITCH(DS_OUT_SOUND1,					/* IC 2K, pin 3 */
+		NODE_20, NODE_24,							/* ENAB, SWITCH */
+		0, TTL_HIGH)								/* INP0,INP1 */
+#else
+	DISCRETE_CUSTOM7(DS_OUT_SOUND1, NODE_20, NODE_21, NODE_21, MR_C5, MR_C16,
 		MR_MIXER_RPAR, MR_C31, &mario_custom_run_info)
-	DISCRETE_MULTIPLY(DS_OUT_SOUND1, NODE_22, MR_MIXER_RPAR / MR_R19)
+#endif
 	DISCRETE_TASK_END()
 
 	/************************************************/
@@ -345,16 +387,30 @@ static DISCRETE_SOUND_START(mario)
 	DISCRETE_LS123(NODE_110, DS_SOUND7_INV, MR_R61, MR_C41)
 	DISCRETE_TRANSFORM2(NODE_111, NODE_110, TTL_HIGH, "0!1*")
 	DISCRETE_RCFILTER(NODE_112, NODE_111, MR_R65, MR_C44)
+#if (USE_LS629)
+	DISCRETE_74LS629(NODE_113,						/* IC 4K, pin 10 */
+		1,											/* ENAB */
+		NODE_112, 5,								/* VMOD, VRNG */
+		MR_C40, MR_R65,								/* C, R_FREQ_IN */
+		DISC_LS624_OUT_LOGIC)
+#else
 	DISCRETE_74LS624(NODE_113, NODE_112, RUN_VCO_VOLTAGE /*VSS*/, MR_C40, DISC_LS624_OUT_LOGIC)
+#endif
 
 	DISCRETE_LOGIC_XOR(NODE_115, NODE_102, NODE_113)
 
 	DISCRETE_RCFILTER(NODE_117, NODE_104, MR_R64, MR_C43)
+#if (USE_LS629)
+	DISCRETE_74LS629(NODE_118,						/* IC 4K, pin 7 */
+		1,											/* ENAB */
+		NODE_117, 5,								/* VMOD, VRNG */
+		MR_C39, MR_R64,								/* C, R_FREQ_IN */
+		DISC_LS624_OUT_LOGIC)
+#else
 	DISCRETE_74LS624(NODE_118, NODE_117, RUN_VCO_VOLTAGE /*VSS*/, MR_C39, DISC_LS624_OUT_COUNT_F)
-
+#endif
 	DISCRETE_LOGIC_AND(NODE_120, NODE_115, NODE_110)
-	DISCRETE_MULTIPLY(NODE_121, NODE_120, TTL_HIGH * MR_MIXER_RPAR / MR_R41)
-	DISCRETE_RCFILTER(DS_OUT_SOUND7, NODE_121, MR_MIXER_RPAR, MR_C31)
+	DISCRETE_MULTIPLY(DS_OUT_SOUND7, NODE_120, TTL_HIGH)
 	DISCRETE_TASK_END()
 
 	/************************************************/
@@ -368,10 +424,7 @@ static DISCRETE_SOUND_START(mario)
 	DISCRETE_TASK_START(1)
 	DISCRETE_INPUT_BUFFER(DS_DAC, 0)
 	DISCRETE_MULTIPLY(NODE_170, DS_DAC, TTL_HIGH/256.0)
-	DISCRETE_RCFILTER(NODE_171, NODE_170, RES_K(750), CAP_P(200))
-
-	DISCRETE_MULTIPLY(NODE_172, NODE_171, MR_MIXER_RPAR / MR_R40)
-	DISCRETE_RCFILTER(DS_OUT_DAC, NODE_172, MR_MIXER_RPAR, MR_C31)
+	DISCRETE_RCFILTER(DS_OUT_DAC, NODE_170, RES_K(750), CAP_P(200))
 	DISCRETE_TASK_END()
 
 
@@ -380,17 +433,11 @@ static DISCRETE_SOUND_START(mario)
 	/************************************************/
 
 	DISCRETE_TASK_START(2)
-	DISCRETE_ADDER4(NODE_295, 1, DS_OUT_SOUND0, DS_OUT_SOUND1, DS_OUT_SOUND7, DS_OUT_DAC)
-
-	/* Amplifier: internal amplifier
-     * Just a 1:n amplifier without filters and no output capacitor
-     */
-	DISCRETE_CRFILTER(NODE_296, NODE_295, RES_2_PARALLEL(MR_R42, MR_R43), MR_C32)
-	/* EZV20 (Monitor) ouput capacitor / Speaker */
-	DISCRETE_CRFILTER(NODE_297, NODE_296, 6, CAP_U(22))
-	DISCRETE_OUTPUT(NODE_297, 32767.0/5.0 * 10)
-	//DISCRETE_WAVELOG1(DS_OUT_SOUND0, 32767/5.0)
-	//DISCRETE_WAVELOG2(NODE_296, 32767/5.0 * 2, DS_SOUND7_INV, 10000)
+	DISCRETE_MIXER4(NODE_297,
+		1,															/* ENAB */
+		DS_OUT_SOUND0, DS_OUT_SOUND1, DS_OUT_SOUND7, DS_OUT_DAC,
+		&mario_mixer)
+	DISCRETE_OUTPUT(NODE_297, 32767.0/1.7)
 	DISCRETE_TASK_END()
 
 DISCRETE_SOUND_END

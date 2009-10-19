@@ -1115,7 +1115,7 @@ static DISCRETE_RESET(dss_op_amp_osc)
 			context->charge_exp[0] = RC_CHARGE_EXP(context->charge_rc[0]);
 			context->charge_exp[1] = RC_CHARGE_EXP(context->charge_rc[1]);
 			context->threshold_low  = (info->vP - OP_AMP_NORTON_VBE) / info->r4;
-			context->threshold_high = context->threshold_low + (info->vP - OP_AMP_NORTON_VBE - OP_AMP_NORTON_VBE) / info->r3;;
+			context->threshold_high = context->threshold_low + (info->vP - 2 * OP_AMP_NORTON_VBE) / info->r3;;
 			context->threshold_low  = context->threshold_low * info->r2 + OP_AMP_NORTON_VBE;
 			context->threshold_high = context->threshold_high * info->r2 + OP_AMP_NORTON_VBE;
 

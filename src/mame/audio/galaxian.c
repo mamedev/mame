@@ -367,7 +367,7 @@ static DISCRETE_SOUND_START(galaxian)
 	/************************************************/
 
 	DISCRETE_TASK_START(2)
-		DISCRETE_MIXER5(NODE_279, 1, NODE_SUB(133,0), NODE_SUB(133,2), NODE_SUB(133,2), NODE_SUB(133,3), NODE_120, &galaxian_mixerpre_desc)
+		DISCRETE_MIXER5(NODE_279, 1, NODE_133_00, NODE_133_02, NODE_133_02, NODE_133_03, NODE_120, &galaxian_mixerpre_desc)
 		DISCRETE_MIXER3(NODE_280, 1, NODE_279, NODE_157, NODE_182, &galaxian_mixer_desc)
 		DISCRETE_OUTPUT(NODE_280, 32767.0/5.0*5)
 	DISCRETE_TASK_END()
@@ -383,7 +383,7 @@ static DISCRETE_SOUND_START(mooncrst)
 	/************************************************/
 	DISCRETE_DELETE(NODE_279, NODE_279)
 	DISCRETE_REPLACE
-	DISCRETE_MIXER7(NODE_280, 1, NODE_SUB(133,0), NODE_SUB(133,2), NODE_SUB(133,2), NODE_SUB(133,3), NODE_120, NODE_157, NODE_182, &mooncrst_mixer_desc)
+	DISCRETE_MIXER7(NODE_280, 1, NODE_133_00, NODE_133_02, NODE_133_02,NODE_133_03, NODE_120, NODE_157, NODE_182, &mooncrst_mixer_desc)
 DISCRETE_SOUND_END
 
 /*************************************
