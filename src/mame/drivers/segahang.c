@@ -1173,13 +1173,82 @@ ROM_START( hangon1 )
 	ROM_REGION( 0x2000, "proms", 0 ) /* zoom table */
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 ROM_END
+
 /**************************************************************************************************************************
  **************************************************************************************************************************
  **************************************************************************************************************************
-    Super Hang On (bootleg upgrade)
+
+Super Hang-On (Japan Ver.)
+(c)1987 Sega
+Ride-on Type
+
+CPU: FD1094 317-0038
+
+Top   : Label 834-6273
+Middle: 834-5704 (Label 837-6340)
+Bottom: 834-5668 (Label 837-6341)
+
+*/
+
+ROM_START( shangonro )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "epr-10833.31", 0x000000, 0x10000, CRC(13ba98bc) SHA1(83710a7bb9d038f8663e6d42b184d4e4d937a26f) ) /* <-- These may not be in the correct order */
+	ROM_LOAD16_BYTE( "epr-10831.25", 0x000001, 0x10000, CRC(3a2de9eb) SHA1(20da548cd1fb466942ee45306cfd04766e5a4f50) )
+	ROM_LOAD16_BYTE( "epr-10832.30", 0x020000, 0x10000, CRC(543cd7bb) SHA1(124b426adc2d8dc51172ef94cb215bde3b8b42a7) )
+	ROM_LOAD16_BYTE( "epr-10830.24", 0x020001, 0x10000, CRC(2ae4e53a) SHA1(b15b5a8b36cbe5fe68b5e18ab3398ebc7214dbee) )
+
+	ROM_REGION( 0x2000, "user1", 0 ) /* decryption key */
+	ROM_LOAD( "317-0038.key", 0x0000, 0x2000,  CRC(85943925) SHA1(76303b0aa79ca9d4a8d10d4e63ee2efe756a0a00) )
+
+	ROM_REGION( 0x40000, "sub", 0 ) /* second 68000 CPU */
+	ROM_LOAD16_BYTE( "epr-10842.22", 0x00000, 0x08000, CRC(24289138) SHA1(700419bb8e4f97e128d85d0077e4aa39a1d2f167) )
+	ROM_LOAD16_BYTE( "epr-10839.8",  0x00001, 0x08000, CRC(70f92d5e) SHA1(3ca0e23d6bb44bbe7d21840c8d179c57f8cbfd20) )
+	ROM_LOAD16_BYTE( "epr-10841.20", 0x10000, 0x08000, CRC(3bb2186c) SHA1(755dbf5d37809ea1de2e96f9827cf373dc2d3f94) )
+	ROM_LOAD16_BYTE( "epr-10838.6",  0x10001, 0x08000, CRC(6aded05a) SHA1(5459157bf4083f677c524d1cb839cb6f4f1a7ee2) )
+	ROM_LOAD16_BYTE( "epr-10840.18", 0x20000, 0x08000, CRC(12ee8716) SHA1(8e798d23d22f85cd046641184d104c17b27995b2) )
+	ROM_LOAD16_BYTE( "epr-10837.4",  0x20001, 0x08000, CRC(155e0cfd) SHA1(e51734351c887fe3920c881f57abdfbb7d075f57) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 ) /* tiles */
+	ROM_LOAD( "epr-10652.38", 0x00000, 0x08000, CRC(260286f9) SHA1(dc7c8d2c6ef924a937328685eed19bda1c8b1819) )
+	ROM_LOAD( "epr-10651.23", 0x08000, 0x08000, CRC(c609ee7b) SHA1(c6dacf81cbfe7e5df1f9a967cf571be1dcf1c429) )
+	ROM_LOAD( "epr-10650.7",  0x10000, 0x08000, CRC(b236a403) SHA1(af02b8122794c083a66f2ab35d2c73b84b2df0be) )
+
+	ROM_REGION16_BE( 0x00e0000, "gfx2", 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "epr-10675.22", 0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
+	ROM_LOAD16_BYTE( "epr-10682.11", 0x000000, 0x010000, CRC(d9d83250) SHA1(f8ca3197edcdf53643a5b335c3c044ddc1310cd4) )
+	ROM_LOAD16_BYTE( "epr-10676.21", 0x020001, 0x010000, CRC(25ebf2c5) SHA1(abcf673ae4e280417dd9f46d18c0ec7c0e4802ae) )
+	ROM_LOAD16_BYTE( "epr-10683.12", 0x020000, 0x010000, CRC(6365d2e9) SHA1(688e2ba194e859f86cd3486c2575ebae257e975a) )
+	ROM_LOAD16_BYTE( "epr-10677.20", 0x040001, 0x010000, CRC(8a57b8d6) SHA1(df1a31559dd2d1e7c2c9d800bf97526bdf3e84e6) )
+	ROM_LOAD16_BYTE( "epr-10684.11", 0x040000, 0x010000, CRC(3aff8910) SHA1(4b41a49a7f02363424e814b37edce9a7a44a112e) )
+	ROM_LOAD16_BYTE( "epr-10678.19", 0x060001, 0x010000, CRC(af473098) SHA1(a2afaba1cbf672949dc50e407b46d7e9ae183774) )
+	ROM_LOAD16_BYTE( "epr-10685.10", 0x060000, 0x010000, CRC(80bafeef) SHA1(f01bcf65485e60f34e533295a896fca0b92e5b14) )
+	ROM_LOAD16_BYTE( "epr-10679.18", 0x080001, 0x010000, CRC(03bc4878) SHA1(548fc58bcc620204e30fa12fa4c4f0a3f6a1e4c0) )
+	ROM_LOAD16_BYTE( "epr-10686.9",  0x080000, 0x010000, CRC(274b734e) SHA1(906fa528659bc17c9b4744cec52f7096711adce8) )
+	ROM_LOAD16_BYTE( "epr-10680.17", 0x0a0001, 0x010000, CRC(9f0677ed) SHA1(5964642b70bfad418da44f2d91476f887b021f74) )
+	ROM_LOAD16_BYTE( "epr-10687.8",  0x0a0000, 0x010000, CRC(508a4701) SHA1(d17aea2aadc2e2cd65d81bf91feb3ef6923d5c0b) )
+	ROM_LOAD16_BYTE( "epr-10681.16", 0x0c0001, 0x010000, CRC(b176ea72) SHA1(7ec0eb0f13398d014c2e235773ded00351edb3e2) )
+	ROM_LOAD16_BYTE( "epr-10688.7",  0x0c0000, 0x010000, CRC(42fcd51d) SHA1(0eacb3527dc21746e5b901fcac83f2764a0f9e2c) )
+
+	ROM_REGION( 0x8000, "gfx3", 0 ) /* road gfx */
+	ROM_LOAD( "epr-10866.108", 0x0000, 0x08000, CRC(1bbe4fc8) SHA1(30f7f301e4d10d3b254d12bf3d32e5371661a566) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD( "epr-10834a.52", 0x0000, 0x08000, CRC(83347dc0) SHA1(079bb750edd6372750a207764e8c84bb6abf2f79) )
+
+	ROM_REGION( 0x20000, "pcm", 0 ) /* Sega PCM sound data */
+	ROM_LOAD( "epr-10835.55", 0x00000, 0x10000, CRC(da08ca2b) SHA1(2c94c127efd66f6cf86b25e2653637818a99aed1) )
+	ROM_LOAD( "epr-10836.56", 0x10000, 0x10000, CRC(8b10e601) SHA1(75e9bcdd3f096be9bed672d61064b9240690deec) )
+
+	ROM_REGION( 0x2000, "proms", 0 ) /* zoom table */
+	ROM_LOAD( "epr-6844.119", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
+ROM_END
+
+/
+    Super Hang On bootleg (of the above?)
     CPU: 68000 (317-????)
 */
-ROM_START( shangupb )
+
+ROM_START( shangonrb )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "s-hangon.30", 0x000000, 0x10000, CRC(d95e82fc) SHA1(bc6cd0b0ac98a9c53f2e22ac086521704ab59e4d) )
 	ROM_LOAD16_BYTE( "s-hangon.32", 0x000001, 0x10000, CRC(2ee4b4fb) SHA1(ba4042ab6e533c16c3cde848248d75e484be113f) )
@@ -1193,40 +1262,39 @@ ROM_START( shangupb )
 	ROM_LOAD16_BYTE( "s-hangon.04", 0x20001, 0x10000, CRC(8f8f4af0) SHA1(1dac21b7df6ec6874d36a07e30de7129b7f7f33a) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 ) /* tiles */
-	ROM_LOAD( "epr-10652.54", 0x00000, 0x08000, CRC(260286f9) SHA1(dc7c8d2c6ef924a937328685eed19bda1c8b1819) )
-	ROM_LOAD( "epr-10651.55", 0x08000, 0x08000, CRC(c609ee7b) SHA1(c6dacf81cbfe7e5df1f9a967cf571be1dcf1c429) )
-	ROM_LOAD( "epr-10650.56", 0x10000, 0x08000, CRC(b236a403) SHA1(af02b8122794c083a66f2ab35d2c73b84b2df0be) )
+	ROM_LOAD( "epr-10652.38", 0x00000, 0x08000, CRC(260286f9) SHA1(dc7c8d2c6ef924a937328685eed19bda1c8b1819) )
+	ROM_LOAD( "epr-10651.23", 0x08000, 0x08000, CRC(c609ee7b) SHA1(c6dacf81cbfe7e5df1f9a967cf571be1dcf1c429) )
+	ROM_LOAD( "epr-10650.7",  0x10000, 0x08000, CRC(b236a403) SHA1(af02b8122794c083a66f2ab35d2c73b84b2df0be) )
 
 	ROM_REGION16_BE( 0x00e0000, "gfx2", 0 ) /* sprites */
-	ROM_LOAD16_BYTE( "epr-10675.8",	 0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
-	ROM_LOAD16_BYTE( "epr-10682.16", 0x000000, 0x010000, CRC(d9d83250) SHA1(f8ca3197edcdf53643a5b335c3c044ddc1310cd4) )
+	ROM_LOAD16_BYTE( "epr-10675.22", 0x000001, 0x010000, CRC(d6ac012b) SHA1(305023b1a0a9d84cfc081ffc2ad7578b53d562f2) )
+	ROM_LOAD16_BYTE( "epr-10682.11", 0x000000, 0x010000, CRC(d9d83250) SHA1(f8ca3197edcdf53643a5b335c3c044ddc1310cd4) )
 	ROM_LOAD16_BYTE( "s-hangon.20",  0x020001, 0x010000, CRC(eef23b3d) SHA1(2416fa9991afbdddf25d469082e53858289550db) )
 	ROM_LOAD16_BYTE( "s-hangon.14",  0x020000, 0x010000, CRC(0f26d131) SHA1(0d8b6eb8b8aae0aa8f0fa0c31dc91ad0e610be3e) )
-	ROM_LOAD16_BYTE( "epr-10677.6",  0x040001, 0x010000, CRC(8a57b8d6) SHA1(df1a31559dd2d1e7c2c9d800bf97526bdf3e84e6) )
-	ROM_LOAD16_BYTE( "epr-10684.14", 0x040000, 0x010000, CRC(3aff8910) SHA1(4b41a49a7f02363424e814b37edce9a7a44a112e) )
-	ROM_LOAD16_BYTE( "epr-10678.5",  0x060001, 0x010000, CRC(af473098) SHA1(a2afaba1cbf672949dc50e407b46d7e9ae183774) )
-	ROM_LOAD16_BYTE( "epr-10685.13", 0x060000, 0x010000, CRC(80bafeef) SHA1(f01bcf65485e60f34e533295a896fca0b92e5b14) )
-	ROM_LOAD16_BYTE( "epr-10679.4",  0x080001, 0x010000, CRC(03bc4878) SHA1(548fc58bcc620204e30fa12fa4c4f0a3f6a1e4c0) )
-	ROM_LOAD16_BYTE( "epr-10686.12", 0x080000, 0x010000, CRC(274b734e) SHA1(906fa528659bc17c9b4744cec52f7096711adce8) )
-	ROM_LOAD16_BYTE( "epr-10680.3",  0x0a0001, 0x010000, CRC(9f0677ed) SHA1(5964642b70bfad418da44f2d91476f887b021f74) )
-	ROM_LOAD16_BYTE( "epr-10687.11", 0x0a0000, 0x010000, CRC(508a4701) SHA1(d17aea2aadc2e2cd65d81bf91feb3ef6923d5c0b) )
-	ROM_LOAD16_BYTE( "epr-10681.2",  0x0c0001, 0x010000, CRC(b176ea72) SHA1(7ec0eb0f13398d014c2e235773ded00351edb3e2) )
-	ROM_LOAD16_BYTE( "epr-10688.10", 0x0c0000, 0x010000, CRC(42fcd51d) SHA1(0eacb3527dc21746e5b901fcac83f2764a0f9e2c) )
+	ROM_LOAD16_BYTE( "epr-10677.20", 0x040001, 0x010000, CRC(8a57b8d6) SHA1(df1a31559dd2d1e7c2c9d800bf97526bdf3e84e6) )
+	ROM_LOAD16_BYTE( "epr-10684.11", 0x040000, 0x010000, CRC(3aff8910) SHA1(4b41a49a7f02363424e814b37edce9a7a44a112e) )
+	ROM_LOAD16_BYTE( "epr-10678.19", 0x060001, 0x010000, CRC(af473098) SHA1(a2afaba1cbf672949dc50e407b46d7e9ae183774) )
+	ROM_LOAD16_BYTE( "epr-10685.10", 0x060000, 0x010000, CRC(80bafeef) SHA1(f01bcf65485e60f34e533295a896fca0b92e5b14) )
+	ROM_LOAD16_BYTE( "epr-10679.18", 0x080001, 0x010000, CRC(03bc4878) SHA1(548fc58bcc620204e30fa12fa4c4f0a3f6a1e4c0) )
+	ROM_LOAD16_BYTE( "epr-10686.9",  0x080000, 0x010000, CRC(274b734e) SHA1(906fa528659bc17c9b4744cec52f7096711adce8) )
+	ROM_LOAD16_BYTE( "epr-10680.17", 0x0a0001, 0x010000, CRC(9f0677ed) SHA1(5964642b70bfad418da44f2d91476f887b021f74) )
+	ROM_LOAD16_BYTE( "epr-10687.8",  0x0a0000, 0x010000, CRC(508a4701) SHA1(d17aea2aadc2e2cd65d81bf91feb3ef6923d5c0b) )
+	ROM_LOAD16_BYTE( "epr-10681.16", 0x0c0001, 0x010000, CRC(b176ea72) SHA1(7ec0eb0f13398d014c2e235773ded00351edb3e2) )
+	ROM_LOAD16_BYTE( "epr-10688.7",  0x0c0000, 0x010000, CRC(42fcd51d) SHA1(0eacb3527dc21746e5b901fcac83f2764a0f9e2c) )
 
 	ROM_REGION( 0x8000, "gfx3", 0 ) /* road gfx */
-	ROM_LOAD( "s-hangon.26", 0x0000, 0x8000, CRC(1bbe4fc8) SHA1(30f7f301e4d10d3b254d12bf3d32e5371661a566) )
+	ROM_LOAD( "epr-10866.108", 0x0000, 0x08000, CRC(1bbe4fc8) SHA1(30f7f301e4d10d3b254d12bf3d32e5371661a566) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "s-hangon.03", 0x0000, 0x08000, CRC(83347dc0) SHA1(079bb750edd6372750a207764e8c84bb6abf2f79) )
+	ROM_LOAD( "epr-10834a.52", 0x0000, 0x08000, CRC(83347dc0) SHA1(079bb750edd6372750a207764e8c84bb6abf2f79) )
 
 	ROM_REGION( 0x20000, "pcm", 0 ) /* Sega PCM sound data */
-	ROM_LOAD( "s-hangon.02", 0x00000, 0x10000, CRC(da08ca2b) SHA1(2c94c127efd66f6cf86b25e2653637818a99aed1) )
-	ROM_LOAD( "s-hangon.01", 0x10000, 0x10000, CRC(8b10e601) SHA1(75e9bcdd3f096be9bed672d61064b9240690deec) )
+	ROM_LOAD( "epr-10835.55", 0x00000, 0x10000, CRC(da08ca2b) SHA1(2c94c127efd66f6cf86b25e2653637818a99aed1) )
+	ROM_LOAD( "epr-10836.56", 0x10000, 0x10000, CRC(8b10e601) SHA1(75e9bcdd3f096be9bed672d61064b9240690deec) )
 
 	ROM_REGION( 0x2000, "proms", 0 ) /* zoom table */
-	ROM_LOAD( "6844.rom", 0x0000, 0x2000, BAD_DUMP CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
+	ROM_LOAD( "epr-6844.119", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 ROM_END
-
 
 /**************************************************************************************************************************
  **************************************************************************************************************************
@@ -1764,12 +1832,13 @@ static DRIVER_INIT( endurob2 )
  *
  *************************************/
 
-GAME( 1985, hangon,   0,        hangon,   hangon,   hangon,   ROT0, "Sega",    "Hang-On (Rev A)", 0 )
-GAME( 1985, hangon1,  hangon,   hangon,   hangon,   hangon,   ROT0, "Sega",    "Hang-On", 0 )
-GAME( 1992, shangupb, shangon,  shangupb, shangupb, hangon,   ROT0, "bootleg", "Super Hang-On (Hang-On upgrade, bootleg)", 0 )
-GAME( 1985, sharrier, 0,        sharrier, sharrier, sharrier, ROT0, "Sega",    "Space Harrier (Rev A, 8751 315-5163A)", 0 )
-GAME( 1985, sharrier1,sharrier, sharrier, sharrier, sharrier, ROT0, "Sega",    "Space Harrier (8751 315-5163)", 0 )
-GAME( 1986, enduror,  0,        enduror,  enduror,  enduror,  ROT0, "Sega",    "Enduro Racer (YM2151, FD1089B 317-0013A)", 0 )
-GAME( 1986, enduror1, enduror,  enduror1, enduror,  enduror,  ROT0, "Sega",    "Enduro Racer (YM2203, FD1089B 317-0013A)", 0 )
-GAME( 1986, endurobl, enduror,  enduror1, enduror,  endurobl, ROT0, "bootleg", "Enduro Racer (bootleg set 1)", 0 )
-GAME( 1986, endurob2, enduror,  endurob2, enduror,  endurob2, ROT0, "bootleg", "Enduro Racer (bootleg set 2)", GAME_NOT_WORKING )
+GAME( 1985, hangon,    0,        hangon,   hangon,   hangon,   ROT0, "Sega",    "Hang-On (Rev A)", 0 )
+GAME( 1985, hangon1,   hangon,   hangon,   hangon,   hangon,   ROT0, "Sega",    "Hang-On", 0 )
+GAME( 1992, shangonro, shangon,  shangupb, shangupb, hangon,   ROT0, "Sega",    "Super Hang-On (Japan, FD1094 317-0038)", GAME_NOT_WORKING )
+GAME( 1992, shangonrb, shangon,  shangupb, shangupb, hangon,   ROT0, "bootleg", "Super Hang-On (bootleg)", 0 )
+GAME( 1985, sharrier,  0,        sharrier, sharrier, sharrier, ROT0, "Sega",    "Space Harrier (Rev A, 8751 315-5163A)", 0 )
+GAME( 1985, sharrier1, sharrier, sharrier, sharrier, sharrier, ROT0, "Sega",    "Space Harrier (8751 315-5163)", 0 )
+GAME( 1986, enduror,   0,        enduror,  enduror,  enduror,  ROT0, "Sega",    "Enduro Racer (YM2151, FD1089B 317-0013A)", 0 )
+GAME( 1986, enduror1,  enduror,  enduror1, enduror,  enduror,  ROT0, "Sega",    "Enduro Racer (YM2203, FD1089B 317-0013A)", 0 )
+GAME( 1986, endurobl,  enduror,  enduror1, enduror,  endurobl, ROT0, "bootleg", "Enduro Racer (bootleg set 1)", 0 )
+GAME( 1986, endurob2,  enduror,  endurob2, enduror,  endurob2, ROT0, "bootleg", "Enduro Racer (bootleg set 2)", GAME_NOT_WORKING )

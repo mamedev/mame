@@ -3683,7 +3683,8 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( hangon1 )	/* (c) 1985 */
 	DRIVER( sharrier )	/* (c) 1985 */
 	DRIVER( sharrier1 )	/* (c) 1985 */
-	DRIVER( shangupb )	/* (c) 1992 (but bootleg, hangon hw?) */
+	DRIVER( shangonro )	/* (c) 1992 (FD1094, decrypted) */
+	DRIVER( shangonrb )	/* (c) 1992 (but bootleg, hangon hw?) */
 
 	/* Pre-16 */
 	DRIVER( aliensynjo )	/* (c) 1987 (FD1089A, decrypted) */
