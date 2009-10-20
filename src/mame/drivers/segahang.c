@@ -1243,7 +1243,7 @@ ROM_START( shangonro )
 	ROM_LOAD( "epr-6844.119", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
 ROM_END
 
-/
+/*
     Super Hang On bootleg (of the above?)
     CPU: 68000 (317-????)
 */
