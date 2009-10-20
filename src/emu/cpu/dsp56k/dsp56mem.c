@@ -336,8 +336,8 @@ static void HCR_set(dsp56k_core* cpustate, UINT16 value)
 	HTIE_bit_set(cpustate, (value & 0x0002) >> 1);
 	HRIE_bit_set(cpustate, (value & 0x0001) >> 0);
 }
-//static UINT16 HF3_bit(dsp56k_core* cpustate);  #define hf3BIT  ((HCR & 0x0010) != 0)
-//static UINT16 HF2_bit(dsp56k_core* cpustate);  #define hf2BIT  ((HCR & 0x0008) != 0)
+//static UINT16 HF3_bit(dsp56k_core* cpustate) { return ((HCR & 0x0010) != 0); }
+//static UINT16 HF2_bit(dsp56k_core* cpustate) { return ((HCR & 0x0008) != 0); }
 static UINT16 HCIE_bit(dsp56k_core* cpustate) { return ((HCR & 0x0004) != 0); }
 static UINT16 HTIE_bit(dsp56k_core* cpustate) { return ((HCR & 0x0002) != 0); }
 static UINT16 HRIE_bit(dsp56k_core* cpustate) { return ((HCR & 0x0001) != 0); }
@@ -380,10 +380,10 @@ static void HRIE_bit_set(dsp56k_core* cpustate, UINT16 value)
 /***********************************/
 /* Host Status Register (HSR) Bits */
 /***********************************/
-//static UINT16 DMA_bit(dsp56k_core* cpustate);  #define dmaBIT  ((HSR & 0x0080) != 0)
-//static UINT16 HF1_bit(dsp56k_core* cpustate);  #define hf1BIT  ((HSR & 0x0010) != 0)
-//static UINT16 HF0_bit(dsp56k_core* cpustate);  #define hf0BIT  ((HSR & 0x0008) != 0)
-//static UINT16 HCP_bit(dsp56k_core* cpustate);  #define hcpBIT  ((HSR & 0x0004) != 0)
+//static UINT16 DMA_bit(dsp56k_core* cpustate) { return ((HSR & 0x0080) != 0); }
+//static UINT16 HF1_bit(dsp56k_core* cpustate) { return ((HSR & 0x0010) != 0); }
+//static UINT16 HF0_bit(dsp56k_core* cpustate) { return ((HSR & 0x0008) != 0); }
+//static UINT16 HCP_bit(dsp56k_core* cpustate) { return ((HSR & 0x0004) != 0); } 
 static UINT16 HTDE_bit(dsp56k_core* cpustate) { return ((HSR & 0x0002) != 0); }
 static UINT16 HRDF_bit(dsp56k_core* cpustate) { return ((HSR & 0x0001) != 0); }
 

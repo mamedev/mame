@@ -247,12 +247,27 @@ static WRITE32_HANDLER( shared_ram_write )
 {
 	COMBINE_DATA(&shared_ram[offset]) ;
 
-	logerror("68k WRITING %04x & %04x to shared ram %x & %x [%08x] (@%x)\n", (shared_ram[offset] & 0xffff0000) >> 16,
-																			 (shared_ram[offset] & 0x0000ffff),
-																			  0xc000 + (offset<<1),
-																			  0xc000 +((offset<<1)+1),
-																			  mem_mask,
-																			  cpu_get_pc(space->cpu));
+	if (mem_mask == 0xffff0000)
+	{
+		logerror("68k WRITING %04x to shared ram %x (@%x)\n", (shared_ram[offset] & 0xffff0000) >> 16,
+															   0xc000 + (offset<<1),
+															   cpu_get_pc(space->cpu));
+	}
+	else if (mem_mask == 0x0000ffff)
+	{
+		logerror("68k WRITING %04x to shared ram %x (@%x)\n", (shared_ram[offset] & 0x0000ffff),
+															   0xc000 +((offset<<1)+1),
+															   cpu_get_pc(space->cpu));
+	}
+	else
+	{
+		logerror("68k WRITING %04x & %04x to shared ram %x & %x [%08x] (@%x)\n", (shared_ram[offset] & 0xffff0000) >> 16,
+																				 (shared_ram[offset] & 0x0000ffff),
+																				  0xc000 + (offset<<1),
+																				  0xc000 +((offset<<1)+1),
+																				  mem_mask,
+																				  cpu_get_pc(space->cpu));
+	}
 
 	/* write to the current dsp56k word */
 	if (mem_mask | (0xffff0000))

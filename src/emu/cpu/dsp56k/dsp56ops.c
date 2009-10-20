@@ -20,8 +20,6 @@ TODO:
     - 0x01ee: should this move sign extend?  otherwise the test-against-minus means nothing.
     - Restore only the proper bits upon loop termination!
     - BFCLR has some errata in the docs that may need to be applied.
-    - *_bit_set(0) is difficult to read.  maybe make it *_bit_chg(0).
-    - Potentially "better" reporting for unimplemented opcodes.
 */
 
 /************************/
@@ -43,7 +41,7 @@ struct _typed_pointer
 };
 typedef struct _typed_pointer typed_pointer;
 
-#define WORD(X) (X<<1)
+#define ADDRESS(X) (X<<1)
 #define BITS(CUR,MASK) (Dsp56kOpMask(CUR,MASK))
 
 
@@ -242,11 +240,11 @@ static void execute_one(dsp56k_core* cpustate)
 
 	/* For MAME */
 	debugger_instruction_hook(cpustate->device, PC);
-	OP = ROPCODE(WORD(PC));
+	OP = ROPCODE(ADDRESS(PC));
 
 	/* The words we're going to be working with */
-	op = ROPCODE(WORD(PC));
-	op2 = ROPCODE(WORD(PC) + WORD(1));
+	op = ROPCODE(ADDRESS(PC));
+	op2 = ROPCODE(ADDRESS(PC) + ADDRESS(1));
 
 
 	/* DECODE */
@@ -1157,8 +1155,8 @@ static size_t dsp56k_op_addsub_2(dsp56k_core* cpustate, const UINT16 op_byte, ty
 	/* S L E U N Z V C */
 	/* * * * * * * * * */
 	/* TODO S, L, E, U, V, C */
-	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if (*((UINT64*)D.addr) == 0)					  Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_SET(); else N_CLEAR();
+	if (*((UINT64*)D.addr) == 0)					  Z_SET(); else Z_CLEAR();
 
 	cycles += 2;		/* TODO: + mv oscillator cycles */
 	return 1;
@@ -1208,8 +1206,8 @@ static size_t dsp56k_op_mac_1(dsp56k_core* cpustate, const UINT16 op_byte, typed
 	/* S L E U N Z V C */
 	/* * * * * * * * - */
 	/* TODO: S, L, E, V */
-	if ( *((UINT64*)D) & U64(0x0000008000000000))		N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if ((*((UINT64*)D) & U64(0x000000ffffffffff)) == 0) Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+	if ( *((UINT64*)D) & U64(0x0000008000000000))		N_SET(); else N_CLEAR();
+	if ((*((UINT64*)D) & U64(0x000000ffffffffff)) == 0) Z_SET(); else Z_CLEAR();
 
 	cycles += 2;		/* TODO: +mv oscillator cycles */
 	return 1;
@@ -1262,8 +1260,8 @@ static size_t dsp56k_op_mpy_1(dsp56k_core* cpustate, const UINT16 op_byte, typed
 	/* S L E U N Z V C */
 	/* * * * * * * * - */
 	/* TODO: S, L, E, V */
-	if ( *((UINT64*)D) & U64(0x0000008000000000))		N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if ((*((UINT64*)D) & U64(0x000000ffffffffff)) == 0) Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+	if ( *((UINT64*)D) & U64(0x0000008000000000))		N_SET(); else N_CLEAR();
+	if ((*((UINT64*)D) & U64(0x000000ffffffffff)) == 0) Z_SET(); else Z_CLEAR();
 
 	cycles += 2;		/* TODO: +mv oscillator cycles */
 	return 1;
@@ -1321,12 +1319,12 @@ static size_t dsp56k_op_clr(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 
 	/* S L E U N Z V C */
 	/* * * * * * * 0 - */
-	/* TODO - S&L */
-	E_bit_set(cpustate, 0);
-	U_bit_set(cpustate, 1);
-	N_bit_set(cpustate, 0);
-	Z_bit_set(cpustate, 1);
-	V_bit_set(cpustate, 0);
+	/* TODO - S, L */
+	E_CLEAR();
+	U_SET();
+	N_CLEAR();
+	Z_SET();
+	V_CLEAR();
 
 	cycles += 2;	/* TODO: + mv oscillator clock cycles */
 	return 1;
@@ -1363,8 +1361,8 @@ static size_t dsp56k_op_add(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 	/* S L E U N Z V C */
 	/* * * * * * * * * */
 	/* TODO S, L, E, U, V, C */
-	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if (*((UINT64*)D.addr) == 0)					  Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_SET(); else N_CLEAR();
+	if (*((UINT64*)D.addr) == 0)					  Z_SET(); else Z_CLEAR();
 
 	cycles += 2;		/* TODO: + mv oscillator cycles */
 	return 1;
@@ -1429,8 +1427,8 @@ static size_t dsp56k_op_rnd(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 	/* S L E U N Z V C */
 	/* * * * * * * * - */
 	/* TODO: S, L, E, U, V */
-	if ((*((UINT64*)D.addr)) & U64(0x0000008000000000)) N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if ((*((UINT64*)D.addr)) == 0)                      Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+	if ((*((UINT64*)D.addr)) & U64(0x0000008000000000)) N_SET(); else N_CLEAR();
+	if ((*((UINT64*)D.addr)) == 0)                      Z_SET(); else Z_CLEAR();
 
 	cycles += 2;		/* TODO: + mv oscillator clock cycles */
 	return 1;
@@ -1451,10 +1449,10 @@ static size_t dsp56k_op_tst(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 	/* S L E U N Z V C */
 	/* 0 * * * * * 0 0 */
 	/* TODO: S, L, E, U */
-	if ((*((UINT64*)D.addr)) & U64(0x0000008000000000)) N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if ((*((UINT64*)D.addr)) == 0)                      Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
-	V_bit_set(cpustate, 0);
-	C_bit_set(cpustate, 0);
+	if ((*((UINT64*)D.addr)) & U64(0x0000008000000000)) N_SET(); else N_CLEAR();
+	if ((*((UINT64*)D.addr)) == 0)                      Z_SET(); else Z_CLEAR();
+	V_CLEAR();
+	C_CLEAR();
 
 	cycles += 2;	/* TODO: + mv oscillator clock cycles */
 	return 1;
@@ -1481,8 +1479,8 @@ static size_t dsp56k_op_inc(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 	/* S L E U N Z V C */
 	/* * * * * * * * * */
 	/* TODO: S, L, E, U, V, C */
-	if ( *((UINT64*)D.addr) & U64(0x0000008000000000))		 N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if ((*((UINT64*)D.addr) & U64(0x000000ffffff0000)) == 0) Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+	if ( *((UINT64*)D.addr) & U64(0x0000008000000000))		 N_SET(); else N_CLEAR();
+	if ((*((UINT64*)D.addr) & U64(0x000000ffffff0000)) == 0) Z_SET(); else Z_CLEAR();
 
 	cycles += 2;	/* TODO: +mv oscillator cycles */
 	return 1;
@@ -1514,8 +1512,8 @@ static size_t dsp56k_op_inc24(dsp56k_core* cpustate, const UINT16 op_byte, typed
 	/* S L E U N Z V C */
 	/* * * * * * ? * * */
 	/* TODO: S, L, E, U, V, C */
-	if ( *((UINT64*)D.addr) & U64(0x0000008000000000))		 N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if ((*((UINT64*)D.addr) & U64(0x000000ffffff0000)) == 0) Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+	if ( *((UINT64*)D.addr) & U64(0x0000008000000000))		 N_SET(); else N_CLEAR();
+	if ((*((UINT64*)D.addr) & U64(0x000000ffffff0000)) == 0) Z_SET(); else Z_CLEAR();
 
 	cycles += 2;		/* TODO: + mv oscillator clock cycles */
 	return 1;
@@ -1541,9 +1539,9 @@ static size_t dsp56k_op_or(dsp56k_core* cpustate, const UINT16 op_byte, typed_po
 	/* S L E U N Z V C */
 	/* * * - - ? ? 0 - */
 	/* TODO: S, L */
-	if ( *((UINT64*)D.addr) & U64(0x0000000080000000))		 N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if ((*((UINT64*)D.addr) & U64(0x00000000ffff0000)) == 0) Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
-	V_bit_set(cpustate, 0);
+	if ( *((UINT64*)D.addr) & U64(0x0000000080000000))		 N_SET(); else N_CLEAR();
+	if ((*((UINT64*)D.addr) & U64(0x00000000ffff0000)) == 0) Z_SET(); else Z_CLEAR();
+	V_CLEAR();
 
 	cycles += 2;		/* TODO: + mv oscillator cycles */
 	return 1;
@@ -1572,10 +1570,10 @@ static size_t dsp56k_op_asr(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 	/* S L E U N Z V C */
 	/* * * * * * * 0 ? */
 	/* TODO: S, L, E, U */
-	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if (*((UINT64*)D.addr) == 0)					  Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
-	V_bit_set(cpustate, 0);
-	if (*p_accum & U64(0x0000000000000001))			  C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0);
+	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_SET(); else N_CLEAR();
+	if (*((UINT64*)D.addr) == 0)					  Z_SET(); else Z_CLEAR();
+	V_CLEAR();
+	if (*p_accum & U64(0x0000000000000001))			  C_SET(); else C_CLEAR();
 
 	cycles += 2;		/* TODO: + mv oscillator cycles */
 	return 1;
@@ -1612,10 +1610,10 @@ static size_t dsp56k_op_lsr(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 	/* S L E U N Z V C */
 	/* * * - - ? ? 0 ? */
 	/* TODO: S, L */
-	N_bit_set(cpustate, 0);
-	if (((PAIR64*)D.addr)->w.h == 0)		Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
-	V_bit_set(cpustate, 0);
-	if (*p_accum & U64(0x0000000000010000))	C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0);
+	N_CLEAR();
+	if (((PAIR64*)D.addr)->w.h == 0)		Z_SET(); else Z_CLEAR();
+	V_CLEAR();
+	if (*p_accum & U64(0x0000000000010000))	C_SET(); else C_CLEAR();
 
 	cycles += 2;		/* TODO: + mv oscillator cycles */
 	return 1;
@@ -1682,8 +1680,8 @@ static size_t dsp56k_op_sub(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 	/* S L E U N Z V C */
 	/* * * * * * * * * */
 	/* TODO S, L, E, U, V, C */
-	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if (*((UINT64*)D.addr) == 0)					  Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_SET(); else N_CLEAR();
+	if (*((UINT64*)D.addr) == 0)					  Z_SET(); else Z_CLEAR();
 
 	cycles += 2;		/* TODO: + mv oscillator cycles */
 	return 1;
@@ -1743,7 +1741,7 @@ static size_t dsp56k_op_cmp(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 	/* S L E U N Z V C */
 	/* * * * * * * * * */
 	/* TODO: S, L, E, U, N, V, C */
-	if (result == 0) Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+	if (result == 0) Z_SET(); else Z_CLEAR();
 
 
 	cycles += 2;		/* TODO: + mv oscillator clock cycles */
@@ -1775,9 +1773,9 @@ static size_t dsp56k_op_not(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 	/* S L E U N Z V C */
 	/* * * - - ? ? 0 - */
 	/* TODO: S?, L */
-	if ( *((UINT64*)D.addr) & U64(0x0000000080000000))		 N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if ((*((UINT64*)D.addr) & U64(0x00000000ffff0000)) == 0) Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
-	V_bit_set(cpustate, 0);
+	if ( *((UINT64*)D.addr) & U64(0x0000000080000000))		 N_SET(); else N_CLEAR();
+	if ((*((UINT64*)D.addr) & U64(0x00000000ffff0000)) == 0) Z_SET(); else Z_CLEAR();
+	V_CLEAR();
 
 	cycles += 2;		/* TODO: + mv oscillator cycles */
 	return 1;
@@ -1817,8 +1815,8 @@ static size_t dsp56k_op_dec24(dsp56k_core* cpustate, const UINT16 op_byte, typed
 	/* S L E U N Z V C */
 	/* * * * * * ? * * */
 	/* TODO: S, L, E, U, V, C */
-	if ( *((UINT64*)D.addr) & U64(0x0000008000000000))		 N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if ((*((UINT64*)D.addr) & U64(0x000000ffffff0000)) == 0) Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+	if ( *((UINT64*)D.addr) & U64(0x0000008000000000))		 N_SET(); else N_CLEAR();
+	if ((*((UINT64*)D.addr) & U64(0x000000ffffff0000)) == 0) Z_SET(); else Z_CLEAR();
 
 	cycles += 2;		/* TODO: + mv oscillator clock cycles */
 	return 1;
@@ -1844,9 +1842,9 @@ static size_t dsp56k_op_and(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 	/* S L E U N Z V C */
 	/* * * - - ? ? 0 - */
 	/* TODO: S, L */
-	if ( *((UINT64*)D.addr) & U64(0x0000000080000000))		 N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if ((*((UINT64*)D.addr) & U64(0x00000000ffff0000)) == 0) Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
-	V_bit_set(cpustate, 0);
+	if ( *((UINT64*)D.addr) & U64(0x0000000080000000))		 N_SET(); else N_CLEAR();
+	if ((*((UINT64*)D.addr) & U64(0x00000000ffff0000)) == 0) Z_SET(); else Z_CLEAR();
+	V_CLEAR();
 
 	cycles += 2;		/* TODO: + mv oscillator cycles */
 	return 1;
@@ -1935,8 +1933,8 @@ static size_t dsp56k_op_cmpm(dsp56k_core* cpustate, const UINT16 op_byte, typed_
 	/* S L E U N Z V C */
 	/* * * * * * * * * */
 	/* TODO: S, L, E, U, V, C */
-	if ( (absResult) & U64(0x0000008000000000))		  N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if (((absResult) & U64(0x000000ffffffffff)) == 0) Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+	if ( (absResult) & U64(0x0000008000000000))		  N_SET(); else N_CLEAR();
+	if (((absResult) & U64(0x000000ffffffffff)) == 0) Z_SET(); else Z_CLEAR();
 
 	cycles += 2;		/* TODO: +mv oscillator cycles */
 	return 1;
@@ -1975,8 +1973,8 @@ static size_t dsp56k_op_mpy(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 	/* S L E U N Z V C */
 	/* * * * * * * * - */
 	/* TODO: S, L, E, V */
-	if ( *((UINT64*)D) & U64(0x0000008000000000))		N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if ((*((UINT64*)D) & U64(0x000000ffffffffff)) == 0) Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+	if ( *((UINT64*)D) & U64(0x0000008000000000))		N_SET(); else N_CLEAR();
+	if ((*((UINT64*)D) & U64(0x000000ffffffffff)) == 0) Z_SET(); else Z_CLEAR();
 
 	cycles += 2;		/* TODO: +mv oscillator cycles */
 	return 1;
@@ -2041,8 +2039,8 @@ static size_t dsp56k_op_mac(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 	/* S L E U N Z V C */
 	/* * * * * * * * - */
 	/* TODO: S, L, E, V */
-	if ( *((UINT64*)D) & U64(0x0000008000000000))		N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if ((*((UINT64*)D) & U64(0x000000ffffffffff)) == 0) Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+	if ( *((UINT64*)D) & U64(0x0000008000000000))		N_SET(); else N_CLEAR();
+	if ((*((UINT64*)D) & U64(0x000000ffffffffff)) == 0) Z_SET(); else Z_CLEAR();
 
 	cycles += 2;		/* TODO: +mv oscillator cycles */
 	return 1;
@@ -2107,8 +2105,8 @@ static size_t dsp56k_op_macr(dsp56k_core* cpustate, const UINT16 op_byte, typed_
 	/* S L E U N Z V C */
 	/* * * * * * * * - */
 	/* TODO: S, L, E, V */
-	if ( *((UINT64*)D) & U64(0x0000008000000000))		N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if ((*((UINT64*)D) & U64(0x000000ffffffffff)) == 0) Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+	if ( *((UINT64*)D) & U64(0x0000008000000000))		N_SET(); else N_CLEAR();
+	if ((*((UINT64*)D) & U64(0x000000ffffffffff)) == 0) Z_SET(); else Z_CLEAR();
 
 	cycles += 2;		/* TODO: +mv oscillator cycles */
 	return 1;
@@ -2177,10 +2175,10 @@ static size_t dsp56k_op_asl4(dsp56k_core* cpustate, const UINT16 op, UINT8* cycl
 	/* V - Set if an arithmetic overflow occurs in the 40 bit result. Also set if bit 35 through 39 are
            not the same. */
 	/* C - Set if bit 36 of source operand is set. Cleared otherwise. */
-	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if (*((UINT64*)D.addr) == 0) 					  Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
-	if ( (*((UINT64*)D.addr) & U64(0x000000ff00000000)) != (p_accum & U64(0x000000ff00000000)) ) V_bit_set(cpustate, 1); else V_bit_set(cpustate, 0);
-	if (p_accum & U64(0x0000001000000000)) 			  C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0);
+	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_SET(); else N_CLEAR();
+	if (*((UINT64*)D.addr) == 0) 					  Z_SET(); else Z_CLEAR();
+	if ( (*((UINT64*)D.addr) & U64(0x000000ff00000000)) != (p_accum & U64(0x000000ff00000000)) ) V_SET(); else V_CLEAR();
+	if (p_accum & U64(0x0000001000000000)) 			  C_SET(); else C_CLEAR();
 
 	cycles += 2;
 	return 1;
@@ -2208,10 +2206,10 @@ static size_t dsp56k_op_asr4(dsp56k_core* cpustate, const UINT16 op, UINT8* cycl
 	/* - * * * * * 0 ? */
 	/* TODO: E, U  */
 	/* C - Set if bit 3 of source operand is set. Cleared otherwise. */
-	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if (*((UINT64*)D.addr) == 0) 					  Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
-	V_bit_set(cpustate, 0);
-	if (p_accum & U64(0x0000000000000008))			  C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0);
+	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_SET(); else N_CLEAR();
+	if (*((UINT64*)D.addr) == 0) 					  Z_SET(); else Z_CLEAR();
+	V_CLEAR();
+	if (p_accum & U64(0x0000000000000008))			  C_SET(); else C_CLEAR();
 
 	cycles += 2;
 	return 1;
@@ -2237,10 +2235,10 @@ static size_t dsp56k_op_asr16(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 	/* S L E U N Z V C */
 	/* - * * * * * 0 ? */
 	/* TODO: E, U */
-	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if (*((UINT64*)D.addr) == 0)					  Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
-	V_bit_set(cpustate, 0);
-	if (backupVal & U64(0x0000000000008000))		  C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0);
+	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_SET(); else N_CLEAR();
+	if (*((UINT64*)D.addr) == 0)					  Z_SET(); else Z_CLEAR();
+	V_CLEAR();
+	if (backupVal & U64(0x0000000000008000))		  C_SET(); else C_CLEAR();
 
 	cycles += 2;
 	return 1;
@@ -2262,7 +2260,7 @@ static size_t dsp56k_op_bfop(dsp56k_core* cpustate, const UINT16 op, const UINT1
 	decode_BBB_bitmask(cpustate, BITS(op2,0xe000), &iVal);
 
 	workAddr = assemble_address_from_Pppppp_table(cpustate, BITS(op,0x0020), BITS(op,0x001f));
-	previousValue = memory_read_word_16le(cpustate->data, WORD(workAddr));
+	previousValue = memory_read_word_16le(cpustate->data, ADDRESS(workAddr));
 	workingWord = previousValue;
 
 	switch(BITS(op2, 0x1f00))
@@ -2286,7 +2284,7 @@ static size_t dsp56k_op_bfop(dsp56k_core* cpustate, const UINT16 op, const UINT1
 
 	tempTP.addr = &workingWord;
 	tempTP.data_type = DT_WORD;
-	SetDataMemoryValue(cpustate, tempTP, WORD(workAddr));
+	SetDataMemoryValue(cpustate, tempTP, ADDRESS(workAddr));
 
 	/* S L E U N Z V C */
 	/* - * - - - - - ? */
@@ -2294,15 +2292,15 @@ static size_t dsp56k_op_bfop(dsp56k_core* cpustate, const UINT16 op, const UINT1
 	switch(BITS(op2, 0x1f00))
 	{
 		case 0x12:	/* BFCHG */
-			if ((iVal & previousValue) == iVal) C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0); break;
+			if ((iVal & previousValue) == iVal) C_SET(); else C_CLEAR(); break;
 		case 0x04:	/* BFCLR */
-			if ((iVal & previousValue) == iVal) C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0); break;
+			if ((iVal & previousValue) == iVal) C_SET(); else C_CLEAR(); break;
 		case 0x18:	/* BFSET */
-			if ((iVal & previousValue) == iVal) C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0); break;
+			if ((iVal & previousValue) == iVal) C_SET(); else C_CLEAR(); break;
 		case 0x10:	/* BFTSTH */
-			if ((iVal & previousValue) == iVal) C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0); break;
+			if ((iVal & previousValue) == iVal) C_SET(); else C_CLEAR(); break;
 		case 0x00:	/* BFTSTL */
-			if ((iVal & previousValue) == 0x0000) C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0); break;
+			if ((iVal & previousValue) == 0x0000) C_SET(); else C_CLEAR(); break;
 	}
 
 	cycles += 4; 	/* TODO: + mvb oscillator clock cycles */
@@ -2328,7 +2326,7 @@ static size_t dsp56k_op_bfop_1(dsp56k_core* cpustate, const UINT16 op, const UIN
 	decode_RR_table(cpustate, BITS(op,0x0003), &R);
 
 	workAddr = *((UINT16*)R.addr);
-	previousValue = memory_read_word_16le(cpustate->data, WORD(workAddr));
+	previousValue = memory_read_word_16le(cpustate->data, ADDRESS(workAddr));
 	workingWord = previousValue;
 
 	switch(BITS(op2, 0x1f00))
@@ -2352,7 +2350,7 @@ static size_t dsp56k_op_bfop_1(dsp56k_core* cpustate, const UINT16 op, const UIN
 
 	tempTP.addr = &workingWord;
 	tempTP.data_type = DT_WORD;
-	SetDataMemoryValue(cpustate, tempTP, WORD(workAddr));
+	SetDataMemoryValue(cpustate, tempTP, ADDRESS(workAddr));
 
 	/* S L E U N Z V C */
 	/* - * - - - - - ? */
@@ -2360,15 +2358,15 @@ static size_t dsp56k_op_bfop_1(dsp56k_core* cpustate, const UINT16 op, const UIN
 	switch(BITS(op2, 0x1f00))
 	{
 		case 0x12:	/* BFCHG */
-			if ((iVal & previousValue) == iVal) C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0); break;
+			if ((iVal & previousValue) == iVal) C_SET(); else C_CLEAR(); break;
 		case 0x04:	/* BFCLR */
-			if ((iVal & previousValue) == iVal) C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0); break;
+			if ((iVal & previousValue) == iVal) C_SET(); else C_CLEAR(); break;
 		case 0x18:	/* BFSET */
-			if ((iVal & previousValue) == iVal) C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0); break;
+			if ((iVal & previousValue) == iVal) C_SET(); else C_CLEAR(); break;
 		case 0x10:	/* BFTSTH */
-			if ((iVal & previousValue) == iVal) C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0); break;
+			if ((iVal & previousValue) == iVal) C_SET(); else C_CLEAR(); break;
 		case 0x00:	/* BFTSTL */
-			if ((iVal & previousValue) == 0x0000) C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0); break;
+			if ((iVal & previousValue) == 0x0000) C_SET(); else C_CLEAR(); break;
 	}
 
 	cycles += 4; 	/* TODO: + mvb oscillator clock cycles */
@@ -2430,15 +2428,15 @@ static size_t dsp56k_op_bfop_2(dsp56k_core* cpustate, const UINT16 op, const UIN
 	switch(BITS(op2, 0x1f00))
 	{
 		case 0x12:	/* BFCHG */
-			if ((iVal & previousValue) == iVal) C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0); break;
+			if ((iVal & previousValue) == iVal) C_SET(); else C_CLEAR(); break;
 		case 0x04:	/* BFCLR */
-			if ((iVal & previousValue) == iVal) C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0); break;
+			if ((iVal & previousValue) == iVal) C_SET(); else C_CLEAR(); break;
 		case 0x18:	/* BFSET */
-			if ((iVal & previousValue) == iVal) C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0); break;
+			if ((iVal & previousValue) == iVal) C_SET(); else C_CLEAR(); break;
 		case 0x10:	/* BFTSTH */
-			if ((iVal & previousValue) == iVal) C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0); break;
+			if ((iVal & previousValue) == iVal) C_SET(); else C_CLEAR(); break;
 		case 0x00:	/* BFTSTL */
-			if ((iVal & previousValue) == 0x0000) C_bit_set(cpustate, 1); else C_bit_set(cpustate, 0); break;
+			if ((iVal & previousValue) == 0x0000) C_SET(); else C_CLEAR(); break;
 	}
 
 	cycles += 4; 	/* TODO: + mvb oscillator clock cycles */
@@ -2594,6 +2592,11 @@ static size_t dsp56k_op_bscc(dsp56k_core* cpustate, const UINT16 op, const UINT1
 		/* Change */
 		cpustate->ppc = PC;
 		PC = PC + (INT16)op2;
+
+		/* S L E U N Z V C */
+		/* - - - - - - - - */
+		cycles += 4;		/* TODO: + jx oscillator clock cycles */
+		return 0;
 	}
 
 	/* S L E U N Z V C */
@@ -2733,8 +2736,8 @@ static size_t dsp56k_op_dmac(dsp56k_core* cpustate, const UINT16 op, UINT8* cycl
 	/* S L E U N Z V C */
 	/* - * * * * * * - */
 	/* TODO: L, E, U, V */
-	if ( *((UINT64*)D) & U64(0x0000008000000000))		N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if ((*((UINT64*)D) & U64(0x000000ffffffffff)) == 0) Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+	if ( *((UINT64*)D) & U64(0x0000008000000000))		N_SET(); else N_CLEAR();
+	if ((*((UINT64*)D) & U64(0x000000ffffffffff)) == 0) Z_SET(); else Z_CLEAR();
 
 	cycles += 2;
 	return 1;
@@ -2806,8 +2809,11 @@ static size_t dsp56k_op_do_2(dsp56k_core* cpustate, const UINT16 op, const UINT1
 	typed_pointer S = {NULL, DT_BYTE};
 	decode_DDDDD_table(cpustate, BITS(op,0x001f), &S);
 
-	/* TODO: Does not work for sources A&B - Fix per the docs */
-	lValue = *((UINT16*)S.addr);
+	/* TODO: Does not properly shift-limit sources A&B - Fix per the docs. */
+	/* TODO: There are other cases besides A&B this code won't work. */
+	if      (S.addr == &A) lValue = *((UINT16*)(&A1));
+	else if (S.addr == &B) lValue = *((UINT16*)(&B1));
+	else				   lValue = *((UINT16*)S.addr);
 
 	/* TODO: Fix for special cased SP S */
 	if (S.addr == &SP)
@@ -3025,7 +3031,7 @@ static size_t dsp56k_op_jsr(dsp56k_core* cpustate, const UINT16 op, const UINT16
 	PC += 2;
 
 	/* TODO: This is a hacky implementation of Long vs Fast Interrupts.  Do it right someday! */
-	if (PC < WORD(0x40))
+	if (PC < ADDRESS(0x40))
 	{
 		/* Long interrupt gets the previous PC, not the current one */
 		SP++;
@@ -3151,8 +3157,8 @@ static size_t dsp56k_op_macsuuu(dsp56k_core* cpustate, const UINT16 op, UINT8* c
 	/* S L E U N Z V C */
 	/* - * * * * * * - */
 	/* TODO: L, E, U, V */
-	if ( *((UINT64*)D) & U64(0x0000008000000000))		N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if ((*((UINT64*)D) & U64(0x000000ffffffffff)) == 0) Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+	if ( *((UINT64*)D) & U64(0x0000008000000000))		N_SET(); else N_CLEAR();
+	if ((*((UINT64*)D) & U64(0x000000ffffffffff)) == 0) Z_SET(); else Z_CLEAR();
 
 	cycles += 2;
 	return 1;
@@ -3180,7 +3186,7 @@ static size_t dsp56k_op_movec(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 	if (W)
 	{
 		/* Write D */
-		UINT16 value = memory_read_word_16le(cpustate->data, WORD(*((UINT16*)R.addr))) ;
+		UINT16 value = memory_read_word_16le(cpustate->data, ADDRESS(*((UINT16*)R.addr))) ;
 		typed_pointer temp_src = { &value, DT_WORD };
 		SetDestinationValue(temp_src, SD);
 	}
@@ -3188,7 +3194,7 @@ static size_t dsp56k_op_movec(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 	{
 		/* Read S */
 		UINT16 dataMemOffset = *((UINT16*)R.addr);
-		SetDataMemoryValue(cpustate, SD, WORD(dataMemOffset));
+		SetDataMemoryValue(cpustate, SD, ADDRESS(dataMemOffset));
 	}
 
 	execute_MM_table(cpustate, BITS(op,0x0003), BITS(op,0x000c));
@@ -3222,7 +3228,7 @@ static size_t dsp56k_op_movec_1(dsp56k_core* cpustate, const UINT16 op, UINT8* c
 	if (W)
 	{
 		/* Write D */
-		UINT16 tempData = memory_read_word_16le(cpustate->data, WORD(memOffset));
+		UINT16 tempData = memory_read_word_16le(cpustate->data, ADDRESS(memOffset));
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
 		SetDestinationValue(temp_src, SD);
 	}
@@ -3231,7 +3237,7 @@ static size_t dsp56k_op_movec_1(dsp56k_core* cpustate, const UINT16 op, UINT8* c
 		/* Read S */
 		UINT16 tempData = *((UINT16*)SD.addr);
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
-		SetDataMemoryValue(cpustate, temp_src, WORD(memOffset));
+		SetDataMemoryValue(cpustate, temp_src, ADDRESS(memOffset));
 	}
 
 	/* S L E U N Z V C */
@@ -3266,7 +3272,7 @@ static size_t dsp56k_op_movec_2(dsp56k_core* cpustate, const UINT16 op, UINT8* c
 	if (W)
 	{
 		/* Write D */
-		UINT16 tempData = memory_read_word_16le(cpustate->data, WORD(memOffset));
+		UINT16 tempData = memory_read_word_16le(cpustate->data, ADDRESS(memOffset));
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
 		SetDestinationValue(temp_src, SD);
 	}
@@ -3275,7 +3281,7 @@ static size_t dsp56k_op_movec_2(dsp56k_core* cpustate, const UINT16 op, UINT8* c
 		/* Read S */
 		UINT16 tempData = *((UINT16*)SD.addr);
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
-		SetDataMemoryValue(cpustate, temp_src, WORD(memOffset));
+		SetDataMemoryValue(cpustate, temp_src, ADDRESS(memOffset));
 	}
 
 
@@ -3317,7 +3323,7 @@ static size_t dsp56k_op_movec_3(dsp56k_core* cpustate, const UINT16 op, const UI
 		else
 		{
 			/* 16-bit long address */
-			UINT16 tempD = memory_read_word_16le(cpustate->data, WORD(op2));
+			UINT16 tempD = memory_read_word_16le(cpustate->data, ADDRESS(op2));
 			typed_pointer tempTP = {&tempD, DT_WORD};
 			SetDestinationValue(tempTP, SD);
 		}
@@ -3333,7 +3339,7 @@ static size_t dsp56k_op_movec_3(dsp56k_core* cpustate, const UINT16 op, const UI
 		else
 		{
 			/* 16-bit long address */
-			SetDataMemoryValue(cpustate, SD, WORD(op2));
+			SetDataMemoryValue(cpustate, SD, ADDRESS(op2));
 		}
 	}
 
@@ -3395,7 +3401,7 @@ static size_t dsp56k_op_movec_5(dsp56k_core* cpustate, const UINT16 op, const UI
 	if (W)
 	{
 		/* Write D */
-		UINT16 tempData = memory_read_word_16le(cpustate->data, WORD(memOffset));
+		UINT16 tempData = memory_read_word_16le(cpustate->data, ADDRESS(memOffset));
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
 		SetDestinationValue(temp_src, SD);
 	}
@@ -3404,7 +3410,7 @@ static size_t dsp56k_op_movec_5(dsp56k_core* cpustate, const UINT16 op, const UI
 		/* Read S */
 		UINT16 tempData = *((UINT16*)SD.addr);
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
-		SetDataMemoryValue(cpustate, temp_src, WORD(memOffset));
+		SetDataMemoryValue(cpustate, temp_src, ADDRESS(memOffset));
 	}
 
 	/* S L E U N Z V C */
@@ -3458,7 +3464,7 @@ static size_t dsp56k_op_movem(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 	{
 		/* Read from Program Memory */
 		typed_pointer data;
-		UINT16 ldata = memory_read_word_16le(cpustate->program, WORD(*((UINT16*)R.addr)));
+		UINT16 ldata = memory_read_word_16le(cpustate->program, ADDRESS(*((UINT16*)R.addr)));
 
 		data.addr = &ldata;
 		data.data_type = DT_WORD;
@@ -3467,7 +3473,7 @@ static size_t dsp56k_op_movem(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 	else
 	{
 		/* Write to Program Memory */
-		SetProgramMemoryValue(cpustate, SD, WORD(*((UINT16*)R.addr))) ;
+		SetProgramMemoryValue(cpustate, SD, ADDRESS(*((UINT16*)R.addr))) ;
 	}
 
 	execute_MM_table(cpustate, BITS(op,0x00c0), BITS(op,0x0018));
@@ -3512,7 +3518,7 @@ static size_t dsp56k_op_movep(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 
 	if (W)
 	{
-		UINT16 data = memory_read_word_16le(cpustate->data, WORD(pp));
+		UINT16 data = memory_read_word_16le(cpustate->data, ADDRESS(pp));
 
 		typed_pointer tempTP;
 		tempTP.addr = &data;
@@ -3522,7 +3528,7 @@ static size_t dsp56k_op_movep(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 	}
 	else
 	{
-		SetDataMemoryValue(cpustate, SD, WORD(pp));
+		SetDataMemoryValue(cpustate, SD, ADDRESS(pp));
 	}
 
 	/* S L E U N Z V C */
@@ -3551,13 +3557,13 @@ static size_t dsp56k_op_movep_1(dsp56k_core* cpustate, const UINT16 op, UINT8* c
 	/* A little different than most W if's - opposite read and write */
 	if (W)
 	{
-		UINT16 data = memory_read_word_16le(cpustate->data, WORD(*((UINT16*)SD.addr)));
+		UINT16 data = memory_read_word_16le(cpustate->data, ADDRESS(*((UINT16*)SD.addr)));
 
 		typed_pointer tempTP;
 		tempTP.addr = &data;
 		tempTP.data_type = DT_WORD;
 
-		SetDataMemoryValue(cpustate, tempTP, WORD(pp));
+		SetDataMemoryValue(cpustate, tempTP, ADDRESS(pp));
 	}
 	else
 	{
@@ -3622,8 +3628,8 @@ static size_t dsp56k_op_mpysuuu(dsp56k_core* cpustate, const UINT16 op, UINT8* c
 	/* S L E U N Z V C */
 	/* - * * * * * * - */
 	/* TODO: L, E, U, V */
-	if ( *((UINT64*)D) & U64(0x0000008000000000))		N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if ((*((UINT64*)D) & U64(0x000000ffffffffff)) == 0) Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
+	if ( *((UINT64*)D) & U64(0x0000008000000000))		N_SET(); else N_CLEAR();
+	if ((*((UINT64*)D) & U64(0x000000ffffffffff)) == 0) Z_SET(); else Z_CLEAR();
 
 	cycles += 2;
 	return 1;
@@ -3685,7 +3691,7 @@ static size_t dsp56k_op_rep_1(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 		LC = iVal;
 
 		cpustate->repFlag = 1;
-		cpustate->repAddr = PC + WORD(1);
+		cpustate->repAddr = PC + ADDRESS(1);
 
 		cycles += 4;		/* TODO: + mv oscillator clock cycles */
 	}
@@ -3721,7 +3727,7 @@ static size_t dsp56k_op_rep_2(dsp56k_core* cpustate, const UINT16 op, UINT8* cyc
 		LC = repValue;
 
 		cpustate->repFlag = 1;
-		cpustate->repAddr = PC + WORD(1);
+		cpustate->repAddr = PC + ADDRESS(1);
 
 		cycles += 4;		/* TODO: + mv oscillator clock cycles */
 	}
@@ -3867,13 +3873,13 @@ static size_t dsp56k_op_tst2(dsp56k_core* cpustate, const UINT16 op, UINT8* cycl
 	/* S L E U N Z V C */
 	/* - * * * * * 0 0 */
 	/* (L,E,U should be set to 0) */
-	L_bit_set(cpustate, 0);
-	E_bit_set(cpustate, 0);
-	// U_bit_set(cpustate, 0);    /* TODO: Conflicting opinions?  "Set if unnormalized."  Documentation is weird (A&B?) */
-	if ((*((UINT16*)D.addr)) &  0x8000) N_bit_set(cpustate, 1); else N_bit_set(cpustate, 0);
-	if ((*((UINT16*)D.addr)) == 0x0000) Z_bit_set(cpustate, 1); else Z_bit_set(cpustate, 0);
-	// V_bit_set(cpustate, 0);    /* TODO: Verify as well! */
-	C_bit_set(cpustate, 0);
+	L_CLEAR();
+	E_CLEAR();
+	// U_CLEAR();    /* TODO: Conflicting opinions?  "Set if unnormalized."  Documentation is weird (A&B?) */
+	if ((*((UINT16*)D.addr)) &  0x8000) N_SET(); else N_CLEAR();
+	if ((*((UINT16*)D.addr)) == 0x0000) Z_SET(); else Z_CLEAR();
+	// V_CLEAR();    /* Unaffected */
+	C_CLEAR();
 
 	cycles += 2;
 	return 1;
@@ -3922,22 +3928,22 @@ static int decode_cccc_table(dsp56k_core* cpustate, UINT16 cccc)
 	switch (cccc)
 	{
 		/* Arranged according to mnemonic table - not decoding table */
-		case 0x0: if( C_bit(cpustate) == 0)													retVal = 1;  break;  // cc(hs)
-		case 0x8: if( C_bit(cpustate) == 1)													retVal = 1;  break;  // cs(lo)
-		case 0x5: if( E_bit(cpustate) == 0)													retVal = 1;  break;  // ec
-		case 0xa: if( Z_bit(cpustate) == 1)													retVal = 1;  break;  // eq
-		case 0xd: if( E_bit(cpustate) == 1)													retVal = 1;  break;  // es
-		case 0x1: if((N_bit(cpustate) ^  V_bit(cpustate)) == 0)								retVal = 1;  break;  // ge
-		case 0x7: if((Z_bit(cpustate) | (N_bit(cpustate) ^ V_bit(cpustate))) == 0)			retVal = 1;  break;  // gt
-		case 0x6: if( L_bit(cpustate) == 0)													retVal = 1;  break;  // lc
-		case 0xf: if((Z_bit(cpustate) | (N_bit(cpustate) ^ V_bit(cpustate))) == 1)			retVal = 1;  break;  // le
-		case 0xe: if( L_bit(cpustate) == 1)													retVal = 1;  break;  // ls
-		case 0x9: if((N_bit(cpustate) ^  V_bit(cpustate)) == 1)								retVal = 1;  break;  // lt
-		case 0xb: if( N_bit(cpustate) == 1)													retVal = 1;  break;  // mi
-		case 0x2: if( Z_bit(cpustate) == 0)													retVal = 1;  break;  // ne
-		case 0xc: if((Z_bit(cpustate) | ((!U_bit(cpustate)) & (!E_bit(cpustate)))) == 1)	retVal = 1;  break;  // nr
-		case 0x3: if( N_bit(cpustate) == 0)													retVal = 1;  break;  // pl
-		case 0x4: if((Z_bit(cpustate) | ((!U_bit(cpustate)) & (!E_bit(cpustate)))) == 0)	retVal = 1;  break;  // nn
+		case 0x0: if( C() == 0)							retVal = 1;  break;  // cc(hs)
+		case 0x8: if( C() == 1)							retVal = 1;  break;  // cs(lo)
+		case 0x5: if( E() == 0)							retVal = 1;  break;  // ec
+		case 0xa: if( Z() == 1)							retVal = 1;  break;  // eq
+		case 0xd: if( E() == 1)							retVal = 1;  break;  // es
+		case 0x1: if((N() ^  V()) == 0)					retVal = 1;  break;  // ge
+		case 0x7: if((Z() | (N() ^ V())) == 0)			retVal = 1;  break;  // gt
+		case 0x6: if( L() == 0)							retVal = 1;  break;  // lc
+		case 0xf: if((Z() | (N() ^ V())) == 1)			retVal = 1;  break;  // le
+		case 0xe: if( L() == 1)							retVal = 1;  break;  // ls
+		case 0x9: if((N() ^  V()) == 1)					retVal = 1;  break;  // lt
+		case 0xb: if( N() == 1)							retVal = 1;  break;  // mi
+		case 0x2: if( Z() == 0)							retVal = 1;  break;  // ne
+		case 0xc: if((Z() | ((!U()) & (!E()))) == 1)	retVal = 1;  break;  // nr
+		case 0x3: if( N() == 0)							retVal = 1;  break;  // pl
+		case 0x4: if((Z() | ((!U()) & (!E()))) == 0)	retVal = 1;  break;  // nn
 	}
 
 	return retVal;
@@ -4559,7 +4565,7 @@ static void execute_x_memory_data_move(dsp56k_core* cpustate, const UINT16 op, t
 	if (W)
 	{
 		/* From X:<ea> to SD */
-		UINT16 data = memory_read_word_16le(cpustate->data, WORD(*((UINT16*)R.addr)));
+		UINT16 data = memory_read_word_16le(cpustate->data, ADDRESS(*((UINT16*)R.addr)));
 
 		typed_pointer tempTP;
 		tempTP.addr = &data;
@@ -4577,11 +4583,11 @@ static void execute_x_memory_data_move(dsp56k_core* cpustate, const UINT16 op, t
 			tempTP.addr = prev_accum_value;
 			tempTP.data_type = DT_LONG_WORD;
 
-			SetDataMemoryValue(cpustate, tempTP, WORD(*((UINT16*)R.addr))) ;
+			SetDataMemoryValue(cpustate, tempTP, ADDRESS(*((UINT16*)R.addr))) ;
 		}
 		else
 		{
-			SetDataMemoryValue(cpustate, SD, WORD(*((UINT16*)R.addr))) ;
+			SetDataMemoryValue(cpustate, SD, ADDRESS(*((UINT16*)R.addr))) ;
 		}
 	}
 
@@ -4607,14 +4613,14 @@ static void execute_x_memory_data_move2(dsp56k_core* cpustate, const UINT16 op, 
 	if (W)
 	{
 		/* Write D */
-		UINT16 value = memory_read_word_16le(cpustate->data, WORD(*mem_offset));
+		UINT16 value = memory_read_word_16le(cpustate->data, ADDRESS(*mem_offset));
 		typed_pointer tempV = {&value, DT_WORD};
 		SetDestinationValue(tempV, SD);
 	}
 	else
 	{
 		/* Read S */
-		SetDataMemoryValue(cpustate, SD, WORD(*mem_offset));
+		SetDataMemoryValue(cpustate, SD, ADDRESS(*mem_offset));
 	}
 }
 
@@ -4635,7 +4641,7 @@ static void execute_x_memory_data_move_with_short_displacement(dsp56k_core* cpus
 	if (W)
 	{
 		/* Write D */
-		UINT16 tempData = memory_read_word_16le(cpustate->data, WORD(memOffset));
+		UINT16 tempData = memory_read_word_16le(cpustate->data, ADDRESS(memOffset));
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
 		SetDestinationValue(temp_src, SD);
 	}
@@ -4644,7 +4650,7 @@ static void execute_x_memory_data_move_with_short_displacement(dsp56k_core* cpus
 		/* Read S */
 		UINT16 tempData = *((UINT16*)SD.addr);
 		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
-		SetDataMemoryValue(cpustate, temp_src, WORD(memOffset));
+		SetDataMemoryValue(cpustate, temp_src, ADDRESS(memOffset));
 	}
 }
 
@@ -4671,13 +4677,13 @@ static void execute_dual_x_memory_data_read(dsp56k_core* cpustate, const UINT16 
 		fatalerror("Dsp56k: Unimplemented access to external X Data Memory >= 0xffc0 in Dual X Memory Data Read.");
 
 	/* First memmove */
-	srcVal1 = memory_read_word_16le(cpustate->data, WORD(*((UINT16*)R.addr)));
+	srcVal1 = memory_read_word_16le(cpustate->data, ADDRESS(*((UINT16*)R.addr)));
 	tempV.addr = &srcVal1;
 	tempV.data_type = DT_WORD;
 	SetDestinationValue(tempV, D1);
 
 	/* Second memmove */
-	srcVal2 = memory_read_word_16le(cpustate->data, WORD(R3));
+	srcVal2 = memory_read_word_16le(cpustate->data, ADDRESS(R3));
 	tempV.addr = &srcVal2;
 	tempV.data_type = DT_WORD;
 	SetDestinationValue(tempV, D2);

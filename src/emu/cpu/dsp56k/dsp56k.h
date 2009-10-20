@@ -240,9 +240,8 @@ typedef struct
 
 
 /***************************************************************************
-    PUBLIC FUNCTIONS
+    PUBLIC FUNCTIONS - ACCESSIBLE TO DRIVERS
 ***************************************************************************/
-
 void  dsp56k_host_interface_write(const device_config* device, UINT8 offset, UINT8 data);
 UINT8 dsp56k_host_interface_read(const device_config* device, UINT8 offset);
 

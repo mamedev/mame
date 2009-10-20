@@ -3,14 +3,6 @@
 ///////////////////////////////////////////
 
 /***************************************************************************
-    CURRENT CPU
-***************************************************************************/
-//TODO: Just an idea.
-//#define CCPU    cpustate
-//#define CCPUdef dsp56k_core* cpustate
-
-
-/***************************************************************************
     ALU
 ***************************************************************************/
 #define X		cpustate->ALU.x.d
@@ -33,7 +25,6 @@
 /***************************************************************************
     AGU
 ***************************************************************************/
-
 #define R0		cpustate->AGU.r0
 #define R1		cpustate->AGU.r1
 #define R2		cpustate->AGU.r2
@@ -50,6 +41,7 @@
 #define M3		cpustate->AGU.m3
 
 #define TEMP	cpustate->AGU.temp
+
 
 /***************************************************************************
     PCU
@@ -83,45 +75,72 @@ static void pcu_reset(dsp56k_core* cpustate);
 #define ST14	(SS[14].d)
 #define ST15	(SS[15].d)
 
-/* 1-25 STATUS REGISTER (SR) BITS */
+/* STATUS REGISTER (SR) BITS (1-25) */
 /* MR */
 static UINT8 LF_bit(dsp56k_core* cpustate);
 static UINT8 FV_bit(dsp56k_core* cpustate);
-//static UINT8 S_bits(dsp56k_core* cpustate); #define s1BIT ((SR & 0x0800) != 0) #define s0BIT ((SR & 0x0400) != 0)
+//static UINT8 S_bits(dsp56k_core* cpustate);
 static UINT8 I_bits(dsp56k_core* cpustate);
-/* CCR */
+
+/* CCR - with macros for easy access */
+#define S() (S_bit(cpustate))
 static UINT8 S_bit(dsp56k_core* cpustate);
+#define L() (L_bit(cpustate))
 static UINT8 L_bit(dsp56k_core* cpustate);
+#define E() (E_bit(cpustate))
 static UINT8 E_bit(dsp56k_core* cpustate);
+#define U() (U_bit(cpustate))
 static UINT8 U_bit(dsp56k_core* cpustate);
+#define N() (N_bit(cpustate))
 static UINT8 N_bit(dsp56k_core* cpustate);
+#define Z() (Z_bit(cpustate))
 static UINT8 Z_bit(dsp56k_core* cpustate);
+#define V() (V_bit(cpustate))
 static UINT8 V_bit(dsp56k_core* cpustate);
+#define C() (C_bit(cpustate))
 static UINT8 C_bit(dsp56k_core* cpustate);
 
-/* MR */
+/* MR setters */
 static void LF_bit_set(dsp56k_core* cpustate, UINT8 value);
 static void FV_bit_set(dsp56k_core* cpustate, UINT8 value);
 static void S_bits_set(dsp56k_core* cpustate, UINT8 value);
 static void I_bits_set(dsp56k_core* cpustate, UINT8 value);
-/* CCR */
+
+/* CCR setters - with macros for easy access */
+#define S_SET() (S_bit_set(cpustate, 1))
+#define S_CLEAR() (S_bit_set(cpustate, 0))
 static void S_bit_set(dsp56k_core* cpustate, UINT8 value);
+#define L_SET() (L_bit_set(cpustate, 1))
+#define L_CLEAR() (L_bit_set(cpustate, 0))
 static void L_bit_set(dsp56k_core* cpustate, UINT8 value);
+#define E_SET() (E_bit_set(cpustate, 1))
+#define E_CLEAR() (E_bit_set(cpustate, 0))
 static void E_bit_set(dsp56k_core* cpustate, UINT8 value);
+#define U_SET() (U_bit_set(cpustate, 1))
+#define U_CLEAR() (U_bit_set(cpustate, 0))
 static void U_bit_set(dsp56k_core* cpustate, UINT8 value);
+#define N_SET() (N_bit_set(cpustate, 1))
+#define N_CLEAR() (N_bit_set(cpustate, 0))
 static void N_bit_set(dsp56k_core* cpustate, UINT8 value);
+#define Z_SET() (Z_bit_set(cpustate, 1))
+#define Z_CLEAR() (Z_bit_set(cpustate, 0))
 static void Z_bit_set(dsp56k_core* cpustate, UINT8 value);
+#define V_SET() (V_bit_set(cpustate, 1))
+#define V_CLEAR() (V_bit_set(cpustate, 0))
 static void V_bit_set(dsp56k_core* cpustate, UINT8 value);
+#define C_SET() (C_bit_set(cpustate, 1))
+#define C_CLEAR() (C_bit_set(cpustate, 0))
 static void C_bit_set(dsp56k_core* cpustate, UINT8 value);
 
 // TODO: Maybe some functions for Interrupt Mask and Scaling Mode go here?
 
+
 /* 1-28 OPERATING MODE REGISTER (OMR) BITS */
-//static UINT8 CD_bit(dsp56k_core* cpustate); #define cdBIT ((OMR & 0x0080) != 0)
-//static UINT8 SD_bit(dsp56k_core* cpustate); #define sdBIT ((OMR & 0x0040) != 0)
-//static UINT8 R_bit(dsp56k_core* cpustate);  #define  rBIT ((OMR & 0x0020) != 0)
-//static UINT8 SA_bit(dsp56k_core* cpustate); #define saBIT ((OMR & 0x0010) != 0)
-//static UINT8 MC_bit(dsp56k_core* cpustate); #define mcBIT ((OMR & 0x0004) != 0)
+//static UINT8 CD_bit(dsp56k_core* cpustate);
+//static UINT8 SD_bit(dsp56k_core* cpustate);
+//static UINT8 R_bit(dsp56k_core* cpustate);
+//static UINT8 SA_bit(dsp56k_core* cpustate);
+//static UINT8 MC_bit(dsp56k_core* cpustate);
 static UINT8 MB_bit(dsp56k_core* cpustate);
 static UINT8 MA_bit(dsp56k_core* cpustate);
 
@@ -147,7 +166,6 @@ static UINT8 SE_bit(dsp56k_core* cpustate);
 #define BOOTSTRAP_HI (2)
 
 
-/* PROTOTYPES */
 /* PCU IRQ goodies */
 static void pcu_service_interrupts(dsp56k_core* cpustate);
 

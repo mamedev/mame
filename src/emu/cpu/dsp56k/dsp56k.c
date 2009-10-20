@@ -93,7 +93,7 @@ static DIRECT_UPDATE_HANDLER( dsp56k_direct_handler )
 ***************************************************************************/
 static void set_irq_line(dsp56k_core* cpustate, int irqline, int state)
 {
-	logerror("DSP56k set irq line %d %d\n", irqline, state);
+	//logerror("DSP56k set irq line %d %d\n", irqline, state);
 
 	switch(irqline)
 	{
@@ -404,19 +404,19 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;	// ?
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 8;							break;	// ?
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;					break;	// 1-5
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;	// 1-5
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -1;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = -1;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 16;							break;	// 1-5
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 16;							break;	// 1-5
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 		info->i = -1;							break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 16;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			info->i = 16;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 			info->i = -1;							break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 				info->i = 0;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 				info->i = 0;							break;
 
-		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODA:			info->i = DSP56K_IRQ_MODA;		break;
-		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODB:			info->i = DSP56K_IRQ_MODB;		break;
-		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODC:			info->i = DSP56K_IRQ_MODC;		break;
+		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODA:	info->i = DSP56K_IRQ_MODA;				break;
+		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODB:	info->i = DSP56K_IRQ_MODB;				break;
+		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODC:	info->i = DSP56K_IRQ_MODC;				break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + DSP56K_PC:			info->i = PC;							break;
@@ -474,13 +474,13 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_INT_REGISTER + DSP56K_ST15:		info->i = ST15;							break;
 
 		// --- the following bits of info are returned as pointers to data or functions ---
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(dsp56k);			break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(dsp56k);					break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(dsp56k);				break;
-		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(dsp56k);					break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(dsp56k);			break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;									break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(dsp56k);	break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(dsp56k); break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(dsp56k);		break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(dsp56k);	break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(dsp56k);		break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(dsp56k); break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(dsp56k); break;
 		case CPUINFO_FCT_DEBUG_INIT:					info->debug_init = NULL;				break;
 		case CPUINFO_FCT_TRANSLATE:						info->translate = NULL;					break;
 		case CPUINFO_FCT_READ:							info->read = NULL;						break;
@@ -494,10 +494,10 @@ CPU_GET_INFO( dsp56k )
 
 		// --- the following bits of info are returned as NULL-terminated strings ---
 		case DEVINFO_STR_NAME:							strcpy(info->s, "DSP56156");			break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Motorola DSP56156");	break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "0.1");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Andrew Gardner");		break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Motorola DSP56156");	break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "0.1");					break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Andrew Gardner");		break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%s%s %s%s%s%s%s%s%s%s %s%s",
