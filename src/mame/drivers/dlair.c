@@ -104,13 +104,13 @@ static int serial_receive(const device_config *device, int channel)
 }
 
 
-static const z80ctc_interface ctc_intf =
+static Z80CTC_INTERFACE( ctc_intf )
 {
 	0,              	/* timer disables */
-	dleuro_interrupt,  	/* interrupt handler */
-	0,					/* ZC/TO0 callback */
-	0,              	/* ZC/TO1 callback */
-	0               	/* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),  	/* interrupt handler */
+	DEVCB_NULL,			/* ZC/TO0 callback */
+	DEVCB_NULL,         /* ZC/TO1 callback */
+	DEVCB_NULL          /* ZC/TO2 callback */
 };
 
 

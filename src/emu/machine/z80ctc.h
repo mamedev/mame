@@ -10,6 +10,7 @@
 #ifndef __Z80CTC_H__
 #define __Z80CTC_H__
 
+#include "devcb.h"
 
 /***************************************************************************
     CONSTANTS
@@ -29,12 +30,16 @@
 typedef struct _z80ctc_interface z80ctc_interface;
 struct _z80ctc_interface
 {
-	int notimer;							/* timer disablers */
-	void (*intr)(const device_config *device, int which); /* callback when change interrupt status */
-	write8_device_func zc0;					/* ZC/TO0 callback */
-	write8_device_func zc1;					/* ZC/TO1 callback */
-	write8_device_func zc2;					/* ZC/TO2 callback */
+	int notimer;				/* timer disablers */
+	devcb_write_line intr;		/* callback when change interrupt status */
+	devcb_write_line zc0;		/* ZC/TO0 callback */
+	devcb_write_line zc1;		/* ZC/TO1 callback */
+	devcb_write_line zc2;		/* ZC/TO2 callback */
 };
+
+
+#define Z80CTC_INTERFACE(name) \
+	const z80ctc_interface (name)=
 
 
 
@@ -69,11 +74,10 @@ READ8_DEVICE_HANDLER( z80ctc_r );
     EXTERNAL TRIGGERS
 ***************************************************************************/
 
-void z80ctc_trg_w(const device_config *device, int trg, UINT8 data);
-WRITE8_DEVICE_HANDLER( z80ctc_trg0_w );
-WRITE8_DEVICE_HANDLER( z80ctc_trg1_w );
-WRITE8_DEVICE_HANDLER( z80ctc_trg2_w );
-WRITE8_DEVICE_HANDLER( z80ctc_trg3_w );
+WRITE_LINE_DEVICE_HANDLER( z80ctc_trg0_w );
+WRITE_LINE_DEVICE_HANDLER( z80ctc_trg1_w );
+WRITE_LINE_DEVICE_HANDLER( z80ctc_trg2_w );
+WRITE_LINE_DEVICE_HANDLER( z80ctc_trg3_w );
 
 
 

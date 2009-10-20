@@ -1516,19 +1516,13 @@ static const ay8910_interface demon_ay8910_interface_3 =
 };
 
 
-static void ctc_interrupt(const device_config *device, int state)
-{
-	cputag_set_input_line(device->machine, "audiocpu", 0, state);
-}
-
-
-static const z80ctc_interface demon_z80ctc_interface =
+static Z80CTC_INTERFACE( demon_z80ctc_interface )
 {
 	0,               /* timer disables */
-	ctc_interrupt,   /* interrupt handler */
-	0,               /* ZC/TO0 callback */
-	0,               /* ZC/TO1 callback */
-	0                /* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),   /* interrupt handler */
+	DEVCB_NULL,     /* ZC/TO0 callback */
+	DEVCB_NULL,		/* ZC/TO1 callback */
+	DEVCB_NULL		/* ZC/TO2 callback */
 };
 
 

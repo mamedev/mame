@@ -216,18 +216,6 @@ const pia6821_interface zwackery_pia2_intf =
  *
  *************************************/
 
-static void ctc_interrupt(const device_config *device, int state)
-{
-	cputag_set_input_line(device->machine, "maincpu", 0, state);
-}
-
-
-static WRITE_LINE_DEVICE_HANDLER( ipu_ctc_interrupt )
-{
-	cputag_set_input_line(device->machine, "ipu", 0, state);
-}
-
-
 const z80_daisy_chain mcr_daisy_chain[] =
 {
 	{ "ctc" },
@@ -245,29 +233,29 @@ const z80_daisy_chain mcr_ipu_daisy_chain[] =
 };
 
 
-const z80ctc_interface mcr_ctc_intf =
+Z80CTC_INTERFACE( mcr_ctc_intf )
 {
-	0,              	/* timer disables */
-	ctc_interrupt,  	/* interrupt handler */
-	z80ctc_trg1_w,		/* ZC/TO0 callback */
-	0,              	/* ZC/TO1 callback */
-	0               	/* ZC/TO2 callback */
+	0,              			/* timer disables */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),  	/* interrupt handler */
+	DEVCB_LINE(z80ctc_trg1_w),	/* ZC/TO0 callback */
+	DEVCB_NULL,              	/* ZC/TO1 callback */
+	DEVCB_NULL               	/* ZC/TO2 callback */
 };
 
 
-const z80ctc_interface nflfoot_ctc_intf =
+Z80CTC_INTERFACE( nflfoot_ctc_intf )
 {
 	0,                  /* timer disables */
-	ipu_ctc_interrupt,  /* interrupt handler */
-	0,					/* ZC/TO0 callback */
-	0,              	/* ZC/TO1 callback */
-	0               	/* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE("ipu", INPUT_LINE_IRQ0),  /* interrupt handler */
+	DEVCB_NULL,			/* ZC/TO0 callback */
+	DEVCB_NULL,			/* ZC/TO1 callback */
+	DEVCB_NULL         	/* ZC/TO2 callback */
 };
 
 
 const z80pio_interface nflfoot_pio_intf =
 {
-	DEVCB_LINE(ipu_ctc_interrupt),
+	DEVCB_CPU_INPUT_LINE("ipu", INPUT_LINE_IRQ0),  /* interrupt handler */
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -275,6 +263,12 @@ const z80pio_interface nflfoot_pio_intf =
 	DEVCB_NULL,
 	DEVCB_NULL
 };
+
+
+static WRITE_LINE_DEVICE_HANDLER( ipu_ctc_interrupt )
+{
+	cputag_set_input_line(device->machine, "ipu", 0, state);
+}
 
 
 const z80sio_interface nflfoot_sio_intf =
@@ -430,15 +424,15 @@ INTERRUPT_GEN( mcr_interrupt )
 
 	/* CTC line 2 is connected to VBLANK, which is once every 1/2 frame */
 	/* for the 30Hz interlaced display */
-	z80ctc_trg2_w(ctc, 0, 1);
-	z80ctc_trg2_w(ctc, 0, 0);
+	z80ctc_trg2_w(ctc, 1);
+	z80ctc_trg2_w(ctc, 0);
 
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */
 	if (cpu_getiloops(device) == 0)
 	{
-		z80ctc_trg3_w(ctc, 0, 1);
-		z80ctc_trg3_w(ctc, 0, 0);
+		z80ctc_trg3_w(ctc, 1);
+		z80ctc_trg3_w(ctc, 0);
 	}
 }
 
@@ -451,8 +445,8 @@ INTERRUPT_GEN( mcr_ipu_interrupt )
 	/* frame at 30Hz */
 	if (cpu_getiloops(device) == 0)
 	{
-		z80ctc_trg3_w(ctc, 0, 1);
-		z80ctc_trg3_w(ctc, 0, 0);
+		z80ctc_trg3_w(ctc, 1);
+		z80ctc_trg3_w(ctc, 0);
 	}
 }
 

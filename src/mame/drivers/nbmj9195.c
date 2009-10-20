@@ -468,41 +468,30 @@ static WRITE8_HANDLER( tmpz84c011_1_dir_pc_w )	{ pio_dir[7] = data; }
 static WRITE8_HANDLER( tmpz84c011_1_dir_pd_w )	{ pio_dir[8] = data; }
 static WRITE8_HANDLER( tmpz84c011_1_dir_pe_w )	{ pio_dir[9] = data; }
 
-
-static void ctc0_interrupt(const device_config *device, int state)
-{
-	cputag_set_input_line(device->machine, "maincpu", 0, state);
-}
-
-static void ctc1_interrupt(const device_config *device, int state)
-{
-	cputag_set_input_line(device->machine, "audiocpu", 0, state);
-}
-
 /* CTC of main cpu, ch0 trigger is vblank */
 static INTERRUPT_GEN( ctc0_trg1 )
 {
 	const device_config *ctc = devtag_get_device(device->machine, "main_ctc");
-	z80ctc_trg1_w(ctc, 0, 1);
-	z80ctc_trg1_w(ctc, 0, 0);
+	z80ctc_trg1_w(ctc, 1);
+	z80ctc_trg1_w(ctc, 0);
 }
 
-static const z80ctc_interface ctc_intf_main =
+static Z80CTC_INTERFACE( ctc_intf_main )
 {
 	0,							/* timer disables */
-	ctc0_interrupt,				/* interrupt handler */
-	0,							/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
-	0,							/* ZC/TO1 callback */
-	0,							/* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),/* interrupt handler */
+	DEVCB_NULL,					/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
+	DEVCB_NULL,					/* ZC/TO1 callback */
+	DEVCB_NULL					/* ZC/TO2 callback */
 };
 
-static const z80ctc_interface ctc_intf_audio =
+static Z80CTC_INTERFACE( ctc_intf_audio )
 {
 	0,							/* timer disables */
-	ctc1_interrupt,				/* interrupt handler */
-	z80ctc_trg3_w,				/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
-	0,							/* ZC/TO1 callback */
-	0							/* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),/* interrupt handler */
+	DEVCB_LINE(z80ctc_trg3_w),	/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
+	DEVCB_NULL,					/* ZC/TO1 callback */
+	DEVCB_NULL					/* ZC/TO2 callback */
 };
 
 static MACHINE_RESET( sailorws )

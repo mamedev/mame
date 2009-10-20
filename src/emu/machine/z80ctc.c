@@ -75,7 +75,8 @@
 typedef struct _ctc_channel ctc_channel;
 struct _ctc_channel
 {
-	write8_device_func 	zc;					/* zero crossing callbacks */
+	devcb_resolved_write_line	zc;			/* zero crossing callbacks */
+
 	UINT8				notimer;			/* no timer masks */
 	UINT16 				mode;				/* current mode */
 	UINT16 				tconst;				/* time constant */
@@ -89,10 +90,11 @@ struct _ctc_channel
 typedef struct _z80ctc z80ctc;
 struct _z80ctc
 {
+	devcb_resolved_write_line intr;			/* interrupt callback */
+
 	UINT8				vector;				/* interrupt vector */
 	attotime			period16;			/* 16/system clock */
 	attotime			period256;			/* 256/system clock */
-	void (*intr)(const device_config *device, int which);	/* interrupt callback */
 	ctc_channel			channel[4];			/* data for each channel */
 };
 
@@ -129,12 +131,10 @@ INLINE z80ctc *get_safe_token(const device_config *device)
 static void interrupt_check(const device_config *device)
 {
 	z80ctc *ctc = get_safe_token(device);
+	int state = (z80ctc_irq_state(device) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;
 
-	/* if we have a callback, update it with the current state */
-	if (ctc->intr != NULL)
-		(*ctc->intr)(device, (z80ctc_irq_state(device) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
+	devcb_call_write_line(&ctc->intr, state);
 }
-
 
 static TIMER_CALLBACK( timercallback )
 {
@@ -151,11 +151,8 @@ static TIMER_CALLBACK( timercallback )
 	}
 
 	/* generate the clock pulse */
-	if (channel->zc != NULL)
-	{
-		(*channel->zc)(device, 0, 1);
-		(*channel->zc)(device, 0, 0);
-	}
+	devcb_call_write_line(&channel->zc, 1);
+	devcb_call_write_line(&channel->zc, 0);
 
 	/* reset the down counter */
 	channel->down = channel->tconst;
@@ -317,7 +314,7 @@ READ8_DEVICE_HANDLER( z80ctc_r )
     EXTERNAL TRIGGERS
 ***************************************************************************/
 
-void z80ctc_trg_w(const device_config *device, int ch, UINT8 data)
+static void z80ctc_trg_w(const device_config *device, int ch, UINT8 data)
 {
 	z80ctc *ctc = get_safe_token(device);
 	ctc_channel *channel = &ctc->channel[ch];
@@ -370,10 +367,10 @@ void z80ctc_trg_w(const device_config *device, int ch, UINT8 data)
 		}
 	}
 }
-WRITE8_DEVICE_HANDLER( z80ctc_trg0_w ) { z80ctc_trg_w(device, 0, data); }
-WRITE8_DEVICE_HANDLER( z80ctc_trg1_w ) { z80ctc_trg_w(device, 1, data); }
-WRITE8_DEVICE_HANDLER( z80ctc_trg2_w ) { z80ctc_trg_w(device, 2, data); }
-WRITE8_DEVICE_HANDLER( z80ctc_trg3_w ) { z80ctc_trg_w(device, 3, data); }
+WRITE_LINE_DEVICE_HANDLER( z80ctc_trg0_w ) { z80ctc_trg_w(device, 0, state); }
+WRITE_LINE_DEVICE_HANDLER( z80ctc_trg1_w ) { z80ctc_trg_w(device, 1, state); }
+WRITE_LINE_DEVICE_HANDLER( z80ctc_trg2_w ) { z80ctc_trg_w(device, 2, state); }
+WRITE_LINE_DEVICE_HANDLER( z80ctc_trg3_w ) { z80ctc_trg_w(device, 3, state); }
 
 
 
@@ -475,11 +472,12 @@ static DEVICE_START( z80ctc )
 		channel->notimer = (intf->notimer >> ch) & 1;
 		channel->timer = timer_alloc(device->machine, timercallback, ptr);
 	}
-	ctc->intr = intf->intr;
-	ctc->channel[0].zc = intf->zc0;
-	ctc->channel[1].zc = intf->zc1;
-	ctc->channel[2].zc = intf->zc2;
-	ctc->channel[3].zc = NULL;
+
+	/* resolve callbacks */
+	devcb_resolve_write_line(&ctc->intr, &intf->intr, device);
+	devcb_resolve_write_line(&ctc->channel[0].zc, &intf->zc0, device);
+	devcb_resolve_write_line(&ctc->channel[1].zc, &intf->zc1, device);
+	devcb_resolve_write_line(&ctc->channel[2].zc, &intf->zc2, device);
 
 	/* register for save states */
     state_save_register_device_item(device, 0, ctc->vector);

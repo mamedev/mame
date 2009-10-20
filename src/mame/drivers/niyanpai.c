@@ -165,18 +165,13 @@ static WRITE8_HANDLER( tmpz84c011_0_dir_pd_w )	{ pio_dir[3] = data; }
 static WRITE8_HANDLER( tmpz84c011_0_dir_pe_w )	{ pio_dir[4] = data; }
 
 
-static void ctc0_interrupt(const device_config *device, int state)
+static Z80CTC_INTERFACE( ctc_intf )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, state);
-}
-
-static const z80ctc_interface ctc_intf =
-{
-	0,					/* timer disables */
-	ctc0_interrupt,		/* interrupt handler */
-	z80ctc_trg3_w,		/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
-	0,					/* ZC/TO1 callback */
-	0,					/* ZC/TO2 callback */
+	0,							/* timer disables */
+	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),/* interrupt handler */
+	DEVCB_LINE(z80ctc_trg3_w),	/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
+	DEVCB_NULL,					/* ZC/TO1 callback */
+	DEVCB_NULL					/* ZC/TO2 callback */
 };
 
 static MACHINE_RESET( niyanpai )

@@ -13,19 +13,37 @@
 #include "sound/dac.h"
 
 static int sound_flags;
+static int coin_flag;
 static const device_config *ctc;
+
+WRITE8_HANDLER( cchasm_reset_coin_flag_w )
+{
+	if (coin_flag)
+	{
+		coin_flag = 0;
+		z80ctc_trg0_w(ctc, coin_flag);
+	}
+}
+
+INPUT_CHANGED( cchasm_set_coin_flag )
+{
+	if (!newval && !coin_flag)
+	{
+		coin_flag = 1;
+		z80ctc_trg0_w(ctc, coin_flag);
+	}
+}
 
 READ8_HANDLER( cchasm_coin_sound_r )
 {
 	UINT8 coin = (input_port_read(space->machine, "IN3") >> 4) & 0x7;
-	if (coin != 0x7) coin |= 0x8;
-	return sound_flags | coin;
+	return sound_flags | (coin_flag << 3) | coin;
 }
 
 READ8_HANDLER( cchasm_soundlatch2_r )
 {
 	sound_flags &= ~0x80;
-	z80ctc_trg2_w(ctc, 0, 0);
+	z80ctc_trg2_w(ctc, 0);
 	return soundlatch2_r(space, offset);
 }
 
@@ -51,7 +69,7 @@ WRITE16_HANDLER( cchasm_io_w )
 		case 1:
 			sound_flags |= 0x80;
 			soundlatch2_w (space, offset, data);
-			z80ctc_trg2_w (ctc, 0, 1);
+			z80ctc_trg2_w(ctc, 1);
 			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			break;
 		case 2:
@@ -84,14 +102,9 @@ READ16_HANDLER( cchasm_io_r )
 static int channel_active[2];
 static int output[2];
 
-static void ctc_interrupt (const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( ctc_timer_1_w )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, state);
-}
-
-static WRITE8_DEVICE_HANDLER( ctc_timer_1_w )
-{
-	if (data) /* rising edge */
+	if (state) /* rising edge */
 	{
 		output[0] ^= 0x7f;
 		channel_active[0] = 1;
@@ -99,9 +112,9 @@ static WRITE8_DEVICE_HANDLER( ctc_timer_1_w )
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( ctc_timer_2_w )
+static WRITE_LINE_DEVICE_HANDLER( ctc_timer_2_w )
 {
-	if (data) /* rising edge */
+	if (state) /* rising edge */
 	{
 		output[1] ^= 0x7f;
 		channel_active[1] = 1;
@@ -109,29 +122,20 @@ static WRITE8_DEVICE_HANDLER( ctc_timer_2_w )
 	}
 }
 
-const z80ctc_interface cchasm_ctc_intf =
+Z80CTC_INTERFACE( cchasm_ctc_intf )
 {
 	0,               /* timer disables */
-	ctc_interrupt,   /* interrupt handler */
-	0,               /* ZC/TO0 callback */
-	ctc_timer_1_w,     /* ZC/TO1 callback */
-	ctc_timer_2_w      /* ZC/TO2 callback */
+	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),   /* interrupt handler */
+	DEVCB_NULL,					/* ZC/TO0 callback */
+	DEVCB_LINE(ctc_timer_1_w),	/* ZC/TO1 callback */
+	DEVCB_LINE(ctc_timer_2_w)	/* ZC/TO2 callback */
 };
-
-static TIMER_CALLBACK( cchasm_sh_update )
-{
-    if ((input_port_read(machine, "IN3") & 0x70) != 0x70)
-        z80ctc_trg0_w (ctc, 0, 1);
-}
 
 SOUND_START( cchasm )
 {
+	coin_flag = 0;
     sound_flags = 0;
     output[0] = 0; output[1] = 0;
 
 	ctc = devtag_get_device(machine, "ctc");
-
-	timer_pulse(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, cchasm_sh_update);
 }
-
-

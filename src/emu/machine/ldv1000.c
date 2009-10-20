@@ -148,10 +148,13 @@ static const ppi8255_interface ppi1intf =
 };
 
 
-static const z80ctc_interface ctcintf =
+static Z80CTC_INTERFACE( ctcintf )
 {
 	0,
-	ctc_interrupt
+	DEVCB_LINE(ctc_interrupt),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -249,8 +252,8 @@ static void ldv1000_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fiel
 	ldplayer_data *player = ld->player;
 
 	/* generate interrupts if we hit the edges */
-	z80ctc_trg1_w(player->ctc, 0, sliderpos == SLIDER_MINIMUM);
-	z80ctc_trg2_w(player->ctc, 0, sliderpos == SLIDER_MAXIMUM);
+	z80ctc_trg1_w(player->ctc, sliderpos == SLIDER_MINIMUM);
+	z80ctc_trg2_w(player->ctc, sliderpos == SLIDER_MAXIMUM);
 
 	/* signal VSYNC and set a timer to turn it off */
 	player->vsync = TRUE;
@@ -417,7 +420,7 @@ static TIMER_DEVICE_CALLBACK( multijump_timer )
     an interrupt in the daisy chain
 -------------------------------------------------*/
 
-static void ctc_interrupt(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( ctc_interrupt )
 {
 	laserdisc_state *ld = ldcore_get_safe_token(device->owner);
 	cpu_set_input_line(ld->player->cpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
