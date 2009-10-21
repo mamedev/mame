@@ -391,6 +391,44 @@ ROM_START( 1942a )
 	ROM_LOAD( "sb-9.m11", 0x0900, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )	/* video timing? (not used) */
 ROM_END
 
+/* this is the same as the 1942a set, but with a different rom arrangement (larger roms), it appears to be a common bootleg */
+ROM_START( 1942abl )
+	ROM_REGION( 0x1c000, "maincpu", 0 )	/* 64k for code + 3*16k for the banked ROMs images */
+	ROM_LOAD( "3.bin", 0x00000, 0x8000, CRC(f3184f5a) SHA1(a566c344ee1f63580d41aca95ece9ad1f7a135d2) )
+	ROM_LOAD( "5.bin", 0x10000, 0x4000, CRC(835f7b24) SHA1(24b66827f08c43fbf5b9517d638acdfc38e1b1e7) )
+	ROM_LOAD( "7.bin", 0x14000, 0x8000, CRC(2f456c6e) SHA1(b728c72f97ccdb57a4aac53ef7ca3f4516fc2ecb) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "1.bin", 0x0000, 0x4000, CRC(bd87f06b) SHA1(821f85cf157f81117eeaba0c3cf0337eac357e58) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "2.bin", 0x0000, 0x2000, CRC(6ebca191) SHA1(0dbddadde54a0ab66994c4a8726be05c6ca88a0e) )	/* characters */
+
+	ROM_REGION( 0xc000, "gfx2", 0 )
+	ROM_LOAD( "9.bin",  0x0000, 0x4000, CRC(60329fa4) SHA1(8f66c283c992a6bc676f5f0f739b7e9d07bbf9ee) )	/* tiles */
+	ROM_LOAD( "11.bin", 0x4000, 0x4000, CRC(66bac116) SHA1(ce21a693ad8d7592d21e05d0cb9eabb36e7e8fef) )
+	ROM_LOAD( "13.bin", 0x8000, 0x4000, CRC(623fcec1) SHA1(b3eea37d705e3871dc94e4cf6f2aacc6fbd09216) )
+
+	ROM_REGION( 0x10000, "gfx3", 0 )
+	ROM_LOAD( "14.bin", 0x04000, 0x4000, CRC(df2345ef) SHA1(3776edebda7bc9c72117f4b764f3bdaec0a632b4) )	/* sprites */
+	ROM_CONTINUE(0x0000,0x4000)
+	ROM_LOAD( "16.bin", 0x0c000, 0x4000, CRC(c106b1ed) SHA1(a16520752fb02e403c93975ecf12b75854d58d69) )
+	ROM_CONTINUE(0x8000,0x4000)
+	
+	// proms not in the set, assumed to be the same
+	ROM_REGION( 0x0a00, "proms", 0 )
+	ROM_LOAD( "sb-5.e8",  0x0000, 0x0100, CRC(93ab8153) SHA1(a792f24e5c0c3c4a6b436102e7a98199f878ece1) )	/* red component */
+	ROM_LOAD( "sb-6.e9",  0x0100, 0x0100, CRC(8ab44f7d) SHA1(f74680a6a987d74b3acb32e6396f20e127874149) )	/* green component */
+	ROM_LOAD( "sb-7.e10", 0x0200, 0x0100, CRC(f4ade9a4) SHA1(62ad31d31d183cce213b03168daa035083b2f28e) )	/* blue component */
+	ROM_LOAD( "sb-0.f1",  0x0300, 0x0100, CRC(6047d91b) SHA1(1ce025f9524c1033e48c5294ee7d360f8bfebe8d) )	/* char lookup table */
+	ROM_LOAD( "sb-4.d6",  0x0400, 0x0100, CRC(4858968d) SHA1(20b5dbcaa1a4081b3139e7e2332d8fe3c9e55ed6) )	/* tile lookup table */
+	ROM_LOAD( "sb-8.k3",  0x0500, 0x0100, CRC(f6fad943) SHA1(b0a24ea7805272e8ebf72a99b08907bc00d5f82f) )	/* sprite lookup table */
+	ROM_LOAD( "sb-2.d1",  0x0600, 0x0100, CRC(8bb8b3df) SHA1(49de2819c4c92057fedcb20425282515d85829aa) )	/* tile palette selector? (not used) */
+	ROM_LOAD( "sb-3.d2",  0x0700, 0x0100, CRC(3b0c99af) SHA1(38f30ac1e48632634e409f328ee3051b987de7ad) )	/* tile palette selector? (not used) */
+	ROM_LOAD( "sb-1.k6",  0x0800, 0x0100, CRC(712ac508) SHA1(5349d722ab6733afdda65f6e0a98322f0d515e86) )	/* interrupt timing (not used) */
+	ROM_LOAD( "sb-9.m11", 0x0900, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )	/* video timing? (not used) */
+ROM_END
+
 ROM_START( 1942b )
 	ROM_REGION( 0x1c000, "maincpu", 0 )	/* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "sr-03.m3", 0x00000, 0x4000, CRC(612975f2) SHA1(f3744335862dd4c53925cc32792badd4a378c837) )
@@ -481,7 +519,8 @@ static DRIVER_INIT( 1942 )
 }
 
 
-GAME( 1984, 1942,  0,    1942, 1942, 1942, ROT270, "Capcom", "1942 (Revision B)", GAME_SUPPORTS_SAVE )
-GAME( 1984, 1942a, 1942, 1942, 1942, 1942, ROT270, "Capcom", "1942 (Revision A)", GAME_SUPPORTS_SAVE )
-GAME( 1984, 1942b, 1942, 1942, 1942, 1942, ROT270, "Capcom", "1942 (First Version)", GAME_SUPPORTS_SAVE )
-GAME( 1985, 1942w, 1942, 1942, 1942, 1942, ROT270, "Capcom (Williams Electronics license)", "1942 (Williams Electronics license)", GAME_SUPPORTS_SAVE ) /* Based on 1942 (Revision B) */
+GAME( 1984, 1942,     0,    1942, 1942, 1942, ROT270, "Capcom", "1942 (Revision B)", GAME_SUPPORTS_SAVE )
+GAME( 1984, 1942a,    1942, 1942, 1942, 1942, ROT270, "Capcom", "1942 (Revision A)", GAME_SUPPORTS_SAVE )
+GAME( 1984, 1942abl,  1942, 1942, 1942, 1942, ROT270, "bootleg", "1942 (Revision A, bootleg)", GAME_SUPPORTS_SAVE ) // data is the same as 1942a set, different rom format
+GAME( 1984, 1942b,    1942, 1942, 1942, 1942, ROT270, "Capcom", "1942 (First Version)", GAME_SUPPORTS_SAVE )
+GAME( 1985, 1942w,    1942, 1942, 1942, 1942, ROT270, "Capcom (Williams Electronics license)", "1942 (Williams Electronics license)", GAME_SUPPORTS_SAVE ) /* Based on 1942 (Revision B) */

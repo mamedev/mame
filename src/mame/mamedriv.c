@@ -2416,6 +2416,7 @@ V-V                           TP-027
 	DRIVER( higemaru )	/*  9/1984 (c) 1984 */
 	DRIVER( 1942 )		/* 12/1984 (c) 1984 */
 	DRIVER( 1942a )		/* 12/1984 (c) 1984 */
+	DRIVER( 1942abl )	/* bootleg */
 	DRIVER( 1942b )		/* 12/1984 (c) 1984 */
 	DRIVER( 1942w )		/* 12/1984 (c) 1984 + Williams Electronics license (c) 1985 */
 	DRIVER( exedexes )	/*  2/1985 (c) 1985 */
