@@ -193,17 +193,17 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( mikie )
 	// basic machine hardware
-	MDRV_CPU_ADD("maincpu", M6809, 1250000)	// ??? MC68A09E
+	MDRV_CPU_ADD("maincpu", M6809, OSC/12)
 	MDRV_CPU_PROGRAM_MAP(mikie_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, CLK)	// 3.58 MHz
+	MDRV_CPU_ADD("audiocpu", Z80, CLK)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	// video hardware
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(60.59)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
@@ -217,13 +217,13 @@ static MACHINE_DRIVER_START( mikie )
 	MDRV_VIDEO_UPDATE(mikie)
 
 	// sound hardware
-	// manual says 2xSN76489AN but SN76489 sounds correct in the locker room level (sound test 24)
+	// on the pcb there are 2x76489AN but SN76489 sounds correct in the locker room level (sound test 24)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489, XTAL/8)
+	MDRV_SOUND_ADD("sn1", SN76489A, XTAL/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MDRV_SOUND_ADD("sn2", SN76489, CLK)
+	MDRV_SOUND_ADD("sn2", SN76489A, CLK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
