@@ -2423,10 +2423,6 @@ WRITE8_DEVICE_HANDLER( spacwalk_audio_2_w )
 #define SHUFFLE_C507	CAP_U(1)
 #define SHUFFLE_C508	CAP_U(1)
 
-#define SHUFFLE_HSYNC	15750	/* unmeasured */
-#define SHUFFLE_1V		SHUFFLE_HSYNC / 2
-#define SHUFFLE_32V		SHUFFLE_1V / 32
-
 
 static const discrete_op_amp_tvca_info shuffle_rolling_tvca =
 {
@@ -2510,8 +2506,8 @@ static DISCRETE_SOUND_START(shuffle)
 	/************************************************
      * Foul
      ************************************************/
-	DISCRETE_SQUAREWFIX(NODE_30,				/* 32V is a guess, scan of schematic is missing actual tone value used */
-		1, SHUFFLE_32V, DEFAULT_TTL_V_LOGIC_1, 50, DEFAULT_TTL_V_LOGIC_1 / 2, 0)	/* ENAB,FREQ,AMP,DUTY,BIAS,PHASE */
+	DISCRETE_SQUAREWFIX(NODE_30,				/* Connected to edge connector V - 120Hz */
+		1, 120, DEFAULT_TTL_V_LOGIC_1, 50, DEFAULT_TTL_V_LOGIC_1 / 2, 0)	/* ENAB,FREQ,AMP,DUTY,BIAS,PHASE */
 	DISCRETE_OP_AMP_TRIG_VCA(SHUFFLE_FOUL_SND,	/* IC M3-4, pin 5 */
 		SHUFFLE_FOUL_EN, 0, 0,					/* TRG0,TRG1,TRG2 */
 		NODE_30, 0,								/*IN0,IN1 */

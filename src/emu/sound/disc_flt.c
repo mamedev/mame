@@ -570,8 +570,8 @@ static DISCRETE_RESET(dst_op_amp_filt)
  * DST_RC_CIRCUIT_1 - RC charge/discharge circuit
  *
  ************************************************************************/
-#define DST_RC_CIRCUIT_1__IN1		DISCRETE_INPUT(0)
-#define DST_RC_CIRCUIT_1__IN2		DISCRETE_INPUT(1)
+#define DST_RC_CIRCUIT_1__IN0		DISCRETE_INPUT(0)
+#define DST_RC_CIRCUIT_1__IN1		DISCRETE_INPUT(1)
 #define DST_RC_CIRCUIT_1__R			DISCRETE_INPUT(2)
 #define DST_RC_CIRCUIT_1__C			DISCRETE_INPUT(3)
 
@@ -581,8 +581,8 @@ static DISCRETE_STEP( dst_rc_circuit_1 )
 {
 	struct dst_rc_circuit_1_context *context = (struct dst_rc_circuit_1_context *)node->context;
 
-	if (DST_RC_CIRCUIT_1__IN1 == 0)
-		if (DST_RC_CIRCUIT_1__IN2 == 0)
+	if (DST_RC_CIRCUIT_1__IN0 == 0)
+		if (DST_RC_CIRCUIT_1__IN1 == 0)
 			/* cap is floating and does not change charge */
 			/* output is pulled to ground */
 			node->output[0] = 0;
@@ -593,7 +593,7 @@ static DISCRETE_STEP( dst_rc_circuit_1 )
 			node->output[0] = context->v_cap * context->v_drop;
 		}
 	else
-		if (DST_RC_CIRCUIT_1__IN2 == 0)
+		if (DST_RC_CIRCUIT_1__IN1 == 0)
 		{
 			/* cap is charged */
 			context->v_cap += (5.0 - context->v_cap) * context->exp_1;
