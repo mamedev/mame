@@ -286,6 +286,7 @@ static const discrete_module module_list[] =
 	{ DST_SALLEN_KEY  ,"DST_SALLEN_KEY"  , 1 ,sizeof(struct dss_filter2_context)     ,dst_sallen_key_reset  ,dst_sallen_key_step  ,NULL                  ,NULL                 },
 	{ DST_CRFILTER    ,"DST_CRFILTER"    , 1 ,sizeof(struct dst_rcfilter_context)    ,dst_crfilter_reset    ,dst_crfilter_step    ,NULL                  ,NULL                 },
 	{ DST_OP_AMP_FILT ,"DST_OP_AMP_FILT" , 1 ,sizeof(struct dst_op_amp_filt_context) ,dst_op_amp_filt_reset ,dst_op_amp_filt_step ,NULL                  ,NULL                 },
+	{ DST_RC_CIRCUIT_1,"DST_RC_CIRCUIT_1", 1 ,sizeof(struct dst_rc_circuit_1_context),dst_rc_circuit_1_reset,dst_rc_circuit_1_step,NULL                  ,NULL                 },
 	{ DST_RCDISC      ,"DST_RCDISC"      , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc_reset      ,dst_rcdisc_step      ,NULL                  ,NULL                 },
 	{ DST_RCDISC2     ,"DST_RCDISC2"     , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc2_reset     ,dst_rcdisc2_step     ,NULL                  ,NULL                 },
 	{ DST_RCDISC3     ,"DST_RCDISC3"     , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc3_reset     ,dst_rcdisc3_step     ,NULL                  ,NULL                 },

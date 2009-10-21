@@ -857,7 +857,7 @@ static const discrete_mixer_desc dkongjr_s1_mixer_desc =
 
 static const discrete_lfsr_desc dkongjr_lfsr =
 {
-	DISC_CLK_BY_COUNT,
+	DISC_CLK_IS_FREQ,
 	16,			          /* Bit Length */
 	0,			          /* Reset Value */
 	2,			          /* Use Bit 2 (QC of first LS164) as F0 input 0 */
@@ -981,27 +981,13 @@ DISCRETE_TASK_END()
 	/************************************************/
 
 DISCRETE_TASK_START(1)
-#if (USE_LS629)
-	DISCRETE_74LS629(NODE_20,						/* IC 7P, pin 10 */
-		1,											/* ENAB */
-		0, DK_SUP_V,								/* VMOD, VRNG */
-		JR_C20, 0,									/* C, R_FREQ_IN */
-		DISC_LS624_OUT_COUNT_F)
-#else
-	/* this should be just replaced with a measured fixed frequency */
-	DISCRETE_74LS624(NODE_20, 0, 0.98*DK_SUP_V, JR_C20, DISC_LS624_OUT_COUNT_F)
-#endif
-
-//DISCRETE_74LS629(NODE_30,						/* IC 7P, pin 10 */
-//		1,											/* ENAB */
-//		0, DK_SUP_V,								/* VMOD, VRNG */
-//		JR_C20, 0,									/* C, R_FREQ_IN */
-//		DISC_LS624_OUT_LOGIC)
-//	/* this should be just replaced with a measured fixed frequency */
-//DISCRETE_74LS624(NODE_31, 0, 0.98*DK_SUP_V, JR_C20, DISC_LS624_OUT_LOGIC)
-//DISCRETE_WAVELOG2(NODE_30, 1000, NODE_31, 1000)
-//
-	DISCRETE_LFSR_NOISE(NODE_21, 1, 1, NODE_20, 1.0, 0, 0.5, &dkongjr_lfsr)
+	/* the noise source clock is a 74LS629 IC 7P, pin 10.
+	 * using JR_C20 as the timing cap, with Freq Control tied to 0V
+	 * and Range tied to 5V.  This creates a fixed frequency of 710Hz.
+	 * So for speed, I breadboarded and measured the frequency.
+	 * Oct 2009, D.R.
+	 */
+	DISCRETE_LFSR_NOISE(NODE_21, 1, 1, 710, 1.0, 0, 0.5, &dkongjr_lfsr)
 	DISCRETE_LS123_INV(NODE_25, DS_SOUND2_INV, JR_R17, JR_C27)
 	DISCRETE_RCDISC_MODULATED(NODE_26, NODE_25, NODE_21, 120, JR_R24, RES_K(0.001), JR_R18, JR_C29, DK_SUP_V)
 	/* The following circuit does not match 100%, however works.

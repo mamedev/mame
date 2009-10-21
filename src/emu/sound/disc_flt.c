@@ -12,6 +12,7 @@
  * DST_FILTER1           - Generic 1st order filter
  * DST_FILTER2           - Generic 2nd order filter
  * DST_OP_AMP_FILT       - Op Amp filter circuits
+ * DST_RC_CIRCUIT_1      - RC charge/discharge circuit
  * DST_RCDISC            - Simple discharging RC
  * DST_RCDISC2           - Simple charge R1/C, discharge R0/C
  * DST_RCDISC3           - Simple charge R1/c, discharge R0*R1/(R0+R1)/C
@@ -64,6 +65,16 @@ struct dst_op_amp_filt_context
 	double  y1, y2;		/* y[k-1], y[k-2], previous 2 output values */
 	double  a1,a2;		/* digital filter coefficients, denominator */
 	double  b0,b1,b2;	/* digital filter coefficients, numerator */
+};
+
+struct dst_rc_circuit_1_context
+{
+	double v_cap;
+	double v_charge_1_2;
+	double v_drop;
+	double exp_1;
+	double exp_1_2;
+	double exp_2;
 };
 
 struct dst_rcdisc_context
@@ -372,7 +383,7 @@ static DISCRETE_STEP(dst_op_amp_filt)
 			i  = context->iFixed;
 			switch (context->type)
 			{
-				case DISC_OP_AMP_FILTER_IS_LOW_PASS_1M:
+				case DISC_OP_AMP_FILTER_IS_LOW_PASS_1_A:
 					i += (DST_OP_AMP_FILT__INP1 - DST_OP_AMP_FILT__INP2) / info->r1;
 					if (info->r2 != 0)
 						i += (context->vP - DST_OP_AMP_FILT__INP2) / info->r2;
@@ -395,7 +406,7 @@ static DISCRETE_STEP(dst_op_amp_filt)
 				node->output[0] = context->vC1 * context->gain + info->vRef;
 				break;
 
-			case DISC_OP_AMP_FILTER_IS_LOW_PASS_1M:
+			case DISC_OP_AMP_FILTER_IS_LOW_PASS_1_A:
 				context->vC1 += (v - context->vC1) * context->exponentC1;
 				node->output[0] = context->vC1 * context->gain + DST_OP_AMP_FILT__INP2;
 				break;
@@ -497,7 +508,7 @@ static DISCRETE_RESET(dst_op_amp_filt)
 	switch (context->type)
 	{
 		case DISC_OP_AMP_FILTER_IS_LOW_PASS_1:
-		case DISC_OP_AMP_FILTER_IS_LOW_PASS_1M:
+		case DISC_OP_AMP_FILTER_IS_LOW_PASS_1_A:
 			context->exponentC1 = RC_CHARGE_EXP(info->rF * info->c1);
 			context->exponentC2 =  0;
 			break;
@@ -553,6 +564,70 @@ static DISCRETE_RESET(dst_op_amp_filt)
 	node->output[0] = info->vRef;
 }
 
+
+/************************************************************************
+ *
+ * DST_RC_CIRCUIT_1 - RC charge/discharge circuit
+ *
+ ************************************************************************/
+#define DST_RC_CIRCUIT_1__IN1		DISCRETE_INPUT(0)
+#define DST_RC_CIRCUIT_1__IN2		DISCRETE_INPUT(1)
+#define DST_RC_CIRCUIT_1__R			DISCRETE_INPUT(2)
+#define DST_RC_CIRCUIT_1__C			DISCRETE_INPUT(3)
+
+#define CD4066_R_ON	270
+
+static DISCRETE_STEP( dst_rc_circuit_1 )
+{
+	struct dst_rc_circuit_1_context *context = (struct dst_rc_circuit_1_context *)node->context;
+
+	if (DST_RC_CIRCUIT_1__IN1 == 0)
+		if (DST_RC_CIRCUIT_1__IN2 == 0)
+			/* cap is floating and does not change charge */
+			/* output is pulled to ground */
+			node->output[0] = 0;
+		else
+		{
+			/* cap is discharged */
+			context->v_cap -= context->v_cap * context->exp_2;
+			node->output[0] = context->v_cap * context->v_drop;
+		}
+	else
+		if (DST_RC_CIRCUIT_1__IN2 == 0)
+		{
+			/* cap is charged */
+			context->v_cap += (5.0 - context->v_cap) * context->exp_1;
+			/* output is pulled to ground */
+			node->output[0] = 0;
+		}
+		else
+		{
+			/* cap is charged slightly less */
+			context->v_cap += (context->v_charge_1_2 - context->v_cap) * context->exp_1_2;
+			node->output[0] = context->v_cap * context->v_drop;
+		}
+}
+
+static DISCRETE_RESET( dst_rc_circuit_1 )
+{
+	struct dst_rc_circuit_1_context *context = (struct dst_rc_circuit_1_context *)node->context;
+
+	/* the charging voltage across the cap based on in2*/
+	context->v_drop =  RES_VOLTAGE_DIVIDER(CD4066_R_ON, CD4066_R_ON + DST_RC_CIRCUIT_1__R);
+	context->v_charge_1_2 = 5.0 * context->v_drop;
+	context->v_cap = 0;
+
+	/* precalculate charging exponents */
+	/* discharge cap - in1 = 0, in2 = 1*/
+	context->exp_2 = RC_CHARGE_EXP((CD4066_R_ON + DST_RC_CIRCUIT_1__R) * DST_RC_CIRCUIT_1__C);
+	/* charge cap - in1 = 1, in2 = 0 */
+	context->exp_1 = RC_CHARGE_EXP(CD4066_R_ON * DST_RC_CIRCUIT_1__C);
+	/* charge cap - in1 = 1, in2 = 1 */
+	context->exp_1_2 = RC_CHARGE_EXP(RES_2_PARALLEL(CD4066_R_ON, CD4066_R_ON + DST_RC_CIRCUIT_1__R) * DST_RC_CIRCUIT_1__C);
+
+	/* starts at 0 until cap starts charging */
+	node->output[0] = 0;
+}
 
 /************************************************************************
  *

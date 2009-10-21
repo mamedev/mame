@@ -25,7 +25,7 @@ D0  explosion enable        gates a noise generator
 #include "sound/discrete.h"
 #include "sound/pokey.h"
 
-#define BZ_NOISE_CLOCK		12000		/* FIXME */
+#define BZ_NOISE_CLOCK		12000
 
 /*************************************
  *
@@ -43,7 +43,7 @@ D0  explosion enable        gates a noise generator
 #define BZ_INP_STARTLED		NODE_10_06
 #define BZ_INP_MOTEN		NODE_10_07
 
-#define TTL_OUT 5
+#define TTL_OUT 3.4
 
 #define BZ_R5			RES_K(1)
 #define BZ_R6			RES_K(4.7)
@@ -83,6 +83,7 @@ D0  explosion enable        gates a noise generator
 #define BZ_C13			CAP_U(10)
 #define BZ_C14			CAP_U(10)
 
+#define BZ_C20			CAP_U(0.1)
 #define BZ_C21			CAP_U(0.0047)
 #define BZ_C22			CAP_U(0.0047)
 #define BZ_C29			CAP_U(0.47)
@@ -168,14 +169,96 @@ static const discrete_mixer_desc bzone_eng_mixer_desc =
 static const discrete_mixer_desc bzone_final_mixer_desc =
 {
 	DISC_MIXER_IS_RESISTOR,
-	{BZ_R28, BZ_R25, BZ_R26, BZ_R27},
+	{BZ_R25, BZ_R28, BZ_R26 + BZ_R20 / 4, BZ_R27},
 	{0, 0, 0, 0},
 	{0, 0, 0, 0},
 	0, BZ_R29,
 	0,
-	0, /* no out cap */
+	BZ_C20, /* The speakers are driven by a +/- signal, just using the cap is good enough */
 	0, 1
 };
+
+
+/************************************************************************
+ *
+ * Custom Battlezone filter
+ *
+ *         .------.         r2           c
+ *         |     O|-----+--ZZZZ--+-------||---------.
+ *         | 4066 |     |        |                  |
+ *  IN0 >--|c    I|-.   Z r1     |       r5         |
+ *         '------' |   Z        +------ZZZZ--------+
+ *                  |   Z        |                  |
+ *                 gnd  |        |           |\     |
+ *                     gnd       |           | \    |
+ *                               '-----------|- \   |
+ *            r3                             |   >--+----> Netlist Node
+ *  IN1 >----ZZZZ----------------+-----------|+ /
+ *                               |           | /
+ *                               Z r4        |/
+ *                               Z
+ *                               Z
+ *                               |           VP = B+
+ *                              gnd
+ *
+ ************************************************************************/
+#define BZONE_CUSTOM_FILTER__IN0	DISCRETE_INPUT(0)
+#define BZONE_CUSTOM_FILTER__IN1	DISCRETE_INPUT(1)
+#define BZONE_CUSTOM_FILTER__R1		DISCRETE_INPUT(2)
+#define BZONE_CUSTOM_FILTER__R2		DISCRETE_INPUT(3)
+#define BZONE_CUSTOM_FILTER__R3		DISCRETE_INPUT(4)
+#define BZONE_CUSTOM_FILTER__R4		DISCRETE_INPUT(5)
+#define BZONE_CUSTOM_FILTER__R5		DISCRETE_INPUT(6)
+#define BZONE_CUSTOM_FILTER__C		DISCRETE_INPUT(7)
+#define BZONE_CUSTOM_FILTER__VP		DISCRETE_INPUT(8)
+
+struct bzone_custom_filter_context
+{
+	double	v_in1_gain;
+	double	v_p;
+	double	exponent;
+	double	gain[2];
+};
+
+#define CD4066_R_ON		270
+
+static DISCRETE_STEP(bzone_custom_filter)
+{
+	struct bzone_custom_filter_context *context = (struct bzone_custom_filter_context *)node->context;
+
+	int		in0 = (BZONE_CUSTOM_FILTER__IN0 == 0) ? 0 : 1;
+	double 	v;
+
+	if (BZONE_CUSTOM_FILTER__IN1 > 0)
+		v = 0;
+
+	v = BZONE_CUSTOM_FILTER__IN1 * context->v_in1_gain * context->gain[in0];
+	if (v > context->v_p) v = context->v_p;
+	if (v < 0) v = 0;
+
+	node->output[0] += (v - node->output[0]) * context->exponent;
+}
+
+static DISCRETE_RESET(bzone_custom_filter)
+{
+	struct bzone_custom_filter_context   *context = (struct bzone_custom_filter_context *)node->context;
+
+	context->gain[0] = BZONE_CUSTOM_FILTER__R1 + BZONE_CUSTOM_FILTER__R2;
+	context->gain[0] = BZONE_CUSTOM_FILTER__R5 / context->gain[0] + 1;
+	context->gain[1] = RES_2_PARALLEL(CD4066_R_ON, BZONE_CUSTOM_FILTER__R1) + BZONE_CUSTOM_FILTER__R2;
+	context->gain[1] = BZONE_CUSTOM_FILTER__R5 / context->gain[1] + 1;
+	context->v_in1_gain = RES_VOLTAGE_DIVIDER(BZONE_CUSTOM_FILTER__R3, BZONE_CUSTOM_FILTER__R4);
+	context->v_p = BZONE_CUSTOM_FILTER__VP - OP_AMP_VP_RAIL_OFFSET;
+	context->exponent = RC_CHARGE_EXP(BZONE_CUSTOM_FILTER__R5 * BZONE_CUSTOM_FILTER__C);;
+	node->output[0] = 0;
+}
+
+static const discrete_custom_info bzone_custom_filter =
+{
+	DISCRETE_CUSTOM_MODULE( bzone_custom_filter, struct bzone_custom_filter_context),
+	NULL
+};
+
 
 /*************************************
  *
@@ -186,13 +269,14 @@ static const discrete_mixer_desc bzone_final_mixer_desc =
 static DISCRETE_SOUND_START(bzone)
 
 	/************************************************/
-	/* Input register mapping for galaxian          */
+	/* Input register mapping for Battlezone        */
 	/************************************************/
 	DISCRETE_INPUT_DATA(BZ_INPUT)
 
 	/* decode the bits */
-	DISCRETE_BITS_DECODE(NODE_10, BZ_INPUT, 0, 7, 5.7)// TTL_OUT)       /* QA-QD 74393 */
-	DISCRETE_ADJUSTMENT_TAG(NODE_11, 0, RES_K(250), DISC_LINADJ, "R11")
+	DISCRETE_BITS_DECODE(NODE_10, BZ_INPUT, 0, 7, 1)      		 /* QA-QD 74393 */
+	/* the pot is 250K, but we will use a smaller range to get a better adjustment range */
+	DISCRETE_ADJUSTMENT_TAG(NODE_11, RES_K(75), RES_K(10), DISC_LINADJ, "R11")
 
 
 	/************************************************/
@@ -215,41 +299,38 @@ static DISCRETE_SOUND_START(bzone)
 	/* Explosion                                    */
 	/************************************************/
 
-	/* FIXME: +0.7 for diode */
-	DISCRETE_RCDISC5(NODE_40, NODE_34, BZ_INP_EXPLO, BZ_R17 + BZ_R16, BZ_C14)
-	DISCRETE_MULTIPLY(NODE_41, BZ_R16 / (BZ_R17 + BZ_R16), NODE_40)
-
-	/* one of two filter configurations active */
-	DISCRETE_LOGIC_INVERT(NODE_42, BZ_INP_EXPLOLS)
-	DISCRETE_OP_AMP_FILTER(NODE_43, BZ_INP_EXPLOLS,  0, NODE_41,
-			DISC_OP_AMP_FILTER_IS_LOW_PASS_1M, &bzone_explo_1)
-	DISCRETE_OP_AMP_FILTER(NODE_44, NODE_42,  0, NODE_41,
-		DISC_OP_AMP_FILTER_IS_LOW_PASS_1M, &bzone_explo_0)
-	DISCRETE_ADDER2(NODE_45, 1, NODE_43, NODE_44)
+	DISCRETE_RC_CIRCUIT_1(NODE_40,
+		BZ_INP_EXPLO, NODE_34,				/* INP0, INP1 */
+		BZ_R17 + BZ_R16, BZ_C14)
+	DISCRETE_CUSTOM9(NODE_45,				/* IC K5, pin 1 */
+		BZ_INP_EXPLOLS, NODE_40,			/* IN0, IN1 */
+		BZ_R19, BZ_R18, BZ_R17, BZ_R16, BZ_R33,
+		BZ_C22,
+		22,									/* B+ of op-amp */
+		&bzone_custom_filter)
 
 	/************************************************/
 	/* Shell                                        */
 	/************************************************/
-	/* FIXME: +0.7 for diode */
-	DISCRETE_RCDISC5(NODE_50, NODE_31, BZ_INP_SHELL, BZ_R14 + BZ_R15, BZ_C9)
-	DISCRETE_MULTIPLY(NODE_51, BZ_R15 / (BZ_R14 + BZ_R15), NODE_50)
-
-	/* one of two filter configurations active */
-	DISCRETE_LOGIC_INVERT(NODE_52, BZ_INP_SHELLLS)
-	DISCRETE_OP_AMP_FILTER(NODE_53, BZ_INP_SHELLLS,  0, NODE_51,
-			DISC_OP_AMP_FILTER_IS_LOW_PASS_1M, &bzone_shell_1)
-	DISCRETE_OP_AMP_FILTER(NODE_54, NODE_52,  0, NODE_51,
-		DISC_OP_AMP_FILTER_IS_LOW_PASS_1M, &bzone_shell_0)
-	DISCRETE_ADDER2(NODE_55, 1, NODE_53, NODE_54)
+	DISCRETE_RC_CIRCUIT_1(NODE_50,
+		BZ_INP_SHELL, NODE_31,				/* INP0, INP1 */
+		BZ_R14 + BZ_R15, BZ_C9)
+	DISCRETE_MULTIPLY(NODE_51, RES_VOLTAGE_DIVIDER(BZ_R14, BZ_R15), NODE_50)
+	DISCRETE_CUSTOM9(NODE_55,				/* IC K5, pin 1 */
+		BZ_INP_EXPLOLS, NODE_50,			/* IN0, IN1 */
+		BZ_R12, BZ_R13, BZ_R14, BZ_R15, BZ_R32,
+		BZ_C21,
+		22,									/* B+ of op-amp */
+		&bzone_custom_filter)
 
 	/************************************************/
 	/* Engine                                       */
 	/************************************************/
 
-
-	DISCRETE_TRANSFORM2(NODE_60, BZ_INP_ENGREV, 0.0, "01=")
-	// FIXME: from R5 .. R7
-	DISCRETE_MULTIPLEX2(NODE_61, NODE_60, 2.5, 4.2)
+	DISCRETE_SWITCH(NODE_61,
+		1, BZ_INP_ENGREV,									/* ENAB, SWITCH */
+		5.0 * RES_VOLTAGE_DIVIDER(BZ_R7, BZ_R6),			/* INP0 */
+		5.0 * RES_VOLTAGE_DIVIDER(BZ_R7, RES_2_PARALLEL(CD4066_R_ON + BZ_R5, BZ_R6)))	/* INP1 */
 	DISCRETE_RCDISC3(NODE_62, 1, NODE_61, BZ_R8, BZ_R9, BZ_C13, -0.5)
 
 	/* R11 taken from adjuster port */
@@ -270,12 +351,10 @@ static DISCRETE_SOUND_START(bzone)
 	/* FINAL MIX                                    */
 	/************************************************/
 
-	/* not sure about pokey output levels - below is just a estimate */
-	DISCRETE_INPUTX_STREAM(NODE_85, 0, 5.0/32767.0 * 4, 0)
-
-	DISCRETE_MIXER4(NODE_280, 1, NODE_45, NODE_55, NODE_75, NODE_85, &bzone_final_mixer_desc)
-	DISCRETE_OUTPUT(NODE_280, 32767.0/1.75)
-	//DISCRETE_WAVELOG2(NODE_30, 32767.0/5.0, NODE_31, 32767.0/5.0)
+	/* not sure about pokey output levels - below is just a estimate to get a 5V signal */
+	DISCRETE_INPUTX_STREAM(NODE_85, 0, 5.0 / 11000, 0)
+	DISCRETE_MIXER4(NODE_280, 1, NODE_55, NODE_45, NODE_75, NODE_85, &bzone_final_mixer_desc)
+	DISCRETE_OUTPUT(NODE_280, 50000)
 
 DISCRETE_SOUND_END
 

@@ -289,6 +289,7 @@
  * DISCRETE_CRFILTER(NODE,IN0,RVAL,CVAL)
  * DISCRETE_CRFILTER_VREF(NODE,IN0,RVAL,CVAL,VREF)
  * DISCRETE_OP_AMP_FILTER(NODE,ENAB,INP0,INP1,TYPE,INFO)
+ * DISCRETE_RC_CIRCUIT_1(NODE,INP0,INP1,RVAL,CVAL)
  * DISCRETE_RCDISC(NODE,ENAB,IN0,RVAL,CVAL)
  * DISCRETE_RCDISC2(NODE,SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL)
  * DISCRETE_RCDISC3(NODE,ENAB,INP0,RVAL0,RVAL1,CVAL, DJV)
@@ -2310,8 +2311,8 @@
  *  vRef >-----------------------'  |/
  *
  *          --------------------------------------------------
-  *
- *     DISC_OP_AMP_FILTER_IS_LOW_PASS_1M
+ *
+ *     DISC_OP_AMP_FILTER_IS_LOW_PASS_1_A
  *          First Order Low Pass Filter
  *
  *                              c1
@@ -2485,8 +2486,44 @@
  *      http://en.wikipedia.org/wiki/Sallen_Key_filter
  ***********************************************************************
  *
+ * DISCRETE_RC_CIRCUIT_1 - RC charge/discharge circuit
+ *
+ *  Declaration syntax
+ *
+ *     DISCRETE_RC_CIRCUIT_1(name of node,
+ *                           In0 (Logic) node,
+ *                           In1 (Logic) node,
+ *                           R static value,
+ *                           C static value)
+ *
+ *              5V
+ *               v
+ *               |
+ *           .-------.
+ *           |  4066 |
+ *   In0 >---|c      |
+ *           '-------'
+ *               |
+ *               +------------.
+ *               |            |
+ *           .-------.       --- C
+ *           |  4066 |       ---
+ *   In1 >---|c      |        |
+ *           '-------'       gnd
+ *               |
+ *               +----> Node Output
+ *               |
+ *               Z
+ *               Z R
+ *               Z
+ *               |
+ *              gnd
+ *
+ * EXAMPLES: see Sky Raider, Battlezone
+ *
+ ************************************************************************
+ *
  * DISCRETE_RCDISC - Simple single pole RC discharge network
- * DISCRETE_RCFILTER_VREF - Same but refrenced to vRef not 0V
  *
  *                        .------------.
  *                        |            |
@@ -2506,12 +2543,6 @@
  *                       input node (or value),
  *                       resistor value in OHMS,
  *                       capacitor value in FARADS)
- *
- *     DISCRETE_RCFILTER_VREF(name of node,
- *                            input node (or value)
- *                            resistor value in OHMS
- *                            capacitor value in FARADS,
- *                            vRef node or static value)
  *
  *  Example config line
  *
@@ -3580,7 +3611,7 @@ enum
 #define DISC_OP_AMP_FILTER_IS_BAND_PASS_1M	0x30
 #define DISC_OP_AMP_FILTER_IS_HIGH_PASS_0	0x40
 #define DISC_OP_AMP_FILTER_IS_BAND_PASS_0	0x50
-#define DISC_OP_AMP_FILTER_IS_LOW_PASS_1M	0x60
+#define DISC_OP_AMP_FILTER_IS_LOW_PASS_1_A	0x60
 
 #define DISC_OP_AMP_FILTER_TYPE_MASK		(0xf0 | DISC_OP_AMP_IS_NORTON)	// Used only internally.
 
@@ -4279,7 +4310,6 @@ enum
 	DST_OP_AMP_1SHT,	/* Op Amp One Shot */
 	DST_TVCA_OP_AMP,	/* Triggered Op Amp Voltage controlled  amplifier circuits */
 	DST_VCA,			/* IC Voltage controlled  amplifiers */
-//  DST_DELAY,          /* Phase shift/Delay line */
 
 	/* from disc_flt.c */
 	/* generic modules */
@@ -4289,6 +4319,7 @@ enum
 	DST_SALLEN_KEY,		/* Sallen key filters */
 	DST_CRFILTER,		/* RC Bypass Filter (High Pass) */
 	DST_OP_AMP_FILT,	/* Op Amp filters */
+	DST_RC_CIRCUIT_1,
 	DST_RCDISC,			/* Simple RC discharge */
 	DST_RCDISC2,		/* Switched 2 Input RC discharge */
 	DST_RCDISC3,		/* Charge/discharge with diode */
@@ -4468,6 +4499,7 @@ enum
 #define DISCRETE_CRFILTER(NODE,INP0,RVAL,CVAL)                          { NODE, DST_CRFILTER    , 4, { INP0,RVAL,CVAL }, { INP0,RVAL,CVAL }, NULL, "DISCRETE_CRFILTER" },
 #define DISCRETE_CRFILTER_VREF(NODE,INP0,RVAL,CVAL,VREF)                { NODE, DST_CRFILTER    , 5, { INP0,RVAL,CVAL,VREF }, { INP0,RVAL,CVAL,VREF }, NULL, "DISCRETE_CRFILTER_VREF" },
 #define DISCRETE_OP_AMP_FILTER(NODE,ENAB,INP0,INP1,TYPE,INFO)           { NODE, DST_OP_AMP_FILT , 4, { ENAB,INP0,INP1,NODE_NC }, { ENAB,INP0,INP1,TYPE }, INFO, "DISCRETE_OP_AMP_FILTER" },
+#define DISCRETE_RC_CIRCUIT_1(NODE,INP0,INP1,RVAL,CVAL)                 { NODE, DST_RC_CIRCUIT_1, 4, { INP0,INP1,NODE_NC,NODE_NC }, { INP0,INP1,RVAL,CVAL }, NULL, "DISCRETE_RC_CIRCUIT_1" },
 #define DISCRETE_RCDISC(NODE,ENAB,INP0,RVAL,CVAL)                       { NODE, DST_RCDISC      , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCDISC" },
 #define DISCRETE_RCDISC2(NODE,SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL)        { NODE, DST_RCDISC2     , 6, { SWITCH,INP0,NODE_NC,INP1,NODE_NC,NODE_NC }, { SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL }, NULL, "DISCRETE_RCDISC2" },
 #define DISCRETE_RCDISC3(NODE,ENAB,INP0,RVAL0,RVAL1,CVAL,DJV)           { NODE, DST_RCDISC3     , 6, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,CVAL,DJV }, NULL, "DISCRETE_RCDISC3" },

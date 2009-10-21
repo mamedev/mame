@@ -103,115 +103,6 @@ static const discrete_mixer_desc skyraid_mixer =
 
 /************************************************************************
  *
- * Custom skyraid explosion charge
- *
- * input[0]    - In1 (Logic)
- * input[1]    - In2 (Logic)
- * input[2]    - R
- * input[3]    - C
- *
- *              5V
- *               v
- *               |
- *           .-------.
- *           |  4066 |
- *   In1 >---|c      |
- *           '-------'
- *               |
- *               +------------.
- *               |            |
- *           .-------.       --- C
- *           |  4066 |       ---
- *   In2 >---|c      |        |
- *           '-------'       gnd
- *               |
- *               +----> Node Output
- *               |
- *               Z
- *               Z R
- *               Z
- *               |
- *              gnd
- *
- ************************************************************************/
-#define SKYRAID_EXPLOSION_CUSTOM_IN1		DISCRETE_INPUT(0)
-#define SKYRAID_EXPLOSION_CUSTOM_IN2		DISCRETE_INPUT(1)
-#define SKYRAID_EXPLOSION_CUSTOM_R			DISCRETE_INPUT(2)
-#define SKYRAID_EXPLOSION_CUSTOM_C			DISCRETE_INPUT(3)
-
-#define SKYRAID_4066_R_ON	270
-
-struct skyraid_explosion_custom_charge_context
-{
-	double v_cap;
-	double v_charge_1_2;
-	double v_drop;
-	double exp_1;
-	double exp_1_2;
-	double exp_2;
-};
-
-static DISCRETE_STEP( skyraid_explosion_custom_charge )
-{
-	struct skyraid_explosion_custom_charge_context *context = (struct skyraid_explosion_custom_charge_context *)node->context;
-
-	if (SKYRAID_EXPLOSION_CUSTOM_IN1 == 0)
-		if (SKYRAID_EXPLOSION_CUSTOM_IN2 == 0)
-			/* cap is floating and does not change charge */
-			/* output is pulled to ground */
-			node->output[0] = 0;
-		else
-		{
-			/* cap is discharged */
-			context->v_cap -= context->v_cap * context->exp_2;
-			node->output[0] = context->v_cap * context->v_drop;
-		}
-	else
-		if (SKYRAID_EXPLOSION_CUSTOM_IN2 == 0)
-		{
-			/* cap is charged */
-			context->v_cap += (5.0 - context->v_cap) * context->exp_1;
-			/* output is pulled to ground */
-			node->output[0] = 0;
-		}
-		else
-		{
-			/* cap is charged slightly less */
-			context->v_cap += (context->v_charge_1_2 - context->v_cap) * context->exp_1_2;
-			node->output[0] = context->v_cap * context->v_drop;
-		}
-}
-
-static DISCRETE_RESET( skyraid_explosion_custom_charge )
-{
-	struct skyraid_explosion_custom_charge_context *context = (struct skyraid_explosion_custom_charge_context *)node->context;
-
-	/* the charging voltage across the cap based on in2*/
-	context->v_drop =  RES_VOLTAGE_DIVIDER(SKYRAID_4066_R_ON, SKYRAID_4066_R_ON + SKYRAID_EXPLOSION_CUSTOM_R);
-	context->v_charge_1_2 = 5.0 * context->v_drop;
-	context->v_cap = 0;
-
-	/* precalculate charging exponents */
-	/* discharge cap - in1 = 0, in2 = 1*/
-	context->exp_2 = RC_CHARGE_EXP((SKYRAID_4066_R_ON + SKYRAID_EXPLOSION_CUSTOM_R) * SKYRAID_EXPLOSION_CUSTOM_C);
-	/* charge cap - in1 = 1, in2 = 0 */
-	context->exp_1 = RC_CHARGE_EXP(SKYRAID_4066_R_ON * SKYRAID_EXPLOSION_CUSTOM_C);
-	/* charge cap - in1 = 1, in2 = 1 */
-	context->exp_1_2 = RC_CHARGE_EXP(RES_2_PARALLEL(SKYRAID_4066_R_ON, SKYRAID_4066_R_ON + SKYRAID_EXPLOSION_CUSTOM_R) * SKYRAID_EXPLOSION_CUSTOM_C);
-
-	/* starts at 0 until cap starts charging */
-	node->output[0] = 0;
-}
-
-static const discrete_custom_info skyraid_explosion_custom_charge =
-{
-	DISCRETE_CUSTOM_MODULE(skyraid_explosion_custom_charge, struct skyraid_explosion_custom_charge_context),
-	NULL
-};
-
-
-/************************************************************************
- *
  * Custom skyraid missle charge
  *
  * input[0]    - In1 (Logic)
@@ -325,13 +216,15 @@ DISCRETE_SOUND_START( skyraid )
 		1,										/* ENAB */
 		SKYRAID_ATTRACT_EN,						/* RESET */
 		1.49 / ((SKYRAID_R20 + 2 * SKYRAID_R19) * SKYRAID_C51),		/* CLK - 555 astable source */
-		1, 0, 0.5, &skyraid_lfsr)				/* AMPL,FEED,BIAS,LFSRTB */
+		1, 0, 0.5, &skyraid_lfsr)				/* AMPL, FEED, BIAS */
 
 	DISCRETE_LOGIC_NOR(NODE_20, SKYRAID_EXPLOSION_EN, SKYRAID_NOISE)
-	DISCRETE_CUSTOM4(NODE_21, SKYRAID_EXPLOSION_EN, NODE_20, RES_2_PARALLEL(SKYRAID_R84, SKYRAID_R85 + SKYRAID_R86), SKYRAID_C68, &skyraid_explosion_custom_charge)
+	DISCRETE_RC_CIRCUIT_1(NODE_21,
+		SKYRAID_EXPLOSION_EN, NODE_20,			/* INP0, INP1 */
+		RES_2_PARALLEL(SKYRAID_R84, SKYRAID_R85 + SKYRAID_R86), SKYRAID_C68)
 	DISCRETE_OP_AMP_FILTER(NODE_22,
 		1,										/* ENAB */
-		NODE_21, 0,								/* INP0,INP1 */
+		NODE_21, 0,								/* INP0, INP1 */
 		DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &skyraid_explosion_filter)	/* TYPE,INFO */
 	/* IC E10, pin 14 gain and clipping */
 	DISCRETE_GAIN(NODE_23, NODE_22, SKYRAID_R119 / SKYRAID_R121 + 1)

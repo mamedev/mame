@@ -405,7 +405,7 @@ ADDRESS_MAP_END
 
 #define BZONEADJ \
 	PORT_START("R11") \
-	PORT_ADJUSTER( 50, "Engine Frequency" )
+	PORT_ADJUSTER( 40, "R11 - Engine Frequency" )
 
 static INPUT_PORTS_START( bzone )
 	BZONEIN0
