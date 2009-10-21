@@ -66,8 +66,8 @@ static UINT8 tms_data;
 /* Frame/Video CPU shared RAM */
 static UINT8 *fdt_a;
 static UINT8 *fdt_b;
-static int _fasel = 0;
-static int _fbsel = 1;
+static int _fasel;
+static int _fbsel;
 
 
 /*************************************
@@ -709,6 +709,8 @@ static DRIVER_INIT( esripsys )
 	state_save_register_global(machine, dac_vol);
 	state_save_register_global(machine, tms_data);
 
+	_fasel = 0;
+	_fbsel = 1;
 	state_save_register_global(machine, _fasel);
 	state_save_register_global(machine, _fbsel);
 }

@@ -1335,7 +1335,7 @@ static const int cab_data[2] = { 0x0, 0x8 };
 static const int kbm_cab_data[2] = { 0x2, 0x8 };
 static const int ppd_cab_data[2] = { 0x1, 0x9 };
 static int cab_data_ptr = 0;
-static const int * cur_cab_data = cab_data;
+static const int * cur_cab_data;
 
 static READ32_HANDLER( cabinet_r )
 {

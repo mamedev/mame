@@ -88,7 +88,6 @@ struct _list_entry
 ***************************************************************************/
 
 static include_path *incpaths;
-static include_path **incpathhead = &incpaths;
 
 static const ext_to_type extension_lookup[] =
 {
@@ -207,6 +206,7 @@ int main(int argc, char *argv[])
 	void *buffer;
 	int result;
 	int argnum;
+	include_path **incpathhead = &incpaths;
 
 	/* loop over arguments */
 	for (argnum = 1; argnum < argc; argnum++)

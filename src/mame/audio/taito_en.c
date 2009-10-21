@@ -10,7 +10,7 @@ static UINT32	es5510_gpr_latch;
 static emu_timer *timer_68681=NULL;
 static int timer_mode,m68681_imr;
 
-static int es_tmp=1;
+//static int es_tmp=1;
 
 #define M68000_CLOCK	16000000
 #define M68681_CLOCK	2000000 /* Actually X1, not the main clock */
@@ -210,9 +210,9 @@ static WRITE16_HANDLER(es5510_dsp_w)
 
 			/* Check if a GPR is selected */
 			if (data<0xc0) {
-				es_tmp=0;
+				//es_tmp=0;
 				es5510_gpr_latch=es5510_gpr[data];
-			} else es_tmp=1;
+			}// else es_tmp=1;
 			break;
 
 		case 0xa0: /* Write select - GPR */

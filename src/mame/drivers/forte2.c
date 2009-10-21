@@ -25,7 +25,7 @@ found/dumped yet. */
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"
 
-static UINT8 forte2_input_mask = 0xff;
+static UINT8 forte2_input_mask;
 
 static ADDRESS_MAP_START( program_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -100,6 +100,8 @@ static const TMS9928a_interface tms9928a_interface =
 static MACHINE_START( forte2 )
 {
 	TMS9928A_configure(&tms9928a_interface);
+
+	forte2_input_mask = 0xff;
 
 	/* register for save states */
 	state_save_register_global(machine, forte2_input_mask);

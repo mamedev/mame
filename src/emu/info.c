@@ -137,7 +137,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 	int i;
 	const char* service = 0;
 	const char* tilt = 0;
-	const char* control_types[] = {"joy", "doublejoy", "stick", "dial", "trackball", "paddle", "lightgun", "pedal"};
+	const char* const control_types[] = {"joy", "doublejoy", "stick", "dial", "trackball", "paddle", "lightgun", "pedal"};
 	static struct _input_info
 	{
 		const char *	type;			/* general type of input */

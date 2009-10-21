@@ -75,7 +75,7 @@ PALETTE_INIT( ksayakyu );
 VIDEO_START( ksayakyu );
 VIDEO_UPDATE( ksayakyu );
 
-static int sound_status=0xff;
+static int sound_status;
 
 static WRITE8_HANDLER( bank_select_w )
 {
@@ -317,4 +317,9 @@ ROM_START( ksayakyu )
 	ROM_LOAD( "9f.bin", 0x0000, 0x0100, CRC(ff71b27f) SHA1(6aad2bd2be997595a05ddb81d24df8fe1435910b) )
 ROM_END
 
-GAME( 1985, ksayakyu, 0, ksayakyu, ksayakyu, 0, ORIENTATION_FLIP_Y, "Taito Corporation", "Kusayakyuu",GAME_IMPERFECT_SOUND|GAME_WRONG_COLORS )
+static DRIVER_INIT( ksayakyu )
+{
+	sound_status = 0xff;
+}
+
+GAME( 1985, ksayakyu, 0, ksayakyu, ksayakyu, ksayakyu, ORIENTATION_FLIP_Y, "Taito Corporation", "Kusayakyuu",GAME_IMPERFECT_SOUND|GAME_WRONG_COLORS )

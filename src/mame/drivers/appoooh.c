@@ -55,7 +55,7 @@ Credits:
 #include "sound/sn76496.h"
 
 static UINT32 appoooh_adpcm_data;
-static UINT32 appoooh_adpcm_address = 0xffffffff;
+static UINT32 appoooh_adpcm_address;
 
 static void appoooh_adpcm_int(const device_config *device)
 {
@@ -216,8 +216,9 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_START( appoooh )
 {
-    state_save_register_global(machine, appoooh_adpcm_data);
-    state_save_register_global(machine, appoooh_adpcm_address);
+	appoooh_adpcm_address = 0xffffffff;
+	state_save_register_global(machine, appoooh_adpcm_data);
+	state_save_register_global(machine, appoooh_adpcm_address);
 }
 
 

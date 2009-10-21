@@ -23,6 +23,8 @@
 #include "audio/atarijsa.h"
 #include "xybots.h"
 
+static int h256;
+
 
 
 /*************************************
@@ -56,8 +58,6 @@ static MACHINE_RESET( xybots )
 
 static READ16_HANDLER( special_port1_r )
 {
-	static int h256 = 0x0400;
-
 	int result = input_port_read(space->machine, "FFE200");
 
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0200;
@@ -383,6 +383,7 @@ ROM_END
 
 static DRIVER_INIT( xybots )
 {
+	h256 = 0x0400;
 	atarigen_eeprom_default = NULL;
 	atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), 0x008000, 0, 107);
 	atarijsa_init(machine, "FFE200", 0x0100);

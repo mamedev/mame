@@ -49,6 +49,7 @@ static UINT8 coin_detected;
 static UINT8 coin_last_reset;
 
 static UINT8 mux_select;
+static int gear;
 
 
 
@@ -185,8 +186,7 @@ static READ8_HANDLER( speedfrk_wheel_r )
 
 static READ8_HANDLER( speedfrk_gear_r )
 {
-	static int gear = 0x0e;
-    int gearval = input_port_read(space->machine, "GEAR");
+	int gearval = input_port_read(space->machine, "GEAR");
 
 	/* check the fake gear input port and determine the bit settings for the gear */
 	if ((gearval & 0x0f) != 0x0f)
@@ -1437,6 +1437,7 @@ ROM_END
 
 static DRIVER_INIT( speedfrk )
 {
+	gear = 0xe;
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x00, 0x03, 0, 0, speedfrk_wheel_r);
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x04, 0x06, 0, 0, speedfrk_gear_r);
 }

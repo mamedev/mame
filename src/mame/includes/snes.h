@@ -605,6 +605,7 @@ typedef struct                      /* Source directory entry       */
 
 extern struct SNES_PPU_STRUCT snes_ppu;
 
+extern VIDEO_START( snes );
 extern VIDEO_UPDATE( snes );
 
 

@@ -162,11 +162,11 @@ static INT32 scrolly_offs;
 
 
 #ifdef MAME_DEBUG
-static int display_pf1 = 1;
-static int display_pf2 = 1;
-static int display_pf3 = 1;
-static int display_pf4 = 1;
-static int displog = 0;
+static int display_pf1;
+static int display_pf2;
+static int display_pf3;
+static int display_pf4;
+static int displog;
 #endif
 
 static INT32 tiles_offsetx;
@@ -278,6 +278,14 @@ static void toaplan1_vram_alloc(running_machine *machine)
 	pf2_tilevram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
 	pf3_tilevram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
 	pf4_tilevram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
+
+#ifdef MAME_DEBUG
+	display_pf1 = 1;
+	display_pf2 = 1;
+	display_pf3 = 1;
+	display_pf4 = 1;
+	displog = 0;
+#endif
 }
 
 static void toaplan1_spritevram_alloc(running_machine *machine)

@@ -116,7 +116,7 @@ static void int_0(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
  *   mnemonic %fs1,%fs2,%fd  */
 static void flop_12d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 {
-	const char *suffix[4] = { "ss", "sd", "ds", "dd" };
+	const char *const suffix[4] = { "ss", "sd", "ds", "dd" };
 	const char *prefix_d, *prefix_p;
 	int s = (insn & 0x180) >> 7;
 	prefix_p = (insn & 0x400) ? "p" : "";
@@ -152,7 +152,7 @@ static void flop_12d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 	/* Special case: pfgt/pfle-- R-bit distinguishes the two.  */
 	if ((insn & 0x7f) == 0x34)
 	{
-		const char *mn[2] = { "fgt.", "fle." };
+		const char *const mn[2] = { "fgt.", "fle." };
 		int r = (insn & 0x080) >> 7;
 		int s = (insn & 0x100) ? 3 : 0;
 		sprintf(buf, "%s%s%s%s\t%%f%d,%%f%d,%%f%d", prefix_d, prefix_p, mn[r],
@@ -168,7 +168,7 @@ static void flop_12d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
  *   mnemonic %fs1,%fd  */
 static void flop_1d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 {
-	const char *suffix[4] = { "ss", "sd", "ds", "dd" };
+	const char *const suffix[4] = { "ss", "sd", "ds", "dd" };
 	const char *prefix_d, *prefix_p;
 	int s = (insn & 0x180) >> 7;
 	prefix_p = (insn & 0x400) ? "p" : "";
@@ -182,7 +182,7 @@ static void flop_1d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
  *   mnemonic %fs2,%fd  */
 static void flop_2d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 {
-	const char *suffix[4] = { "ss", "sd", "ds", "dd" };
+	const char *const suffix[4] = { "ss", "sd", "ds", "dd" };
 	const char *prefix_d;
 	int s = (insn & 0x180) >> 7;
 	prefix_d = (insn & 0x200) ? "d." : "";
@@ -243,7 +243,7 @@ static void int_ldx(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 {
 	/* Operand size, in bytes.  */
 	int sizes[4] = { 1, 1, 2, 4 };
-	const char *suffix[4] = { "b", "b", "s", "l" };
+	const char *const suffix[4] = { "b", "b", "s", "l" };
 	UINT32 idx = 0;
 
 	/* Bits 28 and 0 determine the operand size.  */
@@ -270,7 +270,7 @@ static void int_stx(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 {
 	/* Operand size, in bytes.  */
 	int sizes[4] = { 1, 1, 2, 4 };
-	const char *suffix[4] = { "b", "b", "s", "l" };
+	const char *const suffix[4] = { "b", "b", "s", "l" };
 	int idx = 0;
 	int size;
 	INT32 immsrc = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
@@ -297,13 +297,13 @@ static void int_fldst(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 	INT32 immsrc1 = sign_ext (get_imm16 (insn), 16);
 	/* Operand size, in bytes.  */
 	int sizes[4] = { 8, 4, 16, 4 };
-	const char *suffix[4] = { "d", "l", "q", "l" };
+	const char *const suffix[4] = { "d", "l", "q", "l" };
 	int idx = 0;
 	int size = 0;
 	int auto_inc = (insn & 1);
-	const char *auto_suff[2] = { "", "++" };
+	const char *const auto_suff[2] = { "", "++" };
 	int piped = (insn & 0x40000000) >> 29;
-	const char *piped_suff[2] = { "", "p" };
+	const char *const piped_suff[2] = { "", "p" };
 	int upper_6bits = (insn >> 26) & 0x3f;
 	int is_load = (upper_6bits == 8 || upper_6bits == 9 || upper_6bits == 24
 				   || upper_6bits == 25);
@@ -356,7 +356,7 @@ static void int_fldst(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 /* flush #const(isrc2)[++].  */
 static void int_flush(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 {
-	const char *auto_suff[2] = { "", "++" };
+	const char *const auto_suff[2] = { "", "++" };
 	INT32 immsrc = sign_ext (get_imm16 (insn), 16);
 	immsrc &= ~(16-1);
 	sprintf(buf, "%s\t%d(%%r%d)%s", mnemonic, immsrc, get_isrc2 (insn),

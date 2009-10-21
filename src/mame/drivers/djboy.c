@@ -174,16 +174,20 @@ extern VIDEO_EOF( djboy );
 
 /* KANEKO BEAST state */
 
-static int prot_busy_count;
 #define PROT_OUTPUT_BUFFER_SIZE 8
+
+static int prot_busy_count;
 static UINT8 prot_output_buffer[PROT_OUTPUT_BUFFER_SIZE];
 static int prot_available_data_count;
 static int prot_offs; /* internal state */
 static UINT8 prot_ram[0x80]; /* internal RAM */
 static UINT8 prot_param[8];
+
 static int coin;
 static int complete;
 static int lives[2];
+static int addr;
+static int bankxor;
 
 static enum
 {
@@ -640,14 +644,18 @@ static READ8_HANDLER( beast_status_r )
 } /* beast_status_r */
 
 /******************************************************************************/
-static int bankxor;
-
 static DRIVER_INIT( djboy )
 {
+	coin = 0;
+	complete = 0;
+	memset(lives, 0, sizeof(lives));
+	addr = 0xff;
 	bankxor = 0x00;
 }
+
 static DRIVER_INIT( djboyj )
 {
+	DRIVER_INIT_CALL( djboy );
 	bankxor = 0x1f;
 }
 
@@ -895,7 +903,6 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( djboy_interrupt )
 { /* CPU1 uses interrupt mode 2. For now, just alternate the two interrupts. */
-	static int addr = 0xff;
 	addr ^= 0x02;
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, addr);
 }

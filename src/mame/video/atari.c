@@ -713,6 +713,7 @@ VIDEO_START( atari )
 	LOG(("atari antic_vh_start\n"));
     memset(&antic, 0, sizeof(antic));
 
+	antic.renderer = antic_mode_0_xx;
 	antic.cclk_expand = auto_alloc_array(machine, UINT32, 21 * 256);
 
 	antic.pf_21 	  = &antic.cclk_expand[ 0 * 256];
@@ -787,8 +788,6 @@ VIDEO_UPDATE( atari )
 	}
 	return 0;
 }
-
-static atari_renderer_func antic_renderer = antic_mode_0_xx;
 
 static void artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
 {
@@ -1180,7 +1179,7 @@ static TIMER_CALLBACK( antic_scanline_render )
 	VIDEO *video = antic.video[antic.scanline];
 	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(machine), (antic.cmd & 0x0f), antic.modelines));
 
-    (*antic_renderer)(space, video);
+    (*antic.renderer)(space, video);
 
     /* if player/missile graphics is enabled */
     if( antic.scanline < 256 && (antic.w.dmactl & (DMA_PLAYER|DMA_MISSILE)) )
@@ -1320,7 +1319,7 @@ static void antic_scanline_dma(running_machine *machine, int param)
 					}
 				}
 				/* Set the ANTIC mode renderer function */
-				antic_renderer = renderer[h][new_cmd & ANTIC_MODE][w];
+				antic.renderer = renderer[h][new_cmd & ANTIC_MODE][w];
 
 				switch( new_cmd & ANTIC_MODE )
 				{
@@ -1447,9 +1446,9 @@ static void antic_scanline_dma(running_machine *machine, int param)
 					switch (gtia.w.prior >> 6)
 					{
 						case 0: break;
-						case 1: antic_renderer = renderer[h][16][w];  break;
-						case 2: antic_renderer = renderer[h][17][w];  break;
-						case 3: antic_renderer = renderer[h][18][w];  break;
+						case 1: antic.renderer = renderer[h][16][w];  break;
+						case 2: antic.renderer = renderer[h][17][w];  break;
+						case 3: antic.renderer = renderer[h][18][w];  break;
 					}
 					antic.modelines = 1;
                     break;
@@ -1462,14 +1461,14 @@ static void antic_scanline_dma(running_machine *machine, int param)
 		{
 			LOG(("           out of visible range\n"));
 			antic.cmd = 0x00;
-			antic_renderer = antic_mode_0_xx;
+			antic.renderer = antic_mode_0_xx;
         }
 	}
 	else
 	{
 		LOG(("           DMA is off\n"));
         antic.cmd = 0x00;
-		antic_renderer = antic_mode_0_xx;
+		antic.renderer = antic_mode_0_xx;
 	}
 
 	antic.r.nmist &= ~DLI_NMI;
@@ -1523,7 +1522,7 @@ static void generic_atari_interrupt(running_machine *machine, void (*handle_keyb
 
 		/* do nothing new for the rest of the frame */
 		antic.modelines = video_screen_get_height(machine->primary_screen) - VBL_START;
-		antic_renderer = antic_mode_0_xx;
+		antic.renderer = antic_mode_0_xx;
 
 		/* if the CPU want's to be interrupted at vertical blank... */
 		if( antic.w.nmien & VBL_NMI )

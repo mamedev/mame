@@ -44,12 +44,12 @@ VIDEO_START( trucocl );
 VIDEO_UPDATE( trucocl );
 
 
-static WRITE8_HANDLER( irq_enable_w)
+static WRITE8_HANDLER( irq_enable_w )
 {
 	interrupt_enable_w( space, 0, (~data) & 1 );
 }
 
-static int cur_dac_address = -1;
+static int cur_dac_address;
 static int cur_dac_address_index = 0;
 
 static TIMER_CALLBACK( dac_irq )
@@ -57,7 +57,7 @@ static TIMER_CALLBACK( dac_irq )
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
-static WRITE8_DEVICE_HANDLER( audio_dac_w)
+static WRITE8_DEVICE_HANDLER( audio_dac_w )
 {
 	UINT8 *rom = memory_region(device->machine, "maincpu");
 	int	dac_address = ( data & 0xf0 ) << 8;
@@ -187,8 +187,15 @@ ROM_END
  *
  *************************************/
 
+static DRIVER_INIT( trucocl )
+{
+	cur_dac_address = -1;
+	cur_dac_address_index = 0;
+}
+
+
+
 /******************************************************************************/
+/*    YEAR   NAME     PARENT  MACHINE  INPUT    INIT     MONITOR  */
 
-/*    YEAR   NAME     PARENT  MACHINE  INPUT    INIT  MONITOR  */
-
-GAME( 1991, trucocl,  0,     trucocl, trucocl, 0,    ROT0, "Miky SRL", "Truco Clemente", GAME_IMPERFECT_SOUND )
+GAME( 1991, trucocl,  0,      trucocl, trucocl, trucocl, ROT0, "Miky SRL", "Truco Clemente", GAME_IMPERFECT_SOUND )

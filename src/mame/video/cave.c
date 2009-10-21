@@ -113,7 +113,7 @@ static int num_sprites;
 static struct sprite_cave *sprite_cave;
 static struct sprite_cave *sprite_table[MAX_PRIORITY][MAX_SPRITE_NUM+1];
 static bitmap_t *sprite_zbuf;
-static UINT16 sprite_zbuf_baseval = 0x10000-MAX_SPRITE_NUM;
+static UINT16 sprite_zbuf_baseval;
 
 static void (*get_sprite_info)(running_machine *machine);
 static void (*cave_sprite_draw)( int priority );
@@ -788,6 +788,7 @@ static void sprite_init_cave(running_machine *machine)
 		cave_spritetype2 = 0;
 	}
 
+	sprite_zbuf_baseval = 0x10000-MAX_SPRITE_NUM;
 	sprite_zbuf = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED16 );
 	blit.baseaddr_zbuf = (UINT8 *)sprite_zbuf->base;
 	blit.line_offset_zbuf = sprite_zbuf->rowpixels * sprite_zbuf->bpp / 8;

@@ -18,7 +18,7 @@ UINT16 *nmk_bgvideoram1;
 UINT16 *nmk_bgvideoram2;
 UINT16 *nmk_bgvideoram3;
 
-static int nmk16_simple_scroll = 1;
+static int nmk16_simple_scroll;
 
 UINT16 *nmk_fgvideoram,*nmk_txvideoram;
 UINT16 *gunnail_scrollram, *gunnail_scrollramy;
@@ -120,20 +120,30 @@ static TILE_GET_INFO( get_tile_info_0_8bit )
 
 ***************************************************************************/
 
+static void nmk16_video_init(running_machine *machine)
+{
+	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
+	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
+
+	videoshift = 0;		/* 256x224 screen, no shift */
+	background_bitmap = NULL;
+	nmk16_simple_scroll = 1;
+}
+
+
 VIDEO_START( bioship )
 {
 	bg_tilemap0 = tilemap_create(machine, macross_get_bg0_tile_info, afega_tilemap_scan_pages,16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,tilemap_scan_cols,8,8,32,32);
-	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
-	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
-	background_bitmap = auto_bitmap_alloc(machine,8192,512,video_screen_get_format(machine->primary_screen));
 
 	tilemap_set_transparent_pen(bg_tilemap0,15);
 	tilemap_set_transparent_pen(tx_tilemap,15);
+
+	nmk16_video_init(machine);
+	background_bitmap = auto_bitmap_alloc(machine,8192,512,video_screen_get_format(machine->primary_screen));
 	bioship_background_bank=0;
 	redraw_bitmap = 1;
 
-	videoshift =  0;	/* 256x224 screen, no shift */
 }
 
 VIDEO_START( strahl )
@@ -141,43 +151,34 @@ VIDEO_START( strahl )
 	bg_tilemap0 = tilemap_create(machine, macross_get_bg0_tile_info, afega_tilemap_scan_pages,16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	fg_tilemap = tilemap_create(machine, strahl_get_fg_tile_info, afega_tilemap_scan_pages,16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,tilemap_scan_cols,8,8,32,32);
-	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
-	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 
 	tilemap_set_transparent_pen(fg_tilemap,15);
 	tilemap_set_transparent_pen(tx_tilemap,15);
 
-	videoshift =  0;	/* 256x224 screen, no shift */
-	background_bitmap = NULL;
+	nmk16_video_init(machine);
 }
 
 VIDEO_START( macross )
 {
 	bg_tilemap0 = tilemap_create(machine, macross_get_bg0_tile_info, afega_tilemap_scan_pages,16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,tilemap_scan_cols,8,8,32,32);
-	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
-	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 
 	tilemap_set_transparent_pen(tx_tilemap,15);
 
-	videoshift =  0;	/* 256x224 screen, no shift */
-	background_bitmap = NULL;
+	nmk16_video_init(machine);
 }
 
 VIDEO_START( gunnail )
 {
 	bg_tilemap0 = tilemap_create(machine, macross_get_bg0_tile_info, afega_tilemap_scan_pages,16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 	tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,tilemap_scan_cols,8,8,64,32);
-	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
-	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 
 	tilemap_set_transparent_pen(tx_tilemap,15);
 	tilemap_set_scroll_rows(bg_tilemap0,512);
 
+	nmk16_video_init(machine);
 	videoshift = 64;	/* 384x224 screen, leftmost 64 pixels have to be retrieved */
 						/* from the other side of the tilemap (!) */
-	background_bitmap = NULL;
-
 	nmk16_simple_scroll = 0;
 }
 
@@ -189,16 +190,12 @@ VIDEO_START( macross2 )
 	bg_tilemap3 = tilemap_create(machine, macross_get_bg3_tile_info, afega_tilemap_scan_pages,16,16,TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 
 	tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,tilemap_scan_cols,8,8,64,32);
-	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
-	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 
 	tilemap_set_transparent_pen(tx_tilemap,15);
 
+	nmk16_video_init(machine);
 	videoshift = 64;	/* 384x224 screen, leftmost 64 pixels have to be retrieved */
 						/* from the other side of the tilemap (!) */
-	background_bitmap = NULL;
-
-	nmk16_simple_scroll = 1;
 }
 
 VIDEO_START( raphero )
@@ -211,12 +208,9 @@ VIDEO_START( bjtwin )
 {
 	bg_tilemap0 = tilemap_create(machine, bjtwin_get_bg_tile_info,tilemap_scan_cols,8,8,64,32);
 
-	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
-	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
-
+	nmk16_video_init(machine);
 	videoshift = 64;	/* 384x224 screen, leftmost 64 pixels have to be retrieved */
 						/* from the other side of the tilemap (!) */
-	background_bitmap = NULL;
 }
 
 

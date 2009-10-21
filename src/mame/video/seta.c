@@ -229,7 +229,7 @@ static const struct x_offset *global_offsets;
 
 void seta_coin_lockout_w(running_machine *machine, int data)
 {
-	static int seta_coin_lockout = 1;
+	static int seta_coin_lockout;
 	static const game_driver *seta_driver = NULL;
 	static const char *const seta_nolockout[8] = { "blandia", "gundhara", "kamenrid", "zingzip", "eightfrc", "extdwnhl", "sokonuke", "zombraid"};
 

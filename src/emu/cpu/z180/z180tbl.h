@@ -149,7 +149,8 @@ static const UINT8 cc_ex[0x100] = {
    5, 0, 3, 0,10, 0, 0, 2, 5, 0, 3, 0,10, 0, 0, 2
 };
 
-static const UINT8 *cc[6] = { cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex };
+static const UINT8 *const cc_default[6] = { cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex };
+
 #define Z180_TABLE_dd	 Z180_TABLE_xy
 #define Z180_TABLE_fd	 Z180_TABLE_xy
 
@@ -270,7 +271,7 @@ PROTOTYPES(Z180xycb,xycb);
 /***************************************************************
  * adjust cycle count by n T-states
  ***************************************************************/
-#define CC(prefix,opcode) cpustate->icount -= cc[Z180_TABLE_##prefix][opcode]
+#define CC(prefix,opcode) cpustate->icount -= cpustate->cc[Z180_TABLE_##prefix][opcode]
 
 /***************************************************************
  * execute an opcode

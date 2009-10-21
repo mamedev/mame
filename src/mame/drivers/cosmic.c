@@ -51,7 +51,11 @@ WRITE8_HANDLER( cosmic_color_register_w );
 WRITE8_HANDLER( cosmic_background_enable_w );
 
 
-static UINT32 pixel_clock = 0;
+static UINT32 pixel_clock;
+static int sound_enabled;
+static int march_select;
+static int gun_die_select;
+static int dive_bomb_b_select;
 
 
 
@@ -60,7 +64,6 @@ static UINT32 pixel_clock = 0;
 static WRITE8_HANDLER( panic_sound_output_w )
 {
 	const device_config *samples = devtag_get_device(space->machine, "samples");
-    static int sound_enabled=1;
 
     /* Sound Enable / Disable */
 
@@ -137,9 +140,6 @@ static WRITE8_HANDLER( panic_sound_output2_w )
 static WRITE8_HANDLER( cosmicg_output_w )
 {
 	const device_config *samples = devtag_get_device(space->machine, "samples");
-	static int march_select;
-    static int gun_die_select;
-    static int sound_enabled;
 
     /* Sound Enable / Disable */
 
@@ -204,8 +204,6 @@ static WRITE8_HANDLER( cosmicg_output_w )
 static WRITE8_HANDLER( cosmica_sound_output_w )
 {
 	const device_config *samples = devtag_get_device(space->machine, "samples");
-    static int  sound_enabled=1;
-    static int dive_bomb_b_select=0;
 
     /* Sound Enable / Disable */
     if (offset == 11)
@@ -1552,6 +1550,9 @@ static DRIVER_INIT( cosmicg )
 	offs_t offs, len;
 	UINT8 *rom;
 
+	sound_enabled = 0;
+	march_select = 0;
+	gun_die_select = 0;
     len = memory_region_length(machine, "maincpu");
     rom = memory_region(machine, "maincpu");
     for (offs =0; offs < len; offs++)
@@ -1565,6 +1566,13 @@ static DRIVER_INIT( cosmicg )
 
         rom[offs] = normal;
     }
+}
+
+
+static DRIVER_INIT( cosmica )
+{
+	sound_enabled = 1;
+	dive_bomb_b_select=0;
 }
 
 
@@ -1583,18 +1591,23 @@ static DRIVER_INIT( nomnlnd )
 	memory_install_write8_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dac, 0x480a, 0x480a, 0, 0, dac_w);
 }
 
+static DRIVER_INIT( panic )
+{
+	sound_enabled = 1;
+}
+
 
 GAME( 1979, cosmicg,  0,       cosmicg,  cosmicg,  cosmicg, ROT270, "Universal", "Cosmic Guerilla", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1979, cosmica,  0,       cosmica,  cosmica,  0,       ROT270, "Universal", "Cosmic Alien", GAME_IMPERFECT_SOUND )
-GAME( 1979, cosmica2, cosmica, cosmica,  cosmica,  0,       ROT270, "Universal", "Cosmic Alien (older)", GAME_IMPERFECT_SOUND )
+GAME( 1979, cosmica,  0,       cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien", GAME_IMPERFECT_SOUND )
+GAME( 1979, cosmica2, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (older)", GAME_IMPERFECT_SOUND )
 GAME( 1980, nomnlnd,  0,       nomnlnd,  nomnlnd,  nomnlnd, ROT270, "Universal", "No Man's Land", GAME_IMPERFECT_SOUND )
 GAME( 1980, nomnlndg, nomnlnd, nomnlnd,  nomnlndg, nomnlnd, ROT270, "Universal (Gottlieb license)", "No Man's Land (Gottlieb)", GAME_IMPERFECT_SOUND )
 GAME( 1980, magspot,  0,       magspot,  magspot,  0,       ROT270, "Universal", "Magical Spot", GAME_IMPERFECT_SOUND )
 GAME( 1980, magspot2, 0,       magspot,  magspot,  0,       ROT270, "Universal", "Magical Spot II", GAME_IMPERFECT_SOUND )
-GAME( 1980, panic,    0,       panic,    panic,    0,       ROT270, "Universal", "Space Panic (version E)", GAME_IMPERFECT_SOUND )
-GAME( 1980, panic2,   panic,   panic,    panic,    0,       ROT270, "Universal", "Space Panic (set 2)", GAME_IMPERFECT_SOUND )
-GAME( 1980, panic3,   panic,   panic,    panic,    0,       ROT270, "Universal", "Space Panic (set 3)", GAME_IMPERFECT_SOUND )
-GAME( 1980, panich,   panic,   panic,    panic,    0,       ROT270, "Universal", "Space Panic (harder)", GAME_IMPERFECT_SOUND )
-GAME( 1980, panicger, panic,   panic,    panic,    0,       ROT270, "Universal (ADP Automaten license)", "Space Panic (German)", GAME_IMPERFECT_SOUND )
+GAME( 1980, panic,    0,       panic,    panic,    panic,   ROT270, "Universal", "Space Panic (version E)", GAME_IMPERFECT_SOUND )
+GAME( 1980, panic2,   panic,   panic,    panic,    panic,   ROT270, "Universal", "Space Panic (set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1980, panic3,   panic,   panic,    panic,    panic,   ROT270, "Universal", "Space Panic (set 3)", GAME_IMPERFECT_SOUND )
+GAME( 1980, panich,   panic,   panic,    panic,    panic,   ROT270, "Universal", "Space Panic (harder)", GAME_IMPERFECT_SOUND )
+GAME( 1980, panicger, panic,   panic,    panic,    panic,   ROT270, "Universal (ADP Automaten license)", "Space Panic (German)", GAME_IMPERFECT_SOUND )
 GAME( 1980, devzone,  0,       devzone,  devzone,  devzone, ROT270, "Universal", "Devil Zone", GAME_IMPERFECT_SOUND )
 GAME( 1980, devzone2, devzone, devzone,  devzone2, devzone, ROT270, "Universal", "Devil Zone (easier)", GAME_IMPERFECT_SOUND )

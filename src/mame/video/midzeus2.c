@@ -74,6 +74,9 @@ static int zeus_quad_size;
 
 static UINT32 *waveram[2];
 static emu_timer *int_timer;
+static int yoffs;
+static int texel_width;
+static float zbase;
 
 #if TRACK_REG_USAGE
 typedef struct reg_info
@@ -273,6 +276,9 @@ VIDEO_START( midzeus2 )
 	/* we need to cleanup on exit */
 	add_exit_callback(machine, exit_handler);
 
+	zbase = 2.0f;
+	yoffs = 0;
+	texel_width = 256;
 	zeus_renderbase = waveram[1];
 
 	int_timer = timer_alloc(machine, int_timer_callback, NULL);
@@ -353,8 +359,6 @@ static void exit_handler(running_machine *machine)
  *
  *************************************/
 
-static float zbase = 2.0f;
-
 VIDEO_UPDATE( midzeus2 )
 {
 	int x, y;
@@ -380,14 +384,12 @@ if (input_code_pressed(screen->machine, KEYCODE_DOWN)) { zbase -= 1.0f; popmessa
 	/* waveram drawing case */
 	else
 	{
-		static int yoffs = 0;
-		static int width = 256;
 		const UINT64 *base;
 
 		if (input_code_pressed(screen->machine, KEYCODE_DOWN)) yoffs += input_code_pressed(screen->machine, KEYCODE_LSHIFT) ? 0x40 : 1;
 		if (input_code_pressed(screen->machine, KEYCODE_UP)) yoffs -= input_code_pressed(screen->machine, KEYCODE_LSHIFT) ? 0x40 : 1;
-		if (input_code_pressed(screen->machine, KEYCODE_LEFT) && width > 4) { width >>= 1; while (input_code_pressed(screen->machine, KEYCODE_LEFT)) ; }
-		if (input_code_pressed(screen->machine, KEYCODE_RIGHT) && width < 512) { width <<= 1; while (input_code_pressed(screen->machine, KEYCODE_RIGHT)) ; }
+		if (input_code_pressed(screen->machine, KEYCODE_LEFT) && texel_width > 4) { texel_width >>= 1; while (input_code_pressed(screen->machine, KEYCODE_LEFT)) ; }
+		if (input_code_pressed(screen->machine, KEYCODE_RIGHT) && texel_width < 512) { texel_width <<= 1; while (input_code_pressed(screen->machine, KEYCODE_RIGHT)) ; }
 
 		if (yoffs < 0) yoffs = 0;
 		base = (const UINT64 *)waveram0_ptr_from_expanded_addr(yoffs << 16);
@@ -397,7 +399,7 @@ if (input_code_pressed(screen->machine, KEYCODE_DOWN)) { zbase -= 1.0f; popmessa
 			UINT32 *dest = (UINT32 *)bitmap->base + y * bitmap->rowpixels;
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			{
-				UINT8 tex = get_texel_8bit(base, y, x, width);
+				UINT8 tex = get_texel_8bit(base, y, x, texel_width);
 				dest[x] = (tex << 16) | (tex << 8) | tex;
 			}
 		}
@@ -1169,7 +1171,7 @@ In memory:
 		vert[i].x = x * zeus_matrix[0][0] + y * zeus_matrix[0][1] + z * zeus_matrix[0][2] + zeus_point[0];
 		vert[i].y = x * zeus_matrix[1][0] + y * zeus_matrix[1][1] + z * zeus_matrix[1][2] + zeus_point[1];
 		vert[i].p[0] = x * zeus_matrix[2][0] + y * zeus_matrix[2][1] + z * zeus_matrix[2][2] + zeus_point[2];
-vert[i].p[0] += zbase;
+		vert[i].p[0] += zbase;
 		vert[i].p[2] += texoffs >> 16;
 		vert[i].p[1] *= 256.0f;
 		vert[i].p[2] *= 256.0f;

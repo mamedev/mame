@@ -38,11 +38,11 @@ static UINT32 *tiles32 = NULL, *wram32;
 static int flip_bit, flipscreen = 0;
 static int palshift;
 
-static int semicom_prot_idx = 8;
+static int semicom_prot_idx;
 static int semicom_prot_which = 0;
 static UINT16 semicom_prot_data[2];
 
-static UINT16 finalgdr_backupram_bank = 1;
+static UINT16 finalgdr_backupram_bank;
 static UINT8 *finalgdr_backupram;
 
 static READ16_DEVICE_HANDLER( oki_r )
@@ -1701,18 +1701,21 @@ static DRIVER_INIT( wyvernwg )
 	palshift = 0;
 	flip_bit = 1;
 
+	semicom_prot_idx = 8;
 	semicom_prot_data[0] = 2;
 	semicom_prot_data[1] = 1;
 }
 
 static DRIVER_INIT( finalgdr )
 {
+	finalgdr_backupram_bank = 1;
 	finalgdr_backupram = auto_alloc_array(machine, UINT8, 0x80*0x100);
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x005e874, 0x005e877, 0, 0, finalgdr_speedup_r );
 
 	palshift = 0;
 	flip_bit = 1; //?
 
+	semicom_prot_idx = 8;
 	semicom_prot_data[0] = 2;
 	semicom_prot_data[1] = 3;
 }

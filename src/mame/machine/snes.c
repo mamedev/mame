@@ -47,7 +47,7 @@ static const UINT16 vram_fgr_inctab[4] = { 1, 32, 128, 128 };
 static const UINT16 vram_fgr_inccnts[4] = { 0, 32, 64, 128 };
 static const UINT16 vram_fgr_shiftab[4] = { 0, 5, 6, 7 };
 
-struct snes_cart_info snes_cart = { SNES_MODE_20, 0x40000, 0x40000 };
+struct snes_cart_info snes_cart;
 
 static struct
 {

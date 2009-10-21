@@ -29,11 +29,11 @@ VIDEO_START( othldrby );
 VIDEO_EOF( othldrby );
 VIDEO_UPDATE( othldrby );
 
+static int toggle;
 
 
 static READ16_HANDLER( pip )
 {
-	static int toggle = 0xff;
 	return toggle ^= 1;
 }
 
@@ -278,5 +278,9 @@ ROM_START( othldrby )
 	ROM_LOAD( "db0.4",        0x00000, 0x80000, CRC(a9701868) SHA1(9ee89556666d358e8d3915622573b3ba660048b8) )
 ROM_END
 
+static DRIVER_INIT( othldrby )
+{
+	toggle = 0xff;
+}
 
-GAME( 1995, othldrby, 0, othldrby, othldrby, 0, ROT0, "Sunwise", "Othello Derby (Japan)", 0 )
+GAME( 1995, othldrby, 0, othldrby, othldrby, othldrby, ROT0, "Sunwise", "Othello Derby (Japan)", 0 )

@@ -122,6 +122,7 @@ struct _z180_state
 	UINT8	rtemp;
 	UINT32	ioltemp;
 	int icount;
+	const UINT8 *cc[6];
 };
 
 INLINE z180_state *get_safe_token(const device_config *device)
@@ -2020,6 +2021,7 @@ static CPU_INIT( z180 )
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->iospace = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	memcpy(cpustate->cc, cc_default, sizeof(cpustate->cc));
 
 	/* set up the state table */
 	cpustate->state = state_table_template;
@@ -2516,12 +2518,12 @@ static CPU_SET_INFO( z180 )
 		case CPUINFO_INT_INPUT_STATE + Z180_INT0:		set_irq_line(cpustate, Z180_INT0, info->i);			break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: 		cc[Z180_TABLE_op] = (const UINT8 *)info->p;				break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb: 		cc[Z180_TABLE_cb] = (const UINT8 *)info->p;				break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed: 		cc[Z180_TABLE_ed] = (const UINT8 *)info->p;				break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy: 		cc[Z180_TABLE_xy] = (const UINT8 *)info->p;				break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb: 	cc[Z180_TABLE_xycb] = (const UINT8 *)info->p;				break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex: 		cc[Z180_TABLE_ex] = (const UINT8 *)info->p;				break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: 		cpustate->cc[Z180_TABLE_op] = (const UINT8 *)info->p;				break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb: 		cpustate->cc[Z180_TABLE_cb] = (const UINT8 *)info->p;				break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed: 		cpustate->cc[Z180_TABLE_ed] = (const UINT8 *)info->p;				break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy: 		cpustate->cc[Z180_TABLE_xy] = (const UINT8 *)info->p;				break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb: 	cpustate->cc[Z180_TABLE_xycb] = (const UINT8 *)info->p;				break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex: 		cpustate->cc[Z180_TABLE_ex] = (const UINT8 *)info->p;				break;
 	}
 }
 
@@ -2574,12 +2576,12 @@ CPU_GET_INFO( z180 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state;	break;
 
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: 		info->p = (void *)cc[Z180_TABLE_op];	break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb: 		info->p = (void *)cc[Z180_TABLE_cb];	break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed: 		info->p = (void *)cc[Z180_TABLE_ed];	break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy: 		info->p = (void *)cc[Z180_TABLE_xy];	break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb:	info->p = (void *)cc[Z180_TABLE_xycb];	break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex: 		info->p = (void *)cc[Z180_TABLE_ex];	break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: 		info->p = (void *)cpustate->cc[Z180_TABLE_op];	break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb: 		info->p = (void *)cpustate->cc[Z180_TABLE_cb];	break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed: 		info->p = (void *)cpustate->cc[Z180_TABLE_ed];	break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy: 		info->p = (void *)cpustate->cc[Z180_TABLE_xy];	break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb:	info->p = (void *)cpustate->cc[Z180_TABLE_xycb];	break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex: 		info->p = (void *)cpustate->cc[Z180_TABLE_ex];	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Z180");				break;

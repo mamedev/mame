@@ -64,8 +64,8 @@ struct _astring
     GLOBAL VARIABLES
 ***************************************************************************/
 
-static char dummy_text[2] = { 0 };
-static astring dummy_astring = { dummy_text, 1, { 0 } };
+static const char dummy_text[2] = { 0 };
+static const astring dummy_astring = { (char *)dummy_text, 1, { 0 } };
 
 
 
@@ -154,7 +154,7 @@ astring *astring_alloc(void)
 	/* allocate memory; if we fail, return the dummy */
 	str = (astring *)malloc(sizeof(*str));
 	if (str == NULL)
-		return &dummy_astring;
+		return (astring *)&dummy_astring;
 	memset(str, 0, sizeof(*str));
 
 	/*  initialize the small buffer */

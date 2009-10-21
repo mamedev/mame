@@ -118,7 +118,7 @@ static void create_syncs(nesapu_state *info, unsigned long sps)
 /* INITIALIZE NOISE LOOKUP TABLE */
 static void create_noise(uint8 *buf, const int bits, int size)
 {
-	static int m = 0x0011;
+	int m = 0x0011;
 	int xor_val, i;
 
 	for (i = 0; i < size; i++)

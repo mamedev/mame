@@ -161,10 +161,11 @@ void a600xl_mmu(running_machine *machine, UINT8 new_mmu)
 
  **************************************************************/
 
+static int atari_last;
+
 void a800_handle_keyboard(running_machine *machine)
 {
 	const device_config *pokey = devtag_get_device(machine, "pokey");
-	static int atari_last = 0xff;
 	int atari_code, count, ipt, i;
 	static const char *const tag[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
 										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
@@ -248,7 +249,6 @@ void a800_handle_keyboard(running_machine *machine)
 void a5200_handle_keypads(running_machine *machine)
 {
 	const device_config *pokey = devtag_get_device(machine, "pokey");
-	static int atari_last = 0xff;
 	int atari_code, count, ipt, i;
 	static const char *const tag[] = { "keypad_0", "keypad_1", "keypad_2", "keypad_3" };
 
@@ -314,6 +314,7 @@ static void pokey_reset(running_machine *machine)
 {
 	const device_config *pokey = devtag_get_device(machine, "pokey");
 	pokey_w(pokey,15,0);
+	atari_last = 0xff;
 }
 
 

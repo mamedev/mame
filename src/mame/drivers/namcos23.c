@@ -1177,7 +1177,7 @@ static READ8_HANDLER( s23_mcu_rtc_r )
 	return ret;
 }
 
-static int s23_lastpB = 0x50, s23_setstate = 0, s23_setnum, s23_settings[8];
+static int s23_lastpB, s23_setstate, s23_setnum, s23_settings[8];
 
 static READ8_HANDLER( s23_mcu_portB_r )
 {
@@ -1351,6 +1351,14 @@ static DRIVER_INIT(ss23)
 {
 	mi_rd = mi_wr = im_rd = im_wr = 0;
 	namcos23_jvssense = 1;
+	s23_vbl = 0;
+	s23_lastpB = 0x50;
+	s23_setstate = 0;
+	s23_setnum = 0;
+	memset(s23_settings, 0, sizeof(s23_settings));
+	s23_tssio_port_4 = 0;
+	s23_porta = 0, s23_rtcstate = 0;
+	gorgon_vbl = 0;
 }
 
 #define XOR(a) WORD2_XOR_BE(a)

@@ -60,7 +60,7 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 /* Variables only used here: */
 
 static int cischeat_ip_select;
-static int shift_ret = 1;
+static int shift_ret;
 static UINT8 drawmode_table[16];
 
 #ifdef MAME_DEBUG

@@ -94,7 +94,7 @@ struct DEBUGOPTS
 	UINT8 windows_disabled;
 	UINT8 transparency_disabled;
 };
-static struct DEBUGOPTS debug_options  = {5, {0,0,0,0,0,0}, {0,0,0,0,0,0,0,0}, 0, 0, 0};
+static struct DEBUGOPTS debug_options;
 /*                                    red   green  blue    purple  yellow cyan    grey    white */
 static const UINT16 dbg_mode_colours[8] = { 0x1f, 0x3e0, 0x7c00, 0x7c1f, 0x3ff, 0x7fe0, 0x4210, 0x7fff };
 static UINT8 snes_dbg_video(running_machine *machine, bitmap_t *bitmap, UINT16 curline);
@@ -1240,6 +1240,14 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 	}
 
 	profiler_mark_end();
+}
+
+VIDEO_START( snes )
+{
+#ifdef MAME_DEBUG
+	memset(&debug_options, 0, sizeof(debug_options));
+	debug_options.input_count = 5;
+#endif
 }
 
 VIDEO_UPDATE( snes )

@@ -370,7 +370,7 @@ void install_astrass_protection(running_machine *machine)
 /* Decathlete seems to be a variation on this ... not understood */
 static UINT32 decathlt_protregs[4];
 static UINT32 decathlt_lastcount = 0;
-static UINT32 decathlt_part = 1;
+static UINT32 decathlt_part;
 static UINT32 decathlt_prot_uploadmode=0;
 static UINT32 decathlt_prot_uploadoffset=0;
 static UINT16 decathlt_prottable1[24];
@@ -505,6 +505,11 @@ void install_decathlt_protection(running_machine *machine)
 {
 	/* It uploads 2 tables here, then performs what looks like a number of transfers, setting
        a source address of some kind (scrambled?) and then making many reads from a single address */
+	memset(decathlt_protregs, 0, sizeof(decathlt_protregs));
+	decathlt_lastcount = 0;
+	decathlt_prot_uploadmode = 0;
+	decathlt_prot_uploadoffset = 0;
+	decathlt_part = 1;
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x37FFFF0, 0x37FFFFF, 0, 0, decathlt_prot_r, decathlt_prot_w);
 	/* It uploads 2 tables here too, but nothing else, mirror? unused? */
 //  memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x27FFFF0, 0x27FFFFF, 0, 0, decathlt_prot_r, decathlt_prot_w);

@@ -35,6 +35,8 @@ Notes:
 #include "sound/2413intf.h"
 #include "sound/okim6295.h"
 
+static int toggle, debug_addr, debug_width;
+
 /***************************************************************************
                                 Video Hardware
 ***************************************************************************/
@@ -109,6 +111,10 @@ static VIDEO_START( igs017 )
 
 	tilemap_set_transparent_pen(fg_tilemap,0xf);
 	tilemap_set_transparent_pen(bg_tilemap,0xf);
+
+	toggle = 0;
+	debug_addr = 0;
+	debug_width = 512;
 }
 
 
@@ -220,11 +226,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 static int debug_viewer(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 #ifdef MAME_DEBUG
-	static int toggle = 0;
 	if (input_code_pressed_once(machine, KEYCODE_T))	toggle = 1-toggle;
 	if (toggle)	{
-		static int a = 0, w = 512;
-		int h = 256;
+		int h = 256, w = debug_width, a = debug_addr;
 
 		if (input_code_pressed(machine, KEYCODE_O))		w += 1;
 		if (input_code_pressed(machine, KEYCODE_I))		w -= 1;
@@ -252,6 +256,8 @@ static int debug_viewer(running_machine *machine, bitmap_t *bitmap,const rectang
 		draw_sprite(machine, bitmap, cliprect, 0,0, w,h, 0,0, 0, a);
 
 		popmessage("a: %08X w: %03X p: %02X-%02x-%02x",a,w,sprites_gfx[a/3*3+0],sprites_gfx[a/3*3+1],sprites_gfx[a/3*3+2]);
+		debug_addr = a;
+		debug_width = w;
 		osd_sleep(200000);
 		return 1;
 	}
@@ -1077,6 +1083,7 @@ static MACHINE_RESET( iqblocka )
 {
 	nmi_enable = 0;
 	irq_enable = 0;
+	input_select = 0;
 }
 
 static MACHINE_DRIVER_START( iqblocka )
@@ -1135,8 +1142,11 @@ static INTERRUPT_GEN( mgcs_interrupt )
 
 static MACHINE_RESET( mgcs )
 {
+	MACHINE_RESET_CALL( iqblocka );
 	irq1_enable = 0;
 	irq2_enable = 0;
+	scramble_data = 0;
+	memset(igs_magic, 0, sizeof(igs_magic));
 }
 
 static const ppi8255_interface mgcs_ppi8255_intf =

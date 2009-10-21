@@ -110,8 +110,9 @@ VIDEO_EOF( mlc );
 extern UINT32 *mlc_vram, *mlc_clip_ram;
 static UINT32 *mlc_ram, *irq_ram;
 static emu_timer *raster_irq_timer;
-static int mainCpuIsArm=1;
+static int mainCpuIsArm;
 static int mlc_raster_table[9][256];
+static UINT32 vbl_i;
 
 /***************************************************************************/
 
@@ -161,11 +162,10 @@ static WRITE32_HANDLER( avengrs_palette_w )
 
 static READ32_HANDLER( decomlc_vbl_r )
 {
-	static int i=0xffffffff;
-	i ^=0xffffffff;
+	vbl_i ^=0xffffffff;
 //logerror("vbl r %08x\n", cpu_get_pc(space->cpu));
 	// Todo: Vblank probably in $10
-	return i;
+	return vbl_i;
 }
 
 static READ32_HANDLER( mlc_scanline_r )
@@ -378,6 +378,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( mlc )
 {
+	vbl_i = 0xffffffff;
 	raster_irq_timer = timer_alloc(machine, interrupt_gen, NULL);
 }
 

@@ -149,37 +149,37 @@ static COLOR texel0_color;
 static COLOR texel1_color;
 static COLOR shade_color;
 
-static COLOR one_color		= { 0xff, 0xff, 0xff, 0xff };
-static COLOR zero_color		= { 0x00, 0x00, 0x00, 0x00 };
+static const COLOR one_color		= { 0xff, 0xff, 0xff, 0xff };
+static const COLOR zero_color		= { 0x00, 0x00, 0x00, 0x00 };
 
 // combiner inputs
-static UINT8 *combiner_rgbsub_a_r[2];
-static UINT8 *combiner_rgbsub_a_g[2];
-static UINT8 *combiner_rgbsub_a_b[2];
-static UINT8 *combiner_rgbsub_b_r[2];
-static UINT8 *combiner_rgbsub_b_g[2];
-static UINT8 *combiner_rgbsub_b_b[2];
-static UINT8 *combiner_rgbmul_r[2];
-static UINT8 *combiner_rgbmul_g[2];
-static UINT8 *combiner_rgbmul_b[2];
-static UINT8 *combiner_rgbadd_r[2];
-static UINT8 *combiner_rgbadd_g[2];
-static UINT8 *combiner_rgbadd_b[2];
+static const UINT8 *combiner_rgbsub_a_r[2];
+static const UINT8 *combiner_rgbsub_a_g[2];
+static const UINT8 *combiner_rgbsub_a_b[2];
+static const UINT8 *combiner_rgbsub_b_r[2];
+static const UINT8 *combiner_rgbsub_b_g[2];
+static const UINT8 *combiner_rgbsub_b_b[2];
+static const UINT8 *combiner_rgbmul_r[2];
+static const UINT8 *combiner_rgbmul_g[2];
+static const UINT8 *combiner_rgbmul_b[2];
+static const UINT8 *combiner_rgbadd_r[2];
+static const UINT8 *combiner_rgbadd_g[2];
+static const UINT8 *combiner_rgbadd_b[2];
 
-static UINT8 *combiner_alphasub_a[2];
-static UINT8 *combiner_alphasub_b[2];
-static UINT8 *combiner_alphamul[2];
-static UINT8 *combiner_alphaadd[2];
+static const UINT8 *combiner_alphasub_a[2];
+static const UINT8 *combiner_alphasub_b[2];
+static const UINT8 *combiner_alphamul[2];
+static const UINT8 *combiner_alphaadd[2];
 
 // blender input
-static UINT8 *blender1a_r[2];
-static UINT8 *blender1a_g[2];
-static UINT8 *blender1a_b[2];
-static UINT8 *blender1b_a[2];
-static UINT8 *blender2a_r[2];
-static UINT8 *blender2a_g[2];
-static UINT8 *blender2a_b[2];
-static UINT8 *blender2b_a[2];
+static const UINT8 *blender1a_r[2];
+static const UINT8 *blender1a_g[2];
+static const UINT8 *blender1a_b[2];
+static const UINT8 *blender1b_a[2];
+static const UINT8 *blender2a_r[2];
+static const UINT8 *blender2a_g[2];
+static const UINT8 *blender2a_b[2];
+static const UINT8 *blender2b_a[2];
 
 
 static COLOR pixel_color;
@@ -350,7 +350,7 @@ VIDEO_UPDATE(n64)
 
 /*****************************************************************************/
 
-INLINE void SET_SUBA_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
+INLINE void SET_SUBA_RGB_INPUT(const UINT8 **input_r, const UINT8 **input_g, const UINT8 **input_b, int code)
 {
 	switch (code & 0xf)
 	{
@@ -369,7 +369,7 @@ INLINE void SET_SUBA_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b
 	}
 }
 
-INLINE void SET_SUBB_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
+INLINE void SET_SUBB_RGB_INPUT(const UINT8 **input_r, const UINT8 **input_g, const UINT8 **input_b, int code)
 {
 	switch (code & 0xf)
 	{
@@ -388,7 +388,7 @@ INLINE void SET_SUBB_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b
 	}
 }
 
-INLINE void SET_MUL_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
+INLINE void SET_MUL_RGB_INPUT(const UINT8 **input_r, const UINT8 **input_g, const UINT8 **input_b, int code)
 {
 	switch (code & 0x1f)
 	{
@@ -416,7 +416,7 @@ INLINE void SET_MUL_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b,
 	}
 }
 
-INLINE void SET_ADD_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
+INLINE void SET_ADD_RGB_INPUT(const UINT8 **input_r, const UINT8 **input_g, const UINT8 **input_b, int code)
 {
 	switch (code & 0x7)
 	{
@@ -431,7 +431,7 @@ INLINE void SET_ADD_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b,
 	}
 }
 
-INLINE void SET_SUB_ALPHA_INPUT(UINT8 **input, int code)
+INLINE void SET_SUB_ALPHA_INPUT(const UINT8 **input, int code)
 {
 	switch (code & 0x7)
 	{
@@ -446,7 +446,7 @@ INLINE void SET_SUB_ALPHA_INPUT(UINT8 **input, int code)
 	}
 }
 
-INLINE void SET_MUL_ALPHA_INPUT(UINT8 **input, int code)
+INLINE void SET_MUL_ALPHA_INPUT(const UINT8 **input, int code)
 {
 	switch (code & 0x7)
 	{
@@ -491,7 +491,7 @@ INLINE COLOR COLOR_COMBINER(int cycle)
 
 
 
-INLINE void SET_BLENDER_INPUT(int cycle, int which, UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, UINT8 **input_a, int a, int b)
+INLINE void SET_BLENDER_INPUT(int cycle, int which, const UINT8 **input_r, const UINT8 **input_g, const UINT8 **input_b, const UINT8 **input_a, int a, int b)
 {
 	switch (a & 0x3)
 	{

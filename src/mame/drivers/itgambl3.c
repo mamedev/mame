@@ -45,12 +45,17 @@
 #include "sound/okim6295.h"
 
 
+static int test_x, test_y, start_offs;
+
 /*************************
 *     Video Hardware     *
 *************************/
 
 static VIDEO_START( itgambl3 )
 {
+	test_x = 256;
+	test_y = 256;
+	start_offs = 0;
 }
 
 /* (dirty) debug code for looking 8bpps blitter-based gfxs */
@@ -58,7 +63,6 @@ static VIDEO_UPDATE( itgambl3 )
 {
 	int x,y,count;
 	const UINT8 *blit_ram = memory_region(screen->machine,"gfx1");
-	static int test_x = 256,test_y = 256,start_offs;
 
 	if(input_code_pressed(screen->machine, KEYCODE_Z))
 		test_x++;

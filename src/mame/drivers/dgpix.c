@@ -56,6 +56,7 @@ static UINT32 *vram;
 static int vbuffer = 0;
 
 static int flash_roms;
+static int old_vbuf;
 static UINT32 flash_cmd = 0;
 static INT32 first_offset;
 
@@ -161,8 +162,6 @@ static READ32_HANDLER( vram_r )
 
 static WRITE32_HANDLER( vbuffer_w )
 {
-	static int old_vbuf = 3;
-
 	if(old_vbuf == 3 && (data & 3) == 2)
 	{
 		vbuffer ^= 1;
@@ -300,6 +299,7 @@ static MACHINE_RESET( dgpix )
 	vbuffer = 0;
 	flash_cmd = 0;
 	first_offset = -1;
+	old_vbuf = 3;
 }
 
 

@@ -64,7 +64,9 @@ static tilemap *bg_tilemap;
 static UINT16 hu_scrollx, hu_scrolly;
 static UINT16 port0_data;
 
+static int addr;
 static UINT8 mcu_data;
+static UINT8 mcu_status;
 static UINT8 test_mcu;
 static UINT8 mcu_ram_mux[0x100];
 static struct
@@ -79,6 +81,8 @@ static struct
 
 static MACHINE_RESET( mermaid )
 {
+	addr = 0xff;
+
 	/* ticks for the attract mode. */
 	mcu_ram.attract_timer = 0;
 	/*
@@ -94,6 +98,7 @@ static MACHINE_RESET( mermaid )
     8 = game over screen
     ...
     */
+	mcu_status = 0x8;
 	mcu_ram.program_flow = 0;
 	if(input_port_read(machine, "DSW1") & 4) //service mode
 		mcu_ram.program_flow = 7;
@@ -261,13 +266,11 @@ static READ8_HANDLER( mermaid_data_r )
 */
 static READ8_HANDLER( mermaid_status_r )
 {
-	static UINT8 unk_bit,mcu_status = 8;
 //  printf("R St\n");
 
-	unk_bit^=4;
-	mcu_status^=8;
+	mcu_status^=0xc;
 
-	return mcu_status | unk_bit | 0x10;
+	return mcu_status | 0x10;
 //  return mame_rand(space->machine);
 }
 
@@ -623,7 +626,6 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( hvyunit_interrupt )
 {
-	static int addr = 0xff;
 	addr ^= 0x02;
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, addr);
 }

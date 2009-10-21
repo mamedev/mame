@@ -688,8 +688,8 @@ ADDRESS_MAP_END
 
 
 */
-static UINT8 p1 = 0xff; // save state
-static UINT8 p3 = 0xff; // save state
+static UINT8 p1; // save state
+static UINT8 p3; // save state
 
 static READ8_HANDLER( mcu_r )
 {
@@ -1102,6 +1102,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, screenpl, 0,        maygayv1, screenpl, 0, ROT0, "Maygay", "Screen Play (ver. 4.0)",               GAME_IMPERFECT_SOUND|GAME_REQUIRES_ARTWORK )
-GAME( 1991, screenp1, screenpl, maygayv1, screenpl, 0, ROT0, "Maygay", "Screen Play (ver. 1.9)",               GAME_IMPERFECT_SOUND|GAME_REQUIRES_ARTWORK )
-GAME( 1991, screenp2, screenpl, maygayv1, screenpl, 0, ROT0, "Maygay", "Screen Play (ver. 1.9, Isle of Man)",  GAME_IMPERFECT_SOUND|GAME_REQUIRES_ARTWORK )
+static DRIVER_INIT( screenpl )
+{
+	p1 = p3 = 0xff;
+}
+
+GAME( 1991, screenpl, 0,        maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (ver. 4.0)",               GAME_IMPERFECT_SOUND|GAME_REQUIRES_ARTWORK )
+GAME( 1991, screenp1, screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (ver. 1.9)",               GAME_IMPERFECT_SOUND|GAME_REQUIRES_ARTWORK )
+GAME( 1991, screenp2, screenpl, maygayv1, screenpl, screenpl, ROT0, "Maygay", "Screen Play (ver. 1.9, Isle of Man)",  GAME_IMPERFECT_SOUND|GAME_REQUIRES_ARTWORK )

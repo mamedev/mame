@@ -29,7 +29,7 @@
 #include "video/resnet.h"
 #include "video/segaic16.h"
 
-static int system16_bootleg_spritebank_type = -1;
+static int system16_bootleg_spritebank_type;
 static int system16_bootleg_back_tilemap_yscroll = 0;
 static int system16_bootleg_fore_tilemap_yscroll = 0;
 static int system16_bootleg_text_tilemap_yscroll = 0;

@@ -917,7 +917,7 @@ WRITE32_HANDLER( n64_ai_reg_w )
 // Peripheral Interface
 
 static UINT32 pi_dram_addr, pi_cart_addr;
-static UINT32 pi_first_dma = 1;
+static UINT32 pi_first_dma;
 
 READ32_HANDLER( n64_pi_reg_r )
 {

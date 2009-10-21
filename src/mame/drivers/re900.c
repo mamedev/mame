@@ -81,7 +81,7 @@
 #include "re900.lh"
 
 static UINT8 *re900_rom;
-static UINT8 psg_pa, psg_pb = 0, mux_data = 0, ledant = 0, player = 1, stat_a= 1;
+static UINT8 psg_pa, psg_pb, mux_data, ledant, player, stat_a;
 
 
 /****************
@@ -444,6 +444,7 @@ static DRIVER_INIT( re900 )
 	TMS9928A_configure(&tms9928a_interface);
 	player = 1;
 	stat_a = 1;
+	psg_pa = psg_pb = mux_data = ledant = 0;
 }
 
 

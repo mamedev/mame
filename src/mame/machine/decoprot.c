@@ -78,7 +78,7 @@
 
 static UINT8 decoprot_buffer_ram_selected=0;
 static UINT16 deco16_xor=0;
-static UINT16 deco16_mask=0xffff;
+static UINT16 deco16_mask;
 static int decoprot_last_write=0, decoprot_last_write_val=0;
 static UINT16 decoprot_buffer_ram[0x800];
 static UINT16 decoprot_buffer_ram2[0x800];

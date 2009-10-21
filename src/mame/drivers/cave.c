@@ -87,7 +87,7 @@ Versions known to exist but not dumped:
 
 ***************************************************************************/
 
-static int time_vblank_irq = 2000;
+static int time_vblank_irq;
 static UINT8 irq_level;
 static UINT8 vblank_irq;
 static UINT8 sound_irq;

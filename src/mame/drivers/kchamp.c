@@ -110,7 +110,7 @@ static WRITE8_HANDLER( sound_command_w )
 }
 
 static int msm_data = 0;
-static int msm_play_lo_nibble = 1;
+static int msm_play_lo_nibble;
 
 static WRITE8_HANDLER( sound_msm_w )
 {
@@ -745,15 +745,24 @@ static DRIVER_INIT( kchampvs )
 }
 
 
+static DRIVER_INIT( kchamp )
+{
+	nmi_enable = 0;
+	sound_nmi_enable = 0;
+}
+
 static DRIVER_INIT( kchampvs2 )
 {
+	DRIVER_INIT_CALL( kchamp );
 	decrypt_code(machine);
+	msm_data = 0;
+	msm_play_lo_nibble = 1;
 }
 
 
 
-GAME( 1984, kchamp,    0,      kchamp,   kchamp,   0,         ROT90, "Data East USA", "Karate Champ (US)", 0 )
-GAME( 1984, karatedo,  kchamp, kchamp,   kchamp,   0,         ROT90, "Data East Corporation", "Karate Dou (Japan)", 0 )
+GAME( 1984, kchamp,    0,      kchamp,   kchamp,   kchamp,    ROT90, "Data East USA", "Karate Champ (US)", 0 )
+GAME( 1984, karatedo,  kchamp, kchamp,   kchamp,   kchamp,    ROT90, "Data East Corporation", "Karate Dou (Japan)", 0 )
 GAME( 1984, kchampvs,  kchamp, kchampvs, kchampvs, kchampvs,  ROT90, "Data East USA", "Karate Champ (US, VS version set 1)", 0 )
 GAME( 1984, kchampvs2, kchamp, kchampvs, kchampvs, kchampvs2, ROT90, "Data East USA", "Karate Champ (US, VS version set 2)", 0 )
 GAME( 1984, karatevs,  kchamp, kchampvs, kchampvs, kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", 0 )

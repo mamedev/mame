@@ -20,8 +20,8 @@ UINT8 *vb_scrolly_lo;
 UINT8 *vb_videoram;
 UINT8 *vb_attribram;
 int vball_gfxset=0;
-static int vb_bgprombank=0xff;
-static int vb_spprombank=0xff;
+static int vb_bgprombank;
+static int vb_spprombank;
 
 static tilemap *bg_tilemap;
 
@@ -54,6 +54,8 @@ VIDEO_START( vb )
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info,background_scan, 8, 8,64,64);
 
 	tilemap_set_scroll_rows(bg_tilemap,32);
+	vb_bgprombank=0xff;
+	vb_spprombank=0xff;
 }
 
 WRITE8_HANDLER( vb_videoram_w )

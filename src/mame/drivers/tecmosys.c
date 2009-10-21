@@ -213,8 +213,6 @@ static bitmap_t *tmp_tilemap_composebitmap;
 static bitmap_t *tmp_tilemap_renderbitmap;
 
 
-static MACHINE_RESET( deroon );
-
 static tilemap *bg0tilemap;
 static TILE_GET_INFO( get_bg0tile_info )
 {
@@ -436,16 +434,16 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(eeprom_w	)
 	AM_RANGE(0xa80000, 0xa80005) AM_WRITE(SMH_RAM	) AM_BASE(&tecmosys_a80000regs)	// a80000-3 scroll? a80004 inverted ? 3 : 0
 	AM_RANGE(0xb00000, 0xb00005) AM_WRITE(SMH_RAM	) AM_BASE(&tecmosys_b00000regs)	// b00000-3 scrool?, b00004 inverted ? 3 : 0
-	AM_RANGE(0xb80000, 0xb80001) AM_READWRITE(prot_status_r, prot_status_w)
+	AM_RANGE(0xb80000, 0xb80001) AM_READWRITE(tecmosys_prot_status_r, tecmosys_prot_status_w)
 	AM_RANGE(0xc00000, 0xc00005) AM_WRITE(SMH_RAM	) AM_BASE(&tecmosys_c00000regs)	// c00000-3 scroll? c00004 inverted ? 13 : 10
 	AM_RANGE(0xc80000, 0xc80005) AM_WRITE(SMH_RAM	) AM_BASE(&tecmosys_c80000regs)	// c80000-3 scrool? c80004 inverted ? 3 : 0
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("P1")
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("P2")
 	AM_RANGE(0xd80000, 0xd80001) AM_READ(eeprom_r)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE( sound_w )
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(prot_data_w)
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(tecmosys_prot_data_w)
 	AM_RANGE(0xf00000, 0xf00001) AM_READ(sound_r)
-	AM_RANGE(0xf80000, 0xf80001) AM_READ(prot_data_r)
+	AM_RANGE(0xf80000, 0xf80001) AM_READ(tecmosys_prot_data_r)
 ADDRESS_MAP_END
 
 
@@ -904,7 +902,6 @@ static MACHINE_DRIVER_START( deroon )
 	MDRV_PALETTE_LENGTH(0x4000+0x800)
 
 	MDRV_VIDEO_START(deroon)
-	MDRV_MACHINE_RESET(deroon)
 	MDRV_VIDEO_UPDATE(deroon)
 
 	/* sound hardware */
@@ -1058,12 +1055,6 @@ ROM_START( tkdenshoa )
 	ROM_LOAD( "ae500w07.ad1", 0x080000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
 ROM_END
 
-static MACHINE_RESET( deroon )
-{
-	device_read_ptr = 0;
-	device_status = DS_IDLE;
-}
-
 static void tecmosys_decramble(running_machine *machine)
 {
 	UINT8 *gfxsrc    = memory_region       ( machine, "gfx1" );
@@ -1091,20 +1082,21 @@ static void tecmosys_decramble(running_machine *machine)
 static DRIVER_INIT( deroon )
 {
 	tecmosys_decramble(machine);
-	device_data = &deroon_data;
+	tecmosys_prot_init(machine, 0);
 }
 
 static DRIVER_INIT( tkdensho )
 {
 	tecmosys_decramble(machine);
-	device_data = &tkdensho_data;
+	tecmosys_prot_init(machine, 1);
 }
 
 static DRIVER_INIT( tkdensha )
 {
 	tecmosys_decramble(machine);
-	device_data = &tkdensha_data;
+	tecmosys_prot_init(machine, 2);
 }
+
 GAME( 1995, deroon,           0, deroon, deroon, deroon,     ROT0, "Tecmo", "Deroon DeroDero", 0 )
 GAME( 1996, tkdensho,         0, deroon, deroon, tkdensho,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes- (VER. 960614)", 0 )
 GAME( 1996, tkdenshoa, tkdensho, deroon, deroon, tkdensha,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes- (VER. 960427)", 0 )

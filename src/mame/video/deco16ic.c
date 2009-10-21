@@ -178,6 +178,8 @@ static void custom_tilemap_draw(running_machine *machine,
 	bitmap_t *bitmap,tilemap *tilemap0_8x8,tilemap *tilemap0_16x16,
 	tilemap *tilemap1_8x8,tilemap *tilemap1_16x16, const UINT16 *rowscroll_ptr,const UINT16 scrollx,
 	const UINT16 scrolly,const UINT16 control0, const UINT16 control1,int combine_mask,int combine_shift,int trans_mask,int flags,UINT32 priority);
+static int pf12_last_small, pf12_last_big, pf34_last_big;
+
 
 /******************************************************************************/
 
@@ -437,23 +439,21 @@ void deco16_set_tilemap_transparency_mask(int tmap, int mask)
 
 void deco16_pf12_set_gfxbank(int small, int big)
 {
-	static int last_small=-1, last_big=-1;
-
-	if (last_small!=small) {
+	if (pf12_last_small!=small) {
 		if (pf1_tilemap_8x8)
 			tilemap_mark_all_tiles_dirty(pf1_tilemap_8x8);
 		if (pf2_tilemap_8x8)
 			tilemap_mark_all_tiles_dirty(pf2_tilemap_8x8);
-		last_small=small;
+		pf12_last_small=small;
 	}
 	deco16_pf12_8x8_gfx_bank=small;
 
-	if (last_big!=big) {
+	if (pf12_last_big!=big) {
 		if (pf1_tilemap_16x16)
 			tilemap_mark_all_tiles_dirty(pf1_tilemap_16x16);
 		if (pf2_tilemap_16x16)
 			tilemap_mark_all_tiles_dirty(pf2_tilemap_16x16);
-		last_big=big;
+		pf12_last_big=big;
 	}
 	deco16_pf12_16x16_gfx_bank=big;
 
@@ -461,14 +461,12 @@ void deco16_pf12_set_gfxbank(int small, int big)
 
 void deco16_pf34_set_gfxbank(int small, int big)
 {
-	static int last_big=-1;
-
-	if (last_big!=big) {
+	if (pf34_last_big!=big) {
 		if (pf3_tilemap_16x16)
 			tilemap_mark_all_tiles_dirty(pf3_tilemap_16x16);
 		if (pf4_tilemap_16x16)
 			tilemap_mark_all_tiles_dirty(pf4_tilemap_16x16);
-		last_big=big;
+		pf34_last_big=big;
 	}
 	deco16_pf34_16x16_gfx_bank=big;
 }
@@ -580,6 +578,8 @@ static void deco16_video_init(running_machine *machine, int pf12_only, int split
 	deco16_pf34_16x16_gfx_bank=2;
 
 	deco16_raster_display_position=0;
+
+	pf12_last_small = pf12_last_big = pf34_last_big = -1;
 }
 
 void deco16_1_video_init(running_machine *machine)  /* 1 times playfield generator chip */

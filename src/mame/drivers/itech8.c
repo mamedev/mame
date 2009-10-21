@@ -1895,6 +1895,7 @@ static MACHINE_DRIVER_START( slikshot_hi )
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MDRV_VIDEO_START(slikshot)
 	MDRV_VIDEO_UPDATE(slikshot)
 MACHINE_DRIVER_END
 
@@ -1912,6 +1913,7 @@ static MACHINE_DRIVER_START( slikshot_lo )
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
+	MDRV_VIDEO_START(slikshot)
 	MDRV_VIDEO_UPDATE(slikshot)
 MACHINE_DRIVER_END
 

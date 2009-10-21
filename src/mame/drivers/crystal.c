@@ -544,6 +544,7 @@ static MACHINE_RESET(crystal)
 
 static VIDEO_START(crystal)
 {
+	vrender0_init(machine);
 }
 
 static UINT16 GetVidReg(const address_space *space, UINT16 reg)

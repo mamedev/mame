@@ -72,6 +72,8 @@ static UINT32 zeus_objdata;
 static rectangle zeus_cliprect;
 
 static UINT32 *waveram[2];
+static int yoffs;
+static int texel_width;
 
 
 
@@ -260,6 +262,8 @@ VIDEO_START( midzeus )
 	/* we need to cleanup on exit */
 	add_exit_callback(machine, exit_handler);
 
+	yoffs = 0;
+	texel_width = 256;
 	zeus_renderbase = waveram[1];
 
 	/* state saving */
@@ -329,14 +333,12 @@ VIDEO_UPDATE( midzeus )
 	/* waveram drawing case */
 	else
 	{
-		static int yoffs = 0;
-		static int width = 256;
 		const void *base;
 
 		if (input_code_pressed(screen->machine, KEYCODE_DOWN)) yoffs += input_code_pressed(screen->machine, KEYCODE_LSHIFT) ? 0x40 : 1;
 		if (input_code_pressed(screen->machine, KEYCODE_UP)) yoffs -= input_code_pressed(screen->machine, KEYCODE_LSHIFT) ? 0x40 : 1;
-		if (input_code_pressed(screen->machine, KEYCODE_LEFT) && width > 4) { width >>= 1; while (input_code_pressed(screen->machine, KEYCODE_LEFT)) ; }
-		if (input_code_pressed(screen->machine, KEYCODE_RIGHT) && width < 512) { width <<= 1; while (input_code_pressed(screen->machine, KEYCODE_RIGHT)) ; }
+		if (input_code_pressed(screen->machine, KEYCODE_LEFT) && texel_width > 4) { texel_width >>= 1; while (input_code_pressed(screen->machine, KEYCODE_LEFT)) ; }
+		if (input_code_pressed(screen->machine, KEYCODE_RIGHT) && texel_width < 512) { texel_width <<= 1; while (input_code_pressed(screen->machine, KEYCODE_RIGHT)) ; }
 
 		if (yoffs < 0) yoffs = 0;
 		base = waveram0_ptr_from_block_addr(yoffs << 12);
@@ -346,7 +348,7 @@ VIDEO_UPDATE( midzeus )
 			UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			{
-				UINT8 tex = get_texel_8bit(base, y, x, width);
+				UINT8 tex = get_texel_8bit(base, y, x, texel_width);
 				dest[x] = (tex << 8) | tex;
 			}
 		}

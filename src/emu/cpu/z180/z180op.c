@@ -325,7 +325,7 @@ static void take_interrupt(z180_state *cpustate, int irq)
 			RM16( cpustate, irq_vector, &cpustate->PC );
 			LOG(("Z180 '%s' IM2 [$%04x] = $%04x\n",cpustate->device->tag , irq_vector, cpustate->_PCD));
 			/* CALL opcode timing */
-			cpustate->icount -= cc[Z180_TABLE_op][0xcd];
+			cpustate->icount -= cpustate->cc[Z180_TABLE_op][0xcd];
 		}
 		else
 		/* Interrupt mode 1. RST 38h */
@@ -335,7 +335,7 @@ static void take_interrupt(z180_state *cpustate, int irq)
 			PUSH(cpustate,  PC );
 			cpustate->_PCD = 0x0038;
 			/* RST $38 + 'interrupt latency' cycles */
-			cpustate->icount -= cc[Z180_TABLE_op][0xff] - cc[Z180_TABLE_ex][0xff];
+			cpustate->icount -= cpustate->cc[Z180_TABLE_op][0xff] - cpustate->cc[Z180_TABLE_ex][0xff];
 		}
 		else
 		{
@@ -349,18 +349,18 @@ static void take_interrupt(z180_state *cpustate, int irq)
 					PUSH(cpustate,  PC );
 					cpustate->_PCD = irq_vector & 0xffff;
 						/* CALL $xxxx + 'interrupt latency' cycles */
-					cpustate->icount -= cc[Z180_TABLE_op][0xcd] - cc[Z180_TABLE_ex][0xff];
+					cpustate->icount -= cpustate->cc[Z180_TABLE_op][0xcd] - cpustate->cc[Z180_TABLE_ex][0xff];
 					break;
 				case 0xc30000:	/* jump */
 					cpustate->_PCD = irq_vector & 0xffff;
 					/* JP $xxxx + 2 cycles */
-					cpustate->icount -= cc[Z180_TABLE_op][0xc3] - cc[Z180_TABLE_ex][0xff];
+					cpustate->icount -= cpustate->cc[Z180_TABLE_op][0xc3] - cpustate->cc[Z180_TABLE_ex][0xff];
 					break;
 				default:		/* rst (or other opcodes?) */
 					PUSH(cpustate,  PC );
 					cpustate->_PCD = irq_vector & 0x0038;
 					/* RST $xx + 2 cycles */
-					cpustate->icount -= cc[Z180_TABLE_op][cpustate->_PCD] - cc[Z180_TABLE_ex][cpustate->_PCD];
+					cpustate->icount -= cpustate->cc[Z180_TABLE_op][cpustate->_PCD] - cpustate->cc[Z180_TABLE_ex][cpustate->_PCD];
 					break;
 			}
 		}
@@ -373,7 +373,7 @@ static void take_interrupt(z180_state *cpustate, int irq)
 		RM16( cpustate, irq_vector, &cpustate->PC );
 		LOG(("Z180 '%s' INT%d [$%04x] = $%04x\n", cpustate->device->tag, irq, irq_vector, cpustate->_PCD));
 		/* CALL opcode timing */
-		cpustate->icount -= cc[Z180_TABLE_op][0xcd];
+		cpustate->icount -= cpustate->cc[Z180_TABLE_op][0xcd];
 	}
 }
 

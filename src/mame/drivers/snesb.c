@@ -556,8 +556,8 @@ static MACHINE_DRIVER_START( kinstb )
 	MDRV_MACHINE_RESET( snes )
 
 	/* video hardware */
+	MDRV_VIDEO_START( snes )
 	MDRV_VIDEO_UPDATE( snes )
-
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

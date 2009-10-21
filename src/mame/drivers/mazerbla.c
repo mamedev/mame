@@ -67,7 +67,7 @@ static UINT8 soundlatch;
  *
  *************************************/
 
-static UINT8 bknd_col = 0xaa;
+static UINT8 bknd_col;
 static UINT8 port02_status = 0;
 static UINT8 VCU_video_reg[4];
 static UINT8 vbank = 0; /* video page select signal, likely for double buffering ?*/
@@ -76,7 +76,7 @@ static UINT32 VCU_gfx_param_addr = 0;
 static UINT32 xpos=0, ypos=0, pix_xsize=0, pix_ysize=0;
 static UINT8 color=0, color2=0, mode=0, plane=0;
 static UINT8 lookup_RAM[0x100*4];
-static UINT32 gfx_rom_bank = 0xff;	/* graphics ROMs are banked */
+static UINT32 gfx_rom_bank;	/* graphics ROMs are banked */
 
 
 /***************************************************************************
@@ -1608,7 +1608,12 @@ ROM_START( greatgun )
 	ROM_LOAD( "psb19",0x36000,0x2000, CRC(68752e0d) SHA1(58a4921e4f774af5e1ef7af67f06e9b43643ffab) )
 ROM_END
 
+static DRIVER_INIT( mazerbla )
+{
+	bknd_col = 0xaa;
+	gfx_rom_bank = 0xff;
+}
 
-GAME( 1983, mazerbla, 0,        mazerbla,  mazerbla, 0, ROT0, "Stern", "Mazer Blazer (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 1983, mazerblaa,mazerbla, mazerbla,  mazerbla, 0, ROT0, "Stern", "Mazer Blazer (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 1983, greatgun, 0,        greatgun,  greatgun, 0, ROT0, "Stern", "Great Guns", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1983, mazerbla, 0,        mazerbla,  mazerbla, mazerbla, ROT0, "Stern", "Mazer Blazer (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1983, mazerblaa,mazerbla, mazerbla,  mazerbla, mazerbla, ROT0, "Stern", "Mazer Blazer (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1983, greatgun, 0,        greatgun,  greatgun, mazerbla, ROT0, "Stern", "Great Guns", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

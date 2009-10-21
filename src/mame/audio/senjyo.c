@@ -8,7 +8,7 @@
 #define SINGLE_DIVIDER 8
 
 static INT16 *_single;
-static int single_rate = 1000;
+static int single_rate = 0;
 static int single_volume = 0;
 
 
@@ -78,7 +78,9 @@ SAMPLES_START( senjyo_sh_start )
 		_single[i] = ((i/SINGLE_DIVIDER)&0x01)*127*256;
 
 	/* CTC2 single tone generator */
-	sample_set_volume(device,0,0);
+	single_rate = 1000;
+	single_volume = 0;
+	sample_set_volume(device,0,single_volume / 15.0);
 	sample_start_raw(device,0,_single,SINGLE_LENGTH,single_rate,1);
 
 	timer_pulse(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, senjyo_sh_update);

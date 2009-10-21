@@ -184,12 +184,12 @@ static WRITE16_HANDLER( drgnbowl_sound_command_w )
 /* a function to jump to. */
 
 static int prot;
+static int jumpcode;
 
 static WRITE16_HANDLER( wildfang_protection_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		static int jumpcode;
 		static const int jumppoints[] =
 		{
 			0x0c0c,0x0cac,0x0d42,0x0da2,0x0eea,0x112e,0x1300,0x13fa,
@@ -312,7 +312,7 @@ static const int jumppoints_other[0x100] =
 	    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1
 };
 
-static const int *raiga_jumppoints = jumppoints_00;
+static const int *raiga_jumppoints;
 
 static MACHINE_RESET ( raiga )
 {
@@ -323,8 +323,6 @@ static WRITE16_HANDLER( raiga_protection_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		static int jumpcode;
-
 		data >>= 8;
 
 //      logerror("PC %06x: prot = %02x\n",cpu_get_pc(space->cpu),data);
@@ -1546,13 +1544,17 @@ static DRIVER_INIT( shadoww )
 {
 	/* sprite size Y = sprite size X */
 	gaiden_sprite_sizey = 0;
+	raiga_jumppoints = jumppoints_00;
 }
 
 static DRIVER_INIT( wildfang )
 {
 	/* sprite size Y = sprite size X */
 	gaiden_sprite_sizey = 0;
+	raiga_jumppoints = jumppoints_00;
 
+	prot = 0;
+	jumpcode = 0;
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x07a006, 0x07a007, 0, 0, wildfang_protection_r);
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x07a804, 0x07a805, 0, 0, wildfang_protection_w);
 }
@@ -1561,12 +1563,15 @@ static DRIVER_INIT( raiga )
 {
 	/* sprite size Y independent from sprite size X */
 	gaiden_sprite_sizey = 2;
+	raiga_jumppoints = jumppoints_00;
 
+	prot = 0;
+	jumpcode = 0;
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x07a006, 0x07a007, 0, 0, raiga_protection_r);
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x07a804, 0x07a805, 0, 0, raiga_protection_w);
 }
 
-static DRIVER_INIT( drgnbowl )
+static void descramble_drgnbowl_gfx(running_machine *machine)
 {
 	int i;
 	UINT8 *ROM = memory_region(machine, "maincpu");
@@ -1603,6 +1608,13 @@ static DRIVER_INIT( drgnbowl )
 	}
 
 	free(buffer);
+}
+
+static DRIVER_INIT( drgnbowl )
+{
+	raiga_jumppoints = jumppoints_00;
+
+	descramble_drgnbowl_gfx(machine);
 }
 
 static void descramble_mastninj_gfx(UINT8* src)

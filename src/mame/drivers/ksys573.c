@@ -1901,7 +1901,7 @@ DDR Stage Multiplexor
 
 */
 
-static UINT32 stage_mask = 0xffffffff;
+static UINT32 stage_mask;
 
 #define DDR_STAGE_IDLE ( 0 )
 #define DDR_STAGE_INIT ( 1 )
@@ -2073,6 +2073,7 @@ static DRIVER_INIT( ddr )
 {
 	DRIVER_INIT_CALL(konami573);
 
+	stage_mask = 0xffffffff;
 	gx700pwfbf_init( machine, gn845pwbb_output_callback );
 
 	state_save_register_global(machine,  stage_mask );

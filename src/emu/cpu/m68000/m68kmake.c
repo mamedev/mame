@@ -252,7 +252,7 @@ static void read_insert(char* insert);
 /* ======================================================================== */
 
 /* Name of the input file */
-static char g_input_filename[M68K_MAX_PATH] = FILENAME_INPUT;
+static char g_input_filename[M68K_MAX_PATH];
 
 /* File handles */
 static FILE* g_input_file = NULL;
@@ -1245,7 +1245,7 @@ int main(int argc, char *argv[])
 	printf("\tCopyright Karl Stenerud\n\n");
 
 	/* Check if output path and source for the input file are given */
-    if(argc > 1)
+	if(argc > 1)
 	{
 		char *ptr;
 		strcpy(output_path, argv[1]);
@@ -1254,14 +1254,12 @@ int main(int argc, char *argv[])
 			*ptr = '/';
 
 #if !(defined(__DECC) && defined(VMS))
-        if(output_path[strlen(output_path)-1] != '/')
+		if(output_path[strlen(output_path)-1] != '/')
 			strcat(output_path, "/");
 #endif
-
-		if(argc > 2)
-			strcpy(g_input_filename, argv[2]);
 	}
 
+	strcpy(g_input_filename, (argc > 2) ? argv[2] : FILENAME_INPUT);
 
 #if defined(__DECC) && defined(VMS)
 

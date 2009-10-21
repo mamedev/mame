@@ -81,7 +81,7 @@ static UINT8 z80_clear_to_send;
 
 static UINT16 sensor0, sensor1, sensor2, sensor3;
 
-static UINT8 curvx, curvy = 1, curx;
+static UINT8 curvx, curvy, curx;
 
 static INT8 xbuffer[YBUFFER_COUNT];
 static INT8 ybuffer[YBUFFER_COUNT];
@@ -532,7 +532,29 @@ WRITE8_HANDLER( slikshot_z80_control_w )
 
 /*************************************
  *
- *  VIDEO_UPDATE( slishot )
+ *  VIDEO_START( slikshot )
+ *
+ *************************************/
+
+
+VIDEO_START( slikshot )
+{
+	z80_ctrl = 0;
+	z80_port_val = 0;
+	z80_clear_to_send = 0;
+
+	sensor0 = sensor1 = sensor2 = sensor3 = 0;
+	curvx = 0, curvy = 1, curx = 0;
+	ybuffer_next = 0;
+	curxpos = 0;
+	last_ytotal = 0;
+	crosshair_vis = 0;
+}
+
+
+/*************************************
+ *
+ *  VIDEO_UPDATE( slikshot )
  *
  *************************************/
 

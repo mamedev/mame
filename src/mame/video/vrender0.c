@@ -21,7 +21,7 @@ Missing:
 **************/
 
 static UINT16 InternalPalette[256];
-static UINT32 LastPalUpdate=0xffffffff;
+static UINT32 LastPalUpdate;
 
 /*
 Pick a rare enough color to disable transparency (that way I save a cmp per loop to check
@@ -363,6 +363,12 @@ static const _DrawTemplate DrawTile[]=
 };
 
 #define Packet(i) memory_read_word(space, PacketPtr+2*i)
+
+void vrender0_init(running_machine *machine)
+{
+	memset(InternalPalette, 0, sizeof(InternalPalette));
+	LastPalUpdate=0xffffffff;
+}
 
 //Returns TRUE if the operation was a flip (sync or async)
 int vrender0_ProcessPacket(const address_space *space, UINT32 PacketPtr,UINT16 *Dest,UINT8 *TEXTURE)

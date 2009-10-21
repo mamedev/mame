@@ -50,7 +50,9 @@ To do:
 
 static int nmi_enable,int_enable;
 static int i8751_return, i8751_value;
+static int coin1, coin2, latch, snd;
 static int msm5205next;
+static int toggle;
 
 /******************************************************************************/
 
@@ -157,7 +159,6 @@ static WRITE8_HANDLER( ghostb_i8751_w )
 
 static WRITE8_HANDLER( srdarwin_i8751_w )
 {
-	static int coins, latch;
 	i8751_return = 0;
 
 	switch (offset)
@@ -170,15 +171,15 @@ static WRITE8_HANDLER( srdarwin_i8751_w )
 		break;
 	}
 
-	if (i8751_value == 0x0000) {i8751_return = 0; coins = 0;}
+	if (i8751_value == 0x0000) {i8751_return = 0; coin1 = 0;}
 	if (i8751_value == 0x3063) i8751_return = 0x9c;				/* Protection - Japanese version */
 	if (i8751_value == 0x306b) i8751_return = 0x94;				/* Protection - World version */
 	if ((i8751_value & 0xff00) == 0x4000) i8751_return = i8751_value;	/* Coinage settings */
- 	if (i8751_value == 0x5000) i8751_return =((coins / 10) << 4) | (coins % 10);	/* Coin request */
- 	if (i8751_value == 0x6000) {i8751_value = -1; coins--; }	/* Coin clear */
+ 	if (i8751_value == 0x5000) i8751_return = ((coin1 / 10) << 4) | (coin1 % 10);	/* Coin request */
+ 	if (i8751_value == 0x6000) {i8751_value = -1; coin1--; }	/* Coin clear */
 	/* Nb:  Command 0x4000 for setting coinage options is not supported */
  	if ((input_port_read(space->machine, "FAKE") & 1) == 1) latch = 1;
- 	if ((input_port_read(space->machine, "FAKE") & 1) != 1 && latch) {coins++; latch = 0;}
+ 	if ((input_port_read(space->machine, "FAKE") & 1) != 1 && latch) {coin1++; latch = 0;}
 
 	/* This next value is the index to a series of tables,
     each table controls the end of level bad guy, wrong values crash the
@@ -231,7 +232,6 @@ bb63           = Square things again
 
 static WRITE8_HANDLER( gondo_i8751_w )
 {
-	static int coin1, coin2, latch,snd;
 	i8751_return = 0;
 
 	switch (offset)
@@ -266,7 +266,6 @@ static WRITE8_HANDLER( gondo_i8751_w )
 
 static WRITE8_HANDLER( shackled_i8751_w )
 {
-	static int coin1, coin2, latch = 0;
 	i8751_return = 0;
 
 	switch (offset)
@@ -295,7 +294,6 @@ static WRITE8_HANDLER( shackled_i8751_w )
 
 static WRITE8_HANDLER( lastmiss_i8751_w )
 {
-	static int coin, latch = 0, snd;
 	i8751_return = 0;
 
 	switch (offset)
@@ -313,21 +311,20 @@ static WRITE8_HANDLER( lastmiss_i8751_w )
 	{
 		/* Coins are controlled by the i8751 */
  		if ((input_port_read(space->machine, "IN2") & 3) == 3 && !latch) latch = 1;
- 		if ((input_port_read(space->machine, "IN2") & 3) != 3 && latch) {coin++; latch = 0; snd = 0x400; i8751_return = 0x400; return;}
+ 		if ((input_port_read(space->machine, "IN2") & 3) != 3 && latch) {coin1++; latch = 0; snd = 0x400; i8751_return = 0x400; return;}
 		if (i8751_value == 0x007a) i8751_return = 0x0185; /* Japan ID code */
 		if (i8751_value == 0x007b) i8751_return = 0x0184; /* USA ID code */
-		if (i8751_value == 0x0001) {coin = snd = 0;}//???
+		if (i8751_value == 0x0001) {coin1 = snd = 0;}//???
 		if (i8751_value == 0x0000) {i8751_return = 0x0184;}//???
 		if (i8751_value == 0x0401) i8751_return = 0x0184; //???
 		if ((i8751_value >> 8) == 0x01) i8751_return = 0x0184; /* Coinage setup */
-		if ((i8751_value >> 8) == 0x02) {i8751_return = snd | ((coin / 10) << 4) | (coin % 10); snd = 0;} /* Coin return */
-		if ((i8751_value >> 8) == 0x03 && coin) {i8751_return = 0; coin--; } /* Coin clear */
+		if ((i8751_value >> 8) == 0x02) {i8751_return = snd | ((coin1 / 10) << 4) | (coin1 % 10); snd = 0;} /* Coin return */
+		if ((i8751_value >> 8) == 0x03 && coin1) {i8751_return = 0; coin1--; } /* Coin clear */
 	}
 }
 
 static WRITE8_HANDLER( csilver_i8751_w )
 {
-	static int coin, latch = 0, snd;
 	i8751_return = 0;
 
 	switch (offset)
@@ -345,19 +342,18 @@ static WRITE8_HANDLER( csilver_i8751_w )
 	{
 		/* Coins are controlled by the i8751 */
  		if ((input_port_read(space->machine, "IN2") & 3) == 3 && !latch) latch = 1;
- 		if ((input_port_read(space->machine, "IN2") & 3) != 3 && latch) {coin++; latch = 0; snd = 0x1200; i8751_return = 0x1200; return;}
+ 		if ((input_port_read(space->machine, "IN2") & 3) != 3 && latch) {coin1++; latch = 0; snd = 0x1200; i8751_return = 0x1200; return;}
 
-		if (i8751_value == 0x054a) {i8751_return = ~(0x4a); coin = 0; snd = 0;} /* Captain Silver (Japan) ID */
-		if (i8751_value == 0x054c) {i8751_return = ~(0x4c); coin = 0; snd = 0;} /* Captain Silver (World) ID */
+		if (i8751_value == 0x054a) {i8751_return = ~(0x4a); coin1 = 0; snd = 0;} /* Captain Silver (Japan) ID */
+		if (i8751_value == 0x054c) {i8751_return = ~(0x4c); coin1 = 0; snd = 0;} /* Captain Silver (World) ID */
 		if ((i8751_value >> 8) == 0x01) i8751_return = 0; /* Coinage - Not Supported */
-		if ((i8751_value >> 8) == 0x02) {i8751_return = snd | coin; snd = 0; } /* Coin Return */
-		if ((i8751_value >> 8) == 0x03 && coin) {i8751_return = 0; coin--;} /* Coin Clear */
+		if ((i8751_value >> 8) == 0x02) {i8751_return = snd | coin1; snd = 0; } /* Coin Return */
+		if ((i8751_value >> 8) == 0x03 && coin1) {i8751_return = 0; coin1--;} /* Coin Clear */
 	}
 }
 
 static WRITE8_HANDLER( garyoret_i8751_w )
 {
-	static int coin1, coin2, latch;
 	i8751_return = 0;
 
 	switch (offset)
@@ -437,8 +433,6 @@ static WRITE8_HANDLER( dec8_sound_w )
 
 static void csilver_adpcm_int(const device_config *device)
 {
-	static int toggle = 0;
-
 	toggle ^= 1;
 	if (toggle)
 		cputag_set_input_line(device->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
@@ -1960,19 +1954,18 @@ static const msm5205_interface msm5205_config =
 
 static INTERRUPT_GEN( ghostb_interrupt )
 {
-	static int latch[4];
 	int i8751_out = input_port_read(device->machine, "I8751");
 
 	/* Ghostbusters coins are controlled by the i8751 */
-	if ((i8751_out & 0x8) == 0x8) latch[0] = 1;
-	if ((i8751_out & 0x4) == 0x4) latch[1] = 1;
-	if ((i8751_out & 0x2) == 0x2) latch[2] = 1;
-	if ((i8751_out & 0x1) == 0x1) latch[3] = 1;
+	if ((i8751_out & 0x8) == 0x8) latch |= 1;
+	if ((i8751_out & 0x4) == 0x4) latch |= 2;
+	if ((i8751_out & 0x2) == 0x2) latch |= 4;
+	if ((i8751_out & 0x1) == 0x1) latch |= 8;
 
-	if (((i8751_out & 0x8) != 0x8) && latch[0]) {latch[0] = 0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return = 0x8001; } /* Player 1 coin */
-	if (((i8751_out & 0x4) != 0x4) && latch[1]) {latch[1] = 0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return = 0x4001; } /* Player 2 coin */
-	if (((i8751_out & 0x2) != 0x2) && latch[2]) {latch[2] = 0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return = 0x2001; } /* Player 3 coin */
-	if (((i8751_out & 0x1) != 0x1) && latch[3]) {latch[3] = 0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return = 0x1001; } /* Service */
+	if (((i8751_out & 0x8) != 0x8) && (latch & 1) != 0) {latch &= ~1; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return = 0x8001; } /* Player 1 coin */
+	if (((i8751_out & 0x4) != 0x4) && (latch & 2) != 0) {latch &= ~2; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return = 0x4001; } /* Player 2 coin */
+	if (((i8751_out & 0x2) != 0x2) && (latch & 4) != 0) {latch &= ~4; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return = 0x2001; } /* Player 3 coin */
+	if (((i8751_out & 0x1) != 0x1) && (latch & 8) != 0) {latch &= ~8; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return = 0x1001; } /* Service */
 
 	if (nmi_enable) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE); /* VBL */
 }
@@ -1986,14 +1979,12 @@ static INTERRUPT_GEN( gondo_interrupt )
 /* Coins generate NMI's */
 static INTERRUPT_GEN( oscar_interrupt )
 {
-	static int latch = 1;
-
 	if ((input_port_read(device->machine, "IN2") & 0x7) == 0x7) latch = 1;
 	if (latch && (input_port_read(device->machine, "IN2") & 0x7) != 0x7)
 	{
 		latch = 0;
-    	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-    }
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	}
 }
 
 /******************************************************************************/
@@ -3410,6 +3401,15 @@ ROM_END
 
 /******************************************************************************/
 
+static DRIVER_INIT( dec8 )
+{
+	nmi_enable = int_enable = 0;
+	i8751_return = i8751_value = 0;
+	coin1 = coin2 = latch = snd = 0;
+	msm5205next = 0;
+	toggle = 0;
+}
+
 /* Ghostbusters, Darwin, Oscar use a "Deco 222" custom 6502 for sound. */
 static DRIVER_INIT( deco222 )
 {
@@ -3426,6 +3426,9 @@ static DRIVER_INIT( deco222 )
 
 	for (A = 0x8000;A < 0x10000;A++)
 		decrypt[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x20) << 1) | ((rom[A] & 0x40) >> 1);
+
+	DRIVER_INIT_CALL( dec8 );
+	latch = 1;
 }
 
 static DRIVER_INIT( meikyuh )
@@ -3433,6 +3436,7 @@ static DRIVER_INIT( meikyuh )
 	/* Blank out unused garbage in colour prom to avoid colour overflow */
 	UINT8 *RAM = memory_region(machine, "proms");
 	memset(RAM+0x20,0,0xe0);
+	DRIVER_INIT_CALL( dec8 );
 }
 
 static DRIVER_INIT( ghostb )
@@ -3443,25 +3447,25 @@ static DRIVER_INIT( ghostb )
 
 /******************************************************************************/
 
-GAME( 1988, cobracom, 0,        cobracom, cobracom, 0,       ROT0,   "Data East Corporation", "Cobra-Command (World revision 5)", 0 )
-GAME( 1988, cobracomj,cobracom, cobracom, cobracom, 0,       ROT0,   "Data East Corporation", "Cobra-Command (Japan)", 0 )
+GAME( 1988, cobracom, 0,        cobracom, cobracom, dec8,    ROT0,   "Data East Corporation", "Cobra-Command (World revision 5)", 0 )
+GAME( 1988, cobracomj,cobracom, cobracom, cobracom, dec8,    ROT0,   "Data East Corporation", "Cobra-Command (Japan)", 0 )
 GAME( 1987, ghostb,   0,        ghostb,   ghostb,   ghostb,  ROT0,   "Data East USA", "The Real Ghostbusters (US 2 Players)", 0 )
 GAME( 1987, ghostb3,  ghostb,   ghostb,   ghostb3,  ghostb,  ROT0,   "Data East USA", "The Real Ghostbusters (US 3 Players)", 0 )
 GAME( 1987, meikyuh,  ghostb,   meikyuh,  meikyuh,  meikyuh, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", 0 )
 GAME( 1987, meikyuha, ghostb,   meikyuh,  meikyuh,  meikyuh, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", 0 )
 GAME( 1987, srdarwin, 0,        srdarwin, srdarwin, deco222, ROT270, "Data East Corporation", "Super Real Darwin (World)", 0 )
 GAME( 1987, srdarwinj,srdarwin, srdarwin, srdarwin, deco222, ROT270, "Data East Corporation", "Super Real Darwin (Japan)", 0 )
-GAME( 1987, gondo,    0,        gondo,    gondo,    0,       ROT270, "Data East USA", "Gondomania (US)", 0 )
-GAME( 1987, makyosen, gondo,    gondo,    gondo,    0,       ROT270, "Data East Corporation", "Makyou Senshi (Japan)", 0 )
+GAME( 1987, gondo,    0,        gondo,    gondo,    dec8,    ROT270, "Data East USA", "Gondomania (US)", 0 )
+GAME( 1987, makyosen, gondo,    gondo,    gondo,    dec8,    ROT270, "Data East Corporation", "Makyou Senshi (Japan)", 0 )
 GAME( 1988, oscar,    0,        oscar,    oscar,    deco222, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", 0 )
 GAME( 1987, oscaru,   oscar,    oscar,    oscaru,   deco222, ROT0,   "Data East USA", "Psycho-Nics Oscar (US)", 0 )
 GAME( 1987, oscarj1,  oscar,    oscar,    oscaru,   deco222, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", 0 )
 GAME( 1987, oscarj2,  oscar,    oscar,    oscaru,   deco222, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", 0 )
-GAME( 1986, lastmisn, 0,        lastmiss, lastmisn, 0,       ROT270, "Data East USA", "Last Mission (US revision 6)", 0 )
-GAME( 1986, lastmisno,lastmisn, lastmiss, lastmisn, 0,       ROT270, "Data East USA", "Last Mission (US revision 5)", 0 )
-GAME( 1986, lastmisnj,lastmisn, lastmiss, lastmsnj, 0,       ROT270, "Data East Corporation", "Last Mission (Japan)", 0 )
-GAME( 1986, shackled, 0,        shackled, shackled, 0,       ROT0,   "Data East USA", "Shackled (US)", 0 )
-GAME( 1986, breywood, shackled, shackled, shackled, 0,       ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", 0 )
-GAME( 1987, csilver,  0,        csilver,  csilver,  0,       ROT0,   "Data East Corporation", "Captain Silver (World)", 0 )
-GAME( 1987, csilverj, csilver,  csilver,  csilver,  0,       ROT0,   "Data East Corporation", "Captain Silver (Japan)", 0 )
-GAME( 1987, garyoret, 0,        garyoret, garyoret, 0,       ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", 0 )
+GAME( 1986, lastmisn, 0,        lastmiss, lastmisn, dec8,    ROT270, "Data East USA", "Last Mission (US revision 6)", 0 )
+GAME( 1986, lastmisno,lastmisn, lastmiss, lastmisn, dec8,    ROT270, "Data East USA", "Last Mission (US revision 5)", 0 )
+GAME( 1986, lastmisnj,lastmisn, lastmiss, lastmsnj, dec8,    ROT270, "Data East Corporation", "Last Mission (Japan)", 0 )
+GAME( 1986, shackled, 0,        shackled, shackled, dec8,    ROT0,   "Data East USA", "Shackled (US)", 0 )
+GAME( 1986, breywood, shackled, shackled, shackled, dec8,    ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", 0 )
+GAME( 1987, csilver,  0,        csilver,  csilver,  dec8,    ROT0,   "Data East Corporation", "Captain Silver (World)", 0 )
+GAME( 1987, csilverj, csilver,  csilver,  csilver,  dec8,    ROT0,   "Data East Corporation", "Captain Silver (Japan)", 0 )
+GAME( 1987, garyoret, 0,        garyoret, garyoret, dec8,    ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", 0 )

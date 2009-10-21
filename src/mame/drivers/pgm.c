@@ -823,7 +823,7 @@ static ADDRESS_MAP_START( kovsh_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x500000, 0x500005) AM_READWRITE(kovsh_68k_protlatch_r, kovsh_68k_protlatch_w) /* ARM7 Latch */
 ADDRESS_MAP_END
 
-static UINT32 kovsh_counter=1;
+static UINT32 kovsh_counter;
 
 static READ32_HANDLER( kovsh_arm7_unk_r )
 {
@@ -1457,6 +1457,7 @@ static void pgm_basic_init(running_machine *machine)
 	pgm_bg_videoram = &pgm_videoram[0];
 	pgm_tx_videoram = &pgm_videoram[0x4000/2];
 	pgm_rowscrollram = &pgm_videoram[0x7000/2];
+	kovsh_counter = 1;
 }
 
 static DRIVER_INIT( pgm )

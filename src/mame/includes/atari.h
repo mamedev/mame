@@ -210,7 +210,10 @@ typedef struct {
     UINT16  data[HWIDTH];       /* graphics data buffer (text through chargen) */
 }   VIDEO;
 
+typedef void (*atari_renderer_func)(const address_space *space, VIDEO *video);
+
 typedef struct {
+	atari_renderer_func	renderer;	/* current renderer */
 	UINT32	cmd;				/* currently executed display list command */
 	UINT32	steal_cycles;		/* steal how many cpu cycles for this line ? */
 	UINT32	vscrol_old; 		/* old vscrol value */
@@ -521,8 +524,6 @@ typedef struct {
 	FUNC(36); FUNC(37); FUNC(38); FUNC(39); \
 	FUNC(40); FUNC(41); FUNC(42); FUNC(43); \
 	FUNC(44); FUNC(45); FUNC(46); FUNC(47);
-
-typedef void (*atari_renderer_func)(const address_space *space, VIDEO *video);
 
 /*----------- defined in video/antic.c -----------*/
 
