@@ -3536,6 +3536,7 @@ V-V                           TP-027
 	DRIVER( zaxxon )	/* (c) 1982 */
 	DRIVER( zaxxonj )	/* (c) 1982 */
 	DRIVER( zaxxon2 )	/* (c) 1982 */
+	DRIVER( zaxxon3 )	/* (c) 1982 */
 	DRIVER( zaxxonb )	/* bootleg */
 	DRIVER( szaxxon )	/* (c) 1982 */
 	DRIVER( futspy )	/* (c) 1984 */
