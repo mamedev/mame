@@ -29,10 +29,13 @@ TODO:
 #include "driver.h"
 #include "cpu/arm/arm.h"
 
+#define NUM_PENS	(0x100)
+
 static UINT32 *ertictac_mainram;
 static UINT32 *ertictac_videoram;
 static UINT32 IRQSTA, IRQMSKA, IRQMSKB, FIQMSK, T1low, T1high;
 static UINT32 vidFIFO[256];
+static pen_t pens[NUM_PENS];
 
 static WRITE32_HANDLER(video_fifo_w)
 {
@@ -339,9 +342,7 @@ static INTERRUPT_GEN( ertictac_interrupt )
 }
 
 
-#define NUM_PENS	(0x100)
-
-static void get_pens(pen_t *pens)
+static VIDEO_START( ertictac )
 {
 	int color;
 
@@ -360,9 +361,6 @@ static void get_pens(pen_t *pens)
 static VIDEO_UPDATE( ertictac )
 {
 	int y, x;
-	pen_t pens[NUM_PENS];
-
-	get_pens(pens);
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		for (x = 0; x < 0x140; x += 4)
@@ -395,6 +393,7 @@ static MACHINE_DRIVER_START( ertictac )
 	MDRV_SCREEN_SIZE(320, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 255)
 
+	MDRV_VIDEO_START(ertictac)
 	MDRV_VIDEO_UPDATE(ertictac)
 MACHINE_DRIVER_END
 
