@@ -543,7 +543,7 @@ void kaneko16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rec
 {
 	/* Sprites *must* be parsed from the first in RAM to the last,
        because of the multisprite feature. But they *must* be drawn
-       from the last in RAM (frontmost) to the firtst in order to
+       from the last in RAM (frontmost) to the first in order to
        cope with priorities using pdrawgfx.
 
        Hence we parse them from first to last and put the result

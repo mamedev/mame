@@ -879,7 +879,7 @@ direct_update_func memory_set_direct_update_handler(const address_space *space, 
 
 
 /*-------------------------------------------------
-    memory_set_direct_region - called by deivce
+    memory_set_direct_region - called by device
     cores to update the opcode base for the given
     address
 -------------------------------------------------*/
