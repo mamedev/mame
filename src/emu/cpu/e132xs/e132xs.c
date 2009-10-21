@@ -349,7 +349,6 @@ struct regs_decode
 	UINT8   same_src_dst;
 	UINT8   same_src_dstf;
 	UINT8   same_srcf_dst;
-	UINT16	op;
 };
 
 static void check_interrupts(hyperstone_state *cpustate);
@@ -360,7 +359,6 @@ static void check_interrupts(hyperstone_state *cpustate);
 #define DREGF (decode)->next_dst_value
 #define EXTRA_U (decode)->extra.u
 #define EXTRA_S (decode)->extra.s
-#define OP    (decode)->op
 
 #define SET_SREG( _data_ )  ((decode)->src_is_local ? set_local_register(cpustate, (decode)->src, _data_) : set_global_register(cpustate, (decode)->src, _data_))
 #define SET_SREGF( _data_ ) ((decode)->src_is_local ? set_local_register(cpustate, (decode)->src + 1, _data_) : set_global_register(cpustate, (decode)->src + 1, _data_))
@@ -500,6 +498,7 @@ static void hyperstone_set_trap_entry(hyperstone_state *cpustate, int which)
 	}
 }
 
+#define OP    			cpustate->op
 #define PPC				cpustate->ppc //previous pc
 #define PC				cpustate->global_regs[0] //Program Counter
 #define SR				cpustate->global_regs[1] //Status Register
@@ -4671,18 +4670,17 @@ static CPU_EXECUTE( hyperstone )
 	do
 	{
 		UINT32 oldh = SR & 0x00000020;
-		UINT16 opcode;
 
 		PPC = PC;	/* copy PC to previous PC */
 		debugger_instruction_hook(device, PC);
 
-		opcode = READ_OP(cpustate, PC);
+		OP = READ_OP(cpustate, PC);
 		PC += 2;
 
 		cpustate->instruction_length = 1;
 
 		/* execute opcode */
-		(*hyperstone_op[(opcode & 0xff00) >> 8])(cpustate, opcode);
+		(*hyperstone_op[(OP & 0xff00) >> 8])(cpustate);
 
 		/* clear the H state if it was previously set */
 		SR ^= oldh;
