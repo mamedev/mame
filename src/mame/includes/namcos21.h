@@ -5,6 +5,11 @@
 #define NAMCOS21_POLY_FRAME_WIDTH 496
 #define NAMCOS21_POLY_FRAME_HEIGHT 480
 
+/*----------- defined in drivers/namcos21.c -----------*/
+
+extern void namcos21_kickstart(running_machine *, int);
+
+
 /*----------- defined in video/namcos21.c -----------*/
 
 extern void namcos21_ClearPolyFrameBuffer( void );

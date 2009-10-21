@@ -20,8 +20,6 @@ Todo :
 #include "machine/8255ppi.h"
 #include "sound/2203intf.h"
 
-extern int homerun_gc_up;
-extern int homerun_gc_down;
 extern int homerun_xpa,homerun_xpb,homerun_xpc;
 extern UINT8 *homerun_videoram;
 

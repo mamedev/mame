@@ -1,7 +1,7 @@
 #include "sound/discrete.h"
 
 
-/*----------- defined in audio/norautp.c -----------*/
+/*----------- defined in audio/skyraid.c -----------*/
 
 DISCRETE_SOUND_EXTERN( skyraid );
 

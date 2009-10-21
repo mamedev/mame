@@ -84,6 +84,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
+#include "includes/playmark.h"
 
 
 #define oki_time_base 0x08
@@ -223,9 +224,6 @@ static const UINT8 sslam_snd_loop[8][20] =
 
 
 
-
-/* video/playmark.c */
-WRITE16_HANDLER( bigtwin_paletteram_w );
 
 /* video/sslam.c */
 WRITE16_HANDLER( sslam_tx_tileram_w );

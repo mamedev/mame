@@ -39,7 +39,6 @@ static const UINT8 tcr[5] = { TCR0, TCR1, TCR2, TCR3, TCR4 };
 static const int tscales[4] = { 1, 2, 4, 8 };
 
 extern void h8_3002_InterruptRequest(h83xx_state *h8, UINT8 source, UINT8 state);
-extern void *h8_token;
 
 static void h8itu_timer_expire(h83xx_state *h8, int which)
 {

@@ -176,6 +176,7 @@ Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/
 #include "machine/eeprom.h"
 #include "machine/x76f100.h"
 #include "cdrom.h"
+#include "includes/naomi.h"
 #include "naomibd.h"
 
 #define NAOMIBD_FLAG_AUTO_ADVANCE	(8)	// address auto-advances on read
@@ -183,15 +184,6 @@ Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/
 #define NAOMIBD_FLAG_ADDRESS_SHUFFLE	(2)	// 0 to let protection chip en/decrypt, 1 for normal
 
 #define NAOMIBD_PRINTF_PROTECTION	(0)	// 1 to printf protection access details
-
-/*************************************
- *
- *  Prototypes
- *
- *************************************/
-
-extern void naomi_game_decrypt(running_machine* machine, UINT64 key, UINT8* region, int length);
-
 
 /*************************************
  *

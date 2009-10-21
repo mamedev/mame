@@ -582,10 +582,12 @@ WRITE8_HANDLER( arkanoid_bootleg_d018_w )
 	}
 }
 
+#ifdef UNUSED_CODE
 READ8_HANDLER( block2_bootleg_f000_r )
 {
 	return arkanoid_bootleg_cmd;
 }
+#endif
 
 /* Kludge for some bootlegs that read this address */
 READ8_HANDLER( arkanoid_bootleg_d008_r )

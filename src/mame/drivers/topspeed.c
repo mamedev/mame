@@ -242,7 +242,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 
 WRITE16_HANDLER( rainbow_spritectrl_w );
-WRITE16_HANDLER( rastan_spriteflip_w );
 
 VIDEO_START( topspeed );
 VIDEO_UPDATE( topspeed );

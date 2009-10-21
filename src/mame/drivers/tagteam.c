@@ -36,7 +36,6 @@ extern READ8_HANDLER( tagteam_mirrorvideoram_r );
 extern WRITE8_HANDLER( tagteam_mirrorvideoram_w );
 extern READ8_HANDLER( tagteam_mirrorcolorram_r );
 extern WRITE8_HANDLER( tagteam_mirrorcolorram_w );
-extern WRITE8_HANDLER( tagteam_video_control_w );
 extern WRITE8_HANDLER( tagteam_control_w );
 extern WRITE8_HANDLER( tagteam_flipscreen_w );
 

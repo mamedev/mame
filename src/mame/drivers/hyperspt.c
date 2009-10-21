@@ -26,7 +26,6 @@ extern PALETTE_INIT( hyperspt );
 extern VIDEO_START( hyperspt );
 extern VIDEO_UPDATE( hyperspt );
 extern VIDEO_START( roadf );
-extern VIDEO_UPDATE( roadf );
 
 
 static WRITE8_HANDLER( hyperspt_coin_counter_w )

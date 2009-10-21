@@ -29,10 +29,6 @@ WRITE8_HANDLER( starcrus_proj_parm_2_w );
 READ8_HANDLER( starcrus_coll_det_r );
 extern VIDEO_START( starcrus );
 extern VIDEO_UPDATE( starcrus );
-extern int p1_sprite;
-extern int p2_sprite;
-extern int s1_sprite;
-extern int s2_sprite;
 
 static ADDRESS_MAP_START( starcrus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM

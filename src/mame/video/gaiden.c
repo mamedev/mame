@@ -8,7 +8,6 @@
 
 UINT16 *gaiden_videoram,*gaiden_videoram2,*gaiden_videoram3;
 int gaiden_sprite_sizey;
-//int raiga_alpha;
 
 static tilemap *text_layer,*foreground,*background;
 static bitmap_t *sprite_bitmap, *tile_bitmap_bg, *tile_bitmap_fg;

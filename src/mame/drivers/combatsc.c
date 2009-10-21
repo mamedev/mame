@@ -138,14 +138,12 @@ VIDEO_START( combascb );
 WRITE8_HANDLER( combascb_bankselect_w );
 WRITE8_HANDLER( combasc_bankselect_w );
 MACHINE_RESET( combasc );
-MACHINE_RESET( combascb );
 WRITE8_HANDLER( combasc_pf_control_w );
 READ8_HANDLER( combasc_scrollram_r );
 WRITE8_HANDLER( combasc_scrollram_w );
 
 VIDEO_UPDATE( combascb );
 VIDEO_UPDATE( combasc );
-WRITE8_HANDLER( combasc_io_w );
 WRITE8_HANDLER( combasc_vreg_w );
 
 

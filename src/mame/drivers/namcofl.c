@@ -171,8 +171,6 @@ static emu_timer *raster_interrupt_timer;
 VIDEO_START( namcofl );
 VIDEO_UPDATE( namcofl );
 
-extern UINT32 *namcofl_spritebank32;
-extern UINT32 *namcofl_mcuram;
 extern WRITE32_HANDLER(namcofl_spritebank_w);
 
 static UINT32 *namcofl_workram;

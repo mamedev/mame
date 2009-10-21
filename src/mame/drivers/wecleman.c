@@ -293,15 +293,12 @@ int wecleman_selected_ip, wecleman_irqctrl;
 extern UINT16 *wecleman_videostatus;
 extern UINT16 *wecleman_pageram, *wecleman_txtram, *wecleman_roadram;
 extern size_t wecleman_roadram_size;
-extern int wecleman_bgpage[4], wecleman_fgpage[4], *wecleman_gfx16_RAM;
 
 /* Functions defined in video: */
 WRITE16_HANDLER( hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w );
 WRITE16_HANDLER( wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w );
 WRITE16_HANDLER( wecleman_videostatus_w );
-READ16_HANDLER( wecleman_pageram_r );
 WRITE16_HANDLER( wecleman_pageram_w );
-READ16_HANDLER( wecleman_txtram_r );
 WRITE16_HANDLER( wecleman_txtram_w );
 VIDEO_UPDATE( wecleman );
 VIDEO_START( wecleman );

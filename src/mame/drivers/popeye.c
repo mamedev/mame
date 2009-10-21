@@ -26,7 +26,6 @@ extern UINT8 *popeye_palettebank;
 
 extern WRITE8_HANDLER( popeye_videoram_w );
 extern WRITE8_HANDLER( popeye_colorram_w );
-extern WRITE8_HANDLER( popeye_backgroundram_w );
 extern WRITE8_HANDLER( popeye_bitmap_w );
 extern WRITE8_HANDLER( skyskipr_bitmap_w );
 

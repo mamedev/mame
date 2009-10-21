@@ -605,11 +605,6 @@ static ADDRESS_MAP_START( megaplay_bios_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* basically from src/drivers/segasyse.c */
-UINT8 segae_vdp_ctrl_r ( UINT8 chip );
-UINT8 segae_vdp_data_r ( UINT8 chip );
-void segae_vdp_ctrl_w ( UINT8 chip, UINT8 data );
-void segae_vdp_data_w ( running_machine *machine, UINT8 chip, UINT8 data );
-
 static ADDRESS_MAP_START( megaplay_bios_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("sn2", sn76496_w)	/* SN76489 */

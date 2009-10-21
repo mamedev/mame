@@ -54,8 +54,6 @@ Notes:
 #include "sound/2151intf.h"
 #include "sound/vlm5030.h"
 
-extern int rockrage_irq_enable;
-
 /* from video */
 VIDEO_START( rockrage );
 VIDEO_UPDATE( rockrage );

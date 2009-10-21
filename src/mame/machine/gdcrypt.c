@@ -2,6 +2,7 @@
 /* DES decryption, used by GD-ROM based titles (Naomi etc.) */
 
 #include "driver.h"
+#include "includes/naomi.h"
 
 static UINT32 des_subkeys[32];
 

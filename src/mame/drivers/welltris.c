@@ -322,7 +322,7 @@ UINT16 *welltris_spriteram;
 UINT16 *welltris_pixelram;
 UINT16 *welltris_charvideoram;
 
-READ16_HANDLER( welltris_spriteram_r );
+//READ16_HANDLER( welltris_spriteram_r );
 WRITE16_HANDLER( welltris_spriteram_w );
 WRITE16_HANDLER( welltris_palette_bank_w );
 WRITE16_HANDLER( welltris_gfxbank_w );

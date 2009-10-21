@@ -6,6 +6,7 @@ enum sms_mapper
 	MAPPER_CODEMASTERS = 1
 };
 
+ADDRESS_MAP_EXTERN( sms_io_map, 8 );
 
 extern VIDEO_UPDATE(megatech_bios);
 extern VIDEO_UPDATE(megaplay_bios);
@@ -34,6 +35,8 @@ extern READ8_HANDLER( md_sms_vdp_ctrl_r );
 extern WRITE8_HANDLER( md_sms_vdp_ctrl_w );
 
 extern VIDEO_START(sms);
+extern VIDEO_EOF(sms);
+extern MACHINE_RESET(sms);
 extern READ8_HANDLER( sms_vdp_2_data_r );
 extern WRITE8_HANDLER( sms_vdp_2_data_w );
 extern READ8_HANDLER( sms_vdp_2_ctrl_r );
@@ -47,6 +50,12 @@ extern UINT8* vdp2_vram_bank1;
 extern UINT8* vdp1_vram_bank0;
 extern UINT8* vdp1_vram_bank1;
 extern void segae_set_vram_banks(UINT8 data);
+READ8_HANDLER( sms_ioport_gg00_r );
+void init_extra_gg_ports(running_machine* machine, const char* tag);
+READ8_HANDLER (megatech_sms_ioport_dc_r);
+READ8_HANDLER (megatech_sms_ioport_dd_r);
+READ8_HANDLER( smsgg_backupram_r );
+WRITE8_HANDLER( smsgg_backupram_w );
 extern void megatech_set_genz80_as_sms_standard_map(running_machine *machine, const char* tag, int mapper);
 MACHINE_DRIVER_EXTERN(sms);
 extern DRIVER_INIT(sms);

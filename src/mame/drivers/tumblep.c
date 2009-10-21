@@ -53,8 +53,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 VIDEO_START( tumblep );
 VIDEO_UPDATE( tumblep );
 
-extern UINT16 *tumblep_pf1_data,*tumblep_pf2_data;
-
 /******************************************************************************/
 
 #ifdef UNUSED_FUNCTION

@@ -56,13 +56,11 @@ extern UINT8 *travrusa_videoram;
 PALETTE_INIT( travrusa );
 PALETTE_INIT( shtrider );
 VIDEO_START( travrusa );
-VIDEO_START( shtrider );
 WRITE8_HANDLER( travrusa_videoram_w );
 WRITE8_HANDLER( travrusa_scroll_x_low_w );
 WRITE8_HANDLER( travrusa_scroll_x_high_w );
 WRITE8_HANDLER( travrusa_flipscreen_w );
 VIDEO_UPDATE( travrusa );
-VIDEO_UPDATE( shtrider );
 
 
 

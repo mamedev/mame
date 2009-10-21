@@ -54,8 +54,6 @@ static void h8_check_irqs(h83xx_state *h8);
 
 /* implementation */
 
-extern offs_t h8_disasm(char *output, offs_t address, const UINT8 *oprom, const UINT8 *opram, UINT32 addr_mask);
-
 void h8_3002_InterruptRequest(h83xx_state *h8, UINT8 source, UINT8 state)
 {
 	// don't allow clear on external interrupts

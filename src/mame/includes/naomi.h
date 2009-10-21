@@ -12,6 +12,11 @@ enum {
 	JVSBD_KEYBOARD
 };
 
+/*----------- defined in machine/gdcrypt.c -----------*/
+
+extern void naomi_game_decrypt(running_machine* machine, UINT64 key, UINT8* region, int length);
+
+
 /*----------- defined in machine/naomi.c -----------*/
 
 extern DRIVER_INIT( naomi );

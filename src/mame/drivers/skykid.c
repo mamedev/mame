@@ -30,7 +30,6 @@ WRITE8_HANDLER( skykid_scroll_x_w );
 WRITE8_HANDLER( skykid_scroll_y_w );
 WRITE8_HANDLER( skykid_flipscreen_priority_w );
 VIDEO_UPDATE( skykid );
-VIDEO_UPDATE( drgnbstr );
 PALETTE_INIT( skykid );
 
 

@@ -44,8 +44,6 @@ static tilemap *tx_tilemap;
 static tilemap *fg_tilemap; // strahl
 static bitmap_t *background_bitmap; // bioship
 
-extern UINT16* nmk16_mainram;
-
 /***************************************************************************
 
   Callbacks for the TileMap code

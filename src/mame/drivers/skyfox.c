@@ -27,7 +27,6 @@ extern int skyfox_bg_pos, skyfox_bg_ctrl;
 
 /* Functions defined in video: */
 
-READ8_HANDLER( skyfox_vregs_r );
 WRITE8_HANDLER( skyfox_vregs_w );
 
 PALETTE_INIT( skyfox );

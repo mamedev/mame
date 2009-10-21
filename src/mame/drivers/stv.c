@@ -197,7 +197,6 @@ static UINT16* sound_ram;
 
 int stv_enable_slave_sh2;
 /*VDP2 stuff*/
-extern int get_vblank_duration(running_machine *machine);
 /*SMPC stuff*/
 static UINT8 NMI_reset;
 static void system_reset(void);

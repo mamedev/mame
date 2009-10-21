@@ -35,9 +35,6 @@ extern void megadriv_stop_scanline_timer(void);
 
 void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine, const char* tag);
 
-extern READ8_HANDLER( megatech_sms_ioport_dc_r );
-extern READ8_HANDLER( megatech_sms_ioport_dd_r );
-
 extern READ16_HANDLER( megadriv_vdp_r );
 extern WRITE16_HANDLER( megadriv_vdp_w );
 

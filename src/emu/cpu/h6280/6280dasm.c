@@ -18,8 +18,6 @@
 
 #include "cpuintrf.h"
 
-extern UINT8 H6280_debug_mmr[8];
-
 #define RDOP(addr)   (oprom[addr - pc])
 #define RDBYTE(addr) (opram[addr - pc])
 #define RDWORD(addr) (opram[addr - pc] | ( oprom[(addr) + 1 - pc] << 8 ))

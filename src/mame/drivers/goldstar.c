@@ -100,8 +100,6 @@
 
 static int dataoffset=0;
 
-extern UINT8 *goldstar_video1, *goldstar_video2, *goldstar_video3;
-extern size_t goldstar_video_size;
 extern UINT8 *goldstar_reel1_scroll, *goldstar_reel2_scroll, *goldstar_reel3_scroll;
 
 

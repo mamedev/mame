@@ -127,12 +127,6 @@ void (*ppu_latch)( const device_config *device, offs_t offset );
 /* palette handlers */
 static WRITE8_HANDLER( ppu2c0x_palette_write );
 static READ8_HANDLER( ppu2c0x_palette_read );
-/* name and attribute table functions */
-WRITE8_HANDLER( ppu2c0x_name_write );
-READ8_HANDLER( ppu2c0x_name_read );
-/* name and attribute table functions */
-WRITE8_HANDLER( ppu2c0x_chr_write );
-READ8_HANDLER( ppu2c0x_chr_read );
 
 
 /***************************************************************************

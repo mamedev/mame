@@ -37,7 +37,6 @@ READ8_HANDLER( thief_context_ram_r );
 WRITE8_HANDLER( thief_context_ram_w );
 WRITE8_HANDLER( thief_context_bank_w );
 WRITE8_HANDLER( thief_video_control_w );
-WRITE8_HANDLER( thief_vtcsel_w );
 WRITE8_HANDLER( thief_color_map_w );
 WRITE8_HANDLER( thief_color_plane_w );
 READ8_HANDLER( thief_videoram_r );

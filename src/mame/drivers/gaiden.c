@@ -134,8 +134,6 @@ Notes:
 extern UINT16 *gaiden_videoram,*gaiden_videoram2,*gaiden_videoram3;
 extern int gaiden_sprite_sizey;
 
-extern int raiga_alpha;
-
 VIDEO_START( gaiden );
 VIDEO_START( raiga );
 VIDEO_START( drgnbowl );

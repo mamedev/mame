@@ -140,7 +140,6 @@ Region byte at offset 0x031:
 #include "machine/timekpr.h"
 
 
-VIDEO_EOF( opwolf3_full_buffer_delayed );
 VIDEO_EOF( taito_no_buffer );
 VIDEO_START( slapshot );
 VIDEO_UPDATE( slapshot );

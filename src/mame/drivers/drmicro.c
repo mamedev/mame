@@ -19,9 +19,6 @@ PALETTE_INIT( drmicro );
 VIDEO_START( drmicro );
 VIDEO_UPDATE( drmicro );
 
-WRITE8_HANDLER( drmicro_flipscreen_w );
-WRITE8_HANDLER( drmicro_priority_w );
-
 WRITE8_HANDLER( drmicro_videoram_w );
 
 extern void drmicro_flip_w( running_machine *machine, int flip );

@@ -3,6 +3,8 @@
 
 /*----------- defined in video/gstriker.c -----------*/
 
+extern UINT16 *gstriker_lineram;
+
 /*** VS920A **********************************************/
 
 #define MAX_VS920A	2

@@ -39,7 +39,6 @@ int bladestl_spritebank;
 PALETTE_INIT( bladestl );
 VIDEO_START( bladestl );
 VIDEO_UPDATE( bladestl );
-WRITE8_HANDLER( bladestl_vreg_w );
 
 static INTERRUPT_GEN( bladestl_interrupt )
 {

@@ -38,9 +38,6 @@ extern UINT8 *ssrj_vram1,*ssrj_vram2,*ssrj_vram3,*ssrj_vram4,*ssrj_scrollram;
 WRITE8_HANDLER(ssrj_vram1_w);
 WRITE8_HANDLER(ssrj_vram2_w);
 WRITE8_HANDLER(ssrj_vram4_w);
-READ8_HANDLER(ssrj_vram1_r);
-READ8_HANDLER(ssrj_vram2_r);
-READ8_HANDLER(ssrj_vram4_r);
 
 VIDEO_START( ssrj );
 VIDEO_UPDATE( ssrj );

@@ -225,8 +225,6 @@ DIP locations verified for:
 
 WRITE16_HANDLER( asuka_spritectrl_w );
 
-INTERRUPT_GEN( rastan_s_interrupt );
-
 VIDEO_START( asuka );
 VIDEO_START( galmedes );
 VIDEO_START( cadash );

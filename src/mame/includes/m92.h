@@ -4,6 +4,11 @@
 
 *************************************************************************/
 
+/*----------- defined in drivers/m92.c -----------*/
+
+extern void m92_sprite_interrupt(running_machine *machine);
+
+
 /*----------- defined in video/m92.c -----------*/
 
 extern UINT32 m92_raster_irq_position;

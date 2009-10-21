@@ -79,14 +79,6 @@ static int suna8_text_dim; /* specifies format of text layer */
 UINT8 suna8_rombank, suna8_spritebank, suna8_palettebank;
 UINT8 suna8_unknown;
 
-/* Functions defined in video: */
-
-WRITE8_HANDLER( suna8_spriteram_w );			// for debug
-WRITE8_HANDLER( suna8_banked_spriteram_w );	// for debug
-
-VIDEO_START( suna8 );
-VIDEO_UPDATE( suna8 );
-
 
 /***************************************************************************
     For Debug: there's no tilemap, just sprites.

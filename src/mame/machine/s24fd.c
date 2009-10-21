@@ -8,8 +8,7 @@ this could get messy if games change their own code after initial loading as we'
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/fd1094.h"
-
-extern UINT16 *s24_mainram1;
+#include "includes/segas24.h"
 
 #define S16_NUMCACHE 8
 

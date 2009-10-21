@@ -1,11 +1,9 @@
-
 #include "driver.h"
 #include "gstriker.h"
 
-/* imports from driver file */
-extern UINT16 *gs_videoram3;
-extern UINT16 *gs_mixer_regs;
-extern UINT16 *gstriker_lineram;
+//UINT16 *gs_videoram3;
+//UINT16 *gs_mixer_regs;
+UINT16 *gstriker_lineram;
 
 
 /*** VS920A (score tilemap) **********************************************/

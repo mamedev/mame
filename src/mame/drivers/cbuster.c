@@ -32,7 +32,6 @@ WRITE16_HANDLER( twocrude_palette_24bit_b_w );
 
 static UINT16 *twocrude_ram;
 extern void twocrude_pri_w(int pri);
-WRITE16_HANDLER( twocrude_update_sprites_w );
 static UINT16 prot;
 
 /******************************************************************************/

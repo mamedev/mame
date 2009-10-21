@@ -12,9 +12,8 @@ Namco System II
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6805/m6805.h"
-#include "namcos2.h"
-
-extern void namcos21_kickstart(running_machine *, int);
+#include "includes/namcos21.h"
+#include "includes/namcos2.h"
 
 static TIMER_CALLBACK( namcos2_posirq_tick );
 static void InitC148(void);

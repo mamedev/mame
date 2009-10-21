@@ -17,9 +17,6 @@ TODO:
 
 
 extern UINT16 *sf_objectram,*sf_videoram;
-extern int sf_deltaxb;
-extern int sf_deltaxm;
-extern int sf_active;
 
 WRITE16_HANDLER( sf_bg_scroll_w );
 WRITE16_HANDLER( sf_fg_scroll_w );

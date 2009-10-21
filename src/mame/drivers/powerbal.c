@@ -17,8 +17,7 @@ Magic Sticks:
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
-
-WRITE16_HANDLER( bigtwin_paletteram_w );
+#include "includes/playmark.h"
 
 static tilemap *bg_tilemap;
 static UINT16 *magicstk_videoram;

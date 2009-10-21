@@ -19,7 +19,6 @@ DIP locations verified for:
 
 extern UINT16 *blockout_videoram;
 extern UINT16 *blockout_frontvideoram;
-extern UINT8 *blockout_frontcolor;
 
 WRITE16_HANDLER( blockout_videoram_w );
 WRITE16_HANDLER( blockout_paletteram_w );

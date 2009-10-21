@@ -569,7 +569,6 @@ VIDEO_UPDATE( superpac );
 VIDEO_UPDATE( mappy );
 WRITE8_HANDLER( superpac_videoram_w );
 WRITE8_HANDLER( mappy_videoram_w );
-WRITE8_HANDLER( mappy_spriteram_w );
 WRITE8_HANDLER( mappy_scroll_w );
 READ8_HANDLER( superpac_flipscreen_r );
 WRITE8_HANDLER( superpac_flipscreen_w );

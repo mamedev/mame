@@ -36,7 +36,7 @@ Notes:
 
 static UINT32 bankaddress;
 
-extern UINT16 *m90_video_data,*dynablsb_video_control_data;
+extern UINT16 *m90_video_data;
 
 VIDEO_START( m90 );
 VIDEO_START( dynablsb );

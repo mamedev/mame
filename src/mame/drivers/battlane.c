@@ -24,7 +24,6 @@ extern WRITE8_HANDLER( battlane_spriteram_w );
 extern WRITE8_HANDLER( battlane_bitmap_w );
 extern WRITE8_HANDLER( battlane_video_ctrl_w );
 
-extern PALETTE_INIT( battlane );
 extern VIDEO_START( battlane );
 extern VIDEO_UPDATE( battlane );
 

@@ -42,7 +42,6 @@ static struct _asic65_t
 	FILE * log;
 } asic65;
 
-WRITE16_HANDLER( asic65_w );
 WRITE16_HANDLER( asic65_data_w );
 
 READ16_HANDLER( asic65_r );

@@ -378,7 +378,7 @@ send data to them, although obviously there's no response. */
 
 ///////////////////////////////////////////////////////////////////////////
 
-extern void Scorpion2_SetSwitchState(int strobe, int data, int state)
+void Scorpion2_SetSwitchState(int strobe, int data, int state)
 {
 	if ( strobe < 11 && data < 8 )
 	{
@@ -411,7 +411,7 @@ extern void Scorpion2_SetSwitchState(int strobe, int data, int state)
 
 ///////////////////////////////////////////////////////////////////////////
 
-extern int Scorpion2_GetSwitchState(int strobe, int data)
+int Scorpion2_GetSwitchState(int strobe, int data)
 {
 	int state = 0;
 

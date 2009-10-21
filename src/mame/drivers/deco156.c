@@ -22,9 +22,6 @@
 #include "cpu/arm/arm.h"
 #include "deco16ic.h"
 
-VIDEO_START(hvysmsh);
-VIDEO_UPDATE(hvysmsh);
-
 static int simpl156_bank_callback(const int bank)
 {
 	return ((bank>>4)&0x7) * 0x1000;

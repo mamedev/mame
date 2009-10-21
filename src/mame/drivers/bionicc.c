@@ -78,9 +78,6 @@ VIDEO_START( bionicc );
 VIDEO_UPDATE( bionicc );
 VIDEO_EOF( bionicc );
 
-void bionicc_readinputs(void);
-void bionicc_sound_cmd(int data);
-
 
 
 static UINT16 bionicc_inp[3];

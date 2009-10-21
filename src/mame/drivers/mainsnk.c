@@ -119,7 +119,6 @@ WRITE8_HANDLER(mainsnk_fgram_w);
 WRITE8_HANDLER(mainsnk_bgram_w);
 VIDEO_START(mainsnk);
 VIDEO_UPDATE(mainsnk);
-VIDEO_UPDATE(canvas);
 
 static int sound_cpu_busy;
 

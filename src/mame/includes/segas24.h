@@ -17,3 +17,20 @@ WRITE16_HANDLER( system24temp_sys16_io_w );
 READ32_HANDLER ( system24temp_sys16_io_dword_r );
 
 /* End New Code */
+
+
+/*----------- defined in drivers/segas24.c -----------*/
+
+extern UINT16 *s24_mainram1;
+
+
+/*----------- defined in machine/s24fd.c -----------*/
+
+extern void s24_fd1094_machine_init(running_machine *machine);
+extern void s24_fd1094_driver_init(running_machine *machine);
+
+
+/*----------- defined in video/segas24.c -----------*/
+
+VIDEO_START(system24);
+VIDEO_UPDATE(system24);

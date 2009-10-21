@@ -102,8 +102,6 @@ WRITE8_HANDLER(lethalen_palette_control)
 	}
 }
 
-extern UINT16 *K056832_videoram;
-
 VIDEO_UPDATE(lethalen)
 {
 	bitmap_fill(bitmap, cliprect, 7168);
@@ -121,6 +119,7 @@ VIDEO_UPDATE(lethalen)
 
 #if 0
 	{
+		extern UINT16 *K056832_videoram;
 		FILE *fp;
 
 		fp=fopen("K056832_videoram", "w+b");

@@ -152,7 +152,6 @@ static UINT32 g2bus_regs[0x100/4];
 UINT8 maple0x86data1[0x80];
 static UINT8 maple0x86data2[0x400];
 static emu_timer *dc_rtc_timer;
-extern int jvsboard_type;
 
 static const UINT32 maple0x82answer[]=
 {

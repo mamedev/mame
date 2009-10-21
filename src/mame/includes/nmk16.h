@@ -1,3 +1,8 @@
+/*----------- defined in drivers/nmk16.c -----------*/
+
+extern UINT16* nmk16_mainram;
+
+
 /*----------- defined in video/nmk16.c -----------*/
 
 extern UINT16 *nmk_bgvideoram0;

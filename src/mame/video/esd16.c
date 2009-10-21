@@ -42,15 +42,6 @@ UINT16 *esd16_vram_1, *esd16_scroll_1;
 UINT16 *head_layersize;
 static int esd16_tilemap0_color = 0;
 
-/* Functions defined in video: */
-
-WRITE16_HANDLER( esd16_vram_0_w );
-WRITE16_HANDLER( esd16_vram_1_w );
-WRITE16_HANDLER( esd16_tilemap0_color_w );
-
-VIDEO_START( esd16 );
-VIDEO_UPDATE( esd16 );
-
 
 /***************************************************************************
 

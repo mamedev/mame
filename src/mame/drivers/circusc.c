@@ -67,7 +67,6 @@ WRITE8_HANDLER( circusc_colorram_w );
 VIDEO_START( circusc );
 WRITE8_HANDLER( circusc_flipscreen_w );
 PALETTE_INIT( circusc );
-WRITE8_HANDLER( circusc_sprite_bank_select_w );
 VIDEO_UPDATE( circusc );
 
 

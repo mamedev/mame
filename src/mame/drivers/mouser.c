@@ -24,8 +24,6 @@ static UINT8 mouser_nmi_enable;
 PALETTE_INIT( mouser );
 WRITE8_HANDLER( mouser_flip_screen_x_w );
 WRITE8_HANDLER( mouser_flip_screen_y_w );
-WRITE8_HANDLER( mouser_spriteram_w );
-WRITE8_HANDLER( mouser_colorram_w );
 VIDEO_UPDATE( mouser );
 
 /* Mouser has external masking circuitry around

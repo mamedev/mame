@@ -160,7 +160,6 @@ UINT16 *roundup5_unknown0, *roundup5_unknown1, *roundup5_unknown2;
 static UINT16 bigfight_a20000[8];
 UINT16 bigfight_a40000[2];
 static UINT16 bigfight_a60000[2];
-extern UINT16 bigfight_bank;
 
 /***************************************************************************/
 

@@ -26,7 +26,6 @@ Buccaneers has a 5.6888 Mhz and a 18.432 Mhz OSC
 VIDEO_START( vigilant );
 VIDEO_RESET( vigilant );
 WRITE8_HANDLER( vigilant_paletteram_w );
-WRITE8_HANDLER( vigilant_sprite_paletteram_w );
 WRITE8_HANDLER( vigilant_horiz_scroll_w );
 WRITE8_HANDLER( vigilant_rear_horiz_scroll_w );
 WRITE8_HANDLER( vigilant_rear_color_w );

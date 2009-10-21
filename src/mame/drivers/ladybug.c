@@ -77,8 +77,6 @@ PALETTE_INIT( sraider );
 VIDEO_START( sraider );
 VIDEO_UPDATE( sraider );
 VIDEO_EOF( sraider );
-WRITE8_HANDLER( sraider_grid_color_w );
-WRITE8_HANDLER( sraider_grid_data_w );
 
 READ8_HANDLER( sraider_8005_r );
 WRITE8_HANDLER( sraider_sound_low_w );

@@ -8,8 +8,6 @@
 
 #include "driver.h"
 
-//UINT8 *goldstar_video1, *goldstar_video2, *goldstar_video3;
-//size_t goldstar_video_size;
 UINT8 *goldstar_reel1_scroll, *goldstar_reel2_scroll, *goldstar_reel3_scroll;
 
 static int bgcolor;

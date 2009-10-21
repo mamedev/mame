@@ -40,7 +40,7 @@
 *****************************************************************************/
 
 #include "driver.h"
-#include "m92.h"
+#include "includes/m92.h"
 
 typedef struct _pf_layer_info pf_layer_info;
 struct _pf_layer_info
@@ -60,7 +60,6 @@ UINT32 m92_raster_irq_position;
 UINT16 *m92_vram_data,*m92_spritecontrol;
 UINT8 m92_game_kludge;
 
-extern void m92_sprite_interrupt(running_machine *machine);
 UINT8 m92_sprite_buffer_busy;
 static int m92_palette_bank;
 

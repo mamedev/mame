@@ -142,10 +142,6 @@ VIDEO_UPDATE( galpani2 );
 WRITE16_HANDLER( galpani2_palette_0_w );
 WRITE16_HANDLER( galpani2_palette_1_w );
 
-READ16_HANDLER ( galpani2_bg8_regs_0_r );
-READ16_HANDLER ( galpani2_bg8_regs_1_r );
-WRITE16_HANDLER( galpani2_bg8_regs_0_w );
-WRITE16_HANDLER( galpani2_bg8_regs_1_w );
 WRITE16_HANDLER( galpani2_bg8_0_w );
 WRITE16_HANDLER( galpani2_bg8_1_w );
 

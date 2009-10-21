@@ -3,7 +3,7 @@
 
 
 extern UINT16 *welltris_spriteram;
-extern size_t welltris_spriteram_size;
+//extern size_t welltris_spriteram_size;
 extern UINT16 *welltris_pixelram;
 extern UINT16 *welltris_charvideoram;
 

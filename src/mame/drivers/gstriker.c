@@ -181,7 +181,7 @@ Frequencies: 68k is XTAL_32MHZ/2
 
 
 //UINT16 *gs_videoram3;
-static UINT16 *gs_mixer_regs;
+//UINT16 *gs_mixer_regs;
 static UINT16 dmmy_8f_ret;
 
 
@@ -283,7 +283,6 @@ static const ym2610_interface ym2610_config =
 /*** MEMORY LAYOUTS **********************************************************/
 
 static UINT16 *work_ram;
-UINT16 *gstriker_lineram;
 
 
 static ADDRESS_MAP_START( gstriker_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -295,7 +294,7 @@ static ADDRESS_MAP_START( gstriker_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 
 	AM_RANGE(0x200000, 0x20000f) AM_RAM_WRITE(MB60553_0_regs_w)
-	AM_RANGE(0x200040, 0x20005f) AM_RAM AM_BASE(&gs_mixer_regs)
+	AM_RANGE(0x200040, 0x20005f) AM_RAM //AM_BASE(&gs_mixer_regs)
 	AM_RANGE(0x200060, 0x20007f) AM_RAM
 	AM_RANGE(0x200080, 0x200081) AM_READ_PORT("P1")
 	AM_RANGE(0x200082, 0x200083) AM_READ_PORT("P2")
@@ -331,7 +330,7 @@ static ADDRESS_MAP_START( vgoal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x181000, 0x181fff) AM_RAM AM_BASE(&gstriker_lineram)
 	AM_RANGE(0x1c0000, 0x1c4fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x200000, 0x20000f) AM_RAM_WRITE(MB60553_0_regs_w)
-	AM_RANGE(0x200040, 0x20005f) AM_RAM AM_BASE(&gs_mixer_regs)
+	AM_RANGE(0x200040, 0x20005f) AM_RAM //AM_BASE(&gs_mixer_regs)
 
 	AM_RANGE(0x200080, 0x200081) AM_READ_PORT("P1")
 	AM_RANGE(0x200082, 0x200083) AM_READ_PORT("P2")

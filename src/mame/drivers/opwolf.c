@@ -295,7 +295,6 @@ static int adpcm_data[2];
 static int opwolf_gun_xoffs, opwolf_gun_yoffs;
 
 WRITE16_HANDLER( rainbow_spritectrl_w );
-WRITE16_HANDLER( rastan_spriteflip_w );
 VIDEO_START( opwolf );
 VIDEO_UPDATE( opwolf );
 

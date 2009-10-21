@@ -5,7 +5,6 @@
 #define TC0480SCP_GFX_NUM 1
 
 static int sci_spriteframe;
-extern UINT16 *taitoz_sharedram;
 
 static int road_palbank;
 

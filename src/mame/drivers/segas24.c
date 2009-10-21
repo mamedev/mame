@@ -334,24 +334,18 @@ Notes:
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/m68000/m68000.h"
-#include "segas24.h"
-#include "system16.h"
-#include "video/segaic24.h"
 #include "sound/ym2151.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
+#include "video/segaic24.h"
+#include "includes/system16.h"
+#include "includes/segas24.h"
 
 #define MASTER_CLOCK		XTAL_20MHz
 #define VIDEO_CLOCK			XTAL_32MHz
 
 
 UINT16* s24_mainram1;
-
-extern void s24_fd1094_machine_init(running_machine *machine);
-extern void s24_fd1094_driver_init(running_machine *machine);
-
-VIDEO_START(system24);
-VIDEO_UPDATE(system24);
 
 
 // Floppy Fisk Controller

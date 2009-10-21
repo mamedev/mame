@@ -55,7 +55,6 @@ extern UINT8 *sbasketb_spriteram_select;
 WRITE8_HANDLER( sbasketb_videoram_w );
 WRITE8_HANDLER( sbasketb_colorram_w );
 WRITE8_HANDLER( sbasketb_flipscreen_w );
-WRITE8_HANDLER( sbasketb_scroll_w );
 
 PALETTE_INIT( sbasketb );
 VIDEO_START( sbasketb );
