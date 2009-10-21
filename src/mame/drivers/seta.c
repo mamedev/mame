@@ -2158,11 +2158,83 @@ ADDRESS_MAP_END
         Seta Roulette
 ***************************************************************************/
 
+static READ16_HANDLER( setaroul_c0_r )
+{
+	return 0x00;//mame_rand(space->machine);
+}
+
+static READ16_HANDLER( setaroul_d4_0_r )
+{
+	return 0x00;//mame_rand(space->machine);
+}
+
+static READ16_HANDLER( setaroul_d4_4_r )
+{
+	return 0x00;//mame_rand(space->machine);
+}
+
+static READ16_HANDLER( setaroul_d4_6_r )
+{
+	return 0xffff;//mame_rand(space->machine);
+}
+
+static READ16_HANDLER( setaroul_d4_8_r )
+{
+	return mame_rand(space->machine)&0x000f;
+}
+
+static READ16_HANDLER( setaroul_d4_a_r )
+{
+	return 0x00;//mame_rand(space->machine);
+}
+
+static READ16_HANDLER( setaroul_d4_10_r )
+{
+	return 0x00;// mame_rand(space->machine);
+}
+
+
+// ?? looks like sprite ram access is 8-bit not 16?
+WRITE16_HANDLER( setaroul_spr_w )
+{
+	int realoffs = offset;
+	realoffs >>=1;
+	
+	if (!(offset & 1))
+	{
+		data = data >> 8;
+		mem_mask = mem_mask >> 8;
+	}
+	
+	COMBINE_DATA(&spriteram16[realoffs]);
+
+}
+
 static ADDRESS_MAP_START( setaroul_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM								// ROM
+	
+	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_BASE(&spriteram16_2)		// Sprites Code + X + Attr (maybe not)
+	
+	AM_RANGE(0xc40000, 0xc40001) AM_RAM //AM_BASE(&seta_vregs)
+	AM_RANGE(0xc80000, 0xc80001) AM_NOP
 
-	AM_RANGE(0xc00000, 0xc03fff) AM_RAM
-	AM_RANGE(0xf00000, 0xf03fff) AM_RAM
+	
+	AM_RANGE(0xcc0000, 0xcc0019) AM_READ(setaroul_c0_r)
+
+	AM_RANGE(0xd00000, 0xd00001) AM_NOP // watchdog?
+	AM_RANGE(0xd40000, 0xd40001) AM_READ(setaroul_d4_0_r)
+	AM_RANGE(0xd40004, 0xd40005) AM_READ(setaroul_d4_4_r)
+	AM_RANGE(0xd40006, 0xd40007) AM_READ(setaroul_d4_6_r)
+	AM_RANGE(0xd40008, 0xd40009) AM_READ(setaroul_d4_8_r)
+	AM_RANGE(0xd4000a, 0xd4000b) AM_READ(setaroul_d4_a_r)
+	AM_RANGE(0xd40010, 0xd40011) AM_READ(setaroul_d4_10_r) AM_WRITENOP // multiplex?
+
+	AM_RANGE(0xdc0000, 0xdc3fff) AM_RAM 
+	
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM - draws wheel if you reset enough times..
+	AM_RANGE(0xe40000, 0xe40005) AM_RAM AM_BASE(&seta_vctrl_0)		// VRAM Ctrl
+	AM_RANGE(0xf00000, 0xf03fff) AM_RAM 
+	AM_RANGE(0xf40000, 0xf40c11) AM_WRITE(setaroul_spr_w) AM_BASE(&spriteram16)		// Sprites Y
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -6543,8 +6615,8 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( setaroul )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       512*0, 32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_8bpp, 512*0, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       512*0, 2 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_8bpp, 512*0, 2 ) // [1] Layer 1
 GFXDECODE_END
 
 /***************************************************************************
@@ -7252,22 +7324,23 @@ MACHINE_DRIVER_END
                                 Seta Roulette
 ***************************************************************************/
 
-static VIDEO_START( dummy_start )
+#define SETAROUL_INTERRUPTS_NUM (2)
+static INTERRUPT_GEN( setaroul_interrupt )
 {
-
+	switch (cpu_getiloops(device))
+	{
+		case 0:		cpu_set_input_line(device, 4, HOLD_LINE);	break;
+		case 1:		cpu_set_input_line(device, 2, HOLD_LINE);	break;
+	}
 }
 
-static VIDEO_UPDATE( dummy_update )
-{
-	return 0;
-}
 
 static MACHINE_DRIVER_START( setaroul )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(setaroul_map)
-	//MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(setaroul_interrupt,SETAROUL_INTERRUPTS_NUM) // and 6?
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -7279,11 +7352,12 @@ static MACHINE_DRIVER_START( setaroul )
 
 	MDRV_GFXDECODE(setaroul)
 	MDRV_PALETTE_LENGTH(512)
+	MDRV_PALETTE_INIT(setaroul)
 
-	MDRV_VIDEO_START(dummy_start)
-	//MDRV_VIDEO_EOF(seta_buffer_sprites)   /* qzkklogy uses sprite buffering */
-	MDRV_VIDEO_UPDATE(dummy_update)
-
+	MDRV_VIDEO_START(seta_1_layer)
+	MDRV_VIDEO_EOF(seta_buffer_sprites)	/* qzkklogy uses sprite buffering */
+	MDRV_VIDEO_UPDATE(seta)
+	
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -8542,7 +8616,7 @@ ROM_START( usclssic )
 	ROM_LOAD( "ue001020.130", 0x500000, 0x080000, CRC(bc07403f) SHA1(f994b6d1dee23f5dabdb328f955f4380a8ca9d52) )
 	ROM_LOAD( "ue001021.131", 0x580000, 0x080000, CRC(98c03efd) SHA1(761c51d5573e6f35c48b8b9ee5d88cbde02e92a7) )
 
-	ROM_REGION( 0x400, "proms", 0 )	/* Extra Colours (not used yet) */
+	ROM_REGION( 0x400, "proms", 0 )	/* Extra Colours */
 	ROM_LOAD16_BYTE( "ue1-022.prm", 0x000, 0x200, CRC(1a23129e) SHA1(110eb54ab83ecb8375164a5c96f522b2737c379c) )
 	ROM_LOAD16_BYTE( "ue1-023.prm", 0x001, 0x200, CRC(a13192a4) SHA1(86e312e0f7400b7fa08fbe8fced1eb95a32502ca) )
 
@@ -9599,8 +9673,8 @@ ROM_START( setaroul )
 	ROM_LOAD( "uf1004.u52", 0x000000, 0x020000, CRC(d63ea334) SHA1(93aaf58c90c4f704caae19b63785e471b2c1281a) )
 
 	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD16_BYTE( "uf-017", 0x000, 0x200, NO_DUMP )
-	ROM_LOAD16_BYTE( "uf-018", 0x001, 0x200, NO_DUMP )
+	ROM_LOAD16_BYTE( "ufo017.bin", 0x000, 0x200, CRC(bf50c303) SHA1(31685ed4849e5c27654f02945678db425d54bf5e) )
+	ROM_LOAD16_BYTE( "ufo018.bin", 0x001, 0x200, CRC(1c584d5f) SHA1(f1c7e3da8b108d78b459cae53fabb6e28d3a7ee8) )
 ROM_END
 
 static READ16_HANDLER( twineagl_debug_r )
@@ -9889,7 +9963,7 @@ GAME( 1989, arbalest, 0,        metafox,  arbalest, arbalest, ROT270, "Seta",   
 GAME( 1989, metafox,  0,        metafox,  metafox,  metafox,  ROT270, "Seta",                   "Meta Fox" , 0) // Country/License: DSW
 
 /* 68000 */
-GAME( 198?, setaroul, 0,        setaroul, setaroul, 0,        ROT270, "Seta / Visco",           "Seta Roulette?", 0 ) // I can't see a title in the GFX roms or program but it seems to have roulette GFX
+GAME( 198?, setaroul, 0,        setaroul, setaroul, 0,        ROT270, "Seta / Visco",           "Seta / Visco Roulette?", GAME_NOT_WORKING ) // I can't see a title in the GFX roms.  If you reset it enough times you'll get a flickery roulette wheel
 GAME( 1989, drgnunit, 0,        drgnunit, drgnunit, 0,        ROT0,   "Seta",                   "Dragon Unit / Castle of Dragon", 0 )
 GAME( 1989, wits,     0,        wits,     wits,     0,        ROT0,   "Athena (Visco license)", "Wit's (Japan)" , 0) // Country/License: DSW
 GAME( 1990, thunderl, 0,        thunderl, thunderl, 0,        ROT270, "Seta",                   "Thunder & Lightning" , 0) // Country/License: DSW

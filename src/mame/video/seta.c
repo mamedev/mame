@@ -638,6 +638,14 @@ PALETTE_INIT( inttoote )
 	}
 }
 
+PALETTE_INIT( setaroul )
+{
+	machine->gfx[0]->color_granularity=16;
+	machine->gfx[1]->color_granularity=16;
+
+	PALETTE_INIT_CALL(inttoote);
+}
+
 PALETTE_INIT( usclssic )
 {
 	int color, pen;

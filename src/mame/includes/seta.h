@@ -28,6 +28,7 @@ WRITE16_HANDLER( seta_vregs_w );
 PALETTE_INIT( blandia );
 PALETTE_INIT( gundhara );
 PALETTE_INIT( inttoote );
+PALETTE_INIT( setaroul );
 PALETTE_INIT( jjsquawk );
 PALETTE_INIT( usclssic );
 PALETTE_INIT( zingzip );
