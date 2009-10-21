@@ -1124,7 +1124,7 @@ static void draw_model(UINT32 addr)
 	UINT32 *model = (addr >= 0x100000) ? &model3_vrom[addr] :  &polygon_ram[addr];
 	UINT32 header[7];
 	int index = 0;
-	int last_polygon = FALSE;
+	int last_polygon = FALSE, back_face = FALSE;
 	int num_vertices;
 	int i, v, vi;
 	float fixed_point_fraction;
@@ -1216,7 +1216,7 @@ static void draw_model(UINT32 addr)
 		sn[1] *= coordinate_system[1][2];
 		sn[2] *= coordinate_system[2][0];
 
-		/* TODO: backface culling */
+		/* TODO: depth bias */
 		/* transform vertices */
 		for (i = 0; i < num_vertices; i++)
 		{
@@ -1245,55 +1245,67 @@ static void draw_model(UINT32 addr)
 		num_vertices = clip_polygon(clip_vert, num_vertices, clip_plane[3], clip_vert);
 		num_vertices = clip_polygon(clip_vert, num_vertices, clip_plane[4], clip_vert);
 
-		/* homogeneous Z-divide, screen-space transformation */
-		for(i=0; i < num_vertices; i++) {
-			float ooz = 1.0f / clip_vert[i].pz;
-			clip_vert[i].x = ((clip_vert[i].x * ooz) * viewport_focal_length) + center_x;
-			clip_vert[i].y = ((clip_vert[i].y * ooz) * viewport_focal_length) + center_y;
+		/* backface culling */
+		if( (header[6] & 0x800000) && (!(header[1] & 0x0010)) )	{
+			if(sn[0]*clip_vert[0].x + sn[1]*clip_vert[0].y + sn[2]*clip_vert[0].pz >0)
+				back_face = 1;
+			else 
+				back_face = 0;
 		}
+		else 
+			back_face = 0;	//no culling for transparent or two-sided polygons
 
-		// lighting
-		if ((header[6] & 0x10000) == 0)
-		{
-			dot = dot_product3(sn, parallel_light);
-			intensity = ((dot * parallel_light_intensity) + ambient_light_intensity) * 256.0f;
-			if (intensity > 256)
+		if(!back_face)	{
+			/* homogeneous Z-divide, screen-space transformation */
+			for(i=0; i < num_vertices; i++) {
+				float ooz = 1.0f / clip_vert[i].pz;
+				clip_vert[i].x = ((clip_vert[i].x * ooz) * viewport_focal_length) + center_x;
+				clip_vert[i].y = ((clip_vert[i].y * ooz) * viewport_focal_length) + center_y;
+			}
+
+			// lighting
+			if ((header[6] & 0x10000) == 0)
 			{
+				dot = dot_product3(sn, parallel_light);
+				intensity = ((dot * parallel_light_intensity) + ambient_light_intensity) * 256.0f;
+				if (intensity > 256)
+				{
+					intensity = 256;
+				}
+				if (intensity < 0)
+				{
+					intensity = 0;
+				}
+			}
+			else
+			{
+				// apply luminosity
 				intensity = 256;
 			}
-			if (intensity < 0)
+
+			for (i=2; i < num_vertices; i++)
 			{
-				intensity = 0;
+				memcpy(&tri.v[0], &clip_vert[0], sizeof(poly_vertex));
+				memcpy(&tri.v[1], &clip_vert[i-1], sizeof(poly_vertex));
+				memcpy(&tri.v[2], &clip_vert[i], sizeof(poly_vertex));
+				tri.texture_x 				= ((header[4] & 0x1f) << 1) | ((header[5] >> 7) & 0x1);
+				tri.texture_y 				= (header[5] & 0x1f);
+				tri.texture_width			= ((header[3] >> 3) & 0x7);
+				tri.texture_height			= (header[3] & 0x7);
+				tri.texture_format			= (header[6] >> 7) & 0x7;
+				tri.transparency			= polygon_transparency;
+				tri.intensity 				= intensity;
+				tri.color 					= color;
+
+				tri.param	= 0;
+				tri.param 	|= (header[4] & 0x40) ? TRI_PARAM_TEXTURE_PAGE : 0;
+				tri.param	|= (header[6] & 0x4000000) ? TRI_PARAM_TEXTURE_ENABLE : 0;
+				tri.param	|= (header[2] & 0x2) ? TRI_PARAM_TEXTURE_MIRROR_U : 0;
+				tri.param	|= (header[2] & 0x1) ? TRI_PARAM_TEXTURE_MIRROR_V : 0;
+				tri.param   |= (header[6] & 0x80000000) ? TRI_PARAM_ALPHA_TEST : 0;
+
+				render_one(&tri);
 			}
-		}
-		else
-		{
-			// apply luminosity
-			intensity = 256;
-		}
-
-		for (i=2; i < num_vertices; i++)
-		{
-			memcpy(&tri.v[0], &clip_vert[0], sizeof(poly_vertex));
-			memcpy(&tri.v[1], &clip_vert[i-1], sizeof(poly_vertex));
-			memcpy(&tri.v[2], &clip_vert[i], sizeof(poly_vertex));
-			tri.texture_x 				= ((header[4] & 0x1f) << 1) | ((header[5] >> 7) & 0x1);
-			tri.texture_y 				= (header[5] & 0x1f);
-			tri.texture_width			= ((header[3] >> 3) & 0x7);
-			tri.texture_height			= (header[3] & 0x7);
-			tri.texture_format			= (header[6] >> 7) & 0x7;
-			tri.transparency			= polygon_transparency;
-			tri.intensity 				= intensity;
-			tri.color 					= color;
-
-			tri.param	= 0;
-			tri.param 	|= (header[4] & 0x40) ? TRI_PARAM_TEXTURE_PAGE : 0;
-			tri.param	|= (header[6] & 0x4000000) ? TRI_PARAM_TEXTURE_ENABLE : 0;
-			tri.param	|= (header[2] & 0x2) ? TRI_PARAM_TEXTURE_MIRROR_U : 0;
-			tri.param	|= (header[2] & 0x1) ? TRI_PARAM_TEXTURE_MIRROR_V : 0;
-			tri.param   |= (header[6] & 0x80000000) ? TRI_PARAM_ALPHA_TEST : 0;
-
-			render_one(&tri);
 		}
 
 		++polynum;
