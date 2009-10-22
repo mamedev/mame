@@ -1565,6 +1565,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/miniboy7.o \
 	$(DRIVERS)/mirage.o \
 	$(DRIVERS)/mirax.o \
+	$(DRIVERS)/mirderby.o \
 	$(DRIVERS)/mole.o $(VIDEO)/mole.o \
 	$(DRIVERS)/mosaic.o $(VIDEO)/mosaic.o \
 	$(DRIVERS)/mrjong.o $(VIDEO)/mrjong.o \

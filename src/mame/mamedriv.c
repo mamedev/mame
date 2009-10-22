@@ -8280,6 +8280,7 @@ Other Sun games
 	/* Home Data games */
 	DRIVER( hourouki ) 	/* (c) 1987 Home Data */
 	DRIVER( mhgaiden ) 	/* (c) 1987 Home Data */
+	DRIVER( mirderby )  /* (c) 1988 Home Data? */
 	DRIVER( mjhokite ) 	/* (c) 1988 Home Data */
 	DRIVER( mjclinic ) 	/* (c) 1988 Home Data */
 	DRIVER( mrokumei ) 	/* (c) 1988 Home Data */
