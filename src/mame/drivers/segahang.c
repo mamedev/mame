@@ -117,6 +117,8 @@ static TIMER_CALLBACK( suspend_i8751 )
 
 static MACHINE_RESET( hangon )
 {
+	fd1094_machine_init(cputag_get_cpu(machine, "sub"));
+
 	/* reset misc components */
 	segaic16_tilemap_reset(machine, 0);
 
@@ -316,6 +318,13 @@ static WRITE8_DEVICE_HANDLER( sub_control_adc_w )
 	/* D3-D2 : ADC_SELECT */
 	cputag_set_input_line(device->machine, "sub", 4, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	cputag_set_input_line(device->machine, "sub", INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+
+	/* If the CPU is being Reset we also need to reset the fd1094 state */
+	if (data & 0x20)
+	{
+		fd1094_machine_init(cputag_get_cpu(device->machine, "sub"));
+	}
+
 	adc_select = (data >> 2) & 3;
 }
 
@@ -401,7 +410,6 @@ static ADDRESS_MAP_START( hangon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe00000, 0xffffff) AM_READWRITE(hangon_io_r, hangon_io_w)
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( sharrier_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -423,6 +431,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
+ /* On Super Hang On there is a memory mapper, like the System16 one, todo: emulate it! */
 static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
@@ -1192,21 +1201,21 @@ Bottom: 834-5668 (Label 837-6341)
 
 ROM_START( shangonro )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "epr-10833.31", 0x000000, 0x10000, CRC(13ba98bc) SHA1(83710a7bb9d038f8663e6d42b184d4e4d937a26f) ) /* <-- These may not be in the correct order */
-	ROM_LOAD16_BYTE( "epr-10831.25", 0x000001, 0x10000, CRC(3a2de9eb) SHA1(20da548cd1fb466942ee45306cfd04766e5a4f50) )
-	ROM_LOAD16_BYTE( "epr-10832.30", 0x020000, 0x10000, CRC(543cd7bb) SHA1(124b426adc2d8dc51172ef94cb215bde3b8b42a7) )
-	ROM_LOAD16_BYTE( "epr-10830.24", 0x020001, 0x10000, CRC(2ae4e53a) SHA1(b15b5a8b36cbe5fe68b5e18ab3398ebc7214dbee) )
-
-	ROM_REGION( 0x2000, "user1", 0 ) /* decryption key */
-	ROM_LOAD( "317-0038.key", 0x0000, 0x2000,  CRC(85943925) SHA1(76303b0aa79ca9d4a8d10d4e63ee2efe756a0a00) )
-
-	ROM_REGION( 0x40000, "sub", 0 ) /* second 68000 CPU */
 	ROM_LOAD16_BYTE( "epr-10842.22", 0x00000, 0x08000, CRC(24289138) SHA1(700419bb8e4f97e128d85d0077e4aa39a1d2f167) )
 	ROM_LOAD16_BYTE( "epr-10839.8",  0x00001, 0x08000, CRC(70f92d5e) SHA1(3ca0e23d6bb44bbe7d21840c8d179c57f8cbfd20) )
 	ROM_LOAD16_BYTE( "epr-10841.20", 0x10000, 0x08000, CRC(3bb2186c) SHA1(755dbf5d37809ea1de2e96f9827cf373dc2d3f94) )
 	ROM_LOAD16_BYTE( "epr-10838.6",  0x10001, 0x08000, CRC(6aded05a) SHA1(5459157bf4083f677c524d1cb839cb6f4f1a7ee2) )
 	ROM_LOAD16_BYTE( "epr-10840.18", 0x20000, 0x08000, CRC(12ee8716) SHA1(8e798d23d22f85cd046641184d104c17b27995b2) )
 	ROM_LOAD16_BYTE( "epr-10837.4",  0x20001, 0x08000, CRC(155e0cfd) SHA1(e51734351c887fe3920c881f57abdfbb7d075f57) )
+
+	ROM_REGION( 0x2000, "user1", 0 ) /* FD1094 decryption key */
+	ROM_LOAD( "317-0038.key", 0x0000, 0x2000, CRC(85943925) SHA1(76303b0aa79ca9d4a8d10d4e63ee2efe756a0a00) )
+
+	ROM_REGION( 0x40000, "sub", 0 ) /* second 68000 CPU (encrypted FD1094) */
+	ROM_LOAD16_BYTE( "epr-10833.31", 0x000001, 0x10000, CRC(13ba98bc) SHA1(83710a7bb9d038f8663e6d42b184d4e4d937a26f) )
+	ROM_LOAD16_BYTE( "epr-10831.25", 0x000000, 0x10000, CRC(3a2de9eb) SHA1(20da548cd1fb466942ee45306cfd04766e5a4f50) )
+	ROM_LOAD16_BYTE( "epr-10832.30", 0x020001, 0x10000, CRC(543cd7bb) SHA1(124b426adc2d8dc51172ef94cb215bde3b8b42a7) )
+	ROM_LOAD16_BYTE( "epr-10830.24", 0x020000, 0x10000, CRC(2ae4e53a) SHA1(b15b5a8b36cbe5fe68b5e18ab3398ebc7214dbee) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 ) /* tiles */
 	ROM_LOAD( "epr-10652.38", 0x00000, 0x08000, CRC(260286f9) SHA1(dc7c8d2c6ef924a937328685eed19bda1c8b1819) )
@@ -1823,7 +1832,13 @@ static DRIVER_INIT( endurob2 )
 	memcpy(decrypt, rom, 0x30000);
 	/* missing data ROM */
 }
+static DRIVER_INIT( shangonro )
+{
+	hangon_generic_init();
 
+	/* init the FD1094 */
+	fd1094_driver_init(machine, "sub", NULL);
+}
 
 
 /*************************************
@@ -1834,7 +1849,7 @@ static DRIVER_INIT( endurob2 )
 
 GAME( 1985, hangon,    0,        hangon,   hangon,   hangon,   ROT0, "Sega",    "Hang-On (Rev A)", 0 )
 GAME( 1985, hangon1,   hangon,   hangon,   hangon,   hangon,   ROT0, "Sega",    "Hang-On", 0 )
-GAME( 1992, shangonro, shangon,  shangupb, shangupb, hangon,   ROT0, "Sega",    "Super Hang-On (Japan, FD1094 317-0038)", GAME_NOT_WORKING )
+GAME( 1992, shangonro, shangon,  shangupb, shangupb, shangonro,ROT0, "Sega",    "Super Hang-On (Japan, FD1094 317-0038)", 0 )
 GAME( 1992, shangonrb, shangon,  shangupb, shangupb, hangon,   ROT0, "bootleg", "Super Hang-On (bootleg)", 0 )
 GAME( 1985, sharrier,  0,        sharrier, sharrier, sharrier, ROT0, "Sega",    "Space Harrier (Rev A, 8751 315-5163A)", 0 )
 GAME( 1985, sharrier1, sharrier, sharrier, sharrier, sharrier, ROT0, "Sega",    "Space Harrier (8751 315-5163)", 0 )

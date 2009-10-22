@@ -222,7 +222,7 @@ static void system16a_generic_init(running_machine *machine)
 	MACHINE_RESET_CALL(sys16_onetime);
 
 	/* init the FD1094 */
-	fd1094_driver_init(machine, NULL);
+	fd1094_driver_init(machine, "maincpu", NULL);
 
 	/* reset the custom handlers and other pointers */
 	custom_io_r = NULL;

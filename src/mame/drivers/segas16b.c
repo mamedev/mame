@@ -1062,7 +1062,7 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 	segaic16_memory_mapper_init(cputag_get_cpu(machine, "maincpu"), region_info_list[rom_board], sound_w, NULL);
 
 	/* init the FD1094 */
-	fd1094_driver_init(machine, segaic16_memory_mapper_set_decrypted);
+	fd1094_driver_init(machine, "maincpu", segaic16_memory_mapper_set_decrypted);
 
 	/* reset the custom handlers and other pointers */
 	custom_io_r = NULL;

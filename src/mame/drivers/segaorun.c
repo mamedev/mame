@@ -154,7 +154,7 @@ static void outrun_generic_init(running_machine *machine)
 	segaic16_memory_mapper_init(cputag_get_cpu(machine, "maincpu"), outrun_info, sound_data_w, NULL);
 
 	/* init the FD1094 */
-	fd1094_driver_init(machine, segaic16_memory_mapper_set_decrypted);
+	fd1094_driver_init(machine, "maincpu", segaic16_memory_mapper_set_decrypted);
 
 	/* reset the custom handlers and other pointers */
 	custom_io_r = NULL;

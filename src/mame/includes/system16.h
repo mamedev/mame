@@ -52,7 +52,7 @@ VIDEO_UPDATE( yboard );
 
 void *fd1094_get_decrypted_base(void);
 void fd1094_machine_init(const device_config *device);
-void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(running_machine *, UINT8 *));
+void fd1094_driver_init(running_machine *machine, const char* tag, void (*set_decrypted)(running_machine *, UINT8 *));
 
 /*----------- defined in machine/system16.c -----------*/
 

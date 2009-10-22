@@ -275,7 +275,7 @@ static UINT16 *backupram1, *backupram2;
 static void xboard_generic_init(running_machine *machine)
 {
 	/* init the FD1094 */
-	fd1094_driver_init(machine, NULL);
+	fd1094_driver_init(machine, "maincpu", NULL);
 
 	/* set the default road priority */
 	xboard_set_road_priority(1);
