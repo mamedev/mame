@@ -302,8 +302,8 @@ ROM_START( starfire )
 	ROM_LOAD( "sfire.1f",     0x5000, 0x0800, CRC(af31dc39) SHA1(0dfeff6973fd03e85b08e70c77d212f0bb60121d) )
 
 	ROM_REGION( 0x0040, "proms", 0 ) /* DRAM addressing */
-	ROM_LOAD( "prom-1.7a",    0x0000, 0x0020, CRC(ae1f4acd) SHA1(1d502b61db73cf6a4ac3d235455a5c464f12652a) )
-	ROM_LOAD( "prom-2.8a",    0x0020, 0x0020, CRC(9b713924) SHA1(943ad55d232f7bb99886a9a273dd14a1e1533491) )
+	ROM_LOAD( "prom-1.7a",    0x0000, 0x0020, CRC(ae1f4acd) SHA1(1d502b61db73cf6a4ac3d235455a5c464f12652a) ) /* BPROM type is N82S123 */
+	ROM_LOAD( "prom-2.8a",    0x0020, 0x0020, CRC(9b713924) SHA1(943ad55d232f7bb99886a9a273dd14a1e1533491) ) /* BPROM type is N82S123 */
 ROM_END
 
 ROM_START( starfirea )
@@ -320,8 +320,8 @@ ROM_START( starfirea )
 	ROM_LOAD( "starfire.2e",  0x4800, 0x0800, CRC(ba8434c5) SHA1(1831b291dfe3e4b081e66caa909b8c727bfffa7b) )
 
 	ROM_REGION( 0x0040, "proms", 0 ) /* DRAM addressing */
-	ROM_LOAD( "prom-1.7a",    0x0000, 0x0020, CRC(ae1f4acd) SHA1(1d502b61db73cf6a4ac3d235455a5c464f12652a) )
-	ROM_LOAD( "prom-2.8a",    0x0020, 0x0020, CRC(9b713924) SHA1(943ad55d232f7bb99886a9a273dd14a1e1533491) )
+	ROM_LOAD( "prom-1.7a",    0x0000, 0x0020, CRC(ae1f4acd) SHA1(1d502b61db73cf6a4ac3d235455a5c464f12652a) ) /* BPROM type is N82S123 */
+	ROM_LOAD( "prom-2.8a",    0x0020, 0x0020, CRC(9b713924) SHA1(943ad55d232f7bb99886a9a273dd14a1e1533491) ) /* BPROM type is N82S123 */
 ROM_END
 
 ROM_START( fireone )
@@ -342,8 +342,8 @@ ROM_START( fireone )
 	ROM_LOAD( "fo-ic18.1c",   0x6800, 0x0800, CRC(771ee5ba) SHA1(6577e219386de594dbde8a54d5f5f9657419061a) )
 
 	ROM_REGION( 0x0040, "proms", 0 ) /* DRAM addressing */
-	ROM_LOAD( "prom-1.7a",    0x0000, 0x0020, CRC(ae1f4acd) SHA1(1d502b61db73cf6a4ac3d235455a5c464f12652a) )
-	ROM_LOAD( "prom-2.8a",    0x0020, 0x0020, CRC(9b713924) SHA1(943ad55d232f7bb99886a9a273dd14a1e1533491) )
+	ROM_LOAD( "prom-1.7a",    0x0000, 0x0020, CRC(ae1f4acd) SHA1(1d502b61db73cf6a4ac3d235455a5c464f12652a) ) /* BPROM type is N82S123 */
+	ROM_LOAD( "prom-2.8a",    0x0020, 0x0020, CRC(9b713924) SHA1(943ad55d232f7bb99886a9a273dd14a1e1533491) ) /* BPROM type is N82S123 */
 ROM_END
 
 ROM_START( starfir2 )
@@ -362,8 +362,8 @@ ROM_START( starfir2 )
 	ROM_LOAD( "sfire2.12",    0x5800, 0x0800, CRC(a35ba06d) SHA1(122f1dbc235977367fdd06b7517c356a3147dfd1) )
 
 	ROM_REGION( 0x0040, "proms", 0 ) /* DRAM addressing */
-	ROM_LOAD( "prom-1.7a",    0x0000, 0x0020, CRC(ae1f4acd) SHA1(1d502b61db73cf6a4ac3d235455a5c464f12652a) )
-	ROM_LOAD( "prom-2.8a",    0x0020, 0x0020, CRC(9b713924) SHA1(943ad55d232f7bb99886a9a273dd14a1e1533491) )
+	ROM_LOAD( "prom-1.7a",    0x0000, 0x0020, CRC(ae1f4acd) SHA1(1d502b61db73cf6a4ac3d235455a5c464f12652a) ) /* BPROM type is N82S123 */
+	ROM_LOAD( "prom-2.8a",    0x0020, 0x0020, CRC(9b713924) SHA1(943ad55d232f7bb99886a9a273dd14a1e1533491) ) /* BPROM type is N82S123 */
 ROM_END
 
 
