@@ -201,7 +201,7 @@
  * DISCRETE_INPUT_STREAM(NODE, NUM)
  * DISCRETE_INPUTX_STREAM(NODE,NUM, GAIN,OFFSET)
  *
- * DISCRETE_COUNTER(NODE,ENAB,RESET,CLK,MAX,DIR,INIT0,CLKTYPE)
+ * DISCRETE_COUNTER(NODE,ENAB,RESET,CLK,MIN,MAX,DIR,INIT0,CLKTYPE)
  * DISCRETE_COUNTER_7492(NODE,ENAB,RESET,CLK,CLKTYPE)
  * DISCRETE_LFSR_NOISE(NODE,ENAB,RESET,CLK,AMPL,FEED,BIAS,LFSRTB)
  * DISCRETE_NOISE(NODE,ENAB,FREQ,AMP,BIAS)
@@ -461,7 +461,7 @@
  *
  * DISCRETE_COUNTER     - up/down counter.
  *
- *  This counter counts up/down from 0 to MAX.  When the enable is low, the output
+ *  This counter counts up/down from MIN to MAX.  When the enable is low, the output
  *  is held at it's last value.  When reset is high, the reset value is loaded
  *  into the output.  The counter can be clocked internally or externally.  It also
  *  supports x_time used by the clock modules to pass on anti-aliasing info.
@@ -491,6 +491,7 @@
  *                      enable node or static value,
  *                      reset node or static value, (reset when TRUE)
  *                      clock node or static value,
+ *                      min count static value,
  *                      max count static value,
  *                      direction node or static value,
  *                      reset value node or static value,
@@ -4403,8 +4404,8 @@ enum
 
 /* from disc_wav.c */
 /* generic modules */
-#define DISCRETE_COUNTER(NODE,ENAB,RESET,CLK,MAX,DIR,INIT0,CLKTYPE)     { NODE, DSS_COUNTER     , 7, { ENAB,RESET,CLK,NODE_NC,DIR,INIT0,NODE_NC }, { ENAB,RESET,CLK,MAX,DIR,INIT0,CLKTYPE }, NULL, "DISCRETE_COUNTER" },
-#define DISCRETE_COUNTER_7492(NODE,ENAB,RESET,CLK,CLKTYPE)              { NODE, DSS_COUNTER     , 7, { ENAB,RESET,CLK,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,RESET,CLK,CLKTYPE,1,0,DISC_COUNTER_IS_7492 }, NULL, "DISCRETE_COUNTER_7492" },
+#define DISCRETE_COUNTER(NODE,ENAB,RESET,CLK,MIN,MAX,DIR,INIT0,CLKTYPE) { NODE, DSS_COUNTER     , 8, { ENAB,RESET,CLK,NODE_NC,NODE_NC,DIR,INIT0,NODE_NC }, { ENAB,RESET,CLK,MIN,MAX,DIR,INIT0,CLKTYPE }, NULL, "DISCRETE_COUNTER" },
+#define DISCRETE_COUNTER_7492(NODE,ENAB,RESET,CLK,CLKTYPE)              { NODE, DSS_COUNTER     , 8, { ENAB,RESET,CLK,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,RESET,CLK,CLKTYPE,0,1,0,DISC_COUNTER_IS_7492 }, NULL, "DISCRETE_COUNTER_7492" },
 #define DISCRETE_LFSR_NOISE(NODE,ENAB,RESET,CLK,AMPL,FEED,BIAS,LFSRTB)  { NODE, DSS_LFSR_NOISE  , 6, { ENAB,RESET,CLK,AMPL,FEED,BIAS }, { ENAB,RESET,CLK,AMPL,FEED,BIAS }, LFSRTB, "DISCRETE_LFSR_NOISE" },
 #define DISCRETE_NOISE(NODE,ENAB,FREQ,AMPL,BIAS)                        { NODE, DSS_NOISE       , 4, { ENAB,FREQ,AMPL,BIAS }, { ENAB,FREQ,AMPL,BIAS }, NULL, "DISCRETE_NOISE" },
 #define DISCRETE_NOTE(NODE,ENAB,CLK,DATA,MAX1,MAX2,CLKTYPE)             { NODE, DSS_NOTE        , 6, { ENAB,CLK,DATA,NODE_NC,NODE_NC,NODE_NC }, { ENAB,CLK,DATA,MAX1,MAX2,CLKTYPE }, NULL, "DISCRETE_NOTE" },

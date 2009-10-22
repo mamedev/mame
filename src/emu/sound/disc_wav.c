@@ -33,8 +33,10 @@ struct dss_counter_context
 	int		clock_type;
 	int		out_type;
 	int		is_7492;
-	int		last;		/* Last clock state */
-	int		count;		/* current count */
+	UINT32	last;		/* Last clock state */
+	UINT32	min;
+	UINT32	max;
+	UINT32	diff;
 	double	t_left;		/* time unused during last sample in seconds */
 };
 
@@ -179,11 +181,12 @@ struct dss_trianglewave_context
 #define DSS_COUNTER__ENABLE		DISCRETE_INPUT(0)
 #define DSS_COUNTER__RESET		DISCRETE_INPUT(1)
 #define DSS_COUNTER__CLOCK		DISCRETE_INPUT(2)
-#define DSS_COUNTER__MAX		DISCRETE_INPUT(3)
-#define DSS_COUNTER__DIR		DISCRETE_INPUT(4)
-#define DSS_COUNTER__INIT		DISCRETE_INPUT(5)
-#define DSS_COUNTER__CLOCK_TYPE	DISCRETE_INPUT(6)
-#define DSS_7492__CLOCK_TYPE	 DSS_COUNTER__MAX
+#define DSS_COUNTER__MIN		DISCRETE_INPUT(3)
+#define DSS_COUNTER__MAX		DISCRETE_INPUT(4)
+#define DSS_COUNTER__DIR		DISCRETE_INPUT(5)
+#define DSS_COUNTER__INIT		DISCRETE_INPUT(6)
+#define DSS_COUNTER__CLOCK_TYPE	DISCRETE_INPUT(7)
+#define DSS_7492__CLOCK_TYPE	 DSS_COUNTER__MIN
 
 static const int disc_7492_count[6] = {0x00, 0x01, 0x02, 0x04, 0x05, 0x06};
 
@@ -193,13 +196,8 @@ static DISCRETE_STEP(dss_counter)
 	double	cycles;
 	double	ds_clock;
 	int		clock = 0, last_count, inc = 0;
-	int		max;
 	double	x_time = 0;
-
-	if (context->is_7492)
-		max = 5;
-	else
-		max = DSS_COUNTER__MAX;
+	UINT32	count = node->output[0];
 
 	ds_clock = DSS_COUNTER__CLOCK;
 	if (UNEXPECTED(context->clock_type == DISC_CLK_IS_FREQ))
@@ -213,6 +211,7 @@ static DISCRETE_STEP(dss_counter)
 	else
 	{
 		clock  = (int)ds_clock;
+		/* x_time from input clock */
 		x_time = ds_clock - clock;
 	}
 
@@ -220,8 +219,7 @@ static DISCRETE_STEP(dss_counter)
 	/* If reset enabled then set output to the reset value.  No x_time in reset. */
 	if (UNEXPECTED(DSS_COUNTER__RESET))
 	{
-		context->count = DSS_COUNTER__INIT;
-		node->output[0] = context->count;
+		node->output[0] = (int)DSS_COUNTER__INIT;
 		return;
 	}
 
@@ -231,7 +229,7 @@ static DISCRETE_STEP(dss_counter)
      */
 	if (EXPECTED(DSS_COUNTER__ENABLE))
 	{
-		last_count = context->count;
+		last_count = count;
 
 		switch (context->clock_type)
 		{
@@ -256,57 +254,76 @@ static DISCRETE_STEP(dss_counter)
 				break;
 		}
 
+		/* use loops because init is not always min or max */
 		if (DSS_COUNTER__DIR)
-			context->count = (context->count + inc) % (max + 1);
+		{
+			count += inc;
+			while (count > context->max)
+			{
+				count -= context->diff;
+			}
+		}
 		else
-			context->count = max - ((context->count + inc) % (max + 1));
+		{
+			count -= inc;
+			while (count < context->min)
+			{
+				count += context->diff;
+			}
+		}
 
-		node->output[0] = context->is_7492 ? disc_7492_count[context->count] : context->count;
+		node->output[0] = context->is_7492 ? disc_7492_count[count] : count;
 
-		if (EXPECTED(context->count != last_count))
+		if (UNEXPECTED(count != last_count))
 		{
 			/* the x_time is only output if the output changed. */
 			switch (context->out_type)
 			{
+				case DISC_OUT_HAS_XTIME:
+					node->output[0] += x_time;
+					break;
 				case DISC_OUT_IS_ENERGY:
 					if (x_time == 0) x_time = 1.0;
 					node->output[0] = last_count;
-					if (context->count > last_count)
-						node->output[0] += (context->count - last_count) * x_time;
+					if (count > last_count)
+						node->output[0] += (count - last_count) * x_time;
 					else
-						node->output[0] -= (last_count - context->count) * x_time;
-					break;
-				case DISC_OUT_HAS_XTIME:
-					node->output[0] += x_time;
+						node->output[0] -= (last_count - count) * x_time;
 					break;
 			}
 		}
 	}
-	else
-		node->output[0] = context->count;
 }
 
 static DISCRETE_RESET(dss_counter)
 {
 	struct dss_counter_context *context = (struct dss_counter_context *)node->context;
 
+	if (DSS_COUNTER__MAX < DSS_COUNTER__MIN)
+		fatalerror("MAX < MIN in NODE_%02d", NODE_INDEX(node->block->node));
+
 	if ((int)DSS_COUNTER__CLOCK_TYPE & DISC_COUNTER_IS_7492)
 	{
 		context->is_7492    = 1;
-		context->clock_type = (int)DSS_7492__CLOCK_TYPE;
+		context->clock_type = DSS_7492__CLOCK_TYPE;
+		context->max = 5;
+		context->min = 0;
+		context->diff = 6;
 	}
 	else
 	{
 		context->is_7492    = 0;
-		context->clock_type = (int)DSS_COUNTER__CLOCK_TYPE;
+		context->clock_type = DSS_COUNTER__CLOCK_TYPE;
+		context->max = DSS_COUNTER__MAX;
+		context->min = DSS_COUNTER__MIN;
+		context->diff = context->max - context->min + 1;
 	}
 	context->out_type    = context->clock_type & DISC_OUT_MASK;
 	context->clock_type &= DISC_CLK_MASK;
 
 	context->t_left  = 0;
 	context->last    = 0;
-	context->count   = DSS_COUNTER__INIT; /* count starts at reset value */
-	node->output[0]  = DSS_COUNTER__INIT;
+	node->output[0]  = DSS_COUNTER__INIT; /* count starts at reset value */
 }
 
 
@@ -1247,10 +1264,10 @@ static DISCRETE_RESET(dss_sawtoothwave)
 	/* Establish starting phase, convert from degrees to radians */
 	start = (DSS_SAWTOOTHWAVE__PHASE / 360.0) * (2.0 * M_PI);
 	/* Make sure its always mod 2Pi */
-	context->phase=fmod(start, 2.0 * M_PI);
+	context->phase = fmod(start, 2.0 * M_PI);
 
 	/* Invert gradient depending on sawtooth type /|/|/|/|/| or |\|\|\|\|\ */
-	context->type=(DSS_SAWTOOTHWAVE__GRAD) ? 1 : 0;
+	context->type = (DSS_SAWTOOTHWAVE__GRAD) ? 1 : 0;
 
 	/* Step the node to set the output */
 	DISCRETE_STEP_CALL(dss_sawtoothwave);

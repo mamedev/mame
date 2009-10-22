@@ -4414,7 +4414,7 @@ static DISCRETE_SOUND_START(blueshrk)
 	DISCRETE_COUNTER(NODE_40,							/* IC H3, pin 5 */
 		1, BLUESHRK_HIT_EN,								/* ENAB,RESET */
 		FREQ_OF_555(BLUESHRK_R601, 0, BLUESHRK_C600),	/* CLK - IC H1, pin 9 */
-		1, DISC_COUNT_UP, 0,							/* MAX,DIR,INIT0 */
+		0,1, DISC_COUNT_UP, 0,							/* MIN,MAX,DIR,INIT0 */
 		DISC_CLK_IS_FREQ)
 	DISCRETE_SWITCH(NODE_41,					/* value of toggled caps */
 		1,										/* ENAB */

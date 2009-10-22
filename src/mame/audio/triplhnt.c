@@ -146,14 +146,14 @@ DISCRETE_SOUND_START(triplhnt)
 			&triplhnt_bear_roar_vco)
 	DISCRETE_COUNTER(NODE_23, 1, TRIPLHNT_BEAR_EN,	// IC B6, QB-QD
 			NODE_22,								// from IC C11, pin 3
-			5, 1, 0, DISC_CLK_ON_R_EDGE)			// /6 counter on rising edge
+			0, 5, 1, 0, DISC_CLK_ON_R_EDGE)			// /6 counter on rising edge
 	DISCRETE_TRANSFORM2(NODE_24, NODE_23, 2, "01>")	// IC B6, pin 8
 	DISCRETE_LOGIC_INVERT(NODE_25, NODE_22)			// IC D9, pin 3
 	DISCRETE_LOGIC_NAND(NODE_26, NODE_25, TRIPLHNT_NOISE)	// IC D9, pin 11
 	DISCRETE_LOGIC_XOR(NODE_27, NODE_24, NODE_26)	// IC B8, pin 6
 	DISCRETE_COUNTER(NODE_28, 1, TRIPLHNT_BEAR_EN,	// IC B6, pin 12
 			NODE_27,								// from IC B8, pin 6
-			1, 1, 0, DISC_CLK_ON_R_EDGE)			// /2 counter on rising edge
+			0, 1, 1, 0, DISC_CLK_ON_R_EDGE)			// /2 counter on rising edge
 	DISCRETE_TRANSFORM5(NODE_29, NODE_24, NODE_28, NODE_26, 2, 4, "13*24*+0+")	// Mix the mess together in binary
 	DISCRETE_DAC_R1(TRIPLHNT_BEAR_ROAR_SND, NODE_29,
 			DEFAULT_TTL_V_LOGIC_1,

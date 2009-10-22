@@ -58,7 +58,7 @@ DISCRETE_SOUND_START(hitme)
 	/* There are 2 cascaded 4-bit downcounters (2R = low, 2P = high), effectively
      * making an 8-bit downcounter, clocked by the clock from the 404 chip.
      * The initial count is latched by writing OUT0. */
-	DISCRETE_COUNTER(NODE_20,1,HITME_OUT0,NODE_17,255,0,HITME_DOWNCOUNT_VAL,DISC_CLK_ON_F_EDGE)
+	DISCRETE_COUNTER(NODE_20,1,HITME_OUT0,NODE_17,0,255,0,HITME_DOWNCOUNT_VAL,DISC_CLK_ON_F_EDGE)
 	/* When the counter rolls over from 0->255, we clock a D-type flipflop at 2N. */
 	DISCRETE_TRANSFORM2(NODE_21,NODE_20,255,"01=!")
 

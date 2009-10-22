@@ -670,11 +670,11 @@ DISCRETE_SOUND_START(turbo)
 	// 5-5-5 counter provides the input clock
 	DISCRETE_555_ASTABLE(NODE_50,1,470,120,0.1e-6,&turbo_alarm_555)
 	// which clocks a 74393 dual 4-bit counter, clocked on the falling edge
-	DISCRETE_COUNTER(NODE_51,1,0,NODE_50,15,1,0,DISC_CLK_ON_F_EDGE)
+	DISCRETE_COUNTER(NODE_51,1,0,NODE_50,0,15,1,0,DISC_CLK_ON_F_EDGE)
 	// the high bit of this counter
 	DISCRETE_TRANSFORM2(NODE_52,NODE_51,8,"01/")
 	// clocks the other half of the 74393
-	DISCRETE_COUNTER(NODE_53,1,0,NODE_52,15,1,0,DISC_CLK_ON_F_EDGE)
+	DISCRETE_COUNTER(NODE_53,1,0,NODE_52,0,15,1,0,DISC_CLK_ON_F_EDGE)
 
 	// trig1 triggers a LS123 retriggerable multivibrator
 	DISCRETE_ONESHOT(NODE_60,TURBO_TRIG1_INV,5.0,(0.33e-9)*47*1e6, DISC_ONESHOT_FEDGE|DISC_ONESHOT_RETRIG|DISC_OUT_ACTIVE_HIGH)

@@ -27,12 +27,15 @@ D0  explosion enable        gates a noise generator
 
 #define BZ_NOISE_CLOCK		12000
 
+#define TTL_OUT 3.4
+
 /*************************************
  *
  *  Discrete Sound Defines
  *
  *************************************/
 
+/* Discrete Sound Input Nodes */
 #define BZ_INPUT			NODE_01		/* at M2 LS273 */
 #define BZ_INP_EXPLO		NODE_10_00
 #define BZ_INP_EXPLOLS		NODE_10_01
@@ -43,16 +46,22 @@ D0  explosion enable        gates a noise generator
 #define BZ_INP_STARTLED		NODE_10_06
 #define BZ_INP_MOTEN		NODE_10_07
 
-#define TTL_OUT 3.4
+/* Adjusters */
+#define BZ_R11_POT			NODE_11
 
+/* Discrete Sound Output Nodes */
+#define BZ_NOISE			NODE_20
+#define BZ_SHELL_SND		NODE_21
+#define BZ_EXPLOSION_SND	NODE_22
+#define BZ_ENGINE_SND		NODE_23
+#define BZ_POKEY_SND		NODE_24
+
+/* Parts List - Resistors */
 #define BZ_R5			RES_K(1)
 #define BZ_R6			RES_K(4.7)
 #define BZ_R7			RES_K(1)
 #define BZ_R8			RES_K(100)
 #define BZ_R9			RES_K(22)
-
-//#define RT            (1.0/BZ_R5 + 1.0/BZ_R6 * 1.0/BZ_R7)
-
 #define BZ_R10			RES_K(100)
 #define BZ_R11			RES_K(250)
 #define BZ_R12			RES_K(33)
@@ -63,7 +72,6 @@ D0  explosion enable        gates a noise generator
 #define BZ_R17			RES_K(22)
 #define BZ_R18			RES_K(10)
 #define BZ_R19			RES_K(33)
-
 #define BZ_R20			RES_K(33)
 #define BZ_R21			RES_K(33)
 #define BZ_R25			RES_K(100)
@@ -71,18 +79,16 @@ D0  explosion enable        gates a noise generator
 #define BZ_R27			RES_K(330)
 #define BZ_R28			RES_K(100)
 #define BZ_R29			RES_K(22)
-
 #define BZ_R32			RES_K(330)
 #define BZ_R33			RES_K(330)
 #define BZ_R34			RES_K(33)
 #define BZ_R35			RES_K(33)
 
+/* Parts List - Capacitors */
 #define BZ_C9			CAP_U(4.7)
-
 #define BZ_C11			CAP_U(0.015)
 #define BZ_C13			CAP_U(10)
 #define BZ_C14			CAP_U(10)
-
 #define BZ_C20			CAP_U(0.1)
 #define BZ_C21			CAP_U(0.0047)
 #define BZ_C22			CAP_U(0.0047)
@@ -272,11 +278,11 @@ static DISCRETE_SOUND_START(bzone)
 	/* Input register mapping for Battlezone        */
 	/************************************************/
 	DISCRETE_INPUT_DATA(BZ_INPUT)
-
 	/* decode the bits */
-	DISCRETE_BITS_DECODE(NODE_10, BZ_INPUT, 0, 7, 1)      		 /* QA-QD 74393 */
+	DISCRETE_BITS_DECODE(NODE_10, BZ_INPUT, 0, 7, 1)      		 /* IC M2, bits 0 - 7 */
+
 	/* the pot is 250K, but we will use a smaller range to get a better adjustment range */
-	DISCRETE_ADJUSTMENT_TAG(NODE_11, RES_K(75), RES_K(10), DISC_LINADJ, "R11")
+	DISCRETE_ADJUSTMENT_TAG(BZ_R11_POT, RES_K(75), RES_K(10), DISC_LINADJ, "R11")
 
 
 	/************************************************/
@@ -284,76 +290,91 @@ static DISCRETE_SOUND_START(bzone)
 	/************************************************/
 
 	/* 12Khz clock is divided by two by B4 74LS109 */
-	DISCRETE_LFSR_NOISE(NODE_30, 1, 1, BZ_NOISE_CLOCK / 2, 1.0, 0, 0.5, &bzone_lfsr)
+	DISCRETE_LFSR_NOISE(BZ_NOISE,								/* IC H4, pin 13 */
+		1, 1, BZ_NOISE_CLOCK / 2, 1.0, 0, 0.5, &bzone_lfsr)
 
 	/* divide by 2 */
-	DISCRETE_COUNTER(NODE_31, 1, 0, NODE_30, 1, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)
+	DISCRETE_COUNTER(NODE_31,									/* IC J5, pin 8 */
+		1, 0, BZ_NOISE, 0, 1, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)
 
-	DISCRETE_BITS_DECODE(NODE_32_00, NODE_30_01, 11, 14, 1)		/* to NAND LS20, J4 */
-	/* 11-14 */
-	DISCRETE_LOGIC_NAND4(NODE_33, NODE_32_00, NODE_32_01, NODE_32_02, NODE_32_03)
+	DISCRETE_BITS_DECODE(NODE_32, NODE_SUB(BZ_NOISE, 1), 11, 14, 1)		/* IC H4, pins 6, 10, 11, 12 */
+	DISCRETE_LOGIC_NAND4(NODE_33,								/* IC J4, pin 8 */
+		NODE_32_00, NODE_32_01, NODE_32_02, NODE_32_03)			/* LSFR bits 11-14 */
 	/* divide by 2 */
-	DISCRETE_COUNTER(NODE_34, 1, 0, NODE_33, 1, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)
+	DISCRETE_COUNTER(NODE_34,									/* IC J5, pin 6 */
+		1, 0, NODE_33, 0, 1, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)
+
+	/************************************************/
+	/* Shell                                        */
+	/************************************************/
+	DISCRETE_RC_CIRCUIT_1(NODE_40,					/* IC J3, pin 9 */
+		BZ_INP_SHELL, NODE_31,						/* INP0, INP1 */
+		BZ_R14 + BZ_R15, BZ_C9)
+	DISCRETE_CUSTOM9(BZ_SHELL_SND,					/* IC K5, pin 1 */
+		BZ_INP_EXPLOLS, NODE_40,					/* IN0, IN1 */
+		BZ_R12, BZ_R13, BZ_R14, BZ_R15, BZ_R32,
+		BZ_C21,
+		22,											/* B+ of op-amp */
+		&bzone_custom_filter)
 
 	/************************************************/
 	/* Explosion                                    */
 	/************************************************/
 
-	DISCRETE_RC_CIRCUIT_1(NODE_40,
-		BZ_INP_EXPLO, NODE_34,				/* INP0, INP1 */
+	DISCRETE_RC_CIRCUIT_1(NODE_50,					/* IC J3, pin 3 */
+		BZ_INP_EXPLO, NODE_34,						/* INP0, INP1 */
 		BZ_R17 + BZ_R16, BZ_C14)
-	DISCRETE_CUSTOM9(NODE_45,				/* IC K5, pin 1 */
-		BZ_INP_EXPLOLS, NODE_40,			/* IN0, IN1 */
+	DISCRETE_CUSTOM9(BZ_EXPLOSION_SND,				/* IC K5, pin 1 */
+		BZ_INP_EXPLOLS, NODE_50,					/* IN0, IN1 */
 		BZ_R19, BZ_R18, BZ_R17, BZ_R16, BZ_R33,
 		BZ_C22,
-		22,									/* B+ of op-amp */
+		22,											/* B+ of op-amp */
 		&bzone_custom_filter)
-
-	/************************************************/
-	/* Shell                                        */
-	/************************************************/
-	DISCRETE_RC_CIRCUIT_1(NODE_50,
-		BZ_INP_SHELL, NODE_31,				/* INP0, INP1 */
-		BZ_R14 + BZ_R15, BZ_C9)
-	DISCRETE_MULTIPLY(NODE_51, RES_VOLTAGE_DIVIDER(BZ_R14, BZ_R15), NODE_50)
-	DISCRETE_CUSTOM9(NODE_55,				/* IC K5, pin 1 */
-		BZ_INP_EXPLOLS, NODE_50,			/* IN0, IN1 */
-		BZ_R12, BZ_R13, BZ_R14, BZ_R15, BZ_R32,
-		BZ_C21,
-		22,									/* B+ of op-amp */
-		&bzone_custom_filter)
-
 	/************************************************/
 	/* Engine                                       */
 	/************************************************/
 
-	DISCRETE_SWITCH(NODE_61,
+	DISCRETE_SWITCH(NODE_61,								/* effect of IC L4, pin 2 */
 		1, BZ_INP_ENGREV,									/* ENAB, SWITCH */
 		5.0 * RES_VOLTAGE_DIVIDER(BZ_R7, BZ_R6),			/* INP0 */
 		5.0 * RES_VOLTAGE_DIVIDER(BZ_R7, RES_2_PARALLEL(CD4066_R_ON + BZ_R5, BZ_R6)))	/* INP1 */
-	DISCRETE_RCDISC3(NODE_62, 1, NODE_61, BZ_R8, BZ_R9, BZ_C13, -0.5)
+	/* R5, R6, R7 all affect the following circuit charge discharge rates */
+	/* they are not emulated as their effect is less the the 5% component tolerance */
+	DISCRETE_RCDISC3(NODE_62,								/* IC K5, pin 7 */
+		1, NODE_61, BZ_R8, BZ_R9, BZ_C13, -0.5)
 
-	/* R11 taken from adjuster port */
-	DISCRETE_555_ASTABLE_CV(NODE_63, 1, BZ_R10, NODE_11, BZ_C11, NODE_62, &bzone_vco_desc)
+	DISCRETE_555_ASTABLE_CV(NODE_63,						/* IC F3, pin 3 */
+		1,													/* RESET */
+		BZ_R10, BZ_R11_POT, BZ_C11,
+		NODE_62,											/* CV - IC F3, pin 5 */
+		&bzone_vco_desc)
 
-	/* two LS161, reset to 4 resp 6 counting up to 15, QD and ripple carry mixed */
-	DISCRETE_COUNTER(NODE_65, BZ_INP_MOTEN, 0, NODE_63, 11, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)
-	DISCRETE_TRANSFORM2(NODE_66, NODE_65, 3, "01>") /* QD */
-	DISCRETE_TRANSFORM2(NODE_67, NODE_65, 11, "01=") /* Ripple */
+	DISCRETE_LOGIC_INVERT(NODE_64, BZ_INP_MOTEN)
+	DISCRETE_COUNTER(NODE_65,								/* IC F4 */
+		1, NODE_64, NODE_63,								/* ENAB, RESET, CLK */
+		4, 15, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)		/* MIN, MAX, DIR, INIT, CLKTYPE */
+	DISCRETE_TRANSFORM2(NODE_66, NODE_65, 7, "01>") 		/* QD - IC F4, pin 11 */
+	DISCRETE_TRANSFORM2(NODE_67, NODE_65, 15, "01=") 		/* Ripple - IC F4, pin 15 */
 
-	DISCRETE_COUNTER(NODE_68, BZ_INP_MOTEN, 0, NODE_63, 9, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)
-	DISCRETE_TRANSFORM2(NODE_69, NODE_68, 1, "01>") /* QD */
-	DISCRETE_TRANSFORM2(NODE_70, NODE_68, 9, "01=") /* Ripple */
+	DISCRETE_COUNTER(NODE_68,								/* IC F5 */
+		1, NODE_64, NODE_63,								/* ENAB, RESET, CLK */
+		6, 15, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)		/* MIN, MAX, DIR, INIT, CLKTYPE */
+	DISCRETE_TRANSFORM2(NODE_69, NODE_68, 7, "01>") 		/* QD - IC F5, pin 11 */
+	DISCRETE_TRANSFORM2(NODE_70, NODE_68, 15, "01=") 		/* Ripple - IC F5, pin 15 */
 
-	DISCRETE_MIXER4(NODE_75, 1, NODE_66, NODE_67, NODE_69, NODE_70, &bzone_eng_mixer_desc)
+	DISCRETE_MIXER4(BZ_ENGINE_SND, 1, NODE_66, NODE_67, NODE_69, NODE_70, &bzone_eng_mixer_desc)
 
 	/************************************************/
 	/* FINAL MIX                                    */
 	/************************************************/
 
 	/* not sure about pokey output levels - below is just a estimate to get a 5V signal */
-	DISCRETE_INPUTX_STREAM(NODE_85, 0, 5.0 / 11000, 0)
-	DISCRETE_MIXER4(NODE_280, 1, NODE_55, NODE_45, NODE_75, NODE_85, &bzone_final_mixer_desc)
+	DISCRETE_INPUTX_STREAM(BZ_POKEY_SND, 0, 5.0 / 11000, 0)
+
+	DISCRETE_MIXER4(NODE_280,
+		BZ_INP_SOUNDEN,
+		BZ_SHELL_SND, BZ_EXPLOSION_SND, BZ_ENGINE_SND, BZ_POKEY_SND,
+		&bzone_final_mixer_desc)
 	DISCRETE_OUTPUT(NODE_280, 50000)
 
 DISCRETE_SOUND_END

@@ -92,7 +92,7 @@ DISCRETE_SOUND_START(poolshrk)
 	                 NODE_31,				// Clock enabled by F8, pin 13
 	                 POOLSHRK_SCORE_EN,		// Reset/triggered by score
 	                 15750.0/2.0/64.0,		// 64V signal
-	                 15, 1,					// 4 bit binary up counter
+	                 0, 15, 1,				// 4 bit binary up counter
 	                 0, DISC_CLK_IS_FREQ)	// Cleared to 0
 	DISCRETE_TRANSFORM2(NODE_31, NODE_30, 15, "01=!")	// TC output of E8, pin 15. (inverted)
 
@@ -108,8 +108,8 @@ DISCRETE_SOUND_START(poolshrk)
 			0, 0, 0,	// No rBias, rGnd or rDischarge
 			&poolshrk_score_vco)
 	DISCRETE_COUNTER(NODE_34, 1, 0,	// IC D9, pin 9
-			NODE_33,	// from IC C9, pin 3
-			1, 1, 0, DISC_CLK_ON_R_EDGE)	// /2 counter on rising edge
+			NODE_33,				// from IC C9, pin 3
+			0, 1, 1, 0, DISC_CLK_ON_R_EDGE)	// /2 counter on rising edge
 	DISCRETE_GAIN(POOLSHRK_SCORE_SND, NODE_34, 3.4)
 
 
@@ -136,7 +136,7 @@ DISCRETE_SOUND_START(poolshrk)
 	                 NODE_42,				// Clock enabled by F8, pin 1
 	                 NODE_40,				// Reset/triggered by K9, pin 11
 	                 15750.0/2.0/2.0,		// 2V signal
-	                 15, 1,					// 4 bit binary up counter
+	                 0, 15, 1,				// 4 bit binary up counter
 	                 0, DISC_CLK_IS_FREQ)	// Cleared to 0
 	DISCRETE_TRANSFORM2(NODE_42, NODE_41, 15, "01=!")	// TC output of J9, pin 15. Modified to function as F8 clock enable
 	DISCRETE_TRANSFORM3(POOLSHRK_CLICK_SND, NODE_41, 1, 3.4, "01&2*")	// Q0 output of J9, pin 14.  Set to proper amplitude

@@ -311,7 +311,7 @@ static DISCRETE_SOUND_START(galaxian)
          *
          * One possibility to implement this is
          * DISCRETE_TRANSFORM3(NODE_130, SOUND_CLOCK, 256, GAL_INP_PITCH, "012-/")
-         * DISCRETE_COUNTER(NODE_132, 1, 0, NODE_130, 15, DISC_COUNT_UP, 0, DISC_CLK_IS_FREQ)
+         * DISCRETE_COUNTER(NODE_132, 1, 0, NODE_130, 0, 15, DISC_COUNT_UP, 0, DISC_CLK_IS_FREQ)
          * but there is a native choice:
          */
 	    DISCRETE_NOTE(NODE_132, 1, SOUND_CLOCK, GAL_INP_PITCH, 255, 15,  DISC_CLK_IS_FREQ)

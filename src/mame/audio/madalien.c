@@ -219,7 +219,7 @@ DISCRETE_SOUND_START( madalien )
 	DISCRETE_COUNTER(NODE_54, 1,
 		NODE_53,						// pin 7 in
 		NODE_52,						// pin 1 in
-		15, 1, 0, DISC_CLK_BY_COUNT)	// 4-bit binary up counter
+		0, 15, 1, 0, DISC_CLK_BY_COUNT)	// 4-bit binary up counter
 	DISCRETE_DAC_R1(NODE_55, NODE_54, DEFAULT_TTL_V_LOGIC_1, &madalien_effect1a_dac)
 	DISCRETE_DAC_R1(NODE_56, NODE_54, DEFAULT_TTL_V_LOGIC_1, &madalien_effect1b_dac)
 	DISCRETE_RCFILTER(NODE_57, NODE_56, RES_K(22)/2 + RES_K(22), CAP_U(.033))
@@ -246,7 +246,7 @@ DISCRETE_SOUND_START( madalien )
 	DISCRETE_COUNTER(NODE_67, 1,
 		NODE_66,						// pin 7 in
 		NODE_65,						// pin 1 in
-		15, 1, 0, DISC_CLK_BY_COUNT)	// 4-bit binary up counter
+		0, 15, 1, 0, DISC_CLK_BY_COUNT)	// 4-bit binary up counter
 	DISCRETE_DAC_R1(NODE_68, NODE_67, DEFAULT_TTL_V_LOGIC_1, &madalien_effect2_dac)
 
 	/************************************************

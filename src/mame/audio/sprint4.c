@@ -200,7 +200,7 @@ static const discrete_mixer_desc sprint4_mixer =
 					1,											/* ENAB */                          \
 					SPRINT4_ATTRACT_EN,							/* RESET */                         \
 					SPRINT4_PLAYER_MOTOR_NODE(5, _plr),			/* CLK */                           \
-					1,											/* MAX */                           \
+					0, 1,										/* MIN, MAX */                      \
 					DISC_COUNT_UP,								/* DIR */                           \
 					0,											/* INIT0 */                         \
 					DISC_CLK_ON_F_EDGE)							/* CLKTYPE */                       \
