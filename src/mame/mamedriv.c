@@ -2594,6 +2594,7 @@ V-V                           TP-027
 	DRIVER( sf2v004 )	/* hack */
 	DRIVER( sf2acc )	/* hack */
 	DRIVER( sf2accp2 )	/* hack */
+	DRIVER( sf2dkot2 )	/* hack */
 	DRIVER( sf2m1 )		/* hack */
 	DRIVER( sf2m2 )		/* hack */
 	DRIVER( sf2m3 )		/* hack */
