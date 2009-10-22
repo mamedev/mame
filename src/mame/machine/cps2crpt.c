@@ -769,6 +769,7 @@ static const struct game_keys keys_table[] =
 	{ "ddtodjr2", { 0x4510e79c,0xf36b8a2d }, 0x180000 },	// 0C78 1019 4000  cmpi.w  #$1019,$4000
 	{ "ddtoda",   { 0xdecac105,0x19710411 }, 0x180000 },	// 0C78 1019 4000  cmpi.w  #$1019,$4000
 	{ "ddtodh",   { 0x19691019,0xe825dde0 }, 0x180000 },	// 0C78 1019 4000  cmpi.w  #$1019,$4000
+	{ "ddtodhr1", { 0x19691019,0xe825dde0 }, 0x180000 },	// 0C78 1019 4000  cmpi.w  #$1019,$4000
 	{ "ecofghtr", { 0x931031dc,0xba987654 }, 0x200000 },	// 0838 0003 7345  btst    #3,$7345
 	{ "ecofghtru",{ 0x931031ed,0xcba98765 }, 0x200000 },	// 0838 0003 7345  btst    #3,$7345
 	{ "ecofghtru1",{ 0x931031ed,0xcba98765 }, 0x200000 },	// 0838 0003 7345  btst    #3,$7345
