@@ -470,6 +470,7 @@ Notes: (most info taken from poor quality pics/scans, better info is needed)
 
       IC6  - Sega 315-6146 custom IC (QFP176)
       IC7  - 27C512 EPROM with label 'EPR-22082' (DIP28)
+             On plain 837-13844 (no -02) this is 'EPR-21868' (DIP28)
       IC8  - Sharp LH52256 32k x8 SRAM (SOP28)
       IC10 - Something by NEC? (QFP44)
       OSC1 - 14.7456MHz
@@ -3405,6 +3406,14 @@ ROM_START( 18wheelr )
 
 	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
         ROM_LOAD( "00800000.bin", 0x000000, 0x002000, CRC(7fc42084) SHA1(7c7b9e7e0b8885e690f3edd25e6d26201c899f2f) )
+
+	// JVS I/O board 837-13844, code is for a Z80 of unknown type (it's inside the big Sega ASIC)
+	ROM_REGION( 0x10000, "jvsio", ROMREGION_ERASEFF)
+        ROM_LOAD( "epr-21868.ic7", 0x000000, 0x010000, CRC(c306a51f) SHA1(7833b73dc34c4c62401a30637968f46b949ceac0) )
+
+	// 18 Wheeler motor controller 838-13992, code is for a TMPZ84C015 which is Z80 compatible
+	ROM_REGION( 0x10000, "motorio", ROMREGION_ERASEFF)
+        ROM_LOAD( "epr-23000.ic8", 0x000000, 0x010000, CRC(e3b162f7) SHA1(52c7ad759c3c4a3148764e14d77ba5006bc8af48) )
 ROM_END
 
 
