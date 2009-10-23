@@ -730,6 +730,15 @@ static INPUT_PORTS_START( shangupb )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( shangonro )
+	PORT_INCLUDE( shangupb )
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) // still shows in test mode next to a blank label
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Foot Sw. Right") PORT_CODE(KEYCODE_SPACE) // no effect?
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Foot Sw. Left") PORT_CODE(KEYCODE_LSHIFT) // no effect?
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( sharrier )
 	PORT_INCLUDE( sharrier_generic )
@@ -1849,7 +1858,7 @@ static DRIVER_INIT( shangonro )
 
 GAME( 1985, hangon,    0,        hangon,   hangon,   hangon,   ROT0, "Sega",    "Hang-On (Rev A)", 0 )
 GAME( 1985, hangon1,   hangon,   hangon,   hangon,   hangon,   ROT0, "Sega",    "Hang-On", 0 )
-GAME( 1992, shangonro, shangon,  shangupb, shangupb, shangonro,ROT0, "Sega",    "Super Hang-On (Japan, FD1094 317-0038)", 0 )
+GAME( 1992, shangonro, shangon,  shangupb, shangonro,shangonro,ROT0, "Sega",    "Super Hang-On (Japan, FD1094 317-0038)", 0 )
 GAME( 1992, shangonrb, shangon,  shangupb, shangupb, hangon,   ROT0, "bootleg", "Super Hang-On (bootleg)", 0 )
 GAME( 1985, sharrier,  0,        sharrier, sharrier, sharrier, ROT0, "Sega",    "Space Harrier (Rev A, 8751 315-5163A)", 0 )
 GAME( 1985, sharrier1, sharrier, sharrier, sharrier, sharrier, ROT0, "Sega",    "Space Harrier (8751 315-5163)", 0 )
