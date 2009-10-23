@@ -25,6 +25,14 @@ D0  explosion enable        gates a noise generator
 #include "sound/discrete.h"
 #include "sound/pokey.h"
 
+/* This sets an amount of gain boost to apply to the final signal
+ * that will drive it into clipping.  The slider is ajusted by the
+ * reverse factor, so that the final result is not clipped.
+ * This allows for the user to easily adjust the sound into the clipping
+ * range so it sounds more like a real cabinet.
+ */
+#define BZ_FINAL_GAIN	2
+
 #define BZ_NOISE_CLOCK		12000
 
 #define TTL_OUT 3.4
@@ -79,6 +87,8 @@ D0  explosion enable        gates a noise generator
 #define BZ_R27			RES_K(330)
 #define BZ_R28			RES_K(100)
 #define BZ_R29			RES_K(22)
+#define BZ_R30			RES_K(10)
+#define BZ_R31			RES_K(100)
 #define BZ_R32			RES_K(330)
 #define BZ_R33			RES_K(330)
 #define BZ_R34			RES_K(33)
@@ -367,6 +377,10 @@ static DISCRETE_SOUND_START(bzone)
 	/************************************************/
 	/* FINAL MIX                                    */
 	/************************************************/
+	/* We won't bother emulating the final gain of op-amp IC K5, pin 14.
+	 * There signal never reaches a value where it clips, so we will
+	 * just output the final 16-bit level.
+	 */
 
 	/* not sure about pokey output levels - below is just a estimate to get a 5V signal */
 	DISCRETE_INPUTX_STREAM(BZ_POKEY_SND, 0, 5.0 / 11000, 0)
@@ -375,7 +389,7 @@ static DISCRETE_SOUND_START(bzone)
 		BZ_INP_SOUNDEN,
 		BZ_SHELL_SND, BZ_EXPLOSION_SND, BZ_ENGINE_SND, BZ_POKEY_SND,
 		&bzone_final_mixer_desc)
-	DISCRETE_OUTPUT(NODE_280, 50000)
+	DISCRETE_OUTPUT(NODE_280, 50000 * BZ_FINAL_GAIN)
 
 DISCRETE_SOUND_END
 
@@ -405,5 +419,5 @@ MACHINE_DRIVER_START( bzone_audio )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(bzone)
 
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0 / BZ_FINAL_GAIN)
 MACHINE_DRIVER_END
