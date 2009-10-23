@@ -13,6 +13,8 @@ static UINT32 rdp_cmd_data[0x1000];
 static int rdp_cmd_ptr = 0;
 static int rdp_cmd_cur = 0;
 
+#define RDP_CVG_SPAN_MAX    1024
+
 typedef struct
 {
 	int lx, rx;
@@ -24,9 +26,12 @@ typedef struct
 	int b, db;
 	int a, da;
 	int z, dz;
+    UINT8 cvg[RDP_CVG_SPAN_MAX];
 } SPAN;
 
-static SPAN span[1024];
+UINT8 cvg_mem[8*1048576];
+
+static SPAN span[4096];
 
 /*****************************************************************************/
 
@@ -110,6 +115,7 @@ typedef struct
 	int blend_m2a_1;
 	int blend_m2b_0;
 	int blend_m2b_1;
+    int tex_edge;
 	int force_blend;
 	int alpha_cvg_select;
 	int cvg_times_alpha;
@@ -137,6 +143,9 @@ typedef struct
 #define CYCLE_TYPE_COPY			2
 #define CYCLE_TYPE_FILL			3
 
+#define SAMPLE_TYPE_1x1         0
+#define SAMPLE_TYPE_2x2         1
+
 static COMBINE_MODES combine;
 static OTHER_MODES other_modes;
 
@@ -149,45 +158,42 @@ static COLOR texel0_color;
 static COLOR texel1_color;
 static COLOR shade_color;
 
-static const COLOR one_color		= { 0xff, 0xff, 0xff, 0xff };
-static const COLOR zero_color		= { 0x00, 0x00, 0x00, 0x00 };
+static COLOR one_color		= { 0xff, 0xff, 0xff, 0xff };
+static COLOR zero_color		= { 0x00, 0x00, 0x00, 0x00 };
 
 // combiner inputs
-static const UINT8 *combiner_rgbsub_a_r[2];
-static const UINT8 *combiner_rgbsub_a_g[2];
-static const UINT8 *combiner_rgbsub_a_b[2];
-static const UINT8 *combiner_rgbsub_b_r[2];
-static const UINT8 *combiner_rgbsub_b_g[2];
-static const UINT8 *combiner_rgbsub_b_b[2];
-static const UINT8 *combiner_rgbmul_r[2];
-static const UINT8 *combiner_rgbmul_g[2];
-static const UINT8 *combiner_rgbmul_b[2];
-static const UINT8 *combiner_rgbadd_r[2];
-static const UINT8 *combiner_rgbadd_g[2];
-static const UINT8 *combiner_rgbadd_b[2];
+static UINT8 *combiner_rgbsub_a_r[2];
+static UINT8 *combiner_rgbsub_a_g[2];
+static UINT8 *combiner_rgbsub_a_b[2];
+static UINT8 *combiner_rgbsub_b_r[2];
+static UINT8 *combiner_rgbsub_b_g[2];
+static UINT8 *combiner_rgbsub_b_b[2];
+static UINT8 *combiner_rgbmul_r[2];
+static UINT8 *combiner_rgbmul_g[2];
+static UINT8 *combiner_rgbmul_b[2];
+static UINT8 *combiner_rgbadd_r[2];
+static UINT8 *combiner_rgbadd_g[2];
+static UINT8 *combiner_rgbadd_b[2];
 
-static const UINT8 *combiner_alphasub_a[2];
-static const UINT8 *combiner_alphasub_b[2];
-static const UINT8 *combiner_alphamul[2];
-static const UINT8 *combiner_alphaadd[2];
+static UINT8 *combiner_alphasub_a[2];
+static UINT8 *combiner_alphasub_b[2];
+static UINT8 *combiner_alphamul[2];
+static UINT8 *combiner_alphaadd[2];
 
 // blender input
-static const UINT8 *blender1a_r[2];
-static const UINT8 *blender1a_g[2];
-static const UINT8 *blender1a_b[2];
-static const UINT8 *blender1b_a[2];
-static const UINT8 *blender2a_r[2];
-static const UINT8 *blender2a_g[2];
-static const UINT8 *blender2a_b[2];
-static const UINT8 *blender2b_a[2];
-
+static UINT8 *blender1a_r[2];
+static UINT8 *blender1a_g[2];
+static UINT8 *blender1a_b[2];
+static UINT8 *blender1b_a[2];
+static UINT8 *blender2a_r[2];
+static UINT8 *blender2a_g[2];
+static UINT8 *blender2a_b[2];
+static UINT8 *blender2b_a[2];
 
 static COLOR pixel_color;
 static COLOR inv_pixel_color;
 static COLOR blended_pixel_color;
 static COLOR memory_color;
-
-
 
 static UINT32 fill_color;		// packed 16-bit or 32-bit, depending on framebuffer format
 
@@ -213,44 +219,42 @@ static RECTANGLE clip;
 static UINT8 *texture_cache;
 static UINT32 tlut[256];
 
-#define MASK(S, T)                                                        \
-do                                                                        \
-{                                                                        \
-    if (mask_s != 0)                                                    \
-    {                                                                    \
-        S &= (((UINT32)(0xffffffff) >> (32-mask_s)));                    \
-    }                                                                    \
-    if (mask_t != 0)                                                    \
-    {                                                                    \
-        T &= (((UINT32)(0xffffffff) >> (32-mask_t)));                    \
-    }                                                                    \
-}                                                                        \
+#define MASK(S, T, CYCLE)                                               \
+do                                                                      \
+{                                                                       \
+    if (mask_s[CYCLE] != 0)                                             \
+    {                                                                   \
+        S &= (1 << mask_s[CYCLE]) - 1;                                  \
+    }                                                                   \
+    if (mask_t[CYCLE] != 0)                                             \
+    {                                                                   \
+        T &= (1 << mask_t[CYCLE]) - 1;                                  \
+    }                                                                   \
+}                                                                       \
 while (0)
 
-#define CLAMP(S, T)														\
-do																		\
-{																		\
-	if (clamp_s)														\
-	{																	\
-		if (S < (tsl >> 2)) S = (tsl >> 2);								\
-		if (S > (tsh >> 2)) S = (tsh >> 2);								\
-	}																	\
-	if (mirror_s)														\
-	{																	\
-		if (S < (tsl >> 2)) S = abs(S - (tsl >> 2));					\
-		if (S > (tsh >> 2)) S = abs(S - (tsh >> 2));					\
-	}																	\
-	if (clamp_t)														\
-	{																	\
-		if (T < (ttl >> 2)) T = (ttl >> 2);								\
-		if (T > (tth >> 2)) T = (tth >> 2);								\
-	}																	\
-	if (mirror_t)														\
-	{																	\
-		if (T < (ttl >> 2)) T = abs(T - (ttl >> 2));					\
-		if (T > (tth >> 2)) T = abs(T - (tth >> 2));					\
-	}																	\
-}																		\
+#define CLAMP(S, T, CYCLE)                                              \
+do                                                                      \
+{                                                                       \
+    if (mask_s[CYCLE] != 0 && clamp_s[CYCLE])                           \
+    {                                                                   \
+        if (S < (tsl[CYCLE] >> 2)) S = (tsl[CYCLE] >> 2);               \
+        if (S > (tsh[CYCLE] >> 2)) S = (tsh[CYCLE] >> 2);               \
+    }                                                                   \
+    if (mask_s[CYCLE] != 0 && mirror_s[CYCLE])                          \
+    {                                                                   \
+        if (S & (1 << mask_s[CYCLE])) S ^= (1 << mask_s[CYCLE]) - 1;    \
+    }                                                                   \
+    if (mask_t[CYCLE] != 0 && clamp_t[CYCLE])                           \
+    {                                                                   \
+        if (T < (ttl[CYCLE] >> 2)) T = (ttl[CYCLE] >> 2);               \
+        if (T > (tth[CYCLE] >> 2)) T = (tth[CYCLE] >> 2);               \
+    }                                                                   \
+    if (mask_t[CYCLE] != 0 && mirror_t[CYCLE])                          \
+    {                                                                   \
+        if (T & (1 << mask_t[CYCLE])) T ^= (1 << mask_t[CYCLE]) - 1;    \
+    }                                                                   \
+}                                                                       \
 while (0)
 
 /*****************************************************************************/
@@ -292,10 +296,168 @@ VIDEO_START(n64)
 	blender2b_a[0] = blender2b_a[1] = &pixel_color.r;
 }
 
+static void vi_filter_16( INT32 x, INT32 y, UINT16 *out )
+{
+    UINT8 *cvg_buffer = &cvg_mem[n64_vi_origin / 4];
+    UINT16 *frame_buffer = (UINT16*)&rdram[n64_vi_origin / 4];
+    INT32 i_start = x - 2;
+    INT32 i_end = x + 2;
+    INT32 j_start = y - 1;
+    INT32 j_end = y + 1;
+    INT32 r_sum = 0;
+    INT32 g_sum = 0;
+    INT32 b_sum = 0;
+    INT32 covered_count = 0;
+    INT32 i = 0;
+    INT32 j = 0;
+
+    if (cvg_buffer[y*fb_width + x] == 8)
+    {
+        *out = frame_buffer[y*fb_width + x];
+        return;
+    }
+
+    if (i_start < 0)
+    {
+        i_start = 0;
+    }
+    if (j_start < 0)
+    {
+        j_start = 0;
+    }
+    if (i_end >= fb_width)
+    {
+        i_end = fb_width - 1;
+    }
+    if (j_end >= ((n64_vi_control & 0x40) ? 480 : 240))
+    {
+        j_end = (n64_vi_control & 0x40) ? 479 : 239;
+    }
+
+    for (j = j_start; j <= j_end; j++)
+    {
+        for (i = i_start; i <= i_end; i++)
+        {
+            if (cvg_buffer[j*fb_width + x] == 8)
+            {
+                UINT16 color = frame_buffer[j*fb_width + x];
+                covered_count++;
+                r_sum += (color >> 11) & 0x1f;
+                g_sum += (color >>  6) & 0x1f;
+                b_sum += (color >>  1) & 0x1f;
+            }
+        }
+    }
+
+    if (covered_count)
+    {
+        UINT16 fb = frame_buffer[y*fb_width + x];
+        r_sum /= covered_count;
+        g_sum /= covered_count;
+        b_sum /= covered_count;
+        if (r_sum > 0x1f) r_sum = 0x1f;
+        if (g_sum > 0x1f) g_sum = 0x1f;
+        if (b_sum > 0x1f) b_sum = 0x1f;
+        r_sum = (UINT32)(((float)r_sum / 8.0f) * (float)(8 - cvg_buffer[y*fb_width + x]) +
+                         ((float)((fb >> 11) & 0x1f) / 8.0f) * (float)cvg_buffer[y*fb_width + x]);
+        g_sum = (UINT32)(((float)g_sum / 8.0f) * (float)(8 - cvg_buffer[y*fb_width + x]) +
+                         ((float)((fb >>  6) & 0x1f) / 8.0f) * (float)cvg_buffer[y*fb_width + x]);
+        b_sum = (UINT32)(((float)b_sum / 8.0f) * (float)(8 - cvg_buffer[y*fb_width + x]) +
+                         ((float)((fb >>  1) & 0x1f) / 8.0f) * (float)cvg_buffer[y*fb_width + x]);
+        *out = (r_sum << 11) | (g_sum << 6) | (b_sum << 1);
+    }
+    else
+    {
+        *out = frame_buffer[y*fb_width + x];
+    }
+}
+
+static void vi_filter_32( INT32 x, INT32 y, UINT32 *out )
+{
+    UINT8 *cvg_buffer = &cvg_mem[n64_vi_origin / 4];
+    UINT32 *frame_buffer = (UINT32*)&rdram[n64_vi_origin / 4];
+    INT32 i_start = x - 2;
+    INT32 i_end = x + 2;
+    INT32 j_start = y - 1;
+    INT32 j_end = y + 1;
+    UINT32 r_sum = 0;
+    UINT32 g_sum = 0;
+    UINT32 b_sum = 0;
+    INT32 covered_count = 0;
+    INT32 i = 0;
+    INT32 j = 0;
+
+    if (cvg_buffer[y*fb_width + x] == 8)
+    {
+        *out = frame_buffer[y*fb_width + x];
+        return;
+    }
+
+    if (i_start < 0)
+    {
+        i_start = 0;
+    }
+    if (j_start < 0)
+    {
+        j_start = 0;
+    }
+    if (i_end >= fb_width)
+    {
+        i_end = fb_width - 1;
+    }
+    if (j_end >= ((n64_vi_control & 0x40) ? 480 : 240))
+    {
+        j_end = (n64_vi_control & 0x40) ? 479 : 239;
+    }
+
+    for (j = j_start; j <= j_end; j++)
+    {
+        for (i = i_start; i <= i_end; i++)
+        {
+            if (cvg_buffer[j*fb_width + x] == 8)
+            {
+                UINT32 color = frame_buffer[j*fb_width + x];
+                covered_count++;
+                r_sum += (color >> 16) & 0xff;
+                g_sum += (color >>  8) & 0xff;
+                b_sum += (color >>  0) & 0xff;
+            }
+        }
+    }
+
+    if (covered_count)
+    {
+        r_sum /= covered_count;
+        g_sum /= covered_count;
+        b_sum /= covered_count;
+        if (r_sum > 0xff) r_sum = 0xff;
+        if (g_sum > 0xff) g_sum = 0xff;
+        if (b_sum > 0xff) b_sum = 0xff;
+        *out = (r_sum << 24) | (g_sum << 16) | (b_sum << 8) | 0xe0;
+    }
+    else
+    {
+        *out = frame_buffer[y*fb_width + x];
+    }
+}
+
 VIDEO_UPDATE(n64)
 {
 	int i, j;
     int height = (n64_vi_control & 0x40) ? 479 : 239;
+
+    if (n64_vi_blank)
+    {
+        for (j=0; j <height; j++)
+        {
+            UINT32 *d = BITMAP_ADDR32(bitmap, j, 0);
+            for (i=0; i < fb_width; i++)
+            {
+                d[BYTE_XOR_BE(i)] = 0;
+            }
+        }
+        return 0;
+    }
 
     switch (n64_vi_control & 0x3)
 	{
@@ -309,15 +471,18 @@ VIDEO_UPDATE(n64)
             UINT16 *frame_buffer = (UINT16*)&rdram[n64_vi_origin / 4];
 			if (frame_buffer)
 			{
-				for (j=0; j <height; j++)
+				for (j=0; j <= height; j++)
 				{
 					UINT32 *d = BITMAP_ADDR32(bitmap, j, 0);
 					for (i=0; i < fb_width; i++)
 					{
-						UINT16 pix = *frame_buffer++;
-						int r = ((pix >> 11) & 0x1f) << 3;
-						int g = ((pix >> 6) & 0x1f) << 3;
-						int b = ((pix >> 1) & 0x1f) << 3;
+						//UINT16 pix = *frame_buffer++;
+                        UINT16 pix = 0;
+                        int r, g, b;
+                        vi_filter_16( i, j, &pix );
+						r = ((pix >> 11) & 0x1f) << 3;
+						g = ((pix >> 6) & 0x1f) << 3;
+						b = ((pix >> 1) & 0x1f) << 3;
 						d[BYTE_XOR_BE(i)] = (r << 16) | (g << 8) | b;
 					}
 				}
@@ -330,13 +495,15 @@ VIDEO_UPDATE(n64)
             UINT32 *frame_buffer = (UINT32*)&rdram[n64_vi_origin / 4];
 			if (frame_buffer)
 			{
-				for (j=0; j < height; j++)
+				for (j=0; j <= height; j++)
 				{
 					UINT32 *d = BITMAP_ADDR32(bitmap, j, 0);
 					for (i=0; i < fb_width; i++)
 					{
-						UINT32 pix = *frame_buffer++;
-						*d++ = pix & 0xffffff;
+                        //UINT32 pix = *frame_buffer++;
+                        UINT32 pix = 0;
+                        vi_filter_32( i, j, &pix );
+                        *d++ = (pix >> 8) & 0x00ffffff;
 					}
 				}
 			}
@@ -350,7 +517,7 @@ VIDEO_UPDATE(n64)
 
 /*****************************************************************************/
 
-INLINE void SET_SUBA_RGB_INPUT(const UINT8 **input_r, const UINT8 **input_g, const UINT8 **input_b, int code)
+INLINE void SET_SUBA_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
 {
 	switch (code & 0xf)
 	{
@@ -369,7 +536,7 @@ INLINE void SET_SUBA_RGB_INPUT(const UINT8 **input_r, const UINT8 **input_g, con
 	}
 }
 
-INLINE void SET_SUBB_RGB_INPUT(const UINT8 **input_r, const UINT8 **input_g, const UINT8 **input_b, int code)
+INLINE void SET_SUBB_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
 {
 	switch (code & 0xf)
 	{
@@ -388,7 +555,7 @@ INLINE void SET_SUBB_RGB_INPUT(const UINT8 **input_r, const UINT8 **input_g, con
 	}
 }
 
-INLINE void SET_MUL_RGB_INPUT(const UINT8 **input_r, const UINT8 **input_g, const UINT8 **input_b, int code)
+INLINE void SET_MUL_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
 {
 	switch (code & 0x1f)
 	{
@@ -416,7 +583,7 @@ INLINE void SET_MUL_RGB_INPUT(const UINT8 **input_r, const UINT8 **input_g, cons
 	}
 }
 
-INLINE void SET_ADD_RGB_INPUT(const UINT8 **input_r, const UINT8 **input_g, const UINT8 **input_b, int code)
+INLINE void SET_ADD_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code)
 {
 	switch (code & 0x7)
 	{
@@ -431,7 +598,7 @@ INLINE void SET_ADD_RGB_INPUT(const UINT8 **input_r, const UINT8 **input_g, cons
 	}
 }
 
-INLINE void SET_SUB_ALPHA_INPUT(const UINT8 **input, int code)
+INLINE void SET_SUB_ALPHA_INPUT(UINT8 **input, int code)
 {
 	switch (code & 0x7)
 	{
@@ -446,7 +613,7 @@ INLINE void SET_SUB_ALPHA_INPUT(const UINT8 **input, int code)
 	}
 }
 
-INLINE void SET_MUL_ALPHA_INPUT(const UINT8 **input, int code)
+INLINE void SET_MUL_ALPHA_INPUT(UINT8 **input, int code)
 {
 	switch (code & 0x7)
 	{
@@ -468,30 +635,93 @@ INLINE COLOR COLOR_COMBINER(int cycle)
 	COLOR c;
 	UINT32 r, g, b, a;
 
-	r = (((int)((UINT8)(*combiner_rgbsub_a_r[cycle]) - (UINT8)(*combiner_rgbsub_b_r[cycle])) *
-		*combiner_rgbmul_r[cycle]) >> 8) + *combiner_rgbadd_r[cycle];
+    r = (((UINT32)((UINT32)(*combiner_rgbsub_a_r[cycle]) - (UINT32)(*combiner_rgbsub_b_r[cycle])) *
+        *combiner_rgbmul_r[cycle]) >> 8);
 
-	g = (((int)((UINT8)(*combiner_rgbsub_a_g[cycle]) - (UINT8)(*combiner_rgbsub_b_g[cycle])) *
-		*combiner_rgbmul_g[cycle]) >> 8) + *combiner_rgbadd_g[cycle];
+    g = (((UINT32)((UINT32)(*combiner_rgbsub_a_g[cycle]) - (UINT32)(*combiner_rgbsub_b_g[cycle])) *
+        *combiner_rgbmul_g[cycle]) >> 8);
 
-	b = (((int)((UINT8)(*combiner_rgbsub_a_b[cycle]) - (UINT8)(*combiner_rgbsub_b_b[cycle])) *
-		*combiner_rgbmul_b[cycle]) >> 8) + *combiner_rgbadd_b[cycle];
+    b = (((UINT32)((UINT32)(*combiner_rgbsub_a_b[cycle]) - (UINT32)(*combiner_rgbsub_b_b[cycle])) *
+        *combiner_rgbmul_b[cycle]) >> 8);
 
-	a = (((int)((UINT8)(*combiner_alphasub_a[cycle]) - (UINT8)(*combiner_alphasub_b[cycle])) *
-		*combiner_alphamul[cycle]) >> 8) + *combiner_alphaadd[cycle];
+    a = (((UINT32)((UINT32)(*combiner_alphasub_a[cycle]) - (UINT32)(*combiner_alphasub_b[cycle])) *
+        *combiner_alphamul[cycle]) >> 8);
 
-	if (r > 255) r = 255;
-	if (g > 255) g = 255;
-	if (b > 255) b = 255;
-	if (a > 255) a = 255;
+    if (r & 0xffffff00)
+    {
+        if(r & 0x00000080)
+        {
+            r = 0;
+        }
+        else
+        {
+            r = 255;
+        }
+    }
+    if (g & 0xffffff00)
+    {
+        if(g & 0x00000080)
+        {
+            g = 0;
+        }
+        else
+        {
+            g = 255;
+        }
+    }
+    if (b & 0xffffff00)
+    {
+        if(b & 0x00000080)
+        {
+            b = 0;
+        }
+        else
+        {
+            b = 255;
+        }
+    }
+    if (a & 0xffffff00)
+    {
+        if(a & 0x00000080)
+        {
+            a = 0;
+        }
+        else
+        {
+            a = 255;
+        }
+    }
 
-	c.r = r; c.g = g; c.b = b; c.a = a;
-	return c;
+    c.r = r; c.g = g; c.b = b; c.a = a;
+
+    r += *combiner_rgbadd_r[cycle];
+    g += *combiner_rgbadd_g[cycle];
+    b += *combiner_rgbadd_b[cycle];
+    a += *combiner_alphaadd[cycle];
+
+    r &= 0x000000ff;
+    g &= 0x000000ff;
+    b &= 0x000000ff;
+    a &= 0x000000ff;
+
+    /*
+    if (r > 255) r = 255;
+    if (g > 255) g = 255;
+    if (b > 255) b = 255;
+    if (a > 255) a = 255;
+    */
+
+    c.r = r; c.g = g; c.b = b; c.a = a;
+
+    combined_color.r = r;
+    combined_color.g = g;
+    combined_color.b = b;
+    combined_color.a = a;
+
+    return c;
 }
 
-
-
-INLINE void SET_BLENDER_INPUT(int cycle, int which, const UINT8 **input_r, const UINT8 **input_g, const UINT8 **input_b, const UINT8 **input_a, int a, int b)
+INLINE void SET_BLENDER_INPUT(int cycle, int which, UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, UINT8 **input_a, int a, int b)
 {
 	switch (a & 0x3)
 	{
@@ -568,117 +798,224 @@ static const UINT8 dither_matrix_4x4[16] =
 #define DITHER_RB(val,dith)	((((val) << 1) - ((val) >> 4) + ((val) >> 7) + (dith)) >> 1)
 #define DITHER_G(val,dith)	((((val) << 2) - ((val) >> 4) + ((val) >> 6) + (dith)) >> 2)
 
-INLINE void BLENDER1_16(UINT16 *fb, COLOR c, int dith)
+INLINE void BLENDER1_16(UINT16 *fb, COLOR c, int dith, UINT8 *new_cvg, UINT8 *old_cvg, int *alpha_reject)
 {
-	int r, g, b;
+    int r, g, b;
 
-	pixel_color.r = c.r;	inv_pixel_color.r = 0xff - c.r;
-	pixel_color.g = c.g;	inv_pixel_color.g = 0xff - c.g;
-	pixel_color.b = c.b;	inv_pixel_color.b = 0xff - c.b;
-	pixel_color.a = c.a;	inv_pixel_color.a = 0xff - c.a;
+    if (other_modes.force_blend )
+    {
+        blend_color.r = c.r;
+        blend_color.g = c.g;
+        blend_color.b = c.b;
+    }
 
+    pixel_color.r = c.r;
+    pixel_color.g = c.g;
+    pixel_color.b = c.b;
+    pixel_color.a = c.a;
+    inv_pixel_color.r = 0xff - *blender1a_r[0];
+    inv_pixel_color.g = 0xff - *blender1a_g[0];
+    inv_pixel_color.b = 0xff - *blender1a_b[0];
+    inv_pixel_color.a = 0xff - *blender1b_a[0];
 
+    if( other_modes.alpha_cvg_select )
+    {
+        if( other_modes.cvg_times_alpha )
+        {
+            pixel_color.a = (UINT8)( ( (INT32)(c.a) * (INT32)( (*new_cvg) * 0x20 - 1 ) ) >> 8 );
+        }
+        else
+        {
+            pixel_color.a = (UINT8)( (INT32)(*new_cvg) * 0x20 - 1 );
+        }
+        inv_pixel_color.a = 0xff - pixel_color.a;
 
-	if (other_modes.image_read_en)
-	{
-		UINT16 mem = *fb;
-		memory_color.r = ((mem >> 11) & 0x1f) << 3;
-		memory_color.g = ((mem >>  6) & 0x1f) << 3;
-		memory_color.b = ((mem >>  1) & 0x1f) << 3;
-		memory_color.a = 0;
-	}
+        if( pixel_color.a == 0 )
+        {
+            *alpha_reject = 1;
+            return;
+        }
+    }
 
-	r = (((int)(*blender1a_r[0]) * (int)(*blender1b_a[0])) >> 8) +
-		(((int)(*blender2a_r[0]) * (int)(*blender2b_a[0])) >> 8);
+    if (other_modes.image_read_en)
+    {
+        UINT16 mem = *fb;
+        memory_color.r = (((mem >> 11) & 0x1f) << 3) | ((mem >> 13) & 0x07);
+        memory_color.g = (((mem >>  6) & 0x1f) << 3) | ((mem >>  8) & 0x07);
+        memory_color.b = (((mem >>  1) & 0x1f) << 3) | ((mem >>  3) & 0x07);
+        memory_color.a = /*(UINT8)((INT32)(*old_cvg) * 0x20 - 1)*/0;
+    }
 
-	g = (((int)(*blender1a_g[0]) * (int)(*blender1b_a[0])) >> 8) +
-		(((int)(*blender2a_g[0]) * (int)(*blender2b_a[0])) >> 8);
+    if (((int)(*blender1b_a[0]) + (int)(*blender2b_a[0])) > 0)
+    {
+        r = ((int)(*blender1a_r[0]) * (int)(*blender1b_a[0]) +
+             (int)(*blender2a_r[0]) * (int)(*blender2b_a[0])) /
+            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
 
-	b = (((int)(*blender1a_b[0]) * (int)(*blender1b_a[0])) >> 8) +
-		(((int)(*blender2a_b[0]) * (int)(*blender2b_a[0])) >> 8);
+        g = ((int)(*blender1a_g[0]) * (int)(*blender1b_a[0]) +
+             (int)(*blender2a_g[0]) * (int)(*blender2b_a[0])) /
+            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
 
-	//r = g = b = 0xff;
+        b = ((int)(*blender1a_b[0]) * (int)(*blender1b_a[0]) +
+             (int)(*blender2a_b[0]) * (int)(*blender2b_a[0])) /
+            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
+    }
+    else
+    {
+        r = g = b = 0;
+    }
 
-	if (r > 255) r = 255;
-	if (g > 255) g = 255;
-	if (b > 255) b = 255;
+    //r = g = b = 0xff;
 
-	if (other_modes.rgb_dither_sel != 3)
-	{
-		r = DITHER_RB(r, dith);
-		g = DITHER_G (g, dith);
-		b = DITHER_RB(b, dith);
-	}
+    if (r > 255) r = 255;
+    if (g > 255) g = 255;
+    if (b > 255) b = 255;
 
-	if (c.a != 0)
-	{
-		*fb = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
-	}
+    if (other_modes.rgb_dither_sel != 3)
+    {
+        r = DITHER_RB(r, dith);
+        g = DITHER_G (g, dith);
+        b = DITHER_RB(b, dith);
+    }
+
+    *fb = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1) | 1;
 }
 
-INLINE void BLENDER2_16(UINT16 *fb, COLOR c1, COLOR c2, int dith)
+INLINE void BLENDER2_16(UINT16 *fb, COLOR c1, COLOR c2, int dith, UINT8 *new_cvg, UINT8 *old_cvg, int *alpha_reject)
 {
-	int r, g, b;
+    int r, g, b;
 
-	pixel_color.r = c1.r;	inv_pixel_color.r = 0xff - c1.r;
-	pixel_color.g = c1.g;	inv_pixel_color.g = 0xff - c1.g;
-	pixel_color.b = c1.b;	inv_pixel_color.b = 0xff - c1.b;
-	pixel_color.a = c1.a;	inv_pixel_color.a = 0xff - c1.a;
+    if( other_modes.force_blend )
+    {
+        blend_color.r = c2.r;
+        blend_color.g = c2.g;
+        blend_color.b = c2.b;
+    }
 
-	if (other_modes.image_read_en)
-	{
-		UINT16 mem = *fb;
-		memory_color.r = ((mem >> 11) & 0x1f) << 3;
-		memory_color.g = ((mem >>  6) & 0x1f) << 3;
-		memory_color.b = ((mem >>  1) & 0x1f) << 3;
-		memory_color.a = 0;
-	}
+    pixel_color.r = c2.r;
+    pixel_color.g = c2.g;
+    pixel_color.b = c2.b;
+    pixel_color.a = c2.a;
+    inv_pixel_color.r = 0xff - *blender1a_r[0];
+    inv_pixel_color.g = 0xff - *blender1a_g[0];
+    inv_pixel_color.b = 0xff - *blender1a_b[0];
+    inv_pixel_color.a = 0xff - *blender1b_a[0];
+    *alpha_reject = 0;
 
-	r = (((int)(*blender1a_r[0]) * (int)(*blender1b_a[0])) >> 8) +
-		(((int)(*blender2a_r[0]) * (int)(*blender2b_a[0])) >> 8);
+    if( other_modes.alpha_cvg_select )
+    {
+        if( other_modes.cvg_times_alpha )
+        {
+            pixel_color.a = (UINT8)( ( (INT32)(c2.a) * (INT32)( (*new_cvg) * 0x20 - 1 ) ) >> 8 );
+        }
+        else
+        {
+            pixel_color.a = (UINT8)( (INT32)(*new_cvg) * 0x20 - 1 );
+        }
+        //inv_pixel_color.a = 0xff - pixel_color.a;
 
-	g = (((int)(*blender1a_g[0]) * (int)(*blender1b_a[0])) >> 8) +
-		(((int)(*blender2a_g[0]) * (int)(*blender2b_a[0])) >> 8);
+        if( pixel_color.a == 0 )
+        {
+            *alpha_reject = 1;
+            return;
+        }
+    }
 
-	b = (((int)(*blender1a_b[0]) * (int)(*blender1b_a[0])) >> 8) +
-		(((int)(*blender2a_b[0]) * (int)(*blender2b_a[0])) >> 8);
+    if (other_modes.image_read_en)
+    {
+        UINT16 mem = *fb;
+        memory_color.r = (((mem >> 11) & 0x1f) << 3) | ((mem >> 13) & 0x07);
+        memory_color.g = (((mem >>  6) & 0x1f) << 3) | ((mem >>  8) & 0x07);
+        memory_color.b = (((mem >>  1) & 0x1f) << 3) | ((mem >>  3) & 0x07);
+        memory_color.a = /*(UINT8)((INT32)(*old_cvg) * 0x20 - 1)*/0;
+    }
 
-	blended_pixel_color.r = r;
-	blended_pixel_color.g = g;
-	blended_pixel_color.b = b;
+    if (((int)(*blender1b_a[0]) + (int)(*blender2b_a[0])) > 0)
+    {
+        r = ((int)(*blender1a_r[0]) * (int)(*blender1b_a[0]) +
+             (int)(*blender2a_r[0]) * (int)(*blender2b_a[0])) /
+            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
 
-	pixel_color.r = c2.r;	inv_pixel_color.r = 0xff - c2.r;
-	pixel_color.g = c2.g;	inv_pixel_color.g = 0xff - c2.g;
-	pixel_color.b = c2.b;	inv_pixel_color.b = 0xff - c2.b;
-	pixel_color.a = c2.a;	inv_pixel_color.a = 0xff - c2.a;
+        g = ((int)(*blender1a_g[0]) * (int)(*blender1b_a[0]) +
+             (int)(*blender2a_g[0]) * (int)(*blender2b_a[0])) /
+            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
 
-	r = (((int)(*blender1a_r[1]) * (int)(*blender1b_a[1])) >> 8) +
-		(((int)(*blender2a_r[1]) * (int)(*blender2b_a[1])) >> 8);
+        b = ((int)(*blender1a_b[0]) * (int)(*blender1b_a[0]) +
+             (int)(*blender2a_b[0]) * (int)(*blender2b_a[0])) /
+            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
+    }
+    else
+    {
+        r = g = b = 0;
+    }
 
-	g = (((int)(*blender1a_g[1]) * (int)(*blender1b_a[1])) >> 8) +
-		(((int)(*blender2a_g[1]) * (int)(*blender2b_a[1])) >> 8);
+    blended_pixel_color.r = r;
+    blended_pixel_color.g = g;
+    blended_pixel_color.b = b;
 
-	b = (((int)(*blender1a_b[1]) * (int)(*blender1b_a[1])) >> 8) +
-		(((int)(*blender2a_b[1]) * (int)(*blender2b_a[1])) >> 8);
+    pixel_color.r = c2.r;
+    pixel_color.g = c2.g;
+    pixel_color.b = c2.b;
+    pixel_color.a = c2.a;
+    inv_pixel_color.r = 0xff - *blender1a_r[1];
+    inv_pixel_color.g = 0xff - *blender1a_g[1];
+    inv_pixel_color.b = 0xff - *blender1a_b[1];
+    inv_pixel_color.a = 0xff - *blender1b_a[1];
 
-	r = c1.r;
-	g = c1.g;
-	b = c1.b;
+    if( other_modes.alpha_cvg_select )
+    {
+        if( other_modes.cvg_times_alpha )
+        {
+            pixel_color.a = (UINT8)( ( (INT32)(c2.a) * (INT32)( (*new_cvg) * 0x20 - 1 ) ) >> 8 );
+        }
+        else
+        {
+            pixel_color.a = (UINT8)( (INT32)(*new_cvg) * 0x20 - 1 );
+        }
 
-	if (r > 255) r = 255;
-	if (g > 255) g = 255;
-	if (b > 255) b = 255;
+        if( pixel_color.a == 0 )
+        {
+            *alpha_reject = 1;
+            return;
+        }
+    }
 
-	if (other_modes.rgb_dither_sel != 3)
-	{
-		r = DITHER_RB(r, dith);
-		g = DITHER_G (g, dith);
-		b = DITHER_RB(b, dith);
-	}
+    if (((int)(*blender1b_a[1]) + (int)(*blender2b_a[1])) > 0)
+    {
+        r = ((int)(*blender1a_r[1]) * (int)(*blender1b_a[1]) +
+             (int)(*blender2a_r[1]) * (int)(*blender2b_a[1])) /
+            ((int)(*blender1b_a[1]) + (int)(*blender2b_a[1]));
 
-	{
-		*fb = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
-	}
+        g = ((int)(*blender1a_g[1]) * (int)(*blender1b_a[1]) +
+             (int)(*blender2a_g[1]) * (int)(*blender2b_a[1])) /
+            ((int)(*blender1b_a[1]) + (int)(*blender2b_a[1]));
+
+        b = ((int)(*blender1a_b[1]) * (int)(*blender1b_a[1]) +
+             (int)(*blender2a_b[1]) * (int)(*blender2b_a[1])) /
+            ((int)(*blender1b_a[1]) + (int)(*blender2b_a[1]));
+    }
+
+    //if (r > 255) r = 255;
+    //if (g > 255) g = 255;
+    //if (b > 255) b = 255;
+    if (r > 255) r = 255;
+    if (g > 255) g = 255;
+    if (b > 255) b = 255;
+    if (r < 0)   r = 0;
+    if (g < 0)   g = 0;
+    if (b < 0)   b = 0;
+    //r &= 0x000000ff;
+    //g &= 0x000000ff;
+    //b &= 0x000000ff;
+
+    if (other_modes.rgb_dither_sel != 3)
+    {
+        r = DITHER_RB(r, dith);
+        g = DITHER_G (g, dith);
+        b = DITHER_RB(b, dith);
+    }
+
+    *fb = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1) | 1;
 }
 
 /*****************************************************************************/
@@ -686,16 +1023,22 @@ INLINE void BLENDER2_16(UINT16 *fb, COLOR c1, COLOR c2, int dith)
 static void fill_rectangle_16bit(RECTANGLE *rect)
 {
 	UINT16 *fb = (UINT16*)&rdram[(fb_address / 4)];
+    UINT8* cvg_buf = (UINT8*)&cvg_mem[fb_address];
 	int index, i, j;
 	int x1 = rect->xh / 4;
 	int x2 = rect->xl / 4;
 	int y1 = rect->yh / 4;
 	int y2 = rect->yl / 4;
 	int clipx1, clipx2, clipy1, clipy2;
+    int alpha_reject = 0;
+    COLOR c1, c2;
 
 	UINT16 fill_color1, fill_color2;
 	fill_color1 = (fill_color >> 16) & 0xffff;
 	fill_color2 = (fill_color >>  0) & 0xffff;
+
+    c1.r = c1.g = c1.b = c1.a = 0;
+    c2.r = c2.g = c2.b = c2.a = 0;
 
 	// TODO: clip
 	clipx1 = clip.xh / 4;
@@ -728,66 +1071,70 @@ static void fill_rectangle_16bit(RECTANGLE *rect)
 			index = j * fb_width;
 			for (i=x1; i <= x2; i++)
 			{
+                cvg_buf[(index + i) ^ 1] = (i & 1) ? ( ( fill_color1 & 1 ) ? 8 : 1 ) : ( ( fill_color2 & 1 ) ? 8 : 1 );
 				fb[(index + i) ^ 1] = (i & 1) ? fill_color1 : fill_color2;
 			}
 		}
 	}
-	else if (other_modes.cycle_type == CYCLE_TYPE_1)
-	{
-		shade_color.r = prim_color.r;
-		shade_color.g = prim_color.g;
-		shade_color.b = prim_color.b;
-		shade_color.a = prim_color.a;
+    else if (other_modes.cycle_type == CYCLE_TYPE_1)
+    {
+        shade_color.r = prim_color.r;
+        shade_color.g = prim_color.g;
+        shade_color.b = prim_color.b;
+        shade_color.a = prim_color.a;
 
-		for (j=y1; j <= y2; j++)
-		{
-			index = j * fb_width;
-			for (i=x1; i <= x2; i++)
-			{
-				COLOR c = COLOR_COMBINER(0);
+        for (j=y1; j <= y2; j++)
+        {
+            index = j * fb_width;
+            for (i=x1; i <= x2; i++)
+            {
+                int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
 
-				//BLENDER1_16(&fb[(index + i) ^ 1], c);
-				{
-					int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
-					BLENDER1_16(&fb[(index + i) ^ WORD_ADDR_XOR], c, dith);
-				}
-			}
-		}
-	}
-	else if (other_modes.cycle_type == CYCLE_TYPE_2)
-	{
-		shade_color.r = prim_color.r;
-		shade_color.g = prim_color.g;
-		shade_color.b = prim_color.b;
-		shade_color.a = prim_color.a;
+                c1 = COLOR_COMBINER(0);
 
-		for (j=y1; j <= y2; j++)
-		{
-			index = j * fb_width;
-			for (i=x1; i <= x2; i++)
-			{
-				COLOR c1 = COLOR_COMBINER(0);
-				COLOR c2 = COLOR_COMBINER(1);
+                cvg_buf[(index + i) ^ WORD_ADDR_XOR] = 8; // Wrong
+                BLENDER1_16(&fb[(index + i) ^ WORD_ADDR_XOR], c1, dith, &cvg_buf[(index + i) ^ WORD_ADDR_XOR], &cvg_buf[(index + i) ^ WORD_ADDR_XOR], &alpha_reject);
+            }
+        }
+    }
+    else if (other_modes.cycle_type == CYCLE_TYPE_2)
+    {
+        shade_color.r = prim_color.r;
+        shade_color.g = prim_color.g;
+        shade_color.b = prim_color.b;
+        shade_color.a = prim_color.a;
 
-				//BLENDER1_16(&fb[(index + i) ^ 1], c);
-				{
-					int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
-					BLENDER2_16(&fb[(index + i) ^ WORD_ADDR_XOR], c1, c2, dith);
-				}
-			}
-		}
-	}
-	else
-	{
-		fatalerror("fill_rectangle_16bit: cycle type copy");
-	}
+        for (j=y1; j <= y2; j++)
+        {
+            index = j * fb_width;
+            for (i=x1; i <= x2; i++)
+            {
+                int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
+
+                c1 = COLOR_COMBINER(0);
+                c2 = COLOR_COMBINER(1);
+
+                cvg_buf[(index + i) ^ WORD_ADDR_XOR] = 8; // Wrong
+                BLENDER2_16(&fb[(index + i) ^ WORD_ADDR_XOR], c1, c2, dith, &cvg_buf[(index + i) ^ WORD_ADDR_XOR], &cvg_buf[(index + i) ^ WORD_ADDR_XOR], &alpha_reject);
+            }
+        }
+    }
+    else
+    {
+        fatalerror("fill_rectangle_16bit: cycle type copy");
+    }
 }
 
 #define XOR_SWAP_BYTE	4
 #define XOR_SWAP_WORD	2
 #define XOR_SWAP_DWORD	1
 
-INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tformat, UINT32 tsize, UINT32 tbase)
+INLINE int taddr_clamp(int addr)
+{
+    return (addr > 0x100000) ? 0 : addr;
+}
+
+INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tformat, UINT32 tsize, UINT32 tbase, UINT8 tpal)
 {
 	if (t < 0) t = 0;
 	if (s < 0) s = 0;
@@ -798,17 +1145,54 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tforma
 		{
 			switch (tsize)
 			{
-				case 0:
-					color->r = color->g = color->b = color->a = 0xff;
-					break;
-				case 1:
-					// FIXME?: Extreme-G 2 does this
-					color->r = color->g = color->b = color->a = 0xff;
-					break;
+                case PIXEL_SIZE_4BIT:
+                {
+                    // 4-bit RGBA is a "valid" mode; some games use it, it behaves the same as 4-bit CI
+                    UINT8 *tc = (UINT8*)texture_cache;
+                    int taddr = taddr_clamp((tbase + ((t) * twidth) + ((s) / 2)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0));
+                    UINT8 p = ((s) & 1) ? (tc[taddr ^ BYTE_ADDR_XOR] & 0xf) : (tc[taddr ^ BYTE_ADDR_XOR] >> 4);
+                    UINT16 c = tlut[(p + (tpal << 4))^ WORD_ADDR_XOR];
+
+                    if (other_modes.tlut_type == 0)
+                    {
+                        color->r = ((c >> 11) & 0x1f) << 3;
+                        color->g = ((c >>  6) & 0x1f) << 3;
+                        color->b = ((c >>  1) & 0x1f) << 3;
+                        color->a = (c & 1) ? 0xff : 0;
+                    }
+                    else
+                    {
+                        color->r = color->g = color->b = (c >> 8) & 0xff;
+                        color->a = c & 0xff;
+                    }
+                    break;
+                }
+                case PIXEL_SIZE_8BIT:
+                {
+                    // 8-bit RGBA is a "valid" mode; some games use it, it behaves the same as 8-bit CI
+                    UINT8 *tc = (UINT8*)texture_cache;
+                    int taddr = taddr_clamp((tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0));
+                    UINT8 p = tc[taddr ^ BYTE_ADDR_XOR];
+                    UINT16 c = tlut[p ^ WORD_ADDR_XOR];
+
+                    if (other_modes.tlut_type == 0)
+                    {
+                        color->r = ((c >> 11) & 0x1f) << 3;
+                        color->g = ((c >>  6) & 0x1f) << 3;
+                        color->b = ((c >>  1) & 0x1f) << 3;
+                        color->a = (c & 1) ? 0xff : 0;
+                    }
+                    else
+                    {
+                        color->r = color->g = color->b = (c >> 8) & 0xff;
+                        color->a = c & 0xff;
+                    }
+                    break;
+                }
 				case PIXEL_SIZE_16BIT:
 				{
 					UINT16 *tc = (UINT16*)texture_cache;
-					int taddr = ((tbase/2) + ((t) * (twidth/2)) + (s))  ^ ((t & 1) ? XOR_SWAP_WORD : 0);
+                    int taddr = taddr_clamp(((tbase/2) + ((t) * (twidth/2)) + (s))  ^ ((t & 1) ? XOR_SWAP_WORD : 0));
 					UINT16 c = tc[taddr ^ WORD_ADDR_XOR];
 
 					color->r = ((c >> 11) & 0x1f) << 3;
@@ -820,7 +1204,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tforma
 				case PIXEL_SIZE_32BIT:
 				{
 					UINT32 *tc = (UINT32*)texture_cache;
-                    int taddr = ((tbase/4) + ((t) * (twidth/2)) + (s)) ^ ((t & 1) ? XOR_SWAP_DWORD : 0);
+                    int taddr = taddr_clamp(((tbase/4) + ((t) * (twidth/2)) + (s)) ^ ((t & 1) ? XOR_SWAP_DWORD : 0));
 					UINT32 c = tc[taddr];
 
 					color->r = ((c >> 24) & 0xff);
@@ -843,7 +1227,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tforma
 				case PIXEL_SIZE_4BIT:
 				{
 					UINT8 *tc = (UINT8*)texture_cache;
-					int taddr = (tbase + ((t) * twidth) + ((s) / 2)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0);
+                    int taddr = taddr_clamp((tbase + ((t) * twidth) + ((s) / 2)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0));
 					UINT8 p = ((s) & 1) ? (tc[taddr ^ BYTE_ADDR_XOR] & 0xf) : (tc[taddr ^ BYTE_ADDR_XOR] >> 4);
 					UINT16 c = tlut[p ^ WORD_ADDR_XOR];
 
@@ -864,7 +1248,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tforma
 				case PIXEL_SIZE_8BIT:
 				{
 					UINT8 *tc = (UINT8*)texture_cache;
-					int taddr = (tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0);
+                    int taddr = taddr_clamp((tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0));
 					UINT8 p = tc[taddr ^ BYTE_ADDR_XOR];
 					UINT16 c = tlut[p ^ WORD_ADDR_XOR];
 
@@ -882,10 +1266,19 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tforma
 					}
 					break;
 				}
-				case 2:
-			 		// FIXME?: Clay Fighter Sculptor's Cut does this..
-					color->r = color->g = color->b = color->a = 0xff;
-					break;
+                case PIXEL_SIZE_16BIT:
+                {
+                    // 16-bit CI is a "valid" mode; some games use it, it behaves the same as 16-bit RGBA
+                    UINT16 *tc = (UINT16*)texture_cache;
+                    int taddr = taddr_clamp(((tbase/2) + ((t) * (twidth/2)) + (s))  ^ ((t & 1) ? XOR_SWAP_WORD : 0));
+                    UINT16 c = tc[taddr ^ WORD_ADDR_XOR];
+
+                    color->r = ((c >> 11) & 0x1f) << 3;
+                    color->g = ((c >>  6) & 0x1f) << 3;
+                    color->b = ((c >>  1) & 0x1f) << 3;
+                    color->a = (c & 1) ? 0xff : 0;
+                    break;
+                }
 				default:
 					color->r = color->g = color->b = color->a = 0xff;
 					fatalerror("FETCH_TEXEL: unknown CI texture size %d\n", tsize);
@@ -900,7 +1293,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tforma
 				case PIXEL_SIZE_4BIT:
 				{
 					UINT8 *tc = (UINT8*)texture_cache;
-					int taddr = (tbase + ((t) * twidth) + ((s) / 2)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0);
+                    int taddr = taddr_clamp((tbase + ((t) * twidth) + ((s) / 2)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0));
 					UINT8 p = ((s) & 1) ? (tc[taddr ^ BYTE_ADDR_XOR] & 0xf) : (tc[taddr ^ BYTE_ADDR_XOR] >> 4);
 					UINT8 i = ((p & 0xe) << 4) | ((p & 0xe) << 1) | (p & 0xe >> 2);
 
@@ -913,7 +1306,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tforma
 				case PIXEL_SIZE_8BIT:
 				{
 					UINT8 *tc = (UINT8*)texture_cache;
-					int taddr = (tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0);
+                    int taddr = taddr_clamp((tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0));
 					UINT8 p = tc[taddr ^ BYTE_ADDR_XOR];
 					UINT8 i = (p >> 4) | (p & 0xf0);
 
@@ -926,7 +1319,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tforma
 				case PIXEL_SIZE_16BIT:
 				{
 					UINT16 *tc = (UINT16*)texture_cache;
-					int taddr = (tbase + ((t) * (twidth/2)) + (s)) ^ ((t & 1) ? XOR_SWAP_WORD : 0);
+                    int taddr = taddr_clamp((tbase + ((t) * (twidth/2)) + (s)) ^ ((t & 1) ? XOR_SWAP_WORD : 0));
 					UINT16 c = tc[taddr ^ WORD_ADDR_XOR];
 					UINT8 i = (c >> 8);
 
@@ -950,7 +1343,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tforma
 				case PIXEL_SIZE_4BIT:
 				{
 					UINT8 *tc = (UINT8*)texture_cache;
-					int taddr = (tbase + ((t) * twidth) + ((s) / 2)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0);
+                    int taddr = taddr_clamp((tbase + ((t) * twidth) + ((s) / 2)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0));
 					UINT8 c = ((s) & 1) ? (tc[taddr ^ BYTE_ADDR_XOR] & 0xf) : (tc[taddr ^ BYTE_ADDR_XOR] >> 4);
 					c |= (c << 4);
 
@@ -963,7 +1356,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tforma
 				case PIXEL_SIZE_8BIT:
 				{
 					UINT8 *tc = (UINT8*)texture_cache;
-					int taddr = (tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0);
+                    int taddr = taddr_clamp((tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0));
 					UINT8 c = tc[taddr ^ BYTE_ADDR_XOR];
 
 					color->r = c;
@@ -989,71 +1382,71 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tforma
 }
 
 #if 1
-#define TEXTURE_PIPELINE(TEX, SSS, SST, NOBILINEAR)																					\
-do																																	\
-{																																	\
-	if (other_modes.sample_type && !NOBILINEAR)																						\
-	{																																\
-		COLOR t0, t1, t2, t3;																										\
-		int sss1, sst1, sss2, sst2;																									\
-																																	\
-		/* bilinear */																												\
-																																	\
+#define TEXTURE_PIPELINE(TEX, SSS, SST, NOBILINEAR, CYCLE)                                                                          \
+do                                                                                                                                  \
+{                                                                                                                                   \
+    if (other_modes.sample_type && !NOBILINEAR)                                                                                     \
+    {                                                                                                                               \
+        COLOR t0, t1, t2, t3;                                                                                                       \
+        int sss1, sst1, sss2, sst2;                                                                                                 \
+                                                                                                                                    \
+        /* bilinear */                                                                                                              \
+                                                                                                                                    \
         sss1 = SSS >> 10;                                                                                                           \
         sss2 = sss1 + 1;                                                                                                            \
                                                                                                                                     \
         sst1 = SST >> 10;                                                                                                           \
         sst2 = sst1 + 1;                                                                                                            \
                                                                                                                                     \
-		CLAMP(sss1, sst1);																											\
-		CLAMP(sss2, sst2);																											\
-																																	\
-        sss1 -= tsl >> 2;                                                                                                           \
-        sss2 -= tsl >> 2;                                                                                                           \
+        sss1 -= tsl[CYCLE] >> 2;                                                                                                    \
+        sss2 -= tsl[CYCLE] >> 2;                                                                                                    \
                                                                                                                                     \
-        sst1 -= ttl >> 2;                                                                                                           \
-        sst2 -= ttl >> 2;                                                                                                           \
+        sst1 -= ttl[CYCLE] >> 2;                                                                                                    \
+        sst2 -= ttl[CYCLE] >> 2;                                                                                                    \
                                                                                                                                     \
-        MASK(sss1, sst1);                                                                                                           \
-        MASK(sss2, sst2);                                                                                                           \
+        CLAMP(sss1, sst1, CYCLE);                                                                                                   \
+        CLAMP(sss2, sst2, CYCLE);                                                                                                   \
                                                                                                                                     \
-		FETCH_TEXEL(&t0, sss1, sst1, twidth, tformat, tsize, tbase);																\
-		FETCH_TEXEL(&t1, sss2, sst1, twidth, tformat, tsize, tbase);																\
-		FETCH_TEXEL(&t2, sss1, sst2, twidth, tformat, tsize, tbase);																\
-		FETCH_TEXEL(&t3, sss2, sst2, twidth, tformat, tsize, tbase);																\
-																																	\
-		TEX.r = (((( (t0.r * (0x3ff - (SSS & 0x3ff))) + (t1.r * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +		\
-						 (((( (t2.r * (0x3ff - (SSS & 0x3ff))) + (t3.r * ((SSS & 0x3ff))) ) >> 10) * ((SST & 0x3ff))) >> 10);		\
-								 																									\
-		TEX.g = (((( (t0.g * (0x3ff - (SSS & 0x3ff))) + (t1.g * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +		\
-						 (((( (t2.g * (0x3ff - (SSS & 0x3ff))) + (t3.g * ((SSS & 0x3ff))) ) >> 10) * ((SST & 0x3ff))) >> 10);		\
-								 																									\
-		TEX.b = (((( (t0.b * (0x3ff - (SSS & 0x3ff))) + (t1.b * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +		\
-						 (((( (t2.b * (0x3ff - (SSS & 0x3ff))) + (t3.b * ((SSS & 0x3ff))) ) >> 10) * ((SST & 0x3ff))) >> 10);		\
-								 																									\
-		TEX.a = (((( (t0.a * (0x3ff - (SSS & 0x3ff))) + (t1.a * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +		\
-						 (((( (t2.a * (0x3ff - (SSS & 0x3ff))) + (t3.a * ((SSS & 0x3ff))) ) >> 10) * ((SST & 0x3ff))) >> 10);		\
-	}																																\
-	else																															\
-	{																																\
-		int sss1, sst1;																												\
+        MASK(sss1, sst1, CYCLE);                                                                                                    \
+        MASK(sss2, sst2, CYCLE);                                                                                                    \
+                                                                                                                                    \
+        FETCH_TEXEL(&t0, sss1, sst1, twidth[CYCLE], tformat[CYCLE], tsize[CYCLE], tbase[CYCLE], tpal[CYCLE]);                       \
+        FETCH_TEXEL(&t1, sss2, sst1, twidth[CYCLE], tformat[CYCLE], tsize[CYCLE], tbase[CYCLE], tpal[CYCLE]);                       \
+        FETCH_TEXEL(&t2, sss1, sst2, twidth[CYCLE], tformat[CYCLE], tsize[CYCLE], tbase[CYCLE], tpal[CYCLE]);                       \
+        FETCH_TEXEL(&t3, sss2, sst2, twidth[CYCLE], tformat[CYCLE], tsize[CYCLE], tbase[CYCLE], tpal[CYCLE]);                       \
+                                                                                                                                    \
+        TEX.r = (((( (t0.r * (0x3ff - (SSS & 0x3ff))) + (t1.r * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +       \
+                         (((( (t2.r * (0x3ff - (SSS & 0x3ff))) + (t3.r * ((SSS & 0x3ff))) ) >> 10) * ((SST & 0x3ff))) >> 10);       \
+                                                                                                                                    \
+        TEX.g = (((( (t0.g * (0x3ff - (SSS & 0x3ff))) + (t1.g * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +       \
+                         (((( (t2.g * (0x3ff - (SSS & 0x3ff))) + (t3.g * ((SSS & 0x3ff))) ) >> 10) * ((SST & 0x3ff))) >> 10);       \
+                                                                                                                                    \
+        TEX.b = (((( (t0.b * (0x3ff - (SSS & 0x3ff))) + (t1.b * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +       \
+                         (((( (t2.b * (0x3ff - (SSS & 0x3ff))) + (t3.b * ((SSS & 0x3ff))) ) >> 10) * ((SST & 0x3ff))) >> 10);       \
+                                                                                                                                    \
+        TEX.a = (((( (t0.a * (0x3ff - (SSS & 0x3ff))) + (t1.a * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +       \
+                         (((( (t2.a * (0x3ff - (SSS & 0x3ff))) + (t3.a * ((SSS & 0x3ff))) ) >> 10) * ((SST & 0x3ff))) >> 10);       \
+    }                                                                                                                               \
+    else                                                                                                                            \
+    {                                                                                                                               \
+        int sss1, sst1;                                                                                                             \
         sss1 = SSS >> 10;                                                                                                           \
         if ((SSS & 0x3ff) >= 0x200) sss1++;                                                                                         \
                                                                                                                                     \
         sst1 = SST >> 10;                                                                                                           \
         if ((SST & 0x3ff) >= 0x200) sst1++;                                                                                         \
                                                                                                                                     \
-		CLAMP(sss1, sst1);																											\
-																																	\
-        sss1 -= tsl >> 2;                                                                                                           \
-        sst1 -= ttl >> 2;                                                                                                           \
+        sss1 -= tsl[CYCLE] >> 2;                                                                                                    \
+        sst1 -= ttl[CYCLE] >> 2;                                                                                                    \
                                                                                                                                     \
-        MASK(sss1, sst1);                                                                                                           \
+        CLAMP(sss1, sst1, CYCLE);                                                                                                   \
                                                                                                                                     \
-		/* point sample */																											\
-		FETCH_TEXEL(&TEX, sss1, sst1, twidth, tformat, tsize, tbase);																\
-	}																																\
-}																																	\
+        MASK(sss1, sst1, CYCLE);                                                                                                    \
+                                                                                                                                    \
+        /* point sample */                                                                                                          \
+        FETCH_TEXEL(&TEX, sss1, sst1, twidth[CYCLE], tformat[CYCLE], tsize[CYCLE], tbase[CYCLE], tpal[CYCLE]);                      \
+    }                                                                                                                               \
+}                                                                                                                                   \
 while(0)
 #endif
 
@@ -1061,603 +1454,1013 @@ while(0)
 // TODO: check the correct texel samples and weighting values
 
 #if 0
-#define TEXTURE_PIPELINE(TEX, SSS, SST, NOBILINEAR)																					\
-do																																	\
-{																																	\
-	if (other_modes.sample_type && !NOBILINEAR)																						\
-	{																																\
-		COLOR t0, t1, t2;																											\
-		int sss1, sst1, sss2, sst2;																									\
-																																	\
-		/* bilinear */																												\
-																																	\
-		sss1 = (SSS >> 10) - (tsl >> 2);																							\
-		sss2 = sss1 + 1;																											\
-																																	\
-		sst1 = (SST >> 10) - (ttl >> 2);																							\
-		sst2 = sst1 + 1;																											\
-																																	\
-		CLAMP(sss1, sst1);																											\
-		CLAMP(sss2, sst2);																											\
-																																	\
-		FETCH_TEXEL(&t0, sss1, sst1, twidth, tformat, tsize, tbase);																\
-		FETCH_TEXEL(&t1, sss2, sst1, twidth, tformat, tsize, tbase);																\
-		FETCH_TEXEL(&t2, sss2, sst2, twidth, tformat, tsize, tbase);																\
-																																	\
-		TEX.r = (((( (t0.r * (0x3ff - (SSS & 0x3ff))) + (t1.r * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +		\
-				(( (t2.r) * ((SST & 0x3ff))) >> 10);																				\
-								 																									\
-		TEX.g = (((( (t0.g * (0x3ff - (SSS & 0x3ff))) + (t1.g * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +		\
-				(( (t2.g) * ((SST & 0x3ff))) >> 10);																				\
-							 																										\
-		TEX.b = (((( (t0.b * (0x3ff - (SSS & 0x3ff))) + (t1.b * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +		\
-				(( (t2.b) * ((SST & 0x3ff))) >> 10);																				\
-								 																									\
-		TEX.a = (((( (t0.a * (0x3ff - (SSS & 0x3ff))) + (t1.a * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +		\
-				(( (t2.a) * ((SST & 0x3ff))) >> 10);																				\
-	}																																\
-	else																															\
-	{																																\
-		int sss1, sst1;																												\
-		sss1 = (SSS >> 10) - (tsl >> 2);																							\
-		if ((SSS & 0x3ff) >= 0x200) sss1++;																							\
-																																	\
-		sst1 = (SST >> 10) - (ttl >> 2);																							\
-		if ((SST & 0x3ff) >= 0x200) sst1++;																							\
-																																	\
-		CLAMP(sss1, sst1);																											\
-																																	\
-		/* point sample */																											\
-		FETCH_TEXEL(&TEX, sss1, sst1, twidth, tformat, tsize, tbase);																\
-	}																																\
-}																																	\
+#define TEXTURE_PIPELINE(TEX, SSS, SST, NOBILINEAR)                                                                                 \
+do                                                                                                                                  \
+{                                                                                                                                   \
+    if (other_modes.sample_type && !NOBILINEAR)                                                                                     \
+    {                                                                                                                               \
+        COLOR t0, t1, t2;                                                                                                           \
+        int sss1, sst1, sss2, sst2;                                                                                                 \
+                                                                                                                                    \
+        /* bilinear */                                                                                                              \
+                                                                                                                                    \
+        sss1 = (SSS >> 10) - (tsl >> 2);                                                                                            \
+        sss2 = sss1 + 1;                                                                                                            \
+                                                                                                                                    \
+        sst1 = (SST >> 10) - (ttl >> 2);                                                                                            \
+        sst2 = sst1 + 1;                                                                                                            \
+                                                                                                                                    \
+        CLAMP(sss1, sst1);                                                                                                          \
+        CLAMP(sss2, sst2);                                                                                                          \
+                                                                                                                                    \
+        FETCH_TEXEL(&t0, sss1, sst1, twidth, tformat, tsize, tbase);                                                                \
+        FETCH_TEXEL(&t1, sss2, sst1, twidth, tformat, tsize, tbase);                                                                \
+        FETCH_TEXEL(&t2, sss2, sst2, twidth, tformat, tsize, tbase);                                                                \
+                                                                                                                                    \
+        TEX.r = (((( (t0.r * (0x3ff - (SSS & 0x3ff))) + (t1.r * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +       \
+                (( (t2.r) * ((SST & 0x3ff))) >> 10);                                                                                \
+                                                                                                                                    \
+        TEX.g = (((( (t0.g * (0x3ff - (SSS & 0x3ff))) + (t1.g * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +       \
+                (( (t2.g) * ((SST & 0x3ff))) >> 10);                                                                                \
+                                                                                                                                    \
+        TEX.b = (((( (t0.b * (0x3ff - (SSS & 0x3ff))) + (t1.b * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +       \
+                (( (t2.b) * ((SST & 0x3ff))) >> 10);                                                                                \
+                                                                                                                                    \
+        TEX.a = (((( (t0.a * (0x3ff - (SSS & 0x3ff))) + (t1.a * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +       \
+                (( (t2.a) * ((SST & 0x3ff))) >> 10);                                                                                \
+    }                                                                                                                               \
+    else                                                                                                                            \
+    {                                                                                                                               \
+        int sss1, sst1;                                                                                                             \
+        sss1 = (SSS >> 10) - (tsl >> 2);                                                                                            \
+        if ((SSS & 0x3ff) >= 0x200) sss1++;                                                                                         \
+                                                                                                                                    \
+        sst1 = (SST >> 10) - (ttl >> 2);                                                                                            \
+        if ((SST & 0x3ff) >= 0x200) sst1++;                                                                                         \
+                                                                                                                                    \
+        CLAMP(sss1, sst1);                                                                                                          \
+                                                                                                                                    \
+        /* point sample */                                                                                                          \
+        FETCH_TEXEL(&TEX, sss1, sst1, twidth, tformat, tsize, tbase);                                                               \
+    }                                                                                                                               \
+}                                                                                                                                   \
 while(0)
 #endif
 
-#define TEXTURE_PIPELINE1(SSS, SST, NOBILINEAR)				\
-do															\
-{															\
-	TEXTURE_PIPELINE(texel0_color, SSS, SST, NOBILINEAR);	\
-}															\
+#define TEXTURE_PIPELINE1(SSS, SST, NOBILINEAR)             \
+do                                                          \
+{                                                           \
+    TEXTURE_PIPELINE(texel0_color, SSS, SST, NOBILINEAR, 0);\
+}                                                           \
 while(0)
 
-#define TEXTURE_PIPELINE2(SSS, SST, NOBILINEAR)				\
-do															\
-{															\
-	TEXTURE_PIPELINE(texel0_color, SSS, SST, NOBILINEAR);	\
-	TEXTURE_PIPELINE(texel1_color, SSS, SST, NOBILINEAR);	\
-}															\
+#define TEXTURE_PIPELINE2(SSS, SST, NOBILINEAR)             \
+do                                                          \
+{                                                           \
+    TEXTURE_PIPELINE(texel0_color, SSS, SST, NOBILINEAR, 0);\
+    TEXTURE_PIPELINE(texel1_color, SSS, SST, NOBILINEAR, 1);\
+}                                                           \
 while(0)
 
+static int alpha_compare_success(COLOR c1, COLOR c2)
+{
+    if( other_modes.alpha_compare_en )
+    {
+        if( other_modes.cycle_type == CYCLE_TYPE_1 )
+        {
+            if( c1.a > blend_color.a )
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        if( other_modes.cycle_type == CYCLE_TYPE_2 )
+        {
+            if( c2.a > blend_color.a )
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+    }
+    else
+    {
+        return 1;
+    }
+    return 0;
+}
 
+/* Does not yet work properly */
+static void compress_z(UINT32 in, UINT16 *out_z, UINT8 *out_dz)
+{
+    UINT32 rounded = (in >> 13) & 0x0003ffff;
+    UINT16 full_delta = in & 0x0000ffff;
+    UINT8 exponent = 0;
+    UINT8 high_delta_bit = 15;
+    UINT16 mantissa = 0;
+    UINT32 final_value = 0;
+
+    // Determine exponent and mantissa
+    for (exponent = 0; exponent < 7; exponent++)
+    {
+        if (!(rounded & (0x00020000 >> exponent)))
+        {
+            break;
+        }
+    }
+    mantissa = (rounded >> ((exponent != 7) ? (6 - exponent) : 0)) & 0x000007ff;
+
+    // Determine the high bit of Z delta
+    for (high_delta_bit = 15; high_delta_bit > 0; high_delta_bit--)
+    {
+        if (full_delta & (1 << high_delta_bit))
+        {
+            break;
+        }
+    }
+
+    // Composite the final value
+    final_value = (mantissa << 7) | (exponent << 4) | (high_delta_bit & 0x0f);
+    *out_z = (final_value >> 2) & 0xfffc;
+    *out_dz = final_value & 0x000f;
+}
+
+/* Does not yet work properly */
+static void decompress_z(UINT16 in, UINT32 *out)
+{
+    UINT16 mantissa = (in >> 5) & 0x07ff;
+    UINT8 exponent = (in >> 2) & 0x0007;
+    switch (exponent)
+    {
+        case 0:
+            (*out) = (mantissa << 6);
+            break;
+        case 1:
+            (*out) = 0x20000 | (mantissa << 5);
+            break;
+        case 2:
+            (*out) = 0x30000 | (mantissa << 4);
+            break;
+        case 3:
+            (*out) = 0x38000 | (mantissa << 3);
+            break;
+        case 4:
+            (*out) = 0x3c000 | (mantissa << 2);
+            break;
+        case 5:
+            (*out) = 0x3e000 | (mantissa << 1);
+            break;
+        case 6:
+            (*out) = 0x3f000 | mantissa;
+            break;
+        case 7:
+            (*out) = 0x3f800 | mantissa;
+            break;
+    }
+}
+
+static void calculate_coverage( UINT8 *out, UINT8 in, int* ovf, UINT8 *old )
+{
+    (*old) = (*out);
+    if (((*out) + in) > 8)
+    {
+        (*ovf) = 1;
+    }
+    switch (other_modes.cvg_dest)
+    {
+        case 0: // Clamp
+            if (other_modes.image_read_en)
+            {
+                (*out) = (*out) + in;
+            }
+            else
+            {
+                (*out) = in;
+            }
+            if (*out > 8)
+            {
+                *out = 8;
+            }
+            break;
+        case 1: // Wrap
+            if (other_modes.image_read_en)
+            {
+                (*out) = ( (*out) - 1 ) + in;
+            }
+            else
+            {
+                (*out) = in;
+            }
+            (*out) &= 0x07;
+            (*out)++;
+            break;
+        case 2: // Zap
+            (*out) = 8;
+            break;
+        case 3: // Save
+            (*out) = (*out);
+            break;
+    }
+}
 
 static void texture_rectangle_16bit(TEX_RECTANGLE *rect)
 {
-	UINT16 *fb = (UINT16*)&rdram[(fb_address / 4)];
-	int i, j;
-	int x1, x2, y1, y2;
-	int tsl, tsh, ttl, tth;
-	int s, t;
-	int twidth, tformat, tsize, tbase;
-	int clamp_s, clamp_t, mask_s, mask_t, mirror_s, mirror_t;
-	int clipx1, clipx2, clipy1, clipy2;
+    UINT16 *fb = (UINT16*)&rdram[(fb_address / 4)];
+    UINT16 *zb = (UINT16*)&rdram[(zb_address / 4)];
+    UINT8* cvg_buf = (UINT8*)&cvg_mem[fb_address];
+    int i, j;
+    int x1, x2, y1, y2;
+    int tsl[2], tsh[2], ttl[2], tth[2];
+    int s, t;
+    int twidth[2], tformat[2], tsize[2], tbase[2], tpal[2];
+    int clamp_s[2], clamp_t[2], mask_s[2], mask_t[2], mirror_s[2], mirror_t[2];
+    int clipx1, clipx2, clipy1, clipy2;
+    int cycle;
+    UINT8 cvg_span[RDP_CVG_SPAN_MAX];
+    int span_index = 0;
+    int alpha_reject = 0;
+    COLOR c1, c2;
+    c1.r = c1.g = c1.b = c1.a = 0;
+    c2.r = c2.g = c2.b = c2.a = 0;
 
-	x1 = (rect->xh / 4);
-	x2 = (rect->xl / 4);
-	y1 = (rect->yh / 4);
-	y2 = (rect->yl / 4);
+    x1 = rect->xh;
+    x2 = rect->xl;
+    y1 = rect->yh;
+    y2 = rect->yl;
 
-	if (other_modes.cycle_type == CYCLE_TYPE_FILL || other_modes.cycle_type == CYCLE_TYPE_COPY)
-	{
-		rect->dsdx /= 4;
-		x2 += 1;
-		y2 += 1;
-	}
+    if (other_modes.cycle_type == CYCLE_TYPE_FILL || other_modes.cycle_type == CYCLE_TYPE_COPY)
+    {
+        rect->dsdx /= 4;
+        x2 += 1;
+        y2 += 1;
+    }
 
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
+    clipx1 = clip.xh;
+    clipx2 = clip.xl;
+    clipy1 = clip.yh;
+    clipy2 = clip.yl;
 
-	// clip
-	if (x1 < clipx1)
-	{
-		x1 = clipx1;
-	}
-	if (y1 < clipy1)
-	{
-		y1 = clipy1;
-	}
-	if (x2 >= clipx2)
-	{
-		x2 = clipx2-1;
-	}
-	if (y2 >= clipy2)
-	{
-		y2 = clipy2-1;
-	}
+    // clip
+    if (x1 < clipx1)
+    {
+        x1 = clipx1;
+    }
+    if (y1 < clipy1)
+    {
+        y1 = clipy1;
+    }
+    if (x2 >= clipx2)
+    {
+        x2 = clipx2-1;
+    }
+    if (y2 >= clipy2)
+    {
+        y2 = clipy2-1;
+    }
 
-	tsl = tile[rect->tilenum].sl;
-	tsh = tile[rect->tilenum].sh;
-	ttl = tile[rect->tilenum].tl;
-	tth = tile[rect->tilenum].th;
+    for( cycle = 0; cycle < 2; cycle++ )
+    {
+        tsl[cycle] = tile[rect->tilenum + cycle].sl;
+        tsh[cycle] = tile[rect->tilenum + cycle].sh;
+        ttl[cycle] = tile[rect->tilenum + cycle].tl;
+        tth[cycle] = tile[rect->tilenum + cycle].th;
 
-	twidth = tile[rect->tilenum].line;
-	tformat = tile[rect->tilenum].format;
-	tsize = tile[rect->tilenum].size;
-	tbase = tile[rect->tilenum].tmem;
+        twidth[cycle] = tile[rect->tilenum + cycle].line;
+        tformat[cycle] = tile[rect->tilenum + cycle].format;
+        tsize[cycle] = tile[rect->tilenum + cycle].size;
+        tbase[cycle] = tile[rect->tilenum + cycle].tmem;
+        tpal[cycle] = tile[rect->tilenum + cycle].palette;
 
-    clamp_t = tile[rect->tilenum].ct;
-    clamp_s = tile[rect->tilenum].cs;
+        clamp_t[cycle] = tile[rect->tilenum + cycle].ct;
+        clamp_s[cycle] = tile[rect->tilenum + cycle].cs;
 
-	mirror_t = tile[rect->tilenum].mt;
-	mirror_s = tile[rect->tilenum].ms;
-	mask_t = tile[rect->tilenum].mask_t;
-	mask_s = tile[rect->tilenum].mask_s;
+        mirror_t[cycle] = tile[rect->tilenum + cycle].mt;
+        mirror_s[cycle] = tile[rect->tilenum + cycle].ms;
+        mask_t[cycle] = tile[rect->tilenum + cycle].mask_t;
+        mask_s[cycle] = tile[rect->tilenum + cycle].mask_s;
+    }
 
-	t = (int)(rect->t) << 5;
+    t = (int)(rect->t) << 5;
 
-	if (other_modes.cycle_type == CYCLE_TYPE_1 || other_modes.cycle_type == CYCLE_TYPE_2)
-	{
-	}
+    if (other_modes.cycle_type == CYCLE_TYPE_1)
+    {
+        for (j = y1; j < y2; j += ((j == y1) ? (4 - (y1 & 0x0003)) : 4) )
+        {
+            int fb_index = (j >> 2) * fb_width;
 
-	if (other_modes.cycle_type == CYCLE_TYPE_1)
-	{
-		for (j = y1; j < y2; j++)
-		{
-			int fb_index = j * fb_width;
+            s = (int)(rect->s) << 5;
 
-			s = (int)(rect->s) << 5;
+            memset( cvg_span, 0, RDP_CVG_SPAN_MAX );
 
-			for (i = x1; i < x2; i++)
-			{
-				COLOR c;
-
-				//ss = (s >> 10) - (tsl >> 2);
-				//if ((s & 0x3ff) >= 0x200) ss++;
-				//st = (t >> 10) - (ttl >> 2);
-				//if ((t & 0x3ff) >= 0x200) st++;
-
-				//CLAMP(ss, st);
-				//FETCH_TEXEL(&texel0_color, ss, st, twidth, tformat, tsize, tbase);
-
-				TEXTURE_PIPELINE1(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
-
-				c = COLOR_COMBINER(0);
-
-				{
-					int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
-					BLENDER1_16(&fb[(fb_index + i) ^ WORD_ADDR_XOR], c, dith);
-				}
-
-				s += rect->dsdx;
-			}
-
-			t += rect->dtdy;
-		}
-	}
-	else if (other_modes.cycle_type == CYCLE_TYPE_2)
-	{
-		for (j = y1; j < y2; j++)
-		{
-			int fb_index = j * fb_width;
-
-			s = (int)(rect->s) << 5;
-
-			for (i = x1; i < x2; i++)
-			{
-				COLOR c1, c2;
-
-				//ss = (s >> 10) - (tsl >> 2);
-				//if ((s & 0x3ff) >= 0x200) ss++;
-				//st = (t >> 10) - (ttl >> 2);
-				//if ((t & 0x3ff) >= 0x200) st++;
-
-				//CLAMP(ss, st);
-				//FETCH_TEXEL(&texel0_color, ss, st, twidth, tformat, tsize, tbase);
-				//FETCH_TEXEL(&texel1_color, ss, st, twidth, tformat, tsize, tbase);
-
-				TEXTURE_PIPELINE2(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
-
-				c1 = COLOR_COMBINER(0);
-				c2 = COLOR_COMBINER(1);
-
-				//BLENDER2_16(&fb[(fb_index + i) ^ WORD_ADDR_XOR], c1, c2);
-				{
-					int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
-					BLENDER2_16(&fb[(fb_index + i) ^ WORD_ADDR_XOR], c1, c2, dith);
-				}
-
-				s += rect->dsdx;
-			}
-
-			t += rect->dtdy;
-		}
-	}
-	else if (other_modes.cycle_type == CYCLE_TYPE_COPY)
-	{
-		for (j = y1; j < y2; j++)
-		{
-			int fb_index = j * fb_width;
-
-			s = (int)(rect->s) << 5;
-
-			for (i = x1; i < x2; i++)
-			{
-			/*
-                if (clamp_s)
+            for (span_index = j; span_index < ((j &~ 0x0003) + 4) && span_index < y2; span_index++)
+            {
+                int span_start = x1;
+                int span_end = x2;
+                int span_iter = 0;
+                if (x1 < 0)
                 {
-                    if (s < (tsl << 8)) s = (tsl << 8);
-                    if (s > (tsh << 8)) s = (tsh << 8);
+                    span_start = 0;
                 }
-                if (clamp_t)
+                if (x2 >= (RDP_CVG_SPAN_MAX << 2))
                 {
-                    if (t < (ttl << 8)) t = (ttl << 8);
-                    if (t > (tth << 8)) t = (tth << 8);
+                    span_end = (RDP_CVG_SPAN_MAX << 2) - 1;
                 }
-                if (mask_s)
+                //printf( "%d: Span from %d to %d\n", j, span_start, span_end );
+                for (span_iter=span_start; span_iter < span_end; span_iter++)
                 {
-                    s &= (((UINT32)(0xffffffff) >> (32-mask_s)) << 10) | 0x3ff;
+                    if ((span_iter & 1) == (span_index & 1))
+                    {
+                        cvg_span[span_iter >> 2]++;
+                    }
                 }
-                if (mask_t)
+            }
+
+            for (i = x1; i < x2; i += 4)
+            {
+                if (i >= 0 && i < (RDP_CVG_SPAN_MAX << 2) && cvg_span[i >> 2] > 0)
                 {
-                    t &= (((UINT32)(0xffffffff) >> (32-mask_t)) << 10) | 0x3ff;
+                    TEXTURE_PIPELINE1(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
+
+                    c1 = COLOR_COMBINER(0);
+
+                    if( alpha_compare_success(c1, c2) )
+                    {
+                        int dith = dither_matrix_4x4[(((j >> 2) & 3) << 2) + (((i >> 2)^WORD_ADDR_XOR) & 3)];
+                        int cvg_ovf = 0;
+                        UINT8 cvg_old = 0;
+                        calculate_coverage( &cvg_buf[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR], cvg_span[i >> 2], &cvg_ovf, &cvg_old );
+                        if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
+                        {
+                            BLENDER1_16(&fb[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR], c1, dith, &cvg_span[i >> 2], &cvg_old, &alpha_reject);
+
+                            if( other_modes.z_update_en && other_modes.z_source_sel && !alpha_reject )
+                            {
+                                zb[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR] = primitive_z;
+                            }
+                        }
+                    }
                 }
 
-                FETCH_TEXEL(&c, (s-tile[rect->tilenum].sl) >> 10, (t-tile[rect->tilenum].tl) >> 10, twidth, tformat, tsize, tbase);
-            */
-				//ss = (s >> 10) - (tsl >> 2);
-				//if ((s & 0x3ff) >= 0x200) ss++;
-				//st = (t >> 10) - (ttl >> 2);
-				//if ((t & 0x3ff) >= 0x200) st++;
+                s += rect->dsdx;
+            }
 
-				//CLAMP(ss, st);
-				//FETCH_TEXEL(&c, ss, st, twidth, tformat, tsize, tbase);
+            t += rect->dtdy;
+        }
+    }
+    else if (other_modes.cycle_type == CYCLE_TYPE_2)
+    {
+        for (j = y1; j < y2; j += (j == y1) ? (4 - (y1 & 0x0003)): 4 )
+        {
+            int fb_index = (j >> 2) * fb_width;
 
-				TEXTURE_PIPELINE1(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
+            s = (int)(rect->s) << 5;
 
-				if (texel0_color.a != 0)
-				{
-					fb[(fb_index + i) ^ WORD_ADDR_XOR] = ((texel0_color.r >> 3) << 11) | ((texel0_color.g >> 3) << 6) | ((texel0_color.b >> 3) << 1);
-				}
+            memset( cvg_span, 0, RDP_CVG_SPAN_MAX );
 
-				s += rect->dsdx;
-			}
+            for (span_index = j; span_index < ((j &~ 0x0003) + 4) && span_index < y2; span_index++)
+            {
+                int span_start = x1;
+                int span_end = x2;
+                int span_iter = 0;
+                if (x1 < 0)
+                {
+                    span_start = 0;
+                }
+                if (x2 >= (RDP_CVG_SPAN_MAX << 2))
+                {
+                    span_end = (RDP_CVG_SPAN_MAX << 2) - 1;
+                }
+                for (span_iter=span_start; span_iter < span_end; span_iter++)
+                {
+                    if ((span_iter & 1) == (span_index & 1))
+                    {
+                        cvg_span[span_iter >> 2]++;
+                    }
+                }
+            }
 
-			t += rect->dtdy;
-		}
-	}
-	else
-	{
-		fatalerror("texture_rectangle_16bit: unknown cycle type %d\n", other_modes.cycle_type);
-	}
+            for (i = x1; i < x2; i += 4)
+            {
+                if (i >= 0 && i < (RDP_CVG_SPAN_MAX << 2) && cvg_span[i >> 2] > 0)
+                {
+                    TEXTURE_PIPELINE2(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
+
+                    c1 = COLOR_COMBINER(0);
+                    c2 = COLOR_COMBINER(1);
+
+                    if( alpha_compare_success(c1, c2) )
+                    {
+                        int dith = dither_matrix_4x4[((((j >> 2)) & 3) << 2) + (((i >> 2)^WORD_ADDR_XOR) & 3)];
+                        int cvg_ovf = 0;
+                        UINT8 cvg_old = 0;
+                        calculate_coverage( &cvg_buf[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR], cvg_span[i >> 2], &cvg_ovf, &cvg_old );
+                        if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
+                        {
+                            BLENDER2_16(&fb[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR], c1, c2, dith, &cvg_span[i >> 2], &cvg_old, &alpha_reject);
+
+                            if( other_modes.z_update_en && other_modes.z_source_sel && !alpha_reject )
+                            {
+                                zb[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR] = primitive_z;
+                            }
+                        }
+                    }
+                }
+
+                s += rect->dsdx;
+            }
+
+            t += rect->dtdy;
+        }
+    }
+    else if (other_modes.cycle_type == CYCLE_TYPE_COPY)
+    {
+        for (j = y1; j < y2; j += (j == y1) ? (4 - (y1 & 0x0003)): 4 )
+        {
+            int fb_index = (j >> 2) * fb_width;
+
+            s = (int)(rect->s) << 5;
+
+            memset( cvg_span, 0, RDP_CVG_SPAN_MAX );
+
+            for (span_index = j; span_index < ((j &~ 0x0003) + 4) && span_index < y2; span_index++)
+            {
+                int span_start = x1;
+                int span_end = x2;
+                int span_iter = 0;
+                if (x1 < 0)
+                {
+                    span_start = 0;
+                }
+                if (x2 >= (RDP_CVG_SPAN_MAX << 2))
+                {
+                    span_end = (RDP_CVG_SPAN_MAX << 2) - 1;
+                }
+                for (span_iter=span_start; span_iter < span_end; span_iter++)
+                {
+                    if ((span_iter & 1) == (span_index & 1))
+                    {
+                        cvg_span[span_iter >> 2]++;
+                    }
+                }
+            }
+
+            // MooglyGuy note: Fix this, this is probably completely wrong
+
+            for (i = x1; i < x2; i += 4)
+            {
+                if (i >= 0 && i < (RDP_CVG_SPAN_MAX << 2) && cvg_span[i >> 2] > 0)
+                {
+                    TEXTURE_PIPELINE1(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
+
+                    if( texel0_color.a != 0 )
+                    {
+                        int cvg_ovf = 0;
+                        UINT8 cvg_old = 0;
+                        calculate_coverage( &cvg_buf[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR], cvg_span[i >> 2], &cvg_ovf, &cvg_old );
+                        if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
+                        {
+                            fb[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR] = ((texel0_color.r >> 3) << 11) | ((texel0_color.g >> 3) << 6) | ((texel0_color.b >> 3) << 1) | ((cvg_buf[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR] - 1) >> 2);
+                            if( other_modes.z_update_en && other_modes.z_source_sel )
+                            {
+                                zb[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR] = primitive_z;
+                            }
+                        }
+                    }
+                }
+
+                s += rect->dsdx;
+            }
+
+            t += rect->dtdy;
+        }
+    }
+    else
+    {
+        fatalerror("texture_rectangle_16bit: unknown cycle type %d\n", other_modes.cycle_type);
+    }
 }
 
 /*****************************************************************************/
 
-INLINE void BLENDER1_32(UINT32 *fb, COLOR c)
+INLINE void BLENDER1_32(UINT32 *fb, COLOR c, UINT8 *new_cvg, UINT8 *old_cvg, int *alpha_reject)
 {
-	int r, g, b;
+    int r, g, b;
 
-	pixel_color.r = c.r;	inv_pixel_color.r = 0xff - c.r;
-	pixel_color.g = c.g;	inv_pixel_color.g = 0xff - c.g;
-	pixel_color.b = c.b;	inv_pixel_color.b = 0xff - c.b;
-	pixel_color.a = c.a;	inv_pixel_color.a = 0xff - c.a;
+    if( other_modes.force_blend )
+    {
+        blend_color.r = c.r;
+        blend_color.g = c.g;
+        blend_color.b = c.b;
+    }
 
-	if (other_modes.image_read_en)
-	{
-		UINT32 mem = *fb;
-		memory_color.r = ((mem >> 16) & 0xff);
-		memory_color.g = ((mem >>  8) & 0xff);
-		memory_color.b = ((mem >>  0) & 0xff);
-		memory_color.a = 0;
-	}
+    pixel_color.r = c.r;
+    pixel_color.g = c.g;
+    pixel_color.b = c.b;
+    pixel_color.a = c.a;
+    inv_pixel_color.r = 0xff - *blender1a_r[0];
+    inv_pixel_color.g = 0xff - *blender1a_g[0];
+    inv_pixel_color.b = 0xff - *blender1a_b[0];
+    inv_pixel_color.a = 0xff - *blender1b_a[0];
 
-	r = (((int)(*blender1a_r[0]) * (int)(*blender1b_a[0])) >> 8) +
-		(((int)(*blender2a_r[0]) * (int)(*blender2b_a[0])) >> 8);
+    if( other_modes.alpha_cvg_select )
+    {
+        if( other_modes.cvg_times_alpha )
+        {
+            pixel_color.a = (UINT8)( ( (INT32)(c.a) * (INT32)( (*new_cvg) * 0x20 - 1 ) ) >> 8 );
+        }
+        else
+        {
+            pixel_color.a = (UINT8)( (INT32)(*new_cvg) * 0x20 - 1 );
+        }
 
-	g = (((int)(*blender1a_g[0]) * (int)(*blender1b_a[0])) >> 8) +
-		(((int)(*blender2a_g[0]) * (int)(*blender2b_a[0])) >> 8);
+        if( pixel_color.a == 0 )
+        {
+            *alpha_reject = 1;
+            return;
+        }
+    }
 
-	b = (((int)(*blender1a_b[0]) * (int)(*blender1b_a[0])) >> 8) +
-		(((int)(*blender2a_b[0]) * (int)(*blender2b_a[0])) >> 8);
+    if (other_modes.image_read_en)
+    {
+        UINT32 mem = *fb;
+        memory_color.r = ((mem >> 24) & 0xff);
+        memory_color.g = ((mem >> 16) & 0xff);
+        memory_color.b = ((mem >>  8) & 0xff);
+        memory_color.a = /*(UINT8)((INT32)(*old_cvg) * 0x20 - 1)*/0;
+    }
 
-	//r = g = b = 0xff;
+    if (((int)(*blender1b_a[0]) + (int)(*blender2b_a[0])) > 0)
+    {
+        r = ((int)(*blender1a_r[0]) * (int)(*blender1b_a[0]) +
+             (int)(*blender2a_r[0]) * (int)(*blender2b_a[0])) /
+            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
 
-	if (r > 255) r = 255;
-	if (g > 255) g = 255;
-	if (b > 255) b = 255;
+        g = ((int)(*blender1a_g[0]) * (int)(*blender1b_a[0]) +
+             (int)(*blender2a_g[0]) * (int)(*blender2b_a[0])) /
+            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
 
-	*fb = (r << 16) | (g << 8) | b;
+        b = ((int)(*blender1a_b[0]) * (int)(*blender1b_a[0]) +
+             (int)(*blender2a_b[0]) * (int)(*blender2b_a[0])) /
+            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
+    }
+    else
+    {
+        r = g = b = 0;
+    }
+
+    //r = g = b = 0xff;
+
+    if (r > 255) r = 255;
+    if (g > 255) g = 255;
+    if (b > 255) b = 255;
+
+    *fb = (r << 24) | (g << 16) | (b << 8) | 0xe0;
 }
 
-INLINE void BLENDER2_32(UINT32 *fb, COLOR c1, COLOR c2)
+INLINE void BLENDER2_32(UINT32 *fb, COLOR c1, COLOR c2, UINT8 *new_cvg, UINT8 *old_cvg, int *alpha_reject)
 {
-	int r, g, b;
+    int r, g, b;
 
-	pixel_color.r = c1.r;	inv_pixel_color.r = 0xff - c1.r;
-	pixel_color.g = c1.g;	inv_pixel_color.g = 0xff - c1.g;
-	pixel_color.b = c1.b;	inv_pixel_color.b = 0xff - c1.b;
-	pixel_color.a = c1.a;	inv_pixel_color.a = 0xff - c1.a;
+    if( other_modes.force_blend )
+    {
+        blend_color.r = c2.r;
+        blend_color.g = c2.g;
+        blend_color.b = c2.b;
+    }
 
-	if (other_modes.image_read_en)
-	{
-		UINT32 mem = *fb;
-		memory_color.r = ((mem >> 16) & 0xff);
-		memory_color.g = ((mem >>  8) & 0xff);
-		memory_color.b = ((mem >>  0) & 0xff);
-		memory_color.a = 0;
-	}
+    pixel_color.r = c2.r;
+    pixel_color.g = c2.g;
+    pixel_color.b = c2.b;
+    pixel_color.a = c2.a;
+    inv_pixel_color.r = 0xff - *blender1a_r[0];
+    inv_pixel_color.g = 0xff - *blender1a_g[0];
+    inv_pixel_color.b = 0xff - *blender1a_b[0];
+    inv_pixel_color.a = 0xff - *blender1b_a[0];
 
-	r = (((int)(*blender1a_r[0]) * (int)(*blender1b_a[0])) >> 8) +
-		(((int)(*blender2a_r[0]) * (int)(*blender2b_a[0])) >> 8);
+    if( other_modes.alpha_cvg_select )
+    {
+        if( other_modes.cvg_times_alpha )
+        {
+            pixel_color.a = (UINT8)( ( (INT32)(c2.a) * (INT32)( (*new_cvg) * 0x20 - 1 ) ) >> 8 );
+        }
+        else
+        {
+            pixel_color.a = (UINT8)( (INT32)(*new_cvg) * 0x20 - 1 );
+        }
 
-	g = (((int)(*blender1a_g[0]) * (int)(*blender1b_a[0])) >> 8) +
-		(((int)(*blender2a_g[0]) * (int)(*blender2b_a[0])) >> 8);
+        if( pixel_color.a == 0 )
+        {
+            *alpha_reject = 1;
+            return;
+        }
+    }
 
-	b = (((int)(*blender1a_b[0]) * (int)(*blender1b_a[0])) >> 8) +
-		(((int)(*blender2a_b[0]) * (int)(*blender2b_a[0])) >> 8);
+    if (other_modes.image_read_en)
+    {
+        UINT32 mem = *fb;
+        memory_color.r = ((mem >> 24) & 0xff);
+        memory_color.g = ((mem >> 16) & 0xff);
+        memory_color.b = ((mem >>  8) & 0xff);
+        memory_color.a = /*(UINT8)((INT32)(*old_cvg) * 0x20 - 1)*/0;
+    }
 
-	blended_pixel_color.r = r;
-	blended_pixel_color.g = g;
-	blended_pixel_color.b = b;
+    if (((int)(*blender1b_a[0]) + (int)(*blender2b_a[0])) > 0)
+    {
+        r = ((int)(*blender1a_r[0]) * (int)(*blender1b_a[0]) +
+             (int)(*blender2a_r[0]) * (int)(*blender2b_a[0])) /
+            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
 
-	pixel_color.r = c2.r;	inv_pixel_color.r = 0xff - c2.r;
-	pixel_color.g = c2.g;	inv_pixel_color.g = 0xff - c2.g;
-	pixel_color.b = c2.b;	inv_pixel_color.b = 0xff - c2.b;
-	pixel_color.a = c2.a;	inv_pixel_color.a = 0xff - c2.a;
+        g = ((int)(*blender1a_g[0]) * (int)(*blender1b_a[0]) +
+             (int)(*blender2a_g[0]) * (int)(*blender2b_a[0])) /
+            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
 
-	r = (((int)(*blender1a_r[1]) * (int)(*blender1b_a[1])) >> 8) +
-		(((int)(*blender2a_r[1]) * (int)(*blender2b_a[1])) >> 8);
+        b = ((int)(*blender1a_b[0]) * (int)(*blender1b_a[0]) +
+             (int)(*blender2a_b[0]) * (int)(*blender2b_a[0])) /
+            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
+    }
+    else
+    {
+        r = g = b = 0;
+    }
 
-	g = (((int)(*blender1a_g[1]) * (int)(*blender1b_a[1])) >> 8) +
-		(((int)(*blender2a_g[1]) * (int)(*blender2b_a[1])) >> 8);
+    blended_pixel_color.r = r;
+    blended_pixel_color.g = g;
+    blended_pixel_color.b = b;
 
-	b = (((int)(*blender1a_b[1]) * (int)(*blender1b_a[1])) >> 8) +
-		(((int)(*blender2a_b[1]) * (int)(*blender2b_a[1])) >> 8);
+    pixel_color.r = c2.r;
+    pixel_color.g = c2.g;
+    pixel_color.b = c2.b;
+    pixel_color.a = c2.a;
+    if( other_modes.alpha_cvg_select )
+    {
+        if( other_modes.cvg_times_alpha )
+        {
+            pixel_color.a = (UINT8)( ( (INT32)(c2.a) * (INT32)( (*new_cvg) * 0x20 - 1 ) ) >> 8 );
+        }
+        else
+        {
+            pixel_color.a = (UINT8)( (INT32)(*new_cvg) * 0x20 - 1 );
+        }
 
-	if (r > 255) r = 255;
-	if (g > 255) g = 255;
-	if (b > 255) b = 255;
+        if( pixel_color.a == 0 )
+        {
+            *alpha_reject = 1;
+            return;
+        }
+    }
+    inv_pixel_color.r = 0xff - *blender1a_r[0];
+    inv_pixel_color.g = 0xff - *blender1a_g[0];
+    inv_pixel_color.b = 0xff - *blender1a_b[0];
+    inv_pixel_color.a = 0xff - *blender1b_a[0];
 
-	*fb = (r << 16) | (g << 8) | b;
+    if (((int)(*blender1b_a[1]) + (int)(*blender2b_a[1])) > 0)
+    {
+        r = ((int)(*blender1a_r[1]) * (int)(*blender1b_a[1]) +
+             (int)(*blender2a_r[1]) * (int)(*blender2b_a[1])) /
+            ((int)(*blender1b_a[1]) + (int)(*blender2b_a[1]));
+
+        g = ((int)(*blender1a_g[1]) * (int)(*blender1b_a[1]) +
+             (int)(*blender2a_g[1]) * (int)(*blender2b_a[1])) /
+            ((int)(*blender1b_a[1]) + (int)(*blender2b_a[1]));
+
+        b = ((int)(*blender1a_b[1]) * (int)(*blender1b_a[1]) +
+             (int)(*blender2a_b[1]) * (int)(*blender2b_a[1])) /
+            ((int)(*blender1b_a[1]) + (int)(*blender2b_a[1]));
+    }
+    else
+    {
+        r = g = b = 0;
+    }
+
+    if (r > 255) r = 255;
+    if (g > 255) g = 255;
+    if (b > 255) b = 255;
+
+    *fb = (r << 24) | (g << 16) | (b << 8) | 0xe0;
 }
 
 static void fill_rectangle_32bit(RECTANGLE *rect)
 {
-	UINT32 *fb = (UINT32*)&rdram[(fb_address / 4)];
-	int index, i, j;
-	int x1 = rect->xh / 4;
-	int x2 = rect->xl / 4;
-	int y1 = rect->yh / 4;
-	int y2 = rect->yl / 4;
-	int clipx1, clipx2, clipy1, clipy2;
+    UINT32 *fb = (UINT32*)&rdram[(fb_address / 4)];
+    UINT8* cvg_buf = (UINT8*)&cvg_mem[fb_address];
+    int index, i, j;
+    int x1 = rect->xh / 4;
+    int x2 = rect->xl / 4;
+    int y1 = rect->yh / 4;
+    int y2 = rect->yl / 4;
+    int clipx1, clipx2, clipy1, clipy2;
+    int alpha_reject = 0;
+    COLOR c1, c2;
+    c1.r = c1.g = c1.b = c1.a = 0;
+    c2.r = c2.g = c2.b = c2.a = 0;
 
-	// TODO: clip
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
+    // TODO: clip
+    clipx1 = clip.xh / 4;
+    clipx2 = clip.xl / 4;
+    clipy1 = clip.yh / 4;
+    clipy2 = clip.yl / 4;
 
-	// clip
-	if (x1 < clipx1)
-	{
-		x1 = clipx1;
-	}
-	if (y1 < clipy1)
-	{
-		y1 = clipy1;
-	}
-	if (x2 >= clipx2)
-	{
-		x2 = clipx2-1;
-	}
-	if (y2 >= clipy2)
-	{
-		y2 = clipy2-1;
-	}
+    // clip
+    if (x1 < clipx1)
+    {
+        x1 = clipx1;
+    }
+    if (y1 < clipy1)
+    {
+        y1 = clipy1;
+    }
+    if (x2 >= clipx2)
+    {
+        x2 = clipx2-1;
+    }
+    if (y2 >= clipy2)
+    {
+        y2 = clipy2-1;
+    }
 
-	if (other_modes.cycle_type == CYCLE_TYPE_FILL)
-	{
-		for (j=y1; j <= y2; j++)
-		{
-			index = j * fb_width;
-			for (i=x1; i <= x2; i++)
-			{
-				fb[(index + i) ^ 1] = fill_color;
-			}
-		}
-	}
-	else if (other_modes.cycle_type == CYCLE_TYPE_1)
-	{
-		shade_color.r = prim_color.r;
-		shade_color.g = prim_color.g;
-		shade_color.b = prim_color.b;
-		shade_color.a = prim_color.a;
+    if (other_modes.cycle_type == CYCLE_TYPE_FILL)
+    {
+        for (j=y1; j <= y2; j++)
+        {
+            index = j * fb_width;
+            for (i=x1; i <= x2; i++)
+            {
+                cvg_buf[(index + i)] = (fill_color & 0x000000ff) ? 8 : 1; // Wrong
+                fb[(index + i) ^ 1] = fill_color;
+            }
+        }
+    }
+    else if (other_modes.cycle_type == CYCLE_TYPE_1)
+    {
+        shade_color.r = prim_color.r;
+        shade_color.g = prim_color.g;
+        shade_color.b = prim_color.b;
+        shade_color.a = prim_color.a;
 
-		for (j=y1; j <= y2; j++)
-		{
-			index = j * fb_width;
-			for (i=x1; i <= x2; i++)
-			{
-				COLOR c = COLOR_COMBINER(0);
+        for (j=y1; j <= y2; j++)
+        {
+            index = j * fb_width;
+            for (i=x1; i <= x2; i++)
+            {
+                c1 = COLOR_COMBINER(0);
 
-				BLENDER1_32(&fb[(index + i)], c);
-			}
-		}
-	}
-	else if (other_modes.cycle_type == CYCLE_TYPE_2)
-	{
-		shade_color.r = prim_color.r;
-		shade_color.g = prim_color.g;
-		shade_color.b = prim_color.b;
-		shade_color.a = prim_color.a;
+                cvg_buf[(index + i)] = 8; // Wrong
+                BLENDER1_32(&fb[(index + i)], c1, &cvg_buf[(index + i)], &cvg_buf[(index + i)], &alpha_reject);
+            }
+        }
+    }
+    else if (other_modes.cycle_type == CYCLE_TYPE_2)
+    {
+        shade_color.r = prim_color.r;
+        shade_color.g = prim_color.g;
+        shade_color.b = prim_color.b;
+        shade_color.a = prim_color.a;
 
-		for (j=y1; j <= y2; j++)
-		{
-			index = j * fb_width;
-			for (i=x1; i <= x2; i++)
-			{
-				COLOR c1 = COLOR_COMBINER(0);
-				COLOR c2 = COLOR_COMBINER(1);
+        for (j=y1; j <= y2; j++)
+        {
+            index = j * fb_width;
+            for (i=x1; i <= x2; i++)
+            {
+                c1 = COLOR_COMBINER(0);
+                c2 = COLOR_COMBINER(1);
 
-				BLENDER2_32(&fb[(index + i)], c1, c2);
-			}
-		}
-	}
-	else
-	{
-		fatalerror("fill_rectangle_32bit: cycle type copy");
-	}
+                cvg_buf[(index + i)] = 8; // Wrong
+                BLENDER2_32(&fb[(index + i)], c1, c2, &cvg_buf[(index + i)], &cvg_buf[(index + i)], &alpha_reject);
+            }
+        }
+    }
+    else
+    {
+        fatalerror("fill_rectangle_32bit: cycle type copy");
+    }
 }
 
 static void texture_rectangle_32bit(TEX_RECTANGLE *rect)
 {
-	UINT32 *fb = (UINT32*)&rdram[(fb_address / 4)];
-	int i, j;
-	int x1, x2, y1, y2;
-	int tsl, tsh, ttl, tth;
-	int s, t;
-	int twidth, tformat, tsize, tbase;
-	int clamp_s, clamp_t, mask_s, mask_t, mirror_s, mirror_t;
-	int clipx1, clipx2, clipy1, clipy2;
+    UINT32 *fb = (UINT32*)&rdram[(fb_address / 4)];
+    UINT16 *zb = (UINT16*)&rdram[(zb_address / 4)];
+    UINT8* cvg_buf = (UINT8*)&cvg_mem[fb_address];
+    int i, j;
+    int x1, x2, y1, y2;
+    int tsl[2], tsh[2], ttl[2], tth[2];
+    int s, t;
+    int twidth[2], tformat[2], tsize[2], tbase[2], tpal[2];
+    int clamp_s[2], clamp_t[2], mask_s[2], mask_t[2], mirror_s[2], mirror_t[2];
+    int clipx1, clipx2, clipy1, clipy2;
+    int cycle;
+    UINT8 cvg_span[RDP_CVG_SPAN_MAX];
+    int span_index = 0;
+    int alpha_reject = 0;
+    COLOR c1, c2;
+    c1.r = c1.g = c1.b = c1.a = 0;
+    c2.r = c2.g = c2.b = c2.a = 0;
 
-	x1 = (rect->xh / 4);
-	x2 = (rect->xl / 4);
-	y1 = (rect->yh / 4);
-	y2 = (rect->yl / 4);
+    x1 = rect->xh;
+    x2 = rect->xl;
+    y1 = rect->yh;
+    y2 = rect->yl;
 
-	if (other_modes.cycle_type == CYCLE_TYPE_FILL || other_modes.cycle_type == CYCLE_TYPE_COPY)
-	{
-		rect->dsdx /= 4;
-		x2 += 1;
-		y2 += 1;
-	}
+    if (other_modes.cycle_type == CYCLE_TYPE_FILL || other_modes.cycle_type == CYCLE_TYPE_COPY)
+    {
+        rect->dsdx /= 4;
+        x2 += 1;
+        y2 += 1;
+    }
 
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
+    clipx1 = clip.xh;
+    clipx2 = clip.xl;
+    clipy1 = clip.yh;
+    clipy2 = clip.yl;
 
-	// clip
-	if (x1 < clipx1)
-	{
-		x1 = clipx1;
-	}
-	if (y1 < clipy1)
-	{
-		y1 = clipy1;
-	}
-	if (x2 >= clipx2)
-	{
-		x2 = clipx2-1;
-	}
-	if (y2 >= clipy2)
-	{
-		y2 = clipy2-1;
-	}
+    // clip
+    if (x1 < clipx1)
+    {
+        x1 = clipx1;
+    }
+    if (y1 < clipy1)
+    {
+        y1 = clipy1;
+    }
+    if (x2 >= clipx2)
+    {
+        x2 = clipx2-1;
+    }
+    if (y2 >= clipy2)
+    {
+        y2 = clipy2-1;
+    }
 
-	tsl = tile[rect->tilenum].sl;
-	tsh = tile[rect->tilenum].sh;
-	ttl = tile[rect->tilenum].tl;
-	tth = tile[rect->tilenum].th;
+    for( cycle = 0; cycle < 2; cycle++ )
+    {
+        tsl[cycle] = tile[rect->tilenum + cycle].sl;
+        tsh[cycle] = tile[rect->tilenum + cycle].sh;
+        ttl[cycle] = tile[rect->tilenum + cycle].tl;
+        tth[cycle] = tile[rect->tilenum + cycle].th;
 
-	twidth = tile[rect->tilenum].line;
-	tformat = tile[rect->tilenum].format;
-	tsize = tile[rect->tilenum].size;
-	tbase = tile[rect->tilenum].tmem;
+        twidth[cycle] = tile[rect->tilenum + cycle].line;
+        tformat[cycle] = tile[rect->tilenum + cycle].format;
+        tsize[cycle] = tile[rect->tilenum + cycle].size;
+        tbase[cycle] = tile[rect->tilenum + cycle].tmem;
+        tpal[cycle] = tile[rect->tilenum + cycle].palette;
 
-    clamp_t = tile[rect->tilenum].ct;
-    clamp_s = tile[rect->tilenum].cs;
+        clamp_t[cycle] = tile[rect->tilenum + cycle].ct;
+        clamp_s[cycle] = tile[rect->tilenum + cycle].cs;
 
-	mirror_t = tile[rect->tilenum].mt;
-	mirror_s = tile[rect->tilenum].ms;
-	mask_t = tile[rect->tilenum].mask_t;
-	mask_s = tile[rect->tilenum].mask_s;
+        mirror_t[cycle] = tile[rect->tilenum + cycle].mt;
+        mirror_s[cycle] = tile[rect->tilenum + cycle].ms;
+        mask_t[cycle] = tile[rect->tilenum + cycle].mask_t;
+        mask_s[cycle] = tile[rect->tilenum + cycle].mask_s;
+    }
 
-	t = (int)(rect->t) << 5;
+    t = (int)(rect->t) << 5;
 
-	if (other_modes.cycle_type == CYCLE_TYPE_1 || other_modes.cycle_type == CYCLE_TYPE_2)
-	{
-	}
+    if (other_modes.cycle_type == CYCLE_TYPE_1)
+    {
+        for (j = y1; j < y2; j += ((j == y1) ? (4 - (y1 & 0x0003)) : 4) )
+        {
+            int fb_index = (j >> 2) * fb_width;
 
-	if (other_modes.cycle_type == CYCLE_TYPE_1)
-	{
-		for (j = y1; j < y2; j++)
-		{
-			int fb_index = j * fb_width;
+            s = (int)(rect->s) << 5;
 
-			s = (int)(rect->s) << 5;
+            memset( cvg_span, 0, RDP_CVG_SPAN_MAX );
 
-			for (i = x1; i < x2; i++)
-			{
-				COLOR c;
+            for (span_index = j; span_index < ((j &~ 0x0003) + 4) && span_index < y2; span_index++)
+            {
+                int span_start = x1;
+                int span_end = x2;
+                int span_iter = 0;
+                if (x1 < 0)
+                {
+                    span_start = 0;
+                }
+                if (x2 >= (RDP_CVG_SPAN_MAX << 2))
+                {
+                    span_end = (RDP_CVG_SPAN_MAX << 2) - 1;
+                }
+                //printf( "%d: Span from %d to %d\n", j, span_start, span_end );
+                for (span_iter=span_start; span_iter < span_end; span_iter++)
+                {
+                    if ((span_iter & 1) == (span_index & 1))
+                    {
+                        cvg_span[span_iter >> 2]++;
+                    }
+                }
+            }
 
-				//ss = (s >> 10) - (tsl >> 2);
-				//if ((s & 0x3ff) >= 0x200) ss++;
-				//st = (t >> 10) - (ttl >> 2);
-				//if ((t & 0x3ff) >= 0x200) st++;
+            for (i = x1; i < x2; i += 4)
+            {
+                if (i >= 0 && i < (RDP_CVG_SPAN_MAX << 2) && cvg_span[i >> 2] > 0)
+                {
+                    TEXTURE_PIPELINE1(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
 
-				//CLAMP(ss, st);
-				//FETCH_TEXEL(&texel0_color, ss, st, twidth, tformat, tsize, tbase);
+                    c1 = COLOR_COMBINER(0);
 
-				TEXTURE_PIPELINE1(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
+                    if( alpha_compare_success(c1, c2) )
+                    {
+                        int cvg_ovf = 0;
+                        UINT8 cvg_old = 0;
+                        calculate_coverage( &cvg_buf[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR], cvg_span[i >> 2], &cvg_ovf, &cvg_old );
+                        if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
+                        {
+                            BLENDER1_32(&fb[(fb_index + (i >> 2))], c1, &cvg_span[i >> 2], &cvg_old, &alpha_reject);
 
-				c = COLOR_COMBINER(0);
+                            if( other_modes.z_update_en && other_modes.z_source_sel && !alpha_reject )
+                            {
+                                zb[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR] = primitive_z;
+                            }
+                        }
+                    }
+                }
 
-				BLENDER1_32(&fb[(fb_index + i)], c);
+                s += rect->dsdx;
+            }
 
-				s += rect->dsdx;
-			}
+            t += rect->dtdy;
+        }
+    }
+    else if (other_modes.cycle_type == CYCLE_TYPE_2)
+    {
+        for (j = y1; j < y2; j += (j == y1) ? (4 - (y1 & 0x0003)): 4 )
+        {
+            int fb_index = (j >> 2) * fb_width;
 
-			t += rect->dtdy;
-		}
-	}
-	else if (other_modes.cycle_type == CYCLE_TYPE_2)
-	{
-		for (j = y1; j < y2; j++)
-		{
-			int fb_index = j * fb_width;
+            s = (int)(rect->s) << 5;
 
-			s = (int)(rect->s) << 5;
+            memset( cvg_span, 0, RDP_CVG_SPAN_MAX );
 
-			for (i = x1; i < x2; i++)
-			{
-				COLOR c1, c2;
+            for (span_index = j; span_index < ((j &~ 0x0003) + 4) && span_index < y2; span_index++)
+            {
+                int span_start = x1;
+                int span_end = x2;
+                int span_iter = 0;
+                if (x1 < 0)
+                {
+                    span_start = 0;
+                }
+                if (x2 >= (RDP_CVG_SPAN_MAX << 2))
+                {
+                    span_end = (RDP_CVG_SPAN_MAX << 2) - 1;
+                }
+                for (span_iter=span_start; span_iter < span_end; span_iter++)
+                {
+                    if ((span_iter & 1) == (span_index & 1))
+                    {
+                        cvg_span[span_iter >> 2]++;
+                    }
+                }
+            }
 
-				//ss = (s >> 10) - (tsl >> 2);
-				//if ((s & 0x3ff) >= 0x200) ss++;
-				//st = (t >> 10) - (ttl >> 2);
-				//if ((t & 0x3ff) >= 0x200) st++;
+            for (i = x1; i < x2; i += 4)
+            {
+                if (i >= 0 && i < (RDP_CVG_SPAN_MAX << 2) && cvg_span[i >> 2] > 0)
+                {
+                    TEXTURE_PIPELINE2(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
 
-				//CLAMP(ss, st);
-				//FETCH_TEXEL(&texel0_color, ss, st, twidth, tformat, tsize, tbase);
-				//FETCH_TEXEL(&texel1_color, ss, st, twidth, tformat, tsize, tbase);
+                    c1 = COLOR_COMBINER(0);
+                    c2 = COLOR_COMBINER(1);
 
-				TEXTURE_PIPELINE2(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
+                    if( alpha_compare_success(c1, c2) )
+                    {
+                        int cvg_ovf = 0;
+                        UINT8 cvg_old = 0;
+                        calculate_coverage( &cvg_buf[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR], cvg_span[i >> 2], &cvg_ovf, &cvg_old );
+                        if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
+                        {
+                            BLENDER2_32(&fb[fb_index + (i >> 2)], c1, c2, &cvg_span[i >> 2], &cvg_old, &alpha_reject);
 
-				c1 = COLOR_COMBINER(0);
-				c2 = COLOR_COMBINER(1);
+                            if( other_modes.z_update_en && other_modes.z_source_sel && !alpha_reject )
+                            {
+                                zb[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR] = primitive_z;
+                            }
+                        }
+                    }
+                }
 
-				BLENDER2_32(&fb[(fb_index + i)], c1, c2);
+                s += rect->dsdx;
+            }
 
-				s += rect->dsdx;
-			}
+            t += rect->dtdy;
+        }
+    }
+    else if (other_modes.cycle_type == CYCLE_TYPE_COPY)
+    {
+        for (j = y1; j < y2; j++)
+        {
+            int fb_index = j * fb_width;
 
-			t += rect->dtdy;
-		}
-	}
-	else if (other_modes.cycle_type == CYCLE_TYPE_COPY)
-	{
-		for (j = y1; j < y2; j++)
-		{
-			int fb_index = j * fb_width;
+            s = (int)(rect->s) << 5;
 
-			s = (int)(rect->s) << 5;
+            // MooglyGuy note: This is probably completely wrong, fix it
 
-			for (i = x1; i < x2; i++)
-			{
-			/*
+            for (i = x1; i < x2; i++)
+            {
+            /*
                 if (clamp_s)
                 {
                     if (s < (tsl << 8)) s = (tsl << 8);
@@ -1675,796 +2478,864 @@ static void texture_rectangle_32bit(TEX_RECTANGLE *rect)
                 if (mask_t)
                 {
                     t &= (((UINT32)(0xffffffff) >> (32-mask_t)) << 10) | 0x3ff;
-                }
+
 
                 FETCH_TEXEL(&c, (s-tile[rect->tilenum].sl) >> 10, (t-tile[rect->tilenum].tl) >> 10, twidth, tformat, tsize, tbase);
             */
-				//ss = (s >> 10) - (tsl >> 2);
-				//if ((s & 0x3ff) >= 0x200) ss++;
-				//st = (t >> 10) - (ttl >> 2);
-				//if ((t & 0x3ff) >= 0x200) st++;
+                //ss = (s >> 10) - (tsl >> 2);
+                //if ((s & 0x3ff) >= 0x200) ss++;
+                //st = (t >> 10) - (ttl >> 2);
+                //if ((t & 0x3ff) >= 0x200) st++;
 
-				TEXTURE_PIPELINE1(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
+                TEXTURE_PIPELINE1(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
 
-				//CLAMP(ss, st);
-				//FETCH_TEXEL(&c, ss, st, twidth, tformat, tsize, tbase);
+                //CLAMP(ss, st);
+                //FETCH_TEXEL(&c, ss, st, twidth, tformat, tsize, tbase);
 
-				if (texel0_color.a != 0)
-				{
-					fb[(fb_index + i) ^ WORD_ADDR_XOR] = (texel0_color.r << 16) | (texel0_color.g << 8) | (texel0_color.b << 0);
-				}
+                if (texel0_color.a != 0)
+                {
+                    fb[(fb_index + i) ^ WORD_ADDR_XOR] = (texel0_color.r << 24) | (texel0_color.g << 16) | (texel0_color.b << 8) | 0xe0;
+                }
 
-				s += rect->dsdx;
-			}
+                s += rect->dsdx;
+            }
 
-			t += rect->dtdy;
-		}
-	}
-	else
-	{
-		fatalerror("texture_rectangle_32bit: unknown cycle type %d\n", other_modes.cycle_type);
-	}
+            t += rect->dtdy;
+        }
+    }
+    else
+    {
+        fatalerror("texture_rectangle_32bit: unknown cycle type %d\n", other_modes.cycle_type);
+    }
 }
 
 
 static void render_spans_32(int start, int end, int tilenum, int shade, int texture, int zbuffer, int flip)
 {
-	UINT32 *fb = (UINT32*)&rdram[fb_address / 4];
-	UINT16 *zb = (UINT16*)&rdram[zb_address / 4];
-	int i, j;
-	int tsl, tsh, ttl, tth;
-	int twidth, tformat, tsize, tbase;
-	int clamp_s, clamp_t, mask_s, mask_t, mirror_s, mirror_t;
+    UINT32 *fb = (UINT32*)&rdram[fb_address / 4];
+    UINT16 *zb = (UINT16*)&rdram[zb_address / 4];
+    UINT8* cvg_buf = (UINT8*)&cvg_mem[fb_address];
+    int i, j;
+    int tsl[2], tsh[2], ttl[2], tth[2];
+    int twidth[2], tformat[2], tsize[2], tbase[2], tpal[2];
+    int clamp_s[2], clamp_t[2], mask_s[2], mask_t[2], mirror_s[2], mirror_t[2];
+    int cycle;
+    int alpha_reject = 0;
 
-	int clipx1, clipx2, clipy1, clipy2;
+    int clipx1, clipx2, clipy1, clipy2;
 
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
+    clipx1 = clip.xh / 4;
+    clipx2 = clip.xl / 4;
+    clipy1 = clip.yh / 4;
+    clipy2 = clip.yl / 4;
 
-	tsl = tile[tilenum].sl;
-	tsh = tile[tilenum].sh;
-	ttl = tile[tilenum].tl;
-	tth = tile[tilenum].th;
+    for( cycle = 0; cycle < 2; cycle++ )
+    {
+        tsl[cycle] = tile[tilenum + cycle].sl;
+        tsh[cycle] = tile[tilenum + cycle].sh;
+        ttl[cycle] = tile[tilenum + cycle].tl;
+        tth[cycle] = tile[tilenum + cycle].th;
 
-	twidth = tile[tilenum].line;
-	tformat = tile[tilenum].format;
-	tsize = tile[tilenum].size;
-	tbase = tile[tilenum].tmem;
+        twidth[cycle] = tile[tilenum + cycle].line;
+        tformat[cycle] = tile[tilenum + cycle].format;
+        tsize[cycle] = tile[tilenum + cycle].size;
+        tbase[cycle] = tile[tilenum + cycle].tmem;
+        tpal[cycle] = tile[tilenum + cycle].palette;
 
-	clamp_t = tile[tilenum].ct;
-	clamp_s = tile[tilenum].cs;
-	mirror_t = tile[tilenum].mt;
-	mirror_s = tile[tilenum].ms;
-	mask_t = tile[tilenum].mask_t;
-	mask_s = tile[tilenum].mask_s;
+        clamp_t[cycle] = tile[tilenum + cycle].ct;
+        clamp_s[cycle] = tile[tilenum + cycle].cs;
+        mirror_t[cycle] = tile[tilenum + cycle].mt;
+        mirror_s[cycle] = tile[tilenum + cycle].ms;
+        mask_t[cycle] = tile[tilenum + cycle].mask_t;
+        mask_s[cycle] = tile[tilenum + cycle].mask_s;
+    }
 
-	if (start < clipy1)
-	{
-		start = clipy1;
-	}
-	if (start >= clipy2)
-	{
-		start = clipy2-1;
-	}
-	if (end < clipy1)
-	{
-		end = clipy1;
-	}
-	if (end >= clipy2)
-	{
-		end = clipy2-1;
-	}
+    if (start < clipy1)
+    {
+        start = clipy1;
+    }
+    if (start >= clipy2)
+    {
+        start = clipy2-1;
+    }
+    if (end < clipy1)
+    {
+        end = clipy1;
+    }
+    if (end >= clipy2)
+    {
+        end = clipy2-1;
+    }
 
-	for (i=start; i <= end; i++)
-	{
-		int xstart = span[i].lx;
-		int xend = span[i].rx;
-		int r = span[i].r;
-		int g = span[i].g;
-		int b = span[i].b;
-		int a = span[i].a;
-		int z = span[i].z;
-		int s = span[i].s;
-		int t = span[i].t;
-		int w = span[i].w;
-		int dr = span[i].dr;
-		int dg = span[i].dg;
-		int db = span[i].db;
-		int da = span[i].da;
-		int dz = span[i].dz;
-		int ds = span[i].ds;
-		int dt = span[i].dt;
-		int dw = span[i].dw;
-		int drinc, dginc, dbinc, dainc, dzinc, dsinc, dtinc, dwinc;
+    for (i=start; i <= end; i++)
+    {
+        int xstart = span[i].lx;
+        int xend = span[i].rx;
+        int r = span[i].r;
+        int g = span[i].g;
+        int b = span[i].b;
+        int a = span[i].a;
+        int z = span[i].z;
+        int s = span[i].s;
+        int t = span[i].t;
+        int w = span[i].w;
+        int dr = span[i].dr;
+        int dg = span[i].dg;
+        int db = span[i].db;
+        int da = span[i].da;
+        int dz = span[i].dz;
+        int ds = span[i].ds;
+        int dt = span[i].dt;
+        int dw = span[i].dw;
+        int drinc, dginc, dbinc, dainc, dzinc, dsinc, dtinc, dwinc;
 
-		int x;
-		int xinc;
+        int x;
+        int xinc;
 
-		int fb_index = fb_width * i;
-		int length;
+        int fb_index = fb_width * i;
+        int length;
 
-		drinc = flip ? (dr) : -dr;
-		dginc = flip ? (dg) : -dg;
-		dbinc = flip ? (db) : -db;
-		dainc = flip ? (da) : -da;
-		dzinc = flip ? (dz) : -dz;
-		dsinc = flip ? (ds) : -ds;
-		dtinc = flip ? (dt) : -dt;
-		dwinc = flip ? (dw) : -dw;
+        drinc = flip ? (dr) : -dr;
+        dginc = flip ? (dg) : -dg;
+        dbinc = flip ? (db) : -db;
+        dainc = flip ? (da) : -da;
+        dzinc = flip ? (dz) : -dz;
+        dsinc = flip ? (ds) : -ds;
+        dtinc = flip ? (dt) : -dt;
+        dwinc = flip ? (dw) : -dw;
 
-		xinc = flip ? 1 : -1;
-		x = xend;
+        xinc = flip ? 1 : -1;
+        x = xend;
 
-		length = flip ? (xstart - xend) : (xend - xstart);
+        length = flip ? (xstart - xend) : (xend - xstart);
 
-		for (j=0; j <= length; j++)
-		{
-			int sr = r >> 16;
-			int sg = g >> 16;
-			int sb = b >> 16;
-			int sa = a >> 16;
-			int ss = s >> 16;
-			int st = t >> 16;
-			int sw = w >> 16;
-			UINT16 sz = z >> 16;
-			int oz;
-			int sss = 0, sst = 0;
+        for (j=0; j <= length; j++)
+        {
+            int sr = r >> 16;
+            int sg = g >> 16;
+            int sb = b >> 16;
+            int sa = a >> 16;
+            int ss = s >> 16;
+            int st = t >> 16;
+            int sw = w >> 16;
+            UINT16 sz = (other_modes.z_source_sel) ? primitive_z : (z >> 16);
+            int oz;
+            int sss = 0, sst = 0;
 
-			if (x >= clipx1 && x < clipx2)
-			{
-                //int alpha_out = 0;
-				COLOR c1, c2;
-				c1.r = c1.g = c1.b = c1.a = 0;
-				c2.r = c2.g = c2.b = c2.a = 0;
+            if (x >= clipx1 && x < clipx2)
+            {
+                COLOR c1, c2;
+                c1.r = c1.g = c1.b = c1.a = 0;
+                c2.r = c2.g = c2.b = c2.a = 0;
 
-				if ((z & 0xffff) >= 0x8000) sz++;
-				if ((w & 0xffff) >= 0x8000) sw++;
+                if ((z & 0xffff) >= 0x8000) sz++;
+                if ((w & 0xffff) >= 0x8000) sw++;
 
-				if (other_modes.persp_tex_en)
-				{
-					if (sw != 0)
-					{
-						sss = (((INT64)(ss) << 20) / sw);
-						sst = (((INT64)(st) << 20) / sw);
-					}
-				}
-				else
-				{
-					sss = ss;
-					sst = st;
-				}
-
-				if (sr > 0xff) sr = 0xff;	if (sg > 0xff) sg = 0xff;	if (sb > 0xff) sb = 0xff;
-
-				shade_color.r = sr; shade_color.g = sg; shade_color.b = sb; shade_color.a = sa;
-
-				if (texture)
-				{
-					/*if (other_modes.sample_type)
+                if (other_modes.persp_tex_en)
+                {
+                    if (sw != 0)
                     {
-                        // bilinear
+                        sss = (((INT64)(ss) << 20) / sw);
+                        sst = (((INT64)(st) << 20) / sw);
+                    }
+                }
+                else
+                {
+                    sss = ss;
+                    sst = st;
+                }
 
-                        sss1 = (sss >> 10) - (tsl >> 2);
-                        sss2 = sss1 + 1;
+                if (sr > 0xff) sr = 0xff;   if (sg > 0xff) sg = 0xff;   if (sb > 0xff) sb = 0xff;
 
-                        sst1 = (sst >> 10) - (ttl >> 2);
-                        sst2 = sst1 + 1;
+                shade_color.r = sr; shade_color.g = sg; shade_color.b = sb; shade_color.a = sa;
 
-                        CLAMP(sss1, sst1);
-                        CLAMP(sss2, sst2);
-
-                        FETCH_TEXEL(&t0, sss1, sst1, twidth, tformat, tsize, tbase);
-                        FETCH_TEXEL(&t1, sss2, sst1, twidth, tformat, tsize, tbase);
-                        FETCH_TEXEL(&t2, sss1, sst2, twidth, tformat, tsize, tbase);
-                        FETCH_TEXEL(&t3, sss2, sst2, twidth, tformat, tsize, tbase);
-
-                        texel0_color.r = (((( (t0.r * (0x3ff - (sss & 0x3ff))) + (t1.r * ((sss & 0x3ff))) ) >> 10) * (0x3ff - (sst & 0x3ff))) >> 10) +
-                                         (((( (t2.r * (0x3ff - (sss & 0x3ff))) + (t3.r * ((sss & 0x3ff))) ) >> 10) * ((sst & 0x3ff))) >> 10);
-
-                        texel0_color.g = (((( (t0.g * (0x3ff - (sss & 0x3ff))) + (t1.g * ((sss & 0x3ff))) ) >> 10) * (0x3ff - (sst & 0x3ff))) >> 10) +
-                                         (((( (t2.g * (0x3ff - (sss & 0x3ff))) + (t3.g * ((sss & 0x3ff))) ) >> 10) * ((sst & 0x3ff))) >> 10);
-
-                        texel0_color.b = (((( (t0.b * (0x3ff - (sss & 0x3ff))) + (t1.b * ((sss & 0x3ff))) ) >> 10) * (0x3ff - (sst & 0x3ff))) >> 10) +
-                                         (((( (t2.b * (0x3ff - (sss & 0x3ff))) + (t3.b * ((sss & 0x3ff))) ) >> 10) * ((sst & 0x3ff))) >> 10);
-
-                        texel0_color.a = (((( (t0.a * (0x3ff - (sss & 0x3ff))) + (t1.a * ((sss & 0x3ff))) ) >> 10) * (0x3ff - (sst & 0x3ff))) >> 10) +
-                                         (((( (t2.a * (0x3ff - (sss & 0x3ff))) + (t3.a * ((sss & 0x3ff))) ) >> 10) * ((sst & 0x3ff))) >> 10);
+                if (texture)
+                {
+                    if (other_modes.cycle_type == CYCLE_TYPE_1)
+                    {
+                        TEXTURE_PIPELINE1(sss, sst, other_modes.sample_type == 0);
                     }
                     else
                     {
-                        sss1 = (sss >> 10) - (tsl >> 2);
-                        if ((sss & 0x3ff) >= 0x200) sss1++;
-
-                        sst1 = (sst >> 10) - (ttl >> 2);
-                        if ((sst & 0x3ff) >= 0x200) sst1++;
-
-                        CLAMP(sss1, sst1);
-
-                        // point sample
-                        FETCH_TEXEL(&texel0_color, sss1, sst1, twidth, tformat, tsize, tbase);
-                    }*/
-
-					if (other_modes.cycle_type == CYCLE_TYPE_1)
-					{
-						TEXTURE_PIPELINE1(sss, sst, 0);
-					}
-					else
-					{
-						TEXTURE_PIPELINE2(sss, sst, 0);
-					}
-				}
-
-				if (other_modes.cycle_type == CYCLE_TYPE_1)
-				{
-					c1 = COLOR_COMBINER(0);
-                    if( c1.a == 0 )
-                    {
-                        //alpha_out = 1;
+                        TEXTURE_PIPELINE2(sss, sst, other_modes.sample_type == 0);
                     }
-				}
-				else if (other_modes.cycle_type == CYCLE_TYPE_2)
-				{
-					c1 = COLOR_COMBINER(0);
-					c2 = COLOR_COMBINER(1);
-                    if( c2.a == 0 )
-                    {
-                        //alpha_out = 1;
-                    }
-				}
+                }
 
-                /* SGINUT 1/6/08: This fixes things in some games and breaks things in others.
-                                  I believe the pixels should be discarded based on the alpha
-                                  value stored in memory, but alpha and coverage are stored in
-                                  anciliary bits in the framebuffer which are not currently
-                                  emulated by MESS. */
-                if( /*!alpha_out*/ 1 )
+                if (other_modes.cycle_type == CYCLE_TYPE_1)
                 {
-                    oz = (UINT16)zb[(fb_index + x) ^ WORD_ADDR_XOR];
-                    if (zbuffer)
+                    c1 = COLOR_COMBINER(0);
+                }
+                else if (other_modes.cycle_type == CYCLE_TYPE_2)
+                {
+                    c1 = COLOR_COMBINER(0);
+                    c2 = COLOR_COMBINER(1);
+                }
+
+                if( alpha_compare_success(c1, c2) )
+                {
+                    oz = (other_modes.z_source_sel) ? primitive_z : (UINT16)zb[(fb_index + x) ^ WORD_ADDR_XOR];
+                    if (other_modes.z_compare_en && zbuffer)
                     {
-                        if (sz < oz /*&& c.a != 0*/)
+                        if (sz < oz)
+                        {
+                            int cvg_ovf = 0;
+                            UINT8 cvg_old = 0;
+                            calculate_coverage( &cvg_buf[(fb_index + x) ^ WORD_ADDR_XOR], span[i].cvg[x], &cvg_ovf, &cvg_old );
+                            if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
+                            {
+                                if (other_modes.cycle_type == CYCLE_TYPE_1)
+                                {
+                                    BLENDER1_32(&fb[(fb_index + x)], c1, &span[i].cvg[x], &cvg_old, &alpha_reject);
+                                }
+                                else
+                                {
+                                    BLENDER2_32(&fb[(fb_index + x)], c1, c2, &span[i].cvg[x], &cvg_old, &alpha_reject);
+                                }
+
+                                if (other_modes.z_update_en && !alpha_reject)
+                                {
+                                    zb[(fb_index + x) ^ WORD_ADDR_XOR] = sz;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        int cvg_ovf = 0;
+                        UINT8 cvg_old = 0;
+                        calculate_coverage( &cvg_buf[(fb_index + x) ^ WORD_ADDR_XOR], span[i].cvg[x], &cvg_ovf, &cvg_old );
+                        if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
                         {
                             if (other_modes.cycle_type == CYCLE_TYPE_1)
                             {
-                                BLENDER1_32(&fb[(fb_index + x)], c1);
+                                BLENDER1_32(&fb[(fb_index + x)], c1, &span[i].cvg[x], &cvg_old, &alpha_reject);
                             }
                             else
                             {
-                                BLENDER2_32(&fb[(fb_index + x)], c1, c2);
+                                BLENDER2_32(&fb[(fb_index + x)], c1, c2, &span[i].cvg[x], &cvg_old, &alpha_reject);
                             }
-
-                            if (other_modes.z_compare_en && other_modes.z_update_en)
-                            {
-                                zb[(fb_index + x) ^ WORD_ADDR_XOR] = sz;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (other_modes.cycle_type == CYCLE_TYPE_1)
-                        {
-                            BLENDER1_32(&fb[(fb_index + x)], c1);
-                        }
-                        else
-                        {
-                            BLENDER2_32(&fb[(fb_index + x)], c1, c2);
                         }
                     }
                 }
-			}
+            }
 
-			r += drinc;
-			g += dginc;
-			b += dbinc;
-			a += dainc;
-			z += dzinc;
-			s += dsinc;
-			t += dtinc;
-			w += dwinc;
+            r += drinc;
+            g += dginc;
+            b += dbinc;
+            a += dainc;
+            z += dzinc;
+            s += dsinc;
+            t += dtinc;
+            w += dwinc;
 
-			x += xinc;
-		}
-	}
+            x += xinc;
+        }
+    }
 }
 
 /*****************************************************************************/
 
-
-
 static void render_spans_16(int start, int end, int tilenum, int shade, int texture, int zbuffer, int flip)
 {
-	UINT16 *fb = (UINT16*)&rdram[fb_address / 4];
-	UINT16 *zb = (UINT16*)&rdram[zb_address / 4];
-	int i, j;
-	int tsl, tsh, ttl, tth;
-	int twidth, tformat, tsize, tbase;
-	int clamp_s, clamp_t, mask_s, mask_t, mirror_s, mirror_t;
+    UINT16 *fb = (UINT16*)&rdram[fb_address / 4];
+    UINT16 *zb = (UINT16*)&rdram[zb_address / 4];
+    UINT8* cvg_buf = (UINT8*)&cvg_mem[fb_address];
+    UINT8* zd_buf = (UINT8*)&cvg_mem[zb_address];
+    int i, j;
+    int tsl[2], tsh[2], ttl[2], tth[2];
+    int twidth[2], tformat[2], tsize[2], tbase[2], tpal[2];
+    int clamp_s[2], clamp_t[2], mask_s[2], mask_t[2], mirror_s[2], mirror_t[2];
+    int cycle;
+    int alpha_reject = 0;
 
-	int clipx1, clipx2, clipy1, clipy2;
+    int clipx1, clipx2, clipy1, clipy2;
 
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
+    clipx1 = clip.xh / 4;
+    clipx2 = clip.xl / 4;
+    clipy1 = clip.yh / 4;
+    clipy2 = clip.yl / 4;
 
-	tsl = tile[tilenum].sl;
-	tsh = tile[tilenum].sh;
-	ttl = tile[tilenum].tl;
-	tth = tile[tilenum].th;
+    for( cycle = 0; cycle < 2; cycle++ )
+    {
+        tsl[cycle] = tile[tilenum + cycle].sl;
+        tsh[cycle] = tile[tilenum + cycle].sh;
+        ttl[cycle] = tile[tilenum + cycle].tl;
+        tth[cycle] = tile[tilenum + cycle].th;
 
-	twidth = tile[tilenum].line;
-	tformat = tile[tilenum].format;
-	tsize = tile[tilenum].size;
-	tbase = tile[tilenum].tmem;
+        twidth[cycle] = tile[tilenum + cycle].line;
+        tformat[cycle] = tile[tilenum + cycle].format;
+        tsize[cycle] = tile[tilenum + cycle].size;
+        tbase[cycle] = tile[tilenum + cycle].tmem;
+        tpal[cycle] = tile[tilenum + cycle].palette;
 
-	clamp_t = tile[tilenum].ct;
-	clamp_s = tile[tilenum].cs;
-	mirror_t = tile[tilenum].mt;
-	mirror_s = tile[tilenum].ms;
-	mask_t = tile[tilenum].mask_t;
-	mask_s = tile[tilenum].mask_s;
+        clamp_t[cycle] = tile[tilenum + cycle].ct;
+        clamp_s[cycle] = tile[tilenum + cycle].cs;
+        mirror_t[cycle] = tile[tilenum + cycle].mt;
+        mirror_s[cycle] = tile[tilenum + cycle].ms;
+        mask_t[cycle] = tile[tilenum + cycle].mask_t;
+        mask_s[cycle] = tile[tilenum + cycle].mask_s;
+    }
 
-	if (start < clipy1)
-	{
-		start = clipy1;
-	}
-	if (start >= clipy2)
-	{
-		start = clipy2-1;
-	}
-	if (end < clipy1)
-	{
-		end = clipy1;
-	}
-	if (end >= clipy2)
-	{
-		end = clipy2-1;
-	}
+    if (start < clipy1)
+    {
+        start = clipy1;
+    }
+    if (start >= clipy2)
+    {
+        start = clipy2-1;
+    }
+    if (end < clipy1)
+    {
+        end = clipy1;
+    }
+    if (end >= clipy2)
+    {
+        end = clipy2-1;
+    }
 
-	for (i=start; i <= end; i++)
-	{
-		int xstart = span[i].lx;
-		int xend = span[i].rx;
-		int r = span[i].r;
-		int g = span[i].g;
-		int b = span[i].b;
-		int a = span[i].a;
-		int z = span[i].z;
-		int s = span[i].s;
-		int t = span[i].t;
-		int w = span[i].w;
-		int dr = span[i].dr;
-		int dg = span[i].dg;
-		int db = span[i].db;
-		int da = span[i].da;
-		int dz = span[i].dz;
-		int ds = span[i].ds;
-		int dt = span[i].dt;
-		int dw = span[i].dw;
-		int drinc, dginc, dbinc, dainc, dzinc, dsinc, dtinc, dwinc;
+    for (i=start; i <= end; i++)
+    {
+        int xstart = span[i].lx;
+        int xend = span[i].rx;
+        int r = span[i].r;
+        int g = span[i].g;
+        int b = span[i].b;
+        int a = span[i].a;
+        int z = span[i].z;
+        int s = span[i].s;
+        int t = span[i].t;
+        int w = span[i].w;
+        int dr = span[i].dr;
+        int dg = span[i].dg;
+        int db = span[i].db;
+        int da = span[i].da;
+        int dz = span[i].dz;
+        int ds = span[i].ds;
+        int dt = span[i].dt;
+        int dw = span[i].dw;
+        int drinc, dginc, dbinc, dainc, dzinc, dsinc, dtinc, dwinc;
 
-		int x;
-		int xinc;
+        int x;
+        int xinc;
 
-		int fb_index = fb_width * i;
-		int length;
+        int fb_index = fb_width * i;
+        int length;
 
-		drinc = flip ? (dr) : -dr;
-		dginc = flip ? (dg) : -dg;
-		dbinc = flip ? (db) : -db;
-		dainc = flip ? (da) : -da;
-		dzinc = flip ? (dz) : -dz;
-		dsinc = flip ? (ds) : -ds;
-		dtinc = flip ? (dt) : -dt;
-		dwinc = flip ? (dw) : -dw;
+        drinc = flip ? (dr) : -dr;
+        dginc = flip ? (dg) : -dg;
+        dbinc = flip ? (db) : -db;
+        dainc = flip ? (da) : -da;
+        dzinc = flip ? (dz) : -dz;
+        dsinc = flip ? (ds) : -ds;
+        dtinc = flip ? (dt) : -dt;
+        dwinc = flip ? (dw) : -dw;
 
-		/*if (flip)
+        xinc = flip ? 1 : -1;
+        x = xend;
+
+        length = flip ? (xstart - xend) : (xend - xstart);
+
+        for (j=0; j <= length; j++)
         {
-            if (xend > clipx2)
+            int sr = r >> 16;
+            int sg = g >> 16;
+            int sb = b >> 16;
+            int sa = a >> 16;
+            int ss = s >> 16;
+            int st = t >> 16;
+            int sw = w >> 16;
+            //UINT16 sz;
+            int sz = (other_modes.z_source_sel) ? (int)((primitive_z << 16) | primitive_delta_z) : (int)z;
+            UINT32 oz = 0;
+            int sss = 0, sst = 0;
+            COLOR c1, c2;
+            //UINT8 old_delta_z;
+            c1.r = c1.g = c1.b = c1.a = 0;
+            c2.r = c2.g = c2.b = c2.a = 0;
+
+            /*
+            if (other_modes.z_source_sel)
             {
-                int d = xend-clipx2;
-                r += d * drinc;
-                g += d * dginc;
-                b += d * dbinc;
-                a += d * dainc;
-                z += d * dzinc;
-                s += d * dsinc;
-                t += d * dtinc;
-                w += d * dwinc;
-
-                xend = clipx2;
+                compress_z((primitive_z << 16) | primitive_delta_z, &sz, &old_delta_z);
             }
-            if (xstart < clipx1)
+            else
             {
-                xstart = clipx1;
+                compress_z(z, &sz, &old_delta_z);
             }
-        }
-        else
-        {
-            if (xstart > clipx2)
+            */
+
+            if (x >= clipx1 && x < clipx2)
             {
-                int d = xstart-clipx2;
-                r += d * drinc;
-                g += d * dginc;
-                b += d * dbinc;
-                a += d * dainc;
-                z += d * dzinc;
-                s += d * dsinc;
-                t += d * dtinc;
-                w += d * dwinc;
+                //if ((z & 0xffff) >= 0x8000) sz++;
+                if ((w & 0xffff) >= 0x8000) sw++;
 
-                xstart = clipx2;
-            }
-            if (xend < clipx1)
-            {
-                xend = clipx1;
-            }
-        }*/
-
-		xinc = flip ? 1 : -1;
-		x = xend;
-
-		length = flip ? (xstart - xend) : (xend - xstart);
-
-		for (j=0; j <= length; j++)
-		{
-			int sr = r >> 16;
-			int sg = g >> 16;
-			int sb = b >> 16;
-			int sa = a >> 16;
-			int ss = s >> 16;
-			int st = t >> 16;
-			int sw = w >> 16;
-			UINT16 sz = z >> 16;
-			int oz;
-			int sss = 0, sst = 0;
-            //int alpha_out = 0;
-			COLOR c1, c2;
-			c1.r = c1.g = c1.b = c1.a = 0;
-			c2.r = c2.g = c2.b = c2.a = 0;
-
-			if (x >= clipx1 && x < clipx2)
-			{
-				if ((z & 0xffff) >= 0x8000) sz++;
-				if ((w & 0xffff) >= 0x8000) sw++;
-
-				if (other_modes.persp_tex_en)
-				{
-					if (sw != 0)
-					{
-						sss = (((INT64)(ss) << 20) / sw);
-						sst = (((INT64)(st) << 20) / sw);
-					}
-				}
-				else
-				{
-					sss = ss;
-					sst = st;
-				}
-
-				if (sr > 0xff) sr = 0xff;	if (sg > 0xff) sg = 0xff;	if (sb > 0xff) sb = 0xff;
-
-				shade_color.r = sr; shade_color.g = sg; shade_color.b = sb; shade_color.a = sa;
-
-				if (texture)
-				{
-					/*if (other_modes.sample_type)
+                if (other_modes.persp_tex_en)
+                {
+                    if (sw != 0)
                     {
-                        // bilinear
+                        sss = (((INT64)(ss) << 20) / sw);
+                        sst = (((INT64)(st) << 20) / sw);
+                    }
+                }
+                else
+                {
+                    sss = ss;
+                    sst = st;
+                }
 
-                        sss1 = (sss >> 10) - (tsl >> 2);
-                        sss2 = sss1 + 1;
+                if (sr > 0xff) sr = 0xff;   if (sg > 0xff) sg = 0xff;   if (sb > 0xff) sb = 0xff;
 
-                        sst1 = (sst >> 10) - (ttl >> 2);
-                        sst2 = sst1 + 1;
+                shade_color.r = sr; shade_color.g = sg; shade_color.b = sb; shade_color.a = sa;
 
-                        CLAMP(sss1, sst1);
-                        CLAMP(sss2, sst2);
-
-                        FETCH_TEXEL(&t0, sss1, sst1, twidth, tformat, tsize, tbase);
-                        FETCH_TEXEL(&t1, sss2, sst1, twidth, tformat, tsize, tbase);
-                        FETCH_TEXEL(&t2, sss1, sst2, twidth, tformat, tsize, tbase);
-                        FETCH_TEXEL(&t3, sss2, sst2, twidth, tformat, tsize, tbase);
-
-                        texel0_color.r = (((( (t0.r * (0x3ff - (sss & 0x3ff))) + (t1.r * ((sss & 0x3ff))) ) >> 10) * (0x3ff - (sst & 0x3ff))) >> 10) +
-                                         (((( (t2.r * (0x3ff - (sss & 0x3ff))) + (t3.r * ((sss & 0x3ff))) ) >> 10) * ((sst & 0x3ff))) >> 10);
-
-                        texel0_color.g = (((( (t0.g * (0x3ff - (sss & 0x3ff))) + (t1.g * ((sss & 0x3ff))) ) >> 10) * (0x3ff - (sst & 0x3ff))) >> 10) +
-                                         (((( (t2.g * (0x3ff - (sss & 0x3ff))) + (t3.g * ((sss & 0x3ff))) ) >> 10) * ((sst & 0x3ff))) >> 10);
-
-                        texel0_color.b = (((( (t0.b * (0x3ff - (sss & 0x3ff))) + (t1.b * ((sss & 0x3ff))) ) >> 10) * (0x3ff - (sst & 0x3ff))) >> 10) +
-                                         (((( (t2.b * (0x3ff - (sss & 0x3ff))) + (t3.b * ((sss & 0x3ff))) ) >> 10) * ((sst & 0x3ff))) >> 10);
-
-                        texel0_color.a = (((( (t0.a * (0x3ff - (sss & 0x3ff))) + (t1.a * ((sss & 0x3ff))) ) >> 10) * (0x3ff - (sst & 0x3ff))) >> 10) +
-                                         (((( (t2.a * (0x3ff - (sss & 0x3ff))) + (t3.a * ((sss & 0x3ff))) ) >> 10) * ((sst & 0x3ff))) >> 10);
+                if (texture)
+                {
+                    if (other_modes.cycle_type == CYCLE_TYPE_1)
+                    {
+                        TEXTURE_PIPELINE1(sss, sst, other_modes.sample_type == 0);
                     }
                     else
                     {
-                        sss1 = (sss >> 10) - (tsl >> 2);
-                        if ((sss & 0x3ff) >= 0x200) sss1++;
-
-                        sst1 = (sst >> 10) - (ttl >> 2);
-                        if ((sst & 0x3ff) >= 0x200) sst1++;
-
-                        CLAMP(sss1, sst1);
-
-                        // point sample
-                        FETCH_TEXEL(&texel0_color, sss1, sst1, twidth, tformat, tsize, tbase);
-                    }*/
-
-					if (other_modes.cycle_type == CYCLE_TYPE_1)
-					{
-						TEXTURE_PIPELINE1(sss, sst, 0);
-					}
-					else
-					{
-						TEXTURE_PIPELINE2(sss, sst, 0);
-					}
-				}
-
-				if (other_modes.cycle_type == CYCLE_TYPE_1)
-				{
-					c1 = COLOR_COMBINER(0);
-                    if( c1.a == 0 )
-                    {
-                        //alpha_out = 1;
+                        TEXTURE_PIPELINE2(sss, sst, other_modes.sample_type == 0);
                     }
-				}
-				else if (other_modes.cycle_type == CYCLE_TYPE_2)
-				{
-					c1 = COLOR_COMBINER(0);
-					c2 = COLOR_COMBINER(1);
-                    if( c2.a == 0 )
-                    {
-                        //alpha_out = 1;
-                    }
-				}
+                }
 
-                /* SGINUT 1/6/08: This fixes things in some games and breaks things in others.
-                                  I believe the pixels should be discarded based on the alpha
-                                  value stored in memory, but alpha and coverage are stored in
-                                  anciliary bits in the framebuffer which are not currently
-                                  emulated by MESS. */
-                if( /*!alpha_out*/ 1 )
+                if (other_modes.cycle_type == CYCLE_TYPE_1)
                 {
-                    oz = (UINT16)zb[(fb_index + x) ^ WORD_ADDR_XOR];
-                    if (zbuffer)
+                    c1 = COLOR_COMBINER(0);
+                }
+                else if (other_modes.cycle_type == CYCLE_TYPE_2)
+                {
+                    c1 = COLOR_COMBINER(0);
+                    c2 = COLOR_COMBINER(1);
+                }
+
+                if( alpha_compare_success(c1, c2) )
+                {
+                    decompress_z(zb[(fb_index + x) ^ WORD_ADDR_XOR], &oz);
+                    //oz = (UINT16)zb[(fb_index + x) ^ WORD_ADDR_XOR];
+
+                    if (other_modes.z_compare_en && zbuffer)
                     {
-                        if (sz < oz /*&& c.a != 0*/)
+                        if (((sz >> 13) < oz) || ((other_modes.z_mode == 3) && ((sz >> 13) == oz)))
                         {
-                            //BLENDER1_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c);
+                            int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
+                            int cvg_ovf = 0;
+                            UINT8 cvg_old = 0;
+                            calculate_coverage( &cvg_buf[(fb_index + x) ^ WORD_ADDR_XOR], span[i].cvg[x], &cvg_ovf, &cvg_old );
+                            if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
                             {
-                                int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
                                 if (other_modes.cycle_type == CYCLE_TYPE_1)
                                 {
-                                    BLENDER1_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, dith);
+                                    BLENDER1_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, dith, &span[i].cvg[x], &cvg_old, &alpha_reject);
                                 }
                                 else
                                 {
-                                    BLENDER2_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, c2, dith);
+                                    if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
+                                    {
+                                        BLENDER2_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, c2, dith, &span[i].cvg[x], &cvg_old, &alpha_reject);
+                                    }
                                 }
-                            }
 
-                            if (other_modes.z_compare_en && other_modes.z_update_en)
-                            {
-                                zb[(fb_index + x) ^ WORD_ADDR_XOR] = sz;
+                                if (other_modes.z_update_en && !alpha_reject)
+                                {
+                                    //zb[(fb_index + x) ^ WORD_ADDR_XOR] = sz;
+                                    compress_z(sz, &zb[(fb_index + x) ^ WORD_ADDR_XOR], &zd_buf[(fb_index + x) ^ WORD_ADDR_XOR] );
+                                }
                             }
                         }
                     }
                     else
                     {
-                        //BLENDER1_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c);
-
+                        int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
+                        int cvg_ovf = 0;
+                        UINT8 cvg_old = 0;
+                        calculate_coverage( &cvg_buf[(fb_index + x) ^ WORD_ADDR_XOR], span[i].cvg[x], &cvg_ovf, &cvg_old );
+                        if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
                         {
-                            int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
                             if (other_modes.cycle_type == CYCLE_TYPE_1)
                             {
-                                BLENDER1_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, dith);
+                                BLENDER1_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, dith, &span[i].cvg[x], &cvg_old, &alpha_reject);
                             }
                             else
                             {
-                                BLENDER2_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, c2, dith);
+                                BLENDER2_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, c2, dith, &span[i].cvg[x], &cvg_old, &alpha_reject);
                             }
                         }
                     }
                 }
-			}
+            }
 
-			r += drinc;
-			g += dginc;
-			b += dbinc;
-			a += dainc;
-			z += dzinc;
-			s += dsinc;
-			t += dtinc;
-			w += dwinc;
+            r += drinc;
+            g += dginc;
+            b += dbinc;
+            a += dainc;
+            z += dzinc;
+            s += dsinc;
+            t += dtinc;
+            w += dwinc;
 
-			x += xinc;
-		}
-	}
+            x += xinc;
+        }
+    }
+}
+
+typedef struct
+{
+    INT32 xl, xm, xh;
+    INT32 yl, ym, yh;
+    INT64 dxldy, dxhdy, dxmdy;
+    int r, g, b, a, s, t, w, z;
+    int drdx, dgdx, dbdx, dadx, dsdx, dtdx, dwdx, dzdx;
+    int drdy, dgdy, dbdy, dady, dsdy, dtdy, dwdy, dzdy;
+    int drde, dgde, dbde, dade, dsde, dtde, dwde, dzde;
+    int tile;
+    int flip;
+
+} triangle_data;
+
+static void fill_span_buffer_1x1( triangle_data* tri, int* span_start, int* span_end )
+{
+    int j;
+    int cvg_idx;
+    int xleft, xright, xleft_inc, xright_inc;
+    int xstart, xend;
+
+    tri->yl >>= 2;
+    tri->ym >>= 2;
+    tri->yh >>= 2;
+
+    xleft = tri->xm;
+    xright = tri->xh;
+    xleft_inc = tri->dxmdy;
+    xright_inc = tri->dxhdy;
+
+    for(j = tri->yh; j <= tri->yl; j++)
+    {
+        if(j == tri->ym)
+        {
+            xleft = tri->xl;
+            xleft_inc = tri->dxldy;
+            xright_inc = tri->dxhdy;
+        }
+
+        xstart = xleft >> 16;
+        xend = xright >> 16;
+
+        if(j >= 0)
+        {
+            span[j].lx = xstart;
+            span[j].rx = xend;
+            span[j].s = tri->s;     span[j].ds = tri->dsdx;
+            span[j].t = tri->t;     span[j].dt = tri->dtdx;
+            span[j].w = tri->w;     span[j].dw = tri->dwdx;
+            span[j].r = tri->r;     span[j].dr = tri->drdx;
+            span[j].g = tri->g;     span[j].dg = tri->dgdx;
+            span[j].b = tri->b;     span[j].db = tri->dbdx;
+            span[j].a = tri->a;     span[j].da = tri->dadx;
+            span[j].z = tri->z;     span[j].dz = tri->dzdx;
+            if(tri->flip)
+            {
+                for(cvg_idx = xend; cvg_idx <= xstart; cvg_idx++)
+                {
+                    span[j].cvg[cvg_idx] = 8;
+                }
+            }
+            else
+            {
+                for(cvg_idx = xstart; cvg_idx <= xend; cvg_idx++)
+                {
+                    span[j].cvg[cvg_idx] = 8;
+                }
+            }
+        }
+
+        xleft += xleft_inc;
+        xright += xright_inc;
+        tri->s += tri->dsde;
+        tri->t += tri->dtde;
+        tri->w += tri->dwde;
+        tri->r += tri->drde;
+        tri->g += tri->dgde;
+        tri->b += tri->dbde;
+        tri->a += tri->dade;
+        tri->z += tri->dzde;
+    }
+
+    *span_start = tri->yh;
+    *span_end = tri->yl;
+}
+
+static void fill_span_buffer_2x2( triangle_data* tri, int* span_start, int* span_end )
+{
+    int j;
+    int xleft, xright, xleft_inc, xright_inc;
+    int xstart, xend;
+    int covered_pixels = 0;
+
+    tri->xm += (tri->dxmdy >> 2) * (tri->yh & 0x0003);
+    tri->xh += (tri->dxhdy >> 2) * (tri->yh & 0x0003);
+
+    tri->r += (tri->drde >> 2) * (tri->yh & 0x0003);
+    tri->g += (tri->dgde >> 2) * (tri->yh & 0x0003);
+    tri->b += (tri->dbde >> 2) * (tri->yh & 0x0003);
+    tri->a += (tri->dade >> 2) * (tri->yh & 0x0003);
+    tri->s += (tri->dsde >> 2) * (tri->yh & 0x0003);
+    tri->t += (tri->dtde >> 2) * (tri->yh & 0x0003);
+    tri->w += (tri->dwde >> 2) * (tri->yh & 0x0003);
+    tri->z += (tri->dzde >> 2) * (tri->yh & 0x0003);
+
+    xleft = tri->xm;
+    xright = tri->xh;
+    xleft_inc = tri->dxmdy;
+    xright_inc = tri->dxhdy;
+
+    for( j = tri->yh; j <= tri->yl; j++ )
+    {
+        if (j == tri->ym)
+        {
+            xleft = tri->xl;
+            xleft_inc = tri->dxldy;
+            xright_inc = tri->dxhdy;
+        }
+
+        xstart = xleft >> 14;
+        xend = xright >> 14;
+
+        if( j >= 0 && ((j == tri->yh) || ((j & 3) == 0)) )
+        {
+            memset( span[j >> 2].cvg, 0, RDP_CVG_SPAN_MAX );
+            covered_pixels = 0;
+        }
+
+        if( j >= 0 )
+        {
+            if( tri->flip )
+            {
+                int cvg_iter = 0;
+
+                if( xend & 0x0003 )
+                {
+                    // Round up to the next pixel
+                    xend &= ~0x0003;
+                    xend += 4;
+                }
+                if( xleft & ((1 << 14) - 1) )
+                {
+                    xstart++;
+                }
+                for( cvg_iter=xend; cvg_iter < xstart; cvg_iter++ )
+                {
+                    if( (cvg_iter < 0) || (cvg_iter >= (RDP_CVG_SPAN_MAX << 2)) )
+                    {
+                        continue;
+                    }
+                    if( (cvg_iter & 1) == (j & 1) )
+                    {
+                        span[j >> 2].cvg[cvg_iter >> 2]++;
+                        covered_pixels++;
+                    }
+                }
+            }
+            else
+            {
+                int cvg_iter = 0;
+
+                if( xstart & 0x0003 )
+                {
+                    // Round up to the next pixel
+                    xstart &= ~0x0003;
+                    xstart += 4;
+                }
+                if( xright & ((1 << 14) - 1) )
+                {
+                    xend++;
+                }
+                for( cvg_iter = xstart; cvg_iter < xend; cvg_iter++ )
+                {
+                    if( cvg_iter < 0 || cvg_iter >= (RDP_CVG_SPAN_MAX << 2) )
+                    {
+                        continue;
+                    }
+                    if( (cvg_iter & 1) == (j & 1) )
+                    {
+                        span[j >> 2].cvg[cvg_iter >> 2]++;
+                        covered_pixels++;
+                    }
+                }
+            }
+
+            if( (j & 3) == 3 )
+            {
+                span[j >> 2].s = tri->s;    span[j >> 2].ds = tri->dsdx;
+                span[j >> 2].t = tri->t;    span[j >> 2].dt = tri->dtdx;
+                span[j >> 2].w = tri->w;    span[j >> 2].dw = tri->dwdx;
+                span[j >> 2].r = tri->r;    span[j >> 2].dr = tri->drdx;
+                span[j >> 2].g = tri->g;    span[j >> 2].dg = tri->dgdx;
+                span[j >> 2].b = tri->b;    span[j >> 2].db = tri->dbdx;
+                span[j >> 2].a = tri->a;    span[j >> 2].da = tri->dadx;
+                span[j >> 2].z = tri->z;    span[j >> 2].dz = tri->dzdx;
+            }
+
+            if( (j & 3) == 3 )
+            {
+                int cvg_start = 0;
+                int cvg_end = 0;
+                int cvg_iter = 0;
+
+                for( cvg_iter = 0; cvg_iter < (RDP_CVG_SPAN_MAX - 1); cvg_iter++ )
+                {
+                    if( span[j >> 2].cvg[cvg_iter] == 0 && span[j >> 2].cvg[cvg_iter + 1] > 0 )
+                    {
+                        cvg_start = cvg_iter + 1;
+                    }
+                    if( span[j >> 2].cvg[cvg_iter] > 0 && span[j >> 2].cvg[cvg_iter + 1] == 0 )
+                    {
+                        break;
+                    }
+                }
+                cvg_end = cvg_iter;
+
+                span[j >> 2].lx = xstart >> 2;
+                span[j >> 2].rx = xend >> 2;
+
+                if( covered_pixels == 0 )
+                {
+                    span[j >> 2].lx = -1;
+                    span[j >> 2].rx = -1;
+                }
+            }
+        }
+
+        xleft += xleft_inc >> 2;
+        xright += xright_inc >> 2;
+        tri->s += tri->dsde >> 2;
+        tri->t += tri->dtde >> 2;
+        tri->w += tri->dwde >> 2;
+        tri->r += tri->drde >> 2;
+        tri->g += tri->dgde >> 2;
+        tri->b += tri->dbde >> 2;
+        tri->a += tri->dade >> 2;
+        tri->z += tri->dzde >> 2;
+    }
+
+    *span_start = tri->yh >> 2;
+    *span_end = ((tri->yl & 0x0003) == 3) ? (tri->yl >> 2) : ((tri->yl >> 2) - 1);
 }
 
 static void triangle(UINT32 w1, UINT32 w2, int shade, int texture, int zbuffer)
 {
-	int j;
-	int xleft, xright, xleft_inc, xright_inc;
-	int xstart, xend;
-	int r, g, b, a, z, s, t, w;
-	//int dr, dg, db, da;
-	int drdx = 0, dgdx = 0, dbdx = 0, dadx = 0, dzdx = 0, dsdx = 0, dtdx = 0, dwdx = 0;
-	//int drdy = 0, dgdy = 0, dbdy = 0, dady = 0, dzdy = 0, dsdy = 0, dtdy = 0, dwdy = 0;
-	int drde = 0, dgde = 0, dbde = 0, dade = 0, dzde = 0, dsde = 0, dtde = 0, dwde = 0;
-	int tile;
-	int flip = (w1 & 0x800000) ? 1 : 0;
+    UINT32 w3, w4, w5, w6, w7, w8;
 
-	INT32 yl, ym, yh;
-	INT32 xl, xm, xh;
-	INT64 dxldy, dxhdy, dxmdy;
-	UINT32 w3, w4, w5, w6, w7, w8;
+    int shade_base = rdp_cmd_cur + 8;
+    int texture_base = rdp_cmd_cur + 8;
+    int zbuffer_base = rdp_cmd_cur + 8;
 
-	int shade_base = rdp_cmd_cur + 8;
-	int texture_base = rdp_cmd_cur + 8;
-	int zbuffer_base = rdp_cmd_cur + 8;
-	if (shade)
-	{
-		texture_base += 16;
-		zbuffer_base += 16;
-	}
-	if (texture)
-	{
-		zbuffer_base += 16;
-	}
+    int span_start = 0;
+    int span_end = 0;
 
-	w3 = rdp_cmd_data[rdp_cmd_cur+2];
-	w4 = rdp_cmd_data[rdp_cmd_cur+3];
-	w5 = rdp_cmd_data[rdp_cmd_cur+4];
-	w6 = rdp_cmd_data[rdp_cmd_cur+5];
-	w7 = rdp_cmd_data[rdp_cmd_cur+6];
-	w8 = rdp_cmd_data[rdp_cmd_cur+7];
+    triangle_data tri;
 
-	yl = (w1 & 0x3fff) >> 2;
-	ym = ((w2 >> 16) & 0x3fff) >> 2;
-	yh = ((w2 >>  0) & 0x3fff) >> 2;
-	xl = (INT32)(w3);
-	xh = (INT32)(w5);
-	xm = (INT32)(w7);
-	dxldy = (INT32)(w4);
-	dxhdy = (INT32)(w6);
-	dxmdy = (INT32)(w8);
+    tri.yl = tri.ym = tri.yh = 0;
+    tri.xl = tri.xm = tri.xh = 0;
+    tri.dxldy = tri.dxhdy = tri.dxmdy = 0;
+    tri.r = tri.g = tri.b = tri.a = tri.s = tri.t = tri.w = tri.z = 0;
+    tri.drdx = tri.dgdx = tri.dbdx = tri.dadx = tri.dsdx = tri.dtdx = tri.dwdx = tri.dzdx = 0;
+    tri.drdy = tri.dgdy = tri.dbdy = tri.dady = tri.dsdy = tri.dtdy = tri.dwdy = tri.dzdy = 0;
+    tri.drde = tri.dgde = tri.dbde = tri.dade = tri.dsde = tri.dtde = tri.dwde = tri.dzde = 0;
+    tri.tile = (w1 >> 16) & 0x7;;
+    tri.flip = (w1 & 0x800000) ? 1 : 0;
 
-	if (yl & 0x800) yl |= 0xfffff000;
-	if (ym & 0x800) ym |= 0xfffff000;
-	if (yh & 0x800) yh |= 0xfffff000;
+    if (shade)
+    {
+        texture_base += 16;
+        zbuffer_base += 16;
+    }
+    if (texture)
+    {
+        zbuffer_base += 16;
+    }
 
-	yl += (w1 >> 1) & 1;
-	ym += (w2 >> 17) & 1;
-	yh += (w2 >> 1) & 1;
+    w3 = rdp_cmd_data[rdp_cmd_cur+2];
+    w4 = rdp_cmd_data[rdp_cmd_cur+3];
+    w5 = rdp_cmd_data[rdp_cmd_cur+4];
+    w6 = rdp_cmd_data[rdp_cmd_cur+5];
+    w7 = rdp_cmd_data[rdp_cmd_cur+6];
+    w8 = rdp_cmd_data[rdp_cmd_cur+7];
 
-	tile = (w1 >> 16) & 0x7;
+    tri.yl = (w1 & 0x3fff);
+    tri.ym = ((w2 >> 16) & 0x3fff);
+    tri.yh = ((w2 >>  0) & 0x3fff);
+    tri.xl = (INT32)(w3);
+    tri.xh = (INT32)(w5);
+    tri.xm = (INT32)(w7);
+    tri.dxldy = (INT32)(w4);
+    tri.dxhdy = (INT32)(w6);
+    tri.dxmdy = (INT32)(w8);
 
-	r = 0xff;	g = 0xff;	b = 0xff;	a = 0xff;	z = 0;	s = 0;	t = 0;	w = 0;
-	//dr = 0;       dg = 0;     db = 0;     da = 0;
+    if (tri.yl & 0x2000) tri.yl |= 0xffffc000;
+    if (tri.ym & 0x2000) tri.ym |= 0xffffc000;
+    if (tri.yh & 0x2000) tri.yh |= 0xffffc000;
 
-	if (shade)
-	{
-		r    = (rdp_cmd_data[shade_base+0 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+4 ] >> 16) & 0x0000ffff);
-		g    = ((rdp_cmd_data[shade_base+0 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+4 ] & 0x0000ffff);
-		b    = (rdp_cmd_data[shade_base+1 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+5 ] >> 16) & 0x0000ffff);
-		a    = ((rdp_cmd_data[shade_base+1 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+5 ] & 0x0000ffff);
-		drdx = (rdp_cmd_data[shade_base+2 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+6 ] >> 16) & 0x0000ffff);
-		dgdx = ((rdp_cmd_data[shade_base+2 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+6 ] & 0x0000ffff);
-		dbdx = (rdp_cmd_data[shade_base+3 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+7 ] >> 16) & 0x0000ffff);
-		dadx = ((rdp_cmd_data[shade_base+3 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+7 ] & 0x0000ffff);
-		drde = (rdp_cmd_data[shade_base+8 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+12] >> 16) & 0x0000ffff);
-		dgde = ((rdp_cmd_data[shade_base+8 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+12] & 0x0000ffff);
-		dbde = (rdp_cmd_data[shade_base+9 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+13] >> 16) & 0x0000ffff);
-		dade = ((rdp_cmd_data[shade_base+9 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+13] & 0x0000ffff);
-		//drdy = (rdp_cmd_data[shade_base+10] & 0xffff0000) | ((rdp_cmd_data[shade_base+14] >> 16) & 0x0000ffff);
-		//dgdy = ((rdp_cmd_data[shade_base+10] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+14] & 0x0000ffff);
-		//dbdy = (rdp_cmd_data[shade_base+11] & 0xffff0000) | ((rdp_cmd_data[shade_base+15] >> 16) & 0x0000ffff);
-		//dady = ((rdp_cmd_data[shade_base+11] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+15] & 0x0000ffff);
-	}
-	if (texture)
-	{
-		s    = (rdp_cmd_data[texture_base+0 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+4 ] >> 16) & 0x0000ffff);
-		t    = ((rdp_cmd_data[texture_base+0 ] << 16) & 0xffff0000)	| (rdp_cmd_data[texture_base+4 ] & 0x0000ffff);
-		w    = (rdp_cmd_data[texture_base+1 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+5 ] >> 16) & 0x0000ffff);
-		dsdx = (rdp_cmd_data[texture_base+2 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+6 ] >> 16) & 0x0000ffff);
-		dtdx = ((rdp_cmd_data[texture_base+2 ] << 16) & 0xffff0000)	| (rdp_cmd_data[texture_base+6 ] & 0x0000ffff);
-		dwdx = (rdp_cmd_data[texture_base+3 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+7 ] >> 16) & 0x0000ffff);
-		dsde = (rdp_cmd_data[texture_base+8 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+12] >> 16) & 0x0000ffff);
-		dtde = ((rdp_cmd_data[texture_base+8 ] << 16) & 0xffff0000)	| (rdp_cmd_data[texture_base+12] & 0x0000ffff);
-		dwde = (rdp_cmd_data[texture_base+9 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+13] >> 16) & 0x0000ffff);
-		//dsdy = (rdp_cmd_data[texture_base+10] & 0xffff0000) | ((rdp_cmd_data[texture_base+14] >> 16) & 0x0000ffff);
-		//dtdy = ((rdp_cmd_data[texture_base+10] << 16) & 0xffff0000)   | (rdp_cmd_data[texture_base+14] & 0x0000ffff);
-		//dwdy = (rdp_cmd_data[texture_base+11] & 0xffff0000) | ((rdp_cmd_data[texture_base+15] >> 16) & 0x0000ffff);
-	}
-	if (zbuffer)
-	{
-		z    = rdp_cmd_data[zbuffer_base+0];
-		dzdx = rdp_cmd_data[zbuffer_base+1];
-		dzde = rdp_cmd_data[zbuffer_base+2];
-		//dzdy = rdp_cmd_data[zbuffer_base+3];
-	}
+    tri.r = tri.g = tri.b = tri.a = 0xff;
+    tri.s = tri.t = tri.w = 0;
+    tri.z = 0;
 
-	xleft = xm;
-	xright = xh;
-	xleft_inc = dxmdy;
-	xright_inc = dxhdy;
+    if (shade)
+    {
+        tri.r    = (rdp_cmd_data[shade_base+0 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+4 ] >> 16) & 0x0000ffff);
+        tri.g    = ((rdp_cmd_data[shade_base+0 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+4 ] & 0x0000ffff);
+        tri.b    = (rdp_cmd_data[shade_base+1 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+5 ] >> 16) & 0x0000ffff);
+        tri.a    = ((rdp_cmd_data[shade_base+1 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+5 ] & 0x0000ffff);
+        tri.drdx = (rdp_cmd_data[shade_base+2 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+6 ] >> 16) & 0x0000ffff);
+        tri.dgdx = ((rdp_cmd_data[shade_base+2 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+6 ] & 0x0000ffff);
+        tri.dbdx = (rdp_cmd_data[shade_base+3 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+7 ] >> 16) & 0x0000ffff);
+        tri.dadx = ((rdp_cmd_data[shade_base+3 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+7 ] & 0x0000ffff);
+        tri.drde = (rdp_cmd_data[shade_base+8 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+12] >> 16) & 0x0000ffff);
+        tri.dgde = ((rdp_cmd_data[shade_base+8 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+12] & 0x0000ffff);
+        tri.dbde = (rdp_cmd_data[shade_base+9 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+13] >> 16) & 0x0000ffff);
+        tri.dade = ((rdp_cmd_data[shade_base+9 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+13] & 0x0000ffff);
+        tri.drdy = (rdp_cmd_data[shade_base+10] & 0xffff0000) | ((rdp_cmd_data[shade_base+14] >> 16) & 0x0000ffff);
+        tri.dgdy = ((rdp_cmd_data[shade_base+10] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+14] & 0x0000ffff);
+        tri.dbdy = (rdp_cmd_data[shade_base+11] & 0xffff0000) | ((rdp_cmd_data[shade_base+15] >> 16) & 0x0000ffff);
+        tri.dady = ((rdp_cmd_data[shade_base+11] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+15] & 0x0000ffff);
+    }
+    if (texture)
+    {
+        tri.s    = (rdp_cmd_data[texture_base+0 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+4 ] >> 16) & 0x0000ffff);
+        tri.t    = ((rdp_cmd_data[texture_base+0 ] << 16) & 0xffff0000) | (rdp_cmd_data[texture_base+4 ] & 0x0000ffff);
+        tri.w    = (rdp_cmd_data[texture_base+1 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+5 ] >> 16) & 0x0000ffff);
+        tri.dsdx = (rdp_cmd_data[texture_base+2 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+6 ] >> 16) & 0x0000ffff);
+        tri.dtdx = ((rdp_cmd_data[texture_base+2 ] << 16) & 0xffff0000) | (rdp_cmd_data[texture_base+6 ] & 0x0000ffff);
+        tri.dwdx = (rdp_cmd_data[texture_base+3 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+7 ] >> 16) & 0x0000ffff);
+        tri.dsde = (rdp_cmd_data[texture_base+8 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+12] >> 16) & 0x0000ffff);
+        tri.dtde = ((rdp_cmd_data[texture_base+8 ] << 16) & 0xffff0000) | (rdp_cmd_data[texture_base+12] & 0x0000ffff);
+        tri.dwde = (rdp_cmd_data[texture_base+9 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+13] >> 16) & 0x0000ffff);
+        tri.dsdy = (rdp_cmd_data[texture_base+10] & 0xffff0000) | ((rdp_cmd_data[texture_base+14] >> 16) & 0x0000ffff);
+        tri.dtdy = ((rdp_cmd_data[texture_base+10] << 16) & 0xffff0000) | (rdp_cmd_data[texture_base+14] & 0x0000ffff);
+        tri.dwdy = (rdp_cmd_data[texture_base+11] & 0xffff0000) | ((rdp_cmd_data[texture_base+15] >> 16) & 0x0000ffff);
+    }
+    if (zbuffer)
+    {
+        tri.z    = rdp_cmd_data[zbuffer_base+0];
+        tri.dzdx = rdp_cmd_data[zbuffer_base+1];
+        tri.dzde = rdp_cmd_data[zbuffer_base+2];
+        tri.dzdy = rdp_cmd_data[zbuffer_base+3];
+    }
 
-	for (j=yh; j < ym; j++)
-	{
-		xstart = xleft >> 16;
-		xend = xright >> 16;
+    if( other_modes.sample_type == SAMPLE_TYPE_1x1 )
+    {
+        fill_span_buffer_1x1( &tri, &span_start, &span_end );
+    }
+    else
+    {
+        fill_span_buffer_2x2( &tri, &span_start, &span_end );
+    }
 
-		if (j >= 0)
-		{
-			span[j].lx = xstart;
-			span[j].rx = xend;
-			span[j].s = s;		span[j].ds = dsdx;
-			span[j].t = t;		span[j].dt = dtdx;
-			span[j].w = w;		span[j].dw = dwdx;
-			span[j].r = r;		span[j].dr = drdx;
-			span[j].g = g;		span[j].dg = dgdx;
-			span[j].b = b;		span[j].db = dbdx;
-			span[j].a = a;		span[j].da = dadx;
-			span[j].z = z;		span[j].dz = dzdx;
-		}
-
-		xleft += xleft_inc;
-		xright += xright_inc;
-		s += dsde;
-		t += dtde;
-		w += dwde;
-		r += drde;
-		g += dgde;
-		b += dbde;
-		a += dade;
-		z += dzde;
-	}
-
-	xleft = xl;
-	xleft_inc = dxldy;
-	xright_inc = dxhdy;
-
-	for (j=ym; j <= yl; j++)
-	{
-		xstart = xleft >> 16;
-		xend = xright >> 16;
-
-		if (j >= 0)
-		{
-			span[j].lx = xstart;
-			span[j].rx = xend;
-			span[j].s = s;		span[j].ds = dsdx;
-			span[j].t = t;		span[j].dt = dtdx;
-			span[j].w = w;		span[j].dw = dwdx;
-			span[j].r = r;		span[j].dr = drdx;
-			span[j].g = g;		span[j].dg = dgdx;
-			span[j].b = b;		span[j].db = dbdx;
-			span[j].a = a;		span[j].da = dadx;
-			span[j].z = z;		span[j].dz = dzdx;
-		}
-
-		xleft += xleft_inc;
-		xright += xright_inc;
-		s += dsde;
-		t += dtde;
-		w += dwde;
-		r += drde;
-		g += dgde;
-		b += dbde;
-		a += dade;
-		z += dzde;
-	}
-
-	switch (fb_size)
-	{
-		case PIXEL_SIZE_16BIT:	render_spans_16(yh, yl, tile, shade, texture, zbuffer, flip); break;
-		case PIXEL_SIZE_32BIT:	render_spans_32(yh, yl, tile, shade, texture, zbuffer, flip); break;
-	}
+    switch (fb_size)
+    {
+        case PIXEL_SIZE_16BIT:  render_spans_16(span_start, span_end, tri.tile, shade, texture, zbuffer, tri.flip); break;
+        case PIXEL_SIZE_32BIT:  render_spans_32(span_start, span_end, tri.tile, shade, texture, zbuffer, tri.flip); break;
+    }
 }
 
 /*****************************************************************************/

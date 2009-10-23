@@ -2,6 +2,7 @@
 
 #include "driver.h"
 #include "cpu/mips/mips3.h"
+#include "cpu/mips/mips3com.h"
 #include "streams.h"
 #include "includes/n64.h"
 #include "sound/dmadac.h"
@@ -38,11 +39,196 @@ void clear_rcp_interrupt(running_machine *machine, int interrupt)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
+UINT8 is64_buffer[0x10000];
+
+READ32_HANDLER( n64_is64_r )
+{
+    switch(offset)
+    {
+        case 0x0000/4:
+            return 0x49533634;
+
+        case 0x0004/4:
+        case 0x0008/4:
+        case 0x000c/4:
+        case 0x0010/4:
+        case 0x0014/4:
+        case 0x0018/4:
+        case 0x001c/4:
+            return 0;
+
+        default:
+            return ( is64_buffer[(offset << 2) + 0] << 24 ) |
+                   ( is64_buffer[(offset << 2) + 1] << 16 ) |
+                   ( is64_buffer[(offset << 2) + 2] <<  8 ) |
+                   ( is64_buffer[(offset << 2) + 3] <<  0 );
+    }
+}
+
+WRITE32_HANDLER( n64_is64_w )
+{
+    int i = 0;
+
+    switch(offset)
+    {
+        case 0x0014/4:
+            for(i = 0x20; i < (0x20 + data); i++)
+            {
+                printf( "%c", is64_buffer[i] );
+                if(is64_buffer[i] == 0x0a)
+                {
+                    printf( "%c", 0x0d );
+                }
+                is64_buffer[i] = 0;
+            }
+            break;
+
+        default:
+            is64_buffer[(offset << 2) + 0] = (data >> 24) & 0x000000ff;
+            is64_buffer[(offset << 2) + 1] = (data >> 16) & 0x000000ff;
+            is64_buffer[(offset << 2) + 2] = (data >>  8) & 0x000000ff;
+            is64_buffer[(offset << 2) + 3] = (data >>  0) & 0x000000ff;
+            break;
+    }
+}
+
+READ32_HANDLER( n64_open_r )
+{
+    UINT32 retval = (offset << 2) & 0x0000ffff;
+    retval = (retval << 16) | retval;
+    return retval;
+}
+
+WRITE32_HANDLER( n64_open_w )
+{
+    // Do nothing
+}
+
+// RDRAM registers
+static UINT32 rdram_config;
+static UINT32 rdram_device_id;
+static UINT32 rdram_delay;
+static UINT32 rdram_mode;
+static UINT32 rdram_ref_interval;
+static UINT32 rdram_ref_row;
+static UINT32 rdram_ras_interval;
+static UINT32 rdram_min_interval;
+static UINT32 rdram_addr_select;
+static UINT32 rdram_device_manuf;
+
+READ32_HANDLER( n64_rdram_reg_r )
+{
+    switch (offset)
+    {
+        case 0x00/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            return rdram_config;
+
+        case 0x04/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            return rdram_device_id;
+
+        case 0x08/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            return rdram_delay;
+
+        case 0x0c/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            return rdram_mode;
+
+        case 0x10/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            return rdram_ref_interval;
+
+        case 0x14/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            return rdram_ref_row;
+
+        case 0x18/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            return rdram_ras_interval;
+
+        case 0x1c/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            return rdram_min_interval;
+
+        case 0x20/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            return rdram_addr_select;
+
+        case 0x24/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            return rdram_device_manuf;
+
+        default:
+            logerror("rdram_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
+            break;
+    }
+    return 0;
+}
+
+WRITE32_HANDLER( n64_rdram_reg_w )
+{
+    switch (offset)
+    {
+        case 0x00/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            rdram_config = data;
+            break;
+
+        case 0x04/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            rdram_device_id = data;
+            break;
+
+        case 0x08/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            rdram_delay = data;
+            break;
+
+        case 0x0c/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            rdram_mode = data;
+            break;
+
+        case 0x10/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            rdram_ref_interval = data;
+            break;
+
+        case 0x14/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            rdram_ref_row = data;
+            break;
+
+        case 0x18/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            rdram_ras_interval = data;
+            break;
+
+        case 0x1c/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            rdram_min_interval = data;
+            break;
+
+        case 0x20/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            rdram_addr_select = data;
+            break;
+
+        case 0x24/4:            // RDRAM_CONFIG_REG / RDRAM_DEVICE_TYPE_REG
+            rdram_device_manuf = data;
+            break;
+
+        default:
+            logerror("mi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+            break;
+    }
+}
+
+// Memory Interface (MI)
+
+UINT32 mi_mode;
+
+#define MI_CLR_INIT             0x0080      /* Bit  7: clear init mode */
+#define MI_SET_INIT             0x0100      /* Bit  8: set init mode */
+#define MI_CLR_EBUS             0x0200      /* Bit  9: clear ebus test */
+#define MI_SET_EBUS             0x0400      /* Bit 10: set ebus test mode */
+#define MI_CLR_DP_INTR          0x0800      /* Bit 11: clear dp interrupt */
+#define MI_CLR_RDRAM            0x1000      /* Bit 12: clear RDRAM reg */
+#define MI_SET_RDRAM            0x2000      /* Bit 13: set RDRAM reg mode */
+#define MI_MODE_INIT            0x0080      /* Bit  7: init mode */
+#define MI_MODE_EBUS            0x0100      /* Bit  8: ebus test mode */
+#define MI_MODE_RDRAM           0x0200      /* Bit  9: RDRAM reg mode */
 
 READ32_HANDLER( n64_mi_reg_r )
 {
 	switch (offset)
 	{
+        case 0x00/4:            // MI_MODE_REG
+            return mi_mode;
+
 		case 0x04/4:			// MI_VERSION_REG
 			return mi_version;
 
@@ -65,7 +251,13 @@ WRITE32_HANDLER( n64_mi_reg_w )
 	switch (offset)
 	{
 		case 0x00/4:		// MI_INIT_MODE_REG
-			if (data & 0x0800)
+            if (data & MI_CLR_INIT)     mi_mode &= ~MI_MODE_INIT;
+            if (data & MI_SET_INIT)     mi_mode |=  MI_MODE_INIT;
+            if (data & MI_CLR_EBUS)     mi_mode &= ~MI_MODE_EBUS;
+            if (data & MI_SET_EBUS)     mi_mode |=  MI_MODE_EBUS;
+            if (data & MI_CLR_RDRAM)    mi_mode &= ~MI_MODE_RDRAM;
+            if (data & MI_SET_RDRAM)    mi_mode |=  MI_MODE_RDRAM;
+            if (data & MI_CLR_DP_INTR)
 			{
 				clear_rcp_interrupt(space->machine, DP_INTERRUPT);
 			}
@@ -77,18 +269,54 @@ WRITE32_HANDLER( n64_mi_reg_w )
 
 		case 0x0c/4:		// MI_INTR_MASK_REG
 		{
-			if (data & 0x0001) mi_intr_mask &= ~0x1;		// clear SP mask
-			if (data & 0x0002) mi_intr_mask |= 0x1;			// set SP mask
-			if (data & 0x0004) mi_intr_mask &= ~0x2;		// clear SI mask
-			if (data & 0x0008) mi_intr_mask |= 0x2;			// set SI mask
-			if (data & 0x0010) mi_intr_mask &= ~0x4;		// clear AI mask
-			if (data & 0x0020) mi_intr_mask |= 0x4;			// set AI mask
-			if (data & 0x0040) mi_intr_mask &= ~0x8;		// clear VI mask
-			if (data & 0x0080) mi_intr_mask |= 0x8;			// set VI mask
-			if (data & 0x0100) mi_intr_mask &= ~0x10;		// clear PI mask
-			if (data & 0x0200) mi_intr_mask |= 0x10;		// set PI mask
-			if (data & 0x0400) mi_intr_mask &= ~0x20;		// clear DP mask
-			if (data & 0x0800) mi_intr_mask |= 0x20;		// set DP mask
+            if (data & 0x0001)
+            {
+                mi_intr_mask &= ~0x1;      // clear SP mask
+            }
+            if (data & 0x0002)
+            {
+                mi_intr_mask |= 0x1;           // set SP mask
+            }
+            if (data & 0x0004)
+            {
+                mi_intr_mask &= ~0x2;      // clear SI mask
+            }
+            if (data & 0x0008)
+            {
+                mi_intr_mask |= 0x2;           // set SI mask
+            }
+            if (data & 0x0010)
+            {
+                mi_intr_mask &= ~0x4;      // clear AI mask
+            }
+            if (data & 0x0020)
+            {
+                mi_intr_mask |= 0x4;           // set AI mask
+            }
+            if (data & 0x0040)
+            {
+                mi_intr_mask &= ~0x8;      // clear VI mask
+            }
+            if (data & 0x0080)
+            {
+                mi_intr_mask |= 0x8;           // set VI mask
+            }
+            if (data & 0x0100)
+            {
+                mi_intr_mask &= ~0x10;     // clear PI mask
+            }
+            if (data & 0x0200)
+            {
+                mi_intr_mask |= 0x10;      // set PI mask
+            }
+            if (data & 0x0400)
+            {
+                mi_intr_mask &= ~0x20;     // clear DP mask
+            }
+            if (data & 0x0800)
+            {
+                mi_intr_mask |= 0x20;      // set DP mask
+            }
 			break;
 		}
 
@@ -128,7 +356,7 @@ static void sp_dma(int direction)
 	{
 		//fatalerror("sp_dma (%s): sp_dma_length unaligned %08X\n", cpu ? "RSP" : "R4300i", sp_dma_length);
 		//sp_dma_length = sp_dma_length & ~3;
-        sp_dma_length = (sp_dma_length + 3) & ~3;
+        sp_dma_length = (sp_dma_length + 7) & ~7;
 
 		//sp_dma_length &= ~3;
 	}
@@ -156,7 +384,9 @@ static void sp_dma(int direction)
 
 	if ((sp_mem_addr & 0xfff) + (sp_dma_length) > 0x1000)
 	{
-		fatalerror("sp_dma: dma out of memory area: %08X, %08X\n", sp_mem_addr, sp_dma_length);
+		printf("sp_dma: dma out of memory area: %08X, %08X\n", sp_mem_addr, sp_dma_length);
+		//fatalerror("sp_dma: dma out of memory area: %08X, %08X\n", sp_mem_addr, sp_dma_length);
+		sp_dma_length = 0x1000 - (sp_mem_addr & 0xfff);
 	}
 
 	if (direction == 0)		// RDRAM -> I/DMEM
@@ -242,7 +472,15 @@ READ32_HANDLER( n64_sp_reg_r )
 			return 0;
 
 		case 0x1c/4:		// SP_SEMAPHORE_REG
-			return sp_semaphore;
+            if( sp_semaphore )
+            {
+                return 0;
+            }
+            else
+            {
+                sp_semaphore = 1;
+                return 1;
+            }
 
         case 0x20/4:        // DP_CMD_START
         case 0x24/4:        // DP_CMD_END
@@ -443,7 +681,7 @@ WRITE32_HANDLER( n64_sp_reg_w )
             }
 
 			case 0x1c/4:		// SP_SEMAPHORE_REG
-				sp_semaphore = data;
+                sp_semaphore = 0;
 		//      mame_printf_debug("sp_semaphore = %08X\n", sp_semaphore);
 				break;
 
@@ -555,8 +793,47 @@ const rsp_config n64_rsp_config =
 UINT32 n64_vi_width; // This needs to be non-static
 UINT32 n64_vi_origin;
 UINT32 n64_vi_control;
+UINT32 n64_vi_blank;
 static UINT32 n64_vi_burst, n64_vi_vsync,  n64_vi_hsync,  n64_vi_leap,  n64_vi_hstart, n64_vi_vstart;
 static UINT32 n64_vi_intr,  n64_vi_vburst, n64_vi_xscale, n64_vi_yscale;
+
+
+static void n64_vi_recalculate_resolution(running_machine *machine)
+{
+    int x_start = (n64_vi_hstart & 0x03ff0000) >> 16;
+    int x_end = n64_vi_hstart & 0x000003ff;
+    int y_start = ((n64_vi_vstart & 0x03ff0000) >> 16) / 2;
+    int y_end = (n64_vi_vstart & 0x000003ff) / 2;
+    int width = ((n64_vi_xscale & 0x00000fff) * (x_end - x_start)) / 0x400;
+    int height = ((n64_vi_yscale & 0x00000fff) * (y_end - y_start)) / 0x400;
+    rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+    attoseconds_t period = video_screen_get_frame_period(machine->primary_screen).attoseconds;
+
+    if (width == 0 || height == 0)
+    {
+        n64_vi_blank = 1;
+    }
+    else
+    {
+        n64_vi_blank = 0;
+    }
+
+    if (width == 0)
+        width = 1;
+
+    if (height == 0)
+        height = 1;
+
+    if (width > 640)
+        width = 640;
+
+    if (height > 480)
+        height = 480;
+
+    visarea.max_x = width - 1;
+    visarea.max_y = height - 1;
+    video_screen_configure(machine->primary_screen, width, 525, &visarea, period);
+}
 
 READ32_HANDLER( n64_vi_reg_r )
 {
@@ -615,12 +892,7 @@ WRITE32_HANDLER( n64_vi_reg_w )
 		case 0x00/4:		// VI_CONTROL_REG
             if ((n64_vi_control & 0x40) != (data & 0x40))
 			{
-				int width = video_screen_get_width(space->machine->primary_screen);
-				rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen);
-				attoseconds_t period = video_screen_get_frame_period(space->machine->primary_screen).attoseconds;
-
-				visarea.max_y = (data & 0x40) ? 479 : 239;
-				video_screen_configure(space->machine->primary_screen, width, visarea.max_y + 1, &visarea, period);
+                n64_vi_recalculate_resolution(space->machine);
 			}
             n64_vi_control = data;
 			break;
@@ -632,12 +904,7 @@ WRITE32_HANDLER( n64_vi_reg_w )
 		case 0x08/4:		// VI_WIDTH_REG
             if (n64_vi_width != data && data > 0)
 			{
-				int height = video_screen_get_height(space->machine->primary_screen);
-				rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen);
-				attoseconds_t period = video_screen_get_frame_period(space->machine->primary_screen).attoseconds;
-
-				visarea.max_x = data-1;
-				video_screen_configure(space->machine->primary_screen, visarea.max_x + 1, height, &visarea, period);
+                n64_vi_recalculate_resolution(space->machine);
 			}
             n64_vi_width = data;
 		    fb_width = data;
@@ -669,10 +936,12 @@ WRITE32_HANDLER( n64_vi_reg_w )
 
 		case 0x24/4:		// VI_H_START_REG
             n64_vi_hstart = data;
+            n64_vi_recalculate_resolution(space->machine);
 			break;
 
 		case 0x28/4:		// VI_V_START_REG
             n64_vi_vstart = data;
+            n64_vi_recalculate_resolution(space->machine);
 			break;
 
 		case 0x2c/4:		// VI_V_BURST_REG
@@ -681,10 +950,12 @@ WRITE32_HANDLER( n64_vi_reg_w )
 
 		case 0x30/4:		// VI_X_SCALE_REG
             n64_vi_xscale = data;
+            n64_vi_recalculate_resolution(space->machine);
 			break;
 
 		case 0x34/4:		// VI_Y_SCALE_REG
             n64_vi_yscale = data;
+            n64_vi_recalculate_resolution(space->machine);
 			break;
 
         /*
@@ -917,7 +1188,18 @@ WRITE32_HANDLER( n64_ai_reg_w )
 // Peripheral Interface
 
 static UINT32 pi_dram_addr, pi_cart_addr;
-static UINT32 pi_first_dma;
+static UINT32 pi_first_dma = 1;
+static UINT32 pi_rd_len = 0;
+static UINT32 pi_wr_len = 0;
+static UINT32 pi_status = 0;
+static UINT32 pi_bsd_dom1_lat = 0;
+static UINT32 pi_bsd_dom1_pwd = 0;
+static UINT32 pi_bsd_dom1_pgs = 0;
+static UINT32 pi_bsd_dom1_rls = 0;
+static UINT32 pi_bsd_dom2_lat = 0;
+static UINT32 pi_bsd_dom2_pwd = 0;
+static UINT32 pi_bsd_dom2_pgs = 0;
+static UINT32 pi_bsd_dom2_rls = 0;
 
 READ32_HANDLER( n64_pi_reg_r )
 {
@@ -930,7 +1212,31 @@ READ32_HANDLER( n64_pi_reg_r )
 			return pi_cart_addr;
 
 		case 0x10/4:		// PI_STATUS_REG
-			return 0;
+			return pi_status;
+
+        case 0x14/4:        // PI_BSD_DOM1_LAT
+            return pi_bsd_dom1_lat;
+
+        case 0x18/4:        // PI_BSD_DOM1_PWD
+            return pi_bsd_dom1_pwd;
+
+        case 0x1c/4:        // PI_BSD_DOM1_PGS
+            return pi_bsd_dom1_pgs;
+
+        case 0x20/4:        // PI_BSD_DOM1_RLS
+            return pi_bsd_dom1_rls;
+
+        case 0x24/4:        // PI_BSD_DOM2_LAT
+            return pi_bsd_dom2_lat;
+
+        case 0x28/4:        // PI_BSD_DOM2_PWD
+            return pi_bsd_dom2_pwd;
+
+        case 0x2c/4:        // PI_BSD_DOM2_PGS
+            return pi_bsd_dom2_pgs;
+
+        case 0x30/4:        // PI_BSD_DOM2_RLS
+            return pi_bsd_dom2_rls;
 
 		default:
 			logerror("pi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
@@ -959,6 +1265,7 @@ WRITE32_HANDLER( n64_pi_reg_w )
 		{
 			int i;
 			UINT32 dma_length = (data + 1);
+            pi_rd_len = data;
 
 			/*if (dma_length & 3)
             {
@@ -986,6 +1293,7 @@ WRITE32_HANDLER( n64_pi_reg_w )
 		{
 			int i;
 			UINT32 dma_length = (data + 1);
+            pi_wr_len = data;
 
 			if (dma_length & 3)
             {
@@ -1031,6 +1339,38 @@ WRITE32_HANDLER( n64_pi_reg_w )
 			break;
 		}
 
+        case 0x14/4:        // PI_BSD_DOM1_LAT
+            pi_bsd_dom1_lat = data;
+            break;
+
+        case 0x18/4:        // PI_BSD_DOM1_PWD
+            pi_bsd_dom1_pwd = data;
+            break;
+
+        case 0x1c/4:        // PI_BSD_DOM1_PGS
+            pi_bsd_dom1_pgs = data;
+            break;
+
+        case 0x20/4:        // PI_BSD_DOM1_RLS
+            pi_bsd_dom1_rls = data;
+            break;
+
+        case 0x24/4:        // PI_BSD_DOM2_LAT
+            pi_bsd_dom2_lat = data;
+            break;
+
+        case 0x28/4:        // PI_BSD_DOM2_PWD
+            pi_bsd_dom2_pwd = data;
+            break;
+
+        case 0x2c/4:        // PI_BSD_DOM2_PGS
+            pi_bsd_dom2_pgs = data;
+            break;
+
+        case 0x30/4:        // PI_BSD_DOM2_RLS
+            pi_bsd_dom2_rls = data;
+            break;
+
 		default:
 			logerror("pi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
 			break;
@@ -1038,10 +1378,44 @@ WRITE32_HANDLER( n64_pi_reg_w )
 }
 
 // RDRAM Interface
+UINT32 ri_mode = 0;
+UINT32 ri_config = 0;
+UINT32 ri_current_load = 0;
+UINT32 ri_select = 0;
+UINT32 ri_count = 0;
+UINT32 ri_latency = 0;
+UINT32 ri_rerror = 0;
+UINT32 ri_werror = 0;
+
 READ32_HANDLER( n64_ri_reg_r )
 {
+    //printf( "n64_ri_reg_r: 0x%02x/4 (%08x)\n", offset << 2, mem_mask );
 	switch (offset)
 	{
+        case 0x00/4: // RI_MODE_REG
+            return ri_mode;
+
+        case 0x04/4: // RI_CONFIG_REG
+            return ri_config;
+
+        case 0x08/4: // RI_CURRENT_LOAD_REG
+            return ri_current_load;
+
+        case 0x0c/4: // RI_SELECT_REG
+            return ri_select;
+
+        case 0x10/4: // RI_COUNT_REG
+            return ri_count;
+
+        case 0x14/4: // RI_LATENCY_REG
+            return ri_latency;
+
+        case 0x18/4: // RI_RERROR_REG
+            return ri_rerror;
+
+        case 0x1c/4: // RI_WERROR_REG
+            return ri_werror;
+
 		default:
 			logerror("ri_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
 			break;
@@ -1052,8 +1426,41 @@ READ32_HANDLER( n64_ri_reg_r )
 
 WRITE32_HANDLER( n64_ri_reg_w )
 {
+    //printf( "n64_ri_reg_w: 0x%02x/4 = %08x (%08x)\n", offset << 2, data, mem_mask );
 	switch (offset)
 	{
+        case 0x00/4: // RI_MODE_REG
+            ri_mode = data;
+            break;
+
+        case 0x04/4: // RI_CONFIG_REG
+            ri_config = data;
+            break;
+
+        case 0x08/4: // RI_CURRENT_LOAD_REG
+            ri_current_load = data;
+            break;
+
+        case 0x0c/4: // RI_SELECT_REG
+            ri_select = data;
+            break;
+
+        case 0x10/4: // RI_COUNT_REG
+            ri_count = data;
+            break;
+
+        case 0x14/4: // RI_LATENCY_REG
+            ri_latency = data;
+            break;
+
+        case 0x18/4: // RI_RERROR_REG
+            ri_rerror = data;
+            break;
+
+        case 0x1c/4: // RI_WERROR_REG
+            ri_werror = data;
+            break;
+
 		default:
 			logerror("ri_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
 			break;
@@ -1065,6 +1472,8 @@ static UINT8 pif_ram[0x40];
 static UINT8 pif_cmd[0x40];
 static UINT32 si_dram_addr = 0;
 static UINT32 si_pif_addr = 0;
+static UINT32 si_pif_addr_rd64b = 0;
+static UINT32 si_pif_addr_wr64b = 0;
 static UINT32 si_status = 0;
 
 static UINT8 eeprom[512];
@@ -1317,7 +1726,7 @@ static int pif_channel_handle_command(running_machine *machine, int channel, int
 			}
 			//mame_printf_debug("\n");
 
-			rdata[0] = 0;
+			//rdata[0] = 0;
 
 			return 1;
 		}
@@ -1483,8 +1892,8 @@ READ32_HANDLER( n64_si_reg_r )
 {
 	switch (offset)
 	{
-		case 0x00/4:		// SI_DRAM_ADDR_REG
-			return si_dram_addr;
+		//case 0x00/4:		// SI_DRAM_ADDR_REG
+			//return si_dram_addr;
 
 		case 0x18/4:		// SI_STATUS_REG
 			return si_status;
@@ -1504,12 +1913,14 @@ WRITE32_HANDLER( n64_si_reg_w )
 		case 0x04/4:		// SI_PIF_ADDR_RD64B_REG
 			// PIF RAM -> RDRAM
 			si_pif_addr = data;
+            si_pif_addr_rd64b = data;
             pif_dma(space->machine, 0);
 			break;
 
 		case 0x10/4:		// SI_PIF_ADDR_WR64B_REG
 			// RDRAM -> PIF RAM
 			si_pif_addr = data;
+            si_pif_addr_wr64b = data;
             pif_dma(space->machine, 1);
 			break;
 
@@ -1529,21 +1940,23 @@ static UINT32 cic_status = 0x00000000;
 READ32_HANDLER( n64_pif_ram_r )
 {
     /*mame_printf_debug( "pif_ram_r: %08X, %08X = %08X\n", offset << 2, mem_mask, ( ( pif_ram[offset*4+0] << 24 ) | ( pif_ram[offset*4+1] << 16 ) | ( pif_ram[offset*4+2] <<  8 ) | ( pif_ram[offset*4+3] <<  0 ) ) & mem_mask );*/
-    if( offset == ( 0x24 / 4 ) )
+    if(!space->debugger_access)
     {
-        cic_status = 0x00000080;
-    }
-    if( offset == ( 0x3C / 4 ) )
-    {
-        return cic_status;
-    }
+    	if( offset == ( 0x24 / 4 ) )
+    	{
+    	    cic_status = 0x00000080;
+    	}
+    	if( offset == ( 0x3C / 4 ) )
+    	{
+    	    return cic_status;
+    	}
+	}
     return ( ( pif_ram[offset*4+0] << 24 ) | ( pif_ram[offset*4+1] << 16 ) | ( pif_ram[offset*4+2] <<  8 ) | ( pif_ram[offset*4+3] <<  0 ) ) & mem_mask;
 }
 
 WRITE32_HANDLER( n64_pif_ram_w )
 {
     /*mame_printf_debug("pif_ram_w: %08X, %08X, %08X\n", data, offset << 4, mem_mask);*/
-    /*
     if( mem_mask & 0xff000000 )
     {
         pif_ram[offset*4+0] = ( data >> 24 ) & 0x000000ff;
@@ -1560,7 +1973,6 @@ WRITE32_HANDLER( n64_pif_ram_w )
     {
         pif_ram[offset*4+3] = ( data >>  0 ) & 0x000000ff;
     }
-    */
 
     signal_rcp_interrupt(space->machine, SI_INTERRUPT);
 }
@@ -1646,162 +2058,57 @@ MACHINE_RESET( n64 )
     if (boot_checksum == U64(0x000000d057e84864))
     {
         // CIC-NUS-6101
-        mame_printf_debug("CIC-NUS-6101 detected\n");
-        // crc_seed = 0x3f;
+        printf("CIC-NUS-6102 detected\n");
         pif_ram[0x24] = 0x00;
-        pif_ram[0x25] = 0x04;
+        pif_ram[0x25] = 0x02;
+        pif_ram[0x26] = 0x3f;
+        pif_ram[0x27] = 0x3f;
+        // crc_seed = 0x3f;
+    }
+    else if (boot_checksum == U64(0x000000cffb830843) || boot_checksum == U64(0x000000d0027fdf31))
+    {
+        // CIC-NUS-6103
+        printf("CIC-NUS-6101 detected\n");
+        // crc_seed = 0x78;
+        pif_ram[0x24] = 0x00;
+        pif_ram[0x25] = 0x06;
         pif_ram[0x26] = 0x3f;
         pif_ram[0x27] = 0x3f;
     }
     else if (boot_checksum == U64(0x000000d6499e376b))
     {
         // CIC-NUS-6103
-        mame_printf_debug("CIC-NUS-6103 detected\n");
+        printf("CIC-NUS-6103 detected\n");
         // crc_seed = 0x78;
         pif_ram[0x24] = 0x00;
-        pif_ram[0x25] = 0x04;
+        pif_ram[0x25] = 0x02;
         pif_ram[0x26] = 0x78;
-        pif_ram[0x27] = 0x78;
+        pif_ram[0x27] = 0x3f;
     }
     else if (boot_checksum == U64(0x0000011a4a1604b6))
     {
         // CIC-NUS-6105
-        mame_printf_debug("CIC-NUS-6105 detected\n");
+        printf("CIC-NUS-6105 detected\n");
         // crc_seed = 0x91;
 
         // first_rsp = 0;
         pif_ram[0x24] = 0x00;
-        pif_ram[0x25] = 0x04;
+        pif_ram[0x25] = 0x02;
         pif_ram[0x26] = 0x91;
-        pif_ram[0x27] = 0x91;
+        pif_ram[0x27] = 0x3f;
     }
     else if (boot_checksum == U64(0x000000d6d5de4ba0))
     {
         // CIC-NUS-6106
-        mame_printf_debug("CIC-NUS-6106 detected\n");
+        printf("CIC-NUS-6106 detected\n");
         // crc_seed = 0x85;
         pif_ram[0x24] = 0x00;
-        pif_ram[0x25] = 0x04;
+        pif_ram[0x25] = 0x02;
         pif_ram[0x26] = 0x85;
-        pif_ram[0x27] = 0x85;
+        pif_ram[0x27] = 0x3f;
     }
     else
     {
-        mame_printf_debug("Unknown BootCode Checksum %08X%08X\n", (UINT32)(boot_checksum>>32),(UINT32)(boot_checksum));
+        printf("Unknown BootCode Checksum %08X%08X\n", (UINT32)(boot_checksum>>32),(UINT32)(boot_checksum));
     }
-
-    /*
-    // bootcode differs between CIC-chips, so we can use its checksum to detect the CIC-chip
-    boot_checksum = 0;
-    for (i=0x40; i < 0x1000; i+=4)
-    {
-        boot_checksum += cart[i/4]+i;
-    }
-
-    if (boot_checksum == U64(0x000000d057e84864))
-    {
-        // CIC-NUS-6101
-        mame_printf_debug("CIC-NUS-6101 detected\n");
-        crc_seed = 0x3f;
-    }
-    else if (boot_checksum == U64(0x000000d6499e376b))
-    {
-        // CIC-NUS-6103
-        mame_printf_debug("CIC-NUS-6103 detected\n");
-        crc_seed = 0x78;
-    }
-    else if (boot_checksum == U64(0x0000011a4a1604b6))
-    {
-        // CIC-NUS-6105
-        mame_printf_debug("CIC-NUS-6105 detected\n");
-        crc_seed = 0x91;
-
-        first_rsp = 0;
-    }
-    else if (boot_checksum == U64(0x000000d6d5de4ba0))
-    {
-        // CIC-NUS-6106
-        mame_printf_debug("CIC-NUS-6106 detected\n");
-        crc_seed = 0x85;
-    }
-    else
-    {
-        mame_printf_debug("Unknown BootCode Checksum %08X%08X\n", (UINT32)(boot_checksum>>32),(UINT32)(boot_checksum));
-    }
-
-    // The PIF Boot ROM is not dumped, the following code simulates it
-
-    // clear all registers
-    for (i=1; i < 32; i++)
-    {
-        *pif_rom++ = 0x00000000 | 0 << 21 | 0 << 16 | i << 11 | 0x20;       // ADD ri, r0, r0
-    }
-
-    // R20 <- 0x00000001
-    *pif_rom++ = 0x34000000 | 20 << 16 | 0x0001;                    // ORI r20, r0, 0x0001
-
-    // R22 <- 0x0000003F
-    *pif_rom++ = 0x34000000 | 22 << 16 | crc_seed;                  // ORI r22, r0, 0x003f
-
-    // R29 <- 0xA4001FF0
-    *pif_rom++ = 0x3c000000 | 29 << 16 | 0xa400;                    // LUI r29, 0xa400
-    *pif_rom++ = 0x34000000 | 29 << 21 | 29 << 16 | 0x1ff0;         // ORI r29, r29, 0x1ff0
-
-    // clear CP0 registers
-    for (i=0; i < 32; i++)
-    {
-        *pif_rom++ = 0x40000000 | 4 << 21 | 0 << 16 | i << 11;      // MTC2 cp0ri, r0
-    }
-
-    // Random <- 0x0000001F
-    *pif_rom++ = 0x34000000 | 1 << 16 | 0x001f;
-    *pif_rom++ = 0x40000000 | 4 << 21 | 1 << 16 | 1 << 11;          // MTC2 Random, r1
-
-    // Status <- 0x70400004
-    *pif_rom++ = 0x3c000000 | 1 << 16 | 0x7040;                     // LUI r1, 0x7040
-    *pif_rom++ = 0x34000000 | 1 << 21 | 1 << 16 | 0x0004;           // ORI r1, r1, 0x0004
-    *pif_rom++ = 0x40000000 | 4 << 21 | 1 << 16 | 12 << 11;         // MTC2 Status, r1
-
-    // PRId <- 0x00000B00
-    *pif_rom++ = 0x34000000 | 1 << 16 | 0x0b00;                     // ORI r1, r0, 0x0b00
-    *pif_rom++ = 0x40000000 | 4 << 21 | 1 << 16 | 15 << 11;         // MTC2 PRId, r1
-
-    // Config <- 0x0006E463
-    *pif_rom++ = 0x3c000000 | 1 << 16 | 0x0006;                     // LUI r1, 0x0006
-    *pif_rom++ = 0x34000000 | 1 << 21 | 1 << 16 | 0xe463;           // ORI r1, r1, 0xe463
-    *pif_rom++ = 0x40000000 | 4 << 21 | 1 << 16 | 16 << 11;         // MTC2 Config, r1
-
-    // (0xa4300004) <- 0x01010101
-    *pif_rom++ = 0x3c000000 | 1 << 16 | 0x0101;                     // LUI r1, 0x0101
-    *pif_rom++ = 0x34000000 | 1 << 21 | 1 << 16 | 0x0101;           // ORI r1, r1, 0x0101
-    *pif_rom++ = 0x3c000000 | 3 << 16 | 0xa430;                     // LUI r3, 0xa430
-    *pif_rom++ = 0xac000000 | 3 << 21 | 1 << 16 | 0x0004;           // SW r1, 0x0004(r3)
-
-    // Copy 0xb0000000...1fff -> 0xa4000000...1fff
-    *pif_rom++ = 0x34000000 | 3 << 16 | 0x0400;                     // ORI r3, r0, 0x0400
-    *pif_rom++ = 0x3c000000 | 4 << 16 | 0xb000;                     // LUI r4, 0xb000
-    *pif_rom++ = 0x3c000000 | 5 << 16 | 0xa400;                     // LUI r5, 0xa400
-    *pif_rom++ = 0x8c000000 | 4 << 21 | 1 << 16;                    // LW r1, 0x0000(r4)
-    *pif_rom++ = 0xac000000 | 5 << 21 | 1 << 16;                    // SW r1, 0x0000(r5)
-    *pif_rom++ = 0x20000000 | 4 << 21 | 4 << 16 | 0x0004;           // ADDI r4, r4, 0x0004
-    *pif_rom++ = 0x20000000 | 5 << 21 | 5 << 16 | 0x0004;           // ADDI r5, r5, 0x0004
-    *pif_rom++ = 0x20000000 | 3 << 21 | 3 << 16 | 0xffff;           // ADDI r3, r3, -1
-    *pif_rom++ = 0x14000000 | 3 << 21 | 0 << 16 | 0xfffa;           // BNE r3, r0, -6
-    *pif_rom++ = 0x00000000;
-
-    *pif_rom++ = 0x34000000 | 3 << 16 | 0x0000;                     // ORI r3, r0, 0x0000
-    *pif_rom++ = 0x34000000 | 4 << 16 | 0x0000;                     // ORI r4, r0, 0x0000
-    *pif_rom++ = 0x34000000 | 5 << 16 | 0x0000;                     // ORI r5, r0, 0x0000
-
-    // Zelda and DK64 need these
-    *pif_rom++ = 0x3c000000 | 9 << 16 | 0xa400;
-    *pif_rom++ = 0x34000000 | 9 << 21 | 9 << 16 | 0x1ff0;
-    *pif_rom++ = 0x3c000000 | 11 << 16 | 0xa400;
-    *pif_rom++ = 0x3c000000 | 31 << 16 | 0xffff;
-    *pif_rom++ = 0x34000000 | 31 << 21 | 31 << 16 | 0xffff;
-
-    *pif_rom++ = 0x3c000000 | 1 << 16 | 0xa400;                     // LUI r1, 0xa400
-    *pif_rom++ = 0x34000000 | 1 << 21 | 1 << 16 | 0x0040;           // ORI r1, r1, 0x0040
-    *pif_rom++ = 0x00000000 | 1 << 21 | 0x8;                        // JR r1
-    */
 }
