@@ -1584,6 +1584,7 @@ src/mame/drivers/gberet.c svneol=native#text/plain
 src/mame/drivers/gbusters.c svneol=native#text/plain
 src/mame/drivers/gcpinbal.c svneol=native#text/plain
 src/mame/drivers/getrivia.c svneol=native#text/plain
+src/mame/drivers/ggconnie.c svneol=native#text/plain
 src/mame/drivers/ghosteo.c svneol=native#text/plain
 src/mame/drivers/gijoe.c svneol=native#text/plain
 src/mame/drivers/ginganin.c svneol=native#text/plain
