@@ -4128,7 +4128,8 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( von )		/* 1996.01 Dennou Senki Virtual-On */
 	DRIVER( vonj )
 	DRIVER( gunblade )	/* 1996.04 Gunblade N.Y. */
-	DRIVER( schamp )	/* 1996.05 Sonic the Fighters */
+	DRIVER( schamp )	/* 1996.05 Sonic Championship */
+	DRIVER( sfight )	/* 1996.05 Sonic the Fighters */
 	DRIVER( lastbrnx )	/* 1996.06 Last Bronx */
 	DRIVER( lastbrnxj )
 	DRIVER( sgt24h )	/* 1996.07 Super GT 24h */
