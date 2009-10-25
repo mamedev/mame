@@ -64,8 +64,8 @@ To Do:
 - Figure out how MCU resets writeback address (currently hacked)
 - Find relationship between Key tables and final datablock
 - Clean up debug code file writes etc. (when above are done only!)
-- Interrupt timing? (some sprites flicker)
-- Sprite buffering (1-2 frames?, or related to above)
+- Interrupt timing? (some sprites flicker) - some sprite flicker exists in youtube videos too, so probably not a bug
+- Sprite buffering (1-2 frames?, or related to above) - some bg objects with sprite parts break up in shogun
 
 Dip locations verified from manual for:
 
@@ -807,15 +807,38 @@ ADDRESS_MAP_END
                                 Shogun Warriors
 ***************************************************************************/
 
-/* Works for B-Rap Boys - untested with Shogun Warriors */
+static void kaneko16_common_oki_bank_w( running_machine* machine, int bankindex, const char* tag, int bank, size_t fixedsize, size_t bankedsize )
+{
+	UINT32 bankaddr;
+	UINT8* samples = memory_region(machine,tag);
+	size_t length = memory_region_length(machine,tag);
+
+	bankaddr = fixedsize + (bankedsize * bank);
+
+	if (bankaddr <= (length-bankedsize))
+	{
+		memory_set_bankptr(machine, bankindex, samples + bankaddr);
+	}
+}
+
 static WRITE16_HANDLER( shogwarr_oki_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(devtag_get_device(space->machine, "oki1"), 0x40000 * ((data >> 4) & 0xf));
-		okim6295_set_bank_base(devtag_get_device(space->machine, "oki2"), 0x40000 * (data & 0xf));
+		kaneko16_common_oki_bank_w(space->machine, 10, "oki1", (data >> 4) & 0xf, 0x30000, 0x10000);
+		kaneko16_common_oki_bank_w(space->machine, 11, "oki2", (data & 0xf)     , 0x00000, 0x40000);
 	}
 }
+
+static WRITE16_HANDLER( brapboys_oki_bank_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		kaneko16_common_oki_bank_w(space->machine, 10, "oki1", (data >> 4) & 0xf, 0x30000, 0x10000);
+		kaneko16_common_oki_bank_w(space->machine, 11, "oki2", (data & 0xf)     , 0x20000, 0x20000);
+	}
+}
+
 
 static ADDRESS_MAP_START( shogwarr, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM		// ROM
@@ -2153,6 +2176,15 @@ static NVRAM_HANDLER( shogwarr )
 	}
 }
 
+static ADDRESS_MAP_START( shogwarr_oki1_map, 0, 8 )
+	AM_RANGE(0x00000, 0x2ffff) AM_ROM
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK(10)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( shogwarr_oki2_map, 0, 8 )
+	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK(11)
+ADDRESS_MAP_END
+
 static MACHINE_DRIVER_START( shogwarr )
 
 	/* basic machine hardware */
@@ -2184,12 +2216,24 @@ static MACHINE_DRIVER_START( shogwarr )
 	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_16MHz/8)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_DEVICE_ADDRESS_MAP(0, shogwarr_oki1_map)
 
 	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_16MHz/8)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_DEVICE_ADDRESS_MAP(0, shogwarr_oki2_map)
 MACHINE_DRIVER_END
 
+static ADDRESS_MAP_START( brapboys_oki2_map, 0, 8 )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK(11)
+ADDRESS_MAP_END
+
+static MACHINE_DRIVER_START( brapboys )
+	MDRV_IMPORT_FROM(shogwarr)
+	MDRV_SOUND_MODIFY("oki2")
+	MDRV_DEVICE_ADDRESS_MAP(0, brapboys_oki2_map)
+MACHINE_DRIVER_END
 
 /***************************************************************************
 
@@ -3302,6 +3346,66 @@ ROM_START( mgcrystlj ) /* Master Up: 92/01/13 14:44:20 */
 ROM_END
 
 
+
+/***************************************************************************
+
+Shogun Warriors (Europe Rev.xx)(Kaneko 1992)
+
+Dumped from an original Kaneko PCB. Board No. Z01DK-002 / Serial FB92E01342. + Top board "Z05DP FOR Z01DK"
+
+Two Program roms are equal to the Japanese version. See Below:
+
+fb000e.u43  = fb001e.u43  Shogun Warriors               <Note: Different label compared to Mame.
+fb001e.u101 = fb000e.u42  Shogun Warriors               <Note: Different label/position compared to Mame.
+fb030e.u61  = fb030j.u61  Fujiyama Buster(Japan)        <Note: Same as the Japanese version in Mame.
+fb031e.u62 NO MATCH
+fb040e.u33  = fb040j.u33  Fujiyama Buster (Japan)       <Note: Same as the Japanese version in Mame.
+
+
+The rom positions are equal to the Japanese version in Mame (Same Hardware revision).
+The "e" suffix on the roms of "Shogun Warriors" that is previously
+in Mame indicates that it is an European Version too, so this must be
+an earlier or later European revision.
+
+Some hardware(custom chip) differences compared with the info in the Mame source:
+
+Fujiyama Buster(Japan)                      Shogun Warriors (Europe) (My Dump)
+
+KANEKO JAPAN 9152EV 175101 (160 Pin PQFP) = KANEKO JAPAN 9202EV 175071 (160 Pin PQFP)
+KANEKO JAPAN 9203 T (44 PIN PQFP)         = KANEKO JAPAN 9204 T (44 PIN PQFP)
+
+***************************************************************************/
+
+ROM_START( shogwarr )
+ 	ROM_REGION( 0x040000, "maincpu", 0 )			/* 68000 Code */
+	ROM_LOAD16_BYTE( "fb030e.u61", 0x000000, 0x020000, CRC(32ce7909) SHA1(02d87342706ac9547eb611bd542f8498ba41e34a) )
+	ROM_LOAD16_BYTE( "fb031e.u62", 0x000001, 0x020000, CRC(228aeaf5) SHA1(5e080d7975bc5dcf6fccfbc286eafe939496d9bf) )
+
+ 	ROM_REGION( 0x020000, "cpu1", 0 )			/* MCU Code */
+	ROM_LOAD( "fb040e.u33",  0x000000, 0x020000, CRC(299d0746) SHA1(67fe3a47ab01fa02ce2bb5836c2041986c19d875) )
+
+	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASEFF )	/* Sprites */
+	ROM_LOAD( "fb-020a.u1", 0x000000, 0x100000, CRC(87e55c6d) SHA1(87886c045d7c30b8dee3c8fb0bf8f2cdbc5fd7fb) )
+	ROM_LOAD( "fb020b.u2",  0x100000, 0x100000, CRC(276b9d7b) SHA1(7a154f65b4737f2b6ac8effa3352711079f571dc) )
+	ROM_LOAD( "fb021a.u3",  0x200000, 0x100000, CRC(7da15d37) SHA1(345cf2242e8210a697294a45197f2b3b974de885) )
+	ROM_LOAD( "fb021b.u4",  0x300000, 0x100000, CRC(6a512d7b) SHA1(7fc3002d23262a9a590a283ea9e111e38d889ef2) )
+	ROM_LOAD( "fb-22a.u5",  0x400000, 0x100000, CRC(9039e5d3) SHA1(222452cd7947f7c99c68e495835cca62e0449b5c) )
+	ROM_LOAD( "fb-22b.u6",  0x500000, 0x100000, CRC(96ac9e54) SHA1(2b066375963dc57fe2ce89d65f6c0a9d183a838d) )
+	ROM_LOAD( "fb023.u7",   0x600000, 0x100000, CRC(132794bd) SHA1(bcc73c3183c59a4b66f79d04774773b8a9239501) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Tiles (scrambled) */
+	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )	// 42 pin mask rom
+	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )	// 40 pin mask rom (verified correct)
+
+	ROM_REGION( 0x100000, "oki1", 0 )
+	ROM_LOAD( "fb001e.u43",  0x000000, 0x080000, CRC(f524aaa1) SHA1(006a886f9df2e57c51b61c6cea70a6574fc20304) )
+	ROM_LOAD( "fb000e.u42",  0x080000, 0x080000, CRC(969f1465) SHA1(4f56d1ad341b08f4db41b7ab2498740612ff7c3d) )
+
+	ROM_REGION( 0x200000, "oki2", 0 )
+	ROM_LOAD( "fb-002.u45",   0x000000, 0x100000, CRC(010acc17) SHA1(2dc0897c7778eacf6bce12ff0adbadb307ea6c17) )
+	ROM_LOAD( "fb-003.u44",   0x100000, 0x100000, CRC(0aea4ac5) SHA1(8f3b30e505b0ba51c140a0a2c071680d4fa05db9) )
+ROM_END
+
 /***************************************************************************
 
                                 Shogun Warriors
@@ -3347,7 +3451,7 @@ ROUTINES:
 // the 'green garbage' on the VS logo shown in the video ( http://www.youtube.com/watch?v=lz4gY9d7uxw ) doesn't happen on the real PCB,
 // it appears to be an encoding artifact on the videos uploaded by this poster
 
-ROM_START( shogwarr )
+ROM_START( shogwarru )
  	ROM_REGION( 0x040000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "fb030a.u61", 0x000000, 0x020000, CRC(a04106c6) SHA1(95ab084f2e709be7cec2964cb09bcf5a8d3aacdf) )
 	ROM_LOAD16_BYTE( "fb031a.u62", 0x000001, 0x020000, CRC(d1def5e2) SHA1(f442de4433547e52b483549aca5786e4597a7122) )
@@ -3368,76 +3472,9 @@ ROM_START( shogwarr )
 	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )	// 42 pin mask rom
 	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )	// 40 pin mask rom (verified correct)
 
-	ROM_REGION( 0x300000, "samples", 0 )
+	ROM_REGION( 0x100000, "oki1", 0 )
 	ROM_LOAD( "fb001e.u43",  0x000000, 0x080000, CRC(f524aaa1) SHA1(006a886f9df2e57c51b61c6cea70a6574fc20304) )
 	ROM_LOAD( "fb000e.u42",  0x080000, 0x080000, CRC(969f1465) SHA1(4f56d1ad341b08f4db41b7ab2498740612ff7c3d) )
-
-	/* Sound data is copied here during driver init */
-	ROM_REGION( 0x400000*16, "oki1", 0 )
-	ROM_FILL(                0x00000, 0x400000*16, 0x00 )
-
-	ROM_REGION( 0x200000, "oki2", 0 )
-	ROM_LOAD( "fb-002.u45",   0x000000, 0x100000, CRC(010acc17) SHA1(2dc0897c7778eacf6bce12ff0adbadb307ea6c17) )
-	ROM_LOAD( "fb-003.u44",   0x100000, 0x100000, CRC(0aea4ac5) SHA1(8f3b30e505b0ba51c140a0a2c071680d4fa05db9) )
-ROM_END
-
-/***************************************************************************
-
-Shogun Warriors (Europe Rev.xx)(Kaneko 1992)
-
-Dumped from an original Kaneko PCB. Board No. Z01DK-002 / Serial FB92E01342. + Top board "Z05DP FOR Z01DK"
-
-Two Program roms are equal to the Japanese version. See Below:
-
-fb000e.u43  = fb001e.u43  Shogun Warriors               <Note: Different label compared to Mame.
-fb001e.u101 = fb000e.u42  Shogun Warriors               <Note: Different label/position compared to Mame.
-fb030e.u61  = fb030j.u61  Fujiyama Buster(Japan)        <Note: Same as the Japanese version in Mame.
-fb031e.u62 NO MATCH
-fb040e.u33  = fb040j.u33  Fujiyama Buster (Japan)       <Note: Same as the Japanese version in Mame.
-
-
-The rom positions are equal to the Japanese version in Mame (Same Hardware revision).
-The "e" suffix on the roms of "Shogun Warriors" that is previously
-in Mame indicates that it is an European Version too, so this must be
-an earlier or later European revision.
-
-Some hardware(custom chip) differences compared with the info in the Mame source:
-
-Fujiyama Buster(Japan)                      Shogun Warriors (Europe) (My Dump)
-
-KANEKO JAPAN 9152EV 175101 (160 Pin PQFP) = KANEKO JAPAN 9202EV 175071 (160 Pin PQFP)
-KANEKO JAPAN 9203 T (44 PIN PQFP)         = KANEKO JAPAN 9204 T (44 PIN PQFP)
-
-***************************************************************************/
-
-ROM_START( shogwarre )
- 	ROM_REGION( 0x040000, "maincpu", 0 )			/* 68000 Code */
-	ROM_LOAD16_BYTE( "fb030e.u61", 0x000000, 0x020000, CRC(32ce7909) SHA1(02d87342706ac9547eb611bd542f8498ba41e34a) )
-	ROM_LOAD16_BYTE( "fb031e.u62", 0x000001, 0x020000, CRC(228aeaf5) SHA1(5e080d7975bc5dcf6fccfbc286eafe939496d9bf) )
-
- 	ROM_REGION( 0x020000, "cpu1", 0 )			/* MCU Code */
-	ROM_LOAD( "fb040e.u33",  0x000000, 0x020000, CRC(299d0746) SHA1(67fe3a47ab01fa02ce2bb5836c2041986c19d875) )
-
-	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASEFF )	/* Sprites */
-	ROM_LOAD( "fb-020a.u1", 0x000000, 0x100000, CRC(87e55c6d) SHA1(87886c045d7c30b8dee3c8fb0bf8f2cdbc5fd7fb) )
-	ROM_LOAD( "fb020b.u2",  0x100000, 0x100000, CRC(276b9d7b) SHA1(7a154f65b4737f2b6ac8effa3352711079f571dc) )
-	ROM_LOAD( "fb021a.u3",  0x200000, 0x100000, CRC(7da15d37) SHA1(345cf2242e8210a697294a45197f2b3b974de885) )
-	ROM_LOAD( "fb021b.u4",  0x300000, 0x100000, CRC(6a512d7b) SHA1(7fc3002d23262a9a590a283ea9e111e38d889ef2) )
-	ROM_LOAD( "fb-22a.u5",  0x400000, 0x100000, CRC(9039e5d3) SHA1(222452cd7947f7c99c68e495835cca62e0449b5c) )
-	ROM_LOAD( "fb-22b.u6",  0x500000, 0x100000, CRC(96ac9e54) SHA1(2b066375963dc57fe2ce89d65f6c0a9d183a838d) )
-	ROM_LOAD( "fb023.u7",   0x600000, 0x100000, CRC(132794bd) SHA1(bcc73c3183c59a4b66f79d04774773b8a9239501) )
-
-	ROM_REGION( 0x400000, "gfx2", 0 )	/* Tiles (scrambled) */
-	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )	// 42 pin mask rom
-	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )	// 40 pin mask rom (verified correct)
-
-	ROM_REGION( 0x300000, "samples", 0 )
-	ROM_LOAD( "fb001e.u43",  0x000000, 0x080000, CRC(f524aaa1) SHA1(006a886f9df2e57c51b61c6cea70a6574fc20304) )
-	ROM_LOAD( "fb000e.u42",  0x080000, 0x080000, CRC(969f1465) SHA1(4f56d1ad341b08f4db41b7ab2498740612ff7c3d) )
-
-	/* Sound data is copied here during driver init */
-	ROM_REGION( 0x400000*16, "oki1", 0 )
-	ROM_FILL(                0x00000, 0x400000*16, 0x00 )
 
 	ROM_REGION( 0x200000, "oki2", 0 )
 	ROM_LOAD( "fb-002.u45",   0x000000, 0x100000, CRC(010acc17) SHA1(2dc0897c7778eacf6bce12ff0adbadb307ea6c17) )
@@ -3503,14 +3540,9 @@ ROM_START( fjbuster )	// Fujiyama Buster - Japan version of Shogun Warriors
 	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )	// 42 pin mask rom
 	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )	// 40 pin mask rom (verified correct)
 
-
-	ROM_REGION( 0x300000, "samples", 0 )
+	ROM_REGION( 0x100000, "oki1", 0 )
 	ROM_LOAD( "fb000j.u43",    0x000000, 0x080000, CRC(a7522555) SHA1(ea88d90dda20bc309f98a1924c41551e7708e6af) )
 	ROM_LOAD( "fb001j_u.101",  0x080000, 0x080000, CRC(07d4e8e2) SHA1(0de911f452ddeb54b0b435b9c1cf5d5881175d44) )
-
-	/* Sound data is copied here during driver init */
-	ROM_REGION( 0x400000*16, "oki1", 0 )
-	ROM_FILL(                0x00000, 0x400000*16, 0x00 )
 
 	ROM_REGION( 0x200000, "oki2", 0 )
 	ROM_LOAD( "fb-002.u45",   0x000000, 0x100000, CRC(010acc17) SHA1(2dc0897c7778eacf6bce12ff0adbadb307ea6c17) )
@@ -3655,21 +3687,13 @@ ROM_START( brapboys ) /* Single PCB, fully populated, no rom sub board */
 	ROM_LOAD( "rb-012.u67",  0x200000, 0x100000, CRC(bfdbe0d1) SHA1(3abc5398ee8ee1871b4d081f9b748539d69bcdba) )
 	ROM_LOAD( "rb-013.u68",  0x300000, 0x100000, CRC(28c37fe8) SHA1(e10dd1a810983077328b44e6e33ce2e899c506d2) )
 
-	ROM_REGION( 0x300000, "samples", 0 )
-	/* OKI 1 */
+	ROM_REGION( 0x100000, "oki1", 0 )
 	ROM_LOAD( "rb-000.u43",  0x000000, 0x080000, CRC(58ad1a62) SHA1(1d2643b5f6eac22682972a88d284e00de3e3b223) )
 	ROM_LOAD( "rb-003.101",  0x080000, 0x080000, CRC(2cac25d7) SHA1(0412c317bf650a93051b9304d23035efde0c026a) )
 
-	/* OKI 2 */
-	ROM_LOAD( "rb-001.u44",  0x100000, 0x100000, CRC(7cf774b3) SHA1(3fb0a5096ce9480f97e311439042eb8cbc26efb4) )
-	ROM_LOAD( "rb-002.u45",  0x200000, 0x100000, CRC(e4b30444) SHA1(be6756dce3721226e0b7f5d4d168008c31aeea8e) )
-
-	/* Sound data is copied here during driver init */
-	ROM_REGION( 0x400000*16, "oki1", 0 )
-	ROM_FILL(                0x00000, 0x400000*16, 0x00 )
-
-	ROM_REGION( 0x400000*16, "oki2", 0 )
-	ROM_FILL(                0x00000, 0x400000*16, 0x00 )
+	ROM_REGION( 0x200000, "oki2", 0 )
+	ROM_LOAD( "rb-001.u44",  0x000000, 0x100000, CRC(7cf774b3) SHA1(3fb0a5096ce9480f97e311439042eb8cbc26efb4) )
+	ROM_LOAD( "rb-002.u45",  0x100000, 0x100000, CRC(e4b30444) SHA1(be6756dce3721226e0b7f5d4d168008c31aeea8e) )
 ROM_END
 
 
@@ -3682,7 +3706,6 @@ ROM_START( brapboysj ) /* The Japanese version has an extra rom??? and used a ro
 	ROM_LOAD( "rb-006.u33",  0x000000, 0x020000, CRC(f1d76b20) SHA1(c571b5f28e529589ee2d7697ef5d4b60ccb66e7a) )
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )	/* Sprites */
-	/* prety sure all these are at least half size */
 	ROM_LOAD( "rb-020.c2",  0x000000, 0x100000, CRC(ce220d38) SHA1(b88d7c89a3e1a826bf19a1fa692ec77c944596d9) )
 	ROM_LOAD( "rb-021.u76", 0x100000, 0x100000, CRC(74001407) SHA1(90002056ceb4e0401246950b8c3f996af0a2463c) )
 	ROM_LOAD( "rb-022.u77", 0x200000, 0x100000, CRC(cb3f42dc) SHA1(5415f15621924dd263b8fe7daaf3dc25d470b814) )
@@ -3691,28 +3714,19 @@ ROM_START( brapboysj ) /* The Japanese version has an extra rom??? and used a ro
 	ROM_LOAD( "rb-025.u4",  0x500000, 0x080000, CRC(aa795ba5) SHA1(c5256dcceded2e76f548b60c18e51d0dd0209d81) ) // eprom, special title screen
 	ROM_LOAD( "rb-026.u5",  0x580000, 0x080000, CRC(bb7604d4) SHA1(57d51ce4ea2000f9a50bae326cfcb66ec494249f) ) // eprom, logs that bounce past
 
-
 	ROM_REGION( 0x400000, "gfx2", 0 )	/* Tiles (scrambled) */
 	ROM_LOAD( "rb-010.u65",  0x000000, 0x100000, CRC(ffd73f87) SHA1(1a661f71976be61c22d9b962850e738ba17f1d45) )
 	ROM_LOAD( "rb-011.u66",  0x100000, 0x100000, CRC(d9325f78) SHA1(346832608664aa8f3ac9260a549903386b4125a8) )
 	ROM_LOAD( "rb-012.u67",  0x200000, 0x100000, CRC(bfdbe0d1) SHA1(3abc5398ee8ee1871b4d081f9b748539d69bcdba) )
 	ROM_LOAD( "rb-013.u68",  0x300000, 0x100000, CRC(28c37fe8) SHA1(e10dd1a810983077328b44e6e33ce2e899c506d2) )
 
-	ROM_REGION( 0x300000, "samples", 0 )
-	/* OKI 1 */
+	ROM_REGION( 0x100000, "oki1", 0 )
 	ROM_LOAD( "rb-000.u43",  0x000000, 0x080000, CRC(58ad1a62) SHA1(1d2643b5f6eac22682972a88d284e00de3e3b223) )
 	ROM_LOAD( "rb-003.101",  0x080000, 0x080000, CRC(2cac25d7) SHA1(0412c317bf650a93051b9304d23035efde0c026a) )
 
-	/* OKI 2 */
-	ROM_LOAD( "rb-001.u44",  0x100000, 0x100000, CRC(7cf774b3) SHA1(3fb0a5096ce9480f97e311439042eb8cbc26efb4) )
-	ROM_LOAD( "rb-002.u45",  0x200000, 0x100000, CRC(e4b30444) SHA1(be6756dce3721226e0b7f5d4d168008c31aeea8e) )
-
-	/* Sound data is copied here during driver init */
-	ROM_REGION( 0x400000*16, "oki1", 0 )
-	ROM_FILL(                0x00000, 0x400000*16, 0x00 )
-
-	ROM_REGION( 0x400000*16, "oki2", 0 )
-	ROM_FILL(                0x00000, 0x400000*16, 0x00 )
+	ROM_REGION( 0x200000, "oki2", 0 )
+	ROM_LOAD( "rb-001.u44",  0x000000, 0x100000, CRC(7cf774b3) SHA1(3fb0a5096ce9480f97e311439042eb8cbc26efb4) )
+	ROM_LOAD( "rb-002.u45",  0x100000, 0x100000, CRC(e4b30444) SHA1(be6756dce3721226e0b7f5d4d168008c31aeea8e) )
 ROM_END
 
 /**********************************************************************
@@ -3814,71 +3828,27 @@ static DRIVER_INIT( calc3 )
 	DRIVER_INIT_CALL(kaneko16);
     //  MCU is a 78K series III type CPU
 }
-static void expand_shogwarr_samples(running_machine* machine)
-{
-	/*
-        Expand the OKI sample data
 
-        OKI 1:
-        Address space 0x00000-0x2ffff is fixed
-        Address space 0x30000-0x3ffff is banked (13 banks)
-    */
-
-	int bank;
-	UINT8 *src = memory_region(machine, "samples");
-	UINT8 *dst1 = memory_region(machine, "oki1");
-
-	/* OKI 1 */
-	for (bank = 0; bank < 13; ++bank)
-	{
-		UINT8 *dst;
-		UINT8 *srcn;
-
-		dst = dst1 + 0x40000 * bank;
-		srcn = src + 0x30000 + (0x10000 * bank);
-		memcpy(dst, src, 0x30000);
-		memcpy(dst + 0x30000, srcn, 0x10000);
-	}
-}
-
-static void expand_brapboys_music(running_machine* machine)
-{
-	/*
-        Expand the OKI sample data
-
-        OKI 2:
-        Address space 0x00000-0x1ffff is fixed
-        Address space 0x20000-0x3ffff is banked (15 banks)
-    */
-
-	int bank;
-	UINT8 *src = memory_region(machine, "samples");
-	UINT8 *dst2 = memory_region(machine, "oki2");
-
-	/* OKI 2 */
-	for (bank = 0; bank < 15; ++bank)
-	{
-		UINT8 *dst;
-		UINT8 *srcn;
-		dst = dst2 + 0x40000 * bank;
-		srcn = src + 0x120000 + (0x20000 * bank);
-		memcpy(dst, src + 0x100000, 0x20000);
-		memcpy(dst + 0x20000, srcn, 0x20000);
-	}
-}
 
 static DRIVER_INIT( shogwarr )
 {
-	expand_shogwarr_samples(machine);
+	// default sample banks
+	kaneko16_common_oki_bank_w(machine, 10, "oki1", 0, 0x30000, 0x10000);
+	kaneko16_common_oki_bank_w(machine, 11, "oki2", 0, 0x00000, 0x40000);
+
 	DRIVER_INIT_CALL(calc3);
 }
 
 
 static DRIVER_INIT( brapboys )
 {
-	expand_shogwarr_samples(machine);
 	// sample banking is different on brap boys for the music, why? GALs / PALs ?
-	expand_brapboys_music(machine);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe00000, 0xe00001, 0, 0, brapboys_oki_bank_w);
+
+	// default sample banks
+	kaneko16_common_oki_bank_w(machine, 10, "oki1", 0, 0x30000, 0x10000);
+	kaneko16_common_oki_bank_w(machine, 11, "oki2", 0, 0x20000, 0x20000);
+
 	DRIVER_INIT_CALL(calc3);
 }
 
@@ -3910,9 +3880,9 @@ GAME( 1995, gtmr2,    0,        gtmr2,    gtmr2,    gtmr2, ROT0,  "Kaneko", "Mil
 GAME( 1995, gtmr2a,   gtmr2,    gtmr2,    gtmr2,    gtmr2, ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/04/04)", 0 )
 GAME( 1995, gtmr2u,   gtmr2,    gtmr2,    gtmr2,    gtmr2, ROT0,  "Kaneko", "Great 1000 Miles Rally 2 USA (95/05/18)", 0 )
 // some functionality of the protection chip still needs investigating on these, but they seem to be playable
-GAME( 1992, brapboys, 0,        shogwarr, brapboys, brapboys,          ROT0,  "Kaneko", "B.Rap Boys (World)",      0 )
-GAME( 1992, brapboysj,brapboys, shogwarr, brapboys, brapboys,          ROT0,  "Kaneko", "B.Rap Boys Special (Japan)",      0 )
-GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors (US)",    0 )
-GAME( 1992, shogwarre,shogwarr, shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors (World)", 0 )
+GAME( 1992, brapboys, 0,        brapboys, brapboys, brapboys,   ROT0,  "Kaneko", "B.Rap Boys (World)", 0 )
+GAME( 1992, brapboysj,brapboys, brapboys, brapboys, brapboys,   ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", 0 )
+GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors (World)", 0 )
+GAME( 1992, shogwarru,shogwarr, shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors (US)",    0 )
 GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Fujiyama Buster (Japan)", 0 )
 
