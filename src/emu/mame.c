@@ -1309,6 +1309,7 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 	/* if we have a valid game driver, parse game-specific INI files */
 	if (driver != NULL)
 	{
+#ifndef MESS
 		const game_driver *parent = driver_get_clone(driver);
 		const game_driver *gparent = (parent != NULL) ? driver_get_clone(parent) : NULL;
 		const device_config *device;
@@ -1349,6 +1350,7 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 			parse_ini_file(options, gparent->name, OPTION_PRIORITY_GPARENT_INI);
 		if (parent != NULL)
 			parse_ini_file(options, parent->name, OPTION_PRIORITY_PARENT_INI);
+#endif	/* MESS */
 		parse_ini_file(options, driver->name, OPTION_PRIORITY_DRIVER_INI);
 	}
 }
