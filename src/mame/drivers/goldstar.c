@@ -400,7 +400,6 @@ static ADDRESS_MAP_START( lucky8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( kkojnoli_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM	/* definitelly no NVRAM */
@@ -460,6 +459,31 @@ static ADDRESS_MAP_START( ladylinr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("sn", sn76496_w)	/* sound */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( wcat3_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_WRITE(goldstar_fg_vidram_w) AM_BASE(&videoram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_WRITE(goldstar_fg_atrram_w) AM_BASE(&colorram)
+	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_WRITE(goldstar_reel1_ram_w) AM_BASE(&goldstar_reel1_ram)
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_WRITE(goldstar_reel2_ram_w) AM_BASE(&goldstar_reel2_ram)
+	AM_RANGE(0xa800, 0xa9ff) AM_RAM AM_WRITE(goldstar_reel3_ram_w) AM_BASE(&goldstar_reel3_ram)
+	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_BASE(&goldstar_reel1_scroll)
+	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_BASE(&goldstar_reel2_scroll)
+	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_BASE(&goldstar_reel3_scroll)
+
+	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
+	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
+	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
+	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("ay", ay8910_address_w)	/* no sound... only use both ports for DSWs */
+	AM_RANGE(0xb850, 0xb850) AM_WRITE(lucky8_outport_w)
+	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("sn", sn76496_w)	/* sound */
+//	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_3", ppi8255_r, ppi8255_w)	/* Other PPI initialized? */
+	AM_RANGE(0xd000, 0xefff) AM_ROM
+	AM_RANGE(0xf000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
 
 static READ8_HANDLER( unkch_unk_r )
 {
@@ -5118,6 +5142,48 @@ static MACHINE_DRIVER_START( ladylinr )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( wcat3 )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(wcat3_map)
+	//MDRV_CPU_IO_MAP(goldstar_readport)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+
+	/* 3x 8255 */
+	MDRV_PPI8255_ADD( "ppi8255_0", lucky8_ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", lucky8_ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_2", lucky8_ppi8255_intf[2] )
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+	MDRV_PALETTE_INIT(lucky8)
+
+	MDRV_GFXDECODE(ncb3)
+	MDRV_PALETTE_LENGTH(256)
+	MDRV_NVRAM_HANDLER(goldstar)
+
+	MDRV_VIDEO_START(goldstar)
+	MDRV_VIDEO_UPDATE(goldstar)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("sn", SN76489, PSG_CLOCK)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MDRV_SOUND_ADD("ay", AY8910, AY_CLOCK)
+	MDRV_SOUND_CONFIG(lucky8_ay8910_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+MACHINE_DRIVER_END
+
+
 /* diff with cm machine driver: gfxdecode, OKI & portmap */
 static MACHINE_DRIVER_START( amcoe1 )
 
@@ -6097,6 +6163,105 @@ ROM_END
   It has different settings/parameters, and additional graphics for a game
   called New Super 8 Lines. There are basic reels tiles with a semi-naked woman,
   a sort of Super Mario character from Nintendo, clouds and stars...
+
+  PCB Layout:
++----------------------------------------------------------------------------------------------------------------------------+
+|      J       I       H         G            F         E         D           C          B              A                    |
+|                                                                        +----------+                                        |
+|   +-----+ +-----+ +-------+ +-----+                +-----+             |ASB IN USA| +--------------+ +-----+            +--+
+|14 |     | |     | |   F   | |  T  |                |  M  |             |4FJ       | |      8       | |  R  |            |
+|   +-----+ +-----+ +-------+ +-----+                +-----+             |HM6116LP-2| |   D27256     | +-----+            |
+|                                                                        +----------+ |              |                    +--+
+|   +-----+           +-----+ +-----+      +-----+   +-------+ +-----+   +-------+    +--------------+ +-----+             --|
+|13 |  H  |           |     | |  T  |      |  H  |   |   F   | |  S  |   |   A   |                     |  M  |             --|
+|   +-----+           +-----+ +-----+      +-----+   +-------+ +-----+   +-------+                     +-----+             --|
+|                +----------+                                                                                              --|
+|                |Toshiba   | +-----+                +-----+   +-----+   +-------+                                         --|
+|12              |TMM2016BP-| |     |                |  B  |   |  S  |   |   A   |                                         --|
+|                |12        | +-----+                +-----+   +-----+   +-------+                                         --|
+|                +----------+                                                                                              --|
+|                +----------+                                            +------------------+                              --|
+|                |          | +-----+                +-----+   +-----+   |      ZILOG       |                              --|
+|11              |HM6116L-90| |     |                |  B  |   |     |   |   Z0840004PSC    |                              --|
+|                |          | +-----+                +-----+   +-----+   |   Z80 CPU        |                              --|
+|                +----------+                                            +------------------+                              --|
+|   +-----+  +--------------+ +-----+      +-----+   +-----+   +-----+   +------------------+                              --|
+|10 |  J  |  |      [7]     | |     |      |     |   |  B  |   |     |   |    NEC JAPAN     |                              --|
+|   +-----+  |    D27256    | +-----+      +-----+   +-----+   +-----+   |    D8255AC-2     |                              --|
+|            |              |                                            |    9014XD010     |                              --|
+|   +-----+  +--------------+ +-----+      +-----+   +-----+   +-----+   +------------------+                            36--|
+|9  |  J  |  +--------------+ |     |      |  E  |   |  C  |   |     |                                                 Pinout|
+|   +-----+  |      [6]     | +-----+      +-----+   +-----+   +-----+   +------------------+                              --|
+|   +-----+  |    D27256    | +-------+    +-----+   +-----+ +--------+  |    NEC JAPAN     |                              --|
+|8  |  J  |  |              | |   I   |    |  E  |   |  D  | |  DIP1  |  |    D8255AC-2     |                              --|
+|   +-----+  +--------------+ +-------+    +-----+   +-----+ +--------+  |    9014XD010     |                              --|
+|   +-----+  +--------------+ +-------+              +-----+ +--------+  +------------------+ +---+ +-----+                --|
+|7  |  G  |  |      [5]     | |   I   |              |  E  | |  DIP2  |  +------------------+ | Q | |  P  |                --|
+|   +-----+  |   D27256     | +-------+              +-----+ +--------+  |    NEC JAPAN     | +---+ +-----+                --|
+|            |              |                                            |    D8255AC-2     |                              --|
+|    XTAL    +--------------+ +-------+              +-----+ +--------+  |    9014XD010     |       +-----+                --|
+|6  .----.   +--------------+ |   I   |              |  L  | |  DIP3  |  +------------------+       |  P  |                --|
+|            |      [4]     | +-------+              +-----+ +--------+  +------------------+       +-----+                --|
+|            |   D2764D     |                                            |     Winbond      |                              --|
+|   +-----+  |              | +-------+    +-----+   +-----+ +--------+  |     WF19054      |                              --|
+|5  |  J  |  +--------------+ |       |    |  K  |   |  B  | |  DIP4  |  |  4150C14090830   |                              --|
+|   +-----+  +--------------+ +-------+    +-----+   +-----+ +--------+  +------------------+                              --|
+|            |      [3]     | +----------+                                                                                 --|
+|   +-----+  |  HN482764G   | |Toshiba Tm| +-----+   +-----+ +---------+  +------+ +------+                                --|
+|4  |  J  |  |              | |m2016BP-12| |  K  |   |  B  | |    I    |  |      | |      |                                --|
+|   +-----+  +--------------+ +----------+ +-----+   +-----+ +---------+  +------+ +------+                               +--+
+|   +-----+  +--------------+ +----------+ +-----+   +-----+ +-------+    +------+ +------+                               |
+|3  |  J  |  |     [2]      | |USC 6516-A| |  T  |   |  B  | |   H   |    |      | |      |                               | 
+|   +-----+  |    D2764     | |9252E GYU1| +-----+   +-----+ +-------+    +------+ +------+                               +--+
+|            |              | +----------+                                                                                   |
+|   +-----+  +--------------+ +----------+ +-----+   +-----+  +------+    +------+                                           |
+|2  |  J  |  +--------------+ |Toshiba Tm| |  O  |   |  M  |  |      |    |      |                                           |
+|   +-----+  |     [1]      | |m2016BP-12| +-----+   +-----+  +------+    +------+                                           |
+|   +-----+  |  MBM2764-25  | +----------+ +-----+   +-----+  +------+                                                       |
+|1  |  J  |  |              | +----------+ |  O  |   |  N  |  |      |                                                       |
+|   +-----+  +--------------+ |HM6116L-90| +-----+   +-----+  +------+                                  A                    |
+|                             |  9140A   |                                           +-----+    10 Pins   +-----+            |
+|      J       I       H      +----------+    F         E         D           C     B|     ||||||||||||||||     |            |
++------------------------------------------------------------------------------------+     +--------------+     +------------+
+
+DIP1:                     DIP2:                     DIP3:                     DIP4:
++-------------------+     +-------------------+     +-------------------+     +-------------------+
+| ON                |     | ON                |     | ON                |     | ON                |
+| +---------------+ |     | +---------------+ |     | +---------------+ |     | +---------------+ |
+| |_|_|_|#|_|_|_|_| |     | |#|#|#|_|_|_|_|#| |     | |_|_|#|#|#|#|#|_| |     | |_|_|_|_|#|_|_|_| |
+| |#|#|#| |#|#|#|#| |     | | | | |#|#|#|#| | |     | |#|#| | | | | |#| |     | |#|#|#|#| |#|#|#| |
+| +---------------+ |     | +---------------+ |     | +---------------+ |     | +---------------+ |
+|  1 2 3 4 5 6 7 8  |     |  1 2 3 4 5 6 7 8  |     |  1 2 3 4 5 6 7 8  |     |  1 2 3 4 5 6 7 8  |
++-------------------+     +-------------------+     +-------------------+     +-------------------+     
+
+1x XTAL = 12 Mhz
+
+A = SN74LS244N / XXAC9307
+B = GD74LS161A / A9417
+C = MB74LS10 / 8507 M12
+D = 74LSMPC / SLB1254
+E = GD74LS74A / 9430
+F = HD74LS273P
+G = HD74LS368AP
+H = 74LS32
+I = T74LS24581 / W994K9318 / Malaysia
+J = GS 9429 / GD74LS166     ?????
+K = SN74LS283N / KKFQ9149
+L = GS 9427 / GD74LS138
+M = GS 9424 / GD74LS04
+N = Malaysia 9022AS / SN74LS139AN
+O = GS 9425 / GD74LS157 ???? 
+P = HD74LS04P
+Q = 5560 / JRC / 3151A
+R = HD74HC00P
+S = DM74S288
+T = DM74S287
+U = 
+V = 
+W =
+X = 
+Y = 
+Z = 
 
 */
 
@@ -8212,7 +8377,7 @@ GAME( 1989, lucky8a,   lucky8,   lucky8,   lucky8a,  lucky8a,   ROT0, "Wing Co.L
 GAME( 198?, ns8lines,  0,        lucky8,   ns8lines, 0,         ROT0, "Unknown",           "New Lucky 8 Lines / New Super 8 Lines",       0 )
 GAME( 198?, ladylinr,  0,        ladylinr, ladylinr, 0,         ROT0, "TAB Austria",       "Lady Liner",                                  0 )
 GAME( 198?, kkojnoli,  0,        kkojnoli, kkojnoli, 0,         ROT0, "south korean hack", "Kkoj Noli (Kill the Bees)",                   GAME_IMPERFECT_COLORS )
-GAME( 198?, wcat3,     0,        lucky8,   lucky8,   0,         ROT0, "E.A.I.",            "Wild Cat 3",                                  GAME_NOT_WORKING )
+GAME( 198?, wcat3,     0,        wcat3,    lucky8,   0,         ROT0, "E.A.I.",            "Wild Cat 3",                                  GAME_NOT_WORKING )
 
 GAME( 198?, mtonic,    0,        ncb3,     cmv801,   mtonic,    ROT0, "Tonic",             "Magical Tonic?",                              GAME_WRONG_COLORS | GAME_NOT_WORKING )
 
