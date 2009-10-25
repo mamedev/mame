@@ -52,7 +52,12 @@ void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_rea
 	else if (config->type >= DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->readspace != NULL)
 	{
 		FPTR space = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM);
-		const device_config *cpu = cputag_get_cpu(device->machine, config->tag);
+		const device_config *cpu;
+
+		if (device->owner != NULL)
+			cpu = device_find_child_by_tag(device->owner, config->tag);
+		else
+			cpu = cputag_get_cpu(device->machine, config->tag);
 
 		if (cpu == NULL)
 			fatalerror("devcb_resolve_read_line: unable to find CPU '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
@@ -67,7 +72,14 @@ void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_rea
 	/* device handlers */
 	else if ((config->type == DEVCB_TYPE_DEVICE || config->type == DEVCB_TYPE_SELF) && (config->readline != NULL || config->readdevice != NULL))
 	{
-		resolved->target = (config->type == DEVCB_TYPE_SELF) ? device : devtag_get_device(device->machine, config->tag);
+		/* locate the device */
+		if (config->type == DEVCB_TYPE_SELF)
+			resolved->target = device;
+		else if (device->owner != NULL)
+			resolved->target = device_find_child_by_tag(device->owner, config->tag);
+		else
+			resolved->target = devtag_get_device(device->machine, config->tag);
+
 		if (resolved->target == NULL)
 			fatalerror("devcb_resolve_read_line: unable to find device '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
 
@@ -114,7 +126,12 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 	if (config->type >= DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->writespace != NULL)
 	{
 		FPTR space = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM);
-		const device_config *cpu = cputag_get_cpu(device->machine, config->tag);
+		const device_config *cpu;
+
+		if (device->owner != NULL)
+			cpu = device_find_child_by_tag(device->owner, config->tag);
+		else
+			cpu = cputag_get_cpu(device->machine, config->tag);
 
 		if (cpu == NULL)
 			fatalerror("devcb_resolve_write_line: unable to find CPU '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
@@ -130,7 +147,12 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 	else if (config->type >= DEVCB_TYPE_CPU_LINE(0) && config->type < DEVCB_TYPE_CPU_LINE(MAX_INPUT_LINES))
 	{
 		FPTR line = (FPTR)config->type - (FPTR)DEVCB_TYPE_CPU_LINE(0);
-		const device_config *cpu = cputag_get_cpu(device->machine, config->tag);
+		const device_config *cpu;
+
+		if (device->owner != NULL)
+			cpu = device_find_child_by_tag(device->owner, config->tag);
+		else
+			cpu = cputag_get_cpu(device->machine, config->tag);
 
 		if (cpu == NULL)
 			fatalerror("devcb_resolve_write_line: unable to find CPU '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
@@ -143,7 +165,14 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 	/* device handlers */
 	else if ((config->type == DEVCB_TYPE_DEVICE || config->type == DEVCB_TYPE_SELF) && (config->writeline != NULL || config->writedevice != NULL))
 	{
-		resolved->target = (config->type == DEVCB_TYPE_SELF) ? device : devtag_get_device(device->machine, config->tag);
+		/* locate the device */
+		if (config->type == DEVCB_TYPE_SELF)
+			resolved->target = device;
+		else if (device->owner != NULL)
+			resolved->target = device_find_child_by_tag(device->owner, config->tag);
+		else
+			resolved->target = devtag_get_device(device->machine, config->tag);
+
 		if (resolved->target == NULL)
 			fatalerror("devcb_resolve_write_line: unable to find device '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
 
