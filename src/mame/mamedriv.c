@@ -8053,6 +8053,7 @@ Other Sun games
 	DRIVER( ddenlovb )	/* bootleg */
 	DRIVER( hanakanz )	/* "507" 1996 Dynax */
 	DRIVER( akamaru )	/* "501" 1996 Dynax */
+	DRIVER( sryudens )	/* "502" 1996 Dynax / Face */
 	DRIVER( mjflove )	/*       1996 Dynax */
 	DRIVER( hkagerou )	/* "510" Hana Kagerou 1996 Nakanihon */
 	DRIVER( realbrk )	/* "600" Billiard Academy Real Break 1998 (Europe)*/
@@ -8063,6 +8064,7 @@ Other Sun games
 	DRIVER( mjreach1 )	/* "526" Mahjong Reach Ippatsu 1998 Nihon System/Dynax */
 	DRIVER( cafebrk )	/* "528" Mahjong Cafe Break (C) 1999 Nakanihon / Dynax */
 	DRIVER( jongtei )	/* "532" Mahjong Jong-Tei (C) 1999 Dynax */
+	DRIVER( daimyojn )	/* 2002 Dynax / Techno-Top */
 
 	DRIVER( pkgnsh )	/* "505" Pachinko Gindama Shoubu 1998 (Japan) */
 	DRIVER( pkgnshdx )	/* "522" Pachinko Gindama Shoubu DX 1998 (Japan) */
