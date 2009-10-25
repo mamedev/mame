@@ -1557,7 +1557,7 @@ static WRITE8_HANDLER( gekisha_hopper_w )
 {
 	static UINT8 val[2];
 	val[offset] = data;
-//	popmessage("%02x %02x",val[0],val[1]);
+//  popmessage("%02x %02x",val[0],val[1]);
 }
 
 
@@ -1605,7 +1605,7 @@ static WRITE8_HANDLER( gekisha_8000_w )
 
 			case 0x8001:	dynax_blit_palette01_w(space, offset - 0x01, data);		return;
 
-//			case 0x8002:	// ? 1
+//          case 0x8002:    // ? 1
 
 			case 0x8003:	dynax_blit_backpen_w(space, offset - 0x03, data);		return;
 
@@ -1641,9 +1641,9 @@ static WRITE8_HANDLER( gekisha_8000_w )
 
 			case 0x8060:	keyb = data;	return;
 
-//			case 0x8080:	// ? 0,1,6 (bit 0 = screen disable?)
-//				popmessage("80 = %02x", data);
-//				break;
+//          case 0x8080:    // ? 0,1,6 (bit 0 = screen disable?)
+//              popmessage("80 = %02x", data);
+//              break;
 		}
 	}
 	logerror("%04x: unmapped offset %04X=%02X written with rombank=%02X\n",cpu_get_pc(space->cpu),offset,data,rombank);
@@ -2372,8 +2372,8 @@ static INPUT_PORTS_START( hjingi )
 	PORT_DIPSETTING(    0x04, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Very_Low ) )
-//	PORT_DIPSETTING(    0x01, DEF_STR( ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( ) )
+//  PORT_DIPSETTING(    0x01, DEF_STR( ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( ) )
 	PORT_DIPNAME( 0x08, 0x08, "Payout Rate Change" )
 	PORT_DIPSETTING(    0x08, "Big" )
 	PORT_DIPSETTING(    0x00, "Small" )
@@ -2450,12 +2450,12 @@ static INPUT_PORTS_START( hjingi )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1	)	// 18A
 
 	PORT_INCLUDE( HANAFUDA_KEYS_BET )
-//	PORT_INCLUDE( HANAFUDA_KEYS_BET_ALT )
+//  PORT_INCLUDE( HANAFUDA_KEYS_BET_ALT )
 
 	PORT_START("BET")
 	PORT_CONFNAME( 0x40, 0x40, "Allow Betting" )
 	PORT_CONFSETTING(    0x40, DEF_STR( Yes ) )	// 2 keyboards, normal bet layout, hopper not pulsing in key test
-//	PORT_CONFSETTING(    0x00, DEF_STR( No ) )	// 1 keyboard,  alt bet layout,    hopper pulsing in key test
+//  PORT_CONFSETTING(    0x00, DEF_STR( No ) )  // 1 keyboard,  alt bet layout,    hopper pulsing in key test
 INPUT_PORTS_END
 
 
@@ -6885,7 +6885,7 @@ Mahjong Gekisha
 PCB Layout
 ----------
                             SUBBOARD HERE
-D2809218L-1                    | 
+D2809218L-1                    |
 |--------------------------|---|-------|
 |                          |   \/  5563|
 |          2801 2802 2803 2804 2805    |
@@ -6909,7 +6909,7 @@ Notes:
       0.1F - 0.1 Farad Supercap
       5563 - 8kx8 SRAM
       4461 - TMS4461 64kx4 Multiport Video RAM
-      
+
 
 Sub Board
 

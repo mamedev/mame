@@ -479,7 +479,7 @@ static ADDRESS_MAP_START( wcat3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("ay", ay8910_address_w)	/* no sound... only use both ports for DSWs */
 	AM_RANGE(0xb850, 0xb850) AM_WRITE(lucky8_outport_w)
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("sn", sn76496_w)	/* sound */
-//	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_3", ppi8255_r, ppi8255_w)	/* Other PPI initialized? */
+//  AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_3", ppi8255_r, ppi8255_w) /* Other PPI initialized? */
 	AM_RANGE(0xd000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -2633,7 +2633,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ns8lines )
 	PORT_START("IN0")	/* d800 */
-//	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+//  PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN0-01")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN0-02")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_X) PORT_NAME("P1 - Big / Switch Controls")
@@ -6211,7 +6211,7 @@ ROM_END
 |4  |  J  |  |              | |m2016BP-12| |  K  |   |  B  | |    I    |  |      | |      |                                --|
 |   +-----+  +--------------+ +----------+ +-----+   +-----+ +---------+  +------+ +------+                               +--+
 |   +-----+  +--------------+ +----------+ +-----+   +-----+ +-------+    +------+ +------+                               |
-|3  |  J  |  |     [2]      | |USC 6516-A| |  T  |   |  B  | |   H   |    |      | |      |                               | 
+|3  |  J  |  |     [2]      | |USC 6516-A| |  T  |   |  B  | |   H   |    |      | |      |                               |
 |   +-----+  |    D2764     | |9252E GYU1| +-----+   +-----+ +-------+    +------+ +------+                               +--+
 |            |              | +----------+                                                                                   |
 |   +-----+  +--------------+ +----------+ +-----+   +-----+  +------+    +------+                                           |
@@ -6232,7 +6232,7 @@ DIP1:                     DIP2:                     DIP3:                     DI
 | |#|#|#| |#|#|#|#| |     | | | | |#|#|#|#| | |     | |#|#| | | | | |#| |     | |#|#|#|#| |#|#|#| |
 | +---------------+ |     | +---------------+ |     | +---------------+ |     | +---------------+ |
 |  1 2 3 4 5 6 7 8  |     |  1 2 3 4 5 6 7 8  |     |  1 2 3 4 5 6 7 8  |     |  1 2 3 4 5 6 7 8  |
-+-------------------+     +-------------------+     +-------------------+     +-------------------+     
++-------------------+     +-------------------+     +-------------------+     +-------------------+
 
 1x XTAL = 12 Mhz
 
@@ -6250,18 +6250,18 @@ K = SN74LS283N / KKFQ9149
 L = GS 9427 / GD74LS138
 M = GS 9424 / GD74LS04
 N = Malaysia 9022AS / SN74LS139AN
-O = GS 9425 / GD74LS157 ???? 
+O = GS 9425 / GD74LS157 ????
 P = HD74LS04P
 Q = 5560 / JRC / 3151A
 R = HD74HC00P
 S = DM74S288
 T = DM74S287
-U = 
-V = 
+U =
+V =
 W =
-X = 
-Y = 
-Z = 
+X =
+Y =
+Z =
 
 */
 
@@ -6429,7 +6429,7 @@ Cherry master type game
 .h7  27256  handwritten 5
 .h8  27256  handwritten 6
 .h10 27256  stickered 7 E.A.I.
-.g13 82s129	stickered G13
+.g13 82s129 stickered G13
 .g14 82s129 stickered G14
 .d12 82s123 handwritten 2
 .d13 82s123 stickered D13
@@ -6438,7 +6438,7 @@ Cherry master type game
 open 24 pin socket @ B13
 
 Daughter board
-.u5	 27512
+.u5  27512
 
 Z80 on daughter board
 SN76489AN

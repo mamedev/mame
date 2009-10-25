@@ -1,17 +1,17 @@
 /****************************************************************************
 
-	Go! Go! Connie chan Jaka Jaka Janken
+    Go! Go! Connie chan Jaka Jaka Janken
 
     Driver by Mariusz Wojcieszek
 
-	EC9601
+    EC9601
 
-	Hudson Chip
-	CPU  :Hu6280
-	Video:Hu6202,Hu6260,Hu6270
+    Hudson Chip
+    CPU  :Hu6280
+    Video:Hu6202,Hu6260,Hu6270
 
-	OSC  :21.47727MHz
-	Other:XILINX XC7336-15,OKI M6295
+    OSC  :21.47727MHz
+    Other:XILINX XC7336-15,OKI M6295
 
 
 ****************************************************************************/

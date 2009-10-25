@@ -2825,12 +2825,12 @@ ROM_START( f355 )
 	ROM_LOAD("mpr-21901.ic21",0xa800000, 0x0800000, BAD_DUMP CRC(55dcbd6d) SHA1(9fec353f9e58016090e177f899a799e2e8fc7c9f) ) // returns bad in Naomi test mode
 ROM_END		 					 									// ROM reads different each time and fails test mode on real h/w, need a new cart
 
-ROM_START( f355twin )                                                                                                    
+ROM_START( f355twin )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	F355_BIOS
 
 	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASEFF)
-        ROM_LOAD( "epr22848.ic22", 0x0000000, 0x800000, CRC(54de0bd5) SHA1(5f6be36d2d39eea681ecac14358b92eaf4bf6c1e) )    
+        ROM_LOAD( "epr22848.ic22", 0x0000000, 0x800000, CRC(54de0bd5) SHA1(5f6be36d2d39eea681ecac14358b92eaf4bf6c1e) )
         ROM_LOAD( "mpr22827.ic1",  0x0800000, 0x800000, CRC(eeb1b975) SHA1(929f453eaf5565ae3e660dbbb8f406ff8aa7897d) )
         ROM_LOAD( "mpr22828.ic2",  0x1000000, 0x800000, CRC(691d246a) SHA1(a2d538bc2e0d592a4f18d65f52fea035e1d4c625) )
         ROM_LOAD( "mpr22829.ic3",  0x1800000, 0x800000, CRC(00719c9c) SHA1(f0f19af4ebe2720bd822a9ea7e0004db163c706a) )
@@ -2854,12 +2854,12 @@ ROM_START( f355twin )
         ROM_LOAD( "mpr22847.ic21", 0xa800000, 0x800000, CRC(955ad42e) SHA1(e396ca02b5786557434632c4fac56af3a4a9f8ce) )
 ROM_END
 
-ROM_START( f355twn2 )                                                                                                    
+ROM_START( f355twn2 )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	F355_BIOS
 
 	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASEFF)
-        ROM_LOAD( "epr23399.ic22", 0x0000000, 0x400000, CRC(36de514c) SHA1(1c32064169c233156921fdf170c1958dc0f8a750) )     
+        ROM_LOAD( "epr23399.ic22", 0x0000000, 0x400000, CRC(36de514c) SHA1(1c32064169c233156921fdf170c1958dc0f8a750) )
         ROM_LOAD( "mpr23378.ic1",  0x0800000, 0x800000, CRC(1ad80f12) SHA1(415a021987e07bb298e43eacb54ff898619837b1) )
         ROM_LOAD( "mpr23379.ic2",  0x1000000, 0x800000, CRC(a198f0a8) SHA1(7025adfd26f80087fa405acb49797d5c77a55e98) )
         ROM_LOAD( "mpr23380.ic3",  0x1800000, 0x800000, CRC(b1993286) SHA1(01ddc81ba3542f37dd2dadac972114ec254059a1) )
@@ -3358,7 +3358,7 @@ ROM_START( crzytaxi )
         ROM_LOAD( "a03ff000.bin", 0x000000, 0x000500, CRC(be5e415d) SHA1(baf87191236f332c8df7674a080c2be4824a4bcb) )
 ROM_END
 
-/* Jambo! Safari */ 
+/* Jambo! Safari */
 ROM_START( jambo )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
@@ -4424,8 +4424,8 @@ GAME( 1998, naomi,    0,        naomi,    naomi,    naomi, ROT0, "Sega",        
 /* 00??C */ GAME( 1999, smlg99,   naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Super Major League '99", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0020C */ GAME( 1999, samba,    naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Samba De Amigo (JPN)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0083C */ GAME( 1999, derbyoc2, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Derby Owners Club II (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* ????? */ GAME( 1999, crzytaxi, naomi,    naomi,    naomi,    naomi, ROT0, "Sega", 		"Crazy Taxi (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) 
-/* ????? */ GAME( 1999, jambo,    naomi,    naomi,    naomi,    naomi, ROT0, "Sega", 		"Jambo! Safari (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) 
+/* ????? */ GAME( 1999, crzytaxi, naomi,    naomi,    naomi,    naomi, ROT0, "Sega", 		"Crazy Taxi (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* ????? */ GAME( 1999, jambo,    naomi,    naomi,    naomi,    naomi, ROT0, "Sega", 		"Jambo! Safari (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0021C */ GAME( 2000, virnba,   naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Virtua NBA (JPN, USA, EXP, KOR, AUS)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0021C */ GAME( 2000, virnbao,  virnba,   naomi,    naomi,    naomi, ROT0, "Sega",            "Virtua NBA (JPN, USA, EXP, KOR, AUS) (original)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0026C */ GAME( 2000, totd,     naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "The Typing of the Dead (JPN, USA, EXP, KOR, AUS)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -4439,7 +4439,7 @@ GAME( 1998, naomi,    0,        naomi,    naomi,    naomi, ROT0, "Sega",        
 /* 0044C */ GAME( 2001, csmasho,  csmash,   naomi,    naomi,    naomi, ROT0, "Sega",            "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (original)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0128C */ GAME( 2001, shootpl,  naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Shootout Pool (JPN, USA, KOR, AUS) / Shootout Pool Prize (EXP)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0???? */ GAME( 2001, shootopl, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Shootout Pool", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-/* 0???? */ GAME( 2001, vtenis2c, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Power Smash 2 / Virtua Tennis 2 (cartridge)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) 
+/* 0???? */ GAME( 2001, vtenis2c, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Power Smash 2 / Virtua Tennis 2 (cartridge)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
 /* 841-xxxxx ("Licensed by Sega" games)*/
 /* 0001C */ GAME( 1999, pstone,   naomi,    naomi,    naomi,    naomi,    ROT0, "Capcom",          "Power Stone (JPN, USA, EUR, ASI, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )

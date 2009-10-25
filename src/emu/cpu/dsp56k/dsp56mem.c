@@ -383,7 +383,7 @@ static void HRIE_bit_set(dsp56k_core* cpustate, UINT16 value)
 //static UINT16 DMA_bit(dsp56k_core* cpustate) { return ((HSR & 0x0080) != 0); }
 //static UINT16 HF1_bit(dsp56k_core* cpustate) { return ((HSR & 0x0010) != 0); }
 //static UINT16 HF0_bit(dsp56k_core* cpustate) { return ((HSR & 0x0008) != 0); }
-//static UINT16 HCP_bit(dsp56k_core* cpustate) { return ((HSR & 0x0004) != 0); } 
+//static UINT16 HCP_bit(dsp56k_core* cpustate) { return ((HSR & 0x0004) != 0); }
 static UINT16 HTDE_bit(dsp56k_core* cpustate) { return ((HSR & 0x0002) != 0); }
 static UINT16 HRDF_bit(dsp56k_core* cpustate) { return ((HSR & 0x0001) != 0); }
 

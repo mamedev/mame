@@ -1,40 +1,40 @@
-/*   Miracle Derby - Ascot 
+/*   Miracle Derby - Ascot
 
    - has the same GX61A01 custom (blitter?) as homedata.c and a 'similar' CPU setup (this has more CPUs)
      and similar board / rom numbering (X**-)
 
      The drivers can probably be merged later, although the current per-game handling of the blitter in
-	 homedata.c should be looked at.
+     homedata.c should be looked at.
 
 
 
-		Notes from Stefan Lindberg:
+        Notes from Stefan Lindberg:
 
-		Eprom "x70_a04.5g" had wires attached to it, pin 2 and 16 was joined and pin 1,32,31,30 was joined, i
-		removed them and read the eprom as the type it was (D27c1000D).
+        Eprom "x70_a04.5g" had wires attached to it, pin 2 and 16 was joined and pin 1,32,31,30 was joined, i
+        removed them and read the eprom as the type it was (D27c1000D).
 
-		Measured frequencies:
-		MBL68B09E = 2mhz
-		MBL68B09E = 2mhz
-		z80 = 4mhz
-		YM2203 = 2mhz
+        Measured frequencies:
+        MBL68B09E = 2mhz
+        MBL68B09E = 2mhz
+        z80 = 4mhz
+        YM2203 = 2mhz
 
-		See included PCB pics.
+        See included PCB pics.
 
 
 
-		Roms:
+        Roms:
 
-		Name              Size     CRC32         Chip Type
-		---------------------------------------------------------------------------------
-		x70a07.8l         256      0x7d4c9712    82s129
-		x70a08.7l         256      0xc4e77174    82s129
-		x70a09.6l         256      0xd0187957    82s129
-		x70_a03.8g        32768    0x4e298b2d    27c256
-		x70_a04.5g        131072   0x14392fdb    D27c1000D
-		x70_a11.1g        32768    0xb394eef7    27c256
-		x70_b02.12e       32768    0x76c9bb6f    27c256
-		x70_c01.14e       65536    0xd79d072d    27c512
+        Name              Size     CRC32         Chip Type
+        ---------------------------------------------------------------------------------
+        x70a07.8l         256      0x7d4c9712    82s129
+        x70a08.7l         256      0xc4e77174    82s129
+        x70a09.6l         256      0xd0187957    82s129
+        x70_a03.8g        32768    0x4e298b2d    27c256
+        x70_a04.5g        131072   0x14392fdb    D27c1000D
+        x70_a11.1g        32768    0xb394eef7    27c256
+        x70_b02.12e       32768    0x76c9bb6f    27c256
+        x70_c01.14e       65536    0xd79d072d    27c512
 
 
 
@@ -155,18 +155,18 @@ ROM_START( mirderby )
 	ROM_LOAD( "x70_c01.14e", 0x00000, 0x10000, CRC(d79d072d) SHA1(8e189931de9c4eb520c1ec2d0898d8eaba0f01b5) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* M6809 code */
-	ROM_LOAD( "x70_b02.12e", 0x8000, 0x8000, CRC(76c9bb6f) SHA1(dd8893f3082d33d366247295e9531f8879c219c5) )	
+	ROM_LOAD( "x70_b02.12e", 0x8000, 0x8000, CRC(76c9bb6f) SHA1(dd8893f3082d33d366247295e9531f8879c219c5) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 ) // horse gfx
-	ROM_LOAD( "x70_a03.8g", 0x0000, 0x8000, CRC(4e298b2d) SHA1(ae78327d1f30c8d19ef772b82803dab4d6b7b919))	
+	ROM_LOAD( "x70_a03.8g", 0x0000, 0x8000, CRC(4e298b2d) SHA1(ae78327d1f30c8d19ef772b82803dab4d6b7b919))
 
 	ROM_REGION( 0x20000, "gfx2", 0 ) // fonts etc.
-	ROM_LOAD( "x70_a04.5g", 0x0000, 0x20000, CRC(14392fdb) SHA1(dafdce473b2d2ebbdbf49fbd12f85c1ad69b2877) )	
+	ROM_LOAD( "x70_a04.5g", 0x0000, 0x20000, CRC(14392fdb) SHA1(dafdce473b2d2ebbdbf49fbd12f85c1ad69b2877) )
 
 	ROM_REGION( 0x300, "proms", 0 ) /* colours */
-	ROM_LOAD( "x70a07.8l", 0x000, 0x100, CRC(7d4c9712) SHA1(fe2a89841fdf5e4fd6cd41478ad2f29d28bed54d) )	
-	ROM_LOAD( "x70a08.7l", 0x100, 0x100, CRC(c4e77174) SHA1(ada238ded69f01b4daeb0159a2c5c422977bb95e) )	
-	ROM_LOAD( "x70a09.6l", 0x200, 0x100, CRC(d0187957) SHA1(6b36c1bccad24708cfa2fc78da08313f9bcfdbc0) )	
+	ROM_LOAD( "x70a07.8l", 0x000, 0x100, CRC(7d4c9712) SHA1(fe2a89841fdf5e4fd6cd41478ad2f29d28bed54d) )
+	ROM_LOAD( "x70a08.7l", 0x100, 0x100, CRC(c4e77174) SHA1(ada238ded69f01b4daeb0159a2c5c422977bb95e) )
+	ROM_LOAD( "x70a09.6l", 0x200, 0x100, CRC(d0187957) SHA1(6b36c1bccad24708cfa2fc78da08313f9bcfdbc0) )
 ROM_END
 
 static DRIVER_INIT( mirderby )

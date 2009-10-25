@@ -543,7 +543,7 @@
   3x ULN2003A (Darlington transistor array)
   1x NE555P   (Timer)
   1x F 2N4401 (NPN General Purpose Amplifier)
- 
+
 
   .------.                              .------------.              .-------.
   |  U17 |                              |   NE555P   |              |2N4401 |
@@ -581,7 +581,7 @@
   C3 = 503   ; 50.000 pf = 50 nf = 0.05 uf.
   C4 = .01 Z
   C5 = .01 Z
-  C6 = .1 Z 
+  C6 = .1 Z
 
 
   All Capacitors are Ceramic Disc.
@@ -594,7 +594,7 @@
   U23:
   PPI-0 (); PortA IN.
   DIP Switches bank:
-  
+
   7654 3210
   ---- ---x  * DIP switch 8
   ---- --x-  * DIP switch 7
@@ -611,7 +611,7 @@
 
   Hardware Layout (SMS Hi-Lo Double Up Joker Poker):
 
-  - CPU:             1x AMD P8080A 
+  - CPU:             1x AMD P8080A
   - RAM:             2x 2111A-2: Static Random Access Memory 256 x 4 bit.
   - RAM:             2x NEC D5101LC-1: 256x4 static CMOS RAM.
   - I/O:             3x 8255: Peripeheral Interface Adapter.
@@ -621,19 +621,19 @@
   - Crystal:         1x 18.000 MHz.
   - PROM             1x 82S129: Bipolar PROM: U51.
                      1x 3.6 Vcc Battery.
-                     
-  Frequency on CPU P8080A (pins 15 & 22) = 2.00032 MHz.                    
-                     
-  
+
+  Frequency on CPU P8080A (pins 15 & 22) = 2.00032 MHz.
+
+
   PCB MARKED:
 
-  Solderside: 
+  Solderside:
   PCB silksceened: SMS Manufacturing Corporation.
 
   Component side:
   PCB silksceened: REV 2.
   PCB Engraved: "1350" "10-83".
-   
+
 
   PCB Layout (SMS Hi-Lo Double Up Joker Poker):                                             Edge Connector 36x2
    ____________________________________________________________________________________________________________
@@ -753,7 +753,7 @@
   - Crystal:         1x 18.000 MHz.
 
 
-  Etched in copper on board:	TP2
+  Etched in copper on board:    TP2
 
   .U30  2732a    ; stickered  (c) 1993 MICRO MFG TURBO POKER CHAR, ROM.
 
@@ -1197,12 +1197,12 @@ static WRITE8_DEVICE_HANDLER( counterlamps_w )
 
 //static READ8_DEVICE_HANDLER( ppi2_portc_r )
 //{
-//	return;
+//  return;
 //}
 
 //static WRITE8_DEVICE_HANDLER( ppi2_portc_w )
 //{
-//	/* PC0-PC2 don't seems to be connected to any output */
+//  /* PC0-PC2 don't seems to be connected to any output */
 //}
 
 
@@ -1224,8 +1224,8 @@ static WRITE8_HANDLER( vram_data_w )
 	np_vram[np_addr] = data & 0xff;
 
 	/* trigger 8255-2 port C bit 7 (/OBF) */
-//	i8255a_pc7_w(devtag_get_device(device->machine, "ppi8255_2"), 0);
-//	i8255a_pc7_w(devtag_get_device(device->machine, "ppi8255_2"), 1);
+//  i8255a_pc7_w(devtag_get_device(device->machine, "ppi8255_2"), 0);
+//  i8255a_pc7_w(devtag_get_device(device->machine, "ppi8255_2"), 1);
 
 }
 
@@ -1290,7 +1290,7 @@ static ADDRESS_MAP_START( norautp_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
 	AM_RANGE(0xa0, 0xa3) AM_MIRROR(0x1c) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
-//	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
+//  AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3c) AM_READWRITE(vram_data_r, vram_data_w)
 	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x3c) AM_WRITE(vram_addr_w)
 	AM_RANGE(0xc2, 0xc2) AM_MIRROR(0x3c) AM_READ(test_r)
@@ -1348,7 +1348,7 @@ static ADDRESS_MAP_START( dphla_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dphltest_map, ADDRESS_SPACE_PROGRAM, 8 )
-//	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 not connected */
+//  ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 not connected */
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
@@ -1612,12 +1612,12 @@ static I8255A_INTERFACE (ppi8255_intf_1)
 //{
     /* (c0-c3) Group A Mode 2 (5-lines handshacked bidirectional port)
                Group B Mode 0, output;  (see below for lines PC0-PC2) */
-//	DEVCB_HANDLER(vram_data_r),		/* Port A read (VRAM data read)*/
-//	DEVCB_NULL,						/* Port B read */
-//	DEVCB_HANDLER(ppi2_portc_r),	/* Port C read */
-//	DEVCB_HANDLER(vram_data_w),		/* Port A write (VRAM data write) */
-//	DEVCB_HANDLER(vram_addr_w),		/* Port B write (VRAM address write) */
-//	DEVCB_HANDLER(ppi2_portc_w)		/* Port C write */
+//  DEVCB_HANDLER(vram_data_r),     /* Port A read (VRAM data read)*/
+//  DEVCB_NULL,                     /* Port B read */
+//  DEVCB_HANDLER(ppi2_portc_r),    /* Port C read */
+//  DEVCB_HANDLER(vram_data_w),     /* Port A write (VRAM data write) */
+//  DEVCB_HANDLER(vram_addr_w),     /* Port B write (VRAM address write) */
+//  DEVCB_HANDLER(ppi2_portc_w)     /* Port C write */
 
 	/*  PPI-2 is configured as mixed mode2 and mode0 output.
         It means that port A should be bidirectional and port B just as output.
@@ -1640,7 +1640,7 @@ static MACHINE_DRIVER_START( noraut_base )
 	/* 3x 8255 */
 	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
 	MDRV_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
-//	MDRV_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
+//  MDRV_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1961,7 +1961,7 @@ ROM_START( dphl )
 	ROM_LOAD( "dphl_36e3.u18", 0x1000, 0x1000, CRC(06cf6789) SHA1(587d883c399348b518e3be4d1dc2581824055328) )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
-//	ROM_FILL(              0x0000, 0x0800, 0xff )
+//  ROM_FILL(              0x0000, 0x0800, 0xff )
 	ROM_LOAD( "dphl_model_2_cgi_3939.u31",  0x0000, 0x1000, CRC(2028db2c) SHA1(0f81bb71e88c60df3817f58c28715ce2ea01ad4d) )
 
 	ROM_REGION( 0x0100,  "proms", 0 )
@@ -2010,7 +2010,7 @@ ROM_END
 
 /*
 
-Hi-Lo Double Up Joker Poker 
+Hi-Lo Double Up Joker Poker
 SMS Manufacturing Corp., 1983.
 
 almost identical to DPHL.
@@ -2118,51 +2118,51 @@ ROM_END
 */
 static DRIVER_INIT( norautrh )
 {
-//	UINT8 *ROM = memory_region(machine, "maincpu");
-//	ROM[0x1110] = 0x00;
-//	ROM[0x1111] = 0x00;
+//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  ROM[0x1110] = 0x00;
+//  ROM[0x1111] = 0x00;
 }
 
 static DRIVER_INIT( norautpn )
 {
-//	UINT8 *ROM = memory_region(machine, "maincpu");
-//	ROM[0x0827] = 0x00;
-//	ROM[0x0828] = 0x00;
+//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  ROM[0x0827] = 0x00;
+//  ROM[0x0828] = 0x00;
 }
 
 static DRIVER_INIT( norautu )
 {
-//	UINT8 *ROM = memory_region(machine, "maincpu");
-//	ROM[0x083c] = 0x00;
-//	ROM[0x083d] = 0x00;
-//	ROM[0x083e] = 0x00;
+//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  ROM[0x083c] = 0x00;
+//  ROM[0x083d] = 0x00;
+//  ROM[0x083e] = 0x00;
 }
 
 static DRIVER_INIT( gtipoker )
 {
-//	UINT8 *ROM = memory_region(machine, "maincpu");
-//	ROM[0x0cc6] = 0x00;
-//	ROM[0x0cc7] = 0x00;
-//	ROM[0x0cc8] = 0x00;
-//	ROM[0x10a5] = 0x00;
-//	ROM[0x10a6] = 0x00;
-//	ROM[0x10a7] = 0x00;
+//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  ROM[0x0cc6] = 0x00;
+//  ROM[0x0cc7] = 0x00;
+//  ROM[0x0cc8] = 0x00;
+//  ROM[0x10a5] = 0x00;
+//  ROM[0x10a6] = 0x00;
+//  ROM[0x10a7] = 0x00;
 }
 
 static DRIVER_INIT( dphl )
 {
-//	UINT8 *ROM = memory_region(machine, "maincpu");
-//	ROM[0x1510] = 0x00;
-//	ROM[0x1511] = 0x00;
-//	ROM[0x1512] = 0x00;
+//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  ROM[0x1510] = 0x00;
+//  ROM[0x1511] = 0x00;
+//  ROM[0x1512] = 0x00;
 }
 
 static DRIVER_INIT( dphla )
 {
-//	UINT8 *ROM = memory_region(machine, "maincpu");
-//	ROM[0x0b09] = 0x00;
-//	ROM[0x0b0a] = 0x00;
-//	ROM[0x0b0b] = 0x00;
+//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  ROM[0x0b09] = 0x00;
+//  ROM[0x0b0a] = 0x00;
+//  ROM[0x0b0b] = 0x00;
 }
 
 

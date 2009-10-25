@@ -1892,7 +1892,7 @@ READ32_HANDLER( n64_si_reg_r )
 {
 	switch (offset)
 	{
-		//case 0x00/4:		// SI_DRAM_ADDR_REG
+		//case 0x00/4:      // SI_DRAM_ADDR_REG
 			//return si_dram_addr;
 
 		case 0x18/4:		// SI_STATUS_REG

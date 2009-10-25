@@ -378,9 +378,9 @@ static DISCRETE_SOUND_START(bzone)
 	/* FINAL MIX                                    */
 	/************************************************/
 	/* We won't bother emulating the final gain of op-amp IC K5, pin 14.
-	 * There signal never reaches a value where it clips, so we will
-	 * just output the final 16-bit level.
-	 */
+     * There signal never reaches a value where it clips, so we will
+     * just output the final 16-bit level.
+     */
 
 	/* not sure about pokey output levels - below is just a estimate to get a 5V signal */
 	DISCRETE_INPUTX_STREAM(BZ_POKEY_SND, 0, 5.0 / 11000, 0)

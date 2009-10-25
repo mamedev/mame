@@ -2199,26 +2199,26 @@ WRITE16_HANDLER( setaroul_spr_w )
 {
 	int realoffs = offset;
 	realoffs >>=1;
-	
+
 	if (!(offset & 1))
 	{
 		data = data >> 8;
 		mem_mask = mem_mask >> 8;
 	}
-	
+
 	COMBINE_DATA(&spriteram16[realoffs]);
 
 }
 
 static ADDRESS_MAP_START( setaroul_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM								// ROM
-	
+
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_BASE(&spriteram16_2)		// Sprites Code + X + Attr (maybe not)
-	
+
 	AM_RANGE(0xc40000, 0xc40001) AM_RAM //AM_BASE(&seta_vregs)
 	AM_RANGE(0xc80000, 0xc80001) AM_NOP
 
-	
+
 	AM_RANGE(0xcc0000, 0xcc0019) AM_READ(setaroul_c0_r)
 
 	AM_RANGE(0xd00000, 0xd00001) AM_NOP // watchdog?
@@ -2229,11 +2229,11 @@ static ADDRESS_MAP_START( setaroul_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd4000a, 0xd4000b) AM_READ(setaroul_d4_a_r)
 	AM_RANGE(0xd40010, 0xd40011) AM_READ(setaroul_d4_10_r) AM_WRITENOP // multiplex?
 
-	AM_RANGE(0xdc0000, 0xdc3fff) AM_RAM 
-	
+	AM_RANGE(0xdc0000, 0xdc3fff) AM_RAM
+
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM - draws wheel if you reset enough times..
 	AM_RANGE(0xe40000, 0xe40005) AM_RAM AM_BASE(&seta_vctrl_0)		// VRAM Ctrl
-	AM_RANGE(0xf00000, 0xf03fff) AM_RAM 
+	AM_RANGE(0xf00000, 0xf03fff) AM_RAM
 	AM_RANGE(0xf40000, 0xf40c11) AM_WRITE(setaroul_spr_w) AM_BASE(&spriteram16)		// Sprites Y
 ADDRESS_MAP_END
 
@@ -7357,7 +7357,7 @@ static MACHINE_DRIVER_START( setaroul )
 	MDRV_VIDEO_START(seta_1_layer)
 	MDRV_VIDEO_EOF(seta_buffer_sprites)	/* qzkklogy uses sprite buffering */
 	MDRV_VIDEO_UPDATE(seta)
-	
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

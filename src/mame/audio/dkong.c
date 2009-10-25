@@ -887,8 +887,8 @@ static DISCRETE_SOUND_START(dkongjr)
 	//DISCRETE_INPUT_DATA(DS_DAC)
 
 	/************************************************
-	 * SOUND0 / SOUND7  -
-	 ************************************************/
+     * SOUND0 / SOUND7  -
+     ************************************************/
 
 DISCRETE_TASK_START(1)
 	DISCRETE_LOGIC_INVERT(DS_SOUND7,DS_SOUND7_INV)
@@ -935,11 +935,11 @@ DISCRETE_TASK_START(1)
 	DISCRETE_74LS624(NODE_118, NODE_117, DK_SUP_V, JR_C19, DISC_LS624_OUT_COUNT_F)
 #endif
 
-//DISCRETE_74LS629(NODE_30,						/* IC 5K, pin 7 */
-//		1,											/* ENAB */
-//		NODE_117, DK_SUP_V,							/* VMOD, VRNG */
-//		JR_C19, JR_R11,								/* C, R_FREQ_IN */
-//		DISC_LS624_OUT_COUNT_F)
+//DISCRETE_74LS629(NODE_30,                     /* IC 5K, pin 7 */
+//      1,                                          /* ENAB */
+//      NODE_117, DK_SUP_V,                         /* VMOD, VRNG */
+//      JR_C19, JR_R11,                             /* C, R_FREQ_IN */
+//      DISC_LS624_OUT_COUNT_F)
 //DISCRETE_74LS624(NODE_31, NODE_117, DK_SUP_V, JR_C19, DISC_LS624_OUT_COUNT_F)
 //DISCRETE_WAVELOG2(NODE_30, 1000,NODE_31, 1000)
 
@@ -948,8 +948,8 @@ DISCRETE_TASK_START(1)
 DISCRETE_TASK_END()
 
 	/************************************************
-	 * SOUND1  - Jump
-	 ************************************************/
+     * SOUND1  - Jump
+     ************************************************/
 
 DISCRETE_TASK_START(2)
 	/* needs NODE_104 from TASK(1) ready */
@@ -982,11 +982,11 @@ DISCRETE_TASK_END()
 
 DISCRETE_TASK_START(1)
 	/* the noise source clock is a 74LS629 IC 7P, pin 10.
-	 * using JR_C20 as the timing cap, with Freq Control tied to 0V
-	 * and Range tied to 5V.  This creates a fixed frequency of 710Hz.
-	 * So for speed, I breadboarded and measured the frequency.
-	 * Oct 2009, D.R.
-	 */
+     * using JR_C20 as the timing cap, with Freq Control tied to 0V
+     * and Range tied to 5V.  This creates a fixed frequency of 710Hz.
+     * So for speed, I breadboarded and measured the frequency.
+     * Oct 2009, D.R.
+     */
 	DISCRETE_LFSR_NOISE(NODE_21, 1, 1, 710, 1.0, 0, 0.5, &dkongjr_lfsr)
 	DISCRETE_LS123_INV(NODE_25, DS_SOUND2_INV, JR_R17, JR_C27)
 	DISCRETE_RCDISC_MODULATED(NODE_26, NODE_25, NODE_21, 120, JR_R24, RES_K(0.001), JR_R18, JR_C29, DK_SUP_V)
@@ -998,8 +998,8 @@ DISCRETE_TASK_START(1)
 DISCRETE_TASK_END()
 
 	/************************************************
-	 * SOUND9 - Falling
-	 ************************************************/
+     * SOUND9 - Falling
+     ************************************************/
 
 DISCRETE_TASK_START(1)
 #if (USE_LS629)

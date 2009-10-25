@@ -3,7 +3,7 @@
 /* ************************************************************************* */
 /*                   MR                                  CCR                 */
 /* |-------------------------------------| |-------------------------------| */
-/* | LF | FV | * | * | S1 | S0 | I1 | I0 | | S | L | E | U | N | Z | V | C | */ 
+/* | LF | FV | * | * | S1 | S0 | I1 | I0 | | S | L | E | U | N | Z | V | C | */
 /* |-------------------------------------| |-------------------------------| */
 /*                                                                           */
 /* ************************************************************************* */
@@ -343,7 +343,7 @@ static void dsp56k_irq_table_init(void)
 	dsp56k_set_irq_source(31, 0x003e, "Host Command 8");
 }
 
-/* Clear all entries from the pending table */ 
+/* Clear all entries from the pending table */
 static void dsp56k_clear_pending_interrupts(dsp56k_core* cpustate)
 {
 	int i;

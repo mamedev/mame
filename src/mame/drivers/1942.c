@@ -414,7 +414,7 @@ ROM_START( 1942abl )
 	ROM_CONTINUE(0x0000,0x4000)
 	ROM_LOAD( "16.bin", 0x0c000, 0x4000, CRC(c106b1ed) SHA1(a16520752fb02e403c93975ecf12b75854d58d69) )
 	ROM_CONTINUE(0x8000,0x4000)
-	
+
 	// proms not in the set, assumed to be the same
 	ROM_REGION( 0x0a00, "proms", 0 )
 	ROM_LOAD( "sb-5.e8",  0x0000, 0x0100, CRC(93ab8153) SHA1(a792f24e5c0c3c4a6b436102e7a98199f878ece1) )	/* red component */

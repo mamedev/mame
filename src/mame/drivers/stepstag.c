@@ -229,7 +229,7 @@ ROM_REGION( 0x100000, "maincpu", 0 ) /* 68k */
 	DISK_IMAGE("step3", 0, NO_DUMP)
 ROM_END
 
-//GAME( 1999, stepstag, 0, stepstag, stepstag, 0, ROT0, "Jaleco", "Stepping Stage", GAME_NO_SOUND| GAME_NOT_WORKING)	// Original Game
+//GAME( 1999, stepstag, 0, stepstag, stepstag, 0, ROT0, "Jaleco", "Stepping Stage", GAME_NO_SOUND| GAME_NOT_WORKING)    // Original Game
 GAME( 1999, stepstag, 0, stepstag, stepstag, 0, ROT0, "Jaleco", "Stepping Stage Special", GAME_NO_SOUND| GAME_NOT_WORKING)
 //GAME( 1999, stepstag, 0, stepstag, stepstag, 0, ROT0, "Jaleco", "Stepping Stage 2 Supreme", GAME_NO_SOUND| GAME_NOT_WORKING)
 GAME( 1999, step3, 0,	stepstag, stepstag, 0,	ROT0, "Jaleco", "Stepping 3 Superior", GAME_NO_SOUND| GAME_NOT_WORKING)

@@ -1249,10 +1249,10 @@ static void draw_model(UINT32 addr)
 		if( (header[6] & 0x800000) && (!(header[1] & 0x0010)) )	{
 			if(sn[0]*clip_vert[0].x + sn[1]*clip_vert[0].y + sn[2]*clip_vert[0].pz >0)
 				back_face = 1;
-			else 
+			else
 				back_face = 0;
 		}
-		else 
+		else
 			back_face = 0;	//no culling for transparent or two-sided polygons
 
 		if(!back_face)	{

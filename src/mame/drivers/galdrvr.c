@@ -3552,7 +3552,7 @@ ROM_START( atlantisb ) /* Artic Multi-System */
 ROM_END
 
 
-ROM_START( tenspot )	
+ROM_START( tenspot )
 	/* Game A - Survivor */
 	ROM_REGION( 0x4000, "game_0_cpu", 0 )
 	ROM_LOAD( "svt1-a.a1",    0x0000, 0x1000, CRC(5806d0e6) SHA1(887ff2985578faa9535387a5ce3953452e7a3171) )
@@ -3565,7 +3565,7 @@ ROM_START( tenspot )
 
 	ROM_REGION( 0x0020, "game_0_prom", 0 )
 	ROM_LOAD( "clr3.a7",       0x0000, 0x0020, CRC(aefcf6b1) SHA1(10cde93e23fe8720f5af9039c4f68999f7cfce67) )
-	
+
 	/* Game B - Moon Cresta */
 	ROM_REGION( 0x4000, "game_1_cpu", 0 )
 	ROM_LOAD( "mct1-a.b1",    0x0000, 0x1000, CRC(90a74a0b) SHA1(a1fb24aa621611c18bf6188f380640e5576ac248) )
@@ -3579,7 +3579,7 @@ ROM_START( tenspot )
 
 	ROM_REGION( 0x0020, "game_1_prom", 0 )
 	ROM_LOAD( "clr2.b7",       0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
-	
+
 	/* Game C - Space Cruiser */
 	ROM_REGION( 0x4000, "game_2_cpu", 0 )
 	ROM_LOAD( "sct1-a.c1",    0x0000, 0x1000, CRC(5068e89c) SHA1(539fe47ec846ec038ee6ffd2d3578d7cf25d4219) )
@@ -3592,7 +3592,7 @@ ROM_START( tenspot )
 
 	ROM_REGION( 0x0020, "game_2_prom", 0 )
 	ROM_LOAD( "clr1.c7",       0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
-	
+
 	/* Game D - Mission Rescue (Black Hole) */
 	ROM_REGION( 0x4000, "game_3_cpu", 0 )
 	ROM_LOAD( "mrt1-a.d1",    0x0000, 0x1000, CRC(eb63c4e0) SHA1(29a59fa8616e36dd098ff9f6e520128db3b66ed9) )
@@ -3619,7 +3619,7 @@ ROM_START( tenspot )
 
 	ROM_REGION( 0x0020, "game_4_prom", 0 )
 	ROM_LOAD( "clr1.e7",       0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
-	
+
 	/* Game F - Batman Pt.2 (Phoenix) - this needs custom video banking like the standalone version.... */
 	ROM_REGION( 0x4000, "game_5_cpu", 0 )
 	ROM_LOAD( "bmt1-a.f1",    0x0000, 0x1000, CRC(2aecaaa0) SHA1(07c35f34eebbe65247a412c828328a558936d03c) )
@@ -3647,13 +3647,13 @@ ROM_START( tenspot )
 
 	ROM_REGION( 0x0020, "game_6_prom", 0 )
 	ROM_LOAD( "clr1.h7",       0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
-	
+
 	/* Game J - King and Balloon */
 	ROM_REGION( 0x4000, "game_7_cpu", 0 )
 	ROM_LOAD( "kbt1-a.j1",    0x0000, 0x1000, CRC(6bcdfaef) SHA1(5f3d57a91d57c8758f1fa39a44be6082fff52406) )
 	ROM_LOAD( "kbt2-a.j2",    0x1000, 0x1000, CRC(3652c64b) SHA1(7cb2a51e1830d48d5d3a62d521dfef1779dd5222) )
 	ROM_LOAD( "kbt3-a.j3",    0x2000, 0x1000, CRC(946447c6) SHA1(0759f7d8b538d5e489a85bc6551cde76e6b3ed71) )
-	
+
  	ROM_REGION( 0x2000, "game_7_temp", 0 )
 	ROM_LOAD( "kbt5-a.j5",       0x0000, 0x1000, CRC(ea36f825) SHA1(20e26c97d780fb1fd15ad4c33c097a5b3539d43d) )
 	ROM_LOAD( "kbt6-a.j6",       0x1000, 0x1000, CRC(2b8b46bc) SHA1(48a7a65fc5c174d0cc654557b3a1166df7fea4da) )
@@ -3666,7 +3666,7 @@ ROM_START( tenspot )
 	ROM_LOAD( "omt1-a.k1",    0x0000, 0x1000, CRC(8fc41a53) SHA1(c1bb4018bad12b83954cf8da8eba49f23618139a) )
 	ROM_LOAD( "omt2-a.k2",    0x1000, 0x1000, CRC(a3073430) SHA1(200b15c572d7cff9be39439a247c9be742f17a61) )
 	ROM_LOAD( "omt3-a.k3",    0x2000, 0x1000, CRC(b0de1fa2) SHA1(71cf8303b7ddc5813d6b92a71bd53f83272f5f22) )
-	
+
  	ROM_REGION( 0x2000, "game_8_temp", 0 )
 	ROM_LOAD( "omt5-a.k5",       0x0000, 0x1000, CRC(5ab402c8) SHA1(c0640d9907d7dcd34cd7105d21b99fc15fcbac6e) )
 	ROM_LOAD( "omt6-a.k6",       0x1000, 0x1000, CRC(2552e470) SHA1(ba5fba8047e4bb23442b0c2d45c858ec9da63945) )
@@ -3680,7 +3680,7 @@ ROM_START( tenspot )
 	ROM_LOAD( "bat2-a.l2",    0x1000, 0x1000, CRC(adc2ce4b) SHA1(36f477a48b3df9cb2456460048b2fdd0d3e8b73e) )
 	ROM_LOAD( "bat3-a.l3",    0x2000, 0x1000, CRC(81270ace) SHA1(0385fedacbbda4ed750c5a64d51a60ed98c3ed65) )
 	ROM_LOAD( "bat4-a.l4",    0x3000, 0x1000, CRC(bd751ba9) SHA1(dbdc8972b0236755d5a8ea90e2de2d16585f5e02) )
-	
+
  	ROM_REGION( 0x2000, "game_9_temp", 0 )
 	ROM_LOAD( "bat5-a.l5",       0x0000, 0x1000, CRC(b9701513) SHA1(d8bc7b36a6d0b1e73aa7b6a5dab7b36ce111a04c) )
 	ROM_LOAD( "bat6-a.l6",       0x1000, 0x1000, CRC(54b423b7) SHA1(31eec49b4e9c8b56668b9037dd47e66659ce64cb) )
@@ -5602,7 +5602,7 @@ GAME( 1981, pacmanbla,puckman,  pacmanbl, pacmanbl, pacmanbl, ROT270, "bootleg",
 GAME( 1981, phoenxp2, phoenix,  galaxian, phoenxp2, batman2,  ROT270, "bootleg", "Phoenix Part 2", GAME_SUPPORTS_SAVE )
 GAME( 1981, batman2,  phoenix,  galaxian, batman2,  batman2,  ROT270, "bootleg", "Batman Part 2", GAME_SUPPORTS_SAVE ) /* similar to pisces, but with different video banking characteristics */
 GAME( 1981, atlantisb,atlantis, galaxian, atlantib, galaxian, ROT270, "bootleg", "Battle of Atlantis (bootleg)", GAME_SUPPORTS_SAVE ) // I don't know if this should have a starfield...
-GAME( 1982, tenspot,  0,        tenspot,  tenspot,  tenspot,  ROT270, "Thomas Automatics", "Ten Spot", GAME_NOT_WORKING ) // work out how menu works 
+GAME( 1982, tenspot,  0,        tenspot,  tenspot,  tenspot,  ROT270, "Thomas Automatics", "Ten Spot", GAME_NOT_WORKING ) // work out how menu works
 
 /* separate tile/sprite ROMs, plus INT instead of NMI */
 GAME( 1984, devilfsg, devilfsh, pacmanbl, devilfsg, devilfsg, ROT270, "Vision / Artic", "Devil Fish (Galaxian hardware, bootleg?)", GAME_SUPPORTS_SAVE )

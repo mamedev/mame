@@ -2581,7 +2581,7 @@ static DRIVER_INIT( moonqsr )
 
 static WRITE8_HANDLER( artic_gfxbank_w )
 {
-//	printf("artic_gfxbank_w %02x\n",data);
+//  printf("artic_gfxbank_w %02x\n",data);
 }
 
 static DRIVER_INIT( pacmanbl )
@@ -2645,7 +2645,7 @@ void tenspot_set_game_bank(running_machine* machine, int bank, int from_game)
 	srcregion = memory_region(machine,tmp);
 	dstregion = memory_region(machine,"proms");
 	memcpy(dstregion, srcregion, 0x20);
-	
+
 	color_prom = dstregion;
 	PALETTE_INIT_CALL(galaxian);
 }
@@ -2655,7 +2655,7 @@ static DRIVER_INIT( tenspot )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* these are needed for batman part 2 to work properly, this banking is probably a property of the artic board,
-	   which tenspot appears to have copied */
+       which tenspot appears to have copied */
 
 	/* video extensions */
 	//common_init(machine, galaxian_draw_bullet, galaxian_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
