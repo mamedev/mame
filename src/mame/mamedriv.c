@@ -8304,6 +8304,7 @@ Other Sun games
 
 	/* Dynamo games */
 	DRIVER( skeetsht )	/* (c) 1991 */
+	DRIVER( toursol )
 
 	/* Taiyo games */
 	DRIVER( dynamski )	/* (c) 1984 Taiyo */
