@@ -426,6 +426,31 @@ ROM_START( pbaction4 )
 	ROM_LOAD( "pinball_12.bin",     0x04000, 0x2000, CRC(af6e9817) SHA1(56f47d25761b3850c49a3a81b5ea35f12bd77b14) )
 ROM_END
 
+ROM_START( pbaction5 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "p16.bin",     0x0000, 0x4000, CRC(ad20b360) SHA1(91e3cdceb1c170580d926b2ed8359c3100f71b11) )
+	ROM_LOAD( "c15.bin",     0x4000, 0x4000, CRC(057acfe3) SHA1(49c184d7caea0c0e9f0d0e163f2ef42bb9aebf16) )
+	ROM_LOAD( "p14.bin",     0x8000, 0x2000, CRC(e7412d68) SHA1(e75731d9bea80e0dc09798dd46e3b947fdb54aaa) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound board */
+	ROM_LOAD( "p1.bin",     0x0000,  0x2000, CRC(8b69b933) SHA1(eb0762579d52ed9f5b1a002ffe7e517c59650e22) )
+
+	ROM_REGION( 0x06000, "fgchars", 0 )
+	ROM_LOAD( "p7.bin",     0x00000, 0x2000, CRC(9a74a8e1) SHA1(bd27439b91f41db3fd7eedb44e828d61b793bda0) )
+	ROM_LOAD( "p8.bin",     0x02000, 0x2000, CRC(5ca6ad3c) SHA1(7c8eff087f18cc2ff0572ea45e681a3a1ec94fad) )
+	ROM_LOAD( "p9.bin",     0x04000, 0x2000, CRC(9f00b757) SHA1(74b6d926b8f456c8d0101f0232c5d3662423b396) )
+
+	ROM_REGION( 0x10000, "bgchars", 0 )
+	ROM_LOAD( "p2.bin",     0x00000, 0x4000, CRC(21efe866) SHA1(0c0a05a26d793ba98b0f421d464ff4b1d301ff9e) )
+	ROM_LOAD( "p3.bin",     0x04000, 0x4000, CRC(7f984c80) SHA1(18795ecbcd2da94f1cfcce5559d652388d1b8bc0) )
+	ROM_LOAD( "p4.bin",     0x08000, 0x4000, CRC(df69e51b) SHA1(52ab15c63332f0fa98884fa9adc8d35b93c939c4) )
+	ROM_LOAD( "p5.bin",     0x0c000, 0x4000, CRC(0094cb8b) SHA1(58f48d24903b797e8451bf231f9e8df621685d9f) )
+
+	ROM_REGION( 0x06000, "sprites", 0 )
+	ROM_LOAD( "p11.bin",     0x00000, 0x2000, CRC(d1795ef5) SHA1(69ad8e419e340d2f548468ed7838102789b978da) )
+	ROM_LOAD( "p12.bin",     0x02000, 0x2000, CRC(f28df203) SHA1(060f70ed6386c808303a488c97691257681bd8f3) )
+	ROM_LOAD( "p13.bin",     0x04000, 0x2000, CRC(af6e9817) SHA1(56f47d25761b3850c49a3a81b5ea35f12bd77b14) )
+ROM_END
 
 static READ8_HANDLER( pbactio3_prot_kludge_r )
 {
@@ -466,3 +491,4 @@ GAME( 1985, pbaction, 0,        pbaction, pbaction, 0,        ROT90, "Tehkan", "
 GAME( 1985, pbaction2,pbaction, pbaction, pbaction, 0,        ROT90, "Tehkan", "Pinball Action (set 2)", 0 )
 GAME( 1985, pbaction3,pbaction, pbaction, pbaction, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", 0 )
 GAME( 1985, pbaction4,pbaction, pbaction, pbaction, pbactio4, ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", 0 )
+GAME( 1985, pbaction5,pbaction, pbaction, pbaction, pbactio4, ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", 0 )
