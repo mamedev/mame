@@ -503,7 +503,11 @@ profiler_mark_start(PROFILER_USER1);
 
 	if (video_control & 0x08)
 	{
-		if (priority) return;
+		if (priority)
+		{
+			profiler_mark_end();
+			return;
+		}
 
 		if (video_control & 0x10)   /*flip screen*/
 		{

@@ -701,7 +701,10 @@ do { 																					\
 		/* compute final pixel in Y and exit if we are entirely clipped */				\
 		destendy = desty + dstheight - 1;												\
 		if (desty > cliprect->max_y || destendy < cliprect->min_y)						\
+		{																				\
+			profiler_mark_end();													\
 			return;																		\
+		}																				\
 																						\
 		/* apply top clip */															\
 		srcy = 0;																		\
