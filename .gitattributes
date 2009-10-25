@@ -2004,7 +2004,6 @@ src/mame/drivers/sderby.c svneol=native#text/plain
 src/mame/drivers/seattle.c svneol=native#text/plain
 src/mame/drivers/segac2.c svneol=native#text/plain
 src/mame/drivers/segae.c svneol=native#text/plain
-src/mame/drivers/segae.h svneol=native#text/plain
 src/mame/drivers/segag80r.c svneol=native#text/plain
 src/mame/drivers/segag80v.c svneol=native#text/plain
 src/mame/drivers/segahang.c svneol=native#text/plain
