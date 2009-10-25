@@ -979,6 +979,9 @@ astring *game_info_astring(running_machine *machine, astring *string)
 	/* loop over all CPUs */
 	for (device = machine->firstcpu; device != NULL; device = scandevice)
 	{
+		/* get cpu specific clock that takes internal multiplier/dividers into account */
+		int clock = cpu_get_clock(device);
+
 		/* count how many identical CPUs we have */
 		count = 1;
 		for (scandevice = device->typenext; scandevice != NULL; scandevice = scandevice->typenext)
@@ -994,10 +997,10 @@ astring *game_info_astring(running_machine *machine, astring *string)
 		astring_catc(string, cpu_get_name(device));
 
 		/* display clock in kHz or MHz */
-		if (device->clock >= 1000000)
-			astring_catprintf(string, " %d.%06d" UTF8_NBSP "MHz\n", device->clock / 1000000, device->clock % 1000000);
+		if (clock >= 1000000)
+			astring_catprintf(string, " %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
 		else
-			astring_catprintf(string, " %d.%03d" UTF8_NBSP "kHz\n", device->clock / 1000, device->clock % 1000);
+			astring_catprintf(string, " %d.%03d" UTF8_NBSP "kHz\n", clock / 1000, clock % 1000);
 	}
 
 	/* loop over all sound chips */
