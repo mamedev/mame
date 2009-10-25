@@ -4,6 +4,8 @@
 
 ***************************************************************************/
 
+#include "sound/msm5205.h"
+
 /*----------- defined in audio/trackfld.c -----------*/
 
 WRITE8_HANDLER( konami_sh_irqtrigger_w );
@@ -15,6 +17,10 @@ WRITE8_DEVICE_HANDLER( hyperspt_sound_w );
 WRITE8_HANDLER( konami_SN76496_latch_w );
 WRITE8_DEVICE_HANDLER( konami_SN76496_w );
 
+/*----------- defined in drivers/trackfld.c -----------*/
+extern const msm5205_interface hyprolyb_msm5205_config;
+extern WRITE8_HANDLER( hyprolyb_adpcm_w );
+ADDRESS_MAP_EXTERN( hyprolyb_adpcm_map, 8 );
 
 /*----------- defined in video/trackfld.c -----------*/
 

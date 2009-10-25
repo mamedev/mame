@@ -5183,6 +5183,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tp84a )		/* GX388 (c) 1984 */
 	DRIVER( tp84b )		/* GX388 (c) 1984 */
 	DRIVER( hyperspt )	/* GX330 (c) 1984 + Centuri */
+	DRIVER( hypersptb ) /* bootleg */
 	DRIVER( hpolym84 )	/* GX330 (c) 1984 */
 	DRIVER( sbasketb )	/* GX405 (c) 1984 (Version I, Encrypted) */
 	DRIVER( sbasketh )	/* GX405 (c) 1984 (Version H, Unprotected) */

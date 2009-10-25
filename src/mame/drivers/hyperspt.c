@@ -15,6 +15,8 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 #include "sound/vlm5030.h"
 #include "machine/konami1.h"
 #include "konamipt.h"
+#include "cpu/m6800/m6800.h"
+#include "includes/trackfld.h"
 
 extern UINT8 *hyperspt_scroll;
 
@@ -32,25 +34,6 @@ static WRITE8_HANDLER( hyperspt_coin_counter_w )
 {
 	coin_counter_w(offset,data);
 }
-
-/* handle fake button for speed cheat */
-static READ8_HANDLER( konami_IN1_r )
-{
-	int res;
-	static int cheat = 0;
-	static const int bits[] = { 0xee, 0xff, 0xbb, 0xaa };
-
-	res = input_port_read(space->machine, "P1_P2");
-
-	if ((res & 0x80) == 0)
-	{
-		res |= 0x55;
-		res &= bits[cheat];
-		cheat = (cheat+1)%4;
-	}
-	return res;
-}
-
 
 
 /*
@@ -80,8 +63,7 @@ static ADDRESS_MAP_START( hyperspt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1500, 0x1500) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x1600, 0x1600) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1680, 0x1680) AM_READ_PORT("SYSTEM")
-//  AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x1681, 0x1681) AM_READ(konami_IN1_r)	 /* P1/P2 IO and handle fake button for cheating */
+	AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1682, 0x1682) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x1683, 0x1683) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(hyperspt_videoram_w) AM_BASE(&videoram)
@@ -124,6 +106,17 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE("sn", konami_SN76496_w) 	 /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( soundb_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x4fff) AM_RAM
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ(hyperspt_sh_timer_r)
+	AM_RANGE(0xa000, 0xa000) AM_NOP
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(hyprolyb_adpcm_w)	  /* speech and output control */
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_w)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
+	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE("sn", konami_SN76496_w) 	 /* This address triggers the SN chip to read the data port. */
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hyperspt )
 	PORT_START("SYSTEM")
@@ -144,9 +137,7 @@ static INPUT_PORTS_START( hyperspt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-//  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	/* Fake button to press buttons 1 and 3 impossibly fast. Handle via konami_IN1_r */
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Run Like Hell (Cheat)") PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P3_P4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3  ) PORT_PLAYER(3) //PORT_COCKTAIL  These were commented out
@@ -344,6 +335,23 @@ static MACHINE_DRIVER_START( hyperspt )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( hypersptb )
+	MDRV_IMPORT_FROM(hyperspt)
+	MDRV_DEVICE_REMOVE("vlm")
+
+	MDRV_CPU_MODIFY("audiocpu")
+	MDRV_CPU_PROGRAM_MAP(soundb_map)
+
+	MDRV_CPU_ADD("adpcm", M6802, XTAL_14_31818MHz/8)	/* unknown clock */
+	MDRV_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
+
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
+	MDRV_SOUND_CONFIG(hyprolyb_msm5205_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( roadf )
 	MDRV_IMPORT_FROM(hyperspt)
 	MDRV_CPU_MODIFY("maincpu")
@@ -395,6 +403,55 @@ ROM_START( hyperspt )
 
 	ROM_REGION( 0x10000, "vlm", 0 )	/*  64k for speech rom    */
 	ROM_LOAD( "c08",          0x0000, 0x2000, CRC(e8f8ea78) SHA1(8d37818e5a2740c96696f37996f2a3f870386690) )
+ROM_END
+
+
+
+ROM_START( hypersptb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.5g",          0x4000, 0x2000, CRC(0cfc68a7) SHA1(48ddd444f4366a39afb589e1c5df10d815b4b64f) )
+	ROM_LOAD( "2.7g",          0x6000, 0x2000, CRC(560258e0) SHA1(788d0d3cbbd97fb54eceb3281ccf84a31e5e3e98) )
+	ROM_LOAD( "3.8g",          0x8000, 0x2000, CRC(9b01c7e6) SHA1(0106f94b38ad62e7514e56aab35581968074bbe0) )
+	ROM_LOAD( "4.11g",          0xa000, 0x2000, CRC(4ed32240) SHA1(b093763655ebfd00b08542b49eab4606ea1ef8c6) )
+	ROM_LOAD( "5.13g",          0xc000, 0x2000, CRC(b105a8cd) SHA1(7d77ab4d75c0bff7ac7372a5ff5fe55839b57d19) )
+	ROM_LOAD( "6.15g",          0xe000, 0x2000, CRC(1a34a849) SHA1(daa42a959ea162ca7f098010c85a7453a8805df8) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "12.17a",          0x0000, 0x2000, CRC(3dc1a6ff) SHA1(1e67cac46b6c8a9a0bb1560e135983435520f1fc) )
+	ROM_LOAD( "11.15a",          0x2000, 0x2000, CRC(9b525c3e) SHA1(d8775ec3b4f12117431a2b7c7eaa038c1255241b) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "20.15g",          0x00000, 0x4000, CRC(551d222f) SHA1(cd3d544ca5009cad3f9748804301bfed57329775) ) // 27256 ?! - it doesn't need to be!
+	ROM_CONTINUE(0xc000,0x4000) // causes data we want to be at 0xe000 - 0xffff
+	ROM_LOAD( "16.19j",          0x00000, 0x2000, CRC(c72d63be) SHA1(0677b4f7196551ebc1bbbecd0e15d79f8e32857d) )
+	ROM_LOAD( "15.18j",          0x02000, 0x2000, CRC(76565608) SHA1(418fb9a81c0583d0214afb27fea28794563b8460) )
+	ROM_LOAD( "14.17j",          0x04000, 0x2000, CRC(74d2cc69) SHA1(684b65455217f243b3690822d445efdcb18211bb) )
+	ROM_LOAD( "13.15j",          0x06000, 0x2000, CRC(66cbcb4d) SHA1(c4ea51a6f30d2cd0cd6e22fdadb83d889f2cc471) )
+	ROM_LOAD( "17.19g",          0x08000, 0x2000, CRC(ed25e669) SHA1(2e306db101cd4443b0a81cecf817e5ebbdaf1bba) )
+	ROM_LOAD( "18.18g",          0x0a000, 0x2000, CRC(b145b39f) SHA1(e696e1f9b44aa44360ea9962c4ee9b61db8e53f5) )
+	ROM_LOAD( "19.17g",          0x0c000, 0x2000, CRC(d7ff9f2b) SHA1(b0e6a056db96027ba0c10d3ee3bfdef145a236e2) )
+
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "b.14a",          0x00000, 0x4000, CRC(8fd90bd2) SHA1(4faa270002f859a27719d08004b012cc297405f5) )  // 27256 ?! - it doesn't need to be!
+	ROM_CONTINUE(0x0000,0x4000)  // causes data we want to be at 0x0000 - 0x1fff
+	ROM_LOAD( "a.12a",          0x02000, 0x2000, CRC(a3d422c6) SHA1(f0e26a7190e64acd9b682aab5a66223de4055de0) )
+	ROM_LOAD( "d.14c",          0x04000, 0x2000, CRC(ed9271a0) SHA1(a458ad79922383f45f6522775e19cf693e226883) )
+	ROM_LOAD( "c.12c",          0x06000, 0x2000, CRC(0c8ed053) SHA1(2bf5e4fd94cbf7d459495a144b86b677eb1f89da) )
+
+	ROM_REGION( 0x0220, "proms", 0 )
+	ROM_LOAD( "mmi6331-1.3c",  0x0000, 0x0020, CRC(bc8a5956) SHA1(90746145d9f380c29919edea3ef7a8434c48c9d9) )
+	// no proms matched the ones below, but they're colours, so I assume them to be the same
+	ROM_LOAD( "j12_c28.bin",  0x0020, 0x0100, CRC(2c891d59) SHA1(79050fbe058c24349927edc7937ec68a77f450f1) )
+	ROM_LOAD( "a09_c29.bin",  0x0120, 0x0100, CRC(811a3f3f) SHA1(474f03345847cd9791ff6b7161286bbfef3f990a) )
+
+    /* These ROM's are located on the Sound Board */
+	ROM_REGION( 0x10000, "adpcm", 0 )	/*  64k for the 6802 which plays ADPCM samples */
+	ROM_LOAD( "10.20c",       0x8000, 0x2000, CRC(a4cddeb8) SHA1(057981ad3b04239662bb19342e9ec14b0dab2351) )
+	ROM_LOAD( "9.20cd",       0xa000, 0x2000, CRC(e9919365) SHA1(bd11d6e3ee2c6e698159c2768e315389d666107f) )
+	ROM_LOAD( "8.20d",        0xc000, 0x2000, CRC(49a06454) SHA1(159a293125d7ac92a81120e290497ee7ed6d8acf) )
+	ROM_LOAD( "7.20b",        0xe000, 0x2000, CRC(607a36df) SHA1(17e553e5070771133ed094f05b26dd6cd63cfc23) )
+
 ROM_END
 
 ROM_START( hpolym84 )
@@ -499,6 +556,7 @@ static DRIVER_INIT( hyperspt )
 
 
 GAME( 1984, hyperspt, 0,		hyperspt, hyperspt, hyperspt, ROT0,  "Konami (Centuri license)", "Hyper Sports", 0 )
+GAME( 1984, hypersptb,hyperspt, hypersptb,hyperspt, hyperspt, ROT0,  "bootleg", "Hyper Sports (bootleg)", GAME_IMPERFECT_SOUND ) // has ADPCM vis MSM5205 instead of VLM
 GAME( 1984, hpolym84, hyperspt, hyperspt, hyperspt, hyperspt, ROT0,  "Konami", "Hyper Olympic '84", 0 )
 GAME( 1984, roadf,	  0,		roadf,	  roadf,	hyperspt, ROT90, "Konami", "Road Fighter (set 1)", 0 )
 GAME( 1984, roadf2,   roadf,	roadf,	  roadf,	hyperspt, ROT90, "Konami", "Road Fighter (set 2)", 0 )

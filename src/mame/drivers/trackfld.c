@@ -63,7 +63,7 @@ static WRITE8_HANDLER( questions_bank_w )
 		memory_set_bank(space->machine, 1, 7);
 }
 
-static WRITE8_HANDLER( hyprolyb_adpcm_w )
+WRITE8_HANDLER( hyprolyb_adpcm_w )
 {
 	soundlatch2_w(space, offset, data);
 	hyprolyb_adpcm_ready = 0x80;
@@ -244,7 +244,7 @@ static ADDRESS_MAP_START( hyprolyb_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe004, 0xe004) AM_MIRROR(0x1ff8) AM_WRITE(hyprolyb_adpcm_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hyprolyb_adpcm_map, ADDRESS_SPACE_PROGRAM, 8 )
+ADDRESS_MAP_START( hyprolyb_adpcm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ(hyprolyb_adpcm_data_r)
 	AM_RANGE(0x1001, 0x1001) AM_READ(hyprolyb_adpcm_ready_r)
@@ -682,7 +682,7 @@ static void adpcm_vck_callback(const device_config *device)
 	hyprolyb_vck_ready = 0x80;
 }
 
-static const msm5205_interface msm5205_config =
+const msm5205_interface hyprolyb_msm5205_config =
 {
 	adpcm_vck_callback,	/* VCK function */
 	MSM5205_S96_4B		/* 4 kHz */
@@ -745,7 +745,7 @@ static MACHINE_DRIVER_START( hyprolyb )
 	MDRV_DEVICE_REMOVE("vlm")
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
+	MDRV_SOUND_CONFIG(hyprolyb_msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
