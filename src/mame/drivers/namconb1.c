@@ -895,7 +895,7 @@ static WRITE16_HANDLER( nbmcu_shared_w )
 	// HACK!  Many games data ROM routines redirect the vector from the sound command read to an RTS.
 	// This needs more investigation.  nebulray and vshoot do NOT do this.
 	// Timers A2 and A3 are set up in "external input counter" mode, this may be related.
-#if 1
+#if 0
 	if ((offset == 0x647c/2) && (data != 0))
 	{
 		data = 0xd2f6;
