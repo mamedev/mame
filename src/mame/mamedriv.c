@@ -2688,6 +2688,7 @@ V-V                           TP-027
 	DRIVER( dstlku )	/* 18/08/1994 (c) 1994 (US) */
 	DRIVER( dstlkur1 )	/* 05/07/1994 (c) 1994 (US) */
 	DRIVER( dstlka )	/* 05/07/1994 (c) 1994 (Asia) */
+	DRIVER( dstlkh )	/* 18/08/1994 (c) 1994 (Hispanic) */
 	DRIVER( vampj )		/* 05/07/1994 (c) 1994 (Japan) */
 	DRIVER( vampja )	/* 05/07/1994 (c) 1994 (Japan) */
 	DRIVER( vampjr1 )	/* 30/06/1994 (c) 1994 (Japan) */
