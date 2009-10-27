@@ -539,6 +539,8 @@ WRITE8_HANDLER( slikshot_z80_control_w )
 
 VIDEO_START( slikshot )
 {
+	VIDEO_START_CALL( itech8 );
+
 	z80_ctrl = 0;
 	z80_port_val = 0;
 	z80_clear_to_send = 0;
