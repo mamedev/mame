@@ -696,6 +696,7 @@ const game_driver * const drivers[] =
 	DRIVER( polepos2 )	/* (c) 1983 */
 	DRIVER( polepos2a )	/* 136014   (c) 1983 + Atari license */
 	DRIVER( polepos2b )	/* bootleg */
+	DRIVER( polepos2bi )/* bootleg */
 	/* no custom I/O in the following, HD63701 (or compatible) microcontroller instead */
 	DRIVER( pacland )	/* (c) 1984 */
 	DRIVER( pacland2 )	/* (c) 1984 */
