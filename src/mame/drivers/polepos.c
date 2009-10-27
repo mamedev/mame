@@ -1877,21 +1877,20 @@ ROM_START( polepos2bi )
 	ROM_REGION( 0x0100, "namco", 0 )
 	ROM_LOAD( "74s287-b.bin",   0x0000, 0x0100, CRC(8568decc) SHA1(0aac1fa082858d4d201e21511c609a989f9a1535) )    /* Namco sound */
 
-	ROM_REGION( 0x4000, "engine", 0 )
-	ROM_LOAD( "pp4-16.bin",   0x0000, 0x2000, CRC(7d93bc1c) SHA1(dad7c0aa24aef593c84e21f7f8858ca7ada86364) )    /* engine sound */
+	ROM_REGION( 0x4000, "engine", 0 ) /* these roms are both the same on the original sets, but here they differ */
+	ROM_LOAD( "pp4-15.bin",   0x0000, 0x2000, CRC(5d79e1ad) SHA1(0323bdf3b9aca298b788bb07020653a43114c952) )	
 	ROM_LOAD( "pp4-16.bin",   0x2000, 0x2000, CRC(7d93bc1c) SHA1(dad7c0aa24aef593c84e21f7f8858ca7ada86364) )    /* engine sound */
 
 	ROM_REGION( 0x6000, "52xx", ROMREGION_ERASEFF )
-	/* no 52xx on the bootleg */
+	/* the bootleg has a TMS5220, NOT the Namco 52xx */
 
 	/* unknown or unused (P)ROM data */
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "74s287-a.bin",   0x0000, 0x0100, CRC(0e742cb1) SHA1(3ae43270aab4848fdeece1648e7e040ab216b08e) )    /* sync chain */
 
-	/* haven't worked out what these are yet, maybe samples */
-	ROM_REGION( 0x2000, "others", 0 )
+	/* this is used for the italian speech, not hooked up */
+	ROM_REGION( 0x2000, "tms5220", 0 )
 	ROM_LOAD( "20.bin",       0x0000, 0x2000, CRC(1771fe1b) SHA1(da74ca85dfd4f5ad5a9dbfe6f7668d93105e3575) )
-	ROM_LOAD( "pp4-15.bin",   0x0000, 0x2000, CRC(5d79e1ad) SHA1(0323bdf3b9aca298b788bb07020653a43114c952) )	
 
 	ROM_REGION( 0x2000, "pals", 0 )
 	ROM_LOAD( "pal12l6-a.bin.bad.dump",     0x0000, 0x34, BAD_DUMP CRC(56c2e02f) SHA1(33545f83d63b476d9164472b439aa7002506b33d) )
