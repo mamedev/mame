@@ -1025,7 +1025,8 @@ static DEVICE_START( naomibd )
 			v->memory = (UINT8 *)memory_region(device->machine, config->regiontag);
 			v->gdromchd = get_disk_handle(device->machine, config->gdromregiontag);
 			v->picdata = (UINT8 *)memory_region(device->machine, config->picregiontag);
-			load_rom_gdrom(device->machine, v);
+			if (v->memory != NULL && v->gdromchd != NULL && v->picdata != NULL)
+				load_rom_gdrom(device->machine, v);
 			break;
 
 		default:
