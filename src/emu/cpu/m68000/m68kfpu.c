@@ -76,6 +76,11 @@ static UINT8 READ_EA_8(m68ki_cpu_core *m68k, int ea)
 		{
 			return REG_D[reg];
 		}
+		case 2: 	// (An)
+		{
+			UINT32 ea = REG_A[reg];
+			return m68ki_read_8(m68k, ea);
+		}
 		case 5:		// (d16, An)
 		{
 			UINT32 ea = EA_AY_DI_8(m68k);
@@ -223,6 +228,142 @@ static UINT32 READ_EA_32(m68ki_cpu_core *m68k, int ea)
 	return 0;
 }
 
+static void WRITE_EA_8(m68ki_cpu_core *m68k, int ea, UINT8 data)
+{
+	int mode = (ea >> 3) & 0x7;
+	int reg = (ea & 0x7);
+
+	switch (mode)
+	{
+		case 0:		// Dn
+		{
+			REG_D[reg] = data;
+			break;
+		}
+		case 2:		// (An)
+		{
+			UINT32 ea = REG_A[reg];
+			m68ki_write_8(m68k, ea, data);
+			break;
+		}
+		case 3:		// (An)+
+		{
+			UINT32 ea = EA_AY_PI_8(m68k);
+			m68ki_write_8(m68k, ea, data);
+			break;
+		}
+		case 4:		// -(An)
+		{
+			UINT32 ea = EA_AY_PD_8(m68k);
+			m68ki_write_8(m68k, ea, data);
+			break;
+		}
+		case 5:		// (d16, An)
+		{
+			UINT32 ea = EA_AY_DI_8(m68k);
+			m68ki_write_8(m68k, ea, data);
+			break;
+		}
+		case 6:		// (An) + (Xn) + d8
+		{
+			UINT32 ea = EA_AY_IX_8(m68k);
+			m68ki_write_8(m68k, ea, data);
+			break;
+		}
+		case 7:
+		{
+			switch (reg)
+			{
+				case 1:		// (xxx).B
+				{
+					UINT32 d1 = OPER_I_16(m68k);
+					UINT32 d2 = OPER_I_16(m68k);
+					UINT32 ea = (d1 << 16) | d2;
+					m68ki_write_8(m68k, ea, data);
+					break;
+				}
+				case 2:		// (d16, PC)
+				{
+					UINT32 ea = EA_PCDI_16(m68k);
+					m68ki_write_8(m68k, ea, data);
+					break;
+				}
+				default:	fatalerror("MC68040: WRITE_EA_8: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
+			}
+			break;
+		}
+		default:	fatalerror("MC68040: WRITE_EA_8: unhandled mode %d, reg %d, data %08X at %08X\n", mode, reg, data, REG_PC);
+	}
+}
+
+static void WRITE_EA_16(m68ki_cpu_core *m68k, int ea, UINT16 data)
+{
+	int mode = (ea >> 3) & 0x7;
+	int reg = (ea & 0x7);
+
+	switch (mode)
+	{
+		case 0:		// Dn
+		{
+			REG_D[reg] = data;
+			break;
+		}
+		case 2:		// (An)
+		{
+			UINT32 ea = REG_A[reg];
+			m68ki_write_16(m68k, ea, data);
+			break;
+		}
+		case 3:		// (An)+
+		{
+			UINT32 ea = EA_AY_PI_16(m68k);
+			m68ki_write_16(m68k, ea, data);
+			break;
+		}
+		case 4:		// -(An)
+		{
+			UINT32 ea = EA_AY_PD_16(m68k);
+			m68ki_write_16(m68k, ea, data);
+			break;
+		}
+		case 5:		// (d16, An)
+		{
+			UINT32 ea = EA_AY_DI_16(m68k);
+			m68ki_write_16(m68k, ea, data);
+			break;
+		}
+		case 6:		// (An) + (Xn) + d8
+		{
+			UINT32 ea = EA_AY_IX_16(m68k);
+			m68ki_write_16(m68k, ea, data);
+			break;
+		}
+		case 7:
+		{
+			switch (reg)
+			{
+				case 1:		// (xxx).W
+				{
+					UINT32 d1 = OPER_I_16(m68k);
+					UINT32 d2 = OPER_I_16(m68k);
+					UINT32 ea = (d1 << 16) | d2;
+					m68ki_write_16(m68k, ea, data);
+					break;
+				}
+				case 2:		// (d16, PC)
+				{
+					UINT32 ea = EA_PCDI_16(m68k);
+					m68ki_write_16(m68k, ea, data);
+					break;
+				}
+				default:	fatalerror("MC68040: WRITE_EA_16: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
+			}
+			break;
+		}
+		default:	fatalerror("MC68040: WRITE_EA_16: unhandled mode %d, reg %d, data %08X at %08X\n", mode, reg, data, REG_PC);
+	}
+}
+
 static void WRITE_EA_32(m68ki_cpu_core *m68k, int ea, UINT32 data)
 {
 	int mode = (ea >> 3) & 0x7;
@@ -359,7 +500,7 @@ static void WRITE_EA_64(m68ki_cpu_core *m68k, int ea, UINT64 data)
 		{
 			UINT32 ea = REG_A[reg];
 			m68ki_write_32(m68k, ea, (UINT32)(data >> 32));
-			m68ki_write_32(m68k, ea, (UINT32)(data));
+			m68ki_write_32(m68k, ea+4, (UINT32)(data));
 			break;
 		}
 		case 4:		// -(An)
@@ -605,7 +746,8 @@ static void fmove_reg_mem(m68ki_cpu_core *m68k, UINT16 w2)
 		}
 		case 4:		// Word Integer
 		{
-			fatalerror("fmove_reg_mem: word integer store unimplemented at %08X\n", REG_PC-4);
+			INT16 d = (INT16)(REG_FP[src].f);
+			WRITE_EA_16(m68k, ea, d);
 			break;
 		}
 		case 5:		// Double-precision Real
@@ -616,7 +758,8 @@ static void fmove_reg_mem(m68ki_cpu_core *m68k, UINT16 w2)
 		}
 		case 6:		// Byte Integer
 		{
-			fatalerror("fmove_reg_mem: byte integer store unimplemented at %08X\n", REG_PC-4);
+			INT8 d = (INT16)(REG_FP[src].f);
+			WRITE_EA_8(m68k, ea, d);
 			break;
 		}
 		case 7:		// Packed-decimal Real with Dynamic K-factor

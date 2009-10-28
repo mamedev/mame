@@ -893,7 +893,7 @@ M68KMAKE_OP(1111, 0, ., .)
 
 M68KMAKE_OP(040fpu0, 32, ., .)
 {
-	if(CPU_TYPE_IS_040_PLUS(m68k->cpu_type))
+	if(CPU_TYPE_IS_030_PLUS(m68k->cpu_type))
 	{
 		m68040_fpu_op0(m68k);
 		return;
@@ -904,7 +904,7 @@ M68KMAKE_OP(040fpu0, 32, ., .)
 
 M68KMAKE_OP(040fpu1, 32, ., .)
 {
-	if(CPU_TYPE_IS_040_PLUS(m68k->cpu_type))
+	if(CPU_TYPE_IS_030_PLUS(m68k->cpu_type))
 	{
 		m68040_fpu_op1(m68k);
 		return;
@@ -8033,7 +8033,31 @@ M68KMAKE_OP(pmove, 32, ., .)
 			case 2:	// MC68881 form, FD never set
 				if (modes & 0x200)
 				{
-					logerror("680x0: PMOVE from MMU not supported\n");
+				 	switch ((modes>>10) & 7)
+					{
+						case 0:	// translation control register
+							memory_write_word_32be(m68k->program, ea, m68k->mmu_tc>>16);
+							memory_write_word_32be(m68k->program, ea+2, m68k->mmu_tc&0xffff);
+							break;
+
+						case 2: // supervisor root pointer
+							memory_write_word_32be(m68k->program, ea, m68k->mmu_srp_limit>>16);
+							memory_write_word_32be(m68k->program, ea+2, m68k->mmu_srp_limit&0xffff);
+							memory_write_word_32be(m68k->program, ea+4, m68k->mmu_srp_aptr>>16);
+							memory_write_word_32be(m68k->program, ea+6, m68k->mmu_srp_aptr&0xffff);
+							break;
+
+						case 3: // CPU root pointer
+							memory_write_word_32be(m68k->program, ea, m68k->mmu_crp_limit>>16);
+							memory_write_word_32be(m68k->program, ea+2, m68k->mmu_crp_limit&0xffff);
+							memory_write_word_32be(m68k->program, ea+4, m68k->mmu_crp_aptr>>16);
+							memory_write_word_32be(m68k->program, ea+6, m68k->mmu_crp_aptr&0xffff);
+							break;
+
+						default:
+							logerror("680x0: PMOVE from unknown MMU register %x, PC %x\n", (modes>>10) & 7, m68k->pc);
+							break;
+					}
 				}
 				else
 				{
@@ -8068,7 +8092,7 @@ M68KMAKE_OP(pmove, 32, ., .)
 							break;
 
 						default:
-							logerror("680x0: PMOVE to unknown MMU register %x\n", (modes>>10) & 7);
+							logerror("680x0: PMOVE to unknown MMU register %x, PC %x\n", (modes>>10) & 7, m68k->pc);
 							break;
 					}
 				}
