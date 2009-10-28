@@ -152,6 +152,7 @@ static int usage(void)
 	printf("usage: chdman -info input.chd\n");
 	printf("   or: chdman -createraw inputhd.raw output.chd [inputoffs [hunksize]]\n");
 	printf("   or: chdman -createhd inputhd.raw output.chd [ident.bin] [inputoffs [cylinders heads sectors [sectorsize [hunksize]]]]\n");
+	printf("   or: chdman -createuncomphd inputhd.raw output.chd [ident.bin] [inputoffs [cylinders heads sectors [sectorsize [hunksize]]]]\n");
 	printf("   or: chdman -createblankhd output.chd cylinders heads sectors [sectorsize [hunksize]]\n");
 	printf("   or: chdman -createcd input.toc output.chd\n");
 	printf("   or: chdman -createav input.avi output.chd [firstframe [numframes]]\n");
@@ -424,6 +425,147 @@ cleanup:
 	return (err != CHDERR_NONE);
 }
 
+/*-------------------------------------------------
+    do_createhd_uncomp - create a new uncompressed hard
+    disk image from a raw file
+-------------------------------------------------*/
+
+static int do_createhd_uncomp(int argc, char *argv[], int param)
+{
+	UINT32 guess_cylinders = 0, guess_heads = 0, guess_sectors = 0, guess_sectorsize = 0;
+	UINT32 cylinders, heads, sectors, sectorsize, hunksize, totalsectors, offset;
+	const char *inputfile, *outputfile = NULL;
+	chd_error err = CHDERR_NONE;
+	UINT32 identdatasize = 0;
+	UINT8 *identdata = NULL;
+	chd_file *chd = NULL;
+	char metadata[256];
+	chd_header header;
+
+	/* if a file is provided for argument 4 (ident filename), then shift the remaining arguments down */
+	if (argc >= 5)
+	{
+		char *scan;
+
+		/* if there are any non-digits in the 'offset', then treat it as a ident file */
+		for (scan = argv[4]; *scan != 0; scan++)
+			if (!isdigit((UINT8)*scan))
+				break;
+		if (*scan != 0)
+		{
+			/* attempt to load the file */
+			file_error filerr = core_fload(argv[4], (void **)&identdata, &identdatasize);
+			if (filerr != FILERR_NONE)
+			{
+				fprintf(stderr, "Error opening ident file '%s'\n", argv[4]);
+				return 1;
+			}
+
+			/* shift the remaining arguments down */
+			if (argc > 5)
+				memmove(&argv[4], &argv[5], (argc - 5) * sizeof(argv[0]));
+			argc--;
+		}
+	}
+
+	/* require 4-5, or 8-10 args total */
+	if (argc != 4 && argc != 5 && argc != 8 && argc != 9 && argc != 10)
+		return usage();
+
+	/* extract the first few parameters */
+	inputfile = argv[2];
+	outputfile = argv[3];
+	offset = (argc >= 5) ? atoi(argv[4]) : (get_file_size(inputfile) % IDE_SECTOR_SIZE);
+
+	/* if less than 8 parameters, we need to guess the CHS values */
+	if (argc < 8)
+	{
+		if (identdata != NULL)
+			err = get_chs_from_ident(inputfile, offset, identdata, identdatasize, &guess_cylinders, &guess_heads, &guess_sectors, &guess_sectorsize);
+		else
+			err = guess_chs(inputfile, offset, IDE_SECTOR_SIZE, &guess_cylinders, &guess_heads, &guess_sectors, &guess_sectorsize);
+		if (err != CHDERR_NONE)
+			goto cleanup;
+	}
+
+	/* parse the remaining parameters */
+	cylinders = (argc >= 6) ? atoi(argv[5]) : guess_cylinders;
+	heads = (argc >= 7) ? atoi(argv[6]) : guess_heads;
+	sectors = (argc >= 8) ? atoi(argv[7]) : guess_sectors;
+	sectorsize = (argc >= 9) ? atoi(argv[8]) : guess_sectorsize;
+	if (sectorsize == 0) sectorsize = IDE_SECTOR_SIZE;
+	hunksize = (argc >= 10) ? atoi(argv[9]) : (sectorsize > 4096) ? sectorsize : ((4096 / sectorsize) * sectorsize);
+	totalsectors = cylinders * heads * sectors;
+
+	/* print some info */
+	printf("Input file:   %s\n", inputfile);
+	printf("Output file:  %s\n", outputfile);
+	printf("Input offset: %d\n", offset);
+	printf("Cylinders:    %d\n", cylinders);
+	printf("Heads:        %d\n", heads);
+	printf("Sectors:      %d\n", sectors);
+	printf("Bytes/sector: %d\n", sectorsize);
+	printf("Sectors/hunk: %d\n", hunksize / sectorsize);
+	printf("Logical size: %s\n", big_int_string((UINT64)totalsectors * (UINT64)sectorsize));
+
+	/* create the new hard drive */
+	err = chd_create(outputfile, (UINT64)totalsectors * (UINT64)sectorsize, hunksize, CHDCOMPRESSION_NONE, NULL);
+	if (err != CHDERR_NONE)
+	{
+		fprintf(stderr, "Error creating CHD file: %s\n", chd_error_string(err));
+		goto cleanup;
+	}
+
+	/* open the new hard drive */
+	err = chd_open(outputfile, CHD_OPEN_READWRITE, NULL, &chd);
+	if (err != CHDERR_NONE)
+	{
+		fprintf(stderr, "Error opening new CHD file: %s\n", chd_error_string(err));
+		goto cleanup;
+	}
+
+	/* write the metadata */
+	sprintf(metadata, HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize);
+	err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1, CHD_MDFLAGS_CHECKSUM);
+	if (err != CHDERR_NONE)
+	{
+		fprintf(stderr, "Error adding hard disk metadata: %s\n", chd_error_string(err));
+		goto cleanup;
+	}
+
+	/* write the ident if present */
+	if (identdata != NULL)
+	{
+		err = chd_set_metadata(chd, HARD_DISK_IDENT_METADATA_TAG, 0, identdata, identdatasize, CHD_MDFLAGS_CHECKSUM);
+		if (err != CHDERR_NONE)
+		{
+			fprintf(stderr, "Error adding hard disk metadata: %s\n", chd_error_string(err));
+			goto cleanup;
+		}
+	}
+
+	/* compress the hard drive */
+	err = chdman_compress_file(chd, inputfile, offset);
+	if (err != CHDERR_NONE)
+		fprintf(stderr, "Error during compression: %s\n", chd_error_string(err));
+
+	/* make it writeable */
+	header = *chd_get_header(chd);
+	header.flags |= CHDFLAGS_IS_WRITEABLE;
+	err = chd_set_header_file(chd_core_file(chd), &header);
+	if (err != CHDERR_NONE)
+		fprintf(stderr, "Error writing new header: %s\n", chd_error_string(err));
+
+cleanup:
+	/* close everything down */
+	if (chd != NULL)
+		chd_close(chd);
+	if (err != CHDERR_NONE)
+		osd_rmfile(outputfile);
+	if (identdata != NULL)
+		free(identdata);
+	return (err != CHDERR_NONE);
+}
 
 /*-------------------------------------------------
     do_createraw - create a new compressed raw
@@ -3146,6 +3288,7 @@ int CLIB_DECL main(int argc, char **argv)
 	} option_list[] =
 	{
 		{ "-createhd",		do_createhd, 0 },
+		{ "-createuncomphd", 	do_createhd_uncomp, 0 },
 		{ "-createraw",		do_createraw, 0 },
 		{ "-createcd",		do_createcd, 0 },
 		{ "-createblankhd",	do_createblankhd, 0 },
