@@ -834,7 +834,8 @@ static DRIVER_INIT( coh3002t )
 	dip_timer = timer_alloc(machine,  dip_timer_fired, NULL );
 
 	memset(cis, 0xff, 512);
-	chd_get_metadata(get_disk_handle(machine, "card"), PCMCIA_CIS_METADATA_TAG, 0, cis, 512, 0, 0, 0);
+	if (get_disk_handle(machine, "card") != NULL)
+		chd_get_metadata(get_disk_handle(machine, "card"), PCMCIA_CIS_METADATA_TAG, 0, cis, 512, 0, 0, 0);
 }
 
 static DRIVER_INIT( coh3002t_mp )
@@ -851,12 +852,11 @@ static MACHINE_RESET( coh3002t )
 	control = 0;
 	psx_machine_init(machine);
 	devtag_reset(machine, "card");
-	ide_set_gnet_readlock (devtag_get_device(machine, "card"), 1);
+	ide_set_gnet_readlock(devtag_get_device(machine, "card"), 1);
 }
 
 static ADDRESS_MAP_START( zn_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE(1) AM_BASE(&g_p_n_psxram) AM_SIZE(&g_n_psxramsize) /*
- ram */
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE(1) AM_BASE(&g_p_n_psxram) AM_SIZE(&g_n_psxramsize) /* ram */
 	AM_RANGE(0x00400000, 0x007fffff) AM_RAM AM_SHARE(1) /* ram mirror */
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_READWRITE(flash_s1_r, flash_s1_w)
 	AM_RANGE(0x1f200000, 0x1f3fffff) AM_READWRITE(flash_s2_r, flash_s2_w)
