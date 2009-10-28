@@ -180,6 +180,17 @@ static const struct
 	{ "gdarius2", tt01, tt07 }, /* OK */
 	{ "aerofgts", kn01, kn02 }, /* OK */
 	{ "sncwgltd", kn01, kn02 }, /* OK */
+	/* 2009-10 FP: to avoid crash when running BIOS sets alone, I added the entries below.        */
+	/* Now we get "Error B930 - Cannot Find Program Rom". Is this the correct way to handle them? */
+	{ "acpsx",    ac01, ac02 },
+	{ "atpsx",    tw01, tw02 },
+	{ "atluspsx", at01, at02 },
+	{ "cpzn1",    cp01, cp02 },
+	{ "cpzn2",    cp01, cp02 },
+	{ "psarc95",  et01, et02 },
+	{ "tps",      mg01, mg02 },
+	{ "taitofx1", tt01, tt02 },
+	{ "vspsx",    kn01, kn02 },
 	{ NULL, NULL, NULL }
 };
 
@@ -2776,6 +2787,8 @@ INPUT_PORTS_END
 
 ROM_START( cpzn1 )
 	CPZN1_BIOS
+	ROM_REGION32_LE( 0x80000, "user3", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x2400000, "user2", ROMREGION_ERASE00 )
 	ROM_REGION( 0x50000, "audiocpu", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3035,6 +3048,8 @@ ROM_END
 
 ROM_START( cpzn2 )
 	CPZN2_BIOS
+	ROM_REGION32_LE( 0x80000, "user3", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x3000000, "user2", ROMREGION_ERASE00 )
 	ROM_REGION( 0x50000, "audiocpu", ROMREGION_ERASE00 )
 ROM_END
 
@@ -3479,6 +3494,7 @@ ROM_END
 
 ROM_START( tps )
 	TPS_BIOS
+	ROM_REGION32_LE( 0x02800000, "user2", ROMREGION_ERASE00 )
 ROM_END
 
 /*
@@ -3716,6 +3732,8 @@ ROM_END
 
 ROM_START( vspsx )
 	KN_BIOS
+	ROM_REGION32_LE( 0x0280000, "user2", ROMREGION_ERASE00 )
+	ROM_REGION32_LE( 0x1800000, "user3", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( aerofgts )
@@ -3765,6 +3783,7 @@ ROM_END
 
 ROM_START( taitofx1 )
 	TAITOFX1_BIOS
+	ROM_REGION32_LE( 0x01000000, "user2", ROMREGION_ERASE00 )
 	ROM_REGION( 0x080000, "audiocpu", ROMREGION_ERASE00 )
 ROM_END
 
@@ -4042,7 +4061,9 @@ ROM_END
 
 ROM_START( psarc95 )
 	PSARC95_BIOS
+	ROM_REGION32_LE( 0x1800000, "user2", ROMREGION_ERASE00 )
 	ROM_REGION( 0x080000, "audiocpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x400000, "ymf", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( beastrzr )
@@ -4246,6 +4267,7 @@ ROM_END
 
 ROM_START( atpsx )
 	TW_BIOS
+	ROM_REGION32_LE( 0x200000, "user2", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( primrag2 )
@@ -4269,6 +4291,7 @@ ROM_END
 
 ROM_START( acpsx )
 	AC_BIOS
+	ROM_REGION32_LE( 0x2000000, "user2", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( nbajamex )
@@ -4331,6 +4354,7 @@ ROM_END
 
 ROM_START( atluspsx )
 	ATLUS_BIOS
+	ROM_REGION32_LE( 0x02000000, "user2", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( hvnsgate )
