@@ -1102,11 +1102,15 @@ ROM_END
 /* Game 61 - Turbo Outrun */
 #define MEGATECH_GAME61(GAME_REGION, INSTRUCTION_REGION) \
 	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
-	ROM_LOAD16_WORD_SWAP( "epr-14674.ic1", 0x000000, 0x080000, CRC(c2b9a802) SHA1(108cc844c944125f9d271a2f2db094301294e8c2) ) \
+	ROM_LOAD16_WORD_SWAP( "epr-14674.ic1", 0x000000, 0x080000, CRC(453712a2) SHA1(5d2c8430a9a14aac7f19c22617539b0503ab92cd) ) \
     MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
 	ROM_LOAD( "epr-12368-61.ic2", 0x000000, 0x08000, CRC(4aa0b2a2) SHA1(bce03f88d6cfd02683d51c28058f6229fda13b49) ) \
 
-ROM_START( mt_tout ) /* Sonic The Hedgehog 2 */
+// original dump of epr-14674.ic1 had CRC(c2b9a802) SHA1(108cc844c944125f9d271a2f2db094301294e8c2)
+// with the byte at offset 3 being F6 instead of Fe, this seems like a bad dump when compared to the Genesis rom which
+// has been verified on multiple carts, chances are the ROM had developed a fault.  
+
+ROM_START( mt_tout ) /* Turbo Outrun */
 	MEGATECH_BIOS
 	MEGATECH_GAME61("game0", "inst0")
 ROM_END
