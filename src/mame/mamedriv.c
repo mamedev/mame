@@ -5690,7 +5690,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( firetrk )	/* 030926           1978/06 [6808] */
 	DRIVER( skydiver )	/* 009787           1978/06 [6800] */
 	/* Smokey Joe */	/* 030926           1978/07 [6502] */
-	DRIVER( sbrkout )	/* 033442-033455    1978/09 [6502] */
+	DRIVER( sbrkout3 )	/* 033442-033452    1978/09 [6502] */
+	DRIVER( sbrkout )	/* 033453-033455    1978/09 [6502] */
 	DRIVER( atarifb )	/* 033xxx           1978/10 [6502] */
 	DRIVER( atarifb1 )	/* 033xxx           1978/10 [6502] */
 	DRIVER( orbit )		/* 033689-033702    1978/11 [6800] */
