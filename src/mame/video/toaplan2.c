@@ -582,6 +582,7 @@ VIDEO_START( truxton2_0 )
 		tilemap_set_scrolldx(tx_tilemap, 0x1d4 +1, 0x2a);
 	}
 
+	display_sp[0] = 1;
 	register_state_save(machine,1);
 }
 
@@ -591,6 +592,8 @@ VIDEO_START( bgaregga_0 )
 	truxton2_create_tilemaps_0(machine);
 	tilemap_set_scrolldx(tx_tilemap, 0x1d4, 0x2a);
 	defaultOffsets();
+	display_sp[0] = 1;
+	display_sp[1] = 1;
 	register_state_save(machine,1);
 }
 
@@ -608,6 +611,8 @@ VIDEO_START( batrider_0 )
 
 	tilemap_set_scrolldx(tx_tilemap, 0x1d4, 0x2a);
 	defaultOffsets();
+	display_sp[0] = 1;
+	display_sp[1] = 1;
 	register_state_save(machine,1);
 }
 
