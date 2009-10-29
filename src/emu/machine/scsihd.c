@@ -116,6 +116,13 @@ static void scsihd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 	SCSIHd *our_this = (SCSIHd *)SCSIThis( &SCSIClassHARDDISK, scsiInstance );
 	SCSIGetCommand( scsiInstance, &command, &commandLength );
 
+	// if we're a drive without a disk, return all zeroes
+	if (!our_this->disk)
+	{
+		memset(data, 0, dataLength);
+		return;
+	}
+
 	switch ( command[0] )
 	{
 		case 0x03:	// REQUEST SENSE
@@ -206,6 +213,11 @@ static void scsihd_write_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 	int commandLength;
 	SCSIHd *our_this = (SCSIHd *)SCSIThis( &SCSIClassHARDDISK, scsiInstance );
 	SCSIGetCommand( scsiInstance, &command, &commandLength );
+
+	if (!our_this->disk)
+	{
+		return;
+	}
 
 	switch ( command[0] )
 	{
