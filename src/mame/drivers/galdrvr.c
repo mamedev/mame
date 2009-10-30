@@ -5574,16 +5574,15 @@ GAME( 1979, galaxiant,  galaxian, galaxian, superg,   galaxian, ROT90,  "[Namco]
 
 /* straight Galaxian ripoffs on basic galaxian hardware */
 GAME( 1979, moonaln,  galaxian, galaxian, superg,   galaxian, ROT90,  "[Nichibutsu] (Karateco license)", "Moon Alien", GAME_SUPPORTS_SAVE )
-GAME( 1979, superg,   galaxian, galaxian, superg,   galaxian, ROT90,  "hack", "Super Galaxians (galaxiaj hack)", GAME_SUPPORTS_SAVE )
+GAME( 1979, superg,   galaxian, galaxian, superg,   galaxian, ROT90,  "hack", "Super Galaxians (galaxiana hack)", GAME_SUPPORTS_SAVE )
 GAME( 1979, galturbo, galaxian, galaxian, superg,   galaxian, ROT90,  "hack", "Galaxian Turbo (superg hack)", GAME_SUPPORTS_SAVE )
 GAME( 1979, galapx,   galaxian, galaxian, superg,   galaxian, ROT90,  "hack", "Galaxian Part X (moonaln hack)", GAME_SUPPORTS_SAVE )
-GAME( 1979, galap1,   galaxian, galaxian, superg,   galaxian, ROT90,  "hack", "Space Invaders Galactica (galaxiaj hack)", GAME_SUPPORTS_SAVE )
+GAME( 1979, galap1,   galaxian, galaxian, superg,   galaxian, ROT90,  "hack", "Space Invaders Galactica (galaxiana hack)", GAME_SUPPORTS_SAVE )
 GAME( 1979, galap4,   galaxian, galaxian, superg,   galaxian, ROT90,  "G.G.I", "Galaxian Part 4 (hack)", GAME_SUPPORTS_SAVE )
 GAME( 1979, swarm,    galaxian, galaxian, swarm,    galaxian, ROT90,  "Subelectro", "Swarm (bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 1979, zerotime, galaxian, galaxian, zerotime, galaxian, ROT90,  "Petaco S.A.", "Zero Time", GAME_SUPPORTS_SAVE )
 GAME( 1979, starfght, galaxian, galaxian, swarm,    galaxian, ROT90,  "Jeutel", "Star Fighter", GAME_SUPPORTS_SAVE )
 GAME( 1979, galaxbsf, galaxian, galaxian, galaxian, galaxian, ROT90,  "bootleg", "Galaxian (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1979, kamakazi3,galaxian, galaxian, superg,   galaxian, ROT90,  "hack", "Kamakazi III (superg hack)", GAME_SUPPORTS_SAVE )
 GAME( 1980, supergx,  galaxian, galaxian, superg,   galaxian, ROT90,  "Nichibutsu", "Super GX", GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 19??, tst_galx, galaxian, galaxian, galaxian, galaxian, ROT90,  "Test ROM", "Galaxian Test ROM", GAME_SUPPORTS_SAVE )
 
@@ -5600,6 +5599,7 @@ GAME( 1981, warofbug, 0,        galaxian, warofbug, nolock,   ROT90,  "Armenia",
 GAME( 1981, redufo,   0,        galaxian, redufo,   nolock,   ROT90,  "bootleg", "Defend the Terra Attack on the Red UFO", GAME_SUPPORTS_SAVE )
 GAME( 19??, exodus,   redufo,   galaxian, exodus,   nolock,   ROT90,  "Subelectro", "Exodus (bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 1983, tdpgal,   0,        galaxian, tdpgal,   nolock,   ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker", GAME_SUPPORTS_SAVE )
+GAME( 1979, kamakazi3,galaxian, galaxian, superg,   nolock,	  ROT90,  "hack", "Kamakazi III (superg hack)", GAME_SUPPORTS_SAVE )
 
 /* different bullet color */
 GAME( 1982, azurian,  0,        galaxian, azurian,  azurian,  ROT90,  "Rait Electronics Ltd", "Azurian Attack", GAME_SUPPORTS_SAVE )
