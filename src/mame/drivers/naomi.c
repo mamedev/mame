@@ -1940,6 +1940,11 @@ EPR-22850 & EPR-22851 differ by 7 bytes:
 0x1ffffa-0x1fffff is the BIOS checksum
 
 
+Airline Pilot specific Naomi BIOS roms:
+
+EPR-21802 - NAOMI BOOT ROM 1999 03/11  1.30 (Export)
+
+
 Region byte encoding is as follows:
 
 0x00 = Japan
@@ -1997,6 +2002,10 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "epr-22851.bin", 0x000000, 0x200000, CRC(62483677) SHA1(3e3bcacf5f972c376b569f45307ee7fd0b5031b7) ) \
 	ROM_SYSTEM_BIOS( 1, "bios1", "Ferrari F355 (USA)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 1,  "epr-22850.bin", 0x000000, 0x200000, CRC(28aa539d) SHA1(14485368656af80504b212da620179c49f84c1a2) )
+	
+#define AIRLINE_BIOS \
+	ROM_SYSTEM_BIOS( 0, "bios0", "Airline Pilots Deluxe (Export)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "epr-21802.bin", 0x000000, 0x200000, CRC(a77c6b1c) SHA1(bd50a6bb8fa9bac121b076e21ea048a83a240a48) ) \
 
 
 /* only revisions d and higher support the GDROM, and there is an additional bios (and SH4!) on the DIMM board for the CD Controller */
@@ -2099,6 +2108,13 @@ ROM_END
 ROM_START( f355bios )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	F355_BIOS
+
+	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
+ROM_END
+
+ROM_START( airlbios )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	AIRLINE_BIOS
 
 	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
 ROM_END
@@ -2883,6 +2899,29 @@ ROM_START( f355twn2 )
         ROM_LOAD( "mpr23398.ic21", 0xa800000, 0x800000, CRC(ea4d4d2a) SHA1(3dc9c7164516ae7f3b988c088ab819d8fd40d75e) )
 ROM_END
 
+ROM_START( alpiltdx )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	AIRLINE_BIOS
+
+	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr21787b.ic22", 0x0000000, 0x400000, CRC(56893156) SHA1(8e56e0633f92b1f50105421b7eb8428f51a78b27) )
+	ROM_LOAD( "mpr21728.ic1",  0x0800000, 0x800000, CRC(872338d4) SHA1(04857b300196c0ec51361d7cf7bb57274a15a326) )
+	ROM_LOAD( "mpr21729.ic2",  0x1000000, 0x800000, CRC(9a9b72ad) SHA1(ce96da7904dd82abaa448df45e954521dd834ed8) )
+	ROM_LOAD( "mpr21730.ic3",  0x1800000, 0x800000, CRC(93c25058) SHA1(658374bca3cf615982ebcf493eeaaa9e40e70f03) )
+	ROM_LOAD( "mpr21731.ic4",  0x2000000, 0x800000, CRC(f14e578b) SHA1(d572903f7021757aebbb903b25a11a5aaf9f7a71) )
+	ROM_LOAD( "mpr21732.ic5",  0x2800000, 0x800000, CRC(28ea4e8c) SHA1(7f87fe08819e756bb7aadca2aaacb0f6e59c13f0) )
+	ROM_LOAD( "mpr21733.ic6",  0x3000000, 0x800000, CRC(5aee9e99) SHA1(8db726a73723c931fd8a4be2dd99d7c32352ad21) )
+	ROM_LOAD( "mpr21734.ic7",  0x3800000, 0x800000, CRC(0574390d) SHA1(5988bdd089d23035ee2dd3596ea9c822455311d3) )
+	ROM_LOAD( "mpr21735.ic8",  0x4000000, 0x800000, CRC(811400b4) SHA1(5f8d8b70f499b293b2d952c754c853c53b39c438) )
+	ROM_LOAD( "mpr21736.ic9",  0x4800000, 0x800000, CRC(d74eda63) SHA1(d6794fa433cea9f06dc0a20dc9e10388162e7fd8) )
+	ROM_LOAD( "mpr21737.ic10", 0x5000000, 0x800000, CRC(260aaa98) SHA1(d1082587afe9d79f286df8b107a553ee51c27643) )
+	ROM_LOAD( "mpr21738.ic11", 0x5800000, 0x800000, CRC(95a592e8) SHA1(862dce467e8805381bab001df68262f1baf3c498) )
+
+	// on-cart X76F100 eeprom contents
+	ROM_REGION( 0x100, "naomibd_eeprom", ROMREGION_ERASE00 )
+	ROM_LOAD( "airlinepdx.sf",  0x000000, 0x000084, CRC(404b2add) SHA1(540c8474806775646ace111a2993397b1419fee3) )
+ROM_END
+
 ROM_START( hotd2 )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	HOTD2_BIOS
@@ -3410,8 +3449,10 @@ ROM_START( 18wheelr )
         ROM_LOAD( "00800000.bin", 0x000000, 0x002000, CRC(7fc42084) SHA1(7c7b9e7e0b8885e690f3edd25e6d26201c899f2f) )
 
 	// JVS I/O board 837-13844, code is for a Z80 of unknown type (it's inside the big Sega ASIC)
-	ROM_REGION( 0x10000, "jvsio", ROMREGION_ERASEFF)
+	ROM_REGION( 0x20000, "jvsio", ROMREGION_ERASEFF)
         ROM_LOAD( "epr-21868.ic7", 0x000000, 0x010000, CRC(c306a51f) SHA1(7833b73dc34c4c62401a30637968f46b949ceac0) )
+	// later version of the same I/O board (temporary, we'll handle this properly later)
+        ROM_LOAD( "epr-22082.ic7", 0x010000, 0x010000, CRC(de26fc6c) SHA1(cf8ef7969770fff8697299c3e3152413b898a967) )
 
 	// 18 Wheeler motor controller 838-13992, code is for a TMPZ84C015 which is Z80 compatible
 	ROM_REGION( 0x10000, "motorio", ROMREGION_ERASEFF)
@@ -4469,6 +4510,8 @@ GAME( 1999, f355bios, 0,        naomi,    naomi,    0,     ROT0, "Sega",        
 GAME( 1999, f355,     f355bios, naomi,    naomi,    0,     ROT0, "Sega",            "Ferrari F355 Challenge", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 1999, f355twin, f355bios, naomi,    naomi,    0,     ROT0, "Sega",            "Ferrari F355 Challenge (Twin)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 1999, f355twn2, f355bios, naomi,    naomi,    0,     ROT0, "Sega",            "Ferrari F355 Challenge 2 (Twin)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 1999, airlbios, 0,	naomi,    naomi,    0,     ROT0, "Sega",            "Naomi Airline Pilots Deluxe Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 1999, alpiltdx, airlbios, naomi,    naomi,    0,     ROT0, "Sega",            "Airline Pilots Deluxe", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
 /**********************************************
  *

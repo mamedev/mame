@@ -4375,7 +4375,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( pstone )	/* 1999.02 Power Stone */
 	DRIVER( crzytaxi )	/* 1999.02 Crazy Taxi */
 	DRIVER( zombrvn )	/* 1999.02 Zombie Revenge */
-						/* 1999.03 Airline Pilots */
+	DRIVER( airlbios )	/* 1999.03 Airline Pilots */
+	DRIVER( alpiltdx )
 	DRIVER( ggram2 )	/* 1999.04 Giant Gram Zen Nippon Pro-wres 2 */
 						/* 1999.05 Taisen Puzzle Kurutto Stone */
 						/* 1999.06 Ringout 4x4 */
