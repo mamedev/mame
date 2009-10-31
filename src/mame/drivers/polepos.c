@@ -229,6 +229,7 @@ Todo:
 #include "audio/namco52.h"
 #include "audio/namco54.h"
 #include "polepos.h"
+#include "sound/tms5220.h"
 
 #include "polepos.lh"
 
@@ -979,6 +980,30 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
 MACHINE_DRIVER_END
+
+static ADDRESS_MAP_START( sound_z80_bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2700, 0x27ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_z80_bootleg_iomap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+ADDRESS_MAP_END
+
+static MACHINE_DRIVER_START( polepos2bi )
+	MDRV_IMPORT_FROM(polepos)
+
+	/* todo, remove namco devices! */
+
+	MDRV_CPU_ADD("soundz80bl", Z80, 24576000/8)	/*? MHz */
+	MDRV_CPU_PROGRAM_MAP(sound_z80_bootleg_map)
+	MDRV_CPU_IO_MAP(sound_z80_bootleg_iomap)
+
+	MDRV_SOUND_ADD("tms", TMS5220, 600000)	/* ? Mhz */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
+MACHINE_DRIVER_END
+
 
 
 /*********************************************************************
@@ -1888,8 +1913,8 @@ ROM_START( polepos2bi )
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "74s287-a.bin",   0x0000, 0x0100, CRC(0e742cb1) SHA1(3ae43270aab4848fdeece1648e7e040ab216b08e) )    /* sync chain */
 
-	/* this is used for the italian speech, not hooked up */
-	ROM_REGION( 0x2000, "tms5220", 0 )
+	/* this is used for the italian speech with a TMS5220, not properly hooked up */
+	ROM_REGION( 0x2000, "soundz80bl", 0 )
 	ROM_LOAD( "20.bin",       0x0000, 0x2000, CRC(1771fe1b) SHA1(da74ca85dfd4f5ad5a9dbfe6f7668d93105e3575) )
 
 	ROM_REGION( 0x2000, "pals", 0 )
@@ -1933,13 +1958,13 @@ static DRIVER_INIT( polepos2 )
  * Game drivers
  *********************************************************************/
 
-GAME( 1982, polepos,    0,        polepos, polepos,  polepos,  ROT0, "Namco", "Pole Position", 0 )
-GAME( 1982, poleposa,   polepos,  polepos, poleposa, polepos,  ROT0, "Namco (Atari license)", "Pole Position (Atari version 2)", 0 )
-GAME( 1982, polepos1,   polepos,  polepos, poleposa, polepos,  ROT0, "[Namco] (Atari license)", "Pole Position (Atari version 1)", 0 )
-GAME( 1982, topracer,   polepos,  polepos, polepos,  polepos,  ROT0, "bootleg", "Top Racer (set 1)", 0 )
-GAME( 1982, topracra,   polepos,  polepos, topracra, topracra, ROT0, "bootleg", "Top Racer (set 2)", 0 )
-GAME( 1983, topracrb,   polepos,  polepos, polepos,  polepos,  ROT0, "bootleg", "Top Racer (set 3)", 0 )
-GAME( 1983, polepos2,   0,        polepos, polepos2, polepos2, ROT0, "Namco", "Pole Position II", 0 )
-GAME( 1983, polepos2a,  polepos2, polepos, polepos2, polepos2, ROT0, "Namco (Atari license)", "Pole Position II (Atari)", 0 )
-GAME( 1983, polepos2b,  polepos2, polepos, polepos2, polepos,  ROT0, "bootleg", "Pole Position II (bootleg)", 0 )
-GAME( 1983, polepos2bi, polepos2, polepos, topracra, topracra, ROT0, "bootleg", "Gran Premio F1 (Italian bootleg of Pole Position II)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND ) // should have italian voices
+GAME( 1982, polepos,    0,        polepos,    polepos,  polepos,  ROT0, "Namco", "Pole Position", 0 )
+GAME( 1982, poleposa,   polepos,  polepos,    poleposa, polepos,  ROT0, "Namco (Atari license)", "Pole Position (Atari version 2)", 0 )
+GAME( 1982, polepos1,   polepos,  polepos,    poleposa, polepos,  ROT0, "[Namco] (Atari license)", "Pole Position (Atari version 1)", 0 )
+GAME( 1982, topracer,   polepos,  polepos,    polepos,  polepos,  ROT0, "bootleg", "Top Racer (set 1)", 0 )
+GAME( 1982, topracra,   polepos,  polepos,    topracra, topracra, ROT0, "bootleg", "Top Racer (set 2)", 0 )
+GAME( 1983, topracrb,   polepos,  polepos,    polepos,  polepos,  ROT0, "bootleg", "Top Racer (set 3)", 0 )
+GAME( 1983, polepos2,   0,        polepos,    polepos2, polepos2, ROT0, "Namco", "Pole Position II", 0 )
+GAME( 1983, polepos2a,  polepos2, polepos,    polepos2, polepos2, ROT0, "Namco (Atari license)", "Pole Position II (Atari)", 0 )
+GAME( 1983, polepos2b,  polepos2, polepos,    polepos2, polepos,  ROT0, "bootleg", "Pole Position II (bootleg)", 0 )
+GAME( 1983, polepos2bi, polepos2, polepos2bi, topracra, topracra, ROT0, "bootleg", "Gran Premio F1 (Italian bootleg of Pole Position II)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND ) // should have italian voices
