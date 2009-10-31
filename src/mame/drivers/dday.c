@@ -172,6 +172,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ddayc )
 	PORT_INCLUDE(dday)
 
+	PORT_MODIFY("BUTTONS")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) /* Distance Button */
+
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x0c, 0x00, "Extended Play At" )
 	PORT_DIPSETTING(    0x00, "4000" )
@@ -182,7 +186,7 @@ static INPUT_PORTS_START( ddayc )
 	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )		// Easy   - No Bombs, No Troop Carriers
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )	// Normal - No Bombs, Troop Carriers
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )		// Hard   - Bombs, Troop Carriers
-//  PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )     // Same as 0x10
+    PORT_DIPSETTING(    0x00, "Hard (duplicate setting)" )     // Same as 0x10
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )	// Doesn't seem to be used
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
