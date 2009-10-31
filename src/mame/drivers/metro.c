@@ -1752,7 +1752,7 @@ static ADDRESS_MAP_START( mouja_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_BASE(&metro_videoregs)					// Video Registers
 	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE("oki", mouja_sound_rombank_w)
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0xffff)
 #if 0
 	AM_RANGE(0x460000, 0x46ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
