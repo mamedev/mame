@@ -855,6 +855,116 @@ static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x40000, 0xfffff) AM_ROMBANK(2)
 ADDRESS_MAP_END
 
+/* new zero team uses the copd3 protection... and uploads a 0x400 byte table, probably the mcu code, encrypted */
+
+
+static UINT16 mcu_prog[0x400];
+static int mcu_prog_offs = 0;
+
+static WRITE16_HANDLER( mcu_prog_w )
+{
+	mcu_prog[mcu_prog_offs*2] = data;
+}
+
+static WRITE16_HANDLER( mcu_prog_w2 )
+{
+	mcu_prog[mcu_prog_offs*2+1] = data;
+	
+	// both new zero team and raiden2/dx v33 version upload the same table..
+#if 1
+    {
+		char tmp[64];
+        FILE *fp;
+	    sprintf(tmp,"cop3_%s.data", space->machine->gamedrv->name);
+
+		fp=fopen(tmp, "w+b");
+        if (fp)
+        {
+            fwrite(mcu_prog, 0x400, 2, fp);
+            fclose(fp);
+        }
+    }
+#endif
+}
+
+static WRITE16_HANDLER( mcu_prog_offs_w )
+{
+	mcu_prog_offs = data;
+}
+
+
+
+static READ16_HANDLER( rdx_v33_system_r )
+{
+	return input_port_read(space->machine, "SYSTEM");
+}
+
+
+static READ16_HANDLER( r2_playerin_r )
+{
+	return input_port_read(space->machine, "INPUT");
+}
+
+static READ16_HANDLER( rdx_v33_unknown_r )
+{
+	return 0x0000;
+}
+
+static READ16_HANDLER( rdx_v33_unknown2_r )
+{
+	return 0x0000;
+}
+
+static READ16_HANDLER( nzerotea_unknown_r )
+{
+	return 0xffff;
+}
+
+
+static ADDRESS_MAP_START( nzerotea_mem, ADDRESS_SPACE_PROGRAM, 16 )
+//	AM_RANGE(0x00400, 0x007ff) AM_READWRITE(raiden2_mcu_r, raiden2_mcu_w) AM_BASE(&cop_mcu_ram)
+	
+	/* results from cop? */
+	AM_RANGE(0x00430, 0x00431) AM_READ(nzerotea_unknown_r)
+	AM_RANGE(0x00432, 0x00433) AM_READ(nzerotea_unknown_r)
+	AM_RANGE(0x00434, 0x00435) AM_READ(nzerotea_unknown_r)
+	AM_RANGE(0x00436, 0x00437) AM_READ(nzerotea_unknown_r)
+	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
+	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
+	AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
+	AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
+	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
+//  AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
+	AM_RANGE(0x006dc, 0x006dd) AM_READ(nzerotea_unknown_r)
+//  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
+	//AM_RANGE(0x00700, 0x00701) AM_WRITE(rdx_v33_eeprom_w)
+	AM_RANGE(0x00740, 0x00741) AM_READ(nzerotea_unknown_r)
+	AM_RANGE(0x00744, 0x00745) AM_READ(r2_playerin_r)
+	AM_RANGE(0x0074c, 0x0074d) AM_READ(rdx_v33_system_r)
+	AM_RANGE(0x00762, 0x00763) AM_READ(nzerotea_unknown_r)
+	
+	AM_RANGE(0x00788, 0x00789) AM_READ(nzerotea_unknown_r)
+	AM_RANGE(0x00794, 0x00795) AM_READ(nzerotea_unknown_r)
+
+	AM_RANGE(0x00000, 0x0bfff) AM_READWRITE(any_r, any_w) AM_BASE(&mainram)
+//  AM_RANGE(0x00000, 0x003ff) AM_RAM
+
+	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(&back_data)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(&fore_data)
+    AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(&mid_data)
+    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(&videoram16)
+	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
+
+	AM_RANGE(0x10000, 0x1efff) AM_RAM_WRITE(w1x) AM_BASE(&w1ram)
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK(1)
+	AM_RANGE(0x40000, 0xfffff) AM_ROMBANK(2)
+ADDRESS_MAP_END
+
+
+
 /* INPUT PORTS */
 
 static INPUT_PORTS_START( raiden2 )
@@ -1113,6 +1223,18 @@ static MACHINE_DRIVER_START( raiden2 )
 /* Sound hardware infos: Z80 and YM2151 are clocked at XTAL_28_63636MHz/8 */
 /* The 2 Oki M6295 are clocked at XTAL_28_63636MHz/28 and pin 7 is high for both */
 
+MACHINE_DRIVER_END
+
+
+
+static MACHINE_DRIVER_START( nzerotea )
+
+	MDRV_IMPORT_FROM(raiden2)
+
+	/* basic machine hardware */
+	MDRV_DEVICE_MODIFY("maincpu") // also change it to a v33!
+	MDRV_CPU_PROGRAM_MAP(nzerotea_mem)
+	MDRV_CPU_VBLANK_INT("screen", raiden2_interrupt)
 MACHINE_DRIVER_END
 
 /* ROM LOADING */
@@ -1984,56 +2106,6 @@ static WRITE16_HANDLER( rdx_v33_eeprom_w )
 	}
 }
 
-static READ16_HANDLER( rdx_v33_eeprom_r )
-{
-	return input_port_read(space->machine, "SYSTEM");
-}
-
-
-static UINT16 mcu_prog[0x400];
-static int mcu_prog_offs = 0;
-
-static WRITE16_HANDLER( mcu_prog_w )
-{
-	mcu_prog[mcu_prog_offs*2] = data;
-}
-
-static WRITE16_HANDLER( mcu_prog_w2 )
-{
-	mcu_prog[mcu_prog_offs*2+1] = data;
-
-/* Uncommented until actively worked on
-    {
-        FILE *fp;
-        fp=fopen("rdx_v33.dmp", "w+b");
-        if (fp)
-        {
-            fwrite(mcu_prog, 0x400, 2, fp);
-            fclose(fp);
-        }
-    }
-*/
-}
-
-static WRITE16_HANDLER( mcu_prog_offs_w )
-{
-	mcu_prog_offs = data;
-}
-
-static READ16_HANDLER( r2_playerin_r )
-{
-	return input_port_read(space->machine, "INPUT");
-}
-static READ16_HANDLER( rdx_v33_unknown_r )
-{
-	return 0x00;
-}
-
-static READ16_HANDLER( rdx_v33_unknown2_r )
-{
-	return 0x00;
-}
-
 
 static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
@@ -2057,20 +2129,14 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
 	AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 	AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
-
 	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
-
 //  AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
 	AM_RANGE(0x006dc, 0x006dd) AM_READ(rdx_v33_unknown2_r)
 //  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
-
 	AM_RANGE(0x00700, 0x00701) AM_WRITE(rdx_v33_eeprom_w)
-
 	AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
-
 	AM_RANGE(0x00744, 0x00745) AM_READ(r2_playerin_r)
-	AM_RANGE(0x0074c, 0x0074d) AM_READ(rdx_v33_eeprom_r)
-
+	AM_RANGE(0x0074c, 0x0074d) AM_READ(rdx_v33_system_r)
 	AM_RANGE(0x00762, 0x00763) AM_READ(rdx_v33_unknown2_r)
 
 	AM_RANGE(0x00780, 0x00781) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff) // single OKI chip on this version
@@ -2112,6 +2178,46 @@ static INPUT_PORTS_START( rdx_v33 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0040, 0x0040, "Test Mode" )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("INPUT")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+ 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( nzerotea )
+
+	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0040, 0x0040, "Test Mode" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
@@ -2230,7 +2336,7 @@ GAME( 1993, zeroteams,zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaih
 GAME( 1995, xsedae,   0,       raiden2,  raiden2,  xsedae,   ROT0,   "Dream Island",   "X Se Dae Quiz", GAME_NOT_WORKING|GAME_NO_SOUND)
 
 // 'V33 system type_b' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system
-GAME( 1993, nzerotea, zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND) // this uses a v33 and COPD3
+GAME( 1993, nzerotea, zeroteam,  nzerotea, nzerotea,  raiden2,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND) // this uses a v33 and COPD3
 
 // newer PCB, with V33 CPU and COPD3 protection, but weak sound hardware. - was marked as Raiden DX New in the rom dump, but boots as Raiden 2 New version, is it switchable?
 GAME( 1996, r2dx_v33, 0, rdx_v33,  rdx_v33, rdx_v33,  ROT270, "Seibu Kaihatsu", "Raiden 2 / DX (newer V33 PCB)", GAME_NOT_WORKING|GAME_NO_SOUND)

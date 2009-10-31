@@ -7139,7 +7139,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( heatbrlu )	/* (c) 1992 Tad (US) */
 	DRIVER( godzilla )	/* (c) 1993 Banpresto */
 	DRIVER( denjinmk )	/* (c) 199? Banpresto */
-	DRIVER( sdgndmrb )	/* (c) 1993 Banpresto */
+	DRIVER( grainbow )	/* (c) 1993 Banpresto */
 	DRIVER( cupsoc )	/* (c) 1992 Seibu */
 	DRIVER( cupsoca )	/* (c) 1992 Seibu */
 	DRIVER( cupsocs )	/* (c) 1992 Seibu */

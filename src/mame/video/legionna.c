@@ -15,7 +15,7 @@ UINT16 legionna_layer_disable;
 /******************************************************************************/
 
 static UINT16 back_gfx_bank = 0,fore_gfx_bank = 0,mid_gfx_bank = 0;
-UINT8 sdgndmrb_pri_n;
+UINT8 grainbow_pri_n;
 
 void heatbrl_setgfxbank(UINT16 data)
 {
@@ -405,7 +405,7 @@ VIDEO_UPDATE( godzilla )
 	return 0;
 }
 
-VIDEO_UPDATE( sdgndmrb )
+VIDEO_UPDATE( grainbow )
 {
 	/* Setup the tilemaps */
 	tilemap_set_scrollx( background_layer, 0, legionna_scrollram16[0] );
@@ -419,23 +419,23 @@ VIDEO_UPDATE( sdgndmrb )
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
-	if(!(sdgndmrb_pri_n & 1))
+	if(!(grainbow_pri_n & 1))
 		tilemap_draw(bitmap,cliprect,background_layer,0,0);
 	draw_sprites(screen->machine,bitmap,cliprect,2);
 
-	if(!(sdgndmrb_pri_n & 2))
+	if(!(grainbow_pri_n & 2))
 		tilemap_draw(bitmap,cliprect,midground_layer,0,0);
 
 	draw_sprites(screen->machine,bitmap,cliprect,1);
 
-	if(!(sdgndmrb_pri_n & 4))
+	if(!(grainbow_pri_n & 4))
 		tilemap_draw(bitmap,cliprect,foreground_layer,0,0);
 
 	draw_sprites(screen->machine,bitmap,cliprect,0);
 
 	draw_sprites(screen->machine,bitmap,cliprect,3);
 
-	if(!(sdgndmrb_pri_n & 8))
+	if(!(grainbow_pri_n & 8))
 		tilemap_draw(bitmap,cliprect,text_layer,0,0);
 
 	return 0;

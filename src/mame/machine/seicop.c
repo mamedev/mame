@@ -44,8 +44,1319 @@
   to do:
   clean it up, consolidate code, make it work!
 
- */
+  Protection information
 
+ALL games using COPX-D/D2 upload a series of command tables, using the following upload pattern.
+This happens ONCE at startup.
+
+Each table is 8 words long, and the table upload offsets aren't always in sequential order, as
+you can see from this example (cupsocs) it uploads in the following order
+
+00 - 07, 08 - 0f, 10 - 17, 18 - 1f, 28 - 2f, 60 - 67, 80 - 87, 88 - 8f
+90 - 97, 98 - 9f, 20 - 27, 30 - 37, 38 - 3f, 40 - 47, 48 - 4f, 68 - 6f
+c0 - c7, a0 - a7, a8 - af, b0 - b7, b8 - bf, c8 - cf, d0 - d7, d8 - df
+e0 - e7, e8 - ef, 50 - 57, 58 - 5f, 78 - 7f, f0 - f7
+
+table data is never overwritten, and in this case no data is uploaded
+in the 70-77 or f8 - ff region.
+
+It is assumed that the data written before each part of the table is associated
+with that table.
+
+000620:  write data 0205 at offset 003c <- 'trigger' associated with this table
+000624:  write data 0006 at offset 0038 <- 'unknown1 (4-bit)'
+000628:  write data ffeb at offset 003a <- 'unknown2'
+
+000632:  write data 0000 at offset 0034 <- 'table offset'
+000638:  write data 0188 at offset 0032 <- '12-bit data' for this offset
+000632:  write data 0001 at offset 0034
+000638:  write data 0282 at offset 0032
+000632:  write data 0002 at offset 0034
+000638:  write data 0082 at offset 0032
+000632:  write data 0003 at offset 0034
+000638:  write data 0b8e at offset 0032
+000632:  write data 0004 at offset 0034
+000638:  write data 098e at offset 0032
+000632:  write data 0005 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 0006 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 0007 at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data 0905 at offset 003c
+000624:  write data 0006 at offset 0038
+000628:  write data fbfb at offset 003a
+
+000632:  write data 0008 at offset 0034
+000638:  write data 0194 at offset 0032
+000632:  write data 0009 at offset 0034
+000638:  write data 0288 at offset 0032
+000632:  write data 000a at offset 0034
+000638:  write data 0088 at offset 0032
+000632:  write data 000b at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 000c at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 000d at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 000e at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 000f at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data 138e at offset 003c
+000624:  write data 0005 at offset 0038
+000628:  write data bf7f at offset 003a
+
+000632:  write data 0010 at offset 0034
+000638:  write data 0984 at offset 0032
+000632:  write data 0011 at offset 0034
+000638:  write data 0aa4 at offset 0032
+000632:  write data 0012 at offset 0034
+000638:  write data 0d82 at offset 0032
+000632:  write data 0013 at offset 0034
+000638:  write data 0aa2 at offset 0032
+000632:  write data 0014 at offset 0034
+000638:  write data 039b at offset 0032
+000632:  write data 0015 at offset 0034
+000638:  write data 0b9a at offset 0032
+000632:  write data 0016 at offset 0034
+000638:  write data 0b9a at offset 0032
+000632:  write data 0017 at offset 0034
+000638:  write data 0a9a at offset 0032
+--------------------------------------------
+000620:  write data 1905 at offset 003c
+000624:  write data 0006 at offset 0038
+000628:  write data fbfb at offset 003a
+
+000632:  write data 0018 at offset 0034
+000638:  write data 0994 at offset 0032
+000632:  write data 0019 at offset 0034
+000638:  write data 0a88 at offset 0032
+000632:  write data 001a at offset 0034
+000638:  write data 0088 at offset 0032
+000632:  write data 001b at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 001c at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 001d at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 001e at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 001f at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data 2a05 at offset 003c
+000624:  write data 0006 at offset 0038
+000628:  write data ebeb at offset 003a
+
+000632:  write data 0028 at offset 0034
+000638:  write data 09af at offset 0032
+000632:  write data 0029 at offset 0034
+000638:  write data 0a82 at offset 0032
+000632:  write data 002a at offset 0034
+000638:  write data 0082 at offset 0032
+000632:  write data 002b at offset 0034
+000638:  write data 0a8f at offset 0032
+000632:  write data 002c at offset 0034
+000638:  write data 018e at offset 0032
+000632:  write data 002d at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 002e at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 002f at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data 6200 at offset 003c
+000624:  write data 0008 at offset 0038
+000628:  write data f3e7 at offset 003a
+
+000632:  write data 0060 at offset 0034
+000638:  write data 03a0 at offset 0032
+000632:  write data 0061 at offset 0034
+000638:  write data 03a6 at offset 0032
+000632:  write data 0062 at offset 0034
+000638:  write data 0380 at offset 0032
+000632:  write data 0063 at offset 0034
+000638:  write data 0aa0 at offset 0032
+000632:  write data 0064 at offset 0034
+000638:  write data 02a6 at offset 0032
+000632:  write data 0065 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 0066 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 0067 at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data 8100 at offset 003c
+000624:  write data 0007 at offset 0038
+000628:  write data fdfb at offset 003a
+
+000632:  write data 0080 at offset 0034
+000638:  write data 0b9a at offset 0032
+000632:  write data 0081 at offset 0034
+000638:  write data 0b88 at offset 0032
+000632:  write data 0082 at offset 0034
+000638:  write data 0888 at offset 0032
+000632:  write data 0083 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 0084 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 0085 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 0086 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 0087 at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data 8900 at offset 003c
+000624:  write data 0007 at offset 0038
+000628:  write data fdfb at offset 003a
+
+000632:  write data 0088 at offset 0034
+000638:  write data 0b9a at offset 0032
+000632:  write data 0089 at offset 0034
+000638:  write data 0b8a at offset 0032
+000632:  write data 008a at offset 0034
+000638:  write data 088a at offset 0032
+000632:  write data 008b at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 008c at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 008d at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 008e at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 008f at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data 9180 at offset 003c
+000624:  write data 0007 at offset 0038
+000628:  write data f8f7 at offset 003a
+
+000632:  write data 0090 at offset 0034
+000638:  write data 0b80 at offset 0032
+000632:  write data 0091 at offset 0034
+000638:  write data 0b94 at offset 0032
+000632:  write data 0092 at offset 0034
+000638:  write data 0b94 at offset 0032
+000632:  write data 0093 at offset 0034
+000638:  write data 0894 at offset 0032
+000632:  write data 0094 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 0095 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 0096 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 0097 at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data 9980 at offset 003c
+000624:  write data 0007 at offset 0038
+000628:  write data f8f7 at offset 003a
+
+000632:  write data 0098 at offset 0034
+000638:  write data 0b80 at offset 0032
+000632:  write data 0099 at offset 0034
+000638:  write data 0b94 at offset 0032
+000632:  write data 009a at offset 0034
+000638:  write data 0b94 at offset 0032
+000632:  write data 009b at offset 0034
+000638:  write data 0896 at offset 0032
+000632:  write data 009c at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 009d at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 009e at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 009f at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data 2288 at offset 003c
+000624:  write data 0005 at offset 0038
+000628:  write data f5df at offset 003a
+
+000632:  write data 0020 at offset 0034
+000638:  write data 0f8a at offset 0032
+000632:  write data 0021 at offset 0034
+000638:  write data 0b8a at offset 0032
+000632:  write data 0022 at offset 0034
+000638:  write data 0388 at offset 0032
+000632:  write data 0023 at offset 0034
+000638:  write data 0b9a at offset 0032
+000632:  write data 0024 at offset 0034
+000638:  write data 0b9a at offset 0032
+000632:  write data 0025 at offset 0034
+000638:  write data 0a9a at offset 0032
+000632:  write data 0026 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 0027 at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data 338e at offset 003c
+000624:  write data 0005 at offset 0038
+000628:  write data bf7f at offset 003a
+
+000632:  write data 0030 at offset 0034
+000638:  write data 0984 at offset 0032
+000632:  write data 0031 at offset 0034
+000638:  write data 0aa4 at offset 0032
+000632:  write data 0032 at offset 0034
+000638:  write data 0d82 at offset 0032
+000632:  write data 0033 at offset 0034
+000638:  write data 0aa2 at offset 0032
+000632:  write data 0034 at offset 0034
+000638:  write data 039c at offset 0032
+000632:  write data 0035 at offset 0034
+000638:  write data 0b9c at offset 0032
+000632:  write data 0036 at offset 0034
+000638:  write data 0b9c at offset 0032
+000632:  write data 0037 at offset 0034
+000638:  write data 0a9a at offset 0032
+--------------------------------------------
+000620:  write data 3bb0 at offset 003c
+000624:  write data 0004 at offset 0038
+000628:  write data 007f at offset 003a
+
+000632:  write data 0038 at offset 0034
+000638:  write data 0f9c at offset 0032
+000632:  write data 0039 at offset 0034
+000638:  write data 0b9c at offset 0032
+000632:  write data 003a at offset 0034
+000638:  write data 0b9c at offset 0032
+000632:  write data 003b at offset 0034
+000638:  write data 0b9c at offset 0032
+000632:  write data 003c at offset 0034
+000638:  write data 0b9c at offset 0032
+000632:  write data 003d at offset 0034
+000638:  write data 0b9c at offset 0032
+000632:  write data 003e at offset 0034
+000638:  write data 0b9c at offset 0032
+000632:  write data 003f at offset 0034
+000638:  write data 099c at offset 0032
+--------------------------------------------
+000620:  write data 42c2 at offset 003c
+000624:  write data 0005 at offset 0038
+000628:  write data fcdd at offset 003a
+
+000632:  write data 0040 at offset 0034
+000638:  write data 0f9a at offset 0032
+000632:  write data 0041 at offset 0034
+000638:  write data 0b9a at offset 0032
+000632:  write data 0042 at offset 0034
+000638:  write data 0b9c at offset 0032
+000632:  write data 0043 at offset 0034
+000638:  write data 0b9c at offset 0032
+000632:  write data 0044 at offset 0034
+000638:  write data 0b9c at offset 0032
+000632:  write data 0045 at offset 0034
+000638:  write data 029c at offset 0032
+000632:  write data 0046 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 0047 at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data 4aa0 at offset 003c
+000624:  write data 0005 at offset 0038
+000628:  write data fcdd at offset 003a
+
+000632:  write data 0048 at offset 0034
+000638:  write data 0f9a at offset 0032
+000632:  write data 0049 at offset 0034
+000638:  write data 0b9a at offset 0032
+000632:  write data 004a at offset 0034
+000638:  write data 0b9c at offset 0032
+000632:  write data 004b at offset 0034
+000638:  write data 0b9c at offset 0032
+000632:  write data 004c at offset 0034
+000638:  write data 0b9c at offset 0032
+000632:  write data 004d at offset 0034
+000638:  write data 099b at offset 0032
+000632:  write data 004e at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 004f at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data 6880 at offset 003c
+000624:  write data 000a at offset 0038
+000628:  write data fff3 at offset 003a
+
+000632:  write data 0068 at offset 0034
+000638:  write data 0b80 at offset 0032
+000632:  write data 0069 at offset 0034
+000638:  write data 0ba0 at offset 0032
+000632:  write data 006a at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 006b at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 006c at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 006d at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 006e at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 006f at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data c480 at offset 003c
+000624:  write data 000a at offset 0038
+000628:  write data ff00 at offset 003a
+
+000632:  write data 00c0 at offset 0034
+000638:  write data 0080 at offset 0032
+000632:  write data 00c1 at offset 0034
+000638:  write data 0882 at offset 0032
+000632:  write data 00c2 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00c3 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00c4 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00c5 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00c6 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00c7 at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data a180 at offset 003c
+000624:  write data 0000 at offset 0038
+000628:  write data ffff at offset 003a
+
+000632:  write data 00a0 at offset 0034
+000638:  write data 0b80 at offset 0032
+000632:  write data 00a1 at offset 0034
+000638:  write data 0b82 at offset 0032
+000632:  write data 00a2 at offset 0034
+000638:  write data 0b84 at offset 0032
+000632:  write data 00a3 at offset 0034
+000638:  write data 0b86 at offset 0032
+000632:  write data 00a4 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00a5 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00a6 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00a7 at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data a980 at offset 003c
+000624:  write data 000f at offset 0038
+000628:  write data ffff at offset 003a
+
+000632:  write data 00a8 at offset 0034
+000638:  write data 0ba0 at offset 0032
+000632:  write data 00a9 at offset 0034
+000638:  write data 0ba2 at offset 0032
+000632:  write data 00aa at offset 0034
+000638:  write data 0ba4 at offset 0032
+000632:  write data 00ab at offset 0034
+000638:  write data 0ba6 at offset 0032
+000632:  write data 00ac at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00ad at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00ae at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00af at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data b100 at offset 003c
+000624:  write data 0009 at offset 0038
+000628:  write data ffff at offset 003a
+
+000632:  write data 00b0 at offset 0034
+000638:  write data 0b40 at offset 0032
+000632:  write data 00b1 at offset 0034
+000638:  write data 0bc0 at offset 0032
+000632:  write data 00b2 at offset 0034
+000638:  write data 0bc2 at offset 0032
+000632:  write data 00b3 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00b4 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00b5 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00b6 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00b7 at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data b900 at offset 003c
+000624:  write data 0006 at offset 0038
+000628:  write data ffff at offset 003a
+
+000632:  write data 00b8 at offset 0034
+000638:  write data 0b60 at offset 0032
+000632:  write data 00b9 at offset 0034
+000638:  write data 0be0 at offset 0032
+000632:  write data 00ba at offset 0034
+000638:  write data 0be2 at offset 0032
+000632:  write data 00bb at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00bc at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00bd at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00be at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00bf at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data cb8f at offset 003c
+000624:  write data 0005 at offset 0038
+000628:  write data bf7f at offset 003a
+
+000632:  write data 00c8 at offset 0034
+000638:  write data 0984 at offset 0032
+000632:  write data 00c9 at offset 0034
+000638:  write data 0aa4 at offset 0032
+000632:  write data 00ca at offset 0034
+000638:  write data 0d82 at offset 0032
+000632:  write data 00cb at offset 0034
+000638:  write data 0aa2 at offset 0032
+000632:  write data 00cc at offset 0034
+000638:  write data 039b at offset 0032
+000632:  write data 00cd at offset 0034
+000638:  write data 0b9a at offset 0032
+000632:  write data 00ce at offset 0034
+000638:  write data 0b9a at offset 0032
+000632:  write data 00cf at offset 0034
+000638:  write data 0a9f at offset 0032
+--------------------------------------------
+000620:  write data d104 at offset 003c
+000624:  write data 0005 at offset 0038
+000628:  write data fffb at offset 003a
+
+000632:  write data 00d0 at offset 0034
+000638:  write data 0ac2 at offset 0032
+000632:  write data 00d1 at offset 0034
+000638:  write data 09e0 at offset 0032
+000632:  write data 00d2 at offset 0034
+000638:  write data 00a2 at offset 0032
+000632:  write data 00d3 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00d4 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00d5 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00d6 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00d7 at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data dde5 at offset 003c
+000624:  write data 0005 at offset 0038
+000628:  write data 7ff7 at offset 003a
+
+000632:  write data 00d8 at offset 0034
+000638:  write data 0f80 at offset 0032
+000632:  write data 00d9 at offset 0034
+000638:  write data 0aa2 at offset 0032
+000632:  write data 00da at offset 0034
+000638:  write data 0984 at offset 0032
+000632:  write data 00db at offset 0034
+000638:  write data 00c2 at offset 0032
+000632:  write data 00dc at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00dd at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00de at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00df at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data e38e at offset 003c
+000624:  write data 0005 at offset 0038
+000628:  write data b07f at offset 003a
+
+000632:  write data 00e0 at offset 0034
+000638:  write data 0984 at offset 0032
+000632:  write data 00e1 at offset 0034
+000638:  write data 0ac4 at offset 0032
+000632:  write data 00e2 at offset 0034
+000638:  write data 0d82 at offset 0032
+000632:  write data 00e3 at offset 0034
+000638:  write data 0ac2 at offset 0032
+000632:  write data 00e4 at offset 0034
+000638:  write data 039b at offset 0032
+000632:  write data 00e5 at offset 0034
+000638:  write data 0b9a at offset 0032
+000632:  write data 00e6 at offset 0034
+000638:  write data 0b9a at offset 0032
+000632:  write data 00e7 at offset 0034
+000638:  write data 0a9a at offset 0032
+--------------------------------------------
+000620:  write data eb8e at offset 003c
+000624:  write data 0005 at offset 0038
+000628:  write data b07f at offset 003a
+
+000632:  write data 00e8 at offset 0034
+000638:  write data 0984 at offset 0032
+000632:  write data 00e9 at offset 0034
+000638:  write data 0ac4 at offset 0032
+000632:  write data 00ea at offset 0034
+000638:  write data 0d82 at offset 0032
+000632:  write data 00eb at offset 0034
+000638:  write data 0ac2 at offset 0032
+000632:  write data 00ec at offset 0034
+000638:  write data 039b at offset 0032
+000632:  write data 00ed at offset 0034
+000638:  write data 0b9a at offset 0032
+000632:  write data 00ee at offset 0034
+000638:  write data 0b9a at offset 0032
+000632:  write data 00ef at offset 0034
+000638:  write data 0a9f at offset 0032
+--------------------------------------------
+000620:  write data 5105 at offset 003c
+000624:  write data 0005 at offset 0038
+000628:  write data fefb at offset 003a
+
+000632:  write data 0050 at offset 0034
+000638:  write data 0a80 at offset 0032
+000632:  write data 0051 at offset 0034
+000638:  write data 0984 at offset 0032
+000632:  write data 0052 at offset 0034
+000638:  write data 0082 at offset 0032
+000632:  write data 0053 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 0054 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 0055 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 0056 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 0057 at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data 5905 at offset 003c
+000624:  write data 0005 at offset 0038
+000628:  write data fffb at offset 003a
+
+000632:  write data 0058 at offset 0034
+000638:  write data 09c8 at offset 0032
+000632:  write data 0059 at offset 0034
+000638:  write data 0a84 at offset 0032
+000632:  write data 005a at offset 0034
+000638:  write data 00a2 at offset 0032
+000632:  write data 005b at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 005c at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 005d at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 005e at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 005f at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data 7905 at offset 003c
+000624:  write data 0006 at offset 0038
+000628:  write data fffb at offset 003a
+
+000632:  write data 0078 at offset 0034
+000638:  write data 01a2 at offset 0032
+000632:  write data 0079 at offset 0034
+000638:  write data 02c2 at offset 0032
+000632:  write data 007a at offset 0034
+000638:  write data 00a2 at offset 0032
+000632:  write data 007b at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 007c at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 007d at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 007e at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 007f at offset 0034
+000638:  write data 0000 at offset 0032
+--------------------------------------------
+000620:  write data f105 at offset 003c
+000624:  write data 0005 at offset 0038
+000628:  write data fefb at offset 003a
+
+000632:  write data 00f0 at offset 0034
+000638:  write data 0a88 at offset 0032
+000632:  write data 00f1 at offset 0034
+000638:  write data 0994 at offset 0032
+000632:  write data 00f2 at offset 0034
+000638:  write data 0088 at offset 0032
+000632:  write data 00f3 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00f4 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00f5 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00f6 at offset 0034
+000638:  write data 0000 at offset 0032
+000632:  write data 00f7 at offset 0034
+000638:  write data 0000 at offset 0032
+
+These uploads appear to form the basis of one part of the protection; command lists.
+
+The games upload these tables
+
+cupsoc, cupsoca, cupsocs, cupsocs2, olysoc92
+t    u1  u2     trg    tbl
+00 | 6 | ffeb | 0205 | 188 282 082 b8e 98e
+01 | 6 | fbfb | 0905 | 194 288 088
+02 | 5 | bf7f | 138e | 984 aa4 d82 aa2 39b b9a b9a a9a
+03 | 6 | fbfb | 1905 | 994 a88 088
+04 | 5 | f5df | 2288 | f8a b8a 388 b9a b9a a9a
+05 | 6 | ebeb | 2a05 | 9af a82 082 a8f 18e
+06 | 5 | bf7f | 338e | 984 aa4 d82 aa2 39c b9c b9c a9a
+07 | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+08 | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
+09 | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
+0a | 5 | fefb | 5105 | a80 984 082
+0b | 5 | fffb | 5905 | 9c8 a84 0a2
+0c | 8 | f3e7 | 6200 | 3a0 3a6 380 aa0 2a6
+0d | a | fff3 | 6880 | b80 ba0
+0e | 0 | 0000 | 0000 | 
+0f | 6 | fffb | 7905 | 1a2 2c2 0a2
+10 | 7 | fdfb | 8100 | b9a b88 888
+11 | 7 | fdfb | 8900 | b9a b8a 88a
+12 | 7 | f8f7 | 9180 | b80 b94 b94 894
+13 | 7 | f8f7 | 9980 | b80 b94 b94 896
+14 | 0 | ffff | a180 | b80 b82 b84 b86
+15 | f | ffff | a980 | ba0 ba2 ba4 ba6
+16 | 9 | ffff | b100 | b40 bc0 bc2
+17 | 6 | ffff | b900 | b60 be0 be2
+18 | a | ff00 | c480 | 080 882
+19 | 5 | bf7f | cb8f | 984 aa4 d82 aa2 39b b9a b9a a9f
+1a | 5 | fffb | d104 | ac2 9e0 0a2
+1b | 5 | 7ff7 | dde5 | f80 aa2 984 0c2
+1c | 5 | b07f | e38e | 984 ac4 d82 ac2 39b b9a b9a a9a
+1d | 5 | b07f | eb8e | 984 ac4 d82 ac2 39b b9a b9a a9f
+1e | 5 | fefb | f105 | a88 994 088
+1f | 0 | 0000 | 0000 | 
+
+heatbrl, heatbrl2, heatbrlo, heatbrlu
+t    u1  u2     trg    tbl
+00 | 6 | ffeb | 0205 | 188 282 082 b8e 98e
+01 | 6 | fbfb | 0905 | 194 288 088
+02 | 5 | bf7f | 138e | 984 aa4 d82 aa2 39b b9a b9a b9a
+03 | 6 | fbfb | 1905 | 994 a88 088
+04 | 5 | f5df | 2288 | f8a b8a 388 b9c b9a a9a
+05 | 6 | ebeb | 2a05 | 9af a82 082 a8f 18e
+06 | 5 | bf7f | 338e | 984 aa4 d82 aa2 39c b9c b9c a9a
+07 | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+08 | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
+09 | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
+0a | 0 | 0000 | 0000 | 
+0b | 0 | 0000 | 0000 | 
+0c | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
+0d | a | fff3 | 6880 | b80 ba0
+0e | 0 | 0000 | 0000 | 
+0f | 0 | 0000 | 0000 | 
+10 | 7 | fdfb | 8100 | b9a b88 888 
+11 | 7 | fdfb | 8900 | b9a b8a 88a 
+12 | 7 | f8f7 | 9180 | b80 b94 b94 894 
+13 | 7 | f8f7 | 9980 | b80 b96 b96 896 
+14 | 0 | ffff | a100 | b80 b82 b84 b86 
+15 | f | ffff | a900 | ba0 ba2 ba4 ba6 
+16 | 9 | ffff | b080 | b40 bc0 bc2 
+17 | 6 | ffff | b880 | b60 be0 be2 
+18 | a | ff00 | c480 | 080 882 
+19 | 0 | 0000 | 0000 | 
+1a | 0 | 0000 | 0000 | 
+1b | 0 | 0000 | 0000 | 
+1c | 0 | 0000 | 0000 | 
+1d | 0 | 0000 | 0000 | 
+1e | 0 | 0000 | 0000 | 
+1f | 0 | 0000 | 0000 | 
+
+legionna, legionnau (commands are the same as heatbrl, triggers are different)
+t    u1  u2     trg    tbl
+00 | 6 | ffeb | 0205 | 188 282 082 b8e 98e
+01 | 6 | fbfb | 0905 | 194 288 088
+02 | 5 | bf7f | 138e | 984 aa4 d82 aa2 39b b9a b9a b9a
+03 | 6 | fbfb | 1905 | 994 a88 088
+04 | 5 | f5df | 2288 | f8a b8a 388 b9c b9a a9a
+05 | 6 | ebeb | 2a05 | 9af a82 082 a8f 18e
+06 | 5 | bf7f | 338e | 984 aa4 d82 aa2 39c b9c b9c a9a
+07 | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+08 | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
+09 | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
+0a | 0 | 0000 | 0000 | 
+0b | 0 | 0000 | 0000 | 
+0c | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
+0d | a | fff3 | 6880 | b80 ba0
+0e | 0 | 0000 | 0000 | 
+0f | 0 | 0000 | 0000 | 
+10 | 7 | fdfb | 8100 | b9a b88 888
+11 | 7 | fdfb | 8900 | b9a b8a 88a
+12 | 7 | f8f7 | 9180 | b80 b94 b94 894
+13 | 7 | f8f7 | 9980 | b80 b96 b96 896
+14 | 0 | ffff | a180 | b80 b82 b84 b86
+15 | f | ffff | a980 | ba0 ba2 ba4 ba6
+16 | 9 | ffff | b100 | b40 bc0 bc2
+17 | 6 | ffff | b900 | b60 be0 be2
+18 | a | ff00 | c480 | 080 882
+19 | 0 | 0000 | 0000 | 
+1a | 0 | 0000 | 0000 |
+1b | 0 | 0000 | 0000 | 
+1c | 0 | 0000 | 0000 | 
+1d | 0 | 0000 | 0000 | 
+1e | 0 | 0000 | 0000 |
+1f | 0 | 0000 | 0000 |
+
+godzilla, denjinmk
+(denjinmk doesn't actually make use of the table, it never writes to the execute trigger)
+t    u1  u2     trg    tbl
+00 | 6 | ffeb | 0205 | 188 282 082 b8e 98e
+01 | 6 | fbfb | 0905 | 194 288 088
+02 | 5 | bf7f | 138e | 984 aa4 d82 aa2 39b b9a b9a a9a
+03 | 6 | fbfb | 1905 | 994 a88 088
+04 | 5 | f5df | 2288 | f8a b8a 388 b9a b9a a9a
+05 | 6 | ebeb | 2a05 | 9af a82 082 a8f 18e
+06 | 5 | bf7f | 338e | 984 aa4 d82 aa2 39c b9c b9c a9a
+07 | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+08 | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
+09 | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
+0a | 0 | 0000 | 0000 | 
+0b | 0 | 0000 | 0000 |
+0c | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
+0d | a | fff3 | 6880 | b80 ba0
+0e | 0 | 0000 | 0000 |
+0f | 0 | 0000 | 0000 |
+10 | 7 | fdfb | 8100 | b9a b88 888
+11 | 7 | fdfb | 8900 | b9a b8a 88a
+12 | 7 | f8f7 | 9180 | b80 b94 b94 894
+13 | 7 | f8f7 | 9980 | b80 b94 b94 896
+14 | 0 | ffff | a180 | b80 b82 b84 b86
+15 | f | ffff | a980 | ba0 ba2 ba4 ba6
+16 | 9 | ffff | b100 | b40 bc0 bc2
+17 | 6 | ffff | b900 | b60 be0 be2
+18 | a | ff00 | c480 | 080 882
+19 | 0 | 0000 | 0000 | 
+1a | 0 | 0000 | 0000 |
+1b | 0 | 0000 | 0000 | 
+1c | 0 | 0000 | 0000 | 
+1d | 0 | 0000 | 0000 |
+1e | 0 | 0000 | 0000 |
+1f | 0 | 0000 | 0000 |
+
+grainbow
+t    u1  u2     trg    tbl
+00 | 6 | ffeb | 0205 | 188 282 082 b8e 98e
+01 | 6 | fbfb | 0905 | 194 288 088
+02 | 5 | bf7f | 138e | 984 aa4 d82 aa2 39b b9a b9a a9a
+03 | 6 | fbfb | 1905 | 994 a88 088
+04 | 5 | f5df | 2288 | f8a b8a 388 b9a b9a a9a
+05 | 6 | ebeb | 2a05 | 9af a82 082 a8f 18e
+06 | 5 | bf7f | 338e | 984 aa4 d82 aa2 39c b9c b9c a9a
+07 | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+08 | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
+09 | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
+0a | 5 | fefb | 5105 | a80 984 082
+0b | 5 | fffb | 5905 | 9c8 a84 0a2
+0c | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
+0d | a | fff3 | 6980 | b80 ba0
+0e | 0 | 0000 | 0000 | 
+0f | 6 | fffb | 7905 | 1a2 2c2 0a2
+10 | 7 | fdfb | 8100 | b9a b88 888
+11 | 7 | fdfb | 8900 | b9a b8a 88a
+12 | 7 | f8f7 | 9180 | b80 b94 b94 894
+13 | 7 | f8f7 | 9980 | b80 b94 b94 896
+14 | 0 | 02ff | a180 | b80 b82 b84 b86
+15 | f | 02ff | a980 | ba0 ba2 ba4 ba6
+16 | 9 | ffff | b100 | b40 bc0 bc2
+17 | 6 | ffff | b900 | b60 be0 be2
+18 | a | ff00 | c480 | 080 882
+19 | 5 | bf7f | cb8f | 984 aa4 d82 aa2 39b b9a b9a a9f
+1a | 5 | fffb | d104 | ac2 9e0 0a2
+1b | 5 | 7ff7 | dde5 | f80 aa2 984 0c2
+1c | 5 | b07f | e38e | 984 ac4 d82 ac2 39b b9a b9a a9a
+1d | 5 | b07f | eb8e | 984 ac4 d82 ac2 39b b9a b9a a9f
+1e | 5 | fefb | f105 | a88 994 088
+1f | 0 | 0000 | 0000 | 
+
+raiden2, raiden2a, raiden2b, raiden2c, raiden2d, raiden2e, raiden2f
+t    u1  u2     trg    tbl
+00 | 6 | ffeb | 0205 | 188 282 082 b8e 98e
+01 | 6 | fbfb | 0905 | 194 288 088
+02 | 5 | bf7f | 130e | 984 aa4 d82 aa2 39b b9a b9a a9a
+03 | 6 | fbfb | 1905 | 994 a88 088
+04 | 5 | f5df | 2208 | f8a b8a 388 b9a b9a a9a
+05 | 6 | ebeb | 2a05 | 9af a82 082 a8f 18e
+06 | 5 | bf7f | 338e | 984 aa4 d82 aa2 39c b9c b9c a9a
+07 | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+08 | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
+09 | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
+0a | 6 | fff7 | 5205 | 180 2e0 3a0 0a0 3a0
+0b | 6 | fff7 | 5a05 | 180 2e0 3a0 0a0 3a0
+0c | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
+0d | 0 | 0000 | 0000 |
+0e | 0 | 0000 | 0000 |
+0f | 0 | 0000 | 0000 |
+10 | 7 | fdfb | 8100 | b9a b88 888 
+11 | 7 | fdfb | 8900 | b9a b8a 88a 
+12 | 7 | fefb | 9100 | b80 b94 894 
+13 | 7 | fefb | 9900 | b80 b94 896 
+14 | 0 | 00ff | a100 | b80 b82 b84 b86 
+15 | f | 00ff | a900 | ba0 ba2 ba4 ba6 
+16 | 9 | ffff | b100 | b40 bc0 bc2 
+17 | 6 | ffff | b900 | b60 be0 be2 
+18 | 0 | 0000 | 0000 | 
+19 | 0 | 0000 | 0000 | 
+1a | 0 | 0000 | 0000 | 
+1b | 0 | 0000 | 0000 | 
+1c | 0 | 0000 | 0000 |
+1d | 0 | 0000 | 0000 |
+1e | 6 | fff7 | f205 | 182 2e0 3c0 0c0 3c0
+1f | 0 | 0000 | 0000 |
+
+raidndx, raidndxj, raidndxm, raidndxt
+(the same as raiden2, but adds an extra command with trigger 7e05)
+t    u1  u2     trg    tbl
+00 | 6 | ffeb | 0205 | 188 282 082 b8e 98e
+01 | 6 | fbfb | 0905 | 194 288 088
+02 | 5 | bf7f | 130e | 984 aa4 d82 aa2 39b b9a b9a a9a
+03 | 6 | fbfb | 1905 | 994 a88 088
+04 | 5 | f5df | 2208 | f8a b8a 388 b9a b9a a9a
+05 | 6 | ebeb | 2a05 | 9af a82 082 a8f 18e
+06 | 5 | bf7f | 338e | 984 aa4 d82 aa2 39c b9c b9c a9a
+07 | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+08 | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
+09 | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
+0a | 6 | fff7 | 5205 | 180 2e0 3a0 0a0 3a0
+0b | 6 | fff7 | 5a05 | 180 2e0 3a0 0a0 3a0
+0c | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
+0d | 0 | 0000 | 0000 | 
+0e | 0 | 0000 | 0000 | 
+0f | 6 | fffb | 7e05 | 180 282 080 180 282 
+10 | 7 | fdfb | 8100 | b9a b88 888
+11 | 7 | fdfb | 8900 | b9a b8a 88a
+12 | 7 | fefb | 9100 | b80 b94 894
+13 | 7 | fefb | 9900 | b80 b94 896
+14 | 0 | 00ff | a100 | b80 b82 b84 b86
+15 | f | 00ff | a900 | ba0 ba2 ba4 ba6
+16 | 9 | ffff | b100 | b40 bc0 bc2
+17 | 6 | ffff | b900 | b60 be0 be2
+18 | 0 | 0000 | 0000 |
+19 | 0 | 0000 | 0000 |
+1a | 0 | 0000 | 0000 |
+1b | 0 | 0000 | 0000 |
+1c | 0 | 0000 | 0000 |
+1d | 0 | 0000 | 0000 |
+1e | 6 | fff7 | f205 | 182 2e0 3c0 0c0 3c0
+1f | 0 | 0000 | 0000 |
+
+
+zeroteam, zeroteama, zeroteamb, zeroteamc, zeroteams, xsedae
+t    u1  u2     trg    tbl
+00 | 6 | ffeb | 0205 | 188 282 082 b8e 98e
+01 | 6 | fbfb | 0905 | 194 288 088
+02 | 5 | bf7f | 130e | 984 aa4 d82 aa2 39b b9a b9a a9a
+03 | 6 | fbfb | 1905 | 994 a88 088
+04 | 5 | f5df | 2208 | f8a b8a 388 b9a b9a a9a
+05 | 6 | ebeb | 2a05 | 9af a82 082 a8f 18e
+06 | 5 | bf7f | 330e | 984 aa4 d82 aa2 39c b9c b9c a9a
+07 | 4 | 007f | 3b30 | f9c b9c b9c b9c b9c b9c b9c 99c
+08 | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
+09 | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
+0a | 6 | fffb | 5105 | 180 2e0 0a0
+0b | 6 | ffdb | 5a85 | 180 2e0 0a0 182 2e0 0c0 3c0
+0c | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
+0d | a | fff3 | 6980 | b80 ba0
+0e | 8 | fdfd | 7100 | b80 a80 b80
+0f | 0 | 0000 | 0000 | 
+10 | 7 | fdfb | 8100 | b9a b88 888
+11 | 7 | fdfb | 8900 | b9a b8a 88a
+12 | 7 | f8f7 | 9100 | b80 b94 b94 894
+13 | 7 | f8f7 | 9900 | b80 b94 b94 896
+14 | 0 | ffff | a100 | b80 b82 b84 b86
+15 | f | ffff | a900 | ba0 ba2 ba4 ba6
+16 | 9 | ffff | b100 | b40 bc0 bc2
+17 | 6 | ffff | b900 | b60 be0 be2
+18 | a | ff00 | 7c80 | 080 882
+19 | 0 | 0000 | 0000 | 
+1a | 0 | 0000 | 0000 | 
+1b | 0 | 0000 | 0000 | 
+1c | 5 | 06fb | e105 | a88 994 088
+1d | 5 | 05f7 | ede5 | f88 a84 986 08a
+1e | 4 | 00ff | f790 | f80 b84 b84 b84 b84 b84 b84 b84
+1f | 6 | 00ff | fc84 | 182 280
+
+as you can see, there are a lot of command 'command lists' between the games.
+(todo, comment ones which seem to have a known function)
+
+executing these seems to cause various operations to occur, be it memory transfer, collision checking, or movement checking.
+
+each 12-bit entry in the tables is probably some kind of 'opcode' which runs and processes data placed in registers / memory.
+
+If we rearrange these tables a bit, so that we can see which are common between games we get the following, take note of
+the ones with slight changes, these could be important to figuring out how this works!
+
+
+Game       |u1 |u2    | trig | macrolist
+
+Table 00 - Same on All games
+(grainbow) | 6 | ffeb | 0205 | 188 282 082 b8e 98e
+(cupsoc)   | 6 | ffeb | 0205 | 188 282 082 b8e 98e
+(legionna) | 6 | ffeb | 0205 | 188 282 082 b8e 98e
+(godzilla) | 6 | ffeb | 0205 | 188 282 082 b8e 98e
+(heatbrl)  | 6 | ffeb | 0205 | 188 282 082 b8e 98e
+(zeroteam) | 6 | ffeb | 0205 | 188 282 082 b8e 98e
+(raiden2)  | 6 | ffeb | 0205 | 188 282 082 b8e 98e
+(raidndx)  | 6 | ffeb | 0205 | 188 282 082 b8e 98e
+
+Table 01 - Same on All games
+(grainbow) | 6 | fbfb | 0905 | 194 288 088
+(cupsoc)   | 6 | fbfb | 0905 | 194 288 088
+(legionna) | 6 | fbfb | 0905 | 194 288 088
+(godzilla) | 6 | fbfb | 0905 | 194 288 088
+(heatbrl)  | 6 | fbfb | 0905 | 194 288 088
+(zeroteam) | 6 | fbfb | 0905 | 194 288 088
+(raiden2)  | 6 | fbfb | 0905 | 194 288 088
+(raidndx)  | 6 | fbfb | 0905 | 194 288 088
+
+Table 02 - grainbow and heatbrl have different last entry.  triggers differ on v30 hw
+(grainbow) | 5 | bf7f | 138e | 984 aa4 d82 aa2 39b b9a b9a b9a
+(cupsoc)   | 5 | bf7f | 138e | 984 aa4 d82 aa2 39b b9a b9a a9a
+(legionna) | 5 | bf7f | 138e | 984 aa4 d82 aa2 39b b9a b9a a9a
+(godzilla) | 5 | bf7f | 138e | 984 aa4 d82 aa2 39b b9a b9a a9a
+(heatbrl)  | 5 | bf7f | 138e | 984 aa4 d82 aa2 39b b9a b9a b9a
+(zeroteam) | 5 | bf7f | 130e | 984 aa4 d82 aa2 39b b9a b9a a9a
+(raiden2)  | 5 | bf7f | 130e | 984 aa4 d82 aa2 39b b9a b9a a9a
+(raidndx)  | 5 | bf7f | 130e | 984 aa4 d82 aa2 39b b9a b9a a9a
+
+Table 03 - Same on All games
+(grainbow) | 6 | fbfb | 1905 | 994 a88 088
+(cupsoc)   | 6 | fbfb | 1905 | 994 a88 088
+(legionna) | 6 | fbfb | 1905 | 994 a88 088
+(godzilla) | 6 | fbfb | 1905 | 994 a88 088
+(heatbrl)  | 6 | fbfb | 1905 | 994 a88 088
+(zeroteam) | 6 | fbfb | 1905 | 994 a88 088
+(raiden2)  | 6 | fbfb | 1905 | 994 a88 088
+(raidndx)  | 6 | fbfb | 1905 | 994 a88 088
+
+Table 04 - grainbow and heatbrl have a b9c in the 4th slot, triggers differ on v30 hw 
+(grainbow) | 5 | f5df | 2288 | f8a b8a 388 b9c b9a a9a
+(cupsoc)   | 5 | f5df | 2288 | f8a b8a 388 b9a b9a a9a
+(legionna) | 5 | f5df | 2288 | f8a b8a 388 b9a b9a a9a
+(godzilla) | 5 | f5df | 2288 | f8a b8a 388 b9a b9a a9a
+(heatbrl)  | 5 | f5df | 2288 | f8a b8a 388 b9c b9a a9a
+(zeroteam) | 5 | f5df | 2208 | f8a b8a 388 b9a b9a a9a
+(raiden2)  | 5 | f5df | 2208 | f8a b8a 388 b9a b9a a9a
+(raidndx)  | 5 | f5df | 2208 | f8a b8a 388 b9a b9a a9a
+
+Table 05 - Same on All games
+(grainbow) | 6 | ebeb | 2a05 | 9af a82 082 a8f 18e
+(cupsoc)   | 6 | ebeb | 2a05 | 9af a82 082 a8f 18e
+(legionna) | 6 | ebeb | 2a05 | 9af a82 082 a8f 18e
+(godzilla) | 6 | ebeb | 2a05 | 9af a82 082 a8f 18e
+(heatbrl)  | 6 | ebeb | 2a05 | 9af a82 082 a8f 18e
+(zeroteam) | 6 | ebeb | 2a05 | 9af a82 082 a8f 18e
+(raiden2)  | 6 | ebeb | 2a05 | 9af a82 082 a8f 18e
+(raidndx)  | 6 | ebeb | 2a05 | 9af a82 082 a8f 18e
+
+Table 06 - different trigger on zeroteam (330e)
+(grainbow) | 5 | bf7f | 338e | 984 aa4 d82 aa2 39c b9c b9c a9a
+(cupsoc)   | 5 | bf7f | 338e | 984 aa4 d82 aa2 39c b9c b9c a9a
+(legionna) | 5 | bf7f | 338e | 984 aa4 d82 aa2 39c b9c b9c a9a
+(godzilla) | 5 | bf7f | 338e | 984 aa4 d82 aa2 39c b9c b9c a9a
+(heatbrl)  | 5 | bf7f | 338e | 984 aa4 d82 aa2 39c b9c b9c a9a
+(zeroteam) | 5 | bf7f | 330e | 984 aa4 d82 aa2 39c b9c b9c a9a
+(raiden2)  | 5 | bf7f | 338e | 984 aa4 d82 aa2 39c b9c b9c a9a
+(raidndx)  | 5 | bf7f | 338e | 984 aa4 d82 aa2 39c b9c b9c a9a
+
+Table 07 - different trigger on zeroteam (3b30)
+(grainbow) | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+(cupsoc)   | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+(legionna) | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+(godzilla) | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+(heatbrl)  | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+(zeroteam) | 4 | 007f | 3b30 | f9c b9c b9c b9c b9c b9c b9c 99c
+(raiden2)  | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+(raidndx)  | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
+
+Table 08 - Same on All games
+(grainbow) | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
+(cupsoc)   | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
+(legionna) | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
+(godzilla) | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
+(heatbrl)  | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
+(zeroteam) | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
+(raiden2)  | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
+(raidndx)  | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
+
+Table 09 - Same on All games
+(grainbow) | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
+(cupsoc)   | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
+(legionna) | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
+(godzilla) | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
+(heatbrl)  | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
+(zeroteam) | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
+(raiden2)  | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
+(raidndx)  | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
+
+Table 0a - Game specific
+(grainbow) | 5 | fefb | 5105 | a80 984 082
+(cupsoc)   | 5 | fefb | 5105 | a80 984 082
+(legionna) | 0 | 0000 | 0000 | 
+(godzilla) | 0 | 0000 | 0000 | 
+(heatbrl)  | 0 | 0000 | 0000 | 
+(zeroteam) | 6 | fffb | 5105 | 180 2e0 0a0
+(raiden2)  | 6 | fff7 | 5205 | 180 2e0 3a0 0a0 3a0
+(raidndx)  | 6 | fff7 | 5205 | 180 2e0 3a0 0a0 3a0
+
+Table 0b - Game specific
+(grainbow) | 5 | fffb | 5905 | 9c8 a84 0a2
+(cupsoc)   | 5 | fffb | 5905 | 9c8 a84 0a2
+(legionna) | 0 | 0000 | 0000 | 
+(godzilla) | 0 | 0000 | 0000 |
+(heatbrl)  | 0 | 0000 | 0000 | 
+(zeroteam) | 6 | ffdb | 5a85 | 180 2e0 0a0 182 2e0 0c0 3c0
+(raiden2)  | 6 | fff7 | 5a05 | 180 2e0 3a0 0a0 3a0
+(raidndx)  | 6 | fff7 | 5a05 | 180 2e0 3a0 0a0 3a0
+
+Table 0c - cupsoc has various modifications
+notice how *80 is replaced by *a0 and *9a is replaced with *a6, maybe it has the same function, but on different registers?
+(grainbow) | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
+(cupsoc)   | 8 | f3e7 | 6200 | 3a0 3a6 380 aa0 2a6
+(legionna) | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
+(godzilla) | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
+(heatbrl)  | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
+(zeroteam) | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
+(raiden2)  | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
+(raidndx)  | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
+
+Table 0d - Zero team uses different trigger, doesn't exist on raiden2/dx
+(grainbow) | a | fff3 | 6980 | b80 ba0
+(cupsoc)   | a | fff3 | 6880 | b80 ba0
+(legionna) | a | fff3 | 6880 | b80 ba0
+(godzilla) | a | fff3 | 6880 | b80 ba0
+(heatbrl)  | a | fff3 | 6880 | b80 ba0
+(zeroteam) | a | fff3 | 6980 | b80 ba0
+(raiden2)  | 0 | 0000 | 0000 |
+(raidndx)  | 0 | 0000 | 0000 | 
+
+Table 0e - Zero Team only
+(grainbow) | 0 | 0000 | 0000 | 
+(cupsoc)   | 0 | 0000 | 0000 | 
+(legionna) | 0 | 0000 | 0000 |
+(godzilla) | 0 | 0000 | 0000 | 
+(heatbrl)  | 0 | 0000 | 0000 | 
+(zeroteam) | 8 | fdfd | 7100 | b80 a80 b80
+(raiden2)  | 0 | 0000 | 0000 |
+(raidndx)  | 0 | 0000 | 0000 | 
+
+Table 0f - Same on grainbow/cupsoc, different on raidndx (added compared to raiden2)
+(grainbow) | 6 | fffb | 7905 | 1a2 2c2 0a2
+(cupsoc)   | 6 | fffb | 7905 | 1a2 2c2 0a2
+(legionna) | 0 | 0000 | 0000 | 
+(godzilla) | 0 | 0000 | 0000 |
+(heatbrl)  | 0 | 0000 | 0000 | 
+(zeroteam) | 0 | 0000 | 0000 | 
+(raiden2)  | 0 | 0000 | 0000 |
+(raidndx)  | 6 | fffb | 7e05 | 180 282 080 180 282 
+
+Table 10 - Same on all games
+(grainbow) | 7 | fdfb | 8100 | b9a b88 888 
+(cupsoc)   | 7 | fdfb | 8100 | b9a b88 888
+(legionna) | 7 | fdfb | 8100 | b9a b88 888
+(godzilla) | 7 | fdfb | 8100 | b9a b88 888
+(heatbrl)  | 7 | fdfb | 8100 | b9a b88 888
+(zeroteam) | 7 | fdfb | 8100 | b9a b88 888
+(raiden2)  | 7 | fdfb | 8100 | b9a b88 888 
+(raidndx)  | 7 | fdfb | 8100 | b9a b88 888
+
+Table 11 - Same on all games
+(grainbow) | 7 | fdfb | 8900 | b9a b8a 88a 
+(cupsoc)   | 7 | fdfb | 8900 | b9a b8a 88a
+(legionna) | 7 | fdfb | 8900 | b9a b8a 88a
+(godzilla) | 7 | fdfb | 8900 | b9a b8a 88a
+(heatbrl)  | 7 | fdfb | 8900 | b9a b8a 88a
+(zeroteam) | 7 | fdfb | 8900 | b9a b8a 88a
+(raiden2)  | 7 | fdfb | 8900 | b9a b8a 88a 
+(raidndx)  | 7 | fdfb | 8900 | b9a b8a 88a
+
+Table 12 - Raiden2/DX differ from others (list and trigger)
+(grainbow) | 7 | f8f7 | 9180 | b80 b94 b94 894 
+(cupsoc)   | 7 | f8f7 | 9180 | b80 b94 b94 894
+(legionna) | 7 | f8f7 | 9180 | b80 b94 b94 894
+(godzilla) | 7 | f8f7 | 9180 | b80 b94 b94 894
+(heatbrl)  | 7 | f8f7 | 9180 | b80 b94 b94 894
+(zeroteam) | 7 | f8f7 | 9100 | b80 b94 b94 894
+(raiden2)  | 7 | fefb | 9100 | b80 b94 894 
+(raidndx)  | 7 | fefb | 9100 | b80 b94 894
+
+Table 13 - Raiden2/DX differ from others , slight changes on legionna and hearbrl too
+           (*94 replaced with *96, to operate on a different register?)
+(grainbow) | 7 | f8f7 | 9980 | b80 b94 b94 896
+(cupsoc)   | 7 | f8f7 | 9980 | b80 b94 b94 896
+(legionna) | 7 | f8f7 | 9980 | b80 b96 b96 896
+(godzilla) | 7 | f8f7 | 9980 | b80 b94 b94 896
+(heatbrl)  | 7 | f8f7 | 9980 | b80 b96 b96 896 
+(zeroteam) | 7 | f8f7 | 9900 | b80 b94 b94 896
+(raiden2)  | 7 | fefb | 9900 | b80 b94 896 
+(raidndx)  | 7 | fefb | 9900 | b80 b94 896
+
+Table 14 - Trigger differs on heatbrl + v30 games, unknown param differs on grainbow + v30 games
+(grainbow) | 0 | 02ff | a180 | b80 b82 b84 b86
+(cupsoc)   | 0 | ffff | a180 | b80 b82 b84 b86
+(legionna) | 0 | ffff | a180 | b80 b82 b84 b86
+(godzilla) | 0 | ffff | a180 | b80 b82 b84 b86
+(heatbrl)  | 0 | ffff | a100 | b80 b82 b84 b86 
+(zeroteam) | 0 | ffff | a100 | b80 b82 b84 b86
+(raiden2)  | 0 | 00ff | a100 | b80 b82 b84 b86 
+(raidndx)  | 0 | 00ff | a100 | b80 b82 b84 b86
+
+Table 15 - Trigger differs on heatbrl + v30 games, unknown param differs on grainbow + v30 games
+(grainbow) | f | 02ff | a980 | ba0 ba2 ba4 ba6
+(cupsoc)   | f | ffff | a980 | ba0 ba2 ba4 ba6
+(legionna) | f | ffff | a980 | ba0 ba2 ba4 ba6
+(godzilla) | f | ffff | a980 | ba0 ba2 ba4 ba6
+(heatbrl)  | f | ffff | a900 | ba0 ba2 ba4 ba6 
+(zeroteam) | f | ffff | a900 | ba0 ba2 ba4 ba6
+(raiden2)  | f | 00ff | a900 | ba0 ba2 ba4 ba6 
+(raidndx)  | f | 00ff | a900 | ba0 ba2 ba4 ba6
+
+Table 16 - Trigger differs on heatbrl
+(grainbow) | 9 | ffff | b100 | b40 bc0 bc2
+(cupsoc)   | 9 | ffff | b100 | b40 bc0 bc2
+(legionna) | 9 | ffff | b100 | b40 bc0 bc2
+(godzilla) | 9 | ffff | b100 | b40 bc0 bc2
+(heatbrl)  | 9 | ffff | b080 | b40 bc0 bc2 
+(zeroteam) | 9 | ffff | b100 | b40 bc0 bc2
+(raiden2)  | 9 | ffff | b100 | b40 bc0 bc2 
+(raidndx)  | 9 | ffff | b100 | b40 bc0 bc2
+
+Table 17 - Trigger differs on heatbrl
+(grainbow) | 6 | ffff | b900 | b60 be0 be2
+(cupsoc)   | 6 | ffff | b900 | b60 be0 be2
+(legionna) | 6 | ffff | b900 | b60 be0 be2
+(godzilla) | 6 | ffff | b900 | b60 be0 be2
+(heatbrl)  | 6 | ffff | b880 | b60 be0 be2 
+(zeroteam) | 6 | ffff | b900 | b60 be0 be2
+(raiden2)  | 6 | ffff | b900 | b60 be0 be2 
+(raidndx)  | 6 | ffff | b900 | b60 be0 be2
+
+Table 18 - Same for all 68k games, zero team has different trigger, not on Raiden2/DX
+(grainbow) | a | ff00 | c480 | 080 882
+(cupsoc)   | a | ff00 | c480 | 080 882
+(legionna) | a | ff00 | c480 | 080 882
+(godzilla) | a | ff00 | c480 | 080 882
+(heatbrl)  | a | ff00 | c480 | 080 882 
+(zeroteam) | a | ff00 | 7c80 | 080 882
+(raiden2)  | 0 | 0000 | 0000 | 
+(raidndx)  | 0 | 0000 | 0000 |
+
+Table 19 - grainbow / cupsoc only
+(grainbow) | 5 | bf7f | cb8f | 984 aa4 d82 aa2 39b b9a b9a a9f
+(cupsoc)   | 5 | bf7f | cb8f | 984 aa4 d82 aa2 39b b9a b9a a9f
+(legionna) | 0 | 0000 | 0000 | 
+(godzilla) | 0 | 0000 | 0000 | 
+(heatbrl)  | 0 | 0000 | 0000 | 
+(zeroteam) | 0 | 0000 | 0000 | 
+(raiden2)  | 0 | 0000 | 0000 | 
+(raidndx)  | 0 | 0000 | 0000 |
+
+Table 1a - grainbow / cupsoc only
+(grainbow) | 5 | fffb | d104 | ac2 9e0 0a2
+(cupsoc)   | 5 | fffb | d104 | ac2 9e0 0a2
+(legionna) | 0 | 0000 | 0000 |
+(godzilla) | 0 | 0000 | 0000 |
+(heatbrl)  | 0 | 0000 | 0000 | 
+(zeroteam) | 0 | 0000 | 0000 | 
+(raiden2)  | 0 | 0000 | 0000 | 
+(raidndx)  | 0 | 0000 | 0000 |
+
+Table 1b - grainbow / cupsoc only
+(grainbow) | 5 | 7ff7 | dde5 | f80 aa2 984 0c2
+(cupsoc)   | 5 | 7ff7 | dde5 | f80 aa2 984 0c2
+(legionna) | 0 | 0000 | 0000 | 
+(godzilla) | 0 | 0000 | 0000 | 
+(heatbrl)  | 0 | 0000 | 0000 | 
+(zeroteam) | 0 | 0000 | 0000 | 
+(raiden2)  | 0 | 0000 | 0000 | 
+(raidndx)  | 0 | 0000 | 0000 |
+
+Table 1c - grainbow / cupsoc are the same, different on zero team
+(grainbow) | 5 | b07f | e38e | 984 ac4 d82 ac2 39b b9a b9a a9a
+(cupsoc)   | 5 | b07f | e38e | 984 ac4 d82 ac2 39b b9a b9a a9a
+(legionna) | 0 | 0000 | 0000 | 
+(godzilla) | 0 | 0000 | 0000 | 
+(heatbrl)  | 0 | 0000 | 0000 | 
+(zeroteam) | 5 | 06fb | e105 | a88 994 088
+(raiden2)  | 0 | 0000 | 0000 |
+(raidndx)  | 0 | 0000 | 0000 |
+
+Table 1d - grainbow / cupsoc are the same, different on zero team
+(grainbow) | 5 | b07f | eb8e | 984 ac4 d82 ac2 39b b9a b9a a9f
+(cupsoc)   | 5 | b07f | eb8e | 984 ac4 d82 ac2 39b b9a b9a a9f
+(legionna) | 0 | 0000 | 0000 | 
+(godzilla) | 0 | 0000 | 0000 |
+(heatbrl)  | 0 | 0000 | 0000 | 
+(zeroteam) | 5 | 05f7 | ede5 | f88 a84 986 08a
+(raiden2)  | 0 | 0000 | 0000 |
+(raidndx)  | 0 | 0000 | 0000 |
+
+Table 1e - grainbow / cupsoc are the same, different on zero team, different on raiden2/dx
+(grainbow) | 5 | fefb | f105 | a88 994 088
+(cupsoc)   | 5 | fefb | f105 | a88 994 088
+(legionna) | 0 | 0000 | 0000 |
+(godzilla) | 0 | 0000 | 0000 |
+(heatbrl)  | 0 | 0000 | 0000 | 
+(zeroteam) | 4 | 00ff | f790 | f80 b84 b84 b84 b84 b84 b84 b84
+(raiden2)  | 6 | fff7 | f205 | 182 2e0 3c0 0c0 3c0
+(raidndx)  | 6 | fff7 | f205 | 182 2e0 3c0 0c0 3c0
+
+Table 1f - zeroteam specific
+(grainbow) | 0 | 0000 | 0000 | 
+(cupsoc)   | 0 | 0000 | 0000 | 
+(legionna) | 0 | 0000 | 0000 |
+(godzilla) | 0 | 0000 | 0000 | 
+(heatbrl)  | 0 | 0000 | 0000 |
+(zeroteam) | 6 | 00ff | fc84 | 182 280
+(raiden2)  | 0 | 0000 | 0000 |
+(raidndx)  | 0 | 0000 | 0000 |
+
+
+
+typically the games write data for use with the commands at MCUBASE+0xa0 - 0xaf  and MCUBASE+0xc0 - 0xcf before triggering
+the operation by writing to MCUBASE+0x100 (or MCUBASE+0x102) with the trigger value.  I believe the commands can change
+both COP registers and system memory.
+
+(MCUBASE typically being 0x100400 in the 68k games, and 0x400 in the v30 games)
+
+Seibu Cup Soccer sometimes attempts to use a trigger value which wasn't defined in the table, I don't know what should
+happen in that case!
+
+----
+
+Protection Part 2: BCD Maths
+
+some additional registers serve as a math box type device, converting numbers + other functions.  Godzilla seems to use
+this for a protection check, other games (Denjin Makai, Raiden 2) use it for scoring:
+
+----
+
+Protection Part 3: Private Buffer DMA + RAM Clear
+(todo, expand on this)
+
+address ranges can be specified which allows DMA Fill / Clear operations to be performed, as well as transfering 
+tilemap+palette data to private buffers for rendering.  If you don't use these nothing gets updated on the real
+hardware!.  These don't currently make much sense because the hardware specifies ranges which aren't mapped, or
+contain nothing.  It's possible the original hardware has mirroring which this function relies on.
+
+the DMA to private buffer operations are currently ignored due to 
+if ((cop_clearfill_lasttrigger==0x14) || (cop_clearfill_lasttrigger==0x15)) return;
+
+----
+
+Other Protections?
+
+Denjin Makai seems to rely on a byteswapped mirror to write the palette.
+Various other ports go through the COP area, and get mapped to inputs / sounds / video registers, this adds to
+the confusion and makes it less clear what is / isn't protection related
+Raiden 2 / Zero Team banking doesn't make much sense, a bank address has been found through testing on real
+hardware, but the game never writes directly to it.
+
+ */
 #include "driver.h"
 #include "audio/seibu.h"
 #include "includes/legionna.h"
@@ -75,7 +1386,7 @@ static UINT16 copd2_offs = 0;
 
 static void copd2_set_tableoffset(running_machine *machine, UINT16 data)
 {
-	logerror("mcu_offs %04x\n", data);
+	//logerror("mcu_offs %04x\n", data);
 	copd2_offs = data;
 	if (copd2_offs>0xff)
 	{
@@ -85,8 +1396,8 @@ static void copd2_set_tableoffset(running_machine *machine, UINT16 data)
 	copd2_table_2[copd2_offs/8] = cop_438;
 	copd2_table_3[copd2_offs/8] = cop_43a;
 	copd2_table_4[copd2_offs/8] = cop_43c;
+#if 0
 
-/* Uncommented until actively worked on
     {
         FILE *fp;
         char filename[256];
@@ -120,16 +1431,36 @@ static void copd2_set_tableoffset(running_machine *machine, UINT16 data)
             fclose(fp);
         }
     }
-*/
+
+	{
+		int i;
+
+		printf("start\n");
+
+		for (i=0;i<0x20;i++)
+		{
+			int ii;
+			printf("%02x | %01x | %04x | %04x | ", i, copd2_table_2[i], copd2_table_3[i], copd2_table_4[i]);
+
+			
+			for (ii=0;ii<0x8;ii++)
+			{
+				printf("%03x ", copd2_table[i*8 + ii]);
+
+			}
+			printf("\n");
+		}
+
+	}
+#endif
 
 }
 
 static void copd2_set_tabledata(running_machine *machine, UINT16 data)
 {
 	copd2_table[copd2_offs] = data;
-	logerror("mcu_data %04x\n", data);
-
-/* Uncommented until actively worked on
+	//logerror("mcu_data %04x\n", data);
+#if 0
     {
         FILE *fp;
         char filename[256];
@@ -141,7 +1472,7 @@ static void copd2_set_tabledata(running_machine *machine, UINT16 data)
             fclose(fp);
         }
     }
-*/
+#endif
 }
 
 
@@ -1411,6 +2742,8 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
+	seibu_cop_log("%06x: Legionna write data %04x at offset %04x\n", cpu_get_pc(space->cpu), data, offset*2);
+
 	switch (offset)
 	{
 		default:
@@ -1637,7 +2970,7 @@ WRITE16_HANDLER( denjinmk_mcu_w )
   SD Gundam Rainbow Trout
 **********************************************************************************************/
 
-READ16_HANDLER( sdgndmrb_mcu_r )
+READ16_HANDLER( grainbow_mcu_r )
 {
 	switch (offset)
 	{
@@ -1673,7 +3006,7 @@ READ16_HANDLER( sdgndmrb_mcu_r )
 }
 
 
-WRITE16_HANDLER( sdgndmrb_mcu_w )
+WRITE16_HANDLER( grainbow_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
@@ -1770,7 +3103,7 @@ WRITE16_HANDLER( sdgndmrb_mcu_w )
             ---- --x- Midground Layer
             ---- ---x Background Layer
             */
-			sdgndmrb_pri_n = cop_mcu_ram[offset] & 0xf;
+			grainbow_pri_n = cop_mcu_ram[offset] & 0xf;
 			break;
 		}
 
@@ -1887,6 +3220,9 @@ WRITE16_HANDLER( legionna_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
+	seibu_cop_log("%06x: Legionna write data %04x at offset %04x\n", cpu_get_pc(space->cpu), data, offset*2);
+
+
 	switch (offset)
 	{
 		default:
@@ -1967,6 +3303,8 @@ READ16_HANDLER( raiden2_mcu_r )
 WRITE16_HANDLER( raiden2_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
+
+	seibu_cop_log("%06x: raiden2 write data %04x at offset %04x\n", cpu_get_pc(space->cpu), data, offset*2);
 
 	switch (offset)
 	{

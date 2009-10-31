@@ -1,7 +1,7 @@
 /*----------- defined in video/legionna.c -----------*/
 
 extern UINT16 *legionna_back_data,*legionna_fore_data,*legionna_mid_data,*legionna_scrollram16,*legionna_textram;
-extern UINT8 sdgndmrb_pri_n;
+extern UINT8 grainbow_pri_n;
 extern UINT16 legionna_layer_disable;
 
 void heatbrl_setgfxbank(UINT16 data);
@@ -16,4 +16,4 @@ VIDEO_START( cupsoc );
 VIDEO_START( denjinmk );
 VIDEO_UPDATE( legionna );
 VIDEO_UPDATE( godzilla );
-VIDEO_UPDATE( sdgndmrb );
+VIDEO_UPDATE( grainbow );

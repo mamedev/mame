@@ -152,10 +152,10 @@ static ADDRESS_MAP_START( denjinmk_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x11f000, 0x11ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sdgndmrb_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( grainbow_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(sdgndmrb_mcu_r, sdgndmrb_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
+	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(grainbow_mcu_r, grainbow_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
 	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
 	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
 	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
@@ -516,7 +516,7 @@ static INPUT_PORTS_START( godzilla )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( sdgndmrb )
+static INPUT_PORTS_START( grainbow )
 	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
 	PORT_START("DSW1")
@@ -1028,7 +1028,7 @@ static GFXDECODE_START( heatbrl )
 	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,   16*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( sdgndmrb )
+static GFXDECODE_START( grainbow )
 	GFXDECODE_ENTRY( "gfx1", 0, legionna_new_charlayout,    48*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,    0*16, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,  32*16, 16 )	/* unused */
@@ -1164,11 +1164,11 @@ static MACHINE_DRIVER_START( denjinmk )
 	SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(14318180/4,1320000)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( sdgndmrb )
+static MACHINE_DRIVER_START( grainbow )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 20000000/2)
-	MDRV_CPU_PROGRAM_MAP(sdgndmrb_map)
+	MDRV_CPU_PROGRAM_MAP(grainbow_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
@@ -1185,11 +1185,11 @@ static MACHINE_DRIVER_START( sdgndmrb )
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 32*8-1)
 
-	MDRV_GFXDECODE(sdgndmrb)
+	MDRV_GFXDECODE(grainbow)
 	MDRV_PALETTE_LENGTH(128*16)
 
 	MDRV_VIDEO_START(legionna)
-	MDRV_VIDEO_UPDATE(sdgndmrb)
+	MDRV_VIDEO_UPDATE(grainbow)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(14318180/4,1320000)
@@ -1221,7 +1221,7 @@ static MACHINE_DRIVER_START( cupsoc )
 	MDRV_PALETTE_LENGTH(128*16)
 
 	MDRV_VIDEO_START(cupsoc)
-	MDRV_VIDEO_UPDATE(sdgndmrb)
+	MDRV_VIDEO_UPDATE(grainbow)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
@@ -1257,7 +1257,7 @@ static MACHINE_DRIVER_START( cupsocbl )
 	MDRV_PALETTE_LENGTH(128*16)
 
 	MDRV_VIDEO_START(cupsoc)
-	MDRV_VIDEO_UPDATE(sdgndmrb)
+	MDRV_VIDEO_UPDATE(grainbow)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1768,7 +1768,7 @@ SEI300 TC25SC900AF 001 9211EAI JAPAN
 
 */
 
-ROM_START( sdgndmrb )
+ROM_START( grainbow )
 	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD32_BYTE( "rb-p1.25",     0x000000, 0x040000, CRC(0995c511) SHA1(97fb2bd7d26720552ace25e655fce09ad9a7afd7) )
 	ROM_LOAD32_BYTE( "rb-p2.24",     0x000001, 0x040000, CRC(c9eb756f) SHA1(88d784a71bfab4f321d3320aed1b6b2648529979) )
@@ -2116,7 +2116,7 @@ GAME( 1992, heatbrlo, heatbrl,  heatbrl,  heatbrl,  0,   ROT0, "Tad", "Heated Ba
 GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl,  0,   ROT0, "Tad", "Heated Barrel (US)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
 GAME( 1993, godzilla, 0,        godzilla, godzilla, 0,        ROT0, "Banpresto", "Godzilla", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1993, sdgndmrb, 0,        sdgndmrb, sdgndmrb, 0, 		  ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, grainbow, 0,        grainbow, grainbow, 0, 		  ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, denjinmk, ROT0, "Banpresto", "Denjin Makai", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
 GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Seibu Cup Soccer (set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
