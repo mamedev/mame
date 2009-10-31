@@ -255,7 +255,7 @@ CPU_DISASSEMBLE( tms32010 )
 	}
 	if (op == -1)
 	{
-		sprintf(buffer,"???? dw %04Xh",code);
+		sprintf(buffer, "dw   $%04X (invalid op)", code);
 		return cnt | DASMFLAG_SUPPORTED;
 	}
 	buffertmp = buffer;
