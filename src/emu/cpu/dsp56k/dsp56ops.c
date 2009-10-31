@@ -12,7 +12,7 @@
             is written, the register receives the low-order portion of the word; the high-order portion is not used
           : ...much more!
           : ...shifter/limiter/overflow notes too.
-  
+
 */
 
 /*
@@ -1503,7 +1503,7 @@ static size_t dsp56k_op_inc24(dsp56k_core* cpustate, const UINT16 op_byte, typed
 	/* TODO: I wonder if workBits24 should be signed? */
 	workBits24 = ((*((UINT64*)D.addr)) & U64(0x000000ffffff0000)) >> 16;
 	workBits24++;
-	//workBits24 &= 0x00ffffff;		/* Solves -x issues - TODO: huh? */
+	//workBits24 &= 0x00ffffff;     /* Solves -x issues - TODO: huh? */
 
 	/* Set the D bits with the dec result */
 	*((UINT64*)D.addr) &= U64(0x000000000000ffff);
@@ -1873,25 +1873,25 @@ static size_t dsp56k_op_abs(dsp56k_core* cpustate, const UINT16 op_byte, typed_p
 	decode_F_table(cpustate, BITS(op_byte,0x0008), &D);
 
 	*p_accum = *((UINT64*)D.addr);
-	
+
 	/* Sign extend D into a temp variable */
 	opD = *p_accum;
 	if (opD &  U64(0x0000008000000000))
 		opD |= U64(0xffffff0000000000);
 	else
 		opD &= U64(0x000000ffffffffff);
-	
+
 	/* Take the absolute value and clean up */
 	opD = abs(opD);
 	opD &= U64(0x000000ffffffffff);
-	
+
 	/* Reassign */
 	*((UINT64*)D.addr) = opD;
-	
+
 	/* Special overflow case */
 	if ((*p_accum) == U64(0x0000008000000000))
 		*((UINT64*)D.addr) = U64(0x0000007fffffffff);
-	
+
 	/* S L E U N Z V C */
 	/* * * * * * * * - */
 	/* TODO: S, L, E, U */

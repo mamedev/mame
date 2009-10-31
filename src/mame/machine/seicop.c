@@ -713,7 +713,7 @@ t    u1  u2     trg    tbl
 0b | 5 | fffb | 5905 | 9c8 a84 0a2
 0c | 8 | f3e7 | 6200 | 3a0 3a6 380 aa0 2a6
 0d | a | fff3 | 6880 | b80 ba0
-0e | 0 | 0000 | 0000 | 
+0e | 0 | 0000 | 0000 |
 0f | 6 | fffb | 7905 | 1a2 2c2 0a2
 10 | 7 | fdfb | 8100 | b9a b88 888
 11 | 7 | fdfb | 8900 | b9a b8a 88a
@@ -730,7 +730,7 @@ t    u1  u2     trg    tbl
 1c | 5 | b07f | e38e | 984 ac4 d82 ac2 39b b9a b9a a9a
 1d | 5 | b07f | eb8e | 984 ac4 d82 ac2 39b b9a b9a a9f
 1e | 5 | fefb | f105 | a88 994 088
-1f | 0 | 0000 | 0000 | 
+1f | 0 | 0000 | 0000 |
 
 heatbrl, heatbrl2, heatbrlo, heatbrlu
 t    u1  u2     trg    tbl
@@ -744,28 +744,28 @@ t    u1  u2     trg    tbl
 07 | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
 08 | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
 09 | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
-0a | 0 | 0000 | 0000 | 
-0b | 0 | 0000 | 0000 | 
+0a | 0 | 0000 | 0000 |
+0b | 0 | 0000 | 0000 |
 0c | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
 0d | a | fff3 | 6880 | b80 ba0
-0e | 0 | 0000 | 0000 | 
-0f | 0 | 0000 | 0000 | 
-10 | 7 | fdfb | 8100 | b9a b88 888 
-11 | 7 | fdfb | 8900 | b9a b8a 88a 
-12 | 7 | f8f7 | 9180 | b80 b94 b94 894 
-13 | 7 | f8f7 | 9980 | b80 b96 b96 896 
-14 | 0 | ffff | a100 | b80 b82 b84 b86 
-15 | f | ffff | a900 | ba0 ba2 ba4 ba6 
-16 | 9 | ffff | b080 | b40 bc0 bc2 
-17 | 6 | ffff | b880 | b60 be0 be2 
-18 | a | ff00 | c480 | 080 882 
-19 | 0 | 0000 | 0000 | 
-1a | 0 | 0000 | 0000 | 
-1b | 0 | 0000 | 0000 | 
-1c | 0 | 0000 | 0000 | 
-1d | 0 | 0000 | 0000 | 
-1e | 0 | 0000 | 0000 | 
-1f | 0 | 0000 | 0000 | 
+0e | 0 | 0000 | 0000 |
+0f | 0 | 0000 | 0000 |
+10 | 7 | fdfb | 8100 | b9a b88 888
+11 | 7 | fdfb | 8900 | b9a b8a 88a
+12 | 7 | f8f7 | 9180 | b80 b94 b94 894
+13 | 7 | f8f7 | 9980 | b80 b96 b96 896
+14 | 0 | ffff | a100 | b80 b82 b84 b86
+15 | f | ffff | a900 | ba0 ba2 ba4 ba6
+16 | 9 | ffff | b080 | b40 bc0 bc2
+17 | 6 | ffff | b880 | b60 be0 be2
+18 | a | ff00 | c480 | 080 882
+19 | 0 | 0000 | 0000 |
+1a | 0 | 0000 | 0000 |
+1b | 0 | 0000 | 0000 |
+1c | 0 | 0000 | 0000 |
+1d | 0 | 0000 | 0000 |
+1e | 0 | 0000 | 0000 |
+1f | 0 | 0000 | 0000 |
 
 legionna, legionnau (commands are the same as heatbrl, triggers are different)
 t    u1  u2     trg    tbl
@@ -779,12 +779,12 @@ t    u1  u2     trg    tbl
 07 | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
 08 | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
 09 | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
-0a | 0 | 0000 | 0000 | 
-0b | 0 | 0000 | 0000 | 
+0a | 0 | 0000 | 0000 |
+0b | 0 | 0000 | 0000 |
 0c | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
 0d | a | fff3 | 6880 | b80 ba0
-0e | 0 | 0000 | 0000 | 
-0f | 0 | 0000 | 0000 | 
+0e | 0 | 0000 | 0000 |
+0f | 0 | 0000 | 0000 |
 10 | 7 | fdfb | 8100 | b9a b88 888
 11 | 7 | fdfb | 8900 | b9a b8a 88a
 12 | 7 | f8f7 | 9180 | b80 b94 b94 894
@@ -794,11 +794,11 @@ t    u1  u2     trg    tbl
 16 | 9 | ffff | b100 | b40 bc0 bc2
 17 | 6 | ffff | b900 | b60 be0 be2
 18 | a | ff00 | c480 | 080 882
-19 | 0 | 0000 | 0000 | 
+19 | 0 | 0000 | 0000 |
 1a | 0 | 0000 | 0000 |
-1b | 0 | 0000 | 0000 | 
-1c | 0 | 0000 | 0000 | 
-1d | 0 | 0000 | 0000 | 
+1b | 0 | 0000 | 0000 |
+1c | 0 | 0000 | 0000 |
+1d | 0 | 0000 | 0000 |
 1e | 0 | 0000 | 0000 |
 1f | 0 | 0000 | 0000 |
 
@@ -815,7 +815,7 @@ t    u1  u2     trg    tbl
 07 | 4 | 007f | 3bb0 | f9c b9c b9c b9c b9c b9c b9c 99c
 08 | 5 | fcdd | 42c2 | f9a b9a b9c b9c b9c 29c
 09 | 5 | fcdd | 4aa0 | f9a b9a b9c b9c b9c 99b
-0a | 0 | 0000 | 0000 | 
+0a | 0 | 0000 | 0000 |
 0b | 0 | 0000 | 0000 |
 0c | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
 0d | a | fff3 | 6880 | b80 ba0
@@ -830,10 +830,10 @@ t    u1  u2     trg    tbl
 16 | 9 | ffff | b100 | b40 bc0 bc2
 17 | 6 | ffff | b900 | b60 be0 be2
 18 | a | ff00 | c480 | 080 882
-19 | 0 | 0000 | 0000 | 
+19 | 0 | 0000 | 0000 |
 1a | 0 | 0000 | 0000 |
-1b | 0 | 0000 | 0000 | 
-1c | 0 | 0000 | 0000 | 
+1b | 0 | 0000 | 0000 |
+1c | 0 | 0000 | 0000 |
 1d | 0 | 0000 | 0000 |
 1e | 0 | 0000 | 0000 |
 1f | 0 | 0000 | 0000 |
@@ -854,7 +854,7 @@ t    u1  u2     trg    tbl
 0b | 5 | fffb | 5905 | 9c8 a84 0a2
 0c | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
 0d | a | fff3 | 6980 | b80 ba0
-0e | 0 | 0000 | 0000 | 
+0e | 0 | 0000 | 0000 |
 0f | 6 | fffb | 7905 | 1a2 2c2 0a2
 10 | 7 | fdfb | 8100 | b9a b88 888
 11 | 7 | fdfb | 8900 | b9a b8a 88a
@@ -871,7 +871,7 @@ t    u1  u2     trg    tbl
 1c | 5 | b07f | e38e | 984 ac4 d82 ac2 39b b9a b9a a9a
 1d | 5 | b07f | eb8e | 984 ac4 d82 ac2 39b b9a b9a a9f
 1e | 5 | fefb | f105 | a88 994 088
-1f | 0 | 0000 | 0000 | 
+1f | 0 | 0000 | 0000 |
 
 raiden2, raiden2a, raiden2b, raiden2c, raiden2d, raiden2e, raiden2f
 t    u1  u2     trg    tbl
@@ -891,18 +891,18 @@ t    u1  u2     trg    tbl
 0d | 0 | 0000 | 0000 |
 0e | 0 | 0000 | 0000 |
 0f | 0 | 0000 | 0000 |
-10 | 7 | fdfb | 8100 | b9a b88 888 
-11 | 7 | fdfb | 8900 | b9a b8a 88a 
-12 | 7 | fefb | 9100 | b80 b94 894 
-13 | 7 | fefb | 9900 | b80 b94 896 
-14 | 0 | 00ff | a100 | b80 b82 b84 b86 
-15 | f | 00ff | a900 | ba0 ba2 ba4 ba6 
-16 | 9 | ffff | b100 | b40 bc0 bc2 
-17 | 6 | ffff | b900 | b60 be0 be2 
-18 | 0 | 0000 | 0000 | 
-19 | 0 | 0000 | 0000 | 
-1a | 0 | 0000 | 0000 | 
-1b | 0 | 0000 | 0000 | 
+10 | 7 | fdfb | 8100 | b9a b88 888
+11 | 7 | fdfb | 8900 | b9a b8a 88a
+12 | 7 | fefb | 9100 | b80 b94 894
+13 | 7 | fefb | 9900 | b80 b94 896
+14 | 0 | 00ff | a100 | b80 b82 b84 b86
+15 | f | 00ff | a900 | ba0 ba2 ba4 ba6
+16 | 9 | ffff | b100 | b40 bc0 bc2
+17 | 6 | ffff | b900 | b60 be0 be2
+18 | 0 | 0000 | 0000 |
+19 | 0 | 0000 | 0000 |
+1a | 0 | 0000 | 0000 |
+1b | 0 | 0000 | 0000 |
 1c | 0 | 0000 | 0000 |
 1d | 0 | 0000 | 0000 |
 1e | 6 | fff7 | f205 | 182 2e0 3c0 0c0 3c0
@@ -924,9 +924,9 @@ t    u1  u2     trg    tbl
 0a | 6 | fff7 | 5205 | 180 2e0 3a0 0a0 3a0
 0b | 6 | fff7 | 5a05 | 180 2e0 3a0 0a0 3a0
 0c | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
-0d | 0 | 0000 | 0000 | 
-0e | 0 | 0000 | 0000 | 
-0f | 6 | fffb | 7e05 | 180 282 080 180 282 
+0d | 0 | 0000 | 0000 |
+0e | 0 | 0000 | 0000 |
+0f | 6 | fffb | 7e05 | 180 282 080 180 282
 10 | 7 | fdfb | 8100 | b9a b88 888
 11 | 7 | fdfb | 8900 | b9a b8a 88a
 12 | 7 | fefb | 9100 | b80 b94 894
@@ -962,7 +962,7 @@ t    u1  u2     trg    tbl
 0c | 8 | f3e7 | 6200 | 380 39a 380 a80 29a
 0d | a | fff3 | 6980 | b80 ba0
 0e | 8 | fdfd | 7100 | b80 a80 b80
-0f | 0 | 0000 | 0000 | 
+0f | 0 | 0000 | 0000 |
 10 | 7 | fdfb | 8100 | b9a b88 888
 11 | 7 | fdfb | 8900 | b9a b8a 88a
 12 | 7 | f8f7 | 9100 | b80 b94 b94 894
@@ -972,9 +972,9 @@ t    u1  u2     trg    tbl
 16 | 9 | ffff | b100 | b40 bc0 bc2
 17 | 6 | ffff | b900 | b60 be0 be2
 18 | a | ff00 | 7c80 | 080 882
-19 | 0 | 0000 | 0000 | 
-1a | 0 | 0000 | 0000 | 
-1b | 0 | 0000 | 0000 | 
+19 | 0 | 0000 | 0000 |
+1a | 0 | 0000 | 0000 |
+1b | 0 | 0000 | 0000 |
 1c | 5 | 06fb | e105 | a88 994 088
 1d | 5 | 05f7 | ede5 | f88 a84 986 08a
 1e | 4 | 00ff | f790 | f80 b84 b84 b84 b84 b84 b84 b84
@@ -1033,7 +1033,7 @@ Table 03 - Same on All games
 (raiden2)  | 6 | fbfb | 1905 | 994 a88 088
 (raidndx)  | 6 | fbfb | 1905 | 994 a88 088
 
-Table 04 - grainbow and heatbrl have a b9c in the 4th slot, triggers differ on v30 hw 
+Table 04 - grainbow and heatbrl have a b9c in the 4th slot, triggers differ on v30 hw
 (grainbow) | 5 | f5df | 2288 | f8a b8a 388 b9c b9a a9a
 (cupsoc)   | 5 | f5df | 2288 | f8a b8a 388 b9a b9a a9a
 (legionna) | 5 | f5df | 2288 | f8a b8a 388 b9a b9a a9a
@@ -1096,9 +1096,9 @@ Table 09 - Same on All games
 Table 0a - Game specific
 (grainbow) | 5 | fefb | 5105 | a80 984 082
 (cupsoc)   | 5 | fefb | 5105 | a80 984 082
-(legionna) | 0 | 0000 | 0000 | 
-(godzilla) | 0 | 0000 | 0000 | 
-(heatbrl)  | 0 | 0000 | 0000 | 
+(legionna) | 0 | 0000 | 0000 |
+(godzilla) | 0 | 0000 | 0000 |
+(heatbrl)  | 0 | 0000 | 0000 |
 (zeroteam) | 6 | fffb | 5105 | 180 2e0 0a0
 (raiden2)  | 6 | fff7 | 5205 | 180 2e0 3a0 0a0 3a0
 (raidndx)  | 6 | fff7 | 5205 | 180 2e0 3a0 0a0 3a0
@@ -1106,9 +1106,9 @@ Table 0a - Game specific
 Table 0b - Game specific
 (grainbow) | 5 | fffb | 5905 | 9c8 a84 0a2
 (cupsoc)   | 5 | fffb | 5905 | 9c8 a84 0a2
-(legionna) | 0 | 0000 | 0000 | 
+(legionna) | 0 | 0000 | 0000 |
 (godzilla) | 0 | 0000 | 0000 |
-(heatbrl)  | 0 | 0000 | 0000 | 
+(heatbrl)  | 0 | 0000 | 0000 |
 (zeroteam) | 6 | ffdb | 5a85 | 180 2e0 0a0 182 2e0 0c0 3c0
 (raiden2)  | 6 | fff7 | 5a05 | 180 2e0 3a0 0a0 3a0
 (raidndx)  | 6 | fff7 | 5a05 | 180 2e0 3a0 0a0 3a0
@@ -1132,56 +1132,56 @@ Table 0d - Zero team uses different trigger, doesn't exist on raiden2/dx
 (heatbrl)  | a | fff3 | 6880 | b80 ba0
 (zeroteam) | a | fff3 | 6980 | b80 ba0
 (raiden2)  | 0 | 0000 | 0000 |
-(raidndx)  | 0 | 0000 | 0000 | 
+(raidndx)  | 0 | 0000 | 0000 |
 
 Table 0e - Zero Team only
-(grainbow) | 0 | 0000 | 0000 | 
-(cupsoc)   | 0 | 0000 | 0000 | 
+(grainbow) | 0 | 0000 | 0000 |
+(cupsoc)   | 0 | 0000 | 0000 |
 (legionna) | 0 | 0000 | 0000 |
-(godzilla) | 0 | 0000 | 0000 | 
-(heatbrl)  | 0 | 0000 | 0000 | 
+(godzilla) | 0 | 0000 | 0000 |
+(heatbrl)  | 0 | 0000 | 0000 |
 (zeroteam) | 8 | fdfd | 7100 | b80 a80 b80
 (raiden2)  | 0 | 0000 | 0000 |
-(raidndx)  | 0 | 0000 | 0000 | 
+(raidndx)  | 0 | 0000 | 0000 |
 
 Table 0f - Same on grainbow/cupsoc, different on raidndx (added compared to raiden2)
 (grainbow) | 6 | fffb | 7905 | 1a2 2c2 0a2
 (cupsoc)   | 6 | fffb | 7905 | 1a2 2c2 0a2
-(legionna) | 0 | 0000 | 0000 | 
+(legionna) | 0 | 0000 | 0000 |
 (godzilla) | 0 | 0000 | 0000 |
-(heatbrl)  | 0 | 0000 | 0000 | 
-(zeroteam) | 0 | 0000 | 0000 | 
+(heatbrl)  | 0 | 0000 | 0000 |
+(zeroteam) | 0 | 0000 | 0000 |
 (raiden2)  | 0 | 0000 | 0000 |
-(raidndx)  | 6 | fffb | 7e05 | 180 282 080 180 282 
+(raidndx)  | 6 | fffb | 7e05 | 180 282 080 180 282
 
 Table 10 - Same on all games
-(grainbow) | 7 | fdfb | 8100 | b9a b88 888 
+(grainbow) | 7 | fdfb | 8100 | b9a b88 888
 (cupsoc)   | 7 | fdfb | 8100 | b9a b88 888
 (legionna) | 7 | fdfb | 8100 | b9a b88 888
 (godzilla) | 7 | fdfb | 8100 | b9a b88 888
 (heatbrl)  | 7 | fdfb | 8100 | b9a b88 888
 (zeroteam) | 7 | fdfb | 8100 | b9a b88 888
-(raiden2)  | 7 | fdfb | 8100 | b9a b88 888 
+(raiden2)  | 7 | fdfb | 8100 | b9a b88 888
 (raidndx)  | 7 | fdfb | 8100 | b9a b88 888
 
 Table 11 - Same on all games
-(grainbow) | 7 | fdfb | 8900 | b9a b8a 88a 
+(grainbow) | 7 | fdfb | 8900 | b9a b8a 88a
 (cupsoc)   | 7 | fdfb | 8900 | b9a b8a 88a
 (legionna) | 7 | fdfb | 8900 | b9a b8a 88a
 (godzilla) | 7 | fdfb | 8900 | b9a b8a 88a
 (heatbrl)  | 7 | fdfb | 8900 | b9a b8a 88a
 (zeroteam) | 7 | fdfb | 8900 | b9a b8a 88a
-(raiden2)  | 7 | fdfb | 8900 | b9a b8a 88a 
+(raiden2)  | 7 | fdfb | 8900 | b9a b8a 88a
 (raidndx)  | 7 | fdfb | 8900 | b9a b8a 88a
 
 Table 12 - Raiden2/DX differ from others (list and trigger)
-(grainbow) | 7 | f8f7 | 9180 | b80 b94 b94 894 
+(grainbow) | 7 | f8f7 | 9180 | b80 b94 b94 894
 (cupsoc)   | 7 | f8f7 | 9180 | b80 b94 b94 894
 (legionna) | 7 | f8f7 | 9180 | b80 b94 b94 894
 (godzilla) | 7 | f8f7 | 9180 | b80 b94 b94 894
 (heatbrl)  | 7 | f8f7 | 9180 | b80 b94 b94 894
 (zeroteam) | 7 | f8f7 | 9100 | b80 b94 b94 894
-(raiden2)  | 7 | fefb | 9100 | b80 b94 894 
+(raiden2)  | 7 | fefb | 9100 | b80 b94 894
 (raidndx)  | 7 | fefb | 9100 | b80 b94 894
 
 Table 13 - Raiden2/DX differ from others , slight changes on legionna and hearbrl too
@@ -1190,9 +1190,9 @@ Table 13 - Raiden2/DX differ from others , slight changes on legionna and hearbr
 (cupsoc)   | 7 | f8f7 | 9980 | b80 b94 b94 896
 (legionna) | 7 | f8f7 | 9980 | b80 b96 b96 896
 (godzilla) | 7 | f8f7 | 9980 | b80 b94 b94 896
-(heatbrl)  | 7 | f8f7 | 9980 | b80 b96 b96 896 
+(heatbrl)  | 7 | f8f7 | 9980 | b80 b96 b96 896
 (zeroteam) | 7 | f8f7 | 9900 | b80 b94 b94 896
-(raiden2)  | 7 | fefb | 9900 | b80 b94 896 
+(raiden2)  | 7 | fefb | 9900 | b80 b94 896
 (raidndx)  | 7 | fefb | 9900 | b80 b94 896
 
 Table 14 - Trigger differs on heatbrl + v30 games, unknown param differs on grainbow + v30 games
@@ -1200,9 +1200,9 @@ Table 14 - Trigger differs on heatbrl + v30 games, unknown param differs on grai
 (cupsoc)   | 0 | ffff | a180 | b80 b82 b84 b86
 (legionna) | 0 | ffff | a180 | b80 b82 b84 b86
 (godzilla) | 0 | ffff | a180 | b80 b82 b84 b86
-(heatbrl)  | 0 | ffff | a100 | b80 b82 b84 b86 
+(heatbrl)  | 0 | ffff | a100 | b80 b82 b84 b86
 (zeroteam) | 0 | ffff | a100 | b80 b82 b84 b86
-(raiden2)  | 0 | 00ff | a100 | b80 b82 b84 b86 
+(raiden2)  | 0 | 00ff | a100 | b80 b82 b84 b86
 (raidndx)  | 0 | 00ff | a100 | b80 b82 b84 b86
 
 Table 15 - Trigger differs on heatbrl + v30 games, unknown param differs on grainbow + v30 games
@@ -1210,9 +1210,9 @@ Table 15 - Trigger differs on heatbrl + v30 games, unknown param differs on grai
 (cupsoc)   | f | ffff | a980 | ba0 ba2 ba4 ba6
 (legionna) | f | ffff | a980 | ba0 ba2 ba4 ba6
 (godzilla) | f | ffff | a980 | ba0 ba2 ba4 ba6
-(heatbrl)  | f | ffff | a900 | ba0 ba2 ba4 ba6 
+(heatbrl)  | f | ffff | a900 | ba0 ba2 ba4 ba6
 (zeroteam) | f | ffff | a900 | ba0 ba2 ba4 ba6
-(raiden2)  | f | 00ff | a900 | ba0 ba2 ba4 ba6 
+(raiden2)  | f | 00ff | a900 | ba0 ba2 ba4 ba6
 (raidndx)  | f | 00ff | a900 | ba0 ba2 ba4 ba6
 
 Table 16 - Trigger differs on heatbrl
@@ -1220,9 +1220,9 @@ Table 16 - Trigger differs on heatbrl
 (cupsoc)   | 9 | ffff | b100 | b40 bc0 bc2
 (legionna) | 9 | ffff | b100 | b40 bc0 bc2
 (godzilla) | 9 | ffff | b100 | b40 bc0 bc2
-(heatbrl)  | 9 | ffff | b080 | b40 bc0 bc2 
+(heatbrl)  | 9 | ffff | b080 | b40 bc0 bc2
 (zeroteam) | 9 | ffff | b100 | b40 bc0 bc2
-(raiden2)  | 9 | ffff | b100 | b40 bc0 bc2 
+(raiden2)  | 9 | ffff | b100 | b40 bc0 bc2
 (raidndx)  | 9 | ffff | b100 | b40 bc0 bc2
 
 Table 17 - Trigger differs on heatbrl
@@ -1230,9 +1230,9 @@ Table 17 - Trigger differs on heatbrl
 (cupsoc)   | 6 | ffff | b900 | b60 be0 be2
 (legionna) | 6 | ffff | b900 | b60 be0 be2
 (godzilla) | 6 | ffff | b900 | b60 be0 be2
-(heatbrl)  | 6 | ffff | b880 | b60 be0 be2 
+(heatbrl)  | 6 | ffff | b880 | b60 be0 be2
 (zeroteam) | 6 | ffff | b900 | b60 be0 be2
-(raiden2)  | 6 | ffff | b900 | b60 be0 be2 
+(raiden2)  | 6 | ffff | b900 | b60 be0 be2
 (raidndx)  | 6 | ffff | b900 | b60 be0 be2
 
 Table 18 - Same for all 68k games, zero team has different trigger, not on Raiden2/DX
@@ -1240,19 +1240,19 @@ Table 18 - Same for all 68k games, zero team has different trigger, not on Raide
 (cupsoc)   | a | ff00 | c480 | 080 882
 (legionna) | a | ff00 | c480 | 080 882
 (godzilla) | a | ff00 | c480 | 080 882
-(heatbrl)  | a | ff00 | c480 | 080 882 
+(heatbrl)  | a | ff00 | c480 | 080 882
 (zeroteam) | a | ff00 | 7c80 | 080 882
-(raiden2)  | 0 | 0000 | 0000 | 
+(raiden2)  | 0 | 0000 | 0000 |
 (raidndx)  | 0 | 0000 | 0000 |
 
 Table 19 - grainbow / cupsoc only
 (grainbow) | 5 | bf7f | cb8f | 984 aa4 d82 aa2 39b b9a b9a a9f
 (cupsoc)   | 5 | bf7f | cb8f | 984 aa4 d82 aa2 39b b9a b9a a9f
-(legionna) | 0 | 0000 | 0000 | 
-(godzilla) | 0 | 0000 | 0000 | 
-(heatbrl)  | 0 | 0000 | 0000 | 
-(zeroteam) | 0 | 0000 | 0000 | 
-(raiden2)  | 0 | 0000 | 0000 | 
+(legionna) | 0 | 0000 | 0000 |
+(godzilla) | 0 | 0000 | 0000 |
+(heatbrl)  | 0 | 0000 | 0000 |
+(zeroteam) | 0 | 0000 | 0000 |
+(raiden2)  | 0 | 0000 | 0000 |
 (raidndx)  | 0 | 0000 | 0000 |
 
 Table 1a - grainbow / cupsoc only
@@ -1260,27 +1260,27 @@ Table 1a - grainbow / cupsoc only
 (cupsoc)   | 5 | fffb | d104 | ac2 9e0 0a2
 (legionna) | 0 | 0000 | 0000 |
 (godzilla) | 0 | 0000 | 0000 |
-(heatbrl)  | 0 | 0000 | 0000 | 
-(zeroteam) | 0 | 0000 | 0000 | 
-(raiden2)  | 0 | 0000 | 0000 | 
+(heatbrl)  | 0 | 0000 | 0000 |
+(zeroteam) | 0 | 0000 | 0000 |
+(raiden2)  | 0 | 0000 | 0000 |
 (raidndx)  | 0 | 0000 | 0000 |
 
 Table 1b - grainbow / cupsoc only
 (grainbow) | 5 | 7ff7 | dde5 | f80 aa2 984 0c2
 (cupsoc)   | 5 | 7ff7 | dde5 | f80 aa2 984 0c2
-(legionna) | 0 | 0000 | 0000 | 
-(godzilla) | 0 | 0000 | 0000 | 
-(heatbrl)  | 0 | 0000 | 0000 | 
-(zeroteam) | 0 | 0000 | 0000 | 
-(raiden2)  | 0 | 0000 | 0000 | 
+(legionna) | 0 | 0000 | 0000 |
+(godzilla) | 0 | 0000 | 0000 |
+(heatbrl)  | 0 | 0000 | 0000 |
+(zeroteam) | 0 | 0000 | 0000 |
+(raiden2)  | 0 | 0000 | 0000 |
 (raidndx)  | 0 | 0000 | 0000 |
 
 Table 1c - grainbow / cupsoc are the same, different on zero team
 (grainbow) | 5 | b07f | e38e | 984 ac4 d82 ac2 39b b9a b9a a9a
 (cupsoc)   | 5 | b07f | e38e | 984 ac4 d82 ac2 39b b9a b9a a9a
-(legionna) | 0 | 0000 | 0000 | 
-(godzilla) | 0 | 0000 | 0000 | 
-(heatbrl)  | 0 | 0000 | 0000 | 
+(legionna) | 0 | 0000 | 0000 |
+(godzilla) | 0 | 0000 | 0000 |
+(heatbrl)  | 0 | 0000 | 0000 |
 (zeroteam) | 5 | 06fb | e105 | a88 994 088
 (raiden2)  | 0 | 0000 | 0000 |
 (raidndx)  | 0 | 0000 | 0000 |
@@ -1288,9 +1288,9 @@ Table 1c - grainbow / cupsoc are the same, different on zero team
 Table 1d - grainbow / cupsoc are the same, different on zero team
 (grainbow) | 5 | b07f | eb8e | 984 ac4 d82 ac2 39b b9a b9a a9f
 (cupsoc)   | 5 | b07f | eb8e | 984 ac4 d82 ac2 39b b9a b9a a9f
-(legionna) | 0 | 0000 | 0000 | 
+(legionna) | 0 | 0000 | 0000 |
 (godzilla) | 0 | 0000 | 0000 |
-(heatbrl)  | 0 | 0000 | 0000 | 
+(heatbrl)  | 0 | 0000 | 0000 |
 (zeroteam) | 5 | 05f7 | ede5 | f88 a84 986 08a
 (raiden2)  | 0 | 0000 | 0000 |
 (raidndx)  | 0 | 0000 | 0000 |
@@ -1300,16 +1300,16 @@ Table 1e - grainbow / cupsoc are the same, different on zero team, different on 
 (cupsoc)   | 5 | fefb | f105 | a88 994 088
 (legionna) | 0 | 0000 | 0000 |
 (godzilla) | 0 | 0000 | 0000 |
-(heatbrl)  | 0 | 0000 | 0000 | 
+(heatbrl)  | 0 | 0000 | 0000 |
 (zeroteam) | 4 | 00ff | f790 | f80 b84 b84 b84 b84 b84 b84 b84
 (raiden2)  | 6 | fff7 | f205 | 182 2e0 3c0 0c0 3c0
 (raidndx)  | 6 | fff7 | f205 | 182 2e0 3c0 0c0 3c0
 
 Table 1f - zeroteam specific
-(grainbow) | 0 | 0000 | 0000 | 
-(cupsoc)   | 0 | 0000 | 0000 | 
+(grainbow) | 0 | 0000 | 0000 |
+(cupsoc)   | 0 | 0000 | 0000 |
 (legionna) | 0 | 0000 | 0000 |
-(godzilla) | 0 | 0000 | 0000 | 
+(godzilla) | 0 | 0000 | 0000 |
 (heatbrl)  | 0 | 0000 | 0000 |
 (zeroteam) | 6 | 00ff | fc84 | 182 280
 (raiden2)  | 0 | 0000 | 0000 |
@@ -1338,12 +1338,12 @@ this for a protection check, other games (Denjin Makai, Raiden 2) use it for sco
 Protection Part 3: Private Buffer DMA + RAM Clear
 (todo, expand on this)
 
-address ranges can be specified which allows DMA Fill / Clear operations to be performed, as well as transfering 
+address ranges can be specified which allows DMA Fill / Clear operations to be performed, as well as transfering
 tilemap+palette data to private buffers for rendering.  If you don't use these nothing gets updated on the real
 hardware!.  These don't currently make much sense because the hardware specifies ranges which aren't mapped, or
 contain nothing.  It's possible the original hardware has mirroring which this function relies on.
 
-the DMA to private buffer operations are currently ignored due to 
+the DMA to private buffer operations are currently ignored due to
 if ((cop_clearfill_lasttrigger==0x14) || (cop_clearfill_lasttrigger==0x15)) return;
 
 ----
@@ -1442,7 +1442,7 @@ static void copd2_set_tableoffset(running_machine *machine, UINT16 data)
 			int ii;
 			printf("%02x | %01x | %04x | %04x | ", i, copd2_table_2[i], copd2_table_3[i], copd2_table_4[i]);
 
-			
+
 			for (ii=0;ii<0x8;ii++)
 			{
 				printf("%03x ", copd2_table[i*8 + ii]);

@@ -1874,7 +1874,7 @@ ROM_START( polepos2bi )
 	ROM_LOAD( "09.bin",      0xa000, 0x2000, CRC(7053e219) SHA1(97700fbe887e2d11c9f9a0937147725f6787f081) )
 	ROM_LOAD( "08.bin",      0xc000, 0x2000, CRC(5fe9b365) SHA1(1a3ac099a6bb506a5f71c12c6fb14d014172371c) )
 	ROM_LOAD( "07.bin",      0xe000, 0x2000, CRC(ca14ca7b) SHA1(e58e40fdf1385ae9b080225d9ffe3ec5b122bf69) )
-	
+
 	ROM_REGION( 0x5000, "gfx5", 0 ) 	/* road generation ROMs needed at runtime */
 	ROM_LOAD( "03.bin",   0x0000, 0x2000, CRC(ee6b3315) SHA1(9cc26c6d3604c0f60d716f86e67e9d9c0487f87d) )    /* road control */
 	ROM_LOAD( "02.bin",   0x2000, 0x2000, CRC(6d1e7042) SHA1(90113ff0c93ed86d95067290088705bb5e6608d1) )    /* road bits 1 */
@@ -1903,7 +1903,7 @@ ROM_START( polepos2bi )
 	ROM_LOAD( "74s287-b.bin",   0x0000, 0x0100, CRC(8568decc) SHA1(0aac1fa082858d4d201e21511c609a989f9a1535) )    /* Namco sound */
 
 	ROM_REGION( 0x4000, "engine", 0 ) /* these roms are both the same on the original sets, but here they differ */
-	ROM_LOAD( "pp4-15.bin",   0x0000, 0x2000, CRC(5d79e1ad) SHA1(0323bdf3b9aca298b788bb07020653a43114c952) )	
+	ROM_LOAD( "pp4-15.bin",   0x0000, 0x2000, CRC(5d79e1ad) SHA1(0323bdf3b9aca298b788bb07020653a43114c952) )
 	ROM_LOAD( "pp4-16.bin",   0x2000, 0x2000, CRC(7d93bc1c) SHA1(dad7c0aa24aef593c84e21f7f8858ca7ada86364) )    /* engine sound */
 
 	ROM_REGION( 0x6000, "52xx", ROMREGION_ERASEFF )

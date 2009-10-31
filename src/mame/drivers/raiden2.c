@@ -869,7 +869,7 @@ static WRITE16_HANDLER( mcu_prog_w )
 static WRITE16_HANDLER( mcu_prog_w2 )
 {
 	mcu_prog[mcu_prog_offs*2+1] = data;
-	
+
 	// both new zero team and raiden2/dx v33 version upload the same table..
 #if 1
     {
@@ -922,8 +922,8 @@ static READ16_HANDLER( nzerotea_unknown_r )
 
 
 static ADDRESS_MAP_START( nzerotea_mem, ADDRESS_SPACE_PROGRAM, 16 )
-//	AM_RANGE(0x00400, 0x007ff) AM_READWRITE(raiden2_mcu_r, raiden2_mcu_w) AM_BASE(&cop_mcu_ram)
-	
+//  AM_RANGE(0x00400, 0x007ff) AM_READWRITE(raiden2_mcu_r, raiden2_mcu_w) AM_BASE(&cop_mcu_ram)
+
 	/* results from cop? */
 	AM_RANGE(0x00430, 0x00431) AM_READ(nzerotea_unknown_r)
 	AM_RANGE(0x00432, 0x00433) AM_READ(nzerotea_unknown_r)
@@ -942,7 +942,7 @@ static ADDRESS_MAP_START( nzerotea_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00744, 0x00745) AM_READ(r2_playerin_r)
 	AM_RANGE(0x0074c, 0x0074d) AM_READ(rdx_v33_system_r)
 	AM_RANGE(0x00762, 0x00763) AM_READ(nzerotea_unknown_r)
-	
+
 	AM_RANGE(0x00788, 0x00789) AM_READ(nzerotea_unknown_r)
 	AM_RANGE(0x00794, 0x00795) AM_READ(nzerotea_unknown_r)
 

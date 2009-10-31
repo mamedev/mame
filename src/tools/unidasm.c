@@ -536,7 +536,7 @@ int main(int argc, char *argv[])
 		if (numbytes == 0)
 			numbytes = displaychunk;
 		numchunks = numbytes / displaychunk;
-		
+
 		// non-flipped case
 		if (!opts.flipped)
 		{
@@ -582,13 +582,13 @@ int main(int argc, char *argv[])
 				}
 			}
 		}
-		
+
 		// flipped case
 		else
 		{
 			// output the disassembly and address
 			printf("\t%-40s ; %08X", buffer, curpc);
-			
+
 			// output the raw bytes
 			if (!opts.norawbytes)
 			{

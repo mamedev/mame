@@ -1108,7 +1108,7 @@ ROM_END
 
 // original dump of epr-14674.ic1 had CRC(c2b9a802) SHA1(108cc844c944125f9d271a2f2db094301294e8c2)
 // with the byte at offset 3 being F6 instead of Fe, this seems like a bad dump when compared to the Genesis rom which
-// has been verified on multiple carts, chances are the ROM had developed a fault.  
+// has been verified on multiple carts, chances are the ROM had developed a fault.
 
 ROM_START( mt_tout ) /* Turbo Outrun */
 	MEGATECH_BIOS
