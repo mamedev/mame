@@ -160,26 +160,31 @@ static const double DCTime[] =
 
 /* Notes about the LFO Frequency Table below;
 
-    There appears to be at least 2 errors in the table from the original manual.
+    There are 2 known errors in the LFO table listed in the original manual.
 
-    Both 201 & 202 where listed as 3.74490.  202 has be changed to 3.91513 which was computed based on formulas by OG & Nicola
-    232 was listed as 13.35547.  We use 14.35547 as this is the correct value based on the formula listed below:
+    Both 201 & 202 were listed as 3.74490.  202 has be corrected to 3.91513
+    232 was listed as 13.35547 but has been replace with 14.35547.
+
+  Corrections are computed values based on formulas by Olivier Galibert & Nicola Salmoria listed below:
 
 LFO period seems easy to compute:
 
-int lfo_period(int entry)
-{
-  int ma, ex;
-  entry = 256-entry;
-  ma = entry & 15;
-  ex = entry >> 4;
-  if(ex)
-    return (ma | 16) << (ex+6);
-  else
-    return ma << 7;
-}
+Olivier Galibert's version                     Nicola Salmoria's version
 
-lfo_freq = 44100 / lfo_period
+int lfo_period(int entry)             or       int calc_lfo_period(int entry)
+{                                                {
+  int ma, ex;                                      entry = 256 - entry;
+  entry = 256-entry;
+  ma = entry & 15;                                 if (entry < 16)
+                                                   {
+  ex = entry >> 4;                                    return (entry & 0x0f) << 7;
+  if(ex)                                           }
+    return (ma | 16) << (ex+6);                    else
+  else                                             {
+    return ma << 7;                                   int shift = 6 + (entry >> 4);
+}                                                     return (0x10 + (entry & 0x0f)) << shift;
+                                                   }
+lfo_freq = 44100 / lfo_period                    }
 
 */
 
