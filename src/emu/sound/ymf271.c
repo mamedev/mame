@@ -163,15 +163,15 @@ static const double DCTime[] =
     There are 2 known errors in the LFO table listed in the original manual.
 
     Both 201 & 202 were listed as 3.74490.  202 has be corrected to 3.91513
-    232 was listed as 13.35547 but has been replace with 14.35547.
+    232 was listed as 13.35547 but has been replaced with 14.35547.
 
   Corrections are computed values based on formulas by Olivier Galibert & Nicola Salmoria listed below:
 
 LFO period seems easy to compute:
 
-Olivier Galibert's version                     Nicola Salmoria's version
+Olivier Galibert's version                       Nicola Salmoria's version
 
-int lfo_period(int entry)             or       int calc_lfo_period(int entry)
+int lfo_period(int entry)             or         int calc_lfo_period(int entry)
 {                                                {
   int ma, ex;                                      entry = 256 - entry;
   entry = 256-entry;
