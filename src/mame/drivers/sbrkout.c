@@ -568,4 +568,4 @@ ROM_END
  *************************************/
 
 GAMEL( 1978, sbrkout, 0, sbrkout, sbrkout, 0, ROT270, "Atari", "Super Breakout (rev 04)", GAME_SUPPORTS_SAVE, layout_sbrkout )
-GAMEL( 1978, sbrkout3, 0, sbrkout, sbrkout, 0, ROT270, "Atari", "Super Breakout (rev 03)", GAME_SUPPORTS_SAVE, layout_sbrkout )
+GAMEL( 1978, sbrkout3, sbrkout, sbrkout, sbrkout, 0, ROT270, "Atari", "Super Breakout (rev 03)", GAME_SUPPORTS_SAVE, layout_sbrkout )
