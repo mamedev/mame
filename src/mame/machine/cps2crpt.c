@@ -757,6 +757,7 @@ static const struct game_keys keys_table[] =
 	{ "ssf2j",    { 0x01234567,0x89abcdef }, 0x400000 },	// 0838 0007 2000  btst    #7,$2000
 	{ "ssf2jr1",  { 0x01234567,0x89abcdef }, 0x400000 },	// 0838 0007 2000  btst    #7,$2000
 	{ "ssf2jr2",  { 0x01234567,0x89abcdef }, 0x400000 },	// 0838 0007 2000  btst    #7,$2000
+	{ "ssf2h",    { 0x56789abc,0xdef01234 }, 0x400000 },	// 0838 0007 2000  btst    #7,$2000
 	{ "ssf2tb",   { 0x89abcdef,0x01234567 }, 0x400000 },	// 0838 0007 2000  btst    #7,$2000
 	{ "ssf2tbr1", { 0x89abcdef,0x01234567 }, 0x400000 },	// 0838 0007 2000  btst    #7,$2000
 	{ "ssf2tbj",  { 0x6789abcd,0xef012345 }, 0x400000 },	// 0838 0007 2000  btst    #7,$2000
@@ -862,6 +863,7 @@ static const struct game_keys keys_table[] =
 	{ "megaman2", { 0x50501cac,0xed346550 }, 0x100000 },	// 0C80 0164 7101  cmpi.l  #$01647101,D0
 	{ "megaman2a",{ 0x3f148a2b,0xd6790a15 }, 0x100000 },	// 0C80 0164 7101  cmpi.l  #$01647101,D0
 	{ "rckman2j", { 0x319eca73,0x10551270 }, 0x100000 },	// 0C80 0164 7101  cmpi.l  #$01647101,D0
+	{ "megaman2h",{          0,         0 }, 0x100000 },	// 0C80 0164 7101  cmpi.l  #$01647101,D0
 	{ "qndream",  { 0x5804ea73,0xf66b0798 }, 0x080000 },	// 0C81 1973 0827  cmpi.l  #$19730827,D1
 	{ "sfa2",     { 0xfc4acf9c,0x3bfbe1f9 }, 0x100000 },	// 0C80 3039 9783  cmpi.l  #$30399783,D0
 	{ "sfa2u",    { 0x1bbf3d96,0x8af4614a }, 0x100000 },	// 0C80 3039 9783  cmpi.l  #$30399783,D0
