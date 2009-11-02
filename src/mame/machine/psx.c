@@ -25,10 +25,6 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 	}
 }
 
-/******************
-* DEFINES
-*/
-
 UINT32 *g_p_n_psxram;
 size_t g_n_psxramsize;
 
