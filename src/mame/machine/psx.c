@@ -25,6 +25,10 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 	}
 }
 
+/******************
+* DEFINES
+*/
+
 UINT32 *g_p_n_psxram;
 size_t g_n_psxramsize;
 
@@ -87,7 +91,7 @@ WRITE32_HANDLER( psx_irq_w )
 	case 0x01:
 		verboselog( machine, 2, "psx irq mask ( %08x, %08x ) %08x -> %08x\n", data, mem_mask, m_n_irqmask, ( m_n_irqmask & ~mem_mask ) | data );
 		m_n_irqmask = ( m_n_irqmask & ~mem_mask ) | data;
-		if( ( m_n_irqmask & ~( 0x1 | 0x08 | 0x10 | 0x20 | 0x40 | 0x80 | 0x100 | 0x200 | 0x400 ) ) != 0 )
+		if( ( m_n_irqmask &~ PSX_IRQ_MASK ) != 0 )
 		{
 			verboselog( machine, 0, "psx_irq_w( %08x, %08x, %08x ) unknown irq\n", offset, data, mem_mask );
 		}
@@ -175,7 +179,7 @@ static void dma_interrupt_update( running_machine *machine )
 	{
 		verboselog( machine, 2, "dma_interrupt_update( %02x, %02x ) interrupt triggered\n", n_int, n_mask );
 		m_n_dicr |= 0x80000000;
-		psx_irq_set( machine, 0x0008 );
+		psx_irq_set( machine, PSX_IRQ_DMA );
 	}
 	else if( ( m_n_dicr & 0x80000000 ) != 0 )
 	{
@@ -578,7 +582,7 @@ static TIMER_CALLBACK( root_finished )
 	if( ( m_p_n_root_mode[ n_counter ] & RC_IRQOVERFLOW ) != 0 ||
 		( m_p_n_root_mode[ n_counter ] & RC_IRQTARGET ) != 0 )
 	{
-		psx_irq_set( machine, 0x10 << n_counter );
+		psx_irq_set( machine, (n_counter == 3) ? PSX_IRQ_ROOTCOUNTER3 : (PSX_IRQ_ROOTCOUNTER0 << n_counter) );
 	}
 }
 
@@ -692,11 +696,11 @@ static void sio_interrupt( running_machine *machine, int n_port )
 	m_p_n_sio_status[ n_port ] |= SIO_STATUS_IRQ;
 	if( n_port == 0 )
 	{
-		psx_irq_set( machine, 0x80 );
+		psx_irq_set( machine, PSX_IRQ_SIO0 );
 	}
 	else
 	{
-		psx_irq_set( machine, 0x100 );
+		psx_irq_set( machine, PSX_IRQ_SIO1 );
 	}
 }
 

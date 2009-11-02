@@ -22,6 +22,18 @@ extern void psx_lightgun_set( int, int );
 
 /*----------- defined in machine/psx.c -----------*/
 
+#define PSX_IRQ_ROOTCOUNTER3	0x0001
+#define PSX_IRQ_CDROM			0x0004
+#define PSX_IRQ_DMA				0x0008
+#define PSX_IRQ_ROOTCOUNTER2	0x0010
+#define PSX_IRQ_ROOTCOUNTER1	0x0020
+#define PSX_IRQ_ROOTCOUNTER0	0x0040
+#define PSX_IRQ_SIO0			0x0080
+#define PSX_IRQ_SIO1			0x0100
+#define PSX_IRQ_SPU				0x0200
+#define PSX_IRQ_EXTCD			0x0400
+#define PSX_IRQ_MASK			(PSX_IRQ_ROOTCOUNTER3 | PSX_IRQ_CDROM | PSX_IRQ_DMA | PSX_IRQ_ROOTCOUNTER2 | PSX_IRQ_ROOTCOUNTER1 | PSX_IRQ_ROOTCOUNTER0 | PSX_IRQ_SIO0 | PSX_IRQ_SIO1 | PSX_IRQ_SPU | PSX_IRQ_EXTCD)
+
 extern UINT32 *g_p_n_psxram;
 extern size_t g_n_psxramsize;
 typedef void ( *psx_dma_read_handler )( running_machine *, UINT32, INT32 );
