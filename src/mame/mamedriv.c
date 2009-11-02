@@ -5582,6 +5582,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gradius4 )	/* GX837 (c)1999 */
 	DRIVER( sscope )	/* GX830 (c)1999 */
 	DRIVER( sscopea )	/* GX830 (c)1999 */
+	DRIVER( sscopeb )	/* GX830 (c)1999 */
 	DRIVER( sscope2 )	/* GX931 (c)2000 */
 	DRIVER( racingj )	/* GX676 (c)1998 */
 	DRIVER( racingj2 )	/* GX888 (c)1999 */
