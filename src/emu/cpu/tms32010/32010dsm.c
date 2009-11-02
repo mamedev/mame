@@ -255,7 +255,7 @@ CPU_DISASSEMBLE( tms32010 )
 	}
 	if (op == -1)
 	{
-		sprintf(buffer, "dw   $%04X (invalid op)", code);
+		sprintf(buffer, "dw   %04Xh *(invalid op)", code);
 		return cnt | DASMFLAG_SUPPORTED;
 	}
 	buffertmp = buffer;
@@ -313,8 +313,8 @@ CPU_DISASSEMBLE( tms32010 )
 			cp++;
 			switch (*cp++)
 			{
-				case 'A': sprintf(num,"$%02X",a); break;
-				case 'B': sprintf(num,"$%04X",b); break;
+				case 'A': sprintf(num,"%02Xh",a); break; // was $%02X
+				case 'B': sprintf(num,"%04Xh",b); break; // was $%04X
 				case 'D': sprintf(num,"%02Xh",d); break;
 				case 'K': sprintf(num,"%d",k); break;
 				case 'N': sprintf(num,"%s",nextar[n]); break;
