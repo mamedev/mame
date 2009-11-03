@@ -8,6 +8,7 @@
 
 
 CPU     :   68000
+Custom  :   IGS005, IGS006, IGS007, IGS008
 Sound   :   Z80 + M6295 [+ M6295] + YM3812
 NVRAM   :   93C46
 
@@ -683,7 +684,7 @@ ROM_END
 
 /*
 
-    Huang Fei Hong
+    Huang Fei Hong (Alien Challenge?)
 
 */
 
@@ -717,5 +718,5 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1994, lordgun, 0, lordgun, lordgun, lordgun, ROT0, "IGS", "Lord of Gun (USA)", GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 199?, hfh,     0, hfh,     lordgun, 0,       ROT0, "IGS", "Huang Fei Hong",    GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1994, lordgun, 0, lordgun, lordgun, lordgun, ROT0, "IGS", "Lord of Gun (USA)",                 GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 199?, hfh,     0, hfh,     lordgun, 0,       ROT0, "IGS", "Huang Fei Hong (Alien Challenge?)", GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )

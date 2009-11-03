@@ -8121,8 +8121,16 @@ Other Sun games
 	DRIVER( stellecu )	/* (c) 1998 */
 	DRIVER( iqblock )	/* (c) 1993 */
 	DRIVER( grndtour )	/* (c) 1993 */
+
+	/* IGS005 + IGS006 + IGS007 + IGS008 Games */
+	DRIVER( lordgun )	/* (c) 1994 */
+	DRIVER( hfh )		/* (c) 199? */
+
+	/* IGS009 Games */
 	DRIVER( jingbell )	/* (c) 1995? */
-	DRIVER( gp98 )		/* (c) 19?? */
+	DRIVER( gp98 )		/* (c) 1998 */
+
+	/* IGS011 Games */
 	DRIVER( lhb )		/* (c) 1995 */
 	DRIVER( lhba )		/* (c) 1995 */
 	DRIVER( dbc )		/* (c) 199? */
@@ -8139,22 +8147,21 @@ Other Sun games
 	DRIVER( drgnwrldv10c )	/* (c) 1995 */
 	DRIVER( drgnwrldv11h )	/* (c) 1995 */
 
-	DRIVER( lordgun )	/* (c) 1994 */
-	DRIVER( hfh )		/* (c) 199? */
-	DRIVER( tarzan )
-
-	DRIVER( dunhuang )	/* (c) 199? */
-
+	/* IGS017 / IGS031 Games */
 	DRIVER( iqblocka )	/* (c) 1996 */
 	DRIVER( iqblockf )	/* (c) 1996 */
 	DRIVER( tjsb )		/* (c) 1997 */
-
+	DRIVER( sdmg2 )		/* (c) 1997 */
+	DRIVER( mgdh )		/* (c) 1997 */
+	DRIVER( mgcs )		/* (c) 1998 */
 	DRIVER( lhzb2 )		/* (c) 1998 */
 	DRIVER( lhzb2a )	/* (c) 1998 */
-	DRIVER( mgcs )		/* (c) 1998 */
 	DRIVER( slqz2 )		/* (c) 1998 */
-	DRIVER( sdmg2 )		/* (c) 1997 */
+	DRIVER( tarzan )	/* (c) 1999? */
+	DRIVER( tarzana )	/* (c) 1999? */
+	DRIVER( starzan )	/* (c) 2000? */
 
+	/* IGS027A Games */
 	DRIVER( bigd2 )		/* (c) 2000 */
 	DRIVER( sdwx )		/* (c) 2002 */
 	DRIVER( sddz )		/* (c) 200? */
@@ -8162,7 +8169,6 @@ Other Sun games
 	DRIVER( lhzb4 )		/* (c) 200? */
 	DRIVER( klxyj )		/* (c) 200? */
 	DRIVER( mgfx )		/* (c) 200? */
-	DRIVER( ddz )		/* (c) 200? */
 
 	/* IGS PGM System Games */
 	DRIVER( pgm )
@@ -8207,6 +8213,9 @@ Other Sun games
 	DRIVER( oldsplus )
 	DRIVER( killbldp )
 	DRIVER( svg )
+
+	/* Spirit Tech. Corp. */
+	DRIVER( dunhuang )	/* (c) 1995 */
 
 	/* RamTek games */
 	DRIVER( hitme )		/* (c) 1976 Ramtek */
@@ -8421,6 +8430,8 @@ Other Sun games
 	DRIVER( evosocc )	/* 2001 Evoga. Evolution Soccer */
 	DRIVER( topbladv )	/* 2002 Sonokong. Top Blade V */
 	DRIVER( officeye )
+
+	DRIVER( ddz )		/* (c) 200? */
 
 	DRIVER( psattack )	/* 2004 Uniana */
 

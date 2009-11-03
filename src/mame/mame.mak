@@ -684,12 +684,10 @@ $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/igs_blit.o \
 	$(DRIVERS)/igs017.o \
 	$(DRIVERS)/igs_m027.o \
-	$(DRIVERS)/igs_m68.o \
 	$(DRIVERS)/spoker.o \
 	$(DRIVERS)/iqblock.o $(VIDEO)/iqblock.o \
 	$(DRIVERS)/lordgun.o $(VIDEO)/lordgun.o \
 	$(DRIVERS)/pgm.o $(VIDEO)/pgm.o \
-	$(DRIVERS)/tarzan.o \
 	$(MACHINE)/pgmcrypt.o \
 	$(MACHINE)/pgmprot.o \
 
