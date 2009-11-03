@@ -18,6 +18,7 @@
  *   - This entire notice must remain in the source code.
  *
  *   TODO:
+ *    - Interrupt mode 0 should be able to execute arbitrary opcodes
  *    - If LD A,I or LD A,R is interrupted, P/V flag gets reset, even if IFF2
  *      was set before this instruction
  *    - Ideally, the tiny differences between Z80 types should be supported,
@@ -3316,26 +3317,34 @@ static void take_interrupt(z80_state *z80)
 		/* if neither of these were found we assume a 1 byte opcode */
 		/* was placed on the databus                                */
 		LOG(("Z80 '%s' IM0 $%04x\n", z80->device->tag, irq_vector));
-		switch (irq_vector & 0xff0000)
+
+		/* check for nop */
+		if (irq_vector != 0x00)
 		{
-			case 0xcd0000:	/* call */
-				PUSH(z80, pc);
-				z80->PCD = irq_vector & 0xffff;
-				 /* CALL $xxxx + 'interrupt latency' cycles */
-				z80->icount -= z80->cc_op[0xcd] + z80->cc_ex[0xff];
-				break;
-			case 0xc30000:	/* jump */
-				z80->PCD = irq_vector & 0xffff;
-				/* JP $xxxx + 2 cycles */
-				z80->icount -= z80->cc_op[0xc3] + z80->cc_ex[0xff];
-				break;
-			default:		/* rst (or other opcodes?) */
-				PUSH(z80, pc);
-				z80->PCD = irq_vector & 0x0038;
-				/* RST $xx + 2 cycles */
-				z80->icount -= z80->cc_op[0xff] + z80->cc_ex[0xff];
-				break;
+			switch (irq_vector & 0xff0000)
+			{
+				case 0xcd0000:	/* call */
+					PUSH(z80, pc);
+					z80->PCD = irq_vector & 0xffff;
+					 /* CALL $xxxx cycles */
+					z80->icount -= z80->cc_op[0xcd];
+					break;
+				case 0xc30000:	/* jump */
+					z80->PCD = irq_vector & 0xffff;
+					/* JP $xxxx cycles */
+					z80->icount -= z80->cc_op[0xc3];
+					break;
+				default:		/* rst (or other opcodes?) */
+					PUSH(z80, pc);
+					z80->PCD = irq_vector & 0x0038;
+					/* RST $xx cycles */
+					z80->icount -= z80->cc_op[0xff];
+					break;
+			}
 		}
+
+		/* 'interrupt latency' cycles */
+		z80->icount -= z80->cc_ex[0xff];
 	}
 	z80->WZ=z80->PCD;
 }
