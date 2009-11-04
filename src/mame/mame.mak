@@ -681,7 +681,7 @@ $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/jackie.o \
 	$(DRIVERS)/igspoker.o \
 	$(DRIVERS)/igs009.o \
-	$(DRIVERS)/igs_blit.o \
+	$(DRIVERS)/igs011.o \
 	$(DRIVERS)/igs017.o \
 	$(DRIVERS)/igs_m027.o \
 	$(DRIVERS)/spoker.o \

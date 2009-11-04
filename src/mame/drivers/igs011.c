@@ -1,26 +1,28 @@
 /***************************************************************************
 
-                      -= IGS Blitter Based Hardware =-
+                      -= IGS011 (Blitter) Based Hardware =-
 
                     driver by   Luca Elia (l.elia@tin.it)
             code decrypted by   Olivier Galibert
 
 
 CPU     :   68000
-Sound   :   M6295 or ICS2115 + Optional FM
-Video   :   IGS011
+Sound   :   M6295 + Optional FM or ICS2115
+Custom  :   IGS011 (blitter), IGS003 (8255), IGS012 (optional, near CPU)
 NVRAM   :   Battery for main RAM
 
 ---------------------------------------------------------------------------
-Year + Game               FM Sound    Chips
+Year + Game            PCB        Sound         Chips
 ---------------------------------------------------------------------------
-1995  Da Ban Cheng        -           IGS011
-1995  Long Hu Bang        -           IGS011
-1995  Zhong Guo Long      YM3812      IGS003, IGS011, IGS012, IGSD0301
-1996  Long Hu Bang II     YM2413      IGS011
-1996  Wan Li Chang Cheng  -           ?
-1996  Xing Yen Man Guan   -           ?
-1996  Virtua Bowling      -           IGS011, IGS012
+95 Da Ban Cheng        NO-T0084-1 M6295         IGS011 8255
+95 Long Hu Bang        NO-T0093   M6295         IGS011 8255
+95 Mahjong Ryukobou    NO-T0094   M6295         IGS011 8255
+95 Dragon World        NO-0105-1  M6295 YM3812  IGS011 IGS003  IGS012
+96 Virtua Bowling      NO-0101-1  ICS2115       IGS011 IGS003e IGS012
+96 Long Hu Bang II     NO-0115    M6295 YM2413  IGS011 8255
+96 Wan Li Chang Cheng  ?
+96 Xing Yen Man Guan   ?
+98 Mj Nenrikishu SP    NO-0115-5  M6295 YM2413  IGS011 8255
 ---------------------------------------------------------------------------
 
 To do:
@@ -44,9 +46,9 @@ Notes:
 
 ***************************************************************************/
 
+#include "deprecat.h"
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
 #include "sound/3812intf.h"
@@ -69,23 +71,23 @@ Notes:
 
 static UINT8 *layer[8];
 
-static UINT16 igs_priority, *igs_priority_ram;
+static UINT16 igs011_priority, *igs011_priority_ram;
 
-static UINT8 chmplst2_pen_hi;	// high 3 bits of pens (chmplst2 only)
+static UINT8 lhb2_pen_hi;	// high 3 bits of pens (lhb2 only)
 
 
-static WRITE16_HANDLER( igs_priority_w )
+static WRITE16_HANDLER( igs011_priority_w )
 {
-	COMBINE_DATA(&igs_priority);
+	COMBINE_DATA(&igs011_priority);
 
-//  logerror("%06x: igs_priority = %02x\n", cpu_get_pc(space->cpu), igs_priority);
+//  logerror("%06x: igs011_priority = %02x\n", cpu_get_pc(space->cpu), igs011_priority);
 
 	if (data & ~0x7)
-		logerror("%06x: warning, unknown bits written to igs_priority = %02x\n", cpu_get_pc(space->cpu), igs_priority);
+		logerror("%06x: warning, unknown bits written to igs011_priority = %02x\n", cpu_get_pc(space->cpu), igs011_priority);
 }
 
 
-static VIDEO_START(igs)
+static VIDEO_START( igs011 )
 {
 	int i;
 
@@ -94,10 +96,10 @@ static VIDEO_START(igs)
 		layer[i] = auto_alloc_array(machine, UINT8, 512 * 256);
 	}
 
-	chmplst2_pen_hi = 0;
+	lhb2_pen_hi = 0;
 }
 
-static VIDEO_UPDATE(igs)
+static VIDEO_UPDATE( igs011 )
 {
 #ifdef MAME_DEBUG
 	int layer_enable = -1;
@@ -122,7 +124,7 @@ static VIDEO_UPDATE(igs)
 	}
 #endif
 
-	pri_ram = &igs_priority_ram[(igs_priority & 7) * 512/2];
+	pri_ram = &igs011_priority_ram[(igs011_priority & 7) * 512/2];
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
@@ -173,7 +175,7 @@ static VIDEO_UPDATE(igs)
 
 ***************************************************************************/
 
-static READ16_HANDLER( igs_layers_r )
+static READ16_HANDLER( igs011_layers_r )
 {
 	int layer0 = ((offset & (0x80000/2)) ? 4 : 0) + ((offset & 1) ? 0 : 2);
 
@@ -186,7 +188,7 @@ static READ16_HANDLER( igs_layers_r )
 	return (l0[offset] << 8) | l1[offset];
 }
 
-static WRITE16_HANDLER( igs_layers_w )
+static WRITE16_HANDLER( igs011_layers_w )
 {
 	UINT16 word;
 
@@ -202,6 +204,25 @@ static WRITE16_HANDLER( igs_layers_w )
 	COMBINE_DATA(&word);
 	l0[offset] = word >> 8;
 	l1[offset] = word;
+}
+
+/***************************************************************************
+
+    Palette (r5g5b5)
+    
+    offset + 0x000: xRRRRRGG
+    offset + 0x800: GGGBBBBB
+
+***************************************************************************/
+
+static WRITE16_HANDLER( igs011_palette )
+{
+	int rgb;
+
+	COMBINE_DATA(&paletteram16[offset]);
+
+	rgb = (paletteram16[offset & 0x7ff] & 0xff) | ((paletteram16[offset | 0x800] & 0xff) << 8);
+	palette_set_color_rgb(space->machine,offset & 0x7ff,pal5bit(rgb >> 0),pal5bit(rgb >> 5),pal5bit(rgb >> 10));
 }
 
 /***************************************************************************
@@ -222,17 +243,17 @@ static struct
 }	blitter;
 
 
-static WRITE16_HANDLER( igs_blit_x_w )		{	COMBINE_DATA(&blitter.x);		}
-static WRITE16_HANDLER( igs_blit_y_w )		{	COMBINE_DATA(&blitter.y);		}
-static WRITE16_HANDLER( igs_blit_gfx_lo_w )	{	COMBINE_DATA(&blitter.gfx_lo);	}
-static WRITE16_HANDLER( igs_blit_gfx_hi_w )	{	COMBINE_DATA(&blitter.gfx_hi);	}
-static WRITE16_HANDLER( igs_blit_w_w )		{	COMBINE_DATA(&blitter.w);		}
-static WRITE16_HANDLER( igs_blit_h_w )		{	COMBINE_DATA(&blitter.h);		}
-static WRITE16_HANDLER( igs_blit_depth_w )	{	COMBINE_DATA(&blitter.depth);	}
-static WRITE16_HANDLER( igs_blit_pen_w )	{	COMBINE_DATA(&blitter.pen);		}
+static WRITE16_HANDLER( igs011_blit_x_w )		{	COMBINE_DATA(&blitter.x);		}
+static WRITE16_HANDLER( igs011_blit_y_w )		{	COMBINE_DATA(&blitter.y);		}
+static WRITE16_HANDLER( igs011_blit_gfx_lo_w )	{	COMBINE_DATA(&blitter.gfx_lo);	}
+static WRITE16_HANDLER( igs011_blit_gfx_hi_w )	{	COMBINE_DATA(&blitter.gfx_hi);	}
+static WRITE16_HANDLER( igs011_blit_w_w )		{	COMBINE_DATA(&blitter.w);		}
+static WRITE16_HANDLER( igs011_blit_h_w )		{	COMBINE_DATA(&blitter.h);		}
+static WRITE16_HANDLER( igs011_blit_depth_w )	{	COMBINE_DATA(&blitter.depth);	}
+static WRITE16_HANDLER( igs011_blit_pen_w )	{	COMBINE_DATA(&blitter.pen);		}
 
 
-static WRITE16_HANDLER( igs_blit_flags_w )
+static WRITE16_HANDLER( igs011_blit_flags_w )
 {
 	int x, xstart, xend, xinc, flipx;
 	int y, ystart, yend, yinc, flipy;
@@ -240,10 +261,10 @@ static WRITE16_HANDLER( igs_blit_flags_w )
 	UINT8 trans_pen, clear_pen, pen_hi, *dest;
 	UINT8 pen = 0;
 
-	UINT8 *gfx		=	memory_region(space->machine, "gfx1");
-	UINT8 *gfx2		=	memory_region(space->machine, "gfx2");
-	int gfx_size	=	memory_region_length(space->machine, "gfx1");
-	int gfx2_size	=	memory_region_length(space->machine, "gfx2");
+	UINT8 *gfx		=	memory_region(space->machine, "blitter");
+	UINT8 *gfx2		=	memory_region(space->machine, "blitter_hi");
+	int gfx_size	=	memory_region_length(space->machine, "blitter");
+	int gfx2_size	=	memory_region_length(space->machine, "blitter_hi");
 
 	const rectangle *clip = video_screen_get_visible_area(space->machine->primary_screen);
 
@@ -259,21 +280,21 @@ static WRITE16_HANDLER( igs_blit_flags_w )
 	flipy	=			   blitter.flags & 0x0040;
 	if					(!(blitter.flags & 0x0400)) return;
 
-	pen_hi	=	(chmplst2_pen_hi & 0x07) << 5;
+	pen_hi	=	(lhb2_pen_hi & 0x07) << 5;
 
 	// pixel address
 	z		=	blitter.gfx_lo  + (blitter.gfx_hi << 16);
 
 	// what were they smoking???
 	depth4	=	!((blitter.flags & 0x7) < (4 - (blitter.depth & 0x7))) ||
-				(z & 0x800000);		// see chmplst2
+				(z & 0x800000);		// see lhb2
 
 	z &= 0x7fffff;
 
 	if (depth4)
 	{
 		z	*=	2;
-		if (gfx2 && (blitter.gfx_hi & 0x80))	trans_pen = 0x1f;	// chmplst2
+		if (gfx2 && (blitter.gfx_hi & 0x80))	trans_pen = 0x1f;	// lhb2
 		else									trans_pen = 0x0f;
 
 		clear_pen = blitter.pen | 0xf0;
@@ -344,7 +365,12 @@ static WRITE16_HANDLER( igs_blit_flags_w )
 
 // Inputs
 
-static UINT16 igs_dips_sel, igs_input_sel;
+static UINT16 igs_dips_sel, igs_input_sel, igs_hopper;
+
+static CUSTOM_INPUT( igs_hopper_r )
+{
+	return (igs_hopper && ((video_screen_get_frame_number(field->port->machine->primary_screen)/5)&1)) ? 0x0000 : 0x0001;
+}
 
 static WRITE16_HANDLER( igs_dips_w )
 {
@@ -360,7 +386,7 @@ static READ16_HANDLER( igs_##NUM##_dips_r )												\
 																						\
 	for (i = 0; i < NUM; i++)															\
 		if ((~igs_dips_sel) & (1 << i) )												\
-			ret = input_port_read(space->machine, dipnames[i]);								\
+			ret = input_port_read(space->machine, dipnames[i]);							\
 																						\
 	/* 0x0100 is blitter busy */														\
 	return 	(ret & 0xff) | 0x0000;														\
@@ -371,31 +397,13 @@ IGS_DIPS_R( 3 )
 IGS_DIPS_R( 4 )
 IGS_DIPS_R( 5 )
 
-
-
-// Palette r5g5b5
-// offset+0x000: xRRRRRGG
-// offset+0x800: GGGBBBBB
-
-static WRITE16_HANDLER( igs_palette_w )
-{
-	int rgb;
-
-	COMBINE_DATA(&paletteram16[offset]);
-
-	rgb = (paletteram16[offset & 0x7ff] & 0xff) | ((paletteram16[offset | 0x800] & 0xff) << 8);
-	palette_set_color_rgb(space->machine,offset & 0x7ff,pal5bit(rgb >> 0),pal5bit(rgb >> 5),pal5bit(rgb >> 10));
-}
-
-
-
 /***************************************************************************
 
     Code Decryption
 
 ***************************************************************************/
 
-static void grtwall_decrypt(running_machine *machine)
+static void wlcc_decrypt(running_machine *machine)
 {
 	int i;
 	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
@@ -534,7 +542,7 @@ static void drgnwrld_type1_decrypt(running_machine *machine)
 }
 
 
-static void chmplst2_decrypt(running_machine *machine)
+static void lhb2_decrypt(running_machine *machine)
 {
 	int i,j;
 	int rom_size = 0x80000;
@@ -550,6 +558,47 @@ static void chmplst2_decrypt(running_machine *machine)
 
 		if ((i & 0x0204) == 0x0000)
  			x ^= 0x0008;
+
+		if ((i & 0x3080) != 0x3080 && (i & 0x3090) != 0x3010)
+			x ^= 0x0020;
+
+		j = BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14,13, 8, 11,10, 9, 2, 7,6,5,4,3, 12, 1,0);
+
+		result_data[j] = x;
+	}
+
+	memcpy(src,result_data,rom_size);
+
+	free(result_data);
+}
+
+
+// To be done (similar to lhb2?)
+static void nkishusp_decrypt(running_machine *machine)
+{
+//	lhb_decrypt(machine);
+//	dbc_decrypt(machine);
+//	lhb2_decrypt(machine);
+//	drgnwrld_type1_decrypt(machine);
+//	drgnwrld_type2_decrypt(machine);
+//	drgnwrld_type3_decrypt(machine);
+//	wlcc_decrypt(machine);
+//	vbowlj_decrypt(machine);
+
+	int i,j;
+	int rom_size = 0x80000;
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
+	UINT16 *result_data = alloc_array_or_die(UINT16, rom_size/2);
+
+ 	for (i=0; i<rom_size/2; i++)
+	{
+		UINT16 x = src[i];
+
+		if ((i & 0x0054) != 0x0000 && (i & 0x0056) != 0x0010)
+			x ^= 0x0004;
+
+//		if ((i & 0x0204) == 0x0000)
+//			x ^= 0x0008;
 
 		if ((i & 0x3080) != 0x3080 && (i & 0x3090) != 0x3010)
 			x ^= 0x0020;
@@ -649,6 +698,30 @@ static void dbc_decrypt(running_machine *machine)
 }
 
 
+static void ryukobou_decrypt(running_machine *machine)
+{
+	int i;
+	UINT16 *src = (UINT16 *) memory_region(machine, "maincpu");
+	int rom_size = 0x80000;
+
+	for (i=0; i<rom_size/2; i++)
+	{
+		UINT16 x = src[i];
+
+		if ( (i & 0x00100) && (i & 0x00400) )
+			x ^= 0x0200;
+
+		if ( !(i & 0x00004) || !(i & 0x02000) || (!(i & 0x00080) && !(i & 0x00010) ) )
+			x ^= 0x0020;
+
+		if ( (i & 0x00100) || (i & 0x00040) || ( (i & 0x00010)&&(i & 0x00002) ) )
+			x ^= 0x00004;
+
+		src[i] = x;
+	}
+}
+
+
 /***************************************************************************
 
     Gfx Decryption
@@ -656,11 +729,11 @@ static void dbc_decrypt(running_machine *machine)
 ***************************************************************************/
 
 
-static void chmplst2_decrypt_gfx(running_machine *machine)
+static void lhb2_decrypt_gfx(running_machine *machine)
 {
 	int i;
 	unsigned rom_size = 0x200000;
-	UINT8 *src = (UINT8 *) (memory_region(machine, "gfx1"));
+	UINT8 *src = (UINT8 *) (memory_region(machine, "blitter"));
 	UINT8 *result_data = alloc_array_or_die(UINT8, rom_size);
 
 	for (i=0; i<rom_size; i++)
@@ -675,7 +748,7 @@ static void drgnwrld_gfx_decrypt(running_machine *machine)
 {
 	int i;
 	unsigned rom_size = 0x400000;
-	UINT8 *src = (UINT8 *) (memory_region(machine, "gfx1"));
+	UINT8 *src = (UINT8 *) (memory_region(machine, "blitter"));
 	UINT8 *result_data = alloc_array_or_die(UINT8, rom_size);
 
  	for (i=0; i<rom_size; i++)
@@ -696,7 +769,7 @@ static void drgnwrld_gfx_decrypt(running_machine *machine)
 
 static UINT16 igs_magic[2];
 
-static WRITE16_HANDLER( chmplst2_magic_w )
+static WRITE16_HANDLER( lhb2_magic_w )
 {
 	COMBINE_DATA(&igs_magic[offset]);
 
@@ -712,6 +785,7 @@ static WRITE16_HANDLER( chmplst2_magic_w )
 			{
 				coin_counter_w(0,	data & 0x20);
 				//  coin out        data & 0x40
+				igs_hopper		=	data & 0x80;
 			}
 
 			if ( igs_input_sel & ~0x7f )
@@ -723,15 +797,15 @@ static WRITE16_HANDLER( chmplst2_magic_w )
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				chmplst2_pen_hi = data & 0x07;
+				lhb2_pen_hi = data & 0x07;
 
 				okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), (data & 0x08) ? 0x40000 : 0);
 			}
 
-			if ( chmplst2_pen_hi & ~0xf )
-				logerror("%06x: warning, unknown bits written in chmplst2_pen_hi = %02x\n", cpu_get_pc(space->cpu), chmplst2_pen_hi);
+			if ( lhb2_pen_hi & ~0xf )
+				logerror("%06x: warning, unknown bits written in lhb2_pen_hi = %02x\n", cpu_get_pc(space->cpu), lhb2_pen_hi);
 
-//          popmessage("oki %02x",chmplst2_pen_hi & 0x08);
+//          popmessage("oki %02x",lhb2_pen_hi & 0x08);
 			break;
 
 		default:
@@ -739,7 +813,7 @@ static WRITE16_HANDLER( chmplst2_magic_w )
 	}
 }
 
-static READ16_HANDLER( chmplst2_magic_r )
+static READ16_HANDLER( lhb2_magic_r )
 {
 	switch(igs_magic[0])
 	{
@@ -852,7 +926,7 @@ static READ16_HANDLER( drgnwrld_magic_r )
 
 
 
-static WRITE16_HANDLER( grtwall_magic_w )
+static WRITE16_HANDLER( wlcc_magic_w )
 {
 	COMBINE_DATA(&igs_magic[offset]);
 
@@ -864,12 +938,14 @@ static WRITE16_HANDLER( grtwall_magic_w )
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(0,data & 0x01);
+				coin_counter_w(0,	data & 0x01);
+				//  coin out        data & 0x02
 
 				okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), (data & 0x10) ? 0x40000 : 0);
+				igs_hopper		=	data & 0x20;
 			}
 
-			if (data & ~0x11)
+			if (data & ~0x33)
 				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(space->cpu), data);
 
 //          popmessage("coin %02x",data);
@@ -880,7 +956,7 @@ static WRITE16_HANDLER( grtwall_magic_w )
 	}
 }
 
-static READ16_HANDLER( grtwall_magic_r )
+static READ16_HANDLER( wlcc_magic_r )
 {
 	switch(igs_magic[0])
 	{
@@ -936,12 +1012,12 @@ static WRITE16_HANDLER( lhb_inputs_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0,			 data & 0x20	);
-		//  coin out                 data & 0x40
-		//  pay out?                 data & 0x80
+		coin_counter_w(0,	data & 0x20	);
+		//  coin out        data & 0x40
+		igs_hopper		=	data & 0x80;
 	}
 
-	if ( igs_input_sel & (~0x7f) )
+	if ( igs_input_sel & (~0xff) )
 		logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(space->cpu), igs_input_sel);
 
 //  popmessage("sel2 %02x",igs_input_sel&~0x1f);
@@ -1117,75 +1193,75 @@ static READ16_HANDLER( xymg_magic_r )
 static ADDRESS_MAP_START( drgnwrld, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
-	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs_priority_ram )
-	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs_palette_w ) AM_BASE( &paletteram16 )
+	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
+	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE( &paletteram16 )
 	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
 	AM_RANGE( 0x700000, 0x700003 ) AM_DEVWRITE8( "ym", ym3812_w, 0x00ff )
 	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE( drgnwrld_magic_w )
 	AM_RANGE( 0x800002, 0x800003 ) AM_READ ( drgnwrld_magic_r )
-	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE( igs_priority_w )
+	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE( igs011_priority_w )
 	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE( igs_dips_w )
-	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE( igs_blit_x_w )
-	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE( igs_blit_y_w )
-	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE( igs_blit_w_w )
-	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE( igs_blit_h_w )
-	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE( igs_blit_gfx_lo_w )
-	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE( igs_blit_gfx_hi_w )
-	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE( igs_blit_flags_w )
-	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE( igs_blit_pen_w )
-	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE( igs_blit_depth_w )
+	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE( igs011_blit_x_w )
+	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE( igs011_blit_y_w )
+	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE( igs011_blit_w_w )
+	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE( igs011_blit_h_w )
+	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE( igs011_blit_gfx_lo_w )
+	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE( igs011_blit_gfx_hi_w )
+	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE( igs011_blit_flags_w )
+	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE( igs011_blit_pen_w )
+	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE( igs011_blit_depth_w )
 	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ( igs_3_dips_r )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( chmplst2, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( lhb2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
 	AM_RANGE( 0x200000, 0x200001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
 	AM_RANGE( 0x204000, 0x204003 ) AM_DEVWRITE8( "ym", ym2413_w, 0x00ff )
-	AM_RANGE( 0x208000, 0x208003 ) AM_WRITE( chmplst2_magic_w )
-	AM_RANGE( 0x208002, 0x208003 ) AM_READ ( chmplst2_magic_r )
-	AM_RANGE( 0x20c000, 0x20cfff ) AM_RAM AM_BASE(&igs_priority_ram)
-	AM_RANGE( 0x210000, 0x211fff ) AM_RAM_WRITE( igs_palette_w ) AM_BASE( &paletteram16 )
+	AM_RANGE( 0x208000, 0x208003 ) AM_WRITE( lhb2_magic_w )
+	AM_RANGE( 0x208002, 0x208003 ) AM_READ ( lhb2_magic_r )
+	AM_RANGE( 0x20c000, 0x20cfff ) AM_RAM AM_BASE(&igs011_priority_ram)
+	AM_RANGE( 0x210000, 0x211fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE( &paletteram16 )
 	AM_RANGE( 0x214000, 0x214001 ) AM_READ_PORT( "COIN" )
-	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs_layers_r, igs_layers_w )
-	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE( igs_priority_w )
+	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
+	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE( igs011_priority_w )
 	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE( igs_dips_w )
-	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE( igs_blit_x_w )
-	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE( igs_blit_y_w )
-	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE( igs_blit_w_w )
-	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE( igs_blit_h_w )
-	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE( igs_blit_gfx_lo_w )
-	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE( igs_blit_gfx_hi_w )
-	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE( igs_blit_flags_w )
-	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE( igs_blit_pen_w )
-	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE( igs_blit_depth_w )
+	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE( igs011_blit_x_w )
+	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE( igs011_blit_y_w )
+	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE( igs011_blit_w_w )
+	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE( igs011_blit_h_w )
+	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE( igs011_blit_gfx_lo_w )
+	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE( igs011_blit_gfx_hi_w )
+	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE( igs011_blit_flags_w )
+	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE( igs011_blit_pen_w )
+	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE( igs011_blit_depth_w )
 	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ( igs_3_dips_r )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( grtwall, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( wlcc, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
-	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs_priority_ram )
-	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs_layers_r, igs_layers_w )
-	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs_palette_w ) AM_BASE( &paletteram16 )
+	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
+	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
+	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE( &paletteram16 )
 	AM_RANGE( 0x520000, 0x520001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
-	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE( grtwall_magic_w )
-	AM_RANGE( 0x800002, 0x800003 ) AM_READ ( grtwall_magic_r )
-	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE( igs_priority_w )
+	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE( wlcc_magic_w )
+	AM_RANGE( 0x800002, 0x800003 ) AM_READ ( wlcc_magic_r )
+	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE( igs011_priority_w )
 	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE( igs_dips_w )
-	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE( igs_blit_x_w )
-	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE( igs_blit_y_w )
-	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE( igs_blit_w_w )
-	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE( igs_blit_h_w )
-	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE( igs_blit_gfx_lo_w )
-	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE( igs_blit_gfx_hi_w )
-	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE( igs_blit_flags_w )
-	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE( igs_blit_pen_w )
-	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE( igs_blit_depth_w )
+	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE( igs011_blit_x_w )
+	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE( igs011_blit_y_w )
+	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE( igs011_blit_w_w )
+	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE( igs011_blit_h_w )
+	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE( igs011_blit_gfx_lo_w )
+	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE( igs011_blit_gfx_hi_w )
+	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE( igs011_blit_flags_w )
+	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE( igs011_blit_pen_w )
+	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE( igs011_blit_depth_w )
 	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ( igs_4_dips_r )
 ADDRESS_MAP_END
 
@@ -1201,25 +1277,25 @@ static ADDRESS_MAP_START( lhb, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x010000, 0x010001 ) AM_DEVWRITE( "oki", lhb_okibank_w )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
-	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs_priority_ram )
-	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs_layers_r, igs_layers_w )
-	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs_palette_w ) AM_BASE( &paletteram16 )
+	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
+	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
+	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE( &paletteram16 )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
 	AM_RANGE( 0x700000, 0x700001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x700002, 0x700005 ) AM_READ ( lhb_inputs_r )
 	AM_RANGE( 0x700002, 0x700003 ) AM_WRITE( lhb_inputs_w )
-	AM_RANGE( 0x820000, 0x820001 ) AM_WRITE( igs_priority_w )
+	AM_RANGE( 0x820000, 0x820001 ) AM_WRITE( igs011_priority_w )
 	AM_RANGE( 0x838000, 0x838001 ) AM_WRITE( lhb_irq_enable_w )
 	AM_RANGE( 0x840000, 0x840001 ) AM_WRITE( igs_dips_w )
-	AM_RANGE( 0x858000, 0x858001 ) AM_WRITE( igs_blit_x_w )
-	AM_RANGE( 0x858800, 0x858801 ) AM_WRITE( igs_blit_y_w )
-	AM_RANGE( 0x859000, 0x859001 ) AM_WRITE( igs_blit_w_w )
-	AM_RANGE( 0x859800, 0x859801 ) AM_WRITE( igs_blit_h_w )
-	AM_RANGE( 0x85a000, 0x85a001 ) AM_WRITE( igs_blit_gfx_lo_w )
-	AM_RANGE( 0x85a800, 0x85a801 ) AM_WRITE( igs_blit_gfx_hi_w )
-	AM_RANGE( 0x85b000, 0x85b001 ) AM_WRITE( igs_blit_flags_w )
-	AM_RANGE( 0x85b800, 0x85b801 ) AM_WRITE( igs_blit_pen_w )
-	AM_RANGE( 0x85c000, 0x85c001 ) AM_WRITE( igs_blit_depth_w )
+	AM_RANGE( 0x858000, 0x858001 ) AM_WRITE( igs011_blit_x_w )
+	AM_RANGE( 0x858800, 0x858801 ) AM_WRITE( igs011_blit_y_w )
+	AM_RANGE( 0x859000, 0x859001 ) AM_WRITE( igs011_blit_w_w )
+	AM_RANGE( 0x859800, 0x859801 ) AM_WRITE( igs011_blit_h_w )
+	AM_RANGE( 0x85a000, 0x85a001 ) AM_WRITE( igs011_blit_gfx_lo_w )
+	AM_RANGE( 0x85a800, 0x85a801 ) AM_WRITE( igs011_blit_gfx_hi_w )
+	AM_RANGE( 0x85b000, 0x85b001 ) AM_WRITE( igs011_blit_flags_w )
+	AM_RANGE( 0x85b800, 0x85b801 ) AM_WRITE( igs011_blit_pen_w )
+	AM_RANGE( 0x85c000, 0x85c001 ) AM_WRITE( igs011_blit_depth_w )
 	AM_RANGE( 0x888000, 0x888001 ) AM_READ( igs_5_dips_r )
 ADDRESS_MAP_END
 
@@ -1267,11 +1343,11 @@ static WRITE16_HANDLER( vbowl_pen_hi_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		chmplst2_pen_hi = data & 0x07;
+		lhb2_pen_hi = data & 0x07;
 	}
 
 	if (data & ~0x7)
-		logerror("%06x: warning, unknown bits written to pen_hi = %04x\n", cpu_get_pc(space->cpu), igs_priority);
+		logerror("%06x: warning, unknown bits written to pen_hi = %04x\n", cpu_get_pc(space->cpu), igs011_priority);
 }
 
 static WRITE16_HANDLER( vbowl_link_0_w )	{ }
@@ -1282,9 +1358,9 @@ static WRITE16_HANDLER( vbowl_link_3_w )	{ }
 static ADDRESS_MAP_START( vbowl, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
-	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs_priority_ram )
-	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs_layers_r, igs_layers_w )
-	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs_palette_w ) AM_BASE( &paletteram16 )
+	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
+	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
+	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE( &paletteram16 )
 	AM_RANGE( 0x520000, 0x520001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x600000, 0x600007 ) AM_DEVREADWRITE( "ics", ics2115_word_r, ics2115_word_w )
 	AM_RANGE( 0x700000, 0x700003 ) AM_RAM AM_BASE( &vbowl_trackball )
@@ -1297,17 +1373,17 @@ static ADDRESS_MAP_START( vbowl, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xa10000, 0xa10001 ) AM_WRITE( vbowl_link_2_w )
 	AM_RANGE( 0xa18000, 0xa18001 ) AM_WRITE( vbowl_link_3_w )
 
-	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE( igs_priority_w )
+	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE( igs011_priority_w )
 	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE( igs_dips_w )
-	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE( igs_blit_x_w )
-	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE( igs_blit_y_w )
-	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE( igs_blit_w_w )
-	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE( igs_blit_h_w )
-	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE( igs_blit_gfx_lo_w )
-	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE( igs_blit_gfx_hi_w )
-	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE( igs_blit_flags_w )
-	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE( igs_blit_pen_w )
-	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE( igs_blit_depth_w )
+	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE( igs011_blit_x_w )
+	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE( igs011_blit_y_w )
+	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE( igs011_blit_w_w )
+	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE( igs011_blit_h_w )
+	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE( igs011_blit_gfx_lo_w )
+	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE( igs011_blit_gfx_hi_w )
+	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE( igs011_blit_flags_w )
+	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE( igs011_blit_pen_w )
+	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE( igs011_blit_depth_w )
 
 	AM_RANGE( 0xa80000, 0xa80001 ) AM_READ( vbowl_unk_r )
 	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ( igs_4_dips_r )
@@ -1321,23 +1397,23 @@ static ADDRESS_MAP_START( xymg, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x010000, 0x010001 ) AM_DEVWRITE( "oki", lhb_okibank_w )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM
-	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs_priority_ram )
-	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs_layers_r, igs_layers_w )
-	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs_palette_w ) AM_BASE( &paletteram16 )
+	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
+	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
+	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE( &paletteram16 )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
 	AM_RANGE( 0x700000, 0x700003 ) AM_WRITE( xymg_magic_w )
 	AM_RANGE( 0x700002, 0x700003 ) AM_READ ( xymg_magic_r )
-	AM_RANGE( 0x820000, 0x820001 ) AM_WRITE( igs_priority_w )
+	AM_RANGE( 0x820000, 0x820001 ) AM_WRITE( igs011_priority_w )
 	AM_RANGE( 0x840000, 0x840001 ) AM_WRITE( igs_dips_w )
-	AM_RANGE( 0x858000, 0x858001 ) AM_WRITE( igs_blit_x_w )
-	AM_RANGE( 0x858800, 0x858801 ) AM_WRITE( igs_blit_y_w )
-	AM_RANGE( 0x859000, 0x859001 ) AM_WRITE( igs_blit_w_w )
-	AM_RANGE( 0x859800, 0x859801 ) AM_WRITE( igs_blit_h_w )
-	AM_RANGE( 0x85a000, 0x85a001 ) AM_WRITE( igs_blit_gfx_lo_w )
-	AM_RANGE( 0x85a800, 0x85a801 ) AM_WRITE( igs_blit_gfx_hi_w )
-	AM_RANGE( 0x85b000, 0x85b001 ) AM_WRITE( igs_blit_flags_w )
-	AM_RANGE( 0x85b800, 0x85b801 ) AM_WRITE( igs_blit_pen_w )
-	AM_RANGE( 0x85c000, 0x85c001 ) AM_WRITE( igs_blit_depth_w )
+	AM_RANGE( 0x858000, 0x858001 ) AM_WRITE( igs011_blit_x_w )
+	AM_RANGE( 0x858800, 0x858801 ) AM_WRITE( igs011_blit_y_w )
+	AM_RANGE( 0x859000, 0x859001 ) AM_WRITE( igs011_blit_w_w )
+	AM_RANGE( 0x859800, 0x859801 ) AM_WRITE( igs011_blit_h_w )
+	AM_RANGE( 0x85a000, 0x85a001 ) AM_WRITE( igs011_blit_gfx_lo_w )
+	AM_RANGE( 0x85a800, 0x85a801 ) AM_WRITE( igs011_blit_gfx_hi_w )
+	AM_RANGE( 0x85b000, 0x85b001 ) AM_WRITE( igs011_blit_flags_w )
+	AM_RANGE( 0x85b800, 0x85b801 ) AM_WRITE( igs011_blit_pen_w )
+	AM_RANGE( 0x85c000, 0x85c001 ) AM_WRITE( igs011_blit_depth_w )
 	AM_RANGE( 0x888000, 0x888001 ) AM_READ( igs_3_dips_r )
 	AM_RANGE( 0x1f0000, 0x1f3fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size ) // extra ram
 ADDRESS_MAP_END
@@ -1538,7 +1614,7 @@ static INPUT_PORTS_START( drgnwrld )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( chmplst2 )
+static INPUT_PORTS_START( lhb2 )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x02, "Pay Out (%)" )
 	PORT_DIPSETTING(    0x07, "50" )
@@ -1577,7 +1653,9 @@ static INPUT_PORTS_START( chmplst2 )
 	PORT_DIPNAME( 0x10, 0x10, "Money Type" )	// Decides whether to use bits 0&1 or bit 2
 	PORT_DIPSETTING(    0x10, "Coins" )
 	PORT_DIPSETTING(    0x00, "Notes" )
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPNAME( 0x20, 0x20, "Pay Out Type" )
+	PORT_DIPSETTING(    0x20, "Coins" )
+	PORT_DIPSETTING(    0x00, "Notes" )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -1606,14 +1684,14 @@ static INPUT_PORTS_START( chmplst2 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )	// data clear
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )	// keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE4 )	// haba?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(igs_hopper_r, (void *)0)	// hopper switch
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )	// stats
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )	// clear coin
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)	// clear coin
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
 	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
@@ -1761,7 +1839,7 @@ static INPUT_PORTS_START( drgnwrldj )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( grtwall )
+static INPUT_PORTS_START( wlcc )
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN( 0x01, 0x01 )
 	PORT_DIPUNKNOWN( 0x02, 0x02 )
@@ -1807,7 +1885,9 @@ static INPUT_PORTS_START( grtwall )
 	PORT_DIPNAME( 0x20, 0x20, "Money Type" )
 	PORT_DIPSETTING(    0x20, "Coins" )	// use bits 0-1
 	PORT_DIPSETTING(    0x00, "Notes" )	// use bits 2-3
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPNAME( 0x40, 0x00, "Pay Out Type" )
+	PORT_DIPSETTING(    0x00, "Coins" )
+	PORT_DIPSETTING(    0x40, "Notes" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
@@ -1823,14 +1903,14 @@ static INPUT_PORTS_START( grtwall )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1    )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2    )
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )	// keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD)	// shown in test mode
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)	// shown in test mode
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1     )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2     )
+	PORT_SERVICE_NO_TOGGLE( 0x04,   IP_ACTIVE_LOW )	// keep pressed while booting
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE1  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE2  )	// shown in test mode
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)	// clear coin
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL   ) PORT_CUSTOM(igs_hopper_r, (void *)0)	// hopper switch
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -1839,7 +1919,7 @@ static INPUT_PORTS_START( grtwall )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )	// bet
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
 INPUT_PORTS_END
 
@@ -1959,12 +2039,12 @@ static INPUT_PORTS_START( lhb )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(igs_hopper_r, (void *)0)	// hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 )	// system reset
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )	// keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )	// stats
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1    ) PORT_IMPULSE(5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )	// clear coins
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)	// clear coins
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("0") PORT_CODE(KEYCODE_0_PAD)	// shown in test mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
@@ -2291,7 +2371,7 @@ static INPUT_PORTS_START( xymg )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )	// keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )	// stats
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )	// clear coin
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)	// clear coin
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -2354,84 +2434,82 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-/*
 // for debugging
 
-static const gfx_layout gfxlayout_8x8x4 =
+#if 0
+static const gfx_layout layout_8x8x4 =
 {
-    8,8,
-    RGN_FRAC(1,1),
-    4,
-    { STEP4(0,1) },
-    { 4, 0, 12,  8, 20,16, 28,24 },
-    { STEP8(0,8*4) },
-    8*8*4
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ 4, 0, 12,  8, 20,16, 28,24 },
+	{ STEP8(0,8*4) },
+	8*8*4
 };
-static const gfx_layout gfxlayout_16x16x4 =
+static const gfx_layout layout_16x16x4 =
 {
-    16,16,
-    RGN_FRAC(1,1),
-    4,
-    { STEP4(0,1) },
-    {  4, 0, 12, 8, 20,16, 28,24,
-      36,32, 44,40, 52,48, 60,56    },
-    { STEP16(0,16*4) },
-    16*16*4
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ 4, 0, 12, 8, 20,16, 28,24,
+	  36,32, 44,40, 52,48, 60,56 },
+	{ STEP16(0,16*4) },
+	16*16*4
 };
-static const gfx_layout gfxlayout_8x8x8 =
+static const gfx_layout layout_8x8x8 =
 {
-    8,8,
-    RGN_FRAC(1,1),
-    8,
-    { STEP8(0,1) },
-    { STEP8(0,8) },
-    { STEP8(0,8*8) },
-    8*8*8
+	8,8,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	{ STEP8(0,8*8) },
+	8*8*8
 };
-static const gfx_layout gfxlayout_16x16x8 =
+static const gfx_layout layout_16x16x8 =
 {
-    16,16,
-    RGN_FRAC(1,1),
-    8,
-    { STEP8(0,1) },
-    { STEP16(0,8) },
-    { STEP16(0,16*8) },
-    16*16*8
+	16,16,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0,1) },
+	{ STEP16(0,8) },
+	{ STEP16(0,16*8) },
+	16*16*8
 };
-static const gfx_layout gfxlayout_16x16x1 =
+static const gfx_layout layout_16x16x1 =
 {
-    16,16,
-    RGN_FRAC(1,1),
-    1,
-    { 0 },
-    { STEP16(15,-1) },
-    { STEP16(0,16*1) },
-    16*16*1
+	16,16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP16(15,-1) },
+	{ STEP16(0,16*1) },
+	16*16*1
 };
 
-static GFXDECODE_START( igs_blit )
-    GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x4,   0, 0x80  )
-    GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_16x16x4, 0, 0x80  )
-    GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x8,   0, 0x08  )
-    GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_16x16x8, 0, 0x08  )
+static GFXDECODE_START( igs011_blit )
+	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x4,   0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4, 0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,   0, 0x08 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x8, 0, 0x08 )
 GFXDECODE_END
-static GFXDECODE_START( chmplst2 )
-    GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x4,   0, 0x80  )
-    GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_16x16x4, 0, 0x80  )
-    GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x8,   0, 0x08  )
-    GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_16x16x8, 0, 0x08  )
-    GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_16x16x1, 0, 0x80  )
+static GFXDECODE_START( lhb2 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x4,   0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x4, 0, 0x80 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_8x8x8,   0, 0x08 )
+	GFXDECODE_ENTRY( "blitter", 0, layout_16x16x8, 0, 0x08 )
+	GFXDECODE_ENTRY( "blitter_hi", 0, layout_16x16x1, 0, 0x80 )
 GFXDECODE_END
-*/
+#endif
 
-static MACHINE_DRIVER_START( igs_base )
-	MDRV_CPU_ADD("maincpu",M68000, 22000000/3)
+static MACHINE_DRIVER_START( igs011_base )
+	MDRV_CPU_ADD("maincpu",M68000, XTAL_22MHz/3)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-//  MDRV_GFXDECODE(igs_blit)
-
-
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -2440,20 +2518,20 @@ static MACHINE_DRIVER_START( igs_base )
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 
 	MDRV_PALETTE_LENGTH(0x800)
+//  MDRV_GFXDECODE(igs011_blit)
 
-	MDRV_VIDEO_START( igs )
-	MDRV_VIDEO_UPDATE( igs )
+	MDRV_VIDEO_START( igs011 )
+	MDRV_VIDEO_UPDATE( igs011 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("oki", OKIM6295, 1047600)
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_22MHz/21)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
-static INTERRUPT_GEN( chmplst2_interrupt )
+static INTERRUPT_GEN( lhb2_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{
@@ -2463,13 +2541,13 @@ static INTERRUPT_GEN( chmplst2_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( chmplst2 )
-	MDRV_IMPORT_FROM(igs_base)
+static MACHINE_DRIVER_START( lhb2 )
+	MDRV_IMPORT_FROM(igs011_base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(chmplst2)
-	MDRV_CPU_VBLANK_INT_HACK(chmplst2_interrupt,1+4)	// lev5 frequency drives the music tempo
+	MDRV_CPU_PROGRAM_MAP(lhb2)
+	MDRV_CPU_VBLANK_INT_HACK(lhb2_interrupt,1+4)	// lev5 frequency drives the music tempo
 
-//  MDRV_GFXDECODE(chmplst2)
+//  MDRV_GFXDECODE(lhb2)
 
 	MDRV_SOUND_ADD("ym", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
@@ -2477,17 +2555,17 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( drgnwrld )
-	MDRV_IMPORT_FROM(igs_base)
+	MDRV_IMPORT_FROM(igs011_base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(drgnwrld)
-	MDRV_CPU_VBLANK_INT_HACK(chmplst2_interrupt,1+4)	// lev5 frequency drives the music tempo
+	MDRV_CPU_VBLANK_INT_HACK(lhb2_interrupt,1+4)	// lev5 frequency drives the music tempo
 
 	MDRV_SOUND_ADD("ym", YM3812, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_DRIVER_END
 
 
-static INTERRUPT_GEN( grtwall_interrupt )
+static INTERRUPT_GEN( wlcc_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{
@@ -2496,11 +2574,11 @@ static INTERRUPT_GEN( grtwall_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( grtwall )
-	MDRV_IMPORT_FROM(igs_base)
+static MACHINE_DRIVER_START( wlcc )
+	MDRV_IMPORT_FROM(igs011_base)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(grtwall)
-	MDRV_CPU_VBLANK_INT_HACK(grtwall_interrupt,2)
+	MDRV_CPU_PROGRAM_MAP(wlcc)
+	MDRV_CPU_VBLANK_INT_HACK(wlcc_interrupt,2)
 MACHINE_DRIVER_END
 
 
@@ -2521,7 +2599,7 @@ static INTERRUPT_GEN( lhb_interrupt )
 }
 
 static MACHINE_DRIVER_START( lhb )
-	MDRV_IMPORT_FROM(igs_base)
+	MDRV_IMPORT_FROM(igs011_base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(lhb)
 	MDRV_CPU_VBLANK_INT_HACK(lhb_interrupt,3+1)
@@ -2551,13 +2629,13 @@ static INTERRUPT_GEN( vbowl_interrupt )
 }
 
 static MACHINE_DRIVER_START( vbowl )
-	MDRV_IMPORT_FROM(igs_base)
+	MDRV_IMPORT_FROM(igs011_base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(vbowl)
 	MDRV_CPU_VBLANK_INT_HACK(vbowl_interrupt,3+4)
 
 	MDRV_VIDEO_EOF(vbowl)	// trackball
-//  MDRV_GFXDECODE(chmplst2)
+//  MDRV_GFXDECODE(lhb2)
 
 	MDRV_DEVICE_REMOVE("oki")
 	MDRV_SOUND_ADD("ics", ICS2115, 0)
@@ -2568,20 +2646,20 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( xymg )
-	MDRV_IMPORT_FROM(igs_base)
+	MDRV_IMPORT_FROM(igs011_base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(xymg)
-	MDRV_CPU_VBLANK_INT_HACK(grtwall_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(wlcc_interrupt,2)
 MACHINE_DRIVER_END
 
 
 
-static DRIVER_INIT( chmplst2 )
+static DRIVER_INIT( lhb2 )
 {
 	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
-	chmplst2_decrypt(machine);
-	chmplst2_decrypt_gfx(machine);
+	lhb2_decrypt(machine);
+	lhb2_decrypt_gfx(machine);
 
 	// PROTECTION CHECKS
 	rom[0x034f4/2]	=	0x4e71;		// 0034F4: 660E    bne 3504   (rom test, fills palette with white otherwise)
@@ -2596,6 +2674,13 @@ static DRIVER_INIT( chmplst2 )
 	rom[0x3ed80/2]	=	0x6036;		// 03ED80: 6736    beq 3edb8  (fills palette with red otherwise)
 	rom[0x41d72/2]	=	0x6034;		// 041D72: 6734    beq 41da8  (fills palette with black otherwise)
 	rom[0x44834/2]	=	0x6034;		// 044834: 6734    beq 4486a  (fills palette with black otherwise)
+}
+
+static DRIVER_INIT( nkishusp )
+{
+	nkishusp_decrypt(machine);
+
+	// PROTECTION CHECKS (similar to lhb2?)
 }
 
 static DRIVER_INIT( drgnwrld )
@@ -2670,7 +2755,6 @@ static DRIVER_INIT( drgnwrldv21 )
 	rom[0x2766a/2]	=	0x606c;		// ??
 	rom[0x2a830/2]	=	0x606c;		// ??
 }
-
 
 static DRIVER_INIT( drgnwrldv10c )
 {
@@ -2758,12 +2842,11 @@ static DRIVER_INIT( drgnwrldv20j )
 	rom[0x2a86e/2]	=	0x606c;		// 02A86E: 676C        beq 2a8dc    (ASIC11 CHECK PORT ERROR 2)
 }
 
-
-static DRIVER_INIT( grtwall )
+static DRIVER_INIT( wlcc )
 {
 	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
-	grtwall_decrypt(machine);
+	wlcc_decrypt(machine);
 
 	// PROTECTION CHECKS
 	rom[0x16b96/2]	=	0x6000;		// 016B96: 6700 02FE    beq 16e96  (fills palette with red otherwise)
@@ -2804,7 +2887,7 @@ static DRIVER_INIT( lhba )
 static DRIVER_INIT( vbowl )
 {
 	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-	UINT8  *gfx = (UINT8 *)  memory_region(machine, "gfx1");
+	UINT8  *gfx = (UINT8 *)  memory_region(machine, "blitter");
 	int i;
 
 	vbowlj_decrypt(machine);
@@ -2825,7 +2908,7 @@ static DRIVER_INIT( vbowl )
 static DRIVER_INIT( vbowlj )
 {
 	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
-	UINT8  *gfx = (UINT8 *)  memory_region(machine, "gfx1");
+	UINT8  *gfx = (UINT8 *)  memory_region(machine, "blitter");
 	int i;
 
 	vbowlj_decrypt(machine);
@@ -2839,8 +2922,6 @@ static DRIVER_INIT( vbowlj )
 	// PROTECTION CHECKS
 	rom[0x37b4/2] = 0x4e75;	// 0037B4: 4E56 0000 link    A6, #$0
 }
-
-
 
 static DRIVER_INIT( xymg )
 {
@@ -2902,64 +2983,22 @@ static DRIVER_INIT( dbc )
 //  rom[0x19E90/2]  =   0x00ff;
 }
 
+static DRIVER_INIT( ryukobou )
+{
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
+
+	ryukobou_decrypt(machine);
+
+	// PROTECTION CHECKS
+	rom[0x2df68/2]	=	0x4e75;		// 02DF68: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
+}
+
+
 /***************************************************************************
 
     ROMs Loading
 
 ***************************************************************************/
-
-/***************************************************************************
-
-Champion List II
-IGS, 1996
-
-PCB Layout
-----------
-
-IGS PCB NO-0115
-|---------------------------------------------|
-|                  M6295  IGSS0503.U38        |
-|  UM3567  3.57945MHz                         |
-|                          DSW3               |
-|                          DSW2     PAL       |
-| IGSM0502.U5              DSW1    6264       |
-| IGSM0501.U7     PAL              6264       |
-|                 PAL                         |
-|                 PAL            IGS011       |
-|                 PAL                         |
-|                 PAL                         |
-|                                             |
-|   MC68HC000P10          22MHz  TC524258AZ-10|
-|           6264         8255    TC524258AZ-10|
-|    BATT   6264   MAJ2V185H.U29 TC524258AZ-10|
-|                                TC524258AZ-10|
-|---------------------------------------------|
-
-Notes:
-        68k clock: 7.3333MHz (i.e. 22/3)
-      M6295 clock: 1.0476MHz (i.e. 22/21) \
-         M6295 SS: HIGH                   / Therefore sampling freq = 7.936363636kHz (i.e. 1047600 / 132)
-           UM3567: Compatible with YM2413, clock = 3.57945MHz
-            HSync: 15.78kHz
-            VSync: 60Hz
-
-***************************************************************************/
-
-ROM_START( chmplst2 )
-	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "maj2v185h.u29", 0x00000, 0x80000, CRC(2572d59a) SHA1(1d5362e209dadf8b21c10d1351d4bb038bfcaaef) )
-
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "igsm0501.u7", 0x00000, 0x200000, CRC(1c952bd6) SHA1(a6b6f1cdfb29647e81c032ffe59c94f1a10ceaf8) )
-
-	ROM_REGION( 0x80000, "gfx2", 0 ) // high order bit of graphics (5th bit)
-	/* these are identical ..seems ok as igs number is same, only ic changed */
-	ROM_LOAD( "igsm0502.u4", 0x00000, 0x80000, CRC(5d73ae99) SHA1(7283aa3d6b15ceb95db80756892be46eb997ef15) )
-	ROM_LOAD( "igsm0502.u5", 0x00000, 0x80000, CRC(5d73ae99) SHA1(7283aa3d6b15ceb95db80756892be46eb997ef15) )
-
-	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "igss0503.u38", 0x00000, 0x80000, CRC(c9609c9c) SHA1(f036e682b792033409966e84292a69275eaa05e5) )	// 2 banks
-ROM_END
 
 /***************************************************************************
 
@@ -2992,7 +3031,7 @@ ROM_START( drgnwrld )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "chinadr-v0400.u3", 0x00000, 0x80000, CRC(a6daa2b8) SHA1(0cbfd001c1fd82a6385453d1c2a808add67746af) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "blitter", 0 )
 	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
@@ -3017,7 +3056,7 @@ ROM_START( drgnwrldv30 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "chinadr-v0300.u3", 0x00000, 0x80000, CRC(5ac243e5) SHA1(50cccff0307239187ac2b65331ad2bcc666f8033) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "blitter", 0 )
 	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
@@ -3028,13 +3067,12 @@ ROM_START( drgnwrldv21 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "china-dr-v-0210.u3", 0x00000, 0x80000, CRC(60c2b018) SHA1(58563e3ccb51bd9d8362aa17c23743bb5a593c3b) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "blitter", 0 )
 	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "china-dr-sp.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
 ROM_END
-
 
 /***************************************************************************
 
@@ -3076,7 +3114,7 @@ ROM_START( drgnwrldv10c )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "igs-d0303.u3", 0x00000, 0x80000, CRC(3b3c29bb) SHA1(77b7e58104314303985c283cce3aec40bd7b9334) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "blitter", 0 )
 	//ROM_LOAD( "igs-0301.u39", 0x000000, 0x400000, CRC(655ab941) SHA1(4bbefb27e8971446998508969661042c5111bc72) ) // bad dump
 	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
 
@@ -3115,7 +3153,7 @@ ROM_START( drgnwrldv20j )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "china_jp.v20", 0x00000, 0x80000, CRC(9e018d1a) SHA1(fe14e6344434cabf43685e50fd49c90f05f565be) )
 
-	ROM_REGION( 0x420000, "gfx1", 0 )
+	ROM_REGION( 0x420000, "blitter", 0 )
 	// igs-d0301.u39 wasn't in this set
 	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
 	ROM_LOAD( "china.u44",     0x400000, 0x020000, CRC(10549746) SHA1(aebd83796679c85b43ad514b2771897f94e61294) ) // 1xxxxxxxxxxxxxxxx = 0x00
@@ -3128,7 +3166,7 @@ ROM_START( drgnwrldv21j )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "v-021j", 0x00000, 0x80000, CRC(2f87f6e4) SHA1(d43065b078fdd9605c121988ad3092dce6cf0bf1) )
 
-	ROM_REGION( 0x420000, "gfx1", 0 )
+	ROM_REGION( 0x420000, "blitter", 0 )
 	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
 	ROM_LOAD( "cg",            0x400000, 0x020000, CRC(2dda0be3) SHA1(587b7cab747d4336515c98eb3365341bb6c7e5e4) )
 
@@ -3146,18 +3184,16 @@ ROM_START( drgnwrldv11h )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "c_drgn_hk.u3", 0x00000, 0x80000, CRC(182037ce) SHA1(141b698777533e57493e588d2526523d4bd3e17d) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "blitter", 0 )
 	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
 ROM_END
 
-
-
 /***************************************************************************
 
-    The Great Wall?
+    Wan Li Chang Cheng (The Great Wall)
 
     Other files in the zip:
 
@@ -3168,14 +3204,14 @@ ROM_END
 
 ***************************************************************************/
 
-ROM_START( grtwall )
+ROM_START( wlcc )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "wlcc4096.rom", 0x00000, 0x80000, CRC(3b16729f) SHA1(4ef4e5cbd6ccc65775e36c2c8b459bc1767d6574) )
 	ROM_CONTINUE        (                 0x00000, 0x80000 ) // 1ST+2ND IDENTICAL
 
-	ROM_REGION( 0x280000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x280000, "blitter", ROMREGION_ERASE00 )
 	ROM_LOAD( "m0201-ig.160", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
-	ROM_LOAD( "grtwall.gfx",  0x200000, 0x080000, CRC(1f7ad299) SHA1(ab0a8fb31906519b9352ba172def48456e8d565c) )
+	ROM_LOAD( "wlcc.gfx",  0x200000, 0x080000, CRC(1f7ad299) SHA1(ab0a8fb31906519b9352ba172def48456e8d565c) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "040-c3c2.snd", 0x00000, 0x80000, CRC(220949aa) SHA1(1e0dba168a0687d32aaaed42714ae24358f4a3e7) ) // 2 banks
@@ -3200,7 +3236,7 @@ ROM_START( lhb )
 	// identical to LHB-4096
 	ROM_LOAD16_WORD_SWAP( "v305j-409", 0x00000, 0x80000, CRC(701de8ef) SHA1(4a77160f642f4de02fa6fbacf595b75c0d4a505d) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "blitter", 0 )
 	ROM_LOAD( "m0201-ig.160", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3262,7 +3298,7 @@ ROM_START( lhba )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "maj_v-033c.u30", 0x00000, 0x80000, CRC(02a0b716) SHA1(cd0ee32ea69f66768196b0e9b4df0fae3af84ed3) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "blitter", 0 )
 	ROM_LOAD( "igs_m0201.u15", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3324,12 +3360,161 @@ ROM_START( dbc )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "maj-h_v027h.u30", 0x00000, 0x80000, CRC(5d5ccd5b) SHA1(7a1223923f9a5825fd919ae9a36912284e705382) )
 
-	ROM_REGION( 0x280000, "gfx1", 0 )
+	ROM_REGION( 0x280000, "blitter", 0 )
 	ROM_LOAD( "igs_m0201.u15", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
 	ROM_LOAD( "maj-h_cg.u8",   0x200000, 0x080000, CRC(ee45cc46) SHA1(ed011f758a02026222994aaea0677a4e9580fbda) )	// 1xxxxxxxxxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "igs_m0202.u39", 0x00000, 0x80000, CRC(106ac5f7) SHA1(5796a880c3424e3d2251b2223a0e594957afecaf) ) // 2 banks
+ROM_END
+
+/***************************************************************************
+
+Mahjong Ryukobou
+Alta, 1995
+
+PCB Layout
+----------
+
+IGS PCB NO-T0094
+|------------------------------------|
+|UPC1242  VOL  LM7805  DSW5          |
+|   MAJ-J_SP           DSW4          |
+|  TD62003     M6295   DSW3 CY7C185  |
+|        8255          DSW2 CY7C185  |
+|M                     DSW1 MAJ-J_CG |
+|A                                   |
+|H              IGS011      IGS_M0201|
+|J                               PAL |
+|O                                   |
+|N  MAJ_V030J     22MHz              |
+|G    6264              TC524256     |
+|     6264              TC524256     |
+|     PAL               TC524256     |
+|     PAL      68000P10 TC524256     |
+|     PAL                            |
+|------------------------------------|
+Notes:
+      68000 - clock 7.33333MHz [22/3]
+      M6295 - clock 1.04762MHz [22/21]
+      VSync - 60.0078Hz
+      HSync - 15.620kHz
+
+***************************************************************************/
+
+ROM_START( ryukobou )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "maj_v030j.u30", 0x000000, 0x80000, CRC(186f2b4e) SHA1(380a3d94722d9f5fa5ec206ed0af6dbb8dd81715) )
+
+	ROM_REGION( 0x280000, "blitter", 0 )
+	ROM_LOAD( "igs_m0201.u15", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
+	ROM_LOAD( "maj-j_cg.u8",   0x200000, 0x080000, CRC(3c8de5d1) SHA1(51e43bfe7b5157112ded9a34b7032f73b7ffad11) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "maj-j_sp.u39", 0x000000, 0x80000, CRC(82f670f3) SHA1(d10dd67e40aee0e1c4f4b2c1217ce0935cb86406) )
+ROM_END
+
+/***************************************************************************
+
+Long Hu Bang II
+IGS, 1996
+
+PCB Layout
+----------
+
+IGS PCB NO-0115
+|---------------------------------------------|
+|                  M6295  IGSS0503.U38        |
+|  UM3567  3.57945MHz                         |
+|                          DSW3               |
+|                          DSW2     PAL       |
+| IGSM0502.U5              DSW1    6264       |
+| IGSM0501.U7     PAL              6264       |
+|                 PAL                         |
+|                 PAL            IGS011       |
+|                 PAL                         |
+|                 PAL                         |
+|                                             |
+|   MC68HC000P10          22MHz  TC524258AZ-10|
+|           6264         8255    TC524258AZ-10|
+|    BATT   6264   MAJ2V185H.U29 TC524258AZ-10|
+|                                TC524258AZ-10|
+|---------------------------------------------|
+
+Notes:
+        68k clock: 7.3333MHz (i.e. 22/3)
+      M6295 clock: 1.0476MHz (i.e. 22/21) \
+         M6295 SS: HIGH                   / Therefore sampling freq = 7.936363636kHz (i.e. 1047600 / 132)
+           UM3567: Compatible with YM2413, clock = 3.57945MHz
+            HSync: 15.78kHz
+            VSync: 60Hz
+
+***************************************************************************/
+
+ROM_START( lhb2 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "maj2v185h.u29", 0x00000, 0x80000, CRC(2572d59a) SHA1(1d5362e209dadf8b21c10d1351d4bb038bfcaaef) )
+
+	ROM_REGION( 0x200000, "blitter", 0 )
+	ROM_LOAD( "igsm0501.u7", 0x00000, 0x200000, CRC(1c952bd6) SHA1(a6b6f1cdfb29647e81c032ffe59c94f1a10ceaf8) )
+
+	ROM_REGION( 0x80000, "blitter_hi", 0 ) // high order bit of graphics (5th bit)
+	/* these are identical ..seems ok as igs number is same, only ic changed */
+	ROM_LOAD( "igsm0502.u4", 0x00000, 0x80000, CRC(5d73ae99) SHA1(7283aa3d6b15ceb95db80756892be46eb997ef15) )
+	ROM_LOAD( "igsm0502.u5", 0x00000, 0x80000, CRC(5d73ae99) SHA1(7283aa3d6b15ceb95db80756892be46eb997ef15) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igss0503.u38", 0x00000, 0x80000, CRC(c9609c9c) SHA1(f036e682b792033409966e84292a69275eaa05e5) )	// 2 banks
+ROM_END
+
+/***************************************************************************
+
+Mahjong Nenrikishu SP
+IGS/Alta, 1998
+
+PCB Layout
+----------
+
+IGS PCB NO-0115-5
+|----------------------------------|
+|UPC1242H VOL M6295     SP         |
+|   U3567 LM7805                   |
+|   CG   3.579545MHz   DSW3        |
+|  M0502               DSW2   PAL  |
+|M                     DSW1  6264  |
+|A M0501                     6264  |
+|H              PAL        IGS011  |
+|J              PAL                |
+|O              PAL                |
+|N              PAL                |
+|G                                 |
+|                   22MHz M5M442256|
+|     68000P16            M5M442256|
+|RESET    6264     8255   M5M442256|
+| BATT    6264  V250J     M5M442256|
+|----------------------------------|
+Notes:
+      68000 - Clock 7.3333MHz [22/2]
+      U3567 - YM2413, clock 3.579545MHz
+      M6295 - Clock 1.0476 [22/21]. pin 7 high
+      VSync - 60.0052Hz
+      HSync - 15.620kHz
+
+***************************************************************************/
+
+ROM_START( nkishusp )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "v250j.u29", 0x00000, 0x80000, CRC(500cb919) SHA1(76eed80b59c43e8cc1e258056cfe08b33a651852) )
+
+	ROM_REGION( 0x200000, "blitter", 0 )
+	ROM_LOAD( "m0501.u7", 0x00000, 0x200000, CRC(1c952bd6) SHA1(a6b6f1cdfb29647e81c032ffe59c94f1a10ceaf8) ) // Identical to igsm0501.u7
+
+	ROM_REGION( 0x80000, "blitter_hi", 0 ) // high order bit of graphics (5th bit)
+	ROM_LOAD( "m0502.u6", 0x000000, 0x80000, CRC(5d73ae99) SHA1(7283aa3d6b15ceb95db80756892be46eb997ef15) ) // Identical to igsm0502.u4, igsm0502.u5
+	ROM_LOAD( "cg.u4",    0x000000, 0x80000, CRC(fe60f485) SHA1(d75e5f7a187161137a7f7b54d495d1cb3e1802a4) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "sp.u38", 0x00000, 0x80000, CRC(d80e28e2) SHA1(c03441686e770227db6a2a41922fbb4284710571) )
 ROM_END
 
 /***************************************************************************
@@ -3360,11 +3545,11 @@ ROM_START( vbowl )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "bowlingv101xcm.u45", 0x00000, 0x80000, BAD_DUMP CRC(ab8e3f1f) SHA1(69159e22559d6a26fe2afafd770aa640c192ba4b) )
 
-	ROM_REGION( 0x400000 * 2, "gfx1", 0)
+	ROM_REGION( 0x400000 * 2, "blitter", 0)
 	ROM_LOAD( "vrbowlng.u69", 0x000000, 0x400000, CRC(b0d339e8) SHA1(a26a5e0202a78e8cdc562b10d64e14eadfa4e115) )
 	// extra space to expand every 4 bits to 8
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "blitter_hi", ROMREGION_INVERT )
 	ROM_LOAD( "vrbowlng.u68", 0x000000, 0x100000, CRC(b0ce27e7) SHA1(6d3ef97edd606f384b1e05b152fbea12714887b7) )
 
 	ROM_REGION( 0x400000, "ics", 0 )
@@ -3379,11 +3564,11 @@ ROM_START( vbowlj )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "vrbowlng.u45", 0x00000, 0x80000, CRC(091c19c1) SHA1(5a7bfbee357122e9061b38dfe988c3853b0984b0) ) // second half all 00
 
-	ROM_REGION( 0x400000 * 2, "gfx1", 0)
+	ROM_REGION( 0x400000 * 2, "blitter", 0)
 	ROM_LOAD( "vrbowlng.u69", 0x000000, 0x400000, CRC(b0d339e8) SHA1(a26a5e0202a78e8cdc562b10d64e14eadfa4e115) )
 	// extra space to expand every 4 bits to 8
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_INVERT )
+	ROM_REGION( 0x100000, "blitter_hi", ROMREGION_INVERT )
 	ROM_LOAD( "vrbowlng.u68", 0x000000, 0x100000, CRC(b0ce27e7) SHA1(6d3ef97edd606f384b1e05b152fbea12714887b7) )
 
 	ROM_REGION( 0x400000, "ics", 0 )
@@ -3393,7 +3578,6 @@ ROM_START( vbowlj )
 	ROM_COPY( "ics", 0, 0x200000,0x100000)
 	ROM_COPY( "ics", 0, 0x300000,0x100000)
 ROM_END
-
 
 /***************************************************************************
 
@@ -3411,7 +3595,7 @@ ROM_START( xymg )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "u30-ebac.rom", 0x00000, 0x80000, CRC(7d272b6f) SHA1(15fd1be23cabdc77b747541f5cd9fed6b08be4ad) )
 
-	ROM_REGION( 0x280000, "gfx1", 0 )
+	ROM_REGION( 0x280000, "blitter", 0 )
 	ROM_LOAD( "m0201-ig.160", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
 	ROM_LOAD( "ygxy-u8.rom",  0x200000, 0x080000, CRC(56a2706f) SHA1(98bf4b3153eef53dd449e2538b4b7ff2cc2fe6fa) )
 
@@ -3428,14 +3612,16 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1995, lhb,      0,        lhb,      lhb,      lhb,      ROT0, "IGS",        "Long Hu Bang (V035C)",                 0 )
-GAME( 1995, lhba,     lhb,      lhb,      lhb,      lhba,     ROT0, "IGS",        "Long Hu Bang (V033C)",                 0 )
-GAME( 1995, dbc,      0,        lhb,      lhb,      dbc,      ROT0, "IGS",        "Da Ban Cheng (V027H)",                 0 )
-GAME( 1996, chmplst2, 0,        chmplst2, chmplst2, chmplst2, ROT0, "IGS",        "Long Hu Bang II (V185H)",              0 )
-GAME( 1996, xymg,     0,        xymg,     xymg,     xymg,     ROT0, "IGS",        "Xing Yun Man Guan (V651C)",            0 )
-GAME( 1996, grtwall,  xymg,     grtwall,  grtwall,  grtwall,  ROT0, "IGS",        "Wan Li Chang Cheng (V638C)",           0 )
-GAME( 1996, vbowl,    0,        vbowl,    vbowl,    vbowl,    ROT0, "IGS",        "Virtua Bowling (World, V101XCM)",      GAME_IMPERFECT_SOUND )
-GAME( 1996, vbowlj,   vbowl,    vbowl,    vbowlj,   vbowlj,   ROT0, "IGS / Alta", "Virtua Bowling (Japan, V100JCM)",      GAME_IMPERFECT_SOUND )
+GAME( 1995, lhb,          0,        lhb,      lhb,       lhb,          ROT0, "IGS",        "Long Hu Bang (China, V035C)",          0 )
+GAME( 1995, lhba,         lhb,      lhb,      lhb,       lhba,         ROT0, "IGS",        "Long Hu Bang (China, V033C)",          0 )
+GAME( 1995, dbc,          lhb,      lhb,      lhb,       dbc,          ROT0, "IGS",        "Da Ban Cheng (Hong Kong, V027H)",      0 )
+GAME( 1995, ryukobou,     lhb,      lhb,      lhb,       ryukobou,     ROT0, "IGS / Alta", "Mahjong Ryukobou (Japan, V030J)",      0 )
+GAME( 1996, lhb2,         0,        lhb2,     lhb2,      lhb2,         ROT0, "IGS",        "Long Hu Bang II (Hong Kong, V185H)",   0 )
+GAME( 1996, xymg,         0,        xymg,     xymg,      xymg,         ROT0, "IGS",        "Xing Yun Man Guan (China, V651C)",     0 )
+GAME( 1996, wlcc,         xymg,     wlcc,     wlcc,      wlcc,         ROT0, "IGS",        "Wan Li Chang Cheng (China, V638C)",    0 )
+GAME( 1996, vbowl,        0,        vbowl,    vbowl,     vbowl,        ROT0, "IGS",        "Virtua Bowling (World, V101XCM)",      GAME_IMPERFECT_SOUND )
+GAME( 1996, vbowlj,       vbowl,    vbowl,    vbowlj,    vbowlj,       ROT0, "IGS / Alta", "Virtua Bowling (Japan, V100JCM)",      GAME_IMPERFECT_SOUND )
+GAME( 1998, nkishusp,     0,        lhb2,     lhb2,      nkishusp,     ROT0, "IGS / Alta", "Mahjong Nenrikishu SP",                0 )
 
 GAME( 1997, drgnwrld,     0,        drgnwrld, drgnwrld,  drgnwrld,     ROT0, "IGS",        "Dragon World (World, V040O)",          0 )
 GAME( 1995, drgnwrldv30,  drgnwrld, drgnwrld, drgnwrld,  drgnwrldv30,  ROT0, "IGS",        "Dragon World (World, V030O)",          0 )

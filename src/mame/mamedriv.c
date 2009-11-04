@@ -8133,10 +8133,11 @@ Other Sun games
 	/* IGS011 Games */
 	DRIVER( lhb )		/* (c) 1995 */
 	DRIVER( lhba )		/* (c) 1995 */
+	DRIVER( ryukobou )	/* (c) 1995 */
 	DRIVER( dbc )		/* (c) 199? */
-	DRIVER( chmplst2 )	/* (c) 1996 */
+	DRIVER( lhb2 )		/* (c) 1996 */
 	DRIVER( xymg )		/* (c) 1996 */
-	DRIVER( grtwall )	/* (c) 1996 */
+	DRIVER( wlcc )		/* (c) 1996 */
 	DRIVER( vbowl )		/* (c) 1996 */
 	DRIVER( vbowlj )	/* (c) 1996 */
 	DRIVER( drgnwrld )	/* (c) 1997 */
@@ -8146,6 +8147,7 @@ Other Sun games
 	DRIVER( drgnwrldv20j )	/* (c) 1995 */
 	DRIVER( drgnwrldv10c )	/* (c) 1995 */
 	DRIVER( drgnwrldv11h )	/* (c) 1995 */
+	DRIVER( nkishusp )	/* (c) 1998 */
 
 	/* IGS017 / IGS031 Games */
 	DRIVER( iqblocka )	/* (c) 1996 */
