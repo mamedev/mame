@@ -692,8 +692,8 @@ const game_driver * const drivers[] =
 	DRIVER( poleposa )	/* 136014   (c) 1982 + Atari license */
 	DRIVER( polepos1 )	/* 136014   (c) 1982 Atari */
 	DRIVER( topracer )	/* bootleg */
-	DRIVER( topracra )	/* bootleg */
-	DRIVER( topracrb )	/* bootleg */
+	DRIVER( topracera )	/* bootleg */
+	DRIVER( topracern )	/* bootleg */
 	DRIVER( polepos2 )	/* (c) 1983 */
 	DRIVER( polepos2a )	/* 136014   (c) 1983 + Atari license */
 	DRIVER( polepos2b )	/* bootleg */

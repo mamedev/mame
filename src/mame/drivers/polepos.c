@@ -207,12 +207,12 @@ Notes:
   136014-231 which matches Namco's PP1-27. The bad bit should cause a tiny gfx
   glitch, though it's difficult to notice.
 
-- topracra: Use Service1 to start game
 
 Todo:
 
-- topracra: Gear is not updated in artwork
-- bootlegs shouldn't be using NAMCO devices.
+- the bootlegs without Namco devices (topracern, polepos2bi) still still require
+  our 06xx and 51xx emulation to boot, this is incorrect.
+- these sets also don't update the ingame gear artwork
 
 ***************************************************************************/
 
@@ -683,15 +683,14 @@ static INPUT_PORTS_START( poleposa )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( topracra )
-	// no coins ?!
+static INPUT_PORTS_START( topracern )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(auto_start_r, NULL)	// start 1, program controlled
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("IN0L")
@@ -981,6 +980,81 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
 MACHINE_DRIVER_END
 
+/* doesn't exist on the bootleg, but required for now or the game only boots in test mode!
+   - they probably simulate some of the logic */
+static const namco_51xx_interface namco_51xx_bl_intf =
+{
+	{	/* port read handlers */
+		DEVCB_NULL,
+		DEVCB_INPUT_PORT("IN0H"),
+		DEVCB_NULL,
+		DEVCB_NULL
+	},
+	{	/* port write handlers */
+		DEVCB_NULL,
+		DEVCB_NULL
+	}
+};
+
+
+static MACHINE_DRIVER_START( topracern )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z80, 24576000/8)	/* 3.072 MHz */
+	MDRV_CPU_PROGRAM_MAP(z80_map)
+	MDRV_CPU_IO_MAP(z80_io)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_assert,2)	/* 64V */
+
+	MDRV_CPU_ADD("sub", Z8000, 24576000/8)	/* 3.072 MHz */
+	MDRV_CPU_PROGRAM_MAP(z8002_map)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+
+	MDRV_CPU_ADD("sub2", Z8000, 24576000/8)	/* 3.072 MHz */
+	MDRV_CPU_PROGRAM_MAP(z8002_map)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+
+	/* todo, remove these devices too, this bootleg doesn't have them, but the emulation doesn't boot without them.. */
+	MDRV_NAMCO_51XX_ADD("51xx", 18432000/6/2, namco_51xx_bl_intf)		/* 1.536 MHz */
+	MDRV_NAMCO_06XX_ADD("06xx", 18432000/6/64, "maincpu", "51xx", NULL, NULL, NULL)
+
+	MDRV_WATCHDOG_VBLANK_INIT(16)	// 128V clocks the same as VBLANK
+
+	MDRV_QUANTUM_TIME(HZ(6000))	/* some interleaving */
+
+	MDRV_MACHINE_RESET(polepos)
+	MDRV_NVRAM_HANDLER(generic_1fill)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60.606060)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(polepos)
+	MDRV_PALETTE_LENGTH(0x0f00)
+	MDRV_DEFAULT_LAYOUT(layout_polepos)
+
+	MDRV_PALETTE_INIT(polepos)
+	MDRV_VIDEO_START(polepos)
+	MDRV_VIDEO_UPDATE(polepos)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MDRV_SOUND_ADD("namco", NAMCO, 24576000/512)
+	MDRV_SOUND_CONFIG(namco_config)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
+
+	/* engine sound */
+	MDRV_SOUND_ADD("polepos", POLEPOS, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
+MACHINE_DRIVER_END
+
+
 static ADDRESS_MAP_START( sound_z80_bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2700, 0x27ff) AM_RAM
@@ -991,9 +1065,7 @@ static ADDRESS_MAP_START( sound_z80_bootleg_iomap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( polepos2bi )
-	MDRV_IMPORT_FROM(polepos)
-
-	/* todo, remove namco devices! */
+	MDRV_IMPORT_FROM(topracern)
 
 	MDRV_CPU_ADD("soundz80bl", Z80, 24576000/8)	/*? MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_z80_bootleg_map)
@@ -1427,84 +1499,7 @@ ROM_START( topracer )
 	ROM_LOAD( "7052-4.c14",   0x0000, 0x0100, CRC(0e742cb1) SHA1(3ae43270aab4848fdeece1648e7e040ab216b08e) )    /* sync chain */
 ROM_END
 
-ROM_START( topracra )
-	/* Z80 memory/ROM data */
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pole-c2",      0x0000, 0x2000, CRC(caab829a) SHA1(826f25f5c792ab8b24e73ebb735aebcad552454f) )
-	ROM_LOAD( "pole-h2",      0x2000, 0x1000, CRC(148f5000) SHA1(071f75518f06a317f53db78f11da3ee878569f86) )
-
-	/* Z8002 #1 memory/ROM data */
-	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD16_BYTE( "tr1b.bin",     0x0001, 0x2000, CRC(127f0750) SHA1(97ae6c6f8086187c7cdb8bff5fec94914791890b) )
-	ROM_LOAD16_BYTE( "tr2b.bin",     0x0000, 0x2000, CRC(6bd4ff6b) SHA1(cf992de39a8cf7804961a8e6773fc4f7feb1878b) )
-
-	/* Z8002 #2 memory/ROM data */
-	ROM_REGION( 0x10000, "sub2", 0 )
-	ROM_LOAD16_BYTE( "tr5b.bin",     0x0001, 0x2000, CRC(4e5f7b9c) SHA1(d26b1f24dd9ef00388987890bc5b95d4db403815) )
-	ROM_LOAD16_BYTE( "pole-d",       0x0000, 0x2000, CRC(932bb5a7) SHA1(8045fe1f9b4b1973ec0d6705adf3ba3891bddaa1) )
-
-	/* graphics data */
-	ROM_REGION( 0x01000, "gfx1", 0 ) 	/* 2bpp alpha layer */
-	ROM_LOAD( "tr28.bin",     0x0000, 0x1000, CRC(b8217c96) SHA1(aba311bc3c4b118ba322a00e33e2d5cbe7bc6e4a) )
-
-	ROM_REGION( 0x01000, "gfx2", 0 ) 	/* 2bpp view layer */
-	ROM_LOAD( "tr29.bin",     0x0000, 0x1000, CRC(c6e15c21) SHA1(e2a70b3f7ce51a003068eb75d9fe82548f0206d7) )
-
-	ROM_REGION( 0x04000, "gfx3", 0 ) 	/* 4bpp 16x16 sprites */
-	ROM_LOAD( "pole-5",       0x0000, 0x2000, CRC(301117d2) SHA1(0d8be9e50da4601963a8392aa3e0f3414e721fa1) )    /* 4bpp sm sprites, planes 0+1 */
-	ROM_LOAD( "pole-6",       0x2000, 0x2000, CRC(3c9db014) SHA1(c26098dd78803e699845fefa92bf034c38259cea) )    /* 4bpp sm sprites, planes 2+3 */
-
-	ROM_REGION( 0x10000, "gfx4", 0 ) 	/* 4bpp 32x32 sprites */
-	ROM_LOAD( "pp17.bin",     0x0000, 0x2000, CRC(613ab0df) SHA1(88aa4500275aae010fc9783c1d8d843feab89afa) )    /* 4bpp lg sprites, planes 0+1 */
-	ROM_LOAD( "tr19.bin",     0x2000, 0x2000, CRC(f8e7f551) SHA1(faa23c55bc43325e6f71936be970f2ca144697d8) )
-	ROM_LOAD( "tr21.bin",     0x4000, 0x2000, CRC(17c798b0) SHA1(ae2047bc0e4e8c85e1de09c39c200ea8f7c6a72e) )
-	ROM_LOAD( "pp18.bin",     0x8000, 0x2000, CRC(5fd933e3) SHA1(5b27a8519234c935308f943cd58abc1efc463726) )    /* 4bpp lg sprites, planes 2+3 */
-	ROM_LOAD( "tr20.bin",     0xa000, 0x2000, CRC(7053e219) SHA1(97700fbe887e2d11c9f9a0937147725f6787f081) )
-	ROM_LOAD( "pole-9",       0xc000, 0x2000, CRC(5fe9b365) SHA1(1a3ac099a6bb506a5f71c12c6fb14d014172371c) )
-
-	ROM_REGION( 0x5000, "gfx5", 0 ) 	/* road generation ROMs needed at runtime */
-	ROM_LOAD( "136014.158",   0x0000, 0x2000, CRC(ee6b3315) SHA1(9cc26c6d3604c0f60d716f86e67e9d9c0487f87d) )    /* road control */
-	ROM_LOAD( "136014.159",   0x2000, 0x2000, CRC(6d1e7042) SHA1(90113ff0c93ed86d95067290088705bb5e6608d1) )    /* road bits 1 */
-	ROM_LOAD( "136014.134",   0x4000, 0x1000, CRC(4e97f101) SHA1(f377d053821c74aee93ebcd30a4d43e6156f3cfe) )    /* road bits 2 */
-
-	ROM_REGION( 0x1000, "gfx6", 0 ) 	/* sprite scaling */
-	ROM_LOAD( "136014.231",   0x0000, 0x1000, CRC(a61bff15) SHA1(f7a59970831cdaaa7bf59c2221a38e4746c54244) )    /* vertical scaling */
-
-	/* graphics (P)ROM data */
-	ROM_REGION( 0x1040, "proms", 0 )
-	ROM_LOAD( "136014.137",   0x0000, 0x0100, CRC(f07ff2ad) SHA1(e1f3cb10a03d23f8c1d422acf271dba4e7b98cb1) )    /* red palette */
-	ROM_LOAD( "136014.138",   0x0100, 0x0100, CRC(adbde7d7) SHA1(956ac5117c1e310f554ac705aa2dc24a796c36a5) )    /* green palette */
-	ROM_LOAD( "136014.139",   0x0200, 0x0100, CRC(ddac786a) SHA1(d1860105bf91297533ccc4aa6775987df198d0fa) )    /* blue palette */
-	ROM_LOAD( "10p.bin",      0x0300, 0x0100, CRC(5af3f710) SHA1(da13d17acf8abd0f6ebb4b51b23c3324c6197b7d) )    /* alpha color */
-	ROM_LOAD( "7052-11.j15",  0x0400, 0x0100, CRC(8c90e36e) SHA1(2646288d9e0f86300da7f06e1dc0595673205bb4) )    /* background color */
-	ROM_LOAD( "136014.142",   0x0500, 0x0100, CRC(2d502464) SHA1(682b7dd22e51d5db52c0804b7e27e47641dfa6bd) )    /* vertical position low */
-	ROM_LOAD( "136014.143",   0x0600, 0x0100, CRC(027aa62c) SHA1(c7030d8b64b80e107c446f6fbdd63f560c0a91c0) )    /* vertical position med */
-	ROM_LOAD( "136014.144",   0x0700, 0x0100, CRC(1f8d0df3) SHA1(b8f17758f114f5e247b65b3f2922ca2660757e66) )    /* vertical position hi */
-	ROM_LOAD( "136014.145",   0x0800, 0x0400, CRC(7afc7cfc) SHA1(ba2407f6eff124e881b354f13205a4c058b7cf60) )    /* road color */
-	ROM_LOAD( "pp1_6.bpr",    0x0c00, 0x0400, CRC(2f1079ee) SHA1(18a27998a78deff13dd198f3668a7e92f084f467) )    /* sprite color */
-	ROM_LOAD( "136014.135",   0x1000, 0x0020, CRC(4330a51b) SHA1(9531d18ce2de4eda9913d47ef8c5cd8f05791716) )    /* video RAM address decoder (not used) */
-	ROM_LOAD( "136014.136",   0x1020, 0x0020, CRC(4330a51b) SHA1(9531d18ce2de4eda9913d47ef8c5cd8f05791716) )    /* video RAM address decoder (not used) */
-
-	/* sound (P)ROM data */
-	ROM_REGION( 0x0100, "namco", 0 )
-	ROM_LOAD( "136014.118",   0x0000, 0x0100, CRC(8568decc) SHA1(0aac1fa082858d4d201e21511c609a989f9a1535) )    /* Namco sound */
-
-	ROM_REGION( 0x4000, "engine", 0 )
-	ROM_LOAD( "136014.110",   0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) )    /* engine sound */
-	ROM_LOAD( "136014.111",   0x2000, 0x2000, CRC(8fdd2f6f) SHA1(3818dc94c60cd78c4212ab7a4367cf3d98166ee6) )    /* engine sound */
-
-	ROM_REGION( 0x8000, "52xx", 0 )
-	ROM_LOAD( "pp1_11.2e",    0x0000, 0x2000, CRC(45b9bfeb) SHA1(ff8c690471944d414931fb88666594ef608997f8) )    /* voice */
-	ROM_LOAD( "pp1_12.2f",    0x2000, 0x2000, CRC(a31b4be5) SHA1(38298093bb97ea8647fe187359cae05b65e1c616) )    /* voice */
-	ROM_LOAD( "pp1_13.1e",    0x4000, 0x2000, CRC(a4237466) SHA1(88a397276038cc2fc05f2c18472e6b7cef167f2e) )    /* voice */
-	ROM_LOAD( "pp1_14.1f",    0x6000, 0x2000, CRC(944580f9) SHA1(c76f529cae718674ce97a1a599a3c6eaf6bf561a) )    /* voice */
-
-	/* unknown or unused (P)ROM data */
-	ROM_REGION( 0x0100, "user1", 0 )
-	ROM_LOAD( "7052-4.c14",   0x0000, 0x0100, CRC(0e742cb1) SHA1(3ae43270aab4848fdeece1648e7e040ab216b08e) )    /* sync chain */
-ROM_END
-
-ROM_START( topracrb )
+ROM_START( topracera )
 	/* Z80 memory/ROM data */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tr9.f17",    0x0000, 0x2000, CRC(94436b70) SHA1(7495c2a8c3928c59146760d19e672afee01c5b17) )
@@ -1579,8 +1574,114 @@ ROM_START( topracrb )
 ROM_END
 
 
+/* Top Racer (bootleg without MB8841 / MB8842)
+
+CPU	Lower Board (label "1081-C")
+2x ZILOG Z8002PS (DIP40)
+1x NEC D708C-1 (DIP40)
+
+Upper Board (label "1080-C")
+1x oscillator 24.576 MHz 
+ROMs	Lower Board (label "1081-C")
+7x HN482764G (1a,a2,a3,a4,a5,a,b)
+1x HN482732G (a6)
+1x PROM 82S129
+2x PAL 12L6
+1x PAL 16L8
+
+Upper Board (label "1080-C")
+8x HN482764G (1,2,3,6,7,8,9,10)
+2x AM2764 (5,11)
+4x TMS2732JL (12,13,14,15)
+8x PROM 24S10
+2x PROM 7603
+2x PROM 7643 
+Note	Lower Board (label "1081-C")
+1x flat cable connector to upper
+1x 18x2 edge connector
+
+Upper Board (label "1080-C")
+1x flat cable connector to lower
+1x 18x2 edge connector
+ 
+*/
+
+ROM_START( topracern )
+	/* Z80 memory/ROM data */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a5.bin",      0x0000, 0x2000, CRC(caab829a) SHA1(826f25f5c792ab8b24e73ebb735aebcad552454f) )
+	ROM_LOAD( "a6.bin",      0x2000, 0x1000, CRC(148f5000) SHA1(071f75518f06a317f53db78f11da3ee878569f86) )
+
+	/* Z8002 #1 memory/ROM data */
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD16_BYTE( "a1.bin",     0x0001, 0x2000, CRC(127f0750) SHA1(97ae6c6f8086187c7cdb8bff5fec94914791890b) )
+	ROM_LOAD16_BYTE( "a2.bin",     0x0000, 0x2000, CRC(6bd4ff6b) SHA1(cf992de39a8cf7804961a8e6773fc4f7feb1878b) )
+
+	/* Z8002 #2 memory/ROM data */
+	ROM_REGION( 0x10000, "sub2", 0 )
+	ROM_LOAD16_BYTE( "a3.bin",     0x0001, 0x2000, CRC(4e5f7b9c) SHA1(d26b1f24dd9ef00388987890bc5b95d4db403815) )
+	//ROM_LOAD16_BYTE( "a4.bin",     0x0000, 0x2000, CRC(b3641d0c) SHA1(38ce172b2e38895749cbd3cc1c0e2c0fe8be744a) ) /* one set had this rom, which matches topracera */
+	ROM_LOAD16_BYTE( "pole-d",       0x0000, 0x2000, CRC(932bb5a7) SHA1(8045fe1f9b4b1973ec0d6705adf3ba3891bddaa1) ) /* the other set had this one, what's the difference? */
+
+	/* graphics data */
+	ROM_REGION( 0x01000, "gfx1", 0 ) 	/* 2bpp alpha layer */
+	ROM_LOAD( "13.bin",     0x0000, 0x1000, CRC(b8217c96) SHA1(aba311bc3c4b118ba322a00e33e2d5cbe7bc6e4a) )
+
+	ROM_REGION( 0x01000, "gfx2", 0 ) 	/* 2bpp view layer */
+	ROM_LOAD( "12.bin",     0x0000, 0x1000, CRC(c6e15c21) SHA1(e2a70b3f7ce51a003068eb75d9fe82548f0206d7) )
+
+	ROM_REGION( 0x04000, "gfx3", 0 ) 	/* 4bpp 16x16 sprites */
+	ROM_LOAD( "5.bin",       0x0000, 0x2000, CRC(301117d2) SHA1(0d8be9e50da4601963a8392aa3e0f3414e721fa1) )    /* 4bpp sm sprites, planes 0+1 */
+	ROM_LOAD( "6.bin",       0x2000, 0x2000, CRC(3c9db014) SHA1(c26098dd78803e699845fefa92bf034c38259cea) )    /* 4bpp sm sprites, planes 2+3 */
+
+	ROM_REGION( 0x10000, "gfx4", 0 ) 	/* 4bpp 32x32 sprites */
+	ROM_LOAD( "1.bin",     0x0000, 0x2000, CRC(613ab0df) SHA1(88aa4500275aae010fc9783c1d8d843feab89afa) )    /* 4bpp lg sprites, planes 0+1 */
+	ROM_LOAD( "2.bin",     0x2000, 0x2000, CRC(f8e7f551) SHA1(faa23c55bc43325e6f71936be970f2ca144697d8) )
+	//ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(94d0b00c) SHA1(24e4004d1091292afda76bdfb007f08c13778675) ) // this one has more corrupt lines in one of the flags
+	ROM_LOAD( "3.bin",     0x4000, 0x2000, CRC(17c798b0) SHA1(ae2047bc0e4e8c85e1de09c39c200ea8f7c6a72e) )
+	ROM_LOAD( "7.bin",     0x8000, 0x2000, CRC(5fd933e3) SHA1(5b27a8519234c935308f943cd58abc1efc463726) )    /* 4bpp lg sprites, planes 2+3 */
+	ROM_LOAD( "8.bin",     0xa000, 0x2000, CRC(7053e219) SHA1(97700fbe887e2d11c9f9a0937147725f6787f081) )
+	ROM_LOAD( "9.bin",     0xc000, 0x2000, CRC(5fe9b365) SHA1(1a3ac099a6bb506a5f71c12c6fb14d014172371c) )
+
+	ROM_REGION( 0x5000, "gfx5", 0 ) 	/* road generation ROMs needed at runtime */
+	ROM_LOAD( "11.bin",   0x0000, 0x2000, CRC(ee6b3315) SHA1(9cc26c6d3604c0f60d716f86e67e9d9c0487f87d) )    /* road control */
+	ROM_LOAD( "10.bin",   0x2000, 0x2000, CRC(6d1e7042) SHA1(90113ff0c93ed86d95067290088705bb5e6608d1) )    /* road bits 1 */
+	ROM_LOAD( "14.bin",   0x4000, 0x1000, CRC(4e97f101) SHA1(f377d053821c74aee93ebcd30a4d43e6156f3cfe) )    /* road bits 2 */
+
+	ROM_REGION( 0x1000, "gfx6", 0 ) 	/* sprite scaling */
+	ROM_LOAD( "15.bin",   0x0000, 0x1000, CRC(a61bff15) SHA1(f7a59970831cdaaa7bf59c2221a38e4746c54244) )    /* vertical scaling */
+
+	/* graphics (P)ROM data */
+	ROM_REGION( 0x1040, "proms", 0 )
+	ROM_LOAD( "24s10.5",   0x0000, 0x0100, CRC(f07ff2ad) SHA1(e1f3cb10a03d23f8c1d422acf271dba4e7b98cb1) )    /* red palette */
+	ROM_LOAD( "24s10.4",   0x0100, 0x0100, CRC(adbde7d7) SHA1(956ac5117c1e310f554ac705aa2dc24a796c36a5) )    /* green palette */
+	ROM_LOAD( "24s10.3",   0x0200, 0x0100, CRC(ddac786a) SHA1(d1860105bf91297533ccc4aa6775987df198d0fa) )    /* blue palette */
+	ROM_LOAD( "24s10.2",      0x0300, 0x0100, CRC(5af3f710) SHA1(da13d17acf8abd0f6ebb4b51b23c3324c6197b7d) )    /* alpha color */
+	ROM_LOAD( "24s10.1",  0x0400, 0x0100, CRC(8c90e36e) SHA1(2646288d9e0f86300da7f06e1dc0595673205bb4) )    /* background color */
+	ROM_LOAD( "24s10.8",   0x0500, 0x0100, CRC(2d502464) SHA1(682b7dd22e51d5db52c0804b7e27e47641dfa6bd) )    /* vertical position low */
+	ROM_LOAD( "24s10.7",   0x0600, 0x0100, CRC(027aa62c) SHA1(c7030d8b64b80e107c446f6fbdd63f560c0a91c0) )    /* vertical position med */
+	ROM_LOAD( "24s10.6",   0x0700, 0x0100, CRC(1f8d0df3) SHA1(b8f17758f114f5e247b65b3f2922ca2660757e66) )    /* vertical position hi */
+	ROM_LOAD( "7643.1",   0x0800, 0x0400, CRC(7afc7cfc) SHA1(ba2407f6eff124e881b354f13205a4c058b7cf60) )    /* road color */
+	ROM_LOAD( "7643.2",    0x0c00, 0x0400, CRC(2f1079ee) SHA1(18a27998a78deff13dd198f3668a7e92f084f467) )    /* sprite color */
+	ROM_LOAD( "7603.1",   0x1000, 0x0020, CRC(4330a51b) SHA1(9531d18ce2de4eda9913d47ef8c5cd8f05791716) )    /* video RAM address decoder (not used) */
+	ROM_LOAD( "7603.2",   0x1020, 0x0020, CRC(4330a51b) SHA1(9531d18ce2de4eda9913d47ef8c5cd8f05791716) )    /* video RAM address decoder (not used) */
+
+	/* sound (P)ROM data */
+	ROM_REGION( 0x0100, "namco", 0 )
+	ROM_LOAD( "136014.118",   0x0000, 0x0100, CRC(8568decc) SHA1(0aac1fa082858d4d201e21511c609a989f9a1535) )    /* Namco sound */
+
+	ROM_REGION( 0x4000, "engine", 0 )
+	ROM_LOAD( "a.bin",   0x0000, 0x2000, CRC(b5ad4d5f) SHA1(c07e77a050200d6fe9952031f971ca35f4d15ff8) )    /* engine sound */
+	ROM_LOAD( "b.bin",   0x2000, 0x2000, CRC(8fdd2f6f) SHA1(3818dc94c60cd78c4212ab7a4367cf3d98166ee6) )    /* engine sound */
+
+	/* unknown or unused (P)ROM data */
+	ROM_REGION( 0x0100, "user1", 0 )
+	ROM_LOAD( "7052-4.c14",   0x0000, 0x0100, CRC(0e742cb1) SHA1(3ae43270aab4848fdeece1648e7e040ab216b08e) )    /* sync chain */
+ROM_END
+
+
 /*
-    Pole Position - Namco Version
+    Pole Position 2 - Namco Version
 */
 
 ROM_START( polepos2 )
@@ -1934,7 +2035,7 @@ static DRIVER_INIT( polepos )
 	polepos_gear_bit = 2;
 }
 
-static DRIVER_INIT( topracra )
+static DRIVER_INIT( topracern )
 {
 	polepos_gear_bit = 0x20;
 
@@ -1961,10 +2062,11 @@ static DRIVER_INIT( polepos2 )
 GAME( 1982, polepos,    0,        polepos,    polepos,  polepos,  ROT0, "Namco", "Pole Position", 0 )
 GAME( 1982, poleposa,   polepos,  polepos,    poleposa, polepos,  ROT0, "Namco (Atari license)", "Pole Position (Atari version 2)", 0 )
 GAME( 1982, polepos1,   polepos,  polepos,    poleposa, polepos,  ROT0, "[Namco] (Atari license)", "Pole Position (Atari version 1)", 0 )
-GAME( 1982, topracer,   polepos,  polepos,    polepos,  polepos,  ROT0, "bootleg", "Top Racer (set 1)", 0 )
-GAME( 1982, topracra,   polepos,  polepos,    topracra, topracra, ROT0, "bootleg", "Top Racer (set 2)", 0 )
-GAME( 1983, topracrb,   polepos,  polepos,    polepos,  polepos,  ROT0, "bootleg", "Top Racer (set 3)", 0 )
+GAME( 1982, topracer,   polepos,  polepos,    polepos,  polepos,  ROT0, "bootleg", "Top Racer (with MB8841 + MB8842, set 1)", 0 ) // the NAMCO customs have been cloned on these bootlegs
+GAME( 1983, topracera,  polepos,  polepos,    polepos,  polepos,  ROT0, "bootleg", "Top Racer (with MB8841 + MB8842, set 2)", 0 ) // ^
+GAME( 1982, topracern,  polepos,  topracern,  topracern,topracern,ROT0, "bootleg", "Top Racer (no MB8841 + MB8842)", 0 )
+
 GAME( 1983, polepos2,   0,        polepos,    polepos2, polepos2, ROT0, "Namco", "Pole Position II", 0 )
 GAME( 1983, polepos2a,  polepos2, polepos,    polepos2, polepos2, ROT0, "Namco (Atari license)", "Pole Position II (Atari)", 0 )
 GAME( 1983, polepos2b,  polepos2, polepos,    polepos2, polepos,  ROT0, "bootleg", "Pole Position II (bootleg)", 0 )
-GAME( 1983, polepos2bi, polepos2, polepos2bi, topracra, topracra, ROT0, "bootleg", "Gran Premio F1 (Italian bootleg of Pole Position II)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND ) // should have italian voices
+GAME( 1983, polepos2bi, polepos2, polepos2bi, topracern, topracern, ROT0, "bootleg", "Gran Premio F1 (Italian bootleg of Pole Position II)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND ) // should have italian voices
