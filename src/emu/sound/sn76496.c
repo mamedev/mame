@@ -12,9 +12,11 @@
   duty cycle channel.
 
   Noise emulation for all chips should be accurate:
-  SN76489 uses a 15-bit shift register with taps on bits D and E, output on /E
+  SN76489 uses a 15-bit shift register with taps on bits D and E, output on E,
+  XOR function; SN94624 is identical to SN76489.
   * It uses a 15-bit ring buffer for periodic noise/arbitrary duty cycle.
-  SN76489A uses a 16-bit shift register with taps on bits D and F, output on F
+  SN76489A uses a 16-bit shift register with taps on bits D and E, output on F,
+  XNOR function
   * It uses a 16-bit ring buffer for periodic noise/arbitrary duty cycle.
   SN76494 and SN76496 are PROBABLY identical in operation to the SN76489A
   * They have an audio input line which is mixed with the 4 channels of output.
@@ -36,14 +38,20 @@
   28/04/2009 : Lord Nightmare
   Add READY line readback; cleaned up struct a bit. Cleaned up comments.
   Add more TODOs. Fixed some unsaved savestate related stuff.
+  
+  04/11/2009 : Lord Nightmare
+  Changed the way that the invert works (it now selects between XOR and XNOR
+  for the taps), and added R->OldNoise to simulate the extra 0 that is always
+  output before the noise LFSR contents are after an LFSR reset.
+  This fixes SN76489/A to match chips. Added SN94624.
 
   TODO: * Implement a function for setting stereo regs for the game gear.
           Requires making the core support both mono and stereo, and have
           a select register which determines which channels go where.
-        * Implement the TMS9919 and SN94624, which are earlier versions,
-          possibly lacking the /8 clock divider, of the SN76489, and hence
-          would have a max clock of 500Khz and 4 clocks per sample, as
-          opposed to max of 4Mhz and 32 clocks per sample on the SN76489A
+        * Implement the TMS9919 which is an earlier version, possibly
+          lacking the /8 clock divider, of the SN76489, and hence would
+          have a max clock of 500Khz and 4 clocks per sample, as opposed to
+          max of 4Mhz and 32 clocks per sample on the SN76489A.
         * Implement the T6W28; has registers in a weird order, needs writes
           to be 'sanitized' first. Also is stereo, similar to game gear.
         * Implement the NCR 7496; Is probably 100% compatible with SN76496,
@@ -73,9 +81,10 @@ struct _sn76496_state
 	UINT32 RNG;			/* noise generator LFSR*/
 	INT32 FeedbackMask;	/* mask for feedback */
 	INT32 WhitenoiseTaps;	/* mask for white noise taps */
-	INT32 WhitenoiseInvert;	/* white noise invert flag */
+	INT32 FeedbackInvert;	/* feedback invert flag (xor vs xnor) */
 	INT32 Period[4];	/* Length of 1/2 of waveform */
 	INT32 Count[4];		/* Position within the waveform */
+	INT32 OldNoise;		/* 1 bit output of the PREVIOUS noise output, buffered by the volume amp */
 	INT32 Output[4];	/* 1-bit output of each channel, pre-volume */
 	INT32 CyclestoREADY;/* number of cycles until the READY line goes active */
 };
@@ -247,7 +256,7 @@ static STREAM_UPDATE( SN76496Update )
 			{
 		        if (NOISEMODE == 1) /* White Noise Mode */
 		        {
-			        if (((R->RNG & R->WhitenoiseTaps) != R->WhitenoiseTaps) && ((R->RNG & R->WhitenoiseTaps) != 0)) /* crappy xor! */
+			        if ((((R->RNG & R->WhitenoiseTaps) != R->WhitenoiseTaps) && ((R->RNG & R->WhitenoiseTaps) != 0)) ^ R->FeedbackInvert ) /* XOR or XNOR */
 					{
 				        R->RNG >>= 1;
 				        R->RNG |= R->FeedbackMask;
@@ -256,7 +265,6 @@ static STREAM_UPDATE( SN76496Update )
 					{
 				        R->RNG >>= 1;
 					}
-					R->Output[3] = R->WhitenoiseInvert ? !(R->RNG & 1) : R->RNG & 1;
 				}
 				else /* Periodic noise mode */
 				{
@@ -269,8 +277,9 @@ static STREAM_UPDATE( SN76496Update )
 					{
 				        R->RNG >>= 1;
 					}
-					R->Output[3] = R->RNG & 1;
 				}
+				R->Output[3] = R->OldNoise;
+				R->OldNoise = R->RNG & 1;
 				R->Count[3] += R->Period[3];
 				if (R->Output[3]) vol[3] += R->Period[3];
 			}
@@ -344,17 +353,19 @@ static int SN76496_init(const device_config *device, sn76496_state *R)
 	/* Default is SN76489 non-A */
 	R->FeedbackMask = 0x4000;     /* mask for feedback */
 	R->WhitenoiseTaps = 0x03;   /* mask for white noise taps */
-	R->WhitenoiseInvert = 1; /* white noise invert flag */
+	R->FeedbackInvert = 0; /* feedback invert flag */
 	R->CyclestoREADY = 1; /* assume ready is not active immediately on init. is this correct?*/
 
 	R->RNG = R->FeedbackMask;
-	R->Output[3] = R->RNG & 1;
+	R->OldNoise = 0;
+	R->Output[3] = R->OldNoise;
+	R->OldNoise = R->RNG & 1;
 
 	return 0;
 }
 
 
-static void generic_start(const device_config *device, int feedbackmask, int noisetaps, int noiseinvert)
+static void generic_start(const device_config *device, int feedbackmask, int noisetaps, int feedbackinvert)
 {
 	sn76496_state *chip = get_safe_token(device);
 
@@ -364,7 +375,7 @@ static void generic_start(const device_config *device, int feedbackmask, int noi
 
 	chip->FeedbackMask = feedbackmask;
 	chip->WhitenoiseTaps = noisetaps;
-	chip->WhitenoiseInvert = noiseinvert;
+	chip->FeedbackInvert = feedbackinvert;
 
 	state_save_register_device_item_array(device, 0, chip->VolTable);
 	state_save_register_device_item_array(device, 0, chip->Register);
@@ -373,9 +384,10 @@ static void generic_start(const device_config *device, int feedbackmask, int noi
 	state_save_register_device_item(device, 0, chip->RNG);
 	state_save_register_device_item(device, 0, chip->FeedbackMask);
 	state_save_register_device_item(device, 0, chip->WhitenoiseTaps);
-	state_save_register_device_item(device, 0, chip->WhitenoiseInvert);
+	state_save_register_device_item(device, 0, chip->FeedbackInvert);
 	state_save_register_device_item_array(device, 0, chip->Period);
 	state_save_register_device_item_array(device, 0, chip->Count);
+	state_save_register_device_item(device, 0, chip->OldNoise);
 	state_save_register_device_item_array(device, 0, chip->Output);
 	state_save_register_device_item(device, 0, chip->CyclestoREADY);
 }
@@ -383,32 +395,37 @@ static void generic_start(const device_config *device, int feedbackmask, int noi
 
 static DEVICE_START( sn76489 )
 {
-	generic_start(device, 0x4000, 0x03, TRUE);
+	generic_start(device, 0x4000, 0x03, FALSE);
 }
 
 static DEVICE_START( sn76489a )
 {
-	generic_start(device, 0x8000, 0x06, FALSE);
+	generic_start(device, 0x8000, 0x06, TRUE);
 }
 
 static DEVICE_START( sn76494 )
 {
-	generic_start(device, 0x8000, 0x06, FALSE);
+	generic_start(device, 0x8000, 0x06, TRUE);
 }
 
 static DEVICE_START( sn76496 )
 {
-	generic_start(device, 0x8000, 0x06, FALSE);
+	generic_start(device, 0x8000, 0x06, TRUE);
+}
+
+static DEVICE_START( sn94624 )
+{
+	generic_start(device, 0x4000, 0x03, FALSE);
 }
 
 static DEVICE_START( gamegear )
 {
-	generic_start(device, 0x8000, 0x09, FALSE);
+	generic_start(device, 0x8000, 0x09, TRUE);
 }
 
 static DEVICE_START( smsiii )
 {
-	generic_start(device, 0x8000, 0x09, FALSE);
+	generic_start(device, 0x8000, 0x09, TRUE);
 }
 
 
@@ -443,6 +460,16 @@ DEVICE_GET_INFO( sn76489 )
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sn76489 );		break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "SN76489");						break;
+		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
+	}
+}
+
+DEVICE_GET_INFO( sn94624 )
+{
+	switch (state)
+	{
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sn94624 );		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SN94624");						break;
 		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
 	}
 }
