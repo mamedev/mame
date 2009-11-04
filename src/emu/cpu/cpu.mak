@@ -992,6 +992,8 @@ endif
 
 $(CPUOBJ)/dsp56k/dsp56k.o:	$(CPUSRC)/dsp56k/dsp56k.c \
 							$(CPUSRC)/dsp56k/dsp56ops.c \
+							$(CPUSRC)/dsp56k/dsp56mem.c \
+							$(CPUSRC)/dsp56k/dsp56pcu.c \
 							$(CPUSRC)/dsp56k/dsp56k.h
 
 

@@ -90,52 +90,63 @@ static UINT8 SE_bit(dsp56k_core* cpustate) { return ((SP & 0x0010) != 0); }
 /***************************************************************************
     INITIALIZATION AND RESET
 ***************************************************************************/
-static void pcu_init(dsp56k_core* cpustate)
+static void pcu_init(dsp56k_core* cpustate, const device_config *device)
 {
-	// Init the irq table
+	/* Init the irq table */
 	dsp56k_irq_table_init();
+
+	/* save states - dsp56k_pcu members */
+	state_save_register_device_item(device, 0, cpustate->PCU.pc);
+	state_save_register_device_item(device, 0, cpustate->PCU.la);
+	state_save_register_device_item(device, 0, cpustate->PCU.lc);
+	state_save_register_device_item(device, 0, cpustate->PCU.sr);
+	state_save_register_device_item(device, 0, cpustate->PCU.omr);
+	state_save_register_device_item(device, 0, cpustate->PCU.sp);
+	state_save_register_device_item_array(device, 0, cpustate->PCU.ss);
+	state_save_register_device_item_array(device, 0, cpustate->PCU.pending_interrupts);
+	state_save_register_device_item(device, 0, cpustate->PCU.reset_vector);
 }
 
 static void pcu_reset(dsp56k_core* cpustate)
 {
 	int i;
 
-	// When reset is deasserted, set MA, MB, and MC from MODA, MODB, and MODC lines.
+	/* When reset is deasserted, set MA, MB, and MC from MODA, MODB, and MODC lines. */
 	MA_bit_set(cpustate, cpustate->modA_state);
 	MB_bit_set(cpustate, cpustate->modB_state);
 	MC_bit_set(cpustate, cpustate->modC_state);
 
-	// Reset based on the operating mode.
+	/* Reset based on the operating mode. */
 	switch(dsp56k_operating_mode(cpustate))
 	{
 		case 0x00:
 			logerror("Dsp56k in Special Bootstrap Mode 1\n");
 
-			// HACK - We don't need to put the bootstrap mode on here since
-			//        we'll simulate it entirely in this function
+			/* HACK - We don't need to put the bootstrap mode on here since */
+			/*        we'll simulate it entirely in this function */
 			cpustate->bootstrap_mode = BOOTSTRAP_OFF;
 
-			// HACK - Simply copy over 0x1000 bytes of data located at program memory 0xc000.
-			//        This, in actuality, is handled with the internal boot ROM.
+			/* HACK - Simply copy over 0x1000 bytes of data located at program memory 0xc000. */
+			/*        This, in actuality, is handled with the internal boot ROM. */
 			for (i = 0; i < 0x800; i++)
 			{
 				UINT32 mem_offset = (0xc000<<1) + (i<<1);	/* TODO: TEST */
 
-				// TODO - DO I HAVE TO FLIP THIS WORD?
-				// P:$c000 -> Internal P:$0000 low byte
-				// P:$c001 -> Internal P:$0000 high byte
-				// ...
-				// P:$cffe -> Internal P:$07ff low byte
-				// P:$cfff -> Internal P:$07ff high byte
+				/* TODO - DO I HAVE TO FLIP THIS WORD? */
+				/* P:$c000 -> Internal P:$0000 low byte */
+				/* P:$c001 -> Internal P:$0000 high byte */
+				/* ... */
+				/* P:$cffe -> Internal P:$07ff low byte */
+				/* P:$cfff -> Internal P:$07ff high byte */
 				UINT8 mem_value_low  = memory_read_byte_16le(cpustate->program, mem_offset);		/* TODO: IS THIS READING RIGHT? */
 				UINT8 mem_value_high = memory_read_byte_16be(cpustate->program, mem_offset);
 				dsp56k_program_ram[i] = (mem_value_high << 8) || mem_value_low;
 			}
 
-			// HACK - Set the PC to 0x0000 as per the boot ROM.
+			/* HACK - Set the PC to 0x0000 as per the boot ROM. */
 			PC = 0x0000;
 
-			// HACK - All done!  Set the Operating Mode to 2 as per the boot ROM.
+			/* HACK - All done!  Set the Operating Mode to 2 as per the boot ROM. */
 			MB_bit_set(cpustate, 1);
 			MA_bit_set(cpustate, 0);
 			cpustate->PCU.reset_vector = 0xe000;
@@ -144,11 +155,11 @@ static void pcu_reset(dsp56k_core* cpustate)
 		case 0x01:
 			logerror("Dsp56k in Special Bootstrap Mode 2\n");
 
-			// HACK - Turn bootstrap mode on.  This hijacks the CPU execute loop and lets
-			//        Either the host interface or the SSIO interface suck in all the data
-			//        they need.  Once they've had their fill, they turn bootstrap mode off
-			//        and the CPU begins execution at 0x0000;
-			// HACK - Read bit 15 at 0xc000 to see if we're working with the SSIO or host interface.
+			/* HACK - Turn bootstrap mode on.  This hijacks the CPU execute loop and lets */
+			/*        Either the host interface or the SSIO interface suck in all the data */
+			/*        they need.  Once they've had their fill, they turn bootstrap mode off */
+			/*        and the CPU begins execution at 0x0000; */
+			/* HACK - Read bit 15 at 0xc000 to see if we're working with the SSIO or host interface. */
 			if (memory_read_word_16le(cpustate->program, 0xc000<<1) & 0x8000)
 			{
 				cpustate->bootstrap_mode = BOOTSTRAP_SSIX;
@@ -160,10 +171,10 @@ static void pcu_reset(dsp56k_core* cpustate)
 				logerror("DSP56k : Currently in (hacked) bootstrap mode - reading from Host Interface.\n");
 			}
 
-			// HACK - Set the PC to 0x0000 as per the boot ROM.
+			/* HACK - Set the PC to 0x0000 as per the boot ROM. */
 			PC = 0x0000;
 
-			// HACK - Not done yet, but set the Operating Mode to 2 in preparation.
+			/* HACK - Not done yet, but set the Operating Mode to 2 in preparation. */
 			MB_bit_set(cpustate, 1);
 			MA_bit_set(cpustate, 0);
 			cpustate->PCU.reset_vector = 0xe000;
@@ -177,42 +188,42 @@ static void pcu_reset(dsp56k_core* cpustate)
 
 		case 0x03:
 			logerror("Dsp56k in Development Expanded Mode\n");
-			// TODO: Disable internal ROM, etc.  Likely a tricky thing for MAME?
+			/* TODO: Disable internal ROM, etc.  Likely a tricky thing for MAME? */
 			PC = 0x0000;
 			cpustate->PCU.reset_vector = 0x0000;
 			break;
 	}
 
-	// Set registers properly
-	// 1-17 Clear Interrupt Priority Register (IPR)
+	/* Set registers properly */
+	/* 1-17 Clear Interrupt Priority Register (IPR) */
 	IPR = 0x0000;
 
-	// FM.5-4
+	/* FM.5-4 */
 	I_bits_set(cpustate, 0x03);
 	S_bits_set(cpustate, 0);
 	L_bit_set(cpustate, 0);
 	S_bit_set(cpustate, 0);
 	FV_bit_set(cpustate, 0);
 
-	// FM.7-25
+	/* FM.7-25 */
 	E_bit_set(cpustate, 0);
 	U_bit_set(cpustate, 0);
 	N_bit_set(cpustate, 0);
 	V_bit_set(cpustate, 0);
 	Z_bit_set(cpustate, 0);
 
-	// FM.5-4+
+	/* FM.5-4+ */
 	C_bit_set(cpustate, 0);
 	LF_bit_set(cpustate, 0);
 	SP = 0x0000;
 
-	// FM.5-14 (OMR)
+	/* FM.5-14 (OMR) */
 	SA_bit_set(cpustate, 0);
 	R_bit_set(cpustate, 0);
 	SD_bit_set(cpustate, 0);
 	CD_bit_set(cpustate, 0);
 
-	// Clear out the pending interrupt list
+	/* Clear out the pending interrupt list */
 	dsp56k_clear_pending_interrupts(cpustate);
 }
 
@@ -227,50 +238,50 @@ typedef struct
 
 static dsp56k_irq_data dsp56k_interrupt_sources[32];
 
-// TODO: Figure out how to switch on level versus edge-triggered.
+/* TODO: Figure out how to switch on level versus edge-triggered. */
 static void pcu_service_interrupts(dsp56k_core* cpustate)
 {
 	int i;
 
-	// Count list of pending interrupts
+	/* Count list of pending interrupts */
 	int num_servicable = dsp56k_count_pending_interrupts(cpustate);
 
 	if (num_servicable == 0)
 		return;
 
-	// Sort list according to priority
+	/* Sort list according to priority */
 	dsp56k_sort_pending_interrupts(cpustate, num_servicable);
 
-	// Service each interrupt in order
-	// TODO: This just *can't* be right :)
+	/* Service each interrupt in order */
+	/* TODO: This just *can't* be right :) */
 	for (i = 0; i < num_servicable; i++)
 	{
 		const int interrupt_index = cpustate->PCU.pending_interrupts[i];
 
-		// Get the priority of the interrupt - a return value of -1 means disabled!
+		/* Get the priority of the interrupt - a return value of -1 means disabled! */
 		INT8 priority = dsp56k_get_irq_priority(cpustate, interrupt_index);
 
-		// 1-12 Make sure you're not masked out against the Interrupt Mask Bits (disabled is handled for free here)
+		/* 1-12 Make sure you're not masked out against the Interrupt Mask Bits (disabled is handled for free here) */
 		if (priority >= I_bits(cpustate))
 		{
-			// TODO: Implement long interrupts & fast interrupts correctly!
-			//       Right now they are handled in the JSR & BSR ops.  SupahLame.
+			/* TODO: Implement long interrupts & fast interrupts correctly! */
+			/*       Right now they are handled in the JSR & BSR ops.  SupahLame. */
 			cpustate->ppc = PC;
 
-			// Are you anything but the Host Command interrupt?
+			/* Are you anything but the Host Command interrupt? */
 			if (interrupt_index != 22)
 			{
-				// Execute a normal interrupt
+				/* Execute a normal interrupt */
 				PC = dsp56k_interrupt_sources[interrupt_index].irq_vector;
 			}
 			else
 			{
-				// The host command input has a floating vector.
+				/* The host command input has a floating vector. */
 				const UINT16 irq_vector = HV_bits(cpustate) << 1;
 
 				PC = irq_vector;
 
-				// TODO: 5-9 5-11 Gotta' Clear HC (HCP gets it too) when taking this exception!
+				/* TODO: 5-9 5-11 Gotta' Clear HC (HCP gets it too) when taking this exception! */
 				HC_bit_set(cpustate, 0);
 			}
 		}
@@ -306,8 +317,8 @@ static void dsp56k_set_irq_source(UINT8 irq_num, UINT16 iv, const char* source)
 /* Construct a table containing pertient IRQ information */
 static void dsp56k_irq_table_init(void)
 {
-	// 1-14 + 1-18
-	// TODO: Cull host command stuff appropriately
+	/* 1-14 + 1-18 */
+	/* TODO: Cull host command stuff appropriately */
 	/* array index . vector . token */
 	dsp56k_set_irq_source(0,  0x0000, "Hardware RESET");
 	dsp56k_set_irq_source(1,  0x0002, "Illegal Instruction");
@@ -370,14 +381,14 @@ static void dsp56k_sort_pending_interrupts(dsp56k_core* cpustate, int num)
 {
 	int i, j;
 
-	// We're going to be sorting the priorities
+	/* We're going to be sorting the priorities */
 	int priority_list[32];
 	for (i = 0; i < num; i++)
 	{
 		priority_list[i] = dsp56k_get_irq_priority(cpustate, cpustate->PCU.pending_interrupts[i]);
 	}
 
-	// Bubble sort should be good enough for us
+	/* Bubble sort should be good enough for us */
 	for (i = 0; i < num; i++)
 	{
 	    for(j = 0; j < num-1; j++)
@@ -386,12 +397,12 @@ static void dsp56k_sort_pending_interrupts(dsp56k_core* cpustate, int num)
 			{
 				int holder;
 
-				// Swap priorities
+				/* Swap priorities */
 				holder = priority_list[j+1];
 				priority_list[j+1] = priority_list[j];
 				priority_list[j] = holder;
 
-				// Swap irq indices.
+				/* Swap irq indices. */
 				holder = cpustate->PCU.pending_interrupts[j+1];
 				cpustate->PCU.pending_interrupts[j+1] = cpustate->PCU.pending_interrupts[j];
 				cpustate->PCU.pending_interrupts[j] = holder;
@@ -399,50 +410,50 @@ static void dsp56k_sort_pending_interrupts(dsp56k_core* cpustate, int num)
 		}
 	}
 
-	// TODO: 1-17 Now sort each of the priority levels within their categories.
+	/* TODO: 1-17 Now sort each of the priority levels within their categories. */
 }
 
 /* Given an index into the irq table, return the interrupt's current priority */
 static INT8 dsp56k_get_irq_priority(dsp56k_core* cpustate, int index)
 {
-	// 1-12
+	/* 1-12 */
 	switch (index)
 	{
-		// Non-maskable
-		case 0:  return 3; // Hardware RESET
-		case 1:  return 3; // Illegal Instruction
-		case 2:  return 3; // Stack Error
-		case 3:  return 3; // Reserved
-		case 4:  return 3; // SWI
+		/* Non-maskable */
+		case 0:  return 3; /* Hardware RESET */
+		case 1:  return 3; /* Illegal Instruction */
+		case 2:  return 3; /* Stack Error */
+		case 3:  return 3; /* Reserved */
+		case 4:  return 3; /* SWI */
 
-		// Poll the IPR for these guys.
-		case 5:  return irqa_ipl(cpustate);  // IRQA
-		case 6:  return irqb_ipl(cpustate);  // IRQB
-		case 7:  return -1;         		 // Reserved
-		case 8:  return ssi0_ipl(cpustate);  // SSI0 Receive Data with Exception
-		case 9:  return ssi0_ipl(cpustate);  // SSI0 Receive Data
-		case 10: return ssi0_ipl(cpustate);  // SSI0 Transmit Data with Exception
-		case 11: return ssi0_ipl(cpustate);  // SSI0 Transmit Data
-		case 12: return ssi1_ipl(cpustate);  // SSI1 Receive Data with Exception
-		case 13: return ssi1_ipl(cpustate);  // SSI1 Receive Data
-		case 14: return ssi1_ipl(cpustate);  // SSI1 Transmit Data with Exception
-		case 15: return ssi1_ipl(cpustate);  // SSI1 Transmit Data
-		case 16: return tm_ipl(cpustate);    // Timer Overflow
-		case 17: return tm_ipl(cpustate);    // Timer Compare
-		case 18: return host_ipl(cpustate);  // Host DMA Receive Data
-		case 19: return host_ipl(cpustate);  // Host DMA Transmit Data
-		case 20: return host_ipl(cpustate);  // Host Receive Data
-		case 21: return host_ipl(cpustate);  // Host Transmit Data
-		case 22: return host_ipl(cpustate);  // Host Command 0 (Default)
-		case 23: return codec_ipl(cpustate); // Codec Receive/Transmit
-		case 24: return host_ipl(cpustate);  // Host Command 1              // TODO: Are all host ipl's the same?
-		case 25: return host_ipl(cpustate);  // Host Command 2
-		case 26: return host_ipl(cpustate);  // Host Command 3
-		case 27: return host_ipl(cpustate);  // Host Command 4
-		case 28: return host_ipl(cpustate);  // Host Command 5
-		case 29: return host_ipl(cpustate);  // Host Command 6
-		case 30: return host_ipl(cpustate);  // Host Command 7
-		case 31: return host_ipl(cpustate);  // Host Command 8
+		/* Poll the IPR for these guys. */
+		case 5:  return irqa_ipl(cpustate);  /* IRQA */
+		case 6:  return irqb_ipl(cpustate);  /* IRQB */
+		case 7:  return -1;         		 /* Reserved */
+		case 8:  return ssi0_ipl(cpustate);  /* SSI0 Receive Data with Exception */
+		case 9:  return ssi0_ipl(cpustate);  /* SSI0 Receive Data */
+		case 10: return ssi0_ipl(cpustate);  /* SSI0 Transmit Data with Exception */
+		case 11: return ssi0_ipl(cpustate);  /* SSI0 Transmit Data */
+		case 12: return ssi1_ipl(cpustate);  /* SSI1 Receive Data with Exception */
+		case 13: return ssi1_ipl(cpustate);  /* SSI1 Receive Data */
+		case 14: return ssi1_ipl(cpustate);  /* SSI1 Transmit Data with Exception */
+		case 15: return ssi1_ipl(cpustate);  /* SSI1 Transmit Data */
+		case 16: return tm_ipl(cpustate);    /* Timer Overflow */
+		case 17: return tm_ipl(cpustate);    /* Timer Compare */
+		case 18: return host_ipl(cpustate);  /* Host DMA Receive Data */
+		case 19: return host_ipl(cpustate);  /* Host DMA Transmit Data */
+		case 20: return host_ipl(cpustate);  /* Host Receive Data */
+		case 21: return host_ipl(cpustate);  /* Host Transmit Data */
+		case 22: return host_ipl(cpustate);  /* Host Command 0 (Default) */
+		case 23: return codec_ipl(cpustate); /* Codec Receive/Transmit */
+		case 24: return host_ipl(cpustate);  /* Host Command 1              // TODO: Are all host ipl's the same? */
+		case 25: return host_ipl(cpustate);  /* Host Command 2 */
+		case 26: return host_ipl(cpustate);  /* Host Command 3 */
+		case 27: return host_ipl(cpustate);  /* Host Command 4 */
+		case 28: return host_ipl(cpustate);  /* Host Command 5 */
+		case 29: return host_ipl(cpustate);  /* Host Command 6 */
+		case 30: return host_ipl(cpustate);  /* Host Command 7 */
+		case 31: return host_ipl(cpustate);  /* Host Command 8 */
 
 		default: break;
 	}

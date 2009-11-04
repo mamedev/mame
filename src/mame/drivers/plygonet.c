@@ -763,6 +763,15 @@ static DRIVER_INIT(polygonet)
 
 	/* The dsp56k occasionally executes out of mapped memory */
 	dsp56k_update_handler = memory_set_direct_update_handler(cputag_get_address_space(machine, "dsp", ADDRESS_SPACE_PROGRAM), plygonet_dsp56k_direct_handler);
+    
+    /* save states */
+	state_save_register_global(machine, init_eeprom_count);
+	state_save_register_global_pointer(machine, dsp56k_bank00_ram,    2 * 8 * dsp56k_bank00_size);
+	state_save_register_global_pointer(machine, dsp56k_bank01_ram,    2 * 8 * dsp56k_bank01_size);
+	state_save_register_global_pointer(machine, dsp56k_bank02_ram,    2 * 8 * dsp56k_bank02_size);
+	state_save_register_global_pointer(machine, dsp56k_shared_ram_16, 2 * 8 * dsp56k_shared_ram_16_size);
+	state_save_register_global_pointer(machine, dsp56k_bank04_ram,    2 * 8 * dsp56k_bank04_size);
+	state_save_register_global(machine, cur_sound_region);
 }
 
 
@@ -821,6 +830,6 @@ ROM_START( polynetw )
 ROM_END
 
 /*          ROM       parent   machine   inp        init */
-GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet, ROT90, "Konami", "Polygonet Commanders (ver UAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1993, polynetw, 0,       plygonet, polynetw,  polygonet, ROT90, "Konami", "Poly-Net Warriors (ver JAA)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1993, plygonet, 0,       plygonet, polygonet, polygonet, ROT90, "Konami", "Polygonet Commanders (ver UAA)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, polynetw, 0,       plygonet, polynetw,  polygonet, ROT90, "Konami", "Poly-Net Warriors (ver JAA)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 

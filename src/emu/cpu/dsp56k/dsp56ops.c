@@ -2865,8 +2865,8 @@ static size_t dsp56k_op_do_2(dsp56k_core* cpustate, const UINT16 op, const UINT1
 	/* HACK */
     if (lValue >= 0xfff0)
 	{
-		lValue = 0x0000;
 		logerror("Dsp56k : DO_2 operation changed %04x to 0000.\n", lValue);
+		lValue = 0x0000;
 	}
 
 	/* TODO: Fix for special cased SP S */
