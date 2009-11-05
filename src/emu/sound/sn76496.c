@@ -84,7 +84,7 @@ struct _sn76496_state
 	INT32 FeedbackInvert;	/* feedback invert flag (xor vs xnor) */
 	INT32 Period[4];	/* Length of 1/2 of waveform */
 	INT32 Count[4];		/* Position within the waveform */
-	INT32 OldNoise;		/* 1 bit output of the PREVIOUS noise output, buffered by the volume amp */
+	INT32 OldNoise;		/* 1 bit output of the PREVIOUS noise output */
 	INT32 Output[4];	/* 1-bit output of each channel, pre-volume */
 	INT32 CyclestoREADY;/* number of cycles until the READY line goes active */
 };
@@ -172,7 +172,9 @@ WRITE8_DEVICE_HANDLER( sn76496_w )
 				R->Period[3] = ((n&3) == 3) ? 2 * R->Period[2] : (STEP << (5+(n&3)));
 			        /* Reset noise shifter */
 				R->RNG = R->FeedbackMask;
-				R->Output[3] = R->RNG & 1;
+				R->OldNoise = 0;
+				R->Output[3] = R->OldNoise;
+				R->OldNoise = R->RNG & 1;
 			}
 			break;
 	}
