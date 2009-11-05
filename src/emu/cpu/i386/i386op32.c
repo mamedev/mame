@@ -998,9 +998,41 @@ static void I386OP(lea32)(i386_state *cpustate)				// Opcode 0x8d
 	CYCLES(cpustate,CYCLES_LEA);
 }
 
+static void I386OP(enter32)(i386_state *cpustate)			// Opcode 0xc8
+{
+	UINT16 framesize = FETCH16(cpustate);
+	UINT8 level = FETCH(cpustate) % 32;
+	UINT8 x;
+	UINT32 frameptr;
+	PUSH32(cpustate,REG32(EBP));
+	if(!STACK_32BIT)
+		frameptr = REG16(SP);
+	else
+		frameptr = REG32(ESP);
+	
+	if(level > 0)
+	{
+		for(x=1;x<level-1;x++)
+		{
+			REG32(EBP) -= 4;
+			PUSH32(cpustate,READ32(cpustate,REG32(EBP)));
+		}
+		PUSH32(cpustate,frameptr);
+	}
+	REG32(EBP) = frameptr;
+	if(!STACK_32BIT)
+		REG16(SP) -= framesize;
+	else
+		REG32(ESP) -= framesize;
+	CYCLES(cpustate,CYCLES_ENTER);
+}
+
 static void I386OP(leave32)(i386_state *cpustate)			// Opcode 0xc9
 {
-	REG32(ESP) = REG32(EBP);
+	if(!STACK_32BIT)
+		REG16(SP) = REG16(BP);
+	else
+		REG32(ESP) = REG32(EBP);
 	REG32(EBP) = POP32(cpustate);
 	CYCLES(cpustate,CYCLES_LEAVE);
 }

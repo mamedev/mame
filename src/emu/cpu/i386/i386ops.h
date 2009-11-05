@@ -220,7 +220,7 @@ static const X86_OPCODE x86_opcode_table[] =
 	{ 0xC5,		OP_I386,					I386OP(lds16),					I386OP(lds32),				},
 	{ 0xC6,		OP_I386,					I386OP(mov_rm8_i8),				I386OP(mov_rm8_i8),			},
 	{ 0xC7,		OP_I386,					I386OP(mov_rm16_i16),			I386OP(mov_rm32_i32),		},
-	{ 0xC8,		OP_I386,					I386OP(unimplemented),			I386OP(unimplemented),		},
+	{ 0xC8,		OP_I386,					I386OP(enter16),				I386OP(enter32),			},
 	{ 0xC9,		OP_I386,					I386OP(leave16),				I386OP(leave32),			},
 	{ 0xCA,		OP_I386,					I386OP(retf_i16),				I386OP(retf_i32),			},
 	{ 0xCB,		OP_I386,					I386OP(retf16),					I386OP(retf32),				},

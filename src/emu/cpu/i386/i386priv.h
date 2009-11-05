@@ -197,6 +197,9 @@ struct _i386_state
 	UINT8 AF;
 	UINT8 IF;
 	UINT8 TF;
+	UINT8 IOP1;
+	UINT8 IOP2;
+	UINT8 NT;
 
 	UINT8 performed_intersegment_jump;
 

@@ -90,6 +90,9 @@ static UINT32 get_flags(i386_state *cpustate)
 	f |= cpustate->IF << 9;
 	f |= cpustate->DF << 10;
 	f |= cpustate->OF << 11;
+	f |= cpustate->IOP1 << 12;
+	f |= cpustate->IOP2 << 13;
+	f |= cpustate->NT << 14;
 	return (cpustate->eflags & 0xFFFF0000) | (f & 0xFFFF);
 }
 
@@ -104,6 +107,9 @@ static void set_flags(i386_state *cpustate, UINT32 f )
 	cpustate->IF = (f & 0x200) ? 1 : 0;
 	cpustate->DF = (f & 0x400) ? 1 : 0;
 	cpustate->OF = (f & 0x800) ? 1 : 0;
+	cpustate->IOP1 = (f & 0x1000) ? 1 : 0;
+	cpustate->IOP2 = (f & 0x2000) ? 1 : 0;
+	cpustate->NT = (f & 0x4000) ? 1 : 0;
 }
 
 static void sib_byte(i386_state *cpustate,UINT8 mod, UINT32* out_ea, UINT8* out_segment)
@@ -275,14 +281,14 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate)
 	UINT32 v1, v2;
 	UINT32 offset;
 	UINT16 segment;
-	int entry = irq * (cpustate->sreg[CS].d ? 8 : 4);
+	int entry = irq * (PROTECTED_MODE ? 8 : 4);
 
 	/* Check if IRQ is out of IDTR's bounds */
 	if( entry > cpustate->idtr.limit ) {
 		fatalerror("I386 Interrupt: IRQ out of IDTR bounds (IRQ: %d, IDTR Limit: %d)", irq, cpustate->idtr.limit);
 	}
 
-	if( !cpustate->sreg[CS].d )
+	if( !(PROTECTED_MODE) )
 	{
 		/* 16-bit */
 		PUSH16(cpustate, get_flags(cpustate) & 0xffff );
@@ -306,15 +312,25 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate)
 	{
 		int type;
 		/* 32-bit */
-		PUSH32(cpustate, get_flags(cpustate) & 0x00fcffff );
-		PUSH32(cpustate, cpustate->sreg[CS].selector );
-		PUSH32(cpustate, cpustate->eip );
 
 		v1 = READ32(cpustate, cpustate->idtr.base + entry );
 		v2 = READ32(cpustate, cpustate->idtr.base + entry + 4 );
 		offset = (v2 & 0xffff0000) | (v1 & 0xffff);
 		segment = (v1 >> 16) & 0xffff;
 		type = (v2>>8) & 0x1F;
+
+		if(type != 0x0e && type != 0x0f)  // if not 386 interrupt or trap gate
+		{
+			PUSH16(cpustate, get_flags(cpustate) & 0xffff );
+			PUSH16(cpustate, cpustate->sreg[CS].selector );
+			PUSH16(cpustate, cpustate->eip );
+		}
+		else
+		{
+			PUSH32(cpustate, get_flags(cpustate) & 0x00fcffff );
+			PUSH32(cpustate, cpustate->sreg[CS].selector );
+			PUSH32(cpustate, cpustate->eip );
+		}
 
 		cpustate->sreg[CS].selector = segment;
 		cpustate->eip = offset;
