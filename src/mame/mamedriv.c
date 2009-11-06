@@ -4065,6 +4065,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( vmahjong )	/* 1997.02 Virtual Mahjong (Micronet) */
 	DRIVER( groovef )	/* 1997.05 Groove on Fight (Atlus) */
 	DRIVER( nclubv3 )	/* 1997.07 Name Club Ver. 3 */
+	DRIVER( pclub2 )	/* 1997.09 Print Club 2 */
 	DRIVER( thunt )		/* 1997.09 Puzzle & Action Treasure Hunt (Sega (Deniam License)) */
 	DRIVER( thuntk )
 	DRIVER( winterht )	/* 1997.10 Winter Heat (Data East) */
@@ -4088,6 +4089,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( elandore )	/* 1998.11 Touryuu Densetsu Elandore (Sai-Mate) */
 	DRIVER( sss )		/* 1998.12 Steep Slope Sliders (Capcom / Cave / Victor) */
 	DRIVER( micrombc )	/* 1999.03 Microman Battle Charge */
+	DRIVER( pclub2v3 )	/* 1999.03 Print Club 2 Vol. 3 */
 	DRIVER( sanjeon )	/* 1999.04 Sanjun Sujun (Sega / Deniam) */
 	DRIVER( danchih )	/* 1999.06 Danchi de Hanafuda Okusan Komeya Desuyo! (Altron (Tecmo License)) */
 	DRIVER( ffreveng )	/* 1999.09 Final Fight Revenge (Capcom) */
@@ -4548,7 +4550,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2001.06 Club Kart */
 	DRIVER( beachspi )	/* 2001.07 Beach Spikers */
 						/* 2001.08 Wave Runner GP */
-	DRIVER( vf4cart )     	/* 2001.08.02 Virtua Fighter 4 (cartridge) */
+	DRIVER( vf4cart )	/* 2001.08.02 Virtua Fighter 4 (cartridge) */
 	DRIVER( vf4 )		/* 2001.08.02 Virtua Fighter 4 (GD-ROM) */
 	DRIVER( vf4b )		/* 2001.08.20 Virtua Fighter 4 ver.B */
 	DRIVER( vf4c )		/* 2002.01.31 Virtua Fighter 4 ver.C */
