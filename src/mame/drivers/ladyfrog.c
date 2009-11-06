@@ -376,4 +376,4 @@ ROM_END
 
 
 GAME( 1990, ladyfrog, 0,       ladyfrog,  ladyfrog, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", 0)
-GAME( 1990, toucheme, 0,       ladyfrog,  toucheme, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Touche Me", GAME_IMPERFECT_GRAPHICS)
+GAME( 19??, toucheme, 0,       ladyfrog,  toucheme, 0, ORIENTATION_SWAP_XY, "Unknown", "Touche Me", GAME_IMPERFECT_GRAPHICS)
