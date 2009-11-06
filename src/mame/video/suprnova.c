@@ -348,10 +348,10 @@ void skns_sprite_kludge(int x, int y)
 /* We are working in .6 fixed point if you hadn't guessed */
 
 #define z_decls(step)				\
-	UINT16 zxs = 0x40-(zx>>10);			\
-	UINT16 zxd = 0x40-((zx>>2) & 0x3f);		\
-	UINT16 zys = 0x40-(zy>>10);			\
-	UINT16 zyd = 0x40-((zy>>2) & 0x3f);		\
+	UINT16 zxs = 0x40-(zx_m>>2);			\
+	UINT16 zxd = 0x40-(zx_s>>2);		\
+	UINT16 zys = 0x40-(zy_m>>2);			\
+	UINT16 zyd = 0x40-(zy_s>>2);		\
 	int xs, ys, xd, yd, old, old2;		\
 	int step_spr = step;				\
 	int bxs = 0, bys = 0;				\
@@ -443,7 +443,7 @@ void skns_sprite_kludge(int x, int y)
 		old2 += 0x40;				\
 	}
 
-static void blit_nf_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx, UINT16 zy, int colour)
+static void blit_nf_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_min();
@@ -457,7 +457,7 @@ static void blit_nf_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *
 	}
 }
 
-static void blit_fy_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx, UINT16 zy, int colour)
+static void blit_fy_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_min();
@@ -471,7 +471,7 @@ static void blit_fy_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *
 	}
 }
 
-static void blit_fx_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx, UINT16 zy, int colour)
+static void blit_fx_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_max();
@@ -485,7 +485,7 @@ static void blit_fx_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *
 	}
 }
 
-static void blit_fxy_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx, UINT16 zy, int colour)
+static void blit_fxy_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_max();
@@ -499,7 +499,7 @@ static void blit_fxy_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 
 	}
 }
 
-static void (*const blit_z[4])(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx, UINT16 zy, int colour) = {
+static void (*const blit_z[4])(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour) = {
 	blit_nf_z,
 	blit_fy_z,
 	blit_fx_z,
@@ -560,7 +560,7 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 	int sx,sy;
 	int endromoffs=0, gfxlen;
 	int grow;
-	UINT16 zoomx, zoomy;
+	UINT16 zoomx_m, zoomx_s, zoomy_m, zoomy_s;
 
 
 	if ((!disabled) && suprnova_alt_enable_sprites){
@@ -700,15 +700,25 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 
 			if (!grow)
 			{
-				zoomx = (source[2] >> 16)&0xfcfc;
-				zoomy = (source[3] >> 16)&0xfcfc;
+				zoomx_m = (source[2] >> 24)&0x00fc;
+				zoomx_s = (source[2] >> 16)&0x00fc;
+				zoomy_m = (source[3] >> 24)&0x00fc;
+				zoomy_s = (source[3] >> 16)&0x00fc;
 			}
 			else
 			{
-				// the bad sprites in sengekis all have this not set..
-				// we need to handle sprite shrink properly
-				zoomx = 0;
-				zoomy = 0;
+				// sengekis uses this on sprites which are shrinking as they head towards the ground
+				// it's also used on the input test of Gals Panic S2
+				// 
+				// it appears to offer a higher precision 'shrink' mode (although I'm not entirely
+				//  convinced this implementation is correct because we simply end up ignoring
+				//  part of the data)		
+				zoomx_m = 0;
+				zoomx_s = (source[2] >> 24)&0x00fc;
+				zoomy_m = 0;
+				zoomy_s = (source[3] >> 24)&0x00fc;
+
+			
 			}
 
 
@@ -732,9 +742,9 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 			{
 				int NewColour = (colour<<8) | (pri << 14);
 
-				if(zoomx || zoomy)
+				if(zoomx_m || zoomx_s || zoomy_m || zoomy_s)
 				{
-					blit_z[ (xflip<<1) | yflip ](bitmap, cliprect, decodebuffer, sx, sy, xsize, ysize, zoomx, zoomy, NewColour);
+					blit_z[ (xflip<<1) | yflip ](bitmap, cliprect, decodebuffer, sx, sy, xsize, ysize, zoomx_m, zoomx_s, zoomy_m, zoomy_s, NewColour);
 				}
 				else
 				{
@@ -952,11 +962,13 @@ static void supernova_draw_a( bitmap_t *bitmap, bitmap_t* bitmap_flags, const re
 	if (enable_a && suprnova_alt_enable_background)
 	{
 		startx = skns_v3_regs[0x1c/4];
-		incyy  = skns_v3_regs[0x30/4]; // was xx, changed for sarukani
+		incyy  = skns_v3_regs[0x30/4]&0x7ffff;
+		if (incyy&0x40000) incyy = incyy-0x80000; // level 3 boss in sengekis
 		incyx  = skns_v3_regs[0x2c/4];
 		starty = skns_v3_regs[0x20/4];
 		incxy  = skns_v3_regs[0x28/4];
-		incxx  = skns_v3_regs[0x24/4]; // was yy, changed for sarukani
+		incxx  = skns_v3_regs[0x24/4]&0x7ffff;
+		if (incxx&0x40000) incxx = incxx-0x80000;
 
 		columnscroll = (skns_v3_regs[0x0c/4] >> 1) & 0x0001;
 
@@ -980,13 +992,18 @@ static void supernova_draw_b( bitmap_t *bitmap, bitmap_t* bitmap_flags, const re
 	if (enable_b && suprnova_alt_enable_background)
 	{
 		startx = skns_v3_regs[0x40/4];
-		incyy  = skns_v3_regs[0x54/4];
+		incyy  = skns_v3_regs[0x54/4]&0x7ffff;
+		if (incyy&0x40000) incyy = incyy-0x80000;
 		incyx  = skns_v3_regs[0x50/4];
 		starty = skns_v3_regs[0x44/4];
 		incxy  = skns_v3_regs[0x4c/4];
-		incxx  = skns_v3_regs[0x48/4];
+		incxx  = skns_v3_regs[0x48/4]&0x7ffff;
+		if (incxx&0x40000) incxx = incxx-0x80000;
 		columnscroll = (skns_v3_regs[0x0c/4] >> 9) & 0x0001; // selects column scroll or rowscroll
 		suprnova_draw_roz(bitmap,bitmap_flags, cliprect, skns_tilemap_B, startx << 8,starty << 8,	incxx << 8,incxy << 8,incyx << 8,incyy << 8, !nowrap_b, columnscroll, &skns_v3slc_ram[0x1000/4]);
+
+		//popmessage("%08x %08x %08x %08x %08x %08x", startx, starty, incxx, incyy, incxy, incyx);
+
 	}
 }
 
