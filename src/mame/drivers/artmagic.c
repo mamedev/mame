@@ -152,7 +152,8 @@ static TIMER_CALLBACK( irq_off )
 static READ16_HANDLER( ultennis_hack_r )
 {
 	/* IRQ5 points to: jsr (a5); rte */
-	if (cpu_get_pc(space->cpu) == 0x18c2)
+	UINT32 pc = cpu_get_pc(space->cpu);
+	if (pc == 0x18c2 || pc == 0x18e4)
 	{
 		hack_irq = 1;
 		update_irq_state(space->machine);
@@ -946,7 +947,7 @@ static DRIVER_INIT( stonebal )
  *************************************/
 
 GAME( 1993, ultennis, 0,        artmagic, ultennis, ultennis, ROT0, "Art & Magic", "Ultimate Tennis", GAME_SUPPORTS_SAVE )
-GAME( 1993, ultennisj, ultennis,artmagic, ultennis, ultennis, ROT0, "Art & Magic", "Ultimate Tennis (Japan)", GAME_NOT_WORKING)
+GAME( 1993, ultennisj,ultennis, artmagic, ultennis, ultennis, ROT0, "[Art & Magic] (Banpresto license)", "Ultimate Tennis (v 1.4, Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1994, cheesech, 0,        cheesech, cheesech, cheesech, ROT0, "Art & Magic", "Cheese Chase", GAME_SUPPORTS_SAVE )
 GAME( 1994, stonebal, 0,        stonebal, stonebal, stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players)", GAME_SUPPORTS_SAVE )
 GAME( 1994, stonebal2,stonebal, stonebal, stoneba2, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players)", GAME_SUPPORTS_SAVE )
