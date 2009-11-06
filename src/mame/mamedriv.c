@@ -8323,6 +8323,7 @@ Other Sun games
 
 	/* Art & Magic games */
 	DRIVER( ultennis )	/* (c) 1993 */
+	DRIVER( ultennisj )	/* (c) 1993 */
 	DRIVER( cheesech )	/* (c) 1994 */
 	DRIVER( stonebal )	/* (c) 1994 */
 	DRIVER( stonebal2 )	/* (c) 1994 */
@@ -8753,6 +8754,7 @@ Other Sun games
 	DRIVER( strvmstr )	/* (c) 1986 Enerdyne Technologies Inc */
 	DRIVER( dorachan )	/* (c) 1980 Craul Denshi */
 	DRIVER( ladyfrog )	/* (c) 1990 Mondial Games */
+	DRIVER( toucheme )
 	DRIVER( rabbit )	/* (c) 1997 Electronic Arts */
 	DRIVER( tmmjprd )	/* (c) 1997 Media / Sonnet */
 	DRIVER( tmpdoki )	/* (c) 1998 Media Syouji */

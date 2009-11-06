@@ -791,6 +791,19 @@ ROM_START( ultennis )
 ROM_END
 
 
+ROM_START( ultennisj )
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for 68000 code */
+	ROM_LOAD16_BYTE( "a&m001d0194-13c-u102-japan.u102", 0x00000, 0x40000, CRC(65cee452) SHA1(49259e8faf289d6d80769f6d44e9d61d15e431c6) )
+	ROM_LOAD16_BYTE( "a&m001d0194-12c-u101-japan.u101", 0x00001, 0x40000, CRC(5f4b0ca0) SHA1(57e9ed60cc0e53eeb4e08c4003138d3bdaec3de7) )
+
+	ROM_REGION16_LE( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "a&m-001-01-a.ic133", 0x000000, 0x200000, CRC(29d9204d) SHA1(0b2b77a55b8c2877c2e31b63156505584d4ee1f0) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "a&m001c1293-14a-u151.u151", 0x00000,  0x40000, CRC(4e19ca89) SHA1(ac7e17631ec653f83c4912df6f458b0e1df88096) )
+ROM_END
+
+
 /*
 Stone Ball
 Art & Magic, 1994
@@ -932,7 +945,8 @@ static DRIVER_INIT( stonebal )
  *
  *************************************/
 
-GAME( 1993, ultennis, 0,        artmagic, ultennis, ultennis, ROT0, "Art & Magic", "Ultimate Tennis",		 GAME_SUPPORTS_SAVE )
-GAME( 1994, cheesech, 0,        cheesech, cheesech, cheesech, ROT0, "Art & Magic", "Cheese Chase",			 GAME_SUPPORTS_SAVE )
+GAME( 1993, ultennis, 0,        artmagic, ultennis, ultennis, ROT0, "Art & Magic", "Ultimate Tennis", GAME_SUPPORTS_SAVE )
+GAME( 1993, ultennisj, ultennis,artmagic, ultennis, ultennis, ROT0, "Art & Magic", "Ultimate Tennis (Japan)", GAME_NOT_WORKING)
+GAME( 1994, cheesech, 0,        cheesech, cheesech, cheesech, ROT0, "Art & Magic", "Cheese Chase", GAME_SUPPORTS_SAVE )
 GAME( 1994, stonebal, 0,        stonebal, stonebal, stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players)", GAME_SUPPORTS_SAVE )
 GAME( 1994, stonebal2,stonebal, stonebal, stoneba2, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players)", GAME_SUPPORTS_SAVE )
