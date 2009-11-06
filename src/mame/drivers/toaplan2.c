@@ -3105,6 +3105,23 @@ static INPUT_PORTS_START( batrider )
 	PORT_DIPSETTING(		0x1000, DEF_STR( On ) )
 	/* These Dips are showed only when Coin_A is set to Free_Play, but they work in normal play mode too. */
 	PORT_DIPNAME( 0x2000,	0x0000, "Guest Player" )			PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(		0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000,	0x0000, "Player Select" )			PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(		0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000,	0x0000, "Special Course" )			PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(		0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( batridrj )
+	PORT_INCLUDE( batrider )
+
+	PORT_MODIFY("SYS-DSW")	/* Coin/System and DSWC */
+	/* These Dips are showed only when Coin_A is set to Free_Play, but they work in normal play mode too. */
+	PORT_DIPNAME( 0x2000,	0x0000, "Guest Player" )			PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x2000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x4000,	0x0000, "Player Select" )			PORT_DIPLOCATION("SW3:7")
@@ -5279,10 +5296,10 @@ GAME( 1996, bgareggacn, bgaregga, bgaregga, bgaregcn, T2_Z80,   ROT270, "Raizing
 GAME( 1998, batrid,   0,        batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
 GAME( 1998, batridu,  batrid,   batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (U.S.A.) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
 GAME( 1998, batridc,  batrid,   batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (China) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
-GAME( 1998, batridj,  batrid,   batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider - B Version (Japan) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
+GAME( 1998, batridj,  batrid,   batrider, batridrj, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider - B Version (Japan) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
 GAME( 1998, batridk,  batrid,   batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Korea) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
 // version A is older code
-GAME( 1998, batridja, batrid,   batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan) (Mon Dec 22 1997)", GAME_SUPPORTS_SAVE )
+GAME( 1998, batridja, batrid,   batrider, batridrj, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan) (Mon Dec 22 1997)", GAME_SUPPORTS_SAVE )
 
 // Battle Bakraid
 // the 'unlimited' version is a newer revision of the code.
