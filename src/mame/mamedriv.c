@@ -9758,6 +9758,11 @@ Other Sun games
 
 	/* Scorpion 2 */
 	DRIVER( m_brkfst )
+	DRIVER( m_brkfs1 )
+	DRIVER( m_brkfs2 )
+	DRIVER( m_brkfs3 )
+	DRIVER( m_brkfs4 )
+	DRIVER( m_brkfs5 )
 
 	DRIVER( m_bdrwho )
 	DRIVER( m_bdrwh1 )
