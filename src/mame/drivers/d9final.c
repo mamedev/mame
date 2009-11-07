@@ -60,6 +60,14 @@ static WRITE8_HANDLER( d9final_bank_w )
 	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
 }
 
+/* game checks this after three attract cycles, otherwise coin inputs stop to work. */
+static READ8_HANDLER( prot_latch_r )
+{
+//	printf("PC=%06x\n",cpu_get_pc(space->cpu));
+
+	return 0x04;
+}
+
 static ADDRESS_MAP_START( d9final_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
@@ -69,11 +77,12 @@ static ADDRESS_MAP_START( d9final_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&lo_vram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE(&hi_vram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&cram)
+	AM_RANGE(0xf000, 0xf000) AM_READ(prot_latch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( d9final_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x00, 0x00) AM_WRITENOP //bit 0: irq enable?
+//	AM_RANGE(0x00, 0x00) AM_WRITENOP //bit 0: irq enable? screen enable?
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA")
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSWB")
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWC")
@@ -255,9 +264,9 @@ GFXDECODE_END
 
 static MACHINE_RESET( d9final )
 {
-//	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-//	memory_set_bankptr(machine, 1, &ROM[0x10000]);
+	memory_set_bankptr(machine, 1, &ROM[0x10000]);
 }
 
 static MACHINE_DRIVER_START( d9final )
@@ -294,7 +303,7 @@ MACHINE_DRIVER_END
 ROM_START( d9final )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "2.4h", 0x00000, 0x8000, CRC(a8d838c8) SHA1(85b2cd1b73569e0e4fc13bfff537cfc2b4d569a1)  )
-	ROM_CONTINUE(       0x10000, 0x08000 )
+	ROM_CONTINUE(        0x10000, 0x08000 )
 	ROM_COPY( "maincpu", 0x10000, 0x18000, 0x08000 ) //or just 0xff
 	ROM_LOAD( "1.2h", 0x20000, 0x10000, CRC(901281ec) SHA1(7b4cae343f1b025d988a507141c0fa8229a0fea1)  )
 
