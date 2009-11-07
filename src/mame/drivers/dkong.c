@@ -324,8 +324,8 @@ Donkey Kong Junior Notes
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( hb_dma_read_byte );
-static WRITE8_DEVICE_HANDLER( hb_dma_write_byte );
+static READ8_HANDLER( hb_dma_read_byte );
+static WRITE8_HANDLER( hb_dma_write_byte );
 static READ8_DEVICE_HANDLER( dk_dma_read_byte );
 static WRITE8_DEVICE_HANDLER( dk_dma_write_byte );
 static READ8_DEVICE_HANDLER( p8257_ctl_r );
@@ -347,28 +347,26 @@ static const z80dma_interface dk3_dma =
     NULL
 };
 
-static const dma8257_interface dk_dma =
+static I8257_INTERFACE( dk_dma )
 {
-    "maincpu",
-
-    dk_dma_read_byte,
-    dk_dma_write_byte,
-
-    { 0, p8257_ctl_r, 0, 0 },
-    { p8257_ctl_w, 0, 0, 0 },
-    { 0, 0, 0, 0 }
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
+    { DEVCB_NULL, DEVCB_HANDLER(p8257_ctl_r), DEVCB_NULL, DEVCB_NULL },
+    { DEVCB_HANDLER(p8257_ctl_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
-static const dma8257_interface hb_dma =
+static I8257_INTERFACE( hb_dma )
 {
-    "maincpu",
-
-    hb_dma_read_byte,
-    hb_dma_write_byte,
-
-    { 0, p8257_ctl_r, 0, 0 },
-    { p8257_ctl_w, 0, 0, 0 },
-    { 0, 0, 0, 0 }
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, hb_dma_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, hb_dma_write_byte),
+    { DEVCB_NULL, DEVCB_HANDLER(p8257_ctl_r), DEVCB_NULL, DEVCB_NULL },
+    { DEVCB_HANDLER(p8257_ctl_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
 /*************************************
@@ -506,10 +504,9 @@ static WRITE8_DEVICE_HANDLER( dk_dma_write_byte )
     memory_write_byte(space, offset, data);
 }
 
-static READ8_DEVICE_HANDLER( hb_dma_read_byte )
+static READ8_HANDLER( hb_dma_read_byte )
 {
-    const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-    dkong_state *state = (dkong_state *)device->machine->driver_data;
+    dkong_state *state = (dkong_state *)space->machine->driver_data;
     int   bucket = state->rev_map[(offset>>10) & 0x1ff];
     int   addr;
 
@@ -521,10 +518,9 @@ static READ8_DEVICE_HANDLER( hb_dma_read_byte )
     return memory_read_byte(space, addr);
 }
 
-static WRITE8_DEVICE_HANDLER( hb_dma_write_byte )
+static WRITE8_HANDLER( hb_dma_write_byte )
 {
-    const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-    dkong_state *state = (dkong_state *)device->machine->driver_data;
+    dkong_state *state = (dkong_state *)space->machine->driver_data;
     int   bucket = state->rev_map[(offset>>10) & 0x1ff];
     int   addr;
 
@@ -562,8 +558,8 @@ static WRITE8_HANDLER( dkong3_coin_counter_w )
 
 static WRITE8_DEVICE_HANDLER( p8257_drq_w )
 {
-    dma8257_drq_w(device, 0, data & 0x01);
-    dma8257_drq_w(device, 1, data & 0x01);
+    i8257_drq0_w(device, data & 0x01);
+    i8257_drq1_w(device, data & 0x01);
 }
 
 static READ8_HANDLER( dkong_in2_r )
@@ -764,7 +760,7 @@ static ADDRESS_MAP_START( dkong_map, ADDRESS_SPACE_PROGRAM, 8 )
                                     AM_SIZE_MEMBER(dkong_state, sprite_ram_size) /* sprite set 1 */
     AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w)
                                     AM_BASE_MEMBER(dkong_state, video_ram)
-    AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE("dma8257", dma8257_r, dma8257_w)   /* P8257 control registers */
+    AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE("dma8257", i8257_r, i8257_w)   /* P8257 control registers */
     AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_LATCH8_WRITE("ls175.3d")    /* IN0, sound CPU intf */
     AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(radarscp_grid_color_w)/* IN1 */
 
@@ -788,7 +784,7 @@ static ADDRESS_MAP_START( dkongjr_map, ADDRESS_SPACE_PROGRAM, 8 )
                                     AM_SIZE_MEMBER(dkong_state, sprite_ram_size) /* sprite set 1 */
     AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w)
                                     AM_BASE_MEMBER(dkong_state, video_ram)
-    AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE("dma8257", dma8257_r, dma8257_w)   /* P8257 control registers */
+    AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE("dma8257", i8257_r, i8257_w)   /* P8257 control registers */
 
     AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_LATCH8_WRITE("ls174.3d")    /* IN0, sound interface */
 
@@ -865,7 +861,7 @@ static ADDRESS_MAP_START( s2650_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(dkong_videoram_w)
                                     AM_BASE_MEMBER(dkong_state, video_ram)        /* 0x7400 */
     AM_RANGE(0x1C00, 0x1f7f) AM_RAM                                               /* 0x6000 */
-    AM_RANGE(0x1f80, 0x1f8f) AM_DEVREADWRITE("dma8257", dma8257_r, dma8257_w)   /* P8257 control registers */
+    AM_RANGE(0x1f80, 0x1f8f) AM_DEVREADWRITE("dma8257", i8257_r, i8257_w)   /* P8257 control registers */
     /* 0x6800 not remapped */
     AM_RANGE(0x2000, 0x2fff) AM_ROM
     AM_RANGE(0x3000, 0x3fff) AM_READWRITE(s2650_mirror_r, s2650_mirror_w)
@@ -1594,7 +1590,7 @@ static MACHINE_DRIVER_START( dkong_base )
     MDRV_MACHINE_START(dkong2b)
     MDRV_MACHINE_RESET(dkong)
 
-    MDRV_DMA8257_ADD("dma8257", CLOCK_1H, dk_dma)
+    MDRV_I8257_ADD("dma8257", CLOCK_1H, dk_dma)
 
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
