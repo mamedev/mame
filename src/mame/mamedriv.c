@@ -8580,6 +8580,7 @@ Other Sun games
 	DRIVER( gfire2 )	/* (c) 1992 Topis Corp */
 	DRIVER( sprcros2 )	/* (c) 1986 GM Shoji */
 	DRIVER( sprcros2a )	/* (c) 1986 GM Shoji */
+	DRIVER( d9final )	/* (c) 1992 Excellent System */
 	DRIVER( gcpinbal )	/* (c) 1994 Excellent System */
 	DRIVER( vmetal )	/* (c) 1995 Excellent System? */
 	DRIVER( vmetaln )	/* (c) 1995 Excellent System? */
