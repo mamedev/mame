@@ -564,9 +564,9 @@ WRITE32_HANDLER( konamigx_555_palette_w )
 	paletteram16 = (UINT16 *)paletteram32;
 
 	if ((ACCESSING_BITS_16_23) && (ACCESSING_BITS_24_31))
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(space, offset*2, data >> 16, mem_mask >> 16);
+		paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset*2, data >> 16, mem_mask >> 16);
 	if ((ACCESSING_BITS_0_7) && (ACCESSING_BITS_8_15))
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(space, offset*2+1, data, mem_mask);
+		paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset*2+1, data, mem_mask);
 }
 
 // sub monitor for type 3
@@ -578,9 +578,9 @@ WRITE32_HANDLER( konamigx_555_palette2_w )
 	paletteram16 = (UINT16 *)paletteram32;
 
 	if ((ACCESSING_BITS_16_23) && (ACCESSING_BITS_24_31))
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(space, offset*2, data >> 16, mem_mask >> 16);
+		paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset*2, data >> 16, mem_mask >> 16);
 	if ((ACCESSING_BITS_0_7) && (ACCESSING_BITS_8_15))
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(space, offset*2+1, data, mem_mask);
+		paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset*2+1, data, mem_mask);
 }
 
 WRITE32_HANDLER( konamigx_tilebank_w )
