@@ -1306,6 +1306,37 @@ ROM_START( scfinals )
 	ROM_LOAD16_BYTE("d49-05", 0x600000, 0x100000, CRC(ed894fe1) SHA1(5bf2fb6abdcf25bc525a2c3b29dbf7aca0b18fea) )	// -std-
 ROM_END
 
+ROM_START( lightbr )
+	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
+ 	ROM_LOAD32_BYTE("d69-25.ic40", 0x000000, 0x80000, CRC(27f1b8be) SHA1(e5fc47644a000c96056e2013c42272ae5beeb98e) )
+	ROM_LOAD32_BYTE("d69-26.ic38", 0x000001, 0x80000, CRC(2ff7dba6) SHA1(8757d949f44bb69fbf918852046ed0cd46ab7864) )
+	ROM_LOAD32_BYTE("d69-28.ic36", 0x000002, 0x80000, CRC(a5546162) SHA1(35d9cd41f379e7fc4092c6c519b158208b977d89) )
+	ROM_LOAD32_BYTE("d69-27.ic34", 0x000003, 0x80000, CRC(e232a949) SHA1(aa6969e0aa195dbae1aecc4e812c590ab4389174) )
+
+	ROM_REGION(0xc00000, "gfx1" , 0) /* Sprites */
+	ROM_LOAD16_BYTE("d69-06.bin", 0x000000, 0x200000, CRC(cb4aac81) SHA1(15d315c6b9695cc2fe07defc67c7a4fb26de1950) )
+  	ROM_LOAD16_BYTE("d69-07.bin", 0x000001, 0x200000, CRC(b749f984) SHA1(39fd662bdc42e812519181a640a83e29e300826a) )
+	ROM_LOAD16_BYTE("d69-09.bin", 0x400000, 0x100000, CRC(a96c19b8) SHA1(7872b4dd9d51877bed709fec393413e41d6b954f) )
+	ROM_LOAD16_BYTE("d69-10.bin", 0x400001, 0x100000, CRC(36aa80c6) SHA1(aeb5f7632810564426761b5798539bf4c4a0c64c) )
+	ROM_LOAD       ("d69-08.bin", 0x900000, 0x200000, CRC(5b68d7d8) SHA1(f2ee3dd7100a3c9d8f402fe36dae2bc66cb17be3) )
+	ROM_LOAD       ("d69-11.bin", 0xb00000, 0x100000, CRC(c11adf92) SHA1(ee9ce49a43b419c4f44ac1aea8d0a12d7b289244) )
+	ROM_FILL       (              0x600000, 0x300000, 0 )
+
+	ROM_REGION(0x800000, "gfx2" , 0) /* Tiles */
+	ROM_LOAD16_BYTE("d69-03.bin", 0x000000, 0x200000, CRC(6999c86f) SHA1(8a91930edfc0b5d23e59f8c3b43131db6edb4d37) )
+  	ROM_LOAD16_BYTE("d69-04.bin", 0x000001, 0x200000, CRC(cc91dcb7) SHA1(97f510b1e1a3adf49efe82babdd7abce3756ce4b) )
+	ROM_LOAD       ("d69-05.bin", 0x600000, 0x200000, CRC(f9f5433c) SHA1(d3de66385d883c72967c44bc29983d7a79f665d1) )
+	ROM_FILL       (              0x400000, 0x200000, 0 )
+
+	ROM_REGION(0x140000, "audiocpu", 0)	/* 68000 sound CPU */
+	ROM_LOAD16_BYTE("d69-18.bin", 0x100000, 0x20000, CRC(04600d7b) SHA1(666cfab09b61fd6e0bc4ff277018ebf1cda01b0e) )
+	ROM_LOAD16_BYTE("d69-19.bin", 0x100001, 0x20000, CRC(1484e853) SHA1(4459c18ba005786483c652857e527c6093efb036) )
+
+	ROM_REGION16_BE(0x800000, "ensoniq.0" , ROMREGION_ERASE00 )	// V2: 4 banks, only 2 populated
+	ROM_LOAD16_BYTE("d69-01.bin", 0x000000, 0x200000, CRC(9ac93ac2) SHA1(1c44f6ba95505f85b0c8a90395f09d2a49da3553) )	// C8 C9 CA CB
+	ROM_LOAD16_BYTE("d69-02.bin", 0x400000, 0x200000, CRC(dce28dd7) SHA1(eacfc98349b0608fc1a944c11f0483fb6caa4445) )	// CC CD -std-
+ROM_END
+
 ROM_START( dungeonm )
 	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
  	ROM_LOAD32_BYTE("d69-20.bin", 0x000000, 0x80000, CRC(33650fe4) SHA1(df8b775749b1f0f02d0df6141597cc49fb3ae227) )
@@ -1428,7 +1459,7 @@ Notes:
       D69-18/D69-19             27C1001 EPROM (DIP32)
 */
 
-ROM_START( lightbr )
+ROM_START( lightbrj )
 	ROM_REGION(0x200000, "maincpu", 0) /* 68020 code */
  	ROM_LOAD32_BYTE("d69-20.bin", 0x000000, 0x80000, CRC(33650fe4) SHA1(df8b775749b1f0f02d0df6141597cc49fb3ae227) )
 	ROM_LOAD32_BYTE("d69-13.bin", 0x000001, 0x80000, CRC(dec2ec17) SHA1(8472a5aaea9e4e4fb5f7f4b5eda356b590d1541d) )
@@ -3831,9 +3862,10 @@ GAME( 1993, gunlock,  0,        f3_224a, f3, gunlock,  ROT90,  "Taito Corporatio
 GAME( 1993, rayforcej,gunlock,  f3_224a, f3, gunlock,  ROT90,  "Taito Corporation",         "Ray Force (Ver 2.3J 1994/01/20)", 0 )
 GAME( 1993, rayforce, gunlock,  f3_224a, f3, gunlock,  ROT90,  "Taito America Corporation", "Ray Force (Ver 2.3A 1994/01/20)", 0 )
 GAME( 1993, scfinals, 0,        f3_224a, f3, scfinals, ROT0,   "Taito Corporation Japan",   "Super Cup Finals (Ver 2.1O 1993/11/19)", 0 )
-GAME( 1993, dungeonm, 0,        f3_224a, f3, lightbr,  ROT0,   "Taito Corporation Japan",   "Dungeon Magic (Ver 2.1O 1994/02/18)", 0 )
-GAME( 1993, lightbr,  dungeonm, f3_224a, f3, lightbr,  ROT0,   "Taito Corporation",         "Light Bringer (Ver 2.1J 1994/02/18)", 0 )
-GAME( 1993, dungeonmu,dungeonm, f3_224a, f3, lightbr,  ROT0,   "Taito America Corporation", "Dungeon Magic (Ver 2.1A 1994/02/18)", 0 )
+GAME( 1993, lightbr,  0,        f3_224a, f3, lightbr,  ROT0,   "Taito Corporation Japan",   "Light Bringer (Ver 2.20 1994/04/08)", 0 )
+GAME( 1993, lightbrj, lightbr,  f3_224a, f3, lightbr,  ROT0,   "Taito Corporation",         "Light Bringer (Ver 2.1J 1994/02/18)", 0 )
+GAME( 1993, dungeonm, lightbr,  f3_224a, f3, lightbr,  ROT0,   "Taito Corporation Japan",   "Dungeon Magic (Ver 2.1O 1994/02/18)", 0 )
+GAME( 1993, dungeonmu,lightbr,  f3_224a, f3, lightbr,  ROT0,   "Taito America Corporation", "Dungeon Magic (Ver 2.1A 1994/02/18)", 0 )
 GAME( 1994, intcup94, 0,        f3_224a, f3, intcup94, ROT0,   "Taito Corporation Japan",   "International Cup '94 (Ver 2.2O 1994/05/26)", 0 )
 GAME( 1994, hthero94, intcup94, f3_224a, f3, intcup94, ROT0,   "Taito America Corporation", "Hat Trick Hero '94 (Ver 2.2A 1994/05/26)", 0 )
 GAME( 1994, kaiserkn, 0,        f3_224a, kn, kaiserkn, ROT0,   "Taito Corporation Japan",   "Kaiser Knuckle (Ver 2.1O 1994/07/29)", 0 )

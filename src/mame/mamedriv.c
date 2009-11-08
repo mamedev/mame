@@ -2059,7 +2059,8 @@ const game_driver * const drivers[] =
 	DRIVER( scfinals )	/* 1994.?? D68 (c) 1993 Taito Corporation Japan (World) */
 	DRIVER( intcup94 )	/* 1994.?? D78 (c) 1994 Taito (World) */
 	DRIVER( hthero94 )	/* 1994.09 D78 (c) 1994 Taito (US) */
-	DRIVER( lightbr )	/* 1994.03 D69 (c) 1993 Taito Corporation (Japan) */
+	DRIVER( lightbr )	/* 1994.03 D69 (c) 1993 Taito Corporation Japan (World) */
+	DRIVER( lightbrj )	/* 1994.03 D69 (c) 1993 Taito Corporation (Japan) */
 	DRIVER( dungeonm )	/* 1994.?? D69 (c) 1993 Taito Corporation Japan (World) */
 	DRIVER( dungeonmu )	/* 1994.?? D69 (c) 1993 Taito America Corporation (US) */
 	DRIVER( kaiserkn )	/* 1994.?? D84 (c) 1994 Taito Corporation Japan (World) */
@@ -7515,6 +7516,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sarukani )	/* 1997.01 (c) 1997 Kaneko / Mediaworks (Japan) */
 	DRIVER( vblokbrk )	/* 1997.?? (c) 1997 Kaneko / Mediaworks (Asia) */
 	DRIVER( galpanis )	/* 1997.04 (c) 1997 Kaneko (Japan) */
+	DRIVER( galpanisk )	/* 1997.04 (c) 1997 Kaneko (Korea) */
 	DRIVER( sengekis )	/* 1997.?? (c) 1997 Kaneko / Warashi (Asia) */
 	DRIVER( sengekisj )	/* 1997.07 (c) 1997 Kaneko / Warashi (Japan) */
 	DRIVER( jjparad2 )	/* 1997.12 (c) 1997 Electro Design Co. (Japan) */
