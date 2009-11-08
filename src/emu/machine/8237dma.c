@@ -217,7 +217,7 @@ static void set_dack(i8237_t *i8237, int channel)
 	
 	for (i = 0; i < 4; i++)
 	{
-		int state = (i == channel) ^ BIT(i8237->command, 7);
+		int state = (i == channel) ^ !BIT(i8237->command, 7);
 
 		devcb_call_write_line(&i8237->chan[i].out_dack_func, state);
 	}
