@@ -226,7 +226,12 @@ void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *conf
 	else if (config->type >= DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->readspace != NULL)
 	{
 		FPTR space = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM);
-		const device_config *cpu = cputag_get_cpu(device->machine, config->tag);
+		const device_config *cpu;
+
+		if (device->owner != NULL)
+			cpu = device_find_child_by_tag(device->owner, config->tag);
+		else
+			cpu = cputag_get_cpu(device->machine, config->tag);
 
 		if (cpu == NULL)
 			fatalerror("devcb_resolve_read8: unable to find CPU '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
@@ -279,7 +284,12 @@ void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *c
 	if (config->type >= DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->writespace != NULL)
 	{
 		FPTR space = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM);
-		const device_config *cpu = cputag_get_cpu(device->machine, config->tag);
+		const device_config *cpu;
+
+		if (device->owner != NULL)
+			cpu = device_find_child_by_tag(device->owner, config->tag);
+		else
+			cpu = cputag_get_cpu(device->machine, config->tag);
 
 		if (cpu == NULL)
 			fatalerror("devcb_resolve_write8: unable to find CPU '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
