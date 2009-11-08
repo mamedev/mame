@@ -519,8 +519,6 @@ WRITE_LINE_DEVICE_HANDLER( z80dma_rdy_w )
 	z80dma_t *z80dma = get_safe_token(device);
 	int param;
 
-	assert( offset == 0);
-
 	param = (state ? 1 : 0);
 	LOG(("RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH(z80dma)));
 	timer_call_after_resynch(device->machine, (void *) device, param, z80dma_rdy_write_callback);
