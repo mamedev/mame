@@ -24,30 +24,47 @@
 #include "sound/2413intf.h"
 
 static UINT8 *lo_vram,*hi_vram,*cram;
+static tilemap *sc0_tilemap;
 
-VIDEO_START(d9final)
+static TILE_GET_INFO( get_sc0_tile_info )
 {
+	int tile = ((hi_vram[tile_index] & 0x3f)<<8) | lo_vram[tile_index];
+	int color = cram[tile_index] & 0x3f;
 
+	SET_TILE_INFO(
+			0,
+			tile,
+			color,
+			0);
 }
 
-VIDEO_UPDATE(d9final)
+static VIDEO_START(d9final)
 {
-	const gfx_element *gfx = screen->machine->gfx[0];
-	int count = 0x00000;
-	int y,x;
+	sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,64,32);
+}
 
-	for (y=0;y<32;y++)
-	{
-		for (x=0;x<64;x++)
-		{
-			int tile = lo_vram[count] | ((hi_vram[count] & 0x3f)<<8);
-			int color = cram[count] & 0x3f;
-
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*8,y*8);
-			count++;
-		}
-	}
+static VIDEO_UPDATE(d9final)
+{
+	tilemap_draw(bitmap,cliprect,sc0_tilemap,0,0);
 	return 0;
+}
+
+static WRITE8_HANDLER( sc0_lovram )
+{
+	lo_vram[offset] = data;
+	tilemap_mark_tile_dirty(sc0_tilemap,offset);
+}
+
+static WRITE8_HANDLER( sc0_hivram )
+{
+	hi_vram[offset] = data;
+	tilemap_mark_tile_dirty(sc0_tilemap,offset);
+}
+
+static WRITE8_HANDLER( sc0_cram )
+{
+	cram[offset] = data;
+	tilemap_mark_tile_dirty(sc0_tilemap,offset);
 }
 
 static WRITE8_HANDLER( d9final_bank_w )
@@ -67,15 +84,16 @@ static READ8_HANDLER( prot_latch_r )
 	return 0x04;
 }
 
+
 static ADDRESS_MAP_START( d9final_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE(&paletteram)
 	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE(&paletteram_2)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&lo_vram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE(&hi_vram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&cram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sc0_lovram) AM_BASE(&lo_vram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sc0_hivram) AM_BASE(&hi_vram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sc0_cram) AM_BASE(&cram)
 	AM_RANGE(0xf000, 0xf000) AM_READ(prot_latch_r)
 ADDRESS_MAP_END
 
@@ -119,10 +137,10 @@ static INPUT_PORTS_START( d9final )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x32, 0x32, "Credit Limit" )
+	PORT_DIPNAME( 0x32, 0x32, "Credit Limit" ) PORT_DIPLOCATION("SW1:2,5,6")
 	PORT_DIPSETTING(    0x32, "1000" )
 	PORT_DIPSETTING(    0x12, "5000" )
 	PORT_DIPSETTING(    0x22, "10000" )
@@ -130,21 +148,19 @@ static INPUT_PORTS_START( d9final )
 	PORT_DIPSETTING(    0x02, "50000" )
 // 0x10 20000
 // 0x30 20000
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Auto Start" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPNAME( 0x08, 0x08, "Auto Start" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Hopper Switch" )
+	PORT_DIPNAME( 0x40, 0x40, "Hopper Switch" ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( High ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
-	PORT_DIPNAME( 0x80, 0x80, "Payout" )
+	PORT_DIPNAME( 0x80, 0x80, "Payout" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB") //odd rates / difficulty stuff
-	PORT_DIPNAME( 0x07, 0x07, "Win Percentage" )
+	PORT_DIPNAME( 0x07, 0x07, "Win Percentage" ) PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x00, "60%" )
 	PORT_DIPSETTING(    0x04, "65%" )
 	PORT_DIPSETTING(    0x02, "70%" )
@@ -153,22 +169,20 @@ static INPUT_PORTS_START( d9final )
 	PORT_DIPSETTING(    0x05, "85%" )
 	PORT_DIPSETTING(    0x03, "90%" )
 	PORT_DIPSETTING(    0x07, "95%" )
-	PORT_DIPNAME( 0x18, 0x18, "Bet Max" )
+	PORT_DIPNAME( 0x18, 0x18, "Bet Max" ) PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "8" )
 	PORT_DIPSETTING(    0x08, "16" )
 	PORT_DIPSETTING(    0x10, "32" )
 	PORT_DIPSETTING(    0x00, "64" )
-	PORT_DIPNAME( 0x60, 0x60, "Double-Up Difficulty" )
+	PORT_DIPNAME( 0x60, 0x60, "Double-Up Difficulty" ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 
 	PORT_START("DSWD") //coinage C & D
-	PORT_DIPNAME( 0x0f, 0x0e, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0f, 0x0e, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW3:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "10 Coins / 1 Credit" )
 	PORT_DIPSETTING(    0x08, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, "5 Coins / 2 Credits" )
@@ -185,7 +199,7 @@ static INPUT_PORTS_START( d9final )
 	PORT_DIPSETTING(    0x0b, "1 Coin / 25 Credits" )
 	PORT_DIPSETTING(    0x07, "1 Coin / 50 Credits" )
 	PORT_DIPSETTING(    0x0f, "1 Coin / 100 Credits" )
-	PORT_DIPNAME( 0x70, 0x30, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x70, 0x30, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW3:5,6,7")
 	PORT_DIPSETTING(    0x00, "10 Coins / 1 Credit" )
 	PORT_DIPSETTING(    0x40, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 6C_1C ) )
@@ -194,12 +208,10 @@ static INPUT_PORTS_START( d9final )
 	PORT_DIPSETTING(    0x50, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x70, "1 Coin / 50 Credits" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW3:8" )
 
 	PORT_START("DSWC") //coinage C & Key In Coinage
-	PORT_DIPNAME( 0x07, 0x00, "Coin C" )
+	PORT_DIPNAME( 0x07, 0x00, "Coin C" ) PORT_DIPLOCATION("SW4:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_4C ) )
@@ -208,7 +220,7 @@ static INPUT_PORTS_START( d9final )
 	PORT_DIPSETTING(    0x05, "1 Coin / 20 Credits" )
 	PORT_DIPSETTING(    0x03, "1 Coin / 25 Credits" )
 	PORT_DIPSETTING(    0x07, "1 Coin / 50 Credits" )
-	PORT_DIPNAME( 0x38, 0x00, "Key In" )
+	PORT_DIPNAME( 0x38, 0x00, "Key In" ) PORT_DIPLOCATION("SW4:4,5,6")
 	PORT_DIPSETTING(    0x00, "1 Coin / 10 Credits" )
 	PORT_DIPSETTING(    0x20, "1 Coin / 20 Credits" )
 	PORT_DIPSETTING(    0x10, "1 Coin / 40 Credits" )
@@ -217,12 +229,8 @@ static INPUT_PORTS_START( d9final )
 	PORT_DIPSETTING(    0x28, "1 Coin / 200 Credits" )
 	PORT_DIPSETTING(    0x18, "1 Coin / 250 Credits" )
 	PORT_DIPSETTING(    0x38, "1 Coin / 500 Credits" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW4:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW4:8" )
 INPUT_PORTS_END
 
 static const gfx_layout tiles16x8_layout =
