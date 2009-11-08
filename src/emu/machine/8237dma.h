@@ -1,66 +1,99 @@
-/**********************************************************************
-
-    8237 DMA interface and emulation
-
-**********************************************************************/
-
-#ifndef __DMA8237_H_
-#define __DMA8237_H_
-
-#define DMA8237		DEVICE_GET_INFO_NAME(dma8237)
-
-typedef void  (*dma8237_hrq_func)(const device_config *device, int state);
-typedef UINT8 (*dma8237_mem_read_func)(const device_config *device, int channel, offs_t offset);
-typedef void  (*dma8237_mem_write_func)(const device_config *device, int channel, offs_t offset, UINT8 data);
-typedef int   (*dma8237_channel_read_func)(const device_config *device);
-typedef void  (*dma8237_channel_write_func)(const device_config *device, int data);
-typedef void  (*dma8237_out_eop_func)(const device_config *device, int channel, int state);
-
-#define DMA8237_HRQ_CHANGED(name)		void  name(const device_config *device, int state)
-#define DMA8237_MEM_READ(name)			UINT8 name(const device_config *device, int channel, offs_t offset)
-#define DMA8237_MEM_WRITE(name)			void  name(const device_config *device, int channel, offs_t offset, UINT8 data)
-#define DMA8237_CHANNEL_READ(name)		int   name(const device_config *device)
-#define DMA8237_CHANNEL_WRITE(name)		void  name(const device_config *device, int data)
-#define DMA8237_OUT_EOP(name)			void  name(const device_config *device, int channel, int state)
-
-struct dma8237_interface
-{
-	/* speed of DMA accesses (per byte) */
-	double bus_speed;
-
-	/* function that will be called when HRQ may have changed */
-	dma8237_hrq_func			hrq_changed;
-
-	/* accessors to main memory */
-	dma8237_mem_read_func		memory_read_func;
-	dma8237_mem_write_func		memory_write_func;
-
-	/* channel accesors */
-	dma8237_channel_read_func	channel_read_func[4];
-	dma8237_channel_write_func	channel_write_func[4];
-
-	/* function to call when DMA completes */
-	dma8237_out_eop_func		out_eop_func;
-};
-
-
 /***************************************************************************
-    DEVICE CONFIGURATION MACROS
+
+    Intel 8237 Programmable DMA Controller emulation
+
+    Copyright Nicola Salmoria and the MAME Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+****************************************************************************
+                            _____   _____
+                 _I/OR   1 |*    \_/     | 40  A7
+                 _I/OW   2 |             | 39  A6
+                 _MEMR   3 |             | 38  A5
+                 _MEMW   4 |             | 37  A4
+					     5 |             | 36  _EOP
+                 READY   6 |             | 35  A3
+                  HLDA   7 |             | 34  A2
+                 ADSTB   8 |             | 33  A1
+                   AEN   9 |             | 32  A0
+				   HRQ  10 |     8237	 | 31  Vcc
+                   _CS  11 |             | 30  DB0
+                   CLK  12 |             | 29  DB1
+                 RESET  13 |             | 28  DB2
+                 DACK2  14 |             | 27  DB3
+                 DACK3  15 |             | 26  DB4
+                 DREQ3  16 |             | 25  DACK0
+                 DREQ2  17 |             | 24  DACK1
+                 DREQ1  18 |             | 23  DB5
+                 DREQ0  19 |             | 22  DB6
+                   GND  20 |_____________| 21  DB7
+
 ***************************************************************************/
 
-#define MDRV_DMA8237_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, DMA8237, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#ifndef __I8237__
+#define __I8237__
 
+#include "devcb.h"
 
-/* device interface */
-DEVICE_GET_INFO( dma8237 );
-READ8_DEVICE_HANDLER( dma8237_r );
-WRITE8_DEVICE_HANDLER( dma8237_w );
-void dma8237_drq_write(const device_config *device, int channel, int state);
-void dma8237_set_hlda(const device_config *device, int state);
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
+
+#define I8237 DEVICE_GET_INFO_NAME(i8237)
+
+#define MDRV_I8237_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, I8237, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define I8237_INTERFACE(_name) \
+	const i8237_interface (_name) =
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _i8237_interface i8237_interface;
+struct _i8237_interface
+{
+	devcb_write_line	out_hrq_func;
+	devcb_write_line	out_eop_func;
+
+	/* accessors to main memory */
+	devcb_read8			in_memr_func;
+	devcb_write8		out_memw_func;
+
+	/* channel accessors */
+	devcb_read8			in_ior_func[4];
+	devcb_write8		out_iow_func[4];
+	devcb_write_line	out_dack_func[4];
+};
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+
+/* register access */
+READ8_DEVICE_HANDLER( i8237_r );
+WRITE8_DEVICE_HANDLER( i8237_w );
+
+/* hold acknowledge */
+WRITE_LINE_DEVICE_HANDLER( i8237_hlda_w );
+
+/* ready */
+WRITE_LINE_DEVICE_HANDLER( i8237_ready_w );
+
+/* data request */
+WRITE_LINE_DEVICE_HANDLER( i8237_dreq0_w );
+WRITE_LINE_DEVICE_HANDLER( i8237_dreq1_w );
+WRITE_LINE_DEVICE_HANDLER( i8237_dreq2_w );
+WRITE_LINE_DEVICE_HANDLER( i8237_dreq3_w );
+
+/* end of process */
+WRITE_LINE_DEVICE_HANDLER( i8237_eop_w );
+
+DEVICE_GET_INFO( i8237 );
 
 /* unfortunate hack for the interim for PC HDC */
-void dma8237_run_transfer(const device_config *device, int channel);
+void i8237_run_transfer(const device_config *device, int channel);
 
-#endif /* __DMA8237_H_ */
+#endif

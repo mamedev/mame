@@ -111,36 +111,10 @@ static struct {
 DMA8237 Controller
 ******************/
 
+static int dma_channel;
 static UINT8 dma_offset[2][4];
 static UINT8 at_pages[0x10];
 
-static DMA8237_HRQ_CHANGED( pc_dma_hrq_changed )
-{
-	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
-
-	/* Assert HLDA */
-	dma8237_set_hlda( device, state );
-}
-
-
-static DMA8237_MEM_READ( pc_dma_read_byte )
-{
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
-		& 0xFF0000;
-
-	return memory_read_byte(space, page_offset + offset);
-}
-
-
-static DMA8237_MEM_WRITE( pc_dma_write_byte )
-{
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
-		& 0xFF0000;
-
-	memory_write_byte(space, page_offset + offset, data);
-}
 
 static READ8_HANDLER(dma_page_select_r)
 {
@@ -187,30 +161,58 @@ static WRITE8_HANDLER(dma_page_select_w)
 }
 
 
-static const struct dma8237_interface dma8237_1_config =
+static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
-	XTAL_14_31818MHz/3,
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
-	pc_dma_hrq_changed,
-	pc_dma_read_byte,
-	pc_dma_write_byte,
+	/* Assert HLDA */
+	i8237_hlda_w( device, state );
+}
 
-	{ NULL, NULL, NULL, NULL },
-	{ NULL, NULL, NULL, NULL },
-	NULL
+
+static READ8_HANDLER( pc_dma_read_byte )
+{
+	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
+		& 0xFF0000;
+
+	return memory_read_byte(space, page_offset + offset);
+}
+
+
+static WRITE8_HANDLER( pc_dma_write_byte )
+{
+	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
+		& 0xFF0000;
+
+	memory_write_byte(space, page_offset + offset, data);
+}
+
+
+static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { if (state) dma_channel = 0; }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { if (state) dma_channel = 1; }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { if (state) dma_channel = 2; }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { if (state) dma_channel = 3; }
+
+static I8237_INTERFACE( dma8237_1_config )
+{
+	DEVCB_LINE(pc_dma_hrq_changed),
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
 };
 
-static const struct dma8237_interface dma8237_2_config =
+static I8237_INTERFACE( dma8237_2_config )
 {
-	XTAL_14_31818MHz/3,
-
-	NULL,
-	NULL,
-	NULL,
-
-	{ NULL, NULL, NULL, NULL },
-	{ NULL, NULL, NULL, NULL },
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
 
@@ -352,14 +354,14 @@ static WRITE32_HANDLER( vga_regs_w )
 }
 
 static ADDRESS_MAP_START( pcat_io, ADDRESS_SPACE_IO, 32 )
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_RAM//READWRITE(mc146818_port32le_r,     mc146818_port32le_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(dma_page_select_r,dma_page_select_w, 0xffffffff)//TODO
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", dma8237_r, dma8237_w, 0xffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", i8237_r, i8237_w, 0xffff)
 	AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
 	AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
 	AM_RANGE(0x03c0, 0x03c3) AM_RAM
@@ -513,8 +515,8 @@ static MACHINE_DRIVER_START( pcat_dyn )
 //  MDRV_IMPORT_FROM( at_kbdc8042 )
 	MDRV_PIC8259_ADD( "pic8259_1", pic8259_1_config )
 	MDRV_PIC8259_ADD( "pic8259_2", pic8259_2_config )
-	MDRV_DMA8237_ADD( "dma8237_1", dma8237_1_config )
-	MDRV_DMA8237_ADD( "dma8237_2", dma8237_2_config )
+	MDRV_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
+	MDRV_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
 	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
 
 	MDRV_PALETTE_INIT(pcat_286)
