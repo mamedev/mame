@@ -95,48 +95,28 @@ write:
 
 #include "mario.h"
 
-static READ8_DEVICE_HANDLER(mario_dma_read_byte);
-static WRITE8_DEVICE_HANDLER(mario_dma_write_byte);
-
 /*************************************
  *
  *  statics
  *
  *************************************/
 
-static const z80dma_interface mario_dma =
+static Z80DMA_INTERFACE( mario_dma )
 {
-	"maincpu",
-
-	mario_dma_read_byte,
-	mario_dma_write_byte,
-	0, 0, 0, 0,
-	NULL
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
-/*************************************
- *
- *  Machine setup
- *
- *************************************/
-
-/*************************************
- *
- *  DMA handling
- *
- *************************************/
-
-static READ8_DEVICE_HANDLER(mario_dma_read_byte)
+static WRITE8_DEVICE_HANDLER( mario_z80dma_rdy_w )
 {
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	return memory_read_byte(space, offset);
+	z80dma_rdy_w(device, data & 0x01);
 }
 
-static WRITE8_DEVICE_HANDLER(mario_dma_write_byte)
-{
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_write_byte(space, offset, data);
-}
 
 /*************************************
  *
@@ -156,7 +136,7 @@ static ADDRESS_MAP_START( mario_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(mario_flip_w)
 	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(mario_palettebank_w)
 	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE("z80dma", z80dma_rdy_w)	/* ==> DMA Chip */
+	AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE("z80dma", mario_z80dma_rdy_w)	/* ==> DMA Chip */
 	AM_RANGE(0x7f00, 0x7f07) AM_WRITE(mario_sh3_w) /* Sound port */
 	AM_RANGE(0x7f80, 0x7f80) AM_READ_PORT("DSW")	/* DSW */
 	AM_RANGE(0x7e00, 0x7e00) AM_WRITE(mario_sh_tuneselect_w)
@@ -176,7 +156,7 @@ static ADDRESS_MAP_START( masao_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(mario_flip_w)
 	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(mario_palettebank_w)
 	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE("z80dma", z80dma_rdy_w)	/* ==> DMA Chip */
+	AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE("z80dma", mario_z80dma_rdy_w)	/* ==> DMA Chip */
 	AM_RANGE(0x7f00, 0x7f00) AM_WRITE(masao_sh_irqtrigger_w)
 	AM_RANGE(0x7f80, 0x7f80) AM_READ_PORT("DSW")	/* DSW */
 	AM_RANGE(0xf000, 0xffff) AM_ROM

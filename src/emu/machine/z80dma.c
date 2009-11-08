@@ -97,7 +97,14 @@
 typedef struct _z80dma_t z80dma_t;
 struct _z80dma_t
 {
-	const z80dma_interface *intf;
+	devcb_resolved_write_line	out_busreq_func;
+	devcb_resolved_write_line	out_int_func;
+	devcb_resolved_write_line	out_bao_func;
+	devcb_resolved_read8		in_mreq_func;
+	devcb_resolved_write8		out_mreq_func;
+	devcb_resolved_read8		in_iorq_func;
+	devcb_resolved_write8		out_iorq_func;
+
 	emu_timer *timer;
 
 	UINT16 	regs[REGNUM(6,1)+1];
@@ -147,9 +154,9 @@ static void z80dma_do_read(const device_config *device)
 			if (PORTA_IS_SOURCE(cntx))
 			{
 				if (PORTA_MEMORY(cntx))
-					cntx->latch = cntx->intf->memory_read(device, cntx->addressA);
+					cntx->latch = devcb_call_read8(&cntx->in_mreq_func, cntx->addressA);
 				else
-					cntx->latch = cntx->intf->portA_read(device, cntx->addressA);
+					cntx->latch = devcb_call_read8(&cntx->in_iorq_func, cntx->addressA);
 
 				LOG(("A src: %04x \n",cntx->addressA));
 				cntx->addressA += PORTA_FIXED(cntx) ? 0 : PORTA_INC(cntx) ? PORTA_STEP(cntx) : -PORTA_STEP(cntx);
@@ -157,9 +164,9 @@ static void z80dma_do_read(const device_config *device)
 			else
 			{
 				if (PORTB_MEMORY(cntx))
-					cntx->latch = cntx->intf->memory_read(device, cntx->addressB);
+					cntx->latch = devcb_call_read8(&cntx->in_mreq_func, cntx->addressB);
 				else
-					cntx->latch = cntx->intf->portB_read(device, cntx->addressB);
+					cntx->latch = devcb_call_read8(&cntx->in_iorq_func, cntx->addressB);
 
 				LOG(("B src: %04x \n",cntx->addressB));
 				cntx->addressB += PORTB_FIXED(cntx) ? 0 : PORTB_INC(cntx) ? PORTB_STEP(cntx) : -PORTB_STEP(cntx);
@@ -190,9 +197,9 @@ static int z80dma_do_write(const device_config *device)
 			if (PORTA_IS_SOURCE(cntx))
 			{
 				if (PORTB_MEMORY(cntx))
-					cntx->intf->memory_write(device, cntx->addressB, cntx->latch);
+					devcb_call_write8(&cntx->out_mreq_func, cntx->addressB, cntx->latch);
 				else
-					cntx->intf->portB_write(device, cntx->addressB, cntx->latch);
+					devcb_call_write8(&cntx->out_iorq_func, cntx->addressB, cntx->latch);
 
 				LOG(("B dst: %04x \n",cntx->addressB));
 				cntx->addressB += PORTB_FIXED(cntx) ? 0 : PORTB_INC(cntx) ? PORTB_STEP(cntx) : -PORTB_STEP(cntx);
@@ -200,9 +207,9 @@ static int z80dma_do_write(const device_config *device)
 			else
 			{
 				if (PORTA_MEMORY(cntx))
-					cntx->intf->memory_write(device, cntx->addressA, cntx->latch);
+					devcb_call_write8(&cntx->out_mreq_func, cntx->addressA, cntx->latch);
 				else
-					cntx->intf->portA_write(device, cntx->addressA, cntx->latch);
+					devcb_call_write8(&cntx->out_iorq_func, cntx->addressA, cntx->latch);
 
 				LOG(("A dst: %04x \n",cntx->addressA));
 				cntx->addressA += PORTA_FIXED(cntx) ? 0 : PORTA_INC(cntx) ? PORTA_STEP(cntx) : -PORTA_STEP(cntx);
@@ -296,13 +303,8 @@ static void z80dma_update_status(const device_config *device)
 		timer_reset(z80dma->timer, attotime_never);
 	}
 
-	/* set the halt line */
-	if (z80dma->intf && z80dma->intf->cputag != NULL)
-	{
-		//FIXME: Synchronization is done by BUSREQ!
-		cputag_set_input_line(device->machine, z80dma->intf->cputag, INPUT_LINE_HALT,
-			pending_transfer ? ASSERT_LINE : CLEAR_LINE);
-	}
+	/* set the busreq line */
+	devcb_call_write_line(&z80dma->out_busreq_func, pending_transfer ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -423,13 +425,13 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 					LOG(("Disable DMA\n"));
 					cntx->dma_enabled = 0;
 					cntx->rdy = 1 ^ ((WR5(cntx) & 0x8)>>3);
-					z80dma_rdy_w(device, 0, cntx->rdy);
+					z80dma_rdy_w(device, cntx->rdy);
 					break;
 				case 0x87:	/* Enable dma */
 					LOG(("Enable DMA\n"));
 					cntx->dma_enabled = 1;
 					cntx->rdy = (WR5(cntx) & 0x8)>>3;
-					z80dma_rdy_w(device, 0, cntx->rdy);
+					z80dma_rdy_w(device, cntx->rdy);
 					break;
 				case 0xBB:
 					LOG(("Set Read Mask\n"));
@@ -453,7 +455,7 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 				case 0xB3:	/* Force ready */
 					LOG(("Force ready\n"));
 					cntx->rdy = (WR5(cntx) & 0x8)>>3;
-					z80dma_rdy_w(device, 0, cntx->rdy);
+					z80dma_rdy_w(device, cntx->rdy);
 					break;
 				case 0xAB:	/* Enable interrupts */
 					LOG(("Enable IRQ\n"));
@@ -512,16 +514,24 @@ static TIMER_CALLBACK( z80dma_rdy_write_callback )
 }
 
 
-WRITE8_DEVICE_HANDLER( z80dma_rdy_w )
+WRITE_LINE_DEVICE_HANDLER( z80dma_rdy_w )
 {
 	z80dma_t *z80dma = get_safe_token(device);
 	int param;
 
 	assert( offset == 0);
 
-	param = (data ? 1 : 0);
-	LOG(("RDY: %d Active High: %d\n", data, READY_ACTIVE_HIGH(z80dma)));
+	param = (state ? 1 : 0);
+	LOG(("RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH(z80dma)));
 	timer_call_after_resynch(device->machine, (void *) device, param, z80dma_rdy_write_callback);
+}
+
+WRITE_LINE_DEVICE_HANDLER( z80dma_wait_w )
+{
+}
+
+WRITE_LINE_DEVICE_HANDLER( z80dma_bai_w )
+{
 }
 
 
@@ -552,23 +562,27 @@ static void z80dma_irq_reti(const device_config *device)
 static DEVICE_START( z80dma )
 {
 	z80dma_t *z80dma = get_safe_token(device);
+	z80dma_interface *intf = (z80dma_interface *)device->static_config;
 
-	/* validate arguments */
-	assert(device != NULL);
-	assert(device->tag != NULL);
+	/* resolve callbacks */
+	devcb_resolve_write_line(&z80dma->out_busreq_func, &intf->out_busreq_func, device);
+	devcb_resolve_write_line(&z80dma->out_int_func, &intf->out_int_func, device);
+	devcb_resolve_write_line(&z80dma->out_bao_func, &intf->out_bao_func, device);
+	devcb_resolve_read8(&z80dma->in_mreq_func, &intf->in_mreq_func, device);
+	devcb_resolve_write8(&z80dma->out_mreq_func, &intf->out_mreq_func, device);
+	devcb_resolve_read8(&z80dma->in_iorq_func, &intf->in_iorq_func, device);
+	devcb_resolve_write8(&z80dma->out_iorq_func, &intf->out_iorq_func, device);
 
-	z80dma->intf = (const z80dma_interface *)device->static_config;
-
+	/* allocate timer */
 	z80dma->timer = timer_alloc(device->machine, z80dma_timerproc, (void *) device);
 
+	/* register for state saving */
 	state_save_register_device_item_array(device, 0, z80dma->regs);
 	state_save_register_device_item_array(device, 0, z80dma->regs_follow);
-
 	state_save_register_device_item(device, 0, z80dma->num_follow);
 	state_save_register_device_item(device, 0, z80dma->cur_follow);
 	state_save_register_device_item(device, 0, z80dma->status);
 	state_save_register_device_item(device, 0, z80dma->dma_enabled);
-
 	state_save_register_device_item(device, 0, z80dma->addressA);
 	state_save_register_device_item(device, 0, z80dma->addressB);
 	state_save_register_device_item(device, 0, z80dma->count);
@@ -612,11 +626,10 @@ DEVICE_GET_INFO( z80dma )
 		case DEVINFO_FCT_IRQ_RETI:						info->f = (genf *)z80dma_irq_reti;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Z80DMA");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "DMA controllers");		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Z8410");				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Z80DMA");				break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");					break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
-

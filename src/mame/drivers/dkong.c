@@ -326,8 +326,6 @@ Donkey Kong Junior Notes
 
 static READ8_HANDLER( hb_dma_read_byte );
 static WRITE8_HANDLER( hb_dma_write_byte );
-static READ8_DEVICE_HANDLER( dk_dma_read_byte );
-static WRITE8_DEVICE_HANDLER( dk_dma_write_byte );
 static READ8_DEVICE_HANDLER( p8257_ctl_r );
 static WRITE8_DEVICE_HANDLER( p8257_ctl_w );
 
@@ -337,14 +335,15 @@ static WRITE8_DEVICE_HANDLER( p8257_ctl_w );
  *
  *************************************/
 
-static const z80dma_interface dk3_dma =
+static Z80DMA_INTERFACE( dk3_dma )
 {
-    "maincpu",
-
-    dk_dma_read_byte,
-    dk_dma_write_byte,
-    0, 0, 0, 0,
-    NULL
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static I8257_INTERFACE( dk_dma )
@@ -491,18 +490,6 @@ static MACHINE_RESET( drakton )
  *  DMA handling
  *
  *************************************/
-
-static READ8_DEVICE_HANDLER( dk_dma_read_byte )
-{
-    const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-    return memory_read_byte(space, offset);
-}
-
-static WRITE8_DEVICE_HANDLER( dk_dma_write_byte )
-{
-    const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-    memory_write_byte(space, offset, data);
-}
 
 static READ8_HANDLER( hb_dma_read_byte )
 {
@@ -746,6 +733,11 @@ static READ8_HANDLER( strtheat_inputport_1_r )
     }
 }
 
+static WRITE8_DEVICE_HANDLER( dkong_z80dma_rdy_w )
+{
+	z80dma_rdy_w(device, data & 0x01);
+}
+
 
 /*************************************
  *
@@ -824,7 +816,7 @@ static ADDRESS_MAP_START( dkong3_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x7e82, 0x7e82) AM_WRITE(dkong_flipscreen_w)
     AM_RANGE(0x7e83, 0x7e83) AM_WRITE(dkong_spritebank_w)                 /* 2 PSL Signal */
     AM_RANGE(0x7e84, 0x7e84) AM_WRITE(interrupt_enable_w)
-    AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE("z80dma", z80dma_rdy_w)  /* ==> DMA Chip */
+    AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE("z80dma", dkong_z80dma_rdy_w)  /* ==> DMA Chip */
     AM_RANGE(0x7e86, 0x7e87) AM_WRITE(dkong_palettebank_w)
     AM_RANGE(0x8000, 0x9fff) AM_ROM                                       /* DK3 and bootleg DKjr only */
 ADDRESS_MAP_END
