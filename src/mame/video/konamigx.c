@@ -52,21 +52,48 @@ static TILE_GET_INFO( get_gx_psac_tile_info )
 	SET_TILE_INFO(0, tileno, colour, TILE_FLIPYX(flipx));
 }
 
-/* Soccer Superstars (tile and flip bits now TRUSTED) */
-static TILE_GET_INFO( get_gx_psac3_tile_info )
+UINT32* konamigx_type3_psac2_bank;
+int konamigx_type3_psac2_actual_bank;
+int konamigx_type3_psac2_actual_last_bank = 0;
+
+WRITE32_HANDLER( konamigx_type3_psac2_bank_w )
 {
-	int tileno, colour, flip;
-	UINT8 *tmap = memory_region(machine, "gfx4");
+	// other bits are used for something...
 
-	tileno = tmap[tile_index*2] | ((tmap[(tile_index*2)+1] & 0x0f)<<8);
-	colour = (psac_colorbase << 8);
+	COMBINE_DATA(&konamigx_type3_psac2_bank[offset]);
+	konamigx_type3_psac2_actual_bank = (konamigx_type3_psac2_bank[0] & 0x10000000) >> 28;
 
-	flip = 0;
-	if (tmap[(tile_index*2)+1] & 0x20) flip |= TILE_FLIPX;
-	if (tmap[(tile_index*2)+1] & 0x10) flip |= TILE_FLIPY;
+	if (konamigx_type3_psac2_actual_bank!=konamigx_type3_psac2_actual_last_bank)
+	{
+		tilemap_mark_all_tiles_dirty (gx_psac_tilemap);
+		konamigx_type3_psac2_actual_last_bank = konamigx_type3_psac2_actual_bank;
+	}
 
-	SET_TILE_INFO(0, tileno, colour, flip);
 }
+
+
+
+/* Soccer Superstars (tile and flip bits now TRUSTED) */
+ static TILE_GET_INFO( get_gx_psac3_tile_info )
+ {
+ 	int tileno, colour, flip;
+ 	UINT8 *tmap = memory_region(machine, "gfx4");
+
+	int base_index = tile_index;
+
+	if (konamigx_type3_psac2_actual_bank)
+		base_index+=0x20000/2;
+
+
+	tileno =  tmap[base_index*2] | ((tmap[(base_index*2)+1] & 0x0f)<<8);
+	colour = (tmap[(base_index*2)+1]&0xc0)>>6;
+
+ 	flip = 0;
+	if (tmap[(base_index*2)+1] & 0x20) flip |= TILE_FLIPY;
+	if (tmap[(base_index*2)+1] & 0x10) flip |= TILE_FLIPX;
+
+ 	SET_TILE_INFO(0, tileno, colour, flip);
+ }
 
 /* PSAC4 */
 /* these tilemaps are weird in both format and content, one of them
@@ -302,11 +329,16 @@ VIDEO_START(konamigx_6bpp)
 VIDEO_START(konamigx_type3)
 {
 	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -53, -23, konamigx_type2_sprite_callback);
 
-	_gxcommoninit(machine);
+	_gxcommoninitnosprites(machine);
 
-	gx_psac_tilemap = tilemap_create(machine, get_gx_psac3_tile_info, tilemap_scan_rows,  16, 16, 256, 1024);
-	gx_rozenable = 1;
+	gx_psac_tilemap = tilemap_create(machine, get_gx_psac3_tile_info, tilemap_scan_cols,  16, 16, 256, 256);
+	gx_rozenable = 0;
+	gx_specialrozenable = 2;
+
+
+	//tilemap_set_flip(gx_psac_tilemap, TILEMAP_FLIPX| TILEMAP_FLIPY);
 
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, 0, 0);
@@ -477,19 +509,32 @@ VIDEO_UPDATE(konamigx)
 	if (dirty) K056832_MarkAllTilemapsDirty();
 
 	// Type-1
-	if (gx_specialrozenable)
+	if (gx_specialrozenable == 1)
 	{
 		K053936_0_zoom_draw(gxtype1_roz_dstbitmap, &gxtype1_roz_dstbitmapclip,gx_psac_tilemap, 0,0,0); // height data
 		K053936_0_zoom_draw(gxtype1_roz_dstbitmap2,&gxtype1_roz_dstbitmapclip,gx_psac_tilemap2,0,0,0); // colour data (+ some voxel height data?)
 	}
 
-	if (gx_rozenable)
-		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, gx_psac_tilemap, GXSUB_8BPP, 0);
-	else
-		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0);
+
+
+//	if (gx_rozenable)
+//		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, gx_psac_tilemap, GXSUB_8BPP, 0);
+//	else
+ 		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0);
+
+ 	// hack, draw the roz tilemap if W is held
+ 	// todo: fix so that it works with the mixer without crashing(!)
+	if (gx_specialrozenable == 2)
+	{
+		if ( input_code_pressed(screen->machine, KEYCODE_W) )
+		{
+			K053936_0_zoom_draw(bitmap, cliprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
+		}
+	}
+
 
 	/* Hack! draw type-1 roz layer here for testing purposes only */
-	if (gx_specialrozenable)
+	if (gx_specialrozenable == 1)
 	{
 		const pen_t *paldata = screen->machine->pens;
 
