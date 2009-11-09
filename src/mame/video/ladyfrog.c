@@ -11,6 +11,7 @@ static int tilebank=0;
 static tilemap *bg_tilemap;
 static int palette_bank;
 //static int gfxctrl;
+static int spritetilebase;
 
 UINT8 *ladyfrog_scrlram;
 
@@ -105,10 +106,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int offs = (pr & 0x1f) * 4;
 		{
 			int code,sx,sy,flipx,flipy,pal;
-			code = ladyfrog_spriteram[offs+2] + ((ladyfrog_spriteram[offs+1] & 0x10) << 4)+0x800;
+			code = ladyfrog_spriteram[offs+2] + ((ladyfrog_spriteram[offs+1] & 0x10) << 4)+spritetilebase;
 			pal=ladyfrog_spriteram[offs+1] & 0x0f;
 			sx = ladyfrog_spriteram[offs+3];
-			sy = 240-ladyfrog_spriteram[offs+0];
+			sy = 238-ladyfrog_spriteram[offs+0];
 			flipx = ((ladyfrog_spriteram[offs+1]&0x40)>>6);
 			flipy = ((ladyfrog_spriteram[offs+1]&0x80)>>7);
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
@@ -131,7 +132,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 }
 
-VIDEO_START( ladyfrog )
+VIDEO_START( ladyfrog_common )
 {
   ladyfrog_spriteram = auto_alloc_array(machine, UINT8, 160);
   bg_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
@@ -140,6 +141,19 @@ VIDEO_START( ladyfrog )
   paletteram_2 = auto_alloc_array(machine, UINT8, 0x200);
   tilemap_set_scroll_cols(bg_tilemap,32);
   tilemap_set_scrolldy( bg_tilemap,   15, 15 );
+}
+
+VIDEO_START( ladyfrog )
+{
+	// weird, there are sprite tiles at 0x000 and 0x400, but they don't contain all the sprites!
+	spritetilebase = 0x800;
+	VIDEO_START_CALL(ladyfrog_common);
+}
+
+VIDEO_START( toucheme )
+{
+	spritetilebase = 0x000;
+	VIDEO_START_CALL(ladyfrog_common);
 }
 
 

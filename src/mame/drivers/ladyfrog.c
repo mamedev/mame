@@ -56,6 +56,7 @@ Notes:
 #include "sound/msm5232.h"
 
 VIDEO_START( ladyfrog );
+VIDEO_START( toucheme );
 VIDEO_UPDATE( ladyfrog );
 
 extern UINT8 *ladyfrog_scrlram;
@@ -250,7 +251,7 @@ static INPUT_PORTS_START( toucheme )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )
 
-        PORT_MODIFY("DSW2")
+	PORT_MODIFY("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
@@ -340,22 +341,11 @@ static MACHINE_DRIVER_START( ladyfrog )
 	// pin 22 Noise Output  not mapped
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( toucheme )
+	MDRV_IMPORT_FROM(ladyfrog)
+	MDRV_VIDEO_START(toucheme)
+MACHINE_DRIVER_END
 
-ROM_START( toucheme )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2.ic107",   0x0000, 0x10000, CRC(26f4580b) SHA1(59dc5799436cdaf68dfcb620cd9e2f6929ac7817) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "1.ic115",   0x0000, 0x8000, CRC(902589aa) SHA1(d60088fc31a67fec91f908f671af77bb87a5e59c) )
-
-	ROM_REGION( 0x60000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "3.ic32",   0x30000, 0x10000, CRC(223b4435) SHA1(fb5a4096012093bae5fda213a5de317e63a88ec3) )
-	ROM_LOAD( "4.ic33",   0x40000, 0x10000, CRC(96dcc2f3) SHA1(9c61f8161771e40ca41b6e102bc04583dc97cd0d) )
-	ROM_LOAD( "5.ic34",   0x50000, 0x10000, CRC(b8667a6b) SHA1(288a5cbd8fc01b24822e89fbc1e6d7f45c181483) )
-	ROM_LOAD( "6.ic8",    0x00000, 0x10000, CRC(d257382f) SHA1(9c459b90c9ddfe90de4a252f29a7bee809412b46) )
-	ROM_LOAD( "7.ic9",    0x10000, 0x10000, CRC(feb1b974) SHA1(ffd4527472cdf655fbebebf4d3abb61962e54457) )
-	ROM_LOAD( "8.ic10",   0x20000, 0x10000, CRC(fc6808bf) SHA1(f1f1b75a79dfdb500012f9b52c6364f0a13dce2d) )
-ROM_END
 
 ROM_START( ladyfrog )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -373,7 +363,21 @@ ROM_START( ladyfrog )
 	ROM_LOAD( "8.10",   0x20000, 0x10000, CRC(8c73baa1) SHA1(50fb408be181ef3c125dee23b04daeb010c9f276) )
 ROM_END
 
+ROM_START( toucheme )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2.ic107",   0x0000, 0x10000, CRC(26f4580b) SHA1(59dc5799436cdaf68dfcb620cd9e2f6929ac7817) )
 
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "1.ic115",   0x0000, 0x8000, CRC(902589aa) SHA1(d60088fc31a67fec91f908f671af77bb87a5e59c) )
 
-GAME( 1990, ladyfrog, 0,       ladyfrog,  ladyfrog, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", 0)
-GAME( 19??, toucheme, 0,       ladyfrog,  toucheme, 0, ORIENTATION_SWAP_XY, "Unknown", "Touche Me", GAME_IMPERFECT_GRAPHICS)
+	ROM_REGION( 0x60000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "3.ic32",   0x30000, 0x10000, CRC(223b4435) SHA1(fb5a4096012093bae5fda213a5de317e63a88ec3) )
+	ROM_LOAD( "4.ic33",   0x40000, 0x10000, CRC(96dcc2f3) SHA1(9c61f8161771e40ca41b6e102bc04583dc97cd0d) )
+	ROM_LOAD( "5.ic34",   0x50000, 0x10000, CRC(b8667a6b) SHA1(288a5cbd8fc01b24822e89fbc1e6d7f45c181483) )
+	ROM_LOAD( "6.ic8",    0x00000, 0x10000, CRC(d257382f) SHA1(9c459b90c9ddfe90de4a252f29a7bee809412b46) )
+	ROM_LOAD( "7.ic9",    0x10000, 0x10000, CRC(feb1b974) SHA1(ffd4527472cdf655fbebebf4d3abb61962e54457) )
+	ROM_LOAD( "8.ic10",   0x20000, 0x10000, CRC(fc6808bf) SHA1(f1f1b75a79dfdb500012f9b52c6364f0a13dce2d) )
+ROM_END
+
+GAME( 1990, ladyfrog, 0, ladyfrog, ladyfrog, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", 0)
+GAME( 19??, toucheme, 0, toucheme, toucheme, 0, ORIENTATION_SWAP_XY, "Unknown", "Touche Me", 0) // art style is similar, so it's probably the same manufacturer
