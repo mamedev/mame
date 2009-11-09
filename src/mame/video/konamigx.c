@@ -533,39 +533,17 @@ VIDEO_UPDATE(konamigx)
 //	if (gx_rozenable)
 //		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, gx_psac_tilemap, GXSUB_8BPP, 0);
 //	else
- 		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0);
 
  	// hack, draw the roz tilemap if W is held
  	// todo: fix so that it works with the mixer without crashing(!)
 	if (gx_specialrozenable == 2)
 	{
-		int xx,yy;
-		int width = video_screen_get_width(screen);
-		int height = video_screen_get_height(screen);
-		const pen_t *paldata = screen->machine->pens;
-
-		//if ( input_code_pressed(screen->machine, KEYCODE_W) )
-		// flicker between game and roz tilemap - warning, may hurt eyes
-		if(video_screen_get_frame_number(screen->machine->primary_screen) & 1)
-		{
-			K053936_0_zoom_draw(type3_roz_temp_bitmap, cliprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
-
-			// the output size of the roz layer has to be doubled horizontally
-			// so that it aligns with the sprites and normal tilemaps.  This appears
-			// to be done as a post-processing / mixing step effect
-			for (yy=0;yy<height;yy++)
-			{
-				UINT16* src = BITMAP_ADDR16(type3_roz_temp_bitmap,yy,0);
-				UINT32* dst = BITMAP_ADDR32(bitmap,yy,0);
-				int shiftpos = 30;
-				for (xx=0;xx<width;xx+=2)
-				{
-					dst[xx] = paldata[src[(((xx/2)+shiftpos))%width]];
-					dst[xx+1] = paldata[src[(((xx/2)+shiftpos))%width]];
-				}
-			}
-		}
-
+		K053936_0_zoom_draw(type3_roz_temp_bitmap, cliprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
+ 		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0, type3_roz_temp_bitmap);
+	}
+	else
+	{
+ 		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0, 0);
 	}
 
 

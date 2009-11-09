@@ -22,10 +22,10 @@
 	#define GX_ZPAGESIZE 0x300000
 	#define GX_ZBUFSIZE  0x600000
 #else
-	#define GX_ZBUFW     384
+	#define GX_ZBUFW     576
 	#define GX_ZBUFH     224
-	#define GX_ZPAGESIZE 0x150000
-	#define GX_ZBUFSIZE  0x2a0000
+	#define GX_ZPAGESIZE (GX_ZBUFW*GX_ZBUFH)
+	#define GX_ZBUFSIZE  ((GX_ZBUFW*GX_ZBUFH)*2)
 #endif
 
 static UINT8 *gx_objzbuf, *gx_shdzbuf;
@@ -1078,7 +1078,7 @@ void konamigx_objdma(void)
 void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 					tilemap *sub1, int sub1flags,
 					tilemap *sub2, int sub2flags,
-					int mixerflags)
+					int mixerflags, bitmap_t *extra_bitmap)
 {
 	static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
 	static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
@@ -1237,6 +1237,7 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 			case 5 :
 				offs = -128;
 				if (sub2flags & 0xf) { if (sub2flags & GXSUB_K053250) offs = -5; else if (sub2) offs = -3; }
+				if (extra_bitmap) offs = -3;
 			break;
 			default: offs = -1;
 		}
@@ -1481,7 +1482,9 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 					l = sub1flags & 0xf;
 
 					if (offs == -2)
+					{
 						K053936GP_0_zoom_draw(machine, bitmap, cliprect, sub1, l, k, alpha);
+					}
 					else
 						K053250_draw(machine, bitmap, cliprect, 0, vcblk[4]<<l, 0, 0);
 				}
@@ -1511,7 +1514,34 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 					l = sub2flags & 0xf;
 
 					if (offs == -3)
-						K053936GP_1_zoom_draw(machine, bitmap, cliprect, sub2, l, k, alpha);
+					{
+						if (extra_bitmap) // soccer superstars roz layer
+						{
+							int xx,yy;
+							int width = video_screen_get_width(machine->primary_screen);
+							int height = video_screen_get_height(machine->primary_screen);
+							const pen_t *paldata = machine->pens;
+
+							// the output size of the roz layer has to be doubled horizontally
+							// so that it aligns with the sprites and normal tilemaps.  This appears
+							// to be done as a post-processing / mixing step effect
+							for (yy=0;yy<height;yy++)
+							{
+								UINT16* src = BITMAP_ADDR16(extra_bitmap,yy,0);
+								UINT32* dst = BITMAP_ADDR32(bitmap,yy,0);
+								int shiftpos = 30;
+								for (xx=0;xx<width;xx+=2)
+								{
+									dst[xx] = paldata[src[(((xx/2)+shiftpos))%width]];
+									dst[xx+1] = paldata[src[(((xx/2)+shiftpos))%width]];
+
+								}
+							}
+						}
+						else
+							K053936GP_1_zoom_draw(machine, bitmap, cliprect, sub2, l, k, alpha);
+
+					}
 					else
 						K053250_draw(machine, bitmap, cliprect, 1, vcblk[5]<<l, 0, 0);
 				}
