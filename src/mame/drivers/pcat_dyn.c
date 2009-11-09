@@ -1,10 +1,16 @@
 /********************************************************************************************************************
 
-Tournament Solitaire (c) 199x Dynamo
+Tournament Solitaire (c) 1995 Dynamo
 
-An (un?)-modified 486 PC-AT HW. Input uses a trackball device that isn't PC standard afaik.
+Unmodified 486 PC-AT HW. Input uses a trackball device that isn't PC standard afaik.
+
+Jet Way Information Co. OP495SLC motherboard
+ - AMD Am486-DX40 CPU
+ - Trident TVGA9000i video card
 
 preliminary driver by Angelo Salese
+
+- Gets stuck on 640K DRAM banking, beeps endlessly once it gets to memory test.
 
 ********************************************************************************************************************/
 
@@ -21,6 +27,7 @@ preliminary driver by Angelo Salese
 #include "machine/8042kbdc.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
+#include "sound/beep.h"
 
 static UINT32 *vga_vram;
 static UINT8 vga_regs[0x19];
@@ -292,6 +299,8 @@ static ADDRESS_MAP_START( pcat_map, ADDRESS_SPACE_PROGRAM, 32 )
 //  AM_RANGE(0x000e0000, 0x000effff) AM_ROM AM_REGION("game_prg", 0)
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("bios", 0 )
 	AM_RANGE(0x00100000, 0x001fffff) AM_RAM //AM_REGION("game_prg", 0)
+	AM_RANGE(0x00200000, 0x00ffffff) AM_RAM
+	AM_RANGE(0x01000000, 0x01ffffff) AM_RAM
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
 ADDRESS_MAP_END
 
@@ -359,9 +368,10 @@ static ADDRESS_MAP_START( pcat_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_RAM//READWRITE(mc146818_port32le_r,     mc146818_port32le_w)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(dma_page_select_r,dma_page_select_w, 0xffffffff)//TODO
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(dma_page_select_r,dma_page_select_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", i8237_r, i8237_w, 0xffff)
+	AM_RANGE(0x0220, 0x022f) AM_RAM //Sound card, according to ROMs
 	AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
 	AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
 	AM_RANGE(0x03c0, 0x03c3) AM_RAM
@@ -496,7 +506,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( pcat_dyn )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I486, 14318180*2)	/* I486 ?? Mhz */
+	MDRV_CPU_ADD("maincpu", I486, 40000000)	/* Am486 DX-40 */
 	MDRV_CPU_PROGRAM_MAP(pcat_map)
 	MDRV_CPU_IO_MAP(pcat_io)
 
@@ -542,6 +552,23 @@ ROM_START(toursol)
 	ROM_CONTINUE(				0x00001, 0x04000 )
 
 	ROM_REGION32_LE(0x100000, "game_prg", 0)	/* PromStor 32, mapping unknown */
+	ROM_LOAD("sol.u21", 0x00000, 0x40000, CRC(e97724d9) SHA1(995b89d129c371b815c6b498093bd1bbf9fd8755))
+	ROM_LOAD("sol.u22", 0x40000, 0x40000, CRC(69d42f50) SHA1(737fe62f3827b00b4f6f3b72ef6c7b6740947e95))
+	ROM_LOAD("sol.u23", 0x80000, 0x40000, CRC(d1e39bd4) SHA1(39c7ee43cddb53fba0f7c0572ddc40289c4edd07))
+	ROM_LOAD("sol.u24", 0xa0000, 0x40000, CRC(555341e0) SHA1(81fee576728855e234ff7aae06f54ae9705c3ab5))
+	ROM_LOAD("sol.u28", 0xe0000, 0x02000, CRC(c9374d50) SHA1(49173bc69f70bb2a7e8af9d03e2538b34aa881d8))
+ROM_END
+
+
+ROM_START(toursol1)
+	ROM_REGION32_LE(0x10000, "bios", 0)	/* Motherboard BIOS */
+	ROM_LOAD("prom.mb", 0x000000, 0x10000, CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) )
+
+	ROM_REGION(0x20000, "video_bios", 0)	/* Trident TVGA9000 BIOS */
+	ROM_LOAD16_BYTE("prom.vid", 0x00000, 0x04000, CRC(ad7eadaf) SHA1(ab379187914a832284944e81e7652046c7d938cc) )
+	ROM_CONTINUE(				0x00001, 0x04000 )
+
+	ROM_REGION32_LE(0x100000, "game_prg", 0)	/* PromStor 32, mapping unknown */
 	ROM_LOAD("prom.0", 0x00000, 0x40000, CRC(f26ce73f) SHA1(5516c31aa18716a47f46e412fc273ae8784d2061))
 	ROM_LOAD("prom.1", 0x40000, 0x40000, CRC(8f96e2a8) SHA1(bc3ce8b99e6ff40e355df2c3f797f1fe88b3b219))
 	ROM_LOAD("prom.2", 0x80000, 0x40000, CRC(8b0ac5cf) SHA1(1c2b6a53c9ff4d18a5227d899facbbc719f40205))
@@ -549,4 +576,6 @@ ROM_START(toursol)
 	ROM_LOAD("prom.7", 0xe0000, 0x02000, CRC(154c8092) SHA1(4439ee82f36d5d5c334494ba7bb4848e839213a7))
 ROM_END
 
-GAME( 199?, toursol,    0,		   pcat_dyn, pcat_dyn, 0, ROT0, "Dynamo",  "Tournament Solitaire", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, toursol,  0,       pcat_dyn, pcat_dyn, 0, ROT0, "Dynamo", "Tournament Solitaire (V1.06, 08/03/95)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, toursol1, toursol, pcat_dyn, pcat_dyn, 0, ROT0, "Dynamo", "Tournament Solitaire (V1.04, 06/22/95)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
