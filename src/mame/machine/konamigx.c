@@ -1591,12 +1591,13 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 
 		// apply wrapping and global offsets
 		temp = wrapsize-1;
+
+		ox += K053247_dx;
+		oy -= K053247_dy;
 		ox = ( ox - offx) & temp;
 		oy = (-oy - offy) & temp;
 		if (ox >= xwraplim) ox -= wrapsize;
 		if (oy >= ywraplim) oy -= wrapsize;
-		ox += K053247_dx;
-		oy += K053247_dy;
 
 
 		temp = temp4>>8 & 0x0f;
