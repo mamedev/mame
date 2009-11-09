@@ -831,6 +831,18 @@ static READ32_HANDLER( sound020_r )
 			if (cpu_get_pc(space->cpu) == 0x0236e04)  rv = 0xffffffff;
 			if (cpu_get_pc(space->cpu) == 0x0236e12)  rv = 0xffffffff;
 			break;
+		case 14: // Soccer Superstars ver. JAC
+			//if(cpu_get_pc(space->cpu) != 0x2367b4)
+			//	printf("Read 68k @ %x (PC=%x)\n", reg, cpu_get_pc(space->cpu));
+			if (cpu_get_pc(space->cpu) == 0x02367ea)  rv = 0xffffffff;
+			if (cpu_get_pc(space->cpu) == 0x02367f8)  rv = 0xffffffff;
+			break;
+		case 15: // Soccer Superstars ver. JAA
+			//if(cpu_get_pc(space->cpu) != 0x23670a)
+			//	printf("Read 68k @ %x (PC=%x)\n", reg, cpu_get_pc(space->cpu));
+			if (cpu_get_pc(space->cpu) == 0x0236740)  rv = 0xffffffff;
+			if (cpu_get_pc(space->cpu) == 0x023674e)  rv = 0xffffffff;
+			break;
 		}
 
 	return(rv);
@@ -3517,7 +3529,8 @@ static const GXGameInfoT gameDefs[] =
 	{ "winspikej", 8, 2, 7, BPP4 },
 	{ "soccerss",  7, 13, 0, BPP4 },
 	{ "soccerssa", 7, 13, 0, BPP4 },
-	{ "soccerssj", 7, 13, 0, BPP4 },
+	{ "soccerssj", 7, 14, 0, BPP4 },
+	{ "soccerssja",7, 15, 0, BPP4 },
 	{ "vsnetscr",  7, 8, 0, BPP4 },
 	{ "vsnetscru", 7, 5, 0, BPP4 },
 	{ "vsnetscrj", 7, 10, 0, BPP4 },
