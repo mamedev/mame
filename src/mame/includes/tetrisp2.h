@@ -9,7 +9,7 @@ extern UINT16 *tetrisp2_vram_bg, *tetrisp2_scroll_bg;
 extern UINT16 *tetrisp2_vram_fg, *tetrisp2_scroll_fg;
 extern UINT16 *tetrisp2_vram_rot, *tetrisp2_rotregs;
 
-extern UINT16 *tetrisp2_priority;
+extern UINT8 *tetrisp2_priority;
 
 extern UINT16 *rocknms_sub_vram_bg, *rocknms_sub_scroll_bg;
 extern UINT16 *rocknms_sub_vram_fg, *rocknms_sub_scroll_fg;
@@ -19,8 +19,9 @@ extern UINT16 *rocknms_sub_priority;
 
 WRITE16_HANDLER( tetrisp2_palette_w );
 WRITE16_HANDLER( rocknms_sub_palette_w );
-WRITE16_HANDLER( tetrisp2_priority_w );
-WRITE16_HANDLER( rockn_priority_w );
+WRITE8_HANDLER( tetrisp2_priority_w );
+WRITE8_HANDLER( rockn_priority_w );
+READ8_HANDLER( tetrisp2_priority_r );
 WRITE16_HANDLER( rocknms_sub_priority_w );
 READ16_HANDLER( nndmseal_priority_r );
 

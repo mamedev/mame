@@ -299,6 +299,7 @@ static WRITE16_HANDLER( tetrisp2_coincounter_w )
 }
 
 
+
 /***************************************************************************
 
 
@@ -312,7 +313,7 @@ static ADDRESS_MAP_START( tetrisp2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)			// Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM															// Spare Object RAM
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM															// Work RAM
-	AM_RANGE(0x200000, 0x23ffff) AM_RAM_WRITE(tetrisp2_priority_w) AM_BASE(&tetrisp2_priority)	// Priority
+	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE8(tetrisp2_priority_r, tetrisp2_priority_w, 0x00ff)
 	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE(tetrisp2_palette_w) AM_BASE(&paletteram16)		// Palette
 	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_BASE(&tetrisp2_vram_fg)	// Foreground
 	AM_RANGE(0x404000, 0x407fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_BASE(&tetrisp2_vram_bg)	// Background
@@ -369,7 +370,8 @@ static ADDRESS_MAP_START( nndmseal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM	// Spare Object RAM
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM	// Work RAM
-	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE(nndmseal_priority_r, SMH_RAM) AM_BASE(&tetrisp2_priority	)	// Priority
+	AM_RANGE(0x200000, 0x23ffff) AM_WRITE8(tetrisp2_priority_w, 0x00ff)	// Priority
+	AM_RANGE(0x200000, 0x23ffff) AM_READ(nndmseal_priority_r)
 	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE(tetrisp2_palette_w) AM_BASE(&paletteram16		)	// Palette
 	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_BASE(&tetrisp2_vram_fg	)	// Foreground
 	AM_RANGE(0x404000, 0x407fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_BASE(&tetrisp2_vram_bg	)	// Background
@@ -414,7 +416,7 @@ static ADDRESS_MAP_START( rockn1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)			// Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM															// Spare Object RAM
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM															// Work RAM
-	AM_RANGE(0x200000, 0x23ffff) AM_RAM_WRITE(rockn_priority_w) AM_BASE(&tetrisp2_priority)		// Priority
+	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE8(tetrisp2_priority_r, rockn_priority_w, 0x00ff)		// Priority
 	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE(tetrisp2_palette_w) AM_BASE(&paletteram16)		// Palette
 	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_BASE(&tetrisp2_vram_fg)	// Foreground
 	AM_RANGE(0x404000, 0x407fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_BASE(&tetrisp2_vram_bg)	// Background
@@ -448,7 +450,7 @@ static ADDRESS_MAP_START( rockn2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)			// Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM															// Spare Object RAM
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM															// Work RAM
-	AM_RANGE(0x200000, 0x23ffff) AM_RAM_WRITE(rockn_priority_w) AM_BASE(&tetrisp2_priority)		// Priority
+	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE8(tetrisp2_priority_r, rockn_priority_w, 0x00ff) 	// Priority
 	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE(tetrisp2_palette_w) AM_BASE(&paletteram16)		// Palette
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM															// Line
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_BASE(&tetrisp2_vram_rot)	// Rotation
@@ -482,7 +484,7 @@ static ADDRESS_MAP_START( rocknms_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)			// Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM															// Spare Object RAM
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM															// Work RAM
-	AM_RANGE(0x200000, 0x23ffff) AM_RAM_WRITE(rockn_priority_w) AM_BASE(&tetrisp2_priority)		// Priority
+	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE8(tetrisp2_priority_r, rockn_priority_w, 0x00ff) 		// Priority
 	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE(tetrisp2_palette_w) AM_BASE(&paletteram16)		// Palette
 //  AM_RANGE(0x500000, 0x50ffff) AM_RAM                                                         // Line
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_BASE(&tetrisp2_vram_rot)	// Rotation
@@ -1003,19 +1005,24 @@ static const gfx_layout layout_16x16x8 =
 	16*16*8
 };
 
+
+/* sprites are contained in 256x256 "tiles" */
+static GFXLAYOUT_RAW( spritelayout, 8, 256, 256, 256*8, 256*256*8 )
+
+
 static GFXDECODE_START( tetrisp2 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,   0x0000, 0x10 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0x0000, 0x10 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8, 0x1000, 0x10 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8, 0x2000, 0x10 ) // [2] Rotation
 	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8,   0x6000, 0x10 ) // [3] Foreground
 GFXDECODE_END
 
 static GFXDECODE_START( rocknms )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,   0x0000, 0x10 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0x0000, 0x10 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x8, 0x1000, 0x10 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8, 0x2000, 0x10 ) // [2] Rotation
 	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8,   0x6000, 0x10 ) // [3] Foreground
-	GFXDECODE_ENTRY( "gfx5", 0, layout_8x8x8,   0x8000, 0x10 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx5", 0, spritelayout,   0x8000, 0x10 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx6", 0, layout_16x16x8, 0x9000, 0x10 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx7", 0, layout_16x16x8, 0xa000, 0x10 ) // [2] Rotation
 	GFXDECODE_ENTRY( "gfx8", 0, layout_8x8x8,   0xe000, 0x10 ) // [3] Foreground

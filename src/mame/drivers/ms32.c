@@ -1,8 +1,6 @@
 /* Jaleco MegaSystem 32 (Preliminary Driver)
 
---- this driver is about to undergo a major update
-     based on actual hardware tests ---
-
+ - hardware tests are needed to establish how the mixing really works (and interrupt source etc.)
 
 Used by Jaleco in the Mid-90's this system, based on the V70 processor consisted
 of a two board set up, the first a standard mainboard and the second a 'cartridge'
@@ -45,7 +43,7 @@ MS32 Cartridge
 
 Game Roms + Custom Chip
 
-The Custom chip is probably related to the encryption?
+The Custom chip provides the encryption
 
 Desert War     - Custom chip: JALECO SS91022-10 (144 pin PQFP) (located on small plug-in board with) (ID: SE93139 EB91022-30056)
 Game Paradise  - Custom chip: JALECO SS91022-10 9515EV 420201 06441
@@ -75,7 +73,8 @@ ToDo / Notes
 
 Z80 + Sound Bits
 
-Re-Add Priorities
+Priorities (code in tetrisp2.c doesn't use all of the priority ram.. and doesn't work here)
+ - some games require completely reversed list processing!
 
 Dip switches/inputs in t2m32 and f1superb
 some games (hayaosi2) don't seeem to have service mode even if it's listed among the dips
@@ -83,12 +82,11 @@ service mode is still accessible through F1 though
 
 Fix Anything Else (Palette etc.)
 
-Replace CPU divider with Idle skip since we don't know how fast the v70 really is (cpu timing is ignored)...
-
-Mirror Ram addresses?
 
 Not sure about the main "global brightness" control register, I don't think it can make the palette
 completely black because of kirarast attract mode, so I'm making it cut by 50% at most.
+ - brightness control also breaks other games in various places, eg gametngk everything going dark
+   when bomb is used, p47 aces intro? 
 
 gametngk seems to need some kind of shadow sprites but the only difference in the sprite attributes is one of the
     priority bits, forcing sprites of that priority to be shadows doesn't work
@@ -98,8 +96,6 @@ The above might be related to the second "global brightness" control register, w
 except gametngk, tetrisp, tp2m32 and gratia.
 
 horizontal position of tx and bg tilemaps is off by 1 pixel in some games
-
-There should be NVRAM somewhere, maybe fc000000-fc007fff
 
 bbbxing: some sprite/roz/bg alignment issues
 
@@ -123,18 +119,17 @@ roz layer wrapping: currently it's always ON, breaking places where it gets very
     repeated on the screen (p47aces, kirarast, bbbxing, gametngk need it OFF).
     gratia and desertwr need it ON.
 
-there are sprite lag issues, but they might be caused by cpu timing so it's better to leave
-    them alone until the CPU clock is correct.
+there are sprite lag issues - sprites should be framebuffered
+
+missing clipping window effect in gametngk intro
 
 
 Not Working Games
 -----------------
 
-tp2m32 - writes invalid SBR, enables interrupts, crashes (fixed patching the bogus SBR).
-f1superb - the road is straight despite the road signs saying otherwise? :-p
-         - there are 4 unknown ROMS which might be related to the above.
-         - the handler for IRQ 11 also seems to be valid, the game might need it.
-
+f1superb - the road is always rendered as straight.
+         - the game has an extra roz layer and extra roms for it
+		 - there is an unknown maths DSP for protection
 
 Jaleco Megasystem 32 Game List - thanks to Yasuhiro
 ---------------------------------------------------
@@ -146,22 +141,23 @@ Tetris Plus 2 (tp2m32)
 Best Bout Boxing (bbbxing)
 Wangan Sensou / Desert War (desertwr)
 Second Earth Gratia (92047-01 version) (gratia)
-*Second Earth Gratia  (91022-10 version) (gratiaa)
-*Super Strong Warriors
+*Second Earth Gratia  (91022-10 version) (gratiaa) (redump needed)
 F-1 Super Battle (f1superb)
 
 Idol Janshi Su-Chi-Pi 2 (47pie2)
 Ryuusei Janshi Kirara Star (kirarast)
 Mahjong Angel Kiss
-*Vs. Janshi Brand New Stars
+Vs. Janshi Brand New Stars
 
-Hayaoshi Quiz Ouza Ketteisen (hayaosi2)
-*Hayaoshi Quiz Nettou Namahousou
-*Hayaoshi Quiz Grand Champion Taikai
+ 
+Hayaoshi Quiz Nettou Namahousou ( hayaosi3 )
+Hayaoshi Quiz Grand Champion Taikai (hayaosi2)
 
-Maybe some more...
+Not Dumped:
 
-Games marked * need dumping / redumping
+Super Strong Warriors
+
+
 
 */
 
@@ -174,7 +170,7 @@ Games marked * need dumping / redumping
 #include "sound/ymf271.h"
 #include "includes/ms32.h"
 
-static UINT32 *ms32_fc000000;
+static UINT8 *ms32_nvram_8;
 
 static UINT32 *ms32_mahjong_input_select;
 
@@ -211,6 +207,7 @@ static CUSTOM_INPUT( mahjong_ctrl_r )
 	return  mj_input & 0xff;
 }
 
+#if 0
 static READ32_HANDLER( ms32_read_inputs3 )
 {
 	int a,b,c,d;
@@ -220,6 +217,7 @@ static READ32_HANDLER( ms32_read_inputs3 )
 	d = (input_port_read(space->machine, "AN0") - 0xb0) & 0xff;
 	return a << 24 | b << 16 | c << 8 | d << 0;
 }
+#endif
 
 static WRITE32_HANDLER( ms32_sound_w )
 {
@@ -245,44 +243,66 @@ static WRITE32_HANDLER( reset_sub_w )
 
 /********** MEMORY MAP **********/
 
-/* some games games test more ram than others .. ram areas with closed comments before
-the lines get tested by various games but I'm not sure are really used, maybe they're
-mirror addresses? */
-
-/*
-p47 aces:
-there are bugs in the test routine, so it checks twice the amount of RAM
-actually present, relying on mirror addresses.
-See how ASCII and SCROLL overlap.
-SCRATCH RAM   fee00000-fee1ffff
-ASCII RAM     fec00000-fec0ffff (actually fec00000-fec07fff ?)
-SCROLL RAM    fec08000-fec17fff (actually fec08000-fec0ffff ?)
-ROTATE RAM    fe000000-fe03ffff (actually fe000000-fe01ffff ?)
-OBJECT RAM    fe800000-fe87ffff (actually fe800000-fe83ffff ?)
-COLOR RAM     fd400000-fd40ffff (this one is actually larger than tested)
-PRIORITY RAM  fd180000-fd1bffff (actually fd180000-fd19ffff ?)
-SOUND RAM
-
-This applies to most of the other games.
-Also, gametngk uses mirror addresses for the background during gameplay, without
-support for them bad tiles appear in the bg.
-*/
-
 static WRITE32_HANDLER( pip_w )
 {
 	if (data)
 		popmessage("fce00a7c = %02x",data);
 }
 
+extern tilemap *ms32_tx_tilemap, *ms32_roz_tilemap, *ms32_bg_tilemap;
+extern UINT8* ms32_priram_8;
+extern UINT16* ms32_palram_16;
+extern UINT16* ms32_rozram_16;
+extern UINT16* ms32_lineram_16;
+extern UINT16* ms32_sprram_16;
+extern UINT16* ms32_txram_16;
+extern UINT16* ms32_bgram_16;
+
+static READ8_HANDLER(   ms32_nvram_r8 )    { return ms32_nvram_8[offset]; }
+static WRITE8_HANDLER(  ms32_nvram_w8 )    { ms32_nvram_8[offset] = data; }
+static READ8_HANDLER(   ms32_priram_r8 )   { return ms32_priram_8[offset]; }
+static WRITE8_HANDLER(  ms32_priram_w8 )   { ms32_priram_8[offset] = data; }
+static READ16_HANDLER(  ms32_palram_r16 )  { return ms32_palram_16[offset]; }
+static WRITE16_HANDLER( ms32_palram_w16 )  { COMBINE_DATA(&ms32_palram_16[offset]); }
+static READ16_HANDLER(  ms32_rozram_r16 )  { return ms32_rozram_16[offset]; }
+static WRITE16_HANDLER( ms32_rozram_w16 )  { COMBINE_DATA(&ms32_rozram_16[offset]); tilemap_mark_tile_dirty(ms32_roz_tilemap,offset/2); }
+static READ16_HANDLER(  ms32_lineram_r16 ) { return ms32_lineram_16[offset]; }
+static WRITE16_HANDLER( ms32_lineram_w16 ) { COMBINE_DATA(&ms32_lineram_16[offset]); }
+static READ16_HANDLER(  ms32_sprram_r16 )  { return ms32_sprram_16[offset]; }
+static WRITE16_HANDLER( ms32_sprram_w16 )  { COMBINE_DATA(&ms32_sprram_16[offset]); }
+static READ16_HANDLER(  ms32_txram_r16 )   { return ms32_txram_16[offset]; }
+static WRITE16_HANDLER( ms32_txram_w16 )   { COMBINE_DATA(&ms32_txram_16[offset]); tilemap_mark_tile_dirty(ms32_tx_tilemap,offset/2); }
+static READ16_HANDLER(  ms32_bgram_r16 )   { return ms32_bgram_16[offset]; }
+static WRITE16_HANDLER( ms32_bgram_w16 )   { COMBINE_DATA(&ms32_bgram_16[offset]); tilemap_mark_tile_dirty(ms32_bg_tilemap,offset/2); }
+
+
 static ADDRESS_MAP_START( ms32_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
-	AM_RANGE(0xfc000000, 0xfc007fff) AM_RAM AM_BASE(&ms32_fc000000)	// NVRAM?
+	/* RAM areas verified by testing on real hw - usually accessed at the 0xfc000000 + mirror */	
+	AM_RANGE(0xc0000000, 0xc0007fff) AM_READWRITE8 (ms32_nvram_r8,   ms32_nvram_w8,   0x000000ff) AM_MIRROR(0x3c1fe000)	// nvram is 8-bit wide, 0x2000 in size */
+/*  AM_RANGE(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above */
+	AM_RANGE(0xc1180000, 0xc1187fff) AM_READWRITE8 (ms32_priram_r8,  ms32_priram_w8,  0x000000ff) AM_MIRROR(0x3c038000) /* priram is 8-bit wide, 0x2000 in size */
+/*  AM_RANGE(0xc1188000, 0xc11bffff) // mirrors of priram, handled above */
+	AM_RANGE(0xc1400000, 0xc143ffff) AM_READWRITE16(ms32_palram_r16, ms32_palram_w16, 0x0000ffff) AM_MIRROR(0x3c1c0000) /* palram is 16-bit wide, 0x20000 in size */
+/*  AM_RANGE(0xc1440000, 0xc145ffff) // mirrors of palram, handled above */
+	AM_RANGE(0xc2000000, 0xc201ffff) AM_READWRITE16(ms32_rozram_r16, ms32_rozram_w16, 0x0000ffff) AM_MIRROR(0x3c1e0000) /* rozram is 16-bit wide, 0x10000 in size */
+/*	AM_RANGE(0xc2020000, 0xc21fffff) // mirrors of rozram, handled above */
+	AM_RANGE(0xc2200000, 0xc2201fff) AM_READWRITE16(ms32_lineram_r16,ms32_lineram_w16,0x0000ffff) AM_MIRROR(0x3c1fe000) /* lineram is 16-bit wide, 0x1000 in size */
+/*	AM_RANGE(0xc2202000, 0xc23fffff) // mirrors of lineram, handled above */
+	AM_RANGE(0xc2800000, 0xc283ffff) AM_READWRITE16(ms32_sprram_r16, ms32_sprram_w16, 0x0000ffff) AM_MIRROR(0x3c1c0000) /* spriteram is 16-bit wide, 0x20000 in size */
+/*	AM_RANGE(0xc2840000, 0xc29fffff) // mirrors of sprram, handled above */
+	AM_RANGE(0xc2c00000, 0xc2c07fff) AM_READWRITE16(ms32_txram_r16,  ms32_txram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) /* txram is 16-bit wide, 0x4000 in size */
+	AM_RANGE(0xc2c08000, 0xc2c0ffff) AM_READWRITE16(ms32_bgram_r16,  ms32_bgram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) /* bgram is 16-bit wide, 0x4000 in size */
+/*	AM_RANGE(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above */
+	AM_RANGE(0xc2e00000, 0xc2e1ffff) AM_RAM AM_BASE(&ms32_mainram)                                AM_MIRROR(0x3c0e0000) /* mainram is 32-bit wide, 0x20000 in size */
+	AM_RANGE(0xc3e00000, 0xc3ffffff) AM_ROMBANK(1)                                                AM_MIRROR(0x3c000000) // ROM is 32-bit wide, 0x200000 in size */
+
+	
+	
+	/* todo: clean up the mapping of these */
 	AM_RANGE(0xfc800000, 0xfc800003) AM_READNOP	/* sound? */
 	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITE(ms32_sound_w) /* sound? */
-
 	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ_PORT("DSW")
-
 	AM_RANGE(0xfce00034, 0xfce00037) AM_WRITENOP // irq ack?
 	AM_RANGE(0xfce00038, 0xfce0003b) AM_WRITE(reset_sub_w)
 	AM_RANGE(0xfce00050, 0xfce0005f) AM_WRITENOP	// watchdog? I haven't investigated
@@ -293,39 +313,24 @@ static ADDRESS_MAP_START( ms32_map, ADDRESS_SPACE_PROGRAM, 32 )
 /**/AM_RANGE(0xfce00a00, 0xfce00a17) AM_RAM AM_BASE(&ms32_tx_scroll)	/* tx layer scroll */
 /**/AM_RANGE(0xfce00a20, 0xfce00a37) AM_RAM AM_BASE(&ms32_bg_scroll)	/* bg layer scroll */
 	AM_RANGE(0xfce00a7c, 0xfce00a7f) AM_WRITE(pip_w)	// ??? layer related? seems to be always 0
-//  AM_RANGE(0xfce00800, 0xfce0085f) // f1superb, roz #2 control?
 //  AM_RANGE(0xfce00e00, 0xfce00e03)    coin counters + something else
-
 	AM_RANGE(0xfd000000, 0xfd000003) AM_READ(ms32_sound_r)
-	AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ(ms32_read_inputs3) /* analog controls in f1superb? */
+	AM_RANGE(0xfd1c0000, 0xfd1c0003) AM_WRITEONLY AM_BASE(&ms32_mahjong_input_select)
+	
+ADDRESS_MAP_END
 
+
+/* F1 Super Blast has an extra ROZ tilemap, and am unknown maths chip (mcu?) handling perspective calculations for the road / corners etc. */
+/* it should use it's own memory map */
+
+//  AM_RANGE(0xfce00800, 0xfce0085f) // f1superb, roz #2 control?
 ///**/AM_RANGE(0xfd104000, 0xfd105fff) AM_RAM /* f1superb */
 ///**/AM_RANGE(0xfd144000, 0xfd145fff) AM_RAM /* f1superb */
-
-	AM_RANGE(0xfd180000, 0xfd19ffff) AM_READWRITE(ms32_priram_r,ms32_priram_w) AM_BASE(&ms32_priram) /* priority ram */
-	AM_RANGE(0xfd1a0000, 0xfd1bffff) AM_READWRITE(ms32_priram_r,ms32_priram_w)	/* mirror only used by memory test in service mode */
-	AM_RANGE(0xfd1c0000, 0xfd1c0003) AM_WRITEONLY AM_BASE(&ms32_mahjong_input_select)
-
-	AM_RANGE(0xfd400000, 0xfd43ffff) AM_RAM_WRITE(ms32_palram_w) AM_BASE(&ms32_palram) /* Palette */
 ///**/AM_RANGE(0xfd440000, 0xfd47ffff) AM_RAM /* f1superb color */
-
 ///**/AM_RANGE(0xfdc00000, 0xfdc006ff) AM_RAM /* f1superb */
 ///**/AM_RANGE(0xfde00000, 0xfde01fff) AM_RAM /* f1superb lineram #2? */
-	AM_RANGE(0xfe000000, 0xfe01ffff) AM_READWRITE(ms32_rozram_r,ms32_rozram_w) AM_BASE(&ms32_rozram)	/* roz layer */
-	AM_RANGE(0xfe020000, 0xfe03ffff) AM_READWRITE(ms32_rozram_r,ms32_rozram_w)	/* mirror only used by memory test in service mode */
-	AM_RANGE(0xfe1ffc88, 0xfe1fffff) AM_WRITENOP	/* gratia writes here before falling into lineram, could be a mirror */
-	AM_RANGE(0xfe200000, 0xfe201fff) AM_READWRITE(ms32_lineram_r,ms32_lineram_w) AM_BASE(&ms32_lineram) /* line ram for roz layer */
 ///**/AM_RANGE(0xfe202000, 0xfe2fffff) AM_RAM /* f1superb vram */
-
-	AM_RANGE(0xfe800000, 0xfe83ffff) AM_READWRITE(ms32_spram_r,ms32_spram_w) AM_BASE(&ms32_spram)	/* sprites */
-	AM_RANGE(0xfe840000, 0xfe87ffff) AM_READWRITE(ms32_spram_r,ms32_spram_w) /* mirror only used by memory test in service mode */
-	AM_RANGE(0xfec00000, 0xfec07fff) AM_READWRITE(ms32_txram_r,ms32_txram_w) AM_BASE(&ms32_txram)	/* tx layer */
-	AM_RANGE(0xfec08000, 0xfec0ffff) AM_READWRITE(ms32_bgram_r,ms32_bgram_w) AM_BASE(&ms32_bgram)	/* bg layer */
-	AM_RANGE(0xfec10000, 0xfec17fff) AM_READWRITE(ms32_txram_r,ms32_txram_w) /* mirror only used by memory test in service mode */
-	AM_RANGE(0xfec18000, 0xfec1ffff) AM_READWRITE(ms32_bgram_r,ms32_bgram_w) /* mirror used by gametngk at the beginning of the game */
-	AM_RANGE(0xfee00000, 0xfee1ffff) AM_RAM AM_BASE(&ms32_mainram)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROMBANK(1)
-ADDRESS_MAP_END
+//	AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ(ms32_read_inputs3) /* analog controls in f1superb? */
 
 /*************************************
  *
@@ -1184,12 +1189,12 @@ static MACHINE_DRIVER_START( ms32 )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(40*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 
 	MDRV_GFXDECODE(ms32)
-	MDRV_PALETTE_LENGTH(0x8000)
+	MDRV_PALETTE_LENGTH(0x10000)
 
 	MDRV_VIDEO_START(ms32)
 	MDRV_VIDEO_UPDATE(ms32)
@@ -2121,10 +2126,16 @@ static void configure_banks(running_machine *machine)
 	memory_configure_bank(machine, 5, 0, 16, memory_region(machine, "audiocpu") + 0x14000, 0x4000);
 }
 
+static DRIVER_INIT( ms32_common )
+{
+	ms32_nvram_8 = auto_alloc_array(machine, UINT8, 0x2000);
+	configure_banks(machine);
+}
+
 /* SS91022-10: desertwr, gratiaa, tp2m32, gametngk */
 static DRIVER_INIT (ss91022_10)
 {
-	configure_banks(machine);
+	DRIVER_INIT_CALL(ms32_common);
 	ms32_rearrange_sprites(machine, "gfx1");
 	decrypt_ms32_tx(machine, 0x00000,0x35, "gfx4");
 	decrypt_ms32_bg(machine, 0x00000,0xa3, "gfx3");
@@ -2133,7 +2144,7 @@ static DRIVER_INIT (ss91022_10)
 /* SS92046_01: bbbxing, f1superb, tetrisp, hayaosi2 */
 static DRIVER_INIT (ss92046_01)
 {
-	configure_banks(machine);
+	DRIVER_INIT_CALL(ms32_common);
 	ms32_rearrange_sprites(machine, "gfx1");
 	decrypt_ms32_tx(machine, 0x00020,0x7e, "gfx4");
 	decrypt_ms32_bg(machine, 0x00001,0x9b, "gfx3");
@@ -2142,7 +2153,7 @@ static DRIVER_INIT (ss92046_01)
 /* SS92047-01: gratia, kirarast */
 static DRIVER_INIT (ss92047_01)
 {
-	configure_banks(machine);
+	DRIVER_INIT_CALL(ms32_common);
 	ms32_rearrange_sprites(machine, "gfx1");
 	decrypt_ms32_tx(machine, 0x24000,0x18, "gfx4");
 	decrypt_ms32_bg(machine, 0x24000,0x55, "gfx3");
@@ -2151,7 +2162,7 @@ static DRIVER_INIT (ss92047_01)
 /* SS92048-01: p47aces, 47pie2, 47pie2o */
 static DRIVER_INIT (ss92048_01)
 {
-	configure_banks(machine);
+	DRIVER_INIT_CALL(ms32_common);
 	ms32_rearrange_sprites(machine, "gfx1");
 	decrypt_ms32_tx(machine, 0x20400,0xd6, "gfx4");
 	decrypt_ms32_bg(machine, 0x20400,0xd4, "gfx3");
@@ -2205,3 +2216,295 @@ GAME( 1996, wpksocv2, 0,        ms32, wpksocv2, ss92046_01, ROT0,   "Jaleco", "W
 
 /* these boot and show something */
 GAME( 1994, f1superb, 0,        ms32, f1superb, f1superb, ROT0,   "Jaleco", "F1 Super Battle", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+
+/* Notes from Charles MacDonald
+
+----------------------------------------------------------------------------
+ Z80 communication
+ ----------------------------------------------------------------------------
+
+ The system has two 8-bit registers which store bytes going from the Z80
+ to the V70 and vice-versa.
+
+ V70 side
+
+ $FC800000 : Writes load the Z80 sound latch and trigger a NMI.
+
+             Reads return D31-D16 = open bus, D15-D0 = $FFFF.
+
+ $FD000000 : Reads return D31-D16 = open bus, D15-D8 = $FF, and
+             D7-D0 =  V70 sound latch, inverted.
+
+             Writes halt the system.
+
+ Z80 side
+
+     $3F10 : Reads return the contents of the Z80 sound latch, inverted.
+             Writes load the V70 sound latch.
+
+ To handle the inversion of sound latch data, both CPUs should invert the
+ data read from their respective read addresses.
+
+ *** Does NMI stay low such that further NMIs can't occur until it's ACK'd?
+
+     Well, reading 3F10-3F1F allows further NMIs which are otherwise masked.
+
+     Is /NMI line really physically held low during this time?
+     Or is there just a flip-flop that remains set until read, which
+     gates NMI?
+
+ *** Does $3F10 cause interrupt on V60 side when accessed? Or $3F20?
+     Could 3F20 be a V70-side interrupt request clear register?
+
+ ----------------------------------------------------------------------------
+ Sound reset register
+ ----------------------------------------------------------------------------
+
+ Writing a '1' to bit 0 of $FCE00038 temporarily pulses the Z80 /RESET pin
+ low for approximately one second, at which point it goes high again and the
+ Z80 resumes operation.
+
+ Setting this bit does *not* keep the Z80 reset for the duration that
+ it is set. It's function is that of a trigger for an automatically timed
+ reset pulse.
+
+ *** Measure /RESET pulse width in units of Z80 clocks.
+
+ ----------------------------------------------------------------------------
+ V70 memory map
+ ----------------------------------------------------------------------------
+
+ Overview
+
+ The hardware maps memory and other devices to a 64MB chunk that is
+ repeatedly mirrored throughout the last 1GB of the address space.
+
+ The system is set up so the V70 is halted when it accesses an unused
+ memory address or accesses it in an unintended way (reading write-only
+ locations, writing to read-only locations). Shortly thereafter the
+ watchdog resets the system due to inactivity.
+
+ The V70 data bus is 32-bit but is connected to a mix of 8, 16, and 32-bit
+ hardware. The undriven data bus bits tend to float high, though my
+ board had a lot of extra pull-up resistors someone added in one of
+ the expansion sockets. I'll try to give approximate garbage values read
+ from these locations when possible.
+
+ V70 memory map
+
+ C0000000-FBFFFFFF : Mirror of FC000000-FFFFFFFF
+
+ Range               Acc  Repeat  Size  Width Description
+
+ FC000000-FC1FFFFF : R/W : 32K  : 8K   : 8  : NVRAM
+ FC600000-FC7FFFFF : R/W : ---  : ---  : -- : Unused (return $FFFFFFFF)
+ FC800000-FC9FFFFF : R/W : 4b   :      : 16 : Z80 sound latch (out)
+ FCC00000-FCDFFFFF : R/W : 32b  :      : 32 : I/O area
+ FCE00000-FCFFFFFF : W/O : 8K   : 4K   : 16 : Video registers
+ FD000000-FD03FFFF : R/O : 4b   :      : 16 : Z80 sound latch (in)
+ FD180000-FD1BFFFF : R/W : 32K  : 8K   : 8  : Priority RAM
+ FD400000-FD5FFFFF : R/W : 256K : 128K : 16 : Color RAM
+ FE000000-FE1FFFFF : R/W : 128K : 64K  : 16 : Rotate RAM
+ FE200000-FE3FFFFF : R/W : 8K   : 4K   : 16 : Line RAM
+ FE800000-FE9FFFFF : R/W : 256K : 128K : 16 : Object RAM
+ FEC00000-FEDFFFFF : R/W : 64K  : 32K  : 16 : ASCII RAM / Scroll RAM
+ FEE00000-FEEFFFFF : R/W : 128K : 128K : 32 : Work RAM
+ FF000000-FFFFFFFF : R/O : 2MB  : 2MB  : 32 : Program ROM
+
+ For example, the object RAM is 128Kx16, mapped to D15-D0 of each word.
+ This corresponds to a 256K space (128K x 32-bits, 16 of which are used)
+ that repeats every 256K within FE800000-FE9FFFFF.
+
+ 1.) Data written to the LSB is stored inverted in $3F10 and triggers NMI.
+     Writing to D15-D8 does nothing and value read is $FF.
+     Writing to D31-D16 resets the machine, values read are open bus (opcodes).
+
+ All items listed are repeatedly mirrored throughout the memory ranges
+ they are assigned to.
+
+ This is the memory map for a Desert War boardset. Other games can add
+ additional hardware on the ROM board which take up memory ranges not listed
+ here. Consider it to be the memory map for a stock Mega System 32 mainboard.
+
+ ----------------------------------------------------------------------------
+ I/O ports
+ ----------------------------------------------------------------------------
+
+ The I/O area consists of 16 word locations that are mirrored repeatedly
+ throughout the range they are mapped to:
+
+ FCC00000 : ?
+ FCC00004 : Player 1, 2 and control panel inputs
+ FCC00008 : ?
+ FCC0000C : ?
+ FCC00010 : DIP switch inputs
+ FCC00014 : ?
+ FCC00018 : ?
+ FCC0001C : ?
+
+ Input details
+
+ FCC00004 : ---- ---- ---- ---- ---- ---- 4321 rldu : 1P buttons, joystick
+          : ---- ---- ---- ---- 4321 rldu ---- ---- : 2P buttons, joystick
+          : ---- ---- ---- --21 ---- ---- ---- ---- : 2P coin, 1P coin
+          : ---- ---- ---- ts-- ---- ---- ---- ---- : Test, service
+          : ---- ---- --21 ---- ---- ---- ---- ---- : 2P start, 1P start
+
+ * All inputs are active-high (1= switch released, 0= switch pressed)
+
+ * When the TILT input is asserted, the system is reset. This continues
+   until TILT is released. The state of TILT cannot be read.
+
+ FCC00010 : ---- ---- ---- ---- ---- ---- 1234 5678 : DIP SW2 #1-8
+          : ---- ---- ---- ---- 1234 5678 ---- ---- : DIP SW1 #1-8
+          : ---- ---- 1234 5678 ---- ---- ---- ---- : DIP SW3 #1-8
+
+ * All inputs are active-low (1= switch OFF, 0= switch ON)
+
+
+ ----------------------------------------------------------------------------
+ System and video registers
+ ----------------------------------------------------------------------------
+
+ This area is 8K long and repeats every 8K. All registers are write-only
+ and are mapped to D15-D0 of each word.
+
+ $FCE00000 : Screen mode control
+
+ D0 : Dot clock control (1= 24 KHz?, 0= 15 KHz)
+
+ $FCE00004 : Horizontal timing 
+ $FCE00008 : Horizontal timing
+ $FCE0000C : Horizontal timing
+ $FCE00010 : Horizontal viewport start
+ $FCE00014 : Frame height
+ $FCE00018 : Display height
+ $FCE0001C : Horizontal positioning
+ $FCE00020 : Fine positioning adjust
+
+ $FCE00045 : IRQ acknowledge
+ $FCE00038 : Sound CPU reset
+ $FCE00050 : Watchdog reset
+ $FCE006xx : ROZ
+
+ $FCE00A00 : Text layer horizontal scroll #1
+ $FCE00A04 : Text layer vertical scroll #1
+ $FCE00A08 : Text layer horizontal scroll #2
+ $FCE00A0C : Text layer vertical scroll #2
+
+ $FCE00A2x : BG layer
+ $FCE00A7C : Layer related
+ $FCE00Exx : Coin meter + lockout
+
+ ----------------------------------------------------------------------------
+ NVRAM
+ ----------------------------------------------------------------------------
+
+ NVRAM is 8K, occupying D7-D0 of each word. It is mirrored every 8K-words
+ (32K bytes) in memory.
+
+ Remaining data bits return $FFFFF4xx.
+
+ The NVRAM consists of a low-power 8K SRAM connected to a .1F capacitor for
+ short-term data retention and a CR2032 lithium battery for long-term
+ retention. It also has a write inhibit circuit to protect RAM from spurious
+ writes when the voltage drops low enough to trigger a system reset.
+ During normal operation the write protection is transparent to the
+ programmer and the SRAM can be accessed normally.
+
+ ----------------------------------------------------------------------------
+ Priority RAM
+ ----------------------------------------------------------------------------
+
+ Priority RAM is 8K, occupying D7-D0 of each word. It is mirrored
+ every 8K-words (32K bytes) in memory.
+
+ Remaining data bits return $00FFFFxx.
+
+ Note that the priority RAM chip is actually 32K. The upper address lines
+ are tied low or high, so perhaps priority RAM is banked.
+
+ ----------------------------------------------------------------------------
+ Color RAM
+ ----------------------------------------------------------------------------
+
+ Color RAM is implemented with three 32Kx8 SRAMs. Every eight-byte area
+ within color RAM addresses one location in color RAM. The red and green
+ color RAMs are connected in parallel to D15-D0 respectively for even words,
+ and the blue color RAM is connected to D7-D0 for odd words:
+
+        MSB                                  LSB
+ +$00 : ---- ---- ---- ---- rrrr rrrr gggg gggg : Red, green components
+ +$04 : ---- ---- ---- ---- ---- ---- bbbb bbbb : Blue component
+
+ - = Bit isn't used. Usually returns '1'.
+
+ The color RAM area is 256K in size (32K entries x 8 bytes per entry) and
+ is mirrored every 256K bytes in memory.
+
+ ----------------------------------------------------------------------------
+ Rotate RAM
+ ----------------------------------------------------------------------------
+
+ Rotate RAM is 64K, occuping D15-D0 of each word. It is mirrored every
+ 64K-words (128K bytes) in memory.
+
+ Remaining data bits return $00FFxxxx or $0000xxxx randomly.
+
+ ----------------------------------------------------------------------------
+ Object RAM
+ ----------------------------------------------------------------------------
+
+ Object RAM is 128K, occuping D15-D0 of each word. It is mirrored every
+ 128K-words (256K bytes) in memory.
+
+ Remaining data bits return $FFFFxxxx.
+
+ ----------------------------------------------------------------------------
+ ASCII / Scroll RAM
+ ----------------------------------------------------------------------------
+
+ ASCII / Scroll RAM is 32K, occupying D15-D0 of each word. It is mirrored
+ every 64K-words (128K bytes) in memory.
+
+ Remaining data bits return $0000xxxx.
+
+ ----------------------------------------------------------------------------
+ Work RAM
+ ----------------------------------------------------------------------------
+
+ Work RAM is 128K, occupying D31-D0 of each word. It is mirrored every 128K
+ bytes in memory.
+
+ ----------------------------------------------------------------------------
+ Program ROM
+ ----------------------------------------------------------------------------
+
+ Program ROM is 512K, occupying D31-D0 of each word. It is mirrored every
+ 512K bytes in memory.
+
+ ----------------------------------------------------------------------------
+ CPU information
+ ----------------------------------------------------------------------------
+
+ Main CPU:  NEC uPD70632GD-20 (200-pin PQFP, 20 MHz)
+
+ * The value of PIR for this particular chip is $00007007.
+
+ * The instruction MOV.D with a register operand uses the register
+   pair "rn:rn+1" as the source data. R31 is a special case; the second
+   register of the pair is still R31 rather than wrapping to R0.
+
+   mov.d r2, [r0]       ; Write pair R2:R3 to [R0]
+   mov.d r3, [r0]       ; Write pair R3:R4 to [R0]
+   mov.d r31, [r0]      ; Write pair R31:R31 to [R0]
+
+   Using the immediate or quick immediate addressing mode for the source
+   operand causes an Addressing Mode exception, just like the uPD70616.
+
+ Sound CPU: Zilog Z80840008PSC (40-pin DIP, 8 MHz)
+
+ * NMOS type. Undocumented instruction "out (c), 0" functions normally.
+
+
+ */

@@ -15,26 +15,39 @@ priority should be given to
 #include "driver.h"
 #include "includes/ms32.h"
 
+bitmap_t* temp_bitmap_tilemaps;
+bitmap_t* temp_bitmap_sprites;
+bitmap_t* temp_bitmap_sprites_pri;
+
 
 //UINT32 *ms32_fce00000;
 UINT32 *ms32_roz_ctrl;
 UINT32 *ms32_tx_scroll;
 UINT32 *ms32_bg_scroll;
-UINT32 *ms32_priram;
-UINT32 *ms32_palram;
-UINT32 *ms32_bgram;
-UINT32 *ms32_rozram;
-UINT32 *ms32_lineram;
-UINT32 *ms32_spram;
-UINT32 *ms32_txram;
+//UINT32 *ms32_priram;
+//UINT32 *ms32_palram;
+//UINT32 *ms32_rozram;
+//UINT32 *ms32_lineram;
+//UINT32 *ms32_spram;
+//UINT32 *ms32_bgram;
+//UINT32 *ms32_txram;
 UINT32 *ms32_mainram;
+
+
+UINT8* ms32_priram_8;
+UINT16* ms32_palram_16;
+UINT16* ms32_rozram_16;
+UINT16 *ms32_lineram_16;
+UINT16 *ms32_sprram_16;
+UINT16 *ms32_bgram_16;
+UINT16 *ms32_txram_16;
 
 // kirarast, tp2m32, and 47pie2 require the sprites in a different order
 static int ms32_reverse_sprite_order;
 
 /********** Tilemaps **********/
 
-static tilemap *ms32_tx_tilemap, *ms32_roz_tilemap, *ms32_bg_tilemap;
+tilemap *ms32_tx_tilemap, *ms32_roz_tilemap, *ms32_bg_tilemap;
 static int flipscreen;
 
 
@@ -42,8 +55,8 @@ static TILE_GET_INFO( get_ms32_tx_tile_info )
 {
 	int tileno, colour;
 
-	tileno = ms32_txram[tile_index *2] & 0x0000ffff;
-	colour = ms32_txram[tile_index *2+1] & 0x000000f;
+	tileno = ms32_txram_16[tile_index *2]   & 0xffff;
+	colour = ms32_txram_16[tile_index *2+1] & 0x000f;
 
 	SET_TILE_INFO(3,tileno,colour,0);
 }
@@ -52,8 +65,8 @@ static TILE_GET_INFO( get_ms32_roz_tile_info )
 {
 	int tileno,colour;
 
-	tileno = ms32_rozram[tile_index *2] & 0x0000ffff;
-	colour = ms32_rozram[tile_index *2+1] & 0x000000f;
+	tileno = ms32_rozram_16[tile_index *2]   & 0xffff;
+	colour = ms32_rozram_16[tile_index *2+1] & 0x000f;
 
 	SET_TILE_INFO(1,tileno,colour,0);
 }
@@ -62,8 +75,8 @@ static TILE_GET_INFO( get_ms32_bg_tile_info )
 {
 	int tileno,colour;
 
-	tileno = ms32_bgram[tile_index *2] & 0x0000ffff;
-	colour = ms32_bgram[tile_index *2+1] & 0x000000f;
+	tileno = ms32_bgram_16[tile_index *2]   & 0xffff;
+	colour = ms32_bgram_16[tile_index *2+1] & 0x000f;
 
 	SET_TILE_INFO(2,tileno,colour,0);
 }
@@ -73,9 +86,27 @@ static int brt_r,brt_g,brt_b;
 
 VIDEO_START( ms32 )
 {
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+
+	ms32_priram_8   = auto_alloc_array(machine, UINT8, 0x2000);
+	ms32_palram_16  = auto_alloc_array(machine, UINT16, 0x20000);
+	ms32_rozram_16  = auto_alloc_array(machine, UINT16, 0x10000);
+	ms32_lineram_16 = auto_alloc_array(machine, UINT16, 0x1000);
+	ms32_sprram_16  = auto_alloc_array(machine, UINT16, 0x20000);
+	ms32_bgram_16   = auto_alloc_array(machine, UINT16, 0x4000);
+	ms32_txram_16   = auto_alloc_array(machine, UINT16, 0x4000);
+
 	ms32_tx_tilemap = tilemap_create(machine, get_ms32_tx_tile_info,tilemap_scan_rows,8, 8,64,64);
 	ms32_bg_tilemap = tilemap_create(machine, get_ms32_bg_tile_info,tilemap_scan_rows,16,16,64,64);
 	ms32_roz_tilemap = tilemap_create(machine, get_ms32_roz_tile_info,tilemap_scan_rows,16,16,128,128);
+
+
+	/* set up tile layers */
+	temp_bitmap_tilemaps = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	temp_bitmap_sprites  = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	temp_bitmap_sprites_pri = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16); // not actually being used for rendering, we embed pri info in the raw colour bitmap
+
 
 	tilemap_set_transparent_pen(ms32_tx_tilemap,0);
 	tilemap_set_transparent_pen(ms32_bg_tilemap,0);
@@ -109,15 +140,15 @@ static void update_color(running_machine *machine, int color)
      */
 	if (~color & 0x4000)
 	{
-		r = ((ms32_palram[color*2] & 0xff00) >>8 ) * brt_r / 0x100;
-		g = ((ms32_palram[color*2] & 0x00ff) >>0 ) * brt_g / 0x100;
-		b = ((ms32_palram[color*2+1] & 0x00ff) >>0 ) * brt_b / 0x100;
+		r = ((ms32_palram_16[color*2] & 0xff00) >>8 ) * brt_r / 0x100;
+		g = ((ms32_palram_16[color*2] & 0x00ff) >>0 ) * brt_g / 0x100;
+		b = ((ms32_palram_16[color*2+1] & 0x00ff) >>0 ) * brt_b / 0x100;
 	}
 	else
 	{
-		r = ((ms32_palram[color*2] & 0xff00) >>8 );
-		g = ((ms32_palram[color*2] & 0x00ff) >>0 );
-		b = ((ms32_palram[color*2+1] & 0x00ff) >>0 );
+		r = ((ms32_palram_16[color*2] & 0xff00) >>8 );
+		g = ((ms32_palram_16[color*2] & 0x00ff) >>0 );
+		b = ((ms32_palram_16[color*2+1] & 0x00ff) >>0 );
 	}
 
 	palette_set_color(machine,color,MAKE_RGB(r,g,b));
@@ -131,7 +162,7 @@ WRITE32_HANDLER( ms32_brightness_w )
 	if (brt[offset] != oldword)
 	{
 		int bank = ((offset & 2) >> 1) * 0x4000;
-		int i;
+		//int i;
 
 		if (bank == 0)
 		{
@@ -139,85 +170,18 @@ WRITE32_HANDLER( ms32_brightness_w )
 			brt_g = 0x100 - ((brt[0] & 0x00ff) >> 0);
 			brt_b = 0x100 - ((brt[1] & 0x00ff) >> 0);
 
-			for (i = 0;i < 0x3000;i++)	// colors 0x3000-0x3fff are not used
-				update_color(space->machine, i);
+		//	for (i = 0;i < 0x3000;i++)	// colors 0x3000-0x3fff are not used
+		//		update_color(space->machine, i);
 		}
 	}
 
 //popmessage("%04x %04x %04x %04x",brt[0],brt[1],brt[2],brt[3]);
 }
 
-WRITE32_HANDLER( ms32_palram_w )
-{
-	COMBINE_DATA(&ms32_palram[offset]);
-
-	update_color(space->machine, offset/2);
-}
 
 
 
-READ32_HANDLER( ms32_txram_r )
-{
-	return ms32_txram[offset];
-}
 
-WRITE32_HANDLER( ms32_txram_w )
-{
-	COMBINE_DATA(&ms32_txram[offset]);
-	tilemap_mark_tile_dirty(ms32_tx_tilemap,offset/2);
-}
-
-READ32_HANDLER( ms32_rozram_r )
-{
-	return ms32_rozram[offset];
-}
-
-WRITE32_HANDLER( ms32_rozram_w )
-{
-	COMBINE_DATA(&ms32_rozram[offset]);
-	tilemap_mark_tile_dirty(ms32_roz_tilemap,offset/2);
-}
-
-READ32_HANDLER( ms32_lineram_r )
-{
-	return ms32_lineram[offset];
-}
-
-WRITE32_HANDLER( ms32_lineram_w )
-{
-	COMBINE_DATA(&ms32_lineram[offset]);
-}
-
-READ32_HANDLER( ms32_bgram_r )
-{
-	return ms32_bgram[offset];
-}
-
-WRITE32_HANDLER( ms32_bgram_w )
-{
-	COMBINE_DATA(&ms32_bgram[offset]);
-	tilemap_mark_tile_dirty(ms32_bg_tilemap,offset/2);
-}
-
-READ32_HANDLER( ms32_spram_r )
-{
-	return ms32_spram[offset];
-}
-
-WRITE32_HANDLER( ms32_spram_w )
-{
-	COMBINE_DATA(&ms32_spram[offset]);
-}
-
-READ32_HANDLER( ms32_priram_r )
-{
-	return ms32_priram[offset];
-}
-
-WRITE32_HANDLER( ms32_priram_w )
-{
-	COMBINE_DATA(&ms32_priram[offset]);
-}
 
 WRITE32_HANDLER( ms32_gfxctrl_w )
 {
@@ -239,138 +203,10 @@ WRITE32_HANDLER( ms32_gfxctrl_w )
 
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
-
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 *sprram_top, size_t sprram_size)
-{
-/***************************************************************************
+/* now using function in tetrisp2.c */
+void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t *bitmap_pri, const rectangle *cliprect, UINT8* priram, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int reverseorder, int flip, int allowzoom);
 
 
-                                Sprites Drawing
-
-    Offset:     Bits:                   Meaning:
-
-    0.w         fedc ba98 ---- ----
-                ---- ---- 7654 ----     Priority
-                ---- ---- ---- 3---
-                ---- ---- ---- -2--     Draw this sprite
-                ---- ---- ---- --1-     Flip Y
-                ---- ---- ---- ---0     Flip X
-
-    1.w         fedc ba98 ---- ----     Tile's Y position in the tile page (*)
-                ---- ---- 7654 3210     Tile's X position in the tile page (*)
-
-    2.w         fedc ---- ---- ----     Color
-                ---- ba98 7654 3210     Tile Page (32x32 tiles = 256x256 pixels each)
-
-    3.w         fedc ba98 ---- ----     Y Size - 1 (*)
-                ---- ---- 7654 3210     X Size - 1 (*)
-
-    4.w         fedc ba-- ---- ----
-                ---- --98 7654 3210     Y (Signed)
-
-    5.w         fedc b--- ---- ----
-                ---- -a98 7654 3210     X (Signed)
-
-    6.w         fedc ba98 7654 3210     Zoom Y
-
-    7.w         fedc ba98 7654 3210     Zoom X
-
-(*) 1 pixel granularity
-
-***************************************************************************/
-
-	int tx, ty, sx, sy, flipx, flipy;
-	int xsize, ysize, xzoom, yzoom;
-	int code, attr, color, size, pri, pri_mask;
-	gfx_element *gfx = machine->gfx[0];
-
-	UINT32		*source	= sprram_top;
-	const UINT32	*finish	= sprram_top + (sprram_size - 0x20) / 4;
-
-
-	if (ms32_reverse_sprite_order == 1)
-	{
-		source	= sprram_top + (sprram_size - 0x20) / 4;
-		finish	= sprram_top;
-	}
-
-
-	for (;ms32_reverse_sprite_order ? (source>=finish) : (source<finish); ms32_reverse_sprite_order ? (source-=8) : (source+=8))
-	{
-		attr	=	source[ 0 ];
-
-		if ((attr & 0x0004) == 0)			continue;
-
-		flipx	=	attr & 1;
-		flipy	=	attr & 2;
-
-		pri = (attr >> 4)&0xf;
-
-		code	=	source[ 1 ];
-		color	=	source[ 2 ];
-
-		tx		=	(code >> 0) & 0xff;
-		ty		=	(code >> 8) & 0xff;
-
-		code	=	(color & 0x0fff);
-
-		color	=	(color >> 12) & 0xf;
-
-		size	=	source[ 3 ];
-
-		xsize	=	((size >> 0) & 0xff) + 1;
-		ysize	=	((size >> 8) & 0xff) + 1;
-
-		sy		=	source[ 4 ];
-		sx		=	source[ 5 ];
-
-		sx		=	(sx & 0x3ff) - (sx & 0x400);
-		sy		=	(sy & 0x1ff) - (sy & 0x200);
-
-		xzoom	=	(source[ 6 ]&0xffff);
-		yzoom	=	(source[ 7 ]&0xffff);
-
-		if (!yzoom || !xzoom)				continue;
-
-		yzoom = 0x1000000/yzoom;
-		xzoom = 0x1000000/xzoom;
-
-		// there are surely also shadows (see gametngk) but how they're enabled we don't know
-
-		if (flipscreen)
-		{
-			sx = 320 - ((xsize*xzoom)>>16) - sx;
-			sy = 224 - ((ysize*yzoom)>>16) - sy;
-			flipx = !flipx;
-			flipy = !flipy;
-		}
-
-#if 0
-if (input_code_pressed(machine, KEYCODE_A) && (pri & 8)) color = rand();
-if (input_code_pressed(machine, KEYCODE_S) && (pri & 4)) color = rand();
-if (input_code_pressed(machine, KEYCODE_D) && (pri & 2)) color = rand();
-if (input_code_pressed(machine, KEYCODE_F) && (pri & 1)) color = rand();
-#endif
-
-		/* TODO: priority handling is completely wrong, but better than nothing */
-		if (pri == 0x0)
-			pri_mask = 0x00;
-		else if (pri <= 0xd)
-			pri_mask = 0xf0;
-		else if (pri <= 0xe)
-			pri_mask = 0xfc;
-		else
-			pri_mask = 0xfe;
-
-		gfx_element_set_source_clip(gfx, tx, xsize, ty, ysize);
-		pdrawgfxzoom_transpen(bitmap, cliprect, gfx,
-				code,
-				color,
-				flipx, flipy,
-				sx,sy,
-				xzoom, yzoom, machine->priority_bitmap,pri_mask, 0);
-	}	/* end sprite loop */
-}
 
 
 
@@ -391,7 +227,7 @@ static void draw_roz(bitmap_t *bitmap, const rectangle *cliprect,int priority)
 
 		while (y <= maxy)
 		{
-			UINT32 *lineaddr = ms32_lineram + 8 * (y & 0xff);
+			UINT16 *lineaddr = ms32_lineram_16 + 8 * (y & 0xff);
 
 			int start2x = (lineaddr[0x00/4] & 0xffff) | ((lineaddr[0x04/4] & 3) << 16);
 			int start2y = (lineaddr[0x08/4] & 0xffff) | ((lineaddr[0x0c/4] & 3) << 16);
@@ -459,6 +295,9 @@ static void draw_roz(bitmap_t *bitmap, const rectangle *cliprect,int priority)
 VIDEO_UPDATE( ms32 )
 {
 	int scrollx,scrolly;
+	int asc_pri;
+	int scr_pri;
+	int rot_pri;
 
 	/* TODO: registers 0x04/4 and 0x10/4 are used too; the most interesting case
        is gametngk, where they are *usually*, but not always, copies of 0x00/4
@@ -468,6 +307,11 @@ VIDEO_UPDATE( ms32 )
        The two registers might be somewhat related to the width and height of the
        tilemaps, but there's something that just doesn't fit.
      */
+	int i;
+
+	for (i = 0;i < 0x10000;i++)	// colors 0x3000-0x3fff are not used
+		update_color(screen->machine, i);
+
 	scrollx = ms32_tx_scroll[0x00/4] + ms32_tx_scroll[0x08/4] + 0x18;
 	scrolly = ms32_tx_scroll[0x0c/4] + ms32_tx_scroll[0x14/4];
 	tilemap_set_scrollx(ms32_tx_tilemap, 0, scrollx);
@@ -481,26 +325,313 @@ VIDEO_UPDATE( ms32 )
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
+
+
 	/* TODO: 0 is correct for gametngk, but break f1superb scrolling grid (text at
        top and bottom of the screen becomes black on black) */
-	bitmap_fill(bitmap,cliprect,0);	/* bg color */
+	bitmap_fill(temp_bitmap_tilemaps,cliprect,0);	/* bg color */
+	
+	/* clear our sprite bitmaps */
+	bitmap_fill(temp_bitmap_sprites,cliprect,0);
+	bitmap_fill(temp_bitmap_sprites_pri,cliprect,0);
+
+	tetrisp2_draw_sprites(screen->machine, temp_bitmap_sprites, temp_bitmap_sprites_pri, cliprect, NULL, ms32_sprram_16, 0x20000, 0, ms32_reverse_sprite_order, 0, 1 );
+	   
+	   
 
 
-	/* priority hack, we really need to figure out what priority ram is I think */
-	if (!strcmp(screen->machine->gamedrv->name,"hayaosi3"))
-	{
-		tilemap_draw(bitmap,cliprect,ms32_bg_tilemap,0,1);
-		tilemap_draw(bitmap,cliprect,ms32_tx_tilemap,0,4);
-		draw_roz(bitmap,cliprect,4); // this question text needs to appear over the sprites
-		draw_sprites(screen->machine,bitmap,cliprect, ms32_spram, 0x40000);
+	asc_pri = scr_pri = rot_pri = 0;
 
-	}
+	if((ms32_priram_8[0x2b00 / 2] & 0x00ff) == 0x0034)
+		asc_pri++;
 	else
+		rot_pri++;
+
+	if((ms32_priram_8[0x2e00 / 2] & 0x00ff) == 0x0034)
+		asc_pri++;
+	else
+		scr_pri++;
+
+	if((ms32_priram_8[0x3a00 / 2] & 0x00ff) == 0x000c)
+		scr_pri++;
+	else
+		rot_pri++;
+
+	if (rot_pri == 0)
+		draw_roz(temp_bitmap_tilemaps,cliprect, 1 << 1);
+	else if (scr_pri == 0)
+		tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_bg_tilemap,  0, 1 << 0);
+	else if (asc_pri == 0)
+		tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_tx_tilemap,  0, 1 << 2);
+
+	if (rot_pri == 1)
+		draw_roz(temp_bitmap_tilemaps,cliprect, 1 << 1);
+	else if (scr_pri == 1)
+		tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_bg_tilemap,  0, 1 << 0);
+	else if (asc_pri == 1)
+		tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_tx_tilemap,  0, 1 << 2);
+
+	if (rot_pri == 2)
+		draw_roz(temp_bitmap_tilemaps,cliprect, 1 << 1);
+	else if (scr_pri == 2)
+		tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_bg_tilemap,  0, 1 << 0);
+	else if (asc_pri == 2)
+		tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_tx_tilemap,  0, 1 << 2);
+
+	/* MIX it! */
+	/* this mixing isn't 100% accurate, it should be using ALL the data in
+	   the priority ram, probably for per-pixel / pen mixing, or more levels
+	   than are supported here..  I don't know, it will need hw tests I think */
 	{
-		tilemap_draw(bitmap,cliprect,ms32_bg_tilemap,0,1);
-		draw_roz(bitmap,cliprect,2);
-		tilemap_draw(bitmap,cliprect,ms32_tx_tilemap,0,4);
-		draw_sprites(screen->machine,bitmap,cliprect, ms32_spram, 0x40000);
+		int xx, yy;
+		int width = video_screen_get_width(screen);
+		int height = video_screen_get_height(screen);
+		const pen_t *paldata = screen->machine->pens;
+
+		UINT16* srcptr_tile;
+		UINT8* srcptr_tilepri;
+		UINT16* srcptr_spri;
+		//UINT8* srcptr_spripri;
+		
+		UINT32* dstptr_bitmap;
+
+		bitmap_fill(bitmap,cliprect,0);
+
+		for (yy=0;yy<height;yy++)
+		{
+			srcptr_tile =     BITMAP_ADDR16(temp_bitmap_tilemaps, yy, 0);
+			srcptr_tilepri =  BITMAP_ADDR8(screen->machine->priority_bitmap, yy, 0);
+			srcptr_spri =     BITMAP_ADDR16(temp_bitmap_sprites, yy, 0);
+			//srcptr_spripri =  BITMAP_ADDR8(temp_bitmap_sprites_pri, yy, 0);
+			dstptr_bitmap  =  BITMAP_ADDR32(bitmap, yy, 0);
+			for (xx=0;xx<width;xx++)
+			{
+				UINT16 src_tile  = srcptr_tile[xx];
+				UINT8 src_tilepri = srcptr_tilepri[xx];
+				UINT16 src_spri = srcptr_spri[xx];
+				//UINT8 src_spripri;// = srcptr_spripri[xx];
+				UINT16 spridat = ((src_spri&0x0fff));
+				UINT8  spritepri =     ((src_spri&0xf000) >> 8);
+				int primask = 0;
+
+				// get sprite priority value back out of bitmap/colour data (this is done in draw_sprite for standalone hw)
+				if (ms32_priram_8[(spritepri | 0x0a00 | 0x1500) / 2] & 0x38) primask |= 1 << 0;
+				if (ms32_priram_8[(spritepri | 0x0a00 | 0x1400) / 2] & 0x38) primask |= 1 << 1;
+				if (ms32_priram_8[(spritepri | 0x0a00 | 0x1100) / 2] & 0x38) primask |= 1 << 2;
+				if (ms32_priram_8[(spritepri | 0x0a00 | 0x1000) / 2] & 0x38) primask |= 1 << 3;
+				if (ms32_priram_8[(spritepri | 0x0a00 | 0x0500) / 2] & 0x38) primask |= 1 << 4;
+				if (ms32_priram_8[(spritepri | 0x0a00 | 0x0400) / 2] & 0x38) primask |= 1 << 5;
+				if (ms32_priram_8[(spritepri | 0x0a00 | 0x0100) / 2] & 0x38) primask |= 1 << 6;
+				if (ms32_priram_8[(spritepri | 0x0a00 | 0x0000) / 2] & 0x38) primask |= 1 << 7;
+
+
+				if (primask == 0x00)
+				{
+					
+					if (src_tilepri==0x00)
+					{
+						if (spridat & 0xff)
+							dstptr_bitmap[xx] = paldata[spridat]; // best bout boxing title
+						else
+							dstptr_bitmap[xx] = paldata[src_tile];
+					}
+					else if (src_tilepri==0x01)
+					{
+						if (spridat & 0xff)
+							dstptr_bitmap[xx] = paldata[spridat]; // best bout boxing title
+						else
+							dstptr_bitmap[xx] = paldata[src_tile];
+					}
+					else if (src_tilepri==0x02)
+					{
+						if (spridat & 0xff)
+							dstptr_bitmap[xx] = paldata[spridat]; // best bout boxing
+						else
+							dstptr_bitmap[xx] = paldata[src_tile];
+					}
+					else if (src_tilepri==0x03)
+					{
+						if (spridat & 0xff)
+							dstptr_bitmap[xx] = paldata[spridat]; // best bout boxing
+						else
+							dstptr_bitmap[xx] = paldata[src_tile];
+					}
+					else if (src_tilepri==0x04)
+					{
+						if (spridat & 0xff)
+							dstptr_bitmap[xx] = paldata[spridat];
+						else
+							dstptr_bitmap[xx] = paldata[src_tile];
+					}
+					else if (src_tilepri==0x05)
+					{
+						if (spridat & 0xff)
+							dstptr_bitmap[xx] = paldata[spridat];
+						else
+							dstptr_bitmap[xx] = paldata[src_tile];
+					}
+					else if (src_tilepri==0x06)
+					{
+						if (spridat & 0xff)
+							dstptr_bitmap[xx] = paldata[spridat];
+						else
+							dstptr_bitmap[xx] = paldata[src_tile];
+					}
+					else if (src_tilepri==0x07)
+					{
+						if (spridat & 0xff)
+							dstptr_bitmap[xx] = paldata[spridat]; // desert war radar?
+						else
+							dstptr_bitmap[xx] = paldata[src_tile];
+					}
+
+
+				}
+				else if (primask == 0xc0)
+				{
+					dstptr_bitmap[xx] = paldata[mame_rand(screen->machine)&0xfff];
+				}
+				else if (primask == 0xf0)
+				{
+//					dstptr_bitmap[xx] = paldata[spridat];
+					if (src_tilepri==0x00)
+					{
+						if (spridat & 0xff)
+							dstptr_bitmap[xx] = paldata[spridat]; // clouds at top gametngk intro
+						else
+							dstptr_bitmap[xx] = paldata[src_tile];
+					}
+					else if (src_tilepri==0x01)
+					{
+						if (spridat & 0xff)
+							dstptr_bitmap[xx] = paldata[spridat]; // clouds gametngk intro
+						else
+							dstptr_bitmap[xx] = paldata[src_tile];
+					}
+					else if (src_tilepri==0x02)
+					{
+						if (spridat & 0xff)
+							dstptr_bitmap[xx] = paldata[spridat]; // mode select gametngk
+						else
+							dstptr_bitmap[xx] = paldata[src_tile];
+					}
+					else if (src_tilepri==0x03)
+					{
+						if (spridat & 0xff)
+							dstptr_bitmap[xx] = paldata[spridat]; // title gametngk
+						else
+							dstptr_bitmap[xx] = paldata[src_tile];
+					}
+					else if (src_tilepri==0x04)
+					{
+						dstptr_bitmap[xx] = paldata[src_tile]; // insert coin text on girl gametngk intro
+					}
+					else if (src_tilepri==0x05)
+					{
+						dstptr_bitmap[xx] = paldata[src_tile]; // insert coin gametngk intro
+					}
+					else if (src_tilepri==0x06)
+					{
+						dstptr_bitmap[xx] = paldata[src_tile]; // insert coin gametngk intro
+					}
+					else if (src_tilepri==0x07)
+					{
+						dstptr_bitmap[xx] = paldata[src_tile]; // insert coin gametngk intro
+					}
+				}
+				else if (primask == 0xfc)
+				{
+					if (src_tilepri==0x00)
+					{
+						if (spridat & 0xff)
+							dstptr_bitmap[xx] = paldata[spridat]; // tetrisp intro text
+						else 
+							dstptr_bitmap[xx] = paldata[src_tile];
+					}
+					else if (src_tilepri==0x01)
+					{
+						if (spridat & 0xff)
+							dstptr_bitmap[xx] = paldata[spridat]; // tetrisp intro text
+						else 
+							dstptr_bitmap[xx] = paldata[src_tile];
+					}
+					else if (src_tilepri==0x02)
+					{
+						dstptr_bitmap[xx] = paldata[src_tile]; // tetrisp story
+					}
+					else if (src_tilepri==0x03)
+					{
+						dstptr_bitmap[xx] = paldata[src_tile]; // tetrisp fader to game after story
+					}
+					else if (src_tilepri==0x04)
+					{
+						dstptr_bitmap[xx] = paldata[src_tile]; // credit text tetrisp mode select
+					}
+					else if (src_tilepri==0x05)
+					{
+						dstptr_bitmap[xx] = paldata[src_tile]; // credit text tetrisp intro
+					}
+					else if (src_tilepri==0x06)
+					{
+						//dstptr_bitmap[xx] = paldata[mame_rand(screen->machine)&0xfff];
+						dstptr_bitmap[xx] = paldata[src_tile]; // assumed
+					}
+					else if (src_tilepri==0x07)
+					{
+						//dstptr_bitmap[xx] = paldata[mame_rand(screen->machine)&0xfff];
+						dstptr_bitmap[xx] = paldata[src_tile]; // assumed	
+					}
+				}
+				else if (primask == 0xfe)
+				{
+					if (src_tilepri==0x00)
+					{
+						if (spridat & 0xff)
+							dstptr_bitmap[xx] = paldata[spridat]; // screens in gametngk intro
+						else 
+							dstptr_bitmap[xx] = paldata[src_tile];
+					}
+					else if (src_tilepri==0x01)
+					{
+						dstptr_bitmap[xx] = alpha_blend_r32( paldata[src_tile], 0x00000000, 128); // shadow, gametngk title
+					}
+					else if (src_tilepri==0x02)
+					{
+						dstptr_bitmap[xx] = alpha_blend_r32( paldata[src_tile], 0x00000000, 128); // shadow, gametngk mode select
+					}
+					else if (src_tilepri==0x03)
+					{
+						dstptr_bitmap[xx] = alpha_blend_r32( paldata[src_tile], 0x00000000, 128); // shadow, gametngk title
+					}
+					else if (src_tilepri==0x04)
+					{
+						dstptr_bitmap[xx] = paldata[src_tile]; // credit text gametngk intro
+					}
+					else if (src_tilepri==0x05)
+					{
+						dstptr_bitmap[xx] = paldata[src_tile]; // credit text near shadow, gametngk title
+					}
+					else if (src_tilepri==0x06)
+					{
+						dstptr_bitmap[xx] = paldata[src_tile]; // credit gametngk highscores
+					}
+					else if (src_tilepri==0x07)
+					{
+						dstptr_bitmap[xx] = paldata[src_tile]; // assumed
+					}
+				}
+
+				else
+				{
+					fatalerror("unhandled priority type %02x\n",primask);
+				}
+				
+
+				
+			}
+
+		}
+
 	}
 
 

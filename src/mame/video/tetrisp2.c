@@ -5,15 +5,6 @@
                     driver by   Luca Elia (l.elia@tin.it)
 
 
-Note:   if MAME_DEBUG is defined, pressing Z with:
-
-        Q       shows the background
-        W       shows the foreground
-        A       shows the sprites
-
-        Keys can be used together!
-
-
     [ 2 Scrolling Layers ]
 
     The Background is a 64 x 64 Tilemap with 16 x 16 x 8 tiles (1024 x 1024).
@@ -34,7 +25,8 @@ To Do:
 
 -   There is a 3rd unimplemented layer capable of rotation (not used by
     the game, can be tested in service mode).
--   Priority RAM is not taken into account.
+-   Priority RAM is not properly taken into account.
+-   Can the Tetris Plus 2 sprites zoom, or is this an MS32 only feature?
 
 ***************************************************************************/
 
@@ -48,7 +40,7 @@ UINT16 *tetrisp2_vram_bg, *tetrisp2_scroll_bg;
 UINT16 *tetrisp2_vram_fg, *tetrisp2_scroll_fg;
 UINT16 *tetrisp2_vram_rot, *tetrisp2_rotregs;
 
-UINT16 *tetrisp2_priority;
+UINT8 *tetrisp2_priority;
 
 UINT16 *rocknms_sub_vram_bg, *rocknms_sub_scroll_bg;
 UINT16 *rocknms_sub_vram_fg, *rocknms_sub_scroll_fg;
@@ -91,9 +83,9 @@ WRITE16_HANDLER( rocknms_sub_palette_w )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( tetrisp2_priority_w )
+WRITE8_HANDLER( tetrisp2_priority_w )
 {
-	if (ACCESSING_BITS_8_15)
+	//if (ACCESSING_BITS_8_15)
 	{
 		data |= ((data & 0xff00) >> 8);
 		tetrisp2_priority[offset] = data;
@@ -101,9 +93,9 @@ WRITE16_HANDLER( tetrisp2_priority_w )
 }
 
 
-WRITE16_HANDLER( rockn_priority_w )
+WRITE8_HANDLER( rockn_priority_w )
 {
-	if (ACCESSING_BITS_8_15)
+	//if (ACCESSING_BITS_8_15)
 	{
 		tetrisp2_priority[offset] = data;
 	}
@@ -122,6 +114,10 @@ READ16_HANDLER( nndmseal_priority_r )
 	return tetrisp2_priority[offset] | 0xff00;
 }
 
+READ8_HANDLER( tetrisp2_priority_r )
+{
+	return tetrisp2_priority[offset];
+}
 
 /***************************************************************************
 
@@ -256,6 +252,7 @@ WRITE16_HANDLER( rocknms_sub_vram_rot_w )
 
 
 
+extern void ms32_rearrange_sprites(running_machine *machine, const char *region);
 
 VIDEO_START( tetrisp2 )
 {
@@ -276,6 +273,10 @@ VIDEO_START( tetrisp2 )
 	tilemap_set_transparent_pen(tilemap_bg,0);
 	tilemap_set_transparent_pen(tilemap_fg,0);
 	tilemap_set_transparent_pen(tilemap_rot,0);
+	
+	// should be smaller and mirrored like m32 I guess
+	tetrisp2_priority = auto_alloc_array(machine, UINT8, 0x40000);
+	ms32_rearrange_sprites(machine, "gfx1");
 }
 
 VIDEO_START( nndmseal )
@@ -303,6 +304,10 @@ VIDEO_START( rockntread )
 	tilemap_set_transparent_pen(tilemap_bg, 0);
 	tilemap_set_transparent_pen(tilemap_fg, 0);
 	tilemap_set_transparent_pen(tilemap_rot, 0);
+
+	// should be smaller and mirrored like m32 I guess
+	tetrisp2_priority = auto_alloc_array(machine, UINT8, 0x40000);
+	ms32_rearrange_sprites(machine, "gfx1");
 }
 
 
@@ -325,6 +330,8 @@ VIDEO_START( rocknms )
 	tilemap_set_transparent_pen(tilemap_sub_bg, 0);
 	tilemap_set_transparent_pen(tilemap_sub_fg, 0);
 	tilemap_set_transparent_pen(tilemap_sub_rot, 0);
+
+	ms32_rearrange_sprites(machine, "gfx5");
 }
 
 
@@ -367,33 +374,41 @@ VIDEO_START( rocknms )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 *sprram_top, size_t sprram_size, int gfxnum)
+/* this is also used by ms32.c */
+/* sprites should be able to create shadows too, how?
+  -- it appears that sprites which should be shadows are often rendered *UNDER* the tilemaps, maybe related?
+*/
+void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t *bitmap_pri, const rectangle *cliprect, UINT8* priram, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int reverseorder, int flip, int allowzoom)
 {
-	int x, y, tx, ty, sx, sy, flipx, flipy;
-	int xsize, ysize, xnum, ynum;
-	int xstart, ystart, xend, yend, xinc, yinc;
+	int tx, ty, sx, sy, flipx, flipy;
+	int xsize, ysize;
 	int code, attr, color, size;
 	int flipscreen;
+	int pri;
+	int xzoom, yzoom;
 	UINT32 primask;
-	UINT16 *priority_ram;
-
-	int min_x = cliprect->min_x;
-	int max_x = cliprect->max_x;
-	int min_y = cliprect->min_y;
-	int max_y = cliprect->max_y;
+	UINT8 *priority_ram;
+	gfx_element *gfx = machine->gfx[gfxnum];
 
 	UINT16		*source	=	sprram_top;
-	const UINT16	*finish	=	sprram_top + (sprram_size - 0x10) / 2;
+	UINT16	*finish	=	sprram_top + (sprram_size - 0x10) / 2;
+	
+	flipscreen = flip;
 
-	priority_ram = tetrisp2_priority;
-
-	flipscreen = (tetrisp2_systemregs[0x00] & 0x02);
-
-	for (; source <= finish; source += 0x10/2 )
+	if (reverseorder == 1)
 	{
-		rectangle clip;
+		source	= sprram_top + (sprram_size - 0x10) / 2;
+		finish	= sprram_top;
+	}
 
+	priority_ram = priram;
+
+
+	for (;reverseorder ? (source>=finish) : (source<finish); reverseorder ? (source-=8) : (source+=8))
+	{		
 		attr	=	source[ 0 ];
+
+		pri = (attr & 0x00f0);
 
 		if ((attr & 0x0004) == 0)			continue;
 
@@ -406,9 +421,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		tx		=	(code >> 0) & 0xff;
 		ty		=	(code >> 8) & 0xff;
 
-		code	=	(tx / 8) +
-					(ty / 8) * (0x100/8) +
-					(color & 0x7f) * (0x100/8) * (0x100/8);
+		code	=	(color & 0x0fff);
 
 		color	=	(color >> 12) & 0xf;
 
@@ -417,72 +430,67 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		xsize	=	((size >> 0) & 0xff) + 1;
 		ysize	=	((size >> 8) & 0xff) + 1;
 
-		xnum	=	( ((tx + xsize) & ~7) + (((tx + xsize) & 7) ? 8 : 0) - (tx & ~7) ) / 8;
-		ynum	=	( ((ty + ysize) & ~7) + (((ty + ysize) & 7) ? 8 : 0) - (ty & ~7) ) / 8;
-
 		sy		=	source[ 4 ];
 		sx		=	source[ 5 ];
 
 		sx		=	(sx & 0x3ff) - (sx & 0x400);
 		sy		=	(sy & 0x1ff) - (sy & 0x200);
 
-		/* Flip Screen */
-		if (flipscreen)
+		xzoom	=	(source[ 6 ]&0xffff);
+		yzoom	=	(source[ 7 ]&0xffff);
+
+		// tetrisp2 hardware doesn't work with zoom?
+		if (allowzoom)
 		{
-			sx = max_x + 1 - sx - xsize;	flipx = !flipx;
-			sy = max_y + 1 - sy - ysize;	flipy = !flipy;
+			if (!yzoom || !xzoom)
+				continue;
+
+			yzoom = 0x1000000/yzoom;
+			xzoom = 0x1000000/xzoom;
 		}
-
-		/* Clip the sprite if its width or height is not an integer
-           multiple of 8 pixels (1 tile) */
-
-		clip.min_x	=	sx;
-		clip.max_x	=	sx + xsize - 1;
-		clip.min_y	=	sy;
-		clip.max_y	=	sy + ysize - 1;
-
-		if (clip.min_x > max_x)	continue;
-		if (clip.max_x < min_x)	continue;
-
-		if (clip.min_y > max_y)	continue;
-		if (clip.max_y < min_y)	continue;
-
-		if (clip.min_x < min_x)	clip.min_x = min_x;
-		if (clip.max_x > max_x)	clip.max_x = max_x;
-
-		if (clip.min_y < min_y)	clip.min_y = min_y;
-		if (clip.max_y > max_y)	clip.max_y = max_y;
-
-		if (flipx)	{ xstart = xnum-1;  xend = -1;    xinc = -1;  sx -= xnum*8 - xsize - (tx & 7); }
-		else		{ xstart = 0;       xend = xnum;  xinc = +1;  sx -= tx & 7; }
-
-		if (flipy)	{ ystart = ynum-1;  yend = -1;    yinc = -1;  sy -= ynum*8 - ysize - (ty & 7); }
-		else		{ ystart = 0;       yend = ynum;  yinc = +1;  sy -= ty & 7; }
-
-		primask = 0;
-		if (priority_ram[((attr & 0x00f0) | 0x0a00 | 0x1500) / 2] & 0x38) primask |= 1 << 0;
-		if (priority_ram[((attr & 0x00f0) | 0x0a00 | 0x1400) / 2] & 0x38) primask |= 1 << 1;
-		if (priority_ram[((attr & 0x00f0) | 0x0a00 | 0x1100) / 2] & 0x38) primask |= 1 << 2;
-		if (priority_ram[((attr & 0x00f0) | 0x0a00 | 0x1000) / 2] & 0x38) primask |= 1 << 3;
-		if (priority_ram[((attr & 0x00f0) | 0x0a00 | 0x0500) / 2] & 0x38) primask |= 1 << 4;
-		if (priority_ram[((attr & 0x00f0) | 0x0a00 | 0x0400) / 2] & 0x38) primask |= 1 << 5;
-		if (priority_ram[((attr & 0x00f0) | 0x0a00 | 0x0100) / 2] & 0x38) primask |= 1 << 6;
-		if (priority_ram[((attr & 0x00f0) | 0x0a00 | 0x0000) / 2] & 0x38) primask |= 1 << 7;
-
-		for (y = ystart; y != yend; y += yinc)
+		else
 		{
-			for (x = xstart; x != xend; x += xinc)
-			{
-				pdrawgfx_transpen(bitmap, &clip,
-						machine->gfx[gfxnum],
-						code++,
-						color,
-						flipx, flipy,
-						sx + x * 8, sy + y * 8,
-						machine->priority_bitmap, primask, 0);
-			}
-			code	+=	(0x100/8) - xnum;
+			xzoom = 0x10000;
+			yzoom = 0x10000;
 		}
+		
+
+		gfx_element_set_source_clip(gfx, tx, xsize, ty, ysize);
+		
+		if (priority_ram == NULL)
+		{
+			// passes the priority as the upper bits of the colour
+			// for post-processing in mixer instead
+			pdrawgfxzoom_transpen_raw(bitmap, cliprect, gfx,
+					code,
+					color<<8 | pri<<8,
+					flipx, flipy,
+					sx,sy,
+					xzoom, yzoom, bitmap_pri,0, 0);
+		}
+		else
+		{
+			primask = 0;
+			if (priority_ram[(pri | 0x0a00 | 0x1500) / 2] & 0x38) primask |= 1 << 0;
+			if (priority_ram[(pri | 0x0a00 | 0x1400) / 2] & 0x38) primask |= 1 << 1;
+			if (priority_ram[(pri | 0x0a00 | 0x1100) / 2] & 0x38) primask |= 1 << 2;
+			if (priority_ram[(pri | 0x0a00 | 0x1000) / 2] & 0x38) primask |= 1 << 3;
+			if (priority_ram[(pri | 0x0a00 | 0x0500) / 2] & 0x38) primask |= 1 << 4;
+			if (priority_ram[(pri | 0x0a00 | 0x0400) / 2] & 0x38) primask |= 1 << 5;
+			if (priority_ram[(pri | 0x0a00 | 0x0100) / 2] & 0x38) primask |= 1 << 6;
+			if (priority_ram[(pri | 0x0a00 | 0x0000) / 2] & 0x38) primask |= 1 << 7;
+
+
+			pdrawgfxzoom_transpen(bitmap, cliprect, gfx,
+					code,
+					color,
+					flipx, flipy,
+					sx,sy,
+					xzoom, yzoom, bitmap_pri,primask, 0);
+
+		}
+		
+
 	}	/* end sprite loop */
 }
 
@@ -575,7 +583,7 @@ VIDEO_UPDATE( tetrisp2 )
 	else if (asc_pri == 2)
 		tilemap_draw(bitmap,cliprect, tilemap_fg,  0, 1 << 2);
 
-	draw_sprites(screen->machine, bitmap,cliprect, spriteram16, spriteram_size, 0);
+	tetrisp2_draw_sprites(screen->machine, bitmap,screen->machine->priority_bitmap, cliprect, tetrisp2_priority, spriteram16, spriteram_size, 0, 0, (tetrisp2_systemregs[0x00] & 0x02), 0);
 	return 0;
 }
 
@@ -659,7 +667,7 @@ VIDEO_UPDATE( rockntread )
 	else if (asc_pri == 2)
 		tilemap_draw(bitmap,cliprect, tilemap_fg,  0, 1 << 2);
 
-	draw_sprites(screen->machine, bitmap,cliprect, spriteram16, spriteram_size, 0);
+	tetrisp2_draw_sprites(screen->machine, bitmap,screen->machine->priority_bitmap,cliprect, tetrisp2_priority, spriteram16, spriteram_size, 0, 0, (tetrisp2_systemregs[0x00] & 0x02), 0);
 	return 0;
 }
 
@@ -726,7 +734,7 @@ VIDEO_UPDATE( rocknms )
 		else if (asc_pri == 2)
 			tilemap_draw(bitmap,cliprect, tilemap_sub_fg,  0, 1 << 2);
 
-		draw_sprites(screen->machine, bitmap,cliprect, spriteram16_2, spriteram_2_size, 4);
+		tetrisp2_draw_sprites(screen->machine, bitmap,screen->machine->priority_bitmap,cliprect, tetrisp2_priority, spriteram16_2, spriteram_2_size, 4, 0, (tetrisp2_systemregs[0x00] & 0x02), 0);
 	}
 	else if (screen == right_screen) /* game screen */
 	{
@@ -779,7 +787,7 @@ VIDEO_UPDATE( rocknms )
 		else if (asc_pri == 2)
 			tilemap_draw(bitmap,cliprect, tilemap_fg,  0, 1 << 2);
 
-		draw_sprites(screen->machine, bitmap,cliprect, spriteram16, spriteram_size, 0);
+		tetrisp2_draw_sprites(screen->machine, bitmap,screen->machine->priority_bitmap,cliprect, tetrisp2_priority, spriteram16, spriteram_size, 0, 0, (tetrisp2_systemregs[0x00] & 0x02), 0);
 	}
 
 	return 0;
