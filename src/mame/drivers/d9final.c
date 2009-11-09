@@ -257,7 +257,7 @@ static MACHINE_RESET( d9final )
 
 static MACHINE_DRIVER_START( d9final )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,24000000/4)/* ? MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 24000000/4)/* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(d9final_map)
 	MDRV_CPU_IO_MAP(d9final_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -281,7 +281,7 @@ static MACHINE_DRIVER_START( d9final )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2413, 24000000/8) // ?
+	MDRV_SOUND_ADD("ym", YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 
@@ -300,4 +300,4 @@ ROM_END
 
 
 
-GAME( 1992, d9final,  0,    d9final, d9final,  0, ROT0, "Excellent System", "Dream 9 Final (v2.24)", 0 )
+GAME( 1992, d9final, 0, d9final, d9final, 0, ROT0, "Excellent System", "Dream 9 Final (v2.24)", 0 )
