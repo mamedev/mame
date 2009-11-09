@@ -708,7 +708,11 @@ static INTERRUPT_GEN(konamigx_vbinterrupt_type4)
 	// IRQ 1 is the main 60hz vblank interrupt
 	// the gx_syncen & 0x20 test doesn't work on type 3 or 4 ROM boards, likely because the ROM board
 	// generates the timing in those cases.  With this change, rushing heroes and rng2 boot :)
-	if (1) // gx_syncen & 0x20)
+
+	// maybe this interupt should only be every 30fps, or maybe there are flags to prevent the game running too fast
+	// the real hardware should output the display for each screen on alternate frames
+	if(video_screen_get_frame_number(device->machine->primary_screen) & 1)
+//	if (1) // gx_syncen & 0x20)
 	{
 		gx_syncen &= ~0x20;
 
@@ -1207,8 +1211,8 @@ static ADDRESS_MAP_START( gx_type3_map, ADDRESS_SPACE_PROGRAM, 32 )
 	//AM_RANGE(0xe20000, 0xe20003) AM_WRITENOP
 	AM_RANGE(0xe40000, 0xe40003) AM_WRITE(konamigx_type3_psac2_bank_w) AM_BASE(&konamigx_type3_psac2_bank)
 	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE((UINT32**)&K053936_0_linectrl)
-	AM_RANGE(0xe80000, 0xe87fff) AM_RAM_WRITE(konamigx_555_palette_w) AM_BASE(&paletteram32) 	// main monitor palette (twice as large as reality)
-	AM_RANGE(0xea0000, 0xea3fff) AM_RAM_WRITE(konamigx_555_palette2_w) AM_BASE(&gx_subpaletteram32) // sub monitor palette
+	AM_RANGE(0xe80000, 0xe83fff) AM_RAM_WRITE(konamigx_555_palette_w) AM_BASE(&paletteram32) 	// main monitor palette
+	AM_RANGE(0xea0000, 0xea3fff) AM_RAM_WRITE(konamigx_555_palette2_w) AM_BASE(&gx_subpaletteram32)
 	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)
 	//AM_RANGE(0xf00000, 0xf07fff) AM_RAM
 	AM_IMPORT_FROM(gx_base_memmap)
@@ -1221,7 +1225,7 @@ static ADDRESS_MAP_START( gx_type4_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xe20000, 0xe20003) AM_WRITENOP
 	AM_RANGE(0xe40000, 0xe40003) AM_WRITENOP
 	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE((UINT32**)&K053936_1_linectrl)  // 29C & 29G (PSAC2 line control)
-	AM_RANGE(0xe80000, 0xe8ffff) AM_RAM_WRITE(konamigx_palette_w) AM_BASE(&paletteram32) // 11G/13G/15G (main screen palette RAM) (twice as large as reality)
+	AM_RANGE(0xe80000, 0xe87fff) AM_RAM_WRITE(konamigx_palette_w) AM_BASE(&paletteram32) // 11G/13G/15G (main screen palette RAM)
 	AM_RANGE(0xea0000, 0xea7fff) AM_RAM_WRITE(konamigx_palette2_w) AM_BASE(&gx_subpaletteram32) // 5G/7G/9G (sub screen palette RAM)
 	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)		// type 4 polls this too
 	AM_RANGE(0xf00000, 0xf07fff) AM_RAM_WRITE(konamigx_t4_psacmap_w) AM_BASE(&gx_psacram)	// PSAC2 tilemap

@@ -332,7 +332,7 @@ VIDEO_START(konamigx_type3)
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
 
-	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 1, NULL, konamigx_type2_tile_callback, 0);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 1);
 	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -132, -24, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites(machine);
@@ -638,30 +638,34 @@ WRITE32_HANDLER( konamigx_palette2_w )
 	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
+INLINE void set_color_555(running_machine *machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
+{
+	palette_set_color_rgb(machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
+}
+
 // main monitor for type 3
 WRITE32_HANDLER( konamigx_555_palette_w )
 {
+	UINT32 coldat;
 	COMBINE_DATA(&paletteram32[offset]);
-	paletteram16 = (UINT16 *)paletteram32;
 
-	if ((ACCESSING_BITS_16_23) && (ACCESSING_BITS_24_31))
-		paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset*2, data >> 16, mem_mask >> 16);
-	if ((ACCESSING_BITS_0_7) && (ACCESSING_BITS_8_15))
-		paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset*2+1, data, mem_mask);
+	coldat = paletteram32[offset];
+
+	set_color_555(space->machine, offset*2, 0, 5, 10,coldat >> 16);
+	set_color_555(space->machine, offset*2+1, 0, 5, 10,coldat & 0xffff);
 }
 
 // sub monitor for type 3
 WRITE32_HANDLER( konamigx_555_palette2_w )
 {
+	UINT32 coldat;
 	COMBINE_DATA(&gx_subpaletteram32[offset]);
-	offset += (0x4000/4);
-	COMBINE_DATA(&paletteram32[offset]);
-	paletteram16 = (UINT16 *)paletteram32;
+	coldat = gx_subpaletteram32[offset];
 
-	if ((ACCESSING_BITS_16_23) && (ACCESSING_BITS_24_31))
-		paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset*2, data >> 16, mem_mask >> 16);
-	if ((ACCESSING_BITS_0_7) && (ACCESSING_BITS_8_15))
-		paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset*2+1, data, mem_mask);
+	offset += (0x4000/4);
+
+	set_color_555(space->machine, offset*2, 0, 5, 10,coldat >> 16);
+	set_color_555(space->machine, offset*2+1, 0, 5, 10,coldat & 0xffff);
 }
 
 WRITE32_HANDLER( konamigx_tilebank_w )
