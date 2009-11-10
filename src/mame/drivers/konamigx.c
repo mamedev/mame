@@ -1110,7 +1110,7 @@ static WRITE32_HANDLER( type4_prot_w )
 					memory_write_dword(space, 0xc0fe00, memory_read_dword(space, 0xc00f30));
 					memory_write_dword(space, 0xc0fe04, memory_read_dword(space, 0xc00f34));
 				}
-				else if(last_prot_op == 0xd97)	// rushhero & vsnetscr
+				else if(last_prot_op == 0xd97)	// rushhero
 				{
 					int src = 0xc09ff0;
 					int dst = 0xd20000;
@@ -1133,12 +1133,15 @@ static WRITE32_HANDLER( type4_prot_w )
 					memory_write_byte(space, 0xc01cc4, ~memory_read_byte(space, 0xc00547));
 					memory_write_byte(space, 0xc01cc5, ~memory_read_byte(space, 0xc00567));
 				}
-				else if(last_prot_op == 0x515)
+				else if(last_prot_op == 0x515) // vsnetscr
 				{
-					memory_write_byte(space, 0xc01d00, ~memory_read_byte(space, 0xc00d07));
-					memory_write_byte(space, 0xc01d01, ~memory_read_byte(space, 0xc00d27));
-					memory_write_byte(space, 0xc01d04, ~memory_read_byte(space, 0xc00d47));
-					memory_write_byte(space, 0xc01d05, ~memory_read_byte(space, 0xc00d67));
+					//...
+
+					/* are these correct? Investigate... */
+					//memory_write_byte(space, 0xc01d00, ~memory_read_byte(space, 0xc00d07));
+					//memory_write_byte(space, 0xc01d01, ~memory_read_byte(space, 0xc00d27));
+					//memory_write_byte(space, 0xc01d04, ~memory_read_byte(space, 0xc00d47));
+					//memory_write_byte(space, 0xc01d05, ~memory_read_byte(space, 0xc00d67));
 				}
 				else
 				{
@@ -3729,4 +3732,4 @@ GAME( 1996, vsnetscra, vsnetscr, gxtype4vsnet, type3, konamigx, ROT0, "Konami", 
 GAME( 1996, vsnetscrj, vsnetscr, gxtype4vsnet, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver JAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
 GAME( 1996, rungun2,   konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Run and Gun 2 (ver UAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
 GAME( 1996, slamdnk2,  rungun2,  gxtype4, type3, konamigx, ROT0, "Konami", "Slam Dunk 2 (ver JAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, rushhero,  konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Rushing Heroes (ver UAB)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING  )
+GAME( 1996, rushhero,  konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Rushing Heroes (ver UAB)", GAME_IMPERFECT_GRAPHICS  )
