@@ -360,8 +360,9 @@ VIDEO_START(konamigx_type3)
 VIDEO_START(konamigx_type4)
 {
 	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
+	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -132, -24, konamigx_type2_sprite_callback);
 
-	_gxcommoninit(machine);
+	_gxcommoninitnosprites(machine);
 
 	gx_psac_tilemap = tilemap_create(machine, get_gx_psac_tile_info, tilemap_scan_rows,  16, 16, 128, 128);
 	gx_rozenable = 1;
