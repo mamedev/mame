@@ -5439,11 +5439,17 @@ static void K056832_UpdatePageLayout(void)
 		}
 	}
 
+	// winning spike doesn't like layer association..
+	if (K056832_djmain_hack==2)
+		K056832_LayerAssociation = 0;
+
+
 	// disable all tilemaps
 	for (pageIndex=0; pageIndex<K056832_PAGE_COUNT; pageIndex++)
 	{
 		K056832_LayerAssociatedWithPage[pageIndex] = -1;
 	}
+
 
 	// enable associated tilemaps
 	for (layer=0; layer<4; layer++)
@@ -5460,7 +5466,7 @@ static void K056832_UpdatePageLayout(void)
 			for (c=0; c<colspan; c++)
 			{
 				pageIndex = (((rowstart + r) & 3) << 2) + ((colstart + c) & 3);
-if (!K056832_djmain_hack || K056832_LayerAssociatedWithPage[pageIndex] == -1) //*
+if (!(K056832_djmain_hack==1) || K056832_LayerAssociatedWithPage[pageIndex] == -1) //*
 					K056832_LayerAssociatedWithPage[pageIndex] = setlayer;
 			}
 		}

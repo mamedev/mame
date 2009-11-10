@@ -296,7 +296,7 @@ VIDEO_START(konamigx_5bpp)
 
 VIDEO_START(winspike)
 {
-	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 0, NULL, konamigx_alpha_tile_callback, 0);
+	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 0, NULL, konamigx_alpha_tile_callback, 2);
 	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_LE2, -53, -23, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites(machine);
@@ -371,7 +371,7 @@ VIDEO_START(konamigx_type3)
 VIDEO_START(konamigx_type4)
 {
 	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
-	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -132, -24, konamigx_type2_sprite_callback);
+	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -78, -24, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites(machine);
 
@@ -379,8 +379,15 @@ VIDEO_START(konamigx_type4)
 	gx_rozenable = 0;
 	gx_specialrozenable = 3;
 
+
+	K056832_set_LayerOffset(0,  -22, 0);
+	K056832_set_LayerOffset(1,  -22, 0);
+	K056832_set_LayerOffset(2,  -22, 0);
+	K056832_set_LayerOffset(3,  -22, 0);
+
+
 	K053936_wraparound_enable(0, 0);
-	K053936GP_set_offset(0, 0, 0);
+	K053936GP_set_offset(1, -36, 0);
 }
 
 VIDEO_START(konamigx_6bpp_2)

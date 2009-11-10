@@ -342,7 +342,7 @@ INLINE void zdrawgfxzoom32GP(
 	UINT8  *ozbuf_ptr;
 	UINT8  *szbuf_ptr;
 	const pen_t *pal_base;
-	const pen_t *shd_base;
+	//const pen_t *shd_base;
 	UINT32 *dst_ptr;
 
 	// outter loop
@@ -389,7 +389,7 @@ INLINE void zdrawgfxzoom32GP(
 	src_base  = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 	pal_base  = gfx->machine->pens + gfx->color_base + (color % gfx->total_colors) * granularity;
-	shd_base  = gfx->machine->shadow_table;
+	//shd_base  = gfx->machine->pens;
 
 	dst_ptr   = (UINT32 *)bitmap->base;
 	dst_pitch = bitmap->rowpixels;
@@ -606,8 +606,8 @@ INLINE void zdrawgfxzoom32GP(
 							eax = dst_ptr[ecx];
 							szbuf_ptr[ecx*2] = z8;
 							szbuf_ptr[ecx*2+1] = p8;
-							eax = (eax>>9&0x7c00) | (eax>>6&0x03e0) | (eax>>3&0x001f);
-							dst_ptr[ecx] = shd_base[eax];
+							//eax = (eax>>9&0x7c00) | (eax>>6&0x03e0) | (eax>>3&0x001f);
+							dst_ptr[ecx] = alpha_blend_r32( eax, 0x00000000, 128);
 						}
 						while (++ecx);
 
@@ -741,8 +741,8 @@ INLINE void zdrawgfxzoom32GP(
 							eax = dst_ptr[ecx];
 							szbuf_ptr[ecx*2] = z8;
 							szbuf_ptr[ecx*2+1] = p8;
-							eax = (eax>>9&0x7c00) | (eax>>6&0x03e0) | (eax>>3&0x001f);
-							dst_ptr[ecx] = shd_base[eax];
+							//eax = (eax>>9&0x7c00) | (eax>>6&0x03e0) | (eax>>3&0x001f);
+							dst_ptr[ecx] = alpha_blend_r32( eax, 0x00000000, 128);
 						}
 						while (++ecx);
 

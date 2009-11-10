@@ -1557,10 +1557,20 @@ static MACHINE_DRIVER_START( gxtype4 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(128*8, 32*8)
 //	MDRV_SCREEN_VISIBLE_AREA(0, 128*8-1, 0, 32*8-1)
-	MDRV_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
+//	MDRV_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
+	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 16, 32*8-1-16)
+
 	MDRV_PALETTE_LENGTH(8192)
 	MDRV_GFXDECODE(type4)
 	MDRV_VIDEO_START(konamigx_type4)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( gxtype4vsnet )
+	MDRV_IMPORT_FROM(gxtype4)
+
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_SIZE(128*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( winspike )
@@ -3704,11 +3714,11 @@ GAME( 1994, soccerssja,soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soc
 GAME( 1994, soccerssa,soccerss, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver AAA)", GAME_IMPERFECT_GRAPHICS )
 
 /* Type 4: dual monitor output and 53936 on the ROM board, external palette RAM, DMA protection */
-GAME( 1996, vsnetscr,  konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAD)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, vsnetscreb,vsnetscr, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, vsnetscru, vsnetscr, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver UAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, vsnetscra, vsnetscr, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver AAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, vsnetscrj, vsnetscr, gxtype4, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver JAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, vsnetscr,  konamigx, gxtype4vsnet, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAD)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, vsnetscreb,vsnetscr, gxtype4vsnet, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver EAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, vsnetscru, vsnetscr, gxtype4vsnet, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver UAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, vsnetscra, vsnetscr, gxtype4vsnet, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver AAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, vsnetscrj, vsnetscr, gxtype4vsnet, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver JAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
 GAME( 1996, rungun2,   konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Run and Gun 2 (ver UAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
 GAME( 1996, slamdnk2,  rungun2,  gxtype4, type3, konamigx, ROT0, "Konami", "Slam Dunk 2 (ver JAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
 GAME( 1996, rushhero,  konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Rushing Heroes (ver UAB)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING  )
