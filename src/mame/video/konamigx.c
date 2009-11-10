@@ -605,13 +605,11 @@ WRITE32_HANDLER( konamigx_palette2_w )
 
 	COMBINE_DATA(&gx_subpaletteram32[offset]);
 
+ 	r = (gx_subpaletteram32[offset] >>16) & 0xff;
+	g = (gx_subpaletteram32[offset] >> 8) & 0xff;
+	b = (gx_subpaletteram32[offset] >> 0) & 0xff;
+
 	offset += (0x8000/4);
-
-	COMBINE_DATA(&paletteram32[offset]);
-
- 	r = (paletteram32[offset] >>16) & 0xff;
-	g = (paletteram32[offset] >> 8) & 0xff;
-	b = (paletteram32[offset] >> 0) & 0xff;
 
 	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
