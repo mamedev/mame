@@ -2314,7 +2314,7 @@ ROM_START( rushhero )
 
 	/* sound data */
 	ROM_REGION( 0x400000, "shared", 0 )
-	ROM_LOAD( "605a23.7r", 0x000000, 4*1024*1024, CRC(992c4751) SHA1(18ecfc21138f9dc62f0658750808bbef649510f7))
+	ROM_LOAD( "605a23.7r", 0x000000, 4*1024*1024, BAD_DUMP CRC(992c4751) SHA1(18ecfc21138f9dc62f0658750808bbef649510f7)) //speaker samples are distorted
 ROM_END
 
 /* Taisen Tokkae-dama */
