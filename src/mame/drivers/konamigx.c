@@ -1233,10 +1233,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gx_type4_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM
-	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE((UINT32**)&K053936_0_ctrl)
+	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE((UINT32**)&K053936_1_ctrl)
 	AM_RANGE(0xe20000, 0xe20003) AM_WRITENOP
 	AM_RANGE(0xe40000, 0xe40003) AM_WRITENOP
-	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE((UINT32**)&K053936_0_linectrl)  // 29C & 29G (PSAC2 line control)
+	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE((UINT32**)&K053936_1_linectrl)  // 29C & 29G (PSAC2 line control)
 	AM_RANGE(0xe80000, 0xe87fff) AM_RAM_WRITE(konamigx_palette_w) AM_BASE(&paletteram32) // 11G/13G/15G (main screen palette RAM)
 //	AM_RANGE(0xea0000, 0xea7fff) AM_RAM_WRITE(konamigx_palette2_w) AM_BASE(&gx_subpaletteram32) // 5G/7G/9G (sub screen palette RAM)
  	AM_RANGE(0xea0000, 0xea7fff) AM_RAM AM_BASE(&gx_subpaletteram32) // 5G/7G/9G (sub screen palette RAM)
