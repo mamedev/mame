@@ -13,6 +13,7 @@ static int layer_colorbase[4];
 static INT32 gx_tilebanks[8], gx_oldbanks[8];
 static int gx_tilemode, gx_rozenable, psac_colorbase, last_psac_colorbase;
 static int gx_specialrozenable; // type 1 roz, with voxel height-map, rendered from 2 source tilemaps (which include height data) to temp bitmap for further processing
+static int gx_rushingheroes_hack;
 static tilemap *gx_psac_tilemap, *gx_psac_tilemap2;
 extern UINT32 *gx_psacram, *gx_subpaletteram32;
 static bitmap_t* type3_roz_temp_bitmap;
@@ -43,23 +44,25 @@ static void (*game_tile_callback)(int layer, int *code, int *color, int *flags);
 /* Run and Gun 2 / Rushing Heroes */
 static TILE_GET_INFO( get_gx_psac_tile_info )
 {
-	int tileno, colour, flip = 0;
+	int tileno, colour, col, flip = 0;
 	if (tile_index&1)
 	{
-		tileno = gx_psacram[tile_index/2] & 0x00003fff;
+		tileno = gx_psacram[tile_index/2] & 0x00001fff;
+		col    =(gx_psacram[tile_index/2] & 0x00002000)>>13;
 		if      (gx_psacram[tile_index/2] & 0x00004000) flip |= TILE_FLIPX;
 		if      (gx_psacram[tile_index/2] & 0x00008000) flip |= TILE_FLIPY;
 
 	}
 	else
 	{
-		tileno = (gx_psacram[tile_index/2] & 0x3fff0000)>>16;
+		tileno = (gx_psacram[tile_index/2] & 0x1fff0000)>>16;
+		col    = (gx_psacram[tile_index/2] & 0x20000000)>>29;
 		if       (gx_psacram[tile_index/2] & 0x40000000) flip |= TILE_FLIPX;
 		if       (gx_psacram[tile_index/2] & 0x80000000) flip |= TILE_FLIPY;
 
 	}
 
-	colour = (psac_colorbase << 4);
+	colour = (psac_colorbase << 4) + col;
 
 	SET_TILE_INFO(0, tileno, colour, TILE_FLIPYX(flip));
 }
@@ -231,6 +234,7 @@ static void _gxcommoninitnosprites(running_machine *machine)
 
 	gx_rozenable = 0;
 	gx_specialrozenable = 0;
+	gx_rushingheroes_hack = 0;
 
 	// Documented relative offsets of non-flipped games are (-2, 0, 2, 3),(0, 0, 0, 0).
 	// (+ve values move layers to the right and -ve values move layers to the left)
@@ -387,7 +391,10 @@ VIDEO_START(konamigx_type4)
 
 
 	K053936_wraparound_enable(0, 0);
-	K053936GP_set_offset(1, -36, 0);
+	K053936GP_set_offset(0, -36, 0);
+
+	gx_rushingheroes_hack = 1;
+
 }
 
 VIDEO_START(konamigx_6bpp_2)
@@ -552,15 +559,7 @@ VIDEO_UPDATE(konamigx)
 
 	if (gx_specialrozenable==3)
 	{
-		// hold W to see the roz layer
-		if ( input_code_pressed(screen->machine, KEYCODE_W) )
-		{
-			konamigx_mixer(screen->machine, bitmap, cliprect,0, 0, gx_psac_tilemap, GXSUB_8BPP,  0, 0);
-		}
-		else
-		{
-			konamigx_mixer(screen->machine, bitmap, cliprect,0, 0, 0, 0,  0, 0);
-		}
+		konamigx_mixer(screen->machine, bitmap, cliprect, gx_psac_tilemap, GXSUB_8BPP,0,0,  0, 0, gx_rushingheroes_hack);
 	}
  	// hack, draw the roz tilemap if W is held
  	// todo: fix so that it works with the mixer without crashing(!)
@@ -574,11 +573,11 @@ VIDEO_UPDATE(konamigx)
 		temprect.max_y = cliprect->max_y;
 
 		K053936_0_zoom_draw(type3_roz_temp_bitmap, &temprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
- 		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0, type3_roz_temp_bitmap);
+ 		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0, type3_roz_temp_bitmap, gx_rushingheroes_hack);
 	}
 	else
 	{
- 		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0, 0);
+ 		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0, 0, gx_rushingheroes_hack);
 	}
 
 

@@ -802,6 +802,7 @@ static READ32_HANDLER( sound020_r )
 			if (cpu_get_pc(space->cpu) == 0x24c722) rv = 0xc0c0c0c0;
 			break;
 		case 8:	// Vs. Net Soccer ver. EAD
+			if (cpu_get_pc(space->cpu) == 0x24c416) rv = 0xffffffff;
 			if (cpu_get_pc(space->cpu) == 0x24c482) rv = 0xc0c0c0c0;
 			break;
 		case 9:	// Vs. Net Soccer ver. EAB
@@ -1109,7 +1110,7 @@ static WRITE32_HANDLER( type4_prot_w )
 					memory_write_dword(space, 0xc0fe00, memory_read_dword(space, 0xc00f30));
 					memory_write_dword(space, 0xc0fe04, memory_read_dword(space, 0xc00f34));
 				}
-				else if(last_prot_op == 0xd97)	// rushhero
+				else if(last_prot_op == 0xd97)	// rushhero & vsnetscr
 				{
 					int src = 0xc09ff0;
 					int dst = 0xd20000;
@@ -1126,11 +1127,18 @@ static WRITE32_HANDLER( type4_prot_w )
 						dst += 0x10;
 					}
 
-					/* Input buffer copiers, only this command is polled so it's safe to assume that's polled here */
+					/* Input buffer copiers, only this command is executed so it's safe to assume that's polled here */
 					memory_write_byte(space, 0xc01cc0, ~memory_read_byte(space, 0xc00507));
 					memory_write_byte(space, 0xc01cc1, ~memory_read_byte(space, 0xc00527));
 					memory_write_byte(space, 0xc01cc4, ~memory_read_byte(space, 0xc00547));
 					memory_write_byte(space, 0xc01cc5, ~memory_read_byte(space, 0xc00567));
+				}
+				else if(last_prot_op == 0x515)
+				{
+					memory_write_byte(space, 0xc01d00, ~memory_read_byte(space, 0xc00d07));
+					memory_write_byte(space, 0xc01d01, ~memory_read_byte(space, 0xc00d27));
+					memory_write_byte(space, 0xc01d04, ~memory_read_byte(space, 0xc00d47));
+					memory_write_byte(space, 0xc01d05, ~memory_read_byte(space, 0xc00d67));
 				}
 				else
 				{
@@ -1239,10 +1247,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gx_type4_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM
-	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE((UINT32**)&K053936_1_ctrl)
+	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE((UINT32**)&K053936_0_ctrl)
 	AM_RANGE(0xe20000, 0xe20003) AM_WRITENOP
 	AM_RANGE(0xe40000, 0xe40003) AM_WRITENOP
-	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE((UINT32**)&K053936_1_linectrl)  // 29C & 29G (PSAC2 line control)
+	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE((UINT32**)&K053936_0_linectrl)  // 29C & 29G (PSAC2 line control)
 	AM_RANGE(0xe80000, 0xe87fff) AM_RAM_WRITE(konamigx_palette_w) AM_BASE(&paletteram32) // 11G/13G/15G (main screen palette RAM)
 //	AM_RANGE(0xea0000, 0xea7fff) AM_RAM_WRITE(konamigx_palette2_w) AM_BASE(&gx_subpaletteram32) // 5G/7G/9G (sub screen palette RAM)
  	AM_RANGE(0xea0000, 0xea7fff) AM_RAM AM_BASE(&gx_subpaletteram32) // 5G/7G/9G (sub screen palette RAM)

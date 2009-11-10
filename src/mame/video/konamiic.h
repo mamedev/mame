@@ -392,7 +392,7 @@ void K054338_vh_start(running_machine *machine);
 WRITE16_HANDLER( K054338_word_w ); // "CLCT" registers
 WRITE32_HANDLER( K054338_long_w );
 int K054338_read_register(int reg);
-void K054338_update_all_shadows(running_machine *machine);			// called at the beginning of VIDEO_UPDATE()
+void K054338_update_all_shadows(running_machine *machine, int rushingheroes_hack);			// called at the beginning of VIDEO_UPDATE()
 void K054338_fill_solid_bg(bitmap_t *bitmap);				// solid backcolor fill
 void K054338_fill_backcolor(running_machine *machine, bitmap_t *bitmap, int mode);	// unified fill, 0=solid, 1=gradient
 int  K054338_set_alpha_level(int pblend);							// blend style 0-2

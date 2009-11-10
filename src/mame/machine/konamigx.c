@@ -322,6 +322,7 @@ void K053936GP_1_zoom_draw(running_machine *machine, bitmap_t *bitmap, const rec
     pri     : 0 = topmost, 255 = backmost (pixel priority)
 */
 
+
 INLINE void zdrawgfxzoom32GP(
 		bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
@@ -342,7 +343,7 @@ INLINE void zdrawgfxzoom32GP(
 	UINT8  *ozbuf_ptr;
 	UINT8  *szbuf_ptr;
 	const pen_t *pal_base;
-	//const pen_t *shd_base;
+	const pen_t *shd_base;
 	UINT32 *dst_ptr;
 
 	// outter loop
@@ -389,7 +390,7 @@ INLINE void zdrawgfxzoom32GP(
 	src_base  = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 	pal_base  = gfx->machine->pens + gfx->color_base + (color % gfx->total_colors) * granularity;
-	//shd_base  = gfx->machine->pens;
+	shd_base  = gfx->machine->shadow_table;
 
 	dst_ptr   = (UINT32 *)bitmap->base;
 	dst_pitch = bitmap->rowpixels;
@@ -606,8 +607,10 @@ INLINE void zdrawgfxzoom32GP(
 							eax = dst_ptr[ecx];
 							szbuf_ptr[ecx*2] = z8;
 							szbuf_ptr[ecx*2+1] = p8;
-							//eax = (eax>>9&0x7c00) | (eax>>6&0x03e0) | (eax>>3&0x001f);
-							dst_ptr[ecx] = alpha_blend_r32( eax, 0x00000000, 128);
+							
+							// the shadow tables are 15-bit lookup tables which accept RGB15...	lossy, nasty, yuck!
+							dst_ptr[ecx] = shd_base[rgb_to_rgb15(eax)];
+							//dst_ptr[ecx] =(eax>>3&0x001f);lend_r32( eax, 0x00000000, 128);
 						}
 						while (++ecx);
 
@@ -741,8 +744,9 @@ INLINE void zdrawgfxzoom32GP(
 							eax = dst_ptr[ecx];
 							szbuf_ptr[ecx*2] = z8;
 							szbuf_ptr[ecx*2+1] = p8;
-							//eax = (eax>>9&0x7c00) | (eax>>6&0x03e0) | (eax>>3&0x001f);
-							dst_ptr[ecx] = alpha_blend_r32( eax, 0x00000000, 128);
+						
+							// the shadow tables are 15-bit lookup tables which accept RGB15...	lossy, nasty, yuck!
+							dst_ptr[ecx] = shd_base[rgb_to_rgb15(eax)];
 						}
 						while (++ecx);
 
@@ -1095,7 +1099,7 @@ void konamigx_objdma(void)
 void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 					tilemap *sub1, int sub1flags,
 					tilemap *sub2, int sub2flags,
-					int mixerflags, bitmap_t *extra_bitmap)
+					int mixerflags, bitmap_t *extra_bitmap, int rushingheroes_hack)
 {
 	static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
 	static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
@@ -1210,7 +1214,7 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 		for (i=0; i<4; i++) if (!(temp>>i & 1) && spri_min < layerpri[i]) spri_min = layerpri[i]; // HACK
 
 		// update shadows status
-		K054338_update_all_shadows(machine);
+		K054338_update_all_shadows(machine, rushingheroes_hack);
 	}
 
 	// pre-sort layers
@@ -1476,9 +1480,10 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 				continue;
 				case -2:
 				case -4:
-				if (disp & K55_INP_SUB1)
+				if ((disp & K55_INP_SUB1) || (rushingheroes_hack))
 				{
 					int alpha = 255;
+
 					if (j == GXMIX_BLEND_NONE)  { temp1 = 0xff; temp2 = temp3 = 0; } else
 					if (j == GXMIX_BLEND_FORCE) { temp1 = 0x00; temp2 = mixerflags>>24; temp3 = 3; }
 					else
@@ -1497,13 +1502,15 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 					}
 
 					l = sub1flags & 0xf;
-
+					
 					if (offs == -2)
 					{
 						K053936GP_0_zoom_draw(machine, bitmap, cliprect, sub1, l, k, alpha);
 					}
 					else
+					{
 						K053250_draw(machine, bitmap, cliprect, 0, vcblk[4]<<l, 0, 0);
+					}
 				}
 				continue;
 				case -3:

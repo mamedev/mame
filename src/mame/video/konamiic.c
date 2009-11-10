@@ -7273,7 +7273,7 @@ int K054338_read_register(int reg)
 	return k54338_regs[reg];
 }
 
-void K054338_update_all_shadows(running_machine *machine)
+void K054338_update_all_shadows(running_machine *machine, int rushingheroes_hack)
 {
 	int i, d;
 	int noclip = k54338_regs[K338_REG_CONTROL] & K338_CTL_CLIPSL;
@@ -7285,9 +7285,18 @@ void K054338_update_all_shadows(running_machine *machine)
 		K054338_shdRGB[i] = d;
 	}
 
-	palette_set_shadow_dRGB32(machine, 0, K054338_shdRGB[0], K054338_shdRGB[1], K054338_shdRGB[2], noclip);
-	palette_set_shadow_dRGB32(machine, 1, K054338_shdRGB[3], K054338_shdRGB[4], K054338_shdRGB[5], noclip);
-	palette_set_shadow_dRGB32(machine, 2, K054338_shdRGB[6], K054338_shdRGB[7], K054338_shdRGB[8], noclip);
+	if (!rushingheroes_hack)
+	{
+		palette_set_shadow_dRGB32(machine, 0, K054338_shdRGB[0], K054338_shdRGB[1], K054338_shdRGB[2], noclip);
+		palette_set_shadow_dRGB32(machine, 1, K054338_shdRGB[3], K054338_shdRGB[4], K054338_shdRGB[5], noclip);
+		palette_set_shadow_dRGB32(machine, 2, K054338_shdRGB[6], K054338_shdRGB[7], K054338_shdRGB[8], noclip);
+	}
+	else // rushing heroes seems to specify shadows in another format, or it's not being interpreted properly.
+	{
+		palette_set_shadow_dRGB32(machine, 0, -80, -80, -80, 0);
+		palette_set_shadow_dRGB32(machine, 1, -80, -80, -80, 0);
+		palette_set_shadow_dRGB32(machine, 2, -80, -80, -80, 0);
+	}
 }
 
 // K054338 BG color fill

@@ -72,7 +72,7 @@ void konamigx_le2_sprite_callback(int *code, int *color, int *priority);
 void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 					tilemap *sub1, int sub1flags,
 					tilemap *sub2, int sub2flags,
-					int mixerflags, bitmap_t* extra_bitmap);
+					int mixerflags, bitmap_t* extra_bitmap, int rushingheroes_hack);
 
 void konamigx_mixer_init(running_machine *machine, int objdma);
 void konamigx_mixer_primode(int mode);
