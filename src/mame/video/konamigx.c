@@ -559,7 +559,14 @@ VIDEO_UPDATE(konamigx)
  	// todo: fix so that it works with the mixer without crashing(!)
 	else if (gx_specialrozenable == 2)
 	{
-		K053936_0_zoom_draw(type3_roz_temp_bitmap, cliprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
+		// we're going to throw half of this away anyway in post-process, so only render what's needed
+		rectangle temprect;
+		temprect.min_x = cliprect->min_x;
+		temprect.max_x = cliprect->min_x+320;
+		temprect.min_y = cliprect->min_y;
+		temprect.max_y = cliprect->max_y;
+
+		K053936_0_zoom_draw(type3_roz_temp_bitmap, &temprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
  		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0, type3_roz_temp_bitmap);
 	}
 	else

@@ -1125,6 +1125,12 @@ static WRITE32_HANDLER( type4_prot_w )
 						src -= 0x10;
 						dst += 0x10;
 					}
+
+					/* Input buffer copiers, only this command is polled so it's safe to assume that's polled here */
+					memory_write_byte(space, 0xc01cc0, ~memory_read_byte(space, 0xc00507));
+					memory_write_byte(space, 0xc01cc1, ~memory_read_byte(space, 0xc00527));
+					memory_write_byte(space, 0xc01cc4, ~memory_read_byte(space, 0xc00547));
+					memory_write_byte(space, 0xc01cc5, ~memory_read_byte(space, 0xc00567));
 				}
 				else
 				{
@@ -1420,7 +1426,7 @@ static GFXDECODE_START( type34 )
 GFXDECODE_END
 
 static GFXDECODE_START( type4 )
-	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x0000, 8 )
+	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1800, 8 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( konamigx )
@@ -1534,7 +1540,7 @@ static MACHINE_DRIVER_START( gxtype3 )
 	MDRV_VIDEO_START(konamigx_type3)
 	MDRV_PALETTE_LENGTH(16384)
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE(128*8, 32*8)
+	MDRV_SCREEN_SIZE(576, 32*8)
 //	MDRV_SCREEN_VISIBLE_AREA(0, 128*8-1, 0, 32*8-1)
 	MDRV_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
 
@@ -1552,7 +1558,7 @@ static MACHINE_DRIVER_START( gxtype4 )
 	MDRV_SCREEN_SIZE(128*8, 32*8)
 //	MDRV_SCREEN_VISIBLE_AREA(0, 128*8-1, 0, 32*8-1)
 	MDRV_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
-	MDRV_PALETTE_LENGTH(16384)
+	MDRV_PALETTE_LENGTH(8192)
 	MDRV_GFXDECODE(type4)
 	MDRV_VIDEO_START(konamigx_type4)
 MACHINE_DRIVER_END
@@ -2270,8 +2276,8 @@ ROM_START( rushhero )
 	_48_WORD_ROM_LOAD( "605a19.14r", 0x0000000, 4*1024*1024, CRC(293427d0) SHA1(c31f93797bda09ea7e990100a5556eb0fde64968) )
 	_48_WORD_ROM_LOAD( "605a15.18r", 0x0000002, 4*1024*1024, CRC(19e6e356) SHA1(b2568e14d6fb9a9792f95aafcf694dbf00c0d2c8) )
 	_48_WORD_ROM_LOAD( "605a11.23r", 0x0000004, 4*1024*1024, CRC(bc61339c) SHA1(77a5737501bf8ffd7ae4192a6e5924c479eb6655) )
-	_48_WORD_ROM_LOAD( "605a17.16r", 0x0c00002, 4*1024*1024, BAD_DUMP CRC(42e6dc6f) SHA1(8035b7160267a988a1aa2690423c68b6f1975f1a) ) // - these two looks suspicious...
-	_48_WORD_ROM_LOAD( "605a13.21r", 0x0c00000, 4*1024*1024, BAD_DUMP CRC(08137923) SHA1(c1af6b55c1c08e16384d2660b2210ccf3b955be9) ) // /
+	_48_WORD_ROM_LOAD( "605a17.16r", 0x0c00000, 4*1024*1024, BAD_DUMP CRC(42e6dc6f) SHA1(8035b7160267a988a1aa2690423c68b6f1975f1a) ) // - these two looks suspicious...
+	_48_WORD_ROM_LOAD( "605a13.21r", 0x0c00002, 4*1024*1024, BAD_DUMP CRC(08137923) SHA1(c1af6b55c1c08e16384d2660b2210ccf3b955be9) ) // /
 	_48_WORD_ROM_LOAD( "605a09.25r", 0x0c00004, 4*1024*1024, CRC(624fd486) SHA1(edd81d5487f8239ffa89b931430cf41f06a17cf6) )
 	_48_WORD_ROM_LOAD( "605a14.14m", 0x1800000, 4*1024*1024, CRC(4d4dbecb) SHA1(7c3cb2739d6b729d855d652b1991c7af6cd79d1c) )
 	_48_WORD_ROM_LOAD( "605a18.18m", 0x1800002, 4*1024*1024, CRC(b5115d76) SHA1(48c3119afb649c58d4df36806fe5530ddd379782) )
