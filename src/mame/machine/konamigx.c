@@ -65,6 +65,8 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 	int src_pitch, incxy, incxx;
 	int src_minx, src_maxx, src_miny, src_maxy, cmask;
 	UINT16 *src_base;
+	size_t src_size;
+
 	const pen_t *pal_base;
 	UINT32 *dst_ptr;
 
@@ -82,6 +84,7 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 		src_miny = src_cliprect->min_y;
 		src_maxy = src_cliprect->max_y;
 	}
+	// this simply isn't safe to do!
 	else { src_minx = src_miny = -0x10000; src_maxx = src_maxy = 0x10000; }
 
 	if (dst_cliprect) // set target clip range
@@ -107,6 +110,7 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 
 	src_pitch = src_bitmap->rowpixels;
 	src_base = (UINT16 *)src_bitmap->base;
+	src_size = src_bitmap->width * src_bitmap->height;
 
 	dst_ptr = dst_base;
 	cy = starty;
@@ -123,13 +127,19 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 				int srcx = (cx >> 16) & 0x1fff;
 				int srcy = (cy >> 16) & 0x1fff;
 				int pixel;
+				UINT32 offs;
+				offs = srcy * src_pitch + srcx;
 
 				cx += incxx;
 				cy += incxy;
+
+				if (offs<0 || offs>=src_size)
+					continue;
+
 				if (srcx < src_minx || srcx > src_maxx || srcy < src_miny || srcy > src_maxy)
 					continue;
 
-				pixel = src_base[srcy * src_pitch + srcx];
+				pixel = src_base[offs];
 				if (!(pixel & cmask))
 					continue;
 
@@ -180,13 +190,20 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 				int srcx = (cx >> 16) & 0x1fff;
 				int srcy = (cy >> 16) & 0x1fff;
 				int pixel;
+				UINT32 offs;
+
+				offs = srcy * src_pitch + srcx;
 
 				cx += incxx;
 				cy += incxy;
-				if (srcx < src_minx || srcx > src_maxx || srcy < src_miny || srcy > src_maxy)
+
+				if (offs<0 || offs>=src_size)
 					continue;
 
-				pixel = src_base[srcy * src_pitch + srcx];
+				if (srcx < src_minx || srcx > src_maxx || srcy < src_miny || srcy > src_maxy)
+					continue;
+				
+				pixel = src_base[offs];
 				if (!(pixel & cmask))
 					continue;
 

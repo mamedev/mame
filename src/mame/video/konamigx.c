@@ -41,19 +41,28 @@ static rectangle gxtype1_roz_dstbitmapclip;
 static void (*game_tile_callback)(int layer, int *code, int *color, int *flags);
 
 /* Run and Gun 2 / Rushing Heroes */
-#if 0
 static TILE_GET_INFO( get_gx_psac_tile_info )
 {
-	int tileno, colour, flipx;
-	UINT16 *map16 = (UINT16 *)gx_psacram;
+	int tileno, colour, flip = 0;
+	if (tile_index&1)
+	{
+		tileno = gx_psacram[tile_index/2] & 0x00003fff;
+		if      (gx_psacram[tile_index/2] & 0x00004000) flip |= TILE_FLIPX;
+		if      (gx_psacram[tile_index/2] & 0x00008000) flip |= TILE_FLIPY;
 
-	tileno = map16[tile_index*2+1] & 0x3fff;
+	}
+	else
+	{
+		tileno = (gx_psacram[tile_index/2] & 0x3fff0000)>>16;
+		if       (gx_psacram[tile_index/2] & 0x40000000) flip |= TILE_FLIPX;
+		if       (gx_psacram[tile_index/2] & 0x80000000) flip |= TILE_FLIPY;
+
+	}
+
 	colour = (psac_colorbase << 4);
-	flipx = 0;
 
-	SET_TILE_INFO(0, tileno, colour, TILE_FLIPYX(flipx));
+	SET_TILE_INFO(0, tileno, colour, TILE_FLIPYX(flip));
 }
-#endif
 
 UINT32* konamigx_type3_psac2_bank;
 int konamigx_type3_psac2_actual_bank;
@@ -366,8 +375,9 @@ VIDEO_START(konamigx_type4)
 
 	_gxcommoninitnosprites(machine);
 
-//	gx_psac_tilemap = tilemap_create(machine, get_gx_psac_tile_info, tilemap_scan_rows,  16, 16, 128, 128);
+	gx_psac_tilemap = tilemap_create(machine, get_gx_psac_tile_info, tilemap_scan_cols,  16, 16, 128, 128);
 	gx_rozenable = 0;
+	gx_specialrozenable = 3;
 
 	K053936_wraparound_enable(0, 0);
 	K053936GP_set_offset(0, 0, 0);
@@ -533,13 +543,21 @@ VIDEO_UPDATE(konamigx)
 
 
 
-//	if (gx_rozenable)
-//		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, gx_psac_tilemap, GXSUB_8BPP, 0);
-//	else
-
+	if (gx_specialrozenable==3)
+	{
+		// hold W to see the roz layer
+		if ( input_code_pressed(screen->machine, KEYCODE_W) )
+		{
+			konamigx_mixer(screen->machine, bitmap, cliprect,0, 0, gx_psac_tilemap, GXSUB_8BPP,  0, 0);
+		}
+		else
+		{
+			konamigx_mixer(screen->machine, bitmap, cliprect,0, 0, 0, 0,  0, 0);
+		}
+	}
  	// hack, draw the roz tilemap if W is held
  	// todo: fix so that it works with the mixer without crashing(!)
-	if (gx_specialrozenable == 2)
+	else if (gx_specialrozenable == 2)
 	{
 		K053936_0_zoom_draw(type3_roz_temp_bitmap, cliprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
  		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0, type3_roz_temp_bitmap);
@@ -548,6 +566,7 @@ VIDEO_UPDATE(konamigx)
 	{
  		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0, 0);
 	}
+
 
 
 	/* Hack! draw type-1 roz layer here for testing purposes only */
@@ -672,6 +691,7 @@ WRITE32_HANDLER( konamigx_t4_psacmap_w )
 {
 	COMBINE_DATA(&gx_psacram[offset]);
 
-//	tilemap_mark_tile_dirty(gx_psac_tilemap, offset);
+	tilemap_mark_tile_dirty(gx_psac_tilemap, offset*2);
+	tilemap_mark_tile_dirty(gx_psac_tilemap, (offset*2)+1);
 }
 
