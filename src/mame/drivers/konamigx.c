@@ -796,6 +796,7 @@ static READ32_HANDLER( sound020_r )
 			if (cpu_get_pc(space->cpu) == 0x24c63e) rv = 0xc0c0c0c0;
 			break;
 		case 6: // Slam Dunk 2
+			if (cpu_get_pc(space->cpu) == 0x24f1b0) rv = 0xffffffff;
 			if (cpu_get_pc(space->cpu) == 0x24f21c) rv = 0xc0c0c0c0;
 			break;
 		case 7:	// Vs. Net Soccer ver. AAA
@@ -1132,6 +1133,21 @@ static WRITE32_HANDLER( type4_prot_w )
 					memory_write_byte(space, 0xc01cc1, ~memory_read_byte(space, 0xc00527));
 					memory_write_byte(space, 0xc01cc4, ~memory_read_byte(space, 0xc00547));
 					memory_write_byte(space, 0xc01cc5, ~memory_read_byte(space, 0xc00567));
+				}
+				else if(last_prot_op == 0xb16) // slamdnk2
+				{
+					int src = 0xc01000;
+					int dst = 0xd20000;
+					int spr;
+
+					for (spr = 0; spr < 0x100; spr++)
+					{
+						memory_write_word(space, dst, memory_read_word(space, src));
+						src += 4;
+						dst += 2;
+					}
+
+					//maybe here there's a [$d8001f] <- 0x31 write too?
 				}
 				else if(last_prot_op == 0x515) // vsnetscr
 				{
@@ -2249,12 +2265,12 @@ ROM_START( slamdnk2 )
 	_48_WORD_ROM_LOAD( "505a19.14r", 0x0000000, 2*1024*1024, CRC(ffde4f17) SHA1(df93853f7bd3c775a15836b0ca9042f75eb65630) )
 	_48_WORD_ROM_LOAD( "505a15.18r", 0x0000002, 2*1024*1024, CRC(d9ab1e6c) SHA1(748a61d939bd335c1b50f440e819303552b3d5a1) )
 	_48_WORD_ROM_LOAD( "505a11.23r", 0x0000004, 2*1024*1024, CRC(75c13df0) SHA1(6680f75a67ca510fac29b65bce32fef64e844695) )
-	_48_WORD_ROM_LOAD( "505a18.18m", 0x0600000, 2*1024*1024, CRC(c12bacfe) SHA1(5b5f4dd9a51c7a305dd4de1354cd1df2ce75c932) )
-	_48_WORD_ROM_LOAD( "505a14.14m", 0x0600002, 2*1024*1024, CRC(356a75b0) SHA1(5f8b7a9d06d4207f19ed0f7c89513226488afde1) )
-	_48_WORD_ROM_LOAD( "505a10.23m", 0x0600004, 2*1024*1024, CRC(fc315ee0) SHA1(4dab661e0bd8e5386e52d514a1511ceba6e5b7bd) )
-	_48_WORD_ROM_LOAD( "505a17.16r", 0x0c00000, 2*1024*1024, CRC(8176f2f5) SHA1(d7944314b35bcd5301bbfba8a5b1ed6b35b9b888) )
-	_48_WORD_ROM_LOAD( "505a13.21r", 0x0c00002, 2*1024*1024, CRC(e60c5191) SHA1(02a8af81682838800489aa1123a453045d70acd8) )
-	_48_WORD_ROM_LOAD( "505a09.25r", 0x0c00004, 2*1024*1024, CRC(3e1d5a15) SHA1(ec4d46c2f2cc57e6193865357ffb3d62a9eecd4f) )
+	_48_WORD_ROM_LOAD( "505a17.16r", 0x0600000, 2*1024*1024, CRC(8176f2f5) SHA1(d7944314b35bcd5301bbfba8a5b1ed6b35b9b888) )
+	_48_WORD_ROM_LOAD( "505a13.21r", 0x0600002, 2*1024*1024, CRC(e60c5191) SHA1(02a8af81682838800489aa1123a453045d70acd8) )
+	_48_WORD_ROM_LOAD( "505a09.25r", 0x0600004, 2*1024*1024, CRC(3e1d5a15) SHA1(ec4d46c2f2cc57e6193865357ffb3d62a9eecd4f) )
+	_48_WORD_ROM_LOAD( "505a18.18m", 0x0c00000, 2*1024*1024, CRC(c12bacfe) SHA1(5b5f4dd9a51c7a305dd4de1354cd1df2ce75c932) )
+	_48_WORD_ROM_LOAD( "505a14.14m", 0x0c00002, 2*1024*1024, CRC(356a75b0) SHA1(5f8b7a9d06d4207f19ed0f7c89513226488afde1) )
+	_48_WORD_ROM_LOAD( "505a10.23m", 0x0c00004, 2*1024*1024, CRC(fc315ee0) SHA1(4dab661e0bd8e5386e52d514a1511ceba6e5b7bd) )
 	_48_WORD_ROM_LOAD( "505a16.16m", 0x1200000, 2*1024*1024, CRC(ca9c2193) SHA1(cc3fb558b834e0b7914879ab47c3750170d257f4) )
 	_48_WORD_ROM_LOAD( "505a12.21m", 0x1200002, 2*1024*1024, CRC(421d5034) SHA1(f7a85b7e41f3ddf9ddbdc6f8b6d3dbf8ba40d61b) )
 	_48_WORD_ROM_LOAD( "505a08.25m", 0x1200004, 2*1024*1024, CRC(442ed3ec) SHA1(d44e1c4e9f8c63a8f754f8d20064cec15ae0b6d6) )

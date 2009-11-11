@@ -109,7 +109,7 @@ VIDEO_UPDATE( xexex )
 
 	sortlayers(layer, layerpri);
 
-	K054338_update_all_shadows(screen->machine);
+	K054338_update_all_shadows(screen->machine, 0);
 	K054338_fill_backcolor(screen->machine, bitmap, 0);
 
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
