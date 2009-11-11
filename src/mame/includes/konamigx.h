@@ -1,5 +1,3 @@
-#ifndef __MACH_KONAMIGX_H
-#define __MACH_KONAMIGX_H
 
 // 2nd-Tier GX/MW Hardware Functions
 void K053247GP_set_SpriteOffset(int offsx, int offsy);
@@ -80,7 +78,6 @@ void konamigx_mixer_primode(int mode);
 
 void konamigx_objdma(void);
 
-
 // K055550/K053990/ESC protection devices handlers
 READ16_HANDLER ( K055550_word_r );
 WRITE16_HANDLER( K055550_word_w );
@@ -90,4 +87,5 @@ void konamigx_esc_alert(UINT32 *srcbase, int srcoffs, int count, int mode);
 void fantjour_dma_install(running_machine *machine);
 WRITE32_HANDLER(fantjour_dma_w);
 
-#endif
+extern UINT16 *K053247_ram;
+

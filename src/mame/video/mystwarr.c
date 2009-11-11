@@ -7,7 +7,7 @@
 
 #include "driver.h"
 #include "video/konamiic.h"
-#include "machine/konamigx.h"
+#include "konamigx.h"
 
 static int layer_colorbase[6];
 static int oinprion, cbparam;

@@ -9,7 +9,7 @@
 
 #include "driver.h"
 #include "video/konamiic.h"
-#include "machine/konamigx.h"
+#include "konamigx.h"
 
 static int layer_colorbase[4], layerpri[4];
 
