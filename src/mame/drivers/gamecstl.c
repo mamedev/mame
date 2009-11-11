@@ -447,11 +447,15 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 	memory_write_byte(space, page_offset + offset, data);
 }
 
+static void set_dma_channel(const device_config *device, int channel, int state)
+{
+	if (!state) dma_channel = channel;
+}
 
-static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { if (state) dma_channel = 0; }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { if (state) dma_channel = 1; }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { if (state) dma_channel = 2; }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { if (state) dma_channel = 3; }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { set_dma_channel(device, 1, state); }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { set_dma_channel(device, 2, state); }
+static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { set_dma_channel(device, 3, state); }
 
 static I8237_INTERFACE( dma8237_1_config )
 {
