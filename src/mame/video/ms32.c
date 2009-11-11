@@ -41,13 +41,17 @@ UINT16 *ms32_lineram_16;
 UINT16 *ms32_sprram_16;
 UINT16 *ms32_bgram_16;
 UINT16 *ms32_txram_16;
+UINT32 ms32_tilemaplayoutcontrol;
+
+UINT16* f1superb_extraram_16;
 
 // kirarast, tp2m32, and 47pie2 require the sprites in a different order
 static int ms32_reverse_sprite_order;
 
 /********** Tilemaps **********/
 
-tilemap *ms32_tx_tilemap, *ms32_roz_tilemap, *ms32_bg_tilemap;
+tilemap *ms32_tx_tilemap, *ms32_roz_tilemap, *ms32_bg_tilemap, *ms32_bg_tilemap_alt;
+tilemap *ms32_extra_tilemap;
 static int flipscreen;
 
 
@@ -81,6 +85,17 @@ static TILE_GET_INFO( get_ms32_bg_tile_info )
 	SET_TILE_INFO(2,tileno,colour,0);
 }
 
+static TILE_GET_INFO( get_ms32_extra_tile_info )
+{
+	int tileno,colour;
+
+	tileno = f1superb_extraram_16[tile_index *2+1]   & 0xffff;
+	colour = f1superb_extraram_16[tile_index *2] & 0x000f;
+
+	SET_TILE_INFO(4,tileno,colour,0);
+}
+
+
 static UINT32 brt[4];
 static int brt_r,brt_g,brt_b;
 
@@ -99,6 +114,7 @@ VIDEO_START( ms32 )
 
 	ms32_tx_tilemap = tilemap_create(machine, get_ms32_tx_tile_info,tilemap_scan_rows,8, 8,64,64);
 	ms32_bg_tilemap = tilemap_create(machine, get_ms32_bg_tile_info,tilemap_scan_rows,16,16,64,64);
+	ms32_bg_tilemap_alt = tilemap_create(machine, get_ms32_bg_tile_info,tilemap_scan_rows,16,16,256,16); // alt layout, controller by register?
 	ms32_roz_tilemap = tilemap_create(machine, get_ms32_roz_tile_info,tilemap_scan_rows,16,16,128,128);
 
 
@@ -110,6 +126,7 @@ VIDEO_START( ms32 )
 
 	tilemap_set_transparent_pen(ms32_tx_tilemap,0);
 	tilemap_set_transparent_pen(ms32_bg_tilemap,0);
+	tilemap_set_transparent_pen(ms32_bg_tilemap_alt,0);
 	tilemap_set_transparent_pen(ms32_roz_tilemap,0);
 
 	ms32_reverse_sprite_order = 1;
@@ -125,6 +142,15 @@ VIDEO_START( ms32 )
 
 	// tp2m32 doesn't set the brightness registers so we need sensible defaults
 	brt[0] = brt[1] = 0xffff;
+}
+
+VIDEO_START( f1superb )
+{
+	VIDEO_START_CALL( ms32 );
+
+	f1superb_extraram_16  = auto_alloc_array(machine, UINT16, 0x10000);
+	ms32_extra_tilemap = tilemap_create(machine, get_ms32_extra_tile_info,tilemap_scan_rows,2048,1,1,0x400);
+
 }
 
 /********** PALETTE WRITES **********/
@@ -191,6 +217,7 @@ WRITE32_HANDLER( ms32_gfxctrl_w )
 		flipscreen = data & 0x02;
 		tilemap_set_flip(ms32_tx_tilemap,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 		tilemap_set_flip(ms32_bg_tilemap,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		tilemap_set_flip(ms32_bg_tilemap_alt,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 		/* bit 2 used by f1superb, unknown */
 
@@ -321,6 +348,8 @@ VIDEO_UPDATE( ms32 )
 	scrolly = ms32_bg_scroll[0x0c/4] + ms32_bg_scroll[0x14/4];
 	tilemap_set_scrollx(ms32_bg_tilemap, 0, scrollx);
 	tilemap_set_scrolly(ms32_bg_tilemap, 0, scrolly);
+	tilemap_set_scrollx(ms32_bg_tilemap_alt, 0, scrollx);
+	tilemap_set_scrolly(ms32_bg_tilemap_alt, 0, scrolly);
 
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
@@ -360,21 +389,42 @@ VIDEO_UPDATE( ms32 )
 	if (rot_pri == 0)
 		draw_roz(temp_bitmap_tilemaps,cliprect, 1 << 1);
 	else if (scr_pri == 0)
-		tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_bg_tilemap,  0, 1 << 0);
+		if (ms32_tilemaplayoutcontrol&1)
+		{
+			tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_bg_tilemap_alt,  0, 1 << 0);
+		}
+		else
+		{
+			tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_bg_tilemap,  0, 1 << 0);
+		}
 	else if (asc_pri == 0)
 		tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_tx_tilemap,  0, 1 << 2);
 
 	if (rot_pri == 1)
 		draw_roz(temp_bitmap_tilemaps,cliprect, 1 << 1);
 	else if (scr_pri == 1)
-		tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_bg_tilemap,  0, 1 << 0);
+		if (ms32_tilemaplayoutcontrol&1)
+		{
+			tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_bg_tilemap_alt,  0, 1 << 0);
+		}
+		else
+		{
+			tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_bg_tilemap,  0, 1 << 0);
+		}
 	else if (asc_pri == 1)
 		tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_tx_tilemap,  0, 1 << 2);
 
 	if (rot_pri == 2)
 		draw_roz(temp_bitmap_tilemaps,cliprect, 1 << 1);
 	else if (scr_pri == 2)
-		tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_bg_tilemap,  0, 1 << 0);
+		if (ms32_tilemaplayoutcontrol&1)
+		{
+			tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_bg_tilemap_alt,  0, 1 << 0);
+		}
+		else
+		{
+			tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_bg_tilemap,  0, 1 << 0);
+		}
 	else if (asc_pri == 2)
 		tilemap_draw(temp_bitmap_tilemaps,cliprect, ms32_tx_tilemap,  0, 1 << 2);
 

@@ -128,7 +128,7 @@ Not Working Games
 -----------------
 
 f1superb - the road is always rendered as straight.
-         - the game has an extra roz layer and extra roms for it
+         - the game has a road layer and extra roms for it
 		 - there is an unknown maths DSP for protection
 
 Jaleco Megasystem 32 Game List - thanks to Yasuhiro
@@ -207,7 +207,7 @@ static CUSTOM_INPUT( mahjong_ctrl_r )
 	return  mj_input & 0xff;
 }
 
-#if 0
+
 static READ32_HANDLER( ms32_read_inputs3 )
 {
 	int a,b,c,d;
@@ -217,7 +217,7 @@ static READ32_HANDLER( ms32_read_inputs3 )
 	d = (input_port_read(space->machine, "AN0") - 0xb0) & 0xff;
 	return a << 24 | b << 16 | c << 8 | d << 0;
 }
-#endif
+
 
 static WRITE32_HANDLER( ms32_sound_w )
 {
@@ -243,13 +243,8 @@ static WRITE32_HANDLER( reset_sub_w )
 
 /********** MEMORY MAP **********/
 
-static WRITE32_HANDLER( pip_w )
-{
-	if (data)
-		popmessage("fce00a7c = %02x",data);
-}
 
-extern tilemap *ms32_tx_tilemap, *ms32_roz_tilemap, *ms32_bg_tilemap;
+extern tilemap *ms32_tx_tilemap, *ms32_roz_tilemap, *ms32_bg_tilemap, *ms32_bg_tilemap_alt;
 extern UINT8* ms32_priram_8;
 extern UINT16* ms32_palram_16;
 extern UINT16* ms32_rozram_16;
@@ -257,6 +252,7 @@ extern UINT16* ms32_lineram_16;
 extern UINT16* ms32_sprram_16;
 extern UINT16* ms32_txram_16;
 extern UINT16* ms32_bgram_16;
+extern UINT32 ms32_tilemaplayoutcontrol;
 
 static READ8_HANDLER(   ms32_nvram_r8 )    { return ms32_nvram_8[offset]; }
 static WRITE8_HANDLER(  ms32_nvram_w8 )    { ms32_nvram_8[offset] = data; }
@@ -273,7 +269,15 @@ static WRITE16_HANDLER( ms32_sprram_w16 )  { COMBINE_DATA(&ms32_sprram_16[offset
 static READ16_HANDLER(  ms32_txram_r16 )   { return ms32_txram_16[offset]; }
 static WRITE16_HANDLER( ms32_txram_w16 )   { COMBINE_DATA(&ms32_txram_16[offset]); tilemap_mark_tile_dirty(ms32_tx_tilemap,offset/2); }
 static READ16_HANDLER(  ms32_bgram_r16 )   { return ms32_bgram_16[offset]; }
-static WRITE16_HANDLER( ms32_bgram_w16 )   { COMBINE_DATA(&ms32_bgram_16[offset]); tilemap_mark_tile_dirty(ms32_bg_tilemap,offset/2); }
+static WRITE16_HANDLER( ms32_bgram_w16 )   { COMBINE_DATA(&ms32_bgram_16[offset]); tilemap_mark_tile_dirty(ms32_bg_tilemap,offset/2); tilemap_mark_tile_dirty(ms32_bg_tilemap_alt,offset/2); }
+
+static WRITE32_HANDLER( pip_w )
+{
+	ms32_tilemaplayoutcontrol = data;
+
+	if ((data) && (data != 1))
+		popmessage("fce00a7c = %02x",data);
+}
 
 
 static ADDRESS_MAP_START( ms32_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -295,8 +299,6 @@ static ADDRESS_MAP_START( ms32_map, ADDRESS_SPACE_PROGRAM, 32 )
 /*	AM_RANGE(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above */
 	AM_RANGE(0xc2e00000, 0xc2e1ffff) AM_RAM AM_BASE(&ms32_mainram)                                AM_MIRROR(0x3c0e0000) /* mainram is 32-bit wide, 0x20000 in size */
 	AM_RANGE(0xc3e00000, 0xc3ffffff) AM_ROMBANK(1)                                                AM_MIRROR(0x3c000000) // ROM is 32-bit wide, 0x200000 in size */
-
-	
 	
 	/* todo: clean up the mapping of these */
 	AM_RANGE(0xfc800000, 0xfc800003) AM_READNOP	/* sound? */
@@ -316,12 +318,36 @@ static ADDRESS_MAP_START( ms32_map, ADDRESS_SPACE_PROGRAM, 32 )
 //  AM_RANGE(0xfce00e00, 0xfce00e03)    coin counters + something else
 	AM_RANGE(0xfd000000, 0xfd000003) AM_READ(ms32_sound_r)
 	AM_RANGE(0xfd1c0000, 0xfd1c0003) AM_WRITEONLY AM_BASE(&ms32_mahjong_input_select)
-	
 ADDRESS_MAP_END
 
 
-/* F1 Super Blast has an extra ROZ tilemap, and am unknown maths chip (mcu?) handling perspective calculations for the road / corners etc. */
+/* F1 Super Battle has an extra linemap for the road, and am unknown maths chip (mcu?) handling perspective calculations for the road / corners etc. */
 /* it should use it's own memory map */
+
+extern UINT16* f1superb_extraram_16;
+extern tilemap* ms32_extra_tilemap;
+
+static WRITE16_HANDLER( ms32_extra_w16 )  { COMBINE_DATA(&f1superb_extraram_16[offset]); tilemap_mark_tile_dirty(ms32_extra_tilemap,offset/2); }
+static READ16_HANDLER(  ms32_extra_r16 )  { return f1superb_extraram_16[offset]; }
+
+static ADDRESS_MAP_START( f1superb_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ(ms32_read_inputs3)
+
+	AM_RANGE(0xfce00004, 0xfce00023) AM_RAM // regs?
+	AM_RANGE(0xfce00200, 0xfce0021f) AM_RAM // regs?
+	AM_RANGE(0xfce00800, 0xfce0085f) AM_RAM // regs?
+
+	AM_RANGE(0xfce00e00, 0xfce00e03) AM_NOP // writes 02 often
+
+	AM_RANGE(0xfd0f0000, 0xfd0f0003) AM_NOP // writes 00 often
+
+ 	AM_RANGE(0xfd104000, 0xfd105fff) AM_RAM
+ 	AM_RANGE(0xfd144000, 0xfd145fff) AM_RAM AM_READWRITE16(ms32_extra_r16, ms32_extra_w16, 0x0000ffff)
+ 	AM_RANGE(0xfdc00000, 0xfdc006ff) AM_RAM 
+	AM_RANGE(0xfde00000, 0xfde01fff) AM_RAM  
+
+	AM_IMPORT_FROM(ms32_map)
+ADDRESS_MAP_END
 
 //  AM_RANGE(0xfce00800, 0xfce0085f) // f1superb, roz #2 control?
 ///**/AM_RANGE(0xfd104000, 0xfd105fff) AM_RAM /* f1superb */
@@ -1046,11 +1072,22 @@ static GFXLAYOUT_RAW( spritelayout, 8, 256, 256, 256*8, 256*256*8 )
 static GFXLAYOUT_RAW( bglayout, 8, 16, 16, 16*8, 16*16*8 )
 static GFXLAYOUT_RAW( txlayout, 8, 8, 8, 8*8, 8*8*8 )
 
+static GFXLAYOUT_RAW( f1layout, 8, 2048, 1, 2048*8, 2048*8 )
+
+
 static GFXDECODE_START( ms32 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x0000, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x2000, 0x10 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x1000, 0x10 )
 	GFXDECODE_ENTRY( "gfx4", 0, txlayout,     0x6000, 0x10 )
+GFXDECODE_END
+
+static GFXDECODE_START( f1superb )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0x0000, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x2000, 0x10 )
+	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x1000, 0x10 )
+	GFXDECODE_ENTRY( "gfx4", 0, txlayout,     0x6000, 0x10 )
+	GFXDECODE_ENTRY( "gfx5", 0, f1layout,     0x2000, 0x10 ) // not tilemap data?
 GFXDECODE_END
 
 
@@ -1206,6 +1243,18 @@ static MACHINE_DRIVER_START( ms32 )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( f1superb )
+	MDRV_IMPORT_FROM(ms32)
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(f1superb_map)
+
+	MDRV_GFXDECODE(f1superb)
+
+	MDRV_VIDEO_START(f1superb)
+MACHINE_DRIVER_END
+
 
 
 /********** ROM LOADING **********/
@@ -1403,7 +1452,7 @@ ROM_START( f1superb )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "f1sb32.bin", 0x000000, 0x080000, CRC(1b31fcce) SHA1(354cc6f43cd3bf3ba921ac8c5631ab993bedf563) )
 
-	ROM_REGION( 0x800000, "user1", 0 ) /* extra ROMs, unknown */
+	ROM_REGION( 0x800000, "gfx5", 0 ) /* extra data? doesn't seem to be tiles */
 	ROM_LOAD( "f1sb2b.bin", 0x000000, 0x200000, CRC(18d73b16) SHA1(f06f4d31b15658cc1e1b559ae3b8a90b797546ca) )
 	ROM_LOAD( "f1sb3b.bin", 0x200000, 0x200000, CRC(ce728fe0) SHA1(e0fd7b8f4d3dc9e2b15ddf027c61e67e5c1f22b5) )
 	ROM_LOAD( "f1sb4b.bin", 0x400000, 0x200000, CRC(077180c5) SHA1(ab16739da709ecdbbb1264beba349ef6ecf3f8b1) )
@@ -2215,7 +2264,7 @@ GAME( 1996, wpksocv2, 0,        ms32, wpksocv2, ss92046_01, ROT0,   "Jaleco", "W
 
 
 /* these boot and show something */
-GAME( 1994, f1superb, 0,        ms32, f1superb, f1superb, ROT0,   "Jaleco", "F1 Super Battle", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1994, f1superb, 0,        f1superb, f1superb, f1superb, ROT0,   "Jaleco", "F1 Super Battle", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
 /* Notes from Charles MacDonald
 

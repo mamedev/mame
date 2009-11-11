@@ -40,4 +40,5 @@ WRITE32_HANDLER( ms32_spram_w );
 
 WRITE32_HANDLER( ms32_gfxctrl_w );
 VIDEO_START( ms32 );
+VIDEO_START( f1superb );
 VIDEO_UPDATE( ms32 );
