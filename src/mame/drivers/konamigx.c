@@ -788,6 +788,7 @@ static READ32_HANDLER( sound020_r )
 			if (cpu_get_pc(space->cpu) == 0x2026fe) rv = 0xc0c0c0c0;
 			break;
 		case 3: // Run'n Gun 2
+			if (cpu_get_pc(space->cpu) == 0x24f0b6) rv = 0xffffffff;
 			if (cpu_get_pc(space->cpu) == 0x24f122) rv = 0xc0c0c0c0;
 			break;
 		case 4:	// Rushing Heroes
@@ -3754,6 +3755,6 @@ GAME( 1996, vsnetscreb,vsnetscr, gxtype4vsnet, type3, konamigx, ROT0, "Konami", 
 GAME( 1996, vsnetscru, vsnetscr, gxtype4vsnet, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver UAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
 GAME( 1996, vsnetscra, vsnetscr, gxtype4vsnet, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver AAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
 GAME( 1996, vsnetscrj, vsnetscr, gxtype4vsnet, type3, konamigx, ROT0, "Konami", "Versus Net Soccer (ver JAB)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1996, rungun2,   konamigx, gxtype4sd2, type3, konamigx, ROT0, "Konami", "Run and Gun 2 (ver UAA)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, rungun2,   konamigx, gxtype4sd2, type3, konamigx, ROT0, "Konami", "Run and Gun 2 (ver UAA)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, slamdnk2,  rungun2,  gxtype4sd2, type3, konamigx, ROT0, "Konami", "Slam Dunk 2 (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, rushhero,  konamigx, gxtype4, type3, konamigx, ROT0, "Konami", "Rushing Heroes (ver UAB)", GAME_IMPERFECT_GRAPHICS  )

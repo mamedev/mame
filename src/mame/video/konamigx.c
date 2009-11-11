@@ -1594,9 +1594,9 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 								int shiftpos = 30;
 								for (xx=0;xx<width;xx+=2)
 								{
-									dst[xx] = paldata[src[(((xx/2)+shiftpos))%width]];
-									dst[xx+1] = paldata[src[(((xx/2)+shiftpos))%width]];
-
+									UINT16 dat = src[(((xx/2)+shiftpos))%width];
+									if (dat&0xff)
+										dst[xx+1] = dst[xx] = paldata[dat];
 								}
 							}
 						}
