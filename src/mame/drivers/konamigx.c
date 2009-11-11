@@ -795,6 +795,7 @@ static READ32_HANDLER( sound020_r )
 			if (cpu_get_pc(space->cpu) == 0x20eda6) rv = 0xc0c0c0c0;
 			break;
 		case 5:	// Vs. Net Soccer ver. UAB
+			if (cpu_get_pc(space->cpu) == 0x24c5d2) rv = 0xffffffff;
 			if (cpu_get_pc(space->cpu) == 0x24c63e) rv = 0xc0c0c0c0;
 			break;
 		case 6: // Slam Dunk 2
@@ -802,6 +803,7 @@ static READ32_HANDLER( sound020_r )
 			if (cpu_get_pc(space->cpu) == 0x24f21c) rv = 0xc0c0c0c0;
 			break;
 		case 7:	// Vs. Net Soccer ver. AAA
+			if (cpu_get_pc(space->cpu) == 0x24c6b6) rv = 0xffffffff;
 			if (cpu_get_pc(space->cpu) == 0x24c722) rv = 0xc0c0c0c0;
 			break;
 		case 8:	// Vs. Net Soccer ver. EAD
@@ -809,9 +811,11 @@ static READ32_HANDLER( sound020_r )
 			if (cpu_get_pc(space->cpu) == 0x24c482) rv = 0xc0c0c0c0;
 			break;
 		case 9:	// Vs. Net Soccer ver. EAB
+			if (cpu_get_pc(space->cpu) == 0x24c400) rv = 0xffffffff;
 			if (cpu_get_pc(space->cpu) == 0x24c46c) rv = 0xc0c0c0c0;
 			break;
 		case 10: // Vs. Net Soccer ver. JAB
+			if (cpu_get_pc(space->cpu) == 0x24c584) rv = 0xffffffff;
 			if (cpu_get_pc(space->cpu) == 0x24c5f0) rv = 0xc0c0c0c0;
 			break;
 		case 11: // Racin' Force
