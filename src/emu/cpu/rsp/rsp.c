@@ -2667,6 +2667,7 @@ static CPU_EXECUTE( rsp )
 				{
 					case 0x00:	/* BLTZ */		if ((INT32)(RSVAL) < 0) JUMP_REL(SIMM16); break;
 					case 0x01:	/* BGEZ */		if ((INT32)(RSVAL) >= 0) JUMP_REL(SIMM16); break;
+					case 0x10:	/* BLTZAL */	if ((INT32)(RSVAL) < 0) JUMP_REL_L(SIMM16, 31); break;
 					case 0x11:	/* BGEZAL */	if ((INT32)(RSVAL) >= 0) JUMP_REL_L(SIMM16, 31); break;
 					default:	unimplemented_opcode(cpustate, op); break;
 				}
