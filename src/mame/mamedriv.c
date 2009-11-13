@@ -2762,6 +2762,7 @@ V-V                           TP-027
 	DRIVER( ddsomjr1 )	/* 06/02/1996 (c) 1996 (Japan) */
 	DRIVER( ddsomj )	/* 19/06/1996 (c) 1996 (Japan) */
 	DRIVER( ddsoma )	/* 19/06/1996 (c) 1996 (Asia) */
+	DRIVER( ddsomh )	/* 23/02/1996 (c) 1996 (Hispanic) */
 	DRIVER( ddsomb )	/* 23/02/1996 (c) 1996 (Brazil) */
 	DRIVER( sfa2 )		/* 06/03/1996 (c) 1996 (Euro) */
 	DRIVER( sfa2u )		/* 06/03/1996 (c) 1996 (US) */
