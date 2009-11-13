@@ -1402,7 +1402,7 @@ ROM_START( cosmica1 ) /* earlier 7910-A pcb, had lots of rework; roms do NOT hav
 	ROM_LOAD( "u7910.d9",    0x0000, 0x0020, CRC(dfb60f19) SHA1(d510327ff3492f098659c551f7245835f61a2959) ) /* MMI 6331 */
 
 	ROM_REGION( 0x0400, "user1", 0 ) /* color map */
-	ROM_LOAD( "9.e2",        0x0000, 0x0400, CRC(B83AFFF4) SHA1(5501E490177B69D61099CC8F1439B91320572584) ) /* 2708 */
+	ROM_LOAD( "9.e2",        0x0000, 0x0400, BAD_DUMP CRC(B83AFFF4) SHA1(5501E490177B69D61099CC8F1439B91320572584) ) /* 2708 */ /* dumped as all 0xFF */
 
 	ROM_REGION( 0x0400, "user2", 0 ) /* starfield generator */
 	ROM_LOAD( "8.k3",       0x0000, 0x0400, CRC(acbd4e98) SHA1(d33fe8bdc77bb18a3ffb369ea692210d1b890771) ) /* 2708; located on sub pcb */
@@ -1621,7 +1621,7 @@ static DRIVER_INIT( panic )
 
 GAME( 1979, cosmicg,  0,       cosmicg,  cosmicg,  cosmicg, ROT270, "Universal", "Cosmic Guerilla", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1979, cosmica,  0,       cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (version II)", GAME_IMPERFECT_SOUND )
-GAME( 1979, cosmica1, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (first version)", GAME_IMPERFECT_SOUND )
+GAME( 1979, cosmica1, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (first version)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS)
 GAME( 1979, cosmica2, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (bootleg or hack?)", GAME_IMPERFECT_SOUND )
 GAME( 1980, nomnlnd,  0,       nomnlnd,  nomnlnd,  nomnlnd, ROT270, "Universal", "No Man's Land", GAME_IMPERFECT_SOUND )
 GAME( 1980, nomnlndg, nomnlnd, nomnlnd,  nomnlndg, nomnlnd, ROT270, "Universal (Gottlieb license)", "No Man's Land (Gottlieb)", GAME_IMPERFECT_SOUND )
