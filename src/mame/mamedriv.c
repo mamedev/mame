@@ -929,7 +929,8 @@ const game_driver * const drivers[] =
 
 	/* Universal games */
 	DRIVER( cosmicg )	/* 7907 (c) 1979 */
-	DRIVER( cosmica )	/* 7910 (c) [1979] */
+	DRIVER( cosmica )	/* 7910-AII (c) [1979] */
+	DRIVER( cosmica1 )	/* 7910-A (c) [1979] */
 	DRIVER( cosmica2 )	/* 7910 (c) 1979 */
 	DRIVER( nomnlnd )	/* 8003 (c) [1980?] */
 	DRIVER( nomnlndg )	/* 8003 (c) [1980?] + Gottlieb */

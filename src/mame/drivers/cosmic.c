@@ -1340,29 +1340,29 @@ ROM_START( panicger )
 	ROM_LOAD( "spcpanic.8",   0x0000, 0x0800, CRC(7da0b321) SHA1(b450cc02de9cc27e3f336c626221c90c6961b51e) )
 ROM_END
 
-ROM_START( cosmica )
+ROM_START( cosmica ) /* later revision 7910-AII pcb; some roms are marked II-x */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ca.e3",        0x0000, 0x0800, CRC(535ee0c5) SHA1(3ec3056b7fabe07ef49a9179114aa74be44a943e) )
-	ROM_LOAD( "ca.e4",        0x0800, 0x0800, CRC(ed3cf8f7) SHA1(6ba1d98d82400519e844b950cb2fb1274c06d89a) )
-	ROM_LOAD( "ca.e5",        0x1000, 0x0800, CRC(6a111e5e) SHA1(593be409bc969cece2ff88623e53c166b4dc43cd) )
-	ROM_LOAD( "ca.e6",        0x1800, 0x0800, CRC(c9b5ca2a) SHA1(3384b98954b6bc9a64e753b95757f61ce1d3c52e) )
-	ROM_LOAD( "ca.e7",        0x2000, 0x0800, CRC(43666d68) SHA1(e44492360a77d93aeaaaa0f38f4ac19732998559) )
+	ROM_LOAD( "ii-1.e3",        0x0000, 0x0800, CRC(535ee0c5) SHA1(3ec3056b7fabe07ef49a9179114aa74be44a943e) ) /* tms2516 */
+	ROM_LOAD( "ii-2.e4",        0x0800, 0x0800, CRC(ed3cf8f7) SHA1(6ba1d98d82400519e844b950cb2fb1274c06d89a) ) /* tms2516; has an & stamped on the chip */
+	ROM_LOAD( "ii-3.e5",        0x1000, 0x0800, CRC(6a111e5e) SHA1(593be409bc969cece2ff88623e53c166b4dc43cd) ) /* tms2516 */
+	ROM_LOAD( "ii-4.e6",        0x1800, 0x0800, CRC(c9b5ca2a) SHA1(3384b98954b6bc9a64e753b95757f61ce1d3c52e) ) /* tms2516 */
+	ROM_LOAD( "ii-5.e7",        0x2000, 0x0800, CRC(43666d68) SHA1(e44492360a77d93aeaaaa0f38f4ac19732998559) ) /* tms2516; has an & stamped on the chip */
 
 	ROM_REGION( 0x1000, "gfx1", 0 )	/* sprites */
-	ROM_LOAD( "ca.n2",        0x0000, 0x0800, CRC(aa6c6079) SHA1(af4ab73e9e1c189290b26bf42adb511d5a347df9) )
-	ROM_LOAD( "ca.n1",        0x0800, 0x0800, CRC(431e866c) SHA1(b007cd3cc856360a0247bd78bb49d173f5cef321) )
+	ROM_LOAD( "ii-7.n2",        0x0000, 0x0800, CRC(aa6c6079) SHA1(af4ab73e9e1c189290b26bf42adb511d5a347df9) ) // verify marking
+	ROM_LOAD( "ii-6.n1",        0x0800, 0x0800, CRC(431e866c) SHA1(b007cd3cc856360a0247bd78bb49d173f5cef321) ) // verify marking
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "ca.d9",        0x0000, 0x0020, CRC(dfb60f19) SHA1(d510327ff3492f098659c551f7245835f61a2959) )
+	ROM_LOAD( "u7910.d9",    0x0000, 0x0020, CRC(dfb60f19) SHA1(d510327ff3492f098659c551f7245835f61a2959) ) // verify marking
 
 	ROM_REGION( 0x0400, "user1", 0 ) /* color map */
-	ROM_LOAD( "ca.e2",        0x0000, 0x0400, CRC(ea4ee931) SHA1(d0a4afda4b493efb40286c2d67bf56a2a8b8da9d) )
+	ROM_LOAD( "9.e2",        0x0000, 0x0400, CRC(ea4ee931) SHA1(d0a4afda4b493efb40286c2d67bf56a2a8b8da9d) ) /* marked same as the earlier version but contents differ? */
 
 	ROM_REGION( 0x0400, "user2", 0 ) /* starfield generator */
-	ROM_LOAD( "ca.sub",       0x0000, 0x0400, CRC(acbd4e98) SHA1(d33fe8bdc77bb18a3ffb369ea692210d1b890771) )
+	ROM_LOAD( "8.k3",       0x0000, 0x0400, CRC(acbd4e98) SHA1(d33fe8bdc77bb18a3ffb369ea692210d1b890771) ) // verify marking
 ROM_END
 
-ROM_START( cosmica2 )
+ROM_START( cosmica2 ) /* this set is strange; bootleg, or maybe a hack to make the game easier/harder/etc? */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ca.e3",        0x0000, 0x0800, CRC(535ee0c5) SHA1(3ec3056b7fabe07ef49a9179114aa74be44a943e) )
 	ROM_LOAD( "c3.bin",       0x0800, 0x0400, CRC(699c849e) SHA1(90a58ab8ede9c31eec3df1f8f251b59858f85eb6) )
@@ -1384,6 +1384,28 @@ ROM_START( cosmica2 )
 
 	ROM_REGION( 0x0400, "user2", 0 ) /* starfield generator */
 	ROM_LOAD( "ca.sub",       0x0000, 0x0400, CRC(acbd4e98) SHA1(d33fe8bdc77bb18a3ffb369ea692210d1b890771) )
+ROM_END
+
+ROM_START( cosmica1 ) /* earlier 7910-A pcb, had lots of rework; roms do NOT have 'II' markings stamped on them as on the cosmica set */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.e3",        0x0000, 0x0800, CRC(2E44F50E) SHA1(9D87C519A498C47296AA02453806FBA95FC4C455) ) /* tms2516 */
+	ROM_LOAD( "2.e4",        0x0800, 0x0800, CRC(9E5C5281) SHA1(EAF9CA2A37196DF758453A73EE145C83E0E3C476) ) /* tms2516; has an & stamped on the chip */
+	ROM_LOAD( "3.e5",        0x1000, 0x0800, CRC(9E1309DB) SHA1(1AFBAA8DA68ABC90BF6F4ACD9DF9E4D3610F10CE) ) /* tms2516 */
+	ROM_LOAD( "4.e6",        0x1800, 0x0800, CRC(BA4A9295) SHA1(C7ED9DAF48E01EF87253ADDB0A7E5C62FA1F37CD) ) /* tms2516 */
+	ROM_LOAD( "5.e7",        0x2000, 0x0800, CRC(2106C82A) SHA1(FA807CF0321813E20DC2D2F2A8AE3778496FA97C) ) /* tms2516; has an & stamped on the chip */
+
+	ROM_REGION( 0x1000, "gfx1", 0 )	/* sprites */
+	ROM_LOAD( "7.n2",        0x0000, 0x0800, CRC(EE3E86FC) SHA1(4FB5FBEE06B2D590A83519761F63EC9D6B90EFB3) ) /* tms2516 */
+	ROM_LOAD( "6.n1",        0x0800, 0x0800, CRC(81C86CA0) SHA1(4CEA1A61523AE1C3C681B1102B8E18AB26D0040A) ) /* tms2516 */
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "u7910.d9",    0x0000, 0x0020, CRC(dfb60f19) SHA1(d510327ff3492f098659c551f7245835f61a2959) ) /* MMI 6331 */
+
+	ROM_REGION( 0x0400, "user1", 0 ) /* color map */
+	ROM_LOAD( "9.e2",        0x0000, 0x0400, CRC(B83AFFF4) SHA1(5501E490177B69D61099CC8F1439B91320572584) ) /* 2708 */
+
+	ROM_REGION( 0x0400, "user2", 0 ) /* starfield generator */
+	ROM_LOAD( "8.k3",       0x0000, 0x0400, CRC(acbd4e98) SHA1(d33fe8bdc77bb18a3ffb369ea692210d1b890771) ) /* 2708; located on sub pcb */
 ROM_END
 
 ROM_START( cosmicg )
@@ -1598,8 +1620,9 @@ static DRIVER_INIT( panic )
 
 
 GAME( 1979, cosmicg,  0,       cosmicg,  cosmicg,  cosmicg, ROT270, "Universal", "Cosmic Guerilla", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1979, cosmica,  0,       cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien", GAME_IMPERFECT_SOUND )
-GAME( 1979, cosmica2, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (older)", GAME_IMPERFECT_SOUND )
+GAME( 1979, cosmica,  0,       cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (version II)", GAME_IMPERFECT_SOUND )
+GAME( 1979, cosmica1, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (first version)", GAME_IMPERFECT_SOUND )
+GAME( 1979, cosmica2, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (bootleg or hack?)", GAME_IMPERFECT_SOUND )
 GAME( 1980, nomnlnd,  0,       nomnlnd,  nomnlnd,  nomnlnd, ROT270, "Universal", "No Man's Land", GAME_IMPERFECT_SOUND )
 GAME( 1980, nomnlndg, nomnlnd, nomnlnd,  nomnlndg, nomnlnd, ROT270, "Universal (Gottlieb license)", "No Man's Land (Gottlieb)", GAME_IMPERFECT_SOUND )
 GAME( 1980, magspot,  0,       magspot,  magspot,  0,       ROT270, "Universal", "Magical Spot", GAME_IMPERFECT_SOUND )
