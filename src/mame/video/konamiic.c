@@ -6821,6 +6821,12 @@ void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rect
 
 			drawrect.min_x = (dminx < cminx ) ? cminx : dminx;
 			drawrect.max_x = (dmaxx > cmaxx ) ? cmaxx : dmaxx;
+			
+			// soccer superstars visible area is >512 pixels, this causes problems with the logic because
+			// the tilemaps are 512 pixels across.  Assume that if the limits were set as below that we
+			// want the tilemap to be drawn on the right hand side..  this is probably not the correct
+			// logic, but it works.
+			if ((drawrect.min_x>0) && (drawrect.max_x==511)) drawrect.max_x=cliprect->max_x;
 
 			tilemap_set_scrollx(tmap, 0, dx);
 

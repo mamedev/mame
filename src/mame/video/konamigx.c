@@ -1591,7 +1591,7 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 							{
 								UINT16* src = BITMAP_ADDR16(extra_bitmap,yy,0);
 								UINT32* dst = BITMAP_ADDR32(bitmap,yy,0);
-								int shiftpos = 30;
+								int shiftpos = 0;
 								for (xx=0;xx<width;xx+=2)
 								{
 									UINT16 dat = src[(((xx/2)+shiftpos))%width];
@@ -2078,7 +2078,7 @@ VIDEO_START(konamigx_type3)
 	int height = video_screen_get_height(machine->primary_screen);
 
 	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 1);
-	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -132, -24, konamigx_type2_sprite_callback);
+	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
 
 	_gxcommoninitnosprites(machine);
 
@@ -2094,9 +2094,10 @@ VIDEO_START(konamigx_type3)
 	//tilemap_set_flip(gx_psac_tilemap, TILEMAP_FLIPX| TILEMAP_FLIPY);
 
 	K053936_wraparound_enable(0, 1);
-	K053936GP_set_offset(0, 0, 0);
+//	K053936GP_set_offset(0, -30, -1);
+	K053936_set_offset(0, -30, +1);
 
-	K056832_set_LayerOffset(0,  -48, 0);
+	K056832_set_LayerOffset(0,  -52, 0);
 	K056832_set_LayerOffset(1,  -48, 0);
 	K056832_set_LayerOffset(2,  -48, 0);
 	K056832_set_LayerOffset(3,  -48, 0);
