@@ -632,6 +632,36 @@ ROM_START( lastduelo )
 	ROM_LOAD( "ld.3d",        0x0000, 0x0100, CRC(729a1ddc) SHA1(eb1d48785a0f187a4cb9c164e6c82481268b3174) ) /* priority (not used) BPROM type 63S141 or compatible like 82S129A */
 ROM_END
 
+ROM_START( lastduelj )
+	ROM_REGION( 0x60000, "maincpu", 0 )	/* 68000 code */
+	ROM_LOAD16_BYTE( "ld_06.13k",  0x00000, 0x20000, CRC(58a9e12b) SHA1(bd0b8226271ef0aaff381604455866e0d42fd791) )
+	ROM_LOAD16_BYTE( "ld_05.12k",  0x00001, 0x20000, CRC(14685d78) SHA1(6f6c2431366868df268857d65f6f1325f6c91b89) )
+	ROM_LOAD16_BYTE( "ld_04.11k",  0x40000, 0x10000, CRC(aa4bf001) SHA1(3f14b174016c6fa4c82011d3d0f1c957096d6d93) )
+	ROM_LOAD16_BYTE( "ld_03.9k",   0x40001, 0x10000, CRC(bbaac8ab) SHA1(3c5773e39e7a96ef62da7b846ce4099222b3e66b) )
+
+	ROM_REGION( 0x10000 , "audiocpu", 0 ) /* audio CPU */
+	ROM_LOAD( "ld_02.16h",    0x0000, 0x10000, CRC(91834d0c) SHA1(aaa63b8470fc19b82c25028ab27675a7837ab9a1) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "ld-11.12b",    0x000000, 0x20000, CRC(49d4dbbd) SHA1(e58ebda9e9ad37a6990f2aca2a312d55cdaca979) ) /* sprites */
+	ROM_LOAD( "ld-09.12a",    0x020000, 0x20000, CRC(6efadb74) SHA1(b00ddd33c08557940610570b1fd8c9a84dcaf063) )
+	ROM_LOAD( "ld-12.17b",    0x040000, 0x20000, CRC(313e5338) SHA1(beceeb5ae9de6a41d3fde06767b8a23fc9f42259) )
+	ROM_LOAD( "ld-10.17a",    0x060000, 0x20000, CRC(b8d3b2e3) SHA1(a08ef780c798b59bb1e1582d82317421a3353887) )
+
+	ROM_REGION( 0x08000, "gfx2", 0 )
+	ROM_LOAD( "ld_01.12f",    0x000000, 0x08000, CRC(ad3c6f87) SHA1(1a5ef003c0eb641484921dc0c11450c53ee315f5) ) /* 8x8 text */
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD16_BYTE( "ld-15.6p",     0x000001, 0x20000, CRC(d977a175) SHA1(e3cb482ede10d2204f8352b10623e442a4ae99d2) ) /* tiles */
+	ROM_LOAD16_BYTE( "ld-13.6m",     0x000000, 0x20000, CRC(bc25729f) SHA1(7a6e8a4158bf4c804e87b11c15deb6d0f09fa538) )
+
+	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_LOAD( "ld-14.15n",    0x000000, 0x80000, CRC(d0653739) SHA1(8278e8601e82470d785a8ffef48a1b5f70bc2a9b) ) /* tiles */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "ld.3d",        0x0000, 0x0100, CRC(729a1ddc) SHA1(eb1d48785a0f187a4cb9c164e6c82481268b3174) ) /* priority (not used) BPROM type 63S141 or compatible like 82S129A */
+ROM_END
+
 ROM_START( lastduelb )
 	ROM_REGION( 0x60000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "ld_08.bin",    0x00000, 0x10000, CRC(43811a96) SHA1(79db50c941d8845f1642f2257c610768172923a3) )
@@ -827,6 +857,7 @@ ROM_END
 
 GAME( 1988, lastduel,  0,        lastduel, lastduel, 0, ROT270, "Capcom", "Last Duel (US New Ver.)", 0 )
 GAME( 1988, lastduelo, lastduel, lastduel, lastduel, 0, ROT270, "Capcom", "Last Duel (US Old Ver.)", 0 )
+GAME( 1988, lastduelj, lastduel, lastduel, lastduel, 0, ROT270, "Capcom", "Last Duel (Japan)", 0 )
 GAME( 1988, lastduelb, lastduel, lastduel, lastduel, 0, ROT270, "bootleg", "Last Duel (bootleg)", 0 )
 GAME( 1989, madgear,   0,        madgear,  madgear,  0, ROT270, "Capcom", "Mad Gear (US)", 0 )
 GAME( 1989, madgearj,  madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Mad Gear (Japan)", 0 )
