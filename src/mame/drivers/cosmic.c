@@ -1390,8 +1390,8 @@ ROM_START( cosmica1 ) /* earlier 7910-A pcb, had lots of rework; roms do NOT hav
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.e3",        0x0000, 0x0800, CRC(2e44f50e) SHA1(9d87c519a498c47296aa02453806fba95fc4c455) ) /* tms2516 */
 	ROM_LOAD( "2.e4",        0x0800, 0x0800, CRC(9e5c5281) SHA1(eaf9ca2a37196df758453a73ee145c83e0e3c476) ) /* tms2516; has an & stamped on the chip */
-	ROM_LOAD( "3.e5",        0x1000, 0x0800, CRC(9e1309db) SHA1(1afbaa8da68abc90bf6f4acd9df9e4d3610d10ce) ) /* tms2516 */
-	ROM_LOAD( "4.e6",        0x1800, 0x0800, CRC(ba4a9295) SHA1(c7ed9dad48e01ef87253addb0a7e5c62fa1f37cd) ) /* tms2516 */
+	ROM_LOAD( "3.e5",        0x1000, 0x0800, CRC(9e1309db) SHA1(1afbaa8da68abc90bf6f4acd9df9e4d3610f10ce) ) /* tms2516 */
+	ROM_LOAD( "4.e6",        0x1800, 0x0800, CRC(ba4a9295) SHA1(c7ed9daf48e01ef87253addb0a7e5c62fa1f37cd) ) /* tms2516 */
 	ROM_LOAD( "5.e7",        0x2000, 0x0800, CRC(2106c82a) SHA1(fa807cf0321813e20dc2d2f2a8ae3778496fa97c) ) /* tms2516; has an & stamped on the chip */
 
 	ROM_REGION( 0x1000, "gfx1", 0 )	/* sprites */
