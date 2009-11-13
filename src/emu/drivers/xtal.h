@@ -83,6 +83,7 @@ enum
 	XTAL_10_730MHz   	= 10730000,		/* Ruleta RE-900 VDP Clock */
 	XTAL_10_733MHz   	= 10733000,		/* The Fairyland Story */
 	XTAL_10_738635MHz	= 10738635,		/* TMS9918 family */
+	XTAL_10_816MHz   	= 10816000,		/* Universal 1979-1980 (Cosmic Alien, etc) */
 	XTAL_11MHz			= 11000000,		/* Mario I8039 sound */
 	XTAL_11_0592MHz  	= 11059200,		/* Lethal Justice, Ruleta RE-900 */
 	XTAL_11_2MHz  		= 11200000,		/* New York, New York */

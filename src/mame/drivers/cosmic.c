@@ -23,6 +23,16 @@ a physical DSW B but only read when SWA:3,4 are both set to OFF. Currently,
 * In devzone, setting SWA:3,4 on anything but OFF,OFF results in no coins
     accepted at all
 
+TODO: Cosmic alien colors in-game are wrong;
+See http://www.andysarcade.net/pix/dumping/cosmic/
+The colors for the text on the "titlescreen" (with the 1979 universal
+copyright), and the status bars are correct in mame, but the sprite colors
+for the aliens when in formation are clearly wrong as compared to andy's pics.
+The shots on andy's page are the correct ones, as the aliens when 'breaking
+formation' in mame change to colors which match the ones in his pictures.
+There is probably a missing bit for color prom banking or for
+forcing all sprites on a row to have an added blue component.
+
 ***************************************************************************/
 
 
@@ -33,8 +43,8 @@ a physical DSW B but only read when SWA:3,4 are both set to OFF. Currently,
 #include "sound/samples.h"
 #include "sound/dac.h"
 
-#define MASTER_CLOCK (XTAL_9_828MHz)
-
+#define COSMICG_MASTER_CLOCK (XTAL_9_828MHz)
+#define Z80_MASTER_CLOCK (XTAL_10_816MHz)
 
 PALETTE_INIT( panic );
 PALETTE_INIT( cosmica );
@@ -1063,7 +1073,7 @@ static const samples_interface cosmicg_samples_interface =
 static MACHINE_DRIVER_START( cosmic )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,10816000/6)	/* 1.802 MHz*/
+	MDRV_CPU_ADD("maincpu", Z80,Z80_MASTER_CLOCK/6)	/* 1.8026 MHz*/
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1134,7 +1144,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cosmicg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", TMS9980, MASTER_CLOCK/8)
+	MDRV_CPU_ADD("maincpu", TMS9980, COSMICG_MASTER_CLOCK/8)
 			/* 9.828 MHz Crystal */
 			/* R Nabet : huh ? This would imply the crystal frequency is somehow divided by 2 before being
             fed to the tms9904 or tms9980.  Also, I have never heard of a tms9900/9980 operating under
@@ -1373,8 +1383,8 @@ ROM_START( cosmica2 ) /* this set is strange; bootleg, or maybe a hack to make t
 	ROM_LOAD( "j0.bin",       0x2400, 0x0400, CRC(4ff70f45) SHA1(791499be62a7b91bde75e7a7ab6c546f5fb63027) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )	/* sprites */
-	ROM_LOAD( "ii-7.n2",        0x0000, 0x0800, CRC(aa6c6079) SHA1(af4ab73e9e1c189290b26bf42adb511d5a347df9) )
-	ROM_LOAD( "ii-6.n1",        0x0800, 0x0800, CRC(431e866c) SHA1(b007cd3cc856360a0247bd78bb49d173f5cef321) )
+	ROM_LOAD( "ii-7.n2",        0x0000, 0x0800, CRC(aa6c6079) SHA1(af4ab73e9e1c189290b26bf42adb511d5a347df9) ) // verify marking
+	ROM_LOAD( "ii-6.n1",        0x0800, 0x0800, CRC(431e866c) SHA1(b007cd3cc856360a0247bd78bb49d173f5cef321) ) // verify marking
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "u7910.d9",    0x0000, 0x0020, CRC(dfb60f19) SHA1(d510327ff3492f098659c551f7245835f61a2959) )
@@ -1620,9 +1630,9 @@ static DRIVER_INIT( panic )
 
 
 GAME( 1979, cosmicg,  0,       cosmicg,  cosmicg,  cosmicg, ROT270, "Universal", "Cosmic Guerilla", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1979, cosmica,  0,       cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (version II)", GAME_IMPERFECT_SOUND )
-GAME( 1979, cosmica1, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (first version)", GAME_IMPERFECT_SOUND )
-GAME( 1979, cosmica2, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (bootleg or hack?)", GAME_IMPERFECT_SOUND )
+GAME( 1979, cosmica,  0,       cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (version II)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1979, cosmica1, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (first version)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1979, cosmica2, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (bootleg or hack?)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
 GAME( 1980, nomnlnd,  0,       nomnlnd,  nomnlnd,  nomnlnd, ROT270, "Universal", "No Man's Land", GAME_IMPERFECT_SOUND )
 GAME( 1980, nomnlndg, nomnlnd, nomnlnd,  nomnlndg, nomnlnd, ROT270, "Universal (Gottlieb license)", "No Man's Land (Gottlieb)", GAME_IMPERFECT_SOUND )
 GAME( 1980, magspot,  0,       magspot,  magspot,  0,       ROT270, "Universal", "Magical Spot", GAME_IMPERFECT_SOUND )
