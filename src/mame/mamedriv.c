@@ -6153,6 +6153,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mnchmobl )	/* A2001      (c) 1983 + Centuri license */
 	DRIVER( marvins )	/* A2003      (c) 1983 */
 	DRIVER( madcrash )	/* A2005      (c) 1984 */
+	DRIVER( madcrush )	/* A2005      (c) 1984 */
 	DRIVER( vangrd2 )	/* A2005      (c) 1984 */
 	DRIVER( mainsnk )	/*            (c) 1984 */
 	DRIVER( canvas )	/* A3008      (c) 1985 */

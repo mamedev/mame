@@ -926,6 +926,53 @@ static ADDRESS_MAP_START( madcrash_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE(3)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( madcrush_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
+	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("IN1")
+	AM_RANGE(0x8200, 0x8200) AM_READ_PORT("IN2")
+	AM_RANGE(0x8300, 0x8300) AM_WRITE(marvins_soundlatch_w)
+	AM_RANGE(0x8400, 0x8400) AM_READ_PORT("DSW1")
+	AM_RANGE(0x8500, 0x8500) AM_READ_PORT("DSW2")
+	AM_RANGE(0x8600, 0x8600) AM_MIRROR(0xff) AM_WRITE(marvins_flipscreen_w)
+	AM_RANGE(0x8700, 0x8700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(&spriteram) AM_SHARE(1)	// + work ram
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(marvins_fg_videoram_w) AM_SHARE(4)  AM_BASE(&snk_fg_videoram)
+	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0xff) AM_WRITE(marvins_palette_bank_w)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE(5)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(marvins_bg_videoram_w) AM_SHARE(2)AM_BASE(&snk_bg_videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE(3)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE(6) AM_BASE(&snk_tx_videoram)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(snk_sp16_scrolly_w)
+	AM_RANGE(0xf900, 0xf900) AM_WRITE(snk_sp16_scrollx_w)
+	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(snk_fg_scrolly_w)
+	AM_RANGE(0xfb00, 0xfb00) AM_WRITE(snk_fg_scrollx_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(snk_bg_scrolly_w)
+	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(snk_bg_scrollx_w)
+	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(snk_sprite_split_point_w)
+	AM_RANGE(0xff00, 0xff00) AM_WRITE(marvins_scroll_msb_w)
+ADDRESS_MAP_END
+ 
+static ADDRESS_MAP_START( madcrush_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x9fff) AM_ROM
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(snk_cpuB_nmi_ack_w)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE(1)	// + work ram
+	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0xff) AM_WRITE(marvins_palette_bank_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(marvins_fg_videoram_w) AM_SHARE(4)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE(5)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(marvins_bg_videoram_w) AM_SHARE(2) // ??
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE(3)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE(6)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(snk_sp16_scrolly_w)
+	AM_RANGE(0xf900, 0xf900) AM_WRITE(snk_sp16_scrollx_w)
+	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(snk_fg_scrolly_w)
+	AM_RANGE(0xfb00, 0xfb00) AM_WRITE(snk_fg_scrollx_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(snk_bg_scrolly_w)
+	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(snk_bg_scrollx_w)
+	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(snk_sprite_split_point_w)
+	AM_RANGE(0xff00, 0xff00) AM_WRITE(marvins_scroll_msb_w)
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( jcross_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
@@ -1623,7 +1670,7 @@ static INPUT_PORTS_START( madcrash )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(marvins_sound_busy, NULL) /* sound CPU status */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(marvins_sound_busy, NULL) /* sound CPU status */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SERVICE )
 
 	PORT_START("IN1")
@@ -3621,6 +3668,19 @@ static MACHINE_DRIVER_START( vangrd2 )
 
 	MDRV_CPU_MODIFY("sub")
 	MDRV_CPU_PROGRAM_MAP(madcrash_cpuB_map)
+MACHINE_DRIVER_END 
+
+
+static MACHINE_DRIVER_START( madcrush )
+ 
+	MDRV_IMPORT_FROM(marvins)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(madcrush_cpuA_map)
+
+	MDRV_CPU_MODIFY("sub")
+	MDRV_CPU_PROGRAM_MAP(madcrush_cpuB_map)
 MACHINE_DRIVER_END
 
 
@@ -4110,6 +4170,44 @@ ROM_START( madcrash )
 
 	ROM_REGION( 0x0c00, "proms", 0 )
 	ROM_LOAD( "m3-prom.j3",  0x000, 0x400, CRC(d19e8a91) SHA1(b21fbdb8ed8d0b27c3ec78cf2e115624f69c67e0) )
+	ROM_LOAD( "m2-prom.j4",  0x400, 0x400, CRC(9fc325af) SHA1(a180662f168ba001376f25f5d9205cb119c1ffee) )
+	ROM_LOAD( "m1-prom.j5",  0x800, 0x400, CRC(07678443) SHA1(267951886d8b031dd633dc4823d9bd862a585437) )
+ROM_END
+
+ROM_START( madcrush )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for CPUA code */
+	ROM_LOAD( "p3.a8",   0x0000, 0x2000, CRC(fbd3eda1) SHA1(23fb06978fe51ec409f1ebdbcc70d1b3b73f08ca) ) /* These 3 roms are located on the A2003 UP01-03 PCB */
+	ROM_LOAD( "p4.a9",   0x2000, 0x2000, CRC(1bc67cab) SHA1(7d667c234d9eac34c0e90df7f68e9f5aa2726e8c) )
+	ROM_LOAD( "p5.a10",  0x4000, 0x2000, CRC(d905ff79) SHA1(5b45e63d10191544ff6ca8c3ecb517484d70d5e3) )
+
+	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for CPUB code */
+	ROM_LOAD( "p6.a11",   0x0000, 0x2000, CRC(432b5743) SHA1(d3c86c9983ee2174c58becc1e250d94426e6fc70) ) /* These 3 roms are located on the A2003 UP01-03 PCB */
+	ROM_LOAD( "p7.a13",   0x2000, 0x2000, CRC(dea2865a) SHA1(0807281e35159ee29fbe2d1aa087b57804f1a14f) ) /* Same as Mad Crasher, but different label */
+	ROM_LOAD( "p8.a14",   0x4000, 0x2000, CRC(e25a9b9c) SHA1(26853611e3898907239e15f1a00f62290889f89b) ) /* Same as Mad Crasher, but different label */
+	/* Roms P9 & P10 are located on the A3006SUB plug-in module also containing a Z80A CPU plugged into the A2003 UP01-03 PCB */
+	ROM_LOAD( "p10.bin",  0x6000, 0x2000, CRC(55b14a36) SHA1(7d5566a6ba285af92ddf560efda60a79f1da84c2) ) /* Same as Mad Crasher, but different label */
+	ROM_LOAD( "p9.bin",   0x8000, 0x2000, CRC(e3c8c2cb) SHA1(b3e39eacd2609ff0fa0f511bff0fc83e6b3970d4) ) /* Same as Mad Crasher, but different label */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound code */
+	ROM_LOAD( "p1.a6",   0x0000, 0x2000, CRC(2dcd036d) SHA1(4da42ab1e502fff57f5d5787df406289538fa484) ) /* Located on the A2003UP03-01 duaghtercard PCB */
+	ROM_LOAD( "p2.a8",   0x2000, 0x2000, CRC(cc30ae8b) SHA1(ffedc747b9e0b616a163ff8bb1def318e522585b) ) /* Located on the A2003UP03-01 duaghtercard PCB */
+
+	ROM_REGION( 0x2000, "tx_tiles", 0 )
+	ROM_LOAD( "p13.e2",    0x0000, 0x2000, CRC(fcdd36ca) SHA1(bb9408e1feaa15949f11d797e3eb91d37c3e0add) ) /* Located on the A2003 UP01-04 PCB */
+
+	ROM_REGION( 0x2000, "fg_tiles", 0 )
+	ROM_LOAD( "p11.a2",    0x0000, 0x2000, CRC(67174956) SHA1(65a921176294212971c748932a9010f45e1fb499) ) /* Located on the A2003 UP01-04 PCB */
+
+	ROM_REGION( 0x2000, "bg_tiles", 0 )
+	ROM_LOAD( "p12.c2",    0x0000, 0x2000, CRC(085094c1) SHA1(5c5599d1ed7f8a717ada54bbd28383a22e09a8fe) ) /* Located on the A2003 UP01-04 PCB */
+
+	ROM_REGION( 0x6000, "sp16_tiles", 0 )
+	ROM_LOAD( "p16.k4",    0x0000, 0x2000, CRC(6153611a) SHA1(b352f92b233761122f74830e46913cc4df800259) ) /* These 3 roms are located on the A2003 UP01-04 PCB */
+	ROM_LOAD( "p15.k2",    0x2000, 0x2000, CRC(a74149d4) SHA1(e8011a8d4d1a98a0ffe67fc28ea9fa192ca80321) )
+	ROM_LOAD( "p14.k1",    0x4000, 0x2000, CRC(07e807bc) SHA1(f651d3a5394ced8e0a1b2be3aa52b3e5a5d84c37) )
+
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "m3-prom.j3",  0x000, 0x400, CRC(d19e8a91) SHA1(b21fbdb8ed8d0b27c3ec78cf2e115624f69c67e0) ) /* These 3 bproms are located on the A2003 UP01-03 PCB */
 	ROM_LOAD( "m2-prom.j4",  0x400, 0x400, CRC(9fc325af) SHA1(a180662f168ba001376f25f5d9205cb119c1ffee) )
 	ROM_LOAD( "m1-prom.j5",  0x800, 0x400, CRC(07678443) SHA1(267951886d8b031dd633dc4823d9bd862a585437) )
 ROM_END
@@ -6169,6 +6267,7 @@ static DRIVER_INIT( countryc )
 GAME( 1983, marvins,  0,        marvins,  marvins,  0,        ROT270, "SNK", "Marvin's Maze", 0 )
 GAME( 1984, vangrd2,  0,        vangrd2,  vangrd2,  0,        ROT270, "SNK", "Vanguard II", 0 )
 GAME( 1984, madcrash, 0,        vangrd2,  madcrash, 0,        ROT0,   "SNK", "Mad Crasher", 0 )
+GAME( 1984, madcrush, madcrash, madcrush, madcrash, 0,        ROT0,   "SNK", "Mad Crusher (Japan)", 0 )
 
 GAME( 1984, jcross,   0,        jcross,   jcross,   0,        ROT270, "SNK", "Jumping Cross", 0 )
 GAME( 1984, sgladiat, 0,        sgladiat, sgladiat, 0,        ROT0,   "SNK", "Gladiator 1984", 0 )
