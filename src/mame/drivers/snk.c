@@ -4176,15 +4176,15 @@ ROM_END
 
 ROM_START( madcrush )
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for CPUA code */
-	ROM_LOAD( "p3.a8",   0x0000, 0x2000, CRC(fbd3eda1) SHA1(23fb06978fe51ec409f1ebdbcc70d1b3b73f08ca) ) /* These 3 roms are located on the A2003 UP01-03 PCB */
+	ROM_LOAD( "p3.a8",   0x0000, 0x2000, CRC(fbd3eda1) SHA1(23fb06978fe51ec409f1ebdbcc70d1b3b73f08ca) ) /* These 3 roms are located on the A2003 UP02-03 PCB */
 	ROM_LOAD( "p4.a9",   0x2000, 0x2000, CRC(1bc67cab) SHA1(7d667c234d9eac34c0e90df7f68e9f5aa2726e8c) )
 	ROM_LOAD( "p5.a10",  0x4000, 0x2000, CRC(d905ff79) SHA1(5b45e63d10191544ff6ca8c3ecb517484d70d5e3) )
 
 	ROM_REGION( 0x10000, "sub", 0 )	/* 64k for CPUB code */
-	ROM_LOAD( "p6.a11",   0x0000, 0x2000, CRC(432b5743) SHA1(d3c86c9983ee2174c58becc1e250d94426e6fc70) ) /* These 3 roms are located on the A2003 UP01-03 PCB */
+	ROM_LOAD( "p6.a11",   0x0000, 0x2000, CRC(432b5743) SHA1(d3c86c9983ee2174c58becc1e250d94426e6fc70) ) /* These 3 roms are located on the A2003 UP02-03 PCB */
 	ROM_LOAD( "p7.a13",   0x2000, 0x2000, CRC(dea2865a) SHA1(0807281e35159ee29fbe2d1aa087b57804f1a14f) ) /* Same as Mad Crasher, but different label */
 	ROM_LOAD( "p8.a14",   0x4000, 0x2000, CRC(e25a9b9c) SHA1(26853611e3898907239e15f1a00f62290889f89b) ) /* Same as Mad Crasher, but different label */
-	/* Roms P9 & P10 are located on the A3006SUB plug-in module also containing a Z80A CPU plugged into the A2003 UP01-03 PCB */
+	/* Roms P9 & P10 are located on the A3006SUB plug-in module also containing a Z80A CPU plugged into the A2003 UP02-03 PCB */
 	ROM_LOAD( "p10.bin",  0x6000, 0x2000, CRC(55b14a36) SHA1(7d5566a6ba285af92ddf560efda60a79f1da84c2) ) /* Same as Mad Crasher, but different label */
 	ROM_LOAD( "p9.bin",   0x8000, 0x2000, CRC(e3c8c2cb) SHA1(b3e39eacd2609ff0fa0f511bff0fc83e6b3970d4) ) /* Same as Mad Crasher, but different label */
 
@@ -4207,7 +4207,7 @@ ROM_START( madcrush )
 	ROM_LOAD( "p14.k1",    0x4000, 0x2000, CRC(07e807bc) SHA1(f651d3a5394ced8e0a1b2be3aa52b3e5a5d84c37) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )
-	ROM_LOAD( "m3-prom.j3",  0x000, 0x400, CRC(d19e8a91) SHA1(b21fbdb8ed8d0b27c3ec78cf2e115624f69c67e0) ) /* These 3 bproms are located on the A2003 UP01-03 PCB */
+	ROM_LOAD( "m3-prom.j3",  0x000, 0x400, CRC(d19e8a91) SHA1(b21fbdb8ed8d0b27c3ec78cf2e115624f69c67e0) ) /* These 3 bproms are located on the A2003 UP02-03 PCB */
 	ROM_LOAD( "m2-prom.j4",  0x400, 0x400, CRC(9fc325af) SHA1(a180662f168ba001376f25f5d9205cb119c1ffee) )
 	ROM_LOAD( "m1-prom.j5",  0x800, 0x400, CRC(07678443) SHA1(267951886d8b031dd633dc4823d9bd862a585437) )
 ROM_END
