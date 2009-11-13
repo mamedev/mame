@@ -59,6 +59,15 @@ static WRITE8_HANDLER( findout_bitmap_w )
 	if (mask & 0x01) *BITMAP_ADDR16(tmpbitmap, sy, sx+7) = (bits & 0x01) ? fg : bg;
 }
 
+static PALETTE_INIT(findout)
+{
+	int i;
+
+	for (i = 0; i < 8; i++ )
+	{
+		palette_set_color(machine, i, MAKE_RGB(pal1bit(i >> 2), pal1bit(i), pal1bit(i >> 1)));
+	}
+}
 
 static READ8_DEVICE_HANDLER( portC_r )
 {
@@ -460,7 +469,8 @@ static MACHINE_DRIVER_START( findout )
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(48, 511-48, 16, 255-16)
 
-	MDRV_PALETTE_LENGTH(256)
+	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_INIT(findout)
 
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)

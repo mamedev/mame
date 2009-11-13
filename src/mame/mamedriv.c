@@ -8622,8 +8622,11 @@ Other Sun games
 	DRIVER( quiz211 )	/* (c) 1986 Italian bootleg */
 	DRIVER( jokpoker )	/* (c) 1982 Greyhound Electronics */
 	DRIVER( jokpokera )	/* (c) 1982 Greyhound Electronics */
+	DRIVER( jokpokerb )
+	DRIVER( jokpokerc )
 	DRIVER( superbwl )	/* (c) 1982 Greyhound Electronics */
 	DRIVER( amuse )		/* (c) 1982 Greyhound Electronics */
+	DRIVER( amuse1 )	/* (c) 1982 Greyhound Electronics */
 	DRIVER( gs4002 )	/* (c) 1982 G.E.I. */
 	DRIVER( gs4002a )	/* (c) 1982 G.E.I. */
 	DRIVER( gepoker )	/* (c) 1984 Greyhound Electronics */
@@ -8639,6 +8642,9 @@ Other Sun games
 	DRIVER( gtsersb )	/* (c) 1985 Greyhound Electronics */
 	DRIVER( sextriv1 )	/* (c) 1985 Kinky Kit and Game Co. */
 	DRIVER( sextriv2 )	/* (c) 1985 Kinky Kit and Game Co. */
+	DRIVER( geimulti )	/* (c) 1992 Grayhound Electronics */
+	DRIVER( sprtauth )	/* (c) 1982 Classic Games */
+	DRIVER( suprpokr )	
 	DRIVER( dribling )	/* (c) 1983 Model Racing */
 	DRIVER( driblingo )	/* (c) 1983 Olympia */
 	DRIVER( ace )		/* [1976 Allied Leisure] */
