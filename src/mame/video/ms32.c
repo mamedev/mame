@@ -89,10 +89,10 @@ static TILE_GET_INFO( get_ms32_extra_tile_info )
 {
 	int tileno,colour;
 
-	tileno = f1superb_extraram_16[tile_index *2+1]   & 0xffff;
-	colour = f1superb_extraram_16[tile_index *2] & 0x000f;
+	tileno = f1superb_extraram_16[tile_index *2]   & 0xffff;
+	colour = f1superb_extraram_16[tile_index *2+1] & 0x000f;
 
-	SET_TILE_INFO(4,tileno,colour,0);
+	SET_TILE_INFO(4,tileno,colour+0x50,0);
 }
 
 

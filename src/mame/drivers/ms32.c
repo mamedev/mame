@@ -330,6 +330,18 @@ extern tilemap* ms32_extra_tilemap;
 static WRITE16_HANDLER( ms32_extra_w16 )  { COMBINE_DATA(&f1superb_extraram_16[offset]); tilemap_mark_tile_dirty(ms32_extra_tilemap,offset/2); }
 static READ16_HANDLER(  ms32_extra_r16 )  { return f1superb_extraram_16[offset]; }
 
+static void irq_raise(running_machine *machine, int level);
+
+static WRITE32_HANDLER( ms32_irq2_guess_w )
+{
+	irq_raise(space->machine, 2);
+}
+
+static WRITE32_HANDLER( ms32_irq5_guess_w )
+{
+	irq_raise(space->machine, 5);
+}
+
 static ADDRESS_MAP_START( f1superb_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ(ms32_read_inputs3)
 
@@ -337,17 +349,122 @@ static ADDRESS_MAP_START( f1superb_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfce00200, 0xfce0021f) AM_RAM // regs?
 	AM_RANGE(0xfce00800, 0xfce0085f) AM_RAM // regs?
 
-	AM_RANGE(0xfce00e00, 0xfce00e03) AM_NOP // writes 02 often
+	/* these two are almost certainly wrong, they just let you see what
+	   happens if you generate the FPU ints without breaking other games */
+	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE(ms32_irq5_guess_w)
+	AM_RANGE(0xfd0f0000, 0xfd0f0003) AM_WRITE(ms32_irq2_guess_w)
 
-	AM_RANGE(0xfd0f0000, 0xfd0f0003) AM_NOP // writes 00 often
+	AM_RANGE(0xfd100000, 0xfd103fff) AM_RAM // used when you start enabling fpu ints
+ 	AM_RANGE(0xfd104000, 0xfd105fff) AM_RAM // uploads data here
 
- 	AM_RANGE(0xfd104000, 0xfd105fff) AM_RAM
- 	AM_RANGE(0xfd144000, 0xfd145fff) AM_RAM AM_READWRITE16(ms32_extra_r16, ms32_extra_w16, 0x0000ffff)
- 	AM_RANGE(0xfdc00000, 0xfdc006ff) AM_RAM 
-	AM_RANGE(0xfde00000, 0xfde01fff) AM_RAM  
+	AM_RANGE(0xfd140000, 0xfd143fff) AM_RAM // used when you start enabling fpu ints
+	AM_RANGE(0xfd144000, 0xfd145fff) AM_RAM // same data here
+
+ 	AM_RANGE(0xfdc00000, 0xfdc007ff) AM_RAM AM_READWRITE16(ms32_extra_r16, ms32_extra_w16, 0x0000ffff) // definitely line ram
+	AM_RANGE(0xfde00000, 0xfde01fff) AM_RAM // scroll info for lineram?
 
 	AM_IMPORT_FROM(ms32_map)
 ADDRESS_MAP_END
+
+/* F1 Super Battle speculation from nuapete
+
+Hi David,
+
+I had a first look at f1superb, this is what I found so far.
+
+The sprite RAM is updated in a few places, but taking one of the
+sprite RAM updating routines at 0xFFE47B6F which is used to draw stuff
+that should move around, I see that the information is copied from
+buffers with these bases:
+FEE11000 = x position data
+FEE11100 = y position data
+FEE11200 = priority etc data
+
+You already spotted that loop at FFE19D1C that fills the "y position"
+buffer from an array of static values. The buffers are refilled again
+by the routine at 0xFFE17581. You can see that the data is sourced
+from another buffer at 0xFD100000 (currently not mapped in the driver,
+but I mapped it in for testing...)
+
+If you backtrace that call, it comes from irq 5 and 7. (They have
+identical ISR code) so I tried adding in a trigger for irq 7. Now the
+values are populated, and stuff moves, but everything moves way too
+much, it's all over the place, eventually the car zooms off up into
+the sky. It gets clearer as you map less and less of the RAM at
+0xFD100000. With just 1K or so mapped, you can see the buildings in
+the background veer about in quite a promising manner. (The patch you
+put in loses effect with irq 5 or 7 hooked up, because they repopulate
+the Y coords too.)
+
+I took a closer look at the interrupts. Handily enough they left some
+strings in the ROM with names for each interrupt  :)  They aren't quite
+in the order of the interrupts, but I matched the unreferenced strings
+up to the valid interrupts as well as I could and then tried to
+confirm them by looking at the code. The ROM string is in quotes.
+
+FFE00DE8  ; irq_0  probably "1msec interrupt"
+FFE00DF4  ; irq_1  "sound cpu interrupt"
+FFE00878  ; irq_2  probably "fpu 1-1 interrupt"
+FFE00884  ; irq_3  unused and labelled "fpu 0-1 interrupt"
+FFE00898  ; irq_4  unused and labelled "fpu 1-0 interrupt"
+FFE008AC  ; irq_5  probably "fpu 0-0 interrupt", x coords (and y) populated from here
+FFE008D0  ; irq_6  unused and labelled "option 2 interrupt"
+FFE008E4  ; irq_7  same as 5 - probably "option 1 interrupt"
+FFE01034  ; irq_9  VBL at 60Hz this would be "16msec interrupt"
+FFE01094  ; irq_10 loads of processing in the 0xfc000000 area : must be "32msec interrupt"
+FFE00E14  ; irq_11 "communication interrupt"
+
+irq_0 is sort of confirmed by the "hayaosi2 needs at least 12 IRQ
+0..." comment. irq_1 I see is already known. irq_9 is known, irq_10 I
+tried halving the frequency it runs at, no effect. irq_11 can be
+pretty much confirmed as comms by the code there and the use of
+MOVT/MOVZ to i/o with 16 bit device based at FEE00000, so that leaves
+the ones that do the sprite info loading, this is where it starts to
+look less promising  :( 
+
+Between irqs 2,3,4,5,7 the only unused strings in the ROM are the four "fpu
+* interrupt" and the "option 1".
+Irqs 2,5,7 all do "or.w    #6, FD1424C8[PC]" ,so they are all probably
+"fpu * interrupt".
+
+I'm thinking that the stuff is dumped in that RAM at 0xFD100000 that's
+not used by other games and then some FPU operation is carried out on it
+before it's grabbed by the sprite copy code. The "option" stuff, may be
+they tried a few different ways to work out the sprite coords? There's
+one more intersting string at 0xFFE481FC referenced from unused code
+at 0xFFE47FBC. It looks like debugging dump of sprite coordinate and
+angle information.
+
+I had a scout around for photos or anything of the PCB to see if there
+is some sort of DSP or FPU on it, but I can't find anything useful. I
+suspect it's not a generic MegaSystem 32 PCB, going by the extra
+stuff, and also the IRQ 5/7 breaks the other games. I see a vanilla
+one for sale, but I'd guess there's no point me picking it up for a
+closer look because it won't have whatever the extras are.
+
+I'll keep looking a bit more, but I think that 0xFD100000 buffer is
+processed by something external that triggers irq 5 or 7 when it's
+done. I might see something obvious by looking at the values in
+fact... I'd be interested to know what you think, or if there's any
+chance of finding out if there's stuff like dual port RAM or something
+that might qualify as a FPU?
+
+
+Hi David,
+
+On the f1superb stuff, I've traced the sprite elements right back to
+the arrays for each race track in ROM that they are sourced from. The
+only processing they get is in that "fpu" interrupt. I've figured out
+the structure of the "fpu" device, it uses two arrays of static info
+loaded from the ROM at boot, two identical sets of registers, and 4
+banks of volatile data read in every frame or so from the ROM race
+track arrays (although it looks like one was not used in the end).
+There's a sequence of four operations ivolving the "fpu" carried out
+to prepare the info which then gets copied back to RAM and then to
+sprite RAM. I'll capture the relevant info and see if I can figure out
+what the operations might be, my maths isn't up to much though...
+
+*/
 
 //  AM_RANGE(0xfce00800, 0xfce0085f) // f1superb, roz #2 control?
 ///**/AM_RANGE(0xfd104000, 0xfd105fff) AM_RAM /* f1superb */
@@ -1087,7 +1204,7 @@ static GFXDECODE_START( f1superb )
 	GFXDECODE_ENTRY( "gfx2", 0, bglayout,     0x2000, 0x10 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     0x1000, 0x10 )
 	GFXDECODE_ENTRY( "gfx4", 0, txlayout,     0x6000, 0x10 )
-	GFXDECODE_ENTRY( "gfx5", 0, f1layout,     0x2000, 0x10 ) // not tilemap data?
+	GFXDECODE_ENTRY( "gfx5", 0, f1layout,     0x0000, 0x100 ) // not tilemap data?
 GFXDECODE_END
 
 
