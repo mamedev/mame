@@ -46,9 +46,6 @@ Notes:
 
 */
 
-/* set to 1 for real screen size - two more tile columns on right side = black(title)/garbage(game) */
-#define ladyfrog_scr_size 0
-
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
@@ -242,7 +239,10 @@ static INPUT_PORTS_START( toucheme )
 	PORT_INCLUDE( ladyfrog )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_A ) )  PORT_DIPLOCATION("SW1:7,8")
@@ -253,7 +253,9 @@ static INPUT_PORTS_START( toucheme )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
 INPUT_PORTS_END
 
@@ -307,11 +309,8 @@ static MACHINE_DRIVER_START( ladyfrog )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
-#if ladyfrog_scr_size
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 29*8-1)
-#else
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 27*8-1)
-#endif
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 29*8-1) // black borders in ladyfrog gameplay are correct
+
 
 	MDRV_GFXDECODE(ladyfrog)
 	MDRV_PALETTE_LENGTH(512)
