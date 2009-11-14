@@ -9,8 +9,8 @@ Notes:
  this is actually the m68k C compiler used for doing this game.
 
 TODO:
--Correct NVRAM emulation (and default eeprom too?);
--Doesn't accept coins? (likely to be related to the eeprom);
+-Correct NVRAM emulation (and default eeprom too?), you cannot save settings to the EEPROM
+ right now, also remove the patch (it doesn't boot otherwise);
 -UART;
 
 *******************************************************************************************/
@@ -98,9 +98,11 @@ static READ16_HANDLER( jackpool_io_r )
 		case 0x18: return input_port_read(space->machine,"HOLD5");
 		case 0x1a: return input_port_read(space->machine,"START1");
 		case 0x1c: return input_port_read(space->machine,"BET");
-     	case 0x2c: break;//return mame_rand(space->machine);//eeprom_read_bit();
-     	case 0x2e: break;//return mame_rand(space->machine);//eeprom_read_bit();
-		default: printf("R %02x\n",offset*2); break;
+		case 0x1e: return 0xff; //ticket motor
+		case 0x20: return 0xff; //hopper motor
+     	case 0x2c: return eeprom_read_bit();
+     	case 0x2e: return eeprom_read_bit();
+//		default: printf("R %02x\n",offset*2); break;
 	}
 
 //  printf("R %02x\n",offset*2);
@@ -123,10 +125,12 @@ static WRITE16_HANDLER( jackpool_io_w )
 		case 0x3e: break;
 		case 0x40: /* ---- ---x PAYOUT lamp */ break;
 		case 0x46: /* ---- ---x coin counter */break;
+		case 0x4a: /* ---- ---x Ticket motor */break;
+		case 0x4c: /* ---- ---x Hopper motor */break;
 		case 0x4e: map_vreg = data & 1;        break;
-//		case 0x50: eeprom_set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
-//		case 0x52: eeprom_set_clock_line((data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
-//		case 0x54: eeprom_write_bit(data & 1); break;
+		case 0x50: eeprom_set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
+		case 0x52: eeprom_set_clock_line((data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
+		case 0x54: eeprom_write_bit(data & 1); break;
 //		case 0x5a: eeprom_set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
 //		case 0x5c: eeprom_set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
 		case 0x60: break;
@@ -181,25 +185,25 @@ static INPUT_PORTS_START( jackpool )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("START1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_CODE(KEYCODE_1) PORT_NAME("Deal / W-Up")
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("START2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("BET")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet / Cancel")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet / Cancel / Take")
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("HOLD1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("HOLD2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / Low")
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("HOLD3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("HOLD4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / High")
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("HOLD5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
@@ -279,4 +283,12 @@ ROM_START( jackpool )
 	ROM_LOAD( "jpc7", 0xc0000, 0x40000,  CRC(b1d40623) SHA1(fb76ae6b53474bd4bee19dbce9537da0f2b63ff4) )
 ROM_END
 
-GAME( 1997, jackpool, 0, jackpool, jackpool, 0, ROT0, "Electronic Projects", "Jackpot Cards / Jackpot Pool (Italy)",GAME_NOT_WORKING )
+static DRIVER_INIT( jackpool )
+{
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+
+	/* patch NVRAM routine */
+	rom[0x9040/2] = 0x6602;
+}
+
+GAME( 1997, jackpool, 0, jackpool, jackpool, jackpool, ROT0, "Electronic Projects", "Jackpot Cards / Jackpot Pool (Italy)",GAME_NOT_WORKING )
