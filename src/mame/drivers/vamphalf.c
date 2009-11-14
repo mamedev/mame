@@ -1207,7 +1207,7 @@ ROM1 & ROM2 are both ST 27c4000D
 */
 
 ROM_START( wyvernwg )
-	ROM_REGION32_BE( 0x100000, "user1", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "rom1.bin", 0x000000, 0x080000, CRC(66bf3a5c) SHA1(037d5e7a6ef6f5b4ac08a9c811498c668a9d2522) )
 	ROM_LOAD( "rom2.bin", 0x080000, 0x080000, CRC(fd9b5911) SHA1(a01e8c6e5a9009024af385268ba3ba90e1ebec50) )
 
@@ -1346,7 +1346,7 @@ SW2 is the setup button
 */
 
 ROM_START( finalgdr ) /* version 2.20.5915, Korea only */
-	ROM_REGION32_BE( 0x100000, "user1", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* rom0 empty */
 	ROM_LOAD( "rom1", 0x080000, 0x080000, CRC(45815931) SHA1(80ba7a366994e40a1f520ea18fad82e6b068b279) )
 
