@@ -85,50 +85,37 @@ NOTE: Series 8 and above are version 1.03a (currently in findout.c)
 #include "sound/dac.h"
 
 static UINT8 drawctrl[3];
-static UINT8 drawctrl_bgcolor = 0;
+static UINT8 color[8];
 
 static WRITE8_HANDLER( getrivia_drawctrl_w )
 {
 	drawctrl[offset] = data;
-
-	if (offset==2 && drawctrl[1]==0xff)
+	if (offset == 2)
 	{
-		drawctrl_bgcolor = drawctrl[0];
+		int i;
+		for (i = 0; i < 8; i++)
+			if (BIT(drawctrl[1],i)) color[i] = drawctrl[0] & 7;
 	}
 }
 
 static WRITE8_HANDLER( getrivia_bitmap_w )
 {
 	int sx,sy;
-	int fg,bg,mask,bits;
 	static int prevoffset, yadd;
+	int i;
 
 	videoram[offset] = data;
 
 	yadd = (offset==prevoffset) ? (yadd+1):0;
 	prevoffset = offset;
 
-	fg = drawctrl[0] & 7;
-	bg = drawctrl_bgcolor & 7;
-	mask = 0xff;//drawctrl[2];
-	bits = drawctrl[1];
-
 	sx = 8 * (offset % 64);
 	sy = offset / 64;
 	sy = (sy + yadd) & 0xff;
 
 
-//if (mask != bits)
-//  popmessage("color %02x bits %02x mask %02x\n",fg,bits,mask);
-
-	if (mask & 0x80) *BITMAP_ADDR16(tmpbitmap, sy, sx+0) = (bits & 0x80) ? fg : bg;
-	if (mask & 0x40) *BITMAP_ADDR16(tmpbitmap, sy, sx+1) = (bits & 0x40) ? fg : bg;
-	if (mask & 0x20) *BITMAP_ADDR16(tmpbitmap, sy, sx+2) = (bits & 0x20) ? fg : bg;
-	if (mask & 0x10) *BITMAP_ADDR16(tmpbitmap, sy, sx+3) = (bits & 0x10) ? fg : bg;
-	if (mask & 0x08) *BITMAP_ADDR16(tmpbitmap, sy, sx+4) = (bits & 0x08) ? fg : bg;
-	if (mask & 0x04) *BITMAP_ADDR16(tmpbitmap, sy, sx+5) = (bits & 0x04) ? fg : bg;
-	if (mask & 0x02) *BITMAP_ADDR16(tmpbitmap, sy, sx+6) = (bits & 0x02) ? fg : bg;
-	if (mask & 0x01) *BITMAP_ADDR16(tmpbitmap, sy, sx+7) = (bits & 0x01) ? fg : bg;
+	for (i = 0; i < 8; i++)
+		*BITMAP_ADDR16(tmpbitmap, sy, sx+i) = color[8-i-1]; 
 }
 
 static PALETTE_INIT(getrivia)
