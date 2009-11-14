@@ -187,14 +187,13 @@ static WRITE8_DEVICE_HANDLER( lamps2_w )
 
 static WRITE8_DEVICE_HANDLER( nmi_w )
 {
-//	const address_space *space = cputag_get_address_space(device->machine, "cpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "cpu", ADDRESS_SPACE_PROGRAM);
 
 	/* bit 4 - play/raise button lamp, lamp 9 in selection test mode  */
 	set_led_status(8,data & 0x10);
 
 	/* bit 6 enables NMI */
-	/* there seems to be no NMI enable on board, and jokpokera doesn't register coins if nmi is disabled here */
-	/*	interrupt_enable_w(space, 0, data & 0x40); */
+	interrupt_enable_w(space, 0, data & 0x40);
 }
 
 static WRITE8_HANDLER( banksel_1_1_w )
@@ -686,6 +685,18 @@ static MACHINE_DRIVER_START( gselect )
 
 	MDRV_PPI8255_RECONFIG( "ppi8255_0", gselect_ppi8255_intf[0] )
 	MDRV_PPI8255_RECONFIG( "ppi8255_1", gselect_ppi8255_intf[1] )
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( jokpokera )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(getrivia)
+
+	MDRV_CPU_MODIFY("cpu")
+	MDRV_CPU_PROGRAM_MAP(gselect_map)
+
+	MDRV_MACHINE_RESET(gselect)
+	MDRV_PPI8255_RECONFIG( "ppi8255_0", gselect_ppi8255_intf[0] )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( amuse )
@@ -1184,9 +1195,9 @@ static DRIVER_INIT( geimulti )
 }
 
 GAME( 1982, jokpoker, 0,        gselect,  gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03B)",            GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, jokpokera,jokpoker, gselect,  gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03BI)",           GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, jokpokerb,jokpoker, gselect,  gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.04BI 10-19-88, Joker Poker ICB 9-30-86)",  GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, jokpokerc,jokpoker, gselect,  gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03BI 5-10-85, Poker No Raise ICB 9-30-86)",  GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, jokpokera,jokpoker, jokpokera,gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03BI)",           GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, jokpokerb,jokpoker, jokpokera,gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.04BI 10-19-88, Joker Poker ICB 9-30-86)",  GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, jokpokerc,jokpoker, jokpokera,gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03BI 5-10-85, Poker No Raise ICB 9-30-86)",  GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1982, superbwl, 0,        gselect,  gselect,  setbank, ROT0, "Greyhound Electronics", "Super Bowl (Version 16.03B)",             GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1982, gs4002,   0,        gselect,  gselect,  0,       ROT0, "Greyhound Electronics", "Selection (Version 40.02TMB, set 1)",     GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
