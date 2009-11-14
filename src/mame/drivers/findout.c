@@ -20,10 +20,16 @@ replaced by a 6th button to start games. This is a feature of the PCB for privat
 
 
 static UINT8 drawctrl[3];
+static UINT8 drawctrl_bgcolor = 0;
 
 static WRITE8_HANDLER( findout_drawctrl_w )
 {
 	drawctrl[offset] = data;
+
+	if (offset==2 && drawctrl[1]==0xff)
+	{
+		drawctrl_bgcolor = drawctrl[0];
+	}
 }
 
 static WRITE8_HANDLER( findout_bitmap_w )
@@ -38,7 +44,7 @@ static WRITE8_HANDLER( findout_bitmap_w )
 	prevoffset = offset;
 
 	fg = drawctrl[0] & 7;
-	bg = 2;
+	bg = drawctrl_bgcolor & 7;
 	mask = 0xff;//drawctrl[2];
 	bits = drawctrl[1];
 
@@ -46,6 +52,7 @@ static WRITE8_HANDLER( findout_bitmap_w )
 	sy = offset / 64;
 	sy = (sy + yadd) & 0xff;
 
+	logerror("bitmap_w: offset = %04x, x = %d, y = %d\n", offset, sx, sy );
 //if (mask != bits)
 //  popmessage("color %02x bits %02x mask %02x\n",fg,bits,mask);
 
