@@ -187,7 +187,7 @@ static WRITE8_DEVICE_HANDLER( lamps2_w )
 
 static WRITE8_DEVICE_HANDLER( nmi_w )
 {
-	const address_space *space = cputag_get_address_space(device->machine, "cpu", ADDRESS_SPACE_PROGRAM);
+//	const address_space *space = cputag_get_address_space(device->machine, "cpu", ADDRESS_SPACE_PROGRAM);
 
 	/* bit 4 - play/raise button lamp, lamp 9 in selection test mode  */
 	set_led_status(8,data & 0x10);
