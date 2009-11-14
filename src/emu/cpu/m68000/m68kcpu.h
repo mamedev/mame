@@ -81,8 +81,9 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 #define CPU_TYPE_EC030  (0x00000020)
 #define CPU_TYPE_030    (0x00000040)
 #define CPU_TYPE_EC040  (0x00000080)
-#define CPU_TYPE_040    (0x00000100)
-#define CPU_TYPE_SCC070 (0x00000200)
+#define CPU_TYPE_LC040  (0x00000100)
+#define CPU_TYPE_040    (0x00000200)
+#define CPU_TYPE_SCC070 (0x00000400)
 
 /* Different ways to stop the CPU */
 #define STOP_LEVEL_STOP 1

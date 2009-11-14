@@ -95,6 +95,11 @@ static UINT8 READ_EA_8(m68ki_cpu_core *m68k, int ea)
 		{
 			switch (reg)
 			{
+				case 0:		// (xxx).W
+				{
+					UINT32 ea = (UINT32)OPER_I_16(m68k);
+					return m68ki_read_8(m68k, ea);
+				}
 				case 1:		// (xxx).L
 				{
 					UINT32 d1 = OPER_I_16(m68k);
@@ -146,6 +151,11 @@ static UINT16 READ_EA_16(m68ki_cpu_core *m68k, int ea)
 		{
 			switch (reg)
 			{
+				case 0:		// (xxx).W
+				{
+					UINT32 ea = (UINT32)OPER_I_16(m68k);
+					return m68ki_read_16(m68k, ea);
+				}
 				case 1:		// (xxx).L
 				{
 					UINT32 d1 = OPER_I_16(m68k);
@@ -203,6 +213,11 @@ static UINT32 READ_EA_32(m68ki_cpu_core *m68k, int ea)
 		{
 			switch (reg)
 			{
+				case 0:		// (xxx).W
+				{
+					UINT32 ea = (UINT32)OPER_I_16(m68k);
+					return m68ki_read_32(m68k, ea);
+				}
 				case 1:		// (xxx).L
 				{
 					UINT32 d1 = OPER_I_16(m68k);
@@ -225,6 +240,63 @@ static UINT32 READ_EA_32(m68ki_cpu_core *m68k, int ea)
 		}
 		default:	fatalerror("MC68040: READ_EA_32: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
 	}
+	return 0;
+}
+
+static UINT64 READ_EA_64(m68ki_cpu_core *m68k, int ea)
+{
+	int mode = (ea >> 3) & 0x7;
+	int reg = (ea & 0x7);
+	UINT32 h1, h2;
+
+	switch (mode)
+	{
+		case 2:		// (An)
+		{
+			UINT32 ea = REG_A[reg];
+			h1 = m68ki_read_32(m68k, ea+0);
+			h2 = m68ki_read_32(m68k, ea+4);
+			return  (UINT64)(h1) << 32 | (UINT64)(h2);
+		}
+		case 3:		// (An)+
+		{
+			UINT32 ea = REG_A[reg];
+			REG_A[reg] += 8;
+			h1 = m68ki_read_32(m68k, ea+0);
+			h2 = m68ki_read_32(m68k, ea+4);
+			return  (UINT64)(h1) << 32 | (UINT64)(h2);
+		}
+		case 5:		// (d16, An)
+		{
+			UINT32 ea = EA_AY_DI_32(m68k);
+			h1 = m68ki_read_32(m68k, ea+0);
+			h2 = m68ki_read_32(m68k, ea+4);
+			return  (UINT64)(h1) << 32 | (UINT64)(h2);
+		}
+		case 7:
+		{
+			switch (reg)
+			{
+				case 4:		// #<data>
+				{
+					h1 = OPER_I_32(m68k);
+					h2 = OPER_I_32(m68k);
+					return  (UINT64)(h1) << 32 | (UINT64)(h2);
+				}
+				case 2:		// (d16, PC)
+				{
+					UINT32 ea = EA_PCDI_32(m68k);
+					h1 = m68ki_read_32(m68k, ea+0);
+					h2 = m68ki_read_32(m68k, ea+4);
+					return  (UINT64)(h1) << 32 | (UINT64)(h2);
+				}
+				default:	fatalerror("MC68040: READ_EA_64: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
+			}
+			break;
+		}
+		default:	fatalerror("MC68040: READ_EA_64: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
+	}
+
 	return 0;
 }
 
@@ -376,6 +448,11 @@ static void WRITE_EA_32(m68ki_cpu_core *m68k, int ea, UINT32 data)
 			REG_D[reg] = data;
 			break;
 		}
+		case 1:		// An
+		{
+			REG_A[reg] = data;
+			break;
+		}
 		case 2:		// (An)
 		{
 			UINT32 ea = REG_A[reg];
@@ -430,63 +507,6 @@ static void WRITE_EA_32(m68ki_cpu_core *m68k, int ea, UINT32 data)
 		}
 		default:	fatalerror("MC68040: WRITE_EA_32: unhandled mode %d, reg %d, data %08X at %08X\n", mode, reg, data, REG_PC);
 	}
-}
-
-static UINT64 READ_EA_64(m68ki_cpu_core *m68k, int ea)
-{
-	int mode = (ea >> 3) & 0x7;
-	int reg = (ea & 0x7);
-	UINT32 h1, h2;
-
-	switch (mode)
-	{
-		case 2:		// (An)
-		{
-			UINT32 ea = REG_A[reg];
-			h1 = m68ki_read_32(m68k, ea+0);
-			h2 = m68ki_read_32(m68k, ea+4);
-			return  (UINT64)(h1) << 32 | (UINT64)(h2);
-		}
-		case 3:		// (An)+
-		{
-			UINT32 ea = REG_A[reg];
-			REG_A[reg] += 8;
-			h1 = m68ki_read_32(m68k, ea+0);
-			h2 = m68ki_read_32(m68k, ea+4);
-			return  (UINT64)(h1) << 32 | (UINT64)(h2);
-		}
-		case 5:		// (d16, An)
-		{
-			UINT32 ea = EA_AY_DI_32(m68k);
-			h1 = m68ki_read_32(m68k, ea+0);
-			h2 = m68ki_read_32(m68k, ea+4);
-			return  (UINT64)(h1) << 32 | (UINT64)(h2);
-		}
-		case 7:
-		{
-			switch (reg)
-			{
-				case 4:		// #<data>
-				{
-					h1 = OPER_I_32(m68k);
-					h2 = OPER_I_32(m68k);
-					return  (UINT64)(h1) << 32 | (UINT64)(h2);
-				}
-				case 2:		// (d16, PC)
-				{
-					UINT32 ea = EA_PCDI_32(m68k);
-					h1 = m68ki_read_32(m68k, ea+0);
-					h2 = m68ki_read_32(m68k, ea+4);
-					return  (UINT64)(h1) << 32 | (UINT64)(h2);
-				}
-				default:	fatalerror("MC68040: READ_EA_64: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
-			}
-			break;
-		}
-		default:	fatalerror("MC68040: READ_EA_64: unhandled mode %d, reg %d at %08X\n", mode, reg, REG_PC);
-	}
-
-	return 0;
 }
 
 static void WRITE_EA_64(m68ki_cpu_core *m68k, int ea, UINT64 data)

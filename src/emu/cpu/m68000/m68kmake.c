@@ -3,7 +3,7 @@
 /* ======================================================================== */
 /*
  *                                  MUSASHI
- *                                Version 4.10
+ *                                Version 4.55
  *
  * A portable Motorola M680x0 processor emulation engine.
  * Copyright Karl Stenerud.  All rights reserved.
@@ -55,7 +55,7 @@
  */
 
 
-static const char g_version[] = "4.10";
+static const char g_version[] = "4.55";
 
 /* ======================================================================== */
 /* =============================== INCLUDES =============================== */
@@ -767,7 +767,7 @@ static void write_body(FILE* filep, body_struct* body, replace_struct* replace)
 			}
 			/* Found a directive with no matching replace string */
 			if(!found)
-				error_exit("Unknown " ID_BASE " directive");
+				error_exit("Unknown " ID_BASE " directive [%s]", output);
 		}
 		fprintf(filep, "%s\n", output);
 	}
