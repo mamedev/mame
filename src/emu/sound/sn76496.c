@@ -44,6 +44,10 @@
   for the taps), and added R->OldNoise to simulate the extra 0 that is always
   output before the noise LFSR contents are after an LFSR reset.
   This fixes SN76489/A to match chips. Added SN94624.
+  
+  14/11/2009 : Lord Nightmare
+  Removed STEP mess, vastly simplifying the code. Made output bipolar rather
+  than always above the 0 line.
 
   TODO: * Implement a function for setting stereo regs for the game gear.
           Requires making the core support both mono and stereo, and have
