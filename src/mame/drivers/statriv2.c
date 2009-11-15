@@ -274,16 +274,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( statriv2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x28, 0x2b) AM_READ(question_data_r) AM_WRITEONLY AM_BASE(&question_offset)
-	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE("tms", tms9927_r, tms9927_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( statusbj_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE("tms", tms9927_r, tms9927_w)
 ADDRESS_MAP_END
 
@@ -591,7 +591,7 @@ static MACHINE_DRIVER_START( statriv2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, MASTER_CLOCK/8)
+	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

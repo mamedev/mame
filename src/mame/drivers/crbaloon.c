@@ -160,7 +160,7 @@ static READ8_HANDLER( pc3259_r )
 static WRITE8_HANDLER( port_sound_w )
 {
 	const device_config *discrete = devtag_get_device(space->machine, "discrete");
-	const device_config *sn = devtag_get_device(space->machine, "sn");
+	const device_config *sn = devtag_get_device(space->machine, "snsnd");
 
 	/* D0 - interrupt enable - also goes to PC3259 as /HTCTRL */
 	cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), (data & 0x01) ? TRUE : FALSE);

@@ -98,7 +98,7 @@ extern const ym2203_interface seibu_ym2203_interface;
 #define SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(freq1,freq2)			\
 	MDRV_SPEAKER_STANDARD_MONO("mono")								\
 																	\
-	MDRV_SOUND_ADD("ym", YM3812, freq1)								\
+	MDRV_SOUND_ADD("ymsnd", YM3812, freq1)								\
 	MDRV_SOUND_CONFIG(seibu_ym3812_interface)						\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)						\
 																	\
@@ -109,7 +109,7 @@ extern const ym2203_interface seibu_ym2203_interface;
 #define SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(freq1,freq2)		\
 	MDRV_SPEAKER_STANDARD_MONO("mono")								\
 																	\
-	MDRV_SOUND_ADD("ym", YM3812, freq1)								\
+	MDRV_SOUND_ADD("ymsnd", YM3812, freq1)								\
 	MDRV_SOUND_CONFIG(seibu_ym3812_interface)						\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)						\
 																	\
@@ -120,7 +120,7 @@ extern const ym2203_interface seibu_ym2203_interface;
 #define SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(freq1,freq2)			\
 	MDRV_SPEAKER_STANDARD_MONO("mono")								\
 																	\
-	MDRV_SOUND_ADD("ym", YM2151, freq1)								\
+	MDRV_SOUND_ADD("ymsnd", YM2151, freq1)								\
 	MDRV_SOUND_CONFIG(seibu_ym2151_interface)						\
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)								\
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)								\
@@ -133,7 +133,7 @@ extern const ym2203_interface seibu_ym2203_interface;
 #define SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(freq1,freq2,regiona, regionb)		\
 	MDRV_SPEAKER_STANDARD_MONO("mono")								\
 																	\
-	MDRV_SOUND_ADD("ym", YM2151, freq1)								\
+	MDRV_SOUND_ADD("ymsnd", YM2151, freq1)								\
 	MDRV_SOUND_CONFIG(seibu_ym2151_interface)						\
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)								\
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)								\

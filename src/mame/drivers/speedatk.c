@@ -198,8 +198,8 @@ static ADDRESS_MAP_START( speedatk_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x24, 0x24) AM_WRITE(watchdog_reset_w)  //watchdog
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	//what's 60-6f for? Seems used only in attract mode...
 ADDRESS_MAP_END
 
@@ -345,7 +345,7 @@ static MACHINE_DRIVER_START( speedatk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, MASTER_CLOCK/4) //divider is unknown
+	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/4) //divider is unknown
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END

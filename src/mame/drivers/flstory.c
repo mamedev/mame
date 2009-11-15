@@ -233,7 +233,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_3_w ) /* unknown */
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE("msm", msm5232_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_DEVWRITE("msm", sound_control_0_w)
 	AM_RANGE(0xce00, 0xce00) AM_DEVWRITE("msm", sound_control_1_w)
@@ -643,7 +643,7 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("ay", sound_control_2_w),
+	DEVCB_DEVICE_HANDLER("aysnd", sound_control_2_w),
 	DEVCB_HANDLER(sound_control_3_w)
 };
 
@@ -689,7 +689,7 @@ static MACHINE_DRIVER_START( flstory )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, XTAL_8MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_8MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
@@ -746,7 +746,7 @@ static MACHINE_DRIVER_START( onna34ro )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 8000000/4)
+	MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
@@ -803,7 +803,7 @@ static MACHINE_DRIVER_START( victnine )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 8000000/4)
+	MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

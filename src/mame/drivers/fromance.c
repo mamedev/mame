@@ -302,7 +302,7 @@ static ADDRESS_MAP_START( nekkyoku_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe6, 0xe6) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
 	AM_RANGE(0xe7, 0xe7) AM_DEVWRITE("msm", fromance_adpcm_reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0xe9, 0xea) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0xe9, 0xea) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( idolmj_sub_io_map, ADDRESS_SPACE_IO, 8 )
@@ -316,7 +316,7 @@ static ADDRESS_MAP_START( idolmj_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
 	AM_RANGE(0x27, 0x27) AM_DEVWRITE("msm", fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0x29, 0x2a) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0x29, 0x2a) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_sub_io_map, ADDRESS_SPACE_IO, 8 )
@@ -330,7 +330,7 @@ static ADDRESS_MAP_START( fromance_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
 	AM_RANGE(0x27, 0x27) AM_DEVWRITE("msm", fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0x2a, 0x2b) AM_DEVWRITE("ym", ym2413_w)
+	AM_RANGE(0x2a, 0x2b) AM_DEVWRITE("ymsnd", ym2413_w)
 ADDRESS_MAP_END
 
 
@@ -1002,7 +1002,7 @@ static MACHINE_DRIVER_START( nekkyoku )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 12000000/6)
+	MDRV_SOUND_ADD("aysnd", AY8910, 12000000/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
@@ -1040,7 +1040,7 @@ static MACHINE_DRIVER_START( idolmj )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 12000000/6)
+	MDRV_SOUND_ADD("aysnd", AY8910, 12000000/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
@@ -1078,7 +1078,7 @@ static MACHINE_DRIVER_START( fromance )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)

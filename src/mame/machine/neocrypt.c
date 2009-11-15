@@ -1469,8 +1469,8 @@ NeoGeo 'V' (PCM) ROM encryption
 /* Neo-Pcm2 Drivers for Encrypted V Roms */
 void neo_pcm2_snk_1999(running_machine *machine, int value)
 {	/* thanks to Elsemi for the NEO-PCM2 info */
-	UINT16 *rom = (UINT16 *)memory_region(machine, "ym");
-	int size = memory_region_length(machine, "ym");
+	UINT16 *rom = (UINT16 *)memory_region(machine, "ymsnd");
+	int size = memory_region_length(machine, "ymsnd");
 	int i, j;
 
 	if( rom != NULL )
@@ -1509,7 +1509,7 @@ void neo_pcm2_swap(running_machine *machine, int value)
 		{0xcb,0x29,0x7d,0x43,0xd2,0x3a,0xc2,0xb4},
 		{0x4b,0xa4,0x63,0x46,0xf0,0x91,0xea,0x62},
 		{0x4b,0xa4,0x63,0x46,0xf0,0x91,0xea,0x62}};
-	UINT8 *src = memory_region(machine, "ym");
+	UINT8 *src = memory_region(machine, "ymsnd");
 	UINT8 *buf = alloc_array_or_die(UINT8, 0x1000000);
 	int i, j, d;
 

@@ -231,7 +231,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("upd", twin16_upd_reset_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("upd", upd7759_port_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("upd", twin16_upd_start_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREAD("upd", twin16_upd_busy_r)	// miaj writes 0 to it
@@ -752,7 +752,7 @@ static MACHINE_DRIVER_START( twin16 )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, 7159160/2)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 7159160/2)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -807,7 +807,7 @@ static MACHINE_DRIVER_START( fround )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, 7159160/2)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 7159160/2)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 

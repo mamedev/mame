@@ -119,7 +119,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x80, 0x81) AM_READWRITE(soundlatch_r, vigilant_sample_addr_w)	/* STL / STH */
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE("dac", m72_sample_w)			/* COUNT UP */
 	AM_RANGE(0x83, 0x83) AM_WRITE(m72_sound_irq_ack_w)	/* IRQ clear */
@@ -556,7 +556,7 @@ static MACHINE_DRIVER_START( vigilant )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579645)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 3579645)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.55)
@@ -658,7 +658,7 @@ static MACHINE_DRIVER_START( kikcubic )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579645)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 3579645)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.55)

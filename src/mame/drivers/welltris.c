@@ -397,7 +397,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(welltris_sh_bankswitch_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ym", ym2610_r, ym2610_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x10, 0x10) AM_READ(soundlatch_r)
 	AM_RANGE(0x18, 0x18) AM_WRITE(pending_command_clear_w)
 ADDRESS_MAP_END
@@ -743,7 +743,7 @@ static MACHINE_DRIVER_START( welltris )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2610, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 0.75)
@@ -783,7 +783,7 @@ ROM_START( welltris )
 	ROM_REGION( 0x080000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "lh534j11.126", 0x00000, 0x80000, CRC(bf85fb0d) SHA1(358f91bbff2d3260f83b5a0422c0d985d1735cef) )
 
-	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "lh534j09.123", 0x00000, 0x80000, CRC(6c2ce9a5) SHA1(a4011ecfb505191c9934ba374933cd11b331d55a) )
 	ROM_LOAD( "lh534j10.124", 0x80000, 0x80000, CRC(e3682221) SHA1(3e1cda07cf451955dc473eabe007854e5148ae27) )
 ROM_END
@@ -810,7 +810,7 @@ ROM_START( welltrisj )
 	ROM_REGION( 0x080000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "lh534j11.126", 0x00000, 0x80000, CRC(bf85fb0d) SHA1(358f91bbff2d3260f83b5a0422c0d985d1735cef) )
 
-	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "lh534j09.123", 0x00000, 0x80000, CRC(6c2ce9a5) SHA1(a4011ecfb505191c9934ba374933cd11b331d55a) )
 	ROM_LOAD( "lh534j10.124", 0x80000, 0x80000, CRC(e3682221) SHA1(3e1cda07cf451955dc473eabe007854e5148ae27) )
 ROM_END
@@ -839,7 +839,7 @@ ROM_START( quiz18k )
 	ROM_REGION( 0x040000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "ic126.bin", 0x00000, 0x40000, CRC(7a92fbc9) SHA1(c13be1e84fc8e74c85d25d3357e078bc9e264682) )
 
-	ROM_REGION( 0x140000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x140000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "ic123.bin", 0x00000, 0x80000, CRC(ee4995cf) SHA1(1b47938ddc87709f8d118b86fe62602972c77ced) )
 	ROM_LOAD( "ic124.bin", 0x80000, 0x40000, CRC(076f58c3) SHA1(bd78f39b85b2697e733896705355e21b8d2a141d) )
 ROM_END

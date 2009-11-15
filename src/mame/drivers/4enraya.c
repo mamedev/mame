@@ -85,7 +85,7 @@ static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x23, 0x23) AM_WRITE(sound_data_w)
-	AM_RANGE(0x33, 0x33) AM_DEVWRITE("ay", sound_control_w)
+	AM_RANGE(0x33, 0x33) AM_DEVWRITE("aysnd", sound_control_w)
 ADDRESS_MAP_END
 
 
@@ -180,7 +180,7 @@ static MACHINE_DRIVER_START( 4enraya )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8910, 8000000/4 /* guess */)
+	MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4 /* guess */)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

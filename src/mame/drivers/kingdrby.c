@@ -375,8 +375,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -720,7 +720,7 @@ static MACHINE_DRIVER_START( kingdrby )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, CLK_1/8)	/* guess */
+	MDRV_SOUND_ADD("aysnd", AY8910, CLK_1/8)	/* guess */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END

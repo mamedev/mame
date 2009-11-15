@@ -162,7 +162,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ym", ym3526_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_w)
 /*  AM_RANGE(0x04, 0x04) AM_READNOP    value read and *discarded*    */
@@ -467,7 +467,7 @@ static MACHINE_DRIVER_START( galivan )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3526, 8000000/2)
+	MDRV_SOUND_ADD("ymsnd", YM3526, 8000000/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("dac1", DAC, 0)
@@ -509,7 +509,7 @@ static MACHINE_DRIVER_START( ninjemak )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ym", YM3526, 8000000/2)
+	MDRV_SOUND_ADD("ymsnd", YM3526, 8000000/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("dac1", DAC, 0)

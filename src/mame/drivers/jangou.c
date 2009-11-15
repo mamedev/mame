@@ -360,8 +360,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu0_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
 	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
@@ -431,8 +431,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntrygrl_cpu0_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
 	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
@@ -788,7 +788,7 @@ static MACHINE_DRIVER_START( jangou )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, MASTER_CLOCK / 16)
+	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 16)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 

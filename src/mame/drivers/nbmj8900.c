@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( ohpaipee_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x60, 0x60) AM_WRITE(nbmj8900_romsel_w)
 	AM_RANGE(0x70, 0x70) AM_WRITE(nbmj8900_scrolly_w)
 
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ym", ym3812_r,ym3812_w)
+	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ymsnd", ym3812_r,ym3812_w)
 
 	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r)
 
@@ -353,7 +353,7 @@ static MACHINE_DRIVER_START( ohpaipee )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, 2500000)
+	MDRV_SOUND_ADD("ymsnd", YM3812, 2500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)

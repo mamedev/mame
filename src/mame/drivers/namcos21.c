@@ -1408,7 +1408,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( am_sound_winrun, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(6) /* banked */
 	AM_RANGE(0x3000, 0x3003) AM_WRITENOP /* ? */
-	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ym", ym2151_r,ym2151_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2151_r,ym2151_w)
 	AM_RANGE(0x5000, 0x6fff) AM_DEVREADWRITE("c140", c140_r,c140_w)
 	AM_RANGE(0x7000, 0x77ff) AM_READWRITE(namcos2_dualportram_byte_r,namcos2_dualportram_byte_w) AM_BASE(&mpDualPortRAM)
 	AM_RANGE(0x7800, 0x7fff) AM_READWRITE(namcos2_dualportram_byte_r,namcos2_dualportram_byte_w) /* mirror */
@@ -1582,7 +1582,7 @@ static MACHINE_DRIVER_START( poly_c140_typeA )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579580)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 3579580)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_DRIVER_END
@@ -1597,7 +1597,7 @@ static MACHINE_DRIVER_START( poly_c140_typeB )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579580)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 3579580)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_DRIVER_END
@@ -1652,7 +1652,7 @@ static MACHINE_DRIVER_START( driveyes )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579580)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 3579580)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_DRIVER_END
@@ -1710,7 +1710,7 @@ static MACHINE_DRIVER_START( winrun_c140_typeB )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579580)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 3579580)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_DRIVER_END

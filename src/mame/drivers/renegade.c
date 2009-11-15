@@ -559,7 +559,7 @@ static ADDRESS_MAP_START( renegade_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_r)
 	AM_RANGE(0x1800, 0x1800) AM_WRITENOP // this gets written the same values as 0x2000
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(adpcm_play_w)
-	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ym", ym3526_r,ym3526_w)
+	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym3526_r,ym3526_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITENOP /* adpcm related? stereo pan? */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -807,7 +807,7 @@ static MACHINE_DRIVER_START( renegade )
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3526, 12000000/4)
+	MDRV_SOUND_ADD("ymsnd", YM3526, 12000000/4)
 	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

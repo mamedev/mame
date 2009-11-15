@@ -417,8 +417,8 @@ static ADDRESS_MAP_START( dunhuang_io_map, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE( 0x001b, 0x001b ) AM_WRITE( dunhuang_block_dest_w )
 
-	AM_RANGE( 0x0081, 0x0081 ) AM_DEVWRITE( "ym", ym2413_register_port_w	)
-	AM_RANGE( 0x0089, 0x0089 ) AM_DEVWRITE( "ym", ym2413_data_port_w		)
+	AM_RANGE( 0x0081, 0x0081 ) AM_DEVWRITE( "ymsnd", ym2413_register_port_w	)
+	AM_RANGE( 0x0089, 0x0089 ) AM_DEVWRITE( "ymsnd", ym2413_data_port_w		)
 
 //  AM_RANGE( 0x0082, 0x0082 ) AM_WRITE( dunhuang_82_w )
 
@@ -699,7 +699,7 @@ static MACHINE_DRIVER_START( dunhuang )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("ay8910", AY8910, 12000000/8)

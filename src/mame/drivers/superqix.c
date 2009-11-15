@@ -584,8 +584,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pbillian_port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE(&paletteram)
-	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x0408, 0x0408) AM_READ(pbillian_from_mcu_r)
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(pbillian_z80_mcu_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(pbillian_0410_w)
@@ -597,8 +597,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotsmash_port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE(&paletteram)
-	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x0408, 0x0408) AM_READ(hotsmash_from_mcu_r)
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(hotsmash_z80_mcu_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(pbillian_0410_w)
@@ -1052,7 +1052,7 @@ static MACHINE_DRIVER_START( pbillian )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 12000000/8)
+	MDRV_SOUND_ADD("aysnd", AY8910, 12000000/8)
 	MDRV_SOUND_CONFIG(pbillian_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
@@ -1088,7 +1088,7 @@ static MACHINE_DRIVER_START( hotsmash )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 12000000/8)
+	MDRV_SOUND_ADD("aysnd", AY8910, 12000000/8)
 	MDRV_SOUND_CONFIG(hotsmash_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 

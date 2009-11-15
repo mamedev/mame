@@ -372,13 +372,13 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
 
 	if (BIT(upd7807_portc,5) && !BIT(data,5))	/* write clock 1->0 */
 	{
-		const device_config *device = devtag_get_device(space->machine, "ym");
+		const device_config *device = devtag_get_device(space->machine, "ymsnd");
 		ym2203_w(device, BIT(data,3), upd7807_porta);
 	}
 
 	if (BIT(upd7807_portc,4) && !BIT(data,4))	/* read clock 1->0 */
 	{
-		const device_config *device = devtag_get_device(space->machine, "ym");
+		const device_config *device = devtag_get_device(space->machine, "ymsnd");
 		upd7807_porta = ym2203_r(device, BIT(data,3));
 	}
 
@@ -527,7 +527,7 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 	coin_counter_w(0,~data & 0x80);
 
 	if (BIT(upd7807_portc,5) && !BIT(data,5))	/* clock 1->0 */
-		sn76496_w(devtag_get_device(space->machine, "sn"),0,upd7807_porta);
+		sn76496_w(devtag_get_device(space->machine, "snsnd"),0,upd7807_porta);
 
 	upd7807_portc = data;
 }
@@ -579,7 +579,7 @@ static ADDRESS_MAP_START( mrokumei_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(mrokumei_blitter_start_w)	// in some games also ROM bank switch to access service ROM
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(mrokumei_keyboard_select_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(mrokumei_sound_cmd_w)
-	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE("sn", sn76496_w)
+	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE("snsnd", sn76496_w)
 	AM_RANGE(0x8006, 0x8006) AM_WRITE(homedata_blitter_param_w)
 	AM_RANGE(0x8007, 0x8007) AM_WRITE(mrokumei_blitter_bank_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -1198,7 +1198,7 @@ static MACHINE_DRIVER_START( mrokumei )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn", SN76489A, 16000000/4)     // SN76489AN actually
+	MDRV_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
@@ -1266,7 +1266,7 @@ static MACHINE_DRIVER_START( reikaids )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 3000000)
+	MDRV_SOUND_ADD("ymsnd", YM2203, 3000000)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 0.25)
@@ -1317,7 +1317,7 @@ static MACHINE_DRIVER_START( pteacher )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn", SN76489A, 16000000/4)     // SN76489AN actually
+	MDRV_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)

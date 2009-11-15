@@ -399,12 +399,12 @@ static ADDRESS_MAP_START( turbofrc_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(aerofgt_sh_bankswitch_w)
 	AM_RANGE(0x14, 0x14) AM_READWRITE(soundlatch_r, pending_command_clear_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ym", ym2610_r, ym2610_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aerofgt_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ym", ym2610_r, ym2610_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(aerofgt_sh_bankswitch_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(pending_command_clear_w)
 	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_r)
@@ -422,7 +422,7 @@ static ADDRESS_MAP_START( wbbc97_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
-	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ym", ym3812_w)
+	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ymsnd", ym3812_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_NOP
 	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -1336,7 +1336,7 @@ static MACHINE_DRIVER_START( pspikes )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2610, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -1462,7 +1462,7 @@ static MACHINE_DRIVER_START( karatblz )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2610, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -1501,7 +1501,7 @@ static MACHINE_DRIVER_START( spinlbrk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2610, XTAL_8MHz)	/* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -1540,7 +1540,7 @@ static MACHINE_DRIVER_START( turbofrc )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2610, XTAL_8MHz)	/* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -1580,7 +1580,7 @@ static MACHINE_DRIVER_START( aerofgtb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2610, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -1620,7 +1620,7 @@ static MACHINE_DRIVER_START( aerofgt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2610, XTAL_8MHz)	/* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -1719,7 +1719,7 @@ static MACHINE_DRIVER_START( wbbc97 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM3812, 3579545)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -1754,7 +1754,7 @@ ROM_START( pspikes )
 	ROM_REGION( 0x40000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "a47",          0x00000, 0x40000, CRC(c6779dfa) SHA1(ea7adefdb0da02755428aac9a6f86c908fc11253) )
 
-	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "o5b",          0x000000, 0x100000, CRC(07d6cbac) SHA1(d3d5778dbaca7b6cdceae959d0847d56df7b5cc1) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
@@ -1779,7 +1779,7 @@ ROM_START( pspikesk )
 	ROM_REGION( 0x40000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "a47",          0x00000, 0x40000, CRC(c6779dfa) SHA1(ea7adefdb0da02755428aac9a6f86c908fc11253) )
 
-	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "o5b",          0x000000, 0x100000, CRC(07d6cbac) SHA1(d3d5778dbaca7b6cdceae959d0847d56df7b5cc1) )
 
 	ROM_REGION( 0x0400, "plds", 0 )
@@ -1805,7 +1805,7 @@ ROM_START( svolly91 )
 	ROM_REGION( 0x40000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "a47",          0x00000, 0x40000, CRC(c6779dfa) SHA1(ea7adefdb0da02755428aac9a6f86c908fc11253) )
 
-	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "o5b",          0x000000, 0x100000, CRC(07d6cbac) SHA1(d3d5778dbaca7b6cdceae959d0847d56df7b5cc1) )
 ROM_END
 
@@ -1988,7 +1988,7 @@ ROM_START( spinlbrk )
 
 	/* no "ym.deltat" */
 
-	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "ic166",        0x000000, 0x80000, CRC(6e0d063a) SHA1(313983e69f9625814de033fef7f6e9564694117a) )
 	ROM_LOAD( "ic163",        0x080000, 0x80000, CRC(e6621dfb) SHA1(85ee77c4720b7eb20ecf293c16b3105c8dcb1114) )	//FIRST AND SECOND HALF IDENTICAL
 
@@ -2038,7 +2038,7 @@ ROM_START( spinlbrku )
 
 	/* no "ym.deltat" */
 
-	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "ic166",        0x000000, 0x80000, CRC(6e0d063a) SHA1(313983e69f9625814de033fef7f6e9564694117a) )
 	ROM_LOAD( "ic163",        0x080000, 0x80000, CRC(e6621dfb) SHA1(85ee77c4720b7eb20ecf293c16b3105c8dcb1114) )	//FIRST AND SECOND HALF IDENTICAL
 
@@ -2088,7 +2088,7 @@ ROM_START( spinlbrkj )
 
 	/* no "ym.deltat" */
 
-	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "ic166",        0x000000, 0x80000, CRC(6e0d063a) SHA1(313983e69f9625814de033fef7f6e9564694117a) )
 	ROM_LOAD( "ic163",        0x080000, 0x80000, CRC(e6621dfb) SHA1(85ee77c4720b7eb20ecf293c16b3105c8dcb1114) )	//FIRST AND SECOND HALF IDENTICAL
 
@@ -2129,7 +2129,7 @@ ROM_START( karatblz )
 	ROM_REGION( 0x080000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "u105.gh8",     0x000000, 0x080000, CRC(7a68cb1b) SHA1(1bdd0000c2d68019b9e5bf8f7ad84a6ae1af8443) )
 
-	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "u104",         0x000000, 0x100000, CRC(5795e884) SHA1(a4178497ad0a1e60ceb87612b218d77b36d2a11b) )
 ROM_END
 
@@ -2161,7 +2161,7 @@ ROM_START( karatblzu )
 	ROM_REGION( 0x080000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "u105.gh8",     0x000000, 0x080000, CRC(7a68cb1b) SHA1(1bdd0000c2d68019b9e5bf8f7ad84a6ae1af8443) )
 
-	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "u104",         0x000000, 0x100000, CRC(5795e884) SHA1(a4178497ad0a1e60ceb87612b218d77b36d2a11b) )
 ROM_END
 
@@ -2193,7 +2193,7 @@ ROM_START( karatblzj )
 	ROM_REGION( 0x080000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "u105.gh8",     0x000000, 0x080000, CRC(7a68cb1b) SHA1(1bdd0000c2d68019b9e5bf8f7ad84a6ae1af8443) )
 
-	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "u104",         0x000000, 0x100000, CRC(5795e884) SHA1(a4178497ad0a1e60ceb87612b218d77b36d2a11b) )
 ROM_END
 
@@ -2228,7 +2228,7 @@ ROM_START( turbofrc )
 	ROM_REGION( 0x20000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "tfrcu180.bin",   0x00000, 0x20000, CRC(39c7c7d5) SHA1(66ee9f7cbc18ffab2c70f77ab0edead6bb018ca9) )
 
-	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "tfrcu179.bin", 0x000000, 0x100000, CRC(60ca0333) SHA1(28b94edc98d360386759780ccd1122d43ffa5279) )
 ROM_END
 
@@ -2253,7 +2253,7 @@ ROM_START( aerofgt )
 	ROM_REGION( 0x40000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-01",     0x00000, 0x40000, CRC(6d42723d) SHA1(57c59234e9925430a4c687733682efed06d7eed1) )
 
-	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-06",     0x000000, 0x100000, CRC(cdbbdb1d) SHA1(067c816545f246ff1fd4c821d70df1e7eb47938c) )
 ROM_END
 
@@ -2283,7 +2283,7 @@ ROM_START( aerofgtb )
 	ROM_REGION( 0x40000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-01",     0x00000, 0x40000, CRC(6d42723d) SHA1(57c59234e9925430a4c687733682efed06d7eed1) )
 
-	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-06",     0x000000, 0x100000, CRC(cdbbdb1d) SHA1(067c816545f246ff1fd4c821d70df1e7eb47938c) )
 ROM_END
 
@@ -2314,7 +2314,7 @@ ROM_START( aerofgtc )
 	ROM_REGION( 0x40000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-01",     0x00000, 0x40000, CRC(6d42723d) SHA1(57c59234e9925430a4c687733682efed06d7eed1) )
 
-	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-06",     0x000000, 0x100000, CRC(cdbbdb1d) SHA1(067c816545f246ff1fd4c821d70df1e7eb47938c) )
 ROM_END
 
@@ -2345,7 +2345,7 @@ ROM_START( sonicwi )
 	ROM_REGION( 0x40000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-01",     0x00000, 0x40000, CRC(6d42723d) SHA1(57c59234e9925430a4c687733682efed06d7eed1) )
 
-	ROM_REGION( 0x100000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-06",     0x000000, 0x100000, CRC(cdbbdb1d) SHA1(067c816545f246ff1fd4c821d70df1e7eb47938c) )
 ROM_END
 

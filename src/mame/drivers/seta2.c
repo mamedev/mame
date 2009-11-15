@@ -549,8 +549,8 @@ static WRITE16_HANDLER( seta2_sound_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *ROM = memory_region( space->machine, "x1" );
-		int banks = (memory_region_length( space->machine, "x1" ) - 0x100000) / 0x20000;
+		UINT8 *ROM = memory_region( space->machine, "x1snd" );
+		int banks = (memory_region_length( space->machine, "x1snd" ) - 0x100000) / 0x20000;
 		if (data >= banks)
 		{
 			logerror("CPU #0 PC %06X: invalid sound bank %04X\n",cpu_get_pc(space->cpu),data);
@@ -587,7 +587,7 @@ static ADDRESS_MAP_START( grdians_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")				// Coins
 	AM_RANGE(0x70000c, 0x70000d) AM_READ(watchdog_reset16_r)		// Watchdog
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(grdians_lockout_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)		// Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
 	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM								// cleared
@@ -649,7 +649,7 @@ static ADDRESS_MAP_START( gundamex_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("IN1")				// P2
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(grdians_lockout_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
 	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM								// cleared
@@ -710,7 +710,7 @@ static ADDRESS_MAP_START( mj4simai_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600300, 0x600301) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")				// DSW 2
 	AM_RANGE(0x600300, 0x60030f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)	// Video Registers
@@ -733,7 +733,7 @@ static ADDRESS_MAP_START( myangel_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700300, 0x700301) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0x700302, 0x700303) AM_READ_PORT("DSW2")				// DSW 2
 	AM_RANGE(0x700310, 0x70031f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)		// Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)				// Video Registers
@@ -756,7 +756,7 @@ static ADDRESS_MAP_START( myangel2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600300, 0x600301) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")				// DSW 2
 	AM_RANGE(0x600300, 0x60030f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xd00000, 0xd3ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)		// Sprites
 	AM_RANGE(0xd40000, 0xd4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
 	AM_RANGE(0xd60000, 0xd6003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs	)			// Video Registers
@@ -804,7 +804,7 @@ static ADDRESS_MAP_START( pzlbowl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)		// Sprites
 	AM_RANGE(0x840000, 0x84ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
 	AM_RANGE(0x860000, 0x86003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)				// Video Registers
-	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)		// TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -830,7 +830,7 @@ static ADDRESS_MAP_START( penbros_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)		// Sprites
 	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
 	AM_RANGE(0xb60000, 0xb6003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs	)
-	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)		// TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -874,7 +874,7 @@ static ADDRESS_MAP_START( samshoot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x840000, 0x84ffff ) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
 	AM_RANGE( 0x860000, 0x86003f ) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)	// Video Registers
 
-	AM_RANGE( 0x900000, 0x903fff ) AM_DEVREADWRITE( "x1", seta_sound_word_r, seta_sound_word_w	)	// Sound
+	AM_RANGE( 0x900000, 0x903fff ) AM_DEVREADWRITE( "x1snd", seta_sound_word_r, seta_sound_word_w	)	// Sound
 
 	AM_RANGE( 0xfffd0a, 0xfffd0b ) AM_READ_PORT("DSW2")				// parallel data register (DSW 2)
 	AM_RANGE( 0xfffc00, 0xffffff ) AM_RAM_WRITE( tmp68301_regs_w) AM_BASE(&tmp68301_regs )	// TMP68301 Registers
@@ -2318,7 +2318,7 @@ static MACHINE_DRIVER_START( mj4simai )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 50000000/3)
+	MDRV_SOUND_ADD("x1snd", X1_010, 50000000/3)
 	MDRV_SOUND_CONFIG(x1_010_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -2530,7 +2530,7 @@ ROM_START( gundamex )
 	ROM_LOAD( "ka001008.u23",  0x1400000, 0x200000, CRC(db55a60a) SHA1(03d118c7284ca86219891c473e2a89489710ea27) )
 	ROM_FILL(                  0x1800000, 0x600000, 0 )	/* 6bpp instead of 8bpp */
 
-	ROM_REGION( 0x300000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x300000, "x1snd", 0 )	/* Samples */
 	/* Leave 1MB empty (addressable by the chip) */
 	ROM_LOAD( "ka001015.u28", 0x100000, 0x200000, CRC(ada2843b) SHA1(09d06026031bc7558da511c3c0e29187ea0a0099) )
 ROM_END
@@ -2559,7 +2559,7 @@ ROM_START( grdians )
 	ROM_LOAD( "u21.bin",  0x1e00000, 0x200000, CRC(6f95e466) SHA1(28482fad16a3ac9302f152d81552e6f84a44f3e4) )
 	ROM_CONTINUE(         0x1c00000, 0x200000 )
 
-	ROM_REGION( 0x200000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x200000, "x1snd", 0 )	/* Samples */
 	/* Leave 1MB empty (addressable by the chip) */
 	ROM_LOAD( "u32.bin", 0x100000, 0x100000, CRC(cf0f3017) SHA1(8376d3a674f71aec72f52c72758fbc53d9feb1a1) )
 ROM_END
@@ -2580,7 +2580,7 @@ ROM_START( mj4simai )
 	ROM_LOAD( "cha-02.u22",  0x1400000, 0x400000, CRC(f6346860) SHA1(4eebd3fa315b97964fa39b88224f9de7622ba881) )
 	ROM_FILL(                0x1800000, 0x800000, 0 )	/* 6bpp instead of 8bpp */
 
-	ROM_REGION( 0x500000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x500000, "x1snd", 0 )	/* Samples */
 	/* Leave 1MB empty (addressable by the chip) */
 	ROM_LOAD( "cha-07.u32",  0x100000, 0x400000, CRC(817519ee) SHA1(ed09740cdbf61a328f7b50eb569cf498fb749416) )
 ROM_END
@@ -2602,7 +2602,7 @@ ROM_START( myangel )
 	ROM_LOAD( "kq1-cg7.u21", 0xc00000, 0x200000, CRC(9f48382c) SHA1(80dfc33a55123b5d3cdb3ed97b43a527f0254d61) )
 	ROM_LOAD( "kq1-cg5.u17", 0xe00000, 0x200000, CRC(a4bc4516) SHA1(0eb11fa54d16bba1b96f9dd943a68949a3bb9a2f) )
 
-	ROM_REGION( 0x300000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x300000, "x1snd", 0 )	/* Samples */
 	/* Leave 1MB empty (addressable by the chip) */
 	ROM_LOAD( "kq1-snd.u32", 0x100000, 0x200000, CRC(8ca1b449) SHA1(f54096fb5400843af4879135c96760485b6cb319) )
 ROM_END
@@ -2624,7 +2624,7 @@ ROM_START( myangel2 )
 	ROM_LOAD( "kqs1-cg7.u21", 0x1200000, 0x200000, CRC(2c977904) SHA1(2589447f2471cdc414266b34aff552044c680d93) )
 	ROM_LOAD( "kqs1-cg3.u17", 0x1400000, 0x400000, CRC(de3b2191) SHA1(d7d6ea07b665cfd834747d3c0776b968ce03bc6a) )
 
-	ROM_REGION( 0x500000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x500000, "x1snd", 0 )	/* Samples */
 	/* Leave 1MB empty (addressable by the chip) */
 	ROM_LOAD( "kqs1-snd.u32", 0x100000, 0x400000, CRC(792a6b49) SHA1(341b4e8f248b5032217733bada32e353c67e3888) )
 ROM_END
@@ -2640,7 +2640,7 @@ ROM_START( pzlbowl )
 	ROM_LOAD( "kuc-u40.i00", 0x800000, 0x400000, CRC(7e49a2cf) SHA1(d24683addbc54515c33fb620ac500e6702bd9e17) )
 	ROM_LOAD( "kuc-u41.i00", 0xc00000, 0x400000, CRC(2febf19b) SHA1(8081ac590c0463529777b5e4817305a1a6f6ea41) )
 
-	ROM_REGION( 0x500000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x500000, "x1snd", 0 )	/* Samples */
 	/* Leave 1MB empty (addressable by the chip) */
 	ROM_LOAD( "kus-u18.i00", 0x100000, 0x400000, CRC(e2b1dfcf) SHA1(fb0b8be119531a1a27efa46ed7b86b05a37ed585) )
 ROM_END
@@ -2656,7 +2656,7 @@ ROM_START( penbros )
 	ROM_LOAD( "u40.bin", 0x800000, 0x400000, CRC(dc9e0a96) SHA1(c2c8ccf9039ee0e179b08fdd2d37f29899349cda) )
 	ROM_FILL(            0xc00000, 0x400000, 0 )	/* 6bpp instead of 8bpp */
 
-	ROM_REGION( 0x300000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x300000, "x1snd", 0 )	/* Samples */
 	/* Leave 1MB empty (addressable by the chip) */
 	ROM_LOAD( "u18.bin", 0x100000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
 ROM_END
@@ -2672,7 +2672,7 @@ ROM_START( deerhunt ) /* Deer Hunting USA V4.3 (11/1/2000) - The "E05" breaks ve
 	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
 	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
-	ROM_REGION( 0x500000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x500000, "x1snd", 0 )	/* Samples */
 	/* Leave 1MB empty (addressable by the chip) */
 	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
 ROM_END
@@ -2688,7 +2688,7 @@ ROM_START( deerhunta ) /* Deer Hunting USA V4.2 (xx/x/2000) */
 	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
 	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
-	ROM_REGION( 0x500000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x500000, "x1snd", 0 )	/* Samples */
 	/* Leave 1MB empty (addressable by the chip) */
 	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
 ROM_END
@@ -2704,7 +2704,7 @@ ROM_START( deerhuntb ) /* Deer Hunting USA V4.0 (6/15/2000) */
 	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
 	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
-	ROM_REGION( 0x500000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x500000, "x1snd", 0 )	/* Samples */
 	/* Leave 1MB empty (addressable by the chip) */
 	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
 ROM_END
@@ -2722,7 +2722,7 @@ ROM_START( deerhuntc ) /* Deer Hunting USA V2.x - No version number is printed t
 	ROM_LOAD( "as0903m01.u40", 0x1000000, 0x800000, CRC(e8ef81b3) SHA1(97666942ca6cca5b8ea6451314a2aaabad9e06ba) )
 	ROM_LOAD( "as0904m01.u41", 0x1800000, 0x800000, CRC(d0f97fdc) SHA1(776c9d42d03a9f61155521212305e1ed696eaf47) )
 
-	ROM_REGION( 0x500000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x500000, "x1snd", 0 )	/* Samples */
 	/* Leave 1MB empty (addressable by the chip) */
 	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
 ROM_END
@@ -2738,7 +2738,7 @@ ROM_START( turkhunt ) /* V1.0 is currently the only known version */
 	ROM_LOAD( "asx903m01.u40", 0x1000000, 0x800000, CRC(5f86c322) SHA1(5a72adb99eea176199f172384cb051e2b045ab94) )
 	ROM_LOAD( "asx904m01.u41", 0x1800000, 0x800000, CRC(c77e0b66) SHA1(0eba30e62e4bd38c198fa6cb69fb94d002ded77a) )
 
-	ROM_REGION( 0x500000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x500000, "x1snd", 0 )	/* Samples */
 	/* Leave 1MB empty (addressable by the chip) */
 	ROM_LOAD( "asx905m01.u18", 0x100000, 0x400000, CRC(8d9dd9a9) SHA1(1fc2f3688d2c24c720dca7357bca6bf5f4016c53) )
 ROM_END
@@ -2754,7 +2754,7 @@ ROM_START( wschamp ) /* Wing Shootiong Championship V2.00 (01/23/2002) */
 	ROM_LOAD( "as1003m01.u40", 0x1000000, 0x800000, CRC(89618858) SHA1(a8bd07f233482e8f5a256af7ff9577648eb58ef4) )
 	ROM_LOAD( "as1004m01.u41", 0x1800000, 0x800000, CRC(500c0909) SHA1(73ff27d46b9285f34a50a81c21c54437f21e1939) )
 
-	ROM_REGION( 0x500000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x500000, "x1snd", 0 )	/* Samples */
 	/* Leave 1MB empty (addressable by the chip) */
 	ROM_LOAD( "as1005m01.u18", 0x100000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
 ROM_END
@@ -2770,7 +2770,7 @@ ROM_START( wschampa ) /* Wing Shootiong Championship V1.01 */
 	ROM_LOAD( "as1003m01.u40", 0x1000000, 0x800000, CRC(89618858) SHA1(a8bd07f233482e8f5a256af7ff9577648eb58ef4) )
 	ROM_LOAD( "as1004m01.u41", 0x1800000, 0x800000, CRC(500c0909) SHA1(73ff27d46b9285f34a50a81c21c54437f21e1939) )
 
-	ROM_REGION( 0x500000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x500000, "x1snd", 0 )	/* Samples */
 	/* Leave 1MB empty (addressable by the chip) */
 	ROM_LOAD( "as1005m01.u18", 0x100000, 0x400000, CRC(e4b137b8) SHA1(4d8d15073c51f7d383282cc5755ae5b2eab6226c) )
 ROM_END
@@ -2786,7 +2786,7 @@ ROM_START( trophyh ) /* V1.0 is currently the only known version */
 	ROM_LOAD( "as1103m01.u40", 0x1000000, 0x800000, CRC(adf8a54e) SHA1(bb28bf219d18082246f7964851a5c49b9c0ba7f5) )
 	ROM_LOAD( "as1104m01.u41", 0x1800000, 0x800000, CRC(387882e9) SHA1(0fdd0c77dabd1066c6f3bd64e357236a76f524ab) )
 
-	ROM_REGION( 0x500000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x500000, "x1snd", 0 )	/* Samples */
 	/* Leave 1MB empty (addressable by the chip) */
 	ROM_LOAD( "as1105m01.u18", 0x100000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) )
 ROM_END

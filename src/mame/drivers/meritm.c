@@ -589,8 +589,8 @@ static ADDRESS_MAP_START( meritm_crt250_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_r, z80pio_w)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_r, z80pio_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
 ADDRESS_MAP_END
 
@@ -608,8 +608,8 @@ static ADDRESS_MAP_START( meritm_crt250_crt258_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_r, z80pio_w)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_r, z80pio_w)
 	AM_RANGE(0x60, 0x67) AM_READWRITE(pc16552d_0_r,pc16552d_0_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
 ADDRESS_MAP_END
 
@@ -635,8 +635,8 @@ static ADDRESS_MAP_START( meritm_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_r, z80pio_w)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_r, z80pio_w)
 	AM_RANGE(0x60, 0x67) AM_READWRITE(pc16552d_0_r,pc16552d_0_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_bank_w)
 ADDRESS_MAP_END
 
@@ -1006,7 +1006,7 @@ static MACHINE_DRIVER_START(meritm_crt250)
 
   /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8910, SYSTEM_CLK/12)
+	MDRV_SOUND_ADD("aysnd", AY8910, SYSTEM_CLK/12)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

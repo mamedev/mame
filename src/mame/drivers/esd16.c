@@ -269,7 +269,7 @@ static READ8_HANDLER( esd16_sound_command_r )
 
 static ADDRESS_MAP_START( multchmp_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ym", ym3812_w	)	// YM3812
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3812_w	)	// YM3812
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)	// M6295
 	AM_RANGE(0x03, 0x03) AM_READ(esd16_sound_command_r		)	// From Main CPU
 	AM_RANGE(0x04, 0x04) AM_WRITE(SMH_NOP					)	// ? $00, $30
@@ -555,7 +555,7 @@ static MACHINE_DRIVER_START( multchmp )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, 4000000)
+	MDRV_SOUND_ADD("ymsnd", YM3812, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)

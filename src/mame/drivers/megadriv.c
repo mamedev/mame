@@ -983,8 +983,8 @@ WRITE16_HANDLER( megadriv_vdp_w )
 		case 0x12:
 		case 0x14:
 		case 0x16:
-			if (ACCESSING_BITS_0_7) sn76496_w(devtag_get_device(space->machine, "sn"), 0, data & 0xff);
-			//if (ACCESSING_BITS_8_15) sn76496_w(devtag_get_device(space->machine, "sn"), 0, (data >>8) & 0xff);
+			if (ACCESSING_BITS_0_7) sn76496_w(devtag_get_device(space->machine, "snsnd"), 0, data & 0xff);
+			//if (ACCESSING_BITS_8_15) sn76496_w(devtag_get_device(space->machine, "snsnd"), 0, (data >>8) & 0xff);
 			break;
 
 		default:
@@ -1968,7 +1968,7 @@ static ADDRESS_MAP_START( megadriv_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram,megadriv_68k_write_z80_ram)
 	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8("ym", megadriv_68k_YM2612_read,megadriv_68k_YM2612_write, 0xffff)
+	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8("ymsnd", megadriv_68k_YM2612_read,megadriv_68k_YM2612_write, 0xffff)
 
 	AM_RANGE(0xa06000, 0xa06001) AM_WRITE(megadriv_68k_z80_bank_write)
 
@@ -2087,7 +2087,7 @@ static TIMER_CALLBACK( megadriv_z80_run_state )
 	{
 		devtag_reset( machine, "genesis_snd_z80" );
 		cputag_suspend( machine, "genesis_snd_z80", SUSPEND_REASON_HALT, 1 );
-		devtag_reset( machine, "ym" );
+		devtag_reset( machine, "ymsnd" );
 	}
 	else
 	{
@@ -2249,7 +2249,7 @@ static WRITE8_HANDLER( megadriv_z80_vdp_write )
 		case 0x13:
 		case 0x15:
 		case 0x17:
-			sn76496_w(devtag_get_device(space->machine, "sn"), 0, data);
+			sn76496_w(devtag_get_device(space->machine, "snsnd"), 0, data);
 			break;
 
 		default:
@@ -2280,7 +2280,7 @@ static WRITE8_HANDLER( z80_write_68k_banked_data )
 	else if (fulladdress == 0xc00011)
 	{
 		/* quite a few early games write here, most of the later ones don't */
-		sn76496_w(devtag_get_device(space->machine, "sn"), 0, data);
+		sn76496_w(devtag_get_device(space->machine, "snsnd"), 0, data);
 	}
 	else
 	{
@@ -2303,7 +2303,7 @@ static READ8_HANDLER( megadriv_z80_unmapped_read )
 
 static ADDRESS_MAP_START( megadriv_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK(1) AM_MIRROR(0x2000) // RAM can be accessed by the 68k
-	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("ym", ym2612_r,ym2612_w)
+	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("ymsnd", ym2612_r,ym2612_w)
 
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(megadriv_z80_z80_bank_w)
 	AM_RANGE(0x6001, 0x6001) AM_WRITE(megadriv_z80_z80_bank_w) // wacky races uses this address
@@ -2330,7 +2330,7 @@ static ADDRESS_MAP_START( md_bootleg_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram, megadriv_68k_write_z80_ram)
 	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8("ym", megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
+	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8("ymsnd", megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
 	AM_RANGE(0xa06000, 0xa06001) AM_WRITE(megadriv_68k_z80_bank_write)
 
 	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE(megadriv_68k_io_read, megadriv_68k_io_write)
@@ -6090,12 +6090,12 @@ MACHINE_DRIVER_START( megadriv )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2612, MASTER_CLOCK_NTSC/7) /* 7.67 MHz */
+	MDRV_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7) /* 7.67 MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK_NTSC/15)
+	MDRV_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK_NTSC/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_DRIVER_END
@@ -6134,12 +6134,12 @@ MACHINE_DRIVER_START( megadpal )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2612, MASTER_CLOCK_PAL/7) /* 7.67 MHz */
+	MDRV_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_PAL/7) /* 7.67 MHz */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK_PAL/15)
+	MDRV_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK_PAL/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_DRIVER_END
@@ -6402,7 +6402,7 @@ static WRITE8_HANDLER( z80_unmapped_w )
 /* sets the megadrive z80 to it's normal ports / map */
 void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine, const char* tag)
 {
-	const device_config *ym = devtag_get_device(machine, "ym");
+	const device_config *ym = devtag_get_device(machine, "ymsnd");
 
 	/* INIT THE PORTS *********************************************************************************************/
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_IO), 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);

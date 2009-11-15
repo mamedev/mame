@@ -110,7 +110,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE("upd", bingoc_play_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("upd", upd7759_port_w)
 #if !SOUND_TEST
@@ -153,7 +153,7 @@ static MACHINE_DRIVER_START( bingoc )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") //might just be mono...
 
-	MDRV_SOUND_ADD("ym", YM2151, 7159160/2)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 7159160/2)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 

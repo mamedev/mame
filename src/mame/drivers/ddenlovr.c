@@ -1613,10 +1613,10 @@ static ADDRESS_MAP_START( quiz365_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300286, 0x300287) AM_READ(ddenlovr_gfxrom_r)								// Video Chip
 
 	AM_RANGE(0x3002c0, 0x3002c1) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)// Sound
-	AM_RANGE(0x300300, 0x300303) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
+	AM_RANGE(0x300300, 0x300303) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0x300340, 0x30035f) AM_DEVREADWRITE8("rtc", msm6242_r, msm6242_w, 0x00ff)	// 6242RTC
-	AM_RANGE(0x300380, 0x300383) AM_DEVWRITE8("ay", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0x300384, 0x300385) AM_DEVREAD8("ay", ay8910_r, 0x00ff)
+	AM_RANGE(0x300380, 0x300383) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0x300384, 0x300385) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
 	AM_RANGE(0x3003c2, 0x3003c3) AM_DEVWRITE("oki", quiz365_oki_bank1_w)
 	AM_RANGE(0x3003ca, 0x3003cb) AM_WRITE(ddenlovr_blitter_irq_ack_w)					// Blitter irq acknowledge
 	AM_RANGE(0x3003cc, 0x3003cd) AM_DEVWRITE("oki", quiz365_oki_bank2_w)
@@ -1667,9 +1667,9 @@ static ADDRESS_MAP_START( ddenlvrj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300070, 0x300071) AM_READ(unk16_r)										// ? must be 78 on startup (not necessary in ddlover)
 	AM_RANGE(0x300080, 0x300083) AM_WRITE(ddenlovr_blitter_w)
 	AM_RANGE(0x300086, 0x300087) AM_READ(ddenlovr_gfxrom_r)								// Video Chip
-	AM_RANGE(0x3000c0, 0x3000c3) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
+	AM_RANGE(0x3000c0, 0x3000c3) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0x300100, 0x30011f) AM_DEVREADWRITE8("rtc", msm6242_r, msm6242_w, 0x00ff)	// 6242RTC
-	AM_RANGE(0x300140, 0x300143) AM_DEVWRITE8("ay", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0x300140, 0x300143) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x300180, 0x300181) AM_READ_PORT("P1")
 	AM_RANGE(0x300182, 0x300183) AM_READ_PORT("P2")
 	AM_RANGE(0x300184, 0x300185) AM_READ_PORT("SYSTEM")
@@ -1735,10 +1735,10 @@ static ADDRESS_MAP_START( ddenlvrk_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe00308, 0xe00309) AM_WRITE(ddenlovr_coincounter_0_w)							// Coin Counters
 	AM_RANGE(0xe0030c, 0xe0030d) AM_WRITE(ddenlovr_coincounter_1_w)							//
 
-	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
+	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8("rtc", msm6242_r,	msm6242_w, 0x00ff)		// 6242RTC
-	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("ay", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8("ay", ay8910_r, 0x00ff)
+	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
 	AM_RANGE(0xe00700, 0xe00701) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)	// Sound
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM														// RAM
 ADDRESS_MAP_END
@@ -1773,10 +1773,10 @@ static ADDRESS_MAP_START( ddenlovr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe00308, 0xe00309) AM_WRITE(ddenlovr_coincounter_0_w)							// Coin Counters
 	AM_RANGE(0xe0030c, 0xe0030d) AM_WRITE(ddenlovr_coincounter_1_w)							//
 
-	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
+	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8("rtc", msm6242_r, msm6242_w, 0x00ff)		// 6242RTC
-	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("ay", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8("ay", ay8910_r, 0x00ff)
+	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
 	AM_RANGE(0xe00700, 0xe00701) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)	// Sound
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM														// RAM
 ADDRESS_MAP_END
@@ -1847,9 +1847,9 @@ static ADDRESS_MAP_START( nettoqc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300070, 0x300071) AM_READ(unk16_r)											// ? must be 78 on startup (not necessary in ddlover)
 	AM_RANGE(0x300080, 0x300083) AM_WRITE(ddenlovr_blitter_w)
 	AM_RANGE(0x300086, 0x300087) AM_READ(ddenlovr_gfxrom_r)									// Video Chip
-	AM_RANGE(0x3000c0, 0x3000c3) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
+	AM_RANGE(0x3000c0, 0x3000c3) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0x300100, 0x30011f) AM_DEVREADWRITE8("rtc", msm6242_r, msm6242_w, 0x00ff)		// 6242RTC
-	AM_RANGE(0x300140, 0x300143) AM_DEVWRITE8("ay", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0x300140, 0x300143) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x300180, 0x300181) AM_READ_PORT("P1")
 	AM_RANGE(0x300182, 0x300183) AM_READ_PORT("P2")
 	AM_RANGE(0x300184, 0x300185) AM_READ_PORT("SYSTEM")
@@ -1909,7 +1909,7 @@ static ADDRESS_MAP_START( quizchq_portmap, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLO
 	AM_RANGE(0x22, 0x23) AM_READ(rongrong_input2_r)
 
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
-	AM_RANGE(0x60, 0x61) AM_DEVWRITE("ym", ym2413_w)
+	AM_RANGE(0x60, 0x61) AM_DEVWRITE("ymsnd", ym2413_w)
 
 	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w)
 	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w)
@@ -1944,7 +1944,7 @@ static ADDRESS_MAP_START( rongrong_portmap, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GL
 
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)	// 6242RTC
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
-	AM_RANGE(0x60, 0x61) AM_DEVWRITE("ym", ym2413_w)
+	AM_RANGE(0x60, 0x61) AM_DEVWRITE("ymsnd", ym2413_w)
 
 	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w)
 	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w)
@@ -2070,7 +2070,7 @@ static ADDRESS_MAP_START( mmpanic_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x60, 0x61) AM_WRITE(mmpanic_blitter_w)
 	AM_RANGE(0x63, 0x63) AM_READ(rongrong_gfxrom_r)	// Video Chip
 	AM_RANGE(0x64, 0x65) AM_WRITE(mmpanic_blitter2_w)
-	AM_RANGE(0x68, 0x68) AM_DEVWRITE("ay", ddenlovr_select_w)
+	AM_RANGE(0x68, 0x68) AM_DEVWRITE("aysnd", ddenlovr_select_w)
 	AM_RANGE(0x69, 0x69) AM_WRITE(mmpanic_lockout_w)
 	AM_RANGE(0x6a, 0x6a) AM_READ_PORT("IN0")
 	AM_RANGE(0x6b, 0x6b) AM_READ_PORT("IN1")
@@ -2100,9 +2100,9 @@ static ADDRESS_MAP_START( mmpanic_sound_portmap, ADDRESS_SPACE_IO, 8 )	ADDRESS_M
 	AM_RANGE(0x02, 0x02) AM_READ(SMH_NOP )		// read just before port 00
 	AM_RANGE(0x04, 0x04) AM_NOP					// read only once at the start
 	AM_RANGE(0x06, 0x06) AM_WRITENOP	// almost always 1, sometimes 0
-	AM_RANGE(0x08, 0x09) AM_DEVWRITE("ym", ym2413_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("ay", ay8910_data_w)
-	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0x08, 0x09) AM_DEVWRITE("ymsnd", ym2413_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("aysnd", ay8910_address_w)
 ADDRESS_MAP_END
 
 
@@ -2390,7 +2390,7 @@ static ADDRESS_MAP_START( hanakanz_portmap, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GL
 	AM_RANGE(0x93, 0x93) AM_WRITE(hanakanz_coincounter_w)
 	AM_RANGE(0x94, 0x94) AM_WRITE(hanakanz_keyb_w)
 	AM_RANGE(0x96, 0x96) AM_READ(hanakanz_rand_r)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ym", ym2413_w)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ymsnd", ym2413_w)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)	// 6242RTC
 ADDRESS_MAP_END
@@ -2405,7 +2405,7 @@ static ADDRESS_MAP_START( hkagerou_portmap, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GL
 	AM_RANGE(0x80, 0x80) AM_WRITE(hanakanz_blitter_data_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(hanakanz_palette_w)
 	AM_RANGE(0x83, 0x84) AM_READ(hanakanz_gfxrom_r)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ym", ym2413_w)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ymsnd", ym2413_w)
 	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb1, 0xb2) AM_READ(hanakanz_keyb_r)
 	AM_RANGE(0xb3, 0xb3) AM_WRITE(hanakanz_coincounter_w)
@@ -2443,7 +2443,7 @@ static ADDRESS_MAP_START( mjreach1_portmap, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GL
 	AM_RANGE(0x94, 0x94) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x95, 0x96) AM_READ(hanakanz_keyb_r)
 	AM_RANGE(0x97, 0x97) AM_WRITE(hanakanz_coincounter_w)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ym", ym2413_w)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ymsnd", ym2413_w)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)	// 6242RTC
 ADDRESS_MAP_END
@@ -2570,9 +2570,9 @@ static ADDRESS_MAP_START( mjchuuka_portmap, ADDRESS_SPACE_IO, 8 )	// 16 bit I/O
 	AM_RANGE(0x63, 0x63) AM_MIRROR(0xff00) AM_READ_PORT("DSW4")
 	AM_RANGE(0x64, 0x64) AM_MIRROR(0xff00) AM_READ_PORT("DSW5")		// DSW 1-4 high bits
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
-	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_DEVWRITE("ym", ym2413_w)
+	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_DEVWRITE("ymsnd", ym2413_w)
 	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)	// 6242RTC
-	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 
@@ -2678,10 +2678,10 @@ static ADDRESS_MAP_START( mjmyster_portmap, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GL
 	AM_RANGE(0x22, 0x22) AM_READ(mjmyster_coins_r)
 	AM_RANGE(0x23, 0x23) AM_READ(mjmyster_keyb_r)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
-	AM_RANGE(0x42, 0x43) AM_DEVWRITE("ym", ym2413_w)
-	AM_RANGE(0x44, 0x44) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x46, 0x46) AM_DEVWRITE("ay", ay8910_data_w)
-	AM_RANGE(0x48, 0x48) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0x42, 0x43) AM_DEVWRITE("ymsnd", ym2413_w)
+	AM_RANGE(0x44, 0x44) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x46, 0x46) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x48, 0x48) AM_DEVWRITE("aysnd", ay8910_address_w)
 	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)	// 6242RTC
 	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w)
 	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w)
@@ -2843,10 +2843,10 @@ static ADDRESS_MAP_START( hginga_portmap, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOB
 	AM_RANGE(0x03, 0x03) AM_READ(rongrong_gfxrom_r)
 	AM_RANGE(0x1c, 0x1c) AM_READNOP AM_WRITE(mjmyster_rambank_w)
 	AM_RANGE(0x1e, 0x1e) AM_WRITE(hginga_rombank_w)
-	AM_RANGE(0x22, 0x23) AM_DEVWRITE("ym", ym2413_w)
-	AM_RANGE(0x24, 0x24) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x26, 0x26) AM_DEVWRITE("ay", ay8910_data_w)
-	AM_RANGE(0x28, 0x28) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0x22, 0x23) AM_DEVWRITE("ymsnd", ym2413_w)
+	AM_RANGE(0x24, 0x24) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x26, 0x26) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x28, 0x28) AM_DEVWRITE("aysnd", ay8910_address_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(hginga_input_w)
 	AM_RANGE(0x41, 0x41) AM_WRITE(hginga_coins_w)
 	AM_RANGE(0x42, 0x42) AM_READ(hginga_coins_r)
@@ -2959,10 +2959,10 @@ static ADDRESS_MAP_START( hgokou_portmap, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOB
 	AM_RANGE(0x61, 0x61) AM_WRITE(hgokou_input_w)
 	AM_RANGE(0x62, 0x62) AM_READ(hgokou_input_r)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE("ym", ym2413_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x86, 0x86) AM_DEVWRITE("ay", ay8910_data_w)
-	AM_RANGE(0x88, 0x88) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE("ymsnd", ym2413_w)
+	AM_RANGE(0x84, 0x84) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x86, 0x86) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x88, 0x88) AM_DEVWRITE("aysnd", ay8910_address_w)
 	AM_RANGE(0xb0, 0xb0) AM_READ(hanakanz_rand_r)
 ADDRESS_MAP_END
 
@@ -3038,7 +3038,7 @@ static ADDRESS_MAP_START( hparadis_portmap, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GL
 	AM_RANGE(0x1c, 0x1c) AM_READ(hparadis_dsw_r)
 	AM_RANGE(0x1e, 0x1e) AM_WRITE(hparadis_select_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
-	AM_RANGE(0x60, 0x61) AM_DEVWRITE("ym", ym2413_w)
+	AM_RANGE(0x60, 0x61) AM_DEVWRITE("ymsnd", ym2413_w)
 	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w)
 	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w)
 	AM_RANGE(0x88, 0x8b) AM_WRITE(ddenlovr_transparency_pen_w)
@@ -3083,10 +3083,10 @@ static ADDRESS_MAP_START( mjmywrld_portmap, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GL
 	AM_RANGE(0x22, 0x22) AM_READ(mjmywrld_coins_r)
 	AM_RANGE(0x23, 0x23) AM_READ(mjmyster_keyb_r)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
-	AM_RANGE(0x42, 0x43) AM_DEVWRITE("ym", ym2413_w)
-	AM_RANGE(0x44, 0x44) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x46, 0x46) AM_DEVWRITE("ay", ay8910_data_w)
-	AM_RANGE(0x48, 0x48) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0x42, 0x43) AM_DEVWRITE("ymsnd", ym2413_w)
+	AM_RANGE(0x44, 0x44) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x46, 0x46) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x48, 0x48) AM_DEVWRITE("aysnd", ay8910_address_w)
 	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)	// 6242RTC
 	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w)
 	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w)
@@ -3184,10 +3184,10 @@ static ADDRESS_MAP_START( akamaru_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe00308, 0xe00309) AM_WRITE(ddenlovr_coincounter_0_w)							// Coin Counters
 	AM_RANGE(0xe0030c, 0xe0030d) AM_WRITE(ddenlovr_coincounter_1_w)							//
 
-	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
+	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8("rtc", msm6242_r, msm6242_w, 0x00ff)		// 6242RTC
-	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("ay", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8("ay", ay8910_r, 0x00ff)
+	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
 	AM_RANGE(0xe00700, 0xe00701) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)	// Sound
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM														// RAM
 ADDRESS_MAP_END
@@ -3277,9 +3277,9 @@ static ADDRESS_MAP_START( mjflove_portmap, ADDRESS_SPACE_IO, 8 )	// 16 bit I/O
 	AM_RANGE(0x0100, 0x0100) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0181, 0x0181) AM_WRITENOP						// ? int. enable
 	AM_RANGE(0x0184, 0x0184) AM_WRITE(mjflove_coincounter_w)
-	AM_RANGE(0x0200, 0x0201) AM_DEVWRITE("ym", ym2413_w)
+	AM_RANGE(0x0200, 0x0201) AM_DEVWRITE("ymsnd", ym2413_w)
 	AM_RANGE(0x0280, 0x028f) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)	// 6242RTC
-	AM_RANGE(0x0300, 0x0301) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x0300, 0x0301) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x0380, 0x0380) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 ADDRESS_MAP_END
 
@@ -3317,7 +3317,7 @@ static ADDRESS_MAP_START( jongtei_portmap, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLO
 	AM_RANGE(0x60, 0x60) AM_WRITE(hanakanz_blitter_data_w)
 	AM_RANGE(0x61, 0x61) AM_WRITE(hanakanz_palette_w)
 	AM_RANGE(0x63, 0x64) AM_READ(hanakanz_gfxrom_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ym", ym2413_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ymsnd", ym2413_w)
 	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)	// 6242RTC
 ADDRESS_MAP_END
@@ -3377,8 +3377,8 @@ static WRITE8_HANDLER( sryudens_rambank_w )
 
 static ADDRESS_MAP_START( sryudens_portmap, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ym", ym2413_w)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ymsnd", ym2413_w)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x1c, 0x1c) AM_READNOP AM_WRITE(sryudens_rambank_w)	// ? ack on RTC int
 	AM_RANGE(0x1e, 0x1e) AM_WRITE(mjflove_rombank_w)
 	AM_RANGE(0x20, 0x23) AM_WRITE(ddenlovr_palette_base_w)
@@ -3494,7 +3494,7 @@ static ADDRESS_MAP_START( daimyojn_portmap, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GL
 	AM_RANGE(0x42, 0x44) AM_READ(hanakanz_gfxrom_r)
 	AM_RANGE(0x8a, 0x8b) AM_READ(daimyojn_year_hack_r)	// ?
 	AM_RANGE(0x80, 0x8f) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)	// 6242RTC
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ym", ym2413_w)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ymsnd", ym2413_w)
 	AM_RANGE(0xa2, 0xa2) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xa8, 0xa8) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xaa, 0xaa) AM_READ(daimyojn_keyb1_r)
@@ -7362,10 +7362,10 @@ static MACHINE_DRIVER_START( ddenlovr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2413, XTAL_28_63636MHz / 8)
+	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("ay", AY8910, XTAL_28_63636MHz / 16)	// or /8 ?
+	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_28_63636MHz / 16)	// or /8 ?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_28_63636MHz / 28)
@@ -7416,7 +7416,7 @@ static MACHINE_DRIVER_START( quiz365 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(quiz365_map)
 
-	MDRV_SOUND_MODIFY("ay")
+	MDRV_SOUND_MODIFY("aysnd")
 	MDRV_SOUND_CONFIG(quiz365_ay8910_interface)
 MACHINE_DRIVER_END
 
@@ -7488,7 +7488,7 @@ static MACHINE_DRIVER_START( quizchq )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1022720)
@@ -7566,10 +7566,10 @@ static MACHINE_DRIVER_START( mmpanic )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("ay", AY8910, 3579545)
+	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1022720)
@@ -7633,7 +7633,7 @@ static MACHINE_DRIVER_START( hanakanz )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1022720)
@@ -7692,7 +7692,7 @@ static MACHINE_DRIVER_START( mjchuuka )
 	MDRV_CPU_IO_MAP(mjchuuka_portmap)
 	MDRV_CPU_VBLANK_INT("screen", mjchuuka_irq)
 
-	MDRV_SOUND_ADD("ay", AY8910, 1789772)
+	MDRV_SOUND_ADD("aysnd", AY8910, 1789772)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -7767,7 +7767,7 @@ static MACHINE_DRIVER_START( mjmyster )
 	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
 	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
-	MDRV_SOUND_ADD("ay", AY8910, 3579545)
+	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
 	MDRV_SOUND_CONFIG(mjmyster_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -7815,7 +7815,7 @@ static MACHINE_DRIVER_START( hginga )
 	MDRV_CPU_IO_MAP(hginga_portmap)
 	MDRV_CPU_VBLANK_INT("screen", hginga_irq)
 
-	MDRV_SOUND_ADD("ay", AY8910, 3579545)
+	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
 	MDRV_SOUND_CONFIG(hginga_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -7828,7 +7828,7 @@ static MACHINE_DRIVER_START( hgokou )
 	MDRV_CPU_IO_MAP(hgokou_portmap)
 	MDRV_CPU_VBLANK_INT("screen", hginga_irq)
 
-	MDRV_SOUND_ADD("ay", AY8910, 3579545)
+	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
 	MDRV_SOUND_CONFIG(hginga_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -7850,7 +7850,7 @@ static MACHINE_DRIVER_START( mjmyuniv )
 	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
 	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
-	MDRV_SOUND_ADD("ay", AY8910, 1789772)
+	MDRV_SOUND_ADD("aysnd", AY8910, 1789772)
 	MDRV_SOUND_CONFIG(mjmyster_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -7863,7 +7863,7 @@ static MACHINE_DRIVER_START( mjmyornt )
 	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
 	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
-	MDRV_SOUND_ADD("ay", AY8910, 1789772)
+	MDRV_SOUND_ADD("aysnd", AY8910, 1789772)
 	MDRV_SOUND_CONFIG(mjmyster_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -7895,7 +7895,7 @@ static MACHINE_DRIVER_START( mjflove )
 
 	MDRV_VIDEO_START(mjflove)	// blitter commands in the roms are shuffled around
 
-	MDRV_SOUND_ADD("ay", AY8910, 28636363/8)
+	MDRV_SOUND_ADD("aysnd", AY8910, 28636363/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
@@ -7940,7 +7940,7 @@ static MACHINE_DRIVER_START( jongtei )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2413, XTAL_28_63636MHz / 8)
+	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_28_63636MHz / 28)
@@ -7980,10 +7980,10 @@ static MACHINE_DRIVER_START( sryudens )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2413, XTAL_28_63636MHz / 8)
+	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("ay", AY8910, XTAL_28_63636MHz / 8)
+	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_28_63636MHz / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_28_63636MHz / 28)	// ?
@@ -8023,7 +8023,7 @@ static MACHINE_DRIVER_START( daimyojn )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2413, XTAL_28_63636MHz / 8)
+	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_28_63636MHz / 28)

@@ -97,7 +97,7 @@ static ADDRESS_MAP_START( surpratk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5fa0, 0x5faf) AM_READWRITE(K053244_r, K053244_w)
 	AM_RANGE(0x5fb0, 0x5fbf) AM_WRITE(K053251_w)
 	AM_RANGE(0x5fc0, 0x5fc0) AM_READWRITE(watchdog_reset_r, surpratk_5fc0_w)
-	AM_RANGE(0x5fd0, 0x5fd1) AM_DEVWRITE("ym", ym2151_w)
+	AM_RANGE(0x5fd0, 0x5fd1) AM_DEVWRITE("ymsnd", ym2151_w)
 	AM_RANGE(0x5fc4, 0x5fc4) AM_WRITE(surpratk_videobank_w)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(K052109_r, K052109_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM					/* ROM */
@@ -202,7 +202,7 @@ static MACHINE_DRIVER_START( surpratk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 3579545)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)

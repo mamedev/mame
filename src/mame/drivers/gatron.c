@@ -346,7 +346,7 @@ static ADDRESS_MAP_START( gat_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(gat_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* battery backed RAM */
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn", sn76496_w)							/* PSG */
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("snsnd", sn76496_w)							/* PSG */
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(output_port_0_w)										/* lamps */
 ADDRESS_MAP_END
 
@@ -465,7 +465,7 @@ static MACHINE_DRIVER_START( gat )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK/8 )	/* 2 MHz, guess */
+	MDRV_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/8 )	/* 2 MHz, guess */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
 MACHINE_DRIVER_END
 

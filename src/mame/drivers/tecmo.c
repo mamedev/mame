@@ -234,7 +234,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rygar_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ym", ym3812_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ymsnd", ym3812_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r) AM_DEVWRITE("msm", tecmo_adpcm_start_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(tecmo_adpcm_end_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", tecmo_adpcm_vol_w)
@@ -246,7 +246,7 @@ static ADDRESS_MAP_START( tecmo_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 												/* writes code to this area */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym", ym3812_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ymsnd", ym3812_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r) AM_DEVWRITE("msm", tecmo_adpcm_start_w)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(tecmo_adpcm_end_w)
 	AM_RANGE(0xc800, 0xc800) AM_DEVWRITE("msm", tecmo_adpcm_vol_w)
@@ -704,7 +704,7 @@ static MACHINE_DRIVER_START( rygar )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, XTAL_4MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -763,7 +763,7 @@ static MACHINE_DRIVER_START( backfirt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, XTAL_4MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

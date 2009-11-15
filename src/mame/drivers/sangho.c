@@ -78,7 +78,7 @@ static WRITE8_HANDLER(pzlestar_bank_w)
 
 static ADDRESS_MAP_START( pzlestar_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE( "ym", ym2413_w )
+	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE( "ymsnd", ym2413_w )
 	AM_RANGE( 0x91, 0x91) AM_WRITE( pzlestar_bank_w )
 	AM_RANGE( 0x98, 0x98) AM_READWRITE( v9938_0_vram_r, v9938_0_vram_w )
 	AM_RANGE( 0x99, 0x99) AM_READWRITE( v9938_0_status_r, v9938_0_command_w )
@@ -93,7 +93,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sexyboom_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE( "ym", ym2413_w )
+	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE( "ymsnd", ym2413_w )
 	AM_RANGE( 0xa0, 0xa0) AM_READ_PORT("P1")
 	AM_RANGE( 0xa1, 0xa1) AM_READ_PORT("P2")
 	AM_RANGE( 0xf0, 0xf0) AM_READWRITE( v9938_0_vram_r,v9938_0_vram_w )
@@ -243,7 +243,7 @@ static MACHINE_DRIVER_START(pzlestar)
 
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ym", YM2413, 3580000)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3580000)
 
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -275,7 +275,7 @@ static MACHINE_DRIVER_START(sexyboom )
 	MDRV_VIDEO_UPDATE( generic_bitmapped )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ym", YM2413, 3580000)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3580000)
 
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

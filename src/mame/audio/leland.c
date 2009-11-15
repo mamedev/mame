@@ -518,7 +518,7 @@ static DEVICE_START( common_sh_start )
 	int i;
 
 	/* determine which sound hardware is installed */
-	has_ym2151 = (devtag_get_device(device->machine, "ym") != NULL);
+	has_ym2151 = (devtag_get_device(device->machine, "ymsnd") != NULL);
 
 	/* allocate separate streams for the DMA and non-DMA DACs */
 	dma_stream = stream_create(device, 0, 1, OUTPUT_RATE, (void *)dmaspace, leland_80186_dma_update);
@@ -2043,7 +2043,7 @@ static READ16_HANDLER( peripheral_r )
 			if (!has_ym2151)
 				return pit8254_r(space, offset | 0x40, mem_mask);
 			else
-				return ym2151_r(devtag_get_device(space->machine, "ym"), offset);
+				return ym2151_r(devtag_get_device(space->machine, "ymsnd"), offset);
 
 		case 4:
 			if (is_redline)
@@ -2079,7 +2079,7 @@ static WRITE16_HANDLER( peripheral_w )
 			if (!has_ym2151)
 				pit8254_w(space, offset | 0x40, data, mem_mask);
 			else
-				ym2151_w(devtag_get_device(space->machine, "ym"), offset, data);
+				ym2151_w(devtag_get_device(space->machine, "ymsnd"), offset, data);
 			break;
 
 		case 4:

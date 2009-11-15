@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( sbasketb_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("vlm", hyperspt_sound_w)     /* speech and output controll */
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
-	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE("sn", konami_SN76496_w)      /* This address triggers the SN chip to read the data port. */
+	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE("snsnd", konami_SN76496_w)      /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
 
 
@@ -214,7 +214,7 @@ static MACHINE_DRIVER_START( sbasketb )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("sn", SN76489, XTAL_14_31818MHz / 8)
+	MDRV_SOUND_ADD("snsnd", SN76489, XTAL_14_31818MHz / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* Schematics say 3.58MHz, but board uses 3.579545MHz xtal */

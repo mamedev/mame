@@ -159,7 +159,7 @@ static ADDRESS_MAP_START( gberet_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe044, 0xe044) AM_WRITE(gberet_flipscreen_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(gberet_coin_counter_w)
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2") AM_WRITENOP			// Loads the snd command into the snd latch
-	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW3") AM_DEVWRITE("sn", sn76496_w)	// This address triggers the SN chip to read the data port.
+	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW3") AM_DEVWRITE("snsnd", sn76496_w)	// This address triggers the SN chip to read the data port.
 	AM_RANGE(0xf600, 0xf600) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf601, 0xf601) AM_READ_PORT("P2")
 	AM_RANGE(0xf602, 0xf602) AM_READ_PORT("P1")
@@ -179,7 +179,7 @@ static ADDRESS_MAP_START( gberetb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe900, 0xe9ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP				// coin counter not supported
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("sn", sn76496_w)
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("snsnd", sn76496_w)
 	AM_RANGE(0xf600, 0xf600) AM_READ_PORT("P2")
 	AM_RANGE(0xf601, 0xf601) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf602, 0xf602) AM_READ_PORT("P1")
@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( mrgoemon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe044, 0xe044) AM_WRITE(mrgoemon_flipscreen_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mrgoemon_coin_counter_w)
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2") AM_WRITENOP				// Loads the snd command into the snd latch
-	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW3") AM_DEVWRITE("sn", sn76496_w)		// This address triggers the SN chip to read the data port.
+	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW3") AM_DEVWRITE("snsnd", sn76496_w)		// This address triggers the SN chip to read the data port.
 	AM_RANGE(0xf600, 0xf600) AM_READ_PORT("DSW1") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xf601, 0xf601) AM_READ_PORT("P2")
 	AM_RANGE(0xf602, 0xf602) AM_READ_PORT("P1")
@@ -379,7 +379,7 @@ static MACHINE_DRIVER_START( gberet )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn", SN76496, 18432000/12)
+	MDRV_SOUND_ADD("snsnd", SN76496, 18432000/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

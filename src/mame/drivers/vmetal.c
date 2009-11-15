@@ -228,7 +228,7 @@ static ADDRESS_MAP_START( varia_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_BASE(&vmetal_videoregs)
 	AM_RANGE(0x179700, 0x179713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
 
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_DEVWRITE8("es", vmetal_control_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_DEVWRITE8("essnd", vmetal_control_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 
 	/* i have no idea whats meant to be going on here .. it seems to read one bit of the dips from some of them, protection ??? */
@@ -252,7 +252,7 @@ static ADDRESS_MAP_START( varia_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff )
 	AM_RANGE(0x400002, 0x400003) AM_DEVWRITE8("oki", okim6295_w, 0x00ff)	// Volume/channel info
-	AM_RANGE(0x500000, 0x50000d) AM_DEVWRITE8("es", vmetal_es8712_w, 0x00ff)
+	AM_RANGE(0x500000, 0x50000d) AM_DEVWRITE8("essnd", vmetal_es8712_w, 0x00ff)
 
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -450,7 +450,7 @@ static MACHINE_DRIVER_START( varia )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("es", ES8712, 12000)
+	MDRV_SOUND_ADD("essnd", ES8712, 12000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_DRIVER_END
@@ -471,7 +471,7 @@ ROM_START( vmetal )
 	/* Second half is junk */
 	ROM_LOAD( "8.u9", 0x00000, 0x80000, CRC(c14c001c) SHA1(bad96b5cd40d1c34ef8b702262168ecab8192fb6) )
 
-	ROM_REGION( 0x200000, "es", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "essnd", 0 ) /* Samples */
 	ROM_LOAD( "7.u12", 0x00000, 0x200000, CRC(a88c52f1) SHA1(d74a5a11f84ba6b1042b33a2c156a1071b6fbfe1) )
 ROM_END
 
@@ -490,7 +490,7 @@ ROM_START( vmetaln )
 	/* Second half is junk */
 	ROM_LOAD( "8.u9", 0x00000, 0x80000, CRC(c14c001c) SHA1(bad96b5cd40d1c34ef8b702262168ecab8192fb6) )
 
-	ROM_REGION( 0x200000, "es", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "essnd", 0 ) /* Samples */
 	ROM_LOAD( "7.u12", 0x00000, 0x200000, CRC(a88c52f1) SHA1(d74a5a11f84ba6b1042b33a2c156a1071b6fbfe1) )
 ROM_END
 

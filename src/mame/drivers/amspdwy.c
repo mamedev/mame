@@ -95,7 +95,7 @@ static ADDRESS_MAP_START( amspdwy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa800, 0xa800) AM_READ(amspdwy_wheel_0_r)							// Player 1
 	AM_RANGE(0xac00, 0xac00) AM_READ(amspdwy_wheel_1_r)							// Player 2
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP										// ? Exiting IRQ
-	AM_RANGE(0xb400, 0xb400) AM_DEVREAD("ym", amspdwy_sound_r) AM_WRITE(amspdwy_sound_w)		// YM2151 status, To Sound CPU
+	AM_RANGE(0xb400, 0xb400) AM_DEVREAD("ymsnd", amspdwy_sound_r) AM_WRITE(amspdwy_sound_w)		// YM2151 status, To Sound CPU
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)// Sprites
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM												// Work RAM
 ADDRESS_MAP_END
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( amspdwy_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM									// ROM
 //  AM_RANGE(0x8000, 0x8000) AM_WRITENOP                            // ? Written with 0 at the start
 	AM_RANGE(0x9000, 0x9000) AM_READ(soundlatch_r)					// From Main CPU
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)			//
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)			//
 	AM_RANGE(0xc000, 0xdfff) AM_RAM									// Work RAM
 	AM_RANGE(0xffff, 0xffff) AM_READNOP								// ??? IY = FFFF at the start ?
 ADDRESS_MAP_END
@@ -295,7 +295,7 @@ static MACHINE_DRIVER_START( amspdwy )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, 3000000)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 3000000)
 	MDRV_SOUND_CONFIG(amspdwy_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)

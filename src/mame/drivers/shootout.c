@@ -95,7 +95,7 @@ static ADDRESS_MAP_START( shootouj_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(shootout_coin_counter_w)
 	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ym", ym2203_r,ym2203_w)
+	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym2203_r,ym2203_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(shootout_textram_w) AM_BASE(&shootout_textram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(shootout_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
@@ -106,7 +106,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shootout_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ym", ym2203_r,ym2203_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2203_r,ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(interrupt_enable_w)
@@ -296,7 +296,7 @@ static MACHINE_DRIVER_START( shootout )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 1500000)
+	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -326,7 +326,7 @@ static MACHINE_DRIVER_START( shootouj )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 1500000)
+	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
 	MDRV_SOUND_CONFIG(ym2203_interface2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

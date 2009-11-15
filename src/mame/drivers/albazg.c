@@ -254,8 +254,8 @@ static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
@@ -301,7 +301,7 @@ static MACHINE_DRIVER_START( yumefuda )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, MASTER_CLOCK/16) /* guessed to use the same xtal as the crtc */
+	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/16) /* guessed to use the same xtal as the crtc */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

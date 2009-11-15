@@ -140,8 +140,8 @@ static ADDRESS_MAP_START( main_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x99, 0x99) AM_WRITE(v9938_0_command_w) AM_READ(v9938_0_status_r)
 	AM_RANGE(0x9a, 0x9a) AM_WRITE(v9938_0_palette_w)
 	AM_RANGE(0x9b, 0x9b) AM_WRITE(v9938_0_register_w)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("ay", ay8910_r) /* Dip-Switches routes here. */
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_r) /* Dip-Switches routes here. */
 ADDRESS_MAP_END
 
 
@@ -207,7 +207,7 @@ static INPUT_PORTS_START( big10 )
 	PORT_DIPSETTING(    0x20, "80%" )
 	PORT_DIPSETTING(    0x30, "90%" )
 	PORT_DIPNAME( 0xC0, 0x00, "Coinage (A=1; B=5; C=10)" )	PORT_DIPLOCATION("DSW1:1,2")
-	PORT_DIPSETTING(    0x00, "x1" )
+	PORT_DIPSETTING(    0x00, "x1snd" )
 	PORT_DIPSETTING(    0x40, "x2" )
 	PORT_DIPSETTING(    0x80, "x5" )
 	PORT_DIPSETTING(    0xC0, "x10" )
@@ -265,7 +265,7 @@ static MACHINE_DRIVER_START( big10 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8910, MASTER_CLOCK/12)	/* guess */
+	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/12)	/* guess */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END

@@ -438,7 +438,7 @@ static ADDRESS_MAP_START( jingbell_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x6492, 0x6492 ) AM_WRITE( jingbell_leds_w )
 	AM_RANGE( 0x64a0, 0x64a0 ) AM_READ_PORT( "BUTTONS2" )
 
-	AM_RANGE( 0x64b0, 0x64b1 ) AM_DEVWRITE( "ym", ym2413_w )
+	AM_RANGE( 0x64b0, 0x64b1 ) AM_DEVWRITE( "ymsnd", ym2413_w )
 
 	AM_RANGE( 0x64c0, 0x64c0 ) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
 
@@ -657,7 +657,7 @@ static MACHINE_DRIVER_START( jingbell )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ym", YM2413, XTAL_3_579545MHz)
+	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_12MHz / 12)

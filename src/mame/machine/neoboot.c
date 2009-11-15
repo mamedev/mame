@@ -653,7 +653,7 @@ void decrypt_kof2k4se_68k( running_machine *machine )
 void lans2004_vx_decrypt( running_machine *machine )
 {
 	int i;
-	UINT8 *rom = memory_region( machine, "ym" );
+	UINT8 *rom = memory_region( machine, "ymsnd" );
 	for (i = 0; i < 0xA00000; i++)
 		rom[i] = BITSWAP8(rom[i], 0, 1, 5, 4, 3, 2, 6, 7);
 }
@@ -1067,8 +1067,8 @@ void samsho5b_px_decrypt( running_machine *machine )
 
 void samsho5b_vx_decrypt( running_machine *machine )
 {
-	int vx_size = memory_region_length( machine, "ym" );
-	UINT8 *rom = memory_region( machine, "ym" );
+	int vx_size = memory_region_length( machine, "ymsnd" );
+	UINT8 *rom = memory_region( machine, "ymsnd" );
 	int i;
 
 	for( i = 0; i < vx_size; i++ )

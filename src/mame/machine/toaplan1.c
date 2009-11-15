@@ -232,7 +232,7 @@ WRITE16_HANDLER( toaplan1_reset_sound )
 	if (ACCESSING_BITS_0_7 && (data == 0))
 	{
 		logerror("PC:%04x  Resetting Sound CPU and Sound chip (%08x)\n", cpu_get_previouspc(space->cpu), data);
-		devtag_reset(space->machine, "ym");
+		devtag_reset(space->machine, "ymsnd");
 		if (cputag_get_cpu(space->machine, "audiocpu") != NULL && cpu_get_type(cputag_get_cpu(space->machine, "audiocpu")) == CPU_Z80)
 			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 	}

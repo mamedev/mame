@@ -3149,7 +3149,7 @@ DISCRETE_SOUND_END
 MACHINE_DRIVER_START( spcenctr_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn", SN76477, 0)
+	MDRV_SOUND_ADD("snsnd", SN76477, 0)
 	MDRV_SOUND_CONFIG(spcenctr_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
@@ -3189,7 +3189,7 @@ WRITE8_DEVICE_HANDLER( spcenctr_audio_2_w )
 
 WRITE8_DEVICE_HANDLER( spcenctr_audio_3_w )
 {
-	const device_config *sn = devtag_get_device(device->machine, "sn");
+	const device_config *sn = devtag_get_device(device->machine, "snsnd");
 
 	/* if (data & 0x01)  enable SCREECH (hit the sides) sound */
 
@@ -3516,7 +3516,7 @@ MACHINE_DRIVER_START( invaders_samples_audio )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn", SN76477, 0)
+	MDRV_SOUND_ADD("snsnd", SN76477, 0)
 	MDRV_SOUND_CONFIG(invaders_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
@@ -4083,7 +4083,7 @@ DISCRETE_SOUND_END
 MACHINE_DRIVER_START( invaders_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn", SN76477, 0)
+	MDRV_SOUND_ADD("snsnd", SN76477, 0)
 	MDRV_SOUND_CONFIG(invaders_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
@@ -4095,7 +4095,7 @@ MACHINE_DRIVER_END
 
 WRITE8_DEVICE_HANDLER( invaders_audio_1_w )
 {
-	const device_config *sn = devtag_get_device(device->machine, "sn");
+	const device_config *sn = devtag_get_device(device->machine, "snsnd");
 
 	sn76477_enable_w(sn, (~data >> 0) & 0x01);	/* saucer sound */
 

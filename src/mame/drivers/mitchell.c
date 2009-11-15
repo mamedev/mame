@@ -373,8 +373,8 @@ static ADDRESS_MAP_START( mitchell_io_map, ADDRESS_SPACE_IO, 8 )
                                                        The Mahjong games and Block Block need special input treatment */
 	AM_RANGE(0x01, 0x01) AM_WRITE(input_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)	/* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ym", ym2413_data_port_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ym", ym2413_register_port_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ymsnd", ym2413_data_port_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ymsnd", ym2413_register_port_w)
 	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r) AM_DEVWRITE("oki", okim6295_w)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP				/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)	/* Video RAM bank register */
@@ -399,8 +399,8 @@ static ADDRESS_MAP_START( spangbl_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x02) AM_READ(input_r)	/* Super Pang needs a kludge to initialize EEPROM. */
 	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ym", ym2413_data_port_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ym", ym2413_register_port_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ymsnd", ym2413_data_port_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ymsnd", ym2413_register_port_w)
 	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP	/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)      /* Video RAM bank register */
@@ -1117,7 +1117,7 @@ static MACHINE_DRIVER_START( mgakuen )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("ym", YM2413, 4000000)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1153,7 +1153,7 @@ static MACHINE_DRIVER_START( pang )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("ym",YM2413, XTAL_16MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd",YM2413, XTAL_16MHz/4) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1283,7 +1283,7 @@ static MACHINE_DRIVER_START( marukin )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("ym", YM2413, 4000000)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

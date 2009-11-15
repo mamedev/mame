@@ -378,13 +378,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ym", ym2610_r, ym2610_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0xc0, 0xc1) AM_WRITENOP /* -> Main CPU */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sounda_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ym", ym2608_r, ym2608_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2608_r, ym2608_w)
 	AM_RANGE(0xc0, 0xc1) AM_WRITENOP /* -> Main CPU */
 ADDRESS_MAP_END
 
@@ -735,7 +735,7 @@ static MACHINE_DRIVER_START( bbusters )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2610, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.0)
@@ -772,7 +772,7 @@ static MACHINE_DRIVER_START( mechatt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2608, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM2608, 8000000)
 	MDRV_SOUND_CONFIG(ym2608_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.50)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.50)
@@ -820,7 +820,7 @@ ROM_START( bbusters )
 	ROM_LOAD( "bb-8.a14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 	ROM_LOAD( "bb-9.c14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 
-	ROM_REGION( 0x80000, "ym", 0 )
+	ROM_REGION( 0x80000, "ymsnd", 0 )
 	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
 
 	ROM_REGION( 0x80000, "ym.deltat", 0 )
@@ -865,7 +865,7 @@ ROM_START( bbustersu )
 	ROM_LOAD( "bb-8.a14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 	ROM_LOAD( "bb-9.c14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 
-	ROM_REGION( 0x80000, "ym", 0 )
+	ROM_REGION( 0x80000, "ymsnd", 0 )
 	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
 
 	ROM_REGION( 0x80000, "ym.deltat", 0 )
@@ -901,7 +901,7 @@ ROM_START( mechatt )
 	ROM_REGION( 0x80000, "gfx5", 0 )
 	ROM_LOAD( "mab289c2.bin",  0x000000, 0x80000, CRC(14f97ceb) SHA1(a22033532ea616dc3a3db8b66ad6ccc6172ed7cc) )
 
-	ROM_REGION( 0x20000, "ym", 0 )
+	ROM_REGION( 0x20000, "ymsnd", 0 )
 	ROM_LOAD( "ma2.bin",       0x000000, 0x20000, CRC(ea4cc30d) SHA1(d8f089fc0ce76309411706a8110ad907f93dc97e) )
 
 	ROM_REGION( 0x20000, "user1", 0 ) /* Zoom table */
@@ -938,7 +938,7 @@ ROM_START( mechattu )
 	ROM_REGION( 0x80000, "gfx5", 0 )
 	ROM_LOAD( "mab289c2.bin",  0x000000, 0x80000, CRC(14f97ceb) SHA1(a22033532ea616dc3a3db8b66ad6ccc6172ed7cc) )
 
-	ROM_REGION( 0x20000, "ym", 0 )
+	ROM_REGION( 0x20000, "ymsnd", 0 )
 	ROM_LOAD( "ma2.bin",       0x000000, 0x20000, CRC(ea4cc30d) SHA1(d8f089fc0ce76309411706a8110ad907f93dc97e) )
 
 	ROM_REGION( 0x20000, "user1", 0 ) /* Zoom table */

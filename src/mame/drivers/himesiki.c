@@ -270,7 +270,7 @@ static const gfx_layout layout3 =
 };
 
 static GFXDECODE_START( himesiki )
-	GFXDECODE_ENTRY( "bg",        0, layout1, 0x000, 16 )
+	GFXDECODE_ENTRY( "bgtiles",   0, layout1, 0x000, 16 )
 	GFXDECODE_ENTRY( "sprites_1", 0, layout2, 0x200, 16 )
 	GFXDECODE_ENTRY( "sprites_2", 0, layout3, 0x200, 16 )
 GFXDECODE_END
@@ -321,7 +321,7 @@ ROM_START( himesiki )
 	ROM_REGION( 0x010000, "sub", 0 ) /* z80 */
 	ROM_LOAD( "5.6n",  0x00000,  0x08000, CRC(b1214ac7) SHA1(ee5459c28d9c3c2eb3467261716b1259ec486534) )
 
-	ROM_REGION( 0x020000, "bg", 0 ) /* bg */
+	ROM_REGION( 0x020000, "bgtiles", 0 ) /* bg */
 	ROM_LOAD( "3.5f",  0x000000,  0x010000, CRC(73843e60) SHA1(0d8a397d8798e15f3fa7bf7a83e4c2ee44f6fa86) )
 	ROM_LOAD( "4.5d",  0x010000,  0x010000, CRC(443a3164) SHA1(08aa002214251a870581a01d775f497dd390957c) )
 

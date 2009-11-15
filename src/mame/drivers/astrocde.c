@@ -708,9 +708,9 @@ static ADDRESS_MAP_START( tenpin_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x97, 0x97) AM_READ(soundlatch_r)
-	AM_RANGE(0x98, 0x98) AM_DEVWRITE("ay", ay8910_address_w)
-	AM_RANGE(0x98, 0x98) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x9a, 0x9a) AM_DEVWRITE("ay", ay8910_data_w)
+	AM_RANGE(0x98, 0x98) AM_DEVWRITE("aysnd", ay8910_address_w)
+	AM_RANGE(0x98, 0x98) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x9a, 0x9a) AM_DEVWRITE("aysnd", ay8910_data_w)
 ADDRESS_MAP_END
 
 
@@ -1466,7 +1466,7 @@ static MACHINE_DRIVER_START( tenpindx )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8912, ASTROCADE_CLOCK/4)	/* real clock unknown */
+	MDRV_SOUND_ADD("aysnd", AY8912, ASTROCADE_CLOCK/4)	/* real clock unknown */
 	MDRV_SOUND_CONFIG(ay8912_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_DRIVER_END

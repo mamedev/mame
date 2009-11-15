@@ -172,7 +172,7 @@ ADDRESS_MAP_END
 /*realbrk specific memory map*/
 static ADDRESS_MAP_START( realbrk_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_IMPORT_FROM(base_mem)
-	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)	//
+	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)	//
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")							// P1 & P2 (Inputs)
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")							// Coins
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(realbrk_dsw_r,SMH_RAM) AM_BASE(&realbrk_dsw_select)	// DSW select
@@ -182,7 +182,7 @@ ADDRESS_MAP_END
 
 /*pkgnsh specific memory map*/
 static ADDRESS_MAP_START( pkgnsh_mem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ym", ym2413_w, 0xff00	)	// YM2413
+	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_w, 0xff00	)	// YM2413
 	AM_RANGE(0xc00000, 0xc00013) AM_READ(pkgnsh_input_r		        )	// P1 & P2 (Inputs)
 	AM_RANGE(0xff0000, 0xfffbff) AM_READWRITE(backup_ram_r,backup_ram_w) AM_BASE(&backup_ram)	// RAM
 	AM_IMPORT_FROM(base_mem)
@@ -190,7 +190,7 @@ ADDRESS_MAP_END
 
 /*pkgnshdx specific memory map*/
 static ADDRESS_MAP_START( pkgnshdx_mem, ADDRESS_SPACE_PROGRAM, 16)
-	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)	//
+	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)	//
 	AM_RANGE(0xc00000, 0xc00013) AM_READ(pkgnshdx_input_r		        )	// P1 & P2 (Inputs)
 	AM_RANGE(0xc00004, 0xc00005) AM_WRITE(SMH_RAM) AM_BASE(&realbrk_dsw_select) // DSW select
 	AM_RANGE(0xff0000, 0xfffbff) AM_READWRITE(backup_ram_dx_r,backup_ram_w) AM_BASE(&backup_ram)	// RAM
@@ -201,7 +201,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dai2kaku_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x605000, 0x6053ff) AM_READWRITE(SMH_RAM,SMH_RAM) AM_BASE(&realbrk_vram_0ras)	// rasterinfo   (0)
 	AM_RANGE(0x605400, 0x6057ff) AM_READWRITE(SMH_RAM,SMH_RAM) AM_BASE(&realbrk_vram_1ras)	// rasterinfo   (1)
-	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)	//
+	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)	//
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")							// P1 & P2 (Inputs)
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")							// Coins
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(realbrk_dsw_r,SMH_RAM) AM_BASE(&realbrk_dsw_select)	// DSW select
@@ -703,7 +703,7 @@ static MACHINE_DRIVER_START( realbrk )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ym", YM2413, XTAL_3_579545MHz)
+	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_DRIVER_END

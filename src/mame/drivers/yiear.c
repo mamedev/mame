@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_DEVREAD("vlm", yiear_speech_r)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(yiear_control_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(konami_SN76496_latch_w)
-	AM_RANGE(0x4900, 0x4900) AM_DEVWRITE("sn", konami_SN76496_w)
+	AM_RANGE(0x4900, 0x4900) AM_DEVWRITE("snsnd", konami_SN76496_w)
 	AM_RANGE(0x4a00, 0x4a00) AM_DEVWRITE("vlm", yiear_VLM5030_control_w)
 	AM_RANGE(0x4b00, 0x4b00) AM_DEVWRITE("vlm", vlm5030_data_w)
 	AM_RANGE(0x4c00, 0x4c00) AM_READ_PORT("DSW1")
@@ -219,7 +219,7 @@ static MACHINE_DRIVER_START( yiear )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn", SN76496, XTAL_18_432MHz/16)   /* verified on pcb */
+	MDRV_SOUND_ADD("snsnd", SN76496, XTAL_18_432MHz/16)   /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz)   /* verified on pcb */

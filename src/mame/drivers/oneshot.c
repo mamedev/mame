@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( oneshot_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(soundlatch_r,soundlatch_w)
 	AM_RANGE(0x8001, 0x87ff) AM_RAM
-	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym", ym3812_r,ym3812_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym3812_r,ym3812_w)
 	AM_RANGE(0xe010, 0xe010) AM_DEVREADWRITE("oki", okim6295_r,okim6295_w)
 ADDRESS_MAP_END
 
@@ -372,7 +372,7 @@ static MACHINE_DRIVER_START( oneshot )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, 3500000)
+	MDRV_SOUND_ADD("ymsnd", YM3812, 3500000)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -439,7 +439,7 @@ ROM_START( maddonna )
 	/* no samples for this game */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x1", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, zooming?
+	ROM_LOAD( "x1snd", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, zooming?
 ROM_END
 
 ROM_START( maddonnb )
@@ -465,7 +465,7 @@ ROM_START( maddonnb )
 	/* no samples for this game */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x1", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, zooming?
+	ROM_LOAD( "x1snd", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, zooming?
 ROM_END
 
 

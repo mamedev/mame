@@ -691,7 +691,7 @@ static ADDRESS_MAP_START( fncywld_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 #else
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
 #endif
-	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8("ym", ym2151_r, ym2151_w, 0x00ff)
+	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff)
 	AM_RANGE(0x100004, 0x100005) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size) /* sprites */
@@ -806,7 +806,7 @@ static WRITE8_HANDLER( oki_sound_bank_w )
 static ADDRESS_MAP_START( semicom_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 //  AM_RANGE(0xf006, 0xf006) ??
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)
@@ -841,7 +841,7 @@ static READ8_HANDLER(jumppop_z80latch_r)
 
 static ADDRESS_MAP_START( jumppop_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ym", ym3812_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3812_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0x03, 0x03) AM_READ(jumppop_z80latch_r)
 	AM_RANGE(0x04, 0x04) AM_NOP
@@ -2107,7 +2107,7 @@ static MACHINE_DRIVER_START( fncywld )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, 32220000/9)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 32220000/9)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.20)
 
@@ -2170,7 +2170,7 @@ static MACHINE_DRIVER_START( htchctch )
 	/* sound hardware - same as hyperpac */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, 3427190)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 3427190)
 	MDRV_SOUND_CONFIG(semicom_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.10)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.10)
@@ -2190,7 +2190,7 @@ static MACHINE_DRIVER_START( bcstory )
 	MDRV_IMPORT_FROM(htchctch)
 	MDRV_VIDEO_UPDATE( bcstory )
 
-	MDRV_SOUND_REPLACE("ym", YM2151, 3427190)
+	MDRV_SOUND_REPLACE("ymsnd", YM2151, 3427190)
 	MDRV_SOUND_CONFIG(semicom_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.10)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.10)
@@ -2211,7 +2211,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( metlsavr )
 	MDRV_IMPORT_FROM(cookbib)
 
-	MDRV_SOUND_REPLACE("ym", YM2151, 3427190)
+	MDRV_SOUND_REPLACE("ymsnd", YM2151, 3427190)
 	MDRV_SOUND_CONFIG(semicom_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.10)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.10)
@@ -2244,7 +2244,7 @@ static MACHINE_DRIVER_START( jumppop )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM3812, 3500000)
+	MDRV_SOUND_ADD("ymsnd", YM3812, 3500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.70)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.70)
 

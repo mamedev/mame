@@ -276,7 +276,7 @@ static void asuka_msm5205_vck(const device_config *device)
 	}
 	else
 	{
-		adpcm_data = memory_region(device->machine, "ym")[adpcm_pos];
+		adpcm_data = memory_region(device->machine, "ymsnd")[adpcm_pos];
 		adpcm_pos = (adpcm_pos + 1) & 0xffff;
 		msm5205_data_w(device, adpcm_data >> 4);
 	}
@@ -391,7 +391,7 @@ static ADDRESS_MAP_START( bonzeadv_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ym", ym2610_r, ym2610_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
@@ -405,7 +405,7 @@ static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 //  AM_RANGE(0x9002, 0x9100) AM_READNOP
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
@@ -419,7 +419,7 @@ static ADDRESS_MAP_START( cadash_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 ADDRESS_MAP_END
@@ -820,7 +820,7 @@ static MACHINE_DRIVER_START( bonzeadv )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2610, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
@@ -859,7 +859,7 @@ static MACHINE_DRIVER_START( asuka )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_16MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_16MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
@@ -901,7 +901,7 @@ static MACHINE_DRIVER_START( cadash )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_8MHz/2)	/* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_8MHz/2)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
@@ -939,7 +939,7 @@ static MACHINE_DRIVER_START( mofflott )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, 4000000)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 4000000)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
@@ -981,7 +981,7 @@ static MACHINE_DRIVER_START( galmedes )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, 4000000)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 4000000)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
@@ -1019,7 +1019,7 @@ static MACHINE_DRIVER_START( eto )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, 4000000)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 4000000)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
@@ -1051,7 +1051,7 @@ ROM_START( bonzeadv )
 
 	/* CPU3 - CCHIP aka TC0030CMD marked b41-05.43 */
 
-	ROM_REGION( 0x80000, "ym", 0 )	  /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )	  /* ADPCM samples */
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
 ROM_END
 
@@ -1076,7 +1076,7 @@ ROM_START( bonzeadvo )
 
 	/* CPU3 - CCHIP aka TC0030CMD marked b41-05.43 */
 
-	ROM_REGION( 0x80000, "ym", 0 )	  /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )	  /* ADPCM samples */
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
 ROM_END
 
@@ -1101,7 +1101,7 @@ ROM_START( bonzeadvu )
 
 	/* CPU3 - CCHIP aka TC0030CMD marked b41-05.43 */
 
-	ROM_REGION( 0x80000, "ym", 0 )	  /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )	  /* ADPCM samples */
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
 ROM_END
 
@@ -1126,7 +1126,7 @@ ROM_START( jigkmgri )
 
 	/* CPU3 - CCHIP aka TC0030CMD marked b41-05.43 */
 
-	ROM_REGION( 0x80000, "ym", 0 )	  /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd", 0 )	  /* ADPCM samples */
 	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
 ROM_END
 
@@ -1149,7 +1149,7 @@ ROM_START( asuka )
 	ROM_LOAD( "b68-11.bin", 0x00000, 0x04000, CRC(c378b508) SHA1(1b145fe736b924f298e02532cf9f26cc18b42ca7) )
 	ROM_CONTINUE(             0x10000, 0x0c000 )	/* banked stuff */
 
-	ROM_REGION( 0x10000, "ym", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x10000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "b68-10.bin", 0x00000, 0x10000, CRC(387aaf40) SHA1(47c583564ef1d49ece15f97221b2e073e8fb0544) )
 ROM_END
 
@@ -1172,7 +1172,7 @@ ROM_START( asukaj )
 	ROM_LOAD( "b68-11.bin", 0x00000, 0x04000, CRC(c378b508) SHA1(1b145fe736b924f298e02532cf9f26cc18b42ca7) )
 	ROM_CONTINUE(             0x10000, 0x0c000 )	/* banked stuff */
 
-	ROM_REGION( 0x10000, "ym", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x10000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "b68-10.bin", 0x00000, 0x10000, CRC(387aaf40) SHA1(47c583564ef1d49ece15f97221b2e073e8fb0544) )
 ROM_END
 
@@ -1195,7 +1195,7 @@ ROM_START( mofflott )
 	ROM_LOAD( "c17-07.bin", 0x00000, 0x04000, CRC(cdb7bc2c) SHA1(5113055c954a39918436db75cc06b53c29c60728) )
 	ROM_CONTINUE(           0x10000, 0x0c000 )	/* banked stuff */
 
-	ROM_REGION( 0x10000, "ym", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x10000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c17-06.bin", 0x00000, 0x10000, CRC(5c332125) SHA1(408f42df18b38347c8a4e177a9484162a66877e1) )
 ROM_END
 

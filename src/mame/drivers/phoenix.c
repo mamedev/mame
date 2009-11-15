@@ -64,8 +64,8 @@ static ADDRESS_MAP_START( survival_memory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(SMH_BANK(1), phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
 	AM_RANGE(0x5000, 0x53ff) AM_WRITE(phoenix_videoreg_w)
 	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
-	AM_RANGE(0x6800, 0x68ff) AM_DEVWRITE("ay", ay8910_address_w)
-	AM_RANGE(0x6900, 0x69ff) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x6800, 0x68ff) AM_DEVWRITE("aysnd", ay8910_address_w)
+	AM_RANGE(0x6900, 0x69ff) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0x7000, 0x73ff) AM_READ(survival_input_port_0_r)				/* IN0 or IN1 */
 	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0") 							/* DSW */
 ADDRESS_MAP_END
@@ -550,7 +550,7 @@ static MACHINE_DRIVER_START( survival )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	/* FIXME: check clock */
-	MDRV_SOUND_ADD("ay", AY8910, 11000000/4)
+	MDRV_SOUND_ADD("aysnd", AY8910, 11000000/4)
 	MDRV_SOUND_CONFIG(survival_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

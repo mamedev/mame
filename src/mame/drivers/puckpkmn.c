@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( puckpkmn_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700016, 0x700017) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700018, 0x700019) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700022, 0x700023) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
-	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8("ym", megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
+	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8("ymsnd", megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
 	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w)
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
 

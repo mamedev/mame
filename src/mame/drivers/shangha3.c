@@ -134,9 +134,9 @@ static ADDRESS_MAP_START( shangha3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200008, 0x200009) AM_WRITE(shangha3_blitter_go_w)
 	AM_RANGE(0x20000a, 0x20000b) AM_WRITENOP	/* irq ack? */
 	AM_RANGE(0x20000c, 0x20000d) AM_WRITE(shangha3_coinctrl_w)
-	AM_RANGE(0x20001e, 0x20001f) AM_DEVREAD8("ay", ay8910_r, 0x00ff)
-	AM_RANGE(0x20002e, 0x20002f) AM_DEVWRITE8("ay", ay8910_data_w, 0x00ff)
-	AM_RANGE(0x20003e, 0x20003f) AM_DEVWRITE8("ay", ay8910_address_w, 0x00ff)
+	AM_RANGE(0x20001e, 0x20001f) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
+	AM_RANGE(0x20002e, 0x20002f) AM_DEVWRITE8("aysnd", ay8910_data_w, 0x00ff)
+	AM_RANGE(0x20003e, 0x20003f) AM_DEVWRITE8("aysnd", ay8910_address_w, 0x00ff)
 	AM_RANGE(0x20004e, 0x20004f) AM_READWRITE(shangha3_prot_r,shangha3_prot_w)
 	AM_RANGE(0x20006e, 0x20006f) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE(&shangha3_ram) AM_SIZE(&shangha3_ram_size)	/* gfx & work ram */
@@ -184,7 +184,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( heberpop_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ym", ym3438_r, ym3438_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym3438_r, ym3438_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -502,7 +502,7 @@ static MACHINE_DRIVER_START( shangha3 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 1500000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
@@ -542,7 +542,7 @@ static MACHINE_DRIVER_START( heberpop )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3438, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM3438, 8000000)
 	MDRV_SOUND_CONFIG(ym3438_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 	MDRV_SOUND_ROUTE(1, "mono", 0.40)
@@ -583,7 +583,7 @@ static MACHINE_DRIVER_START( blocken )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3438, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM3438, 8000000)
 	MDRV_SOUND_CONFIG(ym3438_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 	MDRV_SOUND_ROUTE(1, "mono", 0.40)

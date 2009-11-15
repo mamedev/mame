@@ -469,7 +469,7 @@ static WRITE8_HANDLER( nmi_rate_w )
 
 static CUSTOM_INPUT( speech_drq_custom_r )
 {
-	return sp0250_drq_r(devtag_get_device(field->port->machine, "sp"));
+	return sp0250_drq_r(devtag_get_device(field->port->machine, "spsnd"));
 }
 
 
@@ -506,14 +506,14 @@ static WRITE8_HANDLER( speech_control_w )
 	/* bit 6 = speech chip DATA PRESENT pin; high then low to make the chip read data */
 	if ((previous & 0x40) == 0 && (data & 0x40) != 0)
 	{
-		const device_config *sp = devtag_get_device(space->machine, "sp");
+		const device_config *sp = devtag_get_device(space->machine, "spsnd");
 		sp0250_w(sp, 0, *sp0250_latch);
 	}
 
 	/* bit 7 goes to the speech chip RESET pin */
 	if ((previous ^ data) & 0x80)
 	{
-		const device_config *sp = devtag_get_device(space->machine, "sp");
+		const device_config *sp = devtag_get_device(space->machine, "spsnd");
 		device_reset(sp);
 	}
 }
@@ -601,7 +601,7 @@ MACHINE_DRIVER_START( gottlieb_soundrev2 )
 	MDRV_SOUND_ADD("ay2", AY8913, SOUND2_CLOCK/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("sp", SP0250, SOUND2_SPEECH_CLOCK)
+	MDRV_SOUND_ADD("spsnd", SP0250, SOUND2_SPEECH_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

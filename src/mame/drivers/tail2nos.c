@@ -94,9 +94,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x07, 0x07) AM_READWRITE(soundlatch_r, SMH_NOP)	/* the write is a clear pending command */
-	AM_RANGE(0x08, 0x0b) AM_DEVWRITE("ym", ym2608_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVWRITE("ymsnd", ym2608_w)
 #if 0
-	AM_RANGE(0x18, 0x1b) AM_DEVREAD("ym", ym2608_r)
+	AM_RANGE(0x18, 0x1b) AM_DEVREAD("ymsnd", ym2608_r)
 #endif
 ADDRESS_MAP_END
 
@@ -263,7 +263,7 @@ static MACHINE_DRIVER_START( tail2nos )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2608, XTAL_8MHz)	/* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2608, XTAL_8MHz)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2608_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -304,7 +304,7 @@ ROM_START( tail2nos )
 	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )	/* gfx data for the 051316 */
 	/* RAM, not ROM - handled at run time */
 
-	ROM_REGION( 0x20000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x20000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "osb",          0x00000, 0x20000, CRC(d49ab2f5) SHA1(92f7f6c8f35ac39910879dd88d2cfb6db7c848c9) )
 ROM_END
 
@@ -339,7 +339,7 @@ ROM_START( sformula )
 	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )	/* gfx data for the 051316 */
 	/* RAM, not ROM - handled at run time */
 
-	ROM_REGION( 0x20000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x20000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "osb",          0x00000, 0x20000, CRC(d49ab2f5) SHA1(92f7f6c8f35ac39910879dd88d2cfb6db7c848c9) )
 ROM_END
 

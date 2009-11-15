@@ -121,11 +121,11 @@ static WRITE8_HANDLER( drw80pkr_io_w )
 
 	// ay8910 control port
 	if (p1 == 0xfc && p2 == 0xff && offset == 0x00)
-		ay8910_address_w(devtag_get_device(space->machine, "ay"), 0, data);
+		ay8910_address_w(devtag_get_device(space->machine, "aysnd"), 0, data);
 
 	// ay8910_write_port_0_w
 	if (p1 == 0xfe && p2 == 0xff && offset == 0x00)
-		ay8910_data_w(devtag_get_device(space->machine, "ay"), 0, data);
+		ay8910_data_w(devtag_get_device(space->machine, "aysnd"), 0, data);
 
 	// CRTC Register
 	// R0 = 0x1f(31)    Horizontal Total
@@ -331,7 +331,7 @@ static MACHINE_DRIVER_START( drw80pkr )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8912, 20000000/12)
+	MDRV_SOUND_ADD("aysnd", AY8912, 20000000/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 

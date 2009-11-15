@@ -324,12 +324,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinhero_bbx_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shangkid_bbx_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 /***************************************************************************************/
@@ -414,7 +414,7 @@ static MACHINE_DRIVER_START( chinhero )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("ay", AY8910, XTAL_18_432MHz/12) /* verified on pcb */
+	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12) /* verified on pcb */
 	MDRV_SOUND_CONFIG(chinhero_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
@@ -439,7 +439,7 @@ static MACHINE_DRIVER_START( shangkid )
 	/* video hardware */
 	MDRV_GFXDECODE(shangkid)
 
-	MDRV_SOUND_MODIFY("ay")
+	MDRV_SOUND_MODIFY("aysnd")
 	MDRV_SOUND_CONFIG(shangkid_ay8910_interface)
 MACHINE_DRIVER_END
 
@@ -463,7 +463,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dynamski_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* ports are reversed */
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( dynamski )
@@ -491,7 +491,7 @@ static MACHINE_DRIVER_START( dynamski )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 2000000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
 

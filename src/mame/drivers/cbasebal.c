@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( cbasebal_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_WRITE(eeprom_clock_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(eeprom_serial_w)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE("oki", okim6295_w)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("ym", ym2413_w)
+	AM_RANGE(0x06, 0x07) AM_DEVWRITE("ymsnd", ym2413_w)
 	AM_RANGE(0x08, 0x09) AM_WRITE(cbasebal_scrollx_w)
 	AM_RANGE(0x0a, 0x0b) AM_WRITE(cbasebal_scrolly_w)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("P1")
@@ -270,7 +270,7 @@ static MACHINE_DRIVER_START( cbasebal )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

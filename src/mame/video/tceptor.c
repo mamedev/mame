@@ -534,7 +534,7 @@ VIDEO_UPDATE( tceptor )
 	int pri;
 	int bg_center = 144 - ((((bg1_scroll_x + bg2_scroll_x ) & 0x1ff) - 288) / 2);
 
-	const device_config *_2d_screen       = devtag_get_device(screen->machine, "2d");
+	const device_config *_2d_screen       = devtag_get_device(screen->machine, "2dscreen");
 	const device_config *_3d_left_screen  = devtag_get_device(screen->machine, "3dleft");
 	const device_config *_3d_right_screen = devtag_get_device(screen->machine, "3dright");
 

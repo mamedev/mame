@@ -109,8 +109,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hotblock_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(hotblock_port0_w)
 	AM_RANGE(0x0004, 0x0004) AM_READ(hotblock_port4_r) AM_WRITE(hotblock_port4_w)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
 
@@ -211,7 +211,7 @@ static MACHINE_DRIVER_START( hotblock )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 1000000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 1000000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

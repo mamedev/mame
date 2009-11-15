@@ -272,7 +272,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_RESET, ASSERT_LINE);
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
 	cputag_set_input_line(machine, "genesis_snd_z80", INPUT_LINE_HALT, ASSERT_LINE);
-	devtag_reset(machine, "ym");
+	devtag_reset(machine, "ymsnd");
 
 	sprintf(tempname, "game%d", gameno);
 	game_region = memory_region(machine, tempname);

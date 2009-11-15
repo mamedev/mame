@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( mayumi_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(input_sel_w)
 	AM_RANGE(0xc1, 0xc2) AM_READ(key_matrix_r)	// 0xc0-c3 8255ppi
 	AM_RANGE(0xc3, 0xc3) AM_WRITENOP		// 0xc0-c3 8255ppi
-	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
+	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 /****************************************************************************/
@@ -296,7 +296,7 @@ static MACHINE_DRIVER_START( mayumi )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, MCLK/4)
+	MDRV_SOUND_ADD("ymsnd", YM2203, MCLK/4)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)

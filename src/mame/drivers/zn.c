@@ -1214,7 +1214,7 @@ static ADDRESS_MAP_START( fx1a_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK(10))	/* Fallthrough */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ym", ym2610_r, ym2610_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_READWRITE(SMH_NOP, taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
@@ -1242,7 +1242,7 @@ static MACHINE_DRIVER_START( coh1000ta )
 	MDRV_MACHINE_RESET( coh1000ta )
 	MDRV_NVRAM_HANDLER( coh1000ta )
 
-	MDRV_SOUND_ADD("ym", YM2610B, 16000000/2)
+	MDRV_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
 	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -3906,7 +3906,7 @@ ROM_START( mgcldate )
 	ROM_LOAD( "e32-07.22",           0x0000000, 0x004000, CRC(adf3feb5) SHA1(bae5bc3fad99a92a3492be1b775dab861007eb3b) )
 	ROM_CONTINUE(                    0x0010000, 0x01c000 ) /* banked stuff */
 
-	ROM_REGION( 0x400000, "ym", 0 )
+	ROM_REGION( 0x400000, "ymsnd", 0 )
 	ROM_LOAD( "e32-04.15",           0x0000000, 0x400000, CRC(c72f9eea) SHA1(7ab8b412a8ed00a42016acb7d13d3b074155780a) )
 ROM_END
 
@@ -3924,7 +3924,7 @@ ROM_START( mgcldtex )
 	ROM_LOAD( "e32-10.22",           0x0000000, 0x004000, CRC(adf3feb5) SHA1(bae5bc3fad99a92a3492be1b775dab861007eb3b) )
 	ROM_CONTINUE(                    0x0010000, 0x01c000 ) /* banked stuff */
 
-	ROM_REGION( 0x400000, "ym", 0 )
+	ROM_REGION( 0x400000, "ymsnd", 0 )
 	ROM_LOAD( "e32-04.15",           0x0000000, 0x400000, CRC(c72f9eea) SHA1(7ab8b412a8ed00a42016acb7d13d3b074155780a) )
 ROM_END
 
@@ -3942,7 +3942,7 @@ ROM_START( psyforce )
 	ROM_LOAD( "e22-07.22",           0x0000000, 0x004000, CRC(739af589) SHA1(dbb4d1c6d824a99ccf27168e2c21644e19811523) )
 	ROM_CONTINUE(                    0x0010000, 0x01c000 ) /* banked stuff */
 
-	ROM_REGION( 0x200000, "ym", 0 )
+	ROM_REGION( 0x200000, "ymsnd", 0 )
 	ROM_LOAD( "e22-01.15",           0x000000,  0x200000, CRC(808b8340) SHA1(d8bde850dd9b5b71e94ea707d2d728754f907977) )
 ROM_END
 
@@ -3960,7 +3960,7 @@ ROM_START( psyforcej )
 	ROM_LOAD( "e22-07.22",           0x0000000, 0x004000, CRC(739af589) SHA1(dbb4d1c6d824a99ccf27168e2c21644e19811523) )
 	ROM_CONTINUE(                    0x0010000, 0x01c000 ) /* banked stuff */
 
-	ROM_REGION( 0x200000, "ym", 0 )
+	ROM_REGION( 0x200000, "ymsnd", 0 )
 	ROM_LOAD( "e22-01.15",           0x000000,  0x200000, CRC(808b8340) SHA1(d8bde850dd9b5b71e94ea707d2d728754f907977) )
 ROM_END
 
@@ -3978,7 +3978,7 @@ ROM_START( psyforcex )
 	ROM_LOAD( "e22-07.22",           0x0000000, 0x004000, CRC(739af589) SHA1(dbb4d1c6d824a99ccf27168e2c21644e19811523) )
 	ROM_CONTINUE(                    0x0010000, 0x01c000 ) /* banked stuff */
 
-	ROM_REGION( 0x200000, "ym", 0 )
+	ROM_REGION( 0x200000, "ymsnd", 0 )
 	ROM_LOAD( "e22-01.15",           0x000000,  0x200000, CRC(808b8340) SHA1(d8bde850dd9b5b71e94ea707d2d728754f907977) )
 ROM_END
 
@@ -4030,7 +4030,7 @@ ROM_START( sfchamp )
 	ROM_LOAD( "e18-09.22",           0x0000000, 0x004000, CRC(bb5a5319) SHA1(0bb700cafc157d3af663cc9bebb8167487ff2852) )
 	ROM_CONTINUE(                    0x0010000, 0x01c000 ) /* banked stuff */
 
-	ROM_REGION( 0x200000, "ym", 0 )
+	ROM_REGION( 0x200000, "ymsnd", 0 )
 	ROM_LOAD( "e18-01.15",           0x0000000, 0x200000, CRC(dbd1408c) SHA1(ef81064f2f95e5ae25eb1f10d1e78f27f9e294f5) )
 ROM_END
 
@@ -4049,7 +4049,7 @@ ROM_START( sfchampj )
 	ROM_LOAD( "e18-09.22",           0x0000000, 0x004000, CRC(bb5a5319) SHA1(0bb700cafc157d3af663cc9bebb8167487ff2852) )
 	ROM_CONTINUE(                    0x0010000, 0x01c000 ) /* banked stuff */
 
-	ROM_REGION( 0x200000, "ym", 0 )
+	ROM_REGION( 0x200000, "ymsnd", 0 )
 	ROM_LOAD( "e18-01.15",           0x0000000, 0x200000, CRC(dbd1408c) SHA1(ef81064f2f95e5ae25eb1f10d1e78f27f9e294f5) )
 ROM_END
 

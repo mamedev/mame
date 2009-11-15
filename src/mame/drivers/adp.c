@@ -328,7 +328,7 @@ static READ16_HANDLER(test_r)
 	switch(mux_data)
 	{
 		case 0x00: value = input_port_read(space->machine, "x0"); break;
-		case 0x01: value = input_port_read(space->machine, "x1"); break;
+		case 0x01: value = input_port_read(space->machine, "x1snd"); break;
 		case 0x02: value = input_port_read(space->machine, "x2"); break;
 		case 0x03: value = input_port_read(space->machine, "1P_UP"); break;
 		case 0x04: value = input_port_read(space->machine, "1P_B1"); break;
@@ -377,8 +377,8 @@ static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w)
 	AM_RANGE(0x800100, 0x800101) AM_READWRITE(test_r,wh2_w) //related to input
 	AM_RANGE(0x800140, 0x800141) AM_READ(t2_r)
-	AM_RANGE(0x800140, 0x800143) AM_DEVWRITE8("ay", ay8910_address_data_w, 0x00ff) //18b too
-	AM_RANGE(0x800142, 0x800143) AM_DEVREAD8("ay", ay8910_r, 0x00ff) //18b too
+	AM_RANGE(0x800140, 0x800143) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff) //18b too
+	AM_RANGE(0x800142, 0x800143) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff )
 //  AM_RANGE(0xffd246, 0xffd247) AM_READ(handler3_r)
 //  AM_RANGE(0xffd248, 0xffd249) AM_READ(handler3_r)
@@ -410,8 +410,8 @@ static ADDRESS_MAP_START( funland_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w)
 //  AM_RANGE(0x800100, 0x8001ff) AM_READ(test_r) //18b too
 	AM_RANGE(0x800140, 0x800141) AM_READ(t2_r)
-	AM_RANGE(0x800140, 0x800143) AM_DEVWRITE8("ay", ay8910_address_data_w, 0x00ff) //18b too
-	AM_RANGE(0x800142, 0x800143) AM_DEVREAD8("ay", ay8910_r, 0x00ff) //18b too
+	AM_RANGE(0x800140, 0x800143) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff) //18b too
+	AM_RANGE(0x800142, 0x800143) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff )
 	AM_RANGE(0xfc0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -440,7 +440,7 @@ static INPUT_PORTS_START( skattv )
 	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
 
-	PORT_START("x1")
+	PORT_START("x1snd")
 	PORT_DIPNAME( 0x0004,0x0004, "SW1" ) //another up button
 	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
@@ -536,7 +536,7 @@ static MACHINE_DRIVER_START( quickjac )
 	MDRV_VIDEO_UPDATE(adp)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8910, 3686400/2)
+	MDRV_SOUND_ADD("aysnd", AY8910, 3686400/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 MACHINE_DRIVER_END
@@ -564,7 +564,7 @@ static MACHINE_DRIVER_START( skattv )
 	MDRV_VIDEO_UPDATE(adp)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8910, 3686400/2)
+	MDRV_SOUND_ADD("aysnd", AY8910, 3686400/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 MACHINE_DRIVER_END
@@ -586,7 +586,7 @@ static MACHINE_DRIVER_START( backgamn )
 	MDRV_VIDEO_UPDATE(adp)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8910, 3686400/2)
+	MDRV_SOUND_ADD("aysnd", AY8910, 3686400/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 MACHINE_DRIVER_END

@@ -192,8 +192,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( lsasquad_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym", ym2203_r,ym2203_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2203_r,ym2203_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(lsasquad_sh_sound_command_r,lsasquad_sh_result_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(lsasquad_sh_nmi_disable_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(lsasquad_sh_nmi_enable_w)
@@ -361,8 +361,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( daikaiju_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ(daikaiju_sh_sound_command_r)
 	AM_RANGE(0xd400, 0xd400) AM_WRITENOP
 	AM_RANGE(0xd800, 0xd800) AM_READ(daikaiju_sound_status_r) AM_WRITENOP
@@ -562,10 +562,10 @@ static MACHINE_DRIVER_START( lsasquad )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 3000000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 3000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MDRV_SOUND_ADD("ym", YM2203, 3000000)
+	MDRV_SOUND_ADD("ymsnd", YM2203, 3000000)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.12)
 	MDRV_SOUND_ROUTE(1, "mono", 0.12)
@@ -607,10 +607,10 @@ static MACHINE_DRIVER_START( daikaiju )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 3000000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 3000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MDRV_SOUND_ADD("ym", YM2203, 3000000)
+	MDRV_SOUND_ADD("ymsnd", YM2203, 3000000)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.12)
 	MDRV_SOUND_ROUTE(1, "mono", 0.12)

@@ -1259,8 +1259,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( system32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0x100000)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE("rf", rf5c68_w)
-	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE("rf", rf5c68_mem_r, rf5c68_mem_w)
+	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE("rfsnd", rf5c68_w)
+	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE("rfsnd", rf5c68_mem_r, rf5c68_mem_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE(&z80_shared_ram)
 ADDRESS_MAP_END
 
@@ -1287,7 +1287,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( multi32_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym", ym3438_r, ym3438_w)
+	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ymsnd", ym3438_r, ym3438_w)
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(sound_bank_lo_w)
 	AM_RANGE(0xb0, 0xbf) AM_DEVWRITE("sega", multipcm_bank_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(sound_int_control_lo_w)
@@ -2215,7 +2215,7 @@ static MACHINE_DRIVER_START( system32 )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MDRV_SOUND_ADD("rf", RF5C68, RFC_CLOCK/4)
+	MDRV_SOUND_ADD("rfsnd", RF5C68, RFC_CLOCK/4)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.55)
 MACHINE_DRIVER_END
@@ -2267,7 +2267,7 @@ static MACHINE_DRIVER_START( multi32 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM3438, MASTER_CLOCK/4)
+	MDRV_SOUND_ADD("ymsnd", YM3438, MASTER_CLOCK/4)
 	MDRV_SOUND_CONFIG(ym3438_config)
 	MDRV_SOUND_ROUTE(1, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.40)

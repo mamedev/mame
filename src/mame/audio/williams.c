@@ -97,7 +97,7 @@ static WRITE8_HANDLER( narc_slave_sync_w );
 /* CVSD readmem/writemem structures */
 static ADDRESS_MAP_START( williams_cvsd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("cvsdpia", pia6821_r, pia6821_w)
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x07ff) AM_DEVWRITE("cvsd", cvsd_digit_clock_clear_w)
 	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07ff) AM_DEVWRITE("cvsd", cvsd_clock_set_w)
@@ -109,7 +109,7 @@ ADDRESS_MAP_END
 /* NARC master readmem/writemem structures */
 static ADDRESS_MAP_START( williams_narc_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_WRITE(narc_master_talkback_w)
 	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_WRITE(narc_command2_w)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_DEVWRITE("dac1", dac_w)
@@ -139,7 +139,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( williams_adpcm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_WRITE(adpcm_bank_select_w)
-	AM_RANGE(0x2400, 0x2401) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x2400, 0x2401) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_READ(adpcm_command_r)
@@ -201,7 +201,7 @@ MACHINE_DRIVER_START( williams_cvsd_sound )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, CVSD_FM_CLOCK)
+	MDRV_SOUND_ADD("ymsnd", YM2151, CVSD_FM_CLOCK)
 	MDRV_SOUND_CONFIG(cvsd_ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
@@ -222,7 +222,7 @@ MACHINE_DRIVER_START( williams_narc_sound )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, NARC_FM_CLOCK)
+	MDRV_SOUND_ADD("ymsnd", YM2151, NARC_FM_CLOCK)
 	MDRV_SOUND_CONFIG(adpcm_ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
@@ -247,7 +247,7 @@ MACHINE_DRIVER_START( williams_adpcm_sound )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, ADPCM_FM_CLOCK)
+	MDRV_SOUND_ADD("ymsnd", YM2151, ADPCM_FM_CLOCK)
 	MDRV_SOUND_CONFIG(adpcm_ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
@@ -382,7 +382,7 @@ void williams_adpcm_init(running_machine *machine)
 static void init_audio_state(running_machine *machine)
 {
 	/* reset the YM2151 state */
-	devtag_reset(machine, "ym");
+	devtag_reset(machine, "ymsnd");
 
 	/* clear all the interrupts */
 	williams_sound_int_state = 0;

@@ -198,7 +198,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, soundlatch_w)	/* goes back to the main CPU, checked during boot */
 ADDRESS_MAP_END
 
@@ -300,7 +300,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( honeydol_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)								// not connected?
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)								// not connected?
 	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, soundlatch_w)	/* goes back to the main CPU, checked during boot */
 ADDRESS_MAP_END
 
@@ -375,7 +375,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hyperpac_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym", ym2151_r,ym2151_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_r,ym2151_w)
 	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki",okim6295_r,okim6295_w)
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -1543,7 +1543,7 @@ static MACHINE_DRIVER_START( snowbros )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, 3000000)
+	MDRV_SOUND_ADD("ymsnd", YM3812, 3000000)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1575,7 +1575,7 @@ static MACHINE_DRIVER_START( semicom )
 	MDRV_GFXDECODE(hyperpac)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("ym", YM2151, 4000000)
+	MDRV_SOUND_REPLACE("ymsnd", YM2151, 4000000)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.10)
 	MDRV_SOUND_ROUTE(1, "mono", 0.10)
@@ -1652,7 +1652,7 @@ static MACHINE_DRIVER_START( honeydol )
 
 	/* sound hardware */
 
-	MDRV_SOUND_ADD("ym", YM3812, 3000000)
+	MDRV_SOUND_ADD("ymsnd", YM3812, 3000000)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -1725,7 +1725,7 @@ static MACHINE_DRIVER_START( finalttr )
 
 	MDRV_MACHINE_RESET ( finalttr )
 
-	MDRV_SOUND_REPLACE("ym", YM2151, 4000000)
+	MDRV_SOUND_REPLACE("ymsnd", YM2151, 4000000)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.08)
 	MDRV_SOUND_ROUTE(1, "mono", 0.08)

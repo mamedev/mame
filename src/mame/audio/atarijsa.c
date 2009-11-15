@@ -136,7 +136,7 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 
 	/* determine which sound hardware is installed */
 	tms5220 = devtag_get_device(machine, "tms");
-	ym2151 = devtag_get_device(machine, "ym");
+	ym2151 = devtag_get_device(machine, "ymsnd");
 	pokey = devtag_get_device(machine, "pokey");
 	oki6295 = devtag_get_device(machine, "adpcm");
 	oki6295_l = devtag_get_device(machine, "adpcml");
@@ -723,7 +723,7 @@ static void update_all_volumes(running_machine *machine )
 
 static ADDRESS_MAP_START( atarijsa1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(jsa1_io_r, jsa1_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -731,7 +731,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atarijsa2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(jsa2_io_r, jsa2_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -740,7 +740,7 @@ ADDRESS_MAP_END
 /* full map verified from schematics and Batman GALs */
 static ADDRESS_MAP_START( atarijsa3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(jsa3_io_r, jsa3_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -748,7 +748,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atarijsa3s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(jsa3s_io_r, jsa3s_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -785,7 +785,7 @@ MACHINE_DRIVER_START( jsa_i_stereo )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, JSA_MASTER_CLOCK)
+	MDRV_SOUND_ADD("ymsnd", YM2151, JSA_MASTER_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)
@@ -799,7 +799,7 @@ MACHINE_DRIVER_START( jsa_i_stereo_swapped )
 	MDRV_IMPORT_FROM(jsa_i_stereo)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("ym", YM2151, JSA_MASTER_CLOCK)
+	MDRV_SOUND_REPLACE("ymsnd", YM2151, JSA_MASTER_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.60)
 	MDRV_SOUND_ROUTE(1, "lspeaker", 0.60)
@@ -830,7 +830,7 @@ MACHINE_DRIVER_START( jsa_i_mono_speech )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, JSA_MASTER_CLOCK)
+	MDRV_SOUND_ADD("ymsnd", YM2151, JSA_MASTER_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
@@ -851,7 +851,7 @@ MACHINE_DRIVER_START( jsa_ii_mono )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, JSA_MASTER_CLOCK)
+	MDRV_SOUND_ADD("ymsnd", YM2151, JSA_MASTER_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
@@ -897,7 +897,7 @@ MACHINE_DRIVER_START( jsa_iiis_stereo )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, JSA_MASTER_CLOCK)
+	MDRV_SOUND_ADD("ymsnd", YM2151, JSA_MASTER_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)

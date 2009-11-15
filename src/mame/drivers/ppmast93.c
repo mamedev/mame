@@ -196,7 +196,7 @@ static WRITE8_HANDLER(ppmast_sound_w)
 	switch(offset&0xff)
 	{
 		case 0:
-		case 1: ym2413_w(devtag_get_device(space->machine, "ym"),offset,data); break;
+		case 1: ym2413_w(devtag_get_device(space->machine, "ymsnd"),offset,data); break;
 		case 2: dac_data_w(devtag_get_device(space->machine, "dac"),data);break;
 		default: logerror("%x %x - %x\n",offset,data,cpu_get_previouspc(space->cpu));
 	}
@@ -369,7 +369,7 @@ static MACHINE_DRIVER_START( ppmast93 )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2413, 5000000/2)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 5000000/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)

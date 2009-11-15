@@ -414,9 +414,9 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2A01, 0x2A01) AM_READWRITE(mux_ctrl_r,mux_ctrl_w)// mux status register
 	AM_RANGE(0x2E00, 0x2E00) AM_READ(irqlatch_r)		// irq latch ( MC6850 / timer )
 
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("ay", ay8910_data_w)
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("aysnd", ay8910_data_w)
 	AM_RANGE(0x3001, 0x3001) AM_READNOP //sound latch
-	AM_RANGE(0x3200, 0x3200) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0x3200, 0x3200) AM_DEVWRITE("aysnd", ay8910_address_w)
 
 	AM_RANGE(0x3402, 0x3402) AM_DEVWRITE("acia6850_0", acia6850_ctrl_w)
 	AM_RANGE(0x3403, 0x3403) AM_DEVWRITE("acia6850_0", acia6850_data_w)
@@ -443,7 +443,7 @@ static MACHINE_DRIVER_START( bfmsys85 )
 	MDRV_ACIA6850_ADD("acia6850_0", m6809_acia_if)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay",AY8912, MASTER_CLOCK/4)			// add AY8912 soundchip
+	MDRV_SOUND_ADD("aysnd",AY8912, MASTER_CLOCK/4)			// add AY8912 soundchip
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)					// load/save nv RAM

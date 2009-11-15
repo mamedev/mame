@@ -68,8 +68,8 @@ static ADDRESS_MAP_START( pastelg_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_WRITENOP
 	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
-	AM_RANGE(0x81, 0x81) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x90, 0x96) AM_WRITE(pastelg_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(nb1413m3_inputport1_r, nb1413m3_inputportsel_w)
@@ -117,8 +117,8 @@ static WRITE8_HANDLER( threeds_inputportsel_w )
 
 static ADDRESS_MAP_START( threeds_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x81, 0x81) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM") AM_WRITE( threeds_romsel_w )
 	AM_RANGE(0xf0, 0xf6) AM_WRITE(pastelg_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(threeds_inputport1_r, threeds_inputportsel_w)
@@ -426,7 +426,7 @@ static MACHINE_DRIVER_START( pastelg )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 1250000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 1250000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
@@ -485,7 +485,7 @@ static MACHINE_DRIVER_START( threeds )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 1250000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 1250000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 

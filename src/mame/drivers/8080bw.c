@@ -903,7 +903,7 @@ static MACHINE_DRIVER_START( schaser )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn", SN76477, 0)
+	MDRV_SOUND_ADD("snsnd", SN76477, 0)
 	MDRV_SOUND_CONFIG(schaser_sn76477_interface)
 	MDRV_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
 

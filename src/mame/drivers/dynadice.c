@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( dynadice_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
 	AM_RANGE(0x01, 0x01) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sound_data_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ay", sound_control_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("aysnd", sound_control_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dynadice )
@@ -222,7 +222,7 @@ static MACHINE_DRIVER_START( dynadice )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 2000000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

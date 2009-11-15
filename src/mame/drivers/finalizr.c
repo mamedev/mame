@@ -117,7 +117,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0813, 0x0813) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0818, 0x0818) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0819, 0x0819) AM_WRITE(finalizr_coin_w)
-	AM_RANGE(0x081a, 0x081a) AM_DEVWRITE("sn", sn76496_w)	/* This address triggers the SN chip to read the data port. */
+	AM_RANGE(0x081a, 0x081a) AM_DEVWRITE("snsnd", sn76496_w)	/* This address triggers the SN chip to read the data port. */
 	AM_RANGE(0x081b, 0x081b) AM_WRITENOP		/* Loads the snd command into the snd latch */
 	AM_RANGE(0x081c, 0x081c) AM_WRITE(finalizr_i8039_irq_w)	/* custom sound chip */
 	AM_RANGE(0x081d, 0x081d) AM_WRITE(soundlatch_w)			/* custom sound chip */
@@ -276,7 +276,7 @@ static MACHINE_DRIVER_START( finalizr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn", SN76489A, XTAL_18_432MHz/12)
+	MDRV_SOUND_ADD("snsnd", SN76489A, XTAL_18_432MHz/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)

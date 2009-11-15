@@ -198,7 +198,7 @@ static MACHINE_RESET( tugboat )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_BASE(&tugboat_ram)
-	AM_RANGE(0x1060, 0x1061) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x1060, 0x1061) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x10a0, 0x10a1) AM_WRITE(tugboat_hd46505_0_w)	/* scrolling is performed changing the start_addr register (0C/0D) */
 	AM_RANGE(0x10c0, 0x10c1) AM_WRITE(tugboat_hd46505_1_w)
 	AM_RANGE(0x11e4, 0x11e7) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
@@ -338,7 +338,7 @@ static MACHINE_DRIVER_START( tugboat )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 2000000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_DRIVER_END
 

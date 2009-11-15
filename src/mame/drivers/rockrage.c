@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( rockrage_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("vlm", rockrage_VLM5030_busy_r)			/* VLM5030 */
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("vlm", rockrage_speech_w)				/* VLM5030 */
 	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)								/* soundlatch_r */
-	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ym", ym2151_r,ym2151_w)			/* YM 2151 */
+	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ymsnd", ym2151_r,ym2151_w)			/* YM 2151 */
 	AM_RANGE(0x7000, 0x77ff) AM_RAM												/* RAM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM												/* ROM */
 ADDRESS_MAP_END
@@ -294,7 +294,7 @@ static MACHINE_DRIVER_START( rockrage )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 3579545)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 

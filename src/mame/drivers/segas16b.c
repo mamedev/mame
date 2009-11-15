@@ -1558,7 +1558,7 @@ static void wrestwar_i8751_sim(running_machine *machine)
 
 static WRITE16_HANDLER( atomicp_sound_w )
 {
-	ym2413_w(devtag_get_device(space->machine, "ym"), offset, data >> 8);
+	ym2413_w(devtag_get_device(space->machine, "ymsnd"), offset, data >> 8);
 }
 
 
@@ -1785,7 +1785,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVWRITE("upd", upd7759_control_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_DEVREADWRITE("upd", upd7759_status_r, upd7759_port_w)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(soundlatch_r)
@@ -3264,7 +3264,7 @@ static MACHINE_DRIVER_START( system16b )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, MASTER_CLOCK_8MHz/2)
+	MDRV_SOUND_ADD("ymsnd", YM2151, MASTER_CLOCK_8MHz/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
 
 	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
@@ -3299,7 +3299,7 @@ static MACHINE_DRIVER_START( atomicp ) /* 10MHz CPU Clock verified */
 	MDRV_MACHINE_RESET(atomicp)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("ym", YM2413, XTAL_20MHz/4) /* 20MHz OSC divided by 4 (verified) */
+	MDRV_SOUND_REPLACE("ymsnd", YM2413, XTAL_20MHz/4) /* 20MHz OSC divided by 4 (verified) */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_DEVICE_REMOVE("upd")

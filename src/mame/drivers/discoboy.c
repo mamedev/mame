@@ -326,7 +326,7 @@ static void splash_msm5205_int(const device_config *device)
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ym", ym3812_w)
+	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_w)
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -474,7 +474,7 @@ static MACHINE_DRIVER_START( discoboy )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, 2500000)
+	MDRV_SOUND_ADD("ymsnd", YM3812, 2500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 

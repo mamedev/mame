@@ -214,7 +214,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bssoccer_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	// ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM	// RAM
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)	// YM2151
+	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)	// YM2151
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(soundlatch_r)	// From Main CPU
 	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(soundlatch2_w)	// To PCM Z80 #1
 	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(soundlatch3_w)	// To PCM Z80 #2
@@ -227,7 +227,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( uballoon_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM	// ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM	// RAM
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)	// YM2151
+	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)	// YM2151
 	AM_RANGE(0xfc00, 0xfc00) AM_READWRITE(soundlatch_r, soundlatch2_w)	// To PCM Z80
 ADDRESS_MAP_END
 
@@ -238,7 +238,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sunaq_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xe82f) AM_ROM	// ROM
 	AM_RANGE(0xe830, 0xf7ff) AM_RAM	// RAM (writes to efxx, could be a program bug tho)
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)	// YM2151
+	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)	// YM2151
 	AM_RANGE(0xfc00, 0xfc00) AM_READWRITE(soundlatch_r, soundlatch2_w)	// To PCM Z80
 ADDRESS_MAP_END
 
@@ -248,8 +248,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bestbest_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0xbfff ) AM_ROM									// ROM
-	AM_RANGE( 0xc000, 0xc001 ) AM_DEVWRITE( "ym", ym3526_w	)	//
-	AM_RANGE( 0xc002, 0xc003 ) AM_DEVWRITE( "ay", ay8910_address_data_w	)	// AY8910
+	AM_RANGE( 0xc000, 0xc001 ) AM_DEVWRITE( "ymsnd", ym3526_w	)	//
+	AM_RANGE( 0xc002, 0xc003 ) AM_DEVWRITE( "aysnd", ay8910_address_data_w	)	// AY8910
 	AM_RANGE( 0xe000, 0xe7ff ) AM_RAM									// RAM
 	AM_RANGE( 0xf000, 0xf000 ) AM_WRITE( soundlatch2_w				)	// To PCM Z80
 	AM_RANGE( 0xf800, 0xf800 ) AM_READ ( soundlatch_r				)	// From Main CPU
@@ -796,7 +796,7 @@ static MACHINE_DRIVER_START( bssoccer )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 3579545)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.20)
 
@@ -856,7 +856,7 @@ static MACHINE_DRIVER_START( uballoon )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 3579545)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -905,7 +905,7 @@ static MACHINE_DRIVER_START( sunaq )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, 14318000/4)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 14318000/4)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -977,12 +977,12 @@ static MACHINE_DRIVER_START( bestbest )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ay", AY8910, 24000000/16)
+	MDRV_SOUND_ADD("aysnd", AY8910, 24000000/16)
 	MDRV_SOUND_CONFIG(bestbest_ay8910_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("ym", YM3526, 24000000/8)
+	MDRV_SOUND_ADD("ymsnd", YM3526, 24000000/8)
 	MDRV_SOUND_CONFIG(bestbest_ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)

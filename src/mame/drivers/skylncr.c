@@ -377,8 +377,8 @@ static ADDRESS_MAP_START( io_map_skylncr, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0x20, 0x20) AM_WRITE( skylncr_coin_w )
 
-	AM_RANGE(0x30, 0x31) AM_DEVWRITE( "ay", ay8910_address_data_w )
-	AM_RANGE(0x31, 0x31) AM_DEVREAD( "ay", ay8910_r )
+	AM_RANGE(0x30, 0x31) AM_DEVWRITE( "aysnd", ay8910_address_data_w )
+	AM_RANGE(0x31, 0x31) AM_DEVREAD( "aysnd", ay8910_r )
 
 	AM_RANGE(0x40, 0x41) AM_WRITE( skylncr_paletteram_w )
 	AM_RANGE(0x50, 0x51) AM_WRITE( skylncr_paletteram2_w )
@@ -527,7 +527,7 @@ static INPUT_PORTS_START( skylncr )
 	PORT_DIPSETTING(    0x00, "24" )
 	PORT_DIPNAME( 0x80, 0x00, "Key Out" )
 	PORT_DIPSETTING(    0x80, "x100" )
-	PORT_DIPSETTING(    0x00, "x1" )
+	PORT_DIPSETTING(    0x00, "x1snd" )
 
 	PORT_START("DSW2")	/* $10 (PPI1 port A) */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -686,7 +686,7 @@ static MACHINE_DRIVER_START( skylncr )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8910, MASTER_CLOCK/8)
+	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

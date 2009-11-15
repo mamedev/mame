@@ -574,7 +574,7 @@ static const ay8910_interface stratvox_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("sn", stratvox_sn76477_w),  /* SN76477 commands (not used in Route 16?) */
+	DEVCB_DEVICE_HANDLER("snsnd", stratvox_sn76477_w),  /* SN76477 commands (not used in Route 16?) */
 	DEVCB_NULL
 };
 
@@ -662,7 +662,7 @@ static MACHINE_DRIVER_START( stratvox )
 	MDRV_SOUND_CONFIG(stratvox_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("sn", SN76477, 0)
+	MDRV_SOUND_ADD("snsnd", SN76477, 0)
 	MDRV_SOUND_CONFIG(sn76477_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

@@ -13,7 +13,7 @@ WRITE8_HANDLER( laserbat_csound1_w )
 
 WRITE8_HANDLER( laserbat_csound2_w )
 {
-	const device_config *sn = devtag_get_device(space->machine, "sn");
+	const device_config *sn = devtag_get_device(space->machine, "snsnd");
 	int ksound = 0;
 
 	if (data & 0x01)

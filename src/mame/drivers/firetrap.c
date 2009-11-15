@@ -299,7 +299,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym", ym3526_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ymsnd", ym3526_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(firetrap_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2400, 0x2400) AM_WRITE(firetrap_sound_2400_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(firetrap_sound_bankselect_w)
@@ -588,7 +588,7 @@ static MACHINE_DRIVER_START( firetrap )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3526, 3000000)
+	MDRV_SOUND_ADD("ymsnd", YM3526, 3000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
@@ -626,7 +626,7 @@ static MACHINE_DRIVER_START( firetpbl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3526, 3000000)
+	MDRV_SOUND_ADD("ymsnd", YM3526, 3000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)

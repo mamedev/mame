@@ -128,8 +128,8 @@ static ADDRESS_MAP_START( hanaroku_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// ??? always 0x40
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM			// main ram
 	AM_RANGE(0xc400, 0xc4ff) AM_RAM			// ???
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0") AM_WRITE(hanaroku_out_0_w)
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("IN1")
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN2") AM_WRITE(hanaroku_out_1_w)
@@ -249,7 +249,7 @@ static MACHINE_DRIVER_START( hanaroku )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 1500000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

@@ -179,7 +179,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym", ym2203_w	)	//
+	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ymsnd", ym2203_w	)	//
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r				)	// From Main CPU
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -382,7 +382,7 @@ static MACHINE_DRIVER_START( thedeep )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/4)  /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)  /* verified on pcb */
 	MDRV_SOUND_CONFIG(thedeep_ym2203_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

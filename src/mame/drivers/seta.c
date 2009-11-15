@@ -1601,7 +1601,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( downtown_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM								// ROM
-	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0x200000, 0x200001) AM_NOP								// watchdog? (twineagl)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP						// IRQ enable/acknowledge?
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(twineagl_tilebank_w)		// special tile banking to animate water in twineagl
@@ -1765,7 +1765,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( atehate_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM								// ROM
 	AM_RANGE(0x900000, 0x9fffff) AM_RAM								// RAM
-	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP						// ? watchdog ?
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP						// ? 0 (irq ack lev 2?)
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP						// ? (end of lev 1: bit 4 goes 1,0,1)
@@ -1806,7 +1806,7 @@ static ADDRESS_MAP_START( blandia_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb04000, 0xb0ffff) AM_RAM								// (jjsquawk)
 	AM_RANGE(0xb80000, 0xb83fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE(&seta_vram_2)	// VRAM 2&3
 	AM_RANGE(0xb84000, 0xb8ffff) AM_RAM								// (jjsquawk)
-	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xd00000, 0xd00007) AM_WRITENOP						// ?
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP						// ? VBlank IRQ Ack
 	AM_RANGE(0xf00000, 0xf00001) AM_WRITENOP						// ? Sound  IRQ Ack
@@ -1840,7 +1840,7 @@ static ADDRESS_MAP_START( blandiap_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0xa00000, 0xa00607) AM_RAM AM_BASE(&spriteram16)		// Sprites Y
 /**/AM_RANGE(0xa80000, 0xa80001) AM_RAM								// ? 0x4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_BASE(&spriteram16_2)		// Sprites Code + X + Attr
-	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xd00000, 0xd00007) AM_WRITENOP						// ?
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP						// ? VBlank IRQ Ack
 	AM_RANGE(0xf00000, 0xf00001) AM_WRITENOP						// ? Sound  IRQ Ack
@@ -1918,7 +1918,7 @@ static ADDRESS_MAP_START( wrofaero_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0xa00000, 0xa00607) AM_RAM AM_BASE(&spriteram16)		// Sprites Y
 /**/AM_RANGE(0xa80000, 0xa80001) AM_RAM								// ? 0x4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM	AM_BASE(&spriteram16_2)		// Sprites Code + X + Attr
-	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 #if __uPD71054_TIMER
 	AM_RANGE(0xd00000, 0xd00007) AM_WRITE(timer_regs_w)				// ?
 #else
@@ -1950,7 +1950,7 @@ static ADDRESS_MAP_START( jjsquawb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa0a000, 0xa0a607) AM_RAM AM_BASE(&spriteram16)		// RZ: Sprites Y
 // AM_RANGE(0xa80000, 0xa80001) AM_RAM                              // ? 0x4000
 	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM AM_BASE(&spriteram16_2)		// RZ: Sprites Code + X + Attr
-	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 #if __uPD71054_TIMER
 	AM_RANGE(0xd00000, 0xd00007) AM_WRITE(timer_regs_w)				// ?
 #else
@@ -1977,7 +1977,7 @@ static ADDRESS_MAP_START( orbs_map, ADDRESS_SPACE_PROGRAM, 16 )
 	//AM_RANGE(0x600000, 0x60000f) AM_READ(krzybowl_input_r     )   // P1
 	AM_RANGE(0x8000f0, 0x8000f1) AM_RAM								// NVRAM
 	AM_RANGE(0x800100, 0x8001ff) AM_RAM								// NVRAM
-	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_BASE(&paletteram16) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_BASE(&spriteram16_2)		// Sprites Code + X + Attr
 /**/AM_RANGE(0xd00000, 0xd00001) AM_RAM								// ? 0x4000
@@ -2059,7 +2059,7 @@ static ADDRESS_MAP_START( keroppi_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800100, 0x8001ff) AM_RAM								// NVRAM
 	AM_RANGE(0x900000, 0x900001) AM_WRITENOP						// ?
 	AM_RANGE(0x900002, 0x900003) AM_WRITE(keroppi_prize_w)			//
-	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_BASE(&paletteram16) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_BASE(&spriteram16_2)		// Sprites Code + X + Attr
 /**/AM_RANGE(0xd00000, 0xd00001) AM_RAM								// ? 0x4000
@@ -2089,7 +2089,7 @@ static ADDRESS_MAP_START( blockcar_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("COINS")				// Coins
-	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_BASE(&paletteram16) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_BASE(&spriteram16_2)	// Sprites Code + X + Attr
 /**/AM_RANGE(0xd00000, 0xd00001) AM_RAM	// ? 0x4000
@@ -2123,7 +2123,7 @@ static ADDRESS_MAP_START( daioh_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa80000, 0xa80001) AM_RAM	// ? 0x4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_BASE(&spriteram16_2		)	// Sprites Code + X + Attr
 	AM_RANGE(0xb04000, 0xb13fff) AM_RAM
-	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP	//
 ADDRESS_MAP_END
 
@@ -2136,7 +2136,7 @@ static ADDRESS_MAP_START( drgnunit_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM								// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM								// RAM (qzkklogy)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM								// RAM (drgnunit,stg)
-	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP						// Watchdog
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP						// ? IRQ Ack
 	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_BASE(&seta_vregs)	// Coin Lockout + Video Registers
@@ -2265,7 +2265,7 @@ static ADDRESS_MAP_START( extdwnhl_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0xa80000, 0xa80001) AM_RAM								// ? 0x4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_BASE(&spriteram16_2)		// Sprites Code + X + Attr
 	AM_RANGE(0xb04000, 0xb13fff) AM_RAM								//
-	AM_RANGE(0xe00000, 0xe03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xe00000, 0xe03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 ADDRESS_MAP_END
 
 
@@ -2301,7 +2301,7 @@ static ADDRESS_MAP_START( kamenrid_map, ADDRESS_SPACE_PROGRAM, 16 )
 #else
 	AM_RANGE(0xc00000, 0xc00007) AM_WRITENOP						// ?
 #endif
-	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 ADDRESS_MAP_END
 
 /* almost identical to kamenrid */
@@ -2329,7 +2329,7 @@ static ADDRESS_MAP_START( madshark_map, ADDRESS_SPACE_PROGRAM, 16 )
 #else
 	AM_RANGE(0xc00000, 0xc00007) AM_WRITENOP						// ?
 #endif
-	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 ADDRESS_MAP_END
 
 
@@ -2374,7 +2374,7 @@ static ADDRESS_MAP_START( krzybowl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x60000f) AM_READ(krzybowl_input_r)			// P1
 	AM_RANGE(0x8000f0, 0x8000f1) AM_RAM								// NVRAM
 	AM_RANGE(0x800100, 0x8001ff) AM_RAM								// NVRAM
-	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_BASE(&paletteram16) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_BASE(&spriteram16_2)		// Sprites Code + X + Attr
 /**/AM_RANGE(0xd00000, 0xd00001) AM_RAM								// ? 0x4000
@@ -2418,7 +2418,7 @@ static ADDRESS_MAP_START( msgundam_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa80000, 0xa83fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE(&seta_vram_2)	// VRAM 2&3
 	AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_BASE(&seta_vctrl_0)		// VRAM 0&1 Ctrl
 	AM_RANGE(0xb80000, 0xb80005) AM_RAM AM_BASE(&seta_vctrl_2)		// VRAM 2&3 Ctrl
-	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 #if __uPD71054_TIMER
 	AM_RANGE(0xd00000, 0xd00007) AM_WRITE(timer_regs_w)	// ?
 #else
@@ -2442,7 +2442,7 @@ static ADDRESS_MAP_START( oisipuzl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP						// ? IRQ Ack
 	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_BASE(&seta_vregs)	// Coin Lockout + Video Registers
-	AM_RANGE(0x700000, 0x703fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0x700000, 0x703fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0)	// VRAM 0&1
 	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE(&seta_vram_2)	// VRAM 2&3
 /**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE(&seta_vctrl_0)		// VRAM 0&1 Ctrl
@@ -2529,7 +2529,7 @@ static ADDRESS_MAP_START( kiwame_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0x900000, 0x900001) AM_RAM								// ? 0x4000
 /**/AM_RANGE(0xa00000, 0xa00607) AM_RAM AM_BASE(&spriteram16)		// Sprites Y
 	AM_RANGE(0xb00000, 0xb003ff) AM_RAM AM_BASE(&paletteram16) AM_SIZE(&seta_paletteram_size)	// Palette
-	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xd00000, 0xd00009) AM_READ(kiwame_input_r)			// mahjong panel
 	AM_RANGE(0xe00000, 0xe00003) AM_READ(seta_dsw_r)				// DSW
 ADDRESS_MAP_END
@@ -2554,7 +2554,7 @@ static WRITE16_HANDLER( thunderl_protection_w )
 static ADDRESS_MAP_START( thunderl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM								// ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM								// RAM
-	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP						// ?
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP						// ?
 	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)	// Protection (not in wits)
@@ -2640,7 +2640,7 @@ static ADDRESS_MAP_START( umanclub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00607) AM_RAM AM_BASE(&spriteram16)		// Sprites Y
 /**/AM_RANGE(0xa80000, 0xa80001) AM_RAM								// ? 0x4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_BASE(&spriteram16_2)		// Sprites Code + X + Attr
-	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 ADDRESS_MAP_END
 
 
@@ -2709,7 +2709,7 @@ static ADDRESS_MAP_START( pairlove_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("COINS")				// Coins
 	AM_RANGE(0x900000, 0x9001ff) AM_READWRITE(pairlove_prot_r,pairlove_prot_w)
-	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xb00000, 0xb00fff) AM_RAM AM_BASE(&paletteram16) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_BASE(&spriteram16_2)		// Sprites Code + X + Attr
 	AM_RANGE(0xd00000, 0xd00001) AM_RAM								// ? 0x4000
@@ -2732,7 +2732,7 @@ static ADDRESS_MAP_START( crazyfgt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x620000, 0x620003) AM_WRITENOP	// protection
 	AM_RANGE(0x630000, 0x630003) AM_READ(seta_dsw_r)
 	AM_RANGE(0x640400, 0x640fff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
-	AM_RANGE(0x650000, 0x650003) AM_DEVWRITE8("ym", ym3812_w, 0x00ff)
+	AM_RANGE(0x650000, 0x650003) AM_DEVWRITE8("ymsnd", ym3812_w, 0x00ff)
 	AM_RANGE(0x658000, 0x658001) AM_DEVWRITE8("oki", okim6295_w, 0x00ff)
 	AM_RANGE(0x670000, 0x670001) AM_READNOP		// watchdog?
 	AM_RANGE(0x800000, 0x803fff) AM_WRITE(seta_vram_2_w) AM_BASE(&seta_vram_2) // VRAM 2
@@ -2798,7 +2798,7 @@ static ADDRESS_MAP_START( inttoote_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE8("rtc", msm6242_r, msm6242_w, 0x00ff)   // 6242RTC
 
-	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE( "x1", seta_sound_word_r, seta_sound_word_w		)	// Sound
+	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE( "x1snd", seta_sound_word_r, seta_sound_word_w		)	// Sound
 
 	AM_RANGE(0xa00000, 0xa00005) AM_WRITE(SMH_RAM) AM_BASE(&seta_vctrl_0		)	// VRAM 0&1 Ctrl
 	AM_RANGE(0xb00000, 0xb03fff) AM_READWRITE(SMH_RAM,seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM 0&1
@@ -2860,7 +2860,7 @@ static ADDRESS_MAP_START( jockeyc_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE8("rtc", msm6242_r, msm6242_w, 0x00ff)   // 6242RTC
 
-	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE( "x1", seta_sound_word_r, seta_sound_word_w)	// Sound
+	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE( "x1snd", seta_sound_word_r, seta_sound_word_w)	// Sound
 
 	AM_RANGE(0xa00000, 0xa00005) AM_WRITEONLY AM_BASE(&seta_vctrl_0)	// VRAM 0&1 Ctrl
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0)	// VRAM 0&1
@@ -2997,7 +2997,7 @@ static WRITE8_HANDLER( calibr50_soundlatch2_w )
 }
 
 static ADDRESS_MAP_START( calibr50_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("x1", seta_sound_r,seta_sound_w)	// Sound
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("x1snd", seta_sound_r,seta_sound_w)	// Sound
 	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)				// From Main CPU
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_bankswitch_w)			// Bankswitching
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)						// Banked ROM
@@ -3033,12 +3033,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( utoukond_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_DEVREADWRITE("x1", seta_sound_r,seta_sound_w)
+	AM_RANGE(0xf000, 0xffff) AM_DEVREADWRITE("x1snd", seta_sound_r,seta_sound_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( utoukond_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ym", ym3438_r, ym3438_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym3438_r, ym3438_w)
 	AM_RANGE(0x80, 0x80) AM_WRITENOP //?
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -6872,7 +6872,7 @@ static MACHINE_DRIVER_START( twineagl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -6912,7 +6912,7 @@ static MACHINE_DRIVER_START( downtown )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -6973,7 +6973,7 @@ static MACHINE_DRIVER_START( usclssic )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf2)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7019,7 +7019,7 @@ static MACHINE_DRIVER_START( calibr50 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -7059,7 +7059,7 @@ static MACHINE_DRIVER_START( metafox )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7094,7 +7094,7 @@ static MACHINE_DRIVER_START( atehate )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7137,7 +7137,7 @@ static MACHINE_DRIVER_START( blandia )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7169,7 +7169,7 @@ static MACHINE_DRIVER_START( blandiap )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7204,7 +7204,7 @@ static MACHINE_DRIVER_START( blockcar )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7239,7 +7239,7 @@ static MACHINE_DRIVER_START( daioh )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7280,7 +7280,7 @@ static MACHINE_DRIVER_START( drgnunit )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7314,7 +7314,7 @@ static MACHINE_DRIVER_START( qzkklgy2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7361,7 +7361,7 @@ static MACHINE_DRIVER_START( setaroul )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7396,7 +7396,7 @@ static MACHINE_DRIVER_START( eightfrc )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7437,7 +7437,7 @@ static MACHINE_DRIVER_START( extdwnhl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7498,7 +7498,7 @@ static MACHINE_DRIVER_START( gundhara )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7538,7 +7538,7 @@ static MACHINE_DRIVER_START( jjsquawk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7569,7 +7569,7 @@ static MACHINE_DRIVER_START( jjsquawb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7608,7 +7608,7 @@ static MACHINE_DRIVER_START( kamenrid )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7644,7 +7644,7 @@ static MACHINE_DRIVER_START( orbs )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 14318180)	/* 14.318180 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 14318180)	/* 14.318180 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7681,7 +7681,7 @@ static MACHINE_DRIVER_START( keroppi )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 14318180)	/* 14.318180 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 14318180)	/* 14.318180 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7716,7 +7716,7 @@ static MACHINE_DRIVER_START( krzybowl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7758,7 +7758,7 @@ static MACHINE_DRIVER_START( madshark )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7803,7 +7803,7 @@ static MACHINE_DRIVER_START( msgundam )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7839,7 +7839,7 @@ static MACHINE_DRIVER_START( oisipuzl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7910,7 +7910,7 @@ static MACHINE_DRIVER_START( kiwame )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7948,7 +7948,7 @@ static MACHINE_DRIVER_START( rezon )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -7986,7 +7986,7 @@ static MACHINE_DRIVER_START( thunderl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -8050,7 +8050,7 @@ static MACHINE_DRIVER_START( wits )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -8085,7 +8085,7 @@ static MACHINE_DRIVER_START( umanclub )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -8124,12 +8124,12 @@ static MACHINE_DRIVER_START( utoukond )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("ym", YM3438, 16000000/4)	/* 4 MHz */
+	MDRV_SOUND_ADD("ymsnd", YM3438, 16000000/4)	/* 4 MHz */
 	MDRV_SOUND_CONFIG(utoukond_ym3438_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
@@ -8172,7 +8172,7 @@ static MACHINE_DRIVER_START( wrofaero )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -8215,7 +8215,7 @@ static MACHINE_DRIVER_START( zingzip )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -8249,7 +8249,7 @@ static MACHINE_DRIVER_START( pairlove )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -8294,7 +8294,7 @@ static MACHINE_DRIVER_START( crazyfgt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, 16000000/4)	/* 4 MHz */
+	MDRV_SOUND_ADD("ymsnd", YM3812, 16000000/4)	/* 4 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)	// clock?
@@ -8388,7 +8388,7 @@ static MACHINE_DRIVER_START( inttoote )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1", X1_010, 16000000)
+	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -8478,7 +8478,7 @@ ROM_START( twineagl )
 	ROM_LOAD( "ua2-7",  0x100000, 0x080000, CRC(fce56907) SHA1(5d0d2d6dfdbadb21f1d61d84b8992ec0e527e18d) )
 	ROM_LOAD( "ua2-9",  0x180000, 0x080000, CRC(a451eae9) SHA1(c236c92d9ecf56f8d8f4a5ee493e3791be0d3db4) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "ua2-11", 0x000000, 0x080000, CRC(624e6057) SHA1(0e8e4d4b6bc5febf5ca83eea92e3ed06f16e7df0) )
 	ROM_LOAD( "ua2-12", 0x080000, 0x080000, CRC(3068ff64) SHA1(7c06a48a99ebb9e7f3709f25bd0caa4c9d7a2688) )
 ROM_END
@@ -8504,7 +8504,7 @@ ROM_START( downtown )
 	ROM_LOAD( "ud2009.t05", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) )
 	ROM_LOAD( "ud2010.t06", 0x080000, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) )
 
-	ROM_REGION( 0x080000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x080000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "ud2011.t07", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) )
 ROM_END
 
@@ -8529,7 +8529,7 @@ ROM_START( downtown2 )
 	ROM_LOAD( "ud2009.t05", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) )
 	ROM_LOAD( "ud2010.t06", 0x080000, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) )
 
-	ROM_REGION( 0x080000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x080000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "ud2011.t07", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) )
 ROM_END
 
@@ -8554,7 +8554,7 @@ ROM_START( downtownj )
 	ROM_LOAD( "ud2009.t05", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) )
 	ROM_LOAD( "ud2010.t06", 0x080000, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) )
 
-	ROM_REGION( 0x080000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x080000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "ud2011.t07", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) )
 ROM_END
 
@@ -8579,7 +8579,7 @@ ROM_START( downtownp )
 	ROM_LOAD( "ud2009.t05", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) )
 	ROM_LOAD( "ud2010.t06", 0x080000, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) )
 
-	ROM_REGION( 0x080000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x080000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "ud2011.t07", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) )
 ROM_END
 
@@ -8620,7 +8620,7 @@ ROM_START( usclssic )
 	ROM_LOAD16_BYTE( "ue1-022.prm", 0x000, 0x200, CRC(1a23129e) SHA1(110eb54ab83ecb8375164a5c96f522b2737c379c) )
 	ROM_LOAD16_BYTE( "ue1-023.prm", 0x001, 0x200, CRC(a13192a4) SHA1(86e312e0f7400b7fa08fbe8fced1eb95a32502ca) )
 
-	ROM_REGION( 0x080000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x080000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "ue001005.132", 0x000000, 0x080000, CRC(c5fea37c) SHA1(af4f09dd36af06e50262f607ff14eedc33beffd2) )
 ROM_END
 
@@ -8645,7 +8645,7 @@ ROM_START( calibr50 )
 	ROM_LOAD( "uh001010.u3x", 0x000000, 0x080000, CRC(f986577a) SHA1(8f6c2fca271fed21a1c04e93c3f50dc41348ae30) )
 	ROM_LOAD( "uh001011.u50", 0x080000, 0x080000, CRC(08620052) SHA1(e2ab49dbabc139e6b276401340085ccab1ae3892) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "uh001013.u60", 0x000000, 0x080000, CRC(09ec0df6) SHA1(57c68d05074ea4a1e133be2ce6e25c594f04a712) )
 	ROM_LOAD( "uh001012.u46", 0x080000, 0x080000, CRC(bb996547) SHA1(0c8f570ef4454b10a023e0c463001c22a8cf99cd) )
 ROM_END
@@ -8674,7 +8674,7 @@ ROM_START( arbalest )
 	ROM_LOAD( "uk001.12", 0x100000, 0x080000, CRC(818a4085) SHA1(fd8b5658fc7f5fa6d3daebb4be17aeabd60c9028) )
 	ROM_LOAD( "uk001.13", 0x180000, 0x080000, CRC(771fa164) SHA1(a91214318808f991846a828f0e309c0ff430245e) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "uk001.15", 0x000000, 0x080000, CRC(ce9df5dd) SHA1(91d879b774b5b367adb5bd511fda827bc0bae0a9) )
 	ROM_LOAD( "uk001.14", 0x080000, 0x080000, CRC(016b844a) SHA1(1fe091233746ced358292014393896af730f5940) )
 ROM_END
@@ -8705,7 +8705,7 @@ ROM_START( metafox )
 	ROM_LOAD( "up001012", 0x100000, 0x080000, CRC(fed2c5f9) SHA1(81f0f19a500b665c937f5431000ebde7abd97c30) )
 	ROM_LOAD( "up001013", 0x180000, 0x080000, CRC(adabf9ea) SHA1(db28e4e565e567a97a6b05a4803a55a403e24a0e) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "up001015", 0x000000, 0x080000, CRC(2e20e39f) SHA1(6f8bd4a76ed5c2150015698e7a98044d060157be) )
 	ROM_LOAD( "up001014", 0x080000, 0x080000, CRC(fca6315e) SHA1(cef2385ec43f8b7a2d655b42c18ef44e46ff7364) )
 ROM_END
@@ -8736,7 +8736,7 @@ ROM_START( drgnunit )
 	ROM_LOAD( "scr-3e.bin",  0x0c0000, 0x020000, CRC(1592b8c2) SHA1(d337de280c5ea3704dec9baa04c45e1c837924a9) )
 	ROM_LOAD( "scr-4e.bin",  0x0e0000, 0x020000, CRC(8201681c) SHA1(7784a68828d728107b0228bb3568129c543cbf40) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "snd-1.bin", 0x000000, 0x020000, CRC(8f47bd0d) SHA1(c55e22ac4294931cfb72ac88a2128891d9f8ee93) )
 	ROM_LOAD( "snd-2.bin", 0x020000, 0x020000, CRC(65c40ef5) SHA1(726b46144e2216d17b0828abad2f5e7c2305c174) )
 	ROM_LOAD( "snd-3.bin", 0x040000, 0x020000, CRC(71fbd54e) SHA1(bdaf7ecf1c79c6c8fc82d959186ca2f3304729c8) )
@@ -8758,7 +8758,7 @@ ROM_START( wits )
 	ROM_LOAD16_BYTE( "un001006.4l", 0x040000, 0x020000, CRC(98a980d4) SHA1(ab2c1ed83bccffabfacc8a185d1fbc3e8aaf210d) )
 	ROM_LOAD16_BYTE( "un001005.2l", 0x040001, 0x020000, CRC(6f2ce3c0) SHA1(8086b44c7025bc0bffff75cc6c6c7846cc56e8d0) )
 
-	ROM_REGION( 0x40000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x40000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "un001004.12a", 0x000000, 0x020000, CRC(a15ff938) SHA1(fdfdf73e85d89a39cfc5b3c3048a64178200f942) )
 	ROM_LOAD( "un001003.10a", 0x020000, 0x020000, CRC(3f4b9e55) SHA1(3cecf89ae6a056622affcddec9e10be08761e56d) )
 ROM_END
@@ -8774,7 +8774,7 @@ ROM_START( thunderl )
 	ROM_LOAD16_BYTE( "t15", 0x040000, 0x020000, CRC(b97a7b56) SHA1(c08d3586d489947af21f3493356e3a88d79746e8) )
 	ROM_LOAD16_BYTE( "t14", 0x040001, 0x020000, CRC(79c707be) SHA1(f67fa40c8f6ab0fbce44997fdfbf699fea1f0df6) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "r28", 0x000000, 0x080000, CRC(a043615d) SHA1(e483fa9fd8e922578a9d7b6ced0750643089ca78) )
 	ROM_LOAD( "r27", 0x080000, 0x080000, CRC(cb8425a3) SHA1(655afa295fbe99acc79c4004f03ed832560cff5b) )
 ROM_END
@@ -8818,7 +8818,7 @@ ROM_START( rezon )
 	ROM_REGION( 0x080000, "gfx3", 0 )	/* Layer 2 */
 	ROM_LOAD( "us001008.u68",  0x000000, 0x080000, CRC(0ab73910) SHA1(78e2c0570c5c6f5e1cdb2fbeae73376923127024) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "us001009.u70",  0x000000, 0x100000, CRC(0d7d2e2b) SHA1(cfba19314ecb0a49ed9ff8df32cd6a3fe37ff526) )
 ROM_END
 
@@ -8843,7 +8843,7 @@ ROM_START( rezont )
 	ROM_REGION( 0x080000, "gfx3", 0 )	/* Layer 2 */
 	ROM_LOAD( "us001008.u68",  0x000000, 0x080000, CRC(0ab73910) SHA1(78e2c0570c5c6f5e1cdb2fbeae73376923127024) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD16_WORD_SWAP( "us001009.u70",  0x000000, 0x100000, CRC(0d7d2e2b) SHA1(cfba19314ecb0a49ed9ff8df32cd6a3fe37ff526) )
 ROM_END
 
@@ -8862,7 +8862,7 @@ ROM_START( stg )
 	ROM_LOAD( "att01008.u39", 0x000000, 0x080000, CRC(20c47457) SHA1(53ddf8c076aa35fb87edc739bc9e9612a5a1526b) ) // FIRST AND SECOND HALF IDENTICAL
 	ROM_LOAD( "att01007.u42", 0x080000, 0x080000, CRC(ac975544) SHA1(5cdd2c7aada7179d4bdaf8578134c0ef672a2704) ) // FIRST AND SECOND HALF IDENTICAL
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "att01009.u47", 0x000000, 0x080000, CRC(4276b58d) SHA1(a2e77dc3295791520c6cb25dea4e910b5a7bc137) )
 	ROM_LOAD( "att01010.u55", 0x080000, 0x080000, CRC(fffb2f53) SHA1(0aacb24437e9a6874850313163922d834da27611) )
 ROM_END
@@ -8888,7 +8888,7 @@ ROM_START( blandia )
 	ROM_LOAD( "ux001012.068",  0x040000, 0x080000, CRC(f29959f6) SHA1(edccea3d0bf972a07edd6339e18792d089033bff) )
 
 	/* The c0000-fffff region is bankswitched */
-	ROM_REGION( 0x240000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x240000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "ux001013.069",  0x000000, 0x0c0000, CRC(5cd273cd) SHA1(602e1f10454e2b1c941f2e6983872bb9ca77a542) )
 	// skip c0000-fffff (banked region)
 	ROM_CONTINUE(              0x100000, 0x040000  )
@@ -8929,7 +8929,7 @@ ROM_START( blandiap )
 	ROM_LOAD( "v2-3.bin",  0x0a0000, 0x020000, CRC(80ad0c3b) SHA1(00fcbcf7805784d7298b92136e7f256d65029c44) )
 
 	/* The c0000-fffff region is bankswitched */
-	ROM_REGION( 0x240000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x240000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "s-0.bin",  0x000000, 0x020000, CRC(a5fde408) SHA1(89efcd37ef6c5b313169d74a962a7c074a09b12a) )
 	ROM_CONTINUE(         0x140000, 0x020000  )
 	ROM_LOAD( "s-1.bin",  0x020000, 0x020000, CRC(3083f9c4) SHA1(f5d2297c3d680eb1f128fa42a3a7f61badb9853a) )
@@ -8957,7 +8957,7 @@ ROM_START( blockcar )
 	ROM_LOAD( "bl-chr-0.j3",  0x000000, 0x080000, CRC(a33300ca) SHA1(b0a7ccb77c3e8e33c12b83e254924f30209a4c2c) )
 	ROM_LOAD( "bl-chr-1.l3",  0x080000, 0x080000, CRC(563de808) SHA1(40b2f9f4a4cb1a019f6419572ee21d66dda7d4af) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "bl-snd-0.a13",  0x000000, 0x080000, CRC(a92dabaf) SHA1(610c1dc0467753dfddaa4b27bc40cb118b0bc7a3) )
 	ROM_RELOAD(                0x080000, 0x080000  )
 ROM_END
@@ -8977,7 +8977,7 @@ ROM_START( qzkklogy )
 	ROM_LOAD( "t2709u42.u39", 0x000000, 0x080000, CRC(194d5704) SHA1(ab2833f7427d0608850c158b813bc49935ac7d6d) )
 	ROM_LOAD( "t2709u39.u42", 0x080000, 0x080000, CRC(6f95a76d) SHA1(925f5880fb5153c1215d1f5ee1eff5b53a84abea) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "t2709u47.u47", 0x000000, 0x080000, CRC(0ebdad40) SHA1(6558eeaac76d98d91b0be6faa78f531f1e3b9f84) )
 	ROM_LOAD( "t2709u55.u55", 0x080000, 0x080000, CRC(43960c68) SHA1(9a1901b65f989aa57ab8736ef0be3bac492c081c) )
 ROM_END
@@ -8991,7 +8991,7 @@ ROM_START( umanclub )
 	ROM_LOAD( "bp-u-002.u2", 0x000000, 0x080000, CRC(936cbaaa) SHA1(f7932ee310eb792b2776ae8a9d29e1a492761b11) )
 	ROM_LOAD( "bp-u-001.u1", 0x080000, 0x080000, CRC(87813c48) SHA1(7ec9b08fe0490d277c531e2b6394862df4d5678d) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "uw003.u13", 0x000000, 0x100000, CRC(e2f718eb) SHA1(fd085b68f76c8778816a1b7d47783b9dc20bff12) )
 ROM_END
 
@@ -9011,7 +9011,7 @@ ROM_START( zingzip )
 	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 2 */
 	ROM_LOAD( "uy001010.68",  0x000000, 0x100000, CRC(bdbcdf03) SHA1(857f541697f76086ac6c761a3505678a3d3499df) ) // FIRST AND SECOND HALF IDENTICAL
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "uy001011.70",  0x000000, 0x100000, CRC(bd845f55) SHA1(345b79cfcd8c924d6ba365814286e518438f10bc) ) // uy001017 + uy001018
 ROM_END
 
@@ -9023,7 +9023,7 @@ ROM_START( atehate )
 	ROM_REGION( 0x200000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "fs001003.gfx", 0x000000, 0x200000, CRC(8b17e431) SHA1(643fc62d5bad9941630ab621ecb3c69ded9d4536) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "fs001004.pcm", 0x000000, 0x100000, CRC(f9344ce5) SHA1(cffbc235f3a8e9a5004e671d924affd321ec9eed) )
 ROM_END
 
@@ -9042,7 +9042,7 @@ ROM_START( daioh )
 	ROM_REGION( 0x200000, "gfx3", 0 ) /* Layer 2 */
 	ROM_LOAD( "fg1-006",  0x000000, 0x200000, CRC(2052c39a) SHA1(83a444a76e68aa711b0e25a5aa963ca876a6357e) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "fg1-007",  0x000000, 0x100000, CRC(4a2fe9e0) SHA1(e55b6f301f842ff5d3c7a0041856695ac1d8a78f) )
 ROM_END
 
@@ -9061,7 +9061,7 @@ ROM_START( msgundam )
 	ROM_REGION( 0x080000, "gfx3", 0 )	/* Layer 2 */
 	ROM_LOAD( "fa001005.u24",  0x000000, 0x080000, CRC(8cd7ff86) SHA1(ce7eb90776e21239f8f52e822c636143506c6f9b) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "fa001004.u26",  0x000000, 0x100000, CRC(b965f07c) SHA1(ff7827cc80655465ffbb732d55ba81f21f51a5ca) )
 ROM_END
 
@@ -9080,7 +9080,7 @@ ROM_START( msgundam1 )
 	ROM_REGION( 0x080000, "gfx3", 0 )	/* Layer 2 */
 	ROM_LOAD( "fa001005.u24",  0x000000, 0x080000, CRC(8cd7ff86) SHA1(ce7eb90776e21239f8f52e822c636143506c6f9b) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "fa001004.u26",  0x000000, 0x100000, CRC(b965f07c) SHA1(ff7827cc80655465ffbb732d55ba81f21f51a5ca) )
 ROM_END
 
@@ -9103,7 +9103,7 @@ ROM_START( oisipuzl )
 	ROM_REGION( 0x080000, "gfx3", 0 )	/* Layer 2 */
 	ROM_LOAD( "ss1u25.v10",  0x000000, 0x080000, CRC(56840728) SHA1(db61539fd84f0de35ee2077238ba3646c4960cc6) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "ss1u26.v10", 0x000000, 0x080000, CRC(d452336b) SHA1(d3bf3cb383c40911758a60546f121c48087868e3) )
 	ROM_LOAD( "ss1u27.v10", 0x080000, 0x080000, CRC(17fe921d) SHA1(7fc176b8eefad4f2b8532bfe62e7852d2be185ca) )
 ROM_END
@@ -9146,7 +9146,7 @@ ROM_START( qzkklgy2 )
 	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 1 */
 	ROM_LOAD( "fn001005.104", 0x000000, 0x200000, CRC(95726a63) SHA1(e53ffc2815c4858bbfb5ff452c581bccb41854c9) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "fn001006.105", 0x000000, 0x100000, CRC(83f201e6) SHA1(536e74788ad0e07451300a1ad3b127bc9d2d9063) )
 ROM_END
 
@@ -9165,7 +9165,7 @@ ROM_START( wrofaero )
 	ROM_REGION( 0x080000, "gfx3", 0 )	/* Layer 2 */
 	ROM_LOAD( "u68.bin",  0x000000, 0x080000, CRC(25c0c483) SHA1(2e705e7f0c66c3bc73e78ffb526606ab8be61d99) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "u69.bin",  0x000000, 0x080000, CRC(957ecd41) SHA1(3b37ba44b8b8f0f0de41c8c26c3dfdb391ba572c) )
 	ROM_LOAD( "u70.bin",  0x080000, 0x080000, CRC(8d756fdf) SHA1(d66712a6aa19252f2c915ac66fc27df031fa9512) )
 ROM_END
@@ -9193,7 +9193,7 @@ ROM_START( jjsquawk )
 	ROM_LOAD       ( "jj-rom13",    0x080000, 0x080000, CRC(51e29871) SHA1(9d33283bd9a3f57602a55cfc9fafa49edd0be8c5) )
 	ROM_LOAD16_BYTE( "jj-rom4.040", 0x100000, 0x080000, CRC(a235488e) SHA1(a45d02a4451defbef7fbdab15671955fab8ed76b) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "jj-rom5.040", 0x000000, 0x080000, CRC(d99f2879) SHA1(66e83a6bc9093d19c72bd8ef1ec0523cfe218250) )
 	ROM_LOAD( "jj-rom6.040", 0x080000, 0x080000, CRC(9df1e478) SHA1(f41b55821187b417ad09e4a1f439c01a107d2674) )
 ROM_END
@@ -9221,7 +9221,7 @@ ROM_START( jjsquawkb )
 	ROM_COPY( "gfxtemp", 0x300000, 0x100000, 0x100000 )
 
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "1", 0x000000, 0x100000, CRC(181a55b8) SHA1(6fa404f85bad93cc15e80feb61d19bed84602b82) ) /* jj-rom5.040 + jj-rom6.040 from jjsquawk */
 ROM_END
 
@@ -9242,7 +9242,7 @@ ROM_START( kamenrid )
 	ROM_REGION( 0x40000, "gfx3", 0 )	/* Layer 2 */
 	ROM_COPY( "user1", 0x040000, 0x000000, 0x040000 )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "fj001008.26", 0x000000, 0x100000, CRC(45e2b329) SHA1(8526afae1aa9178570c906eb96438f174d174f4d) )
 ROM_END
 
@@ -9261,7 +9261,7 @@ ROM_START( eightfrc )
 	ROM_REGION( 0x100000, "gfx3", 0 )	/* Layer 2 */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(c17aad22) SHA1(eabbae2142cad3eef6a94d542ea03221c8228e94) )
 
-	ROM_REGION( 0x240000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x240000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "u70.bin",  0x000000, 0x0c0000, CRC(dfdb67a3) SHA1(0fed6fb498dcfc1276facd0ecd2dfde45ff671f2) )
 	// skip c0000-fffff (banked region)
 	ROM_CONTINUE(         0x100000, 0x040000  )
@@ -9276,7 +9276,7 @@ ROM_START( kiwame )
 	ROM_REGION( 0x080000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "fp001003.bin", 0x000000, 0x080000, CRC(0f904421) SHA1(de5810746cfab1a4a7d1b055b1a97bc7fbc173dd) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "fp001006.bin", 0x000000, 0x080000, CRC(96cf395d) SHA1(877b291598e3a42e5003b2f50a16d162348ce72d) )
 	ROM_LOAD( "fp001005.bin", 0x080000, 0x080000, CRC(65b5fe9a) SHA1(35605be00c7c455551d18386fcb5ad013aa2907e) )
 ROM_END
@@ -9290,7 +9290,7 @@ ROM_START( krzybowl )
 	ROM_LOAD( "fv001.003", 0x000000, 0x080000, CRC(7de22749) SHA1(933a11f2d45667348b136d72806fc2e2f6f8d944) )
 	ROM_LOAD( "fv001.004", 0x080000, 0x080000, CRC(c7d2fe32) SHA1(37291fa78c28be274e1240e081ea253ebe487e5c) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "fv001.005", 0x000000, 0x080000, CRC(5e206062) SHA1(e47cfb6947df178f3547dfe61907571bcb84e4ac) )
 	ROM_LOAD( "fv001.006", 0x080000, 0x080000, CRC(572a15e7) SHA1(b6a3e99e14a473b78ff48d1a46b20a0862d128e9) )
 ROM_END
@@ -9308,7 +9308,7 @@ ROM_START( orbs )	/* All eproms are socketed and labelled (handwritten) "ORBS 10
 	ROM_LOAD( "orbs.u12",  0x100000, 0x080000, CRC(b8c352c2) SHA1(7d6fd1425d9d5cf6a14a1ddceba0ad10e472dfa5) )
 	ROM_LOAD( "orbs.u11",  0x180000, 0x080000, CRC(58cb38ba) SHA1(1c6c5f7ccb9c81b71bc1cbad080799b97962f262) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "orbs.u15",  0x000000, 0x080000, CRC(bc0e9fe3) SHA1(758a44d07d59af8bbc87602df25dfcdc6cb8d9b3) )
 	ROM_LOAD( "orbs.u16",  0x080000, 0x080000, CRC(aecd8373) SHA1(5620bcb281a9ea4920cfe81d163827013289c5bf) )
 ROM_END
@@ -9324,7 +9324,7 @@ ROM_START( keroppi )
 	ROM_LOAD( "ft-001-005.u12",  0x100000, 0x080000, CRC(de6432a8) SHA1(afee9b29e0b3db4815fc29456044532aee03597e) )
 	ROM_LOAD( "ft-001-006.u11",  0x180000, 0x080000, CRC(9c500eae) SHA1(3448adef04c9ad2e0b39a283e4eb9c9bac7d4967) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "ft-001-007.u15",  0x000000, 0x080000, CRC(c98dacf0) SHA1(b508433e2383af1e8bd5fda253c9925c48443490) )
 	ROM_LOAD( "ft-001-008.u16",  0x080000, 0x080000, CRC(b9c4b637) SHA1(82977d10de1048f71525bab5431b031cca510114) )
 ROM_END
@@ -9344,7 +9344,7 @@ ROM_START( extdwnhl )
 	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 2 */
 	ROM_LOAD( "fw001006.152",  0x000000, 0x200000, CRC(d00e8ddd) SHA1(e13692034afec1a0e86d19abfb9efa518b374147) )	// FIRST AND SECOND HALF IDENTICAL
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "fw001007.026",  0x080000, 0x080000, CRC(16d84d7a) SHA1(fdc13776ba1ec9c48a33a9f2dfe8a0e55c54d89e) )	// swapped halves
 	ROM_CONTINUE(              0x000000, 0x080000  )
 ROM_END
@@ -9370,7 +9370,7 @@ ROM_START( gundhara )
 	ROM_LOAD       ( "bpgh-012.u68", 0x000000, 0x200000, CRC(edfda595) SHA1(5942181430d59c0c303cd1cbe753910c26c109a2) )
 	ROM_LOAD16_BYTE( "bpgh-011.u67", 0x200000, 0x100000, CRC(49aff270) SHA1(de25209e520cd8747042078440ee20866097d0cb) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "bpgh-013.u70",  0x080000, 0x080000, CRC(0fa5d503) SHA1(fd7a80cd25c23e737cc2c3d11de2291e22313b58) )	// swapped halves
 	ROM_CONTINUE(              0x000000, 0x080000  )
 ROM_END
@@ -9390,7 +9390,7 @@ ROM_START( sokonuke )
 	ROM_REGION( 0x100, "gfx3", ROMREGION_ERASE )	/* Layer 2 */
 	/* Unused */
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "001-006.bin",   0x080000, 0x080000, CRC(ecfac767) SHA1(3d05bdb2c2a8c7eb5fa77b0c4482f98d3947c6d6) )
 	ROM_CONTINUE(              0x000000, 0x080000  )
 ROM_END
@@ -9413,7 +9413,7 @@ ROM_START( zombraid )
 	ROM_LOAD       ( "fy001010.68", 0x000000, 0x200000, CRC(8b40ed7a) SHA1(05fcd7947a8419cab5ed2305fba9a671911e4850) )
 	ROM_LOAD16_BYTE( "fy001009.67", 0x200000, 0x100000, CRC(6bcca641) SHA1(49c9106e6f23e25e5b5917af11fc48d34457c61a) )
 
-	ROM_REGION( 0x480000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x480000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "fy001012.b",  0x000000, 0x080000, CRC(fd30e102) SHA1(ae02f94f69aa301b0c37921ca1117e3ad20467b5) )
 	// skip 80000-fffff (banked region)
 	ROM_CONTINUE(            0x100000, 0x180000  )
@@ -9441,7 +9441,7 @@ ROM_START( madshark )
 	ROM_COPY( "user1", 0x100000, 0x000000, 0x100000 )
 	ROM_COPY( "user1", 0x300000, 0x100000, 0x100000 )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "fq001007.26", 0x000000, 0x100000, CRC(e4b33c13) SHA1(c4f9532de7a09c80f5a74c3a386e99a0f546846f) )
 ROM_END
 
@@ -9466,7 +9466,7 @@ ROM_START( utoukond )
 	ROM_LOAD( "93uta07.68",  0x000000, 0x100000, CRC(67bdd036) SHA1(527b6a67e7a62263bee738dc82d6ff289ab54853) )
 	ROM_LOAD( "93uta06.67",  0x100000, 0x100000, CRC(294c26e4) SHA1(459ec7f8c8db4f1e3906d5db240298405bda991c) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "93uta08.69", 0x000000, 0x100000, CRC(3d50bbcd) SHA1(e9b78d08466e1f9b42f11999bb53b6deceb81a12) )
 ROM_END
 
@@ -9479,7 +9479,7 @@ ROM_START( neobattl )
 	ROM_LOAD( "bp923003.u15", 0x00000, 0x80000, CRC(91ca98a1) SHA1(b02b362e3a6118f52d9e1a262ca11aecef887b00) )
 	ROM_LOAD( "bp923004.u9",  0x80000, 0x80000, CRC(15c678e3) SHA1(8c0fa41a1f4e7b4e1c90faaeec7f6c910cc3ad0b) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "bp923005.u4", 0x000000, 0x100000, CRC(7c0e37be) SHA1(5d5779de948f986971a82db2a5a4302044c3257a) )
 ROM_END
 
@@ -9492,7 +9492,7 @@ ROM_START( pairlove )
 	ROM_LOAD( "ut2-001-004.5j",  0x000000, 0x080000, CRC(fdc47b26) SHA1(0de51bcf67b909ac9578f0d1b14af8a4c758aacf) )
 	ROM_LOAD( "ut2-001-005.5l",  0x080000, 0x080000, CRC(076f94a2) SHA1(94b4b41a497dea1b6db5396bd7cd81ebcb217735) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "ut2-001-003.12a",  0x000000, 0x080000, CRC(900219a9) SHA1(3260a900df25beba597bf947a9fbb6f7392827d7) )
 	ROM_RELOAD(                   0x080000, 0x080000  )
 ROM_END
@@ -9552,7 +9552,7 @@ ROM_START( jockeyc )
 	ROM_LOAD16_BYTE( "ya-010.prom",  0x000, 0x200, CRC(778094b3) SHA1(270329a0d544dc7a8240d6dab08ccd54ea87ab70) )
 	ROM_LOAD16_BYTE( "ya-011.prom",  0x001, 0x200, CRC(bd4fe2f6) SHA1(83d9f9db3fbfa2d172f5227c397ea4d5a9687015) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "ya_011_013.u71", 0x00000, 0x80000, CRC(2bccaf47) SHA1(1658643444d575410f11b648e0d7ae6c43fcf1ea) )
 	ROM_LOAD( "ya_011_012.u64", 0x80000, 0x80000, CRC(a8015ce6) SHA1(bb0b589856ec82e1fd42be9af89b07ba1d17e595) )
 ROM_END
@@ -9589,7 +9589,7 @@ ROM_START( inttoote )
 	ROM_LOAD16_BYTE( "ya-010.prom",  0x000, 0x200, CRC(778094b3) SHA1(270329a0d544dc7a8240d6dab08ccd54ea87ab70) )
 	ROM_LOAD16_BYTE( "ya-011.prom",  0x001, 0x200, CRC(bd4fe2f6) SHA1(83d9f9db3fbfa2d172f5227c397ea4d5a9687015) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "ya_011_013.u71", 0x00000, 0x80000, CRC(2bccaf47) SHA1(1658643444d575410f11b648e0d7ae6c43fcf1ea) )
 	ROM_LOAD( "ya_011_012.u64", 0x80000, 0x80000, CRC(a8015ce6) SHA1(bb0b589856ec82e1fd42be9af89b07ba1d17e595) )
 ROM_END
@@ -9627,7 +9627,7 @@ ROM_START( inttootea )
 	ROM_LOAD16_BYTE( "ya-010.prom",  0x000, 0x200, CRC(778094b3) SHA1(270329a0d544dc7a8240d6dab08ccd54ea87ab70) )
 	ROM_LOAD16_BYTE( "ya-011.prom",  0x001, 0x200, CRC(bd4fe2f6) SHA1(83d9f9db3fbfa2d172f5227c397ea4d5a9687015) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "ya_011_013.u71", 0x00000, 0x80000, CRC(2bccaf47) SHA1(1658643444d575410f11b648e0d7ae6c43fcf1ea) )
 	ROM_LOAD( "ya_011_012.u64", 0x80000, 0x80000, CRC(a8015ce6) SHA1(bb0b589856ec82e1fd42be9af89b07ba1d17e595) )
 ROM_END
@@ -9669,7 +9669,7 @@ ROM_START( setaroul )
 	ROM_LOAD( "uf0015.u40",  0x300000, 0x080000, CRC(11dc19fa) SHA1(e7084f61d075a61249d924a523c32e7993d9ae46) )
 	ROM_LOAD( "uf0016.u48",  0x380000, 0x080000, CRC(10f99fa8) SHA1(7ef9a3f71dd071483cf3513ef57e2fcfe8702994) )
 
-	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )	/* Samples */
 	ROM_LOAD( "uf1004.u52", 0x000000, 0x020000, CRC(d63ea334) SHA1(93aaf58c90c4f704caae19b63785e471b2c1281a) )
 
 	ROM_REGION( 0x400, "proms", 0 )

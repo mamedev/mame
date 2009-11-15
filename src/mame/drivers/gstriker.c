@@ -315,7 +315,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ym", ym2610_r, ym2610_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(gs_sh_bankswitch_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(gs_sh_pending_command_clear_w)
 	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_r)
@@ -574,7 +574,7 @@ static MACHINE_DRIVER_START( gstriker )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2610, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -614,7 +614,7 @@ static MACHINE_DRIVER_START( vgoal )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2610, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -652,7 +652,7 @@ ROM_START( gstriker )
 	ROM_REGION( 0x40000, "ym.deltat", 0 )
 	ROM_LOAD( "human_scr-gs-106_m532001b-16_3402370.u93", 0x00000, 0x040000, CRC(93c9868c) SHA1(dcecb34e46405155e35aaf134b8547430d23f5a7) )
 
-	ROM_REGION( 0x100000, "ym", 0 )
+	ROM_REGION( 0x100000, "ymsnd", 0 )
 	ROM_LOAD( "scrgs107.u99", 0x00000, 0x100000, CRC(ecc0a01b) SHA1(239e832b7d22925460a8f44eb82e782cd13aba49) )
 
 	ROM_REGION( 0x1000, "plds", 0 )
@@ -688,7 +688,7 @@ ROM_START( gstrikera )
 	ROM_REGION( 0x40000, "ym.deltat", 0 )
 	ROM_LOAD( "human_scr-gs-106_m532001b-16_3402370.u93", 0x00000, 0x040000, CRC(93c9868c) SHA1(dcecb34e46405155e35aaf134b8547430d23f5a7) )
 
-	ROM_REGION( 0x100000, "ym", 0 )
+	ROM_REGION( 0x100000, "ymsnd", 0 )
 	ROM_LOAD( "scrgs107.u99", 0x00000, 0x100000, CRC(ecc0a01b) SHA1(239e832b7d22925460a8f44eb82e782cd13aba49) )
 
       /* PALs were protected on this version, used the ones from the "gstriker" set */
@@ -726,7 +726,7 @@ ROM_START( vgoalsoc )
 	ROM_REGION( 0x40000, "ym.deltat", 0 )
 	ROM_LOAD( "c13_u86.u86",  0x000000, 0x040000, CRC(4b76a162) SHA1(38dcb7536662f5f520e59f3ff746b42e9df789d2) )
 
-	ROM_REGION( 0x200000, "ym", 0 )
+	ROM_REGION( 0x200000, "ymsnd", 0 )
 	ROM_LOAD( "c13_u104.104", 0x000000, 0x200000, CRC(8437b6f8) SHA1(79f183dcbf3cde5c77e086e4fdd8341809396e37) )
 ROM_END
 
@@ -754,7 +754,7 @@ ROM_START( vgoalsca )
 	ROM_REGION( 0x40000, "ym.deltat", 0 )
 	ROM_LOAD( "c13_u86.u86",  0x000000, 0x040000, CRC(4b76a162) SHA1(38dcb7536662f5f520e59f3ff746b42e9df789d2) )
 
-	ROM_REGION( 0x100000, "ym", 0 )
+	ROM_REGION( 0x100000, "ymsnd", 0 )
 	ROM_LOAD( "vgoalc16.104", 0x000000, 0x100000, CRC(6fb06e1b) SHA1(c4584b480fe1165f8e2f887acaa578690514d35d) )
 ROM_END
 
@@ -784,7 +784,7 @@ ROM_START( twrldc94 )
 	ROM_REGION( 0x40000, "ym.deltat", 0 )
 	ROM_LOAD( "u86",          0x000000, 0x040000, CRC(775f45dc) SHA1(1a740dd880d9f873e93dfc096fbcae1784b4f522) )
 
-	ROM_REGION( 0x100000, "ym", 0 )
+	ROM_REGION( 0x100000, "ymsnd", 0 )
 	ROM_LOAD( "u104",         0x000000, 0x100000, CRC(df07d0af) SHA1(356560e164ff222bc9004fe202f829c93244a6c9) )
 ROM_END
 
@@ -814,7 +814,7 @@ ROM_START( twrldc94a )
 	ROM_REGION( 0x40000, "ym.deltat", 0 )
 	ROM_LOAD( "u86",          0x000000, 0x040000, CRC(775f45dc) SHA1(1a740dd880d9f873e93dfc096fbcae1784b4f522) )
 
-	ROM_REGION( 0x100000, "ym", 0 )
+	ROM_REGION( 0x100000, "ymsnd", 0 )
 	ROM_LOAD( "u104",         0x000000, 0x100000, CRC(df07d0af) SHA1(356560e164ff222bc9004fe202f829c93244a6c9) )
 ROM_END
 

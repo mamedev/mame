@@ -213,7 +213,7 @@ AB 1010_1011
 static ADDRESS_MAP_START( talbot_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1) /* MCU shared RAM */
-	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(&champbas_bg_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
@@ -240,7 +240,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( champbas_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x7800, 0x7fff) AM_ROM	// champbb2 only
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(&champbas_bg_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
@@ -272,7 +272,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( exctsccb_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 //  AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1) // MCU not used (though it's present on the board)
-	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 //  AM_RANGE(0x7800, 0x7fff) AM_ROM // champbb2 only
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(&champbas_bg_videoram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE(&spriteram_2) /* ??? */
@@ -576,7 +576,7 @@ static MACHINE_DRIVER_START( talbot )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8910, XTAL_18_432MHz/12)
+	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 
@@ -610,7 +610,7 @@ static MACHINE_DRIVER_START( champbas )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, XTAL_18_432MHz/12)
+	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
@@ -716,7 +716,7 @@ static MACHINE_DRIVER_START( exctsccb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, XTAL_18_432MHz/12)
+	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)

@@ -307,7 +307,7 @@ ADDRESS_MAP_END
 	// 50  W test mode status flags (bit 0 = ROM test fail, bit 1 = RAM test fail, bit 2 = YM2151 IRQ not received)
 ADDRESS_MAP_START( t5182_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(t5182_sharedram_semaphore_snd_acquire_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(t5182_sharedram_semaphore_snd_release_w)
 	AM_RANGE(0x12, 0x12) AM_WRITE(t5182_ym2151_irq_ack_w)

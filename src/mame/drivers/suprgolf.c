@@ -285,7 +285,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x05, 0x05) AM_READ(rom_bank_select_r) AM_WRITE(rom_bank_select_w)
 	AM_RANGE(0x06, 0x06) AM_READWRITE( suprgolf_vregs_r,suprgolf_vregs_w )
 //  AM_RANGE(0x07, 0x07)
-	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
+	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(adpcm_data_w)
  ADDRESS_MAP_END
 
@@ -473,7 +473,7 @@ static MACHINE_DRIVER_START( suprgolf )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 3000000) /* guess */
+	MDRV_SOUND_ADD("ymsnd", YM2203, 3000000) /* guess */
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 

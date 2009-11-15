@@ -884,7 +884,7 @@ static WRITE8_HANDLER( zigzag_ay8910_w )
 			/* bit 0 = WRITE */
 			/* bit 1 = C/D */
 			if ((offset & 1) != 0)
-				ay8910_data_address_w(devtag_get_device(space->machine, "ay"), offset >> 1, zigzag_ay8910_latch);
+				ay8910_data_address_w(devtag_get_device(space->machine, "aysnd"), offset >> 1, zigzag_ay8910_latch);
 			break;
 
 		case 0x100:
@@ -976,21 +976,21 @@ static WRITE8_HANDLER( mshuttle_ay8910_cs_w )
 static WRITE8_HANDLER( mshuttle_ay8910_control_w )
 {
 	if (!mshuttle_ay8910_cs)
-		ay8910_address_w(devtag_get_device(space->machine, "ay"), offset, data);
+		ay8910_address_w(devtag_get_device(space->machine, "aysnd"), offset, data);
 }
 
 
 static WRITE8_HANDLER( mshuttle_ay8910_data_w )
 {
 	if (!mshuttle_ay8910_cs)
-		ay8910_data_w(devtag_get_device(space->machine, "ay"), offset, data);
+		ay8910_data_w(devtag_get_device(space->machine, "aysnd"), offset, data);
 }
 
 
 static READ8_HANDLER( mshuttle_ay8910_data_r )
 {
 	if (!mshuttle_ay8910_cs)
-		return ay8910_r(devtag_get_device(space->machine, "ay"), offset);
+		return ay8910_r(devtag_get_device(space->machine, "aysnd"), offset);
 	return 0xff;
 }
 
@@ -1387,8 +1387,8 @@ static ADDRESS_MAP_START( jumpbug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_BASE(&spriteram)
-	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x00ff) AM_DEVWRITE("ay", ay8910_data_w)
-	AM_RANGE(0x5900, 0x5900) AM_MIRROR(0x00ff) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x00ff) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x5900, 0x5900) AM_MIRROR(0x00ff) AM_DEVWRITE("aysnd", ay8910_address_w)
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
 	AM_RANGE(0x6002, 0x6006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_gfxbank_w)
 	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
@@ -1519,8 +1519,8 @@ static ADDRESS_MAP_START( checkman_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x03, 0x03) AM_READ(soundlatch_r)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
 
@@ -1529,8 +1529,8 @@ static ADDRESS_MAP_START( checkmaj_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0xa002, 0xa002) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xa002, 0xa002) AM_DEVREAD("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
 
@@ -1913,7 +1913,7 @@ static MACHINE_DRIVER_START( zigzag )
 	MDRV_CPU_PROGRAM_MAP(galaxian_map_base)  /* no discrete sound */
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("ay", AY8910, 1789750)
+	MDRV_SOUND_ADD("aysnd", AY8910, 1789750)
 
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -1950,7 +1950,7 @@ static MACHINE_DRIVER_START( jumpbug )
 	MDRV_CPU_PROGRAM_MAP(jumpbug_map)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("ay", AY8910, 1789750)
+	MDRV_SOUND_ADD("aysnd", AY8910, 1789750)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -1965,7 +1965,7 @@ static MACHINE_DRIVER_START( checkman )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* NMIs are triggered by the main CPU */
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("ay", AY8910, 1789750)
+	MDRV_SOUND_ADD("aysnd", AY8910, 1789750)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -1984,7 +1984,7 @@ static MACHINE_DRIVER_START( checkmaj )
 	MDRV_TIMER_ADD_SCANLINE("irq0", checkmaj_irq0_gen, "screen", 0, 8)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("ay", AY8910, 1620000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 1620000)
 	MDRV_SOUND_CONFIG(checkmaj_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2)
 MACHINE_DRIVER_END
@@ -1999,7 +1999,7 @@ static MACHINE_DRIVER_START( mshuttle )
 	MDRV_CPU_IO_MAP(mshuttle_portmap)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("ay", AY8910, GALAXIAN_PIXEL_CLOCK/3/4)
+	MDRV_SOUND_ADD("aysnd", AY8910, GALAXIAN_PIXEL_CLOCK/3/4)
 	MDRV_SOUND_CONFIG(cclimber_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

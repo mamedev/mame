@@ -137,7 +137,7 @@ static WRITE8_HANDLER( hc11_porta_w )
 
 static WRITE8_HANDLER( ay8910_w )
 {
-	const device_config *ay = devtag_get_device(space->machine, "ay");
+	const device_config *ay = devtag_get_device(space->machine, "aysnd");
 
 	if (ay_sel)
 		ay8910_data_w(ay, 0, data);
@@ -248,7 +248,7 @@ static MACHINE_DRIVER_START( skeetsht )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 2000000) // ?
+	MDRV_SOUND_ADD("aysnd", AY8910, 2000000) // ?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

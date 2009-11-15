@@ -114,7 +114,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ym", ym3812_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ymsnd", ym3812_w)
 	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0x07, 0x07) AM_DEVWRITE("oki", deniam16b_oki_rom_bank_w)
 ADDRESS_MAP_END
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( deniam16c_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc44002, 0xc44003) AM_READ_PORT("P1")
 	AM_RANGE(0xc44004, 0xc44005) AM_READ_PORT("P2") AM_WRITENOP /* irq ack? */
 	AM_RANGE(0xc44006, 0xc44007) AM_READNOP	AM_DEVWRITE("oki", deniam16c_oki_rom_bank_w) /* read unused? */
-	AM_RANGE(0xc40008, 0xc4000b) AM_DEVWRITE8("ym", ym3812_w, 0xff00)
+	AM_RANGE(0xc40008, 0xc4000b) AM_DEVWRITE8("ymsnd", ym3812_w, 0xff00)
 	AM_RANGE(0xc4400a, 0xc4400b) AM_READ_PORT("DSW") /* probably YM3812 input port */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -276,7 +276,7 @@ static MACHINE_DRIVER_START( deniam16b )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, XTAL_25MHz/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified */
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_25MHz/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified */
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
@@ -312,7 +312,7 @@ static MACHINE_DRIVER_START( deniam16c )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, XTAL_25MHz/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified) */
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_25MHz/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified) */
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 

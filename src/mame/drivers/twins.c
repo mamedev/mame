@@ -85,8 +85,8 @@ static ADDRESS_MAP_START( twins_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( twins_io, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE(0x0000, 0x0003) AM_DEVWRITE8("ay", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0x0002, 0x0003) AM_DEVREAD8("ay", ay8910_r, 0x00ff)
+	AM_RANGE(0x0000, 0x0003) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0x0002, 0x0003) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
 	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)
 	AM_RANGE(0x0006, 0x0007) AM_WRITE(port6_pal0_w)
 	AM_RANGE(0x000e, 0x000f) AM_WRITE(porte_paloff0_w)
@@ -189,7 +189,7 @@ static MACHINE_DRIVER_START( twins )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 2000000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -248,8 +248,8 @@ static ADDRESS_MAP_START( twinsa_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE(twinsa_unk_r, porte_paloff0_w)
 	AM_RANGE(0x0002, 0x0003) AM_WRITE(porte_paloff0_w)
 	AM_RANGE(0x0004, 0x0005) AM_WRITE(twinsa_port4_w) // palette on this set
-	AM_RANGE(0x0008, 0x0009) AM_DEVWRITE8("ay", ay8910_address_w, 0x00ff)
-	AM_RANGE(0x0010, 0x0011) AM_DEVREADWRITE8("ay", ay8910_r, ay8910_data_w, 0x00ff)
+	AM_RANGE(0x0008, 0x0009) AM_DEVWRITE8("aysnd", ay8910_address_w, 0x00ff)
+	AM_RANGE(0x0010, 0x0011) AM_DEVREADWRITE8("aysnd", ay8910_r, ay8910_data_w, 0x00ff)
 	AM_RANGE(0x0018, 0x0019) AM_READ(twins_port4_r) AM_WRITE(twins_port4_w)
 ADDRESS_MAP_END
 
@@ -277,7 +277,7 @@ static MACHINE_DRIVER_START( twinsa )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, XTAL_16MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_16MHz/8) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

@@ -124,9 +124,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megazone_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay", ay8910_address_w)
-	AM_RANGE(0x00, 0x02) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("ay", ay8910_data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("aysnd", ay8910_address_w)
+	AM_RANGE(0x00, 0x02) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("aysnd", ay8910_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megazone_i8039_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -273,7 +273,7 @@ static MACHINE_DRIVER_START( megazone )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 14318000/8)
+	MDRV_SOUND_ADD("aysnd", AY8910, 14318000/8)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(0, "filter.0.0", 0.30)
 	MDRV_SOUND_ROUTE(1, "filter.0.1", 0.30)

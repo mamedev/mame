@@ -1643,7 +1643,7 @@ static void megatech_set_genz80_as_sms_standard_ports(running_machine *machine, 
 	/* INIT THE PORTS *********************************************************************************************/
 
 	const address_space *io = cputag_get_address_space(machine, tag, ADDRESS_SPACE_IO);
-	const device_config *sn = devtag_get_device(machine, "sn");
+	const device_config *sn = devtag_get_device(machine, "snsnd");
 
 	memory_install_readwrite8_handler(io, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
 
@@ -1749,7 +1749,7 @@ MACHINE_DRIVER_START( sms )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn", SN76496, 3579540)
+	MDRV_SOUND_ADD("snsnd", SN76496, 3579540)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

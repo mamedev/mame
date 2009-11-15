@@ -381,8 +381,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cclimber_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x09) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x08, 0x09) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yamato_portmap, ADDRESS_SPACE_IO, 8 )
@@ -1006,7 +1006,7 @@ static MACHINE_DRIVER_START( cclimber )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, MASTER_CLOCK/3/2/2)
+	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/3/2/2)
 	MDRV_SOUND_CONFIG(cclimber_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

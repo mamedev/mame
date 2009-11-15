@@ -202,10 +202,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf801, 0xf801) AM_DEVREADWRITE("ym", ym2151_status_port_r, ym2151_data_port_w)
+	AM_RANGE(0xf801, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_status_port_r, ym2151_data_port_w)
 	AM_RANGE(0xfa00, 0xfa2f) AM_DEVREADWRITE("konami", k053260_r, k053260_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(sound_arm_nmi_w)
-	AM_RANGE(0xfe00, 0xfe00) AM_DEVWRITE("ym", ym2151_register_port_w)
+	AM_RANGE(0xfe00, 0xfe00) AM_DEVWRITE("ymsnd", ym2151_register_port_w)
 ADDRESS_MAP_END
 
 
@@ -255,7 +255,7 @@ static MACHINE_DRIVER_START( asterix )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, 4000000)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 4000000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 

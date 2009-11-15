@@ -225,7 +225,7 @@ static MACHINE_DRIVER_START( bigstrkb )
 	MDRV_VIDEO_UPDATE(bigstrkb)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-//  MDRV_SOUND_ADD("ym", YM2151, ym2151_config)
+//  MDRV_SOUND_ADD("ymsnd", YM2151, ym2151_config)
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, 4000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)

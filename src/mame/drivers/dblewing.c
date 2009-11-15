@@ -468,7 +468,7 @@ static READ8_HANDLER(irq_latch_r)
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
- 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym", ym2151_status_port_r,ym2151_w)
+ 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_status_port_r,ym2151_w)
 	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE("oki", okim6295_r,okim6295_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
  	AM_RANGE(0xd000, 0xd000) AM_READ(irq_latch_r) //timing? sound latch?
@@ -691,7 +691,7 @@ static MACHINE_DRIVER_START( dblewing )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, 32220000/9)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 32220000/9)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 

@@ -64,7 +64,7 @@ WRITE8_HANDLER( cyberbal_sound_bank_select_w )
 	coin_counter_w(1, (data >> 5) & 1);
 	coin_counter_w(0, (data >> 4) & 1);
 	cputag_set_input_line(space->machine, "dac", INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
-	if (!(data & 0x01)) devtag_reset(space->machine, "ym");
+	if (!(data & 0x01)) devtag_reset(space->machine, "ymsnd");
 }
 
 

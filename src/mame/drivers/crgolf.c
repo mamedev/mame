@@ -258,7 +258,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xc002, 0xc002) AM_WRITENOP
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(switch_input_r, switch_input_select_w)
 	AM_RANGE(0xe001, 0xe001) AM_READWRITE(analog_input_r, unknown_w)
@@ -382,7 +382,7 @@ static MACHINE_DRIVER_START( crgolf )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8910, MASTER_CLOCK/3/2/2)
+	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/3/2/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

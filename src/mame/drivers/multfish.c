@@ -545,9 +545,9 @@ static ADDRESS_MAP_START( multfish_portmap, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0x35, 0x35) AM_WRITE(multfish_port35_w)
 //  AM_RANGE(0x36, 0x36) AM_WRITE(multfish_port36_w)
 //  AM_RANGE(0x37, 0x37) AM_WRITE(multfish_watchdog_reset_w)
-	AM_RANGE(0x38, 0x38) AM_DEVWRITE("ay", ay8910_address_w)
-	AM_RANGE(0x39, 0x39) AM_DEVWRITE("ay", ay8910_data_w)
-	AM_RANGE(0x3a, 0x3a) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x38, 0x38) AM_DEVWRITE("aysnd", ay8910_address_w)
+	AM_RANGE(0x39, 0x39) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x3a, 0x3a) AM_DEVREAD("aysnd", ay8910_r)
 
 	AM_RANGE(0x90, 0x90) AM_READ(ray_r)
 
@@ -630,7 +630,7 @@ static MACHINE_DRIVER_START( multfish )
 	MDRV_VIDEO_UPDATE(multfish)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8910, 6000000/4)
+	MDRV_SOUND_ADD("aysnd", AY8910, 6000000/4)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END

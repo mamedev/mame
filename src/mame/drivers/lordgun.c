@@ -221,7 +221,7 @@ static WRITE8_DEVICE_HANDLER( lordgun_okibank_w )
 }
 
 static ADDRESS_MAP_START( lordgun_soundio_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE( "ym", ym3812_w )
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE( "ymsnd", ym3812_w )
 	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
 	AM_RANGE(0x3000, 0x3000) AM_READ( soundlatch2_r )
 	AM_RANGE(0x4000, 0x4000) AM_READ( soundlatch_r )
@@ -234,7 +234,7 @@ static ADDRESS_MAP_START( hfh_soundio_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x3000, 0x3000) AM_READ( soundlatch2_r )
 	AM_RANGE(0x4000, 0x4000) AM_READ( soundlatch_r )
 	AM_RANGE(0x5000, 0x5000) AM_READ( SMH_NOP )
-	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE( "ym", ym3812_w )
+	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE( "ymsnd", ym3812_w )
 	AM_RANGE(0x7400, 0x7400) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
 	AM_RANGE(0x7800, 0x7800) AM_DEVREADWRITE( "oki2", okim6295_r, okim6295_w )
 ADDRESS_MAP_END
@@ -441,7 +441,7 @@ static MACHINE_DRIVER_START( lordgun )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM3812, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM3812, 3579545)
 	MDRV_SOUND_CONFIG(lordgun_ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)

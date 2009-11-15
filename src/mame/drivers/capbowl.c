@@ -276,7 +276,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP  				/* Not hooked up according to the schematics */
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0x7000, 0x7000) AM_READ(soundlatch_r)
@@ -375,7 +375,7 @@ static MACHINE_DRIVER_START( capbowl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, MASTER_CLOCK/2)
+	MDRV_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK/2)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.07)
 	MDRV_SOUND_ROUTE(1, "mono", 0.07)

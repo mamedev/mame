@@ -344,15 +344,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hustler_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE("aysnd", ay8910_address_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hustlerb_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("ay", ay8910_address_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("aysnd", ay8910_address_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
 
 /* stratgyx coinage DIPs are spread accross two input ports */
@@ -1006,7 +1006,7 @@ static MACHINE_DRIVER_START( hustler )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8910, 14318000/8)
+	MDRV_SOUND_ADD("aysnd", AY8910, 14318000/8)
 	MDRV_SOUND_CONFIG(hustler_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_DRIVER_END

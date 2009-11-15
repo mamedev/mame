@@ -168,7 +168,7 @@ static ADDRESS_MAP_START( ladyfrog_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_WRITENOP
-	AM_RANGE(0xc802, 0xc803) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0xc802, 0xc803) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xc900, 0xc90d) AM_DEVWRITE("msm", msm5232_w)
 	AM_RANGE(0xca00, 0xca00) AM_WRITENOP
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITENOP
@@ -321,7 +321,7 @@ static MACHINE_DRIVER_START( ladyfrog )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 8000000/4)
+	MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 

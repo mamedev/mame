@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( cabaret_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x00a2, 0x00a2 ) AM_READ_PORT("DSW2")			/* DSW2 */
 	AM_RANGE( 0x00b0, 0x00b0 ) AM_READ_PORT("DSW3")			/* DSW3 */
 
-	AM_RANGE( 0x00e0, 0x00e1 ) AM_DEVWRITE( "ym", ym2413_w )
+	AM_RANGE( 0x00e0, 0x00e1 ) AM_DEVWRITE( "ymsnd", ym2413_w )
 
 	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE( fg_tile_w )  AM_BASE( &fg_tile_ram )
 	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE( fg_color_w ) AM_BASE( &fg_color_ram )
@@ -328,7 +328,7 @@ static MACHINE_DRIVER_START( cabaret )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ym", YM2413, XTAL_3_579545MHz)
+	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

@@ -906,7 +906,7 @@ static ADDRESS_MAP_START( i8051_sound_port, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(baby_sound_p0_r, baby_sound_p0_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(baby_sound_p1_r, baby_sound_p1_w)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READ(baby_sound_p2_r) AM_DEVWRITE("dac", baby_sound_p2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_DEVREADWRITE("ay", baby_sound_p3_r, baby_sound_p3_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_DEVREADWRITE("aysnd", baby_sound_p3_r, baby_sound_p3_w)
 ADDRESS_MAP_END
 
 
@@ -1239,7 +1239,7 @@ static MACHINE_DRIVER_START( babypkr )
 	MDRV_GFXDECODE(videodad)
 	MDRV_VIDEO_START(vidadcba)
 
-	MDRV_SOUND_ADD("ay", AY8910, CPU_CLOCK / 6)
+	MDRV_SOUND_ADD("aysnd", AY8910, CPU_CLOCK / 6)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END

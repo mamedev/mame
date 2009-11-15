@@ -760,7 +760,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
 	AM_RANGE(0xc080, 0xc08d) AM_DEVWRITE("msm", msm5232_w)
-	AM_RANGE(0xc0a0, 0xc0a1) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0xc0a0, 0xc0a1) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0xc0b0, 0xc0b0) AM_WRITENOP // n.c.
 	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(equites_cymbal_ctrl_w)
 	AM_RANGE(0xc0d0, 0xc0d0) AM_WRITE(equites_dac_latch_w)	// followed by 1 (and usually 0) on 8155 port B
@@ -1180,7 +1180,7 @@ static MACHINE_DRIVER_START( common_sound )
 	MDRV_SOUND_ROUTE(9, "mono", 1.0)		// pin 2 SOLO 16' (this actually feeds an analog section)
 	MDRV_SOUND_ROUTE(10,"mono", 0.12)		// pin 22 Noise Output (this actually feeds an analog section)
 
-	MDRV_SOUND_ADD("ay", AY8910, XTAL_6_144MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_6_144MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(equites_8910intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 

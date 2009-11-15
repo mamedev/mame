@@ -161,7 +161,7 @@ static ADDRESS_MAP_START( bigkarnk_snd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM											/* RAM */
 	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)	/* OKI6295 */
 //  AM_RANGE(0x0900, 0x0900) AM_WRITENOP                                    /* enable sound output? */
-	AM_RANGE(0x0a00, 0x0a01) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)		/* YM3812 */
+	AM_RANGE(0x0a00, 0x0a01) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)		/* YM3812 */
 	AM_RANGE(0x0b00, 0x0b00) AM_READ(soundlatch_r)							/* Sound latch */
 	AM_RANGE(0x0c00, 0xffff) AM_ROM											/* ROM */
 ADDRESS_MAP_END
@@ -236,7 +236,7 @@ static MACHINE_DRIVER_START( bigkarnk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, 3580000)
+	MDRV_SOUND_ADD("ymsnd", YM3812, 3580000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)

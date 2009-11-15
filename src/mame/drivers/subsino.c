@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( srider_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x0d00c, 0x0d00c ) AM_READ_PORT( "INC" )
 
-	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE( "ym", ym3812_w )
+	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE( "ymsnd", ym3812_w )
 
 	AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVWRITE( "oki", okim6295_w )
 
@@ -285,7 +285,7 @@ static MACHINE_DRIVER_START( victor5 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2413, XTAL_3_579545MHz)
+	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_4_433619MHz / 4)
@@ -326,7 +326,7 @@ static MACHINE_DRIVER_START( srider )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, XTAL_3_579545MHz)
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_4_433619MHz / 4)
@@ -360,7 +360,7 @@ static MACHINE_DRIVER_START( crsbingo )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2413, XTAL_3_579545MHz)	// unknown clock
+	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)	// unknown clock
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// no OKI

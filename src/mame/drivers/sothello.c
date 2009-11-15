@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( maincpu_io_map, ADDRESS_SPACE_IO, 8 )
     AM_RANGE( 0x33, 0x33) AM_READ(soundcpu_status_r)
     AM_RANGE( 0x40, 0x4f) AM_WRITE(soundlatch_w)
     AM_RANGE( 0x50, 0x50) AM_WRITE(bank_w)
-    AM_RANGE( 0x60, 0x61) AM_MIRROR(0x02) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
+    AM_RANGE( 0x60, 0x61) AM_MIRROR(0x02) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
    						/* not sure, but the A1 line is ignored, code @ $8b8 */
     AM_RANGE( 0x70, 0x70) AM_WRITE( v9938_0_vram_w ) AM_READ( v9938_0_vram_r )
     AM_RANGE( 0x71, 0x71) AM_WRITE( v9938_0_command_w ) AM_READ( v9938_0_status_r )
@@ -377,7 +377,7 @@ static MACHINE_DRIVER_START( sothello )
 
     /* sound hardware */
     MDRV_SPEAKER_STANDARD_MONO("mono")
-    MDRV_SOUND_ADD("ym", YM2203, YM_CLOCK)
+    MDRV_SOUND_ADD("ymsnd", YM2203, YM_CLOCK)
     MDRV_SOUND_CONFIG(ym2203_config)
     MDRV_SOUND_ROUTE(0, "mono", 0.25)
     MDRV_SOUND_ROUTE(1, "mono", 0.25)

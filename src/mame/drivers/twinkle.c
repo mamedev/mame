@@ -747,14 +747,14 @@ static WRITE16_HANDLER( twinkle_spu_ctrl_w )
 
 static READ16_HANDLER( twinkle_waveram_r )
 {
-	UINT16 *waveram = (UINT16 *)memory_region(space->machine, "rf");
+	UINT16 *waveram = (UINT16 *)memory_region(space->machine, "rfsnd");
 
 	return waveram[offset];
 }
 
 static WRITE16_HANDLER( twinkle_waveram_w )
 {
-	UINT16 *waveram = (UINT16 *)memory_region(space->machine, "rf");
+	UINT16 *waveram = (UINT16 *)memory_region(space->machine, "rfsnd");
 
 	COMBINE_DATA(&waveram[offset]);
 }
@@ -784,7 +784,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x280000, 0x280fff) AM_READWRITE( shared_68k_r, shared_68k_w )
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("ide", twinkle_ide_r, twinkle_ide_w)
 	// 34000E = ???
-	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rf", rf5c400_r, rf5c400_w)
+	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rfsnd", rf5c400_r, rf5c400_w)
 	AM_RANGE(0x800000, 0xffffff) AM_READWRITE( twinkle_waveram_r, twinkle_waveram_w )	// 8 MB window wave RAM
 ADDRESS_MAP_END
 
@@ -962,7 +962,7 @@ static MACHINE_DRIVER_START( twinkle )
 	MDRV_SOUND_ROUTE( 0, "speakerleft", 0.75 )
 	MDRV_SOUND_ROUTE( 1, "speakerright", 0.75 )
 
-	MDRV_SOUND_ADD("rf", RF5C400, 32000000/2)
+	MDRV_SOUND_ADD("rfsnd", RF5C400, 32000000/2)
 	MDRV_SOUND_ROUTE(0, "speakerleft", 1.0)
 	MDRV_SOUND_ROUTE(1, "speakerright", 1.0)
 
@@ -1026,7 +1026,7 @@ INPUT_PORTS_END
 	ROM_REGION32_LE( 0x080000, "audiocpu", 0 )\
 	ROM_LOAD16_WORD_SWAP( "863a05.2x",    0x000000, 0x080000, CRC(6f42a09e) SHA1(cab5209f90f47b9ee6e721479913ad74e3ba84b1) )\
 \
-	ROM_REGION(0x1800000, "rf", ROMREGION_ERASE00)
+	ROM_REGION(0x1800000, "rfsnd", ROMREGION_ERASE00)
 
 ROM_START( gq863 )
 	TWINKLE_BIOS

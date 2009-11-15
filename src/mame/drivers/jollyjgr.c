@@ -151,8 +151,8 @@ static ADDRESS_MAP_START( jollyjgr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8ff8, 0x8ff8) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8ff9, 0x8ff9) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x8ff8, 0x8ff8) AM_DEVWRITE("ay", ay8910_address_w)
-	AM_RANGE(0x8ffa, 0x8ffa) AM_READ_PORT("SYSTEM") AM_DEVWRITE("ay", ay8910_data_w)
+	AM_RANGE(0x8ff8, 0x8ff8) AM_DEVWRITE("aysnd", ay8910_address_w)
+	AM_RANGE(0x8ffa, 0x8ffa) AM_READ_PORT("SYSTEM") AM_DEVWRITE("aysnd", ay8910_data_w)
 	AM_RANGE(0x8fff, 0x8fff) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE(jollyjgr_misc_w)
 	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE(jollyjgr_coin_lookout_w)
@@ -420,7 +420,7 @@ static MACHINE_DRIVER_START( jollyjgr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 3579545)
+	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_DRIVER_END
 

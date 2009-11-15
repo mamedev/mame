@@ -987,7 +987,7 @@ static ADDRESS_MAP_START( hotdogst_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(hotdogst_rombank_w)					// ROM bank
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)						// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r)						//
-	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)		//
+	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)		//
 	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)	// M6295
 	AM_RANGE(0x70, 0x70) AM_WRITE(hotdogst_okibank_w)					// Samples bank
 ADDRESS_MAP_END
@@ -1018,8 +1018,8 @@ static ADDRESS_MAP_START( mazinger_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(mazinger_rombank_w)			// ROM bank
 	AM_RANGE(0x10, 0x10) AM_WRITE(soundlatch_ack_w)				// To Main CPU
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)				// From Main CPU
-	AM_RANGE(0x50, 0x51) AM_DEVWRITE("ym", ym2203_w)			// YM2203
-	AM_RANGE(0x52, 0x53) AM_DEVREAD("ym", ym2203_r)				// YM2203
+	AM_RANGE(0x50, 0x51) AM_DEVWRITE("ymsnd", ym2203_w)			// YM2203
+	AM_RANGE(0x52, 0x53) AM_DEVREAD("ymsnd", ym2203_r)				// YM2203
 	AM_RANGE(0x70, 0x70) AM_DEVWRITE("oki", okim6295_w)			// M6295
 	AM_RANGE(0x74, 0x74) AM_WRITE(hotdogst_okibank_w)			// Samples bank
 ADDRESS_MAP_END
@@ -1068,7 +1068,7 @@ static ADDRESS_MAP_START( metmqstr_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_READ(soundflags_r)						// Communication
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)					// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r)					//
-	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)	// YM2151
+	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)	// YM2151
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE("oki1", okim6295_w)			// M6295 #0
 	AM_RANGE(0x70, 0x70) AM_WRITE(metmqstr_okibank0_w)				// Samples Bank #0
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("oki2", okim6295_w)			// M6295 #1
@@ -1100,7 +1100,7 @@ static ADDRESS_MAP_START( pwrinst2_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)	// M6295
 	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)	//
 	AM_RANGE(0x10, 0x17) AM_WRITE(NMK112_okibank_w)							// Samples bank
-	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)			//
+	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)			//
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch_ack_w)							// To Main CPU
 //  AM_RANGE(0x51, 0x51) AM_WRITE(SMH_NOP)                                  // ?? volume
 	AM_RANGE(0x80, 0x80) AM_WRITE(pwrinst2_rombank_w)						// ROM bank
@@ -1164,7 +1164,7 @@ static ADDRESS_MAP_START( sailormn_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_READ(soundflags_r)								// Communication
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)							// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r)							//
-	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)			// YM2151
+	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)			// YM2151
 	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)	// M6295 #0
 	AM_RANGE(0x70, 0x70) AM_WRITE(sailormn_okibank0_w)						// Samples Bank #0
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)	// M6295 #1
@@ -1973,7 +1973,7 @@ static MACHINE_DRIVER_START( hotdogst )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2203, XTAL_4MHz)
+	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_4MHz)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.20)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.20)
@@ -2068,7 +2068,7 @@ static MACHINE_DRIVER_START( mazinger )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2203, XTAL_4MHz)
+	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_4MHz)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.20)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.20)
@@ -2124,7 +2124,7 @@ static MACHINE_DRIVER_START( metmqstr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_16MHz / 4)
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_16MHz / 4)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.20)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.20)
@@ -2179,7 +2179,7 @@ static MACHINE_DRIVER_START( pwrinst2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2203, XTAL_16MHz / 4)
+	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_16MHz / 4)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.40)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.40)
@@ -2239,7 +2239,7 @@ static MACHINE_DRIVER_START( sailormn )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_16MHz/4)
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_16MHz/4)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)

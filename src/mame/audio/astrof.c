@@ -219,7 +219,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( tomahawk_audio_w )
 {
-	const device_config *sn = devtag_get_device(space->machine, "sn");
+	const device_config *sn = devtag_get_device(space->machine, "snsnd");
 
 	/* D0 - sonar */
 
@@ -271,7 +271,7 @@ static const sn76477_interface tomahawk_sn76477_interface =
 
 MACHINE_DRIVER_START( tomahawk_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sn", SN76477, 0)
+	MDRV_SOUND_ADD("snsnd", SN76477, 0)
 	MDRV_SOUND_CONFIG(tomahawk_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

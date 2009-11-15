@@ -124,8 +124,8 @@ static ADDRESS_MAP_START( fortecar_ports, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x21, 0x21) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("fcppi0", ppi8255_r, ppi8255_w)//M5L8255AP
 //	AM_RANGE(0x80, 0x81) //8251A UART
  	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN0") //written too,multiplexer?
@@ -335,7 +335,7 @@ static MACHINE_DRIVER_START( fortecar )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 1500000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

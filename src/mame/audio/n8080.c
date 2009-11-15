@@ -170,13 +170,13 @@ static void stop_mono_flop(const device_config *sn, int n)
 
 static TIMER_CALLBACK( stop_mono_flop_callback )
 {
-	stop_mono_flop(devtag_get_device(machine, "sn"), param);
+	stop_mono_flop(devtag_get_device(machine, "snsnd"), param);
 }
 
 
 static void spacefev_sound_pins_changed(running_machine *machine)
 {
-	const device_config *sn = devtag_get_device(machine, "sn");
+	const device_config *sn = devtag_get_device(machine, "snsnd");
 	UINT16 changes = ~curr_sound_pins & prev_sound_pins;
 
 	if (changes & (1 << 0x3))
@@ -208,7 +208,7 @@ static void spacefev_sound_pins_changed(running_machine *machine)
 
 static void sheriff_sound_pins_changed(running_machine *machine)
 {
-	const device_config *sn = devtag_get_device(machine, "sn");
+	const device_config *sn = devtag_get_device(machine, "snsnd");
 	UINT16 changes = ~curr_sound_pins & prev_sound_pins;
 
 	if (changes & (1 << 0x6))
@@ -442,7 +442,7 @@ static WRITE8_HANDLER( helifire_sound_ctrl_w )
 
 static TIMER_CALLBACK( spacefev_vco_voltage_timer )
 {
-	const device_config *sn = devtag_get_device(machine, "sn");
+	const device_config *sn = devtag_get_device(machine, "snsnd");
 	double voltage = 0;
 
 	if (mono_flop[2])
@@ -561,7 +561,7 @@ MACHINE_DRIVER_START( spacefev_sound )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("sn", SN76477, 0)
+	MDRV_SOUND_ADD("snsnd", SN76477, 0)
 	MDRV_SOUND_CONFIG(spacefev_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_DRIVER_END
@@ -582,7 +582,7 @@ MACHINE_DRIVER_START( sheriff_sound )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("sn", SN76477, 0)
+	MDRV_SOUND_ADD("snsnd", SN76477, 0)
 	MDRV_SOUND_CONFIG(sheriff_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_DRIVER_END

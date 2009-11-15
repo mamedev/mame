@@ -297,7 +297,7 @@ static ADDRESS_MAP_START( jackie_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x5090, 0x5090) AM_READ_PORT("BUTTONS1")
 	AM_RANGE(0x5091, 0x5091) AM_WRITE( jackie_lamps_w )
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")
-	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE("ym", ym2413_w)
+	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE("ymsnd", ym2413_w)
 	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
 	AM_RANGE(0x6000, 0x60ff) AM_RAM_WRITE( bg_scroll_w ) AM_BASE( &bg_scroll )
 	AM_RANGE(0x6800, 0x69ff) AM_RAM_WRITE( jackie_reel1_ram_w )  AM_BASE( &jackie_reel1_ram )
@@ -481,7 +481,7 @@ static MACHINE_DRIVER_START( jackie )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_DRIVER_END

@@ -121,7 +121,7 @@ static WRITE8_DEVICE_HANDLER( battlera_adpcm_reset_w )
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
  	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040001) AM_DEVWRITE("ym", ym2203_w)
+	AM_RANGE(0x040000, 0x040001) AM_DEVWRITE("ymsnd", ym2203_w)
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(battlera_adpcm_data_w)
 	AM_RANGE(0x1fe800, 0x1fe80f) AM_DEVWRITE("c6280", c6280_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK(7) /* Main ram */
@@ -268,7 +268,7 @@ static MACHINE_DRIVER_START( battlera )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2203, 12000000 / 8)
+	MDRV_SOUND_ADD("ymsnd", YM2203, 12000000 / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 

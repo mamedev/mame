@@ -441,7 +441,7 @@ static WRITE8_HANDLER( metro_portb_w )
 	{
 		if (!BIT(data,2))
 		{
-			const device_config *ym = devtag_get_device(space->machine, "ym");
+			const device_config *ym = devtag_get_device(space->machine, "ymsnd");
 			ym2413_w(ym,BIT(data,1),porta);
 		}
 		portb = data;
@@ -480,7 +480,7 @@ static WRITE8_HANDLER( daitorid_portb_w )
 
 	if (BIT(portb,6) && !BIT(data,6))	/* clock 1->0 */
 	{
-		const device_config *ym = devtag_get_device(space->machine, "ym");
+		const device_config *ym = devtag_get_device(space->machine, "ymsnd");
 		if (!BIT(data,2))
 		{
 			/* write */
@@ -1315,7 +1315,7 @@ static ADDRESS_MAP_START( gakusai_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_BASE(&metro_videoregs)					// Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP											// ? 5
 	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE("oki", gakusai_oki_bank_lo_w)				// Sound
-	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
+	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)	// Sound
 	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(gakusai_eeprom_r,gakusai_eeprom_w)		// EEPROM
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE("oki", gakusai_oki_bank_hi_w)
@@ -1355,7 +1355,7 @@ static ADDRESS_MAP_START( gakusai2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE("oki", gakusai_oki_bank_lo_w)				// Sound bank
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("oki", gakusai_oki_bank_hi_w)
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)	// Sound
-	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
+	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE(gakusai_eeprom_r,gakusai_eeprom_w)		// EEPROM
 ADDRESS_MAP_END
 
@@ -1421,7 +1421,7 @@ static ADDRESS_MAP_START( dokyusp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_BASE(&metro_videoregs)					// Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP											// ? 5
 	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE("oki", gakusai_oki_bank_lo_w)				// Sound
-	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
+	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)	// Sound
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(dokyusp_eeprom_reset_w)						// EEPROM
 	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(dokyusp_eeprom_r,dokyusp_eeprom_bit_w)	// EEPROM
@@ -1463,7 +1463,7 @@ static ADDRESS_MAP_START( dokyusei_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE("oki", gakusai_oki_bank_hi_w)				// Samples Bank?
 	AM_RANGE(0x900000, 0x900001) AM_WRITENOP											// ? 4
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("oki", gakusai_oki_bank_lo_w)				// Samples Bank
-	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)					//
+	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)					//
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)	// Sound
 ADDRESS_MAP_END
 
@@ -1680,7 +1680,7 @@ static ADDRESS_MAP_START( blzntrnd_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(blzntrnd_sh_bankswitch_w)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r) AM_WRITENOP
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ym", ym2610_r,ym2610_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ymsnd", ym2610_r,ym2610_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blzntrnd_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1751,7 +1751,7 @@ static ADDRESS_MAP_START( mouja_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478888, 0x478889) AM_WRITENOP											// ??
 	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_BASE(&metro_videoregs)					// Video Registers
 	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE("oki", mouja_sound_rombank_w)
-	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
+	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0xffff)
 #if 0
 	AM_RANGE(0x460000, 0x46ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
@@ -1779,7 +1779,7 @@ static ADDRESS_MAP_START( puzzlet_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x470000, 0x47dfff ) AM_RAM
 
 	AM_RANGE( 0x500000, 0x500001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0xff00 )
-	AM_RANGE( 0x580000, 0x580003 ) AM_DEVWRITE8( "ym", ym2413_w, 0xff00 )
+	AM_RANGE( 0x580000, 0x580003 ) AM_DEVWRITE8( "ymsnd", ym2413_w, 0xff00 )
 
 	AM_RANGE( 0x700000, 0x71ffff ) AM_READWRITE( SMH_RAM, metro_vram_0_w ) AM_BASE( &metro_vram_0 )	// Layer 0
 	AM_RANGE( 0x720000, 0x73ffff ) AM_READWRITE( SMH_RAM, metro_vram_1_w ) AM_BASE( &metro_vram_1 )	// Layer 1
@@ -3591,7 +3591,7 @@ static MACHINE_DRIVER_START( daitorid )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, 4000000)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 4000000)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
@@ -3639,7 +3639,7 @@ static MACHINE_DRIVER_START( dharma )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_DRIVER_END
@@ -3681,7 +3681,7 @@ static MACHINE_DRIVER_START( karatour )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_DRIVER_END
@@ -3723,7 +3723,7 @@ static MACHINE_DRIVER_START( 3kokushi )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_DRIVER_END
@@ -3765,7 +3765,7 @@ static MACHINE_DRIVER_START( lastfort )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_DRIVER_END
@@ -3806,7 +3806,7 @@ static MACHINE_DRIVER_START( lastforg )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_DRIVER_END
@@ -3842,7 +3842,7 @@ static MACHINE_DRIVER_START( dokyusei )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ym", YM2413, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_DRIVER_END
@@ -3893,7 +3893,7 @@ static MACHINE_DRIVER_START( dokyusp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ym", YM2413, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_DRIVER_END
@@ -3931,7 +3931,7 @@ static MACHINE_DRIVER_START( gakusai )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ym", YM2413, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_DRIVER_END
@@ -3969,7 +3969,7 @@ static MACHINE_DRIVER_START( gakusai2 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ym", YM2413, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_DRIVER_END
@@ -4011,7 +4011,7 @@ static MACHINE_DRIVER_START( pangpoms )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_DRIVER_END
@@ -4053,7 +4053,7 @@ static MACHINE_DRIVER_START( poitto )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_DRIVER_END
@@ -4090,7 +4090,7 @@ static MACHINE_DRIVER_START( pururun )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, 4000000)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 4000000)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
@@ -4138,7 +4138,7 @@ static MACHINE_DRIVER_START( skyalert )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_DRIVER_END
@@ -4180,7 +4180,7 @@ static MACHINE_DRIVER_START( toride2g )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 MACHINE_DRIVER_END
@@ -4216,7 +4216,7 @@ static MACHINE_DRIVER_START( mouja )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_DRIVER_END
@@ -4252,7 +4252,7 @@ static MACHINE_DRIVER_START( blzntrnd )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2610, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(blzntrnd_ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -4291,7 +4291,7 @@ static MACHINE_DRIVER_START( gstrik2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2610, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(blzntrnd_ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -4362,7 +4362,7 @@ static MACHINE_DRIVER_START( puzzlet )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ym", YM2413, XTAL_20MHz/5)
+	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_20MHz/5)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.90)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.90)
 MACHINE_DRIVER_END
@@ -4692,7 +4692,7 @@ ROM_START( blzntrnd )
 	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* Samples */
 	ROM_LOAD( "rom8.bin", 0x000000, 0x080000, CRC(565a4086) SHA1(bd5780acfa5affa8705acbfccb0af16bac8ed298) )
 
-	ROM_REGION( 0x400000, "ym", 0 )	/* ? YRW801-M ? */
+	ROM_REGION( 0x400000, "ymsnd", 0 )	/* ? YRW801-M ? */
 	ROM_LOAD( "rom6.bin", 0x000000, 0x200000, CRC(8b8819fc) SHA1(5fd9d2b5088cb676c11d32cac7ba8c5c18e31b64) )
 	ROM_LOAD( "rom7.bin", 0x200000, 0x200000, CRC(0089a52b) SHA1(d643ac122d62557de27f06ba1413ef757a45a927) )
 ROM_END
@@ -4776,7 +4776,7 @@ ROM_START( gstrik2 )
 	ROM_REGION( 0x200000, "ym.deltat", 0 )	/* Samples */
 	ROM_LOAD( "sndpcm-b.22", 0x000000, 0x200000, CRC(a5d844d2) SHA1(18d644545f0844e66aa53775b67b0a29c7b7c31b) )
 
-	ROM_REGION( 0x400000, "ym", 0 )	/* ? YRW801-M ? */
+	ROM_REGION( 0x400000, "ymsnd", 0 )	/* ? YRW801-M ? */
 	ROM_LOAD( "sndpcm-a.23", 0x000000, 0x200000, CRC(e6d32373) SHA1(8a79d4ea8b27d785fffd80e38d5ae73b7cea7304) )
 	/* ROM7.27 not populated?  */
 ROM_END
@@ -4816,7 +4816,7 @@ ROM_START( gstrik2e )
 	ROM_REGION( 0x200000, "ym.deltat", 0 )	/* Samples */
 	ROM_LOAD( "sndpcm-b.22", 0x000000, 0x200000, BAD_DUMP CRC(a5d844d2) SHA1(18d644545f0844e66aa53775b67b0a29c7b7c31b) )
 
-	ROM_REGION( 0x400000, "ym", 0 )	/* ? YRW801-M ? */
+	ROM_REGION( 0x400000, "ymsnd", 0 )	/* ? YRW801-M ? */
 	ROM_LOAD( "sndpcm-a.23", 0x000000, 0x200000, BAD_DUMP CRC(e6d32373) SHA1(8a79d4ea8b27d785fffd80e38d5ae73b7cea7304) )
 	/* ROM7.27 not populated?  */
 ROM_END

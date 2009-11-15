@@ -420,7 +420,7 @@ static MACHINE_DRIVER_START( vpoker )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-//  MDRV_SOUND_ADD("ay", AY8910, 8000000/4 /* guess */)
+//  MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4 /* guess */)
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

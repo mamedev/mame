@@ -137,7 +137,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ym", ym2610_r, ym2610_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(taotaido_sh_bankswitch_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(pending_command_clear_w)
 	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_r)
@@ -358,7 +358,7 @@ static MACHINE_DRIVER_START( taotaido )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2610, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -379,7 +379,7 @@ ROM_START( taotaido )
 	ROM_REGION( 0x100000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "u104.bin",     0x000000, 0x100000, CRC(e89387a9) SHA1(1deeee056af367d1a5aa0722dd3d6c68a82d0489) )
 
-	ROM_REGION( 0x200000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x200000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "u127.bin",     0x00000, 0x200000, CRC(0cf0cb23) SHA1(a87e7159db2fa0d50446cbf45ec9fbf585b8f396) )
 
 	ROM_REGION( 0x600000, "gfx1", 0 ) /* Sprites */
@@ -403,7 +403,7 @@ ROM_START( taotaidoa )
 	ROM_REGION( 0x100000, "ym.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "u104.bin",     0x000000, 0x100000, CRC(e89387a9) SHA1(1deeee056af367d1a5aa0722dd3d6c68a82d0489) )
 
-	ROM_REGION( 0x200000, "ym", 0 ) /* sound samples */
+	ROM_REGION( 0x200000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "u127.bin",     0x00000, 0x200000, CRC(0cf0cb23) SHA1(a87e7159db2fa0d50446cbf45ec9fbf585b8f396) )
 
 	ROM_REGION( 0x600000, "gfx1", 0 ) /* Sprites */

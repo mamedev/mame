@@ -74,7 +74,7 @@ static ADDRESS_MAP_START( quizdna_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x91, 0x91) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(quizdna_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
+	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 ADDRESS_MAP_END
 
@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( gakupara_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x91, 0x91) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(quizdna_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
+	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 ADDRESS_MAP_END
 
@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( gekiretu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x91, 0x91) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(gekiretu_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
+	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 ADDRESS_MAP_END
 
@@ -477,7 +477,7 @@ static MACHINE_DRIVER_START( quizdna )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, MCLK/4)
+	MDRV_SOUND_ADD("ymsnd", YM2203, MCLK/4)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.10)
 	MDRV_SOUND_ROUTE(1, "mono", 0.10)

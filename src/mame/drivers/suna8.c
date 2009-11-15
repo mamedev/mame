@@ -911,10 +911,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hardhead_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	// ROM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)
-	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ay", ay8910_address_data_w		)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
+	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("aysnd", ay8910_address_data_w		)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM	// RAM
-	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("ym", ym3812_status_port_r)	// ? unsure
+	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("ymsnd", ym3812_status_port_r)	// ? unsure
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch2_w				)	//
 	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_r				)	// From Main CPU
 ADDRESS_MAP_END
@@ -946,8 +946,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( brickzn_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM	// ROM
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym", ym3812_w	)
-	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("ay", ay8910_address_data_w		)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ymsnd", ym3812_w	)
+	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("aysnd", ay8910_address_data_w		)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM	// RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch2_w				)	// To PCM CPU
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r				)	// From Main CPU
@@ -1437,11 +1437,11 @@ static MACHINE_DRIVER_START( hardhead )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM3812, SUNA8_MASTER_CLOCK / 8)
+	MDRV_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("ay", AY8910, SUNA8_MASTER_CLOCK / 16)
+	MDRV_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
 	MDRV_SOUND_CONFIG(hardhead_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
@@ -1567,12 +1567,12 @@ static MACHINE_DRIVER_START( brickzn )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM3812, SUNA8_MASTER_CLOCK / 6)
+	MDRV_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 6)
 	MDRV_SOUND_CONFIG(brickzn_ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("ay", AY8910, SUNA8_MASTER_CLOCK / 16)
+	MDRV_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
@@ -1667,11 +1667,11 @@ static MACHINE_DRIVER_START( starfigh )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM3812, SUNA8_MASTER_CLOCK / 6)
+	MDRV_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("ay", AY8910, SUNA8_MASTER_CLOCK / 16)
+	MDRV_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
 	MDRV_SOUND_CONFIG(starfigh_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
@@ -1725,11 +1725,11 @@ static MACHINE_DRIVER_START( sparkman )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM3812, SUNA8_MASTER_CLOCK / 6)
+	MDRV_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("ay", AY8910, SUNA8_MASTER_CLOCK / 16)
+	MDRV_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
 	MDRV_SOUND_CONFIG(hardhead_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)

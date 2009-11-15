@@ -134,7 +134,7 @@ static MACHINE_DRIVER_START( mirderby )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 2000000)
+	MDRV_SOUND_ADD("ymsnd", YM2203, 2000000)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 0.25)
 	MDRV_SOUND_ROUTE(2, "mono", 0.25)

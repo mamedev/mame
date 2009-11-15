@@ -273,7 +273,7 @@ static MACHINE_DRIVER_START( darkmist )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, 14318180/4)	/* 3.579545 MHz */
+	MDRV_SOUND_ADD("ymsnd", YM2151, 14318180/4)	/* 3.579545 MHz */
 	MDRV_SOUND_CONFIG(t5182_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)

@@ -516,7 +516,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( saklove_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0020, 0x0020) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
-	AM_RANGE(0x0040, 0x0041) AM_DEVWRITE( "ym", ym3812_w )
+	AM_RANGE(0x0040, 0x0041) AM_DEVWRITE( "ymsnd", ym3812_w )
 
 	AM_RANGE(0x0060, 0x0062) AM_WRITE( colordac_w )
 
@@ -883,7 +883,7 @@ static MACHINE_DRIVER_START( saklove )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("ym", YM3812, XTAL_12MHz / 4)	// ? chip and clock unknown
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz / 4)	// ? chip and clock unknown
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

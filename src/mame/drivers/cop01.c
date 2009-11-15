@@ -153,7 +153,7 @@ static READ8_HANDLER( kludge ) { static int timer; return timer++; }
 
 static ADDRESS_MAP_START( mightguy_audio_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ym", ym3526_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_w)
 	AM_RANGE(0x02, 0x02) AM_WRITENOP	/* 1412M2? */
 	AM_RANGE(0x03, 0x03) AM_WRITENOP	/* 1412M2? */
 	AM_RANGE(0x03, 0x03) AM_READ(kludge)	/* 1412M2? */
@@ -456,7 +456,7 @@ static MACHINE_DRIVER_START( mightguy )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3526, 4000000)
+	MDRV_SOUND_ADD("ymsnd", YM3526, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

@@ -282,13 +282,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantland_sound_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0080, 0x0080 ) AM_READ( soundlatch_r )
-	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE( "ym", ym2151_r, ym2151_w )
+	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE( "ymsnd", ym2151_r, ym2151_w )
 	AM_RANGE( 0x0180, 0x0180 ) AM_DEVWRITE( "dac", dac_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( galaxygn_sound_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0080, 0x0080 ) AM_READ( soundlatch_r )
-	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE( "ym", ym2151_r, ym2151_w )
+	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE( "ymsnd", ym2151_r, ym2151_w )
 ADDRESS_MAP_END
 
 
@@ -399,7 +399,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( wheelrun_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym", ym3526_r, ym3526_w )
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3526_r, ym3526_w )
 
 	AM_RANGE(0xb000, 0xb000) AM_WRITE( SMH_NOP )	// on a car crash / hit
 	AM_RANGE(0xc000, 0xc000) AM_WRITE( SMH_NOP )	// ""
@@ -853,7 +853,7 @@ static MACHINE_DRIVER_START( fantland )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, 3000000)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 3000000)
 	MDRV_SOUND_ROUTE(0, "mono", 0.35)
 	MDRV_SOUND_ROUTE(1, "mono", 0.35)
 
@@ -901,7 +901,7 @@ static MACHINE_DRIVER_START( galaxygn )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, 3000000)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 3000000)
 	MDRV_SOUND_CONFIG(galaxygn_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
@@ -1013,7 +1013,7 @@ static MACHINE_DRIVER_START( wheelrun )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3526, XTAL_14MHz/4)
+	MDRV_SOUND_ADD("ymsnd", YM3526, XTAL_14MHz/4)
 	MDRV_SOUND_CONFIG(wheelrun_ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

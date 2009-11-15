@@ -163,7 +163,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_w)
 	AM_RANGE(0x04, 0x04) AM_READ(sound_latch_r)
 	AM_RANGE(0x06, 0x06) AM_READ(sound_latch_status_r)
@@ -378,7 +378,7 @@ static MACHINE_DRIVER_START( ashnojoe )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 4000000)
+	MDRV_SOUND_ADD("ymsnd", YM2203, 4000000)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 

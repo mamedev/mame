@@ -226,7 +226,7 @@ static ADDRESS_MAP_START( hitpoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xbe53, 0xbe53) AM_READ(eeprom_r)
 	AM_RANGE(0xbe80, 0xbe80) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xbe81, 0xbe81) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE(0xbe90, 0xbe91) AM_DEVREADWRITE("ay", ay8910_r,ay8910_address_data_w)
+	AM_RANGE(0xbe90, 0xbe91) AM_DEVREADWRITE("aysnd", ay8910_r,ay8910_address_data_w)
 	AM_RANGE(0xbea0, 0xbea0) AM_READ_PORT("VBLANK") //probably other bits as well
 //  AM_RANGE(0xbe00, 0xbeff) AM_READ(test_r)
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(hitpoker_cram_r,hitpoker_cram_w)
@@ -483,7 +483,7 @@ static MACHINE_DRIVER_START( hitpoker )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 1500000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

@@ -399,8 +399,8 @@ static ADDRESS_MAP_START( srmp2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP						/* ??? */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP						/* ??? */
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP						/* ??? */
-	AM_RANGE(0xf00000, 0xf00001) AM_DEVREAD8("ay", ay8910_r, 0x00ff)
-	AM_RANGE(0xf00000, 0xf00003) AM_DEVWRITE8("ay", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0xf00000, 0xf00001) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
+	AM_RANGE(0xf00000, 0xf00003) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -421,8 +421,8 @@ static ADDRESS_MAP_START( mjyuugi_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00001) AM_READ(srmp2_cchip_status_0_r)	/* custom chip status ??? */
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("msm", srmp2_adpcm_code_w)			/* ADPCM number */
 	AM_RANGE(0xa00002, 0xa00003) AM_READ(srmp2_cchip_status_1_r)	/* custom chip status ??? */
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("ay", ay8910_r, 0x00ff)
-	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8("ay", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
+	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP					/* ??? */
 	AM_RANGE(0xd00000, 0xd00609) AM_RAM AM_BASE(&spriteram16)	/* Sprites Y */
 	AM_RANGE(0xd02000, 0xd023ff) AM_RAM							/* ??? only writes $00fa */
@@ -558,8 +558,8 @@ static ADDRESS_MAP_START( srmp3_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xa1, 0xa1) AM_READ(srmp3_cchip_status_0_r)				/* custom chip status ??? */
 	AM_RANGE(0xc0, 0xc0) AM_READWRITE(srmp3_input_r, srmp3_input_1_w)	/* key matrix | I/O ??? */
 	AM_RANGE(0xc1, 0xc1) AM_READWRITE(srmp3_cchip_status_1_r, srmp3_input_2_w)	/* custom chip status ??? | I/O ??? */
-	AM_RANGE(0xe0, 0xe1) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0xe2, 0xe2) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0xe0, 0xe1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xe2, 0xe2) AM_DEVREAD("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
 
@@ -1049,7 +1049,7 @@ static MACHINE_DRIVER_START( srmp2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 20000000/16)
+	MDRV_SOUND_ADD("aysnd", AY8910, 20000000/16)
 	MDRV_SOUND_CONFIG(srmp2_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
@@ -1089,7 +1089,7 @@ static MACHINE_DRIVER_START( srmp3 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 16000000/16)
+	MDRV_SOUND_ADD("aysnd", AY8910, 16000000/16)
 	MDRV_SOUND_CONFIG(srmp2_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
@@ -1125,7 +1125,7 @@ static MACHINE_DRIVER_START( mjyuugi )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 16000000/16)
+	MDRV_SOUND_ADD("aysnd", AY8910, 16000000/16)
 	MDRV_SOUND_CONFIG(srmp2_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 

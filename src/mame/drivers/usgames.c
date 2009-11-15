@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( usgames_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2041, 0x2041) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x2060, 0x2060) AM_WRITE(usgames_rombank_w)
 	AM_RANGE(0x2070, 0x2070) AM_READ_PORT("UNK2")
-	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(usgames_charram_w) AM_BASE(&usgames_charram)
 	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(usgames_videoram_w) AM_BASE(&usgames_videoram)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
@@ -89,7 +89,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( usg185_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("DSW")
 	AM_RANGE(0x2410, 0x2410) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x2420, 0x2420) AM_WRITE(lamps1_w)
@@ -266,7 +266,7 @@ static MACHINE_DRIVER_START( usg32 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 2000000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

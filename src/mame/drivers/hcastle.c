@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9880, 0x9889) AM_DEVWRITE("konami2", k051649_frequency_w)
 	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE("konami2", k051649_volume_w)
 	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE("konami2", k051649_keyonoff_w)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami1", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("konami1", sound_bank_w) /* 7232 bankswitch */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
@@ -223,7 +223,7 @@ static MACHINE_DRIVER_START( hcastle )
 	MDRV_SOUND_ROUTE(0, "mono", 0.44)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 
-	MDRV_SOUND_ADD("ym", YM3812, 3579545)
+	MDRV_SOUND_ADD("ymsnd", YM3812, 3579545)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 

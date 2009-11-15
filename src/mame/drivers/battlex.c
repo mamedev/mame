@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x10) AM_WRITE(battlex_flipscreen_w)
 
 	/* verify all of these */
-	AM_RANGE(0x22, 0x23) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0x22, 0x23) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 
 	/* 0x30 looks like scroll, but can't be ? changes (increases or decreases)
         depending on the direction your ship is facing on lev 2. at least */
@@ -218,7 +218,7 @@ static MACHINE_DRIVER_START( battlex )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8910, 10000000/8)
+	MDRV_SOUND_ADD("aysnd", AY8910, 10000000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 

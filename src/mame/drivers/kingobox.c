@@ -112,8 +112,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kingobox_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac", dac_w)
-	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("aysnd", ay8910_address_w)
 ADDRESS_MAP_END
 
 /* Ring King */
@@ -157,8 +157,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ringking_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac", dac_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 
@@ -510,7 +510,7 @@ static MACHINE_DRIVER_START( kingofb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 1500000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -560,7 +560,7 @@ static MACHINE_DRIVER_START( ringking )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 1500000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

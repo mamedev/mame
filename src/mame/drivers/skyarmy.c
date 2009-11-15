@@ -160,8 +160,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( skyarmy_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( skyarmy )
@@ -258,7 +258,7 @@ static MACHINE_DRIVER_START( skyarmy )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8910, 2500000)
+	MDRV_SOUND_ADD("aysnd", AY8910, 2500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_DRIVER_END
 

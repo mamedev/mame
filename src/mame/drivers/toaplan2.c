@@ -1481,7 +1481,7 @@ static ADDRESS_MAP_START( truxton2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("IN2")
 	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("SYS")
 	AM_RANGE(0x700010, 0x700011) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
-	AM_RANGE(0x700014, 0x700017) AM_DEVREADWRITE8("ym", ym2151_r, ym2151_w, 0x00ff)
+	AM_RANGE(0x700014, 0x700017) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff)
 	AM_RANGE(0x70001e, 0x70001f) AM_WRITE(toaplan2_coin_word_w)		/* Coin count/lock */
 ADDRESS_MAP_END
 
@@ -1717,7 +1717,7 @@ static ADDRESS_MAP_START( snowbro2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)	/* VBlank */
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x500000, 0x500003) AM_DEVREADWRITE8("ym", ym2151_r, ym2151_w, 0x00ff)
+	AM_RANGE(0x500000, 0x500003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff)
 	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("JMPR")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("DSWA")
@@ -1877,14 +1877,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&toaplan2_shared_ram)
-	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( raizing_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&raizing_shared_ram)
-	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xe00e, 0xe00e) AM_WRITE(toaplan2_coin_w)
 ADDRESS_MAP_END
@@ -1894,7 +1894,7 @@ static ADDRESS_MAP_START( bgaregga_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&raizing_shared_ram)
-	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITE(raizing_okim6295_bankselect_0)
 	AM_RANGE(0xe008, 0xe008) AM_WRITE(raizing_okim6295_bankselect_1)
@@ -1920,7 +1920,7 @@ static ADDRESS_MAP_START( batrider_sound_z80_port, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x46, 0x46) AM_WRITE(raizing_clear_nmi_w)
 	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_r)
 	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_r)
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x82, 0x82) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
 	AM_RANGE(0x84, 0x84) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
 	AM_RANGE(0x88, 0x88) AM_WRITE(batrider_bankswitch_w)
@@ -1964,7 +1964,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( V25_kbash_mem, ADDRESS_SPACE_PROGRAM, 8 )
 //	AM_RANGE(0x00000, 0x03fff) AM_ROM
 //  AM_RANGE(0x00000, 0x007ff) AM_RAM                           /* External shared RAM (Banked) */
-	AM_RANGE(0x04000, 0x04001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x04000, 0x04001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x04002, 0x04002) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 //  AM_RANGE(0x04004, 0x04004) AM_DEVWRITE("oki", oki_bankswitch_w)
 	AM_RANGE(0x04008, 0x04008) AM_READ_PORT("IN1")
@@ -2028,7 +2028,7 @@ static READ8_HANDLER( kludge_r )
 #endif
 
 static ADDRESS_MAP_START( V25_rambased_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE(6) AM_BASE(&batsugun_share)
 
 //	AM_RANGE(0x40000, 0x477ff) AM_RAM AM_SHARE(7)
@@ -3463,7 +3463,7 @@ static MACHINE_DRIVER_START( tekipaki )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, XTAL_27MHz/8)
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -3502,7 +3502,7 @@ static MACHINE_DRIVER_START( ghox )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3564,7 +3564,7 @@ static MACHINE_DRIVER_START( dogyuun )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_25MHz/24) /* verified on pcb */
@@ -3654,7 +3654,7 @@ static MACHINE_DRIVER_START( kbash )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8)
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/32)
@@ -3728,7 +3728,7 @@ static MACHINE_DRIVER_START( truxton2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/4) /* verified on pcb */
@@ -3770,7 +3770,7 @@ static MACHINE_DRIVER_START( pipibibs )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, XTAL_27MHz/8)			/* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)			/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -3810,7 +3810,7 @@ static MACHINE_DRIVER_START( whoopee )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, XTAL_27MHz/8)
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -3849,7 +3849,7 @@ static MACHINE_DRIVER_START( pipibibi )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, XTAL_27MHz/8)
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -3917,7 +3917,7 @@ static MACHINE_DRIVER_START( fixeight )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/16) /* verified on pcb */
@@ -4022,7 +4022,7 @@ static MACHINE_DRIVER_START( vfive )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -4101,7 +4101,7 @@ static MACHINE_DRIVER_START( batsugun )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8)
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_SOUND_CONFIG(batsugun_ym2151_interface)
 
@@ -4139,7 +4139,7 @@ static MACHINE_DRIVER_START( snowbro2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8)
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_27MHz/10)
@@ -4181,7 +4181,7 @@ static MACHINE_DRIVER_START( mahoudai )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8)
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/32)
@@ -4223,7 +4223,7 @@ static MACHINE_DRIVER_START( shippumd )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8)
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono",1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/32)
@@ -4265,7 +4265,7 @@ static MACHINE_DRIVER_START( bgaregga )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_32MHz/8)
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_32MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/16)
@@ -4307,7 +4307,7 @@ static MACHINE_DRIVER_START( batrider )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_32MHz/8)
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_32MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_32MHz/10)

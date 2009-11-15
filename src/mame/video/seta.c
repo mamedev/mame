@@ -279,7 +279,7 @@ WRITE16_HANDLER( seta_vregs_w )
         ---- ---- ---- ---0     Coin #0 Counter     */
 			if (ACCESSING_BITS_0_7)
 			{
-				const device_config *x1_010 = devtag_get_device(space->machine, "x1");
+				const device_config *x1_010 = devtag_get_device(space->machine, "x1snd");
 				seta_coin_lockout_w (space->machine, data & 0x0f);
 				if (x1_010 != NULL)
 					seta_sound_enable_w (x1_010, data & 0x20);
@@ -306,8 +306,8 @@ WRITE16_HANDLER( seta_vregs_w )
 
 				if (new_bank != seta_samples_bank)
 				{
-					UINT8 *rom = memory_region(space->machine, "x1");
-					int samples_len = memory_region_length(space->machine, "x1");
+					UINT8 *rom = memory_region(space->machine, "x1snd");
+					int samples_len = memory_region_length(space->machine, "x1snd");
 					int addr;
 
 					seta_samples_bank = new_bank;

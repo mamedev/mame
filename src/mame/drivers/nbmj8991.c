@@ -254,7 +254,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( galkoku_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READWRITE(nb1413m3_sndrom_r,nbmj8991_blitter_w)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("fm", ym3812_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("fmsnd", ym3812_w)
 	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
@@ -268,8 +268,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hyouban_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READWRITE(nb1413m3_sndrom_r,nbmj8991_blitter_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREAD("fm", ay8910_r)
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE("fm", ay8910_data_address_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREAD("fmsnd", ay8910_r)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE("fmsnd", ay8910_data_address_w)
 	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
@@ -320,7 +320,7 @@ static ADDRESS_MAP_START( nbmj8991_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac2", DAC_WRITE)
 	AM_RANGE(0x04, 0x04) AM_WRITE(nbmj8991_soundbank_w)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("fm", ym3812_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("fmsnd", ym3812_w)
 ADDRESS_MAP_END
 
 
@@ -1498,7 +1498,7 @@ static MACHINE_DRIVER_START( nbmjdrv1 )	// galkoku
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("fm", YM3812, 25000000/10)
+	MDRV_SOUND_ADD("fmsnd", YM3812, 25000000/10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
@@ -1537,7 +1537,7 @@ static MACHINE_DRIVER_START( nbmjdrv2 )	// pstadium
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("fm", YM3812, 25000000/6.25)
+	MDRV_SOUND_ADD("fmsnd", YM3812, 25000000/6.25)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MDRV_SOUND_ADD("dac1", DAC, 0)
@@ -1554,7 +1554,7 @@ static MACHINE_DRIVER_START( nbmjdrv3 )
 	MDRV_IMPORT_FROM(nbmjdrv1)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("fm", AY8910, 1250000)
+	MDRV_SOUND_REPLACE("fmsnd", AY8910, 1250000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_DRIVER_END

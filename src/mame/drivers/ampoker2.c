@@ -607,8 +607,8 @@ static ADDRESS_MAP_START( ampoker2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x35, 0x35) AM_WRITE (ampoker2_port35_w)	/* see write handlers */
 	AM_RANGE(0x36, 0x36) AM_WRITE (ampoker2_port36_w)	/* see write handlers */
 	AM_RANGE(0x37, 0x37) AM_WRITE(ampoker2_watchdog_reset_w)
-	AM_RANGE(0x38, 0x39) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0x3A, 0x3A) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x38, 0x39) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x3A, 0x3A) AM_DEVREAD("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
 /*
@@ -1084,7 +1084,7 @@ static MACHINE_DRIVER_START( ampoker2 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8910,MASTER_CLOCK/4)	/* 1.5 MHz, measured */
+	MDRV_SOUND_ADD("aysnd", AY8910,MASTER_CLOCK/4)	/* 1.5 MHz, measured */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END

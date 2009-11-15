@@ -166,8 +166,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0802, 0x0802) AM_WRITE(MC6840_write_port_0_w)		/* Takahiro Nogi. 1999/09/27 */
 	AM_RANGE(0x0803, 0x0803) AM_WRITE(MC6840_write_port_1_w)		/* Takahiro Nogi. 1999/09/27 */
 	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym", y8950_w)
-	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ymsnd", y8950_w)
+	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -351,10 +351,10 @@ static MACHINE_DRIVER_START( ginganin )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 3579545 / 2)
+	MDRV_SOUND_ADD("aysnd", AY8910, 3579545 / 2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD("ym", Y8950, 3579545)
+	MDRV_SOUND_ADD("ymsnd", Y8950, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -395,7 +395,7 @@ ROM_START( ginganin )
 	ROM_REGION( 0x08000, "gfx5", 0 )	/* background tilemaps */
 	ROM_LOAD( "gn_11.bin", 0x00000, 0x08000, CRC(f0d0e605) SHA1(0c541e8e036573be1d99ecb71fdb4568ca8cc269) )
 
-	ROM_REGION( 0x20000, "ym", 0 )	/* samples */
+	ROM_REGION( 0x20000, "ymsnd", 0 )	/* samples */
 	ROM_LOAD( "gn_04.bin", 0x00000, 0x10000, CRC(0ed9133b) SHA1(77f628e8ec28016efac2d906146865ca4ec54bd5) )
 	ROM_LOAD( "gn_03.bin", 0x10000, 0x10000, CRC(f1ba222c) SHA1(780c0bd0045bac1e1bb3209576383db90504fbf3) )
 
@@ -430,7 +430,7 @@ ROM_START( ginganina )
 	ROM_REGION( 0x08000, "gfx5", 0 )	/* background tilemaps */
 	ROM_LOAD( "gn_11.bin", 0x00000, 0x08000, CRC(f0d0e605) SHA1(0c541e8e036573be1d99ecb71fdb4568ca8cc269) )
 
-	ROM_REGION( 0x20000, "ym", 0 )	/* samples */
+	ROM_REGION( 0x20000, "ymsnd", 0 )	/* samples */
 	ROM_LOAD( "gn_04.bin", 0x00000, 0x10000, CRC(0ed9133b) SHA1(77f628e8ec28016efac2d906146865ca4ec54bd5) )
 	ROM_LOAD( "gn_03.bin", 0x10000, 0x10000, CRC(f1ba222c) SHA1(780c0bd0045bac1e1bb3209576383db90504fbf3) )
 ROM_END

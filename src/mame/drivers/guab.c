@@ -623,7 +623,7 @@ static WRITE16_HANDLER( io_w )
 		}
 		case 0x30:
 		{
-			sn76496_w(devtag_get_device(space->machine, "sn"), 0, data & 0xff);
+			sn76496_w(devtag_get_device(space->machine, "snsnd"), 0, data & 0xff);
 			break;
 		}
 		case 0x31:
@@ -784,7 +784,7 @@ static MACHINE_DRIVER_START( guab )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	/* TODO: Verify clock */
-	MDRV_SOUND_ADD("sn", SN76489, 2000000)
+	MDRV_SOUND_ADD("snsnd", SN76489, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* 6840 PTM */

@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( lions_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x5000, 0x500f) AM_MIRROR(0x0010) AM_READWRITE(lions_via_r, lions_via_w)
 	AM_RANGE(0x5300, 0x5300) AM_READ(test_r)//AM_READ_PORT("IN0")
-	AM_RANGE(0x5382, 0x5383) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0x5382, 0x5383) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -380,7 +380,7 @@ static MACHINE_DRIVER_START( lions )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, MAIN_CLOCK/8)	/* 1.5 MHz.(guess) */
+	MDRV_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/8)	/* 1.5 MHz.(guess) */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END

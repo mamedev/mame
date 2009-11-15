@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("vlm", hyperspt_sound_w)	  /* speech and output control */
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
-	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE("sn", konami_SN76496_w) 	 /* This address triggers the SN chip to read the data port. */
+	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE("snsnd", konami_SN76496_w) 	 /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundb_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( soundb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(hyprolyb_adpcm_w)	  /* speech and output control */
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
-	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE("sn", konami_SN76496_w) 	 /* This address triggers the SN chip to read the data port. */
+	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE("snsnd", konami_SN76496_w) 	 /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hyperspt )
@@ -327,7 +327,7 @@ static MACHINE_DRIVER_START( hyperspt )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("sn", SN76496, XTAL_14_31818MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD("snsnd", SN76496, XTAL_14_31818MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */

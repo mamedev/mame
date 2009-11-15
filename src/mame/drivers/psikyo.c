@@ -402,7 +402,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sngkace_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ym", ym2610_r, ym2610_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sngkace_sound_bankswitch_w)
 	AM_RANGE(0x08, 0x08) AM_READ(psikyo_soundlatch_r)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(psikyo_clear_nmi_w)
@@ -433,7 +433,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gunbird_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ym", ym2610_r, ym2610_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x08, 0x08) AM_READ(psikyo_soundlatch_r)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(psikyo_clear_nmi_w)
 ADDRESS_MAP_END
@@ -1213,7 +1213,7 @@ static MACHINE_DRIVER_START( sngkace )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2610, XTAL_32MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(sngkace_ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  1.2)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.2)
@@ -1264,7 +1264,7 @@ static MACHINE_DRIVER_START( gunbird )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2610, 8000000)
+	MDRV_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(gunbird_ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  1.2)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.2)
@@ -1377,7 +1377,7 @@ ROM_START( samuraia )
 	ROM_LOAD( "u34.bin",  0x000000, 0x100000, CRC(e6a75bd8) SHA1(1aa84ea54584b6c8b2846194b48bf6d2afa67fee) )
 	ROM_LOAD( "u35.bin",  0x100000, 0x100000, CRC(c4ca0164) SHA1(c75422de2e0127cdc23d8c223b674a5bd85b00fb) )
 
-	ROM_REGION( 0x100000, "ym", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )	/* Samples */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
 
 	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
@@ -1402,7 +1402,7 @@ ROM_START( sngkace )
 	ROM_LOAD( "u34.bin",  0x000000, 0x100000, CRC(e6a75bd8) SHA1(1aa84ea54584b6c8b2846194b48bf6d2afa67fee) )
 	ROM_LOAD( "u35.bin",  0x100000, 0x100000, CRC(c4ca0164) SHA1(c75422de2e0127cdc23d8c223b674a5bd85b00fb) )
 
-	ROM_REGION( 0x100000, "ym", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )	/* Samples */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
 
 	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
@@ -1413,8 +1413,8 @@ ROM_END
 static DRIVER_INIT( sngkace )
 {
 	{
-		UINT8 *RAM	=	memory_region(machine, "ym");
-		int len		=	memory_region_length(machine, "ym");
+		UINT8 *RAM	=	memory_region(machine, "ymsnd");
+		int len		=	memory_region_length(machine, "ymsnd");
 		int i;
 
 		/* Bit 6&7 of the samples are swapped. Naughty, naughty... */
@@ -1485,7 +1485,7 @@ ROM_START( gunbird )
 	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layers 0 + 1 */
 	ROM_LOAD( "u33.bin",  0x000000, 0x200000, CRC(54494e6b) SHA1(f5d090d2d34d908b56b53a246def194929eba990) )
 
-	ROM_REGION( 0x100000, "ym", 0 )	/* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
 	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
@@ -1515,7 +1515,7 @@ ROM_START( gunbirdk )
 	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layers 0 + 1 */
 	ROM_LOAD( "u33.bin",  0x000000, 0x200000, CRC(54494e6b) SHA1(f5d090d2d34d908b56b53a246def194929eba990) )
 
-	ROM_REGION( 0x100000, "ym", 0 )	/* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
 	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
@@ -1545,7 +1545,7 @@ ROM_START( gunbirdj )
 	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layers 0 + 1 */
 	ROM_LOAD( "u33.bin",  0x000000, 0x200000, CRC(54494e6b) SHA1(f5d090d2d34d908b56b53a246def194929eba990) )
 
-	ROM_REGION( 0x100000, "ym", 0 )	/* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
 	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
@@ -1576,7 +1576,7 @@ ROM_START( btlkroad )
 	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layers 0 + 1 */
 	ROM_LOAD( "u33.bin",  0x000000, 0x200000, CRC(4c8577f1) SHA1(d27043514632954a06667ac63f4a4e4a31870511) )
 
-	ROM_REGION( 0x100000, "ym", 0 )	/* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(51d73682) SHA1(562038d08e9a4389ffa39f3a659b2a29b94dc156) )
 
 	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
@@ -1640,7 +1640,7 @@ ROM_START( s1945jn )
 	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 0 + 1 */
 	ROM_LOAD( "u34.bin",  0x000000, 0x200000, CRC(aaf83e23) SHA1(1c75d09ff42c0c215f8c66c699ca75688c95a05e) )
 
-	ROM_REGION( 0x100000, "ym", 0 )	/* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(fe1312c2) SHA1(8339a96a0885518d6e22cb3bdb9c2f82d011d86d) )
 
 	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */

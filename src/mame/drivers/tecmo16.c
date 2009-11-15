@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xfbff) AM_RAM	/* Sound RAM */
 	AM_RANGE(0xfc00, 0xfc00) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
-	AM_RANGE(0xfc04, 0xfc05) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xfc04, 0xfc05) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xfc08, 0xfc08) AM_READ(soundlatch_r)
 	AM_RANGE(0xfc0c, 0xfc0c) AM_NOP
 	AM_RANGE(0xfffe, 0xffff) AM_RAM
@@ -427,7 +427,7 @@ static MACHINE_DRIVER_START( fstarfrc )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2151, 8000000/2)
+	MDRV_SOUND_ADD("ymsnd", YM2151, 8000000/2)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)

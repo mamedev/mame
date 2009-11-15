@@ -186,8 +186,8 @@ static ADDRESS_MAP_START( rmhaihai_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(keyboard_r, SMH_NOP)	// ??
 	AM_RANGE(0x8001, 0x8001) AM_READWRITE(SMH_NOP, keyboard_w)	// ??
-	AM_RANGE(0x8020, 0x8020) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x8020, 0x8020) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x8040, 0x8040) AM_DEVWRITE("msm", adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITENOP	// ??
@@ -209,8 +209,8 @@ static ADDRESS_MAP_START( themj_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(keyboard_r, SMH_NOP)	// ??
 	AM_RANGE(0x8001, 0x8001) AM_READWRITE(SMH_NOP, keyboard_w)	// ??
-	AM_RANGE(0x8020, 0x8020) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x8020, 0x8020) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x8040, 0x8040) AM_DEVWRITE("msm", adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITENOP	// ??
@@ -461,7 +461,7 @@ static MACHINE_DRIVER_START( rmhaihai )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 20000000/16)
+	MDRV_SOUND_ADD("aysnd", AY8910, 20000000/16)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 

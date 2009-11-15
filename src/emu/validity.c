@@ -205,6 +205,11 @@ INLINE int validate_tag(const game_driver *driver, const char *object, const cha
 		mame_printf_error("%s: %s has %s with 0-length tag\n", driver->source_file, driver->name, object);
 		error = TRUE;
 	}
+	if (strlen(begin) < MIN_TAG_LENGTH)
+	{
+		mame_printf_error("%s: %s has %s with tag '%s' < %d characters\n", driver->source_file, driver->name, object, tag, MIN_TAG_LENGTH);
+		error = TRUE;
+	}
 	if (strlen(begin) > MAX_TAG_LENGTH)
 	{
 		mame_printf_error("%s: %s has %s with tag '%s' > %d characters\n", driver->source_file, driver->name, object, tag, MAX_TAG_LENGTH);

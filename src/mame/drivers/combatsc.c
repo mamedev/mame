@@ -308,8 +308,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM										/* ROM */
 	AM_RANGE(0x8000, 0x87ef) AM_RAM										/* RAM */
 	AM_RANGE(0x87f0, 0x87ff) AM_RAM										/* ??? */
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)	/* YM 2203 */
-	AM_RANGE(0x9008, 0x9009) AM_DEVREAD("ym", ym2203_r)					/* ??? */
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)	/* YM 2203 */
+	AM_RANGE(0x9008, 0x9009) AM_DEVREAD("ymsnd", ym2203_r)					/* ??? */
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)						/* soundlatch_r? */
 	AM_RANGE(0x8800, 0xfffb) AM_ROM										/* ROM? */
 	AM_RANGE(0xfffc, 0xffff) AM_RAM										/* ??? */
@@ -326,7 +326,7 @@ static ADDRESS_MAP_START( combasc_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("upd", combasc_voice_reset_w)			/* upd7759 reset? */
 
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)								/* soundlatch_r? */
-	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym", combasc_ym2203_r, ym2203_w)	/* YM 2203 intercepted */
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", combasc_ym2203_r, ym2203_w)	/* YM 2203 intercepted */
 ADDRESS_MAP_END
 
 
@@ -576,7 +576,7 @@ static MACHINE_DRIVER_START( combasc )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 3000000)
+	MDRV_SOUND_ADD("ymsnd", YM2203, 3000000)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
@@ -617,7 +617,7 @@ static MACHINE_DRIVER_START( combascb )
 	/* We are using the original sound subsystem */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 3000000)
+	MDRV_SOUND_ADD("ymsnd", YM2203, 3000000)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 

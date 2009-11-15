@@ -708,7 +708,7 @@ static MACHINE_DRIVER_START( laserbat )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn", SN76477, 0) // output not connected
+	MDRV_SOUND_ADD("snsnd", SN76477, 0) // output not connected
 	MDRV_SOUND_CONFIG(laserbat_sn76477_interface)
 
 	MDRV_SOUND_ADD("tms1", TMS3615, 4000000/8/2) // 250 kHz, from second chip's clock out

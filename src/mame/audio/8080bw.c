@@ -40,7 +40,7 @@ MACHINE_START( extra_8080bw_sh )
 WRITE8_HANDLER( invadpt2_sh_port_1_w )
 {
 	const device_config *samples = devtag_get_device(space->machine, "samples");
-	const device_config *sn = devtag_get_device(space->machine, "sn");
+	const device_config *sn = devtag_get_device(space->machine, "snsnd");
 	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	sn76477_enable_w(sn, !(data & 0x01));			/* SAUCER SOUND */
@@ -92,7 +92,7 @@ WRITE8_HANDLER( spcewars_sh_port_w )
 {
 	const device_config *samples = devtag_get_device(space->machine, "samples");
 	const device_config *speaker = devtag_get_device(space->machine, "speaker");
-	const device_config *sn = devtag_get_device(space->machine, "sn");
+	const device_config *sn = devtag_get_device(space->machine, "snsnd");
 	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	sn76477_enable_w(sn, !(data & 0x01));			/* Saucer Sound */
@@ -800,7 +800,7 @@ static const double schaser_effect_rc[8] =
 WRITE8_HANDLER( schaser_sh_port_1_w )
 {
 	const device_config *discrete = devtag_get_device(space->machine, "discrete");
-	const device_config *sn = devtag_get_device(space->machine, "sn");
+	const device_config *sn = devtag_get_device(space->machine, "snsnd");
 	static int last_effect = 0;
 	int effect;
 
@@ -895,7 +895,7 @@ WRITE8_HANDLER( schaser_sh_port_2_w )
 
 static TIMER_CALLBACK( schaser_effect_555_cb )
 {
-	const device_config *sn = devtag_get_device(machine, "sn");
+	const device_config *sn = devtag_get_device(machine, "snsnd");
 	int effect = param;
 	attotime new_time;
 	/* Toggle 555 output */
@@ -1032,7 +1032,7 @@ WRITE8_HANDLER( invrvnge_sh_port_w )
 WRITE8_HANDLER( lupin3_sh_port_1_w )
 {
 	const device_config *samples = devtag_get_device(space->machine, "samples");
-	const device_config *sn = devtag_get_device(space->machine, "sn");
+	const device_config *sn = devtag_get_device(space->machine, "snsnd");
 	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	if (rising_bits & 0x01) sample_start(samples, 0, 6, 0);		/* Walking, get money */
@@ -1120,7 +1120,7 @@ WRITE8_HANDLER( yosakdon_sh_port_1_w )
 WRITE8_HANDLER( yosakdon_sh_port_2_w )
 {
 	const device_config *samples = devtag_get_device(space->machine, "samples");
-	const device_config *sn = devtag_get_device(space->machine, "sn");
+	const device_config *sn = devtag_get_device(space->machine, "snsnd");
 	UINT8 rising_bits = data & ~port_2_last_extra;
 
 	if (rising_bits & 0x01) sample_start(samples, 1, 6, 0);			/* Ready? , Game Over */
@@ -1146,7 +1146,7 @@ WRITE8_HANDLER( shuttlei_sh_port_1_w )
 	/* bit 3 is high while you are alive and playing */
 
 	const device_config *samples = devtag_get_device(space->machine, "samples");
-	const device_config *sn = devtag_get_device(space->machine, "sn");
+	const device_config *sn = devtag_get_device(space->machine, "snsnd");
 	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	if (rising_bits & 0x01) sample_start(samples, 4, 4, 0);			/* Fleet move */
