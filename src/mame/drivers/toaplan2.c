@@ -265,8 +265,8 @@ To Do / Unknowns:
 
 
 /**************** Machine stuff ******************/
-#define USE_HD64x180	0		/* Define if CPU support is available */
-#define USE_V25		0
+//#define USE_HD64x180			/* Define if CPU support is available */
+//#define USE_ENCRYPTED_V25S	/* Define to enable V25 even on games where it is encrypted */
 
 #define CPU_2_NONE		0x00
 #define CPU_2_Z80		0x5a
@@ -277,7 +277,9 @@ To Do / Unknowns:
 static UINT8 *toaplan2_shared_ram;
 static UINT8 *raizing_shared_ram;		/* Shared ram used in Shippumd and Mahoudai */
 static UINT16 *toaplan2_shared_ram16;	/* Really 8bit RAM connected to Z180 */
+#ifndef USE_ENCRYPTED_V25S
 static UINT16 *V25_shared_ram;			/* Really 8bit RAM connected to Z180 */
+#endif
 static UINT16 *fixeight_sec_cpu_mem;
 
 /********** Status related values **********/
@@ -292,12 +294,10 @@ static UINT16 raizing_Z80_busreq;
 static int bbakraid_unlimited_ver;
 
 static MACHINE_RESET(batsugun);
-#if USE_V25
 static READ16_HANDLER( batsugun_share_r );
 static READ16_HANDLER( batsugun_share2_r );
 static WRITE16_HANDLER( batsugun_share_w );
 static WRITE16_HANDLER( batsugun_share2_w );
-#endif
 
 static const device_config *sub_cpu = NULL;
 
@@ -400,12 +400,13 @@ static DRIVER_INIT( T2_noZ80 )
 
 static DRIVER_INIT( fixeight )
 {
-	#if USE_V25
 	sub_cpu = cputag_get_cpu(machine, "audiocpu");
-	#else
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x28f002, 0x28fbff, 0, 0, (read16_space_func)SMH_BANK(2), (write16_space_func)SMH_BANK(2) );
-	memory_set_bankptr(machine, 2, fixeight_sec_cpu_mem);
-	#endif
+
+	if (fixeight_sec_cpu_mem)
+	{
+		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x28f002, 0x28fbff, 0, 0, (read16_space_func)SMH_BANK(2), (write16_space_func)SMH_BANK(2) );
+		memory_set_bankptr(machine, 2, fixeight_sec_cpu_mem);
+	}
 
 	toaplan2_sub_cpu = CPU_2_V25;
 	register_state_save(machine);
@@ -628,7 +629,7 @@ static WRITE16_HANDLER( toaplan2_v25_coin_word_w )
 	{
 		toaplan2_coin_w(space, offset, data & 0x0f);
 
-		#if USE_V25
+		#ifdef USE_ENCRYPTED_V25S
 		/* only the ram-based V25 based games access the following bits */
 		//cpu_set_input_line(sub_cpu, INPUT_LINE_RESET, (data & 0x0020) ? CLEAR_LINE : ASSERT_LINE );
 		cpu_set_input_line(sub_cpu, INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
@@ -641,6 +642,22 @@ static WRITE16_HANDLER( toaplan2_v25_coin_word_w )
 	}
 }
 
+static WRITE16_HANDLER( toaplan2_v25_batsugun_coin_word_w )
+{
+	// logerror("toaplan2_v25_coin_word_w %04x\n",data);
+
+	if (ACCESSING_BITS_0_7)
+	{
+		toaplan2_coin_w(space, offset, data & 0x0f);
+		/* only the ram-based V25 based games access the following bits */
+		//cpu_set_input_line(sub_cpu, INPUT_LINE_RESET, (data & 0x0020) ? CLEAR_LINE : ASSERT_LINE );
+		cpu_set_input_line(sub_cpu, INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
+	}
+	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
+	{
+		logerror("Writing unknown upper MSB command (%04x) to coin control\n",data & 0xff00);
+	}
+}
 
 static WRITE16_HANDLER( shippumd_coin_word_w )
 {
@@ -809,6 +826,7 @@ static WRITE16_HANDLER( ghox_shared_ram_w )
 	}
 }
 
+#ifndef USE_ENCRYPTED_V25S
 static READ16_HANDLER( shared_ram_r )
 {
 /*  Other games using a NEC V25+ secondary CPU, have shared memory between
@@ -869,24 +887,6 @@ static WRITE16_HANDLER( dogyuun_snd_cpu_w )
 	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",cpu_get_previouspc(space->cpu),mcu_data);
 }
 
-static READ16_HANDLER( kbash_snd_cpu_r )
-{
-/*  Knuckle Bash's  68000 reads secondary CPU status via an I/O port.
-    If a value of 2 is read, then secondary CPU is busy.
-    Secondary CPU must report 0xff when no longer busy, to signify that it
-    has passed POST.
-*/
-	return 0xff;
-}
-
-static WRITE16_HANDLER( kbash_snd_cpu_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		kbash_okisnd_w(devtag_get_device(space->machine, "oki"), data);
-	}
-	logerror("PC:%06x Writing Sound command (%04x) to the NEC V25+ secondary CPU\n",cpu_get_previouspc(space->cpu),data);
-}
 
 static READ16_HANDLER( fixeight_sec_cpu_r )
 {
@@ -934,8 +934,8 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 			/* game keeping service mode. It writes/reads the settings to/from */
 			/* these shared RAM locations. The secondary CPU reads/writes them */
 			/* from/to nvram to store the settings (a 93C45 EEPROM) */
-			memory_install_readwrite16_handler(space, 0x28f002, 0x28fbff, 0, 0, (read16_space_func)SMH_BANK(2), (write16_space_func)SMH_BANK(2));
-			memory_set_bankptr(space->machine, 2, fixeight_sec_cpu_mem);
+			//memory_install_readwrite16_handler(space, 0x28f002, 0x28fbff, 0, 0, (read16_space_func)SMH_BANK(2), (write16_space_func)SMH_BANK(2));
+			//memory_set_bankptr(space->machine, 2, fixeight_sec_cpu_mem);
 			memory_install_read_port_handler(space, 0x28f004, 0x28f005, 0, 0, "DSWA");	/* Dip Switch A - Wrong !!! */
 			memory_install_read_port_handler(space, 0x28f006, 0x28f007, 0, 0, "DSWB");	/* Dip Switch B - Wrong !!! */
 			memory_install_read_port_handler(space, 0x28f008, 0x28f009, 0, 0, "JMPR");	/* Territory Jumper block - Wrong !!! */
@@ -981,6 +981,27 @@ static WRITE16_HANDLER( V25_sharedram_w )
 		V25_shared_ram[offset] = data & 0xff;
 	}
 }
+#endif
+
+static READ16_HANDLER( kbash_snd_cpu_r )
+{
+/*  Knuckle Bash's  68000 reads secondary CPU status via an I/O port.
+    If a value of 2 is read, then secondary CPU is busy.
+    Secondary CPU must report 0xff when no longer busy, to signify that it
+    has passed POST.
+*/
+	return 0xff;
+}
+
+static WRITE16_HANDLER( kbash_snd_cpu_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		kbash_okisnd_w(devtag_get_device(space->machine, "oki"), data);
+	}
+	logerror("PC:%06x Writing Sound command (%04x) to the NEC V25+ secondary CPU\n",cpu_get_previouspc(space->cpu),data);
+}
+
 
 static WRITE16_DEVICE_HANDLER( oki_bankswitch_w )
 {
@@ -1363,7 +1384,7 @@ static ADDRESS_MAP_START( dogyuun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)
-#if USE_V25
+#ifdef USE_ENCRYPTED_V25S
 //  AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)   /* $21f000 status port */
 //  AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)    /* 16-bit on 68000 side, 8-bit on V25+ side */
 	AM_RANGE(0x210000, 0x21efff) AM_READWRITE( batsugun_share2_r, batsugun_share2_w )
@@ -1503,7 +1524,7 @@ static ADDRESS_MAP_START( pipibibi_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x19c034, 0x19c035) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
-#if USE_V25
+#ifdef USE_ENCRYPTED_V25S
 // guess, could be wrong
 WRITE16_HANDLER( fixeight_subcpu_ctrl )
 {
@@ -1521,7 +1542,7 @@ static ADDRESS_MAP_START( fixeight_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("IN3")
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
-#if USE_V25
+#ifdef USE_ENCRYPTED_V25S
 //  AM_RANGE(0x28e000, 0x28fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)   /* $28f000 status port */
 //  AM_RANGE(0x28fc00, 0x28ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)    /* 16-bit on 68000 side, 8-bit on V25+ side */
 	AM_RANGE(0x280000, 0x28efff) AM_READWRITE( batsugun_share2_r, batsugun_share2_w )
@@ -1583,7 +1604,7 @@ static ADDRESS_MAP_START( vfive_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)	/* Coin count/lock */
-#if USE_V25
+#ifdef USE_ENCRYPTED_V25S
 //  AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)   /* $21f000 status port */
 //  AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)    /* 16-bit on 68000 side, 8-bit on V25+ side */
 	AM_RANGE(0x210000, 0x21efff) AM_READWRITE( batsugun_share2_r, batsugun_share2_w )
@@ -1605,7 +1626,6 @@ static ADDRESS_MAP_START( vfive_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-#if USE_V25
 static UINT8* batsugun_share;
 static UINT8* batsugun_share2;
 
@@ -1649,7 +1669,6 @@ static WRITE16_HANDLER( batsugun_share2_w )
 		batsugun_share2[offset] = data;
 	}
 }
-#endif
 
 static ADDRESS_MAP_START( batsugun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -1657,21 +1676,19 @@ static ADDRESS_MAP_START( batsugun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
 	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
-	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)	/* Coin count/lock + v25 reset/hold control lines? */
-#if USE_V25
-//  AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)   /* $21f000 status port */
-//  AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)    /* 16-bit on 68000 side, 8-bit on V25+ side */
-	AM_RANGE(0x210000, 0x21efff) AM_READWRITE( batsugun_share2_r, batsugun_share2_w )
-	AM_RANGE(0x21f000, 0x21ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
-#else
-	AM_RANGE(0x210000, 0x21bbff) AM_RAM
-	AM_RANGE(0x21e000, 0x21efff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)
+	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_batsugun_coin_word_w)	/* Coin count/lock + v25 reset/hold control lines? */
+
+	/* override the shared region with some hacks because we're not emulating the V25+ well enough to provide these */
+#ifndef USE_ENCRYPTED_V25S
 	AM_RANGE(0x21f000, 0x21f001) AM_READWRITE(toaplan2_snd_cpu_r, batsugun_snd_cpu_w)	/* V25+ Command/Status port */
 	AM_RANGE(0x21f004, 0x21f005) AM_READ_PORT("DSWA")
 	AM_RANGE(0x21f006, 0x21f007) AM_READ_PORT("DSWB")
 	AM_RANGE(0x21f008, 0x21f009) AM_READ_PORT("JMPR")
-	AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
 #endif
+	/* this ram is shared with the V25+, once it's emulated properly only these should be needed */
+	AM_RANGE(0x210000, 0x21efff) AM_READWRITE( batsugun_share2_r, batsugun_share2_w )
+	AM_RANGE(0x21f000, 0x21ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
+
 	/***** The following in 0x30000x are for video controller 1 ******/
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(toaplan2_0_voffs_w)	/* VideoRAM selector/offset */
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
@@ -1930,7 +1947,7 @@ ADDRESS_MAP_END
 
 
 
-#if USE_HD64x180
+#ifdef USE_HD64x180
 static ADDRESS_MAP_START( hd647180_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xfe00, 0xffff) AM_RAM			/* Internal 512 bytes of RAM */
@@ -1938,11 +1955,9 @@ ADDRESS_MAP_END
 #endif
 
 
-#if USE_V25
-
 /* this seems to be the map for the ROM based game, Knuckle Bash */
-static ADDRESS_MAP_START( V25_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x03fff) AM_ROM
+static ADDRESS_MAP_START( V25_kbash_mem, ADDRESS_SPACE_PROGRAM, 8 )
+//	AM_RANGE(0x00000, 0x03fff) AM_ROM
 //  AM_RANGE(0x00000, 0x007ff) AM_RAM                           /* External shared RAM (Banked) */
 	AM_RANGE(0x04000, 0x04001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x04002, 0x04002) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
@@ -1953,10 +1968,12 @@ static ADDRESS_MAP_START( V25_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0400e, 0x0400e) AM_WRITE(toaplan2_coin_w)
 	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM							/* Internal 512 bytes of RAM */
 //  AM_RANGE(0x80000, 0x87fff) AM_RAM AM_BASE(&V25_sharedram)   /* External shared RAM (ROM for KBASH) */
+
+    AM_RANGE(0xa0000, 0xa7fff) AM_ROM AM_SHARE(10)
+	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_SHARE(10) AM_REGION("mcu", 0)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( V25_port, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( V25_kbash_port, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0060, 0x0060) AM_READ_PORT("DSWA")	/* Directly mapped I/O ports */
 	AM_RANGE(0x0061, 0x0061) AM_READ_PORT("DSWA")	/* Directly mapped I/O ports */
 	AM_RANGE(0x0062, 0x0062) AM_READ_PORT("JMPR")	/* Directly mapped I/O ports */
@@ -1969,9 +1986,6 @@ ADDRESS_MAP_END
 
   Others are encrypted
 */
-
-
-
 
 static ADDRESS_MAP_START( V25_rambased_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
@@ -1987,15 +2001,6 @@ static ADDRESS_MAP_START( V25_rambased_mem, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xff800, 0xfffff) AM_RAM AM_SHARE(6) AM_BASE(&batsugun_share)
 ADDRESS_MAP_END
-
-
-
-
-
-
-#endif
-
-
 
 /*****************************************************************************
     Input Port definitions
@@ -3385,7 +3390,7 @@ static MACHINE_DRIVER_START( tekipaki )
 	MDRV_CPU_PROGRAM_MAP(tekipaki_68k_mem)
 	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-#if USE_HD64x180
+#ifdef USE_HD64x180
 	MDRV_CPU_ADD("mcu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
 	MDRV_CPU_PROGRAM_MAP(hd647180_mem)
 #endif
@@ -3424,7 +3429,7 @@ static MACHINE_DRIVER_START( ghox )
 	MDRV_CPU_PROGRAM_MAP(ghox_68k_mem)
 	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-#if USE_HD64x180
+#ifdef USE_HD64x180
 	MDRV_CPU_ADD("mcu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
 	MDRV_CPU_PROGRAM_MAP(hd647180_mem)
 #endif
@@ -3454,6 +3459,31 @@ static MACHINE_DRIVER_START( ghox )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+/* x = modified to match batsugun 'unencrypted' code */
+
+const UINT8 ts002mach_decryption_table[256] = {
+	0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07, 0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f, /* 00 */
+	0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17, 0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f, /* 10 */
+	0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27, 0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f, /* 20 */
+	0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37, 0x38,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f, /* 30 */
+	0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47, 0x48,0x49,0x4a,0x4b,0x4c,0x4d,0x4e,0x4f, /* 40 */
+	0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57, 0x58,0x59,0x5a,0x5b,0x5c,0x5d,0x5e,0x5f, /* 50 */
+	0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67, 0x68,0x69,0x6a,0x6b,0x6c,0x6d,0x6e,0x6f, /* 60 */
+	0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77, 0x78,0x79,0x7a,0x7b,0x7c,0x7d,0x7e,0x7f, /* 70 */
+	0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87, 0x88,0x89,0x8a,0x8b,0x48,0x8d,0x8e,0x8f, /* 80 */
+	                                                             /*x*/
+	0x90,0x91,0x92,0x93,0x94,0x95,0x96,0x97, 0x98,0x99,0x9a,0x9b,0x9c,0x9d,0x9e,0x9f, /* 90 */
+	0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7, 0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf, /* a0 */
+	0xb0,0xb1,0xb2,0xb3,0xb4,0xb5,0xb6,0xb7, 0xb8,0xb9,0xba,0xbb,0xbc,0xbd,0xbe,0xbf, /* b0 */
+	0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7, 0xc8,0xc9,0xca,0xea,0xcc,0xcd,0xce,0xcf, /* c0 */
+	                                                        /*x*/
+	0xd0,0xd1,0xd2,0xd3,0xd4,0xd5,0xd6,0xd7, 0xd8,0xd9,0xda,0xdb,0xdc,0xdd,0xde,0xdf, /* d0 */
+	0xe0,0xe1,0xe2,0xe3,0xe4,0xe5,0xe6,0xe7, 0xe8,0xe9,0xea,0xeb,0xec,0xed,0x33,0xef, /* e0 */
+	                                                                       /*x*/
+	0xf0,0xf1,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7, 0xf8,0xf9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff, /* f0 */
+};
+
+static const nec_config ts002mach_config ={ ts002mach_decryption_table, };
 
 static MACHINE_DRIVER_START( dogyuun )
 
@@ -3462,11 +3492,9 @@ static MACHINE_DRIVER_START( dogyuun )
 	MDRV_CPU_PROGRAM_MAP(dogyuun_68k_mem)
 	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-#if USE_V25
 	MDRV_CPU_ADD("audiocpu", V25, XTAL_25MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem)
-	//MDRV_CPU_IO_MAP(V25_port)
-#endif
+	MDRV_CPU_CONFIG(ts002mach_config)
 
 	MDRV_MACHINE_RESET(dogyuun)
 
@@ -3497,6 +3525,52 @@ static MACHINE_DRIVER_START( dogyuun )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+/* x = modified to match batsugun 'unencrypted' code - '?' likewise, but not so sure about them
+  '!' = code stops being the same as batsugun at this point, might be wrong
+  - they seem to have mostly mapped extra opcodes for common ones, eg. mov
+*/
+const UINT8 ts004dash_decryption_table[256] = {
+	0x00,0x01,0x02,0x03,0x8c,0x05,0x06,0x07, 0x08,0x09,0x36,0x0b,0x0c,0x0d,0x8c,0x0f, /* 00 */
+	                    /*?*/                          /*?*/               /*?*/
+	0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17, 0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x8e,0x1f, /* 10 */
+	                                                                       /*x*/
+	0x20,0x21,0x22,0x23,0x36,0x25,0x26,0x27, 0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f, /* 20 */
+	                    /*?*/
+	0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37, 0x38,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f, /* 30 */
+	0x40,0x41,0x42,0x43,0x44,0xb8,0x46,0x47, 0x48,0x49,0x4a,0x4b,0x4c,0x4d,0x4e,0x4f, /* 40 */
+                             /*x*/
+	0x50,0x51,0x52,0xfc,0x54,0x55,0x56,0x57, 0x58,0x59,0x5a,0x5b,0x5c,0x5d,0x5e,0x5f, /* 50 */
+	               /*!*/
+	0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67, 0x68,0x69,0x6a,0x6b,0x6c,0x6d,0x6e,0x6f, /* 60 */
+	0x70,0x71,0x8c,0x73,0x74,0x75,0x76,0x77, 0x78,0x79,0x7a,0x7b,0x7c,0x7d,0x7e,0x7f, /* 70 */
+	          /*?*/
+	0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87, 0x88,0x89,0x8a,0x8b,0x48,0x8d,0x8e,0x8f, /* 80 */
+	                                                             /*x*/
+	0x90,0x91,0x92,0x93,0x94,0x95,0x96,0xbc, 0x98,0x99,0x9a,0x9b,0x9c,0xc6,0x9e,0x9f, /* 90 */
+	                                   /*x*/
+	0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7, 0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf, /* a0 */
+	0xb0,0xb1,0xb2,0xb3,0xb4,0xb5,0xb6,0xb7, 0xb8,0xb9,0xba,0xbb,0xbc,0xbd,0xbe,0x33, /* b0 */
+	                                                                            /*x*/
+	0xc0,0xc1,0xc2,0xc3,0xc4,0x36,0xc6,0xc7, 0xc8,0xc9,0xc6,0xea,0xcc,0xcd,0xce,0xcf, /* c0 */
+                             /*x*/                     /*x*//*x*/
+	0xd0,0xd1,0xd2,0xd3,0xd4,0xd5,0xd6,0xd7, 0xbb,0xd9,0xda,0xdb,0xdc,0xdd,0xde,0xdf, /* d0 */
+	                                         /*x*/
+	0xe0,0xe1,0xe2,0xbd,0xe4,0xe5,0xe6,0xe7, 0xe8,0xc7,0xea,0x36,0xec,0xed,0xee,0xef, /* e0 */
+	               /*?*/                          /*?*/     /*?*/
+	0xf0,0xf1,0xf2,0xf3,0xf4,0xf5,0xf6,0x8e, 0xf8,0xf9,0x36,0xfb,0xfc,0xfd,0xfe,0xff, /* f0 */
+                                       /*x*/           /*?*/
+};
+
+static const nec_config ts004dash_config ={ ts004dash_decryption_table, };
+
+static MACHINE_RESET(kbash)
+{
+#ifndef USE_ENCRYPTED_V25S
+	cpu_set_input_line(sub_cpu, INPUT_LINE_HALT, ASSERT_LINE);
+#endif
+}
+
+
 
 static MACHINE_DRIVER_START( kbash )
 
@@ -3506,13 +3580,13 @@ static MACHINE_DRIVER_START( kbash )
 	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 	/* ROM based v25 */
-#if USE_V25
 	MDRV_CPU_ADD("mcu", V25, XTAL_16MHz)			/* NEC V25+ type Toaplan marked CPU ??? */
-	MDRV_CPU_PROGRAM_MAP(V25_mem)
-	MDRV_CPU_IO_MAP(V25_port)
-#endif
+	MDRV_CPU_PROGRAM_MAP(V25_kbash_mem)
+	MDRV_CPU_IO_MAP(V25_kbash_port)
+	MDRV_CPU_CONFIG(ts004dash_config)
 
-	MDRV_MACHINE_RESET(toaplan2)
+
+	MDRV_MACHINE_RESET(kbash)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3733,6 +3807,32 @@ static MACHINE_DRIVER_START( pipibibi )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+/* x = modified to match batsugun 'unencrypted' code - '?' likewise, but not so sure about them */
+/* this one seems more different to the other tables */
+const UINT8 ts001turbo_decryption_table[256] = {
+	0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07, 0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f, /* 00 */
+	0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17, 0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f, /* 10 */
+	0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27, 0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f, /* 20 */
+	0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37, 0x38,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f, /* 30 */
+	0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47, 0x48,0x49,0x4a,0x4b,0x4c,0x4d,0x4e,0x4f, /* 40 */
+	0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57, 0x58,0x59,0x5a,0x5b,0x5c,0x5d,0x5e,0x5f, /* 50 */
+	0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67, 0x68,0x69,0x6a,0x6b,0x6c,0x6d,0x6e,0x6f, /* 60 */
+	0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77, 0x78,0x79,0x7a,0x7b,0x7c,0x7d,0x7e,0x7f, /* 70 */
+	0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87, 0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f, /* 80 */
+	0x33,0x91,0x92,0x93,0x94,0x95,0x96,0x97, 0x98,0x99,0x9a,0x9b,0x9c,0x9d,0x9e,0x9f, /* 90 */
+	/*x*/
+	0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7, 0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf, /* a0 */
+	0xb0,0xb1,0xb2,0xb3,0xb4,0xb5,0xb6,0xb7, 0xb8,0xb9,0xba,0xbb,0xbc,0xbd,0xbe,0xbf, /* b0 */
+	0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xea,0xc7, 0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf, /* c0 */
+	                              /*x*/
+	0xd0,0xd1,0xd2,0xd3,0xd4,0xd5,0xd6,0xd7, 0xd8,0xd9,0xda,0xdb,0xdc,0xdd,0xde,0xdf, /* d0 */
+	0xe0,0xe1,0xe2,0xe3,0xe4,0xe5,0xe6,0xe7, 0xe8,0xe9,0xea,0xeb,0xec,0xed,0xee,0xef, /* e0 */
+	0xf0,0xf1,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7, 0xf8,0x48,0xfa,0xfb,0xfc,0xfd,0xfe,0xff, /* f0 */
+	                                              /*x*/
+};
+
+static const nec_config ts001turbo_config ={ ts001turbo_decryption_table, };
+
 
 static MACHINE_DRIVER_START( fixeight )
 
@@ -3741,14 +3841,15 @@ static MACHINE_DRIVER_START( fixeight )
 	MDRV_CPU_PROGRAM_MAP(fixeight_68k_mem)
 	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-#if USE_V25
 	MDRV_CPU_ADD("audiocpu", V25, XTAL_16MHz)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem)
+	MDRV_CPU_CONFIG(ts001turbo_config)
 	//MDRV_CPU_IO_MAP(V25_port)
-#endif
 
 	MDRV_MACHINE_RESET(batsugun)
-//  MDRV_NVRAM_HANDLER(fixeight)        /* See 37B6 code */
+//	MDRV_MACHINE_RESET(toaplan2)
+
+	//  MDRV_NVRAM_HANDLER(fixeight)        /* See 37B6 code */
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3810,6 +3911,37 @@ static MACHINE_DRIVER_START( fixeighb )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+/* according to the comments this chip has the same markings as the Batsugun chip,
+   maybe they double map some opcodes on it and recycled the chips using unencrypted ones
+   for Batsugun??
+   
+    - note, the basic startup code remapping seems identical between all games, so they
+	  probably use a common remap with some per-game changes which supports the above theory
+   */
+const UINT8 ts007spy_vfive_decryption_table[256] = {
+	0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07, 0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f, /* 00 */
+	0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17, 0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f, /* 10 */
+	0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27, 0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f, /* 20 */
+	0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37, 0x38,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f, /* 30 */
+	0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47, 0x48,0x49,0x4a,0x4b,0x4c,0x4d,0x4e,0x4f, /* 40 */
+	0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57, 0x58,0x59,0x5a,0x5b,0x5c,0x5d,0x5e,0x5f, /* 50 */
+	0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67, 0x68,0x69,0x6a,0x6b,0x6c,0x6d,0x6e,0x6f, /* 60 */
+	0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77, 0x78,0x79,0x7a,0x7b,0x7c,0x7d,0x7e,0x7f, /* 70 */
+	0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87, 0x88,0x89,0x8a,0x8b,0x48,0x8d,0x8e,0x8f, /* 80 */
+	                                                             /*x*/
+	0x90,0x91,0x92,0x93,0x94,0x95,0x96,0x97, 0x98,0x99,0x9a,0x9b,0x9c,0x9d,0x9e,0x9f, /* 90 */
+	0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7, 0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf, /* a0 */
+	0xb0,0xb1,0xb2,0xb3,0xb4,0xb5,0xb6,0xb7, 0xb8,0xb9,0xba,0xbb,0xbc,0xbd,0xbe,0xbf, /* b0 */
+	0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7, 0xc8,0xc9,0xca,0xea,0xcc,0xcd,0xce,0xcf, /* c0 */
+	                                                        /*x*/
+	0xd0,0xd1,0xd2,0xd3,0xd4,0xd5,0xd6,0xd7, 0xd8,0xd9,0xda,0xdb,0xdc,0xdd,0xde,0xdf, /* d0 */
+	0xe0,0xe1,0xe2,0xe3,0xe4,0xe5,0xe6,0xe7, 0xe8,0xe9,0xea,0xeb,0xec,0xed,0x33,0xef, /* e0 */
+	                                                                       /*x*/
+	0xf0,0xf1,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7, 0xf8,0xf9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff, /* f0 */
+};
+
+static const nec_config ts007spy_vfive_config ={ ts007spy_vfive_decryption_table, };
+
 
 static MACHINE_DRIVER_START( vfive )
 
@@ -3818,11 +3950,9 @@ static MACHINE_DRIVER_START( vfive )
 	MDRV_CPU_PROGRAM_MAP(vfive_68k_mem)
 	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-#if USE_V25
 	MDRV_CPU_ADD("audiocpu", V25, XTAL_20MHz/2)	/* Verified on pcb, NEC V25+ type Toaplan mark scratched out */
 	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem)
-	//MDRV_CPU_IO_MAP(V25_port)
-#endif
+	MDRV_CPU_CONFIG(ts007spy_vfive_config)
 
 	MDRV_MACHINE_RESET(vfive)
 
@@ -3851,10 +3981,10 @@ MACHINE_DRIVER_END
 
 static MACHINE_RESET(batsugun)
 {
-	#if USE_V25
 	cpu_set_input_line(sub_cpu, INPUT_LINE_HALT, ASSERT_LINE);
-	#endif
 }
+
+
 
 static void batsugun_ym2151_irqhandler(const device_config *device, int linestate)
 {
@@ -3867,6 +3997,29 @@ static const ym2151_interface batsugun_ym2151_interface =
 	batsugun_ym2151_irqhandler
 };
 
+/* the batsugun cpu is mostly non-encrypted, from a glance over the code it seems they
+   only encrypted a few opcodes used in the interrupt routine, the rest is a 1:1 mapping */
+const UINT8 ts007spy_decryption_table[256] = {
+	0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07, 0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f, /* 00 */
+	0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17, 0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f, /* 10 */
+	0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27, 0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f, /* 20 */
+	0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37, 0x38,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f, /* 30 */
+	0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47, 0x48,0x49,0x4a,0x4b,0x4c,0x4d,0x4e,0x4f, /* 40 */
+	0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57, 0x58,0x59,0x5a,0x5b,0x5c,0x5d,0x5e,0x5f, /* 50 */
+	0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67, 0x68,0x69,0x6a,0x6b,0x6c,0x6d,0x6e,0x6f, /* 60 */
+	0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77, 0x78,0x79,0x7a,0x7b,0x7c,0x7d,0x7e,0x7f, /* 70 */
+	0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87, 0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f, /* 80 */
+	0x90,0x91,0x92,0x93,0x94,0x95,0x96,0x97, 0x98,0x99,0x9a,0x9b,0x9c,0x9d,0x9e,0x9f, /* 90 */
+	0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7, 0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf, /* a0 */
+	0xb0,0xb1,0xb2,0xb3,0xb4,0xb5,0xb6,0xb7, 0xb8,0xb9,0xba,0xbb,0xbc,0xbd,0xbe,0xbf, /* b0 */
+	0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7, 0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf, /* c0 */
+	0xd0,0xd1,0xd2,0xd3,0xd4,0xd5,0xd6,0xd7, 0xd8,0xd9,0xda,0xdb,0xdc,0xdd,0xde,0xdf, /* d0 */
+	0xe0,0xe1,0xe2,0xe3,0xe4,0xe5,0xe6,0xe7, 0xe8,0xe9,0xea,0xeb,0xec,0xed,0xee,0xef, /* e0 */
+	0xf0,0xf1,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7, 0xf8,0xf9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff, /* f0 */
+};
+
+static const nec_config ts007spy_config ={ ts007spy_decryption_table, };
+
 static MACHINE_DRIVER_START( batsugun )
 
 	/* basic machine hardware */
@@ -3874,11 +4027,11 @@ static MACHINE_DRIVER_START( batsugun )
 	MDRV_CPU_PROGRAM_MAP(batsugun_68k_mem)
 	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-#if USE_V25
 	MDRV_CPU_ADD("audiocpu", V25, XTAL_32MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem)
+	MDRV_CPU_CONFIG(ts007spy_config)
+
 	//MDRV_CPU_IO_MAP(V25_port)
-#endif
 
 	MDRV_MACHINE_RESET(batsugun)
 
@@ -4174,11 +4327,9 @@ ROM_START( tekipaki )
 	ROM_LOAD16_BYTE( "tp020-1.bin", 0x000000, 0x010000, CRC(d8420bd5) SHA1(30c1ad9e053cd7e79adb42aa428ebee28e144755) )
 	ROM_LOAD16_BYTE( "tp020-2.bin", 0x000001, 0x010000, CRC(7222de8e) SHA1(8352ae23efc24a2e20cc24b6d37cb8fc6b1a730c) )
 
-#if USE_HD64x180
 	ROM_REGION( 0x10000, "cpu1", 0 )			/* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.020", 0x00000, 0x08000, NO_DUMP )
-#endif
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "tp020-4.bin", 0x000000, 0x080000, CRC(3ebbe41e) SHA1(cea196c5f83e1a23d5b538a0db9bbbffa7af5118) )
@@ -4191,11 +4342,9 @@ ROM_START( ghox ) /* Spinner with single axis (up/down) controls */
 	ROM_LOAD16_BYTE( "tp021-01.u10", 0x000000, 0x020000, CRC(9e56ac67) SHA1(daf241d9e55a6e60fc004ed61f787641595b1e62) )
 	ROM_LOAD16_BYTE( "tp021-02.u11", 0x000001, 0x020000, CRC(15cac60f) SHA1(6efa3a50a5dfe6ef4072738d6a7d0d95dca8a675) )
 
-#if USE_HD64x180
 	ROM_REGION( 0x10000, "cpu1", 0 )			/* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.021", 0x00000, 0x08000, NO_DUMP )
-#endif
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "tp021-03.u36", 0x000000, 0x080000, CRC(a15d8e9d) SHA1(640a33997bdce8e84bea6a944139716379839037) )
@@ -4208,11 +4357,9 @@ ROM_START( ghoxj ) /* 8-way joystick for controls */
 	ROM_LOAD16_BYTE( "tp021-01a.u10", 0x000000, 0x020000, CRC(c11b13c8) SHA1(da7defc1d3b6ddded910ba56c31fbbdb5ed57b09) )
 	ROM_LOAD16_BYTE( "tp021-02a.u11", 0x000001, 0x020000, CRC(8d426767) SHA1(1ed4a8bcbf4352257e7d58cb5c2c91eb48c2f047) )
 
-#if USE_HD64x180
 	ROM_REGION( 0x10000, "cpu1", 0 )			/* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.021", 0x00000, 0x08000, NO_DUMP )
-#endif
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "tp021-03.u36", 0x000000, 0x080000, CRC(a15d8e9d) SHA1(640a33997bdce8e84bea6a944139716379839037) )
@@ -4225,11 +4372,7 @@ ROM_START( dogyuun )
 	ROM_LOAD16_WORD_SWAP( "tp022_01.r16", 0x000000, 0x080000, CRC(79eb2429) SHA1(088c5ed0ed77557ab71f52cafe35028e3648ae1e) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-002-MACH  TOA PLAN) */
-	/* Its likely to be a NEC V25+ (PLCC94). */
-#if USE_V25
-	ROM_REGION( 0x10000, "cpu1", 0 )			/* Sound CPU code */
-//  ROM_LOAD( "tp022.mcu", 0x00000, 0x08000, NO_DUMP )
-#endif
+	/* It's some kind of NEC V25+ (PLCC94). - (encrypted program uploaded by main CPU) */
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD16_WORD_SWAP( "tp022_3.w92", 0x000000, 0x100000, CRC(191b595f) SHA1(89344946daa18087cc83f92027cf5da659b1c7a5) )
@@ -4249,11 +4392,7 @@ ROM_START( dogyuunk )
 	ROM_LOAD16_WORD_SWAP( "01.u64", 0x000000, 0x080000, CRC(fe5bd7f4) SHA1(9c725466112a514c9ed0fb074422d291c175c3f4) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-002-MACH  TOA PLAN) */
-	/* Its likely to be a NEC V25+ (PLCC94). */
-#if USE_V25
-	ROM_REGION( 0x10000, "cpu1", 0 )			/* Sound CPU code */
-//  ROM_LOAD( "tp022.mcu", 0x00000, 0x08000, NO_DUMP )
-#endif
+	/* It's some kind of NEC V25+ (PLCC94). - (encrypted program uploaded by main CPU) */
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD16_WORD_SWAP( "tp022_3.w92", 0x000000, 0x100000, CRC(191b595f) SHA1(89344946daa18087cc83f92027cf5da659b1c7a5) )
@@ -4274,14 +4413,8 @@ ROM_START( kbash )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-004-Dash  TOA PLAN) */
 	/* Its likely to be a NEC V25+ (PLCC94). */
-#if USE_V25
-	ROM_REGION( 0x88000, "cpu1", 0 )			/* Sound CPU code */
-	ROM_LOAD( "kbash02.bin", 0x80000, 0x08000, CRC(4cd882a1) SHA1(7199a5c384918f775f0815e09c46b2a58141814a) )
-#else
-	ROM_REGION( 0x08000, "user1", 0 )
-	ROM_LOAD( "kbash02.bin", 0x00200, 0x07e00, CRC(4cd882a1) SHA1(7199a5c384918f775f0815e09c46b2a58141814a) )
-	ROM_CONTINUE(			 0x00000, 0x00200 )
-#endif
+	ROM_REGION( 0x8000, "mcu", 0 )			/* Sound CPU code */
+	ROM_LOAD( "kbash02.bin", 0x0000, 0x8000, CRC(4cd882a1) SHA1(7199a5c384918f775f0815e09c46b2a58141814a) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD( "kbash03.bin", 0x000000, 0x200000, CRC(32ad508b) SHA1(e473489beaf649d3e5236770eb043327e309850c) )
@@ -4420,11 +4553,7 @@ ROM_START( fixeight )
 	ROM_LOAD16_WORD_SWAP( "tp-026-1", 0x000000, 0x080000, CRC(f7b1746a) SHA1(0bbea6f111b818bc9b9b2060af4fe900f37cf7f9) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-001-Turbo  TOA PLAN) */
-	/* Its likely to be a NEC V25+ (PLCC94). */
-#if USE_V25
-	ROM_REGION( 0x10000, "cpu1", 0 )			/* Secondary CPU code */
-//  ROM_LOAD( "tp-026.mcu", 0x0000, 0x8000, NO_DUMP )
-#endif
+	/* It's some kind of NEC V25+ (PLCC94). - (encrypted program uploaded by main CPU) */
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	ROM_LOAD( "tp-026-3", 0x000000, 0x200000, CRC(e5578d98) SHA1(280d2b716d955e767d311fc9596823852435b6d7) )
@@ -4501,11 +4630,7 @@ ROM_START( grindstm )
 	ROM_LOAD16_WORD_SWAP( "01.bin", 0x000000, 0x080000, CRC(4923f790) SHA1(1c2d66b432d190d0fb6ac7ca0ec0687aea3ccbf4) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
-	/* Its likely to be a NEC V25+ (PLCC94). */
-#if USE_V25
-	ROM_REGION( 0x10000, "cpu1", 0 )			/* Sound CPU code */
-//  ROM_LOAD( "tp027.mcu", 0x8000, 0x8000, NO_DUMP )
-#endif
+	/* It's some kind of NEC V25+ (PLCC94). - (encrypted program uploaded by main CPU) */
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "tp027_02.bin", 0x000000, 0x100000, CRC(877b45e8) SHA1(b3ed8d8dbbe51a1919afc55d619d2b6771971493) )
@@ -4518,11 +4643,7 @@ ROM_START( grindstma )
 	ROM_LOAD16_WORD_SWAP( "tp027-01.rom", 0x000000, 0x080000, CRC(8d8c0392) SHA1(824dde274c8bef8a87c54d8ccdda7f0feb8d11e1) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
-	/* Its likely to be a NEC V25+ (PLCC94). */
-#if USE_V25
-	ROM_REGION( 0x10000, "cpu1", 0 )			/* Sound CPU code */
-//  ROM_LOAD( "tp027.mcu", 0x8000, 0x8000, NO_DUMP )
-#endif
+	/* It's some kind of NEC V25+ (PLCC94). - (encrypted program uploaded by main CPU) */
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "tp027_02.bin", 0x000000, 0x100000, CRC(877b45e8) SHA1(b3ed8d8dbbe51a1919afc55d619d2b6771971493) )
@@ -4535,11 +4656,7 @@ ROM_START( vfive )
 	ROM_LOAD16_WORD_SWAP( "tp027_01.bin", 0x000000, 0x080000, CRC(731d50f4) SHA1(794255d0a809cda9170f5bac473df9d7f0efdac8) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
-	/* Its likely to be a NEC V25+ (PLCC94). */
-#if USE_V25
-	ROM_REGION( 0x10000, "cpu1", 0 )			/* Sound CPU code */
-//  ROM_LOAD( "tp027.mcu", 0x8000, 0x8000, NO_DUMP )
-#endif
+	/* It's some kind of NEC V25+ (PLCC94). - (encrypted program uploaded by main CPU) */
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "tp027_02.bin", 0x000000, 0x100000, CRC(877b45e8) SHA1(b3ed8d8dbbe51a1919afc55d619d2b6771971493) )
@@ -4552,11 +4669,7 @@ ROM_START( batsugun )
 	ROM_LOAD16_WORD_SWAP( "tp030_01.bin", 0x000000, 0x080000, CRC(3873d7dd) SHA1(baf6187d7d554cfcf4a86b63f07fc30df7ef84c9) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
-	/* Its likely to be a NEC V25+ (PLCC94). */
-#if USE_V25
-	ROM_REGION( 0x10000, "cpu1", 0 )			/* Sound CPU code */
-//  ROM_LOAD( "tp030.mcu", 0x8000, 0x8000, NO_DUMP )
-#endif
+	/* It's some kind of NEC V25+ (PLCC94). - (mostly unencrypted program uploaded by main CPU) */
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	ROM_LOAD( "tp030_3l.bin", 0x000000, 0x100000, CRC(3024b793) SHA1(e161db940f069279356fca2c5bf2753f07773705) )
@@ -4578,11 +4691,7 @@ ROM_START( batsuguna )
 	ROM_LOAD16_WORD_SWAP( "tp030_1a.bin", 0x000000, 0x080000,  CRC(cb1d4554) SHA1(ef31f24d77e1c13bdf5558a04a6253e2e3e6a790) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
-	/* Its likely to be a NEC V25+ (PLCC94). */
-#if USE_V25
-	ROM_REGION( 0x10000, "cpu1", 0 )			/* Sound CPU code */
-//  ROM_LOAD( "tp030.mcu", 0x8000, 0x8000, NO_DUMP )
-#endif
+	/* It's some kind of NEC V25+ (PLCC94). - (unencrypted(?) program uploaded by main CPU) */
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	ROM_LOAD( "tp030_3l.bin", 0x000000, 0x100000, CRC(3024b793) SHA1(e161db940f069279356fca2c5bf2753f07773705) )
@@ -4604,11 +4713,7 @@ ROM_START( batsugunsp )
 	ROM_LOAD16_WORD_SWAP( "tp030-sp.u69", 0x000000, 0x080000, CRC(8072a0cd) SHA1(3a0a9cdf894926a16800c4882a2b00383d981367) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
-	/* Its likely to be a NEC V25+ (PLCC94). */
-#if USE_V25
-	ROM_REGION( 0x10000, "cpu1", 0 )			/* Sound CPU code */
-//  ROM_LOAD( "tp030.mcu", 0x8000, 0x8000, NO_DUMP )
-#endif
+	/* It's some kind of NEC V25+ (PLCC94). - (unencrypted(?) program uploaded by main CPU) */
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	ROM_LOAD( "tp030_3l.bin", 0x000000, 0x100000, CRC(3024b793) SHA1(e161db940f069279356fca2c5bf2753f07773705) )
