@@ -981,6 +981,7 @@ $(MAMEOBJ)/nichibut.a: \
 	$(DRIVERS)/magmax.o $(VIDEO)/magmax.o \
 	$(DRIVERS)/nbmj8688.o $(VIDEO)/nbmj8688.o \
 	$(DRIVERS)/nbmj8891.o $(VIDEO)/nbmj8891.o \
+	$(DRIVERS)/nbmj8900.o $(VIDEO)/nbmj8900.o \
 	$(DRIVERS)/nbmj8991.o $(VIDEO)/nbmj8991.o \
 	$(DRIVERS)/nbmj9195.o $(VIDEO)/nbmj9195.o \
 	$(DRIVERS)/nightgal.o \

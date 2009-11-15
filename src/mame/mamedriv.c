@@ -534,6 +534,9 @@ const game_driver * const drivers[] =
 	DRIVER( av2mj1bb )	/* (c) 1991 MIKI SYOUJI/AV JAPAN */
 	DRIVER( av2mj2rg )	/* (c) 1991 MIKI SYOUJI/AV JAPAN */
 
+	DRIVER( ohpaipee )	/* (c) 1990 Nichibutsu */
+	DRIVER( togenkyo )	/* (c) 1990 Nichibutsu */
+
 	DRIVER( mjuraden )	/* (c) 1992 Nichibutsu/Yubis */
 	DRIVER( koinomp )	/* (c) 1992 */
 	DRIVER( patimono )	/* (c) 1992 */

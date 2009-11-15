@@ -305,6 +305,8 @@ READ8_HANDLER( nb1413m3_sndrom_r )
 		case NB1413M3_MJNANPAS:
 		case NB1413M3_MLADYHTR:
 		case NB1413M3_CLUB90S:
+		case NB1413M3_OHPAIPEE:
+		case NB1413M3_TOGENKYO:
 		case NB1413M3_LOVEHOUS:
 		case NB1413M3_CHINMOKU:
 		case NB1413M3_GALKAIKA:
@@ -431,6 +433,8 @@ READ8_HANDLER( nb1413m3_inputport1_r )
 			break;
 		case NB1413M3_PAIRSNB:
 		case NB1413M3_PAIRSTEN:
+		case NB1413M3_OHPAIPEE:
+		case NB1413M3_TOGENKYO:
 			return input_port_read(space->machine, "P1");
 		default:
 			switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
@@ -480,6 +484,8 @@ READ8_HANDLER( nb1413m3_inputport2_r )
 			break;
 		case NB1413M3_PAIRSNB:
 		case NB1413M3_PAIRSTEN:
+		case NB1413M3_OHPAIPEE:
+		case NB1413M3_TOGENKYO:
 			return input_port_read(space->machine, "P2");
 		default:
 			switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
