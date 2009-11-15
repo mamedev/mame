@@ -197,14 +197,15 @@ struct _memory_block
 	UINT8 *					data;					/* pointer to the data for this block */
 };
 
-/* a bank is a global pointer to memory that can be shared across devices and changed dynamically */
+/* a bank reference is an entry in a list of address spaces that reference a given bank */
 typedef struct _bank_reference bank_reference;
 struct _bank_reference
 {
-	bank_reference *		next;
-	const address_space *	space;
+	bank_reference *		next;					/* link to the next reference */
+	const address_space *	space;					/* address space that references us */
 };
 
+/* a bank is a global pointer to memory that can be shared across devices and changed dynamically */
 typedef struct _bank_data bank_info;
 struct _bank_data
 {
