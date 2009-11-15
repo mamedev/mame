@@ -295,9 +295,11 @@ static int bbakraid_unlimited_ver;
 
 static MACHINE_RESET(batsugun);
 static READ16_HANDLER( batsugun_share_r );
-static READ16_HANDLER( batsugun_share2_r );
 static WRITE16_HANDLER( batsugun_share_w );
+#ifdef USE_ENCRYPTED_V25S
+static READ16_HANDLER( batsugun_share2_r );
 static WRITE16_HANDLER( batsugun_share2_w );
+#endif
 
 static const device_config *sub_cpu = NULL;
 
@@ -1627,7 +1629,9 @@ ADDRESS_MAP_END
 
 
 static UINT8* batsugun_share;
+#ifdef USE_ENCRYPTED_V25S
 static UINT8* batsugun_share2;
+#endif
 
 static READ16_HANDLER( batsugun_share_r )
 {
@@ -1649,7 +1653,8 @@ static WRITE16_HANDLER( batsugun_share_w )
 	}
 }
 
-
+#ifdef USE_ENCRYPTED_V25S
+/* To be removed... */
 static READ16_HANDLER( batsugun_share2_r )
 {
 	return batsugun_share2[offset] | batsugun_share2[offset]<<8;
@@ -1669,6 +1674,7 @@ static WRITE16_HANDLER( batsugun_share2_w )
 		batsugun_share2[offset] = data;
 	}
 }
+#endif
 
 static ADDRESS_MAP_START( batsugun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -1686,8 +1692,7 @@ static ADDRESS_MAP_START( batsugun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x21f008, 0x21f009) AM_READ_PORT("JMPR")
 #endif
 	/* this ram is shared with the V25+, once it's emulated properly only these should be needed */
-	AM_RANGE(0x210000, 0x21efff) AM_READWRITE( batsugun_share2_r, batsugun_share2_w )
-	AM_RANGE(0x21f000, 0x21ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
+	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
 
 	/***** The following in 0x30000x are for video controller 1 ******/
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(toaplan2_0_voffs_w)	/* VideoRAM selector/offset */
@@ -1986,20 +1991,57 @@ ADDRESS_MAP_END
 
   Others are encrypted
 */
+#ifdef USE_ENCRYPTED_V25S
+/*
+	AM_RANGE(0x21f000, 0x21f001) AM_READWRITE(toaplan2_snd_cpu_r, batsugun_snd_cpu_w)	;V25+ Command/Status port
+	AM_RANGE(0x21f004, 0x21f005) AM_READ_PORT("DSWA")
+	AM_RANGE(0x21f006, 0x21f007) AM_READ_PORT("DSWB")
+	AM_RANGE(0x21f008, 0x21f009) AM_READ_PORT("JMPR")
+*/
+
+/* FIXME: These should be moved into the CPU core files, putted here for simplicity. */
+static READ8_HANDLER( v25s_internal_io_r )
+{
+	switch(offset+0xf00)
+	{
+		case 0xf00: return input_port_read(space->machine, "DSWB"); //port 0
+		case 0xf08: return input_port_read(space->machine, "JMPR"); //port 1
+//		case 0xf10: //port 2
+		case 0xf38: return input_port_read(space->machine, "DSWA"); //port T
+	}
+
+	printf("(PC=%05x) V25S internal I/O read [%04x]\n",cpu_get_pc(space->cpu),offset+0xf00);
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( v25s_internal_io_w )
+{
+	printf("(PC=%05x) V25S internal I/O write %02x at [%04x]\n",cpu_get_pc(space->cpu),data,offset+0xf00);
+}
+
+/* FIXME: needs an irq to remove this, I've seen two irq routines that have encrypted opcodes... -AS */
+static READ8_HANDLER( kludge_r )
+{
+	return 0xff;
+}
+#endif
 
 static ADDRESS_MAP_START( V25_rambased_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE(6) AM_BASE(&batsugun_share)
 
-	AM_RANGE(0x07800, 0x07fff) AM_RAM AM_SHARE(6)
+//	AM_RANGE(0x40000, 0x477ff) AM_RAM AM_SHARE(7)
+	AM_RANGE(0x40e00, 0x40eff) AM_RAM //internal V25 RAM
+	#ifdef USE_ENCRYPTED_V25S
+	AM_RANGE(0x40f00, 0x40fff) AM_READWRITE(v25s_internal_io_r,v25s_internal_io_w)
+	AM_RANGE(0x87ff9, 0x87ff9) AM_READ(kludge_r)
+	#endif
 
-	AM_RANGE(0x40000, 0x477ff) AM_RAM AM_SHARE(7)
+	AM_RANGE(0x80000, 0x87fff) AM_RAM AM_SHARE(6)
+	AM_RANGE(0xa0000, 0xa7fff) AM_RAM AM_SHARE(6)
 
-	AM_RANGE(0x87800, 0x87fff) AM_RAM AM_SHARE(6)
-
-	AM_RANGE(0xa0000, 0xa77ff) AM_RAM AM_SHARE(7) AM_BASE(&batsugun_share2)
-	AM_RANGE(0xa7800, 0xa7fff) AM_RAM AM_SHARE(6)
-
-	AM_RANGE(0xff800, 0xfffff) AM_RAM AM_SHARE(6) AM_BASE(&batsugun_share)
+	AM_RANGE(0xf8000, 0xfffff) AM_RAM AM_SHARE(6)
 ADDRESS_MAP_END
 
 /*****************************************************************************
@@ -2657,6 +2699,10 @@ static INPUT_PORTS_START( batsugun )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
 	PORT_MODIFY("JMPR")
+	#ifdef USE_ENCRYPTED_V25S
+	/* FIXME: jumper setting are differently mapped there, V25S executes a ror al,4h instruction before putting it on the RAM shared memory */
+	PORT_BIT( 0x00fe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	#else
 	PORT_DIPNAME( 0x000f,	0x0009, "Territory" )
 	PORT_DIPSETTING(		0x0009, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0008, "Europe (Taito Corp license)" )
@@ -2675,6 +2721,7 @@ static INPUT_PORTS_START( batsugun )
 	PORT_DIPSETTING(		0x0005, "Taiwan" )
 	PORT_DIPSETTING(		0x0004, "Taiwan (Taito Corp license)" )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* bit 0x10 sound ready */
+	#endif
 INPUT_PORTS_END
 
 
@@ -3914,7 +3961,7 @@ MACHINE_DRIVER_END
 /* according to the comments this chip has the same markings as the Batsugun chip,
    maybe they double map some opcodes on it and recycled the chips using unencrypted ones
    for Batsugun??
-   
+
     - note, the basic startup code remapping seems identical between all games, so they
 	  probably use a common remap with some per-game changes which supports the above theory
    */
