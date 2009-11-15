@@ -3092,6 +3092,39 @@ ROM_START( rtype2j )
 	ROM_LOAD( "ic14.4c",      0x00000, 0x20000, CRC(637172d5) SHA1(9dd0dc409306287238826bf301e2a7a12d6cd9ce) )
 ROM_END
 
+ROM_START( rtype2jc )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rt2-a-h0-c.54",  0x00001, 0x20000, CRC(ef9a9990) SHA1(fdf8fb7cb2b16f3cc58592da5c696ccff85f87e0) )
+	ROM_LOAD16_BYTE( "rt2-a-l0-c.60",  0x00000, 0x20000, CRC(d8b9da64) SHA1(ce19fc95d0adefa57c2161d7b0d756ecf799c707) )
+	ROM_LOAD16_BYTE( "rt2-a-h1-c.53",  0x40001, 0x20000, CRC(1b1870f4) SHA1(9a98b146980a87d088b7157da7a64c99902ddd54) )
+	ROM_RELOAD(                        0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "rt2-a-l1-c.59",  0x40000, 0x20000, CRC(60fdff35) SHA1(9c89682deebfa88864b5af9cf0f05944d5c2212f) )
+	ROM_RELOAD(                        0xc0000, 0x20000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "ic17.4f",      0x0000, 0x10000, CRC(73ffecb4) SHA1(4795bf0d6263060c3d3759b659bdb189a4087600) )
+
+	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_LOAD( "ic31.6l",      0x00000, 0x20000, CRC(2cd8f913) SHA1(a53752b35da95b420dd29a09176d265d292b3938) )	/* sprites */
+	ROM_LOAD( "ic21.4l",      0x20000, 0x20000, CRC(5033066d) SHA1(e125127f0610c63f9e59a585db547be5d49ed863) )
+	ROM_LOAD( "ic32.6m",      0x40000, 0x20000, CRC(ec3a0450) SHA1(632bdd397f1bc67f6970faf7d09ab8d911e105fe) )
+	ROM_LOAD( "ic22.4m",      0x60000, 0x20000, CRC(db6176fc) SHA1(1eaf72af0322490c98461aded202288e387caac1) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "ic50.7s",      0x00000, 0x20000, CRC(f3f8736e) SHA1(37872b30459ad05b2981d4ac84983f3b52d0d2d6) )	/* tiles */
+	ROM_LOAD( "ic51.7u",      0x20000, 0x20000, CRC(b4c543af) SHA1(56042eba711160fc701021c8787414dcaddcdecb) )
+	ROM_LOAD( "ic56.8s",      0x40000, 0x20000, CRC(4cb80d66) SHA1(31c5496c14b277e428a2f22195fe1742d6a577d4) )
+	ROM_LOAD( "ic57.8u",      0x60000, 0x20000, CRC(bee128e0) SHA1(b149dae5f8f67a329d6df033fadf50ad75c0a57a) )
+	ROM_LOAD( "ic65.9r",      0x80000, 0x20000, CRC(2dc9c71a) SHA1(124e89c17f3af034d5a387ff3eab906d289c27f7) )
+	ROM_LOAD( "ic66.9u",      0xa0000, 0x20000, CRC(7533c428) SHA1(ba435cfb6c3c49fcc4d716dcecf8f17545b8eec6) )
+	ROM_LOAD( "ic63.9m",      0xc0000, 0x20000, CRC(a6ad67f2) SHA1(b005b037ce8b3c932089982ecfbccdc922278fe3) )
+	ROM_LOAD( "ic64.9p",      0xe0000, 0x20000, CRC(3686d555) SHA1(d03754d9b8a6a3bfd4a85eeddacc35a36af197bd) )
+
+	ROM_REGION( 0x20000, "samples", 0 )	/* samples */
+	ROM_LOAD( "ic14.4c",      0x00000, 0x20000, CRC(637172d5) SHA1(9dd0dc409306287238826bf301e2a7a12d6cd9ce) )
+ROM_END
+
+
 ROM_START( majtitle )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "mt_h0-a.bin",    0x00001, 0x20000, CRC(36aadb67) SHA1(11cb9f190431ef7b68bcad691191c810b00452be) )
@@ -3491,17 +3524,18 @@ GAME( 1987, bchopper,    0,        m72,      bchopper, bchopper, ROT0,   "Irem",
 GAME( 1987, mrheli,      bchopper, m72,      bchopper, mrheli,   ROT0,   "Irem", "Mr. HELI no Dai-Bouken", GAME_NO_COCKTAIL )
 GAME( 1988, nspirit,     0,        m72,      nspirit,  nspirit,  ROT0,   "Irem", "Ninja Spirit", GAME_NO_COCKTAIL )
 GAME( 1988, nspiritj,    nspirit,  m72_8751, nspirit,  m72_8751, ROT0,   "Irem", "Saigo no Nindou (Japan)", GAME_NO_COCKTAIL ) /* some corruption on warning screen (layer enable?) */
-GAME( 1988, imgfight,    0,        m72,      imgfight, imgfight, ROT270, "Irem", "Image Fight (revision A, Japan)", 0 )
+GAME( 1988, imgfight,    0,        m72,      imgfight, imgfight, ROT270, "Irem", "Image Fight (Japan, revision A)", 0 )
 GAME( 1988, imgfighto,   imgfight, m72,      imgfight, imgfight, ROT270, "Irem", "Image Fight (Japan)", 0 )
 GAME( 1989, loht,        0,        m72,      loht,     loht,     ROT0,   "Irem", "Legend of Hero Tonma", GAME_NO_COCKTAIL )
 GAME( 1989, lohtj,       loht,     m72,      loht,     loht,     ROT0,   "Irem", "Legend of Hero Tonma (Japan)", GAME_NO_COCKTAIL )
 GAME( 1989, lohtb,       loht,     m72,      loht,     0,        ROT0,   "Irem", "Legend of Hero Tonma (bootleg, set 1)", GAME_NOT_WORKING| GAME_NO_COCKTAIL )
 GAME( 1989, lohtb2,      loht,     m72_8751, loht,     m72_8751, ROT0,   "Irem", "Legend of Hero Tonma (bootleg, set 2)", GAME_NO_COCKTAIL )
 GAME( 1989, xmultipl,    0,        xmultipl, xmultipl, xmultipl, ROT0,   "Irem", "X Multiply (Japan)", GAME_NO_COCKTAIL )
-GAME( 1989, dbreed,      0,        dbreed,   dbreed,   0,        ROT0,   "Irem", "Dragon Breed (M81 pcb version)", GAME_NO_COCKTAIL )
-GAME( 1989, dbreedm72,   dbreed,   dbreed72, dbreed,   dbreed72, ROT0,   "Irem", "Dragon Breed (M72 pcb version)", GAME_NO_COCKTAIL )
+GAME( 1989, dbreed,      0,        dbreed,   dbreed,   0,        ROT0,   "Irem", "Dragon Breed (M81 PCB version)", GAME_NO_COCKTAIL )
+GAME( 1989, dbreedm72,   dbreed,   dbreed72, dbreed,   dbreed72, ROT0,   "Irem", "Dragon Breed (M72 PCB version)", GAME_NO_COCKTAIL )
 GAME( 1989, rtype2,      0,        rtype2,   rtype2,   0,        ROT0,   "Irem", "R-Type II", GAME_NO_COCKTAIL )
 GAME( 1989, rtype2j,     rtype2,   rtype2,   rtype2,   0,        ROT0,   "Irem", "R-Type II (Japan)", GAME_NO_COCKTAIL )
+GAME( 1989, rtype2jc,    rtype2,   rtype2,   rtype2,   0,        ROT0,   "Irem", "R-Type II (Japan, revision C)", GAME_NO_COCKTAIL )
 GAME( 1990, majtitle,    0,        majtitle, rtype2,   0,        ROT0,   "Irem", "Major Title (World)", GAME_NO_COCKTAIL )
 GAME( 1990, majtitlej,   majtitle, majtitle, rtype2,   0,        ROT0,   "Irem", "Major Title (Japan)", GAME_NO_COCKTAIL )
 GAME( 1990, hharry,      0,        hharry,   hharry,   0,        ROT0,   "Irem", "Hammerin' Harry (World)", GAME_NO_COCKTAIL )

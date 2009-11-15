@@ -1494,6 +1494,7 @@ const game_driver * const drivers[] =
 	DRIVER( dbreedm72 )	/* (c) 1989 */
 	DRIVER( rtype2 )	/* (c) 1989 */
 	DRIVER( rtype2j )	/* (c) 1989 (Japan) */
+	DRIVER( rtype2jc )	/* (c) 1989 (Japan) */
 	DRIVER( majtitle )	/* (c) 1990 (World) */
 	DRIVER( majtitlej )	/* (c) 1990 (Japan) */
 	DRIVER( hharry )	/* (c) 1990 (World) */
