@@ -11,12 +11,128 @@ UINT32 *rdram;
 UINT32 *rsp_imem;
 UINT32 *rsp_dmem;
 
-//static int first_rsp = 1;
-
-// MIPS Interface
-static UINT32 mi_version;
+// Memory Interface
+static UINT32 mi_version = 0;
 static UINT32 mi_interrupt = 0;
 static UINT32 mi_intr_mask = 0;
+static UINT32 mi_mode = 0;
+
+// Memory Interface (MI)
+
+#define MI_CLR_INIT             0x0080      /* Bit  7: clear init mode */
+#define MI_SET_INIT             0x0100      /* Bit  8: set init mode */
+#define MI_CLR_EBUS             0x0200      /* Bit  9: clear ebus test */
+#define MI_SET_EBUS             0x0400      /* Bit 10: set ebus test mode */
+#define MI_CLR_DP_INTR          0x0800      /* Bit 11: clear dp interrupt */
+#define MI_CLR_RDRAM            0x1000      /* Bit 12: clear RDRAM reg */
+#define MI_SET_RDRAM            0x2000      /* Bit 13: set RDRAM reg mode */
+#define MI_MODE_INIT            0x0080      /* Bit  7: init mode */
+#define MI_MODE_EBUS            0x0100      /* Bit  8: ebus test mode */
+#define MI_MODE_RDRAM           0x0200      /* Bit  9: RDRAM reg mode */
+
+READ32_HANDLER( n64_mi_reg_r )
+{
+	switch (offset)
+	{
+        case 0x00/4:            // MI_MODE_REG
+            return mi_mode;
+
+		case 0x04/4:			// MI_VERSION_REG
+			return mi_version;
+
+		case 0x08/4:			// MI_INTR_REG
+			return mi_interrupt;
+
+		case 0x0c/4:			// MI_INTR_MASK_REG
+			return mi_intr_mask;
+
+		default:
+			logerror("mi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
+			break;
+	}
+
+	return 0;
+}
+
+WRITE32_HANDLER( n64_mi_reg_w )
+{
+	switch (offset)
+	{
+		case 0x00/4:		// MI_INIT_MODE_REG
+            if (data & MI_CLR_INIT)     mi_mode &= ~MI_MODE_INIT;
+            if (data & MI_SET_INIT)     mi_mode |=  MI_MODE_INIT;
+            if (data & MI_CLR_EBUS)     mi_mode &= ~MI_MODE_EBUS;
+            if (data & MI_SET_EBUS)     mi_mode |=  MI_MODE_EBUS;
+            if (data & MI_CLR_RDRAM)    mi_mode &= ~MI_MODE_RDRAM;
+            if (data & MI_SET_RDRAM)    mi_mode |=  MI_MODE_RDRAM;
+            if (data & MI_CLR_DP_INTR)
+			{
+				clear_rcp_interrupt(space->machine, DP_INTERRUPT);
+			}
+			break;
+
+		case 0x04/4:		// MI_VERSION_REG
+			mi_version = data;
+			break;
+
+		case 0x0c/4:		// MI_INTR_MASK_REG
+		{
+            if (data & 0x0001)
+            {
+                mi_intr_mask &= ~0x1;      // clear SP mask
+            }
+            if (data & 0x0002)
+            {
+                mi_intr_mask |= 0x1;           // set SP mask
+            }
+            if (data & 0x0004)
+            {
+                mi_intr_mask &= ~0x2;      // clear SI mask
+            }
+            if (data & 0x0008)
+            {
+                mi_intr_mask |= 0x2;           // set SI mask
+            }
+            if (data & 0x0010)
+            {
+                mi_intr_mask &= ~0x4;      // clear AI mask
+            }
+            if (data & 0x0020)
+            {
+                mi_intr_mask |= 0x4;           // set AI mask
+            }
+            if (data & 0x0040)
+            {
+                mi_intr_mask &= ~0x8;      // clear VI mask
+            }
+            if (data & 0x0080)
+            {
+                mi_intr_mask |= 0x8;           // set VI mask
+            }
+            if (data & 0x0100)
+            {
+                mi_intr_mask &= ~0x10;     // clear PI mask
+            }
+            if (data & 0x0200)
+            {
+                mi_intr_mask |= 0x10;      // set PI mask
+            }
+            if (data & 0x0400)
+            {
+                mi_intr_mask &= ~0x20;     // clear DP mask
+            }
+            if (data & 0x0800)
+            {
+                mi_intr_mask |= 0x20;      // set DP mask
+            }
+			break;
+		}
+
+		default:
+			logerror("mi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+			break;
+	}
+}
 
 static const device_config *dmadac[2];
 
@@ -39,6 +155,7 @@ void clear_rcp_interrupt(running_machine *machine, int interrupt)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
+
 UINT8 is64_buffer[0x10000];
 
 READ32_HANDLER( n64_is64_r )
@@ -207,139 +324,15 @@ WRITE32_HANDLER( n64_rdram_reg_w )
     }
 }
 
-// Memory Interface (MI)
-
-UINT32 mi_mode;
-
-#define MI_CLR_INIT             0x0080      /* Bit  7: clear init mode */
-#define MI_SET_INIT             0x0100      /* Bit  8: set init mode */
-#define MI_CLR_EBUS             0x0200      /* Bit  9: clear ebus test */
-#define MI_SET_EBUS             0x0400      /* Bit 10: set ebus test mode */
-#define MI_CLR_DP_INTR          0x0800      /* Bit 11: clear dp interrupt */
-#define MI_CLR_RDRAM            0x1000      /* Bit 12: clear RDRAM reg */
-#define MI_SET_RDRAM            0x2000      /* Bit 13: set RDRAM reg mode */
-#define MI_MODE_INIT            0x0080      /* Bit  7: init mode */
-#define MI_MODE_EBUS            0x0100      /* Bit  8: ebus test mode */
-#define MI_MODE_RDRAM           0x0200      /* Bit  9: RDRAM reg mode */
-
-READ32_HANDLER( n64_mi_reg_r )
-{
-	switch (offset)
-	{
-        case 0x00/4:            // MI_MODE_REG
-            return mi_mode;
-
-		case 0x04/4:			// MI_VERSION_REG
-			return mi_version;
-
-		case 0x08/4:			// MI_INTR_REG
-			return mi_interrupt;
-
-		case 0x0c/4:			// MI_INTR_MASK_REG
-			return mi_intr_mask;
-
-		default:
-			logerror("mi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
-			break;
-	}
-
-	return 0;
-}
-
-WRITE32_HANDLER( n64_mi_reg_w )
-{
-	switch (offset)
-	{
-		case 0x00/4:		// MI_INIT_MODE_REG
-            if (data & MI_CLR_INIT)     mi_mode &= ~MI_MODE_INIT;
-            if (data & MI_SET_INIT)     mi_mode |=  MI_MODE_INIT;
-            if (data & MI_CLR_EBUS)     mi_mode &= ~MI_MODE_EBUS;
-            if (data & MI_SET_EBUS)     mi_mode |=  MI_MODE_EBUS;
-            if (data & MI_CLR_RDRAM)    mi_mode &= ~MI_MODE_RDRAM;
-            if (data & MI_SET_RDRAM)    mi_mode |=  MI_MODE_RDRAM;
-            if (data & MI_CLR_DP_INTR)
-			{
-				clear_rcp_interrupt(space->machine, DP_INTERRUPT);
-			}
-			break;
-
-		case 0x04/4:		// MI_VERSION_REG
-			mi_version = data;
-			break;
-
-		case 0x0c/4:		// MI_INTR_MASK_REG
-		{
-            if (data & 0x0001)
-            {
-                mi_intr_mask &= ~0x1;      // clear SP mask
-            }
-            if (data & 0x0002)
-            {
-                mi_intr_mask |= 0x1;           // set SP mask
-            }
-            if (data & 0x0004)
-            {
-                mi_intr_mask &= ~0x2;      // clear SI mask
-            }
-            if (data & 0x0008)
-            {
-                mi_intr_mask |= 0x2;           // set SI mask
-            }
-            if (data & 0x0010)
-            {
-                mi_intr_mask &= ~0x4;      // clear AI mask
-            }
-            if (data & 0x0020)
-            {
-                mi_intr_mask |= 0x4;           // set AI mask
-            }
-            if (data & 0x0040)
-            {
-                mi_intr_mask &= ~0x8;      // clear VI mask
-            }
-            if (data & 0x0080)
-            {
-                mi_intr_mask |= 0x8;           // set VI mask
-            }
-            if (data & 0x0100)
-            {
-                mi_intr_mask &= ~0x10;     // clear PI mask
-            }
-            if (data & 0x0200)
-            {
-                mi_intr_mask |= 0x10;      // set PI mask
-            }
-            if (data & 0x0400)
-            {
-                mi_intr_mask &= ~0x20;     // clear DP mask
-            }
-            if (data & 0x0800)
-            {
-                mi_intr_mask |= 0x20;      // set DP mask
-            }
-			break;
-		}
-
-		default:
-			logerror("mi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
-			break;
-	}
-}
-
-
 // RSP Interface
 
-// #define RSP_STATUS_HALT          0x00000001
-
-//static UINT32 rsp_sp_status = 0;
-//static UINT32 cpu_sp_status = SP_STATUS_HALT;
 static UINT32 sp_mem_addr;
 static UINT32 sp_dram_addr;
 static int sp_dma_length;
 static int sp_dma_count;
 static int sp_dma_skip;
-
 static UINT32 sp_semaphore;
+static UINT32 dp_clock = 0;
 
 static void sp_dma(int direction)
 {
@@ -352,13 +345,13 @@ static void sp_dma(int direction)
 	}
 
 	sp_dma_length++;
-	if ((sp_dma_length & 3) != 0)
+	if ((sp_dma_length & 7) != 0)
 	{
 		//fatalerror("sp_dma (%s): sp_dma_length unaligned %08X\n", cpu ? "RSP" : "R4300i", sp_dma_length);
 		//sp_dma_length = sp_dma_length & ~3;
         sp_dma_length = (sp_dma_length + 7) & ~7;
 
-		//sp_dma_length &= ~3;
+		//sp_dma_length &= ~7;
 	}
 
 	if (sp_mem_addr & 0x3)
@@ -368,7 +361,7 @@ static void sp_dma(int direction)
         // sp_mem_addr &= ~0x3;
         // fatalerror("sp_dma (%s): sp_mem_addr unaligned: %08X\n", cpu ? "RSP" : "R4300i", sp_mem_addr);
 	}
-	if (sp_dram_addr & 0x3)
+	if (sp_dram_addr & 0x7)
 	{
         sp_dram_addr = sp_dram_addr & ~7;
 	}
@@ -474,23 +467,27 @@ READ32_HANDLER( n64_sp_reg_r )
 		case 0x1c/4:		// SP_SEMAPHORE_REG
             if( sp_semaphore )
             {
-                return 0;
+                return 1;
             }
             else
             {
                 sp_semaphore = 1;
-                return 1;
+                return 0;
             }
 
         case 0x20/4:        // DP_CMD_START
         case 0x24/4:        // DP_CMD_END
         case 0x28/4:        // DP_CMD_CURRENT
-        case 0x2c/4:        // DP_CMD_STATUS
-        case 0x30/4:        // DP_CMD_CLOCK
         case 0x34/4:        // DP_CMD_BUSY
         case 0x38/4:        // DP_CMD_PIPE_BUSY
         case 0x3c/4:        // DP_CMD_TMEM_BUSY
             return 0;
+
+        case 0x2c/4:        // DP_CMD_STATUS
+        	return 0x88;
+
+        case 0x30/4:        // DP_CMD_CLOCK
+        	return ++dp_clock;
 
         case 0x40000/4:     // PC
             return cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_PC) & 0x00000fff;
@@ -681,7 +678,10 @@ WRITE32_HANDLER( n64_sp_reg_w )
             }
 
 			case 0x1c/4:		// SP_SEMAPHORE_REG
-                sp_semaphore = 0;
+				if(data == 0)
+				{
+                	sp_semaphore = 0;
+				}
 		//      mame_printf_debug("sp_semaphore = %08X\n", sp_semaphore);
 				break;
 
@@ -717,7 +717,7 @@ WRITE32_HANDLER( n64_sp_reg_w )
 UINT32 dp_start;
 UINT32 dp_end;
 UINT32 dp_current;
-UINT32 dp_status = 0;
+UINT32 dp_status = 0x88;
 
 
 void dp_full_sync(running_machine *machine)
@@ -790,12 +790,16 @@ const rsp_config n64_rsp_config =
 
 
 // Video Interface
-UINT32 n64_vi_width; // This needs to be non-static
+UINT32 n64_vi_width;
 UINT32 n64_vi_origin;
 UINT32 n64_vi_control;
 UINT32 n64_vi_blank;
-static UINT32 n64_vi_burst, n64_vi_vsync,  n64_vi_hsync,  n64_vi_leap,  n64_vi_hstart, n64_vi_vstart;
-static UINT32 n64_vi_intr,  n64_vi_vburst, n64_vi_xscale, n64_vi_yscale;
+UINT32 n64_vi_hstart;
+UINT32 n64_vi_vstart;
+UINT32 n64_vi_xscale;
+UINT32 n64_vi_yscale;
+static UINT32 n64_vi_burst, n64_vi_vsync,  n64_vi_hsync,  n64_vi_leap;
+static UINT32 n64_vi_intr,  n64_vi_vburst;
 
 
 static void n64_vi_recalculate_resolution(running_machine *machine)
@@ -830,6 +834,8 @@ static void n64_vi_recalculate_resolution(running_machine *machine)
     if (height > 480)
         height = 480;
 
+	fb_height = height;
+
     visarea.max_x = width - 1;
     visarea.max_y = height - 1;
     video_screen_configure(machine->primary_screen, width, 525, &visarea, period);
@@ -839,6 +845,9 @@ READ32_HANDLER( n64_vi_reg_r )
 {
 	switch (offset)
 	{
+		case 0x00/4:		// VI_CONTROL_REG
+			return n64_vi_control;
+
 		case 0x04/4:		// VI_ORIGIN_REG
             return n64_vi_origin;
 
@@ -890,11 +899,8 @@ WRITE32_HANDLER( n64_vi_reg_w )
 	switch (offset)
 	{
 		case 0x00/4:		// VI_CONTROL_REG
-            if ((n64_vi_control & 0x40) != (data & 0x40))
-			{
-                n64_vi_recalculate_resolution(space->machine);
-			}
             n64_vi_control = data;
+            n64_vi_recalculate_resolution(space->machine);
 			break;
 
 		case 0x04/4:		// VI_ORIGIN_REG
@@ -1279,7 +1285,7 @@ WRITE32_HANDLER( n64_pi_reg_w )
 				for (i=0; i < dma_length; i++)
 				{
 					UINT8 b = memory_read_byte(space, pi_dram_addr);
-					memory_write_byte(space, pi_cart_addr, b);
+					memory_write_byte(space, pi_cart_addr & 0x1fffffff, b);
 					pi_cart_addr += 1;
 					pi_dram_addr += 1;
 				}
@@ -1312,7 +1318,7 @@ WRITE32_HANDLER( n64_pi_reg_w )
                     pi_dram_addr += 4;*/
 
 					UINT8 b = memory_read_byte(space, pi_cart_addr);
-					memory_write_byte(space, pi_dram_addr, b);
+					memory_write_byte(space, pi_dram_addr & 0x1fffffff, b);
 					pi_cart_addr += 1;
 					pi_dram_addr += 1;
 				}
@@ -1997,6 +2003,7 @@ MACHINE_RESET( n64 )
 	mi_version = 0;
 	mi_interrupt = 0;
 	mi_intr_mask = 0;
+	mi_mode = 0;
 
 	sp_mem_addr = 0;
 	sp_dram_addr = 0;
@@ -2008,7 +2015,7 @@ MACHINE_RESET( n64 )
 	dp_start = 0;
 	dp_end = 0;
 	dp_current = 0;
-	dp_status = 0;
+	dp_status = 0x88;
 
 	n64_vi_width = 0;
 	n64_vi_origin = 0;

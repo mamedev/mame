@@ -1,7 +1,12 @@
 /*
     Nintendo 64 Video Hardware
+
+    Initial version by Ville Linde
+    Many improvements by Harmony
+    Many improvements by angrylion, Gonetz, Orkin
 */
 
+#include <math.h>
 #include "driver.h"
 #include "includes/n64.h"
 
@@ -13,11 +18,20 @@ static UINT32 rdp_cmd_data[0x1000];
 static int rdp_cmd_ptr = 0;
 static int rdp_cmd_cur = 0;
 
+static UINT32 curpixel_cvg=0;
+static UINT32 curpixel_overlap = 0;
+
+//sign-extension macros
+#define SIGN17(x)	(((x) & 0x10000) ? ((x) | ~0x1ffff) : ((x) & 0x1ffff))
+#define SIGN16(x)	(((x) & 0x8000) ? ((x) | ~0xffff) : ((x) & 0xffff))
+#define SIGN11(x)	(((x) & 0x400) ? ((x) | ~0x7ff) : ((x) & 0x7ff))
+
 #define RDP_CVG_SPAN_MAX    1024
 
 typedef struct
 {
 	int lx, rx;
+	int dymax;
 	int s, ds;
 	int t, dt;
 	int w, dw;
@@ -27,6 +41,7 @@ typedef struct
 	int a, da;
 	int z, dz;
     UINT8 cvg[RDP_CVG_SPAN_MAX];
+    int dzpix;
 } SPAN;
 
 UINT8 cvg_mem[8*1048576];
@@ -54,19 +69,19 @@ typedef struct
 	UINT16 xl, yl, xh, yh;		// 10.2 fixed-point
 	INT16 s, t;					// 10.5 fixed-point
 	INT16 dsdx, dtdy;			// 5.10 fixed-point
+	int flip;
 } TEX_RECTANGLE;
 
 typedef struct
 {
-	int format, size;
-	UINT32 line;
-	UINT32 tmem;
-	int palette;
-	// TODO: clamp & mirror parameters
-	int ct, mt, cs, ms;
-	int mask_t, shift_t, mask_s, shift_s;
-
-	UINT16 sl, tl, sh, th;		// 10.2 fixed-point
+	int format;	// Image data format: RGBA, YUV, CI, IA, I
+	int size; // Size of texel element: 4b, 8b, 16b, 32b
+	UINT32 line; // Size of tile line in bytes
+	UINT32 tmem; // Starting tmem address for this tile in bytes
+	int palette; // Palette number for 4b CI texels
+	int ct, mt, cs, ms; // Clamp / mirror enable bits for S / T direction
+	int mask_t, shift_t, mask_s, shift_s; // Mask values / LOD shifts
+	UINT16 sl, tl, sh, th;		// 10.2 fixed-point, starting and ending texel row / column
 } TILE;
 
 typedef struct
@@ -157,6 +172,8 @@ static COLOR combined_color;
 static COLOR texel0_color;
 static COLOR texel1_color;
 static COLOR shade_color;
+static COLOR key_scale; // Used in NASCAR 2000
+static COLOR noise_color; // Used in Super Smash Bros.
 
 static COLOR one_color		= { 0xff, 0xff, 0xff, 0xff };
 static COLOR zero_color		= { 0x00, 0x00, 0x00, 0x00 };
@@ -203,6 +220,7 @@ static UINT16 primitive_delta_z;
 static int fb_format;
 static int fb_size;
 int fb_width;
+int fb_height;
 static UINT32 fb_address;
 
 static UINT32 zb_address;
@@ -219,43 +237,220 @@ static RECTANGLE clip;
 static UINT8 *texture_cache;
 static UINT32 tlut[256];
 
-#define MASK(S, T, CYCLE)                                               \
-do                                                                      \
-{                                                                       \
-    if (mask_s[CYCLE] != 0)                                             \
-    {                                                                   \
-        S &= (1 << mask_s[CYCLE]) - 1;                                  \
-    }                                                                   \
-    if (mask_t[CYCLE] != 0)                                             \
-    {                                                                   \
-        T &= (1 << mask_t[CYCLE]) - 1;                                  \
-    }                                                                   \
-}                                                                       \
-while (0)
+static INT32 k0, k1, k2, k3, k4, k5;
+static UINT8 primitive_lod_frac = 0;
+static UINT8 lod_frac = 0;
+static UINT8 hidden_bits[0x800000];
 
-#define CLAMP(S, T, CYCLE)                                              \
-do                                                                      \
-{                                                                       \
-    if (mask_s[CYCLE] != 0 && clamp_s[CYCLE])                           \
-    {                                                                   \
-        if (S < (tsl[CYCLE] >> 2)) S = (tsl[CYCLE] >> 2);               \
-        if (S > (tsh[CYCLE] >> 2)) S = (tsh[CYCLE] >> 2);               \
-    }                                                                   \
-    if (mask_s[CYCLE] != 0 && mirror_s[CYCLE])                          \
-    {                                                                   \
-        if (S & (1 << mask_s[CYCLE])) S ^= (1 << mask_s[CYCLE]) - 1;    \
-    }                                                                   \
-    if (mask_t[CYCLE] != 0 && clamp_t[CYCLE])                           \
-    {                                                                   \
-        if (T < (ttl[CYCLE] >> 2)) T = (ttl[CYCLE] >> 2);               \
-        if (T > (tth[CYCLE] >> 2)) T = (tth[CYCLE] >> 2);               \
-    }                                                                   \
-    if (mask_t[CYCLE] != 0 && mirror_t[CYCLE])                          \
-    {                                                                   \
-        if (T & (1 << mask_t[CYCLE])) T ^= (1 << mask_t[CYCLE]) - 1;    \
-    }                                                                   \
-}                                                                       \
-while (0)
+static INT32 NormPointRom[64];
+static INT32 NormSlopeRom[64];
+
+#define zmode other_modes.z_mode
+struct
+{
+	UINT32 shift;
+	UINT32 add;
+} z_dec_table[8] =
+{
+	{ 6, 0x00000 },
+	{ 5, 0x20000 },
+	{ 4, 0x30000 },
+	{ 3, 0x38000 },
+	{ 2, 0x3c000 },
+	{ 1, 0x3e000 },
+	{ 0, 0x3f000 },
+	{ 0, 0x3f800 },
+};
+
+static INT32 gamma_table[256];
+static INT32 gamma_dither_table[0x4000];
+static UINT16 z_com_table[0x40000]; // Pre-calculated table of compressed z values
+static UINT32 max_level = 0;
+static UINT32 min_level = 0;
+static COLOR ViBuffer[640][480]; // Used by divot filter
+static INT32 maskbits_table[16]; // Pre-calculated
+static INT32 clamp_t_diff[8];
+static INT32 clamp_s_diff[8];
+
+INLINE int alpha_compare(running_machine *machine, UINT8 comb_alpha);
+INLINE UINT8 alpha_cvg_get(UINT8 comb_alpha);
+INLINE UINT8 COMBINER_EQUATION(UINT8 A, UINT8 B, UINT8 C, UINT8 D);
+INLINE void BLENDER_EQUATION(INT32* r, INT32* g, INT32* b, int cycle, int bsel_special);
+INLINE UINT32 addrightcvg(UINT32 x, UINT32 k);
+INLINE UINT32 addleftcvg(UINT32 x, UINT32 k);
+INLINE UINT32 FBWRITE_16(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b);
+INLINE UINT32 FBWRITE_32(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b);
+//INLINE UINT32 FBWRITE_8(UINT8* fb, UINT8 c);
+INLINE UINT32 z_decompress(UINT16* zb);
+INLINE UINT16 dz_decompress(UINT16* zb, UINT8* zhb);
+INLINE void z_build_com_table(void);
+INLINE void z_store(UINT16* zb, UINT8* zhb, UINT32 z, UINT32 deltaz);
+INLINE UINT32 z_compare(void* fb, UINT8* hb, UINT16* zb, UINT8* zhb, UINT32 sz, UINT16 dzpix);
+INLINE INT32 normalize_dzpix(INT32 sum);
+INLINE INT32 CLIP(INT32 value,INT32 min,INT32 max);
+INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres);
+INLINE void divot_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff);
+INLINE void restore_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff, UINT32 hres);
+INLINE UINT32 getlog2(UINT32 lod_clamp);
+INLINE void set_shade_for_rects(void);
+INLINE void set_shade_for_tris(UINT32 shade);
+INLINE void copy_colors(COLOR* dst, COLOR* src);
+INLINE void BILERP_AND_WRITE(UINT32* src0, UINT32* src1, UINT32* dest);
+INLINE void tcdiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst);
+INLINE void divot_filter16_buffer(INT32* r, INT32* g, INT32* b, COLOR* vibuffer);
+INLINE void restore_filter16_buffer(INT32* r, INT32* g, INT32* b, COLOR* vibuff, UINT32 hres);
+INLINE void restore_two(COLOR* filtered, COLOR* neighbour);
+INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb);
+INLINE UINT32 ge_two(UINT32 enb);
+INLINE void calculate_clamp_diffs(UINT32 prim_tile);
+INLINE void rgb_dither(INT32* r, INT32* g, INT32* b, int dith);
+
+INLINE void MASK(INT32* S, INT32* T, INT32 cycle)
+{
+	INT32 swrap, twrap;
+
+	if (tile[cycle].mask_s) // Select clamp if mask == 0
+	{
+		swrap = *S >> (tile[cycle].mask_s > 10 ? 10 : tile[cycle].mask_s);
+		swrap &= 1;
+		if (tile[cycle].ms && swrap)
+		{
+			*S = (~(*S)) & maskbits_table[tile[cycle].mask_s]; // Mirroring and masking
+		}
+		else if (tile[cycle].mask_s)
+		{
+			*S &= maskbits_table[tile[cycle].mask_s]; // Masking
+		}
+	}
+
+	if (tile[cycle].mask_t)
+	{
+		twrap = *T >> (tile[cycle].mask_t > 10 ? 10 : tile[cycle].mask_t);
+		twrap &= 1;
+		if (tile[cycle].mt && twrap)
+		{
+			*T = (~(*T)) & maskbits_table[tile[cycle].mask_t]; // Mirroring and masking
+		}
+		else if (tile[cycle].mask_t)
+		{
+			*T &= maskbits_table[tile[cycle].mask_t];
+		}
+	}
+}
+
+INLINE void SHIFT(INT32* S, INT32* T, INT32* maxs, INT32* maxt, UINT32 num)
+{
+	*S = SIGN16(*S);
+	*T = SIGN16(*T);
+	if (tile[num].shift_s)
+	{
+		if (tile[num].shift_s < 11)
+		{
+			*S >>= tile[num].shift_s;
+		}
+		else
+		{
+			*S <<= (16 - tile[num].shift_s);
+		}
+		*S = SIGN16(*S);
+	}
+	if (tile[num].shift_s)
+	{
+		if (tile[num].shift_t < 11)
+		{
+			*T >>= tile[num].shift_t;
+		}
+    	else
+    	{
+			*T <<= (16 - tile[num].shift_t);
+		}
+		*T = SIGN16(*T);
+	}
+	*maxs = ((*S >> 3) >= tile[num].sh);
+	*maxt = ((*T >> 3) >= tile[num].th);
+}
+
+INLINE void CLAMP(INT32* S, INT32* T, INT32* SFRAC, INT32* TFRAC, INT32 maxs, INT32 maxt, INT32 num)
+{
+	int notcopy = (other_modes.cycle_type != CYCLE_TYPE_COPY);
+	int dosfrac = (tile[num].cs || !tile[num].mask_s);
+	int dos = dosfrac && notcopy;
+	int dotfrac = (tile[num].ct || !tile[num].mask_t);
+	int dot = dotfrac && notcopy;
+	int overunders = 0;
+	int overundert = 0;
+	if (*S & 0x10000 && dos)
+	{
+		*S = 0;
+		overunders = 1;
+	}
+	else if (maxs && dos)
+	{
+		*S = clamp_s_diff[num];
+		overunders = 1;
+
+	}
+	else
+	{
+		*S = (SIGN17(*S) >> 5) & 0x1fff;
+	}
+	if (overunders && dosfrac)
+	{
+		*SFRAC = 0;
+	}
+
+	if (*T & 0x10000 && dot)
+	{
+		*T = 0;
+		overundert = 1;
+	}
+	else if (maxt && dot)
+	{
+		*T = clamp_t_diff[num];
+		overundert = 1;
+	}
+	else
+	{
+		*T = (SIGN17(*T) >> 5) & 0x1fff;
+	}
+	if (overundert && dotfrac)
+	{
+		*TFRAC = 0;
+	}
+}
+
+INLINE void CLAMP_LIGHT(INT32* S, INT32* T, INT32 maxs, INT32 maxt, INT32 num)
+{
+	int notcopy = (other_modes.cycle_type != CYCLE_TYPE_COPY);
+	int dos = (tile[num].cs || !tile[num].mask_s) && notcopy;
+	int dot = (tile[num].ct || !tile[num].mask_t) && notcopy;
+
+	if (*S & 0x10000 && dos)
+	{
+		*S = 0;
+	}
+	else if (maxs && dos)
+	{
+		*S = clamp_s_diff[num];
+	}
+	else
+	{
+		*S = (SIGN17(*S) >> 5) & 0x1fff;
+	}
+
+	if (*T & 0x10000 && dot)
+	{
+		*T = 0;
+	}
+	else if (maxt && dot)
+	{
+		*T = clamp_t_diff[num];
+	}
+	else
+	{
+		*T = (SIGN17(*T) >> 5) & 0x1fff;
+	}
+}
 
 /*****************************************************************************/
 
@@ -263,6 +458,10 @@ while (0)
 
 VIDEO_START(n64)
 {
+	int i = 0;
+	UINT8 *normpoint = memory_region(machine, "normpoint");
+	UINT8 *normslope = memory_region(machine, "normslope");
+
 	if (LOG_RDP_EXECUTION)
 		rdp_exec = fopen("rdp_execute.txt", "wt");
 
@@ -294,157 +493,116 @@ VIDEO_START(n64)
 	blender2a_g[0] = blender2a_g[1] = &pixel_color.r;
 	blender2a_b[0] = blender2a_b[1] = &pixel_color.r;
 	blender2b_a[0] = blender2b_a[1] = &pixel_color.r;
-}
 
-static void vi_filter_16( INT32 x, INT32 y, UINT16 *out )
-{
-    UINT8 *cvg_buffer = &cvg_mem[n64_vi_origin / 4];
-    UINT16 *frame_buffer = (UINT16*)&rdram[n64_vi_origin / 4];
-    INT32 i_start = x - 2;
-    INT32 i_end = x + 2;
-    INT32 j_start = y - 1;
-    INT32 j_end = y + 1;
-    INT32 r_sum = 0;
-    INT32 g_sum = 0;
-    INT32 b_sum = 0;
-    INT32 covered_count = 0;
-    INT32 i = 0;
-    INT32 j = 0;
+	memset(hidden_bits, 3, 4194304); // Hack / fix for letters in Rayman 2
 
-    if (cvg_buffer[y*fb_width + x] == 8)
-    {
-        *out = frame_buffer[y*fb_width + x];
-        return;
-    }
+	for (i = 0; i < 256; i++)
+	{
+		gamma_table[i] = sqrt((float)(i << 6));
+		gamma_table[i] <<= 1;
+	}
 
-    if (i_start < 0)
-    {
-        i_start = 0;
-    }
-    if (j_start < 0)
-    {
-        j_start = 0;
-    }
-    if (i_end >= fb_width)
-    {
-        i_end = fb_width - 1;
-    }
-    if (j_end >= ((n64_vi_control & 0x40) ? 480 : 240))
-    {
-        j_end = (n64_vi_control & 0x40) ? 479 : 239;
-    }
+	for (i = 0; i < 0x4000; i++)
+	{
+		gamma_dither_table[i] = sqrt(i);
+		gamma_dither_table[i] <<= 1;
+	}
 
-    for (j = j_start; j <= j_end; j++)
-    {
-        for (i = i_start; i <= i_end; i++)
-        {
-            if (cvg_buffer[j*fb_width + x] == 8)
-            {
-                UINT16 color = frame_buffer[j*fb_width + x];
-                covered_count++;
-                r_sum += (color >> 11) & 0x1f;
-                g_sum += (color >>  6) & 0x1f;
-                b_sum += (color >>  1) & 0x1f;
-            }
-        }
-    }
+	z_build_com_table();
 
-    if (covered_count)
-    {
-        UINT16 fb = frame_buffer[y*fb_width + x];
-        r_sum /= covered_count;
-        g_sum /= covered_count;
-        b_sum /= covered_count;
-        if (r_sum > 0x1f) r_sum = 0x1f;
-        if (g_sum > 0x1f) g_sum = 0x1f;
-        if (b_sum > 0x1f) b_sum = 0x1f;
-        r_sum = (UINT32)(((float)r_sum / 8.0f) * (float)(8 - cvg_buffer[y*fb_width + x]) +
-                         ((float)((fb >> 11) & 0x1f) / 8.0f) * (float)cvg_buffer[y*fb_width + x]);
-        g_sum = (UINT32)(((float)g_sum / 8.0f) * (float)(8 - cvg_buffer[y*fb_width + x]) +
-                         ((float)((fb >>  6) & 0x1f) / 8.0f) * (float)cvg_buffer[y*fb_width + x]);
-        b_sum = (UINT32)(((float)b_sum / 8.0f) * (float)(8 - cvg_buffer[y*fb_width + x]) +
-                         ((float)((fb >>  1) & 0x1f) / 8.0f) * (float)cvg_buffer[y*fb_width + x]);
-        *out = (r_sum << 11) | (g_sum << 6) | (b_sum << 1);
-    }
-    else
-    {
-        *out = frame_buffer[y*fb_width + x];
-    }
-}
+	maskbits_table[0] = 0x3ff;
+	for(i = 1; i < 16; i++)
+	{
+		maskbits_table[i] = ((UINT16)(0xffff) >> (16 - i)) & 0x3ff;
+	}
 
-static void vi_filter_32( INT32 x, INT32 y, UINT32 *out )
-{
-    UINT8 *cvg_buffer = &cvg_mem[n64_vi_origin / 4];
-    UINT32 *frame_buffer = (UINT32*)&rdram[n64_vi_origin / 4];
-    INT32 i_start = x - 2;
-    INT32 i_end = x + 2;
-    INT32 j_start = y - 1;
-    INT32 j_end = y + 1;
-    UINT32 r_sum = 0;
-    UINT32 g_sum = 0;
-    UINT32 b_sum = 0;
-    INT32 covered_count = 0;
-    INT32 i = 0;
-    INT32 j = 0;
-
-    if (cvg_buffer[y*fb_width + x] == 8)
-    {
-        *out = frame_buffer[y*fb_width + x];
-        return;
-    }
-
-    if (i_start < 0)
-    {
-        i_start = 0;
-    }
-    if (j_start < 0)
-    {
-        j_start = 0;
-    }
-    if (i_end >= fb_width)
-    {
-        i_end = fb_width - 1;
-    }
-    if (j_end >= ((n64_vi_control & 0x40) ? 480 : 240))
-    {
-        j_end = (n64_vi_control & 0x40) ? 479 : 239;
-    }
-
-    for (j = j_start; j <= j_end; j++)
-    {
-        for (i = i_start; i <= i_end; i++)
-        {
-            if (cvg_buffer[j*fb_width + x] == 8)
-            {
-                UINT32 color = frame_buffer[j*fb_width + x];
-                covered_count++;
-                r_sum += (color >> 16) & 0xff;
-                g_sum += (color >>  8) & 0xff;
-                b_sum += (color >>  0) & 0xff;
-            }
-        }
-    }
-
-    if (covered_count)
-    {
-        r_sum /= covered_count;
-        g_sum /= covered_count;
-        b_sum /= covered_count;
-        if (r_sum > 0xff) r_sum = 0xff;
-        if (g_sum > 0xff) g_sum = 0xff;
-        if (b_sum > 0xff) b_sum = 0xff;
-        *out = (r_sum << 24) | (g_sum << 16) | (b_sum << 8) | 0xe0;
-    }
-    else
-    {
-        *out = frame_buffer[y*fb_width + x];
-    }
+	for(i = 0; i < 64; i++)
+	{
+		NormPointRom[i] = (normpoint[(i << 1) + 1] << 8) | normpoint[i << 1];
+		NormSlopeRom[i] = (normslope[(i << 1) + 1] << 8) | normslope[i << 1];
+	}
 }
 
 VIDEO_UPDATE(n64)
 {
 	int i, j;
-    int height = (n64_vi_control & 0x40) ? 479 : 239;
+	UINT32 final = 0;
+	UINT32 prev_cvg = 0, next_cvg = 0;
+    int height = fb_height;
+    int dither_filter = (n64_vi_control >> 16) & 1;
+    int fsaa = (((n64_vi_control >> 8) & 3) < 2);
+    int divot = (n64_vi_control >> 4) & 1;
+    int gamma = (n64_vi_control >> 3) & 1;
+    int gamma_dither = (n64_vi_control >> 2) & 1;
+    int vibuffering = ((n64_vi_control & 2) && fsaa && divot);
+
+    UINT32 *frame_buffer32;
+	UINT16 *frame_buffer;
+	UINT32 hb;
+	UINT8* hidden_buffer;
+	COLOR newc;
+
+	UINT32 pixels = 0;
+	UINT16 pix = 0;
+	int r, g, b;
+	int dith = 0;
+
+	INT32 hdiff = (n64_vi_hstart & 0x3ff) - ((n64_vi_hstart >> 16) & 0x3ff);
+	float hcoeff = ((float)(n64_vi_xscale & 0xfff) / (1 << 10));
+	UINT32 hres = ((float)hdiff * hcoeff);
+	INT32 invisiblewidth = n64_vi_width - hres;
+
+	INT32 vdiff = ((n64_vi_vstart & 0x3ff) - ((n64_vi_vstart >> 16) & 0x3ff)) >> 1;
+	float vcoeff = ((float)(n64_vi_yscale & 0xfff) / (1 << 10));
+	UINT32 vres = ((float)vdiff * vcoeff);
+
+	if (vdiff <= 0 || hdiff <= 0)
+	{
+		return 0;
+	}
+
+	frame_buffer = (UINT16*)&rdram[(n64_vi_origin & 0xffffff) >> 2];
+	hb = ((UINT32)(frame_buffer) - (UINT32)(rdram)) >> 1;
+	hidden_buffer = &hidden_bits[hb];
+
+	vibuffering = 0; // Disabled for now
+
+
+	if (hres > 640) // Needed by Top Gear Overdrive (E)
+	{
+		invisiblewidth += (hres - 640);
+		hres = 640;
+	}
+
+	if (vibuffering && ((n64_vi_control & 3) == 2))
+	{
+		if (frame_buffer)
+		{
+			for (j=0; j < vres; j++)
+			{
+				for (i=0; i < hres; i++)
+				{
+					UINT16 pix;
+					pix = frame_buffer[pixels ^ WORD_ADDR_XOR];
+					curpixel_cvg = ((pix & 1) << 2) | (hidden_buffer[pixels ^ BYTE_ADDR_XOR] & 3); // Reuse of this variable
+					if (curpixel_cvg < 7 && i > 1 && j > 1 && i < (hres - 2) && j < (vres - 2) && fsaa)
+					{
+						newc = video_filter16(&frame_buffer[pixels ^ WORD_ADDR_XOR], &hidden_buffer[pixels ^ BYTE_ADDR_XOR], n64_vi_width);
+						ViBuffer[i][j] = newc;
+					}
+					else
+					{
+						newc.r = (((pix >> 11) & 0x1f) << 3);
+						newc.g = (((pix >> 6) & 0x1f) << 3);
+						newc.b = (((pix >> 1) & 0x1f) << 3);
+						ViBuffer[i][j] = newc;
+					}
+					pixels++;
+				}
+				pixels += invisiblewidth;
+			}
+		}
+	}
 
     if (n64_vi_blank)
     {
@@ -468,23 +626,92 @@ VIDEO_UPDATE(n64)
 
 		case 2:		// RGBA5551
 		{
-            UINT16 *frame_buffer = (UINT16*)&rdram[n64_vi_origin / 4];
+			pixels = 0;
+
 			if (frame_buffer)
 			{
-				for (j=0; j <= height; j++)
+				for (j=0; j < vres; j++)
 				{
 					UINT32 *d = BITMAP_ADDR32(bitmap, j, 0);
-					for (i=0; i < fb_width; i++)
+
+					for (i=0; i < hres; i++)
 					{
-						//UINT16 pix = *frame_buffer++;
-                        UINT16 pix = 0;
-                        int r, g, b;
-                        vi_filter_16( i, j, &pix );
-						r = ((pix >> 11) & 0x1f) << 3;
-						g = ((pix >> 6) & 0x1f) << 3;
-						b = ((pix >> 1) & 0x1f) << 3;
-						d[BYTE_XOR_BE(i)] = (r << 16) | (g << 8) | b;
+						int r, g, b;
+
+						pix = frame_buffer[pixels ^ WORD_ADDR_XOR];
+						curpixel_cvg = ((pix & 1) << 2) | (hidden_buffer[pixels ^ BYTE_ADDR_XOR] & 3);
+
+						if (i > 0 && i < (hres - 1) && divot)
+						{
+							prev_cvg = ((frame_buffer[(pixels - 1)^WORD_ADDR_XOR] & 1) << 2) | (hidden_buffer[(pixels - 1)^BYTE_ADDR_XOR] & 3);
+							next_cvg = ((frame_buffer[(pixels + 1)^WORD_ADDR_XOR] & 1) << 2) | (hidden_buffer[(pixels + 1)^BYTE_ADDR_XOR] & 3);
+						}
+						r = (((pix >> 11) & 0x1f) << 3);
+						g = (((pix >> 6) & 0x1f) << 3);
+						b = (((pix >> 1) & 0x1f) << 3);
+
+						if (!vibuffering && curpixel_cvg < 7 && i > 1 && j > 1 && i < (hres - 2) && j < (vres - 2) && fsaa)
+						{
+							newc = video_filter16(&frame_buffer[pixels ^ WORD_ADDR_XOR],&hidden_buffer[pixels ^ BYTE_ADDR_XOR], n64_vi_width);
+							r = newc.r; g = newc.g; b = newc.b;
+						}
+						else if (dither_filter && curpixel_cvg == 7 && i > 0 && j > 0 && i < (hres - 1) && j < (vres - 1))
+						{
+							if (vibuffering)
+							{
+								restore_filter16_buffer(&r, &g, &b, &ViBuffer[i][j], n64_vi_width);
+							}
+							else
+							{
+								restore_filter16(&r, &g, &b, &frame_buffer[pixels ^ WORD_ADDR_XOR], n64_vi_width);
+							}
+						}
+						if (i > 0 && i < (hres - 1) && divot && (curpixel_cvg != 7 || prev_cvg != 7 || next_cvg != 7))
+						{
+							if (vibuffering)
+							{
+								divot_filter16_buffer(&r, &g, &b, &ViBuffer[i][j]);
+							}
+							else
+							{
+								divot_filter16(&r, &g, &b, &frame_buffer[pixels ^ WORD_ADDR_XOR]);
+							}
+						}
+
+						if (gamma_dither)
+						{
+							dith = mame_rand(screen->machine) & 0x3f;
+						}
+						if (gamma)
+						{
+							if (gamma_dither)
+							{
+								r = gamma_dither_table[(r << 6)|dith];
+								g = gamma_dither_table[(g << 6)|dith];
+								b = gamma_dither_table[(b << 6)|dith];
+							}
+							else
+							{
+								r = gamma_table[r];
+								g = gamma_table[g];
+								b = gamma_table[b];
+							}
+						}
+						else if (gamma_dither)
+						{
+							if (r < 255)
+								r += (dith & 1);
+							if (g < 255)
+								g += (dith & 1);
+							if (b < 255)
+								b += (dith & 1);
+						}
+						pixels++;
+
+						final = (r << 16) | (g << 8) | b;
+						d[i] = final; // Fix me for endianness
 					}
+					pixels +=invisiblewidth;
 				}
 			}
 			break;
@@ -492,19 +719,55 @@ VIDEO_UPDATE(n64)
 
 		case 3:		// RGBA8888
 		{
-            UINT32 *frame_buffer = (UINT32*)&rdram[n64_vi_origin / 4];
-			if (frame_buffer)
+            frame_buffer32 = (UINT32*)&rdram[(n64_vi_origin & 0xffffff) >> 2];
+			if (frame_buffer32)
 			{
-				for (j=0; j <= height; j++)
+				for (j=0; j < vres; j++)
 				{
 					UINT32 *d = BITMAP_ADDR32(bitmap, j, 0);
-					for (i=0; i < fb_width; i++)
+					for (i=0; i < hres; i++)
 					{
-                        //UINT32 pix = *frame_buffer++;
-                        UINT32 pix = 0;
-                        vi_filter_32( i, j, &pix );
-                        *d++ = (pix >> 8) & 0x00ffffff;
+						UINT32 pix = *frame_buffer32++;
+						if (gamma || gamma_dither)
+						{
+							r = (pix >> 24) & 0xff;
+							g = (pix >> 16) & 0xff;
+							b = (pix >> 8) & 0xff;
+							if (gamma_dither)
+							{
+								dith = mame_rand(screen->machine) & 0x3f;
+							}
+							if (gamma)
+							{
+								if (gamma_dither)
+								{
+									r = gamma_dither_table[(r << 6)| dith];
+									g = gamma_dither_table[(g << 6)| dith];
+									b = gamma_dither_table[(b << 6)| dith];
+								}
+								else
+								{
+									r = gamma_table[r];
+									g = gamma_table[g];
+									b = gamma_table[b];
+								}
+							}
+							else if (gamma_dither)
+							{
+								if (r < 255)
+									r += (dith & 1);
+								if (g < 255)
+									g += (dith & 1);
+								if (b < 255)
+									b += (dith & 1);
+							}
+							pix = (r << 24) | (g << 16) | (b << 8);
+						}
+
+
+						d[i] = (pix >> 8);
 					}
+					frame_buffer32 += invisiblewidth;
 				}
 			}
 			break;
@@ -528,7 +791,7 @@ INLINE void SET_SUBA_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b
 		case 4:		*input_r = &shade_color.r;		*input_g = &shade_color.g;		*input_b = &shade_color.b;		break;
 		case 5:		*input_r = &env_color.r;		*input_g = &env_color.g;		*input_b = &env_color.b;		break;
 		case 6:		*input_r = &one_color.r;		*input_g = &one_color.g;		*input_b = &one_color.b;		break;
-		case 7:		break; //TODO fatalerror("SET_SUBA_RGB_INPUT: noise\n"); break;
+		case 7:		*input_r = &noise_color.r;		*input_g = &noise_color.g;		*input_b = &noise_color.b;		break;
 		case 8: case 9: case 10: case 11: case 12: case 13: case 14: case 15:
 		{
 			*input_r = &zero_color.r;		*input_g = &zero_color.g;		*input_b = &zero_color.b;		break;
@@ -547,7 +810,7 @@ INLINE void SET_SUBB_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b
 		case 4:		*input_r = &shade_color.r;		*input_g = &shade_color.g;		*input_b = &shade_color.b;		break;
 		case 5:		*input_r = &env_color.r;		*input_g = &env_color.g;		*input_b = &env_color.b;		break;
 		case 6:		fatalerror("SET_SUBB_RGB_INPUT: key_center\n"); break;
-		case 7:		fatalerror("SET_SUBB_RGB_INPUT: convert_k4\n"); break;
+		case 7:		*input_r = (UINT8*)&k4;			*input_g = (UINT8*)&k4;			*input_b = (UINT8*)&k4;			break;
 		case 8: case 9: case 10: case 11: case 12: case 13: case 14: case 15:
 		{
 			*input_r = &zero_color.r;		*input_g = &zero_color.g;		*input_b = &zero_color.b;		break;
@@ -565,16 +828,16 @@ INLINE void SET_MUL_RGB_INPUT(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b,
 		case 3:		*input_r = &prim_color.r;		*input_g = &prim_color.g;		*input_b = &prim_color.b;		break;
 		case 4:		*input_r = &shade_color.r;		*input_g = &shade_color.g;		*input_b = &shade_color.b;		break;
 		case 5:		*input_r = &env_color.r;		*input_g = &env_color.g;		*input_b = &env_color.b;		break;
-		case 6:		fatalerror("SET_MUL_RGB_INPUT: key scale\n"); break;
+		case 6:		*input_r = &key_scale.r;		*input_g = &key_scale.g;		*input_b = &key_scale.b;		break;
 		case 7:		*input_r = &combined_color.a;	*input_g = &combined_color.a;	*input_b = &combined_color.a;	break;
 		case 8:		*input_r = &texel0_color.a;		*input_g = &texel0_color.a;		*input_b = &texel0_color.a;		break;
 		case 9:		*input_r = &texel1_color.a;		*input_g = &texel1_color.a;		*input_b = &texel1_color.a;		break;
 		case 10:	*input_r = &prim_color.a;		*input_g = &prim_color.a;		*input_b = &prim_color.a;		break;
 		case 11:	*input_r = &shade_color.a;		*input_g = &shade_color.a;		*input_b = &shade_color.a;		break;
 		case 12:	*input_r = &env_color.a;		*input_g = &env_color.a;		*input_b = &env_color.a;		break;
-		case 13:	break;//TODO fatalerror("SET_MUL_RGB_INPUT: lod fraction\n"); break;
-		case 14:	break;//TODO fatalerror("SET_MUL_RGB_INPUT: primitive lod fraction\n"); break;
-		case 15:	break;//TODO fatalerror("SET_MUL_RGB_INPUT: convert k5\n"); break;
+		case 13:	*input_r = &lod_frac;			*input_g = &lod_frac;			*input_b = &lod_frac;			break;
+		case 14:	*input_r = &primitive_lod_frac;	*input_g = &primitive_lod_frac;	*input_b = &primitive_lod_frac; break;
+		case 15:	*input_r = (UINT8*)&k5;			*input_g = (UINT8*)&k5;			*input_b = (UINT8*)&k5;			break;
 		case 16: case 17: case 18: case 19: case 20: case 21: case 22: case 23:
 		case 24: case 25: case 26: case 27: case 28: case 29: case 30: case 31:
 		{
@@ -617,108 +880,65 @@ INLINE void SET_MUL_ALPHA_INPUT(UINT8 **input, int code)
 {
 	switch (code & 0x7)
 	{
-		case 0:		break;//TODO fatalerror("SET_MUL_ALPHA_INPUT: lod fraction\n"); break;
+		case 0:		*input = &lod_frac; break;//HACK
 		case 1:		*input = &texel0_color.a; break;
 		case 2:		*input = &texel1_color.a; break;
 		case 3:		*input = &prim_color.a; break;
 		case 4:		*input = &shade_color.a; break;
 		case 5:		*input = &env_color.a; break;
-		case 6:		break;//TODO fatalerror("SET_MUL_ALPHA_INPUT: primitive lod fraction\n"); break;
+		case 6:		*input = &primitive_lod_frac; break;//HACK
 		case 7:		*input = &zero_color.a; break;
 	}
 }
 
 
 
-INLINE COLOR COLOR_COMBINER(int cycle)
+INLINE COLOR COLOR_COMBINER(running_machine *machine, int cycle)
 {
 	COLOR c;
+	COLOR temp;
 	UINT32 r, g, b, a;
 
-    r = (((UINT32)((UINT32)(*combiner_rgbsub_a_r[cycle]) - (UINT32)(*combiner_rgbsub_b_r[cycle])) *
-        *combiner_rgbmul_r[cycle]) >> 8);
+	if (other_modes.cycle_type == CYCLE_TYPE_1) //http://moogle-tech.com/blog/?p=84
+	{
+		cycle=1; // Needed by F-1 Pole Position 64 menus
+	}
 
-    g = (((UINT32)((UINT32)(*combiner_rgbsub_a_g[cycle]) - (UINT32)(*combiner_rgbsub_b_g[cycle])) *
-        *combiner_rgbmul_g[cycle]) >> 8);
+	if (other_modes.cycle_type == CYCLE_TYPE_2 && cycle == 1)
+	{
+		copy_colors(&temp, &texel0_color);
+		copy_colors(&texel0_color, &texel1_color);
+		copy_colors(&texel1_color, &temp);
+	}
 
-    b = (((UINT32)((UINT32)(*combiner_rgbsub_a_b[cycle]) - (UINT32)(*combiner_rgbsub_b_b[cycle])) *
-        *combiner_rgbmul_b[cycle]) >> 8);
+	if (combiner_rgbsub_a_r[cycle] == &noise_color.r)
+	{
+		noise_color.r = mame_rand(machine) & 0xff;
+		noise_color.g = mame_rand(machine) & 0xff;
+		noise_color.b = mame_rand(machine) & 0xff;
+	}
 
-    a = (((UINT32)((UINT32)(*combiner_alphasub_a[cycle]) - (UINT32)(*combiner_alphasub_b[cycle])) *
-        *combiner_alphamul[cycle]) >> 8);
+	r = COMBINER_EQUATION(*combiner_rgbsub_a_r[cycle],*combiner_rgbsub_b_r[cycle],*combiner_rgbmul_r[cycle],*combiner_rgbadd_r[cycle]);
+	g = COMBINER_EQUATION(*combiner_rgbsub_a_g[cycle],*combiner_rgbsub_b_g[cycle],*combiner_rgbmul_g[cycle],*combiner_rgbadd_g[cycle]);
+	b = COMBINER_EQUATION(*combiner_rgbsub_a_b[cycle],*combiner_rgbsub_b_b[cycle],*combiner_rgbmul_b[cycle],*combiner_rgbadd_b[cycle]);
+	a = COMBINER_EQUATION(*combiner_alphasub_a[cycle],*combiner_alphasub_b[cycle],*combiner_alphamul[cycle],*combiner_alphaadd[cycle]);
 
-    if (r & 0xffffff00)
-    {
-        if(r & 0x00000080)
-        {
-            r = 0;
-        }
-        else
-        {
-            r = 255;
-        }
-    }
-    if (g & 0xffffff00)
-    {
-        if(g & 0x00000080)
-        {
-            g = 0;
-        }
-        else
-        {
-            g = 255;
-        }
-    }
-    if (b & 0xffffff00)
-    {
-        if(b & 0x00000080)
-        {
-            b = 0;
-        }
-        else
-        {
-            b = 255;
-        }
-    }
-    if (a & 0xffffff00)
-    {
-        if(a & 0x00000080)
-        {
-            a = 0;
-        }
-        else
-        {
-            a = 255;
-        }
-    }
+	if (other_modes.cycle_type == CYCLE_TYPE_2 && cycle == 0)
+	{
+		combined_color.r=r;
+		combined_color.g=g;
+		combined_color.b=b;
+		combined_color.a=a;
+	}
 
-    c.r = r; c.g = g; c.b = b; c.a = a;
+	//Alpha coverage combiner
+	if (other_modes.cycle_type == CYCLE_TYPE_1 || (other_modes.cycle_type == CYCLE_TYPE_2 && cycle == 1))
+	{
+		a = alpha_cvg_get(a);
+	}
 
-    r += *combiner_rgbadd_r[cycle];
-    g += *combiner_rgbadd_g[cycle];
-    b += *combiner_rgbadd_b[cycle];
-    a += *combiner_alphaadd[cycle];
-
-    r &= 0x000000ff;
-    g &= 0x000000ff;
-    b &= 0x000000ff;
-    a &= 0x000000ff;
-
-    /*
-    if (r > 255) r = 255;
-    if (g > 255) g = 255;
-    if (b > 255) b = 255;
-    if (a > 255) a = 255;
-    */
-
-    c.r = r; c.g = g; c.b = b; c.a = a;
-
-    combined_color.r = r;
-    combined_color.g = g;
-    combined_color.b = b;
-    combined_color.a = a;
-
-    return c;
+	c.r = r; c.g = g; c.b = b; c.a = a;
+	return c;
 }
 
 INLINE void SET_BLENDER_INPUT(int cycle, int which, UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, UINT8 **input_a, int a, int b)
@@ -744,8 +964,6 @@ INLINE void SET_BLENDER_INPUT(int cycle, int which, UINT8 **input_r, UINT8 **inp
 
 		case 1:
 		{
-			//fatalerror("SET_BLENDER_INPUT: cycle %d, input A: memory color\n", cycle);
-			// TODO
 			*input_r = &memory_color.r;
 			*input_g = &memory_color.g;
 			*input_b = &memory_color.b;
@@ -770,7 +988,7 @@ INLINE void SET_BLENDER_INPUT(int cycle, int which, UINT8 **input_r, UINT8 **inp
 		switch (b & 0x3)
 		{
 			case 0:		*input_a = &pixel_color.a; break;
-			case 1:		*input_a = &one_color.a; break;
+			case 1:		*input_a = &fog_color.a; break;
 			case 2:		*input_a = &shade_color.a; break;
 			case 3:		*input_a = &zero_color.a; break;
 		}
@@ -787,258 +1005,2242 @@ INLINE void SET_BLENDER_INPUT(int cycle, int which, UINT8 **input_r, UINT8 **inp
 	}
 }
 
-static const UINT8 dither_matrix_4x4[16] =
-{
-	 0,  8,  2, 10,
-	12,  4, 14,  6,
-	 3, 11,  1,  9,
-	15,  7, 13,  5
+static const UINT8 bayer_matrix[16] =
+{ /* Bayer matrix */
+	 0,  4,  1, 5,
+	 6,  2,  7, 3,
+	 1,	 5,  0, 4,
+	 7,  3,  6, 2
 };
 
-#define DITHER_RB(val,dith)	((((val) << 1) - ((val) >> 4) + ((val) >> 7) + (dith)) >> 1)
-#define DITHER_G(val,dith)	((((val) << 2) - ((val) >> 4) + ((val) >> 6) + (dith)) >> 2)
+static const UINT8 magic_matrix[16] =
+{ /* Magic square matrix */
+	 0,  6,  1, 7,
+	 4,  2,  5, 3,
+	 3,	 5,  2, 4,
+	 7,  1,  6, 0
+};
 
-INLINE void BLENDER1_16(UINT16 *fb, COLOR c, int dith, UINT8 *new_cvg, UINT8 *old_cvg, int *alpha_reject)
+INLINE int BLENDER1_16(running_machine *machine, UINT16 *fb, UINT8* hb, COLOR c, int dith)
 {
-    int r, g, b;
+	int r, g, b;
+	int special_bsel = 0;
+	UINT16 mem = *fb;
+	UINT32 memory_cvg = ((mem & 1) << 2) + (*hb & 3);
 
-    if (other_modes.force_blend )
-    {
-        blend_color.r = c.r;
-        blend_color.g = c.g;
-        blend_color.b = c.b;
-    }
+	// Alpha compare
+	if (!alpha_compare(machine, c.a))
+	{
+		return 0;
+	}
+	if (!curpixel_cvg) // New coverage is zero, so abort
+	{
+		return 0;
+	}
 
-    pixel_color.r = c.r;
-    pixel_color.g = c.g;
-    pixel_color.b = c.b;
-    pixel_color.a = c.a;
-    inv_pixel_color.r = 0xff - *blender1a_r[0];
-    inv_pixel_color.g = 0xff - *blender1a_g[0];
-    inv_pixel_color.b = 0xff - *blender1a_b[0];
-    inv_pixel_color.a = 0xff - *blender1b_a[0];
+	if (blender2b_a[0] == &memory_color.a)
+	{
+		special_bsel = 1;
+	}
 
-    if( other_modes.alpha_cvg_select )
-    {
-        if( other_modes.cvg_times_alpha )
-        {
-            pixel_color.a = (UINT8)( ( (INT32)(c.a) * (INT32)( (*new_cvg) * 0x20 - 1 ) ) >> 8 );
-        }
-        else
-        {
-            pixel_color.a = (UINT8)( (INT32)(*new_cvg) * 0x20 - 1 );
-        }
-        inv_pixel_color.a = 0xff - pixel_color.a;
+	copy_colors(&pixel_color,&c);
 
-        if( pixel_color.a == 0 )
-        {
-            *alpha_reject = 1;
-            return;
-        }
-    }
+	if (!other_modes.z_compare_en)
+	{
+		curpixel_overlap = 0;
+	}
 
-    if (other_modes.image_read_en)
-    {
-        UINT16 mem = *fb;
-        memory_color.r = (((mem >> 11) & 0x1f) << 3) | ((mem >> 13) & 0x07);
-        memory_color.g = (((mem >>  6) & 0x1f) << 3) | ((mem >>  8) & 0x07);
-        memory_color.b = (((mem >>  1) & 0x1f) << 3) | ((mem >>  3) & 0x07);
-        memory_color.a = /*(UINT8)((INT32)(*old_cvg) * 0x20 - 1)*/0;
-    }
+	memory_color.r = ((mem >> 11) & 0x1f) << 3;
+	memory_color.g = ((mem >>  6) & 0x1f) << 3;
+	memory_color.b = ((mem >>  1) & 0x1f) << 3;
 
-    if (((int)(*blender1b_a[0]) + (int)(*blender2b_a[0])) > 0)
-    {
-        r = ((int)(*blender1a_r[0]) * (int)(*blender1b_a[0]) +
-             (int)(*blender2a_r[0]) * (int)(*blender2b_a[0])) /
-            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
+	if (other_modes.image_read_en)
+	{
+		memory_color.a = (memory_cvg << 5) & 0xe0;
+	}
+	else
+	{
+		memory_color.a = 0xe0;
+	}
 
-        g = ((int)(*blender1a_g[0]) * (int)(*blender1b_a[0]) +
-             (int)(*blender2a_g[0]) * (int)(*blender2b_a[0])) /
-            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
+	if (!curpixel_overlap && !other_modes.force_blend)
+	{
+		r = *blender1a_r[0];
+		g = *blender1a_g[0];
+		b = *blender1a_b[0];
+	}
+	else
+	{
+		inv_pixel_color.a = 0xff - *blender1b_a[0];
 
-        b = ((int)(*blender1a_b[0]) * (int)(*blender1b_a[0]) +
-             (int)(*blender2a_b[0]) * (int)(*blender2b_a[0])) /
-            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
-    }
-    else
-    {
-        r = g = b = 0;
-    }
+		BLENDER_EQUATION(&r, &g, &b, 0, special_bsel);
+	}
 
-    //r = g = b = 0xff;
+	if (other_modes.rgb_dither_sel < 2)
+	{
+		// Hack to prevent "double-dithering" artifacts
+		int dithhack = ((r & 0xf8)==(memory_color.r&0xf8) && (g & 0xf8) == (memory_color.g & 0xf8) &&(b&0xf8)==(memory_color.b&0xf8));
+		if (!dithhack)
+		{
+			rgb_dither(&r, &g, &b, dith);
+		}
+	}
 
-    if (r > 255) r = 255;
-    if (g > 255) g = 255;
-    if (b > 255) b = 255;
-
-    if (other_modes.rgb_dither_sel != 3)
-    {
-        r = DITHER_RB(r, dith);
-        g = DITHER_G (g, dith);
-        b = DITHER_RB(b, dith);
-    }
-
-    *fb = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1) | 1;
+    return (FBWRITE_16(fb, hb, r, g, b));
 }
 
-INLINE void BLENDER2_16(UINT16 *fb, COLOR c1, COLOR c2, int dith, UINT8 *new_cvg, UINT8 *old_cvg, int *alpha_reject)
+INLINE int BLENDER2_16(running_machine *machine, UINT16 *fb, UINT8* hb, COLOR c1, COLOR c2, int dith)
 {
-    int r, g, b;
+	int r, g, b;
+	int special_bsel = 0;
+	UINT16 mem = *fb;
+	UINT32 memory_cvg = ((mem & 1) << 2) + (*hb & 3);
 
-    if( other_modes.force_blend )
-    {
-        blend_color.r = c2.r;
-        blend_color.g = c2.g;
-        blend_color.b = c2.b;
-    }
+	// Alpha compare
+	if (!alpha_compare(machine, c2.a))
+	{
+		return 0;
+	}
+	if (!curpixel_cvg)
+	{
+		return 0;
+	}
 
-    pixel_color.r = c2.r;
-    pixel_color.g = c2.g;
-    pixel_color.b = c2.b;
-    pixel_color.a = c2.a;
-    inv_pixel_color.r = 0xff - *blender1a_r[0];
-    inv_pixel_color.g = 0xff - *blender1a_g[0];
-    inv_pixel_color.b = 0xff - *blender1a_b[0];
-    inv_pixel_color.a = 0xff - *blender1b_a[0];
-    *alpha_reject = 0;
+	if (blender2b_a[0] == &memory_color.a)
+	{
+		special_bsel = 1;
+	}
 
-    if( other_modes.alpha_cvg_select )
-    {
-        if( other_modes.cvg_times_alpha )
-        {
-            pixel_color.a = (UINT8)( ( (INT32)(c2.a) * (INT32)( (*new_cvg) * 0x20 - 1 ) ) >> 8 );
-        }
-        else
-        {
-            pixel_color.a = (UINT8)( (INT32)(*new_cvg) * 0x20 - 1 );
-        }
-        //inv_pixel_color.a = 0xff - pixel_color.a;
+	copy_colors(&pixel_color, &c2);
+	if (!other_modes.z_compare_en)
+	{
+		curpixel_overlap = 0;
+	}
 
-        if( pixel_color.a == 0 )
-        {
-            *alpha_reject = 1;
-            return;
-        }
-    }
+	memory_color.r = ((mem >> 11) & 0x1f) << 3;
+	memory_color.g = ((mem >>  6) & 0x1f) << 3;
+	memory_color.b = ((mem >>  1) & 0x1f) << 3;
 
-    if (other_modes.image_read_en)
-    {
-        UINT16 mem = *fb;
-        memory_color.r = (((mem >> 11) & 0x1f) << 3) | ((mem >> 13) & 0x07);
-        memory_color.g = (((mem >>  6) & 0x1f) << 3) | ((mem >>  8) & 0x07);
-        memory_color.b = (((mem >>  1) & 0x1f) << 3) | ((mem >>  3) & 0x07);
-        memory_color.a = /*(UINT8)((INT32)(*old_cvg) * 0x20 - 1)*/0;
-    }
+	if (other_modes.image_read_en)
+	{
+		memory_color.a = (memory_cvg << 5) & 0xe0;
+	}
+	else
+	{
+		memory_color.a = 0xe0;
+	}
 
-    if (((int)(*blender1b_a[0]) + (int)(*blender2b_a[0])) > 0)
-    {
-        r = ((int)(*blender1a_r[0]) * (int)(*blender1b_a[0]) +
-             (int)(*blender2a_r[0]) * (int)(*blender2b_a[0])) /
-            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
+	inv_pixel_color.a = 0xff - *blender1b_a[0];
 
-        g = ((int)(*blender1a_g[0]) * (int)(*blender1b_a[0]) +
-             (int)(*blender2a_g[0]) * (int)(*blender2b_a[0])) /
-            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
+	BLENDER_EQUATION(&r, &g, &b, 0, special_bsel);
 
-        b = ((int)(*blender1a_b[0]) * (int)(*blender1b_a[0]) +
-             (int)(*blender2a_b[0]) * (int)(*blender2b_a[0])) /
-            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
-    }
-    else
-    {
-        r = g = b = 0;
-    }
+	blended_pixel_color.r = r;
+	blended_pixel_color.g = g;
+	blended_pixel_color.b = b;
+	blended_pixel_color.a = pixel_color.a;
 
-    blended_pixel_color.r = r;
-    blended_pixel_color.g = g;
-    blended_pixel_color.b = b;
+	pixel_color.r = r;
+	pixel_color.g = g;
+	pixel_color.b = b;
 
-    pixel_color.r = c2.r;
-    pixel_color.g = c2.g;
-    pixel_color.b = c2.b;
-    pixel_color.a = c2.a;
-    inv_pixel_color.r = 0xff - *blender1a_r[1];
-    inv_pixel_color.g = 0xff - *blender1a_g[1];
-    inv_pixel_color.b = 0xff - *blender1a_b[1];
-    inv_pixel_color.a = 0xff - *blender1b_a[1];
+	inv_pixel_color.a = 0xff - *blender1b_a[1];
 
-    if( other_modes.alpha_cvg_select )
-    {
-        if( other_modes.cvg_times_alpha )
-        {
-            pixel_color.a = (UINT8)( ( (INT32)(c2.a) * (INT32)( (*new_cvg) * 0x20 - 1 ) ) >> 8 );
-        }
-        else
-        {
-            pixel_color.a = (UINT8)( (INT32)(*new_cvg) * 0x20 - 1 );
-        }
+	if (!curpixel_overlap && !other_modes.force_blend)
+	{
+		r = *blender1a_r[1];
+		g = *blender1a_g[1];
+		b = *blender1a_b[1];
+	}
+	else
+	{
+		if (blender2b_a[1] == &memory_color.a)
+		{
+			special_bsel = 1;
+		}
+		else
+		{
+			special_bsel = 0;
+		}
 
-        if( pixel_color.a == 0 )
-        {
-            *alpha_reject = 1;
-            return;
-        }
-    }
+		BLENDER_EQUATION(&r, &g, &b, 1, special_bsel);
+	}
 
-    if (((int)(*blender1b_a[1]) + (int)(*blender2b_a[1])) > 0)
-    {
-        r = ((int)(*blender1a_r[1]) * (int)(*blender1b_a[1]) +
-             (int)(*blender2a_r[1]) * (int)(*blender2b_a[1])) /
-            ((int)(*blender1b_a[1]) + (int)(*blender2b_a[1]));
+	if (other_modes.rgb_dither_sel < 2)
+	{
+		// Hack to prevent "double-dithering" artifacts
+		int dithhack = ((r & 0xf8)==(memory_color.r&0xf8) && (g & 0xf8) == (memory_color.g & 0xf8) &&(b&0xf8)==(memory_color.b&0xf8));
+		if (!dithhack)
+		{
+			rgb_dither(&r, &g, &b, dith);
+		}
+	}
 
-        g = ((int)(*blender1a_g[1]) * (int)(*blender1b_a[1]) +
-             (int)(*blender2a_g[1]) * (int)(*blender2b_a[1])) /
-            ((int)(*blender1b_a[1]) + (int)(*blender2b_a[1]));
-
-        b = ((int)(*blender1a_b[1]) * (int)(*blender1b_a[1]) +
-             (int)(*blender2a_b[1]) * (int)(*blender2b_a[1])) /
-            ((int)(*blender1b_a[1]) + (int)(*blender2b_a[1]));
-    }
-
-    //if (r > 255) r = 255;
-    //if (g > 255) g = 255;
-    //if (b > 255) b = 255;
-    if (r > 255) r = 255;
-    if (g > 255) g = 255;
-    if (b > 255) b = 255;
-    if (r < 0)   r = 0;
-    if (g < 0)   g = 0;
-    if (b < 0)   b = 0;
-    //r &= 0x000000ff;
-    //g &= 0x000000ff;
-    //b &= 0x000000ff;
-
-    if (other_modes.rgb_dither_sel != 3)
-    {
-        r = DITHER_RB(r, dith);
-        g = DITHER_G (g, dith);
-        b = DITHER_RB(b, dith);
-    }
-
-    *fb = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1) | 1;
+	return (FBWRITE_16(fb, hb, r, g, b));
 }
 
 /*****************************************************************************/
 
-static void fill_rectangle_16bit(RECTANGLE *rect)
+
+static void fill_rectangle_16bit(running_machine *machine, RECTANGLE *rect)
 {
 	UINT16 *fb = (UINT16*)&rdram[(fb_address / 4)];
-    UINT8* cvg_buf = (UINT8*)&cvg_mem[fb_address];
+	UINT8* hb = &hidden_bits[fb_address >> 1];
+
 	int index, i, j;
 	int x1 = rect->xh / 4;
 	int x2 = rect->xl / 4;
 	int y1 = rect->yh / 4;
 	int y2 = rect->yl / 4;
 	int clipx1, clipx2, clipy1, clipy2;
-    int alpha_reject = 0;
-    COLOR c1, c2;
-
 	UINT16 fill_color1, fill_color2;
+	int fill_cvg1;
+	int fill_cvg2;
+
+	if (x2 <= x1)
+	{
+		x2=x1+1; // SCARS (E)
+	}
+	if (y2 == y1)
+	{
+		y2=y1+1; // Goldeneye
+	}
+
+
 	fill_color1 = (fill_color >> 16) & 0xffff;
 	fill_color2 = (fill_color >>  0) & 0xffff;
+	fill_cvg1 = (fill_color1 & 1) ? 8 : 1;
+	fill_cvg2 = (fill_color2 & 1) ? 8 : 1;
 
-    c1.r = c1.g = c1.b = c1.a = 0;
-    c2.r = c2.g = c2.b = c2.a = 0;
+	clipx1 = clip.xh / 4;
+	clipx2 = clip.xl / 4;
+	clipy1 = clip.yh / 4;
+	clipy2 = clip.yl / 4;
+
+	// clip
+	if (x1 < clipx1)
+	{
+		x1 = clipx1;
+	}
+	if (y1 < clipy1)
+	{
+		y1 = clipy1;
+	}
+	if (x2 >= clipx2)
+	{
+		x2 = clipx2-1;
+	}
+	if (y2 >= clipy2)
+	{
+		y2 = clipy2-1;
+	}
+
+	set_shade_for_rects(); // Needed by Command & Conquer menus
+
+	if (other_modes.cycle_type == CYCLE_TYPE_FILL)
+	{
+		for (j=y1; j <= y2; j++)
+		{
+			index = j * fb_width;
+			for (i=x1; i <= x2; i++)
+			{
+				int curpixel = index + i;
+				fb[curpixel ^ WORD_ADDR_XOR] = (i & 1) ? fill_color1 : fill_color2;
+				hb[curpixel ^ BYTE_ADDR_XOR] = (i & 1) ? ((fill_color1 & 1)? 3:0) : ((fill_color2 & 1) ? 3:0);
+			}
+		}
+	}
+	else if (other_modes.cycle_type == CYCLE_TYPE_1)
+	{
+		for (j = y1; j <= y2; j++)
+		{
+			COLOR c;
+			int dith = 0;
+			index = j * fb_width;
+			for (i = x1; i <= x2; i++)
+			{
+				curpixel_cvg = (i & 1) ? fill_cvg1 : fill_cvg2;
+				c = COLOR_COMBINER(machine, 0);
+				if (!other_modes.rgb_dither_sel)
+				{
+					dith = magic_matrix[(((j) & 3) << 2) + ((i ^ WORD_ADDR_XOR) & 3)];
+				}
+				else if (other_modes.rgb_dither_sel == 1)
+				{
+					dith = bayer_matrix[(((j) & 3) << 2) + ((i ^ WORD_ADDR_XOR) & 3)];
+				}
+				BLENDER1_16(machine, &fb[(index + i) ^ WORD_ADDR_XOR], &hb[(index + i) ^ BYTE_ADDR_XOR], c, dith);
+			}
+		}
+	}
+	else if (other_modes.cycle_type == CYCLE_TYPE_2)
+	{
+		for (j=y1; j <= y2; j++)
+		{
+			COLOR c1, c2;
+			int dith = 0;
+			index = j * fb_width;
+			for (i=x1; i <= x2; i++)
+			{
+				curpixel_cvg = (i & 1) ? fill_cvg1 : fill_cvg2;
+				c1 = COLOR_COMBINER(machine, 0);
+				c2 = COLOR_COMBINER(machine, 1);
+				if (!other_modes.rgb_dither_sel)
+				{
+					dith = magic_matrix[(((j) & 3) << 2) + ((i ^ WORD_ADDR_XOR) & 3)];
+				}
+				else if (other_modes.rgb_dither_sel == 1)
+				{
+					dith = bayer_matrix[(((j) & 3) << 2) + ((i ^ WORD_ADDR_XOR) & 3)];
+				}
+				BLENDER2_16(machine, &fb[(index + i) ^ WORD_ADDR_XOR],  &hb[(index + i) ^ BYTE_ADDR_XOR], c1, c2, dith);
+			}
+		}
+	}
+	else
+	{
+		fatalerror("fill_rectangle_16bit: cycle type copy");
+	}
+}
+
+#define XOR_SWAP_BYTE	4
+#define XOR_SWAP_WORD	2
+#define XOR_SWAP_DWORD	1
+
+INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
+{
+	UINT32 twidth	= tile[tilenum].line;
+	UINT32	tformat = tile[tilenum].format;
+	UINT32 tsize =	tile[tilenum].size;
+	UINT32 tbase =	tile[tilenum].tmem;
+	UINT32 tpal	= tile[tilenum].palette;
+
+	if (t < 0) t = 0;
+	if (s < 0) s = 0;
+
+	switch (tformat)
+	{
+		case 0:		// RGBA
+		{
+			switch (tsize)
+			{
+				case PIXEL_SIZE_4BIT:
+				{
+					UINT8 *tc = (UINT8*)texture_cache;
+                    int taddr = ((tbase + ((t) * twidth) + ((s) / 2)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0)) & 0x7ff;
+					UINT8 p = ((s) & 1) ? (tc[taddr ^ BYTE_ADDR_XOR] & 0xf) : (tc[taddr ^ BYTE_ADDR_XOR] >> 4);
+					UINT16 c = tlut[((tpal << 4) | p) ^ WORD_ADDR_XOR];
+
+					if (other_modes.en_tlut)
+					{
+						if (other_modes.tlut_type == 0)
+						{
+							color->r = ((c >> 11) & 0x1f) << 3;
+							color->g = ((c >>  6) & 0x1f) << 3;
+							color->b = ((c >>  1) & 0x1f) << 3;
+							color->a = (c & 1) ? 0xff : 0;
+						}
+						else
+						{
+							color->r = color->g = color->b = (c >> 8) & 0xff;
+							color->a = c & 0xff;
+						}
+					}
+					else
+					{
+						color->r = color->g = color->b = color->a = (tpal << 4) | p;
+					}
+					break;
+				}
+				case PIXEL_SIZE_8BIT:
+				{
+					UINT8 *tc = (UINT8*)texture_cache;
+                    int taddr = ((tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0)) & 0x7ff;
+					UINT8 p = tc[taddr ^ BYTE_ADDR_XOR];
+					UINT16 c = tlut[p ^ WORD_ADDR_XOR];
+
+					if (other_modes.en_tlut)
+					{
+						if (other_modes.tlut_type == 0)
+						{
+							color->r = ((c >> 11) & 0x1f) << 3;
+							color->g = ((c >>  6) & 0x1f) << 3;
+							color->b = ((c >>  1) & 0x1f) << 3;
+							color->a = (c & 1) ? 0xff : 0;
+						}
+						else
+						{
+							color->r = color->g = color->b = (c >> 8) & 0xff;
+							color->a = c & 0xff;
+						}
+					}
+					else
+					{
+						color->r = color->g = color->b = color->a = p;
+					}
+					break;
+				}
+				case PIXEL_SIZE_16BIT:
+				{
+					UINT16 *tc = (UINT16*)texture_cache;
+                    int taddr = ((tbase>>1) + ((t) * (twidth>>1)) + (s))  ^ ((t & 1) ? XOR_SWAP_WORD : 0);
+					UINT16 c = tc[(taddr & 0x7ff) ^ WORD_ADDR_XOR]; // PGA European Tour (U)
+
+					if (!other_modes.en_tlut)
+					{
+						color->r = ((c >> 11) & 0x1f) << 3;
+						color->g = ((c >>  6) & 0x1f) << 3;
+						color->b = ((c >>  1) & 0x1f) << 3;
+						color->a = (c & 1) ? 0xff : 0;
+					}
+					else
+					{
+						c = tlut[(c >> 8) << 2];
+						if (other_modes.tlut_type == 0) //Golden Eye 007, sea, "frigate" level
+						{
+							color->r = ((c >> 11) & 0x1f) << 3;
+							color->g = ((c >>  6) & 0x1f) << 3;
+							color->b = ((c >>  1) & 0x1f) << 3;
+							color->a = (c & 1) ? 0xff : 0;
+						}
+						else // Beetle Adventure Racing, Mount Mayhem
+						{
+							color->r = color->g = color->b = (c >> 8) & 0xff;
+							color->a = c & 0xff;
+						}
+					}
+					break;
+				}
+				case PIXEL_SIZE_32BIT:
+				{
+					UINT32 *tc = (UINT32*)texture_cache;
+					int xorval = (fb_size == PIXEL_SIZE_16BIT) ? XOR_SWAP_DWORD : XOR_SWAP_WORD; // Conker's Bad Fur Day, Jet Force Gemini, Super Smash Bros., Mickey's Speedway USA, Ogre Battle, Wave Race, Gex 3, South Park Rally
+                    int taddr = (((tbase >> 2) + ((t) * (twidth >> 1)) + (s)) ^ ((t & 1) ? xorval : 0)) & 0x3ff;
+					UINT32 c = tc[taddr];
+
+					if (!other_modes.en_tlut)
+					{
+						color->r = ((c >> 24) & 0xff);
+						color->g = ((c >> 16) & 0xff);
+						color->b = ((c >>  8) & 0xff);
+						color->a = ((c >>  0) & 0xff);
+					}
+					else
+					{
+						c = tlut[(c >> 24) << 2];
+						if (!other_modes.tlut_type)
+						{
+							color->r = ((c >> 11) & 0x1f) << 3;
+							color->g = ((c >>  6) & 0x1f) << 3;
+							color->b = ((c >>  1) & 0x1f) << 3;
+							color->a = (c & 1) ? 0xff : 0;
+						}
+						else
+						{
+							color->r = color->g = color->b = (c >> 8) & 0xff;
+							color->a = c & 0xff;
+						}
+					}
+					break;
+				}
+				default:
+					color->r = color->g = color->b = color->a = 0xff;
+					fatalerror("FETCH_TEXEL: unknown RGBA texture size %d\n", tsize);
+					break;
+			}
+			break;
+		}
+		case 1:		// YUV: Bottom of the 9th, Pokemon Stadium, Ogre Battle 64
+		{
+			switch (tsize)
+			{
+				case PIXEL_SIZE_16BIT:
+				{
+					INT32 newr = 0;
+					INT32 newg = 0;
+					INT32 newb = 0;
+					UINT16 *tc = (UINT16*)texture_cache;
+					int taddr = ((tbase >> 1) + ((t) * (twidth)) + (s)) ^ ((t & 1) ? XOR_SWAP_WORD : 0);
+					UINT16 c1, c2;
+					INT32 y;
+					INT32 u, v;
+					c1 = tc[taddr ^ WORD_ADDR_XOR];
+					c2 = tc[taddr]; // other word
+
+					if (!(taddr & 1))
+					{
+						v = c2 >> 8;
+						u = c1 >> 8;
+						y = c1 & 0xff;
+					}
+					else
+					{
+						v = c1 >> 8;
+						u = c2 >> 8;
+						y = c1 & 0xff;
+					}
+					v -= 128;
+					u -= 128;
+
+					if (!other_modes.bi_lerp0)
+					{
+						newr = y + ((k0 * v) >> 8);
+						newg = y + ((k1 * u) >> 8) + ((k2 * v) >> 8);
+						newb = y + ((k3 * u) >> 8);
+					}
+					color->r = (newr < 0) ? 0 : ((newr > 0xff) ? 0xff : newr);
+					color->g = (newg < 0) ? 0 : ((newg > 0xff) ? 0xff : newg);
+					color->b = (newb < 0) ? 0 : ((newb > 0xff) ? 0xff : newb);
+					color->a = 0xff;
+					break;
+				}
+			}
+			break;
+		}
+		case 2:		// Color Index
+		{
+			switch (tsize)
+			{
+				case PIXEL_SIZE_4BIT:
+				{
+					UINT8 *tc = (UINT8*)texture_cache;
+                    int taddr = ((tbase + ((t) * twidth) + ((s) / 2)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0)) & 0x7ff;
+					UINT8 p = ((s) & 1) ? (tc[taddr ^ BYTE_ADDR_XOR] & 0xf) : (tc[taddr ^ BYTE_ADDR_XOR] >> 4);
+					UINT16 c = tlut[((tpal << 4) | p) ^ WORD_ADDR_XOR];
+
+					if (other_modes.en_tlut)
+					{
+						if (other_modes.tlut_type == 0)
+						{
+							color->r = ((c >> 11) & 0x1f) << 3;
+							color->g = ((c >>  6) & 0x1f) << 3;
+							color->b = ((c >>  1) & 0x1f) << 3;
+							color->a = (c & 1) ? 0xff : 0;
+						}
+						else
+						{
+							color->r = color->g = color->b = (c >> 8) & 0xff;
+							color->a = c & 0xff;
+						}
+					}
+					else
+					{
+						color->r = color->g = color->b = color->a = (tpal << 4) | p;
+					}
+					break;
+				}
+				case PIXEL_SIZE_8BIT:
+				{
+					UINT8 *tc = (UINT8*)texture_cache;
+                    int taddr = ((tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0)) & 0x7ff;
+					UINT8 p = tc[taddr ^ BYTE_ADDR_XOR];
+					UINT16 c = tlut[p ^ WORD_ADDR_XOR];
+
+					if (other_modes.en_tlut)
+					{
+						if (other_modes.tlut_type == 0)
+						{
+							color->r = ((c >> 11) & 0x1f) << 3;
+							color->g = ((c >>  6) & 0x1f) << 3;
+							color->b = ((c >>  1) & 0x1f) << 3;
+							color->a = (c & 1) ? 0xff : 0;
+						}
+						else
+						{
+							color->r = color->g = color->b = (c >> 8) & 0xff;
+							color->a = c & 0xff;
+						}
+					}
+					else
+					{
+						color->r = color->g = color->b = color->a = p;
+					}
+					break;
+				}
+				case PIXEL_SIZE_16BIT:
+				{
+                    // 16-bit CI is a "valid" mode; some games use it, it behaves the same as 16-bit RGBA
+					UINT16 *tc = (UINT16*)texture_cache;
+                    int taddr = ((tbase>>1) + ((t) * (twidth>>1)) + (s))  ^ ((t & 1) ? XOR_SWAP_WORD : 0);
+					UINT16 c = tc[(taddr & 0x7ff) ^ WORD_ADDR_XOR]; // PGA European Tour (U)
+
+					if (!other_modes.en_tlut)
+					{
+						color->r = ((c >> 11) & 0x1f) << 3;
+						color->g = ((c >>  6) & 0x1f) << 3;
+						color->b = ((c >>  1) & 0x1f) << 3;
+						color->a = (c & 1) ? 0xff : 0;
+					}
+					else
+					{
+						c = tlut[(c >> 8) << 2];
+						if (other_modes.tlut_type == 0) //Golden Eye 007, sea, "frigate" level
+						{
+							color->r = ((c >> 11) & 0x1f) << 3;
+							color->g = ((c >>  6) & 0x1f) << 3;
+							color->b = ((c >>  1) & 0x1f) << 3;
+							color->a = (c & 1) ? 0xff : 0;
+						}
+						else // Beetle Adventure Racing, Mount Mayhem
+						{
+							color->r = color->g = color->b = (c >> 8) & 0xff;
+							color->a = c & 0xff;
+						}
+					}
+					break;
+				}
+				default:
+					color->r = color->g = color->b = color->a = 0xff;
+					fatalerror("FETCH_TEXEL: unknown CI texture size %d\n", tsize);
+					break;
+			}
+			break;
+		}
+		case 3:		// Intensity + Alpha
+		{
+			switch (tsize)
+			{
+				case PIXEL_SIZE_4BIT:
+				{
+					UINT8 *tc = (UINT8*)texture_cache;
+                    int taddr = (tbase + ((t) * twidth) + (s >> 1)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0);
+					UINT8 p = ((s) & 1) ? (tc[taddr ^ BYTE_ADDR_XOR] & 0xf) : (tc[taddr ^ BYTE_ADDR_XOR] >> 4);
+					UINT8 i = ((p & 0xe) << 4) | ((p & 0xe) << 1) | (p & 0xe >> 2);
+
+					if (!other_modes.en_tlut)
+					{
+						color->r = i;
+						color->g = i;
+						color->b = i;
+						color->a = (p & 0x1) ? 0xff : 0;
+					}
+					else
+					{
+						UINT16 c = tlut[((tpal << 4) | p) << 2];
+						if (!other_modes.tlut_type)
+						{
+                    		color->r = ((c >> 11) & 0x1f) << 3;
+                    		color->g = ((c >>  6) & 0x1f) << 3;
+                    		color->b = ((c >>  1) & 0x1f) << 3;
+                    		color->a = (c & 1) ? 0xff : 0;
+						}
+						else
+						{
+							color->r = color->g = color->b = (c >> 8) & 0xff;
+							color->a = c & 0xff;
+						}
+					}
+					break;
+				}
+				case PIXEL_SIZE_8BIT:
+				{
+					UINT8 *tc = (UINT8*)texture_cache;
+                    int taddr = ((tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0)) & 0xfff;
+					UINT8 p = tc[taddr ^ BYTE_ADDR_XOR];
+					UINT8 i = 0;
+
+					if (!other_modes.en_tlut)
+					{
+						i = (p >> 4) | (p & 0xf0);
+						color->r = i;
+						color->g = i;
+						color->b = i;
+						color->a = (p & 0xf) | ((p << 4) & 0xf0);
+					}
+					else
+					{
+						UINT16 c = tlut[p << 2];
+						if (!other_modes.tlut_type)
+						{
+                    		color->r = ((c >> 11) & 0x1f) << 3;
+                    		color->g = ((c >>  6) & 0x1f) << 3;
+                    		color->b = ((c >>  1) & 0x1f) << 3;
+                    		color->a = (c & 1) ? 0xff : 0;
+						}
+						else
+						{
+							color->r = color->g = color->b = (c >> 8) & 0xff;
+							color->a = c & 0xff;
+						}
+					}
+					break;
+				}
+				case PIXEL_SIZE_16BIT:
+				{
+					UINT16 *tc = (UINT16*)texture_cache;
+                    int taddr = ((tbase >> 1) + ((t) * (twidth >> 1)) + (s)) ^ ((t & 1) ? XOR_SWAP_WORD : 0);
+					UINT16 c = tc[taddr ^ WORD_ADDR_XOR];
+					UINT8 i = (c >> 8);
+
+					if (!other_modes.en_tlut)
+					{
+						color->r = i;
+						color->g = i;
+						color->b = i;
+						color->a = c & 0xff;
+					}
+					else
+					{
+						c = tlut[(c >> 8) << 2];
+						if (!other_modes.tlut_type)
+						{
+                    		color->r = ((c >> 11) & 0x1f) << 3;
+                    		color->g = ((c >>  6) & 0x1f) << 3;
+                    		color->b = ((c >>  1) & 0x1f) << 3;
+                    		color->a = (c & 1) ? 0xff : 0;
+						}
+						else
+						{
+							color->r = c >> 8;
+							color->g = c >> 8;
+							color->b = c >> 8;
+                    		color->a = c & 0xff;
+						}
+					}
+					break;
+				}
+				default:
+					color->r = color->g = color->b = color->a = 0xff;
+					fatalerror("FETCH_TEXEL: unknown IA texture size %d\n", tsize);
+					break;
+			}
+			break;
+		}
+		case 4:		// Intensity
+		{
+			switch (tsize)
+			{
+				case PIXEL_SIZE_4BIT:
+				{
+					UINT8 *tc = (UINT8*)texture_cache;
+                    int taddr = ((tbase + ((t) * twidth) + ((s) / 2)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0)) & 0xfff;
+					UINT8 c = ((s) & 1) ? (tc[taddr ^ BYTE_ADDR_XOR] & 0xf) : (tc[taddr ^ BYTE_ADDR_XOR] >> 4);
+					c |= (c << 4);
+
+					if (!other_modes.en_tlut)
+					{
+						color->r = c;
+						color->g = c;
+						color->b = c;
+						color->a = c;
+					}
+					else
+					{
+						UINT16 k = tlut[((tpal << 4) | c) << 2];
+						if (!other_modes.tlut_type)
+						{
+							color->r = ((k >> 11) & 0x1f) << 3;
+							color->g = ((k >>  6) & 0x1f) << 3;
+							color->b = ((k >>  1) & 0x1f) << 3;
+							color->a = (k & 1) ? 0xff : 0;
+						}
+						else
+						{
+							color->r = color->g = color->b = (k >> 8) & 0xff;
+							color->a = k & 0xff;
+						}
+					}
+					break;
+				}
+				case PIXEL_SIZE_8BIT:
+				{
+					UINT8 *tc = (UINT8*)texture_cache;
+                    int taddr = ((tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0)) & 0xfff;
+					UINT8 c = tc[taddr ^ BYTE_ADDR_XOR];
+
+					if (!other_modes.en_tlut)
+					{
+						color->r = c;
+						color->g = c;
+						color->b = c;
+						color->a = c;
+					}
+					else
+					{
+						UINT16 k = tlut[ c << 2];
+						if (!other_modes.tlut_type)
+						{
+							color->r = ((k >> 11) & 0x1f) << 3;
+							color->g = ((k >>  6) & 0x1f) << 3;
+							color->b = ((k >>  1) & 0x1f) << 3;
+							color->a = (k & 1) ? 0xff : 0;
+						}
+						else
+						{
+							color->r = color->g = color->b = (k >> 8) & 0xff;
+							color->a = k & 0xff;
+						}
+					}
+					break;
+				}
+				default:
+					color->r = color->g = color->b = color->a = 0xff;
+					//fatalerror("FETCH_TEXEL: unknown I texture size %d\n", tsize);
+					break;
+			}
+			break;
+		}
+		default:
+		{
+			color->r = color->g = color->b = color->a = 0xff;
+			fatalerror("FETCH_TEXEL: unknown texture format %d\n", tformat);
+			break;
+		}
+	}
+}
+
+INLINE void TEXTURE_PIPELINE(COLOR* TEX, INT32 SSS, INT32 SST, UINT32 NOBILINEAR, UINT32 tilenum)
+{
+#define RELATIVE(x, y) 	((((x) >> 3) - (y)) << 3) | (x & 7);
+	INT32 maxs, maxt;
+	if (other_modes.sample_type)
+	{
+		COLOR t0, t1, t2, t3;
+		int sss1, sst1, sss2, sst2;
+		INT32 rt0 = 0, rt1 = 0, rt2 = 0, rt3 = 0;
+		INT32 gt0 = 0, gt1 = 0, gt2 = 0, gt3 = 0;
+		INT32 bt0 = 0, bt1 = 0, bt2 = 0, bt3 = 0;
+		INT32 at0 = 0, at1 = 0, at2 = 0, at3 = 0;
+
+		INT32 SFRAC = 0, TFRAC = 0, INVSF = 0, INVTF = 0;
+		INT32 R32, G32, B32, A32;
+		INT32 maxs2, maxt2;
+		int upper = 0;
+
+		sss1 = SSS;
+		sst1 = SST;
+
+		SHIFT(&sss1, &sst1, &maxs, &maxt, tilenum);
+
+		sss2 = sss1 + 32; sst2 = sst1 + 32;
+		maxs2 = ((sss2 >> 3) >= tile[tilenum].sh);
+		maxt2 = ((sst2 >> 3) >= tile[tilenum].th);
+
+		sss1 = RELATIVE(sss1, tile[tilenum].sl);
+		sst1 = RELATIVE(sst1, tile[tilenum].tl);
+		sss2 = RELATIVE(sss2, tile[tilenum].sl);
+		sst2 = RELATIVE(sst2, tile[tilenum].tl);
+
+		SFRAC = sss1 & 0x1f;
+		TFRAC = sst1 & 0x1f;
+
+		CLAMP(&sss1, &sst1, &SFRAC, &TFRAC, maxs, maxt, tilenum);
+		CLAMP_LIGHT(&sss2, &sst2, maxs2, maxt2, tilenum);
+
+		MASK(&sss1, &sst1, tilenum);
+        MASK(&sss2, &sst2, tilenum);
+
+		upper = ((SFRAC + TFRAC) >= 0x20);
+		if (upper)
+		{
+			INVSF = 0x20 - SFRAC;
+			INVTF = 0x20 - TFRAC;
+		}
+
+		if (other_modes.mid_texel || !upper)
+		{
+			FETCH_TEXEL(&t0, sss1, sst1, tilenum);
+		}
+		FETCH_TEXEL(&t1, sss2, sst1, tilenum);
+		FETCH_TEXEL(&t2, sss1, sst2, tilenum);
+		if (other_modes.mid_texel || upper)
+		{
+			FETCH_TEXEL(&t3, sss2, sst2, tilenum);
+		}
+		if (other_modes.mid_texel || !upper)
+		{
+			rt0 = t0.r; gt0 = t0.g; bt0=t0.b; at0 = t0.a;
+		}
+		rt1 = t1.r; rt2 = t2.r; gt1 = t1.g; gt2 = t2.g; bt1 = t1.b; bt2 = t2.b; at1 = t1.a; at2 = t2.a;
+		if (other_modes.mid_texel || upper)
+		{
+			rt3 = t3.r; gt3 = t3.g; bt3 = t3.b; at3 = t3.a;
+		}
+
+		if (!other_modes.mid_texel || SFRAC!= 0x10 || TFRAC != 0x10)
+		{
+			if (upper)
+			{
+				R32 = rt3 + ((INVSF*(rt2 - rt3))>>5) + ((INVTF*(rt1 - rt3))>>5);
+				TEX->r = (R32 < 0) ? 0 : R32;
+				G32 = gt3 + ((INVSF*(gt2 - gt3))>>5) + ((INVTF*(gt1 - gt3))>>5);
+				TEX->g = (G32 < 0) ? 0 : G32;
+				B32 = bt3 + ((INVSF*(bt2 - bt3))>>5) + ((INVTF*(bt1 - bt3))>>5);
+				TEX->b = (B32 < 0) ? 0 : B32;
+				A32 = at3 + ((INVSF*(at2 - at3))>>5) + ((INVTF*(at1 - at3))>>5);
+				TEX->a = (A32 < 0) ? 0 : A32;
+			}
+			else
+			{
+				R32 = rt0 + ((SFRAC*(rt1 - rt0))>>5) + ((TFRAC*(rt2 - rt0))>>5);
+				TEX->r = (R32 < 0) ? 0 : R32;
+				G32 = gt0 + ((SFRAC*(gt1 - gt0))>>5) + ((TFRAC*(gt2 - gt0))>>5);
+				TEX->g = (G32 < 0) ? 0 : G32;
+				B32 = bt0 + ((SFRAC*(bt1 - bt0))>>5) + ((TFRAC*(bt2 - bt0))>>5);
+				TEX->b = (B32 < 0) ? 0 : B32;
+				A32 = at0 + ((SFRAC*(at1 - at0))>>5) + ((TFRAC*(at2 - at0))>>5);
+				TEX->a = (A32 < 0) ? 0 : A32;
+			}
+		}
+		else // Is this accurate?
+		{
+			TEX->r = (rt0 + rt1 + rt2 + rt3) >> 2;
+			TEX->g = (gt0 + gt1 + gt2 + gt3) >> 2;
+			TEX->b = (bt0 + bt1 + bt2 + bt3) >> 2;
+			TEX->a = (at0 + at1 + at2 + at3) >> 2;
+		}
+	}
+	else
+	{
+		int sss1, sst1;
+		INT32 SFRAC, TFRAC;
+
+		sss1 = SSS;
+		sst1 = SST;
+
+		SHIFT(&sss1, &sst1, &maxs, &maxt, tilenum);
+		sss1 = RELATIVE(sss1, tile[tilenum].sl);
+		sst1 = RELATIVE(sst1, tile[tilenum].tl);
+
+		sss1 += 0x10;
+		sst1 += 0x10;
+
+		SFRAC = sss1 & 0x1f;
+		TFRAC = sst1 & 0x1f;
+
+		CLAMP(&sss1, &sst1, &SFRAC, &TFRAC, maxs, maxt, tilenum);
+
+        MASK(&sss1, &sst1, tilenum);
+
+		/* point sample */
+		FETCH_TEXEL(TEX, sss1, sst1, tilenum);
+	}
+}
+
+INLINE UINT32 z_decompress(UINT16 *zb)
+{
+	UINT32 exponent = (*zb >> 13) & 7;
+	UINT32 mantissa = (*zb >> 2) & 0x7ff;
+	return ((mantissa << z_dec_table[exponent].shift) + z_dec_table[exponent].add);
+}
+
+INLINE void z_build_com_table(void) // Thanks to angrylion, Gonetz and Orkin
+{
+	int j = 0;
+	for(j = 0; j < 0x40000; j++)
+	{
+		UINT32 exponent = 0;
+		UINT32 testbit = 0x20000;
+		UINT32 mantissa = 0;
+		while( (j & testbit) && (exponent < 7) )
+		{
+			exponent++;
+			testbit = 1 << (17 - exponent);
+		}
+
+		mantissa = (j >> (6 - (6 < exponent ? 6 : exponent))) & 0x7ff;
+		z_com_table[j] = (UINT16)(((exponent << 11) | mantissa) << 2);
+	}
+}
+
+INLINE void z_store(UINT16* zb, UINT8* zhb, UINT32 z, UINT32 deltaz)
+{
+	UINT8 deltazmem = 15;
+	int j = 0;
+	z &= 0x3ffff;
+	deltaz &= 0xffff;
+	for(j = 15; j >= 0; j--)
+	{
+		if( (deltaz >> j) == 1 )
+		{
+			break;
+		}
+		else
+		{
+			deltazmem--;
+		}
+	}
+	if (deltazmem>15)
+	{
+		deltazmem=0;
+	}
+	*zb = z_com_table[z]|(deltazmem>>2);
+	*zhb = (deltazmem & 3);
+}
+
+INLINE UINT16 dz_decompress(UINT16* zb, UINT8* zhb)
+{
+	UINT32 dz_compressed = (((*zb & 3) << 2)|(*zhb & 3));
+	return (1 << dz_compressed);
+}
+
+INLINE UINT32 z_compare(void* fb, UINT8* hb, UINT16* zb, UINT8* zhb, UINT32 sz, UINT16 dzpix)
+{
+	int force_coplanar = 0;
+	UINT32 oz = z_decompress(zb);
+	UINT32 dzmem = dz_decompress(zb, zhb);
+	UINT32 dznew = 0;
+	UINT32 farther = 0;
+	UINT32 diff = 0;
+	UINT32 nearer = 0;
+	UINT32 infront = 0;
+	UINT32 max = 0;
+	int precision_factor = (oz >> 15) & 0xf;
+	int overflow = 0;
+	int cvgcoeff = 0;
+	UINT32 mempixel, memory_cvg;
+
+	sz &= 0x3ffff;
+	if (dzmem == 0x8000 && precision_factor < 3)
+	{
+		force_coplanar = 1;
+	}
+	if (!precision_factor)
+	{
+		dzmem = ((dzmem << 1) > 16) ? (dzmem << 1) : 16;
+	}
+	else if (precision_factor == 1)
+	{
+		dzmem = ((dzmem << 1) > 8) ? (dzmem << 1) : 8;
+	}
+	else if (precision_factor == 2)
+	{
+		dzmem = ((dzmem << 1) > 4) ? (dzmem << 1) : 4;
+	}
+	if (dzmem == 0 && precision_factor < 3)
+	{
+		dzmem = 0xffff;
+	}
+	if (dzmem > 0x8000)
+	{
+		dzmem = 0xffff;
+	}
+	dznew =((dzmem > dzpix) ? dzmem : (UINT32)dzpix) << 3;
+	dznew &= 0x3ffff;
+
+	farther = ((sz + dznew) >= oz) ? 1 : 0;
+	diff = (sz >= dznew) ? (sz - dznew) : 0;
+	nearer = (diff <= oz) ? 1: 0;
+	infront = (sz < oz) ? 1 : 0;
+	max = (dzmem == 0x3ffff);
+
+	if (force_coplanar)
+	{
+		farther = nearer = 1;
+	}
+
+	curpixel_overlap = 0;
+
+	switch(fb_size)
+	{
+		case 1: /* Banjo Tooie */
+			memory_cvg = 0; //??
+			break;
+		case 2:
+			mempixel = *(UINT16*)fb;
+			memory_cvg = ((mempixel & 1) << 2) + (*hb & 3);
+			break;
+		case 3:
+			mempixel = *(UINT32*)fb;
+			memory_cvg = (mempixel >> 5) & 7;
+			break;
+		default:
+			fatalerror("z_compare: fb_size = %d",fb_size);
+			break;
+	}
+
+	if (!other_modes.image_read_en)
+	{
+		memory_cvg = 7;
+	}
+
+	overflow = ((memory_cvg + curpixel_cvg - 1) > 7) ? 1 : 0;
+	curpixel_overlap = (other_modes.force_blend || (!overflow && other_modes.antialias_en && farther));
+
+	if (other_modes.z_mode == 1 && infront && farther && overflow)
+	{
+		cvgcoeff = ((dzmem >> dznew) - (sz >> dznew)) & 0xf;
+		curpixel_cvg = ((cvgcoeff * (curpixel_cvg - 1)) >> 3) & 0xf;
+	}
+	if (curpixel_cvg > 8)
+		curpixel_cvg = 8;
+
+	switch(other_modes.z_mode)
+	{
+		case 0: // Opaque
+			return (max || (overflow ? infront : nearer))? 1 : 0;
+			break;
+		case 1: // Interpenetrating
+			return (max || (overflow ? infront : nearer))? 1 : 0;
+			break;
+		case 2: // Transparent
+			return (infront || max)? 1: 0;
+			break;
+		case 3: // Decal
+			return (farther && nearer && !max) ? 1 : 0;
+			break;
+		default:
+			fatalerror( "z_mode = %d", other_modes.z_mode);
+			break;
+	}
+}
+
+INLINE INT32 normalize_dzpix(INT32 sum)
+{
+	int count = 0;
+	if (sum & 0xc000)
+	{
+		return 0x8000;
+	}
+	if (!(sum & 0xffff))
+	{
+		return 1;
+	}
+	for(count = 0x2000; count > 0; count >>= 1)
+    {
+		if (sum & count)
+		{
+        	return(count << 1);
+		}
+    }
+    return 0;
+}
+
+INLINE INT32 CLIP(INT32 value,INT32 min,INT32 max)
+{
+	if (value < min)
+	{
+		return min;
+	}
+	else if(value > max)
+	{
+		return max;
+	}
+	else
+	{
+		return value;
+	}
+}
+
+INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres)
+{
+	COLOR filtered, penumax, penumin, max, min;
+	UINT16 pix = *vbuff;
+	UINT32 centercvg = (*hbuff & 3) + ((pix & 1) << 2) + 1;
+	UINT32 numoffull = 1;
+	UINT32 cvg;
+	UINT32 r = ((pix >> 11) & 0x1f) << 3;
+	UINT32 g = ((pix >> 6) & 0x1f) << 3;
+	UINT32 b = ((pix >> 1) & 0x1f) << 3;
+	UINT32 backr[7], backg[7], backb[7];
+	UINT32 invr[7], invg[7], invb[7];
+	INT32 coeff;
+	UINT32 hresdiff = hres << 1;
+	UINT32 hresdiffcvg = hres;
+	UINT32 addr = (UINT32)vbuff;
+	UINT32 leftuppix = (addr - hresdiff - 4) ^ 2;
+	UINT32 leftdownpix = (addr + hresdiff - 4) ^ 2;
+	UINT32 toleftpix = (addr - 4) ^ 2;
+	UINT32 leftupcvg = 0;
+	UINT32 leftdowncvg = 0;
+	UINT32 toleftcvg = 0;
+	UINT32 colr, colg, colb;
+	UINT32 enb;
+	int i = 0;
+
+	filtered.r = filtered.g = filtered.b = filtered.a = 0;
+
+	backr[0] = r;
+	backg[0] = g;
+	backb[0] = b;
+	invr[0] = 255 - r;
+	invg[0] = 255 - g;
+	invb[0] = 255 - b;
+
+	if (centercvg == 8)
+	{
+		filtered.r = r; filtered.g = g; filtered.b = b;
+		return filtered;
+	}
+
+	addr = (UINT32)hbuff;
+	leftupcvg = (addr - hresdiffcvg - 2) ^ BYTE_ADDR_XOR;
+	leftdowncvg = (addr + hresdiffcvg - 2) ^ BYTE_ADDR_XOR;
+	toleftcvg = (addr - 2) ^ BYTE_ADDR_XOR;
+
+	for(i = 0; i < 5; i++)
+	{
+		pix = *(UINT16*)(leftuppix ^ 2);
+		cvg = (*(UINT8*)(leftupcvg ^ BYTE_ADDR_XOR)) & 3;
+		if  (i& 1)
+		{
+			if (cvg == 3 && (pix & 1))
+			{
+				backr[numoffull] = (((pix >> 11) & 0x1f) << 3);
+				backg[numoffull] = (((pix >> 6) & 0x1f) << 3);
+				backb[numoffull] = (((pix >> 1) & 0x1f) << 3);
+				invr[numoffull] = 255 - backr[numoffull];
+				invg[numoffull] = 255 - backg[numoffull];
+				invb[numoffull] = 255 - backb[numoffull];
+			}
+			else
+			{
+                backr[numoffull] = invr[numoffull] = 0;
+				backg[numoffull] = invg[numoffull] = 0;
+				backb[numoffull] = invb[numoffull] = 0;
+			}
+			numoffull++;
+		}
+		leftuppix += 2;
+		leftupcvg++;
+	}
+
+	for(i = 0; i < 5; i++)
+	{
+		pix = *(UINT16*)(leftdownpix ^ 2);
+		cvg = (*(UINT8*)(leftdowncvg ^ BYTE_ADDR_XOR)) & 3;
+		if (i&1)
+		{
+			if (cvg == 3 && (pix & 1))
+			{
+				backr[numoffull] = (((pix >> 11) & 0x1f) << 3);
+				backg[numoffull] = (((pix >> 6) & 0x1f) << 3);
+				backb[numoffull] = (((pix >> 1) & 0x1f) << 3);
+				invr[numoffull] = 255 - backr[numoffull];
+				invg[numoffull] = 255 - backg[numoffull];
+				invb[numoffull] = 255 - backb[numoffull];
+			}
+			else
+			{
+                backr[numoffull] = invr[numoffull] = 0;
+				backg[numoffull] = invg[numoffull] = 0;
+				backb[numoffull] = invb[numoffull] = 0;
+			}
+			numoffull++;
+		}
+		leftdownpix += 2;
+		leftdowncvg++;
+	}
+
+	for(i = 0; i < 5; i++)
+	{
+		pix = *(UINT16*)(toleftpix ^ 2);
+		cvg = (*(UINT8*)(toleftcvg ^ BYTE_ADDR_XOR)) & 3;
+		if (!(i&3))
+		{
+			if (cvg == 3 && (pix & 1))
+			{
+				backr[numoffull] = (((pix >> 11) & 0x1f) << 3);
+				backg[numoffull] = (((pix >> 6) & 0x1f) << 3);
+				backb[numoffull] = (((pix >> 1) & 0x1f) << 3);
+				invr[numoffull] = 255 - backr[numoffull];
+				invg[numoffull] = 255 - backg[numoffull];
+				invb[numoffull] = 255 - backb[numoffull];
+			}
+			else
+			{
+                backr[numoffull] = invr[numoffull] = 0;
+				backg[numoffull] = invg[numoffull] = 0;
+				backb[numoffull] = invb[numoffull] = 0;
+			}
+			numoffull++;
+		}
+		toleftpix += 2;
+		toleftcvg++;
+	}
+
+	if (numoffull != 7)
+	{
+		fatalerror("Something went wrong in vi_filter16");
+	}
+
+	video_max(&backr[0], &max.r, &enb);
+	for(i = 1; i < 7; i++)
+	{
+		if (!((enb >> i) & 1))
+		{
+			backr[i] = 0;
+		}
+	}
+	video_max(&backg[0], &max.g, &enb);
+	for (i = 1; i < 7; i++)
+	{
+		if (!((enb >> i) & 1))
+		{
+			backg[i] = 0;
+		}
+	}
+	video_max(&backb[0], &max.b, &enb);
+	for (i = 1; i < 7; i++)
+	{
+		if (!((enb >> i) & 1))
+		{
+			backb[i] = 0;
+		}
+	}
+	video_max(&invr[0], &min.r, &enb);
+	for (i = 1; i < 7; i++)
+	{
+		if (!((enb >> i) & 1))
+		{
+			backr[i] = 0;
+		}
+	}
+	video_max(&invg[0], &min.g, &enb);
+	for (i = 1; i < 7; i++)
+	{
+		if (!((enb >> i) & 1))
+		{
+			backg[i] = 0;
+		}
+	}
+	video_max(&invb[0], &min.b, &enb);
+	for (i = 1; i < 7; i++)
+	{
+		if (!((enb >> i) & 1))
+		{
+			backb[i] = 0;
+		}
+	}
+
+	video_max(&backr[0], &penumax.r, &enb);
+	i = ge_two(enb);
+	penumax.r = i ? max.r : penumax.r;
+
+	video_max(&backg[0], &penumax.g, &enb);
+	i = ge_two(enb);
+	penumax.g = i ? max.g : penumax.g;
+
+	video_max(&backb[0], &penumax.b, &enb);
+	i = ge_two(enb);
+	penumax.b = i ? max.b : penumax.b;
+
+	video_max(&invr[0], &penumin.r, &enb);
+	i = ge_two(enb);
+	penumin.r = i ? min.r : penumin.r;
+
+	video_max(&invg[0], &penumin.g, &enb);
+	i = ge_two(enb);
+	penumin.g = i ? min.g : penumin.g;
+
+	video_max(&invb[0], &penumin.b, &enb);
+	i = ge_two(enb);
+	penumin.b = i ? min.b : penumin.b;
+
+	penumin.r = 255 - penumin.r;
+	penumin.g = 255 - penumin.g;
+	penumin.b = 255 - penumin.b;
+
+	colr = (UINT32)penumin.r + (UINT32)penumax.r - (r << 1);
+	colg = (UINT32)penumin.g + (UINT32)penumax.g - (g << 1);
+	colb = (UINT32)penumin.b + (UINT32)penumax.b - (b << 1);
+	coeff = 8 - (INT32)centercvg;
+	colr = (((colr * coeff) + 4) >> 3) + r;
+	colg = (((colg * coeff) + 4) >> 3) + g;
+	colb = (((colb * coeff) + 4) >> 3) + b;
+	colr &= 0xff;
+	colg &= 0xff;
+	colb &= 0xff;
+
+	filtered.r = colr;
+	filtered.g = colg;
+	filtered.b = colb;
+	return filtered;
+}
+
+// This needs to be fixed for endianness.
+INLINE void divot_filter16(INT32* r, INT32* g, INT32* b, UINT16* fbuff)
+{
+	UINT32 leftr, leftg, leftb, rightr, rightg, rightb;
+	UINT16 leftpix, rightpix;
+	UINT16* next, *prev;
+	UINT32 addr = (UINT32)fbuff;
+	UINT32 Lsw = (addr >> 1) & 1;
+	next = (Lsw) ? (UINT16*)(addr - 2) : (UINT16*)(addr + 6);
+	prev = (Lsw) ? (UINT16*)(addr - 6) : (UINT16*)(addr + 2);
+	leftpix = *prev;
+	rightpix = *next;
+
+	//leftpix = *(fbuff - 1); //for BE targets
+	//rightpix = *(fbuff + 1);
+
+	leftr = (((leftpix >> 11) & 0x1f) << 3);
+	leftg = (((leftpix >> 6) & 0x1f) << 3);
+	leftb = (((leftpix >> 1) & 0x1f) << 3);
+	rightr = (((rightpix >> 11) & 0x1f) << 3);
+	rightg = (((rightpix >> 6) & 0x1f) << 3);
+	rightb = (((rightpix >> 1) & 0x1f) << 3);
+	if ((leftr >= *r && rightr >= leftr) || (leftr >= rightr && *r >= leftr))
+	{
+		*r = leftr; //left = median value
+	}
+	if ((rightr >= *r && leftr >= rightr) || (rightr >= leftr && *r >= rightr))
+	{
+		*r = rightr; //right = median, else *r itself is median
+	}
+	if ((leftg >= *g && rightg >= leftg) || (leftg >= rightg && *g >= leftg))
+	{
+		*g = leftg;
+	}
+	if ((rightg >= *g && leftg >= rightg) || (rightg >= leftg && *g >= rightg))
+	{
+		*g = rightg;
+	}
+	if ((leftb >= *b && rightb >= leftb) || (leftb >= rightb && *b >= leftb))
+	{
+		*b = leftb;
+	}
+	if ((rightb >= *b && leftb >= rightb) || (rightb >= leftb && *b >= rightb))
+	{
+		*b = rightb;
+	}
+}
+
+INLINE void divot_filter16_buffer(int* r, int* g, int* b, COLOR* vibuffer)
+{
+	UINT32 leftr, leftg, leftb, rightr, rightg, rightb;
+	COLOR leftpix, rightpix, filtered;
+	leftpix = vibuffer[-1];
+	rightpix = vibuffer[1];
+	filtered = *vibuffer;
+
+	*r = filtered.r;
+	*g = filtered.g;
+	*b = filtered.b;
+	leftr = leftpix.r;
+	leftg = leftpix.g;
+	leftb = leftpix.b;
+	rightr = rightpix.r;
+	rightg = rightpix.g;
+	rightb = rightpix.b;
+	if ((leftr >= *r && rightr >= leftr) || (leftr >= rightr && *r >= leftr))
+	{
+		*r = leftr; //left = median value
+	}
+	if ((rightr >= *r && leftr >= rightr) || (rightr >= leftr && *r >= rightr))
+	{
+		*r = rightr; //right = median, else *r itself is median
+	}
+	if ((leftg >= *g && rightg >= leftg) || (leftg >= rightg && *g >= leftg))
+	{
+		*g = leftg;
+	}
+	if ((rightg >= *g && leftg >= rightg) || (rightg >= leftg && *g >= rightg))
+	{
+		*g = rightg;
+	}
+	if ((leftb >= *b && rightb >= leftb) || (leftb >= rightb && *b >= leftb))
+	{
+		*b = leftb;
+	}
+	if ((rightb >= *b && leftb >= rightb) || (rightb >= leftb && *b >= rightb))
+	{
+		*b = rightb;
+	}
+
+	filtered.r = *r;
+	filtered.g = *g;
+	filtered.b = *b;
+}
+
+// Fix me for endianness.
+INLINE void restore_filter16(int* r, int* g, int* b, UINT16* fbuff, UINT32 hres)
+{
+	UINT32 hresdiff = hres << 1;
+	UINT32 addr = (UINT32)fbuff;
+	UINT32 Lsw = (addr >> 1) & 1;
+	INT32 pixdiff = Lsw ? 6 : -2;
+	UINT32 leftuppix = (addr - hresdiff - pixdiff);
+	UINT32 leftdownpix = (addr + hresdiff - pixdiff);
+	UINT32 toleftpix = (addr - pixdiff);
+	UINT8 tempr, tempg, tempb;
+	UINT16 pix;
+	int i;
+
+	UINT8 r5 = *r;
+	UINT8 g5 = *g;
+	UINT8 b5 = *b;
+	r5 &= ~7;
+	g5 &= ~7;
+	b5 &= ~7;
+
+	for (i = 0; i < 3; i++)
+	{
+		pix = *(UINT16*)leftuppix;
+		tempr = (((pix >> 11) & 0x1f) << 3);
+		tempg = (((pix >> 6) & 0x1f) << 3);
+		tempb = (((pix >> 1) & 0x1f) << 3);
+		tempr &= ~7;
+		tempg &= ~7;
+		tempb &= ~7;
+		if (tempr > r5)
+		{
+			*r += 1;
+		}
+		if (tempr < r5)
+		{
+			*r -= 1;
+		}
+		if (tempg > g5)
+		{
+			*g += 1;
+		}
+		if (tempg < g5)
+		{
+			*g -= 1;
+		}
+		if (tempb > b5)
+		{
+			*b += 1;
+		}
+		if (tempb < b5)
+		{
+			*b -= 1;
+		}
+		leftuppix = ((leftuppix ^ 2) + 2) ^ 2;
+	}
+
+	for (i = 0; i < 3; i++)
+	{
+		pix = *(UINT16*)leftdownpix;
+		tempr = (((pix >> 11) & 0x1f) << 3);
+		tempg = (((pix >> 6) & 0x1f) << 3);
+		tempb = (((pix >> 1) & 0x1f) << 3);
+		tempr &= ~7;
+		tempg &= ~7;
+		tempb &= ~7;
+		if (tempr > r5)
+		{
+			*r += 1;
+		}
+		if (tempr < r5)
+		{
+			*r -= 1;
+		}
+		if (tempg > g5)
+		{
+			*g += 1;
+		}
+		if (tempg < g5)
+		{
+			*g -= 1;
+		}
+		if (tempb > b5)
+		{
+			*b += 1;
+		}
+		if (tempb < b5)
+		{
+			*b -= 1;
+		}
+		leftdownpix = ((leftdownpix ^ 2) + 2) ^ 2;
+	}
+	for(i = 0; i < 3; i++)
+	{
+		if (!(i & 1))
+		{
+			pix = *(UINT16*)toleftpix;
+			tempr = (((pix >> 11) & 0x1f) << 3);
+			tempg = (((pix >> 6) & 0x1f) << 3);
+			tempb = (((pix >> 1) & 0x1f) << 3);
+			tempr &= ~7;
+			tempg &= ~7;
+			tempb &= ~7;
+			if (tempr > r5)
+			{
+				*r += 1;
+			}
+			if (tempr < r5)
+			{
+				*r -= 1;
+			}
+			if (tempg > g5)
+			{
+				*g += 1;
+			}
+			if (tempg < g5)
+			{
+				*g -= 1;
+			}
+			if (tempb > b5)
+			{
+				*b += 1;
+			}
+			if (tempb < b5)
+			{
+				*b -= 1;
+			}
+		}
+		toleftpix = ((toleftpix ^ 2) + 2) ^ 2;
+	}
+}
+
+INLINE void restore_filter16_buffer(INT32* r, INT32* g, INT32* b, COLOR* vibuff, UINT32 hres)
+{
+	COLOR filtered;
+	COLOR leftuppix, leftdownpix, leftpix;
+	COLOR rightuppix, rightdownpix, rightpix;
+	COLOR uppix, downpix;
+	INT32 ihres = (INT32)hres; //can't apply unary minus to unsigned
+
+	leftuppix = vibuff[-ihres - 1];
+	leftdownpix = vibuff[ihres - 1];
+	leftpix = vibuff[-1];
+
+	rightuppix = vibuff[-ihres + 1];
+	rightdownpix = vibuff[ihres + 1];
+	rightpix = vibuff[1];
+
+	uppix = vibuff[-ihres];
+	downpix = vibuff[ihres];
+	filtered = *vibuff;
+
+	restore_two(&filtered, &leftuppix);
+	restore_two(&filtered, &uppix);
+	restore_two(&filtered, &rightuppix);
+
+	restore_two(&filtered, &leftpix);
+	restore_two(&filtered, &rightpix);
+
+	restore_two(&filtered, &leftdownpix);
+	restore_two(&filtered, &downpix);
+	restore_two(&filtered, &rightdownpix);
+
+	*r = filtered.r;
+	*g = filtered.g;
+	*b = filtered.b;
+
+	*r = CLIP(*r, 0, 0xff);
+	*g = CLIP(*g, 0, 0xff);
+	*b = CLIP(*b, 0, 0xff);
+}
+
+// This is wrong, only the 5 upper bits are compared.
+INLINE void restore_two(COLOR* filtered, COLOR* neighbour)
+{
+	if (neighbour->r > filtered->r)
+	{
+		filtered->r += 1;
+	}
+	if (neighbour->r < filtered->r)
+	{
+		filtered->r -= 1;
+	}
+	if (neighbour->g > filtered->g)
+	{
+		filtered->g += 1;
+	}
+	if (neighbour->g < filtered->g)
+	{
+		filtered->g -= 1;
+	}
+	if (neighbour->b > filtered->b)
+	{
+		filtered->b += 1;
+	}
+	if (neighbour->b < filtered->b)
+	{
+		filtered->b -= 1;
+	}
+}
+
+INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
+{
+	int i;
+	int pos = 0;
+	*enb = 0;
+	for(i = 0; i < 7; i++)
+	{
+	    if (Pixels[i] >= Pixels[pos])
+			pos = i;
+	}
+	for(i = 0; i < 7; i++)
+	{
+	    if (Pixels[i] != Pixels[pos])
+		    *enb += (1 << i);
+	}
+	*max = Pixels[pos];
+}
+
+INLINE UINT32 ge_two(UINT32 enb)
+{
+	int i;
+	int j = 0;
+	for(i = 0; i < 7; i++)
+	{
+		if (!((enb >> i) & 1))
+		{
+			j++;
+		}
+	}
+	return (j > 1);
+}
+
+INLINE void calculate_clamp_diffs(UINT32 prim_tile)
+{
+	int start, end;
+	if (other_modes.tex_lod_en || prim_tile == 7)
+	{
+		start = 0;
+		end = 7;
+	}
+	else
+	{
+		start = prim_tile;
+		end = prim_tile + 1;
+	}
+	for (; start <= end; start++)
+	{
+		clamp_s_diff[start] = (tile[start].sh >> 2) - (tile[start].sl >> 2);
+		clamp_t_diff[start] = (tile[start].th >> 2) - (tile[start].tl >> 2);
+	}
+}
+
+INLINE void rgb_dither(INT32* r, INT32* g, INT32* b, int dith)
+{
+	if ((*r & 7) > dith)
+	{
+		*r = (*r & 0xf8) + 8;
+		if (*r > 247)
+			*r = 255;
+	}
+	if ((*g & 7) > dith)
+	{
+		*g = (*g & 0xf8) + 8;
+		if (*g > 247)
+			*g = 255;
+	}
+	if ((*b & 7) > dith)
+	{
+		*b = (*b & 0xf8) + 8;
+		if (*b > 247)
+			*b = 255;
+	}
+}
+
+INLINE void set_shade_for_rects(void)
+{
+	shade_color.r = 0;
+	shade_color.g = 0;
+	shade_color.b = 0;
+	shade_color.a = 0;
+}
+
+INLINE void set_shade_for_tris(UINT32 shade)
+{
+	if (!shade) // Hack, needed for Top Gear Rally 2 sky
+	{
+		shade_color.r = prim_color.r;
+		shade_color.g = prim_color.g;
+		shade_color.b = prim_color.b;;
+		shade_color.a = prim_color.a;
+	}
+}
+
+INLINE UINT32 getlog2(UINT32 lod_clamp)
+{
+	int i;
+	if (lod_clamp < 2)
+	{
+		return 0;
+	}
+	else
+	{
+		for (i = 7; i > 0; i--)
+		{
+			if ((lod_clamp >> i) & 1)
+			{
+				return i;
+			}
+		}
+	}
+	return 0;
+}
+
+INLINE void copy_colors(COLOR* dst, COLOR* src)
+{
+	dst->r = src->r;
+	dst->g = src->g;
+	dst->b = src->b;
+	dst->a = src->a;
+}
+
+INLINE void BILERP_AND_WRITE(UINT32* src0, UINT32* src1, UINT32* dest)
+{
+	UINT32 r1, g1, b1, col0, col1;
+	col0 = *src0;
+	col1 = *src1;
+	r1 = (((col0 >> 16)&0xff) + ((col1 >> 16)&0xff))>>1;
+	g1 = (((col0 >> 8)&0xff) + ((col1 >> 8)&0xff))>>1;
+	b1 = (((col0 >> 0)&0xff) + ((col1 >> 0)&0xff))>>1;
+	*dest = (r1 << 16) | (g1 << 8) | b1;
+}
+
+INLINE void tcdiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
+{
+	int w_carry;
+	int shift;
+	int normout;
+	int wnorm;
+	int temppoint, tempslope;
+	int tlu_rcp;
+	int tempmask;
+	int shift_value;
+
+	if ((sw & 0x8000) || !(sw & 0x7fff))
+	{
+		w_carry = 1;
+	}
+	else
+	{
+		w_carry = 0;
+	}
+
+	sw &= 0x7fff;
+	for(shift = 1; shift <= 14 && !((sw << shift) & 0x8000); shift++);
+	shift -= 1;
+
+	normout = ((sw << shift) & 0x3fff) >> 8;
+	wnorm = ((sw << shift) & 0xff) << 2;
+	temppoint = NormPointRom[normout];
+	tempslope = NormSlopeRom[normout];
+
+	tlu_rcp = ((-(tempslope * wnorm)) >> 10);
+	tlu_rcp = (tlu_rcp + temppoint);
+
+	*sss = SIGN16(ss) * tlu_rcp;
+	*sst = SIGN16(st) * tlu_rcp;
+	tempmask = ((1 << (shift+1)) - 1) << (29 - shift);
+	shift_value = 13 - shift;
+	if (shift_value < 0)
+	{
+		shift_value = 0;
+	}
+	*sss >>= shift_value;
+	*sst >>= shift_value;
+	if (shift == 0xe)
+	{
+		*sss <<= 1;
+		*sst <<= 1;
+	}
+}
+
+void col_decode16(UINT16* addr, COLOR* col)
+{
+	col->r = ((*addr >> 11) & 0x1f) << 3;
+	col->g = ((*addr >> 6) & 0x1f) << 3;
+	col->b = ((*addr >> 1) & 0x1f) << 3;
+	col->a = (*addr & 1) ? 0xff : 0;
+}
+
+static void texture_rectangle_16bit(running_machine *machine, TEX_RECTANGLE *rect)
+{
+	UINT16 *fb = (UINT16*)&rdram[(fb_address / 4)];
+	UINT16 *zb = (UINT16*)&rdram[zb_address / 4];
+	UINT8 *hb = &hidden_bits[fb_address >> 1];
+	UINT8 *zhb = &hidden_bits[zb_address >> 1];
+
+	int i, j;
+	int x1, x2, y1, y2;
+	int s, t;
+	int ss, st;
+
+	int clipx1, clipx2, clipy1, clipy2;
+
+	UINT32 tilenum = rect->tilenum;
+	UINT32 tilenum2 = 0;
+
+	x1 = (rect->xh / 4);
+	x2 = (rect->xl / 4);
+	y1 = (rect->yh / 4);
+	y2 = (rect->yl / 4);
+
+	if (x2<=x1)
+	{
+		x2 = x1 + 1;
+	}
+	if (y1==y2)
+	{
+		y2 = y1 + 1; // Needed by Goldeneye
+	}
+	if (other_modes.cycle_type == CYCLE_TYPE_FILL || other_modes.cycle_type == CYCLE_TYPE_COPY)
+	{
+		rect->dsdx /= 4;
+		x2 += 1;
+		y2 += 1;
+	}
+	else
+	{
+		if ((rect->xl & 3) == 3) // Needed by Mega Man 64
+		{
+			x2++;
+		}
+		if ((rect->yl & 3) == 3)
+		{
+			y2++;
+		}
+	}
+
+	clipx1 = clip.xh / 4;
+	clipx2 = clip.xl / 4;
+	clipy1 = clip.yh / 4;
+	clipy2 = clip.yl / 4;
+
+	calculate_clamp_diffs(tilenum);
+
+	if (other_modes.cycle_type == CYCLE_TYPE_2)
+	{
+		if (!other_modes.tex_lod_en)
+		{
+			tilenum2 = (tilenum + 1) & 7;
+		}
+		else
+		{
+			tilenum2 = (tilenum + 1) & 7;
+		}
+	}
+
+
+	set_shade_for_rects(); // Needed by Pilotwings 64
+
+	t = ((int)(rect->t)) << 5;
+
+	if (other_modes.cycle_type == CYCLE_TYPE_1)
+	{
+		for (j = y1; j < y2; j++)
+		{
+			int fb_index = j * fb_width;
+			if (j >= clipy1 && j < clipy2)
+			{
+            	s = ((int)(rect->s)) << 5;
+
+				for (i = x1; i < x2; i++)
+				{
+					if (i >= clipx1 && i < clipx2)
+					{
+						COLOR c;
+						int rendered = 0;
+						int dith = 0;
+						int curpixel = fb_index + i;
+						UINT16* fbcur = &fb[curpixel ^ WORD_ADDR_XOR];
+						UINT16* zbcur = &zb[curpixel ^ WORD_ADDR_XOR];
+						UINT8* hbcur = &hb[curpixel ^ BYTE_ADDR_XOR];
+						UINT8* zhbcur = &zhb[curpixel ^ BYTE_ADDR_XOR];
+
+						curpixel_cvg = 8;
+
+						ss = s >> 5;
+						st = t >> 5;
+						if (rect->flip)
+						{
+							TEXTURE_PIPELINE(&texel0_color, st, ss, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)), tilenum);
+						}
+						else
+						{
+							TEXTURE_PIPELINE(&texel0_color, ss, st, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)), tilenum);
+						}
+
+						c = COLOR_COMBINER(machine, 0);
+
+						if (!other_modes.rgb_dither_sel)
+						{
+							dith = magic_matrix[(((j) & 3) << 2) + ((i ^ WORD_ADDR_XOR) & 3)];
+						}
+						else if (other_modes.rgb_dither_sel == 1)
+						{
+							dith = bayer_matrix[(((j) & 3) << 2) + ((i ^ WORD_ADDR_XOR) & 3)];
+						}
+
+
+						if (other_modes.z_compare_en && other_modes.z_source_sel)
+						{
+							if (z_compare(fbcur, hbcur, zbcur, zhbcur, ((UINT32)primitive_z)<<3,primitive_delta_z))
+							{
+								rendered = BLENDER1_16(machine, fbcur, hbcur, c, dith);
+							}
+						}
+						else
+						{
+							rendered = BLENDER1_16(machine, fbcur, hbcur, c, dith);
+						}
+						if (other_modes.z_update_en && other_modes.z_source_sel && rendered)
+						{
+							z_store(zbcur, zhbcur, ((UINT32)primitive_z) << 3,primitive_delta_z);
+						}
+					}
+
+					s += (int)(rect->dsdx);
+				}
+			}
+			t += (int)(rect->dtdy);
+		}
+	}
+	else if (other_modes.cycle_type == CYCLE_TYPE_2)
+	{
+		for (j = y1; j < y2; j++)
+		{
+			int fb_index = j * fb_width;
+
+			if (j >= clipy1 && j < clipy2)
+			{
+				s = (int)(rect->s) << 5;
+
+				for (i = x1; i < x2; i++)
+				{
+					if (i >= clipx1 && i < clipx2)
+					{
+						COLOR c1, c2;
+						int rendered=0;
+						int curpixel = fb_index + i;
+						UINT16* fbcur = &fb[curpixel ^ WORD_ADDR_XOR];
+						UINT16* zbcur = &zb[curpixel ^ WORD_ADDR_XOR];
+						UINT8* hbcur = &hb[curpixel ^ BYTE_ADDR_XOR];
+						UINT8* zhbcur = &zhb[curpixel ^ BYTE_ADDR_XOR];
+						int dith = 0;
+
+						curpixel_cvg = 8;
+
+						ss = s >> 5;
+						st = t >> 5;
+
+						if (rect->flip)
+						{
+							TEXTURE_PIPELINE(&texel0_color, st, ss, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)),tilenum);
+							TEXTURE_PIPELINE(&texel1_color, st, ss, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)),tilenum2);
+						}
+						else
+						{
+							TEXTURE_PIPELINE(&texel0_color, ss, st, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)),tilenum);
+							TEXTURE_PIPELINE(&texel1_color, ss, st, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)),tilenum2);
+						}
+						c1 = COLOR_COMBINER(machine, 0);
+						c2 = COLOR_COMBINER(machine, 1);
+
+						if (!other_modes.rgb_dither_sel)
+						{
+							dith = magic_matrix[(((j) & 3) << 2) + ((i ^ WORD_ADDR_XOR) & 3)];
+						}
+						else if (other_modes.rgb_dither_sel == 1)
+						{
+							dith = bayer_matrix[(((j) & 3) << 2) + ((i ^ WORD_ADDR_XOR) & 3)];
+						}
+
+						if (other_modes.z_compare_en && other_modes.z_source_sel)
+						{
+							if (z_compare(fbcur, hbcur, zbcur, zhbcur, ((UINT32)primitive_z) << 3,primitive_delta_z))
+							{
+								rendered = BLENDER2_16(machine, fbcur, hbcur, c1, c2, dith);
+							}
+						}
+						else
+						{
+							rendered = BLENDER2_16(machine, fbcur, hbcur, c1, c2, dith);
+						}
+						if (other_modes.z_update_en && other_modes.z_source_sel && rendered)
+						{
+							z_store(zbcur, zhbcur, ((UINT32)primitive_z) << 3,primitive_delta_z);
+						}
+					}
+
+					s += (rect->dsdx);
+				}
+			}
+			t += (rect->dtdy);
+		}
+	}
+	else if (other_modes.cycle_type == CYCLE_TYPE_COPY)
+	{
+		for (j = y1; j < y2; j++)
+		{
+			int fb_index = j * fb_width;
+			if (j >= clipy1 && j < clipy2)
+			{
+				s = (int)(rect->s) << 5;
+
+				for (i = x1; i < x2; i++)
+				{
+                	if (i >= clipx1 && i < clipx2)
+					{
+						ss = s >> 5;
+						st = t >> 5;
+
+						if (rect->flip)
+						{
+							TEXTURE_PIPELINE(&texel0_color, st, ss, 1, tilenum);
+						}
+						else
+						{
+							TEXTURE_PIPELINE(&texel0_color, ss, st, 1, tilenum);
+						}
+
+						curpixel_cvg = 8;
+
+						if ((texel0_color.a != 0)||(!other_modes.alpha_compare_en))
+						{
+							fb[(fb_index + i) ^ WORD_ADDR_XOR] = ((texel0_color.r >> 3) << 11) | ((texel0_color.g >> 3) << 6) | ((texel0_color.b >> 3) << 1)|1;
+						}
+					}
+					s += rect->dsdx;
+				}
+			}
+			t += rect->dtdy;
+		}
+	}
+	else
+	{
+		fatalerror("texture_rectangle_16bit: unknown cycle type %d\n", other_modes.cycle_type);
+	}
+}
+
+/*****************************************************************************/
+
+INLINE int BLENDER1_32(running_machine *machine, UINT32 *fb, COLOR c)
+{
+	UINT32 mem = *fb;
+	int r, g, b;
+
+	// Alpha compare
+	if (!alpha_compare(machine, c.a))
+	{
+		return 0;
+	}
+	if (!curpixel_cvg)
+	{
+		return 0;
+	}
+
+	copy_colors(&pixel_color, &c);
+	if (!other_modes.z_compare_en)
+	{
+		curpixel_overlap = 0;
+	}
+
+	memory_color.r = (mem >>24) & 0xff;
+	memory_color.g = (mem >> 16) & 0xff;
+	memory_color.b = (mem >> 8) & 0xff;
+
+	if (other_modes.image_read_en)
+	{
+		memory_color.a = mem & 0xe0;
+	}
+	else
+	{
+		memory_color.a = 0xe0;
+	}
+
+	if (!curpixel_overlap && !other_modes.force_blend)
+	{
+		r = *blender1a_r[0];
+		g = *blender1a_g[0];
+		b = *blender1a_b[0];
+	}
+	else
+	{
+		int special_bsel = 0;
+		if (blender2b_a[0] == &memory_color.a)
+		{
+			special_bsel = 1;
+		}
+
+		inv_pixel_color.a = 0xff - *blender1b_a[0];
+
+		BLENDER_EQUATION(&r, &g, &b, 0, special_bsel);
+	}
+
+	return  (FBWRITE_32(fb,r,g,b));
+}
+
+INLINE int BLENDER2_32(running_machine *machine, UINT32 *fb, COLOR c1, COLOR c2)
+{
+	UINT32 mem = *fb;
+	int r, g, b;
+	int special_bsel = 0;
+
+	// Alpha compare
+	if (!alpha_compare(machine, c2.a))
+	{
+		return 0;
+	}
+	if (!curpixel_cvg)
+	{
+		return 0;
+	}
+
+	copy_colors(&pixel_color, &c2);
+	if (!other_modes.z_compare_en)
+	{
+		curpixel_overlap = 0;
+	}
+
+	memory_color.r = (mem >>24) & 0xff;
+	memory_color.g = (mem >> 16) & 0xff;
+	memory_color.b = (mem >> 8) & 0xff;
+
+	if (other_modes.image_read_en)
+	{
+		memory_color.a = (mem & 0xe0);
+	}
+	else
+	{
+		memory_color.a = 0xe0;
+	}
+
+	if (blender2b_a[0] == &memory_color.a)
+	{
+		special_bsel = 1;
+	}
+
+	inv_pixel_color.a = 0xff - *blender1b_a[0];
+
+	BLENDER_EQUATION(&r, &g, &b, 0, special_bsel);
+
+	blended_pixel_color.r = r;
+	blended_pixel_color.g = g;
+	blended_pixel_color.b = b;
+
+	pixel_color.r = r;
+	pixel_color.g = g;
+	pixel_color.b = b;
+
+	if (!curpixel_overlap && !other_modes.force_blend)
+	{
+		r = *blender1a_r[1];
+		g = *blender1a_g[1];
+		b = *blender1a_b[1];
+	}
+	else
+	{
+		if (blender2b_a[1] == &memory_color.a)
+		{
+			special_bsel = 1;
+		}
+		else
+		{
+			special_bsel = 0;
+		}
+
+		inv_pixel_color.a = 0xff - *blender1b_a[1];
+
+		BLENDER_EQUATION(&r, &g, &b, 1, special_bsel);
+	}
+
+	return  (FBWRITE_32(fb,r,g,b));
+}
+
+static void fill_rectangle_32bit(running_machine *machine, RECTANGLE *rect)
+{
+	UINT32 *fb = (UINT32*)&rdram[(fb_address / 4)];
+	int index, i, j;
+	int x1 = rect->xh / 4;
+	int x2 = rect->xl / 4;
+	int y1 = rect->yh / 4;
+	int y2 = rect->yl / 4;
+	int clipx1, clipx2, clipy1, clipy2;
+	int fill_cvg = 0;
+
+	if (x2 < x1)
+	{
+		fatalerror(" SCARS (E) case: fill_rectangle_32bit");
+	}
 
 	// TODO: clip
 	clipx1 = clip.xh / 4;
@@ -1064,2278 +3266,1251 @@ static void fill_rectangle_16bit(RECTANGLE *rect)
 		y2 = clipy2-1;
 	}
 
+	set_shade_for_rects();
+
+	fill_cvg = ((fill_color >> 5) & 7) + 1;
+
 	if (other_modes.cycle_type == CYCLE_TYPE_FILL)
 	{
 		for (j=y1; j <= y2; j++)
 		{
 			index = j * fb_width;
+
 			for (i=x1; i <= x2; i++)
 			{
-                cvg_buf[(index + i) ^ 1] = (i & 1) ? ( ( fill_color1 & 1 ) ? 8 : 1 ) : ( ( fill_color2 & 1 ) ? 8 : 1 );
-				fb[(index + i) ^ 1] = (i & 1) ? fill_color1 : fill_color2;
+				fb[(index + i)^1] = fill_color;
 			}
 		}
 	}
-    else if (other_modes.cycle_type == CYCLE_TYPE_1)
-    {
-        shade_color.r = prim_color.r;
-        shade_color.g = prim_color.g;
-        shade_color.b = prim_color.b;
-        shade_color.a = prim_color.a;
-
-        for (j=y1; j <= y2; j++)
-        {
-            index = j * fb_width;
-            for (i=x1; i <= x2; i++)
-            {
-                int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
-
-                c1 = COLOR_COMBINER(0);
-
-                cvg_buf[(index + i) ^ WORD_ADDR_XOR] = 8; // Wrong
-                BLENDER1_16(&fb[(index + i) ^ WORD_ADDR_XOR], c1, dith, &cvg_buf[(index + i) ^ WORD_ADDR_XOR], &cvg_buf[(index + i) ^ WORD_ADDR_XOR], &alpha_reject);
-            }
-        }
-    }
-    else if (other_modes.cycle_type == CYCLE_TYPE_2)
-    {
-        shade_color.r = prim_color.r;
-        shade_color.g = prim_color.g;
-        shade_color.b = prim_color.b;
-        shade_color.a = prim_color.a;
-
-        for (j=y1; j <= y2; j++)
-        {
-            index = j * fb_width;
-            for (i=x1; i <= x2; i++)
-            {
-                int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
-
-                c1 = COLOR_COMBINER(0);
-                c2 = COLOR_COMBINER(1);
-
-                cvg_buf[(index + i) ^ WORD_ADDR_XOR] = 8; // Wrong
-                BLENDER2_16(&fb[(index + i) ^ WORD_ADDR_XOR], c1, c2, dith, &cvg_buf[(index + i) ^ WORD_ADDR_XOR], &cvg_buf[(index + i) ^ WORD_ADDR_XOR], &alpha_reject);
-            }
-        }
-    }
-    else
-    {
-        fatalerror("fill_rectangle_16bit: cycle type copy");
-    }
-}
-
-#define XOR_SWAP_BYTE	4
-#define XOR_SWAP_WORD	2
-#define XOR_SWAP_DWORD	1
-
-INLINE int taddr_clamp(int addr)
-{
-    return (addr > 0x100000) ? 0 : addr;
-}
-
-INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tformat, UINT32 tsize, UINT32 tbase, UINT8 tpal)
-{
-	if (t < 0) t = 0;
-	if (s < 0) s = 0;
-
-	switch (tformat)
+	else if (other_modes.cycle_type == CYCLE_TYPE_1)
 	{
-		case 0:		// RGBA
+		for (j=y1; j <= y2; j++)
 		{
-			switch (tsize)
+			COLOR c;
+			index = j * fb_width;
+			for (i=x1; i <= x2; i++)
 			{
-                case PIXEL_SIZE_4BIT:
-                {
-                    // 4-bit RGBA is a "valid" mode; some games use it, it behaves the same as 4-bit CI
-                    UINT8 *tc = (UINT8*)texture_cache;
-                    int taddr = taddr_clamp((tbase + ((t) * twidth) + ((s) / 2)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0));
-                    UINT8 p = ((s) & 1) ? (tc[taddr ^ BYTE_ADDR_XOR] & 0xf) : (tc[taddr ^ BYTE_ADDR_XOR] >> 4);
-                    UINT16 c = tlut[(p + (tpal << 4))^ WORD_ADDR_XOR];
-
-                    if (other_modes.tlut_type == 0)
-                    {
-                        color->r = ((c >> 11) & 0x1f) << 3;
-                        color->g = ((c >>  6) & 0x1f) << 3;
-                        color->b = ((c >>  1) & 0x1f) << 3;
-                        color->a = (c & 1) ? 0xff : 0;
-                    }
-                    else
-                    {
-                        color->r = color->g = color->b = (c >> 8) & 0xff;
-                        color->a = c & 0xff;
-                    }
-                    break;
-                }
-                case PIXEL_SIZE_8BIT:
-                {
-                    // 8-bit RGBA is a "valid" mode; some games use it, it behaves the same as 8-bit CI
-                    UINT8 *tc = (UINT8*)texture_cache;
-                    int taddr = taddr_clamp((tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0));
-                    UINT8 p = tc[taddr ^ BYTE_ADDR_XOR];
-                    UINT16 c = tlut[p ^ WORD_ADDR_XOR];
-
-                    if (other_modes.tlut_type == 0)
-                    {
-                        color->r = ((c >> 11) & 0x1f) << 3;
-                        color->g = ((c >>  6) & 0x1f) << 3;
-                        color->b = ((c >>  1) & 0x1f) << 3;
-                        color->a = (c & 1) ? 0xff : 0;
-                    }
-                    else
-                    {
-                        color->r = color->g = color->b = (c >> 8) & 0xff;
-                        color->a = c & 0xff;
-                    }
-                    break;
-                }
-				case PIXEL_SIZE_16BIT:
-				{
-					UINT16 *tc = (UINT16*)texture_cache;
-                    int taddr = taddr_clamp(((tbase/2) + ((t) * (twidth/2)) + (s))  ^ ((t & 1) ? XOR_SWAP_WORD : 0));
-					UINT16 c = tc[taddr ^ WORD_ADDR_XOR];
-
-					color->r = ((c >> 11) & 0x1f) << 3;
-					color->g = ((c >>  6) & 0x1f) << 3;
-					color->b = ((c >>  1) & 0x1f) << 3;
-					color->a = (c & 1) ? 0xff : 0;
-					break;
-				}
-				case PIXEL_SIZE_32BIT:
-				{
-					UINT32 *tc = (UINT32*)texture_cache;
-                    int taddr = taddr_clamp(((tbase/4) + ((t) * (twidth/2)) + (s)) ^ ((t & 1) ? XOR_SWAP_DWORD : 0));
-					UINT32 c = tc[taddr];
-
-					color->r = ((c >> 24) & 0xff);
-					color->g = ((c >> 16) & 0xff);
-					color->b = ((c >>  8) & 0xff);
-					color->a = ((c >>  0) & 0xff);
-					break;
-				}
-				default:
-					color->r = color->g = color->b = color->a = 0xff;
-					fatalerror("FETCH_TEXEL: unknown RGBA texture size %d\n", tsize);
-					break;
+				curpixel_cvg = fill_cvg;
+				c = COLOR_COMBINER(machine, 0);
+				BLENDER1_32(machine, &fb[(index + i)], c);
 			}
-			break;
 		}
-		case 2:		// Color Index
+	}
+	else if (other_modes.cycle_type == CYCLE_TYPE_2)
+	{
+		for (j=y1; j <= y2; j++)
 		{
-			switch (tsize)
+			COLOR c1, c2;
+			index = j * fb_width;
+			for (i=x1; i <= x2; i++)
 			{
-				case PIXEL_SIZE_4BIT:
-				{
-					UINT8 *tc = (UINT8*)texture_cache;
-                    int taddr = taddr_clamp((tbase + ((t) * twidth) + ((s) / 2)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0));
-					UINT8 p = ((s) & 1) ? (tc[taddr ^ BYTE_ADDR_XOR] & 0xf) : (tc[taddr ^ BYTE_ADDR_XOR] >> 4);
-					UINT16 c = tlut[p ^ WORD_ADDR_XOR];
+				curpixel_cvg = fill_cvg;
+				c1 = COLOR_COMBINER(machine, 0);
+				c2 = COLOR_COMBINER(machine, 1);
+				BLENDER2_32(machine, &fb[(index + i)], c1, c2);
+			}
+		}
+	}
+	else
+	{
+		fatalerror("fill_rectangle_32bit: cycle type copy");
+	}
+}
 
-					if (other_modes.tlut_type == 0)
+INLINE void texture_rectangle_32bit(running_machine *machine, TEX_RECTANGLE *rect)
+{	// TODO: Z-compare and Z-update
+	UINT32 *fb = (UINT32*)&rdram[(fb_address / 4)];
+	int i, j;
+	int x1, x2, y1, y2;
+	int s, t;
+	int ss, st;
+
+	int clipx1, clipx2, clipy1, clipy2;
+
+	UINT32 tilenum = rect ->tilenum;
+	UINT32 tilenum2 = 0;
+
+	x1 = (rect->xh / 4);
+	x2 = (rect->xl / 4);
+	y1 = (rect->yh / 4);
+	y2 = (rect->yl / 4);
+
+	if (x2 < x1)
+	{
+		fatalerror( "x2 < x1: texture_rectangle_32bit" );
+	}
+
+	if (other_modes.cycle_type == CYCLE_TYPE_FILL || other_modes.cycle_type == CYCLE_TYPE_COPY)
+	{
+		rect->dsdx /= 4;
+		x2 += 1;
+		y2 += 1;
+	}
+
+	clipx1 = clip.xh / 4;
+	clipx2 = clip.xl / 4;
+	clipy1 = clip.yh / 4;
+	clipy2 = clip.yl / 4;
+
+	calculate_clamp_diffs(tilenum);
+
+	if (other_modes.cycle_type == CYCLE_TYPE_2)
+	{
+		if (!other_modes.tex_lod_en)
+		{
+			tilenum2 = (tilenum + 1) & 7;
+		}
+		else
+		{
+			tilenum2 = (tilenum + 1) & 7;
+		}
+	}
+
+	set_shade_for_rects(); // Needed by Pilotwings 64
+
+	t = (int)(rect->t) << 5;
+
+	if (other_modes.cycle_type == CYCLE_TYPE_1)
+	{
+		for (j = y1; j < y2; j++)
+		{
+			int fb_index = j * fb_width;
+
+			s = (int)(rect->s) << 5;
+
+			for (i = x1; i < x2; i++)
+			{
+				COLOR c;
+				curpixel_cvg=8;
+				ss = s >> 5;
+				st = t >> 5;
+				if (rect->flip)
+				{
+					TEXTURE_PIPELINE(&texel0_color, st, ss,(rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)), tilenum);
+				}
+				else
+				{
+					TEXTURE_PIPELINE(&texel0_color, ss, st,(rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)), tilenum);
+				}
+
+				c = COLOR_COMBINER(machine, 0);
+
+				BLENDER1_32(machine, &fb[(fb_index + i)], c);
+
+				s += rect->dsdx;
+			}
+
+			t += rect->dtdy;
+		}
+	}
+	else if (other_modes.cycle_type == CYCLE_TYPE_2)
+	{
+		for (j = y1; j < y2; j++)
+		{
+			int fb_index = j * fb_width;
+
+			s = (int)(rect->s) << 5;
+
+			for (i = x1; i < x2; i++)
+			{
+				COLOR c1, c2;
+				curpixel_cvg=8;
+				ss = s >> 5;
+				st = t >> 5;
+				if (rect->flip)
+				{
+					TEXTURE_PIPELINE(&texel0_color, st, ss, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)),tilenum);
+					TEXTURE_PIPELINE(&texel1_color, st, ss, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)),tilenum2);
+				}
+				else
+				{
+					TEXTURE_PIPELINE(&texel0_color, ss, st, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)),tilenum);
+					TEXTURE_PIPELINE(&texel1_color, ss, st, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)),tilenum2);
+				}
+
+				c1 = COLOR_COMBINER(machine, 0);
+				c2 = COLOR_COMBINER(machine, 1);
+
+				BLENDER2_32(machine, &fb[(fb_index + i)], c1, c2);
+
+				s += rect->dsdx;
+			}
+
+			t += rect->dtdy;
+		}
+	}
+	else if (other_modes.cycle_type == CYCLE_TYPE_COPY)
+	{
+		for (j = y1; j < y2; j++)
+		{
+			int fb_index = j * fb_width;
+
+			s = (int)(rect->s) << 5;
+
+			for (i = x1; i < x2; i++)
+			{
+				ss = s >> 5;
+				st = t >> 5;
+				if (rect->flip)
+				{
+					TEXTURE_PIPELINE(&texel0_color, st, ss,(rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)), tilenum);
+				}
+				else
+				{
+					TEXTURE_PIPELINE(&texel0_color, ss, st,(rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)), tilenum);
+				}
+
+				fb[fb_index + i] = (texel0_color.r << 24) | (texel0_color.g << 16) | (texel0_color.b << 8)|1;
+
+				s += rect->dsdx;
+			}
+
+			t += rect->dtdy;
+		}
+	}
+	else
+	{
+		fatalerror("texture_rectangle_32bit: unknown cycle type %d\n", other_modes.cycle_type);
+	}
+}
+
+
+static void render_spans_32(running_machine *machine, int start, int end, int tilenum, int shade, int texture, int zbuffer, int flip)
+{
+	UINT32 *fb = (UINT32*)&rdram[fb_address / 4];
+	UINT16 *zb = (UINT16*)&rdram[zb_address / 4];
+	UINT8 *zhb = &hidden_bits[zb_address >> 1];
+	int i, j;
+
+	int clipx1, clipx2, clipy1, clipy2;
+
+	UINT32 tilenum2 = 0;
+
+	int dr = span[0].dr;
+	int dg = span[0].dg;
+	int db = span[0].db;
+	int da = span[0].da;
+	int dz = span[0].dz;
+	int ds = span[0].ds;
+	int dt = span[0].dt;
+	int dw = span[0].dw;
+	int dzpix = span[0].dzpix;
+	int drinc, dginc, dbinc, dainc, dzinc, dsinc, dtinc, dwinc;
+	int xinc = flip ? 1 : -1;
+
+	calculate_clamp_diffs(tilenum);
+
+	clipx1 = clip.xh / 4;
+	clipx2 = clip.xl / 4;
+	clipy1 = clip.yh / 4;
+	clipy2 = clip.yl / 4;
+
+
+	if (other_modes.key_en)
+	{
+		fatalerror( "render_spans_32: key_en" );
+	}
+
+	if (other_modes.cycle_type == CYCLE_TYPE_2 && texture)
+	{
+		if (!other_modes.tex_lod_en)
+		{
+			tilenum2 = (tilenum + 1) & 7;
+		}
+		else
+		{
+			tilenum2 = (tilenum + 1) & 7;
+		}
+	}
+
+	if (start < clipy1)
+	{
+		start = clipy1;
+	}
+	if (start >= clipy2)
+	{
+		start = clipy2-1;
+	}
+	if (end < clipy1)
+	{
+		end = clipy1;
+	}
+	if (end >= clipy2)
+	{
+		end = clipy2-1;
+	}
+
+	drinc = flip ? (dr) : -dr;
+	dginc = flip ? (dg) : -dg;
+	dbinc = flip ? (db) : -db;
+	dainc = flip ? (da) : -da;
+	dzinc = flip ? (dz) : -dz;
+	dsinc = flip ? (ds) : -ds;
+	dtinc = flip ? (dt) : -dt;
+	dwinc = flip ? (dw) : -dw;
+
+	set_shade_for_tris(shade);
+
+	for (i = start; i <= end; i++)
+	{
+		int xstart = span[i].lx;
+		int xend = span[i].rx;
+		int r = span[i].r;
+		int g = span[i].g;
+		int b = span[i].b;
+		int a = span[i].a;
+		int z = span[i].z;
+		int s = span[i].s;
+		int t = span[i].t;
+		int w = span[i].w;
+
+		int x;
+		int fb_index = fb_width * i;
+		int length;
+
+		x = xend;
+
+		length = flip ? (xstart - xend) : (xend - xstart);
+
+		for (j=0; j <= length; j++)
+		{
+			int sr = r >> 16;
+			int sg = g >> 16;
+			int sb = b >> 16;
+			int sa = a >> 16;
+			int ss = s >> 16;
+			int st = t >> 16;
+			int sw = w >> 16;
+			UINT32 sz = z >> 13;
+			int sss = 0, sst = 0;
+			if (other_modes.z_source_sel)
+			{
+				sz = (((UINT32)primitive_z) << 3) & 0x3ffff;
+				dzpix = primitive_delta_z;
+			}
+
+			if (x >= clipx1 && x < clipx2)
+			{
+				curpixel_cvg = span[i].cvg[x];
+				if (curpixel_cvg > 8)
+				{
+					fatalerror("render_spans_32: curpixel_cvg = %d", curpixel_cvg);
+				}
+				if (curpixel_cvg)
+				{
+					COLOR c1, c2;
+					int curpixel = fb_index + x;
+					UINT32* fbcur = &fb[curpixel];
+					UINT16* zbcur = &zb[curpixel ^ WORD_ADDR_XOR];
+					UINT8* zhbcur = &zhb[curpixel ^ BYTE_ADDR_XOR];
+					UINT8* hbcur = 0;
+					int z_compare_result = 1;
+
+					c1.r = c1.g = c1.b = c1.a = 0;
+					c2.r = c2.g = c2.b = c2.a = 0;
+
+					if (other_modes.persp_tex_en)
 					{
-						color->r = ((c >> 11) & 0x1f) << 3;
-						color->g = ((c >>  6) & 0x1f) << 3;
-						color->b = ((c >>  1) & 0x1f) << 3;
-						color->a = (c & 1) ? 0xff : 0;
+						tcdiv(ss, st, sw, &sss, &sst);
 					}
 					else
 					{
-						color->r = color->g = color->b = (c >> 8) & 0xff;
-						color->a = c & 0xff;
+						sss = ss;
+						sst = st;
 					}
-					break;
-				}
-				case PIXEL_SIZE_8BIT:
-				{
-					UINT8 *tc = (UINT8*)texture_cache;
-                    int taddr = taddr_clamp((tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0));
-					UINT8 p = tc[taddr ^ BYTE_ADDR_XOR];
-					UINT16 c = tlut[p ^ WORD_ADDR_XOR];
 
-					if (other_modes.tlut_type == 0)
+					if (shade)
 					{
-						color->r = ((c >> 11) & 0x1f) << 3;
-						color->g = ((c >>  6) & 0x1f) << 3;
-						color->b = ((c >>  1) & 0x1f) << 3;
-						color->a = (c & 1) ? 0xff : 0;
+						// Needed by Superman
+						if (sr > 0xff) sr = 0xff;
+						if (sg > 0xff) sg = 0xff;
+						if (sb > 0xff) sb = 0xff;
+						if (sa > 0xff) sa = 0xff;
+						if (sr < 0) sr = 0;
+						if (sg < 0) sg = 0;
+						if (sb < 0) sb = 0;
+						if (sa < 0) sa = 0;
+						shade_color.r = sr;
+						shade_color.g = sg;
+						shade_color.b = sb;
+						shade_color.a = sa;
 					}
-					else
+
+					if (texture)
 					{
-						color->r = color->g = color->b = (c >> 8) & 0xff;
-						color->a = c & 0xff;
+						if (other_modes.cycle_type == CYCLE_TYPE_1)
+						{
+							TEXTURE_PIPELINE(&texel0_color, sss, sst, 0, tilenum);
+						}
+						else
+						{
+							TEXTURE_PIPELINE(&texel0_color, sss, sst, 0, tilenum);
+							TEXTURE_PIPELINE(&texel1_color, sss, sst, 0, tilenum2);
+						}
 					}
-					break;
-				}
-                case PIXEL_SIZE_16BIT:
-                {
-                    // 16-bit CI is a "valid" mode; some games use it, it behaves the same as 16-bit RGBA
-                    UINT16 *tc = (UINT16*)texture_cache;
-                    int taddr = taddr_clamp(((tbase/2) + ((t) * (twidth/2)) + (s))  ^ ((t & 1) ? XOR_SWAP_WORD : 0));
-                    UINT16 c = tc[taddr ^ WORD_ADDR_XOR];
 
-                    color->r = ((c >> 11) & 0x1f) << 3;
-                    color->g = ((c >>  6) & 0x1f) << 3;
-                    color->b = ((c >>  1) & 0x1f) << 3;
-                    color->a = (c & 1) ? 0xff : 0;
-                    break;
-                }
-				default:
-					color->r = color->g = color->b = color->a = 0xff;
-					fatalerror("FETCH_TEXEL: unknown CI texture size %d\n", tsize);
-					break;
+					if (other_modes.cycle_type == CYCLE_TYPE_1)
+					{
+						c1 = COLOR_COMBINER(machine, 0);
+					}
+					else if (other_modes.cycle_type == CYCLE_TYPE_2)
+					{
+						c1 = COLOR_COMBINER(machine, 0);
+						c2 = COLOR_COMBINER(machine, 1);
+  					}
+
+					if ((zbuffer || other_modes.z_source_sel) && other_modes.z_compare_en)
+					{
+						z_compare_result = z_compare(fbcur, hbcur, zbcur, zhbcur, sz, dzpix);
+					}
+
+					if(z_compare_result)
+					{
+						int rendered = 0;
+
+						if (other_modes.cycle_type == CYCLE_TYPE_1)
+						{
+							rendered = BLENDER1_32(machine, fbcur, c1);
+						}
+                		else
+                		{
+							rendered = BLENDER2_32(machine, fbcur, c1, c2);
+						}
+
+						if (other_modes.z_update_en && rendered)
+						{
+							z_store(zbcur, zhbcur, sz, dzpix);
+						}
+					}
+				}
 			}
-			break;
-		}
-		case 3:		// Intensity + Alpha
-		{
-			switch (tsize)
-			{
-				case PIXEL_SIZE_4BIT:
-				{
-					UINT8 *tc = (UINT8*)texture_cache;
-                    int taddr = taddr_clamp((tbase + ((t) * twidth) + ((s) / 2)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0));
-					UINT8 p = ((s) & 1) ? (tc[taddr ^ BYTE_ADDR_XOR] & 0xf) : (tc[taddr ^ BYTE_ADDR_XOR] >> 4);
-					UINT8 i = ((p & 0xe) << 4) | ((p & 0xe) << 1) | (p & 0xe >> 2);
 
-					color->r = i;
-					color->g = i;
-					color->b = i;
-					color->a = (p & 0x1) ? 0xff : 0;
-					break;
-				}
-				case PIXEL_SIZE_8BIT:
-				{
-					UINT8 *tc = (UINT8*)texture_cache;
-                    int taddr = taddr_clamp((tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0));
-					UINT8 p = tc[taddr ^ BYTE_ADDR_XOR];
-					UINT8 i = (p >> 4) | (p & 0xf0);
+			r += drinc;
+			g += dginc;
+			b += dbinc;
+			a += dainc;
+			z += dzinc;
+			s += dsinc;
+			t += dtinc;
+			w += dwinc;
 
-					color->r = i;
-					color->g = i;
-					color->b = i;
-					color->a = (p & 0xf) | ((p << 4) & 0xf0);
-					break;
-				}
-				case PIXEL_SIZE_16BIT:
-				{
-					UINT16 *tc = (UINT16*)texture_cache;
-                    int taddr = taddr_clamp((tbase + ((t) * (twidth/2)) + (s)) ^ ((t & 1) ? XOR_SWAP_WORD : 0));
-					UINT16 c = tc[taddr ^ WORD_ADDR_XOR];
-					UINT8 i = (c >> 8);
-
-					color->r = i;
-					color->g = i;
-					color->b = i;
-					color->a = c & 0xff;
-					break;
-				}
-				default:
-					color->r = color->g = color->b = color->a = 0xff;
-					fatalerror("FETCH_TEXEL: unknown IA texture size %d\n", tsize);
-					break;
-			}
-			break;
-		}
-		case 4:		// Intensity
-		{
-			switch (tsize)
-			{
-				case PIXEL_SIZE_4BIT:
-				{
-					UINT8 *tc = (UINT8*)texture_cache;
-                    int taddr = taddr_clamp((tbase + ((t) * twidth) + ((s) / 2)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0));
-					UINT8 c = ((s) & 1) ? (tc[taddr ^ BYTE_ADDR_XOR] & 0xf) : (tc[taddr ^ BYTE_ADDR_XOR] >> 4);
-					c |= (c << 4);
-
-					color->r = c;
-					color->g = c;
-					color->b = c;
-					color->a = c;
-					break;
-				}
-				case PIXEL_SIZE_8BIT:
-				{
-					UINT8 *tc = (UINT8*)texture_cache;
-                    int taddr = taddr_clamp((tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0));
-					UINT8 c = tc[taddr ^ BYTE_ADDR_XOR];
-
-					color->r = c;
-					color->g = c;
-					color->b = c;
-					color->a = c;
-					break;
-				}
-				default:
-					color->r = color->g = color->b = color->a = 0xff;
-					fatalerror("FETCH_TEXEL: unknown I texture size %d\n", tsize);
-					break;
-			}
-			break;
-		}
-		default:
-		{
-			color->r = color->g = color->b = color->a = 0xff;
-			fatalerror("FETCH_TEXEL: unknown texture format %d\n", tformat);
-			break;
+			x += xinc;
 		}
 	}
 }
 
-#if 1
-#define TEXTURE_PIPELINE(TEX, SSS, SST, NOBILINEAR, CYCLE)                                                                          \
-do                                                                                                                                  \
-{                                                                                                                                   \
-    if (other_modes.sample_type && !NOBILINEAR)                                                                                     \
-    {                                                                                                                               \
-        COLOR t0, t1, t2, t3;                                                                                                       \
-        int sss1, sst1, sss2, sst2;                                                                                                 \
-                                                                                                                                    \
-        /* bilinear */                                                                                                              \
-                                                                                                                                    \
-        sss1 = SSS >> 10;                                                                                                           \
-        sss2 = sss1 + 1;                                                                                                            \
-                                                                                                                                    \
-        sst1 = SST >> 10;                                                                                                           \
-        sst2 = sst1 + 1;                                                                                                            \
-                                                                                                                                    \
-        sss1 -= tsl[CYCLE] >> 2;                                                                                                    \
-        sss2 -= tsl[CYCLE] >> 2;                                                                                                    \
-                                                                                                                                    \
-        sst1 -= ttl[CYCLE] >> 2;                                                                                                    \
-        sst2 -= ttl[CYCLE] >> 2;                                                                                                    \
-                                                                                                                                    \
-        CLAMP(sss1, sst1, CYCLE);                                                                                                   \
-        CLAMP(sss2, sst2, CYCLE);                                                                                                   \
-                                                                                                                                    \
-        MASK(sss1, sst1, CYCLE);                                                                                                    \
-        MASK(sss2, sst2, CYCLE);                                                                                                    \
-                                                                                                                                    \
-        FETCH_TEXEL(&t0, sss1, sst1, twidth[CYCLE], tformat[CYCLE], tsize[CYCLE], tbase[CYCLE], tpal[CYCLE]);                       \
-        FETCH_TEXEL(&t1, sss2, sst1, twidth[CYCLE], tformat[CYCLE], tsize[CYCLE], tbase[CYCLE], tpal[CYCLE]);                       \
-        FETCH_TEXEL(&t2, sss1, sst2, twidth[CYCLE], tformat[CYCLE], tsize[CYCLE], tbase[CYCLE], tpal[CYCLE]);                       \
-        FETCH_TEXEL(&t3, sss2, sst2, twidth[CYCLE], tformat[CYCLE], tsize[CYCLE], tbase[CYCLE], tpal[CYCLE]);                       \
-                                                                                                                                    \
-        TEX.r = (((( (t0.r * (0x3ff - (SSS & 0x3ff))) + (t1.r * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +       \
-                         (((( (t2.r * (0x3ff - (SSS & 0x3ff))) + (t3.r * ((SSS & 0x3ff))) ) >> 10) * ((SST & 0x3ff))) >> 10);       \
-                                                                                                                                    \
-        TEX.g = (((( (t0.g * (0x3ff - (SSS & 0x3ff))) + (t1.g * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +       \
-                         (((( (t2.g * (0x3ff - (SSS & 0x3ff))) + (t3.g * ((SSS & 0x3ff))) ) >> 10) * ((SST & 0x3ff))) >> 10);       \
-                                                                                                                                    \
-        TEX.b = (((( (t0.b * (0x3ff - (SSS & 0x3ff))) + (t1.b * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +       \
-                         (((( (t2.b * (0x3ff - (SSS & 0x3ff))) + (t3.b * ((SSS & 0x3ff))) ) >> 10) * ((SST & 0x3ff))) >> 10);       \
-                                                                                                                                    \
-        TEX.a = (((( (t0.a * (0x3ff - (SSS & 0x3ff))) + (t1.a * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +       \
-                         (((( (t2.a * (0x3ff - (SSS & 0x3ff))) + (t3.a * ((SSS & 0x3ff))) ) >> 10) * ((SST & 0x3ff))) >> 10);       \
-    }                                                                                                                               \
-    else                                                                                                                            \
-    {                                                                                                                               \
-        int sss1, sst1;                                                                                                             \
-        sss1 = SSS >> 10;                                                                                                           \
-        if ((SSS & 0x3ff) >= 0x200) sss1++;                                                                                         \
-                                                                                                                                    \
-        sst1 = SST >> 10;                                                                                                           \
-        if ((SST & 0x3ff) >= 0x200) sst1++;                                                                                         \
-                                                                                                                                    \
-        sss1 -= tsl[CYCLE] >> 2;                                                                                                    \
-        sst1 -= ttl[CYCLE] >> 2;                                                                                                    \
-                                                                                                                                    \
-        CLAMP(sss1, sst1, CYCLE);                                                                                                   \
-                                                                                                                                    \
-        MASK(sss1, sst1, CYCLE);                                                                                                    \
-                                                                                                                                    \
-        /* point sample */                                                                                                          \
-        FETCH_TEXEL(&TEX, sss1, sst1, twidth[CYCLE], tformat[CYCLE], tsize[CYCLE], tbase[CYCLE], tpal[CYCLE]);                      \
-    }                                                                                                                               \
-}                                                                                                                                   \
-while(0)
-#endif
-
-// This is the implementation with 3-sample bilinear filtering, which should be more correct, but not yet working properly
-// TODO: check the correct texel samples and weighting values
-
-#if 0
-#define TEXTURE_PIPELINE(TEX, SSS, SST, NOBILINEAR)                                                                                 \
-do                                                                                                                                  \
-{                                                                                                                                   \
-    if (other_modes.sample_type && !NOBILINEAR)                                                                                     \
-    {                                                                                                                               \
-        COLOR t0, t1, t2;                                                                                                           \
-        int sss1, sst1, sss2, sst2;                                                                                                 \
-                                                                                                                                    \
-        /* bilinear */                                                                                                              \
-                                                                                                                                    \
-        sss1 = (SSS >> 10) - (tsl >> 2);                                                                                            \
-        sss2 = sss1 + 1;                                                                                                            \
-                                                                                                                                    \
-        sst1 = (SST >> 10) - (ttl >> 2);                                                                                            \
-        sst2 = sst1 + 1;                                                                                                            \
-                                                                                                                                    \
-        CLAMP(sss1, sst1);                                                                                                          \
-        CLAMP(sss2, sst2);                                                                                                          \
-                                                                                                                                    \
-        FETCH_TEXEL(&t0, sss1, sst1, twidth, tformat, tsize, tbase);                                                                \
-        FETCH_TEXEL(&t1, sss2, sst1, twidth, tformat, tsize, tbase);                                                                \
-        FETCH_TEXEL(&t2, sss2, sst2, twidth, tformat, tsize, tbase);                                                                \
-                                                                                                                                    \
-        TEX.r = (((( (t0.r * (0x3ff - (SSS & 0x3ff))) + (t1.r * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +       \
-                (( (t2.r) * ((SST & 0x3ff))) >> 10);                                                                                \
-                                                                                                                                    \
-        TEX.g = (((( (t0.g * (0x3ff - (SSS & 0x3ff))) + (t1.g * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +       \
-                (( (t2.g) * ((SST & 0x3ff))) >> 10);                                                                                \
-                                                                                                                                    \
-        TEX.b = (((( (t0.b * (0x3ff - (SSS & 0x3ff))) + (t1.b * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +       \
-                (( (t2.b) * ((SST & 0x3ff))) >> 10);                                                                                \
-                                                                                                                                    \
-        TEX.a = (((( (t0.a * (0x3ff - (SSS & 0x3ff))) + (t1.a * ((SSS & 0x3ff))) ) >> 10) * (0x3ff - (SST & 0x3ff))) >> 10) +       \
-                (( (t2.a) * ((SST & 0x3ff))) >> 10);                                                                                \
-    }                                                                                                                               \
-    else                                                                                                                            \
-    {                                                                                                                               \
-        int sss1, sst1;                                                                                                             \
-        sss1 = (SSS >> 10) - (tsl >> 2);                                                                                            \
-        if ((SSS & 0x3ff) >= 0x200) sss1++;                                                                                         \
-                                                                                                                                    \
-        sst1 = (SST >> 10) - (ttl >> 2);                                                                                            \
-        if ((SST & 0x3ff) >= 0x200) sst1++;                                                                                         \
-                                                                                                                                    \
-        CLAMP(sss1, sst1);                                                                                                          \
-                                                                                                                                    \
-        /* point sample */                                                                                                          \
-        FETCH_TEXEL(&TEX, sss1, sst1, twidth, tformat, tsize, tbase);                                                               \
-    }                                                                                                                               \
-}                                                                                                                                   \
-while(0)
-#endif
-
-#define TEXTURE_PIPELINE1(SSS, SST, NOBILINEAR)             \
-do                                                          \
-{                                                           \
-    TEXTURE_PIPELINE(texel0_color, SSS, SST, NOBILINEAR, 0);\
-}                                                           \
-while(0)
-
-#define TEXTURE_PIPELINE2(SSS, SST, NOBILINEAR)             \
-do                                                          \
-{                                                           \
-    TEXTURE_PIPELINE(texel0_color, SSS, SST, NOBILINEAR, 0);\
-    TEXTURE_PIPELINE(texel1_color, SSS, SST, NOBILINEAR, 1);\
-}                                                           \
-while(0)
-
-static int alpha_compare_success(COLOR c1, COLOR c2)
-{
-    if( other_modes.alpha_compare_en )
-    {
-        if( other_modes.cycle_type == CYCLE_TYPE_1 )
-        {
-            if( c1.a > blend_color.a )
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-        if( other_modes.cycle_type == CYCLE_TYPE_2 )
-        {
-            if( c2.a > blend_color.a )
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-    }
-    else
-    {
-        return 1;
-    }
-    return 0;
-}
-
-/* Does not yet work properly */
-static void compress_z(UINT32 in, UINT16 *out_z, UINT8 *out_dz)
-{
-    UINT32 rounded = (in >> 13) & 0x0003ffff;
-    UINT16 full_delta = in & 0x0000ffff;
-    UINT8 exponent = 0;
-    UINT8 high_delta_bit = 15;
-    UINT16 mantissa = 0;
-    UINT32 final_value = 0;
-
-    // Determine exponent and mantissa
-    for (exponent = 0; exponent < 7; exponent++)
-    {
-        if (!(rounded & (0x00020000 >> exponent)))
-        {
-            break;
-        }
-    }
-    mantissa = (rounded >> ((exponent != 7) ? (6 - exponent) : 0)) & 0x000007ff;
-
-    // Determine the high bit of Z delta
-    for (high_delta_bit = 15; high_delta_bit > 0; high_delta_bit--)
-    {
-        if (full_delta & (1 << high_delta_bit))
-        {
-            break;
-        }
-    }
-
-    // Composite the final value
-    final_value = (mantissa << 7) | (exponent << 4) | (high_delta_bit & 0x0f);
-    *out_z = (final_value >> 2) & 0xfffc;
-    *out_dz = final_value & 0x000f;
-}
-
-/* Does not yet work properly */
-static void decompress_z(UINT16 in, UINT32 *out)
-{
-    UINT16 mantissa = (in >> 5) & 0x07ff;
-    UINT8 exponent = (in >> 2) & 0x0007;
-    switch (exponent)
-    {
-        case 0:
-            (*out) = (mantissa << 6);
-            break;
-        case 1:
-            (*out) = 0x20000 | (mantissa << 5);
-            break;
-        case 2:
-            (*out) = 0x30000 | (mantissa << 4);
-            break;
-        case 3:
-            (*out) = 0x38000 | (mantissa << 3);
-            break;
-        case 4:
-            (*out) = 0x3c000 | (mantissa << 2);
-            break;
-        case 5:
-            (*out) = 0x3e000 | (mantissa << 1);
-            break;
-        case 6:
-            (*out) = 0x3f000 | mantissa;
-            break;
-        case 7:
-            (*out) = 0x3f800 | mantissa;
-            break;
-    }
-}
-
-static void calculate_coverage( UINT8 *out, UINT8 in, int* ovf, UINT8 *old )
-{
-    (*old) = (*out);
-    if (((*out) + in) > 8)
-    {
-        (*ovf) = 1;
-    }
-    switch (other_modes.cvg_dest)
-    {
-        case 0: // Clamp
-            if (other_modes.image_read_en)
-            {
-                (*out) = (*out) + in;
-            }
-            else
-            {
-                (*out) = in;
-            }
-            if (*out > 8)
-            {
-                *out = 8;
-            }
-            break;
-        case 1: // Wrap
-            if (other_modes.image_read_en)
-            {
-                (*out) = ( (*out) - 1 ) + in;
-            }
-            else
-            {
-                (*out) = in;
-            }
-            (*out) &= 0x07;
-            (*out)++;
-            break;
-        case 2: // Zap
-            (*out) = 8;
-            break;
-        case 3: // Save
-            (*out) = (*out);
-            break;
-    }
-}
-
-static void texture_rectangle_16bit(TEX_RECTANGLE *rect)
-{
-    UINT16 *fb = (UINT16*)&rdram[(fb_address / 4)];
-    UINT16 *zb = (UINT16*)&rdram[(zb_address / 4)];
-    UINT8* cvg_buf = (UINT8*)&cvg_mem[fb_address];
-    int i, j;
-    int x1, x2, y1, y2;
-    int tsl[2], tsh[2], ttl[2], tth[2];
-    int s, t;
-    int twidth[2], tformat[2], tsize[2], tbase[2], tpal[2];
-    int clamp_s[2], clamp_t[2], mask_s[2], mask_t[2], mirror_s[2], mirror_t[2];
-    int clipx1, clipx2, clipy1, clipy2;
-    int cycle;
-    UINT8 cvg_span[RDP_CVG_SPAN_MAX];
-    int span_index = 0;
-    int alpha_reject = 0;
-    COLOR c1, c2;
-    c1.r = c1.g = c1.b = c1.a = 0;
-    c2.r = c2.g = c2.b = c2.a = 0;
-
-    x1 = rect->xh;
-    x2 = rect->xl;
-    y1 = rect->yh;
-    y2 = rect->yl;
-
-    if (other_modes.cycle_type == CYCLE_TYPE_FILL || other_modes.cycle_type == CYCLE_TYPE_COPY)
-    {
-        rect->dsdx /= 4;
-        x2 += 1;
-        y2 += 1;
-    }
-
-    clipx1 = clip.xh;
-    clipx2 = clip.xl;
-    clipy1 = clip.yh;
-    clipy2 = clip.yl;
-
-    // clip
-    if (x1 < clipx1)
-    {
-        x1 = clipx1;
-    }
-    if (y1 < clipy1)
-    {
-        y1 = clipy1;
-    }
-    if (x2 >= clipx2)
-    {
-        x2 = clipx2-1;
-    }
-    if (y2 >= clipy2)
-    {
-        y2 = clipy2-1;
-    }
-
-    for( cycle = 0; cycle < 2; cycle++ )
-    {
-        tsl[cycle] = tile[rect->tilenum + cycle].sl;
-        tsh[cycle] = tile[rect->tilenum + cycle].sh;
-        ttl[cycle] = tile[rect->tilenum + cycle].tl;
-        tth[cycle] = tile[rect->tilenum + cycle].th;
-
-        twidth[cycle] = tile[rect->tilenum + cycle].line;
-        tformat[cycle] = tile[rect->tilenum + cycle].format;
-        tsize[cycle] = tile[rect->tilenum + cycle].size;
-        tbase[cycle] = tile[rect->tilenum + cycle].tmem;
-        tpal[cycle] = tile[rect->tilenum + cycle].palette;
-
-        clamp_t[cycle] = tile[rect->tilenum + cycle].ct;
-        clamp_s[cycle] = tile[rect->tilenum + cycle].cs;
-
-        mirror_t[cycle] = tile[rect->tilenum + cycle].mt;
-        mirror_s[cycle] = tile[rect->tilenum + cycle].ms;
-        mask_t[cycle] = tile[rect->tilenum + cycle].mask_t;
-        mask_s[cycle] = tile[rect->tilenum + cycle].mask_s;
-    }
-
-    t = (int)(rect->t) << 5;
-
-    if (other_modes.cycle_type == CYCLE_TYPE_1)
-    {
-        for (j = y1; j < y2; j += ((j == y1) ? (4 - (y1 & 0x0003)) : 4) )
-        {
-            int fb_index = (j >> 2) * fb_width;
-
-            s = (int)(rect->s) << 5;
-
-            memset( cvg_span, 0, RDP_CVG_SPAN_MAX );
-
-            for (span_index = j; span_index < ((j &~ 0x0003) + 4) && span_index < y2; span_index++)
-            {
-                int span_start = x1;
-                int span_end = x2;
-                int span_iter = 0;
-                if (x1 < 0)
-                {
-                    span_start = 0;
-                }
-                if (x2 >= (RDP_CVG_SPAN_MAX << 2))
-                {
-                    span_end = (RDP_CVG_SPAN_MAX << 2) - 1;
-                }
-                //printf( "%d: Span from %d to %d\n", j, span_start, span_end );
-                for (span_iter=span_start; span_iter < span_end; span_iter++)
-                {
-                    if ((span_iter & 1) == (span_index & 1))
-                    {
-                        cvg_span[span_iter >> 2]++;
-                    }
-                }
-            }
-
-            for (i = x1; i < x2; i += 4)
-            {
-                if (i >= 0 && i < (RDP_CVG_SPAN_MAX << 2) && cvg_span[i >> 2] > 0)
-                {
-                    TEXTURE_PIPELINE1(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
-
-                    c1 = COLOR_COMBINER(0);
-
-                    if( alpha_compare_success(c1, c2) )
-                    {
-                        int dith = dither_matrix_4x4[(((j >> 2) & 3) << 2) + (((i >> 2)^WORD_ADDR_XOR) & 3)];
-                        int cvg_ovf = 0;
-                        UINT8 cvg_old = 0;
-                        calculate_coverage( &cvg_buf[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR], cvg_span[i >> 2], &cvg_ovf, &cvg_old );
-                        if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
-                        {
-                            BLENDER1_16(&fb[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR], c1, dith, &cvg_span[i >> 2], &cvg_old, &alpha_reject);
-
-                            if( other_modes.z_update_en && other_modes.z_source_sel && !alpha_reject )
-                            {
-                                zb[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR] = primitive_z;
-                            }
-                        }
-                    }
-                }
-
-                s += rect->dsdx;
-            }
-
-            t += rect->dtdy;
-        }
-    }
-    else if (other_modes.cycle_type == CYCLE_TYPE_2)
-    {
-        for (j = y1; j < y2; j += (j == y1) ? (4 - (y1 & 0x0003)): 4 )
-        {
-            int fb_index = (j >> 2) * fb_width;
-
-            s = (int)(rect->s) << 5;
-
-            memset( cvg_span, 0, RDP_CVG_SPAN_MAX );
-
-            for (span_index = j; span_index < ((j &~ 0x0003) + 4) && span_index < y2; span_index++)
-            {
-                int span_start = x1;
-                int span_end = x2;
-                int span_iter = 0;
-                if (x1 < 0)
-                {
-                    span_start = 0;
-                }
-                if (x2 >= (RDP_CVG_SPAN_MAX << 2))
-                {
-                    span_end = (RDP_CVG_SPAN_MAX << 2) - 1;
-                }
-                for (span_iter=span_start; span_iter < span_end; span_iter++)
-                {
-                    if ((span_iter & 1) == (span_index & 1))
-                    {
-                        cvg_span[span_iter >> 2]++;
-                    }
-                }
-            }
-
-            for (i = x1; i < x2; i += 4)
-            {
-                if (i >= 0 && i < (RDP_CVG_SPAN_MAX << 2) && cvg_span[i >> 2] > 0)
-                {
-                    TEXTURE_PIPELINE2(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
-
-                    c1 = COLOR_COMBINER(0);
-                    c2 = COLOR_COMBINER(1);
-
-                    if( alpha_compare_success(c1, c2) )
-                    {
-                        int dith = dither_matrix_4x4[((((j >> 2)) & 3) << 2) + (((i >> 2)^WORD_ADDR_XOR) & 3)];
-                        int cvg_ovf = 0;
-                        UINT8 cvg_old = 0;
-                        calculate_coverage( &cvg_buf[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR], cvg_span[i >> 2], &cvg_ovf, &cvg_old );
-                        if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
-                        {
-                            BLENDER2_16(&fb[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR], c1, c2, dith, &cvg_span[i >> 2], &cvg_old, &alpha_reject);
-
-                            if( other_modes.z_update_en && other_modes.z_source_sel && !alpha_reject )
-                            {
-                                zb[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR] = primitive_z;
-                            }
-                        }
-                    }
-                }
-
-                s += rect->dsdx;
-            }
-
-            t += rect->dtdy;
-        }
-    }
-    else if (other_modes.cycle_type == CYCLE_TYPE_COPY)
-    {
-        for (j = y1; j < y2; j += (j == y1) ? (4 - (y1 & 0x0003)): 4 )
-        {
-            int fb_index = (j >> 2) * fb_width;
-
-            s = (int)(rect->s) << 5;
-
-            memset( cvg_span, 0, RDP_CVG_SPAN_MAX );
-
-            for (span_index = j; span_index < ((j &~ 0x0003) + 4) && span_index < y2; span_index++)
-            {
-                int span_start = x1;
-                int span_end = x2;
-                int span_iter = 0;
-                if (x1 < 0)
-                {
-                    span_start = 0;
-                }
-                if (x2 >= (RDP_CVG_SPAN_MAX << 2))
-                {
-                    span_end = (RDP_CVG_SPAN_MAX << 2) - 1;
-                }
-                for (span_iter=span_start; span_iter < span_end; span_iter++)
-                {
-                    if ((span_iter & 1) == (span_index & 1))
-                    {
-                        cvg_span[span_iter >> 2]++;
-                    }
-                }
-            }
-
-            // MooglyGuy note: Fix this, this is probably completely wrong
-
-            for (i = x1; i < x2; i += 4)
-            {
-                if (i >= 0 && i < (RDP_CVG_SPAN_MAX << 2) && cvg_span[i >> 2] > 0)
-                {
-                    TEXTURE_PIPELINE1(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
-
-                    if( texel0_color.a != 0 )
-                    {
-                        int cvg_ovf = 0;
-                        UINT8 cvg_old = 0;
-                        calculate_coverage( &cvg_buf[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR], cvg_span[i >> 2], &cvg_ovf, &cvg_old );
-                        if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
-                        {
-                            fb[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR] = ((texel0_color.r >> 3) << 11) | ((texel0_color.g >> 3) << 6) | ((texel0_color.b >> 3) << 1) | ((cvg_buf[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR] - 1) >> 2);
-                            if( other_modes.z_update_en && other_modes.z_source_sel )
-                            {
-                                zb[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR] = primitive_z;
-                            }
-                        }
-                    }
-                }
-
-                s += rect->dsdx;
-            }
-
-            t += rect->dtdy;
-        }
-    }
-    else
-    {
-        fatalerror("texture_rectangle_16bit: unknown cycle type %d\n", other_modes.cycle_type);
-    }
-}
-
 /*****************************************************************************/
 
-INLINE void BLENDER1_32(UINT32 *fb, COLOR c, UINT8 *new_cvg, UINT8 *old_cvg, int *alpha_reject)
+static void render_spans_16(running_machine *machine, int start, int end, int tilenum, int shade, int texture, int zbuffer, int flip)
 {
-    int r, g, b;
+	UINT16 *fb = (UINT16*)&rdram[fb_address / 4];
+	UINT16 *zb = (UINT16*)&rdram[zb_address / 4];
+	UINT8 *hb = &hidden_bits[fb_address >> 1];
+	UINT8 *zhb = &hidden_bits[zb_address >> 1];
 
-    if( other_modes.force_blend )
-    {
-        blend_color.r = c.r;
-        blend_color.g = c.g;
-        blend_color.b = c.b;
-    }
+	int i, j;
 
-    pixel_color.r = c.r;
-    pixel_color.g = c.g;
-    pixel_color.b = c.b;
-    pixel_color.a = c.a;
-    inv_pixel_color.r = 0xff - *blender1a_r[0];
-    inv_pixel_color.g = 0xff - *blender1a_g[0];
-    inv_pixel_color.b = 0xff - *blender1a_b[0];
-    inv_pixel_color.a = 0xff - *blender1b_a[0];
+	int clipx1, clipx2, clipy1, clipy2;
 
-    if( other_modes.alpha_cvg_select )
-    {
-        if( other_modes.cvg_times_alpha )
-        {
-            pixel_color.a = (UINT8)( ( (INT32)(c.a) * (INT32)( (*new_cvg) * 0x20 - 1 ) ) >> 8 );
-        }
-        else
-        {
-            pixel_color.a = (UINT8)( (INT32)(*new_cvg) * 0x20 - 1 );
-        }
+	UINT32 prim_tile = tilenum;
+	UINT32 tilenum2 = 0;
+	UINT32 disable_lod = 0;
 
-        if( pixel_color.a == 0 )
-        {
-            *alpha_reject = 1;
-            return;
-        }
-    }
+	int LOD = 0;
+	INT32 horstep, vertstep;
+	INT32 l_tile;
+	UINT32 magnify = 0;
+	UINT32 distant = 0;
 
-    if (other_modes.image_read_en)
-    {
-        UINT32 mem = *fb;
-        memory_color.r = ((mem >> 24) & 0xff);
-        memory_color.g = ((mem >> 16) & 0xff);
-        memory_color.b = ((mem >>  8) & 0xff);
-        memory_color.a = /*(UINT8)((INT32)(*old_cvg) * 0x20 - 1)*/0;
-    }
+	int dr = span[0].dr;
+	int dg = span[0].dg;
+	int db = span[0].db;
+	int da = span[0].da;
+	int dz = span[0].dz;
+	int ds = span[0].ds;
+	int dt = span[0].dt;
+	int dw = span[0].dw;
+	int dzpix = span[0].dzpix;
+	int drinc, dginc, dbinc, dainc, dzinc, dsinc, dtinc, dwinc;
+	int xinc = flip ? 1 : -1;
 
-    if (((int)(*blender1b_a[0]) + (int)(*blender2b_a[0])) > 0)
-    {
-        r = ((int)(*blender1a_r[0]) * (int)(*blender1b_a[0]) +
-             (int)(*blender2a_r[0]) * (int)(*blender2b_a[0])) /
-            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
+	int nexts, nextt, nextsw;
+	int lodclamp = 0;
 
-        g = ((int)(*blender1a_g[0]) * (int)(*blender1b_a[0]) +
-             (int)(*blender2a_g[0]) * (int)(*blender2b_a[0])) /
-            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
+	calculate_clamp_diffs(tilenum);
 
-        b = ((int)(*blender1a_b[0]) * (int)(*blender1b_a[0]) +
-             (int)(*blender2a_b[0]) * (int)(*blender2b_a[0])) /
-            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
-    }
-    else
-    {
-        r = g = b = 0;
-    }
+	clipx1 = clip.xh / 4;
+	clipx2 = clip.xl / 4;
+	clipy1 = clip.yh / 4;
+	clipy2 = clip.yl / 4;
 
-    //r = g = b = 0xff;
+	if (other_modes.cycle_type == CYCLE_TYPE_2 && texture && !other_modes.tex_lod_en)
+	{
+		tilenum2 = (prim_tile + 1) & 7;
+	}
+	if (texture && !other_modes.tex_lod_en)
+	{
+		tilenum = prim_tile;
+	}
 
-    if (r > 255) r = 255;
-    if (g > 255) g = 255;
-    if (b > 255) b = 255;
 
-    *fb = (r << 24) | (g << 16) | (b << 8) | 0xe0;
+	if (other_modes.tex_lod_en && other_modes.cycle_type != CYCLE_TYPE_2) // Used by World Driver Championship
+	{
+		disable_lod = 1;
+	}
+
+	drinc = flip ? (dr) : -dr;
+	dginc = flip ? (dg) : -dg;
+	dbinc = flip ? (db) : -db;
+	dainc = flip ? (da) : -da;
+	dzinc = flip ? (dz) : -dz;
+	dsinc = flip ? (ds) : -ds;
+	dtinc = flip ? (dt) : -dt;
+	dwinc = flip ? (dw) : -dw;
+
+	if (start < clipy1)
+	{
+		start = clipy1;
+	}
+	if (start >= clipy2)
+	{
+		start = clipy2 - 1;
+	}
+	if (end < clipy1)
+	{
+		end = clipy1;
+	}
+	if (end >= clipy2) // Needed by 40 Winks
+	{
+		end = clipy2 - 1;
+	}
+
+	set_shade_for_tris(shade); // Needed by backgrounds in Top Gear Rally 1
+
+	for (i = start; i <= end; i++)
+	{
+		int xstart = span[i].lx;
+		int xend = span[i].rx;
+		int r = 0, g = 0, b = 0, a = 0;
+		int z = span[i].z;
+		int s = span[i].s;
+		int t = span[i].t;
+		int w = span[i].w;
+
+		int x;
+
+		int fb_index = fb_width * i;
+		int length;
+
+		if (shade)
+		{
+			r = span[i].r;
+			g = span[i].g;
+			b = span[i].b;
+			a = span[i].a;
+		}
+
+		x = xend;
+
+		length = flip ? (xstart - xend) : (xend - xstart); //Moogly
+
+		for (j = 0; j <= length; j++)
+		{
+			int sr = 0, sg = 0, sb = 0, sa = 0;
+			int ss = s >> 16;
+			int st = t >> 16;
+			int sw = w >> 16;
+			int sz = z >> 13;
+			int sss = 0, sst = 0;
+			COLOR c1, c2;
+			if (shade)
+			{
+				sr = r >> 16;
+				sg = g >> 16;
+				sb = b >> 16;
+				sa = a >> 16;
+			}
+			c1.r = c1.g = c1.b = c1.a = 0;
+			c2.r = c2.g = c2.b = c2.a = 0;
+			if (other_modes.z_source_sel)
+			{
+				sz = (((UINT32)primitive_z) << 3) & 0x3ffff;
+				dzpix = primitive_delta_z;
+			}
+
+
+			if (x >= clipx1 && x < clipx2)
+			{
+				int z_compare_result = 1;
+
+				curpixel_cvg=span[i].cvg[x];
+
+				if (curpixel_cvg > 8)
+				{
+					fatalerror("render_spans_16: cvg of current pixel is %d", curpixel_cvg);
+				}
+
+				if (curpixel_cvg)
+				{
+					int curpixel = fb_index + x;
+					UINT16* fbcur = &fb[curpixel ^ WORD_ADDR_XOR];
+					UINT16* zbcur = &zb[curpixel ^ WORD_ADDR_XOR];
+					UINT8* hbcur = &hb[curpixel ^ BYTE_ADDR_XOR];
+					UINT8* zhbcur = &zhb[curpixel ^ BYTE_ADDR_XOR];
+
+					if (other_modes.persp_tex_en)
+					{
+						tcdiv(ss, st, sw, &sss, &sst);
+					}
+					else // Hack for Bust-a-Move 2
+					{
+						sss = ss;
+						sst = st;
+					}
+
+					if (other_modes.tex_lod_en && !disable_lod)
+					{
+						if (other_modes.persp_tex_en)
+						{
+							nextsw = (w + dwinc) >> 16;
+							nexts = (s + dsinc) >> 16;
+							nextt = (t + dtinc) >> 16;
+							tcdiv(nexts, nextt, nextsw, &nexts, &nextt);
+						}
+						else
+						{
+							nexts = (s + dsinc)>>16;
+							nextt = (t + dtinc)>>16;
+						}
+
+						lodclamp = 0;
+
+						horstep = SIGN17(nexts & 0x1ffff) - SIGN17(sss & 0x1ffff);
+						vertstep = SIGN17(nextt & 0x1ffff) - SIGN17(sst & 0x1ffff);
+						if (horstep & 0x20000)
+						{
+							horstep = ~horstep & 0x1ffff;
+						}
+						if (vertstep & 0x20000)
+						{
+							vertstep = ~vertstep & 0x1ffff;
+						}
+						LOD = ((horstep >= vertstep) ? horstep : vertstep);
+						LOD = (LOD >= span[0].dymax) ? LOD : span[0].dymax;
+
+						if ((LOD & 0x1c000) || lodclamp)
+						{
+							LOD = 0x7fff;
+						}
+						if (LOD < min_level)
+						{
+							LOD = min_level;
+						}
+
+						magnify = (LOD < 32) ? 1: 0;
+						l_tile = getlog2((LOD >> 5) & 0xff);
+						distant = ((LOD & 0x6000) || (l_tile >= max_level)) ? 1 : 0;
+
+						lod_frac = ((LOD << 3) >> l_tile) & 0xff;
+
+						if (distant)
+						{
+							l_tile = max_level;
+						}
+						if(!other_modes.sharpen_tex_en && !other_modes.detail_tex_en && magnify)
+						{
+							lod_frac = 0;
+						}
+						if(!other_modes.sharpen_tex_en && !other_modes.detail_tex_en && distant)
+						{
+							lod_frac = 0xff;
+						}
+						if(other_modes.sharpen_tex_en && magnify)
+						{
+							lod_frac |= 0x100;
+						}
+
+						if (!other_modes.detail_tex_en)
+						{
+							tilenum = (prim_tile + l_tile);
+							tilenum &= 7;
+							if (other_modes.sharpen_tex_en)
+							{
+								tilenum2 = (tilenum + 1) & 7;
+							}
+							else if (!distant)
+							{
+								tilenum2 = (tilenum + 1) & 7;
+							}
+							else
+							{
+								tilenum2 = tilenum;
+							}
+						}
+						else
+						{
+							if (!magnify)
+							{
+								tilenum = (prim_tile + l_tile + 1);
+							}
+							else
+							{
+								tilenum = (prim_tile + l_tile);
+							}
+							tilenum &= 7;
+
+							if (!distant && !magnify)
+							{
+								tilenum2 = (prim_tile + l_tile + 2) & 7;
+							}
+							else
+							{
+								tilenum2 = (prim_tile + l_tile + 1) & 7;
+							}
+						}
+					}
+
+					if (shade)
+					{
+						if (sr > 0xff) sr = 0xff;
+						if (sg > 0xff) sg = 0xff;
+						if (sb > 0xff) sb = 0xff;
+						if (sa > 0xff) sa = 0xff;
+						if (sr < 0) sr = 0;
+						if (sg < 0) sg = 0;
+						if (sb < 0) sb = 0;
+						if (sa < 0) sa = 0;
+						shade_color.r = sr;
+						shade_color.g = sg;
+						shade_color.b = sb;
+						shade_color.a = sa;
+					}
+
+					if (texture)
+					{
+						if (other_modes.cycle_type == CYCLE_TYPE_1)
+						{
+							TEXTURE_PIPELINE(&texel0_color, sss, sst, 0, tilenum);
+						}
+						else
+						{
+							TEXTURE_PIPELINE(&texel0_color, sss, sst, 0, tilenum);
+							TEXTURE_PIPELINE(&texel1_color, sss, sst, 0, tilenum2);
+						}
+					}
+
+					if (other_modes.cycle_type == CYCLE_TYPE_1)
+					{
+						c1 = COLOR_COMBINER(machine, 0);
+					}
+					else if (other_modes.cycle_type == CYCLE_TYPE_2)
+					{
+						c1 = COLOR_COMBINER(machine, 0);
+						c2 = COLOR_COMBINER(machine, 1);
+					}
+
+					if ((zbuffer || other_modes.z_source_sel) && other_modes.z_compare_en)
+					{
+						z_compare_result = z_compare(fbcur, hbcur, zbcur, zhbcur, sz, dzpix);
+					}
+
+					if(z_compare_result)
+					{
+						int rendered=0;//ìî¸
+						int dith = 0;
+						if (!other_modes.rgb_dither_sel)
+						{
+							dith = magic_matrix[(((i) & 3) << 2) + ((x ^ WORD_ADDR_XOR) & 3)];
+						}
+						else if (other_modes.rgb_dither_sel == 1)
+						{
+							dith = bayer_matrix[(((i) & 3) << 2) + ((x ^ WORD_ADDR_XOR) & 3)];
+						}
+
+                    	if (other_modes.cycle_type == CYCLE_TYPE_1)
+                    	{
+							rendered = BLENDER1_16(machine, fbcur, hbcur, c1, dith);
+						}
+						else
+						{
+							rendered = BLENDER2_16(machine, fbcur, hbcur, c1, c2, dith);
+						}
+
+						if (other_modes.z_update_en && rendered)
+						{
+							z_store(zbcur, zhbcur, sz, dzpix);
+						}
+					}
+				}
+			}
+
+			if (shade)
+			{
+				r += drinc;
+				g += dginc;
+				b += dbinc;
+				a += dainc;
+			}
+			z += dzinc;
+			s += dsinc;
+			t += dtinc;
+			w += dwinc;
+
+			x += xinc;
+		}
+	}
 }
 
-INLINE void BLENDER2_32(UINT32 *fb, COLOR c1, COLOR c2, UINT8 *new_cvg, UINT8 *old_cvg, int *alpha_reject)
+static void triangle(running_machine *machine, UINT32 w1, UINT32 w2, int shade, int texture, int zbuffer)
 {
-    int r, g, b;
+	int j;
+	int xleft, xright, xleft_inc, xright_inc;
+	int xstart, xend;
+	int r = 0, g = 0, b = 0, a = 0, z = 0, s = 0, t = 0, w = 0;
+	int dr, dg, db, da;
+	int drdx = 0, dgdx = 0, dbdx = 0, dadx = 0, dzdx = 0, dsdx = 0, dtdx = 0, dwdx = 0;
+	int drdy = 0, dgdy = 0, dbdy = 0, dady = 0, dzdy = 0, dsdy = 0, dtdy = 0, dwdy = 0;
+	int drde = 0, dgde = 0, dbde = 0, dade = 0, dzde = 0, dsde = 0, dtde = 0, dwde = 0;
+	int tilenum;
+	int flip = (w1 & 0x800000) ? 1 : 0;
 
-    if( other_modes.force_blend )
-    {
-        blend_color.r = c2.r;
-        blend_color.g = c2.g;
-        blend_color.b = c2.b;
-    }
+	INT32 yl, ym, yh;
+	INT32 xl, xm, xh;
+	INT32 dxldy, dxhdy, dxmdy;
+	int dzdy_dz, dzdx_dz;
+	int dsdylod, dtdylod;
+	UINT32 w3, w4, w5, w6, w7, w8;
 
-    pixel_color.r = c2.r;
-    pixel_color.g = c2.g;
-    pixel_color.b = c2.b;
-    pixel_color.a = c2.a;
-    inv_pixel_color.r = 0xff - *blender1a_r[0];
-    inv_pixel_color.g = 0xff - *blender1a_g[0];
-    inv_pixel_color.b = 0xff - *blender1a_b[0];
-    inv_pixel_color.a = 0xff - *blender1b_a[0];
+	int k=0;
 
-    if( other_modes.alpha_cvg_select )
-    {
-        if( other_modes.cvg_times_alpha )
-        {
-            pixel_color.a = (UINT8)( ( (INT32)(c2.a) * (INT32)( (*new_cvg) * 0x20 - 1 ) ) >> 8 );
-        }
-        else
-        {
-            pixel_color.a = (UINT8)( (INT32)(*new_cvg) * 0x20 - 1 );
-        }
+	INT32 limcvg;
+	INT32 startcvg;
 
-        if( pixel_color.a == 0 )
-        {
-            *alpha_reject = 1;
-            return;
-        }
-    }
+	int sign_dxldy;
+	int sign_dxmdy;
+	int samesign;
 
-    if (other_modes.image_read_en)
-    {
-        UINT32 mem = *fb;
-        memory_color.r = ((mem >> 24) & 0xff);
-        memory_color.g = ((mem >> 16) & 0xff);
-        memory_color.b = ((mem >>  8) & 0xff);
-        memory_color.a = /*(UINT8)((INT32)(*old_cvg) * 0x20 - 1)*/0;
-    }
+	int dsdiff, dtdiff, dwdiff, drdiff, dgdiff, dbdiff, dadiff, dzdiff;
+	int sign_dxhdy;
 
-    if (((int)(*blender1b_a[0]) + (int)(*blender2b_a[0])) > 0)
-    {
-        r = ((int)(*blender1a_r[0]) * (int)(*blender1b_a[0]) +
-             (int)(*blender2a_r[0]) * (int)(*blender2b_a[0])) /
-            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
+	int dsdeh, dtdeh, dwdeh, drdeh, dgdeh, dbdeh, dadeh, dzdeh, dsdyh, dtdyh, dwdyh, drdyh, dgdyh, dbdyh, dadyh, dzdyh;
+	int do_offset;
 
-        g = ((int)(*blender1a_g[0]) * (int)(*blender1b_a[0]) +
-             (int)(*blender2a_g[0]) * (int)(*blender2b_a[0])) /
-            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
+	int xfrac;
+	int dseoff, dteoff, dweoff, dreoff, dgeoff, dbeoff, daeoff, dzeoff;
 
-        b = ((int)(*blender1a_b[0]) * (int)(*blender1b_a[0]) +
-             (int)(*blender2a_b[0]) * (int)(*blender2b_a[0])) /
-            ((int)(*blender1b_a[0]) + (int)(*blender2b_a[0]));
-    }
-    else
-    {
-        r = g = b = 0;
-    }
+	int dsdxh, dtdxh, dwdxh, drdxh, dgdxh, dbdxh, dadxh, dzdxh;
 
-    blended_pixel_color.r = r;
-    blended_pixel_color.g = g;
-    blended_pixel_color.b = b;
+	int m_inc;
+	UINT32 min=0, max=3;
+	INT32 maxxmx = 0, minxmx = 0, maxxhx = 0, minxhx = 0;
 
-    pixel_color.r = c2.r;
-    pixel_color.g = c2.g;
-    pixel_color.b = c2.b;
-    pixel_color.a = c2.a;
-    if( other_modes.alpha_cvg_select )
-    {
-        if( other_modes.cvg_times_alpha )
-        {
-            pixel_color.a = (UINT8)( ( (INT32)(c2.a) * (INT32)( (*new_cvg) * 0x20 - 1 ) ) >> 8 );
-        }
-        else
-        {
-            pixel_color.a = (UINT8)( (INT32)(*new_cvg) * 0x20 - 1 );
-        }
+	int spix = 0; // Current subpixel
+	int ycur;
+	int ylfar;
+	int ldflag;
+	int yhpix;
+	int ympix;
+	int ylpix;
 
-        if( pixel_color.a == 0 )
-        {
-            *alpha_reject = 1;
-            return;
-        }
-    }
-    inv_pixel_color.r = 0xff - *blender1a_r[0];
-    inv_pixel_color.g = 0xff - *blender1a_g[0];
-    inv_pixel_color.b = 0xff - *blender1a_b[0];
-    inv_pixel_color.a = 0xff - *blender1b_a[0];
+	int shade_base = rdp_cmd_cur + 8;
+	int texture_base = rdp_cmd_cur + 8;
+	int zbuffer_base = rdp_cmd_cur + 8;
 
-    if (((int)(*blender1b_a[1]) + (int)(*blender2b_a[1])) > 0)
-    {
-        r = ((int)(*blender1a_r[1]) * (int)(*blender1b_a[1]) +
-             (int)(*blender2a_r[1]) * (int)(*blender2b_a[1])) /
-            ((int)(*blender1b_a[1]) + (int)(*blender2b_a[1]));
+	if (shade)
+	{
+		texture_base += 16;
+		zbuffer_base += 16;
+	}
+	if (texture)
+	{
+		zbuffer_base += 16;
+	}
 
-        g = ((int)(*blender1a_g[1]) * (int)(*blender1b_a[1]) +
-             (int)(*blender2a_g[1]) * (int)(*blender2b_a[1])) /
-            ((int)(*blender1b_a[1]) + (int)(*blender2b_a[1]));
+	w3 = rdp_cmd_data[rdp_cmd_cur+2];
+	w4 = rdp_cmd_data[rdp_cmd_cur+3];
+	w5 = rdp_cmd_data[rdp_cmd_cur+4];
+	w6 = rdp_cmd_data[rdp_cmd_cur+5];
+	w7 = rdp_cmd_data[rdp_cmd_cur+6];
+	w8 = rdp_cmd_data[rdp_cmd_cur+7];
 
-        b = ((int)(*blender1a_b[1]) * (int)(*blender1b_a[1]) +
-             (int)(*blender2a_b[1]) * (int)(*blender2b_a[1])) /
-            ((int)(*blender1b_a[1]) + (int)(*blender2b_a[1]));
-    }
-    else
-    {
-        r = g = b = 0;
-    }
+	yl = (w1 & 0x3fff);
+	ym = ((w2 >> 16) & 0x3fff);
+	yh = ((w2 >>  0) & 0x3fff);
+	xl = (INT32)(w3 & 0x3fffffff);
+	xh = (INT32)(w5 & 0x3fffffff);
+	xm = (INT32)(w7 & 0x3fffffff);
+	// Inverse slopes in 16.16 format
+	dxldy = (INT32)(w4);
+	dxhdy = (INT32)(w6);
+	dxmdy = (INT32)(w8);
 
-    if (r > 255) r = 255;
-    if (g > 255) g = 255;
-    if (b > 255) b = 255;
+	max_level = ((w1 >> 19) & 7);
+	tilenum = (w1 >> 16) & 0x7;
 
-    *fb = (r << 24) | (g << 16) | (b << 8) | 0xe0;
+	if (yl & 0x2000)  yl |= 0xffffc000;
+	if (ym & 0x2000)  ym |= 0xffffc000;
+	if (yh & 0x2000)  yh |= 0xffffc000;
+
+	if ((xl >> 16) & 0x2000)  xl |= 0xc0000000;
+	if ((xm >> 16) & 0x2000)  xm |= 0xc0000000;
+	if ((xh >> 16) & 0x2000)  xh |= 0xc0000000;
+
+	z = 0;
+	s = 0;	t = 0;	w = 0;
+	dr = 0;		dg = 0;		db = 0;		da = 0;
+
+	if (shade)
+	{
+		r    = (rdp_cmd_data[shade_base+0 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+4 ] >> 16) & 0x0000ffff);
+		g    = ((rdp_cmd_data[shade_base+0 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+4 ] & 0x0000ffff);
+		b    = (rdp_cmd_data[shade_base+1 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+5 ] >> 16) & 0x0000ffff);
+		a    = ((rdp_cmd_data[shade_base+1 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+5 ] & 0x0000ffff);
+		drdx = (rdp_cmd_data[shade_base+2 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+6 ] >> 16) & 0x0000ffff);
+		dgdx = ((rdp_cmd_data[shade_base+2 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+6 ] & 0x0000ffff);
+		dbdx = (rdp_cmd_data[shade_base+3 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+7 ] >> 16) & 0x0000ffff);
+		dadx = ((rdp_cmd_data[shade_base+3 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+7 ] & 0x0000ffff);
+		drde = (rdp_cmd_data[shade_base+8 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+12] >> 16) & 0x0000ffff);
+		dgde = ((rdp_cmd_data[shade_base+8 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+12] & 0x0000ffff);
+		dbde = (rdp_cmd_data[shade_base+9 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+13] >> 16) & 0x0000ffff);
+		dade = ((rdp_cmd_data[shade_base+9 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+13] & 0x0000ffff);
+		drdy = (rdp_cmd_data[shade_base+10] & 0xffff0000) | ((rdp_cmd_data[shade_base+14] >> 16) & 0x0000ffff);
+		dgdy = ((rdp_cmd_data[shade_base+10] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+14] & 0x0000ffff);
+		dbdy = (rdp_cmd_data[shade_base+11] & 0xffff0000) | ((rdp_cmd_data[shade_base+15] >> 16) & 0x0000ffff);
+		dady = ((rdp_cmd_data[shade_base+11] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+15] & 0x0000ffff);
+	}
+	if (texture)
+	{
+		s    = (rdp_cmd_data[texture_base+0 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+4 ] >> 16) & 0x0000ffff);
+		t    = ((rdp_cmd_data[texture_base+0 ] << 16) & 0xffff0000)	| (rdp_cmd_data[texture_base+4 ] & 0x0000ffff);
+		w    = (rdp_cmd_data[texture_base+1 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+5 ] >> 16) & 0x0000ffff);
+		dsdx = (rdp_cmd_data[texture_base+2 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+6 ] >> 16) & 0x0000ffff);
+		dtdx = ((rdp_cmd_data[texture_base+2 ] << 16) & 0xffff0000)	| (rdp_cmd_data[texture_base+6 ] & 0x0000ffff);
+		dwdx = (rdp_cmd_data[texture_base+3 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+7 ] >> 16) & 0x0000ffff);
+		dsde = (rdp_cmd_data[texture_base+8 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+12] >> 16) & 0x0000ffff);
+		dtde = ((rdp_cmd_data[texture_base+8 ] << 16) & 0xffff0000)	| (rdp_cmd_data[texture_base+12] & 0x0000ffff);
+		dwde = (rdp_cmd_data[texture_base+9 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+13] >> 16) & 0x0000ffff);
+		dsdy = (rdp_cmd_data[texture_base+10] & 0xffff0000) | ((rdp_cmd_data[texture_base+14] >> 16) & 0x0000ffff);
+		dtdy = ((rdp_cmd_data[texture_base+10] << 16) & 0xffff0000)	| (rdp_cmd_data[texture_base+14] & 0x0000ffff);
+		dwdy = (rdp_cmd_data[texture_base+11] & 0xffff0000) | ((rdp_cmd_data[texture_base+15] >> 16) & 0x0000ffff);
+	}
+	if (zbuffer)
+	{
+		z    = rdp_cmd_data[zbuffer_base+0];
+		dzdx = rdp_cmd_data[zbuffer_base+1];
+		dzde = rdp_cmd_data[zbuffer_base+2];
+		dzdy = rdp_cmd_data[zbuffer_base+3];
+	}
+
+	span[0].ds = dsdx;
+	span[0].dt = dtdx;
+	span[0].dw = dwdx;
+	span[0].dr = drdx & ~0x1f;
+	span[0].dg = dgdx & ~0x1f;
+	span[0].db = dbdx & ~0x1f;
+	span[0].da = dadx & ~0x1f;
+	span[0].dz = dzdx;
+	dzdy_dz = (dzdy >> 16) & 0xffff;
+	dzdx_dz = (dzdx >> 16) & 0xffff;
+	span[0].dzpix = ((dzdy_dz & 0x8000) ? ((~dzdy_dz) & 0x7fff) : dzdy_dz) + ((dzdx_dz & 0x8000) ? ((~dzdx_dz) & 0x7fff) : dzdx_dz);
+	span[0].dzpix = normalize_dzpix(span[0].dzpix);
+	dsdylod = dsdy >> 16;
+	dtdylod = dtdy >> 16;
+	if (dsdylod & 0x20000)
+	{
+		dsdylod = ~dsdylod & 0x1ffff;
+	}
+	if (dtdylod & 0x20000)
+	{
+		dtdylod = ~dtdylod & 0x1ffff;
+	}
+	span[0].dymax = (dsdylod > dtdylod)? dsdylod : dtdylod;
+
+	xleft_inc = dxmdy >> 2;
+	xright_inc = dxhdy >> 2;
+
+	xright = xh;
+	xleft = xm;
+
+	limcvg = ((yl>>2) <= 1023) ? (yl>>2) : 1023; // Needed by 40 Winks
+	if (limcvg < 0)
+	{
+		limcvg = 0;
+	}
+
+	startcvg = ((yh>>2)>=0) ? (yh>>2) : 0;
+	for (k = startcvg; k <= limcvg; k++)
+	{
+		memset((void*)&span[k].cvg[0],0,640);
+	}
+
+	sign_dxldy = (dxldy & 0x80000000) ? 1 : 0;
+	sign_dxmdy = (dxmdy & 0x80000000) ? 1 : 0;
+	samesign = !(sign_dxldy ^ sign_dxmdy);
+
+	sign_dxhdy = (dxhdy & 0x80000000) ? 1 : 0;
+
+	do_offset = !(sign_dxhdy ^ (flip));
+
+	if (do_offset)
+	{
+		dsdeh = dsde >> 9;	dsdyh = dsdy >> 9;
+		dtdeh = dtde >> 9;	dtdyh = dtdy >> 9;
+		dwdeh = dwde >> 9;	dwdyh = dwdy >> 9;
+		drdeh = drde >> 9;	drdyh = drdy >> 9;
+		dgdeh = dgde >> 9;	dgdyh = dgdy >> 9;
+		dbdeh = dbde >> 9;	dbdyh = dbdy >> 9;
+		dadeh = dade >> 9;	dadyh = dady >> 9;
+		dzdeh = dzde >> 9;	dzdyh = dzdy >> 9;
+
+		dsdiff = (dsdeh*3 - dsdyh*3) << 7;
+		dtdiff = (dtdeh*3 - dtdyh*3) << 7;
+		dwdiff = (dwdeh*3 - dwdyh*3) << 7;
+		drdiff = (drdeh*3 - drdyh*3) << 7;
+		dgdiff = (dgdeh*3 - dgdyh*3) << 7;
+		dbdiff = (dbdeh*3 - dbdyh*3) << 7;
+		dadiff = (dadeh*3 - dadyh*3) << 7;
+		dzdiff = (dzdeh*3 - dzdyh*3) << 7;
+	}
+	else
+	{
+		dsdiff = dtdiff = dwdiff = drdiff = dgdiff = dbdiff = dadiff = dzdiff = 0;
+	}
+
+	if (do_offset)
+	{
+		dseoff = (dsdeh*3) << 7;
+		dteoff = (dtdeh*3) << 7;
+		dweoff = (dwdeh*3) << 7;
+		dreoff = (drdeh*3) << 7;
+		dgeoff = (dgdeh*3) << 7;
+		dbeoff = (dbdeh*3) << 7;
+		daeoff = (dadeh*3) << 7;
+		dzeoff = (dzdeh*3) << 7;
+	}
+	else
+	{
+		dseoff = dteoff = dweoff = dreoff = dgeoff = dbeoff = daeoff = dzeoff = 0;
+	}
+#define adjust_deoff_only()		\
+{							\
+			span[j].s = s + dseoff;				\
+			span[j].t = t + dteoff;				\
+			span[j].w = w + dweoff;				\
+			span[j].r = r + dreoff;				\
+			span[j].g = g + dgeoff;				\
+			span[j].b = b + dbeoff;				\
+			span[j].a = a + daeoff;				\
+			span[j].z = z + dzeoff;				\
 }
 
-static void fill_rectangle_32bit(RECTANGLE *rect)
-{
-    UINT32 *fb = (UINT32*)&rdram[(fb_address / 4)];
-    UINT8* cvg_buf = (UINT8*)&cvg_mem[fb_address];
-    int index, i, j;
-    int x1 = rect->xh / 4;
-    int x2 = rect->xl / 4;
-    int y1 = rect->yh / 4;
-    int y2 = rect->yl / 4;
-    int clipx1, clipx2, clipy1, clipy2;
-    int alpha_reject = 0;
-    COLOR c1, c2;
-    c1.r = c1.g = c1.b = c1.a = 0;
-    c2.r = c2.g = c2.b = c2.a = 0;
-
-    // TODO: clip
-    clipx1 = clip.xh / 4;
-    clipx2 = clip.xl / 4;
-    clipy1 = clip.yh / 4;
-    clipy2 = clip.yl / 4;
-
-    // clip
-    if (x1 < clipx1)
-    {
-        x1 = clipx1;
-    }
-    if (y1 < clipy1)
-    {
-        y1 = clipy1;
-    }
-    if (x2 >= clipx2)
-    {
-        x2 = clipx2-1;
-    }
-    if (y2 >= clipy2)
-    {
-        y2 = clipy2-1;
-    }
-
-    if (other_modes.cycle_type == CYCLE_TYPE_FILL)
-    {
-        for (j=y1; j <= y2; j++)
-        {
-            index = j * fb_width;
-            for (i=x1; i <= x2; i++)
-            {
-                cvg_buf[(index + i)] = (fill_color & 0x000000ff) ? 8 : 1; // Wrong
-                fb[(index + i) ^ 1] = fill_color;
-            }
-        }
-    }
-    else if (other_modes.cycle_type == CYCLE_TYPE_1)
-    {
-        shade_color.r = prim_color.r;
-        shade_color.g = prim_color.g;
-        shade_color.b = prim_color.b;
-        shade_color.a = prim_color.a;
-
-        for (j=y1; j <= y2; j++)
-        {
-            index = j * fb_width;
-            for (i=x1; i <= x2; i++)
-            {
-                c1 = COLOR_COMBINER(0);
-
-                cvg_buf[(index + i)] = 8; // Wrong
-                BLENDER1_32(&fb[(index + i)], c1, &cvg_buf[(index + i)], &cvg_buf[(index + i)], &alpha_reject);
-            }
-        }
-    }
-    else if (other_modes.cycle_type == CYCLE_TYPE_2)
-    {
-        shade_color.r = prim_color.r;
-        shade_color.g = prim_color.g;
-        shade_color.b = prim_color.b;
-        shade_color.a = prim_color.a;
-
-        for (j=y1; j <= y2; j++)
-        {
-            index = j * fb_width;
-            for (i=x1; i <= x2; i++)
-            {
-                c1 = COLOR_COMBINER(0);
-                c2 = COLOR_COMBINER(1);
-
-                cvg_buf[(index + i)] = 8; // Wrong
-                BLENDER2_32(&fb[(index + i)], c1, c2, &cvg_buf[(index + i)], &cvg_buf[(index + i)], &alpha_reject);
-            }
-        }
-    }
-    else
-    {
-        fatalerror("fill_rectangle_32bit: cycle type copy");
-    }
+#define addleft(x) addleftcvg(x,k)
+#define addright(x) addrightcvg(x,k)
+#define setvalues() {					\
+			addvalues();				\
+			adjust_attr();	\
 }
 
-static void texture_rectangle_32bit(TEX_RECTANGLE *rect)
-{
-    UINT32 *fb = (UINT32*)&rdram[(fb_address / 4)];
-    UINT16 *zb = (UINT16*)&rdram[(zb_address / 4)];
-    UINT8* cvg_buf = (UINT8*)&cvg_mem[fb_address];
-    int i, j;
-    int x1, x2, y1, y2;
-    int tsl[2], tsh[2], ttl[2], tth[2];
-    int s, t;
-    int twidth[2], tformat[2], tsize[2], tbase[2], tpal[2];
-    int clamp_s[2], clamp_t[2], mask_s[2], mask_t[2], mirror_s[2], mirror_t[2];
-    int clipx1, clipx2, clipy1, clipy2;
-    int cycle;
-    UINT8 cvg_span[RDP_CVG_SPAN_MAX];
-    int span_index = 0;
-    int alpha_reject = 0;
-    COLOR c1, c2;
-    c1.r = c1.g = c1.b = c1.a = 0;
-    c2.r = c2.g = c2.b = c2.a = 0;
+	dsdxh = dsdx >> 8;
+	dtdxh = dtdx >> 8;
+	dwdxh = dwdx >> 8;
+	drdxh = drdx >> 8;
+	dgdxh = dgdx >> 8;
+	dbdxh = dbdx >> 8;
+	dadxh = dadx >> 8;
+	dzdxh = dzdx >> 8;
 
-    x1 = rect->xh;
-    x2 = rect->xl;
-    y1 = rect->yh;
-    y2 = rect->yl;
-
-    if (other_modes.cycle_type == CYCLE_TYPE_FILL || other_modes.cycle_type == CYCLE_TYPE_COPY)
-    {
-        rect->dsdx /= 4;
-        x2 += 1;
-        y2 += 1;
-    }
-
-    clipx1 = clip.xh;
-    clipx2 = clip.xl;
-    clipy1 = clip.yh;
-    clipy2 = clip.yl;
-
-    // clip
-    if (x1 < clipx1)
-    {
-        x1 = clipx1;
-    }
-    if (y1 < clipy1)
-    {
-        y1 = clipy1;
-    }
-    if (x2 >= clipx2)
-    {
-        x2 = clipx2-1;
-    }
-    if (y2 >= clipy2)
-    {
-        y2 = clipy2-1;
-    }
-
-    for( cycle = 0; cycle < 2; cycle++ )
-    {
-        tsl[cycle] = tile[rect->tilenum + cycle].sl;
-        tsh[cycle] = tile[rect->tilenum + cycle].sh;
-        ttl[cycle] = tile[rect->tilenum + cycle].tl;
-        tth[cycle] = tile[rect->tilenum + cycle].th;
-
-        twidth[cycle] = tile[rect->tilenum + cycle].line;
-        tformat[cycle] = tile[rect->tilenum + cycle].format;
-        tsize[cycle] = tile[rect->tilenum + cycle].size;
-        tbase[cycle] = tile[rect->tilenum + cycle].tmem;
-        tpal[cycle] = tile[rect->tilenum + cycle].palette;
-
-        clamp_t[cycle] = tile[rect->tilenum + cycle].ct;
-        clamp_s[cycle] = tile[rect->tilenum + cycle].cs;
-
-        mirror_t[cycle] = tile[rect->tilenum + cycle].mt;
-        mirror_s[cycle] = tile[rect->tilenum + cycle].ms;
-        mask_t[cycle] = tile[rect->tilenum + cycle].mask_t;
-        mask_s[cycle] = tile[rect->tilenum + cycle].mask_s;
-    }
-
-    t = (int)(rect->t) << 5;
-
-    if (other_modes.cycle_type == CYCLE_TYPE_1)
-    {
-        for (j = y1; j < y2; j += ((j == y1) ? (4 - (y1 & 0x0003)) : 4) )
-        {
-            int fb_index = (j >> 2) * fb_width;
-
-            s = (int)(rect->s) << 5;
-
-            memset( cvg_span, 0, RDP_CVG_SPAN_MAX );
-
-            for (span_index = j; span_index < ((j &~ 0x0003) + 4) && span_index < y2; span_index++)
-            {
-                int span_start = x1;
-                int span_end = x2;
-                int span_iter = 0;
-                if (x1 < 0)
-                {
-                    span_start = 0;
-                }
-                if (x2 >= (RDP_CVG_SPAN_MAX << 2))
-                {
-                    span_end = (RDP_CVG_SPAN_MAX << 2) - 1;
-                }
-                //printf( "%d: Span from %d to %d\n", j, span_start, span_end );
-                for (span_iter=span_start; span_iter < span_end; span_iter++)
-                {
-                    if ((span_iter & 1) == (span_index & 1))
-                    {
-                        cvg_span[span_iter >> 2]++;
-                    }
-                }
-            }
-
-            for (i = x1; i < x2; i += 4)
-            {
-                if (i >= 0 && i < (RDP_CVG_SPAN_MAX << 2) && cvg_span[i >> 2] > 0)
-                {
-                    TEXTURE_PIPELINE1(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
-
-                    c1 = COLOR_COMBINER(0);
-
-                    if( alpha_compare_success(c1, c2) )
-                    {
-                        int cvg_ovf = 0;
-                        UINT8 cvg_old = 0;
-                        calculate_coverage( &cvg_buf[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR], cvg_span[i >> 2], &cvg_ovf, &cvg_old );
-                        if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
-                        {
-                            BLENDER1_32(&fb[(fb_index + (i >> 2))], c1, &cvg_span[i >> 2], &cvg_old, &alpha_reject);
-
-                            if( other_modes.z_update_en && other_modes.z_source_sel && !alpha_reject )
-                            {
-                                zb[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR] = primitive_z;
-                            }
-                        }
-                    }
-                }
-
-                s += rect->dsdx;
-            }
-
-            t += rect->dtdy;
-        }
-    }
-    else if (other_modes.cycle_type == CYCLE_TYPE_2)
-    {
-        for (j = y1; j < y2; j += (j == y1) ? (4 - (y1 & 0x0003)): 4 )
-        {
-            int fb_index = (j >> 2) * fb_width;
-
-            s = (int)(rect->s) << 5;
-
-            memset( cvg_span, 0, RDP_CVG_SPAN_MAX );
-
-            for (span_index = j; span_index < ((j &~ 0x0003) + 4) && span_index < y2; span_index++)
-            {
-                int span_start = x1;
-                int span_end = x2;
-                int span_iter = 0;
-                if (x1 < 0)
-                {
-                    span_start = 0;
-                }
-                if (x2 >= (RDP_CVG_SPAN_MAX << 2))
-                {
-                    span_end = (RDP_CVG_SPAN_MAX << 2) - 1;
-                }
-                for (span_iter=span_start; span_iter < span_end; span_iter++)
-                {
-                    if ((span_iter & 1) == (span_index & 1))
-                    {
-                        cvg_span[span_iter >> 2]++;
-                    }
-                }
-            }
-
-            for (i = x1; i < x2; i += 4)
-            {
-                if (i >= 0 && i < (RDP_CVG_SPAN_MAX << 2) && cvg_span[i >> 2] > 0)
-                {
-                    TEXTURE_PIPELINE2(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
-
-                    c1 = COLOR_COMBINER(0);
-                    c2 = COLOR_COMBINER(1);
-
-                    if( alpha_compare_success(c1, c2) )
-                    {
-                        int cvg_ovf = 0;
-                        UINT8 cvg_old = 0;
-                        calculate_coverage( &cvg_buf[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR], cvg_span[i >> 2], &cvg_ovf, &cvg_old );
-                        if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
-                        {
-                            BLENDER2_32(&fb[fb_index + (i >> 2)], c1, c2, &cvg_span[i >> 2], &cvg_old, &alpha_reject);
-
-                            if( other_modes.z_update_en && other_modes.z_source_sel && !alpha_reject )
-                            {
-                                zb[(fb_index + (i >> 2)) ^ WORD_ADDR_XOR] = primitive_z;
-                            }
-                        }
-                    }
-                }
-
-                s += rect->dsdx;
-            }
-
-            t += rect->dtdy;
-        }
-    }
-    else if (other_modes.cycle_type == CYCLE_TYPE_COPY)
-    {
-        for (j = y1; j < y2; j++)
-        {
-            int fb_index = j * fb_width;
-
-            s = (int)(rect->s) << 5;
-
-            // MooglyGuy note: This is probably completely wrong, fix it
-
-            for (i = x1; i < x2; i++)
-            {
-            /*
-                if (clamp_s)
-                {
-                    if (s < (tsl << 8)) s = (tsl << 8);
-                    if (s > (tsh << 8)) s = (tsh << 8);
-                }
-                if (clamp_t)
-                {
-                    if (t < (ttl << 8)) t = (ttl << 8);
-                    if (t > (tth << 8)) t = (tth << 8);
-                }
-                if (mask_s)
-                {
-                    s &= (((UINT32)(0xffffffff) >> (32-mask_s)) << 10) | 0x3ff;
-                }
-                if (mask_t)
-                {
-                    t &= (((UINT32)(0xffffffff) >> (32-mask_t)) << 10) | 0x3ff;
-
-
-                FETCH_TEXEL(&c, (s-tile[rect->tilenum].sl) >> 10, (t-tile[rect->tilenum].tl) >> 10, twidth, tformat, tsize, tbase);
-            */
-                //ss = (s >> 10) - (tsl >> 2);
-                //if ((s & 0x3ff) >= 0x200) ss++;
-                //st = (t >> 10) - (ttl >> 2);
-                //if ((t & 0x3ff) >= 0x200) st++;
-
-                TEXTURE_PIPELINE1(s, t, (rect->dsdx == (1 << 10)) && (rect->dtdy == (1 << 10)));
-
-                //CLAMP(ss, st);
-                //FETCH_TEXEL(&c, ss, st, twidth, tformat, tsize, tbase);
-
-                if (texel0_color.a != 0)
-                {
-                    fb[(fb_index + i) ^ WORD_ADDR_XOR] = (texel0_color.r << 24) | (texel0_color.g << 16) | (texel0_color.b << 8) | 0xe0;
-                }
-
-                s += rect->dsdx;
-            }
-
-            t += rect->dtdy;
-        }
-    }
-    else
-    {
-        fatalerror("texture_rectangle_32bit: unknown cycle type %d\n", other_modes.cycle_type);
-    }
+#define adjust_attr()		\
+{							\
+			span[j].s = (s + dsdiff - (xfrac * dsdxh)) & ~0x1f;				\
+			span[j].t = (t + dtdiff - (xfrac * dtdxh)) & ~0x1f;				\
+			span[j].w = (w + dwdiff - (xfrac * dwdxh)) & ~0x1f;				\
+			span[j].r = r + drdiff - (xfrac * drdxh);				\
+			span[j].g = g + dgdiff - (xfrac * dgdxh);				\
+			span[j].b = b + dbdiff - (xfrac * dbdxh);				\
+			span[j].a = a + dadiff - (xfrac * dadxh);				\
+			span[j].z = z + dzdiff - (xfrac * dzdxh);				\
 }
 
-
-static void render_spans_32(int start, int end, int tilenum, int shade, int texture, int zbuffer, int flip)
-{
-    UINT32 *fb = (UINT32*)&rdram[fb_address / 4];
-    UINT16 *zb = (UINT16*)&rdram[zb_address / 4];
-    UINT8* cvg_buf = (UINT8*)&cvg_mem[fb_address];
-    int i, j;
-    int tsl[2], tsh[2], ttl[2], tth[2];
-    int twidth[2], tformat[2], tsize[2], tbase[2], tpal[2];
-    int clamp_s[2], clamp_t[2], mask_s[2], mask_t[2], mirror_s[2], mirror_t[2];
-    int cycle;
-    int alpha_reject = 0;
-
-    int clipx1, clipx2, clipy1, clipy2;
-
-    clipx1 = clip.xh / 4;
-    clipx2 = clip.xl / 4;
-    clipy1 = clip.yh / 4;
-    clipy2 = clip.yl / 4;
-
-    for( cycle = 0; cycle < 2; cycle++ )
-    {
-        tsl[cycle] = tile[tilenum + cycle].sl;
-        tsh[cycle] = tile[tilenum + cycle].sh;
-        ttl[cycle] = tile[tilenum + cycle].tl;
-        tth[cycle] = tile[tilenum + cycle].th;
-
-        twidth[cycle] = tile[tilenum + cycle].line;
-        tformat[cycle] = tile[tilenum + cycle].format;
-        tsize[cycle] = tile[tilenum + cycle].size;
-        tbase[cycle] = tile[tilenum + cycle].tmem;
-        tpal[cycle] = tile[tilenum + cycle].palette;
-
-        clamp_t[cycle] = tile[tilenum + cycle].ct;
-        clamp_s[cycle] = tile[tilenum + cycle].cs;
-        mirror_t[cycle] = tile[tilenum + cycle].mt;
-        mirror_s[cycle] = tile[tilenum + cycle].ms;
-        mask_t[cycle] = tile[tilenum + cycle].mask_t;
-        mask_s[cycle] = tile[tilenum + cycle].mask_s;
-    }
-
-    if (start < clipy1)
-    {
-        start = clipy1;
-    }
-    if (start >= clipy2)
-    {
-        start = clipy2-1;
-    }
-    if (end < clipy1)
-    {
-        end = clipy1;
-    }
-    if (end >= clipy2)
-    {
-        end = clipy2-1;
-    }
-
-    for (i=start; i <= end; i++)
-    {
-        int xstart = span[i].lx;
-        int xend = span[i].rx;
-        int r = span[i].r;
-        int g = span[i].g;
-        int b = span[i].b;
-        int a = span[i].a;
-        int z = span[i].z;
-        int s = span[i].s;
-        int t = span[i].t;
-        int w = span[i].w;
-        int dr = span[i].dr;
-        int dg = span[i].dg;
-        int db = span[i].db;
-        int da = span[i].da;
-        int dz = span[i].dz;
-        int ds = span[i].ds;
-        int dt = span[i].dt;
-        int dw = span[i].dw;
-        int drinc, dginc, dbinc, dainc, dzinc, dsinc, dtinc, dwinc;
-
-        int x;
-        int xinc;
-
-        int fb_index = fb_width * i;
-        int length;
-
-        drinc = flip ? (dr) : -dr;
-        dginc = flip ? (dg) : -dg;
-        dbinc = flip ? (db) : -db;
-        dainc = flip ? (da) : -da;
-        dzinc = flip ? (dz) : -dz;
-        dsinc = flip ? (ds) : -ds;
-        dtinc = flip ? (dt) : -dt;
-        dwinc = flip ? (dw) : -dw;
-
-        xinc = flip ? 1 : -1;
-        x = xend;
-
-        length = flip ? (xstart - xend) : (xend - xstart);
-
-        for (j=0; j <= length; j++)
-        {
-            int sr = r >> 16;
-            int sg = g >> 16;
-            int sb = b >> 16;
-            int sa = a >> 16;
-            int ss = s >> 16;
-            int st = t >> 16;
-            int sw = w >> 16;
-            UINT16 sz = (other_modes.z_source_sel) ? primitive_z : (z >> 16);
-            int oz;
-            int sss = 0, sst = 0;
-
-            if (x >= clipx1 && x < clipx2)
-            {
-                COLOR c1, c2;
-                c1.r = c1.g = c1.b = c1.a = 0;
-                c2.r = c2.g = c2.b = c2.a = 0;
-
-                if ((z & 0xffff) >= 0x8000) sz++;
-                if ((w & 0xffff) >= 0x8000) sw++;
-
-                if (other_modes.persp_tex_en)
-                {
-                    if (sw != 0)
-                    {
-                        sss = (((INT64)(ss) << 20) / sw);
-                        sst = (((INT64)(st) << 20) / sw);
-                    }
-                }
-                else
-                {
-                    sss = ss;
-                    sst = st;
-                }
-
-                if (sr > 0xff) sr = 0xff;   if (sg > 0xff) sg = 0xff;   if (sb > 0xff) sb = 0xff;
-
-                shade_color.r = sr; shade_color.g = sg; shade_color.b = sb; shade_color.a = sa;
-
-                if (texture)
-                {
-                    if (other_modes.cycle_type == CYCLE_TYPE_1)
-                    {
-                        TEXTURE_PIPELINE1(sss, sst, other_modes.sample_type == 0);
-                    }
-                    else
-                    {
-                        TEXTURE_PIPELINE2(sss, sst, other_modes.sample_type == 0);
-                    }
-                }
-
-                if (other_modes.cycle_type == CYCLE_TYPE_1)
-                {
-                    c1 = COLOR_COMBINER(0);
-                }
-                else if (other_modes.cycle_type == CYCLE_TYPE_2)
-                {
-                    c1 = COLOR_COMBINER(0);
-                    c2 = COLOR_COMBINER(1);
-                }
-
-                if( alpha_compare_success(c1, c2) )
-                {
-                    oz = (other_modes.z_source_sel) ? primitive_z : (UINT16)zb[(fb_index + x) ^ WORD_ADDR_XOR];
-                    if (other_modes.z_compare_en && zbuffer)
-                    {
-                        if (sz < oz)
-                        {
-                            int cvg_ovf = 0;
-                            UINT8 cvg_old = 0;
-                            calculate_coverage( &cvg_buf[(fb_index + x) ^ WORD_ADDR_XOR], span[i].cvg[x], &cvg_ovf, &cvg_old );
-                            if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
-                            {
-                                if (other_modes.cycle_type == CYCLE_TYPE_1)
-                                {
-                                    BLENDER1_32(&fb[(fb_index + x)], c1, &span[i].cvg[x], &cvg_old, &alpha_reject);
-                                }
-                                else
-                                {
-                                    BLENDER2_32(&fb[(fb_index + x)], c1, c2, &span[i].cvg[x], &cvg_old, &alpha_reject);
-                                }
-
-                                if (other_modes.z_update_en && !alpha_reject)
-                                {
-                                    zb[(fb_index + x) ^ WORD_ADDR_XOR] = sz;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        int cvg_ovf = 0;
-                        UINT8 cvg_old = 0;
-                        calculate_coverage( &cvg_buf[(fb_index + x) ^ WORD_ADDR_XOR], span[i].cvg[x], &cvg_ovf, &cvg_old );
-                        if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
-                        {
-                            if (other_modes.cycle_type == CYCLE_TYPE_1)
-                            {
-                                BLENDER1_32(&fb[(fb_index + x)], c1, &span[i].cvg[x], &cvg_old, &alpha_reject);
-                            }
-                            else
-                            {
-                                BLENDER2_32(&fb[(fb_index + x)], c1, c2, &span[i].cvg[x], &cvg_old, &alpha_reject);
-                            }
-                        }
-                    }
-                }
-            }
-
-            r += drinc;
-            g += dginc;
-            b += dbinc;
-            a += dainc;
-            z += dzinc;
-            s += dsinc;
-            t += dtinc;
-            w += dwinc;
-
-            x += xinc;
-        }
-    }
+#define adjust_diffonly()		\
+{							\
+			span[j].s = s + dsdiff;				\
+			span[j].t = t + dtdiff;				\
+			span[j].w = w + dwdiff;				\
+			span[j].r = r + drdiff;				\
+			span[j].g = g + dgdiff;				\
+			span[j].b = b + dbdiff;				\
+			span[j].a = a + dadiff;				\
+			span[j].z = z + dzdiff;				\
 }
 
-/*****************************************************************************/
-
-static void render_spans_16(int start, int end, int tilenum, int shade, int texture, int zbuffer, int flip)
-{
-    UINT16 *fb = (UINT16*)&rdram[fb_address / 4];
-    UINT16 *zb = (UINT16*)&rdram[zb_address / 4];
-    UINT8* cvg_buf = (UINT8*)&cvg_mem[fb_address];
-    UINT8* zd_buf = (UINT8*)&cvg_mem[zb_address];
-    int i, j;
-    int tsl[2], tsh[2], ttl[2], tth[2];
-    int twidth[2], tformat[2], tsize[2], tbase[2], tpal[2];
-    int clamp_s[2], clamp_t[2], mask_s[2], mask_t[2], mirror_s[2], mirror_t[2];
-    int cycle;
-    int alpha_reject = 0;
-
-    int clipx1, clipx2, clipy1, clipy2;
-
-    clipx1 = clip.xh / 4;
-    clipx2 = clip.xl / 4;
-    clipy1 = clip.yh / 4;
-    clipy2 = clip.yl / 4;
-
-    for( cycle = 0; cycle < 2; cycle++ )
-    {
-        tsl[cycle] = tile[tilenum + cycle].sl;
-        tsh[cycle] = tile[tilenum + cycle].sh;
-        ttl[cycle] = tile[tilenum + cycle].tl;
-        tth[cycle] = tile[tilenum + cycle].th;
-
-        twidth[cycle] = tile[tilenum + cycle].line;
-        tformat[cycle] = tile[tilenum + cycle].format;
-        tsize[cycle] = tile[tilenum + cycle].size;
-        tbase[cycle] = tile[tilenum + cycle].tmem;
-        tpal[cycle] = tile[tilenum + cycle].palette;
-
-        clamp_t[cycle] = tile[tilenum + cycle].ct;
-        clamp_s[cycle] = tile[tilenum + cycle].cs;
-        mirror_t[cycle] = tile[tilenum + cycle].mt;
-        mirror_s[cycle] = tile[tilenum + cycle].ms;
-        mask_t[cycle] = tile[tilenum + cycle].mask_t;
-        mask_s[cycle] = tile[tilenum + cycle].mask_s;
-    }
-
-    if (start < clipy1)
-    {
-        start = clipy1;
-    }
-    if (start >= clipy2)
-    {
-        start = clipy2-1;
-    }
-    if (end < clipy1)
-    {
-        end = clipy1;
-    }
-    if (end >= clipy2)
-    {
-        end = clipy2-1;
-    }
-
-    for (i=start; i <= end; i++)
-    {
-        int xstart = span[i].lx;
-        int xend = span[i].rx;
-        int r = span[i].r;
-        int g = span[i].g;
-        int b = span[i].b;
-        int a = span[i].a;
-        int z = span[i].z;
-        int s = span[i].s;
-        int t = span[i].t;
-        int w = span[i].w;
-        int dr = span[i].dr;
-        int dg = span[i].dg;
-        int db = span[i].db;
-        int da = span[i].da;
-        int dz = span[i].dz;
-        int ds = span[i].ds;
-        int dt = span[i].dt;
-        int dw = span[i].dw;
-        int drinc, dginc, dbinc, dainc, dzinc, dsinc, dtinc, dwinc;
-
-        int x;
-        int xinc;
-
-        int fb_index = fb_width * i;
-        int length;
-
-        drinc = flip ? (dr) : -dr;
-        dginc = flip ? (dg) : -dg;
-        dbinc = flip ? (db) : -db;
-        dainc = flip ? (da) : -da;
-        dzinc = flip ? (dz) : -dz;
-        dsinc = flip ? (ds) : -ds;
-        dtinc = flip ? (dt) : -dt;
-        dwinc = flip ? (dw) : -dw;
-
-        xinc = flip ? 1 : -1;
-        x = xend;
-
-        length = flip ? (xstart - xend) : (xend - xstart);
-
-        for (j=0; j <= length; j++)
-        {
-            int sr = r >> 16;
-            int sg = g >> 16;
-            int sb = b >> 16;
-            int sa = a >> 16;
-            int ss = s >> 16;
-            int st = t >> 16;
-            int sw = w >> 16;
-            //UINT16 sz;
-            int sz = (other_modes.z_source_sel) ? (int)((primitive_z << 16) | primitive_delta_z) : (int)z;
-            UINT32 oz = 0;
-            int sss = 0, sst = 0;
-            COLOR c1, c2;
-            //UINT8 old_delta_z;
-            c1.r = c1.g = c1.b = c1.a = 0;
-            c2.r = c2.g = c2.b = c2.a = 0;
-
-            /*
-            if (other_modes.z_source_sel)
-            {
-                compress_z((primitive_z << 16) | primitive_delta_z, &sz, &old_delta_z);
-            }
-            else
-            {
-                compress_z(z, &sz, &old_delta_z);
-            }
-            */
-
-            if (x >= clipx1 && x < clipx2)
-            {
-                //if ((z & 0xffff) >= 0x8000) sz++;
-                if ((w & 0xffff) >= 0x8000) sw++;
-
-                if (other_modes.persp_tex_en)
-                {
-                    if (sw != 0)
-                    {
-                        sss = (((INT64)(ss) << 20) / sw);
-                        sst = (((INT64)(st) << 20) / sw);
-                    }
-                }
-                else
-                {
-                    sss = ss;
-                    sst = st;
-                }
-
-                if (sr > 0xff) sr = 0xff;   if (sg > 0xff) sg = 0xff;   if (sb > 0xff) sb = 0xff;
-
-                shade_color.r = sr; shade_color.g = sg; shade_color.b = sb; shade_color.a = sa;
-
-                if (texture)
-                {
-                    if (other_modes.cycle_type == CYCLE_TYPE_1)
-                    {
-                        TEXTURE_PIPELINE1(sss, sst, other_modes.sample_type == 0);
-                    }
-                    else
-                    {
-                        TEXTURE_PIPELINE2(sss, sst, other_modes.sample_type == 0);
-                    }
-                }
-
-                if (other_modes.cycle_type == CYCLE_TYPE_1)
-                {
-                    c1 = COLOR_COMBINER(0);
-                }
-                else if (other_modes.cycle_type == CYCLE_TYPE_2)
-                {
-                    c1 = COLOR_COMBINER(0);
-                    c2 = COLOR_COMBINER(1);
-                }
-
-                if( alpha_compare_success(c1, c2) )
-                {
-                    decompress_z(zb[(fb_index + x) ^ WORD_ADDR_XOR], &oz);
-                    //oz = (UINT16)zb[(fb_index + x) ^ WORD_ADDR_XOR];
-
-                    if (other_modes.z_compare_en && zbuffer)
-                    {
-                        if (((sz >> 13) < oz) || ((other_modes.z_mode == 3) && ((sz >> 13) == oz)))
-                        {
-                            int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
-                            int cvg_ovf = 0;
-                            UINT8 cvg_old = 0;
-                            calculate_coverage( &cvg_buf[(fb_index + x) ^ WORD_ADDR_XOR], span[i].cvg[x], &cvg_ovf, &cvg_old );
-                            if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
-                            {
-                                if (other_modes.cycle_type == CYCLE_TYPE_1)
-                                {
-                                    BLENDER1_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, dith, &span[i].cvg[x], &cvg_old, &alpha_reject);
-                                }
-                                else
-                                {
-                                    if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
-                                    {
-                                        BLENDER2_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, c2, dith, &span[i].cvg[x], &cvg_old, &alpha_reject);
-                                    }
-                                }
-
-                                if (other_modes.z_update_en && !alpha_reject)
-                                {
-                                    //zb[(fb_index + x) ^ WORD_ADDR_XOR] = sz;
-                                    compress_z(sz, &zb[(fb_index + x) ^ WORD_ADDR_XOR], &zd_buf[(fb_index + x) ^ WORD_ADDR_XOR] );
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
-                        int cvg_ovf = 0;
-                        UINT8 cvg_old = 0;
-                        calculate_coverage( &cvg_buf[(fb_index + x) ^ WORD_ADDR_XOR], span[i].cvg[x], &cvg_ovf, &cvg_old );
-                        if ((other_modes.color_on_cvg && cvg_ovf) || !other_modes.color_on_cvg)
-                        {
-                            if (other_modes.cycle_type == CYCLE_TYPE_1)
-                            {
-                                BLENDER1_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, dith, &span[i].cvg[x], &cvg_old, &alpha_reject);
-                            }
-                            else
-                            {
-                                BLENDER2_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, c2, dith, &span[i].cvg[x], &cvg_old, &alpha_reject);
-                            }
-                        }
-                    }
-                }
-            }
-
-            r += drinc;
-            g += dginc;
-            b += dbinc;
-            a += dainc;
-            z += dzinc;
-            s += dsinc;
-            t += dtinc;
-            w += dwinc;
-
-            x += xinc;
-        }
-    }
+#define addvalues() {	\
+			s += dsde;	\
+			t += dtde;	\
+			w += dwde; \
+			r += drde; \
+			g += dgde; \
+			b += dbde; \
+			a += dade; \
+			z += dzde; \
 }
 
-typedef struct
-{
-    INT32 xl, xm, xh;
-    INT32 yl, ym, yh;
-    INT64 dxldy, dxhdy, dxmdy;
-    int r, g, b, a, s, t, w, z;
-    int drdx, dgdx, dbdx, dadx, dsdx, dtdx, dwdx, dzdx;
-    int drdy, dgdy, dbdy, dady, dsdy, dtdy, dwdy, dzdy;
-    int drde, dgde, dbde, dade, dsde, dtde, dwde, dzde;
-    int tile;
-    int flip;
-
-} triangle_data;
-
-static void fill_span_buffer_1x1( triangle_data* tri, int* span_start, int* span_end )
-{
-    int j;
-    int cvg_idx;
-    int xleft, xright, xleft_inc, xright_inc;
-    int xstart, xend;
-
-    tri->yl >>= 2;
-    tri->ym >>= 2;
-    tri->yh >>= 2;
-
-    xleft = tri->xm;
-    xright = tri->xh;
-    xleft_inc = tri->dxmdy;
-    xright_inc = tri->dxhdy;
-
-    for(j = tri->yh; j <= tri->yl; j++)
-    {
-        if(j == tri->ym)
-        {
-            xleft = tri->xl;
-            xleft_inc = tri->dxldy;
-            xright_inc = tri->dxhdy;
-        }
-
-        xstart = xleft >> 16;
-        xend = xright >> 16;
-
-        if(j >= 0)
-        {
-            span[j].lx = xstart;
-            span[j].rx = xend;
-            span[j].s = tri->s;     span[j].ds = tri->dsdx;
-            span[j].t = tri->t;     span[j].dt = tri->dtdx;
-            span[j].w = tri->w;     span[j].dw = tri->dwdx;
-            span[j].r = tri->r;     span[j].dr = tri->drdx;
-            span[j].g = tri->g;     span[j].dg = tri->dgdx;
-            span[j].b = tri->b;     span[j].db = tri->dbdx;
-            span[j].a = tri->a;     span[j].da = tri->dadx;
-            span[j].z = tri->z;     span[j].dz = tri->dzdx;
-            if(tri->flip)
-            {
-                for(cvg_idx = xend; cvg_idx <= xstart; cvg_idx++)
-                {
-                    span[j].cvg[cvg_idx] = 8;
-                }
-            }
-            else
-            {
-                for(cvg_idx = xstart; cvg_idx <= xend; cvg_idx++)
-                {
-                    span[j].cvg[cvg_idx] = 8;
-                }
-            }
-        }
-
-        xleft += xleft_inc;
-        xright += xright_inc;
-        tri->s += tri->dsde;
-        tri->t += tri->dtde;
-        tri->w += tri->dwde;
-        tri->r += tri->drde;
-        tri->g += tri->dgde;
-        tri->b += tri->dbde;
-        tri->a += tri->dade;
-        tri->z += tri->dzde;
-    }
-
-    *span_start = tri->yh;
-    *span_end = tri->yl;
+#define justassign()		\
+{							\
+			span[j].s = s & ~0x1f;				\
+			span[j].t = t & ~0x1f;				\
+			span[j].w = w & ~0x1f;				\
+			span[j].r = r;				\
+			span[j].g = g;				\
+			span[j].b = b;				\
+			span[j].a = a;				\
+			span[j].z = z;				\
 }
 
-static void fill_span_buffer_2x2( triangle_data* tri, int* span_start, int* span_end )
-{
-    int j;
-    int xleft, xright, xleft_inc, xright_inc;
-    int xstart, xend;
-    int covered_pixels = 0;
+	m_inc = flip ? 1 : -1;
 
-    tri->xm += (tri->dxmdy >> 2) * (tri->yh & 0x0003);
-    tri->xh += (tri->dxhdy >> 2) * (tri->yh & 0x0003);
+	ycur =	yh & ~3;
+	ylfar = yl | 3;
+	ldflag = (sign_dxhdy ^ flip) ? 0 : 3;
+	yhpix = yh >> 2;
+	ympix = ym >> 2;
+	ylpix = yl >> 2;
 
-    tri->r += (tri->drde >> 2) * (tri->yh & 0x0003);
-    tri->g += (tri->dgde >> 2) * (tri->yh & 0x0003);
-    tri->b += (tri->dbde >> 2) * (tri->yh & 0x0003);
-    tri->a += (tri->dade >> 2) * (tri->yh & 0x0003);
-    tri->s += (tri->dsde >> 2) * (tri->yh & 0x0003);
-    tri->t += (tri->dtde >> 2) * (tri->yh & 0x0003);
-    tri->w += (tri->dwde >> 2) * (tri->yh & 0x0003);
-    tri->z += (tri->dzde >> 2) * (tri->yh & 0x0003);
+	for (k = ycur; k <= ylfar; k++)
+	{
+		if (k == ym)
+		{
+			xleft = xl;
+			xleft_inc = dxldy >> 2;
+		}
 
-    xleft = tri->xm;
-    xright = tri->xh;
-    xleft_inc = tri->dxmdy;
-    xright_inc = tri->dxhdy;
+		xstart = xleft >> 16;
+		xend = xright >> 16;
+		j = k >> 2;
+		spix = k & 3;
 
-    for( j = tri->yh; j <= tri->yl; j++ )
-    {
-        if (j == tri->ym)
-        {
-            xleft = tri->xl;
-            xleft_inc = tri->dxldy;
-            xright_inc = tri->dxhdy;
-        }
+		if (k >= 0 && k < 0x1000)
+		{
+			int m = 0;
+			int n = 0;
+			int length = 0;
+			min = 0; max = 3;
+			if (j == yhpix)
+			{
+				min = yh & 3;
+			}
+			if (j == ylpix)
+			{
+				max = yl & 3;
+			}
+			if (spix >= min && spix <= max)
+			{
+				if (spix == min)
+				{
+					minxmx = maxxmx = xstart;
+					minxhx = maxxhx = xend;
+				}
+				else
+				{
+					minxmx = (xstart < minxmx) ? xstart : minxmx;
+					maxxmx = (xstart > maxxmx) ? xstart : maxxmx;
+					minxhx = (xend < minxhx) ? xend : minxhx;
+					maxxhx = (xend > maxxhx) ? xend : maxxhx;
+				}
+			}
 
-        xstart = xleft >> 14;
-        xend = xright >> 14;
+			if (spix == max)
+			{
+				if (flip)
+				{
+					span[j].lx = maxxmx;
+					span[j].rx = minxhx;
+				}
+				else
+				{
+					span[j].lx = minxmx;
+					span[j].rx = maxxhx;
+				}
+			}
 
-        if( j >= 0 && ((j == tri->yh) || ((j & 3) == 0)) )
-        {
-            memset( span[j >> 2].cvg, 0, RDP_CVG_SPAN_MAX );
-            covered_pixels = 0;
-        }
+			length = flip ? (xstart - xend) : (xend - xstart);
 
-        if( j >= 0 )
-        {
-            if( tri->flip )
-            {
-                int cvg_iter = 0;
+			if (spix == ldflag)
+			{
+				xfrac = ((xright >> 8) & 0xff);
+				adjust_attr();
+			}
 
-                if( xend & 0x0003 )
-                {
-                    // Round up to the next pixel
-                    xend &= ~0x0003;
-                    xend += 4;
-                }
-                if( xleft & ((1 << 14) - 1) )
-                {
-                    xstart++;
-                }
-                for( cvg_iter=xend; cvg_iter < xstart; cvg_iter++ )
-                {
-                    if( (cvg_iter < 0) || (cvg_iter >= (RDP_CVG_SPAN_MAX << 2)) )
-                    {
-                        continue;
-                    }
-                    if( (cvg_iter & 1) == (j & 1) )
-                    {
-                        span[j >> 2].cvg[cvg_iter >> 2]++;
-                        covered_pixels++;
-                    }
-                }
-            }
-            else
-            {
-                int cvg_iter = 0;
+			m = flip ? (xend+1) : (xend-1);
 
-                if( xstart & 0x0003 )
-                {
-                    // Round up to the next pixel
-                    xstart &= ~0x0003;
-                    xstart += 4;
-                }
-                if( xright & ((1 << 14) - 1) )
-                {
-                    xend++;
-                }
-                for( cvg_iter = xstart; cvg_iter < xend; cvg_iter++ )
-                {
-                    if( cvg_iter < 0 || cvg_iter >= (RDP_CVG_SPAN_MAX << 2) )
-                    {
-                        continue;
-                    }
-                    if( (cvg_iter & 1) == (j & 1) )
-                    {
-                        span[j >> 2].cvg[cvg_iter >> 2]++;
-                        covered_pixels++;
-                    }
-                }
-            }
+			if (k >= yh && length >= 0 && k <= yl)
+			{
+				if (xstart>=0 && xstart <1024)
+				{
+					if (!flip)
+					{
+						span[j].cvg[xstart] += addleft(xleft);
+					}
+					else
+					{
+						span[j].cvg[xstart] += addright(xleft);
+					}
+				}
+				if (xend>=0 && xend<1024)
+				{
+					if (xstart != xend)
+					{
+						if (!flip)
+						{
+							span[j].cvg[xend] += addright(xright);
+						}
+						else
+						{
+							span[j].cvg[xend] += addleft(xright);
+						}
+					}
+					else
+					{
+						if (!flip)
+						{
+							span[j].cvg[xend] -= (2 - addright(xright));
+						}
+						else
+						{
+							span[j].cvg[xend] -= (2 - addleft(xright));
+						}
+						if (span[j].cvg[xend] > 200)
+						{
+							span[j].cvg[xend] = 0;
+						}
+					}
+				}
+				for (n = 0; n < (length - 1); n++)
+				{
+					if (m>=0 && m < 640)
+					{
+						span[j].cvg[m] += 2;
+					}
 
-            if( (j & 3) == 3 )
-            {
-                span[j >> 2].s = tri->s;    span[j >> 2].ds = tri->dsdx;
-                span[j >> 2].t = tri->t;    span[j >> 2].dt = tri->dtdx;
-                span[j >> 2].w = tri->w;    span[j >> 2].dw = tri->dwdx;
-                span[j >> 2].r = tri->r;    span[j >> 2].dr = tri->drdx;
-                span[j >> 2].g = tri->g;    span[j >> 2].dg = tri->dgdx;
-                span[j >> 2].b = tri->b;    span[j >> 2].db = tri->dbdx;
-                span[j >> 2].a = tri->a;    span[j >> 2].da = tri->dadx;
-                span[j >> 2].z = tri->z;    span[j >> 2].dz = tri->dzdx;
-            }
+					m += m_inc;
+				}
+			}
+		}
 
-            if( (j & 3) == 3 )
-            {
-                int cvg_start = 0;
-                int cvg_end = 0;
-                int cvg_iter = 0;
+		if (spix == 3)
+		{
+			addvalues();
+		}
+		xleft += xleft_inc;
+		xright += xright_inc;
+	}
 
-                for( cvg_iter = 0; cvg_iter < (RDP_CVG_SPAN_MAX - 1); cvg_iter++ )
-                {
-                    if( span[j >> 2].cvg[cvg_iter] == 0 && span[j >> 2].cvg[cvg_iter + 1] > 0 )
-                    {
-                        cvg_start = cvg_iter + 1;
-                    }
-                    if( span[j >> 2].cvg[cvg_iter] > 0 && span[j >> 2].cvg[cvg_iter + 1] == 0 )
-                    {
-                        break;
-                    }
-                }
-                cvg_end = cvg_iter;
-
-                span[j >> 2].lx = xstart >> 2;
-                span[j >> 2].rx = xend >> 2;
-
-                if( covered_pixels == 0 )
-                {
-                    span[j >> 2].lx = -1;
-                    span[j >> 2].rx = -1;
-                }
-            }
-        }
-
-        xleft += xleft_inc >> 2;
-        xright += xright_inc >> 2;
-        tri->s += tri->dsde >> 2;
-        tri->t += tri->dtde >> 2;
-        tri->w += tri->dwde >> 2;
-        tri->r += tri->drde >> 2;
-        tri->g += tri->dgde >> 2;
-        tri->b += tri->dbde >> 2;
-        tri->a += tri->dade >> 2;
-        tri->z += tri->dzde >> 2;
-    }
-
-    *span_start = tri->yh >> 2;
-    *span_end = ((tri->yl & 0x0003) == 3) ? (tri->yl >> 2) : ((tri->yl >> 2) - 1);
-}
-
-static void triangle(UINT32 w1, UINT32 w2, int shade, int texture, int zbuffer)
-{
-    UINT32 w3, w4, w5, w6, w7, w8;
-
-    int shade_base = rdp_cmd_cur + 8;
-    int texture_base = rdp_cmd_cur + 8;
-    int zbuffer_base = rdp_cmd_cur + 8;
-
-    int span_start = 0;
-    int span_end = 0;
-
-    triangle_data tri;
-
-    tri.yl = tri.ym = tri.yh = 0;
-    tri.xl = tri.xm = tri.xh = 0;
-    tri.dxldy = tri.dxhdy = tri.dxmdy = 0;
-    tri.r = tri.g = tri.b = tri.a = tri.s = tri.t = tri.w = tri.z = 0;
-    tri.drdx = tri.dgdx = tri.dbdx = tri.dadx = tri.dsdx = tri.dtdx = tri.dwdx = tri.dzdx = 0;
-    tri.drdy = tri.dgdy = tri.dbdy = tri.dady = tri.dsdy = tri.dtdy = tri.dwdy = tri.dzdy = 0;
-    tri.drde = tri.dgde = tri.dbde = tri.dade = tri.dsde = tri.dtde = tri.dwde = tri.dzde = 0;
-    tri.tile = (w1 >> 16) & 0x7;;
-    tri.flip = (w1 & 0x800000) ? 1 : 0;
-
-    if (shade)
-    {
-        texture_base += 16;
-        zbuffer_base += 16;
-    }
-    if (texture)
-    {
-        zbuffer_base += 16;
-    }
-
-    w3 = rdp_cmd_data[rdp_cmd_cur+2];
-    w4 = rdp_cmd_data[rdp_cmd_cur+3];
-    w5 = rdp_cmd_data[rdp_cmd_cur+4];
-    w6 = rdp_cmd_data[rdp_cmd_cur+5];
-    w7 = rdp_cmd_data[rdp_cmd_cur+6];
-    w8 = rdp_cmd_data[rdp_cmd_cur+7];
-
-    tri.yl = (w1 & 0x3fff);
-    tri.ym = ((w2 >> 16) & 0x3fff);
-    tri.yh = ((w2 >>  0) & 0x3fff);
-    tri.xl = (INT32)(w3);
-    tri.xh = (INT32)(w5);
-    tri.xm = (INT32)(w7);
-    tri.dxldy = (INT32)(w4);
-    tri.dxhdy = (INT32)(w6);
-    tri.dxmdy = (INT32)(w8);
-
-    if (tri.yl & 0x2000) tri.yl |= 0xffffc000;
-    if (tri.ym & 0x2000) tri.ym |= 0xffffc000;
-    if (tri.yh & 0x2000) tri.yh |= 0xffffc000;
-
-    tri.r = tri.g = tri.b = tri.a = 0xff;
-    tri.s = tri.t = tri.w = 0;
-    tri.z = 0;
-
-    if (shade)
-    {
-        tri.r    = (rdp_cmd_data[shade_base+0 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+4 ] >> 16) & 0x0000ffff);
-        tri.g    = ((rdp_cmd_data[shade_base+0 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+4 ] & 0x0000ffff);
-        tri.b    = (rdp_cmd_data[shade_base+1 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+5 ] >> 16) & 0x0000ffff);
-        tri.a    = ((rdp_cmd_data[shade_base+1 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+5 ] & 0x0000ffff);
-        tri.drdx = (rdp_cmd_data[shade_base+2 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+6 ] >> 16) & 0x0000ffff);
-        tri.dgdx = ((rdp_cmd_data[shade_base+2 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+6 ] & 0x0000ffff);
-        tri.dbdx = (rdp_cmd_data[shade_base+3 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+7 ] >> 16) & 0x0000ffff);
-        tri.dadx = ((rdp_cmd_data[shade_base+3 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+7 ] & 0x0000ffff);
-        tri.drde = (rdp_cmd_data[shade_base+8 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+12] >> 16) & 0x0000ffff);
-        tri.dgde = ((rdp_cmd_data[shade_base+8 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+12] & 0x0000ffff);
-        tri.dbde = (rdp_cmd_data[shade_base+9 ] & 0xffff0000) | ((rdp_cmd_data[shade_base+13] >> 16) & 0x0000ffff);
-        tri.dade = ((rdp_cmd_data[shade_base+9 ] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+13] & 0x0000ffff);
-        tri.drdy = (rdp_cmd_data[shade_base+10] & 0xffff0000) | ((rdp_cmd_data[shade_base+14] >> 16) & 0x0000ffff);
-        tri.dgdy = ((rdp_cmd_data[shade_base+10] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+14] & 0x0000ffff);
-        tri.dbdy = (rdp_cmd_data[shade_base+11] & 0xffff0000) | ((rdp_cmd_data[shade_base+15] >> 16) & 0x0000ffff);
-        tri.dady = ((rdp_cmd_data[shade_base+11] << 16) & 0xffff0000) | (rdp_cmd_data[shade_base+15] & 0x0000ffff);
-    }
-    if (texture)
-    {
-        tri.s    = (rdp_cmd_data[texture_base+0 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+4 ] >> 16) & 0x0000ffff);
-        tri.t    = ((rdp_cmd_data[texture_base+0 ] << 16) & 0xffff0000) | (rdp_cmd_data[texture_base+4 ] & 0x0000ffff);
-        tri.w    = (rdp_cmd_data[texture_base+1 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+5 ] >> 16) & 0x0000ffff);
-        tri.dsdx = (rdp_cmd_data[texture_base+2 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+6 ] >> 16) & 0x0000ffff);
-        tri.dtdx = ((rdp_cmd_data[texture_base+2 ] << 16) & 0xffff0000) | (rdp_cmd_data[texture_base+6 ] & 0x0000ffff);
-        tri.dwdx = (rdp_cmd_data[texture_base+3 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+7 ] >> 16) & 0x0000ffff);
-        tri.dsde = (rdp_cmd_data[texture_base+8 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+12] >> 16) & 0x0000ffff);
-        tri.dtde = ((rdp_cmd_data[texture_base+8 ] << 16) & 0xffff0000) | (rdp_cmd_data[texture_base+12] & 0x0000ffff);
-        tri.dwde = (rdp_cmd_data[texture_base+9 ] & 0xffff0000) | ((rdp_cmd_data[texture_base+13] >> 16) & 0x0000ffff);
-        tri.dsdy = (rdp_cmd_data[texture_base+10] & 0xffff0000) | ((rdp_cmd_data[texture_base+14] >> 16) & 0x0000ffff);
-        tri.dtdy = ((rdp_cmd_data[texture_base+10] << 16) & 0xffff0000) | (rdp_cmd_data[texture_base+14] & 0x0000ffff);
-        tri.dwdy = (rdp_cmd_data[texture_base+11] & 0xffff0000) | ((rdp_cmd_data[texture_base+15] >> 16) & 0x0000ffff);
-    }
-    if (zbuffer)
-    {
-        tri.z    = rdp_cmd_data[zbuffer_base+0];
-        tri.dzdx = rdp_cmd_data[zbuffer_base+1];
-        tri.dzde = rdp_cmd_data[zbuffer_base+2];
-        tri.dzdy = rdp_cmd_data[zbuffer_base+3];
-    }
-
-    if( other_modes.sample_type == SAMPLE_TYPE_1x1 )
-    {
-        fill_span_buffer_1x1( &tri, &span_start, &span_end );
-    }
-    else
-    {
-        fill_span_buffer_2x2( &tri, &span_start, &span_end );
-    }
-
-    switch (fb_size)
-    {
-        case PIXEL_SIZE_16BIT:  render_spans_16(span_start, span_end, tri.tile, shade, texture, zbuffer, tri.flip); break;
-        case PIXEL_SIZE_32BIT:  render_spans_32(span_start, span_end, tri.tile, shade, texture, zbuffer, tri.flip); break;
-    }
+	switch (fb_size) // 8bpp needs to be implemented
+	{
+		case PIXEL_SIZE_16BIT:	render_spans_16(machine, yh>>2, yl>>2, tilenum, shade, texture, zbuffer, flip); break;
+		case PIXEL_SIZE_32BIT:	render_spans_32(machine, yh>>2, yl>>2, tilenum, shade, texture, zbuffer, flip); break;
+		default: break; // V-Rally2 does this, fb_size=0
+	}
 }
 
 /*****************************************************************************/
@@ -3348,7 +4523,7 @@ INLINE UINT32 READ_RDP_DATA(UINT32 address)
 	}
 	else
 	{
-		return rdram[(address / 4)];
+		return rdram[((address & 0xffffff) / 4)];
 	}
 }
 
@@ -3751,56 +4926,42 @@ static RDP_COMMAND( rdp_noop )
 
 static RDP_COMMAND( rdp_tri_noshade )
 {
-	//fatalerror("RDP: unhandled command tri_noshade, %08X %08X\n", w1, w2);
-	triangle(w1, w2, 0, 0, 0);
+	triangle(machine, w1, w2, 0, 0, 0);
 }
 
 static RDP_COMMAND( rdp_tri_noshade_z )
 {
-	//fatalerror("RDP: unhandled command tri_noshade_z, %08X %08X\n", w1, w2);
-	triangle(w1, w2, 0, 0, 1);
+	triangle(machine, w1, w2, 0, 0, 1);
 }
 
 static RDP_COMMAND( rdp_tri_tex )
 {
-	//osd_die("RDP: unhandled command tri_tex, %08X %08X\n", w1, w2);
-
-	triangle(w1, w2, 0, 1, 0);
+	triangle(machine, w1, w2, 0, 1, 0);
 }
 
 static RDP_COMMAND( rdp_tri_tex_z )
 {
-	//osd_die("RDP: unhandled command tri_tex_z, %08X %08X\n", w1, w2);
-
-	triangle(w1, w2, 0, 1, 1);
+	triangle(machine, w1, w2, 0, 1, 1);
 }
 
 static RDP_COMMAND( rdp_tri_shade )
 {
-	//osd_die("RDP: unhandled command tri_shade, %08X %08X\n", w1, w2);
-
-	triangle(w1, w2, 1, 0, 0);
+	triangle(machine, w1, w2, 1, 0, 0);
 }
 
 static RDP_COMMAND( rdp_tri_shade_z )
 {
-	//osd_die("RDP: unhandled command tri_shade_z, %08X %08X\n", w1, w2);
-
-	triangle(w1, w2, 1, 0, 1);
+	triangle(machine, w1, w2, 1, 0, 1);
 }
 
 static RDP_COMMAND( rdp_tri_texshade )
 {
-	//osd_die("RDP: unhandled command tri_texshade, %08X %08X\n", w1, w2);
-
-	triangle(w1, w2, 1, 1, 0);
+	triangle(machine, w1, w2, 1, 1, 0);
 }
 
 static RDP_COMMAND( rdp_tri_texshade_z )
 {
-	//osd_die("RDP: unhandled command tri_texshade_z, %08X %08X\n", w1, w2);
-
-	triangle(w1, w2, 1, 1, 1);
+	triangle(machine, w1, w2, 1, 1, 1);
 }
 
 static RDP_COMMAND( rdp_tex_rect )
@@ -3820,11 +4981,12 @@ static RDP_COMMAND( rdp_tex_rect )
 	rect.t			= (w3 >>  0) & 0xffff;
 	rect.dsdx		= (w4 >> 16) & 0xffff;
 	rect.dtdy		= (w4 >>  0) & 0xffff;
+	rect.flip		= 0;
 
 	switch (fb_size)
 	{
-		case PIXEL_SIZE_16BIT:		texture_rectangle_16bit(&rect); break;
-		case PIXEL_SIZE_32BIT:		texture_rectangle_32bit(&rect); break;
+		case PIXEL_SIZE_16BIT:		texture_rectangle_16bit(machine, &rect); break;
+		case PIXEL_SIZE_32BIT:		texture_rectangle_32bit(machine, &rect); break;
 	}
 }
 
@@ -3845,11 +5007,12 @@ static RDP_COMMAND( rdp_tex_rect_flip )
 	rect.s			= (w3 >>  0) & 0xffff;
 	rect.dtdy		= (w4 >> 16) & 0xffff;
 	rect.dsdx		= (w4 >>  0) & 0xffff;
+	rect.flip		= 1;
 
 	switch (fb_size)
 	{
-		case PIXEL_SIZE_16BIT:		texture_rectangle_16bit(&rect); break;
-		case PIXEL_SIZE_32BIT:		texture_rectangle_32bit(&rect); break;
+		case PIXEL_SIZE_16BIT:		texture_rectangle_16bit(machine, &rect); break;
+		case PIXEL_SIZE_32BIT:		texture_rectangle_32bit(machine, &rect); break;
 	}
 }
 
@@ -3875,17 +5038,29 @@ static RDP_COMMAND( rdp_sync_full )
 
 static RDP_COMMAND( rdp_set_key_gb )
 {
-	//osd_die("RDP: unhandled command set_key_gb, %08X %08X\n", w1, w2);
+	key_scale.b = w2 & 0xff;
+	key_scale.g = (w2 >> 16) & 0xff;
 }
 
 static RDP_COMMAND( rdp_set_key_r )
 {
-	//osd_die("RDP: unhandled command set_key_r, %08X %08X\n", w1, w2);
+	key_scale.r = w2 & 0xff;
 }
 
 static RDP_COMMAND( rdp_set_convert )
 {
-	//osd_die("RDP: unhandled command set_convert, %08X %08X\n", w1, w2);
+	k0 = (w1 >> 13) & 0xff;
+	k0 = ((w1 >> 21) & 1) ? (-(0x100 - k0)) : k0;
+	k1 = (w1 >> 4) & 0xff;
+	k1 = ((w1 >> 12) & 1) ?	(-(0x100 - k1)) : k1;
+	k2 = ((w1 & 7) << 5) | ((w2 >> 27) & 0x1f);
+	k2 = (w1 & 0xf) ? (-(0x100 - k2)) : k2;
+	k3 = (w2 >> 18) & 0xff;
+	k3 = ((w2 >> 26) & 1) ? (-(0x100 - k3)) : k3;
+	k4 = (w2 >> 9) & 0xff;
+	k4 = ((w2 >> 17) & 1) ? (-(0x100 - k4)) : k4;
+	k5 = w2 & 0xff;
+	k5 = ((w2 >> 8) & 1) ? (-(0x100 - k5)) : k5;
 }
 
 static RDP_COMMAND( rdp_set_scissor )
@@ -3900,7 +5075,7 @@ static RDP_COMMAND( rdp_set_scissor )
 
 static RDP_COMMAND( rdp_set_prim_depth )
 {
-	primitive_z = (UINT16)(w2 >> 16);
+	primitive_z = (UINT16)(w2 >> 16) & 0x7fff;
 	primitive_delta_z = (UINT16)(w1);
 }
 
@@ -3951,23 +5126,12 @@ static RDP_COMMAND( rdp_set_other_modes )
 					  other_modes.blend_m1a_1, other_modes.blend_m1b_1);
 	SET_BLENDER_INPUT(1, 1, &blender2a_r[1], &blender2a_g[1], &blender2a_b[1], &blender2b_a[1],
 					  other_modes.blend_m2a_1, other_modes.blend_m2b_1);
-
-//  mame_printf_debug("blend: m1a = %d, m1b = %d, m2a = %d, m2b = %d\n", other_modes.blend_m1a_0, other_modes.blend_m1b_0, other_modes.blend_m2a_0, other_modes.blend_m2b_0);
-
-	switch (other_modes.rgb_dither_sel)
-	{
-		case 0: break;
-		case 1: break; //fatalerror("bayer matrix dither\n"); break;
-		case 2: break; /////fatalerror("noise dither\n"); break;
-		case 3: break;
-	}
 }
 
 static RDP_COMMAND( rdp_load_tlut )
 {
 	int i;
 	UINT16 sl, sh;
-//  int tilenum = (w2 >> 24) & 0x7;
 
 	sl	= ((w1 >> 12) & 0xfff) / 4;
 	sh	= ((w2 >> 12) & 0xfff) / 4;
@@ -3981,12 +5145,10 @@ static RDP_COMMAND( rdp_load_tlut )
 				case PIXEL_SIZE_16BIT:
 				{
 					UINT16 *src = (UINT16*)&rdram[ti_address / 4];
-	//              UINT16 *tlut = (UINT16*)&texture_cache[tile[tilenum].tmem/2];
 
 					for (i=sl; i <= sh; i++)
 					{
 						tlut[i] = src[i];
-			//          mame_printf_debug("TLUT %d = %04X\n", i, tlut[i]);
 					}
 					break;
 				}
@@ -4016,17 +5178,28 @@ static RDP_COMMAND( rdp_load_block )
 	UINT16 sl, sh, tl, dxt;
 	int tilenum = (w2 >> 24) & 0x7;
 	UINT32 *src, *tc;
-	int tb;
+	UINT32 tb;
+	UINT16 *ram16 = (UINT16*)rdram;
+	UINT32 ti_address2 = ti_address - ((ti_address & 3) ? 4 : 0);
+	int ti_width2 = ti_width;
+	int slindwords = 0;
 
-	if (ti_format != tile[tilenum].format || ti_size != tile[tilenum].size)
-		fatalerror("RDP: load_block: format conversion required!\n");
-
-	sl	= ((w1 >> 12) & 0xfff);
-	tl	= ((w1 >>  0) & 0xfff) << 11;
-	sh	= ((w2 >> 12) & 0xfff);
+	tile[tilenum].sl = sl = ((w1 >> 12) & 0xfff);
+	tile[tilenum].tl = tl = ((w1 >>  0) & 0xfff);
+	tile[tilenum].sh = sh = ((w2 >> 12) & 0xfff);
 	dxt	= ((w2 >>  0) & 0xfff);
 
+	if (sh < sl)
+	{
+		//fatalerror( "load_block: sh < sl" );
+	}
+
 	width = (sh - sl) + 1;
+
+	if (width > 2048) // Hack for Magical Tetris Challenge
+	{
+		width = 2048;
+	}
 
 	switch (ti_size)
 	{
@@ -4036,30 +5209,76 @@ static RDP_COMMAND( rdp_load_block )
 		case PIXEL_SIZE_32BIT:	width <<= 2; break;
 	}
 
+	if ((ti_address & 3) && (ti_address & 0xffffff00) != 0xf8a00)
+	{
+		fatalerror( "load block: unaligned ti_address 0x%x",ti_address ); // Rat Attack
+	}
 
-	src = (UINT32*)&rdram[ti_address / 4];
+	src = (UINT32*)&ram16[ti_address2 >> 1];
 	tc = (UINT32*)texture_cache;
-	tb = tile[tilenum].tmem;
+	tb = tile[tilenum].tmem >> 2;
+
+	if ((tb + (width >> 2)) > 0x400)
+	{
+		width = 0x1000 - tb*4; // Hack for Magical Tetris Challenge
+	}
+
+	if (ti_width2 < 0)
+	{
+		fatalerror( "load_block: negative ti_width2" );
+	}
+
+	switch (ti_size)
+	{
+		case PIXEL_SIZE_4BIT:	ti_width2 >>= 1; break;
+		case PIXEL_SIZE_8BIT:	break;
+		case PIXEL_SIZE_16BIT:	ti_width2 <<= 1; break;
+		case PIXEL_SIZE_32BIT:	ti_width2 <<= 2; break;
+	}
+
+	slindwords = sl;
+	switch (ti_size) // Needed by Vigilante 8
+	{
+		case PIXEL_SIZE_4BIT:	slindwords >>= 3; break;
+		case PIXEL_SIZE_8BIT:	slindwords >>= 2;break;
+		case PIXEL_SIZE_16BIT:	slindwords >>= 1; break;
+		case PIXEL_SIZE_32BIT:	break;
+	}
+
+	if (width & 7)	// Sigh... another Rat Attack-specific thing.
+	{
+		width = (width & (~7)) + 8;
+	}
 
 	if (dxt != 0)
 	{
-		int j=0;
-		for (i=0; i < width; i+=2)
+		int j= 0;
+		int t = 0;
+		int oldt = 0;
+		int ptr;
+		int xorval = (fb_size == PIXEL_SIZE_16BIT && ti_size == PIXEL_SIZE_32BIT ) ? 2 : 1; // Wave Race-specific
+		UINT32 srcstart = ((tl * ti_width2) >> 2) + slindwords;
+		src = &src[srcstart];
+		for (i = 0; i < (width >> 2); i += 2)
 		{
-			int t = j >> 11;
-
-			tc[((tb+i) + 0)] = src[((((tl * ti_width) / 4) + sl + i + 0) ^ ((t & 1) ? 1 : 0))];
-			tc[((tb+i) + 1)] = src[((((tl * ti_width) / 4) + sl + i + 1) ^ ((t & 1) ? 1 : 0))];
-
+			oldt = t;
+			t = ((j >> 11) & 1) ? xorval : 0;
+			if (t > oldt)
+			{
+				i += ((tile[tilenum].line >> 3) << 1);
+			}
+			ptr = tb + i;
+			tc[ptr & 0x3ff] = src[i ^ t];
+			tc[(ptr + 1) & 0x3ff] = src[(i + 1) ^ t];
 			j += dxt;
 		}
+		tile[tilenum].th = tl + (j >> 11);
 	}
-	else
+	else // Needed by Pilotwings 64 intro, Top Gear Rally intro
 	{
-		for (i=0; i < width / 4; i++)
-		{
-			tc[(tb+i)] = src[((tl * ti_width) / 4) + sl + i];
-		}
+		UINT32 srcstart = ((tl * ti_width2) >> 2) + slindwords;
+		memcpy(&tc[tb],&src[srcstart],width);
+		tile[tilenum].th = tl;
 	}
 }
 
@@ -4069,63 +5288,110 @@ static RDP_COMMAND( rdp_load_tile )
 	UINT16 sl, sh, tl, th;
 	int width, height;
 	int tilenum = (w2 >> 24) & 0x7;
+	int line = tile[tilenum].line; // Per Ziggy
+	int toppad;
 
-	if (ti_format != tile[tilenum].format || ti_size != tile[tilenum].size)
-		fatalerror("RDP: load_block: format conversion required!\n");
+	if (!line)
+	{
+		return; // Needed by Wipeout 64
+	}
 
-	sl	= ((w1 >> 12) & 0xfff) / 4;
-	tl	= ((w1 >>  0) & 0xfff) / 4;
-	sh	= ((w2 >> 12) & 0xfff) / 4;
-	th	= ((w2 >>  0) & 0xfff) / 4;
+	if ((ti_format != tile[tilenum].format || ti_size != tile[tilenum].size))
+	{
+		fatalerror("load_tile: format conversion required!\n %d %d %d %d", ti_format, tile[tilenum].format, ti_size, tile[tilenum].size);
+	}
+
+	tile[tilenum].sl = ((w1 >> 12) & 0xfff);
+	tile[tilenum].tl = ((w1 >>  0) & 0xfff);
+	tile[tilenum].sh = ((w2 >> 12) & 0xfff);
+	tile[tilenum].th = ((w2 >>  0) & 0xfff);
+	sl = tile[tilenum].sl / 4;
+	tl = tile[tilenum].tl / 4;
+	sh = tile[tilenum].sh / 4;
+	th = tile[tilenum].th / 4;
 
 	width = (sh - sl) + 1;
 	height = (th - tl) + 1;
+
+	if (ti_size < 3)
+	{
+		toppad = (width * ti_size) & 0x7;
+	}
+	else
+	{
+		toppad = (width << 2) & 0x7;
+	}
+	toppad = 0; // Currently disabled
 
 	switch (ti_size)
 	{
 		case PIXEL_SIZE_8BIT:
 		{
-			UINT8 *src = (UINT8*)&rdram[ti_address / 4];
+			UINT8 *src = (UINT8*)rdram;
 			UINT8 *tc = (UINT8*)texture_cache;
 			int tb = tile[tilenum].tmem;
 
 			if (tb + (width * height) > 4096)
 			{
-				fatalerror("rdp_load_tile 8-bit: tmem %04X, width %d, height %d = %d\n", tile[tilenum].tmem, width, height, width*height);
+				height = (4096 - tb) / line; // Per Ziggy
 			}
 
 			for (j=0; j < height; j++)
 			{
 				int tline = tb + (tile[tilenum].line * j);
 				int s = ((j + tl) * ti_width) + sl;
+#define BYTE_XOR_DWORD_SWAP 7
+				int xorval8 = ((j & 1) ? BYTE_XOR_DWORD_SWAP : BYTE_ADDR_XOR); // Per Ziggy
 
 				for (i=0; i < width; i++)
 				{
-					tc[((tline+i) ^ BYTE_ADDR_XOR) ^ ((j & 1) ? 4 : 0)] = src[(s++) ^ BYTE_ADDR_XOR];
+					tc[(tline + i) ^ xorval8] = src[(ti_address + s + i) ^ BYTE_ADDR_XOR];
 				}
+				//for (int k=0; k < (topad); k++) // Padding is possibly necessary, not yet known.
+				//{
+				//    tc[((tline+i+k) ^ xorval8] = src[(ti_address + s + i) ^ BYTE_ADDR_XOR];
+				//}
 			}
 			break;
 		}
 		case PIXEL_SIZE_16BIT:
 		{
-			UINT16 *src = (UINT16*)&rdram[ti_address / 4];
+			UINT16 *src = (UINT16*)rdram;
+			UINT32 ti_addr16 = ti_address >> 1;
 			UINT16 *tc = (UINT16*)texture_cache;
 			int tb = (tile[tilenum].tmem / 2);
+			int taddr;
 
-			if (tb + (width * height) > 2048)
+			if ((tb + (width * height)) > 2048)
 			{
-				//fatalerror("rdp_load_tile 16-bit: tmem %04X, width %d, height %d = %d\n", tile[tilenum].tmem, width, height, width*height);
+				height = (2048 - tb) / (line / 2); // Per Ziggy
 			}
 
-			for (j=0; j < height; j++)
+			for (j = 0; j < height; j++)
 			{
 				int tline = tb + ((tile[tilenum].line / 2) * j);
-				int s = ((j + tl) * ti_width) + sl;
-
-				for (i=0; i < width; i++)
+				int s = 0;
+				int xorval16 = 0;
+				if (tile[tilenum].format == 1) // Needed by Ogre Battle 64
 				{
-					tc[((tline+i) ^ WORD_ADDR_XOR) ^ ((j & 1) ? 2 : 0)] = src[(s++) ^ WORD_ADDR_XOR];
+					tline = tb + (tile[tilenum].line * j);
 				}
+				s = ((j + tl) * ti_width) + sl;
+#define WORD_XOR_DWORD_SWAP 3
+				xorval16 = (j & 1) ? WORD_XOR_DWORD_SWAP : WORD_ADDR_XOR;
+
+				for (i = 0; i < width; i++)
+				{
+					taddr = (tline+i) ^ xorval16;
+					if (taddr < 2048) // Needed by World Driver Championship
+					{
+						tc[taddr] = src[(ti_addr16 + s + i) ^ WORD_ADDR_XOR];
+					}
+				}
+				//for (int k=0; k < (topad>>1); k++) // Padding is possibly necessary, not yet known.
+				//{
+				//    tc[((tline+i+k) ^ xorval16] = src[(ti_addr16+s+i) ^ WORD_ADDR_XOR];
+				//}
 			}
 			break;
 		}
@@ -4134,20 +5400,21 @@ static RDP_COMMAND( rdp_load_tile )
 			UINT32 *src = (UINT32*)&rdram[ti_address / 4];
 			UINT32 *tc = (UINT32*)texture_cache;
 			int tb = (tile[tilenum].tmem / 4);
+			int xorval32 = ((fb_size == PIXEL_SIZE_16BIT) ? 2 : 1);
 
 			if (tb + (width * height) > 1024)
 			{
-				fatalerror("rdp_load_tile 32-bit: tmem %04X, width %d, height %d = %d\n", tile[tilenum].tmem, width, height, width*height);
+				height = (1024 - tb) / (line/4); // Per Ziggy
 			}
 
 			for (j=0; j < height; j++)
 			{
 				int tline = tb + ((tile[tilenum].line / 2) * j);
 				int s = ((j + tl) * ti_width) + sl;
-
+				int xorval32cur = (j & 1) ? xorval32 : 0;
 				for (i=0; i < width; i++)
 				{
-					tc[(tline+i) ^ ((j & 1) ? 1 : 0)] = src[(s++)];
+					tc[(tline + i) ^ xorval32cur] = src[s + i];
 				}
 			}
 			break;
@@ -4166,6 +5433,7 @@ static RDP_COMMAND( rdp_set_tile )
 	tile[tilenum].size		= (w1 >> 19) & 0x3;
 	tile[tilenum].line		= ((w1 >>  9) & 0x1ff) * 8;
 	tile[tilenum].tmem		= ((w1 >>  0) & 0x1ff) * 8;
+	tile[tilenum].palette	= (w2 >> 20) & 0xf;
 	tile[tilenum].ct		= (w2 >> 19) & 0x1;
 	tile[tilenum].mt		= (w2 >> 18) & 0x1;
 	tile[tilenum].mask_t	= (w2 >> 14) & 0xf;
@@ -4188,8 +5456,8 @@ static RDP_COMMAND( rdp_fill_rect )
 
 	switch (fb_size)
 	{
-		case PIXEL_SIZE_16BIT:		fill_rectangle_16bit(&rect); break;
-		case PIXEL_SIZE_32BIT:		fill_rectangle_32bit(&rect); break;
+		case PIXEL_SIZE_16BIT:		fill_rectangle_16bit(machine, &rect); break;
+		case PIXEL_SIZE_32BIT:		fill_rectangle_32bit(machine, &rect); break;
 	}
 }
 
@@ -4216,7 +5484,8 @@ static RDP_COMMAND( rdp_set_blend_color )
 
 static RDP_COMMAND( rdp_set_prim_color )
 {
-	// TODO: prim min level, prim_level
+	min_level = (w1 >> 8) & 0x1f;
+	primitive_lod_frac = (w1 & 0xff);
 	prim_color.r = (w2 >> 24) & 0xff;
 	prim_color.g = (w2 >> 16) & 0xff;
 	prim_color.b = (w2 >>  8) & 0xff;
@@ -4289,9 +5558,22 @@ static RDP_COMMAND( rdp_set_color_image )
 	fb_size		= (w1 >> 19) & 0x3;
 	fb_width	= (w1 & 0x3ff) + 1;
 	fb_address	= w2 & 0x01ffffff;
+	if (fb_format && fb_format != 2) // Jet Force Gemini sets the format to 4, Intensity.  Protection?
+	{
+		if (fb_size == 1)
+		{
+			fb_format = 2;
+		}
+		else
+		{
+			fb_format = 0;
+		}
+	}
 
-	//if (fb_format != 0)   fatalerror("rdp_set_color_image: format = %d\n", fb_format);
-	if (fb_format != 0) fb_format = 0;
+	if (fb_format != 0)
+	{
+		fb_format = 0;
+	}
 }
 
 /*****************************************************************************/
@@ -4378,5 +5660,366 @@ void rdp_process_list(running_machine *machine)
 	rdp_cmd_ptr = 0;
 	rdp_cmd_cur = 0;
 
-	dp_start = dp_end;
+	dp_start = dp_current = dp_end;
 }
+
+INLINE int alpha_compare(running_machine *machine, UINT8 comb_alpha)
+{
+	if (other_modes.alpha_compare_en)
+	{
+		if (other_modes.dither_alpha_en)
+		{
+			if (comb_alpha < (mame_rand(machine) & 0xff))
+			{
+				return 0;
+			}
+		}
+		else
+		{
+			if (comb_alpha < blend_color.a)
+			{
+				return 0;
+			}
+		}
+		return 1;
+	}
+	return 1;
+}
+
+INLINE UINT8 alpha_cvg_get(UINT8 comb_alpha)
+{
+	UINT32 temp = comb_alpha;
+	UINT32 temp2 = curpixel_cvg;
+	UINT32 temp3 = 0;
+
+	if (other_modes.cvg_times_alpha > 1 || other_modes.alpha_cvg_select > 1)
+	{
+		fatalerror( "alpha_cvg_get failed" );
+	}
+
+	if (other_modes.cvg_times_alpha)
+	{
+		temp3 = (temp * temp2) + 4;
+		curpixel_cvg = temp3 >> 8;
+	}
+
+	if (other_modes.alpha_cvg_select)
+	{
+		temp = (other_modes.cvg_times_alpha) ? (temp3 >> 3) : (temp2 << 5);
+	}
+
+	if (temp > 0xff)
+	{
+		temp = 0xff;
+	}
+
+	return (UINT8)temp;
+}
+
+INLINE UINT8 COMBINER_EQUATION(UINT8 A, UINT8 B, UINT8 C, UINT8 D)
+{
+	INT32 color = (((A-B)* C) + (D << 8) + 0x80);
+	color >>= 8;
+	if (color > 255)
+	{
+		color = 255;
+	}
+	if (color < 0)
+	{
+		color = 0;
+	}
+	return (UINT8)color;
+}
+
+INLINE void BLENDER_EQUATION(INT32* r, INT32* g, INT32* b, int cycle, int bsel_special)
+{
+	UINT8 blend1a, blend2a;
+	UINT32 sum = 0;
+	blend1a = *blender1b_a[cycle];
+	blend2a = *blender2b_a[cycle];
+	if (bsel_special)
+	{
+		blend1a &= 0xe0;
+	}
+
+	sum = (((blend1a >> 5) + (blend2a >> 5) + 1) & 0xf) << 5;
+
+	*r = (((int)(*blender1a_r[cycle]) * (int)(blend1a))) +
+		(((int)(*blender2a_r[cycle]) * (int)(blend2a)));
+	*r += (bsel_special) ? (((int)(*blender2a_r[cycle])) << 5) : (((int)(*blender2a_r[cycle])) << 3);
+
+	*g = (((int)(*blender1a_g[cycle]) * (int)(blend1a))) +
+		(((int)(*blender2a_g[cycle]) * (int)(blend2a)));
+	*g += (bsel_special) ? ((int)((*blender2a_g[cycle])) << 5) : (((int)(*blender2a_g[cycle])) << 3);
+
+	*b = (((int)(*blender1a_b[cycle]) * (int)(blend1a))) +
+		(((int)(*blender2a_b[cycle]) * (int)(blend2a)));
+	*b += (bsel_special) ? (((int)(*blender2a_b[cycle])) << 5) : (((int)(*blender2a_b[cycle])) << 3);
+
+	if (other_modes.force_blend)
+	{
+		*r >>= 8;
+		*g >>= 8;
+		*b >>= 8;
+	}
+	else
+	{
+		if (sum)
+		{
+			*r /= sum;
+			*g /= sum;
+			*b /= sum;
+		}
+		else
+		{
+			*r = *g = *b = 0xff;
+		}
+	}
+
+
+	if (*r > 255) *r = 255;
+	if (*g > 255) *g = 255;
+	if (*b > 255) *b = 255;
+}
+
+INLINE UINT32 addrightcvg(UINT32 x, UINT32 k)
+{
+#undef FULL_SUBPIXELS
+	UINT32 coveredsubpixels=((x >> 14) & 3);
+	if (!(x & 0xffff))
+	{
+		return 0;
+	}
+#ifdef FULL_SUBPIXELS
+	if (!coveredsubpixels)
+	{
+		return 0;
+	}
+	if (!(k & 1))
+	{
+		return (coveredsubpixels<3) ? 1 : 2;
+	}
+	else
+	{
+		return (coveredsubpixels<2) ? 0 : 1;
+	}
+#endif
+	if (!(k & 1))
+	{
+		return (coveredsubpixels < 2) ? 1 : 2;
+	}
+	else
+	{
+		if (coveredsubpixels<1)
+		{
+			return 0;
+		}
+		else if (coveredsubpixels<3)
+		{
+			return 1;
+		}
+		else
+		{
+			return 2;
+		}
+	}
+}
+
+INLINE UINT32 addleftcvg(UINT32 x, UINT32 k)
+{
+	UINT32 coveredsubpixels = 3 - ((x >> 14) & 3);
+	if (!(x & 0xffff))
+	{
+		return 2;
+	}
+#ifdef FULL_SUBPIXELS
+	if (!coveredsubpixels)
+	{
+		return 0;
+	}
+	if (!(k & 1))
+	{
+		return (coveredsubpixels<2) ? 0 : 1;
+	}
+	else
+	{
+		return (coveredsubpixels<3) ? 1 : 2;
+	}
+#endif
+	if (k & 1)
+	{
+		return (coveredsubpixels<2) ? 1 : 2;
+	}
+	else
+	{
+		if (coveredsubpixels < 1)
+		{
+			return 0;
+		}
+		else if (coveredsubpixels < 3)
+		{
+			return 1;
+		}
+		else
+		{
+			return 2;
+		}
+	}
+}
+
+INLINE UINT32 FBWRITE_16(UINT16 *fb, UINT8* hb, UINT32 r, UINT32 g, UINT32 b)
+{
+#undef CVG_DRAW
+	UINT16 finalcolor;
+	UINT32 memory_cvg;
+	UINT32 newcvg;
+	UINT32 wrapflag;
+	UINT32 clampcvg;
+#ifdef CVG_DRAW
+	int covdraw;
+	if (curpixel_cvg == 8)
+	{
+		covdraw=255;
+	}
+	else
+	{
+		covdraw = curpixel_cvg << 5;
+	}
+	r=covdraw; g=covdraw; b=covdraw;
+#endif
+
+	if (!other_modes.z_compare_en)
+	{
+		curpixel_overlap = 0;
+	}
+	if (other_modes.image_read_en)
+	{
+		memory_cvg = ((*fb & 1) << 2) + (*hb & 3) + 1;
+	}
+	else
+	{
+		memory_cvg = 8;
+	}
+
+	if (curpixel_cvg > 8)
+	{
+		fatalerror("FBWRITE_16: curpixel_cvg %d", curpixel_cvg);
+	}
+
+	newcvg = curpixel_cvg + memory_cvg;
+	wrapflag = (newcvg > 8) ? 1 : 0;
+
+	finalcolor = ((r >> 3) << 11) | ((g >> 3) << 6) | ((b >> 3) << 1);
+
+	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
+
+	if (!curpixel_cvg)
+	{
+		fatalerror("cvg underflow");
+	}
+
+	curpixel_cvg--;
+	newcvg--;
+	memory_cvg--;
+	clampcvg--;
+
+	if (other_modes.color_on_cvg && !wrapflag)
+	{
+		*fb &= 0xfffe;
+		*fb |= ((newcvg >> 2) & 1);
+		*hb = (newcvg & 3);
+		return 0;
+	}
+
+	if (!other_modes.cvg_dest)
+	{
+		if (!other_modes.force_blend && !curpixel_overlap)
+		{
+			*fb = finalcolor|((curpixel_cvg >>2)&1);
+			*hb = (curpixel_cvg & 3);
+		}
+		else
+		{
+			*fb = finalcolor|((clampcvg>>2)&1);
+			*hb = (clampcvg&3);
+		}
+	}
+	else if (other_modes.cvg_dest == 2)
+	{
+		*fb = finalcolor|1;
+		*hb = 3;
+	}
+	else if (other_modes.cvg_dest == 3)
+	{
+		*fb = finalcolor|((memory_cvg >> 2) & 1);
+		*hb = (memory_cvg & 3);
+	}
+	else if (other_modes.cvg_dest == 1)
+	{
+		*fb = finalcolor|((newcvg >> 2) & 1);
+		*hb = (newcvg & 3);
+	}
+	return 1;
+}
+
+INLINE UINT32 FBWRITE_32(UINT32 *fb, UINT32 r, UINT32 g, UINT32 b)
+{
+	UINT32 finalcolor=(r << 24) | (g << 16) | (b << 8);
+	UINT32 memory_alphachannel = *fb & 0xff;
+	UINT32 memory_cvg;
+	UINT32 newcvg;
+	UINT32 wrapflag;
+	UINT32 clampcvg;
+	if (other_modes.image_read_en)
+	{
+		memory_cvg = ((*fb >>5) & 7) + 1;
+	}
+	else
+	{
+		memory_cvg = 8;
+	}
+
+	newcvg = curpixel_cvg + memory_cvg;
+	wrapflag = (newcvg > 8) ? 1 : 0;
+	clampcvg = (newcvg > 8) ? 8 : newcvg;
+	newcvg = (wrapflag)? (newcvg - 8) : newcvg;
+
+	curpixel_cvg--;
+	newcvg--;
+	memory_cvg--;
+	clampcvg--;
+
+	if (other_modes.color_on_cvg && !wrapflag)
+	{
+		*fb &= 0xffffff00;
+		*fb |= ((newcvg << 5) & 0xff);
+		return 0;
+	}
+
+	if (!other_modes.cvg_dest)
+	{
+		if (!other_modes.force_blend && !curpixel_overlap)
+		{
+			*fb = finalcolor|(curpixel_cvg << 5);
+		}
+		else
+		{
+			*fb = finalcolor|(clampcvg << 5);
+		}
+	}
+	else if (other_modes.cvg_dest==2)
+	{
+		*fb = finalcolor | 0xE0;
+	}
+	else if (other_modes.cvg_dest == 3)
+	{
+		*fb = finalcolor | memory_alphachannel;
+	}
+	else if (other_modes.cvg_dest == 1)
+	{
+		*fb = finalcolor | (newcvg << 5);
+	}
+	return 1;
+}
+

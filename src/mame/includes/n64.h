@@ -6,6 +6,7 @@
 /*----------- defined in video/n64.c -----------*/
 
 extern int fb_width;
+extern int fb_height;
 
 extern VIDEO_START( n64 );
 extern VIDEO_UPDATE( n64 );
@@ -59,6 +60,10 @@ extern UINT32 n64_vi_width;
 extern UINT32 n64_vi_origin;
 extern UINT32 n64_vi_control;
 extern UINT32 n64_vi_blank;
+extern UINT32 n64_vi_hstart;
+extern UINT32 n64_vi_vstart;
+extern UINT32 n64_vi_xscale;
+extern UINT32 n64_vi_yscale;
 
 extern void dp_full_sync(running_machine *machine);
 extern void signal_rcp_interrupt(running_machine *machine, int interrupt);

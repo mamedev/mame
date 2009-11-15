@@ -473,6 +473,12 @@ ROM_START( aleck64 )
 	ROM_REGION32_BE( 0x4000000, "user2", ROMREGION_ERASE00 )
 	ROM_REGION32_BE( 0x100000, "user3", ROMREGION_ERASE00 )
 	ROM_REGION32_BE( 0x80, "user4", ROMREGION_ERASE00 )
+
+	ROM_REGION16_BE( 0x80, "normpoint", 0 )
+    ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
+
+	ROM_REGION16_BE( 0x80, "normslope", 0 )
+    ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 ROM_END
 
 ROM_START( 11beat )
@@ -481,6 +487,12 @@ ROM_START( 11beat )
 
 	ROM_REGION32_BE( 0x4000000, "user2", 0 )
 	ROM_LOAD16_WORD_SWAP( "nus-zhaj.u3", 0x000000, 0x0800000,  CRC(95258ba2) SHA1(0299b8fb9a8b1b24428d0f340f6bf1cfaf99c672) )
+
+	ROM_REGION16_BE( 0x80, "normpoint", 0 )
+    ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
+
+	ROM_REGION16_BE( 0x80, "normslope", 0 )
+    ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 ROM_END
 
 ROM_START( mtetrisc )
@@ -495,6 +507,12 @@ ROM_START( mtetrisc )
 
 	ROM_REGION32_BE( 0x80, "user4", 0 )
 	ROM_LOAD ( "at24c01.u34", 0x000000, 0x80,  CRC(ba7e503f) SHA1(454aa4fdde7d8694d1affaf25cd750fa678686bb) )
+
+	ROM_REGION16_BE( 0x80, "normpoint", 0 )
+    ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
+
+	ROM_REGION16_BE( 0x80, "normslope", 0 )
+    ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 ROM_END
 
 
@@ -513,6 +531,12 @@ ROM_START( starsldr )
 	ROM_REGION32_BE( 0x4000000, "user2", 0 )
 	ROM_LOAD16_WORD_SWAP( "nus-zhbj-0.u3", 0x000000, 0xc00000,  CRC(a4edac93) SHA1(3794606c008fb69f5d16dcccece94d03da23bf8a) )
 
+	ROM_REGION16_BE( 0x80, "normpoint", 0 )
+    ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
+
+	ROM_REGION16_BE( 0x80, "normslope", 0 )
+    ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
+
 ROM_END
 
 ROM_START( srmvs )
@@ -521,6 +545,12 @@ ROM_START( srmvs )
 
 	ROM_REGION32_BE( 0x4000000, "user2", 0 )
 	ROM_LOAD16_WORD_SWAP( "nus-zsej-0.u2", 0x000000, 0x2000000,  CRC(44f40102) SHA1(a78de955f2fcd99dda14e782984368b320eb5415) )
+
+	ROM_REGION16_BE( 0x80, "normpoint", 0 )
+    ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
+
+	ROM_REGION16_BE( 0x80, "normslope", 0 )
+    ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 
 ROM_END
 
@@ -539,6 +569,12 @@ ROM_START( vivdolls )
 
 	ROM_REGION32_BE( 0x4000000, "user2", 0 )
 	ROM_LOAD16_WORD_SWAP( "nus-zsaj-0.u3", 0x000000, 0x800000,  CRC(f3220e29) SHA1(06d8b808cc19378b046803f4dc75c7d791b7767f) )
+
+	ROM_REGION16_BE( 0x80, "normpoint", 0 )
+    ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
+
+	ROM_REGION16_BE( 0x80, "normslope", 0 )
+    ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 
 ROM_END
 
@@ -564,6 +600,12 @@ ROM_START( twrshaft )
 
 	ROM_REGION32_BE( 0x800000, "user3", 0 )
 	ROM_LOAD16_WORD_SWAP( "nus-zsij-0.u1", 0x000000, 0x800000,  CRC(2389576f) SHA1(dc22b2eab4d7a02cb918827a62e6c120b3a84e6c) )
+
+	ROM_REGION16_BE( 0x80, "normpoint", 0 )
+    ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
+
+	ROM_REGION16_BE( 0x80, "normslope", 0 )
+    ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 ROM_END
 
 
@@ -577,6 +619,12 @@ ROM_START( hipai )
 
 	ROM_REGION32_BE( 0x800000, "user3", 0 )
 	ROM_LOAD16_WORD_SWAP( "nus-nsij-0.u1", 0x000000, 0x800000,  CRC(94cf9f8d) SHA1(cd624d1f5de2be3bec3ece06556a2e39bef66d77) )
+
+	ROM_REGION16_BE( 0x80, "normpoint", 0 )
+    ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
+
+	ROM_REGION16_BE( 0x80, "normslope", 0 )
+    ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 ROM_END
 
 
@@ -590,6 +638,12 @@ ROM_START( doncdoon )
 
 	ROM_REGION32_BE( 0x800000, "user3", 0 )
 	ROM_LOAD16_WORD_SWAP( "nus-zsij-0.u1", 0x000000, 0x800000,   CRC(2389576f) SHA1(dc22b2eab4d7a02cb918827a62e6c120b3a84e6c) ) // same as tower & shaft
+
+	ROM_REGION16_BE( 0x80, "normpoint", 0 )
+    ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
+
+	ROM_REGION16_BE( 0x80, "normslope", 0 )
+    ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 ROM_END
 
 ROM_START( kurufev )
@@ -602,6 +656,12 @@ ROM_START( kurufev )
 
 	ROM_REGION32_BE( 0x800000, "user3", 0 )
 	ROM_LOAD16_WORD_SWAP( "nus-zsij-0.u1", 0x000000, 0x800000, CRC(547d8122) SHA1(347f0785767265acb0f0c21646e06cbe6f561821) )
+
+	ROM_REGION16_BE( 0x80, "normpoint", 0 )
+    ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
+
+	ROM_REGION16_BE( 0x80, "normslope", 0 )
+    ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 ROM_END
 
 
@@ -611,6 +671,12 @@ ROM_START( mayjin3 )
 
 	ROM_REGION32_BE( 0x4000000, "user2", 0 )
 	ROM_LOAD16_WORD_SWAP( "nus-zscj.u3", 0x000000, 0x800000,  CRC(8b36eb91) SHA1(179745625c16c6813d5f8d29bfd7628783d55806) )
+
+	ROM_REGION16_BE( 0x80, "normpoint", 0 )
+    ROM_LOAD( "normpnt.rom", 0x00, 0x80, CRC(e7f2a005) SHA1(c27b4a364a24daeee6e99fd286753fd6216362b4) )
+
+	ROM_REGION16_BE( 0x80, "normslope", 0 )
+    ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 
 ROM_END
 
