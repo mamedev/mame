@@ -47,7 +47,7 @@
   
   14/11/2009 : Lord Nightmare
   Removed STEP mess, vastly simplifying the code. Made output bipolar rather
-  than always above the 0 line.
+  than always above the 0 line, but disabled that code due to pending issues.
 
   TODO: * Implement a function for setting stereo regs for the game gear.
           Requires making the core support both mono and stereo, and have
@@ -69,7 +69,8 @@
 #include "sn76496.h"
 
 
-#define MAX_OUTPUT 0x3fff
+#define MAX_OUTPUT 0x7fff
+// make the above 0x3fff if using bipolar output
 #define NOISEMODE (R->Register[6]&4)?1:0
 
 
@@ -241,11 +242,16 @@ static STREAM_UPDATE( SN76496Update )
 			R->OldNoise = R->RNG & 1;
 			R->Count[3] = R->Period[3];
 		}
-
+/* //bipolar output, doesn't seem to work right with sonic 2 on gamegear at least
 		out = (R->Output[0]?R->Volume[0]:(0-R->Volume[0]))
 			+(R->Output[1]?R->Volume[1]:(0-R->Volume[1]))
 			+(R->Output[2]?R->Volume[2]:(0-R->Volume[2]))
 			+(R->Output[3]?R->Volume[3]:(0-R->Volume[3]));
+*/
+		out = (R->Output[0]?R->Volume[0]:0)
+			+(R->Output[1]?R->Volume[1]:0)
+			+(R->Output[2]?R->Volume[2]:0)
+			+(R->Output[3]?R->Volume[3]:0);
 
 		*(buffer++) = out;
 
