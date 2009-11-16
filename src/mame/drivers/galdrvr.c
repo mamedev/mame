@@ -4082,6 +4082,27 @@ ROM_START( spcdraga )
 	ROM_LOAD( "prom_6331.10f", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
 ROM_END
 
+ROM_START( stera )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "stera.1",      0x0000, 0x0800, CRC(cd04fea8) SHA1(f3ba58f276c784f4ad4a53f9f961c269faa8fa87) )
+	ROM_LOAD( "stera.2",      0x0800, 0x0800, CRC(ccd1878e) SHA1(cfa4913a3cd3e58998bd983c9078af58560cfbd6) )
+	ROM_LOAD( "stera.3",      0x1000, 0x0800, CRC(29a2b0ab) SHA1(e9fc7161d0566e36307c45b7132e2262c0af4845) )
+	ROM_LOAD( "stera.4",      0x1800, 0x0800, CRC(4c6a5a6d) SHA1(366516f63c9b5239e703e4dfb672659049ddbf44) )
+	ROM_LOAD( "stera.5",      0x2000, 0x0800, CRC(06d378a6) SHA1(99dbe9fc7f95f8fdce86eb5c32bd1ca1bea0ca3c) )
+	ROM_LOAD( "stera.6",      0x2800, 0x0800, CRC(6e84a927) SHA1(82e8e825d157c3c947a3a222bca059a735169c7d) )
+	ROM_LOAD( "stera.7",      0x3000, 0x0800, CRC(b45af1e8) SHA1(d7020774707234acdaef5c655f667d5ee9e54a13) )
+	ROM_LOAD( "stera.8",      0x3800, 0x0800, CRC(37f19956) SHA1(cb59ae3bb06f56baa0898baeae8b3810263e046b) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "stera.10",  0x0000, 0x0800, CRC(528da705) SHA1(d726ee18b79774c982f88afb2a508eb5d5783193) )
+	ROM_LOAD( "stera.12",  0x0800, 0x0800, CRC(13932a15) SHA1(b8885c555c6ad7021be55c6925a0a0872c1b6abd) )
+	ROM_LOAD( "stera.11",  0x1000, 0x0800, CRC(4e79ff6b) SHA1(f72386a3766a7fcc7b4b8cedfa58b8d57f911f6f) )
+	ROM_LOAD( "stera.9",   0x1800, 0x0800, CRC(24cfd145) SHA1(08c6599db170dd6ee364c44f70a0f5c0f881b6ef) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "stera.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
 ROM_START( mooncrgx )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "1",            0x0000, 0x0800, CRC(84cf420b) SHA1(82c979467c51df699337d5878340d05bee606480) )
@@ -5668,6 +5689,7 @@ GAME( 198?, mooncmw,  mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg",
 // The boards were marked 'Space Dragon' although this doesn't appear in the games.
 GAME( 1980, spcdrag,  mooncrst, mooncrst, smooncrs, mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1980, spcdraga, mooncrst, mooncrst, smooncrs, mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, stera,    mooncrst, mooncrst, smooncrs, mooncrsu, ROT90,  "bootleg", "Steraranger (Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrgx, mooncrst, galaxian, mooncrgx, mooncrgx, ROT270, "bootleg", "Moon Cresta (Galaxian hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1980, moonqsr,  0,        mooncrst, moonqsr,  moonqsr,  ROT90,  "Nichibutsu", "Moon Quasar", GAME_SUPPORTS_SAVE )
 GAME( 1980, moonal2,  galaxian, mooncrst, moonal2,  galaxian, ROT90,  "Nichibutsu", "Moon Alien Part 2", GAME_SUPPORTS_SAVE )

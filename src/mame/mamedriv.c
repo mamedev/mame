@@ -196,6 +196,7 @@ const game_driver * const drivers[] =
 	DRIVER( mooncrsb )	/* bootleg */
 	DRIVER( mooncrs2 )	/* bootleg */
 	DRIVER( spcdrag )	/* bootleg */
+	DRIVER( stera )		/* bootleg */
 	DRIVER( spcdraga )	/* bootleg */
 	DRIVER( mooncrs3 )	/* bootleg */
 	DRIVER( fantazia )	/* bootleg */
