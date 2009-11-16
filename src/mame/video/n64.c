@@ -2147,9 +2147,9 @@ INLINE COLOR video_filter16(UINT16* vbuff, UINT8* hbuff, UINT32 hres)
 	UINT32 backr[7], backg[7], backb[7];
 	UINT32 invr[7], invg[7], invb[7];
 	INT32 coeff;
-	UINT32 leftup = -hres - 2;
-	UINT32 leftdown = hres - 2;
-	UINT32 toleft = -2;
+	INT32 leftup = -hres - 2;
+	INT32 leftdown = hres - 2;
+	INT32 toleft = -2;
 	UINT32 colr, colg, colb;
 	UINT32 enb;
 	int i = 0;
