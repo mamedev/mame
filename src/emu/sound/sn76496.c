@@ -11,21 +11,30 @@
   channel sound generator, with three squarewave channels and a noise/arbitrary
   duty cycle channel.
 
-  Noise emulation for all chips should be accurate:
-  SN76489 uses a 15-bit shift register with taps on bits D and E, output on E,
-  XOR function; SN94624 is identical to SN76489.
-  * It uses a 15-bit ring buffer for periodic noise/arbitrary duty cycle.
-  SN76489A uses a 16-bit shift register with taps on bits D and E, output on F,
-  XNOR function
-  * It uses a 16-bit ring buffer for periodic noise/arbitrary duty cycle.
-  SN76494 and SN76496 are PROBABLY identical in operation to the SN76489A
-  * They have an audio input line which is mixed with the 4 channels of output.
-  Sega Master System III/MD/Genesis PSG uses a 16-bit shift register with taps
-  on bits C and F, output on F
-  * It uses a 16-bit ring buffer for periodic noise/arbitrary duty cycle.
-  Sega Game Gear PSG is identical to the SMS3/MD/Genesis one except it has an
-  extra register for mapping which channels go to which speaker.
+  Noise emulation for all verified chips should be accurate:
 
+  ** SN76489 uses a 15-bit shift register with taps on bits D and E, output on E,
+  XOR function; SN94624 is identical to SN76489.
+  It uses a 15-bit ring buffer for periodic noise/arbitrary duty cycle.
+  ** SN76489A uses a 16-bit shift register with taps on bits D and E, output on F,
+  XNOR function
+  It uses a 16-bit ring buffer for periodic noise/arbitrary duty cycle.
+  ** SN76494 and SN76496 are PROBABLY identical in operation to the SN76489A
+  They have an audio input line which is mixed with the 4 channels of output.
+  ** Sega Master System III/MD/Genesis PSG uses a 16-bit shift register with taps
+  on bits C and F, output on F
+  It uses a 16-bit ring buffer for periodic noise/arbitrary duty cycle.
+  (whether it uses an XOR or XNOR needs to be verified)
+  ** Sega Game Gear PSG is identical to the SMS3/MD/Genesis one except it has an
+  extra register for mapping which channels go to which speaker.
+  The register, connected to a z80 port, means:
+  for bits 7  6  5  4  3  2  1  0
+           L3 L2 L1 L0 R3 R2 R1 R0
+  ** NCR7496 (as used on the Tandy 1000) is similar to the SN76489 but with a
+  different noise LFSR patttern: taps on bits A and E, output on E
+  It uses a 15-bit ring buffer for periodic noise/arbitrary duty cycle.
+  (all this chip's info needs to be verified)
+  
   28/03/2005 : Sebastien Chevalier
   Update th SN76496Write func, according to SN76489 doc found on SMSPower.
    - On write with 0x80 set to 0, when LastRegister is other then TONE,
@@ -52,7 +61,7 @@
   16/11/2009 : Lord Nightmare
   Fix screeching in regulus: When summing together four equal channels, the
   size of the max amplitude per channel should be 1/4 of the max range, not
-  1/3.
+  1/3. Added NCR7496. Changed sega psg/gamegear from XNOR to XOR.
 
   TODO: * Implement a function for setting stereo regs for the game gear.
           Requires making the core support both mono and stereo, and have
@@ -63,9 +72,10 @@
           max of 4Mhz and 32 clocks per sample on the SN76489A.
         * Implement the T6W28; has registers in a weird order, needs writes
           to be 'sanitized' first. Also is stereo, similar to game gear.
-        * Implement the NCR 7496; Is probably 100% compatible with SN76496,
-          but the whitenoise taps could be different. Needs someone with a
-          Tandy 1200 or whatever it was which uses this to run some tests.
+        * Test the NCR7496; Smspower says the whitenoise taps are A and E,
+          but this needs verification on real hardware.
+        * Test the SMS PSG/Gamegear PSG to see whether it uses XOR or XNOR
+          taps.
         * Factor out common code so that the SAA1099 can share some code.
 ***************************************************************************/
 
@@ -109,6 +119,7 @@ INLINE sn76496_state *get_safe_token(const device_config *device)
 		   sound_get_type(device) == SOUND_SN76489A ||
 		   sound_get_type(device) == SOUND_SN76494 ||
 		   sound_get_type(device) == SOUND_SN94624 ||
+		   sound_get_type(device) == SOUND_NCR7496 ||
 		   sound_get_type(device) == SOUND_GAMEGEAR ||
 		   sound_get_type(device) == SOUND_SMSIII);
 	return (sn76496_state *)device->token;
@@ -359,37 +370,42 @@ static void generic_start(const device_config *device, int feedbackmask, int noi
 
 static DEVICE_START( sn76489 )
 {
-	generic_start(device, 0x4000, 0x03, FALSE);
+	generic_start(device, 0x4000, 0x03, FALSE); // todo: verify; assumed to be the same as sn94624
 }
 
 static DEVICE_START( sn76489a )
 {
-	generic_start(device, 0x8000, 0x06, TRUE);
+	generic_start(device, 0x8000, 0x06, TRUE); // verified by plgdavid
 }
 
 static DEVICE_START( sn76494 )
 {
-	generic_start(device, 0x8000, 0x06, TRUE);
+	generic_start(device, 0x8000, 0x06, TRUE); // todo: verify; assumed to be the same as sn76489a
 }
 
 static DEVICE_START( sn76496 )
 {
-	generic_start(device, 0x8000, 0x06, TRUE);
+	generic_start(device, 0x8000, 0x06, TRUE); // todo: verify; assumed to be the same as sn76489a
 }
 
 static DEVICE_START( sn94624 )
 {
-	generic_start(device, 0x4000, 0x03, FALSE);
+	generic_start(device, 0x4000, 0x03, FALSE); // verified by plgdavid
+}
+
+static DEVICE_START( ncr7496 )
+{
+	generic_start(device, 0x4000, 0x11, FALSE); // todo: verify; from smspower wiki
 }
 
 static DEVICE_START( gamegear )
 {
-	generic_start(device, 0x8000, 0x09, TRUE);
+	generic_start(device, 0x8000, 0x09, FALSE); // todo: verify; from smspower wiki
 }
 
 static DEVICE_START( smsiii )
 {
-	generic_start(device, 0x8000, 0x09, TRUE);
+	generic_start(device, 0x8000, 0x09, FALSE); // todo: verify; from smspower wiki
 }
 
 
@@ -428,16 +444,6 @@ DEVICE_GET_INFO( sn76489 )
 	}
 }
 
-DEVICE_GET_INFO( sn94624 )
-{
-	switch (state)
-	{
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sn94624 );		break;
-		case DEVINFO_STR_NAME:							strcpy(info->s, "SN94624");						break;
-		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
-	}
-}
-
 DEVICE_GET_INFO( sn76489a )
 {
 	switch (state)
@@ -454,6 +460,26 @@ DEVICE_GET_INFO( sn76494 )
 	{
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sn76494 );		break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "SN76494");						break;
+		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
+	}
+}
+
+DEVICE_GET_INFO( sn94624 )
+{
+	switch (state)
+	{
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sn94624 );		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SN94624");						break;
+		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
+	}
+}
+
+DEVICE_GET_INFO( ncr7496 )
+{
+	switch (state)
+	{
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ncr7496 );		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "NCR7496");						break;
 		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
 	}
 }
