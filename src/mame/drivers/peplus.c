@@ -375,7 +375,7 @@ static WRITE8_HANDLER( peplus_duart_w )
 
 static WRITE8_HANDLER( peplus_cmos_w )
 {
-	char bank_name[5];
+	char bank_name[6];
 
 	/* Test for Wingboard PAL Trigger Condition */
 	if (offset == 0x1fff && wingboard && data < 5)

@@ -1017,7 +1017,6 @@ static void disassemble_instruction(irmb_ops *op)
 		}
 		if (op->jtype != 7) logerror("  %04X    \n",op->nxtadd);
 		if (op->jtype == 5) logerror("\n");
-		}
 	}
 }
 #endif

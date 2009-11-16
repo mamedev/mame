@@ -327,7 +327,7 @@ static UINT8 dec_7seg(int data)
 static void count_7dig(unsigned long data, UINT8 index)
 {
 	UINT8 i;
-	char strn[7];
+	char strn[8];
 	sprintf(strn,"%7lu",data);
 
 	for (i = 0; i < 7; i++)
