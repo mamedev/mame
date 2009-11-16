@@ -121,6 +121,7 @@
 #define UML_ROLAND(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_ROLAND,  4, IF_ALWAYS,  dst, src, shift, mask); } while (0)
 #define UML_ROLINS(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_ROLINS,  4, IF_ALWAYS,  dst, src, shift, mask); } while (0)
 #define UML_ADD(block, dst, src1, src2)						do { drcuml_block_append_3(block, DRCUML_OP_ADD,     4, IF_ALWAYS,  dst, src1, src2); } while (0)
+#define UML_ADDc(block, cond, dst, src1, src2)				do { drcuml_block_append_3(block, DRCUML_OP_ADD,     4, cond,       dst, src1, src2); } while (0)
 #define UML_ADDC(block, dst, src1, src2)					do { drcuml_block_append_3(block, DRCUML_OP_ADDC,    4, IF_ALWAYS,  dst, src1, src2); } while (0)
 #define UML_SUB(block, dst, src1, src2)						do { drcuml_block_append_3(block, DRCUML_OP_SUB,     4, IF_ALWAYS,  dst, src1, src2); } while (0)
 #define UML_SUBB(block, dst, src1, src2)					do { drcuml_block_append_3(block, DRCUML_OP_SUBB,    4, IF_ALWAYS,  dst, src1, src2); } while (0)

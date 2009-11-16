@@ -1103,8 +1103,8 @@ static void static_generate_tlb_mismatch(mips3_state *mips3)
 	}
 	UML_TEST(block, IREG(1), IMM(VTLB_FETCH_ALLOWED));								// test    i1,VTLB_FETCH_ALLOWED
 	UML_JMPc(block, IF_NZ, 1);														// jmp     1,nz
-	UML_TEST(block, IREG(1), IMM(VTLB_FLAG_VALID));									// test    i1,VTLB_FLAG_VALID
-	UML_EXHc(block, IF_Z, mips3->impstate->exception[EXCEPTION_TLBLOAD], IREG(0));	// exh     exception[TLBLOAD],i0,z
+	UML_TEST(block, IREG(1), IMM(VTLB_FLAG_FIXED));									// test    i1,VTLB_FLAG_FIXED
+	UML_EXHc(block, IF_NZ, mips3->impstate->exception[EXCEPTION_TLBLOAD], IREG(0));	// exh     exception[TLBLOAD],i0,nz
 	UML_EXH(block, mips3->impstate->exception[EXCEPTION_TLBLOAD_FILL], IREG(0));	// exh     exception[TLBLOAD_FILL],i0
 	UML_LABEL(block, 1);														// 1:
 	save_fast_iregs(mips3, block);
@@ -1175,8 +1175,10 @@ static void static_generate_exception(mips3_state *mips3, UINT8 exception, int r
 	UML_OR(block, IREG(2), IREG(2), IMM(0x80000000));								// or      i2,i2,0x80000000
 	UML_SUB(block, IREG(0), IREG(0), IMM(1));										// sub     i0,i0,1
 	UML_LABEL(block, next);														// <next>:
+	UML_MOV(block, IREG(3), IMM(offset));											// mov     i3,offset
 	UML_TEST(block, CPR032(COP0_Status), IMM(SR_EXL));								// test    [Status],SR_EXL
 	UML_MOVc(block, IF_Z, CPR032(COP0_EPC), IREG(0));								// mov     [EPC],i0,Z
+	UML_MOVc(block, IF_NZ, IREG(3), IMM(0x180));									// mov     i3,0x180,NZ
 	UML_OR(block, CPR032(COP0_Cause), IREG(2), IMM(exception << 2));				// or      [Cause],i2,exception << 2
 
 	/* for BADCOP exceptions, we use the exception parameter to know which COP */
@@ -1199,9 +1201,9 @@ static void static_generate_exception(mips3_state *mips3, UINT8 exception, int r
 	}
 
 	/* choose our target PC */
-	UML_MOV(block, IREG(0), IMM(0xbfc00200 + offset));								// mov     i0,0xbfc00200 + offset
+	UML_ADD(block, IREG(0), IREG(3), IMM(0xbfc00200));								// add     i0,i3,0xbfc00200
 	UML_TEST(block, IREG(1), IMM(SR_BEV));											// test    i1,SR_BEV
-	UML_MOVc(block, IF_Z, IREG(0), IMM(0x80000000 + offset));						// mov     i0,0x80000000 + offset,z
+	UML_ADDc(block, IF_Z, IREG(0), IREG(3), IMM(0x80000000));						// add     i0,i3,0x80000000,z
 
 	/* adjust cycles */
 	UML_SUB(block, MEM(&mips3->icount), MEM(&mips3->icount), IREG(1));			 	// sub icount,icount,cycles,S
@@ -1425,8 +1427,8 @@ static void static_generate_memory_accessor(mips3_state *mips3, int mode, int si
 			UML_EXHc(block, IF_NZ, mips3->impstate->exception[EXCEPTION_TLBMOD], IREG(0));
 																					// exh     tlbmod,i0,nz
 		}
-		UML_TEST(block, IREG(3), IMM(VTLB_FLAG_VALID));								// test    i3,VTLB_FLAG_VALID
-		UML_EXHc(block, IF_Z, exception_tlb, IREG(0));								// exh     tlb,i0,z
+		UML_TEST(block, IREG(3), IMM(VTLB_FLAG_FIXED));								// test    i3,VTLB_FLAG_FIXED
+		UML_EXHc(block, IF_NZ, exception_tlb, IREG(0));								// exh     tlb,i0,nz
 		UML_EXH(block, exception_tlbfill, IREG(0));									// exh     tlbfill,i0
 	}
 
