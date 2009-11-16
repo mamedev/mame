@@ -5,7 +5,7 @@
 
   Routines to emulate the:
   Texas Instruments SN76489, SN76489A, SN76494/SN76496
-  ( Also known as, or at least compatible with, the TMS9919.)
+  ( Also known as, or at least compatible with, the TMS9919 and SN94624.)
   and the Sega 'PSG' used on the Master System, Game Gear, and Megadrive/Genesis
   This chip is known as the Programmable Sound Generator, or PSG, and is a 4
   channel sound generator, with three squarewave channels and a noise/arbitrary
@@ -48,6 +48,11 @@
   14/11/2009 : Lord Nightmare
   Removed STEP mess, vastly simplifying the code. Made output bipolar rather
   than always above the 0 line, but disabled that code due to pending issues.
+  
+  16/11/2009 : Lord Nightmare
+  Fix screeching in regulus: When summing together four equal channels, the
+  size of the max amplitude per channel should be 1/4 of the max range, not
+  1/3.
 
   TODO: * Implement a function for setting stereo regs for the game gear.
           Requires making the core support both mono and stereo, and have
@@ -270,7 +275,7 @@ static void SN76496_set_gain(sn76496_state *R,int gain)
 	gain &= 0xff;
 
 	/* increase max output basing on gain (0.2 dB per step) */
-	out = MAX_OUTPUT / 3;
+	out = MAX_OUTPUT / 4; // four channels, each gets 1/4 of the total range
 	while (gain-- > 0)
 		out *= 1.023292992;	/* = (10 ^ (0.2/20)) */
 
