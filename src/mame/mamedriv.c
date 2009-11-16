@@ -52,6 +52,7 @@ const game_driver * const drivers[] =
 	DRIVER( hangly )	/* hack */
 	DRIVER( hangly2 )	/* hack */
 	DRIVER( hangly3 )	/* hack */
+	DRIVER( popeyeman )	/* hack */
 	DRIVER( piranhah )	/* hack */
 	DRIVER( abscam )	/* hack */
 	DRIVER( crush )		/* (c) 1981 Kural Samno Electric Ltd */

@@ -3673,6 +3673,32 @@ ROM_START( hangly3 )
 	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 ROM_END
 
+ROM_START( popeyeman )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.6e",   0x0000, 0x0800, CRC(9d027c4a) SHA1(88e094880057451a75cdc2ce9477403021813982) )
+	ROM_LOAD( "5.6k",   0x0800, 0x0800, CRC(194c7189) SHA1(fd423bac2810015313841c7b935054565390fbd0) )
+	ROM_LOAD( "2.6f",   0x1000, 0x0800, CRC(5ba228bb) SHA1(b0e902cdf98bee72d6ec8069eec96adce3245074) )
+	ROM_LOAD( "6.6m",   0x1800, 0x0800, CRC(baf5461e) SHA1(754586a6449fd54a342f260e572c1cd60ab70815) )
+	ROM_LOAD( "3.6h",   0x2000, 0x0800, CRC(08419c4a) SHA1(7e5001adad401080c788737c1d2349f218750442) )
+	ROM_LOAD( "7.6n",   0x2800, 0x0800, CRC(ab74b51f) SHA1(1bce8933ed7807eb7aca9670df8994f8d1a8b5b7) )
+	ROM_LOAD( "4.6j",   0x3000, 0x0800, CRC(5039b082) SHA1(086a6ac4742734167d283b1121fce29d8ac4a6cd) )
+	ROM_LOAD( "8.6p",   0x3800, 0x0800, CRC(931770d7) SHA1(78fcf88e07ec5126c12c3297b62ca388809e947c) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "9.5e", 	0x0000, 0x0800, CRC(b569c4c1) SHA1(34a09bcb6eb08375cd5e9ce0aa66b23d60489f92) )
+	ROM_LOAD( "11.5h",  0x0800, 0x0800, CRC(3591b89d) SHA1(79bb456be6c39c1ccd7d077fbe181523131fb300) )
+	ROM_LOAD( "10.5f", 	0x1000, 0x0800, CRC(014fb5a4) SHA1(7779f0f0d11027adf3b9175af26d53f1e3a54f29) )
+	ROM_LOAD( "12.5j", 	0x1800, 0x0800, CRC(21b91c64) SHA1(4818194ecc18b5df159f3799ea93c911fd4b9556) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "82s126.4a",    0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+
+	ROM_REGION( 0x0200, "namco", 0 )	/* sound PROMs */
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
+ROM_END
+
 ROM_START( puckmanh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pm01.6e",      0x0000, 0x1000, CRC(5fe8610a) SHA1(d63eaebd85e10aa6c27bb7f47642dd403eeb6934) )
@@ -5721,6 +5747,7 @@ GAME( 1981, pacheart, puckman,  pacman,   pacman,   0,        ROT90,  "hack", "P
 GAME( 1981, hangly,   puckman,  pacman,   pacman,   0,        ROT90,  "hack", "Hangly-Man (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, hangly2,  puckman,  pacman,   pacman,   0,        ROT90,  "hack", "Hangly-Man (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, hangly3,  puckman,  pacman,   pacman,   0,        ROT90,  "hack", "Hangly-Man (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1981, popeyeman,puckman,  pacman,   pacman,   0,        ROT90,  "hack", "Popeye-Man", GAME_SUPPORTS_SAVE )
 GAME( 1981, piranhah, puckman,  pacman,   mspacman, 0,        ROT90,  "hack", "Piranha (hack)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crush,    0,        pacman,   maketrax, maketrax, ROT90,  "Kural Samno Electric", "Crush Roller (Kural Samno)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crushbl,  crush,    pacman,   maketrax, 0,        ROT90,  "bootleg", "Crush Roller (bootleg)", GAME_SUPPORTS_SAVE )
