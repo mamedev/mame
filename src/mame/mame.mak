@@ -252,7 +252,6 @@ DRVLIBS = \
 	$(MAMEOBJ)/gameplan.a \
 	$(MAMEOBJ)/gametron.a \
 	$(MAMEOBJ)/gottlieb.a \
-	$(MAMEOBJ)/greyhnd.a \
 	$(MAMEOBJ)/igs.a \
 	$(MAMEOBJ)/irem.a \
 	$(MAMEOBJ)/itech.a \
@@ -669,10 +668,6 @@ $(MAMEOBJ)/gametron.a: \
 $(MAMEOBJ)/gottlieb.a: \
 	$(DRIVERS)/exterm.o $(VIDEO)/exterm.o \
 	$(DRIVERS)/gottlieb.o $(AUDIO)/gottlieb.o $(VIDEO)/gottlieb.o \
-
-$(MAMEOBJ)/greyhnd.a: \
-	$(DRIVERS)/findout.o \
-	$(DRIVERS)/getrivia.o \
 
 $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/cabaret.o \
@@ -1521,6 +1516,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/funworld.o $(VIDEO)/funworld.o \
 	$(DRIVERS)/galaxi.o \
 	$(DRIVERS)/gamecstl.o \
+	$(DRIVERS)/gei.o \
 	$(DRIVERS)/good.o \
 	$(DRIVERS)/goldnpkr.o \
 	$(DRIVERS)/gotcha.o $(VIDEO)/gotcha.o \
