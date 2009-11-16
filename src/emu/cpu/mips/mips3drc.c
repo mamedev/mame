@@ -1157,9 +1157,10 @@ static void static_generate_exception(mips3_state *mips3, UINT8 exception, int r
 
 	if (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE)
 	{
+		offset = 0x000;
 		/* set the upper bits of EntryHi and the lower bits of Context to the fault page */
 		UML_ROLINS(block, CPR032(COP0_EntryHi), IREG(0), IMM(0), IMM(0xffffe000));	// rolins  [EntryHi],i0,0,0xffffe000
-		UML_ROLINS(block, CPR032(COP0_Context), IREG(0), IMM(32-9), IMM(0x7fffff));	// rolins  [Context],i0,32-9,0x7fffff
+		UML_ROLINS(block, CPR032(COP0_Context), IREG(0), IMM(32-9), IMM(0x7ffff0));	// rolins  [Context],i0,32-9,0x7fffff
 	}
 
 	/* set the EPC and Cause registers */
