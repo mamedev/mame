@@ -1257,7 +1257,7 @@ static void static_generate_tlb_mismatch(powerpc_state *ppc)
 	UML_MOV(block, MEM(&ppc->param0), IREG(0));												// mov     [param0],i0
 	UML_MOV(block, MEM(&ppc->param1), IMM(TRANSLATE_FETCH));								// mov     [param1],TRANSLATE_FETCH
 	UML_CALLC(block, ppccom_tlb_fill, ppc);													// callc   tlbfill,ppc
-	UML_SHR(block, IREG(1), IREG(0), IMM(12));												// shr     i1,i0,11
+	UML_SHR(block, IREG(1), IREG(0), IMM(12));												// shr     i1,i0,12
 	UML_LOAD(block, IREG(1), (void *)vtlb_table(ppc->vtlb), IREG(1), DWORD);				// load    i1,[vtlb],i1,dword
 	UML_TEST(block, IREG(1), IMM(VTLB_FETCH_ALLOWED));										// test    i1,VTLB_FETCH_ALLOWED
 	UML_JMPc(block, IF_Z, isi = label++);													// jmp     isi,z

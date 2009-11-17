@@ -522,9 +522,15 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 	/* if we're simulating the 603 MMU, fill in the data and stop here */
 	if (ppc->cap & PPCCAP_603_MMU)
 	{
+		UINT32 entry = vtlb_table(ppc->vtlb)[*address >> 12];
 		ppc->mmu603_cmp = 0x80000000 | ((segreg & 0xffffff) << 7) | (0 << 6) | ((*address >> 22) & 0x3f);
 		ppc->mmu603_hash[0] = hashbase | ((hash << 6) & hashmask);
 		ppc->mmu603_hash[1] = hashbase | ((~hash << 6) & hashmask);
+		if ((entry & (VTLB_FLAG_FIXED | VTLB_FLAG_VALID)) == (VTLB_FLAG_FIXED | VTLB_FLAG_VALID))
+		{
+			*address = (entry & 0xfffff000) | (*address & 0x00000fff);
+			return 0x001;
+		}
 		return DSISR_NOT_FOUND | ((transtype == TRANSLATE_WRITE) ? DSISR_STORE : 0);
 	}
 
