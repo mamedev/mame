@@ -74,7 +74,7 @@ struct _x86log_context
 ***************************************************************************/
 
 static void reset_log(x86log_context *log);
-extern int i386_dasm_one(char *buffer, UINT64 eip, const UINT8 *oprom, int mode);
+extern int i386_dasm_one_ex(char *buffer, UINT64 eip, const UINT8 *oprom, int mode);
 
 
 
@@ -237,9 +237,9 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
 		else
 		{
 #ifdef PTR64
-			bytes = i386_dasm_one(buffer, (FPTR)cur, cur, 64) & DASMFLAG_LENGTHMASK;
+			bytes = i386_dasm_one_ex(buffer, (FPTR)cur, cur, 64) & DASMFLAG_LENGTHMASK;
 #else
-			bytes = i386_dasm_one(buffer, (FPTR)cur, cur, 32) & DASMFLAG_LENGTHMASK;
+			bytes = i386_dasm_one_ex(buffer, (FPTR)cur, cur, 32) & DASMFLAG_LENGTHMASK;
 #endif
 		}
 
