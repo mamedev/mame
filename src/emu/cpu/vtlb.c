@@ -211,8 +211,9 @@ void vtlb_load(vtlb_state *vtlb, int entrynum, int numpages, offs_t address, vtl
 	if (vtlb->live[liveindex] != 0)
 	{
 		int pagecount = vtlb->fixedpages[entrynum];
+		int oldtableindex = vtlb->live[liveindex] - 1;
 		for (pagenum = 0; pagenum < pagecount; pagenum++)
-			vtlb->table[vtlb->live[liveindex] - 1 + pagenum] = 0;
+			vtlb->table[oldtableindex + pagenum] = 0;
 	}
 
 	/* claim this new entry */
@@ -220,6 +221,7 @@ void vtlb_load(vtlb_state *vtlb, int entrynum, int numpages, offs_t address, vtl
 
 	/* store the raw value, making sure the "fixed" flag is set */
 	value |= VTLB_FLAG_FIXED;
+	vtlb->fixedpages[entrynum] = numpages;
 	for (pagenum = 0; pagenum < numpages; pagenum++)
 		vtlb->table[tableindex + pagenum] = value + (pagenum << vtlb->pageshift);
 }
