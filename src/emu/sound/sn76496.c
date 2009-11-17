@@ -61,7 +61,7 @@
   16/11/2009 : Lord Nightmare
   Fix screeching in regulus: When summing together four equal channels, the
   size of the max amplitude per channel should be 1/4 of the max range, not
-  1/3. Added NCR7496. Changed sega psg/gamegear from XNOR to XOR.
+  1/3. Added NCR7496.
 
   TODO: * Implement a function for setting stereo regs for the game gear.
           Requires making the core support both mono and stereo, and have
@@ -75,7 +75,7 @@
         * Test the NCR7496; Smspower says the whitenoise taps are A and E,
           but this needs verification on real hardware.
         * Test the SMS PSG/Gamegear PSG to see whether it uses XOR or XNOR
-          taps.
+          taps. (17/11/2009: this seems to be XNOR? Need a better sample.)
         * Factor out common code so that the SAA1099 can share some code.
 ***************************************************************************/
 
@@ -400,12 +400,12 @@ static DEVICE_START( ncr7496 )
 
 static DEVICE_START( gamegear )
 {
-	generic_start(device, 0x8000, 0x09, FALSE); // todo: verify; from smspower wiki
+	generic_start(device, 0x8000, 0x09, TRUE); // semi-verified by Lord Nightmare, need better sample
 }
 
 static DEVICE_START( smsiii )
 {
-	generic_start(device, 0x8000, 0x09, FALSE); // todo: verify; from smspower wiki
+	generic_start(device, 0x8000, 0x09, TRUE); // todo: verify; from smspower wiki, assumed to have same invert as gamegear
 }
 
 
