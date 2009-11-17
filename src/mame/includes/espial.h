@@ -1,8 +1,38 @@
 /***************************************************************************
 
- Espial hardware games
+ Espial hardware games (drivers: espial.c, marineb.c and zodiack.c)
 
 ***************************************************************************/
+
+typedef struct _espial_state espial_state;
+struct _espial_state
+{
+	UINT8 *   videoram;	// espial, zodiack, marineb
+	UINT8 *   colorram;	// espial, marineb
+	UINT8 *   attributeram;	// espial, zodiack
+	UINT8 *   scrollram;	// espial
+	UINT8 *   spriteram_1;	// espial
+	UINT8 *   spriteram_2;	// espial
+	UINT8 *   spriteram_3;	// espial
+	UINT8 *   spriteram;	// zodiack, marineb (hoccer only)
+	UINT8 *   videoram_2;	// zodiack
+	UINT8 *   bulletsram;	// zodiack
+
+	/* video-related */
+	tilemap   *bg_tilemap, *fg_tilemap;
+	int       flipscreen;	// espial
+	UINT8     palette_bank;	// marineb
+	UINT8     column_scroll;	// marineb
+	UINT8     flipscreen_x, flipscreen_y;	// marineb
+	UINT8     marineb_active_low_flipscreen;	// marineb
+
+	/* sound-related */
+	UINT8     sound_nmi_enabled;	// espial
+
+	/* misc */
+	int       percuss_hardware;	// zodiack
+
+};
 
 /*----------- defined in drivers/espial.c -----------*/
 
@@ -18,14 +48,6 @@ INTERRUPT_GEN( espial_sound_nmi_gen );
 
 /*----------- defined in video/espial.c -----------*/
 
-extern UINT8 *espial_videoram;
-extern UINT8 *espial_colorram;
-extern UINT8 *espial_attributeram;
-extern UINT8 *espial_scrollram;
-extern UINT8 *espial_spriteram_1;
-extern UINT8 *espial_spriteram_2;
-extern UINT8 *espial_spriteram_3;
-
 PALETTE_INIT( espial );
 VIDEO_START( espial );
 VIDEO_START( netwars );
@@ -38,10 +60,6 @@ VIDEO_UPDATE( espial );
 
 
 /*----------- defined in video/marineb.c -----------*/
-
-extern UINT8 *marineb_videoram;
-extern UINT8 *marineb_colorram;
-extern UINT8 marineb_active_low_flipscreen;
 
 WRITE8_HANDLER( marineb_videoram_w );
 WRITE8_HANDLER( marineb_colorram_w );
@@ -59,15 +77,8 @@ VIDEO_UPDATE( hoccer );
 VIDEO_UPDATE( hopprobo );
 
 
-/*----------- defined in drivers/zodiack.c -----------*/
-
-extern int percuss_hardware;
-
 /*----------- defined in video/zodiack.c -----------*/
 
-extern UINT8 *zodiack_videoram2;
-extern UINT8 *zodiack_attributesram;
-extern UINT8 *zodiack_bulletsram;
 extern size_t zodiack_bulletsram_size;
 
 WRITE8_HANDLER( zodiack_videoram_w );

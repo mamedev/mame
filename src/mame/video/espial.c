@@ -9,19 +9,6 @@
 #include "driver.h"
 #include "includes/espial.h"
 
-
-UINT8 *espial_videoram;
-UINT8 *espial_colorram;
-UINT8 *espial_attributeram;
-UINT8 *espial_scrollram;
-UINT8 *espial_spriteram_1;
-UINT8 *espial_spriteram_2;
-UINT8 *espial_spriteram_3;
-
-static int flipscreen;
-static tilemap *bg_tilemap;
-
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -41,15 +28,14 @@ static tilemap *bg_tilemap;
   bit 0 -- 1  kohm resistor  -- RED
 
 ***************************************************************************/
+
 PALETTE_INIT( espial )
 {
 	int i;
 
-
-	for (i = 0;i < machine->config->total_colors;i++)
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
-
+		int bit0, bit1, bit2, r, g, b;
 
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
@@ -67,7 +53,7 @@ PALETTE_INIT( espial )
 		bit2 = (color_prom[i + machine->config->total_colors] >> 3) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine, i, MAKE_RGB(r,g,b));
 	}
 }
 
@@ -81,9 +67,10 @@ PALETTE_INIT( espial )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	UINT8 code = espial_videoram[tile_index];
-	UINT8 col = espial_colorram[tile_index];
-	UINT8 attr = espial_attributeram[tile_index];
+	espial_state *state = (espial_state *)machine->driver_data;
+	UINT8 code = state->videoram[tile_index];
+	UINT8 col = state->colorram[tile_index];
+	UINT8 attr = state->attributeram[tile_index];
 	SET_TILE_INFO(0,
 				  code | ((attr & 0x03) << 8),
 				  col & 0x3f,
@@ -100,22 +87,25 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( espial )
 {
-	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
+	espial_state *state = (espial_state *)machine->driver_data;
 
-	tilemap_set_scroll_cols(bg_tilemap, 32);
+	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_scroll_cols(state->bg_tilemap, 32);
 
-	state_save_register_global(machine, flipscreen);
+	state_save_register_global(machine, state->flipscreen);
 }
 
 VIDEO_START( netwars )
 {
+	espial_state *state = (espial_state *)machine->driver_data;
+
 	/* Net Wars has a tile map that's twice as big as Espial's */
-	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,64);
+	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 64);
 
-	tilemap_set_scroll_cols(bg_tilemap, 32);
-	tilemap_set_scrolldy(bg_tilemap, 0, 0x100);
+	tilemap_set_scroll_cols(state->bg_tilemap, 32);
+	tilemap_set_scrolldy(state->bg_tilemap, 0, 0x100);
 
-	state_save_register_global(machine, flipscreen);
+	state_save_register_global(machine, state->flipscreen);
 }
 
 
@@ -127,37 +117,46 @@ VIDEO_START( netwars )
 
 WRITE8_HANDLER( espial_videoram_w )
 {
-	espial_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	espial_state *state = (espial_state *)space->machine->driver_data;
+
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
 WRITE8_HANDLER( espial_colorram_w )
 {
-	espial_colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	espial_state *state = (espial_state *)space->machine->driver_data;
+
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
 WRITE8_HANDLER( espial_attributeram_w )
 {
-	espial_attributeram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	espial_state *state = (espial_state *)space->machine->driver_data;
+
+	state->attributeram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
 WRITE8_HANDLER( espial_scrollram_w )
 {
-	espial_scrollram[offset] = data;
-	tilemap_set_scrolly(bg_tilemap, offset, data);
+	espial_state *state = (espial_state *)space->machine->driver_data;
+
+	state->scrollram[offset] = data;
+	tilemap_set_scrolly(state->bg_tilemap, offset, data);
 }
 
 
 WRITE8_HANDLER( espial_flipscreen_w )
 {
-	flipscreen = data;
+	espial_state *state = (espial_state *)space->machine->driver_data;
 
-	tilemap_set_flip(bg_tilemap, flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	state->flipscreen = data;
+	tilemap_set_flip(state->bg_tilemap, state->flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 }
 
 
@@ -167,26 +166,26 @@ WRITE8_HANDLER( espial_flipscreen_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	espial_state *state = (espial_state *)machine->driver_data;
 	int offs;
-
 
 	/* Note that it is important to draw them exactly in this */
 	/* order, to have the correct priorities. */
-	for (offs = 0;offs < 16;offs++)
+	for (offs = 0; offs < 16; offs++)
 	{
-		int sx,sy,code,color,flipx,flipy;
+		int sx, sy, code, color, flipx, flipy;
 
 
-		sx = espial_spriteram_1[offs + 16];
-		sy = espial_spriteram_2[offs];
-		code = espial_spriteram_1[offs] >> 1;
-		color = espial_spriteram_2[offs + 16];
-		flipx = espial_spriteram_3[offs] & 0x04;
-		flipy = espial_spriteram_3[offs] & 0x08;
+		sx = state->spriteram_1[offs + 16];
+		sy = state->spriteram_2[offs];
+		code = state->spriteram_1[offs] >> 1;
+		color = state->spriteram_2[offs + 16];
+		flipx = state->spriteram_3[offs] & 0x04;
+		flipy = state->spriteram_3[offs] & 0x08;
 
-		if (flipscreen)
+		if (state->flipscreen)
 		{
 			flipx = !flipx;
 			flipy = !flipy;
@@ -196,9 +195,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			sy = 240 - sy;
 		}
 
-		if (espial_spriteram_1[offs] & 1)	/* double height */
+		if (state->spriteram_1[offs] & 1)	/* double height */
 		{
-			if (flipscreen)
+			if (state->flipscreen)
 			{
 				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 						code,color,
@@ -235,7 +234,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( espial )
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+	espial_state *state = (espial_state *)screen->machine->driver_data;
+
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

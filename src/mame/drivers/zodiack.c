@@ -85,18 +85,27 @@ TODO:
 #include "includes/espial.h"
 
 
-int percuss_hardware;
+static MACHINE_START( zodiack )
+{
+	espial_state *state = (espial_state *)machine->driver_data;
 
+	state_save_register_global(machine, state->percuss_hardware);
+	MACHINE_START_CALL(espial);
+}
 
 static MACHINE_RESET( zodiack )
 {
-	percuss_hardware = 0;
+	espial_state *state = (espial_state *)machine->driver_data;
+
+	state->percuss_hardware = 0;
 	MACHINE_RESET_CALL(espial);
 }
 
 static MACHINE_RESET( percuss )
 {
-	percuss_hardware = 1;
+	espial_state *state = (espial_state *)machine->driver_data;
+
+	state->percuss_hardware = 1;
 	MACHINE_RESET_CALL(espial);
 }
 
@@ -122,12 +131,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(SMH_NOP,watchdog_reset_w)  /* NOP??? */
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(zodiac_master_interrupt_enable_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(zodiack_flipscreen_w)
-	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(zodiack_attributes_w) AM_BASE(&zodiack_attributesram)
-	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE(&zodiack_bulletsram) AM_SIZE(&zodiack_bulletsram_size)
+	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(zodiack_attributes_w) AM_BASE_MEMBER(espial_state, attributeram)
+	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE_MEMBER(espial_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE_MEMBER(espial_state, bulletsram) AM_SIZE(&zodiack_bulletsram_size)
 	AM_RANGE(0x9080, 0x93ff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(zodiack_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(zodiack_videoram2_w) AM_BASE(&zodiack_videoram2)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(zodiack_videoram_w) AM_BASE_MEMBER(espial_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(zodiack_videoram2_w) AM_BASE_MEMBER(espial_state, videoram_2)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 ADDRESS_MAP_END
 
@@ -516,6 +525,9 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( zodiack )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(espial_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4.00 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -527,7 +539,7 @@ static MACHINE_DRIVER_START( zodiack )
 	MDRV_CPU_VBLANK_INT_HACK(espial_sound_nmi_gen,8)	/* IRQs are triggered by the main CPU */
 
 	MDRV_MACHINE_RESET(zodiack)
-	MDRV_MACHINE_START(espial)
+	MDRV_MACHINE_START(zodiack)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
