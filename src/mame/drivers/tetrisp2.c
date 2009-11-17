@@ -1442,8 +1442,8 @@ ROM_START( nndmseal )
 	ROM_LOAD16_BYTE( "1.1", 0x00000, 0x40000, CRC(45acea25) SHA1(f2f2e78be261c3d8c0145a639bc3771f0588401d) )	// 1xxxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "3.3", 0x00001, 0x40000, CRC(0754d96a) SHA1(1da44994e8bcfd8832755e298c0125b38cfdd16e) )	// 1xxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x100, "gfx1", ROMREGION_ERASE )	/* 8x8x8 (Sprites) */
-	// unused
+ 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE )    /* 8x8x8 (Sprites) */
+/* This game doesn't use sprites, but the region needs to be a valid size for at least one sprite 'page' for the init to work. */
 
 	ROM_REGION( 0x400000, "gfx2", 0 )	// 16x16x8 (Background)
 	ROM_LOAD( "mr97006-02.5", 0x000000, 0x200000, CRC(4793f84e) SHA1(05acba6cc8a527a6050af79a460b08c4676287aa) )
