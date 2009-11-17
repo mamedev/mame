@@ -729,27 +729,29 @@ static WRITE32_HANDLER( hng64_sram_w )
 
 static WRITE32_HANDLER( hng64_dualport_w )
 {
-	logerror("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+	printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 	COMBINE_DATA (&hng64_dualport[offset]);
 }
 
-
 static READ32_HANDLER( hng64_dualport_r )
 {
-	static int toggle = 0;
-
-	logerror("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+	printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 
 	// These hacks create some red marks for the boot-up sequence
 	switch (offset*4)
 	{
-		//SamSho64
         case 0x00:
 		{
 
-			if (hng64_boothack == 1) // ss64
+			if (hng64_boothack == 1) // ss64 2
 			{
-				toggle^=1; if (toggle==1) {return 0x00000400;} else {return 0x00000300;};
+				/* this is used on post by the io mcu to signal that a task is complete, zeroed otherwise. */
+				if(cpu_get_pc(space->cpu) == 0x8010376c) //i/o init 1
+					return 0x300;
+				else if(cpu_get_pc(space->cpu) == 0x8010380c)//i/o init 2
+					return 0x400;
+				else
+					return 0x000;
 			}
 			else if (hng64_boothack == 2) // ffwa
 			{
