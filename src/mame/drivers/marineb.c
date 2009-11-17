@@ -864,13 +864,13 @@ ROM_END
 
 
 /*    year  name      parent   machine   inputs */
-GAME( 1982, marineb,  0,       marineb,  marineb, 0, ROT0,   "Orca", "Marine Boy", 0 )
-GAME( 1982, changes,  0,       changes,  changes, 0, ROT0,   "Orca", "Changes", 0 )
-GAME( 1982, changesa, changes, changes,  changes, 0, ROT0,   "Orca (Eastern Micro Electronics, Inc. license)", "Changes (EME license)", 0)
-GAME( 1982, looper,   changes, changes,  changes, 0, ROT0,   "Orca", "Looper", 0 )
-GAME( 1982, springer, 0,       springer, marineb, 0, ROT270, "Orca", "Springer", 0 )
-GAME( 1983, hoccer,   0,       hoccer,   hoccer,  0, ROT90,  "Eastern Micro Electronics, Inc.", "Hoccer (set 1)", 0 )
-GAME( 1983, hoccer2,  hoccer,  hoccer,   hoccer,  0, ROT90,  "Eastern Micro Electronics, Inc.", "Hoccer (set 2)" , 0)	/* earlier */
-GAME( 1983, bcruzm12, 0,       bcruzm12, bcruzm12,0, ROT90,  "Sigma Enterprises Inc.", "Battle Cruiser M-12", 0 )
-GAME( 1983, hopprobo, 0,       hopprobo, marineb, 0, ROT90,  "Sega", "Hopper Robo", 0 )
-GAME( 1984, wanted,   0,       wanted,   wanted,  0, ROT90,  "Sigma Enterprises Inc.", "Wanted", 0 )
+GAME( 1982, marineb,  0,       marineb,  marineb, 0, ROT0,   "Orca", "Marine Boy", GAME_SUPPORTS_SAVE )
+GAME( 1982, changes,  0,       changes,  changes, 0, ROT0,   "Orca", "Changes", GAME_SUPPORTS_SAVE )
+GAME( 1982, changesa, changes, changes,  changes, 0, ROT0,   "Orca (Eastern Micro Electronics, Inc. license)", "Changes (EME license)", GAME_SUPPORTS_SAVE )
+GAME( 1982, looper,   changes, changes,  changes, 0, ROT0,   "Orca", "Looper", GAME_SUPPORTS_SAVE )
+GAME( 1982, springer, 0,       springer, marineb, 0, ROT270, "Orca", "Springer", GAME_SUPPORTS_SAVE )
+GAME( 1983, hoccer,   0,       hoccer,   hoccer,  0, ROT90,  "Eastern Micro Electronics, Inc.", "Hoccer (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1983, hoccer2,  hoccer,  hoccer,   hoccer,  0, ROT90,  "Eastern Micro Electronics, Inc.", "Hoccer (set 2)" , GAME_SUPPORTS_SAVE )	/* earlier */
+GAME( 1983, bcruzm12, 0,       bcruzm12, bcruzm12,0, ROT90,  "Sigma Enterprises Inc.", "Battle Cruiser M-12", GAME_SUPPORTS_SAVE )
+GAME( 1983, hopprobo, 0,       hopprobo, marineb, 0, ROT90,  "Sega", "Hopper Robo", GAME_SUPPORTS_SAVE )
+GAME( 1984, wanted,   0,       wanted,   wanted,  0, ROT90,  "Sigma Enterprises Inc.", "Wanted", GAME_SUPPORTS_SAVE )
