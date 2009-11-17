@@ -1462,7 +1462,7 @@ UVM-8B romboard
 
 */
 
-ROM_START( amuse1 )
+ROM_START( amuse1 ) /* v30.08 */
 	ROM_REGION( 0x20000, "cpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "m108_control_5-16-84",  0x00000, 0x4000, CRC(9dda922f) SHA1(ded42adda8376452e0ac4f771ebb42fd86811dc5) )
 	ROM_LOAD( "m108_hcon_5-16-84",     0x05800, 0x1000, CRC(ade5c42d) SHA1(d3e32ecaeb21a4e5eedd243c42d5914b03f572bd) )
@@ -1476,7 +1476,7 @@ ROM_END
 ROM_START( suprpokr )
 	ROM_REGION( 0x10000, "cpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "10-19s-1.e1",  0x00000, 0x4000, CRC(50662b4d) SHA1(967161a755db43d2cfd5ce92e14c5284f1f1f8ad) )
-	ROM_LOAD( "10-19s-1.e2",  0x08000, 0x4000, CRC(22b45aeb) SHA1(006c3072cc44c6fde9b4d15163dc70707bbd5a9c) )
+	ROM_LOAD( "10-19s-1.e2",  0x08000, 0x4000, BAD_DUMP CRC(22b45aeb) SHA1(006c3072cc44c6fde9b4d15163dc70707bbd5a9c) ) /* Self test reports this ROM bad */
 ROM_END
 
 ROM_START( reelfun ) /* v7.01 */
@@ -1633,7 +1633,7 @@ ROM_END
 ROM_START( quiz211 )
 	ROM_REGION( 0x38000, "cpu", 0 )
 	ROM_LOAD( "1a.bin",         0x000000, 0x4000, CRC(116de0ea) SHA1(9af97b100aa2c79a58de055abe726d6e2e00aab4) )
-	ROM_CONTINUE(				0x000000, 0x4000 ) // halves identical
+	ROM_CONTINUE(               0x000000, 0x4000 ) // halves identical
 	ROM_LOAD( "hobby.bin",      0x10000, 0x8000, CRC(c86d0c2b) SHA1(987ef17c7b9cc119511a16cbd98ec44d24665af5) )
 	ROM_LOAD( "musica.bin",     0x18000, 0x8000, CRC(6b08990f) SHA1(bbc633dc4e0c395269d3d3fbf1f7617ea7adabf1) )
 	ROM_LOAD( "natura.bin",     0x20000, 0x8000, CRC(f17b0d59) SHA1(ebe3d5a0247f3065f0c5d4ee0b846a737700f379) )
@@ -1690,7 +1690,7 @@ All roms are 27C256 type eproms
 
 ROM_START( geimulti )
 	ROM_REGION( 0x10000, "cpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "cont",				0x00000, 0x8000, CRC(920020df) SHA1(01cb0a58bf863d63bcafe1e198ce5ea10bb8f59e) )
+	ROM_LOAD( "cont", 0x00000, 0x8000, CRC(920020df) SHA1(01cb0a58bf863d63bcafe1e198ce5ea10bb8f59e) )
 
 	ROM_REGION( 0x8000*(13 + 1), "bank", ROMREGION_ERASEFF )
 	ROM_LOAD( "pokr",      0x00000, 0x8000, CRC(1e9651a0) SHA1(23f98633701a9ac01784b29d1283ec9236810baf) )
