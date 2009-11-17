@@ -339,7 +339,7 @@ static WRITE8_HANDLER( gottlieb_analog_reset_w )
 
 static CUSTOM_INPUT( stooges_joystick_r )
 {
-	static const char *const joyport[] = { "P1JOY", "P2JOY", "P3JOY", NULL };
+	static const char *const joyport[] = { "P2JOY", "P3JOY", "P1JOY", NULL };
 	return (joyport[joystick_select & 3] != NULL) ? input_port_read(field->port->machine, joyport[joystick_select & 3]) : 0xff;
 }
 
