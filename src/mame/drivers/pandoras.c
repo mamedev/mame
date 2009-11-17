@@ -24,29 +24,21 @@ Added dsw locations and verified factory setting based on Guru's notes
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "konamipt.h"
-
-static int irq_enable_a, irq_enable_b;
-static int firq_old_data_a, firq_old_data_b;
-static int i8039_status;
-
-/* from video */
-PALETTE_INIT( pandoras );
-WRITE8_HANDLER( pandoras_vram_w );
-WRITE8_HANDLER( pandoras_cram_w );
-WRITE8_HANDLER( pandoras_flipscreen_w );
-WRITE8_HANDLER( pandoras_scrolly_w );
-VIDEO_START( pandoras );
-VIDEO_UPDATE( pandoras );
+#include "pandoras.h"
 
 static INTERRUPT_GEN( pandoras_master_interrupt )
 {
-	if (irq_enable_a)
+	pandoras_state *state = (pandoras_state *)device->machine->driver_data;
+
+	if (state->irq_enable_a)
 		cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( pandoras_slave_interrupt )
 {
-	if (irq_enable_b)
+	pandoras_state *state = (pandoras_state *)device->machine->driver_data;
+
+	if (state->irq_enable_b)
 		cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
 }
 
@@ -61,46 +53,54 @@ static WRITE8_HANDLER( pandoras_int_control_w )
 
         other bytes unknown */
 
+	pandoras_state *state = (pandoras_state *)space->machine->driver_data;
+
 	switch (offset)
 	{
-		case 0x00:	if (!data) cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
-					irq_enable_a = data;
-					break;
+		case 0x00:	if (!data) 
+					cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
+				state->irq_enable_a = data;
+				break;
 		case 0x02:	coin_counter_w(0,data & 0x01);
-					break;
+				break;
 		case 0x03:	coin_counter_w(1,data & 0x01);
-					break;
+				break;
 		case 0x05:	pandoras_flipscreen_w(space, 0, data);
-					break;
-		case 0x06:	if (!data) cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, CLEAR_LINE);
-					irq_enable_b = data;
-					break;
+				break;
+		case 0x06:	if (!data) 
+					cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, CLEAR_LINE);
+				state->irq_enable_b = data;
+				break;
 		case 0x07:	cputag_set_input_line(space->machine, "sub",INPUT_LINE_NMI,PULSE_LINE);
-					break;
+				break;
 
-		default:
-			logerror("%04x: (irq_ctrl) write %02x to %02x\n",cpu_get_pc(space->cpu), data, offset);
+		default:	logerror("%04x: (irq_ctrl) write %02x to %02x\n",cpu_get_pc(space->cpu), data, offset);
+				break;
 	}
 }
 
 static WRITE8_HANDLER( pandoras_cpua_irqtrigger_w )
 {
-	if (!firq_old_data_a && data)
+	pandoras_state *state = (pandoras_state *)space->machine->driver_data;
+
+	if (!state->firq_old_data_a && data)
 	{
 		cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE);
 	}
 
-	firq_old_data_a = data;
+	state->firq_old_data_a = data;
 }
 
 static WRITE8_HANDLER( pandoras_cpub_irqtrigger_w )
 {
-	if (!firq_old_data_b && data)
+	pandoras_state *state = (pandoras_state *)space->machine->driver_data;
+
+	if (!state->firq_old_data_b && data)
 	{
 		cputag_set_input_line(space->machine, "sub", M6809_FIRQ_LINE, HOLD_LINE);
 	}
 
-	firq_old_data_b = data;
+	state->firq_old_data_b = data;
 }
 
 static WRITE8_HANDLER( pandoras_i8039_irqtrigger_w )
@@ -110,12 +110,14 @@ static WRITE8_HANDLER( pandoras_i8039_irqtrigger_w )
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
 {
+	pandoras_state *state = (pandoras_state *)space->machine->driver_data;
+
 	/* bit 7 enables IRQ */
 	if ((data & 0x80) == 0)
 		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 
 	/* bit 5 goes to 8910 port A */
-	i8039_status = (data & 0x20) >> 5;
+	state->i8039_status = (data & 0x20) >> 5;
 }
 
 static WRITE8_HANDLER( pandoras_z80_irqtrigger_w )
@@ -126,9 +128,9 @@ static WRITE8_HANDLER( pandoras_z80_irqtrigger_w )
 
 
 static ADDRESS_MAP_START( pandoras_master_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1) AM_BASE(&spriteram) 						/* Work RAM (Shared with CPU B) */
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(pandoras_cram_w) AM_SHARE(2) AM_BASE(&colorram)	/* Color RAM (shared with CPU B) */
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(pandoras_vram_w) AM_SHARE(3) AM_BASE(&videoram)	/* Video RAM (shared with CPU B) */
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1) AM_BASE_MEMBER(pandoras_state, spriteram) 				/* Work RAM (Shared with CPU B) */
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(pandoras_cram_w) AM_SHARE(2) AM_BASE_MEMBER(pandoras_state, colorram)	/* Color RAM (shared with CPU B) */
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(pandoras_vram_w) AM_SHARE(3) AM_BASE_MEMBER(pandoras_state, videoram)	/* Video RAM (shared with CPU B) */
 	AM_RANGE(0x1800, 0x1807) AM_WRITE(pandoras_int_control_w)								/* INT control */
 	AM_RANGE(0x1a00, 0x1a00) AM_WRITE(pandoras_scrolly_w)									/* bg scroll */
 	AM_RANGE(0x1c00, 0x1c00) AM_WRITE(pandoras_z80_irqtrigger_w)							/* cause INT on the Z80 */
@@ -141,7 +143,7 @@ static ADDRESS_MAP_START( pandoras_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pandoras_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)												/* Work RAM (Shared with CPU A) */
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)										/* Work RAM (Shared with CPU A) */
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(pandoras_cram_w) AM_SHARE(2) 						/* Color RAM (shared with CPU A) */
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(pandoras_vram_w) AM_SHARE(3) 						/* Video RAM (shared with CPU A) */
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW1")
@@ -289,15 +291,34 @@ GFXDECODE_END
 
 ***************************************************************************/
 
+static MACHINE_START( pandoras )
+{
+	pandoras_state *state = (pandoras_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->firq_old_data_a);
+	state_save_register_global(machine, state->firq_old_data_b);
+	state_save_register_global(machine, state->irq_enable_a);
+	state_save_register_global(machine, state->irq_enable_b);
+	state_save_register_global(machine, state->i8039_status);
+}
+
 static MACHINE_RESET( pandoras )
 {
-	firq_old_data_a = firq_old_data_b = 0;
-	irq_enable_a = irq_enable_b = 0;
+	pandoras_state *state = (pandoras_state *)machine->driver_data;
+
+	state->firq_old_data_a = 0;
+	state->firq_old_data_b = 0;
+	state->irq_enable_a = 0;
+	state->irq_enable_b = 0;
+	state->i8039_status = 0;
+
+	state->flipscreen = 0;
 }
 
 static READ8_DEVICE_HANDLER( pandoras_portA_r )
 {
-	return i8039_status;
+	pandoras_state *state = (pandoras_state *)device->machine->driver_data;
+	return state->i8039_status;
 }
 
 static READ8_DEVICE_HANDLER( pandoras_portB_r )
@@ -317,6 +338,9 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_DRIVER_START( pandoras )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(pandoras_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,18432000/6)	/* CPU A */
 	MDRV_CPU_PROGRAM_MAP(pandoras_master_map)
@@ -335,6 +359,7 @@ static MACHINE_DRIVER_START( pandoras )
 
 	MDRV_QUANTUM_TIME(HZ(3000))	/* slices per frame */
 
+	MDRV_MACHINE_START(pandoras)
 	MDRV_MACHINE_RESET(pandoras)
 
 	/* video hardware */
@@ -402,4 +427,4 @@ ROM_START( pandoras )
 ROM_END
 
 
-GAME( 1984, pandoras, 0, pandoras, pandoras, 0, ROT90, "Konami/Interlogic", "Pandora's Palace", 0 )
+GAME( 1984, pandoras, 0, pandoras, pandoras, 0, ROT90, "Konami/Interlogic", "Pandora's Palace", GAME_SUPPORTS_SAVE )
