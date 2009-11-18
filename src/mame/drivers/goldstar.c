@@ -8417,7 +8417,7 @@ GAME( 1991, cmast91,   0,        cmast91,  cmast91,  cmast91,   ROT0, "Dyna",   
 GAME( 1989, lucky8,    0,        lucky8,   lucky8,   0,         ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 1)",                   0 )
 GAME( 1989, lucky8a,   lucky8,   lucky8,   lucky8a,  lucky8a,   ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 2)",                   0 )
 GAME( 1989, lucky8b,   lucky8,   lucky8,   ns8lines, 0,         ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 3, extended gfx)",     0 )
-GAME( 198?, ns8lines,  0,        lucky8,   ns8lines, 0,         ROT0, "Unknown",           "New Lucky 8 Lines / New Super 8 Lines",       0 )
+GAME( 198?, ns8lines,  0,        lucky8,   ns8lines, 0,         ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines",       0 )
 GAME( 198?, ladylinr,  0,        ladylinr, ladylinr, 0,         ROT0, "TAB Austria",       "Lady Liner",                                  0 )
 GAME( 198?, kkojnoli,  0,        kkojnoli, kkojnoli, 0,         ROT0, "south korean hack", "Kkoj Noli (Kill the Bees)",                   GAME_IMPERFECT_COLORS )
 GAME( 198?, wcat3,     0,        wcat3,    lucky8,   0,         ROT0, "E.A.I.",            "Wild Cat 3",                                  GAME_NOT_WORKING )

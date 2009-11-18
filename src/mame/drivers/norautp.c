@@ -2183,9 +2183,9 @@ GAMEL( 198?, norautpn, norautp, norautp,  norautpn, norautpn, ROT0, "bootleg?", 
 
 /* The following ones are 'Draw Poker Hi-Lo', running in a i8080a based hardware */
 GAME(  1983, dphl,     0,       dphl,     norautp,  dphl,     ROT0, "M. Kramer Manufacturing.",  "Draw Poker Hi-Lo (M.Kramer)",  GAME_NOT_WORKING )
-GAME(  1983, dphla,    0,       dphla,    norautp,  dphla,    ROT0, "Unknown",                   "Draw Poker Hi-Lo (Alt)",       GAME_NOT_WORKING )
+GAME(  1983, dphla,    0,       dphla,    norautp,  dphla,    ROT0, "<unknown>",                 "Draw Poker Hi-Lo (Alt)",       GAME_NOT_WORKING )
 
 GAME(  1983, gtipoker, 0,       dphl,     norautp,  gtipoker, ROT0, "GTI Inc",                   "GTI Poker",                    GAME_NOT_WORKING )
-GAME(  1983, dphljp,   0,       dphl,     norautp,  0,        ROT0, "Unknown",                   "Draw Poker Hi-Lo (Japanese)",  GAME_NOT_WORKING )
+GAME(  1983, dphljp,   0,       dphl,     norautp,  0,        ROT0, "<unknown>",                 "Draw Poker Hi-Lo (Japanese)",  GAME_NOT_WORKING )
 GAME(  1983, smshilo,  0,       dphlnv,   norautp,  0,        ROT0, "SMS Manufacturing Corp.",   "Hi-Lo Double Up Joker Poker ", GAME_NOT_WORKING )
 GAME(  1993, tpoker2,  0,       dphltest, norautp,  0,        ROT0, "Micro Manufacturing, Inc.", "Turbo Poker 2",                GAME_NOT_WORKING )
