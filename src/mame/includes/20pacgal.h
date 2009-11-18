@@ -20,6 +20,9 @@ struct __20pacgal_state
 
 	/* machine state */
 	UINT8 game_selected;	/* 0 = Ms. Pac-Man, 1 = Galaga */
+
+	/* devices */
+	const device_config *eeprom;
 };
 
 

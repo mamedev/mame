@@ -37,7 +37,7 @@
 
 #include "driver.h"
 #include "cpu/z180/z180.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/namco.h"
 #include "sound/dac.h"
 #include "20pacgal.h"
@@ -69,7 +69,7 @@ static WRITE8_HANDLER( irqack_w )
 	cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), bit);
 
 	if (!bit)
-		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE );
+		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -94,47 +94,37 @@ static const namco_interface namco_config =
  *
  *************************************/
 
-static const eeprom_interface eeprom_intf =
+static const eeprom_interface _20pacgal_eeprom_intf =
 {
-	7,				/* address bits */
-	8,				/* data bits */
-	"*110",			/* read command */
-	"*101",			/* write command */
-	0,				/* erase command */
-	"*10000xxxxx",	/* lock command */
-	"*10011xxxxx",	/* unlock command */
+	7,                /* address bits */
+	8,                /* data bits */
+	"*110",           /* read command */
+	"*101",           /* write command */
+	0,                /* erase command */
+	"*10000xxxxx",    /* lock command */
+	"*10011xxxxx",    /* unlock command */
 };
 
 
-static NVRAM_HANDLER( eeprom )
+static READ8_DEVICE_HANDLER( eeprom_r )
 {
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
+	_20pacgal_state *state = (_20pacgal_state *)device->machine->driver_data;
 
-		if (file)
-			eeprom_load(file);
-	}
-}
-
-
-static READ8_HANDLER( eeprom_r )
-{
 	/* bit 7 is EEPROM data */
-	return eeprom_read_bit() << 7;
+	return eepromdev_read_bit(state->eeprom) << 7;
 }
 
 
-static WRITE8_HANDLER( eeprom_w )
+static WRITE8_DEVICE_HANDLER( eeprom_w )
 {
+	_20pacgal_state *state = (_20pacgal_state *)device->machine->driver_data;
+
 	/* bit 7 is data */
 	/* bit 6 is clock (active high) */
 	/* bit 5 is cs (active low) */
-	eeprom_write_bit(data & 0x80);
-	eeprom_set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-	eeprom_set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	eepromdev_write_bit(state->eeprom, data & 0x80);
+	eepromdev_set_cs_line(state->eeprom, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+	eepromdev_set_clock_line(state->eeprom, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -167,7 +157,7 @@ static WRITE8_HANDLER( rom_bank_select_w )
 	if (state->game_selected == 0)
 	{
 		UINT8 *rom = memory_region(space->machine, "maincpu");
-		memcpy(rom+0x48000, rom+0x8000, 0x2000);
+		memcpy(rom + 0x48000, rom + 0x8000, 0x2000);
 	}
 }
 
@@ -229,7 +219,7 @@ static ADDRESS_MAP_START( 20pacgal_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x81, 0x81) AM_WRITENOP				/* ??? pulsed by the timer irq */
 	AM_RANGE(0x82, 0x82) AM_WRITE(irqack_w)
 	AM_RANGE(0x85, 0x86) AM_WRITENOP				/* stars: rng seed (lo/hi) */
-	AM_RANGE(0x87, 0x87) AM_READWRITE(eeprom_r, eeprom_w)
+	AM_RANGE(0x87, 0x87) AM_DEVREADWRITE("eeprom", eeprom_r, eeprom_w)
 	AM_RANGE(0x88, 0x88) AM_WRITE(rom_bank_select_w)
 	AM_RANGE(0x89, 0x89) AM_DEVWRITE("dac", dac_signed_w)
 	AM_RANGE(0x8a, 0x8a) AM_WRITENOP				/* stars: bits 3-4 = active set; bit 5 = enable */
@@ -285,6 +275,22 @@ INPUT_PORTS_END
  *
  *************************************/
 
+static MACHINE_START( 20pacgal )
+{
+	_20pacgal_state *state = (_20pacgal_state *)machine->driver_data;
+
+	state->eeprom = devtag_get_device(machine, "eeprom");
+
+	state_save_register_global(machine, state->game_selected);
+}
+
+static MACHINE_RESET( 20pacgal )
+{
+	_20pacgal_state *state = (_20pacgal_state *)machine->driver_data;
+
+	state->game_selected = 0;
+}
+
 static MACHINE_DRIVER_START( 20pacgal )
 
 	MDRV_DRIVER_DATA(_20pacgal_state)
@@ -295,7 +301,10 @@ static MACHINE_DRIVER_START( 20pacgal )
 	MDRV_CPU_IO_MAP(20pacgal_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_NVRAM_HANDLER(eeprom)
+	MDRV_MACHINE_START(20pacgal)
+	MDRV_MACHINE_RESET(20pacgal)
+
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", _20pacgal_eeprom_intf)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(20pacgal_video)

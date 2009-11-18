@@ -939,19 +939,17 @@ static MACHINE_RESET( galgames )
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
 
-static UINT8 *galgames_eeprom_data = NULL;
-
 static MACHINE_DRIVER_START( galgames )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(galgames_map)
 	MDRV_CPU_VBLANK_INT_HACK(galgames_interrupt, 1+20)	// ??
 
 	// 5 EEPROMs on the motherboard (for BIOS + 4 Carts)
-	MDRV_EEPROM_ADD(GALGAMES_EEPROM_BIOS,  galgames_eeprom_interface, 0, galgames_eeprom_data)
-	MDRV_EEPROM_ADD(GALGAMES_EEPROM_CART1, galgames_eeprom_interface, 0, galgames_eeprom_data)
-	MDRV_EEPROM_ADD(GALGAMES_EEPROM_CART2, galgames_eeprom_interface, 0, galgames_eeprom_data)
-	MDRV_EEPROM_ADD(GALGAMES_EEPROM_CART3, galgames_eeprom_interface, 0, galgames_eeprom_data)
-	MDRV_EEPROM_ADD(GALGAMES_EEPROM_CART4, galgames_eeprom_interface, 0, galgames_eeprom_data)
+	MDRV_EEPROM_NODEFAULT_ADD(GALGAMES_EEPROM_BIOS,  galgames_eeprom_interface)
+	MDRV_EEPROM_NODEFAULT_ADD(GALGAMES_EEPROM_CART1, galgames_eeprom_interface)
+	MDRV_EEPROM_NODEFAULT_ADD(GALGAMES_EEPROM_CART2, galgames_eeprom_interface)
+	MDRV_EEPROM_NODEFAULT_ADD(GALGAMES_EEPROM_CART3, galgames_eeprom_interface)
+	MDRV_EEPROM_NODEFAULT_ADD(GALGAMES_EEPROM_CART4, galgames_eeprom_interface)
 
 	MDRV_MACHINE_RESET( galgames )
 
