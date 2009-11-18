@@ -71,7 +71,6 @@ other supported games as well.
 #include "cpu/z80/z80.h"
 #include "includes/iremz80.h"
 #include "iremipt.h"
-#include "audio/irem.h"
 
 
 /* Lode Runner 2 seems to have a simple protection on the bank switching */

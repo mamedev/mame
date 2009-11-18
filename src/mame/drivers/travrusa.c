@@ -49,7 +49,6 @@ and 2764 eprom (swapped D3/D4 and D5/D6 data lines)
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "audio/irem.h"
 #include "includes/iremz80.h"
 
 

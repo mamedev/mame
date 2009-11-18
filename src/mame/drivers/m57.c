@@ -51,7 +51,6 @@
 #include "cpu/z80/z80.h"
 #include "iremipt.h"
 #include "includes/iremz80.h"
-#include "audio/irem.h"
 
 
 #define MASTER_CLOCK		XTAL_18_432MHz
