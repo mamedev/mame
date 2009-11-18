@@ -1148,7 +1148,7 @@ static void static_generate_exception(mips3_state *mips3, UINT8 exception, int r
 	UML_HANDLE(block, *exception_handle);											// handle  name
 
 	/* exception parameter is expected to be the fault address in this case */
-	if (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE || exception == EXCEPTION_ADDRLOAD || exception == EXCEPTION_ADDRSTORE)
+	if (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE || exception == EXCEPTION_TLBMOD || exception == EXCEPTION_ADDRLOAD || exception == EXCEPTION_ADDRSTORE)
 	{
 		/* set BadVAddr to the fault address */
 		UML_GETEXP(block, IREG(0));													// getexp  i0
