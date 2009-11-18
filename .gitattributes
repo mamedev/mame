@@ -2290,6 +2290,7 @@ src/mame/drivers/zr107.c svneol=native#text/plain
 src/mame/etc/fd1094dp.c svneol=native#text/plain
 src/mame/etc/jrcrypt.c svneol=native#text/plain
 src/mame/includes/20pacgal.h svneol=native#text/plain
+src/mame/includes/4enraya.h svneol=native#text/plain
 src/mame/includes/8080bw.h svneol=native#text/plain
 src/mame/includes/aerofgt.h svneol=native#text/plain
 src/mame/includes/ajax.h svneol=native#text/plain

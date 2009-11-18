@@ -52,31 +52,28 @@ Sound :
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-VIDEO_START( 4enraya );
-VIDEO_UPDATE( 4enraya );
-
-WRITE8_HANDLER( fenraya_videoram_w );
-
-static int soundlatch;
+#include "includes/4enraya.h"
 
 static WRITE8_HANDLER( sound_data_w )
 {
-	soundlatch = data;
+	_4enraya_state *state = (_4enraya_state *)space->machine->driver_data;
+	state->soundlatch = data;
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
-	static int last;
-	if ((last & 0x04) == 0x04 && (data & 0x4) == 0x00)
-		ay8910_data_address_w(device, last, soundlatch);
-	last=data;
+	_4enraya_state *state = (_4enraya_state *)device->machine->driver_data;
+
+	if ((state->last_snd_ctrl & 0x04) == 0x04 && (data & 0x4) == 0x00)
+		ay8910_data_address_w(device, state->last_snd_ctrl, state->soundlatch);
+
+	state->last_snd_ctrl = data;
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(fenraya_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE(fenraya_videoram_w) AM_BASE_MEMBER(_4enraya_state, videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
@@ -152,16 +149,32 @@ GFXDECODE_END
 
 static MACHINE_START( 4enraya )
 {
-    state_save_register_global(machine, soundlatch);
+	_4enraya_state *state = (_4enraya_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->soundlatch);
+	state_save_register_global(machine, state->last_snd_ctrl);
+}
+
+static MACHINE_RESET( 4enraya )
+{
+	_4enraya_state *state = (_4enraya_state *)machine->driver_data;
+
+	state->soundlatch = 0;
+	state->last_snd_ctrl = 0;
 }
 
 static MACHINE_DRIVER_START( 4enraya )
+
+	MDRV_DRIVER_DATA(_4enraya_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(main_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+
+	MDRV_MACHINE_START(4enraya)
+	MDRV_MACHINE_RESET(4enraya)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -175,8 +188,6 @@ static MACHINE_DRIVER_START( 4enraya )
 
 	MDRV_VIDEO_START(4enraya)
 	MDRV_VIDEO_UPDATE(4enraya)
-
-    MDRV_MACHINE_START(4enraya)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -204,4 +215,4 @@ ROM_START( 4enraya )
 	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) )	/* not used */
 ROM_END
 
-GAME( 1990, 4enraya,  0,       4enraya,  4enraya,  0, ROT0, "IDSA", "4 En Raya", GAME_SUPPORTS_SAVE )
+GAME( 1990, 4enraya,  0,   4enraya,  4enraya,  0, ROT0, "IDSA", "4 En Raya", GAME_SUPPORTS_SAVE )
