@@ -5,7 +5,7 @@
 *************************************************************************/
 
 
-#define EXERION_MASTER_CLOCK	(20000000)
+#define EXERION_MASTER_CLOCK    (XTAL_19_968MHz)   /* verified on pcb */
 #define EXERION_CPU_CLOCK		(EXERION_MASTER_CLOCK / 6)
 #define EXERION_AY8910_CLOCK	(EXERION_CPU_CLOCK / 2)
 #define EXERION_PIXEL_CLOCK		(EXERION_MASTER_CLOCK / 3)

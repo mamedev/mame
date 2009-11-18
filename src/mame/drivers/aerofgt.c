@@ -1307,11 +1307,11 @@ static const ym3812_interface ym3812_config =
 static MACHINE_DRIVER_START( pspikes )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
+	MDRV_CPU_ADD("maincpu",M68000,XTAL_20MHz/2)    /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(pspikes_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)/* all irq vectors are the same */
 
-	MDRV_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
+	MDRV_CPU_ADD("audiocpu",Z80,XTAL_20MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
@@ -1321,7 +1321,7 @@ static MACHINE_DRIVER_START( pspikes )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+    MDRV_SCREEN_REFRESH_RATE(61.31)  /* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
@@ -1462,7 +1462,7 @@ static MACHINE_DRIVER_START( karatblz )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2610, 8000000)
+    MDRV_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz ) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -1526,7 +1526,7 @@ static MACHINE_DRIVER_START( turbofrc )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+    MDRV_SCREEN_REFRESH_RATE(61.31)  /* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
@@ -1595,7 +1595,7 @@ static MACHINE_DRIVER_START( aerofgt )
 	MDRV_CPU_PROGRAM_MAP(aerofgt_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)/* all irq vectors are the same */
 
-	MDRV_CPU_ADD("audiocpu",Z80,5000000) /* 5 MHz (verified on pcb) */
+    MDRV_CPU_ADD("audiocpu",Z80,XTAL_20MHz/4) /* 5 MHz verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(aerofgt_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
@@ -1605,7 +1605,7 @@ static MACHINE_DRIVER_START( aerofgt )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+    MDRV_SCREEN_REFRESH_RATE(61.31)  /* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(400))
 				/* wrong but improves sprite-background synchronization */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

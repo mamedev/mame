@@ -401,19 +401,19 @@ static INTERRUPT_GEN( sound_int )
 static MACHINE_DRIVER_START( kchampvs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
+    MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)    /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(kchampvs_map)
 	MDRV_CPU_IO_MAP(kchampvs_io_map)
 	MDRV_CPU_VBLANK_INT("screen", kc_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
+    MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4)    /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(kchampvs_sound_map)
 	MDRV_CPU_IO_MAP(kchampvs_sound_io_map)		/* irq's triggered from main cpu */
 										/* nmi's from msm5205 */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+    MDRV_SCREEN_REFRESH_RATE(59.10) /* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
@@ -429,13 +429,13 @@ static MACHINE_DRIVER_START( kchampvs )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
+    MDRV_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)    /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
+    MDRV_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)    /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 375000)
+    MDRV_SOUND_ADD("msm", MSM5205, 375000)  /* verified on pcb, discrete circuit clock */
 	MDRV_SOUND_CONFIG(msm_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
