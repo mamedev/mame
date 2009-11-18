@@ -452,7 +452,12 @@ or Fatal Fury for example).
 #include "deprecat.h"
 #include "cpu/mips/mips3.h"
 
-static int hng64_boothack = 0;
+static int hng64_mcu_type = 0;
+#define FIGHT_MCU  1
+#define SHOOT_MCU  2
+#define RACING_MCU 3
+#define SAMSHO_MCU 4
+
 static UINT32 *rombase;
 static UINT32 *hng_mainram;
 static UINT32 *hng_cart;
@@ -619,7 +624,7 @@ static WRITE32_HANDLER( hng64_pal_w )
 	//  popmessage("Alpha is not zero!") ;
 
 	// sams64 / sams64_2 never write a palette, why not?
-	if (hng64_boothack!=1)
+	if (hng64_mcu_type!=SAMSHO_MCU)
 		palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
@@ -727,53 +732,97 @@ static WRITE32_HANDLER( hng64_sram_w )
 	COMBINE_DATA (&hng64_sram[offset]);
 }
 
-static WRITE32_HANDLER( hng64_dualport_w )
+/**************************************
+* MCU simulations
+**************************************/
+
+/* Fatal Fury Wild Ambition / Buriki One */
+static READ32_HANDLER( fight_io_r )
 {
-	printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
-	COMBINE_DATA (&hng64_dualport[offset]);
+	switch (offset*4)
+	{
+		case 0x000: return 0x00000400;
+		case 0x004: return input_port_read(space->machine, "SYSTEM");
+		case 0x008: return input_port_read(space->machine, "P1_P2");
+		case 0x600: return no_machine_error_code;
+	}
+
+	return hng64_dualport[offset];
+}
+
+/* Samurai Shodown 64 / Samurai Shodown 64 2 */
+static READ32_HANDLER( samsho_io_r )
+{
+	switch (offset*4)
+	{
+        case 0x000:
+		{
+			/* this is used on post by the io mcu to signal that a init task is complete, zeroed otherwise. */
+			if(cpu_get_pc(space->cpu) == 0x8010376c) //i/o init 1
+				return 0x300;
+			else if(cpu_get_pc(space->cpu) == 0x8010380c)//i/o init 2
+				return 0x400;
+			else
+				return 0x000;
+		}
+		case 0x004: return input_port_read(space->machine, "SYSTEM");
+		case 0x008: return input_port_read(space->machine, "P1_P2");
+		case 0x600: return no_machine_error_code;
+	}
+
+	return hng64_dualport[offset];
+}
+
+/* Beast Busters 2 */
+static READ32_HANDLER( shoot_io_r )
+{
+	switch (offset*4)
+	{
+        case 0x000: return mame_rand(space->machine);
+		case 0x004: return input_port_read(space->machine, "SYSTEM");
+		case 0x008: return input_port_read(space->machine, "P1_P2");
+		case 0x600: return no_machine_error_code;
+	}
+
+	return hng64_dualport[offset];
+}
+
+/* Roads Edge / Xtreme Rally */
+static READ32_HANDLER( racing_io_r )
+{
+	switch (offset*4)
+	{
+        case 0x000: return mame_rand(space->machine);
+		case 0x004: return input_port_read(space->machine, "SYSTEM");
+		case 0x008: return input_port_read(space->machine, "P1_P2");
+		case 0x600: return no_machine_error_code;
+	}
+
+	return hng64_dualport[offset];
 }
 
 static READ32_HANDLER( hng64_dualport_r )
 {
 	printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 
-	// These hacks create some red marks for the boot-up sequence
-	switch (offset*4)
+	switch(hng64_mcu_type)
 	{
-        case 0x00:
-		{
-
-			if (hng64_boothack == 1) // ss64 2
-			{
-				/* this is used on post by the io mcu to signal that a task is complete, zeroed otherwise. */
-				if(cpu_get_pc(space->cpu) == 0x8010376c) //i/o init 1
-					return 0x300;
-				else if(cpu_get_pc(space->cpu) == 0x8010380c)//i/o init 2
-					return 0x400;
-				else
-					return 0x000;
-			}
-			else if (hng64_boothack == 2) // ffwa
-			{
-				return 0x00000400;
-			}
-
-			return mame_rand(space->machine);
-		}
-
-		//RoadsEdge
-//      case 0x00:  return input_port_read(space->machine, "IPT_TEST");
-
-
-		case 0x04:  return input_port_read(space->machine, "SYSTEM");
-		case 0x08:  return input_port_read(space->machine, "P1_P2");
-
-		// This takes care of the 'machine' error code
-		case 0x600: return no_machine_error_code;
+		case FIGHT_MCU:  return fight_io_r(space, offset,0xffffffff);
+		case SHOOT_MCU:  return shoot_io_r(space, offset,0xffffffff);
+		case RACING_MCU: return racing_io_r(space, offset,0xffffffff);
+		case SAMSHO_MCU: return samsho_io_r(space, offset,0xffffffff);
 	}
 
+	if(offset*4 == 0x600)
+		return no_machine_error_code;
+
 	return mame_rand(space->machine)&0xffffffff;
-	//return hng64_dualport[offset];
+}
+
+static WRITE32_HANDLER( hng64_dualport_w )
+{
+	printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+	COMBINE_DATA (&hng64_dualport[offset]);
 }
 
 // Hardware calls these '3d buffers'
@@ -1500,25 +1549,26 @@ static DRIVER_INIT(hng64_fght)
 static DRIVER_INIT( fatfurwa )
 {
 	DRIVER_INIT_CALL(hng64_fght);
-	hng64_boothack = 2;
+	hng64_mcu_type = FIGHT_MCU;
 }
 
 static DRIVER_INIT( ss64 )
 {
 	DRIVER_INIT_CALL(hng64_fght);
-	hng64_boothack = 1;
+	hng64_mcu_type = SAMSHO_MCU;
 }
 
 
 static DRIVER_INIT(hng64_race)
 {
 	no_machine_error_code=0x02000000;
+	hng64_mcu_type = RACING_MCU;
 	DRIVER_INIT_CALL(hng64);
 }
 
 static DRIVER_INIT(hng64_shoot)
 {
-	hng64_boothack = 2;
+	hng64_mcu_type = SHOOT_MCU;
 	no_machine_error_code=0x03000000;
 	DRIVER_INIT_CALL(hng64);
 }
