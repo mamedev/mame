@@ -279,10 +279,14 @@ int eepromdev_read_bit(const device_config *device)
 	return res;
 }
 
-/*CUSTOM_INPUT( eeprom_bit_r )
+CUSTOM_INPUT( eepromdev_bit_r )
 {
-    return eeprom_read_bit();
-}*/
+	const char *devtag = (const char *)param;
+	const device_config *eeprom = devtag_get_device(field->port->machine, devtag);
+
+	/* we test if the device is indeed an eeprom when calling this device handler */
+	return eepromdev_read_bit(eeprom);
+}
 
 void eepromdev_set_cs_line(const device_config *device, int state)
 {

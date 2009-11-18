@@ -61,7 +61,7 @@ extern UINT8 *eeprom_empty_default_data;
 
 void eepromdev_write_bit( const device_config *device, int bit );
 int eepromdev_read_bit( const device_config *device );
-//CUSTOM_INPUT( eeprom_bit_r );
+CUSTOM_INPUT( eepromdev_bit_r );
 void eepromdev_set_cs_line( const device_config *device, int state );
 void eepromdev_set_clock_line( const device_config *device, int state );
 
