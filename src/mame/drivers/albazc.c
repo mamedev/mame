@@ -14,45 +14,52 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
+typedef struct _albazc_state albazc_state;
+struct _albazc_state
+{
+	/* video-related */
+	UINT8 *  spriteram1;
+	UINT8 *  spriteram2;
+	UINT8 *  spriteram3;
+};
+
+
+
 /* video */
-
-static UINT8 *hanaroku_spriteram1;
-static UINT8 *hanaroku_spriteram2;
-static UINT8 *hanaroku_spriteram3;
-
 
 static PALETTE_INIT( hanaroku )
 {
 	int i;
-	int r,g,b;
+	int r, g, b;
 
 	for (i = 0; i < 0x200; i++)
 	{
-		b = (color_prom[i*2+1] & 0x1f);
-		g = ((color_prom[i*2+1] & 0xe0) | ( (color_prom[i*2+0]& 0x03) <<8)  ) >> 5;
-		r = (color_prom[i*2+0]&0x7c) >> 2;
+		b = (color_prom[i * 2 + 1] & 0x1f);
+		g = ((color_prom[i * 2 + 1] & 0xe0) | ((color_prom[i * 2 + 0]& 0x03) <<8)) >> 5;
+		r = (color_prom[i * 2 + 0] & 0x7c) >> 2;
 
-		palette_set_color_rgb(machine,i,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(machine, i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
 
-static VIDEO_START(hanaroku)
+static VIDEO_START( hanaroku )
 {
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	albazc_state *state = (albazc_state *)machine->driver_data;
 	int i;
 
 	for (i = 511; i >= 0; i--)
 	{
-		int code = hanaroku_spriteram1[i] | (hanaroku_spriteram2[i] << 8);
-		int color = (hanaroku_spriteram2[i + 0x200] & 0xf8) >> 3;
+		int code = state->spriteram1[i] | (state->spriteram2[i] << 8);
+		int color = (state->spriteram2[i + 0x200] & 0xf8) >> 3;
 		int flipx = 0;
 		int flipy = 0;
-		int sx = hanaroku_spriteram1[i + 0x200] | ((hanaroku_spriteram2[i + 0x200] & 0x07) << 8);
-		int sy = 242 - hanaroku_spriteram3[i];
+		int sx = state->spriteram1[i + 0x200] | ((state->spriteram2[i + 0x200] & 0x07) << 8);
+		int sy = 242 - state->spriteram3[i];
 
 		if (flip_screen_get(machine))
 		{
@@ -120,9 +127,9 @@ static WRITE8_HANDLER( hanaroku_out_2_w )
 
 static ADDRESS_MAP_START( hanaroku_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&hanaroku_spriteram1)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE(&hanaroku_spriteram2)
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE(&hanaroku_spriteram3)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(albazc_state, spriteram1)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE_MEMBER(albazc_state, spriteram2)
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE_MEMBER(albazc_state, spriteram3)
 	AM_RANGE(0xa200, 0xa2ff) AM_WRITENOP	// ??? written once during P.O.S.T.
 	AM_RANGE(0xa300, 0xa304) AM_WRITENOP	// ???
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// ??? always 0x40
@@ -227,6 +234,10 @@ static const ay8910_interface ay8910_config =
 
 
 static MACHINE_DRIVER_START( hanaroku )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(albazc_state)
+
 	MDRV_CPU_ADD("maincpu", Z80,6000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(hanaroku_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -271,4 +282,4 @@ ROM_START( hanaroku )
 ROM_END
 
 
-GAME( 1988, hanaroku, 0,        hanaroku, hanaroku, 0, ROT0, "Alba", "Hanaroku", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS )
+GAME( 1988, hanaroku, 0,        hanaroku, hanaroku, 0, ROT0, "Alba", "Hanaroku", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )

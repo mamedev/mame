@@ -71,16 +71,8 @@
 #include "arabian.h"
 #include "sound/ay8910.h"
 
-
 /* constants */
 #define MAIN_OSC		12000000
-
-
-/* local variables */
-static UINT8 custom_cpu_reset;
-static UINT8 custom_cpu_busy;
-static UINT8 *custom_cpu_ram;
-
 
 
 /*************************************
@@ -91,6 +83,8 @@ static UINT8 *custom_cpu_ram;
 
 static WRITE8_DEVICE_HANDLER( ay8910_porta_w )
 {
+	arabian_state *state = (arabian_state *)device->machine->driver_data;
+
 	/*
         bit 7 = ENA
         bit 6 = ENB
@@ -98,12 +92,14 @@ static WRITE8_DEVICE_HANDLER( ay8910_porta_w )
         bit 4 = /AGHF
         bit 3 = /ARHF
     */
-	arabian_video_control = data;
+	state->video_control = data;
 }
 
 
 static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
 {
+	arabian_state *state = (arabian_state *)device->machine->driver_data;
+
 	/*
         bit 5 = /IREQ to custom CPU
         bit 4 = /SRES to custom CPU
@@ -112,7 +108,7 @@ static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
     */
 
 	/* track the custom CPU reset */
-	custom_cpu_reset = ~data & 0x10;
+	state->custom_cpu_reset = ~data & 0x10;
 
 	/* clock the coin counters */
 	coin_counter_w(1, ~data & 0x02);
@@ -129,6 +125,8 @@ static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
 
 static READ8_HANDLER( custom_cpu_r )
 {
+	arabian_state *state = (arabian_state *)space->machine->driver_data;
+
 	/* since we don't have a simulator for the Fujitsu 8841 4-bit microprocessor */
 	/* we have to simulate its behavior; it looks like Arabian reads out of the  */
 	/* alternate CPU's RAM space while the CPU is running. If the CPU is not     */
@@ -137,8 +135,8 @@ static READ8_HANDLER( custom_cpu_r )
 	static const char *const comnames[] = { "COM0", "COM1", "COM2", "COM3", "COM4", "COM5" };
 
 	/* if the CPU reset line is being held down, just return RAM */
-	if (custom_cpu_reset)
-		return custom_cpu_ram[0x7f0 + offset];
+	if (state->custom_cpu_reset)
+		return state->custom_cpu_ram[0x7f0 + offset];
 
 	/* otherwise, assume the custom CPU is live */
 	switch (offset)
@@ -157,28 +155,32 @@ static READ8_HANDLER( custom_cpu_r )
 		/* it wants. There appears to be a number of different ways to make */
 		/* the custom turn this on. */
 		case 6:
-			return custom_cpu_busy ^= 1;
+			return state->custom_cpu_busy ^= 1;
 
 		/* handshake read; the main CPU writes to the previous memory location */
 		/* and waits for the custom to copy that value here */
 		case 8:
-			return custom_cpu_ram[0x7f0 + offset - 1];
+			return state->custom_cpu_ram[0x7f0 + offset - 1];
 
 		/* error cases */
 		default:
-			logerror("Input Port %04X read.  PC=%04X\n", offset+0xd7f0, cpu_get_pc(space->cpu));
+			logerror("Input Port %04X read.  PC = %04X\n", offset + 0xd7f0, cpu_get_pc(space->cpu));
 	}
 	return 0;
 }
 
 static WRITE8_HANDLER( custom_cpu_w )
 {
- 	custom_cpu_ram[0x7f0 + offset] = data;
+	arabian_state *state = (arabian_state *)space->machine->driver_data;
+
+ 	state->custom_cpu_ram[0x7f0 + offset] = data;
 }
 
 
-static void update_flip_state(void)
+static void update_flip_state( running_machine *machine )
 {
+	arabian_state *state = (arabian_state *)machine->driver_data;
+
 	/* the custom CPU also controls the video flip control line; unfortunately,    */
 	/* it appears that the custom is smart enough to flip the screen itself, based */
 	/* on the information stored at $d400 and $d401. The value at $d400 specifies  */
@@ -187,25 +189,29 @@ static void update_flip_state(void)
 	/* state. */
 
 	/* initial state is based on the flip screen flag */
-	arabian_flip_screen = custom_cpu_ram[0x34b];
+	state->flip_screen = state->custom_cpu_ram[0x34b];
 
 	/* flip if not player 1 and cocktail mode */
-	if (custom_cpu_ram[0x400] != 0 && !(custom_cpu_ram[0x401] & 0x02))
-		arabian_flip_screen = !arabian_flip_screen;
+	if (state->custom_cpu_ram[0x400] != 0 && !(state->custom_cpu_ram[0x401] & 0x02))
+		state->flip_screen = !state->flip_screen;
 }
 
 
 static WRITE8_HANDLER( custom_flip_w )
 {
-	custom_cpu_ram[0x34b + offset] = data;
-	update_flip_state();
+	arabian_state *state = (arabian_state *)space->machine->driver_data;
+
+	state->custom_cpu_ram[0x34b + offset] = data;
+	update_flip_state(space->machine);
 }
 
 
 static WRITE8_HANDLER( custom_cocktail_w )
 {
-	custom_cpu_ram[0x400 + offset] = data;
-	update_flip_state();
+	arabian_state *state = (arabian_state *)space->machine->driver_data;
+
+	state->custom_cpu_ram[0x400 + offset] = data;
+	update_flip_state(space->machine);
 }
 
 
@@ -221,9 +227,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(arabian_videoram_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x01ff) AM_READ_PORT("IN0")
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x01ff) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd000, 0xd7ef) AM_RAM AM_BASE(&custom_cpu_ram)
+	AM_RANGE(0xd000, 0xd7ef) AM_RAM AM_BASE_MEMBER(arabian_state, custom_cpu_ram)
 	AM_RANGE(0xd7f0, 0xd7ff) AM_READWRITE(custom_cpu_r, custom_cpu_w)
-	AM_RANGE(0xe000, 0xe007) AM_MIRROR(0x0ff8) AM_WRITE(arabian_blitter_w) AM_BASE(&arabian_blitter)
+	AM_RANGE(0xe000, 0xe007) AM_MIRROR(0x0ff8) AM_WRITE(arabian_blitter_w) AM_BASE_MEMBER(arabian_state, blitter)
 ADDRESS_MAP_END
 
 
@@ -368,11 +374,26 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( arabian )
 {
-    state_save_register_global(machine, custom_cpu_reset);
-    state_save_register_global(machine, custom_cpu_busy);
+	arabian_state *state = (arabian_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->custom_cpu_reset);
+	state_save_register_global(machine, state->custom_cpu_busy);
+}
+
+static MACHINE_RESET( arabian )
+{
+	arabian_state *state = (arabian_state *)machine->driver_data;
+
+	state->custom_cpu_reset = 0;
+	state->custom_cpu_busy = 0;
+	state->video_control = 0;
+	state->flip_screen = 0;
 }
 
 static MACHINE_DRIVER_START( arabian )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(arabian_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_OSC/4)
@@ -380,7 +401,8 @@ static MACHINE_DRIVER_START( arabian )
 	MDRV_CPU_IO_MAP(main_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-    MDRV_MACHINE_START(arabian)
+	MDRV_MACHINE_START(arabian)
+	MDRV_MACHINE_RESET(arabian)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

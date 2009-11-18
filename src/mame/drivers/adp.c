@@ -150,13 +150,17 @@ Video board has additional chips:
 #include "machine/microtch.h"
 #include "machine/68681.h"
 
-static UINT8 register_active;
-static UINT8 mux_data;
-
-static struct
+typedef struct _adp_state adp_state;
+struct _adp_state
 {
-	const device_config *duart68681;
-} skattv_devices;
+	/* misc */
+	UINT8 mux_data;
+	UINT8 register_active;
+
+	/* devices */
+	const device_config *duart;
+};
+
 
 /***************************************************************************
 
@@ -164,38 +168,47 @@ static struct
 
 ***************************************************************************/
 
-static void duart_irq_handler(const device_config *device, UINT8 vector)
+static void duart_irq_handler( const device_config *device, UINT8 vector )
 {
 	cputag_set_input_line_and_vector(device->machine, "maincpu", 4, HOLD_LINE, vector);
 };
 
-static void duart_tx(const device_config *device, int channel, UINT8 data)
+static void duart_tx( const device_config *device, int channel, UINT8 data )
 {
-	if ( channel == 0 )
+	if (channel == 0)
 	{
 		microtouch_rx(1, &data);
 	}
 };
 
-static void microtouch_tx(running_machine *machine, UINT8 data)
+static void microtouch_tx( running_machine *machine, UINT8 data )
 {
-	duart68681_rx_data(skattv_devices.duart68681, 0, data);
+	adp_state *state = (adp_state *)machine->driver_data;
+	duart68681_rx_data(state->duart, 0, data);
 }
 
-static UINT8 duart_input(const device_config *device)
+static UINT8 duart_input( const device_config *device )
 {
 	return input_port_read(device->machine, "DSW1");
 }
 
 static MACHINE_START( skattv )
 {
+	adp_state *state = (adp_state *)machine->driver_data;
 	microtouch_init(machine, microtouch_tx, 0);
+
+	state->duart = devtag_get_device(machine, "duart68681");
+
+	state_save_register_global(machine, state->mux_data);
+	state_save_register_global(machine, state->register_active);
 }
 
 static MACHINE_RESET( skattv )
 {
-	skattv_devices.duart68681 = devtag_get_device( machine, "duart68681" );
-	mux_data = 0;
+	adp_state *state = (adp_state *)machine->driver_data;
+
+	state->mux_data = 0;
+	state->register_active = 0;
 }
 
 static const duart68681_config skattv_duart68681_config =
@@ -210,10 +223,9 @@ static PALETTE_INIT( adp )
 {
     int i;
 
-
-    for (i = 0;i < machine->config->total_colors;i++)
+    for (i = 0; i < machine->config->total_colors; i++)
     {
-        int bit0,bit1,bit2,r,g,b;
+        int bit0, bit1, bit2, r, g, b;
 
 
         // red component
@@ -232,7 +244,7 @@ static PALETTE_INIT( adp )
         bit2 = (i >> 2) & 0x01;
         b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-        palette_set_color(machine,i,MAKE_RGB(r,g,b));
+        palette_set_color(machine, i, MAKE_RGB(r,g,b));
     }
 }
 
@@ -250,7 +262,7 @@ static VIDEO_START(adp)
 
 static VIDEO_UPDATE(adp)
 {
-	int x,y,b;
+	int x, y, b;
 
 	b = ((HD63484_reg[0xcc/2] & 0x000f) << 16) + HD63484_reg[0xce/2];
 #if 0
@@ -321,11 +333,12 @@ if (!input_code_pressed(screen->machine, KEYCODE_O))
 	return 0;
 }
 
-static READ16_HANDLER(test_r)
+static READ16_HANDLER( test_r )
 {
+	adp_state *state = (adp_state *)space->machine->driver_data;
 	int value = 0xffff;
 
-	switch(mux_data)
+	switch (state->mux_data)
 	{
 		case 0x00: value = input_port_read(space->machine, "x0"); break;
 		case 0x01: value = input_port_read(space->machine, "x1snd"); break;
@@ -344,8 +357,9 @@ static READ16_HANDLER(test_r)
 		case 0x0e: value = input_port_read(space->machine, "x14"); break;
 		case 0x0f: value = input_port_read(space->machine, "x15"); break;
 	}
-	mux_data++;
-	mux_data&=0xf;
+
+	state->mux_data++;
+	state->mux_data &= 0xf;
 
 	return value;
 }
@@ -353,22 +367,23 @@ static READ16_HANDLER(test_r)
 /*???*/
 static WRITE16_HANDLER(wh2_w)
 {
-	register_active = data;
+	adp_state *state = (adp_state *)space->machine->driver_data;
+	state->register_active = data;
 }
 
 static READ16_HANDLER(t2_r)
 {
- static UINT16 vblank = 0,hblank = 0;
+	static UINT16 vblank = 0, hblank = 0;
 
- vblank ^=0x40;
- hblank ^=0x20;
+	vblank ^=0x40;
+	hblank ^=0x20;
 
- return mame_rand(space->machine) & 0x00f0;
+	return mame_rand(space->machine) & 0x00f0;
 
 // FIXME: this code is never executed
 // popmessage("%08x",cpu_get_pc(space->cpu));
 // return 0x0000;
- return 0xff9f | vblank | hblank;
+	return 0xff9f | vblank | hblank;
 }
 
 static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -514,6 +529,10 @@ static INTERRUPT_GEN( adp_int )
 }
 */
 static MACHINE_DRIVER_START( quickjac )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(adp_state)
+
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(quickjac_mem)
 //  MDRV_CPU_VBLANK_INT("screen", adp_int)
@@ -542,6 +561,10 @@ static MACHINE_DRIVER_START( quickjac )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( skattv )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(adp_state)
+
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(skattv_mem)
 //  MDRV_CPU_VBLANK_INT("screen", adp_int)
@@ -570,6 +593,10 @@ static MACHINE_DRIVER_START( skattv )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( backgamn )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(adp_state)
+
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(backgamn_mem)
 
@@ -662,10 +689,9 @@ ROM_START( funlddlx )
 	ROM_LOAD16_BYTE( "flv_f1_ii.bin", 0x00001, 0x80000, CRC(2aa904e6) SHA1(864530b136dd488d619cc95f48e7dce8d93d88e0) )
 ROM_END
 
-GAME( 1990, backgamn,        0, backgamn,    adp,    0, ROT0,  "ADP", "Backgammon", GAME_NOT_WORKING )
-GAME( 1993, quickjac,        0, quickjac,    skattv,    0, ROT0,  "ADP", "Quick Jack", GAME_NOT_WORKING )
-GAME( 1994, skattv,          0, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV", GAME_NOT_WORKING )
-GAME( 1995, skattva,    skattv, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV (version TS3)", GAME_NOT_WORKING )
-GAME( 1997, fashiong,        0, skattv,      skattv,    0, ROT0,  "ADP", "Fashion Gambler", GAME_NOT_WORKING )
-GAME( 1999, funlddlx,        0, funland,     skattv,    0, ROT0,  "Stella", "Funny Land de Luxe", GAME_NOT_WORKING )
-
+GAME( 1990, backgamn,        0, backgamn,    adp,       0, ROT0,  "ADP",     "Backgammon", GAME_NOT_WORKING )
+GAME( 1993, quickjac,        0, quickjac,    skattv,    0, ROT0,  "ADP",     "Quick Jack", GAME_NOT_WORKING )
+GAME( 1994, skattv,          0, skattv,      skattv,    0, ROT0,  "ADP",     "Skat TV", GAME_NOT_WORKING )
+GAME( 1995, skattva,    skattv, skattv,      skattv,    0, ROT0,  "ADP",     "Skat TV (version TS3)", GAME_NOT_WORKING )
+GAME( 1997, fashiong,        0, skattv,      skattv,    0, ROT0,  "ADP",     "Fashion Gambler", GAME_NOT_WORKING )
+GAME( 1999, funlddlx,        0, funland,     skattv,    0, ROT0,  "Stella",  "Funny Land de Luxe", GAME_NOT_WORKING )
