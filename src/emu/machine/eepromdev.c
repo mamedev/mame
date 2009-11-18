@@ -12,6 +12,9 @@
 #define SERIAL_BUFFER_LENGTH 40
 #define MEMORY_SIZE 1024
 
+/* FIXME: many drivers do not need default_data / default_data_size and put them to 0 in the drivers seems a waste of code */
+UINT8 *eeprom_empty_default_data = NULL;
+
 typedef struct _eeprom_state eeprom_state;
 struct _eeprom_state
 {

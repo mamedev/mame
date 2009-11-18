@@ -53,6 +53,11 @@ DEVICE_GET_INFO(eeprom);
 	MDRV_DEVICE_CONFIG_DATAPTR(eeprom_config, default_data, &_data) \
 	MDRV_DEVICE_CONFIG_DATA32(eeprom_config, default_data_size, _size)
 
+/* FIXME: many drivers do not need default_data / default_data_size and put them to 0 in the drivers seems a waste of code */
+extern UINT8 *eeprom_empty_default_data;
+
+#define MDRV_EEPROM_NODEFAULT_ADD(_tag, _interface) \
+	MDRV_EEPROM_ADD(_tag, _interface, 0, eeprom_empty_default_data)
 
 void eepromdev_write_bit( const device_config *device, int bit );
 int eepromdev_read_bit( const device_config *device );
