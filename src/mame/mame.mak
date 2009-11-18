@@ -705,7 +705,6 @@ $(MAMEOBJ)/irem.a: \
 	$(DRIVERS)/travrusa.o $(VIDEO)/travrusa.o \
 	$(DRIVERS)/vigilant.o $(VIDEO)/vigilant.o \
 	$(MACHINE)/irem_cpu.o \
-	$(AUDIO)/fghtbskt.o \
 	$(AUDIO)/irem.o \
 
 $(MAMEOBJ)/itech.a: \

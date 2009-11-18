@@ -50,26 +50,15 @@ and 2764 eprom (swapped D3/D4 and D5/D6 data lines)
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "audio/irem.h"
-
-extern UINT8 *travrusa_videoram;
-
-PALETTE_INIT( travrusa );
-PALETTE_INIT( shtrider );
-VIDEO_START( travrusa );
-WRITE8_HANDLER( travrusa_videoram_w );
-WRITE8_HANDLER( travrusa_scroll_x_low_w );
-WRITE8_HANDLER( travrusa_scroll_x_high_w );
-WRITE8_HANDLER( travrusa_flipscreen_w );
-VIDEO_UPDATE( travrusa );
-
+#include "includes/iremz80.h"
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(travrusa_videoram_w) AM_BASE(&travrusa_videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(travrusa_videoram_w) AM_BASE_MEMBER(irem_z80_state, videoram)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(travrusa_scroll_x_low_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(travrusa_scroll_x_high_w)
-	AM_RANGE(0xc800, 0xc9ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc800, 0xc9ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(irem_z80_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(irem_sound_cmd_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(travrusa_flipscreen_w)	/* + coin counters - not written by shtrider */
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("SYSTEM")		/* IN0 */
@@ -300,14 +289,25 @@ static GFXDECODE_START( shtrider )
 	GFXDECODE_ENTRY( "gfx2", 0, shtrider_spritelayout, 16*8, 16 )
 GFXDECODE_END
 
+static MACHINE_RESET( travrusa )
+{
+	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
 
+	state->scrollx[0] = 0;
+	state->scrollx[1] = 0;
+}
 
 static MACHINE_DRIVER_START( travrusa )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(irem_z80_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_MACHINE_RESET(travrusa)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -458,14 +458,14 @@ ROM_END
 
 static DRIVER_INIT( motorace )
 {
-	int A,j;
+	int A, j;
 	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *buffer = alloc_array_or_die(UINT8, 0x2000);
 
-		memcpy(buffer,rom,0x2000);
+		memcpy(buffer, rom, 0x2000);
 
 		/* The first CPU ROM has the address and data lines scrambled */
-		for (A = 0;A < 0x2000;A++)
+		for (A = 0; A < 0x2000; A++)
 		{
 			j = BITSWAP16(A,15,14,13,9,7,5,3,1,12,10,8,6,4,2,0,11);
 			rom[j] = BITSWAP8(buffer[A],2,7,4,1,6,3,0,5);
@@ -486,7 +486,7 @@ static DRIVER_INIT( shtridra )
 
 
 
-GAME( 1983, travrusa, 0,        travrusa, travrusa, 0,        ROT270, "Irem", "Traverse USA / Zippy Race", 0 )
-GAME( 1983, motorace, travrusa, travrusa, motorace, motorace, ROT270, "Irem (Williams license)", "MotoRace USA", 0 )
-GAME( 1985, shtrider, 0,        shtrider, shtrider, 0,        ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu", "Shot Rider", 0 )
-GAME( 1984, shtridera,shtrider, shtrider, shtrider, shtridra, ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu (Sigma license)", "Shot Rider (Sigma license)", 0 )
+GAME( 1983, travrusa, 0,        travrusa, travrusa, 0,        ROT270, "Irem", "Traverse USA / Zippy Race", GAME_SUPPORTS_SAVE )
+GAME( 1983, motorace, travrusa, travrusa, motorace, motorace, ROT270, "Irem (Williams license)", "MotoRace USA", GAME_SUPPORTS_SAVE )
+GAME( 1985, shtrider, 0,        shtrider, shtrider, 0,        ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu", "Shot Rider", GAME_SUPPORTS_SAVE )
+GAME( 1984, shtridera,shtrider, shtrider, shtrider, shtridra, ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu (Sigma license)", "Shot Rider (Sigma license)", GAME_SUPPORTS_SAVE )

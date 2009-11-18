@@ -44,7 +44,7 @@
 
 #include "driver.h"
 #include "iremipt.h"
-#include "m52.h"
+#include "includes/iremz80.h"
 #include "audio/irem.h"
 #include "cpu/z80/z80.h"
 
@@ -60,10 +60,10 @@
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(m52_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(m52_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(m52_videoram_w) AM_BASE_MEMBER(irem_z80_state, videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(m52_colorram_w) AM_BASE_MEMBER(irem_z80_state, colorram)
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07ff) AM_READ(m52_protection_r)
-	AM_RANGE(0xc800, 0xcbff) AM_MIRROR(0x0400) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc800, 0xcbff) AM_MIRROR(0x0400) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(irem_z80_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd000, 0xd000) AM_MIRROR(0x07fc) AM_WRITE(irem_sound_cmd_w)
 	AM_RANGE(0xd001, 0xd001) AM_MIRROR(0x07fc) AM_WRITE(m52_flipscreen_w)	/* + coin counters */
 	AM_RANGE(0xd000, 0xd000) AM_MIRROR(0x07f8) AM_READ_PORT("IN0")
@@ -77,9 +77,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( alpha1v_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(m52_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(m52_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xc800, 0xc9ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size) AM_SHARE(1) // bigger or mirrored?
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(m52_videoram_w) AM_BASE_MEMBER(irem_z80_state, videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(m52_colorram_w) AM_BASE_MEMBER(irem_z80_state, colorram)
+	AM_RANGE(0xc800, 0xc9ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(irem_z80_state, spriteram) AM_SIZE(&spriteram_size) AM_SHARE(1) // bigger or mirrored?
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0") AM_WRITE(irem_sound_cmd_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("IN1") AM_WRITE(alpha1v_flipscreen_w)
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN2")
@@ -380,13 +380,29 @@ GFXDECODE_END
  *
  *************************************/
 
+static MACHINE_RESET( m52 )
+{
+	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
+
+	state->bg1xpos = 0;
+	state->bg1ypos = 0;
+	state->bg2xpos = 0;
+	state->bg2ypos = 0;
+	state->bgcontrol = 0;
+}
+
 static MACHINE_DRIVER_START( m52 )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(irem_z80_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(main_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_MACHINE_RESET(m52)
 
 	/* video hardware */
 	MDRV_GFXDECODE(m52)
@@ -540,4 +556,4 @@ ROM_END
 
 GAME( 1982, mpatrol,  0,        m52,      mpatrol,  0, ROT0, "Irem", "Moon Patrol", GAME_SUPPORTS_SAVE )
 GAME( 1982, mpatrolw, mpatrol,  m52,      mpatrolw, 0, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)", GAME_SUPPORTS_SAVE )
-GAME( 1988, alpha1v,  0,        alpha1v,  alpha1v,  0, ROT0, "Vision Electronics", "Alpha One (Vision Electronics / Kyle Hodgetts)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1988, alpha1v,  0,        alpha1v,  alpha1v,  0, ROT0, "Vision Electronics", "Alpha One (Vision Electronics / Kyle Hodgetts)", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_SUPPORTS_SAVE )

@@ -128,26 +128,28 @@ Notes (couriersud)
 
 #define LOG(x) do { if (DEBUG) printf x; } while (0)
 
-static WRITE8_DEVICE_HANDLER(ic8j1_output_changed)
+static WRITE8_DEVICE_HANDLER( ic8j1_output_changed )
 {
 	LOG(("ic8j1: %d %d\n", data, video_screen_get_vpos(device->machine->primary_screen)));
 	cputag_set_input_line(device->machine, "maincpu", 0, !data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static WRITE8_DEVICE_HANDLER(ic8j2_output_changed)
+static WRITE8_DEVICE_HANDLER( ic8j2_output_changed )
 {
+	m10_state *state = (m10_state *)device->machine->driver_data;
+
 	/* written from /Q to A with slight delight */
 	LOG(("ic8j2: %d\n", data));
 	ttl74123_a_w(device, 0, data);
-	ttl74123_a_w(devtag_get_device(device->machine, "ic8j1"), 0, data);
+	ttl74123_a_w(state->ic8j1, 0, data);
 }
 
 static const ttl74123_config ic8j1_intf =
 {
 	/* completely illegible */
 	TTL74123_NOT_GROUNDED_DIODE,	/* the hook up type */
-	RES_K(1),			/* resistor connected to RCext */
-	CAP_U(1),		/* capacitor connected to Cext and RCext */
+	RES_K(1),				/* resistor connected to RCext */
+	CAP_U(1),				/* capacitor connected to Cext and RCext */
 	1,					/* A pin - driven by the CRTC */
 	1,					/* B pin - pulled high */
 	1,					/* Clear pin - pulled high */
@@ -158,8 +160,8 @@ static const ttl74123_config ic8j2_intf =
 {
 	TTL74123_NOT_GROUNDED_DIODE,	/* the hook up type */
 	/* 10k + 20k variable resistor */
-	RES_K(22),			/* resistor connected to RCext */
-	CAP_U(2.2),		/* capacitor connected to Cext and RCext */
+	RES_K(22),				/* resistor connected to RCext */
+	CAP_U(2.2),				/* capacitor connected to Cext and RCext */
 	1,					/* A pin - driven by the CRTC */
 	1,					/* B pin - pulled high */
 	1,					/* Clear pin - pulled high */
@@ -189,12 +191,26 @@ static PALETTE_INIT( m10 )
 	}
 }
 
-static MACHINE_RESET( irem )
+static MACHINE_START( m10 )
 {
 	m10_state *state = (m10_state *)machine->driver_data;
 
+	state->ic8j1 = devtag_get_device(machine, "ic8j1");
+	state->ic8j2 = devtag_get_device(machine, "ic8j2");
+	state->samples = devtag_get_device(machine, "samples");
+
 	state_save_register_global(machine, state->bottomline);
 	state_save_register_global(machine, state->flip);
+	state_save_register_global(machine, state->last);
+}
+
+static MACHINE_RESET( m10 )
+{
+	m10_state *state = (m10_state *)machine->driver_data;
+
+	state->bottomline = 0;
+	state->flip = 0;
+	state->last = 0;
 }
 
 /*************************************
@@ -224,7 +240,6 @@ static MACHINE_RESET( irem )
 
 static WRITE8_HANDLER( m10_ctrl_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
 	m10_state *state = (m10_state *)space->machine->driver_data;
 
 #if DEBUG
@@ -249,27 +264,27 @@ static WRITE8_HANDLER( m10_ctrl_w )
 			break;
 		case 0x01:
 			/* MISSILE sound */
-			sample_start(samples, 0, 0, 0);
+			sample_start(state->samples, 0, 0, 0);
 			break;
 		case 0x02:
 			/* EXPLOSION sound */
-			sample_start(samples, 1, 1, 0);
+			sample_start(state->samples, 1, 1, 0);
 			break;
 		case 0x03:
 			/* INVADER HIT sound */
-			sample_start(samples, 2, 2, 0);
+			sample_start(state->samples, 2, 2, 0);
 			break;
 		case 0x04:
 			/* BONUS BASE sound */
-			sample_start(samples, 3, 8, 0);
+			sample_start(state->samples, 3, 8, 0);
 			break;
 		case 0x05:
 			/* FLEET MOVE sound */
-			sample_start(samples, 3, 3, 0);
+			sample_start(state->samples, 3, 3, 0);
 			break;
 		case 0x06:
 			/* SAUCER HIT SOUND */
-			sample_start(samples, 2, 7, 0);
+			sample_start(state->samples, 2, 7, 0);
 			break;
 		default:
 			popmessage("Unknown sound M10: %02x\n", data & 0x07);
@@ -277,9 +292,9 @@ static WRITE8_HANDLER( m10_ctrl_w )
 	}
 	/* UFO SOUND */
 	if (data & 0x08)
-		sample_stop(samples, 4);
+		sample_stop(state->samples, 4);
 	else
-		sample_start(samples, 4, 9, 1);
+		sample_start(state->samples, 4, 9, 1);
 
 }
 
@@ -305,7 +320,7 @@ static WRITE8_HANDLER( m11_ctrl_w )
 	m10_state *state = (m10_state *)space->machine->driver_data;
 
 #if DEBUG
-	if (data & 0x4C)
+	if (data & 0x4c)
 		popmessage("M11 ctrl: %02x",data);
 #endif
 
@@ -338,7 +353,7 @@ static WRITE8_HANDLER( m15_ctrl_w )
 	m10_state *state = (m10_state *)space->machine->driver_data;
 
 #if DEBUG
-	if (data & 0xF0)
+	if (data & 0xf0)
 		popmessage("M15 ctrl: %02x",data);
 #endif
 	if (input_port_read(space->machine, "CAB") & 0x01)
@@ -364,52 +379,51 @@ static WRITE8_HANDLER( m15_ctrl_w )
 static WRITE8_HANDLER( m10_a500_w )
 {
 #if DEBUG
-	if (data & 0xFC)
+	if (data & 0xfc)
 		popmessage("a500: %02x",data);
 #endif
 }
 
 static WRITE8_HANDLER( m11_a100_w )
 {
-	static int last = 0x00;
-	const device_config *samples = devtag_get_device(space->machine, "samples");
-	int raising_bits = data & ~last;
-	//int falling_bits = ~data & last;
+	m10_state *state = (m10_state *)space->machine->driver_data;
+	int raising_bits = data & ~state->last;
+	//int falling_bits = ~data & state->last;
 
 	// should a falling bit stop a sample?
 	// This port is written to about 20x per vblank
 #if DEBUG
-	if ((last & 0xE8) != (data & 0xE8))
+	if ((state->last & 0xe8) != (data & 0xe8))
 		popmessage("A100: %02x\n", data);
 #endif
-	last = data;
+	state->last = data;
+
 	// audio control!
 	/* MISSILE sound */
 	if (raising_bits & 0x01)
-		sample_start(samples, 0, 0, 0);
+		sample_start(state->samples, 0, 0, 0);
 
 	/* EXPLOSION sound */
 	if (raising_bits & 0x02)
-		sample_start(samples, 1, 1, 0);
+		sample_start(state->samples, 1, 1, 0);
 
 	/* Rapidly falling parachute */
 	if (raising_bits & 0x04)
-		sample_start(samples, 3, 8, 0);
+		sample_start(state->samples, 3, 8, 0);
 
 	/* Background sound ? */
 	if (data & 0x10)
-		sample_start(samples, 4, 9, 1);
+		sample_start(state->samples, 4, 9, 1);
 	else
-		sample_stop(samples, 4);
+		sample_stop(state->samples, 4);
 
 }
 
 static WRITE8_HANDLER( m15_a100_w )
 {
-	static int last = 0x00;
-	const device_config *samples = devtag_get_device(space->machine, "samples");
-	//int raising_bits = data & ~last;
-	int falling_bits = ~data & last;
+	m10_state *state = (m10_state *)space->machine->driver_data;
+	//int raising_bits = data & ~state->last;
+	int falling_bits = ~data & state->last;
 
 	// should a falling bit stop a sample?
 	// Bit 4 is used
@@ -425,60 +439,62 @@ static WRITE8_HANDLER( m15_a100_w )
 	// 0x40: dot
 
 #if DEBUG
-	if ((last & 0x82) != (data & 0x82))
+	if ((state->last & 0x82) != (data & 0x82))
 		popmessage("A100: %02x\n", data);
 #endif
 	/* DOT sound */
 	if (falling_bits & 0x40)
-		sample_start(samples, 0, 0, 0);
+		sample_start(state->samples, 0, 0, 0);
 #if 0
 	if (raising_bits & 0x40)
-		sample_stop(samples, 0);
+		sample_stop(state->samples, 0);
 #endif
 
 	/* EXPLOSION sound */
 	if (falling_bits & 0x08)
-		sample_start(samples, 1, 1, 0);
+		sample_start(state->samples, 1, 1, 0);
 #if 0
 	if (raising_bits & 0x08)
-		sample_stop(samples, 1);
+		sample_stop(state->samples, 1);
 #endif
 
 	/* player changes lane */
 	if (falling_bits & 0x10)
-		sample_start(samples, 3, 3, 0);
+		sample_start(state->samples, 3, 3, 0);
 #if 0
 	if (raising_bits & 0x10)
-		sample_stop(samples, 3);
+		sample_stop(state->samples, 3);
 #endif
 
 	/* computer car changes lane */
 	if (falling_bits & 0x20)
-		sample_start(samples, 4, 4, 0);
+		sample_start(state->samples, 4, 4, 0);
 #if 0
 	if (raising_bits & 0x20)
-		sample_stop(samples, 4);
+		sample_stop(state->samples, 4);
 #endif
 
-	last = data;
+	state->last = data;
 }
 
 static READ8_HANDLER( m10_a700_r )
 {
-   	//LOG(("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen)));
+ 	m10_state *state = (m10_state *)space->machine->driver_data;
+  	//LOG(("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen)));
 	LOG(("clear\n"));
-	ttl74123_clear_w(devtag_get_device(space->machine, "ic8j1"), 0, 0);
-	ttl74123_clear_w(devtag_get_device(space->machine, "ic8j1"), 0, 1);
+	ttl74123_clear_w(state->ic8j1, 0, 0);
+	ttl74123_clear_w(state->ic8j1, 0, 1);
 	return 0x00;
 }
 
 static READ8_HANDLER( m11_a700_r )
 {
+	m10_state *state = (m10_state *)space->machine->driver_data;
    	//LOG(("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen)));
 	//cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 	LOG(("clear\n"));
-	ttl74123_clear_w(devtag_get_device(space->machine, "ic8j1"), 0, 0);
-	ttl74123_clear_w(devtag_get_device(space->machine, "ic8j1"), 0, 1);
+	ttl74123_clear_w(state->ic8j1, 0, 0);
+	ttl74123_clear_w(state->ic8j1, 0, 1);
 	return 0x00;
 }
 
@@ -497,18 +513,18 @@ static INPUT_CHANGED( coin_inserted )
 
 static TIMER_CALLBACK( interrupt_callback )
 {
-    if (param==0)
-    {
-	    cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
-	    timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART+16, 0), NULL, 1,interrupt_callback);
-    }
-    if (param==1)
-    {
-	    cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
-    	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART+24, 0), NULL, 2,interrupt_callback);
-    }
-    if (param==-1)
-	    cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	if (param == 0)
+	{
+		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART + 16, 0), NULL, 1, interrupt_callback);
+	}
+	if (param == 1)
+	{
+		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART + 24, 0), NULL, 2, interrupt_callback);
+	}
+	if (param == -1)
+		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 
 }
 
@@ -516,7 +532,7 @@ static TIMER_CALLBACK( interrupt_callback )
 static INTERRUPT_GEN( m11_interrupt )
 {
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	//timer_set(device->machine, video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBEND, 0), NULL, -1,interrupt_callback);
+	//timer_set(device->machine, video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBEND, 0), NULL, -1, interrupt_callback);
 }
 
 static INTERRUPT_GEN( m10_interrupt )
@@ -528,7 +544,7 @@ static INTERRUPT_GEN( m10_interrupt )
 static INTERRUPT_GEN( m15_interrupt )
 {
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-   	timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, IREMM10_VBSTART+1, 80), NULL, -1,interrupt_callback);
+   	timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, IREMM10_VBSTART + 1, 80), NULL, -1, interrupt_callback);
 }
 
 /*************************************
@@ -540,8 +556,8 @@ static INTERRUPT_GEN( m15_interrupt )
 static ADDRESS_MAP_START( m10_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_READ(SMH_ROM) AM_BASE_MEMBER(m10_state, rom)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE(&colorram) /* foreground colour  */
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(m10_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE_MEMBER(m10_state, colorram) /* foreground colour  */
 	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(m10_chargen_w) AM_BASE_MEMBER(m10_state, chargen) /* background ????? */
 	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
 	AM_RANGE(0xa300, 0xa300) AM_READ_PORT("INPUTS")
@@ -554,8 +570,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( m11_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_READ(SMH_ROM) AM_BASE_MEMBER(m10_state, rom)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE(&colorram) /* foreground colour  */
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(m10_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE_MEMBER(m10_state, colorram) /* foreground colour  */
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(m10_state, chargen) /* background ????? */
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(m11_a100_w) /* sound writes ???? */
 	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
@@ -568,8 +584,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( m15_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x33ff) AM_READ(SMH_ROM) AM_BASE_MEMBER(m10_state, rom)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE(&colorram) /* foreground colour  */
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(m10_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE_MEMBER(m10_state, colorram) /* foreground colour  */
 	AM_RANGE(0x5000, 0x57ff) AM_RAM_WRITE(m15_chargen_w) AM_BASE_MEMBER(m10_state, chargen) /* background ????? */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P2")
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(m15_a100_w) /* sound writes ???? */
@@ -821,7 +837,8 @@ static MACHINE_DRIVER_START( m10 )
 	MDRV_CPU_ADD("maincpu", M6502,IREMM10_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(m10_main)
 
-	MDRV_MACHINE_RESET(irem)
+	MDRV_MACHINE_START(m10)
+	MDRV_MACHINE_RESET(m10)
 
 	//MDRV_CPU_VBLANK_INT("screen", m10_interrupt)
 
@@ -873,7 +890,8 @@ static MACHINE_DRIVER_START( m15 )
 	MDRV_CPU_ADD("maincpu", M6502,IREMM15_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(m15_main)
 
-	MDRV_MACHINE_RESET(irem)
+	MDRV_MACHINE_START(m10)
+	MDRV_MACHINE_RESET(m10)
 
 	MDRV_CPU_VBLANK_INT("screen", m15_interrupt)
 
@@ -1039,10 +1057,10 @@ ROM_START( greenber )
 	ROM_LOAD( "gb9", 0x3000, 0x0400, CRC(c27b9ba3) SHA1(a2f4f0c4b61eb03bba13ae5d25dc01009a4f86ee) ) // ok ?
 ROM_END
 
-GAME( 1979, andromed,  0,        m11,     skychut,  andromed, ROT270, "Irem", "Andromeda (Japan?)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
-GAME( 1979, ipminvad,  0,        m10,     ipminvad, 0,        ROT270, "Irem", "I P M Invader", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS )
-GAME( 1979, ipminvad1, ipminvad, m10,     ipminvad, ipminva1, ROT270, "Irem", "I P M Invader (Incomplete Dump)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1980, skychut,   0,        m11,     skychut,  0,        ROT270, "Irem", "Sky Chuter", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1979, spacbeam,  0,        m15,     spacbeam, 0,        ROT270, "Irem", "Space Beam", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1979, headoni,   0,        headoni, headoni,  0,        ROT270, "Irem", "Head On (Irem, M-15 Hardware)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1980, greenber,  0,        m15,     spacbeam, 0,        ROT270, "Irem", "Green Beret (Irem)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
+GAME( 1979, andromed,  0,        m11,     skychut,  andromed, ROT270, "Irem", "Andromeda (Japan?)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1979, ipminvad,  0,        m10,     ipminvad, 0,        ROT270, "Irem", "I P M Invader", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1979, ipminvad1, ipminvad, m10,     ipminvad, ipminva1, ROT270, "Irem", "I P M Invader (Incomplete Dump)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1980, skychut,   0,        m11,     skychut,  0,        ROT270, "Irem", "Sky Chuter", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1979, spacbeam,  0,        m15,     spacbeam, 0,        ROT270, "Irem", "Space Beam", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1979, headoni,   0,        headoni, headoni,  0,        ROT270, "Irem", "Head On (Irem, M-15 Hardware)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1980, greenber,  0,        m15,     spacbeam, 0,        ROT270, "Irem", "Green Beret (Irem)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

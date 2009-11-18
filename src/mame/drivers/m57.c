@@ -36,7 +36,7 @@
      Ribbon cable connector to M57-A-A PCB
 
     New Tropical Angel:
-     Roms where found on an official IREM board with genuine IREM Tropical Angel
+     Roms were found on an official IREM board with genuine IREM Tropical Angel
      license seal and genuine IREM serial number sticker.
      The "new" roms have hand written labels, while those that match the current
      Tropical Angel set look to be factory labeled chips.
@@ -50,7 +50,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "iremipt.h"
-#include "m57.h"
+#include "includes/iremz80.h"
 #include "audio/irem.h"
 
 
@@ -66,9 +66,9 @@
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(m57_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE(&m57_scroll)
-	AM_RANGE(0xc820, 0xc8ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(m57_videoram_w) AM_BASE_MEMBER(irem_z80_state, videoram)
+	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE_MEMBER(irem_z80_state, scrollram)
+	AM_RANGE(0xc820, 0xc8ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(irem_z80_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(irem_sound_cmd_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(m57_flipscreen_w)	/* + coin counters */
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0")
@@ -225,6 +225,9 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( m57 )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(irem_z80_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -327,5 +330,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, troangel, 0,        m57,      troangel, 0, ROT0, "Irem", "Tropical Angel", 0 )
-GAME( 1983, newtangl, troangel, m57,      troangel, 0, ROT0, "Irem", "New Tropical Angel", 0 )
+GAME( 1983, troangel, 0,        m57,   troangel, 0, ROT0, "Irem", "Tropical Angel", GAME_SUPPORTS_SAVE )
+GAME( 1983, newtangl, troangel, m57,   troangel, 0, ROT0, "Irem", "New Tropical Angel", GAME_SUPPORTS_SAVE )

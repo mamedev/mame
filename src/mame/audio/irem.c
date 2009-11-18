@@ -10,8 +10,7 @@
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "sound/discrete.h"
-
-static UINT8 port1, port2;
+#include "includes/iremz80.h"
 
 
 /*************************************
@@ -22,8 +21,15 @@ static UINT8 port1, port2;
 
 static SOUND_START( irem_audio )
 {
-	state_save_register_global(machine, port1);
-	state_save_register_global(machine, port2);
+	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
+
+	state->adpcm1 = devtag_get_device(machine, "msm1");
+	state->adpcm2 = devtag_get_device(machine, "msm2");
+	state->ay1 = devtag_get_device(machine, "ay1");
+	state->ay2 = devtag_get_device(machine, "ay2");
+
+	state_save_register_global(machine, state->port1);
+	state_save_register_global(machine, state->port2);
 }
 
 
@@ -53,37 +59,38 @@ WRITE8_HANDLER( irem_sound_cmd_w )
 
 static WRITE8_HANDLER( m6803_port1_w )
 {
-	port1 = data;
+	irem_z80_state *state = (irem_z80_state *)space->machine->driver_data;
+
+	state->port1 = data;
 }
 
 
 static WRITE8_HANDLER( m6803_port2_w )
 {
-	/* write latch */
-	if ((port2 & 0x01) && !(data & 0x01))
-	{
-		const device_config *ay1 = devtag_get_device(space->machine, "ay1");
-		const device_config *ay2 = devtag_get_device(space->machine, "ay2");
+	irem_z80_state *state = (irem_z80_state *)space->machine->driver_data;
 
+	/* write latch */
+	if ((state->port2 & 0x01) && !(data & 0x01))
+	{
 		/* control or data port? */
-		if (port2 & 0x04)
+		if (state->port2 & 0x04)
 		{
 			/* PSG 0 or 1? */
-			if (port2 & 0x08)
-				ay8910_address_w(ay1, 0, port1);
-			if (port2 & 0x10)
-				ay8910_address_w(ay2, 0, port1);
+			if (state->port2 & 0x08)
+				ay8910_address_w(state->ay1, 0, state->port1);
+			if (state->port2 & 0x10)
+				ay8910_address_w(state->ay2, 0, state->port1);
 		}
 		else
 		{
 			/* PSG 0 or 1? */
-			if (port2 & 0x08)
-				ay8910_data_w(ay1, 0, port1);
-			if (port2 & 0x10)
-				ay8910_data_w(ay2, 0, port1);
+			if (state->port2 & 0x08)
+				ay8910_data_w(state->ay1, 0, state->port1);
+			if (state->port2 & 0x10)
+				ay8910_data_w(state->ay2, 0, state->port1);
 		}
 	}
-	port2 = data;
+	state->port2 = data;
 }
 
 
@@ -96,11 +103,13 @@ static WRITE8_HANDLER( m6803_port2_w )
 
 static READ8_HANDLER( m6803_port1_r )
 {
+	irem_z80_state *state = (irem_z80_state *)space->machine->driver_data;
+
 	/* PSG 0 or 1? */
-	if (port2 & 0x08)
-		return ay8910_r(devtag_get_device(space->machine, "ay1"), 0);
-	if (port2 & 0x10)
-		return ay8910_r(devtag_get_device(space->machine, "ay2"), 0);
+	if (state->port2 & 0x08)
+		return ay8910_r(state->ay1, 0);
+	if (state->port2 & 0x10)
+		return ay8910_r(state->ay2, 0);
 	return 0xff;
 }
 
@@ -120,18 +129,17 @@ static READ8_HANDLER( m6803_port2_r )
 
 static WRITE8_DEVICE_HANDLER( ay8910_0_portb_w )
 {
-	const device_config *adpcm0 = devtag_get_device(device->machine, "msm1");
-	const device_config *adpcm1 = devtag_get_device(device->machine, "msm2");
+	irem_z80_state *state = (irem_z80_state *)device->machine->driver_data;
 
 	/* bits 2-4 select MSM5205 clock & 3b/4b playback mode */
-	msm5205_playmode_w(adpcm0, (data >> 2) & 7);
-	if (adpcm1 != NULL)
-		msm5205_playmode_w(adpcm1, ((data >> 2) & 4) | 3);	/* always in slave mode */
+	msm5205_playmode_w(state->adpcm1, (data >> 2) & 7);
+	if (state->adpcm2 != NULL)
+		msm5205_playmode_w(state->adpcm2, ((data >> 2) & 4) | 3);	/* always in slave mode */
 
 	/* bits 0 and 1 reset the two chips */
-	msm5205_reset_w(adpcm0, data & 1);
-	if (adpcm1 != NULL)
-		msm5205_reset_w(adpcm1, data & 2);
+	msm5205_reset_w(state->adpcm1, data & 1);
+	if (state->adpcm2 != NULL)
+		msm5205_reset_w(state->adpcm2, data & 2);
 }
 
 
@@ -158,23 +166,25 @@ static WRITE8_HANDLER( sound_irq_ack_w )
 
 static WRITE8_HANDLER( m52_adpcm_w )
 {
+	irem_z80_state *state = (irem_z80_state *)space->machine->driver_data;
+
 	if (offset & 1)
 	{
-		const device_config *adpcm = devtag_get_device(space->machine, "msm1");
-		msm5205_data_w(adpcm, data);
+		msm5205_data_w(state->adpcm1, data);
 	}
 	if (offset & 2)
 	{
-		const device_config *adpcm = devtag_get_device(space->machine, "msm2");
-		if (adpcm != NULL)
-			msm5205_data_w(adpcm, data);
+		if (state->adpcm2 != NULL)
+			msm5205_data_w(state->adpcm2, data);
 	}
 }
 
 
 static WRITE8_HANDLER( m62_adpcm_w )
 {
-	const device_config *adpcm = devtag_get_device(space->machine, (offset & 1) ? "msm2" : "msm1");
+	irem_z80_state *state = (irem_z80_state *)space->machine->driver_data;
+
+	const device_config *adpcm = (offset & 1) ? state->adpcm2 : state->adpcm1;
 	if (adpcm != NULL)
 		msm5205_data_w(adpcm, data);
 }
@@ -189,15 +199,15 @@ static WRITE8_HANDLER( m62_adpcm_w )
 
 static void adpcm_int(const device_config *device)
 {
-	const device_config *msm2 = devtag_get_device(device->machine, "msm2");
+	irem_z80_state *state = (irem_z80_state *)device->machine->driver_data;
 
 	cputag_set_input_line(device->machine, "iremsound", INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the first MSM5205 clocks the second */
-	if (msm2 != NULL)
+	if (state->adpcm2 != NULL)
 	{
-		msm5205_vclk_w(msm2, 1);
-		msm5205_vclk_w(msm2, 0);
+		msm5205_vclk_w(state->adpcm2, 1);
+		msm5205_vclk_w(state->adpcm2, 0);
 	}
 }
 

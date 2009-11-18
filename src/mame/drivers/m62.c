@@ -69,7 +69,7 @@ other supported games as well.
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "m62.h"
+#include "includes/iremz80.h"
 #include "iremipt.h"
 #include "audio/irem.h"
 
@@ -81,16 +81,16 @@ other supported games as well.
 /* Since the data written to 0x80 is always the level number, I just use */
 /* that to select the ROM. The only exception I make is a special case used in */
 /* service mode to test the ROMs. */
-static int ldrun2_bankswap;
 
 static READ8_HANDLER( ldrun2_bankswitch_r )
 {
-	if (ldrun2_bankswap)
+	irem_z80_state *state = (irem_z80_state *)space->machine->driver_data;
+	if (state->ldrun2_bankswap)
 	{
-		ldrun2_bankswap--;
+		state->ldrun2_bankswap--;
 
 		/* swap to bank #1 on second read */
-		if (ldrun2_bankswap == 0)
+		if (state->ldrun2_bankswap == 0)
 			memory_set_bank(space->machine, 1, 1);
 	}
 	return 0;
@@ -98,7 +98,7 @@ static READ8_HANDLER( ldrun2_bankswitch_r )
 
 static WRITE8_HANDLER( ldrun2_bankswitch_w )
 {
-	static int bankcontrol[2];
+	irem_z80_state *state = (irem_z80_state *)space->machine->driver_data;
 	static const int banks[30] =
 	{
 		0,0,0,0,0,1,0,1,0,0,
@@ -107,22 +107,24 @@ static WRITE8_HANDLER( ldrun2_bankswitch_w )
 	};
 
 
-	bankcontrol[offset] = data;
+	state->bankcontrol[offset] = data;
+
 	if (offset == 0)
 	{
 		if (data < 1 || data > 30)
 		{
-logerror("unknown bank select %02x\n",data);
+			logerror("unknown bank select %02x\n",data);
 			return;
 		}
-		memory_set_bank(space->machine, 1, banks[data-1]);
+		memory_set_bank(space->machine, 1, banks[data - 1]);
 	}
 	else
 	{
-		if (bankcontrol[0] == 0x01 && data == 0x0d)
+		if (state->bankcontrol[0] == 0x01 && data == 0x0d)
 		/* special case for service mode */
-			ldrun2_bankswap = 2;
-		else ldrun2_bankswap = 0;
+			state->ldrun2_bankswap = 2;
+		else 
+			state->ldrun2_bankswap = 0;
 	}
 }
 
@@ -160,8 +162,8 @@ static WRITE8_HANDLER( spelunkr_bankswitch_w )
 
 static WRITE8_HANDLER( spelunk2_bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, (data & 0xc0)>>6);
-	memory_set_bank(space->machine, 2, (data & 0x3c)>>2);
+	memory_set_bank(space->machine, 1, (data & 0xc0) >> 6);
+	memory_set_bank(space->machine, 2, (data & 0x3c) >> 2);
 }
 
 static WRITE8_HANDLER( youjyudn_bankswitch_w )
@@ -174,10 +176,10 @@ static ADDRESS_MAP_START( kungfum_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(m62_hscroll_low_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(m62_hscroll_high_w)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_MEMBER(irem_z80_state, spriteram) AM_SIZE(&spriteram_size)
 	/* Kung Fu Master is the only game in this driver to have separated (but */
 	/* contiguous) videoram and colorram. They are interleaved in all the others. */
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(kungfum_tileram_w) AM_BASE(&m62_tileram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(kungfum_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -193,9 +195,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( battroad_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(m62_textram_w) AM_BASE(&m62_textram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE(&m62_tileram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_MEMBER(irem_z80_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(m62_textram_w) AM_BASE_MEMBER(irem_z80_state, m62_textram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -214,16 +216,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ldrun_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE(&m62_tileram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_MEMBER(irem_z80_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ldrun2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE(&m62_tileram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_MEMBER(irem_z80_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -243,8 +245,8 @@ static ADDRESS_MAP_START( ldrun3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xc800) AM_READ(ldrun3_prot_5_r)
 	AM_RANGE(0xcc00, 0xcc00) AM_READ(ldrun3_prot_7_r)
 	AM_RANGE(0xcfff, 0xcfff) AM_READ(ldrun3_prot_7_r)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE(&m62_tileram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_MEMBER(irem_z80_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
 	AM_RANGE(0xd000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -262,9 +264,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ldrun4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_MEMBER(irem_z80_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(ldrun4_bankswitch_w)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE(&m62_tileram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -281,18 +283,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lotlot_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(m62_textram_w) AM_BASE(&m62_textram)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE(&m62_tileram)
+	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(m62_textram_w) AM_BASE_MEMBER(irem_z80_state, m62_textram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_MEMBER(irem_z80_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kidniki_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(m62_tileram_w) AM_BASE(&m62_tileram)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_textram_w) AM_BASE(&m62_textram)
+	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_MEMBER(irem_z80_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_textram_w) AM_BASE_MEMBER(irem_z80_state, m62_textram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -314,9 +316,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spelunkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE(&m62_tileram)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(m62_textram_w) AM_BASE(&m62_textram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_MEMBER(irem_z80_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(m62_textram_w) AM_BASE_MEMBER(irem_z80_state, m62_textram)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(m62_vscroll_low_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(m62_vscroll_high_w)
 	AM_RANGE(0xd002, 0xd002) AM_WRITE(m62_hscroll_low_w)
@@ -330,9 +332,9 @@ static ADDRESS_MAP_START( spelunk2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK(1)
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK(2)
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE(&m62_tileram)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(m62_textram_w) AM_BASE(&m62_textram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_MEMBER(irem_z80_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(m62_textram_w) AM_BASE_MEMBER(irem_z80_state, m62_textram)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(m62_vscroll_low_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(m62_hscroll_low_w)
 	AM_RANGE(0xd002, 0xd002) AM_WRITE(spelunk2_gfxport_w)
@@ -343,9 +345,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( youjyudn_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(m62_textram_w) AM_BASE(&m62_textram)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(m62_tileram_w) AM_BASE(&m62_tileram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_MEMBER(irem_z80_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(m62_textram_w) AM_BASE_MEMBER(irem_z80_state, m62_textram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -363,9 +365,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( horizon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xc800, 0xc83f) AM_RAM_WRITE(horizon_scrollram_w) AM_BASE(&horizon_scrollram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE(&m62_tileram)
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM AM_BASE_MEMBER(irem_z80_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc800, 0xc83f) AM_RAM_WRITE(horizon_scrollram_w) AM_BASE_MEMBER(irem_z80_state, scrollram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -928,15 +930,44 @@ static GFXDECODE_START( youjyudn )
 GFXDECODE_END
 
 
+static MACHINE_START( m62 )
+{
+	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
 
+	state_save_register_global(machine, state->ldrun2_bankswap);
+	state_save_register_global_array(machine, state->bankcontrol);
+}
+
+static MACHINE_RESET( m62 )
+{
+	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
+
+	state->flipscreen = 0;
+	state->m62_background_hscroll = 0;
+	state->m62_background_vscroll = 0;
+	state->kidniki_background_bank = 0;
+	state->kidniki_text_vscroll = 0;
+	state->ldrun3_topbottom_mask = 0;
+	state->spelunkr_palbank = 0;
+
+	state->ldrun2_bankswap = 0;
+	state->bankcontrol[0] = 0;
+	state->bankcontrol[1] = 0;
+}
 
 static MACHINE_DRIVER_START( ldrun )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(irem_z80_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 24000000/6)
 	MDRV_CPU_PROGRAM_MAP(ldrun_map)
 	MDRV_CPU_IO_MAP(kungfum_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_MACHINE_START(m62)
+	MDRV_MACHINE_RESET(m62)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1296,7 +1327,7 @@ ROM_START( kungfub )
 	ROM_LOAD( "tbp24s10-main-1b.bin", 0x0400, 0x0100, CRC(550563e1) SHA1(11edb45acba8b28a462c49956ebb1ba0a8b2ff26) )	/* character palette blue component */
 	ROM_LOAD( "tbp24s10-gfx-1p.bin",  0x0500, 0x0100, CRC(35e45021) SHA1(511b94507f41b377f38184ed9a85f34949b28d26) )	/* sprite palette blue component */
 	ROM_LOAD( "18s030-gfx-8t.bin",    0x0600, 0x0020, CRC(7a601c3d) SHA1(5c5cdf51b2c9fdb2b05402d9c260208ae73fe245) )	/* sprite height, one entry per 32 */
-																													/* sprites. Used at run time! */
+															/* sprites. Used at run time! */
 	ROM_LOAD( "tbp24s10-gfx-9k.bin",  0x0620, 0x0100, CRC(82c20d12) SHA1(268903f7d9be58a70d030b02bf31a2d6b5b6e249) )	/* video timing - same as battroad */
 	ROM_LOAD( "18s030-gfx-10a.bin",   0x0720, 0x0020, CRC(3858acd0) SHA1(49c96467c0e7146ed89f5107bcb7908bf4ce721a) )
 	ROM_LOAD( "18s030-gfx-5d.bin",    0x0740, 0x0020, CRC(51304fcd) SHA1(be4d659e526f6fa5318b4cd3b6612c5b73f24437) )
@@ -1402,7 +1433,7 @@ ROM_START( battroad )
 	ROM_LOAD( "br-b-1l",     0x0500, 0x0100, CRC(5271c7d8) SHA1(1254b61133ed8fd6e032df04482fb775c3f66981) )	/* sprite palette blue component */
 	ROM_LOAD( "br-c-1j",     0x0600, 0x0020, CRC(78eb5d77) SHA1(dd82f7843bea8c953f491faade6ced17e57ddf3c) )	/* character palette */
 	ROM_LOAD( "br-b-5p",     0x0620, 0x0020, CRC(ce746937) SHA1(387e73a9ca684ac2e30061fca281970ff20ef0a5) )	/* sprite height, one entry per 32 */
-	                                                        /* sprites. Used at run time! */
+															/* sprites. Used at run time! */
 	ROM_LOAD( "br-b-6f",     0x0640, 0x0100, CRC(82c20d12) SHA1(268903f7d9be58a70d030b02bf31a2d6b5b6e249) )	/* video timing - same as kungfum */
 ROM_END
 
@@ -1435,7 +1466,7 @@ ROM_START( ldrun )
 	ROM_LOAD( "lr-e-3n",      0x0400, 0x0100, CRC(5b716837) SHA1(e3ea250891fec43a97e92ac1c3a4fbb5ee2d4a4d) )	/* character palette blue component */
 	ROM_LOAD( "lr-b-1l",      0x0500, 0x0100, CRC(08d8cf9a) SHA1(a46213e0dc04e44b0544401eb341fd49eef331dd) )	/* sprite palette blue component */
 	ROM_LOAD( "lr-b-5p",      0x0600, 0x0020, CRC(e01f69e2) SHA1(0d00ef348025ea4a9c274a7e3dbb006217d8449d) )	/* sprite height, one entry per 32 */
-	                                                        /* sprites. Used at run time! */
+															/* sprites. Used at run time! */
 	ROM_LOAD( "lr-b-6f",      0x0620, 0x0100, CRC(34d88d3c) SHA1(727f4c5cfff33538886fa0a29fd119aa085d7008) )	/* video timing - common to the other games */
 ROM_END
 
@@ -1468,7 +1499,7 @@ ROM_START( ldruna )
 	ROM_LOAD( "lr-e-3n",      0x0400, 0x0100, CRC(5b716837) SHA1(e3ea250891fec43a97e92ac1c3a4fbb5ee2d4a4d) )	/* character palette blue component */
 	ROM_LOAD( "lr-b-1l",      0x0500, 0x0100, CRC(08d8cf9a) SHA1(a46213e0dc04e44b0544401eb341fd49eef331dd) )	/* sprite palette blue component */
 	ROM_LOAD( "lr-b-5p",      0x0600, 0x0020, CRC(e01f69e2) SHA1(0d00ef348025ea4a9c274a7e3dbb006217d8449d) )	/* sprite height, one entry per 32 */
-	                                                        /* sprites. Used at run time! */
+															/* sprites. Used at run time! */
 	ROM_LOAD( "lr-b-6f",      0x0620, 0x0100, CRC(34d88d3c) SHA1(727f4c5cfff33538886fa0a29fd119aa085d7008) )	/* video timing - common to the other games */
 ROM_END
 
@@ -1507,7 +1538,7 @@ ROM_START( ldrun2 )
 	ROM_LOAD( "lr2-h-3n",     0x0400, 0x0100, CRC(2b28aec5) SHA1(946633bd7203ba1481250f900f3232c18538613b) )	/* character palette blue component */
 	ROM_LOAD( "lr2-b-1l",     0x0500, 0x0100, CRC(c8fb708a) SHA1(ed38f36fa7918179c7176c762c0fcc86b5ddb218) )	/* sprite palette blue component */
 	ROM_LOAD( "lr2-b-5p",     0x0600, 0x0020, CRC(e01f69e2) SHA1(0d00ef348025ea4a9c274a7e3dbb006217d8449d) )	/* sprite height, one entry per 32 */
-	                                                        /* sprites. Used at run time! */
+															/* sprites. Used at run time! */
 	ROM_LOAD( "lr2-b-6f",     0x0620, 0x0100, CRC(34d88d3c) SHA1(727f4c5cfff33538886fa0a29fd119aa085d7008) )	/* video timing - common to the other games */
 ROM_END
 
@@ -1542,7 +1573,7 @@ ROM_START( ldrun3 )
 	ROM_LOAD( "lr3-n-2m",     0x0400, 0x0100, CRC(69ad8678) SHA1(96134aa530cb93a5e3b56fffa996aefa08a666a2) ) /* character palette blue component */
 	ROM_LOAD( "lr3-b-1l",     0x0500, 0x0100, CRC(5b11c41d) SHA1(186ca7bfa2894311fc573f3f5882da677e029f2a) ) /* sprite palette blue component */
 	ROM_LOAD( "lr3-b-5p",     0x0600, 0x0020, CRC(e01f69e2) SHA1(0d00ef348025ea4a9c274a7e3dbb006217d8449d) )	/* sprite height, one entry per 32 */
-	                                                        /* sprites. Used at run time! */
+															/* sprites. Used at run time! */
 	ROM_LOAD( "lr3-n-4f",     0x0620, 0x0100, CRC(df674be9) SHA1(4d8c5378234bc24fac62dc227d8cd72f1ab7a35c) )	/* unknown */
 	ROM_LOAD( "lr3-b-6f",     0x0720, 0x0100, CRC(34d88d3c) SHA1(727f4c5cfff33538886fa0a29fd119aa085d7008) )	/* video timing - common to the other games */
 ROM_END
@@ -1575,7 +1606,7 @@ ROM_START( ldrun3j )
 	ROM_LOAD( "lr3-n-2m",     0x0400, 0x0100, CRC(69ad8678) SHA1(96134aa530cb93a5e3b56fffa996aefa08a666a2) ) /* character palette blue component */
 	ROM_LOAD( "lr3-b-1l",     0x0500, 0x0100, CRC(5b11c41d) SHA1(186ca7bfa2894311fc573f3f5882da677e029f2a) ) /* sprite palette blue component */
 	ROM_LOAD( "lr3-b-5p",     0x0600, 0x0020, CRC(e01f69e2) SHA1(0d00ef348025ea4a9c274a7e3dbb006217d8449d) )	/* sprite height, one entry per 32 */
-	                                                        /* sprites. Used at run time! */
+															/* sprites. Used at run time! */
 	ROM_LOAD( "lr3-n-4f",     0x0620, 0x0100, CRC(df674be9) SHA1(4d8c5378234bc24fac62dc227d8cd72f1ab7a35c) )	/* unknown */
 	ROM_LOAD( "lr3-b-6f",     0x0720, 0x0100, CRC(34d88d3c) SHA1(727f4c5cfff33538886fa0a29fd119aa085d7008) )	/* video timing - common to the other games */
 ROM_END
@@ -1611,7 +1642,7 @@ ROM_START( ldrun4 )
 	ROM_LOAD( "lr4-v-1p",     0x0400, 0x0100, CRC(0df23ebe) SHA1(054736b762aa6698c1e6d827f8db62ae0342c83f) ) /* character palette blue component */
 	ROM_LOAD( "lr4-b-1l",     0x0500, 0x0100, CRC(0d89b692) SHA1(b2854290c46c34934ff91980d72768070ebc8bf3) ) /* sprite palette blue component */
 	ROM_LOAD( "lr4-b-5p",     0x0600, 0x0020, CRC(e01f69e2) SHA1(0d00ef348025ea4a9c274a7e3dbb006217d8449d) )	/* sprite height, one entry per 32 */
-	                                                        /* sprites. Used at run time! */
+															/* sprites. Used at run time! */
 	ROM_LOAD( "lr4-v-4h",     0x0620, 0x0100, CRC(df674be9) SHA1(4d8c5378234bc24fac62dc227d8cd72f1ab7a35c) )	/* unknown */
 	ROM_LOAD( "lr4-b-6f",     0x0720, 0x0100, CRC(34d88d3c) SHA1(727f4c5cfff33538886fa0a29fd119aa085d7008) )	/* video timing - common to the other games */
 ROM_END
@@ -1650,7 +1681,7 @@ ROM_START( lotlot )
 	ROM_LOAD( "lot-b-1l",     0x0700, 0x0100, CRC(8b6fcde3) SHA1(04e9ce04b77a5f8737f2ec0aaeadaccdbbdda573) ) /* sprite palette blue component */
 	ROM_LOAD( "lot-k-2j",     0x0800, 0x0100, CRC(e791ef2a) SHA1(cb1236630cbbc23e2e684ad3b7f51e52389eea2e) ) /* character palette blue component */
 	ROM_LOAD( "lot-b-5p",     0x0900, 0x0020, CRC(110b21fd) SHA1(a7a660ff18540e2d73a80f341cd50c5f4d184085) )	/* sprite height, one entry per 32 */
-	                                                        /* sprites. Used at run time! */
+															/* sprites. Used at run time! */
 	ROM_LOAD( "lot-k-7e",     0x0920, 0x0200, CRC(6cef0fbd) SHA1(0c5c63a203e7bd852a3574c18f212487caf529ca) )	/* unknown */
 	ROM_LOAD( "lot-k-7h",     0x0b20, 0x0200, CRC(04442bee) SHA1(37d10b605830b9355b00256af479c06cd4b97950) )	/* unknown */
 	ROM_LOAD( "lot-b-6f",     0x0d20, 0x0100, CRC(34d88d3c) SHA1(727f4c5cfff33538886fa0a29fd119aa085d7008) )	/* video timing - common to the other games */
@@ -1701,7 +1732,7 @@ ROM_START( kidniki )
 	ROM_LOAD( "dr27.3j",      0x0400, 0x0100, CRC(70d668ef) SHA1(2cc647f2708932105bb9a5130aacc5a8a160e418) )	/* character palette blue component */
 	ROM_LOAD( "dr29.1l",      0x0500, 0x0100, CRC(1173a754) SHA1(dbb7d02b72ae1842e0d17aee324a5b85ff2a2178) )	/* sprite palette blue component */
 	ROM_LOAD( "dr32.5p",      0x0600, 0x0020, CRC(11cd1f2e) SHA1(45ceb84ff373127ff370610c1ce8d83fc6045bcb) )	/* sprite height, one entry per 32 */
-	                                                        /* sprites. Used at run time! */
+															/* sprites. Used at run time! */
 	ROM_LOAD( "dr28.8f",      0x0620, 0x0200, CRC(6cef0fbd) SHA1(0c5c63a203e7bd852a3574c18f212487caf529ca) )	/* unknown */
 	ROM_LOAD( "dr33.6f",      0x0820, 0x0100, CRC(34d88d3c) SHA1(727f4c5cfff33538886fa0a29fd119aa085d7008) )	/* video timing - common to the other games */
 ROM_END
@@ -1751,7 +1782,7 @@ ROM_START( kidnikiu )
 	ROM_LOAD( "dr27.3j",      0x0400, 0x0100, CRC(70d668ef) SHA1(2cc647f2708932105bb9a5130aacc5a8a160e418) )	/* character palette blue component */
 	ROM_LOAD( "dr29.1l",      0x0500, 0x0100, CRC(1173a754) SHA1(dbb7d02b72ae1842e0d17aee324a5b85ff2a2178) )	/* sprite palette blue component */
 	ROM_LOAD( "dr32.5p",      0x0600, 0x0020, CRC(11cd1f2e) SHA1(45ceb84ff373127ff370610c1ce8d83fc6045bcb) )	/* sprite height, one entry per 32 */
-	                                                        /* sprites. Used at run time! */
+															/* sprites. Used at run time! */
 	ROM_LOAD( "dr28.8f",      0x0620, 0x0200, CRC(6cef0fbd) SHA1(0c5c63a203e7bd852a3574c18f212487caf529ca) )	/* unknown */
 	ROM_LOAD( "dr33.6f",      0x0820, 0x0100, CRC(34d88d3c) SHA1(727f4c5cfff33538886fa0a29fd119aa085d7008) )	/* video timing - common to the other games */
 ROM_END
@@ -1802,7 +1833,7 @@ ROM_START( yanchamr )
 	ROM_LOAD( "dr27.3j",      0x0400, 0x0100, CRC(70d668ef) SHA1(2cc647f2708932105bb9a5130aacc5a8a160e418) )	/* character palette blue component */
 	ROM_LOAD( "dr29.1l",      0x0500, 0x0100, CRC(1173a754) SHA1(dbb7d02b72ae1842e0d17aee324a5b85ff2a2178) )	/* sprite palette blue component */
 	ROM_LOAD( "dr32.5p",      0x0600, 0x0020, CRC(11cd1f2e) SHA1(45ceb84ff373127ff370610c1ce8d83fc6045bcb) )	/* sprite height, one entry per 32 */
-	                                                        /* sprites. Used at run time! */
+															/* sprites. Used at run time! */
 	ROM_LOAD( "dr28.8f",      0x0620, 0x0200, CRC(6cef0fbd) SHA1(0c5c63a203e7bd852a3574c18f212487caf529ca) )	/* unknown */
 	ROM_LOAD( "dr33.6f",      0x0820, 0x0100, CRC(34d88d3c) SHA1(727f4c5cfff33538886fa0a29fd119aa085d7008) )	/* video timing - common to the other games */
 ROM_END
@@ -1845,7 +1876,7 @@ ROM_START( lithero )
 	ROM_LOAD( "dr27.3j",      0x0400, 0x0100, CRC(70d668ef) SHA1(2cc647f2708932105bb9a5130aacc5a8a160e418) )	/* character palette blue component */
 	ROM_LOAD( "dr29.1l",      0x0500, 0x0100, CRC(1173a754) SHA1(dbb7d02b72ae1842e0d17aee324a5b85ff2a2178) )	/* sprite palette blue component */
 	ROM_LOAD( "dr32.5p",      0x0600, 0x0020, CRC(11cd1f2e) SHA1(45ceb84ff373127ff370610c1ce8d83fc6045bcb) )	/* sprite height, one entry per 32 */
-	                                                        /* sprites. Used at run time! */
+															/* sprites. Used at run time! */
 	ROM_LOAD( "dr28.8f",      0x0620, 0x0200, CRC(6cef0fbd) SHA1(0c5c63a203e7bd852a3574c18f212487caf529ca) )	/* unknown */
 	ROM_LOAD( "dr33.6f",      0x0820, 0x0100, CRC(34d88d3c) SHA1(727f4c5cfff33538886fa0a29fd119aa085d7008) )	/* video timing - common to the other games */
 ROM_END
@@ -2180,25 +2211,25 @@ static DRIVER_INIT( youjyudn )
 	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
-GAME( 1984, kungfum,  0,        kungfum,  kungfum,  0,        ROT0,   "Irem", "Kung-Fu Master", 0 )
-GAME( 1984, kungfumd, kungfum,  kungfum,  kungfum,  0,        ROT0,   "Irem (Data East license)", "Kung-Fu Master (Data East)", 0 )
-GAME( 1984, spartanx, kungfum,  kungfum,  kungfum,  0,        ROT0,   "Irem", "Spartan X (Japan)", 0 )
-GAME( 1984, kungfub,  kungfum,  kungfum,  kungfum,  0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 1)", 0 )
-GAME( 1984, kungfub2, kungfum,  kungfum,  kungfum,  0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 2)", 0 )
-GAME( 1984, battroad, 0,        battroad, battroad, battroad, ROT90,  "Irem", "The Battle-Road", GAME_IMPERFECT_COLORS )
-GAME( 1984, ldrun,    0,        ldrun,    ldrun,    0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 1)", 0 )
-GAME( 1984, ldruna,   ldrun,    ldrun,    ldrun,    0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 2)", 0 )
-GAME( 1984, ldrun2,   0,        ldrun2,   ldrun2,   ldrun2,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner II - The Bungeling Strikes Back" , 0)	/* Japanese version is called Bangeringu Teikoku No Gyakushuu */
-GAME( 1985, ldrun3,   0,        ldrun3,   ldrun3,   0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - The Golden Labyrinth", 0 )
-GAME( 1985, ldrun3j,  ldrun3,   ldrun3,   ldrun3,   0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - Majin No Fukkatsu", 0 )
-GAME( 1986, ldrun4,   0,        ldrun4,   ldrun4,   ldrun4,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner IV - Teikoku Karano Dasshutsu", 0 )
-GAME( 1985, lotlot,   0,        lotlot,   lotlot,   0,        ROT0,   "Irem (licensed from Tokuma Shoten)", "Lot Lot", 0 )
-GAME( 1986, kidniki,  0,        kidniki,  kidniki,  kidniki,  ROT0,   "Irem", "Kid Niki - Radical Ninja (World)", GAME_IMPERFECT_SOUND )
-GAME( 1986, kidnikiu, kidniki,  kidniki,  kidniki,  kidniki,  ROT0,   "Irem (Data East USA license)", "Kid Niki - Radical Ninja (US)", GAME_IMPERFECT_SOUND )
-GAME( 1986, yanchamr, kidniki,  kidniki,  kidniki,  kidniki,  ROT0,   "Irem", "Kaiketsu Yanchamaru (Japan)", GAME_IMPERFECT_SOUND )
-GAME( 1987, lithero,  kidniki,  kidniki,  kidniki,  kidniki,  ROT0,   "bootleg", "Little Hero", GAME_IMPERFECT_SOUND )
-GAME( 1985, spelunkr, 0,        spelunkr, spelunkr, spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker", 0 )
-GAME( 1985, spelunkrj,spelunkr, spelunkr, spelunkr, spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker (Japan)", 0 )
-GAME( 1986, spelunk2, 0,        spelunk2, spelunk2, spelunk2, ROT0,   "Irem (licensed from Broderbund)", "Spelunker II", GAME_IMPERFECT_SOUND )
-GAME( 1986, youjyudn, 0,        youjyudn, youjyudn, youjyudn, ROT270, "Irem", "Youjyuden (Japan)", 0 )
-GAME( 1985, horizon,  0,        horizon,  horizon,  0,        ROT0,   "Irem", "Horizon", GAME_IMPERFECT_SOUND )
+GAME( 1984, kungfum,  0,        kungfum,  kungfum,  0,        ROT0,   "Irem", "Kung-Fu Master", GAME_SUPPORTS_SAVE )
+GAME( 1984, kungfumd, kungfum,  kungfum,  kungfum,  0,        ROT0,   "Irem (Data East license)", "Kung-Fu Master (Data East)", GAME_SUPPORTS_SAVE )
+GAME( 1984, spartanx, kungfum,  kungfum,  kungfum,  0,        ROT0,   "Irem", "Spartan X (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1984, kungfub,  kungfum,  kungfum,  kungfum,  0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, kungfub2, kungfum,  kungfum,  kungfum,  0,        ROT0,   "bootleg", "Kung-Fu Master (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, battroad, 0,        battroad, battroad, battroad, ROT90,  "Irem", "The Battle-Road", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1984, ldrun,    0,        ldrun,    ldrun,    0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, ldruna,   ldrun,    ldrun,    ldrun,    0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, ldrun2,   0,        ldrun2,   ldrun2,   ldrun2,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner II - The Bungeling Strikes Back", GAME_SUPPORTS_SAVE )	/* Japanese version is called Bangeringu Teikoku No Gyakushuu */
+GAME( 1985, ldrun3,   0,        ldrun3,   ldrun3,   0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - The Golden Labyrinth", GAME_SUPPORTS_SAVE )
+GAME( 1985, ldrun3j,  ldrun3,   ldrun3,   ldrun3,   0,        ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - Majin No Fukkatsu", GAME_SUPPORTS_SAVE )
+GAME( 1986, ldrun4,   0,        ldrun4,   ldrun4,   ldrun4,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner IV - Teikoku Karano Dasshutsu", GAME_SUPPORTS_SAVE )
+GAME( 1985, lotlot,   0,        lotlot,   lotlot,   0,        ROT0,   "Irem (licensed from Tokuma Shoten)", "Lot Lot", GAME_SUPPORTS_SAVE )
+GAME( 1986, kidniki,  0,        kidniki,  kidniki,  kidniki,  ROT0,   "Irem", "Kid Niki - Radical Ninja (World)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1986, kidnikiu, kidniki,  kidniki,  kidniki,  kidniki,  ROT0,   "Irem (Data East USA license)", "Kid Niki - Radical Ninja (US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1986, yanchamr, kidniki,  kidniki,  kidniki,  kidniki,  ROT0,   "Irem", "Kaiketsu Yanchamaru (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1987, lithero,  kidniki,  kidniki,  kidniki,  kidniki,  ROT0,   "bootleg", "Little Hero", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1985, spelunkr, 0,        spelunkr, spelunkr, spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker", GAME_SUPPORTS_SAVE )
+GAME( 1985, spelunkrj,spelunkr, spelunkr, spelunkr, spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, spelunk2, 0,        spelunk2, spelunk2, spelunk2, ROT0,   "Irem (licensed from Broderbund)", "Spelunker II", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1986, youjyudn, 0,        youjyudn, youjyudn, youjyudn, ROT270, "Irem", "Youjyuden (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1985, horizon,  0,        horizon,  horizon,  0,        ROT0,   "Irem", "Horizon", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

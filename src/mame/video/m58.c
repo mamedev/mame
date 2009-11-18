@@ -5,16 +5,8 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "m58.h"
+#include "includes/iremz80.h"
 #include "video/resnet.h"
-
-UINT8 *yard_scroll_x_low;
-UINT8 *yard_scroll_x_high;
-UINT8 *yard_scroll_y_low;
-UINT8 *yard_score_panel_disabled;
-static bitmap_t *scroll_panel_bitmap;
-
-static tilemap *bg_tilemap;
 
 #define SCROLL_PANEL_WIDTH  (14*4)
 #define RADAR_PALETTE_BASE	(256)
@@ -113,19 +105,24 @@ PALETTE_INIT( yard )
 
 WRITE8_HANDLER( yard_videoram_w )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
+	irem_z80_state *state = (irem_z80_state *)space->machine->driver_data;
+
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 
 WRITE8_HANDLER( yard_scroll_panel_w )
 {
+	irem_z80_state *state = (irem_z80_state *)space->machine->driver_data;
+
 	int sx,sy,i;
 
 	sx = ( offset % 16 );
 	sy = ( offset / 16 );
 
-	if (sx < 1 || sx > 14)  return;
+	if (sx < 1 || sx > 14)  
+		return;
 
 	sx = 4 * (sx - 1);
 
@@ -136,7 +133,7 @@ WRITE8_HANDLER( yard_scroll_panel_w )
 		col = (data >> i) & 0x11;
 		col = ((col >> 3) | col) & 3;
 
-		*BITMAP_ADDR16(scroll_panel_bitmap, sy, sx + i) = RADAR_PALETTE_BASE + (sy & 0xfc) + col;
+		*BITMAP_ADDR16(state->scroll_panel_bitmap, sy, sx + i) = RADAR_PALETTE_BASE + (sy & 0xfc) + col;
 	}
 }
 
@@ -150,9 +147,11 @@ WRITE8_HANDLER( yard_scroll_panel_w )
 
 static TILE_GET_INFO( yard_get_bg_tile_info )
 {
+	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
+
 	int offs = tile_index * 2;
-	int attr = videoram[offs + 1];
-	int code = videoram[offs] + ((attr & 0xc0) << 2);
+	int attr = state->videoram[offs + 1];
+	int code = state->videoram[offs] + ((attr & 0xc0) << 2);
 	int color = attr & 0x1f;
 	int flags = (attr & 0x20) ? TILE_FLIPX : 0;
 
@@ -164,9 +163,9 @@ static UINT32 yard_tilemap_scan_rows( UINT32 col, UINT32 row, UINT32 num_cols, U
 {
 	/* logical (col,row) -> memory offset */
 	if (col >= 32)
-		return (row+32)*32 + col-32;
+		return (row + 32) * 32 + col - 32;
 	else
-		return row*32 + col;
+		return row * 32 + col;
 }
 
 
@@ -179,16 +178,18 @@ static UINT32 yard_tilemap_scan_rows( UINT32 col, UINT32 row, UINT32 num_cols, U
 
 VIDEO_START( yard )
 {
+	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
+
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
 	bitmap_format format = video_screen_get_format(machine->primary_screen);
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	bg_tilemap = tilemap_create(machine, yard_get_bg_tile_info, yard_tilemap_scan_rows,  8, 8, 64, 32);
-	tilemap_set_scrolldx(bg_tilemap, visarea->min_x, width - (visarea->max_x + 1));
-	tilemap_set_scrolldy(bg_tilemap, visarea->min_y - 8, height + 16 - (visarea->max_y + 1));
+	state->bg_tilemap = tilemap_create(machine, yard_get_bg_tile_info, yard_tilemap_scan_rows,  8, 8, 64, 32);
+	tilemap_set_scrolldx(state->bg_tilemap, visarea->min_x, width - (visarea->max_x + 1));
+	tilemap_set_scrolldy(state->bg_tilemap, visarea->min_y - 8, height + 16 - (visarea->max_y + 1));
 
-	scroll_panel_bitmap = auto_bitmap_alloc(machine, SCROLL_PANEL_WIDTH, height, format);
+	state->scroll_panel_bitmap = auto_bitmap_alloc(machine, SCROLL_PANEL_WIDTH, height, format);
 }
 
 
@@ -220,20 +221,21 @@ WRITE8_HANDLER( yard_flipscreen_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
 	int offs;
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
 	{
-		int attr = spriteram[offs + 1];
+		int attr = state->spriteram[offs + 1];
 		int bank = (attr & 0x20) >> 5;
-		int code1 = spriteram[offs + 2] & 0xbf;
+		int code1 = state->spriteram[offs + 2] & 0xbf;
 		int code2 = 0;
 		int color = attr & 0x1f;
 		int flipx = attr & 0x40;
 		int flipy = attr & 0x80;
-		int sx = spriteram[offs + 3];
-		int sy1 = 233 - spriteram[offs];
+		int sx = state->spriteram[offs + 3];
+		int sy1 = 233 - state->spriteram[offs];
 		int sy2 = 0;
 
 		if (flipy)
@@ -274,7 +276,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static void draw_panel( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	if (! *yard_score_panel_disabled)
+	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
+
+	if (!*state->yard_score_panel_disabled)
 	{
 		static const rectangle clippanel =
 		{
@@ -295,7 +299,7 @@ static void draw_panel( running_machine *machine, bitmap_t *bitmap, const rectan
 		clip.max_y += visarea->max_y + yoffs;
 		sect_rect(&clip, cliprect);
 
-		copybitmap(bitmap, scroll_panel_bitmap, flip_screen_get(machine), flip_screen_get(machine),
+		copybitmap(bitmap, state->scroll_panel_bitmap, flip_screen_get(machine), flip_screen_get(machine),
 				   sx, visarea->min_y + yoffs, &clip);
 	}
 }
@@ -310,10 +314,12 @@ static void draw_panel( running_machine *machine, bitmap_t *bitmap, const rectan
 
 VIDEO_UPDATE( yard )
 {
-	tilemap_set_scrollx(bg_tilemap, 0, (*yard_scroll_x_high * 0x100) + *yard_scroll_x_low);
-	tilemap_set_scrolly(bg_tilemap, 0, *yard_scroll_y_low);
+	irem_z80_state *state = (irem_z80_state *)screen->machine->driver_data;
 
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_set_scrollx(state->bg_tilemap, 0, (*state->yard_scroll_x_high * 0x100) + *state->yard_scroll_x_low);
+	tilemap_set_scrolly(state->bg_tilemap, 0, *state->yard_scroll_y_low);
+
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	draw_panel(screen->machine, bitmap, cliprect);
 	return 0;

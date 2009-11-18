@@ -31,19 +31,30 @@ typedef struct _m10_state m10_state;
 struct _m10_state
 {
 	/* memory pointers */
-	UINT8 *			chargen;
-	UINT8 *			memory;
-	UINT8 *			rom;
+	UINT8 *             chargen;
+	UINT8 *             memory;
+	UINT8 *             rom;
+	UINT8 *             videoram;
+	UINT8 *             colorram;
 
-	/* machine states */
+	/* video-related */
+	tilemap *           tx_tilemap;
+	gfx_element *       back_gfx;
 
-	/* sound state */
+	/* this is currently unused, because it is needed by gfx_layout (which has no machine) */
+	UINT32              extyoffs[32 * 8];
 
 	/* video state */
-	UINT8			bottomline;
-	UINT8 			flip;
+	UINT8	              bottomline;
+	UINT8               flip;
 
-	/* Specific states */
+	/* misc */
+	int                 last;
+
+	/* devices */
+	const device_config *ic8j1;
+	const device_config *ic8j2;
+	const device_config *samples;
 };
 
 
@@ -59,4 +70,3 @@ VIDEO_UPDATE( m15 );
 
 VIDEO_START( m10 );
 VIDEO_START( m15 );
-
