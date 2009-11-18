@@ -16,36 +16,36 @@
 
 #define MASTER_CLOCK	XTAL_20_16MHz
 
-static unsigned shift_data;
-static unsigned shift_bits;
-static int inte;
 
 static WRITE8_HANDLER( n8080_shift_bits_w )
 {
-	shift_bits = data & 7;
+	n8080_state *state = (n8080_state *)space->machine->driver_data;
+	state->shift_bits = data & 7;
 }
 static WRITE8_HANDLER( n8080_shift_data_w )
 {
-	shift_data = (shift_data >> 8) | (data << 8);
+	n8080_state *state = (n8080_state *)space->machine->driver_data;
+	state->shift_data = (state->shift_data >> 8) | (data << 8);
 }
 
 
 static READ8_HANDLER( n8080_shift_r )
 {
-	return shift_data >> (8 - shift_bits);
+	n8080_state *state = (n8080_state *)space->machine->driver_data;
+	return state->shift_data >> (8 - state->shift_bits);
 }
 
 static ADDRESS_MAP_START( main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(n8080_state, videoram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( helifire_main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(&videoram)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&colorram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(n8080_state, videoram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(n8080_state, colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
@@ -63,130 +63,8 @@ static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_WRITE(n8080_video_control_w)
 ADDRESS_MAP_END
 
-/* Interrupts */
 
-static TIMER_DEVICE_CALLBACK( rst1_tick )
-{
-	int state = inte ? ASSERT_LINE : CLEAR_LINE;
-
-	/* V7 = 1, V6 = 0 */
-	cputag_set_input_line_and_vector(timer->machine, "maincpu", INPUT_LINE_IRQ0, state, 0xcf);
-}
-
-static TIMER_DEVICE_CALLBACK( rst2_tick )
-{
-	int state = inte ? ASSERT_LINE : CLEAR_LINE;
-
-	/* vblank */
-	cputag_set_input_line_and_vector(timer->machine, "maincpu", INPUT_LINE_IRQ0, state, 0xd7);
-}
-
-static WRITE_LINE_DEVICE_HANDLER( n8080_inte_callback )
-{
-	inte = state;
-}
-
-static WRITE8_DEVICE_HANDLER( n8080_status_callback )
-{
-	if (data & I8085_STATUS_INTA)
-	{
-		/* interrupt acknowledge */
-		cpu_set_input_line(device, INPUT_LINE_IRQ0, CLEAR_LINE);
-	}
-}
-
-static I8085_CONFIG( n8080_cpu_config )
-{
-	DEVCB_HANDLER(n8080_status_callback),	/* STATUS changed callback */
-	DEVCB_LINE(n8080_inte_callback),		/* INTE changed callback */
-	DEVCB_NULL,								/* SID changed callback (8085A only) */
-	DEVCB_NULL								/* SOD changed callback (8085A only) */
-};
-
-static MACHINE_DRIVER_START( spacefev )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK / 10)
-	MDRV_CPU_CONFIG(n8080_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(main_cpu_map)
-	MDRV_CPU_IO_MAP(main_io_map)
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 16, 239)
-
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(n8080)
-	MDRV_VIDEO_START(spacefev)
-	MDRV_VIDEO_UPDATE(spacefev)
-
-	MDRV_TIMER_ADD_SCANLINE("rst1", rst1_tick, "screen", 128, 256)
-	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)
-
-	/* sound hardware */
-	MDRV_IMPORT_FROM( spacefev_sound )
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( sheriff )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK / 10)
-	MDRV_CPU_CONFIG(n8080_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(main_cpu_map)
-	MDRV_CPU_IO_MAP(main_io_map)
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 16, 239)
-
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(n8080)
-	MDRV_VIDEO_START(sheriff)
-	MDRV_VIDEO_UPDATE(sheriff)
-
-	MDRV_TIMER_ADD_SCANLINE("rst1", rst1_tick, "screen", 128, 256)
-	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)
-
-	/* sound hardware */
-	MDRV_IMPORT_FROM( sheriff_sound )
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( helifire )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK / 10)
-	MDRV_CPU_CONFIG(n8080_cpu_config)
-	MDRV_CPU_PROGRAM_MAP(helifire_main_cpu_map)
-	MDRV_CPU_IO_MAP(main_io_map)
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 16, 239)
-
-	MDRV_PALETTE_LENGTH(8 + 0x400)
-	MDRV_PALETTE_INIT(helifire)
-	MDRV_VIDEO_START(helifire)
-	MDRV_VIDEO_UPDATE(helifire)
-	MDRV_VIDEO_EOF(helifire)
-
-	MDRV_TIMER_ADD_SCANLINE("rst1", rst1_tick, "screen", 128, 256)
-	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)
-
-	/* sound hardware */
-	MDRV_IMPORT_FROM( helifire_sound )
-MACHINE_DRIVER_END
-
+/* Input ports */
 
 static INPUT_PORTS_START( spacefev )
 	PORT_START("IN0")
@@ -487,8 +365,7 @@ static INPUT_PORTS_START( helifire )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
 
 	/* potentiometers */
-
-	PORT_START("POT0")	/* 04 */
+	PORT_START("POT0")
 	PORT_DIPNAME( 0xff, 0x50, "VR1 sun brightness" )
 	PORT_DIPSETTING(    0x00, "00" )
 	PORT_DIPSETTING(    0x10, "10" )
@@ -499,7 +376,7 @@ static INPUT_PORTS_START( helifire )
 	PORT_DIPSETTING(    0x60, "60" )
 	PORT_DIPSETTING(    0x70, "70" )
 
-	PORT_START("POT1")	/* 05 */
+	PORT_START("POT1")
 	PORT_DIPNAME( 0xff, 0x00, "VR2 sea brightness" )
 	PORT_DIPSETTING(    0x00, "00" )
 	PORT_DIPSETTING(    0x10, "10" )
@@ -509,8 +386,225 @@ static INPUT_PORTS_START( helifire )
 	PORT_DIPSETTING(    0x50, "50" )
 	PORT_DIPSETTING(    0x60, "60" )
 	PORT_DIPSETTING(    0x70, "70" )
-
 INPUT_PORTS_END
+
+
+/* Interrupts */
+
+static TIMER_DEVICE_CALLBACK( rst1_tick )
+{
+	n8080_state *n8080 = (n8080_state *)timer->machine->driver_data;
+	int state = n8080->inte ? ASSERT_LINE : CLEAR_LINE;
+
+	/* V7 = 1, V6 = 0 */
+	cputag_set_input_line_and_vector(timer->machine, "maincpu", INPUT_LINE_IRQ0, state, 0xcf);
+}
+
+static TIMER_DEVICE_CALLBACK( rst2_tick )
+{
+	n8080_state *n8080 = (n8080_state *)timer->machine->driver_data;
+	int state = n8080->inte ? ASSERT_LINE : CLEAR_LINE;
+
+	/* vblank */
+	cputag_set_input_line_and_vector(timer->machine, "maincpu", INPUT_LINE_IRQ0, state, 0xd7);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( n8080_inte_callback )
+{
+	n8080_state *n8080 = (n8080_state *)device->machine->driver_data;
+	n8080->inte = state;
+}
+
+static WRITE8_DEVICE_HANDLER( n8080_status_callback )
+{
+	if (data & I8085_STATUS_INTA)
+	{
+		/* interrupt acknowledge */
+		cpu_set_input_line(device, INPUT_LINE_IRQ0, CLEAR_LINE);
+	}
+}
+
+static I8085_CONFIG( n8080_cpu_config )
+{
+	DEVCB_HANDLER(n8080_status_callback),	/* STATUS changed callback */
+	DEVCB_LINE(n8080_inte_callback),		/* INTE changed callback */
+	DEVCB_NULL,								/* SID changed callback (8085A only) */
+	DEVCB_NULL								/* SOD changed callback (8085A only) */
+};
+
+static MACHINE_START( n8080 )
+{
+	n8080_state *state = (n8080_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->shift_data);
+	state_save_register_global(machine, state->shift_bits);
+	state_save_register_global(machine, state->inte);
+}
+
+static MACHINE_START( spacefev )
+{
+	MACHINE_START_CALL(n8080);
+	MACHINE_START_CALL(spacefev_sound);
+}
+
+static MACHINE_START( sheriff )
+{
+	MACHINE_START_CALL(n8080);
+	MACHINE_START_CALL(sheriff_sound);
+}
+
+static MACHINE_START( helifire )
+{
+	MACHINE_START_CALL(n8080);
+	MACHINE_START_CALL(helifire_sound);
+}
+
+
+static MACHINE_RESET( n8080 )
+{
+	n8080_state *state = (n8080_state *)machine->driver_data;
+
+	state->shift_data = 0;
+	state->shift_bits = 0;
+	state->inte = 0;
+}
+
+static MACHINE_RESET( spacefev )
+{
+	n8080_state *state = (n8080_state *)machine->driver_data;
+
+	MACHINE_RESET_CALL(n8080);
+	MACHINE_RESET_CALL(spacefev_sound);
+
+	state->spacefev_red_screen = 0;
+	state->spacefev_red_cannon = 0;
+}
+
+static MACHINE_RESET( sheriff )
+{
+	n8080_state *state = (n8080_state *)machine->driver_data;
+
+	MACHINE_RESET_CALL(n8080);
+	MACHINE_RESET_CALL(sheriff_sound);
+
+	state->sheriff_color_mode = 0;
+	state->sheriff_color_data = 0;
+}
+
+static MACHINE_RESET( helifire )
+{
+	n8080_state *state = (n8080_state *)machine->driver_data;
+
+	MACHINE_RESET_CALL(n8080);
+	MACHINE_RESET_CALL(helifire_sound);
+
+	state->helifire_mv = 0;
+	state->helifire_sc = 0;
+	state->helifire_flash = 0;
+}
+
+
+static MACHINE_DRIVER_START( spacefev )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(n8080_state)
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK / 10)
+	MDRV_CPU_CONFIG(n8080_cpu_config)
+	MDRV_CPU_PROGRAM_MAP(main_cpu_map)
+	MDRV_CPU_IO_MAP(main_io_map)
+
+	MDRV_MACHINE_START(spacefev)
+	MDRV_MACHINE_RESET(spacefev)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(256, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 255, 16, 239)
+
+	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_INIT(n8080)
+	MDRV_VIDEO_START(spacefev)
+	MDRV_VIDEO_UPDATE(spacefev)
+
+	MDRV_TIMER_ADD_SCANLINE("rst1", rst1_tick, "screen", 128, 256)
+	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)
+
+	/* sound hardware */
+	MDRV_IMPORT_FROM( spacefev_sound )
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( sheriff )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(n8080_state)
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK / 10)
+	MDRV_CPU_CONFIG(n8080_cpu_config)
+	MDRV_CPU_PROGRAM_MAP(main_cpu_map)
+	MDRV_CPU_IO_MAP(main_io_map)
+
+	MDRV_MACHINE_START(sheriff)
+	MDRV_MACHINE_RESET(sheriff)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(256, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 255, 16, 239)
+
+	MDRV_PALETTE_LENGTH(8)
+	MDRV_PALETTE_INIT(n8080)
+	MDRV_VIDEO_START(sheriff)
+	MDRV_VIDEO_UPDATE(sheriff)
+
+	MDRV_TIMER_ADD_SCANLINE("rst1", rst1_tick, "screen", 128, 256)
+	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)
+
+	/* sound hardware */
+	MDRV_IMPORT_FROM( sheriff_sound )
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( helifire )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(n8080_state)
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK / 10)
+	MDRV_CPU_CONFIG(n8080_cpu_config)
+	MDRV_CPU_PROGRAM_MAP(helifire_main_cpu_map)
+	MDRV_CPU_IO_MAP(main_io_map)
+
+	MDRV_MACHINE_START(helifire)
+	MDRV_MACHINE_RESET(helifire)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(256, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 255, 16, 239)
+
+	MDRV_PALETTE_LENGTH(8 + 0x400)
+	MDRV_PALETTE_INIT(helifire)
+	MDRV_VIDEO_START(helifire)
+	MDRV_VIDEO_UPDATE(helifire)
+	MDRV_VIDEO_EOF(helifire)
+
+	MDRV_TIMER_ADD_SCANLINE("rst1", rst1_tick, "screen", 128, 256)
+	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)
+
+	/* sound hardware */
+	MDRV_IMPORT_FROM( helifire_sound )
+MACHINE_DRIVER_END
 
 
 /*
@@ -824,14 +918,14 @@ ROM_START( helifirea )
 ROM_END
 
 
-GAME( 1979, spacefev,   0,        spacefev, spacefev, 0, ROT270, "Nintendo", "Space Fever (New Ver.)", 0 )
-GAME( 1979, spacefevo,  spacefev, spacefev, spacefev, 0, ROT270, "Nintendo", "Space Fever (Old Ver.)", 0 )
-GAME( 1979, spacefevo2, spacefev, spacefev, spacefev, 0, ROT270, "Nintendo", "Space Fever (Older Ver.)", 0 )
-GAME( 1979, highsplt,   0,        spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 1)", 0 )
-GAME( 1979, highsplta,  highsplt, spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 2)", 0 )
-GAME( 1979, highspltb,  highsplt, spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (alt Sound)", 0 )
-GAME( 1979, spacelnc,   0,        spacefev, spacelnc, 0, ROT270, "Nintendo", "Space Launcher", GAME_NOT_WORKING )
-GAME( 1979, sheriff,    0,        sheriff,  sheriff,  0, ROT270, "Nintendo", "Sheriff", 0 )
-GAME( 1980, bandido,    sheriff,  sheriff,  bandido,  0, ROT270, "Exidy",    "Bandido", 0 )
-GAME( 1980, helifire,   0,        helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 1)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
-GAME( 1980, helifirea,  helifire, helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 2)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
+GAME( 1979, spacefev,   0,        spacefev, spacefev, 0, ROT270, "Nintendo", "Space Fever (New Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1979, spacefevo,  spacefev, spacefev, spacefev, 0, ROT270, "Nintendo", "Space Fever (Old Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1979, spacefevo2, spacefev, spacefev, spacefev, 0, ROT270, "Nintendo", "Space Fever (Older Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1979, highsplt,   0,        spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1979, highsplta,  highsplt, spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1979, highspltb,  highsplt, spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (alt Sound)", GAME_SUPPORTS_SAVE )
+GAME( 1979, spacelnc,   0,        spacefev, spacelnc, 0, ROT270, "Nintendo", "Space Launcher", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1979, sheriff,    0,        sheriff,  sheriff,  0, ROT270, "Nintendo", "Sheriff", GAME_SUPPORTS_SAVE )
+GAME( 1980, bandido,    sheriff,  sheriff,  bandido,  0, ROT270, "Exidy",    "Bandido", GAME_SUPPORTS_SAVE )
+GAME( 1980, helifire,   0,        helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 1)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1980, helifirea,  helifire, helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 2)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
