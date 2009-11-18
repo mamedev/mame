@@ -112,8 +112,6 @@
 #include "atarifb4.lh"
 #include "abaseb.lh"
 
-
-
 /*************************************
  *
  *  Palette generation
@@ -123,22 +121,22 @@
 static PALETTE_INIT( atarifb )
 {
 	/* chars */
-	palette_set_color(machine,0,MAKE_RGB(0xff,0xff,0xff)); /* white  */
-	palette_set_color(machine,1,MAKE_RGB(0x00,0x00,0x00)); /* black  */
+	palette_set_color(machine, 0, MAKE_RGB(0xff,0xff,0xff)); /* white  */
+	palette_set_color(machine, 1, MAKE_RGB(0x00,0x00,0x00)); /* black  */
 
 	/* sprites */
-	palette_set_color(machine,2,MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette_set_color(machine,3,MAKE_RGB(0xff,0xff,0xff)); /* white  */
-	palette_set_color(machine,4,MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette_set_color(machine,5,MAKE_RGB(0x00,0x00,0x00)); /* black  */
+	palette_set_color(machine, 2, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette_set_color(machine, 3, MAKE_RGB(0xff,0xff,0xff)); /* white  */
+	palette_set_color(machine, 4, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette_set_color(machine, 5, MAKE_RGB(0x00,0x00,0x00)); /* black  */
 
 	/* sprite masks */
-	palette_set_color(machine,6,MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette_set_color(machine,7,MAKE_RGB(0x80,0x80,0x80)); /* grey  */
-	palette_set_color(machine,8,MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette_set_color(machine,9,MAKE_RGB(0x00,0x00,0x00)); /* black  */
-	palette_set_color(machine,10,MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	palette_set_color(machine,11,MAKE_RGB(0xff,0xff,0xff)); /* white  */
+	palette_set_color(machine, 6, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette_set_color(machine, 7, MAKE_RGB(0x80,0x80,0x80)); /* grey  */
+	palette_set_color(machine, 8, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette_set_color(machine, 9, MAKE_RGB(0x00,0x00,0x00)); /* black  */
+	palette_set_color(machine, 10, MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette_set_color(machine, 11, MAKE_RGB(0xff,0xff,0xff)); /* white  */
 }
 
 
@@ -152,12 +150,12 @@ static PALETTE_INIT( atarifb )
 static ADDRESS_MAP_START( atarifb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x025f) AM_RAM_WRITE(atarifb_alpha1_videoram_w) AM_BASE(&atarifb_alphap1_videoram)
+	AM_RANGE(0x0200, 0x025f) AM_RAM_WRITE(atarifb_alpha1_videoram_w) AM_BASE_MEMBER(atarifb_state, alphap1_videoram)
 	AM_RANGE(0x0260, 0x039f) AM_RAM
-	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
-	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
-	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x2000, 0x2000) AM_WRITEONLY AM_BASE(&atarifb_scroll_register) /* OUT 0 */
+	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_BASE_MEMBER(atarifb_state, alphap2_videoram)
+	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_BASE_MEMBER(atarifb_state, field_videoram)
+	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE_MEMBER(atarifb_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x2000, 0x2000) AM_WRITEONLY AM_BASE_MEMBER(atarifb_state, scroll_register) /* OUT 0 */
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(atarifb_out1_w) /* OUT 1 */
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
 	AM_RANGE(0x2003, 0x2003) AM_WRITE(atarifb_out3_w) /* OUT 3 */
@@ -172,12 +170,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( atarifb4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x025f) AM_RAM_WRITE(atarifb_alpha1_videoram_w) AM_BASE(&atarifb_alphap1_videoram)
+	AM_RANGE(0x0200, 0x025f) AM_RAM_WRITE(atarifb_alpha1_videoram_w) AM_BASE_MEMBER(atarifb_state, alphap1_videoram)
 	AM_RANGE(0x0260, 0x039f) AM_RAM
-	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
-	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
-	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x2000, 0x2000) AM_WRITEONLY AM_BASE(&atarifb_scroll_register) /* OUT 0 */
+	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_BASE_MEMBER(atarifb_state, alphap2_videoram)
+	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_BASE_MEMBER(atarifb_state, field_videoram)
+	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE_MEMBER(atarifb_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x2000, 0x2000) AM_WRITEONLY AM_BASE_MEMBER(atarifb_state, scroll_register) /* OUT 0 */
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(atarifb4_out1_w) /* OUT 1 */
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
 	AM_RANGE(0x2003, 0x2003) AM_WRITE(atarifb_out3_w) /* OUT 3 */
@@ -193,12 +191,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abaseb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x025f) AM_RAM_WRITE(atarifb_alpha1_videoram_w) AM_BASE(&atarifb_alphap1_videoram)
+	AM_RANGE(0x0200, 0x025f) AM_RAM_WRITE(atarifb_alpha1_videoram_w) AM_BASE_MEMBER(atarifb_state, alphap1_videoram)
 	AM_RANGE(0x0260, 0x039f) AM_RAM
-	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
-	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
-	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x2000, 0x2000) AM_WRITEONLY AM_BASE(&atarifb_scroll_register) /* OUT 0 */
+	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_BASE_MEMBER(atarifb_state, alphap2_videoram)
+	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_BASE_MEMBER(atarifb_state, field_videoram)
+	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE_MEMBER(atarifb_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x2000, 0x2000) AM_WRITEONLY AM_BASE_MEMBER(atarifb_state, scroll_register) /* OUT 0 */
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(abaseb_out1_w) /* OUT 1 */
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
 	AM_RANGE(0x2003, 0x2003) AM_WRITE(atarifb_out3_w) /* OUT 3 */
@@ -213,12 +211,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( soccer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x025f) AM_RAM_WRITE(atarifb_alpha1_videoram_w) AM_BASE(&atarifb_alphap1_videoram)
+	AM_RANGE(0x0200, 0x025f) AM_RAM_WRITE(atarifb_alpha1_videoram_w) AM_BASE_MEMBER(atarifb_state, alphap1_videoram)
 	AM_RANGE(0x0260, 0x039f) AM_RAM
-	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
-	AM_RANGE(0x0800, 0x0bbf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
-	AM_RANGE(0x0bc0, 0x0bff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x1000, 0x1000) AM_WRITEONLY AM_BASE(&atarifb_scroll_register) /* OUT 0 */
+	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_BASE_MEMBER(atarifb_state, alphap2_videoram)
+	AM_RANGE(0x0800, 0x0bbf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_BASE_MEMBER(atarifb_state, field_videoram)
+	AM_RANGE(0x0bc0, 0x0bff) AM_RAM AM_BASE_MEMBER(atarifb_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1000, 0x1000) AM_WRITEONLY AM_BASE_MEMBER(atarifb_state, scroll_register) /* OUT 0 */
 	AM_RANGE(0x1001, 0x1001) AM_WRITE(soccer_out1_w) /* OUT 1 */
 	AM_RANGE(0x1002, 0x1002) AM_WRITE(soccer_out2_w) /* OUT 2 */
 	AM_RANGE(0x1004, 0x1004) AM_WRITENOP /* Interrupt Acknowledge */
@@ -507,12 +505,64 @@ GFXDECODE_END
  *
  *************************************/
 
+static MACHINE_START( atarifb )
+{
+	atarifb_state *state = (atarifb_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->CTRLD);
+	state_save_register_global(machine, state->sign_x_1);
+	state_save_register_global(machine, state->sign_x_2);
+	state_save_register_global(machine, state->sign_x_3);
+	state_save_register_global(machine, state->sign_x_4);
+	state_save_register_global(machine, state->sign_y_1);
+	state_save_register_global(machine, state->sign_y_2);
+	state_save_register_global(machine, state->sign_y_3);
+	state_save_register_global(machine, state->sign_y_4);
+	state_save_register_global(machine, state->counter_x_in0);
+	state_save_register_global(machine, state->counter_y_in0);
+	state_save_register_global(machine, state->counter_x_in0b);
+	state_save_register_global(machine, state->counter_y_in0b);
+	state_save_register_global(machine, state->counter_x_in2);
+	state_save_register_global(machine, state->counter_y_in2);
+	state_save_register_global(machine, state->counter_x_in2b);
+	state_save_register_global(machine, state->counter_y_in2b);
+}
+
+static MACHINE_RESET( atarifb )
+{
+	atarifb_state *state = (atarifb_state *)machine->driver_data;
+
+	state->CTRLD = 0;
+	state->sign_x_1 = 0;
+	state->sign_y_1 = 0;
+	state->sign_x_2 = 0;
+	state->sign_y_2 = 0;
+	state->sign_x_3 = 0;
+	state->sign_y_3 = 0;
+	state->sign_x_4 = 0;
+	state->sign_y_4 = 0;
+	state->counter_x_in0 = 0;
+	state->counter_y_in0 = 0;
+	state->counter_x_in0b = 0;
+	state->counter_y_in0b = 0;
+	state->counter_x_in2 = 0;
+	state->counter_y_in2 = 0;
+	state->counter_x_in2b = 0;
+	state->counter_y_in2b = 0;
+}
+
 static MACHINE_DRIVER_START( atarifb )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(atarifb_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 750000)
 	MDRV_CPU_PROGRAM_MAP(atarifb_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+
+	MDRV_MACHINE_START(atarifb)
+	MDRV_MACHINE_RESET(atarifb)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -735,9 +785,9 @@ ROM_END
  *************************************/
 
 /*     YEAR  NAME      PARENT   MACHINE   INPUT */
-GAMEL( 1978, atarifb,  0,       atarifb,  atarifb,  0, ROT0, "Atari", "Atari Football (revision 2)", 0, layout_atarifb )
-GAMEL( 1978, atarifb1, atarifb, atarifb,  atarifb,  0, ROT0, "Atari", "Atari Football (revision 1)", 0, layout_atarifb )
-GAMEL( 1979, atarifb4, atarifb, atarifb4, atarifb4, 0, ROT0, "Atari", "Atari Football (4 players)", 0, layout_atarifb4 )
-GAMEL( 1979, abaseb,   0,       abaseb,   abaseb,   0, ROT0, "Atari", "Atari Baseball (set 1)", 0, layout_abaseb )
-GAMEL( 1979, abaseb2,  abaseb,  abaseb,   abaseb,   0, ROT0, "Atari", "Atari Baseball (set 2)", 0, layout_abaseb )
-GAME ( 1980, soccer,   0,       soccer,   soccer,   0, ROT0, "Atari", "Atari Soccer", 0 )
+GAMEL( 1978, atarifb,  0,       atarifb,  atarifb,  0, ROT0, "Atari", "Atari Football (revision 2)", GAME_SUPPORTS_SAVE, layout_atarifb )
+GAMEL( 1978, atarifb1, atarifb, atarifb,  atarifb,  0, ROT0, "Atari", "Atari Football (revision 1)", GAME_SUPPORTS_SAVE, layout_atarifb )
+GAMEL( 1979, atarifb4, atarifb, atarifb4, atarifb4, 0, ROT0, "Atari", "Atari Football (4 players)", GAME_SUPPORTS_SAVE, layout_atarifb4 )
+GAMEL( 1979, abaseb,   0,       abaseb,   abaseb,   0, ROT0, "Atari", "Atari Baseball (set 1)", GAME_SUPPORTS_SAVE, layout_abaseb )
+GAMEL( 1979, abaseb2,  abaseb,  abaseb,   abaseb,   0, ROT0, "Atari", "Atari Baseball (set 2)", GAME_SUPPORTS_SAVE, layout_abaseb )
+GAME ( 1980, soccer,   0,       soccer,   soccer,   0, ROT0, "Atari", "Atari Soccer", GAME_SUPPORTS_SAVE )

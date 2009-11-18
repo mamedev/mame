@@ -15,6 +15,33 @@
 #define ATARIFB_HIT_EN			NODE_05
 
 
+typedef struct _atarifb_state atarifb_state;
+struct _atarifb_state
+{
+	/* video-related */
+	UINT8 *  alphap1_videoram;
+	UINT8 *  alphap2_videoram;
+	UINT8 *  field_videoram;
+	UINT8 *  spriteram;
+	UINT8 *  scroll_register;
+
+	tilemap  *alpha1_tilemap;
+	tilemap  *alpha2_tilemap;
+	tilemap  *field_tilemap;
+
+	/* sound-related */
+	int CTRLD;
+	int sign_x_1, sign_y_1;
+	int sign_x_2, sign_y_2;
+	int sign_x_3, sign_y_3;
+	int sign_x_4, sign_y_4;
+	int counter_x_in0, counter_y_in0;
+	int counter_x_in0b, counter_y_in0b;
+	int counter_x_in2, counter_y_in2;
+	int counter_x_in2b, counter_y_in2b;
+};
+
+
 /*----------- defined in machine/atarifb.c -----------*/
 
 WRITE8_HANDLER( atarifb_out1_w );
@@ -40,11 +67,6 @@ DISCRETE_SOUND_EXTERN( abaseb );
 
 
 /*----------- defined in video/atarifb.c -----------*/
-
-extern UINT8 *atarifb_alphap1_videoram;
-extern UINT8 *atarifb_alphap2_videoram;
-extern UINT8 *atarifb_field_videoram;
-extern UINT8 *atarifb_scroll_register;
 
 VIDEO_START( atarifb );
 VIDEO_UPDATE( atarifb );
