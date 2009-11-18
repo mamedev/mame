@@ -30,6 +30,7 @@
   The register, connected to a z80 port, means:
   for bits 7  6  5  4  3  2  1  0
            L3 L2 L1 L0 R3 R2 R1 R0
+  Noise is an XOR function, and audio output is negated before being output.
   ** NCR7496 (as used on the Tandy 1000) is similar to the SN76489 but with a
   different noise LFSR patttern: taps on bits A and E, output on E
   It uses a 15-bit ring buffer for periodic noise/arbitrary duty cycle.
@@ -62,11 +63,14 @@
   Fix screeching in regulus: When summing together four equal channels, the
   size of the max amplitude per channel should be 1/4 of the max range, not
   1/3. Added NCR7496.
+  
+  18/11/2009 : Lord Nightmare
+  Modify Init functions to support negating the audio output. The gamegear
+  psg does this. Change gamegear and sega psgs to use XOR rather than XNOR
+  based on testing. Got rid of R->OldNoise and fixed taps accordingly.
+  Added stereo support for game gear.
 
-  TODO: * Implement a function for setting stereo regs for the game gear.
-          Requires making the core support both mono and stereo, and have
-          a select register which determines which channels go where.
-        * Implement the TMS9919 which is an earlier version, possibly
+  TODO: * Implement the TMS9919 which is an earlier version, possibly
           lacking the /8 clock divider, of the SN76489, and hence would
           have a max clock of 500Khz and 4 clocks per sample, as opposed to
           max of 4Mhz and 32 clocks per sample on the SN76489A.
@@ -74,8 +78,6 @@
           to be 'sanitized' first. Also is stereo, similar to game gear.
         * Test the NCR7496; Smspower says the whitenoise taps are A and E,
           but this needs verification on real hardware.
-        * Test the SMS PSG/Gamegear PSG to see whether it uses XOR or XNOR
-          taps. (17/11/2009: this seems to be XNOR? Need a better sample.)
         * Factor out common code so that the SAA1099 can share some code.
 ***************************************************************************/
 
@@ -101,9 +103,11 @@ struct _sn76496_state
 	INT32 FeedbackMask;	/* mask for feedback */
 	INT32 WhitenoiseTaps;	/* mask for white noise taps */
 	INT32 FeedbackInvert;	/* feedback invert flag (xor vs xnor) */
+	INT32 Negate;		/* output negate flag */
+	INT32 Stereo;		/* whether we're dealing with stereo or not */
+	INT32 StereoMask;	/* the stereo output mask */
 	INT32 Period[4];	/* Length of 1/2 of waveform */
 	INT32 Count[4];		/* Position within the waveform */
-	INT32 OldNoise;		/* 1 bit output of the PREVIOUS noise output */
 	INT32 Output[4];	/* 1-bit output of each channel, pre-volume */
 	INT32 CyclestoREADY;/* number of cycles until the READY line goes active */
 };
@@ -130,6 +134,14 @@ READ8_DEVICE_HANDLER( sn76496_ready_r )
 	sn76496_state *R = get_safe_token(device);
 	stream_update(R->Channel);
 	return (R->CyclestoREADY? 0 : 1);
+}
+
+WRITE8_DEVICE_HANDLER( sn76496_stereo_w )
+{
+	sn76496_state *R = get_safe_token(device);
+	stream_update(R->Channel);
+	if (R->Stereo) R->StereoMask = data;
+	else fatalerror("Call to stereo write with mono chip!\n");
 }
 
 WRITE8_DEVICE_HANDLER( sn76496_w )
@@ -192,9 +204,7 @@ WRITE8_DEVICE_HANDLER( sn76496_w )
 				R->Period[3] = ((n&3) == 3) ? 2 * R->Period[2] : (1 << (5+(n&3)));
 			        /* Reset noise shifter */
 				R->RNG = R->FeedbackMask;
-				R->OldNoise = 0;
-				R->Output[3] = R->OldNoise;
-				R->OldNoise = R->RNG & 1;
+				R->Output[3] = R->RNG & 1;
 			}
 			break;
 	}
@@ -204,13 +214,14 @@ static STREAM_UPDATE( SN76496Update )
 {
 	int i;
 	sn76496_state *R = (sn76496_state *)param;
-	stream_sample_t *buffer = outputs[0];
-
+	stream_sample_t *lbuffer = outputs[0];
+	stream_sample_t *rbuffer = outputs[1];
 
 	while (samples > 0)
 	{
 	// clock chip once
-		INT16 out;
+		INT16 out = 0;
+		INT16 out2 = 0;
 
 		/* decrement Cycles to READY by one */
 		if (R->CyclestoREADY >0) R->CyclestoREADY--;
@@ -254,8 +265,7 @@ static STREAM_UPDATE( SN76496Update )
 					R->RNG >>= 1;
 				}
 			}
-			R->Output[3] = R->OldNoise;
-			R->OldNoise = R->RNG & 1;
+			R->Output[3] = R->RNG & 1;
 			R->Count[3] = R->Period[3];
 		}
 /* //bipolar output, doesn't seem to work right with sonic 2 on gamegear at least
@@ -264,13 +274,30 @@ static STREAM_UPDATE( SN76496Update )
 			+(R->Output[2]?R->Volume[2]:(0-R->Volume[2]))
 			+(R->Output[3]?R->Volume[3]:(0-R->Volume[3]));
 */
-		out = (R->Output[0]?R->Volume[0]:0)
-			+(R->Output[1]?R->Volume[1]:0)
-			+(R->Output[2]?R->Volume[2]:0)
-			+(R->Output[3]?R->Volume[3]:0);
+		if (R->Stereo)
+		{
+			out = (((R->StereoMask&0x10)&&R->Output[0])?R->Volume[0]:0)
+				+ (((R->StereoMask&0x20)&&R->Output[1])?R->Volume[1]:0)
+				+ (((R->StereoMask&0x40)&&R->Output[2])?R->Volume[2]:0)
+				+ (((R->StereoMask&0x80)&&R->Output[3])?R->Volume[3]:0);
+				
+			out2 = (((R->StereoMask&0x1)&&R->Output[0])?R->Volume[0]:0)
+				+ (((R->StereoMask&0x2)&&R->Output[1])?R->Volume[1]:0)
+				+ (((R->StereoMask&0x4)&&R->Output[2])?R->Volume[2]:0)
+				+ (((R->StereoMask&0x8)&&R->Output[3])?R->Volume[3]:0);
+		}
+		else
+		{
+			out = (R->Output[0]?R->Volume[0]:0)
+				+(R->Output[1]?R->Volume[1]:0)
+				+(R->Output[2]?R->Volume[2]:0)
+				+(R->Output[3]?R->Volume[3]:0);
+		}
 
-		*(buffer++) = out;
+		if(R->Negate) { out = -out; out2 = -out2; }
 
+		*(lbuffer++) = out;
+		if (R->Stereo) *(rbuffer++) = out2;
 		samples--;
 	}
 }
@@ -294,7 +321,7 @@ static void SN76496_set_gain(sn76496_state *R,int gain)
 	for (i = 0;i < 15;i++)
 	{
 		/* limit volume to avoid clipping */
-		if (out > MAX_OUTPUT / 3) R->VolTable[i] = MAX_OUTPUT / 3;
+		if (out > MAX_OUTPUT / 4) R->VolTable[i] = MAX_OUTPUT / 4;
 		else R->VolTable[i] = out;
 
 		out /= 1.258925412;	/* = 10 ^ (2/20) = 2dB */
@@ -304,12 +331,12 @@ static void SN76496_set_gain(sn76496_state *R,int gain)
 
 
 
-static int SN76496_init(const device_config *device, sn76496_state *R)
+static int SN76496_init(const device_config *device, sn76496_state *R, int stereo)
 {
 	int sample_rate = device->clock/16;
 	int i;
 
-	R->Channel = stream_create(device,0,1,sample_rate,R,SN76496Update);
+	R->Channel = stream_create(device,0,(stereo?2:1),sample_rate,R,SN76496Update);
 
 	for (i = 0;i < 4;i++) R->Volume[i] = 0;
 
@@ -330,27 +357,30 @@ static int SN76496_init(const device_config *device, sn76496_state *R)
 	R->WhitenoiseTaps = 0x03;   /* mask for white noise taps */
 	R->FeedbackInvert = 0; /* feedback invert flag */
 	R->CyclestoREADY = 1; /* assume ready is not active immediately on init. is this correct?*/
+	R->Negate = 0; /* channels are not negated */
+	R->Stereo = stereo; /* depends on init */
+	R->StereoMask = 0xFF; /* all channels enabled */
 
 	R->RNG = R->FeedbackMask;
-	R->OldNoise = 0;
-	R->Output[3] = R->OldNoise;
-	R->OldNoise = R->RNG & 1;
+	R->Output[3] = R->RNG & 1;
 
 	return 0;
 }
 
 
-static void generic_start(const device_config *device, int feedbackmask, int noisetaps, int feedbackinvert)
+static void generic_start(const device_config *device, int feedbackmask, int noisetaps, int feedbackinvert, int negate, int stereo)
 {
 	sn76496_state *chip = get_safe_token(device);
 
-	if (SN76496_init(device,chip) != 0)
+	if (SN76496_init(device,chip,stereo) != 0)
 		fatalerror("Error creating SN76496 chip");
 	SN76496_set_gain(chip, 0);
 
 	chip->FeedbackMask = feedbackmask;
 	chip->WhitenoiseTaps = noisetaps;
 	chip->FeedbackInvert = feedbackinvert;
+	chip->Negate = negate;
+	chip->Stereo = stereo;
 
 	state_save_register_device_item_array(device, 0, chip->VolTable);
 	state_save_register_device_item_array(device, 0, chip->Register);
@@ -360,52 +390,55 @@ static void generic_start(const device_config *device, int feedbackmask, int noi
 	state_save_register_device_item(device, 0, chip->FeedbackMask);
 	state_save_register_device_item(device, 0, chip->WhitenoiseTaps);
 	state_save_register_device_item(device, 0, chip->FeedbackInvert);
+	state_save_register_device_item(device, 0, chip->Negate);
+	state_save_register_device_item(device, 0, chip->Stereo);
+	state_save_register_device_item(device, 0, chip->StereoMask);
 	state_save_register_device_item_array(device, 0, chip->Period);
 	state_save_register_device_item_array(device, 0, chip->Count);
-	state_save_register_device_item(device, 0, chip->OldNoise);
 	state_save_register_device_item_array(device, 0, chip->Output);
 	state_save_register_device_item(device, 0, chip->CyclestoREADY);
 }
 
+// function parameters: device, feedback destination tap, feedback source taps, xor(false)/xnor(true), normal(false)/invert(true), mono(false)/stereo(true)
 
 static DEVICE_START( sn76489 )
 {
-	generic_start(device, 0x4000, 0x03, FALSE); // todo: verify; assumed to be the same as sn94624
+	generic_start(device, 0x8000, 0x06, FALSE, FALSE, FALSE); // todo: verify; assumed to be the same as sn94624
 }
 
 static DEVICE_START( sn76489a )
 {
-	generic_start(device, 0x8000, 0x06, TRUE); // verified by plgdavid
+	generic_start(device, 0x10000, 0x0C, TRUE, FALSE, FALSE); // verified by plgdavid
 }
 
 static DEVICE_START( sn76494 )
 {
-	generic_start(device, 0x8000, 0x06, TRUE); // todo: verify; assumed to be the same as sn76489a
+	generic_start(device, 0x10000, 0x0C, TRUE, FALSE, FALSE); // todo: verify; assumed to be the same as sn76489a
 }
 
 static DEVICE_START( sn76496 )
 {
-	generic_start(device, 0x8000, 0x06, TRUE); // todo: verify; assumed to be the same as sn76489a
+	generic_start(device, 0x10000, 0x0C, TRUE, FALSE, FALSE); // todo: verify; assumed to be the same as sn76489a
 }
 
 static DEVICE_START( sn94624 )
 {
-	generic_start(device, 0x4000, 0x03, FALSE); // verified by plgdavid
+	generic_start(device, 0x10000, 0x0C, FALSE, FALSE, FALSE); // verified by plgdavid
 }
 
 static DEVICE_START( ncr7496 )
 {
-	generic_start(device, 0x4000, 0x11, FALSE); // todo: verify; from smspower wiki
+	generic_start(device, 0x8000, 0x22, FALSE, FALSE, FALSE); // todo: verify; from smspower wiki
 }
 
 static DEVICE_START( gamegear )
 {
-	generic_start(device, 0x8000, 0x09, TRUE); // semi-verified by Lord Nightmare, need better sample
+	generic_start(device, 0x8000, 0x09, FALSE, TRUE, TRUE); // Verified by Justin Kerk
 }
 
 static DEVICE_START( smsiii )
 {
-	generic_start(device, 0x8000, 0x09, TRUE); // todo: verify; from smspower wiki, assumed to have same invert as gamegear
+	generic_start(device, 0x8000, 0x09, FALSE, TRUE, FALSE); // todo: verify; from smspower wiki, assumed to have same invert as gamegear
 }
 
 
