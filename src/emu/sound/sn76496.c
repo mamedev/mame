@@ -215,7 +215,7 @@ static STREAM_UPDATE( SN76496Update )
 	int i;
 	sn76496_state *R = (sn76496_state *)param;
 	stream_sample_t *lbuffer = outputs[0];
-	stream_sample_t *rbuffer = outputs[1];
+	stream_sample_t *rbuffer = (R->Stereo)?outputs[1]:NULL;
 
 	while (samples > 0)
 	{
