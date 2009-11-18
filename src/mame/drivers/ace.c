@@ -42,67 +42,77 @@ A1                   2101            2101
 
 #define MASTER_CLOCK XTAL_18MHz
 
-static UINT8 *ace_scoreram;
-static UINT8 *ace_ram2;
-static UINT8 *ace_characterram;
 
+typedef struct _ace_state ace_state;
+struct _ace_state
+{
+	/* video-related */
+	UINT8 *  ram2;
+	UINT8 *  scoreram;
+	UINT8 *  characterram;
 
-static int objpos[8];
+	/* input-related */
+	int objpos[8];
+};
+
 
 static WRITE8_HANDLER( ace_objpos_w )
 {
-	objpos[offset]=data;
+	ace_state *state = (ace_state *)space->machine->driver_data;
+	state->objpos[offset] = data;
 }
 
 #if 0
 static READ8_HANDLER( ace_objpos_r )
 {
-	return objpos[offset];
+	ace_state *state = (ace_state *)space->machine->driver_data;
+	return state->objpos[offset];
 }
 #endif
 
 static VIDEO_START( ace )
 {
-	gfx_element_set_source(machine->gfx[1], ace_characterram);
-	gfx_element_set_source(machine->gfx[2], ace_characterram);
-	gfx_element_set_source(machine->gfx[3], ace_characterram);
-	gfx_element_set_source(machine->gfx[4], ace_scoreram);
+	ace_state *state = (ace_state *)machine->driver_data;
+	gfx_element_set_source(machine->gfx[1], state->characterram);
+	gfx_element_set_source(machine->gfx[2], state->characterram);
+	gfx_element_set_source(machine->gfx[3], state->characterram);
+	gfx_element_set_source(machine->gfx[4], state->scoreram);
 }
 
 static VIDEO_UPDATE( ace )
 {
+	ace_state *state = (ace_state *)screen->machine->driver_data;
 	int offs;
 
 	/* first of all, fill the screen with the background color */
 	bitmap_fill(bitmap, cliprect, 0);
 
+	drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[1],
+			0,
+			0,
+			0, 0,
+			state->objpos[0], state->objpos[1]);
 
-		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[1],
-				0,
-				0,
-				0,0,
-				objpos[0],objpos[1]);
+	drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[2],
+			0,
+			0,
+			0, 0,
+			state->objpos[2], state->objpos[3]);
 
-		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[2],
-				0,
-				0,
-				0,0,
-				objpos[2],objpos[3]);
-
-		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[3],
-				0,
-				0,
-				0,0,
-				objpos[4],objpos[5]);
+	drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[3],
+			0,
+			0,
+			0, 0,
+			state->objpos[4], state->objpos[5]);
 
 	for (offs = 0; offs < 8; offs++)
 	{
 		drawgfx_opaque(bitmap,/* ?? */
-				cliprect,screen->machine->gfx[4],
+				cliprect, screen->machine->gfx[4],
 				offs,
 				0,
-				0,0,
-				10*8+offs*16,256-16);
+				0, 0,
+				10 * 8 + offs * 16, 256 - 16);
 	}
 	return 0;
 }
@@ -110,21 +120,22 @@ static VIDEO_UPDATE( ace )
 
 static PALETTE_INIT( ace )
 {
-	palette_set_color(machine,0,MAKE_RGB(0x10,0x20,0xd0)); /* light bluish */
-	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff)); /* white */
+	palette_set_color(machine, 0, MAKE_RGB(0x10,0x20,0xd0)); /* light bluish */
+	palette_set_color(machine, 1, MAKE_RGB(0xff,0xff,0xff)); /* white */
 }
 
 
 static WRITE8_HANDLER( ace_characterram_w )
 {
-	if (ace_characterram[offset] != data)
+	ace_state *state = (ace_state *)space->machine->driver_data;
+	if (state->characterram[offset] != data)
 	{
-		if (data&(~0x07))
+		if (data & ~0x07)
 		{
-			logerror("write to %04x data=%02x\n", 0x8000+offset, data);
-			popmessage("write to %04x data=%02x\n", 0x8000+offset, data);
+			logerror("write to %04x data = %02x\n", 0x8000 + offset, data);
+			popmessage("write to %04x data = %02x\n", 0x8000 + offset, data);
 		}
-		ace_characterram[offset] = data;
+		state->characterram[offset] = data;
 		gfx_element_mark_dirty(space->machine->gfx[1], 0);
 		gfx_element_mark_dirty(space->machine->gfx[2], 0);
 		gfx_element_mark_dirty(space->machine->gfx[3], 0);
@@ -133,13 +144,14 @@ static WRITE8_HANDLER( ace_characterram_w )
 
 static WRITE8_HANDLER( ace_scoreram_w )
 {
-	ace_scoreram[offset] = data;
+	ace_state *state = (ace_state *)space->machine->driver_data;
+	state->scoreram[offset] = data;
 	gfx_element_mark_dirty(space->machine->gfx[4], offset / 32);
 }
 
 static READ8_HANDLER( unk_r )
 {
-	return mame_rand(space->machine)&0xff;
+	return mame_rand(space->machine) & 0xff;
 }
 
 
@@ -151,9 +163,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x09ff) AM_ROM
 
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(ace_scoreram_w) AM_BASE(&ace_scoreram)	/* 2x2101 */
-	AM_RANGE(0x8300, 0x83ff) AM_RAM AM_BASE(&ace_ram2)		/* 2x2101 */
-	AM_RANGE(0x8000, 0x80ff) AM_RAM_WRITE(ace_characterram_w) AM_BASE(&ace_characterram)	/* 3x3101 (3bits: 0, 1, 2) */
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(ace_scoreram_w) AM_BASE_MEMBER(ace_state, scoreram)	/* 2x2101 */
+	AM_RANGE(0x8300, 0x83ff) AM_RAM AM_BASE_MEMBER(ace_state, ram2)	/* 2x2101 */
+	AM_RANGE(0x8000, 0x80ff) AM_RAM_WRITE(ace_characterram_w) AM_BASE_MEMBER(ace_state, characterram)	/* 3x3101 (3bits: 0, 1, 2) */
 
 	AM_RANGE(0xc000, 0xc005) AM_WRITE(ace_objpos_w)
 
@@ -304,15 +316,30 @@ GFXDECODE_END
 
 static MACHINE_START( ace )
 {
-    state_save_register_global_array(machine, objpos);
+	ace_state *state = (ace_state *)machine->driver_data;
+	state_save_register_global_array(machine, state->objpos);
+}
+
+static MACHINE_RESET( ace )
+{
+	ace_state *state = (ace_state *)machine->driver_data;
+	int i;
+
+	for (i = 0; i < 8; i++)
+		state->objpos[i] = 0;
 }
 
 static MACHINE_DRIVER_START( ace )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(ace_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK/9)	/* 2 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(main_map)
-    MDRV_MACHINE_START(ace)
+
+	MDRV_MACHINE_START(ace)
+	MDRV_MACHINE_RESET(ace)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
