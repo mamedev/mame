@@ -28,14 +28,7 @@ other 2 bits (output & 0x0c) unknown
 ***************************************************************************/
 
 #include "driver.h"
-
-UINT8 *c1943_scrollx;
-UINT8 *c1943_scrolly;
-UINT8 *c1943_bgscrollx;
-
-static int chon, objon, sc1on, sc2on;
-
-static tilemap *bg2_tilemap, *bg_tilemap, *fg_tilemap;
+#include "1943.h"
 
 /***************************************************************************
 
@@ -127,28 +120,33 @@ PALETTE_INIT( 1943 )
 
 WRITE8_HANDLER( c1943_videoram_w )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	_1943_state *state = (_1943_state *)space->machine->driver_data;
+
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( c1943_colorram_w )
 {
-	colorram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	_1943_state *state = (_1943_state *)space->machine->driver_data;
+
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( c1943_c804_w )
 {
-	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	_1943_state *state = (_1943_state *)space->machine->driver_data;
+	int bank, i;
 
 	/* bits 0 and 1 are coin counters */
 	coin_counter_w(0, data & 0x01);
 	coin_counter_w(1, data & 0x02);
 
 	/* bits 2, 3 and 4 select the ROM bank */
-	bankaddress = 0x10000 + (data & 0x1c) * 0x1000;
-	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
+	bank = data & 0x1c;
+	for (i = 1; i < 5; i++)
+		memory_set_bank(space->machine, i, bank);
 
 	/* bit 5 resets the sound CPU - we ignore it */
 
@@ -156,19 +154,21 @@ WRITE8_HANDLER( c1943_c804_w )
 	flip_screen_set(space->machine, data & 0x40);
 
 	/* bit 7 enables characters */
-	chon = data & 0x80;
+	state->char_on = data & 0x80;
 }
 
 WRITE8_HANDLER( c1943_d806_w )
 {
+	_1943_state *state = (_1943_state *)space->machine->driver_data;
+
 	/* bit 4 enables bg 1 */
-	sc1on = data & 0x10;
+	state->bg1_on = data & 0x10;
 
 	/* bit 5 enables bg 2 */
-	sc2on = data & 0x20;
+	state->bg2_on = data & 0x20;
 
 	/* bit 6 enables sprites */
-	objon = data & 0x40;
+	state->obj_on = data & 0x40;
 }
 
 static TILE_GET_INFO( c1943_get_bg2_tile_info )
@@ -200,8 +200,9 @@ static TILE_GET_INFO( c1943_get_bg_tile_info )
 
 static TILE_GET_INFO( c1943_get_fg_tile_info )
 {
-	int attr = colorram[tile_index];
-	int code = videoram[tile_index] + ((attr & 0xe0) << 3);
+	_1943_state *state = (_1943_state *)machine->driver_data;
+	int attr = state->colorram[tile_index];
+	int code = state->videoram[tile_index] + ((attr & 0xe0) << 3);
 	int color = attr & 0x1f;
 
 	SET_TILE_INFO(0, code, color, 0);
@@ -209,35 +210,32 @@ static TILE_GET_INFO( c1943_get_fg_tile_info )
 
 VIDEO_START( 1943 )
 {
-	bg2_tilemap = tilemap_create(machine, c1943_get_bg2_tile_info, tilemap_scan_cols,
-		 32, 32, 2048, 8);
+	_1943_state *state = (_1943_state *)machine->driver_data;
+	state->bg2_tilemap = tilemap_create(machine, c1943_get_bg2_tile_info, tilemap_scan_cols, 32, 32, 2048, 8);
+	state->bg_tilemap = tilemap_create(machine, c1943_get_bg_tile_info, tilemap_scan_cols, 32, 32, 2048, 8);
+	state->fg_tilemap = tilemap_create(machine, c1943_get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	bg_tilemap = tilemap_create(machine, c1943_get_bg_tile_info, tilemap_scan_cols,
-		 32, 32, 2048, 8);
+	colortable_configure_tilemap_groups(machine->colortable, state->bg_tilemap, machine->gfx[1], 0x0f);
+	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
-	fg_tilemap = tilemap_create(machine, c1943_get_fg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
-
-	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[1], 0x0f);
-	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-    state_save_register_global(machine, chon);
-    state_save_register_global(machine, objon);
-    state_save_register_global(machine, sc1on);
-    state_save_register_global(machine, sc2on);
+	state_save_register_global(machine, state->char_on);
+	state_save_register_global(machine, state->obj_on);
+	state_save_register_global(machine, state->bg1_on);
+	state_save_register_global(machine, state->bg2_on);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
+	_1943_state *state = (_1943_state *)machine->driver_data;
 	int offs;
 
 	for (offs = spriteram_size - 32; offs >= 0; offs -= 32)
 	{
-		int attr = spriteram[offs + 1];
-		int code = spriteram[offs] + ((attr & 0xe0) << 3);
+		int attr = state->spriteram[offs + 1];
+		int code = state->spriteram[offs] + ((attr & 0xe0) << 3);
 		int color = attr & 0x0f;
-		int sx = spriteram[offs + 3] - ((attr & 0x10) << 4);
-		int sy = spriteram[offs + 2];
+		int sx = state->spriteram[offs + 3] - ((attr & 0x10) << 4);
+		int sy = state->spriteram[offs + 2];
 
 		if (flip_screen_get(machine))
 		{
@@ -249,36 +247,39 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (priority)
 		{
 			if (color != 0x0a && color != 0x0b)
-			{
-				drawgfx_transpen(bitmap, cliprect, machine->gfx[3], code, color, flip_screen_get(machine), flip_screen_get(machine),
-					sx, sy, 0);
-			}
+				drawgfx_transpen(bitmap, cliprect, machine->gfx[3], code, color, flip_screen_get(machine), flip_screen_get(machine), sx, sy, 0);
 		}
 		else
 		{
 			if (color == 0x0a || color == 0x0b)
-			{
-				drawgfx_transpen(bitmap, cliprect, machine->gfx[3], code, color, flip_screen_get(machine), flip_screen_get(machine),
-					sx, sy, 0);
-			}
+				drawgfx_transpen(bitmap, cliprect, machine->gfx[3], code, color, flip_screen_get(machine), flip_screen_get(machine), sx, sy, 0);
 		}
 	}
 }
 
 VIDEO_UPDATE( 1943 )
 {
-	tilemap_set_scrollx(bg2_tilemap, 0, c1943_bgscrollx[0] + 256 * c1943_bgscrollx[1]);
-	tilemap_set_scrollx(bg_tilemap, 0, c1943_scrollx[0] + 256 * c1943_scrollx[1]);
-	tilemap_set_scrolly(bg_tilemap, 0, c1943_scrolly[0]);
+	_1943_state *state = (_1943_state *)screen->machine->driver_data;
+	tilemap_set_scrollx(state->bg2_tilemap, 0, state->bgscrollx[0] + 256 * state->bgscrollx[1]);
+	tilemap_set_scrollx(state->bg_tilemap, 0, state->scrollx[0] + 256 * state->scrollx[1]);
+	tilemap_set_scrolly(state->bg_tilemap, 0, state->scrolly[0]);
 
-	if (sc2on)
-		tilemap_draw(bitmap, cliprect, bg2_tilemap, 0, 0);
+	if (state->bg2_on)
+		tilemap_draw(bitmap, cliprect, state->bg2_tilemap, 0, 0);
 	else
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
-	if (objon) draw_sprites(screen->machine, bitmap, cliprect, 0);
-	if (sc1on) tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	if (objon) draw_sprites(screen->machine, bitmap, cliprect, 1);
-	if (chon)  tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	if (state->obj_on) 
+		draw_sprites(screen->machine, bitmap, cliprect, 0);
+
+	if (state->bg1_on) 
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+
+	if (state->obj_on) 
+		draw_sprites(screen->machine, bitmap, cliprect, 1);
+
+	if (state->char_on)  
+		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+
 	return 0;
 }

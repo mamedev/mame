@@ -24,19 +24,8 @@
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+#include "1943.h"
 
-extern UINT8 *c1943_scrollx;
-extern UINT8 *c1943_scrolly;
-extern UINT8 *c1943_bgscrollx;
-
-extern WRITE8_HANDLER( c1943_c804_w );
-extern WRITE8_HANDLER( c1943_d806_w );
-extern WRITE8_HANDLER( c1943_videoram_w );
-extern WRITE8_HANDLER( c1943_colorram_w );
-
-extern PALETTE_INIT( 1943 );
-extern VIDEO_START( 1943 );
-extern VIDEO_UPDATE( 1943 );
 
 /* Read/Write Handlers */
 
@@ -48,7 +37,7 @@ static READ8_HANDLER( c1943_protection_r )
     */
 
 	int data = cpu_get_reg(space->cpu, Z80_BC) >> 8;
-//  logerror("protection read, PC: %04x Result:%02x\n",cpu_get_pc(space->cpu),data);
+//  logerror("protection read, PC: %04x Result:%02x\n", cpu_get_pc(space->cpu), data);
 	return data;
 }
 
@@ -56,7 +45,10 @@ static READ8_HANDLER( c1943_protection_r )
 
 static ADDRESS_MAP_START( c1943_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK(1)
+	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK(2)
+	AM_RANGE(0xa000, 0xafff) AM_ROMBANK(3)
+	AM_RANGE(0xb000, 0xbfff) AM_ROMBANK(4)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
@@ -67,18 +59,18 @@ static ADDRESS_MAP_START( c1943_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(c1943_c804_w)	// ROM bank switch, screen flip
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xc807, 0xc807) AM_WRITENOP // ???
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(c1943_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(c1943_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xd800, 0xd801) AM_RAM AM_BASE(&c1943_scrollx)
-	AM_RANGE(0xd802, 0xd802) AM_RAM AM_BASE(&c1943_scrolly)
-	AM_RANGE(0xd803, 0xd804) AM_RAM AM_BASE(&c1943_bgscrollx)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(c1943_videoram_w) AM_BASE_MEMBER(_1943_state, videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(c1943_colorram_w) AM_BASE_MEMBER(_1943_state, colorram)
+	AM_RANGE(0xd800, 0xd801) AM_RAM AM_BASE_MEMBER(_1943_state, scrollx)
+	AM_RANGE(0xd802, 0xd802) AM_RAM AM_BASE_MEMBER(_1943_state, scrolly)
+	AM_RANGE(0xd803, 0xd804) AM_RAM AM_BASE_MEMBER(_1943_state, bgscrollx)
 	AM_RANGE(0xd806, 0xd806) AM_WRITE(c1943_d806_w)	// sprites, bg1, bg2 enable
 	AM_RANGE(0xd808, 0xd808) AM_WRITENOP // ???
 	AM_RANGE(0xd868, 0xd868) AM_WRITENOP // ???
 	AM_RANGE(0xd888, 0xd888) AM_WRITENOP // ???
 	AM_RANGE(0xd8a8, 0xd8a8) AM_WRITENOP // ???
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(_1943_state, spriteram) AM_SIZE(&spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -244,9 +236,23 @@ static GFXDECODE_START( 1943 )
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout, 32*4+16*16+16*16, 16 )
 GFXDECODE_END
 
+
 /* Machine Driver */
 
+static MACHINE_RESET( 1943 )
+{
+	_1943_state *state = (_1943_state *)machine->driver_data;
+
+	state->char_on = 0;
+	state->obj_on = 0;
+	state->bg1_on = 0;
+	state->bg2_on = 0;
+}
+
 static MACHINE_DRIVER_START( 1943 )
+
+	MDRV_DRIVER_DATA(_1943_state)
+
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(c1943_map)
@@ -256,8 +262,9 @@ static MACHINE_DRIVER_START( 1943 )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
 
-	// video hardware
+	MDRV_MACHINE_RESET(1943)
 
+	// video hardware
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -454,8 +461,16 @@ ROM_START( 1943kai )
 	ROM_LOAD( "bmprom.06",    0x0b00, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )	/* video timing (not used) */
 ROM_END
 
-/* Game Drivers */
+static DRIVER_INIT( 1943 )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, 1, 0, 28, &ROM[0x10000], 0x1000);
+	memory_configure_bank(machine, 2, 0, 28, &ROM[0x11000], 0x1000);
+	memory_configure_bank(machine, 3, 0, 28, &ROM[0x12000], 0x1000);
+	memory_configure_bank(machine, 4, 0, 28, &ROM[0x13000], 0x1000);
+}
 
-GAME( 1987, 1943,     0,        1943,     1943,     0, ROT270, "Capcom", "1943: The Battle of Midway (US)", GAME_SUPPORTS_SAVE )
-GAME( 1987, 1943j,    1943,     1943,     1943,     0, ROT270, "Capcom", "1943: Midway Kaisen (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, 1943kai,  0,        1943,     1943,     0, ROT270, "Capcom", "1943 Kai: Midway Kaisen (Japan)", GAME_SUPPORTS_SAVE )
+/* Game Drivers */
+GAME( 1987, 1943,     0,     1943,   1943,  1943, ROT270,  "Capcom",  "1943: The Battle of Midway (US)", GAME_SUPPORTS_SAVE )
+GAME( 1987, 1943j,    1943,  1943,   1943,  1943, ROT270,  "Capcom",  "1943: Midway Kaisen (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, 1943kai,  0,     1943,   1943,  1943, ROT270,  "Capcom",  "1943 Kai: Midway Kaisen (Japan)", GAME_SUPPORTS_SAVE )

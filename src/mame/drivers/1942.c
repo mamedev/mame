@@ -57,19 +57,6 @@ correctly.
      at the sound CPU.
 
 
-SAVE STATE (lee@lmservers.com):
-1942 uses the Z80 and AY8910 which both support save state.
-
-The global variables in drivers/1942.c are extern and defined in video/1942.c
-The rationale for saving/not saving are as follows:
-UINT8 *c1942_fgvideoram;        Saved via reference to AM_BASE
-UINT8 *c1942_bgvideoram;        Saved via reference to AM_BASE
-
-static int c1942_palette_bank;  Explicitly saved
-static tilemap *fg_tilemap, *bg_tilemap;    Saved due to tilemap supporting save
-
-There are no static local variables.
-
 ***************************************************************************/
 
 #define MAIN_CPU_CLOCK		(XTAL_12MHz/3) /* 12MHz is the only OSC on the PCB */
@@ -80,22 +67,7 @@ There are no static local variables.
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
-
-
-extern UINT8 *c1942_fgvideoram;
-extern UINT8 *c1942_bgvideoram;
-
-
-extern WRITE8_HANDLER( c1942_fgvideoram_w );
-extern WRITE8_HANDLER( c1942_bgvideoram_w );
-extern WRITE8_HANDLER( c1942_scroll_w );
-extern WRITE8_HANDLER( c1942_c804_w );
-extern WRITE8_HANDLER( c1942_palette_bank_w );
-
-extern PALETTE_INIT( 1942 );
-extern VIDEO_START( 1942 );
-extern VIDEO_UPDATE( 1942 );
-
+#include "1942.h"
 
 
 static WRITE8_HANDLER( c1942_bankswitch_w )
@@ -103,16 +75,13 @@ static WRITE8_HANDLER( c1942_bankswitch_w )
 	memory_set_bank(space->machine, 1, data & 0x03);
 }
 
-
-
 static INTERRUPT_GEN( c1942_interrupt )
 {
 	if (cpu_getiloops(device) != 0)
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);/* RST 08h */
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
 	else
 		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
 }
-
 
 
 static ADDRESS_MAP_START( c1942_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -128,9 +97,9 @@ static ADDRESS_MAP_START( c1942_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(c1942_c804_w)
 	AM_RANGE(0xc805, 0xc805) AM_WRITE(c1942_palette_bank_w)
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(c1942_bankswitch_w)
-	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(c1942_fgvideoram_w) AM_BASE(&c1942_fgvideoram)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(c1942_bgvideoram_w) AM_BASE(&c1942_bgvideoram)
+	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_BASE_MEMBER(_1942_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(c1942_fgvideoram_w) AM_BASE_MEMBER(_1942_state, fg_videoram)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(c1942_bgvideoram_w) AM_BASE_MEMBER(_1942_state, bg_videoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -265,8 +234,18 @@ static GFXDECODE_START( 1942 )
 GFXDECODE_END
 
 
+static MACHINE_RESET( 1942 )
+{
+	_1942_state *state = (_1942_state *)machine->driver_data;
+
+	state->palette_bank = 0;
+	state->scroll[0] = 0;
+	state->scroll[1] = 0;
+}
 
 static MACHINE_DRIVER_START( 1942 )
+
+	MDRV_DRIVER_DATA(_1942_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)	/* 4 MHz ??? */
@@ -276,6 +255,8 @@ static MACHINE_DRIVER_START( 1942 )
 	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)	/* 3 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+
+	MDRV_MACHINE_RESET(1942)
 
 	/* video hardware */
 	MDRV_GFXDECODE(1942)
