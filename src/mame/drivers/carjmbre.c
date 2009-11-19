@@ -1,29 +1,30 @@
-/*
-Car Jamboree
-Omori Electric CAD (OEC) 1981
+/***************************************************************************
 
-c14                c.d19
-c13                c.d18           c10
-c12                                c9
-c11         2125   2125
-            2125   2125
-            2125   2125  2114 2114
-            2125   2125  2114 2114
-            2125   2125            c8
-            2125   2125            c7
-                                   c6
-                                   c5
-                                   c4
-                                   c3
-5101                               c2
-5101                               c1
-                                   6116
-18.432MHz
-          6116
-Z80A      c15
-                                   Z80A
-       8910         SW
-       8910
+    Car Jamboree
+    Omori Electric CAD (OEC) 1981
+
+    c14                c.d19
+    c13                c.d18           c10
+    c12                                c9
+    c11         2125   2125
+                2125   2125
+                2125   2125  2114 2114
+                2125   2125  2114 2114
+                2125   2125            c8
+                2125   2125            c7
+                                       c6
+                                       c5
+                                       c4
+                                       c3
+    5101                               c2
+    5101                               c1
+                                       6116
+    18.432MHz
+              6116
+    Z80A      c15
+                                       Z80A
+           8910         SW
+           8910
 
 Notes:
 
@@ -38,20 +39,19 @@ Notes:
 - colours are wrong, sprites and characters only using one of the proms
 
 - background colour calculation is a guess
-*/
+
+***************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "carjmbre.h"
 
-WRITE8_HANDLER( carjmbre_flipscreen_w );
-WRITE8_HANDLER( carjmbre_bgcolor_w );
-WRITE8_HANDLER( carjmbre_videoram_w );
-
-PALETTE_INIT( carjmbre );
-VIDEO_START( carjmbre );
-VIDEO_UPDATE( carjmbre );
-
+/*************************************
+ *
+ *  Memory maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( carjmbre_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -62,8 +62,8 @@ static ADDRESS_MAP_START( carjmbre_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8807, 0x8807) AM_WRITE(carjmbre_flipscreen_w)
 	AM_RANGE(0x8fc1, 0x8fc1) AM_WRITENOP			//overrun during initial screen clear
 	AM_RANGE(0x8fe1, 0x8fe1) AM_WRITENOP			//overrun during initial screen clear
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(carjmbre_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9800, 0x985f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(carjmbre_videoram_w) AM_BASE_MEMBER(carjmbre_state, videoram)
+	AM_RANGE(0x9800, 0x985f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(carjmbre_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9880, 0x98df) AM_WRITE(SMH_RAM)			//spriteram mirror
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2")
@@ -91,6 +91,12 @@ static ADDRESS_MAP_START( carjmbre_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x30, 0x31) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0x32, 0x32) AM_WRITENOP				//?? written before and after 0x31 with same value
 ADDRESS_MAP_END
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( carjmbre )
 	PORT_START("P1")
@@ -138,6 +144,12 @@ static INPUT_PORTS_START( carjmbre )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
 static const gfx_layout carjmbre_charlayout =
 {
 	8,8,
@@ -165,12 +177,32 @@ static GFXDECODE_START( carjmbre )
 	GFXDECODE_ENTRY( "gfx2", 0, carjmbre_spritelayout, 0, 16 )
 GFXDECODE_END
 
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_RESET( carjmbre )
+{
+	carjmbre_state *state = (carjmbre_state *)machine->driver_data;
+
+	state->flipscreen = 0;
+	state->bgcolor = 0;
+}
+
 static MACHINE_DRIVER_START( carjmbre )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(carjmbre_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,18432000/6)
 	MDRV_CPU_PROGRAM_MAP(carjmbre_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+
+	MDRV_MACHINE_RESET(carjmbre)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 1500000)
 	MDRV_CPU_PROGRAM_MAP(carjmbre_sound_map)
@@ -180,7 +212,7 @@ static MACHINE_DRIVER_START( carjmbre )
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -201,6 +233,12 @@ static MACHINE_DRIVER_START( carjmbre )
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 MACHINE_DRIVER_END
+
+/*************************************
+ *
+ *  ROM definition
+ *
+ *************************************/
 
 ROM_START( carjmbre )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -231,5 +269,10 @@ ROM_START( carjmbre )
 	ROM_LOAD( "c.d18",  0x0020, 0x0020, CRC(7b9ed1b0) SHA1(ec5e1f56e5a2fc726083866c08ac0e1de0ed6ace) )
 ROM_END
 
-GAME( 1983, carjmbre, 0, carjmbre, carjmbre, 0, ROT90, "Omori Electric Co., Ltd.", "Car Jamboree", GAME_IMPERFECT_COLORS )
+/*************************************
+ *
+ *  Game driver
+ *
+ *************************************/
 
+GAME( 1983, carjmbre, 0, carjmbre, carjmbre, 0, ROT90, "Omori Electric Co., Ltd.", "Car Jamboree", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )

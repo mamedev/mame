@@ -1,68 +1,65 @@
-/* battlex.c - by David Haywood
+/***************************************************************************
 
-Stephh's notes :
+    Omori Battle Cross
 
-  - I don't know exactly how to call the "Free Play" Dip Switch 8(
-    It's effect is the following :
-      * you need to insert at least one credit and start a game
-      * when the game is over, you can start another games WITHOUT
-        inserting another coins
-    Note that the number of credits is decremented though.
-    Credits are BCD coded on 3 bytes (0x000000-0x999999) at addresses
-    0xa039 (LSB), 0xa03a and 0xa03b (MSB), but only the LSB is displayed.
+    driver by David Haywood
 
-   - Setting the flipscreen dip to ON also hides the copyright message (?)
+    Stephh's notes :
 
-TO DO :
+    - I don't know exactly how to call the "Free Play" Dip Switch 8(
+      It's effect is the following :
+        * you need to insert at least one credit and start a game
+        * when the game is over, you can start another games WITHOUT
+          inserting another coins
+      Note that the number of credits is decremented though.
+      Credits are BCD coded on 3 bytes (0x000000-0x999999) at addresses
+      0xa039 (LSB), 0xa03a and 0xa03b (MSB), but only the LSB is displayed.
 
-  - missing starfield
+     - Setting the flipscreen dip to ON also hides the copyright message (?)
 
-  - game speed, its seems to be controlled by the IRQ's, how fast should it
-    be? firing seems frustratingly inconsistant
+    TO DO :
 
-  - colors match Tim's screen shots, but there's no guarantee RGB are in the
-    correct order.
-*/
+    - missing starfield
 
-/*
+    - game speed, its seems to be controlled by the IRQ's, how fast should it
+      be? firing seems frustratingly inconsistant
 
-Battle Cross (c)1982 Omori
+    - colors match Tim's screen shots, but there's no guarantee RGB are in the
+      correct order.
 
-CPU: Z80A
-Sound: AY-3-8910
-Other: 93419 (in socket marked 93219)
+****************************************************************************
 
-RAM: 4116(x12), 2114(x2), 2114(x6)
-PROMS: none
+    Battle Cross (c)1982 Omori
 
-XTAL: 10.0 MHz
+    CPU: Z80A
+    Sound: AY-3-8910
+    Other: 93419 (in socket marked 93219)
 
-*/
+    RAM: 4116(x12), 2114(x2), 2114(x6)
+    PROMS: none
+
+    XTAL: 10.0 MHz
+
+***************************************************************************/
 
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
+#include "battlex.h"
 
 
-extern WRITE8_HANDLER( battlex_palette_w );
-extern WRITE8_HANDLER( battlex_videoram_w );
-extern WRITE8_HANDLER( battlex_scroll_x_lsb_w );
-extern WRITE8_HANDLER( battlex_scroll_x_msb_w );
-extern WRITE8_HANDLER( battlex_flipscreen_w );
-
-extern PALETTE_INIT( battlex );
-extern VIDEO_START( battlex );
-extern VIDEO_UPDATE( battlex );
-
-
-/*** MEMORY & PORT READ / WRITE **********************************************/
+/*************************************
+ *
+ *  Memory maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( battlex_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(battlex_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(battlex_videoram_w) AM_BASE_MEMBER(battlex_state, videoram)
+	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE_MEMBER(battlex_state, spriteram)
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM
 	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE(battlex_palette_w)
 ADDRESS_MAP_END
@@ -87,7 +84,11 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x33, 0x33) AM_WRITE(battlex_scroll_x_msb_w)
 ADDRESS_MAP_END
 
-/*** INPUT PORTS *************************************************************/
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( battlex )
 	PORT_START("DSW1")	/* IN0 */
@@ -158,8 +159,13 @@ static INPUT_PORTS_START( battlex )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-/*** GFX DECODE **************************************************************/
 
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 static const gfx_layout battlex_charlayout =
 {
@@ -192,15 +198,33 @@ static GFXDECODE_START( battlex )
 	GFXDECODE_ENTRY( "gfx2", 0, battlex_spritelayout, 16*8, 8 )
 GFXDECODE_END
 
-/*** MACHINE DRIVERS *********************************************************/
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_RESET( battlex )
+{
+	battlex_state *state = (battlex_state *)machine->driver_data;
+
+	state->scroll_lsb = 0;
+	state->scroll_msb = 0;
+}
 
 static MACHINE_DRIVER_START( battlex )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(battlex_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,10000000/2 )		 /* 10 MHz, divided ? (Z80A CPU) */
 	MDRV_CPU_PROGRAM_MAP(battlex_map)
 	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8) /* controls game speed? */
+
+	MDRV_MACHINE_RESET(battlex)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -223,7 +247,11 @@ static MACHINE_DRIVER_START( battlex )
 MACHINE_DRIVER_END
 
 
-/*** ROM LOADING *************************************************************/
+/*************************************
+ *
+ *  ROM definition
+ *
+ *************************************/
 
 ROM_START( battlex )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -250,11 +278,18 @@ ROM_START( battlex )
 	ROM_LOAD( "2732.e",    0x0000, 0x1000, CRC(126842b7) SHA1(2da4f64e077232c1dd0853d07d801f9781517850) )
 ROM_END
 
+
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
+
 static DRIVER_INIT( battlex )
 {
-	UINT8 *cold    = memory_region       ( machine, "user1" );
-	UINT8 *mskd    = memory_region       ( machine, "user2" );
-	UINT8 *dest    = memory_region       ( machine, "gfx1" );
+	UINT8 *cold = memory_region(machine, "user1");
+	UINT8 *mskd = memory_region(machine, "user2");
+	UINT8 *dest = memory_region(machine, "gfx1");
 
 	int outcount;
 
@@ -267,22 +302,28 @@ static DRIVER_INIT( battlex )
 			int bitmask = 0x01;
 			int bitcount;
 
-			for (bitcount = 0;bitcount < 8 ; bitcount ++)
+			for (bitcount = 0; bitcount < 8 ; bitcount ++)
 			{
 				int bit, col;
-				bit = (mskd[outcount*8+linecount] & bitmask) >> bitcount;
+				bit = (mskd[outcount * 8 + linecount] & bitmask) >> bitcount;
 
-				if (bit) col = (cold[outcount*8+(linecount&~1)+(bitcount/4)] & 0x0f) << 4;
-				else col = (cold[outcount*8+(linecount&~1)+(bitcount/4)] & 0xf0);
+				if (bit) 
+					col = (cold[outcount * 8 + (linecount & ~1) + (bitcount / 4)] & 0x0f) << 4;
+				else 
+					col = (cold[outcount * 8 + (linecount & ~1) + (bitcount / 4)] & 0xf0);
 
-				dest[outcount*32 + linecount*4 + bitcount /2] |= (col >> (4*(bitcount & 1)));
+				dest[outcount * 32 + linecount * 4 + bitcount /2] |= (col >> (4 * (bitcount & 1)));
 				bitmask = bitmask << 1;
 			}
 		}
 	}
 }
 
-/*** GAME DRIVERS ************************************************************/
 
-GAME( 1982, battlex, 0, battlex, battlex, battlex, ROT180, "Omori Electric", "Battle Cross", GAME_IMPERFECT_GRAPHICS )
+/*************************************
+ *
+ *  Game driver
+ *
+ *************************************/
 
+GAME( 1982, battlex, 0, battlex, battlex, battlex, ROT180, "Omori Electric", "Battle Cross", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

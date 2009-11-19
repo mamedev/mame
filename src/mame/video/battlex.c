@@ -1,17 +1,19 @@
+/***************************************************************************
+
+    Video emulation for Omori Battle Cross
+
+***************************************************************************/
+
 #include "driver.h"
-
-static int battlex_scroll_lsb;
-static int battlex_scroll_msb;
-
-static tilemap *bg_tilemap;
+#include "battlex.h"
 
 PALETTE_INIT( battlex )
 {
-	int i,col;
+	int i, col;
 
-	for (col = 0;col < 8;col++)
+	for (col = 0; col < 8; col++)
 	{
-		for (i = 0;i < 16;i++)
+		for (i = 0; i < 16; i++)
 		{
 			int data = i | col;
 			int g = pal1bit(data >> 0);
@@ -28,30 +30,33 @@ PALETTE_INIT( battlex )
 			}
 #endif
 
-			palette_set_color(machine, i + 16 * col,MAKE_RGB(r,g,b));
+			palette_set_color(machine, i + 16 * col, MAKE_RGB(r,g,b));
 		}
 	}
 }
 
 WRITE8_HANDLER( battlex_palette_w )
 {
-	palette_set_color_rgb(space->machine,16*8 + offset,pal1bit(data >> 2),pal1bit(data >> 0),pal1bit(data >> 1));
+	palette_set_color_rgb(space->machine, 16 * 8 + offset, pal1bit(data >> 2), pal1bit(data >> 0), pal1bit(data >> 1));
 }
 
 WRITE8_HANDLER( battlex_scroll_x_lsb_w )
 {
-	battlex_scroll_lsb = data;
+	battlex_state *state = (battlex_state *)space->machine->driver_data;
+	state->scroll_lsb = data;
 }
 
 WRITE8_HANDLER( battlex_scroll_x_msb_w )
 {
-	battlex_scroll_msb = data;
+	battlex_state *state = (battlex_state *)space->machine->driver_data;
+	state->scroll_msb = data;
 }
 
 WRITE8_HANDLER( battlex_videoram_w )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
+	battlex_state *state = (battlex_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( battlex_flipscreen_w )
@@ -69,25 +74,30 @@ WRITE8_HANDLER( battlex_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int tile = videoram[tile_index*2] | (((videoram[tile_index*2+1] & 0x01)) << 8);
-	int color = (videoram[tile_index*2+1] & 0x0e) >> 1;
+	battlex_state *state = (battlex_state *)machine->driver_data;
+	int tile = state->videoram[tile_index * 2] | (((state->videoram[tile_index * 2 + 1] & 0x01)) << 8);
+	int color = (state->videoram[tile_index * 2 + 1] & 0x0e) >> 1;
 
-	SET_TILE_INFO(0,tile,color,0);
+	SET_TILE_INFO(0, tile, color, 0);
 }
 
 VIDEO_START( battlex )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 64, 32);
+	battlex_state *state = (battlex_state *)machine->driver_data;
+
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	state_save_register_global(machine, state->scroll_lsb);
+	state_save_register_global(machine, state->scroll_msb);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	battlex_state *state = (battlex_state *)machine->driver_data;
 	const gfx_element *gfx = machine->gfx[1];
-	UINT8 *source = spriteram;
-	UINT8 *finish = spriteram + 0x200;
+	UINT8 *source = state->spriteram;
+	UINT8 *finish = state->spriteram + 0x200;
 
-	while( source<finish )
+	while (source < finish)
 	{
 		int sx = (source[0] & 0x7f) * 2 - (source[0] & 0x80) * 2;
 		int sy = source[3];
@@ -104,8 +114,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,gfx,tile,color,flipx,flipy,sx,sy,0);
-
+		drawgfx_transpen(bitmap, cliprect, gfx, tile, color, flipx, flipy, sx, sy, 0);
 		source += 4;
 	}
 
@@ -113,8 +122,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE(battlex)
 {
-	tilemap_set_scrollx(bg_tilemap, 0, battlex_scroll_lsb | (battlex_scroll_msb << 8));
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	battlex_state *state = (battlex_state *)screen->machine->driver_data;
+
+	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll_lsb | (state->scroll_msb << 8));
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

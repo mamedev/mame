@@ -1,24 +1,26 @@
-/*
-Popper
+/***************************************************************************
 
-Omori Electric CAD (OEC) 1983
+    Popper
 
-
-PPR-12
+    Omori Electric CAD (OEC) 1983
 
 
-18.432MHz                    6148 6148
-                             6148 4148
-                2128
-                2128
-                2128
- 2128
-            p3                p6
-z80A        p2                p5
-  p0        p1             p4
-            z80A
-   8910
- 8910              SW2 SW1    p.m4 p.m3
+    PPR-12
+
+
+    18.432MHz                    6148 6148
+                                 6148 4148
+                    2128
+                    2128
+                    2128
+     2128
+                p3                p6
+    z80A        p2                p5
+      p0        p1             p4
+                z80A
+       8910
+     8910              SW2 SW1    p.m4 p.m3
+
 
 Notes:
 
@@ -76,28 +78,21 @@ Notes:
 - the game freezes in much the same way as the stop dip switch when the coin
   inputs are high (a short PORT_IMPULSE duration will still cause a hitch),
   so potentially there's a coin lockout mechanism
-*/
+
+***************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
+#include "popper.h"
 
-extern UINT8 *popper_videoram, *popper_attribram, *popper_ol_videoram, *popper_ol_attribram, *popper_spriteram;
-extern size_t popper_spriteram_size;
 
-WRITE8_HANDLER( popper_videoram_w );
-WRITE8_HANDLER( popper_attribram_w );
-WRITE8_HANDLER( popper_ol_videoram_w );
-WRITE8_HANDLER( popper_ol_attribram_w );
-WRITE8_HANDLER( popper_flipscreen_w );
-WRITE8_HANDLER( popper_e002_w );
-WRITE8_HANDLER( popper_gfx_bank_w );
-
-PALETTE_INIT( popper );
-VIDEO_START( popper );
-VIDEO_UPDATE( popper );
-
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 //e000                  e001                  e002                  e003
 //76543210              76543210              76543210              76543210
@@ -128,18 +123,18 @@ VIDEO_UPDATE( popper );
 //                      -------x  sound
 static READ8_HANDLER( popper_input_ports_r )
 {
-	UINT8 data=0;
+	UINT8 data = 0;
 	switch (offset)
 	{
 		//           player inputs        dsw1                           dsw2
-		case 0: data=input_port_read(space->machine, "IN0") | ((input_port_read(space->machine, "DSW1") & 0x02)<<5) | ((input_port_read(space->machine, "DSW2") & 0x01)<<4); break;
-		case 1: data=input_port_read(space->machine, "IN1") | ((input_port_read(space->machine, "DSW1") & 0x01)<<6) | ((input_port_read(space->machine, "DSW2") & 0x02)<<3); break;
-		case 2: data=input_port_read(space->machine, "IN2") | ((input_port_read(space->machine, "DSW1") & 0x08)<<3) | ((input_port_read(space->machine, "DSW2") & 0x04)<<2); break;
-		case 3: data=input_port_read(space->machine, "IN3") | ((input_port_read(space->machine, "DSW1") & 0x04)<<4) | ((input_port_read(space->machine, "DSW2") & 0x08)<<1); break;
-		case 4: data=                   ((input_port_read(space->machine, "DSW1") & 0x20)<<2) | ((input_port_read(space->machine, "DSW2") & 0x10)<<1); break;
-		case 5: data=                   ((input_port_read(space->machine, "DSW1") & 0x10)<<3) | ((input_port_read(space->machine, "DSW2") & 0x20)<<0); break;
-		case 6: data=                   ((input_port_read(space->machine, "DSW1") & 0x80)<<0) | ((input_port_read(space->machine, "DSW2") & 0x40)>>1); break;
-		case 7: data=                   ((input_port_read(space->machine, "DSW1") & 0x40)<<1) | ((input_port_read(space->machine, "DSW2") & 0x80)>>2); break;
+		case 0: data = input_port_read(space->machine, "IN0") | ((input_port_read(space->machine, "DSW1") & 0x02) << 5) | ((input_port_read(space->machine, "DSW2") & 0x01) << 4); break;
+		case 1: data = input_port_read(space->machine, "IN1") | ((input_port_read(space->machine, "DSW1") & 0x01) << 6) | ((input_port_read(space->machine, "DSW2") & 0x02) << 3); break;
+		case 2: data = input_port_read(space->machine, "IN2") | ((input_port_read(space->machine, "DSW1") & 0x08) << 3) | ((input_port_read(space->machine, "DSW2") & 0x04) << 2); break;
+		case 3: data = input_port_read(space->machine, "IN3") | ((input_port_read(space->machine, "DSW1") & 0x04) << 4) | ((input_port_read(space->machine, "DSW2") & 0x08) << 1); break;
+		case 4: data = ((input_port_read(space->machine, "DSW1") & 0x20) << 2) | ((input_port_read(space->machine, "DSW2") & 0x10) << 1); break;
+		case 5: data = ((input_port_read(space->machine, "DSW1") & 0x10) << 3) | ((input_port_read(space->machine, "DSW2") & 0x20) << 0); break;
+		case 6: data = ((input_port_read(space->machine, "DSW1") & 0x80) << 0) | ((input_port_read(space->machine, "DSW2") & 0x40) >> 1); break;
+		case 7: data = ((input_port_read(space->machine, "DSW1") & 0x40) << 1) | ((input_port_read(space->machine, "DSW2") & 0x80) >> 2); break;
 	}
 	return data;
 }
@@ -150,16 +145,22 @@ static READ8_HANDLER( popper_soundcpu_nmi_r )
 	return 0;
 }
 
+/*************************************
+ *
+ *  Memory maps
+ *
+ *************************************/
+
 static ADDRESS_MAP_START( popper_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xc000, 0xc1bf) AM_RAM
-	AM_RANGE(0xc1c0, 0xc1ff) AM_RAM_WRITE(popper_ol_videoram_w) AM_BASE(&popper_ol_videoram)
-	AM_RANGE(0xc200, 0xc61f) AM_RAM_WRITE(popper_videoram_w) AM_BASE(&popper_videoram)
+	AM_RANGE(0xc1c0, 0xc1ff) AM_RAM_WRITE(popper_ol_videoram_w) AM_BASE_MEMBER(popper_state, ol_videoram)
+	AM_RANGE(0xc200, 0xc61f) AM_RAM_WRITE(popper_videoram_w) AM_BASE_MEMBER(popper_state, videoram)
 	AM_RANGE(0xc620, 0xc9bf) AM_RAM
-	AM_RANGE(0xc9c0, 0xc9ff) AM_RAM_WRITE(popper_ol_attribram_w) AM_BASE(&popper_ol_attribram)
-	AM_RANGE(0xca00, 0xce1f) AM_RAM_WRITE(popper_attribram_w) AM_BASE(&popper_attribram)
+	AM_RANGE(0xc9c0, 0xc9ff) AM_RAM_WRITE(popper_ol_attribram_w) AM_BASE_MEMBER(popper_state, ol_attribram)
+	AM_RANGE(0xca00, 0xce1f) AM_RAM_WRITE(popper_attribram_w) AM_BASE_MEMBER(popper_state, attribram)
 	AM_RANGE(0xce20, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&popper_spriteram) AM_SIZE(&popper_spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_MEMBER(popper_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xe000, 0xe007) AM_READ(popper_input_ports_r)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(interrupt_enable_w)
@@ -184,6 +185,12 @@ static ADDRESS_MAP_START( popper_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa002, 0xa002) AM_WRITENOP				//?? same writes as 0xa000
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE(1)
 ADDRESS_MAP_END
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( popper )
 	PORT_START("IN0")
@@ -258,6 +265,12 @@ static INPUT_PORTS_START( popper )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
 static const gfx_layout popper_charlayout =
 {
 	8,8,
@@ -285,7 +298,25 @@ static GFXDECODE_START( popper )
 	GFXDECODE_ENTRY( "gfx2", 0, popper_spritelayout, 0, 16 )
 GFXDECODE_END
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_RESET( popper )
+{
+	popper_state *state = (popper_state *)machine->driver_data;
+
+	state->flipscreen = 0;
+	state->e002 = 0;
+	state->gfx_bank = 0;
+}
+
 static MACHINE_DRIVER_START( popper )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(popper_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,18432000/6)
@@ -297,6 +328,8 @@ static MACHINE_DRIVER_START( popper )
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)		//NMIs caused by the main CPU
 
 	MDRV_QUANTUM_TIME(HZ(1800))
+
+	MDRV_MACHINE_RESET(popper)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -324,6 +357,12 @@ static MACHINE_DRIVER_START( popper )
 MACHINE_DRIVER_END
 
 
+/*************************************
+ *
+ *  ROM definition
+ *
+ *************************************/
+
 ROM_START( popper )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "p1",   0x0000, 0x2000, CRC(56881b70) SHA1(d3ade7a54a6cb8a0babf0d667a6b27f492a739dc) )
@@ -346,4 +385,10 @@ ROM_START( popper )
 ROM_END
 
 
-GAME( 1983, popper, 0, popper, popper, 0, ROT90, "Omori Electric Co., Ltd.", "Popper", GAME_IMPERFECT_COLORS )
+/*************************************
+ *
+ *  Game driver
+ *
+ *************************************/
+
+GAME( 1983, popper, 0, popper, popper, 0, ROT90, "Omori Electric Co., Ltd.", "Popper", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
