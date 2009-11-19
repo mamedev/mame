@@ -1,0 +1,37 @@
+/***************************************************************************
+
+    Bionic Commando
+
+***************************************************************************/
+
+typedef struct _bionicc_state bionicc_state;
+struct _bionicc_state
+{
+	/* memory pointers */
+	UINT16 *  bgvideoram;
+	UINT16 *  fgvideoram;
+	UINT16 *  txvideoram;
+	UINT16 *  paletteram16;
+//	UINT16 *  spriteram16;	// needed for EOF, but currently handled through buffer_spriteram16
+
+	/* video-related */
+	tilemap   *tx_tilemap, *bg_tilemap, *fg_tilemap;
+	UINT16    scroll[4];
+
+	UINT16    inp[3];
+	UINT16    soundcommand;
+};
+
+
+/*----------- defined in video/bionicc.c -----------*/
+
+WRITE16_HANDLER( bionicc_fgvideoram_w );
+WRITE16_HANDLER( bionicc_bgvideoram_w );
+WRITE16_HANDLER( bionicc_txvideoram_w );
+WRITE16_HANDLER( bionicc_paletteram_w );
+WRITE16_HANDLER( bionicc_scroll_w );
+WRITE16_HANDLER( bionicc_gfxctrl_w );
+
+VIDEO_START( bionicc );
+VIDEO_UPDATE( bionicc );
+VIDEO_EOF( bionicc );
