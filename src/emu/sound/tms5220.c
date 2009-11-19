@@ -293,6 +293,7 @@ INLINE tms5220_state *get_safe_token(const device_config *device)
 	assert(device->token != NULL);
 	assert(device->type == SOUND);
 	assert(sound_get_type(device) == SOUND_TMS5220 ||
+		   sound_get_type(device) == SOUND_TMS5220C ||
 		   sound_get_type(device) == SOUND_TMC0285 ||
 		   sound_get_type(device) == SOUND_TMS5200);
 	return (tms5220_state *)device->token;
