@@ -774,13 +774,37 @@ static READ32_HANDLER( samsho_io_r )
 }
 
 /* Beast Busters 2 */
+/* FIXME: trigger input doesn't work? */
 static READ32_HANDLER( shoot_io_r )
 {
 	switch (offset*4)
 	{
-        case 0x000: return mame_rand(space->machine);
-		case 0x004: return input_port_read(space->machine, "SYSTEM");
-		case 0x008: return input_port_read(space->machine, "P1_P2");
+        case 0x000:
+        {
+        	if(cpu_get_pc(space->cpu) == 0x8000e040 || cpu_get_pc(space->cpu) == 0x80012fc0) //i/o init 1
+				return 0x400;
+
+        	return 0;
+		}
+		case 0x010: return input_port_read(space->machine, "D_IN");
+		case 0x018:
+		{
+			UINT8 p1_x, p1_y, p2_x, p2_y;
+			p1_x = input_port_read(space->machine, "LIGHT_P1_X") & 0xff;
+			p1_y = input_port_read(space->machine, "LIGHT_P1_Y") & 0xff;
+			p2_x = input_port_read(space->machine, "LIGHT_P2_X") & 0xff;
+			p2_y = input_port_read(space->machine, "LIGHT_P2_Y") & 0xff;
+
+			return p1_x<<24 | p1_y<<16 | p2_x<<8 | p2_y;
+		}
+		case 0x01c:
+		{
+			UINT8 p3_x, p3_y;
+			p3_x = input_port_read(space->machine, "LIGHT_P3_X") & 0xff;
+			p3_y = input_port_read(space->machine, "LIGHT_P3_Y") & 0xff;
+
+			return p3_x<<24 | p3_y<<16 | p3_x<<8 | p3_y; //FIXME: see what's the right bank here when the trigger works
+		}
 		case 0x600: return no_machine_error_code;
 	}
 
@@ -812,9 +836,6 @@ static READ32_HANDLER( hng64_dualport_r )
 		case RACING_MCU: return racing_io_r(space, offset,0xffffffff);
 		case SAMSHO_MCU: return samsho_io_r(space, offset,0xffffffff);
 	}
-
-	if(offset*4 == 0x600)
-		return no_machine_error_code;
 
 	return mame_rand(space->machine)&0xffffffff;
 }
@@ -1383,6 +1404,102 @@ static INPUT_PORTS_START( hng64 )
 	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( bbust2 )
+	PORT_START("D_IN")
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_SERVICE2 )
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_SERVICE3 )
+	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_SERVICE )
+	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) //trigger
+	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3) //pump
+	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3) //bomb
+	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x00200000, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_START3 )
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) //trigger
+	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) //pump
+	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) //bomb
+	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) //trigger
+	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) //pump
+	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) //bomb
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("LIGHT_P1_P2")
+	PORT_DIPNAME( 0x0001, 0x0000, "2-1" )
+	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0000, "2-2" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x008000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+
+	PORT_START("LIGHT_P1_X")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_START("LIGHT_P1_Y")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_START("LIGHT_P2_X")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START("LIGHT_P2_Y")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START("LIGHT_P3_X")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(3)
+
+	PORT_START("LIGHT_P3_Y")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(3)
+INPUT_PORTS_END
 
 
 static const gfx_layout hng64_8x8x4_tilelayout =
@@ -1654,7 +1771,6 @@ static MACHINE_RESET(hyperneo)
 	// "Display List" init - ugly
 	activeBuffer = 0 ;
 }
-
 
 static MACHINE_DRIVER_START( hng64 )
 	/* basic machine hardware */
@@ -2159,7 +2275,7 @@ GAME( 1997, hng64,  0,        hng64, hng64, hng64,      ROT0, "SNK", "Hyper NeoG
 GAME( 1997, roadedge, hng64,  hng64, hng64, hng64_race, ROT0, "SNK", "Roads Edge / Round Trip (rev.B)",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 001 */
 GAME( 1998, sams64,   hng64,  hng64, hng64, ss64,       ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 002 */
 GAME( 1998, xrally,   hng64,  hng64, hng64, hng64_race, ROT0, "SNK", "Xtreme Rally / Off Beat Racer!",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 003 */
-GAME( 1998, bbust2,   hng64,  hng64, hng64, hng64_shoot,ROT0, "SNK", "Beast Busters 2nd Nightmare",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 004 */
+GAME( 1998, bbust2,   hng64,  hng64, bbust2,hng64_shoot,ROT0, "SNK", "Beast Busters 2nd Nightmare",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 004 */
 GAME( 1998, sams64_2, hng64,  hng64, hng64, ss64,       ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 005 */
 GAME( 1998, fatfurwa, hng64,  hng64, hng64, fatfurwa,   ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", GAME_NOT_WORKING|GAME_NO_SOUND )	/* 006 */
 GAME( 1999, buriki,   hng64,  hng64, hng64, fatfurwa,   ROT0, "SNK", "Buriki One (rev.B)",				  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 007 */
