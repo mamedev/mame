@@ -9203,7 +9203,8 @@ Other Sun games
 	DRIVER( jongkyo )	/* (c) 1985 Kiwako */
 	DRIVER( gamecstl )	/* MAME based bootleg */
 	DRIVER( gamecst2 )	/* MAME based bootleg, version 2.613 */
-	DRIVER( drw80pkr )	/* (c) 1983 IGT */
+	DRIVER( drw80pkr )	/* (c) 1982 IGT */
+	DRIVER( drw80pk2 )	/* (c) 1983 IGT */
 	DRIVER( blazlaz )	/* (c) 1989 Hudson Soft */
 	DRIVER( ggconnie )	/* (c) ???? Capcom */
 	DRIVER( paranoia )	/* (c) 1990 Naxat Soft */
