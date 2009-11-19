@@ -33,6 +33,7 @@
 static UINT8 *gx_objzbuf, *gx_shdzbuf;
 
 
+
 static int layer_colorbase[4];
 static INT32 gx_tilebanks[8], gx_oldbanks[8];
 static int gx_tilemode, gx_rozenable, psac_colorbase, last_psac_colorbase;
@@ -41,6 +42,14 @@ static int gx_rushingheroes_hack;
 static tilemap *gx_psac_tilemap, *gx_psac_tilemap2;
 extern UINT32 *gx_psacram, *gx_subpaletteram32;
 static bitmap_t* type3_roz_temp_bitmap;
+static tilemap* gx_psac_tilemap_alt;
+
+static int konamigx_has_dual_screen;
+int konamigx_current_frame;
+INLINE void set_color_555(running_machine *machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data);
+static int konamigx_palformat;
+static bitmap_t* dualscreen_left_tempbitmap;
+static bitmap_t* dualscreen_right_tempbitmap;
 
 /* On Type-1 the K053936 output is rendered to these temporary bitmaps as raw data
    the 'voxel' effect to give the pixels height is a post-process operation on the
@@ -1808,12 +1817,13 @@ WRITE32_HANDLER( konamigx_type3_psac2_bank_w )
 	COMBINE_DATA(&konamigx_type3_psac2_bank[offset]);
 	konamigx_type3_psac2_actual_bank = (konamigx_type3_psac2_bank[0] & 0x10000000) >> 28;
 
+	/* handle this by creating 2 roz tilemaps instead, otherwise performance dies completely on dual screen mode
 	if (konamigx_type3_psac2_actual_bank!=konamigx_type3_psac2_actual_last_bank)
 	{
 		tilemap_mark_all_tiles_dirty (gx_psac_tilemap);
 		konamigx_type3_psac2_actual_last_bank = konamigx_type3_psac2_actual_bank;
 	}
-
+	*/
 }
 
 
@@ -1826,8 +1836,8 @@ WRITE32_HANDLER( konamigx_type3_psac2_bank_w )
 
 	int base_index = tile_index;
 
-	if (konamigx_type3_psac2_actual_bank)
-		base_index+=0x20000/2;
+//	if (konamigx_type3_psac2_actual_bank)
+//		base_index+=0x20000/2;
 
 
 	tileno =  tmap[base_index*2] | ((tmap[(base_index*2)+1] & 0x0f)<<8);
@@ -1839,6 +1849,28 @@ WRITE32_HANDLER( konamigx_type3_psac2_bank_w )
 
  	SET_TILE_INFO(0, tileno, colour, flip);
  }
+
+ static TILE_GET_INFO( get_gx_psac3_alt_tile_info )
+ {
+ 	int tileno, colour, flip;
+ 	UINT8 *tmap = memory_region(machine, "gfx4")+0x20000;
+
+	int base_index = tile_index;
+
+//	if (konamigx_type3_psac2_actual_bank)
+//		base_index+=0x20000/2;
+
+
+	tileno =  tmap[base_index*2] | ((tmap[(base_index*2)+1] & 0x0f)<<8);
+	colour = (tmap[(base_index*2)+1]&0xc0)>>6;
+
+ 	flip = 0;
+	if (tmap[(base_index*2)+1] & 0x20) flip |= TILE_FLIPY;
+	if (tmap[(base_index*2)+1] & 0x10) flip |= TILE_FLIPX;
+
+ 	SET_TILE_INFO(0, tileno, colour, flip);
+ }
+
 
 /* PSAC4 */
 /* these tilemaps are weird in both format and content, one of them
@@ -1975,6 +2007,9 @@ static void _gxcommoninitnosprites(running_machine *machine)
 	K056832_set_LayerOffset(1,  0, 0);
 	K056832_set_LayerOffset(2,  2, 0);
 	K056832_set_LayerOffset(3,  3, 0);
+
+	konamigx_has_dual_screen = 0;
+	konamigx_current_frame = 0;
 }
 
 static void _gxcommoninit(running_machine *machine)
@@ -2080,9 +2115,14 @@ VIDEO_START(konamigx_type3)
 	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 0, NULL, konamigx_type2_tile_callback, 1);
 	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -132, -23, konamigx_type2_sprite_callback);
 
+	dualscreen_left_tempbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
+	dualscreen_right_tempbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
+
 	_gxcommoninitnosprites(machine);
 
 	gx_psac_tilemap = tilemap_create(machine, get_gx_psac3_tile_info, tilemap_scan_cols,  16, 16, 256, 256);
+	gx_psac_tilemap_alt = tilemap_create(machine, get_gx_psac3_alt_tile_info, tilemap_scan_cols,  16, 16, 256, 256);
+
 	gx_rozenable = 0;
 	gx_specialrozenable = 2;
 
@@ -2101,12 +2141,21 @@ VIDEO_START(konamigx_type3)
 	K056832_set_LayerOffset(1,  -48, 0);
 	K056832_set_LayerOffset(2,  -48, 0);
 	K056832_set_LayerOffset(3,  -48, 0);
+
+	konamigx_has_dual_screen = 1;
+	konamigx_palformat = 1;
 }
 
 VIDEO_START(konamigx_type4)
 {
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+
 	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
 	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -79, -24, konamigx_type2_sprite_callback); // -23 looks better in intro
+
+	dualscreen_left_tempbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
+	dualscreen_right_tempbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
 
 	_gxcommoninitnosprites(machine);
 
@@ -2123,12 +2172,21 @@ VIDEO_START(konamigx_type4)
 	K053936GP_set_offset(0, -36, 1);
 
 	gx_rushingheroes_hack = 1;
+	konamigx_has_dual_screen = 1;
+	konamigx_palformat = 0;
+
 }
 
 VIDEO_START(konamigx_type4_sd2)
 {
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+
 	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 0, NULL, konamigx_type2_tile_callback, 0);
 	K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -81, -23, konamigx_type2_sprite_callback);
+
+	dualscreen_left_tempbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
+	dualscreen_right_tempbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
 
 	_gxcommoninitnosprites(machine);
 
@@ -2147,6 +2205,9 @@ VIDEO_START(konamigx_type4_sd2)
 	K053936GP_set_offset(0, -36, -1);
 
 	gx_rushingheroes_hack = 1;
+	konamigx_has_dual_screen = 1;
+	konamigx_palformat = 0;
+
 }
 
 
@@ -2252,6 +2313,98 @@ VIDEO_START(racinfrc)
 VIDEO_UPDATE(konamigx)
 {
 	int i, newbank, newbase, dirty, unchained;
+	bitmap_t* realbitmap = bitmap;
+
+	if (konamigx_has_dual_screen)
+	{
+		const device_config *left_screen  = devtag_get_device(screen->machine, "screen");
+		const device_config *right_screen = devtag_get_device(screen->machine, "screen2");
+
+		/* the video gets demuxed by a board which plugs into the jamma connector */
+		if (screen==left_screen)
+		{
+			konamigx_current_frame^=1;
+
+			if (konamigx_current_frame==1)
+			{
+				int offset=0;
+				
+				if (konamigx_palformat==1)
+				{
+					for (offset=0;offset<0x4000/4;offset++)
+					{
+						UINT32 coldat = paletteram32[offset];
+
+						set_color_555(screen->machine, offset*2, 0, 5, 10,coldat >> 16);
+						set_color_555(screen->machine, offset*2+1, 0, 5, 10,coldat & 0xffff);
+					}
+				}
+				else
+				{
+					for (offset=0;offset<0x8000/4;offset++)
+					{
+						int r,g,b;
+
+ 						r = (paletteram32[offset] >>16) & 0xff;
+						g = (paletteram32[offset] >> 8) & 0xff;
+						b = (paletteram32[offset] >> 0) & 0xff;
+
+						palette_set_color(screen->machine,offset,MAKE_RGB(r,g,b));
+					}
+				}
+
+				bitmap = dualscreen_left_tempbitmap;
+				// draw
+			}
+			else
+			{
+				copybitmap(bitmap, dualscreen_left_tempbitmap, 0, 0, 0, 0, cliprect);
+				return 0;
+			}
+
+		}
+		else if (screen==right_screen)
+		{
+
+			if (konamigx_current_frame==1)
+			{
+				copybitmap(bitmap, dualscreen_right_tempbitmap, 0, 0, 0, 0, cliprect);
+				return 0;
+			}
+			else
+			{
+				
+				int offset=0;
+
+				if (konamigx_palformat==1)
+				{
+					for (offset=0;offset<0x4000/4;offset++)
+					{
+						UINT32 coldat = gx_subpaletteram32[offset];
+
+						set_color_555(screen->machine, offset*2, 0, 5, 10,coldat >> 16);
+						set_color_555(screen->machine, offset*2+1, 0, 5, 10,coldat & 0xffff);
+					}
+				}
+				else
+				{
+					for (offset=0;offset<0x8000/4;offset++)
+					{
+						int r,g,b;
+
+ 						r = (gx_subpaletteram32[offset] >>16) & 0xff;
+						g = (gx_subpaletteram32[offset] >> 8) & 0xff;
+						b = (gx_subpaletteram32[offset] >> 0) & 0xff;
+
+						palette_set_color(screen->machine,offset,MAKE_RGB(r,g,b));
+					}
+				}
+				bitmap = dualscreen_right_tempbitmap;
+				// draw
+			}
+		}
+	}
+
 
 	/* if any banks are different from last render, we need to flush the planes */
 	for (dirty = 0, i = 0; i < 8; i++)
@@ -2325,8 +2478,11 @@ VIDEO_UPDATE(konamigx)
 		temprect.min_y = cliprect->min_y;
 		temprect.max_y = cliprect->max_y;
 
-		K053936_0_zoom_draw(type3_roz_temp_bitmap, &temprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
- 		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0, type3_roz_temp_bitmap, gx_rushingheroes_hack);
+		if (konamigx_type3_psac2_actual_bank == 1) K053936_0_zoom_draw(type3_roz_temp_bitmap, &temprect,gx_psac_tilemap_alt, 0,0,0); // soccerss playfield
+		else K053936_0_zoom_draw(type3_roz_temp_bitmap, &temprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
+ 		
+		
+		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0, type3_roz_temp_bitmap, gx_rushingheroes_hack);
 	}
 	else
 	{
@@ -2368,6 +2524,21 @@ VIDEO_UPDATE(konamigx)
 
 		}
 
+	}
+
+	if (konamigx_has_dual_screen)
+	{
+		const device_config *left_screen  = devtag_get_device(screen->machine, "screen");
+		const device_config *right_screen = devtag_get_device(screen->machine, "screen2");
+
+		if (screen==left_screen)
+		{
+			copybitmap(realbitmap, dualscreen_left_tempbitmap, 0, 0, 0, 0, cliprect);
+		}
+		else if (screen==right_screen)
+		{
+			copybitmap(realbitmap, dualscreen_right_tempbitmap, 0, 0, 0, 0, cliprect);
+		}
 	}
 
 	return 0;
@@ -2431,6 +2602,7 @@ WRITE32_HANDLER( konamigx_555_palette2_w )
 	set_color_555(space->machine, offset*2, 0, 5, 10,coldat >> 16);
 	set_color_555(space->machine, offset*2+1, 0, 5, 10,coldat & 0xffff);
 }
+
 
 WRITE32_HANDLER( konamigx_tilebank_w )
 {
