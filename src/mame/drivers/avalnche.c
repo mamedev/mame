@@ -58,11 +58,9 @@ static INTERRUPT_GEN( avalnche_interrupt )
  *
  *************************************/
 
-static UINT8 avalance_video_inverted;
-
-
 static VIDEO_UPDATE( avalnche )
 {
+	avalnche_state *state = (avalnche_state *)screen->machine->driver_data;
 	offs_t offs;
 
 	for (offs = 0; offs < videoram_size; offs++)
@@ -71,13 +69,13 @@ static VIDEO_UPDATE( avalnche )
 
 		UINT8 x = offs << 3;
 		int y = offs >> 5;
-		UINT8 data = videoram[offs];
+		UINT8 data = state->videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
 			pen_t pen;
 
-			if (avalance_video_inverted)
+			if (state->avalance_video_inverted)
 				pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
 			else
 				pen = (data & 0x80) ? RGB_BLACK : RGB_WHITE;
@@ -95,7 +93,8 @@ static VIDEO_UPDATE( avalnche )
 
 static WRITE8_HANDLER( avalance_video_invert_w )
 {
-	avalance_video_inverted = data & 0x01;
+	avalnche_state *state = (avalnche_state *)space->machine->driver_data;
+	state->avalance_video_inverted = data & 0x01;
 }
 
 
@@ -133,7 +132,7 @@ static WRITE8_HANDLER( avalance_start_lamp_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(avalnche_state, videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffc) AM_READ_PORT("IN0")
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffc) AM_READ_PORT("IN1")
 	AM_RANGE(0x2002, 0x2002) AM_MIRROR(0x0ffc) AM_READ_PORT("PADDLE")
@@ -217,12 +216,32 @@ INPUT_PORTS_END
  *
  *************************************/
 
+static MACHINE_START( avalnche )
+{
+	avalnche_state *state = (avalnche_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->avalance_video_inverted);
+}
+
+static MACHINE_RESET( avalnche )
+{
+	avalnche_state *state = (avalnche_state *)machine->driver_data;
+
+	state->avalance_video_inverted = 0;
+}
+
 static MACHINE_DRIVER_START( avalnche )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(avalnche_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,MASTER_CLOCK/16)	   /* clock input is the "2H" signal divided by two */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT_HACK(avalnche_interrupt,8)
+
+	MDRV_MACHINE_START(avalnche)
+	MDRV_MACHINE_RESET(avalnche)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(avalnche)
@@ -278,5 +297,5 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1978, avalnche, 0,        avalnche, avalnche, 0, ROT0, "Atari", "Avalanche", 0, layout_avalnche )
-GAMEL( 1978, cascade,  avalnche, avalnche, cascade,  0, ROT0, "Sidam", "Cascade", 0, layout_avalnche )
+GAMEL( 1978, avalnche, 0,        avalnche, avalnche, 0, ROT0, "Atari",  "Avalanche", GAME_SUPPORTS_SAVE, layout_avalnche )
+GAMEL( 1978, cascade,  avalnche, avalnche, cascade,  0, ROT0, "Sidam",  "Cascade",   GAME_SUPPORTS_SAVE, layout_avalnche )
