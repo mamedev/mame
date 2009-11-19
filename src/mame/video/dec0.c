@@ -229,13 +229,16 @@ static void custom_tilemap_draw(running_machine *machine,
 	int column_offset=0, src_x=0, src_y=0;
 	UINT32 scrollx=control1[0];
 	UINT32 scrolly=control1[1];
-	int width_mask = src_bitmap->width - 1;
-	int height_mask = src_bitmap->height - 1;
+	int width_mask;
+	int height_mask;
 	int row_scroll_enabled = (rowscroll_ptr && (control0[0]&0x4));
 	int col_scroll_enabled = (colscroll_ptr && (control0[0]&0x8));
 
 	if (!src_bitmap)
 		return;
+
+	width_mask = src_bitmap->width - 1;
+	height_mask = src_bitmap->height - 1;
 
 	/* Column scroll & row scroll may per applied per pixel, there are
     shift registers for each which control the granularity of the row/col
