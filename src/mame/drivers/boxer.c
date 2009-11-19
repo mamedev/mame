@@ -1,40 +1,58 @@
 /***************************************************************************
 
-Atari Boxer (prototype) driver
+    Atari Boxer (prototype) driver
 
-  AKA Boxing, both game titles appear in the schematics
+    AKA Boxing, both game titles appear in the schematics
 
-  This game had some weird controls that don't work well in MAME.
+    This game had some weird controls that don't work well in MAME.
 
 ***************************************************************************/
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 
+
 #define MASTER_CLOCK XTAL_12_096MHz
 
-extern UINT8* boxer_tile_ram;
-extern UINT8* boxer_sprite_ram;
+/*************************************
+ *
+ *  Driver data
+ *
+ *************************************/
 
-extern VIDEO_UPDATE( boxer );
+typedef struct _boxer_state boxer_state;
+struct _boxer_state
+{
+	/* memory pointers */
+	UINT8 * tile_ram;
+	UINT8 * sprite_ram;
 
-static UINT8 pot_state;
-static UINT8 pot_latch;
+	/* misc */
+	UINT8 pot_state;
+	UINT8 pot_latch;
+};
 
+/*************************************
+ *
+ *  Interrupts / Timers
+ *
+ *************************************/
 
 static TIMER_CALLBACK( pot_interrupt )
 {
+	boxer_state *state = (boxer_state *)machine->driver_data;
 	int mask = param;
 
-	if (pot_latch & mask)
+	if (state->pot_latch & mask)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 
-	pot_state |= mask;
+	state->pot_state |= mask;
 }
 
 
 static TIMER_CALLBACK( periodic_callback )
 {
+	boxer_state *state = (boxer_state *)machine->driver_data;
 	int scanline = param;
 
 	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
@@ -58,7 +76,7 @@ static TIMER_CALLBACK( periodic_callback )
 			if (mask[i] != 0)
 				timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, i, 0), NULL, mask[i], pot_interrupt);
 
-		pot_state = 0;
+		state->pot_state = 0;
 	}
 
 	scanline += 64;
@@ -70,6 +88,12 @@ static TIMER_CALLBACK( periodic_callback )
 }
 
 
+/*************************************
+ *
+ *  Video system
+ *
+ *************************************/
+
 static PALETTE_INIT( boxer )
 {
 	palette_set_color(machine,0, MAKE_RGB(0x00,0x00,0x00));
@@ -79,14 +103,87 @@ static PALETTE_INIT( boxer )
 	palette_set_color(machine,3, MAKE_RGB(0x00,0x00,0x00));
 }
 
-
-static MACHINE_RESET( boxer )
+static void draw_boxer( running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect )
 {
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, periodic_callback);
+	boxer_state *state = (boxer_state *)machine->driver_data;
+	int n;
 
-	pot_latch = 0;
+	for (n = 0; n < 2; n++)
+	{
+		const UINT8* p = memory_region(machine, n == 0 ? "user1" : "user2");
+
+		int i, j;
+
+		int x = 196 - state->sprite_ram[0 + 2 * n];
+		int y = 192 - state->sprite_ram[1 + 2 * n];
+
+		int l = state->sprite_ram[4 + 2 * n] & 15;
+		int r = state->sprite_ram[5 + 2 * n] & 15;
+
+		for (i = 0; i < 8; i++)
+		{
+			for (j = 0; j < 4; j++)
+			{
+				UINT8 code;
+
+				code = p[32 * l + 4 * i + j];
+
+				drawgfx_transpen(bitmap, cliprect,
+					machine->gfx[n],
+					code,
+					0,
+					code & 0x80, 0,
+					x + 8 * j,
+					y + 8 * i, 1);
+
+				code = p[32 * r + 4 * i - j + 3];
+
+				drawgfx_transpen(bitmap, cliprect,
+					machine->gfx[n],
+					code,
+					0,
+					!(code & 0x80), 0,
+					x + 8 * j + 32,
+					y + 8 * i, 1);
+			}
+		}
+	}
 }
 
+
+VIDEO_UPDATE( boxer )
+{
+	boxer_state *state = (boxer_state *)screen->machine->driver_data;
+	int i, j;
+
+	bitmap_fill(bitmap, cliprect, 1);
+
+	for (i = 0; i < 16; i++)
+	{
+		for (j = 0; j < 32; j++)
+		{
+			UINT8 code = state->tile_ram[32 * i + j];
+
+			drawgfx_transpen(bitmap, cliprect,
+				screen->machine->gfx[2],
+				code,
+				0,
+				code & 0x40, code & 0x40,
+				8 * j + 4,
+				8 * (i % 2) + 32 * (i / 2), 0);
+		}
+	}
+
+	draw_boxer(screen->machine, bitmap, cliprect);
+	return 0;
+}
+
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 static READ8_HANDLER( boxer_input_r )
 {
@@ -101,12 +198,13 @@ static READ8_HANDLER( boxer_input_r )
 
 static READ8_HANDLER( boxer_misc_r )
 {
+	boxer_state *state = (boxer_state *)space->machine->driver_data;
 	UINT8 val = 0;
 
 	switch (offset & 3)
 	{
 	case 0:
-		val = pot_state & pot_latch;
+		val = state->pot_state & state->pot_latch;
 		break;
 
 	case 1:
@@ -140,6 +238,7 @@ static WRITE8_HANDLER( boxer_sound_w )
 
 static WRITE8_HANDLER( boxer_pot_w )
 {
+	boxer_state *state = (boxer_state *)space->machine->driver_data;
 	/* BIT0 => HPOT1 */
 	/* BIT1 => VPOT1 */
 	/* BIT2 => RPOT1 */
@@ -147,7 +246,7 @@ static WRITE8_HANDLER( boxer_pot_w )
 	/* BIT4 => VPOT2 */
 	/* BIT5 => RPOT2 */
 
-	pot_latch = data & 0x3f;
+	state->pot_latch = data & 0x3f;
 
 	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -177,12 +276,16 @@ static WRITE8_HANDLER( boxer_led_w )
 }
 
 
-
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( boxer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_BASE(&boxer_tile_ram)
+	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_BASE_MEMBER(boxer_state, tile_ram)
 	AM_RANGE(0x0800, 0x08ff) AM_READ(boxer_input_r)
 	AM_RANGE(0x1000, 0x17ff) AM_READ(boxer_misc_r)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(boxer_pot_w)
@@ -191,14 +294,19 @@ static ADDRESS_MAP_START( boxer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1b00, 0x1bff) AM_WRITE(boxer_crowd_w)
 	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(boxer_irq_reset_w)
 	AM_RANGE(0x1d00, 0x1dff) AM_WRITE(boxer_bell_w)
-	AM_RANGE(0x1e00, 0x1eff) AM_WRITEONLY AM_BASE(&boxer_sprite_ram)
+	AM_RANGE(0x1e00, 0x1eff) AM_WRITEONLY AM_BASE_MEMBER(boxer_state, sprite_ram)
 	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static INPUT_PORTS_START( boxer )
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
+static INPUT_PORTS_START( boxer )
 	PORT_START("IN0")
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) /* TIMER */
@@ -242,13 +350,18 @@ static INPUT_PORTS_START( boxer )
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(30) PORT_KEYDELTA(16) PORT_CODE_DEC(KEYCODE_Q) PORT_CODE_INC(KEYCODE_W) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 
 	PORT_START("IN3")
-	PORT_DIPNAME( 0xff, 0x5C, "Round Time" ) /* actually a potentiometer */
-	PORT_DIPSETTING(    0x3C, "15 seconds" )
-	PORT_DIPSETTING(    0x5C, "30 seconds" )
-	PORT_DIPSETTING(    0x7C, "45 seconds" )
-
+	PORT_DIPNAME( 0xff, 0x5c, "Round Time" ) /* actually a potentiometer */
+	PORT_DIPSETTING(    0x3c, "15 seconds" )
+	PORT_DIPSETTING(    0x5c, "30 seconds" )
+	PORT_DIPSETTING(    0x7c, "45 seconds" )
 INPUT_PORTS_END
 
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 static const gfx_layout tile_layout =
 {
@@ -289,16 +402,43 @@ static GFXDECODE_START( boxer )
 GFXDECODE_END
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( boxer )
+{
+	boxer_state *state = (boxer_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->pot_state);
+	state_save_register_global(machine, state->pot_latch);
+}
+
+static MACHINE_RESET( boxer )
+{
+	boxer_state *state = (boxer_state *)machine->driver_data;
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, periodic_callback);
+
+	state->pot_state = 0;
+	state->pot_latch = 0;
+}
+
+
 static MACHINE_DRIVER_START(boxer)
+
+	/* driver data */
+	MDRV_DRIVER_DATA(boxer_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16)
 	MDRV_CPU_PROGRAM_MAP(boxer_map)
 
-	/* video hardware */
+	MDRV_MACHINE_START(boxer)
 	MDRV_MACHINE_RESET(boxer)
 
-
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -314,8 +454,13 @@ static MACHINE_DRIVER_START(boxer)
 MACHINE_DRIVER_END
 
 
-ROM_START( boxer )
+/*************************************
+ *
+ *  ROM definition
+ *
+ *************************************/
 
+ROM_START( boxer )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD_NIB_LOW ( "3400l.e1", 0x3400, 0x0400, CRC(df85afa4) SHA1(5a74a08f1e0b0bbec02999d5e46513d8afd333ac) )
 	ROM_LOAD_NIB_HIGH( "3400m.a1", 0x3400, 0x0400, CRC(23fe06aa) SHA1(03a4eedbf60f07d1dd8d7af576828df5f032146e) )
@@ -343,5 +488,11 @@ ROM_START( boxer )
 	ROM_LOAD( "9402.m3", 0x0000, 0x0100, CRC(00e224a0) SHA1(1a384ef488791c62566c91b18d6a1fb4a5def2ba) )
 ROM_END
 
+
+/*************************************
+ *
+ *  Game driver
+ *
+ *************************************/
 
 GAME( 1978, boxer, 0, boxer, boxer, 0, 0, "Atari", "Boxer (prototype)", GAME_NO_SOUND )

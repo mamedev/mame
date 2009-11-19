@@ -386,7 +386,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/batman.o $(VIDEO)/batman.o \
 	$(DRIVERS)/beathead.o $(VIDEO)/beathead.o \
 	$(DRIVERS)/blstroid.o $(VIDEO)/blstroid.o \
-	$(DRIVERS)/boxer.o $(VIDEO)/boxer.o \
+	$(DRIVERS)/boxer.o \
 	$(DRIVERS)/bsktball.o $(MACHINE)/bsktball.o $(AUDIO)/bsktball.o $(VIDEO)/bsktball.o \
 	$(DRIVERS)/bwidow.o \
 	$(DRIVERS)/bzone.o $(AUDIO)/bzone.o \
