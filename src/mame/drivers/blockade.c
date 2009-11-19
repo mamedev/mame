@@ -1,30 +1,30 @@
 /****************************************************************************
 
-Blockade/Comotion/Blasto/Hustle Memory MAP
-Frank Palazzolo (palazzol@comcast.net)
+    Blockade/Comotion/Blasto/Hustle Memory MAP
+    Frank Palazzolo (palazzol@comcast.net)
 
-CPU - Intel 8080A
+    CPU - Intel 8080A
 
-Memory Address              (Upper/Lower)
+    Memory Address              (Upper/Lower)
 
-0xxx 00aa aaaa aaaa     ROM     U2/U3    R       1K for Blockade/Comotion/Blasto
-0xxx 01aa aaaa aaaa     ROM     U4/U5    R       1K for Comotion/Blasto/Hustle Only
-1xx0 xxaa aaaa aaaa    VRAM              W       1K playfield
-xxx1 xxxx aaaa aaaa     RAM              R/W     256 bytes
+    0xxx 00aa aaaa aaaa     ROM     U2/U3    R       1K for Blockade/Comotion/Blasto
+    0xxx 01aa aaaa aaaa     ROM     U4/U5    R       1K for Comotion/Blasto/Hustle Only
+    1xx0 xxaa aaaa aaaa    VRAM              W       1K playfield
+    xxx1 xxxx aaaa aaaa     RAM              R/W     256 bytes
 
-                    CHAR ROM  U29/U43            256 bytes for Blockade/Comotion
-                                                 512 for Blasto/Hustle
+                        CHAR ROM  U29/U43            256 bytes for Blockade/Comotion
+                                                     512 for Blasto/Hustle
 
-Ports    In            Out
-1        Controls      bit 7 = Coin Latch Reset
-                       bit 5 = Pin 19?
-2        Controls      Square Wave Pitch Register
-4        Controls      Noise On
-8        N/A           Noise Off
+    Ports    In            Out
+    1        Controls      bit 7 = Coin Latch Reset
+                           bit 5 = Pin 19?
+    2        Controls      Square Wave Pitch Register
+    4        Controls      Noise On
+    8        N/A           Noise Off
 
 
-Notes:  Support is complete with the exception of the noise generator.
-        Hopefully I can add this based on some measurements from a real board
+    Notes:  Support is complete with the exception of the noise generator.
+            Hopefully I can add this based on some measurements from a real board
 
 ****************************************************************************/
 
@@ -38,15 +38,6 @@ Notes:  Support is complete with the exception of the noise generator.
 #define MASTER_CLOCK XTAL_20_079MHz
 
 /* These are used to simulate coin latch circuitry */
-
-static UINT8 coin_latch;  /* Active Low */
-static UINT8 just_been_reset;
-
-static DRIVER_INIT( blockade )
-{
-	coin_latch = 1;
-	just_been_reset = 0;
-}
 
 /*************************************************************/
 /*                                                           */
@@ -67,53 +58,69 @@ static DRIVER_INIT( blockade )
 
 static INTERRUPT_GEN( blockade_interrupt )
 {
+	blockade_state *state = (blockade_state *)device->machine->driver_data;
 	cpu_resume(device, SUSPEND_ANY_REASON);
 
 	if ((input_port_read(device->machine, "IN0") & 0x80) == 0)
 	{
-		just_been_reset = 1;
+		state->just_been_reset = 1;
 		cpu_set_input_line(device, INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
+
 static READ8_HANDLER( blockade_input_port_0_r )
 {
-    /* coin latch is bit 7 */
+	blockade_state *state = (blockade_state *)space->machine->driver_data;
+	/* coin latch is bit 7 */
+	UINT8 temp = (input_port_read(space->machine, "IN0") & 0x7f);
 
-    UINT8 temp = (input_port_read(space->machine, "IN0") & 0x7f);
-    return (coin_latch<<7) | (temp);
+	return (state->coin_latch << 7) | temp;
 }
 
 static WRITE8_HANDLER( blockade_coin_latch_w )
 {
-    if (data & 0x80)
-    {
-        if (BLOCKADE_LOG) mame_printf_debug("Reset Coin Latch\n");
-        if (just_been_reset)
-        {
-            just_been_reset = 0;
-            coin_latch = 0;
-        }
-        else
-            coin_latch = 1;
-    }
+	blockade_state *state = (blockade_state *)space->machine->driver_data;
 
-    if (data & 0x20)
-    {
-        if (BLOCKADE_LOG) mame_printf_debug("Pin 19 High\n");
-    }
-    else
-    {
-        if (BLOCKADE_LOG) mame_printf_debug("Pin 19 Low\n");
-    }
+	if (data & 0x80)
+	{
+		if (BLOCKADE_LOG) mame_printf_debug("Reset Coin Latch\n");
+		if (state->just_been_reset)
+		{
+			state->just_been_reset = 0;
+			state->coin_latch = 0;
+		}
+		else
+			state->coin_latch = 1;
+	}
+
+	if (data & 0x20)
+	{
+		if (BLOCKADE_LOG) mame_printf_debug("Pin 19 High\n");
+	}
+	else
+	{
+		if (BLOCKADE_LOG) mame_printf_debug("Pin 19 Low\n");
+	}
 
     return;
 }
 
 
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
+
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x07ff) AM_ROM AM_MIRROR(0x6000)
-    AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(blockade_videoram_w) AM_BASE(&videoram) AM_MIRROR(0x6c00)
+    AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(blockade_videoram_w) AM_BASE_MEMBER(blockade_state, videoram) AM_MIRROR(0x6c00)
     AM_RANGE(0x9000, 0x90ff) AM_RAM AM_MIRROR(0x6f00)
 ADDRESS_MAP_END
 
@@ -126,29 +133,36 @@ static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
     AM_RANGE(0x08, 0x08) AM_WRITE(blockade_env_off_w)
 ADDRESS_MAP_END
 
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
+
 /* These are not dip switches, they are mapped to */
 /* connectors on the board.  Different games had  */
 /* different harnesses which plugged in here, and */
 /* some pins were unused.                         */
 
 static INPUT_PORTS_START( blockade )
-	PORT_START("IN0")		/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x04, 0x04, "Boom Switch" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
+	PORT_CONFNAME( 0x04, 0x04, "Boom Switch" )
+	PORT_CONFSETTING(	   0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(	   0x04, DEF_STR( On ) )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x60, "3" )
-	PORT_DIPSETTING(	0x50, "4" )
-	PORT_DIPSETTING(	0x30, "5" )
-	PORT_DIPSETTING(	0x70, "6" )
+	PORT_CONFNAME( 0x70, 0x70, DEF_STR( Lives ) )
+	PORT_CONFSETTING(	   0x60, "3" )
+	PORT_CONFSETTING(	   0x50, "4" )
+	PORT_CONFSETTING(	   0x30, "5" )
+	PORT_CONFSETTING(	   0x70, "6" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 								/* this is really used for the coin latch,  */
 								/* see blockade_interrupt()                 */
 
-	PORT_START("IN1")		/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
@@ -158,7 +172,7 @@ static INPUT_PORTS_START( blockade )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
 
-	PORT_START("IN2")		/* IN2 */
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -168,21 +182,21 @@ static INPUT_PORTS_START( blockade )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")		/* IN3 */
+	PORT_START("IN3")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( comotion )
-	PORT_START("IN0")		/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x04, 0x04, "Boom Switch" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x00, "3" )
-	PORT_DIPSETTING(	0x08, "4" )
+	PORT_CONFNAME( 0x04, 0x04, "Boom Switch" )
+	PORT_CONFSETTING(	   0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(	   0x04, DEF_STR( On ) )
+	PORT_CONFNAME( 0x08, 0x00, DEF_STR( Lives ) )
+	PORT_CONFSETTING(	   0x00, "3" )
+	PORT_CONFSETTING(	   0x08, "4" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -190,7 +204,7 @@ static INPUT_PORTS_START( comotion )
 								/* this is really used for the coin latch,  */
 								/* see blockade_interrupt()                 */
 
-	PORT_START("IN1")		/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
@@ -200,7 +214,7 @@ static INPUT_PORTS_START( comotion )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(3)
 
-	PORT_START("IN2")		/* IN2 */
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
@@ -210,24 +224,24 @@ static INPUT_PORTS_START( comotion )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(4)
 
-	PORT_START("IN3")		/* IN3 */
+	PORT_START("IN3")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( blasto )
-	PORT_START("IN0")		/* IN0 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x04, 0x04, "Attract Sound" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Game_Time ) )
-	PORT_DIPSETTING(	0x00, "70 Secs" )
-	PORT_DIPSETTING(	0x08, "90 Secs" )
+	PORT_START("IN0")
+	PORT_CONFNAME( 0x03, 0x03, DEF_STR( Coinage ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( 3C_1C ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_CONFSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_CONFNAME( 0x04, 0x04, "Attract Sound" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
+	PORT_CONFNAME( 0x08, 0x08, DEF_STR( Game_Time ) )
+	PORT_CONFSETTING(    0x00, "70 Secs" )
+	PORT_CONFSETTING(    0x08, "90 Secs" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -235,7 +249,7 @@ static INPUT_PORTS_START( blasto )
 								/* this is really used for the coin latch,  */
 								/* see blockade_interrupt()                 */
 
-	PORT_START("IN1")		/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -245,7 +259,7 @@ static INPUT_PORTS_START( blasto )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 
-	PORT_START("IN2")		/* IN2 */
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
@@ -255,21 +269,21 @@ static INPUT_PORTS_START( blasto )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 
-	PORT_START("IN3")		/* IN3 */
+	PORT_START("IN3")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hustle )
-	PORT_START("IN0")		/* IN0 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Game_Time ) )
-	PORT_DIPSETTING(	0x00, "1.5 mins" )
-	PORT_DIPSETTING(	0x04, "2 mins" )
+	PORT_START("IN0")
+	PORT_CONFNAME( 0x03, 0x03, DEF_STR( Coinage ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( 3C_1C ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_CONFSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_CONFNAME( 0x04, 0x04, DEF_STR( Game_Time ) )
+	PORT_CONFSETTING(    0x00, "1.5 mins" )
+	PORT_CONFSETTING(    0x04, "2 mins" )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -278,7 +292,7 @@ static INPUT_PORTS_START( hustle )
 								/* this is really used for the coin latch,  */
 								/* see blockade_interrupt()                 */
 
-	PORT_START("IN1")		/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
@@ -288,40 +302,40 @@ static INPUT_PORTS_START( hustle )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
 
-	PORT_START("IN2")		/* IN2 */
-	PORT_DIPNAME( 0xf1, 0xf0, "Free Game" )
-	PORT_DIPSETTING(	0x71, "11000" )
-	PORT_DIPSETTING(	0xb1, "13000" )
-	PORT_DIPSETTING(	0xd1, "15000" )
-	PORT_DIPSETTING(	0xe1, "17000" )
-	PORT_DIPSETTING(	0xf0, "Disabled" )
+	PORT_START("IN2")
+	PORT_CONFNAME( 0xf1, 0xf0, "Free Game" )
+	PORT_CONFSETTING(    0x71, "11000" )
+	PORT_CONFSETTING(    0xb1, "13000" )
+	PORT_CONFSETTING(    0xd1, "15000" )
+	PORT_CONFSETTING(    0xe1, "17000" )
+	PORT_CONFSETTING(    0xf0, "Disabled" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")		/* IN3 */
+	PORT_START("IN3")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mineswpr )
-	PORT_START("IN0")		/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* This wiring selects upright mode */
-	PORT_DIPNAME( 0x04, 0x04, "Boom Switch" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
+	PORT_CONFNAME( 0x04, 0x04, "Boom Switch" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x60, "3" )
-	PORT_DIPSETTING(	0x50, "4" )
-	PORT_DIPSETTING(	0x30, "5" )
-	PORT_DIPSETTING(	0x70, "6" )
+	PORT_CONFNAME( 0x70, 0x70, DEF_STR( Lives ) )
+	PORT_CONFSETTING(    0x60, "3" )
+	PORT_CONFSETTING(    0x50, "4" )
+	PORT_CONFSETTING(    0x30, "5" )
+	PORT_CONFSETTING(    0x70, "6" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 								/* this is really used for the coin latch,  */
 								/* see blockade_interrupt()                 */
 
-	PORT_START("IN1")		/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
@@ -331,7 +345,7 @@ static INPUT_PORTS_START( mineswpr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
 
-	PORT_START("IN2")		/* IN2 */
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -341,29 +355,29 @@ static INPUT_PORTS_START( mineswpr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")		/* IN3 */
+	PORT_START("IN3")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( minesw4p )
-	PORT_START("IN0")		/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* This wiring selects cocktail mode */
-	PORT_DIPNAME( 0x04, 0x04, "Boom Switch" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( On ) )
+	PORT_CONFNAME( 0x04, 0x04, "Boom Switch" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Lives ) )
-	PORT_DIPSETTING(	0x60, "3" )
-	PORT_DIPSETTING(	0x50, "4" )
-	PORT_DIPSETTING(	0x30, "5" )
-	PORT_DIPSETTING(	0x70, "6" )
+	PORT_CONFNAME( 0x70, 0x70, DEF_STR( Lives ) )
+	PORT_CONFSETTING(    0x60, "3" )
+	PORT_CONFSETTING(    0x50, "4" )
+	PORT_CONFSETTING(    0x30, "5" )
+	PORT_CONFSETTING(    0x70, "6" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 								/* this is really used for the coin latch,  */
 								/* see blockade_interrupt()                 */
 
-	PORT_START("IN1")		/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
@@ -373,7 +387,7 @@ static INPUT_PORTS_START( minesw4p )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
 
-	PORT_START("IN2")		/* IN2 */
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(3)
@@ -383,11 +397,17 @@ static INPUT_PORTS_START( minesw4p )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(4)
 
-	PORT_START("IN3")		/* IN3 */
+	PORT_START("IN3")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 INPUT_PORTS_END
 
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 static const gfx_layout blockade_layout =
 {
@@ -438,13 +458,41 @@ static PALETTE_INIT( bw )
 }
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( blockade )
+{
+	blockade_state *state = (blockade_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->coin_latch);
+	state_save_register_global(machine, state->just_been_reset);
+}
+
+static MACHINE_RESET( blockade )
+{
+	blockade_state *state = (blockade_state *)machine->driver_data;
+
+	state->coin_latch = 1;
+	state->just_been_reset = 0;
+}
+
 static MACHINE_DRIVER_START( blockade )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(blockade_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK/10)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(main_io_map)
 	MDRV_CPU_VBLANK_INT("screen", blockade_interrupt)
+
+	MDRV_MACHINE_START(blockade)
+	MDRV_MACHINE_RESET(blockade)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -490,11 +538,11 @@ static MACHINE_DRIVER_START( hustle )
 	MDRV_PALETTE_INIT(yellow)
 MACHINE_DRIVER_END
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( blockade )
     ROM_REGION( 0x10000, "maincpu", 0 )
@@ -562,9 +610,15 @@ ROM_START( mineswpr4 )
     ROM_LOAD_NIB_LOW(  "mineswee.cls", 0x0000, 0x0200, CRC(70959755) SHA1(f62d448742da3fae8bbd96eb3a2714db500cecce) )
 ROM_END
 
-GAME( 1976, blockade,  0,        blockade, blockade, blockade, ROT0, "Gremlin", "Blockade", GAME_IMPERFECT_SOUND )
-GAME( 1976, comotion,  0,        comotion, comotion, blockade, ROT0, "Gremlin", "Comotion", GAME_IMPERFECT_SOUND )
-GAME( 1978, blasto,    0,        blasto,   blasto,   blockade, ROT0, "Gremlin", "Blasto", GAME_IMPERFECT_SOUND )
-GAME( 1977, hustle,    0,        hustle,   hustle,   blockade, ROT0, "Gremlin", "Hustle", GAME_IMPERFECT_SOUND )
-GAME( 1977, mineswpr,  0,        blasto,   mineswpr, blockade, ROT0, "Amutech", "Minesweeper", GAME_IMPERFECT_SOUND )
-GAME( 1977, mineswpr4, mineswpr, blasto,   minesw4p, blockade, ROT0, "Amutech", "Minesweeper (4-Player)", GAME_IMPERFECT_SOUND )
+/*************************************
+ *
+ *  Game driver
+ *
+ *************************************/
+
+GAME( 1976, blockade,  0,        blockade, blockade, 0, ROT0, "Gremlin", "Blockade", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1976, comotion,  0,        comotion, comotion, 0, ROT0, "Gremlin", "Comotion", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1978, blasto,    0,        blasto,   blasto,   0, ROT0, "Gremlin", "Blasto", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1977, hustle,    0,        hustle,   hustle,   0, ROT0, "Gremlin", "Hustle", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1977, mineswpr,  0,        blasto,   mineswpr, 0, ROT0, "Amutech", "Minesweeper", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1977, mineswpr4, mineswpr, blasto,   minesw4p, 0, ROT0, "Amutech", "Minesweeper (4-Player)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

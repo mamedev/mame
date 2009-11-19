@@ -13,6 +13,28 @@
 #define BSKTBALL_BOUNCE_EN		NODE_04
 
 
+typedef struct _bsktball_state bsktball_state;
+struct _bsktball_state
+{
+	/* memory pointers */
+	UINT8 *  videoram;
+	UINT8 *  motion;
+
+	/* video-related */
+	tilemap  *bg_tilemap;
+
+	/* misc */
+	UINT32   nmi_on;
+	int      i256v;
+
+	/* input-related */
+	int ld1, ld2;
+	int dir0, dir1, dir2, dir3;
+	int last_p1_horiz, last_p1_vert, last_p2_horiz, last_p2_vert;
+};
+
+
+
 /*----------- defined in machine/bsktball.c -----------*/
 
 WRITE8_HANDLER( bsktball_nmion_w );
@@ -33,8 +55,6 @@ WRITE8_DEVICE_HANDLER( bsktball_noise_reset_w );
 DISCRETE_SOUND_EXTERN( bsktball );
 
 /*----------- defined in video/bsktball.c -----------*/
-
-extern UINT8 *bsktball_motion;
 
 VIDEO_START( bsktball );
 VIDEO_UPDATE( bsktball );

@@ -1,50 +1,51 @@
 /***************************************************************************
-Break Thru Doc. Data East (1986)
 
-driver by Phil Stroffolino
+    Break Thru Doc. Data East (1986)
 
-UNK-1.1    (16Kb)  Code (4000-7FFF)
-UNK-1.2    (32Kb)  Main 6809 (8000-FFFF)
-UNK-1.3    (32Kb)  Mapped (2000-3FFF)
-UNK-1.4    (32Kb)  Mapped (2000-3FFF)
+    driver by Phil Stroffolino
 
-UNK-1.5    (32Kb)  Sound 6809 (8000-FFFF)
+    UNK-1.1    (16Kb)  Code (4000-7FFF)
+    UNK-1.2    (32Kb)  Main 6809 (8000-FFFF)
+    UNK-1.3    (32Kb)  Mapped (2000-3FFF)
+    UNK-1.4    (32Kb)  Mapped (2000-3FFF)
 
-Background has 4 banks, with 256 16x16x8 tiles in each bank.
-UNK-1.6    (32Kb)  GFX Background
-UNK-1.7    (32Kb)  GFX Background
-UNK-1.8    (32Kb)  GFX Background
+    UNK-1.5    (32Kb)  Sound 6809 (8000-FFFF)
 
-UNK-1.9    (32Kb)  GFX Sprites
-UNK-1.10   (32Kb)  GFX Sprites
-UNK-1.11   (32Kb)  GFX Sprites
+    Background has 4 banks, with 256 16x16x8 tiles in each bank.
+    UNK-1.6    (32Kb)  GFX Background
+    UNK-1.7    (32Kb)  GFX Background
+    UNK-1.8    (32Kb)  GFX Background
 
-Text has 256 8x8x4 characters.
-UNK-1.12   (8Kb)   GFX Text
+    UNK-1.9    (32Kb)  GFX Sprites
+    UNK-1.10   (32Kb)  GFX Sprites
+    UNK-1.11   (32Kb)  GFX Sprites
 
-**************************************************************************
-Memory Map for Main CPU by Carlos A. Lozano
-**************************************************************************
+    Text has 256 8x8x4 characters.
+    UNK-1.12   (8Kb)   GFX Text
 
-MAIN CPU
-0000-03FF                                   W                   Plane0
-0400-0BFF                                  R/W                  RAM
-0C00-0FFF                                   W                   Plane2(Background)
-1000-10FF                                   W                   Plane1(sprites)
-1100-17FF                                  R/W                  RAM
-1800-180F                                  R/W                  In/Out
-1810-1FFF                                  R/W                  RAM (unmapped?)
-2000-3FFF                                   R                   ROM Mapped(*)
-4000-7FFF                                   R                   ROM(UNK-1.1)
-8000-FFFF                                   R                   ROM(UNK-1.2)
+    **************************************************************************
+    Memory Map for Main CPU by Carlos A. Lozano
+    **************************************************************************
 
-Interrupts: Reset, NMI, IRQ
-The test routine is at F000
+    MAIN CPU
+    0000-03FF                                   W                   Plane0
+    0400-0BFF                                  R/W                  RAM
+    0C00-0FFF                                   W                   Plane2(Background)
+    1000-10FF                                   W                   Plane1(sprites)
+    1100-17FF                                  R/W                  RAM
+    1800-180F                                  R/W                  In/Out
+    1810-1FFF                                  R/W                  RAM (unmapped?)
+    2000-3FFF                                   R                   ROM Mapped(*)
+    4000-7FFF                                   R                   ROM(UNK-1.1)
+    8000-FFFF                                   R                   ROM(UNK-1.2)
 
-Sound: YM2203 and YM3526 driven by 6809.  Sound added by Bryan McPhail, 1/4/98.
+    Interrupts: Reset, NMI, IRQ
+    The test routine is at F000
 
-2008-07
-Dip locations verified with manual for brkthru (US conv. kit) and darwin
+    Sound: YM2203 and YM3526 driven by 6809.  Sound added by Bryan McPhail, 1/4/98.
+
+    2008-07
+    Dip locations verified with manual for brkthru (US conv. kit) and darwin
 
 ***************************************************************************/
 
@@ -52,22 +53,17 @@ Dip locations verified with manual for brkthru (US conv. kit) and darwin
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
+#include "brkthru.h"
 
 
 #define MASTER_CLOCK		XTAL_12MHz
 
 
-//UINT8 *brkthru_nmi_enable; /* needs to be tracked down */
-extern UINT8 *brkthru_videoram;
-extern size_t brkthru_videoram_size;
-
-WRITE8_HANDLER( brkthru_1800_w );
-WRITE8_HANDLER( brkthru_bgram_w );
-WRITE8_HANDLER( brkthru_fgram_w );
-VIDEO_START( brkthru );
-PALETTE_INIT( brkthru );
-VIDEO_UPDATE( brkthru );
-
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 static WRITE8_HANDLER( brkthru_1803_w )
 {
@@ -87,7 +83,7 @@ static WRITE8_HANDLER( darwin_0803_w )
 
 static WRITE8_HANDLER( brkthru_soundlatch_w )
 {
-	soundlatch_w(space,offset,data);
+	soundlatch_w(space, offset, data);
 	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -98,12 +94,17 @@ static INPUT_CHANGED( coin_inserted )
 }
 
 
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( brkthru_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(brkthru_fgram_w) AM_BASE(&brkthru_videoram) AM_SIZE(&brkthru_videoram_size)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(brkthru_fgram_w) AM_BASE_MEMBER(brkthru_state, fg_videoram) AM_SIZE_MEMBER(brkthru_state, fg_videoram_size)
 	AM_RANGE(0x0400, 0x0bff) AM_RAM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(brkthru_bgram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(brkthru_bgram_w) AM_BASE_MEMBER(brkthru_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_MEMBER(brkthru_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x1100, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("P2")
@@ -116,13 +117,12 @@ static ADDRESS_MAP_START( brkthru_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-
 /* same as brktrhu, but xor 0x1000 below 8k */
 static ADDRESS_MAP_START( darwin_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(brkthru_fgram_w) AM_BASE(&brkthru_videoram) AM_SIZE(&brkthru_videoram_size)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(brkthru_fgram_w) AM_BASE_MEMBER(brkthru_state, fg_videoram) AM_SIZE_MEMBER(brkthru_state, fg_videoram_size)
 	AM_RANGE(0x1400, 0x1bff) AM_RAM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(brkthru_bgram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(brkthru_bgram_w) AM_BASE_MEMBER(brkthru_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_MEMBER(brkthru_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x0100, 0x01ff) AM_WRITENOP /*tidyup, nothing realy here?*/
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("P1")
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("P2")
@@ -145,6 +145,11 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( brkthru )
 	PORT_START("P1")
@@ -258,6 +263,12 @@ static INPUT_PORTS_START( darwin )
 INPUT_PORTS_END
 
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
 static const gfx_layout charlayout =
 {
 	8,8,	/* 8*8 chars */
@@ -321,6 +332,13 @@ static GFXDECODE_START( brkthru )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout, 0x40,  8 )	/* use colors 0x40-0x7f */
 GFXDECODE_END
 
+
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int linestate)
 {
@@ -334,7 +352,25 @@ static const ym3526_interface ym3526_config =
 
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_RESET( brkthru )
+{
+	brkthru_state *state = (brkthru_state *)machine->driver_data;
+
+	state->bgscroll = 0;
+	state->bgbasecolor = 0;
+	state->flipscreen = 0;
+}
+
 static MACHINE_DRIVER_START( brkthru )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(brkthru_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
@@ -343,6 +379,8 @@ static MACHINE_DRIVER_START( brkthru )
 
 	MDRV_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/8)		/* 1.5 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
+
+	MDRV_MACHINE_RESET(brkthru)
 
 	/* video hardware */
 	MDRV_GFXDECODE(brkthru)
@@ -374,6 +412,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( darwin )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(brkthru_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(darwin_map)
@@ -381,6 +422,8 @@ static MACHINE_DRIVER_START( darwin )
 
 	MDRV_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/8)		/* 1.5 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
+
+	MDRV_MACHINE_RESET(brkthru)
 
 	/* video hardware */
 	MDRV_GFXDECODE(brkthru)
@@ -399,7 +442,7 @@ static MACHINE_DRIVER_START( darwin )
                   = HSync / (VDisplay + VBlank)
                   = 15.625kHz / (240 + 32)
                   = 57.444855Hz
-    tuned by Shingo SUZUKI(VSyncMAME Project) 2000/10/19 */
+        tuned by Shingo SUZUKI(VSyncMAME Project) 2000/10/19 */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
 	MDRV_PALETTE_INIT(brkthru)
@@ -422,11 +465,11 @@ MACHINE_DRIVER_END
 
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( brkthru )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for main CPU + 64k for banked ROMs */
@@ -590,8 +633,25 @@ ROM_START( darwin )
 ROM_END
 
 
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
 
-GAME( 1986, brkthru,  0,       brkthru, brkthru,  0, ROT0,   "Data East USA", "Break Thru (US)", 0 )
-GAME( 1986, brkthruj, brkthru, brkthru, brkthruj, 0, ROT0,   "Data East Corporation", "Kyohkoh-Toppa (Japan)", 0 )
-GAME( 1986, forcebrk, brkthru, brkthru, brkthruj, 0, ROT0,   "bootleg", "Force Break (bootleg)", 0 )
-GAME( 1986, darwin,   0,       darwin,  darwin,   0, ROT270, "Data East Corporation", "Darwin 4078 (Japan)", 0 )
+static DRIVER_INIT( brkthru )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, 1, 0, 8, &ROM[0x10000], 0x2000);
+}
+
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1986, brkthru,  0,       brkthru, brkthru,  brkthru, ROT0,   "Data East USA",         "Break Thru (US)", GAME_SUPPORTS_SAVE )
+GAME( 1986, brkthruj, brkthru, brkthru, brkthruj, brkthru, ROT0,   "Data East Corporation", "Kyohkoh-Toppa (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, forcebrk, brkthru, brkthru, brkthruj, brkthru, ROT0,   "bootleg",               "Force Break (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, darwin,   0,       darwin,  darwin,   brkthru, ROT270, "Data East Corporation", "Darwin 4078 (Japan)", GAME_SUPPORTS_SAVE )

@@ -12,31 +12,22 @@
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/3526intf.h"
+#include "battlane.h"
 
-extern UINT8 *battlane_spriteram;
-extern UINT8 *battlane_tileram;
-
-extern WRITE8_HANDLER( battlane_palette_w );
-extern WRITE8_HANDLER( battlane_scrollx_w );
-extern WRITE8_HANDLER( battlane_scrolly_w );
-extern WRITE8_HANDLER( battlane_tileram_w );
-extern WRITE8_HANDLER( battlane_spriteram_w );
-extern WRITE8_HANDLER( battlane_bitmap_w );
-extern WRITE8_HANDLER( battlane_video_ctrl_w );
-
-extern VIDEO_START( battlane );
-extern VIDEO_UPDATE( battlane );
-
-
-/* CPU interrupt control register */
-int battlane_cpu_control;
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 static WRITE8_HANDLER( battlane_cpu_command_w )
 {
-	battlane_cpu_control = data;
+	battlane_state *state = (battlane_state *)space->machine->driver_data;
+
+	state->cpu_control = data;
 
 	/*
-    CPU control register
+      CPU control register
 
         0x80    = Video Flip
         0x08    = NMI
@@ -56,7 +47,7 @@ static WRITE8_HANDLER( battlane_cpu_command_w )
     */
 
     /*
-    if (~battlane_cpu_control & 0x08)
+    if (~state->cpu_control & 0x08)
     {
         cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
         cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
@@ -88,10 +79,29 @@ static WRITE8_HANDLER( battlane_cpu_command_w )
 	cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, data & 0x02 ? CLEAR_LINE : HOLD_LINE);
 }
 
+static INTERRUPT_GEN( battlane_cpu1_interrupt )
+{
+	battlane_state *state = (battlane_state *)device->machine->driver_data;
+
+	/* See note in battlane_cpu_command_w */
+	if (~state->cpu_control & 0x08)
+	{
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
+	}
+}
+
+
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
+
 static ADDRESS_MAP_START( battlane_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(battlane_tileram_w) AM_SHARE(2) AM_BASE(&battlane_tileram)
-	AM_RANGE(0x1800, 0x18ff) AM_RAM_WRITE(battlane_spriteram_w) AM_SHARE(3) AM_BASE(&battlane_spriteram)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(battlane_tileram_w) AM_SHARE(2) AM_BASE_MEMBER(battlane_state, tileram)
+	AM_RANGE(0x1800, 0x18ff) AM_RAM_WRITE(battlane_spriteram_w) AM_SHARE(3) AM_BASE_MEMBER(battlane_state, spriteram)
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("P1") AM_WRITE(battlane_video_ctrl_w)
 	AM_RANGE(0x1c01, 0x1c01) AM_READ_PORT("P2") AM_WRITE(battlane_scrollx_w)
 	AM_RANGE(0x1c02, 0x1c02) AM_READ_PORT("DSW1") AM_WRITE(battlane_scrolly_w)
@@ -102,17 +112,12 @@ static ADDRESS_MAP_START( battlane_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static INTERRUPT_GEN( battlane_cpu1_interrupt )
-{
-	/* See note in battlane_cpu_command_w */
 
-	if (~battlane_cpu_control & 0x08)
-	{
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-		cputag_set_input_line(device->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
-
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( battlane )
 	PORT_START("P1")
@@ -175,6 +180,12 @@ static INPUT_PORTS_START( battlane )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
 
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 static const gfx_layout spritelayout =
 {
@@ -239,7 +250,13 @@ static GFXDECODE_START( battlane )
 GFXDECODE_END
 
 
-static void irqhandler(const device_config *device, int irq)
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+
+static void irqhandler( const device_config *device, int irq )
 {
 	cputag_set_input_line(device->machine, "maincpu", M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -250,7 +267,24 @@ static const ym3526_interface ym3526_config =
 };
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_RESET( battlane )
+{
+	battlane_state *state = (battlane_state *)machine->driver_data;
+
+	state->video_ctrl = 0;
+	state->cpu_control = 0;
+}
+
 static MACHINE_DRIVER_START( battlane )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(battlane_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1250000)        /* 1.25 MHz ? */
@@ -261,6 +295,8 @@ static MACHINE_DRIVER_START( battlane )
 	MDRV_CPU_PROGRAM_MAP(battlane_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
+
+	MDRV_MACHINE_RESET(battlane)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -284,11 +320,11 @@ static MACHINE_DRIVER_START( battlane )
 MACHINE_DRIVER_END
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( battlane )
 	ROM_REGION( 0x8000, "user1", 0 )     /*  */
@@ -375,6 +411,12 @@ ROM_START( battlane3 )
 ROM_END
 
 
-GAME( 1986, battlane,  0,        battlane, battlane, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 1)", 0 )
-GAME( 1986, battlane2, battlane, battlane, battlane, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 2)", 0 )
-GAME( 1986, battlane3, battlane, battlane, battlane, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 3)", 0 )
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1986, battlane,  0,        battlane, battlane, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, battlane2, battlane, battlane, battlane, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, battlane3, battlane, battlane, battlane, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 3)", GAME_SUPPORTS_SAVE )

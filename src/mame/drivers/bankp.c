@@ -1,15 +1,18 @@
 /***************************************************************************
 
-Bank Panic / Combat Hawk hardware
-Sega & Sanritsu
-1984 - 1987
+    Bank Panic / Combat Hawk hardware
+    Sega & Sanritsu
+    1984 - 1987
 
-PCB Layout (Comba Hawk)
------------------------
+    driver by Nicola Salmoria
 
-C2-00170-A BANK PANIC (screened on PCB)
-834-6381 COMBAT HAWK (sticker)
-SANRITSU VIDEO GAME - screened on PCB
+
+    PCB Layout (Comba Hawk)
+    -----------------------
+
+    C2-00170-A BANK PANIC (screened on PCB)
+    834-6381 COMBAT HAWK (sticker)
+    SANRITSU VIDEO GAME - screened on PCB
 
 |------------------------------------------------------------------------|
 |                             PR-10902             PR-10900              |
@@ -34,16 +37,16 @@ SANRITSU VIDEO GAME - screened on PCB
 |15.468MHz                    EPR-10914             555   358     HA1377A|
 |------------------------------------------------------------------------|
 
-Notes:
-      2016          - 2kx8 SRAM
-      Z80 clock     - 2.578MHz [15.468/6]
-      SN76489 clock - 2.578MHz [15.468/6]
-      VSync         - 60Hz
-      HSync         - 15.36kHz
-      SW1           - 8-position DIP switch
+    Notes:
+          2016          - 2kx8 SRAM
+          Z80 clock     - 2.578MHz [15.468/6]
+          SN76489 clock - 2.578MHz [15.468/6]
+          VSync         - 60Hz
+          HSync         - 15.36kHz
+          SW1           - 8-position DIP switch
 
-      ROMs
-      ----
+          ROMs
+          ----
 
           PR-10900         - ?
           PR-10901         - 82S129 BIPOLAR PROM
@@ -57,72 +60,56 @@ Notes:
 
 ---------------------------------------------------
 
-Bank Panic memory map (preliminary)
-Similar to Appoooh
-
-driver by Nicola Salmoria
+    Bank Panic memory map (preliminary)
+    Similar to Appoooh
 
 
-0000-dfff ROM
-e000-e7ff RAM
-f000-f3ff Video RAM #1
-f400-f7ff Color RAM #1
-f800-fbff Video RAM #2
-fc00-ffff Color RAM #2
+    0000-dfff ROM
+    e000-e7ff RAM
+    f000-f3ff Video RAM #1
+    f400-f7ff Color RAM #1
+    f800-fbff Video RAM #2
+    fc00-ffff Color RAM #2
 
-I/O
-read:
-00  IN0
-01  IN1
-02  IN2
-04  DSW
+    I/O
+    read:
+    00  IN0
+    01  IN1
+    02  IN2
+    04  DSW
 
-write:
-00  SN76496 #1
-01  SN76496 #2
-02  SN76496 #3
-05  horizontal scroll
-07  bit 0-1 = at least one of these two controls the playfield priority
-    bit 2-3 = ?
-    bit 4 = NMI enable
-    bit 5 = flip screen
-    bit 6-7 = ?
+    write:
+    00  SN76496 #1
+    01  SN76496 #2
+    02  SN76496 #3
+    05  horizontal scroll
+    07  bit 0-1 = at least one of these two controls the playfield priority
+        bit 2-3 = ?
+        bit 4 = NMI enable
+        bit 5 = flip screen
+        bit 6-7 = ?
 
 ***************************************************************************/
-
-#define BANKP_MASTER_CLOCK 15468000
-#define BANKP_CPU_CLOCK (BANKP_MASTER_CLOCK/6)
-#define BANKP_SN76496_CLOCK (BANKP_MASTER_CLOCK/6)
-
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
+#include "bankp.h"
 
 
-extern UINT8 *bankp_videoram2;
-extern UINT8 *bankp_colorram2;
-
-extern WRITE8_HANDLER( bankp_videoram_w );
-extern WRITE8_HANDLER( bankp_colorram_w );
-extern WRITE8_HANDLER( bankp_videoram2_w );
-extern WRITE8_HANDLER( bankp_colorram2_w );
-extern WRITE8_HANDLER( bankp_scroll_w );
-extern WRITE8_HANDLER( bankp_out_w );
-
-extern PALETTE_INIT( bankp );
-extern VIDEO_START( bankp );
-extern VIDEO_UPDATE( bankp );
-
-
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( bankp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(bankp_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(bankp_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(bankp_videoram2_w) AM_BASE(&bankp_videoram2)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(bankp_colorram2_w) AM_BASE(&bankp_colorram2)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(bankp_videoram_w) AM_BASE_MEMBER(bankp_state, videoram)
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(bankp_colorram_w) AM_BASE_MEMBER(bankp_state, colorram)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(bankp_videoram2_w) AM_BASE_MEMBER(bankp_state, videoram2)
+	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(bankp_colorram2_w) AM_BASE_MEMBER(bankp_state, colorram2)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bankp_io_map, ADDRESS_SPACE_IO, 8 )
@@ -136,6 +123,11 @@ static ADDRESS_MAP_START( bankp_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( bankp )
 	PORT_START("IN0")
@@ -226,6 +218,13 @@ static INPUT_PORTS_START( combh )
 	PORT_DIPSETTING(    0x80, "90 Units" )
 INPUT_PORTS_END
 
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
 static const gfx_layout charlayout =
 {
 	8,8,	/* 8*8 characters */
@@ -254,14 +253,32 @@ GFXDECODE_END
 
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_RESET( bankp )
+{
+	bankp_state *state = (bankp_state *)machine->driver_data;
+
+	state->scroll_x = 0;
+	state->priority = 0;
+}
+
 static MACHINE_DRIVER_START( bankp )
 
-	/* basic machine hardware */
+	/* driver data */
+	MDRV_DRIVER_DATA(bankp_state)
 
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, BANKP_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(bankp_map)
 	MDRV_CPU_IO_MAP(bankp_io_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+
+	MDRV_MACHINE_RESET(bankp)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -292,11 +309,11 @@ MACHINE_DRIVER_END
 
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( bankp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -358,5 +375,11 @@ ROM_START( combh )
 ROM_END
 
 
-GAME( 1984, bankp, 0, bankp, bankp, 0, ROT0,   "[Sanritsu] Sega", "Bank Panic",  0 )
-GAME( 1987, combh, 0, bankp, combh, 0, ROT270, "Sega / Sanritsu", "Combat Hawk", 0 )
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1984, bankp, 0, bankp, bankp, 0, ROT0,   "[Sanritsu] Sega", "Bank Panic",  GAME_SUPPORTS_SAVE )
+GAME( 1987, combh, 0, bankp, combh, 0, ROT270, "Sega / Sanritsu", "Combat Hawk", GAME_SUPPORTS_SAVE )

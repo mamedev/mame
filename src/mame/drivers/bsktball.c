@@ -90,8 +90,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x102c, 0x102d) AM_DEVWRITE("discrete", bsktball_noise_reset_w) /* Noise Reset */
 	AM_RANGE(0x102e, 0x102f) AM_WRITE(bsktball_nmion_w) /* NMI On */
 	AM_RANGE(0x1030, 0x1030) AM_DEVWRITE("discrete", bsktball_note_w) /* Music Ckt Note Dvsr */
-	AM_RANGE(0x1800, 0x1bbf) AM_RAM_WRITE(bsktball_videoram_w) AM_BASE(&videoram) /* DISPLAY */
-	AM_RANGE(0x1bc0, 0x1bff) AM_RAM AM_BASE(&bsktball_motion)
+	AM_RANGE(0x1800, 0x1bbf) AM_RAM_WRITE(bsktball_videoram_w) AM_BASE_MEMBER(bsktball_state, videoram) /* DISPLAY */
+	AM_RANGE(0x1bc0, 0x1bff) AM_RAM AM_BASE_MEMBER(bsktball_state, motion)
 	AM_RANGE(0x1c00, 0x1cff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_ROM /* PROGRAM */
 ADDRESS_MAP_END
@@ -210,12 +210,55 @@ GFXDECODE_END
  *
  *************************************/
 
+static MACHINE_START( bsktball )
+{
+	bsktball_state *state = (bsktball_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->nmi_on);
+	state_save_register_global(machine, state->i256v);
+	state_save_register_global(machine, state->ld1);
+	state_save_register_global(machine, state->ld2);
+	state_save_register_global(machine, state->dir0);
+	state_save_register_global(machine, state->dir1);
+	state_save_register_global(machine, state->dir2);
+	state_save_register_global(machine, state->dir3);
+	state_save_register_global(machine, state->last_p1_horiz);
+	state_save_register_global(machine, state->last_p1_vert);
+	state_save_register_global(machine, state->last_p2_horiz);
+	state_save_register_global(machine, state->last_p2_vert);
+}
+
+static MACHINE_RESET( bsktball )
+{
+	bsktball_state *state = (bsktball_state *)machine->driver_data;
+
+	state->nmi_on = 0;
+	state->i256v = 0;
+	state->ld1 = 0;
+	state->ld2 = 0;
+	state->dir0 = 0;
+	state->dir1 = 0;
+	state->dir2 = 0;
+	state->dir3 = 0;
+	state->last_p1_horiz = 0;
+	state->last_p1_vert = 0;
+	state->last_p2_horiz = 0;
+	state->last_p2_vert = 0;
+}
+
+
 static MACHINE_DRIVER_START( bsktball )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(bsktball_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,750000)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT_HACK(bsktball_interrupt,8)
+
+	MDRV_MACHINE_START(bsktball)
+	MDRV_MACHINE_RESET(bsktball)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -268,4 +311,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, bsktball, 0, bsktball, bsktball, 0, ROT0, "Atari", "Basketball", 0 )
+GAME( 1979, bsktball, 0, bsktball, bsktball, 0, ROT0, "Atari", "Basketball", GAME_SUPPORTS_SAVE )

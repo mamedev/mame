@@ -39,32 +39,32 @@ DISCRETE_SOUND_END
 WRITE8_DEVICE_HANDLER( blockade_sound_freq_w )
 {
 	discrete_sound_w(device,BLOCKADE_NOTE_DATA, data);
-    return;
+	return;
 }
 
 WRITE8_HANDLER( blockade_env_on_w )
 {
 	const device_config *samples = devtag_get_device(space->machine, "samples");
-    if (BLOCKADE_LOG) mame_printf_debug("Boom Start\n");
-    sample_start(samples, 0,0,0);
-    return;
+	if (BLOCKADE_LOG) mame_printf_debug("Boom Start\n");
+	sample_start(samples, 0,0,0);
+	return;
 }
 
 WRITE8_HANDLER( blockade_env_off_w )
 {
-    if (BLOCKADE_LOG) mame_printf_debug("Boom End\n");
-    return;
+	if (BLOCKADE_LOG) mame_printf_debug("Boom End\n");
+	return;
 }
 
 static const char *const blockade_sample_names[] =
 {
-    "*blockade",
-    "boom.wav",
-    0
+	"*blockade",
+	"boom.wav",
+	0
 };
 
 const samples_interface blockade_samples_interface =
 {
-    1,	/* 1 channel */
+	1,	/* 1 channel */
 	blockade_sample_names
 };
