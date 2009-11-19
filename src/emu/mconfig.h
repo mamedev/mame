@@ -24,8 +24,8 @@
     CONSTANTS
 ***************************************************************************/
 
-/* by convention, tags should all lowercase and between 3-15 characters */
-#define MIN_TAG_LENGTH			3
+/* by convention, tags should all lowercase and between 2-15 characters */
+#define MIN_TAG_LENGTH			2
 #define MAX_TAG_LENGTH			15
 
 
