@@ -453,6 +453,7 @@ or Fatal Fury for example).
 #include "cpu/mips/mips3.h"
 
 static int hng64_mcu_type = 0;
+static UINT32 fake_mcu_time;
 #define FIGHT_MCU  1
 #define SHOOT_MCU  2
 #define RACING_MCU 3
@@ -758,9 +759,14 @@ static READ32_HANDLER( samsho_io_r )
         case 0x000:
 		{
 			/* this is used on post by the io mcu to signal that a init task is complete, zeroed otherwise. */
-			if(cpu_get_pc(space->cpu) == 0x8010376c) //i/o init 1
+			//popmessage("%04x",fake_mcu_time);
+
+			if(fake_mcu_time < 0x100)
+				fake_mcu_time++;
+
+			if(fake_mcu_time < 0x80) //i/o init 1
 				return 0x300;
-			else if(cpu_get_pc(space->cpu) == 0x8010380c)//i/o init 2
+			else if(fake_mcu_time < 0x100)//i/o init 2
 				return 0x400;
 			else
 				return 0x000;
@@ -1432,56 +1438,6 @@ static INPUT_PORTS_START( bbust2 )
 	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) //bomb
 	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("LIGHT_P1_P2")
-	PORT_DIPNAME( 0x0001, 0x0000, "2-1" )
-	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0000, "2-2" )
-	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x008000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-
 	PORT_START("LIGHT_P1_X")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(1)
 
@@ -1770,6 +1726,26 @@ static MACHINE_RESET(hyperneo)
 
 	// "Display List" init - ugly
 	activeBuffer = 0 ;
+
+	/* For simulate MCU stepping */
+	fake_mcu_time = 0;
+}
+
+static PALETTE_INIT( hng64 )
+{
+	#if 0
+
+	int x,r,g,b,i;
+
+	for(i=0;i<0x10;i++)
+	for(x=0;x<0x100;x++)
+	{
+		r = (x & 0xf)*0x10;
+		g = ((x & 0x3c)>>2)*0x10;
+		b = ((x & 0xf0)>>4)*0x10;
+		palette_set_color(machine,x+i*0x100,MAKE_RGB(r,g,b));
+	}
+	#endif
 }
 
 static MACHINE_DRIVER_START( hng64 )
@@ -1785,6 +1761,8 @@ static MACHINE_DRIVER_START( hng64 )
 	MDRV_CPU_ADD("comm", Z80,MASTER_CLOCK/4)		/* KL5C80A12CFP - binary compatible with Z80. */
 	MDRV_CPU_PROGRAM_MAP(hng_comm_map)
 	MDRV_CPU_IO_MAP(hng_comm_io_map)
+
+	MDRV_PALETTE_INIT(hng64)
 
 	MDRV_GFXDECODE(hng64)
 	MDRV_MACHINE_START(hyperneo)
