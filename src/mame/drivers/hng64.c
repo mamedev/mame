@@ -957,6 +957,16 @@ static READ32_HANDLER( tcram_r )
 	return hng64_tcram[offset] ;
 }
 
+/* Some games (namely sams64 after the title screen) tests bit 15 of this to be high, unknown purpose (vblank? related to the display list?). */
+static READ32_HANDLER( unk_vreg_r )
+{
+	static UINT32 toggle;
+
+	toggle^=0x8000;
+	return toggle;
+}
+
+
 /*
 <ElSemi> 0xE0000000 sound
 <ElSemi> 0xD0100000 3D bank A
@@ -1022,6 +1032,7 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(&hng64_tcram)				// Transition Control
 	AM_RANGE(0x20300000, 0x203001ff) AM_WRITE(dl_w) AM_BASE(&hng64_dl)						// 3d Display List
 	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)
+	AM_RANGE(0x20300218, 0x2030021b) AM_READ(unk_vreg_r)
 
 	// 3d?
 //  AM_RANGE(0x30000000, 0x3000002f) AM_READWRITE(q2_r, q2_w) AM_BASE(&hng64_q2)
