@@ -97,8 +97,7 @@ static WRITE8_HANDLER( drw80pkr_io_w )
 
 	if (p2 == 0x3f || p2 == 0x7f)
 	{
-		n_offs = (((~p1) & 0xc0) << 2) - 0x100; // high address
-		n_offs += (offset); // low address
+		n_offs = ((p1 & 0xc0) << 2 ) + offset;
 
 		color_ram[n_offs] = data & 0x0f;
 
@@ -191,16 +190,14 @@ static READ8_HANDLER( drw80pkr_io_r )
 
 	if (p2 == 0x3b)
 	{
-		n_offs = (((~p1) & 0xc0) << 2) - 0x100; // high address
-		n_offs += (offset); // low address
+		n_offs = ((p1 & 0xc0) << 2 ) + offset;
 
 		ret = video_ram[n_offs];
 	}
 
 	if (p2 == 0x7b)
 	{
-		n_offs = (((~p1) & 0xc0) << 2) - 0x100; // high address
-		n_offs += (offset); // low address
+		n_offs = ((p1 & 0xc0) << 2 ) + offset;
 
 		ret = color_ram[n_offs];
 	}
