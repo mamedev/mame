@@ -130,29 +130,12 @@ Dumped by Chackn
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt.h"
 #include "sound/2203intf.h"
+#include "angelkds.h"
 
 static READ8_HANDLER( angelkds_main_sound_r );
 static WRITE8_HANDLER( angelkds_main_sound_w );
 static READ8_HANDLER( angelkds_sub_sound_r );
 static WRITE8_HANDLER( angelkds_sub_sound_w );
-
-extern UINT8 *angelkds_txvideoram, *angelkds_bgtopvideoram, *angelkds_bgbotvideoram;
-
-WRITE8_HANDLER( angelkds_bgtopvideoram_w );
-WRITE8_HANDLER( angelkds_bgbotvideoram_w );
-WRITE8_HANDLER( angelkds_txvideoram_w );
-
-WRITE8_HANDLER( angelkds_bgtopbank_write );
-WRITE8_HANDLER( angelkds_bgtopscroll_write );
-WRITE8_HANDLER( angelkds_bgbotbank_write );
-WRITE8_HANDLER( angelkds_bgbotscroll_write );
-WRITE8_HANDLER( angelkds_txbank_write );
-
-WRITE8_HANDLER( angelkds_paletteram_w );
-WRITE8_HANDLER( angelkds_layer_ctrl_write );
-
-VIDEO_START( angelkds );
-VIDEO_UPDATE( angelkds );
 
 /*** CPU Banking
 
@@ -164,7 +147,7 @@ static WRITE8_HANDLER ( angelkds_cpu_bank_write )
 	UINT8 *RAM = memory_region(space->machine, "user1");
 
 	bankaddress = data & 0x0f;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress*0x4000]);
+	memory_set_bankptr(space->machine, 1, &RAM[bankaddress * 0x4000]);
 }
 
 
@@ -214,19 +197,17 @@ only one of the register (f001) is used for both part?
 Interesting note, each Bank in the 0x8000 - 0xbfff appears to
 contain a level.
 
-
-
 */
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(angelkds_bgtopvideoram_w) AM_BASE(&angelkds_bgtopvideoram) /* Top Half of Screen */
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(angelkds_bgbotvideoram_w) AM_BASE(&angelkds_bgbotvideoram) /* Bottom Half of Screen */
-	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(angelkds_txvideoram_w) AM_BASE(&angelkds_txvideoram)
-	AM_RANGE(0xec00, 0xecff) AM_RAM AM_BASE(&spriteram)
-	AM_RANGE(0xed00, 0xeeff) AM_RAM_WRITE(angelkds_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(angelkds_bgtopvideoram_w) AM_BASE_MEMBER(angelkds_state, bgtopvideoram) /* Top Half of Screen */
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(angelkds_bgbotvideoram_w) AM_BASE_MEMBER(angelkds_state, bgbotvideoram) /* Bottom Half of Screen */
+	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(angelkds_txvideoram_w) AM_BASE_MEMBER(angelkds_state, txvideoram)
+	AM_RANGE(0xec00, 0xecff) AM_RAM AM_BASE_MEMBER(angelkds_state, spriteram)
+	AM_RANGE(0xed00, 0xeeff) AM_RAM_WRITE(angelkds_paletteram_w) AM_BASE_MEMBER(angelkds_state, paletteram)
 	AM_RANGE(0xef00, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(angelkds_bgtopbank_write)
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(angelkds_bgtopscroll_write)
@@ -512,27 +493,28 @@ sound related ?
 
 */
 
-static UINT8 angelkds_sound[4];
-static UINT8 angelkds_sound2[4];
-
 static WRITE8_HANDLER( angelkds_main_sound_w )
 {
-	angelkds_sound[offset]=data;
+	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	state->sound[offset] = data;
 }
 
 static READ8_HANDLER( angelkds_main_sound_r )
 {
-	return angelkds_sound2[offset];
+	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	return state->sound2[offset];
 }
 
 static WRITE8_HANDLER( angelkds_sub_sound_w )
 {
-	angelkds_sound2[offset]=data;
+	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	state->sound2[offset] = data;
 }
 
 static READ8_HANDLER( angelkds_sub_sound_r )
 {
-	return angelkds_sound[offset];
+	angelkds_state *state = (angelkds_state *)space->machine->driver_data;
+	return state->sound[offset];
 }
 
 
@@ -598,11 +580,38 @@ GFXDECODE_END
 
 static MACHINE_START( angelkds )
 {
-    state_save_register_global_array(machine, angelkds_sound);
-    state_save_register_global_array(machine, angelkds_sound2);
+	angelkds_state *state = (angelkds_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->layer_ctrl);
+	state_save_register_global(machine, state->txbank);
+	state_save_register_global(machine, state->bgbotbank);
+	state_save_register_global(machine, state->bgtopbank);
+	state_save_register_global_array(machine, state->sound);
+	state_save_register_global_array(machine, state->sound2);
+}
+
+static MACHINE_RESET( angelkds )
+{
+	angelkds_state *state = (angelkds_state *)machine->driver_data;
+	int i;
+
+	for (i = 0; i < 4; i++)
+	{
+		state->sound[i] = 0;
+		state->sound2[i] = 0;
+	}
+
+	state->layer_ctrl = 0;
+	state->txbank = 0;
+	state->bgbotbank = 0;
+	state->bgtopbank = 0;
 }
 
 static MACHINE_DRIVER_START( angelkds )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(angelkds_state)
+
 	MDRV_CPU_ADD("maincpu", Z80, 8000000) /* 8MHz? 6 seems too slow? */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(main_portmap)
@@ -612,7 +621,8 @@ static MACHINE_DRIVER_START( angelkds )
 	MDRV_CPU_PROGRAM_MAP(sub_map)
 	MDRV_CPU_IO_MAP(sub_portmap)
 
-    MDRV_MACHINE_START(angelkds)
+	MDRV_MACHINE_START(angelkds)
+	MDRV_MACHINE_RESET(angelkds)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -743,8 +753,11 @@ ROM_START( spcpostn )
 ROM_END
 
 
-static DRIVER_INIT( spcpostn )	{ spcpostn_decode(machine, "maincpu"); }
+static DRIVER_INIT( spcpostn )
+{ 
+	spcpostn_decode(machine, "maincpu"); 
+}
 
 
-GAME( 1988, angelkds, 0, angelkds, angelkds,        0,  ROT90,  "Sega / Nasco?", "Angel Kids (Japan)" , GAME_SUPPORTS_SAVE) /* Nasco not displayed but 'Exa Planning' is */
-GAME( 1986, spcpostn, 0, angelkds, spcpostn, spcpostn,  ROT90,  "Sega / Nasco", "Space Position (Japan)" , GAME_SUPPORTS_SAVE) /* encrypted */
+GAME( 1988, angelkds, 0, angelkds, angelkds,        0,  ROT90,  "Sega / Nasco?", "Angel Kids (Japan)" ,     GAME_SUPPORTS_SAVE) /* Nasco not displayed but 'Exa Planning' is */
+GAME( 1986, spcpostn, 0, angelkds, spcpostn, spcpostn,  ROT90,  "Sega / Nasco",  "Space Position (Japan)" , GAME_SUPPORTS_SAVE) /* encrypted */

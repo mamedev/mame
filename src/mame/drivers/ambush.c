@@ -1,49 +1,49 @@
 /***************************************************************************
 
-Ambush Memory Map (preliminary)
+    Ambush Memory Map (preliminary)
 
-driver by Zsolt Vasvari
-
-
-Memory Mapped:
-
-0000-7fff   R   ROM
-8000-87ff   R/W RAM
-a000        R   Watchdog Reset
-c080-c09f   W   Scroll RAM (1 byte for each column)
-c100-c1ff   W   Color RAM (1 line corresponds to 4 in the video ram)
-c200-c3ff   W   Sprite RAM
-c400-c7ff   W   Video RAM
-c800        R   DIP Switches
-cc00-cc03   W   ??? (Maybe analog sound triggers?)
-cc04        W   Flip Screen
-cc05        W   Color Bank Select
-cc07        W   Coin Counter
+    driver by Zsolt Vasvari
 
 
-I/O Ports:
+    Memory Mapped:
 
-00-01       R/W AY8910 #0 (Port A = Input Port #0)
-80-81       R/W AY8910 #1 (Port A = Input Port #1)
+    0000-7fff   R   ROM
+    8000-87ff   R/W RAM
+    a000        R   Watchdog Reset
+    c080-c09f   W   Scroll RAM (1 byte for each column)
+    c100-c1ff   W   Color RAM (1 line corresponds to 4 in the video ram)
+    c200-c3ff   W   Sprite RAM
+    c400-c7ff   W   Video RAM
+    c800        R   DIP Switches
+    cc00-cc03   W   ??? (Maybe analog sound triggers?)
+    cc04        W   Flip Screen
+    cc05        W   Color Bank Select
+    cc07        W   Coin Counter
 
 
-TODO:
+    I/O Ports:
 
-- Verify Z80 and AY8910 clock speeds
+    00-01       R/W AY8910 #0 (Port A = Input Port #0)
+    80-81       R/W AY8910 #1 (Port A = Input Port #1)
+
+
+    TODO:
+
+    - Verify Z80 and AY8910 clock speeds
 
 ***************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "ambush.h"
 
 
-extern UINT8 *ambush_scrollram;
-extern UINT8 *ambush_colorbank;
-
-PALETTE_INIT( ambush );
-VIDEO_UPDATE( ambush );
-
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 static WRITE8_HANDLER( ambush_coin_counter_w )
 {
@@ -57,19 +57,25 @@ static WRITE8_HANDLER( flip_screen_w )
 }
 
 
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
+
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc080, 0xc09f) AM_BASE(&ambush_scrollram)
-	AM_RANGE(0xc100, 0xc1ff) AM_BASE(&colorram)
-	AM_RANGE(0xc200, 0xc3ff) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xc400, 0xc7ff) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xc080, 0xc09f) AM_BASE_MEMBER(ambush_state, scrollram)
+	AM_RANGE(0xc100, 0xc1ff) AM_BASE_MEMBER(ambush_state, colorram)
+	AM_RANGE(0xc200, 0xc3ff) AM_BASE_MEMBER(ambush_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc400, 0xc7ff) AM_BASE_MEMBER(ambush_state, videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("DSW1")
 	AM_RANGE(0xcc00, 0xcc03) AM_WRITENOP
 	AM_RANGE(0xcc04, 0xcc04) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xcc05, 0xcc05) AM_WRITEONLY AM_BASE(&ambush_colorbank)
+	AM_RANGE(0xcc05, 0xcc05) AM_WRITEONLY AM_BASE_MEMBER(ambush_state, colorbank)
 	AM_RANGE(0xcc07, 0xcc07) AM_WRITE(ambush_coin_counter_w)
 ADDRESS_MAP_END
 
@@ -81,6 +87,12 @@ static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x81, 0x81) AM_DEVWRITE("ay2", ay8910_data_w)
 ADDRESS_MAP_END
 
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( ambush )
 	PORT_START("SYSTEM")
@@ -145,6 +157,12 @@ static INPUT_PORTS_START( ambusht )
 INPUT_PORTS_END
 
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 chars */
@@ -175,6 +193,12 @@ static GFXDECODE_START( ambush )
 GFXDECODE_END
 
 
+/*************************************
+ *
+ *  Sound interfaces
+ *
+ *************************************/
+
 static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -196,7 +220,16 @@ static const ay8910_interface ay8910_interface_2 =
 };
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
 static MACHINE_DRIVER_START( ambush )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ambush_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4.00 MHz??? */
@@ -230,11 +263,11 @@ static MACHINE_DRIVER_START( ambush )
 MACHINE_DRIVER_END
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( ambush )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -294,6 +327,12 @@ ROM_START( ambushv )
 	ROM_LOAD( "14.bpr",		  0x0300, 0x0100, CRC(622a8ce7) SHA1(6834f67874251f2ef3a33aec893311f5d10e496f) )  /* They don't look like color PROMs */
 ROM_END
 
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
 GAME( 1983, ambush,   0,        ambush,   ambush,   0, ROT0, "Nippon Amuse Co-Ltd", "Ambush", GAME_SUPPORTS_SAVE )
-GAME( 1983, ambushv,  ambush,   ambush,   ambush,   0, ROT0, "Volt Elec co-ltd", "Ambush (Volt Elec co-ltd)", GAME_SUPPORTS_SAVE )
-GAME( 1983, ambusht,  ambush,   ambush,   ambusht,  0, ROT0, "Tecfri", "Ambush (Tecfri)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ambushv,  ambush,   ambush,   ambush,   0, ROT0, "Volt Elec co-ltd",    "Ambush (Volt Elec co-ltd)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ambusht,  ambush,   ambush,   ambusht,  0, ROT0, "Tecfri",              "Ambush (Tecfri)", GAME_SUPPORTS_SAVE )
