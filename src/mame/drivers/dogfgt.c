@@ -14,23 +14,22 @@ driver by Nicola Salmoria
 #include "sound/ay8910.h"
 
 
-static UINT8 *sharedram;
-
 static READ8_HANDLER( sharedram_r )
 {
-	return sharedram[offset];
+	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	return state->sharedram[offset];
 }
 
 static WRITE8_HANDLER( sharedram_w )
 {
-	sharedram[offset] = data;
+	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	state->sharedram[offset] = data;
 }
 
 
 static WRITE8_HANDLER( subirqtrigger_w )
 {
 	/* bit 0 used but unknown */
-
 	if (data & 0x04)
 		cputag_set_input_line(space->machine, "sub", 0, ASSERT_LINE);
 }
@@ -40,36 +39,33 @@ static WRITE8_HANDLER( sub_irqack_w )
 	cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
 }
 
-
-static int soundlatch;
-
 static WRITE8_HANDLER( dogfgt_soundlatch_w )
 {
-	soundlatch = data;
+	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	state->soundlatch = data;
 }
 
 static WRITE8_HANDLER( dogfgt_soundcontrol_w )
 {
-	static int last;
-
+	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
 
 	/* bit 5 goes to 8910 #0 BDIR pin  */
-	if ((last & 0x20) == 0x20 && (data & 0x20) == 0x00)
-		ay8910_data_address_w(devtag_get_device(space->machine, "ay1"), last >> 4, soundlatch);
+	if ((state->last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)
+		ay8910_data_address_w(devtag_get_device(space->machine, "ay1"), state->last_snd_ctrl >> 4, state->soundlatch);
 
 	/* bit 7 goes to 8910 #1 BDIR pin  */
-	if ((last & 0x80) == 0x80 && (data & 0x80) == 0x00)
-		ay8910_data_address_w(devtag_get_device(space->machine, "ay2"), last >> 6, soundlatch);
+	if ((state->last_snd_ctrl & 0x80) == 0x80 && (data & 0x80) == 0x00)
+		ay8910_data_address_w(devtag_get_device(space->machine, "ay2"), state->last_snd_ctrl >> 6, state->soundlatch);
 
-	last = data;
+	state->last_snd_ctrl = data;
 }
 
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(&sharedram)
-	AM_RANGE(0x0f80, 0x0fdf) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x1000, 0x17ff) AM_WRITE(dogfgt_bgvideoram_w) AM_BASE(&dogfgt_bgvideoram)
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(dogfgt_state, sharedram)
+	AM_RANGE(0x0f80, 0x0fdf) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(dogfgt_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1000, 0x17ff) AM_WRITE(dogfgt_bgvideoram_w) AM_BASE_MEMBER(dogfgt_state, bgvideoram)
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(dogfgt_1800_w)	/* text color, flip screen & coin counters */
 	AM_RANGE(0x1810, 0x1810) AM_READ_PORT("P2")
@@ -215,8 +211,41 @@ GFXDECODE_END
 
 
 
+static MACHINE_START( dogfgt )
+{
+	dogfgt_state *state = (dogfgt_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->bm_plane);
+	state_save_register_global(machine, state->lastflip);
+	state_save_register_global(machine, state->pixcolor);
+	state_save_register_global(machine, state->lastpixcolor);
+	state_save_register_global(machine, state->soundlatch);
+	state_save_register_global(machine, state->last_snd_ctrl);
+
+	state_save_register_global_array(machine, state->scroll);
+}
+
+static MACHINE_RESET( dogfgt )
+{
+	dogfgt_state *state = (dogfgt_state *)machine->driver_data;
+	int i;
+
+	state->bm_plane = 0;
+	state->lastflip = 0;
+	state->pixcolor = 0;
+	state->lastpixcolor = 0;
+	state->soundlatch = 0;
+	state->last_snd_ctrl = 0;
+
+	for (i = 0; i < 3; i++)
+		state->scroll[i] = 0;
+}
+
 
 static MACHINE_DRIVER_START( dogfgt )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(dogfgt_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
@@ -227,6 +256,9 @@ static MACHINE_DRIVER_START( dogfgt )
 	MDRV_CPU_PROGRAM_MAP(sub_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
+
+	MDRV_MACHINE_START(dogfgt)
+	MDRV_MACHINE_RESET(dogfgt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -325,5 +357,5 @@ ROM_END
 
 
 
-GAME( 1984, dogfgt,  0,      dogfgt, dogfgt, 0, ROT0, "Technos Japan", "Acrobatic Dog-Fight", 0 )
-GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, 0, ROT0, "Technos Japan", "Dog-Fight (Japan)", 0 )
+GAME( 1984, dogfgt,  0,      dogfgt, dogfgt, 0, ROT0, "Technos Japan", "Acrobatic Dog-Fight", GAME_SUPPORTS_SAVE )
+GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, 0, ROT0, "Technos Japan", "Dog-Fight (Japan)", GAME_SUPPORTS_SAVE )

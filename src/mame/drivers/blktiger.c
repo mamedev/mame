@@ -1,15 +1,15 @@
 /***************************************************************************
 
-  Black Tiger
+    Black Tiger
 
-  Driver provided by Paul Leaman
+    Driver provided by Paul Leaman
 
-  Thanks to Ishmair for providing information about the screen
-  layout on level 3.
+    Thanks to Ishmair for providing information about the screen
+    layout on level 3.
 
-Notes:
-- sprites/tile priority is a guess. I didn't find a PROM that would simply
-  translate to the scheme I implemented.
+    Notes:
+    - sprites/tile priority is a guess. I didn't find a PROM that would simply
+      translate to the scheme I implemented.
 
 ***************************************************************************/
 
@@ -17,24 +17,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "cpu/mcs51/mcs51.h"
-
-
-extern UINT8 *blktiger_txvideoram;
-
-WRITE8_HANDLER( blktiger_screen_layout_w );
-
-READ8_HANDLER( blktiger_bgvideoram_r );
-WRITE8_HANDLER( blktiger_bgvideoram_w );
-WRITE8_HANDLER( blktiger_txvideoram_w );
-WRITE8_HANDLER( blktiger_video_control_w );
-WRITE8_HANDLER( blktiger_video_enable_w );
-WRITE8_HANDLER( blktiger_bgvideoram_bank_w );
-WRITE8_HANDLER( blktiger_scrollx_w );
-WRITE8_HANDLER( blktiger_scrolly_w );
-
-VIDEO_START( blktiger );
-VIDEO_UPDATE( blktiger );
-VIDEO_EOF( blktiger );
+#include "blktiger.h"
 
 
 /**************************************************
@@ -43,30 +26,32 @@ Protection comms between main cpu and i8751
 
 **************************************************/
 
-static UINT8 z80_latch,i8751_latch;
-
 static READ8_HANDLER( blktiger_from_mcu_r )
 {
-	return i8751_latch;
+	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
+	return state->i8751_latch;
 }
 
 static WRITE8_HANDLER( blktiger_to_mcu_w )
 {
+	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
 	cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, ASSERT_LINE);
-	z80_latch = data;
+	state->z80_latch = data;
 }
 
 static READ8_HANDLER( blktiger_from_main_r )
 {
+	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
 	cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, CLEAR_LINE);
 	//printf("%02x read\n",latch);
-	return z80_latch;
+	return state->z80_latch;
 }
 
 static WRITE8_HANDLER( blktiger_to_main_w )
 {
+	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
 	//printf("%02x write\n",data);
-	i8751_latch = data;
+	state->i8751_latch = data;
 }
 
 
@@ -90,7 +75,7 @@ static ADDRESS_MAP_START( blktiger_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(blktiger_bgvideoram_r, blktiger_bgvideoram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(blktiger_txvideoram_w) AM_BASE(&blktiger_txvideoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(blktiger_txvideoram_w) AM_BASE_MEMBER(blktiger_state, txvideoram)
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE(&paletteram)
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE(&paletteram_2)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
@@ -151,7 +136,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( blktiger )
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
@@ -161,7 +146,7 @@ static INPUT_PORTS_START( blktiger )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -171,7 +156,7 @@ static INPUT_PORTS_START( blktiger )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 
-	PORT_START("IN2")	/* IN2 */
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
@@ -181,7 +166,7 @@ static INPUT_PORTS_START( blktiger )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 
-	PORT_START("DSW0")	/* DSW0 */
+	PORT_START("DSW0")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )		PORT_DIPLOCATION( "SW1:1,2,3" )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
@@ -207,7 +192,7 @@ static INPUT_PORTS_START( blktiger )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW1")      /* DSW1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION( "SW2:1,2" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
@@ -295,11 +280,46 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( blktiger )
 {
+	blktiger_state *state = (blktiger_state *)machine->driver_data;
+
 	/* configure bankswitching */
 	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+
+	state_save_register_global(machine, state->scroll_bank);
+	state_save_register_global(machine, state->screen_layout);
+	state_save_register_global(machine, state->chon);
+	state_save_register_global(machine, state->objon);
+	state_save_register_global(machine, state->bgon);
+	state_save_register_global(machine, state->z80_latch);
+	state_save_register_global(machine, state->i8751_latch);
+	state_save_register_global_array(machine, state->scroll_x);
+	state_save_register_global_array(machine, state->scroll_y);
+}
+
+static MACHINE_RESET( blktiger )
+{
+	blktiger_state *state = (blktiger_state *)machine->driver_data;
+
+	/* configure bankswitching */
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+
+	state->scroll_x[0] = 0;
+	state->scroll_x[1] = 0;
+	state->scroll_y[0] = 0;
+	state->scroll_y[1] = 0;
+	state->scroll_bank = 0;
+	state->screen_layout = 0;
+	state->chon = 0;
+	state->objon = 0;
+	state->bgon = 0;
+	state->z80_latch = 0;
+	state->i8751_latch = 0;
 }
 
 static MACHINE_DRIVER_START( blktiger )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(blktiger_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)	/* verified on pcb */
@@ -316,6 +336,7 @@ static MACHINE_DRIVER_START( blktiger )
 	//MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_START(blktiger)
+	MDRV_MACHINE_RESET(blktiger)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

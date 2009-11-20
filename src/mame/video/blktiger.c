@@ -1,16 +1,9 @@
 #include "driver.h"
+#include "blktiger.h"
 
-UINT8 *blktiger_txvideoram;
 
 #define BGRAM_BANK_SIZE 0x1000
 #define BGRAM_BANKS 4
-
-static UINT32 blktiger_scroll_bank;
-static UINT8 *scroll_ram;
-static UINT8 screen_layout;
-static UINT8 chon,objon,bgon;
-
-static tilemap *tx_tilemap,*bg_tilemap8x4,*bg_tilemap4x8;
 
 
 /***************************************************************************
@@ -33,6 +26,7 @@ static TILEMAP_MAPPER( bg4x8_scan )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
+	blktiger_state *state = (blktiger_state *)machine->driver_data;
 	/* the tile priority table is a guess compiled by looking at the game. It
        was not derived from a PROM so it could be wrong. */
 	static const UINT8 split_table[16] =
@@ -42,11 +36,11 @@ static TILE_GET_INFO( get_bg_tile_info )
 		0,0,0,0,
 		0,0,0,0
 	};
-	UINT8 attr = scroll_ram[2*tile_index + 1];
+	UINT8 attr = state->scroll_ram[2 * tile_index + 1];
 	int color = (attr & 0x78) >> 3;
 	SET_TILE_INFO(
 			1,
-			scroll_ram[2*tile_index] + ((attr & 0x07) << 8),
+			state->scroll_ram[2 * tile_index] + ((attr & 0x07) << 8),
 			color,
 			(attr & 0x80) ? TILE_FLIPX : 0);
 	tileinfo->group = split_table[color];
@@ -54,10 +48,11 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	UINT8 attr = blktiger_txvideoram[tile_index + 0x400];
+	blktiger_state *state = (blktiger_state *)machine->driver_data;
+	UINT8 attr = state->txvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			0,
-			blktiger_txvideoram[tile_index] + ((attr & 0xe0) << 3),
+			state->txvideoram[tile_index] + ((attr & 0xe0) << 3),
 			attr & 0x1f,
 			0);
 }
@@ -71,29 +66,26 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( blktiger )
 {
-	scroll_ram = auto_alloc_array(machine, UINT8, BGRAM_BANK_SIZE * BGRAM_BANKS);
+	blktiger_state *state = (blktiger_state *)machine->driver_data;
 
-	tx_tilemap =    tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows,8,8,32,32);
-	bg_tilemap8x4 = tilemap_create(machine, get_bg_tile_info,bg8x4_scan,          16,16,128,64);
-	bg_tilemap4x8 = tilemap_create(machine, get_bg_tile_info,bg4x8_scan,          16,16,64,128);
+	state->scroll_ram = auto_alloc_array(machine, UINT8, BGRAM_BANK_SIZE * BGRAM_BANKS);
 
-	tilemap_set_transparent_pen(tx_tilemap,3);
+	state->tx_tilemap =    tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->bg_tilemap8x4 = tilemap_create(machine, get_bg_tile_info, bg8x4_scan, 16, 16, 128, 64);
+	state->bg_tilemap4x8 = tilemap_create(machine, get_bg_tile_info, bg4x8_scan, 16, 16, 64, 128);
 
-	tilemap_set_transmask(bg_tilemap8x4,0,0xffff,0x8000);	/* split type 0 is totally transparent in front half */
-	tilemap_set_transmask(bg_tilemap8x4,1,0xfff0,0x800f);	/* split type 1 has pens 4-15 transparent in front half */
-	tilemap_set_transmask(bg_tilemap8x4,2,0xff00,0x80ff);	/* split type 1 has pens 8-15 transparent in front half */
-	tilemap_set_transmask(bg_tilemap8x4,3,0xf000,0x8fff);	/* split type 1 has pens 12-15 transparent in front half */
-	tilemap_set_transmask(bg_tilemap4x8,0,0xffff,0x8000);
-	tilemap_set_transmask(bg_tilemap4x8,1,0xfff0,0x800f);
-	tilemap_set_transmask(bg_tilemap4x8,2,0xff00,0x80ff);
-	tilemap_set_transmask(bg_tilemap4x8,3,0xf000,0x8fff);
+	tilemap_set_transparent_pen(state->tx_tilemap, 3);
 
-	state_save_register_global(machine, blktiger_scroll_bank);
-	state_save_register_global(machine, screen_layout);
-	state_save_register_global(machine, chon);
-	state_save_register_global(machine, objon);
-	state_save_register_global(machine, bgon);
-	state_save_register_global_pointer(machine, scroll_ram, BGRAM_BANK_SIZE * BGRAM_BANKS);
+	tilemap_set_transmask(state->bg_tilemap8x4, 0, 0xffff, 0x8000);	/* split type 0 is totally transparent in front half */
+	tilemap_set_transmask(state->bg_tilemap8x4, 1, 0xfff0, 0x800f);	/* split type 1 has pens 4-15 transparent in front half */
+	tilemap_set_transmask(state->bg_tilemap8x4, 2, 0xff00, 0x80ff);	/* split type 1 has pens 8-15 transparent in front half */
+	tilemap_set_transmask(state->bg_tilemap8x4, 3, 0xf000, 0x8fff);	/* split type 1 has pens 12-15 transparent in front half */
+	tilemap_set_transmask(state->bg_tilemap4x8, 0, 0xffff, 0x8000);
+	tilemap_set_transmask(state->bg_tilemap4x8, 1, 0xfff0, 0x800f);
+	tilemap_set_transmask(state->bg_tilemap4x8, 2, 0xff00, 0x80ff);
+	tilemap_set_transmask(state->bg_tilemap4x8, 3, 0xf000, 0x8fff);
+
+	state_save_register_global_pointer(machine, state->scroll_ram, BGRAM_BANK_SIZE * BGRAM_BANKS);
 }
 
 
@@ -106,55 +98,60 @@ VIDEO_START( blktiger )
 
 WRITE8_HANDLER( blktiger_txvideoram_w )
 {
-	blktiger_txvideoram[offset] = data;
-	tilemap_mark_tile_dirty(tx_tilemap,offset & 0x3ff);
+	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
+	state->txvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->tx_tilemap,offset & 0x3ff);
 }
 
 READ8_HANDLER( blktiger_bgvideoram_r )
 {
-	return scroll_ram[offset + blktiger_scroll_bank];
+	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
+	return state->scroll_ram[offset + state->scroll_bank];
 }
 
 WRITE8_HANDLER( blktiger_bgvideoram_w )
 {
-	offset += blktiger_scroll_bank;
+	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
+	offset += state->scroll_bank;
 
-	scroll_ram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap8x4,offset/2);
-	tilemap_mark_tile_dirty(bg_tilemap4x8,offset/2);
+	state->scroll_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap8x4, offset / 2);
+	tilemap_mark_tile_dirty(state->bg_tilemap4x8, offset / 2);
 }
 
 WRITE8_HANDLER( blktiger_bgvideoram_bank_w )
 {
-	blktiger_scroll_bank = (data % BGRAM_BANKS) * BGRAM_BANK_SIZE;
+	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
+	state->scroll_bank = (data % BGRAM_BANKS) * BGRAM_BANK_SIZE;
 }
 
 
 WRITE8_HANDLER( blktiger_scrolly_w )
 {
-	static UINT8 scroll[2];
+	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
 	int scrolly;
 
-	scroll[offset] = data;
-	scrolly = scroll[0] | (scroll[1] << 8);
-	tilemap_set_scrolly(bg_tilemap8x4,0,scrolly);
-	tilemap_set_scrolly(bg_tilemap4x8,0,scrolly);
+	state->scroll_y[offset] = data;
+	scrolly = state->scroll_y[0] | (state->scroll_y[1] << 8);
+	tilemap_set_scrolly(state->bg_tilemap8x4, 0, scrolly);
+	tilemap_set_scrolly(state->bg_tilemap4x8, 0, scrolly);
 }
 
 WRITE8_HANDLER( blktiger_scrollx_w )
 {
-	static UINT8 scroll[2];
+	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
 	int scrollx;
 
-	scroll[offset] = data;
-	scrollx = scroll[0] | (scroll[1] << 8);
-	tilemap_set_scrollx(bg_tilemap8x4,0,scrollx);
-	tilemap_set_scrollx(bg_tilemap4x8,0,scrollx);
+	state->scroll_x[offset] = data;
+	scrollx = state->scroll_x[0] | (state->scroll_x[1] << 8);
+	tilemap_set_scrollx(state->bg_tilemap8x4, 0, scrollx);
+	tilemap_set_scrollx(state->bg_tilemap4x8, 0, scrollx);
 }
 
 
 WRITE8_HANDLER( blktiger_video_control_w )
 {
+	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
 	/* bits 0 and 1 are coin counters */
 	coin_counter_w(0,data & 1);
 	coin_counter_w(1,data & 2);
@@ -166,24 +163,27 @@ WRITE8_HANDLER( blktiger_video_control_w )
 	flip_screen_set(space->machine, data & 0x40);
 
 	/* bit 7 enables characters? Just a guess */
-	chon = ~data & 0x80;
+	state->chon = ~data & 0x80;
 }
 
 WRITE8_HANDLER( blktiger_video_enable_w )
 {
+	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
+
 	/* not sure which is which, but I think that bit 1 and 2 enable background and sprites */
 	/* bit 1 enables bg ? */
-	bgon = ~data & 0x02;
+	state->bgon = ~data & 0x02;
 
 	/* bit 2 enables sprites ? */
-	objon = ~data & 0x04;
+	state->objon = ~data & 0x04;
 }
 
 WRITE8_HANDLER( blktiger_screen_layout_w )
 {
-	screen_layout = data;
-	tilemap_set_enable(bg_tilemap8x4, screen_layout);
-	tilemap_set_enable(bg_tilemap4x8,!screen_layout);
+	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
+	state->screen_layout = data;
+	tilemap_set_enable(state->bg_tilemap8x4, state->screen_layout);
+	tilemap_set_enable(state->bg_tilemap4x8, !state->screen_layout);
 }
 
 
@@ -194,8 +194,9 @@ WRITE8_HANDLER( blktiger_screen_layout_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+//	blktiger_state *state = (blktiger_state *)machine->driver_data;
 	int offs;
 
 	/* Draw the sprites. */
@@ -225,19 +226,21 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( blktiger )
 {
-	bitmap_fill(bitmap,cliprect,1023);
+	blktiger_state *state = (blktiger_state *)screen->machine->driver_data;
 
-	if (bgon)
-		tilemap_draw(bitmap,cliprect,screen_layout ? bg_tilemap8x4 : bg_tilemap4x8,TILEMAP_DRAW_LAYER1,0);
+	bitmap_fill(bitmap, cliprect, 1023);
 
-	if (objon)
-		draw_sprites(screen->machine, bitmap,cliprect);
+	if (state->bgon)
+		tilemap_draw(bitmap, cliprect, state->screen_layout ? state->bg_tilemap8x4 : state->bg_tilemap4x8, TILEMAP_DRAW_LAYER1, 0);
 
-	if (bgon)
-		tilemap_draw(bitmap,cliprect,screen_layout ? bg_tilemap8x4 : bg_tilemap4x8,TILEMAP_DRAW_LAYER0,0);
+	if (state->objon)
+		draw_sprites(screen->machine, bitmap, cliprect);
 
-	if (chon)
-		tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
+	if (state->bgon)
+		tilemap_draw(bitmap, cliprect, state->screen_layout ? state->bg_tilemap8x4 : state->bg_tilemap4x8, TILEMAP_DRAW_LAYER0, 0);
+
+	if (state->chon)
+		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 	return 0;
 }
 

@@ -1,42 +1,37 @@
-/***************************************************************************
+/*********************************************************************************
 
-Zero Zone memory map
+    Zero Zone memory map
 
-driver by Brad Oliver
+    driver by Brad Oliver
 
-CPU 1 : 68000, uses irq 1
+    CPU 1 : 68000, uses irq 1
 
-0x000000 - 0x01ffff : ROM
-0x080000 - 0x08000f : input ports and dipswitches
-0x088000 - 0x0881ff : palette RAM, 256 total colors
-0x09ce00 - 0x09d9ff : video ram, 48x32
-0x0c0000 - 0x0cffff : RAM
-0x0f8000 - 0x0f87ff : RAM (unused?)
+    0x000000 - 0x01ffff : ROM
+    0x080000 - 0x08000f : input ports and dipswitches
+    0x088000 - 0x0881ff : palette RAM, 256 total colors
+    0x09ce00 - 0x09d9ff : video ram, 48x32
+    0x0c0000 - 0x0cffff : RAM
+    0x0f8000 - 0x0f87ff : RAM (unused?)
 
-Stephh's notes :
+    Stephh's notes :
 
-  IMO, the game only has 2 buttons (1 to rotate the pieces and 1 for help).
-  The 3rd button (when the Dip Switch is activated) subs one "line"
-  (0x0c0966 for player 1 and 0x0c1082 for player 2) each time it is pressed.
-  As I don't see why such thing would REALLY exist, I've added the
-  IPF_CHEAT flag for the Dip Switch and the 3rd button of each player.
+      IMO, the game only has 2 buttons (1 to rotate the pieces and 1 for help).
+      The 3rd button (when the Dip Switch is activated) subs one "line"
+      (0x0c0966 for player 1 and 0x0c1082 for player 2) each time it is pressed.
+      As I don't see why such thing would REALLY exist, I've added the
+      IPF_CHEAT flag for the Dip Switch and the 3rd button of each player.
 
-TODO:
-    * adpcm samples don't seem to be playing at the proper tempo - too fast?
+    TODO:
+        * adpcm samples don't seem to be playing at the proper tempo - too fast?
 
 
-***************************************************************************/
+*********************************************************************************/
+
 #include "driver.h"
+#include "zerozone.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-
-VIDEO_START( zerozone );
-VIDEO_UPDATE( zerozone );
-WRITE16_HANDLER( zerozone_tilemap_w );
-WRITE16_HANDLER( zerozone_tilebank_w );
-
-extern UINT16 *zerozone_videoram;
 
 static READ16_HANDLER( zerozone_input_r )
 {
@@ -52,8 +47,7 @@ static READ16_HANDLER( zerozone_input_r )
 			return input_port_read(space->machine, "DSWA");
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n",cpu_get_pc(space->cpu),0x800000+offset);
-
+	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(space->cpu), 0x800000 + offset);
 	return 0x00;
 }
 
@@ -73,7 +67,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x084000, 0x084001) AM_WRITE(zerozone_sound_w)
 	AM_RANGE(0x088000, 0x0881ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x098000, 0x098001) AM_RAM		/* Watchdog? */
-	AM_RANGE(0x09ce00, 0x09ffff) AM_RAM_WRITE(zerozone_tilemap_w) AM_BASE(&zerozone_videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x09ce00, 0x09ffff) AM_RAM_WRITE(zerozone_tilemap_w) AM_BASE_MEMBER(zerozone_state, videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITE(zerozone_tilebank_w)
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM
 	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM		/* Never read from */
@@ -173,7 +167,16 @@ static GFXDECODE_START( zerozone )
 GFXDECODE_END
 
 
+static MACHINE_RESET( zerozone )
+{
+	zerozone_state *state = (zerozone_state *)machine->driver_data;
+	state->tilebank = 0;
+}
+
 static MACHINE_DRIVER_START( zerozone )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(zerozone_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz */
@@ -184,6 +187,8 @@ static MACHINE_DRIVER_START( zerozone )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_RESET(zerozone)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -249,5 +254,5 @@ ROM_START( lvgirl94 )
 ROM_END
 
 
-GAME( 1993, zerozone, 0, zerozone, zerozone, 0, ROT0, "Comad", "Zero Zone", 0 )
-GAME( 1994, lvgirl94, 0, zerozone, zerozone, 0, ROT0, "Comad", "Las Vegas Girl (Girl '94)", 0 )
+GAME( 1993, zerozone, 0, zerozone, zerozone, 0, ROT0, "Comad", "Zero Zone", GAME_SUPPORTS_SAVE )
+GAME( 1994, lvgirl94, 0, zerozone, zerozone, 0, ROT0, "Comad", "Las Vegas Girl (Girl '94)", GAME_SUPPORTS_SAVE )

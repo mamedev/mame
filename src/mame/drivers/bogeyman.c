@@ -15,56 +15,46 @@
 #include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
-extern UINT8 *bogeyman_videoram2, *bogeyman_colorram2;
+#include "bogeyman.h"
 
-extern WRITE8_HANDLER( bogeyman_videoram_w );
-extern WRITE8_HANDLER( bogeyman_colorram_w );
-extern WRITE8_HANDLER( bogeyman_videoram2_w );
-extern WRITE8_HANDLER( bogeyman_colorram2_w );
-extern WRITE8_HANDLER( bogeyman_paletteram_w );
-
-extern PALETTE_INIT( bogeyman );
-extern VIDEO_START( bogeyman );
-extern VIDEO_UPDATE( bogeyman );
 
 /* Read/Write Handlers */
 
 // Sound section is copied from Mysterious Stones driver by Nicola, Mike, Brad
 
-static int psg_latch;
-
 static WRITE8_HANDLER( bogeyman_8910_latch_w )
 {
-	psg_latch = data;
+	bogeyman_state *state = (bogeyman_state *)space->machine->driver_data;
+	state->psg_latch = data;
 }
 
 static WRITE8_HANDLER( bogeyman_8910_control_w )
 {
-	static int last;
+	bogeyman_state *state = (bogeyman_state *)space->machine->driver_data;
 
 	// bit 0 is flipscreen
 	flip_screen_set(space->machine, data & 0x01);
 
 	// bit 5 goes to 8910 #0 BDIR pin
-	if ((last & 0x20) == 0x20 && (data & 0x20) == 0x00)
-		ay8910_data_address_w(devtag_get_device(space->machine, "ay1"), last >> 4, psg_latch);
+	if ((state->last_write & 0x20) == 0x20 && (data & 0x20) == 0x00)
+		ay8910_data_address_w(devtag_get_device(space->machine, "ay1"), state->last_write >> 4, state->psg_latch);
 
 	// bit 7 goes to 8910 #1 BDIR pin
-	if ((last & 0x80) == 0x80 && (data & 0x80) == 0x00)
-		ay8910_data_address_w(devtag_get_device(space->machine, "ay2"), last >> 6, psg_latch);
+	if ((state->last_write & 0x80) == 0x80 && (data & 0x80) == 0x00)
+		ay8910_data_address_w(devtag_get_device(space->machine, "ay2"), state->last_write >> 6, state->psg_latch);
 
-	last = data;
+	state->last_write = data;
 }
 
 /* Memory Map */
 
 static ADDRESS_MAP_START( bogeyman_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(bogeyman_videoram2_w) AM_BASE(&bogeyman_videoram2)
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(bogeyman_colorram2_w) AM_BASE(&bogeyman_colorram2)
-  	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(bogeyman_videoram_w) AM_BASE(&videoram)
-  	AM_RANGE(0x2100, 0x21ff) AM_RAM_WRITE(bogeyman_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(bogeyman_videoram2_w) AM_BASE_MEMBER(bogeyman_state, videoram2)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(bogeyman_colorram2_w) AM_BASE_MEMBER(bogeyman_state, colorram2)
+  	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(bogeyman_videoram_w) AM_BASE_MEMBER(bogeyman_state, videoram)
+  	AM_RANGE(0x2100, 0x21ff) AM_RAM_WRITE(bogeyman_colorram_w) AM_BASE_MEMBER(bogeyman_state, colorram)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE_MEMBER(bogeyman_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x3000, 0x300f) AM_RAM_WRITE(bogeyman_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("P1") AM_WRITE(bogeyman_8910_control_w)
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("P2") AM_WRITE(bogeyman_8910_latch_w)
@@ -215,11 +205,35 @@ GFXDECODE_END
 
 /* Machine Driver */
 
+static MACHINE_START( bogeyman )
+{
+	bogeyman_state *state = (bogeyman_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->psg_latch);
+	state_save_register_global(machine, state->last_write);
+}
+
+static MACHINE_RESET( bogeyman )
+{
+	bogeyman_state *state = (bogeyman_state *)machine->driver_data;
+
+	state->psg_latch = 0;
+	state->last_write = 0;
+}
+
+
 static MACHINE_DRIVER_START( bogeyman )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(bogeyman_state)
+
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* Verified */
 	MDRV_CPU_PROGRAM_MAP(bogeyman_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 16) // Controls sound
+
+	MDRV_MACHINE_START(bogeyman)
+	MDRV_MACHINE_RESET(bogeyman)
 
 	// video hardware
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -281,4 +295,4 @@ ROM_END
 
 /* Game Driver */
 
-GAME( 1985, bogeyman, 0, bogeyman, bogeyman, 0, ROT0, "Technos Japan", "Bogey Manor", GAME_IMPERFECT_COLORS )
+GAME( 1985, bogeyman, 0, bogeyman, bogeyman, 0, ROT0, "Technos Japan", "Bogey Manor", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )

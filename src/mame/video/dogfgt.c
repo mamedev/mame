@@ -2,19 +2,6 @@
 #include "dogfgt.h"
 
 
-UINT8 *dogfgt_bgvideoram;
-
-static UINT8 *bitmapram;
-static int bm_plane;
-static bitmap_t *pixbitmap;
-static int pixcolor;
-static tilemap *bg_tilemap;
-
-#define PIXMAP_COLOR_BASE (16+32)
-
-#define BITMAPRAM_SIZE 0x6000
-
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -29,11 +16,9 @@ PALETTE_INIT( dogfgt )
 	int i;
 
 	/* first 16 colors are RAM */
-
-	for (i = 0;i < 64;i++)
+	for (i = 0; i < 64; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
-
+		int bit0, bit1, bit2, r, g, b;
 
 		/* red component */
 		bit0 = (*color_prom >> 0) & 0x01;
@@ -51,7 +36,7 @@ PALETTE_INIT( dogfgt )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i+16,MAKE_RGB(r,g,b));
+		palette_set_color(machine, i + 16, MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
@@ -65,10 +50,11 @@ PALETTE_INIT( dogfgt )
 
 static TILE_GET_INFO( get_tile_info )
 {
+	dogfgt_state *state = (dogfgt_state *)machine->driver_data;
 	SET_TILE_INFO(
 			0,
-			dogfgt_bgvideoram[tile_index],
-			dogfgt_bgvideoram[tile_index + 0x400] & 0x03,
+			state->bgvideoram[tile_index],
+			state->bgvideoram[tile_index + 0x400] & 0x03,
 			0);
 }
 
@@ -81,11 +67,14 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( dogfgt )
 {
-	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,16,16,32,32);
+	dogfgt_state *state = (dogfgt_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
-	bitmapram = auto_alloc_array(machine, UINT8, BITMAPRAM_SIZE);
+	state->bitmapram = auto_alloc_array(machine, UINT8, BITMAPRAM_SIZE);
+	state_save_register_global_pointer(machine, state->bitmapram, BITMAPRAM_SIZE);
 
-	pixbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->pixbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state_save_register_global_bitmap(machine, state->pixbitmap);
 }
 
 
@@ -97,85 +86,95 @@ VIDEO_START( dogfgt )
 
 WRITE8_HANDLER( dogfgt_plane_select_w )
 {
-	bm_plane = data;
+	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+
+	state->bm_plane = data;
 }
 
 READ8_HANDLER( dogfgt_bitmapram_r )
 {
-	if (bm_plane > 2)
+	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+
+	if (state->bm_plane > 2)
 	{
-		popmessage("bitmapram_r offs %04x plane %d\n",offset,bm_plane);
+		popmessage("bitmapram_r offs %04x plane %d\n", offset, state->bm_plane);
 		return 0;
 	}
 
-	return bitmapram[offset + BITMAPRAM_SIZE/3 * bm_plane];
+	return state->bitmapram[offset + BITMAPRAM_SIZE / 3 * state->bm_plane];
 }
 
 static WRITE8_HANDLER( internal_bitmapram_w )
 {
-	int x,y,subx;
+	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	int x, y, subx;
 
+	state->bitmapram[offset] = data;
 
-	bitmapram[offset] = data;
-
-	offset &= (BITMAPRAM_SIZE/3-1);
+	offset &= (BITMAPRAM_SIZE / 3 - 1);
 	x = 8 * (offset / 256);
 	y = offset % 256;
 
-	for (subx = 0;subx < 8;subx++)
+	for (subx = 0; subx < 8; subx++)
 	{
-		int i,color = 0;
+		int i, color = 0;
 
-		for (i = 0;i < 3;i++)
-			color |= ((bitmapram[offset + BITMAPRAM_SIZE/3 * i] >> subx) & 1) << i;
+		for (i = 0; i < 3; i++)
+			color |= ((state->bitmapram[offset + BITMAPRAM_SIZE / 3 * i] >> subx) & 1) << i;
+
 		if (flip_screen_get(space->machine))
-			*BITMAP_ADDR16(pixbitmap, y^0xff, (x+subx)^0xff) = PIXMAP_COLOR_BASE + 8*pixcolor + color;
+			*BITMAP_ADDR16(state->pixbitmap, y ^ 0xff, (x + subx) ^ 0xff) = PIXMAP_COLOR_BASE + 8 * state->pixcolor + color;
 		else
-			*BITMAP_ADDR16(pixbitmap, y, x+subx) = PIXMAP_COLOR_BASE + 8*pixcolor + color;
+			*BITMAP_ADDR16(state->pixbitmap, y, x + subx) = PIXMAP_COLOR_BASE + 8 * state->pixcolor + color;
 	}
 }
 
 WRITE8_HANDLER( dogfgt_bitmapram_w )
 {
-	if (bm_plane > 2)
+	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+
+	if (state->bm_plane > 2)
 	{
-		popmessage("bitmapram_w offs %04x plane %d\n",offset,bm_plane);
+		popmessage("bitmapram_w offs %04x plane %d\n", offset, state->bm_plane);
 		return;
 	}
 
-	internal_bitmapram_w(space,offset + BITMAPRAM_SIZE/3 * bm_plane,data);
+	internal_bitmapram_w(space, offset + BITMAPRAM_SIZE / 3 * state->bm_plane, data);
 }
 
 WRITE8_HANDLER( dogfgt_bgvideoram_w )
 {
-	dogfgt_bgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
+	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+
+	state->bgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( dogfgt_scroll_w )
 {
-	static int scroll[4];
+	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
 
-	scroll[offset] = data;
-
-	tilemap_set_scrollx(bg_tilemap,0,scroll[0] + 256 * scroll[1] + 256);
-	tilemap_set_scrolly(bg_tilemap,0,scroll[2] + 256 * scroll[3]);
+	state->scroll[offset] = data;
+	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll[0] + 256 * state->scroll[1] + 256);
+	tilemap_set_scrolly(state->bg_tilemap, 0, state->scroll[2] + 256 * state->scroll[3]);
 }
 
 WRITE8_HANDLER( dogfgt_1800_w )
 {
+	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+
 	/* bits 0 and 1 are probably text color (not verified because PROM is missing) */
-	pixcolor = ((data & 0x01) << 1) | ((data & 0x02) >> 1);
+	state->pixcolor = ((data & 0x01) << 1) | ((data & 0x02) >> 1);
 
 	/* bits 4 and 5 are coin counters */
-	coin_counter_w(0,data & 0x10);
-	coin_counter_w(1,data & 0x20);
+	coin_counter_w(0, data & 0x10);
+	coin_counter_w(1, data & 0x20);
 
 	/* bit 7 is screen flip */
 	flip_screen_set(space->machine, data & 0x80);
 
 	/* other bits unused? */
-	logerror("PC %04x: 1800 = %02x\n",cpu_get_pc(space->cpu),data);
+	logerror("PC %04x: 1800 = %02x\n", cpu_get_pc(space->cpu), data);
 }
 
 
@@ -185,20 +184,21 @@ WRITE8_HANDLER( dogfgt_1800_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
+	dogfgt_state *state = (dogfgt_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0; offs < spriteram_size; offs += 4)
 	{
-		if (spriteram[offs] & 0x01)
+		if (state->spriteram[offs] & 0x01)
 		{
-			int sx,sy,flipx,flipy;
+			int sx, sy, flipx, flipy;
 
-			sx = spriteram[offs+3];
-			sy = (240 - spriteram[offs+2]) & 0xff;
-			flipx = spriteram[offs] & 0x04;
-			flipy = spriteram[offs] & 0x02;
+			sx = state->spriteram[offs + 3];
+			sy = (240 - state->spriteram[offs + 2]) & 0xff;
+			flipx = state->spriteram[offs] & 0x04;
+			flipy = state->spriteram[offs] & 0x02;
 			if (flip_screen_get(machine))
 			{
 				sx = 240 - sx;
@@ -208,8 +208,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			}
 
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
-					spriteram[offs+1] + ((spriteram[offs] & 0x30) << 4),
-					(spriteram[offs] & 0x08) >> 3,
+					state->spriteram[offs + 1] + ((state->spriteram[offs] & 0x30) << 4),
+					(state->spriteram[offs] & 0x08) >> 3,
 					flipx,flipy,
 					sx,sy,0);
 		}
@@ -219,26 +219,25 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( dogfgt )
 {
-	static int lastflip,lastpixcolor;
+	dogfgt_state *state = (dogfgt_state *)screen->machine->driver_data;
 	int offs;
 
-
-	if (lastflip != flip_screen_get(screen->machine) || lastpixcolor != pixcolor)
+	if (state->lastflip != flip_screen_get(screen->machine) || state->lastpixcolor != state->pixcolor)
 	{
 		const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-		lastflip = flip_screen_get(screen->machine);
-		lastpixcolor = pixcolor;
+		state->lastflip = flip_screen_get(screen->machine);
+		state->lastpixcolor = state->pixcolor;
 
-		for (offs = 0;offs < BITMAPRAM_SIZE;offs++)
-			internal_bitmapram_w(space,offs,bitmapram[offs]);
+		for (offs = 0; offs < BITMAPRAM_SIZE; offs++)
+			internal_bitmapram_w(space, offs, state->bitmapram[offs]);
 	}
 
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	draw_sprites(screen->machine, bitmap, cliprect);
 
-	copybitmap_trans(bitmap,pixbitmap,0,0,0,0,cliprect,PIXMAP_COLOR_BASE + 8*pixcolor);
+	copybitmap_trans(bitmap, state->pixbitmap, 0, 0, 0, 0, cliprect, PIXMAP_COLOR_BASE + 8 * state->pixcolor);
 	return 0;
 }

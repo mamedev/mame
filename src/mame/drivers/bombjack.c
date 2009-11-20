@@ -98,53 +98,44 @@ Dip Locations and factory settings verified with manual
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-
-extern WRITE8_HANDLER( bombjack_videoram_w );
-extern WRITE8_HANDLER( bombjack_colorram_w );
-extern WRITE8_HANDLER( bombjack_background_w );
-extern WRITE8_HANDLER( bombjack_flipscreen_w );
-
-extern VIDEO_START( bombjack );
-extern VIDEO_UPDATE( bombjack );
-
-
-static UINT8 latch;
-
-static MACHINE_START( bombjack )
-{
-	state_save_register_global(machine, latch);
-}
+#include "bombjack.h"
 
 
 static TIMER_CALLBACK( soundlatch_callback )
 {
-	latch = param;
+	bombjack_state *state = (bombjack_state *)machine->driver_data;
+	state->latch = param;
 }
 
 static WRITE8_HANDLER( bombjack_soundlatch_w )
 {
 	/* make all the CPUs synchronize, and only AFTER that write the new command to the latch */
-	timer_call_after_resynch(space->machine, NULL, data,soundlatch_callback);
+	timer_call_after_resynch(space->machine, NULL, data, soundlatch_callback);
 }
 
 static READ8_HANDLER( bombjack_soundlatch_r )
 {
+	bombjack_state *state = (bombjack_state *)space->machine->driver_data;
 	int res;
 
-
-	res = latch;
-	latch = 0;
+	res = state->latch;
+	state->latch = 0;
 	return res;
 }
 
 
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
+
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bombjack_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(bombjack_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x9820, 0x987f) AM_WRITEONLY AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bombjack_videoram_w) AM_BASE_MEMBER(bombjack_state, videoram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(bombjack_colorram_w) AM_BASE_MEMBER(bombjack_state, colorram)
+	AM_RANGE(0x9820, 0x987f) AM_WRITEONLY AM_BASE_MEMBER(bombjack_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITENOP
 	AM_RANGE(0x9c00, 0x9cff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
 	AM_RANGE(0x9e00, 0x9e00) AM_WRITE(bombjack_background_w)
@@ -173,6 +164,12 @@ static ADDRESS_MAP_START( audio_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay3", ay8910_address_data_w)
 ADDRESS_MAP_END
 
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( bombjack )
 	PORT_START("P1")
@@ -253,6 +250,12 @@ INPUT_PORTS_END
 
 
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
 static const gfx_layout charlayout1 =
 {
 	8,8,	/* 8*8 characters */
@@ -317,7 +320,34 @@ GFXDECODE_END
 
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( bombjack )
+{
+	bombjack_state *state = (bombjack_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->latch);
+	state_save_register_global(machine, state->background_image);
+}
+
+
+static MACHINE_RESET( bombjack )
+{
+	bombjack_state *state = (bombjack_state *)machine->driver_data;
+
+	state->latch = 0;
+	state->background_image = 0;
+}
+
+
 static MACHINE_DRIVER_START( bombjack )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(bombjack_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
@@ -330,6 +360,7 @@ static MACHINE_DRIVER_START( bombjack )
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_START(bombjack)
+	MDRV_MACHINE_RESET(bombjack)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -360,11 +391,11 @@ MACHINE_DRIVER_END
 
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( bombjack )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -427,5 +458,11 @@ ROM_START( bombjack2 )
 ROM_END
 
 
-GAME( 1984, bombjack, 0,        bombjack, bombjack, 0, ROT90, "Tehkan", "Bomb Jack (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1984, bombjack2,bombjack, bombjack, bombjack, 0, ROT90, "Tehkan", "Bomb Jack (set 2)", GAME_SUPPORTS_SAVE )
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1984, bombjack,  0,        bombjack, bombjack, 0, ROT90, "Tehkan", "Bomb Jack (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, bombjack2, bombjack, bombjack, bombjack, 0, ROT90, "Tehkan", "Bomb Jack (set 2)", GAME_SUPPORTS_SAVE )

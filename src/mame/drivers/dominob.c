@@ -1,31 +1,32 @@
 /***************************************************************************
- Domino Block
 
- Driver by Tomasz Slanina
- some bits by David Haywood
- Fixed Dip Switches and additional infos by Stephh
+     Domino Block
 
- Based on the Arkanoid driver
+     Driver by Tomasz Slanina
+     some bits by David Haywood
+     Fixed Dip Switches and additional infos by Stephh
 
- This is a hacked up version of Arkanoid with high colour backgrounds
- and gameplay modifications.  It runs on custom Korean hardware.
+     Based on the Arkanoid driver
 
- Button 1 = 'use Domino' - The ball will bounce along the bricks in a
-                           horizontal line without coming down
-                           until a "hole" or a grey or gold brick
+    This is a hacked up version of Arkanoid with high colour backgrounds
+    and gameplay modifications.  It runs on custom Korean hardware.
 
- Button 2 = 'use Rocket' - Your paddle will jump to the top of the screen
-                           then back down, destroying everything in its path
+    Button 1 = 'use Domino' - The ball will bounce along the bricks in a
+                              horizontal line without coming down
+                              until a "hole" or a grey or gold brick
 
- Bonus Lives always at 200000, 500000, then every 300000 (no Dip Switch)
+    Button 2 = 'use Rocket' - Your paddle will jump to the top of the screen
+                              then back down, destroying everything in its path
 
- There are 6 stages of 5 rounds. When these 30 levels are completed,
- you'll have to complete round 1 of each stage with a smaller bat.
- When this stage 7 is completed, the game ends but you can't enter
- your initials if you have achieved a high score !
+    Bonus Lives always at 200000, 500000, then every 300000 (no Dip Switch)
 
- It's funny to see that this game, as 'arkanoid', does NOT allow you
- to enter "SEX" as initials (which will be replaced by "H !") ;)
+    There are 6 stages of 5 rounds. When these 30 levels are completed,
+    you'll have to complete round 1 of each stage with a smaller bat.
+    When this stage 7 is completed, the game ends but you can't enter
+    your initials if you have achieved a high score !
+
+    It's funny to see that this game, as 'arkanoid', does NOT allow you
+    to enter "SEX" as initials (which will be replaced by "H !") ;)
 
 ***************************************************************************/
 
@@ -33,36 +34,49 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
+typedef struct _dominob_state dominob_state;
+struct _dominob_state
+{
+	/* memory pointers */
+	UINT8 *  spriteram;
+	UINT8 *  videoram;
+	UINT8 *  bgram;
+//	UINT8 *  paletteram;	// currently this uses generic palette handling
+
+	/* input-related */
+	//UINT8 paddle_select;
+	//UINT8 paddle_value;
+};
+
 static VIDEO_START( dominob )
 {
-	machine->gfx[0]->color_granularity=8;
+	machine->gfx[0]->color_granularity = 8;
 }
 
-static UINT8 *bgram;
-
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	dominob_state *state = (dominob_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0; offs < spriteram_size; offs += 4)
 	{
-		int sx,sy,code;
+		int sx, sy, code;
 
-		sx = spriteram[offs];
-		sy = 248 - spriteram[offs + 1];
+		sx = state->spriteram[offs];
+		sy = 248 - state->spriteram[offs + 1];
 		if (flip_screen_x_get(machine)) sx = 248 - sx;
 		if (flip_screen_y_get(machine)) sy = 248 - sy;
 
-		code = spriteram[offs + 3] + ((spriteram[offs + 2] & 0x03) << 8)  ;
+		code = state->spriteram[offs + 3] + ((state->spriteram[offs + 2] & 0x03) << 8)  ;
 
 		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				2 * code,
-				((spriteram[offs + 2] & 0xf8) >> 3)  ,
+				((state->spriteram[offs + 2] & 0xf8) >> 3)  ,
 				flip_screen_x_get(machine),flip_screen_y_get(machine),
 				sx,sy + (flip_screen_y_get(machine) ? 8 : -8),0);
 		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				2 * code + 1,
-				((spriteram[offs + 2] & 0xf8) >> 3)  ,
+				((state->spriteram[offs + 2] & 0xf8) >> 3)  ,
 				flip_screen_x_get(machine),flip_screen_y_get(machine),
 				sx,sy,0);
 	}
@@ -71,37 +85,38 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static VIDEO_UPDATE( dominob )
 {
+	dominob_state *state = (dominob_state *)screen->machine->driver_data;
+	int x,y;
+	int index = 0;
+
 	/* Convert to tilemaps? */
+	for (y = 0; y < 256 / 32; y++)
 	{
-		int x,y;
-		int index=0;
-		for(y=0;y<256/32;y++)
-	 		for(x=0;x<256/32;x++)
-	 		{
-	 			drawgfx_opaque(	bitmap,
-									cliprect,
-						screen->machine->gfx[1],
-									bgram[index]+256*(bgram[index+1]&0xf),
-						bgram[index+1]>>4,
-						0, 0,
-						x*32,y*32);
-				index+=2;
-	 		}
+		for (x = 0; x < 256 / 32; x++)
+ 		{
+ 			drawgfx_opaque(bitmap,
+					cliprect,
+					screen->machine->gfx[1],
+					state->bgram[index] + 256 * (state->bgram[index + 1] & 0xf),
+					state->bgram[index + 1] >> 4,
+					0, 0,
+					x * 32, y * 32);
+			index += 2;
+ 		}
 	}
 
+	for (y = 0; y < 32; y++)
 	{
-		int x,y;
-		for(y=0;y<32;y++)
-	 		for(x=0;x<32;x++)
-	 		{
-	 			drawgfx_transpen(	bitmap,
-						cliprect,
-						screen->machine->gfx[0],
-						videoram[(y*32+x)*2+1]+(videoram[(y*32+x)*2]&7)*256,
-						(videoram[(y*32+x)*2]>>3),
-						0, 0,
-						x*8,y*8,0);
-	 		}
+ 		for (x = 0; x < 32; x++)
+ 		{
+ 			drawgfx_transpen(	bitmap,
+					cliprect,
+					screen->machine->gfx[0],
+					state->videoram[(y * 32 + x) * 2 + 1] + (state->videoram[(y * 32 + x) * 2] & 7) * 256,
+					(state->videoram[(y * 32 + x) * 2] >> 3),
+					0, 0,
+					x * 8, y * 8,0);
+ 		}
 	}
 
 	draw_sprites(screen->machine, bitmap, cliprect);
@@ -109,9 +124,6 @@ static VIDEO_UPDATE( dominob )
 	return 0;
 }
 
-
-//UINT8 dominob_paddle_select;
-//UINT8 dominob_paddle_value;
 
 static WRITE8_HANDLER( dominob_d008_w )
 {
@@ -129,10 +141,10 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("IN1") AM_WRITENOP
 	AM_RANGE(0xd018, 0xd018) AM_READ_PORT("IN2") AM_WRITENOP
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&videoram)
-	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(dominob_state, videoram)
+	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_MEMBER(dominob_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xe840, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf07f) AM_RAM AM_BASE(&bgram)
+	AM_RANGE(0xf000, 0xf07f) AM_RAM AM_BASE_MEMBER(dominob_state, bgram)
 	AM_RANGE(0xf080, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfbff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_READ(SMH_RAM) AM_BASE(&paletteram)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
@@ -244,6 +256,9 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_DRIVER_START( dominob )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(dominob_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(memmap)
@@ -297,4 +312,4 @@ ROM_START( dominob )
 	ROM_CONTINUE(0xc0000,0x40000) // 1ST AND 2ND HALF IDENTICAL
 ROM_END
 
-GAME( 1990, dominob,  0,       dominob,  dominob,  0, ROT0, "Wonwoo Systems", "Domino Block", 0 )
+GAME( 1990, dominob,  0,       dominob,  dominob,  0, ROT0, "Wonwoo Systems", "Domino Block", GAME_SUPPORTS_SAVE )

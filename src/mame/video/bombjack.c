@@ -7,29 +7,30 @@
 ***************************************************************************/
 
 #include "driver.h"
-
-static UINT8 background_image;
-
-static tilemap *fg_tilemap, *bg_tilemap;
+#include "bombjack.h"
 
 WRITE8_HANDLER( bombjack_videoram_w )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	bombjack_state *state = (bombjack_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( bombjack_colorram_w )
 {
-	colorram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	bombjack_state *state = (bombjack_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( bombjack_background_w )
 {
-	if (background_image != data)
+	bombjack_state *state = (bombjack_state *)space->machine->driver_data;
+
+	if (state->background_image != data)
 	{
-		background_image = data;
-		tilemap_mark_all_tiles_dirty(bg_tilemap);
+		state->background_image = data;
+		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 	}
 }
 
@@ -44,10 +45,11 @@ WRITE8_HANDLER( bombjack_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
+	bombjack_state *state = (bombjack_state *)machine->driver_data;
 	UINT8 *tilerom = memory_region(machine, "gfx4");
 
-	int offs = (background_image & 0x07) * 0x200 + tile_index;
-	int code = (background_image & 0x10) ? tilerom[offs] : 0;
+	int offs = (state->background_image & 0x07) * 0x200 + tile_index;
+	int code = (state->background_image & 0x10) ? tilerom[offs] : 0;
 	int attr = tilerom[offs + 0x100];
 	int color = attr & 0x0f;
 	int flags = (attr & 0x80) ? TILE_FLIPY : 0;
@@ -57,27 +59,25 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code = videoram[tile_index] + 16 * (colorram[tile_index] & 0x10);
-	int color = colorram[tile_index] & 0x0f;
+	bombjack_state *state = (bombjack_state *)machine->driver_data;
+	int code = state->videoram[tile_index] + 16 * (state->colorram[tile_index] & 0x10);
+	int color = state->colorram[tile_index] & 0x0f;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START( bombjack )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
-		 16, 16, 16, 16);
+	bombjack_state *state = (bombjack_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
-
-	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	state_save_register_global(machine, background_image);
+	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	bombjack_state *state = (bombjack_state *)machine->driver_data;
 	int offs;
 
 	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
@@ -99,16 +99,19 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int sx,sy,flipx,flipy;
 
 
-		sx = spriteram[offs+3];
-		if (spriteram[offs] & 0x80)
-			sy = 225-spriteram[offs+2];
+		sx = state->spriteram[offs + 3];
+
+		if (state->spriteram[offs] & 0x80)
+			sy = 225 - state->spriteram[offs + 2];
 		else
-			sy = 241-spriteram[offs+2];
-		flipx = spriteram[offs+1] & 0x40;
-		flipy =	spriteram[offs+1] & 0x80;
+			sy = 241 - state->spriteram[offs + 2];
+
+		flipx = state->spriteram[offs + 1] & 0x40;
+		flipy = state->spriteram[offs + 1] & 0x80;
+
 		if (flip_screen_get(machine))
 		{
-			if (spriteram[offs+1] & 0x20)
+			if (state->spriteram[offs + 1] & 0x20)
 			{
 				sx = 224 - sx;
 				sy = 224 - sy;
@@ -122,9 +125,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[(spriteram[offs] & 0x80) ? 3 : 2],
-				spriteram[offs] & 0x7f,
-				spriteram[offs+1] & 0x0f,
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[(state->spriteram[offs] & 0x80) ? 3 : 2],
+				state->spriteram[offs] & 0x7f,
+				state->spriteram[offs + 1] & 0x0f,
 				flipx,flipy,
 				sx,sy,0);
 	}
@@ -132,8 +135,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( bombjack )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	bombjack_state *state = (bombjack_state *)screen->machine->driver_data;
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
