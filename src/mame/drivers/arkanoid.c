@@ -509,9 +509,6 @@ DIP locations verified for:
 #include "sound/ay8910.h"
 #include "cpu/m6805/m6805.h"
 
-int arkanoid_bootleg_id;
-
-
 /***************************************************************************/
 
 /* Memory Maps */
@@ -525,8 +522,8 @@ static ADDRESS_MAP_START( arkanoid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("SYSTEM")		/* 2 bits from the 68705 */
 	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd018, 0xd018) AM_READWRITE(arkanoid_Z80_mcu_r, arkanoid_Z80_mcu_w)  /* input from the 68705 */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE_MEMBER(arkanoid_state, videoram)
+	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_MEMBER(arkanoid_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READNOP	/* fixes instant death in final level */
 ADDRESS_MAP_END
@@ -540,19 +537,19 @@ static ADDRESS_MAP_START( bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd018, 0xd018) AM_READ_PORT("MUX") AM_WRITENOP
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE_MEMBER(arkanoid_state, videoram)
+	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_MEMBER(arkanoid_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READNOP	/* fixes instant death in final level */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(arkanoid_68705_portA_r, arkanoid_68705_portA_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(arkanoid_68705_port_a_r, arkanoid_68705_port_a_w)
 	AM_RANGE(0x0001, 0x0001) AM_READ_PORT("MUX")
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(arkanoid_68705_portC_r, arkanoid_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(arkanoid_68705_ddrA_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(arkanoid_68705_ddrC_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(arkanoid_68705_port_c_r, arkanoid_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(arkanoid_68705_ddr_a_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(arkanoid_68705_ddr_c_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -800,7 +797,54 @@ static const ay8910_interface ay8910_config =
 
 /* Machine Drivers */
 
+MACHINE_START( arkanoid )
+{
+	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->bootleg_cmd);
+
+	state_save_register_global(machine, state->paddle_select);
+	state_save_register_global(machine, state->z80write);
+	state_save_register_global(machine, state->fromz80);
+	state_save_register_global(machine, state->m68705write);
+	state_save_register_global(machine, state->toz80);
+
+	state_save_register_global(machine, state->port_a_in);
+	state_save_register_global(machine, state->port_a_out);
+	state_save_register_global(machine, state->ddr_a);
+
+	state_save_register_global(machine, state->port_c_out);
+	state_save_register_global(machine, state->ddr_c);
+
+	state_save_register_global(machine, state->gfxbank);
+	state_save_register_global(machine, state->palettebank);
+}
+
+MACHINE_RESET( arkanoid )
+{
+	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+
+	state->port_a_in = 0;
+	state->port_a_out = 0;
+	state->z80write = 0;
+	state->m68705write = 0;
+
+	state->bootleg_cmd = 0;
+	state->paddle_select = 0;
+	state->fromz80 = 0;
+	state->toz80 = 0;
+	state->ddr_a = 0;
+	state->ddr_c = 0;
+	state->port_c_out = 0;
+	state->gfxbank = 0;
+	state->palettebank = 0;
+}
+
 static MACHINE_DRIVER_START( arkanoid )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(arkanoid_state)
+
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(arkanoid_map)
@@ -815,7 +859,6 @@ static MACHINE_DRIVER_START( arkanoid )
 	MDRV_MACHINE_RESET(arkanoid)
 
 	// video hardware
-
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -1195,24 +1238,27 @@ static void arkanoid_bootleg_init( running_machine *machine )
 
 static DRIVER_INIT( arkangc )
 {
-	arkanoid_bootleg_id = ARKANGC;
+	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	state->bootleg_id = ARKANGC;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkangc2 )
 {
-	arkanoid_bootleg_id = ARKANGC2;
+	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	state->bootleg_id = ARKANGC2;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( block2 )
 {
+	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
 	// the graphics on this bootleg have the data scrambled
 	int tile;
 	UINT8* srcgfx = memory_region(machine,"gfx1");
 	UINT8* buffer = alloc_array_or_die(UINT8, 0x18000);
 
-	for (tile=0;tile<0x3000;tile++)
+	for (tile = 0; tile < 0x3000; tile++)
 	{
 		int srctile;
 
@@ -1227,38 +1273,42 @@ static DRIVER_INIT( block2 )
 					 7,6,8,4,
 	                 3,2,1,0);
 
-		srctile = srctile^0xd4;
+		srctile = srctile ^ 0xd4;
 
-		memcpy(&buffer[tile*8], &srcgfx[srctile*8], 8);
+		memcpy(&buffer[tile * 8], &srcgfx[srctile * 8], 8);
 	}
 
-	memcpy(srcgfx,buffer,0x18000);
+	memcpy(srcgfx, buffer, 0x18000);
 
-	arkanoid_bootleg_id = BLOCK2;
+	state->bootleg_id = BLOCK2;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkblock )
 {
-	arkanoid_bootleg_id = ARKBLOCK;
+	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	state->bootleg_id = ARKBLOCK;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkbloc2 )
 {
-	arkanoid_bootleg_id = ARKBLOC2;
+	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	state->bootleg_id = ARKBLOC2;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkgcbl )
 {
-	arkanoid_bootleg_id = ARKGCBL;
+	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	state->bootleg_id = ARKGCBL;
 	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( paddle2 )
 {
-	arkanoid_bootleg_id = PADDLE2;
+	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
+	state->bootleg_id = PADDLE2;
 	arkanoid_bootleg_init(machine);
 }
 
@@ -1268,9 +1318,9 @@ static DRIVER_INIT( tetrsark )
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	int x;
 
-	for (x=0;x<0x8000;x++)
+	for (x = 0; x < 0x8000; x++)
 	{
-		ROM[x]=ROM[x]^0x94;
+		ROM[x] = ROM[x] ^ 0x94;
 	}
 
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd008, 0xd008, 0, 0, tetrsark_d008_w );

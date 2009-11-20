@@ -1,62 +1,55 @@
 /****************************************************************************
 
-  This hardware is derived from Arkanoid's hardware.  The 1986 date found in
-  the roms probably comes from Arkanoid.  This is a Columns style game and
-  the original Columns wasn't released until 1990 and I find it hard to
-  believe that this would pre-date Columns.
+    This hardware is derived from Arkanoid's hardware.  The 1986 date found in
+    the roms probably comes from Arkanoid.  This is a Columns style game and
+    the original Columns wasn't released until 1990 and I find it hard to
+    believe that this would pre-date Columns.
 
-HEXA
+    HEXA
 
-driver by Howie Cohen
+    driver by Howie Cohen
 
-Memory map (prelim)
-0000 7fff ROM
-8000 bfff bank switch rom space??
-c000 c7ff RAM
-e000 e7ff video ram
-e800-efff unused RAM
+    Memory map (prelim)
+    0000 7fff ROM
+    8000 bfff bank switch rom space??
+    c000 c7ff RAM
+    e000 e7ff video ram
+    e800-efff unused RAM
 
-read:
-d001      AY8910 read
-f000      ???????
+    read:
+    d001      AY8910 read
+    f000      ???????
 
-write:
-d000      AY8910 control
-d001      AY8910 write
-d008      bit0/1 = flip screen x/y
-          bit 4 = ROM bank??
-          bit 5 = char bank
-          other bits????????
-d010      watchdog reset, or IRQ acknowledge, or both
-f000      ????????
+    write:
+    d000      AY8910 control
+    d001      AY8910 write
+    d008      bit0/1 = flip screen x/y
+              bit 4 = ROM bank??
+              bit 5 = char bank
+              other bits????????
+    d010      watchdog reset, or IRQ acknowledge, or both
+    f000      ????????
 
 *************************************************************************
 
-main hardware consists of.....
+    main hardware consists of.....
 
-sub board with Z80 x2, 2 ROMs and a scratched 18 pin chip (probably a PIC)
+    sub board with Z80 x2, 2 ROMs and a scratched 18 pin chip (probably a PIC)
 
-main board has....
-12MHz xtal
-ay3-8910
-8 position DSW x1
-ROMs x4
-6116 SRAM x3
-82S123 PROMs x3
+    main board has....
+    12MHz xtal
+    ay3-8910
+    8 position DSW x1
+    ROMs x4
+    6116 SRAM x3
+    82S123 PROMs x3
 
 *************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-
-
-VIDEO_START( hexa );
-VIDEO_UPDATE( hexa );
-WRITE8_HANDLER( hexa_videoram_w );
-WRITE8_HANDLER( hexa_d008_w );
-
+#include "hexa.h"
 
 
 static ADDRESS_MAP_START( hexa_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -67,13 +60,13 @@ static ADDRESS_MAP_START( hexa_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xd008, 0xd008) AM_WRITE(hexa_d008_w)
 	AM_RANGE(0xd010, 0xd010) AM_WRITE(watchdog_reset_w)	/* or IRQ acknowledge, or both */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(hexa_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(hexa_videoram_w) AM_BASE_MEMBER(hexa_state, videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
 
 
 static INPUT_PORTS_START( hexa )
-	PORT_START("INPUTS")	/* IN0 */
+	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -83,7 +76,7 @@ static INPUT_PORTS_START( hexa )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
-	PORT_START("DSW")	/* DSW */
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -141,12 +134,32 @@ static const ay8910_interface ay8910_config =
 
 
 
+static MACHINE_START( hexa )
+{
+	hexa_state *state = (hexa_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->charbank);
+}
+
+static MACHINE_RESET( hexa )
+{
+	hexa_state *state = (hexa_state *)machine->driver_data;
+
+	state->charbank = 0;
+}
+
 static MACHINE_DRIVER_START( hexa )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(hexa_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)		/* 4 MHz ??????? */
 	MDRV_CPU_PROGRAM_MAP(hexa_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_MACHINE_START(hexa)
+	MDRV_MACHINE_RESET(hexa)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -197,8 +210,8 @@ ROM_END
 
 static DRIVER_INIT( hexa )
 {
-#if 0
 	UINT8 *RAM = memory_region(machine, "maincpu");
+#if 0
 
 
 	/* Hexa is not protected or anything, but it keeps writing 0x3f to register */
@@ -210,7 +223,9 @@ static DRIVER_INIT( hexa )
 	RAM[0x0125] = 0x00;
 	RAM[0x0126] = 0x00;
 #endif
+
+	memory_configure_bank(machine, 1, 0, 2, &RAM[0x10000], 0x4000);
 }
 
 
-GAME( 199?, hexa, 0, hexa, hexa, hexa, ROT0, "D. R. Korea", "Hexa", 0 )
+GAME( 199?, hexa, 0, hexa, hexa, hexa, ROT0, "D. R. Korea", "Hexa", GAME_SUPPORTS_SAVE )

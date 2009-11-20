@@ -1,6 +1,6 @@
 /* This it the best way to allow game specific kludges until the system is fully understood */
 enum {
-	ARKUNK=0,  /* unknown bootlegs for inclusion of possible new sets */
+	ARKUNK = 0,  /* unknown bootlegs for inclusion of possible new sets */
 	ARKANGC,
 	ARKANGC2,
 	BLOCK2,
@@ -10,10 +10,28 @@ enum {
 	PADDLE2
 };
 
+typedef struct _arkanoid_state arkanoid_state;
+struct _arkanoid_state
+{
+	/* memory pointers */
+	UINT8 *  videoram;
+	UINT8 *  spriteram;
 
-/*----------- defined in drivers/arkanoid.c -----------*/
+	/* video-related */
+	tilemap  *bg_tilemap;
+	UINT8    gfxbank, palettebank;
 
-extern int arkanoid_bootleg_id;
+	/* input-related */
+	UINT8    paddle_select;
+
+	/* misc */
+	int      bootleg_id;
+	UINT8    z80write, fromz80, m68705write, toz80;
+	UINT8    port_a_in, port_a_out, ddr_a;
+	UINT8    port_c_out, ddr_c;
+	UINT8    bootleg_cmd;
+};
+
 
 
 /*----------- defined in video/arkanoid.c -----------*/
@@ -29,21 +47,19 @@ extern VIDEO_UPDATE( arkanoid );
 
 /*----------- defined in machine/arkanoid.c -----------*/
 
-extern UINT8 arkanoid_paddle_select;
-
 extern MACHINE_START( arkanoid );
 extern MACHINE_RESET( arkanoid );
 
 extern READ8_HANDLER( arkanoid_Z80_mcu_r );
 extern WRITE8_HANDLER( arkanoid_Z80_mcu_w );
 
-extern READ8_HANDLER( arkanoid_68705_portA_r );
-extern WRITE8_HANDLER( arkanoid_68705_portA_w );
-extern WRITE8_HANDLER( arkanoid_68705_ddrA_w );
+extern READ8_HANDLER( arkanoid_68705_port_a_r );
+extern WRITE8_HANDLER( arkanoid_68705_port_a_w );
+extern WRITE8_HANDLER( arkanoid_68705_ddr_a_w );
 
-extern READ8_HANDLER( arkanoid_68705_portC_r );
-extern WRITE8_HANDLER( arkanoid_68705_portC_w );
-extern WRITE8_HANDLER( arkanoid_68705_ddrC_w );
+extern READ8_HANDLER( arkanoid_68705_port_c_r );
+extern WRITE8_HANDLER( arkanoid_68705_port_c_w );
+extern WRITE8_HANDLER( arkanoid_68705_ddr_c_w );
 
 extern CUSTOM_INPUT( arkanoid_68705_input_r );
 extern CUSTOM_INPUT( arkanoid_input_mux );
@@ -52,4 +68,3 @@ extern READ8_HANDLER( arkanoid_bootleg_f000_r );
 extern READ8_HANDLER( arkanoid_bootleg_f002_r );
 extern WRITE8_HANDLER( arkanoid_bootleg_d018_w );
 extern READ8_HANDLER( arkanoid_bootleg_d008_r );
-
