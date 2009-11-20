@@ -797,7 +797,7 @@ static const ay8910_interface ay8910_config =
 
 /* Machine Drivers */
 
-MACHINE_START( arkanoid )
+static MACHINE_START( arkanoid )
 {
 	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
 
@@ -820,7 +820,7 @@ MACHINE_START( arkanoid )
 	state_save_register_global(machine, state->palettebank);
 }
 
-MACHINE_RESET( arkanoid )
+static MACHINE_RESET( arkanoid )
 {
 	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
 

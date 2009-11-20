@@ -47,9 +47,6 @@ extern VIDEO_UPDATE( arkanoid );
 
 /*----------- defined in machine/arkanoid.c -----------*/
 
-extern MACHINE_START( arkanoid );
-extern MACHINE_RESET( arkanoid );
-
 extern READ8_HANDLER( arkanoid_Z80_mcu_r );
 extern WRITE8_HANDLER( arkanoid_Z80_mcu_w );
 
