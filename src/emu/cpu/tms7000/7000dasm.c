@@ -417,7 +417,7 @@ CPU_DISASSEMBLE( tms7000 )
 						break;
 					case PCREL:
 						b = (INT8)opram[pos++];
-						sprintf(tmpbuf, "$%04X", pc+2+k);
+						sprintf(tmpbuf, "$%04X", pc+2+k+b);
 						buffer += sprintf (buffer, of[j].opstr[k], tmpbuf);
 						size += 1;
 						break;
