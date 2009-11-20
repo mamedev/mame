@@ -269,16 +269,16 @@ VIDEO_UPDATE( 1943 )
 	else
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
-	if (state->obj_on) 
+	if (state->obj_on)
 		draw_sprites(screen->machine, bitmap, cliprect, 0);
 
-	if (state->bg1_on) 
+	if (state->bg1_on)
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
-	if (state->obj_on) 
+	if (state->obj_on)
 		draw_sprites(screen->machine, bitmap, cliprect, 1);
 
-	if (state->char_on)  
+	if (state->char_on)
 		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 
 	return 0;

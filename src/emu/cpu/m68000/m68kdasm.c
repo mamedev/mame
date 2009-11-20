@@ -233,7 +233,7 @@ static const char *const g_mmuregs[8] =
 
 static const char *const g_mmucond[16] =
 {
-	"bs", "bc", "ls", "lc", "ss", "sc", "as", "ac", 
+	"bs", "bc", "ls", "lc", "ss", "sc", "as", "ac",
 	"ws", "wc", "is", "ic", "gs", "gc", "cs", "cc"
 };
 
@@ -3139,14 +3139,14 @@ static void d68851_pbcc16(void)
 {
 	UINT32 temp_pc = g_cpu_pc;
 
-	sprintf(g_dasm_str, "pb%s %x", g_mmucond[g_cpu_ir&0xf], temp_pc + make_int_16(read_imm_16())); 
+	sprintf(g_dasm_str, "pb%s %x", g_mmucond[g_cpu_ir&0xf], temp_pc + make_int_16(read_imm_16()));
 }
 
 static void d68851_pbcc32(void)
 {
 	UINT32 temp_pc = g_cpu_pc;
 
-	sprintf(g_dasm_str, "pb%s %x", g_mmucond[g_cpu_ir&0xf], temp_pc + make_int_32(read_imm_32())); 
+	sprintf(g_dasm_str, "pb%s %x", g_mmucond[g_cpu_ir&0xf], temp_pc + make_int_32(read_imm_32()));
 }
 
 static void d68851_pdbcc(void)
@@ -3154,7 +3154,7 @@ static void d68851_pdbcc(void)
 	UINT32 temp_pc = g_cpu_pc;
 	UINT16 modes = read_imm_16();
 
-	sprintf(g_dasm_str, "pb%s %x", g_mmucond[modes&0xf], temp_pc + make_int_16(read_imm_16())); 
+	sprintf(g_dasm_str, "pb%s %x", g_mmucond[modes&0xf], temp_pc + make_int_16(read_imm_16()));
 }
 
 // PScc:  0000000000xxxxxx
@@ -3485,7 +3485,7 @@ static const opcode_struct g_opcode_info[] =
 	{d68000_unlk         , 0xfff8, 0x4e58, 0x000},
 	{d68020_unpk_rr      , 0xf1f8, 0x8180, 0x000},
 	{d68020_unpk_mm      , 0xf1f8, 0x8188, 0x000},
-	{d68851_p000         , 0xffc0, 0xf000, 0x000}, 
+	{d68851_p000         , 0xffc0, 0xf000, 0x000},
 	{d68851_pbcc16       , 0xffc0, 0xf080, 0x000},
 	{d68851_pbcc32       , 0xffc0, 0xf0c0, 0x000},
 	{d68851_pdbcc        , 0xfff8, 0xf048, 0x000},

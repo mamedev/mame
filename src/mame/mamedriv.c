@@ -8650,7 +8650,7 @@ Other Sun games
 	DRIVER( sextriv2 )	/* (c) 1985 Kinky Kit and Game Co. */
 	DRIVER( geimulti )	/* (c) 1992 Grayhound Electronics */
 	DRIVER( sprtauth )	/* (c) 1982 Classic Games */
-	DRIVER( suprpokr )	
+	DRIVER( suprpokr )
 	DRIVER( dribling )	/* (c) 1983 Model Racing */
 	DRIVER( driblingo )	/* (c) 1983 Olympia */
 	DRIVER( ace )		/* [1976 Allied Leisure] */

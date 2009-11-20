@@ -86,11 +86,11 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, const 
 	mips->icache_size = config->icache;
 	mips->dcache_size = config->dcache;
 	mips->system_clock = config->system_clock;
-	
+
 	/* configure flavor-specific parameters */
 	mips->pfnmask = 0x00ffffff;
 	mips->tlbentries = MIPS3_MAX_TLB_ENTRIES;
-	
+
 	/* VR4300 and VR5432 have 4 fewer PFN bits, and only 32 TLB entries */
 	if (flavor == MIPS3_TYPE_VR4300)
 	{

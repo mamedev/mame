@@ -63,7 +63,7 @@ static WRITE8_HANDLER ( aeroboto_1a2_w )
 	aeroboto_state *state = (aeroboto_state *)space->machine->driver_data;
 
 	state->mainram[0x01a2] = data;
-	if (data) 
+	if (data)
 		state->disable_irq = 1;
 }
 

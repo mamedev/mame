@@ -57,7 +57,7 @@ static WRITE8_HANDLER( pandoras_int_control_w )
 
 	switch (offset)
 	{
-		case 0x00:	if (!data) 
+		case 0x00:	if (!data)
 					cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
 				state->irq_enable_a = data;
 				break;
@@ -67,7 +67,7 @@ static WRITE8_HANDLER( pandoras_int_control_w )
 				break;
 		case 0x05:	pandoras_flipscreen_w(space, 0, data);
 				break;
-		case 0x06:	if (!data) 
+		case 0x06:	if (!data)
 					cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, CLEAR_LINE);
 				state->irq_enable_b = data;
 				break;

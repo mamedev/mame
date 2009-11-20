@@ -251,7 +251,7 @@ static void robowres_draw_sprites( bitmap_t *dest_bmp, const rectangle *cliprect
 		int sx    = sprite[offs + 3];
 		int flipx = sprite[offs + 1] & 0x01;
 
-		if(sx >= 248) 
+		if(sx >= 248)
 			sx -= 256;
 
 		if (flipy)

@@ -148,9 +148,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 		sx = state->spriteram[offs];
 		sy = 248 - state->spriteram[offs + 1];
-		if (flip_screen_x_get(machine)) 
+		if (flip_screen_x_get(machine))
 			sx = 248 - sx;
-		if (flip_screen_y_get(machine)) 
+		if (flip_screen_y_get(machine))
 			sy = 248 - sy;
 
 		code = state->spriteram[offs + 3] + ((state->spriteram[offs + 2] & 0x03) << 8) + 1024 * state->gfxbank;

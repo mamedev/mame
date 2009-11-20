@@ -262,7 +262,7 @@ M68KMAKE_OPCODE_HANDLER_HEADER
 #include "mame.h"
 extern void m68040_fpu_op0(m68ki_cpu_core *m68k);
 extern void m68040_fpu_op1(m68ki_cpu_core *m68k);
-extern void m68881_mmu_ops(m68ki_cpu_core *m68k); 
+extern void m68881_mmu_ops(m68ki_cpu_core *m68k);
 
 /* ======================================================================== */
 /* ========================= INSTRUCTION HANDLERS ========================= */

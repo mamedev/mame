@@ -84,7 +84,7 @@ static DRIVER_INIT( ohpaipee )
 
 	nb1413m3_type = NB1413M3_OHPAIPEE;
 
-//	init_nb1413m3(machine);
+//  init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( togenkyo )
@@ -110,13 +110,13 @@ static DRIVER_INIT( togenkyo )
 	ROM[0x010c] = 0x00;
 	ROM[0x010d] = 0x00;
 	// Program ROM SUM check skip
-//	ROM[0x025c] = 0x00;
-//	ROM[0x025d] = 0x00;
+//  ROM[0x025c] = 0x00;
+//  ROM[0x025d] = 0x00;
 #endif
 
 	nb1413m3_type = NB1413M3_TOGENKYO;
 
-//S	init_nb1413m3(machine);
+//S init_nb1413m3(machine);
 }
 
 

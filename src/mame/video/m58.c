@@ -121,7 +121,7 @@ WRITE8_HANDLER( yard_scroll_panel_w )
 	sx = ( offset % 16 );
 	sy = ( offset / 16 );
 
-	if (sx < 1 || sx > 14)  
+	if (sx < 1 || sx > 14)
 		return;
 
 	sx = 4 * (sx - 1);

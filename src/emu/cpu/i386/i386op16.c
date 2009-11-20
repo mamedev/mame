@@ -1144,12 +1144,12 @@ static void I386OP(enter16)(i386_state *cpustate)			// Opcode 0xc8
 	UINT8 x;
 	UINT16 frameptr;
 	PUSH16(cpustate,REG16(BP));
-	
+
 	if(!STACK_32BIT)
 		frameptr = REG16(SP);
 	else
 		frameptr = REG32(ESP);
-	
+
 	if(level > 0)
 	{
 		for(x=1;x<level-1;x++)

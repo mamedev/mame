@@ -763,7 +763,7 @@ static DRIVER_INIT(polygonet)
 
 	/* The dsp56k occasionally executes out of mapped memory */
 	dsp56k_update_handler = memory_set_direct_update_handler(cputag_get_address_space(machine, "dsp", ADDRESS_SPACE_PROGRAM), plygonet_dsp56k_direct_handler);
-    
+
     /* save states */
 	state_save_register_global(machine, init_eeprom_count);
 	state_save_register_global_pointer(machine, dsp56k_bank00_ram,    2 * 8 * dsp56k_bank00_size);

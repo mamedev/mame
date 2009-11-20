@@ -156,9 +156,9 @@ static READ8_HANDLER( input_buttons_r )
 {
 	m14_state *state = (m14_state *)space->machine->driver_data;
 
-	if (state->hop_mux) 
-	{ 
-		state->hop_mux = 0; 
+	if (state->hop_mux)
+	{
+		state->hop_mux = 0;
 		return 0; //0x43 status bits
 	}
 	else

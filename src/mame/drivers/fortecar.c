@@ -86,15 +86,15 @@ static WRITE8_DEVICE_HANDLER( ayporta_w )
 	logerror("AY port A write %02x\n",data);
 
 	/*
-	lamps for POST?
-	0x01: RAM test d000-d7ff
-	0x02: VRAM test d800-ffff
-	0x04: Video SYNC test
-	0x08: ROM check
-	0x10: NVRAM check
-	0x20: IRQ test
-	0x40: Stack RAM check
-	*/
+    lamps for POST?
+    0x01: RAM test d000-d7ff
+    0x02: VRAM test d800-ffff
+    0x04: Video SYNC test
+    0x08: ROM check
+    0x10: NVRAM check
+    0x20: IRQ test
+    0x40: Stack RAM check
+    */
 }
 
 /* lamps? */
@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( fortecar_ports, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("fcppi0", ppi8255_r, ppi8255_w)//M5L8255AP
-//	AM_RANGE(0x80, 0x81) //8251A UART
+//  AM_RANGE(0x80, 0x81) //8251A UART
  	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN0") //written too,multiplexer?
  	AM_RANGE(0xa1, 0xa1) AM_READ_PORT("IN1")
 ADDRESS_MAP_END

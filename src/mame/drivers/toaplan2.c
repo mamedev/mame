@@ -265,8 +265,8 @@ To Do / Unknowns:
 
 
 /**************** Machine stuff ******************/
-//#define USE_HD64x180			/* Define if CPU support is available */
-//#define USE_ENCRYPTED_V25S	/* Define to enable V25 even on games where it is encrypted */
+//#define USE_HD64x180          /* Define if CPU support is available */
+//#define USE_ENCRYPTED_V25S    /* Define to enable V25 even on games where it is encrypted */
 
 #define CPU_2_NONE		0x00
 #define CPU_2_Z80		0x5a
@@ -1962,7 +1962,7 @@ ADDRESS_MAP_END
 
 /* this seems to be the map for the ROM based game, Knuckle Bash */
 static ADDRESS_MAP_START( V25_kbash_mem, ADDRESS_SPACE_PROGRAM, 8 )
-//	AM_RANGE(0x00000, 0x03fff) AM_ROM
+//  AM_RANGE(0x00000, 0x03fff) AM_ROM
 //  AM_RANGE(0x00000, 0x007ff) AM_RAM                           /* External shared RAM (Banked) */
 	AM_RANGE(0x04000, 0x04001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x04002, 0x04002) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
@@ -1993,10 +1993,10 @@ ADDRESS_MAP_END
 */
 #ifdef USE_ENCRYPTED_V25S
 /*
-	AM_RANGE(0x21f000, 0x21f001) AM_READWRITE(toaplan2_snd_cpu_r, batsugun_snd_cpu_w)	;V25+ Command/Status port
-	AM_RANGE(0x21f004, 0x21f005) AM_READ_PORT("DSWA")
-	AM_RANGE(0x21f006, 0x21f007) AM_READ_PORT("DSWB")
-	AM_RANGE(0x21f008, 0x21f009) AM_READ_PORT("JMPR")
+    AM_RANGE(0x21f000, 0x21f001) AM_READWRITE(toaplan2_snd_cpu_r, batsugun_snd_cpu_w)   ;V25+ Command/Status port
+    AM_RANGE(0x21f004, 0x21f005) AM_READ_PORT("DSWA")
+    AM_RANGE(0x21f006, 0x21f007) AM_READ_PORT("DSWB")
+    AM_RANGE(0x21f008, 0x21f009) AM_READ_PORT("JMPR")
 */
 
 /* FIXME: These should be moved into the CPU core files, putted here for simplicity. */
@@ -2006,7 +2006,7 @@ static READ8_HANDLER( v25s_internal_io_r )
 	{
 		case 0xf00: return input_port_read(space->machine, "DSWB"); //port 0
 		case 0xf08: return input_port_read(space->machine, "JMPR"); //port 1
-//		case 0xf10: //port 2
+//      case 0xf10: //port 2
 		case 0xf38: return input_port_read(space->machine, "DSWA"); //port T
 	}
 
@@ -2031,7 +2031,7 @@ static ADDRESS_MAP_START( V25_rambased_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE(6) AM_BASE(&batsugun_share)
 
-//	AM_RANGE(0x40000, 0x477ff) AM_RAM AM_SHARE(7)
+//  AM_RANGE(0x40000, 0x477ff) AM_RAM AM_SHARE(7)
 	AM_RANGE(0x40e00, 0x40eff) AM_RAM //internal V25 RAM
 	#ifdef USE_ENCRYPTED_V25S
 	AM_RANGE(0x40f00, 0x40fff) AM_READWRITE(v25s_internal_io_r,v25s_internal_io_w)
@@ -3894,7 +3894,7 @@ static MACHINE_DRIVER_START( fixeight )
 	//MDRV_CPU_IO_MAP(V25_port)
 
 	MDRV_MACHINE_RESET(batsugun)
-//	MDRV_MACHINE_RESET(toaplan2)
+//  MDRV_MACHINE_RESET(toaplan2)
 
 	//  MDRV_NVRAM_HANDLER(fixeight)        /* See 37B6 code */
 
@@ -3963,7 +3963,7 @@ MACHINE_DRIVER_END
    for Batsugun??
 
     - note, the basic startup code remapping seems identical between all games, so they
-	  probably use a common remap with some per-game changes which supports the above theory
+      probably use a common remap with some per-game changes which supports the above theory
    */
 const UINT8 ts007spy_vfive_decryption_table[256] = {
 	0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07, 0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f, /* 00 */

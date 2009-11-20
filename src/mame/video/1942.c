@@ -225,7 +225,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 		/* handle double / quadruple height */
 		i = (state->spriteram[offs + 1] & 0xc0) >> 6;
-		if (i == 2) 
+		if (i == 2)
 			i = 3;
 
 		do

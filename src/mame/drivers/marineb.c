@@ -47,7 +47,7 @@ static MACHINE_RESET( marineb )
 
 	state->palette_bank = 0;
 	state->column_scroll = 0;
-	state->flipscreen_x = 0; 
+	state->flipscreen_x = 0;
 	state->flipscreen_y = 0;
 	state->marineb_active_low_flipscreen = 0;
 	MACHINE_RESET_CALL(espial);
@@ -59,7 +59,7 @@ static MACHINE_RESET( springer )
 
 	state->palette_bank = 0;
 	state->column_scroll = 0;
-	state->flipscreen_x = 0; 
+	state->flipscreen_x = 0;
 	state->flipscreen_y = 0;
 	state->marineb_active_low_flipscreen = 1;
 	MACHINE_RESET_CALL(espial);

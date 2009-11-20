@@ -1,6 +1,6 @@
 /*
  * video/konamigx.c - Konami GX video hardware (here there be dragons, and achocode)
- *                                              
+ *
  */
 
 #include "driver.h"
@@ -245,7 +245,7 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 
 				if (srcx < src_minx || srcx > src_maxx || srcy < src_miny || srcy > src_maxy)
 					continue;
-				
+
 				pixel = src_base[offs];
 				if (!(pixel & cmask))
 					continue;
@@ -650,8 +650,8 @@ INLINE void zdrawgfxzoom32GP(
 							eax = dst_ptr[ecx];
 							szbuf_ptr[ecx*2] = z8;
 							szbuf_ptr[ecx*2+1] = p8;
-							
-							// the shadow tables are 15-bit lookup tables which accept RGB15...	lossy, nasty, yuck!
+
+							// the shadow tables are 15-bit lookup tables which accept RGB15... lossy, nasty, yuck!
 							dst_ptr[ecx] = shd_base[rgb_to_rgb15(eax)];
 							//dst_ptr[ecx] =(eax>>3&0x001f);lend_r32( eax, 0x00000000, 128);
 						}
@@ -787,8 +787,8 @@ INLINE void zdrawgfxzoom32GP(
 							eax = dst_ptr[ecx];
 							szbuf_ptr[ecx*2] = z8;
 							szbuf_ptr[ecx*2+1] = p8;
-						
-							// the shadow tables are 15-bit lookup tables which accept RGB15...	lossy, nasty, yuck!
+
+							// the shadow tables are 15-bit lookup tables which accept RGB15... lossy, nasty, yuck!
 							dst_ptr[ecx] = shd_base[rgb_to_rgb15(eax)];
 						}
 						while (++ecx);
@@ -1171,7 +1171,7 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 	disp = K055555_read_register(K55_INPUT_ENABLES);
 	if (!disp) return;
 	cltc_shdpri = K054338_read_register(K338_REG_CONTROL);
-	
+
 	if (!rushingheroes_hack) // Slam Dunk 2 never sets this.  It's either part of the protection, or type4 doesn't use it
 	{
 		if (!(cltc_shdpri & K338_CTL_KILL)) return;
@@ -1549,7 +1549,7 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 					}
 
 					l = sub1flags & 0xf;
-					
+
 					if (offs == -2)
 					{
 						K053936GP_0_zoom_draw(machine, bitmap, cliprect, sub1, l, k, alpha);
@@ -1818,12 +1818,12 @@ WRITE32_HANDLER( konamigx_type3_psac2_bank_w )
 	konamigx_type3_psac2_actual_bank = (konamigx_type3_psac2_bank[0] & 0x10000000) >> 28;
 
 	/* handle this by creating 2 roz tilemaps instead, otherwise performance dies completely on dual screen mode
-	if (konamigx_type3_psac2_actual_bank!=konamigx_type3_psac2_actual_last_bank)
-	{
-		tilemap_mark_all_tiles_dirty (gx_psac_tilemap);
-		konamigx_type3_psac2_actual_last_bank = konamigx_type3_psac2_actual_bank;
-	}
-	*/
+    if (konamigx_type3_psac2_actual_bank!=konamigx_type3_psac2_actual_last_bank)
+    {
+        tilemap_mark_all_tiles_dirty (gx_psac_tilemap);
+        konamigx_type3_psac2_actual_last_bank = konamigx_type3_psac2_actual_bank;
+    }
+    */
 }
 
 
@@ -1836,8 +1836,8 @@ WRITE32_HANDLER( konamigx_type3_psac2_bank_w )
 
 	int base_index = tile_index;
 
-//	if (konamigx_type3_psac2_actual_bank)
-//		base_index+=0x20000/2;
+//  if (konamigx_type3_psac2_actual_bank)
+//      base_index+=0x20000/2;
 
 
 	tileno =  tmap[base_index*2] | ((tmap[(base_index*2)+1] & 0x0f)<<8);
@@ -1857,8 +1857,8 @@ WRITE32_HANDLER( konamigx_type3_psac2_bank_w )
 
 	int base_index = tile_index;
 
-//	if (konamigx_type3_psac2_actual_bank)
-//		base_index+=0x20000/2;
+//  if (konamigx_type3_psac2_actual_bank)
+//      base_index+=0x20000/2;
 
 
 	tileno =  tmap[base_index*2] | ((tmap[(base_index*2)+1] & 0x0f)<<8);
@@ -2134,7 +2134,7 @@ VIDEO_START(konamigx_type3)
 	//tilemap_set_flip(gx_psac_tilemap, TILEMAP_FLIPX| TILEMAP_FLIPY);
 
 	K053936_wraparound_enable(0, 1);
-//	K053936GP_set_offset(0, -30, -1);
+//  K053936GP_set_offset(0, -30, -1);
 	K053936_set_offset(0, -30, +1);
 
 	K056832_set_LayerOffset(0,  -52, 0);
@@ -2164,7 +2164,7 @@ VIDEO_START(konamigx_type4)
 	gx_specialrozenable = 3;
 
 	K056832_set_LayerOffset(0,  -27, 0);
-	K056832_set_LayerOffset(1,  -25, 0); 
+	K056832_set_LayerOffset(1,  -25, 0);
 	K056832_set_LayerOffset(2,  -24, 0);
 	K056832_set_LayerOffset(3,  -22, 0);
 
@@ -2196,7 +2196,7 @@ VIDEO_START(konamigx_type4_sd2)
 
 
 	K056832_set_LayerOffset(0,  -29, -1);
-	K056832_set_LayerOffset(1,  -27, -1); 
+	K056832_set_LayerOffset(1,  -27, -1);
 	K056832_set_LayerOffset(2,  -26, -1);
 	K056832_set_LayerOffset(3,  -24, -1);
 
@@ -2328,7 +2328,7 @@ VIDEO_UPDATE(konamigx)
 			if (konamigx_current_frame==1)
 			{
 				int offset=0;
-				
+
 				if (konamigx_palformat==1)
 				{
 					for (offset=0;offset<0x4000/4;offset++)
@@ -2373,7 +2373,7 @@ VIDEO_UPDATE(konamigx)
 			}
 			else
 			{
-				
+
 				int offset=0;
 
 				if (konamigx_palformat==1)
@@ -2480,8 +2480,8 @@ VIDEO_UPDATE(konamigx)
 
 		if (konamigx_type3_psac2_actual_bank == 1) K053936_0_zoom_draw(type3_roz_temp_bitmap, &temprect,gx_psac_tilemap_alt, 0,0,0); // soccerss playfield
 		else K053936_0_zoom_draw(type3_roz_temp_bitmap, &temprect,gx_psac_tilemap, 0,0,0); // soccerss playfield
- 		
-		
+
+
 		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0, type3_roz_temp_bitmap, gx_rushingheroes_hack);
 	}
 	else

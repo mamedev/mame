@@ -754,8 +754,8 @@ ROM_END
 
 
 static DRIVER_INIT( spcpostn )
-{ 
-	spcpostn_decode(machine, "maincpu"); 
+{
+	spcpostn_decode(machine, "maincpu");
 }
 
 

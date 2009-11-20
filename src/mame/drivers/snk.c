@@ -952,7 +952,7 @@ static ADDRESS_MAP_START( madcrush_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(snk_sprite_split_point_w)
 	AM_RANGE(0xff00, 0xff00) AM_WRITE(marvins_scroll_msb_w)
 ADDRESS_MAP_END
- 
+
 static ADDRESS_MAP_START( madcrush_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(snk_cpuB_nmi_ack_w)
@@ -3668,11 +3668,11 @@ static MACHINE_DRIVER_START( vangrd2 )
 
 	MDRV_CPU_MODIFY("sub")
 	MDRV_CPU_PROGRAM_MAP(madcrash_cpuB_map)
-MACHINE_DRIVER_END 
+MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( madcrush )
- 
+
 	MDRV_IMPORT_FROM(marvins)
 
 	/* basic machine hardware */

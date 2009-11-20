@@ -709,16 +709,16 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 			{
 				// sengekis uses this on sprites which are shrinking as they head towards the ground
 				// it's also used on the input test of Gals Panic S2
-				// 
+				//
 				// it appears to offer a higher precision 'shrink' mode (although I'm not entirely
 				//  convinced this implementation is correct because we simply end up ignoring
-				//  part of the data)		
+				//  part of the data)
 				zoomx_m = 0;
 				zoomx_s = (source[2] >> 24)&0x00fc;
 				zoomy_m = 0;
 				zoomy_s = (source[3] >> 24)&0x00fc;
 
-			
+
 			}
 
 

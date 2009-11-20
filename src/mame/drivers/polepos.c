@@ -1576,13 +1576,13 @@ ROM_END
 
 /* Top Racer (bootleg without MB8841 / MB8842)
 
-CPU	Lower Board (label "1081-C")
+CPU Lower Board (label "1081-C")
 2x ZILOG Z8002PS (DIP40)
 1x NEC D708C-1 (DIP40)
 
 Upper Board (label "1080-C")
-1x oscillator 24.576 MHz 
-ROMs	Lower Board (label "1081-C")
+1x oscillator 24.576 MHz
+ROMs    Lower Board (label "1081-C")
 7x HN482764G (1a,a2,a3,a4,a5,a,b)
 1x HN482732G (a6)
 1x PROM 82S129
@@ -1595,15 +1595,15 @@ Upper Board (label "1080-C")
 4x TMS2732JL (12,13,14,15)
 8x PROM 24S10
 2x PROM 7603
-2x PROM 7643 
-Note	Lower Board (label "1081-C")
+2x PROM 7643
+Note    Lower Board (label "1081-C")
 1x flat cable connector to upper
 1x 18x2 edge connector
 
 Upper Board (label "1080-C")
 1x flat cable connector to lower
 1x 18x2 edge connector
- 
+
 */
 
 ROM_START( topracern )

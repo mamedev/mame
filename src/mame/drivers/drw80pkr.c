@@ -196,7 +196,7 @@ static READ8_HANDLER( drw80pkr_io_r )
 	{
 		ret = pkr_io_ram[offset];
 	}
-	
+
 	if (p2 == 0xf7)
 	{
 		// unknown
@@ -214,7 +214,7 @@ static READ8_HANDLER( drw80pkr_io_r )
 
 		switch (kbdin)
 		{
-			// The following is very incorrect, but does allow you to 
+			// The following is very incorrect, but does allow you to
 			// play slightly with very messed up hold buttons etc.
 			//
 			// Open/Close the door with 'O'

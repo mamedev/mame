@@ -317,7 +317,7 @@ static MACHINE_DRIVER_START( blueprnt )
 
 	MDRV_MACHINE_START(blueprnt)
 	MDRV_MACHINE_RESET(blueprnt)
-	
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

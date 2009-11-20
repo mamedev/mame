@@ -214,7 +214,7 @@ INLINE void dma8237_advance( const device_config *device )
 static void set_dack(i8237_t *i8237, int channel)
 {
 	int i;
-	
+
 	for (i = 0; i < 4; i++)
 	{
 		int state = (i == channel) ^ !BIT(i8237->command, 7);

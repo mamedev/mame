@@ -6,17 +6,17 @@
 
     Top Board:
 
-	    68EC030-40
-	    (MSM6295 + Crystal) * 4
+        68EC030-40
+        (MSM6295 + Crystal) * 4
 
-	Bottom Board:
+    Bottom Board:
 
-	    68EC030-40
-	    TMS34010-50
+        68EC030-40
+        TMS34010-50
 
     Video hardware:
 
-	- Blitter that supports rotation and zoom (background and sprites)
+    - Blitter that supports rotation and zoom (background and sprites)
     - TMS34010 (text, score)
 
     Notes:
@@ -28,9 +28,9 @@
       chopped off. This is most noticeable for distant thin objects (falgs, poles of the start banner).
       See maincpu routine at 387B8, specifically the jump at 3880E throws 4 horizontal pixels away.
 
-	- The player often disappears (when she's too slow?). Is this normal ?
+    - The player often disappears (when she's too slow?). Is this normal ?
 
-	- Are button 2 and analog input "Y" used ?
+    - Are button 2 and analog input "Y" used ?
 
 *****************************************************************************************************/
 
@@ -114,7 +114,7 @@ static READ32_HANDLER( skimaxx_blitter_r )
 		else
 			*dst = (*dst & 0xffff0000) | pen;
 	}
-		
+
 	skimaxx_blitter_src_x = (skimaxx_blitter_src_x & 0x10000) | ((skimaxx_blitter_src_x + skimaxx_blitter_src_dx) & 0xffff);
 	skimaxx_blitter_src_y = (skimaxx_blitter_src_y & 0xffff0000) | ((skimaxx_blitter_src_y + skimaxx_blitter_src_dy) & 0xffff);
 
@@ -136,7 +136,7 @@ static VIDEO_START( skimaxx )
 
 static VIDEO_UPDATE( skimaxx )
 {
-//	popmessage("%02x %02x", input_port_read(screen->machine, "X"), input_port_read(screen->machine, "Y") );
+//  popmessage("%02x %02x", input_port_read(screen->machine, "X"), input_port_read(screen->machine, "Y") );
 
 	VIDEO_UPDATE_CALL(tms340x0);
 
@@ -282,13 +282,13 @@ static WRITE32_HANDLER( skimaxx_sub_ctrl_w )
 }
 
 /*
-	00		left max again
+    00      left max again
 
-	01		right max
-	..
-	10		center
-	..
-	1f		left max
+    01      right max
+    ..
+    10      center
+    ..
+    1f      left max
 */
 static READ32_HANDLER( skimaxx_analog_r )
 {
@@ -305,7 +305,7 @@ static ADDRESS_MAP_START( 68030_1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x10000000, 0x10000003) AM_WRITE( skimaxx_sub_ctrl_w )
 	AM_RANGE(0x10100000, 0x1010000f) AM_READWRITE(m68k_tms_r, m68k_tms_w)//AM_NOP
-//	AM_RANGE(0x10180000, 0x10187fff) AM_RAM AM_SHARE(1)
+//  AM_RANGE(0x10180000, 0x10187fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x10180000, 0x1018ffff) AM_RAM AM_SHARE(1)	// above 10188000 accessed at level end (game bug?)
 	AM_RANGE(0x20000000, 0x20000003) AM_READNOP	// watchdog_r?
 
@@ -343,9 +343,9 @@ static ADDRESS_MAP_START( 68030_2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x40000000, 0x40000003) AM_WRITE( skimaxx_fpga_ctrl_w ) AM_BASE( &skimaxx_fpga_ctrl )
 
 	AM_RANGE(0x50000000, 0x5007ffff) AM_RAMBANK(1)	// background ram allocated here at video_start (skimaxx_bg_buffer_back/front)
-//	AM_RANGE(0xfffc0000, 0xfffc7fff) AM_RAM AM_SHARE(1)
+//  AM_RANGE(0xfffc0000, 0xfffc7fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xfffc0000, 0xfffcffff) AM_RAM AM_SHARE(1)
-//	AM_RANGE(0xfffe0000, 0xffffffff) AM_RAM // I think this is banked with the shared RAM? (see CPU sync routines)
+//  AM_RANGE(0xfffe0000, 0xffffffff) AM_RAM // I think this is banked with the shared RAM? (see CPU sync routines)
 	AM_RANGE(0xfffe0010, 0xfffeffff) AM_RAM				// HACK
 	AM_RANGE(0xfffe0000, 0xfffeffff) AM_RAM AM_SHARE(1)	// HACK
 	AM_RANGE(0xffff0000, 0xffffffff) AM_RAM
@@ -457,7 +457,7 @@ static INPUT_PORTS_START( skimaxx )
 
 	PORT_START("Y")
 	PORT_BIT( 0x1f, 0x10, IPT_AD_STICK_Y ) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_MINMAX(0x00,0x1e) PORT_INVERT
-//	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+//  PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 INPUT_PORTS_END
 
@@ -520,17 +520,17 @@ static MACHINE_DRIVER_START( skimaxx )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-//	MDRV_SCREEN_RAW_PARAMS(40000000/4, 156*4, 0, 100*4, 328, 0, 300) // TODO - Wrong but TMS overrides it anyway
+//  MDRV_SCREEN_RAW_PARAMS(40000000/4, 156*4, 0, 100*4, 328, 0, 300) // TODO - Wrong but TMS overrides it anyway
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MDRV_SCREEN_SIZE(0x400, 0x100)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x280-1, 0, 0xf0-1)
 
 	MDRV_VIDEO_START(skimaxx)
-//	MDRV_VIDEO_UPDATE(tms340x0)
+//  MDRV_VIDEO_UPDATE(tms340x0)
 	MDRV_VIDEO_UPDATE(skimaxx)
 
-//	MDRV_GFXDECODE( skimaxx )
+//  MDRV_GFXDECODE( skimaxx )
 
 	MDRV_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
 	MDRV_PALETTE_LENGTH(32768)

@@ -1009,7 +1009,7 @@ static void I386OP(enter32)(i386_state *cpustate)			// Opcode 0xc8
 		frameptr = REG16(SP);
 	else
 		frameptr = REG32(ESP);
-	
+
 	if(level > 0)
 	{
 		for(x=1;x<level-1;x++)

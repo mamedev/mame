@@ -204,7 +204,7 @@ struct _mips3_state
 	UINT64			count_zero_time;
 	UINT32			compare_armed;
 	emu_timer *		compare_int_timer;
-	
+
 	/* derived info based on flavor */
 	UINT32			pfnmask;
 	UINT8			tlbentries;

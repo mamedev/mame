@@ -273,7 +273,7 @@ VIDEO_START( tetrisp2 )
 	tilemap_set_transparent_pen(tilemap_bg,0);
 	tilemap_set_transparent_pen(tilemap_fg,0);
 	tilemap_set_transparent_pen(tilemap_rot,0);
-	
+
 	// should be smaller and mirrored like m32 I guess
 	tetrisp2_priority = auto_alloc_array(machine, UINT8, 0x40000);
 	ms32_rearrange_sprites(machine, "gfx1");
@@ -392,7 +392,7 @@ void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t 
 
 	UINT16		*source	=	sprram_top;
 	UINT16	*finish	=	sprram_top + (sprram_size - 0x10) / 2;
-	
+
 	flipscreen = flip;
 
 	if (reverseorder == 1)
@@ -405,7 +405,7 @@ void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t 
 
 
 	for (;reverseorder ? (source>=finish) : (source<finish); reverseorder ? (source-=8) : (source+=8))
-	{		
+	{
 		attr	=	source[ 0 ];
 
 		pri = (attr & 0x00f0);
@@ -453,10 +453,10 @@ void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t 
 			xzoom = 0x10000;
 			yzoom = 0x10000;
 		}
-		
+
 
 		gfx_element_set_source_clip(gfx, tx, xsize, ty, ysize);
-		
+
 		if (priority_ram == NULL)
 		{
 			// passes the priority as the upper bits of the colour
@@ -489,7 +489,7 @@ void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t 
 					xzoom, yzoom, bitmap_pri,primask, 0);
 
 		}
-		
+
 
 	}	/* end sprite loop */
 }

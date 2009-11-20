@@ -162,7 +162,7 @@ VIDEO_UPDATE( marineb )
 	{
 		int gfx, sx, sy, code, col, flipx, flipy, offs2;
 
-		if ((offs == 0) || (offs == 2))  
+		if ((offs == 0) || (offs == 2))
 			continue;  /* no sprites here */
 
 		if (offs < 8)
@@ -303,7 +303,7 @@ VIDEO_UPDATE( springer )
 	{
 		int gfx, sx, sy, code, col, flipx, flipy, offs2;
 
-		if ((offs == 0) || (offs == 2))  
+		if ((offs == 0) || (offs == 2))
 			continue;  /* no sprites here */
 
 		offs2 = 0x0010 + offs;
@@ -407,7 +407,7 @@ VIDEO_UPDATE( hopprobo )
 	{
 		int gfx, sx, sy, code, col, flipx, flipy, offs2;
 
-		if ((offs == 0) || (offs == 2))  
+		if ((offs == 0) || (offs == 2))
 			continue;  /* no sprites here */
 
 		offs2 = 0x0010 + offs;

@@ -64,7 +64,7 @@ static void draw_chars( running_machine *machine, bitmap_t *bitmap, const rectan
 
 		col = state->colorram[((sy & 0x1c) << 3) + sx];
 
-		if ((col & 0x10) != priority)  
+		if ((col & 0x10) != priority)
 			continue;
 
 		scroll = ~state->scrollram[sx];
@@ -109,7 +109,7 @@ VIDEO_UPDATE( ambush )
 		if ( (sy == 0) ||
 			 (sy == 0xff) ||
 			((sx <  0x40) && (  state->spriteram[offs + 2] & 0x10)) ||
-			((sx >= 0xc0) && (!(state->spriteram[offs + 2] & 0x10))))  
+			((sx >= 0xc0) && (!(state->spriteram[offs + 2] & 0x10))))
 			continue;  /* prevent wraparound */
 
 

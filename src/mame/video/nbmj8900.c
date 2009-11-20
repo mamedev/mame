@@ -393,7 +393,7 @@ VIDEO_START( nbmj8900_2layer )
 	nbmj8900_clut = auto_alloc_array(machine, UINT8, 0x800);
 	memset(nbmj8900_videoram0, 0xff, (screen_width * screen_height * sizeof(UINT8)));
 	memset(nbmj8900_videoram1, 0xff, (screen_width * screen_height * sizeof(UINT8)));
-//	machine->pens[0x07f] = 0xff;	/* palette_transparent_pen */
+//  machine->pens[0x07f] = 0xff;    /* palette_transparent_pen */
 	gfxdraw_mode = 1;
 }
 

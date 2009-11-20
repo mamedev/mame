@@ -196,7 +196,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			int sx, sy, code, color;
 
 			sx = 240 - state->spriteram[offs + 3];
-			if (sx < -7) 
+			if (sx < -7)
 				sx += 256;
 
 			sy = 240 - state->spriteram[offs + 2];

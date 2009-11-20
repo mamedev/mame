@@ -196,8 +196,8 @@ WRITE32_HANDLER( ms32_brightness_w )
 			brt_g = 0x100 - ((brt[0] & 0x00ff) >> 0);
 			brt_b = 0x100 - ((brt[1] & 0x00ff) >> 0);
 
-		//	for (i = 0;i < 0x3000;i++)	// colors 0x3000-0x3fff are not used
-		//		update_color(space->machine, i);
+		//  for (i = 0;i < 0x3000;i++)  // colors 0x3000-0x3fff are not used
+		//      update_color(space->machine, i);
 		}
 	}
 
@@ -359,14 +359,14 @@ VIDEO_UPDATE( ms32 )
 	/* TODO: 0 is correct for gametngk, but break f1superb scrolling grid (text at
        top and bottom of the screen becomes black on black) */
 	bitmap_fill(temp_bitmap_tilemaps,cliprect,0);	/* bg color */
-	
+
 	/* clear our sprite bitmaps */
 	bitmap_fill(temp_bitmap_sprites,cliprect,0);
 	bitmap_fill(temp_bitmap_sprites_pri,cliprect,0);
 
 	tetrisp2_draw_sprites(screen->machine, temp_bitmap_sprites, temp_bitmap_sprites_pri, cliprect, NULL, ms32_sprram_16, 0x20000, 0, ms32_reverse_sprite_order, 0, 1 );
-	   
-	   
+
+
 
 
 	asc_pri = scr_pri = rot_pri = 0;
@@ -430,8 +430,8 @@ VIDEO_UPDATE( ms32 )
 
 	/* MIX it! */
 	/* this mixing isn't 100% accurate, it should be using ALL the data in
-	   the priority ram, probably for per-pixel / pen mixing, or more levels
-	   than are supported here..  I don't know, it will need hw tests I think */
+       the priority ram, probably for per-pixel / pen mixing, or more levels
+       than are supported here..  I don't know, it will need hw tests I think */
 	{
 		int xx, yy;
 		int width = video_screen_get_width(screen);
@@ -442,7 +442,7 @@ VIDEO_UPDATE( ms32 )
 		UINT8* srcptr_tilepri;
 		UINT16* srcptr_spri;
 		//UINT8* srcptr_spripri;
-		
+
 		UINT32* dstptr_bitmap;
 
 		bitmap_fill(bitmap,cliprect,0);
@@ -477,7 +477,7 @@ VIDEO_UPDATE( ms32 )
 
 				if (primask == 0x00)
 				{
-					
+
 					if (src_tilepri==0x00)
 					{
 						if (spridat & 0xff)
@@ -543,7 +543,7 @@ VIDEO_UPDATE( ms32 )
 				}
 				else if (primask == 0xf0)
 				{
-//					dstptr_bitmap[xx] = paldata[spridat];
+//                  dstptr_bitmap[xx] = paldata[spridat];
 					if (src_tilepri==0x00)
 					{
 						if (spridat & 0xff)
@@ -595,14 +595,14 @@ VIDEO_UPDATE( ms32 )
 					{
 						if (spridat & 0xff)
 							dstptr_bitmap[xx] = paldata[spridat]; // tetrisp intro text
-						else 
+						else
 							dstptr_bitmap[xx] = paldata[src_tile];
 					}
 					else if (src_tilepri==0x01)
 					{
 						if (spridat & 0xff)
 							dstptr_bitmap[xx] = paldata[spridat]; // tetrisp intro text
-						else 
+						else
 							dstptr_bitmap[xx] = paldata[src_tile];
 					}
 					else if (src_tilepri==0x02)
@@ -629,7 +629,7 @@ VIDEO_UPDATE( ms32 )
 					else if (src_tilepri==0x07)
 					{
 						//dstptr_bitmap[xx] = paldata[mame_rand(screen->machine)&0xfff];
-						dstptr_bitmap[xx] = paldata[src_tile]; // assumed	
+						dstptr_bitmap[xx] = paldata[src_tile]; // assumed
 					}
 				}
 				else if (primask == 0xfe)
@@ -638,7 +638,7 @@ VIDEO_UPDATE( ms32 )
 					{
 						if (spridat & 0xff)
 							dstptr_bitmap[xx] = paldata[spridat]; // screens in gametngk intro
-						else 
+						else
 							dstptr_bitmap[xx] = paldata[src_tile];
 					}
 					else if (src_tilepri==0x01)
@@ -675,9 +675,9 @@ VIDEO_UPDATE( ms32 )
 				{
 					fatalerror("unhandled priority type %02x\n",primask);
 				}
-				
 
-				
+
+
 			}
 
 		}

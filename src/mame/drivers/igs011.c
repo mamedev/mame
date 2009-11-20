@@ -209,7 +209,7 @@ static WRITE16_HANDLER( igs011_layers_w )
 /***************************************************************************
 
     Palette (r5g5b5)
-    
+
     offset + 0x000: xRRRRRGG
     offset + 0x800: GGGBBBBB
 
@@ -576,14 +576,14 @@ static void lhb2_decrypt(running_machine *machine)
 // To be done (similar to lhb2?)
 static void nkishusp_decrypt(running_machine *machine)
 {
-//	lhb_decrypt(machine);
-//	dbc_decrypt(machine);
-//	lhb2_decrypt(machine);
-//	drgnwrld_type1_decrypt(machine);
-//	drgnwrld_type2_decrypt(machine);
-//	drgnwrld_type3_decrypt(machine);
-//	wlcc_decrypt(machine);
-//	vbowlj_decrypt(machine);
+//  lhb_decrypt(machine);
+//  dbc_decrypt(machine);
+//  lhb2_decrypt(machine);
+//  drgnwrld_type1_decrypt(machine);
+//  drgnwrld_type2_decrypt(machine);
+//  drgnwrld_type3_decrypt(machine);
+//  wlcc_decrypt(machine);
+//  vbowlj_decrypt(machine);
 
 	int i,j;
 	int rom_size = 0x80000;
@@ -597,8 +597,8 @@ static void nkishusp_decrypt(running_machine *machine)
 		if ((i & 0x0054) != 0x0000 && (i & 0x0056) != 0x0010)
 			x ^= 0x0004;
 
-//		if ((i & 0x0204) == 0x0000)
-//			x ^= 0x0008;
+//      if ((i & 0x0204) == 0x0000)
+//          x ^= 0x0008;
 
 		if ((i & 0x3080) != 0x3080 && (i & 0x3090) != 0x3010)
 			x ^= 0x0020;

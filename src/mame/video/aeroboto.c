@@ -63,7 +63,7 @@ VIDEO_START( aeroboto )
 		temp = alloc_array_or_die(UINT8, state->stars_length);
 		memcpy(temp, state->stars_rom, state->stars_length);
 
-		for (i = 0; i < state->stars_length; i++) 
+		for (i = 0; i < state->stars_length; i++)
 			state->stars_rom[(i & ~0xff) + (i << 5 & 0xe0) + (i >> 3 & 0x1f)] = temp[i];
 
 		free(temp);
@@ -168,10 +168,10 @@ VIDEO_UPDATE( aeroboto )
 	// the star field is supposed to be seen through tile pen 0 when active
 	if (!state->starsoff)
 	{
-		if (star_color < 0xd0) 
-		{ 
-			star_color = 0xd0; 
-			sky_color = 0; 
+		if (star_color < 0xd0)
+		{
+			star_color = 0xd0;
+			sky_color = 0;
 		}
 
 		star_color += 2;
@@ -183,7 +183,7 @@ VIDEO_UPDATE( aeroboto )
 		state->ox = *state->starx;
 		x = state->sx / SCROLL_SPEED;
 
-		if (*state->vscroll != 0xff) 
+		if (*state->vscroll != 0xff)
 			state->sy += (char)(*state->stary - state->oy);
 		state->oy = *state->stary;
 		y = state->sy / SCROLL_SPEED;
@@ -201,7 +201,7 @@ VIDEO_UPDATE( aeroboto )
 			for (j = 0; j < 256; j++)
 			{
 				src_rowptr = src_colptr + (((y + j) & 0xff) << 5 );
-				if (!((unsigned)*src_rowptr & src_colmask)) 
+				if (!((unsigned)*src_rowptr & src_colmask))
 					*BITMAP_ADDR16(bitmap, j, i) = pen;
 			}
 		}

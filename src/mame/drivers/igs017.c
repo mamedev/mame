@@ -61,7 +61,7 @@ static WRITE8_HANDLER( video_disable_w )
 	video_disable = data & 1;
 	if (data & (~1))
 		logerror("PC %06X: unknown bits of video_disable written = %02x\n",cpu_get_pc(space->cpu),data);
-//	popmessage("VIDEO %02X",data);
+//  popmessage("VIDEO %02X",data);
 }
 static WRITE16_HANDLER( video_disable_lsb_w )
 {
@@ -670,7 +670,7 @@ static DRIVER_INIT( starzan )
 			x ^= 0x80;
 
 //if ( (i & 0xffff) < 0x20 )
-//	x ^= 0x80;
+//  x ^= 0x80;
 #else
 		// by iq_132
 		if ((i & 0x00011) == 0x00011) x ^= 0x01;
@@ -2713,7 +2713,7 @@ IGS PCB NO-0230-1
       | |----------------| |----------------------| (---)    \   |
       |----------------------------------------------------------|
 
-      U1,U5,U6  ULN2004A			   SW4 1pos switch for reset
+      U1,U5,U6  ULN2004A               SW4 1pos switch for reset
             U2  TBM TB27C4096          Sw1-2-3  8x2 DSW
             U4  IGS025 (protection?)
             U8  IGS S2102 SP V102 1P1327A6 C000538

@@ -715,7 +715,7 @@ static INTERRUPT_GEN(konamigx_vbinterrupt_type4)
 
 	// maybe this interupt should only be every 30fps, or maybe there are flags to prevent the game running too fast
 	// the real hardware should output the display for each screen on alternate frames
-//	if(video_screen_get_frame_number(device->machine->primary_screen) & 1)
+//  if(video_screen_get_frame_number(device->machine->primary_screen) & 1)
 	if (1) // gx_syncen & 0x20)
 	{
 		gx_syncen &= ~0x20;
@@ -840,19 +840,19 @@ static READ32_HANDLER( sound020_r )
 			break;
 		case 13: // Soccer Superstars
 			//if(cpu_get_pc(space->cpu) != 0x236dce && cpu_get_pc(space->cpu) != 0x236d8a && cpu_get_pc(space->cpu) != 0x236d8a)
-			//	printf("Read 68k @ %x (PC=%x)\n", reg, cpu_get_pc(space->cpu));
+			//  printf("Read 68k @ %x (PC=%x)\n", reg, cpu_get_pc(space->cpu));
 			if (cpu_get_pc(space->cpu) == 0x0236e04)  rv = 0xffffffff;
 			if (cpu_get_pc(space->cpu) == 0x0236e12)  rv = 0xffffffff;
 			break;
 		case 14: // Soccer Superstars ver. JAC
 			//if(cpu_get_pc(space->cpu) != 0x2367b4)
-			//	printf("Read 68k @ %x (PC=%x)\n", reg, cpu_get_pc(space->cpu));
+			//  printf("Read 68k @ %x (PC=%x)\n", reg, cpu_get_pc(space->cpu));
 			if (cpu_get_pc(space->cpu) == 0x02367ea)  rv = 0xffffffff;
 			if (cpu_get_pc(space->cpu) == 0x02367f8)  rv = 0xffffffff;
 			break;
 		case 15: // Soccer Superstars ver. JAA
 			//if(cpu_get_pc(space->cpu) != 0x23670a)
-			//	printf("Read 68k @ %x (PC=%x)\n", reg, cpu_get_pc(space->cpu));
+			//  printf("Read 68k @ %x (PC=%x)\n", reg, cpu_get_pc(space->cpu));
 			if (cpu_get_pc(space->cpu) == 0x0236740)  rv = 0xffffffff;
 			if (cpu_get_pc(space->cpu) == 0x023674e)  rv = 0xffffffff;
 			break;
@@ -997,10 +997,10 @@ static READ32_HANDLER( type1_roz_r2 )
 static READ32_HANDLER( type3_sync_r )
 {
 	if(konamigx_current_frame==0)
-		return -1;	//	return 0xfffffffe | 1;
+		return -1;	//  return 0xfffffffe | 1;
 	else
-		return 0;//	return 0xfffffffe | 0;
-}		
+		return 0;// return 0xfffffffe | 0;
+}
 static int last_prot_op, last_prot_clk;
 
 /*
@@ -1284,7 +1284,7 @@ static ADDRESS_MAP_START( gx_type4_map, ADDRESS_SPACE_PROGRAM, 32 )
  	AM_RANGE(0xea0000, 0xea7fff) AM_RAM AM_BASE(&gx_subpaletteram32) // 5G/7G/9G (sub screen palette RAM)
 	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)		// type 4 polls this too
 	AM_RANGE(0xf00000, 0xf07fff) AM_RAM_WRITE(konamigx_t4_psacmap_w) AM_BASE(&gx_psacram)	// PSAC2 tilemap
-//	AM_RANGE(0xf00000, 0xf07fff) AM_RAM
+//  AM_RANGE(0xf00000, 0xf07fff) AM_RAM
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 

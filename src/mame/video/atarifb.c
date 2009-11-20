@@ -136,7 +136,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int shade = 0;
 
 		sy = 255 - state->spriteram[obj * 2 + 1];
-		if (sy == 255) 
+		if (sy == 255)
 			continue;
 
 		charcode = state->spriteram[obj * 2] & 0x3f;

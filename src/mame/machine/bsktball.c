@@ -8,7 +8,7 @@
 #include "bsktball.h"
 
 /***************************************************************************
-	bsktball_nmion_w
+    bsktball_nmion_w
 ***************************************************************************/
 WRITE8_HANDLER( bsktball_nmion_w )
 {
@@ -17,7 +17,7 @@ WRITE8_HANDLER( bsktball_nmion_w )
 }
 
 /***************************************************************************
-	bsktball_interrupt
+    bsktball_interrupt
 ***************************************************************************/
 /* NMI every 32V, IRQ every VBLANK */
 INTERRUPT_GEN( bsktball_interrupt )
@@ -34,7 +34,7 @@ INTERRUPT_GEN( bsktball_interrupt )
 }
 
 /***************************************************************************
-	bsktball_ld_w
+    bsktball_ld_w
 ***************************************************************************/
 
 WRITE8_HANDLER( bsktball_ld1_w )
@@ -51,7 +51,7 @@ WRITE8_HANDLER( bsktball_ld2_w )
 
 
 /***************************************************************************
-	bsktball_in0_r
+    bsktball_in0_r
 ***************************************************************************/
 
 READ8_HANDLER( bsktball_in0_r )
@@ -73,64 +73,64 @@ READ8_HANDLER( bsktball_in0_r )
 	/* P1 H DIR */
 	if (p1_horiz > state->last_p1_horiz)
 	{
-		if ((p1_horiz - state->last_p1_horiz) > 128)									
+		if ((p1_horiz - state->last_p1_horiz) > 128)
 			state->dir2 = 0x40;
-		else									
+		else
 			state->dir2 = 0;
 	}
 	else if (p1_horiz < state->last_p1_horiz)
 	{
-		if ((state->last_p1_horiz - p1_horiz) > 128)									
+		if ((state->last_p1_horiz - p1_horiz) > 128)
 			state->dir2 = 0;
-		else									
+		else
 			state->dir2 = 0x40;
 	}
 
 	/* P1 V DIR */
 	if (p1_vert > state->last_p1_vert)
 	{
-		if ((p1_vert - state->last_p1_vert) > 128)									
+		if ((p1_vert - state->last_p1_vert) > 128)
 			state->dir3 = 0;
-		else									
+		else
 			state->dir3 = 0x80;
 	}
 	else if (p1_vert < state->last_p1_vert)
 	{
-		if ((state->last_p1_vert - p1_vert) > 128)									
+		if ((state->last_p1_vert - p1_vert) > 128)
 			state->dir3 = 0x80;
-		else									
+		else
 			state->dir3 = 0;
 	}
 
 	/* P2 H DIR */
 	if (p2_horiz > state->last_p2_horiz)
 	{
-		if ((p2_horiz - state->last_p2_horiz) > 128)									
+		if ((p2_horiz - state->last_p2_horiz) > 128)
 			state->dir0 = 0x10;
-		else									
+		else
 			state->dir0 = 0;
 	}
 	else if (p2_horiz < state->last_p2_horiz)
 	{
-		if ((state->last_p2_horiz - p2_horiz) > 128)									
+		if ((state->last_p2_horiz - p2_horiz) > 128)
 			state->dir0 = 0;
-		else									
+		else
 			state->dir0 = 0x10;
 	}
 
 	/* P2 V DIR */
 	if (p2_vert > state->last_p2_vert)
 	{
-		if ((p2_vert - state->last_p2_vert) > 128)		
+		if ((p2_vert - state->last_p2_vert) > 128)
 			state->dir1 = 0;
-		else									
+		else
 			state->dir1 = 0x20;
 	}
 	else if (p2_vert < state->last_p2_vert)
 	{
-		if ((state->last_p2_vert - p2_vert) > 128)									
+		if ((state->last_p2_vert - p2_vert) > 128)
 			state->dir1 = 0x20;
-		else									
+		else
 			state->dir1 = 0;
 	}
 
@@ -158,7 +158,7 @@ READ8_HANDLER( bsktball_in0_r )
 }
 
 /***************************************************************************
-	bsktball_led_w
+    bsktball_led_w
 ***************************************************************************/
 WRITE8_HANDLER( bsktball_led1_w )
 {

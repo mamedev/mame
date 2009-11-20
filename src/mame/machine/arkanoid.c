@@ -67,11 +67,11 @@ READ8_HANDLER( arkanoid_68705_port_c_r )
 	int res = 0;
 
 	/* bit 0 is high on a write strobe; clear it once we've detected it */
-	if (state->z80write) 
+	if (state->z80write)
 		res |= 0x01;
 
 	/* bit 1 is high if the previous write has been read */
-	if (!state->m68705write) 
+	if (!state->m68705write)
 		res |= 0x02;
 
 	return (state->port_c_out & state->ddr_c) | (res & ~state->ddr_c);
@@ -110,11 +110,11 @@ CUSTOM_INPUT( arkanoid_68705_input_r )
 	int res = 0;
 
 	/* bit 0x40 of comes from the sticky bit */
-	if (!state->z80write) 
+	if (!state->z80write)
 		res |= 0x01;
 
 	/* bit 0x80 comes from a write latch */
-	if (!state->m68705write) 
+	if (!state->m68705write)
 		res |= 0x02;
 
 	return res;

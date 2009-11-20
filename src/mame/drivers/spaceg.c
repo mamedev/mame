@@ -223,7 +223,7 @@ static WRITE8_HANDLER( zvideoram_w )
 
 	col = state->unkram[0x400];
 
-	if (col > 0x0f) 
+	if (col > 0x0f)
 		popmessage("color > 0x0f = %2d", col);
 
 	col &= 0x0f;

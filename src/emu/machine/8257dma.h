@@ -16,7 +16,7 @@
                   HLDA   7 |             | 34  A2
                  ADSTB   8 |             | 33  A1
                    AEN   9 |             | 32  A0
-				   HRQ  10 |     8257	 | 31  Vcc
+                   HRQ  10 |     8257    | 31  Vcc
                    _CS  11 |             | 30  D0
                    CLK  12 |             | 29  D1
                  RESET  13 |             | 28  D2

@@ -1,20 +1,20 @@
 /*******************************************************************************************
 
-	Dream 9 Final (c) 1992 Excellent Systems
+    Dream 9 Final (c) 1992 Excellent Systems
 
-	driver by Angelo Salese & David Haywood
+    driver by Angelo Salese & David Haywood
 
-	TODO:
-	- Don't know where the ES8712 & RTC62421b chips routes;
-	- A bunch of missing port outputs;
-	- screen disable? Start-up fading looks horrible;
-	- Game looks IGS-esque, is there any correlation?
+    TODO:
+    - Don't know where the ES8712 & RTC62421b chips routes;
+    - A bunch of missing port outputs;
+    - screen disable? Start-up fading looks horrible;
+    - Game looks IGS-esque, is there any correlation?
 
 ============================================================================================
 
-	PCB: ES-9112
+    PCB: ES-9112
 
-	Main Chips: Z80, ES8712, 24Mhz OSC, RTC62421B 9262, YM2413, 4x8DSW
+    Main Chips: Z80, ES8712, 24Mhz OSC, RTC62421B 9262, YM2413, 4x8DSW
 
 *******************************************************************************************/
 
@@ -79,7 +79,7 @@ static WRITE8_HANDLER( d9final_bank_w )
 /* game checks this after three attract cycles, otherwise coin inputs stop to work. */
 static READ8_HANDLER( prot_latch_r )
 {
-//	printf("PC=%06x\n",cpu_get_pc(space->cpu));
+//  printf("PC=%06x\n",cpu_get_pc(space->cpu));
 
 	return 0x04;
 }
@@ -99,7 +99,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( d9final_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x00, 0x00) AM_WRITENOP //bit 0: irq enable? screen enable?
+//  AM_RANGE(0x00, 0x00) AM_WRITENOP //bit 0: irq enable? screen enable?
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA")
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSWB")
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWC")

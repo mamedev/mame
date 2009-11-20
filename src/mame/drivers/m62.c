@@ -122,7 +122,7 @@ static WRITE8_HANDLER( ldrun2_bankswitch_w )
 		if (state->bankcontrol[0] == 0x01 && data == 0x0d)
 		/* special case for service mode */
 			state->ldrun2_bankswap = 2;
-		else 
+		else
 			state->ldrun2_bankswap = 0;
 	}
 }

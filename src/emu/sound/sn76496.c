@@ -35,7 +35,7 @@
   different noise LFSR patttern: taps on bits A and E, output on E
   It uses a 15-bit ring buffer for periodic noise/arbitrary duty cycle.
   (all this chip's info needs to be verified)
-  
+
   28/03/2005 : Sebastien Chevalier
   Update th SN76496Write func, according to SN76489 doc found on SMSPower.
    - On write with 0x80 set to 0, when LastRegister is other then TONE,
@@ -48,22 +48,22 @@
   28/04/2009 : Lord Nightmare
   Add READY line readback; cleaned up struct a bit. Cleaned up comments.
   Add more TODOs. Fixed some unsaved savestate related stuff.
-  
+
   04/11/2009 : Lord Nightmare
   Changed the way that the invert works (it now selects between XOR and XNOR
   for the taps), and added R->OldNoise to simulate the extra 0 that is always
   output before the noise LFSR contents are after an LFSR reset.
   This fixes SN76489/A to match chips. Added SN94624.
-  
+
   14/11/2009 : Lord Nightmare
   Removed STEP mess, vastly simplifying the code. Made output bipolar rather
   than always above the 0 line, but disabled that code due to pending issues.
-  
+
   16/11/2009 : Lord Nightmare
   Fix screeching in regulus: When summing together four equal channels, the
   size of the max amplitude per channel should be 1/4 of the max range, not
   1/3. Added NCR7496.
-  
+
   18/11/2009 : Lord Nightmare
   Modify Init functions to support negating the audio output. The gamegear
   psg does this. Change gamegear and sega psgs to use XOR rather than XNOR
@@ -269,10 +269,10 @@ static STREAM_UPDATE( SN76496Update )
 			R->Count[3] = R->Period[3];
 		}
 /* //bipolar output, doesn't seem to work right with sonic 2 on gamegear at least
-		out = (R->Output[0]?R->Volume[0]:(0-R->Volume[0]))
-			+(R->Output[1]?R->Volume[1]:(0-R->Volume[1]))
-			+(R->Output[2]?R->Volume[2]:(0-R->Volume[2]))
-			+(R->Output[3]?R->Volume[3]:(0-R->Volume[3]));
+        out = (R->Output[0]?R->Volume[0]:(0-R->Volume[0]))
+            +(R->Output[1]?R->Volume[1]:(0-R->Volume[1]))
+            +(R->Output[2]?R->Volume[2]:(0-R->Volume[2]))
+            +(R->Output[3]?R->Volume[3]:(0-R->Volume[3]));
 */
 		if (R->Stereo)
 		{
@@ -280,7 +280,7 @@ static STREAM_UPDATE( SN76496Update )
 				+ (((R->StereoMask&0x20)&&R->Output[1])?R->Volume[1]:0)
 				+ (((R->StereoMask&0x40)&&R->Output[2])?R->Volume[2]:0)
 				+ (((R->StereoMask&0x80)&&R->Output[3])?R->Volume[3]:0);
-				
+
 			out2 = (((R->StereoMask&0x1)&&R->Output[0])?R->Volume[0]:0)
 				+ (((R->StereoMask&0x2)&&R->Output[1])?R->Volume[1]:0)
 				+ (((R->StereoMask&0x4)&&R->Output[2])?R->Volume[2]:0)

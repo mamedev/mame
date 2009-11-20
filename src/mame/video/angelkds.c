@@ -176,7 +176,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		UINT8 bank = attr & 0x08;
 		UINT8 color = attr & 0x03;
 
-		if (bank) 
+		if (bank)
 			tile_no += 0x100;
 
 		ypos = 0xff - ypos;
@@ -286,12 +286,12 @@ VIDEO_UPDATE( angelkds )
 	clip.min_y = visarea->min_y;
 	clip.max_y = visarea->max_y;
 
-	if ((state->layer_ctrl & 0x80) == 0x00) 
+	if ((state->layer_ctrl & 0x80) == 0x00)
 		tilemap_draw(bitmap, &clip, state->bgtop_tilemap, 0, 0);
 
 	draw_sprites(screen->machine, bitmap, &clip, 0x80);
 
-	if ((state->layer_ctrl & 0x20) == 0x00) 
+	if ((state->layer_ctrl & 0x20) == 0x00)
 		tilemap_draw(bitmap, &clip, state->tx_tilemap, 0, 0);
 
 	/* draw bottom of screen */
@@ -300,12 +300,12 @@ VIDEO_UPDATE( angelkds )
 	clip.min_y = visarea->min_y;
 	clip.max_y = visarea->max_y;
 
-	if ((state->layer_ctrl & 0x40) == 0x00) 
+	if ((state->layer_ctrl & 0x40) == 0x00)
 		tilemap_draw(bitmap, &clip, state->bgbot_tilemap, 0, 0);
 
 	draw_sprites(screen->machine, bitmap, &clip, 0x40);
 
-	if ((state->layer_ctrl & 0x20) == 0x00) 
+	if ((state->layer_ctrl & 0x20) == 0x00)
 		tilemap_draw(bitmap, &clip, state->tx_tilemap, 0, 0);
 
 	return 0;
