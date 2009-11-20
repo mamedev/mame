@@ -368,6 +368,12 @@ static UINT16 input_port_read16(const input_port_config *port, offs_t offset, UI
 static UINT32 input_port_read32(const input_port_config *port, offs_t offset, UINT32 mem_mask);
 static UINT64 input_port_read64(const input_port_config *port, offs_t offset, UINT64 mem_mask);
 
+/* output port handlers */
+static void input_port_write8(const input_port_config *port, offs_t offset, UINT8 data);
+static void input_port_write16(const input_port_config *port, offs_t offset, UINT16 data, UINT16 mem_mask);
+static void input_port_write32(const input_port_config *port, offs_t offset, UINT32 data, UINT32 mem_mask);
+static void input_port_write64(const input_port_config *port, offs_t offset, UINT64 data, UINT64 mem_mask);
+
 
 
 /***************************************************************************
@@ -1372,6 +1378,32 @@ void memory_install_read_port_handler(const address_space *space, offs_t addrsta
 
 
 
+/*-------------------------------------------------
+    memory_install_write_port_handler - install a
+    new 8-bit input port handler into the given
+    address space
+-------------------------------------------------*/
+
+void memory_install_write_port_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag)
+{
+	const input_port_config *port = input_port_by_tag(space->machine->portconfig, tag);
+	address_space *spacerw = (address_space *)space;
+	genf *handler = NULL;
+
+	if (port == NULL)
+		fatalerror("Non-existent port referenced: '%s'\n", tag);
+	switch (space->dbits)
+	{
+		case 8:		handler = (genf *)input_port_write8; 	break;
+		case 16:	handler = (genf *)input_port_write16; 	break;
+		case 32:	handler = (genf *)input_port_write32; 	break;
+		case 64:	handler = (genf *)input_port_write64; 	break;
+	}
+	space_map_range(spacerw, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, (void *)port, tag);
+}
+
+
+
 /***************************************************************************
     DEBUGGER HELPERS
 ***************************************************************************/
@@ -1742,6 +1774,25 @@ static void memory_init_populate(running_machine *machine)
 						case 64:	handler = (genf *)input_port_read64; 	break;
 					}
 					space_map_range_private(space, ROW_READ, bits, entry->read_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, handler, (void *)port, entry->read_porttag);
+				}
+
+				/* if we have a write port tag, look it up */
+				if (entry->write_porttag != NULL)
+				{
+					const input_port_config *port = input_port_by_tag(machine->portconfig, entry->write_porttag);
+					int bits = (entry->write_bits == 0) ? space->dbits : entry->write_bits;
+					genf *handler = NULL;
+
+					if (port == NULL)
+						fatalerror("Non-existent port referenced: '%s'\n", entry->write_porttag);
+					switch (bits)
+					{
+						case 8:		handler = (genf *)input_port_write8; 	break;
+						case 16:	handler = (genf *)input_port_write16; 	break;
+						case 32:	handler = (genf *)input_port_write32; 	break;
+						case 64:	handler = (genf *)input_port_write64; 	break;
+					}
+					space_map_range_private(space, ROW_WRITE, bits, entry->write_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, handler, (void *)port, entry->write_porttag);
 				}
 
 				/* install the read handler if present */
@@ -2132,6 +2183,11 @@ static void map_detokenize(address_map *map, const game_driver *driver, const ch
 			case ADDRMAP_TOKEN_READ_PORT:
 				check_entry_field(read_porttag);
 				entry->read_porttag = TOKEN_GET_STRING(tokens);
+				break;
+
+			case ADDRMAP_TOKEN_WRITE_PORT:
+				check_entry_field(write_porttag);
+				entry->write_porttag = TOKEN_GET_STRING(tokens);
 				break;
 
 			case ADDRMAP_TOKEN_REGION:
@@ -3536,6 +3592,32 @@ static UINT32 input_port_read32(const input_port_config *port, offs_t offset, UI
 static UINT64 input_port_read64(const input_port_config *port, offs_t offset, UINT64 mem_mask)
 {
 	return input_port_read_direct(port);
+}
+
+
+
+/*-------------------------------------------------
+    output port handlers
+-------------------------------------------------*/
+
+static void input_port_write8(const input_port_config *port, offs_t offset, UINT8 data)
+{
+	input_port_write_direct(port, data, 0xff);
+}
+
+static void input_port_write16(const input_port_config *port, offs_t offset, UINT16 data, UINT16 mem_mask)
+{
+	input_port_write_direct(port, data, mem_mask);
+}
+
+static void input_port_write32(const input_port_config *port, offs_t offset, UINT32 data, UINT32 mem_mask)
+{
+	input_port_write_direct(port, data, mem_mask);
+}
+
+static void input_port_write64(const input_port_config *port, offs_t offset, UINT64 data, UINT64 mem_mask)
+{
+	input_port_write_direct(port, data, mem_mask);
 }
 
 

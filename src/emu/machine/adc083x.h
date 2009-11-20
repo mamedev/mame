@@ -59,8 +59,8 @@
 
 typedef double (*adc083x_input_convert_func)(const device_config *device, UINT8 input);
 
-typedef struct _adc0831_interface adc0831_interface;
-struct _adc0831_interface
+typedef struct _adc083x_interface adc083x_interface;
+struct _adc083x_interface
 {
 	adc083x_input_convert_func input_callback_r;
 };
@@ -76,11 +76,11 @@ DEVICE_GET_INFO( adc0832 );
 DEVICE_GET_INFO( adc0834 );
 DEVICE_GET_INFO( adc0838 );
 
-extern WRITE8_DEVICE_HANDLER( adc083x_cs_write );
-extern WRITE8_DEVICE_HANDLER( adc083x_clk_write );
-extern WRITE8_DEVICE_HANDLER( adc083x_di_write );
-extern WRITE8_DEVICE_HANDLER( adc083x_se_write );
-extern READ8_DEVICE_HANDLER( adc083x_sars_read );
-extern READ8_DEVICE_HANDLER( adc083x_do_read );
+extern WRITE_LINE_DEVICE_HANDLER( adc083x_cs_write );
+extern WRITE_LINE_DEVICE_HANDLER( adc083x_clk_write );
+extern WRITE_LINE_DEVICE_HANDLER( adc083x_di_write );
+extern WRITE_LINE_DEVICE_HANDLER( adc083x_se_write );
+extern READ_LINE_DEVICE_HANDLER( adc083x_sars_read );
+extern READ_LINE_DEVICE_HANDLER( adc083x_do_read );
 
 #endif	/* __ADC083X_H__ */

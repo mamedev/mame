@@ -419,83 +419,41 @@ static READ32_HANDLER( mb89371_r )
 static READ32_HANDLER( jamma_r )
 {
 	running_machine *machine = space->machine;
-	const device_config *adc0834 = devtag_get_device(space->machine, "adc0834");
-	UINT32 data = 0;
+	UINT32 data = input_port_read(machine, "IN1");
+	data |= 0x000000c0;
 
-	switch (offset)
+	if( has_ds2401[ security_cart_number ] )
 	{
-	case 0:
-		data = input_port_read(machine, "IN0");
-		break;
+		data |= ds2401_read( machine, security_cart_number ) << 14;
+	}
+
+	switch( chiptype[ security_cart_number ] )
+	{
 	case 1:
-	{
-		data = input_port_read(machine, "IN1");
-		data |= 0x000000c0;
+		data |= x76f041_sda_read( machine, security_cart_number ) << 18;
+		break;
 
-		if( has_ds2401[ security_cart_number ] )
-		{
-			data |= ds2401_read( machine, security_cart_number ) << 14;
-		}
+	case 2:
+		data |= x76f100_sda_read( machine, security_cart_number ) << 18;
+		break;
 
-		data |= adc083x_do_read(adc0834, 0) << 16;
-
-		switch( chiptype[ security_cart_number ] )
-		{
-		case 1:
-			data |= x76f041_sda_read( machine, security_cart_number ) << 18;
-			break;
-
-		case 2:
-			data |= x76f100_sda_read( machine, security_cart_number ) << 18;
-			break;
-
-		case 3:
-			data |= zs01_sda_read( machine, security_cart_number ) << 18;
-			break;
-		}
-
-		if( pccard1_flash_start < 0 )
-		{
-			data |= ( 1 << 26 );
-		}
-		if( pccard2_flash_start < 0 )
-		{
-			data |= ( 1 << 27 );
-		}
+	case 3:
+		data |= zs01_sda_read( machine, security_cart_number ) << 18;
 		break;
 	}
-	case 2:
-		data = input_port_read(machine, "IN2");
-		break;
-	case 3:
-		data = input_port_read(machine, "IN3");
-		break;
+
+	if( pccard1_flash_start < 0 )
+	{
+		data |= ( 1 << 26 );
+	}
+	if( pccard2_flash_start < 0 )
+	{
+		data |= ( 1 << 27 );
 	}
 
 	verboselog( machine, 2, "jamma_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	return data;
-}
-
-static WRITE32_HANDLER( jamma_w )
-{
-	running_machine *machine = space->machine;
-	const device_config *adc0834 = devtag_get_device(space->machine, "adc0834");
-	verboselog( machine, 2, "jamma_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
-
-	switch( offset )
-	{
-	case 0:
-		adc083x_cs_write(adc0834, 0, (data >> 1) & 1);
-		adc083x_clk_write(adc0834, 0, (data >> 2) & 1);
-		adc083x_di_write(adc0834, 0, (data >> 0) & 1);
-		adc083x_se_write(adc0834, 0, 0);
-		break;
-
-	default:
-		verboselog( machine, 0, "jamma_w: unhandled offset %08x %08x %08x\n", offset, mem_mask, data );
-		break;
-	}
 }
 
 static UINT32 control;
@@ -1409,7 +1367,10 @@ static READ32_HANDLER( k573_counter_r )
 static ADDRESS_MAP_START( konami573_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE(1) AM_BASE(&g_p_n_psxram) AM_SIZE(&g_n_psxramsize) /* ram */
 	AM_RANGE(0x1f000000, 0x1f3fffff) AM_READWRITE( flash_r, flash_w )
-	AM_RANGE(0x1f400000, 0x1f40001f) AM_READWRITE( jamma_r, jamma_w )
+	AM_RANGE(0x1f400000, 0x1f400003) AM_READ_PORT( "IN0" ) AM_WRITE_PORT( "OUT0" )
+	AM_RANGE(0x1f400004, 0x1f400007) AM_READ( jamma_r )
+	AM_RANGE(0x1f400008, 0x1f40000b) AM_READ_PORT( "IN2" )
+	AM_RANGE(0x1f40000c, 0x1f40000f) AM_READ_PORT( "IN3" )
 	AM_RANGE(0x1f480000, 0x1f48000f) AM_READWRITE( atapi_r, atapi_w )	// IDE controller, used mostly in ATAPI mode (only 3 pure IDE commands seen so far)
 	AM_RANGE(0x1f500000, 0x1f500003) AM_READWRITE( control_r, control_w )	// Konami can't make a game without a "control" register.
 	AM_RANGE(0x1f560000, 0x1f560003) AM_WRITE( atapi_reset_w )
@@ -2876,7 +2837,7 @@ static double analogue_inputs_callback( const device_config *device, UINT8 input
 }
 
 
-static const adc0831_interface konami573_adc_interface = {
+static const adc083x_interface konami573_adc_interface = {
 	analogue_inputs_callback
 };
 
@@ -2932,6 +2893,11 @@ static INPUT_PORTS_START( konami573 )
 	PORT_START("IN0")
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("OUT0")
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("adc0834", adc083x_cs_write)
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("adc0834", adc083x_clk_write)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("adc0834", adc083x_di_write)
+
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x00000001, 0x00000001, "Unused 1" ) PORT_DIPLOCATION( "DIP SW:1" )
 	PORT_DIPSETTING(          0x00000001, DEF_STR( Off ) )
@@ -2956,7 +2922,7 @@ static INPUT_PORTS_START( konami573 )
 //  PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 //  PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 //  PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* adc0834 d0 */
+	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("adc0834", adc083x_do_read)
 //  PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* x76f041/zs01 sda */
     PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNKNOWN )

@@ -196,12 +196,13 @@ struct _digital_joystick_state
 };
 
 
-/* live custom/changed field information */
-typedef struct _callback_field_info callback_field_info;
-struct _callback_field_info
+/* live device field information */
+typedef struct _device_field_info device_field_info;
+struct _device_field_info
 {
-	callback_field_info *		next;				/* linked list of info for this port */
+	device_field_info *		next;					/* linked list of info for this port */
 	const input_field_config *	field;				/* pointer to the input field referenced */
+	const device_config * 	device;					/* device */
 	UINT8						shift;				/* shift to apply to the final result */
 };
 
@@ -224,12 +225,13 @@ struct _input_field_state
 struct _input_port_state
 {
 	analog_field_state *		analoglist;			/* pointer to list of analog port info */
-	callback_field_info *		customlist;			/* pointer to list of custom port info */
-	callback_field_info *		changedlist;		/* pointer to list of changed port info */
+	device_field_info *		readdevicelist;		/* pointer to list of input device info */
+	device_field_info *		writedevicelist;	/* pointer to list of output device info */
 	input_port_value			defvalue;			/* combined default value across the port */
 	input_port_value			digital;			/* current value from all digital inputs */
 	input_port_value			vblank;				/* value of all IPT_VBLANK bits */
 	input_port_value			lastvalue;			/* last value of the port, to detect changes */
+	input_port_value			lastwrite;			/* last value written to the port, to detect changes */
 };
 
 
@@ -442,7 +444,7 @@ static INT32 apply_analog_settings(INT32 current, analog_field_state *analog);
 static void init_port_types(running_machine *machine);
 static void init_port_state(running_machine *machine);
 static void init_autoselect_devices(const input_port_config *portlist, int type1, int type2, int type3, const char *option, const char *ananame);
-static callback_field_info *init_field_callback_info(const input_field_config *field);
+static device_field_info *init_field_device_info(const input_field_config *field,const char *device_name);
 static analog_field_state *init_field_analog_state(const input_field_config *field);
 
 /* once-per-frame updates */
@@ -617,6 +619,29 @@ INLINE void* ATTR_PRINTF(3,4) error_buf_append(char *errorbuf, int errorbuflen, 
 INLINE int condition_equal(const input_condition *cond1, const input_condition *cond2)
 {
 	return (cond1->mask == cond2->mask && cond1->value == cond2->value && cond1->condition == cond2->condition && strcmp(cond1->tag, cond2->tag) == 0);
+}
+
+
+
+/***************************************************************************
+    CUSTOM DEVICE I/O
+***************************************************************************/
+static READ_LINE_DEVICE_HANDLER( custom_read_line_device )
+{
+	const device_field_info *device_field = (const device_field_info *) device;
+
+	return (*device_field->field->custom)(device_field->field, device_field->field->custom_param);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( changed_write_line_device )
+{
+	const device_field_info *device_field = (const device_field_info *) device;
+
+	/* recalculate 'oldval' as it cannot be passed directly */
+	input_port_value last = (device_field->field->type == IPT_OUTPUT) ? device_field->field->port->state->lastwrite : device_field->field->port->state->lastvalue;
+	input_port_value oldval = (last & device_field->field->mask) >> device_field->shift;
+
+	(*device_field->field->changed)(device_field->field, device_field->field->changed_param, oldval, state);
 }
 
 
@@ -1203,7 +1228,7 @@ input_port_value input_port_read_direct(const input_port_config *port)
 {
 	input_port_private *portdata = port->machine->input_port_data;
 	analog_field_state *analog;
-	callback_field_info *custom;
+	device_field_info *device_field;
 	input_port_value result;
 
 	assert_always(portdata->safe_to_read, "Input ports cannot be read at init time!");
@@ -1212,12 +1237,12 @@ input_port_value input_port_read_direct(const input_port_config *port)
 	result = port->state->digital;
 
 	/* update custom values */
-	for (custom = port->state->customlist; custom != NULL; custom = custom->next)
-		if (input_condition_true(port->machine, &custom->field->condition))
+	for (device_field = port->state->readdevicelist; device_field != NULL; device_field = device_field->next)
+		if (input_condition_true(port->machine, &device_field->field->condition))
 		{
-			/* replace the bits with bits from the custom routine */
-			input_port_value newbits = (*custom->field->custom)(custom->field, custom->field->custom_param);
-			result = (result & ~custom->field->mask) | ((newbits << custom->shift) & custom->field->mask);
+			/* replace the bits with bits from the device */
+			input_port_value newval = (*device_field->field->read_line_device)(device_field->device);
+			result = (result & ~device_field->field->mask) | ((newval << device_field->shift) & device_field->field->mask);
 		}
 
 	/* update VBLANK bits */
@@ -1423,6 +1448,65 @@ static INT32 apply_analog_settings(INT32 value, analog_field_state *analog)
 
 
 /***************************************************************************
+    PORT WRITING
+***************************************************************************/
+
+/*-------------------------------------------------
+    input_port_write_direct - write a value
+	to a port
+-------------------------------------------------*/
+
+void input_port_write_direct(const input_port_config *port, input_port_value data, input_port_value mem_mask)
+{
+	/* call device line changed handlers */
+	device_field_info *device_field;
+	input_port_value newvalue = port->state->lastwrite;
+
+	COMBINE_DATA(&newvalue);
+
+	for (device_field = port->state->writedevicelist; device_field; device_field = device_field->next)
+		if (device_field->field->type == IPT_OUTPUT && input_condition_true(port->machine, &device_field->field->condition))
+		{
+			input_port_value oldval = (port->state->lastwrite & device_field->field->mask) >> device_field->shift;
+			input_port_value newval = (newvalue & device_field->field->mask) >> device_field->shift;
+
+			/* if the bits have  changed, call the handler */
+			if (oldval != newval)
+				(*device_field->field->write_line_device)(device_field->device, newval);
+		}
+
+	/* remember the last value */
+	port->state->lastwrite = newvalue;
+}
+
+/*-------------------------------------------------
+    input_port_write - write a value to a
+	port specified by tag
+-------------------------------------------------*/
+
+void input_port_write(running_machine *machine, const char *tag, input_port_value value, input_port_value mask)
+{
+	const input_port_config *port = input_port_by_tag(machine->portconfig, tag);
+	if (port == NULL)
+		fatalerror("Unable to locate input port '%s'", tag);
+	input_port_write_direct(port, value, mask);
+}
+
+/*-------------------------------------------------
+    input_port_read_safe - write a value to
+	a port, ignore if the port does not exist
+-------------------------------------------------*/
+
+void input_port_write_safe(running_machine *machine, const char *tag, input_port_value value, input_port_value mask)
+{
+	const input_port_config *port = input_port_by_tag(machine->portconfig, tag);
+	if (port != NULL)
+		input_port_write_direct(port, value, mask);
+}
+
+
+
+/***************************************************************************
     MISC HELPER FUNCTIONS
 ***************************************************************************/
 
@@ -1560,8 +1644,8 @@ static void init_port_state(running_machine *machine)
 	for (port = machine->portconfig; port != NULL; port = port->next)
 	{
 		analog_field_state **analogstatetail;
-		callback_field_info **custominfotail;
-		callback_field_info **changedinfotail;
+		device_field_info **readdevicetail;
+		device_field_info **writedevicetail;
 		input_port_state *portstate;
 
 		/* allocate a new input_port_info structure */
@@ -1571,8 +1655,8 @@ static void init_port_state(running_machine *machine)
 
 		/* start with tail pointers to all the data */
 		analogstatetail = &portstate->analoglist;
-		custominfotail = &portstate->customlist;
-		changedinfotail = &portstate->changedlist;
+		readdevicetail = &portstate->readdevicelist;
+		writedevicetail = &portstate->writedevicelist;
 
 		/* iterate over fields */
 		for (field = port->fieldlist; field != NULL; field = field->next)
@@ -1605,18 +1689,18 @@ static void init_port_state(running_machine *machine)
 				fieldstate->joystick->inuse = TRUE;
 			}
 
-			/* if this entry has custom callback, allocate memory for the tracking structure */
-			if (field->custom != NULL)
+			/* if this entry has device input, allocate memory for the tracking structure */
+			if (field->read_line_device != NULL)
 			{
-				*custominfotail = init_field_callback_info(field);
-				custominfotail = &(*custominfotail)->next;
+				*readdevicetail = init_field_device_info(field,field->read_device_name);
+				readdevicetail = &(*readdevicetail)->next;
 			}
 
-			/* if this entry has changed callback, allocate memory for the tracking structure */
-			if (field->changed != NULL)
+			/* if this entry has device output, allocate memory for the tracking structure */
+			if (field->write_line_device != NULL)
 			{
-				*changedinfotail = init_field_callback_info(field);
-				changedinfotail = &(*changedinfotail)->next;
+				*writedevicetail = init_field_device_info(field,field->write_device_name);
+				writedevicetail = &(*writedevicetail)->next;
 			}
 
 #ifdef MESS
@@ -1716,23 +1800,27 @@ static void init_autoselect_devices(const input_port_config *portlist, int type1
 
 
 /*-------------------------------------------------
-    init_field_callback_info - allocate and populate
-    information about a changed or custom
-    callback
+    init_field_device_info - allocate and populate
+    information about a device callback
 -------------------------------------------------*/
 
-static callback_field_info *init_field_callback_info(const input_field_config *field)
+static device_field_info *init_field_device_info(const input_field_config *field, const char *device_name)
 {
-	callback_field_info *info;
+	device_field_info *info;
 	input_port_value mask;
 
 	/* allocate memory */
-	info = auto_alloc_clear(field->port->machine, callback_field_info);
+	info = auto_alloc_clear(field->port->machine, device_field_info);
 
 	/* fill in the data */
 	info->field = field;
 	for (mask = field->mask; !(mask & 1); mask >>= 1)
 		info->shift++;
+
+	if (device_name != NULL)
+		info->device = devtag_get_device(field->port->machine, device_name);
+	else
+		info->device = (const device_config *) info;
 
 	return info;
 }
@@ -1975,7 +2063,7 @@ profiler_mark_start(PROFILER_INPUT);
 	for (port = machine->portconfig; port != NULL; port = port->next)
 	{
 		const input_field_config *field;
-		callback_field_info *changed;
+		device_field_info *device_field;
 		input_port_value newvalue;
 
 		/* start with 0 values for the digital and VBLANK bits */
@@ -2004,17 +2092,17 @@ profiler_mark_start(PROFILER_INPUT);
 		mess_input_port_update_hook(machine, port, &port->state->digital);
 #endif /* MESS */
 
-		/* call changed handlers */
+		/* call device line changed handlers */
 		newvalue = input_port_read_direct(port);
-		for (changed = port->state->changedlist; changed; changed = changed->next)
-			if (input_condition_true(port->machine, &changed->field->condition))
+		for (device_field = port->state->writedevicelist; device_field; device_field = device_field->next)
+			if (device_field->field->type != IPT_OUTPUT && input_condition_true(port->machine, &device_field->field->condition))
 			{
-				input_port_value oldbits = (port->state->lastvalue & changed->field->mask) >> changed->shift;
-				input_port_value newbits = (newvalue & changed->field->mask) >> changed->shift;
+				input_port_value oldval = (port->state->lastvalue & device_field->field->mask) >> device_field->shift;
+				input_port_value newval = (newvalue & device_field->field->mask) >> device_field->shift;
 
 				/* if the bits have  changed, call the handler */
-				if (oldbits != newbits)
-					(*changed->field->changed)(changed->field, changed->field->changed_param, oldbits, newbits);
+				if (oldval != newval)
+					(*device_field->field->write_line_device)(device_field->device, newval);
 			}
 
 		/* remember the last value */
@@ -2553,6 +2641,8 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 					TOKEN_SKIP_PTR(ipt);
 					break;
 				}
+				curfield->read_line_device = custom_read_line_device;
+				curfield->read_device_name = NULL;
 				curfield->custom = TOKEN_GET_PTR(ipt, customptr);
 				curfield->custom_param = (void *)TOKEN_GET_PTR(ipt, voidptr);
 				break;
@@ -2566,6 +2656,8 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 					TOKEN_SKIP_PTR(ipt);
 					break;
 				}
+				curfield->write_line_device = changed_write_line_device;
+				curfield->write_device_name = NULL;
 				curfield->changed = TOKEN_GET_PTR(ipt, changedptr);
 				curfield->changed_param = (void *)TOKEN_GET_PTR(ipt, voidptr);
 				break;
@@ -2946,6 +3038,32 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 				curfield = field_config_alloc(curport, IPT_ADJUSTER, defval, 0xff);
 				cursetting = NULL;
 				curfield->name = TOKEN_GET_STRING(ipt);
+				break;
+
+			/* input device handler */
+			case INPUT_TOKEN_READ_LINE_DEVICE:
+				if (curfield == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_READ_LINE_DEVICE encountered with no active field\n");
+					TOKEN_SKIP_STRING(ipt);
+					TOKEN_SKIP_PTR(ipt);
+					break;
+				}
+				curfield->read_device_name = TOKEN_GET_STRING(ipt);
+				curfield->read_line_device = TOKEN_GET_PTR(ipt, read_line_device);
+				break;
+
+			/* output device handler */
+			case INPUT_TOKEN_WRITE_LINE_DEVICE:
+				if (curfield == NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_WRITE_LINE_DEVICE encountered with no active field\n");
+					TOKEN_SKIP_STRING(ipt);
+					TOKEN_SKIP_PTR(ipt);
+					break;
+				}
+				curfield->write_device_name = TOKEN_GET_STRING(ipt);
+				curfield->write_line_device = TOKEN_GET_PTR(ipt, write_line_device);
 				break;
 
 			default:

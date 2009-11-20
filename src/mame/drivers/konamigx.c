@@ -896,20 +896,6 @@ static WRITE32_HANDLER( sound020_w )
 
 /* National Semiconductor ADC0834 4-channel serial ADC emulation */
 
-static READ32_HANDLER( adc0834_r )
-{
-	const device_config *adc0834 = devtag_get_device(space->machine, "adc0834");
-	return adc083x_do_read(adc0834, 0) << 24;
-}
-
-static WRITE32_HANDLER( adc0834_w )
-{
-	const device_config *adc0834 = devtag_get_device(space->machine, "adc0834");
-	adc083x_clk_write(adc0834, 0, (data >> 24) & 1);
-	adc083x_di_write(adc0834, 0, (data >> 25) & 1);
-	adc083x_cs_write(adc0834, 0, (data >> 26) & 1);
-}
-
 static double adc0834_callback( const device_config *device, UINT8 input )
 {
 	switch (input)
@@ -924,7 +910,7 @@ static double adc0834_callback( const device_config *device, UINT8 input )
 	return 0;
 }
 
-static const adc0831_interface konamigx_adc_interface = {
+static const adc083x_interface konamigx_adc_interface = {
 	adc0834_callback
 };
 
@@ -1235,8 +1221,8 @@ static ADDRESS_MAP_START( gx_type1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE(konamigx_palette_w) AM_BASE(&paletteram32)
 	AM_RANGE(0xdc0000, 0xdc1fff) AM_RAM			// LAN RAM? (Racin' Force has, Open Golf doesn't)
 	AM_RANGE(0xdd0000, 0xdd00ff) AM_READNOP AM_WRITENOP	// LAN board
-	AM_RANGE(0xdda000, 0xddafff) AM_WRITE(adc0834_w)
-	AM_RANGE(0xddc000, 0xddcfff) AM_READ(adc0834_r)
+	AM_RANGE(0xdda000, 0xddafff) AM_WRITE_PORT("ADC-WRPORT")
+	AM_RANGE(0xddc000, 0xddcfff) AM_READ_PORT("ADC-RDPORT")
 	AM_RANGE(0xdde000, 0xdde003) AM_WRITE(type1_cablamps_w)
 	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE((UINT32**)&K053936_0_ctrl)
 	AM_RANGE(0xe20000, 0xe2000f) AM_WRITENOP
@@ -1515,8 +1501,6 @@ static MACHINE_DRIVER_START( konamigx )
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	MDRV_ADC0834_ADD( "adc0834", konamigx_adc_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dragoonj )
@@ -1552,6 +1536,8 @@ static MACHINE_DRIVER_START( opengolf )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gx_type1_map)
+
+	MDRV_ADC0834_ADD( "adc0834", konamigx_adc_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( racinfrc )
@@ -1564,6 +1550,8 @@ static MACHINE_DRIVER_START( racinfrc )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gx_type1_map)
+
+	MDRV_ADC0834_ADD( "adc0834", konamigx_adc_interface )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gxtype3 )
@@ -1778,11 +1766,19 @@ static INPUT_PORTS_START( racinfrc )
 	/* racin force needs Player 2 Button 1 ("IN3" & 0x10) set to get past the calibration screen */
 	PORT_INCLUDE( konamigx )
 
+	PORT_START("ADC-WRPORT")
+	PORT_BIT( 0x1000000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("adc0834", adc083x_clk_write)
+	PORT_BIT( 0x2000000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("adc0834", adc083x_di_write)
+	PORT_BIT( 0x4000000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("adc0834", adc083x_cs_write)
+
+	PORT_START("ADC-RDPORT")
+	PORT_BIT( 0x1000000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("adc0834", adc083x_do_read)
+
 	PORT_START("AN0")	/* mask default type                     sens delta min max */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x38,0xc8) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x38,0xc8) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
 
 	PORT_START("AN1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0x68) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_CODE_INC(KEYCODE_LCONTROL)
+	PORT_BIT( 0xff, 0xf0, IPT_PEDAL ) PORT_MINMAX(0x90,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_CODE_INC(KEYCODE_LCONTROL) PORT_REVERSE
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( le2 )

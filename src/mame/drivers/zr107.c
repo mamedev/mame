@@ -280,17 +280,10 @@ static VIDEO_UPDATE( zr107 )
 
 /******************************************************************/
 
-static CUSTOM_INPUT( adcdo_r )
-{
-	const device_config *adc0838 = devtag_get_device(field->port->machine, "adc0838");
-	return adc083x_do_read(adc0838, 0);
-}
-
 static READ8_HANDLER( sysreg_r )
 {
 	UINT32 r = 0;
-	const device_config *adc0838 = devtag_get_device(space->machine, "adc0838");
-	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
+	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4" };
 
 	switch (offset)
 	{
@@ -298,17 +291,8 @@ static READ8_HANDLER( sysreg_r )
 		case 1:	/* I/O port 1 */
 		case 2:	/* I/O port 2 */
 		case 3:	/* System Port 0 */
-			r = input_port_read(space->machine, portnames[offset]);
-			break;
-
 		case 4:	/* System Port 1 */
-			/*
-                0x80 = PARAACK
-                0x40 = unused
-                0x20 = SARS (A/D busy flag)
-                0x10 = EEPDO (EEPROM DO)
-            */
-			r = (adc083x_sars_read(adc0838, 0) << 5) | (eeprom_read_bit() << 4);
+			r = input_port_read(space->machine, portnames[offset]);
 			break;
 
 		case 5:	/* Parallel data port */
@@ -319,8 +303,6 @@ static READ8_HANDLER( sysreg_r )
 
 static WRITE8_HANDLER( sysreg_w )
 {
-	const device_config *adc0838 = devtag_get_device(space->machine, "adc0838");
-
 	switch (offset)
 	{
 		case 0:	/* LED Register 0 */
@@ -369,9 +351,7 @@ static WRITE8_HANDLER( sysreg_w )
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
 				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
-			adc083x_cs_write(adc0838, 0, (data >> 2) & 1);
-			adc083x_di_write(adc0838, 0, (data >> 1) & 1);
-			adc083x_clk_write(adc0838, 0, (data >> 0) & 1);
+			input_port_write(space->machine, "OUT4", data, 0xff);
 			mame_printf_debug("System register 1 = %02X\n", data);
 			break;
 
@@ -541,7 +521,7 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 
-static INPUT_PORTS_START( midnrun )
+static INPUT_PORTS_START( zr107 )
 	PORT_START("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )		// View switch
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )		// Shift up
@@ -555,7 +535,22 @@ static INPUT_PORTS_START( midnrun )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(adcdo_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("adc0838", adc083x_do_read)
+
+	PORT_START("IN4")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* PARAACK */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("adc0838",adc083x_sars_read)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+
+	PORT_START("OUT4")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("adc0838", adc083x_cs_write)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("adc0838", adc083x_di_write)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("adc0838", adc083x_clk_write)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( midnrun )
+	PORT_INCLUDE( zr107 )
 
 	PORT_START("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
@@ -586,20 +581,7 @@ static INPUT_PORTS_START( midnrun )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( windheat )
-	PORT_START("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )		// View switch
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )		// Shift up
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )		// Shift down
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_TOGGLE		// AT/MT switch
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x0b, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(adcdo_r, NULL)
+	PORT_INCLUDE( zr107 )
 
 	PORT_START("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
@@ -619,7 +601,7 @@ static INPUT_PORTS_START( windheat )
 	PORT_DIPSETTING( 0x00, "Twin" )
 
 	PORT_START("ANALOG1")		// Steering wheel
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START("ANALOG2")		// Acceleration pedal
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
@@ -630,20 +612,7 @@ static INPUT_PORTS_START( windheat )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jetwave )
-	PORT_START("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x0b, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(adcdo_r, NULL)
+	PORT_INCLUDE( zr107 )
 
 	PORT_START("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
@@ -705,7 +674,7 @@ static double adc0838_callback( const device_config *device, UINT8 input )
 }
 
 
-static const adc0831_interface zr107_adc_interface = {
+static const adc083x_interface zr107_adc_interface = {
 	adc0838_callback
 };
 

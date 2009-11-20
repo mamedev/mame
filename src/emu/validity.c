@@ -1586,6 +1586,13 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->read_porttag);
 					error = TRUE;
 				}
+
+				/* make sure ports exist */
+				if (entry->write_porttag != NULL && input_port_by_tag(portlist, entry->write_porttag) == NULL)
+				{
+					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->write_porttag);
+					error = TRUE;
+				}
 			}
 
 			/* release the address map */

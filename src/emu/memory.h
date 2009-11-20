@@ -72,6 +72,7 @@ enum
 	ADDRMAP_TOKEN_DEVICE_READ,
 	ADDRMAP_TOKEN_DEVICE_WRITE,
 	ADDRMAP_TOKEN_READ_PORT,
+	ADDRMAP_TOKEN_WRITE_PORT,
 	ADDRMAP_TOKEN_REGION,
 	ADDRMAP_TOKEN_SHARE,
 	ADDRMAP_TOKEN_BASEPTR,
@@ -225,6 +226,7 @@ struct _address_map_entry
 	const char *			read_name;			/* read handler callback name */
 	const char *			read_devtag;		/* read tag for the relevant device */
 	const char *			read_porttag;		/* tag for input port reading */
+	const char *			write_porttag;		/* tag for output port writing */
 	write_handler 			write;				/* write handler callback */
 	UINT8					write_bits;			/* bits for the write handler callback (0=default, 1=8, 2=16, 3=32) */
 	UINT8					write_mask;			/* mask bits indicating which subunits to process */
@@ -736,6 +738,10 @@ union _addrmap64_token
 
 #define AM_READ_PORT(_tag) \
 	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ_PORT, 8, 0, 8, 0, 8), \
+	TOKEN_STRING(_tag),
+
+#define AM_WRITE_PORT(_tag) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE_PORT, 8, 0, 8, 0, 8), \
 	TOKEN_STRING(_tag),
 
 #define AM_REGION(_tag, _offs) \
