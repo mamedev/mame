@@ -78,9 +78,7 @@ static WRITE8_HANDLER( prog_w )
 	// Bankswitch Program Memory
 	if (prog == 0x01)
 	{
-		active_bank++;
-		if (active_bank == 2)
-			active_bank = 0;
+		active_bank = active_bank ^ 0x01;
 
 		memory_set_bank(space->machine, 1, active_bank);
 	}
@@ -99,15 +97,12 @@ static WRITE8_HANDLER( drw80pkr_io_w )
 	{
 		n_offs = ((p1 & 0xc0) << 2 ) + offset;
 
-		color_ram[n_offs] = data & 0x0f;
-
 		if (p2 == 0x3f)
 		{
-			video_ram[n_offs] = data;
-			tilemap_mark_tile_dirty(bg_tilemap, n_offs);
+			video_ram[n_offs] = data; // low address
 		} else {
-			if ((data & 0xf0) != 0x00)
-				video_ram[n_offs] += ((data & 0xf0) << 4 );
+			color_ram[n_offs] = data & 0x0f; // color palette
+			video_ram[n_offs] += ((data & 0xf0) << 4 ); // high address
 		}
 
 		tilemap_mark_tile_dirty(bg_tilemap, n_offs);
@@ -223,7 +218,7 @@ static READ8_HANDLER( drw80pkr_io_r )
 			// play slightly with very messed up hold buttons etc.
 			//
 			// Open/Close the door with 'O'
-			// Press '5' with door open to play credit
+			// Press '5' (twice) with door open to play credit
 			// Press '1' to draw/deal
 			//
 			case 0x0000: ret = 0x00; break;
