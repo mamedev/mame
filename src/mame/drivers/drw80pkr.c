@@ -29,17 +29,41 @@
 #include "sound/ay8910.h"
 #include "cpu/mcs48/mcs48.h"
 
-#define CPU_CLOCK XTAL_7_8643MHz
+#define CPU_CLOCK			XTAL_8MHz
+#define DATA_NVRAM_SIZE     0x100
 
 static tilemap *bg_tilemap;
 
 static UINT8 t0, t1, p0, p1, p2, prog, bus;
-
+static UINT8 attract_mode = 0;
 static UINT8 active_bank = 0;
 
 static UINT8 pkr_io_ram[0x100];
 static UINT16 video_ram[0x0400];
 static UINT8 color_ram[0x0400];
+
+/********************
+*   NVRAM Handler   *
+********************/
+
+static NVRAM_HANDLER( drw80pkr )
+{
+	if (read_or_write)
+	{
+		mame_fwrite(file, pkr_io_ram, DATA_NVRAM_SIZE);
+	}
+	else
+	{
+		if (file)
+		{
+			mame_fread(file, pkr_io_ram, DATA_NVRAM_SIZE);
+		}
+		else
+		{
+			memset(pkr_io_ram, 0, DATA_NVRAM_SIZE);
+		}
+	}
+}
 
 
 /*****************
@@ -108,41 +132,58 @@ static WRITE8_HANDLER( drw80pkr_io_w )
 		tilemap_mark_tile_dirty(bg_tilemap, n_offs);
 	}
 
-	// ay8910 control port
-	if (p1 == 0xfc && p2 == 0xff && offset == 0x00)
-		ay8910_address_w(devtag_get_device(space->machine, "aysnd"), 0, data);
+	if (p2 == 0xc7)
+	{
+		// CRTC Register
+		// R0 = 0x1f(31)    Horizontal Total
+		// R1 = 0x18(24)    Horizontal Displayed
+		// R2 = 0x1a(26)    Horizontal Sync Position
+		// R3 = 0x34(52)    HSYNC/VSYNC Widths
+		// R4 = 0x1f(31)    Vertical Total
+		// R5 = 0x01(01)    Vertical Total Adjust
+		// R6 = 0x1b(27)    Vertical Displayed
+		// R7 = 0x1c(28)    Vertical Sync Position
+		// R8 = 0x10        Mode Control
+		//                  Non-interlace
+		//                  Straight Binary - Ram Addressing
+		//                  Shared Memory - Ram Access
+		//                  Delay Display Enable one character time
+		//                  No Delay Cursor Skew
+		// R9 = 0x07(07)    Scan Line
+		// R10 = 0x00       Cursor Start
+		// R11 = 0x00       Cursor End
+		// R12 = 0x00       Display Start Address (High)
+		// R13 = 0x00       Display Start Address (Low)
+	}
 
-	// ay8910_write_port_0_w
-	if (p1 == 0xfe && p2 == 0xff && offset == 0x00)
-		ay8910_data_w(devtag_get_device(space->machine, "aysnd"), 0, data);
-
-	// CRTC Register
-	// R0 = 0x1f(31)    Horizontal Total
-	// R1 = 0x18(24)    Horizontal Displayed
-	// R2 = 0x1a(26)    Horizontal Sync Position
-	// R3 = 0x34(52)    HSYNC/VSYNC Widths
-	// R4 = 0x1f(31)    Vertical Total
-	// R5 = 0x01(01)    Vertical Total Adjust
-	// R6 = 0x1b(27)    Vertical Displayed
-	// R7 = 0x1c(28)    Vertical Sync Position
-	// R8 = 0x10        Mode Control
-	//                  Non-interlace
-	//                  Straight Binary - Ram Addressing
-	//                  Shared Memory - Ram Access
-	//                  Delay Display Enable one character time
-	//                  No Delay Cursor Skew
-	// R9 = 0x07(07)    Scan Line
-	// R10 = 0x00       Cursor Start
-	// R11 = 0x00       Cursor End
-	// R12 = 0x00       Display Start Address (High)
-	// R13 = 0x00       Display Start Address (Low)
-    //if (p1 == 0xff && p2 == 0xc7)
-
-	// CRTC Address
-    //if (p1 == 0xff && p2 == 0xd7)
+	if (p2 == 0xd7)
+	{
+		// CRTC Address
+	}
 
 	if (p2 == 0xfb) {
 		pkr_io_ram[offset] = data;
+	}
+
+	if (p2 == 0xff)
+	{
+		if (p1 == 0xdf)
+		{
+			attract_mode = data; // Latch this for use in input reads (0x01 = attract mode, 0x00 = game in progress)
+		}
+
+		if (p1 == 0xdb || p1 == 0xef || p1 == 0xf7 || p1 == 0xfb)
+		{
+			// unknown, most likely lamps, meters, hopper etc.
+		}
+
+		// ay8910 control port
+		if (p1 == 0xfc)
+			ay8910_address_w(devtag_get_device(space->machine, "aysnd"), 0, data);
+
+		// ay8910_write_port_0_w
+		if (p1 == 0xfe)
+			ay8910_data_w(devtag_get_device(space->machine, "aysnd"), 0, data);
 	}
 }
 
@@ -196,7 +237,7 @@ static READ8_HANDLER( drw80pkr_io_r )
 	{
 		ret = pkr_io_ram[offset];
 	}
-
+	
 	if (p2 == 0xf7)
 	{
 		// unknown
@@ -209,33 +250,55 @@ static READ8_HANDLER( drw80pkr_io_r )
 
 	if (p2 == 0xff)
 	{
-		// TODO: Get Input Port Values
-		kbdin = ((input_port_read(space->machine, "IN1") & 0xaf ) << 8) + input_port_read(space->machine, "IN0");
-
-		switch (kbdin)
+		if (p1 == 0x5f || p1 == 0x9f || p1 == 0xdb)
 		{
-			// The following is very incorrect, but does allow you to
-			// play slightly with very messed up hold buttons etc.
+			// unknown
+		}
+
+		if (p1 == 0xfe)
+		{
+			// Dip switches tied to sound chip
 			//
-			// Open/Close the door with 'O'
-			// Press '5' (twice) with door open to play credit
-			// Press '1' to draw/deal
+			// TODO: Unknown switch positions, but found the following flipping bits:
+			//		SW.? = Double Up Option
+			//		SW.? = Coin Denomination
+			//		SW.4 = Payout Type (0=cash, 1=credit)
+			//		SW.? = Use Joker in Deck
 			//
-			case 0x0000: ret = 0x00; break;
-			case 0x0001: ret = 0x01; break;	/* Door */
-			case 0x4000: ret = 0x00; break;
-			case 0x8000: ret = 0x00; break;	/* Hand Pay */
-			case 0x0002: ret = 0x00; break;	/* Books */
-			case 0x0004: ret = 0x0e; break;	/* Coin In */
-			case 0x0008: ret = 0x0d; break;	/* Start */
-			case 0x0010: ret = 0x00; break;	/* Discard */
-			case 0x0020: ret = 0x00; break;	/* Cancel */
-			case 0x0040: ret = 0x01; break;	/* Hold 1 */
-			case 0x0080: ret = 0x02; break;	/* Hold 2 */
-			case 0x0100: ret = 0x03; break;	/* Hold 3 */
-			case 0x0200: ret = 0x04; break;	/* Hold 4 */
-			case 0x0400: ret = 0x05; break;	/* Hold 5 */
-			case 0x0800: ret = 0x00; break;	/* Bet */
+			ret = 0x77; // double-up with credit payout
+		}
+
+		if ((attract_mode == 0x01 && p1 == 0xef) || p1 == 0xf7)
+		{
+
+			// TODO: Get Input Port Values
+			kbdin = ((input_port_read(space->machine, "IN1") & 0xaf ) << 8) + input_port_read(space->machine, "IN0");
+
+			switch (kbdin)
+			{
+				// The following is very incorrect, but does allow you to 
+				// play slightly with very messed up hold buttons etc.
+				//
+				// Open/Close the door with 'O'
+				// Press '5' (twice) with door open to play credit
+				// Press '1' to draw/deal
+				//
+				case 0x0000: ret = 0x00; break;
+				case 0x0001: ret = 0x01; break;	/* Door */
+				case 0x4000: ret = 0x00; break;
+				case 0x8000: ret = 0x00; break;	/* Hand Pay */
+				case 0x0002: ret = 0x00; break;	/* Books */
+				case 0x0004: ret = 0x0e; break;	/* Coin In */
+				case 0x0008: ret = 0x0d; break;	/* Start */
+				case 0x0010: ret = 0x00; break;	/* Discard */
+				case 0x0020: ret = 0x00; break;	/* Cancel */
+				case 0x0040: ret = 0x01; break;	/* Hold 1 */
+				case 0x0080: ret = 0x02; break;	/* Hold 2 */
+				case 0x0100: ret = 0x03; break;	/* Hold 3 */
+				case 0x0200: ret = 0x04; break;	/* Hold 4 */
+				case 0x0400: ret = 0x05; break;	/* Hold 5 */
+				case 0x0800: ret = 0x00; break;	/* Bet */
+			}
 		}
 	}
 
@@ -403,6 +466,7 @@ static MACHINE_DRIVER_START( drw80pkr )
 	MDRV_PALETTE_INIT(drw80pkr)
 	MDRV_VIDEO_START(drw80pkr)
 	MDRV_VIDEO_UPDATE(drw80pkr)
+	MDRV_NVRAM_HANDLER(drw80pkr)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
