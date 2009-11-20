@@ -55,9 +55,19 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "cpu/z80/z80.h"
 
 
-static UINT8 *beaminv_videoram;
-static size_t beaminv_videoram_size;
-static UINT8 controller_select;
+typedef struct _beaminv_state beaminv_state;
+struct _beaminv_state
+{
+	/* memory pointers */
+	UINT8 *    videoram;
+	size_t     videoram_size;
+
+	/* misc */
+	emu_timer  *interrupt_timer;
+
+	/* input-related */
+	UINT8      controller_select;
+};
 
 
 
@@ -73,11 +83,10 @@ static UINT8 controller_select;
 
 static const int interrupt_lines[INTERRUPTS_PER_FRAME] = { 0x00, 0x80 };
 
-static emu_timer *interrupt_timer;
-
 
 static TIMER_CALLBACK( interrupt_callback )
 {
+	beaminv_state *state = (beaminv_state *)machine->driver_data;
 	int interrupt_number = param;
 	int next_interrupt_number;
 	int next_vpos;
@@ -88,20 +97,22 @@ static TIMER_CALLBACK( interrupt_callback )
 	next_interrupt_number = (interrupt_number + 1) % INTERRUPTS_PER_FRAME;
 	next_vpos = interrupt_lines[next_interrupt_number];
 
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), next_interrupt_number);
+	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), next_interrupt_number);
 }
 
 
-static void create_interrupt_timer(running_machine *machine)
+static void create_interrupt_timer( running_machine *machine )
 {
-	interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
+	beaminv_state *state = (beaminv_state *)machine->driver_data;
+	state->interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
 }
 
 
-static void start_interrupt_timer(running_machine *machine)
+static void start_interrupt_timer( running_machine *machine )
 {
+	beaminv_state *state = (beaminv_state *)machine->driver_data;
 	int vpos = interrupt_lines[0];
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
+	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
 }
 
 
@@ -114,10 +125,11 @@ static void start_interrupt_timer(running_machine *machine)
 
 static MACHINE_START( beaminv )
 {
+	beaminv_state *state = (beaminv_state *)machine->driver_data;
 	create_interrupt_timer(machine);
 
 	/* setup for save states */
-	state_save_register_global(machine, controller_select);
+	state_save_register_global(machine, state->controller_select);
 }
 
 
@@ -130,7 +142,10 @@ static MACHINE_START( beaminv )
 
 static MACHINE_RESET( beaminv )
 {
+	beaminv_state *state = (beaminv_state *)machine->driver_data;
 	start_interrupt_timer(machine);
+
+	state->controller_select = 0;
 }
 
 
@@ -143,15 +158,16 @@ static MACHINE_RESET( beaminv )
 
 static VIDEO_UPDATE( beaminv )
 {
+	beaminv_state *state = (beaminv_state *)screen->machine->driver_data;
 	offs_t offs;
 
-	for (offs = 0; offs < beaminv_videoram_size; offs++)
+	for (offs = 0; offs < state->videoram_size; offs++)
 	{
 		int i;
 
 		UINT8 y = offs;
 		UINT8 x = offs >> 8 << 3;
-		UINT8 data = beaminv_videoram[offs];
+		UINT8 data = state->videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -186,14 +202,16 @@ static READ8_HANDLER( v128_r )
 
 static WRITE8_HANDLER( controller_select_w )
 {
+	beaminv_state *state = (beaminv_state *)space->machine->driver_data;
 	/* 0x01 (player 1) or 0x02 (player 2) */
-	controller_select = data;
+	state->controller_select = data;
 }
 
 
 static READ8_HANDLER( controller_r )
 {
-	return input_port_read(space->machine, (controller_select == 1) ? P1_CONTROL_PORT_TAG : P2_CONTROL_PORT_TAG);
+	beaminv_state *state = (beaminv_state *)space->machine->driver_data;
+	return input_port_read(space->machine, (state->controller_select == 1) ? P1_CONTROL_PORT_TAG : P2_CONTROL_PORT_TAG);
 }
 
 
@@ -211,7 +229,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_READ(controller_r)
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_READ(v128_r)
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&beaminv_videoram) AM_SIZE(&beaminv_videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(beaminv_state, videoram) AM_SIZE_MEMBER(beaminv_state, videoram_size)
 ADDRESS_MAP_END
 
 
@@ -303,6 +321,9 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( beaminv )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(beaminv_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)	/* 2 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -359,5 +380,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, beaminv,  0,       beaminv, beaminv,  0, ROT270, "Tekunon Kougyou", "Beam Invader (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE)
-GAME( 1979, beaminva, beaminv, beaminv, beaminva, 0, ROT270, "Tekunon Kougyou", "Beam Invader (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE) // what's the real title ?
+GAME( 1979, beaminv,  0,       beaminv, beaminv,  0, ROT270, "Tekunon Kougyou", "Beam Invader (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, beaminva, beaminv, beaminv, beaminva, 0, ROT270, "Tekunon Kougyou", "Beam Invader (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // what's the real title ?
