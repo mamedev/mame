@@ -4472,7 +4472,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( hmgeo )		/* 2001.09 Heavy Metal Geo Matrix */
 						/* 2001.10 Inu no Osanpo */
 	DRIVER( derbyoc2 )	/* 2001.10 Derby Owners Club 2 */
-	DRIVER( vtennis2 )  /* 2001.10 Power Smash 2 / Virtua Tennis 2 */
+	DRIVER( vtennis2 )	/* 2001.10 Power Smash 2 / Virtua Tennis 2 */
 	DRIVER( vtenis2c )	/* Power Smash 2 / Virtua Tennis 2 (cartridge) */
 						/* 2001.11 Shakatto Tambourine Cho Powerup Chu */
 	DRIVER( keyboard )	/* 2001.11 La Keyboardxyu */
@@ -4512,11 +4512,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( undefeat )	/* 2005.10 Under Defeat */
 						/* 2005.12 Radirgy (Rev. A) */
 	DRIVER( kurucham )	/* 2006.03 Kurukuru Chameleon */
-						/* 2006.05 Trigger Heart Exelica */
+	DRIVER( trgheart )	/* 2006.05 Trigger Heart Exelica */
 						/* 2006.07 Touch de Zunou */
 						/* 2006.08 Senkou no Rondo SP */
-						/* 2006.09 Jingi Storm */
-						/* 2006.11 Karous */
+	DRIVER( jingystm )	/* 2006.09 Jingi Storm */
+	DRIVER( karous )	/* 2006.11 Karous */
 						/* 2006.12 Guilty Gear XX Accent Core */
 						/* 2006.12 Melty Blood Act Cadenza ver.B */
 						/* 2006.12.16 Noukone Puzzle Takoron */

@@ -5408,12 +5408,12 @@ GAME( 2005, ggxxsla,   naomigd,  naomigd,  naomi,    ggxxsla, ROT0,   "Arc Syste
 GAME( 2006, kurucham,  naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Able",                   "Kurukuru Chameleon (GDL-0034)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, undefeat,  naomigd,  naomigd,  naomi,    naomi,   ROT270, "G-Rev",                  "Under Defeat (GDL-0035)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GDL-0036 Trigger Heart Exelica
-//GAME( 2005, trgheart,  naomigd,  naomigd,  naomi,    naomi,   ROT270, "Warashi",                "Trigger Heart Exelica (Rev A) (GDL-0036A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-//GAME( 2005, jingystm,  naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Atrativa Japan",         "Jingi Storm - The Arcade (GDL-0037)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2005, trgheart,  naomigd,  naomigd,  naomi,    naomi,   ROT270, "Warashi",                "Trigger Heart Exelica (Rev A) (GDL-0036A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2005, jingystm,  naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Atrativa Japan",         "Jingi Storm - The Arcade (GDL-0037)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GDL-0038 Senko No Ronde Special
 //GAME( 2006, meltyb,    naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Ecole Software",         "Melty Blood Act Cadenza Ver B (GDL-0039)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GAME( 2006, meltyba,   meltyb,   naomigd,  naomi,    naomi,   ROT0,   "Ecole Software",         "Melty Blood Act Cadenza Ver B (Rev A) (GDL-0039A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-//GAME( 2006, karous,    naomigd,  naomigd,  naomi,    naomi,   ROT270, "Milestone",              "Karous (GDL-0040)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2006, karous,    naomigd,  naomigd,  naomi,    naomi,   ROT270, "Milestone",              "Karous (GDL-0040)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GDL-0041 Guilty Gear XX Accent Core
 //GAME( 2006, takoron,   naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Compile",                "Noukone Puzzle Takoron (GDL-0042)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
