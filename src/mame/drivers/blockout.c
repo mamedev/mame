@@ -1,11 +1,66 @@
 /***************************************************************************
 
-Block Out
+    Block Out
 
-driver by Nicola Salmoria
+    driver by Nicola Salmoria
 
-DIP locations verified for:
-- blockout (manual)
+    DIP locations verified for:
+    - blockout (manual)
+
+****************************************************************************
+
+   Agress PCB Info
+   Palco System Corp., 1991
+
+   This game runs on an original unmodified Technos 'Block Out' PCB.
+   All of the Technos identifications are hidden under 'Palco' or 'Agress' stickers.
+
+   PCB Layout (Applies to both Agress and Block Out)
+   ----------
+
+   PS-05307 (sticker)
+   TA-0029-P1-02 (printed on Block Out PCB under the sticker)
+
+   |--------------------------------------------------------|
+   | M51516            YM2151                    3.579545MHz|
+   |           YM3012     6116                              |
+   |   MB3615  1.056MHz   PALCO3.73            20MHz        |
+   |           M6295                                        |
+   |   MB3615                            82S129PR.25  28MHz |
+   |           PALCO4.78                                    |
+   |                      Z80            |-------|          |
+   |                                     |TECHNOS|          |
+   |J         2018     6264              |TJ-001 |          |
+   |A                                    |(QFP80)|          |
+   |M         2018                       |-------|          |
+   |M                                                       |
+   |A                  6264                                 |
+   |                               MB81461-12               |
+   |                               MB81461-12               |
+   |                               MB81461-12               |
+   |                               MB81461-12               |
+   |                               MB81461-12               |
+   |  DSW1(8)                      MB81461-12               |
+   |                               MB81461-12               |
+   |  DSW2(8)                      MB81461-12               |
+   |         PALCO2.91                                      |
+   |                 PALCO1.81               68000          |
+   |--------------------------------------------------------|
+
+   Notes:
+      68000 clock : 10.000MHz
+      Z80 clock   : 3.579545MHz
+      M6295 clock : 1.056MHz, sample rate = 1056000 / 132
+      YM2151 clock: 3.579545MHz
+      VSync       : 58Hz
+
+      PROM is used for video timing etc, without it, no graphics are displayed,
+      only 'Insert Coin' and the manufacturer text/year on the title screen.
+
+      palco1.81 \ Main program   27C010
+      palco2.91 /                  "
+      palco3.73   OKI samples    27C256
+      palco4.78   Z80 program    27C010
 
 ***************************************************************************/
 
@@ -15,16 +70,7 @@ DIP locations verified for:
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-
-
-extern UINT16 *blockout_videoram;
-extern UINT16 *blockout_frontvideoram;
-
-WRITE16_HANDLER( blockout_videoram_w );
-WRITE16_HANDLER( blockout_paletteram_w );
-WRITE16_HANDLER( blockout_frontcolor_w );
-VIDEO_START( blockout );
-VIDEO_UPDATE( blockout );
+#include "blockout.h"
 
 
 static INTERRUPT_GEN( blockout_interrupt )
@@ -45,6 +91,12 @@ static WRITE16_HANDLER( blockout_sound_command_w )
 }
 
 
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
+
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P1")
@@ -54,13 +106,13 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x100014, 0x100015) AM_WRITE(blockout_sound_command_w)
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP	/* don't know, maybe reset sound CPU */
-	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_BASE(&blockout_videoram)
+	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_BASE_MEMBER(blockout_state, videoram)
 	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x1f4000, 0x1fffff) AM_RAM	/* work RAM */
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE(&blockout_frontvideoram)
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_MEMBER(blockout_state, frontvideoram)
 	AM_RANGE(0x208000, 0x21ffff) AM_RAM	/* ??? */
 	AM_RANGE(0x280002, 0x280003) AM_WRITE(blockout_frontcolor_w)
-	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_BASE_MEMBER(blockout_state, paletteram16)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -71,6 +123,12 @@ static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( blockout )
 	PORT_START("P1")
@@ -167,6 +225,13 @@ static INPUT_PORTS_START( agress )
 	PORT_DIPSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
+
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
+
 /* handler called by the 2151 emulator when the internal timers cause an IRQ */
 static void blockout_irq_handler(const device_config *device, int irq)
 {
@@ -179,7 +244,23 @@ static const ym2151_interface ym2151_config =
 };
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_RESET( blockout )
+{
+	blockout_state *state = (blockout_state *)machine->driver_data;
+
+	state->color = 0;
+}
+
 static MACHINE_DRIVER_START( blockout )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(blockout_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
@@ -188,6 +269,8 @@ static MACHINE_DRIVER_START( blockout )
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map)
+
+	MDRV_MACHINE_RESET(blockout)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -218,11 +301,11 @@ MACHINE_DRIVER_END
 
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( blockout )
 	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
@@ -269,61 +352,6 @@ ROM_START( blockoutj )
 	ROM_LOAD( "mb7114h.25",   0x0000, 0x0100, CRC(b25bbda7) SHA1(840f1470886bd0019db3cd29e3d1d80205a65f48) )	/* unknown */
 ROM_END
 
-/*
-
-Agress
-Palco System Corp., 1991
-
-This game runs on an original unmodified Technos 'Block Out' PCB.
-All of the Technos identifications are hidden under 'Palco' or 'Agress' stickers.
-
-PCB Layout (Applies to both Agress and Block Out)
-----------
-
-PS-05307 (sticker)
-TA-0029-P1-02 (printed on Block Out PCB under the sticker)
-|--------------------------------------------------------|
-| M51516            YM2151                    3.579545MHz|
-|           YM3012     6116                              |
-|   MB3615  1.056MHz   PALCO3.73            20MHz        |
-|           M6295                                        |
-|   MB3615                            82S129PR.25  28MHz |
-|           PALCO4.78                                    |
-|                      Z80            |-------|          |
-|                                     |TECHNOS|          |
-|J         2018     6264              |TJ-001 |          |
-|A                                    |(QFP80)|          |
-|M         2018                       |-------|          |
-|M                                                       |
-|A                  6264                                 |
-|                               MB81461-12               |
-|                               MB81461-12               |
-|                               MB81461-12               |
-|                               MB81461-12               |
-|                               MB81461-12               |
-|  DSW1(8)                      MB81461-12               |
-|                               MB81461-12               |
-|  DSW2(8)                      MB81461-12               |
-|         PALCO2.91                                      |
-|                 PALCO1.81               68000          |
-|--------------------------------------------------------|
-Notes:
-      68000 clock : 10.000MHz
-      Z80 clock   : 3.579545MHz
-      M6295 clock : 1.056MHz, sample rate = 1056000 / 132
-      YM2151 clock: 3.579545MHz
-      VSync       : 58Hz
-
-      PROM is used for video timing etc, without it, no graphics are displayed,
-      only 'Insert Coin' and the manufacturer text/year on the title screen.
-
-      palco1.81 \ Main program   27C010
-      palco2.91 /                  "
-      palco3.73   OKI samples    27C256
-      palco4.78   Z80 program    27C010
-
-*/
-
 ROM_START( agress )
 	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "palco1.81",         0x00000, 0x20000, CRC(3acc917a) SHA1(14960588673458d862daf14a8d7474af6c95c2ad) )
@@ -356,8 +384,14 @@ ROM_START( agressb )
 ROM_END
 
 
-GAME( 1989, blockout, 0,        blockout, blockout, 0, ROT0, "Technos Japan + California Dreams", "Block Out (set 1)", 0 )
-GAME( 1989, blockout2,blockout, blockout, blockout, 0, ROT0, "Technos Japan + California Dreams", "Block Out (set 2)", 0 )
-GAME( 1989, blockoutj,blockout, blockout, blckoutj, 0, ROT0, "Technos Japan + California Dreams", "Block Out (Japan)", 0 )
-GAME( 1991, agress,   0,        blockout, agress,   0, ROT0, "Palco", "Agress", 0 )
-GAME( 2003, agressb,  agress,   blockout, agress,   0, ROT0, "Palco", "Agress (English bootleg)", 0 )
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1989, blockout, 0,        blockout, blockout, 0, ROT0, "Technos Japan + California Dreams", "Block Out (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, blockout2,blockout, blockout, blockout, 0, ROT0, "Technos Japan + California Dreams", "Block Out (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, blockoutj,blockout, blockout, blckoutj, 0, ROT0, "Technos Japan + California Dreams", "Block Out (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, agress,   0,        blockout, agress,   0, ROT0, "Palco", "Agress", GAME_SUPPORTS_SAVE )
+GAME( 2003, agressb,  agress,   blockout, agress,   0, ROT0, "Palco", "Agress (English bootleg)", GAME_SUPPORTS_SAVE )

@@ -2338,6 +2338,7 @@ src/mame/includes/bionicc.h svneol=native#text/plain
 src/mame/includes/blktiger.h svneol=native#text/plain
 src/mame/includes/blmbycar.h svneol=native#text/plain
 src/mame/includes/blockade.h svneol=native#text/plain
+src/mame/includes/blockout.h svneol=native#text/plain
 src/mame/includes/blstroid.h svneol=native#text/plain
 src/mame/includes/blueprnt.h svneol=native#text/plain
 src/mame/includes/bogeyman.h svneol=native#text/plain

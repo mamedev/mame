@@ -1,16 +1,17 @@
+/***************************************************************************
+
+    Block Out
+
+***************************************************************************/
+
 #include "driver.h"
+#include "blockout.h"
 
 
-
-UINT16 *blockout_videoram;
-UINT16 *blockout_frontvideoram;
-
-
-
-static void setcolor(running_machine *machine,int color,int rgb)
+static void setcolor( running_machine *machine, int color, int rgb )
 {
-	int bit0,bit1,bit2,bit3;
-	int r,g,b;
+	int bit0, bit1, bit2, bit3;
+	int r, g, b;
 
 
 	/* red component */
@@ -34,21 +35,23 @@ static void setcolor(running_machine *machine,int color,int rgb)
 	bit3 = (rgb >> 11) & 0x01;
 	b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	palette_set_color(machine,color,MAKE_RGB(r,g,b));
+	palette_set_color(machine, color, MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( blockout_paletteram_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
-	setcolor(space->machine,offset,paletteram16[offset]);
+	blockout_state *state = (blockout_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->paletteram16[offset]);
+	setcolor(space->machine, offset, state->paletteram16[offset]);
 }
 
 WRITE16_HANDLER( blockout_frontcolor_w )
 {
-	static UINT16 color;
+	blockout_state *state = (blockout_state *)space->machine->driver_data;
 
-	COMBINE_DATA(&color);
-	setcolor(space->machine,512,color);
+	COMBINE_DATA(&state->color);
+	setcolor(space->machine, 512, state->color);
 }
 
 
@@ -60,72 +63,82 @@ WRITE16_HANDLER( blockout_frontcolor_w )
 ***************************************************************************/
 VIDEO_START( blockout )
 {
+	blockout_state *state = (blockout_state *)machine->driver_data;
+
 	/* Allocate temporary bitmaps */
-	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state_save_register_global_bitmap(machine, state->tmpbitmap);
+
+	state_save_register_global(machine, state->color);
 }
 
-
-
-static void update_pixels(const device_config *screen, int x, int y)
+static void update_pixels( running_machine *machine, int x, int y )
 {
-	UINT16 front,back;
+	blockout_state *state = (blockout_state *)machine->driver_data;
+	UINT16 front, back;
 	int color;
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	if (x < visarea->min_x || x > visarea->max_x || y < visarea->min_y || y > visarea->max_y)
 		return;
 
-	front = blockout_videoram[y*256+x/2];
-	back = blockout_videoram[0x10000 + y*256+x/2];
+	front = state->videoram[y * 256 + x / 2];
+	back = state->videoram[0x10000 + y * 256 + x / 2];
 
-	if (front>>8) color = front>>8;
-	else color = (back>>8) + 256;
-	*BITMAP_ADDR16(tmpbitmap, y, x) = color;
+	if (front >> 8) 
+		color = front >> 8;
+	else 
+		color = (back >> 8) + 256;
 
-	if (front&0xff) color = front&0xff;
-	else color = (back&0xff) + 256;
-	*BITMAP_ADDR16(tmpbitmap, y, x+1) = color;
+	*BITMAP_ADDR16(state->tmpbitmap, y, x) = color;
+
+	if (front & 0xff) 
+		color = front & 0xff;
+	else 
+		color = (back & 0xff) + 256;
+
+	*BITMAP_ADDR16(state->tmpbitmap, y, x + 1) = color;
 }
 
 
 
 WRITE16_HANDLER( blockout_videoram_w )
 {
-	COMBINE_DATA(&blockout_videoram[offset]);
+	blockout_state *state = (blockout_state *)space->machine->driver_data;
 
-	update_pixels(space->machine->primary_screen, (offset % 256)*2, (offset / 256) % 256);
+	COMBINE_DATA(&state->videoram[offset]);
+	update_pixels(space->machine, (offset % 256) * 2, (offset / 256) % 256);
 }
 
 
 
 VIDEO_UPDATE( blockout )
 {
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect);
+	blockout_state *state = (blockout_state *)screen->machine->driver_data;
+	int x, y;
+	pen_t color = 512;
 
+	copybitmap(bitmap, state->tmpbitmap, 0, 0, 0, 0, cliprect);
+
+	for (y = 0; y < 256; y++)
 	{
-		int x,y;
-
-		pen_t color = 512;
-
-		for (y = 0;y < 256;y++)
+		for (x = 0; x < 320; x += 8)
 		{
-			for (x = 0;x < 320;x+=8)
-			{
-				int d = blockout_frontvideoram[y*64+(x/8)];
+			int d = state->frontvideoram[y * 64 + (x / 8)];
 
-				if (d)
-				{
-					if (d&0x80) *BITMAP_ADDR16(bitmap, y, x+0) = color;
-					if (d&0x40) *BITMAP_ADDR16(bitmap, y, x+1) = color;
-					if (d&0x20) *BITMAP_ADDR16(bitmap, y, x+2) = color;
-					if (d&0x10) *BITMAP_ADDR16(bitmap, y, x+3) = color;
-					if (d&0x08) *BITMAP_ADDR16(bitmap, y, x+4) = color;
-					if (d&0x04) *BITMAP_ADDR16(bitmap, y, x+5) = color;
-					if (d&0x02) *BITMAP_ADDR16(bitmap, y, x+6) = color;
-					if (d&0x01) *BITMAP_ADDR16(bitmap, y, x+7) = color;
-				}
+			if (d)
+			{
+				if (d & 0x80) *BITMAP_ADDR16(bitmap, y, x + 0) = color;
+				if (d & 0x40) *BITMAP_ADDR16(bitmap, y, x + 1) = color;
+				if (d & 0x20) *BITMAP_ADDR16(bitmap, y, x + 2) = color;
+				if (d & 0x10) *BITMAP_ADDR16(bitmap, y, x + 3) = color;
+				if (d & 0x08) *BITMAP_ADDR16(bitmap, y, x + 4) = color;
+				if (d & 0x04) *BITMAP_ADDR16(bitmap, y, x + 5) = color;
+				if (d & 0x02) *BITMAP_ADDR16(bitmap, y, x + 6) = color;
+				if (d & 0x01) *BITMAP_ADDR16(bitmap, y, x + 7) = color;
 			}
 		}
 	}
+
 	return 0;
 }
