@@ -104,6 +104,10 @@ static WRITE8_HANDLER( drw80pkr_io_w )
 		if (p2 == 0x3f)
 		{
 			video_ram[n_offs] = data;
+			tilemap_mark_tile_dirty(bg_tilemap, n_offs);
+		} else {
+			if ((data & 0xf0) != 0x00)
+				video_ram[n_offs] += ((data & 0xf0) << 4 );
 		}
 
 		tilemap_mark_tile_dirty(bg_tilemap, n_offs);
@@ -184,27 +188,23 @@ static READ8_HANDLER( bus_r )
 static READ8_HANDLER( drw80pkr_io_r )
 {
 	UINT8 ret;
-	UINT16 n_offs;
+	UINT16 kbdin;
 
 	ret = 0x00;
 
 	if (p2 == 0x3b)
 	{
-		n_offs = ((p1 & 0xc0) << 2 ) + offset;
-
-		ret = video_ram[n_offs];
+		// unknown
 	}
 
 	if (p2 == 0x7b)
 	{
-		n_offs = ((p1 & 0xc0) << 2 ) + offset;
-
-		ret = color_ram[n_offs];
+		ret = pkr_io_ram[offset];
 	}
 	
 	if (p2 == 0xf7)
 	{
-		ret = 0x00; // unknown
+		// unknown
 	}
 
 	if (p2 == 0xfb)
@@ -215,10 +215,33 @@ static READ8_HANDLER( drw80pkr_io_r )
 	if (p2 == 0xff)
 	{
 		// TODO: Get Input Port Values
-		ret = 0x00;
+		kbdin = ((input_port_read(space->machine, "IN1") & 0xaf ) << 8) + input_port_read(space->machine, "IN0");
 
-		// Set High Bit After Input (maybe door?)
-		ret += 0x80;
+		switch (kbdin)
+		{
+			// The following is very incorrect, but does allow you to 
+			// play slightly with very messed up hold buttons etc.
+			//
+			// Open/Close the door with 'O'
+			// Press '5' with door open to play credit
+			// Press '1' to draw/deal
+			//
+			case 0x0000: ret = 0x00; break;
+			case 0x0001: ret = 0x01; break;	/* Door */
+			case 0x4000: ret = 0x00; break;
+			case 0x8000: ret = 0x00; break;	/* Hand Pay */
+			case 0x0002: ret = 0x00; break;	/* Books */
+			case 0x0004: ret = 0x0e; break;	/* Coin In */
+			case 0x0008: ret = 0x0d; break;	/* Start */
+			case 0x0010: ret = 0x00; break;	/* Discard */
+			case 0x0020: ret = 0x00; break;	/* Cancel */
+			case 0x0040: ret = 0x01; break;	/* Hold 1 */
+			case 0x0080: ret = 0x02; break;	/* Hold 2 */
+			case 0x0100: ret = 0x03; break;	/* Hold 3 */
+			case 0x0200: ret = 0x04; break;	/* Hold 4 */
+			case 0x0400: ret = 0x05; break;	/* Hold 5 */
+			case 0x0800: ret = 0x00; break;	/* Bet */
+		}
 	}
 
     return ret;
@@ -337,6 +360,26 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( drw80pkr )
 	// Unknown at this time
+	// These are temporary buttons for testing only
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR ) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK ) PORT_NAME("Books")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Discard") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_CANCEL )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Hopper") PORT_TOGGLE PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 /*************************
