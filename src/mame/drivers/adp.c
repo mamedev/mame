@@ -341,7 +341,7 @@ static READ16_HANDLER( test_r )
 	switch (state->mux_data)
 	{
 		case 0x00: value = input_port_read(space->machine, "x0"); break;
-		case 0x01: value = input_port_read(space->machine, "x1snd"); break;
+		case 0x01: value = input_port_read(space->machine, "x1"); break;
 		case 0x02: value = input_port_read(space->machine, "x2"); break;
 		case 0x03: value = input_port_read(space->machine, "1P_UP"); break;
 		case 0x04: value = input_port_read(space->machine, "1P_B1"); break;
@@ -455,7 +455,7 @@ static INPUT_PORTS_START( skattv )
 	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
 
-	PORT_START("x1snd")
+	PORT_START("x1")
 	PORT_DIPNAME( 0x0004,0x0004, "SW1" ) //another up button
 	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )

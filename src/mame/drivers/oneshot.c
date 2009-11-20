@@ -439,7 +439,7 @@ ROM_START( maddonna )
 	/* no samples for this game */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x1snd", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, zooming?
+	ROM_LOAD( "x1", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, zooming?
 ROM_END
 
 ROM_START( maddonnb )
@@ -465,7 +465,7 @@ ROM_START( maddonnb )
 	/* no samples for this game */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x1snd", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, zooming?
+	ROM_LOAD( "x1", 0x00000, 0x10000, CRC(6b213183) SHA1(599c59d155d11edb151bfaed1d24ef964462a447) ) // motherboard rom, zooming?
 ROM_END
 
 

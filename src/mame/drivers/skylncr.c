@@ -527,7 +527,7 @@ static INPUT_PORTS_START( skylncr )
 	PORT_DIPSETTING(    0x00, "24" )
 	PORT_DIPNAME( 0x80, 0x00, "Key Out" )
 	PORT_DIPSETTING(    0x80, "x100" )
-	PORT_DIPSETTING(    0x00, "x1snd" )
+	PORT_DIPSETTING(    0x00, "x1" )
 
 	PORT_START("DSW2")	/* $10 (PPI1 port A) */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )

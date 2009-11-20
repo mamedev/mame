@@ -1,4 +1,4 @@
-	/***************************************************************************
+/***************************************************************************
 
     Sega Y-board hardware
 
@@ -858,10 +858,10 @@ static INPUT_PORTS_START( rchase )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x04, 0x04, "Coin #1 multiplier" ) PORT_DIPLOCATION("SWA:3")
-	PORT_DIPSETTING(    0x04, "x1snd" )
+	PORT_DIPSETTING(    0x04, "x1" )
 	PORT_DIPSETTING(    0x00, "x2" )
 	PORT_DIPNAME( 0x18, 0x18, "Coin #2 multiplier" ) PORT_DIPLOCATION("SWA:4,5")
-	PORT_DIPSETTING(    0x18, "x1snd" )
+	PORT_DIPSETTING(    0x18, "x1" )
 	PORT_DIPSETTING(    0x10, "x4" )
 	PORT_DIPSETTING(    0x08, "x5" )
 	PORT_DIPSETTING(    0x00, "x6" )
