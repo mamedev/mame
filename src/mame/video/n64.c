@@ -242,8 +242,8 @@ static TILE tile[8];
 
 static RECTANGLE clip;
 
-static UINT8 *texture_cache;
-static UINT32 tlut[256];
+static UINT8 *TMEM;
+#define tlut ((UINT16*)(TMEM + 0x800))
 
 static INT32 k0, k1, k2, k3, k4, k5;
 static UINT8 primitive_lod_frac = 0;
@@ -473,7 +473,9 @@ VIDEO_START(n64)
 	if (LOG_RDP_EXECUTION)
 		rdp_exec = fopen("rdp_execute.txt", "wt");
 
-	texture_cache = auto_alloc_array(machine, UINT8, 0x100000);
+	TMEM = auto_alloc_array(machine, UINT8, 0x1004); // 4 guard bytes
+	memset(TMEM, 0, 0x1000);
+	TMEM[0x1000] = TMEM[0x1001] = 25;
 
 	combiner_rgbsub_a_r[0] = combiner_rgbsub_a_r[1] = &one_color.r;
 	combiner_rgbsub_a_g[0] = combiner_rgbsub_a_g[1] = &one_color.g;
@@ -1126,8 +1128,8 @@ INLINE int BLENDER2_16(running_machine *machine, UINT16 *fb, UINT8* hb, COLOR c1
 	}
 
 	memory_color.r = (((mem >> 11) & 0x1f) << 3) | (((mem >> 11) & 0x1f) >> 2);
-	memory_color.g = (((mem >>  6) & 0x1f) << 3) | (((mem >> 11) & 0x1f) >> 2);
-	memory_color.b = (((mem >>  1) & 0x1f) << 3) | (((mem >> 11) & 0x1f) >> 2);
+	memory_color.g = (((mem >>  6) & 0x1f) << 3) | (((mem >>  6) & 0x1f) >> 2);
+	memory_color.b = (((mem >>  1) & 0x1f) << 3) | (((mem >>  1) & 0x1f) >> 2);
 
 	if (other_modes.image_read_en)
 	{
@@ -1320,7 +1322,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 	UINT32	tformat = tile[tilenum].format;
 	UINT32 tsize =	tile[tilenum].size;
 	UINT32 tbase =	tile[tilenum].tmem;
-	UINT32 tpal	= tile[tilenum].palette;
+	UINT32 tpal	= tile[tilenum].palette & 0xf;
 
 	if (t < 0) t = 0;
 	if (s < 0) s = 0;
@@ -1333,10 +1335,10 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 			{
 				case PIXEL_SIZE_4BIT:
 				{
-					UINT8 *tc = (UINT8*)texture_cache;
+					UINT8 *tc = (UINT8*)TMEM;
                     int taddr = ((tbase + ((t) * twidth) + ((s) / 2)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0)) & 0x7ff;
 					UINT8 p = ((s) & 1) ? (tc[taddr ^ BYTE_ADDR_XOR] & 0xf) : (tc[taddr ^ BYTE_ADDR_XOR] >> 4);
-					UINT16 c = tlut[((tpal << 4) | p) ^ WORD_ADDR_XOR];
+					UINT16 c = tlut[(((tpal << 4) | p) ^ WORD_ADDR_XOR) << 2];
 
 					if (other_modes.en_tlut)
 					{
@@ -1361,10 +1363,10 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 				}
 				case PIXEL_SIZE_8BIT:
 				{
-					UINT8 *tc = (UINT8*)texture_cache;
+					UINT8 *tc = (UINT8*)TMEM;
                     int taddr = ((tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0)) & 0x7ff;
 					UINT8 p = tc[taddr ^ BYTE_ADDR_XOR];
-					UINT16 c = tlut[p ^ WORD_ADDR_XOR];
+					UINT16 c = tlut[(p ^ WORD_ADDR_XOR) << 2];
 
 					if (other_modes.en_tlut)
 					{
@@ -1389,7 +1391,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 				}
 				case PIXEL_SIZE_16BIT:
 				{
-					UINT16 *tc = (UINT16*)texture_cache;
+					UINT16 *tc = (UINT16*)TMEM;
                     int taddr = ((tbase>>1) + ((t) * (twidth>>1)) + (s))  ^ ((t & 1) ? XOR_SWAP_WORD : 0);
 					UINT16 c = tc[(taddr & 0x7ff) ^ WORD_ADDR_XOR]; // PGA European Tour (U)
 
@@ -1420,7 +1422,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 				}
 				case PIXEL_SIZE_32BIT:
 				{
-					UINT32 *tc = (UINT32*)texture_cache;
+					UINT32 *tc = (UINT32*)TMEM;
 					int xorval = (fb_size == PIXEL_SIZE_16BIT) ? XOR_SWAP_WORD : XOR_SWAP_DWORD; // Conker's Bad Fur Day, Jet Force Gemini, Super Smash Bros., Mickey's Speedway USA, Ogre Battle, Wave Race, Gex 3, South Park Rally
                     int taddr = (((tbase >> 2) + ((t) * (twidth >> 1)) + (s)) ^ ((t & 1) ? xorval : 0)) & 0x3ff;
 					UINT32 c = tc[taddr];
@@ -1466,7 +1468,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 					INT32 newr = 0;
 					INT32 newg = 0;
 					INT32 newb = 0;
-					UINT16 *tc = (UINT16*)texture_cache;
+					UINT16 *tc = (UINT16*)TMEM;
 					int taddr = ((tbase >> 1) + ((t) * (twidth)) + (s)) ^ ((t & 1) ? XOR_SWAP_WORD : 0);
 					UINT16 c1, c2;
 					INT32 y;
@@ -1510,10 +1512,10 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 			{
 				case PIXEL_SIZE_4BIT:
 				{
-					UINT8 *tc = (UINT8*)texture_cache;
+					UINT8 *tc = (UINT8*)TMEM;
                     int taddr = ((tbase + ((t) * twidth) + ((s) / 2)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0)) & 0x7ff;
 					UINT8 p = ((s) & 1) ? (tc[taddr ^ BYTE_ADDR_XOR] & 0xf) : (tc[taddr ^ BYTE_ADDR_XOR] >> 4);
-					UINT16 c = tlut[((tpal << 4) | p) ^ WORD_ADDR_XOR];
+					UINT16 c = tlut[((tpal << 4) | p) << 2];
 
 					if (other_modes.en_tlut)
 					{
@@ -1538,10 +1540,10 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 				}
 				case PIXEL_SIZE_8BIT:
 				{
-					UINT8 *tc = (UINT8*)texture_cache;
+					UINT8 *tc = (UINT8*)TMEM;
                     int taddr = ((tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0)) & 0x7ff;
 					UINT8 p = tc[taddr ^ BYTE_ADDR_XOR];
-					UINT16 c = tlut[p ^ WORD_ADDR_XOR];
+					UINT16 c = tlut[p << 2];
 
 					if (other_modes.en_tlut)
 					{
@@ -1567,7 +1569,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 				case PIXEL_SIZE_16BIT:
 				{
                     // 16-bit CI is a "valid" mode; some games use it, it behaves the same as 16-bit RGBA
-					UINT16 *tc = (UINT16*)texture_cache;
+					UINT16 *tc = (UINT16*)TMEM;
                     int taddr = ((tbase>>1) + ((t) * (twidth>>1)) + (s))  ^ ((t & 1) ? XOR_SWAP_WORD : 0);
 					UINT16 c = tc[(taddr & 0x7ff) ^ WORD_ADDR_XOR]; // PGA European Tour (U)
 
@@ -1609,7 +1611,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 			{
 				case PIXEL_SIZE_4BIT:
 				{
-					UINT8 *tc = (UINT8*)texture_cache;
+					UINT8 *tc = (UINT8*)TMEM;
                     int taddr = (tbase + ((t) * twidth) + (s >> 1)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0);
 					UINT8 p = ((s) & 1) ? (tc[taddr ^ BYTE_ADDR_XOR] & 0xf) : (tc[taddr ^ BYTE_ADDR_XOR] >> 4);
 					UINT8 i = ((p & 0xe) << 4) | ((p & 0xe) << 1) | (p & 0xe >> 2);
@@ -1626,9 +1628,9 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 						UINT16 c = tlut[((tpal << 4) | p) << 2];
 						if (!other_modes.tlut_type)
 						{
-                    		color->r = (((c >> 11) & 0x1f) << 3) | (((c >> 11) & 0x1f) << 3);
-                    		color->g = (((c >>  6) & 0x1f) << 3) | (((c >>  6) & 0x1f) << 3);
-                    		color->b = (((c >>  1) & 0x1f) << 3) | (((c >>  1) & 0x1f) << 3);
+                    		color->r = (((c >> 11) & 0x1f) << 3) | (((c >> 11) & 0x1f) >> 2);
+                    		color->g = (((c >>  6) & 0x1f) << 3) | (((c >>  6) & 0x1f) >> 2);
+                    		color->b = (((c >>  1) & 0x1f) << 3) | (((c >>  1) & 0x1f) >> 2);
                     		color->a = (c & 1) ? 0xff : 0;
 						}
 						else
@@ -1641,7 +1643,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 				}
 				case PIXEL_SIZE_8BIT:
 				{
-					UINT8 *tc = (UINT8*)texture_cache;
+					UINT8 *tc = (UINT8*)TMEM;
                     int taddr = ((tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0)) & 0xfff;
 					UINT8 p = tc[taddr ^ BYTE_ADDR_XOR];
 					UINT8 i = 0;
@@ -1674,7 +1676,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 				}
 				case PIXEL_SIZE_16BIT:
 				{
-					UINT16 *tc = (UINT16*)texture_cache;
+					UINT16 *tc = (UINT16*)TMEM;
                     int taddr = ((tbase >> 1) + ((t) * (twidth >> 1)) + (s)) ^ ((t & 1) ? XOR_SWAP_WORD : 0);
 					UINT16 c = tc[taddr ^ WORD_ADDR_XOR];
 					UINT8 i = (c >> 8);
@@ -1719,7 +1721,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 			{
 				case PIXEL_SIZE_4BIT:
 				{
-					UINT8 *tc = (UINT8*)texture_cache;
+					UINT8 *tc = (UINT8*)TMEM;
                     int taddr = ((tbase + ((t) * twidth) + ((s) / 2)) ^ ((t & 1) ? XOR_SWAP_BYTE : 0)) & 0xfff;
 					UINT8 c = ((s) & 1) ? (tc[taddr ^ BYTE_ADDR_XOR] & 0xf) : (tc[taddr ^ BYTE_ADDR_XOR] >> 4);
 					c |= (c << 4);
@@ -1751,7 +1753,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 tilenum)
 				}
 				case PIXEL_SIZE_8BIT:
 				{
-					UINT8 *tc = (UINT8*)texture_cache;
+					UINT8 *tc = (UINT8*)TMEM;
                     int taddr = ((tbase + ((t) * twidth) + ((s))) ^ ((t & 1) ? XOR_SWAP_BYTE : 0)) & 0xfff;
 					UINT8 c = tc[taddr ^ BYTE_ADDR_XOR];
 
@@ -5133,28 +5135,46 @@ static RDP_COMMAND( rdp_load_tlut )
 	sh = tile[tilenum].sh = ((w2 >> 12) & 0xfff);
 	th = tile[tilenum].th = w2 & 0xfff;
 
-	switch (ti_format)
+	switch (ti_size)
 	{
-		case 0:		// RGBA
+		case PIXEL_SIZE_16BIT:
 		{
-			switch (ti_size)
-			{
-				case PIXEL_SIZE_16BIT:
-				{
-					UINT16 *src = (UINT16*)&rdram[(ti_address + (tl >> 2) * (ti_width << 1) + (sl >> 1)) >> 2];
+			//UINT16 *src = (UINT16*)&rdram[(ti_address + (tl >> 2) * (ti_width << 1) + (sl >> 1)) >> 2];
+			UINT16 *src = (UINT16*)rdram;
+			UINT32 srcstart = (ti_address + (tl >> 2) * (ti_width << 1) + (sl >> 1)) >> 1;
+			UINT16 *dst = (UINT16*)&TMEM[tile[tilenum].tmem];
+			int count = ((sh >> 2) - (sl >> 2)) + 1;
 
-					for (i = (sl >> 2); i <= (sh >> 2); i++)
-					{
-						tlut[i] = src[i];
-					}
-					break;
+			for (i = 0; i < count; i++)
+			{
+				if((i*4) < 0x400)
+				{
+					dst[i*4] = src[(srcstart + i) ^ WORD_ADDR_XOR];
+					dst[i*4+1] = 0;
+					dst[i*4+2] = 0;
+					dst[i*4+3] = 0;
 				}
-				default:	fatalerror("RDP: load_tlut: size = %d\n", ti_size);
+				//tlut[i] = src[i];
 			}
 			break;
 		}
+		/*
+		case PIXEL_SIZE_16BIT:
+		{
+			UINT16 *src = (UINT16*)&rdram[(ti_address + (tl >> 2) * (ti_width << 1) + (sl >> 1)) >> 2];
 
-		default:	fatalerror("RDP: load_tlut: format = %d\n", ti_format);
+			for (i = (sl >> 2); i <= (sh >> 2); i++)
+			{
+				tlut[i] = src[i];
+			}
+			break;
+		}*/
+		default:	stricterror("RDP: load_tlut: size = %d\n", ti_size);
+	}
+
+	if (TMEM[0x1000] != 25 || TMEM[0x1001] != 25)
+	{
+		stricterror("rdp_load_tlut: TMEM has been written out-of-bounds");
 	}
 }
 
@@ -5211,7 +5231,7 @@ static RDP_COMMAND( rdp_load_block )
 	}
 
 	src = (UINT32*)&ram16[ti_address2 >> 1];
-	tc = (UINT32*)texture_cache;
+	tc = (UINT32*)TMEM;
 	tb = tile[tilenum].tmem >> 2;
 
 	if ((tb + (width >> 2)) > 0x400)
@@ -5324,7 +5344,7 @@ static RDP_COMMAND( rdp_load_tile )
 		case PIXEL_SIZE_8BIT:
 		{
 			UINT8 *src = (UINT8*)rdram;
-			UINT8 *tc = (UINT8*)texture_cache;
+			UINT8 *tc = (UINT8*)TMEM;
 			int tb = tile[tilenum].tmem;
 
 			if (tb + (width * height) > 4096)
@@ -5354,7 +5374,7 @@ static RDP_COMMAND( rdp_load_tile )
 		{
 			UINT16 *src = (UINT16*)rdram;
 			UINT32 ti_addr16 = ti_address >> 1;
-			UINT16 *tc = (UINT16*)texture_cache;
+			UINT16 *tc = (UINT16*)TMEM;
 			int tb = (tile[tilenum].tmem / 2);
 			int taddr;
 
@@ -5394,7 +5414,7 @@ static RDP_COMMAND( rdp_load_tile )
 		case PIXEL_SIZE_32BIT:
 		{
 			UINT32 *src = (UINT32*)&rdram[ti_address / 4];
-			UINT32 *tc = (UINT32*)texture_cache;
+			UINT32 *tc = (UINT32*)TMEM;
 			int tb = (tile[tilenum].tmem / 4);
 			int xorval32 = ((fb_size == PIXEL_SIZE_16BIT) ? 2 : 1);
 
