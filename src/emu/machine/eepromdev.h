@@ -59,6 +59,12 @@ extern UINT8 *eeprom_empty_default_data;
 #define MDRV_EEPROM_NODEFAULT_ADD(_tag, _interface) \
 	MDRV_EEPROM_ADD(_tag, _interface, 0, eeprom_empty_default_data)
 
+#define MDRV_EEPROM_93C46_NODEFAULT_ADD(_tag) \
+	MDRV_EEPROM_93C46_ADD(_tag, 0, eeprom_empty_default_data)
+
+#define MDRV_EEPROM_93C66B_NODEFAULT_ADD(_tag) \
+	MDRV_EEPROM_93C66B_ADD(_tag, 0, eeprom_empty_default_data)
+
 void eepromdev_write_bit( const device_config *device, int bit );
 int eepromdev_read_bit( const device_config *device );
 CUSTOM_INPUT( eepromdev_bit_r );
