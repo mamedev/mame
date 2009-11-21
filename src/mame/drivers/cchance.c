@@ -41,35 +41,37 @@ static WRITE8_HANDLER( output_0_w )
 {
 
 	//---- --x- divider?
-	coin_lockout_w(0,~data & 1);
+	coin_lockout_w(0, ~data & 1);
 
-//  coin_counter_w(0,~data & 1);
+//  coin_counter_w(0, ~data & 1);
 }
 
-static UINT8 hop_io,bell_io;
 
 static READ8_HANDLER( input_1_r )
 {
-	return (hop_io) | (bell_io) | (input_port_read(space->machine,"SP") & 0xff);
+	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+	return (state->hop_io) | (state->bell_io) | (input_port_read(space->machine, "SP") & 0xff);
 }
 
 static WRITE8_HANDLER( output_1_w )
 {
-	hop_io = (data & 0x40)>>4;
-	bell_io = (data & 0x80)>>4;
+	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
+
+	state->hop_io = (data & 0x40)>>4;
+	state->bell_io = (data & 0x80)>>4;
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(&tnzs_objram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_MEMBER(tnzs_state, objram)
 
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE(&tnzs_vdcram)
-	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE(&tnzs_scrollram) /* scrolling info */
-	AM_RANGE(0xe300, 0xe303) AM_RAM AM_MIRROR(0xfc) AM_BASE(&tnzs_objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(SMH_RAM) AM_BASE(&tnzs_bg_flag)	/* enable / disable background transparency */
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, vdcram)
+	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE_MEMBER(tnzs_state, scrollram) /* scrolling info */
+	AM_RANGE(0xe300, 0xe303) AM_RAM AM_MIRROR(0xfc) AM_BASE_MEMBER(tnzs_state, objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(tnzs_state, bg_flag)	/* enable / disable background transparency */
 
 	AM_RANGE(0xf000, 0xf000) AM_READNOP AM_WRITENOP //???
 	AM_RANGE(0xf001, 0xf001) AM_READ(input_1_r) AM_WRITE(output_0_w)
@@ -179,10 +181,38 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
+static MACHINE_START( cchance )
+{
+	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	state->mcu = NULL; 
+
+	state_save_register_global(machine, state->screenflip);
+	state_save_register_global(machine, state->hop_io);
+	state_save_register_global(machine, state->bell_io);
+}
+
+static MACHINE_RESET( cchance )
+{
+	tnzs_state *state = (tnzs_state *)machine->driver_data;
+
+	state->screenflip = 0;
+	state->mcu_type = -1;
+	state->hop_io = 0;
+	state->bell_io = 0;
+
+}
+
 static MACHINE_DRIVER_START( cchance )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(tnzs_state)
+
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_MACHINE_START(cchance)
+	MDRV_MACHINE_RESET(cchance)
 
 	MDRV_GFXDECODE(cchance)
 
@@ -222,4 +252,4 @@ ROM_START( cchance )
 	ROM_LOAD( "prom2", 0x0200, 0x0200, NO_DUMP )
 ROM_END
 
-GAME( 1987?, cchance,  0,    cchance, cchance,  0, ROT0, "<unknown>", "Cherry Chance", GAME_NOT_WORKING | GAME_WRONG_COLORS )
+GAME( 1987?, cchance,  0,    cchance, cchance,  0, ROT0, "<unknown>", "Cherry Chance", GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

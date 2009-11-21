@@ -56,70 +56,86 @@ DAC               -26.6860Mhz
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
 
-static UINT16 *unkram;
 
-static UINT16 *map1ram;
-static UINT16 *map2ram;
-static UINT16 *map3ram;
-static UINT16 *map4ram;
-static UINT16 *charram;
-static UINT16 *textram;
+typedef struct __2mindril_state _2mindril_state;
+struct __2mindril_state
+{
+	/* memory pointers */
+	UINT16 *      map1ram;
+	UINT16 *      map2ram;
+	UINT16 *      map3ram;
+	UINT16 *      map4ram;
+	UINT16 *      charram;
+	UINT16 *      textram;
+	UINT16 *      unkram;
+//	UINT16 *      paletteram16;	// currently this uses generic palette handling
+	UINT16 *      iodata;
 
-#define DRAW_MAP(map,num) 	{ 	int x,y; \
-			  	for(y=0;y<16;y++) \
-	 				for(x=0;x<128;x++) \
+	/* input-related */
+	UINT16        defender_sensor, shutter_sensor;
+};
+
+
+
+#define DRAW_MAP(map,num) 	{ 	int x, y; \
+			  	for (y = 0; y < 16; y++) \
+	 				for (x = 0; x < 128; x++) \
 	 				{ \
-	 					UINT16 data0=map[y*128+x*2]; \
-	 					UINT16 data1=map[y*128+x*2+1]; \
-	 					drawgfx_transpen(bitmap,\
+	 					UINT16 data0 = map[y * 128 + x * 2]; \
+	 					UINT16 data1 = map[y * 128 + x * 2 + 1]; \
+	 					drawgfx_transpen(bitmap, \
 							cliprect,screen->machine->gfx[0], data1, \
-		 					data0&0xff, \
-							data0&0x4000, data0&0x8000, \
-							x*16-512/*+(((INT16)(unkram[0x60000/2+num]))/32)*/, y*16/*+(((INT16)(unkram[0x60008/2+num]))/32)*/,0); \
+		 					data0 & 0xff, \
+							data0 & 0x4000, data0 & 0x8000, \
+							x * 16 - 512 /*+(((INT16)(state->unkram[0x60000 / 2 + num])) / 32)*/, \
+							y * 16 /*+(((INT16)(state->unkram[0x60008 / 2 + num])) / 32)*/,0); \
 	 				}	\
 			}
 
 static VIDEO_UPDATE( drill )
 {
-	bitmap_fill(bitmap,NULL,0);
+	_2mindril_state *state = (_2mindril_state *)screen->machine->driver_data;
+	bitmap_fill(bitmap, NULL, 0);
 
-	DRAW_MAP(map1ram,0)
-	DRAW_MAP(map2ram,1)
-	DRAW_MAP(map3ram,2)
-	DRAW_MAP(map4ram,3)
-
+	DRAW_MAP(state->map1ram, 0)
+	DRAW_MAP(state->map2ram, 1)
+	DRAW_MAP(state->map3ram, 2)
+	DRAW_MAP(state->map4ram, 3)
 
 	{
-		int x,y;
-		for(y=0;y<64;y++)
-	 		for(x=0;x<64;x++)
+		int x, y;
+		for (y = 0; y < 64; y++)
+	 		for(x = 0; x < 64; x++)
 	 		{
 	 			drawgfx_transpen(	bitmap,
 						cliprect,
 						screen->machine->gfx[1],
-						textram[y*64+x]&0xff, //1ff ??
-						((textram[y*64+x]>>9)&0xf),
+						state->textram[y * 64 + x] & 0xff, //1ff ??
+						((state->textram[y * 64 + x] >> 9) & 0xf),
 						0, 0,
 						x*8,y*8,0);
 	 		}
 	}
-	//printf("%.4X %.4X %.4X %.4X %.4X %.4X\n", unkram[0x60000/2],unkram[0x60000/2+1],unkram[0x60000/2+2],unkram[0x60000/2+3],unkram[0x60000/2+4],unkram[0x60000/2+5]);
+	/*printf("%.4X %.4X %.4X %.4X %.4X %.4X\n", state->unkram[0x60000 / 2], state->unkram[0x60000 / 2 + 1], state->unkram[0x60000 / 2 + 2],
+									state->unkram[0x60000 / 2 + 3], state->unkram[0x60000 / 2 + 4], state->unkram[0x60000 / 2 + 5]);*/
 	return 0;
 }
 
 static VIDEO_START( drill )
 {
-	machine->gfx[0]->color_granularity=16;
-	gfx_element_set_source(machine->gfx[1], (UINT8 *)charram);
-}
+	_2mindril_state *state = (_2mindril_state *)machine->driver_data;
 
-static UINT16 *iodata;
-static UINT16 defender_sensor,shutter_sensor;
+	machine->gfx[0]->color_granularity = 16;
+	gfx_element_set_source(machine->gfx[1], (UINT8 *)state->charram);
+}
 
 static READ16_HANDLER( drill_io_r )
 {
-//  if(offset*2 == 0x4)
-//  popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x",cpu_get_pc(space->cpu),iodata[0/2],iodata[2/2],iodata[4/2],iodata[6/2],iodata[8/2],iodata[0xa/2],iodata[0xc/2],iodata[0xe/2]);
+	_2mindril_state *state = (_2mindril_state *)space->machine->driver_data;
+
+//  if (offset * 2 == 0x4)
+	/*popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x", cpu_get_pc(space->cpu), state->iodata[0/2], state->iodata[2/2], state->iodata[4/2], state->iodata[6/2],
+										state->iodata[8/2], state->iodata[0xa/2], state->iodata[0xc/2], state->iodata[0xe/2]);*/
 
 	switch(offset)
 	{
@@ -135,9 +151,9 @@ static READ16_HANDLER( drill_io_r )
 			if(arm_pwr > 0x40) return ~0x1000;
 			else return ~0x0000;
 		}
-		case 0x4/2: return (defender_sensor) | (shutter_sensor);
+		case 0x4/2: return (state->defender_sensor) | (state->shutter_sensor);
 		case 0xe/2: return input_port_read(space->machine, "IN2");//coins
-//      default:  printf("PC=%08x [%04x] -> %04x R\n",cpu_get_pc(space->cpu),offset*2,iodata[offset]);
+//      default:  printf("PC=%08x [%04x] -> %04x R\n", cpu_get_pc(space->cpu), offset * 2, state->iodata[offset]);
 	}
 
 	return 0xffff;
@@ -145,20 +161,21 @@ static READ16_HANDLER( drill_io_r )
 
 static WRITE16_HANDLER( drill_io_w )
 {
-	COMBINE_DATA(&iodata[offset]);
+	_2mindril_state *state = (_2mindril_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->iodata[offset]);
 
 	switch(offset)
 	{
 		case 0x8/2:
-			coin_counter_w(0,iodata[offset] & 0x0400);
-			coin_counter_w(1,iodata[offset] & 0x0800);
-			coin_lockout_w(0,~iodata[offset] & 0x0100);
-			coin_lockout_w(1,~iodata[offset] & 0x0200);
+			coin_counter_w(0, state->iodata[offset] & 0x0400);
+			coin_counter_w(1, state->iodata[offset] & 0x0800);
+			coin_lockout_w(0, ~state->iodata[offset] & 0x0100);
+			coin_lockout_w(1, ~state->iodata[offset] & 0x0200);
 			break;
 	}
 
 //  if(data != 0 && offset != 8)
-//  printf("PC=%08x [%04x] <- %04x W\n",cpu_get_pc(space->cpu),offset*2,data);
+//  printf("PC=%08x [%04x] <- %04x W\n", cpu_get_pc(space->cpu), offset * 2, data);
 }
 
 /*
@@ -178,70 +195,76 @@ static WRITE16_HANDLER( drill_io_w )
 #ifdef UNUSED_FUNCTION
 static TIMER_CALLBACK( shutter_req )
 {
-	shutter_sensor = param;
+	_2mindril_state *state = (_2mindril_state *)machine->driver_data;
+	state->shutter_sensor = param;
 }
 
 static TIMER_CALLBACK( defender_req )
 {
-	defender_sensor = param;
+	_2mindril_state *state = (_2mindril_state *)machine->driver_data;
+	state->defender_sensor = param;
 }
 #endif
 
 static WRITE16_HANDLER( sensors_w )
 {
+	_2mindril_state *state = (_2mindril_state *)space->machine->driver_data;
+
 	/*---- xxxx ---- ---- select "lamps" (guess)*/
 	/*---- ---- ---- -x-- lamp*/
-	if(data & 1)
+	if (data & 1)
 	{
 		//timer_set(space->machine,  ATTOTIME_IN_SEC(2), NULL, 0x100, shutter_req );
-		shutter_sensor = 0x100;
+		state->shutter_sensor = 0x100;
 	}
-	else if(data & 2)
+	else if (data & 2)
 	{
 		//timer_set( space->machine, ATTOTIME_IN_SEC(2), NULL, 0x200, shutter_req );
-		shutter_sensor = 0x200;
+		state->shutter_sensor = 0x200;
 	}
 
-	if(data & 0x1000 || data & 0x4000)
+	if (data & 0x1000 || data & 0x4000)
 	{
 		//timer_set( space->machine, ATTOTIME_IN_SEC(2), NULL, 0x800, defender_req );
-		defender_sensor = 0x800;
+		state->defender_sensor = 0x800;
 	}
-	else if(data & 0x2000 || data & 0x8000)
+	else if (data & 0x2000 || data & 0x8000)
 	{
 		//timer_set( space->machine, ATTOTIME_IN_SEC(2), NULL, 0x400, defender_req );
-		defender_sensor = 0x400;
+		state->defender_sensor = 0x400;
 	}
 }
 
 static WRITE16_HANDLER( charram_w )
 {
-	COMBINE_DATA(&charram[offset]);
-	gfx_element_mark_dirty(space->machine->gfx[1], offset/16);
+	_2mindril_state *state = (_2mindril_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->charram[offset]);
+	gfx_element_mark_dirty(space->machine->gfx[1], offset / 16);
 }
 
 static ADDRESS_MAP_START( drill_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x3000ff) AM_RAM
-	AM_RANGE(0x410000, 0x411fff) AM_RAM AM_BASE(&map1ram)
-	AM_RANGE(0x412000, 0x413fff) AM_RAM AM_BASE(&map2ram)
-	AM_RANGE(0x414000, 0x415fff) AM_RAM AM_BASE(&map3ram)
-	AM_RANGE(0x416000, 0x417fff) AM_RAM AM_BASE(&map4ram)
-	AM_RANGE(0x41c000, 0x41dfff) AM_RAM AM_BASE(&textram)
-	AM_RANGE(0x41e000, 0x41ffff) AM_RAM_WRITE(charram_w) AM_BASE(&charram)
-	AM_RANGE(0x400000, 0x4fffff) AM_RAM AM_BASE(&unkram)// video stuff, 460000 - video regs ?
+	AM_RANGE(0x410000, 0x411fff) AM_RAM AM_BASE_MEMBER(_2mindril_state, map1ram)
+	AM_RANGE(0x412000, 0x413fff) AM_RAM AM_BASE_MEMBER(_2mindril_state, map2ram)
+	AM_RANGE(0x414000, 0x415fff) AM_RAM AM_BASE_MEMBER(_2mindril_state, map3ram)
+	AM_RANGE(0x416000, 0x417fff) AM_RAM AM_BASE_MEMBER(_2mindril_state, map4ram)
+	AM_RANGE(0x41c000, 0x41dfff) AM_RAM AM_BASE_MEMBER(_2mindril_state, textram)
+	AM_RANGE(0x41e000, 0x41ffff) AM_RAM_WRITE(charram_w) AM_BASE_MEMBER(_2mindril_state, charram)
+	AM_RANGE(0x400000, 0x4fffff) AM_RAM AM_BASE_MEMBER(_2mindril_state, unkram)// video stuff, 460000 - video regs ?
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x502000, 0x503fff) AM_RAM
 	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8("ymsnd", ym2610_r, ym2610_w, 0x00ff)
 	AM_RANGE(0x60000c, 0x60000d) AM_RAM
 	AM_RANGE(0x60000e, 0x60000f) AM_RAM
-	AM_RANGE(0x700000, 0x70000f) AM_READWRITE(drill_io_r,drill_io_w) AM_BASE(&iodata) // i/o
+	AM_RANGE(0x700000, 0x70000f) AM_READWRITE(drill_io_r,drill_io_w) AM_BASE_MEMBER(_2mindril_state, iodata) // i/o
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(sensors_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( drill )
-    PORT_START("DSW")//Dip-Switches
+	PORT_START("DSW")//Dip-Switches
 	PORT_DIPNAME( 0x0001, 0x0001, "DSW" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -294,7 +317,7 @@ static INPUT_PORTS_START( drill )
    	PORT_START("IN0")//sensors
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-    PORT_START("IN1")
+	PORT_START("IN1")
 	PORT_DIPNAME( 0x0001, 0x0000, "IN1" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
@@ -344,7 +367,7 @@ static INPUT_PORTS_START( drill )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
-    PORT_START("IN2")//coins
+	PORT_START("IN2")//coins
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -400,11 +423,33 @@ static const ym2610_interface ym2610_config =
 	irqhandler
 };
 
+
+static MACHINE_START( drill )
+{
+	_2mindril_state *state = (_2mindril_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->defender_sensor);
+	state_save_register_global(machine, state->shutter_sensor);
+}
+
+static MACHINE_RESET( drill )
+{
+	_2mindril_state *state = (_2mindril_state *)machine->driver_data;
+
+	state->defender_sensor = 0;
+	state->shutter_sensor = 0;
+}
+
 static MACHINE_DRIVER_START( drill )
+	MDRV_DRIVER_DATA(_2mindril_state)
+
 	MDRV_CPU_ADD("maincpu", M68000, 16000000 )
 	MDRV_CPU_PROGRAM_MAP(drill_map)
 	MDRV_CPU_VBLANK_INT("screen", drill_interrupt)
 	MDRV_GFXDECODE(2mindril)
+
+	MDRV_MACHINE_START(drill)
+	MDRV_MACHINE_RESET(drill)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -452,18 +497,18 @@ static DRIVER_INIT( drill )
 //  UINT8 *rom = memory_region( machine, "maincpu" );
 	int i;
 
-	for (i=0; i< 0x400000/4; i++)
+	for (i = 0; i < 0x400000 / 4; i++)
 	{
 		UINT32 dat1 = src[i];
-	    dat1 = BITSWAP32(dat1, 3, 11, 19, 27, 2, 10, 18, 26, 1, 9, 17, 25, 0, 8, 16, 24, 7, 15, 23, 31, 6, 14, 22, 30, 5, 13, 21, 29, 4, 12, 20, 28 );
-		dst[(0x400000/4)+i] = dat1;
+		dat1 = BITSWAP32(dat1, 3, 11, 19, 27, 2, 10, 18, 26, 1, 9, 17, 25, 0, 8, 16, 24, 7, 15, 23, 31, 6, 14, 22, 30, 5, 13, 21, 29, 4, 12, 20, 28 );
+		dst[(0x400000 / 4) + i] = dat1;
 	}
 
 	//enable some kind of debug mode (ignore errors)
-//  rom[0x7fffb]=0;
-//  rom[0x7fffc]=0;
-//  rom[0x7fffd]=0;
-//  rom[0x7fffe]=0;
+//  rom[0x7fffb] = 0;
+//  rom[0x7fffc] = 0;
+//  rom[0x7fffd] = 0;
+//  rom[0x7fffe] = 0;
 }
 
-GAME( 1993, 2mindril,    0,        drill,    drill,    drill, ROT0,  "Taito", "Two Minute Drill", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, 2mindril,    0,        drill,    drill,    drill, ROT0,  "Taito", "Two Minute Drill", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

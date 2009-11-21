@@ -41,10 +41,10 @@ static WRITE8_HANDLER ( coinlock_w )
 
 static ADDRESS_MAP_START( chaknpop_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&chaknpop_ram)
-	AM_RANGE(0x8800, 0x8800) AM_READWRITE(chaknpop_mcu_portA_r, chaknpop_mcu_portA_w)
-	AM_RANGE(0x8801, 0x8801) AM_READWRITE(chaknpop_mcu_portB_r, chaknpop_mcu_portB_w)
-	AM_RANGE(0x8802, 0x8802) AM_READWRITE(chaknpop_mcu_portC_r, chaknpop_mcu_portC_w)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(chaknpop_state, mcu_ram)
+	AM_RANGE(0x8800, 0x8800) AM_READWRITE(chaknpop_mcu_port_a_r, chaknpop_mcu_port_a_w)
+	AM_RANGE(0x8801, 0x8801) AM_READWRITE(chaknpop_mcu_port_b_r, chaknpop_mcu_port_b_w)
+	AM_RANGE(0x8802, 0x8802) AM_READWRITE(chaknpop_mcu_port_c_r, chaknpop_mcu_port_c_w)
 	AM_RANGE(0x8804, 0x8805) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_address_data_w)
 	AM_RANGE(0x8806, 0x8807) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_address_data_w)
 	AM_RANGE(0x8808, 0x8808) AM_READ_PORT("DSWC")
@@ -53,9 +53,9 @@ static ADDRESS_MAP_START( chaknpop_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x880b, 0x880b) AM_READ_PORT("P2")
 	AM_RANGE(0x880c, 0x880c) AM_READWRITE(chaknpop_gfxmode_r, chaknpop_gfxmode_w)
 	AM_RANGE(0x880d, 0x880d) AM_WRITE(coinlock_w)												// coin lock out
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(chaknpop_txram_w) AM_BASE(&chaknpop_txram) 			// TX tilemap
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(chaknpop_attrram_w) AM_BASE(&chaknpop_attrram) 		// Color attribute
-	AM_RANGE(0x9840, 0x98ff) AM_RAM AM_BASE(&chaknpop_sprram) AM_SIZE(&chaknpop_sprram_size)	// sprite
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(chaknpop_txram_w) AM_BASE_MEMBER(chaknpop_state, tx_ram) 			// TX tilemap
+	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(chaknpop_attrram_w) AM_BASE_MEMBER(chaknpop_state, attr_ram) 		// Color attribute
+	AM_RANGE(0x9840, 0x98ff) AM_RAM AM_BASE_MEMBER(chaknpop_state, spr_ram) AM_SIZE_MEMBER(chaknpop_state, spr_ram_size)	// sprite
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK(1)														// bitmap plane 1-4
 ADDRESS_MAP_END
@@ -241,7 +241,40 @@ static GFXDECODE_START( chaknpop )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   32, 8 )
 GFXDECODE_END
 
+
+static MACHINE_START( chaknpop )
+{
+	chaknpop_state *state = (chaknpop_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, 1, 0, 2, &ROM[0x10000], 0x4000);
+
+	state_save_register_global(machine, state->gfxmode);
+	state_save_register_global(machine, state->flip_x);
+	state_save_register_global(machine, state->flip_y);
+
+	state_save_register_global(machine, state->mcu_seed);
+	state_save_register_global(machine, state->mcu_result);
+	state_save_register_global(machine, state->mcu_select);
+}
+
+static MACHINE_RESET( chaknpop )
+{
+	chaknpop_state *state = (chaknpop_state *)machine->driver_data;
+
+	state->gfxmode = 0;
+	state->flip_x = 0;
+	state->flip_y = 0;
+
+	state->mcu_seed = MCU_INITIAL_SEED;
+	state->mcu_result = 0;
+	state->mcu_select = 0;
+}
+
 static MACHINE_DRIVER_START( chaknpop )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(chaknpop_state)
 
 	/* basic machine hardware */
 	/* the real board is 3.072MHz, but it is faster for MAME */
@@ -251,6 +284,7 @@ static MACHINE_DRIVER_START( chaknpop )
 	MDRV_CPU_PROGRAM_MAP(chaknpop_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+	MDRV_MACHINE_START(chaknpop)
 	MDRV_MACHINE_RESET(chaknpop)
 
 	/* video hardware */
@@ -315,4 +349,4 @@ ROM_END
 
 
 /*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR  COMPANY              FULLNAME ) */
-GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, chaknpop, ROT0,    "Taito Corporation", "Chack'n Pop", 0)
+GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, 0,        ROT0,    "Taito Corporation", "Chack'n Pop", 0 )

@@ -279,18 +279,24 @@ TODO:
 #define MAIN_XTAL 	XTAL_24MHz
 
 
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
+
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE(&bublbobl_objectram) AM_SIZE(&bublbobl_objectram_size)
+	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_MEMBER(bublbobl_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_MEMBER(bublbobl_state, objectram) AM_SIZE_MEMBER(bublbobl_state, objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
 	AM_RANGE(0xfa00, 0xfa00) AM_READWRITE(bublbobl_sound_status_r, bublbobl_sound_command_w)
 	AM_RANGE(0xfa03, 0xfa03) AM_WRITE(bublbobl_soundcpu_reset_w)
 	AM_RANGE(0xfa80, 0xfa80) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xfb40, 0xfb40) AM_WRITE(bublbobl_bankswitch_w)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_BASE(&bublbobl_mcu_sharedram)
+	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_BASE_MEMBER(bublbobl_state, mcu_sharedram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -310,12 +316,12 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(bublbobl_mcu_ddr1_r,  bublbobl_mcu_ddr1_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(bublbobl_mcu_ddr2_r,  bublbobl_mcu_ddr2_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(bublbobl_mcu_ddr1_r, bublbobl_mcu_ddr1_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(bublbobl_mcu_ddr2_r, bublbobl_mcu_ddr2_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(bublbobl_mcu_port1_r, bublbobl_mcu_port1_w)
 	AM_RANGE(0x0003, 0x0003) AM_READWRITE(bublbobl_mcu_port2_r, bublbobl_mcu_port2_w)
-	AM_RANGE(0x0004, 0x0004) AM_READWRITE(bublbobl_mcu_ddr3_r,  bublbobl_mcu_ddr3_w)
-	AM_RANGE(0x0005, 0x0005) AM_READWRITE(bublbobl_mcu_ddr4_r,  bublbobl_mcu_ddr4_w)
+	AM_RANGE(0x0004, 0x0004) AM_READWRITE(bublbobl_mcu_ddr3_r, bublbobl_mcu_ddr3_w)
+	AM_RANGE(0x0005, 0x0005) AM_READWRITE(bublbobl_mcu_ddr4_r, bublbobl_mcu_ddr4_w)
 	AM_RANGE(0x0006, 0x0006) AM_READWRITE(bublbobl_mcu_port3_r, bublbobl_mcu_port3_w)
 	AM_RANGE(0x0007, 0x0007) AM_READWRITE(bublbobl_mcu_port4_r, bublbobl_mcu_port4_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM
@@ -325,11 +331,11 @@ ADDRESS_MAP_END
 // The 68705 is from a bootleg, the original MCU is a 6801U4
 static ADDRESS_MAP_START( bootlegmcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x000, 0x000) AM_READWRITE(bublbobl_68705_portA_r, bublbobl_68705_portA_w)
-	AM_RANGE(0x001, 0x001) AM_READWRITE(bublbobl_68705_portB_r, bublbobl_68705_portB_w)
+	AM_RANGE(0x000, 0x000) AM_READWRITE(bublbobl_68705_port_a_r, bublbobl_68705_port_a_w)
+	AM_RANGE(0x001, 0x001) AM_READWRITE(bublbobl_68705_port_b_r, bublbobl_68705_port_b_w)
 	AM_RANGE(0x002, 0x002) AM_READ_PORT("IN0")	// COIN
-	AM_RANGE(0x004, 0x004) AM_WRITE(bublbobl_68705_ddrA_w)
-	AM_RANGE(0x005, 0x005) AM_WRITE(bublbobl_68705_ddrB_w)
+	AM_RANGE(0x004, 0x004) AM_WRITE(bublbobl_68705_ddr_a_w)
+	AM_RANGE(0x005, 0x005) AM_WRITE(bublbobl_68705_ddr_b_w)
 	AM_RANGE(0x006, 0x006) AM_WRITENOP // ???
 	AM_RANGE(0x010, 0x07f) AM_RAM
 	AM_RANGE(0x080, 0x7ff) AM_ROM
@@ -338,8 +344,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE(&bublbobl_objectram) AM_SIZE(&bublbobl_objectram_size)
+	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_MEMBER(bublbobl_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_MEMBER(bublbobl_state, objectram) AM_SIZE_MEMBER(bublbobl_state, objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
 	AM_RANGE(0xfa00, 0xfa00) AM_READWRITE(bublbobl_sound_status_r, bublbobl_sound_command_w)
@@ -348,8 +354,8 @@ static ADDRESS_MAP_START( bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfb40, 0xfb40) AM_WRITE(bublbobl_bankswitch_w)
 	AM_RANGE(0xfc00, 0xfcff) AM_RAM
 	AM_RANGE(0xfd00, 0xfdff) AM_RAM
-	AM_RANGE(0xfe00, 0xfe03) AM_READWRITE(boblbobl_ic43_a_r,boblbobl_ic43_a_w)
-	AM_RANGE(0xfe80, 0xfe83) AM_READWRITE(boblbobl_ic43_b_r,boblbobl_ic43_b_w)
+	AM_RANGE(0xfe00, 0xfe03) AM_READWRITE(boblbobl_ic43_a_r, boblbobl_ic43_a_w)
+	AM_RANGE(0xfe80, 0xfe83) AM_READWRITE(boblbobl_ic43_b_r, boblbobl_ic43_b_w)
 	AM_RANGE(0xff00, 0xff00) AM_READ_PORT("DSW0")
 	AM_RANGE(0xff01, 0xff01) AM_READ_PORT("DSW1")
 	AM_RANGE(0xff02, 0xff02) AM_READ_PORT("IN0")
@@ -362,8 +368,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tokio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE(&bublbobl_objectram) AM_SIZE(&bublbobl_objectram_size)
+	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_MEMBER(bublbobl_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_MEMBER(bublbobl_state, objectram) AM_SIZE_MEMBER(bublbobl_state, objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(watchdog_reset_w)
@@ -396,6 +402,11 @@ static ADDRESS_MAP_START( tokio_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( bublbobl )
 	PORT_START("IN0")
@@ -657,6 +668,12 @@ INPUT_PORTS_END
 
 
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
 static const gfx_layout charlayout =
 {
 	8, 8,
@@ -672,6 +689,12 @@ static GFXDECODE_START( bublbobl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
+
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
 
 // handler called by the 2203 emulator when the internal timers cause an IRQ
 static void irqhandler(const device_config *device, int irq)
@@ -691,8 +714,58 @@ static const ym2203_interface ym2203_config =
 
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( common )
+{
+	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
+
+	state->mcu = cputag_get_cpu(machine, "mcu"); 
+
+	state_save_register_global(machine, state->sound_nmi_enable);
+	state_save_register_global(machine, state->pending_nmi);
+	state_save_register_global(machine, state->sound_status);
+	state_save_register_global(machine, state->video_enable);
+}
+
+static MACHINE_RESET( common )
+{
+	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
+
+	state->sound_nmi_enable = 0;
+	state->pending_nmi = 0;
+	state->sound_status = 0;
+}
+
+
+static MACHINE_START( tokio )
+{
+	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
+
+	MACHINE_START_CALL(common);
+
+	state_save_register_global(machine, state->tokio_prot_count);
+}
+
+static MACHINE_RESET( tokio )
+{
+	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
+
+	MACHINE_RESET_CALL(common);
+
+	state->tokio_prot_count = 0;
+}
+
 static MACHINE_DRIVER_START( tokio )
-	// basic machine hardware
+
+	/* driver data */
+	MDRV_DRIVER_DATA(bublbobl_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)	// 6 MHz
 	MDRV_CPU_PROGRAM_MAP(tokio_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -706,8 +779,10 @@ static MACHINE_DRIVER_START( tokio )
 
 	MDRV_QUANTUM_TIME(HZ(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	// video hardware
+	MDRV_MACHINE_START(tokio)
+	MDRV_MACHINE_RESET(tokio)
 
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
@@ -717,7 +792,7 @@ static MACHINE_DRIVER_START( tokio )
 
 	MDRV_VIDEO_UPDATE(bublbobl)
 
-	// sound hardware
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ymsnd", YM2203, MAIN_XTAL/8)
@@ -728,8 +803,53 @@ static MACHINE_DRIVER_START( tokio )
 	MDRV_SOUND_ROUTE(3, "mono", 1.0)
 MACHINE_DRIVER_END
 
+
+static MACHINE_START( bublbobl )
+{
+	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
+
+	MACHINE_START_CALL(common);
+
+	state_save_register_global(machine, state->ddr1);
+	state_save_register_global(machine, state->ddr2);
+	state_save_register_global(machine, state->ddr3);
+	state_save_register_global(machine, state->ddr4);
+	state_save_register_global(machine, state->port1_in);
+	state_save_register_global(machine, state->port2_in);
+	state_save_register_global(machine, state->port3_in);
+	state_save_register_global(machine, state->port4_in);
+	state_save_register_global(machine, state->port1_out);
+	state_save_register_global(machine, state->port2_out);
+	state_save_register_global(machine, state->port3_out);
+	state_save_register_global(machine, state->port4_out);
+}
+
+static MACHINE_RESET( bublbobl )
+{
+	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
+
+	MACHINE_RESET_CALL(common);
+
+	state->ddr1 = 0;
+	state->ddr2 = 0;
+	state->ddr3 = 0;
+	state->ddr4 = 0;
+	state->port1_in = 0;
+	state->port2_in = 0;
+	state->port3_in = 0;
+	state->port4_in = 0;
+	state->port1_out = 0;
+	state->port2_out = 0;
+	state->port3_out = 0;
+	state->port4_out = 0;
+}
+
 static MACHINE_DRIVER_START( bublbobl )
-	// basic machine hardware
+
+	/* driver data */
+	MDRV_DRIVER_DATA(bublbobl_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)	// 6 MHz
 	MDRV_CPU_PROGRAM_MAP(master_map)
 	// IRQs are triggered by the MCU
@@ -747,8 +867,10 @@ static MACHINE_DRIVER_START( bublbobl )
 
 	MDRV_QUANTUM_TIME(HZ(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	// video hardware
+	MDRV_MACHINE_START(bublbobl)
+	MDRV_MACHINE_RESET(bublbobl)
 
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
@@ -758,7 +880,7 @@ static MACHINE_DRIVER_START( bublbobl )
 
 	MDRV_VIDEO_UPDATE(bublbobl)
 
-	// sound hardware
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM2203, MAIN_XTAL/8)
@@ -770,17 +892,71 @@ static MACHINE_DRIVER_START( bublbobl )
 MACHINE_DRIVER_END
 
 
+static MACHINE_START( boblbobl )
+{
+	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
+
+	MACHINE_START_CALL(common);
+
+	state_save_register_global(machine, state->ic43_a);
+	state_save_register_global(machine, state->ic43_b);
+}
+
+static MACHINE_RESET( boblbobl )
+{
+	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
+
+	MACHINE_RESET_CALL(common);
+
+	state->ic43_a = 0;
+	state->ic43_b = 0;
+}
+
 static MACHINE_DRIVER_START( boblbobl )
 	MDRV_IMPORT_FROM(bublbobl)
 
-	// basic machine hardware
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bootleg_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	// interrupt mode 1, unlike Bubble Bobble
 
+	MDRV_MACHINE_START(boblbobl)
+	MDRV_MACHINE_RESET(boblbobl)
+
 	MDRV_DEVICE_REMOVE("mcu")
 MACHINE_DRIVER_END
 
+
+static MACHINE_START( bub68705 )
+{
+	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
+
+	MACHINE_START_CALL(common);
+
+	state_save_register_global(machine, state->port_a_in);
+	state_save_register_global(machine, state->port_a_out);
+	state_save_register_global(machine, state->ddr_a);
+	state_save_register_global(machine, state->port_b_in);
+	state_save_register_global(machine, state->port_b_out);
+	state_save_register_global(machine, state->ddr_b);
+	state_save_register_global(machine, state->address);
+	state_save_register_global(machine, state->latch);
+}
+
+static MACHINE_RESET( bub68705 )
+{
+	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
+
+	MACHINE_RESET_CALL(common);
+
+	state->port_a_in = 0;
+	state->port_a_out = 0;
+	state->ddr_a = 0;
+	state->port_b_in = 0;
+	state->port_b_out = 0;
+	state->ddr_b = 0;
+	state->address = 0;
+	state->latch = 0;
+}
 
 static MACHINE_DRIVER_START( bub68705 )
 	MDRV_IMPORT_FROM(bublbobl)
@@ -789,9 +965,18 @@ static MACHINE_DRIVER_START( bub68705 )
 	MDRV_CPU_ADD("mcu", M68705, 4000000)	// xtal is 4MHz, divided by 4 internally
 	MDRV_CPU_PROGRAM_MAP(bootlegmcu_map)
 	MDRV_CPU_VBLANK_INT_HACK(bublbobl_m68705_interrupt, 2) // ??? should come from the same clock which latches the INT pin on the second Z80
+
+	MDRV_MACHINE_START(bub68705)
+	MDRV_MACHINE_RESET(bub68705)
 MACHINE_DRIVER_END
 
 
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( tokio )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* main CPU */
@@ -1298,7 +1483,13 @@ ROM_END
 
 
 
-static void configure_banks(running_machine* machine)
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
+
+static void configure_banks( running_machine* machine )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, 1, 0, 8, &ROM[0x10000], 0x4000);
@@ -1306,16 +1497,22 @@ static void configure_banks(running_machine* machine)
 
 static DRIVER_INIT( bublbobl )
 {
+	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
+
 	configure_banks(machine);
+
+	/* we init this here, so that it does not conflict with tokio init, below */
+	state->video_enable = 0;
 }
 
 static DRIVER_INIT( tokio )
 {
+	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
 	configure_banks(machine);
 
 	/* preemptively enable video, the bit is not mapped for this game and */
 	/* I don't know if it even has it. */
-	bublbobl_video_enable = 1;
+	state->video_enable = 1;
 }
 
 static DRIVER_INIT( tokiob )
@@ -1330,28 +1527,34 @@ static DRIVER_INIT( dland )
 	// rearrange gfx to original format
 	int i;
 	UINT8* src = memory_region(machine,"gfx1");
-	for (i=0;i<0x40000;i++)
+	for (i = 0; i < 0x40000; i++)
 		src[i] = BITSWAP8(src[i],7,6,5,4,0,1,2,3);
 
-	for (i=0x40000;i<0x80000;i++)
+	for (i = 0x40000; i < 0x80000; i++)
 		src[i] = BITSWAP8(src[i],7,4,5,6,3,0,1,2);
 
 	DRIVER_INIT_CALL(bublbobl);
 }
 
 
-GAME( 1986, tokio,    0,        tokio,    tokio,    tokio,    ROT90, "Taito Corporation", "Tokio / Scramble Formation", GAME_NOT_WORKING )
-GAME( 1986, tokiou,   tokio,    tokio,    tokio,    tokio,    ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)", GAME_NOT_WORKING )
-GAME( 1986, tokiob,   tokio,    tokio,    tokio,    tokiob,   ROT90, "bootleg", "Tokio / Scramble Formation (bootleg)", 0 )
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
 
-GAME( 1986, bublbobl,  0,        bublbobl, bublbobl, bublbobl, ROT0,  "Taito Corporation", "Bubble Bobble", 0 )
-GAME( 1986, bublbobl1, bublbobl, bublbobl, bublbobl, bublbobl, ROT0,  "Taito Corporation", "Bubble Bobble (older)", 0 )
-GAME( 1986, bublboblr, bublbobl, bublbobl, bublbobl, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US with mode select)", 0 )
-GAME( 1986, bublboblr1,bublbobl, bublbobl, bublbobl, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US)", 0 )
+GAME( 1986, tokio,      0,        tokio,    tokio,    tokio,    ROT90, "Taito Corporation", "Tokio / Scramble Formation", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1986, tokiou,     tokio,    tokio,    tokio,    tokio,    ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1986, tokiob,     tokio,    tokio,    tokio,    tokiob,   ROT90, "bootleg", "Tokio / Scramble Formation (bootleg)", GAME_SUPPORTS_SAVE )
 
-GAME( 1986, boblbobl, bublbobl, boblbobl, boblbobl, bublbobl, ROT0,  "bootleg", "Bobble Bobble", 0 )
-GAME( 1986, sboblboa, bublbobl, boblbobl, boblbobl, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (set 1)", 0 )
-GAME( 1986, sboblbob, bublbobl, boblbobl, sboblbob, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (set 2)", 0 )
-GAME( 1986, bub68705, bublbobl, bub68705, bublbobl, bublbobl, ROT0,  "bootleg", "Bubble Bobble (bootleg with 68705)", 0 )
+GAME( 1986, bublbobl,   0,        bublbobl, bublbobl, bublbobl, ROT0,  "Taito Corporation", "Bubble Bobble", GAME_SUPPORTS_SAVE )
+GAME( 1986, bublbobl1,  bublbobl, bublbobl, bublbobl, bublbobl, ROT0,  "Taito Corporation", "Bubble Bobble (older)", GAME_SUPPORTS_SAVE )
+GAME( 1986, bublboblr,  bublbobl, bublbobl, bublbobl, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US with mode select)", GAME_SUPPORTS_SAVE )
+GAME( 1986, bublboblr1, bublbobl, bublbobl, bublbobl, bublbobl, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US)", GAME_SUPPORTS_SAVE )
 
-GAME( 1987, dland,    bublbobl, boblbobl, dland,    dland,    ROT0,  "bootleg", "Dream Land / Super Dream Land (bootleg of Bubble Bobble)", 0 )
+GAME( 1986, boblbobl,   bublbobl, boblbobl, boblbobl, bublbobl, ROT0,  "bootleg", "Bobble Bobble", GAME_SUPPORTS_SAVE )
+GAME( 1986, sboblboa,   bublbobl, boblbobl, boblbobl, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, sboblbob,   bublbobl, boblbobl, sboblbob, bublbobl, ROT0,  "bootleg", "Super Bobble Bobble (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, bub68705,   bublbobl, bub68705, bublbobl, bublbobl, ROT0,  "bootleg", "Bubble Bobble (bootleg with 68705)", GAME_SUPPORTS_SAVE )
+
+GAME( 1987, dland,      bublbobl, boblbobl, dland,    dland,    ROT0,  "bootleg", "Dream Land / Super Dream Land (bootleg of Bubble Bobble)", GAME_SUPPORTS_SAVE )

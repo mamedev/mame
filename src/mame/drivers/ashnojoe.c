@@ -77,28 +77,7 @@ Coin B is not used
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
-
-extern UINT16 *ashnojoetileram16, *ashnojoetileram16_2, *ashnojoetileram16_3, *ashnojoetileram16_4;
-extern UINT16 *ashnojoetileram16_5, *ashnojoetileram16_6, *ashnojoetileram16_7;
-extern UINT16 *ashnojoe_tilemap_reg;
-
-extern WRITE16_HANDLER( ashnojoe_tileram_w );
-extern WRITE16_HANDLER( ashnojoe_tileram2_w );
-extern WRITE16_HANDLER( ashnojoe_tileram3_w );
-extern WRITE16_HANDLER( ashnojoe_tileram4_w );
-extern WRITE16_HANDLER( ashnojoe_tileram5_w );
-extern WRITE16_HANDLER( ashnojoe_tileram6_w );
-extern WRITE16_HANDLER( ashnojoe_tileram7_w );
-extern WRITE16_HANDLER( joe_tilemaps_xscroll_w );
-extern WRITE16_HANDLER( joe_tilemaps_yscroll_w );
-
-extern VIDEO_START( ashnojoe );
-extern VIDEO_UPDATE( ashnojoe );
-
-static UINT8 adpcm_byte;
-static int soundlatch_status;
-static int msm5205_vclk_toggle;
-
+#include "ashnojoe.h"
 
 static READ16_HANDLER(fake_4a00a_r)
 {
@@ -109,27 +88,28 @@ static READ16_HANDLER(fake_4a00a_r)
 
 static WRITE16_HANDLER( ashnojoe_soundlatch_w )
 {
+	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_status = 1;
+		state->soundlatch_status = 1;
 		soundlatch_w(space, 0, data & 0xff);
 	}
 }
 
 static ADDRESS_MAP_START( ashnojoe_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x041fff) AM_RAM_WRITE(ashnojoe_tileram3_w) AM_BASE(&ashnojoetileram16_3)
-	AM_RANGE(0x042000, 0x043fff) AM_RAM_WRITE(ashnojoe_tileram4_w) AM_BASE(&ashnojoetileram16_4)
-	AM_RANGE(0x044000, 0x044fff) AM_RAM_WRITE(ashnojoe_tileram5_w) AM_BASE(&ashnojoetileram16_5)
-	AM_RANGE(0x045000, 0x045fff) AM_RAM_WRITE(ashnojoe_tileram2_w) AM_BASE(&ashnojoetileram16_2)
-	AM_RANGE(0x046000, 0x046fff) AM_RAM_WRITE(ashnojoe_tileram6_w) AM_BASE(&ashnojoetileram16_6)
-	AM_RANGE(0x047000, 0x047fff) AM_RAM_WRITE(ashnojoe_tileram7_w) AM_BASE(&ashnojoetileram16_7)
-	AM_RANGE(0x048000, 0x048fff) AM_RAM_WRITE(ashnojoe_tileram_w) AM_BASE(&ashnojoetileram16)
+	AM_RANGE(0x040000, 0x041fff) AM_RAM_WRITE(ashnojoe_tileram3_w) AM_BASE_MEMBER(ashnojoe_state, tileram_3)
+	AM_RANGE(0x042000, 0x043fff) AM_RAM_WRITE(ashnojoe_tileram4_w) AM_BASE_MEMBER(ashnojoe_state, tileram_4)
+	AM_RANGE(0x044000, 0x044fff) AM_RAM_WRITE(ashnojoe_tileram5_w) AM_BASE_MEMBER(ashnojoe_state, tileram_5)
+	AM_RANGE(0x045000, 0x045fff) AM_RAM_WRITE(ashnojoe_tileram2_w) AM_BASE_MEMBER(ashnojoe_state, tileram_2)
+	AM_RANGE(0x046000, 0x046fff) AM_RAM_WRITE(ashnojoe_tileram6_w) AM_BASE_MEMBER(ashnojoe_state, tileram_6)
+	AM_RANGE(0x047000, 0x047fff) AM_RAM_WRITE(ashnojoe_tileram7_w) AM_BASE_MEMBER(ashnojoe_state, tileram_7)
+	AM_RANGE(0x048000, 0x048fff) AM_RAM_WRITE(ashnojoe_tileram_w) AM_BASE_MEMBER(ashnojoe_state, tileram)
 	AM_RANGE(0x049000, 0x049fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x04a000, 0x04a001) AM_READ_PORT("P1")
 	AM_RANGE(0x04a002, 0x04a003) AM_READ_PORT("P2")
 	AM_RANGE(0x04a004, 0x04a005) AM_READ_PORT("DSW")
-	AM_RANGE(0x04a006, 0x04a007) AM_WRITEONLY AM_BASE(&ashnojoe_tilemap_reg)
+	AM_RANGE(0x04a006, 0x04a007) AM_WRITEONLY AM_BASE_MEMBER(ashnojoe_state, tilemap_reg)
 	AM_RANGE(0x04a008, 0x04a009) AM_WRITE(ashnojoe_soundlatch_w)
 	AM_RANGE(0x04a00a, 0x04a00b) AM_READ(fake_4a00a_r)	// ??
 	AM_RANGE(0x04a010, 0x04a019) AM_WRITE(joe_tilemaps_xscroll_w)
@@ -141,18 +121,21 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( adpcm_w )
 {
-	adpcm_byte = data;
+	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+	state->adpcm_byte = data;
 }
 
 static READ8_HANDLER( sound_latch_r )
 {
-	soundlatch_status = 0;
+	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+	state->soundlatch_status = 0;
 	return soundlatch_r(space, 0);
 }
 
 static READ8_HANDLER( sound_latch_status_r )
 {
-	return soundlatch_status;
+	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+	return state->soundlatch_status;
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -171,7 +154,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( ashnojoe )
-	PORT_START("P1")	/* player 1 16-bit */
+	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
@@ -190,7 +173,7 @@ static INPUT_PORTS_START( ashnojoe )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("P2")	/* player 2 16-bit */
+	PORT_START("P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
@@ -210,7 +193,7 @@ static INPUT_PORTS_START( ashnojoe )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("DSW")	/* 16-bit */
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Cocktail ) )
@@ -307,7 +290,7 @@ static WRITE8_DEVICE_HANDLER( ym2203_write_a )
 
 static WRITE8_DEVICE_HANDLER( ym2203_write_b )
 {
-	memory_set_bankptr(device->machine, 4, memory_region(device->machine, "adpcm") + ((data & 0xf) * 0x8000));
+	memory_set_bank(device->machine, 4, data & 0x0f);
 }
 
 static const ym2203_interface ym2203_config =
@@ -323,19 +306,20 @@ static const ym2203_interface ym2203_config =
 	ym2203_irq_handler
 };
 
-static void ashnojoe_vclk_cb(const device_config *device)
+static void ashnojoe_vclk_cb( const device_config *device )
 {
-	if (msm5205_vclk_toggle == 0)
+	ashnojoe_state *state = (ashnojoe_state *)device->machine->driver_data;
+	if (state->msm5205_vclk_toggle == 0)
 	{
-		msm5205_data_w(device, adpcm_byte >> 4);
+		msm5205_data_w(device, state->adpcm_byte >> 4);
 	}
 	else
 	{
-		msm5205_data_w(device, adpcm_byte & 0xf);
+		msm5205_data_w(device, state->adpcm_byte & 0xf);
 		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 
-	msm5205_vclk_toggle ^= 1;
+	state->msm5205_vclk_toggle ^= 1;
 }
 
 static const msm5205_interface msm5205_config =
@@ -345,12 +329,29 @@ static const msm5205_interface msm5205_config =
 };
 
 
-static DRIVER_INIT( ashnojoe )
+static MACHINE_START( ashnojoe )
 {
-	memory_set_bankptr(machine, 4, memory_region(machine, "adpcm"));
+	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->adpcm_byte);
+	state_save_register_global(machine, state->soundlatch_status);
+	state_save_register_global(machine, state->msm5205_vclk_toggle);
 }
 
+static MACHINE_RESET( ashnojoe )
+{
+	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+
+	state->adpcm_byte = 0;
+	state->soundlatch_status = 0;
+	state->msm5205_vclk_toggle = 0;
+}
+
+
 static MACHINE_DRIVER_START( ashnojoe )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ashnojoe_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -360,6 +361,9 @@ static MACHINE_DRIVER_START( ashnojoe )
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(sound_portmap)
+
+	MDRV_MACHINE_START(ashnojoe)
+	MDRV_MACHINE_RESET(ashnojoe)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -461,5 +465,13 @@ ROM_START( ashnojoe )
 	ROM_LOAD( "sj401-nw.10r", 0x00000, 0x80000, CRC(25dfab59) SHA1(7d50159204ba05323a2442778f35192e66117dda) )
 ROM_END
 
-GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe, ROT0, "WAVE / Taito Corporation", "Success Joe (World)",   0 )
-GAME( 1990, ashnojoe, scessjoe, ashnojoe, ashnojoe, ashnojoe, ROT0, "WAVE / Taito Corporation", "Ashita no Joe (Japan)", 0 )
+static DRIVER_INIT( ashnojoe )
+{
+	UINT8 *ROM = memory_region(machine, "adpcm");
+	memory_configure_bank(machine, 4, 0, 16, &ROM[0x00000], 0x8000);
+
+	memory_set_bank(machine, 4, 0);
+}
+
+GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe, ROT0, "WAVE / Taito Corporation", "Success Joe (World)",   GAME_SUPPORTS_SAVE )
+GAME( 1990, ashnojoe, scessjoe, ashnojoe, ashnojoe, ashnojoe, ROT0, "WAVE / Taito Corporation", "Ashita no Joe (Japan)", GAME_SUPPORTS_SAVE )

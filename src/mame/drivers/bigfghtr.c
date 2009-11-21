@@ -116,44 +116,59 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 
-static UINT16 vreg;
 
-static UINT16 *text_videoram;
-static UINT16 *bg_videoram;
-static UINT16 *fg_videoram;
-static UINT16 *sharedram16;
-static UINT16 fg_scrollx,fg_scrolly;
+typedef struct _bigfghtr_state bigfghtr_state;
+struct _bigfghtr_state
+{
+	/* video-related */
+	UINT16 *      text_videoram;
+	UINT16 *      bg_videoram;
+	UINT16 *      fg_videoram;
+	UINT16 *      sharedram16;
+//	UINT16 *      spriteram16;	// currently this uses generic buffer_spriteram_w
+//	UINT16 *      paletteram16;	// currently this uses generic palette handling
 
+	/* video-related */
+	tilemap       *bg_tilemap, *fg_tilemap, *tx_tilemap;
+	UINT16        fg_scrollx, fg_scrolly;
+	UINT16        vreg;
+	UINT16        scroll_x, scroll_y;
 
-static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
+	/* misc */
+	int           read_latch;
+};
+
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int data = fg_videoram[tile_index];
+	bigfghtr_state *state = (bigfghtr_state *)machine->driver_data;
+	int data = state->fg_videoram[tile_index];
 	SET_TILE_INFO(
 			1,
-			(data&0x7ff),
-			data>>11,
+			(data & 0x7ff),
+			data >> 11,
 			0);
 }
 
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int data = bg_videoram[tile_index];
+	bigfghtr_state *state = (bigfghtr_state *)machine->driver_data;
+	int data = state->bg_videoram[tile_index];
 	SET_TILE_INFO(
 			2,
-			(data&0x3ff),
-			data>>11,
+			(data & 0x3ff),
+			data >> 11,
 			0);
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	int tile_number = text_videoram[tile_index]&0xff;
+	bigfghtr_state *state = (bigfghtr_state *)machine->driver_data;
+	int tile_number = state->text_videoram[tile_index] & 0xff;
 	int attributes;
 
-	attributes = text_videoram[tile_index+0x800]&0xff;
+	attributes = state->text_videoram[tile_index + 0x800] & 0xff;
 
 	SET_TILE_INFO(
 			0,
@@ -164,71 +179,81 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 static VIDEO_START( bigfghtr )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,64,32);
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,16,16,64,32);
-	tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_cols,8,8,64,32);
+	bigfghtr_state *state = (bigfghtr_state *)machine->driver_data;
 
-	tilemap_set_transparent_pen(fg_tilemap,0xf);
-	tilemap_set_transparent_pen(tx_tilemap,0xf);
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 64, 32);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 16, 16, 64, 32);
+	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_cols, 8, 8, 64, 32);
+
+	tilemap_set_transparent_pen(state->fg_tilemap, 0xf);
+	tilemap_set_transparent_pen(state->tx_tilemap, 0xf);
 }
 
 static WRITE16_HANDLER(text_videoram_w )
 {
-	COMBINE_DATA(&text_videoram[offset]);
-	tilemap_mark_tile_dirty(tx_tilemap,offset & 0x7ff);
+	bigfghtr_state *state = (bigfghtr_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->text_videoram[offset]);
+	tilemap_mark_tile_dirty(state->tx_tilemap, offset & 0x7ff);
 }
 
 static WRITE16_HANDLER( fg_videoram_w )
 {
-	COMBINE_DATA(&fg_videoram[offset]);
-	tilemap_mark_tile_dirty(fg_tilemap,offset);
+	bigfghtr_state *state = (bigfghtr_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->fg_videoram[offset]);
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 static WRITE16_HANDLER( bg_videoram_w )
 {
-	COMBINE_DATA(&bg_videoram[offset]);
-	tilemap_mark_tile_dirty(bg_tilemap,offset);
+	bigfghtr_state *state = (bigfghtr_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->bg_videoram[offset]);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static WRITE16_HANDLER( fg_scrollx_w )
 {
-	COMBINE_DATA(&fg_scrollx);
+	bigfghtr_state *state = (bigfghtr_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->fg_scrollx);
 }
 
 static WRITE16_HANDLER( fg_scrolly_w )
 {
-	COMBINE_DATA(&fg_scrolly);
+	bigfghtr_state *state = (bigfghtr_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->fg_scrolly);
 }
 
 static WRITE16_HANDLER( bg_scrollx_w )
 {
-	static UINT16 scroll;
-	COMBINE_DATA(&scroll);
-	tilemap_set_scrollx(bg_tilemap,0,scroll);
+	bigfghtr_state *state = (bigfghtr_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->scroll_x);
+	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll_x);
 }
 
 static WRITE16_HANDLER( bg_scrolly_w )
 {
-	static UINT16 scroll;
-	COMBINE_DATA(&scroll);
-	tilemap_set_scrolly(bg_tilemap,0,scroll);
+	bigfghtr_state *state = (bigfghtr_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->scroll_y);
+	tilemap_set_scrolly(state->bg_tilemap, 0, state->scroll_y);
 }
 
-
-
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	int offs;
-	for (offs = 0;offs < spriteram_size/2;offs += 4)
+	for (offs = 0; offs < spriteram_size / 2; offs += 4)
 	{
-		int code = buffered_spriteram16[offs+1]; /* ??YX?TTTTTTTTTTT */
+		int code = buffered_spriteram16[offs + 1]; /* ??YX?TTTTTTTTTTT */
 		int flipx = code & 0x2000;
 		int flipy = code & 0x1000;
-		int color = (buffered_spriteram16[offs+2]>>8)&0x1f;
-		int sx = buffered_spriteram16[offs+3];
-		int sy = 240-(buffered_spriteram16[offs+0]&0x1ff);
+		int color = (buffered_spriteram16[offs + 2] >> 8) & 0x1f;
+		int sx = buffered_spriteram16[offs + 3];
+		int sy = 240 - (buffered_spriteram16[offs + 0] & 0x1ff);
 
-		if (((buffered_spriteram16[offs+0] & 0x3000) >> 12) == priority)
+		if (((buffered_spriteram16[offs + 0] & 0x3000) >> 12) == priority)
 		{
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 				code & 0xfff,
@@ -242,29 +267,33 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static VIDEO_UPDATE( bigfghtr )
 {
-	int sprite_enable = vreg & 0x200;
+	bigfghtr_state *state = (bigfghtr_state *)screen->machine->driver_data;
+	int sprite_enable = state->vreg & 0x200;
 
-	tilemap_set_enable( bg_tilemap, vreg&0x800 );
-	tilemap_set_enable( fg_tilemap, vreg&0x400 );
-	tilemap_set_enable( tx_tilemap, vreg&0x100 );
+	tilemap_set_enable(state->bg_tilemap, state->vreg & 0x800);
+	tilemap_set_enable(state->fg_tilemap, state->vreg & 0x400);
+	tilemap_set_enable(state->tx_tilemap, state->vreg & 0x100);
 
-	tilemap_set_scrollx( fg_tilemap, 0, fg_scrollx );
-	tilemap_set_scrolly( fg_tilemap, 0, fg_scrolly );
+	tilemap_set_scrollx(state->fg_tilemap, 0, state->fg_scrollx);
+	tilemap_set_scrolly(state->fg_tilemap, 0, state->fg_scrolly);
 
-	if( vreg & 0x0800 )
-	{
-		tilemap_draw( bitmap, cliprect, bg_tilemap, 0, 0);
-	}
+	if (state->vreg & 0x0800)
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	else
-	{
-		bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
-	}
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
-	if( sprite_enable ) draw_sprites(screen->machine, bitmap, cliprect, 2 );
-	tilemap_draw( bitmap, cliprect, fg_tilemap, 0, 0);
-	if( sprite_enable ) draw_sprites(screen->machine, bitmap, cliprect, 1 );
-	tilemap_draw( bitmap, cliprect, tx_tilemap, 0, 0);
-	if( sprite_enable ) draw_sprites(screen->machine, bitmap, cliprect, 0 );
+	if(sprite_enable) 
+		draw_sprites(screen->machine, bitmap, cliprect, 2);
+
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+
+	if(sprite_enable) 
+		draw_sprites(screen->machine, bitmap, cliprect, 1);
+
+	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
+
+	if (sprite_enable) 
+		draw_sprites(screen->machine, bitmap, cliprect, 0);
 
 	return 0;
 }
@@ -281,59 +310,60 @@ static VIDEO_EOF( bigfghtr )
 static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_w(space,0,((data & 0x7f) << 1) | 1);
+		soundlatch_w(space, 0, ((data & 0x7f) << 1) | 1);
 }
 
 static WRITE16_HANDLER( io_w )
 {
-	COMBINE_DATA(&vreg);
-	flip_screen_set(space->machine, vreg & 0x1000);
+	bigfghtr_state *state = (bigfghtr_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->vreg);
+	flip_screen_set(space->machine, state->vreg & 0x1000);
 }
 
-static int read_latch=0;
-
-static READ16_HANDLER(latch_r)
+static READ16_HANDLER( latch_r )
 {
-	read_latch=1;
+	bigfghtr_state *state = (bigfghtr_state *)space->machine->driver_data;
+
+	state->read_latch = 1;
 	return 0;
 }
 
 
-static WRITE16_HANDLER(sharedram_w)
+static WRITE16_HANDLER( sharedram_w )
 {
-
-	COMBINE_DATA(&sharedram16[offset]);
-
+	bigfghtr_state *state = (bigfghtr_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->sharedram16[offset]);
 }
 
 static READ16_HANDLER(sharedram_r)
 {
-		switch(offset)
+	bigfghtr_state *state = (bigfghtr_state *)space->machine->driver_data;
+	switch(offset)
+	{
+	case 0x40/2:
+		if(state->read_latch)
 		{
-			case 0x40/2:
-				if(read_latch)
-				{
-					read_latch=0;
-					return mame_rand(space->machine);
-				}
-			break;
-
-			case 0x46/2:
-				return (input_port_read(space->machine, "P1") & 0xffff)^0xffff;
-
-
+			state->read_latch = 0;
+			return mame_rand(space->machine);
 		}
-		return sharedram16[offset];
+		break;
+
+	case 0x46/2:
+		return (input_port_read(space->machine, "P1") & 0xffff) ^ 0xffff;
+
+	}
+	return state->sharedram16[offset];
 }
 
 static ADDRESS_MAP_START( mainmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0805ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x080600, 0x080fff) AM_READ(sharedram_r) AM_WRITE(sharedram_w) AM_BASE(&sharedram16)
+	AM_RANGE(0x080600, 0x080fff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(bigfghtr_state, sharedram16)
 	AM_RANGE(0x081000, 0x085fff) AM_RAM //??
-	AM_RANGE(0x086000, 0x086fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
-	AM_RANGE(0x087000, 0x087fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
-	AM_RANGE(0x088000, 0x089fff) AM_RAM_WRITE(text_videoram_w) AM_BASE(&text_videoram)
+	AM_RANGE(0x086000, 0x086fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE_MEMBER(bigfghtr_state, bg_videoram)
+	AM_RANGE(0x087000, 0x087fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE_MEMBER(bigfghtr_state, fg_videoram)
+	AM_RANGE(0x088000, 0x089fff) AM_RAM_WRITE(text_videoram_w) AM_BASE_MEMBER(bigfghtr_state, text_videoram)
 	AM_RANGE(0x08a000, 0x08afff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x08b000, 0x08bfff) AM_RAM //??
 	AM_RANGE(0x08c000, 0x08c001) AM_READ_PORT("P1")
@@ -359,7 +389,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( soundlatch_clear_r )
 {
-	soundlatch_clear_w(space,0,0);
+	soundlatch_clear_w(space, 0, 0);
 	return 0;
 }
 
@@ -372,91 +402,7 @@ static ADDRESS_MAP_START( soundport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x6, 0x6) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static const gfx_layout char_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 4, 0, 12, 8, 20, 16, 28, 24},
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
 
-static const gfx_layout tile_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 4, 0, 12, 8, 20, 16, 28, 24,
-			32+4, 32+0, 32+12, 32+8, 32+20, 32+16, 32+28, 32+24 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8
-};
-
-static const gfx_layout sprite_layout =
-{
-	16,16,
-	RGN_FRAC(1,2),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 4, 0, RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 12, 8, RGN_FRAC(1,2)+12, RGN_FRAC(1,2)+8,
-			20, 16, RGN_FRAC(1,2)+20, RGN_FRAC(1,2)+16, 28, 24, RGN_FRAC(1,2)+28, RGN_FRAC(1,2)+24 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	64*8
-};
-
-static GFXDECODE_START( bigfghtr )
-	GFXDECODE_ENTRY( "gfx1", 0, char_layout,		 0*16,	32 )
-	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,		64*16,	32 )
-	GFXDECODE_ENTRY( "gfx3", 0, tile_layout,		96*16,	32 )
-	GFXDECODE_ENTRY( "gfx4", 0, sprite_layout,	32*16,	32 )
-GFXDECODE_END
-
-
-
-static MACHINE_DRIVER_START( bigfghtr )
-	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
-	MDRV_CPU_PROGRAM_MAP(mainmem)
-
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
-
-	MDRV_CPU_ADD("audiocpu", Z80, 3072000)	/* 3.072 MHz???? */
-	MDRV_CPU_PROGRAM_MAP(soundmem)
-	MDRV_CPU_IO_MAP(soundport)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
-	MDRV_GFXDECODE(bigfghtr)
-	MDRV_PALETTE_LENGTH(2048)
-
-	MDRV_VIDEO_EOF(bigfghtr)
-	MDRV_VIDEO_START(bigfghtr)
-	MDRV_VIDEO_UPDATE(bigfghtr)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("ymsnd", YM3812, 4000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
 
 static INPUT_PORTS_START( bigfghtr )
 	PORT_START("P1")
@@ -536,26 +482,122 @@ static INPUT_PORTS_START( bigfghtr )
 INPUT_PORTS_END
 
 
-static DRIVER_INIT( skyrobo )
+static const gfx_layout char_layout =
 {
-	//RAM TESTS
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
-	RAM[0x2e822/2] = 0x4ef9;
-	RAM[0x2e824/2] = 0x0002;
-	RAM[0x2e826/2] = 0xe9ae;
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0, 1, 2, 3 },
+	{ 4, 0, 12, 8, 20, 16, 28, 24},
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	32*8
+};
 
+static const gfx_layout tile_layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 0, 1, 2, 3 },
+	{ 4, 0, 12, 8, 20, 16, 28, 24,
+			32+4, 32+0, 32+12, 32+8, 32+20, 32+16, 32+28, 32+24 },
+	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
+			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	128*8
+};
+
+static const gfx_layout sprite_layout =
+{
+	16,16,
+	RGN_FRAC(1,2),
+	4,
+	{ 0, 1, 2, 3 },
+	{ 4, 0, RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 12, 8, RGN_FRAC(1,2)+12, RGN_FRAC(1,2)+8,
+			20, 16, RGN_FRAC(1,2)+20, RGN_FRAC(1,2)+16, 28, 24, RGN_FRAC(1,2)+28, RGN_FRAC(1,2)+24 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	64*8
+};
+
+static GFXDECODE_START( bigfghtr )
+	GFXDECODE_ENTRY( "gfx1", 0, char_layout,		 0*16,	32 )
+	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,		64*16,	32 )
+	GFXDECODE_ENTRY( "gfx3", 0, tile_layout,		96*16,	32 )
+	GFXDECODE_ENTRY( "gfx4", 0, sprite_layout,	32*16,	32 )
+GFXDECODE_END
+
+
+
+static MACHINE_START( bigfghtr )
+{
+	bigfghtr_state *state = (bigfghtr_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->fg_scrollx);
+	state_save_register_global(machine, state->fg_scrolly);
+	state_save_register_global(machine, state->scroll_x);
+	state_save_register_global(machine, state->scroll_y);
+	state_save_register_global(machine, state->vreg);
+	state_save_register_global(machine, state->read_latch);
+}
+
+static MACHINE_RESET( bigfghtr )
+{
+	bigfghtr_state *state = (bigfghtr_state *)machine->driver_data;
+
+	state->fg_scrollx = 0;
+	state->fg_scrolly = 0;
+	state->scroll_x = 0;
+	state->scroll_y = 0;
+	state->vreg = 0;
+	state->read_latch = 0;
 }
 
 
-static DRIVER_INIT( bigfghtr )
-{
-	//RAM TESTS
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
-	RAM[0x2e8cc/2] = 0x4ef9;
-	RAM[0x2e8ce/2] = 0x0002;
-	RAM[0x2e8d0/2] = 0xea58;
+static MACHINE_DRIVER_START( bigfghtr )
+	MDRV_DRIVER_DATA(bigfghtr_state)
 
-}
+	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
+	MDRV_CPU_PROGRAM_MAP(mainmem)
+
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+
+	MDRV_CPU_ADD("audiocpu", Z80, 3072000)	/* 3.072 MHz???? */
+	MDRV_CPU_PROGRAM_MAP(soundmem)
+	MDRV_CPU_IO_MAP(soundport)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+
+	MDRV_MACHINE_START(bigfghtr)
+	MDRV_MACHINE_RESET(bigfghtr	)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(57)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
+	MDRV_GFXDECODE(bigfghtr)
+	MDRV_PALETTE_LENGTH(2048)
+
+	MDRV_VIDEO_EOF(bigfghtr)
+	MDRV_VIDEO_START(bigfghtr)
+	MDRV_VIDEO_UPDATE(bigfghtr)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ymsnd", YM3812, 4000000)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD("dac1", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_SOUND_ADD("dac2", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
 
 ROM_START( skyrobo )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -621,5 +663,25 @@ ROM_START( bigfghtr )
 	ROM_LOAD( "tf.13h", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* Prom is a N82S129AN type */
 ROM_END
 
-GAME( 1989, skyrobo,        0, bigfghtr, bigfghtr, skyrobo,  ROT0, "Nichibutsu", "Sky Robo",GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION)
-GAME( 1989, bigfghtr, skyrobo, bigfghtr, bigfghtr, bigfghtr, ROT0, "Nichibutsu", "Tatakae! Big Fighter",GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION)
+
+static DRIVER_INIT( skyrobo )
+{
+	//RAM TESTS
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
+	RAM[0x2e822 / 2] = 0x4ef9;
+	RAM[0x2e824 / 2] = 0x0002;
+	RAM[0x2e826 / 2] = 0xe9ae;
+}
+
+
+static DRIVER_INIT( bigfghtr )
+{
+	//RAM TESTS
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
+	RAM[0x2e8cc / 2] = 0x4ef9;
+	RAM[0x2e8ce / 2] = 0x0002;
+	RAM[0x2e8d0 / 2] = 0xea58;
+}
+
+GAME( 1989, skyrobo,        0, bigfghtr, bigfghtr, skyrobo,  ROT0, "Nichibutsu", "Sky Robo", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1989, bigfghtr, skyrobo, bigfghtr, bigfghtr, bigfghtr, ROT0, "Nichibutsu", "Tatakae! Big Fighter", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )

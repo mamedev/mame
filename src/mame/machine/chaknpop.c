@@ -7,14 +7,6 @@
 #include "cpu/z80/z80.h"
 #include "includes/chaknpop.h"
 
-#define MCU_INITIAL_SEED	0x81
-
-UINT8 *chaknpop_ram;
-
-
-static UINT8 mcu_seed;
-static UINT8 mcu_select;
-static UINT8 mcu_result;
 
 /* mcu data that is extracted from the real board! */
 /* updated on 2st Jun 2003 */
@@ -53,17 +45,19 @@ static const UINT8 mcu_data[256] = {
 	0x10, 0xfc, 0x3e, 0x01, 0x32, 0x5b, 0x81, 0xc9
 };
 
-static void mcu_update_seed(UINT8 data)
+static void mcu_update_seed( running_machine *machine, UINT8 data )
 {
+	chaknpop_state *state = (chaknpop_state *)machine->driver_data;
+
 	if (!(data & 0x80))
 	{
-		mcu_seed += 0x83;
-		mcu_seed = (mcu_seed & 0x80) | (mcu_seed >> 1);
+		state->mcu_seed += 0x83;
+		state->mcu_seed = (state->mcu_seed & 0x80) | (state->mcu_seed >> 1);
 	}
 
-	mcu_seed += 0x19;
+	state->mcu_seed += 0x19;
 
-	//logerror("New seed: 0x%02x\n", mcu_seed);
+	//logerror("New seed: 0x%02x\n", state->mcu_seed);
 }
 
 
@@ -71,97 +65,83 @@ static void mcu_update_seed(UINT8 data)
   Memory handlers
 ***************************************************************************/
 
-READ8_HANDLER( chaknpop_mcu_portA_r )
+READ8_HANDLER( chaknpop_mcu_port_a_r )
 {
-	//logerror("%04x: MCU portA read\n", cpu_get_pc(space->cpu));
-	return mcu_result;
+	chaknpop_state *state = (chaknpop_state *)space->machine->driver_data;
+	//logerror("%04x: MCU port_a read\n", cpu_get_pc(space->cpu));
+	return state->mcu_result;
 }
 
 
-READ8_HANDLER( chaknpop_mcu_portB_r )
+READ8_HANDLER( chaknpop_mcu_port_b_r )
 {
-	//logerror("%04x: MCU portB read\n", cpu_get_pc(space->cpu));
+	//logerror("%04x: MCU port_b read\n", cpu_get_pc(space->cpu));
 
 	return 0xff;
 }
 
-READ8_HANDLER( chaknpop_mcu_portC_r )
+READ8_HANDLER( chaknpop_mcu_port_c_r )
 {
-	//logerror("%04x: MCU portC read\n", cpu_get_pc(space->cpu));
+	//logerror("%04x: MCU port_c read\n", cpu_get_pc(space->cpu));
 	return 0x00;
 }
 
-WRITE8_HANDLER( chaknpop_mcu_portA_w )
+WRITE8_HANDLER( chaknpop_mcu_port_a_w )
 {
+	chaknpop_state *state = (chaknpop_state *)space->machine->driver_data;
 	UINT8 mcu_command;
 
-	mcu_command = data + mcu_seed;
-	mcu_result = 0;
+	mcu_command = data + state->mcu_seed;
+	state->mcu_result = 0;
 
 	if (mcu_command < 0x08)
 	{
-		mcu_update_seed(data);
+		mcu_update_seed(space->machine, data);
 
-		mcu_result = mcu_data[mcu_select * 8 + mcu_command];
-		mcu_result -= mcu_seed;
+		state->mcu_result = mcu_data[state->mcu_select * 8 + mcu_command];
+		state->mcu_result -= state->mcu_seed;
 
-		mcu_update_seed(mcu_result);
+		mcu_update_seed(space->machine, state->mcu_result);
 
-		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(space->cpu), mcu_command, mcu_result);
+		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(space->cpu), mcu_command, state->mcu_result);
 	}
 	else if (mcu_command >= 0x28 && mcu_command <= 0x2a)
 	{
-		mcu_update_seed(data);
+		mcu_update_seed(space->machine, data);
 
-		mcu_result = chaknpop_ram[0x380 + mcu_command];
-		mcu_result -= mcu_seed;
+		state->mcu_result = state->mcu_ram[0x380 + mcu_command];
+		state->mcu_result -= state->mcu_seed;
 
-		mcu_update_seed(mcu_result);
+		mcu_update_seed(space->machine, state->mcu_result);
 
-		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(space->cpu), mcu_command, mcu_result);
+		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(space->cpu), mcu_command, state->mcu_result);
 	}
 	else if (mcu_command < 0x80)
 	{
-		mcu_update_seed(data);
+		mcu_update_seed(space->machine, data);
 
 		if (mcu_command >= 0x40 && mcu_command < 0x60)
 		{
-			mcu_select = mcu_command - 0x40;
+			state->mcu_select = mcu_command - 0x40;
 
-			logerror("%04x: MCU select 0x%02x\n", cpu_get_pc(space->cpu), mcu_select);
+			logerror("%04x: MCU select 0x%02x\n", cpu_get_pc(space->cpu), state->mcu_select);
 		}
 	}
 	else if (mcu_command == 0x9c|| mcu_command == 0xde)
 	{
-		mcu_update_seed(data);
+		mcu_update_seed(space->machine, data);
 
 		logerror("%04x: MCU command 0x%02x\n", cpu_get_pc(space->cpu), mcu_command);
 	}
 }
 
-WRITE8_HANDLER( chaknpop_mcu_portB_w )
+WRITE8_HANDLER( chaknpop_mcu_port_b_w )
 {
-	//logerror("%04x: MCU portB write 0x%02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: MCU port_b write 0x%02x\n", cpu_get_pc(space->cpu), data);
 }
 
-WRITE8_HANDLER( chaknpop_mcu_portC_w )
+WRITE8_HANDLER( chaknpop_mcu_port_c_w )
 {
-	//logerror("%04x: MCU portC write 0x%02x\n", cpu_get_pc(space->cpu), data);
+	//logerror("%04x: MCU port_c write 0x%02x\n", cpu_get_pc(space->cpu), data);
 }
 
-
-/***************************************************************************
-  Initialize mcu emulation
-***************************************************************************/
-
-DRIVER_INIT( chaknpop )
-{
-	state_save_register_global(machine, mcu_seed);
-	state_save_register_global(machine, mcu_result);
-	state_save_register_global(machine, mcu_select);
-}
-
-MACHINE_RESET( chaknpop )
-{
-	mcu_seed = MCU_INITIAL_SEED;
-}

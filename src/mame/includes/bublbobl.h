@@ -1,6 +1,45 @@
-/*----------- defined in machine/bublbobl.c -----------*/
 
-extern UINT8 *bublbobl_mcu_sharedram;
+typedef struct _bublbobl_state bublbobl_state;
+struct _bublbobl_state
+{
+	/* memory pointers */
+	UINT8 *  mcu_sharedram;
+	UINT8 *  videoram;
+	UINT8 *  objectram;
+	size_t   objectram_size;
+//	UINT8 *  paletteram;	// currently this uses generic palette handling
+
+	/* missb2.c also needs the following */
+	UINT8 *  bgvram;
+	UINT8 *  bg_paletteram;
+
+	/* video-related */
+	int      video_enable;
+
+	/* sound-related */
+	int      sound_nmi_enable, pending_nmi, sound_status;
+
+	/* mcu-related */
+	/* Tokio*/
+	int      tokio_prot_count;
+	/* Bubble Bobble MCU */
+	UINT8    ddr1, ddr2, ddr3, ddr4;
+	UINT8    port1_in, port2_in, port3_in, port4_in;
+	UINT8    port1_out, port2_out, port3_out, port4_out;
+	/* Bubble Bobble 68705 */
+	UINT8    port_a_in, port_a_out, ddr_a;
+	UINT8    port_b_in, port_b_out, ddr_b;
+	int      address, latch;
+	/* Bobble Bobble */
+	int      ic43_a, ic43_b;
+
+	/* devices */
+	const device_config *mcu;
+};
+
+
+
+/*----------- defined in machine/bublbobl.c -----------*/
 
 WRITE8_HANDLER( bublbobl_bankswitch_w );
 WRITE8_HANDLER( tokio_bankswitch_w );
@@ -38,18 +77,14 @@ WRITE8_HANDLER( bublbobl_mcu_port4_w );
 
 // for 68705 bootleg
 INTERRUPT_GEN( bublbobl_m68705_interrupt );
-READ8_HANDLER( bublbobl_68705_portA_r );
-WRITE8_HANDLER( bublbobl_68705_portA_w );
-WRITE8_HANDLER( bublbobl_68705_ddrA_w );
-READ8_HANDLER( bublbobl_68705_portB_r );
-WRITE8_HANDLER( bublbobl_68705_portB_w );
-WRITE8_HANDLER( bublbobl_68705_ddrB_w );
+READ8_HANDLER( bublbobl_68705_port_a_r );
+WRITE8_HANDLER( bublbobl_68705_port_a_w );
+WRITE8_HANDLER( bublbobl_68705_ddr_a_w );
+READ8_HANDLER( bublbobl_68705_port_b_r );
+WRITE8_HANDLER( bublbobl_68705_port_b_w );
+WRITE8_HANDLER( bublbobl_68705_ddr_b_w );
 
 
 /*----------- defined in video/bublbobl.c -----------*/
-
-extern int bublbobl_video_enable;
-extern UINT8 *bublbobl_objectram;
-extern size_t bublbobl_objectram_size;
 
 VIDEO_UPDATE( bublbobl );

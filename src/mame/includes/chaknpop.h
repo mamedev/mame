@@ -1,22 +1,44 @@
+
+
+#define MCU_INITIAL_SEED	0x81
+
+
+typedef struct _chaknpop_state chaknpop_state;
+struct _chaknpop_state
+{
+	/* memory pointers */
+	UINT8 *  mcu_ram;
+	UINT8 *  tx_ram;
+	UINT8 *  spr_ram;
+	UINT8 *  attr_ram;
+	size_t   spr_ram_size;
+
+	/* mcu-related */
+	UINT8 mcu_seed;
+	UINT8 mcu_select;
+	UINT8 mcu_result;
+
+
+	/* video-related */
+	tilemap  *tx_tilemap;
+	UINT8    *vram1, *vram2, *vram3, *vram4;
+	UINT8    gfxmode;
+	UINT8    flip_x, flip_y;
+};
+
+
+
 /*----------- defined in machine/chaknpop.c -----------*/
 
-extern UINT8 *chaknpop_ram;
-DRIVER_INIT( chaknpop );
-MACHINE_RESET( chaknpop );
-READ8_HANDLER( chaknpop_mcu_portA_r );
-READ8_HANDLER( chaknpop_mcu_portB_r );
-READ8_HANDLER( chaknpop_mcu_portC_r );
-WRITE8_HANDLER( chaknpop_mcu_portA_w );
-WRITE8_HANDLER( chaknpop_mcu_portB_w );
-WRITE8_HANDLER( chaknpop_mcu_portC_w );
+READ8_HANDLER( chaknpop_mcu_port_a_r );
+READ8_HANDLER( chaknpop_mcu_port_b_r );
+READ8_HANDLER( chaknpop_mcu_port_c_r );
+WRITE8_HANDLER( chaknpop_mcu_port_a_w );
+WRITE8_HANDLER( chaknpop_mcu_port_b_w );
+WRITE8_HANDLER( chaknpop_mcu_port_c_w );
 
 
 /*----------- defined in video/chaknpop.c -----------*/
-
-extern UINT8 *chaknpop_txram;
-extern UINT8 *chaknpop_sprram;
-extern size_t chaknpop_sprram_size;
-extern UINT8 *chaknpop_attrram;
 
 PALETTE_INIT( chaknpop );
 VIDEO_START( chaknpop );
@@ -24,7 +46,5 @@ VIDEO_UPDATE( chaknpop );
 
 READ8_HANDLER( chaknpop_gfxmode_r );
 WRITE8_HANDLER( chaknpop_gfxmode_w );
-
 WRITE8_HANDLER( chaknpop_txram_w );
-
 WRITE8_HANDLER( chaknpop_attrram_w );

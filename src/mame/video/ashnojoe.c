@@ -6,15 +6,13 @@
 *********************************************************************/
 
 #include "driver.h"
+#include "ashnojoe.h"
 
-UINT16 *ashnojoetileram16, *ashnojoetileram16_2, *ashnojoetileram16_3, *ashnojoetileram16_4, *ashnojoetileram16_5, *ashnojoetileram16_6, *ashnojoetileram16_7;
-static tilemap *joetilemap, *joetilemap2, *joetilemap3, *joetilemap4, *joetilemap5, *joetilemap6, *joetilemap7;
-
-UINT16 *ashnojoe_tilemap_reg;
 
 static TILE_GET_INFO( get_joe_tile_info )
 {
-	int code = ashnojoetileram16 [tile_index];
+	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+	int code = state->tileram[tile_index];
 
 	SET_TILE_INFO(
 			2,
@@ -25,8 +23,9 @@ static TILE_GET_INFO( get_joe_tile_info )
 
 static TILE_GET_INFO( get_joe_tile_info_2 )
 {
-	int code = ashnojoetileram16_2 [tile_index*2];
-	int attr = ashnojoetileram16_2 [tile_index*2+1];
+	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+	int code = state->tileram_2[tile_index * 2];
+	int attr = state->tileram_2[tile_index * 2 + 1];
 
 	SET_TILE_INFO(
 			4,
@@ -37,7 +36,8 @@ static TILE_GET_INFO( get_joe_tile_info_2 )
 
 static TILE_GET_INFO( get_joe_tile_info_3 )
 {
-	int code = ashnojoetileram16_3 [tile_index];
+	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+	int code = state->tileram_3[tile_index];
 
 	SET_TILE_INFO(
 			0,
@@ -48,7 +48,8 @@ static TILE_GET_INFO( get_joe_tile_info_3 )
 
 static TILE_GET_INFO( get_joe_tile_info_4 )
 {
-	int code = ashnojoetileram16_4 [tile_index];
+	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+	int code = state->tileram_4[tile_index];
 
 	SET_TILE_INFO(
 			1,
@@ -59,8 +60,9 @@ static TILE_GET_INFO( get_joe_tile_info_4 )
 
 static TILE_GET_INFO( get_joe_tile_info_5 )
 {
-	int code = ashnojoetileram16_5 [tile_index*2];
-	int attr = ashnojoetileram16_5 [tile_index*2+1];
+	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+	int code = state->tileram_5[tile_index * 2];
+	int attr = state->tileram_5[tile_index * 2 + 1];
 
 	SET_TILE_INFO(
 			4,
@@ -71,8 +73,9 @@ static TILE_GET_INFO( get_joe_tile_info_5 )
 
 static TILE_GET_INFO( get_joe_tile_info_6 )
 {
-	int code = ashnojoetileram16_6 [tile_index*2];
-	int attr = ashnojoetileram16_6 [tile_index*2+1];
+	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+	int code = state->tileram_6[tile_index * 2];
+	int attr = state->tileram_6[tile_index * 2 + 1];
 
 	SET_TILE_INFO(
 			3,
@@ -84,8 +87,9 @@ static TILE_GET_INFO( get_joe_tile_info_6 )
 
 static TILE_GET_INFO( get_joe_tile_info_7 )
 {
-	int code = ashnojoetileram16_7 [tile_index*2];
-	int attr = ashnojoetileram16_7 [tile_index*2+1];
+	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+	int code = state->tileram_7[tile_index * 2];
+	int attr = state->tileram_7[tile_index * 2 + 1];
 
 	SET_TILE_INFO(
 			3,
@@ -96,127 +100,148 @@ static TILE_GET_INFO( get_joe_tile_info_7 )
 
 WRITE16_HANDLER( ashnojoe_tileram_w )
 {
-	ashnojoetileram16[offset] = data;
-	tilemap_mark_tile_dirty(joetilemap,offset);
+	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+
+	state->tileram[offset] = data;
+	tilemap_mark_tile_dirty(state->joetilemap, offset);
 }
 
 
 WRITE16_HANDLER( ashnojoe_tileram2_w )
 {
-	ashnojoetileram16_2[offset] = data;
-	tilemap_mark_tile_dirty(joetilemap2,offset/2);
+	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+
+	state->tileram_2[offset] = data;
+	tilemap_mark_tile_dirty(state->joetilemap2, offset / 2);
 }
 
 WRITE16_HANDLER( ashnojoe_tileram3_w )
 {
-	ashnojoetileram16_3[offset] = data;
-	tilemap_mark_tile_dirty(joetilemap3,offset);
+	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+
+	state->tileram_3[offset] = data;
+	tilemap_mark_tile_dirty(state->joetilemap3, offset);
 }
 
 WRITE16_HANDLER( ashnojoe_tileram4_w )
 {
-	ashnojoetileram16_4[offset] = data;
-	tilemap_mark_tile_dirty(joetilemap4,offset);
+	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+
+	state->tileram_4[offset] = data;
+	tilemap_mark_tile_dirty(state->joetilemap4, offset);
 }
 
 WRITE16_HANDLER( ashnojoe_tileram5_w )
 {
-	ashnojoetileram16_5[offset] = data;
-	tilemap_mark_tile_dirty(joetilemap5,offset/2);
+	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+
+	state->tileram_5[offset] = data;
+	tilemap_mark_tile_dirty(state->joetilemap5, offset / 2);
 }
 
 WRITE16_HANDLER( ashnojoe_tileram6_w )
 {
-	ashnojoetileram16_6[offset] = data;
-	tilemap_mark_tile_dirty(joetilemap6,offset/2);
+	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+
+	state->tileram_6[offset] = data;
+	tilemap_mark_tile_dirty(state->joetilemap6, offset / 2);
 }
 
 WRITE16_HANDLER( ashnojoe_tileram7_w )
 {
-	ashnojoetileram16_7[offset] = data;
-	tilemap_mark_tile_dirty(joetilemap7,offset/2);
+	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+
+	state->tileram_7[offset] = data;
+	tilemap_mark_tile_dirty(state->joetilemap7, offset / 2);
 }
 
 WRITE16_HANDLER( joe_tilemaps_xscroll_w )
 {
+	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+
 	switch( offset )
 	{
 	case 0:
-		tilemap_set_scrollx(joetilemap3,0,data);
+		tilemap_set_scrollx(state->joetilemap3, 0, data);
 		break;
 	case 1:
-		tilemap_set_scrollx(joetilemap5,0,data);
+		tilemap_set_scrollx(state->joetilemap5, 0, data);
 		break;
 	case 2:
-		tilemap_set_scrollx(joetilemap2,0,data);
+		tilemap_set_scrollx(state->joetilemap2, 0, data);
 		break;
 	case 3:
-		tilemap_set_scrollx(joetilemap4,0,data);
+		tilemap_set_scrollx(state->joetilemap4, 0, data);
 		break;
 	case 4:
-		tilemap_set_scrollx(joetilemap6,0,data);
-		tilemap_set_scrollx(joetilemap7,0,data);
+		tilemap_set_scrollx(state->joetilemap6, 0, data);
+		tilemap_set_scrollx(state->joetilemap7, 0, data);
 		break;
 	}
 }
 
 WRITE16_HANDLER( joe_tilemaps_yscroll_w )
 {
+	ashnojoe_state *state = (ashnojoe_state *)space->machine->driver_data;
+
 	switch( offset )
 	{
 	case 0:
-		tilemap_set_scrolly(joetilemap3,0,data);
+		tilemap_set_scrolly(state->joetilemap3, 0, data);
 		break;
 	case 1:
-		tilemap_set_scrolly(joetilemap5,0,data);
+		tilemap_set_scrolly(state->joetilemap5, 0, data);
 		break;
 	case 2:
-		tilemap_set_scrolly(joetilemap2,0,data);
+		tilemap_set_scrolly(state->joetilemap2, 0, data);
 		break;
 	case 3:
-		tilemap_set_scrolly(joetilemap4,0,data);
+		tilemap_set_scrolly(state->joetilemap4, 0, data);
 		break;
 	case 4:
-		tilemap_set_scrolly(joetilemap6,0,data);
-		tilemap_set_scrolly(joetilemap7,0,data);
+		tilemap_set_scrolly(state->joetilemap6, 0, data);
+		tilemap_set_scrolly(state->joetilemap7, 0, data);
 		break;
 	}
 }
 
 VIDEO_START( ashnojoe )
 {
-	joetilemap  =  tilemap_create(machine, get_joe_tile_info,  tilemap_scan_rows, 8, 8,64,32);
-	joetilemap2 =  tilemap_create(machine, get_joe_tile_info_2,tilemap_scan_rows,16,16,32,32);
-	joetilemap3 =  tilemap_create(machine, get_joe_tile_info_3,tilemap_scan_rows, 8, 8,64,64);
-	joetilemap4 =  tilemap_create(machine, get_joe_tile_info_4,tilemap_scan_rows, 8, 8,64,64);
-	joetilemap5 =  tilemap_create(machine, get_joe_tile_info_5,tilemap_scan_rows,16,16,32,32);
-	joetilemap6 =  tilemap_create(machine, get_joe_tile_info_6,tilemap_scan_rows,		16,16,32,32);
-	joetilemap7 =  tilemap_create(machine, get_joe_tile_info_7,tilemap_scan_rows,		16,16,32,32);
+	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
 
-	tilemap_set_transparent_pen(joetilemap, 15);
-	tilemap_set_transparent_pen(joetilemap2,15);
-	tilemap_set_transparent_pen(joetilemap3,15);
-	tilemap_set_transparent_pen(joetilemap4,15);
-	tilemap_set_transparent_pen(joetilemap5,15);
+	state->joetilemap = tilemap_create(machine, get_joe_tile_info,  tilemap_scan_rows, 8, 8, 64, 32);
+	state->joetilemap2 = tilemap_create(machine, get_joe_tile_info_2, tilemap_scan_rows, 16, 16, 32, 32);
+	state->joetilemap3 = tilemap_create(machine, get_joe_tile_info_3, tilemap_scan_rows, 8, 8, 64, 64);
+	state->joetilemap4 = tilemap_create(machine, get_joe_tile_info_4, tilemap_scan_rows, 8, 8, 64, 64);
+	state->joetilemap5 = tilemap_create(machine, get_joe_tile_info_5, tilemap_scan_rows, 16, 16, 32, 32);
+	state->joetilemap6 = tilemap_create(machine, get_joe_tile_info_6, tilemap_scan_rows, 16, 16, 32, 32);
+	state->joetilemap7 = tilemap_create(machine, get_joe_tile_info_7, tilemap_scan_rows, 16, 16, 32, 32);
+
+	tilemap_set_transparent_pen(state->joetilemap,  15);
+	tilemap_set_transparent_pen(state->joetilemap2, 15);
+	tilemap_set_transparent_pen(state->joetilemap3, 15);
+	tilemap_set_transparent_pen(state->joetilemap4, 15);
+	tilemap_set_transparent_pen(state->joetilemap5, 15);
 }
 
 VIDEO_UPDATE( ashnojoe )
 {
+	ashnojoe_state *state = (ashnojoe_state *)screen->machine->driver_data;
 
-//  ashnojoe_tilemap_reg[0] & 0x10 // ?? on coin insertion
+	//state->tilemap_reg[0] & 0x10 // ?? on coin insertion
 
-	flip_screen_set(screen->machine, ashnojoe_tilemap_reg[0] & 1);
+	flip_screen_set(screen->machine, state->tilemap_reg[0] & 1);
 
-	if(ashnojoe_tilemap_reg[0] & 0x02)
-		tilemap_draw(bitmap,cliprect,joetilemap7,0,0);
+	if(state->tilemap_reg[0] & 0x02)
+		tilemap_draw(bitmap, cliprect, state->joetilemap7, 0, 0);
 	else
-		tilemap_draw(bitmap,cliprect,joetilemap6,0,0);
+		tilemap_draw(bitmap, cliprect, state->joetilemap6, 0, 0);
 
-	tilemap_draw(bitmap,cliprect,joetilemap4,0,0);
-	tilemap_draw(bitmap,cliprect,joetilemap2,0,0);
-	tilemap_draw(bitmap,cliprect,joetilemap5,0,0);
-	tilemap_draw(bitmap,cliprect,joetilemap3,0,0);
-	tilemap_draw(bitmap,cliprect,joetilemap, 0,0);
+	tilemap_draw(bitmap, cliprect, state->joetilemap4, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->joetilemap2, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->joetilemap5, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->joetilemap3, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->joetilemap, 0, 0);
 
 	return 0;
 }

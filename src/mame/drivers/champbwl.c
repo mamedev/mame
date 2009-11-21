@@ -155,18 +155,18 @@ Notes:
 #include "sound/x1_010.h"
 #include "includes/tnzs.h"
 
-static UINT8 last_trackball_val[2] = {0,0};
 
 static READ8_HANDLER( trackball_r )
 {
+	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
 	UINT8 ret;
 	UINT8 port4 = input_port_read(space->machine, "FAKEX");
 	UINT8 port5 = input_port_read(space->machine, "FAKEY");
 
-	ret = (((port4 - last_trackball_val[0]) & 0x0f)<<4) | ((port5 - last_trackball_val[1]) & 0x0f);
+	ret = (((port4 - state->last_trackball_val[0]) & 0x0f)<<4) | ((port5 - state->last_trackball_val[1]) & 0x0f);
 
-	last_trackball_val[0] = port4;
-	last_trackball_val[1] = port5;
+	state->last_trackball_val[0] = port4;
+	state->last_trackball_val[1] = port5;
 
 	return ret;
 }
@@ -179,27 +179,28 @@ static WRITE8_HANDLER( champbwl_misc_w )
 	coin_lockout_w(0, ~data & 8);
 	coin_lockout_w(1, ~data & 4);
 
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + 0x10000 + 0x4000 * ((data & 0x30)>>4));
+	memory_set_bank(space->machine, 1, (data & 0x30) >> 4);
 }
 
 static WRITE8_HANDLER( champbwl_objctrl_w )
 {
+	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
 	if(offset != 0)
 		data ^= 0xff;
 
-	tnzs_objctrl[offset] = data;
+	state->objctrl[offset] = data;
 }
 
 static ADDRESS_MAP_START( champbwl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(&tnzs_objram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_MEMBER(tnzs_state, objram)
 	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("x1snd", seta_sound_r, seta_sound_w)
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE(&tnzs_vdcram)
-	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE(&tnzs_scrollram) /* scrolling info */
-	AM_RANGE(0xe300, 0xe303) AM_MIRROR(0xfc) AM_WRITE(champbwl_objctrl_w) AM_BASE(&tnzs_objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(SMH_RAM) AM_BASE(&tnzs_bg_flag)	/* enable / disable background transparency */
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, vdcram)
+	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE_MEMBER(tnzs_state, scrollram) /* scrolling info */
+	AM_RANGE(0xe300, 0xe303) AM_MIRROR(0xfc) AM_WRITE(champbwl_objctrl_w) AM_BASE_MEMBER(tnzs_state, objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(tnzs_state, bg_flag)	/* enable / disable background transparency */
 
 	AM_RANGE(0xf000, 0xf000) AM_READ(trackball_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN0")
@@ -329,7 +330,34 @@ static const x1_010_interface champbwl_sound_intf =
 	0x0000		/* address */
 };
 
+static MACHINE_START( champbwl )
+{
+	tnzs_state *state = (tnzs_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	state->mcu = NULL; 
+
+	memory_configure_bank(machine, 1, 0, 4, &ROM[0x10000], 0x4000);
+
+	state_save_register_global(machine, state->screenflip);
+	state_save_register_global_array(machine, state->last_trackball_val);
+}
+
+static MACHINE_RESET( champbwl )
+{
+	tnzs_state *state = (tnzs_state *)machine->driver_data;
+
+	state->screenflip = 0;
+	state->mcu_type = -1;
+	state->last_trackball_val[0] = 0;
+	state->last_trackball_val[1] = 0;
+
+}
+
 static MACHINE_DRIVER_START( champbwl )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(tnzs_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 16000000/4) /* 4MHz */
@@ -337,6 +365,9 @@ static MACHINE_DRIVER_START( champbwl )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	MDRV_MACHINE_START(champbwl)
+	MDRV_MACHINE_RESET(champbwl)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -383,4 +414,4 @@ ROM_START( champbwl )
 	ROM_LOAD( "ab002002.2-2", 0xc0000, 0x40000, CRC(42ebe997) SHA1(1808b9e5e996a395c1d48ac001067f736f96feec) )
 ROM_END
 
-GAME( 1989, champbwl, 0, champbwl, champbwl, 0, ROT270, "Seta / Romstar Inc.", "Championship Bowling", 0 )
+GAME( 1989, champbwl, 0, champbwl, champbwl, 0, ROT270, "Seta / Romstar Inc.", "Championship Bowling", GAME_SUPPORTS_SAVE )

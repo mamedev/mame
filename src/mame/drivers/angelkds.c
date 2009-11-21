@@ -141,13 +141,9 @@ static WRITE8_HANDLER( angelkds_sub_sound_w );
 
 */
 
-static WRITE8_HANDLER ( angelkds_cpu_bank_write )
+static WRITE8_HANDLER( angelkds_cpu_bank_write )
 {
-	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "user1");
-
-	bankaddress = data & 0x0f;
-	memory_set_bankptr(space->machine, 1, &RAM[bankaddress * 0x4000]);
+	memory_set_bank(space->machine, 1, data & 0x0f);	// shall we check (data & 0x0f) < # of available banks (8 or 10 resp.)?
 }
 
 
@@ -753,11 +749,20 @@ ROM_START( spcpostn )
 ROM_END
 
 
+static DRIVER_INIT( angelkds )
+{ 
+	UINT8 *RAM = memory_region(machine, "user1");
+	memory_configure_bank(machine, 1, 0, 8, &RAM[0x0000], 0x4000);
+}
+
 static DRIVER_INIT( spcpostn )
-{
-	spcpostn_decode(machine, "maincpu");
+{ 
+	UINT8 *RAM = memory_region(machine, "user1");
+
+	spcpostn_decode(machine, "maincpu"); 
+	memory_configure_bank(machine, 1, 0, 10, &RAM[0x0000], 0x4000);
 }
 
 
-GAME( 1988, angelkds, 0, angelkds, angelkds,        0,  ROT90,  "Sega / Nasco?", "Angel Kids (Japan)" ,     GAME_SUPPORTS_SAVE) /* Nasco not displayed but 'Exa Planning' is */
+GAME( 1988, angelkds, 0, angelkds, angelkds, angelkds,  ROT90,  "Sega / Nasco?", "Angel Kids (Japan)" ,     GAME_SUPPORTS_SAVE) /* Nasco not displayed but 'Exa Planning' is */
 GAME( 1986, spcpostn, 0, angelkds, spcpostn, spcpostn,  ROT90,  "Sega / Nasco",  "Space Position (Japan)" , GAME_SUPPORTS_SAVE) /* encrypted */
