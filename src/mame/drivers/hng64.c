@@ -454,6 +454,7 @@ or Fatal Fury for example).
 
 static int hng64_mcu_type = 0;
 static UINT32 fake_mcu_time;
+static UINT16 hng_mcu_en;
 #define FIGHT_MCU  1
 #define SHOOT_MCU  2
 #define RACING_MCU 3
@@ -634,15 +635,15 @@ static READ32_HANDLER( hng64_sysregs_r )
 	mame_system_time systime;
 	mame_get_base_datetime(space->machine, &systime);
 
-	//if(((offset*4) & 0xff00) == 0x2100)
-	//  printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);
+//	if((offset*4) != 0x1084)
+//	  printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);
 
 	switch(offset*4)
 	{
 		case 0x001c: return mame_rand(space->machine); // hng64 hangs on start-up if zero.
 		//case 0x106c:
 		//case 0x107c:
-		case 0x1084: return 0x00000002; //???
+		case 0x1084: return 0x00000002; //MCU->MIPS latch port
 		//case 0x108c:
 		case 0x1104: return hng64_interrupt_level_request;
 		case 0x1254: return 0x00000000; //dma status, 0x800
@@ -709,15 +710,19 @@ static WRITE32_HANDLER( hng64_sysregs_w )
 	COMBINE_DATA (&hng64_sysregs[offset]);
 	switch(offset*4)
 	{
-		case 0x111c: /* irq ack */ break;
+		case 0x1084: //MIPS->MCU latch port
+			hng_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
+			printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
+			break;
+		case 0x111c: /*irq ack */ break;
 		case 0x1204: hng_dma_start = hng64_sysregs[offset]; break;
 		case 0x1214: hng_dma_dst = hng64_sysregs[offset]; break;
 		case 0x1224:
 			hng_dma_len = hng64_sysregs[offset];
 			hng64_do_dma(space);
 			break;
-		default:
-			logerror("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
+		//default:
+			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
 	}
 }
 
@@ -745,7 +750,9 @@ static READ32_HANDLER( fight_io_r )
 		case 0x000: return 0x00000400;
 		case 0x004: return input_port_read(space->machine, "SYSTEM");
 		case 0x008: return input_port_read(space->machine, "P1_P2");
-		case 0x600: return no_machine_error_code;
+		case 0x600:
+		printf("%04x\n",hng_mcu_en);
+		return no_machine_error_code;
 	}
 
 	return hng64_dualport[offset];
@@ -787,10 +794,13 @@ static READ32_HANDLER( shoot_io_r )
 	{
         case 0x000:
         {
-        	if(cpu_get_pc(space->cpu) == 0x8000e040 || cpu_get_pc(space->cpu) == 0x80012fc0) //i/o init 1
+			if(fake_mcu_time < 0x100)//i/o init
+			{
+				fake_mcu_time++;
 				return 0x400;
-
-        	return 0;
+			}
+			else
+				return 0x000;
 		}
 		case 0x010: return input_port_read(space->machine, "D_IN");
 		case 0x018:
@@ -833,7 +843,20 @@ static READ32_HANDLER( racing_io_r )
 
 static READ32_HANDLER( hng64_dualport_r )
 {
-	printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+//	printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+
+	/*
+	command table:
+	0x0b = ? mode input polling (sams64, bbust2, sams64_2 & roadedge) (*)
+	0x0c = cut down connections, treats the dualport to be normal RAM
+	0x11 = ? mode input polling (fatfurwa, xrally, buriki) (*)
+	0x20 = asks for MCU machine code
+
+	(*) 0x11 is followed by 0x0b if the latter is used, JVS-esque indirect/direct mode?
+	*/
+
+	if(hng_mcu_en == 0x0c)
+		return hng64_dualport[offset];
 
 	switch(hng64_mcu_type)
 	{
@@ -843,12 +866,12 @@ static READ32_HANDLER( hng64_dualport_r )
 		case SAMSHO_MCU: return samsho_io_r(space, offset,0xffffffff);
 	}
 
-	return mame_rand(space->machine)&0xffffffff;
+	return hng64_dualport[offset];
 }
 
 static WRITE32_HANDLER( hng64_dualport_w )
 {
-	printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+//	printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 	COMBINE_DATA (&hng64_dualport[offset]);
 }
 
@@ -1733,13 +1756,12 @@ static MACHINE_RESET(hyperneo)
 	cputag_set_input_line(machine, "comm", INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
 //  cputag_set_input_line(machine, "comm", INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
 
-
-
 	// "Display List" init - ugly
 	activeBuffer = 0 ;
 
 	/* For simulate MCU stepping */
 	fake_mcu_time = 0;
+	hng_mcu_en = 0;
 }
 
 static PALETTE_INIT( hng64 )

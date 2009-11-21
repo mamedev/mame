@@ -51,24 +51,14 @@ static struct polygon *polys ;
  *
  * UINT32 | Bytes    | Use
  * -------+-76543210-+----------------
- *   0    | xxxx---- | y position
- *   0    | ----xxxx | x position
- *   1    | xxxx---- | y zoom
- *   1    | ----xxxx | x zoom
- *   2    | ------x- | x chain
- *   2    | -------x | y chain
- *   2    | xxxx---- | end of sprite list - though it surely contains more info !
- *   2    | ----oo-- | not used ??
- *   3    | --xx---- | palette entry
- *   3    | --x----- | (bit 0x8) - maybe a graphics bank selector
- *   3    | oo--oooo | not used  ?
- *   4    | --xxxxxx | tile number
- *   4    | --x----- | (bit 0x2) - x flip
- *   4    | --x----- | (bit 0x1) - y flip
- *   4    | oo------ | not used ??
- *   5    | oooooooo | not used ??
- *   6    | oooooooo | not used ??
- *   7    | oooooooo | not used ??
+ *   0    | yyyy yyyy yyyy yyyy xxxx xxxx xxxx xxxx | x/y position
+ *   1    | YYYY YYYY YYYY YYYY XXXX XXXX XXXX XXXX | x/y zoom
+ *   2    | ???? ???? ???? ???? ---- ---I cccc CCCC | unknown, 'Inline' chain flag, x/y chain
+ *   3    | ---- ---- bppp pppp ---- ---- ---- ---- | bpp select, palette entry
+ *   4    | ---- --fF ???? tttt tttt tttt tttt tttt | flip bits, unknown, tile number
+ *   5    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
+ *   6    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
+ *   7    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
  */
 
 /* xxxx---- | I think this part of UINT32 2 is interesting as more than just a list end marker (AJG)
@@ -80,37 +70,25 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	UINT32 *source = hng64_spriteram;
 	UINT32 *finish = hng64_spriteram + 0xb000/4;
 
-	/* find end of list? */
-	while( source<finish)
-	{
-		int endlist;
-
-		endlist=(source[2]&0xffff0000)>>16;
-		if (endlist == 0x07ff) break;
-		source+=8;
-	}
-
 //  for (int iii = 0; iii < 0x0f; iii++)
 //      mame_printf_debug("%.8x ", hng64_videoregs[iii]) ;
 
 //  mame_printf_debug("\n") ;
 
-	finish = hng64_spriteram;
-
-	/* draw backwards .. */
-	while( source>finish )
+	while( source<finish )
 	{
 		int xpos, ypos, tileno,chainx,chainy,xflip;
 		int xdrw,ydrw,pal,xinc,yinc,yflip;
+		int chaini;
 		UINT32 zoomx,zoomy;
 		//float foomX, foomY;
-		source-=8;
 
 		ypos = (source[0]&0xffff0000)>>16;
 		xpos = (source[0]&0x0000ffff)>>0;
-		tileno=(source[4]&0x00ffffff);
+		tileno=(source[4]&0x0007ffff);
 		chainx=(source[2]&0x000000f0)>>4;
 		chainy=(source[2]&0x0000000f);
+		chaini=(source[2]&0x00000100);
 
 		zoomy = (source[1]&0xffff0000)>>16;
 		zoomx = (source[1]&0x0000ffff)>>0;
@@ -199,10 +177,38 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			for(xdrw=0;xdrw<=chainx;xdrw++)
 			{
-				drawgfxzoom_transpen(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,xpos+(xinc*xdrw),ypos+(yinc*ydrw),zoomx,zoomy/*0x10000*/,0);
-				tileno++;
+				if (!chaini)
+				{
+					pdrawgfxzoom_transpen(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,xpos+(xinc*xdrw),ypos+(yinc*ydrw),zoomx,zoomy/*0x10000*/,machine->priority_bitmap, 0,0);
+					tileno++;
+				}
+				else // inline chain mode, used by ss64
+				{
+					tileno=(source[4]&0x0007ffff);
+					pal =(source[3]&0x00ff0000)>>16;
+					//xflip=(source[4]&0x02000000)>>25;
+					//yflip=(source[4]&0x01000000)>>24;
+
+					if (source[3]&0x00800000)
+					{
+						gfx= machine->gfx[4];
+					}
+					else
+					{
+						gfx= machine->gfx[5];
+						tileno>>=1;
+					}
+
+					pdrawgfxzoom_transpen(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,xpos+(xinc*xdrw),ypos+(yinc*ydrw),zoomx,zoomy/*0x10000*/,machine->priority_bitmap, 0,0);
+					source +=8;
+
+				}
+
 			}
 		}
+
+
+		if (!chaini) source +=8;
 	}
 }
 
@@ -1124,7 +1130,8 @@ static void hng64_drawtilemap( bitmap_t *bitmap, const rectangle *cliprect, int 
 
 VIDEO_UPDATE( hng64 )
 {
-	bitmap_fill(bitmap, 0, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, 0, screen->machine->pens[0]); //<- user selectable pen too?
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0x00);
 
 	// the tilemap auto animation and moveable tilebases means that they end up
 	// dirty most frames anyway, even with manual tracking
@@ -1146,7 +1153,6 @@ VIDEO_UPDATE( hng64 )
 
 	transition_control(bitmap, cliprect) ;
 
-	/*
     popmessage("%08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x",
     hng64_videoregs[0x00],
     hng64_videoregs[0x01],
@@ -1163,7 +1169,7 @@ VIDEO_UPDATE( hng64 )
     hng64_videoregs[0x0c],
     hng64_videoregs[0x0d],
     hng64_videoregs[0x0e]);
-    */
+
 
 	// tilemap0 per layer flags
 	// 0840 - startup tests, 8x8x4 layer
