@@ -629,19 +629,10 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 #include "includes/tnzs.h"
 #include "sound/2151intf.h"
 
-UINT8 *tnzs_objram;
-UINT8 *tnzs_vdcram, *tnzs_scrollram, *tnzs_objctrl, *tnzs_bg_flag;
-
-
-/* max samples */
-#define	MAX_SAMPLES	0x2f
-
-static INT16 *sampledata[MAX_SAMPLES];
-static int samplesize[MAX_SAMPLES];
-
 static SAMPLES_START( kageki_init_samples )
 {
 	running_machine *machine = device->machine;
+	tnzs_state *state = (tnzs_state *)machine->driver_data;
 	UINT8 *scan, *src;
 	INT16 *dest;
 	int start, size;
@@ -658,19 +649,21 @@ static SAMPLES_START( kageki_init_samples )
 		while (1)
 		{
 			if (*scan++ == 0x00)
-			{
 				break;
-			} else {
+			else 
 				size++;
-			}
 		}
-		sampledata[i] = auto_alloc_array(machine, INT16, size);
-		samplesize[i] = size;
 
-		if (start < 0x100) start = size = 0;
+		/* 2009-11 FP: should these be saved? */
+		state->sampledata[i] = auto_alloc_array(machine, INT16, size);
+		state->samplesize[i] = size;
+
+
+		if (start < 0x100) 
+			start = size = 0;
 
 		// signed 8-bit sample to unsigned 8-bit sample convert
-		dest = sampledata[i];
+		dest = state->sampledata[i];
 		scan = &src[start];
 		for (n = 0; n < size; n++)
 		{
@@ -681,15 +674,15 @@ static SAMPLES_START( kageki_init_samples )
 }
 
 
-static int kageki_csport_sel = 0;
 static READ8_DEVICE_HANDLER( kageki_csport_r )
 {
-	int	dsw, dsw1, dsw2;
+	tnzs_state *state = (tnzs_state *)device->machine->driver_data;
+	int dsw, dsw1, dsw2;
 
 	dsw1 = input_port_read(device->machine, "DSWA");
 	dsw2 = input_port_read(device->machine, "DSWB");
 
-	switch (kageki_csport_sel)
+	switch (state->kageki_csport_sel)
 	{
 		case	0x00:			// DSW2 5,1 / DSW1 5,1
 			dsw = (((dsw2 & 0x10) >> 1) | ((dsw2 & 0x01) << 2) | ((dsw1 & 0x10) >> 3) | ((dsw1 & 0x01) >> 0));
@@ -705,7 +698,7 @@ static READ8_DEVICE_HANDLER( kageki_csport_r )
 			break;
 		default:
 			dsw = 0x00;
-		//  logerror("kageki_csport_sel error !! (0x%08X)\n", kageki_csport_sel);
+		//  logerror("kageki_csport_sel error !! (0x%08X)\n", state->kageki_csport_sel);
 	}
 
 	return (dsw & 0xff);
@@ -713,21 +706,26 @@ static READ8_DEVICE_HANDLER( kageki_csport_r )
 
 static WRITE8_DEVICE_HANDLER( kageki_csport_w )
 {
+	tnzs_state *state = (tnzs_state *)device->machine->driver_data;
 	char mess[80];
 
 	if (data > 0x3f)
 	{
 		// read dipsw port
-		kageki_csport_sel = (data & 0x03);
-	} else {
+		state->kageki_csport_sel = (data & 0x03);
+	} 
+	else 
+	{
 		if (data > MAX_SAMPLES)
 		{
 			// stop samples
 			sample_stop(device, 0);
 			sprintf(mess, "VOICE:%02X STOP", data);
-		} else {
+		}
+		else
+		{
 			// play samples
-			sample_start_raw(device, 0, sampledata[data], samplesize[data], 7000, 0);
+			sample_start_raw(device, 0, state->sampledata[data], state->samplesize[data], 7000, 0);
 			sprintf(mess, "VOICE:%02X PLAY", data);
 		}
 	//  popmessage(mess);
@@ -737,29 +735,26 @@ static WRITE8_DEVICE_HANDLER( kageki_csport_w )
 static WRITE8_DEVICE_HANDLER( kabukiz_sound_bank_w )
 {
 	// to avoid the write when the sound chip is initialized
-	if(data != 0xff)
-	{
-		UINT8 *ROM = memory_region(device->machine, "audiocpu");
-		memory_set_bankptr(device->machine, 3, &ROM[0x10000 + 0x4000 * (data & 0x07)]);
-	}
+	if (data != 0xff)
+		memory_set_bank(device->machine, 3, data & 0x07);
 }
 
 static WRITE8_DEVICE_HANDLER( kabukiz_sample_w )
 {
 	// to avoid the write when the sound chip is initialized
-	if(data != 0xff)
+	if (data != 0xff)
 		dac_data_w(device, data);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)	/* ROM + RAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&tnzs_objram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(tnzs_state, objram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE(&tnzs_vdcram)
-	AM_RANGE(0xf200, 0xf2ff) AM_WRITEONLY AM_BASE(&tnzs_scrollram) /* scrolling info */
-	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITEONLY AM_BASE(&tnzs_objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xf400, 0xf400) AM_WRITEONLY AM_BASE(&tnzs_bg_flag)	/* enable / disable background transparency */
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, vdcram)
+	AM_RANGE(0xf200, 0xf2ff) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, scrollram) /* scrolling info */
+	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xf400, 0xf400) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, bg_flag)	/* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_READNOP AM_WRITE(tnzs_bankswitch_w)
 	/* arknoid2, extrmatn, plumppop and drtoppel have PROMs instead of RAM */
 	/* drtoppel writes here anyway! (maybe leftover from tests during development) */
@@ -770,12 +765,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu0_type2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)	/* ROM + RAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&tnzs_objram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(tnzs_state, objram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE(&tnzs_vdcram)
-	AM_RANGE(0xf200, 0xf2ff) AM_WRITEONLY AM_BASE(&tnzs_scrollram) /* scrolling info */
-	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITEONLY AM_BASE(&tnzs_objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xf400, 0xf400) AM_WRITEONLY AM_BASE(&tnzs_bg_flag)	/* enable / disable background transparency */
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, vdcram)
+	AM_RANGE(0xf200, 0xf2ff) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, scrollram) /* scrolling info */
+	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xf400, 0xf400) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, bg_flag)	/* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_WRITE(tnzs_bankswitch_w)
 	/* kabukiz still writes here but it's not used (it's paletteram in type1 map) */
 	AM_RANGE(0xf800, 0xfbff) AM_WRITENOP
@@ -872,41 +867,39 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( jpopnics_palette_w )
 {
-	int r,g,b;
+	int r, g, b;
 	UINT16 paldata;
 	paletteram[offset] = data;
 
 	offset = offset >> 1;
 
-	paldata = (paletteram[offset*2]<<8) | paletteram[(offset*2+1)];
+	paldata = (paletteram[offset * 2] << 8) | paletteram[(offset * 2 + 1)];
 
 	g = (paldata >> 12) & 0x000f;
 	r = (paldata >> 4) & 0x000f;
 	b = (paldata >> 8) & 0x000f;
 	// the other bits seem to be used, and the colours are wrong..
 
-	palette_set_color_rgb(space->machine,offset,r<<4, g<<4, b<<4);
+	palette_set_color_rgb(space->machine, offset, r << 4, g << 4, b << 4);
 }
 
 static ADDRESS_MAP_START( jpopnics_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&tnzs_objram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(tnzs_state, objram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1) /* WORK RAM (shared by the 2 z80's) */
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE(&tnzs_vdcram) 	/* VDC RAM */
-	AM_RANGE(0xf200, 0xf2ff) AM_RAM AM_BASE(&tnzs_scrollram) /* scrolling info */
-	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITE(SMH_RAM) AM_BASE(&tnzs_objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(SMH_RAM) AM_BASE(&tnzs_bg_flag)	/* enable / disable background transparency */
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, vdcram) 	/* VDC RAM */
+	AM_RANGE(0xf200, 0xf2ff) AM_RAM AM_BASE_MEMBER(tnzs_state, scrollram) /* scrolling info */
+	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(tnzs_state, objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(tnzs_state, bg_flag)	/* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_READWRITE(SMH_NOP, tnzs_bankswitch_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(jpopnics_palette_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( jpopnics_subbankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "sub");
-
 	/* bits 0-1 select ROM bank */
-	memory_set_bankptr (space->machine, 2, &RAM[0x10000 + 0x2000 * (data & 3)]);
+	memory_set_bank(space->machine, 2, data & 0x03);
 }
 
 static ADDRESS_MAP_START( jpopnics_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1607,6 +1600,9 @@ static const samples_interface tnzs_samples_interface =
 
 static MACHINE_DRIVER_START( arknoid2 )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(tnzs_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -1618,6 +1614,7 @@ static MACHINE_DRIVER_START( arknoid2 )
 
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
+	MDRV_MACHINE_START(tnzs)
 	MDRV_MACHINE_RESET(tnzs)
 
 	/* video hardware */
@@ -1646,6 +1643,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( drtoppel )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(tnzs_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -1657,6 +1657,7 @@ static MACHINE_DRIVER_START( drtoppel )
 
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
+	MDRV_MACHINE_START(tnzs)
 	MDRV_MACHINE_RESET(tnzs)
 
 	/* video hardware */
@@ -1685,6 +1686,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tnzs )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(tnzs_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -1699,6 +1703,7 @@ static MACHINE_DRIVER_START( tnzs )
 
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
+	MDRV_MACHINE_START(tnzs)
 	MDRV_MACHINE_RESET(tnzs)
 
 	/* video hardware */
@@ -1726,6 +1731,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( insectx )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(tnzs_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -1737,6 +1745,7 @@ static MACHINE_DRIVER_START( insectx )
 
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
+	MDRV_MACHINE_START(tnzs)
 	MDRV_MACHINE_RESET(tnzs)
 
 	/* video hardware */
@@ -1764,6 +1773,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( kageki )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(tnzs_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -1775,6 +1787,7 @@ static MACHINE_DRIVER_START( kageki )
 
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
+	MDRV_MACHINE_START(tnzs)
 	MDRV_MACHINE_RESET(tnzs)
 
 	/* video hardware */
@@ -1809,6 +1822,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tnzsb )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(tnzs_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu0_type2)
@@ -1824,6 +1840,7 @@ static MACHINE_DRIVER_START( tnzsb )
 
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
+	MDRV_MACHINE_START(tnzs)
 	MDRV_MACHINE_RESET(tnzs)
 
 	/* video hardware */
@@ -1877,6 +1894,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( jpopnics )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(tnzs_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2) /* Not verified - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(jpopnics_main_map)
@@ -1887,6 +1907,9 @@ static MACHINE_DRIVER_START( jpopnics )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+
+	MDRV_MACHINE_START(jpopnics)
+	MDRV_MACHINE_RESET(jpopnics)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
