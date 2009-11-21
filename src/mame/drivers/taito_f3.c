@@ -3862,7 +3862,7 @@ GAME( 1993, gunlock,  0,        f3_224a, f3, gunlock,  ROT90,  "Taito Corporatio
 GAME( 1993, rayforcej,gunlock,  f3_224a, f3, gunlock,  ROT90,  "Taito Corporation",         "Ray Force (Ver 2.3J 1994/01/20)", 0 )
 GAME( 1993, rayforce, gunlock,  f3_224a, f3, gunlock,  ROT90,  "Taito America Corporation", "Ray Force (Ver 2.3A 1994/01/20)", 0 )
 GAME( 1993, scfinals, 0,        f3_224a, f3, scfinals, ROT0,   "Taito Corporation Japan",   "Super Cup Finals (Ver 2.1O 1993/11/19)", 0 )
-GAME( 1993, lightbr,  0,        f3_224a, f3, lightbr,  ROT0,   "Taito Corporation Japan",   "Light Bringer (Ver 2.20 1994/04/08)", 0 )
+GAME( 1993, lightbr,  0,        f3_224a, f3, lightbr,  ROT0,   "Taito Corporation Japan",   "Light Bringer (Ver 2.2O 1994/04/08)", 0 )
 GAME( 1993, lightbrj, lightbr,  f3_224a, f3, lightbr,  ROT0,   "Taito Corporation",         "Light Bringer (Ver 2.1J 1994/02/18)", 0 )
 GAME( 1993, dungeonm, lightbr,  f3_224a, f3, lightbr,  ROT0,   "Taito Corporation Japan",   "Dungeon Magic (Ver 2.1O 1994/02/18)", 0 )
 GAME( 1993, dungeonmu,lightbr,  f3_224a, f3, lightbr,  ROT0,   "Taito America Corporation", "Dungeon Magic (Ver 2.1A 1994/02/18)", 0 )
