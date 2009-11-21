@@ -55,23 +55,42 @@ Code disassembling
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "machine/8255ppi.h"
 
-static tilemap *bg_tilemap;
-static UINT8 mux_data;
-static int bank;
-static UINT8 *cus_ram;
-static UINT8 prot_lock;
+
+typedef struct _albazg_state albazg_state;
+struct _albazg_state
+{
+	/* memory pointers */
+	UINT8 *  cus_ram;
+	UINT8 *  videoram;
+	UINT8 *  colorram;
+//	UINT8 *  paletteram;	// currently this uses generic palette handling
+//	UINT8 *  paletteram_2;	// currently this uses generic palette handling
+
+	/* video-related */
+	tilemap  *bg_tilemap;
+
+	/* misc */
+	UINT8 mux_data;
+	int bank;
+	UINT8 prot_lock;
+
+	/* devices */
+	const device_config *eeprom;
+};
+
 
 #define MASTER_CLOCK XTAL_12MHz
 
 static TILE_GET_INFO( y_get_bg_tile_info )
 {
-	int code = videoram[tile_index];
-	int color = colorram[tile_index];
+	albazg_state *state = (albazg_state *)machine->driver_data;
+	int code = state->videoram[tile_index];
+	int color = state->colorram[tile_index];
 
 	SET_TILE_INFO(
 			0,
@@ -83,12 +102,14 @@ static TILE_GET_INFO( y_get_bg_tile_info )
 
 static VIDEO_START( yumefuda )
 {
-	bg_tilemap = tilemap_create(machine, y_get_bg_tile_info,tilemap_scan_rows,8,8,32,32);
+	albazg_state *state = (albazg_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, y_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static VIDEO_UPDATE( yumefuda )
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+	albazg_state *state = (albazg_state *)screen->machine->driver_data;
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -112,52 +133,61 @@ GFXDECODE_END
 
 static WRITE8_HANDLER( yumefuda_vram_w )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset);
+	albazg_state *state = (albazg_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( yumefuda_cram_w )
 {
-	colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset);
+	albazg_state *state = (albazg_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 /*Custom RAM (Thrash Protection)*/
 static READ8_HANDLER( custom_ram_r )
 {
-//  logerror("Custom RAM read at %02x PC = %x\n",offset+0xaf80,cpu_get_pc(space->cpu));
-	return cus_ram[offset];// ^ 0x55;
+	albazg_state *state = (albazg_state *)space->machine->driver_data;
+//  logerror("Custom RAM read at %02x PC = %x\n", offset + 0xaf80, cpu_get_pc(space->cpu));
+	return state->cus_ram[offset];// ^ 0x55;
 }
 
 static WRITE8_HANDLER( custom_ram_w )
 {
-//  logerror("Custom RAM write at %02x : %02x PC = %x\n",offset+0xaf80,data,cpu_get_pc(space->cpu));
-	if(prot_lock) { cus_ram[offset] = data; }
+	albazg_state *state = (albazg_state *)space->machine->driver_data;
+//  logerror("Custom RAM write at %02x : %02x PC = %x\n", offset + 0xaf80, data, cpu_get_pc(space->cpu));
+	if(state->prot_lock) 
+		state->cus_ram[offset] = data;
 }
 
 /*this might be used as NVRAM commands btw*/
 static WRITE8_HANDLER( prot_lock_w )
 {
-//  logerror("PC %04x Prot lock value written %02x\n",cpu_get_pc(space->cpu),data);
-	prot_lock = data;
+	albazg_state *state = (albazg_state *)space->machine->driver_data;
+//  logerror("PC %04x Prot lock value written %02x\n", cpu_get_pc(space->cpu), data);
+	state->prot_lock = data;
 }
 
 static WRITE8_HANDLER( eeprom_w )
 {
-	eeprom_write_bit(data & 0x04);
-	eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-	eeprom_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	albazg_state *state = (albazg_state *)space->machine->driver_data;
+	eepromdev_write_bit(state->eeprom, data & 0x04);
+	eepromdev_set_cs_line(state->eeprom, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	eepromdev_set_clock_line(state->eeprom, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static READ8_DEVICE_HANDLER( eeprom_r )
 {
-	return ((~eeprom_read_bit() & 0x01)<<6) | (input_port_read(device->machine, "SYSTEM") & ~0x40);
+	albazg_state *state = (albazg_state *)device->machine->driver_data;
+	return ((~eepromdev_read_bit(state->eeprom) & 0x01) << 6) | (input_port_read(device->machine, "SYSTEM") & ~0x40);
 }
 
 static READ8_DEVICE_HANDLER( mux_r )
 {
-	switch(mux_data)
+	albazg_state *state = (albazg_state *)device->machine->driver_data;
+	switch(state->mux_data)
 	{
 		case 0x00: return input_port_read(device->machine, "IN0");
 		case 0x01: return input_port_read(device->machine, "IN1");
@@ -173,28 +203,26 @@ static READ8_DEVICE_HANDLER( mux_r )
 
 static WRITE8_DEVICE_HANDLER( mux_w )
 {
-	int new_bank = (data&0xc0)>>6;
+	albazg_state *state = (albazg_state *)device->machine->driver_data;
+	int new_bank = (data & 0xc0) >> 6;
 
 	//0x10000 "Learn Mode"
 	//0x12000 gameplay
 	//0x14000 bonus game
 	//0x16000 ?
-	if(bank!=new_bank) {
-		UINT8 *ROM = memory_region(device->machine, "maincpu");
-		UINT32 bankaddress;
-
-		bank = new_bank;
-		bankaddress = 0x10000 + 0x2000 * bank;
-		memory_set_bankptr(device->machine, 1, &ROM[bankaddress]);
+	if( state->bank != new_bank) 
+	{
+		state->bank = new_bank;
+		memory_set_bank(device->machine, 1, state->bank);
 	}
 
-	mux_data = data & ~0xc0;
+	state->mux_data = data & ~0xc0;
 }
 
 static WRITE8_DEVICE_HANDLER( yumefuda_output_w )
 {
-	coin_counter_w(0,~data & 4);
-	coin_counter_w(1,~data & 2);
+	coin_counter_w(0, ~data & 4);
+	coin_counter_w(1, ~data & 2);
 	coin_lockout_global_w(data & 1);
 	//data & 0x10 hopper-c (active LOW)
 	//data & 0x08 divider (active HIGH)
@@ -242,11 +270,11 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)
 	AM_RANGE(0xa7fc, 0xa7fc) AM_WRITE(prot_lock_w)
 	AM_RANGE(0xa7ff, 0xa7ff) AM_WRITE(eeprom_w)
-	AM_RANGE(0xaf80, 0xafff) AM_READWRITE(custom_ram_r, custom_ram_w) AM_BASE(&cus_ram)
+	AM_RANGE(0xaf80, 0xafff) AM_READWRITE(custom_ram_r, custom_ram_w) AM_BASE_MEMBER(albazg_state, cus_ram)
 	AM_RANGE(0xb000, 0xb07f) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_split1_w) AM_BASE(&paletteram)
 	AM_RANGE(0xb080, 0xb0ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_split2_w) AM_BASE(&paletteram_2)
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(yumefuda_vram_w) AM_BASE(&videoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(yumefuda_cram_w) AM_BASE(&colorram)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(yumefuda_vram_w) AM_BASE_MEMBER(albazg_state, videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(yumefuda_cram_w) AM_BASE_MEMBER(albazg_state, colorram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -260,14 +288,32 @@ static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
+static MACHINE_START( yumefuda )
+{
+	albazg_state *state = (albazg_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, 1, 0, 4, &ROM[0x10000], 0x2000);
+
+	state->eeprom = devtag_get_device(machine, "eeprom");
+
+	state_save_register_global(machine, state->mux_data);
+	state_save_register_global(machine, state->bank);
+	state_save_register_global(machine, state->prot_lock);
+}
+
 static MACHINE_RESET( yumefuda )
 {
-	mux_data = 0;
-	bank = -1;
-	prot_lock = 0;
+	albazg_state *state = (albazg_state *)machine->driver_data;
+	state->mux_data = 0;
+	state->bank = -1;
+	state->prot_lock = 0;
 }
 
 static MACHINE_DRIVER_START( yumefuda )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(albazg_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80 , MASTER_CLOCK/2) /* xtal is 12 Mhz, unknown divider*/
@@ -275,8 +321,10 @@ static MACHINE_DRIVER_START( yumefuda )
 	MDRV_CPU_IO_MAP(port_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+	MDRV_MACHINE_START(yumefuda)
 	MDRV_MACHINE_RESET(yumefuda)
-	MDRV_NVRAM_HANDLER(93C46)
+
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	MDRV_WATCHDOG_VBLANK_INIT(8) // timing is unknown
 
@@ -320,7 +368,7 @@ static INPUT_PORTS_START( yumefuda )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Flip-Flop")  PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Flip-Flop")  PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Coupon") PORT_IMPULSE(2) //coupon
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Note") PORT_IMPULSE(2)  //note
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
@@ -328,32 +376,32 @@ static INPUT_PORTS_START( yumefuda )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Button 1") PORT_CODE(KEYCODE_Z) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Button 2") PORT_CODE(KEYCODE_X) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Button 3") PORT_CODE(KEYCODE_C) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Button 4") PORT_CODE(KEYCODE_V) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 BET Button") PORT_CODE(KEYCODE_2) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 BET Button") PORT_CODE(KEYCODE_3) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start") PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
 
 	PORT_START("IN2")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Button 5") PORT_CODE(KEYCODE_B) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P1 No Button") PORT_CODE(KEYCODE_A) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P1 Yes Button") PORT_CODE(KEYCODE_Q) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Button 6") PORT_CODE(KEYCODE_N) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Button 3") PORT_CODE(KEYCODE_C) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Button 2")  PORT_CODE(KEYCODE_X) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Button 1") PORT_CODE(KEYCODE_Z) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Button 4") PORT_CODE(KEYCODE_V) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
 
 	PORT_START("IN3")
 	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start") PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 BET Button") PORT_CODE(KEYCODE_2) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Button 6") PORT_CODE(KEYCODE_N) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Button 5") PORT_CODE(KEYCODE_B) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 BET Button") PORT_CODE(KEYCODE_3) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
 
 	/* Some bits of these three are actually used if you use the Royal Panel type */
 	PORT_START("IN4")
@@ -363,13 +411,13 @@ static INPUT_PORTS_START( yumefuda )
 	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P1 No Button") PORT_CODE(KEYCODE_A) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P1 Yes Button") PORT_CODE(KEYCODE_Q) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
 
 	PORT_START("IN6")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    /*Unused,on the PCB there's just one bank*/
+	/* Unused, on the PCB there's just one bank */
 	PORT_START("DSW1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -414,4 +462,4 @@ ROM_START( yumefuda )
 	ROM_LOAD("zg001003.u3", 0xc000, 0x4000, CRC(5822ff27) SHA1(d40fa0790de3c912f770ef8f610bd8c42bc3500f))
 ROM_END
 
-GAME( 1991, yumefuda, 0, yumefuda, yumefuda, 0, ROT0, "Alba", "(Medal) Yumefuda [BET]", GAME_NO_COCKTAIL )
+GAME( 1991, yumefuda, 0, yumefuda, yumefuda, 0, ROT0, "Alba", "(Medal) Yumefuda [BET]", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
