@@ -3516,7 +3516,7 @@ ROM_START( ddr3mp )
 	ROM_LOAD( "gea22ja.u1",   0x000000, 0x000224, BAD_DUMP CRC(ef370ff7) SHA1(cb7a043f8bfa535e54ae9af728031d1018ed0734) )
 
 	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
-	ROM_LOAD( "gca22ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(6291defc) SHA1(bb9dad69896826aeb42dafa91cb99599467c31ff) )
+	ROM_LOAD( "gca22ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(6883c82c) SHA1(6fef1dc7150066eee427db685b6c5fb350b7768d) )
 
 	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
 	ROM_FILL( 0x0000000, 0x1000000, 0xff )
