@@ -1040,7 +1040,7 @@ ROM_START( wgp )
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c32-11.8",  0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c32-12.7",  0x00000, 0x80000, CRC(df48a37b) SHA1(c0c191f4b8a5f55c0f1e52dac9cd3f7d15adace6) )
 
 //  Pals (Guru dump)
@@ -1093,7 +1093,7 @@ ROM_START( wgpj )
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c32-11.8", 0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c32-12.7", 0x00000, 0x80000, CRC(df48a37b) SHA1(c0c191f4b8a5f55c0f1e52dac9cd3f7d15adace6) )
 ROM_END
 
@@ -1129,7 +1129,7 @@ ROM_START( wgpjoy )
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c32-11.8", 0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* delta-t samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* delta-t samples */
 	ROM_LOAD( "c32-12.7", 0x00000, 0x80000, CRC(df48a37b) SHA1(c0c191f4b8a5f55c0f1e52dac9cd3f7d15adace6) )
 ROM_END
 
@@ -1165,7 +1165,7 @@ ROM_START( wgpjoya )	/* Older joystick version ??? */
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c32-11.8", 0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* delta-t samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* delta-t samples */
 	ROM_LOAD( "c32-12.7", 0x00000, 0x80000, CRC(df48a37b) SHA1(c0c191f4b8a5f55c0f1e52dac9cd3f7d15adace6) )
 ROM_END
 
@@ -1201,7 +1201,7 @@ ROM_START( wgp2 )
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c32-11.8", 0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* delta-t samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* delta-t samples */
 	ROM_LOAD( "c32-12.7", 0x00000, 0x80000, CRC(df48a37b) SHA1(c0c191f4b8a5f55c0f1e52dac9cd3f7d15adace6) )
 
 //  WGP2 security board (has TC0190FMC)

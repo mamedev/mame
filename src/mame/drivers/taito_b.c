@@ -2880,7 +2880,7 @@ ROM_START( rastsag2 )
 	ROM_REGION( 0x80000, "ymsnd", 0 )
 	ROM_LOAD( "b81-02.2", 0x00000, 0x80000, CRC(20ec3b86) SHA1(fcdcc7f0a09feb824d8d73b1af0aae7ec30fd1ed) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
 	ROM_LOAD( "b81-01.1", 0x00000, 0x80000, CRC(b33f796b) SHA1(6cdb32f56283acdf20eb46a1e658e3bd7c97978c) )
 ROM_END
 
@@ -2902,7 +2902,7 @@ ROM_START( nastarw )
 	ROM_REGION( 0x80000, "ymsnd", 0 )
 	ROM_LOAD( "b81-02.2", 0x00000, 0x80000, CRC(20ec3b86) SHA1(fcdcc7f0a09feb824d8d73b1af0aae7ec30fd1ed) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
 	ROM_LOAD( "b81-01.1", 0x00000, 0x80000, CRC(b33f796b) SHA1(6cdb32f56283acdf20eb46a1e658e3bd7c97978c) )
 ROM_END
 
@@ -2924,7 +2924,7 @@ ROM_START( nastar )
 	ROM_REGION( 0x80000, "ymsnd", 0 )
 	ROM_LOAD( "b81-02.2", 0x00000, 0x80000, CRC(20ec3b86) SHA1(fcdcc7f0a09feb824d8d73b1af0aae7ec30fd1ed) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
 	ROM_LOAD( "b81-01.1", 0x00000, 0x80000, CRC(b33f796b) SHA1(6cdb32f56283acdf20eb46a1e658e3bd7c97978c) )
 
 	ROM_REGION( 0x0400, "plds", 0 )
@@ -3063,7 +3063,7 @@ ROM_START( tetrist )
 	ROM_REGION( 0x80000, "ymsnd", ROMREGION_ERASE00 )	/* adpcm samples */
 	/* empty */
 
-	ROM_REGION( 0x80000, "ym.deltat", ROMREGION_ERASE00 )	/* DELTA-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", ROMREGION_ERASE00 )	/* DELTA-T samples */
 	/* empty */
 ROM_END
 
@@ -3471,7 +3471,7 @@ ROM_START( silentd )
 	ROM_REGION( 0x80000, "ymsnd", 0 )
 	ROM_LOAD( "east-01.ic1", 0x00000, 0x80000, CRC(b41fff1a) SHA1(54920d13fa2b3000eedab9d0050a299ae743c663) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
 	ROM_LOAD( "east-02.ic3", 0x00000, 0x80000, CRC(e0de5c39) SHA1(75d0e193d882e67921c216c3293454e34304d25e) )
 ROM_END
 
@@ -3495,7 +3495,7 @@ ROM_START( silentdj )
 	ROM_REGION( 0x80000, "ymsnd", 0 )
 	ROM_LOAD( "east-01.ic1", 0x00000, 0x80000, CRC(b41fff1a) SHA1(54920d13fa2b3000eedab9d0050a299ae743c663) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
 	ROM_LOAD( "east-02.ic3", 0x00000, 0x80000, CRC(e0de5c39) SHA1(75d0e193d882e67921c216c3293454e34304d25e) )
 ROM_END
 
@@ -3519,7 +3519,7 @@ ROM_START( silentdu )
 	ROM_REGION( 0x80000, "ymsnd", 0 )
 	ROM_LOAD( "east-01.ic1", 0x00000, 0x80000, CRC(b41fff1a) SHA1(54920d13fa2b3000eedab9d0050a299ae743c663) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
 	ROM_LOAD( "east-02.ic3", 0x00000, 0x80000, CRC(e0de5c39) SHA1(75d0e193d882e67921c216c3293454e34304d25e) )
 ROM_END
 

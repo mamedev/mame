@@ -598,7 +598,7 @@ ROM_START( darius2d )
 	ROM_LOAD( "c07-10.95", 0x00000, 0x80000, CRC(4bbe0ed9) SHA1(081b73c4e4d4fa548445e5548573099bcb1e9213) )
 	ROM_LOAD( "c07-11.96", 0x80000, 0x80000, CRC(3c815699) SHA1(0471ff5b0c0da905267f2cee52fd68c8661cccc9) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c07-12.107", 0x00000, 0x80000, CRC(e0b71258) SHA1(0258e308b643d723475824752ebffc4ea29d1ac4) )
 
 	ROM_REGION( 0x001000, "user1", 0 )	/* unknown roms */
@@ -644,7 +644,7 @@ ROM_START( darius2do )
 	ROM_LOAD( "c07-10.95", 0x00000, 0x80000, CRC(4bbe0ed9) SHA1(081b73c4e4d4fa548445e5548573099bcb1e9213) )
 	ROM_LOAD( "c07-11.96", 0x80000, 0x80000, CRC(3c815699) SHA1(0471ff5b0c0da905267f2cee52fd68c8661cccc9) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c07-12.107", 0x00000, 0x80000, CRC(e0b71258) SHA1(0258e308b643d723475824752ebffc4ea29d1ac4) )
 
 	ROM_REGION( 0x001000, "user1", 0 )	/* unknown roms */

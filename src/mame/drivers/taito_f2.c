@@ -3720,7 +3720,7 @@ ROM_START( finalb )
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "b82-02.1",    0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "b82-01.2",    0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3758,7 +3758,7 @@ ROM_START( finalbj )
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "b82-02.1",    0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "b82-01.2",    0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3797,7 +3797,7 @@ ROM_START( finalbu )
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "b82-02.1",    0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "b82-01.2",    0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3907,7 +3907,7 @@ ROM_START( megab )
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c11-01.29", 0x00000, 0x80000, CRC(fd1ea532) SHA1(481698b747a421a17bfb8cef96065712d4f3997f) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c11-02.30", 0x00000, 0x80000, CRC(451cc187) SHA1(a682f70bbe6cba2fe2c0a6791e8d33db34eb2cee) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3940,7 +3940,7 @@ ROM_START( megabj )
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c11-01.29", 0x00000, 0x80000, CRC(fd1ea532) SHA1(481698b747a421a17bfb8cef96065712d4f3997f) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c11-02.30", 0x00000, 0x80000, CRC(451cc187) SHA1(a682f70bbe6cba2fe2c0a6791e8d33db34eb2cee) )
 ROM_END
 
@@ -3968,7 +3968,7 @@ ROM_START( thundfox )		/* Thunder Fox */
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c28-06.41", 0x00000, 0x80000, CRC(db6983db) SHA1(b72541aa35c48624478060e7453f01956ff1ceb2) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c28-05.42", 0x00000, 0x80000, CRC(d3b238fa) SHA1(b4a0cdd7174e60527e7a47018d6117adc5518da1) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -4004,7 +4004,7 @@ ROM_START( thundfoxu )		/* Thunder Fox */
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c28-06.41", 0x00000, 0x80000, CRC(db6983db) SHA1(b72541aa35c48624478060e7453f01956ff1ceb2) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c28-05.42", 0x00000, 0x80000, CRC(d3b238fa) SHA1(b4a0cdd7174e60527e7a47018d6117adc5518da1) )
 
 // Pals: c28-09.25  c28-10.26  c28-11.35  b89-01.19  b89-03.37  b89-04.33
@@ -4034,7 +4034,7 @@ ROM_START( thundfoxj )		/* Thunder Fox */
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c28-06.41", 0x00000, 0x80000, CRC(db6983db) SHA1(b72541aa35c48624478060e7453f01956ff1ceb2) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c28-05.42", 0x00000, 0x80000, CRC(d3b238fa) SHA1(b4a0cdd7174e60527e7a47018d6117adc5518da1) )
 ROM_END
 
@@ -4444,7 +4444,7 @@ ROM_START( growl )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c74-04.ic28",   0x000000, 0x100000, CRC(2d97edf2) SHA1(d3a995303facdad4f8e1fdda04eaaec4440ff371) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c74-05.ic29",   0x000000, 0x080000, CRC(e29c0828) SHA1(f541d724f118130bb7a8f9e790582c68779cc6b6) )
 
 //Pals c74-06.48  c74-07.47
@@ -4471,7 +4471,7 @@ ROM_START( growlu )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c74-04.ic28",   0x000000, 0x100000, CRC(2d97edf2) SHA1(d3a995303facdad4f8e1fdda04eaaec4440ff371) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c74-05.ic29",   0x000000, 0x080000, CRC(e29c0828) SHA1(f541d724f118130bb7a8f9e790582c68779cc6b6) )
 ROM_END
 
@@ -4496,7 +4496,7 @@ ROM_START( runark )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c74-04.ic28",   0x000000, 0x100000, CRC(2d97edf2) SHA1(d3a995303facdad4f8e1fdda04eaaec4440ff371) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c74-05.ic29",   0x000000, 0x080000, CRC(e29c0828) SHA1(f541d724f118130bb7a8f9e790582c68779cc6b6) )
 ROM_END
 
@@ -4643,7 +4643,7 @@ ROM_START( koshien )	/* Ah Eikou no Koshien */
 	ROM_REGION( 0x080000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c81-05.bin",  0x00000, 0x80000, CRC(9c3d71be) SHA1(79f1bb40d8356d9fc93b569c20be15e7fbf34580) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c81-06.bin",  0x00000, 0x80000, CRC(927833b4) SHA1(c09240e4885d2eace1c64fa6425faeeea0296d98) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
@@ -4700,7 +4700,7 @@ ROM_START( ninjak )
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c85-04.ic31",    0x00000, 0x80000, CRC(5afb747e) SHA1(e4f03582221f3a97f0e24693aa77264663eb1b47) ) /* SCH-B */
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c85-05.ic33",    0x00000, 0x80000, CRC(3c1b0ed0) SHA1(08920dc55d695debae3eea5a8ff1d17bb11afd45) ) /* SCH-A */
 ROM_END
 
@@ -4726,7 +4726,7 @@ ROM_START( ninjakj )
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c85-04.ic31",    0x00000, 0x80000, CRC(5afb747e) SHA1(e4f03582221f3a97f0e24693aa77264663eb1b47) ) /* SCH-B */
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c85-05.ic33",    0x00000, 0x80000, CRC(3c1b0ed0) SHA1(08920dc55d695debae3eea5a8ff1d17bb11afd45) ) /* SCH-A */
 ROM_END
 
@@ -4752,7 +4752,7 @@ ROM_START( ninjaku )
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "c85-04.ic31",    0x00000, 0x80000, CRC(5afb747e) SHA1(e4f03582221f3a97f0e24693aa77264663eb1b47) ) /* SCH-B */
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c85-05.ic33",    0x00000, 0x80000, CRC(3c1b0ed0) SHA1(08920dc55d695debae3eea5a8ff1d17bb11afd45) ) /* SCH-A */
 ROM_END
 
@@ -4878,7 +4878,7 @@ ROM_START( metalb )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "d12-02.10", 0x000000, 0x100000, CRC(79263e74) SHA1(f9ef222239855d593b5855dbf9ea0376ea349c4b) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
 	ROM_LOAD( "d12-05.16", 0x000000, 0x080000, CRC(7fd036c5) SHA1(f412c6302cfba73df110943d7d6679dc908479f7) )
 ROM_END
 
@@ -4903,7 +4903,7 @@ ROM_START( metalbj )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "d12-02.10", 0x000000, 0x100000, CRC(79263e74) SHA1(f9ef222239855d593b5855dbf9ea0376ea349c4b) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
 	ROM_LOAD( "d12-05.16", 0x000000, 0x080000, CRC(7fd036c5) SHA1(f412c6302cfba73df110943d7d6679dc908479f7) )
 ROM_END
 
@@ -5027,7 +5027,7 @@ ROM_START( dinorex )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "d39-07.10",	0x000000, 0x100000, CRC(28262816) SHA1(6df9a31a2edf1dfc23070b41b1da2c0a9e91d1b0) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "d39-08.4",	0x000000, 0x080000, CRC(377b8b7b) SHA1(4905ac3b9b52c70afe5f451f860fb9acd81a1dbb) )
 ROM_END
 
@@ -5053,7 +5053,7 @@ ROM_START( dinorexj )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "d39-07.10",	0x000000, 0x100000, CRC(28262816) SHA1(6df9a31a2edf1dfc23070b41b1da2c0a9e91d1b0) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "d39-08.4",	0x000000, 0x080000, CRC(377b8b7b) SHA1(4905ac3b9b52c70afe5f451f860fb9acd81a1dbb) )
 ROM_END
 
@@ -5079,7 +5079,7 @@ ROM_START( dinorexu )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM samples */
 	ROM_LOAD( "d39-07.10",	0x000000, 0x100000, CRC(28262816) SHA1(6df9a31a2edf1dfc23070b41b1da2c0a9e91d1b0) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "d39-08.4",	0x000000, 0x080000, CRC(377b8b7b) SHA1(4905ac3b9b52c70afe5f451f860fb9acd81a1dbb) )
 ROM_END
 

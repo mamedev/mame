@@ -699,7 +699,7 @@ ROM_START( syvalion )
 	ROM_LOAD16_BYTE( "b51-05.bin", 0x340000, 0x20000, CRC(47976ae9) SHA1(a2b19a39d8968b886412a85c082806917e02d9fd) )
 	ROM_LOAD16_BYTE( "b51-01.bin", 0x340001, 0x20000, CRC(8dab004a) SHA1(1772cdcb9d0ca5ebf429f371c041b9ae12fafcd0) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* samples */
 	ROM_LOAD( "b51-18.bin", 0x00000, 0x80000, CRC(8b23ac83) SHA1(340b9e7f09c1809a332b41d3fb579f5f8cd6367f) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* samples */
@@ -727,7 +727,7 @@ ROM_START( recordbr )
 	ROM_LOAD16_BYTE( "b56-01.bin", 0x300000, 0x20000, CRC(766b7260) SHA1(f7d7176af614f06e8c66e890e4d194ffb6f7af73) )
 	ROM_LOAD16_BYTE( "b56-05.bin", 0x300001, 0x20000, CRC(ed390378) SHA1(0275e5ead206028bfcff7ecbe11c7ab961e648ea) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* samples */
 	ROM_LOAD( "b56-09.bin", 0x00000, 0x80000, CRC(7fd9ee68) SHA1(edc4455b3f6a6f30f418d03c6e53af875542a325) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* samples */
@@ -758,7 +758,7 @@ ROM_START( gogold )
 	ROM_LOAD16_BYTE( "b56-01.bin", 0x300000, 0x20000, CRC(766b7260) SHA1(f7d7176af614f06e8c66e890e4d194ffb6f7af73) )
 	ROM_LOAD16_BYTE( "b56-05.bin", 0x300001, 0x20000, CRC(ed390378) SHA1(0275e5ead206028bfcff7ecbe11c7ab961e648ea) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )	/* samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )	/* samples */
 	ROM_LOAD( "b56-09.bin", 0x00000, 0x80000, CRC(7fd9ee68) SHA1(edc4455b3f6a6f30f418d03c6e53af875542a325) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )	/* samples */

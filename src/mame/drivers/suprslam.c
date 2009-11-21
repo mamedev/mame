@@ -346,7 +346,7 @@ ROM_START( suprslam )
 	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
 	ROM_LOAD( "eb26ic66.bin", 0x000000, 0x200000, CRC(8cb33682) SHA1(0e6189ef0673227d35b9a154e333cc6cf9b65df6) )
 
-	ROM_REGION( 0x100000, "ym.deltat", 0 ) /* Samples */
+	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* Samples */
 	ROM_LOAD( "eb26ic59.bin", 0x000000, 0x100000, CRC(4ae4095b) SHA1(62b0600b18febb6cecb6370b03a2d6b7756840a2) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* 8x8x4 'Screen' Layer GFX */

@@ -4689,7 +4689,7 @@ ROM_START( blzntrnd )
 	ROM_REGION( 0x200000, "gfx3", 0 )	/* 053936 gfx data */
 	ROM_LOAD( "rom9.bin", 0x000000, 0x200000, CRC(37ca3570) SHA1(3374c586bf84583fa33f2793c4e8f2f61a0cab1c) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* Samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Samples */
 	ROM_LOAD( "rom8.bin", 0x000000, 0x080000, CRC(565a4086) SHA1(bd5780acfa5affa8705acbfccb0af16bac8ed298) )
 
 	ROM_REGION( 0x400000, "ymsnd", 0 )	/* ? YRW801-M ? */
@@ -4773,7 +4773,7 @@ ROM_START( gstrik2 )
 	ROM_REGION( 0x200000, "gfx3", 0 )	/* 053936 gfx data */
 	ROM_LOAD( "psacrom.60", 0x000000, 0x200000,  CRC(73f1f279) SHA1(1135b2b1eb4c52249bc12ee178340bbb202a94c8) )
 
-	ROM_REGION( 0x200000, "ym.deltat", 0 )	/* Samples */
+	ROM_REGION( 0x200000, "ymsnd.deltat", 0 )	/* Samples */
 	ROM_LOAD( "sndpcm-b.22", 0x000000, 0x200000, CRC(a5d844d2) SHA1(18d644545f0844e66aa53775b67b0a29c7b7c31b) )
 
 	ROM_REGION( 0x400000, "ymsnd", 0 )	/* ? YRW801-M ? */
@@ -4813,7 +4813,7 @@ ROM_START( gstrik2e )
 	ROM_REGION( 0x200000, "gfx3", 0 )	/* 053936 gfx data */
 	ROM_LOAD( "psacrom.60", 0x000000, 0x200000,  BAD_DUMP CRC(73f1f279) SHA1(1135b2b1eb4c52249bc12ee178340bbb202a94c8) )
 
-	ROM_REGION( 0x200000, "ym.deltat", 0 )	/* Samples */
+	ROM_REGION( 0x200000, "ymsnd.deltat", 0 )	/* Samples */
 	ROM_LOAD( "sndpcm-b.22", 0x000000, 0x200000, BAD_DUMP CRC(a5d844d2) SHA1(18d644545f0844e66aa53775b67b0a29c7b7c31b) )
 
 	ROM_REGION( 0x400000, "ymsnd", 0 )	/* ? YRW801-M ? */

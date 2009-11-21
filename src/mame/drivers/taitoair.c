@@ -680,7 +680,7 @@ ROM_START( topland )
 	ROM_LOAD( "b62-14.2",  0x60000, 0x20000, CRC(617948a3) SHA1(4660570fa6263c28cfae7ccdf154763cc6144896) )
 	ROM_LOAD( "b62-13.1",  0x80000, 0x20000, CRC(b37dc3ea) SHA1(198d4f828132316c624da998e49b1873b9886bf0) )
 
-	ROM_REGION( 0x20000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x20000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "b62-18.31", 0x00000, 0x20000, CRC(3a4e687a) SHA1(43f07fe19dec351e851defdf9c7810fb9df04736) )
 
 	ROM_REGION( 0x02000, "user1", 0 )	/* unknown */
@@ -727,7 +727,7 @@ ROM_START( ainferno )
 	ROM_LOAD( "c45-04.2",  0x60000, 0x20000, CRC(6d081044) SHA1(2d98bde55621762509dfc645d9ca5e267b1757ae) )
 	ROM_LOAD( "c45-05.1",  0x80000, 0x20000, CRC(6c59a808) SHA1(6264bbe4d7ad3070c6441859eb704a42910a82f0) )
 
-	ROM_REGION( 0x20000, "ym.deltat", 0 )	/* Delta-T samples */
+	ROM_REGION( 0x20000, "ymsnd.deltat", 0 )	/* Delta-T samples */
 	ROM_LOAD( "c45-06.31", 0x00000, 0x20000, CRC(6a7976d4) SHA1(a465f9bb874b1eff08742b33cc3c364703b281ca) )
 
 	ROM_REGION( 0x02000, "user1", 0 )

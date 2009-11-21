@@ -504,7 +504,7 @@ ROM_START( crshrace )
 	ROM_LOAD( "h897",         0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )
 	ROM_LOAD( "h896",         0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )
 
-	ROM_REGION( 0x100000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "h894",         0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
@@ -538,7 +538,7 @@ ROM_START( crshrace2 )
 	ROM_LOAD( "h897",         0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )	// IC29.BIN
 	ROM_LOAD( "h896",         0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )	// IC75.BIN
 
-	ROM_REGION( 0x100000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "h894",         0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )	// IC73.BIN
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */

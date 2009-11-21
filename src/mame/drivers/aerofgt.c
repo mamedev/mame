@@ -1751,7 +1751,7 @@ ROM_START( pspikes )
 	ROM_LOAD( "g7j",          0x000000, 0x80000, CRC(0b9e4739) SHA1(64b440a5026735aafe1a7cc2806fe0d78f4a6fba) )
 	ROM_LOAD( "g7l",          0x080000, 0x80000, CRC(943139ff) SHA1(59065f9c3b3a47159c5968df199bdcb1b4f51f29) )
 
-	ROM_REGION( 0x40000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "a47",          0x00000, 0x40000, CRC(c6779dfa) SHA1(ea7adefdb0da02755428aac9a6f86c908fc11253) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
@@ -1776,7 +1776,7 @@ ROM_START( pspikesk )
 	ROM_LOAD( "g7j",          0x000000, 0x80000, CRC(0b9e4739) SHA1(64b440a5026735aafe1a7cc2806fe0d78f4a6fba) )
 	ROM_LOAD( "g7l",          0x080000, 0x80000, CRC(943139ff) SHA1(59065f9c3b3a47159c5968df199bdcb1b4f51f29) )
 
-	ROM_REGION( 0x40000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "a47",          0x00000, 0x40000, CRC(c6779dfa) SHA1(ea7adefdb0da02755428aac9a6f86c908fc11253) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
@@ -1802,7 +1802,7 @@ ROM_START( svolly91 )
 	ROM_LOAD( "g7j",          0x000000, 0x80000, CRC(0b9e4739) SHA1(64b440a5026735aafe1a7cc2806fe0d78f4a6fba) )
 	ROM_LOAD( "g7l",          0x080000, 0x80000, CRC(943139ff) SHA1(59065f9c3b3a47159c5968df199bdcb1b4f51f29) )
 
-	ROM_REGION( 0x40000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "a47",          0x00000, 0x40000, CRC(c6779dfa) SHA1(ea7adefdb0da02755428aac9a6f86c908fc11253) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
@@ -1986,7 +1986,7 @@ ROM_START( spinlbrk )
 	ROM_LOAD16_BYTE( "ic13",    0x00001, 0x10000, CRC(97025bf4) SHA1(0519f0c94f3d417bf8ff0124a3a137035a4013dc) )
 	/* 20000-23fff empty space, filled in vh_startup */
 
-	/* no "ym.deltat" */
+	/* no "ymsnd.deltat" */
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "ic166",        0x000000, 0x80000, CRC(6e0d063a) SHA1(313983e69f9625814de033fef7f6e9564694117a) )
@@ -2036,7 +2036,7 @@ ROM_START( spinlbrku )
 	ROM_LOAD16_BYTE( "ic13",    0x00001, 0x10000, CRC(97025bf4) SHA1(0519f0c94f3d417bf8ff0124a3a137035a4013dc) )
 	/* 20000-23fff empty space, filled in vh_startup */
 
-	/* no "ym.deltat" */
+	/* no "ymsnd.deltat" */
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "ic166",        0x000000, 0x80000, CRC(6e0d063a) SHA1(313983e69f9625814de033fef7f6e9564694117a) )
@@ -2086,7 +2086,7 @@ ROM_START( spinlbrkj )
 	ROM_LOAD16_BYTE( "ic13",    0x00001, 0x10000, CRC(97025bf4) SHA1(0519f0c94f3d417bf8ff0124a3a137035a4013dc) )
 	/* 20000-23fff empty space, filled in vh_startup */
 
-	/* no "ym.deltat" */
+	/* no "ymsnd.deltat" */
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "ic166",        0x000000, 0x80000, CRC(6e0d063a) SHA1(313983e69f9625814de033fef7f6e9564694117a) )
@@ -2126,7 +2126,7 @@ ROM_START( karatblz )
 	ROM_LOAD( "u59.ghb",      0x000000, 0x80000, CRC(158c9cde) SHA1(a2c1b404d40e6c2627691f5c7a3f63484bd5d2de) )
 	ROM_LOAD( "ghd.u60",      0x080000, 0x80000, CRC(73180ae3) SHA1(e4eaf6693826d9e72032d0a0e25938a23ab7d792) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "u105.gh8",     0x000000, 0x080000, CRC(7a68cb1b) SHA1(1bdd0000c2d68019b9e5bf8f7ad84a6ae1af8443) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
@@ -2158,7 +2158,7 @@ ROM_START( karatblzu )
 	ROM_LOAD( "u59.ghb",      0x000000, 0x80000, CRC(158c9cde) SHA1(a2c1b404d40e6c2627691f5c7a3f63484bd5d2de) )
 	ROM_LOAD( "ghd.u60",      0x080000, 0x80000, CRC(73180ae3) SHA1(e4eaf6693826d9e72032d0a0e25938a23ab7d792) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "u105.gh8",     0x000000, 0x080000, CRC(7a68cb1b) SHA1(1bdd0000c2d68019b9e5bf8f7ad84a6ae1af8443) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
@@ -2190,7 +2190,7 @@ ROM_START( karatblzj )
 	ROM_LOAD( "u59.ghb",      0x000000, 0x80000, CRC(158c9cde) SHA1(a2c1b404d40e6c2627691f5c7a3f63484bd5d2de) )
 	ROM_LOAD( "ghd.u60",      0x080000, 0x80000, CRC(73180ae3) SHA1(e4eaf6693826d9e72032d0a0e25938a23ab7d792) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "u105.gh8",     0x000000, 0x080000, CRC(7a68cb1b) SHA1(1bdd0000c2d68019b9e5bf8f7ad84a6ae1af8443) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
@@ -2225,7 +2225,7 @@ ROM_START( turbofrc )
 	ROM_LOAD( "tfrcu134.bin", 0x000000, 0x80000, CRC(487330a2) SHA1(0bd36c1f5776ba2773f621e9bcb22f56ed1d84ec) )
 	ROM_LOAD( "tfrcu135.bin", 0x080000, 0x80000, CRC(3a7e5b6d) SHA1(0079ffaa1bf93a5087c75615c78ec596b28c9a32) )
 
-	ROM_REGION( 0x20000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x20000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "tfrcu180.bin",   0x00000, 0x20000, CRC(39c7c7d5) SHA1(66ee9f7cbc18ffab2c70f77ab0edead6bb018ca9) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
@@ -2250,7 +2250,7 @@ ROM_START( aerofgt )
 	ROM_REGION( 0x080000, "gfx3", 0 )
 	ROM_LOAD( "534g8f.u18",   0x000000, 0x80000, CRC(76ce0926) SHA1(5ef4cec215d4dd600d8fcd1bd9a4c09081d59e33) )
 
-	ROM_REGION( 0x40000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-01",     0x00000, 0x40000, CRC(6d42723d) SHA1(57c59234e9925430a4c687733682efed06d7eed1) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
@@ -2280,7 +2280,7 @@ ROM_START( aerofgtb )
 	ROM_LOAD( "g27",          0x000000, 0x40000, CRC(4d89cbc8) SHA1(93f248f3dc1a15c32d14a147b37d5d660d0e4337) )
 	ROM_LOAD( "g26",          0x040000, 0x40000, CRC(8072c1d2) SHA1(c14634f5f2686cf616f415d9ea4a0c6490054beb) )
 
-	ROM_REGION( 0x40000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-01",     0x00000, 0x40000, CRC(6d42723d) SHA1(57c59234e9925430a4c687733682efed06d7eed1) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
@@ -2311,7 +2311,7 @@ ROM_START( aerofgtc )
 	ROM_LOAD( "g27",          0x000000, 0x40000, CRC(4d89cbc8) SHA1(93f248f3dc1a15c32d14a147b37d5d660d0e4337) )
 	ROM_LOAD( "g26",          0x040000, 0x40000, CRC(8072c1d2) SHA1(c14634f5f2686cf616f415d9ea4a0c6490054beb) )
 
-	ROM_REGION( 0x40000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-01",     0x00000, 0x40000, CRC(6d42723d) SHA1(57c59234e9925430a4c687733682efed06d7eed1) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
@@ -2342,7 +2342,7 @@ ROM_START( sonicwi )
 	ROM_LOAD( "g27",          0x000000, 0x40000, CRC(4d89cbc8) SHA1(93f248f3dc1a15c32d14a147b37d5d660d0e4337) )
 	ROM_LOAD( "g26",          0x040000, 0x40000, CRC(8072c1d2) SHA1(c14634f5f2686cf616f415d9ea4a0c6490054beb) )
 
-	ROM_REGION( 0x40000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x40000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "it-19-01",     0x00000, 0x40000, CRC(6d42723d) SHA1(57c59234e9925430a4c687733682efed06d7eed1) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */

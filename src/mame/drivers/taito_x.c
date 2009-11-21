@@ -1210,7 +1210,7 @@ ROM_START( gigandes )
 	ROM_LOAD( "east_9.3j", 0x100000, 0x80000, CRC(5c5e6898) SHA1(f348ac752a571902c55f36e21aa3fb9ef97528e3) ) /* Plane 2, 3 */
 	ROM_LOAD( "east_6.3k", 0x180000, 0x80000, CRC(52db30e9) SHA1(0b6d73f2c6e6c1ad5fcb2a9edf50069cd0691483) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )      /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )      /* Delta-T samples */
 	ROM_LOAD( "east-11.16f", 0x00000, 0x80000, CRC(92111f96) SHA1(e781f24761b7a923388f4cda64c7b31388fd64c5) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -1234,7 +1234,7 @@ ROM_START( gigandesj )
 	ROM_LOAD( "east_9.3j", 0x100000, 0x80000, CRC(5c5e6898) SHA1(f348ac752a571902c55f36e21aa3fb9ef97528e3) ) /* Plane 2, 3 */
 	ROM_LOAD( "east_6.3k", 0x180000, 0x80000, CRC(52db30e9) SHA1(0b6d73f2c6e6c1ad5fcb2a9edf50069cd0691483) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )   /* Delta-T samples */
 	ROM_LOAD( "east-11.16f", 0x00000, 0x80000, CRC(92111f96) SHA1(e781f24761b7a923388f4cda64c7b31388fd64c5) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -1256,7 +1256,7 @@ ROM_START( kyustrkr )
 	ROM_LOAD( "m-8-1.u5",     0x40000, 0x20000, CRC(9d95aad6) SHA1(3391b14196fea12223ab247d909791bc68fc8d56) )
 	ROM_LOAD( "m-8-0.u6",     0x60000, 0x20000, CRC(0dfb6ed3) SHA1(0937614c8f97040d0216363bfb2bc21161128a3c) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )   /* Delta-T samples */
 	ROM_LOAD( "m-8-5.u2",     0x00000, 0x20000, CRC(d9d90e0a) SHA1(1011548b4fb5f1a194c93ded512e74cda2c06ceb) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
@@ -1278,7 +1278,7 @@ ROM_START( ballbros )
 	ROM_LOAD( "1", 0x040000, 0x20000, CRC(8196d624) SHA1(c859e3b1d3b481f38cfe47576efc1dcdbe6cde28) )
 	ROM_LOAD( "0", 0x060000, 0x20000, CRC(1cc584e5) SHA1(18cf607fa06c095d088b80cea2a1e507d19c7126) )
 
-	ROM_REGION( 0x80000, "ym.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )   /* Delta-T samples */
 	ROM_LOAD( "east-11", 0x00000, 0x80000, CRC(92111f96) SHA1(e781f24761b7a923388f4cda64c7b31388fd64c5) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */

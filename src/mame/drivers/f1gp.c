@@ -560,7 +560,7 @@ ROM_START( f1gp )
 	ROM_REGION( 0x40000, "gfx4", ROMREGION_ERASE00 )	/* gfx data for the 053936 */
 	/* RAM, not ROM - handled at run time */
 
-	ROM_REGION( 0x100000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "rom14-a.09",   0x000000, 0x100000, CRC(b4c1ac31) SHA1(acab2e1b5ce4ca3a5c4734562481b54db4b46995) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
@@ -656,7 +656,7 @@ ROM_START( f1gp2 )
 	ROM_LOAD( "rom9",         0x200000, 0x100000, CRC(1bede8a1) SHA1(325ecc3afb30d281c2c8a56719e83e4dc20545bb) )
 	ROM_LOAD( "rom8",         0x300000, 0x100000, CRC(98baf2a1) SHA1(df7bd1a743ad0a6e067641e2b7a352c466875ef6) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 ) /* sound samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 ) /* sound samples */
 	ROM_LOAD( "rom4",         0x000000, 0x080000, CRC(c2d3d7ad) SHA1(3178096741583cfef1ca8f53e6efa0a59e1d5cb6) )
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */

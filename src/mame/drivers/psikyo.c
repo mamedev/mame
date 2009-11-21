@@ -1488,7 +1488,7 @@ ROM_START( gunbird )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
 	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
@@ -1518,7 +1518,7 @@ ROM_START( gunbirdk )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
 	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
@@ -1548,7 +1548,7 @@ ROM_START( gunbirdj )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
 	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
@@ -1579,7 +1579,7 @@ ROM_START( btlkroad )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(51d73682) SHA1(562038d08e9a4389ffa39f3a659b2a29b94dc156) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(0f33049f) SHA1(ca4fd5f3906685ace1af40b75f5678231d7324e8) )
 
 	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
@@ -1643,7 +1643,7 @@ ROM_START( s1945jn )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(fe1312c2) SHA1(8339a96a0885518d6e22cb3bdb9c2f82d011d86d) )
 
-	ROM_REGION( 0x080000, "ym.deltat", 0 )	/* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(a44a4a9b) SHA1(5378256752d709daed0b5f4199deebbcffe84e10) )
 
 	ROM_REGION( 0x040000, "user1", 0 )	/* */
