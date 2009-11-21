@@ -1027,7 +1027,7 @@ static void match_roms(const char *hash, int length, int *found)
 						/* output information about the match */
 						if (*found != 0)
 							mame_printf_info("                    ");
-						mame_printf_info("= %s%-20s  %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), drivers[drvindex]->description);
+						mame_printf_info("= %s%-20s  %-10s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), drivers[drvindex]->name, drivers[drvindex]->description);
 						(*found)++;
 					}
 
