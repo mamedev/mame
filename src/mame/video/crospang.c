@@ -10,97 +10,112 @@
 */
 
 #include "driver.h"
+#include "crospang.h"
 
-static int xsproff, ysproff; // sprite offsets
-static tilemap *bg_layer,*fg_layer;
-UINT16 *crospang_bg_videoram,*crospang_fg_videoram;
-static int bestri_tilebank;
 WRITE16_HANDLER( bestri_tilebank_w)
 {
-	bestri_tilebank = (data>>10) & 0xf;
+	crospang_state *state = (crospang_state *)space->machine->driver_data;
+
+	state->bestri_tilebank = (data>>10) & 0xf;
 	//printf("bestri %04x\n", data);
 
-	tilemap_mark_all_tiles_dirty(fg_layer);
-	tilemap_mark_all_tiles_dirty(bg_layer);
+	tilemap_mark_all_tiles_dirty(state->fg_layer);
+	tilemap_mark_all_tiles_dirty(state->bg_layer);
 }
 
 
 WRITE16_HANDLER ( bestri_bg_scrolly_w )
 {
+	crospang_state *state = (crospang_state *)space->machine->driver_data;
+
 	/* Very Strange */
-	int scroll =  (data&0x3ff)^ 0x0155;
-	tilemap_set_scrolly(bg_layer,0,-scroll+7);
+	int scroll =  (data & 0x3ff) ^ 0x0155;
+	tilemap_set_scrolly(state->bg_layer, 0, -scroll + 7);
 }
 
 WRITE16_HANDLER ( bestri_fg_scrolly_w )
 {
+	crospang_state *state = (crospang_state *)space->machine->driver_data;
+
 	/* Very Strange */
-	int scroll = (data&0x3ff)^ 0x00ab;
-	tilemap_set_scrolly(fg_layer,0,-scroll+7);
+	int scroll = (data & 0x3ff) ^ 0x00ab;
+	tilemap_set_scrolly(state->fg_layer, 0, -scroll + 7);
 }
 
 WRITE16_HANDLER ( bestri_fg_scrollx_w )
 {
-//  printf("fg_layer x %04x\n",data);
-	tilemap_set_scrollx(fg_layer,0,data+32);
+	crospang_state *state = (crospang_state *)space->machine->driver_data;
+
+	// printf("fg_layer x %04x\n",data);
+	tilemap_set_scrollx(state->fg_layer, 0, data + 32);
 }
 
 WRITE16_HANDLER ( bestri_bg_scrollx_w )
 {
-//  printf("bg_layer x %04x\n",data);
-	tilemap_set_scrollx(bg_layer,0,data-60);
+	crospang_state *state = (crospang_state *)space->machine->driver_data;
+
+	// printf("bg_layer x %04x\n",data);
+	tilemap_set_scrollx(state->bg_layer, 0, data - 60);
 }
 
 
 WRITE16_HANDLER ( crospang_fg_scrolly_w )
 {
-	tilemap_set_scrolly(fg_layer,0,data+8);
+	crospang_state *state = (crospang_state *)space->machine->driver_data;
+	tilemap_set_scrolly(state->fg_layer, 0, data + 8);
 }
 
 WRITE16_HANDLER ( crospang_bg_scrolly_w )
 {
-	tilemap_set_scrolly(bg_layer,0,data+8);
+	crospang_state *state = (crospang_state *)space->machine->driver_data;
+	tilemap_set_scrolly(state->bg_layer, 0, data + 8);
 }
 
 WRITE16_HANDLER ( crospang_fg_scrollx_w )
 {
-	tilemap_set_scrollx(fg_layer,0,data);
+	crospang_state *state = (crospang_state *)space->machine->driver_data;
+	tilemap_set_scrollx(state->fg_layer, 0, data);
 }
 
 WRITE16_HANDLER ( crospang_bg_scrollx_w )
 {
-	tilemap_set_scrollx(bg_layer,0,data+4);
+	crospang_state *state = (crospang_state *)space->machine->driver_data;
+	tilemap_set_scrollx(state->bg_layer, 0, data + 4);
 }
 
 
 WRITE16_HANDLER ( crospang_fg_videoram_w )
 {
-	COMBINE_DATA(&crospang_fg_videoram[offset]);
-	tilemap_mark_tile_dirty(fg_layer,offset);
+	crospang_state *state = (crospang_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->fg_videoram[offset]);
+	tilemap_mark_tile_dirty(state->fg_layer, offset);
 }
 
 WRITE16_HANDLER ( crospang_bg_videoram_w )
 {
-	COMBINE_DATA(&crospang_bg_videoram[offset]);
-	tilemap_mark_tile_dirty(bg_layer,offset);
+	crospang_state *state = (crospang_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->bg_videoram[offset]);
+	tilemap_mark_tile_dirty(state->bg_layer, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int data  = crospang_bg_videoram[tile_index];
+	crospang_state *state = (crospang_state *)machine->driver_data;
+	int data  = state->bg_videoram[tile_index];
 	int tile  = data & 0xfff;
 	int color = (data >> 12) & 0x0f;
 
-	SET_TILE_INFO(1,tile+ bestri_tilebank * 0x1000,color + 0x20,0);
+	SET_TILE_INFO(1, tile + state->bestri_tilebank * 0x1000, color + 0x20, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int data  = crospang_fg_videoram[tile_index];
+	crospang_state *state = (crospang_state *)machine->driver_data;
+	int data  = state->fg_videoram[tile_index];
 	int tile  = data & 0xfff;
 	int color = (data >> 12) & 0x0f;
 
-	SET_TILE_INFO(1,tile+ bestri_tilebank * 0x1000,color + 0x10,0);
+	SET_TILE_INFO(1, tile + state->bestri_tilebank * 0x1000, color + 0x10, 0);
 }
 
 /*
@@ -125,23 +140,26 @@ static TILE_GET_INFO( get_fg_tile_info )
 */
 
 /* jumpkids / tumbleb.c! */
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	crospang_state *state = (crospang_state *)machine->driver_data;
 	int offs;
 	int flipscreen = 0;
 
-	for (offs = 0;offs < spriteram_size/2;offs += 4)
+	for (offs = 0; offs < spriteram_size / 2; offs += 4)
 	{
-		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
+		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
 
-		sprite = spriteram16[offs+1] & 0x7fff;
-		if (!sprite) continue;
+		sprite = state->spriteram[offs + 1] & 0x7fff;
+		if (!sprite) 
+			continue;
 
-		y = spriteram16[offs];
-		flash=y&0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
+		y = state->spriteram[offs];
+		flash = y & 0x1000;
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+			continue;
 
-		x = spriteram16[offs+2];
+		x = state->spriteram[offs + 2];
 		colour = (x >>9) & 0xf;
 
 		fx = y & 0x2000;
@@ -153,9 +171,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		if (x >= 320) x -= 512;
 		if (y >= 256) y -= 512;
 		y = 240 - y;
-        x = 304 - x;
+		x = 304 - x;
 
-	//  sprite &= ~multi; /* Todo:  I bet TumblePop bootleg doesn't do this either */
+		// sprite &= ~multi; /* Todo:  I bet TumblePop bootleg doesn't do this either */
 		if (fy)
 			inc = -1;
 		else
@@ -166,21 +184,22 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		if (flipscreen)
 		{
-			y=240-y;
-			x=304-x;
-			if (fx) fx=0; else fx=1;
-			if (fy) fy=0; else fy=1;
-			mult=16;
+			y = 240 - y;
+			x = 304 - x;
+			if (fx) fx = 0; else fx = 1;
+			if (fy) fy = 0; else fy = 1;
+			mult = 16;
 		}
-		else mult=-16;
+		else 
+			mult = -16;
 
 		while (multi >= 0)
 		{
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 					sprite - multi * inc,
 					colour,
-					fx,fy,
-					x-xsproff,y-ysproff + mult * multi,0);
+					fx, fy,
+					x - state->xsproff, y - state->ysproff + mult * multi,0);
 
 			multi--;
 		}
@@ -189,21 +208,18 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_START( crospang )
 {
-	bg_layer = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,16,16,32,32);
-	fg_layer = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,16,16,32,32);
+	crospang_state *state = (crospang_state *)machine->driver_data;
+	state->bg_layer = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->fg_layer = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
-	tilemap_set_transparent_pen(fg_layer,0);
-	bestri_tilebank = 0;
-//  xsproff = 4;
-//  ysproff = 7;
-	xsproff = 5;
-	ysproff = 7;
+	tilemap_set_transparent_pen(state->fg_layer, 0);
 }
 
 VIDEO_UPDATE( crospang )
 {
-	tilemap_draw(bitmap,cliprect,bg_layer,0,0);
-	tilemap_draw(bitmap,cliprect,fg_layer,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect);
+	crospang_state *state = (crospang_state *)screen->machine->driver_data;
+	tilemap_draw(bitmap, cliprect, state->bg_layer, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->fg_layer, 0, 0);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

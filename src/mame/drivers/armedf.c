@@ -168,45 +168,56 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #define LEGION_HACK	0
 
 
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
+
 static WRITE16_HANDLER( io_w )
 {
-	COMBINE_DATA(&armedf_vreg);
+	armedf_state *state = (armedf_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->vreg);
 	/* bits 0 and 1 of armedf_vreg are coin counters */
 	/* bit 12 seems to handle screen flipping */
-	flip_screen_set(space->machine, armedf_vreg & 0x1000);
+	flip_screen_set(space->machine, state->vreg & 0x1000);
 }
 
 static WRITE16_HANDLER( terraf_io_w )
 {
-	COMBINE_DATA(&armedf_vreg);
+	armedf_state *state = (armedf_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->vreg);
 	/* bits 0 and 1 of armedf_vreg are coin counters */
 	/* bit 12 seems to handle screen flipping */
-	flip_screen_set(space->machine, armedf_vreg & 0x1000);
+	flip_screen_set(space->machine, state->vreg & 0x1000);
 
-
-	if ((armedf_vreg & 0x4000) && !(armedf_vreg & 0x0100))
+	if ((state->vreg & 0x4000) && !(state->vreg & 0x0100))
 	{
 		int i;
 		for (i = 0x10; i < 0x1000; i++)
 		{
-			terraf_text_videoram[i]=0x20;
+			state->text_videoram[i] = 0x20;
 		}
-		tilemap_mark_all_tiles_dirty( armedf_tx_tilemap );
+		tilemap_mark_all_tiles_dirty(state->tx_tilemap);
 		//logerror("vreg WIPE TX\n");
 	}
-	//logerror("VReg = %04x\n", armedf_vreg);
+	//logerror("VReg = %04x\n", state->vreg);
 
 }
 
 static WRITE16_HANDLER( kodure_io_w )
 {
-	COMBINE_DATA(&armedf_vreg);
+	armedf_state *state = (armedf_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->vreg);
 	/* bits 0 and 1 of armedf_vreg are coin counters */
 	/* bit 12 seems to handle screen flipping */
-	flip_screen_set(space->machine, armedf_vreg & 0x1000);
+	flip_screen_set(space->machine, state->vreg & 0x1000);
 
 	/* This is a temporary condition specification. */
-	if (!(armedf_vreg & 0x0080))
+	if (!(state->vreg & 0x0080))
 	{
 		int i;
 		for (i = 0; i < 0x1000; i++)
@@ -219,29 +230,37 @@ static WRITE16_HANDLER( kodure_io_w )
 static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_w(space,0,((data & 0x7f) << 1) | 1);
+		soundlatch_w(space, 0, ((data & 0x7f) << 1) | 1);
 }
 
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( legion_command_c )
 {
-	COMBINE_DATA(&legion_cmd[offset]);
+	armedf_state *state = (armedf_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->legion_cmd[offset]);
 	//logerror("Legion CMD %04x=%04x", offset, data);
 }
 #endif
 
 
 
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
+
 static ADDRESS_MAP_START( terraf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x060000, 0x0603ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x060400, 0x063fff) AM_RAM
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
+	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, text_videoram)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
-	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, fg_videoram)
+	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE_MEMBER(armedf_state, bg_videoram)
 	AM_RANGE(0x078000, 0x078001) AM_READ_PORT("P1")
 	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("P2")
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("DSW1")
@@ -263,11 +282,11 @@ static ADDRESS_MAP_START( terrafb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x0603ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x060400, 0x063fff) AM_RAM
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
+	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, text_videoram)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
-	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, fg_videoram)
+	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE_MEMBER(armedf_state, bg_videoram)
 	AM_RANGE(0x078000, 0x078001) AM_READ_PORT("P1")
 	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("P2")
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("DSW1")
@@ -288,11 +307,11 @@ static ADDRESS_MAP_START( kodure_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
+	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, text_videoram)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
-	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, fg_videoram)
+	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE_MEMBER(armedf_state, bg_videoram)
 	AM_RANGE(0x078000, 0x078001) AM_READ_PORT("P1")
 	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("P2")
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("DSW1")
@@ -310,12 +329,12 @@ static ADDRESS_MAP_START( cclimbr2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
+	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, text_videoram)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
 	AM_RANGE(0x06ca00, 0x06cbff) AM_WRITEONLY
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
-	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, fg_videoram)
+	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE_MEMBER(armedf_state, bg_videoram)
 	AM_RANGE(0x078000, 0x078001) AM_READ_PORT("P1")
 	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("P2")
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("DSW1")
@@ -333,12 +352,12 @@ static ADDRESS_MAP_START( legion_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
+	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, text_videoram)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
 	AM_RANGE(0x06ca00, 0x06cbff) AM_WRITEONLY
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
-	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, fg_videoram)
+	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE_MEMBER(armedf_state, bg_videoram)
 	AM_RANGE(0x078000, 0x078001) AM_READ_PORT("P1")
 	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("P2")
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("DSW1")
@@ -353,17 +372,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( legiono_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x04003f) AM_WRITEONLY AM_BASE(&legion_cmd)
+	AM_RANGE(0x040000, 0x04003f) AM_WRITEONLY AM_BASE_MEMBER(armedf_state, legion_cmd)
 	AM_RANGE(0x040040, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
+	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, text_videoram)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
 	AM_RANGE(0x06ca00, 0x06cbff) AM_WRITEONLY
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
-	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, fg_videoram)
+	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE_MEMBER(armedf_state, bg_videoram)
 	AM_RANGE(0x078000, 0x078001) AM_READ_PORT("P1")
 	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("P2")
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("DSW1")
@@ -380,9 +399,9 @@ static ADDRESS_MAP_START( armedf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x061000, 0x065fff) AM_RAM
-	AM_RANGE(0x066000, 0x066fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
-	AM_RANGE(0x067000, 0x067fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
+	AM_RANGE(0x066000, 0x066fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE_MEMBER(armedf_state, bg_videoram)
+	AM_RANGE(0x067000, 0x067fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE_MEMBER(armedf_state, fg_videoram)
+	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE_MEMBER(armedf_state, text_videoram)
 	AM_RANGE(0x06a000, 0x06afff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x06b000, 0x06bfff) AM_RAM
 	AM_RANGE(0x06c000, 0x06c001) AM_READ_PORT("P1")
@@ -421,7 +440,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( soundlatch_clear_r )
 {
-	soundlatch_clear_w(space,0,0);
+	soundlatch_clear_w(space, 0, 0);
 	return 0;
 }
 
@@ -435,9 +454,11 @@ static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-/****************
-   Dip Switches
-*****************/
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 #define NIHON_SINGLE_JOYSTICK(_n_) \
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(_n_) \
@@ -472,12 +493,12 @@ static INPUT_PORTS_START( armedf )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
 	/* SW1:3,4 defined in manual/test-mode as:
-    PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )                PORT_DIPLOCATION("SW1:3")
-    PORT_DIPSETTING(    0x04, "20k" )
-    PORT_DIPSETTING(    0x00, "40k" )
-    PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )                PORT_DIPLOCATION("SW1:4")
-    PORT_DIPSETTING(    0x08, "60k" )
-    PORT_DIPSETTING(    0x00, "80k" )*/
+	PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )            	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, "20k" )
+	PORT_DIPSETTING(    0x00, "40k" )
+	PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )            	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "60k" )
+	PORT_DIPSETTING(    0x00, "80k" )*/
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )			PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x0c, "20k then every 60k" )
 	PORT_DIPSETTING(    0x04, "20k then every 80k" )
@@ -565,12 +586,12 @@ static INPUT_PORTS_START( terraf )
 
 	PORT_MODIFY("DSW1")
 	/* SW1:3,4 defined in manual/test-mode as:
-    PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )                PORT_DIPLOCATION("SW1:3")
-    PORT_DIPSETTING(    0x04, "20k" )
-    PORT_DIPSETTING(    0x00, "50k" )
-    PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )                PORT_DIPLOCATION("SW1:4")
-    PORT_DIPSETTING(    0x08, "60k" )
-    PORT_DIPSETTING(    0x00, "90k" )*/
+	PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )            	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, "20k" )
+	PORT_DIPSETTING(    0x00, "50k" )
+	PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )            	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "60k" )
+	PORT_DIPSETTING(    0x00, "90k" )*/
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )			PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x0c, "20k then every 60k" )
 	PORT_DIPSETTING(    0x04, "20k then every 90k" )
@@ -598,12 +619,12 @@ static INPUT_PORTS_START( kodure )
 
 	PORT_MODIFY("DSW1")
 	/* SW1:3,4 defined in manual/test-mode as:
-    PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )                PORT_DIPLOCATION("SW1:3")
-    PORT_DIPSETTING(    0x04, DEF_STR( None ) )
-    PORT_DIPSETTING(    0x00, "50k" )
-    PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )                PORT_DIPLOCATION("SW1:4")
-    PORT_DIPSETTING(    0x08, "60k" )
-    PORT_DIPSETTING(    0x00, "90k" )*/
+	PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )            	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x00, "50k" )
+	PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )            	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "60k" )
+	PORT_DIPSETTING(    0x00, "90k" )*/
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )			PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x08, "50k then every 60k" )
 	PORT_DIPSETTING(    0x00, "50k then every 90k" )
@@ -650,12 +671,12 @@ static INPUT_PORTS_START( cclimbr2 )
 
 	PORT_MODIFY("DSW1")
 	/* SW1:3,4 defined in manual/test-mode as:
-    PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )                    PORT_DIPLOCATION("SW1:3")
-    PORT_DIPSETTING(    0x04, "30k" )
-    PORT_DIPSETTING(    0x00, "60k" )
-    PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )                    PORT_DIPLOCATION("SW1:4")
-    PORT_DIPSETTING(    0x08, "70k" )
-    PORT_DIPSETTING(    0x00, DEF_STR( None ) )*/
+	PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )                	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, "30k" )
+	PORT_DIPSETTING(    0x00, "60k" )
+	PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )                	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "70k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )*/
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )				PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x0c, "30K and 100k" )
 	PORT_DIPSETTING(    0x08, "60k and 130k" )
@@ -680,6 +701,12 @@ static INPUT_PORTS_START( cclimbr2 )
 INPUT_PORTS_END
 
 
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 static const gfx_layout char_layout =
 {
@@ -727,7 +754,47 @@ GFXDECODE_END
 
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( armedf )
+{
+	armedf_state *state = (armedf_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->mcu_mode);
+	state_save_register_global(machine, state->old_mcu_mode);
+	state_save_register_global(machine, state->scroll_msb);
+	state_save_register_global(machine, state->waiting_msb);
+	state_save_register_global(machine, state->vreg);
+	state_save_register_global(machine, state->fg_scrollx); 
+	state_save_register_global(machine, state->fg_scrolly);
+	state_save_register_global(machine, state->bg_scrollx);
+	state_save_register_global(machine, state->bg_scrolly);
+	}
+
+static MACHINE_RESET( armedf )
+{
+	armedf_state *state = (armedf_state *)machine->driver_data;
+
+	state->mcu_mode = 0;
+	state->old_mcu_mode = 0;
+	state->scroll_msb = 0;
+	state->waiting_msb = 0;
+	state->vreg = 0;
+	state->fg_scrollx = 0; 
+	state->fg_scrolly = 0;
+	state->bg_scrollx = 0;
+	state->bg_scrolly = 0;
+}
+
+
 static MACHINE_DRIVER_START( terraf )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(armedf_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
@@ -738,6 +805,9 @@ static MACHINE_DRIVER_START( terraf )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(sound_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+
+	MDRV_MACHINE_START(armedf)
+	MDRV_MACHINE_RESET(armedf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -770,6 +840,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( terrafb )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(armedf_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(terrafb_map)
@@ -785,6 +858,8 @@ static MACHINE_DRIVER_START( terrafb )
 	MDRV_CPU_IO_MAP(terrafb_extraz80_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
 
+	MDRV_MACHINE_START(armedf)
+	MDRV_MACHINE_RESET(armedf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -817,6 +892,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( kodure )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(armedf_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(kodure_map)
@@ -826,6 +904,9 @@ static MACHINE_DRIVER_START( kodure )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(sound_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+
+	MDRV_MACHINE_START(armedf)
+	MDRV_MACHINE_RESET(armedf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -858,6 +939,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( armedf )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(armedf_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(armedf_map)
@@ -867,6 +951,9 @@ static MACHINE_DRIVER_START( armedf )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(sound_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+
+	MDRV_MACHINE_START(armedf)
+	MDRV_MACHINE_RESET(armedf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -899,6 +986,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cclimbr2 )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(armedf_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(cclimbr2_map)
@@ -908,6 +998,9 @@ static MACHINE_DRIVER_START( cclimbr2 )
 	MDRV_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MDRV_CPU_IO_MAP(sound_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+
+	MDRV_MACHINE_START(armedf)
+	MDRV_MACHINE_RESET(armedf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -940,6 +1033,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( legion )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(armedf_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(legion_map)
@@ -949,6 +1045,9 @@ static MACHINE_DRIVER_START( legion )
 	MDRV_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MDRV_CPU_IO_MAP(sound_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+
+	MDRV_MACHINE_START(armedf)
+	MDRV_MACHINE_RESET(armedf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -981,6 +1080,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( legiono )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(armedf_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(legiono_map)
@@ -990,6 +1092,9 @@ static MACHINE_DRIVER_START( legiono )
 	MDRV_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MDRV_CPU_IO_MAP(sound_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
+
+	MDRV_MACHINE_START(armedf)
+	MDRV_MACHINE_RESET(armedf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -1020,6 +1125,12 @@ static MACHINE_DRIVER_START( legiono )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( legion )
 	ROM_REGION( 0x60000, "maincpu", 0 )	/* 64K*8 for 68000 code */
@@ -1380,43 +1491,55 @@ ROM_START( armedf )
 ROM_END
 
 
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
+
 static DRIVER_INIT( terraf )
 {
-	armedf_setgfxtype(0);
+	armedf_state *state = (armedf_state *)machine->driver_data;
+	state->scroll_type = 0;
 }
 
 static DRIVER_INIT( terrafu )
 {
-	armedf_setgfxtype(5);
+	armedf_state *state = (armedf_state *)machine->driver_data;
+	state->scroll_type = 5;
 }
 
 static DRIVER_INIT( armedf )
 {
-	armedf_setgfxtype(1);
+	armedf_state *state = (armedf_state *)machine->driver_data;
+	state->scroll_type = 1;
 }
 
 
 static DRIVER_INIT( kodure )
 {
-	armedf_setgfxtype(2);
+	armedf_state *state = (armedf_state *)machine->driver_data;
+	state->scroll_type = 2;
 }
 
 static DRIVER_INIT( legion )
 {
+	armedf_state *state = (armedf_state *)machine->driver_data;
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
          of 3 of the "Unused" Dip Switches (see notes above). */
 	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
-	RAM[0x0001d6/2] = 0x0001;
+	RAM[0x0001d6 / 2] = 0x0001;
 	/* To avoid checksum error */
-	RAM[0x000488/2] = 0x4e71;
+	RAM[0x000488 / 2] = 0x4e71;
 #endif
 
-	armedf_setgfxtype(3);
+	state->scroll_type = 3;
 }
 
 static DRIVER_INIT( legiono )
 {
+	armedf_state *state = (armedf_state *)machine->driver_data;
 #if LEGION_HACK
 	/* This is a hack to allow you to use the extra features
          of 3 of the "Unused" Dip Switches (see notes above). */
@@ -1425,23 +1548,30 @@ static DRIVER_INIT( legiono )
 	/* No need to patch the checksum routine (see notes) ! */
 #endif
 
-	armedf_setgfxtype(6);
+	state->scroll_type = 6;
 }
 
 static DRIVER_INIT( cclimbr2 )
 {
-	armedf_setgfxtype(4);
+	armedf_state *state = (armedf_state *)machine->driver_data;
+	state->scroll_type = 4;
 }
 
 
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
 /*     YEAR, NAME,    PARENT,   MACHINE,  INPUT,    INIT,     MONITOR, COMPANY,         FULLNAME,                          FLAGS */
-GAME( 1987, legion,   0,        legion,   legion,   legion,   ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (ver 2.03)",               GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, legiono,  legion,   legiono,  legion,   legiono,  ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (ver 1.05)",               GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, terraf,   0,        terraf,   terraf,   terraf,   ROT0,   "Nichibutsu",     "Terra Force (set 1)",             GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, terrafb,  terraf,   terrafb,  terraf,   terrafu,  ROT0,   "bootleg",     "Terra Force (bootleg with additional Z80)",GAME_NOT_WORKING )
-GAME( 1987, terrafa,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu",     "Terra Force (set 2)",             GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US)",                GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, kodure,   0,        kodure,   kodure,   kodure,   ROT0,   "Nichibutsu",     "Kodure Ookami (Japan)",           GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan)",         0													)
-GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan, Harder)", 0													)
-GAME( 1988, armedf,   0,        armedf,   armedf,   armedf,   ROT270, "Nichibutsu",     "Armed Formation",                 0													)
+GAME( 1987, legion,   0,        legion,   legion,   legion,   ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (ver 2.03)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, legiono,  legion,   legiono,  legion,   legiono,  ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (ver 1.05)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, terraf,   0,        terraf,   terraf,   terraf,   ROT0,   "Nichibutsu",     "Terra Force (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, terrafb,  terraf,   terrafb,  terraf,   terrafu,  ROT0,   "bootleg",        "Terra Force (bootleg with additional Z80)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1987, terrafa,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu",     "Terra Force (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, kodure,   0,        kodure,   kodure,   kodure,   ROT0,   "Nichibutsu",     "Kodure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE )
+GAME( 1988, armedf,   0,        armedf,   armedf,   armedf,   ROT270, "Nichibutsu",     "Armed Formation", GAME_SUPPORTS_SAVE )

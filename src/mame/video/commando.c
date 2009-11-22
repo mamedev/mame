@@ -7,49 +7,55 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "commando.h"
 
-UINT8 *commando_videoram2, *commando_colorram2;
-
-static tilemap *bg_tilemap, *fg_tilemap;
 
 WRITE8_HANDLER( commando_videoram_w )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	commando_state *state = (commando_state *)space->machine->driver_data;
+
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( commando_colorram_w )
 {
-	colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	commando_state *state = (commando_state *)space->machine->driver_data;
+
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( commando_videoram2_w )
 {
-	commando_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	commando_state *state = (commando_state *)space->machine->driver_data;
+
+	state->videoram2[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( commando_colorram2_w )
 {
-	commando_colorram2[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	commando_state *state = (commando_state *)space->machine->driver_data;
+
+	state->colorram2[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( commando_scrollx_w )
 {
-	static UINT8 scroll[2];
+	commando_state *state = (commando_state *)space->machine->driver_data;
 
-	scroll[offset] = data;
-	tilemap_set_scrollx(bg_tilemap,0,scroll[0] | (scroll[1] << 8));
+	state->scroll_x[offset] = data;
+	tilemap_set_scrollx(state->bg_tilemap, 0, state->scroll_x[0] | (state->scroll_x[1] << 8));
 }
 
 WRITE8_HANDLER( commando_scrolly_w )
 {
-	static UINT8 scroll[2];
+	commando_state *state = (commando_state *)space->machine->driver_data;
 
-	scroll[offset] = data;
-	tilemap_set_scrolly(bg_tilemap,0,scroll[0] | (scroll[1] << 8));
+	state->scroll_y[offset] = data;
+	tilemap_set_scrolly(state->bg_tilemap, 0, state->scroll_y[0] | (state->scroll_y[1] << 8));
 }
 
 WRITE8_HANDLER( commando_c804_w )
@@ -67,8 +73,9 @@ WRITE8_HANDLER( commando_c804_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = colorram[tile_index];
-	int code = videoram[tile_index] + ((attr & 0xc0) << 2);
+	commando_state *state = (commando_state *)machine->driver_data;
+	int attr = state->colorram[tile_index];
+	int code = state->videoram[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
@@ -77,8 +84,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int attr = commando_colorram2[tile_index];
-	int code = commando_videoram2[tile_index] + ((attr & 0xc0) << 2);
+	commando_state *state = (commando_state *)machine->driver_data;
+	int attr = state->colorram2[tile_index];
+	int code = state->videoram2[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
@@ -87,16 +95,15 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( commando )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,
-		 16, 16, 32, 32);
+	commando_state *state = (commando_state *)machine->driver_data;
 
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(fg_tilemap, 3);
+	tilemap_set_transparent_pen(state->fg_tilemap, 3);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -121,15 +128,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		}
 
 		if (bank < 3)
-			drawgfx_transpen(bitmap,cliprect, machine->gfx[2], code, color, flipx, flipy, sx, sy, 15);
+			drawgfx_transpen(bitmap, cliprect, machine->gfx[2], code, color, flipx, flipy, sx, sy, 15);
 	}
 }
 
 VIDEO_UPDATE( commando )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	commando_state *state = (commando_state *)screen->machine->driver_data;
+
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;
 }
 

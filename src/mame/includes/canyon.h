@@ -16,6 +16,18 @@
 #define CANYON_ATTRACT2_EN		NODE_07
 
 
+
+typedef struct _canyon_state canyon_state;
+struct _canyon_state
+{
+	/* memory pointers */
+	UINT8 *  videoram;
+
+	/* video-related */
+	tilemap  *bg_tilemap;
+};
+
+
 /*----------- defined in audio/canyon.c -----------*/
 
 WRITE8_DEVICE_HANDLER( canyon_motor_w );
@@ -27,8 +39,6 @@ DISCRETE_SOUND_EXTERN( canyon );
 
 
 /*----------- defined in video/canyon.c -----------*/
-
-extern UINT8* canyon_videoram;
 
 VIDEO_START( canyon );
 VIDEO_UPDATE( canyon );

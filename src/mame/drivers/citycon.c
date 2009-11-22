@@ -11,17 +11,7 @@ Dip locations added from dip listing at crazykong.com
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
-
-
-extern UINT8 *citycon_videoram;
-extern UINT8 *citycon_scroll;
-extern UINT8 *citycon_linecolor;
-WRITE8_HANDLER( citycon_videoram_w );
-WRITE8_HANDLER( citycon_linecolor_w );
-WRITE8_HANDLER( citycon_background_w );
-
-VIDEO_UPDATE( citycon );
-VIDEO_START( citycon );
+#include "citycon.h"
 
 
 static READ8_HANDLER( citycon_in_r )
@@ -38,14 +28,14 @@ static READ8_HANDLER( citycon_irq_ack_r )
 
 static ADDRESS_MAP_START( citycon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(citycon_videoram_w) AM_BASE(&citycon_videoram)
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(citycon_linecolor_w) AM_BASE(&citycon_linecolor)
-	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(citycon_videoram_w) AM_BASE_MEMBER(citycon_state, videoram)
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(citycon_linecolor_w) AM_BASE_MEMBER(citycon_state, linecolor)
+	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_BASE_MEMBER(citycon_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x2800, 0x2fff) AM_NOP //0x2900-0x2fff cleared at post but unused
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(citycon_in_r, citycon_background_w)	/* player 1 & 2 inputs multiplexed */
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_WRITE(soundlatch_w)
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_WRITE(soundlatch2_w)
-	AM_RANGE(0x3004, 0x3005) AM_READNOP AM_WRITEONLY AM_BASE(&citycon_scroll)
+	AM_RANGE(0x3004, 0x3005) AM_READNOP AM_WRITEONLY AM_BASE_MEMBER(citycon_state, scroll)
 	AM_RANGE(0x3007, 0x3007) AM_READ(citycon_irq_ack_r)
 	AM_RANGE(0x3800, 0x3cff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -196,7 +186,25 @@ static const ym2203_interface ym2203_config =
 
 
 
+static MACHINE_START( citycon )
+{
+	citycon_state *state = (citycon_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->bg_image);
+}
+
+static MACHINE_RESET( citycon )
+{
+	citycon_state *state = (citycon_state *)machine->driver_data;
+
+	state->bg_image = 0;
+}
+
+
 static MACHINE_DRIVER_START( citycon )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(citycon_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2048000)        /* 2.048 MHz ??? */
@@ -206,6 +214,9 @@ static MACHINE_DRIVER_START( citycon )
 	MDRV_CPU_ADD("audiocpu", M6809, 640000)       /* 0.640 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 //  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) //actually unused, probably it was during development
+
+	MDRV_MACHINE_START(citycon)
+	MDRV_MACHINE_RESET(citycon)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -332,29 +343,28 @@ static DRIVER_INIT( citycon )
 	UINT8 *rom = memory_region(machine, "gfx1");
 	int i;
 
-
 	/*
       City Connection controls the text color code for each _scanline_, not
       for each character as happens in most games. To handle that conveniently,
       I convert the 2bpp char data into 5bpp, and create a virtual palette so
       characters can still be drawn in one pass.
       */
-	for (i = 0x0fff;i >= 0;i--)
+	for (i = 0x0fff; i >= 0; i--)
 	{
 		int mask;
 
-		rom[3*i] = rom[i];
-		rom[3*i+1] = 0;
-		rom[3*i+2] = 0;
+		rom[3 * i] = rom[i];
+		rom[3 * i + 1] = 0;
+		rom[3 * i + 2] = 0;
 		mask = rom[i] | (rom[i] << 4) | (rom[i] >> 4);
-		if (i & 0x01) rom[3*i+1] |= mask & 0xf0;
-		if (i & 0x02) rom[3*i+1] |= mask & 0x0f;
-		if (i & 0x04) rom[3*i+2] |= mask & 0xf0;
+		if (i & 0x01) rom[3 * i + 1] |= mask & 0xf0;
+		if (i & 0x02) rom[3 * i + 1] |= mask & 0x0f;
+		if (i & 0x04) rom[3 * i + 2] |= mask & 0xf0;
 	}
 }
 
 
 
-GAME( 1985, citycon,  0,       citycon, citycon, citycon, ROT0, "Jaleco", "City Connection (set 1)", 0 )
-GAME( 1985, citycona, citycon, citycon, citycon, citycon, ROT0, "Jaleco", "City Connection (set 2)", 0 )
-GAME( 1985, cruisin,  citycon, citycon, citycon, citycon, ROT0, "Jaleco (Kitkorp license)", "Cruisin", 0 )
+GAME( 1985, citycon,  0,       citycon, citycon, citycon, ROT0, "Jaleco", "City Connection (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, citycona, citycon, citycon, citycon, citycon, ROT0, "Jaleco", "City Connection (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, cruisin,  citycon, citycon, citycon, citycon, ROT0, "Jaleco (Kitkorp license)", "Cruisin", GAME_SUPPORTS_SAVE )

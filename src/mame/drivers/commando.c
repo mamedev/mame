@@ -46,20 +46,8 @@ Note : there is an ingame typo bug that doesn't display the bonus life values
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/2203intf.h"
+#include "commando.h"
 
-extern UINT8 *commando_videoram2, *commando_colorram2;
-
-extern WRITE8_HANDLER( commando_videoram_w );
-extern WRITE8_HANDLER( commando_colorram_w );
-extern WRITE8_HANDLER( commando_videoram2_w );
-extern WRITE8_HANDLER( commando_colorram2_w );
-extern WRITE8_HANDLER( commando_scrollx_w );
-extern WRITE8_HANDLER( commando_scrolly_w );
-extern WRITE8_HANDLER( commando_c804_w );
-
-extern VIDEO_START( commando );
-extern VIDEO_UPDATE( commando );
-extern VIDEO_EOF( commando );
 
 /* Memory Maps */
 
@@ -74,10 +62,10 @@ static ADDRESS_MAP_START( commando_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(commando_c804_w)
 	AM_RANGE(0xc808, 0xc809) AM_WRITE(commando_scrollx_w)
 	AM_RANGE(0xc80a, 0xc80b) AM_WRITE(commando_scrolly_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(commando_videoram2_w) AM_BASE(&commando_videoram2)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(commando_colorram2_w) AM_BASE(&commando_colorram2)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(commando_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(commando_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(commando_videoram2_w) AM_BASE_MEMBER(commando_state, videoram2)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(commando_colorram2_w) AM_BASE_MEMBER(commando_state, colorram2)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(commando_videoram_w) AM_BASE_MEMBER(commando_state, videoram)
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(commando_colorram_w) AM_BASE_MEMBER(commando_state, colorram)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
 	AM_RANGE(0xfe00, 0xff7f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xff80, 0xffff) AM_RAM
@@ -236,8 +224,31 @@ static INTERRUPT_GEN( commando_interrupt )
 
 /* Machine Driver */
 
+static MACHINE_START( commando )
+{
+	commando_state *state = (commando_state *)machine->driver_data;
+
+	state_save_register_global_array(machine, state->scroll_x);
+	state_save_register_global_array(machine, state->scroll_y);
+}
+
+static MACHINE_RESET( commando )
+{
+	commando_state *state = (commando_state *)machine->driver_data;
+
+	state->scroll_x[0] = 0;
+	state->scroll_x[1] = 0;
+	state->scroll_y[0] = 0;
+	state->scroll_y[1] = 0;
+}
+
+
 static MACHINE_DRIVER_START( commando )
-	// basic machine hardware
+
+	/* driver data */
+	MDRV_DRIVER_DATA(commando_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, PHI_MAIN)	// ???
 	MDRV_CPU_PROGRAM_MAP(commando_map)
 	MDRV_CPU_VBLANK_INT("screen", commando_interrupt)
@@ -246,7 +257,10 @@ static MACHINE_DRIVER_START( commando )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
 
-	// video hardware
+	MDRV_MACHINE_START(commando)
+	MDRV_MACHINE_RESET(commando)
+
+	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -264,7 +278,7 @@ static MACHINE_DRIVER_START( commando )
 	MDRV_VIDEO_UPDATE(commando)
 	MDRV_VIDEO_EOF(commando)
 
-	// sound hardware
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM2203, PHI_B/2)
@@ -273,6 +287,7 @@ static MACHINE_DRIVER_START( commando )
 	MDRV_SOUND_ADD("ym2", YM2203, PHI_B/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_DRIVER_END
+
 
 /* ROMs */
 
@@ -543,9 +558,9 @@ static DRIVER_INIT( spaceinv )
 
 /* Game Drivers */
 
-GAME( 1985, commando, 0,        commando, commando, commando, ROT270, "Capcom", "Commando (World)", 0 )
-GAME( 1985, commandou,commando, commando, commandu, commando, ROT270, "Capcom (Data East USA license)", "Commando (US)", 0 )
-GAME( 1985, commandoj,commando, commando, commando, commando, ROT270, "Capcom", "Senjou no Ookami", 0 )
-GAME( 1985, commandob,commando, commando, commando, spaceinv, ROT270, "bootleg", "Commando (bootleg)", 0 )
-GAME( 1985, sinvasn,  commando, commando, commando, commando, ROT270, "Capcom", "Space Invasion (Europe)", 0 )
-GAME( 1985, sinvasnb, commando, commando, commando, spaceinv, ROT270, "bootleg", "Space Invasion (bootleg)", 0 )
+GAME( 1985, commando,  0,        commando, commando, commando, ROT270, "Capcom", "Commando (World)", GAME_SUPPORTS_SAVE )
+GAME( 1985, commandou, commando, commando, commandu, commando, ROT270, "Capcom (Data East USA license)", "Commando (US)", GAME_SUPPORTS_SAVE )
+GAME( 1985, commandoj, commando, commando, commando, commando, ROT270, "Capcom", "Senjou no Ookami", GAME_SUPPORTS_SAVE )
+GAME( 1985, commandob, commando, commando, commando, spaceinv, ROT270, "bootleg", "Commando (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1985, sinvasn,   commando, commando, commando, commando, ROT270, "Capcom", "Space Invasion (Europe)", GAME_SUPPORTS_SAVE )
+GAME( 1985, sinvasnb,  commando, commando, commando, spaceinv, ROT270, "bootleg", "Space Invasion (bootleg)", GAME_SUPPORTS_SAVE )

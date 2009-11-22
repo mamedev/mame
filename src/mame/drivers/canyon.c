@@ -42,8 +42,6 @@
 #include "sound/discrete.h"
 
 
-
-
 /*************************************
  *
  *  Palette generation
@@ -70,13 +68,10 @@ static READ8_HANDLER( canyon_switches_r )
 	UINT8 val = 0;
 
 	if ((input_port_read(space->machine, "IN2") >> (offset & 7)) & 1)
-	{
 		val |= 0x80;
-	}
+
 	if ((input_port_read(space->machine, "IN1") >> (offset & 3)) & 1)
-	{
 		val |= 0x01;
-	}
 
 	return val;
 }
@@ -119,7 +114,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0600, 0x0603) AM_DEVWRITE("discrete", canyon_whistle_w)
 	AM_RANGE(0x0680, 0x0683) AM_WRITE(canyon_led_w)
 	AM_RANGE(0x0700, 0x0703) AM_DEVWRITE("discrete", canyon_attract_w)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(canyon_videoram_w) AM_BASE(&canyon_videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(canyon_videoram_w) AM_BASE_MEMBER(canyon_state, videoram)
 	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(canyon_switches_r, SMH_NOP)  /* sloppy code writes here */
 	AM_RANGE(0x1800, 0x1fff) AM_READ(canyon_options_r)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
@@ -193,10 +188,10 @@ INPUT_PORTS_END
 static const gfx_layout tile_layout =
 {
 	8, 8,
-    64,
-    1,
-    { 0 },
-    {
+	64,
+	1,
+	{ 0 },
+	{
 		0x4, 0x5, 0x6, 0x7, 0xC, 0xD, 0xE, 0xF
 	},
 	{
@@ -240,6 +235,9 @@ GFXDECODE_END
  *************************************/
 
 static MACHINE_DRIVER_START( canyon )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(canyon_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12096000 / 16)
@@ -323,5 +321,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1977, canyon,  0,      canyon, canyon, 0, ROT0, "Atari", "Canyon Bomber", 0 )
-GAME( 1977, canyonp, canyon, canyon, canyon, 0, ROT0, "Atari", "Canyon Bomber (prototype)", 0 )
+GAME( 1977, canyon,  0,      canyon, canyon, 0, ROT0, "Atari", "Canyon Bomber", GAME_SUPPORTS_SAVE )
+GAME( 1977, canyonp, canyon, canyon, canyon, 0, ROT0, "Atari", "Canyon Bomber (prototype)", GAME_SUPPORTS_SAVE )
