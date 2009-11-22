@@ -25,9 +25,9 @@ extern void psx_lightgun_set( int, int );
 #define PSX_IRQ_ROOTCOUNTER3	0x0001
 #define PSX_IRQ_CDROM			0x0004
 #define PSX_IRQ_DMA				0x0008
-#define PSX_IRQ_ROOTCOUNTER2	0x0010
+#define PSX_IRQ_ROOTCOUNTER0	0x0010
 #define PSX_IRQ_ROOTCOUNTER1	0x0020
-#define PSX_IRQ_ROOTCOUNTER0	0x0040
+#define PSX_IRQ_ROOTCOUNTER2	0x0040
 #define PSX_IRQ_SIO0			0x0080
 #define PSX_IRQ_SIO1			0x0100
 #define PSX_IRQ_SPU				0x0200
