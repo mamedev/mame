@@ -18,6 +18,8 @@ Volfied (c) 1989 Taito Corporation
 
     OSC: 32MHz, 26.686MHz & 20MHz
 
+TC0030CMD is a custom Z80 with embedded 8K ram + 8k rom (20MHz OSC is next to chip, 20MHz/4 = 5MHz(?))
+
 Stephh's notes (based on the game M68000 code and some tests) :
 
 1) 'volfied*'
