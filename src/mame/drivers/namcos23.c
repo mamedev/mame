@@ -50,7 +50,7 @@ Note! This document is a Work-In-Progress and will be updated from time to time 
 
 This document covers all the known Namco System 23 / Super System 23 games, including....
 *Angler King      Namco, 1999    System 23
-*Final Furlong    Namco, 1997    System 22.5/Gorgon
+Final Furlong     Namco, 1997    System 22.5/Gorgon
 Gunmen Wars       Namco, 1998    System 23 [not dumped, but have]
 Motocross Go!     Namco, 1997    System 23
 Panic Park        Namco, 1998    System 23
@@ -638,7 +638,7 @@ Notes:
       Game           Code and revision
       --------------------------------
       Rapid River    RD3 Ver.C
-
+      Final Furlong  FF2 Ver.A
 
 ROM PCB
 -------
@@ -686,7 +686,8 @@ Notes:
       PAL1 - PALCE16V8H stamped 'SS22M1' (PLCC20)
       PAL2 - PALCE20V8H stamped 'SS22M2' (PLCC32)
       PAL3 - PALCE20V8H stamped 'SS22M2' (PLCC32)
-      KEYCUS - MACH211 CPLD stamped 'KC012' (PLCC44)
+      KEYCUS - for Rapid River: MACH211 CPLD stamped 'KC012' (PLCC44)
+      KEYCUS - for Final Furlong: MACH211 CPLD stamped 'KC011' (PLCC44)
       J1->J5 - Custom NAMCO connectors for joining ROM PCB to Main PCB
       JP1/JP2 \
       JP3/JP4 |
@@ -880,6 +881,7 @@ static VIDEO_UPDATE( ss23 )
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
 	tilemap_mark_all_tiles_dirty(bgtilemap);
+	tilemap_set_palette_offset( bgtilemap, 0x7f00 );
 	tilemap_draw( bitmap, cliprect, bgtilemap, 0/*flags*/, 0/*priority*/ ); /* opaque */
 
 #if 0
@@ -970,13 +972,13 @@ INLINE void UpdatePalette( running_machine *machine, int entry )
 {
          int j;
 
-	for( j=0; j<1; j++ )
+	for( j=0; j<2; j++ )
 	{
 		int which = (entry*2)+(j*2);
-		int r = nthbyte(paletteram32,which+0x00001);
-		int g = nthbyte(paletteram32,which+0x08001);
-		int b = nthbyte(paletteram32,which+0x18001);
-		palette_set_color( machine,which,MAKE_RGB(r,g,b) );
+		int r = nthbyte(paletteram32, which+0x00001);
+		int g = nthbyte(paletteram32, which+0x10001);
+		int b = nthbyte(paletteram32, which+0x20001);
+		palette_set_color( machine, which/2, MAKE_RGB(r,g,b) );
 	}
 }
 
@@ -991,7 +993,7 @@ static WRITE32_HANDLER( namcos23_paletteram_w )
 {
 	COMBINE_DATA( &paletteram32[offset] );
 
-	UpdatePalette(space->machine, (offset % (0x8000/4))*2);
+	UpdatePalette(space->machine, (offset % (0x10000/4))*2);
 }
 
 // must return this magic number
@@ -1063,8 +1065,8 @@ static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x06800000, 0x06803fff) AM_WRITE( s23_txtchar_w ) AM_BASE(&namcos23_charram)	// text layer characters
 	AM_RANGE(0x06804000, 0x0681dfff) AM_RAM
 	AM_RANGE(0x0681e000, 0x0681ffff) AM_READ(namcos23_textram_r) AM_WRITE(namcos23_textram_w) AM_BASE(&namcos23_textram)
-	AM_RANGE(0x06a08000, 0x06a2ffff) AM_READ(namcos23_paletteram_r) AM_WRITE(namcos23_paletteram_w) AM_BASE(&paletteram32)
-	AM_RANGE(0x06a30000, 0x06a3ffff) AM_RAM
+	AM_RANGE(0x06a08000, 0x06a0ffff) AM_RAM	//gamma?
+	AM_RANGE(0x06a10000, 0x06a3ffff) AM_READ(namcos23_paletteram_r) AM_WRITE(namcos23_paletteram_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x06820008, 0x0682000f) AM_READ( ss23_vstat_r )	// vblank status?
 	AM_RANGE(0x08000000, 0x08017fff) AM_RAM
 	AM_RANGE(0x0d000000, 0x0d000007) AM_READ(sysctl_stat_r) AM_WRITENOP
@@ -1465,7 +1467,7 @@ static MACHINE_DRIVER_START( s23 )
 	MDRV_CPU_PROGRAM_MAP( s23iobrdmap)
 	MDRV_CPU_IO_MAP( s23iobrdiomap)
 
-	MDRV_QUANTUM_TIME(HZ(60*4000))
+	MDRV_QUANTUM_TIME(HZ(60*18000))	// higher than 60*20000 causes timecrs2 crash after power-on test $1e
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -1504,7 +1506,7 @@ static MACHINE_DRIVER_START( ss23 )
 	MDRV_CPU_IO_MAP( s23h8ionoiobmap)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
-	MDRV_QUANTUM_TIME(HZ(60000))
+	MDRV_QUANTUM_TIME(HZ(60*40000))
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -1587,6 +1589,59 @@ ROM_START( rapidrvr )
 	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
         ROM_LOAD( "rd1wavel.2s",  0x000000, 0x800000, CRC(bf52c08c) SHA1(6745062e078e520484390fad1f723124aa4076d0) )
         ROM_LOAD( "rd1waveh.3s",  0x800000, 0x800000, CRC(ef0136b5) SHA1(a6d923ededca168fe555e0b86a72f53bec5424cc) )
+ROM_END
+
+ROM_START( finlflng )                                                                                                    
+	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
+        ROM_LOAD16_BYTE( "ff2vera.ic2",  0x000000, 0x200000, CRC(e10f9dfa) SHA1(6f6989cd722fec5e3ed3ad1bb4866c5831041ae1) )
+        ROM_LOAD16_BYTE( "ff2vera.ic1",  0x000001, 0x200000, CRC(5a90ffbf) SHA1(e22dc0ae2d3c3b3a521369fe3f63412ae2ae0a12) )
+
+	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
+        ROM_LOAD16_WORD_SWAP( "ff2vera.ic3",  0x000000, 0x080000, CRC(ab681078) SHA1(ec8367404458a54893ab6bea29c8a2ba3272b816) )
+
+	ROM_REGION( 0x800000, "sprite", 0 )	/* sprite? tilemap? tiles */
+        ROM_LOAD16_BYTE( "ff2mtal.1j",   0x000000, 0x400000, CRC(ed1a5bf2) SHA1(bd05388a125a0201a41af95fb2aa5fe1c8b0f270) )
+        ROM_LOAD16_BYTE( "ff2mtah.3j",   0x000001, 0x400000, CRC(161003cd) SHA1(04409333a4776b17700fc6d1aa06a39560132e03) )
+
+	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
+        ROM_LOAD( "ff2cguu.5b",   0x0000000, 0x400000, CRC(595deee4) SHA1(b29ff9c6ba17737f1f87c05b2d899d80b0b72dbb) )
+        ROM_LOAD( "ff2cgum.6b",   0x0800000, 0x400000, CRC(b808be59) SHA1(906bfbb5d34feef9697da545a93930fe6e56685c) )
+        ROM_LOAD( "ff2cgll.8b",   0x1000000, 0x400000, CRC(8e6c34eb) SHA1(795631c8019011246ed1e5546de4433dc22dd9e7) )     
+        ROM_LOAD( "ff2cglm.7b",   0x1800000, 0x400000, CRC(406f321b) SHA1(41a2b0229d5370f141b9d6a4e1801e2f9973f660) )     
+
+	ROM_REGION( 0x2000000, "textiledup", 0 )	/* duplicate bank of texture tiles */
+        ROM_LOAD( "ff2cguu.5f",   0x0000000, 0x400000, CRC(595deee4) SHA1(b29ff9c6ba17737f1f87c05b2d899d80b0b72dbb) )
+        ROM_LOAD( "ff2cgum.6f",   0x0800000, 0x400000, CRC(b808be59) SHA1(906bfbb5d34feef9697da545a93930fe6e56685c) )
+        ROM_LOAD( "ff2cgll.8f",   0x1000000, 0x400000, CRC(8e6c34eb) SHA1(795631c8019011246ed1e5546de4433dc22dd9e7) )     
+        ROM_LOAD( "ff2cglm.7f",   0x1800000, 0x400000, CRC(406f321b) SHA1(41a2b0229d5370f141b9d6a4e1801e2f9973f660) )     
+
+	ROM_REGION( 0x4000000, "textile2", 0 )	/* texture tiles bank 2? */
+        ROM_LOAD( "ff2spruu.9p",  0x0000000, 0x400000, CRC(c134b0de) SHA1(cea9d9f4ce2f45a93c797ed467d8458521db9b3d) )
+        ROM_LOAD( "ff2sprum.10p", 0x0800000, 0x400000, CRC(cb53c03e) SHA1(c39a44cad240c5b77c235c07ea700f9847ab9482) )
+        ROM_LOAD( "ff2sprll.12t", 0x1000000, 0x400000, CRC(1b305a13) SHA1(3d213a77b7a019fe4511097e7a27aa0688a3a586) )
+        ROM_LOAD( "ff2sprlm.11p", 0x1800000, 0x400000, CRC(421a8fbf) SHA1(8bd6f3e1ac9c7b0ac9d25dfbce35f5b7a5d5bcc7) )
+
+	ROM_REGION( 0x2000000, "textile2d", 0 )	/* duplicate of texture tiles bank 2? */
+        ROM_LOAD( "ff2spruu.9t",  0x0000000, 0x400000, CRC(c134b0de) SHA1(cea9d9f4ce2f45a93c797ed467d8458521db9b3d) )
+        ROM_LOAD( "ff2sprum.10t", 0x0800000, 0x400000, CRC(cb53c03e) SHA1(c39a44cad240c5b77c235c07ea700f9847ab9482) )
+        ROM_LOAD( "ff2sprll.12p", 0x1000000, 0x400000, CRC(1b305a13) SHA1(3d213a77b7a019fe4511097e7a27aa0688a3a586) )
+        ROM_LOAD( "ff2sprlm.11t", 0x1800000, 0x400000, CRC(421a8fbf) SHA1(8bd6f3e1ac9c7b0ac9d25dfbce35f5b7a5d5bcc7) )
+
+	ROM_REGION( 0x400000, "textilemap", 0 )	/* texture tilemap */
+        ROM_LOAD( "ff2ccrl.11a",  0x000000, 0x200000, CRC(f1f9e77c) SHA1(adf659a4671ea066817e6620b7d7d5f60f6e01e5) )     
+        ROM_LOAD( "ff2ccrh.11b",  0x200000, 0x200000, CRC(71228c61) SHA1(b39d0b51f36c0d00a6144ae20613bebee3ed22bc) )     
+
+	ROM_REGION( 0x400000, "textilemp2", 0 )	/* duplicate texture tilemap */
+        ROM_LOAD( "ff2ccrl.11e",  0x000000, 0x200000, CRC(f1f9e77c) SHA1(adf659a4671ea066817e6620b7d7d5f60f6e01e5) )     
+        ROM_LOAD( "ff2ccrh.11f",  0x000000, 0x200000, CRC(71228c61) SHA1(b39d0b51f36c0d00a6144ae20613bebee3ed22bc) )     
+
+	ROM_REGION32_LE( 0x2000000, "pointrom", 0 )	/* 3D model data */
+        ROM_LOAD32_WORD( "ff2pt0l.9j",   0x000000, 0x400000, CRC(7eeda441) SHA1(78648559abec5e1f04622cd1cfd5d94bddda7dbf) )
+        ROM_LOAD32_WORD( "ff2pt0h.9l",   0x000002, 0x400000, CRC(344ce7a5) SHA1(79d2c4495b47592be4dee6e39294dd3194eb1d5f) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
+        ROM_LOAD( "ff2wavel.2s",  0x000000, 0x800000, CRC(6235c605) SHA1(521eaee80ac17c0936877d49394e5390fa0ff8a0) )
+        ROM_LOAD( "ff2waveh.3s",  0x00000, 0x800000, CRC(2a59492a) SHA1(886ec0a4a71048d65f93c52df96416e74d23b3ec) )
 ROM_END
 
 ROM_START( motoxgo )
@@ -1726,7 +1781,7 @@ ROM_START( 500gp )
         ROM_LOAD16_WORD_SWAP( "5gp3verc.3",   0x000000, 0x080000, CRC(b323abdf) SHA1(8962e39b48a7074a2d492afb5db3f5f3e5ae2389) )
 
 	ROM_REGION( 0x2000000, "sprite", 0 )	/* sprite? tilemap? tiles */
-		ROM_LOAD16_BYTE( "5gp1mtal.2h",  0x0000000, 0x800000, CRC(1bb00c7b) SHA1(922be45d57330c31853b2dc1642c589952b09188) )
+	ROM_LOAD16_BYTE( "5gp1mtal.2h",  0x0000000, 0x800000, CRC(1bb00c7b) SHA1(922be45d57330c31853b2dc1642c589952b09188) )
         ROM_LOAD16_BYTE( "5gp1mtah.2j",  0x0000001, 0x800000, CRC(246e4b7a) SHA1(75743294b8f48bffb84f062febfbc02230d49ce9) )
 
 		/* COMMON FUJII YASUI WAKAO KURE INOUE
@@ -1750,9 +1805,9 @@ ROM_START( 500gp )
         ROM_LOAD32_WORD( "5gp1pt0h.7a",  0x0000002, 0x400000, CRC(5746a8cd) SHA1(e70fc596ab9360f474f716c73d76cb9851370c76) )
         ROM_LOAD32_WORD( "5gp1pt1l.5c",  0x0800000, 0x400000, CRC(80b25ad2) SHA1(e9a03fe5bb4ce925f7218ab426ed2a1ca1a26a62) )
         ROM_LOAD32_WORD( "5gp1pt1h.5a",  0x0800002, 0x400000, CRC(b1feb5df) SHA1(45db259215511ac3e472895956f70204d4575482) )
-		ROM_LOAD32_WORD( "5gp1pt2l.4c",  0x1000000, 0x400000, CRC(9289dbeb) SHA1(ec546ad3b1c90609591e599c760c70049ba3b581) )
+	ROM_LOAD32_WORD( "5gp1pt2l.4c",  0x1000000, 0x400000, CRC(9289dbeb) SHA1(ec546ad3b1c90609591e599c760c70049ba3b581) )
         ROM_LOAD32_WORD( "5gp1pt2h.4a",  0x1000002, 0x400000, CRC(9a693771) SHA1(c988e04cd91c3b7e75b91376fd73be4a7da543e7) )
-		ROM_LOAD32_WORD( "5gp1pt3l.3c",  0x1800000, 0x400000, CRC(480b120d) SHA1(6c703550faa412095d9633cf508050614e15fbae) )
+	ROM_LOAD32_WORD( "5gp1pt3l.3c",  0x1800000, 0x400000, CRC(480b120d) SHA1(6c703550faa412095d9633cf508050614e15fbae) )
         ROM_LOAD32_WORD( "5gp1pt3h.3a",  0x1800002, 0x400000, CRC(26eaa400) SHA1(0157b76fffe81b40eb970e84c98398807ced92c4) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
@@ -1846,6 +1901,10 @@ ROM_START( panicprk )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "pnp2ver-a.ic3", 0x000000, 0x080000, CRC(fe4bc6f4) SHA1(2114dc4bc63d589e6c3b26a73dbc60924f3b1765) )
 
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+	// i/o program from motoxgo, as it's "general". however, game crashes(H8 unknown opcode) if add this program
+//      ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
+
 	ROM_REGION( 0x2000000, "sprite", 0 )	/* sprite? tilemap? tiles */
         ROM_LOAD16_BYTE( "pnp1mtal.2h",  0x000000, 0x800000, CRC(6490faaa) SHA1(03443746009b434e5d4074ea6314910418907360) )
         ROM_LOAD16_BYTE( "pnp1mtah.2j",  0x000001, 0x800000, CRC(37addddd) SHA1(3032989653304417df80606bc3fde6e9425d8cbb) )
@@ -1880,10 +1939,11 @@ ROM_END
 
 /* Games */
 GAME( 1997, rapidrvr, 0,      gorgon, ss23, ss23, ROT0, "Namco", "Rapid River (RD3 Ver. C)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+GAME( 1997, finlflng, 0,      gorgon, ss23, ss23, ROT0, "Namco", "Final Furlong (FF2 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, motoxgo,  0,         s23, ss23, ss23, ROT0, "Namco", "Motocross Go! (MG3 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, timecrs2, 0,         s23, ss23, ss23, ROT0, "Namco", "Time Crisis 2 (TSS3 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, timecrs2b,timecrs2,  s23, ss23, ss23, ROT0, "Namco", "Time Crisis 2 (TSS2 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1998, panicprk, 0,        ss23, ss23, ss23, ROT0, "Namco", "Panic Park (PNP2 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+GAME( 1998, panicprk, 0,         s23, ss23, ss23, ROT0, "Namco", "Panic Park (PNP2 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, 500gp,    0,        ss23, ss23, ss23, ROT0, "Namco", "500GP", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, finfurl2, 0,        ss23, ss23, ss23, ROT0, "Namco", "Final Furlong 2 (World)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, finfurl2j,finfurl2, ss23, ss23, ss23, ROT0, "Namco", "Final Furlong 2 (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
