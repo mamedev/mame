@@ -58,58 +58,52 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 #define AQUARIUS_HACK	0
 
-static int aquarium_snd_ack;
-
-UINT16 *aquarium_scroll;
-//UINT16 *aquarium_priority;
-UINT16 *aquarium_txt_videoram;
-UINT16 *aquarium_mid_videoram;
-UINT16 *aquarium_bak_videoram;
 
 #if AQUARIUS_HACK
-static MACHINE_RESET( aquarium )
+static MACHINE_RESET( aquarium_hack )
 {
 	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 	int data = input_port_read(machine, "FAKE");
 
 	/* Language : 0x0000 = Japanese - Other value = English */
 
-	RAM[0x000a5c/2] = data;
+	RAM[0x000a5c / 2] = data;
 
 }
 #endif
 
 static READ16_HANDLER( aquarium_coins_r )
 {
+	aquarium_state *state = (aquarium_state *)space->machine->driver_data;
+
 	int data;
 	data = (input_port_read(space->machine, "SYSTEM") & 0x7fff);
-	data |= aquarium_snd_ack;
-	aquarium_snd_ack = 0;
+	data |= state->aquarium_snd_ack;
+	state->aquarium_snd_ack = 0;
+
 	return data;
 }
 
 static WRITE8_HANDLER( aquarium_snd_ack_w )
 {
-	aquarium_snd_ack = 0x8000;
+	aquarium_state *state = (aquarium_state *)space->machine->driver_data;
+	state->aquarium_snd_ack = 0x8000;
 }
 
 static WRITE16_HANDLER( aquarium_sound_w )
 {
 //  popmessage("sound write %04x",data);
 
-	soundlatch_w(space,1,data&0xff);
+	soundlatch_w(space, 1, data & 0xff);
 	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE8_HANDLER( aquarium_z80_bank_w )
 {
-	int soundbank = ((data & 0x7) + 1) * 0x8000;
-	UINT8 *Z80 = (UINT8 *)memory_region(space->machine, "audiocpu");
-
-	memory_set_bankptr(space->machine, 1, &Z80[soundbank + 0x10000]);
+	memory_set_bank(space->machine, 1, data & 0x07);
 }
 
-static UINT8 aquarium_snd_bitswap(UINT8 scrambled_data)
+static UINT8 aquarium_snd_bitswap( UINT8 scrambled_data )
 {
 	UINT8 data = 0;
 
@@ -127,13 +121,13 @@ static UINT8 aquarium_snd_bitswap(UINT8 scrambled_data)
 
 static READ8_DEVICE_HANDLER( aquarium_oki_r )
 {
-	return (aquarium_snd_bitswap(okim6295_r(device,0)) );
+	return aquarium_snd_bitswap(okim6295_r(device, 0));
 }
 
 static WRITE8_DEVICE_HANDLER( aquarium_oki_w )
 {
-	logerror("%s:Writing %04x to the OKI M6295\n",cpuexec_describe_context(device->machine),aquarium_snd_bitswap(data));
-	okim6295_w( device, 0, (aquarium_snd_bitswap(data)) );
+	logerror("%s:Writing %04x to the OKI M6295\n", cpuexec_describe_context(device->machine), aquarium_snd_bitswap(data));
+	okim6295_w(device, 0, (aquarium_snd_bitswap(data)));
 }
 
 
@@ -141,12 +135,12 @@ static WRITE8_DEVICE_HANDLER( aquarium_oki_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(aquarium_mid_videoram_w) AM_BASE(&aquarium_mid_videoram)
-	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(aquarium_bak_videoram_w) AM_BASE(&aquarium_bak_videoram)
-	AM_RANGE(0xc02000, 0xc03fff) AM_RAM_WRITE(aquarium_txt_videoram_w) AM_BASE(&aquarium_txt_videoram)
-	AM_RANGE(0xc80000, 0xc81fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(aquarium_mid_videoram_w) AM_BASE_MEMBER(aquarium_state, mid_videoram)
+	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(aquarium_bak_videoram_w) AM_BASE_MEMBER(aquarium_state, bak_videoram)
+	AM_RANGE(0xc02000, 0xc03fff) AM_RAM_WRITE(aquarium_txt_videoram_w) AM_BASE_MEMBER(aquarium_state, txt_videoram)
+	AM_RANGE(0xc80000, 0xc81fff) AM_RAM AM_BASE_MEMBER(aquarium_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xd80014, 0xd8001f) AM_WRITEONLY AM_BASE(&aquarium_scroll)
+	AM_RANGE(0xd80014, 0xd8001f) AM_WRITEONLY AM_BASE_MEMBER(aquarium_state, scroll)
 	AM_RANGE(0xd80068, 0xd80069) AM_WRITENOP		/* probably not used */
 	AM_RANGE(0xd80080, 0xd80081) AM_READ_PORT("DSW")
 	AM_RANGE(0xd80082, 0xd80083) AM_READNOP	/* stored but not read back ? check code at 0x01f440 */
@@ -282,43 +276,45 @@ static const gfx_layout tilelayout =
 
 static DRIVER_INIT( aquarium )
 {
+	UINT8 *Z80 = memory_region(machine, "audiocpu");
+
 	/* The BG tiles are 5bpp, this rearranges the data from
        the roms containing the 1bpp data so we can decode it
        correctly */
-
-	UINT8 *DAT2 = memory_region(machine, "gfx1")+0x080000;
+	UINT8 *DAT2 = memory_region(machine, "gfx1") + 0x080000;
 	UINT8 *DAT = memory_region(machine, "user1");
 	int len = 0x0200000;
 
-	for (len = 0 ; len < 0x020000 ; len ++ )
+	for (len = 0; len < 0x020000; len++)
 	{
-		DAT2[len*4+1] =  (DAT[len] & 0x80) << 0;
-		DAT2[len*4+1] |= (DAT[len] & 0x40) >> 3;
-		DAT2[len*4+0] =  (DAT[len] & 0x20) << 2;
-		DAT2[len*4+0] |= (DAT[len] & 0x10) >> 1;
-		DAT2[len*4+3] =  (DAT[len] & 0x08) << 4;
-		DAT2[len*4+3] |= (DAT[len] & 0x04) << 1;
-		DAT2[len*4+2] =  (DAT[len] & 0x02) << 6;
-		DAT2[len*4+2] |= (DAT[len] & 0x01) << 3;
+		DAT2[len * 4 + 1] =  (DAT[len] & 0x80) << 0;
+		DAT2[len * 4 + 1] |= (DAT[len] & 0x40) >> 3;
+		DAT2[len * 4 + 0] =  (DAT[len] & 0x20) << 2;
+		DAT2[len * 4 + 0] |= (DAT[len] & 0x10) >> 1;
+		DAT2[len * 4 + 3] =  (DAT[len] & 0x08) << 4;
+		DAT2[len * 4 + 3] |= (DAT[len] & 0x04) << 1;
+		DAT2[len * 4 + 2] =  (DAT[len] & 0x02) << 6;
+		DAT2[len * 4 + 2] |= (DAT[len] & 0x01) << 3;
 	}
 
-	DAT2 = memory_region(machine, "gfx4")+0x080000;
+	DAT2 = memory_region(machine, "gfx4") + 0x080000;
 	DAT = memory_region(machine, "user2");
 
-	for (len = 0 ; len < 0x020000 ; len ++ )
+	for (len = 0; len < 0x020000; len++)
 	{
-		DAT2[len*4+1] =  (DAT[len] & 0x80) << 0;
-		DAT2[len*4+1] |= (DAT[len] & 0x40) >> 3;
-		DAT2[len*4+0] =  (DAT[len] & 0x20) << 2;
-		DAT2[len*4+0] |= (DAT[len] & 0x10) >> 1;
-		DAT2[len*4+3] =  (DAT[len] & 0x08) << 4;
-		DAT2[len*4+3] |= (DAT[len] & 0x04) << 1;
-		DAT2[len*4+2] =  (DAT[len] & 0x02) << 6;
-		DAT2[len*4+2] |= (DAT[len] & 0x01) << 3;
+		DAT2[len * 4 + 1] =  (DAT[len] & 0x80) << 0;
+		DAT2[len * 4 + 1] |= (DAT[len] & 0x40) >> 3;
+		DAT2[len * 4 + 0] =  (DAT[len] & 0x20) << 2;
+		DAT2[len * 4 + 0] |= (DAT[len] & 0x10) >> 1;
+		DAT2[len * 4 + 3] =  (DAT[len] & 0x08) << 4;
+		DAT2[len * 4 + 3] |= (DAT[len] & 0x04) << 1;
+		DAT2[len * 4 + 2] =  (DAT[len] & 0x02) << 6;
+		DAT2[len * 4 + 2] |= (DAT[len] & 0x01) << 3;
 	}
 
-	/* reset the sound bank */
-	aquarium_z80_bank_w(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_IO), 0, 0);
+	/* configure and set up the sound bank */
+	memory_configure_bank(machine, 1, 0, 7, &Z80[0x18000], 0x8000);
+	memory_set_bank(machine, 1, 1);
 }
 
 
@@ -329,9 +325,9 @@ static GFXDECODE_START( aquarium )
 	GFXDECODE_ENTRY( "gfx4", 0, char5bpplayout,   0x400, 32 )
 GFXDECODE_END
 
-static void irq_handler(const device_config *device, int irq)
+static void irq_handler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(device->machine, "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -342,10 +338,24 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_START( aquarium )
 {
-    state_save_register_global(machine, aquarium_snd_ack);
+	aquarium_state *state = (aquarium_state *)machine->driver_data;
+	state_save_register_global(machine, state->aquarium_snd_ack);
+}
+
+static MACHINE_RESET( aquarium )
+{
+	aquarium_state *state = (aquarium_state *)machine->driver_data;
+	state->aquarium_snd_ack = 0;
+
+#if AQUARIUS_HACK
+	MACHINE_RESET_CALL(aquarium_hack);
+#endif
 }
 
 static MACHINE_DRIVER_START( aquarium )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(aquarium_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)
@@ -356,10 +366,8 @@ static MACHINE_DRIVER_START( aquarium )
 	MDRV_CPU_PROGRAM_MAP(snd_map)
 	MDRV_CPU_IO_MAP(snd_portmap)
 
-    MDRV_MACHINE_START(aquarium)
-#if AQUARIUS_HACK
+	MDRV_MACHINE_START(aquarium)
 	MDRV_MACHINE_RESET(aquarium)
-#endif
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

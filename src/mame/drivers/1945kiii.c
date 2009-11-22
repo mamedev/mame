@@ -59,37 +59,54 @@ There are no static local variables.
 
 #define MASTER_CLOCK	XTAL_16MHz
 
-static UINT16* k3_spriteram_1;
-static UINT16* k3_spriteram_2;
-static UINT16* k3_bgram;
-static tilemap *k3_bg_tilemap;
+
+typedef struct _k3_state k3_state;
+struct _k3_state
+{
+	/* memory pointers */
+	UINT16 *  spriteram_1;
+	UINT16 *  spriteram_2;
+	UINT16 *  bgram;
+//	UINT16 *  paletteram16;	// currently this uses generic palette handling
+
+	/* video-related */
+	tilemap  *bg_tilemap;
+
+	/* devices */
+	const device_config *oki1;
+	const device_config *oki2;
+};
+
 
 static WRITE16_HANDLER( k3_bgram_w )
 {
-	COMBINE_DATA(&k3_bgram[offset]);
-	tilemap_mark_tile_dirty(k3_bg_tilemap,offset);
+	k3_state *state = (k3_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->bgram[offset]);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_k3_bg_tile_info )
 {
-	int tileno;
-	tileno = k3_bgram[tile_index];
-	SET_TILE_INFO(1,tileno,0,0);
+	k3_state *state = (k3_state *)machine->driver_data;
+	int tileno = state->bgram[tile_index];
+	SET_TILE_INFO(1, tileno, 0, 0);
 }
 
 static VIDEO_START(k3)
 {
-	k3_bg_tilemap = tilemap_create(machine, get_k3_bg_tile_info,tilemap_scan_rows,16, 16, 32,64);
+	k3_state *state = (k3_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_k3_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 64);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	k3_state *state = (k3_state *)machine->driver_data;
 	const gfx_element *gfx = machine->gfx[0];
-	UINT16 *source = k3_spriteram_1;
-	UINT16 *source2 = k3_spriteram_2;
-	UINT16 *finish = source + 0x1000/2;
+	UINT16 *source = state->spriteram_1;
+	UINT16 *source2 = state->spriteram_2;
+	UINT16 *finish = source + 0x1000 / 2;
 
-	while( source<finish )
+	while (source < finish)
 	{
 		int xpos, ypos;
 		int tileno;
@@ -97,40 +114,43 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		ypos = (source[0] & 0x00ff) >> 0;
 		tileno = (source2[0] & 0x7ffe) >> 1;
 		xpos |=  (source2[0] & 0x0001) << 8;
-		drawgfx_transpen(bitmap,cliprect,gfx, tileno,1,0,0,xpos,ypos,0);
-		drawgfx_transpen(bitmap,cliprect,gfx, tileno,1,0,0,xpos,ypos-0x100,0); // wrap
-		drawgfx_transpen(bitmap,cliprect,gfx, tileno,1,0,0,xpos-0x200,ypos,0); // wrap
-		drawgfx_transpen(bitmap,cliprect,gfx, tileno,1,0,0,xpos-0x200,ypos-0x100,0); // wrap
+		drawgfx_transpen(bitmap, cliprect, gfx, tileno, 1, 0, 0, xpos, ypos, 0);
+		drawgfx_transpen(bitmap, cliprect, gfx, tileno, 1, 0, 0, xpos, ypos - 0x100, 0); // wrap
+		drawgfx_transpen(bitmap, cliprect, gfx, tileno, 1, 0, 0, xpos - 0x200, ypos, 0); // wrap
+		drawgfx_transpen(bitmap, cliprect, gfx, tileno, 1, 0, 0, xpos - 0x200, ypos - 0x100, 0); // wrap
 
-		source++;source2++;
+		source++;
+		source2++;
 	}
 }
 
 static VIDEO_UPDATE(k3)
 {
-	tilemap_draw(bitmap,cliprect,k3_bg_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect);
+	k3_state *state = (k3_state *)screen->machine->driver_data;
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
 
 static WRITE16_HANDLER( k3_scrollx_w )
 {
-	tilemap_set_scrollx( k3_bg_tilemap,0, data);
+	k3_state *state = (k3_state *)space->machine->driver_data;
+	tilemap_set_scrollx(state->bg_tilemap, 0, data);
 }
 
 static WRITE16_HANDLER( k3_scrolly_w )
 {
-	tilemap_set_scrolly( k3_bg_tilemap,0, data);
+	k3_state *state = (k3_state *)space->machine->driver_data;
+	tilemap_set_scrolly(state->bg_tilemap, 0, data);
 }
 
 static WRITE16_HANDLER( k3_soundbanks_w )
 {
-	okim6295_set_bank_base(devtag_get_device(space->machine, "oki1"), (data & 4) ? 0x40000 : 0);
-	okim6295_set_bank_base(devtag_get_device(space->machine, "oki2"), (data & 2) ? 0x40000 : 0);
+	k3_state *state = (k3_state *)space->machine->driver_data;
+	okim6295_set_bank_base(state->oki1, (data & 4) ? 0x40000 : 0);
+	okim6295_set_bank_base(state->oki2, (data & 2) ? 0x40000 : 0);
 }
-
-
 
 static ADDRESS_MAP_START( k3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0009ce, 0x0009cf) AM_WRITENOP	// bug in code? (clean up log)
@@ -139,9 +159,9 @@ static ADDRESS_MAP_START( k3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	// Main Ram
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)	// palette
-	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_BASE(&k3_spriteram_1)
-	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_BASE(&k3_spriteram_2)
-	AM_RANGE(0x2c0000, 0x2c0fff) AM_RAM_WRITE(k3_bgram_w) AM_BASE(&k3_bgram)
+	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_BASE_MEMBER(k3_state, spriteram_1)
+	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_BASE_MEMBER(k3_state, spriteram_2)
+	AM_RANGE(0x2c0000, 0x2c0fff) AM_RAM_WRITE(k3_bgram_w) AM_BASE_MEMBER(k3_state, bgram)
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(k3_scrollx_w)
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(k3_scrolly_w)
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(k3_soundbanks_w)
@@ -178,7 +198,6 @@ static INPUT_PORTS_START( k3 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Are these used at all? */
-
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x007,  0x0007, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW1:1,2,3")
@@ -234,13 +253,26 @@ static GFXDECODE_START( 1945kiii )
 GFXDECODE_END
 
 
+static MACHINE_START( 1945kiii )
+{
+	k3_state *state = (k3_state *)machine->driver_data;
+
+	state->oki1 = devtag_get_device(machine, "oki1");
+	state->oki2 = devtag_get_device(machine, "oki2");
+}
+
 static MACHINE_DRIVER_START( k3 )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(k3_state)
+
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(k3_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_GFXDECODE(1945kiii)
+	MDRV_MACHINE_START(1945kiii)
 
+	MDRV_GFXDECODE(1945kiii)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

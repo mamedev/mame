@@ -28,33 +28,21 @@
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "actfancr.h"
 
-VIDEO_UPDATE( actfancr );
-VIDEO_UPDATE( triothep );
-WRITE8_HANDLER( actfancr_pf1_data_w );
-READ8_HANDLER( actfancr_pf1_data_r );
-WRITE8_HANDLER( actfancr_pf1_control_w );
-WRITE8_HANDLER( actfancr_pf2_data_w );
-READ8_HANDLER( actfancr_pf2_data_r );
-WRITE8_HANDLER( actfancr_pf2_control_w );
-VIDEO_START( actfancr );
-VIDEO_START( triothep );
-
-extern UINT8 *actfancr_pf1_data,*actfancr_pf2_data,*actfancr_pf1_rowscroll_data;
-static UINT8 *actfancr_ram;
 
 /******************************************************************************/
 
-static int trio_control_select;
-
 static WRITE8_HANDLER( triothep_control_select_w )
 {
-	trio_control_select=data;
+	actfancr_state *state = (actfancr_state *)space->machine->driver_data;
+	state->trio_control_select = data;
 }
 
 static READ8_HANDLER( triothep_control_r )
 {
-	switch (trio_control_select)
+	actfancr_state *state = (actfancr_state *)space->machine->driver_data;
+	switch (state->trio_control_select)
 	{
 		case 0: return input_port_read(space->machine, "P1");
 		case 1: return input_port_read(space->machine, "P2");
@@ -68,7 +56,7 @@ static READ8_HANDLER( triothep_control_r )
 
 static WRITE8_HANDLER( actfancr_sound_w )
 {
-	soundlatch_w(space,0,data & 0xff);
+	soundlatch_w(space, 0, data & 0xff);
 	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -77,9 +65,9 @@ static WRITE8_HANDLER( actfancr_sound_w )
 static ADDRESS_MAP_START( actfan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x02ffff) AM_ROM
 	AM_RANGE(0x060000, 0x06001f) AM_WRITE(actfancr_pf1_control_w)
-	AM_RANGE(0x062000, 0x063fff) AM_READWRITE(actfancr_pf1_data_r, actfancr_pf1_data_w) AM_BASE(&actfancr_pf1_data)
+	AM_RANGE(0x062000, 0x063fff) AM_READWRITE(actfancr_pf1_data_r, actfancr_pf1_data_w) AM_BASE_MEMBER(actfancr_state, pf1_data)
 	AM_RANGE(0x070000, 0x07001f) AM_WRITE(actfancr_pf2_control_w)
-	AM_RANGE(0x072000, 0x0727ff) AM_READWRITE(actfancr_pf2_data_r, actfancr_pf2_data_w) AM_BASE(&actfancr_pf2_data)
+	AM_RANGE(0x072000, 0x0727ff) AM_READWRITE(actfancr_pf2_data_r, actfancr_pf2_data_w) AM_BASE_MEMBER(actfancr_state, pf2_data)
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1205ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
@@ -89,23 +77,23 @@ static ADDRESS_MAP_START( actfan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x130003, 0x130003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x140000, 0x140001) AM_READ_PORT("SYSTEM")	/* VBL */
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(actfancr_sound_w)
-	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE(&actfancr_ram) /* Main ram */
+	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE_MEMBER(actfancr_state, main_ram) /* Main ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( triothep_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04001f) AM_WRITE(actfancr_pf2_control_w)
-	AM_RANGE(0x044000, 0x045fff) AM_READWRITE(actfancr_pf2_data_r, actfancr_pf2_data_w) AM_BASE(&actfancr_pf2_data)
+	AM_RANGE(0x044000, 0x045fff) AM_READWRITE(actfancr_pf2_data_r, actfancr_pf2_data_w) AM_BASE_MEMBER(actfancr_state, pf2_data)
 	AM_RANGE(0x046400, 0x0467ff) AM_WRITENOP /* Pf2 rowscroll - is it used? */
 	AM_RANGE(0x060000, 0x06001f) AM_WRITE(actfancr_pf1_control_w)
-	AM_RANGE(0x064000, 0x0647ff) AM_READWRITE(actfancr_pf1_data_r, actfancr_pf1_data_w) AM_BASE(&actfancr_pf1_data)
-	AM_RANGE(0x066400, 0x0667ff) AM_WRITEONLY AM_BASE(&actfancr_pf1_rowscroll_data)
+	AM_RANGE(0x064000, 0x0647ff) AM_READWRITE(actfancr_pf1_data_r, actfancr_pf1_data_w) AM_BASE_MEMBER(actfancr_state, pf1_data)
+	AM_RANGE(0x066400, 0x0667ff) AM_WRITEONLY AM_BASE_MEMBER(actfancr_state, pf1_rowscroll_data)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(actfancr_sound_w)
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x130000, 0x1305ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
 	AM_RANGE(0x140000, 0x140001) AM_READNOP /* Value doesn't matter */
-	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE(&actfancr_ram) /* Main ram */
+	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE_MEMBER(actfancr_state, main_ram) /* Main ram */
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(triothep_control_r, triothep_control_select_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
@@ -288,12 +276,37 @@ static const ym3812_interface ym3812_config =
 
 static MACHINE_START( triothep )
 {
-    state_save_register_global(machine, trio_control_select);
+ 	actfancr_state *state = (actfancr_state *)machine->driver_data;
+	state_save_register_global(machine, state->trio_control_select);
+}
+
+static MACHINE_RESET( actfancr )
+{
+ 	actfancr_state *state = (actfancr_state *)machine->driver_data;
+	int i;
+
+	state->flipscreen = 0;
+	for (i = 0; i < 0x20; i++)
+	{
+		state->control_1[i] = 0;
+		state->control_2[i] = 0;
+	}
+}
+
+static MACHINE_RESET( triothep )
+{
+ 	actfancr_state *state = (actfancr_state *)machine->driver_data;
+
+	MACHINE_RESET_CALL(actfancr);
+	state->trio_control_select = 0;
 }
 
 /******************************************************************************/
 
 static MACHINE_DRIVER_START( actfancr )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(actfancr_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",H6280,21477200/3) /* Should be accurate */
@@ -302,6 +315,8 @@ static MACHINE_DRIVER_START( actfancr )
 
 	MDRV_CPU_ADD("audiocpu",M6502, 1500000) /* Should be accurate */
 	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
+
+	MDRV_MACHINE_RESET(actfancr)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -338,6 +353,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( triothep )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(actfancr_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",H6280,XTAL_21_4772MHz/3) /* XIN=21.4772Mhz, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(triothep_map)
@@ -346,7 +364,8 @@ static MACHINE_DRIVER_START( triothep )
 	MDRV_CPU_ADD("audiocpu",M6502, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
-    MDRV_MACHINE_START(triothep)
+	MDRV_MACHINE_START(triothep)
+	MDRV_MACHINE_RESET(triothep)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -553,12 +572,15 @@ ROM_END
 
 static READ8_HANDLER( cycle_r )
 {
-	int pc=cpu_get_pc(space->cpu);
-	int ret=actfancr_ram[0x26];
+	actfancr_state *state = (actfancr_state *)space->machine->driver_data;
+	int pc = cpu_get_pc(space->cpu);
+	int ret = state->main_ram[0x26];
 
-	if (offset==1) return actfancr_ram[0x27];
+	if (offset == 1) 
+		return state->main_ram[0x27];
 
-	if (pc==0xe29a && ret==0) {
+	if (pc == 0xe29a && ret == 0) 
+	{
 		cpu_spinuntil_int(space->cpu);
 		return 1;
 	}
@@ -568,12 +590,15 @@ static READ8_HANDLER( cycle_r )
 
 static READ8_HANDLER( cyclej_r )
 {
-	int pc=cpu_get_pc(space->cpu);
-	int ret=actfancr_ram[0x26];
+	actfancr_state *state = (actfancr_state *)space->machine->driver_data;
+	int pc = cpu_get_pc(space->cpu);
+	int ret = state->main_ram[0x26];
 
-	if (offset==1) return actfancr_ram[0x27];
+	if (offset == 1) 
+		return state->main_ram[0x27];
 
-	if (pc==0xe2b1 && ret==0) {
+	if (pc == 0xe2b1 && ret == 0) 
+	{
 		cpu_spinuntil_int(space->cpu);
 		return 1;
 	}
@@ -590,7 +615,6 @@ static DRIVER_INIT( actfancj )
 {
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f0026, 0x1f0027, 0, 0, cyclej_r);
 }
-
 
 
 GAME( 1989, actfancr, 0,        actfancr, actfancr, actfancr, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 2)", GAME_SUPPORTS_SAVE )

@@ -1,10 +1,23 @@
-/*----------- defined in drivers/aquarium.c -----------*/
 
-extern UINT16 *aquarium_scroll;
 
-extern UINT16 *aquarium_txt_videoram;
-extern UINT16 *aquarium_mid_videoram;
-extern UINT16 *aquarium_bak_videoram;
+
+typedef struct _aquarium_state aquarium_state;
+struct _aquarium_state
+{
+	/* memory pointers */
+	UINT16 *  scroll;
+	UINT16 *  txt_videoram;
+	UINT16 *  mid_videoram;
+	UINT16 *  bak_videoram;
+	UINT16 *  spriteram;
+//	UINT16 *  paletteram16;	// currently this uses generic palette handling
+
+	/* video-related */
+	tilemap  *txt_tilemap, *mid_tilemap, *bak_tilemap;
+
+	/* misc */
+	int aquarium_snd_ack;
+};
 
 
 /*----------- defined in video/aquarium.c -----------*/
