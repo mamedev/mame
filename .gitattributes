@@ -2367,6 +2367,7 @@ src/mame/includes/changela.h svneol=native#text/plain
 src/mame/includes/cidelsa.h svneol=native#text/plain
 src/mame/includes/cinemat.h svneol=native#text/plain
 src/mame/includes/circus.h svneol=native#text/plain
+src/mame/includes/circusc.h svneol=native#text/plain
 src/mame/includes/cischeat.h svneol=native#text/plain
 src/mame/includes/cloak.h svneol=native#text/plain
 src/mame/includes/cloud9.h svneol=native#text/plain

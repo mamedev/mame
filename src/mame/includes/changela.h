@@ -1,13 +1,47 @@
-/*----------- defined in drivers/changela.c -----------*/
 
-extern UINT8 changela_tree0_col;
-extern UINT8 changela_tree1_col;
-extern UINT8 changela_left_bank_col;
-extern UINT8 changela_right_bank_col;
-extern UINT8 changela_boat_shore_col;
-extern UINT8 changela_collision_reset;
-extern UINT8 changela_tree_collision_reset;
 
+typedef struct _changela_state changela_state;
+struct _changela_state
+{
+	/* memory pointers */
+	UINT8 *  videoram;
+	UINT8 *  colorram;
+	UINT8 *  spriteram;
+
+	/* video-related */
+	bitmap_t *obj0_bitmap, *river_bitmap, *tree0_bitmap, *tree1_bitmap;
+	UINT8*   tree_ram;
+	UINT8*   memory_devices;
+	UINT32   mem_dev_selected; 	/* an offset within memory_devices area */
+	UINT32   slopeROM_bank;
+	UINT8    tree_en;
+	UINT8    horizon;
+	UINT8    v_count_river;
+	UINT8    v_count_tree;
+	int      tree_on[2];
+	emu_timer* scanline_timer;
+
+	/* misc */
+	UINT8    tree0_col;
+	UINT8    tree1_col;
+	UINT8    left_bank_col;
+	UINT8    right_bank_col;
+	UINT8    boat_shore_col;
+	UINT8    collision_reset;
+	UINT8    tree_collision_reset;
+	UINT8    prev_value_31;
+	int      dir_31;
+
+	/* mcu-related */
+	UINT8    port_a_in, port_a_out, ddr_a;
+	UINT8    port_b_out, ddr_b;
+	UINT8    port_c_in, port_c_out, ddr_c;
+
+	UINT8    mcu_out;
+	UINT8    mcu_in;
+	UINT8    mcu_pc_1;
+	UINT8    mcu_pc_0;
+};
 
 /*----------- defined in video/changela.c -----------*/
 

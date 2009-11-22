@@ -43,12 +43,11 @@ D000      Paddle Position and Interrupt Reset
 #include "crash.lh"
 
 #if 0
-static int circus_interrupt;
-
 static READ8_HANDLER( ripcord_IN2_r )
 {
-	circus_interrupt ++;
-	logerror("circus_int: %02x\n", circus_interrupt);
+	circus_state *state = (circus_state *)space->machine->driver_data;
+	state->interrupt++;
+	logerror("circus_int: %02x\n", state->interrupt);
 	return readinputport (2);
 }
 #endif
@@ -60,7 +59,7 @@ static ADDRESS_MAP_START( circus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(circus_clown_x_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(circus_clown_y_w)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(circus_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(circus_videoram_w) AM_BASE_MEMBER(circus_state, videoram)
 	AM_RANGE(0x8000, 0x8000) AM_RAM_WRITE(circus_clown_z_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW")
@@ -261,16 +260,44 @@ GFXDECODE_END
 #if 0
 static INTERRUPT_GEN( ripcord_interrupt )
 {
-	circus_interrupt = 0;
+	state->interrupt = 0;
 }
 #endif
 
+static MACHINE_START( circus )
+{
+	circus_state *state = (circus_state *)machine->driver_data;
+
+	state->samples = devtag_get_device(machine, "samples");
+	state->discrete = devtag_get_device(machine, "discrete");
+
+	state_save_register_global(machine, state->clown_x);
+	state_save_register_global(machine, state->clown_y);
+	state_save_register_global(machine, state->clown_z);
+}
+
+static MACHINE_RESET( circus )
+{
+	circus_state *state = (circus_state *)machine->driver_data;
+
+	state->clown_x = 0;
+	state->clown_y = 0;
+	state->clown_z = 0;
+}
+
+
 static MACHINE_DRIVER_START( circus )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(circus_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 	MDRV_CPU_PROGRAM_MAP(circus_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_MACHINE_START(circus)
+	MDRV_MACHINE_RESET(circus)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -304,8 +331,14 @@ static MACHINE_DRIVER_START( robotbwl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
+
+	/* driver data */
+	MDRV_DRIVER_DATA(circus_state)
 	MDRV_CPU_PROGRAM_MAP(circus_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_MACHINE_START(circus)
+	MDRV_MACHINE_RESET(circus)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -336,10 +369,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( crash )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(circus_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 	MDRV_CPU_PROGRAM_MAP(circus_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+
+	MDRV_MACHINE_START(circus)
+	MDRV_MACHINE_RESET(circus)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -370,10 +409,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ripcord )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(circus_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 	MDRV_CPU_PROGRAM_MAP(circus_map)
 	//MDRV_CPU_VBLANK_INT("screen", ripcord_interrupt) //AT
+
+	MDRV_MACHINE_START(circus)
+	MDRV_MACHINE_RESET(circus)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -516,20 +561,24 @@ ROM_END
 
 static DRIVER_INIT( circus )
 {
-	circus_game = 1;
+	circus_state *state = (circus_state *)machine->driver_data;
+	state->game_id = 1;
 }
 
 static DRIVER_INIT( robotbwl )
 {
-	circus_game = 2;
+	circus_state *state = (circus_state *)machine->driver_data;
+	state->game_id = 2;
 }
 static DRIVER_INIT( crash )
 {
-	circus_game = 3;
+	circus_state *state = (circus_state *)machine->driver_data;
+	state->game_id = 3;
 }
 static DRIVER_INIT( ripcord )
 {
-	circus_game = 4;
+	circus_state *state = (circus_state *)machine->driver_data;
+	state->game_id = 4;
 }
 
 

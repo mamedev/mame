@@ -1,13 +1,36 @@
 #include "sound/discrete.h"
 
-#define GAME_IS_CIRCUS		(circus_game == 1)
-#define GAME_IS_ROBOTBWL	(circus_game == 2)
-#define GAME_IS_CRASH		(circus_game == 3)
-#define GAME_IS_RIPCORD		(circus_game == 4)
+#define GAME_IS_CIRCUS		(state->game_id == 1)
+#define GAME_IS_ROBOTBWL	(state->game_id == 2)
+#define GAME_IS_CRASH		(state->game_id == 3)
+#define GAME_IS_RIPCORD		(state->game_id == 4)
+
+
+typedef struct _circus_state circus_state;
+struct _circus_state
+{
+	/* memory pointers */
+	UINT8 *  videoram;
+
+	/* video-related */
+	tilemap  *bg_tilemap;
+	int      clown_x, clown_y, clown_z;
+
+	/* devices */
+	const device_config *samples;
+	const device_config *discrete;
+
+	/* game id */
+	int      game_id;
+#if 0
+	int      interrupt;	// dead code for ripcord. shall we remove it?
+#endif
+};
+
+
 
 /*----------- defined in audio/circus.c -----------*/
 
-extern int circus_game;
 extern WRITE8_HANDLER( circus_clown_z_w );
 
 DISCRETE_SOUND_EXTERN( circus );
@@ -19,8 +42,6 @@ extern const samples_interface ripcord_samples_interface;
 extern const samples_interface robotbwl_samples_interface;
 
 /*----------- defined in video/circus.c -----------*/
-
-extern int clown_z;
 
 extern WRITE8_HANDLER( circus_clown_x_w );
 extern WRITE8_HANDLER( circus_clown_y_w );
