@@ -1749,7 +1749,7 @@ GAME( 1999, jmpbreak, 0,        jmpbreak, common,   jmpbreak, ROT0,   "F2 System
 GAME( 1999, suplup,   0,        suplup,   common,   suplup,   ROT0,   "Omega System",      "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , 0 )
 GAME( 1999, luplup,   suplup,   suplup,   common,   luplup,   ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", 0 )
 GAME( 1999, luplup29, suplup,   suplup,   common,   luplup29, ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", 0 )
-GAME( 1999, puzlbang, suplup,   suplup,   common,   puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (version 2.8 / 990106)", 0 )
+GAME( 1999, puzlbang, suplup,   suplup,   common,   puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (Korea, version 2.8 / 990106)", 0 )
 GAME( 1999, vamphalf, 0,        vamphalf, common,   vamphalf, ROT0,   "Danbi & F2 System", "Vamf x1/2 (Europe)", 0 )
 GAME( 1999, vamphalfk,vamphalf, vamphalf, common,   vamphafk, ROT0,   "Danbi & F2 System", "Vamp x1/2 (Korea)", 0 )
 GAME( 2000, dquizgo2, 0,        coolmini, common,   dquizgo2, ROT0,   "SemiCom",           "Date Quiz Go Go Episode 2" , 0)
