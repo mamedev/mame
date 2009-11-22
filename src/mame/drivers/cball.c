@@ -7,14 +7,22 @@
 #include "driver.h"
 #include "cpu/m6800/m6800.h"
 
-static UINT8* cball_video_ram;
 
-static tilemap* bg_tilemap;
+typedef struct _cball_state cball_state;
+struct _cball_state
+{
+	/* memory pointers */
+	UINT8 *  video_ram;
+
+	/* video-related */
+	tilemap* bg_tilemap;
+};
 
 
 static TILE_GET_INFO( get_tile_info )
 {
-	UINT8 code = cball_video_ram[tile_index];
+	cball_state *state = (cball_state *)machine->driver_data;
+	UINT8 code = state->video_ram[tile_index];
 
 	SET_TILE_INFO(0, code, code >> 7, 0);
 }
@@ -22,31 +30,34 @@ static TILE_GET_INFO( get_tile_info )
 
 static WRITE8_HANDLER( cball_vram_w )
 {
-	cball_video_ram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	cball_state *state = (cball_state *)space->machine->driver_data;
+
+	state->video_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
 static VIDEO_START( cball )
 {
-	bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	cball_state *state = (cball_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
 static VIDEO_UPDATE( cball )
 {
-	/* draw playfield */
+	cball_state *state = (cball_state *)screen->machine->driver_data;
 
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	/* draw playfield */
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* draw sprite */
-
 	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1],
-		cball_video_ram[0x399] >> 4,
+		state->video_ram[0x399] >> 4,
 		0,
 		0, 0,
-		240 - cball_video_ram[0x390],
-		240 - cball_video_ram[0x398], 0);
+		240 - state->video_ram[0x390],
+		240 - state->video_ram[0x398], 0);
 	return 0;
 }
 
@@ -85,13 +96,17 @@ static PALETTE_INIT( cball )
 
 static READ8_HANDLER( cball_wram_r )
 {
-	return cball_video_ram[0x380 + offset];
+	cball_state *state = (cball_state *)space->machine->driver_data;
+
+	return state->video_ram[0x380 + offset];
 }
 
 
 static WRITE8_HANDLER( cball_wram_w )
 {
-	cball_video_ram[0x380 + offset] = data;
+	cball_state *state = (cball_state *)space->machine->driver_data;
+
+	state->video_ram[0x380 + offset] = data;
 }
 
 
@@ -110,7 +125,7 @@ static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("2800")
 
 	AM_RANGE(0x0000, 0x03ff) AM_WRITE(cball_wram_w) AM_MASK(0x7f)
-	AM_RANGE(0x0400, 0x07ff) AM_WRITE(cball_vram_w) AM_BASE(&cball_video_ram)
+	AM_RANGE(0x0400, 0x07ff) AM_WRITE(cball_vram_w) AM_BASE_MEMBER(cball_state, video_ram)
 	AM_RANGE(0x1800, 0x1800) AM_NOP /* watchdog? */
 	AM_RANGE(0x1810, 0x1811) AM_NOP
 	AM_RANGE(0x1820, 0x1821) AM_NOP
@@ -196,6 +211,9 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( cball )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(cball_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 12096000 / 16) /* ? */

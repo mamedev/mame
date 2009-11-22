@@ -9,11 +9,6 @@
 #include "cpu/m6809/m6809.h"
 #include "capbowl.h"
 
-UINT8 *capbowl_rowaddress;
-
-static offs_t blitter_addr;
-
-
 
 /*************************************
  *
@@ -58,6 +53,7 @@ VIDEO_START( capbowl )
 
 WRITE8_HANDLER( capbowl_tms34061_w )
 {
+	capbowl_state *state = (capbowl_state *)space->machine->driver_data;
 	int func = (offset >> 8) & 3;
 	int col = offset & 0xff;
 
@@ -67,12 +63,13 @@ WRITE8_HANDLER( capbowl_tms34061_w )
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	tms34061_w(space, col, *capbowl_rowaddress, func, data);
+	tms34061_w(space, col, *state->rowaddress, func, data);
 }
 
 
 READ8_HANDLER( capbowl_tms34061_r )
 {
+	capbowl_state *state = (capbowl_state *)space->machine->driver_data;
 	int func = (offset >> 8) & 3;
 	int col = offset & 0xff;
 
@@ -82,7 +79,7 @@ READ8_HANDLER( capbowl_tms34061_r )
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	return tms34061_r(space, col, *capbowl_rowaddress, func);
+	return tms34061_r(space, col, *state->rowaddress, func);
 }
 
 
@@ -95,18 +92,20 @@ READ8_HANDLER( capbowl_tms34061_r )
 
 WRITE8_HANDLER( bowlrama_blitter_w )
 {
+	capbowl_state *state = (capbowl_state *)space->machine->driver_data;
+
 	switch (offset)
 	{
 		case 0x08:	  /* Write address high byte (only 2 bits used) */
-			blitter_addr = (blitter_addr & ~0xff0000) | (data << 16);
+			state->blitter_addr = (state->blitter_addr & ~0xff0000) | (data << 16);
 			break;
 
 		case 0x17:    /* Write address mid byte (8 bits)   */
-			blitter_addr = (blitter_addr & ~0x00ff00) | (data << 8);
+			state->blitter_addr = (state->blitter_addr & ~0x00ff00) | (data << 8);
 			break;
 
 		case 0x18:	  /* Write Address low byte (8 bits)   */
-			blitter_addr = (blitter_addr & ~0x0000ff) | (data << 0);
+			state->blitter_addr = (state->blitter_addr & ~0x0000ff) | (data << 0);
 			break;
 
 		default:
@@ -118,7 +117,8 @@ WRITE8_HANDLER( bowlrama_blitter_w )
 
 READ8_HANDLER( bowlrama_blitter_r )
 {
-	UINT8 data = memory_region(space->machine, "gfx1")[blitter_addr];
+	capbowl_state *state = (capbowl_state *)space->machine->driver_data;
+	UINT8 data = memory_region(space->machine, "gfx1")[state->blitter_addr];
 	UINT8 result = 0;
 
 	switch (offset)
@@ -137,7 +137,7 @@ READ8_HANDLER( bowlrama_blitter_r )
 		/* Read data and increment address */
 		case 4:
 			result = data;
-			blitter_addr = (blitter_addr + 1) & 0x3ffff;
+			state->blitter_addr = (state->blitter_addr + 1) & 0x3ffff;
 			break;
 
 		default:
@@ -156,7 +156,7 @@ READ8_HANDLER( bowlrama_blitter_r )
  *
  *************************************/
 
-INLINE rgb_t pen_for_pixel(UINT8 *src, UINT8 pix)
+INLINE rgb_t pen_for_pixel( UINT8 *src, UINT8 pix )
 {
 	return MAKE_RGB(pal4bit(src[(pix << 1) + 0] >> 0),
 					pal4bit(src[(pix << 1) + 1] >> 4),

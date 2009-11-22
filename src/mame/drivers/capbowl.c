@@ -96,9 +96,6 @@
 
 #define MASTER_CLOCK		8000000		/* 8MHz crystal */
 
-static UINT8 last_trackball_val[2];
-
-
 
 /*************************************
  *
@@ -133,13 +130,6 @@ static TIMER_CALLBACK( capbowl_update )
 }
 
 
-static MACHINE_RESET( capbowl )
-{
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 32, 0), NULL, 32, capbowl_update);
-}
-
-
-
 /*************************************
  *
  *  Graphics ROM banking
@@ -148,8 +138,8 @@ static MACHINE_RESET( capbowl )
 
 static WRITE8_HANDLER( capbowl_rom_select_w )
 {
-	int bankaddress = ((data & 0x0c) << 13) + ((data & 0x01) << 14);
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + 0x10000 + bankaddress);
+	// 2009-11 FP: shall we add a check to be sure that bank < 6?
+	memory_set_bank(space->machine, 1, ((data & 0x0c) >> 1) + (data & 0x01));
 }
 
 
@@ -162,21 +152,25 @@ static WRITE8_HANDLER( capbowl_rom_select_w )
 
 static READ8_HANDLER( track_0_r )
 {
-	return (input_port_read(space->machine, "IN0") & 0xf0) | ((input_port_read(space->machine, "TRACKY") - last_trackball_val[0]) & 0x0f);
+	capbowl_state *state = (capbowl_state *)space->machine->driver_data;
+	return (input_port_read(space->machine, "IN0") & 0xf0) | ((input_port_read(space->machine, "TRACKY") - state->last_trackball_val[0]) & 0x0f);
 }
 
 
 static READ8_HANDLER( track_1_r )
 {
-	return (input_port_read(space->machine, "IN1") & 0xf0) | ((input_port_read(space->machine, "TRACKX") - last_trackball_val[1]) & 0x0f);
+	capbowl_state *state = (capbowl_state *)space->machine->driver_data;
+	return (input_port_read(space->machine, "IN1") & 0xf0) | ((input_port_read(space->machine, "TRACKX") - state->last_trackball_val[1]) & 0x0f);
 }
 
 
 static WRITE8_HANDLER( track_reset_w )
 {
+	capbowl_state *state = (capbowl_state *)space->machine->driver_data;
+
 	/* reset the trackball counters */
-	last_trackball_val[0] = input_port_read(space->machine, "TRACKY");
-	last_trackball_val[1] = input_port_read(space->machine, "TRACKX");
+	state->last_trackball_val[0] = input_port_read(space->machine, "TRACKY");
+	state->last_trackball_val[1] = input_port_read(space->machine, "TRACKX");
 
 	watchdog_reset_w(space, offset, data);
 }
@@ -204,7 +198,7 @@ static WRITE8_HANDLER( capbowl_sndcmd_w )
  *
  *************************************/
 
-static void firqhandler(const device_config *device, int irq)
+static void firqhandler( const device_config *device, int irq )
 {
 	cputag_set_input_line(device->machine, "audiocpu", 1, irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -228,7 +222,7 @@ static NVRAM_HANDLER( capbowl )
 		/* invalidate nvram to make the game initialize it.
            A 0xff fill will cause the game to malfunction, so we use a
            0x01 fill which seems OK */
-		memset(generic_nvram,0x01,generic_nvram_size);
+		memset(generic_nvram, 0x01, generic_nvram_size);
 	}
 }
 
@@ -242,7 +236,7 @@ static NVRAM_HANDLER( capbowl )
 
 static ADDRESS_MAP_START( capbowl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(1)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(SMH_RAM) AM_BASE(&capbowl_rowaddress)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(capbowl_state, rowaddress)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(capbowl_rom_select_w)
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(capbowl_tms34061_r, capbowl_tms34061_w)
@@ -256,7 +250,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bowlrama_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(bowlrama_blitter_r, bowlrama_blitter_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(SMH_RAM) AM_BASE(&capbowl_rowaddress)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(capbowl_state, rowaddress)
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(capbowl_tms34061_r, capbowl_tms34061_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(capbowl_sndcmd_w)
@@ -292,7 +286,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( capbowl )
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	/* low 4 bits are for the trackball */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
@@ -301,20 +295,20 @@ static INPUT_PORTS_START( capbowl )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")
 	/* low 4 bits are for the trackball */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("TRACKY")	/* FAKE */
+	PORT_START("TRACKY")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(40) PORT_REVERSE
 
-	PORT_START("TRACKX")	/* FAKE */
+	PORT_START("TRACKX")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(40)
 
-	PORT_START("SERVICE")	/* FAKE */
+	PORT_START("SERVICE")
 	/* This fake input port is used to get the status of the F2 key, */
 	/* and activate the test mode, which is triggered by a NMI */
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH )
@@ -349,7 +343,35 @@ static const ym2203_interface ym2203_config =
  *
  *************************************/
 
+static MACHINE_START( capbowl )
+{
+	capbowl_state *state = (capbowl_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	/* configure ROM banks in 0x0000-0x3fff */
+	memory_configure_bank(machine, 1, 0, 6, &ROM[0x10000], 0x4000);
+
+	state_save_register_global(machine, state->blitter_addr);
+	state_save_register_global(machine, state->last_trackball_val[0]);
+	state_save_register_global(machine, state->last_trackball_val[1]);
+}
+
+static MACHINE_RESET( capbowl )
+{
+	capbowl_state *state = (capbowl_state *)machine->driver_data;
+
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 32, 0), NULL, 32, capbowl_update);
+
+	state->blitter_addr = 0;
+	state->last_trackball_val[0] = 0;
+	state->last_trackball_val[1] = 0;
+}
+
+
 static MACHINE_DRIVER_START( capbowl )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(capbowl_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809E, MASTER_CLOCK)
@@ -359,6 +381,7 @@ static MACHINE_DRIVER_START( capbowl )
 	MDRV_CPU_ADD("audiocpu", M6809E, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
+	MDRV_MACHINE_START(capbowl)
 	MDRV_MACHINE_RESET(capbowl)
 	MDRV_NVRAM_HANDLER(capbowl)
 
@@ -487,13 +510,22 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( capbowl )
+static DRIVER_INIT( bowlrama )
 {
 	/* Initialize the ticket dispenser to 100 milliseconds */
 	/* (I'm not sure what the correct value really is) */
 	ticket_dispenser_init(machine, 100, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 }
 
+static DRIVER_INIT( capbowl )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	/* configure ROM banks in 0x0000-0x3fff */
+	memory_configure_bank(machine, 1, 0, 6, &ROM[0x10000], 0x4000);
+
+	DRIVER_INIT_CALL(bowlrama);
+}
 
 
 /*************************************
@@ -502,9 +534,9 @@ static DRIVER_INIT( capbowl )
  *
  *************************************/
 
-GAME( 1988, capbowl,  0,       capbowl,  capbowl, capbowl, ROT270, "Incredible Technologies", "Capcom Bowling (set 1)", 0 )
-GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl, ROT270, "Incredible Technologies", "Capcom Bowling (set 2)", 0 )
-GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl, ROT270, "Incredible Technologies", "Capcom Bowling (set 3)", 0 )
-GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl, ROT270, "Incredible Technologies", "Capcom Bowling (set 4)", 0 )
-GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl, ROT270, "Incredible Technologies", "Coors Light Bowling", 0 )
-GAME( 1991, bowlrama, 0,       bowlrama, capbowl, capbowl, ROT270, "P&P Marketing", "Bowl-O-Rama", 0 )
+GAME( 1988, capbowl,  0,       capbowl,  capbowl, capbowl,  ROT270, "Incredible Technologies", "Capcom Bowling (set 1)", 0 )
+GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl,  ROT270, "Incredible Technologies", "Capcom Bowling (set 2)", 0 )
+GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl,  ROT270, "Incredible Technologies", "Capcom Bowling (set 3)", 0 )
+GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl,  ROT270, "Incredible Technologies", "Capcom Bowling (set 4)", 0 )
+GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl,  ROT270, "Incredible Technologies", "Coors Light Bowling", 0 )
+GAME( 1991, bowlrama, 0,       bowlrama, capbowl, bowlrama, ROT270, "P&P Marketing", "Bowl-O-Rama", 0 )
