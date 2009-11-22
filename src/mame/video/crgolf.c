@@ -12,20 +12,6 @@
 #define VIDEORAM_SIZE	(0x2000 * 3)
 
 
-/* globals */
-UINT8 *crgolf_color_select;
-UINT8 *crgolf_screen_flip;
-UINT8 *crgolf_screen_select;
-UINT8 *crgolf_screenb_enable;
-UINT8 *crgolf_screena_enable;
-
-
-/* local variables */
-static UINT8 *crgolf_videoram_a;
-static UINT8 *crgolf_videoram_b;
-
-
-
 /*************************************
  *
  *  Video RAM access
@@ -34,21 +20,24 @@ static UINT8 *crgolf_videoram_b;
 
 WRITE8_HANDLER( crgolf_videoram_w )
 {
-	if (*crgolf_screen_select & 1)
-		crgolf_videoram_b[offset] = data;
+	crgolf_state *state = (crgolf_state *)space->machine->driver_data;
+
+	if (*state->screen_select & 1)
+		state->videoram_b[offset] = data;
 	else
-		crgolf_videoram_a[offset] = data;
+		state->videoram_a[offset] = data;
 }
 
 
 READ8_HANDLER( crgolf_videoram_r )
 {
+	crgolf_state *state = (crgolf_state *)space->machine->driver_data;
 	UINT8 ret;
 
-	if (*crgolf_screen_select & 1)
-		ret = crgolf_videoram_b[offset];
+	if (*state->screen_select & 1)
+		ret = state->videoram_b[offset];
 	else
-		ret = crgolf_videoram_a[offset];
+		ret = state->videoram_a[offset];
 
 	return ret;
 }
@@ -61,7 +50,7 @@ READ8_HANDLER( crgolf_videoram_r )
  *
  *************************************/
 
-static void get_pens(running_machine *machine, pen_t *pens)
+static void get_pens( running_machine *machine, pen_t *pens )
 {
 	offs_t offs;
 	const UINT8 *prom = memory_region(machine, "proms");
@@ -103,13 +92,15 @@ static void get_pens(running_machine *machine, pen_t *pens)
 
 static VIDEO_START( crgolf )
 {
+	crgolf_state *state = (crgolf_state *)machine->driver_data;
+
 	/* allocate memory for the two bitmaps */
-	crgolf_videoram_a = auto_alloc_array(machine, UINT8, VIDEORAM_SIZE);
-	crgolf_videoram_b = auto_alloc_array(machine, UINT8, VIDEORAM_SIZE);
+	state->videoram_a = auto_alloc_array(machine, UINT8, VIDEORAM_SIZE);
+	state->videoram_b = auto_alloc_array(machine, UINT8, VIDEORAM_SIZE);
 
 	/* register for save states */
-	state_save_register_global_pointer(machine, crgolf_videoram_a, VIDEORAM_SIZE);
-	state_save_register_global_pointer(machine, crgolf_videoram_b, VIDEORAM_SIZE);
+	state_save_register_global_pointer(machine, state->videoram_a, VIDEORAM_SIZE);
+	state_save_register_global_pointer(machine, state->videoram_b, VIDEORAM_SIZE);
 }
 
 
@@ -122,7 +113,8 @@ static VIDEO_START( crgolf )
 
 static VIDEO_UPDATE( crgolf )
 {
-	int flip = *crgolf_screen_flip & 1;
+	crgolf_state *state = (crgolf_state *)screen->machine->driver_data;
+	int flip = *state->screen_flip & 1;
 
 	offs_t offs;
 	pen_t pens[NUM_PENS];
@@ -137,12 +129,12 @@ static VIDEO_UPDATE( crgolf )
 		UINT8 y = (offs & 0x1fe0) >> 5;
 		UINT8 x = (offs & 0x001f) << 3;
 
-		UINT8 data_a0 = crgolf_videoram_a[0x2000 | offs];
-		UINT8 data_a1 = crgolf_videoram_a[0x0000 | offs];
-		UINT8 data_a2 = crgolf_videoram_a[0x4000 | offs];
-		UINT8 data_b0 = crgolf_videoram_b[0x2000 | offs];
-		UINT8 data_b1 = crgolf_videoram_b[0x0000 | offs];
-		UINT8 data_b2 = crgolf_videoram_b[0x4000 | offs];
+		UINT8 data_a0 = state->videoram_a[0x2000 | offs];
+		UINT8 data_a1 = state->videoram_a[0x0000 | offs];
+		UINT8 data_a2 = state->videoram_a[0x4000 | offs];
+		UINT8 data_b0 = state->videoram_b[0x2000 | offs];
+		UINT8 data_b1 = state->videoram_b[0x0000 | offs];
+		UINT8 data_b2 = state->videoram_b[0x4000 | offs];
 
 		if (flip)
 		{
@@ -157,10 +149,10 @@ static VIDEO_UPDATE( crgolf )
 			UINT8 data_b = 0;
 			UINT8 data_a = 0;
 
-			if (~*crgolf_screena_enable & 1)
+			if (~*state->screena_enable & 1)
 				data_a = ((data_a0 & 0x80) >> 7) | ((data_a1 & 0x80) >> 6) | ((data_a2 & 0x80) >> 5);
 
-			if (~*crgolf_screenb_enable & 1)
+			if (~*state->screenb_enable & 1)
 				data_b = ((data_b0 & 0x80) >> 7) | ((data_b1 & 0x80) >> 6) | ((data_b2 & 0x80) >> 5);
 
 			/* screen A has priority over B */
@@ -170,7 +162,7 @@ static VIDEO_UPDATE( crgolf )
 				color = data_b | 0x08;
 
 			/* add HI bit if enabled */
-			if (*crgolf_color_select)
+			if (*state->color_select)
 				color = color | 0x10;
 
 			*BITMAP_ADDR32(bitmap, y, x) = pens[color];
@@ -192,7 +184,6 @@ static VIDEO_UPDATE( crgolf )
 
 	return 0;
 }
-
 
 
 /*************************************
