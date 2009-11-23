@@ -127,7 +127,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		zoomx = 0x10000;
 		zoomy = 0x10000;
 
-		if (source[3]&0x00800000) // maybe ..
+		if (source[3]&0x00800000 || source[3]&0x00400000) // TODO: maybe anything that's above 0xf is 4bpp? buriki sets 0x40 on attract mode text
 		{
 			gfx= machine->gfx[4];
 		}
