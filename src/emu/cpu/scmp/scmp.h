@@ -40,4 +40,7 @@ CPU_GET_INFO( scmp );
 
 CPU_DISASSEMBLE( scmp );
 
+CPU_GET_INFO( ins8060 );
+#define CPU_INS8060 CPU_GET_INFO_NAME( ins8060 )
+
 #endif

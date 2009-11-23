@@ -642,7 +642,7 @@ CPU_GET_INFO( scmp )
 		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "SC/MP");				break;
+		case DEVINFO_STR_NAME:						strcpy(info->s, "INS 8050 SC/MP");				break;
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "National Semiconductor SC/MP");			break;
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
 		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);				break;
@@ -659,5 +659,22 @@ CPU_GET_INFO( scmp )
 			  (cpustate->SR & 0x02) ? '1' : '.',
 			  (cpustate->SR & 0x01) ? '0' : '.');
 			break;
+	}
+}
+
+/**************************************************************************
+ * CPU-specific set_info
+ **************************************************************************/
+CPU_GET_INFO( ins8060 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 2;	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "INS 8060 SC/MP II");				break;
+
+		default:										CPU_GET_INFO_CALL(scmp);			break;
 	}
 }
