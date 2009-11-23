@@ -470,7 +470,7 @@ static UINT32 *hng64_sysregs;
 
 // Stuff from over in video...
 extern tilemap *hng64_tilemap0, *hng64_tilemap1, *hng64_tilemap2, *hng64_tilemap3 ;
-extern UINT32 *hng64_spriteram, *hng64_videoregs ;
+extern UINT32 *hng64_spriteram, *hng64_videoregs, *hng64_spriteregs ;
 extern UINT32 *hng64_videoram ;
 extern UINT32 *hng64_tcram ;
 
@@ -562,12 +562,12 @@ static WRITE32_HANDLER( hng64_videoram_w )
 	/* 400000 - 7fffff is scroll regs etc. */
 }
 
-
+#if 0
 static READ32_HANDLER( hng64_random_read )
 {
 	return mame_rand(space->machine)&0xffffffff;
 }
-
+#endif
 
 static READ32_HANDLER( hng64_com_r )
 {
@@ -708,11 +708,15 @@ static void hng64_do_dma (const address_space *space)
 static WRITE32_HANDLER( hng64_sysregs_w )
 {
 	COMBINE_DATA (&hng64_sysregs[offset]);
+
+//	if(((offset*4) & 0x1200) == 0x1200)
+//	printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
+
 	switch(offset*4)
 	{
 		case 0x1084: //MIPS->MCU latch port
 			hng_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
-			printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
+			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
 			break;
 		case 0x111c: /*irq ack */ break;
 		case 0x1204: hng_dma_start = hng64_sysregs[offset]; break;
@@ -750,9 +754,7 @@ static READ32_HANDLER( fight_io_r )
 		case 0x000: return 0x00000400;
 		case 0x004: return input_port_read(space->machine, "SYSTEM");
 		case 0x008: return input_port_read(space->machine, "P1_P2");
-		case 0x600:
-		printf("%04x\n",hng_mcu_en);
-		return no_machine_error_code;
+		case 0x600: return no_machine_error_code;
 	}
 
 	return hng64_dualport[offset];
@@ -1047,13 +1049,13 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0) AM_BASE(&rombase)
 
 	// Video
-	AM_RANGE(0x20000000, 0x2000bfff) AM_RAM AM_BASE(&hng64_spriteram)									// Sprites
-	AM_RANGE(0x20010000, 0x20010013) AM_READ(hng64_random_read)
+	AM_RANGE(0x20000000, 0x2000bfff) AM_RAM AM_BASE(&hng64_spriteram)							// Sprites
+	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_BASE(&hng64_spriteregs)							// Sprites Registers
 	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_BASE(&hng64_videoram)	// Tilemap
-	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_BASE(&hng64_videoregs)									// Video Registers
-	AM_RANGE(0x20200000, 0x20203fff) AM_READWRITE(SMH_RAM,hng64_pal_w) AM_BASE(&paletteram32)			// Palette
-	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(&hng64_tcram)				// Transition Control
-	AM_RANGE(0x20300000, 0x203001ff) AM_WRITE(dl_w) AM_BASE(&hng64_dl)						// 3d Display List
+	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_BASE(&hng64_videoregs)							// Video Registers
+	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_BASE(&paletteram32)			// Palette
+	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(&hng64_tcram)		// Transition Control
+	AM_RANGE(0x20300000, 0x203001ff) AM_RAM_WRITE(dl_w) AM_BASE(&hng64_dl)						// 3d Display List
 	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)
 	AM_RANGE(0x20300218, 0x2030021b) AM_READ(unk_vreg_r)
 
@@ -1540,8 +1542,8 @@ static const gfx_layout hng64_16x16x8_tilelayout =
 	1024+24,1024+8,1024+16,1024+0,
 	1280+24,1280+8,1280+16,1280+0,
 	},
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-	  16*32,17*32,18*32,19*32,20*32,21*32,22*32,22*32,23*32
+	{ 0*32,  1*32,  2*32,  3*32,  4*32,  5*32,  6*32,  7*32,
+	  16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32
 	},
 	64*32
 };
@@ -1639,10 +1641,38 @@ static DRIVER_INIT( hng64_reorder_gfx )
 	hng64_reorder(memory_region(machine,"scrtile"), memory_region_length(machine, "scrtile"));
 }
 
+#define HACK_REGION
 
+
+#ifdef HACK_REGION
+void hng64_patch_bios_region(running_machine* machine, int region)
+{
+	UINT8 *rom = memory_region(machine, "user1");
+
+	if ((rom[0x4000]==0xff) && (rom[0x4001] == 0xff))
+	{
+		// both?
+		rom[0x4002] = region;
+		rom[0x4003] = region;
+
+	}
+
+
+}
+#endif
 
 static DRIVER_INIT( hng64 )
 {
+	// region hacking, english error messages are more useful to us, but no english bios is dumped...
+#ifdef HACK_REGION
+// versions according to fatal fury test mode
+//	hng64_patch_bios_region(machine, 0); // 'Others Ver' (invalid?)
+	hng64_patch_bios_region(machine, 1); // Japan
+//	hng64_patch_bios_region(machine, 2); // USA
+//	hng64_patch_bios_region(machine, 3); // Korea
+//	hng64_patch_bios_region(machine, 4); // 'Others'
+#endif
+
 	hng64_soundram=auto_alloc_array(machine, UINT16, 0x200000/2);
 	DRIVER_INIT_CALL(hng64_reorder_gfx);
 }

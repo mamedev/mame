@@ -2,6 +2,7 @@
 
 #include <math.h>
 
+#define MAKE_MAME_REEEEAAALLLL_SLOW 0
 
 // !!! I'm sure this isn't right !!!
 UINT32 hng64_dls[2][0x81] ;
@@ -16,6 +17,7 @@ tilemap *hng64_tilemap3;
 
 UINT32 *hng64_spriteram;
 UINT32 *hng64_videoregs;
+UINT32 *hng64_spriteregs;
 
 UINT32 *hng64_tcram ;
 
@@ -241,6 +243,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
  *  Or maybe it switches from fading by scaling to fading using absolute addition and subtraction...
  *  Or maybe they set transition type (there seems to be a cute scaling-squares transition in there somewhere)...
  */
+
+/* this is broken for the 'How to Play' screen in Buriki after attract, disabled for now */
+#if 0
 static void transition_control(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i, j ;
@@ -332,7 +337,7 @@ static void transition_control(bitmap_t *bitmap, const rectangle *cliprect)
 		}
 	}
 }
-
+#endif
 
 /*
  * 3d 'Sprite' Format
@@ -1071,30 +1076,259 @@ static TILE_GET_INFO( get_hng64_tile3_info )
 
 
 
-static void hng64_drawtilemap( bitmap_t *bitmap, const rectangle *cliprect, int scrollbase, tilemap* tilemap )
+static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int tm )
 {
-	int xscroll,yscroll,xzoom,yzoom;
+	tilemap* tilemap = 0;
+	UINT32 scrollbase = 0;
+	UINT32 tileregs = 0;
+	int transmask;
 
-	xscroll = (INT16)(hng64_videoram[(0x40000+(scrollbase<<4))/4]>>16);
-	// ???  = (INT16)(hng64_videoram[(0x40004+(scrollbase<<4))/4]>>16);
-	yscroll = (INT16)(hng64_videoram[(0x40008+(scrollbase<<4))/4]>>16);
-//  xzoom   = (INT16)(hng64_videoram[(0x40010+(scrollbase<<4))/4]>>16);
-//  yzoom   = (INT16)(hng64_videoram[(0x4000c+(scrollbase<<4))/4]>>16);
-	// ???  = (INT16)(hng64_videoram[(0x40014+(scrollbase<<4))/4]>>16);
-	// ???  = (INT16)(hng64_videoram[(0x40018+(scrollbase<<4))/4]>>16);
-	// ???  = (INT16)(hng64_videoram[(0x4001c+(scrollbase<<4))/4]>>16);
+	if (tm==0)
+	{
+		scrollbase = (hng64_videoregs[0x04]&0x3fff0000)>>16;
+		tileregs   = (hng64_videoregs[0x02]&0xffff0000)>>16;
+		tilemap = hng64_tilemap0;
+	}
+	else if (tm==1)
+	{
+		scrollbase = (hng64_videoregs[0x04]&0x00003fff)>>0;
+		tileregs   = (hng64_videoregs[0x02]&0x0000ffff)>>0;
+		tilemap = hng64_tilemap1;
+	}
+	else if (tm==2)
+	{
+		scrollbase = (hng64_videoregs[0x05]&0x3fff0000)>>16;
+		tileregs   = (hng64_videoregs[0x03]&0xffff0000)>>16;
+		tilemap = hng64_tilemap2;
+	}
+	else if (tm==3)
+	{
+		scrollbase = (hng64_videoregs[0x05]&0x00003fff)>>0;
+		tileregs   = (hng64_videoregs[0x03]&0x0000ffff)>>0;
+		tilemap = hng64_tilemap3;
+	}
 
-	xscroll <<=16;
-	yscroll <<=16;
+	// set the transmask so our manual copy is correct
+	if (tileregs & 0x0400)
+		transmask = 0xff;
+	else
+		transmask = 0xf;
 
-	xzoom = 0x10000;
-	yzoom = 0x10000;
+	// buriki tm1 = roz
+
+	// my life would be easier if the roz we're talking about for complex zoom wasn't setting this as well
+	//if (!(tileregs & 0x1000)) // floor mode
+	{
+		if (hng64_videoregs[0x00]&0x04000000) // globally selects alt scroll register layout???
+		{
+			/* complex zoom mode? */
+			/* with this scroll register layout rotation effects are possible
+			   the most obvious use of rotation is the Buriki One logo after
+			   attract mode; the text around the outside of the logo is rotated
+			   onto the screen
+
+			   see 1:32 in http://www.youtube.com/watch?v=PoYaHOILuGs
+
+				the 8x8 tile mode might change how this works as the transitions
+				in fatal fury only cover 1/4 of the screen
+
+			   */
+
+			INT32 xtopleft,xmiddle, xalt;
+			INT32 ytopleft,ymiddle, yalt;
+			int xinc, xinc2, yinc, yinc2;
+
+			if (0)
+				if (tm==2)
+					popmessage("X %08x X %08x X %08x Y %08x Y %08x Y %08x",
+						hng64_videoram[(0x40000+(scrollbase<<4))/4],
+						hng64_videoram[(0x40004+(scrollbase<<4))/4],
+						hng64_videoram[(0x40010+(scrollbase<<4))/4],
+						/*hng64_videoram[(0x40014+(scrollbase<<4))/4],*/  // unused? (dupe value on fatfurwa, 00 on rest)
+
+						hng64_videoram[(0x40008+(scrollbase<<4))/4],
+						hng64_videoram[(0x40018+(scrollbase<<4))/4],
+						hng64_videoram[(0x4000c+(scrollbase<<4))/4]);
+						/*hng64_videoram[(0x4001c+(scrollbase<<4))/4]);*/ // unused? (dupe value on fatfurwa, 00 on rest)
 
 
-	tilemap_draw_roz(bitmap,cliprect,tilemap,xscroll,yscroll,
-			xzoom,0,0,yzoom,
-			1,
-			0,0);
+
+			xtopleft  = (hng64_videoram[(0x40000+(scrollbase<<4))/4]);
+			xalt      = (hng64_videoram[(0x40004+(scrollbase<<4))/4]); // middle screen point
+			xmiddle   = (hng64_videoram[(0x40010+(scrollbase<<4))/4]);
+
+			ytopleft     = (hng64_videoram[(0x40008+(scrollbase<<4))/4]);
+			yalt         = (hng64_videoram[(0x40018+(scrollbase<<4))/4]); // middle screen point
+			ymiddle      = (hng64_videoram[(0x4000c+(scrollbase<<4))/4]);
+
+			xinc = (xmiddle - xtopleft) / 512;
+			yinc = (ymiddle - ytopleft) / 512;
+			xinc2 = (xalt-xtopleft) / 512;
+			yinc2 = (yalt-ytopleft) /512;
+
+
+			/* manual copy = slooow */
+			if (MAKE_MAME_REEEEAAALLLL_SLOW)
+			{
+				bitmap_t *bm = tilemap_get_pixmap(tilemap);
+				int bmheight = bm->height;
+				int bmwidth = bm->width;
+				const pen_t *paldata = machine->pens;
+				UINT32* dstptr;
+				UINT16* srcptr;
+				int xx,yy;
+
+
+				int tmp = xtopleft;
+				int tmp2 = ytopleft;
+				//printf("start %08x end %08x start %08x end %08x\n", xtopleft, xmiddle, ytopleft, ymiddle);
+
+				for (yy=0;yy<448;yy++)
+				{
+
+					dstptr = BITMAP_ADDR32(bitmap,yy,0);
+
+					tmp = xtopleft;
+					tmp2 = ytopleft;
+
+					for (xx=0;xx<512;xx++)
+					{
+						int realsrcx = (xtopleft>>16)&(bmwidth-1);
+						int realsrcy = (ytopleft>>16)&(bmheight-1);
+						UINT16 pen;
+
+						srcptr = BITMAP_ADDR16(bm, realsrcy, 0);
+
+						pen = srcptr[realsrcx];
+
+						if (pen&transmask)
+							*dstptr = paldata[pen];
+
+						xtopleft+= xinc<<1;
+						ytopleft+= yinc2<<1;
+						++dstptr;
+					}
+
+					ytopleft = tmp2 + (yinc<<1);
+					xtopleft = tmp + (xinc2<<1);
+				}
+			}
+			else
+			{
+				tilemap_draw_roz(bitmap,cliprect,tilemap,xtopleft,ytopleft,
+						xinc<<1,yinc2<<1,xinc2<<1,yinc<<1,
+						1,
+						0,0);
+			}
+
+		}
+		else
+		{
+			/* simple zoom mode? - only 4 regs? */
+			/* in this mode they can only specify the top left and middle screen points for each tilemap,
+			   this allows simple zooming, but not rotation
+		   */
+
+
+			INT32 xtopleft,xmiddle;
+			INT32 ytopleft,ymiddle;
+			int xinc,yinc;
+
+			if (0)
+				if (tm==2)
+					popmessage("%08x %08x %08x %08x",
+						hng64_videoram[(0x40010+(scrollbase<<4))/4],
+						hng64_videoram[(0x40014+(scrollbase<<4))/4],
+						hng64_videoram[(0x40018+(scrollbase<<4))/4],
+						hng64_videoram[(0x4001c+(scrollbase<<4))/4]);
+
+			if (hng64_videoregs[0x00]&0x00010000) // disable all scrolling / zoom (test screen) (maybe)
+			{
+				/* If this bit is active the scroll registers don't seem valid at all?
+				   It either disables zooming, or disables use of the scroll registers completely
+				   - used at startup
+			   */
+
+				xtopleft = 0;
+				xmiddle = 256<<16;
+
+				ytopleft = 0;
+				ymiddle = 256<<16;
+			}
+			else
+			{
+
+				xtopleft = (hng64_videoram[(0x40000+(scrollbase<<4))/4]);
+				xmiddle   = (hng64_videoram[(0x40004+(scrollbase<<4))/4]); // middle screen point
+				ytopleft = (hng64_videoram[(0x40008+(scrollbase<<4))/4]);
+				ymiddle   = (hng64_videoram[(0x4000c+(scrollbase<<4))/4]); // middle screen point
+			}
+
+			xinc = (xmiddle - xtopleft) / 512;
+			yinc = (ymiddle - ytopleft) / 512;
+
+			/* manual copy = slooow */
+			if (MAKE_MAME_REEEEAAALLLL_SLOW)
+			{
+				bitmap_t *bm = tilemap_get_pixmap(tilemap);
+				int bmheight = bm->height;
+				int bmwidth = bm->width;
+				const pen_t *paldata = machine->pens;
+				UINT32* dstptr;
+				UINT16* srcptr;
+				int xx,yy;
+
+				int tmp = xtopleft;
+
+				//printf("start %08x end %08x start %08x end %08x\n", xtopleft, xmiddle, ytopleft, ymiddle);
+
+				for (yy=0;yy<448;yy++)
+				{
+					int realsrcy = (ytopleft>>16)&(bmheight-1);
+
+					dstptr = BITMAP_ADDR32(bitmap,yy,0);
+					srcptr = BITMAP_ADDR16(bm, realsrcy, 0);
+
+					xtopleft = tmp;
+
+					for (xx=0;xx<512;xx++)
+					{
+						int realsrcx = (xtopleft>>16)&(bmwidth-1);
+
+						UINT16 pen;
+
+						pen = srcptr[realsrcx];
+
+						if (pen&transmask)
+							*dstptr = paldata[pen];
+
+						xtopleft+= xinc<<1;
+						++dstptr;
+					}
+
+					ytopleft+= yinc<<1;
+				}
+			}
+			else
+			{
+				tilemap_draw_roz(bitmap,cliprect,tilemap,xtopleft,ytopleft,
+						xinc<<1,0,0,yinc<<1,
+						1,
+						0,0);
+			}
+		}
+	}
+#if 0
+	else
+	{
+		/* Floor mode - per pixel simple / complex modes? -- every other line?
+		  (there doesn't seem to be enough data in Buriki for every line at least)
+	    */
+		popmessage("Floor is Active");
+
+
+	}
+#endif
 }
 
 
@@ -1103,9 +1337,11 @@ static void hng64_drawtilemap( bitmap_t *bitmap, const rectangle *cliprect, int 
  * Video Regs Format
  * ------------------
  *
+
+ *   0    | ---- -C-- ---- -??Z ---- ---- ---- ---- | unknown (scroll control?) C = Global Complex zoom, ? = Always Set?, Z = Global Zoom Disable?
+
  * UINT32 | Bytes    | Use
  * -------+-76543210-+----------------
- *   0    | oooooooo | unknown - always seems to be 04060000 (fatfurwa) and 00060000 (buriki)
  *   1    | xxxx---- | looks like it's 0001 most (all) of the time - turns off in buriki intro
  *   1    | ----oooo | unknown - always seems to be 0000 (fatfurwa)
  *   2    | xxxx---- | tilemap0 per layer flags
@@ -1128,31 +1364,85 @@ static void hng64_drawtilemap( bitmap_t *bitmap, const rectangle *cliprect, int 
  */
 
 
+
+static UINT32 old_animmask = -1;
+static UINT32 old_animbits = -1;
+static UINT32 old_tileflags0 = -1;
+static UINT32 old_tileflags1 = -1;
+
 VIDEO_UPDATE( hng64 )
 {
+	UINT32 animmask;
+	UINT32 animbits;
+	UINT32 tileflags0, tileflags1;
+
 	bitmap_fill(bitmap, 0, screen->machine->pens[0]); //<- user selectable pen too?
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0x00);
 
-	// the tilemap auto animation and moveable tilebases means that they end up
+	animmask = hng64_videoregs[0x0b];
+	animbits = hng64_videoregs[0x0c];
+	tileflags0 = hng64_videoregs[0x02];
+	tileflags1 = hng64_videoregs[0x03];
+
+	/* if the auto-animation mask or bits have changed search for tiles using them and mark as dirty */
+	if ((old_animmask != animmask) || (old_animbits != animbits))
+	{
+		int tile_index;
+		for (tile_index=0;tile_index<128*128;tile_index++)
+		{
+			if (hng64_videoram[tile_index+(0x00000/4)]&0x200000)
+				tilemap_mark_tile_dirty(hng64_tilemap0,tile_index);
+
+			if (hng64_videoram[tile_index+(0x10000/4)]&0x200000)
+				tilemap_mark_tile_dirty(hng64_tilemap1,tile_index);
+
+			if (hng64_videoram[tile_index+(0x20000/4)]&0x200000)
+				tilemap_mark_tile_dirty(hng64_tilemap2,tile_index);
+
+			if (hng64_videoram[tile_index+(0x30000/4)]&0x200000)
+				tilemap_mark_tile_dirty(hng64_tilemap3,tile_index);
+		}
+
+		old_animmask = animmask;
+		old_animbits = animbits;
+	}
+
+	if (old_tileflags0!=tileflags0)
+	{
+		tilemap_mark_all_tiles_dirty (hng64_tilemap1);
+		tilemap_mark_all_tiles_dirty (hng64_tilemap0);
+		old_tileflags0 = tileflags0;
+	}
+
+	if (old_tileflags1!=tileflags1)
+	{
+		tilemap_mark_all_tiles_dirty (hng64_tilemap2);
+		tilemap_mark_all_tiles_dirty (hng64_tilemap3);
+		old_tileflags1 = tileflags1;
+	}
+
 	// dirty most frames anyway, even with manual tracking
-	tilemap_mark_all_tiles_dirty (hng64_tilemap3);
-	tilemap_mark_all_tiles_dirty (hng64_tilemap2);
-	tilemap_mark_all_tiles_dirty (hng64_tilemap1);
-	tilemap_mark_all_tiles_dirty (hng64_tilemap0);
+	//tilemap_mark_all_tiles_dirty (hng64_tilemap3);
+	//tilemap_mark_all_tiles_dirty (hng64_tilemap2);
+	//tilemap_mark_all_tiles_dirty (hng64_tilemap1);
+	//tilemap_mark_all_tiles_dirty (hng64_tilemap0);
 
 
-	hng64_drawtilemap(bitmap,cliprect, (hng64_videoregs[0x05]&0x00003fff)>>0,  hng64_tilemap3);
-	hng64_drawtilemap(bitmap,cliprect, (hng64_videoregs[0x05]&0x3fff0000)>>16, hng64_tilemap2);
-	hng64_drawtilemap(bitmap,cliprect, (hng64_videoregs[0x04]&0x00003fff)>>0,  hng64_tilemap1);
-	hng64_drawtilemap(bitmap,cliprect, (hng64_videoregs[0x04]&0x3fff0000)>>16, hng64_tilemap0);
+	hng64_drawtilemap(screen->machine,bitmap,cliprect, 3);
+	hng64_drawtilemap(screen->machine,bitmap,cliprect, 2);
+	hng64_drawtilemap(screen->machine,bitmap,cliprect, 1);
+	hng64_drawtilemap(screen->machine,bitmap,cliprect, 0);
 
 	draw_sprites(screen->machine, bitmap,cliprect);
 
 	// 3d really shouldn't be last, but you don't see some cool stuff right now if it's put before sprites :)...
 	draw3d(screen->machine, bitmap, cliprect);
 
+#if 0
 	transition_control(bitmap, cliprect) ;
+#endif
 
+	if (0)
     popmessage("%08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x",
     hng64_videoregs[0x00],
     hng64_videoregs[0x01],
@@ -1186,7 +1476,7 @@ VIDEO_UPDATE( hng64 )
 
 
 
-
+	if (0)
 	popmessage("0: %04x  1: %04x   2: %04x  3: %04x\n", (hng64_videoregs[0x02]&0xffff0000)>>16, (hng64_videoregs[0x02]&0x0000ffff)>>0, (hng64_videoregs[0x03]&0xffff0000)>>16, (hng64_videoregs[0x03]&0x0000ffff)>>0);
 
 
