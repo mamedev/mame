@@ -172,7 +172,7 @@ static const struct WD33C93interface *intf;
 typedef void (*cmd_handler)(running_machine *machine);
 #define CMD_HANDLER(name) void name(running_machine *machine)
 
-#define TEMP_INPUT_LEN	65536
+#define TEMP_INPUT_LEN	262144
 #define FIFO_SIZE		12
 
 /* internal controller data definition */
@@ -815,7 +815,7 @@ void wd33c93_exit( const struct WD33C93interface *interface )
 
 void wd33c93_get_dma_data( int bytes, UINT8 *pData )
 {
-	int		len = bytes;
+	int	len = bytes;
 
 	if ( len >= wd33c93_get_xfer_count() )
 		len = wd33c93_get_xfer_count();
@@ -828,6 +828,8 @@ void wd33c93_get_dma_data( int bytes, UINT8 *pData )
 		logerror( "Reading past end of buffer, increase TEMP_INPUT_LEN size\n" );
 		len = TEMP_INPUT_LEN - len;
 	}
+
+	assert(len);
 
 	memcpy( pData, &scsi_data.temp_input[scsi_data.temp_input_pos], len );
 

@@ -222,6 +222,7 @@ static void scsihd_write_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 	switch ( command[0] )
 	{
 		case 0x0a: // WRITE(6)
+		case 0x2a: // WRITE(10)
 			if ((our_this->disk) && (our_this->blocks))
 			{
 				while (dataLength > 0)
