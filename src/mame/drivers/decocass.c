@@ -17,10 +17,6 @@
 #define HCLK4			(HCLK2/2)
 
 
-static UINT8 *decocass_rambase;
-
-static UINT8 *decrypted;
-
 /***************************************************************************
  *
  *  write decrypted opcodes
@@ -32,29 +28,76 @@ INLINE int swap_bits_5_6(int data)
 	return (data & 0x9f) | ((data & 0x20) << 1) | ((data & 0x40) >> 1);
 }
 
-static WRITE8_HANDLER( ram_w )        { decrypted[0x0000 + offset] = swap_bits_5_6(data); decocass_rambase[0x0000 + offset] = data;  }
-static WRITE8_HANDLER( charram_w )    { decrypted[0x6000 + offset] = swap_bits_5_6(data); decocass_charram_w(space, offset, data); }
-static WRITE8_HANDLER( fgvideoram_w ) { decrypted[0xc000 + offset] = swap_bits_5_6(data); decocass_fgvideoram_w(space, offset, data); }
-static WRITE8_HANDLER( fgcolorram_w ) { decrypted[0xc400 + offset] = swap_bits_5_6(data); decocass_colorram_w(space, offset, data); }
-static WRITE8_HANDLER( tileram_w )    { decrypted[0xd000 + offset] = swap_bits_5_6(data); decocass_tileram_w(space, offset, data); }
-static WRITE8_HANDLER( objectram_w )  { decrypted[0xd800 + offset] = swap_bits_5_6(data); decocass_objectram_w(space, offset, data); }
+static WRITE8_HANDLER( ram_w )
+{ 
+	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	state->decrypted[0x0000 + offset] = swap_bits_5_6(data); 
+	state->rambase[0x0000 + offset] = data;  
+}
+
+static WRITE8_HANDLER( charram_w )    
+{ 
+	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	state->decrypted[0x6000 + offset] = swap_bits_5_6(data); 
+	decocass_charram_w(space, offset, data); 
+}
+
+static WRITE8_HANDLER( fgvideoram_w ) 
+{ 
+	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	state->decrypted[0xc000 + offset] = swap_bits_5_6(data); 
+	decocass_fgvideoram_w(space, offset, data); 
+}
+
+static WRITE8_HANDLER( fgcolorram_w ) 
+{ 
+	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	state->decrypted[0xc400 + offset] = swap_bits_5_6(data); 
+	decocass_colorram_w(space, offset, data); 
+}
+
+static WRITE8_HANDLER( tileram_w )    
+{ 
+	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	state->decrypted[0xd000 + offset] = swap_bits_5_6(data); 
+	decocass_tileram_w(space, offset, data); 
+}
+
+static WRITE8_HANDLER( objectram_w )  
+{ 
+	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	state->decrypted[0xd800 + offset] = swap_bits_5_6(data); 
+	decocass_objectram_w(space, offset, data); 
+}
 
 static WRITE8_HANDLER( mirrorvideoram_w ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); fgvideoram_w(space, offset, data); }
 static WRITE8_HANDLER( mirrorcolorram_w ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); fgcolorram_w(space, offset, data); }
-static READ8_HANDLER( mirrorvideoram_r ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); return decocass_fgvideoram[offset]; }
-static READ8_HANDLER( mirrorcolorram_r ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); return decocass_colorram[offset]; }
+
+static READ8_HANDLER( mirrorvideoram_r ) 
+{ 
+	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); 
+	return state->fgvideoram[offset]; 
+}
+
+static READ8_HANDLER( mirrorcolorram_r ) 
+{
+	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); 
+	return state->colorram[offset]; 
+}
 
 
 static ADDRESS_MAP_START( decocass_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_RAM_WRITE(ram_w) AM_BASE(&decocass_rambase)
-	AM_RANGE(0x6000, 0xbfff) AM_RAM_WRITE(charram_w) AM_BASE(&decocass_charram) /* still RMS3 RAM */
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(fgvideoram_w) AM_BASE(&decocass_fgvideoram) AM_SIZE(&decocass_fgvideoram_size)  /* DSP3 RAM */
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(fgcolorram_w) AM_BASE(&decocass_colorram) AM_SIZE(&decocass_colorram_size)
+	AM_RANGE(0x0000, 0x5fff) AM_RAM_WRITE(ram_w) AM_BASE_MEMBER(decocass_state, rambase)
+	AM_RANGE(0x6000, 0xbfff) AM_RAM_WRITE(charram_w) AM_BASE_MEMBER(decocass_state, charram) /* still RMS3 RAM */
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(fgvideoram_w) AM_BASE_MEMBER(decocass_state, fgvideoram) AM_SIZE_MEMBER(decocass_state, fgvideoram_size)  /* DSP3 RAM */
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(fgcolorram_w) AM_BASE_MEMBER(decocass_state, colorram) AM_SIZE_MEMBER(decocass_state, colorram_size)
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(mirrorvideoram_r, mirrorvideoram_w)
 	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(mirrorcolorram_r, mirrorcolorram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(tileram_w) AM_BASE(&decocass_tileram) AM_SIZE(&decocass_tileram_size)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(objectram_w) AM_BASE(&decocass_objectram) AM_SIZE(&decocass_objectram_size)
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM_WRITE(decocass_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(tileram_w) AM_BASE_MEMBER(decocass_state, tileram) AM_SIZE_MEMBER(decocass_state, tileram_size)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(objectram_w) AM_BASE_MEMBER(decocass_state, objectram) AM_SIZE_MEMBER(decocass_state, objectram_size)
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM_WRITE(decocass_paletteram_w) AM_BASE_MEMBER(decocass_state, paletteram)
 	AM_RANGE(0xe300, 0xe300) AM_READ_PORT("DSW1") AM_WRITE(decocass_watchdog_count_w)
 	AM_RANGE(0xe301, 0xe301) AM_READ_PORT("DSW2") AM_WRITE(decocass_watchdog_flip_w)
 	AM_RANGE(0xe302, 0xe302) AM_WRITE(decocass_color_missiles_w)
@@ -557,6 +600,9 @@ static PALETTE_INIT( decocass )
 
 
 static MACHINE_DRIVER_START( decocass )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(decocass_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, HCLK4)
@@ -1280,19 +1326,22 @@ ROM_END
 
 static DRIVER_INIT( decocass )
 {
+	decocass_state *state = (decocass_state *)machine->driver_data;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
 	int A;
 
 	/* allocate memory and mark all RAM regions with their decrypted pointers */
-	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
-	memory_set_decrypted_region(space, 0x0000, 0xc7ff, &decrypted[0x0000]);
-	memory_set_decrypted_region(space, 0xd000, 0xdbff, &decrypted[0xd000]);
-	memory_set_decrypted_region(space, 0xf000, 0xffff, &decrypted[0xf000]);
+	state->decrypted = auto_alloc_array(machine, UINT8, 0x10000);
+	memory_set_decrypted_region(space, 0x0000, 0xc7ff, &state->decrypted[0x0000]);
+	memory_set_decrypted_region(space, 0xd000, 0xdbff, &state->decrypted[0xd000]);
+	memory_set_decrypted_region(space, 0xf000, 0xffff, &state->decrypted[0xf000]);
 
 	/* Swap bits 5 & 6 for opcodes */
-	for (A = 0xf000;A < 0x10000;A++)
-		decrypted[A] = swap_bits_5_6(rom[A]);
+	for (A = 0xf000; A < 0x10000; A++)
+		state->decrypted[A] = swap_bits_5_6(rom[A]);
+
+	state_save_register_global_pointer(machine, state->decrypted, 0x10000);
 
 	/* Call the state save setup code in machine/decocass.c */
 	decocass_machine_state_save_init(machine);
@@ -1302,28 +1351,32 @@ static DRIVER_INIT( decocass )
 
 static DRIVER_INIT( decocrom )
 {
+	decocass_state *state = (decocass_state *)machine->driver_data;
 	int romlength = memory_region_length(machine, "user3");
 	UINT8 *rom = memory_region(machine, "user3");
-	UINT8 *decrypted2 = auto_alloc_array(machine, UINT8, romlength);
 	int i;
+
+	state->decrypted2 = auto_alloc_array(machine, UINT8, romlength);
 
 	/* standard init */
 	DRIVER_INIT_CALL(decocass);
 
 	/* decrypt the ROMs */
 	for (i = 0; i < romlength; i++)
-		decrypted2[i] = swap_bits_5_6(rom[i]);
+		state->decrypted2[i] = swap_bits_5_6(rom[i]);
 
 	/* convert charram to a banked ROM */
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0xafff, 0, 0, (read8_space_func)SMH_BANK(1), decocass_de0091_w);
-	memory_configure_bank(machine, 1, 0, 1, decocass_charram, 0);
+	memory_configure_bank(machine, 1, 0, 1, state->charram, 0);
 	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user3"), 0);
-	memory_configure_bank_decrypted(machine, 1, 0, 1, &decrypted[0x6000], 0);
-	memory_configure_bank_decrypted(machine, 1, 1, 1, decrypted2, 0);
+	memory_configure_bank_decrypted(machine, 1, 0, 1, &state->decrypted[0x6000], 0);
+	memory_configure_bank_decrypted(machine, 1, 1, 1, state->decrypted2, 0);
 	memory_set_bank(machine, 1, 0);
 
 	/* install the bank selector */
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe900, 0xe900, 0, 0, decocass_e900_w);
+
+	state_save_register_global_pointer(machine, state->decrypted2, romlength);
 }
 
 
