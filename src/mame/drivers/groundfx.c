@@ -65,7 +65,7 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/es5506.h"
 #include "includes/taito_f3.h"
 #include "audio/taito_en.h"
@@ -138,19 +138,6 @@ static const eeprom_interface groundfx_eeprom_interface =
 	"0100110000",	/* lock command */
 };
 
-static NVRAM_HANDLER( groundfx )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else {
-		eeprom_init(machine, &groundfx_eeprom_interface);
-		if (file)
-			eeprom_load(file);
-		else
-			eeprom_set_data(default_eeprom,128);  /* Default the gun setup values */
-	}
-}
-
 
 /**********************************************************
             GAME INPUTS
@@ -168,6 +155,7 @@ static CUSTOM_INPUT( coin_word_r )
 
 static WRITE32_HANDLER( groundfx_input_w )
 {
+	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
 	switch (offset)
 	{
 		case 0x00:
@@ -179,9 +167,9 @@ static WRITE32_HANDLER( groundfx_input_w )
 
 			if (ACCESSING_BITS_0_7)
 			{
-				eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				eeprom_write_bit(data & 0x40);
-				eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				eepromdev_set_clock_line(eeprom, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				eepromdev_write_bit(eeprom, data & 0x40);
+				eepromdev_set_cs_line(eeprom, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				return;
 			}
 
@@ -283,7 +271,7 @@ static INPUT_PORTS_START( groundfx )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eepromdev_bit_r, "eeprom")
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON3 )		/* shift hi */
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON1 )		/* brake */
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -389,7 +377,8 @@ static MACHINE_DRIVER_START( groundfx )
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
 	MDRV_MACHINE_RESET(groundfx)
-	MDRV_NVRAM_HANDLER(groundfx)
+//	MDRV_NVRAM_HANDLER(groundfx)
+	MDRV_EEPROM_ADD("eeprom", groundfx_eeprom_interface, 128, default_eeprom)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

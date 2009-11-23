@@ -13,8 +13,23 @@ OTHER:  ASTRO 0001B, EEPROM
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/okim6295.h"
+
+typedef struct _astrocrp_state astrocrp_state;
+struct _astrocrp_state
+{
+	/* memory pointers */
+	UINT16 *   spriteram16;
+	UINT16 *   paletteram16;
+
+	/* video-related */
+	UINT16     screen_enable;
+
+	/* devices */
+	const device_config *eeprom;
+};
+
 
 /***************************************************************************
                               Sprites Format
@@ -34,22 +49,23 @@ OTHER:  ASTRO 0001B, EEPROM
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
-	UINT16 *source = spriteram16;
-	UINT16 *finish = spriteram16 + spriteram_size/2;
+	astrocrp_state *state = (astrocrp_state *)machine->driver_data;
+	UINT16 *source = state->spriteram16;
+	UINT16 *finish = state->spriteram16 + spriteram_size / 2;
 
-	for ( ; source < finish; source += 8/2 )
+	for ( ; source < finish; source += 8 / 2 )
 	{
-		int x,y;
+		int x, y;
 
-		int	sx		=	source[ 0x0/2 ];
-		int	code	=	source[ 0x2/2 ];
-		int	sy		=	source[ 0x4/2 ];
-		int	attr	=	source[ 0x6/2 ];
+		int	sx	= source[ 0x0/2 ];
+		int	code	= source[ 0x2/2 ];
+		int	sy	= source[ 0x4/2 ];
+		int	attr	= source[ 0x6/2 ];
 
-		int dimx	=	(attr >> 8) & 0xff;
-		int dimy	=	(attr >> 0) & 0xff;
+		int dimx	= (attr >> 8) & 0xff;
+		int dimy	= (attr >> 0) & 0xff;
 
 		if (!dimx && !dimy)
 			return;
@@ -73,17 +89,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}
 }
 
-static UINT16 astrocorp_screen_enable;
-
 static VIDEO_UPDATE(astrocorp)
 {
-	if (astrocorp_screen_enable & 1)
+	astrocrp_state *state = (astrocrp_state *)screen->machine->driver_data;
+
+	if (state->screen_enable & 1)
 	{
 		bitmap_fill(bitmap,cliprect,screen->machine->pens[0xff]);
-		draw_sprites(screen->machine,bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap, cliprect);
 	}
 	else
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	return 0;
 }
@@ -95,21 +111,25 @@ static VIDEO_UPDATE(astrocorp)
 
 static READ16_HANDLER( astrocorp_eeprom_r )
 {
-	return 0xfff7 | (eeprom_read_bit() << 3);
+	astrocrp_state *state = (astrocrp_state *)space->machine->driver_data;
+
+	return 0xfff7 | (eepromdev_read_bit(state->eeprom) << 3);
 }
 
 static WRITE16_HANDLER( astrocorp_eeprom_w )
 {
+	astrocrp_state *state = (astrocrp_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
-		eeprom_write_bit(data & 0x01);
+		eepromdev_write_bit(state->eeprom, data & 0x01);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
+		eepromdev_set_cs_line(state->eeprom, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		eepromdev_set_clock_line(state->eeprom, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -117,8 +137,8 @@ static WRITE16_DEVICE_HANDLER( astrocorp_sound_bank_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		okim6295_set_bank_base(device, 0x40000 * ((data >> 8) & 1) );
-//      logerror("CPU #0 PC %06X: OKI bank %08X\n",cpu_get_pc(space->cpu),data);
+		okim6295_set_bank_base(device, 0x40000 * ((data >> 8) & 1));
+//      logerror("CPU #0 PC %06X: OKI bank %08X\n", cpu_get_pc(space->cpu), data);
 	}
 }
 
@@ -128,7 +148,7 @@ static WRITE16_HANDLER( astrocorp_outputs_w )
 	{
 		coin_counter_w(0,	(data & 0x0004));	// coin counter
 		set_led_status(0,	(data & 0x0008));	// you win
-		if (				(data & 0x0010))	dispensed_tickets++;	// coin out
+		if ((data & 0x0010))	dispensed_tickets++;	// coin out
 		set_led_status(1,	(data & 0x0020));	// coin/hopper jam
 	}
 	if (ACCESSING_BITS_8_15)
@@ -144,10 +164,11 @@ static WRITE16_HANDLER( astrocorp_outputs_w )
 
 static WRITE16_HANDLER( astrocorp_enable_w )
 {
-	COMBINE_DATA( &astrocorp_screen_enable );
+	astrocrp_state *state = (astrocrp_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->screen_enable);
 //  popmessage("%04X",data);
 	if (data & (~1))
-		logerror("CPU #0 PC %06X: screen enable = %04X\n",cpu_get_pc(space->cpu),data);
+		logerror("CPU #0 PC %06X: screen enable = %04X\n", cpu_get_pc(space->cpu), data);
 }
 
 static READ16_HANDLER( astrocorp_unk_r )
@@ -158,42 +179,43 @@ static READ16_HANDLER( astrocorp_unk_r )
 // 5-6-5 Palette: BBBBB-GGGGGG-RRRRR
 static WRITE16_HANDLER( astrocorp_palette_w )
 {
-	COMBINE_DATA( &paletteram16[offset] );
-	palette_set_color_rgb( space->machine, offset,
-		pal5bit((paletteram16[offset] >>  0) & 0x1f),
-		pal6bit((paletteram16[offset] >>  5) & 0x3f),
-		pal5bit((paletteram16[offset] >> 11) & 0x1f)
+	astrocrp_state *state = (astrocrp_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->paletteram16[offset]);
+	palette_set_color_rgb(space->machine, offset,
+		pal5bit((state->paletteram16[offset] >>  0) & 0x1f),
+		pal6bit((state->paletteram16[offset] >>  5) & 0x3f),
+		pal5bit((state->paletteram16[offset] >> 11) & 0x1f)
 	);
 }
 
 static ADDRESS_MAP_START( showhand_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x050000, 0x050fff ) AM_RAM AM_BASE( &spriteram16 ) AM_SIZE( &spriteram_size )
+	AM_RANGE( 0x050000, 0x050fff ) AM_RAM AM_BASE_MEMBER(astrocrp_state, spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE( 0x052000, 0x052001 ) AM_WRITENOP
-	AM_RANGE( 0x054000, 0x054001 ) AM_READ_PORT( "INPUTS" )
-	AM_RANGE( 0x058000, 0x058001 ) AM_WRITE( astrocorp_eeprom_w )
-	AM_RANGE( 0x05a000, 0x05a001 ) AM_WRITE( astrocorp_outputs_w )
-	AM_RANGE( 0x05e000, 0x05e001 ) AM_READ( astrocorp_eeprom_r )
-	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE( astrocorp_palette_w ) AM_BASE( &paletteram16 )
+	AM_RANGE( 0x054000, 0x054001 ) AM_READ_PORT("INPUTS")
+	AM_RANGE( 0x058000, 0x058001 ) AM_WRITE(astrocorp_eeprom_w)
+	AM_RANGE( 0x05a000, 0x05a001 ) AM_WRITE(astrocorp_outputs_w)
+	AM_RANGE( 0x05e000, 0x05e001 ) AM_READ(astrocorp_eeprom_r)
+	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocrp_state, paletteram16)
 	AM_RANGE( 0x070000, 0x073fff ) AM_RAM
-	AM_RANGE( 0x080000, 0x080001 ) AM_DEVWRITE( "oki", astrocorp_sound_bank_w )
-	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE( astrocorp_enable_w )
-	AM_RANGE( 0x0d0000, 0x0d0001 ) AM_READ( astrocorp_unk_r ) AM_DEVWRITE8( "oki", okim6295_w, 0xff00 )
+	AM_RANGE( 0x080000, 0x080001 ) AM_DEVWRITE("oki", astrocorp_sound_bank_w)
+	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE(astrocorp_enable_w)
+	AM_RANGE( 0x0d0000, 0x0d0001 ) AM_READ(astrocorp_unk_r) AM_DEVWRITE8("oki", okim6295_w, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( showhanc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE( astrocorp_palette_w ) AM_BASE( &paletteram16 )
-	AM_RANGE( 0x070000, 0x070001 ) AM_DEVWRITE( "oki", astrocorp_sound_bank_w )
-	AM_RANGE( 0x080000, 0x080fff ) AM_RAM AM_BASE( &spriteram16 ) AM_SIZE( &spriteram_size )
+	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocrp_state, paletteram16)
+	AM_RANGE( 0x070000, 0x070001 ) AM_DEVWRITE("oki", astrocorp_sound_bank_w)
+	AM_RANGE( 0x080000, 0x080fff ) AM_RAM AM_BASE_MEMBER(astrocrp_state, spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE( 0x082000, 0x082001 ) AM_WRITENOP
-	AM_RANGE( 0x084000, 0x084001 ) AM_READ_PORT( "INPUTS" )
-	AM_RANGE( 0x088000, 0x088001 ) AM_WRITE( astrocorp_eeprom_w )
-	AM_RANGE( 0x08a000, 0x08a001 ) AM_WRITE( astrocorp_outputs_w )
-	AM_RANGE( 0x08e000, 0x08e001 ) AM_READ( astrocorp_eeprom_r )
+	AM_RANGE( 0x084000, 0x084001 ) AM_READ_PORT("INPUTS")
+	AM_RANGE( 0x088000, 0x088001 ) AM_WRITE(astrocorp_eeprom_w)
+	AM_RANGE( 0x08a000, 0x08a001 ) AM_WRITE(astrocorp_outputs_w)
+	AM_RANGE( 0x08e000, 0x08e001 ) AM_READ(astrocorp_eeprom_r)
 	AM_RANGE( 0x090000, 0x093fff ) AM_RAM
-	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE( astrocorp_enable_w )
-	AM_RANGE( 0x0e0000, 0x0e0001 ) AM_READ( astrocorp_unk_r ) AM_DEVWRITE8( "oki", okim6295_w, 0xff00 )
+	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE(astrocorp_enable_w)
+	AM_RANGE( 0x0e0000, 0x0e0001 ) AM_READ(astrocorp_unk_r) AM_DEVWRITE8("oki", okim6295_w, 0xff00)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -264,32 +286,39 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
-static const UINT16 showhand_default_eeprom[] =	{0x0001,0x0007,0x000a,0x0003,0x0000,0x0009,0x0003,0x0000,0x0002,0x0001,0x0000,0x0000,0x0000,0x0000,0x0000};
-
-static NVRAM_HANDLER( showhand )
+static MACHINE_START( showhand )
 {
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C46);
+	astrocrp_state *state = (astrocrp_state *)machine->driver_data;
 
-		if (file) eeprom_load(file);
-		else
-		{
-			/* Set the EEPROM to Factory Defaults */
-			eeprom_set_data((UINT8*)showhand_default_eeprom,sizeof(showhand_default_eeprom));
-		}
-	}
+	state->eeprom = devtag_get_device(machine, "eeprom");
+
+	state_save_register_global(machine, state->screen_enable);
 }
 
+static MACHINE_RESET( showhand )
+{
+	astrocrp_state *state = (astrocrp_state *)machine->driver_data;
+
+	state->screen_enable = 0;
+}
+
+
+static const UINT16 showhand_default_eeprom[0x0f] =	{0x0001,0x0007,0x000a,0x0003,0x0000,0x0009,0x0003,0x0000,0x0002,0x0001,0x0000,0x0000,0x0000,0x0000,0x0000};
+
 static MACHINE_DRIVER_START( showhand )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(astrocrp_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(showhand_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_NVRAM_HANDLER(showhand)
+	MDRV_MACHINE_START(showhand)
+	MDRV_MACHINE_RESET(showhand)
+
+	MDRV_EEPROM_93C46_ADD("eeprom", sizeof(showhand_default_eeprom), showhand_default_eeprom)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -444,5 +473,5 @@ static DRIVER_INIT( showhanc )
 #endif
 }
 
-GAME( 1999?, showhand, 0,        showhand, showhand, showhand, ROT0, "Astro Corp.", "Show Hand (Italy)", 0 )
-GAME( 1999?, showhanc, showhand, showhanc, showhanc, showhanc, ROT0, "Astro Corp.", "Wang Pai Dui Jue",  0 )
+GAME( 1999?, showhand, 0,        showhand, showhand, showhand, ROT0, "Astro Corp.", "Show Hand (Italy)", GAME_SUPPORTS_SAVE )
+GAME( 1999?, showhanc, showhand, showhanc, showhanc, showhanc, ROT0, "Astro Corp.", "Wang Pai Dui Jue",  GAME_SUPPORTS_SAVE )
