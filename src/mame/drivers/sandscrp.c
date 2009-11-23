@@ -528,8 +528,9 @@ ROM_END
 
 ROM_START( sandscrpb ) /* Different rev PCB */
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "11.ic4", 0x000000, 0x040000, CRC(80020cab) SHA1(4f1f4d8ea07ad745f2d6d3f800686f07fe4bf20f) )
-	ROM_LOAD16_BYTE( "12.ic5", 0x000001, 0x040000, CRC(8df1d42f) SHA1(2a9db5c4b99a8a3f62bffa9ddd96a95e2042602b) )
+	ROM_LOAD16_BYTE( "11.ic4", 0x000000, 0x040000, CRC(80020cab) SHA1(4f1f4d8ea07ad745f2d6d3f800686f07fe4bf20f) ) /* Chinese title screen */
+	ROM_LOAD16_BYTE( "12.ic5", 0x000001, 0x040000, CRC(8df1d42f) SHA1(2a9db5c4b99a8a3f62bffa9ddd96a95e2042602b) ) /* Game & test menu in English */
+	/* internet translators come up with "fighter lion king" and / or "Hits lion Emperor Quickly" */
 
 	ROM_REGION( 0x24000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "8.ic51", 0x00000, 0x0c000, CRC(6f3e9db1) SHA1(06a04fa17f44319986913bff70433510c89e38f1) )
@@ -548,4 +549,4 @@ ROM_END
 
 GAME( 1992, sandscrp,  0,        sandscrp, sandscrp, 0,          ROT90, "Face",   "Sand Scorpion", 0 )
 GAME( 1992, sandscrpa, sandscrp, sandscrp, sandscrp, 0,          ROT90, "Face",   "Sand Scorpion (Earlier)", 0 )
-GAME( 1992, sandscrpb, sandscrp, sandscrp, sandscrp, 0,          ROT90, "Face",   "Sand Scorpion (Revised Hardware)", 0 )
+GAME( 1992, sandscrpb, sandscrp, sandscrp, sandscrp, 0,          ROT90, "Face",   "Sand Scorpion (Chinese Title Screen, Revised Hardware)", 0 )
