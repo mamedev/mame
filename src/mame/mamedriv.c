@@ -928,6 +928,27 @@ const game_driver * const drivers[] =
 	DRIVER( finfurl2 )	/* (c) 1999 */
 	DRIVER( finfurl2j )	/* (c) 1999 */
 
+	/* Namco System 246 */
+	DRIVER( sys246 )
+	DRIVER( dragchrn )
+	DRIVER( netchu02 )
+	DRIVER( soulclb2 )
+	DRIVER( soulcl2a )
+	DRIVER( tekken4 )
+	DRIVER( tekken4a )
+	DRIVER( tekken4b )
+	DRIVER( zgundm )
+	DRIVER( fghtjam )
+	DRIVER( sukuinuf )
+	DRIVER( zgundmdx )
+	DRIVER( soulclb3 )
+	DRIVER( kinniku )
+	DRIVER( taiko9 )
+
+	/* Namco System 256 */
+	DRIVER( sys256 )
+	DRIVER( tekken51 )
+
 	/* Misc Namco games */
 	DRIVER( 20pacgal )	/* (c) 2000 Ver 1.04 */
 	DRIVER( 20pacgala )	/* (c) 2000 Ver 1.01 */

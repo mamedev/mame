@@ -1850,6 +1850,7 @@ src/mame/drivers/namcoic.c svneol=native#text/plain
 src/mame/drivers/namcona1.c svneol=native#text/plain
 src/mame/drivers/namconb1.c svneol=native#text/plain
 src/mame/drivers/namcond1.c svneol=native#text/plain
+src/mame/drivers/namcops2.c svneol=native#text/plain
 src/mame/drivers/namcos1.c svneol=native#text/plain
 src/mame/drivers/namcos10.c svneol=native#text/plain
 src/mame/drivers/namcos11.c svneol=native#text/plain
