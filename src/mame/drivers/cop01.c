@@ -53,42 +53,40 @@ Mighty Guy board layout:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/3526intf.h"
+#include "cop01.h"
 
-#define MIGHTGUY_HACK	0
+
+#define MIGHTGUY_HACK	 0
+#define TIMER_RATE       12000	/* total guess */
 
 
-extern UINT8 *cop01_bgvideoram,*cop01_fgvideoram;
-
-PALETTE_INIT( cop01 );
-VIDEO_START( cop01 );
-VIDEO_UPDATE( cop01 );
-WRITE8_HANDLER( cop01_background_w );
-WRITE8_HANDLER( cop01_foreground_w );
-WRITE8_HANDLER( cop01_vreg_w );
-
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 static WRITE8_HANDLER( cop01_sound_command_w )
 {
-	soundlatch_w(space,offset,data);
+	soundlatch_w(space, offset, data);
 	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static READ8_HANDLER( cop01_sound_command_r )
 {
-	int res;
-	static int pulse;
-#define TIMER_RATE 12000	/* total guess */
-
-
-	res = (soundlatch_r(space,offset) & 0x7f) << 1;
+	cop01_state *state = (cop01_state *)space->machine->driver_data;
+	int res = (soundlatch_r(space, offset) & 0x7f) << 1;
 
 	/* bit 0 seems to be a timer */
 	if ((cpu_get_total_cycles(space->cpu) / TIMER_RATE) & 1)
 	{
-		if (pulse == 0) res |= 1;
-		pulse = 1;
+		if (state->pulse == 0) 
+			res |= 1;
+
+		state->pulse = 1;
 	}
-	else pulse = 0;
+	else 
+		state->pulse = 0;
 
 	return res;
 }
@@ -101,12 +99,18 @@ static CUSTOM_INPUT( mightguy_area_r )
 }
 
 
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
+
 static ADDRESS_MAP_START( cop01_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM /* c000-c7ff in cop01 */
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(cop01_background_w) AM_BASE(&cop01_bgvideoram)
-	AM_RANGE(0xe000, 0xe0ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(cop01_foreground_w) AM_BASE(&cop01_fgvideoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(cop01_background_w) AM_BASE_MEMBER(cop01_state, bgvideoram)
+	AM_RANGE(0xe000, 0xe0ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(cop01_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(cop01_foreground_w) AM_BASE_MEMBER(cop01_state, fgvideoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
@@ -149,7 +153,11 @@ ADDRESS_MAP_END
 
 
 /* this just gets some garbage out of the YM3526 */
-static READ8_HANDLER( kludge ) { static int timer; return timer++; }
+static READ8_HANDLER( kludge ) 
+{ 
+	cop01_state *state = (cop01_state *)space->machine->driver_data;
+	return state->timer++; 
+}
 
 static ADDRESS_MAP_START( mightguy_audio_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -161,10 +169,15 @@ static ADDRESS_MAP_START( mightguy_audio_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( cop01 )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -174,7 +187,7 @@ static INPUT_PORTS_START( cop01 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -227,14 +240,14 @@ static INPUT_PORTS_START( cop01 )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
 	/* DP2:3,4,5 defined in manual/test-mode as:
-    PORT_DIPNAME( 0x10, 0x10, "1st Bonus Life" )
-    PORT_DIPSETTING(    0x10, "20000" )
-    PORT_DIPSETTING(    0x00, "30000" )
-    PORT_DIPNAME( 0x60, 0x60, "2nd Bonus Life" )
-    PORT_DIPSETTING(    0x60, "30000" )
-    PORT_DIPSETTING(    0x20, "50000" )
-    PORT_DIPSETTING(    0x40, "100000" )
-    PORT_DIPSETTING(    0x00, "150000" ) */
+	PORT_DIPNAME( 0x10, 0x10, "1st Bonus Life" )
+	PORT_DIPSETTING(    0x10, "20000" )
+	PORT_DIPSETTING(    0x00, "30000" )
+	PORT_DIPNAME( 0x60, 0x60, "2nd Bonus Life" )
+	PORT_DIPSETTING(    0x60, "30000" )
+	PORT_DIPSETTING(    0x20, "50000" )
+	PORT_DIPSETTING(    0x40, "100000" )
+	PORT_DIPSETTING(    0x00, "150000" ) */
 	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x70, "20k 50k 30k+" )
 	PORT_DIPSETTING(    0x30, "20k 70k 50k+" )
@@ -251,7 +264,7 @@ INPUT_PORTS_END
    so DSW1-8 has no effect and you can NOT start a game at areas 5 to 8. */
 static INPUT_PORTS_START( mightguy )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -261,7 +274,7 @@ static INPUT_PORTS_START( mightguy )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )	PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -337,6 +350,12 @@ INPUT_PORTS_END
 
 
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
 static const gfx_layout charlayout =
 {
 	8,8,
@@ -386,7 +405,38 @@ GFXDECODE_END
 
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( cop01 )
+{
+	cop01_state *state = (cop01_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->pulse);
+	state_save_register_global(machine, state->timer);
+	state_save_register_global_array(machine, state->vreg);
+}
+
+static MACHINE_RESET( cop01 )
+{
+	cop01_state *state = (cop01_state *)machine->driver_data;
+
+	state->pulse = 0;
+	state->timer = 0;
+	state->vreg[0] = 0;
+	state->vreg[1] = 0;
+	state->vreg[2] = 0;
+	state->vreg[3] = 0;
+}
+
+
 static MACHINE_DRIVER_START( cop01 )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(cop01_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* ???? */
@@ -397,6 +447,9 @@ static MACHINE_DRIVER_START( cop01 )
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* ???? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(audio_io_map)
+
+	MDRV_MACHINE_START(cop01)
+	MDRV_MACHINE_RESET(cop01)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -428,6 +481,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mightguy )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(cop01_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* ???? */
 	MDRV_CPU_PROGRAM_MAP(cop01_map)
@@ -437,6 +493,9 @@ static MACHINE_DRIVER_START( mightguy )
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* ???? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(mightguy_audio_io_map)
+
+	MDRV_MACHINE_START(cop01)
+	MDRV_MACHINE_RESET(cop01)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -461,6 +520,12 @@ static MACHINE_DRIVER_START( mightguy )
 MACHINE_DRIVER_END
 
 
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( cop01 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -568,6 +633,12 @@ ROM_START( mightguy )
 ROM_END
 
 
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
+
 static DRIVER_INIT( mightguy )
 {
 #if MIGHTGUY_HACK
@@ -584,6 +655,12 @@ static DRIVER_INIT( mightguy )
 }
 
 
-GAME( 1985, cop01,    0,     cop01,    cop01,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 1)", 0 )
-GAME( 1985, cop01a,   cop01, cop01,    cop01,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 2)", 0 )
-GAME( 1986, mightguy, 0,     mightguy, mightguy, mightguy, ROT270, "Nichibutsu", "Mighty Guy", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1985, cop01,    0,     cop01,    cop01,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, cop01a,   cop01, cop01,    cop01,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, mightguy, 0,     mightguy, mightguy, mightguy, ROT270, "Nichibutsu", "Mighty Guy", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

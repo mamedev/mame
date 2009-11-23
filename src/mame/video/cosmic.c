@@ -1,69 +1,66 @@
 /***************************************************************************
 
- COSMIC.C
+ cosmic.c
 
  emulation of video hardware of cosmic machines of 1979-1980(ish)
 
 ***************************************************************************/
 
 #include "driver.h"
-
-
-static pen_t (*map_color)(running_machine *machine, UINT8 x, UINT8 y);
-
-static int color_registers[3];
-static int background_enable;
-static int magspot_pen_mask;
-
+#include "cosmic.h"
 
 
 WRITE8_HANDLER( cosmic_color_register_w )
 {
-	color_registers[offset] = data ? 1 : 0;
+	cosmic_state *state = (cosmic_state *)space->machine->driver_data;
+	state->color_registers[offset] = data ? 1 : 0;
 }
 
 
-static pen_t panic_map_color(running_machine *machine, UINT8 x, UINT8 y)
+static pen_t panic_map_color( running_machine *machine, UINT8 x, UINT8 y )
 {
-	offs_t offs = (color_registers[0] << 9) | (color_registers[2] << 10) | ((x >> 4) << 5) | (y >> 3);
+	cosmic_state *state = (cosmic_state *)machine->driver_data;
+	offs_t offs = (state->color_registers[0] << 9) | (state->color_registers[2] << 10) | ((x >> 4) << 5) | (y >> 3);
 	pen_t pen = memory_region(machine, "user1")[offs];
 
-	if (color_registers[1])
+	if (state->color_registers[1])
 		pen >>= 4;
 
 	return pen & 0x0f;
 }
 
-static pen_t cosmica_map_color(running_machine *machine, UINT8 x, UINT8 y)
+static pen_t cosmica_map_color( running_machine *machine, UINT8 x, UINT8 y )
 {
-	offs_t offs = (color_registers[0] << 9) | ((x >> 4) << 5) | (y >> 3);
+	cosmic_state *state = (cosmic_state *)machine->driver_data;
+	offs_t offs = (state->color_registers[0] << 9) | ((x >> 4) << 5) | (y >> 3);
 	pen_t pen = memory_region(machine, "user1")[offs];
 
-	if (color_registers[0])		/* yes, 0 again according to the schematics */
+	if (state->color_registers[0])		/* yes, 0 again according to the schematics */
 		pen >>= 4;
 
 	return pen & 0x07;
 }
 
-static pen_t cosmicg_map_color(running_machine *machine, UINT8 x, UINT8 y)
+static pen_t cosmicg_map_color( running_machine *machine, UINT8 x, UINT8 y )
 {
-	offs_t offs = (color_registers[0] << 8) | (color_registers[1] << 9) | ((y >> 4) << 4) | (x >> 4);
+	cosmic_state *state = (cosmic_state *)machine->driver_data;
+	offs_t offs = (state->color_registers[0] << 8) | (state->color_registers[1] << 9) | ((y >> 4) << 4) | (x >> 4);
 	pen_t pen = memory_region(machine, "user1")[offs];
 
 	/* the upper 4 bits are for cocktail mode support */
-
 	return pen & 0x0f;
 }
 
-static pen_t magspot_map_color(running_machine *machine, UINT8 x, UINT8 y)
+static pen_t magspot_map_color( running_machine *machine, UINT8 x, UINT8 y )
 {
-	offs_t offs = (color_registers[0] << 9) | ((x >> 3) << 4) | (y >> 4);
+	cosmic_state *state = (cosmic_state *)machine->driver_data;
+	offs_t offs = (state->color_registers[0] << 9) | ((x >> 3) << 4) | (y >> 4);
 	pen_t pen = memory_region(machine, "user1")[offs];
 
-	if (color_registers[1])
+	if (state->color_registers[1])
 		pen >>= 4;
 
-	return pen & magspot_pen_mask;
+	return pen & state->magspot_pen_mask;
 }
 
 
@@ -81,6 +78,7 @@ static pen_t magspot_map_color(running_machine *machine, UINT8 x, UINT8 y)
 
 PALETTE_INIT( panic )
 {
+	cosmic_state *state = (cosmic_state *)machine->driver_data;
 	int i;
 
 	/* allocate the colortable */
@@ -107,7 +105,7 @@ PALETTE_INIT( panic )
 		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 
-    map_color = panic_map_color;
+	state->map_color = panic_map_color;
 }
 
 
@@ -122,6 +120,7 @@ PALETTE_INIT( panic )
 
 PALETTE_INIT( cosmica )
 {
+	cosmic_state *state = (cosmic_state *)machine->driver_data;
 	int i;
 
 	/* allocate the colortable */
@@ -149,7 +148,7 @@ PALETTE_INIT( cosmica )
 		colortable_entry_set_value(machine->colortable, i + 0x20, ctabentry);
 	}
 
-    map_color = cosmica_map_color;
+	state->map_color = cosmica_map_color;
 }
 
 
@@ -164,6 +163,7 @@ PALETTE_INIT( cosmica )
  */
 PALETTE_INIT( cosmicg )
 {
+	cosmic_state *state = (cosmic_state *)machine->driver_data;
 	int i;
 
 	for (i = 0; i < machine->config->total_colors; i++)
@@ -175,12 +175,13 @@ PALETTE_INIT( cosmicg )
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 
-    map_color = cosmicg_map_color;
+	state->map_color = cosmicg_map_color;
 }
 
 
 PALETTE_INIT( magspot )
 {
+	cosmic_state *state = (cosmic_state *)machine->driver_data;
 	int i;
 
 	/* allocate the colortable */
@@ -207,13 +208,14 @@ PALETTE_INIT( magspot )
 		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 
-    map_color = magspot_map_color;
-    magspot_pen_mask = 0x0f;
+	state->map_color = magspot_map_color;
+	state->magspot_pen_mask = 0x0f;
 }
 
 
 PALETTE_INIT( nomnlnd )
 {
+	cosmic_state *state = (cosmic_state *)machine->driver_data;
 	int i;
 
 	/* allocate the colortable */
@@ -237,30 +239,32 @@ PALETTE_INIT( nomnlnd )
 		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 
-    map_color = magspot_map_color;
-    magspot_pen_mask = 0x07;
+	state->map_color = magspot_map_color;
+	state->magspot_pen_mask = 0x07;
 }
 
 
 WRITE8_HANDLER( cosmic_background_enable_w )
 {
-	background_enable = data;
+	cosmic_state *state = (cosmic_state *)space->machine->driver_data;
+	state->background_enable = data;
 }
 
 
-static void draw_bitmap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_bitmap( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	cosmic_state *state = (cosmic_state *)machine->driver_data;
 	offs_t offs;
 
 	for (offs = 0; offs < videoram_size; offs++)
 	{
 		int i;
-		UINT8 data = videoram[offs];
+		UINT8 data = state->videoram[offs];
 
 		UINT8 x = offs << 3;
 		UINT8 y = offs >> 5;
 
-		pen_t pen = map_color(machine, x, y);
+		pen_t pen = state->map_color(machine, x, y);
 
 		for (i = 0; i < 8; i++)
 		{
@@ -279,40 +283,41 @@ static void draw_bitmap(running_machine *machine, bitmap_t *bitmap, const rectan
 }
 
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int color_mask, int extra_sprites)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int color_mask, int extra_sprites )
 {
+	cosmic_state *state = (cosmic_state *)machine->driver_data;
 	int offs;
 
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
-		if (spriteram[offs] != 0)
+		if (state->spriteram[offs] != 0)
         {
 			int code, color;
 
-			code  = ~spriteram[offs  ] & 0x3f;
-			color = ~spriteram[offs+3] & color_mask;
+			code  = ~state->spriteram[offs] & 0x3f;
+			color = ~state->spriteram[offs + 3] & color_mask;
 
 			if (extra_sprites)
-				code |= (spriteram[offs+3] & 0x08) << 3;
+				code |= (state->spriteram[offs + 3] & 0x08) << 3;
 
-            if (spriteram[offs] & 0x80)
+            if (state->spriteram[offs] & 0x80)
                 /* 16x16 sprite */
 			    drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 					    code, color,
-					    0, ~spriteram[offs] & 0x40,
-				    	256-spriteram[offs+2],spriteram[offs+1],0);
+					    0, ~state->spriteram[offs] & 0x40,
+				    	256-state->spriteram[offs + 2],state->spriteram[offs + 1],0);
             else
                 /* 32x32 sprite */
 			    drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 					    code >> 2, color,
-					    0, ~spriteram[offs] & 0x40,
-				    	256-spriteram[offs+2],spriteram[offs+1],0);
+					    0, ~state->spriteram[offs] & 0x40,
+				    	256-state->spriteram[offs + 2],state->spriteram[offs + 1],0);
         }
 	}
 }
 
 
-static void cosmica_draw_starfield(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect)
+static void cosmica_draw_starfield( const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	UINT8 y = 0;
 	UINT8 map = 0;
@@ -361,7 +366,7 @@ static void cosmica_draw_starfield(const device_config *screen, bitmap_t *bitmap
 }
 
 
-static void devzone_draw_grid(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void devzone_draw_grid( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	UINT8 y;
 	UINT8 *horz_PROM = memory_region(machine, "user2");
@@ -419,7 +424,7 @@ static void devzone_draw_grid(running_machine *machine, bitmap_t *bitmap, const 
 }
 
 
-static void nomnlnd_draw_background(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect)
+static void nomnlnd_draw_background( const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	UINT8 y = 0;
 	UINT8 water = video_screen_get_frame_number(screen);
@@ -579,9 +584,11 @@ VIDEO_UPDATE( magspot )
 
 VIDEO_UPDATE( devzone )
 {
+	cosmic_state *state = (cosmic_state *)screen->machine->driver_data;
+
 	bitmap_fill(bitmap, cliprect, 0);
 
-	if (background_enable)
+	if (state->background_enable)
 		devzone_draw_grid(screen->machine, bitmap, cliprect);
 
 	draw_bitmap(screen->machine, bitmap, cliprect);
@@ -592,6 +599,8 @@ VIDEO_UPDATE( devzone )
 
 VIDEO_UPDATE( nomnlnd )
 {
+	cosmic_state *state = (cosmic_state *)screen->machine->driver_data;
+
 	/* according to the video summation logic on pg4, the trees and river
        have the highest priority */
 
@@ -599,7 +608,7 @@ VIDEO_UPDATE( nomnlnd )
 	draw_bitmap(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect, 0x07, 0);
 
-	if (background_enable)
+	if (state->background_enable)
 		nomnlnd_draw_background(screen, bitmap, cliprect);
 
 	return 0;

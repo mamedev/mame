@@ -6,15 +6,14 @@
     Driver by Pierpaolo Prazzoli
 
     TODO:
-    - Add colors when proms are dumped
+      - Add colors when proms are dumped
 
-Mods by Tomasz Slanina (2008.06.12):
-
-- fixed sound cpu interrupts (mode 2 (two vectors)+ nmi)
-- added sound and music.
-- ay/msm clocks are arbitrary
-- just a guess - upper nibble of byte from port 3 _probably_
-  contains sound command (sound cpu writes it to port c)
+    Mods by Tomasz Slanina (2008.06.12):
+      - fixed sound cpu interrupts (mode 2 (two vectors)+ nmi)
+      - added sound and music.
+      - ay/msm clocks are arbitrary
+      - just a guess - upper nibble of byte from port 3 _probably_
+        contains sound command (sound cpu writes it to port c)
 
 ******************************************************************************/
 
@@ -24,35 +23,50 @@ Mods by Tomasz Slanina (2008.06.12):
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
 
-static int msm_data = 0;
-static int msm_toggle=0;
 
-static UINT8 *bgvideoram,*fgvideoram;
-static int bg_bank = 0;
-static UINT8 snd_interrupt_enable=0;
-static UINT8 music_interrupt_enable=0;
-static UINT8 snd_ack;
+typedef struct _dacholer_state dacholer_state;
+struct _dacholer_state
+{
+	/* memory pointers */
+	UINT8 *  bgvideoram;
+	UINT8 *  fgvideoram;
+	UINT8 *  spriteram;
 
-static tilemap *bg_tilemap,*fg_tilemap;
+	/* video-related */
+	tilemap  *bg_tilemap,*fg_tilemap;
+	int      bg_bank;
+
+	/* sound-related */
+	int msm_data;
+	int msm_toggle;
+	UINT8 snd_interrupt_enable;
+	UINT8 music_interrupt_enable;
+	UINT8 snd_ack;
+};
+
+
 
 static WRITE8_HANDLER( background_w )
 {
-	bgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset);
+	dacholer_state *state = (dacholer_state *)space->machine->driver_data;
+	state->bgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( foreground_w )
 {
-	fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap,offset);
+	dacholer_state *state = (dacholer_state *)space->machine->driver_data;
+	state->fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( bg_bank_w )
 {
-	if((data & 3) != bg_bank)
+	dacholer_state *state = (dacholer_state *)space->machine->driver_data;
+	if ((data & 3) != state->bg_bank)
 	{
-		bg_bank = data & 3;
-		tilemap_mark_all_tiles_dirty(bg_tilemap);
+		state->bg_bank = data & 3;
+		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 	}
 
 	flip_screen_set(space->machine, data & 0xc); // probably one bit for flipx and one for flipy
@@ -77,9 +91,9 @@ static WRITE8_HANDLER(snd_w)
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8800, 0x97ff) AM_RAM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(background_w) AM_BASE(&bgvideoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(foreground_w) AM_BASE(&fgvideoram)
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(background_w) AM_BASE_MEMBER(dacholer_state, bgvideoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(foreground_w) AM_BASE_MEMBER(dacholer_state, fgvideoram)
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_MEMBER(dacholer_state, spriteram) AM_SIZE(&spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
@@ -105,28 +119,33 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( adpcm_w )
 {
-	msm_data = data;
-	msm_toggle = 0;
+	dacholer_state *state = (dacholer_state *)space->machine->driver_data;
+	state->msm_data = data;
+	state->msm_toggle = 0;
 }
 
 static WRITE8_HANDLER( snd_ack_w )
 {
-	snd_ack = data;
+	dacholer_state *state = (dacholer_state *)space->machine->driver_data;
+	state->snd_ack = data;
 }
 
 static CUSTOM_INPUT( snd_ack_r )
 {
-	return snd_ack;		//guess ...
+	dacholer_state *state = (dacholer_state *)field->port->machine->driver_data;
+	return state->snd_ack;		//guess ...
 }
 
 static WRITE8_HANDLER( snd_irq_w )
 {
-	snd_interrupt_enable = data;
+	dacholer_state *state = (dacholer_state *)space->machine->driver_data;
+	state->snd_interrupt_enable = data;
 }
 
 static WRITE8_HANDLER( music_irq_w )
 {
-	music_interrupt_enable = data;
+	dacholer_state *state = (dacholer_state *)space->machine->driver_data;
+	state->music_interrupt_enable = data;
 }
 
 static ADDRESS_MAP_START( snd_io_map, ADDRESS_SPACE_IO, 8 )
@@ -283,36 +302,40 @@ INPUT_PORTS_END
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	SET_TILE_INFO(1,bgvideoram[tile_index] + bg_bank * 0x100,0,0);
+	dacholer_state *state = (dacholer_state *)machine->driver_data;
+	SET_TILE_INFO(1, state->bgvideoram[tile_index] + state->bg_bank * 0x100, 0, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	SET_TILE_INFO(0,fgvideoram[tile_index],0,0);
+	dacholer_state *state = (dacholer_state *)machine->driver_data;
+	SET_TILE_INFO(0, state->fgvideoram[tile_index], 0, 0);
 }
 
 static VIDEO_START( dacholer )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,32,32);
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
+	dacholer_state *state = (dacholer_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(fg_tilemap,0);
+	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	int offs,code,attr,sx,sy,flipx,flipy;
+	dacholer_state *state = (dacholer_state *)machine->driver_data;
+	int offs, code, attr, sx, sy, flipx, flipy;
 
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0; offs < spriteram_size; offs += 4)
 	{
-		code = spriteram[offs+1];
-		attr = spriteram[offs+2];
+		code = state->spriteram[offs + 1];
+		attr = state->spriteram[offs + 2];
 
 		flipx = attr & 0x10;
 		flipy = attr & 0x20;
 
-		sx = (spriteram[offs+3] - 128) + 256 * (attr & 0x01);
-		sy = 248 - spriteram[offs];
+		sx = (state->spriteram[offs + 3] - 128) + 256 * (attr & 0x01);
+		sy = 248 - state->spriteram[offs];
 
 		if (flip_screen_get(machine))
 		{
@@ -322,7 +345,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[2],
 				code,
 				0,
 				flipx,flipy,
@@ -332,9 +355,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static VIDEO_UPDATE(dacholer)
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect);
+	dacholer_state *state = (dacholer_state *)screen->machine->driver_data;
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -370,20 +394,22 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( sound_irq )
 {
-	if(music_interrupt_enable == 1)
+	dacholer_state *state = (dacholer_state *)device->machine->driver_data;
+	if (state->music_interrupt_enable == 1)
 	{
 		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x30);
 	}
 }
 
-static void adpcm_int(const device_config *device)
+static void adpcm_int( const device_config *device )
 {
-	if(snd_interrupt_enable == 1 || (snd_interrupt_enable == 0 && msm_toggle == 1))
+	dacholer_state *state = (dacholer_state *)device->machine->driver_data;
+	if (state->snd_interrupt_enable == 1 || (state->snd_interrupt_enable == 0 && state->msm_toggle == 1))
 	{
-		msm5205_data_w(device, msm_data >> 4);
-		msm_data <<= 4;
-		msm_toggle ^= 1;
-		if (msm_toggle == 0)
+		msm5205_data_w(device, state->msm_data >> 4);
+		state->msm_data <<= 4;
+		state->msm_toggle ^= 1;
+		if (state->msm_toggle == 0)
 		{
 			cputag_set_input_line_and_vector(device->machine, "audiocpu", 0, HOLD_LINE, 0x38);
 		}
@@ -396,7 +422,37 @@ static const msm5205_interface msm_interface =
 	MSM5205_S96_4B 	/* 1 / 96 = 3906.25Hz playback  - guess */
 };
 
+
+
+static MACHINE_START( dacholer )
+{
+	dacholer_state *state = (dacholer_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->bg_bank);
+	state_save_register_global(machine, state->msm_data);
+	state_save_register_global(machine, state->msm_toggle);
+	state_save_register_global(machine, state->snd_interrupt_enable);
+	state_save_register_global(machine, state->music_interrupt_enable);
+	state_save_register_global(machine, state->snd_ack);
+}
+
+static MACHINE_RESET( dacholer )
+{
+	dacholer_state *state = (dacholer_state *)machine->driver_data;
+
+	state->msm_data = 0;
+	state->msm_toggle = 0;
+
+	state->bg_bank = 0;
+	state->snd_interrupt_enable = 0;
+	state->music_interrupt_enable = 0;
+	state->snd_ack = 0;
+}
+
 static MACHINE_DRIVER_START( dacholer )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(dacholer_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* ? */
@@ -408,6 +464,9 @@ static MACHINE_DRIVER_START( dacholer )
 	MDRV_CPU_PROGRAM_MAP(snd_map)
 	MDRV_CPU_IO_MAP(snd_io_map)
 	MDRV_CPU_VBLANK_INT("screen",sound_irq)
+
+	MDRV_MACHINE_START(dacholer)
+	MDRV_MACHINE_RESET(dacholer)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -498,5 +557,5 @@ ROM_START( kickboy )
 	ROM_LOAD( "proms", 0x0000, 0x0020, NO_DUMP )
 ROM_END
 
-GAME( 1983, dacholer, 0, dacholer, dacholer, 0, ROT0, "Nichibutsu", "Dacholer", GAME_WRONG_COLORS )
-GAME( 1983, kickboy,  0, dacholer, kickboy,  0, ROT0, "Nichibutsu", "Kick Boy", GAME_WRONG_COLORS )
+GAME( 1983, dacholer, 0, dacholer, dacholer, 0, ROT0, "Nichibutsu", "Dacholer", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, kickboy,  0, dacholer, kickboy,  0, ROT0, "Nichibutsu", "Kick Boy", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

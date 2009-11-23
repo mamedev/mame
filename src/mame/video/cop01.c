@@ -7,14 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-
-
-
-UINT8 *cop01_bgvideoram,*cop01_fgvideoram;
-
-static UINT8 mightguy_vreg[4];
-static tilemap *bg_tilemap,*fg_tilemap;
-
+#include "cop01.h"
 
 
 PALETTE_INIT( cop01 )
@@ -69,9 +62,10 @@ PALETTE_INIT( cop01 )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int tile = cop01_bgvideoram[tile_index];
-	int attr = cop01_bgvideoram[tile_index+0x800];
-	int pri  = (attr & 0x80) >> 7;
+	cop01_state *state = (cop01_state *)machine->driver_data;
+	int tile = state->bgvideoram[tile_index];
+	int attr = state->bgvideoram[tile_index + 0x800];
+	int pri = (attr & 0x80) >> 7;
 
 	/* kludge: priority is not actually pen based, but color based. Since the
      * game uses a lookup table, the two are not the same thing.
@@ -83,16 +77,18 @@ static TILE_GET_INFO( get_bg_tile_info )
      * the screen right at the beginning of mightguy. cop01 doesn't seem to
      * use priority at all.
      */
-	if (attr & 0x10) pri = 0;
+	if (attr & 0x10) 
+		pri = 0;
 
-	SET_TILE_INFO(1,tile + ((attr & 0x03) << 8),(attr & 0x1c) >> 2,0);
+	SET_TILE_INFO(1, tile + ((attr & 0x03) << 8), (attr & 0x1c) >> 2, 0);
 	tileinfo->group = pri;
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int tile = cop01_fgvideoram[tile_index];
-	SET_TILE_INFO(0,tile,0,0);
+	cop01_state *state = (cop01_state *)machine->driver_data;
+	int tile = state->fgvideoram[tile_index];
+	SET_TILE_INFO(0, tile, 0, 0);
 }
 
 
@@ -105,14 +101,15 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( cop01 )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,      8,8,64,32);
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
+	cop01_state *state = (cop01_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows, 8, 8, 64, 32);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(fg_tilemap,15);
+	tilemap_set_transparent_pen(state->fg_tilemap, 15);
 
 	/* priority doesn't exactly work this way, see above */
-	tilemap_set_transmask(bg_tilemap,0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
-	tilemap_set_transmask(bg_tilemap,1,0x0fff,0xf000); /* split type 1 has pens 0-11 transparent in front half */
+	tilemap_set_transmask(state->bg_tilemap, 0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */
+	tilemap_set_transmask(state->bg_tilemap, 1, 0x0fff, 0xf000); /* split type 1 has pens 0-11 transparent in front half */
 }
 
 
@@ -125,14 +122,16 @@ VIDEO_START( cop01 )
 
 WRITE8_HANDLER( cop01_background_w )
 {
-	cop01_bgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
+	cop01_state *state = (cop01_state *)space->machine->driver_data;
+	state->bgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset & 0x7ff);
 }
 
 WRITE8_HANDLER( cop01_foreground_w )
 {
-	cop01_fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap,offset);
+	cop01_state *state = (cop01_state *)space->machine->driver_data;
+	state->fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( cop01_vreg_w )
@@ -148,12 +147,13 @@ WRITE8_HANDLER( cop01_vreg_w )
      *        -------x msb xscroll
      *  0x43: xxxxxxxx yscroll
      */
-	mightguy_vreg[offset] = data;
+	cop01_state *state = (cop01_state *)space->machine->driver_data;
+	state->vreg[offset] = data;
 
 	if (offset == 0)
 	{
-		coin_counter_w(0,data & 1);
-		coin_counter_w(1,data & 2);
+		coin_counter_w(0, data & 1);
+		coin_counter_w(1, data & 2);
 		flip_screen_set(space->machine, data & 4);
 	}
 }
@@ -166,14 +166,15 @@ WRITE8_HANDLER( cop01_vreg_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	int offs,code,attr,sx,sy,flipx,flipy,color;
+	cop01_state *state = (cop01_state *)machine->driver_data;
+	int offs, code, attr, sx, sy, flipx, flipy, color;
 
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0; offs < spriteram_size; offs += 4)
 	{
-		code = spriteram[offs+1];
-		attr = spriteram[offs+2];
+		code = state->spriteram[offs + 1];
+		attr = state->spriteram[offs + 2];
 		/* xxxx---- color
          * ----xx-- flipy,flipx
          * -------x msbx
@@ -182,8 +183,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		flipx = attr & 0x04;
 		flipy = attr & 0x08;
 
-		sx = (spriteram[offs+3] - 0x80) + 256 * (attr & 0x01);
-		sy = 240 - spriteram[offs];
+		sx = (state->spriteram[offs + 3] - 0x80) + 256 * (attr & 0x01);
+		sy = 240 - state->spriteram[offs];
 
 		if (flip_screen_get(machine))
 		{
@@ -193,8 +194,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		if (code&0x80)
-			code += (mightguy_vreg[0]&0x30)<<3;
+		if (code & 0x80)
+			code += (state->vreg[0] & 0x30) << 3;
 
 		drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
 			code,
@@ -207,12 +208,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( cop01 )
 {
-	tilemap_set_scrollx(bg_tilemap,0,mightguy_vreg[1] + 256 * (mightguy_vreg[2] & 1));
-	tilemap_set_scrolly(bg_tilemap,0,mightguy_vreg[3]);
+	cop01_state *state = (cop01_state *)screen->machine->driver_data;
+	tilemap_set_scrollx(state->bg_tilemap, 0, state->vreg[1] + 256 * (state->vreg[2] & 1));
+	tilemap_set_scrolly(state->bg_tilemap, 0, state->vreg[3]);
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1,0);
-	draw_sprites(screen->machine, bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0 );
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	draw_sprites(screen->machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0 );
 	return 0;
 }

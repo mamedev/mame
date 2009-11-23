@@ -112,7 +112,7 @@ static VIDEO_UPDATE( cultures )
 static WRITE8_HANDLER( cpu_bankswitch_w )
 {
 	cultures_state *state = (cultures_state *)space->machine->driver_data;
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + 0x4000 * (data & 0xf));
+	memory_set_bank(space->machine, 1, data & 0x0f);
 	state->video_bank = ~data & 0x20;
 }
 
@@ -357,6 +357,9 @@ static INTERRUPT_GEN( cultures_interrupt )
 static MACHINE_START( cultures )
 {
 	cultures_state *state = (cultures_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, 1, 0, 16, &ROM[0x0000], 0x4000);
 
 	state->paletteram = auto_alloc_array(machine, UINT8, 0x4000);
 	state_save_register_global_pointer(machine, state->paletteram, 0x4000);

@@ -29,20 +29,36 @@
 #include "sound/dac.h"
 #include <math.h>
 
-static tilemap *bg_tilemap, *fg_tilemap;
-static UINT8 *videoram2;
 
-static int flipscreen=0;
-static int bg_bank = 0,bg_color_bank;
-static int scrolly = 0, scrollx = 0, scrollx_hi = 0, scrolly_hi = 0, rotation_x = 0, rotation_sign = 0;
-static int disable_roz;
+typedef struct _cntsteer_state cntsteer_state;
+struct _cntsteer_state
+{
+	/* memory pointers */
+	UINT8 *  videoram;
+	UINT8 *  videoram2;
+	UINT8 *  colorram;
+	UINT8 *  spriteram;
+
+	/* video-related */
+	tilemap  *bg_tilemap,*fg_tilemap;
+	int      bg_bank, bg_color_bank;
+	int      flipscreen;
+	int      scrolly, scrolly_hi;
+	int      scrollx, scrollx_hi;
+	int      rotation_x, rotation_sign;
+	int      disable_roz;
+
+	/* misc */
+	int      nmimask;	// zerotrgt only
+};
+
 
 static PALETTE_INIT( zerotrgt )
 {
 	int i;
-	for (i = 0;i < machine->config->total_colors;i++)
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2, r, g, b;
 
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
@@ -55,50 +71,54 @@ static PALETTE_INIT( zerotrgt )
 		bit2 = (color_prom[i] >> 6) & 0x01;
 		r = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
 		/* blue component */
-		bit0 = (color_prom[i+256] >> 0) & 0x01;
-		bit1 = (color_prom[i+256] >> 1) & 0x01;
-		bit2 = (color_prom[i+256] >> 2) & 0x01;
+		bit0 = (color_prom[i + 256] >> 0) & 0x01;
+		bit1 = (color_prom[i + 256] >> 1) & 0x01;
+		bit2 = (color_prom[i + 256] >> 2) & 0x01;
 		b = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine, i, MAKE_RGB(r,g,b));
 	}
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram2[tile_index];
+	cntsteer_state *state = (cntsteer_state *)machine->driver_data;
+	int code = state->videoram2[tile_index];
 
-	SET_TILE_INFO(2, code + bg_bank, bg_color_bank, 0);
+	SET_TILE_INFO(2, code + state->bg_bank, state->bg_color_bank, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code = videoram[tile_index];
-	int attr = colorram[tile_index];
+	cntsteer_state *state = (cntsteer_state *)machine->driver_data;
+	int code = state->videoram[tile_index];
+	int attr = state->colorram[tile_index];
 
-	code|= (attr & 0x01)<<8;
+	code |= (attr & 0x01) << 8;
 
-	SET_TILE_INFO(0, code, 0x30+((attr & 0x78)>>3), 0);
+	SET_TILE_INFO(0, code, 0x30 + ((attr & 0x78) >> 3), 0);
 }
 
 static VIDEO_START( cntsteer )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,64,64);
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows_flip_x,8, 8,32,32);
+	cntsteer_state *state = (cntsteer_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 64, 64);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows_flip_x, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(fg_tilemap,0);
+	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
-//  tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
+	//tilemap_set_flip(state->bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
 }
 
 static VIDEO_START( zerotrgt )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,16,16,64,64);
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows_flip_x,8, 8,32,32);
+	cntsteer_state *state = (cntsteer_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows_flip_x, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(fg_tilemap,0);
+	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
-//  tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
+	//tilemap_set_flip(state->bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
 }
 
 /*
@@ -114,49 +134,52 @@ Sprite list:
 [2] xxxx xxxx X attribute
 [3] xxxx xxxx sprite number
 */
-static void zerotrgt_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void zerotrgt_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	cntsteer_state *state = (cntsteer_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0;offs < 0x200;offs += 4)
+	for (offs = 0; offs < 0x200; offs += 4)
 	{
-		int multi,fx,fy,sx,sy,code,color;
+		int multi, fx, fy, sx, sy, code, color;
 
-		if((spriteram[offs+1] & 1) == 1)
+		if ((state->spriteram[offs + 1] & 1) == 1)
 			continue;
 
-		code = spriteram[offs+3] + ( ( spriteram[offs+1] & 0xc0 ) << 2 );
-		sx = (spriteram[offs+2]);
-		sy = 0xf0 - spriteram[offs];
-		color = 0x10+((spriteram[offs+1] & 0x20) >> 4) + ((spriteram[offs+1] & 0x8)>>3);
+		code = state->spriteram[offs + 3] + ((state->spriteram[offs + 1] & 0xc0) << 2);
+		sx = (state->spriteram[offs + 2]);
+		sy = 0xf0 - state->spriteram[offs];
+		color = 0x10 + ((state->spriteram[offs + 1] & 0x20) >> 4) + ((state->spriteram[offs + 1] & 0x8)>>3);
 
-		fx = !(spriteram[offs+1] & 0x04);
-		fy = (spriteram[offs+1] & 0x02);
+		fx = !(state->spriteram[offs + 1] & 0x04);
+		fy = (state->spriteram[offs + 1] & 0x02);
 
-		multi = spriteram[offs+1] & 0x10;
+		multi = state->spriteram[offs + 1] & 0x10;
 
-		if (flipscreen) {
-			sy=240-sy;
-			sx=240-sx;
-			if (fx) fx=0; else fx=1;
-			//sy2=sy-16;
+		if (state->flipscreen)
+		{
+			sy = 240 - sy;
+			sx = 240 - sx;
+			if (fx) fx = 0; 
+			else fx = 1;
+			//sy2 = sy - 16;
 		}
 
-        if(multi)
-        {
-			if(fy)
+		if (multi)
+		{
+			if (fy)
 			{
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code,color,fx,fy,sx,sy,0);
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code+1,color,fx,fy,sx,sy-16,0);
+				drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, fx, fy, sx, sy, 0);
+				drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code + 1, color, fx, fy, sx, sy - 16, 0);
 			}
 			else
 			{
-        		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code,color,fx,fy,sx,sy-16,0);
-        		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code+1,color,fx,fy,sx,sy,0);
+				drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, fx, fy, sx, sy - 16, 0);
+				drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code + 1, color, fx, fy, sx, sy, 0);
 			}
 		}
 		else
-		   	drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code,color,fx,fy,sx,sy,0);
+			drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, fx, fy, sx, sy, 0);
 	}
 }
 
@@ -169,67 +192,71 @@ static void zerotrgt_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
      ---- --xx tile bank
 */
 
-static void cntsteer_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void cntsteer_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	cntsteer_state *state = (cntsteer_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0;offs < 0x80;offs += 4)
+	for (offs = 0; offs < 0x80; offs += 4)
 	{
-		int multi,fx,fy,sx,sy,code,color;
+		int multi, fx, fy, sx, sy, code, color;
 
-		if((spriteram[offs+0] & 1) == 0)
+		if ((state->spriteram[offs + 0] & 1) == 0)
 			continue;
 
-		code = spriteram[offs+1] + ( ( spriteram[offs+0x80] & 0x03 ) << 8 );
-		sx = 0x100 - spriteram[offs+3];
-		sy = 0x100 - spriteram[offs+2];
-		color = 0x10+((spriteram[offs+0x80] & 0x70)>>4);
+		code = state->spriteram[offs + 1] + ((state->spriteram[offs + 0x80] & 0x03) << 8);
+		sx = 0x100 - state->spriteram[offs + 3];
+		sy = 0x100 - state->spriteram[offs + 2];
+		color = 0x10 + ((state->spriteram[offs + 0x80] & 0x70) >> 4);
 
-		fx = (spriteram[offs+0] & 0x04);
-		fy = (spriteram[offs+0] & 0x02);
+		fx = (state->spriteram[offs + 0] & 0x04);
+		fy = (state->spriteram[offs + 0] & 0x02);
 
-		multi = spriteram[offs+0] & 0x10;
+		multi = state->spriteram[offs + 0] & 0x10;
 
-		if (flipscreen) {
-			sy=240-sy;
-			sx=240-sx;
-			if (fx) fx=0; else fx=1;
-			//sy2=sy-16;
+		if (state->flipscreen)
+		{
+			sy = 240 - sy;
+			sx = 240 - sx;
+			if (fx) fx = 0; 
+			else fx = 1;
+			//sy2 = sy - 16;
 		}
 
-        if(multi)
-        {
-			if(fy)
+		if (multi)
+		{
+			if (fy)
 			{
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code,color,fx,fy,sx,sy,0);
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code+1,color,fx,fy,sx,sy-16,0);
+				drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, fx, fy, sx, sy, 0);
+				drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code + 1, color, fx, fy, sx, sy - 16, 0);
 			}
 			else
 			{
-        		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code,color,fx,fy,sx,sy-16,0);
-        		drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code+1,color,fx,fy,sx,sy,0);
+				drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, fx, fy, sx, sy - 16, 0);
+				drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code + 1, color, fx, fy, sx, sy, 0);
 			}
 		}
 		else
-		   	drawgfx_transpen(bitmap,cliprect,machine->gfx[1],code,color,fx,fy,sx,sy,0);
+			drawgfx_transpen(bitmap, cliprect, machine->gfx[1], code, color, fx, fy, sx, sy, 0);
 	}
 }
 
 static VIDEO_UPDATE( zerotrgt )
 {
-	if(disable_roz)
-		bitmap_fill(bitmap, cliprect, screen->machine->pens[8*bg_color_bank]);
+	cntsteer_state *state = (cntsteer_state *)screen->machine->driver_data;
+
+	if (state->disable_roz)
+		bitmap_fill(bitmap, cliprect, screen->machine->pens[8 * state->bg_color_bank]);
 	else
 	{
-		static int p1,p2,p3,p4;
-		static int rot_val,x,y;
+		int p1, p2, p3, p4;
+		int rot_val, x, y;
+		rot_val = state->rotation_sign ? (-state->rotation_x) : (state->rotation_x);
 
-		rot_val = rotation_sign ? (-rotation_x) : (rotation_x);
+//      popmessage("%d %02x %02x", rot_val, state->rotation_sign, state->rotation_x);
 
-//      popmessage("%d %02x %02x",rot_val,rotation_sign,rotation_x);
-
-		if(rot_val > 90) { rot_val = 90; }
-		if(rot_val < -90) { rot_val = -90; }
+		if (rot_val > 90) { rot_val = 90; }
+		if (rot_val < -90) { rot_val = -90; }
 
 		/*
         (u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
@@ -243,15 +270,15 @@ static VIDEO_UPDATE( zerotrgt )
              0
         */
 		/*65536*z*cos(a), 65536*z*sin(a), -65536*z*sin(a), 65536*z*cos(a)*/
-		p1 = -65536*1*cos(2*M_PI*(rot_val)/1024);
-		p2 = -65536*1*sin(2*M_PI*(rot_val)/1024);
-		p3 = 65536*1*sin(2*M_PI*(rot_val)/1024);
-		p4 = -65536*1*cos(2*M_PI*(rot_val)/1024);
+		p1 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
+		p2 = -65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
+		p3 = 65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
+		p4 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
 
-		x = -256-(scrollx | scrollx_hi);
-		y = 256+(scrolly | scrolly_hi);
+		x = -256 - (state->scrollx | state->scrollx_hi);
+		y = 256 + (state->scrolly | state->scrolly_hi);
 
-		tilemap_draw_roz(bitmap, cliprect, bg_tilemap,
+		tilemap_draw_roz(bitmap, cliprect, state->bg_tilemap,
 						(x << 16), (y << 16),
 						p1, p2,
 						p3, p4,
@@ -259,26 +286,27 @@ static VIDEO_UPDATE( zerotrgt )
 						0, 0);
 	}
 
-	zerotrgt_draw_sprites(screen->machine,bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+	zerotrgt_draw_sprites(screen->machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 
 	return 0;
 }
 
 static VIDEO_UPDATE( cntsteer )
 {
-	if(disable_roz)
-		bitmap_fill(bitmap, cliprect, screen->machine->pens[8*bg_color_bank]);
+	cntsteer_state *state = (cntsteer_state *)screen->machine->driver_data;
+
+	if (state->disable_roz)
+		bitmap_fill(bitmap, cliprect, screen->machine->pens[8 * state->bg_color_bank]);
 	else
 	{
-		static int p1,p2,p3,p4;
-		static int rot_val,x,y;
+		int p1, p2, p3, p4;
+		int rot_val, x, y;
+		state->rotation_x |= state->rotation_x | (state->rotation_sign & 3) << 8;
 
-		rotation_x |= rotation_x|(rotation_sign & 3)<<8;
+		rot_val = (state->rotation_sign & 4) ? (state->rotation_x) : (-state->rotation_x);
 
-		rot_val = (rotation_sign & 4) ? (rotation_x) : (-rotation_x);
-
-//      popmessage("%d %02x %02x",rot_val,rotation_sign,rotation_x);
+//      popmessage("%d %02x %02x", rot_val, state->rotation_sign, state->rotation_x);
 
 		/*
         (u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
@@ -292,15 +320,15 @@ static VIDEO_UPDATE( cntsteer )
              0
         */
 		/*65536*z*cos(a), 65536*z*sin(a), -65536*z*sin(a), 65536*z*cos(a)*/
-		p1 = -65536*1*cos(2*M_PI*(rot_val)/1024);
-		p2 = -65536*1*sin(2*M_PI*(rot_val)/1024);
-		p3 = 65536*1*sin(2*M_PI*(rot_val)/1024);
-		p4 = -65536*1*cos(2*M_PI*(rot_val)/1024);
+		p1 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
+		p2 = -65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
+		p3 = 65536 * 1 * sin(2 * M_PI * (rot_val) / 1024);
+		p4 = -65536 * 1 * cos(2 * M_PI * (rot_val) / 1024);
 
-		x = 256+(scrollx | scrollx_hi);
-		y = 256-(scrolly | scrolly_hi);
+		x = 256 + (state->scrollx | state->scrollx_hi);
+		y = 256 - (state->scrolly | state->scrolly_hi);
 
-		tilemap_draw_roz(bitmap, cliprect, bg_tilemap,
+		tilemap_draw_roz(bitmap, cliprect, state->bg_tilemap,
 						(x << 16), (y << 16),
 						p1, p2,
 						p3, p4,
@@ -308,8 +336,8 @@ static VIDEO_UPDATE( cntsteer )
 						0, 0);
 	}
 
-	cntsteer_draw_sprites(screen->machine,bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+	cntsteer_draw_sprites(screen->machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 
 	return 0;
 }
@@ -328,23 +356,33 @@ static VIDEO_UPDATE( cntsteer )
 */
 static WRITE8_HANDLER(zerotrgt_vregs_w)
 {
+	cntsteer_state *state = (cntsteer_state *)space->machine->driver_data;
 //  static UINT8 test[5];
 
 //  test[offset] = data;
 //    popmessage("%02x %02x %02x %02x %02x",test[0],test[1],test[2],test[3],test[4]);
 
-	switch(offset)
+	switch (offset)
 	{
-		case 0:	scrolly = data; break;
-		case 1: scrollx = data; break;
-		case 2: bg_bank = (data & 0x30) << 4; bg_color_bank = (data & 7); disable_roz = (data & 0x40); tilemap_mark_all_tiles_dirty(bg_tilemap); break;
-		case 3:	rotation_sign = (data & 1); flip_screen_set(space->machine, !(data & 4)); scrolly_hi = (data & 0x30) << 4; scrollx_hi = (data & 0xc0) << 2; break;
-		case 4: rotation_x = data; break;
+		case 0:	state->scrolly = data; break;
+		case 1:	state->scrollx = data; break;
+		case 2:	state->bg_bank = (data & 0x30) << 4; 
+				state->bg_color_bank = (data & 7); 
+				state->disable_roz = (data & 0x40); 
+				tilemap_mark_all_tiles_dirty(state->bg_tilemap); 
+				break;
+		case 3:	state->rotation_sign = (data & 1); 
+				flip_screen_set(space->machine, !(data & 4)); 
+				state->scrolly_hi = (data & 0x30) << 4; 
+				state->scrollx_hi = (data & 0xc0) << 2; 
+				break;
+		case 4:	state->rotation_x = data; break;
 	}
 }
 
 static WRITE8_HANDLER(cntsteer_vregs_w)
 {
+	cntsteer_state *state = (cntsteer_state *)space->machine->driver_data;
 //  static UINT8 test[5];
 
 //  test[offset] = data;
@@ -352,30 +390,40 @@ static WRITE8_HANDLER(cntsteer_vregs_w)
 
 	switch(offset)
 	{
-		case 0:	scrolly = data; break;
-		case 1: scrollx = data; break;
-		case 2: bg_bank = (data & 0x01) << 8; (bg_color_bank = (data & 6)>>1); tilemap_mark_all_tiles_dirty(bg_tilemap); break;
-		case 3:	rotation_sign = (data & 7);  disable_roz = (~data & 0x08); scrolly_hi = (data & 0x30) << 4; scrollx_hi = (data & 0xc0) << 2; break;
-		case 4: rotation_x = data; break;
+		case 0:	state->scrolly = data; break;
+		case 1:	state->scrollx = data; break;
+		case 2:	state->bg_bank = (data & 0x01) << 8; 
+				state->bg_color_bank = (data & 6) >> 1; 
+				tilemap_mark_all_tiles_dirty(state->bg_tilemap); 
+				break;
+		case 3:	state->rotation_sign = (data & 7);  
+				state->disable_roz = (~data & 0x08); 
+				state->scrolly_hi = (data & 0x30) << 4; 
+				state->scrollx_hi = (data & 0xc0) << 2; 
+				break;
+		case 4:	state->rotation_x = data; break;
 	}
 }
 
 static WRITE8_HANDLER( cntsteer_foreground_vram_w )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	cntsteer_state *state = (cntsteer_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( cntsteer_foreground_attr_w )
 {
-	colorram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	cntsteer_state *state = (cntsteer_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( cntsteer_background_w )
 {
-	videoram2[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	cntsteer_state *state = (cntsteer_state *)space->machine->driver_data;
+	state->videoram2[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 /*************************************
@@ -391,32 +439,32 @@ static WRITE8_HANDLER( gekitsui_sub_irq_ack )
 
 static WRITE8_HANDLER( cntsteer_sound_w )
 {
- 	soundlatch_w(space,0,data);
+ 	soundlatch_w(space, 0, data);
  	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( zerotrgt_ctrl_w )
 {
 	/*TODO: check this.*/
-	logerror("CTRL: %04x: %04x: %04x\n",cpu_get_pc(space->cpu),offset,data);
-//  if (offset==0) cputag_set_input_line(space->machine, "subcpu", INPUT_LINE_RESET, ASSERT_LINE);
+	logerror("CTRL: %04x: %04x: %04x\n", cpu_get_pc(space->cpu), offset, data);
+//  if (offset == 0) cputag_set_input_line(space->machine, "subcpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Wrong - bits 0 & 1 used on this
-	if (offset==1) cputag_set_input_line(space->machine, "subcpu", M6809_IRQ_LINE, ASSERT_LINE);
-//  if (offset==2) cputag_set_input_line(space->machine, "subcpu", INPUT_LINE_RESET, CLEAR_LINE);
+	if (offset == 1) cputag_set_input_line(space->machine, "subcpu", M6809_IRQ_LINE, ASSERT_LINE);
+//  if (offset == 2) cputag_set_input_line(space->machine, "subcpu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( cntsteer_sub_irq_w )
 {
 	cputag_set_input_line(space->machine, "subcpu", M6809_IRQ_LINE, ASSERT_LINE);
-//  printf("%02x IRQ\n",data);
+//  printf("%02x IRQ\n", data);
 }
 
 static WRITE8_HANDLER( cntsteer_sub_nmi_w )
 {
-//  if(data)
+//  if (data)
 //  cputag_set_input_line(space->machine, "subcpu", INPUT_LINE_NMI, PULSE_LINE);
-//  popmessage("%02x",data);
+//  popmessage("%02x", data);
 }
 
 static WRITE8_HANDLER( cntsteer_main_irq_w )
@@ -427,37 +475,34 @@ static WRITE8_HANDLER( cntsteer_main_irq_w )
 /* Convert weird input handling with MAME standards.*/
 static READ8_HANDLER( cntsteer_adx_r )
 {
-	static UINT8 res,adx_val;
-
+	UINT8 res = 0, adx_val;
 	adx_val = input_port_read(space->machine, "AN_STEERING");
 
-	if(adx_val >= 0x70 && adx_val <= 0x90)
+	if (adx_val >= 0x70 && adx_val <= 0x90)
 		res = 0xff;
-	else if(adx_val > 0x90)
+	else if (adx_val > 0x90)
 	{
-		if(adx_val > 0x90 && adx_val <= 0xb0)
+		if (adx_val > 0x90 && adx_val <= 0xb0)
 			res = 0xfe;
-		else if(adx_val > 0xb0 && adx_val <= 0xd0)
+		else if (adx_val > 0xb0 && adx_val <= 0xd0)
 			res = 0xfc;
-		else if(adx_val > 0xd0 && adx_val <= 0xf0)
+		else if (adx_val > 0xd0 && adx_val <= 0xf0)
 			res = 0xf8;
-		else if(adx_val > 0xf0)
+		else if (adx_val > 0xf0)
 			res = 0xf0;
 	}
 	else
 	{
-		if(adx_val >= 0x50 && adx_val < 0x70)
+		if (adx_val >= 0x50 && adx_val < 0x70)
 			res = 0xef;
-		else if(adx_val >= 0x30 && adx_val < 0x50)
+		else if (adx_val >= 0x30 && adx_val < 0x50)
 			res = 0xcf;
-		else if(adx_val >= 0x10 && adx_val < 0x30)
+		else if (adx_val >= 0x10 && adx_val < 0x30)
 			res = 0x8f;
-		else if(adx_val < 0x10)
+		else if (adx_val < 0x10)
 			res = 0x0f;
 	}
-
-	//popmessage("%02x",adx_val);
-
+	//popmessage("%02x", adx_val);
 	return res;
 }
 
@@ -465,17 +510,17 @@ static READ8_HANDLER( cntsteer_adx_r )
 
 static ADDRESS_MAP_START( gekitsui_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_MEMBER(cntsteer_state, spriteram)
 	AM_RANGE(0x1200, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE(&videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_BASE(&colorram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE_MEMBER(cntsteer_state, videoram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_BASE_MEMBER(cntsteer_state, colorram)
 	AM_RANGE(0x3000, 0x3003) AM_WRITE(zerotrgt_ctrl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gekitsui_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE(&videoram2)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE_MEMBER(cntsteer_state, videoram2)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW0")
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2")
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
@@ -488,9 +533,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntsteer_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE(&spriteram)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE(&videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_MEMBER(cntsteer_state, spriteram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE_MEMBER(cntsteer_state, videoram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_BASE_MEMBER(cntsteer_state, colorram)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(cntsteer_sub_nmi_w)
 	AM_RANGE(0x3001, 0x3001) AM_WRITE(cntsteer_sub_irq_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -498,7 +543,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntsteer_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE(&videoram2) AM_SHARE(3)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE_MEMBER(cntsteer_state, videoram2) AM_SHARE(3)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(cntsteer_background_w) AM_SHARE(3)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW0")
 	AM_RANGE(0x3001, 0x3001) AM_READ(cntsteer_adx_r)
@@ -514,11 +559,18 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static int nmimask;
+static WRITE8_HANDLER( nmimask_w ) 
+{ 
+	cntsteer_state *state = (cntsteer_state *)space->machine->driver_data;
+	state->nmimask = data & 0x80; 
+}
 
-static WRITE8_HANDLER( nmimask_w ) { nmimask = data & 0x80; }
-
-static INTERRUPT_GEN ( sound_interrupt ) { if (!nmimask) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE); }
+static INTERRUPT_GEN ( sound_interrupt ) 
+{ 
+	cntsteer_state *state = (cntsteer_state *)device->machine->driver_data;
+	if (!state->nmimask) 
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE); 
+}
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
@@ -718,9 +770,56 @@ GFXDECODE_END
 
 /***************************************************************************/
 
+static MACHINE_START( cntsteer )
+{
+	cntsteer_state *state = (cntsteer_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->flipscreen);
+	state_save_register_global(machine, state->bg_bank);
+	state_save_register_global(machine, state->scrolly); 
+	state_save_register_global(machine, state->scrollx);
+	state_save_register_global(machine, state->scrollx_hi);
+	state_save_register_global(machine, state->scrolly_hi);
+	state_save_register_global(machine, state->rotation_x);
+	state_save_register_global(machine, state->rotation_sign);
+
+	state_save_register_global(machine, state->bg_color_bank);
+	state_save_register_global(machine, state->disable_roz);
+}
+
+static MACHINE_START( zerotrgt )
+{
+	cntsteer_state *state = (cntsteer_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->nmimask);
+	MACHINE_START_CALL(cntsteer);
+}
+
+
+static MACHINE_RESET( cntsteer )
+{
+	cntsteer_state *state = (cntsteer_state *)machine->driver_data;
+
+	state->flipscreen = 0;
+	state->bg_bank = 0;
+	state->scrolly = 0; 
+	state->scrollx = 0;
+	state->scrollx_hi = 0;
+	state->scrolly_hi = 0;
+	state->rotation_x = 0;
+	state->rotation_sign = 0;
+
+	state->bg_color_bank = 0;
+	state->disable_roz = 0;
+}
+
+
 static MACHINE_RESET( zerotrgt )
 {
-	nmimask = 0;
+	cntsteer_state *state = (cntsteer_state *)machine->driver_data;
+
+	state->nmimask = 0;
+	MACHINE_RESET_CALL(cntsteer);
 }
 
 static const ay8910_interface ay8910_config =
@@ -734,6 +833,11 @@ static const ay8910_interface ay8910_config =
 };
 
 static MACHINE_DRIVER_START( cntsteer )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(cntsteer_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(cntsteer_cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
@@ -742,9 +846,12 @@ static MACHINE_DRIVER_START( cntsteer )
 	MDRV_CPU_PROGRAM_MAP(cntsteer_cpu2_map)
 //  MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
-    MDRV_CPU_ADD("audiocpu", M6502, 1500000)        /* ? */
-    MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_ADD("audiocpu", M6502, 1500000)        /* ? */
+	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_PERIODIC_INT(sound_interrupt, 480)
+
+	MDRV_MACHINE_START(cntsteer)
+	MDRV_MACHINE_RESET(cntsteer)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -777,6 +884,11 @@ static MACHINE_DRIVER_START( cntsteer )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( zerotrgt )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(cntsteer_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu1_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
@@ -791,6 +903,9 @@ static MACHINE_DRIVER_START( zerotrgt )
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
+	MDRV_MACHINE_START(zerotrgt)
+	MDRV_MACHINE_RESET(zerotrgt)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -798,8 +913,6 @@ static MACHINE_DRIVER_START( zerotrgt )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-
-	MDRV_MACHINE_RESET(zerotrgt)
 
 	MDRV_GFXDECODE(zerotrgt)
 	MDRV_PALETTE_LENGTH(256)
@@ -951,7 +1064,7 @@ ROM_END
 
 /***************************************************************************/
 
-static void zerotrgt_rearrange_gfx(running_machine *machine, int romsize, int romarea)
+static void zerotrgt_rearrange_gfx( running_machine *machine, int romsize, int romarea )
 {
 	UINT8 *src = memory_region(machine, "gfx4");
 	UINT8 *dst = memory_region(machine, "gfx3");
@@ -964,25 +1077,23 @@ static void zerotrgt_rearrange_gfx(running_machine *machine, int romsize, int ro
 	{
 		for (cnt1 = 0; cnt1 < romsize; cnt1++)
 		{
-			dst[rm*romarea+cnt1]         = (src[rm*romarea+cnt1] & 0x0f);
-			dst[rm*romarea+cnt1+romsize] = (src[rm*romarea+cnt1] & 0xf0) >> 4;
+			dst[rm * romarea + cnt1] = (src[rm * romarea + cnt1] & 0x0f);
+			dst[rm * romarea + cnt1 + romsize] = (src[rm * romarea + cnt1] & 0xf0) >> 4;
 		}
 	}
-
 }
 
 #if 0
-static void init_cntsteer(void)
+static DRIVER_INIT( cntsteer )
 {
 	UINT8 *RAM = memory_region(machine, "subcpu");
 
-	RAM[0xc2cf]=0x43; /* Patch out Cpu 1 ram test - it never ends..?! */
-	RAM[0xc2d0]=0x43;
-	RAM[0xc2f1]=0x43;
-	RAM[0xc2f2]=0x43;
+	RAM[0xc2cf] = 0x43; /* Patch out Cpu 1 ram test - it never ends..?! */
+	RAM[0xc2d0] = 0x43;
+	RAM[0xc2f1] = 0x43;
+	RAM[0xc2f2] = 0x43;
 
 	zerotrgt_rearrange_gfx(machine, 0x02000, 0x10000);
-
 }
 #endif
 
@@ -994,6 +1105,6 @@ static DRIVER_INIT( zerotrgt )
 
 /***************************************************************************/
 
-GAME( 1985, zerotrgt, 0,        zerotrgt,  zerotrgt, zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NO_COCKTAIL|GAME_NOT_WORKING )
-GAME( 1985, gekitsui, zerotrgt, zerotrgt,  zerotrgt, zerotrgt, ROT0,   "Data East Corporation", "Gekitsui Oh (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NO_COCKTAIL|GAME_NOT_WORKING )
-GAME( 1985, cntsteer, 0,        cntsteer,  cntsteer, zerotrgt, ROT270, "Data East Corporation", "Counter Steer (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_WRONG_COLORS|GAME_NO_COCKTAIL|GAME_NOT_WORKING )
+GAME( 1985, zerotrgt, 0,        zerotrgt,  zerotrgt, zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NO_COCKTAIL|GAME_NOT_WORKING|GAME_SUPPORTS_SAVE )
+GAME( 1985, gekitsui, zerotrgt, zerotrgt,  zerotrgt, zerotrgt, ROT0,   "Data East Corporation", "Gekitsui Oh (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NO_COCKTAIL|GAME_NOT_WORKING|GAME_SUPPORTS_SAVE )
+GAME( 1985, cntsteer, 0,        cntsteer,  cntsteer, zerotrgt, ROT270, "Data East Corporation", "Counter Steer (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_WRONG_COLORS|GAME_NO_COCKTAIL|GAME_NOT_WORKING|GAME_SUPPORTS_SAVE )

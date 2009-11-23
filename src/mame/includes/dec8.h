@@ -1,6 +1,33 @@
+
+typedef struct _dec8_state dec8_state;
+struct _dec8_state
+{
+	/* memory pointers */
+	UINT8 *  videoram;
+	UINT8 *  pf0_data;
+	UINT8 *  pf1_data;
+	UINT8 *  row;
+//	UINT8 *  paletteram;	// currently this uses generic palette handling
+//	UINT8 *  paletteram_2;	// currently this uses generic palette handling
+//	UINT8 *  spriteram;	// currently this uses buffered_spriteram in some games
+
+	/* video-related */
+	tilemap  *pf0_tilemap, *pf1_tilemap, *fix_tilemap;
+	//int      scroll1[4];
+	int      scroll2[4];
+	int      pf0_control[0x20], pf1_control[0x20];
+	int      gfx_mask, game_uses_priority;
+
+	/* misc */
+	int      nmi_enable, int_enable;
+	int      i8751_return, i8751_value;
+	int      coin1, coin2, latch, snd;
+	int      msm5205next;
+	int      toggle;
+};
+
 /*----------- defined in video/dec8.c -----------*/
 
-extern UINT8 *dec8_pf0_data,*dec8_pf1_data,*dec8_row;
 
 PALETTE_INIT( ghostb );
 VIDEO_UPDATE( cobracom );

@@ -61,7 +61,6 @@ Added Dip locations according to manual.
 #include "copsnrob.lh"
 
 
-
 /*************************************
  *
  *  Palette generation
@@ -75,23 +74,22 @@ static PALETTE_INIT( copsnrob )
 }
 
 
-
 /*************************************
  *
  *  LEDs
  *
  *************************************/
 
-static UINT8 misc = 0;
-
 static READ8_HANDLER( copsnrob_misc_r )
 {
-	return misc | (input_port_read(space->machine, "IN0") & 0x80);
+	copsnrob_state *state = (copsnrob_state *)space->machine->driver_data;
+	return state->misc | (input_port_read(space->machine, "IN0") & 0x80);
 }
 
 static WRITE8_HANDLER( copsnrob_misc_w )
 {
-	misc = data & 0x7f;
+	copsnrob_state *state = (copsnrob_state *)space->machine->driver_data;
+	state->misc = data & 0x7f;
 	set_led_status(1, ~data & 0x40);
 }
 
@@ -114,13 +112,13 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0500, 0x0503) AM_WRITE(SMH_RAM)
 //  AM_RANGE(0x0504, 0x0507) AM_WRITENOP  // ???
 	AM_RANGE(0x0506, 0x0506) AM_WRITE(copsnrob_led_w)
-	AM_RANGE(0x0600, 0x0600) AM_WRITE(SMH_RAM) AM_BASE(&copsnrob_trucky)
-	AM_RANGE(0x0700, 0x07ff) AM_WRITE(SMH_RAM) AM_BASE(&copsnrob_truckram)
-	AM_RANGE(0x0800, 0x08ff) AM_RAM AM_BASE(&copsnrob_bulletsram)
-	AM_RANGE(0x0900, 0x0903) AM_WRITE(SMH_RAM) AM_BASE(&copsnrob_carimage)
-	AM_RANGE(0x0a00, 0x0a03) AM_WRITE(SMH_RAM) AM_BASE(&copsnrob_cary)
+	AM_RANGE(0x0600, 0x0600) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(copsnrob_state, trucky)
+	AM_RANGE(0x0700, 0x07ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(copsnrob_state, truckram)
+	AM_RANGE(0x0800, 0x08ff) AM_RAM AM_BASE_MEMBER(copsnrob_state, bulletsram)
+	AM_RANGE(0x0900, 0x0903) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(copsnrob_state, carimage)
+	AM_RANGE(0x0a00, 0x0a03) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(copsnrob_state, cary)
 	AM_RANGE(0x0b00, 0x0bff) AM_RAM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_BASE_MEMBER(copsnrob_state, videoram) AM_SIZE(&videoram_size)
 //  AM_RANGE(0x1000, 0x1003) AM_WRITENOP
 //  AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN0")
 	AM_RANGE(0x1000, 0x1000) AM_READ(copsnrob_misc_r)
@@ -141,18 +139,18 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( copsnrob )
-	PORT_START("IN0")		/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_VBLANK )
 
-	PORT_START("IN1")		/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("IN2")		/* IN2 */
+	PORT_START("IN2")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("DSW")		/* DIP1 */
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:!2,!1")
 	PORT_DIPSETTING(    0x03, "1 Coin/1 Player" )
 	PORT_DIPSETTING(    0x02, "1 Coin/2 Players" )
@@ -169,22 +167,22 @@ static INPUT_PORTS_START( copsnrob )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
 
 	/* These input ports are fake */
-	PORT_START("FAKE0")		/* IN3 */
+	PORT_START("FAKE0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 
-	PORT_START("FAKE1")		/* IN4 */
+	PORT_START("FAKE1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
-	PORT_START("FAKE2")		/* IN5 */
+	PORT_START("FAKE2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 
-	PORT_START("FAKE3")		/* IN6 */
+	PORT_START("FAKE3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
@@ -258,11 +256,32 @@ GFXDECODE_END
  *
  *************************************/
 
+static MACHINE_START( copsnrob )
+{
+	copsnrob_state *state = (copsnrob_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->misc);
+}
+
+static MACHINE_RESET( copsnrob )
+{
+	copsnrob_state *state = (copsnrob_state *)machine->driver_data;
+
+	state->misc = 0;
+}
+
+
 static MACHINE_DRIVER_START( copsnrob )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(copsnrob_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,14318180/16)		/* 894886.25 kHz */
 	MDRV_CPU_PROGRAM_MAP(main_map)
+
+	MDRV_MACHINE_START(copsnrob)
+	MDRV_MACHINE_RESET(copsnrob)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -325,4 +344,4 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1976, copsnrob, 0, copsnrob, copsnrob, 0, ROT0, "Atari", "Cops'n Robbers", GAME_NO_SOUND, layout_copsnrob )
+GAMEL( 1976, copsnrob, 0, copsnrob, copsnrob, 0, ROT0, "Atari", "Cops'n Robbers", GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_copsnrob )

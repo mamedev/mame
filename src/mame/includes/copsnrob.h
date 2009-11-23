@@ -4,17 +4,27 @@
 
 *************************************************************************/
 
+typedef struct _copsnrob_state copsnrob_state;
+struct _copsnrob_state
+{
+	/* memory pointers */
+	UINT8 *        videoram;
+	UINT8 *        trucky;
+	UINT8 *        truckram;
+	UINT8 *        bulletsram;
+	UINT8 *        cary;
+	UINT8 *        carimage;
+
+	/* misc */
+	UINT8          misc;
+};
+
+
 /*----------- defined in machine/copsnrob.c -----------*/
 
 READ8_HANDLER( copsnrob_gun_position_r );
 
 
 /*----------- defined in video/copsnrob.c -----------*/
-
-extern UINT8 *copsnrob_bulletsram;
-extern UINT8 *copsnrob_carimage;
-extern UINT8 *copsnrob_cary;
-extern UINT8 *copsnrob_trucky;
-extern UINT8 *copsnrob_truckram;
 
 VIDEO_UPDATE( copsnrob );

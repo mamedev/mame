@@ -85,44 +85,41 @@ TODO:
 #include "cpu/alph8201/alph8201.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "champbas.h"
 
 
-#define CPUTAG_MCU "mcu"
-
-extern UINT8 *champbas_bg_videoram;
-
-extern WRITE8_HANDLER( champbas_bg_videoram_w );
-extern WRITE8_HANDLER( champbas_gfxbank_w );
-extern WRITE8_HANDLER( champbas_palette_bank_w );
-extern WRITE8_HANDLER( champbas_flipscreen_w );
-
-extern PALETTE_INIT( champbas );
-extern PALETTE_INIT( exctsccr );
-extern VIDEO_START( champbas );
-extern VIDEO_START( exctsccr );
-extern VIDEO_UPDATE( champbas );
-extern VIDEO_UPDATE( exctsccr );
-
-
-static int champbas_watchdog_count;
-
+/*************************************
+ *
+ *  Watchdog
+ *
+ *************************************/
 
 static VIDEO_EOF( champbas )
 {
-	champbas_watchdog_count++;
+	champbas_state *state = (champbas_state *)machine->driver_data;
+	state->watchdog_count++;
 
-	if (champbas_watchdog_count == 0x10)
+	if (state->watchdog_count == 0x10)
 		mame_schedule_soft_reset(machine);
 }
 
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
+
 static WRITE8_HANDLER( champbas_watchdog_reset_w )
 {
-	champbas_watchdog_count = 0;
+	champbas_state *state = (champbas_state *)space->machine->driver_data;
+	state->watchdog_count = 0;
 }
 
 static CUSTOM_INPUT( champbas_watchdog_bit2 )
 {
-	return BIT(champbas_watchdog_count,2);
+	champbas_state *state = (champbas_state *)field->port->machine->driver_data;
+	return BIT(state->watchdog_count, 2);
 }
 
 
@@ -135,18 +132,10 @@ static WRITE8_HANDLER( irq_enable_w )
 		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
-
 static TIMER_CALLBACK( exctsccr_fm_callback )
 {
 	cputag_set_input_line_and_vector(machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
-
-static MACHINE_START( exctsccr )
-{
-	// FIXME
-	timer_pulse(machine, ATTOTIME_IN_HZ(75), NULL, 0, exctsccr_fm_callback); /* updates fm */
-}
-
 
 // Champion Baseball has only one DAC
 static WRITE8_DEVICE_HANDLER( champbas_dac_w )
@@ -155,9 +144,11 @@ static WRITE8_DEVICE_HANDLER( champbas_dac_w )
 }
 
 
-///////////////////////////////////////////////////////////////////////////
-// protection handling
-///////////////////////////////////////////////////////////////////////////
+/*************************************
+ *
+ *  Protection handling
+ *
+ *************************************/
 
 static WRITE8_HANDLER( champbas_mcu_switch_w )
 {
@@ -167,14 +158,14 @@ static WRITE8_HANDLER( champbas_mcu_switch_w )
 
 static WRITE8_HANDLER( champbas_mcu_halt_w )
 {
-	const device_config *cpu = cputag_get_cpu(space->machine, CPUTAG_MCU);
+	champbas_state *state = (champbas_state *)space->machine->driver_data;
 
 	// MCU not present/not used in champbas
-	if (cpu == NULL)
+	if (state->mcu == NULL)
 		return;
 
 	data &= 1;
-	cpu_set_input_line(cpu, INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(state->mcu, INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -182,41 +173,50 @@ static WRITE8_HANDLER( champbas_mcu_halt_w )
 static READ8_HANDLER( champbja_alt_protection_r )
 {
 	UINT8 data = 0;
-/*
-(68BA) & 0x99 == 0x00
-(6867) & 0x99 == 0x99
-(68AB) & 0x80 == 0x80
-(6854) & 0x99 == 0x19
+	/*
+    (68BA) & 0x99 == 0x00
+    (6867) & 0x99 == 0x99
+    (68AB) & 0x80 == 0x80
+    (6854) & 0x99 == 0x19
 
-BA 1011_1010
-00 0--0_0--0
+    BA 1011_1010
+    00 0--0_0--0
 
-54 0101_0100
-19 0--1_1--1
+    54 0101_0100
+    19 0--1_1--1
 
-67 0110_0111
-99 1--1_1--1
+    67 0110_0111
+    99 1--1_1--1
 
-AB 1010_1011
-80 1--0_0--0
-*/
+    AB 1010_1011
+    80 1--0_0--0
+    */
+
 	/* bit7 =  bit0 */
-	if(  (offset&0x01) ) data |= 0x80;
+	if ((offset & 0x01)) 
+		data |= 0x80;
+
 	/* bit4,3,0 =  bit6 */
-	if(  (offset&0x40) ) data |= 0x19;
+	if ((offset & 0x40)) 
+		data |= 0x19;
 
 	return data;
 }
 
 
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( talbot_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1) /* MCU shared RAM */
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(&champbas_bg_videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE_MEMBER(champbas_state, bg_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_MEMBER(champbas_state, spriteram) AM_SIZE(&spriteram_size)
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
@@ -232,7 +232,7 @@ static ADDRESS_MAP_START( talbot_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(champbas_mcu_switch_w)
 
-	AM_RANGE(0xa060, 0xa06f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0xa060, 0xa06f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(champbas_state, spriteram_2)
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(champbas_watchdog_reset_w)
 ADDRESS_MAP_END
 
@@ -242,9 +242,9 @@ static ADDRESS_MAP_START( champbas_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x7800, 0x7fff) AM_ROM	// champbb2 only
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(&champbas_bg_videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE_MEMBER(champbas_state, bg_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_MEMBER(champbas_state, spriteram) AM_SIZE(&spriteram_size)
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
@@ -260,7 +260,7 @@ static ADDRESS_MAP_START( champbas_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)	// MCU not present/not used in champbas
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(champbas_mcu_switch_w)	// MCU not present/not used in champbas
 
-	AM_RANGE(0xa060, 0xa06f) AM_RAM AM_BASE(&spriteram_2)
+	AM_RANGE(0xa060, 0xa06f) AM_RAM AM_BASE_MEMBER(champbas_state, spriteram_2)
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_w)
 /*  AM_RANGE(0xa0a0, 0xa0a0)    ???? */
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(champbas_watchdog_reset_w)
@@ -274,8 +274,8 @@ static ADDRESS_MAP_START( exctsccb_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1) // MCU not used (though it's present on the board)
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 //  AM_RANGE(0x7800, 0x7fff) AM_ROM // champbb2 only
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(&champbas_bg_videoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE(&spriteram_2) /* ??? */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE_MEMBER(champbas_state, bg_videoram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE_MEMBER(champbas_state, spriteram_2) /* ??? */
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
@@ -289,7 +289,7 @@ static ADDRESS_MAP_START( exctsccb_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa006, 0xa006) AM_WRITENOP	/* MCU is not used, but some leftover code still writes here */
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP	/* MCU is not used, but some leftover code still writes here */
 
-	AM_RANGE(0xa040, 0xa06f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) /* Sprite Pos */
+	AM_RANGE(0xa040, 0xa06f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(champbas_state, spriteram) /* Sprite Pos */
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
@@ -299,8 +299,8 @@ static ADDRESS_MAP_START( exctsccr_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(&champbas_bg_videoram)
-	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_BASE(&spriteram_2) /* ??? */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE_MEMBER(champbas_state, bg_videoram)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_BASE_MEMBER(champbas_state, spriteram_2) /* ??? */
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
@@ -314,7 +314,7 @@ static ADDRESS_MAP_START( exctsccr_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP /* This is also MCU control, but i dont need it */
 
-	AM_RANGE(0xa040, 0xa06f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) /* Sprite pos */
+	AM_RANGE(0xa040, 0xa06f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(champbas_state, spriteram) /* Sprite pos */
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
@@ -355,6 +355,11 @@ static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( talbot )
 	PORT_START("P1")
@@ -470,6 +475,11 @@ static INPUT_PORTS_START( exctsccr )
 INPUT_PORTS_END
 
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 static const gfx_layout charlayout =
 {
@@ -545,12 +555,47 @@ static GFXDECODE_START( exctsccr )
 GFXDECODE_END
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( champbas )
+{
+	champbas_state *state = (champbas_state *)machine->driver_data;
+
+	state->mcu = cputag_get_cpu(machine, CPUTAG_MCU);
+
+	state_save_register_global(machine, state->watchdog_count);
+	state_save_register_global(machine, state->palette_bank);
+	state_save_register_global(machine, state->gfx_bank);
+}
+
+static MACHINE_START( exctsccr )
+{
+	// FIXME
+	timer_pulse(machine, ATTOTIME_IN_HZ(75), NULL, 0, exctsccr_fm_callback); /* updates fm */
+
+	MACHINE_START_CALL(champbas);
+}
+
+
+static MACHINE_RESET( champbas )
+{
+	champbas_state *state = (champbas_state *)machine->driver_data;
+
+	state->palette_bank = 0;
+	state->gfx_bank = 0;	// talbot has only 1 bank
+}
 
 
 static MACHINE_DRIVER_START( talbot )
 
-	/* basic machine hardware */
+	/* driver data */
+	MDRV_DRIVER_DATA(champbas_state)
 
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MDRV_CPU_PROGRAM_MAP(talbot_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
@@ -558,6 +603,9 @@ static MACHINE_DRIVER_START( talbot )
 	/* MCU */
 	MDRV_CPU_ADD(CPUTAG_MCU, ALPHA8201, XTAL_18_432MHz/6/8)
 	MDRV_CPU_PROGRAM_MAP(mcu_map)
+
+	MDRV_MACHINE_START(champbas)
+	MDRV_MACHINE_RESET(champbas)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -582,8 +630,11 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( champbas )
-	/* basic machine hardware */
 
+	/* driver data */
+	MDRV_DRIVER_DATA(champbas_state)
+
+	/* basic machine hardware */
 	/* main cpu */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MDRV_CPU_PROGRAM_MAP(champbas_main_map)
@@ -591,6 +642,9 @@ static MACHINE_DRIVER_START( champbas )
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
 	MDRV_CPU_PROGRAM_MAP(champbas_sub_map)
+
+	MDRV_MACHINE_START(champbas)
+	MDRV_MACHINE_RESET(champbas)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -633,6 +687,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( exctsccr )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(champbas_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6 )
 	MDRV_CPU_PROGRAM_MAP(exctsccr_main_map)
@@ -648,6 +705,7 @@ static MACHINE_DRIVER_START( exctsccr )
 	MDRV_CPU_PROGRAM_MAP(mcu_map)
 
 	MDRV_MACHINE_START(exctsccr)
+	MDRV_MACHINE_RESET(champbas)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -690,6 +748,9 @@ MACHINE_DRIVER_END
 /* Bootleg running on a modified Champion Baseball board */
 static MACHINE_DRIVER_START( exctsccb )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(champbas_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MDRV_CPU_PROGRAM_MAP(exctsccb_main_map)
@@ -697,6 +758,9 @@ static MACHINE_DRIVER_START( exctsccb )
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
 	MDRV_CPU_PROGRAM_MAP(champbas_sub_map)
+
+	MDRV_MACHINE_START(champbas)
+	MDRV_MACHINE_RESET(champbas)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -724,6 +788,12 @@ static MACHINE_DRIVER_START( exctsccb )
 MACHINE_DRIVER_END
 
 
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( talbot )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1041,6 +1111,11 @@ ROM_START( exctscc2 )
 ROM_END
 
 
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
 
 static DRIVER_INIT(champbas)
 {
@@ -1088,17 +1163,22 @@ static DRIVER_INIT( exctsccr )
 }
 
 
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
 
-GAME( 1982, talbot,   0,        talbot,   talbot,   0,        ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", 0 )
+GAME( 1982, talbot,     0,        talbot,   talbot,   0,        ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", GAME_SUPPORTS_SAVE )
 
-GAME( 1983, champbas,  0,        champbas, champbas, champbas, ROT0,   "[Alpha Denshi Co.] (Sega license)", "Champion Base Ball", 0 )
-GAME( 1983, champbasj, champbas, champmcu, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 1)", 0 )
-GAME( 1983, champbasja,champbas, champbas, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 2)", 0 )
-GAME( 1983, champbb2,  0,        champmcu, champbas, champbas, ROT0,   "[Alpha Denshi Co.] (Sega license)", "Champion Base Ball Part-2: Pair Play (set 1)", 0 )
-GAME( 1983, champbb2a, champbb2, champmcu, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Baseball II (set 2)", GAME_NOT_WORKING)	// no dump
+GAME( 1983, champbas,   0,        champbas, champbas, champbas, ROT0,   "[Alpha Denshi Co.] (Sega license)", "Champion Base Ball", GAME_SUPPORTS_SAVE )
+GAME( 1983, champbasj,  champbas, champmcu, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1983, champbasja, champbas, champbas, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1983, champbb2,   0,        champmcu, champbas, champbas, ROT0,   "[Alpha Denshi Co.] (Sega license)", "Champion Base Ball Part-2: Pair Play (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1983, champbb2a,  champbb2, champmcu, champbas, champbas, ROT0,   "Alpha Denshi Co.", "Champion Baseball II (set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )	// no dump
 
-GAME( 1983, exctsccr,  0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", 0 )
-GAME( 1983, exctsccra, exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", 0 )
-GAME( 1983, exctsccrj, exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan)", 0 )
-GAME( 1983, exctsccrb, exctsccr, exctsccb, exctsccr, exctsccr, ROT270, "bootleg",          "Exciting Soccer (bootleg)", 0 )
-GAME( 1984, exctscc2,  0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", 0 )
+GAME( 1983, exctsccr,   0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", GAME_SUPPORTS_SAVE )
+GAME( 1983, exctsccra,  exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", GAME_SUPPORTS_SAVE )
+GAME( 1983, exctsccrj,  exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1983, exctsccrb,  exctsccr, exctsccb, exctsccr, exctsccr, ROT270, "bootleg",          "Exciting Soccer (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1984, exctscc2,   0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", GAME_SUPPORTS_SAVE )

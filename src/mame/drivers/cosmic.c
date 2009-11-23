@@ -42,358 +42,316 @@ forcing all sprites on a row to have an added blue component.
 #include "cpu/z80/z80.h"
 #include "sound/samples.h"
 #include "sound/dac.h"
-
-#define COSMICG_MASTER_CLOCK (XTAL_9_828MHz)
-#define Z80_MASTER_CLOCK (XTAL_10_816MHz)
-
-PALETTE_INIT( panic );
-PALETTE_INIT( cosmica );
-PALETTE_INIT( cosmicg );
-PALETTE_INIT( magspot );
-PALETTE_INIT( nomnlnd );
-VIDEO_UPDATE( panic );
-VIDEO_UPDATE( magspot );
-VIDEO_UPDATE( devzone );
-VIDEO_UPDATE( cosmica );
-VIDEO_UPDATE( cosmicg );
-VIDEO_UPDATE( nomnlnd );
-WRITE8_HANDLER( cosmic_color_register_w );
-WRITE8_HANDLER( cosmic_background_enable_w );
-
-
-static UINT32 pixel_clock;
-static int sound_enabled;
-static int march_select;
-static int gun_die_select;
-static int dive_bomb_b_select;
-
+#include "cosmic.h"
 
 
 /* Schematics show 12 triggers for discrete sound circuits */
 
 static WRITE8_HANDLER( panic_sound_output_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	cosmic_state *state = (cosmic_state *)space->machine->driver_data;
 
-    /* Sound Enable / Disable */
+	/* Sound Enable / Disable */
+	if (offset == 11)
+	{
+		int count;
+		if (data == 0)
+			for (count = 0; count < 9; count++) 
+				sample_stop(state->samples, count);
 
-    if (offset == 11)
-    {
-    	int count;
-    	if (data == 0)
-        	for(count=0; count<9; count++) sample_stop(samples, count);
+		state->sound_enabled = data;
+	}
 
-    	sound_enabled = data;
-    }
+	if (state->sound_enabled)
+	{
+		switch (offset)
+		{
+		case 0:	if (data) sample_start(state->samples, 0, 0, 0); break;  	/* Walk */
+		case 1:	if (data) sample_start(state->samples, 0, 5, 0); break;  	/* Enemy Die 1 */
+		case 2:	if (data)								 	/* Drop 1 */
+				{
+					if (!sample_playing(state->samples, 1))
+					{
+						sample_stop(state->samples, 2);
+						sample_start(state->samples, 1, 3, 0);
+					}
+				}
+				else
+					sample_stop(state->samples, 1);
+				break;
 
-    if (sound_enabled)
-    {
-        switch (offset)
-        {
-		case 0:  if (data) sample_start(samples, 0, 0, 0); break;  	/* Walk */
-        case 1:  if (data) sample_start(samples, 0, 5, 0); break;  	/* Enemy Die 1 */
-        case 2:  if (data)								  	/* Drop 1 */
-				 {
-					 if (!sample_playing(samples, 1))
-					 {
-						 sample_stop(samples, 2);
-						 sample_start(samples, 1, 3, 0);
-					 }
-				 }
-				 else
-				 	sample_stop(samples, 1);
-				 	break;
+		case 3:	if (data && !sample_playing(state->samples, 6))			/* Oxygen */
+					sample_start(state->samples, 6, 9, 1);
+				break;
 
-		case 3:	 if (data && !sample_playing(samples, 6))			/* Oxygen */
-					sample_start(samples, 6, 9, 1);
-                 break;
+		case 4:	break;										/* Drop 2 */
+		case 5:	if (data) sample_start(state->samples, 0, 5, 0); break;	/* Enemy Die 2 (use same sample as 1) */
+		case 6:	if (data && !sample_playing(state->samples, 1) && !sample_playing(state->samples, 3))   /* Hang */
+					sample_start(state->samples, 2, 2, 0);
+				break;
 
-        case 4:  break;										/* Drop 2 */
-        case 5:  if (data) sample_start(samples, 0, 5, 0); break;	/* Enemy Die 2 (use same sample as 1) */
-        case 6:  if (data && !sample_playing(samples, 1) && !sample_playing(samples, 3))   /* Hang */
-                 	sample_start(samples, 2, 2, 0);
-                    break;
+		case 7:	if (data) 									/* Escape */
+				{
+					sample_stop(state->samples, 2);
+					sample_start(state->samples, 3, 4, 0);
+				}
+				else
+					sample_stop(state->samples, 3);
+				break;
 
-		case 7:  if (data) 									/* Escape */
-				 {
-					 sample_stop(samples, 2);
-					 sample_start(samples, 3, 4, 0);
-				 }
-				 else
-				 	 sample_stop(samples, 3);
-                     break;
+		case 8:	if (data) sample_start(state->samples, 0, 1, 0); break;	/* Stairs */
+		case 9:	if (data)									/* Extend */
+					sample_start(state->samples, 4, 8, 0);
+				else
+					sample_stop(state->samples, 4);
+				break;
 
-    	case 8:  if (data) sample_start(samples, 0, 1, 0); break;	/* Stairs */
-    	case 9:  if (data)									/* Extend */
-				 	sample_start(samples, 4, 8, 0);
-				 else
-					sample_stop(samples, 4);
-	  			 break;
+		case 10:	dac_data_w(state->dac, data); break;/* Bonus */
+		case 15:	if (data) sample_start(state->samples, 0, 6, 0); break;	/* Player Die */
+		case 16:	if (data) sample_start(state->samples, 5, 7, 0); break;	/* Enemy Laugh */
+		case 17:	if (data) sample_start(state->samples, 0, 10, 0); break;	/* Coin - Not triggered by software */
+		}
+	}
 
-        case 10: dac_data_w(devtag_get_device(space->machine, "dac"), data); break;/* Bonus */
-		case 15: if (data) sample_start(samples, 0, 6, 0); break;	/* Player Die */
-		case 16: if (data) sample_start(samples, 5, 7, 0); break;	/* Enemy Laugh */
-        case 17: if (data) sample_start(samples, 0, 10, 0); break;	/* Coin - Not triggered by software */
-        }
-    }
-
-    #ifdef MAME_DEBUG
- 	logerror("Sound output %x=%x\n",offset,data);
+	#ifdef MAME_DEBUG
+ 	logerror("Sound output %x=%x\n", offset, data);
 	#endif
 }
 
 static WRITE8_HANDLER( panic_sound_output2_w )
 {
-	panic_sound_output_w(space, offset+15, data);
+	panic_sound_output_w(space, offset + 15, data);
 }
 
 static WRITE8_HANDLER( cosmicg_output_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	cosmic_state *state = (cosmic_state *)space->machine->driver_data;
 
-    /* Sound Enable / Disable */
+	/* Sound Enable / Disable */
+	if (offset == 12)
+	{
+		int count;
 
-    if (offset == 12)
-    {
-	    int count;
+		state->sound_enabled = data;
+		if (data == 0)
+			for (count = 0; count < 9; count++) 
+				sample_stop(state->samples, count);
+	}
 
-    	sound_enabled = data;
-    	if (data == 0)
-        	for(count=0;count<9;count++) sample_stop(samples, count);
-    }
-
-    if (sound_enabled)
-    {
-        switch (offset)
-        {
+	if (state->sound_enabled)
+	{
+		switch (offset)
+		{
 		/* The schematics show a direct link to the sound amp  */
 		/* as other cosmic series games, but it never seems to */
 		/* be used for anything. It is implemented for sake of */
 		/* completness. Maybe it plays a tune if you win ?     */
-		case 1:  dac_data_w(devtag_get_device(space->machine, "dac"), -data); break;
-		case 2:  if (data) sample_start (samples, 0, march_select, 0); break;	/* March Sound */
-		case 3:  march_select = (march_select & 0xfe) | data; break;
-        case 4:  march_select = (march_select & 0xfd) | (data << 1); break;
-        case 5:  march_select = (march_select & 0xfb) | (data << 2); break;
+		case 1:	dac_data_w(state->dac, -data); break;
+		case 2:	if (data) sample_start(state->samples, 0, state->march_select, 0); break;	/* March Sound */
+		case 3:	state->march_select = (state->march_select & 0xfe) | data; break;
+		case 4:	state->march_select = (state->march_select & 0xfd) | (data << 1); break;
+		case 5:	state->march_select = (state->march_select & 0xfb) | (data << 2); break;
 
-        case 6:  if (data)  							/* Killer Attack (crawly thing at bottom of screen) */
-					sample_start(samples, 1, 8, 1);
-				 else
-					sample_stop(samples, 1);
-				 break;
+		case 6:	if (data)  							/* Killer Attack (crawly thing at bottom of screen) */
+					sample_start(state->samples, 1, 8, 1);
+				else
+					sample_stop(state->samples, 1);
+				break;
 
-		case 7:  if (data)								/* Bonus Chance & Got Bonus */
-				 {
-					 sample_stop(samples, 4);
-					 sample_start(samples, 4, 10, 0);
-				 }
-				 break;
+		case 7:	if (data)								/* Bonus Chance & Got Bonus */
+				{
+					sample_stop(state->samples, 4);
+					sample_start(state->samples, 4, 10, 0);
+				}
+				break;
 
-		case 8:  if (data)
-				 {
-					 if (!sample_playing(samples, 4)) sample_start(samples, 4, 9, 1);
-				 }
-				 else
-				 	sample_stop(samples, 4);
-				 break;
+		case 8:	if (data)
+				{
+					if (!sample_playing(state->samples, 4)) sample_start(state->samples, 4, 9, 1);
+				}
+				else
+					sample_stop(state->samples, 4);
+				break;
 
-		case 9:  if (data) sample_start(samples, 3, 11, 0); break;	/* Got Ship */
+		case 9:	if (data) sample_start(state->samples, 3, 11, 0); break;	/* Got Ship */
 //      case 11: watchdog_reset_w(0, 0); break;             /* Watchdog */
-		case 13: if (data) sample_start(samples, 8, 13-gun_die_select, 0); break;  /* Got Monster / Gunshot */
-		case 14: gun_die_select = data; break;
-		case 15: if (data) sample_start(samples, 5, 14, 0); break;	/* Coin Extend (extra base) */
-        }
-    }
+		case 13:	if (data) sample_start(state->samples, 8, 13 - state->gun_die_select, 0); break;  /* Got Monster / Gunshot */
+		case 14:	state->gun_die_select = data; break;
+		case 15:	if (data) sample_start(state->samples, 5, 14, 0); break;	/* Coin Extend (extra base) */
+		}
+	}
 
 	#ifdef MAME_DEBUG
- 	if (offset != 11) logerror("Output %x=%x\n",offset,data);
-    #endif
+ 	if (offset != 11) logerror("Output %x=%x\n", offset, data);
+	#endif
 }
 
 
 static WRITE8_HANDLER( cosmica_sound_output_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
+	cosmic_state *state = (cosmic_state *)space->machine->driver_data;
 
-    /* Sound Enable / Disable */
-    if (offset == 11)
-    {
-    	int count;
-    	if (data == 0)
-        	for(count=0; count<12; count++) sample_stop(samples, count);
-	else
+	/* Sound Enable / Disable */
+	if (offset == 11)
 	{
-	  sample_start(samples, 0, 0, 1); /*Background Noise*/
+		int count;
+		if (data == 0)
+			for (count = 0; count < 12; count++) 
+				sample_stop(state->samples, count);
+		else
+		{
+			sample_start(state->samples, 0, 0, 1); /*Background Noise*/
+		}
+
+		state->sound_enabled = data;
 	}
 
-    	sound_enabled = data;
-    }
-
-    if (sound_enabled)
-    {
-        switch (offset)
-        {
-		case 0: if (data) sample_start(samples, 1, 2, 0); break; /*Dive Bombing Type A*/
+	if (state->sound_enabled)
+	{
+		switch (offset)
+		{
+		case 0:	if (data) sample_start(state->samples, 1, 2, 0); break; /*Dive Bombing Type A*/
 
 		case 2:	/*Dive Bombing Type B (Main Control)*/
-
-
 			if (data)
 			{
-
-			  switch(dive_bomb_b_select)
-			  {
-
-			    case 2:
-
-					if (sample_playing(samples, 2))
+				switch (state->dive_bomb_b_select)
+				{
+				case 2:
+					if (sample_playing(state->samples, 2))
 					{
-					  sample_stop(samples, 2);
-	   				  sample_start(samples, 2, 3, 0); break;
+						sample_stop(state->samples, 2);
+		 				sample_start(state->samples, 2, 3, 0); break;
 					}
 					else
- 		    			 sample_start(samples, 2, 3, 0); break;
+ 						sample_start(state->samples, 2, 3, 0); break;
 
-
-			    case 3:
-
-					if (sample_playing(samples, 3))
+				case 3:
+					if (sample_playing(state->samples, 3))
 					{
-					  sample_stop(samples, 3);
-	   				  sample_start(samples, 3, 4, 0); break;
+						sample_stop(state->samples, 3);
+		 				sample_start(state->samples, 3, 4, 0); break;
 					}
 					else
- 		    			 sample_start(samples, 3, 4, 0); break;
+ 						sample_start(state->samples, 3, 4, 0); break;
 
-
-			    case 4:
-					if (sample_playing(samples, 4))
+				case 4:
+					if (sample_playing(state->samples, 4))
 					{
-					  sample_stop(samples, 4);
-	   				  sample_start(samples, 4, 5, 0); break;
+						sample_stop(state->samples, 4);
+	 					sample_start(state->samples, 4, 5, 0); break;
 					}
 					else
-	 	    			 sample_start(samples, 4, 5, 0); break;
+						sample_start(state->samples, 4, 5, 0); break;
 
-
-
-			    case 5:
-					if (sample_playing(samples, 5))
+				case 5:
+					if (sample_playing(state->samples, 5))
 					{
-					  sample_stop(samples, 5);
-	   				  sample_start(samples, 5, 6, 0); break;
+						sample_stop(state->samples, 5);
+	 					sample_start(state->samples, 5, 6, 0); break;
 					}
 					else
- 		    			 sample_start(samples, 5, 6, 0); break;
+ 						sample_start(state->samples, 5, 6, 0); break;
 
-
-			    case 6:
-					if (sample_playing(samples, 6))
+				case 6:
+					if (sample_playing(state->samples, 6))
 					{
-					  sample_stop(samples, 6);
-	   				  sample_start(samples, 6, 7, 0); break;
+						sample_stop(state->samples, 6);
+	 					sample_start(state->samples, 6, 7, 0); break;
 					}
 					else
- 		    			 sample_start(samples, 6, 7, 0); break;
+ 						sample_start(state->samples, 6, 7, 0); break;
 
-			    case 7:
-
-					if (sample_playing(samples, 7))
+				case 7:
+					if (sample_playing(state->samples, 7))
 					{
-					  sample_stop(samples, 7);
-	   				  sample_start(samples, 7, 8, 0); break;
+						sample_stop(state->samples, 7);
+	 					sample_start(state->samples, 7, 8, 0); break;
 					}
 					else
- 		    			 sample_start(samples, 7, 8, 0); break;
-			  }
+ 						sample_start(state->samples, 7, 8, 0); break;
+			}
 			}
 
 		case 3: /*Dive Bombing Type B (G.S.B)*/
-
 			if (data)
-			  dive_bomb_b_select |= 0x04;
+				state->dive_bomb_b_select |= 0x04;
 			else
-			  dive_bomb_b_select &= 0xFB;
+				state->dive_bomb_b_select &= 0xfb;
 			break;
 
 
 		case 4: /*Dive Bombing Type B (M.S.B)*/
 			if (data)
-			  dive_bomb_b_select |= 0x02;
+				state->dive_bomb_b_select |= 0x02;
 			else
-			  dive_bomb_b_select &= 0xFD;
-
+				state->dive_bomb_b_select &= 0xfd;
 			break;
 
 		case 5: /*Dive Bombing Type B (L.S.B)*/
-
-
 			if (data)
-			  dive_bomb_b_select |= 0x01;
+				state->dive_bomb_b_select |= 0x01;
 			else
-			  dive_bomb_b_select &= 0xFE;
+				state->dive_bomb_b_select &= 0xfe;
 			break;
 
 
-		case 6: if (data) sample_start(samples, 8, 9, 0); break; /*Fire Control*/
+		case 6:	if (data) sample_start(state->samples, 8, 9, 0); break; /*Fire Control*/
 
-		case 7: if (data) sample_start(samples, 9, 10, 0); break; /*Small Explosion*/
+		case 7:	if (data) sample_start(state->samples, 9, 10, 0); break; /*Small Explosion*/
 
-		case 8: if (data) sample_start(samples, 10, 11, 0); break; /*Loud Explosion*/
+		case 8:	if (data) sample_start(state->samples, 10, 11, 0); break; /*Loud Explosion*/
 
 		case 9:
-		 if (data)
-		  sample_start(samples, 11, 1, 1);
-		else
-		 sample_stop(samples, 11);
+			if (data)
+				sample_start(state->samples, 11, 1, 1);
+			else
+				sample_stop(state->samples, 11);
+			break; /*Extend Sound control*/
 
-		break; /*Extend Sound control*/
+		case 12:	if (data) sample_start(state->samples, 11,12, 0); break; /*Insert Coin*/
+		}
+	}
 
-		case 12:
-		 if (data) sample_start(samples, 11,12, 0); break; /*Insert Coin*/
-        }
-    }
-
-    #ifdef MAME_DEBUG
- 	logerror("Sound output %x=%x\n",offset,data);
+	#ifdef MAME_DEBUG
+ 	logerror("Sound output %x=%x\n", offset, data);
 	#endif
 }
-
-
 
 
 static INTERRUPT_GEN( panic_interrupt )
 {
 	if (cpu_getiloops(device) != 0)
 	{
-    	/* Coin insert - Trigger Sample */
+		/* Coin insert - Trigger Sample */
 
-        /* mostly not noticed since sound is */
+		/* mostly not noticed since sound is */
 		/* only enabled if game in progress! */
 
-    	if ((input_port_read(device->machine, "SYSTEM") & 0xc0) != 0xc0)
-        	panic_sound_output_w(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 17, 1);
+		if ((input_port_read(device->machine, "SYSTEM") & 0xc0) != 0xc0)
+			panic_sound_output_w(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 17, 1);
 
 		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
-    }
-    else
-        cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h */
+	}
+	else
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h */
 }
 
 static INTERRUPT_GEN( cosmica_interrupt )
 {
-    pixel_clock = (pixel_clock + 2) & 0x3f;
+	cosmic_state *state = (cosmic_state *)device->machine->driver_data;
+	state->pixel_clock = (state->pixel_clock + 2) & 0x3f;
 
-    if (pixel_clock == 0)
-    {
+	if (state->pixel_clock == 0)
+	{
 		if (input_port_read(device->machine, "FAKE") & 1)	/* Left Coin */
 			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-    }
+	}
 }
 
 static INTERRUPT_GEN( cosmicg_interrupt )
 {
-    /* Insert Coin */
+	/* Insert Coin */
 
 	/* R Nabet : fixed to make this piece of code sensible.
     I assumed that the interrupt request lasted for as long as the coin was "sensed".
@@ -424,16 +382,15 @@ static INTERRUPT_GEN( nomnlnd_interrupt )
 }
 
 
-
 static READ8_HANDLER( cosmica_pixel_clock_r )
 {
-	return pixel_clock;
+	cosmic_state *state = (cosmic_state *)space->machine->driver_data;
+	return state->pixel_clock;
 }
 
 static READ8_HANDLER( cosmicg_port_0_r )
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
-
 	return (input_port_read(space->machine, "IN0") & 0xf0) | ((video_screen_get_vpos(space->machine->primary_screen) & 0xf0) >> 4);
 }
 
@@ -447,40 +404,33 @@ static READ8_HANDLER( magspot_coinage_dip_r )
 
 static READ8_HANDLER( nomnlnd_port_0_1_r )
 {
-	int control;
-    int fire = input_port_read(space->machine, "IN3");
+	int control = input_port_read(space->machine, offset ? "IN1" : "IN0");
+	int fire = input_port_read(space->machine, "IN3");
 
-	if (offset)
-		control = input_port_read(space->machine, "IN1");
-    else
-		control = input_port_read(space->machine, "IN0");
+	/* If firing - stop tank */
+	if ((fire & 0xc0) == 0) return 0xff;
 
-    /* If firing - stop tank */
+	/* set bit according to 8 way direction */
+	if ((control & 0x82) == 0 ) return 0xfe;	/* Up & Left */
+	if ((control & 0x0a) == 0 ) return 0xfb;	/* Down & Left */
+	if ((control & 0x28) == 0 ) return 0xef;	/* Down & Right */
+	if ((control & 0xa0) == 0 ) return 0xbf;	/* Up & Right */
 
-    if ((fire & 0xc0) == 0) return 0xff;
-
-    /* set bit according to 8 way direction */
-
-    if ((control & 0x82) == 0 ) return 0xfe;    /* Up & Left */
-    if ((control & 0x0a) == 0 ) return 0xfb;    /* Down & Left */
-    if ((control & 0x28) == 0 ) return 0xef;    /* Down & Right */
-    if ((control & 0xa0) == 0 ) return 0xbf;    /* Up & Right */
-
-    return control;
+	return control;
 }
 
 
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(space->machine, data&0x80);
+	flip_screen_set(space->machine, data & 0x80);
 }
 
 
 static ADDRESS_MAP_START( panic_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x6000, 0x601f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(cosmic_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x6000, 0x601f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(cosmic_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("P1")
 	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("P2")
 	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")
@@ -494,8 +444,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmica_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x6000, 0x601f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(cosmic_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x6000, 0x601f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(cosmic_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("P1")
 	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("P2")
 	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")
@@ -508,7 +458,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(cosmic_state, videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicg_io_map, ADDRESS_SPACE_IO, 8 )
@@ -522,7 +472,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( magspot_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3800, 0x3807) AM_READ(magspot_coinage_dip_r)
-	AM_RANGE(0x4000, 0x401f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x4000, 0x401f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(cosmic_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x4800, 0x4800) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0x480c, 0x480d) AM_WRITE(cosmic_color_register_w)
 	AM_RANGE(0x480f, 0x480f) AM_WRITE(flip_screen_w)
@@ -530,7 +480,7 @@ static ADDRESS_MAP_START( magspot_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
 	AM_RANGE(0x5002, 0x5002) AM_READ_PORT("IN2")
 	AM_RANGE(0x5003, 0x5003) AM_READ_PORT("IN3")
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE_MEMBER(cosmic_state, videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
 
@@ -1023,16 +973,16 @@ static const char *const panic_sample_names[] =
 {
 	"*panic",
 	"walk.wav",
-    "upordown.wav",
-    "trapped.wav",
-    "falling.wav",
-    "escaping.wav",
+	"upordown.wav",
+	"trapped.wav",
+	"falling.wav",
+	"escaping.wav",
 	"ekilled.wav",
-    "death.wav",
-    "elaugh.wav",
-    "extral.wav",
-    "oxygen.wav",
-    "coin.wav",
+	"death.wav",
+	"elaugh.wav",
+	"extral.wav",
+	"oxygen.wav",
+	"coin.wav",
 	0
 };
 
@@ -1070,10 +1020,45 @@ static const samples_interface cosmicg_samples_interface =
 };
 
 
+static MACHINE_START( cosmic )
+{
+	cosmic_state *state = (cosmic_state *)machine->driver_data;
+
+	state->samples = devtag_get_device(machine, "samples");
+	state->dac = devtag_get_device(machine, "dac");
+
+	state_save_register_global(machine, state->sound_enabled);
+	state_save_register_global(machine, state->march_select);
+	state_save_register_global(machine, state->gun_die_select);
+	state_save_register_global(machine, state->dive_bomb_b_select);
+	state_save_register_global(machine, state->pixel_clock);
+
+	state_save_register_global(machine, state->background_enable);
+	state_save_register_global_array(machine, state->color_registers);
+}
+
+static MACHINE_RESET( cosmic )
+{
+	cosmic_state *state = (cosmic_state *)machine->driver_data;
+
+	state->pixel_clock = 0;
+	state->background_enable = 0;
+	state->color_registers[0] = 0;
+	state->color_registers[1] = 0;
+	state->color_registers[2] = 0;
+}
+
+
 static MACHINE_DRIVER_START( cosmic )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(cosmic_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,Z80_MASTER_CLOCK/6)	/* 1.8026 MHz*/
+
+	MDRV_MACHINE_START(cosmic)
+	MDRV_MACHINE_RESET(cosmic)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1143,6 +1128,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cosmicg )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(cosmic_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS9980, COSMICG_MASTER_CLOCK/8)
 			/* 9.828 MHz Crystal */
@@ -1153,6 +1141,9 @@ static MACHINE_DRIVER_START( cosmicg )
 	MDRV_CPU_IO_MAP(cosmicg_io_map)
 	MDRV_CPU_VBLANK_INT("screen", cosmicg_interrupt)
 
+	MDRV_MACHINE_START(cosmic)
+	MDRV_MACHINE_RESET(cosmic)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -1160,7 +1151,7 @@ static MACHINE_DRIVER_START( cosmicg )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 
-    MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_PALETTE_INIT(cosmicg)
 	MDRV_VIDEO_UPDATE(cosmicg)
@@ -1578,33 +1569,34 @@ ROM_END
 static DRIVER_INIT( cosmicg )
 {
 	/* Program ROMs have data pins connected different from normal */
-
+	cosmic_state *state = (cosmic_state *)machine->driver_data;
 	offs_t offs, len;
 	UINT8 *rom;
+	len = memory_region_length(machine, "maincpu");
+	rom = memory_region(machine, "maincpu");
+	for (offs = 0; offs < len; offs++)
+	{
+		UINT8 scrambled = rom[offs];
 
-	sound_enabled = 0;
-	march_select = 0;
-	gun_die_select = 0;
-    len = memory_region_length(machine, "maincpu");
-    rom = memory_region(machine, "maincpu");
-    for (offs =0; offs < len; offs++)
-    {
-        UINT8 scrambled = rom[offs];
+		UINT8 normal = (scrambled >> 3 & 0x11)
+					  | (scrambled >> 1 & 0x22)
+					  | (scrambled << 1 & 0x44)
+					  | (scrambled << 3 & 0x88);
 
-        UINT8 normal = (scrambled >> 3 & 0x11)
-                       | (scrambled >> 1 & 0x22)
-                       | (scrambled << 1 & 0x44)
-                       | (scrambled << 3 & 0x88);
+		rom[offs] = normal;
+	}
 
-        rom[offs] = normal;
-    }
+	state->sound_enabled = 0;
+	state->march_select = 0;
+	state->gun_die_select = 0;
 }
 
 
 static DRIVER_INIT( cosmica )
 {
-	sound_enabled = 1;
-	dive_bomb_b_select=0;
+	cosmic_state *state = (cosmic_state *)machine->driver_data;
+	state->sound_enabled = 1;
+	state->dive_bomb_b_select = 0;
 }
 
 
@@ -1625,22 +1617,23 @@ static DRIVER_INIT( nomnlnd )
 
 static DRIVER_INIT( panic )
 {
-	sound_enabled = 1;
+	cosmic_state *state = (cosmic_state *)machine->driver_data;
+	state->sound_enabled = 1;
 }
 
 
-GAME( 1979, cosmicg,  0,       cosmicg,  cosmicg,  cosmicg, ROT270, "Universal", "Cosmic Guerilla", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1979, cosmica,  0,       cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (version II)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1979, cosmica1, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (first version)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1979, cosmica2, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (bootleg or hack?)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1980, nomnlnd,  0,       nomnlnd,  nomnlnd,  nomnlnd, ROT270, "Universal", "No Man's Land", GAME_IMPERFECT_SOUND )
-GAME( 1980, nomnlndg, nomnlnd, nomnlnd,  nomnlndg, nomnlnd, ROT270, "Universal (Gottlieb license)", "No Man's Land (Gottlieb)", GAME_IMPERFECT_SOUND )
-GAME( 1980, magspot,  0,       magspot,  magspot,  0,       ROT270, "Universal", "Magical Spot", GAME_IMPERFECT_SOUND )
-GAME( 1980, magspot2, 0,       magspot,  magspot,  0,       ROT270, "Universal", "Magical Spot II", GAME_IMPERFECT_SOUND )
-GAME( 1980, panic,    0,       panic,    panic,    panic,   ROT270, "Universal", "Space Panic (version E)", GAME_IMPERFECT_SOUND )
-GAME( 1980, panic2,   panic,   panic,    panic,    panic,   ROT270, "Universal", "Space Panic (set 2)", GAME_IMPERFECT_SOUND )
-GAME( 1980, panic3,   panic,   panic,    panic,    panic,   ROT270, "Universal", "Space Panic (set 3)", GAME_IMPERFECT_SOUND )
-GAME( 1980, panich,   panic,   panic,    panic,    panic,   ROT270, "Universal", "Space Panic (harder)", GAME_IMPERFECT_SOUND )
-GAME( 1980, panicger, panic,   panic,    panic,    panic,   ROT270, "Universal (ADP Automaten license)", "Space Panic (German)", GAME_IMPERFECT_SOUND )
-GAME( 1980, devzone,  0,       devzone,  devzone,  devzone, ROT270, "Universal", "Devil Zone", GAME_IMPERFECT_SOUND )
-GAME( 1980, devzone2, devzone, devzone,  devzone2, devzone, ROT270, "Universal", "Devil Zone (easier)", GAME_IMPERFECT_SOUND )
+GAME( 1979, cosmicg,  0,       cosmicg,  cosmicg,  cosmicg, ROT270, "Universal", "Cosmic Guerilla", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1979, cosmica,  0,       cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (version II)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1979, cosmica1, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (first version)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1979, cosmica2, cosmica, cosmica,  cosmica,  cosmica, ROT270, "Universal", "Cosmic Alien (bootleg or hack?)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1980, nomnlnd,  0,       nomnlnd,  nomnlnd,  nomnlnd, ROT270, "Universal", "No Man's Land", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, nomnlndg, nomnlnd, nomnlnd,  nomnlndg, nomnlnd, ROT270, "Universal (Gottlieb license)", "No Man's Land (Gottlieb)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, magspot,  0,       magspot,  magspot,  0,       ROT270, "Universal", "Magical Spot", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, magspot2, 0,       magspot,  magspot,  0,       ROT270, "Universal", "Magical Spot II", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, panic,    0,       panic,    panic,    panic,   ROT270, "Universal", "Space Panic (version E)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, panic2,   panic,   panic,    panic,    panic,   ROT270, "Universal", "Space Panic (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, panic3,   panic,   panic,    panic,    panic,   ROT270, "Universal", "Space Panic (set 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, panich,   panic,   panic,    panic,    panic,   ROT270, "Universal", "Space Panic (harder)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, panicger, panic,   panic,    panic,    panic,   ROT270, "Universal (ADP Automaten license)", "Space Panic (German)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, devzone,  0,       devzone,  devzone,  devzone, ROT270, "Universal", "Devil Zone", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, devzone2, devzone, devzone,  devzone2, devzone, ROT270, "Universal", "Devil Zone (easier)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
