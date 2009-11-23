@@ -70,7 +70,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	const gfx_element *gfx;
 	UINT32 *source = hng64_spriteram;
-	UINT32 *finish = hng64_spriteram + 0xb000/4;
+	UINT32 *finish = hng64_spriteram + 0xc000/4;
 
 //  for (int iii = 0; iii < 0x0f; iii++)
 //      mame_printf_debug("%.8x ", hng64_videoregs[iii]) ;
@@ -532,7 +532,6 @@ static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *
 				// 00110000 00000000 00000100 01000100 0400-0000 00007fff 00000000 00000020
 				// ----                                pal  ---- -------- -------- -------- not used (known)
 				paletteState = (workingList[i+4] & 0xff000000) >> 24 ;
-
 				break ;
 
 			case 0x0100:
