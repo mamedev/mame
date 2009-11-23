@@ -165,7 +165,7 @@ const rom_source *rom_first_source(const game_driver *drv, const machine_config 
 
 	/* otherwise, look through devices */
 	if (config != NULL)
-		for (device = config->devicelist; device != NULL; device = device->next)
+		for (device = config->devicelist.head; device != NULL; device = device->next)
 		{
 			const rom_entry *devromp = (const rom_entry *)device_get_info_ptr(device, DEVINFO_PTR_ROM_REGION);
 			if (devromp != NULL)
@@ -186,7 +186,7 @@ const rom_source *rom_next_source(const game_driver *drv, const machine_config *
 
 	/* if the previous was the driver, we want the first device */
 	if (rom_source_is_gamedrv(drv, previous))
-		device = (config != NULL) ? config->devicelist : NULL;
+		device = (config != NULL) ? config->devicelist.head : NULL;
 	else
 		device = ((const device_config *)previous)->next;
 

@@ -43,6 +43,7 @@ UTILOBJS = \
 	$(LIBOBJ)/util/png.o \
 	$(LIBOBJ)/util/pool.o \
 	$(LIBOBJ)/util/sha1.o \
+	$(LIBOBJ)/util/tagmap.o \
 	$(LIBOBJ)/util/unicode.o \
 	$(LIBOBJ)/util/unzip.o \
 	$(LIBOBJ)/util/vbiparse.o \

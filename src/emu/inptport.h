@@ -21,6 +21,7 @@
 #include "inputseq.h"
 #include "tokenize.h"
 #include "unicode.h"
+#include "tagmap.h"
 
 
 
@@ -703,6 +704,15 @@ struct _input_port_config
 };
 
 
+/* an object that contains a list of port configurations */
+typedef struct _input_port_list input_port_list;
+struct _input_port_list
+{
+	const input_port_config *	head;			/* head of the list */
+	tagmap *					map;			/* map for fast lookups */
+};
+
+
 /* describes a fundamental input type, including default input sequences */
 typedef struct _input_type_desc input_type_desc;
 struct _input_type_desc
@@ -1022,20 +1032,20 @@ time_t input_port_init(running_machine *machine, const input_port_token *tokens)
 
 /* ----- port configurations ----- */
 
-/* allocate a list of input ports from the given token list */
-const input_port_config *input_port_config_alloc(const input_port_token *tokens, char *errorbuf, int errorbuflen);
+/* initialize an input port list structure and allocate ports according to the given tokens */
+void input_port_list_init(input_port_list *portlist, const input_port_token *tokens, char *errorbuf, int errorbuflen, int allocmap);
 
-/* free memory allocated from input_port_alloc */
-void input_port_config_free(const input_port_config *portlist);
-
-/* return the config that matches the given tag */
-const input_port_config *input_port_by_tag(const input_port_config *portlist, const char *tag);
+/* free memory attached to an input port list and clear out the structure */
+void input_port_list_deinit(input_port_list *portlist);
 
 /* return the config that matches the given tag */
-const input_port_config *input_port_by_index(const input_port_config *portlist, int index);
+const input_port_config *input_port_by_tag_slow(const input_port_list *portlist, const char *tag);
+
+/* return the config that matches the given tag */
+const input_port_config *input_port_by_index(const input_port_list *portlist, int index);
 
 /* return the field that matches the given tag and mask */
-const input_field_config *input_field_by_tag_and_mask(const input_port_config *portlist, const char *tag, input_port_value mask);
+const input_field_config *input_field_by_tag_and_mask(const input_port_list *portlist, const char *tag, input_port_value mask);
 
 
 
@@ -1134,6 +1144,27 @@ int input_condition_true(running_machine *machine, const input_condition *condit
 
 /* convert an input_port_token to a default string */
 const char *input_port_string_from_token(const input_port_token token);
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    input_port_by_tag - return the config that 
+    matches the given tag
+-------------------------------------------------*/
+
+INLINE const input_port_config *input_port_by_tag(const input_port_list *portlist, const char *tag)
+{
+	/* use the map if we have it */
+	if (portlist->map != NULL)
+		return tagmap_find_hash_only(portlist->map, tag);
+	
+	/* otherwise, do it the slow way */
+	return input_port_by_tag_slow(portlist, tag);
+}
 
 
 #endif	/* __INPTPORT_H__ */

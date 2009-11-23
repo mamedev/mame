@@ -469,7 +469,7 @@ static void K033906_w(const address_space *space, int chip, int reg, UINT32 data
 
 		case 0x10:		// initEnable
 		{
-			const device_config *device = device_list_find_by_index(space->machine->config->devicelist, VOODOO_GRAPHICS, chip);
+			const device_config *device = device_list_find_by_index(&space->machine->config->devicelist, VOODOO_GRAPHICS, chip);
 			voodoo_set_init_enable(device, data);
 			break;
 		}

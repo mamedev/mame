@@ -2234,7 +2234,7 @@ void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_off
 		int xd,yd;
 		TC0100SCN_dblwidth[i]=0;
 
-		screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, i);
+		screen = device_list_find_by_index(&machine->config->devicelist, VIDEO_SCREEN, i);
 		if (screen == NULL)
 			screen = machine->primary_screen;
 

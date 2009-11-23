@@ -88,30 +88,78 @@ INLINE int device_matches_type(const device_config *device, device_type type)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    device_list_init - initialize a device list 
+    structure, optionally allocating a map for it
+-------------------------------------------------*/
+
+void device_list_init(device_list *devlist, int allocmap)
+{
+	/* initialize fields */
+	devlist->head = NULL;
+	devlist->map = NULL;
+	if (allocmap)
+	{
+		devlist->map = tagmap_alloc();
+		if (devlist->map == NULL)
+			fatalerror("Out of memory for device list map");
+	}
+}
+
+
+/*-------------------------------------------------
+    device_list_deinit - free memory attached to 
+    a device list and clear out the structure
+-------------------------------------------------*/
+
+void device_list_deinit(device_list *devlist)
+{
+	/* release all devices */
+	while (devlist->head != NULL)
+		device_list_remove(devlist, devlist->head->tag);
+	
+	/* release the map memory */
+	if (devlist->map != NULL)
+		tagmap_free(devlist->map);
+}
+
+
+/*-------------------------------------------------
     device_list_add - add a new device to the
     end of a device list
 -------------------------------------------------*/
 
-device_config *device_list_add(device_config **listheadptr, const device_config *owner, device_type type, const char *tag, UINT32 clock)
+device_config *device_list_add(device_list *devlist, const device_config *owner, device_type type, const char *tag, UINT32 clock)
 {
 	device_config **devptr, **tempdevptr;
 	device_config *device, *tempdevice;
+	tagmap_error tmerr;
 	UINT32 configlen;
 
-	assert(listheadptr != NULL);
+	assert(devlist != NULL);
+	assert(devlist->map != NULL);
 	assert(type != NULL);
 	assert(tag != NULL);
 
-	/* find the end of the list, and ensure no duplicates along the way */
-	for (devptr = listheadptr; *devptr != NULL; devptr = &(*devptr)->next)
-		if (strcmp(tag, (*devptr)->tag) == 0)
-			fatalerror("Attempted to add duplicate device: type=%s tag=%s\n", device_get_name(*devptr), tag);
+	/* find the end of the list */
+	for (devptr = &devlist->head; *devptr != NULL; devptr = &(*devptr)->next) ;
 
 	/* get the size of the inline config */
 	configlen = (UINT32)devtype_get_info_int(type, DEVINFO_INT_INLINE_CONFIG_BYTES);
 
 	/* allocate a new device */
 	device = (device_config *)alloc_array_or_die(UINT8, sizeof(*device) + strlen(tag) + configlen);
+	
+	/* add to the map */
+	tmerr = tagmap_add_unique_hash(devlist->map, tag, device);
+	if (tmerr == TMERR_DUPLICATE)
+	{
+		device_config *match = tagmap_find_hash_only(devlist->map, tag);
+		assert(match != NULL);
+		if (strcmp(tag, match->tag) == 0)
+			fatalerror("Attempted to add duplicate device: type=%s tag=%s\n", device_get_name(*devptr), tag);
+		else
+			fatalerror("Two devices have tags which hash to the same value: '%s' and '%s'\n", tag, match->tag);
+	}
 
 	/* populate device relationships */
 	device->next = NULL;
@@ -154,12 +202,12 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 	/* fetch function pointers to the core functions */
 
 	/* before adding us to the global list, add us to the end of the type list */
-	tempdevice = (device_config *)device_list_first(*listheadptr, type);
+	tempdevice = (device_config *)device_list_first(devlist, type);
 	for (tempdevptr = &tempdevice; *tempdevptr != NULL; tempdevptr = &(*tempdevptr)->typenext) ;
 	*tempdevptr = device;
 
 	/* and to the end of the class list */
-	tempdevice = (device_config *)device_list_class_first(*listheadptr, device->devclass);
+	tempdevice = (device_config *)device_list_class_first(devlist, device->devclass);
 	for (tempdevptr = &tempdevice; *tempdevptr != NULL; tempdevptr = &(*tempdevptr)->classnext) ;
 	*tempdevptr = device;
 
@@ -174,16 +222,16 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
     device list
 -------------------------------------------------*/
 
-void device_list_remove(device_config **listheadptr, const char *tag)
+void device_list_remove(device_list *devlist, const char *tag)
 {
 	device_config **devptr, **tempdevptr;
 	device_config *device, *tempdevice;
 
-	assert(listheadptr != NULL);
+	assert(devlist != NULL);
 	assert(tag != NULL);
 
 	/* find the device in the list */
-	for (devptr = listheadptr; *devptr != NULL; devptr = &(*devptr)->next)
+	for (devptr = &devlist->head; *devptr != NULL; devptr = &(*devptr)->next)
 		if (strcmp(tag, (*devptr)->tag) == 0)
 			break;
 	device = *devptr;
@@ -191,19 +239,23 @@ void device_list_remove(device_config **listheadptr, const char *tag)
 		fatalerror("Attempted to remove non-existant device: tag=%s\n", tag);
 
 	/* before removing us from the global list, remove us from the type list */
-	tempdevice = (device_config *)device_list_first(*listheadptr, device->type);
+	tempdevice = (device_config *)device_list_first(devlist, device->type);
 	for (tempdevptr = &tempdevice; *tempdevptr != device; tempdevptr = &(*tempdevptr)->typenext) ;
 	assert(*tempdevptr == device);
 	*tempdevptr = device->typenext;
 
 	/* and from the class list */
-	tempdevice = (device_config *)device_list_class_first(*listheadptr, device->devclass);
+	tempdevice = (device_config *)device_list_class_first(devlist, device->devclass);
 	for (tempdevptr = &tempdevice; *tempdevptr != device; tempdevptr = &(*tempdevptr)->classnext) ;
 	assert(*tempdevptr == device);
 	*tempdevptr = device->classnext;
 
 	/* remove the device from the list */
 	*devptr = device->next;
+
+	/* and from the map */
+	if (devlist->map != NULL)
+		tagmap_remove(devlist->map, device->tag);
 
 	/* free the device object */
 	free(device);
@@ -281,7 +333,7 @@ const device_contract *device_get_contract(const device_config *device, const ch
     is allowed
 -------------------------------------------------*/
 
-int device_list_items(const device_config *listhead, device_type type)
+int device_list_items(const device_list *devlist, device_type type)
 {
 	const device_config *curdev;
 	int count = 0;
@@ -289,14 +341,14 @@ int device_list_items(const device_config *listhead, device_type type)
 	/* locate all devices */
 	if (type == DEVICE_TYPE_WILDCARD)
 	{
-		for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+		for (curdev = devlist->head; curdev != NULL; curdev = curdev->next)
 			count++;
 	}
 
 	/* locate all devices of a given type */
 	else
 	{
-		for (curdev = listhead; curdev != NULL && curdev->type != type; curdev = curdev->next) ;
+		for (curdev = devlist->head; curdev != NULL && curdev->type != type; curdev = curdev->next) ;
 		for ( ; curdev != NULL; curdev = curdev->typenext)
 			count++;
 	}
@@ -311,16 +363,16 @@ int device_list_items(const device_config *listhead, device_type type)
     DEVICE_TYPE_WILDCARD is allowed
 -------------------------------------------------*/
 
-const device_config *device_list_first(const device_config *listhead, device_type type)
+const device_config *device_list_first(const device_list *devlist, device_type type)
 {
 	const device_config *curdev;
 
 	/* first of any device type */
 	if (type == DEVICE_TYPE_WILDCARD)
-		return listhead;
+		return devlist->head;
 
 	/* first of a given type */
-	for (curdev = listhead; curdev != NULL && curdev->type != type; curdev = curdev->next) ;
+	for (curdev = devlist->head; curdev != NULL && curdev->type != type; curdev = curdev->next) ;
 	return curdev;
 }
 
@@ -339,19 +391,18 @@ const device_config *device_list_next(const device_config *prevdevice, device_ty
 
 
 /*-------------------------------------------------
-    device_list_find_by_tag - retrieve a device
-    configuration based on a type and tag;
-    DEVICE_TYPE_WILDCARD is allowed
+    device_list_find_by_tag_slow - retrieve a 
+    device configuration based on a tag
 -------------------------------------------------*/
 
-const device_config *device_list_find_by_tag(const device_config *listhead, const char *tag)
+const device_config *device_list_find_by_tag_slow(const device_list *devlist, const char *tag)
 {
 	const device_config *curdev;
 
 	assert(tag != NULL);
 
 	/* locate among all devices */
-	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+	for (curdev = devlist->head; curdev != NULL; curdev = curdev->next)
 		if (strcmp(tag, curdev->tag) == 0)
 			return curdev;
 
@@ -374,7 +425,7 @@ const device_config *device_find_child_by_tag(const device_config *owner, const 
 	assert(tag != NULL);
 
 	tempstring = astring_alloc();
-	child = device_list_find_by_tag(owner->machine->config->devicelist, device_build_tag(tempstring, owner, tag));
+	child = device_list_find_by_tag(&owner->machine->config->devicelist, device_build_tag(tempstring, owner, tag));
 	astring_free(tempstring);
 
 	return child;
@@ -387,7 +438,7 @@ const device_config *device_find_child_by_tag(const device_config *owner, const 
     DEVICE_TYPE_WILDCARD is allowed
 -------------------------------------------------*/
 
-int device_list_index(const device_config *listhead, device_type type, const char *tag)
+int device_list_index(const device_list *devlist, device_type type, const char *tag)
 {
 	const device_config *curdev;
 	int index = 0;
@@ -397,7 +448,7 @@ int device_list_index(const device_config *listhead, device_type type, const cha
 	/* locate among all devices */
 	if (type == DEVICE_TYPE_WILDCARD)
 	{
-		for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+		for (curdev = devlist->head; curdev != NULL; curdev = curdev->next)
 		{
 			if (strcmp(tag, curdev->tag) == 0)
 				return index;
@@ -408,7 +459,7 @@ int device_list_index(const device_config *listhead, device_type type, const cha
 	/* locate among all devices of a given type */
 	else
 	{
-		for (curdev = listhead; curdev != NULL && curdev->type != type; curdev = curdev->next) ;
+		for (curdev = devlist->head; curdev != NULL && curdev->type != type; curdev = curdev->next) ;
 		for ( ; curdev != NULL; curdev = curdev->typenext)
 		{
 			if (strcmp(tag, curdev->tag) == 0)
@@ -426,14 +477,14 @@ int device_list_index(const device_config *listhead, device_type type, const cha
     configuration based on a type and index
 -------------------------------------------------*/
 
-const device_config *device_list_find_by_index(const device_config *listhead, device_type type, int index)
+const device_config *device_list_find_by_index(const device_list *devlist, device_type type, int index)
 {
 	const device_config *curdev;
 
 	/* locate among all devices */
 	if (type == DEVICE_TYPE_WILDCARD)
 	{
-		for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+		for (curdev = devlist->head; curdev != NULL; curdev = curdev->next)
 			if (index-- == 0)
 				return curdev;
 	}
@@ -441,7 +492,7 @@ const device_config *device_list_find_by_index(const device_config *listhead, de
 	/* locate among all devices of a given type */
 	else
 	{
-		for (curdev = listhead; curdev != NULL && curdev->type != type; curdev = curdev->next) ;
+		for (curdev = devlist->head; curdev != NULL && curdev->type != type; curdev = curdev->next) ;
 		for ( ; curdev != NULL; curdev = curdev->typenext)
 			if (index-- == 0)
 				return curdev;
@@ -462,13 +513,13 @@ const device_config *device_list_find_by_index(const device_config *listhead, de
     items of a given class
 -------------------------------------------------*/
 
-int device_list_class_items(const device_config *listhead, device_class devclass)
+int device_list_class_items(const device_list *devlist, device_class devclass)
 {
 	const device_config *curdev;
 	int count = 0;
 
 	/* locate all devices of a given class */
-	for (curdev = listhead; curdev != NULL && curdev->devclass != devclass; curdev = curdev->next) ;
+	for (curdev = devlist->head; curdev != NULL && curdev->devclass != devclass; curdev = curdev->next) ;
 	for ( ; curdev != NULL; curdev = curdev->classnext)
 		count++;
 
@@ -481,12 +532,12 @@ int device_list_class_items(const device_config *listhead, device_class devclass
     device in the list of a given class
 -------------------------------------------------*/
 
-const device_config *device_list_class_first(const device_config *listhead, device_class devclass)
+const device_config *device_list_class_first(const device_list *devlist, device_class devclass)
 {
 	const device_config *curdev;
 
 	/* first of a given class */
-	for (curdev = listhead; curdev != NULL && curdev->devclass != devclass; curdev = curdev->next) ;
+	for (curdev = devlist->head; curdev != NULL && curdev->devclass != devclass; curdev = curdev->next) ;
 	return curdev;
 }
 
@@ -508,7 +559,7 @@ const device_config *device_list_class_next(const device_config *prevdevice, dev
     device based on its class and tag
 -------------------------------------------------*/
 
-int device_list_class_index(const device_config *listhead, device_class devclass, const char *tag)
+int device_list_class_index(const device_list *devlist, device_class devclass, const char *tag)
 {
 	const device_config *curdev;
 	int index = 0;
@@ -516,7 +567,7 @@ int device_list_class_index(const device_config *listhead, device_class devclass
 	assert(tag != NULL);
 
 	/* locate among all devices of a given class */
-	for (curdev = listhead; curdev != NULL && curdev->devclass != devclass; curdev = curdev->next) ;
+	for (curdev = devlist->head; curdev != NULL && curdev->devclass != devclass; curdev = curdev->next) ;
 	for ( ; curdev != NULL; curdev = curdev->classnext)
 	{
 		if (strcmp(tag, curdev->tag) == 0)
@@ -534,12 +585,12 @@ int device_list_class_index(const device_config *listhead, device_class devclass
     index
 -------------------------------------------------*/
 
-const device_config *device_list_class_find_by_index(const device_config *listhead, device_class devclass, int index)
+const device_config *device_list_class_find_by_index(const device_list *devlist, device_class devclass, int index)
 {
 	const device_config *curdev;
 
 	/* locate among all devices of a given class */
-	for (curdev = listhead; curdev != NULL && curdev->devclass != devclass; curdev = curdev->next) ;
+	for (curdev = devlist->head; curdev != NULL && curdev->devclass != devclass; curdev = curdev->next) ;
 	for ( ; curdev != NULL; curdev = curdev->classnext)
 		if (index-- == 0)
 			return curdev;
@@ -566,7 +617,7 @@ void device_list_attach_machine(running_machine *machine)
 	assert(machine != NULL);
 
 	/* iterate over devices and assign the machine to them */
-	for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
+	for (device = (device_config *)machine->config->devicelist.head; device != NULL; device = device->next)
 		device->machine = machine;
 }
 
@@ -589,7 +640,7 @@ void device_list_start(running_machine *machine)
 	add_exit_callback(machine, device_list_stop);
 
 	/* iterate over devices and allocate memory for them */
-	for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
+	for (device = (device_config *)machine->config->devicelist.head; device != NULL; device = device->next)
 	{
 		int spacenum;
 
@@ -622,7 +673,7 @@ void device_list_start(running_machine *machine)
 		int prevstarted = numstarted;
 
 		/* iterate over devices and start them */
-		for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
+		for (device = (device_config *)machine->config->devicelist.head; device != NULL; device = device->next)
 		{
 			device_start_func start = (device_start_func)device_get_info_fct(device, DEVINFO_FCT_START);
 			assert(start != NULL);
@@ -675,7 +726,7 @@ static void device_list_stop(running_machine *machine)
 	assert(machine != NULL);
 
 	/* iterate over devices and stop them */
-	for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
+	for (device = (device_config *)machine->config->devicelist.head; device != NULL; device = device->next)
 	{
 		device_stop_func stop = (device_stop_func)device_get_info_fct(device, DEVINFO_FCT_STOP);
 
@@ -712,7 +763,7 @@ static void device_list_reset(running_machine *machine)
 	assert(machine != NULL);
 
 	/* iterate over devices and stop them */
-	for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
+	for (device = (device_config *)machine->config->devicelist.head; device != NULL; device = device->next)
 		device_reset(device);
 }
 

@@ -1448,7 +1448,7 @@ static slider_state *slider_init(running_machine *machine)
 	}
 
 	/* add analog adjusters */
-	for (port = machine->portconfig; port != NULL; port = port->next)
+	for (port = machine->portlist.head; port != NULL; port = port->next)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->type == IPT_ADJUSTER)
 			{
@@ -1513,7 +1513,7 @@ static slider_state *slider_init(running_machine *machine)
 		tailptr = &(*tailptr)->next;
 	}
 
-	for (device = device_list_first(machine->config->devicelist, LASERDISC); device != NULL; device = device_list_next(device, LASERDISC))
+	for (device = device_list_first(&machine->config->devicelist, LASERDISC); device != NULL; device = device_list_next(device, LASERDISC))
 	{
 		const laserdisc_config *config = (const laserdisc_config *)device->inline_config;
 		if (config->overupdate != NULL)
@@ -1556,7 +1556,7 @@ static slider_state *slider_init(running_machine *machine)
 
 #ifdef MAME_DEBUG
 	/* add crosshair adjusters */
-	for (port = machine->portconfig; port != NULL; port = port->next)
+	for (port = machine->portlist.head; port != NULL; port = port->next)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->crossaxis != CROSSHAIR_AXIS_NONE && field->player == 0)
 			{
@@ -1973,7 +1973,7 @@ static char *slider_get_screen_desc(const device_config *screen)
 
 static char *slider_get_laserdisc_desc(const device_config *laserdisc)
 {
-	int ldcount = device_list_items(laserdisc->machine->config->devicelist, LASERDISC);
+	int ldcount = device_list_items(&laserdisc->machine->config->devicelist, LASERDISC);
 	static char descbuf[256];
 
 	if (ldcount > 1)

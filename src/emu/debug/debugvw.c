@@ -2399,7 +2399,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 	int itemnum;
 
 	/* first add all the device's address spaces */
-	for (device = machine->config->devicelist; device != NULL; device = device->next)
+	for (device = machine->config->devicelist.head; device != NULL; device = device->next)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 			const address_space *space = memory_find_address_space(device, spacenum);

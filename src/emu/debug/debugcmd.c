@@ -542,7 +542,7 @@ int debug_command_parameter_cpu(running_machine *machine, const char *param, con
 	}
 
 	/* if we got a valid one, return */
-	*result = device_list_find_by_index(machine->config->devicelist, CPU, cpunum);
+	*result = device_list_find_by_index(&machine->config->devicelist, CPU, cpunum);
 	if (*result != NULL)
 		return TRUE;
 
@@ -2512,7 +2512,7 @@ static void execute_snap(running_machine *machine, int ref, int params, const ch
 		int scrnum = (params > 1) ? atoi(param[1]) : 0;
 		astring *fname;
 
-		const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, scrnum);
+		const device_config *screen = device_list_find_by_index(&machine->config->devicelist, VIDEO_SCREEN, scrnum);
 
 		if ((screen == NULL) || !render_is_live_screen(screen))
 		{

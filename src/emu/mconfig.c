@@ -36,9 +36,9 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
     the given configuration
 -------------------------------------------------*/
 
-INLINE void remove_device(device_config **listheadptr, const char *tag)
+INLINE void remove_device(device_list *list, const char *tag)
 {
-	device_config *device = (device_config *)device_list_find_by_tag(*listheadptr, tag);
+	device_config *device = (device_config *)device_list_find_by_tag(list, tag);
 	device_custom_config_func custom;
 
 	assert(device != NULL);
@@ -49,7 +49,7 @@ INLINE void remove_device(device_config **listheadptr, const char *tag)
 		(*custom)(device, MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_FREE, NULL);
 
 	/* remove the device from the list */
-	device_list_remove(listheadptr, tag);
+	device_list_remove(list, tag);
 }
 
 
@@ -70,9 +70,13 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 
 	/* allocate a new configuration object */
 	config = alloc_clear_or_die(machine_config);
+	
+	/* initialize the device list */
+	device_list_init(&config->devicelist, TRUE);
 
 	/* parse tokens into the config */
 	machine_config_detokenize(config, tokens, NULL, 0);
+
 	return config;
 }
 
@@ -85,8 +89,9 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 void machine_config_free(machine_config *config)
 {
 	/* release the device list */
-	while (config->devicelist != NULL)
-		remove_device(&config->devicelist, config->devicelist->tag);
+	while (config->devicelist.head != NULL)
+		remove_device(&config->devicelist, config->devicelist.head->tag);
+	device_list_deinit(&config->devicelist);
 
 	/* release the configuration itself */
 	free(config);
@@ -144,7 +149,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 
 			case MCONFIG_TOKEN_DEVICE_MODIFY:
 				tag = TOKEN_GET_STRING(tokens);
-				device = (device_config *)device_list_find_by_tag(config->devicelist, device_build_tag(tempstring, owner, tag));
+				device = (device_config *)device_list_find_by_tag(&config->devicelist, device_build_tag(tempstring, owner, tag));
 				if (device == NULL)
 					fatalerror("Unable to find device: tag=%s\n", astring_c(tempstring));
 				break;
@@ -322,7 +327,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 
 	/* if we are the outermost level, process any device-specific machine configurations */
 	if (depth == 0)
-		for (device = config->devicelist; device != NULL; device = device->next)
+		for (device = config->devicelist.head; device != NULL; device = device->next)
 		{
 			tokens = (const machine_config_token *)device_get_info_ptr(device, DEVINFO_PTR_MACHINE_CONFIG);
 			if (tokens != NULL)

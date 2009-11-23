@@ -896,7 +896,7 @@ static void check_palette(running_machine *machine)
 	const input_port_config *port;
 	int newset;
 
-	port = input_port_by_tag(machine->portconfig, "VIDHW");
+	port = input_port_by_tag(&machine->portlist, "VIDHW");
 	if (port != NULL)
 	{
 		newset = input_port_read_direct(port);

@@ -164,7 +164,7 @@ static void via_irq(const device_config *device, int state)
 
 static input_port_value input_port_read_indexed(running_machine *machine, int portnum)
 {
-	const input_port_config *port = input_port_by_index(machine->portconfig, portnum);
+	const input_port_config *port = input_port_by_index(&machine->portlist, portnum);
 	return input_port_read_direct(port);
 }
 

@@ -346,7 +346,7 @@ void atari_machine_start(running_machine *machine)
 
 	/* GTIA */
 	memset(&gtia_intf, 0, sizeof(gtia_intf));
-	if (input_port_by_tag(machine->portconfig, "console") != NULL)
+	if (input_port_by_tag(&machine->portlist, "console") != NULL)
 		gtia_intf.console_read = console_read;
 	if (devtag_get_device(machine, "dac") != NULL)
 		gtia_intf.console_write = console_write;

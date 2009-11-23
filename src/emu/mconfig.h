@@ -143,7 +143,7 @@ struct _machine_config
 	sound_start_func		sound_start;			/* one-time sound start callback */
 	sound_reset_func		sound_reset;			/* sound reset callback */
 
-	device_config *			devicelist;				/* list head for devices */
+	device_list				devicelist;				/* list head for devices */
 };
 
 

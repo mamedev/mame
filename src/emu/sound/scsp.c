@@ -1208,7 +1208,7 @@ static void dma_scsp(const address_space *space, struct _SCSP *SCSP)
 
 	/*Job done,request a dma end irq*/
 	if(scsp_regs[0x1e/2] & 0x10)
-		cpu_set_input_line(device_list_find_by_index(space->machine->config->devicelist, CPU, 2),dma_transfer_end,HOLD_LINE);
+		cpu_set_input_line(device_list_find_by_index(&space->machine->config->devicelist, CPU, 2),dma_transfer_end,HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION

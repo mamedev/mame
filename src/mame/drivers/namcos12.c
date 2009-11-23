@@ -1407,7 +1407,7 @@ static WRITE8_HANDLER( s12_mcu_settings_w )
 
 static READ8_HANDLER( s12_mcu_gun_h_r )
 {
-	const input_port_config *port = input_port_by_tag(space->machine->portconfig, "LIGHT0_X");
+	const input_port_config *port = input_port_by_tag(&space->machine->portlist, "LIGHT0_X");
 	if( port != NULL )
 	{
 		int rv = input_port_read_direct( port ) << 6;
@@ -1426,7 +1426,7 @@ static READ8_HANDLER( s12_mcu_gun_h_r )
 
 static READ8_HANDLER( s12_mcu_gun_v_r )
 {
-	const input_port_config *port = input_port_by_tag(space->machine->portconfig, "LIGHT0_Y");
+	const input_port_config *port = input_port_by_tag(&space->machine->portlist, "LIGHT0_Y");
 	if( port != NULL )
 	{
 		int rv = input_port_read_direct( port ) << 6;

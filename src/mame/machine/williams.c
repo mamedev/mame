@@ -69,11 +69,11 @@ static WRITE8_DEVICE_HANDLER( joust2_pia_3_cb1_w );
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( input_port_0_device_r ) { return input_port_read_direct(input_port_by_index(device->machine->portconfig, 0)); }
-static READ8_DEVICE_HANDLER( input_port_1_device_r ) { return input_port_read_direct(input_port_by_index(device->machine->portconfig, 1)); }
-static READ8_DEVICE_HANDLER( input_port_2_device_r ) { return input_port_read_direct(input_port_by_index(device->machine->portconfig, 2)); }
-static READ8_DEVICE_HANDLER( input_port_3_device_r ) { return input_port_read_direct(input_port_by_index(device->machine->portconfig, 3)); }
-static READ8_DEVICE_HANDLER( input_port_4_device_r ) { return input_port_read_direct(input_port_by_index(device->machine->portconfig, 4)); }
+static READ8_DEVICE_HANDLER( input_port_0_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 0)); }
+static READ8_DEVICE_HANDLER( input_port_1_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 1)); }
+static READ8_DEVICE_HANDLER( input_port_2_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 2)); }
+static READ8_DEVICE_HANDLER( input_port_3_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 3)); }
+static READ8_DEVICE_HANDLER( input_port_4_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 4)); }
 
 /*************************************
  *

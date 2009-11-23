@@ -148,7 +148,7 @@ struct _running_machine
 {
 	/* configuration data */
 	const machine_config *	config;				/* points to the constructed machine_config */
-	const input_port_config *portconfig;		/* points to a list of input port configurations */
+	input_port_list			portlist;			/* points to a list of input port configurations */
 
 	/* CPU information */
 	const device_config *	firstcpu;			/* first CPU (allows for quick iteration via typenext) */

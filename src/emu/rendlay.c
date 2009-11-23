@@ -1339,7 +1339,7 @@ static int get_variable_value(const machine_config *config, const char *string, 
 	/* screen 0 parameters */
 	for (device = video_screen_first(config); device != NULL; device = video_screen_next(device))
 	{
-		int scrnum = device_list_index(config->devicelist, VIDEO_SCREEN, device->tag);
+		int scrnum = device_list_index(&config->devicelist, VIDEO_SCREEN, device->tag);
 		const screen_config *scrconfig = (const screen_config *)device->inline_config;
 
 		/* native X aspect factor */

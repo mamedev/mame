@@ -32,14 +32,14 @@
 
 /* these functions are macros primarily due to include file ordering */
 /* plus, they are very simple */
-#define sound_count(config)					device_list_items((config)->devicelist, SOUND)
-#define sound_first(config)					device_list_first((config)->devicelist, SOUND)
+#define sound_count(config)					device_list_items(&(config)->devicelist, SOUND)
+#define sound_first(config)					device_list_first(&(config)->devicelist, SOUND)
 #define sound_next(previous)				((previous)->typenext)
 
 /* these functions are macros primarily due to include file ordering */
 /* plus, they are very simple */
-#define speaker_output_count(config)		device_list_items((config)->devicelist, SPEAKER_OUTPUT)
-#define speaker_output_first(config)		device_list_first((config)->devicelist, SPEAKER_OUTPUT)
+#define speaker_output_count(config)		device_list_items(&(config)->devicelist, SPEAKER_OUTPUT)
+#define speaker_output_first(config)		device_list_first(&(config)->devicelist, SPEAKER_OUTPUT)
 #define speaker_output_next(previous)		((previous)->typenext)
 
 

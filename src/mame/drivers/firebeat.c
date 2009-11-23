@@ -471,7 +471,7 @@ static VIDEO_UPDATE(firebeat)
 {
 	int chip;
 
-	if (screen == device_list_find_by_index(screen->machine->config->devicelist, VIDEO_SCREEN, 0))
+	if (screen == device_list_find_by_index(&screen->machine->config->devicelist, VIDEO_SCREEN, 0))
 		chip = 0;
 	else
 		chip = 1;
@@ -600,7 +600,7 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 			COMBINE_DATA( &gcu[chip].visible_area );
 			if (ACCESSING_BITS_0_15)
 			{
-				const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, chip);
+				const device_config *screen = device_list_find_by_index(&machine->config->devicelist, VIDEO_SCREEN, chip);
 
 				if (screen != NULL)
 				{

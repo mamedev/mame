@@ -1360,7 +1360,7 @@ UINT64 *_memory_install_device_handler64(const address_space *space, const devic
 
 void memory_install_read_port_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag)
 {
-	const input_port_config *port = input_port_by_tag(space->machine->portconfig, tag);
+	const input_port_config *port = input_port_by_tag(&space->machine->portlist, tag);
 	address_space *spacerw = (address_space *)space;
 	genf *handler = NULL;
 
@@ -1377,7 +1377,6 @@ void memory_install_read_port_handler(const address_space *space, offs_t addrsta
 }
 
 
-
 /*-------------------------------------------------
     memory_install_write_port_handler - install a
     new 8-bit input port handler into the given
@@ -1386,7 +1385,7 @@ void memory_install_read_port_handler(const address_space *space, offs_t addrsta
 
 void memory_install_write_port_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag)
 {
-	const input_port_config *port = input_port_by_tag(space->machine->portconfig, tag);
+	const input_port_config *port = input_port_by_tag(&space->machine->portlist, tag);
 	address_space *spacerw = (address_space *)space;
 	genf *handler = NULL;
 
@@ -1551,7 +1550,7 @@ static void memory_init_spaces(running_machine *machine)
 	memset(memdata->wptable, STATIC_WATCHPOINT, 1 << LEVEL1_BITS);
 
 	/* loop over devices */
-	for (device = machine->config->devicelist; device != NULL; device = device->next)
+	for (device = machine->config->devicelist.head; device != NULL; device = device->next)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 			if (device_get_addrbus_width(device, spacenum) > 0)
 			{
@@ -1760,7 +1759,7 @@ static void memory_init_populate(running_machine *machine)
 				/* if we have a read port tag, look it up */
 				if (entry->read_porttag != NULL)
 				{
-					const input_port_config *port = input_port_by_tag(machine->portconfig, entry->read_porttag);
+					const input_port_config *port = input_port_by_tag(&machine->portlist, entry->read_porttag);
 					int bits = (entry->read_bits == 0) ? space->dbits : entry->read_bits;
 					genf *handler = NULL;
 
@@ -1779,7 +1778,7 @@ static void memory_init_populate(running_machine *machine)
 				/* if we have a write port tag, look it up */
 				if (entry->write_porttag != NULL)
 				{
-					const input_port_config *port = input_port_by_tag(machine->portconfig, entry->write_porttag);
+					const input_port_config *port = input_port_by_tag(&machine->portlist, entry->write_porttag);
 					int bits = (entry->write_bits == 0) ? space->dbits : entry->write_bits;
 					genf *handler = NULL;
 
@@ -1802,7 +1801,7 @@ static void memory_init_populate(running_machine *machine)
 					void *object = space;
 					if (entry->read_devtag != NULL)
 					{
-						object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->read_devtag);
+						object = (void *)device_list_find_by_tag(&machine->config->devicelist, entry->read_devtag);
 						if (object == NULL)
 							fatalerror("Unidentified object in memory map: tag=%s\n", entry->read_devtag);
 					}
@@ -1816,7 +1815,7 @@ static void memory_init_populate(running_machine *machine)
 					void *object = space;
 					if (entry->write_devtag != NULL)
 					{
-						object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->write_devtag);
+						object = (void *)device_list_find_by_tag(&machine->config->devicelist, entry->write_devtag);
 						if (object == NULL)
 							fatalerror("Unidentified object in memory map: tag=%s\n", entry->write_devtag);
 					}

@@ -42,7 +42,7 @@ void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_rea
 	/* input port handlers */
 	if (config->type == DEVCB_TYPE_INPUT)
 	{
-		resolved->target = input_port_by_tag(device->machine->portconfig, config->tag);
+		resolved->target = input_port_by_tag(&device->machine->portlist, config->tag);
 		if (resolved->target == NULL)
 			fatalerror("devcb_resolve_read_line: unable to find input port '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
 		resolved->read = trampoline_read_port_to_read_line;
@@ -216,7 +216,7 @@ void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *conf
 	/* input port handlers */
 	if (config->type == DEVCB_TYPE_INPUT)
 	{
-		resolved->target = input_port_by_tag(device->machine->portconfig, config->tag);
+		resolved->target = input_port_by_tag(&device->machine->portlist, config->tag);
 		if (resolved->target == NULL)
 			fatalerror("devcb_resolve_read8: unable to find input port '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
 		resolved->read = trampoline_read_port_to_read8;

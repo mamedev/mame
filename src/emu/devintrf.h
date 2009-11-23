@@ -17,6 +17,7 @@
 #include "mamecore.h"
 #include "romload.h"
 #include "memory.h"
+#include "tagmap.h"
 
 
 /***************************************************************************
@@ -182,7 +183,7 @@ enum
 
 
 /* shorthand for accessing devices by machine/type/tag */
-#define devtag_get_device(mach,tag)							device_list_find_by_tag((mach)->config->devicelist, tag)
+#define devtag_get_device(mach,tag)							device_list_find_by_tag(&(mach)->config->devicelist, tag)
 
 #define devtag_reset(mach,tag)								device_reset(devtag_get_device(mach, tag))
 #define devtag_get_address_space(mach,tag,space)
@@ -328,6 +329,15 @@ struct _device_config
 };
 
 
+/* an object that contains a list of devices */
+typedef struct _device_list device_list;
+struct _device_list
+{
+	device_config *			head;					/* head of the list */
+	tagmap *				map;					/* map for fast lookups */
+};
+
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -336,11 +346,17 @@ struct _device_config
 
 /* ----- device configuration ----- */
 
+/* initialize a device list structure, optionally allocating a map for it */
+void device_list_init(device_list *devlist, int allocmap); 
+
+/* free memory attached to a device list and clear out the structure */
+void device_list_deinit(device_list *devlist); 
+
 /* add a new device to the end of a device list */
-device_config *device_list_add(device_config **listheadptr, const device_config *owner, device_type type, const char *tag, UINT32 clock);
+device_config *device_list_add(device_list *devlist, const device_config *owner, device_type type, const char *tag, UINT32 clock);
 
 /* remove a device from a device list */
-void device_list_remove(device_config **listheadptr, const char *tag);
+void device_list_remove(device_list *devlist, const char *tag);
 
 /* build a tag that combines the device's name and the given tag */
 const char *device_build_tag(astring *dest, const device_config *device, const char *tag);
@@ -356,44 +372,44 @@ const device_contract *device_get_contract(const device_config *device, const ch
 /* ----- type-based device access ----- */
 
 /* return the number of items of a given type; DEVICE_TYPE_WILDCARD is allowed */
-int device_list_items(const device_config *listhead, device_type type);
+int device_list_items(const device_list *devlist, device_type type);
 
 /* return the first device in the list of a given type; DEVICE_TYPE_WILDCARD is allowed */
-const device_config *device_list_first(const device_config *listhead, device_type type);
+const device_config *device_list_first(const device_list *devlist, device_type type);
 
 /* return the next device in the list of a given type; DEVICE_TYPE_WILDCARD is allowed */
 const device_config *device_list_next(const device_config *prevdevice, device_type type);
 
-/* retrieve a device configuration based on a tag */
-const device_config *device_list_find_by_tag(const device_config *listhead, const char *tag);
+/* retrieve a device configuration based on a tag via linear search */
+const device_config *device_list_find_by_tag_slow(const device_list *devlist, const char *tag);
 
 /* retrieve a child device configuration based on a tag */
 const device_config *device_find_child_by_tag(const device_config *owner, const char *tag);
 
 /* return the index of a device based on its type and tag; DEVICE_TYPE_WILDCARD is allowed */
-int device_list_index(const device_config *listhead, device_type type, const char *tag);
+int device_list_index(const device_list *devlist, device_type type, const char *tag);
 
 /* retrieve a device configuration based on a type and index; DEVICE_TYPE_WILDCARD is allowed */
-const device_config *device_list_find_by_index(const device_config *listhead, device_type type, int index);
+const device_config *device_list_find_by_index(const device_list *devlist, device_type type, int index);
 
 
 
 /* ----- class-based device access ----- */
 
 /* return the number of items of a given class */
-int device_list_class_items(const device_config *listhead, device_class devclass);
+int device_list_class_items(const device_list *devlist, device_class devclass);
 
 /* return the first device in the list of a given class */
-const device_config *device_list_class_first(const device_config *listhead, device_class devclass);
+const device_config *device_list_class_first(const device_list *devlist, device_class devclass);
 
 /* return the next device in the list of a given class */
 const device_config *device_list_class_next(const device_config *prevdevice, device_class devclass);
 
 /* return the index of a device based on its class and tag */
-int device_list_class_index(const device_config *listhead, device_class devclass, const char *tag);
+int device_list_class_index(const device_list *devlist, device_class devclass, const char *tag);
 
 /* retrieve a device configuration based on a class and index */
-const device_config *device_list_class_find_by_index(const device_config *listhead, device_class devclass, int index);
+const device_config *device_list_class_find_by_index(const device_list *devlist, device_class devclass, int index);
 
 
 
@@ -442,6 +458,28 @@ genf *devtype_get_info_fct(device_type type, UINT32 state);
 
 /* return a string value from a device type (does not need to be allocated) */
 const char *devtype_get_info_string(device_type type, UINT32 state);
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    device_list_find_by_tag - retrieve a device
+    configuration based on a type and tag;
+    DEVICE_TYPE_WILDCARD is allowed
+-------------------------------------------------*/
+
+INLINE const device_config *device_list_find_by_tag(const device_list *devlist, const char *tag)
+{
+	/* if we have a map, use it */
+	if (devlist->map != NULL)
+		return tagmap_find_hash_only(devlist->map, tag);
+
+	/* otherwise, go the slow route */
+	return device_list_find_by_tag_slow(devlist, tag);
+}
 
 
 #endif	/* __DEVINTRF_H__ */
