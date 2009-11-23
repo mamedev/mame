@@ -1469,7 +1469,7 @@ int mame_validitychecks(const game_driver *curdriver)
 	{
 		const char *string = input_port_string_from_index(strnum);
 		if (string != NULL)
-			tagmap_add(defstr, string, (void *)strnum);
+			tagmap_add(defstr, string, (void *)(FPTR)strnum);
 	}
 	prep += get_profile_ticks();
 	
