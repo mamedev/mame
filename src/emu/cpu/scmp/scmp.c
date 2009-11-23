@@ -314,7 +314,7 @@ static void execute_one(scmp_state *cpustate, int opcode)
 						// JP
 						cpustate->icount -= 9;
 						tmp = ARG(cpustate);
-						if (!cpustate->AC & 0x80) {
+						if (!(cpustate->AC & 0x80)) {
 							cpustate->PC.w.l = ADD12(GET_PTR_REG(cpustate,ptr)->w.l,(INT8)tmp);
 							cpustate->icount -= 2;
 						}
