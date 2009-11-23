@@ -626,7 +626,7 @@ static WRITE32_HANDLER( hng64_pal_w )
 	//  popmessage("Alpha is not zero!") ;
 
 	// sams64 / sams64_2 never write a palette, why not?
-	if (hng64_mcu_type!=SAMSHO_MCU)
+	//if (hng64_mcu_type!=SAMSHO_MCU)
 		palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
@@ -662,7 +662,7 @@ static READ32_HANDLER( hng64_sysregs_r )
 		case 0x215c: return ((systime.local_time.year%100)/10);
 		case 0x2164: return (systime.local_time.weekday);
 
-		case 0x216c: return 0x00000010; //enables "system log reader"
+		case 0x216c: return 0x00000010; //disables "system log reader"
 
 		case 0x217c: return 0; //RTC status?
 	}
@@ -845,7 +845,7 @@ static READ32_HANDLER( racing_io_r )
 
 static READ32_HANDLER( hng64_dualport_r )
 {
-//	printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+	printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 
 	/*
 	command table:
@@ -873,7 +873,7 @@ static READ32_HANDLER( hng64_dualport_r )
 
 static WRITE32_HANDLER( hng64_dualport_w )
 {
-//	printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+	printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 	COMBINE_DATA (&hng64_dualport[offset]);
 }
 
@@ -927,6 +927,7 @@ static READ32_HANDLER( dl_r )
 }
 #endif
 
+
 // A read at 0x20300217 ONLY happens if there are more display lists than what are readily available.
 
 // Some kind of buffering of the display lists, or 'render current buffer' write?
@@ -940,8 +941,6 @@ static WRITE32_HANDLER( dl_control_w )
 		activeBuffer = data - 1;
 
 }
-
-
 
 #ifdef UNUSED_FUNCTION
 WRITE32_HANDLER( activate_3d_buffer )
@@ -978,7 +977,11 @@ static WRITE32_HANDLER( tcram_w )
 
 static READ32_HANDLER( tcram_r )
 {
-//  mame_printf_debug("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]) ;
+//  	printf("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]) ;
+
+	if(offset == 0x12)
+		return input_port_read(space->machine, "VBLANK");
+
 	return hng64_tcram[offset] ;
 }
 
@@ -1372,6 +1375,9 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( hng64 )
+	PORT_START("VBLANK")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_VBLANK )
+
 	PORT_START("IPT_TEST")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1447,6 +1453,9 @@ static INPUT_PORTS_START( hng64 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bbust2 )
+	PORT_START("VBLANK")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_VBLANK )
+
 	PORT_START("D_IN")
 	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -1833,7 +1842,7 @@ static MACHINE_DRIVER_START( hng64 )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(1024, 1024)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 16, 447)
