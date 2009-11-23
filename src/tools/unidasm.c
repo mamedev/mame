@@ -113,6 +113,7 @@ CPU_DISASSEMBLE( h6280 );
 CPU_DISASSEMBLE( h8 );
 CPU_DISASSEMBLE( hd6309 );
 CPU_DISASSEMBLE( i4004 );
+CPU_DISASSEMBLE( i8008 );
 CPU_DISASSEMBLE( i8085 );
 CPU_DISASSEMBLE( x86_16 );
 CPU_DISASSEMBLE( x86_32 );
@@ -170,6 +171,7 @@ CPU_DISASSEMBLE( rsp );
 CPU_DISASSEMBLE( s2650 );
 CPU_DISASSEMBLE( saturn );
 CPU_DISASSEMBLE( sc61860 );
+CPU_DISASSEMBLE( scmp );
 CPU_DISASSEMBLE( se3208 );
 CPU_DISASSEMBLE( sh2 );
 CPU_DISASSEMBLE( sh4 );
@@ -234,6 +236,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "hd6309",		_8bit,  0, CPU_DISASSEMBLE_NAME(hd6309) },
 	{ "i386",		_8bit,  0, CPU_DISASSEMBLE_NAME(x86_32) },
 	{ "i4004",		_8bit,  0, CPU_DISASSEMBLE_NAME(i4004) },
+	{ "i8008",		_8bit,  0, CPU_DISASSEMBLE_NAME(i8008) },
 	{ "i8085",		_8bit,  0, CPU_DISASSEMBLE_NAME(i8085) },
 	{ "i80286",		_8bit,  0, CPU_DISASSEMBLE_NAME(x86_16) },
 	{ "i8086",		_8bit,  0, CPU_DISASSEMBLE_NAME(x86_16) },
@@ -293,6 +296,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "s2650",      _8bit,  0, CPU_DISASSEMBLE_NAME(s2650) },
 	{ "saturn",     _8bit,  0, CPU_DISASSEMBLE_NAME(saturn) },
 	{ "sc61860",    _8bit,  0, CPU_DISASSEMBLE_NAME(sc61860) },
+	{ "scmp",    	_8bit,  0, CPU_DISASSEMBLE_NAME(scmp) },
 	{ "se3208",     _16le,  0, CPU_DISASSEMBLE_NAME(se3208) },
 	{ "sh2",        _16be,  0, CPU_DISASSEMBLE_NAME(sh2) },
 	{ "sh4",        _16le,  0, CPU_DISASSEMBLE_NAME(sh4) },

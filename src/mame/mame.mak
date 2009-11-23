@@ -116,6 +116,8 @@ CPUS += TMS0980
 CPUS += I4004
 CPUS += SUPERFX
 CPUS += Z8
+CPUS += I8008
+CPUS += SCMP
 
 
 #-------------------------------------------------

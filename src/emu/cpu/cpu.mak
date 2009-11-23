@@ -544,6 +544,32 @@ $(CPUOBJ)/i4004/i4004.o:	$(CPUSRC)/i4004/i4004.c \
 							$(CPUSRC)/i4004/i4004.h
 
 
+#-------------------------------------------------
+# Intel 8008
+#-------------------------------------------------
+
+ifneq ($(filter I8008,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/i8008
+CPUOBJS += $(CPUOBJ)/i8008/i8008.o
+DASMOBJS += $(CPUOBJ)/i8008/8008dasm.o
+endif
+
+$(CPUOBJ)/i8008/i8008.o:	$(CPUSRC)/i8008/i8008.c \
+							$(CPUSRC)/i8008/i8008.h
+
+#-------------------------------------------------
+#  National Semiconductor SC/MP
+#-------------------------------------------------
+
+ifneq ($(filter SCMP,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/scmp
+CPUOBJS += $(CPUOBJ)/scmp/scmp.o
+DASMOBJS += $(CPUOBJ)/scmp/scmpdasm.o
+endif
+
+$(CPUOBJ)/scmp/scmp.o:		$(CPUSRC)/scmp/scmp.c \
+							$(CPUSRC)/scmp/scmp.h
+
 
 #-------------------------------------------------
 # Intel 8080/8085A
