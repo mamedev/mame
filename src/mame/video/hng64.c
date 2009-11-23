@@ -51,16 +51,26 @@ static struct polygon *polys ;
  * Sprite Format
  * ------------------
  *
- * UINT32 | Bytes    | Use
- * -------+-76543210-+----------------
+ * UINT32 | Bits                                    | Use
+ *        | 3322 2222 2222 1111 1111 11             |
+ * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
  *   0    | yyyy yyyy yyyy yyyy xxxx xxxx xxxx xxxx | x/y position
  *   1    | YYYY YYYY YYYY YYYY XXXX XXXX XXXX XXXX | x/y zoom
- *   2    | ???? ???? ???? ???? ---- ---I cccc CCCC | unknown, 'Inline' chain flag, x/y chain
- *   3    | ---- ---- bppp pppp ---- ---- ---- ---- | bpp select, palette entry
+ *   2    | ---- -zzz zzzz zzzz ---- ---I cccc CCCC | Z-buffer value, 'Inline' chain flag, x/y chain
+ *   3    | ---- ---- pppp pppp ---- ---- ---- ---- | palette entry
  *   4    | ---- --fF ???? tttt tttt tttt tttt tttt | flip bits, unknown, tile number
  *   5    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
  *   6    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
  *   7    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
+ *
+ * Sprite global Video Registers
+ * -----------------------------
+ *
+ * UINT32 | Bits                                    | Use
+ *        | 3322 2222 2222 1111 1111 11             |
+ * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
+ *   0    | ---- ---- x--- ---- ---- ---- ---- ---- | bpp select
+ * (anything else is unknown at the current time)
  */
 
 /* xxxx---- | I think this part of UINT32 2 is interesting as more than just a list end marker (AJG)
@@ -82,8 +92,18 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int xpos, ypos, tileno,chainx,chainy,xflip;
 		int xdrw,ydrw,pal,xinc,yinc,yflip;
 		int chaini;
+		int zbuf;
 		UINT32 zoomx,zoomy;
 		//float foomX, foomY;
+
+		zbuf = (source[2]&0x07ff0000)>>16;
+		#if 1
+		if(zbuf == 0x7ff) //temp kludge to avoid garbage on screen
+		{
+			source+=8;
+			continue;
+		}
+		#endif
 
 		ypos = (source[0]&0xffff0000)>>16;
 		xpos = (source[0]&0x0000ffff)>>0;
@@ -127,7 +147,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		zoomx = 0x10000;
 		zoomy = 0x10000;
 
-		if (source[3]&0x00800000 || source[3]&0x00400000) // TODO: maybe anything that's above 0xf is 4bpp? buriki sets 0x40 on attract mode text
+		if (hng64_spriteregs[0] & 0x00800000) //bpp switch
 		{
 			gfx= machine->gfx[4];
 		}
@@ -135,11 +155,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			gfx= machine->gfx[5];
 			tileno>>=1;
+			pal&=0xf;
 
 			// Just a big hack to make the top and bottom tiles in the intro not crash (a pal value of 0x70 is bad)
 			// Is there a problem with draw_sprites?  Doubtful...
-			if (source[2] == 0x00080000)
-				pal >>=4;
+			//if (source[2] == 0x00080000)
+			//	pal >>=4;
 		}
 
 		// Accomodate for chaining and flipping
