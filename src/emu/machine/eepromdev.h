@@ -65,14 +65,10 @@ extern UINT8 *eeprom_empty_default_data;
 #define MDRV_EEPROM_93C66B_NODEFAULT_ADD(_tag) \
 	MDRV_EEPROM_93C66B_ADD(_tag, 0, eeprom_empty_default_data)
 
-void eepromdev_write_bit( const device_config *device, int bit );
-int eepromdev_read_bit( const device_config *device );
-CUSTOM_INPUT( eepromdev_bit_r );
-void eepromdev_set_cs_line( const device_config *device, int state );
-void eepromdev_set_clock_line( const device_config *device, int state );
-
-void eepromdev_load( const device_config *device, mame_file *file );
-void eepromdev_save( const device_config *device, mame_file *file );
+WRITE_LINE_DEVICE_HANDLER( eepromdev_write_bit );
+READ_LINE_DEVICE_HANDLER( eepromdev_read_bit );
+WRITE_LINE_DEVICE_HANDLER( eepromdev_set_cs_line );
+WRITE_LINE_DEVICE_HANDLER( eepromdev_set_clock_line );
 
 void eepromdev_set_data( const device_config *device, const UINT8 *data, int length );
 void *eepromdev_get_data_pointer( const device_config *device, UINT32 *length, UINT32 *size );

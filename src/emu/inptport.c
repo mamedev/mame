@@ -204,6 +204,7 @@ struct _device_field_info
 	const input_field_config *	field;				/* pointer to the input field referenced */
 	const device_config * 		device;				/* device */
 	UINT8						shift;				/* shift to apply to the final result */
+	input_port_value			oldval;				/* last value */
 };
 
 
@@ -230,8 +231,7 @@ struct _input_port_state
 	input_port_value			defvalue;			/* combined default value across the port */
 	input_port_value			digital;			/* current value from all digital inputs */
 	input_port_value			vblank;				/* value of all IPT_VBLANK bits */
-	input_port_value			lastvalue;			/* last value of the port, to detect changes */
-	input_port_value			lastwrite;			/* last value written to the port, to detect changes */
+	input_port_value			outputvalue;		/* current value for outputs */
 };
 
 
@@ -629,11 +629,7 @@ static WRITE_LINE_DEVICE_HANDLER( changed_write_line_device )
 {
 	const device_field_info *device_field = (const device_field_info *) device;
 
-	/* recalculate 'oldval' as it cannot be passed directly */
-	input_port_value last = (device_field->field->type == IPT_OUTPUT) ? device_field->field->port->state->lastwrite : device_field->field->port->state->lastvalue;
-	input_port_value oldval = (last & device_field->field->mask) >> device_field->shift;
-
-	(*device_field->field->changed)(device_field->field, device_field->field->changed_param, oldval, state);
+	(*device_field->field->changed)(device_field->field, device_field->field->changed_param, device_field->oldval, state);
 }
 
 
@@ -1255,6 +1251,7 @@ input_port_value input_port_read_direct(const input_port_config *port)
 		{
 			/* replace the bits with bits from the device */
 			input_port_value newval = (*device_field->field->read_line_device)(device_field->device);
+			device_field->oldval = newval;
 			result = (result & ~device_field->field->mask) | ((newval << device_field->shift) & device_field->field->mask);
 		}
 
@@ -1473,23 +1470,22 @@ void input_port_write_direct(const input_port_config *port, input_port_value dat
 {
 	/* call device line changed handlers */
 	device_field_info *device_field;
-	input_port_value newvalue = port->state->lastwrite;
 
-	COMBINE_DATA(&newvalue);
+	COMBINE_DATA(&port->state->outputvalue);
 
 	for (device_field = port->state->writedevicelist; device_field; device_field = device_field->next)
 		if (device_field->field->type == IPT_OUTPUT && input_condition_true(port->machine, &device_field->field->condition))
 		{
-			input_port_value oldval = (port->state->lastwrite & device_field->field->mask) >> device_field->shift;
-			input_port_value newval = (newvalue & device_field->field->mask) >> device_field->shift;
+			input_port_value newval = ( (port->state->outputvalue ^ device_field->field->defvalue ) & device_field->field->mask) >> device_field->shift;
 
 			/* if the bits have changed, call the handler */
-			if (oldval != newval)
+			if (device_field->oldval != newval)
+			{
 				(*device_field->field->write_line_device)(device_field->device, newval);
-		}
 
-	/* remember the last value */
-	port->state->lastwrite = newvalue;
+				device_field->oldval = newval;
+			}
+		}
 }
 
 
@@ -2112,16 +2108,16 @@ profiler_mark_start(PROFILER_INPUT);
 		for (device_field = port->state->writedevicelist; device_field; device_field = device_field->next)
 			if (device_field->field->type != IPT_OUTPUT && input_condition_true(port->machine, &device_field->field->condition))
 			{
-				input_port_value oldval = (port->state->lastvalue & device_field->field->mask) >> device_field->shift;
 				input_port_value newval = (newvalue & device_field->field->mask) >> device_field->shift;
 
 				/* if the bits have  changed, call the handler */
-				if (oldval != newval)
+				if (device_field->oldval != newval)
+				{
 					(*device_field->field->write_line_device)(device_field->device, newval);
-			}
 
-		/* remember the last value */
-		port->state->lastvalue = newvalue;
+					device_field->oldval = newval;
+				}
+			}
 	}
 
 	/* handle playback/record */

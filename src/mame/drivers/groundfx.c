@@ -155,11 +155,9 @@ static CUSTOM_INPUT( coin_word_r )
 
 static WRITE32_HANDLER( groundfx_input_w )
 {
-	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
 	switch (offset)
 	{
 		case 0x00:
-		{
 			if (ACCESSING_BITS_24_31)	/* $500000 is watchdog */
 			{
 				watchdog_reset(space->machine);
@@ -167,17 +165,12 @@ static WRITE32_HANDLER( groundfx_input_w )
 
 			if (ACCESSING_BITS_0_7)
 			{
-				eepromdev_set_clock_line(eeprom, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				eepromdev_write_bit(eeprom, data & 0x40);
-				eepromdev_set_cs_line(eeprom, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-				return;
+				input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
 			}
 
-			return;
-		}
+			break;
 
 		case 0x01:
-		{
 			if (ACCESSING_BITS_24_31)
 			{
 				coin_lockout_w(0,~data & 0x01000000);
@@ -186,7 +179,7 @@ static WRITE32_HANDLER( groundfx_input_w )
 				coin_counter_w(1, data & 0x08000000);
 				coin_word = (data >> 16) &0xffff;
 			}
-		}
+			break;
 	}
 }
 
@@ -271,7 +264,7 @@ static INPUT_PORTS_START( groundfx )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eepromdev_bit_r, "eeprom")
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON3 )		/* shift hi */
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON1 )		/* brake */
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -281,6 +274,11 @@ static INPUT_PORTS_START( groundfx )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
 
 	PORT_START("SYSTEM")
 	PORT_SERVICE_NO_TOGGLE( 0x00000001, IP_ACTIVE_LOW )

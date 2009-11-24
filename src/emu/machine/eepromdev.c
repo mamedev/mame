@@ -247,15 +247,15 @@ static void eeprom_reset(eeprom_state *c)
 }
 
 
-void eepromdev_write_bit(const device_config *device, int bit)
+WRITE_LINE_DEVICE_HANDLER( eepromdev_write_bit )
 {
 	eeprom_state *c = get_safe_token(device);
 
-	LOG(("write bit %d\n",bit));
-	c->latch = bit;
+	LOG(("write bit %d\n",state));
+	c->latch = state;
 }
 
-int eepromdev_read_bit(const device_config *device)
+READ_LINE_DEVICE_HANDLER( eepromdev_read_bit )
 {
 	eeprom_state *c = get_safe_token(device);
 	int res;
@@ -279,16 +279,7 @@ int eepromdev_read_bit(const device_config *device)
 	return res;
 }
 
-CUSTOM_INPUT( eepromdev_bit_r )
-{
-	const char *devtag = (const char *)param;
-	const device_config *eeprom = devtag_get_device(field->port->machine, devtag);
-
-	/* we test if the device is indeed an eeprom when calling this device handler */
-	return eepromdev_read_bit(eeprom);
-}
-
-void eepromdev_set_cs_line(const device_config *device, int state)
+WRITE_LINE_DEVICE_HANDLER( eepromdev_set_cs_line )
 {
 	eeprom_state *c = get_safe_token(device);
 
@@ -299,7 +290,7 @@ void eepromdev_set_cs_line(const device_config *device, int state)
 		eeprom_reset(c);
 }
 
-void eepromdev_set_clock_line(const device_config *device, int state)
+WRITE_LINE_DEVICE_HANDLER( eepromdev_set_clock_line )
 {
 	eeprom_state *c = get_safe_token(device);
 
@@ -332,14 +323,14 @@ logerror("EEPROM read %04x from address %02x\n",c->eeprom_data_bits,c->eeprom_re
 }
 
 
-void eepromdev_load(const device_config *device, mame_file *f)
+static void eepromdev_load(const device_config *device, mame_file *f)
 {
 	eeprom_state *c = get_safe_token(device);
 
 	mame_fread(f, c->eeprom_data, (1 << c->intf->address_bits) * c->intf->data_bits / 8);
 }
 
-void eepromdev_save(const device_config *device, mame_file *f)
+static void eepromdev_save(const device_config *device, mame_file *f)
 {
 	eeprom_state *c = get_safe_token(device);
 
