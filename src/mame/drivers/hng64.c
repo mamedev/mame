@@ -667,7 +667,7 @@ static READ32_HANDLER( hng64_sysregs_r )
 		case 0x217c: return 0; //RTC status?
 	}
 
-	//printf("%08x\n",offset*4);
+	printf("%08x\n",offset*4);
 
 	//return mame_rand(space->machine)&0xffffffff;
 	return hng64_sysregs[offset];
@@ -834,7 +834,16 @@ static READ32_HANDLER( racing_io_r )
 {
 	switch (offset*4)
 	{
-        case 0x000: return mame_rand(space->machine);
+        case 0x000:
+        {
+			if(fake_mcu_time < 0x100)//i/o init
+			{
+				fake_mcu_time++;
+				return 0x400;
+			}
+			else
+				return 0x000;
+		}
 		case 0x004: return input_port_read(space->machine, "SYSTEM");
 		case 0x008: return input_port_read(space->machine, "P1_P2");
 		case 0x600: return no_machine_error_code;
@@ -1746,6 +1755,12 @@ static INTERRUPT_GEN( irq_start )
 		break;
 		case 0x02: hng64_interrupt_level_request = 2;
 		break;
+		case 0x03:
+		if(hng64_mcu_type == RACING_MCU)
+			hng64_interrupt_level_request = 11; //network irq
+		else
+			return;
+		break;
 	}
 
 	cpu_set_input_line(device, 0, ASSERT_LINE);
@@ -1825,7 +1840,7 @@ static MACHINE_DRIVER_START( hng64 )
 	MDRV_CPU_ADD("maincpu", VR4300BE, MASTER_CLOCK)  	// actually R4300
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(hng_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq_start,3)
+	MDRV_CPU_VBLANK_INT_HACK(irq_start,4)
 
 	MDRV_CPU_ADD("audiocpu", V30,8000000)		 		// v53, 16? mhz!
 	MDRV_CPU_PROGRAM_MAP(hng_sound_map)

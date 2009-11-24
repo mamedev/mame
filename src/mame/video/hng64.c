@@ -89,8 +89,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 	while( source<finish )
 	{
-		int xpos, ypos, tileno,chainx,chainy,xflip;
-		int xdrw,ydrw,pal,xinc,yinc,yflip;
+		int tileno,chainx,chainy,xflip;
+		int pal,xinc,yinc,yflip;
+		UINT16 xpos, ypos;
+		int xdrw,ydrw;
 		int chaini;
 		int zbuf;
 		UINT32 zoomx,zoomy;
@@ -118,10 +120,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		pal =(source[3]&0x00ff0000)>>16;
 		xflip=(source[4]&0x02000000)>>25;
 		yflip=(source[4]&0x01000000)>>24;
-
-		if(xpos&0x8000) xpos -=0x10000;
-		if(ypos&0x8000) ypos -=0x10000;
-
 
 //      if (!(source[4] == 0x00000000 || source[4] == 0x000000aa))
 //          mame_printf_debug("unknown : %.8x %.8x %.8x %.8x %.8x %.8x %.8x %.8x \n", source[0], source[1], source[2], source[3],
@@ -156,11 +154,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			gfx= machine->gfx[5];
 			tileno>>=1;
 			pal&=0xf;
-
-			// Just a big hack to make the top and bottom tiles in the intro not crash (a pal value of 0x70 is bad)
-			// Is there a problem with draw_sprites?  Doubtful...
-			//if (source[2] == 0x00080000)
-			//	pal >>=4;
 		}
 
 		// Accomodate for chaining and flipping
@@ -191,7 +184,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 
 //      if (((source[2] & 0xffff0000) >> 16) == 0x0001)
-//      {
+//      { 
 //          usrintf_showmessage("T %.8x %.8x %.8x %.8x %.8x", source[0], source[1], source[2], source[3], source[4]) ;
 //          // usrintf_showmessage("T %.8x %.8x %.8x %.8x %.8x", source[0], source[1], source[2], source[3], source[4]) ;
 //      }
@@ -200,19 +193,28 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			for(xdrw=0;xdrw<=chainx;xdrw++)
 			{
+				UINT16 drawx = xpos+(xinc*xdrw);
+				UINT16 drawy = ypos+(yinc*ydrw);
+				
+				// 0x3ff (0x200 sign bit) based on sams64_2 char select
+				drawx &= 0x3ff;
+				drawy &= 0x3ff;
+
+				if (drawx&0x0200)drawx-=0x400;
+				if (drawy&0x0200)drawy-=0x400;
+
 				if (!chaini)
 				{
-					pdrawgfxzoom_transpen(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,xpos+(xinc*xdrw),ypos+(yinc*ydrw),zoomx,zoomy/*0x10000*/,machine->priority_bitmap, 0,0);
+					pdrawgfxzoom_transpen(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,machine->priority_bitmap, 0,0);
 					tileno++;
 				}
 				else // inline chain mode, used by ss64
 				{
+
 					tileno=(source[4]&0x0007ffff);
 					pal =(source[3]&0x00ff0000)>>16;
-					//xflip=(source[4]&0x02000000)>>25;
-					//yflip=(source[4]&0x01000000)>>24;
 
-					if (source[3]&0x00800000)
+					if (hng64_spriteregs[0] & 0x00800000) //bpp switch
 					{
 						gfx= machine->gfx[4];
 					}
@@ -220,17 +222,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					{
 						gfx= machine->gfx[5];
 						tileno>>=1;
+						pal&=0xf;
 					}
 
-					pdrawgfxzoom_transpen(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,xpos+(xinc*xdrw),ypos+(yinc*ydrw),zoomx,zoomy/*0x10000*/,machine->priority_bitmap, 0,0);
+					pdrawgfxzoom_transpen(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,machine->priority_bitmap, 0,0);
 					source +=8;
-
 				}
 
 			}
 		}
-
-
+		
 		if (!chaini) source +=8;
 	}
 }
