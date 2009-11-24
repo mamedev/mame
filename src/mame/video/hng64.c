@@ -33,9 +33,6 @@ UINT32 *hng64_spriteregs;
 
 UINT32 *hng64_tcram ;
 
-/* HAAAACK to make the floor 'work' */
-UINT32 hng64_hackTilemap3, hng64_hackTm3Count, hng64_rowScrollOffset ;
-
 void hng64_mark_all_tiles_dirty( int tilemap )
 {
 	if (tilemap == 0)
@@ -138,6 +135,10 @@ static struct polygon *polys ;
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
  *   0    | ---- ---- x--- ---- ---- ---- ---- ---- | bpp select
+ *   1    | yyyy yyyy yyyy yyyy xxxx xxxx xxxx xxxx | global sprite offset (ss64 rankings in attract)
+ *   2    | ---- ---- ---- ---- ---- ---- ---- ---- |
+ *   3    | ---- ---- ---- ---- ---- ---- ---- ---- |
+ *   4    | ---- ---- ---- ---- ---- ---- ---- ---- |
  * (anything else is unknown at the current time)
  */
 
@@ -149,6 +150,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	const gfx_element *gfx;
 	UINT32 *source = hng64_spriteram;
 	UINT32 *finish = hng64_spriteram + 0xc000/4;
+
+	// global offsets in sprite regs
+	int	spriteoffsx = (hng64_spriteregs[1]>>0)&0xffff;
+	int spriteoffsy = (hng64_spriteregs[1]>>16)&0xffff;
 
 //  for (int iii = 0; iii < 0x0f; iii++)
 //      mame_printf_debug("%.8x ", hng64_videoregs[iii]) ;
@@ -177,6 +182,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		ypos = (source[0]&0xffff0000)>>16;
 		xpos = (source[0]&0x0000ffff)>>0;
+		xpos += (spriteoffsx);
+		ypos += (spriteoffsy);
+
 		tileno=(source[4]&0x0007ffff);
 		chainx=(source[2]&0x000000f0)>>4;
 		chainy=(source[2]&0x0000000f);
@@ -261,8 +269,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			for(xdrw=0;xdrw<=chainx;xdrw++)
 			{
-				UINT16 drawx = xpos+(xinc*xdrw);
-				UINT16 drawy = ypos+(yinc*ydrw);
+				INT16 drawx = xpos+(xinc*xdrw);
+				INT16 drawy = ypos+(yinc*ydrw);
 
 				// 0x3ff (0x200 sign bit) based on sams64_2 char select
 				drawx &= 0x3ff;
@@ -1209,26 +1217,6 @@ WRITE32_HANDLER( hng64_videoram_w )
 
 //  if ((realoff>=0x40000)) mame_printf_debug("offsw %08x %08x\n",realoff,data);
 
-
-	///////////////////////////////////
-	// For the scrolling ground, yo  //
-	///////////////////////////////////
-
-	// First, get the offset we're working with
-	if ( (realoff&0x00000bf0) == 0xbf0)
-	{
-		hng64_hackTilemap3 = 1 ;
-		hng64_rowScrollOffset = realoff & 0x000ff000 ;
-	}
-
-	// Next count the number of lines to be drawn to the screen.
-	// This is probably really done per-scanline or something.
-	if (hng64_rowScrollOffset)
-	{
-		if ((realoff & hng64_rowScrollOffset) == hng64_rowScrollOffset)
-			hng64_hackTm3Count++ ;
-	}
-
 	/* 400000 - 7fffff is scroll regs etc. */
 }
 
@@ -1671,13 +1659,20 @@ VIDEO_UPDATE( hng64 )
 #endif
 
 	if (1)
-    popmessage("%08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x",
+		popmessage("%08x %08x %08x %08x %08x", hng64_spriteregs[0], hng64_spriteregs[1], hng64_spriteregs[2], hng64_spriteregs[3], hng64_spriteregs[4]);
+
+	if (0)
+    popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x %08x",
     hng64_videoregs[0x00],
     hng64_videoregs[0x01],
-    hng64_videoregs[0x02],
-    hng64_videoregs[0x03],
-    hng64_videoregs[0x04],
-    hng64_videoregs[0x05],
+    (hng64_videoregs[0x02]>>16)&0xffff,
+    (hng64_videoregs[0x02]>>0)&0xffff,
+    (hng64_videoregs[0x03]>>16)&0xffff,
+    (hng64_videoregs[0x03]>>0)&0xffff,
+	(hng64_videoregs[0x04]>>16)&0xffff,
+    (hng64_videoregs[0x04]>>0)&0xffff,
+    (hng64_videoregs[0x05]>>16)&0xffff,
+    (hng64_videoregs[0x05]>>0)&0xffff,
     hng64_videoregs[0x06],
     hng64_videoregs[0x07],
     hng64_videoregs[0x08],
@@ -1687,7 +1682,6 @@ VIDEO_UPDATE( hng64 )
     hng64_videoregs[0x0c],
     hng64_videoregs[0x0d],
     hng64_videoregs[0x0e]);
-
 
 
 

@@ -461,7 +461,6 @@ static UINT32 *rombase;
 static UINT32 *hng_mainram;
 static UINT32 *hng_cart;
 static UINT32 *hng64_dualport;
-static UINT32 *hng64_sram;
 static UINT16 *hng64_soundram;
 static UINT32 *hng64_sysregs;
 
@@ -495,10 +494,6 @@ static UINT8 *hng64_com_virtual_mem;
 static UINT8 *hng64_com_op_base;
 
 static UINT8 *hng64_com_mmu_mem;
-
-/* Hacky stuff */
-//static char writeString[1024];
-extern UINT32 hng64_hackTilemap3, hng64_hackTm3Count, hng64_rowScrollOffset;
 
 
 #ifdef UNUSED_FUNCTION
@@ -573,9 +568,7 @@ static WRITE32_HANDLER( hng64_pal_w )
 	//if (a != 0)
 	//  popmessage("Alpha is not zero!") ;
 
-	// sams64 / sams64_2 never write a palette, why not?
-	//if (hng64_mcu_type!=SAMSHO_MCU)
-		palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 static READ32_HANDLER( hng64_sysregs_r )
@@ -676,18 +669,6 @@ static WRITE32_HANDLER( hng64_sysregs_w )
 		//default:
 			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
 	}
-}
-
-static READ32_HANDLER( hng64_sram_r )
-{
-	logerror("HNG64 reading from SRAM 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sram[offset], cpu_get_pc(space->cpu));
-	return hng64_sram[offset];
-}
-
-static WRITE32_HANDLER( hng64_sram_w )
-{
-	logerror("HNG64 writing to SRAM 0x%08x == 0x%08x & 0x%08x. (PC=%08x)\n", offset*4, data, mem_mask, cpu_get_pc(space->cpu));
-	COMBINE_DATA (&hng64_sram[offset]);
 }
 
 /**************************************
@@ -894,8 +875,10 @@ static WRITE32_HANDLER( dl_control_w )
 		memcpy(&hng64_dls[activeBuffer][0],&hng64_dl[0],0x200);
 
 	// Only if it's VALID (hack)
-	if (data == 1 || data == 2)
-		activeBuffer = data - 1;
+	if (data & 1)
+		activeBuffer = 0;
+	if (data & 2)
+		activeBuffer = 1;
 
 }
 
@@ -948,7 +931,8 @@ static READ32_HANDLER( unk_vreg_r )
 	static UINT32 toggle;
 
 	toggle^=0x8000;
-	return toggle;
+
+	return toggle | (mame_rand(space->machine) & 2);
 }
 
 
@@ -1045,7 +1029,7 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f700000, 0x1f702fff) AM_READWRITE(hng64_sysregs_r,hng64_sysregs_w) AM_BASE(&hng64_sysregs)
 
 	// SRAM.  Coin data, Player Statistics, etc.
-	AM_RANGE(0x1F800000, 0x1F803fff) AM_READWRITE(hng64_sram_r, hng64_sram_w) AM_BASE(&hng64_sram)
+	AM_RANGE(0x1F800000, 0x1F803fff) AM_RAM AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
 
 	// Dualport RAM
 	AM_RANGE(0x1F808000, 0x1F8087ff) AM_READWRITE(hng64_dualport_r, hng64_dualport_w) AM_BASE(&hng64_dualport)
@@ -1813,23 +1797,6 @@ static MACHINE_RESET(hyperneo)
 	hng_mcu_en = 0;
 }
 
-static PALETTE_INIT( hng64 )
-{
-	#if 0
-
-	int x,r,g,b,i;
-
-	for(i=0;i<0x10;i++)
-	for(x=0;x<0x100;x++)
-	{
-		r = (x & 0xf)*0x10;
-		g = ((x & 0x3c)>>2)*0x10;
-		b = ((x & 0xf0)>>4)*0x10;
-		palette_set_color(machine,x+i*0x100,MAKE_RGB(r,g,b));
-	}
-	#endif
-}
-
 static MACHINE_DRIVER_START( hng64 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", VR4300BE, MASTER_CLOCK)  	// actually R4300
@@ -1844,7 +1811,7 @@ static MACHINE_DRIVER_START( hng64 )
 	MDRV_CPU_PROGRAM_MAP(hng_comm_map)
 	MDRV_CPU_IO_MAP(hng_comm_io_map)
 
-	MDRV_PALETTE_INIT(hng64)
+	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_GFXDECODE(hng64)
 	MDRV_MACHINE_START(hyperneo)
