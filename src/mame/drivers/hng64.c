@@ -615,7 +615,7 @@ static READ32_HANDLER( hng64_sysregs_r )
 		case 0x217c: return 0; //RTC status?
 	}
 
-	printf("%08x\n",offset*4);
+//	printf("%08x\n",offset*4);
 
 	//return mame_rand(space->machine)&0xffffffff;
 	return hng64_sysregs[offset];
@@ -802,7 +802,7 @@ static READ32_HANDLER( racing_io_r )
 
 static READ32_HANDLER( hng64_dualport_r )
 {
-	printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+//	printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 
 	/*
 	command table:
@@ -830,7 +830,7 @@ static READ32_HANDLER( hng64_dualport_r )
 
 static WRITE32_HANDLER( hng64_dualport_w )
 {
-	printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+//	printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 	COMBINE_DATA (&hng64_dualport[offset]);
 }
 
@@ -991,6 +991,51 @@ static READ32_HANDLER( hng64_soundram_r )
 	return FLIPENDIAN_INT16(datahi) | (FLIPENDIAN_INT16(datalo) << 16);
 }
 
+/* The following is guesswork, needs confirmation with a test on the real board. */
+static WRITE32_HANDLER( hng64_sprite_clear_even_w )
+{
+	static UINT32 spr_offs;
+
+	spr_offs = (offset) * 0x10 * 4;
+
+	if(ACCESSING_BITS_16_31)
+	{
+		memory_write_dword(space, 0x20000000+0x00+0x00+spr_offs, 0x00000000);
+		memory_write_dword(space, 0x20000000+0x08+0x00+spr_offs, 0x00000000);
+		memory_write_dword(space, 0x20000000+0x10+0x00+spr_offs, 0x00000000);
+		memory_write_dword(space, 0x20000000+0x18+0x00+spr_offs, 0x00000000);
+	}
+	if(ACCESSING_BITS_8_15)
+	{
+		memory_write_dword(space, 0x20000000+0x00+0x20+spr_offs, 0x00000000);
+		memory_write_dword(space, 0x20000000+0x08+0x20+spr_offs, 0x00000000);
+		memory_write_dword(space, 0x20000000+0x10+0x20+spr_offs, 0x00000000);
+		memory_write_dword(space, 0x20000000+0x18+0x20+spr_offs, 0x00000000);
+	}
+}
+
+static WRITE32_HANDLER( hng64_sprite_clear_odd_w )
+{
+	static UINT32 spr_offs;
+
+	spr_offs = (offset) * 0x10 * 4;
+
+	if(ACCESSING_BITS_16_31)
+	{
+		memory_write_dword(space, 0x20000000+0x04+0x00+spr_offs, 0x00000000);
+		memory_write_dword(space, 0x20000000+0x0c+0x00+spr_offs, 0x00000000);
+		memory_write_dword(space, 0x20000000+0x14+0x00+spr_offs, 0x00000000);
+		memory_write_dword(space, 0x20000000+0x1c+0x00+spr_offs, 0x00000000);
+	}
+	if(ACCESSING_BITS_0_15)
+	{
+		memory_write_dword(space, 0x20000000+0x04+0x20+spr_offs, 0x00000000);
+		memory_write_dword(space, 0x20000000+0x0c+0x20+spr_offs, 0x00000000);
+		memory_write_dword(space, 0x20000000+0x14+0x20+spr_offs, 0x00000000);
+		memory_write_dword(space, 0x20000000+0x1c+0x20+spr_offs, 0x00000000);
+	}
+}
+
 static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_BASE(&hng_mainram)
@@ -1010,6 +1055,8 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	// Video
 	AM_RANGE(0x20000000, 0x2000bfff) AM_RAM AM_BASE(&hng64_spriteram)							// Sprites
+	AM_RANGE(0x2000d800, 0x2000e3ff) AM_WRITE(hng64_sprite_clear_even_w)
+	AM_RANGE(0x2000e400, 0x2000efff) AM_WRITE(hng64_sprite_clear_odd_w)
 	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_BASE(&hng64_spriteregs)							// Sprites Registers
 	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_BASE(&hng64_videoram)	// Tilemap
 	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_BASE(&hng64_videoregs)							// Video Registers
