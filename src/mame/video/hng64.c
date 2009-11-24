@@ -1540,32 +1540,31 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
  * Video Regs Format
  * ------------------
  *
-
+ * UINT32 | Bits                                    | Use
+ *        | 3322 2222 2222 1111 1111 11             |
+ * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
  *   0    | ---- -C-- ---- -??Z ---- ---- ---- ---- | unknown (scroll control?) C = Global Complex zoom, ? = Always Set?, Z = Global Zoom Disable?
             0000 0011  - road edge alt 1
 			0000 0111  - road edge alt 2
-
- * UINT32 | Bytes    | Use
- * -------+-76543210-+----------------
- *   1    | xxxx---- | looks like it's 0001 most (all) of the time - turns off in buriki intro
- *   1    | ----oooo | unknown - always seems to be 0000 (fatfurwa)
- *   2    | xxxx---- | tilemap0 per layer flags
- *   2    | ----xxxx | tilemap1 per layer flags
- *   3    | xxxx---- | tilemap2 per layer flags
- *   3    | ----xxxx | tilemap3 per layer flags
- *   4    | xxxx---- | tilemap0 offset into tilemap RAM?
- *   4    | ----xxxx | tilemap1 offset into tilemap RAM
- *   5    | xxxx---- | tilemap3 offset into tilemap RAM
- *   5    | ----xxxx | tilemap4 offset into tilemap RAM?
- *   6    | oooooooo | unknown - always seems to be 000001ff (fatfurwa)
- *   7    | oooooooo | unknown - always seems to be 000001ff (fatfurwa)
- *   8    | oooooooo | unknown - always seems to be 80008000 (fatfurwa)
- *   9    | oooooooo | unknown - always seems to be 00000000 (fatfurwa)
- *   a    | oooooooo | unknown - always seems to be 00000000 (fatfurwa)
- *   b    | mmmmmmmm | auto animation mask for tilemaps, - use these bits from the original tile number
- *   c    | xxxxxxxx | auto animation bits for tilemaps, - merge in these bits to auto animate the tilemap
- *   d    | oooooooo | not used ??
- *   e    | oooooooo | not used ??
+ *   1    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | looks like it's 0001 most (all) of the time - turns off in buriki intro
+ *   1    | ---- ---- ---- ---- oooo oooo oooo oooo | unknown - always seems to be 0000 (fatfurwa)
+ *   2    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap0 per layer flags
+ *   2    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap1 per layer flags
+ *   3    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap2 per layer flags
+ *   3    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap3 per layer flags
+ *   4    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap0 offset into tilemap RAM?
+ *   4    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap1 offset into tilemap RAM
+ *   5    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap3 offset into tilemap RAM
+ *   5    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap4 offset into tilemap RAM?
+ *   6    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 000001ff (fatfurwa)
+ *   7    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 000001ff (fatfurwa)
+ *   8    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 80008000 (fatfurwa)
+ *   9    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 00000000 (fatfurwa)
+ *   a    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 00000000 (fatfurwa)
+ *   b    | mmmm mmmm mmmm mmmm mmmm mmmm mmmm mmmm | auto animation mask for tilemaps, - use these bits from the original tile number
+ *   c    | xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx | auto animation bits for tilemaps, - merge in these bits to auto animate the tilemap
+ *   d    | oooo oooo oooo oooo oooo oooo oooo oooo | not used ??
+ *   e    | oooo oooo oooo oooo oooo oooo oooo oooo | not used ??
 
 	per tile regs (0x2/0x3)
 
