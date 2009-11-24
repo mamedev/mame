@@ -3621,7 +3621,7 @@ GAME( 1996, xymg,         0,        xymg,     xymg,      xymg,         ROT0, "IG
 GAME( 1996, wlcc,         xymg,     wlcc,     wlcc,      wlcc,         ROT0, "IGS",        "Wan Li Chang Cheng (China, V638C)",    0 )
 GAME( 1996, vbowl,        0,        vbowl,    vbowl,     vbowl,        ROT0, "IGS",        "Virtua Bowling (World, V101XCM)",      GAME_IMPERFECT_SOUND )
 GAME( 1996, vbowlj,       vbowl,    vbowl,    vbowlj,    vbowlj,       ROT0, "IGS / Alta", "Virtua Bowling (Japan, V100JCM)",      GAME_IMPERFECT_SOUND )
-GAME( 1998, nkishusp,     0,        lhb2,     lhb2,      nkishusp,     ROT0, "IGS / Alta", "Mahjong Nenrikishu SP",                0 )
+GAME( 1998, nkishusp,     lhb2,     lhb2,     lhb2,      nkishusp,     ROT0, "IGS / Alta", "Mahjong Nenrikishu SP",                GAME_NOT_WORKING )
 
 GAME( 1997, drgnwrld,     0,        drgnwrld, drgnwrld,  drgnwrld,     ROT0, "IGS",        "Dragon World (World, V040O)",          0 )
 GAME( 1995, drgnwrldv30,  drgnwrld, drgnwrld, drgnwrld,  drgnwrldv30,  ROT0, "IGS",        "Dragon World (World, V030O)",          0 )
