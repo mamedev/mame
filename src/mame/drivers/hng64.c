@@ -451,14 +451,11 @@ or Fatal Fury for example).
 #include "cpu/nec/nec.h"
 #include "deprecat.h"
 #include "cpu/mips/mips3.h"
+#include "hng64.h"
 
-static int hng64_mcu_type = 0;
+int hng64_mcu_type = 0;
 static UINT32 fake_mcu_time;
 static UINT16 hng_mcu_en;
-#define FIGHT_MCU  1
-#define SHOOT_MCU  2
-#define RACING_MCU 3
-#define SAMSHO_MCU 4
 
 static UINT32 *rombase;
 static UINT32 *hng_mainram;
@@ -469,7 +466,7 @@ static UINT16 *hng64_soundram;
 static UINT32 *hng64_sysregs;
 
 // Stuff from over in video...
-extern tilemap *hng64_tilemap0, *hng64_tilemap1, *hng64_tilemap2, *hng64_tilemap3 ;
+extern WRITE32_HANDLER( hng64_videoram_w );
 extern UINT32 *hng64_spriteram, *hng64_videoregs, *hng64_spriteregs ;
 extern UINT32 *hng64_videoram ;
 extern UINT32 *hng64_tcram ;
@@ -484,7 +481,6 @@ static UINT32 activeBuffer ;
 
 static UINT32 no_machine_error_code;
 static int hng64_interrupt_level_request;
-static WRITE32_HANDLER( hng64_videoram_w );
 
 /* 3D stuff */
 static UINT32 *hng64_3d_1;
@@ -513,54 +509,6 @@ WRITE32_HANDLER( trap_write )
 #endif
 
 
-static WRITE32_HANDLER( hng64_videoram_w )
-{
-	int realoff;
-	COMBINE_DATA(&hng64_videoram[offset]);
-
-	realoff = offset*4;
-
-	if ((realoff>=0) && (realoff<0x10000))
-	{
-		tilemap_mark_tile_dirty(hng64_tilemap0,offset&0x3fff);
-	}
-	else if ((realoff>=0x10000) && (realoff<0x20000))
-	{
-		tilemap_mark_tile_dirty(hng64_tilemap1,offset&0x3fff);
-	}
-	else if ((realoff>=0x20000) && (realoff<0x30000))
-	{
-		tilemap_mark_tile_dirty(hng64_tilemap2,offset&0x3fff);
-	}
-	else if ((realoff>=0x30000) && (realoff<0x40000))
-	{
-		tilemap_mark_tile_dirty(hng64_tilemap3,offset&0x3fff);
-	}
-
-//  if ((realoff>=0x40000)) mame_printf_debug("offsw %08x %08x\n",realoff,data);
-
-
-	///////////////////////////////////
-	// For the scrolling ground, yo  //
-	///////////////////////////////////
-
-	// First, get the offset we're working with
-	if ( (realoff&0x00000bf0) == 0xbf0)
-	{
-		hng64_hackTilemap3 = 1 ;
-		hng64_rowScrollOffset = realoff & 0x000ff000 ;
-	}
-
-	// Next count the number of lines to be drawn to the screen.
-	// This is probably really done per-scanline or something.
-	if (hng64_rowScrollOffset)
-	{
-		if ((realoff & hng64_rowScrollOffset) == hng64_rowScrollOffset)
-			hng64_hackTm3Count++ ;
-	}
-
-	/* 400000 - 7fffff is scroll regs etc. */
-}
 
 #if 0
 static READ32_HANDLER( hng64_random_read )

@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "hng64.h"
 
 #include <math.h>
 
@@ -10,10 +11,21 @@ UINT32 hng64_dls[2][0x81] ;
 static int frameCount = 0 ;
 
 UINT32* hng64_videoram;
-tilemap *hng64_tilemap0;
-tilemap *hng64_tilemap1;
-tilemap *hng64_tilemap2;
-tilemap *hng64_tilemap3;
+tilemap *hng64_tilemap0_8x8;
+tilemap *hng64_tilemap1_8x8;
+tilemap *hng64_tilemap2_8x8;
+tilemap *hng64_tilemap3_8x8;
+
+tilemap *hng64_tilemap0_16x16;
+tilemap *hng64_tilemap1_16x16;
+tilemap *hng64_tilemap2_16x16;
+tilemap *hng64_tilemap3_16x16;
+
+tilemap *hng64_tilemap0_16x16_alt;
+tilemap *hng64_tilemap1_16x16_alt;
+tilemap *hng64_tilemap2_16x16_alt;
+tilemap *hng64_tilemap3_16x16_alt;
+
 
 UINT32 *hng64_spriteram;
 UINT32 *hng64_videoregs;
@@ -23,6 +35,62 @@ UINT32 *hng64_tcram ;
 
 /* HAAAACK to make the floor 'work' */
 UINT32 hng64_hackTilemap3, hng64_hackTm3Count, hng64_rowScrollOffset ;
+
+void hng64_mark_all_tiles_dirty( int tilemap )
+{
+	if (tilemap == 0)
+	{
+		tilemap_mark_all_tiles_dirty (hng64_tilemap0_8x8);
+		tilemap_mark_all_tiles_dirty (hng64_tilemap0_16x16);
+		tilemap_mark_all_tiles_dirty (hng64_tilemap0_16x16_alt);
+	}
+	else if (tilemap == 1)
+	{
+		tilemap_mark_all_tiles_dirty (hng64_tilemap1_8x8);
+		tilemap_mark_all_tiles_dirty (hng64_tilemap1_16x16);
+		tilemap_mark_all_tiles_dirty (hng64_tilemap1_16x16_alt);
+	}
+	else if (tilemap == 2)
+	{
+		tilemap_mark_all_tiles_dirty (hng64_tilemap2_8x8);
+		tilemap_mark_all_tiles_dirty (hng64_tilemap2_16x16);
+		tilemap_mark_all_tiles_dirty (hng64_tilemap2_16x16_alt);
+	}
+	else if (tilemap == 3)
+	{
+		tilemap_mark_all_tiles_dirty (hng64_tilemap3_8x8);
+		tilemap_mark_all_tiles_dirty (hng64_tilemap3_16x16);
+		tilemap_mark_all_tiles_dirty (hng64_tilemap3_16x16_alt);
+	}
+}
+
+void hng64_mark_tile_dirty( int tilemap, int tile_index )
+{
+	if (tilemap == 0)
+	{
+		tilemap_mark_tile_dirty(hng64_tilemap0_8x8,tile_index);
+		tilemap_mark_tile_dirty(hng64_tilemap0_16x16,tile_index);
+		tilemap_mark_tile_dirty(hng64_tilemap0_16x16_alt,tile_index);
+	}
+	else if (tilemap == 1)
+	{
+		tilemap_mark_tile_dirty(hng64_tilemap1_8x8,tile_index);
+		tilemap_mark_tile_dirty(hng64_tilemap1_16x16,tile_index);
+		tilemap_mark_tile_dirty(hng64_tilemap1_16x16_alt,tile_index);
+	}
+	else if (tilemap == 2)
+	{
+		tilemap_mark_tile_dirty(hng64_tilemap2_8x8,tile_index);
+		tilemap_mark_tile_dirty(hng64_tilemap2_16x16,tile_index);
+		tilemap_mark_tile_dirty(hng64_tilemap2_16x16_alt,tile_index);
+	}
+	else if (tilemap == 3)
+	{
+		tilemap_mark_tile_dirty(hng64_tilemap3_8x8,tile_index);
+		tilemap_mark_tile_dirty(hng64_tilemap3_16x16,tile_index);
+		tilemap_mark_tile_dirty(hng64_tilemap3_16x16_alt,tile_index);
+	}
+}
 
 
 static void  matmul4( float *product, const float *a, const float *b ) ;
@@ -184,7 +252,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 
 //      if (((source[2] & 0xffff0000) >> 16) == 0x0001)
-//      { 
+//      {
 //          usrintf_showmessage("T %.8x %.8x %.8x %.8x %.8x", source[0], source[1], source[2], source[3], source[4]) ;
 //          // usrintf_showmessage("T %.8x %.8x %.8x %.8x %.8x", source[0], source[1], source[2], source[3], source[4]) ;
 //      }
@@ -195,7 +263,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			{
 				UINT16 drawx = xpos+(xinc*xdrw);
 				UINT16 drawy = ypos+(yinc*ydrw);
-				
+
 				// 0x3ff (0x200 sign bit) based on sams64_2 char select
 				drawx &= 0x3ff;
 				drawy &= 0x3ff;
@@ -231,7 +299,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			}
 		}
-		
+
 		if (!chaini) source +=8;
 	}
 }
@@ -979,122 +1047,190 @@ static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *
 }
 
 
-/* 8x8x4bpp layer */
-static TILE_GET_INFO( get_hng64_tile0_info )
+
+
+// make this a function!
+// pppppppp ff--atttt tttttttt tttttttt
+#define HNG64_GET_TILE_INFO                                                    \
+{                                                                              \
+	UINT16 tilemapinfo = (hng64_videoregs[reg]>>shift)&0xffff;                 \
+	int tileno,pal, flip;                                                      \
+                                                                               \
+	tileno = hng64_videoram[tile_index+(offset/4)];                            \
+                                                                               \
+	pal = (tileno&0xff000000)>>24;                                             \
+	flip =(tileno&0x00c00000)>>22;                                             \
+                                                                               \
+	if (tileno&0x200000)                                                       \
+	{                                                                          \
+		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];     \
+	}                                                                          \
+                                                                               \
+	tileno &= 0x1fffff;                                                        \
+                                                                               \
+	if (size==0)                                                               \
+	{                                                                          \
+		if (tilemapinfo&0x400)                                                 \
+		{                                                                      \
+			SET_TILE_INFO(1,tileno>>1,pal>>4,TILE_FLIPYX(flip));               \
+		}                                                                      \
+		else                                                                   \
+		{                                                                      \
+			SET_TILE_INFO(0,tileno, pal,TILE_FLIPYX(flip));                    \
+		}                                                                      \
+	}                                                                          \
+	else                                                                       \
+	{                                                                          \
+		if (tilemapinfo&0x400)                                                 \
+		{                                                                      \
+			SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX(flip));               \
+		}                                                                      \
+		else                                                                   \
+		{                                                                      \
+			SET_TILE_INFO(2,tileno>>2, pal,TILE_FLIPYX(flip));                 \
+		}                                                                      \
+	}                                                                          \
+}                                                                              \
+	                                                                           \
+
+static TILE_GET_INFO( get_hng64_tile0_8x8_info )
 {
-	UINT16 tilemapinfo = (hng64_videoregs[0x02]&0xffff0000)>>16;
-	int tileno,pal, flip;
+	int offset = 0x00000;
+	int size = 0;
+	int reg = 0x02;
+	int shift = 16;
 
-	tileno = hng64_videoram[tile_index+(0x00000/4)];
-	// pppppppp ff--atttt tttttttt tttttttt
+	HNG64_GET_TILE_INFO
 
-	pal = (tileno&0xff000000)>>24;
-	flip =(tileno&0x00c00000)>>22;
-
-	if (tileno&0x200000)
-	{
-		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];
-	}
-
-	tileno &= 0x1fffff;
-
-	if (tilemapinfo&0x400)
-	{
-		SET_TILE_INFO(1,tileno>>1,pal>>4,TILE_FLIPYX(flip));
-	}
-	else
-	{
-		SET_TILE_INFO(0,tileno, pal,TILE_FLIPYX(flip));
-	}
 }
 
-/* 16x16 tiles, 8bpp layer */
-static TILE_GET_INFO( get_hng64_tile1_info )
+static TILE_GET_INFO( get_hng64_tile0_16x16_info )
 {
-	UINT16 tilemapinfo = (hng64_videoregs[0x02]&0x0000ffff)>>0;
-	int tileno,pal, flip;
+	int offset = 0x00000;
+	int size = 1;
+	int reg = 0x02;
+	int shift = 16;
 
-	tileno = hng64_videoram[tile_index+(0x10000/4)];
-	// pppppppp ff--atttt tttttttt tttttttt
+	HNG64_GET_TILE_INFO
 
-	pal = (tileno&0xff000000)>>24;
-	flip =(tileno&0x00c00000)>>22;
-
-	if (tileno&0x200000)
-	{
-		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];
-	}
-
-	tileno &= 0x1fffff;
-
-	if (tilemapinfo&0x400)
-	{
-		SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX(flip));
-	}
-	else
-	{
-		SET_TILE_INFO(2,tileno>>2, pal,TILE_FLIPYX(flip));
-	}
 }
 
-/* 16x16 tiles, 8bpp layer */
-static TILE_GET_INFO( get_hng64_tile2_info )
+static TILE_GET_INFO( get_hng64_tile1_8x8_info )
 {
-	UINT16 tilemapinfo = (hng64_videoregs[0x03]&0xffff0000)>>16;
-	int tileno,pal, flip;
+	int offset = 0x10000;
+	int size = 0;
+	int reg = 0x02;
+	int shift = 0;
 
-	tileno = hng64_videoram[tile_index+(0x20000/4)];
-	// pppppppp ff--atttt tttttttt tttttttt
+	HNG64_GET_TILE_INFO
 
-	pal = (tileno&0xff000000)>>24;
-	flip =(tileno&0x00c00000)>>22;
-
-	if (tileno&0x200000)
-	{
-		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];
-	}
-
-	tileno &= 0x1fffff;
-
-	if (tilemapinfo&0x400)
-	{
-		SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX(flip));
-	}
-	else
-	{
-		SET_TILE_INFO(2,tileno>>2, pal,TILE_FLIPYX(flip));
-	}
 }
 
-/* 16x16 tiles, 8bpp layer */
-static TILE_GET_INFO( get_hng64_tile3_info )
+static TILE_GET_INFO( get_hng64_tile1_16x16_info )
 {
-	UINT16 tilemapinfo = (hng64_videoregs[0x03]&0x0000ffff)>>0;
-	int tileno,pal, flip;
+	int offset = 0x10000;
+	int size = 1;
+	int reg = 0x02;
+	int shift = 0;
 
-	tileno = hng64_videoram[tile_index+(0x30000/4)];
-	// pppppppp ff--atttt tttttttt tttttttt
+	HNG64_GET_TILE_INFO
 
-	pal = (tileno&0xff000000)>>24;
-	flip =(tileno&0x00c00000)>>22;
-
-	if (tileno&0x200000)
-	{
-		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];
-	}
-
-	tileno &= 0x1fffff;
-
-	if (tilemapinfo&0x400)
-	{
-		SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX(flip));
-	}
-	else
-	{
-		SET_TILE_INFO(2,tileno>>2, pal,TILE_FLIPYX(flip));
-	}
 }
 
+
+static TILE_GET_INFO( get_hng64_tile2_8x8_info )
+{
+	int offset = 0x20000;
+	int size = 0;
+	int reg = 0x03;
+	int shift = 16;
+
+	HNG64_GET_TILE_INFO
+
+}
+
+static TILE_GET_INFO( get_hng64_tile2_16x16_info )
+{
+	int offset = 0x20000;
+	int size = 1;
+	int reg = 0x03;
+	int shift = 16;
+
+	HNG64_GET_TILE_INFO
+
+}
+
+static TILE_GET_INFO( get_hng64_tile3_8x8_info )
+{
+	int offset = 0x30000;
+	int size = 0;
+	int reg = 0x03;
+	int shift = 0;
+
+	HNG64_GET_TILE_INFO
+
+}
+
+static TILE_GET_INFO( get_hng64_tile3_16x16_info )
+{
+	int offset = 0x30000;
+	int size = 1;
+	int reg = 0x03;
+	int shift = 0;
+
+	HNG64_GET_TILE_INFO
+}
+
+
+
+WRITE32_HANDLER( hng64_videoram_w )
+{
+	int realoff;
+	COMBINE_DATA(&hng64_videoram[offset]);
+
+	realoff = offset*4;
+
+	if ((realoff>=0) && (realoff<0x10000))
+	{
+		hng64_mark_tile_dirty(0,offset&0x3fff);
+	}
+	else if ((realoff>=0x10000) && (realoff<0x20000))
+	{
+		hng64_mark_tile_dirty(1,offset&0x3fff);
+	}
+	else if ((realoff>=0x20000) && (realoff<0x30000))
+	{
+		hng64_mark_tile_dirty(2,offset&0x3fff);
+	}
+	else if ((realoff>=0x30000) && (realoff<0x40000))
+	{
+		hng64_mark_tile_dirty(3,offset&0x3fff);
+	}
+
+//  if ((realoff>=0x40000)) mame_printf_debug("offsw %08x %08x\n",realoff,data);
+
+
+	///////////////////////////////////
+	// For the scrolling ground, yo  //
+	///////////////////////////////////
+
+	// First, get the offset we're working with
+	if ( (realoff&0x00000bf0) == 0xbf0)
+	{
+		hng64_hackTilemap3 = 1 ;
+		hng64_rowScrollOffset = realoff & 0x000ff000 ;
+	}
+
+	// Next count the number of lines to be drawn to the screen.
+	// This is probably really done per-scanline or something.
+	if (hng64_rowScrollOffset)
+	{
+		if ((realoff & hng64_rowScrollOffset) == hng64_rowScrollOffset)
+			hng64_hackTm3Count++ ;
+	}
+
+	/* 400000 - 7fffff is scroll regs etc. */
+}
 
 
 static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int tm )
@@ -1103,30 +1239,76 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 	UINT32 scrollbase = 0;
 	UINT32 tileregs = 0;
 	int transmask;
+	UINT32 global_tileregs = hng64_videoregs[0x00];
+
+	int global_dimensions = (global_tileregs&0x03000000)>>24;
+
+	if ((global_dimensions != 0) && (global_dimensions != 3))
+ 		popmessage("unsupported global_dimensions on tilemaps");
 
 	if (tm==0)
 	{
 		scrollbase = (hng64_videoregs[0x04]&0x3fff0000)>>16;
 		tileregs   = (hng64_videoregs[0x02]&0xffff0000)>>16;
-		tilemap = hng64_tilemap0;
+
+		if (global_dimensions==0)
+		{
+			if (tileregs&0x0200)	tilemap = hng64_tilemap0_16x16;
+			else tilemap = hng64_tilemap0_8x8;
+		}
+		else
+		{
+			if (tileregs&0x0200)	tilemap = hng64_tilemap0_16x16_alt;
+			else tilemap = hng64_tilemap0_8x8; // _alt
+		}
 	}
 	else if (tm==1)
 	{
 		scrollbase = (hng64_videoregs[0x04]&0x00003fff)>>0;
 		tileregs   = (hng64_videoregs[0x02]&0x0000ffff)>>0;
-		tilemap = hng64_tilemap1;
+
+		if (global_dimensions==0)
+		{
+			if (tileregs&0x0200)	tilemap = hng64_tilemap1_16x16;
+			else tilemap = hng64_tilemap1_8x8;
+		}
+		else
+		{
+			if (tileregs&0x0200)	tilemap = hng64_tilemap1_16x16_alt;
+			else tilemap = hng64_tilemap1_8x8; // _alt
+		}
 	}
 	else if (tm==2)
 	{
 		scrollbase = (hng64_videoregs[0x05]&0x3fff0000)>>16;
 		tileregs   = (hng64_videoregs[0x03]&0xffff0000)>>16;
-		tilemap = hng64_tilemap2;
+
+		if (global_dimensions==0)
+		{
+			if (tileregs&0x0200)	tilemap = hng64_tilemap2_16x16;
+			else tilemap = hng64_tilemap2_8x8;
+		}
+		else
+		{
+			if (tileregs&0x0200)	tilemap = hng64_tilemap2_16x16_alt;
+			else tilemap = hng64_tilemap2_8x8; // _alt
+		}
 	}
 	else if (tm==3)
 	{
 		scrollbase = (hng64_videoregs[0x05]&0x00003fff)>>0;
 		tileregs   = (hng64_videoregs[0x03]&0x0000ffff)>>0;
-		tilemap = hng64_tilemap3;
+
+		if (global_dimensions==0)
+		{
+			if (tileregs&0x0200)	tilemap = hng64_tilemap3_16x16;
+			else tilemap = hng64_tilemap3_8x8;
+		}
+		else
+		{
+			if (tileregs&0x0200)	tilemap = hng64_tilemap3_16x16_alt;
+			else tilemap = hng64_tilemap3_8x8; // _alt
+		}
 	}
 
 	// set the transmask so our manual copy is correct
@@ -1140,7 +1322,7 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 	// my life would be easier if the roz we're talking about for complex zoom wasn't setting this as well
 	//if (!(tileregs & 0x1000)) // floor mode
 	{
-		if (hng64_videoregs[0x00]&0x04000000) // globally selects alt scroll register layout???
+		if (global_tileregs&0x04000000) // globally selects alt scroll register layout???
 		{
 			/* complex zoom mode? */
 			/* with this scroll register layout rotation effects are possible
@@ -1360,6 +1542,8 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
  *
 
  *   0    | ---- -C-- ---- -??Z ---- ---- ---- ---- | unknown (scroll control?) C = Global Complex zoom, ? = Always Set?, Z = Global Zoom Disable?
+            0000 0011  - road edge alt 1
+			0000 0111  - road edge alt 2
 
  * UINT32 | Bytes    | Use
  * -------+-76543210-+----------------
@@ -1382,6 +1566,25 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
  *   c    | xxxxxxxx | auto animation bits for tilemaps, - merge in these bits to auto animate the tilemap
  *   d    | oooooooo | not used ??
  *   e    | oooooooo | not used ??
+
+	per tile regs (0x2/0x3)
+
+	// tilemap0 per layer flags
+	// 0840 - startup tests, 8x8x4 layer
+	// 0cc0 - beast busters 2, 8x8x8 layer
+	// 0860 - fatal fury wa
+	// 08e0 - fatal fury wa during transitions
+	// 0940 - samurai shodown 64
+	// 0880 - buriki
+
+	// mmml ?br? ???? ????
+	// m = mosaic related?  (xrally, l maybe too)
+	// l = floor effects / linescroll enable  (buriki on tilemap1, fatal fury on tilemap3) - also enables for rotating logo on buriki ?!
+	// r = tile size (seems correct)
+	// b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
+
+
+
  */
 
 
@@ -1412,16 +1615,21 @@ VIDEO_UPDATE( hng64 )
 		for (tile_index=0;tile_index<128*128;tile_index++)
 		{
 			if (hng64_videoram[tile_index+(0x00000/4)]&0x200000)
-				tilemap_mark_tile_dirty(hng64_tilemap0,tile_index);
-
+			{
+				hng64_mark_tile_dirty(0,tile_index);
+			}
 			if (hng64_videoram[tile_index+(0x10000/4)]&0x200000)
-				tilemap_mark_tile_dirty(hng64_tilemap1,tile_index);
-
+			{
+				hng64_mark_tile_dirty(1,tile_index);
+			}
 			if (hng64_videoram[tile_index+(0x20000/4)]&0x200000)
-				tilemap_mark_tile_dirty(hng64_tilemap2,tile_index);
-
+			{
+				hng64_mark_tile_dirty(2,tile_index);
+			}
 			if (hng64_videoram[tile_index+(0x30000/4)]&0x200000)
-				tilemap_mark_tile_dirty(hng64_tilemap3,tile_index);
+			{
+				hng64_mark_tile_dirty(3,tile_index);
+			}
 		}
 
 		old_animmask = animmask;
@@ -1430,24 +1638,23 @@ VIDEO_UPDATE( hng64 )
 
 	if (old_tileflags0!=tileflags0)
 	{
-		tilemap_mark_all_tiles_dirty (hng64_tilemap1);
-		tilemap_mark_all_tiles_dirty (hng64_tilemap0);
+		hng64_mark_all_tiles_dirty (0);
+		hng64_mark_all_tiles_dirty (1);
 		old_tileflags0 = tileflags0;
 	}
 
 	if (old_tileflags1!=tileflags1)
 	{
-		tilemap_mark_all_tiles_dirty (hng64_tilemap2);
-		tilemap_mark_all_tiles_dirty (hng64_tilemap3);
+		hng64_mark_all_tiles_dirty (2);
+		hng64_mark_all_tiles_dirty (3);
 		old_tileflags1 = tileflags1;
 	}
 
-	// dirty most frames anyway, even with manual tracking
-	//tilemap_mark_all_tiles_dirty (hng64_tilemap3);
-	//tilemap_mark_all_tiles_dirty (hng64_tilemap2);
-	//tilemap_mark_all_tiles_dirty (hng64_tilemap1);
-	//tilemap_mark_all_tiles_dirty (hng64_tilemap0);
-
+	// mark all frames as dirty if for some reason we don't trust the above code
+	//hng64_mark_all_tiles_dirty (0);
+	//hng64_mark_all_tiles_dirty (1);
+	//hng64_mark_all_tiles_dirty (2);
+	//hng64_mark_all_tiles_dirty (3);
 
 	hng64_drawtilemap(screen->machine,bitmap,cliprect, 3);
 	hng64_drawtilemap(screen->machine,bitmap,cliprect, 2);
@@ -1457,13 +1664,14 @@ VIDEO_UPDATE( hng64 )
 	draw_sprites(screen->machine, bitmap,cliprect);
 
 	// 3d really shouldn't be last, but you don't see some cool stuff right now if it's put before sprites :)...
-	draw3d(screen->machine, bitmap, cliprect);
+	if (hng64_mcu_type != RACING_MCU) // disable on racing games until it stops crashing MAME!
+		draw3d(screen->machine, bitmap, cliprect);
 
 #if 0
 	transition_control(bitmap, cliprect) ;
 #endif
 
-	if (0)
+	if (1)
     popmessage("%08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x",
     hng64_videoregs[0x00],
     hng64_videoregs[0x01],
@@ -1482,19 +1690,6 @@ VIDEO_UPDATE( hng64 )
     hng64_videoregs[0x0e]);
 
 
-	// tilemap0 per layer flags
-	// 0840 - startup tests, 8x8x4 layer
-	// 0cc0 - beast busters 2, 8x8x8 layer
-	// 0860 - fatal fury wa
-	// 08e0 - fatal fury wa during transitions
-	// 0940 - samurai shodown 64
-	// 0880 - buriki
-
-	// ---l rb?? ???? ????
-	// l = floor effects / linescroll enable  (buriki on tilemap1, fatal fury on tilemap3)
-	// r = tile size?
-	// b = 4bpp/8bpp ?  (beast busters, samsh64, sasm64 2 switch it for some screens)
-
 
 
 	if (0)
@@ -1512,14 +1707,39 @@ VIDEO_START( hng64 )
 {
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	hng64_tilemap0 = tilemap_create(machine, get_hng64_tile0_info, tilemap_scan_rows,  8,   8, 128,128); /* 128x128x4 = 0x10000 */
-	hng64_tilemap1 = tilemap_create(machine, get_hng64_tile1_info, tilemap_scan_rows,  16, 16, 128,128); /* 128x128x4 = 0x10000 */
-	hng64_tilemap2 = tilemap_create(machine, get_hng64_tile2_info, tilemap_scan_rows,  16, 16, 128,128); /* 128x128x4 = 0x10000 */
-	hng64_tilemap3 = tilemap_create(machine, get_hng64_tile3_info, tilemap_scan_rows,  16, 16, 128,128); /* 128x128x4 = 0x10000 */
-	tilemap_set_transparent_pen(hng64_tilemap0,0);
-	tilemap_set_transparent_pen(hng64_tilemap1,0);
-	tilemap_set_transparent_pen(hng64_tilemap2,0);
-	tilemap_set_transparent_pen(hng64_tilemap3,0);
+	hng64_tilemap0_8x8       = tilemap_create(machine, get_hng64_tile0_8x8_info,   tilemap_scan_rows,  8,   8, 128,128); /* 128x128x4 = 0x10000 */
+	hng64_tilemap0_16x16     = tilemap_create(machine, get_hng64_tile0_16x16_info, tilemap_scan_rows,  16, 16, 128,128); /* 128x128x4 = 0x10000 */
+	hng64_tilemap0_16x16_alt = tilemap_create(machine, get_hng64_tile0_16x16_info, tilemap_scan_rows,  16, 16, 256,64); /* 128x128x4 = 0x10000 */
+
+
+	hng64_tilemap1_8x8       = tilemap_create(machine, get_hng64_tile1_8x8_info,   tilemap_scan_rows,  8,   8, 128,128); /* 128x128x4 = 0x10000 */
+	hng64_tilemap1_16x16     = tilemap_create(machine, get_hng64_tile1_16x16_info, tilemap_scan_rows,  16, 16, 128,128); /* 128x128x4 = 0x10000 */
+	hng64_tilemap1_16x16_alt = tilemap_create(machine, get_hng64_tile1_16x16_info, tilemap_scan_rows,  16, 16, 256,64); /* 128x128x4 = 0x10000 */
+
+
+	hng64_tilemap2_8x8       = tilemap_create(machine, get_hng64_tile2_8x8_info,   tilemap_scan_rows,  8,   8, 128,128); /* 128x128x4 = 0x10000 */
+	hng64_tilemap2_16x16     = tilemap_create(machine, get_hng64_tile2_16x16_info, tilemap_scan_rows,  16, 16, 128,128); /* 128x128x4 = 0x10000 */
+	hng64_tilemap2_16x16_alt = tilemap_create(machine, get_hng64_tile2_16x16_info, tilemap_scan_rows,  16, 16, 256,64); /* 128x128x4 = 0x10000 */
+
+	hng64_tilemap3_8x8       = tilemap_create(machine, get_hng64_tile3_8x8_info,   tilemap_scan_rows,  8,   8, 128,128); /* 128x128x4 = 0x10000 */
+	hng64_tilemap3_16x16     = tilemap_create(machine, get_hng64_tile3_16x16_info, tilemap_scan_rows,  16, 16, 128,128); /* 128x128x4 = 0x10000 */
+	hng64_tilemap3_16x16_alt = tilemap_create(machine, get_hng64_tile3_16x16_info, tilemap_scan_rows,  16, 16, 256,64); /* 128x128x4 = 0x10000 */
+
+	tilemap_set_transparent_pen(hng64_tilemap0_8x8,0);
+	tilemap_set_transparent_pen(hng64_tilemap0_16x16,0);
+	tilemap_set_transparent_pen(hng64_tilemap0_16x16_alt,0);
+
+	tilemap_set_transparent_pen(hng64_tilemap1_8x8,0);
+	tilemap_set_transparent_pen(hng64_tilemap1_16x16,0);
+	tilemap_set_transparent_pen(hng64_tilemap1_16x16_alt,0);
+
+	tilemap_set_transparent_pen(hng64_tilemap2_8x8,0);
+	tilemap_set_transparent_pen(hng64_tilemap2_16x16,0);
+	tilemap_set_transparent_pen(hng64_tilemap2_16x16_alt,0);
+
+	tilemap_set_transparent_pen(hng64_tilemap3_8x8,0);
+	tilemap_set_transparent_pen(hng64_tilemap3_16x16,0);
+	tilemap_set_transparent_pen(hng64_tilemap3_16x16_alt,0);
 
 	// 3d Buffer Allocation
 	depthBuffer = auto_alloc_array(machine, float, (visarea->max_x)*(visarea->max_y)) ;

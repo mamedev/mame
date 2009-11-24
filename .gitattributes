@@ -2453,6 +2453,7 @@ src/mame/includes/gstriker.h svneol=native#text/plain
 src/mame/includes/harddriv.h svneol=native#text/plain
 src/mame/includes/hexa.h svneol=native#text/plain
 src/mame/includes/hitme.h svneol=native#text/plain
+src/mame/includes/hng64.h svneol=native#text/plain
 src/mame/includes/homedata.h svneol=native#text/plain
 src/mame/includes/hyprduel.h svneol=native#text/plain
 src/mame/includes/inufuku.h svneol=native#text/plain
