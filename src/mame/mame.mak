@@ -1204,6 +1204,7 @@ $(MAMEOBJ)/sigma.a: \
 	$(DRIVERS)/nyny.o \
 	$(DRIVERS)/r2dtank.o \
 	$(DRIVERS)/spiders.o $(AUDIO)/spiders.o \
+	$(DRIVERS)/sub.o \
 
 $(MAMEOBJ)/snk.a: \
 	$(DRIVERS)/bbusters.o $(VIDEO)/bbusters.o \
