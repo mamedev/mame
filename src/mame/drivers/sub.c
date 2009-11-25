@@ -5,9 +5,10 @@ Submarine (c) 1985 Sigma
 driver by David Haywood & Angelo Salese
 
 TODO:
-- finish spriteram hook-up;
 - finish dip-switches;
-- a bunch of unemulated writes at 0xe***
+- a bunch of unemulated writes at 0xe*** (I believe that there are individual
+  flip screen x & y)
+- flip screen support;
 
 ======================================================================================
 
@@ -141,19 +142,31 @@ VIDEO_UPDATE(sub)
 		}
 	}
 
+
+	/*
+	sprite bank 1
+	0 xxxx xxxx X offset
+	1 tttt tttt tile offset
+	sprite bank 2
+	0 yyyy yyyy Y offset
+	1 f--- ---- flips the X offset
+	1 -f-- ---- flip y, inverted
+	1 --cc cccc color
+	*/
 	{
-		int x,y,spr_offs,i,col;
+		UINT8 x,y,spr_offs,i,col,fx,fy;
 
 		for(i=0;i<0x40;i+=2)
 		{
 			spr_offs = spriteram[i+1];
-			//x = sub_sprx[i];
-			y = 0xe0 - spriteram_2[i+1];
 			x = spriteram[i+0];
-			col = (spriteram_2[i+0])&0x3f; // or 1f?
-			//spriteram[i+0] & 0x80 should be flip y
+			y = 0xe0 - spriteram_2[i+1];
+			col = (spriteram_2[i+0])&0x3f;
+			fx = (spriteram_2[i+0] & 0x80) ? 0 : 1;
+			if(fx) { x = 0xe0 - x; }
+			fy = (spriteram_2[i+0] & 0x40) ? 0 : 1;
 
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],spr_offs,col,0,0,x,y,0);
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],spr_offs,col,0,fy,x,y,0);
 		}
 	}
 
@@ -284,7 +297,7 @@ static INPUT_PORTS_START( sub )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-// Duplicates 
+// Duplicates
 //	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
 //	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 //	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
@@ -297,16 +310,13 @@ static INPUT_PORTS_START( sub )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-// Duplicates
-//	PORT_DIPSETTING(    0x04, "3" )
-//	PORT_DIPSETTING(    0x05, "4" )
-//	PORT_DIPSETTING(    0x06, "5" )
-//	PORT_DIPSETTING(    0x07, "6" )
-
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
