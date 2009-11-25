@@ -46,6 +46,11 @@ INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int ti
 			break;
 	}
 
+	if (tilenum<0x100)
+		color = ((tilenum&0xff)>>1)+0x00;
+	else
+		color = ((tilenum&0xff)>>1)+0x80;
+
 	SET_TILE_INFO( 0, tilenum, color, flags );
 }
 
@@ -64,31 +69,62 @@ VIDEO_START( portrait )
 	background = tilemap_create( machine, get_bg_tile_info, tilemap_scan_rows,       16, 16, 32, 32 );
 	foreground = tilemap_create( machine, get_fg_tile_info, tilemap_scan_rows,  16, 16, 32, 32 );
 
-		tilemap_set_transparent_pen( foreground, 0 );
+	tilemap_set_transparent_pen( foreground, 7 );
 }
 
-#if 0
-/* probably not right */
+
+
 PALETTE_INIT( portrait )
 {
-	int i,bit1,bit2,r,g,b;
+	int i;
+	UINT8* lookup = memory_region(machine,"tileattr");
+
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x40);
+
+/*
+	for (i = 0;i < 0x40;i++)
+	{
+		int r,g,b,data;
+		data = color_prom[0];
+		
+		
+		r = (data >> 0) & 0x7;
+		g = (data >> 3) & 0x3;
+		b = (data >> 5) & 0x7;
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(pal3bit(r), pal2bit(g), pal3bit(b)));
+
+		color_prom++;
+	}
+*/
+
+	for (i=0;i<0x20;i++)
+	{
+		int r,g,b,data;
+		data = (color_prom[0]<<0) | (color_prom[0x20]<<8);
+		
+		r = (data >> 0) & 0x1f;
+		g = (data >> 5) & 0x1f;
+		b = (data >> 10) & 0x1f;
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b)));
+
+		// ?? the lookup seems to reference 0x3f colours, unless 1 bit is priority or similar?
+		colortable_palette_set_color(machine->colortable, i+0x20, MAKE_RGB(pal5bit(r>>1), pal5bit(g>>1), pal5bit(b>>1)));
+
+		color_prom++;	
+	}
+
+
 
 	for (i = 0;i < 0x800;i++)
 	{
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 0) & 0x01;
-		r = 0x47 * bit1 + 0x97 * bit2;
-		bit1 = (color_prom[i] >> 3) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		g = 0x47 * bit1 + 0x97 * bit2;
-		bit1 = (color_prom[i] >> 5) & 0x01;
-		bit2 = (color_prom[i] >> 4) & 0x01;
-		b = 0x47 * bit1 + 0x97 * bit2;
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		UINT8 ctabentry = lookup[i]&0x3f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
-#endif
+
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
@@ -106,7 +142,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
              * -----x-- msb source[1]
              */
 		int tilenum = source[3];
-		int color = 0;
+		
+		int color = ((tilenum&0xff)>>1)+0x00;
+		
 		int fy = attr & 0x20;
 
 		if(attr & 0x04) sx |= 0x100;
@@ -140,7 +178,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
 				tilenum,color,
 				0,fy,
-				sx,sy,0);
+				sx,sy,7);
 
 		source += 0x10;
 	}
