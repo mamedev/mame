@@ -6,9 +6,7 @@ driver by David Haywood & Angelo Salese
 
 TODO:
 - finish spriteram hook-up;
-- colors;
-- complete inputs;
-- status bar should go above the sprites;
+- dip-switches;
 - a bunch of unemulated writes at 0xe***
 
 ======================================================================================
@@ -111,10 +109,80 @@ PCB2  (Top board, CPU board)
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-
 static UINT8* sub_vid;
 static UINT8* sub_attr;
 static UINT8* sub_scrolly;
+
+VIDEO_START(sub)
+{
+}
+
+VIDEO_UPDATE(sub)
+{
+	const gfx_element *gfx = screen->machine->gfx[0];
+	int y,x;
+	int count = 0;
+
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<32;x++)
+		{
+			UINT16 tile = sub_vid[count];
+			UINT8 col;
+			UINT8 y_offs = sub_scrolly[x];
+
+			tile += (sub_attr[count]&0xe0)<<3;
+			col = (sub_attr[count]&0x1f);
+
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,col+0x40,0,0,x*8,(y*8)-y_offs);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,col+0x40,0,0,x*8,(y*8)-y_offs+256);
+
+			count++;
+		}
+	}
+
+	{
+		int x,y,spr_offs,i,col;
+
+		for(i=0;i<0x40;i+=2)
+		{
+			spr_offs = spriteram[i+1];
+			//x = sub_sprx[i];
+			y = 0xe0 - spriteram_2[i+1];
+			x = spriteram[i+0];
+			col = (spriteram_2[i+0])&0x3f; // or 1f?
+			//spriteram[i+0] & 0x80 should be flip y
+
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],spr_offs,col,0,0,x,y,0);
+		}
+	}
+
+	count = 0;
+
+	/* re-draw score display above the sprites (window effect) */
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<32;x++)
+		{
+			UINT16 tile = sub_vid[count];
+			UINT8 col;
+			UINT8 y_offs = sub_scrolly[x];
+
+			tile += (sub_attr[count]&0xe0)<<3;
+			col = (sub_attr[count]&0x1f);
+
+			if(x >= 28)
+			{
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,col+0x40,0,0,x*8,(y*8)-y_offs);
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,col+0x40,0,0,x*8,(y*8)-y_offs+256);
+			}
+
+			count++;
+		}
+	}
+
+	return 0;
+}
 
 static ADDRESS_MAP_START( subm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xafff) AM_ROM
@@ -179,29 +247,15 @@ static INPUT_PORTS_START( sub )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "DSWC" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 
@@ -265,7 +319,7 @@ static const gfx_layout tiles8x8_layout =
 	8,8,
 	RGN_FRAC(1,3),
 	3,
-	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
 	8*8
@@ -275,7 +329,7 @@ static const gfx_layout tiles16x32_layout = {
     16,32,
     RGN_FRAC(1,3),
     3,
-    { RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+    { RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
     { 64+0, 64+1, 64+2, 64+3, 64+4, 64+5, 64+6, 64+7, 0, 1, 2, 3, 4, 5, 6, 7 },
     { 55*8, 54*8, 53*8, 52*8, 51*8, 50*8, 49*8, 48*8, 39*8,38*8,37*8,36*8,35*8,34*8,33*8,32*8,23*8,22*8,21*8,20*8,19*8,18*8,17*8,16*8,7*8,
 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
@@ -283,74 +337,40 @@ static const gfx_layout tiles16x32_layout = {
 };
 
 static GFXDECODE_START( sub )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x40 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles16x32_layout, 0, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles16x32_layout, 0, 0x80 )
 GFXDECODE_END
 
-
-
-VIDEO_START(sub)
+PALETTE_INIT( sub )
 {
-}
-
-VIDEO_UPDATE(sub)
-{
-	const gfx_element *gfx = screen->machine->gfx[0];
-	int y,x;
-	int count = 0;
-
-	for (y=0;y<32;y++)
-	{
-		for (x=0;x<32;x++)
-		{
-			UINT16 tile = sub_vid[count];
-			UINT8 col;
-			UINT8 y_offs = sub_scrolly[x];
-
-			tile += (sub_attr[count]&0xe0)<<3;
-			col = (sub_attr[count]&0x0f);
-
-			count++;
-
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,col,0,0,x*8,(y*8)-y_offs);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,col,0,0,x*8,(y*8)-y_offs+256);
-		}
-	}
-
-	{
-		int x,y,spr_offs,i;
-
-		for(i=0;i<0x40;i+=2)
-		{
-			spr_offs = spriteram[i+1];
-			//x = sub_sprx[i];
-			y = 0xf0 - spriteram_2[i+1];
-			x = spriteram[i+0];
-
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],spr_offs,0,0,0,x,y,0);
-		}
-	}
-
-	return 0;
-}
-
-static PALETTE_INIT(sub)
-{
-	/* might be wrong */
 	int i;
+	UINT8* lookup = memory_region(machine,"proms2");
 
-	for (i = 0; i < 0x400; i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
+
+	for (i = 0;i < 0x100;i++)
 	{
-		UINT8 data;
-		UINT8*proms = memory_region(machine, "proms2");
-		size_t length = memory_region_length(machine, "proms2");
+		int r,g,b;
+		r = (color_prom[0x000] >> 0);
+		g = (color_prom[0x100] >> 0);
+		b = (color_prom[0x200] >> 0);
 
-		data = proms[length/2 + i] | (proms[length/2 + i] << 4);
+		//colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b)));
 
-		palette_set_color_rgb(machine, i,  pal2bit(data >> 6), pal3bit(data >> 3),  pal3bit(data >> 0));
+		color_prom++;
+	}
+
+
+	for (i = 0;i < 0x400;i++)
+	{
+		UINT8 ctabentry = lookup[i+0x400] | (lookup[i+0x000] << 4);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 
 }
+
 
 static INTERRUPT_GEN( subm_sound_irq )
 {
@@ -418,9 +438,9 @@ ROM_START( sub )
 	ROM_LOAD( "obj 3 pos h4 27128  version3.bin",	  0x8000, 0x4000, CRC(304e2145) SHA1(d4eb49b5502872718d64e53f02acd2150f6bf713) )
 
 	ROM_REGION( 0x300, "proms", 0 ) // what are these?
-	ROM_LOAD( "prom pos a9 n82s129",	  0x0000, 0x100, CRC(8df9cefe) SHA1(86320eb8135932d79c4478929b9fd90ffba55712) )
+	ROM_LOAD( "prom pos a9 n82s129",	  0x0200, 0x100, CRC(8df9cefe) SHA1(86320eb8135932d79c4478929b9fd90ffba55712) )
 	ROM_LOAD( "prom pos a10 n82s129",	  0x0100, 0x100, CRC(3c834094) SHA1(4d681431376a8ed071566d74d4accc737bf965dd) )
-	ROM_LOAD( "prom pos a11 n82s129",	  0x0200, 0x100, CRC(339afa95) SHA1(ff4ff712960f41c26419a681e8dcceaeef75d2e3) )
+	ROM_LOAD( "prom pos a11 n82s129",	  0x0000, 0x100, CRC(339afa95) SHA1(ff4ff712960f41c26419a681e8dcceaeef75d2e3) )
 
 	ROM_REGION( 0x800, "proms2", 0 )
 	ROM_LOAD( "prom pos e5 n82s131",	  0x0000, 0x200, CRC(0024b5dd) SHA1(7d623f8e8964336d643820850cef0fb641e52e22) )
@@ -429,4 +449,4 @@ ROM_START( sub )
 	ROM_LOAD( "prom pos c8 n82s129",	  0x0600, 0x100, CRC(351e1ef8) SHA1(530c9012ff5abda1c4ba9787ca999ca1ae1a893d) )
 ROM_END
 
-GAME( 1985, sub,  0,    sub, sub,  0, ROT270, "Sigma", "Submarine", GAME_NOT_WORKING )
+GAME( 1985, sub,  0,    sub, sub,  0, ROT270, "Sigma", "Submarine", GAME_NO_COCKTAIL )
