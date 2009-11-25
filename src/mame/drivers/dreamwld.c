@@ -87,23 +87,35 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
 
 #define MASTER_CLOCK 32000000
 
-
-static UINT32*dreamwld_bg_videoram;
-static UINT32*dreamwld_bg2_videoram;
-static UINT32*dreamwld_bg_scroll;
-static int dreamwld_tilebank[2], dreamwld_tilebankold[2];
-
-static tilemap *dreamwld_bg_tilemap;
-static tilemap *dreamwld_bg2_tilemap;
-
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+typedef struct _dreamwld_state dreamwld_state;
+struct _dreamwld_state
 {
+	/* memory pointers */
+	UINT32 *  bg_videoram;
+	UINT32 *  bg2_videoram;
+	UINT32 *  bg_scroll;
+	UINT32 *  paletteram;
+	UINT32 *  spriteram;
+
+	/* video-related */
+	tilemap  *bg_tilemap,*bg2_tilemap;
+	int      tilebank[2], tilebankold[2];
+
+	/* misc */
+	int      protindex;
+};
+
+
+
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+{
+	dreamwld_state *state = (dreamwld_state *)machine->driver_data;
 	const gfx_element *gfx = machine->gfx[0];
-	UINT32 *source = spriteram32;
-	UINT32 *finish = spriteram32 + 0x1000/4;
+	UINT32 *source = state->spriteram;
+	UINT32 *finish = state->spriteram + 0x1000 / 4;
 	UINT16 *redirect = (UINT16 *)memory_region(machine, "gfx3");
 
-	while( source<finish )
+	while (source < finish)
 	{
 		int xpos, ypos, tileno;
 		int xsize, ysize, xinc;
@@ -111,116 +123,120 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int xflip;
 		int colour;
 
-		xpos =  (source[0]&0x000001ff) >> 0;
-		ypos =  (source[0]&0x01ff0000) >> 16;
-		xsize = (source[0]&0x00000e00) >> 9;
-		ysize = (source[0]&0x0e000000) >> 25;
+		xpos  = (source[0] & 0x000001ff) >> 0;
+		ypos  = (source[0] & 0x01ff0000) >> 16;
+		xsize = (source[0] & 0x00000e00) >> 9;
+		ysize = (source[0] & 0x0e000000) >> 25;
 
-
-		tileno = (source[1]&0x0000ffff) >>0;
-		colour = (source[1]&0x3f000000) >>24;
-		xflip  = (source[1]&0x40000000);
+		tileno = (source[1] & 0x0000ffff) >>0;
+		colour = (source[1] & 0x3f000000) >>24;
+		xflip  = (source[1] & 0x40000000);
 
 		xinc = 16;
 
 		if (xflip)
 		{
 			xinc = -16;
-			xpos+=16*xsize;
+			xpos += 16 * xsize;
 		}
 
-		ysize++;xsize++; // size 0 = 1 tile
+		ysize++; xsize++; // size 0 = 1 tile
 
 		xpos -=16;
 
 
-		for (yct=0;yct<ysize;yct++)
+		for (yct = 0; yct < ysize; yct++)
 		{
-			for (xct=0;xct<xsize;xct++)
+			for (xct = 0; xct < xsize; xct++)
 			{
-				drawgfx_transpen(bitmap,cliprect,gfx,redirect[tileno],colour,xflip,0,xpos+xct*xinc,ypos+yct*16,0);
-				drawgfx_transpen(bitmap,cliprect,gfx,redirect[tileno],colour,xflip,0,(xpos+xct*xinc)-0x200,ypos+yct*16,0);
-				drawgfx_transpen(bitmap,cliprect,gfx,redirect[tileno],colour,xflip,0,(xpos+xct*xinc)-0x200,(ypos+yct*16)-0x200,0);
-				drawgfx_transpen(bitmap,cliprect,gfx,redirect[tileno],colour,xflip,0,xpos+xct*xinc,(ypos+yct*16)-0x200,0);
+				drawgfx_transpen(bitmap, cliprect, gfx, redirect[tileno], colour, xflip, 0, xpos + xct * xinc, ypos + yct * 16, 0);
+				drawgfx_transpen(bitmap, cliprect, gfx, redirect[tileno], colour, xflip, 0, (xpos + xct * xinc) - 0x200, ypos + yct * 16, 0);
+				drawgfx_transpen(bitmap, cliprect, gfx, redirect[tileno], colour, xflip, 0, (xpos + xct * xinc) - 0x200, (ypos + yct * 16) - 0x200, 0);
+				drawgfx_transpen(bitmap, cliprect, gfx, redirect[tileno], colour, xflip, 0, xpos + xct * xinc, (ypos + yct * 16) - 0x200 , 0);
 
 				tileno++;
 			}
 		}
 
-		source+=2;
+		source += 2;
 	}
 }
 
 
 static WRITE32_HANDLER( dreamwld_bg_videoram_w )
 {
-	COMBINE_DATA(&dreamwld_bg_videoram[offset]);
-	tilemap_mark_tile_dirty(dreamwld_bg_tilemap,offset*2);
-	tilemap_mark_tile_dirty(dreamwld_bg_tilemap,offset*2+1);
-
+	dreamwld_state *state = (dreamwld_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->bg_videoram[offset]);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset * 2);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset * 2 + 1);
 }
 
 static TILE_GET_INFO( get_dreamwld_bg_tile_info )
 {
-	int tileno,colour;
-	tileno = (tile_index&1)?(dreamwld_bg_videoram[tile_index>>1]&0xffff):((dreamwld_bg_videoram[tile_index>>1]>>16)&0xffff);
+	dreamwld_state *state = (dreamwld_state *)machine->driver_data;
+	int tileno, colour;
+	tileno = (tile_index & 1) ? (state->bg_videoram[tile_index >> 1] & 0xffff) : ((state->bg_videoram[tile_index >> 1] >> 16) & 0xffff);
 	colour = tileno >> 13;
-	tileno &=0x1fff;
-	SET_TILE_INFO(1,tileno+dreamwld_tilebank[0]*0x2000,0x80+colour,0);
+	tileno &= 0x1fff;
+	SET_TILE_INFO(1, tileno + state->tilebank[0] * 0x2000, 0x80 + colour, 0);
 }
 
 
 static WRITE32_HANDLER( dreamwld_bg2_videoram_w )
 {
-	COMBINE_DATA(&dreamwld_bg2_videoram[offset]);
-	tilemap_mark_tile_dirty(dreamwld_bg2_tilemap,offset*2);
-	tilemap_mark_tile_dirty(dreamwld_bg2_tilemap,offset*2+1);
+	dreamwld_state *state = (dreamwld_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->bg2_videoram[offset]);
+	tilemap_mark_tile_dirty(state->bg2_tilemap, offset * 2);
+	tilemap_mark_tile_dirty(state->bg2_tilemap, offset * 2 + 1);
 }
 
 static TILE_GET_INFO( get_dreamwld_bg2_tile_info )
 {
-	UINT16 tileno,colour;
-	tileno = (tile_index&1)?(dreamwld_bg2_videoram[tile_index>>1]&0xffff):((dreamwld_bg2_videoram[tile_index>>1]>>16)&0xffff);
+	dreamwld_state *state = (dreamwld_state *)machine->driver_data;
+	UINT16 tileno, colour;
+	tileno = (tile_index & 1) ? (state->bg2_videoram[tile_index >> 1] & 0xffff) : ((state->bg2_videoram[tile_index >> 1] >> 16) & 0xffff);
 	colour = tileno >> 13;
-	tileno &=0x1fff;
-	SET_TILE_INFO(1,tileno+dreamwld_tilebank[1]*0x2000,0xc0+colour,0);
+	tileno &= 0x1fff;
+	SET_TILE_INFO(1, tileno + state->tilebank[1] * 0x2000, 0xc0 + colour, 0);
 }
 
 static VIDEO_START( dreamwld )
 {
-	dreamwld_bg_tilemap = tilemap_create(machine, get_dreamwld_bg_tile_info,tilemap_scan_rows, 16, 16, 64,32);
-	dreamwld_bg2_tilemap = tilemap_create(machine, get_dreamwld_bg2_tile_info,tilemap_scan_rows, 16, 16, 64,32);
-	tilemap_set_transparent_pen(dreamwld_bg2_tilemap,0);
-	dreamwld_tilebankold[0] = dreamwld_tilebankold[1] = -1;
-	dreamwld_tilebank[0] = dreamwld_tilebank[1] = 0;
+	dreamwld_state *state = (dreamwld_state *)machine->driver_data;
+
+	state->bg_tilemap = tilemap_create(machine, get_dreamwld_bg_tile_info,tilemap_scan_rows, 16, 16, 64,32);
+	state->bg2_tilemap = tilemap_create(machine, get_dreamwld_bg2_tile_info,tilemap_scan_rows, 16, 16, 64,32);
+	tilemap_set_transparent_pen(state->bg2_tilemap,0);
 }
 
 static VIDEO_UPDATE( dreamwld )
 {
-	tilemap_set_scrolly( dreamwld_bg_tilemap,0, dreamwld_bg_scroll[(0x400/4)]+32 );
-	tilemap_set_scrolly( dreamwld_bg2_tilemap,0, dreamwld_bg_scroll[(0x400/4)+2]+32 );
-	tilemap_set_scrollx( dreamwld_bg_tilemap,0, dreamwld_bg_scroll[(0x400/4)+1]+3 );
-	tilemap_set_scrollx( dreamwld_bg2_tilemap,0, dreamwld_bg_scroll[(0x400/4)+3]+5 );
+	dreamwld_state *state = (dreamwld_state *)screen->machine->driver_data;
 
-	dreamwld_tilebank[0] = (dreamwld_bg_scroll[(0x400/4)+4]>>6)&1;
-	dreamwld_tilebank[1] = (dreamwld_bg_scroll[(0x400/4)+5]>>6)&1;
+	tilemap_set_scrolly(state->bg_tilemap, 0, state->bg_scroll[(0x400 / 4)] + 32);
+	tilemap_set_scrolly(state->bg2_tilemap, 0, state->bg_scroll[(0x400 / 4) + 2] + 32);
+	tilemap_set_scrollx(state->bg_tilemap, 0, state->bg_scroll[(0x400 / 4) + 1] + 3);
+	tilemap_set_scrollx(state->bg2_tilemap, 0, state->bg_scroll[(0x400 / 4) + 3] + 5);
 
-	if (dreamwld_tilebank[0] != dreamwld_tilebankold[0])
+	state->tilebank[0] = (state->bg_scroll[(0x400 / 4) + 4] >> 6) & 1;
+	state->tilebank[1] = (state->bg_scroll[(0x400 / 4) + 5] >> 6) & 1;
+
+	if (state->tilebank[0] != state->tilebankold[0])
 	{
-		dreamwld_tilebankold[0] = dreamwld_tilebank[0];
-		tilemap_mark_all_tiles_dirty (dreamwld_bg_tilemap);
+		state->tilebankold[0] = state->tilebank[0];
+		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 	}
 
-	if (dreamwld_tilebank[1] != dreamwld_tilebankold[1])
+	if (state->tilebank[1] != state->tilebankold[1])
 	{
-		dreamwld_tilebankold[1] = dreamwld_tilebank[1];
-		tilemap_mark_all_tiles_dirty (dreamwld_bg2_tilemap);
+		state->tilebankold[1] = state->tilebank[1];
+		tilemap_mark_all_tiles_dirty(state->bg2_tilemap);
 	}
 
-	tilemap_draw(bitmap,cliprect,dreamwld_bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,dreamwld_bg2_tilemap,0,0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg2_tilemap, 0, 0);
 
-	draw_sprites(screen->machine,bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 
 	return 0;
 }
@@ -228,26 +244,28 @@ static VIDEO_UPDATE( dreamwld )
 
 static READ32_HANDLER( dreamwld_protdata_r )
 {
-	static int protindex = 0;
-	UINT8 *protdata    = memory_region( space->machine, "user1" );
-	size_t  protsize = memory_region_length( space->machine, "user1" );
-	UINT8 dat = protdata[(protindex++)%protsize];
-	return dat<<24;
+	dreamwld_state *state = (dreamwld_state *)space->machine->driver_data;
+
+	UINT8 *protdata = memory_region(space->machine, "user1");
+	size_t protsize = memory_region_length(space->machine, "user1");
+	UINT8 dat = protdata[(state->protindex++) % protsize];
+	return dat << 24;
 }
 
 
 static WRITE32_HANDLER( dreamwld_palette_w )
 {
+	dreamwld_state *state = (dreamwld_state *)space->machine->driver_data;
 	UINT16 dat;
 	int color;
 
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&state->paletteram[offset]);
 	color = offset * 2;
 
-	dat = paletteram32[offset] & 0x7fff;
+	dat = state->paletteram[offset] & 0x7fff;
 	palette_set_color_rgb(space->machine, color + 1, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 
-	dat = (paletteram32[offset] >> 16) & 0x7fff;
+	dat = (state->paletteram[offset] >> 16) & 0x7fff;
 	palette_set_color_rgb(space->machine, color, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 }
 
@@ -256,52 +274,44 @@ static void dreamwld_oki_setbank( running_machine *machine, UINT8 chip, UINT8 ba
 	/* 0x30000-0x3ffff is banked.
         banks are at 0x30000,0x40000,0x50000 and 0x60000 in rom */
 	UINT8 *sound = memory_region(machine, chip ? "oki1" : "oki2");
-	logerror("OKI%d: set bank %02x\n",chip,bank);
-	memcpy(sound+0x30000, sound+0xb0000+0x10000*bank, 0x10000);
+	logerror("OKI%d: set bank %02x\n", chip, bank);
+	memcpy(sound + 0x30000, sound + 0xb0000 + 0x10000 * bank, 0x10000);
 }
 
 
 static WRITE32_HANDLER( dreamwld_6295_0_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
-	{
-		dreamwld_oki_setbank(space->machine,0,data&0x3);
-	}
+		dreamwld_oki_setbank(space->machine, 0, data & 0x3);
 	else
-	{
 		logerror("OKI0: unk bank write %x mem_mask %8x\n", data, mem_mask);
-	}
 }
 
 static WRITE32_HANDLER( dreamwld_6295_1_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
-	{
-		dreamwld_oki_setbank(space->machine,1,data&0x3);
-	}
+		dreamwld_oki_setbank(space->machine, 1, data & 0x3);
 	else
-	{
 		logerror("OKI1: unk bank write %x mem_mask %8x\n", data, mem_mask);
-	}
 }
 
 static ADDRESS_MAP_START( dreamwld_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM  AM_WRITENOP
 
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE( &spriteram32 )
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(dreamwld_palette_w) AM_BASE(&paletteram32)  // real palette?
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_BASE( &dreamwld_bg_videoram )
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_BASE( &dreamwld_bg2_videoram )
-	AM_RANGE(0x804000, 0x805fff) AM_RAM AM_BASE( &dreamwld_bg_scroll )  // scroll regs etc.
+	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_MEMBER(dreamwld_state, spriteram)
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(dreamwld_palette_w) AM_BASE_MEMBER(dreamwld_state, paletteram)  // real palette?
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_BASE_MEMBER(dreamwld_state, bg_videoram)
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_BASE_MEMBER(dreamwld_state, bg2_videoram)
+	AM_RANGE(0x804000, 0x805fff) AM_RAM AM_BASE_MEMBER(dreamwld_state, bg_scroll)  // scroll regs etc.
 
 	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("c00004")
 
-	AM_RANGE(0xc0000c, 0xc0000f) AM_WRITE( dreamwld_6295_0_bank_w ) // sfx
-	AM_RANGE(0xc00018, 0xc0001b) AM_DEVREADWRITE8( "oki1", okim6295_r, okim6295_w, 0xff000000 ) // sfx
+	AM_RANGE(0xc0000c, 0xc0000f) AM_WRITE(dreamwld_6295_0_bank_w) // sfx
+	AM_RANGE(0xc00018, 0xc0001b) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0xff000000) // sfx
 
-	AM_RANGE(0xc0002c, 0xc0002f) AM_WRITE( dreamwld_6295_1_bank_w ) // sfx
-	AM_RANGE(0xc00028, 0xc0002b) AM_DEVREADWRITE8( "oki2", okim6295_r, okim6295_w, 0xff000000 ) // sfx
+	AM_RANGE(0xc0002c, 0xc0002f) AM_WRITE(dreamwld_6295_1_bank_w) // sfx
+	AM_RANGE(0xc00028, 0xc0002b) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0xff000000) // sfx
 
 	AM_RANGE(0xc00030, 0xc00033) AM_READ(dreamwld_protdata_r) // it reads protection data (irq code) from here and puts it at ffd000
 
@@ -310,7 +320,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( dreamwld )
-	PORT_START("INPUTS")	/* 32bit */
+	PORT_START("INPUTS")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0000fffc, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -331,11 +341,11 @@ static INPUT_PORTS_START( dreamwld )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
 
-	PORT_START("c00004")	/* 32bit */
+	PORT_START("c00004")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "DSW")
 	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "DSW")
 
-	PORT_START("DSW")		/* 16bit */
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0002, "2" )
 	PORT_DIPSETTING(      0x0003, "3" )
@@ -383,11 +393,37 @@ static GFXDECODE_START( dreamwld )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
+
+static MACHINE_START( dreamwld )
+{
+	dreamwld_state *state = (dreamwld_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->protindex);
+	state_save_register_global_array(machine, state->tilebank);
+	state_save_register_global_array(machine, state->tilebankold);
+}
+
+static MACHINE_RESET( dreamwld )
+{
+	dreamwld_state *state = (dreamwld_state *)machine->driver_data;
+
+	state->tilebankold[0] = state->tilebankold[1] = -1;
+	state->tilebank[0] = state->tilebank[1] = 0;
+	state->protindex = 0;
+}
+
 static MACHINE_DRIVER_START( dreamwld )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(dreamwld_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(dreamwld_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold) // 4, 5, or 6, all point to the same place
+
+	MDRV_MACHINE_START(dreamwld)
+	MDRV_MACHINE_RESET(dreamwld)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -436,7 +472,6 @@ ROM_START( dreamwld )
       ram.  The interrupt vectors point at the code placed in RAM. */
 	ROM_LOAD( "protdata.bin", 0x000, 0x6c9 ,  CRC(f284b2fd) SHA1(9e8096c8aa8a288683f002311b38787b120748d1) ) /* extracted */
 
-
 	ROM_REGION( 0x100000, "oki1", 0 ) /* OKI Samples - 1st chip*/
 	ROM_LOAD( "5.bin", 0x000000, 0x80000, CRC(9689570a) SHA1(4414233da8f46214ca7e9022df70953922a63aa4) )
 	ROM_RELOAD(0x80000,0x80000) // fot the banks
@@ -460,4 +495,4 @@ ROM_START( dreamwld )
 ROM_END
 
 
-GAME( 2000, dreamwld, 0,        dreamwld, dreamwld, 0, ROT0,  "SemiCom", "Dream World", 0 )
+GAME( 2000, dreamwld, 0, dreamwld, dreamwld, 0, ROT0,  "SemiCom", "Dream World", GAME_SUPPORTS_SAVE )

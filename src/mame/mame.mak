@@ -603,7 +603,7 @@ $(MAMEOBJ)/dynax.a: \
 	$(DRIVERS)/royalmah.o \
 
 $(MAMEOBJ)/edevices.a: \
-	$(DRIVERS)/diverboy.o $(VIDEO)/diverboy.o \
+	$(DRIVERS)/diverboy.o \
 	$(DRIVERS)/fantland.o $(VIDEO)/fantland.o \
 	$(DRIVERS)/mwarr.o \
 	$(DRIVERS)/mugsmash.o $(VIDEO)/mugsmash.o \

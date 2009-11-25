@@ -11,22 +11,38 @@ similar hardware.
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 
-static UINT16 *drtomy_spriteram;
-static UINT16 *drtomy_videoram_bg, *drtomy_videoram_fg;
-static tilemap *tilemap_bg, *tilemap_fg;
+typedef struct _drtomy_state drtomy_state;
+struct _drtomy_state
+{
+	/* memory pointers */
+	UINT16 *  spriteram;
+	UINT16 *  videoram_bg;
+	UINT16 *  videoram_fg;
+//	UINT16 *  paletteram16;	// currently this uses generic palette handling
+
+	/* video-related */
+	tilemap   *tilemap_bg,*tilemap_fg;
+
+	/* misc */
+	int       oki_bank;
+};
+
+
 
 static TILE_GET_INFO( get_tile_info_fg )
 {
-	int code  = drtomy_videoram_fg[tile_index] & 0xfff;
-	int color = (drtomy_videoram_fg[tile_index] & 0xf000) >> 12;
+	drtomy_state *state = (drtomy_state *)machine->driver_data;
+	int code  = state->videoram_fg[tile_index] & 0xfff;
+	int color = (state->videoram_fg[tile_index] & 0xf000) >> 12;
 	SET_TILE_INFO(2, code, color, 0);
 }
 
 
 static TILE_GET_INFO( get_tile_info_bg )
 {
-	int code  = drtomy_videoram_bg[tile_index] & 0xfff;
-	int color = (drtomy_videoram_bg[tile_index] & 0xf000) >> 12;
+	drtomy_state *state = (drtomy_state *)machine->driver_data;
+	int code  = state->videoram_bg[tile_index] & 0xfff;
+	int color = (state->videoram_bg[tile_index] & 0xf000) >> 12;
 	SET_TILE_INFO(1, code, color, 0);
 }
 
@@ -48,38 +64,42 @@ static TILE_GET_INFO( get_tile_info_bg )
       3  | xxxxxxxx xxxxxx-- | sprite code
 */
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	drtomy_state *state = (drtomy_state *)machine->driver_data;
 	int i, x, y, ex, ey;
 	const gfx_element *gfx = machine->gfx[0];
 
-	static const int x_offset[2] = {0x0,0x2};
-	static const int y_offset[2] = {0x0,0x1};
+	static const int x_offset[2] = {0x0, 0x2};
+	static const int y_offset[2] = {0x0, 0x1};
 
-	for (i = 3; i < 0x1000/2; i+=4){
-		int sx = drtomy_spriteram[i+2] & 0x01ff;
-		int sy = (240 - (drtomy_spriteram[i] & 0x00ff)) & 0x00ff;
-		int number = drtomy_spriteram[i+3];
-		int color = (drtomy_spriteram[i+2] & 0x1e00) >> 9;
-		int attr = (drtomy_spriteram[i] & 0xfe00) >> 9;
+	for (i = 3; i < 0x1000 / 2; i += 4)
+	{
+		int sx = state->spriteram[i + 2] & 0x01ff;
+		int sy = (240 - (state->spriteram[i] & 0x00ff)) & 0x00ff;
+		int number = state->spriteram[i + 3];
+		int color = (state->spriteram[i + 2] & 0x1e00) >> 9;
+		int attr = (state->spriteram[i] & 0xfe00) >> 9;
 
 		int xflip = attr & 0x20;
 		int yflip = attr & 0x40;
 		int spr_size;
 
-		if (attr & 0x04){
+		if (attr & 0x04)
 			spr_size = 1;
-		}
-		else{
+		else
+		{
 			spr_size = 2;
 			number &= (~3);
 		}
 
-		for (y = 0; y < spr_size; y++){
-			for (x = 0; x < spr_size; x++){
+		for (y = 0; y < spr_size; y++)
+		{
+			for (x = 0; x < spr_size; x++)
+			{
 
-				ex = xflip ? (spr_size-1-x) : x;
-				ey = yflip ? (spr_size-1-y) : y;
+				ex = xflip ? (spr_size - 1 - x) : x;
+				ey = yflip ? (spr_size - 1 - y) : y;
 
 				drawgfx_transpen(bitmap,cliprect,gfx,number + x_offset[ex] + y_offset[ey],
 						color,xflip,yflip,
@@ -91,40 +111,45 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static VIDEO_START( drtomy )
 {
-	tilemap_bg = tilemap_create(machine, get_tile_info_bg,tilemap_scan_rows,16,16,32,32);
-	tilemap_fg = tilemap_create(machine, get_tile_info_fg,tilemap_scan_rows,16,16,32,32);
+	drtomy_state *state = (drtomy_state *)machine->driver_data;
 
-	tilemap_set_transparent_pen(tilemap_fg,0);
+	state->tilemap_bg = tilemap_create(machine, get_tile_info_bg, tilemap_scan_rows, 16, 16, 32, 32);
+	state->tilemap_fg = tilemap_create(machine, get_tile_info_fg, tilemap_scan_rows, 16, 16, 32, 32);
+
+	tilemap_set_transparent_pen(state->tilemap_fg, 0);
 }
 
 static VIDEO_UPDATE( drtomy )
 {
-	tilemap_draw(bitmap,cliprect,tilemap_bg,0,0);
-	tilemap_draw(bitmap,cliprect,tilemap_fg,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect);
+	drtomy_state *state = (drtomy_state *)screen->machine->driver_data;
+
+	tilemap_draw(bitmap, cliprect, state->tilemap_bg, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->tilemap_fg, 0, 0);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
 static WRITE16_HANDLER( drtomy_vram_fg_w )
 {
-	COMBINE_DATA(&drtomy_videoram_fg[offset]);
-	tilemap_mark_tile_dirty(tilemap_fg,offset);
+	drtomy_state *state = (drtomy_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->videoram_fg[offset]);
+	tilemap_mark_tile_dirty(state->tilemap_fg, offset);
 }
 
 static WRITE16_HANDLER( drtomy_vram_bg_w )
 {
-	COMBINE_DATA(&drtomy_videoram_bg[offset]);
-	tilemap_mark_tile_dirty(tilemap_bg,offset);
+	drtomy_state *state = (drtomy_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->videoram_bg[offset]);
+	tilemap_mark_tile_dirty(state->tilemap_bg, offset);
 }
 
 static WRITE16_DEVICE_HANDLER( drtomy_okibank_w )
 {
-	static int oki_bank;
-
-	if(oki_bank != (data & 3))
+	drtomy_state *state = (drtomy_state *)device->machine->driver_data;
+	if (state->oki_bank != (data & 3))
 	{
-		oki_bank = data & 3;
-		okim6295_set_bank_base(device, oki_bank * 0x40000);
+		state->oki_bank = data & 3;
+		okim6295_set_bank_base(device, state->oki_bank * 0x40000);
 	}
 
 	/* unknown bit 2 -> (data & 4) */
@@ -132,10 +157,10 @@ static WRITE16_DEVICE_HANDLER( drtomy_okibank_w )
 
 static ADDRESS_MAP_START( drtomy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM	/* ROM */
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(drtomy_vram_fg_w) AM_BASE(&drtomy_videoram_fg)	/* Video RAM FG */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(drtomy_vram_bg_w) AM_BASE(&drtomy_videoram_bg) /* Video RAM BG */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(drtomy_vram_fg_w) AM_BASE_MEMBER(drtomy_state, videoram_fg)	/* Video RAM FG */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(drtomy_vram_bg_w) AM_BASE_MEMBER(drtomy_state, videoram_bg) /* Video RAM BG */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16) /* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&drtomy_spriteram) /* Sprite RAM */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(drtomy_state, spriteram) /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
@@ -247,12 +272,32 @@ static INPUT_PORTS_START( drtomy )
 INPUT_PORTS_END
 
 
+static MACHINE_START( drtomy )
+{
+	drtomy_state *state = (drtomy_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->oki_bank);
+}
+
+static MACHINE_RESET( drtomy )
+{
+	drtomy_state *state = (drtomy_state *)machine->driver_data;
+
+	state->oki_bank = 0;
+}
+
 static MACHINE_DRIVER_START( drtomy )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(drtomy_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(drtomy_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
+
+	MDRV_MACHINE_START(drtomy)
+	MDRV_MACHINE_RESET(drtomy)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -303,4 +348,4 @@ ROM_START( drtomy )
 ROM_END
 
 
-GAME( 1993, drtomy, 0, drtomy, drtomy, 0, ROT0, "Playmark", "Dr. Tomy", 0 )
+GAME( 1993, drtomy, 0, drtomy, drtomy, 0, ROT0, "Playmark", "Dr. Tomy", GAME_SUPPORTS_SAVE )

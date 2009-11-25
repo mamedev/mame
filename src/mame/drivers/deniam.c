@@ -47,55 +47,36 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
-
-extern UINT16 *deniam_videoram,*deniam_textram;
-
-DRIVER_INIT( logicpro );
-DRIVER_INIT( karianx );
-WRITE16_HANDLER( deniam_videoram_w );
-WRITE16_HANDLER( deniam_textram_w );
-WRITE16_HANDLER( deniam_palette_w );
-READ16_HANDLER( deniam_coinctrl_r );
-WRITE16_HANDLER( deniam_coinctrl_w );
-VIDEO_START( deniam );
-VIDEO_UPDATE( deniam );
-
-
+#include "deniam.h"
 
 
 static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(space,offset,(data >> 8) & 0xff);
+		soundlatch_w(space,offset, (data >> 8) & 0xff);
 		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static WRITE8_DEVICE_HANDLER( deniam16b_oki_rom_bank_w )
 {
-	okim6295_set_bank_base(device,(data & 0x40) ? 0x40000 : 0x00000);
+	okim6295_set_bank_base(device, (data & 0x40) ? 0x40000 : 0x00000);
 }
 
 static WRITE16_DEVICE_HANDLER( deniam16c_oki_rom_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
-		okim6295_set_bank_base(device,(data & 0x01) ? 0x40000 : 0x00000);
-}
-
-static MACHINE_RESET( deniam )
-{
-	/* logicpr2 does not reset the bank base on startup */
-	okim6295_set_bank_base(devtag_get_device(machine, "oki"),0x00000);
+		okim6295_set_bank_base(device, (data & 0x01) ? 0x40000 : 0x00000);
 }
 
 
 static ADDRESS_MAP_START( deniam16b_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_BASE(&deniam_videoram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_BASE(&deniam_textram)
-	AM_RANGE(0x440000, 0x4407ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_BASE_MEMBER(deniam_state, videoram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_BASE_MEMBER(deniam_state, textram)
+	AM_RANGE(0x440000, 0x4407ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(deniam_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_BASE_MEMBER(deniam_state, paletteram)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_w)
 	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE(deniam_coinctrl_r, deniam_coinctrl_w)
 	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
@@ -122,10 +103,10 @@ ADDRESS_MAP_END
 /* identical to 16b, but handles sound directly */
 static ADDRESS_MAP_START( deniam16c_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_BASE(&deniam_videoram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_BASE(&deniam_textram)
-	AM_RANGE(0x440000, 0x4407ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_BASE_MEMBER(deniam_state, videoram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_BASE_MEMBER(deniam_state, textram)
+	AM_RANGE(0x440000, 0x4407ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(deniam_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_BASE_MEMBER(deniam_state, paletteram)
 	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE(deniam_coinctrl_r, deniam_coinctrl_w)
 	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
@@ -231,10 +212,12 @@ static GFXDECODE_START( deniam )
 GFXDECODE_END
 
 
-static void irqhandler(const device_config *device, int linestate)
+static void irqhandler( const device_config *device, int linestate )
 {
+	deniam_state *state = (deniam_state *)device->machine->driver_data;
+
 	/* system 16c doesn't have the sound CPU */
-	if (cputag_get_cpu(device->machine, "audiocpu") != NULL)
+	if (state->audio_cpu != NULL)
 		cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }
 
@@ -245,7 +228,40 @@ static const ym3812_interface ym3812_config =
 
 
 
+static MACHINE_START( deniam )
+{
+	deniam_state *state = (deniam_state *)machine->driver_data;
+
+	state->audio_cpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->display_enable);
+	state_save_register_global(machine, state->coinctrl);
+
+	state_save_register_global(machine, state->bg_scrollx_offs);
+	state_save_register_global(machine, state->bg_scrolly_offs);
+	state_save_register_global(machine, state->fg_scrollx_offs);
+	state_save_register_global(machine, state->fg_scrolly_offs);
+	state_save_register_global(machine, state->bg_scrollx_reg);
+	state_save_register_global(machine, state->bg_scrolly_reg);
+	state_save_register_global(machine, state->fg_scrollx_reg);
+	state_save_register_global(machine, state->fg_scrolly_reg);
+	state_save_register_global(machine, state->bg_page_reg);
+	state_save_register_global(machine, state->fg_page_reg);
+	state_save_register_global_array(machine, state->bg_page);
+	state_save_register_global_array(machine, state->fg_page);
+}
+
+
+static MACHINE_RESET( deniam )
+{
+	/* logicpr2 does not reset the bank base on startup */
+	okim6295_set_bank_base(devtag_get_device(machine, "oki"), 0x00000);
+}
+
 static MACHINE_DRIVER_START( deniam16b )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(deniam_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)	/* 12.5Mhz verified */
@@ -256,6 +272,7 @@ static MACHINE_DRIVER_START( deniam16b )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(sound_io_map)
 
+	MDRV_MACHINE_START(deniam)
 	MDRV_MACHINE_RESET(deniam)
 
 	/* video hardware */
@@ -287,11 +304,15 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( deniam16c )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(deniam_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)	/* 12.5Mhz verified */
 	MDRV_CPU_PROGRAM_MAP(deniam16c_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
+	MDRV_MACHINE_START(deniam)
 	MDRV_MACHINE_RESET(deniam)
 
 	/* video hardware */
@@ -415,7 +436,7 @@ ROM_END
 
 
 
-GAME( 1996, logicpro, 0,        deniam16b, logicpr2, logicpro, ROT0, "Deniam", "Logic Pro (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, croquis,  logicpro, deniam16b, logicpr2, logicpro, ROT0, "Deniam", "Croquis (Germany)", 0 )
-GAME( 1996, karianx,  0,        deniam16b, karianx,  karianx,  ROT0, "Deniam", "Karian Cross (Rev. 1.0)", 0 )
-GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1996, logicpro, 0,        deniam16b, logicpr2, logicpro, ROT0, "Deniam", "Logic Pro (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1996, croquis,  logicpro, deniam16b, logicpr2, logicpro, ROT0, "Deniam", "Croquis (Germany)", GAME_SUPPORTS_SAVE )
+GAME( 1996, karianx,  0,        deniam16b, karianx,  karianx,  ROT0, "Deniam", "Karian Cross (Rev. 1.0)", GAME_SUPPORTS_SAVE )
+GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

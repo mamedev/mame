@@ -4,9 +4,26 @@
 
 *************************************************************************/
 
-/*----------- defined in drivers/dribling.c -----------*/
 
-extern UINT8 dribling_abca;
+
+typedef struct _dribling_state dribling_state;
+struct _dribling_state
+{
+	/* memory pointers */
+	UINT8 *  videoram;
+	UINT8 *  colorram;
+
+	/* misc */
+	UINT8    abca;
+	UINT8    dr, ds, sh;
+	UINT8    input_mux;
+	UINT8    di;
+
+
+	/* devices */
+	const device_config *ppi_0;
+	const device_config *ppi_1;
+};
 
 
 /*----------- defined in video/dribling.c -----------*/

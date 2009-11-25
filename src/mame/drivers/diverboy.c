@@ -51,18 +51,70 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 
-extern UINT16 *diverboy_spriteram;
-extern size_t diverboy_spriteram_size;
 
-VIDEO_START(diverboy);
-VIDEO_UPDATE(diverboy);
+
+typedef struct _diverboy_state diverboy_state;
+struct _diverboy_state
+{
+	/* memory pointers */
+	UINT16 *  spriteram;
+//	UINT16 *  paletteram16;	// currently this uses generic palette handling
+};
+
+
+VIDEO_START(diverboy)
+{
+}
+
+static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect )
+{
+	diverboy_state *state = (diverboy_state *)machine->driver_data;
+	UINT16 *source = state->spriteram;
+	UINT16 *finish = source + (spriteram_size / 2);
+
+	while (source < finish)
+	{
+		INT16 xpos, ypos, number, colr, bank, flash;
+
+		ypos = source[4];
+		xpos = source[0];
+		colr = (source[1] & 0x00f0) >> 4;
+		number = source[3];
+		flash = source[1] & 0x1000;
+
+		colr |= ((source[1] & 0x000c) << 2);
+
+		ypos = 0x100 - ypos;
+
+		bank = (source[1] & 0x0002) >> 1;
+
+		if (!flash || (video_screen_get_frame_number(machine->primary_screen) & 1))
+		{
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[bank],
+					number,
+					colr,
+					0,0,
+					xpos,ypos,
+					(source[1] & 0x0008) ? -1 : 0);
+		}
+
+		source += 8;
+	}
+}
+
+VIDEO_UPDATE(diverboy)
+{
+//  bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	draw_sprites(screen->machine, bitmap, cliprect);
+	return 0;
+}
 
 
 static WRITE16_HANDLER( soundcmd_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space,0,data & 0xff);
+		soundlatch_w(space, 0, data & 0xff);
 		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 	}
 }
@@ -72,7 +124,7 @@ static WRITE8_DEVICE_HANDLER( okibank_w )
 	/* bit 2 might be reset */
 //  popmessage("%02x",data);
 
-	okim6295_set_bank_base(device,(data & 3) * 0x40000);
+	okim6295_set_bank_base(device, (data & 3) * 0x40000);
 }
 
 
@@ -80,7 +132,7 @@ static WRITE8_DEVICE_HANDLER( okibank_w )
 static ADDRESS_MAP_START( diverboy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE(&diverboy_spriteram) AM_SIZE(&diverboy_spriteram_size)
+	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE_MEMBER(diverboy_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(soundcmd_w)
 	AM_RANGE(0x140000, 0x1407ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P1_P2")
@@ -182,6 +234,8 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( diverboy )
+	MDRV_DRIVER_DATA(diverboy_state)
+
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* guess */
 	MDRV_CPU_PROGRAM_MAP(diverboy_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
@@ -245,4 +299,4 @@ ROM_END
 
 
 
-GAME( 1992, diverboy, 0, diverboy, diverboy, 0, ORIENTATION_FLIP_X, "Electronic Devices Italy", "Diver Boy", 0 )
+GAME( 1992, diverboy, 0, diverboy, diverboy, 0, ORIENTATION_FLIP_X, "Electronic Devices Italy", "Diver Boy", GAME_SUPPORTS_SAVE )

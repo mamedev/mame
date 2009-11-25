@@ -30,7 +30,7 @@ PALETTE_INIT( dribling )
 		g *= 0x55;
 		b *= 0xff;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine, i, MAKE_RGB(r,g,b));
 	}
 }
 
@@ -44,8 +44,10 @@ PALETTE_INIT( dribling )
 
 WRITE8_HANDLER( dribling_colorram_w )
 {
+	dribling_state *state = (dribling_state *)space->machine->driver_data;
+
 	/* it is very important that we mask off the two bits here */
-	colorram[offset & 0x1f9f] = data;
+	state->colorram[offset & 0x1f9f] = data;
 }
 
 
@@ -58,6 +60,7 @@ WRITE8_HANDLER( dribling_colorram_w )
 
 VIDEO_UPDATE( dribling )
 {
+	dribling_state *state = (dribling_state *)screen->machine->driver_data;
 	UINT8 *prombase = memory_region(screen->machine, "proms");
 	UINT8 *gfxbase = memory_region(screen->machine, "gfx1");
 	int x, y;
@@ -71,11 +74,11 @@ VIDEO_UPDATE( dribling )
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
 			int b7 = prombase[(x >> 3) | ((y >> 3) << 5)] & 1;
-			int b6 = dribling_abca;
+			int b6 = state->abca;
 			int b5 = (x >> 3) & 1;
 			int b4 = (gfxbase[(x >> 3) | (y << 5)] >> (x & 7)) & 1;
-			int b3 = (videoram[(x >> 3) | (y << 5)] >> (x & 7)) & 1;
-			int b2_0 = colorram[(x >> 3) | ((y >> 2) << 7)] & 7;
+			int b3 = (state->videoram[(x >> 3) | (y << 5)] >> (x & 7)) & 1;
+			int b2_0 = state->colorram[(x >> 3) | ((y >> 2) << 7)] & 7;
 
 			/* assemble the various bits into a palette PROM index */
 			dst[x] = (b7 << 7) | (b6 << 6) | (b5 << 5) | (b4 << 4) | (b3 << 3) | b2_0;

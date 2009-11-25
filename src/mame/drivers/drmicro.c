@@ -12,52 +12,53 @@ Quite similar to Appoooh
 #include "cpu/z80/z80.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
+#include "drmicro.h"
 
 #define MCLK 18432000
 
-PALETTE_INIT( drmicro );
-VIDEO_START( drmicro );
-VIDEO_UPDATE( drmicro );
 
-WRITE8_HANDLER( drmicro_videoram_w );
-
-extern void drmicro_flip_w( running_machine *machine, int flip );
-
-/****************************************************************************/
-
-static int drmicro_nmi_enable;
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 static INTERRUPT_GEN( drmicro_interrupt )
 {
-	if (drmicro_nmi_enable)
+	drmicro_state *state = (drmicro_state *)device->machine->driver_data;
+
+	if (state->nmi_enable)
 		 cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
-{	// bit2,3 unknown
-	drmicro_nmi_enable = data & 1;
-	drmicro_flip_w(space->machine, data & 2);
+{
+	drmicro_state *state = (drmicro_state *)space->machine->driver_data;
+
+	state->nmi_enable = data & 1;
+	state->flipscreen = (data & 2) ? 1 : 0;
+	flip_screen_set(space->machine, data & 2);
+
+	// bit2,3 unknown
 }
 
-/****************************************************************************/
-
-static int pcm_adr;
 
 static void pcm_w(const device_config *device)
 {
+	drmicro_state *state = (drmicro_state *)device->machine->driver_data;
 	UINT8 *PCM = memory_region(device->machine, "adpcm");
 
-	int data = PCM[pcm_adr / 2];
+	int data = PCM[state->pcm_adr / 2];
 
 	if (data != 0x70) // ??
 	{
-		if (~pcm_adr & 1)
+		if (~state->pcm_adr & 1)
 			data >>= 4;
 
 		msm5205_data_w(device, data & 0x0f);
 		msm5205_reset_w(device, 0);
 
-		pcm_adr = (pcm_adr + 1) & 0x7fff;
+		state->pcm_adr = (state->pcm_adr + 1) & 0x7fff;
 	}
 	else
 		msm5205_reset_w(device, 1);
@@ -65,11 +66,16 @@ static void pcm_w(const device_config *device)
 
 static WRITE8_HANDLER( pcm_set_w )
 {
-	pcm_adr = ((data & 0x3f) << 9);
-	pcm_w(devtag_get_device(space->machine, "msm"));
+	drmicro_state *state = (drmicro_state *)space->machine->driver_data;
+	state->pcm_adr = ((data & 0x3f) << 9);
+	pcm_w(state->msm);
 }
 
-/****************************************************************************/
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( drmicro_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -88,7 +94,11 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x05, 0x05) AM_READWRITE(SMH_NOP, SMH_NOP) // unused? / watchdog?
 ADDRESS_MAP_END
 
-/****************************************************************************/
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( drmicro )
 	PORT_START("P1")
@@ -146,7 +156,11 @@ static INPUT_PORTS_START( drmicro )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // 4-8
 INPUT_PORTS_END
 
-/****************************************************************************/
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 static const gfx_layout spritelayout4 =
 {
@@ -205,9 +219,38 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S64_4B	/* 6 KHz */
 };
 
-/****************************************************************************/
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( drmicro )
+{
+	drmicro_state *state = (drmicro_state *)machine->driver_data;
+
+	state->msm = devtag_get_device(machine, "msm");
+
+	state_save_register_global(machine, state->nmi_enable);
+	state_save_register_global(machine, state->pcm_adr);
+	state_save_register_global(machine, state->flipscreen);
+}
+
+static MACHINE_RESET( drmicro )
+{
+	drmicro_state *state = (drmicro_state *)machine->driver_data;
+
+	state->nmi_enable = 0;
+	state->pcm_adr = 0;
+	state->flipscreen = 0;
+}
+
 
 static MACHINE_DRIVER_START( drmicro )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(drmicro_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,MCLK/6)	/* 3.072MHz? */
@@ -216,6 +259,9 @@ static MACHINE_DRIVER_START( drmicro )
 	MDRV_CPU_VBLANK_INT("screen", drmicro_interrupt)
 
 	MDRV_QUANTUM_TIME(HZ(60))
+
+	MDRV_MACHINE_START(drmicro)
+	MDRV_MACHINE_RESET(drmicro)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -249,7 +295,11 @@ static MACHINE_DRIVER_START( drmicro )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 
-/****************************************************************************/
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( drmicro )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // CPU
@@ -279,5 +329,12 @@ ROM_START( drmicro )
 	ROM_LOAD( "dm-60.6e", 0x0120,  0x0100, CRC(540a3953) SHA1(bc65388a1019dadf8c71705e234763f5c735e282) )
 ROM_END
 
-GAME( 1983, drmicro, 0, drmicro, drmicro, 0, ROT270, "Sanritsu", "Dr. Micro", 0 )
+
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1983, drmicro, 0, drmicro, drmicro, 0, ROT270, "Sanritsu", "Dr. Micro", GAME_SUPPORTS_SAVE )
 

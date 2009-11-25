@@ -55,19 +55,29 @@ $842f = lives
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-static INT32 char_bank = 0;
-static tilemap *bg_tilemap;
-static UINT8 *bgram;
-static UINT8 *mainram;
-static INT32 bgadr = 0;
 
-static INT32 sound_nmi_enable = 0;
-static INT32 main_nmi_enable = 0;
+typedef struct _ddayjlc_state ddayjlc_state;
+struct _ddayjlc_state
+{
+	/* memory pointers */
+	UINT8 *  bgram;
+	UINT8 *  mainram;
+	UINT8 *  videoram;
+	UINT8 *  spriteram;
 
-static INT32 e00x_l[4];
-static INT32 e00x_d[4][2];
+	/* video-related */
+	tilemap  *bg_tilemap;
+	INT32    char_bank;
+	INT32    bgadr;
 
-static UINT8 protAdr;
+	/* misc */
+	INT32    sound_nmi_enable;
+	INT32    main_nmi_enable;
+	INT32    e00x_l[4];
+	INT32    e00x_d[4][2];
+	UINT8    prot_addr;
+};
+
 
 
 /*
@@ -104,7 +114,7 @@ static UINT8 protAdr;
 
 */
 
-static const UINT8 protData[0x10] =
+static const UINT8 prot_data[0x10] =
 {
 	0x02, 0x02, 0x02, 0x02,
 	0x02, 0x00, 0x02, 0x00,
@@ -114,81 +124,98 @@ static const UINT8 protData[0x10] =
 
 static CUSTOM_INPUT( prot_r )
 {
-	return protData[protAdr];
+	ddayjlc_state *state = (ddayjlc_state *)field->port->machine->driver_data;
+	return prot_data[state->prot_addr];
 }
 
 static WRITE8_HANDLER( prot_w )
 {
-	protAdr = (protAdr & (~(1<<offset))) | ((data & 1)<<offset);
+	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	state->prot_addr = (state->prot_addr & (~(1 << offset))) | ((data & 1) << offset);
 }
 
 static WRITE8_HANDLER( char_bank_w )
 {
-	char_bank = data;
+	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	state->char_bank = data;
 }
 
 static WRITE8_HANDLER( ddayjlc_bgram_w )
 {
-	if(!offset)
-		tilemap_set_scrollx(bg_tilemap, 0, data + 8);
+	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
 
-	bgram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset & 0x3ff);
+	if (!offset)
+		tilemap_set_scrollx(state->bg_tilemap, 0, data + 8);
+
+	state->bgram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset & 0x3ff);
 }
 
 static WRITE8_HANDLER( ddayjlc_videoram_w )
 {
-		videoram[offset] = data;
+	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
 }
 
 
 static WRITE8_HANDLER(sound_nmi_w)
 {
-	sound_nmi_enable = data;
+	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	state->sound_nmi_enable = data;
 }
 
 static WRITE8_HANDLER(main_nmi_w)
 {
-	main_nmi_enable = data;
+	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	state->main_nmi_enable = data;
 }
 
 static WRITE8_HANDLER( bg0_w )
 {
-	bgadr = (bgadr & 0xfe) | (data & 1);
+	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	state->bgadr = (state->bgadr & 0xfe) | (data & 1);
 }
 
 static WRITE8_HANDLER( bg1_w )
 {
-	bgadr = (bgadr & 0xfd) | ((data & 1)<<1);
+	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+	state->bgadr = (state->bgadr & 0xfd) | ((data & 1) << 1);
 }
 
-static WRITE8_HANDLER(bg2_w)
+static WRITE8_HANDLER( bg2_w )
 {
-	bgadr = (bgadr & 0xfb) | ((data & 1)<<2);
-	if(bgadr > 2)
-		bgadr = 0;
-	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "user1") + bgadr * 0x4000 );
+	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+
+	state->bgadr = (state->bgadr & 0xfb) | ((data & 1) << 2);
+	if (state->bgadr > 2)
+		state->bgadr = 0;
+
+	memory_set_bank(space->machine, 1, state->bgadr);
 }
 
 static WRITE8_HANDLER( sound_w )
 {
-	soundlatch_w(space,offset,data);
+	soundlatch_w(space, offset, data);
 	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( i8257_CH0_w )
 {
-	e00x_d[offset][e00x_l[offset]] = data;
-	e00x_l[offset] ^= 1;
+	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+
+	state->e00x_d[offset][state->e00x_l[offset]] = data;
+	state->e00x_l[offset] ^= 1;
 }
 
 static WRITE8_HANDLER( i8257_LMSR_w )
 {
-	if(!data)
+	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+
+	if (!data)
 	{
-		INT32 src = e00x_d[0][1] * 256 + e00x_d[0][0];
-		INT32 dst = e00x_d[2][1] * 256 + e00x_d[2][0];
-		INT32 size = (e00x_d[1][1] * 256 + e00x_d[1][0]) & 0x3ff;
+		INT32 src = state->e00x_d[0][1] * 256 + state->e00x_d[0][0];
+		INT32 dst = state->e00x_d[2][1] * 256 + state->e00x_d[2][0];
+		INT32 size = (state->e00x_d[1][1] * 256 + state->e00x_d[1][0]) & 0x3ff;
 		INT32 i;
 
 		size++; //??
@@ -198,19 +225,19 @@ static WRITE8_HANDLER( i8257_LMSR_w )
 			memory_write_byte(space, dst++, memory_read_byte(space, src++));
 		}
 
-		e00x_l[0] = 0;
-		e00x_l[1] = 0;
-		e00x_l[2] = 0;
-		e00x_l[3] = 0;
+		state->e00x_l[0] = 0;
+		state->e00x_l[1] = 0;
+		state->e00x_l[2] = 0;
+		state->e00x_l[3] = 0;
 	}
 }
 
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&mainram)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE(&spriteram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(ddayjlc_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(ddayjlc_bgram_w) AM_BASE(&bgram) /* 9800-981f - videoregs */
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE_MEMBER(ddayjlc_state, mainram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE_MEMBER(ddayjlc_state, spriteram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(ddayjlc_videoram_w) AM_BASE_MEMBER(ddayjlc_state, videoram)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(ddayjlc_bgram_w) AM_BASE_MEMBER(ddayjlc_state, bgram) /* 9800-981f - videoregs */
 	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK(1) AM_WRITENOP
 	AM_RANGE(0xe000, 0xe003) AM_WRITE(i8257_CH0_w)
 	AM_RANGE(0xe008, 0xe008) AM_WRITENOP
@@ -234,13 +261,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(sound_nmi_w)
-
 	AM_RANGE(0x3000, 0x3000) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_data_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_address_w)
 	AM_RANGE(0x5000, 0x5000) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_data_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_address_w)
-
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(sound_nmi_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ddayjlc )
@@ -334,45 +359,48 @@ GFXDECODE_END
 
 static TILE_GET_INFO( get_tile_info_bg )
 {
-	int code = bgram[tile_index]+((bgram[tile_index+0x400]&(1<<3))<<(8-3));
+	ddayjlc_state *state = (ddayjlc_state *)machine->driver_data;
+	int code = state->bgram[tile_index] + ((state->bgram[tile_index + 0x400] & (1 << 3)) << (8 - 3));
 
 	SET_TILE_INFO(2, code, 0, 0);
 }
 
 static VIDEO_START( ddayjlc )
 {
-	bg_tilemap = tilemap_create(machine, get_tile_info_bg,tilemap_scan_rows,8,8,32,32);
+	ddayjlc_state *state = (ddayjlc_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_tile_info_bg, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static VIDEO_UPDATE( ddayjlc )
 {
+	ddayjlc_state *state = (ddayjlc_state *)screen->machine->driver_data;
 	UINT32 i;
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	for (i = 0; i < 0x400; i += 4)
 	{
-		INT32 flags = spriteram[i + 2];
-		INT32 y = 256-spriteram[i + 0]-8;
-		INT32 code = spriteram[i + 1];
-		INT32 x = spriteram[i + 3]-16;
-		INT32 xflip = flags&0x80;
-		INT32 yflip = (code&0x80);
+		INT32 flags = state->spriteram[i + 2];
+		INT32 y = 256 - state->spriteram[i + 0] - 8;
+		INT32 code = state->spriteram[i + 1];
+		INT32 x = state->spriteram[i + 3] - 16;
+		INT32 xflip = flags & 0x80;
+		INT32 yflip = (code & 0x80);
 
-		code=(code&0x7f)|((flags&0x30)<<3);
+		code = (code & 0x7f) | ((flags & 0x30) << 3);
 
 		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0], code, 1, xflip, yflip, x, y, 0);
 	}
 
 	{
-		UINT32 x,y,c;
-		for(y=0;y<32;y++)
-			for(x=0;x<32;x++)
+		UINT32 x, y, c;
+		for (y = 0; y < 32; y++)
+			for (x = 0; x < 32; x++)
 			{
-				c=videoram[y*32+x];
-				if(x>1&&x<30)
-					drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], c+char_bank*0x100, 1, 0, 0, x*8, y*8, 0);
+				c = state->videoram[y * 32 + x];
+				if (x > 1 && x < 30)
+					drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], c + state->char_bank * 0x100, 1, 0, 0, x*8, y*8, 0);
 				else
-					drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[1], c+char_bank*0x100, 1, 0, 0, x*8, y*8);
+					drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[1], c + state->char_bank * 0x100, 1, 0, 0, x*8, y*8);
 		}
 	}
 	return 0;
@@ -390,17 +418,61 @@ static const ay8910_interface ay8910_config =
 
 static INTERRUPT_GEN( ddayjlc_interrupt )
 {
-	if(main_nmi_enable)
+	ddayjlc_state *state = (ddayjlc_state *)device->machine->driver_data;
+	if(state->main_nmi_enable)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( ddayjlc_snd_interrupt )
 {
-	if(sound_nmi_enable)
+	ddayjlc_state *state = (ddayjlc_state *)device->machine->driver_data;
+	if(state->sound_nmi_enable)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
+
+static MACHINE_START( ddayjlc )
+{
+	ddayjlc_state *state = (ddayjlc_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->char_bank);
+	state_save_register_global(machine, state->bgadr);
+	state_save_register_global(machine, state->sound_nmi_enable);
+	state_save_register_global(machine, state->main_nmi_enable);
+	state_save_register_global(machine, state->prot_addr);
+
+	state_save_register_global_array(machine, state->e00x_l);
+	state_save_register_global_array(machine, state->e00x_d[0]);
+	state_save_register_global_array(machine, state->e00x_d[1]);
+	state_save_register_global_array(machine, state->e00x_d[2]);
+	state_save_register_global_array(machine, state->e00x_d[3]);
+}
+
+static MACHINE_RESET( ddayjlc )
+{
+	ddayjlc_state *state = (ddayjlc_state *)machine->driver_data;
+	int i;
+
+	state->char_bank = 0;
+	state->bgadr = 0;
+	state->sound_nmi_enable = 0;
+	state->main_nmi_enable = 0;
+	state->prot_addr = 0;
+
+	for (i = 0; i < 4; i++)
+	{
+		state->e00x_l[i] = 0;
+		state->e00x_d[i][0] = 0;
+		state->e00x_d[i][1] = 0;
+	}
+}
+
 static MACHINE_DRIVER_START( ddayjlc )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ddayjlc_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/3)
 	MDRV_CPU_PROGRAM_MAP(main_cpu)
 	MDRV_CPU_VBLANK_INT("screen", ddayjlc_interrupt)
@@ -410,6 +482,9 @@ static MACHINE_DRIVER_START( ddayjlc )
 	MDRV_CPU_VBLANK_INT("screen", ddayjlc_snd_interrupt)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
+
+	MDRV_MACHINE_START(ddayjlc)
+	MDRV_MACHINE_RESET(ddayjlc)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -561,21 +636,21 @@ static DRIVER_INIT( ddayjlc )
 		dst = memory_region(machine, "gfx1");
 		length = memory_region_length(machine, "gfx1");
 		memcpy(src, dst, length);
-		newadr=0;
-		oldaddr=0;
-		for (j = 0; j < length/2; j+=32)
+		newadr = 0;
+		oldaddr = 0;
+		for (j = 0; j < length / 2; j += 32)
 		{
 			repack(0);
 			repack(0x4000)
-			newadr+=32;
-			oldaddr+=16;
+			newadr += 32;
+			oldaddr += 16;
 		}
 		free(temp);
 	}
 
-	memory_set_bankptr(machine,  1, memory_region(machine, "user1") );
-
+	memory_configure_bank(machine, 1, 0, 3, memory_region(machine, "user1"), 0x4000);
+	memory_set_bank(machine, 1, 0);
 }
 
-GAME( 1984, ddayjlc,  0,       ddayjlc, ddayjlc, ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 1)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1984, ddayjlca, ddayjlc, ddayjlc, ddayjlc, ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 2)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1984, ddayjlc,  0,       ddayjlc, ddayjlc, ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 1)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1984, ddayjlca, ddayjlc, ddayjlc, ddayjlc, ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 2)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

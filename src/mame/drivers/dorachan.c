@@ -16,10 +16,18 @@ Todo:
 #define NUM_PENS	(8)
 
 
-static UINT8 *dorachan_videoram;
-static size_t dorachan_videoram_size;
-static UINT8 dorachan_flip_screen;
+typedef struct _dorachan_state dorachan_state;
+struct _dorachan_state
+{
+	/* memory pointers */
+	UINT8 *  videoram;
 
+	/* video-related */
+	UINT8    flip_screen;
+
+	/* devices */
+	const device_config *main_cpu;
+};
 
 
 /*************************************
@@ -30,16 +38,17 @@ static UINT8 dorachan_flip_screen;
 
 static CUSTOM_INPUT( dorachan_protection_r )
 {
+	dorachan_state *state = (dorachan_state *)field->port->machine->driver_data;
 	UINT8 ret = 0;
 
-	switch (cpu_get_previouspc(cputag_get_cpu(field->port->machine, "maincpu")))
+	switch (cpu_get_previouspc(state->main_cpu))
 	{
 	case 0x70ce: ret = 0xf2; break;
 	case 0x72a2: ret = 0xd5; break;
 	case 0x72b5: ret = 0xcb; break;
 
 	default:
-		mame_printf_debug("unhandled $2400 read @ %x\n", cpu_get_previouspc(cputag_get_cpu(field->port->machine, "maincpu")));
+		mame_printf_debug("unhandled $2400 read @ %x\n", cpu_get_previouspc(state->main_cpu));
 		break;
 	}
 
@@ -67,6 +76,7 @@ static void get_pens(pen_t *pens)
 
 static VIDEO_UPDATE( dorachan )
 {
+	dorachan_state *state = (dorachan_state *)screen->machine->driver_data;
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	const UINT8 *color_map_base;
@@ -75,7 +85,7 @@ static VIDEO_UPDATE( dorachan )
 
 	color_map_base = memory_region(screen->machine, "proms");
 
-	for (offs = 0; offs < dorachan_videoram_size; offs++)
+	for (offs = 0; offs < videoram_size; offs++)
 	{
 		int i;
 		UINT8 fore_color;
@@ -86,9 +96,9 @@ static VIDEO_UPDATE( dorachan )
 		/* the need for +1 is extremely unusual, but definetely correct */
 		offs_t color_address = ((((offs << 2) & 0x03e0) | (offs >> 8)) + 1) & 0x03ff;
 
-		UINT8 data = dorachan_videoram[offs];
+		UINT8 data = state->videoram[offs];
 
-		if (dorachan_flip_screen)
+		if (state->flip_screen)
 			fore_color = (color_map_base[color_address] >> 3) & 0x07;
 		else
 			fore_color = (color_map_base[color_address] >> 0) & 0x07;
@@ -109,15 +119,17 @@ static VIDEO_UPDATE( dorachan )
 
 static WRITE8_HANDLER(dorachan_ctrl_w)
 {
-	dorachan_flip_screen = (data >> 6) & 0x01;
+	dorachan_state *state = (dorachan_state *)space->machine->driver_data;
+	state->flip_screen = (data >> 6) & 0x01;
 }
 
 
 static CUSTOM_INPUT( dorachan_v128_r )
 {
-	/* to avoid resetting (when player 2 starts) bit 0 need to be
-       inverted when screen is flipped */
-	return ((video_screen_get_vpos(field->port->machine->primary_screen) >> 7) & 0x01) ^ dorachan_flip_screen;
+	dorachan_state *state = (dorachan_state *)field->port->machine->driver_data;
+
+	/* to avoid resetting (when player 2 starts) bit 0 need to be inverted when screen is flipped */
+	return ((video_screen_get_vpos(field->port->machine->primary_screen) >> 7) & 0x01) ^ state->flip_screen;
 }
 
 
@@ -136,7 +148,7 @@ static ADDRESS_MAP_START( dorachan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_READ_PORT("JOY")
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_READ_PORT("V128")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&dorachan_videoram) AM_SIZE(&dorachan_videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(dorachan_state, videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x6000, 0x77ff) AM_ROM
 ADDRESS_MAP_END
 
@@ -206,13 +218,35 @@ INPUT_PORTS_END
  *
  *************************************/
 
+static MACHINE_START( dorachan )
+{
+	dorachan_state *state = (dorachan_state *)machine->driver_data;
+
+	state->main_cpu = devtag_get_device(machine, "maincpu");
+
+	state_save_register_global(machine, state->flip_screen);
+}
+
+static MACHINE_RESET( dorachan )
+{
+	dorachan_state *state = (dorachan_state *)machine->driver_data;
+
+	state->flip_screen = 0;
+}
+
 static MACHINE_DRIVER_START( dorachan )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(dorachan_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(dorachan_map)
 	MDRV_CPU_IO_MAP(dorachan_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+
+	MDRV_MACHINE_START(dorachan)
+	MDRV_MACHINE_RESET(dorachan)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(dorachan)
@@ -261,4 +295,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, dorachan, 0, dorachan, dorachan, 0, ROT270, "Craul Denshi", "Dorachan", GAME_NO_SOUND)
+GAME( 1980, dorachan, 0, dorachan, dorachan, 0, ROT270, "Craul Denshi", "Dorachan", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
