@@ -6,7 +6,7 @@ driver by David Haywood & Angelo Salese
 
 TODO:
 - finish spriteram hook-up;
-- dip-switches;
+- finish dip-switches;
 - a bunch of unemulated writes at 0xe***
 
 ======================================================================================
@@ -272,29 +272,37 @@ static INPUT_PORTS_START( sub )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xf0, 0x10, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 4C_5C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+// Duplicates 
+//	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
+//	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
+//	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
+//	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_1C ) )
+//	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSWC" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+// Duplicates
+//	PORT_DIPSETTING(    0x04, "3" )
+//	PORT_DIPSETTING(    0x05, "4" )
+//	PORT_DIPSETTING(    0x06, "5" )
+//	PORT_DIPSETTING(    0x07, "6" )
+
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
