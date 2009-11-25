@@ -313,7 +313,7 @@ static CUSTOM_INPUT( cdp1869_pcb_r )
 	return state->cdp1869_pcb;
 }
 
-static CUSTOM_INPUT( cdp1869_predisplay_r )
+static CUSTOM_INPUT( cidelsa_prd_r )
 {
 	cidelsa_state *state = (cidelsa_state *)field->port->machine->driver_data;
 
@@ -354,7 +354,7 @@ static INPUT_PORTS_START( destryer )
 	PORT_DIPSETTING(    0x00, "Slot A: 2.5  Slot B: 5" )
 
 	PORT_START("EF")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_predisplay_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cidelsa_prd_r, NULL)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) // ST
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) // M2
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) // M1
@@ -404,7 +404,7 @@ static INPUT_PORTS_START( altair )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EF")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_predisplay_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cidelsa_prd_r, NULL)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) // ST
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) // M2
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) // M1
@@ -456,7 +456,7 @@ static INPUT_PORTS_START( draco )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT )
 
 	PORT_START("EF")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_predisplay_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(CDP1869_TAG, cdp1869_predisplay_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) // ST
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) // M2
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) // M1
@@ -555,7 +555,7 @@ static MACHINE_DRIVER_START( altair )
 	MDRV_MACHINE_RESET(cidelsa)
 
 	/* input/output hardware */
-	MDRV_CDP1852_ADD("ic23", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in0_intf)	/* clock is really tied to CDP1876 CMSEL (pin 32) */
+	MDRV_CDP1852_ADD("ic23", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in0_intf)	/* clock is really tied to CDP1869 CMSEL (pin 37) */
 	MDRV_CDP1852_ADD("ic24", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in1_intf)
 	MDRV_CDP1852_ADD("ic25", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in2_intf)
 	MDRV_CDP1852_ADD("ic26", ALTAIR_CHR1 / 8, altair_cdp1852_out1_intf)		/* clock is CDP1802 TPB */

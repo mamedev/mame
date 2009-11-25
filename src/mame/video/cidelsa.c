@@ -5,13 +5,13 @@
 
 /* Page RAM Access */
 
-static CDP1869_PAGE_RAM_READ( cidelsa_pageram_r )
+static READ8_DEVICE_HANDLER( cidelsa_pageram_r )
 {
 	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
 
-	UINT16 addr = pma & CIDELSA_PAGERAM_MASK;
+	UINT16 addr = offset & CIDELSA_PAGERAM_MASK;
 
-	if (BIT(pma, 10))
+	if (BIT(offset, 10))
 	{
 		return 0xff;
 	}
@@ -19,13 +19,13 @@ static CDP1869_PAGE_RAM_READ( cidelsa_pageram_r )
 	return state->pageram[addr];
 }
 
-static CDP1869_PAGE_RAM_WRITE( cidelsa_pageram_w )
+static WRITE8_DEVICE_HANDLER( cidelsa_pageram_w )
 {
 	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
 
-	UINT16 addr = pma & CIDELSA_PAGERAM_MASK;
+	UINT16 addr = offset & CIDELSA_PAGERAM_MASK;
 
-	if (BIT(pma, 10))
+	if (BIT(offset, 10))
 	{
 		return;
 	}
@@ -33,20 +33,20 @@ static CDP1869_PAGE_RAM_WRITE( cidelsa_pageram_w )
 	state->pageram[addr] = data;
 }
 
-static CDP1869_PAGE_RAM_READ( draco_pageram_r )
+static READ8_DEVICE_HANDLER( draco_pageram_r )
 {
 	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
 
-	UINT16 addr = pma & DRACO_PAGERAM_MASK;
+	UINT16 addr = offset & DRACO_PAGERAM_MASK;
 
 	return state->pageram[addr];
 }
 
-static CDP1869_PAGE_RAM_WRITE( draco_pageram_w )
+static WRITE8_DEVICE_HANDLER( draco_pageram_w )
 {
 	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
 
-	UINT16 addr = pma & DRACO_PAGERAM_MASK;
+	UINT16 addr = offset & DRACO_PAGERAM_MASK;
 
 	state->pageram[addr] = data;
 }
@@ -134,13 +134,6 @@ static WRITE_LINE_DEVICE_HANDLER( cidelsa_prd_w )
 	driver_state->cdp1869_prd = !state;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( draco_prd_w )
-{
-	cidelsa_state *driver_state = (cidelsa_state *)device->machine->driver_data;
-
-	driver_state->cdp1869_prd = state;
-}
-
 /* CDP1869 Interface */
 
 static CDP1869_INTERFACE( destryer_cdp1869_intf )
@@ -149,8 +142,8 @@ static CDP1869_INTERFACE( destryer_cdp1869_intf )
 	SCREEN_TAG,
 	0,
 	CDP1869_PAL,
-	cidelsa_pageram_r,
-	cidelsa_pageram_w,
+	DEVCB_HANDLER(cidelsa_pageram_r),
+	DEVCB_HANDLER(cidelsa_pageram_w),
 	cidelsa_pcb_r,
 	cidelsa_charram_r,
 	cidelsa_charram_w,
@@ -163,8 +156,8 @@ static CDP1869_INTERFACE( altair_cdp1869_intf )
 	SCREEN_TAG,
 	0,
 	CDP1869_PAL,
-	cidelsa_pageram_r,
-	cidelsa_pageram_w,
+	DEVCB_HANDLER(cidelsa_pageram_r),
+	DEVCB_HANDLER(cidelsa_pageram_w),
 	cidelsa_pcb_r,
 	cidelsa_charram_r,
 	cidelsa_charram_w,
@@ -177,12 +170,12 @@ static CDP1869_INTERFACE( draco_cdp1869_intf )
 	SCREEN_TAG,
 	0,
 	CDP1869_PAL,
-	draco_pageram_r,
-	draco_pageram_w,
+	DEVCB_HANDLER(draco_pageram_r),
+	DEVCB_HANDLER(draco_pageram_w),
 	draco_pcb_r,
 	draco_charram_r,
 	draco_charram_w,
-	DEVCB_LINE(draco_prd_w)
+	DEVCB_NULL
 };
 
 /* Video Start */
@@ -200,7 +193,6 @@ static void video_start(running_machine *machine, UINT16 pageram_size)
 	state->cdp1869 = devtag_get_device(machine, CDP1869_TAG);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->cdp1869_prd);
 	state_save_register_global(machine, state->cdp1869_pcb);
 	state_save_register_global_pointer(machine, state->pageram, pageram_size);
 	state_save_register_global_pointer(machine, state->pcbram, CIDELSA_CHARRAM_SIZE);

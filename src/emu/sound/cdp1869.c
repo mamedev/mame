@@ -8,6 +8,7 @@
 
     TODO:
 
+	- remove CDP1802 dependency
     - white noise
     - scanline based update
     - CMSEL output
@@ -47,6 +48,8 @@ enum
 typedef struct _cdp1869_t cdp1869_t;
 struct _cdp1869_t
 {
+	devcb_resolved_read8		in_page_ram_func;
+	devcb_resolved_write8		out_page_ram_func;
 	devcb_resolved_write_line	out_prd_func;
 
 	const device_config *device;
@@ -57,6 +60,7 @@ struct _cdp1869_t
 	int color_clock;
 
 	/* video state */
+	int prd;						/* predisplay */
 	int dispoff;					/* display off */
 	int fresvert;					/* full resolution vertical */
 	int freshorz;					/* full resolution horizontal */
@@ -161,6 +165,7 @@ static TIMER_CALLBACK( prd_changed_tick )
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
 	devcb_call_write_line(&cdp1869->out_prd_func, param);
+	cdp1869->prd = param;
 
 	update_prd_changed_timer(cdp1869);
 }
@@ -609,7 +614,7 @@ READ8_DEVICE_HANDLER( cdp1869_pageram_r )
 		pma = offset;
 	}
 
-	return cdp1869->intf->page_ram_r(device, pma);
+	return devcb_call_read8(&cdp1869->in_page_ram_func, pma);
 }
 
 /*-------------------------------------------------
@@ -631,10 +636,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_pageram_w )
 		pma = offset;
 	}
 
-	if (cdp1869->intf->page_ram_w)
-	{
-		cdp1869->intf->page_ram_w(device, pma, data);
-	}
+	devcb_call_write8(&cdp1869->out_page_ram_func, pma, data);
 }
 
 /*-------------------------------------------------
@@ -694,6 +696,17 @@ WRITE8_DEVICE_HANDLER( cdp1869_charram_w )
 	{
 		cdp1869->intf->char_ram_w(device, pma, cma, data);
 	}
+}
+
+/*-------------------------------------------------
+    cdp1869_predisplay_r - predisplay read
+-------------------------------------------------*/
+
+READ_LINE_DEVICE_HANDLER( cdp1869_predisplay_r )
+{
+	cdp1869_t *cdp1869 = get_safe_token(device);
+
+	return cdp1869->prd;
 }
 
 /*-------------------------------------------------
@@ -849,11 +862,12 @@ static DEVICE_START( cdp1869 )
 	/* validate arguments */
 	cdp1869->intf = (const cdp1869_interface *)device->static_config;
 
-	assert(cdp1869->intf->page_ram_r != NULL);
 	assert(cdp1869->intf->pcb_r != NULL);
 	assert(cdp1869->intf->char_ram_r != NULL);
 
 	/* resolve callbacks */
+	devcb_resolve_read8(&cdp1869->in_page_ram_func, &cdp1869->intf->in_page_ram_func, device);
+	devcb_resolve_write8(&cdp1869->out_page_ram_func, &cdp1869->intf->out_page_ram_func, device);
 	devcb_resolve_write_line(&cdp1869->out_prd_func, &cdp1869->intf->out_prd_func, device);
 
 	/* set initial values */
@@ -879,6 +893,7 @@ static DEVICE_START( cdp1869 )
 	/* register for state saving */
 	state_save_register_postload(device->machine, cdp1869_state_save_postload, cdp1869);
 
+	state_save_register_device_item(device, 0, cdp1869->prd);
 	state_save_register_device_item(device, 0, cdp1869->dispoff);
 	state_save_register_device_item(device, 0, cdp1869->fresvert);
 	state_save_register_device_item(device, 0, cdp1869->freshorz);
