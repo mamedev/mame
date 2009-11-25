@@ -879,7 +879,7 @@ J1100256A VIDEO PCB
 #include "cpu/z80/z80.h"
 #include "taitoipt.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
@@ -1014,7 +1014,7 @@ static INTERRUPT_GEN( dblaxle_cpub_interrupt )
                               EEPROM
 ******************************************************************/
 
-static const UINT8 default_eeprom[128]=
+static const UINT8 spacegun_default_eeprom[128]=
 {
 	0x00,0x00,0x00,0xff,0x00,0x01,0x41,0x41,0x00,0x00,0x00,0xff,0x00,0x00,0xf0,0xf0,
 	0x00,0x00,0x00,0xff,0x00,0x01,0x41,0x41,0x00,0x00,0x00,0xff,0x00,0x00,0xf0,0xf0,
@@ -1026,7 +1026,7 @@ static const UINT8 default_eeprom[128]=
 	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
 };
 
-static const eeprom_interface eeprom_intf =
+static const eeprom_interface spacegun_eeprom_intf =
 {
 	6,				/* address bits */
 	16,				/* data bits */
@@ -1039,25 +1039,6 @@ static const eeprom_interface eeprom_intf =
 	1				/* reset delay */
 };
 
-static NVRAM_HANDLER( spacegun )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-			eeprom_load(file);
-		else
-			eeprom_set_data(default_eeprom,128);  /* Default the gun setup values */
-	}
-}
-
-static int eeprom_r(void)
-{
-	return (eeprom_read_bit() & 0x01)<<7;
-}
 
 #if 0
 static READ16_HANDLER( eep_latch_r )
@@ -1079,9 +1060,7 @@ static WRITE16_HANDLER( spacegun_output_bypass_w )
             x0000000    (unused)                  */
 
 			COMBINE_DATA(&eep_latch);
-			eeprom_write_bit(data & 0x40);
-			eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-			eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
 			break;
 
 		default:
@@ -1281,10 +1260,12 @@ static READ16_HANDLER( sci_steer_input_r )
 
 static READ16_HANDLER( spacegun_input_bypass_r )
 {
+	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+
 	switch (offset)
 	{
 		case 0x03:
-			return eeprom_r();
+			return eepromdev_read_bit(eeprom) << 7;
 
 		default:
 			return TC0220IOC_r(space, offset);	/* might be a 510NIO ! */
@@ -2635,6 +2616,11 @@ static INPUT_PORTS_START( spacegun )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+
 	PORT_START("STICKX1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(1)
 
@@ -3282,7 +3268,7 @@ static MACHINE_DRIVER_START( spacegun )
 
 	MDRV_MACHINE_START(taitoz)
 
-	MDRV_NVRAM_HANDLER(spacegun)
+	MDRV_EEPROM_ADD("eeprom", spacegun_eeprom_intf, 128, spacegun_default_eeprom)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

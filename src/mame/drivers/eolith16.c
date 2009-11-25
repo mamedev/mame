@@ -12,7 +12,7 @@
 #include "driver.h"
 #include "cpu/e132xs/e132xs.h"
 #include "deprecat.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/okim6295.h"
 #include "eolithsp.h"
 
@@ -36,9 +36,7 @@ static WRITE16_HANDLER( eeprom_w )
 	vbuffer = (data & 0x80) >> 7;
 	coin_counter_w(0, data & 1);
 
-	eeprom_write_bit(data & 0x40);
-	eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-	eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
 
 	//data & 0x100 and data & 0x004 always set
 }
@@ -77,7 +75,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( eolith16 )
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL) // eeprom bit
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eolith_speedup_getvblank, NULL)
 	PORT_BIT( 0xff6f, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -98,6 +96,11 @@ static INPUT_PORTS_START( eolith16 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
 INPUT_PORTS_END
 
 static VIDEO_START( eolith16 )
@@ -127,16 +130,6 @@ static VIDEO_UPDATE( eolith16 )
 	return 0;
 }
 
-static NVRAM_HANDLER( eolith16_eeprom )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C66);
-		if (file)	eeprom_load(file);
-	}
-}
 
 // setup a custom palette because pixels use 8 bits per color
 static PALETTE_INIT( eolith16 )
@@ -169,7 +162,7 @@ static MACHINE_DRIVER_START( eolith16 )
 	MDRV_CPU_PROGRAM_MAP(eolith16_map)
 	MDRV_CPU_VBLANK_INT_HACK(eolith_speedup,262)
 
-	MDRV_NVRAM_HANDLER(eolith16_eeprom)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_interface_93C66)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

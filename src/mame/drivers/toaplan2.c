@@ -255,7 +255,7 @@ To Do / Unknowns:
 #include "cpu/nec/nec.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "machine/nmk112.h"
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
@@ -1213,7 +1213,7 @@ static WRITE8_HANDLER( raizing_clear_nmi_w )
 /*###################### Battle Bakraid ##############################*/
 
 /* EEPROM contents with Battle Bakraid Unlimited version features unlocked */
-static const UINT8 bbakraid_unlimited_nvram[512] = {
+static const UINT8 bbakraid_unlim_default[512] = {
 	0xc2,0x49,0x00,0x07,0xa1,0x20,0x2a,0x2a,0x2a,0x90,0x90,0x90,0x00,0x00,0x00,0x00,
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x06,0x1a,0x80,0x2a,0x2a,0x2a,0x94,
 	0x94,0x94,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x04,
@@ -1250,7 +1250,7 @@ static const UINT8 bbakraid_unlimited_nvram[512] = {
 
 
 
-static const eeprom_interface eeprom_interface_93C66 =
+static const eeprom_interface bbakraid_93C66_intf =
 {
 	/* Pin 6 of the 93C66 is connected to Gnd!
        So it's configured for 512 bytes */
@@ -1266,29 +1266,10 @@ static const eeprom_interface eeprom_interface_93C66 =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
-
-static NVRAM_HANDLER( bbakraid )
-{
-	/* Pin 6 of 93C66 is connected to Gnd! */
-
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C66);
-
-		if (file) eeprom_load(file);
-		else
-		{
-			if (bbakraid_unlimited_ver == 1)
-				eeprom_set_data(bbakraid_unlimited_nvram, sizeof(bbakraid_unlimited_nvram));
-		}
-	}
-}
-
-
 static READ16_HANDLER( bbakraid_nvram_r )
 {
+	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
+
 	/* Bit 1 returns the status of BUSAK from the Z80.
        BUSRQ is activated via bit 0x10 on the NVRAM write port.
        These accesses are made when the 68K wants to read the Z80
@@ -1296,7 +1277,7 @@ static READ16_HANDLER( bbakraid_nvram_r )
     */
 
 	int data;
-	data  = ((eeprom_read_bit() & 0x01) << 4);
+	data  = ((eepromdev_read_bit(eeprom) & 0x01) << 4);
 	data |= ((raizing_Z80_busreq >> 4) & 0x01);	/* Loop BUSRQ to BUSAK */
 
 	return data;
@@ -1309,16 +1290,8 @@ static WRITE16_HANDLER( bbakraid_nvram_w )
 		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",cpu_get_pc(space->cpu),data);
 
 	if ( ACCESSING_BITS_0_7 )
-	{
-		// chip select
-		eeprom_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
 
-		// latch the bit
-		eeprom_write_bit( (data & 0x04) >> 2 );
-
-		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE );
-	}
 	raizing_Z80_busreq = data & 0x10;	/* see bbakraid_nvram_r above */
 }
 
@@ -3297,6 +3270,11 @@ static INPUT_PORTS_START( bbakraid )
 	PORT_DIPNAME( 0x8000,	0x0000, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x8000, DEF_STR( On ) )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 INPUT_PORTS_END
 
 
@@ -4334,7 +4312,7 @@ static MACHINE_DRIVER_START( bbakraid )
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(toaplan2)
-	MDRV_NVRAM_HANDLER(bbakraid)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", bbakraid_93C66_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -4360,6 +4338,12 @@ static MACHINE_DRIVER_START( bbakraid )
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( bbakradu )
+	MDRV_IMPORT_FROM(bbakraid)
+
+	MDRV_DEVICE_REMOVE("eeprom")
+	MDRV_EEPROM_ADD("eeprom", bbakraid_93C66_intf, 512, bbakraid_unlim_default)
+MACHINE_DRIVER_END
 
 
 /***************************************************************************
@@ -5455,7 +5439,7 @@ GAME( 1998, batridja, batrid,   batrider, batridrj, batrider, ROT270, "Raizing /
 
 // Battle Bakraid
 // the 'unlimited' version is a newer revision of the code.
-GAME( 1999, bkraidu,  0,       bbakraid, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (U.S.A.) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
-GAME( 1999, bkraiduj, bkraidu, bbakraid, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
+GAME( 1999, bkraidu,  0,        bbakradu, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (U.S.A.) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
+GAME( 1999, bkraiduj, bkraidu,  bbakradu, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
 // older revision of the code
-GAME( 1999, bkraidj,  bkraidu, bbakraid, bbakraid, bbakraid, ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", GAME_SUPPORTS_SAVE )
+GAME( 1999, bkraidj,  bkraidu,  bbakraid, bbakraid, bbakraid, ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", GAME_SUPPORTS_SAVE )

@@ -172,7 +172,7 @@ Notes:
 #include "taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "machine/mb87078.h"
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
@@ -358,7 +358,7 @@ static WRITE16_HANDLER( gain_control_w )
 
 ***************************************************************************/
 
-static const eeprom_interface eeprom_intf =
+static const eeprom_interface taitob_eeprom_intf =
 {
 	6,				/* address bits */
 	16,				/* data bits */
@@ -368,30 +368,6 @@ static const eeprom_interface eeprom_intf =
 	"0100000000",	/*  lock command */
 	"0100110000" 	/* unlock command*/
 };
-
-static NVRAM_HANDLER( taito_b )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-		if (file)
-		{
-			eeprom_load(file);
-		}
-	}
-}
-
-static READ16_HANDLER( eeprom_r )
-{
-	int res;
-
-	res = (eeprom_read_bit() & 0x01);
-	res |= input_port_read(space->machine, "DSWB") & 0xfe;	/* coin inputs */
-
-	return res;
-}
 
 static UINT16 eep_latch = 0;
 
@@ -404,8 +380,8 @@ static WRITE16_HANDLER( eeprom_w )
 {
 	COMBINE_DATA(&eep_latch);
 
-    if (ACCESSING_BITS_8_15)
-    {
+	if (ACCESSING_BITS_8_15)
+	{
 		data >>= 8; /*M68k byte write*/
 
 		/* bit 0 - Unused */
@@ -418,9 +394,7 @@ static WRITE16_HANDLER( eeprom_w )
 		/* bit 7 - set all the time (Chip Select?) */
 
 		/* EEPROM */
-		eeprom_write_bit(data & 0x04);
-		eeprom_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
 	}
 }
 
@@ -457,7 +431,7 @@ static READ16_HANDLER( pbobble_input_bypass_r )
 	switch (offset)
 	{
 		case 0x01:
-			return eeprom_r(space, 0, mem_mask) << 8;
+			return input_port_read(space->machine, "DSWB") << 8;
 
 		default:
 			return TC0640FIO_r(space, offset) << 8;
@@ -1364,7 +1338,7 @@ static INPUT_PORTS_START( pbobble )	/* Missing P3&4 controls ! */
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW ) /*ok*/
 
 	PORT_START("DSWB")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1422,6 +1396,11 @@ static INPUT_PORTS_START( pbobble )	/* Missing P3&4 controls ! */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spacedxo )
@@ -1522,7 +1501,7 @@ static INPUT_PORTS_START( qzshowby )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW ) /*ok*/
 
 	PORT_START("DSWB")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1580,6 +1559,11 @@ static INPUT_PORTS_START( qzshowby )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( viofight )
@@ -2460,7 +2444,7 @@ static MACHINE_DRIVER_START( pbobble )
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(mb87078)
-	MDRV_NVRAM_HANDLER(taito_b)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", taitob_eeprom_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2501,7 +2485,7 @@ static MACHINE_DRIVER_START( spacedx )
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(mb87078)
-	MDRV_NVRAM_HANDLER(taito_b)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", taitob_eeprom_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2580,7 +2564,7 @@ static MACHINE_DRIVER_START( qzshowby )
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(mb87078)
-	MDRV_NVRAM_HANDLER(taito_b)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", taitob_eeprom_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

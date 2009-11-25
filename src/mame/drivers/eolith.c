@@ -54,7 +54,7 @@
 #include "driver.h"
 #include "cpu/e132xs/e132xs.h"
 #include "deprecat.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 
 READ32_HANDLER(eolith_vram_r);
 WRITE32_HANDLER(eolith_vram_w);
@@ -81,18 +81,6 @@ static const eeprom_interface eeprom_interface_93C66 =
 
 
 
-static NVRAM_HANDLER( eolith )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C66);
-		if (file)	eeprom_load(file);
-	}
-}
-
-
 static READ32_HANDLER( eolith_custom_r )
 {
 	/*
@@ -114,9 +102,7 @@ static WRITE32_HANDLER( systemcontrol_w )
 	coin_counter_w(0, data & coin_counter_bit);
 	set_led_status(0, data & 1);
 
-	eeprom_write_bit(data & 0x08);
-	eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-	eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+	input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
 
 	// bit 0x100 and 0x040 ?
 }
@@ -159,7 +145,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL) // eeprom bit
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eolith_speedup_getvblank, NULL)
@@ -185,6 +171,11 @@ static INPUT_PORTS_START( common )
 
 	PORT_START("DSW1")
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNUSED	)
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ironfort )
@@ -192,7 +183,7 @@ static INPUT_PORTS_START( ironfort )
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL) // eeprom bit
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eolith_speedup_getvblank, NULL)
@@ -239,6 +230,11 @@ static INPUT_PORTS_START( ironfort )
 	PORT_DIPSETTING(          0x000000c0, DEF_STR( Normal ) )
 	PORT_DIPSETTING(          0x00000080, DEF_STR( Easy ) )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED	)
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hidnctch )
@@ -334,7 +330,7 @@ static MACHINE_DRIVER_START( eolith45 )
 
 	/* sound cpu */
 
-	MDRV_NVRAM_HANDLER(eolith)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_interface_93C66)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

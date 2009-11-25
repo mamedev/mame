@@ -37,7 +37,7 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "taito_f3.h"
 #include "sound/es5506.h"
 #include "audio/taito_en.h"
@@ -99,9 +99,7 @@ static WRITE32_HANDLER( f3_control_w )
 		case 0x04: /* Eeprom */
 			if (ACCESSING_BITS_0_7)
 			{
-				eeprom_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-				eeprom_write_bit(data & 0x04);
-				eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
 			}
 			return;
 
@@ -195,8 +193,8 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_START4 )
-	PORT_BIT( 0x00ff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "EEPROM")
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "EEPROM")
+	PORT_BIT( 0x00ff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "EEPROMIN")
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "EEPROMIN")
 
 	/* MSW: Coin counters/lockouts are readable, LSW: Joysticks (Player 1 & 2) */
 	PORT_START("IN1")
@@ -248,8 +246,8 @@ static INPUT_PORTS_START( f3 )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* These are not read directly, but through PORT_CUSTOMs above */
-	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL) /* Eprom data bit */
+	PORT_START("EEPROMIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) /* Another service mode */
@@ -263,6 +261,11 @@ static INPUT_PORTS_START( f3 )
 
 	PORT_START("DIAL2")
 	PORT_BIT( 0xfff, 0x000, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kn )
@@ -373,34 +376,16 @@ static MACHINE_RESET( f3 )
 }
 
 
-static NVRAM_HANDLER( taito_f3 )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		static const UINT8 recalh_eeprom[128] =	{
-			0x85,0x54,0x00,0x00,0x30,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xf3,0x35,
-			0x00,0x01,0x86,0xa0,0x00,0x13,0x04,0x13,0x00,0x00,0xc3,0x50,0x00,0x19,0x00,0x0a,
-			0x00,0x00,0x4e,0x20,0x00,0x03,0x18,0x0d,0x00,0x00,0x27,0x10,0x00,0x05,0x14,0x18,
-			0x00,0x00,0x13,0x88,0x00,0x00,0x12,0x27,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-			0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-			0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-			0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-			0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
-		};
-
-		// RecalH does not initialise it's eeprom on first boot, so we provide one.
-		// Same applies to gseeker.
-		eeprom_init(machine, &eeprom_interface_93C46);
-		if (file)
-			eeprom_load(file);
-		else if (f3_game==RECALH)
-			eeprom_set_data(recalh_eeprom,128);
-		else if (f3_game==GSEEKER)
-			eeprom_set_data(recalh_eeprom,128);
-	}
-}
+static const UINT8 recalh_eeprom[128] =	{
+	0x85,0x54,0x00,0x00,0x30,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xf3,0x35,
+	0x00,0x01,0x86,0xa0,0x00,0x13,0x04,0x13,0x00,0x00,0xc3,0x50,0x00,0x19,0x00,0x0a,
+	0x00,0x00,0x4e,0x20,0x00,0x03,0x18,0x0d,0x00,0x00,0x27,0x10,0x00,0x05,0x14,0x18,
+	0x00,0x00,0x13,0x88,0x00,0x00,0x12,0x27,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
+	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
+};
 
 static MACHINE_START(f3)
 {
@@ -418,7 +403,8 @@ static MACHINE_DRIVER_START( f3 )
 
 	MDRV_MACHINE_START(f3)
 	MDRV_MACHINE_RESET(f3)
-	MDRV_NVRAM_HANDLER(taito_f3)
+
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -462,6 +448,20 @@ static MACHINE_DRIVER_START( f3_224c )
 	MDRV_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+224-1)
 MACHINE_DRIVER_END
 
+/* recalh and gseeker need a default EEPROM to work */
+static MACHINE_DRIVER_START( f3_eeprom )
+	MDRV_IMPORT_FROM(f3)
+
+	MDRV_DEVICE_REMOVE("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom", 128, recalh_eeprom)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( f3_224b_eeprom )
+	MDRV_IMPORT_FROM(f3)
+
+	MDRV_DEVICE_REMOVE("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom", 128, recalh_eeprom)
+MACHINE_DRIVER_END
 
 static const gfx_layout bubsympb_sprite_layout =
 {
@@ -501,7 +501,8 @@ static MACHINE_DRIVER_START( bubsympb )
 
 	MDRV_MACHINE_START(f3)
 	//MDRV_MACHINE_RESET(f3)
-	MDRV_NVRAM_HANDLER(taito_f3)
+
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -3845,9 +3846,9 @@ GAME( 1992, arabianmu,arabianm, f3_224a, f3, arabianm, ROT0,   "Taito America Co
 GAME( 1992, ridingf,  0,        f3_224b, f3, ridingf,  ROT0,   "Taito Corporation Japan",   "Riding Fight (Ver 1.0O)", GAME_NO_SOUND )
 GAME( 1992, ridingfj, ridingf,  f3_224b, f3, ridingf,  ROT0,   "Taito Corporation",         "Riding Fight (Ver 1.0J)", GAME_NO_SOUND )
 GAME( 1992, ridingfu, ridingf,  f3_224b, f3, ridingf,  ROT0,   "Taito America Corporation", "Riding Fight (Ver 1.0A)", GAME_NO_SOUND )
-GAME( 1992, gseeker,  0,        f3_224b, f3, gseeker,  ROT90,  "Taito Corporation Japan",   "Grid Seeker: Project Storm Hammer (Ver 1.3O)", 0 )
-GAME( 1992, gseekerj, gseeker,  f3_224b, f3, gseeker,  ROT90,  "Taito Corporation",         "Grid Seeker: Project Storm Hammer (Ver 1.3J)", 0 )
-GAME( 1992, gseekeru, gseeker,  f3_224b, f3, gseeker,  ROT90,  "Taito America Corporation", "Grid Seeker: Project Storm Hammer (Ver 1.3A)", 0 )
+GAME( 1992, gseeker,  0,        f3_224b_eeprom, f3, gseeker,  ROT90,  "Taito Corporation Japan",   "Grid Seeker: Project Storm Hammer (Ver 1.3O)", 0 )
+GAME( 1992, gseekerj, gseeker,  f3_224b_eeprom, f3, gseeker,  ROT90,  "Taito Corporation",         "Grid Seeker: Project Storm Hammer (Ver 1.3J)", 0 )
+GAME( 1992, gseekeru, gseeker,  f3_224b_eeprom, f3, gseeker,  ROT90,  "Taito America Corporation", "Grid Seeker: Project Storm Hammer (Ver 1.3A)", 0 )
 GAME( 1992, commandw, 0,        f3_224b, f3, commandw, ROT0,   "Taito Corporation",         "Command War - Super Special Battle & War Game (Ver 0.0J) (Prototype)", GAME_IMPERFECT_GRAPHICS )
 /* Most of the football games share some GFX roms but shouldn't be considered clones unless they have the same Taito game code for the program roms */
 GAME( 1993, cupfinal, 0,        f3_224a, f3, cupfinal, ROT0,   "Taito Corporation Japan",   "Taito Cup Finals (Ver 1.0O 1993/02/28)", 0 )
@@ -3890,7 +3891,7 @@ GAME( 1994, elvactr,  0,        f3,      f3, elvactr,  ROT0,   "Taito Corporatio
 GAME( 1994, elvactrj, elvactr,  f3,      f3, elvactr,  ROT0,   "Taito Corporation",         "Elevator Action Returns (Ver 2.2J 1995/02/20)", 0 )
 GAME( 1994, elvact2u, elvactr,  f3,      f3, elvactr,  ROT0,   "Taito America Corporation", "Elevator Action II (Ver 2.2A 1995/02/20)", 0 )
 /* There is also a prototype Elevator Action II (US) pcb with the graphics in a different rom format (same program code) */
-GAME( 1994, recalh,   0,        f3,      f3, recalh,   ROT0,   "Taito Corporation",         "Recalhorn (Ver 1.42J 1994/5/11) (Prototype)", 0 )
+GAME( 1994, recalh,   0,        f3_eeprom,f3, recalh,   ROT0,   "Taito Corporation",         "Recalhorn (Ver 1.42J 1994/5/11) (Prototype)", 0 )
 GAME( 1995, spcinv95, 0,        f3_224a, f3, spcinv95, ROT270, "Taito Corporation Japan",   "Space Invaders '95: The Attack Of Lunar Loonies (Ver 2.5O 1995/06/14)", 0 )
 GAME( 1995, spcinv95u,spcinv95, f3_224a, f3, spcinv95, ROT270, "Taito America Corporation", "Space Invaders '95: The Attack Of Lunar Loonies (Ver 2.5A 1995/06/14)", 0 )
 GAME( 1995, akkanvdr, spcinv95, f3_224a, f3, spcinv95, ROT270, "Taito Corporation",         "Akkanbeder (Ver 2.5J 1995/06/14)", 0 )
