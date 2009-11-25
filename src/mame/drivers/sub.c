@@ -437,12 +437,12 @@ ROM_START( sub )
 	ROM_LOAD( "obj 2 pos h3 27128  version3.bin",	  0x4000, 0x4000, CRC(3898d1a8) SHA1(acd3d7695a0fe9faa5e4315032c65e131d24a3ce) )
 	ROM_LOAD( "obj 3 pos h4 27128  version3.bin",	  0x8000, 0x4000, CRC(304e2145) SHA1(d4eb49b5502872718d64e53f02acd2150f6bf713) )
 
-	ROM_REGION( 0x300, "proms", 0 ) // what are these?
+	ROM_REGION( 0x300, "proms", 0 ) // color proms
 	ROM_LOAD( "prom pos a9 n82s129",	  0x0200, 0x100, CRC(8df9cefe) SHA1(86320eb8135932d79c4478929b9fd90ffba55712) )
 	ROM_LOAD( "prom pos a10 n82s129",	  0x0100, 0x100, CRC(3c834094) SHA1(4d681431376a8ed071566d74d4accc737bf965dd) )
 	ROM_LOAD( "prom pos a11 n82s129",	  0x0000, 0x100, CRC(339afa95) SHA1(ff4ff712960f41c26419a681e8dcceaeef75d2e3) )
 
-	ROM_REGION( 0x800, "proms2", 0 )
+	ROM_REGION( 0x800, "proms2", 0 ) // look-up tables
 	ROM_LOAD( "prom pos e5 n82s131",	  0x0000, 0x200, CRC(0024b5dd) SHA1(7d623f8e8964336d643820850cef0fb641e52e22) )
 	ROM_LOAD( "prom pos c7 n82s129",	  0x0200, 0x100, CRC(9072d259) SHA1(9679fa01372d14a866836c9193204ff6e33cf67c) )
 	ROM_LOAD( "prom pos e4 n82s131",	  0x0400, 0x200, CRC(307aa2cf) SHA1(839eccf1d34adaf9a5006bfb30e3524bc19a9b41) )
