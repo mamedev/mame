@@ -85,22 +85,42 @@ A |||                                                     |______|   |          
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
 
+typedef struct _dwarfd_state dwarfd_state;
+struct _dwarfd_state
+{
+	/* memory pointers */
+	UINT8 *  dw_ram;
+	UINT8 *  videobuf;
+
+	/* video-related */
+	int bank;
+	int line;
+	int idx;
+	int crt_access;
+
+	/* i8275 */
+	int i8275Command;
+	int i8275HorizontalCharactersRow;
+	int i8275CommandSeqCnt;
+	int i8275SpacedRows;
+	int i8275VerticalRows;
+	int i8275VerticalRetraceRows;
+	int i8275Underline;
+	int i8275Lines;
+	int i8275LineCounterMode;
+	int i8275FieldAttributeMode;
+	int i8275CursorFormat;
+	int i8275HorizontalRetrace;
+};
+
+
 //should be taken from crt params
-static const int maxy=25;
-static const int maxx=80;
-static int bank=0;
-
-static UINT8 *videobuf;
-static UINT8 *dwarfd_ram;
-
-static int line=0;
-static int idx=0;
-static int crt_access=0;
+static const int maxy = 25;
+static const int maxx = 80;
 
 
 #define TOPLINE 7
 #define BOTTOMLINE 18
-
 
 #define CHARACTERS_UNDEFINED -1
 
@@ -120,51 +140,42 @@ enum
 
 enum
 {
-	I8275_COMMAND_RESET_LENGTH=4,
-	I8275_COMMAND_START_LENGTH=0,
-	I8275_COMMAND_STOP_LENGTH=0,
-	I8275_COMMAND_EI_LENGTH=0,
-	I8275_COMMAND_DI_LENGTH=0,
-	I8275_COMMAND_READ_LIGHT_PEN_LENGTH=2,
-	I8275_COMMAND_LOAD_CURSOR_LENGTH=2,
-	I8275_COMMAND_PRESET_LENGTH=0
+	I8275_COMMAND_RESET_LENGTH = 4,
+	I8275_COMMAND_START_LENGTH = 0,
+	I8275_COMMAND_STOP_LENGTH = 0,
+	I8275_COMMAND_EI_LENGTH = 0,
+	I8275_COMMAND_DI_LENGTH = 0,
+	I8275_COMMAND_READ_LIGHT_PEN_LENGTH = 2,
+	I8275_COMMAND_LOAD_CURSOR_LENGTH = 2,
+	I8275_COMMAND_PRESET_LENGTH = 0
 };
-static int i8275Command;
-static int i8275HorizontalCharactersRow;
-static int i8275CommandSeqCnt;
-static int i8275SpacedRows;
-static int i8275VerticalRows;
-static int i8275VerticalRetraceRows;
-static int i8275Underline;
-static int i8275Lines;
-static int i8275LineCounterMode;
-static int i8275FieldAttributeMode;
-static int i8275CursorFormat;
-static int i8275HorizontalRetrace;
+
 
 static WRITE8_HANDLER (i8275_preg_w) //param reg
 {
-	switch(i8275Command)
+	dwarfd_state *state = (dwarfd_state *)space->machine->driver_data;
+
+	switch (state->i8275Command)
 	{
 		case I8275_COMMAND_RESET:
 		{
-			switch(i8275CommandSeqCnt)
+			switch (state->i8275CommandSeqCnt)
 			{
 				case 4:
 				{
 					//screen byte comp byte 1
-					i8275SpacedRows=data>>7;
-					i8275HorizontalCharactersRow=(data&0x7f)+1;
-					if(i8275HorizontalCharactersRow>80)
+					state->i8275SpacedRows = data >> 7;
+					state->i8275HorizontalCharactersRow = (data & 0x7f) + 1;
+					if (state->i8275HorizontalCharactersRow > 80)
 					{
-						logerror("i8275 Undefined num of characters/Row! = %d\n", i8275HorizontalCharactersRow);
-						i8275HorizontalCharactersRow=CHARACTERS_UNDEFINED;
+						logerror("i8275 Undefined num of characters/Row! = %d\n", state->i8275HorizontalCharactersRow);
+						state->i8275HorizontalCharactersRow = CHARACTERS_UNDEFINED;
 					}
 					else
 					{
-						logerror("i8275 %d characters/row\n", i8275HorizontalCharactersRow);
+						logerror("i8275 %d characters/row\n", state->i8275HorizontalCharactersRow);
 					}
-					if(i8275SpacedRows&1)
+					if (state->i8275SpacedRows & 1)
 					{
 						logerror("i8275 spaced rows\n");
 					}
@@ -172,44 +183,44 @@ static WRITE8_HANDLER (i8275_preg_w) //param reg
 					{
 						logerror("i8275 normal rows\n");
 					}
-					i8275CommandSeqCnt--;
+					state->i8275CommandSeqCnt--;
 				}
 				break;
 
 				case 3:
 				{
 					//screen byte comp byte 2
-					i8275VerticalRows=(data&0x3f)+1;
-					i8275VerticalRetraceRows=(data>>6)+1;
+					state->i8275VerticalRows = (data & 0x3f) + 1;
+					state->i8275VerticalRetraceRows = (data >> 6) + 1;
 
-					logerror("i8275 %d rows\n", i8275VerticalRows);
-					logerror("i8275 %d vertical retrace rows\n", i8275VerticalRetraceRows);
+					logerror("i8275 %d rows\n", state->i8275VerticalRows);
+					logerror("i8275 %d vertical retrace rows\n", state->i8275VerticalRetraceRows);
 
-					i8275CommandSeqCnt--;
+					state->i8275CommandSeqCnt--;
 				}
 				break;
 
 				case 2:
 				{
 					//screen byte comp byte 3
-					i8275Underline=(data>>4)+1;
-					i8275Lines=(data&0xf)+1;
-					logerror("i8275 underline placement: %d\n", i8275Underline);
-					logerror("i8275 %d lines/row\n", i8275Lines);
+					state->i8275Underline = (data >> 4) + 1;
+					state->i8275Lines = (data & 0xf) + 1;
+					logerror("i8275 underline placement: %d\n", state->i8275Underline);
+					logerror("i8275 %d lines/row\n", state->i8275Lines);
 
-					i8275CommandSeqCnt--;
+					state->i8275CommandSeqCnt--;
 				}
 				break;
 
 				case 1:
 				{
 					//screen byte comp byte 4
-					i8275LineCounterMode=data>>7;
-					i8275FieldAttributeMode=(data>>6)&1;
-					i8275CursorFormat=(data>>4)&3;
-					i8275HorizontalRetrace=((data&0xf)+1)<<1;
-					logerror("i8275 line counter mode: %d\n", i8275LineCounterMode);
-					if(i8275FieldAttributeMode)
+					state->i8275LineCounterMode = data >> 7;
+					state->i8275FieldAttributeMode = (data >> 6) & 1;
+					state->i8275CursorFormat = (data >> 4) & 3;
+					state->i8275HorizontalRetrace = ((data & 0xf) + 1) << 1;
+					logerror("i8275 line counter mode: %d\n", state->i8275LineCounterMode);
+					if (state->i8275FieldAttributeMode)
 					{
 						logerror("i8275 field attribute mode non-transparent\n");
 					}
@@ -218,7 +229,7 @@ static WRITE8_HANDLER (i8275_preg_w) //param reg
 						logerror("i8275 field attribute mode transparent\n");
 					}
 
-					switch(i8275CursorFormat)
+					switch (state->i8275CursorFormat)
 					{
 						case 0:	{logerror("i8275 cursor format - blinking reverse video block\n");}	break;
 						case 1:	{logerror("i8275 cursor format - blinking underline\n");}break;
@@ -226,8 +237,8 @@ static WRITE8_HANDLER (i8275_preg_w) //param reg
 						case 3:	{logerror("i8275 cursor format - nonblinking underline\n");}break;
 					}
 
-					logerror("i8275 %d chars for horizontal retrace\n",i8275HorizontalRetrace );
-					i8275CommandSeqCnt--;
+					logerror("i8275 %d chars for horizontal retrace\n",state->i8275HorizontalRetrace );
+					state->i8275CommandSeqCnt--;
 				}
 				break;
 
@@ -258,43 +269,43 @@ static WRITE8_HANDLER (i8275_preg_w) //param reg
 
 static READ8_HANDLER (i8275_preg_r) //param reg
 {
-
-
 	return 0;
 }
 
 static WRITE8_HANDLER (i8275_creg_w) //comand reg
 {
-	switch(data>>5)
+	dwarfd_state *state = (dwarfd_state *)space->machine->driver_data;
+
+	switch (data>>5)
 	{
 		case 0:
 		{
 			/* reset */
-			i8275Command=I8275_COMMAND_RESET;
-			i8275CommandSeqCnt=I8275_COMMAND_RESET_LENGTH;
+			state->i8275Command = I8275_COMMAND_RESET;
+			state->i8275CommandSeqCnt = I8275_COMMAND_RESET_LENGTH;
 		}
 		break;
 
 		case 5:
 		{
 			/* enable interrupt */
-			i8275Command=I8275_COMMAND_EI;
-			i8275CommandSeqCnt=I8275_COMMAND_EI_LENGTH;
+			state->i8275Command = I8275_COMMAND_EI;
+			state->i8275CommandSeqCnt = I8275_COMMAND_EI_LENGTH;
 		}
 		break;
 
 		case 6:
 		{
 			/* disable interrupt */
-			i8275Command=I8275_COMMAND_DI;
-			i8275CommandSeqCnt=I8275_COMMAND_DI_LENGTH;
+			state->i8275Command = I8275_COMMAND_DI;
+			state->i8275CommandSeqCnt = I8275_COMMAND_DI_LENGTH;
 		}
 		break;
 
 		case 7:
 		{
 			/* preset counters */
-			i8275CommandSeqCnt=I8275_COMMAND_PRESET_LENGTH;
+			state->i8275CommandSeqCnt = I8275_COMMAND_PRESET_LENGTH;
 
 		}
 		break;
@@ -308,21 +319,24 @@ static READ8_HANDLER (i8275_sreg_r) //status
 
 static READ8_HANDLER(dwarfd_ram_r)
 {
-	if(crt_access==0)
+	dwarfd_state *state = (dwarfd_state *)space->machine->driver_data;
+
+	if (state->crt_access == 0)
 	{
-		return dwarfd_ram[offset];
+		return state->dw_ram[offset];
 	}
 	else
 	{
-		videobuf[line*256+idx]=dwarfd_ram[offset];
-		idx++;
-		return dwarfd_ram[offset];
+		state->videobuf[state->line * 256 + state->idx] = state->dw_ram[offset];
+		state->idx++;
+		return state->dw_ram[offset];
 	}
 }
 
 static WRITE8_HANDLER(dwarfd_ram_w)
 {
-	dwarfd_ram[offset]=data;
+	dwarfd_state *state = (dwarfd_state *)space->machine->driver_data;
+	state->dw_ram[offset] = data;
 }
 
 static WRITE8_HANDLER(output1_w)
@@ -379,7 +393,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( dwarfd )
-	PORT_START("DSW1")	/* 8bit */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -405,7 +419,7 @@ static INPUT_PORTS_START( dwarfd )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")	/* 8bit */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -457,38 +471,36 @@ static VIDEO_START(dwarfd)
 {
 }
 
-static void drawCrt(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void drawCrt( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
-	int x,y;
-	for (y=0;y<maxy;y++)
+	dwarfd_state *state = (dwarfd_state *)machine->driver_data;
+	int x, y;
+	for (y = 0; y < maxy; y++)
 	{
-		int count=y*256;
-		int bank2=4;
+		int count = y * 256;
+		int bank2 = 4;
 
-		if(y<TOPLINE || y>BOTTOMLINE)
+		if (y < TOPLINE || y > BOTTOMLINE)
 		{
-				bank2=0;
+			bank2 = 0;
 		}
-		for (x=0;x<maxx;x++)
+		for (x = 0; x < maxx; x++)
 		{
-			int tile=0;
+			int tile = 0;
 
-			int b=0; //end marker
-			while(b==0)
+			int b = 0; //end marker
+			while (b == 0)
 			{
-				if(count<0x8000)
-				{
-					tile = videobuf[count++];
-				}
+				if (count < 0x8000)
+					tile = state->videobuf[count++];
 				else
-				{
 						return;
-				}
-				if(tile&0x80)
+
+				if (tile & 0x80)
 				{
-					if((tile&0xfc)==0xf0)
+					if ((tile & 0xfc) == 0xf0)
 					{
-						switch(tile&3)
+						switch (tile & 3)
 						{
 							case 0:
 							case 1: break;
@@ -497,23 +509,21 @@ static void drawCrt(running_machine *machine, bitmap_t *bitmap,const rectangle *
 							case 3: return;
 						}
 					}
-					if((tile&0xc0)==0x80)
+					if ((tile & 0xc0) == 0x80)
 					{
-						bank=(tile>>2)&3;
+						state->bank = (tile >> 2) & 3;
 					}
-					if((tile&0xc0) ==0xc0)
+					if ((tile & 0xc0) == 0xc0)
 					{
-						b=1;
-						tile=mame_rand(machine)&0x7f;//(tile>>2)&0xf;
+						b = 1;
+						tile = mame_rand(machine) & 0x7f;//(tile >> 2) & 0xf;
 					}
 				}
 				else
-				{
-					b=1;
-				}
+					b = 1;
 			}
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
-				tile+(bank+bank2)*128,
+			drawgfx_transpen(bitmap, cliprect, machine->gfx[0],
+				tile + (state->bank + bank2) * 128,
 				0,
 				0, 0,
 				x*8,y*8,0);
@@ -525,13 +535,14 @@ static void drawCrt(running_machine *machine, bitmap_t *bitmap,const rectangle *
 static VIDEO_UPDATE( dwarfd )
 {
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
-	drawCrt(screen->machine,bitmap,cliprect);
+	drawCrt(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( dwarfd_sod_callback )
 {
-	crt_access = state;
+	dwarfd_state *driver_state = (dwarfd_state *)device->machine->driver_data;
+	driver_state->crt_access = state;
 }
 
 
@@ -547,17 +558,19 @@ static I8085_CONFIG( dwarfd_i8085_config )
 #define NUM_LINES 25
 static INTERRUPT_GEN( dwarfd_interrupt )
 {
-	if(cpu_getiloops(device) < NUM_LINES)
+	dwarfd_state *state = (dwarfd_state *)device->machine->driver_data;
+
+	if (cpu_getiloops(device) < NUM_LINES)
 	{
-		cpu_set_input_line(device,I8085_RST65_LINE,HOLD_LINE); // 34 - every 8th line
-		line=cpu_getiloops(device);
-		idx=0;
+		cpu_set_input_line(device, I8085_RST65_LINE, HOLD_LINE); // 34 - every 8th line
+		state->line = cpu_getiloops(device);
+		state->idx = 0;
 	}
 	else
 	{
-		if(cpu_getiloops(device) == NUM_LINES)
+		if (cpu_getiloops(device) == NUM_LINES)
 		{
-			cpu_set_input_line(device,I8085_RST55_LINE,HOLD_LINE);//2c - generated by  crt - end of frame
+			cpu_set_input_line(device, I8085_RST55_LINE, HOLD_LINE);//2c - generated by  crt - end of frame
 		}
 	}
 }
@@ -663,7 +676,7 @@ static PALETTE_INIT(dwarfd)
 {
 	int i;
 
-	for (i = 0;i < 256;i++)
+	for (i = 0; i < 256; i++)
 	{
 		int r = mame_rand(machine)|0x80;
 		int g = mame_rand(machine)|0x80;
@@ -689,7 +702,57 @@ static const ay8910_interface ay8910_config =
 };
 
 
+static MACHINE_START( dwarfd )
+{
+	dwarfd_state *state = (dwarfd_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->bank);
+	state_save_register_global(machine, state->line);
+	state_save_register_global(machine, state->idx);
+	state_save_register_global(machine, state->crt_access);
+
+	/* i8275 */
+	state_save_register_global(machine, state->i8275Command);
+	state_save_register_global(machine, state->i8275HorizontalCharactersRow);
+	state_save_register_global(machine, state->i8275CommandSeqCnt);
+	state_save_register_global(machine, state->i8275SpacedRows);
+	state_save_register_global(machine, state->i8275VerticalRows);
+	state_save_register_global(machine, state->i8275VerticalRetraceRows);
+	state_save_register_global(machine, state->i8275Underline);
+	state_save_register_global(machine, state->i8275Lines);
+	state_save_register_global(machine, state->i8275LineCounterMode);
+	state_save_register_global(machine, state->i8275FieldAttributeMode);
+	state_save_register_global(machine, state->i8275CursorFormat);
+	state_save_register_global(machine, state->i8275HorizontalRetrace);
+}
+
+static MACHINE_RESET( dwarfd )
+{
+	dwarfd_state *state = (dwarfd_state *)machine->driver_data;
+
+	state->bank = 0;
+	state->line = 0;
+	state->idx = 0;
+	state->crt_access = 0;
+	state->i8275Command = 0;
+	state->i8275HorizontalCharactersRow = 0;
+	state->i8275CommandSeqCnt = 0;
+	state->i8275SpacedRows = 0;
+	state->i8275VerticalRows = 0;
+	state->i8275VerticalRetraceRows = 0;
+	state->i8275Underline = 0;
+	state->i8275Lines = 0;
+	state->i8275LineCounterMode = 0;
+	state->i8275FieldAttributeMode = 0;
+	state->i8275CursorFormat = 0;
+	state->i8275HorizontalRetrace = 0;
+}
+
 static MACHINE_DRIVER_START( dwarfd )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(dwarfd_state)
+
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
 	MDRV_CPU_ADD("maincpu", 8085A, 10595000/3*2)        /* ? MHz */
@@ -698,6 +761,9 @@ static MACHINE_DRIVER_START( dwarfd )
 	MDRV_CPU_IO_MAP(io_map)
 
 	MDRV_CPU_VBLANK_INT_HACK(dwarfd_interrupt,NUM_LINES+4) //16 +vblank + 1 unused
+
+	MDRV_MACHINE_START(dwarfd)
+	MDRV_MACHINE_RESET(dwarfd)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -745,46 +811,52 @@ ROM_END
 
 static DRIVER_INIT(dwarfd)
 {
+	dwarfd_state *state = (dwarfd_state *)machine->driver_data;
 	int i;
 	UINT8 *src, *dst;
 
 	/* expand gfx roms */
-	src    = memory_region       ( machine, "gfx1" );
-	dst    = memory_region       ( machine, "gfx2" );
-	for (i=0;i<0x4000;i++)
+	src = memory_region(machine, "gfx1");
+	dst = memory_region(machine, "gfx2");
+
+	for (i = 0; i < 0x4000; i++)
 	{
 		UINT8 dat;
-		dat = (src[i]&0xf0)>>0;
-		dst[i*2] = dat;
+		dat = (src[i] & 0xf0) >> 0;
+		dst[i * 2] = dat;
 
-		dat = (src[i]&0x0f)<<4;
-		dst[i*2+1] = dat;
+		dat = (src[i] & 0x0f)<<4;
+		dst[i * 2 + 1] = dat;
 	}
 
 	/* use low bit as 'interpolation' bit */
-	src    = memory_region       ( machine, "gfx2" );
-	for (i=0;i<0x8000;i++)
+	src = memory_region(machine, "gfx2");
+	for (i = 0; i < 0x8000; i++)
 	{
-		if (src[i]&0x10)
+		if (src[i] & 0x10)
 		{
-			src[i] = src[i]&0xe0;
-	//      src[i] |= ((src[(i+1)&0x7fff]&0xe0) >> 4);
+			src[i] = src[i] & 0xe0;
+	//      src[i] |= ((src[(i + 1) & 0x7fff] & 0xe0) >> 4);
 
 		}
 		else
 		{
-			src[i] = src[i]&0xe0;
+			src[i] = src[i] & 0xe0;
 			src[i] |= (src[i] >> 4);
 
 		}
-	//      src[i] = src[i]&0xe0;
+	//      src[i] = src[i] & 0xe0;
 	}
 
-	videobuf=auto_alloc_array(machine, UINT8, 0x8000);
-	dwarfd_ram=auto_alloc_array(machine, UINT8, 0x1000);
-	memset(videobuf,0,0x8000);
-	memset(dwarfd_ram,0,0x1000);
+	state->videobuf = auto_alloc_array(machine, UINT8, 0x8000);
+	state->dw_ram = auto_alloc_array(machine, UINT8, 0x1000);
+
+	state_save_register_global_pointer(machine, state->videobuf, 0x8000);
+	state_save_register_global_pointer(machine, state->dw_ram, 0x1000);
+
+	memset(state->videobuf, 0, 0x8000);
+	memset(state->dw_ram, 0, 0x1000);
 
 }
 
-GAME( 1981, dwarfd, 0, dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Dwarfs Den", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
+GAME( 1981, dwarfd, 0, dwarfd, dwarfd, dwarfd, ORIENTATION_FLIP_Y, "Electro-Sport", "Dwarfs Den", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

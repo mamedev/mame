@@ -7,10 +7,6 @@
 #include "driver.h"
 #include "epos.h"
 
-
-static UINT8 palette;
-
-
 /***************************************************************************
 
   These games has one 32 byte palette PROM, connected to the RGB output this way:
@@ -26,7 +22,7 @@ static UINT8 palette;
 
 ***************************************************************************/
 
-static void get_pens(running_machine *machine, pen_t *pens)
+static void get_pens( running_machine *machine, pen_t *pens )
 {
 	offs_t i;
 	const UINT8 *prom = memory_region(machine, "proms");
@@ -59,6 +55,7 @@ static void get_pens(running_machine *machine, pen_t *pens)
 
 WRITE8_HANDLER( epos_port_1_w )
 {
+	epos_state *state = (epos_state *)space->machine->driver_data;
 	/* D0 - start light #1
        D1 - start light #2
        D2 - coin counter
@@ -71,12 +68,13 @@ WRITE8_HANDLER( epos_port_1_w )
 
 	coin_counter_w(0, (data >> 2) & 0x01);
 
-	palette = (data >> 3) & 0x01;
+	state->palette = (data >> 3) & 0x01;
 }
 
 
 VIDEO_UPDATE( epos )
 {
+	epos_state *state = (epos_state *)screen->machine->driver_data;
 	pen_t pens[0x20];
 	offs_t offs;
 
@@ -84,13 +82,13 @@ VIDEO_UPDATE( epos )
 
 	for (offs = 0; offs < videoram_size; offs++)
 	{
-		UINT8 data = videoram[offs];
+		UINT8 data = state->videoram[offs];
 
 		int x = (offs % 136) * 2;
 		int y = (offs / 136);
 
-		*BITMAP_ADDR32(bitmap, y, x + 0) = pens[(palette << 4) | (data & 0x0f)];
-		*BITMAP_ADDR32(bitmap, y, x + 1) = pens[(palette << 4) | (data >> 4)];
+		*BITMAP_ADDR32(bitmap, y, x + 0) = pens[(state->palette << 4) | (data & 0x0f)];
+		*BITMAP_ADDR32(bitmap, y, x + 1) = pens[(state->palette << 4) | (data >> 4)];
 	}
 
 	return 0;

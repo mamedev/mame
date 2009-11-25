@@ -8,13 +8,17 @@
 #include "cpu/s2650/s2650.h"
 
 
-static UINT8 *embargo_videoram;
-static size_t embargo_videoram_size;
+typedef struct _embargo_state embargo_state;
+struct _embargo_state
+{
+	/* memory pointers */
+	UINT8 *  videoram;
 
-static UINT8 dial_enable_1;
-static UINT8 dial_enable_2;
-static UINT8 input_select;
-
+	/* misc */
+	UINT8    dial_enable_1;
+	UINT8    dial_enable_2;
+	UINT8    input_select;
+};
 
 
 /*************************************
@@ -25,15 +29,16 @@ static UINT8 input_select;
 
 static VIDEO_UPDATE( embargo )
 {
+	embargo_state *state = (embargo_state *)screen->machine->driver_data;
 	offs_t offs;
 
-	for (offs = 0; offs < embargo_videoram_size; offs++)
+	for (offs = 0; offs < videoram_size; offs++)
 	{
 		int i;
 
 		UINT8 x = offs << 3;
 		UINT8 y = offs >> 5;
-		UINT8 data = embargo_videoram[offs];
+		UINT8 data = state->videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -58,12 +63,15 @@ static VIDEO_UPDATE( embargo )
 
 static READ8_HANDLER( input_port_bit_r )
 {
-	return (input_port_read(space->machine, "IN1") << (7 - input_select)) & 0x80;
+	embargo_state *state = (embargo_state *)space->machine->driver_data;
+	return (input_port_read(space->machine, "IN1") << (7 - state->input_select)) & 0x80;
 }
 
 
 static READ8_HANDLER( dial_r )
 {
+	embargo_state *state = (embargo_state *)space->machine->driver_data;
+
 	UINT8 lo = 0;
 	UINT8 hi = 0;
 
@@ -80,13 +88,13 @@ static READ8_HANDLER( dial_r )
 		0x09, 0x0a, 0x08, 0x09, 0x08, 0x05, 0x07, 0x06
 	};
 
-	if (dial_enable_1 && !dial_enable_2)
+	if (state->dial_enable_1 && !state->dial_enable_2)
 	{
 		lo = input_port_read(space->machine, "DIAL0");
 		hi = input_port_read(space->machine, "DIAL1");
 	}
 
-	if (dial_enable_2 && !dial_enable_1)
+	if (state->dial_enable_2 && !state->dial_enable_1)
 	{
 		lo = input_port_read(space->machine, "DIAL2");
 		hi = input_port_read(space->machine, "DIAL3");
@@ -114,35 +122,22 @@ static READ8_HANDLER( dial_r )
 
 static WRITE8_HANDLER( port_1_w )
 {
-	dial_enable_1 = data & 0x01; /* other bits unknown */
+	embargo_state *state = (embargo_state *)space->machine->driver_data;
+	state->dial_enable_1 = data & 0x01; /* other bits unknown */
 }
 
 
 static WRITE8_HANDLER( port_2_w )
 {
-	dial_enable_2 = data & 0x01; /* other bits unknown */
+	embargo_state *state = (embargo_state *)space->machine->driver_data;
+	state->dial_enable_2 = data & 0x01; /* other bits unknown */
 }
 
 
 static WRITE8_HANDLER( input_select_w )
 {
-	input_select = data & 0x07;
-}
-
-
-
-/*************************************
- *
- *  Machine setup
- *
- *************************************/
-
-static MACHINE_START( embargo )
-{
-	/* register for state saving */
-	state_save_register_global(machine, dial_enable_1);
-	state_save_register_global(machine, dial_enable_2);
-	state_save_register_global(machine, input_select);
+	embargo_state *state = (embargo_state *)space->machine->driver_data;
+	state->input_select = data & 0x07;
 }
 
 
@@ -156,7 +151,7 @@ static MACHINE_START( embargo )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&embargo_videoram) AM_SIZE(&embargo_videoram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(embargo_state, videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
 
@@ -223,11 +218,40 @@ INPUT_PORTS_END
 
 /*************************************
  *
+ *  Machine setup
+ *
+ *************************************/
+
+static MACHINE_START( embargo )
+{
+	embargo_state *state = (embargo_state *)machine->driver_data;
+
+	/* register for state saving */
+	state_save_register_global(machine, state->dial_enable_1);
+	state_save_register_global(machine, state->dial_enable_2);
+	state_save_register_global(machine, state->input_select);
+}
+
+
+static MACHINE_RESET( embargo )
+{
+	embargo_state *state = (embargo_state *)machine->driver_data;
+
+	state->dial_enable_1 = 0;
+	state->dial_enable_2 = 0;
+	state->input_select = 0;
+}
+
+/*************************************
+ *
  *  Machine driver
  *
  *************************************/
 
 static MACHINE_DRIVER_START( embargo )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(embargo_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 625000)
@@ -235,6 +259,7 @@ static MACHINE_DRIVER_START( embargo )
 	MDRV_CPU_IO_MAP(main_io_map)
 
 	MDRV_MACHINE_START(embargo)
+	MDRV_MACHINE_RESET(embargo)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(embargo)

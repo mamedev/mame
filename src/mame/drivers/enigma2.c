@@ -24,7 +24,6 @@ TODO:
 #include "deprecat.h"
 #include "sound/ay8910.h"
 
-
 #define LOG_PROT	(0)
 
 /* these values provide a fairly low refresh rate of around 53Hz, but
@@ -55,13 +54,22 @@ TODO:
 #define NUM_PENS	(8)
 
 
-static UINT8 *enigma2_ram;
+typedef struct _enigma2_state enigma2_state;
+struct _enigma2_state
+{
+	/* memory pointers */
+	UINT8 *  videoram;
 
-static UINT8 sound_latch;
-static UINT8 last_sound_data;
-static UINT8 protection_data;
-static UINT8 engima2_flip_screen;
+	/* misc */
+	int blink_count;
+	UINT8 sound_latch;
+	UINT8 last_sound_data;
+	UINT8 protection_data;
+	UINT8 flip_screen;
 
+	emu_timer *interrupt_clear_timer;
+	emu_timer *interrupt_assert_timer;
+};
 
 
 /*************************************
@@ -70,17 +78,14 @@ static UINT8 engima2_flip_screen;
  *
  *************************************/
 
-static emu_timer *interrupt_clear_timer;
-static emu_timer *interrupt_assert_timer;
 
-
-INLINE UINT16 vpos_to_vysnc_chain_counter(int vpos)
+INLINE UINT16 vpos_to_vysnc_chain_counter( int vpos )
 {
 	return vpos + VCOUNTER_START;
 }
 
 
-INLINE int vysnc_chain_counter_to_vpos(UINT16 counter)
+INLINE int vysnc_chain_counter_to_vpos( UINT16 counter )
 {
 	return counter - VCOUNTER_START;
 }
@@ -94,6 +99,7 @@ static TIMER_CALLBACK( interrupt_clear_callback )
 
 static TIMER_CALLBACK( interrupt_assert_callback )
 {
+	enigma2_state *state = (enigma2_state *)machine->driver_data;
 	UINT16 next_counter;
 	int next_vpos;
 
@@ -110,38 +116,51 @@ static TIMER_CALLBACK( interrupt_assert_callback )
 		next_counter = INT_TRIGGER_COUNT_1;
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter);
-	timer_adjust_oneshot(interrupt_assert_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), 0);
-	timer_adjust_oneshot(interrupt_clear_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos + 1, 0), 0);
+	timer_adjust_oneshot(state->interrupt_assert_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), 0);
+	timer_adjust_oneshot(state->interrupt_clear_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos + 1, 0), 0);
 }
 
 
-static void create_interrupt_timers(running_machine *machine)
+static void create_interrupt_timers( running_machine *machine )
 {
-	interrupt_clear_timer = timer_alloc(machine, interrupt_clear_callback, NULL);
-	interrupt_assert_timer = timer_alloc(machine, interrupt_assert_callback, NULL);
+	enigma2_state *state = (enigma2_state *)machine->driver_data;
+	state->interrupt_clear_timer = timer_alloc(machine, interrupt_clear_callback, NULL);
+	state->interrupt_assert_timer = timer_alloc(machine, interrupt_assert_callback, NULL);
 }
 
 
-static void start_interrupt_timers(running_machine *machine)
+static void start_interrupt_timers( running_machine *machine )
 {
+	enigma2_state *state = (enigma2_state *)machine->driver_data;
 	int vpos = vysnc_chain_counter_to_vpos(INT_TRIGGER_COUNT_1);
-	timer_adjust_oneshot(interrupt_assert_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
+	timer_adjust_oneshot(state->interrupt_assert_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
 }
 
 
 
 static MACHINE_START( enigma2 )
 {
+	enigma2_state *state = (enigma2_state *)machine->driver_data;
 	create_interrupt_timers(machine);
+
+	state_save_register_global(machine, state->blink_count);
+	state_save_register_global(machine, state->sound_latch);
+	state_save_register_global(machine, state->last_sound_data);
+	state_save_register_global(machine, state->protection_data);
+	state_save_register_global(machine, state->flip_screen);
 }
 
 
 static MACHINE_RESET( enigma2 )
 {
-	last_sound_data = 0;
+	enigma2_state *state = (enigma2_state *)machine->driver_data;
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 
-	engima2_flip_screen = 0;
+	state->last_sound_data = 0;
+	state->protection_data = 0;
+	state->flip_screen = 0;
+	state->sound_latch = 0;
+	state->blink_count = 0;
 
 	start_interrupt_timers(machine);
 }
@@ -167,14 +186,13 @@ static void get_pens(pen_t *pens)
 
 static VIDEO_UPDATE( enigma2 )
 {
-	static int blink_count;
-
+	enigma2_state *state = (enigma2_state *)screen->machine->driver_data;
 	pen_t pens[NUM_PENS];
 
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 	UINT8 *prom = memory_region(screen->machine, "proms");
-	UINT8 *color_map_base = engima2_flip_screen ? &prom[0x0400] : &prom[0x0000];
-	UINT8 *star_map_base = (blink_count & 0x08) ? &prom[0x0c00] : &prom[0x0800];
+	UINT8 *color_map_base = state->flip_screen ? &prom[0x0400] : &prom[0x0000];
+	UINT8 *star_map_base = (state->blink_count & 0x08) ? &prom[0x0c00] : &prom[0x0800];
 
 	UINT8 x = 0;
 	UINT16 bitmap_y = visarea->min_y;
@@ -204,16 +222,16 @@ static VIDEO_UPDATE( enigma2 )
 
 			/* when the screen is flipped, all the video address bits are inverted,
                and the adder at 16A is activated */
-			if (engima2_flip_screen)  videoram_address = (~videoram_address + 0x0400) & 0x1fff;
+			if (state->flip_screen)  videoram_address = (~videoram_address + 0x0400) & 0x1fff;
 
-			video_data = enigma2_ram[videoram_address];
+			video_data = state->videoram[videoram_address];
 
 			fore_color = color_map_base[color_map_address] & 0x07;
 			star_color = star_map_base[star_map_address] & 0x07;
 		}
 
 		/* plot the current pixel */
-		if (engima2_flip_screen)
+		if (state->flip_screen)
 		{
 			bit = video_data & 0x80;
 			video_data = video_data << 1;
@@ -248,7 +266,7 @@ static VIDEO_UPDATE( enigma2 )
 		}
 	}
 
-	blink_count++;
+	state->blink_count++;
 
 	return 0;
 }
@@ -256,6 +274,7 @@ static VIDEO_UPDATE( enigma2 )
 
 static VIDEO_UPDATE( enigma2a )
 {
+	enigma2_state *state = (enigma2_state *)screen->machine->driver_data;
 	UINT8 x = 0;
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 	UINT16 bitmap_y = visarea->min_y;
@@ -274,13 +293,13 @@ static VIDEO_UPDATE( enigma2a )
 
 			/* when the screen is flipped, all the video address bits are inverted,
                and the adder at 16A is activated */
-			if (engima2_flip_screen)  videoram_address = (~videoram_address + 0x0400) & 0x1fff;
+			if (state->flip_screen)  videoram_address = (~videoram_address + 0x0400) & 0x1fff;
 
-			video_data = enigma2_ram[videoram_address];
+			video_data = state->videoram[videoram_address];
 		}
 
 		/* plot the current pixel */
-		if (engima2_flip_screen)
+		if (state->flip_screen)
 		{
 			bit = video_data & 0x80;
 			video_data = video_data << 1;
@@ -317,14 +336,15 @@ static VIDEO_UPDATE( enigma2a )
 
 static READ8_HANDLER( dip_switch_r )
 {
+	enigma2_state *state = (enigma2_state *)space->machine->driver_data;
 	UINT8 ret = 0x00;
 
-if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, cpu_get_pc(space->cpu), protection_data);
+	if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, cpu_get_pc(space->cpu), state->protection_data);
 	switch (offset)
 	{
 	case 0x01:
-		if (protection_data != 0xff)
-			ret = protection_data ^ 0x88;
+		if (state->protection_data != 0xff)
+			ret = state->protection_data ^ 0x88;
 		else
 			ret = input_port_read(space->machine, "DSW");
 		break;
@@ -347,32 +367,36 @@ if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, cpu_get
 
 static WRITE8_HANDLER( sound_data_w )
 {
+	enigma2_state *state = (enigma2_state *)space->machine->driver_data;
 	/* clock sound latch shift register on rising edge of D2 */
-	if (!(data & 0x04) && (last_sound_data & 0x04))
-		sound_latch = (sound_latch << 1) | (~data & 0x01);
+	if (!(data & 0x04) && (state->last_sound_data & 0x04))
+		state->sound_latch = (state->sound_latch << 1) | (~data & 0x01);
 
 	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
-	last_sound_data = data;
+	state->last_sound_data = data;
 }
 
 
 static READ8_DEVICE_HANDLER( sound_latch_r )
 {
-	return BITSWAP8(sound_latch,0,1,2,3,4,5,6,7);
+	enigma2_state *state = (enigma2_state *)device->machine->driver_data;
+	return BITSWAP8(state->sound_latch,0,1,2,3,4,5,6,7);
 }
 
 
 static WRITE8_DEVICE_HANDLER( protection_data_w )
 {
-if (LOG_PROT) logerror("%s: Protection Data Write: %x\n", cpuexec_describe_context(device->machine), data);
-	protection_data = data;
+	enigma2_state *state = (enigma2_state *)device->machine->driver_data;
+	if (LOG_PROT) logerror("%s: Protection Data Write: %x\n", cpuexec_describe_context(device->machine), data);
+	state->protection_data = data;
 }
 
 
 static WRITE8_HANDLER( enigma2_flip_screen_w )
 {
-	engima2_flip_screen = ((data >> 5) & 0x01) && ((input_port_read(space->machine, "DSW") & 0x20) == 0x20);
+	enigma2_state *state = (enigma2_state *)space->machine->driver_data;
+	state->flip_screen = ((data >> 5) & 0x01) && ((input_port_read(space->machine, "DSW") & 0x20) == 0x20);
 }
 
 
@@ -384,7 +408,8 @@ static CUSTOM_INPUT( p1_controls_r )
 
 static CUSTOM_INPUT( p2_controls_r )
 {
-	if (engima2_flip_screen)
+	enigma2_state *state = (enigma2_state *)field->port->machine->driver_data;
+	if (state->flip_screen)
 		return input_port_read(field->port->machine, "P2CONTROLS");
 	else
 		return input_port_read(field->port->machine, "P1CONTROLS");
@@ -407,7 +432,7 @@ static const ay8910_interface ay8910_config =
 static ADDRESS_MAP_START( engima2_main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_BASE(&enigma2_ram)
+	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_BASE_MEMBER(enigma2_state, videoram)
 	AM_RANGE(0x4000, 0x4fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(dip_switch_r, SMH_NOP)
 	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x07f8) AM_NOP
@@ -422,7 +447,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( engima2a_main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_BASE(&enigma2_ram)
+	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_BASE_MEMBER(enigma2_state, videoram)
 	AM_RANGE(0x4000, 0x4fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(dip_switch_r, SMH_NOP)
 	AM_RANGE(0x5800, 0x5fff) AM_NOP
@@ -563,6 +588,9 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( enigma2 )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(enigma2_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(engima2_main_cpu_map)
@@ -591,6 +619,9 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( enigma2a )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(enigma2_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, CPU_CLOCK)
@@ -667,5 +698,5 @@ static DRIVER_INIT(enigma2)
 
 
 
-GAME( 1981, enigma2,  0,	   enigma2,  enigma2,  enigma2, ROT270, "GamePlan (Zilec Electronics license)", "Enigma II", 0 )
-GAME( 1984, enigma2a, enigma2, enigma2a, enigma2a, enigma2, ROT270, "Zilec Electronics", "Enigma II (Space Invaders hardware)", 0 )
+GAME( 1981, enigma2,  0,	   enigma2,  enigma2,  enigma2, ROT270, "GamePlan (Zilec Electronics license)", "Enigma II", GAME_SUPPORTS_SAVE )
+GAME( 1984, enigma2a, enigma2, enigma2a, enigma2a, enigma2, ROT270, "Zilec Electronics", "Enigma II (Space Invaders hardware)", GAME_SUPPORTS_SAVE )
