@@ -11,8 +11,6 @@
 #include "driver.h"
 #include "includes/docastle.h"
 
-static tilemap *docastle_tilemap;
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -30,13 +28,14 @@ static tilemap *docastle_tilemap;
   bit 0 -- 390 ohm resistor  -- BLUE
 
 ***************************************************************************/
+
 PALETTE_INIT( docastle )
 {
 	int i;
 
-	for (i = 0;i < 256;i++)
+	for (i = 0; i < 256; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2, r, g, b;
 
 		/* red component */
 		bit0 = (*color_prom >> 5) & 0x01;
@@ -65,54 +64,62 @@ PALETTE_INIT( docastle )
 
 WRITE8_HANDLER( docastle_videoram_w )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(docastle_tilemap, offset);
+	docastle_state *state = (docastle_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->do_tilemap, offset);
 }
 
 WRITE8_HANDLER( docastle_colorram_w )
 {
-	colorram[offset] = data;
-	tilemap_mark_tile_dirty(docastle_tilemap, offset);
+	docastle_state *state = (docastle_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->do_tilemap, offset);
 }
 
 READ8_HANDLER( docastle_flipscreen_off_r )
 {
+	docastle_state *state = (docastle_state *)space->machine->driver_data;
 	flip_screen_set(space->machine, 0);
-	tilemap_mark_all_tiles_dirty(docastle_tilemap);
+	tilemap_mark_all_tiles_dirty(state->do_tilemap);
 	return 0;
 }
 
 READ8_HANDLER( docastle_flipscreen_on_r )
 {
+	docastle_state *state = (docastle_state *)space->machine->driver_data;
 	flip_screen_set(space->machine, 1);
-	tilemap_mark_all_tiles_dirty(docastle_tilemap);
+	tilemap_mark_all_tiles_dirty(state->do_tilemap);
 	return 1;
 }
 
 WRITE8_HANDLER( docastle_flipscreen_off_w )
 {
+	docastle_state *state = (docastle_state *)space->machine->driver_data;
 	flip_screen_set(space->machine, 0);
-	tilemap_mark_all_tiles_dirty(docastle_tilemap);
+	tilemap_mark_all_tiles_dirty(state->do_tilemap);
 }
 
 WRITE8_HANDLER( docastle_flipscreen_on_w )
 {
+	docastle_state *state = (docastle_state *)space->machine->driver_data;
 	flip_screen_set(space->machine, 1);
-	tilemap_mark_all_tiles_dirty(docastle_tilemap);
+	tilemap_mark_all_tiles_dirty(state->do_tilemap);
 }
 
 static TILE_GET_INFO( get_tile_info )
 {
-	int code = videoram[tile_index] + 8 * (colorram[tile_index] & 0x20);
-	int color = colorram[tile_index] & 0x1f;
+	docastle_state *state = (docastle_state *)machine->driver_data;
+	int code = state->videoram[tile_index] + 8 * (state->colorram[tile_index] & 0x20);
+	int color = state->colorram[tile_index] & 0x1f;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
 
-static void video_start_common(running_machine *machine, UINT32 tile_transmask)
+static void video_start_common( running_machine *machine, UINT32 tile_transmask )
 {
-	docastle_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-	tilemap_set_transmask(docastle_tilemap, 0, tile_transmask, 0x0000);
+	docastle_state *state = (docastle_state *)machine->driver_data;
+	state->do_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	tilemap_set_transmask(state->do_tilemap, 0, tile_transmask, 0x0000);
 }
 
 VIDEO_START( docastle )
@@ -125,15 +132,16 @@ VIDEO_START( dorunrun )
 	video_start_common(machine, 0xff00);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	docastle_state *state = (docastle_state *)machine->driver_data;
 	int offs;
 
-	bitmap_fill(machine->priority_bitmap,NULL,1);
+	bitmap_fill(machine->priority_bitmap, NULL, 1);
 
-	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
 	{
-		int sx,sy,flipx,flipy,code,color;
+		int sx, sy, flipx, flipy, code, color;
 
 		if (machine->gfx[1]->total_elements > 256)
 		{
@@ -154,14 +162,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
              */
 
-			code = spriteram[offs + 3];
-			color = spriteram[offs + 2] & 0x0f;
-			sx = ((spriteram[offs + 1] + 8) & 0xff) - 8;
-			sy = spriteram[offs];
-			flipx = spriteram[offs + 2] & 0x40;
+			code = state->spriteram[offs + 3];
+			color = state->spriteram[offs + 2] & 0x0f;
+			sx = ((state->spriteram[offs + 1] + 8) & 0xff) - 8;
+			sy = state->spriteram[offs];
+			flipx = state->spriteram[offs + 2] & 0x40;
 			flipy = 0;
-			if (spriteram[offs + 2] & 0x10) code += 0x100;
-			if (spriteram[offs + 2] & 0x80) code += 0x200;
+			if (state->spriteram[offs + 2] & 0x10) code += 0x100;
+			if (state->spriteram[offs + 2] & 0x80) code += 0x200;
 		}
 		else
 		{
@@ -180,12 +188,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
              */
 
-			code = spriteram[offs + 3];
-			color = spriteram[offs + 2] & 0x1f;
-			sx = ((spriteram[offs + 1] + 8) & 0xff) - 8;
-			sy = spriteram[offs];
-			flipx = spriteram[offs + 2] & 0x40;
-			flipy = spriteram[offs + 2] & 0x80;
+			code = state->spriteram[offs + 3];
+			color = state->spriteram[offs + 2] & 0x1f;
+			sx = ((state->spriteram[offs + 1] + 8) & 0xff) - 8;
+			sy = state->spriteram[offs];
+			flipx = state->spriteram[offs + 2] & 0x40;
+			flipy = state->spriteram[offs + 2] & 0x80;
 		}
 
 		if (flip_screen_get(machine))
@@ -218,8 +226,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( docastle )
 {
-	tilemap_draw(bitmap, cliprect, docastle_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+	docastle_state *state = (docastle_state *)screen->machine->driver_data;
+
+	tilemap_draw(bitmap, cliprect, state->do_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, docastle_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	tilemap_draw(bitmap, cliprect, state->do_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

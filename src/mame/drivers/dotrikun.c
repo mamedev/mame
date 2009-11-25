@@ -23,17 +23,76 @@ SOUND : (none)
 #include "driver.h"
 #include "cpu/z80/z80.h"
 
-/*---------------  External Function Prototypes  ---------------*/
 
-VIDEO_UPDATE( dotrikun );
-VIDEO_START( dotrikun );
-WRITE8_HANDLER( dotrikun_color_w );
+typedef struct _dotrikun_state dotrikun_state;
+struct _dotrikun_state
+{
+	/* memory pointers */
+	UINT8 *        videoram;
 
-/*--------------------  Address / I/O Maps  --------------------*/
+	/* video-related */
+	UINT8          color;
+};
+
+
+/*************************************
+ *
+ *  Video emulation
+ *
+ *************************************/
+
+WRITE8_HANDLER( dotrikun_color_w )
+{
+	dotrikun_state *state = (dotrikun_state *)space->machine->driver_data;
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+	state->color = data;
+}
+
+
+VIDEO_UPDATE( dotrikun )
+{
+	dotrikun_state *state = (dotrikun_state *)screen->machine->driver_data;
+	int offs;
+
+	pen_t back_pen = MAKE_RGB(pal1bit(state->color >> 3), pal1bit(state->color >> 4), pal1bit(state->color >> 5));
+	pen_t fore_pen = MAKE_RGB(pal1bit(state->color >> 0), pal1bit(state->color >> 1), pal1bit(state->color >> 2));
+
+	for (offs = 0; offs < videoram_size; offs++)
+	{
+		int i;
+		UINT8 data = state->videoram[offs];
+
+		UINT8 x = offs << 4;
+		UINT8 y = offs >> 4 << 1;
+
+		for (i = 0; i < 8; i++)
+		{
+			pen_t pen = (data & 0x80) ? fore_pen : back_pen;
+
+			/* I think the video hardware doubles pixels, screen would be too small otherwise */
+			*BITMAP_ADDR32(bitmap, y + 0, x + 0) = pen;
+			*BITMAP_ADDR32(bitmap, y + 0, x + 1) = pen;
+			*BITMAP_ADDR32(bitmap, y + 1, x + 0) = pen;
+			*BITMAP_ADDR32(bitmap, y + 1, x + 1) = pen;
+
+			x = x + 2;
+			data = data << 1;
+		}
+	}
+
+	return 0;
+}
+
+
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( dotrikun_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(dotrikun_state, videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
@@ -41,7 +100,12 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("INPUTS") AM_WRITE(dotrikun_color_w)
 ADDRESS_MAP_END
 
-/*--------------------------  Inputs  --------------------------*/
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( dotrikun )
 	PORT_START("INPUTS")
@@ -55,9 +119,31 @@ static INPUT_PORTS_START( dotrikun )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
 
-/*-------------------------  Machine  --------------------------*/
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( dotrikun )
+{
+	dotrikun_state *state = (dotrikun_state *)machine->driver_data;
+	state_save_register_global(machine, state->color);
+}
+
+static MACHINE_RESET( dotrikun )
+{
+	dotrikun_state *state = (dotrikun_state *)machine->driver_data;
+
+	state->color = 0;
+}
+
 
 static MACHINE_DRIVER_START( dotrikun )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(dotrikun_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)		 /* 4 MHz */
@@ -65,9 +151,11 @@ static MACHINE_DRIVER_START( dotrikun )
 	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+	MDRV_MACHINE_START(dotrikun)
+	MDRV_MACHINE_RESET(dotrikun)
+
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(dotrikun)
-	MDRV_VIDEO_START(dotrikun)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -99,4 +187,3 @@ ROM_END
 
 GAME( 1990, dotrikun, 0,        dotrikun, dotrikun, 0, ROT0, "Sega", "Dottori Kun (new version)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
 GAME( 1990, dotrikun2,dotrikun, dotrikun, dotrikun, 0, ROT0, "Sega", "Dottori Kun (old version)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
-

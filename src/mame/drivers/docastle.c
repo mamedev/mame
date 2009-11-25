@@ -160,65 +160,64 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 #include "includes/docastle.h"
 
 
-static int adpcm_pos, adpcm_idle;
-static int adpcm_data;
-static int adpcm_status;
-
 
 /* Read/Write Handlers */
-
-
-static void idsoccer_adpcm_int(const device_config *device)
+static void idsoccer_adpcm_int( const device_config *device )
 {
-	if (adpcm_pos >= memory_region_length(device->machine, "adpcm"))
+	docastle_state *state = (docastle_state *)device->machine->driver_data;
+
+	if (state->adpcm_pos >= memory_region_length(device->machine, "adpcm"))
 	{
-		adpcm_idle = 1;
+		state->adpcm_idle = 1;
 		msm5205_reset_w(device, 1);
 	}
-	else if (adpcm_data != -1)
+	else if (state->adpcm_data != -1)
 	{
-		msm5205_data_w(device, adpcm_data & 0x0f);
-		adpcm_data = -1;
+		msm5205_data_w(device, state->adpcm_data & 0x0f);
+		state->adpcm_data = -1;
 	}
 	else
 	{
-		adpcm_data = memory_region(device->machine, "adpcm")[adpcm_pos++];
-		msm5205_data_w(device, adpcm_data >> 4);
+		state->adpcm_data = memory_region(device->machine, "adpcm")[state->adpcm_pos++];
+		msm5205_data_w(device, state->adpcm_data >> 4);
 	}
 }
 
 static READ8_DEVICE_HANDLER( idsoccer_adpcm_status_r )
 {
+	docastle_state *state = (docastle_state *)device->machine->driver_data;
+
 	// this is wrong, but the samples work anyway!!
-	adpcm_status ^= 0x80;
-	return adpcm_status;
+	state->adpcm_status ^= 0x80;
+	return state->adpcm_status;
 }
 
 static WRITE8_DEVICE_HANDLER( idsoccer_adpcm_w )
 {
+	docastle_state *state = (docastle_state *)device->machine->driver_data;
+
 	if (data & 0x80)
 	{
-		adpcm_idle = 1;
+		state->adpcm_idle = 1;
 		msm5205_reset_w(device, 1);
 	}
 	else
 	{
-		adpcm_pos = (data & 0x7f) * 0x200;
-		adpcm_idle = 0;
+		state->adpcm_pos = (data & 0x7f) * 0x200;
+		state->adpcm_idle = 0;
 		msm5205_reset_w(device, 0);
 	}
 }
 
 /* Memory Maps */
-
 static ADDRESS_MAP_START( docastle_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM
-	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_BASE_MEMBER(docastle_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_BASE_MEMBER(docastle_state, videoram)
+	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_BASE_MEMBER(docastle_state, colorram)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(docastle_nmitrigger_w)
 ADDRESS_MAP_END
 
@@ -257,12 +256,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dorunrun_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE_MEMBER(docastle_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x4000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(docastle_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xb400, 0xb7ff) AM_RAM_WRITE(docastle_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(docastle_videoram_w) AM_BASE_MEMBER(docastle_state, videoram)
+	AM_RANGE(0xb400, 0xb7ff) AM_RAM_WRITE(docastle_colorram_w) AM_BASE_MEMBER(docastle_state, colorram)
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(docastle_nmitrigger_w)
 ADDRESS_MAP_END
 
@@ -287,12 +286,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( idsoccer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
-	AM_RANGE(0x5800, 0x59ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x5800, 0x59ff) AM_RAM AM_BASE_MEMBER(docastle_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x6000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_BASE_MEMBER(docastle_state, videoram)
+	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_BASE_MEMBER(docastle_state, colorram)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("msm", idsoccer_adpcm_status_r, idsoccer_adpcm_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(docastle_nmitrigger_w)
 ADDRESS_MAP_END
@@ -575,22 +574,38 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_RESET( docastle )
 {
-	adpcm_pos = adpcm_idle = 0;
-	adpcm_data = -1;
-	adpcm_status = 0;
+	docastle_state *state = (docastle_state *)machine->driver_data;
+	int i;
+
+	for (i = 0; i < 9; i++)
+	{
+		state->buffer0[i] = 0;
+		state->buffer1[i] = 0;
+	}
+
+	state->adpcm_pos = state->adpcm_idle = 0;
+	state->adpcm_data = -1;
+	state->adpcm_status = 0;
 }
 
 static MACHINE_START( docastle )
 {
-    state_save_register_global(machine, adpcm_pos);
-    state_save_register_global(machine, adpcm_data);
-    state_save_register_global(machine, adpcm_idle);
-    state_save_register_global(machine, adpcm_status);
-    docastle_shared_state_register(machine);
+	docastle_state *state = (docastle_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->adpcm_pos);
+	state_save_register_global(machine, state->adpcm_data);
+	state_save_register_global(machine, state->adpcm_idle);
+	state_save_register_global(machine, state->adpcm_status);
+	state_save_register_global_array(machine, state->buffer0);
+	state_save_register_global_array(machine, state->buffer1);
 }
 
 static MACHINE_DRIVER_START( docastle )
-	// basic machine hardware
+
+	/* driver data */
+	MDRV_DRIVER_DATA(docastle_state)
+
+	/* basic machine hardware */
 //  MDRV_CPU_ADD("maincpu", Z80, 4000000)  // 4 MHz
 	MDRV_CPU_ADD("maincpu", Z80, 3980000)	// make dip switches work in docastle and dorunrun and fix dorunru2 attract sequence
 	MDRV_CPU_PROGRAM_MAP(docastle_map)
@@ -605,8 +620,7 @@ static MACHINE_DRIVER_START( docastle )
 	MDRV_CPU_PROGRAM_MAP(docastle_map3)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	// video hardware
-
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.60)	// measured on pcb
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -622,26 +636,26 @@ static MACHINE_DRIVER_START( docastle )
 	MDRV_VIDEO_UPDATE(docastle)
 
 	MDRV_MACHINE_RESET( docastle )
-    MDRV_MACHINE_START( docastle )
+	MDRV_MACHINE_START( docastle )
 
-	// sound hardware
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-   MDRV_SOUND_ADD("sn1", SN76489, 4000000)
+	MDRV_SOUND_ADD("sn1", SN76489, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-   MDRV_SOUND_ADD("sn2", SN76489, 4000000)
+	MDRV_SOUND_ADD("sn2", SN76489, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-   MDRV_SOUND_ADD("sn3", SN76489, 4000000)
+	MDRV_SOUND_ADD("sn3", SN76489, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-   MDRV_SOUND_ADD("sn4", SN76489, 4000000)
+	MDRV_SOUND_ADD("sn4", SN76489, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dorunrun )
-	// basic machine hardware
+	/* basic machine hardware */
 	MDRV_IMPORT_FROM(docastle)
 
 	MDRV_CPU_MODIFY("maincpu")
@@ -650,12 +664,12 @@ static MACHINE_DRIVER_START( dorunrun )
 	MDRV_CPU_MODIFY("slave")
 	MDRV_CPU_PROGRAM_MAP(dorunrun_map2)
 
-	// video hardware
+	/* video hardware */
 	MDRV_VIDEO_START(dorunrun)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( idsoccer )
-	// basic machine hardware
+	/* basic machine hardware */
 	MDRV_IMPORT_FROM(docastle)
 
 	MDRV_CPU_MODIFY("maincpu")
@@ -664,10 +678,10 @@ static MACHINE_DRIVER_START( idsoccer )
 	MDRV_CPU_MODIFY("slave")
 	MDRV_CPU_PROGRAM_MAP(idsoccer_map2)
 
-	// video hardware
+	/* video hardware */
 	MDRV_VIDEO_START(dorunrun)
 
-	// sound hardware
+	/* sound hardware */
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

@@ -402,7 +402,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/cojag.o $(AUDIO)/jaguar.o $(VIDEO)/jaguar.o \
 	$(DRIVERS)/copsnrob.o $(MACHINE)/copsnrob.o $(VIDEO)/copsnrob.o \
 	$(DRIVERS)/cyberbal.o $(AUDIO)/cyberbal.o $(VIDEO)/cyberbal.o \
-	$(DRIVERS)/destroyr.o $(VIDEO)/destroyr.o \
+	$(DRIVERS)/destroyr.o \
 	$(DRIVERS)/dragrace.o $(AUDIO)/dragrace.o $(VIDEO)/dragrace.o \
 	$(DRIVERS)/eprom.o $(VIDEO)/eprom.o \
 	$(DRIVERS)/firefox.o \
@@ -1100,7 +1100,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/calorie.o \
 	$(DRIVERS)/coolridr.o \
 	$(DRIVERS)/deniam.o $(VIDEO)/deniam.o \
-	$(DRIVERS)/dotrikun.o $(VIDEO)/dotrikun.o \
+	$(DRIVERS)/dotrikun.o \
 	$(VIDEO)/genesis.o \
 	$(DRIVERS)/gpworld.o \
 	$(DRIVERS)/hikaru.o \

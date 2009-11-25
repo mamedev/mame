@@ -8,24 +8,97 @@ Atari Destroyer Driver
 #include "cpu/m6800/m6800.h"
 #include "deprecat.h"
 
-extern VIDEO_UPDATE( destroyr );
 
-extern int destroyr_wavemod;
-extern int destroyr_cursor;
-
-extern UINT8* destroyr_major_obj_ram;
-extern UINT8* destroyr_minor_obj_ram;
-extern UINT8* destroyr_alpha_num_ram;
-
-static int destroyr_potmask[2];
-static int destroyr_potsense[2];
-static int destroyr_attract;
-static int destroyr_motor_speed;
-static int destroyr_noise;
-
-
-static TIMER_CALLBACK( destroyr_dial_callback	)
+typedef struct _destroyr_state destroyr_state;
+struct _destroyr_state
 {
+	/* memory pointers */
+	UINT8 *        major_obj_ram;
+	UINT8 *        minor_obj_ram;
+	UINT8 *        alpha_num_ram;
+
+	/* video-related */
+	int            cursor;
+	int            wavemod;
+
+	/* misc */
+	int            potmask[2];
+	int            potsense[2];
+	int            attract;
+	int            motor_speed;
+	int            noise;
+};
+
+
+VIDEO_UPDATE( destroyr )
+{
+	destroyr_state *state = (destroyr_state *)screen->machine->driver_data;
+	int i, j;
+
+	bitmap_fill(bitmap, cliprect, 0);
+
+	/* draw major objects */
+	for (i = 0; i < 16; i++)
+	{
+		int attr = state->major_obj_ram[2 * i + 0] ^ 0xff;
+		int horz = state->major_obj_ram[2 * i + 1];
+
+		int num = attr & 3;
+		int scan = attr & 4;
+		int flipx = attr & 8;
+
+		if (scan == 0)
+		{
+			if (horz >= 192)
+				horz -= 256;
+		}
+		else
+		{
+			if (horz < 192)
+				continue;
+		}
+
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[2], num, 0, flipx, 0, horz, 16 * i, 0);
+	}
+
+	/* draw alpha numerics */
+	for (i = 0; i < 8; i++)
+	{
+		for (j = 0; j < 32; j++)
+		{
+			int num = state->alpha_num_ram[32 * i + j];
+
+			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0], num, 0, 0, 0, 8 * j, 8 * i, 0);
+		}
+	}
+
+	/* draw minor objects */
+	for (i = 0; i < 2; i++)
+	{
+		int horz = 256 - state->minor_obj_ram[i + 2];
+		int vert = 256 - state->minor_obj_ram[i + 4];
+
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], state->minor_obj_ram[i + 0], 0, 0, 0, horz, vert, 0);
+	}
+
+	/* draw waves */
+	for (i = 0; i < 4; i++)
+	{
+		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[3], state->wavemod ? 1 : 0, 0, 0, 0, 64 * i, 0x4e, 0);
+	}
+
+	/* draw cursor */
+	for (i = 0; i < 256; i++)
+	{
+		if (i & 4)
+			*BITMAP_ADDR16(bitmap, state->cursor ^ 0xff, i) = 7;
+	}
+	return 0;
+}
+
+static TIMER_CALLBACK( destroyr_dial_callback )
+{
+	destroyr_state *state = (destroyr_state *)machine->driver_data;
 	int dial = param;
 
 	/* Analog inputs come from the player's depth control potentiometer.
@@ -35,9 +108,9 @@ static TIMER_CALLBACK( destroyr_dial_callback	)
        computer then reads the VSYNC data functions to tell where the
        cursor should be located. */
 
-	destroyr_potsense[dial] = 1;
+	state->potsense[dial] = 1;
 
-	if (destroyr_potmask[dial])
+	if (state->potmask[dial])
 	{
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
@@ -46,11 +119,11 @@ static TIMER_CALLBACK( destroyr_dial_callback	)
 
 static TIMER_CALLBACK( destroyr_frame_callback )
 {
-	destroyr_potsense[0] = 0;
-	destroyr_potsense[1] = 0;
+	destroyr_state *state = (destroyr_state *)machine->driver_data;
+	state->potsense[0] = 0;
+	state->potsense[1] = 0;
 
 	/* PCB supports two dials, but cab has only got one */
-
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, input_port_read(machine, "PADDLE"), 0), NULL, 0, destroyr_dial_callback);
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, destroyr_frame_callback);
 }
@@ -58,30 +131,43 @@ static TIMER_CALLBACK( destroyr_frame_callback )
 
 static MACHINE_RESET( destroyr )
 {
+	destroyr_state *state = (destroyr_state *)machine->driver_data;
+
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, destroyr_frame_callback);
+
+	state->cursor = 0;
+	state->wavemod = 0;
+	state->potmask[0] = 0;
+	state->potmask[1] = 0;
+	state->potsense[0] = 0;
+	state->potsense[1] = 0;
+	state->attract = 0;
+	state->motor_speed = 0;
+	state->noise = 0;
 }
 
 
 static WRITE8_HANDLER( destroyr_misc_w )
 {
+	destroyr_state *state = (destroyr_state *)space->machine->driver_data;
+
 	/* bits 0 to 2 connect to the sound circuits */
+	state->attract = data & 0x01;
+	state->noise = data & 0x02;
+	state->motor_speed = data & 0x04;
+	state->potmask[0] = data & 0x08;
+	state->wavemod = data & 0x10;
+	state->potmask[1] = data & 0x20;
 
-	destroyr_attract = data & 1;
-	destroyr_noise = data & 2;
-	destroyr_motor_speed = data & 4;
-	destroyr_potmask[0] = data & 8;
-	destroyr_wavemod = data & 16;
-	destroyr_potmask[1] = data & 32;
-
-	coin_lockout_w(0, !destroyr_attract);
-	coin_lockout_w(1, !destroyr_attract);
+	coin_lockout_w(0, !state->attract);
+	coin_lockout_w(1, !state->attract);
 }
 
 
 static WRITE8_HANDLER( destroyr_cursor_load_w )
 {
-	destroyr_cursor = data;
-
+	destroyr_state *state = (destroyr_state *)space->machine->driver_data;
+	state->cursor = data;
 	watchdog_reset_w(space, offset, data);
 }
 
@@ -94,7 +180,7 @@ static WRITE8_HANDLER( destroyr_interrupt_ack_w )
 
 static WRITE8_HANDLER( destroyr_output_w )
 {
-	offset &= 15;
+	offset &= 0x0f;
 
 	switch (offset)
 	{
@@ -134,15 +220,16 @@ static WRITE8_HANDLER( destroyr_output_w )
 
 static READ8_HANDLER( destroyr_input_r )
 {
-	offset &= 15;
+	destroyr_state *state = (destroyr_state *)space->machine->driver_data;
+	offset &= 0x0f;
 
 	if (offset == 0)
 	{
 		UINT8 ret = input_port_read(space->machine, "IN0");
 
-		if (destroyr_potsense[0] && destroyr_potmask[0])
+		if (state->potsense[0] && state->potmask[0])
 			ret |= 4;
-		if (destroyr_potsense[1] && destroyr_potmask[1])
+		if (state->potsense[1] && state->potmask[1])
 			ret |= 8;
 
 		return ret;
@@ -170,11 +257,11 @@ static ADDRESS_MAP_START( destroyr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0xf00) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(destroyr_input_r, destroyr_output_w)
 	AM_RANGE(0x2000, 0x2fff) AM_READ_PORT("IN2")
-	AM_RANGE(0x3000, 0x30ff) AM_WRITE(SMH_RAM) AM_BASE(&destroyr_alpha_num_ram)
-	AM_RANGE(0x4000, 0x401f) AM_WRITE(SMH_RAM) AM_BASE(&destroyr_major_obj_ram)
+	AM_RANGE(0x3000, 0x30ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(destroyr_state, alpha_num_ram)
+	AM_RANGE(0x4000, 0x401f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(destroyr_state, major_obj_ram)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(destroyr_cursor_load_w)
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(destroyr_interrupt_ack_w)
-	AM_RANGE(0x5002, 0x5007) AM_WRITE(SMH_RAM) AM_BASE(&destroyr_minor_obj_ram)
+	AM_RANGE(0x5002, 0x5007) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(destroyr_state, minor_obj_ram)
 	AM_RANGE(0x6000, 0x6fff) AM_READ(destroyr_scanline_r)
 	AM_RANGE(0x7000, 0x77ff) AM_NOP				/* missing translation ROMs */
 	AM_RANGE(0x7800, 0x7fff) AM_ROM				/* program */
@@ -182,20 +269,20 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( destroyr )
-	PORT_START("IN0")	/* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNUSED ) /* call 7400 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNUSED )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) /* call 7400 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) /* potsense1 */
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) /* potsense2 */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_DIPNAME( 0xc0, 0x80, "Extended Play" ) PORT_DIPLOCATION("SW2:8,7")
 	PORT_DIPSETTING( 0x40, "1500 points" )
 	PORT_DIPSETTING( 0x80, "2500 points" )
 	PORT_DIPSETTING( 0xc0, "3500 points" )
 	PORT_DIPSETTING( 0x00, "never" )
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) /* actually a lever */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
@@ -205,7 +292,7 @@ static INPUT_PORTS_START( destroyr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START("IN2")	/* IN2 */
+	PORT_START("IN2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:4,3")
 	PORT_DIPSETTING( 0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING( 0x02, DEF_STR( 1C_1C ) )
@@ -224,7 +311,7 @@ static INPUT_PORTS_START( destroyr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("PADDLE")	/* IN3 */
+	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 0x00, IPT_PADDLE_V ) PORT_MINMAX(0,160) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -337,13 +424,30 @@ static PALETTE_INIT( destroyr )
 }
 
 
+static MACHINE_START( destroyr )
+{
+	destroyr_state *state = (destroyr_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->cursor);
+	state_save_register_global(machine, state->wavemod);
+	state_save_register_global(machine, state->attract);
+	state_save_register_global(machine, state->motor_speed);
+	state_save_register_global(machine, state->noise);
+	state_save_register_global_array(machine, state->potmask);
+	state_save_register_global_array(machine, state->potsense);
+}
+
 static MACHINE_DRIVER_START( destroyr )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(destroyr_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 12096000 / 16)
 	MDRV_CPU_PROGRAM_MAP(destroyr_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_assert, 4)
 
+	MDRV_MACHINE_START(destroyr)
 	MDRV_MACHINE_RESET(destroyr)
 
 	/* video hardware */

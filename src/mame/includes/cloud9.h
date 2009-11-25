@@ -4,6 +4,33 @@
 
 *************************************************************************/
 
+typedef struct _cloud9_state cloud9_state;
+struct _cloud9_state
+{
+	/* memory pointers */
+	UINT8 *     videoram;
+	UINT8 *     spriteram;
+	UINT8 *     paletteram;
+//	UINT8 *     nvram_stage;	// currently this uses generic nvram handlers
+//	UINT8 *     nvram;		// currently this uses generic nvram handlers
+
+	/* video-related */
+	const UINT8 *syncprom;
+	const UINT8 *wpprom;
+	const UINT8 *priprom;
+	bitmap_t    *spritebitmap;
+	double      rweights[3], gweights[3], bweights[3];
+	UINT8       video_control[8];
+	UINT8       bitmode_addr[2];
+
+	/* misc */
+	int         vblank_start;
+	int         vblank_end;
+	emu_timer   *irq_timer;
+	UINT8       irq_state;
+};
+
+
 /*----------- defined in video/cloud9.c -----------*/
 
 VIDEO_START( cloud9 );
