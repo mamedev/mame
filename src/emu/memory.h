@@ -496,6 +496,8 @@ union _addrmap64_token
 #define memory_install_read64_device_handler(space, device, start, end, mask, mirror, rhandler) \
 	_memory_install_device_handler64(space, device, start, end, mask, mirror, rhandler, NULL, #rhandler, NULL)
 
+#define memory_install_read_port_handler(space, start, end, mask, mirror, rtag) \
+	_memory_install_port_handler(space, start, end, mask, mirror, rtag, NULL)
 
 /* wrappers for dynamic write handler installation */
 #define memory_install_write_handler(space, start, end, mask, mirror, whandler) \
@@ -520,6 +522,8 @@ union _addrmap64_token
 #define memory_install_write64_device_handler(space, device, start, end, mask, mirror, whandler) \
 	_memory_install_device_handler64(space, device, start, end, mask, mirror, NULL, whandler, NULL, #whandler)
 
+#define memory_install_write_port_handler(space, start, end, mask, mirror, wtag) \
+	_memory_install_port_handler(space, start, end, mask, mirror, NULL, wtag)
 
 /* wrappers for dynamic read/write handler installation */
 #define memory_install_readwrite_handler(space, start, end, mask, mirror, rhandler, whandler) \
@@ -543,6 +547,9 @@ union _addrmap64_token
 	_memory_install_device_handler32(space, device, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
 #define memory_install_readwrite64_device_handler(space, device, start, end, mask, mirror, rhandler, whandler) \
 	_memory_install_device_handler64(space, device, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
+
+#define memory_install_readwrite_port_handler(space, start, end, mask, mirror, rtag, wtag) \
+	_memory_install_port_handler(space, start, end, mask, mirror, rtag, wtag)
 
 
 /* macros for accessing bytes and words within larger chunks */
@@ -898,8 +905,8 @@ UINT32 *_memory_install_device_handler32(const address_space *space, const devic
 /* same as above but explicitly for 64-bit handlers */
 UINT64 *_memory_install_device_handler64(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, write64_device_func whandler, const char *rhandler_name, const char *whandler_name) ATTR_NONNULL(1, 2);
 
-/* install a new input port handler into the given address space */
-void memory_install_read_port_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag) ATTR_NONNULL(1, 6);
+/* install a new port handler into the given address space */
+void _memory_install_port_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag) ATTR_NONNULL(1);
 
 
 

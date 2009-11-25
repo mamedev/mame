@@ -1353,52 +1353,43 @@ UINT64 *_memory_install_device_handler64(const address_space *space, const devic
 
 
 /*-------------------------------------------------
-    memory_install_read_port_handler - install a
-    new 8-bit input port handler into the given
-    address space
+    _memory_install_port_handler - install a
+    new port handler into the given address space
 -------------------------------------------------*/
 
-void memory_install_read_port_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag)
+void _memory_install_port_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag)
 {
-	const input_port_config *port = input_port_by_tag(&space->machine->portlist, tag);
 	address_space *spacerw = (address_space *)space;
-	genf *handler = NULL;
+	genf *rhandler = NULL;
+	genf *whandler = NULL;
 
-	if (port == NULL)
-		fatalerror("Non-existent port referenced: '%s'\n", tag);
 	switch (space->dbits)
 	{
-		case 8:		handler = (genf *)input_port_read8; 	break;
-		case 16:	handler = (genf *)input_port_read16; 	break;
-		case 32:	handler = (genf *)input_port_read32; 	break;
-		case 64:	handler = (genf *)input_port_read64; 	break;
+		case 8:		rhandler = (genf *)input_port_read8;	whandler = (genf *)input_port_write8; 	break;
+		case 16:	rhandler = (genf *)input_port_read16; 	whandler = (genf *)input_port_write16; break;
+		case 32:	rhandler = (genf *)input_port_read32; 	whandler = (genf *)input_port_write32; break;
+		case 64:	rhandler = (genf *)input_port_read64; 	whandler = (genf *)input_port_write64; break;
 	}
-	space_map_range(spacerw, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, (void *)port, tag);
-}
 
-
-/*-------------------------------------------------
-    memory_install_write_port_handler - install a
-    new 8-bit input port handler into the given
-    address space
--------------------------------------------------*/
-
-void memory_install_write_port_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag)
-{
-	const input_port_config *port = input_port_by_tag(&space->machine->portlist, tag);
-	address_space *spacerw = (address_space *)space;
-	genf *handler = NULL;
-
-	if (port == NULL)
-		fatalerror("Non-existent port referenced: '%s'\n", tag);
-	switch (space->dbits)
+	if (rtag != NULL)
 	{
-		case 8:		handler = (genf *)input_port_write8; 	break;
-		case 16:	handler = (genf *)input_port_write16; 	break;
-		case 32:	handler = (genf *)input_port_write32; 	break;
-		case 64:	handler = (genf *)input_port_write64; 	break;
+		const input_port_config *port = input_port_by_tag(&space->machine->portlist, rtag);
+		if (port == NULL)
+			fatalerror("Non-existent port referenced: '%s'\n", rtag);
+
+		space_map_range(spacerw, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, rhandler, (void *)port, rtag);
 	}
-	space_map_range(spacerw, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, (void *)port, tag);
+
+	if (wtag != NULL)
+	{
+		const input_port_config *port = input_port_by_tag(&space->machine->portlist, wtag);
+		if (port == NULL)
+			fatalerror("Non-existent port referenced: '%s'\n", wtag);
+
+		space_map_range(spacerw, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, whandler, (void *)port, wtag);
+	}
+
+	mem_dump(space->machine);
 }
 
 
