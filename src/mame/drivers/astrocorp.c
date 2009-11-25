@@ -25,9 +25,6 @@ struct _astrocrp_state
 
 	/* video-related */
 	UINT16     screen_enable;
-
-	/* devices */
-	const device_config *eeprom;
 };
 
 
@@ -109,27 +106,12 @@ static VIDEO_UPDATE(astrocorp)
                                 Memory Maps
 ***************************************************************************/
 
-static READ16_HANDLER( astrocorp_eeprom_r )
-{
-	astrocrp_state *state = (astrocrp_state *)space->machine->driver_data;
-
-	return 0xfff7 | (eepromdev_read_bit(state->eeprom) << 3);
-}
 
 static WRITE16_HANDLER( astrocorp_eeprom_w )
 {
-	astrocrp_state *state = (astrocrp_state *)space->machine->driver_data;
-
 	if (ACCESSING_BITS_0_7)
 	{
-		// latch the bit
-		eepromdev_write_bit(state->eeprom, data & 0x01);
-
-		// reset line asserted: reset.
-		eepromdev_set_cs_line(state->eeprom, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
-
-		// clock line asserted: write latch or select next bit to read
-		eepromdev_set_clock_line(state->eeprom, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
 	}
 }
 
@@ -195,7 +177,7 @@ static ADDRESS_MAP_START( showhand_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x054000, 0x054001 ) AM_READ_PORT("INPUTS")
 	AM_RANGE( 0x058000, 0x058001 ) AM_WRITE(astrocorp_eeprom_w)
 	AM_RANGE( 0x05a000, 0x05a001 ) AM_WRITE(astrocorp_outputs_w)
-	AM_RANGE( 0x05e000, 0x05e001 ) AM_READ(astrocorp_eeprom_r)
+	AM_RANGE( 0x05e000, 0x05e001 ) AM_READ_PORT("EEPROMIN")
 	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocrp_state, paletteram16)
 	AM_RANGE( 0x070000, 0x073fff ) AM_RAM
 	AM_RANGE( 0x080000, 0x080001 ) AM_DEVWRITE("oki", astrocorp_sound_bank_w)
@@ -212,7 +194,7 @@ static ADDRESS_MAP_START( showhanc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x084000, 0x084001 ) AM_READ_PORT("INPUTS")
 	AM_RANGE( 0x088000, 0x088001 ) AM_WRITE(astrocorp_eeprom_w)
 	AM_RANGE( 0x08a000, 0x08a001 ) AM_WRITE(astrocorp_outputs_w)
-	AM_RANGE( 0x08e000, 0x08e001 ) AM_READ(astrocorp_eeprom_r)
+	AM_RANGE( 0x08e000, 0x08e001 ) AM_READ_PORT("EEPROMIN")
 	AM_RANGE( 0x090000, 0x093fff ) AM_RAM
 	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE(astrocorp_enable_w)
 	AM_RANGE( 0x0e0000, 0x0e0001 ) AM_READ(astrocorp_unk_r) AM_DEVWRITE8("oki", okim6295_w, 0xff00)
@@ -240,6 +222,15 @@ static INPUT_PORTS_START( showhand )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN   )	// ?
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN2     )	// key in
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_SPECIAL   )	// coin sensor
+
+	PORT_START( "EEPROMIN" )
+	PORT_BIT( 0xfff7, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( showhanc )
@@ -260,6 +251,15 @@ static INPUT_PORTS_START( showhanc )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL   )	// must be 0 for inputs to work
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN2     )	PORT_IMPULSE(1)	// key in (shows an error)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
+
+	PORT_START( "EEPROMIN" )
+	PORT_BIT( 0xfff7, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -289,16 +289,12 @@ GFXDECODE_END
 static MACHINE_START( showhand )
 {
 	astrocrp_state *state = (astrocrp_state *)machine->driver_data;
-
-	state->eeprom = devtag_get_device(machine, "eeprom");
-
 	state_save_register_global(machine, state->screen_enable);
 }
 
 static MACHINE_RESET( showhand )
 {
 	astrocrp_state *state = (astrocrp_state *)machine->driver_data;
-
 	state->screen_enable = 0;
 }
 
