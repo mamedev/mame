@@ -171,7 +171,7 @@ Check gticlub.c for details on the bottom board.
 #include "machine/konppc.h"
 #include "machine/konamiic.h"
 #include "machine/adc083x.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "video/konamiic.h"
 #include "video/gticlub.h"
 
@@ -328,9 +328,7 @@ static WRITE8_HANDLER( sysreg_w )
                 0x02 = EEPCLK
                 0x01 = EEPDI
             */
-			eeprom_write_bit((data & 0x01) ? 1 : 0);
-			eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
-			eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			input_port_write(space->machine, "EEPROMOUT", data & 0x07, 0xff); 
 			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 0 = %02X\n", data);
 			break;
@@ -541,7 +539,12 @@ static INPUT_PORTS_START( zr107 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* PARAACK */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("adc0838",adc083x_sars_read)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom",eepromdev_read_bit)
+
+	PORT_START("EEPROMOUT")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 
 	PORT_START("OUT4")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("adc0838", adc083x_cs_write)
@@ -711,7 +714,7 @@ static MACHINE_DRIVER_START( zr107 )
 
 	MDRV_QUANTUM_TIME(HZ(30000))
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 	MDRV_MACHINE_START(zr107)
 	MDRV_MACHINE_RESET(zr107)
 
@@ -758,7 +761,7 @@ static MACHINE_DRIVER_START( jetwave )
 
 	MDRV_QUANTUM_TIME(HZ(30000))
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 	MDRV_MACHINE_START(zr107)
 	MDRV_MACHINE_RESET(zr107)
 
