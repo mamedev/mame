@@ -4413,6 +4413,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( zombrvn )	/* 1999.02 Zombie Revenge */
 	DRIVER( airlbios )	/* 1999.03 Airline Pilots */
 	DRIVER( alpiltdx )
+	DRIVER( alpilota )
 	DRIVER( ggram2 )	/* 1999.04 Giant Gram Zen Nippon Pro-wres 2 */
 						/* 1999.05 Taisen Puzzle Kurutto Stone */
 						/* 1999.06 Ringout 4x4 */
@@ -4426,7 +4427,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( toyfight )	/* 1999.09 Toy Fighter */
 	DRIVER( jambo )		/* 1999.09 Jambo! Safari */
 						/* 1999.09 Super Major League 99 */
-						/* 1999.10 Sega Tetris */
+	DRIVER( sgtetris )	/* 1999.10 Sega Tetris */
 	DRIVER( derbyoc )	/* 1999.10 Derby Owners Club */
 	DRIVER( doa2 )		/* 1999.11 Dead or Alive 2 */
 	DRIVER( otrigger )	/* 1999.11 Out Trigger */
