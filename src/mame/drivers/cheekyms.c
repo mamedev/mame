@@ -1,26 +1,15 @@
 /*************************************************************************
- Universal Cheeky Mouse Driver
- (c)Lee Taylor May/June 1998, All rights reserved.
+    Universal Cheeky Mouse Driver
+    (c)Lee Taylor May/June 1998, All rights reserved.
 
- For use only in offical MAME releases.
- Not to be distributed as part of any commerical work.
+    For use only in offical MAME releases.
+    Not to be distributed as part of any commerical work.
 **************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
-
-
-extern UINT8 *cheekyms_videoram;
-extern UINT8 *cheekyms_spriteram;
-extern UINT8 *cheekyms_port_80;
-
-PALETTE_INIT( cheekyms );
-VIDEO_START( cheekyms );
-VIDEO_UPDATE( cheekyms );
-WRITE8_HANDLER( cheekyms_port_40_w );
-WRITE8_HANDLER( cheekyms_port_80_w );
-
+#include "cheekyms.h"
 
 
 static INPUT_CHANGED( coin_inserted )
@@ -34,16 +23,16 @@ static INPUT_CHANGED( coin_inserted )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_BASE(&cheekyms_videoram)
+	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_BASE_MEMBER(cheekyms_state, videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x20, 0x3f) AM_WRITEONLY AM_BASE(&cheekyms_spriteram)
+	AM_RANGE(0x20, 0x3f) AM_WRITEONLY AM_BASE_MEMBER(cheekyms_state, spriteram)
 	AM_RANGE(0x40, 0x40) AM_WRITE(cheekyms_port_40_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(cheekyms_port_80_w) AM_BASE(&cheekyms_port_80)
+	AM_RANGE(0x80, 0x80) AM_WRITE(cheekyms_port_80_w) AM_BASE_MEMBER(cheekyms_state, port_80)
 ADDRESS_MAP_END
 
 
@@ -58,7 +47,7 @@ static INPUT_PORTS_START( cheekyms )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-  //PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+	//PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -118,13 +107,25 @@ static GFXDECODE_START( cheekyms )
 GFXDECODE_END
 
 
+static MACHINE_START( cheekyms )
+{
+	cheekyms_state *state = (cheekyms_state *)machine->driver_data;
+
+	state->dac = devtag_get_device(machine, "dac");
+}
+
 static MACHINE_DRIVER_START( cheekyms )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(cheekyms_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,5000000/2)  /* 2.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_MACHINE_START(cheekyms)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
