@@ -386,60 +386,42 @@ D                                                                               
 
 
 /******************************************************************************/
-
-static UINT16 *equites_workram;
-static UINT8 *mcu_ram;
-
-static int equites_sound_prom_address;
-static UINT8 equites_dac_latch;
-static UINT8 equites_8155_portb;
-
-static UINT8 eq8155_port_a,eq8155_port_c,ay_port_a,ay_port_b,eq_cymbal_ctrl;
-
-static MACHINE_RESET(equites)
-{
-	flip_screen_set(machine, 0);
-}
-
-/******************************************************************************/
 // Sound
 
 /******************************************************************************/
-
-static emu_timer *nmi_timer, *adjuster_timer;
 
 static TIMER_CALLBACK( equites_nmi_callback )
 {
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-
-static float cymvol,hihatvol;
-
 static TIMER_CALLBACK( equites_frq_adjuster_callback )
 {
-	const device_config *msm = devtag_get_device(machine, "msm");
+	equites_state *state = (equites_state *)machine->driver_data;
 	UINT8 frq = input_port_read(machine, FRQ_ADJUSTER_TAG);
 
-	msm5232_set_clock(msm, MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
-//popmessage("8155: C %02x A %02x  AY: A %02x B %02x Unk:%x", eq8155_port_c,eq8155_port_a,ay_port_a,ay_port_b,eq_cymbal_ctrl&15);
+	msm5232_set_clock(state->msm, MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
+//popmessage("8155: C %02x A %02x  AY: A %02x B %02x Unk:%x", state->eq8155_port_c, state->eq8155_port_a, state->ay_port_a, state->ay_port_b, state->eq_cymbal_ctrl & 15);
 
-	cymvol *= 0.94f;
-	hihatvol *= 0.94f;
+	state->cymvol *= 0.94f;
+	state->hihatvol *= 0.94f;
 
-	sound_set_output_gain(msm, 10, hihatvol + cymvol * (ay_port_b & 3) * 0.33);	/* NO from msm5232 */
+	sound_set_output_gain(state->msm, 10, state->hihatvol + state->cymvol * (state->ay_port_b & 3) * 0.33);	/* NO from msm5232 */
 }
 
 static SOUND_START(equites)
 {
-	nmi_timer = timer_alloc(machine, equites_nmi_callback, NULL);
+	equites_state *state = (equites_state *)machine->driver_data;
+	state->nmi_timer = timer_alloc(machine, equites_nmi_callback, NULL);
 
-	adjuster_timer = timer_alloc(machine, equites_frq_adjuster_callback, NULL);
-	timer_adjust_periodic(adjuster_timer, ATTOTIME_IN_HZ(60), 0, ATTOTIME_IN_HZ(60));
+	state->adjuster_timer = timer_alloc(machine, equites_frq_adjuster_callback, NULL);
+	timer_adjust_periodic(state->adjuster_timer, ATTOTIME_IN_HZ(60), 0, ATTOTIME_IN_HZ(60));
 }
 
 static WRITE8_HANDLER(equites_c0f8_w)
 {
+	equites_state *state = (equites_state *)space->machine->driver_data;
+
 	switch (offset)
 	{
 		case 0:	// c0f8: NMI ack (written by NMI handler)
@@ -448,7 +430,7 @@ static WRITE8_HANDLER(equites_c0f8_w)
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
 			// Note: solder pad CP3 on the pcb would allow to disable this
-			generic_pulse_irq_line(cputag_get_cpu(space->machine, "audiocpu"), I8085_RST75_LINE);
+			generic_pulse_irq_line(state->audio_cpu, I8085_RST75_LINE);
 			break;
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)
@@ -461,7 +443,7 @@ static WRITE8_HANDLER(equites_c0f8_w)
 			break;
 
 		case 4: // c0fc: increment PROM address (written by NMI handler)
-			equites_sound_prom_address = (equites_sound_prom_address + 1) & 0x1f;
+			state->sound_prom_address = (state->sound_prom_address + 1) & 0x1f;
 //       at this point, the 5-bit value
 //       goes to an op-amp and to the base of a transistor. The transistor is part
 //       of a resonator that is used to generate the M5232 clock. The PROM doesn't
@@ -479,106 +461,108 @@ static WRITE8_HANDLER(equites_c0f8_w)
 
 		case 7:	// c0ff: sound command latch clear
 			// Note: solder pad CP1 on the pcb would allow to disable this
-			soundlatch_clear_w(space,0,0);
+			soundlatch_clear_w(space, 0, 0);
 			break;
 	}
 }
 
 
-#define POPDRUMKIT 0
-#if POPDRUMKIT
-static int hihat,cymbal;
-#endif
-
-static WRITE8_DEVICE_HANDLER(equites_8910porta_w)
+static WRITE8_DEVICE_HANDLER( equites_8910porta_w )
 {
+	equites_state *state = (equites_state *)device->machine->driver_data;
+
 	// bongo 1
-	sample_set_volume(device, 0, ((data & 0x30)>>4) * 0.33);
-	if (data & ~ay_port_a & 0x80)
+	sample_set_volume(device, 0, ((data & 0x30) >> 4) * 0.33);
+	if (data & ~state->ay_port_a & 0x80)
 		sample_start(device, 0, 0, 0);
 
 	// bongo 2
 	sample_set_volume(device, 1, (data & 0x03) * 0.33);
-	if (data & ~ay_port_a & 0x08)
+	if (data & ~state->ay_port_a & 0x08)
 		sample_start(device, 1, 1, 0);
 
-	ay_port_a = data;
+	state->ay_port_a = data;
 
 #if POPDRUMKIT
-popmessage("HH %d(%d) CYM %d(%d)",hihat,BIT(ay_port_b,6),cymbal,ay_port_b&3);
+popmessage("HH %d(%d) CYM %d(%d)", state->hihat, BIT(state->ay_port_b, 6), state->cymbal, state->ay_port_b & 3);
 #endif
 }
 
-static WRITE8_DEVICE_HANDLER(equites_8910portb_w)
+static WRITE8_DEVICE_HANDLER( equites_8910portb_w )
 {
+	equites_state *state = (equites_state *)device->machine->driver_data;
 #if POPDRUMKIT
-if (data & ~ay_port_b & 0x08) cymbal++;
-if (data & ~ay_port_b & 0x04) hihat++;
+if (data & ~state->ay_port_b & 0x08) state->cymbal++;
+if (data & ~state->ay_port_b & 0x04) state->hihat++;
 #endif
 
 	// bongo 3
 	sample_set_volume(device, 2, ((data & 0x30)>>4) * 0.33);
-	if (data & ~ay_port_b & 0x80)
+	if (data & ~state->ay_port_b & 0x80)
 		sample_start(device, 2, 2, 0);
 
 	// FIXME I'm just enabling the MSM5232 Noise Output for now. Proper emulation
 	// of the analog circuitry should be done instead.
-//  if (data & ~ay_port_b & 0x08)   cymbal hit trigger
-//  if (data & ~ay_port_b & 0x04)   hi-hat hit trigger
+//  if (data & ~state->ay_port_b & 0x08)   cymbal hit trigger
+//  if (data & ~state->ay_port_b & 0x04)   hi-hat hit trigger
 //  data & 3   cymbal volume
 //  data & 0x40  hi-hat enable
 
-	if (data & ~ay_port_b & 0x08)
-		cymvol = 1.0f;
+	if (data & ~state->ay_port_b & 0x08)
+		state->cymvol = 1.0f;
 
-	if (data & ~ay_port_b & 0x04)
-		hihatvol = 0.8f;
+	if (data & ~state->ay_port_b & 0x04)
+		state->hihatvol = 0.8f;
 
 	if (~data & 0x40)
-		hihatvol = 0.0f;
+		state->hihatvol = 0.0f;
 
-	ay_port_b = data;
+	state->ay_port_b = data;
 
 #if POPDRUMKIT
-popmessage("HH %d(%d) CYM %d(%d)",hihat,BIT(ay_port_b,6),cymbal,ay_port_b&3);
+popmessage("HH %d(%d) CYM %d(%d)",state->hihat,BIT(state->ay_port_b,6),state->cymbal,state->ay_port_b & 3);
 #endif
 }
 
 static WRITE8_HANDLER(equites_cymbal_ctrl_w)
 {
-	eq_cymbal_ctrl++;
+	equites_state *state = (equites_state *)space->machine->driver_data;
+	state->eq_cymbal_ctrl++;
 }
 
 
-
-static void equites_update_dac(running_machine *machine)
+static void equites_update_dac( running_machine *machine )
 {
+	equites_state *state = (equites_state *)machine->driver_data;
+
 	// there is only one latch, which is used to drive two DAC channels.
 	// When the channel is enabled in the 4066, it goes to a series of
 	// low-pass filters. The channel is kept enabled only for a short time,
 	// then it's disabled again.
 	// Note that PB0 goes through three filters while PB1 only goes through one.
 
-	if (equites_8155_portb & 1)
-		dac_signed_data_w(devtag_get_device(machine, "dac1"), equites_dac_latch);
+	if (state->eq8155_port_b & 1)
+		dac_signed_data_w(state->dac_1, state->dac_latch);
 
-	if (equites_8155_portb & 2)
-		dac_signed_data_w(devtag_get_device(machine, "dac2"), equites_dac_latch);
+	if (state->eq8155_port_b & 2)
+		dac_signed_data_w(state->dac_2, state->dac_latch);
 }
 
-static WRITE8_HANDLER(equites_dac_latch_w)
+static WRITE8_HANDLER( equites_dac_latch_w )
 {
-	equites_dac_latch = data<<2;
+	equites_state *state = (equites_state *)space->machine->driver_data;
+	state->dac_latch = data << 2;
 	equites_update_dac(space->machine);
 }
 
-static WRITE8_HANDLER(equites_8155_portb_w)
+static WRITE8_HANDLER( equites_8155_portb_w )
 {
-	equites_8155_portb = data;
+	equites_state *state = (equites_state *)space->machine->driver_data;
+	state->eq8155_port_b = data;
 	equites_update_dac(space->machine);
 }
 
-static void equites_msm5232_gate(const device_config *device, int state)
+static void equites_msm5232_gate( const device_config *device, int state )
 {
 }
 
@@ -599,49 +583,43 @@ static INTERRUPT_GEN( equites_interrupt )
 
 static WRITE8_HANDLER(equites_8155_w)
 {
-	static int timer_count;
-	const device_config *device;
+	equites_state *state = (equites_state *)space->machine->driver_data;
 
 	// FIXME proper 8155 emulation must be implemented
 	switch( offset )
 	{
 		case 0: //logerror( "8155 Command register write %x, timer command = %x, interrupt enable = %x, ports = %x\n", data, (data >> 6) & 3, (data >> 4) & 3, data & 0xf );
 			if (((data >> 6) & 3) == 3)
-				timer_adjust_periodic(nmi_timer, ATTOTIME_IN_HZ(XTAL_6_144MHz/2 / timer_count), 0, ATTOTIME_IN_HZ(XTAL_6_144MHz/2 / timer_count));
+				timer_adjust_periodic(state->nmi_timer, ATTOTIME_IN_HZ(XTAL_6_144MHz/2 / state->timer_count), 0, ATTOTIME_IN_HZ(XTAL_6_144MHz/2 / state->timer_count));
 			break;
 		case 1: //logerror( "8155 I/O Port A write %x\n", data );
-			eq8155_port_a = data;
-
-			device = devtag_get_device(space->machine, "msm");
-			sound_set_output_gain(device, 0, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			sound_set_output_gain(device, 1, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			sound_set_output_gain(device, 2, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			sound_set_output_gain(device, 3, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			sound_set_output_gain(device, 4, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
-			sound_set_output_gain(device, 5, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
-			sound_set_output_gain(device, 6, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
-			sound_set_output_gain(device, 7, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
-
+			state->eq8155_port_a = data;
+			sound_set_output_gain(state->msm, 0, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			sound_set_output_gain(state->msm, 1, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			sound_set_output_gain(state->msm, 2, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			sound_set_output_gain(state->msm, 3, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			sound_set_output_gain(state->msm, 4, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			sound_set_output_gain(state->msm, 5, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			sound_set_output_gain(state->msm, 6, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			sound_set_output_gain(state->msm, 7, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
 			break;
 		case 2: //logerror( "8155 I/O Port B write %x\n", data );
-			equites_8155_portb_w(space,0,data);
+			equites_8155_portb_w(space, 0, data);
 			break;
 		case 3: //logerror( "8155 I/O Port C (or control) write %x\n", data );
-			eq8155_port_c = data;
-
-			device = devtag_get_device(space->machine, "msm");
-			sound_set_output_gain(device, 8, (data & 0x0f) / 15.0);	/* SOLO  8' from msm5232 */
+			state->eq8155_port_c = data;
+			sound_set_output_gain(state->msm, 8, (data & 0x0f) / 15.0);	/* SOLO  8' from msm5232 */
 			if (data & 0x20)
-				sound_set_output_gain(device, 9, (data & 0x0f) / 15.0);	/* SOLO 16' from msm5232 */
+				sound_set_output_gain(state->msm, 9, (data & 0x0f) / 15.0);	/* SOLO 16' from msm5232 */
 			else
-				sound_set_output_gain(device, 9, 0);	/* SOLO 16' from msm5232 */
+				sound_set_output_gain(state->msm, 9, 0);	/* SOLO 16' from msm5232 */
 
 			break;
 		case 4: //logerror( "8155 Timer low 8 bits write %x\n", data );
-			timer_count = (timer_count & 0xff00) | data;
+			state->timer_count = (state->timer_count & 0xff00) | data;
 			break;
 		case 5: //logerror( "8155 Timer high 6 bits write %x, timer mode %x\n", data & 0x3f, (data >> 6) & 3);
-			timer_count = (timer_count & 0x00ff) | ((data & 0x3f) << 8);
+			state->timer_count = (state->timer_count & 0x00ff) | ((data & 0x3f) << 8);
 			break;
 	}
 }
@@ -657,22 +635,22 @@ static READ16_HANDLER(hvoltage_debug_r)
 #endif
 
 
-// Gekisou special handling
-static int unknown_bit;
-
 static CUSTOM_INPUT( gekisou_unknown_status )
 {
-	return unknown_bit;
+	equites_state *state = (equites_state *)field->port->machine->driver_data;
+	return state->unknown_bit;
 }
 
 static WRITE16_HANDLER( gekisou_unknown_0_w )
 {
-	unknown_bit = 0;
+	equites_state *state = (equites_state *)space->machine->driver_data;
+	state->unknown_bit = 0;
 }
 
 static WRITE16_HANDLER( gekisou_unknown_1_w )
 {
-	unknown_bit = 1;
+	equites_state *state = (equites_state *)space->machine->driver_data;
+	state->unknown_bit = 1;
 }
 
 /******************************************************************************/
@@ -681,21 +659,24 @@ static WRITE16_HANDLER( gekisou_unknown_1_w )
 
 static READ16_HANDLER(equites_spriteram_kludge_r)
 {
-	if (spriteram16[0] == 0x5555)
+	equites_state *state = (equites_state *)space->machine->driver_data;
+	if (state->spriteram[0] == 0x5555)
 		return 0;
 	else
-		return spriteram16[0];
+		return state->spriteram[0];
 }
 
 static READ16_HANDLER(mcu_r)
 {
-	return 0xff00 | mcu_ram[offset];
+	equites_state *state = (equites_state *)space->machine->driver_data;
+	return 0xff00 | state->mcu_ram[offset];
 }
 
 static WRITE16_HANDLER(mcu_w)
 {
+	equites_state *state = (equites_state *)space->machine->driver_data;
 	if (ACCESSING_BITS_0_7)
-		mcu_ram[offset] = data & 0xff;
+		state->mcu_ram[offset] = data & 0xff;
 }
 
 static WRITE16_HANDLER( mcu_halt_assert_w )
@@ -714,10 +695,10 @@ static ADDRESS_MAP_START( equites_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM	// ROM area is written several times (dev system?)
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	// nvram is for gekisou only
 	AM_RANGE(0x080000, 0x080fff) AM_READWRITE(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
-	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_BASE(&equites_bg_videoram)
+	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_BASE_MEMBER(equites_state, bg_videoram)
 	AM_RANGE(0x0c0200, 0x0c0fff) AM_RAM
 	AM_RANGE(0x100000, 0x100001) AM_READ(equites_spriteram_kludge_r)
-	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_BASE(&spriteram16)
+	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_BASE_MEMBER(equites_state, spriteram)
 	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE(mcu_r, mcu_w)	// 8-bit
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN1") AM_WRITE(soundlatch_word_w) // LSB: sound latch
 	AM_RANGE(0x184000, 0x184001) AM_WRITE(equites_flip0_w)
@@ -735,7 +716,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( splndrbt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE(&equites_workram) // work RAM
+	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE_MEMBER(equites_state, workram) // work RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0") // joyport [2211]
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1") AM_WRITE(splndrbt_flip0_w) // [MMLL] MM: bg color register, LL: normal screen
 	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITE(mcu_halt_clear_w) // 8404 control port1
@@ -750,10 +731,10 @@ static ADDRESS_MAP_START( splndrbt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(splndrbt_bg_scrolly_w)
 	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE(mcu_r, mcu_w)	// 8-bit
 	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x1000) AM_READWRITE(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_BASE(&equites_bg_videoram)
+	AM_RANGE(0x400000, 0x4007ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_BASE_MEMBER(equites_state, bg_videoram)
 	AM_RANGE(0x400800, 0x400fff) AM_RAM
-	AM_RANGE(0x600000, 0x6000ff) AM_RAM AM_BASE(&spriteram16)	// sprite RAM 0,1
-	AM_RANGE(0x600100, 0x6001ff) AM_RAM AM_BASE(&spriteram16_2)	// sprite RAM 2 (8-bit)
+	AM_RANGE(0x600000, 0x6000ff) AM_RAM AM_BASE_MEMBER(equites_state, spriteram)	// sprite RAM 0,1
+	AM_RANGE(0x600100, 0x6001ff) AM_RAM AM_BASE_MEMBER(equites_state, spriteram_2)	// sprite RAM 2 (8-bit)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -775,7 +756,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(&mcu_ram) /* main CPU shared RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(equites_state, mcu_ram) /* main CPU shared RAM */
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -1197,7 +1178,69 @@ MACHINE_DRIVER_END
 
 /******************************************************************************/
 
+static MACHINE_START( equites )
+{
+	equites_state *state = (equites_state *)machine->driver_data;
+
+ 	state->audio_cpu = devtag_get_device(machine, "audiocpu");
+ 	state->msm = devtag_get_device(machine, "msm");
+	state->dac_1 = devtag_get_device(machine, "dac1");
+	state->dac_2 = devtag_get_device(machine, "dac2");
+
+	state_save_register_global(machine, state->fg_char_bank);
+	state_save_register_global(machine, state->bgcolor);
+	state_save_register_global(machine, state->splndrbt_bg_scrollx);
+	state_save_register_global(machine, state->splndrbt_bg_scrolly);
+	state_save_register_global(machine, state->sound_prom_address);
+	state_save_register_global(machine, state->dac_latch);
+	state_save_register_global(machine, state->eq8155_port_b);
+	state_save_register_global(machine, state->eq8155_port_a);
+	state_save_register_global(machine, state->eq8155_port_c);
+	state_save_register_global(machine, state->ay_port_a);
+	state_save_register_global(machine, state->ay_port_b);
+	state_save_register_global(machine, state->eq_cymbal_ctrl);
+	state_save_register_global(machine, state->cymvol);
+	state_save_register_global(machine, state->hihatvol);
+	state_save_register_global(machine, state->timer_count);
+	state_save_register_global(machine, state->unknown_bit);
+#if POPDRUMKIT
+	state_save_register_global(machine, state->hihat);
+	state_save_register_global(machine, state->cymbal);
+#endif
+}
+
+static MACHINE_RESET( equites )
+{
+	equites_state *state = (equites_state *)machine->driver_data;
+
+	flip_screen_set(machine, 0);
+
+	state->fg_char_bank = 0;
+	state->bgcolor = 0;
+	state->splndrbt_bg_scrollx = 0;
+	state->splndrbt_bg_scrolly = 0;
+	state->sound_prom_address = 0;
+	state->dac_latch = 0;
+	state->eq8155_port_b = 0;
+	state->eq8155_port_a = 0;
+	state->eq8155_port_c = 0;
+	state->ay_port_a = 0;
+	state->ay_port_b = 0;
+	state->eq_cymbal_ctrl = 0;
+	state->cymvol = 0.0;
+	state->hihatvol = 0.0;
+	state->timer_count = 0;
+	state->unknown_bit = 0;
+#if POPDRUMKIT
+	state->hihat = state->cymbal = 0;
+#endif
+}
+
+
 static MACHINE_DRIVER_START( equites )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(equites_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz/4) /* 68000P8 running at 3mhz! verified on pcb */
@@ -1222,6 +1265,7 @@ static MACHINE_DRIVER_START( equites )
 	MDRV_VIDEO_START(equites)
 	MDRV_VIDEO_UPDATE(equites)
 
+	MDRV_MACHINE_START(equites)
 	MDRV_MACHINE_RESET(equites)
 MACHINE_DRIVER_END
 
@@ -1236,6 +1280,9 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( splndrbt )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(equites_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/4) /* 68000P8 running at 6mhz, verified on pcb */
@@ -1260,6 +1307,7 @@ static MACHINE_DRIVER_START( splndrbt )
 	MDRV_VIDEO_START(splndrbt)
 	MDRV_VIDEO_UPDATE(splndrbt)
 
+	MDRV_MACHINE_START(equites)
 	MDRV_MACHINE_RESET(equites)
 MACHINE_DRIVER_END
 
@@ -1805,7 +1853,7 @@ ROM_END
 /******************************************************************************/
 // Initializations
 
-static void unpack_block(running_machine *machine, const char *region, int offset, int size)
+static void unpack_block( running_machine *machine, const char *region, int offset, int size )
 {
 	UINT8 *rom = memory_region(machine, region);
 	int i;
@@ -1817,7 +1865,7 @@ static void unpack_block(running_machine *machine, const char *region, int offse
 	}
 }
 
-static void unpack_region(running_machine *machine, const char *region)
+static void unpack_region( running_machine *machine, const char *region )
 {
 	unpack_block(machine, region, 0x0000, 0x2000);
 	unpack_block(machine, region, 0x4000, 0x2000);
@@ -1871,13 +1919,13 @@ static DRIVER_INIT( hvoltage )
 // Game Entries
 
 // Equites Hardware
-GAME( 1984, equites,  0,        equites,  equites,  equites,  ROT90, "Alpha Denshi Co.",                "Equites", GAME_IMPERFECT_SOUND )
-GAME( 1984, equitess, equites,  equites,  equites,  equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Equites (Sega)", GAME_IMPERFECT_SOUND )
-GAME( 1984, bullfgtr, 0,        equites,  bullfgtr, bullfgtr, ROT90, "Alpha Denshi Co.",                "Bull Fighter", GAME_IMPERFECT_SOUND )
-GAME( 1984, bullfgtrs,bullfgtr, equites,  bullfgtr, bullfgtr, ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", GAME_IMPERFECT_SOUND )
-GAME( 1985, kouyakyu, 0,        equites,  kouyakyu, kouyakyu, ROT0,  "Alpha Denshi Co.",                "The Koukouyakyuh", GAME_IMPERFECT_SOUND )
-GAME( 1985, gekisou,  0,        gekisou,  gekisou,  gekisou,  ROT90, "Eastern Corp.",                   "Gekisou (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, equites,  0,        equites,  equites,  equites,  ROT90, "Alpha Denshi Co.",                "Equites", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1984, equitess, equites,  equites,  equites,  equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Equites (Sega)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1984, bullfgtr, 0,        equites,  bullfgtr, bullfgtr, ROT90, "Alpha Denshi Co.",                "Bull Fighter", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1984, bullfgtrs,bullfgtr, equites,  bullfgtr, bullfgtr, ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1985, kouyakyu, 0,        equites,  kouyakyu, kouyakyu, ROT0,  "Alpha Denshi Co.",                "The Koukouyakyuh", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1985, gekisou,  0,        gekisou,  gekisou,  gekisou,  ROT90, "Eastern Corp.",                   "Gekisou (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
 // Splendor Blast Hardware
-GAME( 1985, splndrbt, 0,        splndrbt, splndrbt, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1985, hvoltage, 0,        splndrbt, hvoltage, hvoltage, ROT0,  "Alpha Denshi Co.", "High Voltage", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, splndrbt, 0,        splndrbt, splndrbt, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1985, hvoltage, 0,        splndrbt, hvoltage, hvoltage, ROT0,  "Alpha Denshi Co.", "High Voltage", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

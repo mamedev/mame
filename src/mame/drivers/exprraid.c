@@ -210,31 +210,20 @@ Stephh's notes (based on the games M6502 code and some tests) :
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
-
-
-extern WRITE8_HANDLER( exprraid_videoram_w );
-extern WRITE8_HANDLER( exprraid_colorram_w );
-extern WRITE8_HANDLER( exprraid_flipscreen_w );
-extern WRITE8_HANDLER( exprraid_bgselect_w );
-extern WRITE8_HANDLER( exprraid_scrollx_w );
-extern WRITE8_HANDLER( exprraid_scrolly_w );
-
-extern VIDEO_START( exprraid );
-extern VIDEO_UPDATE( exprraid );
+#include "exprraid.h"
 
 
 /*****************************************************************************************/
 /* Emulate Protection ( only for original express raider, code is cracked on the bootleg */
 /*****************************************************************************************/
 
-static UINT8 *main_ram;
-
 static READ8_HANDLER( exprraid_protection_r )
 {
+	exprraid_state *state = (exprraid_state *)space->machine->driver_data;
 	switch (offset)
 	{
 	case 0:
-		return main_ram[0x02a9];
+		return state->main_ram[0x02a9];
 	case 1:
 		return 0x02;
 	}
@@ -244,8 +233,8 @@ static READ8_HANDLER( exprraid_protection_r )
 
 static WRITE8_HANDLER( sound_cpu_command_w )
 {
-    soundlatch_w(space, 0, data);
-    cputag_set_input_line(space->machine, "slave", INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data);
+	cputag_set_input_line(space->machine, "slave", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( vblank_r )
@@ -254,26 +243,26 @@ static READ8_HANDLER( vblank_r )
 }
 
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x05ff) AM_RAM AM_BASE(&main_ram)
-    AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-    AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(exprraid_videoram_w) AM_BASE(&videoram)
-    AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(exprraid_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_BASE_MEMBER(exprraid_state, main_ram)
+	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE_MEMBER(exprraid_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(exprraid_videoram_w) AM_BASE_MEMBER(exprraid_state, videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(exprraid_colorram_w) AM_BASE_MEMBER(exprraid_state, colorram)
 	AM_RANGE(0x1317, 0x1317) AM_READNOP // ???
 	AM_RANGE(0x1700, 0x1700) AM_READNOP // ???
-    AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW0")	/* DSW 0 */
-    AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")	/* Controls */
-    AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")	/* Coins */
-    AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW1")	/* DSW 1 */
+	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW0")	/* DSW 0 */
+	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")	/* Controls */
+	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")	/* Coins */
+	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW1")	/* DSW 1 */
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP // ???
-    AM_RANGE(0x2001, 0x2001) AM_WRITE(sound_cpu_command_w)
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(sound_cpu_command_w)
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(exprraid_flipscreen_w)
 	AM_RANGE(0x2003, 0x2003) AM_WRITENOP // ???
 	AM_RANGE(0x2800, 0x2801) AM_READ(exprraid_protection_r)
-    AM_RANGE(0x2800, 0x2803) AM_WRITE(exprraid_bgselect_w)
-    AM_RANGE(0x2804, 0x2804) AM_WRITE(exprraid_scrolly_w)
-    AM_RANGE(0x2805, 0x2806) AM_WRITE(exprraid_scrollx_w)
-    AM_RANGE(0x2807, 0x2807) AM_WRITENOP	// Scroll related ?
-    AM_RANGE(0x4000, 0xffff) AM_ROM
+	AM_RANGE(0x2800, 0x2803) AM_WRITE(exprraid_bgselect_w)
+	AM_RANGE(0x2804, 0x2804) AM_WRITE(exprraid_scrolly_w)
+	AM_RANGE(0x2805, 0x2806) AM_WRITE(exprraid_scrollx_w)
+	AM_RANGE(0x2807, 0x2807) AM_WRITENOP	// Scroll related ?
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_io_map, ADDRESS_SPACE_IO, 8 )
@@ -281,11 +270,11 @@ static ADDRESS_MAP_START( master_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x1fff) AM_RAM
-    AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-    AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ym2", ym3526_r, ym3526_w)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ym2", ym3526_r, ym3526_w)
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
-    AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_CHANGED( coin_inserted_deco16 )
@@ -299,10 +288,10 @@ static INPUT_CHANGED( coin_inserted_nmi )
 }
 
 static INPUT_PORTS_START( exprraid )
-	PORT_START("IN0")	/* IN 0 - 0x3800 */
+	PORT_START("IN0")	/* 0x3800 */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START("DSW0")	/* DSW 0 - 0x1800 */
+	PORT_START("DSW0")	/* 0x1800 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
@@ -332,7 +321,7 @@ static INPUT_PORTS_START( exprraid )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" )
 
-	PORT_START("IN1")	/* IN 1 - 0x1801 */
+	PORT_START("IN1")	/* 0x1801 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
@@ -342,7 +331,7 @@ static INPUT_PORTS_START( exprraid )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN2")	/* IN 2 - 0x1802 */
+	PORT_START("IN2")	/* 0x1802 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
@@ -352,7 +341,7 @@ static INPUT_PORTS_START( exprraid )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted_deco16, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted_deco16, 0)
 
-	PORT_START("DSW1")	/* DSW 1 - 0x1803 */
+	PORT_START("DSW1")	/* 0x1803 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
@@ -377,7 +366,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( exprboot )
 	PORT_INCLUDE( exprraid )
-	PORT_MODIFY("IN2")	/* IN 2 - 0x1802 */
+	PORT_MODIFY("IN2")	/* 0x1802 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted_nmi, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted_nmi, 0)
 INPUT_PORTS_END
@@ -447,7 +436,7 @@ GFXDECODE_END
 
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
-static void irqhandler(const device_config *device, int linestate)
+static void irqhandler( const device_config *device, int linestate )
 {
 	cputag_set_input_line_and_vector(device->machine, "slave", 0, linestate, 0xff);
 }
@@ -460,13 +449,13 @@ static const ym3526_interface ym3526_config =
 #if 0
 static INTERRUPT_GEN( exprraid_interrupt )
 {
-	static int coin = 0;
+	exprraid_state *state = (exprraid_state *)device->machine->driver_data;
 
-	if ((~input_port_read(device->machine, "IN2")) & 0xc0 )
+	if ((~input_port_read(device->machine, "IN2")) & 0xc0)
 	{
-		if ( coin == 0 )
+		if (state->coin == 0)
 		{
-			coin = 1;
+			state->coin = 1;
 			//cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 			cpu_set_input_line(device, DECO16_IRQ_LINE, ASSERT_LINE);
 		}
@@ -474,12 +463,33 @@ static INTERRUPT_GEN( exprraid_interrupt )
 	else
 	{
 		cpu_set_input_line(device, DECO16_IRQ_LINE, CLEAR_LINE);
-		coin = 0;
+		state->coin = 0;
 	}
 }
 #endif
 
+
+static MACHINE_START( exprraid )
+{
+	exprraid_state *state = (exprraid_state *)machine->driver_data;
+
+	state_save_register_global_array(machine, state->bg_index);
+}
+
+static MACHINE_RESET( exprraid )
+{
+	exprraid_state *state = (exprraid_state *)machine->driver_data;
+
+	state->bg_index[0] = 0;
+	state->bg_index[1] = 0;
+	state->bg_index[2] = 0;
+	state->bg_index[3] = 0;
+}
+
 static MACHINE_DRIVER_START( exprraid )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(exprraid_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", DECO16, 4000000)        /* 4 MHz ??? */
@@ -489,6 +499,8 @@ static MACHINE_DRIVER_START( exprraid )
 	MDRV_CPU_ADD("slave", M6809, 2000000)        /* 2 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(slave_map)
 								/* IRQs are caused by the YM3526 */
+	MDRV_MACHINE_START(exprraid)
+	MDRV_MACHINE_RESET(exprraid)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -724,17 +736,17 @@ static void exprraid_gfx_expand(running_machine *machine)
 	/* Expand the background rom so we can use regular decode routines */
 
 	UINT8	*gfx = memory_region(machine, "gfx3");
-	int				offs = 0x10000-0x1000;
-	int				i;
+	int offs = 0x10000 - 0x1000;
+	int i;
 
 
-	for ( i = 0x8000-0x1000; i >= 0; i-= 0x1000 )
+	for ( i = 0x8000 - 0x1000; i >= 0; i-= 0x1000 )
 	{
-		memcpy( &(gfx[offs]), &(gfx[i]), 0x1000 );
+		memcpy(&(gfx[offs]), &(gfx[i]), 0x1000);
 
 		offs -= 0x1000;
 
-		memcpy( &(gfx[offs]), &(gfx[i]), 0x1000 );
+		memcpy(&(gfx[offs]), &(gfx[i]), 0x1000);
 
 		offs -= 0x1000;
 	}
@@ -775,8 +787,8 @@ static DRIVER_INIT( wexpresc )
 }
 
 
-GAME( 1986, exprraid,  0,        exprraid, exprraid, exprraid, ROT0, "Data East USA", "Express Raider (US set 1)", 0 )
-GAME( 1986, exprraida, exprraid, exprraid, exprraid, exprraid, ROT0, "Data East USA", "Express Raider (US set 2)", 0 )
-GAME( 1986, wexpress,  exprraid, exprraid, exprraid, wexpress, ROT0, "Data East Corporation", "Western Express (World?)", 0 )
-GAME( 1986, wexpressb, exprraid, exprboot, exprboot, wexpresb, ROT0, "bootleg", "Western Express (bootleg set 1)", 0 )
-GAME( 1986, wexpressb2,exprraid, exprboot, exprboot, wexpresc, ROT0, "bootleg", "Western Express (bootleg set 2)", 0 )
+GAME( 1986, exprraid,  0,        exprraid, exprraid, exprraid, ROT0, "Data East USA", "Express Raider (US set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, exprraida, exprraid, exprraid, exprraid, exprraid, ROT0, "Data East USA", "Express Raider (US set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wexpress,  exprraid, exprraid, exprraid, wexpress, ROT0, "Data East Corporation", "Western Express (World?)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wexpressb, exprraid, exprboot, exprboot, wexpresb, ROT0, "bootleg", "Western Express (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wexpressb2,exprraid, exprboot, exprboot, wexpresc, ROT0, "bootleg", "Western Express (bootleg set 2)", GAME_SUPPORTS_SAVE )

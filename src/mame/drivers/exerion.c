@@ -19,10 +19,6 @@
 #include "sound/ay8910.h"
 
 
-static UINT8 *exerion_ram;
-
-
-
 /*************************************
  *
  *  Interrupts & inputs
@@ -31,8 +27,9 @@ static UINT8 *exerion_ram;
 
 static READ8_HANDLER( exerion_port01_r )
 {
+	exerion_state *state = (exerion_state *)space->machine->driver_data;
 	/* the cocktail flip bit muxes between ports 0 and 1 */
-	return exerion_cocktail_flip ? input_port_read(space->machine, "IN1") : input_port_read(space->machine, "IN0");
+	return state->cocktail_flip ? input_port_read(space->machine, "IN1") : input_port_read(space->machine, "IN0");
 }
 
 
@@ -52,21 +49,21 @@ static INPUT_CHANGED( coin_inserted )
 
 /* This is the first of many Exerion "features." No clue if it's */
 /* protection or some sort of timer. */
-static UINT8 porta;
-static UINT8 portb;
-
 static READ8_DEVICE_HANDLER( exerion_porta_r )
 {
-	porta ^= 0x40;
-	return porta;
+	exerion_state *state = (exerion_state *)device->machine->driver_data;
+	state->porta ^= 0x40;
+	return state->porta;
 }
 
 
 static WRITE8_DEVICE_HANDLER( exerion_portb_w )
 {
+	exerion_state *state = (exerion_state *)device->machine->driver_data;
+
 	/* pull the expected value from the ROM */
-	porta = memory_region(device->machine, "maincpu")[0x5f76];
-	portb = data;
+	state->porta = memory_region(device->machine, "maincpu")[0x5f76];
+	state->portb = data;
 
 	logerror("Port B = %02X\n", data);
 }
@@ -74,10 +71,12 @@ static WRITE8_DEVICE_HANDLER( exerion_portb_w )
 
 static READ8_HANDLER( exerion_protection_r )
 {
+	exerion_state *state = (exerion_state *)space->machine->driver_data;
+
 	if (cpu_get_pc(space->cpu) == 0x4143)
-		return memory_region(space->machine, "maincpu")[0x33c0 + (exerion_ram[0xd] << 2) + offset];
+		return memory_region(space->machine, "maincpu")[0x33c0 + (state->main_ram[0xd] << 2) + offset];
 	else
-		return exerion_ram[0x8 + offset];
+		return state->main_ram[0x8 + offset];
 }
 
 
@@ -91,9 +90,9 @@ static READ8_HANDLER( exerion_protection_r )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6008, 0x600b) AM_READ(exerion_protection_r)
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(&exerion_ram)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x8800, 0x887f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_MEMBER(exerion_state, main_ram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(exerion_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8800, 0x887f) AM_RAM AM_BASE_MEMBER(exerion_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(exerion_port01_r)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW0")
@@ -275,13 +274,48 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
+static MACHINE_START( exerion )
+{
+	exerion_state *state = (exerion_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->porta);
+	state_save_register_global(machine, state->portb);
+	state_save_register_global(machine, state->cocktail_flip);
+	state_save_register_global(machine, state->char_palette);
+	state_save_register_global(machine, state->sprite_palette);
+	state_save_register_global(machine, state->char_bank);
+	state_save_register_global_array(machine, state->background_latches);
+}
+
+static MACHINE_RESET( exerion )
+{
+	exerion_state *state = (exerion_state *)machine->driver_data;
+	int i;
+
+	state->porta = 0;
+	state->portb = 0;
+	state->cocktail_flip = 0;
+	state->char_palette = 0; 
+	state->sprite_palette = 0;
+	state->char_bank = 0;
+
+	for (i = 0; i < 13; i++)
+		state->background_latches[i] = 0;
+}
+
 static MACHINE_DRIVER_START( exerion )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(exerion_state)
 
 	MDRV_CPU_ADD("maincpu", Z80, EXERION_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_CPU_ADD("sub", Z80, EXERION_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(sub_map)
+
+	MDRV_MACHINE_START(exerion)
+	MDRV_MACHINE_RESET(exerion)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -481,6 +515,6 @@ static DRIVER_INIT( exerionb )
  *
  *************************************/
 
-GAME( 1983, exerion,  0,       exerion, exerion, exerion,  ROT90, "Jaleco", "Exerion", 0 )
-GAME( 1983, exeriont, exerion, exerion, exerion, exerion,  ROT90, "Jaleco (Taito America license)", "Exerion (Taito)", 0 )
-GAME( 1983, exerionb, exerion, exerion, exerion, exerionb, ROT90, "bootleg", "Exerion (bootleg)", 0 )
+GAME( 1983, exerion,  0,       exerion, exerion, exerion,  ROT90, "Jaleco", "Exerion", GAME_SUPPORTS_SAVE )
+GAME( 1983, exeriont, exerion, exerion, exerion, exerion,  ROT90, "Jaleco (Taito America license)", "Exerion (Taito)", GAME_SUPPORTS_SAVE )
+GAME( 1983, exerionb, exerion, exerion, exerion, exerionb, ROT90, "bootleg", "Exerion (bootleg)", GAME_SUPPORTS_SAVE )

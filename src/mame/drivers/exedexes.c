@@ -1,11 +1,11 @@
 /***************************************************************************
 
-Exed Exes
+    Exed Exes
 
-Notes:
-- Flip screen is not supported, but doesn't seem to be used (no flip screen
-  dip switch and no cocktail mode)
-- Some writes to unknown memory locations (always 0?)
+    Notes:
+    - Flip screen is not supported, but doesn't seem to be used (no flip screen
+      dip switch and no cocktail mode)
+    - Some writes to unknown memory locations (always 0?)
 
 ***************************************************************************/
 
@@ -14,22 +14,7 @@ Notes:
 #include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
-
-
-extern UINT8 *exedexes_bg_scroll;
-extern UINT8 *exedexes_nbg_yscroll;
-extern UINT8 *exedexes_nbg_xscroll;
-
-extern WRITE8_HANDLER( exedexes_videoram_w );
-extern WRITE8_HANDLER( exedexes_colorram_w );
-extern WRITE8_HANDLER( exedexes_c804_w );
-extern WRITE8_HANDLER( exedexes_gfxctrl_w );
-
-extern PALETTE_INIT( exedexes );
-extern VIDEO_START( exedexes );
-extern VIDEO_UPDATE( exedexes );
-extern VIDEO_EOF( exedexes );
-
+#include "exedexes.h"
 
 
 static INTERRUPT_GEN( exedexes_interrupt )
@@ -39,7 +24,6 @@ static INTERRUPT_GEN( exedexes_interrupt )
 	else
 		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
 }
-
 
 
 static ADDRESS_MAP_START( exedexes_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -52,11 +36,11 @@ static ADDRESS_MAP_START( exedexes_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(exedexes_c804_w)								/* coin counters + text layer enable */
 	AM_RANGE(0xc806, 0xc806) AM_WRITENOP 											/* Watchdog ?? */
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(exedexes_videoram_w) AM_BASE(&videoram)	/* Video RAM */
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(exedexes_colorram_w) AM_BASE(&colorram)	/* Color RAM */
-	AM_RANGE(0xd800, 0xd801) AM_WRITE(SMH_RAM) AM_BASE(&exedexes_nbg_yscroll)
-	AM_RANGE(0xd802, 0xd803) AM_WRITE(SMH_RAM) AM_BASE(&exedexes_nbg_xscroll)
-	AM_RANGE(0xd804, 0xd805) AM_WRITE(SMH_RAM) AM_BASE(&exedexes_bg_scroll)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(exedexes_videoram_w) AM_BASE_MEMBER(exedexes_state, videoram)	/* Video RAM */
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(exedexes_colorram_w) AM_BASE_MEMBER(exedexes_state, colorram)	/* Color RAM */
+	AM_RANGE(0xd800, 0xd801) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(exedexes_state, nbg_yscroll)
+	AM_RANGE(0xd802, 0xd803) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(exedexes_state, nbg_xscroll)
+	AM_RANGE(0xd804, 0xd805) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(exedexes_state, bg_scroll)
 	AM_RANGE(0xd807, 0xd807) AM_WRITE(exedexes_gfxctrl_w)							/* layer enables */
 	AM_RANGE(0xe000, 0xefff) AM_RAM													/* Work RAM */
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)	/* Sprite RAM */
@@ -208,7 +192,30 @@ GFXDECODE_END
 
 
 
+static MACHINE_START( exedexes )
+{
+	exedexes_state *state = (exedexes_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->chon);
+	state_save_register_global(machine, state->objon);
+	state_save_register_global(machine, state->sc1on);
+	state_save_register_global(machine, state->sc2on);
+}
+
+static MACHINE_RESET( exedexes )
+{
+	exedexes_state *state = (exedexes_state *)machine->driver_data;
+
+	state->chon = 0;
+	state->objon = 0;
+	state->sc1on = 0;
+	state->sc2on = 0;
+}
+
 static MACHINE_DRIVER_START( exedexes )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(exedexes_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */
@@ -218,6 +225,9 @@ static MACHINE_DRIVER_START( exedexes )
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* 3 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+
+	MDRV_MACHINE_START(exedexes)
+	MDRV_MACHINE_RESET(exedexes)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -243,10 +253,10 @@ static MACHINE_DRIVER_START( exedexes )
 	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-   MDRV_SOUND_ADD("sn1", SN76489, 3000000)
+	MDRV_SOUND_ADD("sn1", SN76489, 3000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.36)
 
-   MDRV_SOUND_ADD("sn2", SN76489, 3000000)
+	MDRV_SOUND_ADD("sn2", SN76489, 3000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.36)
 MACHINE_DRIVER_END
 
@@ -338,5 +348,5 @@ ROM_END
 
 
 
-GAME( 1985, exedexes, 0,        exedexes, exedexes, 0, ROT270, "Capcom", "Exed Exes", 0 )
-GAME( 1985, savgbees, exedexes, exedexes, exedexes, 0, ROT270, "Capcom (Memetron license)", "Savage Bees", 0 )
+GAME( 1985, exedexes, 0,        exedexes, exedexes, 0, ROT270, "Capcom", "Exed Exes", GAME_SUPPORTS_SAVE )
+GAME( 1985, savgbees, exedexes, exedexes, exedexes, 0, ROT270, "Capcom (Memetron license)", "Savage Bees", GAME_SUPPORTS_SAVE )
