@@ -22,7 +22,7 @@
     rate.
 
     Each stream also has a callback function. This function is called
-    with an array of input sample streams, and an array out output
+    with an array of input sample streams, and an array of output
     sample streams. The input sample streams are automatically resampled
     by the streaming engine to match the stream's current sample rate.
     The output sample streams are expected to be generated at the
@@ -30,7 +30,7 @@
 
     Before the callback can be invoked, all the inputs that flow into it
     must be updated as well. However, each stream can have an independent
-    sample  rate, so this isn't as easy as it sounds.
+    sample rate, so this isn't as easy as it sounds.
 
     To update a stream, the engine must iterate over all the inputs. For
     each input, it requests that input to update to the current time.
@@ -933,21 +933,35 @@ static stream_sample_t *generate_resampled_data(stream_input *input, UINT32 nums
 		}
 	}
 
-	/* input is undersampled: use linear interpolation */
+	/* input is undersampled: point sample except where our sample period covers a boundary */
 	else if (step < FRAC_ONE)
 	{
-		while (numsamples--)
+		while (numsamples != 0)
 		{
-			int interp_frac = basefrac >> (FRAC_BITS - 12);
-
-			/* compute the sample */
-			sample = (source[0] * (0x1000 - interp_frac) + source[1] * interp_frac) >> 12;
+			int nextfrac, startfrac, endfrac;
+		
+			/* fill in with point samples until we hit a boundary */
+			while ((nextfrac = basefrac + step) < FRAC_ONE && numsamples--)
+			{
+				*dest++ = (source[0] * gain) >> 8;
+				basefrac = nextfrac;
+			}
+			
+			/* if we're done, we're done */
+			if ((INT32)numsamples-- < 0)
+				break;
+		
+			/* compute starting and ending fractional positions */
+			startfrac = basefrac >> (FRAC_BITS - 12);
+			endfrac = nextfrac >> (FRAC_BITS - 12);
+			
+			/* blend between the two samples accordingly */
+			sample = (source[0] * (0x1000 - startfrac) + source[1] * (endfrac - 0x1000)) / (endfrac - startfrac);
 			*dest++ = (sample * gain) >> 8;
 
 			/* advance */
-			basefrac += step;
-			source += basefrac >> FRAC_BITS;
-			basefrac &= FRAC_MASK;
+			basefrac = nextfrac & FRAC_MASK;
+			source++;
 		}
 	}
 
