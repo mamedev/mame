@@ -138,7 +138,7 @@ static struct polygon *polys ;
  * UINT32 | Bits                                    | Use
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
- *   0    | ---- ---- x--- ---- ---- ---- ---- ---- | bpp select
+ *   0    | ---- z--- b--- ---- ---- ---- ---- ---- | zooming mode, bpp select
  *   1    | yyyy yyyy yyyy yyyy xxxx xxxx xxxx xxxx | global sprite offset (ss64 rankings in attract)
  *   2    | ---- ---- ---- ---- ---- ---- ---- ---- |
  *   3    | ---- ---- ---- ---- ---- ---- ---- ---- |
@@ -147,7 +147,6 @@ static struct polygon *polys ;
  * Notes:
  * [0]
  * 0xf0000000 setted in both Samurai Shodown
- * 0x08000000 setted by Fatal Fury WA only, zooming mode?
  * 0x00060000 always setted in all the games
  * 0x00010000 setted in POST, sprite disable?
  * [4]
@@ -178,7 +177,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int chaini;
 		int zbuf;
 		UINT32 zoomx,zoomy;
-		//float foomX, foomY;
+		float foomX, foomY;
 
 		zbuf = (source[2]&0x07ff0000)>>16;
 		#if 1
@@ -211,24 +210,24 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 //                                                                         source[4], source[5], source[6], source[7]) ;
 
 		/* Calculate the zoom */
-		/* First, prevent any possible divide by zero errors */
+		{
+			int zoom_factor;
 
-#if 0
-		if(!zoomx) zoomx=0x1000;
-		if(!zoomy) zoomy=0x1000;
+			/* FIXME: regular zoom mode has precision bugs, can be easily seen in Samurai Shodown 64 intro */
+			zoom_factor = (hng64_spriteregs[0] & 0x08000000) ? 0x1000 : 0x100;
+			if(!zoomx) zoomx=zoom_factor;
+			if(!zoomy) zoomy=zoom_factor;
 
-		foomX = (float)(0x1000) / (float)zoomx ;
-		foomY = (float)(0x1000) / (float)zoomy ;
+			/* First, prevent any possible divide by zero errors */
+			foomX = (float)(zoom_factor) / (float)zoomx ;
+			foomY = (float)(zoom_factor) / (float)zoomy ;
 
-		zoomx = ((int)foomX) << 16 ;
-		zoomy = ((int)foomY) << 16 ;
+			zoomx = ((int)foomX) << 16 ;
+			zoomy = ((int)foomY) << 16 ;
 
-		zoomx += (int)((foomX - floor(foomX)) * (float)0x10000) ;
-		zoomy += (int)((foomY - floor(foomY)) * (float)0x10000) ;
-#endif
-
-		zoomx = 0x10000;
-		zoomy = 0x10000;
+			zoomx += (int)((foomX - floor(foomX)) * (float)0x10000) ;
+			zoomy += (int)((foomY - floor(foomY)) * (float)0x10000) ;
+		}
 
 		if (hng64_spriteregs[0] & 0x00800000) //bpp switch
 		{
@@ -244,27 +243,22 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		// Accomodate for chaining and flipping
 		if(xflip)
 		{
-			//xinc=-(int)(16.0f*foomX);
-
-			xinc=-16;
+			xinc=-(int)(16.0f*foomX);
 			xpos-=xinc*chainx;
 		}
 		else
 		{
-			//xinc=(int)(16.0f*foomX);
-			xinc = 16;
+			xinc=(int)(16.0f*foomX);
 		}
 
 		if(yflip)
 		{
-			//yinc=-(int)(16.0f*foomY);
-			yinc = -16;
+			yinc=-(int)(16.0f*foomY);
 			ypos-=yinc*chainy;
 		}
 		else
 		{
-			yinc = 16;
-			//yinc=(int)(16.0f*foomY);
+			yinc=(int)(16.0f*foomY);
 		}
 
 
