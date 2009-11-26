@@ -1,16 +1,19 @@
 /******************************************************************************
 
+  MAGIC CARD - IMPERA
+  -------------------
 
-    MAGIC CARD - IMPERA
-    -------------------
-
-    Preliminary driver by Roberto Fresca, David Haywood & Angelo Salese
+  Preliminary driver by Roberto Fresca, David Haywood & Angelo Salese
 
 
-    Games running on this hardware:
+  Games running on this hardware:
 
-    * Magic Card (set 1),  Impera, 199?
-    * Magic Card (set 2),  Impera, 199?
+  * Magic Card (set 1),        Impera, 199?.
+  * Magic Card (set 2),        Impera, 199?.
+  * Magic Card (set 3),        Impera, 199?.
+  * Magic Card Jackpot (4.01), Impera, 1998.
+  * Magic Lotto Export (5.03), Impera, 1998.
+
 
 *******************************************************************************
 
@@ -43,26 +46,120 @@
     so... they ported the game to Impera/Funworld 8bits boards, losing part of
     graphics and sound/music quality. The new product was named "Magic Card II".
 
+
 *******************************************************************************
 
-TODO:
+   Magic Card Jackpot 4.01
+  (Also Magic Lotto Export)
+  -------------------------
 
--Proper handling of the 68070 (68k with 32 address lines instead of 24)
- & handle the extra features properly (UART,DMA,Timers etc.)
+  PCB Layout:
+   __________________________________________________________________________________________________
+  |                                                                                                  |
+  |                       SERIAL NUMBER                                                              |___
+  |                                                                                                  (A)_|
+  |  __     _____             ___________        _________                                            ___|
+  | |  |   /     \           |9524 GNN   |      |YMZ284-D |                                           ___|
+  | |  |  |BATTERY|          |HM514270AJ8|      |_________|                                           ___|
+  | |A |  |  +3V  |          |___________|                                                            ___|
+  | |  |  |       |                                       __________________         ________     __  ___|
+  | |  |   \_____/            ___________                |                  |       |ULN2803A|   |..| ___|
+  | |__|                     |9524 GNN   |               |  MUSIC           |       |________|   |..| ___|
+  |                          |HM514270AJ8|               |  TR9C1710-11PCA  |                    |..|(J)_|
+  |                          |___________|               |  SA119X/9612     |       _________    |..||
+  |    ___    ___                                        |__________________|      |74HC273N |   |..||
+  |   |   |  |   |                                                                 |_________|   |..||
+  |   |   |  |   |                                                                               |..||
+  |   | B |  | B |                                     _________                    _________    |..||
+  |   |   |  |   |                                    | 74HC04N |                  |74HC245N |   |__||
+  |   |   |  |   |                                    |_________|                  |_________|       |___
+  |   |___|  |___|                                                                                   A___|
+  |                                                                                                   ___|
+  |    _____                  ______________                                                          ___|
+  |   |     |                |              |                                        ________         ___|
+  |   |     |                |  PHILIPS     |     ___    ___________    ________    |ULN2803A|        ___|
+  |   |     | EI79465--A/02  |  SCC66470CAB |    | D |  |PIC16F84-10|  |   E    |   |________|        ___|
+  |   |  C  | LPL-CPU V4.0   |  172632=1/2  |    |___|  |___________|  |________|                     ___|
+  |   |     | MULTI GAME     |  DfD0032I3   |                                       _________         ___|
+  |   |     | 8603186        |              |                                      |74HC273N |        ___|
+  |   |     |                |              |                                      |_________|        ___|
+  |   |     |                |              |                                                         ___|
+  |   |_____|                |______________|                                 _     _________         ___|
+  |                                                                          |G|   |74HC245N |        ___|
+  |                                                                          |_|   |_________|        ___|
+  |   _______   _______                                                                               ___|
+  |  |]     [| |IC21   |                                 ______             ___                       ___|
+  |  |]  E  [| |       |                                |ALTERA|           |___|                __    ___|
+  |  |]  M  [| |       |                                | MAX  |             F      _________  |..|   ___|
+  |  |]  P  [| | MAGIC |     ________________           |      |                   |74HC245N | |..|   ___|
+  |  |]  T  [| | CARD  |    |                |          |EPM712|                   |_________| |..|   ___|
+  |  |]  Y  [| |JACKPOT|    |   PHILIPS      |          |8SQC10|                               |..|   ___|
+  |  |]     [| |       |    |  SCC68070CCA84 |          |0-15  |                               |..|   ___|
+  |  |]  S  [| |Version|    |  213140-1      |          |______|      X_TAL's                  |__|   ___|
+  |  |]  O  [| |   4.01|    |  DfD0103V3     |                      _   _   _                         ___|
+  |  |]  C  [| |       |    |                |    ALL RIGHTS       | | | | | |                        ___|
+  |  |]  K  [| |Vnr.:  |    |                |    BY  IMPERA       |1| |2| |3|                        ___|
+  |  |]  E  [| |11.7.98|    |                |                     |_| |_| |_|                        ___|
+  |  |]  T  [| |       |    |                |                                                        ___|
+  |  |]     [| |       |    |________________|                                                        ___|
+  |  |]_____[| |27C4002|                                                                              ___|
+  |  |_______| |_______|                               ___________                                    ___|
+  |    ___________________                            |RTC2421 A  |                                   ___|
+  |   |   :::::::::::::   |                           |___________|                                  Z___|    
+  |   |___________________|                                                                          |  
+  |__________________________________________________________________________________________________|
 
--Proper emulation of the 66470 Video Chip (still many unhandled features)
 
--Inputs;
+  Xtal 1: 30.000 MHz.
+  Xtal 2:  8.000 MHz.
+  Xtal 3: 19.660 MHz.
 
--Unknown sound chip (it's an ADPCM with eight channels);
 
--Many unknown memory maps;
+  A = LT 0030 / LTC695CN / U18708
+  B = NEC Japan / D43256BGU-70LL / 0008XD041
+  C = MX B9819 / 29F1610MC-12C3 / M25685 / TAIWAN
+  D = 24C02C / 24C04 (Serial I2C Bus EEPROM with User-Defined Block Write Protection).
+  E = P0030SG / CD40106BCN
+  F = 74HCU04D
+  G = 74HC74D
+
+
+  Silkscreened on the solder side:
+
+  LEOTS.
+  2800
+  AT&S-F0 ML 94V-0
+
+  IMPERA AUSTRIA          -------
+  TEL: 0043/7242/27116     V 4.0
+  FAX: 0043/7242/27053    -------
+
+
+*******************************************************************************
+
+  TODO:
+
+  - Proper handling of the 68070 (68k with 32 address lines instead of 24)
+    & handle the extra features properly (UART,DMA,Timers etc.)
+
+  - Proper emulation of the 66470 Video Chip (still many unhandled features)
+
+  - Inputs;
+
+  - Unknown sound chip (it's an ADPCM with eight channels);
+
+  - Many unknown memory maps;
+
+  - Proper memory map and machine driver for magicardj & magicle.
+    (different sound chip, extra undumped rom and PIC controller)
+
 
 *******************************************************************************/
 
 
 #define CLOCK_A	XTAL_30MHz
-#define CLOCK_B	XTAL_19_6608MHz
+#define CLOCK_B	XTAL_8MHz
+#define CLOCK_C	XTAL_19_6608MHz
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
@@ -70,6 +167,7 @@ TODO:
 
 static UINT16 *magicram;
 static UINT16 *pcab_vregs;
+
 
 /*************************
 *     Video Hardware     *
@@ -258,7 +356,6 @@ TODO: check this register,doesn't seem to be 100% correct.
 */
 
 
-
 static VIDEO_START(magicard)
 {
 
@@ -336,7 +433,7 @@ static VIDEO_UPDATE(magicard)
 
 
 /*************************
-* Memory map information *
+*      R/W Handlers      *
 *************************/
 
 static READ16_HANDLER( test_r )
@@ -469,6 +566,10 @@ static WRITE16_HANDLER( scc68070_mmu_w )
 }
 
 
+/*************************
+*      Memory Maps       *
+*************************/
+
 static ADDRESS_MAP_START( magicard_mem, ADDRESS_SPACE_PROGRAM, 16 )
 //  ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x00000000, 0x0017ffff) AM_MIRROR(0x7fe00000) AM_RAM AM_BASE(&magicram) /*only 0-7ffff accessed in Magic Card*/
@@ -510,6 +611,7 @@ static MACHINE_RESET( magicard )
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
 
+
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -547,40 +649,70 @@ static MACHINE_DRIVER_START( magicard )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+
 /*************************
 *        Rom Load        *
 *************************/
 
 ROM_START( magicard )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code & GFX */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
 	ROM_LOAD16_WORD_SWAP( "magicorg.bin", 0x000000, 0x80000, CRC(810edf9f) SHA1(0f1638a789a4be7413aa019b4e198353ba9c12d9) )
 
-	ROM_REGION( 0x0100, "proms", 0 ) /* Color PROM?? */
+	ROM_REGION( 0x0100, "sereeprom", 0 ) /* Serial EPROM */
 	ROM_LOAD16_WORD_SWAP("mgorigee.bin",	0x0000,	0x0100, CRC(73522889) SHA1(3e10d6c1585c3a63cff717a0b950528d5373c781) )
 ROM_END
 
 ROM_START( magicarda )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code & GFX */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
 	ROM_LOAD16_WORD_SWAP( "mcorigg2.bin", 0x00000, 0x20000, CRC(48546aa9) SHA1(23099a5e4c9f2c3386496f6d7f5bb7d435a6fb16) )
 	ROM_RELOAD(                           0x40000, 0x20000 )
 	ROM_LOAD16_WORD_SWAP( "mcorigg1.bin", 0x20000, 0x20000, CRC(c9e4a38d) SHA1(812e5826b27c7ad98142a0f52fbdb6b61a2e31d7) )
 	ROM_RELOAD(                           0x40001, 0x20000 )
 
-	ROM_REGION( 0x0100, "proms", 0 ) /* Color PROM?? */
+	ROM_REGION( 0x0100, "sereeprom", 0 ) /* Serial EPROM */
 	ROM_LOAD("mgorigee.bin",	0x0000,	0x0100, CRC(73522889) SHA1(3e10d6c1585c3a63cff717a0b950528d5373c781) )
 ROM_END
 
 ROM_START( magicardb )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code & GFX */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
 	ROM_LOAD16_WORD_SWAP( "mg_8.bin", 0x00000, 0x80000, CRC(f5499765) SHA1(63bcf40b91b43b218c1f9ec1d126a856f35d0844) )
 
 	/*bigger than the other sets?*/
-	ROM_REGION( 0x20000, "proms", 0 ) /* Color PROM?? */
+	ROM_REGION( 0x20000, "other", 0 ) /* unknown */
 	ROM_LOAD16_WORD_SWAP("mg_u3.bin",	0x00000,	0x20000, CRC(2116de31) SHA1(fb9c21ca936532e7c342db4bcaaac31c478b1a35) )
 ROM_END
 
+ROM_START( magicardj )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
+	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(ab2ed583) SHA1(a2d7148b785a8dfce8cff3b15ada293d65561c98) )
+
+	ROM_REGION( 0x0100, "pic16f84", 0 ) /* protected */
+	ROM_LOAD("pic16f84.ic29",	0x0000, 0x0100, BAD_DUMP CRC(0d968558) SHA1(b376885ac8452b6cbf9ced81b1080bfd570d9b91) )
+
+	ROM_REGION( 0x200000, "other", 0 ) /* unknown contents */
+	ROM_LOAD("29f1610mc.ic30",	0x000000, 0x200000, NO_DUMP )
+
+	ROM_REGION( 0x0100, "sereeprom", 0 ) /* Serial EPROM */
+	ROM_LOAD("24c02c.ic26",	0x0000, 0x0100, CRC(b5c86862) SHA1(0debc0f7e7c506e5a4e2cae152548d80ad72fc2e) )
+ROM_END
+
+ROM_START( magicle )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68070 Code & GFX */
+	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(73328346) SHA1(fca5f8a93f25377e659c2b291674d706ca37400e) )
+
+	ROM_REGION( 0x0100, "pic16f84", 0 ) /* protected */
+	ROM_LOAD("pic16f84.ic29",	0x0000, 0x0100, BAD_DUMP CRC(0d968558) SHA1(b376885ac8452b6cbf9ced81b1080bfd570d9b91) )
+
+	ROM_REGION( 0x200000, "other", 0 ) /* unknown contents */
+	ROM_LOAD("29f1610mc.ic30",	0x000000, 0x200000, NO_DUMP )
+
+	ROM_REGION( 0x0200, "sereeprom", 0 ) /* Serial EPROM */
+	ROM_LOAD("24c04a.ic26",	0x0000, 0x0200, CRC(48c4f473) SHA1(5355313cc96f655096e13bfae78be3ba2dfe8a2d) )
+ROM_END
+
+
 /*************************
-*      Game Drivers      *
+*      Driver Init       *
 *************************/
 
 static DRIVER_INIT( magicard )
@@ -588,11 +720,19 @@ static DRIVER_INIT( magicard )
 	//...
 }
 
-/*    YEAR  NAME      PARENT     MACHINE  INPUT  INIT   ROT    COMPANY   FULLNAME             FLAGS... */
 
-GAME( 199?, magicard,  0,        magicard, 0, magicard, ROT0, "Impera", "Magic Card (set 1)", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 199?, magicarda, magicard, magicard, 0, magicard, ROT0, "Impera", "Magic Card (set 2)", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 199?, magicardb, magicard, magicard, 0, magicard, ROT0, "Impera", "Magic Card (set 3)", GAME_NO_SOUND | GAME_NOT_WORKING )
+/*************************
+*      Game Drivers      *
+*************************/
+
+/*    YEAR  NAME       PARENT    MACHINE   INPUT  INIT      ROT    COMPANY   FULLNAME                    FLAGS... */
+
+GAME( 199?, magicard,  0,        magicard, 0,     magicard, ROT0, "Impera", "Magic Card (set 1)",        GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, magicarda, magicard, magicard, 0,     magicard, ROT0, "Impera", "Magic Card (set 2)",        GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, magicardb, magicard, magicard, 0,     magicard, ROT0, "Impera", "Magic Card (set 3)",        GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1998, magicardj, magicard, magicard, 0,     magicard, ROT0, "Impera", "Magic Card Jackpot (4.01)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2001, magicle,   0,        magicard, 0,     magicard, ROT0, "Impera", "Magic Lotto Export (5.03)", GAME_NO_SOUND | GAME_NOT_WORKING )
+
 
 /*Below here there are CD-I bios defines,to be removed in the end*/
 ROM_START( mcdi200 )

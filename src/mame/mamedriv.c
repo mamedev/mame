@@ -8926,10 +8926,12 @@ Other Sun games
 	DRIVER( cubeqst )	/* (c) 1983 Simutrek Inc. */
 	DRIVER( pkscram )	/* (c) 1993 Cosmo Electronics Corporation */
 
-	/* Impera */
-	DRIVER( magicard )	/* (c) 199? */
-	DRIVER( magicarda )	/* (c) 199? */
-	DRIVER( magicardb )	/* (c) 199? */
+	/* Impera CD-I based */
+	DRIVER( magicard )	/* (c) 199? Impera */
+	DRIVER( magicarda )	/* (c) 199? Impera */
+	DRIVER( magicardb )	/* (c) 199? Impera */
+	DRIVER( magicardj )	/* (c) 1998 Impera */
+	DRIVER( magicle )	/* (c) 1998 Impera */
 
 	/* Funworld */
 	DRIVER( jollycrd )	/* (c) 1985 TAB-Austria */
