@@ -194,7 +194,7 @@ WRITE8_HANDLER( seawolf_audio_w )
 	/* if (data & 0x10)  enable MINE HIT sound */
 	if (rising_bits & 0x10) sample_start(samples, 4, 4, 0);
 
-	coin_counter_w(0, (data >> 5) & 0x01);
+	coin_counter_w(space->machine, 0, (data >> 5) & 0x01);
 
 	/* D6 and D7 are not connected */
 
@@ -247,7 +247,7 @@ WRITE8_HANDLER( gunfight_audio_w )
 
 	/* D0 and D1 are just tied to 1k resistors */
 
-	coin_counter_w(0, (data >> 2) & 0x01);
+	coin_counter_w(space->machine, 0, (data >> 2) & 0x01);
 
 	/* the 74175 latches and inverts the top 4 bits */
 	switch ((~data >> 4) & 0x0f)
@@ -368,7 +368,7 @@ WRITE8_DEVICE_HANDLER( tornbase_audio_w )
 		/* if (data & 0x40)  enable WHISTLE sound */
 	}
 
-	coin_counter_w(0, (data >> 7) & 0x01);
+	coin_counter_w(device->machine, 0, (data >> 7) & 0x01);
 }
 
 
@@ -409,7 +409,7 @@ WRITE8_HANDLER( zzzap_audio_2_w )
                                             before it appears again, not sure what
                                             it is supposed to sound like) */
 
-	coin_counter_w(0, (data >> 5) & 0x01);
+	coin_counter_w(space->machine, 0, (data >> 5) & 0x01);
 
 	/* D4, D6 and D7 are not connected */
 }
@@ -840,7 +840,7 @@ WRITE8_DEVICE_HANDLER( boothill_audio_w )
 {
 	/* D0 and D1 are not connected */
 
-	coin_counter_w(0, (data >> 2) & 0x01);
+	coin_counter_w(device->machine, 0, (data >> 2) & 0x01);
 
 	discrete_sound_w(device, BOOTHILL_GAME_ON_EN, (data >> 3) & 0x01);
 
@@ -1071,7 +1071,7 @@ WRITE8_DEVICE_HANDLER( checkmat_audio_w )
 
 	discrete_sound_w(device, CHECKMAT_BOOM_EN, (data >> 1) & 0x01);
 
-	coin_counter_w(0, (data >> 2) & 0x01);
+	coin_counter_w(device->machine, 0, (data >> 2) & 0x01);
 
 	sound_global_enable(device->machine, (data >> 3) & 0x01);
 
@@ -1280,7 +1280,7 @@ WRITE8_DEVICE_HANDLER( desertgu_audio_1_w )
 {
 	/* D0 and D1 are not connected */
 
-	coin_counter_w(0, (data >> 2) & 0x01);
+	coin_counter_w(device->machine, 0, (data >> 2) & 0x01);
 
 	discrete_sound_w(device, DESERTGU_GAME_ON_EN, (data >> 3) & 0x01);
 
@@ -1553,7 +1553,7 @@ WRITE8_DEVICE_HANDLER( dplay_audio_w )
 
 	discrete_sound_w(device, DPLAY_GAME_ON_EN, (data >> 4) & 0x01);
 
-	coin_counter_w(0, (data >> 5) & 0x01);
+	coin_counter_w(device->machine, 0, (data >> 5) & 0x01);
 
 	/* D6 and D7 are not connected */
 }
@@ -1609,7 +1609,7 @@ WRITE8_HANDLER( gmissile_audio_1_w )
 
 	/* D0 and D1 are not connected */
 
-	coin_counter_w(0, (data >> 2) & 0x01);
+	coin_counter_w(space->machine, 0, (data >> 2) & 0x01);
 
 	sound_global_enable(space->machine, (data >> 3) & 0x01);
 
@@ -1705,7 +1705,7 @@ WRITE8_HANDLER( m4_audio_1_w )
 
 	/* D0 and D1 are not connected */
 
-	coin_counter_w(0, (data >> 2) & 0x01);
+	coin_counter_w(space->machine, 0, (data >> 2) & 0x01);
 
 	sound_global_enable(space->machine, (data >> 3) & 0x01);
 
@@ -1963,7 +1963,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( clowns_audio_1_w )
 {
-	coin_counter_w(0, (data >> 0) & 0x01);
+	coin_counter_w(space->machine, 0, (data >> 0) & 0x01);
 
 	clowns_set_controller_select((data >> 1) & 0x01);
 
@@ -2329,7 +2329,7 @@ MACHINE_DRIVER_END
 
 WRITE8_DEVICE_HANDLER( spacwalk_audio_1_w )
 {
-	coin_counter_w(0, (data >> 0) & 0x01);
+	coin_counter_w(device->machine, 0, (data >> 0) & 0x01);
 
 	clowns_set_controller_select((data >> 1) & 0x01);
 
@@ -2579,7 +2579,7 @@ WRITE8_DEVICE_HANDLER( shuffle_audio_2_w )
 {
 	discrete_sound_w(device, SHUFFLE_FOUL_EN, (data >> 0) & 0x01);
 
-	coin_counter_w(0, (data >> 1) & 0x01);
+	coin_counter_w(device->machine, 0, (data >> 1) & 0x01);
 
 	/* D2-D7 are not connected */
 }
@@ -2625,7 +2625,7 @@ WRITE8_HANDLER( dogpatch_audio_w )
 {
 	/* D0 and D1 are most likely not used */
 
-	coin_counter_w(0, (data >> 2) & 0x01);
+	coin_counter_w(space->machine, 0, (data >> 2) & 0x01);
 
 	sound_global_enable(space->machine, (data >> 3) & 0x01);
 
@@ -3252,7 +3252,7 @@ WRITE8_HANDLER( phantom2_audio_1_w )
 
 	sound_global_enable(space->machine, (data >> 2) & 0x01);
 
-	coin_counter_w(0, (data >> 3) & 0x01);
+	coin_counter_w(space->machine, 0, (data >> 3) & 0x01);
 
 	/* if (data & 0x10)  enable RADAR sound */
 
@@ -3373,7 +3373,7 @@ WRITE8_DEVICE_HANDLER( bowler_audio_1_w )
 {
 	/* D0 - selects controller on the cocktail PCB */
 
-	coin_counter_w(0, (data >> 1) & 0x01);
+	coin_counter_w(device->machine, 0, (data >> 1) & 0x01);
 
 	sound_global_enable(device->machine, (data >> 2) & 0x01);
 

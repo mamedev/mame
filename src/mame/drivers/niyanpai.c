@@ -273,7 +273,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( niyanpai_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 
 	AM_RANGE(0x0a0000, 0x0a08ff) AM_READWRITE(niyanpai_palette_r,niyanpai_palette_w)
 	AM_RANGE(0x0a0900, 0x0a11ff) AM_RAM	// palette work ram?
@@ -313,7 +313,7 @@ static ADDRESS_MAP_START( musobana_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0000, 0x0a08ff) AM_READWRITE(niyanpai_palette_r,niyanpai_palette_w)
 	AM_RANGE(0x0a0900, 0x0a11ff) AM_RAM				// palette work ram?
 
-	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x0bf800, 0x0bffff) AM_RAM
 
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
@@ -352,7 +352,7 @@ static ADDRESS_MAP_START( mhhonban_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x060900, 0x0611ff) AM_RAM				// palette work ram?
 	AM_RANGE(0x07f800, 0x07ffff) AM_RAM
 
-	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x0bf000, 0x0bffff) AM_RAM
 
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)

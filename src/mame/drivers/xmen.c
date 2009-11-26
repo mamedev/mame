@@ -95,7 +95,7 @@ logerror("%06x: write %04x to 108000\n",cpu_get_pc(space->cpu),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = coin counter */
-		coin_counter_w(0, data & 0x01);
+		coin_counter_w(space->machine, 0, data & 0x01);
 
 		/* bit 2 is data */
 		/* bit 3 is clock (active high) */

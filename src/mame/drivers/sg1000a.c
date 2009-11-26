@@ -244,7 +244,7 @@ static const TMS9928a_interface tms9928a_interface =
 
 static WRITE8_DEVICE_HANDLER( sg1000a_coin_counter_w )
 {
-	coin_counter_w(0, data & 0x01);
+	coin_counter_w(device->machine, 0, data & 0x01);
 }
 
 static I8255A_INTERFACE( ppi8255_intf )

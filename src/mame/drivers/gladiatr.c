@@ -392,7 +392,7 @@ static ADDRESS_MAP_START( ppking_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_BASE(&gladiatr_videoram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_BASE(&gladiatr_colorram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_BASE(&gladiatr_textram)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) /* battery backed RAM */
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) /* battery backed RAM */
 ADDRESS_MAP_END
 
 
@@ -430,7 +430,7 @@ static ADDRESS_MAP_START( gladiatr_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_BASE(&gladiatr_videoram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_BASE(&gladiatr_colorram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_BASE(&gladiatr_textram)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) /* battery backed RAM */
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) /* battery backed RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1011,9 +1011,9 @@ static DRIVER_INIT( gladiatr )
 static READ8_HANDLER(f6a3_r)
 {
 	if(cpu_get_previouspc(space->cpu)==0x8e)
-		generic_nvram[0x6a3]=1;
+		space->machine->generic.nvram.ptr.u8[0x6a3]=1;
 
-	return generic_nvram[0x6a3];
+	return space->machine->generic.nvram.ptr.u8[0x6a3];
 }
 
 static DRIVER_INIT(ppking)

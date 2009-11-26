@@ -95,7 +95,7 @@ static READ8_HANDLER( funkybee_input_port_0_r )
 
 static WRITE8_HANDLER( funkybee_coin_counter_w )
 {
-	coin_counter_w(offset,data);
+	coin_counter_w(space->machine, offset,data);
 }
 
 static ADDRESS_MAP_START( funkybee_map, ADDRESS_SPACE_PROGRAM, 8 )

@@ -114,8 +114,8 @@ WRITE8_HANDLER( cvs_video_fx_w )
     if (data & 0x04)   logerror("           SCREEN ROTATE\n");
     if (data & 0x08)   logerror("           SHADE BRIGHTER TO LEFT\n");
 
-    set_led_status(1, data & 0x10);	/* lamp 1 */
-    set_led_status(2, data & 0x20);	/* lamp 2 */
+    set_led_status(space->machine, 1, data & 0x10);	/* lamp 1 */
+    set_led_status(space->machine, 2, data & 0x20);	/* lamp 2 */
 
     if (data & 0x40)   logerror("           SHADE BRIGHTER TO BOTTOM\n");
     if (data & 0x80)   logerror("           SHADE BRIGHTER TO TOP\n");

@@ -89,14 +89,14 @@ static WRITE16_HANDLER( led_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bits 0 and 1 are coin counters */
-		coin_counter_w(0, data & 2);
-		coin_counter_w(1, data & 1);
+		coin_counter_w(space->machine, 0, data & 2);
+		coin_counter_w(space->machine, 1, data & 1);
 
 		/* bit 3 = select second trackball for cocktail mode? */
 
 		/* bits 4 and 5 are LED controls */
-		set_led_status(0, data & 0x10);
-		set_led_status(1, data & 0x20);
+		set_led_status(space->machine, 0, data & 0x10);
+		set_led_status(space->machine, 1, data & 0x20);
 
 		/* bits 6 and 7 flip screen */
 		avg_set_flip_x (data & 0x40);
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_BASE(&quantum_vectorram) AM_SIZE(&vectorram_size)
 	AM_RANGE(0x840000, 0x84001f) AM_DEVREADWRITE8("pokey1", pokey_r, pokey_w, 0x00ff)
 	AM_RANGE(0x840020, 0x84003f) AM_DEVREADWRITE8("pokey2", pokey_r, pokey_w, 0x00ff)
-	AM_RANGE(0x900000, 0x9001ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x900000, 0x9001ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x940000, 0x940001) AM_READ(trackball_r) /* trackball */
 	AM_RANGE(0x948000, 0x948001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x950000, 0x95001f) AM_WRITE(SMH_RAM) AM_BASE(&quantum_colorram)

@@ -34,19 +34,19 @@ WRITE8_HANDLER( sidearms_colorram_w )
 WRITE8_HANDLER( sidearms_c804_w )
 {
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(0, data & 0x01);
-	coin_counter_w(1, data & 0x02);
+	coin_counter_w(space->machine, 0, data & 0x01);
+	coin_counter_w(space->machine, 1, data & 0x02);
 
 	/* bit 2 and 3 lock the coin chutes */
 	if (!sidearms_gameid || sidearms_gameid==3)
 	{
-		coin_lockout_w(0, !(data & 0x04));
-		coin_lockout_w(1, !(data & 0x08));
+		coin_lockout_w(space->machine, 0, !(data & 0x04));
+		coin_lockout_w(space->machine, 1, !(data & 0x08));
 	}
 	else
 	{
-		coin_lockout_w(0, data & 0x04);
-		coin_lockout_w(1, data & 0x08);
+		coin_lockout_w(space->machine, 0, data & 0x04);
+		coin_lockout_w(space->machine, 1, data & 0x08);
 	}
 
 	/* bit 4 resets the sound CPU */

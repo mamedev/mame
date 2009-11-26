@@ -384,9 +384,9 @@ static WRITE8_DEVICE_HANDLER(ppi0_b_w)
 	output_set_lamp_value(8, !BIT(data,7)); /* Stand Light */
 	output_set_lamp_value(9, !BIT(data,6)); /* Cancel Light */
 
-	coin_counter_w(0, BIT(data,1));
-	coin_lockout_w(0, BIT(data,5));
-	coin_lockout_w(1, BIT(data,4));
+	coin_counter_w(device->machine, 0, BIT(data,1));
+	coin_lockout_w(device->machine, 0, BIT(data,5));
+	coin_lockout_w(device->machine, 1, BIT(data,4));
 }
 
 static const ppi8255_interface ppi8255_intf[2] =
@@ -479,7 +479,7 @@ static PALETTE_INIT( sms )
  *************************************/
 
 static ADDRESS_MAP_START( sms_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x00800, 0x00803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x01000, 0x01007) AM_WRITE(video_w)
 	AM_RANGE(0x01800, 0x01803) AM_READWRITE(link_r, link_w)
@@ -490,7 +490,7 @@ static ADDRESS_MAP_START( sms_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sureshot_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x02000, 0x02007) AM_WRITE(video_w)
 	AM_RANGE(0x03000, 0x03003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x03800, 0x03803) AM_READWRITE(link_r, link_w)

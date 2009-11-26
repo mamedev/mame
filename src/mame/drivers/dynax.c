@@ -222,11 +222,11 @@ static void jantouki_sound_callback(const device_config *device, int state)
 
 static WRITE8_HANDLER( dynax_coincounter_0_w )
 {
-	coin_counter_w(0, data);
+	coin_counter_w(space->machine, 0, data);
 }
 static WRITE8_HANDLER( dynax_coincounter_1_w )
 {
-	coin_counter_w(1, data);
+	coin_counter_w(space->machine, 1, data);
 }
 
 static READ8_HANDLER( ret_ff )	{	return 0xff;	}
@@ -457,34 +457,34 @@ static WRITE8_HANDLER( yarunara_layer_half2_w )
 
 static ADDRESS_MAP_START( sprtmtch_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hnoridur_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x8000, 0xffff ) AM_READWRITE(SMH_BANK(1), hnoridur_palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcnpshnt_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x8000, 0xffff ) AM_READWRITE(SMH_BANK(1), hnoridur_palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nanajign_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x8000, 0x80ff ) AM_WRITE(nanajign_palette_w	)
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjdialq2_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0800, 0x0fff ) AM_RAM
-	AM_RANGE( 0x1000, 0x1fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x1000, 0x1fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK(1)
 ADDRESS_MAP_END
@@ -492,7 +492,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( yarunara_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK(1)
 	AM_RANGE( 0x8000, 0x81ff ) AM_WRITE(yarunara_palette_w	)	// Palette or RTC
 ADDRESS_MAP_END
@@ -500,7 +500,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jantouki_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
@@ -599,7 +599,7 @@ static WRITE8_HANDLER( hjingi_bank_w )
 
 static WRITE8_HANDLER( hjingi_lockout_w )
 {
-	coin_lockout_w(0, (~data) & 0x01);
+	coin_lockout_w(space->machine, 0, (~data) & 0x01);
 }
 
 static UINT8 hjingi_hopper;
@@ -624,7 +624,7 @@ static READ8_HANDLER( hjingi_keyboard_1_r )
 
 static ADDRESS_MAP_START( hjingi_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x01ff ) AM_ROM
-	AM_RANGE( 0x0200, 0x1fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x0200, 0x1fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x2000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0xffff ) AM_READWRITE(SMH_BANK(1), hnoridur_palette_w)
 ADDRESS_MAP_END
@@ -969,7 +969,7 @@ static WRITE8_HANDLER( jantouki_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	memory_set_bankptr(space->machine, 1,&ROM[0x8000 + 0x8000*(data&0x0f)]);
-	set_led_status(0,data & 0x10);	// maybe
+	set_led_status(space->machine, 0,data & 0x10);	// maybe
 }
 
 static ADDRESS_MAP_START( jantouki_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1139,7 +1139,7 @@ static WRITE8_HANDLER( htengoku_coin_w )
 			// bit 0 = coin counter
 			// bit 1 = out counter
 			// bit 2 = hopper
-			coin_counter_w(0, data & 1);
+			coin_counter_w(space->machine, 0, data & 1);
 			htengoku_hopper = data & 0x04;
 #ifdef MAME_DEBUG
 //          popmessage("COINS %02x",data);
@@ -1268,8 +1268,8 @@ static WRITE8_HANDLER( tenkai_ip_w )
 	switch( tenkai_ipsel )
 	{
 		case 0x0c:
-			coin_counter_w(0, data & 0x01);
-			coin_counter_w(1, data & 0x02);
+			coin_counter_w(space->machine, 0, data & 0x01);
+			coin_counter_w(space->machine, 1, data & 0x02);
 			// bit 2?
 			// bit 3?
 //          popmessage("%02x",data);
@@ -1485,7 +1485,7 @@ static WRITE8_HANDLER( tenkai_blit_romregion_w )
 static ADDRESS_MAP_START( tenkai_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(  0x0000,  0x5fff ) AM_ROM
 	AM_RANGE(  0x6000,  0x6fff ) AM_RAM
-	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(  0x8000,  0xffff ) AM_READWRITE( tenkai_8000_r, tenkai_8000_w )
 	AM_RANGE( 0x10000, 0x10000 ) AM_DEVREAD ( "aysnd", ay8910_r			)	// AY8910
 	AM_RANGE( 0x10008, 0x10008 ) AM_DEVWRITE( "aysnd", ay8910_data_w	)	//
@@ -1652,7 +1652,7 @@ static WRITE8_HANDLER( gekisha_8000_w )
 
 static ADDRESS_MAP_START( gekisha_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(  0x0000,  0x6fff ) AM_ROM
-	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(  0x8000,  0xffff ) AM_READWRITE( gekisha_8000_r, gekisha_8000_w )
 ADDRESS_MAP_END
 

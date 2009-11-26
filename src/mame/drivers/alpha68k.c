@@ -256,7 +256,7 @@ static MACHINE_START( common )
 
 static WRITE16_HANDLER( tnextspc_coin_counters_w )
 {
-	coin_counter_w(offset, data & 0x01);
+	coin_counter_w(space->machine, offset, data & 0x01);
 }
 
 static WRITE16_HANDLER( tnextspc_unknown_w )

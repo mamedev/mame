@@ -377,9 +377,9 @@ static READ8_HANDLER( dsw_r )
 
 static WRITE8_HANDLER( namcos1_coin_w )
 {
-	coin_lockout_global_w(~data & 1);
-	coin_counter_w(0,data & 2);
-	coin_counter_w(1,data & 4);
+	coin_lockout_global_w(space->machine, ~data & 1);
+	coin_counter_w(space->machine, 0,data & 2);
+	coin_counter_w(space->machine, 1,data & 4);
 }
 
 static void namcos1_update_DACs(running_machine *machine)
@@ -485,7 +485,7 @@ static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK(20) /* banked ROM */
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(namcos1_mcu_patch_w)	/* kludge! see notes */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAMBANK(19)	/* TRIRAM (shared) */
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) /* EEPROM */
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) /* EEPROM */
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(namcos1_dac0_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(namcos1_dac1_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(namcos1_mcu_bankswitch_w) /* ROM bank selector */

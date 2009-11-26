@@ -79,10 +79,10 @@ static WRITE16_HANDLER( shangha3_coinctrl_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_lockout_w(0,~data & 0x0400);
-		coin_lockout_w(1,~data & 0x0400);
-		coin_counter_w(0,data & 0x0100);
-		coin_counter_w(1,data & 0x0200);
+		coin_lockout_w(space->machine, 0,~data & 0x0400);
+		coin_lockout_w(space->machine, 1,~data & 0x0400);
+		coin_counter_w(space->machine, 0,data & 0x0100);
+		coin_counter_w(space->machine, 1,data & 0x0200);
 	}
 }
 
@@ -93,10 +93,10 @@ static WRITE16_HANDLER( heberpop_coinctrl_w )
 		/* the sound ROM bank is selected by the main CPU! */
 		okim6295_set_bank_base(devtag_get_device(space->machine, "oki"),(data & 0x08) ? 0x40000 : 0x00000);
 
-		coin_lockout_w(0,~data & 0x04);
-		coin_lockout_w(1,~data & 0x04);
-		coin_counter_w(0,data & 0x01);
-		coin_counter_w(1,data & 0x02);
+		coin_lockout_w(space->machine, 0,~data & 0x04);
+		coin_lockout_w(space->machine, 1,~data & 0x04);
+		coin_counter_w(space->machine, 0,data & 0x01);
+		coin_counter_w(space->machine, 1,data & 0x02);
 	}
 }
 
@@ -107,10 +107,10 @@ static WRITE16_HANDLER( blocken_coinctrl_w )
 		/* the sound ROM bank is selected by the main CPU! */
 		okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), ((data >> 4) & 3) * 0x40000);
 
-		coin_lockout_w(0,~data & 0x04);
-		coin_lockout_w(1,~data & 0x04);
-		coin_counter_w(0,data & 0x01);
-		coin_counter_w(1,data & 0x02);
+		coin_lockout_w(space->machine, 0,~data & 0x04);
+		coin_lockout_w(space->machine, 1,~data & 0x04);
+		coin_counter_w(space->machine, 0,data & 0x01);
+		coin_counter_w(space->machine, 1,data & 0x02);
 	}
 }
 

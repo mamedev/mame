@@ -326,10 +326,10 @@ static WRITE8_HANDLER( bwidow_misc_w )
 	static int lastdata;
 
 	if (data == lastdata) return;
-	set_led_status(0,~data & 0x10);
-	set_led_status(1,~data & 0x20);
-	coin_counter_w(0, data & 0x01);
-	coin_counter_w(1, data & 0x02);
+	set_led_status(space->machine, 0,~data & 0x10);
+	set_led_status(space->machine, 1,~data & 0x20);
+	coin_counter_w(space->machine, 0, data & 0x01);
+	coin_counter_w(space->machine, 1, data & 0x02);
 	lastdata = data;
 }
 

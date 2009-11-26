@@ -133,7 +133,7 @@ static WRITE8_HANDLER( flyball_misc_w )
 	switch (offset)
 	{
 	case 0:
-		set_led_status(0, bit);
+		set_led_status(space->machine, 0, bit);
 		break;
 	case 1:
 		/* crowd very loud */

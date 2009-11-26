@@ -93,7 +93,7 @@ static PALETTE_INIT( subsino_3proms )
 
 static WRITE8_HANDLER( subsino_out_a_w )
 {
-	coin_counter_w( 0, data & 0x02 );
+	coin_counter_w( space->machine, 0, data & 0x02 );
 //  popmessage("Out A %02x",data);
 }
 static WRITE8_HANDLER( subsino_out_b_w )

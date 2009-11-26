@@ -156,8 +156,8 @@ static WRITE8_HANDLER( ppmast93_port4_w )
 	UINT8 *rom = memory_region(space->machine, "maincpu");
 	int bank;
 
-	coin_counter_w(0, data & 0x08);
-	coin_counter_w(1, data & 0x10);
+	coin_counter_w(space->machine, 0, data & 0x08);
+	coin_counter_w(space->machine, 1, data & 0x10);
 
 	bank = data & 0x07;
 	memory_set_bankptr(space->machine, 1,&rom[0x10000+(bank*0x4000)]);

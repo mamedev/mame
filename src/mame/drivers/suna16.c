@@ -65,11 +65,11 @@ static WRITE16_HANDLER( bssoccer_leds_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		set_led_status(0, data & 0x01);
-		set_led_status(1, data & 0x02);
-		set_led_status(2, data & 0x04);
-		set_led_status(3, data & 0x08);
-		coin_counter_w(0, data & 0x10);
+		set_led_status(space->machine, 0, data & 0x01);
+		set_led_status(space->machine, 1, data & 0x02);
+		set_led_status(space->machine, 2, data & 0x04);
+		set_led_status(space->machine, 3, data & 0x08);
+		coin_counter_w(space->machine, 0, data & 0x10);
 	}
 	if (data & ~0x1f)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(space->cpu), data);
 }
@@ -79,9 +79,9 @@ static WRITE16_HANDLER( uballoon_leds_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0, data & 0x01);
-		set_led_status(0, data & 0x02);
-		set_led_status(1, data & 0x04);
+		coin_counter_w(space->machine, 0, data & 0x01);
+		set_led_status(space->machine, 0, data & 0x02);
+		set_led_status(space->machine, 1, data & 0x04);
 	}
 	if (data & ~0x07)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(space->cpu), data);
 }
@@ -91,7 +91,7 @@ static WRITE16_HANDLER( bestbest_coin_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0, data & 0x04);
+		coin_counter_w(space->machine, 0, data & 0x04);
 	}
 	if (data & ~0x04)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(space->cpu), data);
 }

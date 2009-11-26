@@ -583,14 +583,14 @@ static WRITE8_HANDLER( mastboy_bank_w )
 
 static READ8_HANDLER( mastboy_backupram_r )
 {
-	return generic_nvram[offset];
+	return space->machine->generic.nvram.ptr.u8[offset];
 }
 
 static WRITE8_HANDLER( mastboy_backupram_w )
 {
 //  if (mastboy_backupram_enabled)
 //  {
-		generic_nvram[offset] = data;
+		space->machine->generic.nvram.ptr.u8[offset] = data;
 //  }
 //  else
 //  {
@@ -685,7 +685,7 @@ static ADDRESS_MAP_START( mastboy_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(banked_ram_r,banked_ram_w) // mastboy bank area read / write
 
-	AM_RANGE(0xff000, 0xff7ff) AM_READWRITE(mastboy_backupram_r,mastboy_backupram_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xff000, 0xff7ff) AM_READWRITE(mastboy_backupram_r,mastboy_backupram_w) AM_BASE_SIZE_GENERIC(nvram)
 
 	AM_RANGE(0xff800, 0xff807) AM_READ_PORT("P1")
 	AM_RANGE(0xff808, 0xff80f) AM_READ_PORT("P2")

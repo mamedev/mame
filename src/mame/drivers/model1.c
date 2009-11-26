@@ -888,7 +888,7 @@ static ADDRESS_MAP_START( model1_mem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE(network_ctl_r, network_ctl_w)
 
-	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(snd_latch_to_68k_w)
 	AM_RANGE(0xc40002, 0xc40003) AM_READ(snd_68k_ready_r)
@@ -936,7 +936,7 @@ static ADDRESS_MAP_START( model1_vr_mem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE(network_ctl_r, network_ctl_w)
 
-	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(snd_latch_to_68k_w)
 	AM_RANGE(0xc40002, 0xc40003) AM_READ(snd_68k_ready_r)

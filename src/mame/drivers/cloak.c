@@ -130,12 +130,12 @@ static int cloak_nvram_enabled;
 
 static WRITE8_HANDLER( cloak_led_w )
 {
-	set_led_status(1 - offset, ~data & 0x80);
+	set_led_status(space->machine, 1 - offset, ~data & 0x80);
 }
 
 static WRITE8_HANDLER( cloak_coin_counter_w )
 {
-	coin_counter_w(1 - offset, data & 0x80);
+	coin_counter_w(space->machine, 1 - offset, data & 0x80);
 }
 
 static WRITE8_HANDLER( cloak_custom_w )
@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2200, 0x2200) AM_READ_PORT("P2")
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2600, 0x2600) AM_WRITE(cloak_custom_w)
-	AM_RANGE(0x2800, 0x29ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x2800, 0x29ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x2f00, 0x2fff) AM_NOP
 	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x3200, 0x327f) AM_WRITE(cloak_paletteram_w)

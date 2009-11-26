@@ -276,14 +276,14 @@ static void toaplan0_coin_dsp_w(const address_space *space, int offset, int data
 	if (data > 1)
 		LOG(("%s:Writing %08x to %08x.\n",cpuexec_describe_context(space->machine),data,toaplan_port_type[toaplan_main_cpu] - offset));
 	switch (data) {
-		case 0x08: coin_counter_w(0,0); break;
-		case 0x09: coin_counter_w(0,1); break;
-		case 0x0a: coin_counter_w(1,0); break;
-		case 0x0b: coin_counter_w(1,1); break;
-		case 0x0c: coin_lockout_w(0,1); break;
-		case 0x0d: coin_lockout_w(0,0); break;
-		case 0x0e: coin_lockout_w(1,1); break;
-		case 0x0f: coin_lockout_w(1,0); break;
+		case 0x08: coin_counter_w(space->machine, 0,0); break;
+		case 0x09: coin_counter_w(space->machine, 0,1); break;
+		case 0x0a: coin_counter_w(space->machine, 1,0); break;
+		case 0x0b: coin_counter_w(space->machine, 1,1); break;
+		case 0x0c: coin_lockout_w(space->machine, 0,1); break;
+		case 0x0d: coin_lockout_w(space->machine, 0,0); break;
+		case 0x0e: coin_lockout_w(space->machine, 1,1); break;
+		case 0x0f: coin_lockout_w(space->machine, 1,0); break;
 		/****** The following apply to Flying Shark/Wardner only ******/
 		case 0x00:	/* This means assert the INT line to the DSP */
 					LOG(("Turning DSP on and main CPU off\n"));

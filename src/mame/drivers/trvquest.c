@@ -49,7 +49,7 @@ static READ8_HANDLER( trvquest_question_r )
 
 static WRITE8_DEVICE_HANDLER( trvquest_coin_w )
 {
-	coin_counter_w(0,~data & 1);
+	coin_counter_w(device->machine, 0,~data & 1);
 }
 
 static WRITE8_DEVICE_HANDLER( trvquest_misc_w )
@@ -58,7 +58,7 @@ static WRITE8_DEVICE_HANDLER( trvquest_misc_w )
 }
 
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) // cmos ram
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // cmos ram
 	AM_RANGE(0x2000, 0x27ff) AM_RAM // main ram
 	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE("via6522_1", via_r, via_w)
 	AM_RANGE(0x3810, 0x381f) AM_DEVREADWRITE("via6522_2", via_r, via_w)

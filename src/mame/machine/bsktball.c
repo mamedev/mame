@@ -162,10 +162,10 @@ READ8_HANDLER( bsktball_in0_r )
 ***************************************************************************/
 WRITE8_HANDLER( bsktball_led1_w )
 {
-	set_led_status(0, offset & 0x01);
+	set_led_status(space->machine, 0, offset & 0x01);
 }
 
 WRITE8_HANDLER( bsktball_led2_w )
 {
-	set_led_status(1, offset & 0x01);
+	set_led_status(space->machine, 1, offset & 0x01);
 }

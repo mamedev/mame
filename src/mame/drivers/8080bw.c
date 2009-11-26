@@ -1614,7 +1614,7 @@ MACHINE_DRIVER_END
 
 static WRITE8_HANDLER( steelwkr_sh_port_3_w )
 {
-	coin_lockout_global_w(!(~data & 0x03));		/* possibly */
+	coin_lockout_global_w(space->machine, !(~data & 0x03));		/* possibly */
 }
 
 static ADDRESS_MAP_START( steelwkr_io_map, ADDRESS_SPACE_IO, 8 )

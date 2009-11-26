@@ -167,9 +167,9 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 
 		/* bit 1 is clear during service mode - function unknown */
 
-		set_led_status(0, data & 0x08);
-		coin_counter_w(0, data & 0x10);
-		coin_counter_w(1, data & 0x20);
+		set_led_status(space->machine, 0, data & 0x08);
+		coin_counter_w(space->machine, 0, data & 0x10);
+		coin_counter_w(space->machine, 1, data & 0x20);
 
 //logerror("%06x: write %04x to cpuA_ctrl_w\n",cpu_get_pc(space->cpu),data);
 	}

@@ -783,7 +783,7 @@ static WRITE16_HANDLER( lhb2_magic_w )
 
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(0,	data & 0x20);
+				coin_counter_w(space->machine, 0,	data & 0x20);
 				//  coin out        data & 0x40
 				igs_hopper		=	data & 0x80;
 			}
@@ -874,7 +874,7 @@ static WRITE16_HANDLER( drgnwrld_magic_w )
 
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
-				coin_counter_w(0,data & 2);
+				coin_counter_w(space->machine, 0,data & 2);
 
 			if (data & ~0x2)
 				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(space->cpu), data);
@@ -938,7 +938,7 @@ static WRITE16_HANDLER( wlcc_magic_w )
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(0,	data & 0x01);
+				coin_counter_w(space->machine, 0,	data & 0x01);
 				//  coin out        data & 0x02
 
 				okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), (data & 0x10) ? 0x40000 : 0);
@@ -1012,7 +1012,7 @@ static WRITE16_HANDLER( lhb_inputs_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0,	data & 0x20	);
+		coin_counter_w(space->machine, 0,	data & 0x20	);
 		//  coin out        data & 0x40
 		igs_hopper		=	data & 0x80;
 	}
@@ -1056,8 +1056,8 @@ static WRITE16_HANDLER( vbowl_magic_w )
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(0,data & 1);
-				coin_counter_w(1,data & 2);
+				coin_counter_w(space->machine, 0,data & 1);
+				coin_counter_w(space->machine, 1,data & 2);
 			}
 
 			if (data & ~0x3)
@@ -1123,7 +1123,7 @@ static WRITE16_HANDLER( xymg_magic_w )
 
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(0,	data & 0x20);
+				coin_counter_w(space->machine, 0,	data & 0x20);
 				//  coin out        data & 0x40
 			}
 
@@ -1192,7 +1192,7 @@ static READ16_HANDLER( xymg_magic_r )
 
 static ADDRESS_MAP_START( drgnwrld, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
-	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
+	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE( &paletteram16 )
 	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT( "COIN" )
@@ -1217,7 +1217,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lhb2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
-	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
+	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE( 0x200000, 0x200001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
 	AM_RANGE( 0x204000, 0x204003 ) AM_DEVWRITE8( "ymsnd", ym2413_w, 0x00ff )
 	AM_RANGE( 0x208000, 0x208003 ) AM_WRITE( lhb2_magic_w )
@@ -1243,7 +1243,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wlcc, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
-	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
+	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE( &paletteram16 )
@@ -1276,7 +1276,7 @@ static WRITE16_HANDLER( lhb_irq_enable_w )
 static ADDRESS_MAP_START( lhb, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x010000, 0x010001 ) AM_DEVWRITE( "oki", lhb_okibank_w )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
-	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
+	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE( &paletteram16 )
@@ -1357,7 +1357,7 @@ static WRITE16_HANDLER( vbowl_link_3_w )	{ }
 
 static ADDRESS_MAP_START( vbowl, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
-	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
+	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE( &igs011_priority_ram )
 	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE( igs011_layers_r, igs011_layers_w )
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE( igs011_palette ) AM_BASE( &paletteram16 )
@@ -1415,7 +1415,7 @@ static ADDRESS_MAP_START( xymg, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x85b800, 0x85b801 ) AM_WRITE( igs011_blit_pen_w )
 	AM_RANGE( 0x85c000, 0x85c001 ) AM_WRITE( igs011_blit_depth_w )
 	AM_RANGE( 0x888000, 0x888001 ) AM_READ( igs_3_dips_r )
-	AM_RANGE( 0x1f0000, 0x1f3fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size ) // extra ram
+	AM_RANGE( 0x1f0000, 0x1f3fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram ) // extra ram
 ADDRESS_MAP_END
 
 

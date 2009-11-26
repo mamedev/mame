@@ -454,7 +454,7 @@ static CUSTOM_INPUT( razmataz_dial_r )
 
 static WRITE8_HANDLER( zaxxon_coin_counter_w )
 {
-	coin_counter_w(offset, data & 0x01);
+	coin_counter_w(space->machine, offset, data & 0x01);
 }
 
 

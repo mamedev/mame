@@ -290,8 +290,8 @@ static WRITE8_HANDLER( jsa1_io_w )
 			}
 
 			/* coin counters */
-			coin_counter_w(1, (data >> 5) & 1);
-			coin_counter_w(0, (data >> 4) & 1);
+			coin_counter_w(space->machine, 1, (data >> 5) & 1);
+			coin_counter_w(space->machine, 0, (data >> 4) & 1);
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
@@ -412,8 +412,8 @@ static WRITE8_HANDLER( jsa2_io_w )
 			last_ctl = data;
 
 			/* coin counters */
-			coin_counter_w(1, (data >> 5) & 1);
-			coin_counter_w(0, (data >> 4) & 1);
+			coin_counter_w(space->machine, 1, (data >> 5) & 1);
+			coin_counter_w(space->machine, 0, (data >> 4) & 1);
 
 			/* update the OKI frequency */
 			if (oki6295 != NULL)
@@ -538,8 +538,8 @@ static WRITE8_HANDLER( jsa3_io_w )
 			last_ctl = data;
 
 			/* coin counters */
-			coin_counter_w(1, (data >> 5) & 1);
-			coin_counter_w(0, (data >> 4) & 1);
+			coin_counter_w(space->machine, 1, (data >> 5) & 1);
+			coin_counter_w(space->machine, 0, (data >> 4) & 1);
 
 			/* update the OKI frequency */
 			if (oki6295 != NULL) okim6295_set_pin7(oki6295, data & 8);
@@ -668,8 +668,8 @@ static WRITE8_HANDLER( jsa3s_io_w )
 			last_ctl = data;
 
 			/* coin counters */
-			coin_counter_w(1, (data >> 5) & 1);
-			coin_counter_w(0, (data >> 4) & 1);
+			coin_counter_w(space->machine, 1, (data >> 5) & 1);
+			coin_counter_w(space->machine, 0, (data >> 4) & 1);
 
 			/* update the OKI frequency */
 			okim6295_set_pin7(oki6295_l, data & 8);

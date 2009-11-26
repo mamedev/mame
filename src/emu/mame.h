@@ -140,6 +140,31 @@ typedef struct _ui_input_private ui_input_private;
 typedef struct _cheat_private cheat_private;
 typedef struct _debugcpu_private debugcpu_private;
 typedef struct _debugvw_private debugvw_private;
+typedef struct _generic_machine_private generic_machine_private;
+
+
+/* structure to hold a pointer/size pair for generic pointers */
+typedef struct _generic_ptr generic_ptr;
+struct _generic_ptr
+{
+	union
+	{
+		void *		v;
+		UINT8 *		u8;
+		UINT16 *	u16;
+		UINT32 *	u32;
+		UINT64 *	u64;
+	} ptr;
+	size_t			size;
+};
+
+
+/* this structure holds generic pointers that are commonly used */
+typedef struct _generic_pointers generic_pointers;
+struct _generic_pointers
+{
+	generic_ptr				nvram;				/* generic NVRAM */
+};
 
 
 /* description of the currently-running machine */
@@ -173,6 +198,9 @@ struct _running_machine
 
 	/* debugger-related information */
 	UINT32					debug_flags;		/* the current debug flags */
+	
+	/* generic pointers */
+	generic_pointers		generic;			/* generic pointers */
 
 	/* internal core information */
 	mame_private *			mame_data;			/* internal data from mame.c */
@@ -192,6 +220,7 @@ struct _running_machine
 	cheat_private *			cheat_data;			/* internal data from cheat.c */
 	debugcpu_private *		debugcpu_data;		/* internal data from debugcpu.c */
 	debugvw_private *		debugvw_data;		/* internal data from debugvw.c */
+	generic_machine_private *generic_machine_data; /* internal data from machine/generic.c */
 #ifdef MESS
 	images_private *		images_data;		/* internal data from image.c */
 	ui_mess_private *		ui_mess_data;		/* internal data from uimess.c */

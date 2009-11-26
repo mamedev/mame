@@ -36,7 +36,7 @@ WRITE8_HANDLER( atarifb4_out1_w )
 	discrete_sound_w(discrete, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
 	discrete_sound_w(discrete, ATARIFB_NOISE_EN, data & 0x04);			// Noise Enable / Kicker
 
-	coin_counter_w(1, data & 0x80);
+	coin_counter_w(space->machine, 1, data & 0x80);
 }
 
 
@@ -87,8 +87,8 @@ WRITE8_HANDLER( soccer_out1_w )
 	discrete_sound_w(discrete, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
 	discrete_sound_w(discrete, ATARIFB_NOISE_EN, data & 0x04);			// Noise Enable / Kicker
 
-//  set_led_status(0, data & 0x10);  // !!!!!!!!!! Is this correct????
-	set_led_status(1, data & 0x80);
+//  set_led_status(space->machine, 0, data & 0x10);  // !!!!!!!!!! Is this correct????
+	set_led_status(space->machine, 1, data & 0x80);
 }
 
 
@@ -98,7 +98,7 @@ WRITE8_HANDLER( atarifb_out2_w )
 
 	discrete_sound_w(discrete, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
 
-	coin_counter_w (0, data & 0x10);
+	coin_counter_w (space->machine, 0, data & 0x10);
 }
 
 
@@ -108,9 +108,9 @@ WRITE8_HANDLER( soccer_out2_w )
 
 	discrete_sound_w(discrete, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
 
-	coin_counter_w (0, data & 0x10);
-	coin_counter_w (1, data & 0x20);
-	coin_counter_w (2, data & 0x40);
+	coin_counter_w (space->machine, 0, data & 0x10);
+	coin_counter_w (space->machine, 1, data & 0x20);
+	coin_counter_w (space->machine, 2, data & 0x40);
 }
 
 

@@ -42,8 +42,8 @@ static WRITE8_HANDLER( ajax_bankswitch_w )
 	if (!(data & 0x80))	bankaddress += 0x8000;
 
 	/* coin counters */
-	coin_counter_w(0,data & 0x20);
-	coin_counter_w(1,data & 0x40);
+	coin_counter_w(space->machine, 0,data & 0x20);
+	coin_counter_w(space->machine, 1,data & 0x40);
 
 	/* priority */
 	ajax_priority = data & 0x08;
@@ -79,14 +79,14 @@ static WRITE8_HANDLER( ajax_bankswitch_w )
 
 static WRITE8_HANDLER( ajax_lamps_w )
 {
-	set_led_status(1,data & 0x02);	/* super weapon lamp */
-	set_led_status(2,data & 0x04);	/* power up lamps */
-	set_led_status(5,data & 0x04);	/* power up lamps */
-	set_led_status(0,data & 0x20);	/* start lamp */
-	set_led_status(3,data & 0x40);	/* game over lamps */
-	set_led_status(6,data & 0x40);	/* game over lamps */
-	set_led_status(4,data & 0x80);	/* game over lamps */
-	set_led_status(7,data & 0x80);	/* game over lamps */
+	set_led_status(space->machine, 1,data & 0x02);	/* super weapon lamp */
+	set_led_status(space->machine, 2,data & 0x04);	/* power up lamps */
+	set_led_status(space->machine, 5,data & 0x04);	/* power up lamps */
+	set_led_status(space->machine, 0,data & 0x20);	/* start lamp */
+	set_led_status(space->machine, 3,data & 0x40);	/* game over lamps */
+	set_led_status(space->machine, 6,data & 0x40);	/* game over lamps */
+	set_led_status(space->machine, 4,data & 0x80);	/* game over lamps */
+	set_led_status(space->machine, 7,data & 0x80);	/* game over lamps */
 }
 
 /*  ajax_ls138_f10:

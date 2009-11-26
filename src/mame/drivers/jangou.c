@@ -234,9 +234,9 @@ static WRITE8_HANDLER( output_w )
     ---- ---x coin counter
     */
 //  printf("%02x\n",data);
-	coin_counter_w(0,data & 0x01);
+	coin_counter_w(space->machine, 0,data & 0x01);
 //  flip_screen_set(data & 0x04);
-//  coin_lockout_w(0,~data & 0x20);
+//  coin_lockout_w(space->machine, 0,~data & 0x20);
 }
 
 static READ8_DEVICE_HANDLER( input_mux_r )

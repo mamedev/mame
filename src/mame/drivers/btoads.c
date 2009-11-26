@@ -199,7 +199,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x20000380, 0x200003ff) AM_READWRITE(main_sound_r, main_sound_w)
 	AM_RANGE(0x20000400, 0x2000047f) AM_WRITE(btoads_misc_control_w)
 	AM_RANGE(0x40000000, 0x4000000f) AM_WRITENOP	/* watchdog? */
-	AM_RANGE(0x60000000, 0x6003ffff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x60000000, 0x6003ffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xa0000000, 0xa03fffff) AM_READWRITE(btoads_vram_fg_display_r, btoads_vram_fg_display_w) AM_BASE(&btoads_vram_fg0)
 	AM_RANGE(0xa4000000, 0xa43fffff) AM_READWRITE(btoads_vram_fg_draw_r, btoads_vram_fg_draw_w) AM_BASE(&btoads_vram_fg1)
 	AM_RANGE(0xa8000000, 0xa87fffff) AM_RAM AM_BASE(&btoads_vram_fg_data)

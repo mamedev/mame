@@ -95,7 +95,7 @@ static ADDRESS_MAP_START( chsuper_prg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x0efff) AM_ROM
 	AM_RANGE(0x00000, 0x01fff) AM_WRITE( chsuper_vram_w )
 	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_REGION("maincpu", 0xf000)
-	AM_RANGE(0xfb000, 0xfbfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xfb000, 0xfbfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 ADDRESS_MAP_END
 
 //  AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_w)

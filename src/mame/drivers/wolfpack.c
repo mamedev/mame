@@ -113,13 +113,13 @@ static WRITE8_DEVICE_HANDLER( wolfpack_start_speech_w )
 
 static WRITE8_HANDLER( wolfpack_attract_w )
 {
-	coin_lockout_global_w(!(data & 1));
+	coin_lockout_global_w(space->machine, !(data & 1));
 }
 
 
 static WRITE8_HANDLER( wolfpack_credit_w )
 {
-	set_led_status(0, !(data & 1));
+	set_led_status(space->machine, 0, !(data & 1));
 }
 
 

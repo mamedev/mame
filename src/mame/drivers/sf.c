@@ -36,11 +36,11 @@ static WRITE16_HANDLER( sf_coin_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0,data & 0x01);
-		coin_counter_w(1,data & 0x02);
-		coin_lockout_w(0,~data & 0x10);
-		coin_lockout_w(1,~data & 0x20);
-		coin_lockout_w(2,~data & 0x40);	/* is there a third coin input? */
+		coin_counter_w(space->machine, 0,data & 0x01);
+		coin_counter_w(space->machine, 1,data & 0x02);
+		coin_lockout_w(space->machine, 0,~data & 0x10);
+		coin_lockout_w(space->machine, 1,~data & 0x20);
+		coin_lockout_w(space->machine, 2,~data & 0x40);	/* is there a third coin input? */
 	}
 }
 

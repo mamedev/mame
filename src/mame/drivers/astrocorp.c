@@ -128,18 +128,18 @@ static WRITE16_HANDLER( astrocorp_outputs_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0,	(data & 0x0004));	// coin counter
-		set_led_status(0,	(data & 0x0008));	// you win
-		if ((data & 0x0010))	dispensed_tickets++;	// coin out
-		set_led_status(1,	(data & 0x0020));	// coin/hopper jam
+		coin_counter_w(space->machine, 0,	(data & 0x0004));	// coin counter
+		set_led_status(space->machine, 0,	(data & 0x0008));	// you win
+		if ((data & 0x0010)) increment_dispensed_tickets(space->machine, 1); // coin out
+		set_led_status(space->machine, 1,	(data & 0x0020));	// coin/hopper jam
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(2,	(data & 0x0100));	// bet
-		set_led_status(3,	(data & 0x0800));	// start
-		set_led_status(4,	(data & 0x1000));	// ? select/choose
-		set_led_status(5,	(data & 0x2000));	// ? select/choose
-		set_led_status(6,	(data & 0x4000));	// look
+		set_led_status(space->machine, 2,	(data & 0x0100));	// bet
+		set_led_status(space->machine, 3,	(data & 0x0800));	// start
+		set_led_status(space->machine, 4,	(data & 0x1000));	// ? select/choose
+		set_led_status(space->machine, 5,	(data & 0x2000));	// ? select/choose
+		set_led_status(space->machine, 6,	(data & 0x4000));	// look
 	}
 //  popmessage("%04X",data);
 }

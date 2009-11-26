@@ -282,23 +282,23 @@ WRITE8_HANDLER( mhavoc_out_0_w )
 	}
 
 	/* Bit 0 = Roller light (Blinks on fatal errors) */
-	set_led_status(0, data & 0x01);
+	set_led_status(space->machine, 0, data & 0x01);
 }
 
 
 WRITE8_HANDLER( alphaone_out_0_w )
 {
 	/* Bit 5 = P2 lamp */
-	set_led_status(0, ~data & 0x20);
+	set_led_status(space->machine, 0, ~data & 0x20);
 
 	/* Bit 4 = P1 lamp */
-	set_led_status(1, ~data & 0x10);
+	set_led_status(space->machine, 1, ~data & 0x10);
 
 	/* Bit 1 = right coin counter */
-	coin_counter_w(1, data & 0x02);
+	coin_counter_w(space->machine, 1, data & 0x02);
 
 	/* Bit 0 = left coin counter */
-	coin_counter_w(0, data & 0x01);
+	coin_counter_w(space->machine, 0, data & 0x01);
 
 logerror("alphaone_out_0_w(%02X)\n", data);
 }
@@ -307,10 +307,10 @@ logerror("alphaone_out_0_w(%02X)\n", data);
 WRITE8_HANDLER( mhavoc_out_1_w )
 {
 	/* Bit 1 = left coin counter */
-	coin_counter_w(0, data & 0x02);
+	coin_counter_w(space->machine, 0, data & 0x02);
 
 	/* Bit 0 = right coin counter */
-	coin_counter_w(1, data & 0x01);
+	coin_counter_w(space->machine, 1, data & 0x01);
 }
 
 /*************************************

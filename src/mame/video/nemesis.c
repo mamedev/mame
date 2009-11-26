@@ -157,8 +157,8 @@ WRITE16_HANDLER( salamand_control_port_word_w )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_lockout_w(0, data & 0x0200);
-		coin_lockout_w(1, data & 0x0400);
+		coin_lockout_w(space->machine, 0, data & 0x0200);
+		coin_lockout_w(space->machine, 1, data & 0x0400);
 
 		if (data & 0x0800)
 			cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);

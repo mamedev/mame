@@ -138,7 +138,7 @@ static WRITE16_HANDLER( bit_controls_w )
 					break;
 
 				case 8:
-					set_led_status(0, data & 1);
+					set_led_status(space->machine, 0, data & 1);
 					break;
 			}
 		}
@@ -221,7 +221,7 @@ static READ16_HANDLER( analogy_watchdog_r )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_BASE(&vram_bg)
 	AM_RANGE(0x02000000, 0x020fffff) AM_RAM AM_BASE(&vram_fg)
 	AM_RANGE(0x03000000, 0x030000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)

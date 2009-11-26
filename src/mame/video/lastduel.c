@@ -130,10 +130,10 @@ WRITE16_HANDLER( lastduel_flip_w )
 	{
 		flip_screen_set(space->machine, data & 0x01);
 
-		coin_lockout_w(0,~data & 0x10);
-		coin_lockout_w(1,~data & 0x20);
-		coin_counter_w(0,data & 0x40);
-		coin_counter_w(1,data & 0x80);
+		coin_lockout_w(space->machine, 0,~data & 0x10);
+		coin_lockout_w(space->machine, 1,~data & 0x20);
+		coin_counter_w(space->machine, 0,data & 0x40);
+		coin_counter_w(space->machine, 1,data & 0x80);
 	}
 }
 

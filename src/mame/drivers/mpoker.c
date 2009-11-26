@@ -395,7 +395,7 @@ static WRITE8_HANDLER( outport5_w )
 
 static WRITE8_HANDLER( outport6_w )
 {
-	coin_counter_w(1, data & 0x02);	/* Payout pulse */
+	coin_counter_w(space->machine, 1, data & 0x02);	/* Payout pulse */
 
 	output[6] = data;
 	popmessage("outport6 : %02X %02X %02X %02X %02X %02X %02X %02X", output[0], output[1], output[2], output[3], output[4], output[5], output[6], output[7]);
@@ -415,7 +415,7 @@ static WRITE8_HANDLER( outport6_w )
 
 static WRITE8_HANDLER( outport7_w )
 {
-	coin_counter_w(0, data & 0x02);	/* Coin pulse */
+	coin_counter_w(space->machine, 0, data & 0x02);	/* Coin pulse */
 
 	output[7] = data;
 	popmessage("outport7 : %02X %02X %02X %02X %02X %02X %02X %02X", output[0], output[1], output[2], output[3], output[4], output[5], output[6], output[7]);
@@ -453,7 +453,7 @@ static WRITE8_HANDLER( outport7_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 //  AM_RANGE(0x0158, 0x0158) AM_WRITE (muxed_w)
-	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* NVRAM = 2x SCM5101E */
+	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* NVRAM = 2x SCM5101E */
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&mpoker_video)	/* 4x MM2114N-3 */
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("SW1")
 	AM_RANGE(0x8001, 0x8001) AM_READ (mixport_r) /* DIP switch bank 2 + a sort of watchdog */

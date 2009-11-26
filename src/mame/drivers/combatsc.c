@@ -155,8 +155,8 @@ static WRITE8_HANDLER( combasc_coin_counter_w )
 	/* b1: coin counter 2 */
 	/* b0: coin counter 1 */
 
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+	coin_counter_w(space->machine, 0,data & 0x01);
+	coin_counter_w(space->machine, 1,data & 0x02);
 }
 
 static READ8_HANDLER( trackball_r )

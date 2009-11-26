@@ -152,8 +152,8 @@ WRITE8_HANDLER( cop01_vreg_w )
 
 	if (offset == 0)
 	{
-		coin_counter_w(0, data & 1);
-		coin_counter_w(1, data & 2);
+		coin_counter_w(space->machine, 0, data & 1);
+		coin_counter_w(space->machine, 1, data & 2);
 		flip_screen_set(space->machine, data & 4);
 	}
 }

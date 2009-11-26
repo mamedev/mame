@@ -331,8 +331,8 @@ static WRITE8_HANDLER( scontra_bankswitch_w )
 	palette_selected = ~data & 0x10;
 
 	/* bits 5/6 coin counters */
-	coin_counter_w(0,data & 0x20);
-	coin_counter_w(1,data & 0x40);
+	coin_counter_w(space->machine, 0,data & 0x20);
+	coin_counter_w(space->machine, 1,data & 0x40);
 
 	/* bit 7 controls layer priority */
 	scontra_priority = data & 0x80;
@@ -347,8 +347,8 @@ static WRITE8_HANDLER( thunderx_videobank_w )
 	rambank = data;
 
 	/* bits 1/2 coin counters */
-	coin_counter_w(0,data & 0x02);
-	coin_counter_w(1,data & 0x04);
+	coin_counter_w(space->machine, 0,data & 0x02);
+	coin_counter_w(space->machine, 1,data & 0x04);
 
 	/* bit 3 controls layer priority (seems to be always 1) */
 	scontra_priority = data & 0x08;

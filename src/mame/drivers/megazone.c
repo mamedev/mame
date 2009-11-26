@@ -86,7 +86,7 @@ static WRITE8_HANDLER( i8039_irqen_and_status_w )
 
 static WRITE8_HANDLER( megazone_coin_counter_w )
 {
-	coin_counter_w(1-offset,data);		/* 1-offset, because coin counters are in reversed order */
+	coin_counter_w(space->machine, 1-offset,data);		/* 1-offset, because coin counters are in reversed order */
 }
 
 

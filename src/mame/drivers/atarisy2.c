@@ -704,8 +704,8 @@ static WRITE8_HANDLER( tms5220_strobe_w )
 
 static WRITE8_HANDLER( coincount_w )
 {
-	coin_counter_w(0, (data >> 0) & 1);
-	coin_counter_w(1, (data >> 1) & 1);
+	coin_counter_w(space->machine, 0, (data >> 0) & 1);
+	coin_counter_w(space->machine, 1, (data >> 1) & 1);
 }
 
 

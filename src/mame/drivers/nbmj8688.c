@@ -324,8 +324,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( barline_output_w )
 {
-	coin_lockout_w(0,~data & 0x80);
-	coin_counter_w(0,data & 0x02);
+	coin_lockout_w(space->machine, 0,~data & 0x80);
+	coin_counter_w(space->machine, 0,data & 0x02);
 }
 
 static ADDRESS_MAP_START( barline_io_map, ADDRESS_SPACE_IO, 8 )

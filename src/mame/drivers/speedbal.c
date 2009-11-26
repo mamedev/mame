@@ -66,8 +66,8 @@ WRITE8_HANDLER( speedbal_background_videoram_w );
 
 static WRITE8_HANDLER( speedbal_coincounter_w )
 {
-	coin_counter_w(0, data & 0x80);
-	coin_counter_w(1, data & 0x40);
+	coin_counter_w(space->machine, 0, data & 0x80);
+	coin_counter_w(space->machine, 1, data & 0x40);
 	flip_screen_set(space->machine, data & 8); // also changes data & 0x10 at the same time too (flipx and flipy?)
 	/* unknown: (data & 0x10) and (data & 4) */
 }
@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(speedbal_background_videoram_w) AM_BASE(&speedbal_background_videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(speedbal_foreground_videoram_w) AM_BASE(&speedbal_foreground_videoram)
 	AM_RANGE(0xf000, 0xf5ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
-	AM_RANGE(0xf600, 0xfeff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xf600, 0xfeff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xff00, 0xffff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 ADDRESS_MAP_END
 

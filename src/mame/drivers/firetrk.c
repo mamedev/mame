@@ -83,24 +83,24 @@ static WRITE8_HANDLER( firetrk_output_w )
 	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 
 	/* BIT0 => START1 LAMP */
-	set_led_status(0, !(data & 0x01));
+	set_led_status(space->machine, 0, !(data & 0x01));
 
 	/* BIT1 => START2 LAMP */
-	set_led_status(1, !(data & 0x02));
+	set_led_status(space->machine, 1, !(data & 0x02));
 
 	/* BIT2 => FLASH       */
 	firetrk_flash = data & 0x04;
 
 	/* BIT3 => TRACK LAMP  */
-	set_led_status(3, !(data & 0x08));
+	set_led_status(space->machine, 3, !(data & 0x08));
 
 	/* BIT4 => ATTRACT     */
 	discrete_sound_w(discrete, FIRETRUCK_ATTRACT_EN, data & 0x10);
-	coin_lockout_w(0, !(data & 0x10));
-	coin_lockout_w(1, !(data & 0x10));
+	coin_lockout_w(space->machine, 0, !(data & 0x10));
+	coin_lockout_w(space->machine, 1, !(data & 0x10));
 
 	/* BIT5 => START3 LAMP */
-	set_led_status(2, !(data & 0x20));
+	set_led_status(space->machine, 2, !(data & 0x20));
 
 	/* BIT6 => UNUSED      */
 
@@ -114,18 +114,18 @@ static WRITE8_HANDLER( superbug_output_w )
 	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 
 	/* BIT0 => START LAMP */
-	set_led_status(0, offset & 0x01);
+	set_led_status(space->machine, 0, offset & 0x01);
 
 	/* BIT1 => ATTRACT    */
 	discrete_sound_w(discrete, SUPERBUG_ATTRACT_EN, offset & 0x02);
-	coin_lockout_w(0, !(offset & 0x02));
-	coin_lockout_w(1, !(offset & 0x02));
+	coin_lockout_w(space->machine, 0, !(offset & 0x02));
+	coin_lockout_w(space->machine, 1, !(offset & 0x02));
 
 	/* BIT2 => FLASH      */
 	firetrk_flash = offset & 0x04;
 
 	/* BIT3 => TRACK LAMP */
-	set_led_status(1, offset & 0x08);
+	set_led_status(space->machine, 1, offset & 0x08);
 }
 
 
@@ -134,10 +134,10 @@ static WRITE8_HANDLER( montecar_output_1_w )
 	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 
 	/* BIT0 => START LAMP    */
-	set_led_status(0, !(data & 0x01));
+	set_led_status(space->machine, 0, !(data & 0x01));
 
 	/* BIT1 => TRACK LAMP    */
-	set_led_status(1, !(data & 0x02));
+	set_led_status(space->machine, 1, !(data & 0x02));
 
 	/* BIT2 => ATTRACT       */
 	discrete_sound_w(discrete, MONTECAR_ATTRACT_INV, data & 0x04);
@@ -146,13 +146,13 @@ static WRITE8_HANDLER( montecar_output_1_w )
 	/* BIT4 => UNUSED        */
 
 	/* BIT5 => COIN3 COUNTER */
-	coin_counter_w(0, data & 0x80);
+	coin_counter_w(space->machine, 0, data & 0x80);
 
 	/* BIT6 => COIN2 COUNTER */
-	coin_counter_w(1, data & 0x40);
+	coin_counter_w(space->machine, 1, data & 0x40);
 
 	/* BIT7 => COIN1 COUNTER */
-	coin_counter_w(2, data & 0x20);
+	coin_counter_w(space->machine, 2, data & 0x20);
 }
 
 

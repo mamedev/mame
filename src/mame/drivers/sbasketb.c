@@ -68,7 +68,7 @@ static WRITE8_HANDLER( sbasketb_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( sbasketb_coin_counter_w )
 {
-	coin_counter_w(offset,data);
+	coin_counter_w(space->machine, offset,data);
 }
 
 

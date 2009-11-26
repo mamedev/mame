@@ -114,8 +114,8 @@ WRITE8_HANDLER( ironhors_palettebank_w )
 		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
-	coin_counter_w(0, data & 0x10);
-	coin_counter_w(1, data & 0x20);
+	coin_counter_w(space->machine, 0, data & 0x10);
+	coin_counter_w(space->machine, 1, data & 0x20);
 
 	/* bit 6 unknown - set after game over */
 

@@ -316,9 +316,9 @@ static WRITE8_HANDLER( powerdrv_op5_w )
 	/* bit 3 -> J1-10 = lamp 1 */
 	/* bit 2 -> J1-8 = lamp 2 */
 	/* bit 1 -> J1-6 = lamp 3 */
-	set_led_status(0, (data >> 3) & 1);
-	set_led_status(1, (data >> 2) & 1);
-	set_led_status(2, (data >> 1) & 1);
+	set_led_status(space->machine, 0, (data >> 3) & 1);
+	set_led_status(space->machine, 1, (data >> 2) & 1);
+	set_led_status(space->machine, 2, (data >> 1) & 1);
 
 	/* remaining bits go to standard connections */
 	mcrmono_control_port_w(space, offset, data);
@@ -359,9 +359,9 @@ static WRITE8_HANDLER( stargrds_op5_w )
 	/* bit 2 controls light #0 */
 	/* bit 3 controls light #1 */
 	/* bit 4 controls light #2 */
-	set_led_status(0, (data >> 2) & 1);
-	set_led_status(1, (data >> 3) & 1);
-	set_led_status(2, (data >> 4) & 1);
+	set_led_status(space->machine, 0, (data >> 2) & 1);
+	set_led_status(space->machine, 1, (data >> 3) & 1);
+	set_led_status(space->machine, 2, (data >> 4) & 1);
 
 	/* remaining bits go to standard connections */
 	mcrmono_control_port_w(space, offset, data);
@@ -477,7 +477,7 @@ static READ8_HANDLER( turbotag_kludge_r )
 static ADDRESS_MAP_START( mcrmono_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xea00, 0xebff) AM_RAM
 	AM_RANGE(0xec00, 0xec7f) AM_MIRROR(0x0380) AM_WRITE(mcr3_paletteram_w) AM_BASE(&paletteram)
@@ -513,7 +513,7 @@ static ADDRESS_MAP_START( spyhunt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_RAM_WRITE(spyhunt_alpharam_w) AM_BASE(&spyhunt_alpharam)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xfa00, 0xfa7f) AM_MIRROR(0x0180) AM_WRITE(mcr3_paletteram_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END

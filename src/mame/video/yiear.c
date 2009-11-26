@@ -87,8 +87,8 @@ WRITE8_HANDLER( yiear_control_w )
 
 	/* bits 3 and 4 are coin counters */
 
-	coin_counter_w(0, data & 0x08);
-	coin_counter_w(1, data & 0x10);
+	coin_counter_w(space->machine, 0, data & 0x08);
+	coin_counter_w(space->machine, 1, data & 0x10);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

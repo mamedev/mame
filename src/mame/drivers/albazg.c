@@ -203,9 +203,9 @@ static WRITE8_DEVICE_HANDLER( mux_w )
 
 static WRITE8_DEVICE_HANDLER( yumefuda_output_w )
 {
-	coin_counter_w(0, ~data & 4);
-	coin_counter_w(1, ~data & 2);
-	coin_lockout_global_w(data & 1);
+	coin_counter_w(device->machine, 0, ~data & 4);
+	coin_counter_w(device->machine, 1, ~data & 2);
+	coin_lockout_global_w(device->machine, data & 1);
 	//data & 0x10 hopper-c (active LOW)
 	//data & 0x08 divider (active HIGH)
 	flip_screen_set(device->machine, ~data & 0x20);

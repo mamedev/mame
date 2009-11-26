@@ -159,7 +159,7 @@ static PALETTE_INIT( mjderngr )
 static WRITE8_HANDLER( royalmah_palbank_w )
 {
 	/* bit 1 = coin counter */
-	coin_counter_w(0,data & 2);
+	coin_counter_w(space->machine, 0,data & 2);
 
 	/* bit 2 always set? */
 
@@ -171,7 +171,7 @@ static WRITE8_HANDLER( royalmah_palbank_w )
 static WRITE8_HANDLER( mjderngr_coin_w )
 {
 	/* bit 1 = coin counter */
-	coin_counter_w(0,data & 2);
+	coin_counter_w(space->machine, 0,data & 2);
 
 	/* bit 2 always set? */
 }
@@ -316,8 +316,8 @@ static WRITE8_HANDLER( mjapinky_palbank_w )
 {
 	flip_screen_set(space->machine, ~data & 4);
 	palette_base = (data >> 3) & 0x01;
-	coin_counter_w(0,data & 2);	// in
-	coin_counter_w(1,data & 1);	// out
+	coin_counter_w(space->machine, 0,data & 2);	// in
+	coin_counter_w(space->machine, 1,data & 1);	// out
 }
 
 static READ8_HANDLER( mjapinky_dsw_r )
@@ -421,7 +421,7 @@ static WRITE8_HANDLER ( mjclub_bank_w )
 
 static ADDRESS_MAP_START( royalmah_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_READWRITE( SMH_ROM, royalmah_rom_w )
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK(1) )	// banked ROMs not present in royalmah
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE(&videoram)
 ADDRESS_MAP_END
@@ -429,7 +429,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjapinky_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_READWRITE( SMH_ROM, royalmah_rom_w )
-	AM_RANGE( 0x7000, 0x77ff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x7000, 0x77ff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x7800, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0x8000 ) AM_READ( mjapinky_dsw_r )
 	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK(1) )
@@ -564,7 +564,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( janho_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_READWRITE( SMH_ROM, royalmah_rom_w )
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE(1) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE(1) AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
@@ -686,7 +686,7 @@ static ADDRESS_MAP_START( jansou_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x6407, 0x6407 ) AM_READ(jansou_dsw_r)
 	AM_RANGE( 0x6800, 0x6800 ) AM_WRITE(jansou_sound_w)
 
-	AM_RANGE( 0x7000, 0x77ff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x7000, 0x77ff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
@@ -743,7 +743,7 @@ static WRITE8_HANDLER( janptr96_rombank_w )
 
 static WRITE8_HANDLER( janptr96_rambank_w )
 {
-	memory_set_bankptr(space->machine, 2,generic_nvram + 0x1000 + 0x1000 * data);
+	memory_set_bankptr(space->machine, 2,space->machine->generic.nvram.ptr.u8 + 0x1000 + 0x1000 * data);
 }
 
 static READ8_HANDLER( janptr96_unknown_r )
@@ -755,8 +755,8 @@ static READ8_HANDLER( janptr96_unknown_r )
 static WRITE8_HANDLER( janptr96_coin_counter_w )
 {
 	flip_screen_set(space->machine, ~data & 4);
-	coin_counter_w(0,data & 2);	// in
-	coin_counter_w(1,data & 1);	// out
+	coin_counter_w(space->machine, 0,data & 2);	// in
+	coin_counter_w(space->machine, 1,data & 1);	// out
 }
 
 static ADDRESS_MAP_START( janptr96_iomap, ADDRESS_SPACE_IO, 8 )
@@ -783,8 +783,8 @@ static UINT8 mjifb_rom_enable;
 static WRITE8_HANDLER( mjifb_coin_counter_w )
 {
 	flip_screen_set(space->machine,  data & 4);
-	coin_counter_w(0,data & 2);	// in
-	coin_counter_w(1,data & 1);	// out
+	coin_counter_w(space->machine, 0,data & 2);	// in
+	coin_counter_w(space->machine, 1,data & 1);	// out
 }
 
 static READ8_HANDLER( mjifb_rom_io_r )
@@ -840,7 +840,7 @@ static WRITE8_HANDLER( mjifb_videoram_w )
 
 static ADDRESS_MAP_START( mjifb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjifb_rom_io_r, mjifb_rom_io_w) AM_BASE(&videoram)
 	AM_RANGE( 0xc000, 0xffff ) AM_READWRITE(SMH_ROM, mjifb_videoram_w)
 //  AM_RANGE( 0xc000, 0xffff ) AM_READWRITE(SMH_ROM, SMH_RAM)  This should, but doesn't work
@@ -939,7 +939,7 @@ static WRITE8_HANDLER( mjdejavu_rom_io_w )
 
 static ADDRESS_MAP_START( mjdejavu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjdejavu_rom_io_r, mjdejavu_rom_io_w) AM_BASE(&videoram)
 	AM_RANGE( 0xc000, 0xffff ) AM_READWRITE(SMH_ROM, mjifb_videoram_w)
 ADDRESS_MAP_END
@@ -980,7 +980,7 @@ static ADDRESS_MAP_START( mjtensin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x6ff0, 0x6ff0 ) AM_READWRITE( janptr96_dsw_r, janptr96_dswsel_w )
 	AM_RANGE( 0x6ff1, 0x6ff1 ) AM_WRITE( mjderngr_palbank_w )
 	AM_RANGE( 0x6ff3, 0x6ff3 ) AM_WRITE( mjtensin_6ff3_w )
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK(1) )
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE(&videoram)
 ADDRESS_MAP_END
@@ -1039,7 +1039,7 @@ static WRITE8_HANDLER( cafetime_7fe3_w )
 
 static ADDRESS_MAP_START( cafetime_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
-	AM_RANGE( 0x6000, 0x7eff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x6000, 0x7eff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x7fc1, 0x7fc1 ) AM_DEVREAD( "aysnd", ay8910_r )
 	AM_RANGE( 0x7fc2, 0x7fc3 ) AM_DEVWRITE( "aysnd", ay8910_data_address_w )
 	AM_RANGE( 0x7fd0, 0x7fd0 ) AM_WRITE( janptr96_coin_counter_w )
@@ -1153,8 +1153,8 @@ static WRITE8_HANDLER( mjvegasa_rom_io_w )
 static WRITE8_HANDLER( mjvegasa_coin_counter_w )
 {
 	flip_screen_set(space->machine,  data & 4);
-	coin_counter_w(0,data & 2);	// in
-	coin_counter_w(1,data & 1);	// out
+	coin_counter_w(space->machine, 0,data & 2);	// in
+	coin_counter_w(space->machine, 1,data & 1);	// out
 }
 
 // hopper?
@@ -1172,7 +1172,7 @@ static READ8_HANDLER( mjvegasa_12500_r )
 static ADDRESS_MAP_START( mjvegasa_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x00000, 0x05fff ) AM_ROM
-	AM_RANGE( 0x06000, 0x07fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x06000, 0x07fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE( 0x08000, 0x0ffff ) AM_READWRITE(mjvegasa_rom_io_r, mjvegasa_rom_io_w) AM_BASE(&videoram)
 
 	AM_RANGE( 0x10001, 0x10001 ) AM_DEVREAD( "aysnd", ay8910_r )
@@ -4613,10 +4613,10 @@ static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(machine, 1, memory_region(mac
 
 static DRIVER_INIT( janptr96 )
 {
-	generic_nvram_size = 0x1000 * 9;
-	generic_nvram = auto_alloc_array(machine, UINT8,  generic_nvram_size );
+	machine->generic.nvram.size = 0x1000 * 9;
+	machine->generic.nvram.ptr.u8 = auto_alloc_array(machine, UINT8,  machine->generic.nvram.size );
 
-	memory_set_bankptr(machine, 3,generic_nvram);
+	memory_set_bankptr(machine, 3,machine->generic.nvram.ptr.u8);
 }
 
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, 0,        ROT0,   "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )

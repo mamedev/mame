@@ -226,7 +226,7 @@ static READ8_HANDLER( wiz_protection_r )
 
 static WRITE8_HANDLER( wiz_coin_counter_w )
 {
-	coin_counter_w(offset,data);
+	coin_counter_w(space->machine, offset,data);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )

@@ -68,8 +68,8 @@ static void dragrace_update_misc_flags( running_machine *machine )
      * 0x091f = set Player 2 Start Lamp 0x80000000
      * 0x0938 = clear 0x0918 - 0x091f
      */
-	set_led_status(0, state->misc_flags & 0x00008000);
-	set_led_status(1, state->misc_flags & 0x80000000);
+	set_led_status(machine, 0, state->misc_flags & 0x00008000);
+	set_led_status(machine, 1, state->misc_flags & 0x80000000);
 
 	discrete_sound_w(state->discrete, DRAGRACE_MOTOR1_DATA,  ~state->misc_flags & 0x0000001f);		// Speed1 data*
 	discrete_sound_w(state->discrete, DRAGRACE_EXPLODE1_EN, (state->misc_flags & 0x00000020) ? 1: 0);	// Explosion1 enable

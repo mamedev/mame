@@ -327,12 +327,12 @@ static WRITE8_HANDLER( jingbell_nmi_and_coins_w )
 //      popmessage("%02x",data);
 	}
 
-	coin_counter_w(0,		data & 0x01);	// coin_a
-	coin_counter_w(1,		data & 0x04);	// coin_c
-	coin_counter_w(2,		data & 0x08);	// key in
-	coin_counter_w(3,		data & 0x10);	// coin out mech
+	coin_counter_w(space->machine, 0,		data & 0x01);	// coin_a
+	coin_counter_w(space->machine, 1,		data & 0x04);	// coin_c
+	coin_counter_w(space->machine, 2,		data & 0x08);	// key in
+	coin_counter_w(space->machine, 3,		data & 0x10);	// coin out mech
 
-	set_led_status(6,		data & 0x40);	// led for coin out / hopper active
+	set_led_status(space->machine, 6,		data & 0x40);	// led for coin out / hopper active
 
 	nmi_enable = data;	//  data & 0x80     // nmi enable?
 
@@ -342,8 +342,8 @@ static WRITE8_HANDLER( jingbell_nmi_and_coins_w )
 
 static WRITE8_HANDLER( jingbell_video_and_leds_w )
 {
-	set_led_status(4,	  data & 0x01);	// start?
-	set_led_status(5,	  data & 0x04);	// l_bet?
+	set_led_status(space->machine, 4,	  data & 0x01);	// start?
+	set_led_status(space->machine, 5,	  data & 0x04);	// l_bet?
 
 	video_enable	=	  data & 0x40;
 	hopper			=	(~data)& 0x80;
@@ -354,10 +354,10 @@ static WRITE8_HANDLER( jingbell_video_and_leds_w )
 
 static WRITE8_HANDLER( jingbell_leds_w )
 {
-	set_led_status(0, data & 0x01);	// stop_1
-	set_led_status(1, data & 0x02);	// stop_2
-	set_led_status(2, data & 0x04);	// stop_3
-	set_led_status(3, data & 0x08);	// stop
+	set_led_status(space->machine, 0, data & 0x01);	// stop_1
+	set_led_status(space->machine, 1, data & 0x02);	// stop_2
+	set_led_status(space->machine, 2, data & 0x04);	// stop_3
+	set_led_status(space->machine, 3, data & 0x08);	// stop
 	// data & 0x10?
 
 	out[2] = data;
@@ -409,7 +409,7 @@ static READ8_HANDLER( jingbell_magic_r )
 
 static ADDRESS_MAP_START( jingbell_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x0f3ff ) AM_ROM
-	AM_RANGE( 0x0f400, 0x0ffff ) AM_RAM AM_BASE( &generic_nvram ) AM_SIZE( &generic_nvram_size )
+	AM_RANGE( 0x0f400, 0x0ffff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jingbell_portmap, ADDRESS_SPACE_IO, 8 )

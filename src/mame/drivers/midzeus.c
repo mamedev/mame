@@ -129,7 +129,7 @@ static INTERRUPT_GEN( display_irq )
 static WRITE32_HANDLER( cmos_w )
 {
 	if (bitlatch[2] && !cmos_protected)
-		COMBINE_DATA(&generic_nvram32[offset]);
+		COMBINE_DATA(&space->machine->generic.nvram.ptr.u32[offset]);
 	else
 		logerror("%06X:timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", cpu_get_pc(space->cpu), bitlatch[2], cmos_protected);
 	cmos_protected = TRUE;
@@ -138,7 +138,7 @@ static WRITE32_HANDLER( cmos_w )
 
 static READ32_HANDLER( cmos_r )
 {
-	return generic_nvram32[offset] | 0xffffff00;
+	return space->machine->generic.nvram.ptr.u32[offset] | 0xffffff00;
 }
 
 
@@ -587,7 +587,7 @@ static ADDRESS_MAP_START( zeus_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x8d0000, 0x8d0004) AM_READWRITE(bitlatches_r, bitlatches_w)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
-	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(cmos_r, cmos_w) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(cmos_r, cmos_w) AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
 	AM_RANGE(0xa00000, 0xffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END

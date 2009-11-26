@@ -126,8 +126,8 @@ static MACHINE_RESET( tiamc1 )
 
 static WRITE8_HANDLER( tiamc1_control_w )
 {
-	coin_lockout_w(0, ~data & 0x02);
-	coin_counter_w(0, data & 0x04);
+	coin_lockout_w(space->machine, 0, ~data & 0x02);
+	coin_counter_w(space->machine, 0, data & 0x04);
 }
 
 

@@ -291,10 +291,10 @@ static WRITE16_HANDLER( io_chip_w )
 			segaic16_sprites_set_flip(space->machine, 0, data & 0x20);
 /* These are correct according to cgfm's docs, but mwalker and ddcrew both
    enable the lockout and never turn it off
-            coin_lockout_w(1, data & 0x08);
-            coin_lockout_w(0, data & 0x04); */
-			coin_counter_w(1, data & 0x02);
-			coin_counter_w(0, data & 0x01);
+            coin_lockout_w(space->machine, 1, data & 0x08);
+            coin_lockout_w(space->machine, 0, data & 0x04); */
+			coin_counter_w(space->machine, 1, data & 0x02);
+			coin_counter_w(space->machine, 0, data & 0x01);
 			break;
 
 		/* tile banking */

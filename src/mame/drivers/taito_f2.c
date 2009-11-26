@@ -316,10 +316,10 @@ static WRITE16_HANDLER( growl_coin_word_w )	/* what about coins 3&4 ?? */
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(0, ~data & 0x01);
-		coin_lockout_w(1, ~data & 0x02);
-		coin_counter_w(0,  data & 0x04);
-		coin_counter_w(1,  data & 0x08);
+		coin_lockout_w(space->machine, 0, ~data & 0x01);
+		coin_lockout_w(space->machine, 1, ~data & 0x02);
+		coin_counter_w(space->machine, 0,  data & 0x04);
+		coin_counter_w(space->machine, 1,  data & 0x08);
 	}
 }
 
@@ -327,14 +327,14 @@ static WRITE16_HANDLER( taitof2_4p_coin_word_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(0, ~data & 0x01);
-		coin_lockout_w(1, ~data & 0x02);
-		coin_lockout_w(2, ~data & 0x04);
-		coin_lockout_w(3, ~data & 0x08);
-		coin_counter_w(0,  data & 0x10);
-		coin_counter_w(1,  data & 0x20);
-		coin_counter_w(2,  data & 0x40);
-		coin_counter_w(3,  data & 0x80);
+		coin_lockout_w(space->machine, 0, ~data & 0x01);
+		coin_lockout_w(space->machine, 1, ~data & 0x02);
+		coin_lockout_w(space->machine, 2, ~data & 0x04);
+		coin_lockout_w(space->machine, 3, ~data & 0x08);
+		coin_counter_w(space->machine, 0,  data & 0x10);
+		coin_counter_w(space->machine, 1,  data & 0x20);
+		coin_counter_w(space->machine, 2,  data & 0x40);
+		coin_counter_w(space->machine, 3,  data & 0x80);
 	}
 }
 
@@ -342,14 +342,14 @@ static WRITE16_HANDLER( ninjak_coin_word_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_lockout_w(0, ~data & 0x0100);
-		coin_lockout_w(1, ~data & 0x0200);
-		coin_lockout_w(2, ~data & 0x0400);
-		coin_lockout_w(3, ~data & 0x0800);
-		coin_counter_w(0,  data & 0x1000);
-		coin_counter_w(1,  data & 0x2000);
-		coin_counter_w(2,  data & 0x4000);
-		coin_counter_w(3,  data & 0x8000);
+		coin_lockout_w(space->machine, 0, ~data & 0x0100);
+		coin_lockout_w(space->machine, 1, ~data & 0x0200);
+		coin_lockout_w(space->machine, 2, ~data & 0x0400);
+		coin_lockout_w(space->machine, 3, ~data & 0x0800);
+		coin_counter_w(space->machine, 0,  data & 0x1000);
+		coin_counter_w(space->machine, 1,  data & 0x2000);
+		coin_counter_w(space->machine, 2,  data & 0x4000);
+		coin_counter_w(space->machine, 3,  data & 0x8000);
 	}
 }
 

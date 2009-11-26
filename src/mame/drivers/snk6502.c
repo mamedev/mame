@@ -727,7 +727,7 @@ static INTERRUPT_GEN( satansat_interrupt )
 	{
 		UINT8 val = input_port_read(device->machine, "IN2");
 
-		coin_counter_w(0, val & 1);
+		coin_counter_w(device->machine, 0, val & 1);
 
 		/* user asks to insert coin: generate a NMI interrupt. */
 		if (val & 0x01)
@@ -743,8 +743,8 @@ static INTERRUPT_GEN( snk6502_interrupt )
 	{
 		UINT8 val = input_port_read(device->machine, "IN2");
 
-		coin_counter_w(0, val & 1);
-		coin_counter_w(1, val & 2);
+		coin_counter_w(device->machine, 0, val & 1);
+		coin_counter_w(device->machine, 1, val & 2);
 
 		/* user asks to insert coin: generate a NMI interrupt. */
 		if (val & 0x03)

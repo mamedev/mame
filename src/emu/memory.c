@@ -1922,10 +1922,14 @@ static void memory_init_locate(running_machine *machine)
 				*entry->baseptr = entry->memory;
 			if (entry->baseptroffs_plus1 != 0)
 				*(void **)((UINT8 *)machine->driver_data + entry->baseptroffs_plus1 - 1) = entry->memory;
+			if (entry->genbaseptroffs_plus1 != 0)
+				*(void **)((UINT8 *)&machine->generic + entry->genbaseptroffs_plus1 - 1) = entry->memory;
 			if (entry->sizeptr != NULL)
 				*entry->sizeptr = entry->byteend - entry->bytestart + 1;
 			if (entry->sizeptroffs_plus1 != 0)
 				*(size_t *)((UINT8 *)machine->driver_data + entry->sizeptroffs_plus1 - 1) = entry->byteend - entry->bytestart + 1;
+			if (entry->gensizeptroffs_plus1 != 0)
+				*(size_t *)((UINT8 *)&machine->generic + entry->gensizeptroffs_plus1 - 1) = entry->byteend - entry->bytestart + 1;
 		}
 	}
 
@@ -2207,6 +2211,13 @@ static void map_detokenize(address_map *map, const game_driver *driver, const ch
 				entry->baseptroffs_plus1++;
 				break;
 
+			case ADDRMAP_TOKEN_BASE_GENERIC:
+				check_entry_field(genbaseptroffs_plus1);
+				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->genbaseptroffs_plus1, 24);
+				entry->genbaseptroffs_plus1++;
+				break;
+
 			case ADDRMAP_TOKEN_SIZEPTR:
 				check_entry_field(sizeptr);
 				entry->sizeptr = TOKEN_GET_PTR(tokens, sizeptr);
@@ -2217,6 +2228,22 @@ static void map_detokenize(address_map *map, const game_driver *driver, const ch
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->sizeptroffs_plus1, 24);
 				entry->sizeptroffs_plus1++;
+				break;
+
+			case ADDRMAP_TOKEN_SIZE_GENERIC:
+				check_entry_field(gensizeptroffs_plus1);
+				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->gensizeptroffs_plus1, 24);
+				entry->gensizeptroffs_plus1++;
+				break;
+
+			case ADDRMAP_TOKEN_BASE_SIZE_GENERIC:
+				check_entry_field(genbaseptroffs_plus1);
+				check_entry_field(gensizeptroffs_plus1);
+				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->genbaseptroffs_plus1, 24);
+				entry->genbaseptroffs_plus1++;
+				entry->gensizeptroffs_plus1 = entry->genbaseptroffs_plus1 + offsetof(generic_ptr, size);
 				break;
 
 			default:
@@ -2379,7 +2406,7 @@ static int space_needs_backing_store(const address_space *space, const address_m
 {
 	FPTR handler;
 
-	if (entry->baseptr != NULL || entry->baseptroffs_plus1 != 0)
+	if (entry->baseptr != NULL || entry->baseptroffs_plus1 != 0 || entry->genbaseptroffs_plus1 != 0)
 		return TRUE;
 
 	handler = (FPTR)entry->write.generic;

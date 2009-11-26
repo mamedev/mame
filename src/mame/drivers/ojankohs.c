@@ -211,12 +211,12 @@ static READ8_HANDLER( ccasino_dipsw4_r )
 
 static WRITE8_HANDLER( ojankoy_coinctr_w )
 {
-	coin_counter_w( 0, (data & 0x01));
+	coin_counter_w( space->machine, 0, (data & 0x01));
 }
 
 static WRITE8_HANDLER( ccasino_coinctr_w )
 {
-	coin_counter_w(0, (data & 0x02));
+	coin_counter_w(space->machine, 0, (data & 0x02));
 }
 
 
@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( ojankohs_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(ojankohs_videoram_w)
 	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(ojankohs_colorram_w)
-	AM_RANGE(0xa000, 0xb7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xa000, 0xb7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(ojankohs_palette_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(1)
 ADDRESS_MAP_END
@@ -234,14 +234,14 @@ static ADDRESS_MAP_START( ojankoy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(ojankohs_videoram_w)
 	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(ojankohs_colorram_w)
-	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( ojankoc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1) AM_WRITE(ojankoc_videoram_w)
 ADDRESS_MAP_END
 

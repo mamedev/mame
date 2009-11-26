@@ -96,29 +96,29 @@ MACHINE_RESET( devilfsg )
 
 WRITE8_HANDLER( galaxold_coin_lockout_w )
 {
-	coin_lockout_global_w(~data & 1);
+	coin_lockout_global_w(space->machine, ~data & 1);
 }
 
 
 WRITE8_HANDLER( galaxold_coin_counter_w )
 {
-	coin_counter_w(offset, data & 0x01);
+	coin_counter_w(space->machine, offset, data & 0x01);
 }
 
 WRITE8_HANDLER( galaxold_coin_counter_1_w )
 {
-	coin_counter_w(1, data & 0x01);
+	coin_counter_w(space->machine, 1, data & 0x01);
 }
 
 WRITE8_HANDLER( galaxold_coin_counter_2_w )
 {
-	coin_counter_w(2, data & 0x01);
+	coin_counter_w(space->machine, 2, data & 0x01);
 }
 
 
 WRITE8_HANDLER( galaxold_leds_w )
 {
-	set_led_status(offset,data & 1);
+	set_led_status(space->machine, offset,data & 1);
 }
 
 

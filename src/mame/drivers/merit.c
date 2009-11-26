@@ -268,24 +268,24 @@ static const mc6845_interface mc6845_intf =
 static WRITE8_DEVICE_HANDLER( led1_w )
 {
 	/* 5 button lamps player 1 */
-	set_led_status(0,~data & 0x01);
-	set_led_status(1,~data & 0x02);
-	set_led_status(2,~data & 0x04);
-	set_led_status(3,~data & 0x08);
-	set_led_status(4,~data & 0x10);
+	set_led_status(device->machine, 0,~data & 0x01);
+	set_led_status(device->machine, 1,~data & 0x02);
+	set_led_status(device->machine, 2,~data & 0x04);
+	set_led_status(device->machine, 3,~data & 0x08);
+	set_led_status(device->machine, 4,~data & 0x10);
 }
 
 static WRITE8_DEVICE_HANDLER( led2_w )
 {
 	/* 5 button lamps player 2 */
-	set_led_status(5,~data & 0x01);
-	set_led_status(6,~data & 0x02);
-	set_led_status(7,~data & 0x04);
-	set_led_status(8,~data & 0x08);
-	set_led_status(9,~data & 0x10);
+	set_led_status(device->machine, 5,~data & 0x01);
+	set_led_status(device->machine, 6,~data & 0x02);
+	set_led_status(device->machine, 7,~data & 0x04);
+	set_led_status(device->machine, 8,~data & 0x08);
+	set_led_status(device->machine, 9,~data & 0x10);
 
 	/* coin counter */
-	coin_counter_w(0,0x80-(data & 0x80));
+	coin_counter_w(device->machine,0,0x80-(data & 0x80));
 }
 
 static WRITE8_DEVICE_HANDLER( misc_w )
@@ -348,7 +348,7 @@ static ADDRESS_MAP_START( casino5_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(2)
-	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(casino5_bank_w)
 	AM_RANGE(0x7001, 0x7fff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
@@ -362,7 +362,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigappg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_address_w)
@@ -374,7 +374,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dodge_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_address_w)
@@ -1153,16 +1153,16 @@ static NVRAM_HANDLER(dodge)
 {
 	if (read_or_write)
 	{
-		mame_fwrite(file, generic_nvram, generic_nvram_size);
+		mame_fwrite(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
 	}
 	else if (file)
 	{
-		mame_fread(file, generic_nvram, generic_nvram_size);
+		mame_fread(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
 	}
 	else
 	{
-		memset(generic_nvram, 0x00, generic_nvram_size);
-		generic_nvram[0x1040] = 0xc9; /* ret */
+		memset(machine->generic.nvram.ptr.v, 0x00, machine->generic.nvram.size);
+		machine->generic.nvram.ptr.u8[0x1040] = 0xc9; /* ret */
 	}
 }
 

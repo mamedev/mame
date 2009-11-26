@@ -132,8 +132,8 @@ WRITE8_HANDLER( dooyong_txvideoram8_w )
 WRITE8_HANDLER( lastday_ctrl_w )
 {
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(0, data & 0x01);
-	coin_counter_w(1, data & 0x02);
+	coin_counter_w(space->machine, 0, data & 0x01);
+	coin_counter_w(space->machine, 1, data & 0x02);
 
 	/* bit 3 is used but unknown */
 
@@ -150,8 +150,8 @@ WRITE8_HANDLER( pollux_ctrl_w )
 	flip_screen_set(space->machine, data & 0x01);
 
 	/* bits 6 and 7 are coin counters */
-	coin_counter_w(0, data & 0x80);
-	coin_counter_w(1, data & 0x40);
+	coin_counter_w(space->machine, 0, data & 0x80);
+	coin_counter_w(space->machine, 1, data & 0x40);
 
 	/* bit 1 is used but unknown */
 

@@ -786,15 +786,15 @@ static CUSTOM_INPUT( shifted_port_r ) { return input_port_read(field->port->mach
 
 static WRITE8_DEVICE_HANDLER( out_0 )
 {
-	set_led_status(1,data & 1);
-	set_led_status(0,data & 2);
-	coin_counter_w(1,~data & 4);
-	coin_counter_w(0,~data & 8);
+	set_led_status(device->machine, 1,data & 1);
+	set_led_status(device->machine, 0,data & 2);
+	coin_counter_w(device->machine, 1,~data & 4);
+	coin_counter_w(device->machine, 0,~data & 8);
 }
 
 static WRITE8_DEVICE_HANDLER( out_1 )
 {
-	coin_lockout_global_w(data & 1);
+	coin_lockout_global_w(device->machine, data & 1);
 }
 
 static const namco_51xx_interface namco_51xx_intf =

@@ -171,7 +171,7 @@ static WRITE8_HANDLER( bg_bank_w )
 		state->bg2_bank = (data & 0xc) >> 2;
 		tilemap_mark_all_tiles_dirty(state->bg2_tilemap);
 	}
-	coin_counter_w(0, data & 0x10);
+	coin_counter_w(space->machine, 0, data & 0x10);
 }
 
 static ADDRESS_MAP_START( cultures_map, ADDRESS_SPACE_PROGRAM, 8 )

@@ -163,7 +163,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(space->cpu),data);
 	/* bit 0 is unknown (used, maybe back color enable?) */
 
 	/* bit 1 is coin counter */
-	coin_counter_w(0,data & 2);
+	coin_counter_w(space->machine, 0,data & 2);
 
 	/* bit 2 is flip screen */
 	if (flipscreen != (data & 0x04))
@@ -198,7 +198,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(space->cpu),data);
 	/* bit 0 is unknown (used, maybe back color enable?) */
 
 	/* bit 1 is coin counter */
-	coin_counter_w(0,data & 2);
+	coin_counter_w(space->machine, 0,data & 2);
 
 	/* bit 2 is flip screen */
 	if (flipscreen != (data & 0x04))

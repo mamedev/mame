@@ -101,11 +101,11 @@ WRITE8_HANDLER( exedexes_c804_w )
 	exedexes_state *state = (exedexes_state *)space->machine->driver_data;
 
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(0, data & 0x01);
-	coin_counter_w(1, data & 0x02);
+	coin_counter_w(space->machine, 0, data & 0x01);
+	coin_counter_w(space->machine, 1, data & 0x02);
 
-	coin_lockout_w(0, data & 0x04);
-	coin_lockout_w(1, data & 0x08);
+	coin_lockout_w(space->machine, 0, data & 0x04);
+	coin_lockout_w(space->machine, 1, data & 0x08);
 
 	/* bit 7 is text enable */
 	state->chon = data & 0x80;

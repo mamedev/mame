@@ -43,8 +43,8 @@ static WRITE8_HANDLER( battlnts_bankswitch_w )
 	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 
 	/* bits 4 & 5 = coin counters */
-	coin_counter_w(0,data & 0x10);
-	coin_counter_w(1,data & 0x20);
+	coin_counter_w(space->machine, 0,data & 0x10);
+	coin_counter_w(space->machine, 1,data & 0x20);
 
 	/* other bits unknown */
 }

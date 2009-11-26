@@ -65,7 +65,7 @@ static WRITE16_HANDLER( OKIM6295_bankswitch_w )
 
 static WRITE16_HANDLER( targeth_coin_counter_w )
 {
-	coin_counter_w( (offset >> 3) & 0x01, data & 0x01);
+	coin_counter_w( space->machine, (offset >> 3) & 0x01, data & 0x01);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )

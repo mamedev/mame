@@ -740,38 +740,38 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 		if (cputag_get_cpu(space->machine, "audiocpu"))
 			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
-		coin_counter_w(0, data & 0x0001);
+		coin_counter_w(space->machine, 0, data & 0x0001);
 		if( (strncmp(space->machine->gamedrv->name,"pzloop2",8)==0) ||
 	 	    (strncmp(space->machine->gamedrv->name,"pzloop2j",8)==0) )
 		{
 			// Puzz Loop 2 uses coin counter 2 input to switch between stick and paddle controls
 			readpaddle = data & 0x0002;
-	}
-	else
-	{
-		coin_counter_w(1, data & 0x0002);
-	}
+		}
+		else
+		{
+			coin_counter_w(space->machine, 1, data & 0x0002);
+		}
 
-	if(strncmp(space->machine->gamedrv->name,"mmatrix",7)==0)		// Mars Matrix seems to require the coin lockout bit to be reversed
-	{
-		coin_lockout_w(0,data & 0x0010);
-		coin_lockout_w(1,data & 0x0020);
-		coin_lockout_w(2,data & 0x0040);
-		coin_lockout_w(3,data & 0x0080);
-	}
-	else
-	{
-		coin_lockout_w(0,~data & 0x0010);
-		coin_lockout_w(1,~data & 0x0020);
-		coin_lockout_w(2,~data & 0x0040);
-		coin_lockout_w(3,~data & 0x0080);
-	}
+		if(strncmp(space->machine->gamedrv->name,"mmatrix",7)==0)		// Mars Matrix seems to require the coin lockout bit to be reversed
+		{
+			coin_lockout_w(space->machine, 0,data & 0x0010);
+			coin_lockout_w(space->machine, 1,data & 0x0020);
+			coin_lockout_w(space->machine, 2,data & 0x0040);
+			coin_lockout_w(space->machine, 3,data & 0x0080);
+		}
+		else
+		{
+			coin_lockout_w(space->machine, 0,~data & 0x0010);
+			coin_lockout_w(space->machine, 1,~data & 0x0020);
+			coin_lockout_w(space->machine, 2,~data & 0x0040);
+			coin_lockout_w(space->machine, 3,~data & 0x0080);
+		}
 
-	/*
-    set_led_status(0,data & 0x01);
-    set_led_status(1,data & 0x10);
-    set_led_status(2,data & 0x20);
-    */
+		/*
+	    set_led_status(space->machine, 0,data & 0x01);
+	    set_led_status(space->machine, 1,data & 0x10);
+	    set_led_status(space->machine, 2,data & 0x20);
+	    */
     }
 }
 

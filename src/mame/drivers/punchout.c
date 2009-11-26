@@ -338,7 +338,7 @@ static WRITE8_HANDLER( spunchout_exp_w )
 
 static ADDRESS_MAP_START( punchout_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xdff0, 0xdff7) AM_RAM AM_BASE(&punchout_spr1_ctrlram)
 	AM_RANGE(0xdff8, 0xdffc) AM_RAM AM_BASE(&punchout_spr2_ctrlram)
@@ -352,7 +352,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( armwrest_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xdff0, 0xdff7) AM_RAM AM_BASE(&punchout_spr1_ctrlram)
 	AM_RANGE(0xdff8, 0xdffc) AM_RAM AM_BASE(&punchout_spr2_ctrlram)

@@ -31,7 +31,7 @@ WRITE8_HANDLER( route16_out0_w )
 {
 	palette_1 = data & 0x1f;
 
-	coin_counter_w(0, (data >> 5) & 0x01);
+	coin_counter_w(space->machine, 0, (data >> 5) & 0x01);
 }
 
 

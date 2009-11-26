@@ -286,7 +286,7 @@ static WRITE8_HANDLER( reelscroll4_w )
 
 static WRITE8_HANDLER( skylncr_coin_w )
 {
-	coin_counter_w( 0, data & 0x04 );
+	coin_counter_w( space->machine, 0, data & 0x04 );
 }
 
 static READ8_HANDLER( ret_ff )
@@ -313,7 +313,7 @@ static WRITE8_HANDLER( skylncr_nmi_enable_w )
 
 static ADDRESS_MAP_START( mem_map_skylncr, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 
 	AM_RANGE(0x8800, 0x8fff) AM_READWRITE( SMH_RAM, skylncr_videoram_w ) AM_BASE( &skylncr_videoram )
 	AM_RANGE(0x9000, 0x97ff) AM_READWRITE( SMH_RAM, skylncr_colorram_w ) AM_BASE( &skylncr_colorram )

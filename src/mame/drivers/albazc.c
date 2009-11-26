@@ -95,11 +95,11 @@ static WRITE8_HANDLER( hanaroku_out_0_w )
          7      meter5 (start)
     */
 
-	coin_counter_w(0, data & 0x01);
-	coin_counter_w(1, data & 0x02);
-	coin_counter_w(2, data & 0x04);
-	coin_counter_w(3, data & 0x08);
-	coin_counter_w(4, data & 0x80);
+	coin_counter_w(space->machine, 0, data & 0x01);
+	coin_counter_w(space->machine, 1, data & 0x02);
+	coin_counter_w(space->machine, 2, data & 0x04);
+	coin_counter_w(space->machine, 3, data & 0x08);
+	coin_counter_w(space->machine, 4, data & 0x80);
 }
 
 static WRITE8_HANDLER( hanaroku_out_1_w )

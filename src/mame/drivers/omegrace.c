@@ -301,14 +301,14 @@ static READ8_HANDLER( omegrace_spinner1_r )
 static WRITE8_HANDLER( omegrace_leds_w )
 {
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+	coin_counter_w(space->machine, 0,data & 0x01);
+	coin_counter_w(space->machine, 1,data & 0x02);
 
 	/* bits 2 to 5 are the start leds (4 and 5 cocktail only) */
-	set_led_status(0,~data & 0x04);
-	set_led_status(1,~data & 0x08);
-	set_led_status(2,~data & 0x10);
-	set_led_status(3,~data & 0x20);
+	set_led_status(space->machine, 0,~data & 0x04);
+	set_led_status(space->machine, 1,~data & 0x08);
+	set_led_status(space->machine, 2,~data & 0x10);
+	set_led_status(space->machine, 3,~data & 0x20);
 
 	/* bit 6 flips screen (not supported) */
 }
@@ -331,7 +331,7 @@ static WRITE8_HANDLER( omegrace_soundlatch_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4bff) AM_RAM
-	AM_RANGE(0x5c00, 0x5cff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) /* NVRAM */
+	AM_RANGE(0x5c00, 0x5cff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) /* NVRAM */
 	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("maincpu", 0x8000) /* vector ram */
 	AM_RANGE(0x9000, 0x9fff) AM_ROM /* vector rom */
 ADDRESS_MAP_END

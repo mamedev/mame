@@ -285,10 +285,10 @@ static WRITE8_DEVICE_HANDLER( video_lamps_w )
 	segaic16_sprites_set_flip(device->machine, 0, data & 0x80);
 	segaic16_sprites_set_shadow(device->machine, 0, ~data & 0x40);
 	segaic16_set_display_enable(device->machine, data & 0x10);
-	set_led_status(1, data & 0x08);
-	set_led_status(0, data & 0x04);
-	coin_counter_w(1, data & 0x02);
-	coin_counter_w(0, data & 0x01);
+	set_led_status(device->machine, 1, data & 0x08);
+	set_led_status(device->machine, 0, data & 0x04);
+	coin_counter_w(device->machine, 1, data & 0x02);
+	coin_counter_w(device->machine, 0, data & 0x01);
 }
 
 

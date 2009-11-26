@@ -289,10 +289,10 @@ static WRITE16_HANDLER( sys16_coinctrl_w )
 {
 		coinctrl = data&0xff;
 		sys16_refreshenable = coinctrl & 0x20;
-		set_led_status(1,coinctrl & 0x08);
-		set_led_status(0,coinctrl & 0x04);
-		coin_counter_w(1,coinctrl & 0x02);
-		coin_counter_w(0,coinctrl & 0x01);
+		set_led_status(space->machine, 1,coinctrl & 0x08);
+		set_led_status(space->machine, 0,coinctrl & 0x04);
+		coin_counter_w(space->machine, 1,coinctrl & 0x02);
+		coin_counter_w(space->machine, 0,coinctrl & 0x01);
 		/* bit 6 is also used (1 most of the time; 0 in dduxbl, sdi, wb3;
            tturf has it normally 1 but 0 after coin insertion) */
 		/* eswat sets bit 4 */

@@ -265,14 +265,14 @@ static WRITE8_HANDLER( boxer_crowd_w )
 	/* BIT2 => CROWD-2 */
 	/* BIT3 => CROWD-3 */
 
-	coin_lockout_global_w(data & 1);
+	coin_lockout_global_w(space->machine, data & 1);
 }
 
 
 static WRITE8_HANDLER( boxer_led_w )
 {
-	set_led_status(1, !(data & 1));
-	set_led_status(0, !(data & 2));
+	set_led_status(space->machine, 1, !(data & 1));
+	set_led_status(space->machine, 0, !(data & 2));
 }
 
 

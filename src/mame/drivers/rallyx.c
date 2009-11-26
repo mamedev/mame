@@ -258,19 +258,19 @@ static WRITE8_HANDLER( rallyx_latch_w )
 			break;
 
 		case 0x04:
-			set_led_status(0,bit);
+			set_led_status(space->machine, 0,bit);
 			break;
 
 		case 0x05:
-			set_led_status(1,bit);
+			set_led_status(space->machine, 1,bit);
 			break;
 
 		case 0x06:
-			coin_lockout_w(0,!bit);
+			coin_lockout_w(space->machine, 0,!bit);
 			break;
 
 		case 0x07:
-			coin_counter_w(0,bit);
+			coin_counter_w(space->machine, 0,bit);
 			break;
 	}
 }
@@ -299,14 +299,14 @@ static WRITE8_HANDLER( locomotn_latch_w )
 			break;
 
 		case 0x04:	/* OUT1 */
-			coin_counter_w(0,bit);
+			coin_counter_w(space->machine, 0,bit);
 			break;
 
 		case 0x05:	/* OUT2 */
 			break;
 
 		case 0x06:	/* OUT3 */
-			coin_counter_w(1,bit);
+			coin_counter_w(space->machine, 1,bit);
 			break;
 
 		case 0x07:	/* STARSON */

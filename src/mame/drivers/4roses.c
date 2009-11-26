@@ -196,7 +196,7 @@ VIDEO_UPDATE( funworld );
 *************************/
 
 static ADDRESS_MAP_START( 4roses_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM	// AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM	// AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM

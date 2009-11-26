@@ -111,8 +111,8 @@ static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
 	state->custom_cpu_reset = ~data & 0x10;
 
 	/* clock the coin counters */
-	coin_counter_w(1, ~data & 0x02);
-	coin_counter_w(0, ~data & 0x01);
+	coin_counter_w(device->machine, 1, ~data & 0x02);
+	coin_counter_w(device->machine, 0, ~data & 0x01);
 }
 
 

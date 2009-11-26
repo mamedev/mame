@@ -1117,9 +1117,9 @@ static WRITE32_HANDLER( system11gun_w )
 	if( ACCESSING_BITS_0_15 )
 	{
 		/* start 1 */
-		set_led_status(0, !(data & 0x08));
+		set_led_status(space->machine, 0, !(data & 0x08));
 		/* start 2 */
-		set_led_status(1, !(data & 0x04));
+		set_led_status(space->machine, 1, !(data & 0x04));
 		/* blowback 1 */
 		/* !(data & 0x02) */
 		/* blowback 2 */

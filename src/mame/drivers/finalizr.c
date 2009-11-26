@@ -49,8 +49,8 @@ static INTERRUPT_GEN( finalizr_interrupt )
 
 static WRITE8_HANDLER( finalizr_coin_w )
 {
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+	coin_counter_w(space->machine, 0,data & 0x01);
+	coin_counter_w(space->machine, 1,data & 0x02);
 }
 
 static WRITE8_HANDLER( finalizr_flipscreen_w )

@@ -255,7 +255,7 @@ static WRITE16_HANDLER( write1_w )
 
 static ADDRESS_MAP_START( tv_vcf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
-	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
+	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK(1)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
@@ -294,7 +294,7 @@ static WRITE16_DEVICE_HANDLER( tv_ncf_oki6395_w )
 }
 static ADDRESS_MAP_START( tv_ncf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
-	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
+	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE(0x20000, 0x2ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
 	AM_RANGE(0x40000, 0xbffff) AM_ROM AM_REGION("user1",0x40000)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
@@ -337,7 +337,7 @@ static WRITE16_HANDLER( tv_tcf_bankselect_w )
 
 static ADDRESS_MAP_START( tv_tcf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
-	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
+	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
 	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_WRITE( tv_tcf_paletteram_w ) AM_BASE(&paletteram16)
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK(1)
@@ -388,14 +388,14 @@ static WRITE16_HANDLER( write2_w )
 
 	for(i=0;i<4;i++)
 	{
-		coin_counter_w(i,data & 0x20);
-		coin_lockout_w(i,~data & 0x08);
+		coin_counter_w(space->machine, i,data & 0x20);
+		coin_lockout_w(space->machine, i,~data & 0x08);
 	}
 }
 
 static ADDRESS_MAP_START( newmcard_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
-	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
+	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK(1)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
@@ -463,7 +463,7 @@ static WRITE16_HANDLER( brasil_status_w )
 
 static ADDRESS_MAP_START( brasil_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
-	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
+	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK(1)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
@@ -1209,8 +1209,8 @@ static WRITE16_HANDLER( fashion_output_w )
 
 	for(i=0;i<4;i++)
 	{
-		coin_counter_w(i,data & 0x20);
-		coin_lockout_w(i,~data & 0x01);
+		coin_counter_w(space->machine, i,data & 0x20);
+		coin_lockout_w(space->machine, i,~data & 0x01);
 	}
 }
 

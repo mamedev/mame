@@ -62,7 +62,7 @@ MACHINE_RESET( taitosj )
 
 WRITE8_HANDLER( taitosj_bankswitch_w )
 {
-	coin_lockout_global_w(~data & 1);
+	coin_lockout_global_w(space->machine, ~data & 1);
 
 	if(data & 0x80) memory_set_bank(space->machine, 1, 1);
 	else memory_set_bank(space->machine, 1, 0);

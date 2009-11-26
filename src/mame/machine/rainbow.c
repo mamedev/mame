@@ -755,10 +755,10 @@ static TIMER_CALLBACK( cchip_timer )
 		CRAM[1][0x149] = 0xFF;
 	}
 
-	coin_lockout_w(1, CRAM[0][8] & 0x80);
-	coin_lockout_w(0, CRAM[0][8] & 0x40);
-	coin_counter_w(1, CRAM[0][8] & 0x20);
-	coin_counter_w(0, CRAM[0][8] & 0x10);
+	coin_lockout_w(machine, 1, CRAM[0][8] & 0x80);
+	coin_lockout_w(machine, 0, CRAM[0][8] & 0x40);
+	coin_counter_w(machine, 1, CRAM[0][8] & 0x20);
+	coin_counter_w(machine, 0, CRAM[0][8] & 0x10);
 
 	CRAM[0][3] = input_port_read(machine, "800007");    /* STARTn + SERVICE1 */
 	CRAM[0][4] = input_port_read(machine, "800009");    /* COINn */

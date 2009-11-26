@@ -141,7 +141,7 @@ static WRITE8_HANDLER( jollyjgr_misc_w )
 }
 static WRITE8_HANDLER( jollyjgr_coin_lookout_w )
 {
-	coin_lockout_global_w(data & 1);
+	coin_lockout_global_w(space->machine, data & 1);
 
 	/* bits 4, 5, 6 and 7 are used too */
 }

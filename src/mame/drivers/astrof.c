@@ -94,7 +94,7 @@ static INPUT_CHANGED( coin_inserted )
 {
 	/* coin insertion causes an NMI */
 	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
-	coin_counter_w(0, newval);
+	coin_counter_w(field->port->machine, 0, newval);
 }
 
 

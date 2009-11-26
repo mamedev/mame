@@ -102,7 +102,7 @@ static WRITE8_DEVICE_HANDLER( port_C_w )
 	iqblock_videoenable = data & 0x20;
 
 	/* bit 6 is coin counter */
-	coin_counter_w(0,data & 0x40);
+	coin_counter_w(device->machine, 0,data & 0x40);
 
 	/* bit 7 could be a second coin counter, but coin 2 doesn't seem to work... */
 }

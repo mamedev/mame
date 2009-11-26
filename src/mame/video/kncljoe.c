@@ -143,8 +143,8 @@ WRITE8_HANDLER( kncljoe_control_w )
 	flipscreen = data & 0x01;
 	tilemap_set_flip_all(space->machine,flipscreen ? TILEMAP_FLIPX : TILEMAP_FLIPY);
 
-	coin_counter_w(0,data & 0x02);
-	coin_counter_w(1,data & 0x20);
+	coin_counter_w(space->machine, 0,data & 0x02);
+	coin_counter_w(space->machine, 1,data & 0x20);
 
 	i = (data & 0x10) >> 4;
 	if (tile_bank != i)

@@ -99,7 +99,7 @@ static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 		logerror("%s - Unknown EEPROM bit written %02X\n",cpuexec_describe_context(device->machine),data);
 	}
 
-	coin_counter_w(0, data & 0x01);
+	coin_counter_w(device->machine, 0, data & 0x01);
 
 	// Update light guns positions
 	for (i = 0; i < 2; i++)

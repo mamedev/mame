@@ -79,8 +79,8 @@ WRITE8_HANDLER( gunsmoke_colorram_w )
 WRITE8_HANDLER( gunsmoke_c804_w )
 {
 	/* bits 0 and 1 are for coin counters */
-	coin_counter_w(1, data & 0x01);
-	coin_counter_w(0, data & 0x02);
+	coin_counter_w(space->machine, 1, data & 0x01);
+	coin_counter_w(space->machine, 0, data & 0x02);
 
 	/* bits 2 and 3 select the ROM bank */
 	memory_set_bank(space->machine, 1, (data & 0x0c) >> 2);

@@ -407,7 +407,7 @@ WRITE8_HANDLER( balsente_misc_output_w )
 	}
 	else
 	{
-//      set_led_status(offset, data);
+//      set_led_status(space->machine, offset, data);
 	}
 }
 

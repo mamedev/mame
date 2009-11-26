@@ -111,8 +111,8 @@ WRITE16_HANDLER( ultraman_gfxctrl_w )
 			bank2 = (data & 0x20) >> 5;
 			tilemap_mark_all_tiles_dirty_all(space->machine);	/* should mark only zoom2 */
 		}
-		coin_counter_w(0, data & 0x40);
-		coin_counter_w(1, data & 0x80);
+		coin_counter_w(space->machine, 0, data & 0x40);
+		coin_counter_w(space->machine, 1, data & 0x80);
 	}
 }
 

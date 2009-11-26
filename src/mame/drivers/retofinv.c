@@ -91,12 +91,12 @@ static WRITE8_HANDLER( irq1_ack_w )
 
 static WRITE8_HANDLER( coincounter_w )
 {
-	coin_counter_w(0, data & 1);
+	coin_counter_w(space->machine, 0, data & 1);
 }
 
 static WRITE8_HANDLER( coinlockout_w )
 {
-	coin_lockout_w(0,~data & 1);
+	coin_lockout_w(space->machine, 0,~data & 1);
 }
 
 

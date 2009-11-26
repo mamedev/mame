@@ -161,7 +161,7 @@ static READ16_HANDLER( dassault_control_r )
 
 static WRITE16_HANDLER( dassault_control_w )
 {
-	coin_counter_w(0,data&1);
+	coin_counter_w(space->machine, 0,data&1);
 	if (data&0xfffe)
 		logerror("Coin cointrol %04x\n",data);
 }

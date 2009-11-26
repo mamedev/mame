@@ -255,7 +255,7 @@ static WRITE16_HANDLER( sound_write_w )
 static ADDRESS_MAP_START( ilpag_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROM AM_REGION("blit_data", 0)
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 
 //  AM_RANGE(0x800000, 0x800001) AM_READ(test_r)
 //  AM_RANGE(0x880000, 0x880001) AM_READ(test_r)
@@ -280,7 +280,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( steaser_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROM AM_REGION("blit_data", 0)
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 
  	AM_RANGE(0x800000, 0x800001) AM_READ(test_r)
 //  AM_RANGE(0x840000, 0x840001) AM_WRITE(sound_write_w)
@@ -468,19 +468,19 @@ static TIMER_DEVICE_CALLBACK( steaser_mcu_sim )
 {
 //  static int i;
 	/*first off, signal the "MCU is running" flag*/
-	generic_nvram16[0x932/2] = 0xffff;
+	timer->machine->generic.nvram.ptr.u16[0x932/2] = 0xffff;
 	/*clear the inputs (they are impulsed)*/
 //  for(i=0;i<8;i+=2)
-//      generic_nvram16[((0x8a0)+i)/2] = 0;
+//      timer->machine->generic.nvram.ptr.u16[((0x8a0)+i)/2] = 0;
 	/*finally, read the inputs*/
-	generic_nvram16[0x89e/2] = input_port_read(timer->machine, "MENU") & 0xffff;
-	generic_nvram16[0x8a0/2] = input_port_read(timer->machine, "STAT") & 0xffff;
-	generic_nvram16[0x8a2/2] = input_port_read(timer->machine, "BET_DEAL") & 0xffff;
-	generic_nvram16[0x8a4/2] = input_port_read(timer->machine, "TAKE_DOUBLE") & 0xffff;
-	generic_nvram16[0x8a6/2] = input_port_read(timer->machine, "SMALL_BIG") & 0xffff;
-	generic_nvram16[0x8a8/2] = input_port_read(timer->machine, "CANCEL_HOLD1") & 0xffff;
-	generic_nvram16[0x8aa/2] = input_port_read(timer->machine, "HOLD2_HOLD3") & 0xffff;
-	generic_nvram16[0x8ac/2] = input_port_read(timer->machine, "HOLD4_HOLD5") & 0xffff;
+	timer->machine->generic.nvram.ptr.u16[0x89e/2] = input_port_read(timer->machine, "MENU") & 0xffff;
+	timer->machine->generic.nvram.ptr.u16[0x8a0/2] = input_port_read(timer->machine, "STAT") & 0xffff;
+	timer->machine->generic.nvram.ptr.u16[0x8a2/2] = input_port_read(timer->machine, "BET_DEAL") & 0xffff;
+	timer->machine->generic.nvram.ptr.u16[0x8a4/2] = input_port_read(timer->machine, "TAKE_DOUBLE") & 0xffff;
+	timer->machine->generic.nvram.ptr.u16[0x8a6/2] = input_port_read(timer->machine, "SMALL_BIG") & 0xffff;
+	timer->machine->generic.nvram.ptr.u16[0x8a8/2] = input_port_read(timer->machine, "CANCEL_HOLD1") & 0xffff;
+	timer->machine->generic.nvram.ptr.u16[0x8aa/2] = input_port_read(timer->machine, "HOLD2_HOLD3") & 0xffff;
+	timer->machine->generic.nvram.ptr.u16[0x8ac/2] = input_port_read(timer->machine, "HOLD4_HOLD5") & 0xffff;
 }
 
 /* TODO: remove this hack.*/

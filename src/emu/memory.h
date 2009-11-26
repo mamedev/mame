@@ -77,8 +77,11 @@ enum
 	ADDRMAP_TOKEN_SHARE,
 	ADDRMAP_TOKEN_BASEPTR,
 	ADDRMAP_TOKEN_BASE_MEMBER,
+	ADDRMAP_TOKEN_BASE_GENERIC,
 	ADDRMAP_TOKEN_SIZEPTR,
-	ADDRMAP_TOKEN_SIZE_MEMBER
+	ADDRMAP_TOKEN_SIZE_MEMBER,
+	ADDRMAP_TOKEN_SIZE_GENERIC,
+	ADDRMAP_TOKEN_BASE_SIZE_GENERIC
 };
 
 
@@ -237,6 +240,8 @@ struct _address_map_entry
 	size_t *				sizeptr;			/* receives size of area in bytes (optional) */
 	UINT32					baseptroffs_plus1;	/* offset of base pointer within driver_data, plus 1 */
 	UINT32					sizeptroffs_plus1;	/* offset of size pointer within driver_data, plus 1 */
+	UINT32					genbaseptroffs_plus1;/* offset of base pointer within generic_pointers, plus 1 */
+	UINT32					gensizeptroffs_plus1;/* offset of size pointer within generic_pointers, plus 1 */
 	const char *			region;				/* tag of region containing the memory backing this entry */
 	offs_t					rgnoffs;			/* offset within the region */
 
@@ -765,12 +770,21 @@ union _addrmap64_token
 #define AM_BASE_MEMBER(_struct, _member) \
 	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_BASE_MEMBER, 8, offsetof(_struct, _member), 24),
 
+#define AM_BASE_GENERIC(_member) \
+	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_BASE_GENERIC, 8, offsetof(generic_pointers, _member.ptr), 24),
+
 #define AM_SIZE(_size) \
 	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_SIZEPTR, 8), \
 	TOKEN_PTR(sizeptr, _size),
 
 #define AM_SIZE_MEMBER(_struct, _member) \
 	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_SIZE_MEMBER, 8, offsetof(_struct, _member), 24),
+
+#define AM_SIZE_GENERIC(_member) \
+	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_SIZE_GENERIC, 8, offsetof(generic_pointers, _member.size), 24),
+
+#define AM_BASE_SIZE_GENERIC(_member) \
+	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_BASE_SIZE_GENERIC, 8, offsetof(generic_pointers, _member), 24),
 
 
 /* common shortcuts */

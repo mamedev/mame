@@ -128,7 +128,7 @@ static WRITE8_HANDLER( flip_screen_w )
 
 static WRITE8_HANDLER( tsamurai_coin_counter_w )
 {
-	coin_counter_w(offset,data);
+	coin_counter_w(space->machine, offset,data);
 }
 
 

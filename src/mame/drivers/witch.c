@@ -451,7 +451,7 @@ static ADDRESS_MAP_START( map_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE(&paletteram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE(&paletteram_2)
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xf180, 0xffff) AM_RAM AM_SHARE(2)
 ADDRESS_MAP_END
 

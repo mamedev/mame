@@ -880,7 +880,7 @@ static WRITE8_HANDLER( coininhib_w )
 	{
 		if ( changed & p )
 		{ // this inhibit line has changed
-			coin_lockout_w(i, (~data & p) ); // update lockouts
+			coin_lockout_w(space->machine, i, (~data & p) ); // update lockouts
 			changed &= ~p;
 		}
 

@@ -23,8 +23,8 @@ static UINT8 triplhnt_hit_code;
 
 static DRIVER_INIT( triplhnt )
 {
-	generic_nvram = triplhnt_cmos;
-	generic_nvram_size = sizeof triplhnt_cmos;
+	machine->generic.nvram.ptr.u8 = triplhnt_cmos;
+	machine->generic.nvram.size = sizeof triplhnt_cmos;
 }
 
 
@@ -69,10 +69,10 @@ static void triplhnt_update_misc(running_machine *machine, int offset)
 	triplhnt_sprite_zoom = (triplhnt_misc_flags >> 4) & 1;
 	triplhnt_sprite_bank = (triplhnt_misc_flags >> 7) & 1;
 
-	set_led_status(0, triplhnt_misc_flags & 0x02);
+	set_led_status(machine, 0, triplhnt_misc_flags & 0x02);
 
-	coin_lockout_w(0, !(triplhnt_misc_flags & 0x08));
-	coin_lockout_w(1, !(triplhnt_misc_flags & 0x08));
+	coin_lockout_w(machine, 0, !(triplhnt_misc_flags & 0x08));
+	coin_lockout_w(machine, 1, !(triplhnt_misc_flags & 0x08));
 
 	discrete_sound_w(discrete, TRIPLHNT_SCREECH_EN, triplhnt_misc_flags & 0x04);	// screech
 	discrete_sound_w(discrete, TRIPLHNT_LAMP_EN, triplhnt_misc_flags & 0x02);	// Lamp is used to reset noise

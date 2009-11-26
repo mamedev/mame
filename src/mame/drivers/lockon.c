@@ -430,12 +430,12 @@ static void ym2203_irq(const device_config *device, int irq)
 
 static WRITE8_DEVICE_HANDLER( ym2203_out_b )
 {
-	coin_counter_w(0, data & 0x80);
-	coin_counter_w(1, data & 0x40);
-	coin_counter_w(2, data & 0x20);
+	coin_counter_w(device->machine, 0, data & 0x80);
+	coin_counter_w(device->machine, 1, data & 0x40);
+	coin_counter_w(device->machine, 2, data & 0x20);
 
 	/* 'Lock-On' lamp */
-	set_led_status(1, !(data & 0x10));
+	set_led_status(device->machine, 1, !(data & 0x10));
 }
 
 static const ym2203_interface ym2203_config =

@@ -75,8 +75,8 @@ static WRITE8_HANDLER( onetwo_cpubank_w )
 static WRITE8_HANDLER( onetwo_coin_counters_w )
 {
 	watchdog_reset(space->machine);
-	coin_counter_w(0, data & 0x02);
-	coin_counter_w(1, data & 0x04);
+	coin_counter_w(space->machine, 0, data & 0x02);
+	coin_counter_w(space->machine, 1, data & 0x04);
 }
 
 static WRITE8_HANDLER( onetwo_soundlatch_w )

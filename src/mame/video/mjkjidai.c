@@ -65,7 +65,7 @@ WRITE8_HANDLER( mjkjidai_ctrl_w )
 	display_enable = data & 0x04;
 
 	/* bit 5 = coin counter */
-	coin_counter_w(0,data & 0x20);
+	coin_counter_w(space->machine, 0,data & 0x20);
 
 	/* bits 6-7 select ROM bank */
 	if (data & 0xc0)

@@ -712,7 +712,7 @@ static WRITE16_HANDLER( led_0_w )
 	/* this has $00 written during an IRQ 6, then reset to $ff afterwards */
 	/* LED??? */
 	if (ACCESSING_BITS_0_7)
-		set_led_status(0, data != 0);
+		set_led_status(space->machine, 0, data != 0);
 }
 
 
@@ -720,7 +720,7 @@ static WRITE16_HANDLER( led_1_w )
 {
 	/* LED??? -- only written $00 or $ff */
 	if (ACCESSING_BITS_0_7)
-		set_led_status(1, data != 0);
+		set_led_status(space->machine, 1, data != 0);
 }
 
 

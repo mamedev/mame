@@ -33,21 +33,6 @@
 
 
 /***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-extern UINT32 dispensed_tickets;
-extern UINT32 coin_count[COIN_COUNTERS];
-extern UINT32 coinlockedout[COIN_COUNTERS];
-
-extern size_t generic_nvram_size;
-extern UINT8 *generic_nvram;
-extern UINT16 *generic_nvram16;
-extern UINT32 *generic_nvram32;
-extern UINT64 *generic_nvram64;
-
-
-/***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
@@ -59,16 +44,32 @@ void generic_machine_init(running_machine *machine);
 
 
 
+/* ----- tickets ----- */
+
+/* return the number of tickets dispensed */
+int get_dispensed_tickets(running_machine *machine);
+
+/* increment the number of dispensed tickets */
+void increment_dispensed_tickets(running_machine *machine, int delta);
+
+
+
 /* ----- coin counters ----- */
 
 /* write to a particular coin counter (clocks on active high edge) */
-void coin_counter_w(int num, int on);
+void coin_counter_w(running_machine *machine, int num, int on);
+
+/* return the coin count for a given coin */
+int coin_counter_get_count(running_machine *machine, int num);
 
 /* enable/disable coin lockout for a particular coin */
-void coin_lockout_w(int num, int on);
+void coin_lockout_w(running_machine *machine, int num, int on);
+
+/* return current lockout state for a particular coin */
+int coin_lockout_get_state(running_machine *machine, int num);
 
 /* enable/disable global coin lockout */
-void coin_lockout_global_w(int on);
+void coin_lockout_global_w(running_machine *machine, int on);
 
 
 
@@ -106,14 +107,14 @@ int memcard_insert(running_machine *machine, int index);
 void memcard_eject(running_machine *machine);
 
 /* returns the index of the current memory card, or -1 if none */
-int memcard_present(void);
+int memcard_present(running_machine *machine);
 
 
 
 /* ----- miscellaneous bits & pieces ----- */
 
 /* set the status of an LED */
-void set_led_status(int num, int value);
+void set_led_status(running_machine *machine, int num, int value);
 
 
 

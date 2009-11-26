@@ -140,33 +140,33 @@ DRIVER_INIT( snowboar )
 WRITE16_HANDLER( gaelco2_coin_w )
 {
 	/* Coin Lockouts */
-	coin_lockout_w(0, ~data & 0x01);
-	coin_lockout_w(1, ~data & 0x02);
+	coin_lockout_w(space->machine, 0, ~data & 0x01);
+	coin_lockout_w(space->machine, 1, ~data & 0x02);
 
 	/* Coin Counters */
-	coin_counter_w(0, data & 0x04);
-	coin_counter_w(1, data & 0x08);
+	coin_counter_w(space->machine, 0, data & 0x04);
+	coin_counter_w(space->machine, 1, data & 0x08);
 }
 
 WRITE16_HANDLER( gaelco2_coin2_w )
 {
 	/* coin counters */
-	coin_counter_w(offset & 0x01,  data & 0x01);
+	coin_counter_w(space->machine, offset & 0x01,  data & 0x01);
 }
 
 WRITE16_HANDLER( wrally2_coin_w )
 {
 	/* coin counters */
-	coin_counter_w((offset >> 3) & 0x01,  data & 0x01);
+	coin_counter_w(space->machine, (offset >> 3) & 0x01,  data & 0x01);
 }
 
 WRITE16_HANDLER( touchgo_coin_w )
 {
 	if ((offset >> 2) == 0){
-		coin_counter_w(0, data & 0x01);
-		coin_counter_w(1, data & 0x02);
-		coin_counter_w(2, data & 0x04);
-		coin_counter_w(3, data & 0x08);
+		coin_counter_w(space->machine, 0, data & 0x01);
+		coin_counter_w(space->machine, 1, data & 0x02);
+		coin_counter_w(space->machine, 2, data & 0x04);
+		coin_counter_w(space->machine, 3, data & 0x08);
 	}
 }
 

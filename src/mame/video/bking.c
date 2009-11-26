@@ -147,7 +147,7 @@ WRITE8_HANDLER( bking_cont1_w )
 	/* D3 = Not Connected */
 	/* D4-D7 = CROW0-CROW3 (selects crow picture) */
 
-	coin_lockout_global_w(~data & 0x01);
+	coin_lockout_global_w(space->machine, ~data & 0x01);
 
 	flip_screen_set_no_update(space->machine, data & 0x04);
 

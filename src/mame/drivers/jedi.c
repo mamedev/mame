@@ -232,7 +232,7 @@ static WRITE8_HANDLER( a2d_select_w )
 
 static WRITE8_HANDLER( jedi_coin_counter_w )
 {
-	coin_counter_w(offset, data);
+	coin_counter_w(space->machine, offset, data);
 }
 
 
@@ -248,7 +248,7 @@ static WRITE8_HANDLER( nvram_data_w )
 	jedi_state *state = (jedi_state *)space->machine->driver_data;
 
 	if (state->nvram_enabled)
-		generic_nvram[offset] = data;
+		space->machine->generic.nvram.ptr.u8[offset] = data;
 }
 
 
@@ -269,7 +269,7 @@ static WRITE8_HANDLER( nvram_enable_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0300) AM_RAM_WRITE(nvram_data_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0300) AM_RAM_WRITE(nvram_data_w) AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03fe) AM_READ_PORT("0c00") AM_WRITENOP
 	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x03fe) AM_READ_PORT("0c01") AM_WRITENOP
 	AM_RANGE(0x1000, 0x13ff) AM_NOP

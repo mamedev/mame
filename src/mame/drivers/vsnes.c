@@ -158,7 +158,7 @@ static WRITE8_HANDLER( sprite_dma_1_w )
 
 static WRITE8_HANDLER( vsnes_coin_counter_w )
 {
-	coin_counter_w( 0, data & 0x01 );
+	coin_counter_w( space->machine, 0, data & 0x01 );
 	coin = data;
 	if( data & 0xfe ) //"bnglngby" and "cluclu"
 	{
@@ -174,7 +174,7 @@ static READ8_HANDLER( vsnes_coin_counter_r )
 
 static WRITE8_HANDLER( vsnes_coin_counter_1_w )
 {
-	coin_counter_w( 1, data & 0x01 );
+	coin_counter_w( space->machine, 1, data & 0x01 );
 	if( data & 0xfe ) //vsbball service mode
 	{
 		//do something?

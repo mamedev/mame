@@ -345,7 +345,7 @@ static VIDEO_UPDATE( m63 )
 
 static WRITE8_HANDLER( coin_w )
 {
-	coin_counter_w(offset, data & 0x01);
+	coin_counter_w(space->machine, offset, data & 0x01);
 }
 
 static WRITE8_HANDLER( snd_irq_w )

@@ -231,7 +231,7 @@ WRITE8_HANDLER( nitedrvr_out1_w )
 {
 	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 
-	set_led_status(0,data & 0x10);
+	set_led_status(space->machine, 0,data & 0x10);
 
 	nitedrvr_crash_en = data & 0x01;
 	discrete_sound_w(discrete, NITEDRVR_CRASH_EN, nitedrvr_crash_en);	// Crash enable

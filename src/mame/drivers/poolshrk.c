@@ -55,9 +55,9 @@ static WRITE8_HANDLER( poolshrk_da_latch_w )
 static WRITE8_HANDLER( poolshrk_led_w )
 {
 	if (offset & 2)
-		set_led_status(0, offset & 1);
+		set_led_status(space->machine, 0, offset & 1);
 	if (offset & 4)
-		set_led_status(1, offset & 1);
+		set_led_status(space->machine, 1, offset & 1);
 }
 
 

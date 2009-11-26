@@ -45,7 +45,7 @@ static WRITE8_HANDLER( sspeedr_lamp_w )
 {
 	output_set_value("lampGO", (data >> 0) & 1);
 	output_set_value("lampEP", (data >> 1) & 1);
-	coin_counter_w(0, data & 8);
+	coin_counter_w(space->machine, 0, data & 8);
 }
 
 

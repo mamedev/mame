@@ -135,9 +135,9 @@ static WRITE16_HANDLER( twin16_CPUA_register_w )
 		if ((old & 0x10) == 0 && (twin16_CPUA_register & 0x10))
 			cputag_set_input_line(space->machine, "sub", M68K_IRQ_6, HOLD_LINE);
 
-		coin_counter_w(0, twin16_CPUA_register & 0x01);
-		coin_counter_w(1, twin16_CPUA_register & 0x02);
-		coin_counter_w(2, twin16_CPUA_register & 0x04);
+		coin_counter_w(space->machine, 0, twin16_CPUA_register & 0x01);
+		coin_counter_w(space->machine, 1, twin16_CPUA_register & 0x02);
+		coin_counter_w(space->machine, 2, twin16_CPUA_register & 0x04);
 	}
 }
 
@@ -172,8 +172,8 @@ static WRITE16_HANDLER( fround_CPU_register_w )
 		if ((old & 0x08) == 0 && (twin16_CPUA_register & 0x08))
 			cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 
-		coin_counter_w(0, twin16_CPUA_register & 0x01);
-		coin_counter_w(1, twin16_CPUA_register & 0x02);
+		coin_counter_w(space->machine, 0, twin16_CPUA_register & 0x01);
+		coin_counter_w(space->machine, 1, twin16_CPUA_register & 0x02);
 	}
 }
 
@@ -1332,8 +1332,8 @@ static DRIVER_INIT( cuebrickj )
 {
 	gfx_untangle(machine);
 
-	generic_nvram = (UINT8 *)cuebrickj_nvram;
-	generic_nvram_size = 0x400*0x20;
+	machine->generic.nvram.ptr.u8 = (UINT8 *)cuebrickj_nvram;
+	machine->generic.nvram.size = 0x400*0x20;
 }
 
 /* Game Drivers */

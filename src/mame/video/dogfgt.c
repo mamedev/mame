@@ -167,8 +167,8 @@ WRITE8_HANDLER( dogfgt_1800_w )
 	state->pixcolor = ((data & 0x01) << 1) | ((data & 0x02) >> 1);
 
 	/* bits 4 and 5 are coin counters */
-	coin_counter_w(0, data & 0x10);
-	coin_counter_w(1, data & 0x20);
+	coin_counter_w(space->machine, 0, data & 0x10);
+	coin_counter_w(space->machine, 1, data & 0x20);
 
 	/* bit 7 is screen flip */
 	flip_screen_set(space->machine, data & 0x80);

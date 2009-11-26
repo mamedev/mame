@@ -76,7 +76,7 @@ static WRITE8_HANDLER( flipscreen_w )
 
 static WRITE8_HANDLER( coin_w )
 {
-	coin_counter_w(offset,~data & 1);
+	coin_counter_w(space->machine, offset,~data & 1);
 }
 
 static WRITE8_HANDLER( spinner_select_w )

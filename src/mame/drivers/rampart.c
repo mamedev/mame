@@ -99,8 +99,8 @@ static WRITE16_HANDLER( latch_w )
 	{
 		if (data & 0x1000)
 			logerror("Color bank set to 1!\n");
-		coin_counter_w(0, (data >> 9) & 1);
-		coin_counter_w(1, (data >> 8) & 1);
+		coin_counter_w(space->machine, 0, (data >> 9) & 1);
+		coin_counter_w(space->machine, 1, (data >> 8) & 1);
 	}
 
 	/* lower byte being modified? */

@@ -43,8 +43,8 @@ static WRITE8_HANDLER( hcastle_soundirq_w )
 
 static WRITE8_HANDLER( hcastle_coin_w )
 {
-	coin_counter_w(0,data & 0x40);
-	coin_counter_w(1,data & 0x80);
+	coin_counter_w(space->machine, 0,data & 0x40);
+	coin_counter_w(space->machine, 1,data & 0x80);
 }
 
 

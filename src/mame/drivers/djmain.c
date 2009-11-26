@@ -396,9 +396,9 @@ static WRITE32_HANDLER( light_ctrl_2_w )
 	{
 		output_set_value("left-ssr",       !!(data & 0x08000000));	// SSR
 		output_set_value("right-ssr",      !!(data & 0x08000000));	// SSR
-		set_led_status(0, data & 0x00010000);			// 1P START
-		set_led_status(1, data & 0x00020000);			// 2P START
-		set_led_status(2, data & 0x00040000);			// EFFECT
+		set_led_status(space->machine, 0, data & 0x00010000);			// 1P START
+		set_led_status(space->machine, 1, data & 0x00020000);			// 2P START
+		set_led_status(space->machine, 2, data & 0x00040000);			// EFFECT
 	}
 }
 
@@ -1461,9 +1461,9 @@ static MACHINE_RESET( djmain )
 	devtag_reset(machine, "ide");
 
 	/* reset LEDs */
-	set_led_status(0, 1);
-	set_led_status(1, 1);
-	set_led_status(2, 1);
+	set_led_status(machine, 0, 1);
+	set_led_status(machine, 1, 1);
+	set_led_status(machine, 2, 1);
 }
 
 

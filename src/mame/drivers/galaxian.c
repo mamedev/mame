@@ -316,26 +316,26 @@ static WRITE8_HANDLER( start_lamp_w )
 {
 	/* offset 0 = 1P START LAMP */
 	/* offset 1 = 2P START LAMP */
-	set_led_status(offset, data & 1);
+	set_led_status(space->machine, offset, data & 1);
 }
 
 
 static WRITE8_HANDLER( coin_lock_w )
 {
 	/* many variants and bootlegs don't have this */
-	coin_lockout_global_w(~data & 1);
+	coin_lockout_global_w(space->machine, ~data & 1);
 }
 
 
 static WRITE8_HANDLER( coin_count_0_w )
 {
-	coin_counter_w(0, data & 1);
+	coin_counter_w(space->machine, 0, data & 1);
 }
 
 
 static WRITE8_HANDLER( coin_count_1_w )
 {
-	coin_counter_w(1, data & 1);
+	coin_counter_w(space->machine, 1, data & 1);
 }
 
 
@@ -505,7 +505,7 @@ static WRITE8_HANDLER( theend_ppi8255_w )
 
 static WRITE8_DEVICE_HANDLER( theend_coin_counter_w )
 {
-	coin_counter_w(0, data & 0x80);
+	coin_counter_w(device->machine, 0, data & 0x80);
 }
 
 

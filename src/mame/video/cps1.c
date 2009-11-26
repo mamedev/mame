@@ -1655,15 +1655,15 @@ WRITE16_HANDLER( cps1_cps_b_w )
 		{
 			if (cps1_game_config->cpsb_value == 0x0402)	// Mercs (CN2 connector)
 			{
-				coin_lockout_w(2,~data & 0x01);
-				set_led_status(0,data & 0x02);
-				set_led_status(1,data & 0x04);
-				set_led_status(2,data & 0x08);
+				coin_lockout_w(space->machine, 2,~data & 0x01);
+				set_led_status(space->machine, 0,data & 0x02);
+				set_led_status(space->machine, 1,data & 0x04);
+				set_led_status(space->machine, 2,data & 0x08);
 			}
 			else	// kod, captcomm, knights
 			{
-				coin_lockout_w(2,~data & 0x02);
-				coin_lockout_w(3,~data & 0x08);
+				coin_lockout_w(space->machine, 2,~data & 0x02);
+				coin_lockout_w(space->machine, 3,~data & 0x08);
 			}
 		}
 	}

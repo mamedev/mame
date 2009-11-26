@@ -237,7 +237,7 @@ static WRITE16_HANDLER( output_w )
 	static int i;
 
 	for(i=0;i<3;i++)
-		coin_counter_w(i, data & 0x2000);
+		coin_counter_w(space->machine, i, data & 0x2000);
 
 	output_set_lamp_value(0, (data) & 1);		/* HOLD1 */
 	output_set_lamp_value(1, (data >> 1) & 1);	/* HOLD2 */
@@ -266,7 +266,7 @@ static ADDRESS_MAP_START( mil4000_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x70801e, 0x70801f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 
 	AM_RANGE(0x780000, 0x780fff) AM_RAM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size) // 2x CY62256L-70 (U7 & U8).
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // 2x CY62256L-70 (U7 & U8).
 
 ADDRESS_MAP_END
 

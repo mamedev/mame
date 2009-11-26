@@ -504,8 +504,8 @@ static WRITE8_HANDLER( hardhead_bankswitch_w )
 static WRITE8_HANDLER( hardhead_flipscreen_w )
 {
 	flip_screen_set(space->machine,     data & 0x04);
-	coin_lockout_w ( 0,	data & 0x08);
-	coin_lockout_w ( 1,	data & 0x10);
+	coin_lockout_w ( space->machine, 0,	data & 0x08);
+	coin_lockout_w ( space->machine, 1,	data & 0x10);
 }
 
 static ADDRESS_MAP_START( hardhead_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -551,8 +551,8 @@ static WRITE8_HANDLER( rranger_bankswitch_w )
 	memory_set_bank(space->machine, 1, bank);
 
 	flip_screen_set(space->machine,     data & 0x20);
-	coin_lockout_w ( 0,	data & 0x40);
-	coin_lockout_w ( 1,	data & 0x80);
+	coin_lockout_w ( space->machine, 0,	data & 0x40);
+	coin_lockout_w ( space->machine, 1,	data & 0x80);
 }
 
 /*
@@ -691,9 +691,9 @@ static WRITE8_HANDLER( hardhea2_flipscreen_w )
 
 static WRITE8_HANDLER( hardhea2_leds_w )
 {
-	set_led_status(0, data & 0x01);
-	set_led_status(1, data & 0x02);
-	coin_counter_w(0, data & 0x04);
+	set_led_status(space->machine, 0, data & 0x01);
+	set_led_status(space->machine, 1, data & 0x02);
+	coin_counter_w(space->machine, 0, data & 0x04);
 	if (data & ~0x07)	logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
@@ -840,9 +840,9 @@ static WRITE8_HANDLER( sparkman_flipscreen_w )
 
 static WRITE8_HANDLER( sparkman_leds_w )
 {
-	set_led_status(0, data & 0x01);
-	set_led_status(1, data & 0x02);
-	coin_counter_w(0, data & 0x04);
+	set_led_status(space->machine, 0, data & 0x01);
+	set_led_status(space->machine, 1, data & 0x02);
+	coin_counter_w(space->machine, 0, data & 0x04);
 	if (data & ~0x07)	logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 

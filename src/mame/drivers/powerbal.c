@@ -65,7 +65,7 @@ static WRITE16_HANDLER( magicstk_coin_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0,data & 0x20);
+		coin_counter_w(space->machine, 0,data & 0x20);
 
 		eeprom_set_cs_line((data & 8) ? CLEAR_LINE : ASSERT_LINE);
 		eeprom_write_bit(data & 2);

@@ -55,8 +55,8 @@ WRITE8_HANDLER( jackal_rambank_w )
 	UINT8 *rgn = memory_region(space->machine, "master");
 
 	if (data & 0x04) popmessage("jackal_rambank_w %02x",data);
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+	coin_counter_w(space->machine, 0,data & 0x01);
+	coin_counter_w(space->machine, 1,data & 0x02);
 	jackal_spritebank = &rgn[((data & 0x08) << 13)];
 	jackal_rambank = &rgn[((data & 0x10) << 12)];
 	memory_set_bankptr(space->machine, 1,&rgn[((data & 0x20) << 11) + 0x4000]);

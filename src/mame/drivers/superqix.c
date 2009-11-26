@@ -233,13 +233,13 @@ static WRITE8_HANDLER( bootleg_mcu_p1_w )
 			// ???
 			break;
 		case 1:
-			coin_counter_w(0,data & 1);
+			coin_counter_w(space->machine, 0,data & 1);
 			break;
 		case 2:
-			coin_counter_w(1,data & 1);
+			coin_counter_w(space->machine, 1,data & 1);
 			break;
 		case 3:
-			coin_lockout_global_w((data & 1) ^ invert_coin_lockout);
+			coin_lockout_global_w(space->machine, (data & 1) ^ invert_coin_lockout);
 			break;
 		case 4:
 			flip_screen_set(space->machine, data & 1);
@@ -300,13 +300,13 @@ static WRITE8_HANDLER( sqixu_mcu_p2_w )
 	// bit 0 = unknown (clocked often)
 
 	// bit 1 = coin cointer 1
-	coin_counter_w(0,data & 2);
+	coin_counter_w(space->machine, 0,data & 2);
 
 	// bit 2 = coin counter 2
-	coin_counter_w(1,data & 4);
+	coin_counter_w(space->machine, 1,data & 4);
 
 	// bit 3 = coin lockout
-	coin_lockout_global_w(~data & 8);
+	coin_lockout_global_w(space->machine, ~data & 8);
 
 	// bit 4 = flip screen
 	flip_screen_set(space->machine, data & 0x10);

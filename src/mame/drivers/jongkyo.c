@@ -113,7 +113,7 @@ static WRITE8_HANDLER( mux_w )
 static WRITE8_HANDLER( jongkyo_coin_counter_w )
 {
 	/* bit 1 = coin counter */
-	coin_counter_w(0,data & 2);
+	coin_counter_w(space->machine, 0,data & 2);
 
 	/* bit 2 always set? */
 }

@@ -1279,7 +1279,7 @@ static WRITE16_HANDLER( sdmg2_magic_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				input_select	=	data & 0x1f;
-				coin_counter_w(0,	data & 0x20);
+				coin_counter_w(space->machine, 0,	data & 0x20);
 				//  coin out        data & 0x40
 				hopper			=	data & 0x80;
 			}
@@ -1364,7 +1364,7 @@ static WRITE16_HANDLER( mgdh_magic_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				//  coin out     data & 0x40
-				coin_counter_w(0, data & 0x80);
+				coin_counter_w(space->machine, 0, data & 0x80);
 			}
 
 			if ( data & ~0xc0 )

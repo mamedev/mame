@@ -99,8 +99,8 @@ static READ32_HANDLER( eolith_custom_r )
 static WRITE32_HANDLER( systemcontrol_w )
 {
 	eolith_buffer = (data & 0x80) >> 7;
-	coin_counter_w(0, data & coin_counter_bit);
-	set_led_status(0, data & 1);
+	coin_counter_w(space->machine, 0, data & coin_counter_bit);
+	set_led_status(space->machine, 0, data & 1);
 
 	input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
 

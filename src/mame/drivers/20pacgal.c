@@ -113,7 +113,7 @@ static const eeprom_interface _20pacgal_eeprom_intf =
 
 static WRITE8_HANDLER( _20pacgal_coin_counter_w )
 {
-	coin_counter_w(0, data & 1);
+	coin_counter_w(space->machine, 0, data & 1);
 }
 
 

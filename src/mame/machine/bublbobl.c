@@ -211,7 +211,7 @@ WRITE8_HANDLER( bublbobl_mcu_port1_w )
 	//logerror("%04x: 6801U4 port 1 write %02x\n", cpu_get_pc(space->cpu), data);
 
 	// bit 4: coin lockout
-	coin_lockout_global_w(~data & 0x10);
+	coin_lockout_global_w(space->machine, ~data & 0x10);
 
 	// bit 5: select 1-way or 2-way coin counter
 

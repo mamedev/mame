@@ -39,8 +39,8 @@ WRITE8_HANDLER( arkanoid_d008_w )
 	state->paddle_select = data & 0x04;
 
 	/* bit 3 is coin lockout (but not the service coin) */
-	coin_lockout_w(0, !(data & 0x08));
-	coin_lockout_w(1, !(data & 0x08));
+	coin_lockout_w(space->machine, 0, !(data & 0x08));
+	coin_lockout_w(space->machine, 1, !(data & 0x08));
 
 	/* bit 4 is unknown */
 
@@ -115,8 +115,8 @@ WRITE8_HANDLER( tetrsark_d008_w )
 	}
 
 	/* bit 7 is coin lockout (but not the service coin) */
-	coin_lockout_w(0, !(data & 0x80));
-	coin_lockout_w(1, !(data & 0x80));
+	coin_lockout_w(space->machine, 0, !(data & 0x80));
+	coin_lockout_w(space->machine, 1, !(data & 0x80));
 }
 
 

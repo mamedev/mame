@@ -115,8 +115,8 @@ static WRITE8_DEVICE_HANDLER( sync_sndpia1_porta_w )
 
 static WRITE8_DEVICE_HANDLER( slither_coinctl_w )
 {
-	coin_lockout_w(0, (~data >> 6) & 1);
-	coin_counter_w(0, (data >> 5) & 1);
+	coin_lockout_w(device->machine, 0, (~data >> 6) & 1);
+	coin_counter_w(device->machine, 0, (data >> 5) & 1);
 }
 
 

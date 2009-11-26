@@ -77,13 +77,13 @@ static WRITE16_HANDLER( pkscramble_output_w )
 		interrupt_line_active = 0;
 	}
 
-	coin_counter_w(0, data & 0x80);
+	coin_counter_w(space->machine, 0, data & 0x80);
 }
 
 static ADDRESS_MAP_START( pkscramble_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x0400ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x040000, 0x0400ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x041000, 0x043fff) AM_RAM // main ram
 	AM_RANGE(0x044000, 0x044fff) AM_RAM_WRITE(pkscramble_fgtilemap_w) AM_BASE(&pkscramble_fgtilemap_ram) // fg tilemap
 	AM_RANGE(0x045000, 0x045fff) AM_RAM_WRITE(pkscramble_mdtilemap_w) AM_BASE(&pkscramble_mdtilemap_ram) // md tilemap (just a copy of fg?)

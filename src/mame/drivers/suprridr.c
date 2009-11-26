@@ -150,7 +150,7 @@ static WRITE8_HANDLER( sound_irq_ack_w )
 static WRITE8_HANDLER( coin_lock_w )
 {
 	/* cleared when 9 credits are hit, but never reset! */
-/*  coin_lockout_global_w(~data & 1); */
+/*  coin_lockout_global_w(space->machine, ~data & 1); */
 }
 
 

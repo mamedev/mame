@@ -754,7 +754,7 @@ static WRITE8_DEVICE_HANDLER( lamps_b_w )
 
 static ADDRESS_MAP_START( sys903_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE("ay8912", ay8910_address_data_w)
 	AM_RANGE(0x0880, 0x0880) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
@@ -769,7 +769,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s903mod_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE("ay8912", ay8910_address_data_w)
 	AM_RANGE(0x0880, 0x0880) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
@@ -782,7 +782,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys905_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x1040, 0x1041) AM_DEVWRITE("ay8912", ay8910_address_data_w)
 	AM_RANGE(0x1080, 0x1080) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x1081, 0x1081) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)

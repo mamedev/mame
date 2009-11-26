@@ -93,7 +93,7 @@ static READ8_HANDLER( canyon_options_r )
 
 static WRITE8_HANDLER( canyon_led_w )
 {
-	set_led_status(offset & 0x01, offset & 0x02);
+	set_led_status(space->machine, offset & 0x01, offset & 0x02);
 }
 
 

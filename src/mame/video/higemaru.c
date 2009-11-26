@@ -76,8 +76,8 @@ WRITE8_HANDLER( higemaru_c800_w )
 	if (data & 0x7c) logerror("c800 = %02x\n",data);
 
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(0,data & 2);
-	coin_counter_w(1,data & 1);
+	coin_counter_w(space->machine, 0,data & 2);
+	coin_counter_w(space->machine, 1,data & 1);
 
 	/* bit 7 flips screen */
 	if (flip_screen_get(space->machine) != (data & 0x80))

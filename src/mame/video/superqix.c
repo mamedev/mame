@@ -132,8 +132,8 @@ WRITE8_HANDLER( pbillian_0410_w )
      --5-----  flip screen
     */
 
-	coin_counter_w(0,data & 0x02);
-	coin_counter_w(1,data & 0x04);
+	coin_counter_w(space->machine, 0,data & 0x02);
+	coin_counter_w(space->machine, 1,data & 0x04);
 
 	memory_set_bank(space->machine, 1, (data & 0x08) >> 3);
 

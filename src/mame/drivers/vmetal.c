@@ -157,10 +157,10 @@ static WRITE8_DEVICE_HANDLER( vmetal_control_w )
 {
 	/* Lower nibble is the coin control bits shown in
        service mode, but in game mode they're different */
-	coin_counter_w(0,data & 0x04);
-	coin_counter_w(1,data & 0x08);	/* 2nd coin schute activates coin 0 counter in game mode?? */
-//  coin_lockout_w(0,data & 0x01);  /* always on in game mode?? */
-	coin_lockout_w(1,data & 0x02);	/* never activated in game mode?? */
+	coin_counter_w(device->machine, 0,data & 0x04);
+	coin_counter_w(device->machine, 1,data & 0x08);	/* 2nd coin schute activates coin 0 counter in game mode?? */
+//  coin_lockout_w(device->machine, 0,data & 0x01);  /* always on in game mode?? */
+	coin_lockout_w(device->machine, 1,data & 0x02);	/* never activated in game mode?? */
 
 	if ((data & 0x40) == 0)
 		device_reset(device);

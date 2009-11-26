@@ -173,14 +173,14 @@ static READ8_HANDLER( dipB_l )	{ return input_port_read(space->machine, "DSW1");
 static READ8_HANDLER( dipB_h )	{ return input_port_read(space->machine, "DSW1") >> 4; }	// dips B
 static WRITE8_HANDLER( out_lamps0 )
 {
-	set_led_status(0,data & 1);
-	set_led_status(1,data & 2);
-	coin_lockout_global_w(data & 4);
-	coin_counter_w(0,~data & 8);
+	set_led_status(space->machine, 0,data & 1);
+	set_led_status(space->machine, 1,data & 2);
+	coin_lockout_global_w(space->machine, data & 4);
+	coin_counter_w(space->machine, 0,~data & 8);
 }
 static WRITE8_HANDLER( out_lamps1 )
 {
-	coin_counter_w(1,~data & 1);
+	coin_counter_w(space->machine, 1,~data & 1);
 }
 
 /* chip #0: player inputs, buttons, coins */

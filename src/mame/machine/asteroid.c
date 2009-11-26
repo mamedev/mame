@@ -106,8 +106,8 @@ WRITE8_HANDLER( asteroid_bank_switch_w )
 		memory_set_bankptr(space->machine, 2, asteroid_ram2);
 	}
 
-	set_led_status (0, ~data & 0x02);
-	set_led_status (1, ~data & 0x01);
+	set_led_status (space->machine, 0, ~data & 0x02);
+	set_led_status (space->machine, 1, ~data & 0x01);
 }
 
 
@@ -128,7 +128,7 @@ WRITE8_HANDLER( astdelux_bank_switch_w )
 
 WRITE8_HANDLER( astdelux_led_w )
 {
-	set_led_status(offset, (data & 0x80) ? 0 : 1);
+	set_led_status(space->machine, offset, (data & 0x80) ? 0 : 1);
 }
 
 

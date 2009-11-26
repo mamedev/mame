@@ -457,9 +457,9 @@ static WRITE8_HANDLER( output_port_0_w )
 	output_set_lamp_value(5, bit3);	/* Lamp 5 - STOP4  */
 	output_set_lamp_value(6, bit4);	/* Lamp 6 - STOP5  */
 
-	coin_counter_w(0, data & 0x01);	/* Coin in */
-	coin_counter_w(1, data & 0x10);	/* Key in */
-	coin_counter_w(2, data & 0x04);	/* Payout x10 */
+	coin_counter_w(space->machine, 0, data & 0x01);	/* Coin in */
+	coin_counter_w(space->machine, 1, data & 0x10);	/* Key in */
+	coin_counter_w(space->machine, 2, data & 0x04);	/* Payout x10 */
 
 //  logerror("high: %04x - low: %X \n", outporth, outportl);
 //  popmessage("written : %02X", data);
@@ -505,7 +505,7 @@ static WRITE8_HANDLER( output_port_1_w )
 *************************/
 
 static ADDRESS_MAP_START( snookr10_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0")		/* IN0 */
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("IN1")		/* IN1 */
@@ -520,7 +520,7 @@ static ADDRESS_MAP_START( snookr10_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tenballs_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("IN0")		/* IN0 */
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("IN1")		/* IN1 */

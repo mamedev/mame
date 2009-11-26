@@ -75,11 +75,11 @@ static WRITE8_HANDLER( bg_bank_w )
 
 static WRITE8_HANDLER( coins_w )
 {
-	coin_counter_w(0, data & 1);
-	coin_counter_w(1, data & 2);
+	coin_counter_w(space->machine, 0, data & 1);
+	coin_counter_w(space->machine, 1, data & 2);
 
-	set_led_status(0, data & 4);
-	set_led_status(1, data & 8);
+	set_led_status(space->machine, 0, data & 4);
+	set_led_status(space->machine, 1, data & 8);
 }
 
 static WRITE8_HANDLER(snd_w)

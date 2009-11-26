@@ -142,7 +142,7 @@ static WRITE8_HANDLER(nmi_line_w)
 /* PROGRAM MAPS */
 static ADDRESS_MAP_START( z80_0_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000,0x3fff) AM_ROM
-	AM_RANGE(0xe000,0xe7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xe000,0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xf000,0xf3ff) AM_RAM AM_BASE(&tile_ram)
 	AM_RANGE(0xf400,0xf7ff) AM_RAM AM_BASE(&tile_control_ram)
 ADDRESS_MAP_END

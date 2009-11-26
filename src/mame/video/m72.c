@@ -344,8 +344,8 @@ WRITE16_HANDLER( m72_port02_w )
 		if (data & 0xe0) logerror("write %02x to port 02\n",data);
 
 		/* bits 0/1 are coin counters */
-		coin_counter_w(0,data & 0x01);
-		coin_counter_w(1,data & 0x02);
+		coin_counter_w(space->machine, 0,data & 0x01);
+		coin_counter_w(space->machine, 1,data & 0x02);
 
 		/* bit 2 is flip screen (handled both by software and hardware) */
 		flip_screen_set(space->machine, ((data & 0x04) >> 2) ^ ((~input_port_read(space->machine, "DSW") >> 8) & 1));
@@ -370,8 +370,8 @@ WRITE16_HANDLER( rtype2_port02_w )
 		if (data & 0xe0) logerror("write %02x to port 02\n",data);
 
 		/* bits 0/1 are coin counters */
-		coin_counter_w(0,data & 0x01);
-		coin_counter_w(1,data & 0x02);
+		coin_counter_w(space->machine, 0,data & 0x01);
+		coin_counter_w(space->machine, 1,data & 0x02);
 
 		/* bit 2 is flip screen (handled both by software and hardware) */
 		flip_screen_set(space->machine, ((data & 0x04) >> 2) ^ ((~input_port_read(space->machine, "DSW") >> 8) & 1));

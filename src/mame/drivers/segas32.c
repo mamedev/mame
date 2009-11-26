@@ -695,10 +695,10 @@ static void common_io_chip_w(const address_space *space, int which, offs_t offse
 				eeprom_set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 				eeprom_set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			}
-/*            coin_lockout_w(1 + 2*which, data & 0x08);
-            coin_lockout_w(0 + 2*which, data & 0x04);*/
-			coin_counter_w(1 + 2*which, data & 0x02);
-			coin_counter_w(0 + 2*which, data & 0x01);
+/*            coin_lockout_w(space->machine, 1 + 2*which, data & 0x08);
+            coin_lockout_w(space->machine, 0 + 2*which, data & 0x04);*/
+			coin_counter_w(space->machine, 1 + 2*which, data & 0x02);
+			coin_counter_w(space->machine, 0 + 2*which, data & 0x01);
 			break;
 
 		/* tile banking */

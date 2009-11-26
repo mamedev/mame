@@ -100,7 +100,7 @@ static WRITE8_HANDLER( tankbust_e0xx_w )
 	break;
 
 	case 2:	/* 0xe002 coin counter */
-		coin_counter_w(0, data&1);
+		coin_counter_w(space->machine, 0, data&1);
 	break;
 
 	case 6:	/* 0xe006 screen disable ?? or disable screen update */

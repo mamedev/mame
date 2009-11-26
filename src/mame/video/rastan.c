@@ -57,12 +57,12 @@ WRITE16_HANDLER( rastan_spritectrl_w )
 	/* bit 4 unused */
 
 	/* bits 0 and 1 are coin lockout */
-	coin_lockout_w(1,~data & 0x01);
-	coin_lockout_w(0,~data & 0x02);
+	coin_lockout_w(space->machine, 1,~data & 0x01);
+	coin_lockout_w(space->machine, 0,~data & 0x02);
 
 	/* bits 2 and 3 are the coin counters */
-	coin_counter_w(1,data & 0x04);
-	coin_counter_w(0,data & 0x08);
+	coin_counter_w(space->machine, 1,data & 0x04);
+	coin_counter_w(space->machine, 0,data & 0x08);
 }
 
 WRITE16_HANDLER( rainbow_spritectrl_w )

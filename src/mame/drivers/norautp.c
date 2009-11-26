@@ -1262,9 +1262,9 @@ static WRITE8_DEVICE_HANDLER( counterlamps_w )
 	output_set_lamp_value(10, (data >> 0) & 1);	/* HI lamp */
 	output_set_lamp_value(11, (data >> 1) & 1);	/* LO lamp */
 
-	coin_counter_w(0, data & 0x10);	/* Coin1/3 counter */
-	coin_counter_w(1, data & 0x20);	/* Coin2 counter */
-	coin_counter_w(2, data & 0x08);	/* Payout pulse */
+	coin_counter_w(device->machine, 0, data & 0x10);	/* Coin1/3 counter */
+	coin_counter_w(device->machine, 1, data & 0x20);	/* Coin2 counter */
+	coin_counter_w(device->machine, 2, data & 0x08);	/* Payout pulse */
 }
 
 
@@ -1367,7 +1367,7 @@ static READ8_HANDLER( test2_r )
 static ADDRESS_MAP_START( norautp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* 6116 */
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* 6116 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( norautp_portmap, ADDRESS_SPACE_IO, 8 )
@@ -1398,24 +1398,24 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( nortest1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( norautxp_map, ADDRESS_SPACE_PROGRAM, 8 )
 //	ADDRESS_MAP_GLOBAL_MASK(~0x4000)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* need to be checked */
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) /* HM6116 */
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) /* HM6116 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( norautx4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* need to be checked */
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) /* 6116 */
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) /* 6116 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( norautx8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	/* need to be checked */
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) /* 6116 */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) /* 6116 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( norautxp_portmap, ADDRESS_SPACE_IO, 8 )
@@ -1428,20 +1428,20 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dphl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 not connected */
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM	AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* should be 2x 0x100 segments (4x 2111) */
+	AM_RANGE(0x5000, 0x53ff) AM_RAM	AM_BASE_SIZE_GENERIC(nvram)	/* should be 2x 0x100 segments (4x 2111) */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dphla_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dphltest_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 not connected */
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 ADDRESS_MAP_END
 
 /*
@@ -1462,7 +1462,7 @@ DPHLA
 static ADDRESS_MAP_START( drhl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 not connected */
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x5400, 0x57ff) AM_RAM
 ADDRESS_MAP_END
 

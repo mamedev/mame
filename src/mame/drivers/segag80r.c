@@ -282,8 +282,8 @@ static READ8_HANDLER( spaceod_port_fc_r )
 
 static WRITE8_HANDLER( coin_count_w )
 {
-	coin_counter_w(0, (data >> 7) & 1);
-	coin_counter_w(1, (data >> 6) & 1);
+	coin_counter_w(space->machine, 0, (data >> 7) & 1);
+	coin_counter_w(space->machine, 1, (data >> 6) & 1);
 }
 
 
@@ -306,7 +306,7 @@ static WRITE8_DEVICE_HANDLER( sindbadm_soundport_w )
 
 static WRITE8_DEVICE_HANDLER( sindbadm_misc_w )
 {
-	coin_counter_w(0, data & 0x02);
+	coin_counter_w(device->machine, 0, data & 0x02);
 //  mame_printf_debug("Unknown = %02X\n", data);
 }
 

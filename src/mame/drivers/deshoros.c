@@ -81,7 +81,7 @@ static WRITE8_HANDLER( io_w )
 	{
 		case 0x00: /*Printer data*/						return;
 		case 0x02: update_led_array(data);              return;
-		case 0x05: coin_lockout_w(0,io_ram[offset] & 1);return;
+		case 0x05: coin_lockout_w(space->machine, 0,io_ram[offset] & 1);return;
 		case 0x06: /*Printer IRQ enable*/    		    return;
 //      case 0x0a: "buzzer" 0 write
 //      case 0x0b: "buzzer" 1 write

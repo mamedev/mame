@@ -2413,6 +2413,7 @@ static void menu_bookkeeping(running_machine *machine, ui_menu *menu, void *para
 #ifndef MESS
 static void menu_bookkeeping_populate(running_machine *machine, ui_menu *menu, attotime *curtime)
 {
+	int tickets = get_dispensed_tickets(machine);
 	astring *tempstring = astring_alloc();
 	int ctrnum;
 
@@ -2423,23 +2424,25 @@ static void menu_bookkeeping_populate(running_machine *machine, ui_menu *menu, a
 		astring_catprintf(tempstring, "Uptime: %d:%02d\n\n", (curtime->seconds / 60) % 60, curtime->seconds % 60);
 
 	/* show tickets at the top */
-	if (dispensed_tickets > 0)
-		astring_catprintf(tempstring, "Tickets dispensed: %d\n\n", dispensed_tickets);
+	if (tickets > 0)
+		astring_catprintf(tempstring, "Tickets dispensed: %d\n\n", tickets);
 
 	/* loop over coin counters */
 	for (ctrnum = 0; ctrnum < COIN_COUNTERS; ctrnum++)
 	{
+		int count = coin_counter_get_count(machine, ctrnum);
+		
 		/* display the coin counter number */
 		astring_catprintf(tempstring, "Coin %c: ", ctrnum + 'A');
 
 		/* display how many coins */
-		if (coin_count[ctrnum] == 0)
+		if (count == 0)
 			astring_catc(tempstring, "NA");
 		else
-			astring_catprintf(tempstring, "%d", coin_count[ctrnum]);
+			astring_catprintf(tempstring, "%d", count);
 
 		/* display whether or not we are locked out */
-		if (coinlockedout[ctrnum])
+		if (coin_lockout_get_state(machine, ctrnum))
 			astring_catc(tempstring, " (locked)");
 		astring_catc(tempstring, "\n");
 	}
@@ -2690,7 +2693,7 @@ static void menu_memory_card_populate(running_machine *machine, ui_menu *menu, i
 
 	/* add the remaining items */
 	ui_menu_item_append(menu, "Load Selected Card", NULL, 0, (void *)MEMCARD_ITEM_LOAD);
-	if (memcard_present() != -1)
+	if (memcard_present(machine) != -1)
 		ui_menu_item_append(menu, "Eject Current Card", NULL, 0, (void *)MEMCARD_ITEM_EJECT);
 	ui_menu_item_append(menu, "Create New Card", NULL, 0, (void *)MEMCARD_ITEM_CREATE);
 }

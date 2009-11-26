@@ -57,8 +57,8 @@ static WRITE16_HANDLER( coinctrl_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(0,data & 0x0100);
-		coin_counter_w(1,data & 0x0200);
+		coin_counter_w(space->machine, 0,data & 0x0100);
+		coin_counter_w(space->machine, 1,data & 0x0200);
 	}
 	if (data & 0xfcff)
 		logerror("Writing %04x to unknown coin control bits\n",data);
@@ -110,10 +110,10 @@ static WRITE16_HANDLER( wbeachvl_coin_eeprom_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bits 0-3 are coin counters? (only 0 used?) */
-		coin_counter_w(0,data & 0x01);
-		coin_counter_w(1,data & 0x02);
-		coin_counter_w(2,data & 0x04);
-		coin_counter_w(3,data & 0x08);
+		coin_counter_w(space->machine, 0,data & 0x01);
+		coin_counter_w(space->machine, 1,data & 0x02);
+		coin_counter_w(space->machine, 2,data & 0x04);
+		coin_counter_w(space->machine, 3,data & 0x08);
 
 		/* bits 5-7 control EEPROM */
 		eeprom_set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
@@ -126,7 +126,7 @@ static WRITE16_HANDLER( hotmind_coin_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0,data & 0x20);
+		coin_counter_w(space->machine, 0,data & 0x20);
 
 		eeprom_set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE);
 		eeprom_write_bit(data & 4);
@@ -136,8 +136,8 @@ static WRITE16_HANDLER( hotmind_coin_eeprom_w )
 
 static WRITE16_HANDLER( hrdtimes_coin_w )
 {
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+	coin_counter_w(space->machine, 0,data & 0x01);
+	coin_counter_w(space->machine, 1,data & 0x02);
 }
 
 static WRITE16_HANDLER( playmark_snd_command_w )

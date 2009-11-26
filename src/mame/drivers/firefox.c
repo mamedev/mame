@@ -411,12 +411,12 @@ static WRITE8_HANDLER( self_reset_w )
 
 static WRITE8_HANDLER( led_w )
 {
-    set_led_status( offset, ( data & 0x80 ) == 0 );
+    set_led_status( space->machine, offset, ( data & 0x80 ) == 0 );
 }
 
 static WRITE8_HANDLER( firefox_coin_counter_w )
 {
-	coin_counter_w( offset, data & 0x80 );
+	coin_counter_w( space->machine, offset, data & 0x80 );
 }
 
 

@@ -659,7 +659,7 @@ WRITE8_HANDLER( nb1413m3_outcoin_w )
 			break;
 	}
 
-	set_led_status(2, nb1413m3_outcoin_flag);		// out coin
+	set_led_status(space->machine, 2, nb1413m3_outcoin_flag);		// out coin
 }
 
 WRITE8_HANDLER( nb1413m3_vcrctrl_w )
@@ -667,11 +667,11 @@ WRITE8_HANDLER( nb1413m3_vcrctrl_w )
 	if (data & 0x08)
 	{
 		popmessage(" ** VCR CONTROL ** ");
-		set_led_status(2, 1);
+		set_led_status(space->machine, 2, 1);
 	}
 	else
 	{
-		set_led_status(2, 0);
+		set_led_status(space->machine, 2, 0);
 	}
 }
 

@@ -3931,8 +3931,8 @@ static DRIVER_INIT( glfgreat )
 
 static DRIVER_INIT( cuebrick )
 {
-	generic_nvram = (UINT8 *)cuebrick_nvram;
-	generic_nvram_size = 0x400*0x20;
+	machine->generic.nvram.ptr.u8 = (UINT8 *)cuebrick_nvram;
+	machine->generic.nvram.size = 0x400*0x20;
 
 	/* ROMs are interleaved at byte level */
 	shuffle(memory_region(machine, "gfx1"),memory_region_length(machine, "gfx1"));

@@ -102,7 +102,7 @@ static WRITE8_HANDLER( circusc_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( circusc_coin_counter_w )
 {
-	coin_counter_w(offset, data);
+	coin_counter_w(space->machine, offset, data);
 }
 
 static WRITE8_HANDLER(circusc_sound_w)

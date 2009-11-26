@@ -143,7 +143,7 @@ static CUSTOM_INPUT( get_rng )
 
 static WRITE8_HANDLER( stactics_coin_lockout_w )
 {
-	coin_lockout_w(offset, ~data & 0x01);
+	coin_lockout_w(space->machine, offset, ~data & 0x01);
 }
 
 

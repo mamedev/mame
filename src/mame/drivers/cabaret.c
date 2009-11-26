@@ -118,12 +118,12 @@ static WRITE8_HANDLER( cabaret_nmi_and_coins_w )
 //      popmessage("%02x",data);
 	}
 
-	coin_counter_w(0,		data & 0x01);	// coin_a
-	coin_counter_w(1,		data & 0x04);	// coin_c
-	coin_counter_w(2,		data & 0x08);	// key in
-	coin_counter_w(3,		data & 0x10);	// coin out mech
+	coin_counter_w(space->machine, 0,		data & 0x01);	// coin_a
+	coin_counter_w(space->machine, 1,		data & 0x04);	// coin_c
+	coin_counter_w(space->machine, 2,		data & 0x08);	// key in
+	coin_counter_w(space->machine, 3,		data & 0x10);	// coin out mech
 
-	set_led_status(6,		data & 0x40);	// led for coin out / hopper active
+	set_led_status(space->machine, 6,		data & 0x40);	// led for coin out / hopper active
 
 	nmi_enable = data;	//  data & 0x80     // nmi enable?
 

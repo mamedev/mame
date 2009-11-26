@@ -331,9 +331,9 @@ void at_keyboard_init(running_machine *machine, AT_KEYBOARD_TYPE type)
 	keyboard.input_state = 0;
 	memset(&keyboard.make[0], 0, sizeof(UINT8)*128);
 	/* set default led state */
-	set_led_status(2, 0);
-	set_led_status(0, 0);
-	set_led_status(1, 0);
+	set_led_status(machine, 2, 0);
+	set_led_status(machine, 0, 0);
+	set_led_status(machine, 1, 0);
 
 	keyboard.scan_code_set = 3;
 
@@ -354,15 +354,15 @@ void at_keyboard_init(running_machine *machine, AT_KEYBOARD_TYPE type)
 
 
 
-void at_keyboard_reset(void)
+void at_keyboard_reset(running_machine *machine)
 {
 	keyboard.head = keyboard.tail = 0;
 	keyboard.input_state = 0;
 	memset(&keyboard.make[0], 0, sizeof(UINT8)*128);
 	/* set default led state */
-	set_led_status(2, 0);
-	set_led_status(0, 0);
-	set_led_status(1, 0);
+	set_led_status(machine, 2, 0);
+	set_led_status(machine, 0, 0);
+	set_led_status(machine, 1, 0);
 
 	keyboard.scan_code_set=1;
 	at_keyboard_queue_insert(0xaa);
@@ -675,7 +675,7 @@ Note:   each command is acknowledged by FAh (ACK), if not mentioned otherwise.
 SeeAlso: #P046
 */
 
-void at_keyboard_write(UINT8 data)
+void at_keyboard_write(running_machine *machine, UINT8 data)
 {
 	if (LOG_KEYBOARD)
 		logerror("keyboard write %.2x\n",data);
@@ -765,7 +765,7 @@ void at_keyboard_write(UINT8 data)
 			if (data & 0x080)
 			{
 				/* command received instead of code - execute command */
-				at_keyboard_write(data);
+				at_keyboard_write(machine, data);
 			}
 			else
 			{
@@ -777,9 +777,9 @@ void at_keyboard_write(UINT8 data)
 
 				/* led's in same order as my keyboard leds. */
 				/* num lock, caps lock, scroll lock */
-				set_led_status(2, (data & 0x01));
-				set_led_status(0, ((data & 0x02)>>1));
-				set_led_status(1, ((data & 0x04)>>2));
+				set_led_status(machine, 2, (data & 0x01));
+				set_led_status(machine, 0, ((data & 0x02)>>1));
+				set_led_status(machine, 1, ((data & 0x04)>>2));
 
 			}
 			break;
@@ -790,7 +790,7 @@ void at_keyboard_write(UINT8 data)
 			if (data & 0x080)
 			{
 				/* command received instead of code - execute command */
-				at_keyboard_write(data);
+				at_keyboard_write(machine, data);
 			}
 			else
 			{
@@ -820,7 +820,7 @@ void at_keyboard_write(UINT8 data)
 			if (data & 0x080)
 			{
 				/* command received instead of code - execute command */
-				at_keyboard_write(data);
+				at_keyboard_write(machine, data);
 			}
 			else
 			{

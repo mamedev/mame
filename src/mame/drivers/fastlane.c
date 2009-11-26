@@ -53,8 +53,8 @@ static WRITE8_HANDLER( fastlane_bankswitch_w )
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	/* bits 0 & 1 coin counters */
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+	coin_counter_w(space->machine, 0,data & 0x01);
+	coin_counter_w(space->machine, 1,data & 0x02);
 
 	/* bits 2 & 3 = bank number */
 	bankaddress = 0x10000 + ((data & 0x0c) >> 2) * 0x4000;

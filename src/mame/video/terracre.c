@@ -167,8 +167,8 @@ WRITE16_HANDLER( amazon_flipscreen_w )
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		coin_counter_w( 0, data&0x01 );
-		coin_counter_w( 1, (data&0x02)>>1 );
+		coin_counter_w( space->machine, 0, data&0x01 );
+		coin_counter_w( space->machine, 1, (data&0x02)>>1 );
 		flip_screen_set(space->machine, data&0x04);
 	}
 }

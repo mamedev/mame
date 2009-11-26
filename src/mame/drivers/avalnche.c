@@ -107,19 +107,19 @@ static WRITE8_HANDLER( avalance_video_invert_w )
 
 static WRITE8_HANDLER( avalance_credit_1_lamp_w )
 {
-	set_led_status(0, data & 0x01);
+	set_led_status(space->machine, 0, data & 0x01);
 }
 
 
 static WRITE8_HANDLER( avalance_credit_2_lamp_w )
 {
-	set_led_status(1, data & 0x01);
+	set_led_status(space->machine, 1, data & 0x01);
 }
 
 
 static WRITE8_HANDLER( avalance_start_lamp_w )
 {
-	set_led_status(2, data & 0x01);
+	set_led_status(space->machine, 2, data & 0x01);
 }
 
 

@@ -89,7 +89,7 @@ static WRITE8_HANDLER( sound_mute_w )
 
 static WRITE8_HANDLER( tutankhm_coin_counter_w )
 {
-	coin_counter_w(offset ^ 1, data);
+	coin_counter_w(space->machine, offset ^ 1, data);
 }
 
 

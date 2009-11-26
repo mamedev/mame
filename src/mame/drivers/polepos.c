@@ -361,15 +361,15 @@ static CUSTOM_INPUT( auto_start_r ) { return auto_start_mask; }
 static WRITE8_DEVICE_HANDLER( out_0 )
 {
 // no start lamps in pole position
-//  set_led_status(1,data & 1);
-//  set_led_status(0,data & 2);
-	coin_counter_w(1,~data & 4);
-	coin_counter_w(0,~data & 8);
+//  set_led_status(device->machine, 1,data & 1);
+//  set_led_status(device->machine, 0,data & 2);
+	coin_counter_w(device->machine, 1,~data & 4);
+	coin_counter_w(device->machine, 0,~data & 8);
 }
 
 static WRITE8_DEVICE_HANDLER( out_1 )
 {
-	coin_lockout_global_w(data & 1);
+	coin_lockout_global_w(device->machine, data & 1);
 }
 
 static const namco_51xx_interface namco_51xx_intf =
@@ -480,7 +480,7 @@ static MACHINE_RESET( polepos )
 
 static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x0800) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* Battery Backup */
+	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x0800) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* Battery Backup */
 	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(polepos_sprite_r, polepos_sprite_w)				/* Motion Object */
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(polepos_road_r, polepos_road_w) 				/* Road Memory */
 	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(polepos_alpha_r, polepos_alpha_w)				/* Alphanumeric (char ram) */

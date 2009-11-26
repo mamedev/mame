@@ -246,7 +246,7 @@ static WRITE8_HANDLER( seawolf2_sound_2_w )  // Port 41
 	if (rising_bits & 0x10) sample_start(samples, 8, 3, 0);  /* Right Sonar */
 	if (rising_bits & 0x20) sample_start(samples, 3, 3, 0);  /* Left Sonar */
 
-	coin_counter_w(0, data & 0x40);    /* Coin Counter */
+	coin_counter_w(space->machine, 0, data & 0x40);    /* Coin Counter */
 }
 
 
@@ -272,7 +272,7 @@ static WRITE8_HANDLER( ebases_trackball_select_w )
 
 static WRITE8_HANDLER( ebases_coin_w )
 {
-	coin_counter_w(0, data & 1);
+	coin_counter_w(space->machine, 0, data & 1);
 }
 
 
@@ -285,8 +285,8 @@ static WRITE8_HANDLER( ebases_coin_w )
 
 static READ8_HANDLER( spacezap_io_r )
 {
-	coin_counter_w(0, (offset >> 8) & 1);
-	coin_counter_w(1, (offset >> 9) & 1);
+	coin_counter_w(space->machine, 0, (offset >> 8) & 1);
+	coin_counter_w(space->machine, 1, (offset >> 9) & 1);
 	return input_port_read_safe(space->machine, "P3HANDLE", 0xff);
 }
 
@@ -304,13 +304,13 @@ static READ8_HANDLER( wow_io_r )
 
 	switch ((offset >> 9) & 7)
 	{
-		case 0: coin_counter_w(0, data);		break;
-		case 1: coin_counter_w(1, data);		break;
+		case 0: coin_counter_w(space->machine, 0, data);		break;
+		case 1: coin_counter_w(space->machine, 1, data);		break;
 		case 2: astrocade_sparkle[0] = data;	break;
 		case 3: astrocade_sparkle[1] = data;	break;
 		case 4: astrocade_sparkle[2] = data;	break;
 		case 5: astrocade_sparkle[3] = data;	break;
-		case 7: coin_counter_w(2, data); 		break;
+		case 7: coin_counter_w(space->machine, 2, data); 		break;
 	}
 	return 0xff;
 }
@@ -329,8 +329,8 @@ static READ8_HANDLER( gorf_io_1_r )
 
 	switch ((offset >> 9) & 7)
 	{
-		case 0: coin_counter_w(0, data);		break;
-		case 1: coin_counter_w(1, data);		break;
+		case 0: coin_counter_w(space->machine, 0, data);		break;
+		case 1: coin_counter_w(space->machine, 1, data);		break;
 		case 2: astrocade_sparkle[0] = data;	break;
 		case 3: astrocade_sparkle[1] = data;	break;
 		case 4: astrocade_sparkle[2] = data;	break;
@@ -377,11 +377,11 @@ static READ8_HANDLER( robby_io_r )
 
 	switch ((offset >> 9) & 7)
 	{
-		case 0: coin_counter_w(0, data);	break;
-		case 1: coin_counter_w(1, data);	break;
-		case 2: coin_counter_w(2, data);	break;
-		case 6: set_led_status(0, data);	break;
-		case 7: set_led_status(1, data);	break;
+		case 0: coin_counter_w(space->machine, 0, data);	break;
+		case 1: coin_counter_w(space->machine, 1, data);	break;
+		case 2: coin_counter_w(space->machine, 2, data);	break;
+		case 6: set_led_status(space->machine, 0, data);	break;
+		case 7: set_led_status(space->machine, 1, data);	break;
 	}
 	return 0xff;
 }
@@ -396,10 +396,10 @@ static READ8_HANDLER( robby_io_r )
 
 static READ8_HANDLER( profpac_io_1_r )
 {
-	coin_counter_w(0, (offset >> 8) & 1);
-	coin_counter_w(1, (offset >> 9) & 1);
-	set_led_status(0, (offset >> 10) & 1);
-	set_led_status(1, (offset >> 11) & 1);
+	coin_counter_w(space->machine, 0, (offset >> 8) & 1);
+	coin_counter_w(space->machine, 1, (offset >> 9) & 1);
+	set_led_status(space->machine, 0, (offset >> 10) & 1);
+	set_led_status(space->machine, 1, (offset >> 11) & 1);
 	return 0xff;
 }
 
@@ -469,10 +469,10 @@ static STATE_POSTLOAD( profbank_banksw_restore )
 
 static READ8_HANDLER( demndrgn_io_r )
 {
-	coin_counter_w(0, (offset >> 8) & 1);
-	coin_counter_w(1, (offset >> 9) & 1);
-	set_led_status(0, (offset >> 10) & 1);
-	set_led_status(1, (offset >> 11) & 1);
+	coin_counter_w(space->machine, 0, (offset >> 8) & 1);
+	coin_counter_w(space->machine, 1, (offset >> 9) & 1);
+	set_led_status(space->machine, 0, (offset >> 10) & 1);
+	set_led_status(space->machine, 1, (offset >> 11) & 1);
 	input_select = (offset >> 12) & 1;
 	return 0xff;
 }
@@ -550,7 +550,7 @@ static WRITE8_HANDLER( tenpindx_lamp_w )
 
 static WRITE8_HANDLER( tenpindx_counter_w )
 {
-	coin_counter_w(0, (data >> 0) & 1);
+	coin_counter_w(space->machine, 0, (data >> 0) & 1);
 	if (data & 0xfc) mame_printf_debug("tenpindx_counter_w = %02X\n", data);
 }
 
@@ -619,7 +619,7 @@ static ADDRESS_MAP_START( robby_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
   	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(&protected_ram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xe800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -631,7 +631,7 @@ static ADDRESS_MAP_START( profpac_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
   	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(&protected_ram)
-  	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+  	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xe800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -642,7 +642,7 @@ static ADDRESS_MAP_START( demndrgn_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(profpac_videoram_r, profpac_videoram_w)
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
-  	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+  	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xe800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

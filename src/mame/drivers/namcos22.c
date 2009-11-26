@@ -2591,7 +2591,7 @@ static WRITE8_HANDLER( mcu_port5_w )
 	if (!strcmp(space->machine->gamedrv->name, "propcycl"))
 	{
 		output_set_value("fan0", data & 1);
-		set_led_status(0, data & 2);
+		set_led_status(space->machine, 0, data & 2);
 	}
 }
 

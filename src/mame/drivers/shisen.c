@@ -42,8 +42,8 @@ static WRITE8_HANDLER( sichuan2_coin_w )
 {
 	if ((data & 0xf9) != 0x01) logerror("coin ctrl = %02x\n",data);
 
-	coin_counter_w(0, data & 0x02);
-	coin_counter_w(1, data & 0x04);
+	coin_counter_w(space->machine, 0, data & 0x02);
+	coin_counter_w(space->machine, 1, data & 0x04);
 }
 
 

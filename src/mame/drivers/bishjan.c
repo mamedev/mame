@@ -357,7 +357,7 @@ static WRITE16_HANDLER( bishjan_coin_w )
 	{
 		// coin out         data & 0x01;
 		bishjan_hopper	=	data & 0x02;	// hopper
-		coin_counter_w( 1,	data & 0x10 );
+		coin_counter_w(space->machine, 1,	data & 0x10 );
 	}
 }
 
@@ -367,7 +367,7 @@ static ADDRESS_MAP_START( bishjan_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE( 0x080000, 0x0fffff ) AM_ROM AM_REGION("maincpu", 0)
 
-	AM_RANGE( 0x200000, 0x207fff ) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	// battery
+	AM_RANGE( 0x200000, 0x207fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// battery
 
 
 	// read lo (2)   (only half tilemap?)
@@ -490,7 +490,7 @@ static MACHINE_RESET( saklove )
 }
 
 static ADDRESS_MAP_START( saklove_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	// battery
+	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// battery
 
 	// read lo (2)   (only half tilemap?)
 	AM_RANGE(0x12000, 0x12fff) AM_READWRITE( bishjan_videoram_2_lo_r, bishjan_videoram_2_lo_w )

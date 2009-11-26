@@ -541,8 +541,8 @@ static WRITE16_HANDLER( metro_coin_lockout_1word_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//      coin_lockout_w(0, data & 1);
-//      coin_lockout_w(1, data & 2);
+//      coin_lockout_w(space->machine, 0, data & 1);
+//      coin_lockout_w(space->machine, 1, data & 2);
 	}
 	if (data & ~3)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n",cpu_get_pc(space->cpu),data);
 }
@@ -550,7 +550,7 @@ static WRITE16_HANDLER( metro_coin_lockout_1word_w )
 
 static WRITE16_HANDLER( metro_coin_lockout_4words_w )
 {
-//  coin_lockout_w( (offset >> 1) & 1, offset & 1 );
+//  coin_lockout_w( space->machine, (offset >> 1) & 1, offset & 1 );
 	if (data & ~1)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n",cpu_get_pc(space->cpu),data);
 }
 

@@ -565,7 +565,7 @@ static READ8_HANDLER(meritm_ds1644_r)
 
 static ADDRESS_MAP_START( meritm_crt250_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROMBANK(1)
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( meritm_crt250_questions_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -573,7 +573,7 @@ static ADDRESS_MAP_START( meritm_crt250_questions_map, ADDRESS_SPACE_PROGRAM, 8 
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(meritm_crt250_questions_lo_w)
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(meritm_crt250_questions_hi_w)
 	AM_RANGE(0x0002, 0x0002) AM_WRITE(meritm_crt250_questions_bank_w)
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( meritm_crt250_io_map, ADDRESS_SPACE_IO, 8 )

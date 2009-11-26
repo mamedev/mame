@@ -264,10 +264,10 @@ static WRITE8_HANDLER( galpani2_mcu_nmi2_w ) //driven by CPU2's int5 ISR
 
 static WRITE8_HANDLER( galpani2_coin_lockout_w )
 {
-		coin_counter_w(0, data & 0x01);
-		coin_counter_w(1, data & 0x02);
-		coin_lockout_w(0,~data & 0x04);
-		coin_lockout_w(1,~data & 0x08);
+		coin_counter_w(space->machine, 0, data & 0x01);
+		coin_counter_w(space->machine, 1, data & 0x02);
+		coin_lockout_w(space->machine, 0,~data & 0x04);
+		coin_lockout_w(space->machine, 1,~data & 0x08);
 		// & 0x10     CARD in lockout?
 		// & 0x20     CARD in lockout?
 		// & 0x40     CARD out

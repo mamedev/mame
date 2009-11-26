@@ -241,8 +241,8 @@ GetLives( running_machine *machine )
 static WRITE8_HANDLER( coinplus_w )
 {
 	int dsw = input_port_read(space->machine, "DSW1");
-	coin_counter_w( 0, data&1 );
-	coin_counter_w( 1, data&2 );
+	coin_counter_w( space->machine, 0, data&1 );
+	coin_counter_w( space->machine, 1, data&2 );
 	if( data&1 )
 	{ /* TODO: coinage adjustments */
 		logerror( "COIN A+\n" );

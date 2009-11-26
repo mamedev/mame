@@ -118,17 +118,17 @@ static PALETTE_INIT(gei)
 static WRITE8_DEVICE_HANDLER( lamps_w )
 {
 	/* 5 button lamps */
-	set_led_status(0,data & 0x01);
-	set_led_status(1,data & 0x02);
-	set_led_status(2,data & 0x04);
-	set_led_status(3,data & 0x08);
-	set_led_status(4,data & 0x10);
+	set_led_status(device->machine, 0,data & 0x01);
+	set_led_status(device->machine, 1,data & 0x02);
+	set_led_status(device->machine, 2,data & 0x04);
+	set_led_status(device->machine, 3,data & 0x08);
+	set_led_status(device->machine, 4,data & 0x10);
 
 	/* 3 button lamps for deal, cancel, stand in poker games;
     lamp order verified in poker and selection self tests */
-	set_led_status(7,data & 0x20);
-	set_led_status(5,data & 0x40);
-	set_led_status(6,data & 0x80);
+	set_led_status(device->machine, 7,data & 0x20);
+	set_led_status(device->machine, 5,data & 0x40);
+	set_led_status(device->machine, 6,data & 0x80);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_w )
@@ -136,8 +136,8 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 	const address_space *space = cputag_get_address_space(device->machine, "cpu", ADDRESS_SPACE_PROGRAM);
 
 	/* bit 3 - coin lockout, lamp10 in poker / lamp6 in trivia test modes */
-	coin_lockout_global_w(~data & 0x08);
-	set_led_status(9,data & 0x08);
+	coin_lockout_global_w(device->machine, ~data & 0x08);
+	set_led_status(device->machine, 9,data & 0x08);
 
 	/* bit 5 - ticket out in trivia games */
 	ticket_dispenser_w(space, 0, (data & 0x20)<< 2);
@@ -152,15 +152,15 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 static WRITE8_DEVICE_HANDLER( sound2_w )
 {
 	/* bit 3,6 - coin lockout, lamp10+11 in selection test mode */
-	coin_lockout_w(0, ~data & 0x08);
-	coin_lockout_w(1, ~data & 0x40);
-	set_led_status(9,data & 0x08);
-	set_led_status(10,data & 0x40);
+	coin_lockout_w(device->machine, 0, ~data & 0x08);
+	coin_lockout_w(device->machine, 1, ~data & 0x40);
+	set_led_status(device->machine, 9,data & 0x08);
+	set_led_status(device->machine, 10,data & 0x40);
 
 	/* bit 4,5 - lamps 12, 13 in selection test mode;
     12 lights up if dsw maximum bet = 30 an bet > 15 or if dsw maximum bet = 10 an bet = 10 */
-	set_led_status(11,data & 0x10);
-	set_led_status(12,data & 0x20);
+	set_led_status(device->machine, 11,data & 0x10);
+	set_led_status(device->machine, 12,data & 0x20);
 
 	/* bit 7 goes directly to the sound amplifier */
 	dac_data_w(devtag_get_device(device->machine, "dac"), ((data & 0x80) >> 7) * 255);
@@ -169,7 +169,7 @@ static WRITE8_DEVICE_HANDLER( sound2_w )
 static WRITE8_DEVICE_HANDLER( lamps2_w )
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in poker test mode  */
-	set_led_status(8,data & 0x10);
+	set_led_status(device->machine, 8,data & 0x10);
 }
 
 static WRITE8_DEVICE_HANDLER( nmi_w )
@@ -177,7 +177,7 @@ static WRITE8_DEVICE_HANDLER( nmi_w )
 	const address_space *space = cputag_get_address_space(device->machine, "cpu", ADDRESS_SPACE_PROGRAM);
 
 	/* bit 4 - play/raise button lamp, lamp 9 in selection test mode  */
-	set_led_status(8,data & 0x10);
+	set_led_status(device->machine, 8,data & 0x10);
 
 	/* bit 6 enables NMI */
 	interrupt_enable_w(space, 0, data & 0x40);
@@ -329,7 +329,7 @@ static WRITE8_HANDLER( signature2_w )
 static ADDRESS_MAP_START( getrivia_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x600f, 0x600f) AM_WRITE(banksel_5_1_w)
@@ -351,7 +351,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gselect_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
-	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x4400, 0x4400) AM_WRITE(banksel_1_1_w)
 	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_1_2_w)
 	AM_RANGE(0x4402, 0x4402) AM_WRITE(banksel_2_1_w)
@@ -366,7 +366,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( amuse_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x606f, 0x606f) AM_WRITE(banksel_5_1_w)
@@ -382,7 +382,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gepoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x60ef, 0x60ef) AM_WRITE(banksel_3_1_w)
@@ -399,7 +399,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( amuse1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x4400, 0x4400) AM_WRITE(banksel_1_1_w)
 	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_2_1_w)
 	AM_RANGE(0x4402, 0x4402) AM_WRITE(banksel_3_1_w)
@@ -415,7 +415,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( findout_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r,ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r,ppi8255_w)
 	/* banked ROMs are enabled by low 6 bits of the address */
@@ -437,7 +437,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( suprpokr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x6200, 0x6200) AM_WRITE(signature2_w)
@@ -450,7 +450,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( geimulti_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5800, 0x5fff) AM_ROM
@@ -463,7 +463,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprtauth_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5600, 0x5600) AM_READ(signature_r)

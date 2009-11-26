@@ -207,7 +207,7 @@ static WRITE16_HANDLER( galaxi_500004_w )
 	{
 		ticket = data & 0x0100;
 		hopper = data & 0x1000;
-		coin_counter_w(0, data & 0x2000);	// coins
+		coin_counter_w(space->machine, 0, data & 0x2000);	// coins
 	}
 
 	COMBINE_DATA( &out[2] );
@@ -244,7 +244,7 @@ static ADDRESS_MAP_START( galaxi_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE( 0x700000, 0x700001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
 
-	AM_RANGE( 0x600000, 0x607fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )	// 2x DS1230Y (non volatile SRAM)
+	AM_RANGE( 0x600000, 0x607fff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )	// 2x DS1230Y (non volatile SRAM)
 ADDRESS_MAP_END
 
 /***************************************************************************

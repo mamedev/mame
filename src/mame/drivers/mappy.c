@@ -619,10 +619,10 @@ static READ8_HANDLER( dipB_muxi )	// dips B
 static WRITE8_HANDLER( out_mux )	{ mux = data & 1; }
 static WRITE8_HANDLER( out_lamps )
 {
-	set_led_status(0,data & 1);
-	set_led_status(1,data & 2);
-	coin_lockout_global_w(data & 4);
-	coin_counter_w(0,~data & 8);
+	set_led_status(space->machine, 0,data & 1);
+	set_led_status(space->machine, 1,data & 2);
+	coin_lockout_global_w(space->machine, data & 4);
+	coin_counter_w(space->machine, 0,~data & 8);
 }
 
 /* chip #0: player inputs, buttons, coins */

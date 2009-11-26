@@ -1052,7 +1052,7 @@ VIDEO_UPDATE ( wecleman )
 
 	video_on = wecleman_irqctrl & 0x40;
 
-	set_led_status(0, wecleman_selected_ip & 0x04);	// Start lamp
+	set_led_status(screen->machine, 0, wecleman_selected_ip & 0x04);	// Start lamp
 
 	fg_y = (wecleman_txtram[0x0f24>>1] & (TILEMAP_DIMY - 1));
 	bg_y = (wecleman_txtram[0x0f26>>1] & (TILEMAP_DIMY - 1));
@@ -1139,7 +1139,7 @@ VIDEO_UPDATE( hotchase )
 
 	video_on = wecleman_irqctrl & 0x40;
 
-	set_led_status(0, wecleman_selected_ip & 0x04);	// Start lamp
+	set_led_status(screen->machine, 0, wecleman_selected_ip & 0x04);	// Start lamp
 
 	get_sprite_info(screen->machine);
 

@@ -49,8 +49,8 @@ if (data & 0xe0) popmessage("bankswitch %02x",data);
 	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 
 	/* bits 3 and 4 are coin counters */
-	coin_counter_w(0,data & 0x08);
-	coin_counter_w(1,data & 0x10);
+	coin_counter_w(space->machine, 0,data & 0x08);
+	coin_counter_w(space->machine, 1,data & 0x10);
 }
 
 static ADDRESS_MAP_START( labyrunr_map, ADDRESS_SPACE_PROGRAM, 8 )

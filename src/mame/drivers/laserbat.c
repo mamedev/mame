@@ -82,7 +82,7 @@ static WRITE8_HANDLER( laserbat_input_mux_w )
 
 	flip_screen_set_no_update(space->machine, data & 0x08);
 
-	coin_counter_w(0,data & 1);
+	coin_counter_w(space->machine, 0,data & 1);
 
 	//data & 0x02 ?
 	//data & 0x04 ?

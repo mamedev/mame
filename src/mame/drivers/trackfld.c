@@ -40,7 +40,7 @@ static UINT8 hyprolyb_vck_ready;
 
 static WRITE8_HANDLER( coin_w )
 {
-	coin_counter_w(offset,data & 1);
+	coin_counter_w(space->machine, offset,data & 1);
 }
 
 static WRITE8_HANDLER( questions_bank_w )
@@ -122,7 +122,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE(&trackfld_scroll2)
 	AM_RANGE(0x1c60, 0x1fff) AM_RAM
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( reaktor_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9c40, 0x9c5f) AM_RAM AM_BASE(&trackfld_scroll2)
 	AM_RANGE(0x9c60, 0x9fff) AM_RAM
 	AM_RANGE(0xa800, 0xabff) AM_RAM
-	AM_RANGE(0xac00, 0xafff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xac00, 0xafff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE(&colorram)
 ADDRESS_MAP_END
@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( mastkin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE(&trackfld_scroll2)
 	AM_RANGE(0x1c60, 0x1fff) AM_RAM
 	AM_RANGE(0x2800, 0x2bff) AM_RAM
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
@@ -208,7 +208,7 @@ static ADDRESS_MAP_START( wizzquiz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE(&trackfld_scroll2)
 	AM_RANGE(0x1c60, 0x1fff) AM_RAM
 	AM_RANGE(0x2800, 0x2bff) AM_RAM
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM) AM_WRITE(trackfld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_READ(SMH_RAM) AM_WRITE(trackfld_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(questions_bank_w)

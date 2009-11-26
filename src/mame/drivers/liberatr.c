@@ -155,13 +155,13 @@ static UINT8 ctrld;
 
 static WRITE8_HANDLER( liberatr_led_w )
 {
-	set_led_status(offset, ~data & 0x10);
+	set_led_status(space->machine, offset, ~data & 0x10);
 }
 
 
 static WRITE8_HANDLER( liberatr_coin_counter_w )
 {
-	coin_counter_w(offset ^ 0x01, data & 0x10);
+	coin_counter_w(space->machine, offset ^ 0x01, data & 0x10);
 }
 
 

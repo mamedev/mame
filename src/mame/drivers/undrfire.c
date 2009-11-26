@@ -336,10 +336,10 @@ static WRITE32_HANDLER( undrfire_input_w )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				coin_lockout_w(0,~data & 0x01000000);
-				coin_lockout_w(1,~data & 0x02000000);
-				coin_counter_w(0, data & 0x04000000);
-				coin_counter_w(1, data & 0x08000000);
+				coin_lockout_w(space->machine, 0,~data & 0x01000000);
+				coin_lockout_w(space->machine, 1,~data & 0x02000000);
+				coin_counter_w(space->machine, 0, data & 0x04000000);
+				coin_counter_w(space->machine, 1, data & 0x08000000);
 				coin_word = (data >> 16) &0xffff;
 			}
 		}

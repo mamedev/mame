@@ -48,7 +48,6 @@ void ticket_dispenser_init(running_machine *machine, int msec, int motoronhigh, 
 	motoron				= motoronhigh  ? active_bit : 0;
 	ticketdispensed		= statusactivehigh ? active_bit : 0;
 	ticketnotdispensed	= ticketdispensed ^ active_bit;
-	dispensed_tickets	= 0;
 
 	for (i = 0; i < MAX_DISPENSERS; i++)
 	{
@@ -119,7 +118,7 @@ WRITE8_HANDLER( ticket_dispenser_0_w )
 		{
 			LOG(("PC: %04X  Ticket Power Off\n", cpu_get_pc(space->cpu)));
 			timer_adjust_oneshot(dispenser[0].timer, attotime_never, 0);
-			set_led_status(2,0);
+			set_led_status(space->machine, 2,0);
 			dispenser[0].power = 0;
 		}
 	}
@@ -145,7 +144,7 @@ WRITE8_HANDLER( ticket_dispenser_1_w )
 		{
 			LOG(("PC: %04X  Ticket Power Off\n", cpu_get_pc(space->cpu)));
 			timer_adjust_oneshot(dispenser[1].timer, attotime_never, 0);
-			set_led_status(2,0);
+			set_led_status(space->machine, 2,0);
 			dispenser[1].power = 0;
 		}
 	}
@@ -173,13 +172,13 @@ static TIMER_CALLBACK( ticket_dispenser_toggle )
 
 	if (dispenser->status == ticketdispensed)
 	{
-		set_led_status(2,1);
-		dispensed_tickets++;
+		set_led_status(machine, 2,1);
+		increment_dispensed_tickets(machine, 1);
 
 		LOG(("Ticket Dispensed\n"));
 	}
 	else
 	{
-		set_led_status(2,0);
+		set_led_status(machine, 2,0);
 	}
 }

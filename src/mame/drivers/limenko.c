@@ -48,7 +48,7 @@ static void draw_sprites(running_machine *machine, UINT32 *sprites, const rectan
 
 static WRITE32_HANDLER( limenko_coincounter_w )
 {
-	coin_counter_w(0,data & 0x10000);
+	coin_counter_w(space->machine,0,data & 0x10000);
 }
 
 static WRITE32_HANDLER( limenko_paletteram_w )

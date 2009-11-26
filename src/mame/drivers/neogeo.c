@@ -583,7 +583,7 @@ static CUSTOM_INPUT( get_memcard_status )
 {
 	/* D0 and D1 are memcard presence indicators, D2 indicates memcard
        write protect status (we are always write enabled) */
-	return (memcard_present() == -1) ? 0x07 : 0x00;
+	return (memcard_present(field->port->machine) == -1) ? 0x07 : 0x00;
 }
 
 
@@ -591,7 +591,7 @@ static READ16_HANDLER( memcard_r )
 {
 	UINT16 ret;
 
-	if (memcard_present() != -1)
+	if (memcard_present(space->machine) != -1)
 		ret = memcard_data[offset] | 0xff00;
 	else
 		ret = 0xffff;
@@ -604,7 +604,7 @@ static WRITE16_HANDLER( memcard_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		if (memcard_present() != -1)
+		if (memcard_present(space->machine) != -1)
 			memcard_data[offset] = data;
 	}
 }

@@ -37,7 +37,7 @@ static READ8_HANDLER( kopunch_in_r )
 
 static WRITE8_HANDLER( kopunch_lamp_w )
 {
-	set_led_status(0,~data & 0x80);
+	set_led_status(space->machine, 0,~data & 0x80);
 
 //  if ((data & 0x7f) != 0x7f)
 //      popmessage("port 38 = %02x",data);
@@ -45,8 +45,8 @@ static WRITE8_HANDLER( kopunch_lamp_w )
 
 static WRITE8_HANDLER( kopunch_coin_w )
 {
-	coin_counter_w(0,~data & 0x80);
-	coin_counter_w(1,~data & 0x40);
+	coin_counter_w(space->machine, 0,~data & 0x80);
+	coin_counter_w(space->machine, 1,~data & 0x40);
 
 //  if ((data & 0x3f) != 0x3f)
 //      popmessage("port 34 = %02x",data);

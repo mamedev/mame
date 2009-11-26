@@ -647,14 +647,14 @@ READ8_DEVICE_HANDLER( williams_input_port_49way_0_5_r )
 WRITE8_HANDLER( williams_cmos_w )
 {
 	/* only 4 bits are valid */
-	generic_nvram[offset] = data | 0xf0;
+	space->machine->generic.nvram.ptr.u8[offset] = data | 0xf0;
 }
 
 
 WRITE8_HANDLER( bubbles_cmos_w )
 {
 	/* bubbles has additional CMOS for a full 8 bits */
-	generic_nvram[offset] = data;
+	space->machine->generic.nvram.ptr.u8[offset] = data;
 }
 
 
@@ -892,7 +892,7 @@ static READ8_DEVICE_HANDLER( lottofun_input_port_0_r )
 
 static WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w )
 {
-	coin_lockout_global_w(data & 1); /* bit 5 of PIC control port A */
+	coin_lockout_global_w(device->machine, data & 1); /* bit 5 of PIC control port A */
 }
 
 /*************************************
@@ -923,10 +923,10 @@ static WRITE8_DEVICE_HANDLER( tshoot_maxvol_w )
 static WRITE8_DEVICE_HANDLER( tshoot_lamp_w )
 {
 	/* set the grenade lamp */
-	set_led_status(0,data & 0x04);
+	set_led_status(device->machine, 0,data & 0x04);
 
 	/* set the gun lamp */
-	set_led_status(1,data & 0x08);
+	set_led_status(device->machine, 1,data & 0x08);
 
 #if 0
 	/* gun coil */

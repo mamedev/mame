@@ -214,15 +214,15 @@ static void firqhandler( const device_config *device, int irq )
 static NVRAM_HANDLER( capbowl )
 {
 	if (read_or_write)
-		mame_fwrite(file, generic_nvram, generic_nvram_size);
+		mame_fwrite(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
 	else if (file)
-		mame_fread(file, generic_nvram, generic_nvram_size);
+		mame_fread(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
 	else
 	{
 		/* invalidate nvram to make the game initialize it.
            A 0xff fill will cause the game to malfunction, so we use a
            0x01 fill which seems OK */
-		memset(generic_nvram, 0x01, generic_nvram_size);
+		memset(machine->generic.nvram.ptr.v, 0x01, machine->generic.nvram.size);
 	}
 }
 
@@ -238,7 +238,7 @@ static ADDRESS_MAP_START( capbowl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(capbowl_state, rowaddress)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(capbowl_rom_select_w)
-	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(capbowl_tms34061_r, capbowl_tms34061_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(capbowl_sndcmd_w)
 	AM_RANGE(0x6800, 0x6800) AM_WRITE(track_reset_w)	/* + watchdog */
@@ -251,7 +251,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bowlrama_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(bowlrama_blitter_r, bowlrama_blitter_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(capbowl_state, rowaddress)
-	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(capbowl_tms34061_r, capbowl_tms34061_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(capbowl_sndcmd_w)
 	AM_RANGE(0x6800, 0x6800) AM_WRITE(track_reset_w)	/* + watchdog */

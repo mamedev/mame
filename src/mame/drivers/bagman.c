@@ -166,7 +166,7 @@ static WRITE8_HANDLER( bagman_ls259_w )
 
 static WRITE8_HANDLER( bagman_coin_counter_w )
 {
-	coin_counter_w(offset,data);
+	coin_counter_w(space->machine, offset,data);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )

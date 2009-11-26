@@ -500,19 +500,19 @@ static WRITE8_HANDLER( nmouse_interrupt_vector_w)
 
 static WRITE8_HANDLER( pacman_leds_w )
 {
-	set_led_status(offset,data & 1);
+	set_led_status(space->machine, offset,data & 1);
 }
 
 
 static WRITE8_HANDLER( pacman_coin_counter_w )
 {
-	coin_counter_w(offset,data & 1);
+	coin_counter_w(space->machine, offset,data & 1);
 }
 
 
 static WRITE8_HANDLER( pacman_coin_lockout_global_w )
 {
-	coin_lockout_global_w(~data & 0x01);
+	coin_lockout_global_w(space->machine, ~data & 0x01);
 }
 
 

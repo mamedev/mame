@@ -295,7 +295,7 @@ static WRITE16_HANDLER( rocknms_sub2main_w )
 
 static WRITE16_HANDLER( tetrisp2_coincounter_w )
 {
-	coin_counter_w( 0, (data & 0x0001));
+	coin_counter_w( space->machine, 0, (data & 0x0001));
 }
 
 
@@ -345,16 +345,16 @@ static WRITE16_HANDLER( nndmseal_coincounter_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w( 0,  data  & 0x0001 );
+		coin_counter_w( space->machine, 0,  data  & 0x0001 );
 		//                  data  & 0x0004 ?
-		coin_lockout_w( 0,(~data) & 0x0008 );
+		coin_lockout_w( space->machine, 0,(~data) & 0x0008 );
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status( 0, data & 0x1000 );	// +
-		set_led_status( 1, data & 0x2000 );	// -
-		set_led_status( 2, data & 0x4000 );	// Cancel
-		set_led_status( 3, data & 0x8000 );	// OK
+		set_led_status( space->machine, 0, data & 0x1000 );	// +
+		set_led_status( space->machine, 1, data & 0x2000 );	// -
+		set_led_status( space->machine, 2, data & 0x4000 );	// Cancel
+		set_led_status( space->machine, 3, data & 0x8000 );	// OK
 	}
 //  popmessage("%04x",data);
 }

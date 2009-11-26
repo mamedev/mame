@@ -209,7 +209,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mem_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_READ (rom_r)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(TMS9928A_vram_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(TMS9928A_register_w)
 	AM_RANGE(0xe800, 0xe801) AM_DEVWRITE("ay_re900", ay8910_address_data_w)

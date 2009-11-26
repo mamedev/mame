@@ -238,7 +238,7 @@ static WRITE8_HANDLER( misc_w )
 	UINT8 diff = data ^ last_misc;
 	last_misc = data;
 
-	coin_counter_w(0, (~data >> 4) & 1);
+	coin_counter_w(space->machine, 0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
@@ -264,8 +264,8 @@ static WRITE8_HANDLER( dleuro_misc_w )
 	UINT8 diff = data ^ last_misc;
 	last_misc = data;
 
-	coin_counter_w(1, (~data >> 3) & 1);
-	coin_counter_w(0, (~data >> 4) & 1);
+	coin_counter_w(space->machine, 1, (~data >> 3) & 1);
+	coin_counter_w(space->machine, 0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))

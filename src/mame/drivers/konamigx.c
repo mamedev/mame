@@ -1177,7 +1177,7 @@ static WRITE32_HANDLER( type4_prot_w )
 // cabinet lamps for type 1 games
 static WRITE32_HANDLER( type1_cablamps_w )
 {
-	set_led_status(0, (data>>24)&1);
+	set_led_status(space->machine, 0, (data>>24)&1);
 }
 
 /**********************************************************************************/

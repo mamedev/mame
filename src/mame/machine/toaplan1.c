@@ -242,14 +242,14 @@ WRITE16_HANDLER( toaplan1_reset_sound )
 WRITE8_HANDLER( rallybik_coin_w )
 {
 	switch (data) {
-		case 0x08: if (toaplan1_coin_count) { coin_counter_w(0,1); coin_counter_w(0,0); } break;
-		case 0x09: if (toaplan1_coin_count) { coin_counter_w(2,1); coin_counter_w(2,0); } break;
-		case 0x0a: if (toaplan1_coin_count) { coin_counter_w(1,1); coin_counter_w(1,0); } break;
-		case 0x0b: if (toaplan1_coin_count) { coin_counter_w(3,1); coin_counter_w(3,0); } break;
-		case 0x0c: coin_lockout_w(0,1); coin_lockout_w(2,1); break;
-		case 0x0d: coin_lockout_w(0,0); coin_lockout_w(2,0); break;
-		case 0x0e: coin_lockout_w(1,1); coin_lockout_w(3,1); break;
-		case 0x0f: coin_lockout_w(1,0); coin_lockout_w(3,0); toaplan1_coin_count=1; break;
+		case 0x08: if (toaplan1_coin_count) { coin_counter_w(space->machine, 0,1); coin_counter_w(space->machine, 0,0); } break;
+		case 0x09: if (toaplan1_coin_count) { coin_counter_w(space->machine, 2,1); coin_counter_w(space->machine, 2,0); } break;
+		case 0x0a: if (toaplan1_coin_count) { coin_counter_w(space->machine, 1,1); coin_counter_w(space->machine, 1,0); } break;
+		case 0x0b: if (toaplan1_coin_count) { coin_counter_w(space->machine, 3,1); coin_counter_w(space->machine, 3,0); } break;
+		case 0x0c: coin_lockout_w(space->machine, 0,1); coin_lockout_w(space->machine, 2,1); break;
+		case 0x0d: coin_lockout_w(space->machine, 0,0); coin_lockout_w(space->machine, 2,0); break;
+		case 0x0e: coin_lockout_w(space->machine, 1,1); coin_lockout_w(space->machine, 3,1); break;
+		case 0x0f: coin_lockout_w(space->machine, 1,0); coin_lockout_w(space->machine, 3,0); toaplan1_coin_count=1; break;
 		default:   logerror("PC:%04x  Writing unknown data (%04x) to coin count/lockout port\n",cpu_get_previouspc(space->cpu),data); break;
 	}
 }
@@ -262,24 +262,24 @@ WRITE8_HANDLER( toaplan1_coin_w )
 	/* Are some outputs for lights ? (no space on JAMMA for it though) */
 
 	switch (data) {
-		case 0xee: coin_counter_w(1,1); coin_counter_w(1,0); break; /* Count slot B */
-		case 0xed: coin_counter_w(0,1); coin_counter_w(0,0); break; /* Count slot A */
+		case 0xee: coin_counter_w(space->machine, 1,1); coin_counter_w(space->machine, 1,0); break; /* Count slot B */
+		case 0xed: coin_counter_w(space->machine, 0,1); coin_counter_w(space->machine, 0,0); break; /* Count slot A */
 	/* The following are coin counts after coin-lock active (faulty coin-lock ?) */
-		case 0xe2: coin_counter_w(1,1); coin_counter_w(1,0); coin_lockout_w(1,1); break;
-		case 0xe1: coin_counter_w(0,1); coin_counter_w(0,0); coin_lockout_w(0,1); break;
+		case 0xe2: coin_counter_w(space->machine, 1,1); coin_counter_w(space->machine, 1,0); coin_lockout_w(space->machine, 1,1); break;
+		case 0xe1: coin_counter_w(space->machine, 0,1); coin_counter_w(space->machine, 0,0); coin_lockout_w(space->machine, 0,1); break;
 
-		case 0xec: coin_lockout_global_w(0); break;	/* ??? count games played */
+		case 0xec: coin_lockout_global_w(space->machine, 0); break;	/* ??? count games played */
 		case 0xe8: break;	/* ??? Maximum credits reached with coin/credit ratio */
 		case 0xe4: break;	/* ??? Reset coin system */
 
-		case 0x0c: coin_lockout_global_w(0); break;	/* Unlock all coin slots */
-		case 0x08: coin_lockout_w(2,0); break;	/* Unlock coin slot C */
-		case 0x09: coin_lockout_w(0,0); break;	/* Unlock coin slot A */
-		case 0x0a: coin_lockout_w(1,0); break;	/* Unlock coin slot B */
+		case 0x0c: coin_lockout_global_w(space->machine, 0); break;	/* Unlock all coin slots */
+		case 0x08: coin_lockout_w(space->machine, 2,0); break;	/* Unlock coin slot C */
+		case 0x09: coin_lockout_w(space->machine, 0,0); break;	/* Unlock coin slot A */
+		case 0x0a: coin_lockout_w(space->machine, 1,0); break;	/* Unlock coin slot B */
 
-		case 0x02: coin_lockout_w(1,1); break;	/* Lock coin slot B */
-		case 0x01: coin_lockout_w(0,1); break;	/* Lock coin slot A */
-		case 0x00: coin_lockout_global_w(1); break;	/* Lock all coin slots */
+		case 0x02: coin_lockout_w(space->machine, 1,1); break;	/* Lock coin slot B */
+		case 0x01: coin_lockout_w(space->machine, 0,1); break;	/* Lock coin slot A */
+		case 0x00: coin_lockout_global_w(space->machine, 1); break;	/* Lock all coin slots */
 		default:   logerror("PC:%04x  Writing unknown data (%04x) to coin count/lockout port\n",cpu_get_previouspc(space->cpu),data); break;
 	}
 }
@@ -302,7 +302,7 @@ MACHINE_RESET( toaplan1 )
 	toaplan1_intenable = 0;
 	toaplan1_coin_count = 0;
 	toaplan1_unk_reset_port = 0;
-	coin_lockout_global_w(0);
+	coin_lockout_global_w(machine, 0);
 }
 void toaplan1_driver_savestate(running_machine *machine)
 {

@@ -73,8 +73,8 @@ static WRITE8_HANDLER( coin_w )
 	intenable = data & 0x0c;
 
 	/* bit 0/1 = coin counters */
-	coin_counter_w(0,data & 1);
-	coin_counter_w(1,data & 2);
+	coin_counter_w(space->machine, 0,data & 1);
+	coin_counter_w(space->machine, 1,data & 2);
 
 	/* other bits unknown */
 }
@@ -110,7 +110,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( merlinmm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x5400, 0x57ff) AM_RAM
 	AM_RANGE(0x6000, 0x6007) AM_WRITENOP /* solenoid writes */
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN4")

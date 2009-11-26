@@ -126,7 +126,7 @@ static WRITE16_HANDLER( gx400_irq1_enable_word_w )
 		nemesis_irq1_on = data & 0x0001;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_w(1, data & 0x0100);
+		coin_lockout_w(space->machine, 1, data & 0x0100);
 }
 
 static WRITE16_HANDLER( gx400_irq2_enable_word_w )
@@ -135,7 +135,7 @@ static WRITE16_HANDLER( gx400_irq2_enable_word_w )
 		nemesis_irq2_on = data & 0x0001;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_w(0, data & 0x0100);
+		coin_lockout_w(space->machine, 0, data & 0x0100);
 }
 
 static WRITE16_HANDLER( gx400_irq4_enable_word_w )
@@ -150,7 +150,7 @@ static WRITE16_HANDLER( nemesis_irq_enable_word_w )
 		nemesis_irq_on = data & 0xff;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_global_w(data & 0x0100);
+		coin_lockout_global_w(space->machine, data & 0x0100);
 }
 
 static WRITE16_HANDLER( konamigt_irq_enable_word_w )
@@ -159,7 +159,7 @@ static WRITE16_HANDLER( konamigt_irq_enable_word_w )
 		nemesis_irq_on = data & 0xff;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_w(1, data & 0x0100);
+		coin_lockout_w(space->machine, 1, data & 0x0100);
 }
 
 static WRITE16_HANDLER( konamigt_irq2_enable_word_w )
@@ -168,7 +168,7 @@ static WRITE16_HANDLER( konamigt_irq2_enable_word_w )
 		nemesis_irq2_on = data & 0xff;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_w(0, data & 0x0100);
+		coin_lockout_w(space->machine, 0, data & 0x0100);
 }
 
 

@@ -43,9 +43,9 @@ Notes:
 
 static WRITE16_HANDLER( drgnmst_coin_w )
 {
-	coin_counter_w(0, data & 0x100);
-	coin_lockout_w(0, ~data & 0x400);
-	coin_lockout_w(1, ~data & 0x800);
+	coin_counter_w(space->machine, 0, data & 0x100);
+	coin_lockout_w(space->machine, 0, ~data & 0x400);
+	coin_lockout_w(space->machine, 1, ~data & 0x800);
 }
 
 static WRITE16_HANDLER( drgnmst_snd_command_w )

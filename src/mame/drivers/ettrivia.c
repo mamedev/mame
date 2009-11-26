@@ -63,7 +63,7 @@ static WRITE8_HANDLER( ettrivia_control_w )
 
 	question_bank = (data >> 3) & 3;
 
-	coin_counter_w(0, data & 0x80);
+	coin_counter_w(space->machine, 0, data & 0x80);
 
 	flip_screen_set(space->machine, data & 1);
 }
@@ -118,7 +118,7 @@ static WRITE8_HANDLER( b800_w )
 
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(ettrivia_control_w)
 	AM_RANGE(0x9800, 0x9800) AM_WRITENOP
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP

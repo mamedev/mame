@@ -182,7 +182,7 @@ static CUSTOM_INPUT( cclownz_paddle )
 
 static WRITE16_HANDLER( ripribit_control_w )
 {
-	coin_counter_w(0, data & 1);
+	coin_counter_w(space->machine, 0, data & 1);
 	ticket_dispenser_0_w(space, 0, ((data >> 1) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 }
@@ -194,7 +194,7 @@ static WRITE16_HANDLER( cfarm_control_w )
 	output_set_lamp_value(0, (data >> 2) & 1);
 	output_set_lamp_value(1, (data >> 3) & 1);
 	output_set_lamp_value(2, (data >> 4) & 1);
-	coin_counter_w(0, (data >> 7) & 1);
+	coin_counter_w(space->machine, 0, (data >> 7) & 1);
 }
 
 
@@ -204,7 +204,7 @@ static WRITE16_HANDLER( cclownz_control_w )
 	output_set_lamp_value(0, (data >> 2) & 1);
 	output_set_lamp_value(1, (data >> 4) & 1);
 	output_set_lamp_value(2, (data >> 5) & 1);
-	coin_counter_w(0, (data >> 6) & 1);
+	coin_counter_w(space->machine, 0, (data >> 6) & 1);
 }
 
 

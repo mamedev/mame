@@ -300,10 +300,10 @@ static WRITE16_HANDLER( cave_eeprom_msb_w )
 
 	if ( ACCESSING_BITS_8_15 )  // even address
 	{
-		coin_lockout_w(1,~data & 0x8000);
-		coin_lockout_w(0,~data & 0x4000);
-		coin_counter_w(1, data & 0x2000);
-		coin_counter_w(0, data & 0x1000);
+		coin_lockout_w(space->machine, 1,~data & 0x8000);
+		coin_lockout_w(space->machine, 0,~data & 0x4000);
+		coin_counter_w(space->machine, 1, data & 0x2000);
+		coin_counter_w(space->machine, 0, data & 0x1000);
 
 		// latch the bit
 		eeprom_write_bit(data & 0x0800);
@@ -344,10 +344,10 @@ static WRITE16_HANDLER( cave_eeprom_lsb_w )
 
 	if ( ACCESSING_BITS_0_7 )  // odd address
 	{
-		coin_lockout_w(1,~data & 0x0008);
-		coin_lockout_w(0,~data & 0x0004);
-		coin_counter_w(1, data & 0x0002);
-		coin_counter_w(0, data & 0x0001);
+		coin_lockout_w(space->machine, 1,~data & 0x0008);
+		coin_lockout_w(space->machine, 0,~data & 0x0004);
+		coin_counter_w(space->machine, 1, data & 0x0002);
+		coin_counter_w(space->machine, 0, data & 0x0001);
 
 		// latch the bit
 		eeprom_write_bit(data & 0x80);
@@ -365,8 +365,8 @@ static WRITE16_HANDLER( gaia_coin_lsb_w )
 {
 	if ( ACCESSING_BITS_0_7 )  // odd address
 	{
-		coin_counter_w(1, data & 0x0002);
-		coin_counter_w(0, data & 0x0001);
+		coin_counter_w(space->machine, 1, data & 0x0002);
+		coin_counter_w(space->machine, 0, data & 0x0001);
 	}
 }
 
@@ -379,8 +379,8 @@ static WRITE16_HANDLER( metmqstr_eeprom_msb_w )
 
 	if ( ACCESSING_BITS_8_15 )  // even address
 	{
-		coin_counter_w(1, data & 0x2000);
-		coin_counter_w(0, data & 0x1000);
+		coin_counter_w(space->machine, 1, data & 0x2000);
+		coin_counter_w(space->machine, 0, data & 0x1000);
 
 		if (~data & 0x0100)
 		{
@@ -685,21 +685,21 @@ static WRITE16_HANDLER( korokoro_leds_w )
 {
 	COMBINE_DATA( &leds[0] );
 
-	set_led_status(0, data & 0x8000);
-	set_led_status(1, data & 0x4000);
-	set_led_status(2, data & 0x1000);	// square button
-	set_led_status(3, data & 0x0800);	// round  button
-//  coin_lockout_w(1,~data & 0x0200);   // coin lockouts?
-//  coin_lockout_w(0,~data & 0x0100);
+	set_led_status(space->machine, 0, data & 0x8000);
+	set_led_status(space->machine, 1, data & 0x4000);
+	set_led_status(space->machine, 2, data & 0x1000);	// square button
+	set_led_status(space->machine, 3, data & 0x0800);	// round  button
+//  coin_lockout_w(space->machine, 1,~data & 0x0200);   // coin lockouts?
+//  coin_lockout_w(space->machine, 0,~data & 0x0100);
 
-//  coin_counter_w(2, data & 0x0080);
-//  coin_counter_w(1, data & 0x0020);
-	coin_counter_w(0, data & 0x0010);
+//  coin_counter_w(space->machine, 2, data & 0x0080);
+//  coin_counter_w(space->machine, 1, data & 0x0020);
+	coin_counter_w(space->machine, 0, data & 0x0010);
 
-	set_led_status(5, data & 0x0008);
-	set_led_status(6, data & 0x0004);
-	set_led_status(7, data & 0x0002);
-	set_led_status(8, data & 0x0001);
+	set_led_status(space->machine, 5, data & 0x0008);
+	set_led_status(space->machine, 6, data & 0x0004);
+	set_led_status(space->machine, 7, data & 0x0002);
+	set_led_status(space->machine, 8, data & 0x0001);
 
 	show_leds();
 }

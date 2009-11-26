@@ -107,7 +107,7 @@ static WRITE8_DEVICE_HANDLER( arcadia_cia_0_porta_w )
 		memory_install_write16_handler(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, (write16_space_func)SMH_UNMAP);
 
 	/* bit 2 = Power Led on Amiga */
-	set_led_status(0, (data & 2) ? 0 : 1);
+	set_led_status(device->machine, 0, (data & 2) ? 0 : 1);
 }
 
 
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( amiga_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x800000, 0x97ffff) AM_ROMBANK(2) AM_REGION("user3", 0)
 	AM_RANGE(0x980000, 0x9fbfff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x9fc000, 0x9ffffd) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x9fc000, 0x9ffffd) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x9ffffe, 0x9fffff) AM_WRITE(arcadia_multibios_change_game)
 	AM_RANGE(0xf00000, 0xf7ffff) AM_ROM AM_REGION("user2", 0)
 ADDRESS_MAP_END

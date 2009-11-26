@@ -554,7 +554,7 @@ static TIMER_CALLBACK( cchip_timer )
 				cchip_ram[0x52]=0x55;
 				cchip_coins[slot]-=cchip_coins_for_credit[slot];
 			}
-			coin_counter_w(slot, 1);
+			coin_counter_w(machine, slot, 1);
 		}
 
 		if (cchip_ram[0x53]>9)
@@ -575,10 +575,10 @@ static TIMER_CALLBACK( cchip_timer )
 	cchip_last_05=cchip_ram[0x5];
 
 	// Cchip handles coin lockout (68k flags error if more than 9 coins)
-	coin_lockout_w(1, cchip_ram[0x53]==9);
-	coin_lockout_w(0, cchip_ram[0x53]==9);
-	coin_counter_w(0, 0);
-	coin_counter_w(1, 0);
+	coin_lockout_w(machine, 1, cchip_ram[0x53]==9);
+	coin_lockout_w(machine, 0, cchip_ram[0x53]==9);
+	coin_counter_w(machine, 0, 0);
+	coin_counter_w(machine, 1, 0);
 
 	// Special handling for last level
 	if (cchip_ram[0x1b]==0x6)

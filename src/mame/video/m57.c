@@ -166,8 +166,8 @@ WRITE8_HANDLER( m57_flipscreen_w )
 	state->flipscreen = (data & 0x01) ^ (~input_port_read(space->machine, "DSW2") & 0x01);
 	tilemap_set_flip(state->bg_tilemap, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	coin_counter_w(0,data & 0x02);
-	coin_counter_w(1,data & 0x20);
+	coin_counter_w(space->machine, 0,data & 0x02);
+	coin_counter_w(space->machine, 1,data & 0x20);
 }
 
 

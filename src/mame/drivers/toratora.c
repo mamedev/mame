@@ -104,9 +104,9 @@ static WRITE8_HANDLER( clear_tv_w )
 static WRITE8_DEVICE_HANDLER( port_b_u1_w )
 {
 	if (pia6821_get_port_b_z_mask(device) & 0x20)
-		coin_counter_w(0, 1);
+		coin_counter_w(device->machine, 0, 1);
 	else
-		coin_counter_w(0, data & 0x20);
+		coin_counter_w(device->machine, 0, data & 0x20);
 }
 
 

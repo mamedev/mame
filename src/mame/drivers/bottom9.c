@@ -84,8 +84,8 @@ if ((data & 1) == 0) popmessage("bankswitch RAM bank 0");
 static WRITE8_HANDLER( bottom9_1f90_w )
 {
 	/* bits 0/1 = coin counters */
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+	coin_counter_w(space->machine, 0,data & 0x01);
+	coin_counter_w(space->machine, 1,data & 0x02);
 
 	/* bit 2 = enable char ROM reading through the video RAM */
 	K052109_set_RMRD_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);

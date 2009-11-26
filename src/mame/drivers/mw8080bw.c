@@ -895,8 +895,8 @@ static MACHINE_START( maze )
 static WRITE8_HANDLER( maze_coin_counter_w )
 {
 	/* the data is not used, just pulse the counter */
-	coin_counter_w(0, 0);
-	coin_counter_w(0, 1);
+	coin_counter_w(space->machine, 0, 0);
+	coin_counter_w(space->machine, 0, 1);
 }
 
 
@@ -2546,7 +2546,7 @@ static CUSTOM_INPUT( invaders_coin_input_r )
 {
 	UINT32 ret = input_port_read(field->port->machine, INVADERS_COIN_INPUT_PORT_TAG);
 
-	coin_counter_w(0, !ret);
+	coin_counter_w(field->port->machine, 0, !ret);
 
 	return ret;
 }
@@ -2750,7 +2750,7 @@ static CUSTOM_INPUT( blueshrk_coin_input_r )
 {
 	UINT32 ret = input_port_read(field->port->machine, BLUESHRK_COIN_INPUT_PORT_TAG);
 
-	coin_counter_w(0, !ret);
+	coin_counter_w(field->port->machine, 0, !ret);
 
 	return ret;
 }
@@ -2827,7 +2827,7 @@ static UINT32 invad2ct_coin_input_r(void *param)
 {
 	UINT32 ret = input_port_read(machine, INVAD2CT_COIN_INPUT_PORT_TAG);
 
-	coin_counter_w(0, !ret);
+	coin_counter_w(machine, 0, !ret);
 
 	return ret;
 }

@@ -404,7 +404,7 @@ static ADDRESS_MAP_START( m68k_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x03800e, 0x03800f) AM_READWRITE(laserdisc_r, laserdisc_w)
 	AM_RANGE(0x03c800, 0x03c9ff) AM_RAM_WRITE(palette_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x03cc00, 0x03cc01) AM_WRITE(control_w)
-	AM_RANGE(0x03e000, 0x03efff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x03e000, 0x03efff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x03f000, 0x03ffff) AM_RAM
 ADDRESS_MAP_END
 

@@ -112,7 +112,7 @@ WRITE8_HANDLER( quizdna_screen_ctrl_w )
 	int tmp = (data & 0x10) >> 4;
 	quizdna_video_enable = data & 0x20;
 
-	coin_counter_w(0, data & 1);
+	coin_counter_w(space->machine, 0, data & 1);
 
 	if (quizdna_flipscreen == tmp)
 		return;

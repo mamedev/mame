@@ -238,11 +238,11 @@ static WRITE8_DEVICE_HANDLER( sprint2_skid2_w )
 
 static WRITE8_HANDLER( sprint2_lamp1_w )
 {
-	set_led_status(0, offset & 1);
+	set_led_status(space->machine, 0, offset & 1);
 }
 static WRITE8_HANDLER( sprint2_lamp2_w )
 {
-	set_led_status(1, offset & 1);
+	set_led_status(space->machine, 1, offset & 1);
 }
 
 

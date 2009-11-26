@@ -168,8 +168,8 @@ WRITE8_HANDLER( irobot_rom_banksel_w )
 			memory_set_bankptr(space->machine, 1, &RAM[0x1A000]);
 			break;
 	}
-	set_led_status(0,data & 0x10);
-	set_led_status(1,data & 0x20);
+	set_led_status(space->machine, 0,data & 0x10);
+	set_led_status(space->machine, 1,data & 0x20);
 }
 
 static TIMER_CALLBACK( scanline_callback )

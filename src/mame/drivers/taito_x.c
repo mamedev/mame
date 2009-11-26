@@ -362,10 +362,10 @@ static WRITE16_HANDLER( daisenpu_input_w )
 	switch (offset)
 	{
 		case 0x04:	/* coin counters and lockout */
-			coin_counter_w(0,data & 0x01);
-			coin_counter_w(1,data & 0x02);
-			coin_lockout_w(0,~data & 0x04);
-			coin_lockout_w(1,~data & 0x08);
+			coin_counter_w(space->machine, 0,data & 0x01);
+			coin_counter_w(space->machine, 1,data & 0x02);
+			coin_lockout_w(space->machine, 0,~data & 0x04);
+			coin_lockout_w(space->machine, 1,~data & 0x08);
 //logerror("taitox coin control %04x to offset %04x\n",data,offset);
 			break;
 
@@ -380,10 +380,10 @@ static WRITE16_HANDLER( kyustrkr_input_w )
 	switch (offset)
 	{
 		case 0x04:	/* coin counters and lockout */
-			coin_counter_w(0,data & 0x01);
-			coin_counter_w(1,data & 0x02);
-			coin_lockout_w(0,data & 0x04);
-			coin_lockout_w(1,data & 0x08);
+			coin_counter_w(space->machine, 0,data & 0x01);
+			coin_counter_w(space->machine, 1,data & 0x02);
+			coin_lockout_w(space->machine, 0,data & 0x04);
+			coin_lockout_w(space->machine, 1,data & 0x08);
 //logerror("taitox coin control %04x to offset %04x\n",data,offset);
 			break;
 

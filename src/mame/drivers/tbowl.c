@@ -40,7 +40,7 @@ VIDEO_UPDATE( tbowl );
 
 static WRITE8_HANDLER( tbowl_coin_counter_w )
 {
-	coin_counter_w(0, data & 1);
+	coin_counter_w(space->machine, 0, data & 1);
 }
 
 /*** Banking

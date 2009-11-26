@@ -42,11 +42,11 @@ WRITE16_HANDLER( OKIM6295_bankswitch_w )
 
 WRITE16_HANDLER( wrally_coin_counter_w )
 {
-	coin_counter_w( (offset >> 3) & 0x01, data & 0x01);
+	coin_counter_w( space->machine, (offset >> 3) & 0x01, data & 0x01);
 }
 
 WRITE16_HANDLER( wrally_coin_lockout_w )
 {
-	coin_lockout_w( (offset >> 3) & 0x01, ~data & 0x01);
+	coin_lockout_w( space->machine, (offset >> 3) & 0x01, ~data & 0x01);
 }
 

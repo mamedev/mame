@@ -104,13 +104,13 @@ static WRITE8_HANDLER( portrait_ctrl_w )
 {
 	/* bits 4 and 5 are unknown */
 
-	coin_counter_w(0, data & 0x01);
-	coin_counter_w(1, data & 0x02);
-	coin_counter_w(2, data & 0x04);
+	coin_counter_w(space->machine, 0, data & 0x01);
+	coin_counter_w(space->machine, 1, data & 0x02);
+	coin_counter_w(space->machine, 2, data & 0x04);
 
 	/* the 2 lamps near the camera */
-	set_led_status(0, data & 0x08);
-	set_led_status(1, data & 0x40);
+	set_led_status(space->machine, 0, data & 0x08);
+	set_led_status(space->machine, 1, data & 0x40);
 
 	/* shows the black and white photo from the camera */
 	output_set_value("photo", (data >> 7) & 1);
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( portrait_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa010, 0xa010) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa018, 0xa018) AM_READWRITE(SMH_NOP, portrait_positive_scroll_w)
 	AM_RANGE(0xa019, 0xa019) AM_WRITE(portrait_negative_scroll_w)
-	AM_RANGE(0xa800, 0xa83f) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xa800, 0xa83f) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xffff, 0xffff) AM_READNOP
 ADDRESS_MAP_END
 

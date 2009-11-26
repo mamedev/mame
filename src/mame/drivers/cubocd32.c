@@ -379,7 +379,7 @@ static WRITE8_DEVICE_HANDLER( cd32_cia_0_porta_w )
 	sound_set_output_gain(devtag_get_device(device->machine, "cdda"), 0, ( data & 1 ) ? 0.0 : 1.0 );
 
 	/* bit 2 = Power Led on Amiga */
-	set_led_status(0, (data & 2) ? 0 : 1);
+	set_led_status(device->machine, 0, (data & 2) ? 0 : 1);
 
 	handle_cd32_joystick_cia(data, cia_r(device, 2));
 }

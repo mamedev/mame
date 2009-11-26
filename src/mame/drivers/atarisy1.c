@@ -446,7 +446,7 @@ static const via6522_interface via_interface =
 
 static WRITE8_HANDLER( led_w )
 {
-	set_led_status(offset, ~data & 1);
+	set_led_status(space->machine, offset, ~data & 1);
 }
 
 

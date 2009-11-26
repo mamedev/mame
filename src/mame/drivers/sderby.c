@@ -198,7 +198,7 @@ static WRITE16_HANDLER( sderby_out_w )
 	output_set_lamp_value(2, (data >> 1) & 1);		/* Lamp 2 - BET */
 	output_set_lamp_value(3, (data >> 15) & 1);		/* Lamp 3 - END OF RACE */
 
-	coin_counter_w(0, data & 0x2000);
+	coin_counter_w(space->machine, 0, data & 0x2000);
 }
 
 
@@ -247,7 +247,7 @@ static WRITE16_HANDLER( scmatto_out_w )
 	output_set_lamp_value(6, (data >> 5) & 1);		/* Lamp 6 - START  */
 	output_set_lamp_value(7, (data >> 6) & 1);		/* Lamp 7 - BET    */
 
-	coin_counter_w(0, data & 0x2000);
+	coin_counter_w(space->machine, 0, data & 0x2000);
 }
 
 
@@ -298,7 +298,7 @@ static ADDRESS_MAP_START( sderby_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x380000, 0x380fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	/* unknown... write 0x01 in game, and 0x00 on reset */
-	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -319,7 +319,7 @@ static ADDRESS_MAP_START( spacewin_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd00000, 0xd001ff) AM_RAM
     AM_RANGE(0x800000, 0x800fff) AM_RAM AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x801000, 0x80100d) AM_WRITENOP	/* unknown */
-	AM_RANGE(0x8f0000, 0x8f07ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	/* 16K Dallas DS1220Y-200 NVRAM */
+	AM_RANGE(0x8f0000, 0x8f07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* 16K Dallas DS1220Y-200 NVRAM */
 	AM_RANGE(0x8fc000, 0x8fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -339,7 +339,7 @@ static ADDRESS_MAP_START( roulette_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x70800e, 0x70800f) AM_READWRITE(rprot_r, rprot_w)	/* MCU communication */
 	AM_RANGE(0x780000, 0x780fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
 
-	AM_RANGE(0xff0000, 0xff07ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xff0000, 0xff07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

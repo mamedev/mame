@@ -65,8 +65,8 @@ static WRITE8_HANDLER( blktiger_coinlockout_w )
 {
 	if (input_port_read(space->machine, "COIN_LOCKOUT") & 0x01)
 	{
-		coin_lockout_w(0,~data & 0x01);
-		coin_lockout_w(1,~data & 0x02);
+		coin_lockout_w(space->machine, 0,~data & 0x01);
+		coin_lockout_w(space->machine, 1,~data & 0x02);
 	}
 }
 

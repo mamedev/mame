@@ -368,7 +368,7 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
 
 	memory_set_bankptr(space->machine, 2,memory_region(space->machine, "audiocpu") + 0x10000 * (data & 0x03));
 
-	coin_counter_w(0,~data & 0x80);
+	coin_counter_w(space->machine, 0,~data & 0x80);
 
 	if (BIT(upd7807_portc,5) && !BIT(data,5))	/* write clock 1->0 */
 	{
@@ -524,7 +524,7 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 
 	memory_set_bankptr(space->machine, 2,memory_region(space->machine, "audiocpu") + 0x10000 * ((data & 0x0c) >> 2));
 
-	coin_counter_w(0,~data & 0x80);
+	coin_counter_w(space->machine, 0,~data & 0x80);
 
 	if (BIT(upd7807_portc,5) && !BIT(data,5))	/* clock 1->0 */
 		sn76496_w(devtag_get_device(space->machine, "snsnd"),0,upd7807_porta);

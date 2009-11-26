@@ -71,7 +71,7 @@ static TIMER_CALLBACK( math_run_clear )
 
 WRITE8_HANDLER( starwars_nstore_w )
 {
-	memcpy (generic_nvram, starwars_ram_overlay, generic_nvram_size);
+	memcpy (space->machine->generic.nvram.ptr.v, starwars_ram_overlay, space->machine->generic.nvram.size);
 }
 
 /*************************************
@@ -85,19 +85,19 @@ WRITE8_HANDLER( starwars_out_w )
 	switch (offset & 7)
 	{
 		case 0:		/* Coin counter 1 */
-			coin_counter_w(0, data);
+			coin_counter_w(space->machine, 0, data);
 			break;
 
 		case 1:		/* Coin counter 2 */
-			coin_counter_w(1, data);
+			coin_counter_w(space->machine, 1, data);
 			break;
 
 		case 2:		/* LED 3 */
-			set_led_status(2, ~data & 0x80);
+			set_led_status(space->machine, 2, ~data & 0x80);
 			break;
 
 		case 3:		/* LED 2 */
-			set_led_status(1, ~data & 0x80);
+			set_led_status(space->machine, 1, ~data & 0x80);
 			break;
 
 		case 4:		/* bank switch */
@@ -109,11 +109,11 @@ WRITE8_HANDLER( starwars_out_w )
 			break;
 
 		case 6:		/* LED 1 */
-			set_led_status(0, ~data & 0x80);
+			set_led_status(space->machine, 0, ~data & 0x80);
 			break;
 
 		case 7:		/* NVRAM array recall */
-			memcpy (starwars_ram_overlay, generic_nvram, generic_nvram_size);
+			memcpy (starwars_ram_overlay, space->machine->generic.nvram.ptr.v, space->machine->generic.nvram.size);
 			break;
 	}
 }

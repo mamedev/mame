@@ -4808,10 +4808,10 @@ WRITE8_HANDLER( TC0220IOC_w )
 			break;
 
 		case 0x04:	/* coin counters and lockout, hi nibble irrelevant */
-			coin_lockout_w(0,~data & 0x01);
-			coin_lockout_w(1,~data & 0x02);
-			coin_counter_w(0,data & 0x04);
-			coin_counter_w(1,data & 0x08);
+			coin_lockout_w(space->machine, 0,~data & 0x01);
+			coin_lockout_w(space->machine, 1,~data & 0x02);
+			coin_counter_w(space->machine, 0,data & 0x04);
+			coin_counter_w(space->machine, 1,data & 0x08);
 
 //if (data &0xf0)
 //logerror("PC %06x: warning - write %02x to TC0220IOC address %02x\n",cpu_get_pc(space->cpu),data,offset);
@@ -4889,10 +4889,10 @@ WRITE8_HANDLER( TC0510NIO_w )
 			break;
 
 		case 0x04:	/* coin counters and lockout */
-			coin_lockout_w(0,~data & 0x01);
-			coin_lockout_w(1,~data & 0x02);
-			coin_counter_w(0,data & 0x04);
-			coin_counter_w(1,data & 0x08);
+			coin_lockout_w(space->machine, 0,~data & 0x01);
+			coin_lockout_w(space->machine, 1,~data & 0x02);
+			coin_counter_w(space->machine, 0,data & 0x04);
+			coin_counter_w(space->machine, 1,data & 0x08);
 			break;
 
 		default:
@@ -4972,10 +4972,10 @@ WRITE8_HANDLER( TC0640FIO_w )
 			break;
 
 		case 0x04:	/* coin counters and lockout */
-			coin_lockout_w(0,~data & 0x01);
-			coin_lockout_w(1,~data & 0x02);
-			coin_counter_w(0,data & 0x04);
-			coin_counter_w(1,data & 0x08);
+			coin_lockout_w(space->machine, 0,~data & 0x01);
+			coin_lockout_w(space->machine, 1,~data & 0x02);
+			coin_counter_w(space->machine, 0,data & 0x04);
+			coin_counter_w(space->machine, 1,data & 0x08);
 			break;
 
 		default:

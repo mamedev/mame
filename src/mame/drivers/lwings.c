@@ -91,8 +91,8 @@ static WRITE8_HANDLER( lwings_bankswitch_w )
 	interrupt_enable_w(space,0,data & 0x08);
 
 	/* bits 6 and 7 are coin counters */
-	coin_counter_w(1,data & 0x40);
-	coin_counter_w(0,data & 0x80);
+	coin_counter_w(space->machine, 1,data & 0x40);
+	coin_counter_w(space->machine, 0,data & 0x80);
 }
 
 static INTERRUPT_GEN( lwings_interrupt )

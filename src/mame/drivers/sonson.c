@@ -80,12 +80,12 @@ static WRITE8_HANDLER( sonson_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( sonson_coin1_counter_w )
 {
-	coin_counter_w(0,data & 1);
+	coin_counter_w(space->machine, 0,data & 1);
 }
 
 static WRITE8_HANDLER( sonson_coin2_counter_w )
 {
-	coin_counter_w(1,data & 1);
+	coin_counter_w(space->machine, 1,data & 1);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )

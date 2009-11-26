@@ -472,15 +472,15 @@ static WRITE16_HANDLER( scudhamm_leds_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
- 		set_led_status(0, data & 0x0100);	// 3 buttons
-		set_led_status(1, data & 0x0200);
-		set_led_status(2, data & 0x0400);
+ 		set_led_status(space->machine, 0, data & 0x0100);	// 3 buttons
+		set_led_status(space->machine, 1, data & 0x0200);
+		set_led_status(space->machine, 2, data & 0x0400);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-//      set_led_status(3, data & 0x0010);   // if we had more leds..
-//      set_led_status(4, data & 0x0020);
+//      set_led_status(space->machine, 3, data & 0x0010);   // if we had more leds..
+//      set_led_status(space->machine, 4, data & 0x0020);
 	}
 }
 
@@ -572,16 +572,16 @@ static WRITE16_HANDLER( armchmp2_leds_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(0, data & 0x0100);
- 		set_led_status(1, data & 0x1000);
-		set_led_status(2, data & 0x2000);
-		set_led_status(3, data & 0x4000);
+		set_led_status(space->machine, 0, data & 0x0100);
+ 		set_led_status(space->machine, 1, data & 0x1000);
+		set_led_status(space->machine, 2, data & 0x2000);
+		set_led_status(space->machine, 3, data & 0x4000);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0, data & 0x0040);
-		coin_counter_w(1, data & 0x0080);
+		coin_counter_w(space->machine, 0, data & 0x0040);
+		coin_counter_w(space->machine, 1, data & 0x0080);
 	}
 }
 

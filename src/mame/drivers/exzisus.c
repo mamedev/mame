@@ -109,10 +109,10 @@ static WRITE8_HANDLER( exzisus_cpub_bankswitch_w )
 
 static WRITE8_HANDLER( exzisus_coincounter_w )
 {
-	coin_lockout_w(0,~data & 0x01);
-	coin_lockout_w(1,~data & 0x02);
-	coin_counter_w(0,data & 0x04);
-	coin_counter_w(1,data & 0x08);
+	coin_lockout_w(space->machine, 0,~data & 0x01);
+	coin_lockout_w(space->machine, 1,~data & 0x02);
+	coin_counter_w(space->machine, 0,data & 0x04);
+	coin_counter_w(space->machine, 1,data & 0x08);
 }
 
 static READ8_HANDLER( exzisus_sharedram_ab_r )

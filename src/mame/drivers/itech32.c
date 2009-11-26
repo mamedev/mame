@@ -732,17 +732,17 @@ static WRITE8_DEVICE_HANDLER( drivedge_portb_out )
 	/* bit 4 controls the ticket dispenser */
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
-	set_led_status(1, data & 0x01);
-	set_led_status(2, data & 0x02);
-	set_led_status(3, data & 0x04);
+	set_led_status(space->machine, 1, data & 0x01);
+	set_led_status(space->machine, 2, data & 0x02);
+	set_led_status(space->machine, 3, data & 0x04);
 	ticket_dispenser_w(space, 0, (data & 0x10) << 3);
-	coin_counter_w(0, (data & 0x20) >> 5);
+	coin_counter_w(space->machine, 0, (data & 0x20) >> 5);
 }
 
 
 static WRITE8_DEVICE_HANDLER( drivedge_turbo_light )
 {
-	set_led_status(0, data);
+	set_led_status(device->machine, 0, data);
 }
 
 
@@ -755,7 +755,7 @@ static WRITE8_DEVICE_HANDLER( pia_portb_out )
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	ticket_dispenser_w(space, 0, (data & 0x10) << 3);
-	coin_counter_w(0, (data & 0x20) >> 5);
+	coin_counter_w(space->machine, 0, (data & 0x20) >> 5);
 }
 
 

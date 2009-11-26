@@ -129,18 +129,18 @@ static WRITE32_HANDLER( output_w )
 	if(ACCESSING_BITS_16_31)
 	{
 		/* probably eeprom stuff too */
-		coin_lockout_w(0,~data>>16 & 0x40);
-		coin_lockout_w(1,~data>>16 & 0x40);
-		coin_counter_w(0,data>>16 & 1);
+		coin_lockout_w(space->machine, 0,~data>>16 & 0x40);
+		coin_lockout_w(space->machine, 1,~data>>16 & 0x40);
+		coin_counter_w(space->machine, 0,data>>16 & 1);
 		//data>>16 & 2 coin out
-		coin_counter_w(1,data>>16 & 4);
+		coin_counter_w(space->machine, 1,data>>16 & 4);
 		//data>>16 & 8 coin hopper
 		okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), 0x40000 * (((data>>16) & 0x20)>>5));
 	}
 	if(ACCESSING_BITS_0_15)
 	{
 		/* -xxx xxxx lamps*/
-		coin_counter_w(2,data & 0x2000); //key in
+		coin_counter_w(space->machine, 2,data & 0x2000); //key in
 		//data & 0x4000 key out
 	}
 }

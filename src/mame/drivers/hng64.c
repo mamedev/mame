@@ -1029,7 +1029,7 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f700000, 0x1f702fff) AM_READWRITE(hng64_sysregs_r,hng64_sysregs_w) AM_BASE(&hng64_sysregs)
 
 	// SRAM.  Coin data, Player Statistics, etc.
-	AM_RANGE(0x1F800000, 0x1F803fff) AM_RAM AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x1F800000, 0x1F803fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 
 	// Dualport RAM
 	AM_RANGE(0x1F808000, 0x1F8087ff) AM_READWRITE(hng64_dualport_r, hng64_dualport_w) AM_BASE(&hng64_dualport)

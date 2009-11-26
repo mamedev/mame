@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4380, 0x439f) AM_READ(starwars_adc_r)			/* a-d control result */
 	AM_RANGE(0x4400, 0x4400) AM_READWRITE(starwars_main_read_r, starwars_main_wr_w)
 	AM_RANGE(0x4401, 0x4401) AM_READ(starwars_main_ready_flag_r)
-	AM_RANGE(0x4500, 0x45ff) AM_RAM AM_BASE(&starwars_ram_overlay) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x4500, 0x45ff) AM_RAM AM_BASE(&starwars_ram_overlay) AM_SIZE_GENERIC(nvram)
 	AM_RANGE(0x4600, 0x461f) AM_WRITE(avgdvg_go_w)
 	AM_RANGE(0x4620, 0x463f) AM_WRITE(avgdvg_reset_w)
 	AM_RANGE(0x4640, 0x465f) AM_WRITE(watchdog_reset_w)
@@ -505,7 +505,7 @@ ROM_END
 static DRIVER_INIT( starwars )
 {
 	/* X2212 nvram */
-	generic_nvram = auto_alloc_array(machine, UINT8, generic_nvram_size);
+	machine->generic.nvram.ptr.u8 = auto_alloc_array(machine, UINT8, machine->generic.nvram.size);
 
 	/* prepare the mathbox */
 	starwars_is_esb = 0;
@@ -522,7 +522,7 @@ static DRIVER_INIT( esb )
 	UINT8 *rom = memory_region(machine, "maincpu");
 
 	/* X2212 nvram */
-	generic_nvram = auto_alloc_array(machine, UINT8, generic_nvram_size);
+	machine->generic.nvram.ptr.u8 = auto_alloc_array(machine, UINT8, machine->generic.nvram.size);
 
 	/* init the slapstic */
 	slapstic_init(machine, 101);

@@ -1072,7 +1072,7 @@ static WRITE16_HANDLER( dcs_data_bank_select_w )
 
 	/* bit 11 = sound board led */
 #if 0
-	set_led_status(2, data & 0x800);
+	set_led_status(space->machine, 2, data & 0x800);
 #endif
 }
 

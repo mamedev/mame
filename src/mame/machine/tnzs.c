@@ -71,10 +71,10 @@ WRITE8_HANDLER( tnzs_port2_w )
 	tnzs_state *state = (tnzs_state *)space->machine->driver_data;
 //  logerror("I8742:%04x  Write %02x to port 2\n", cpu_get_previouspc(space->cpu), data);
 
-	coin_lockout_w(0, (data & 0x40));
-	coin_lockout_w(1, (data & 0x80));
-	coin_counter_w(0, (~data & 0x10));
-	coin_counter_w(1, (~data & 0x20));
+	coin_lockout_w(space->machine, 0, (data & 0x40));
+	coin_lockout_w(space->machine, 1, (data & 0x80));
+	coin_counter_w(space->machine, 0, (~data & 0x10));
+	coin_counter_w(space->machine, 1, (~data & 0x20));
 
 	state->input_select = data;
 }
@@ -128,7 +128,7 @@ static void mcu_handle_coins( running_machine *machine, int coin )
 		if (coin & 0x01)	/* coin A */
 		{
 //          logerror("Coin dropped into slot A\n");
-			coin_counter_w(0,1); coin_counter_w(0,0); /* Count slot A */
+			coin_counter_w(machine,0,1); coin_counter_w(machine,0,0); /* Count slot A */
 			state->mcu_coins_a++;
 			if (state->mcu_coins_a >= state->mcu_coinage[0])
 			{
@@ -137,11 +137,11 @@ static void mcu_handle_coins( running_machine *machine, int coin )
 				if (state->mcu_credits >= 9)
 				{
 					state->mcu_credits = 9;
-					coin_lockout_global_w(1); /* Lock all coin slots */
+					coin_lockout_global_w(machine, 1); /* Lock all coin slots */
 				}
 				else
 				{
-					coin_lockout_global_w(0); /* Unlock all coin slots */
+					coin_lockout_global_w(machine, 0); /* Unlock all coin slots */
 				}
 			}
 		}
@@ -149,7 +149,7 @@ static void mcu_handle_coins( running_machine *machine, int coin )
 		if (coin & 0x02)	/* coin B */
 		{
 //          logerror("Coin dropped into slot B\n");
-			coin_counter_w(1,1); coin_counter_w(1,0); /* Count slot B */
+			coin_counter_w(machine,1,1); coin_counter_w(machine,1,0); /* Count slot B */
 			state->mcu_coins_b++;
 			if (state->mcu_coins_b >= state->mcu_coinage[2])
 			{
@@ -158,11 +158,11 @@ static void mcu_handle_coins( running_machine *machine, int coin )
 				if (state->mcu_credits >= 9)
 				{
 					state->mcu_credits = 9;
-					coin_lockout_global_w(1); /* Lock all coin slots */
+					coin_lockout_global_w(machine, 1); /* Lock all coin slots */
 				}
 				else
 				{
-					coin_lockout_global_w(0); /* Unlock all coin slots */
+					coin_lockout_global_w(machine, 0); /* Unlock all coin slots */
 				}
 			}
 		}
@@ -178,7 +178,7 @@ static void mcu_handle_coins( running_machine *machine, int coin )
 	else
 	{
 		if (state->mcu_credits < 9)
-			coin_lockout_global_w(0); /* Unlock all coin slots */
+			coin_lockout_global_w(machine, 0); /* Unlock all coin slots */
 
 		state->mcu_reportcoin = 0;
 	}
@@ -740,22 +740,22 @@ WRITE8_HANDLER( tnzs_bankswitch1_w )
 				/* Coin count and lockout is handled by the i8742 */
 				break;
 		case MCU_NONE_INSECTX:
-				coin_lockout_w(0, (~data & 0x04));
-				coin_lockout_w(1, (~data & 0x08));
-				coin_counter_w(0, (data & 0x10));
-				coin_counter_w(1, (data & 0x20));
+				coin_lockout_w(space->machine, 0, (~data & 0x04));
+				coin_lockout_w(space->machine, 1, (~data & 0x08));
+				coin_counter_w(space->machine, 0, (data & 0x10));
+				coin_counter_w(space->machine, 1, (data & 0x20));
 				break;
 		case MCU_NONE_TNZSB:
 		case MCU_NONE_KABUKIZ:
-				coin_lockout_w(0, (~data & 0x10));
-				coin_lockout_w(1, (~data & 0x20));
-				coin_counter_w(0, (data & 0x04));
-				coin_counter_w(1, (data & 0x08));
+				coin_lockout_w(space->machine, 0, (~data & 0x10));
+				coin_lockout_w(space->machine, 1, (~data & 0x20));
+				coin_counter_w(space->machine, 0, (data & 0x04));
+				coin_counter_w(space->machine, 1, (data & 0x08));
 				break;
 		case MCU_NONE_KAGEKI:
-				coin_lockout_global_w((~data & 0x20));
-				coin_counter_w(0, (data & 0x04));
-				coin_counter_w(1, (data & 0x08));
+				coin_lockout_global_w(space->machine, (~data & 0x20));
+				coin_counter_w(space->machine, 0, (data & 0x04));
+				coin_counter_w(space->machine, 1, (data & 0x08));
 				break;
 		case MCU_ARKANOID:
 		case MCU_EXTRMATN:

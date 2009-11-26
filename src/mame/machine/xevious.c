@@ -147,12 +147,12 @@ WRITE8_HANDLER( battles_customio_data3_w )
 
 WRITE8_HANDLER( battles_CPU4_coin_w )
 {
-	set_led_status(0,data & 0x02);	// Start 1
-	set_led_status(1,data & 0x01);	// Start 2
+	set_led_status(space->machine, 0,data & 0x02);	// Start 1
+	set_led_status(space->machine, 1,data & 0x01);	// Start 2
 
-	coin_counter_w(0,data & 0x20);
-	coin_counter_w(1,data & 0x10);
-	coin_lockout_global_w(~data & 0x04);
+	coin_counter_w(space->machine, 0,data & 0x20);
+	coin_counter_w(space->machine, 1,data & 0x10);
+	coin_lockout_global_w(space->machine, ~data & 0x04);
 }
 
 

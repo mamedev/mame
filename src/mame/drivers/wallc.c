@@ -139,7 +139,7 @@ static VIDEO_UPDATE( wallc )
 
 static WRITE8_HANDLER( wallc_coin_counter_w )
 {
-	coin_counter_w(0,data & 2);
+	coin_counter_w(space->machine, 0,data & 2);
 }
 
 static ADDRESS_MAP_START( wallc_map, ADDRESS_SPACE_PROGRAM, 8 )

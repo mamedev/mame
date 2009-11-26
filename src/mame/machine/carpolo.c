@@ -388,7 +388,7 @@ static WRITE8_DEVICE_HANDLER( pia_0_port_a_w )
        bit 6 - Player 1 crash sound
        bit 7 - Ball hit pulse sound */
 
-	coin_counter_w(0, data & 0x01);
+	coin_counter_w(device->machine, 0, data & 0x01);
 
 
 	TTL7474_clear_w(TTL7474_1F_1, data & 0x08);

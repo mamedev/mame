@@ -174,7 +174,7 @@ WRITE16_HANDLER( deniam_coinctrl_w )
 	COMBINE_DATA(&state->coinctrl);
 
 	/* bit 0 is coin counter */
-	coin_counter_w(0, state->coinctrl & 0x01);
+	coin_counter_w(space->machine, 0, state->coinctrl & 0x01);
 
 	/* bit 6 is display enable (0 freezes screen) */
 	state->display_enable = state->coinctrl & 0x20;

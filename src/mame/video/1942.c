@@ -186,7 +186,7 @@ WRITE8_HANDLER( c1942_c804_w )
        bit 4: cpu B reset
        bit 0: coin counter */
 
-	coin_counter_w(0,data & 0x01);
+	coin_counter_w(space->machine, 0,data & 0x01);
 
 	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 

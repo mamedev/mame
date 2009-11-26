@@ -114,17 +114,17 @@ static WRITE8_HANDLER( ultratnk_da_latch_w )
 
 static WRITE8_HANDLER( ultratnk_led_1_w )
 {
-	set_led_status(0, offset & 1); /* left player start */
+	set_led_status(space->machine, 0, offset & 1); /* left player start */
 }
 static WRITE8_HANDLER( ultratnk_led_2_w )
 {
-	set_led_status(1, offset & 1); /* right player start */
+	set_led_status(space->machine, 1, offset & 1); /* right player start */
 }
 
 
 static WRITE8_HANDLER( ultratnk_lockout_w )
 {
-	coin_lockout_global_w(~offset & 1);
+	coin_lockout_global_w(space->machine, ~offset & 1);
 }
 
 

@@ -449,8 +449,8 @@ WRITE8_HANDLER( qix_68705_portB_w )
 	qix_state *state = (qix_state *)space->machine->driver_data;
 
 	state->_68705_port_out[1] = data;
-	coin_lockout_w(0, (~data >> 6) & 1);
-	coin_counter_w(0, (data >> 7) & 1);
+	coin_lockout_w(space->machine, 0, (~data >> 6) & 1);
+	coin_counter_w(space->machine, 0, (data >> 7) & 1);
 }
 
 
@@ -493,8 +493,8 @@ WRITE8_DEVICE_HANDLER( qix_pia_w )
 
 static WRITE8_DEVICE_HANDLER( qix_coinctl_w )
 {
-	coin_lockout_w(0, (~data >> 2) & 1);
-	coin_counter_w(0, (data >> 1) & 1);
+	coin_lockout_w(device->machine, 0, (~data >> 2) & 1);
+	coin_counter_w(device->machine, 0, (data >> 1) & 1);
 }
 
 

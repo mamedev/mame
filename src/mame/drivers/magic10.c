@@ -251,7 +251,7 @@ static WRITE16_HANDLER( magic10_out_w )
 	output_set_lamp_value(7, (data >> 6) & 1);		/* Lamp 7 - PLAY (BET/TAKE/CANCEL) */
 	output_set_lamp_value(8, (data >> 8) & 1);		/* Lamp 8 - PAYOUT/SUPERGAME */
 
-	coin_counter_w(0, data & 0x400);
+	coin_counter_w(space->machine, 0, data & 0x400);
 }
 
 /***************************
@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( magic10_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE(&layer0_videoram)
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE(&layer2_videoram)
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x300000, 0x3001ff) AM_RAM_WRITE(paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("DSW")
@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( magic10a_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE(&layer0_videoram)
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE(&layer2_videoram)
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x300000, 0x3001ff) AM_RAM_WRITE(paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW")
@@ -295,7 +295,7 @@ static ADDRESS_MAP_START( magic102_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE(&layer0_videoram)
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE(&layer2_videoram)
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x400000, 0x4001ff) AM_RAM_WRITE(paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x500000, 0x500001) AM_READ(magic102_r)
 	AM_RANGE(0x500004, 0x500005) AM_READNOP // gives credits
@@ -314,7 +314,7 @@ static ADDRESS_MAP_START( hotslot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE(&layer0_videoram)
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE(&layer2_videoram)
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x400000, 0x4001ff) AM_RAM_WRITE(paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE(hotslot_copro_r, hotslot_copro_w)	// copro comm
 	AM_RANGE(0x500006, 0x500011) AM_RAM
@@ -333,7 +333,7 @@ static ADDRESS_MAP_START( sgsafari_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE(&layer0_videoram)
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE(&layer2_videoram)
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x300000, 0x3001ff) AM_RAM_WRITE(paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500008, 0x500009) AM_WRITE(magic10_out_w)

@@ -420,10 +420,10 @@ static WRITE16_HANDLER( player_34_coin_ctrl_w )
 	COMBINE_DATA(&coin_word);
 
 	/* coin counters and lockout */
-	coin_lockout_w(2,~data & 0x0100);
-	coin_lockout_w(3,~data & 0x0200);
-	coin_counter_w(2, data & 0x0400);
-	coin_counter_w(3, data & 0x0800);
+	coin_lockout_w(space->machine, 2,~data & 0x0100);
+	coin_lockout_w(space->machine, 3,~data & 0x0200);
+	coin_counter_w(space->machine, 2, data & 0x0400);
+	coin_counter_w(space->machine, 3, data & 0x0800);
 }
 
 static READ16_HANDLER( pbobble_input_bypass_r )

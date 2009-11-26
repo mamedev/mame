@@ -360,7 +360,7 @@ static WRITE8_HANDLER( general_output_w )
 		gottlieb_laserdisc_video_control_w(space, offset, data);
 
 	/* bit 4 controls the coin meter */
-	coin_counter_w(0, data & 0x10);
+	coin_counter_w(space->machine, 0, data & 0x10);
 
 	/* bit 5 controls the knocker */
 	output_set_value("knocker0", (data >> 5) & 1);
@@ -374,9 +374,9 @@ static WRITE8_HANDLER( general_output_w )
 static WRITE8_HANDLER( reactor_output_w )
 {
 	general_output_w(space, offset, data & ~0xe0);
-	set_led_status(0, data & 0x20);
-	set_led_status(1, data & 0x40);
-	set_led_status(2, data & 0x80);
+	set_led_status(space->machine, 0, data & 0x20);
+	set_led_status(space->machine, 1, data & 0x40);
+	set_led_status(space->machine, 2, data & 0x80);
 }
 
 
@@ -735,7 +735,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gottlieb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_REGION("maincpu", 0x1000)	/* or ROM */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_REGION("maincpu", 0x2000) 	/* or ROM */
 	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0700) AM_WRITEONLY AM_BASE(&spriteram)							/* FRSEL */

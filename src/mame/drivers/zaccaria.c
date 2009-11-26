@@ -183,7 +183,7 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 	acs = ~data & 0x08;
 
 	// bit 4 = led (for testing?)
-	set_led_status(0,~data & 0x10);
+	set_led_status(device->machine, 0,~data & 0x10);
 }
 
 static READ_LINE_DEVICE_HANDLER( zaccaria_ca2_r )
@@ -302,7 +302,7 @@ static READ8_HANDLER( zaccaria_prot2_r )
 
 static WRITE8_HANDLER( coin_w )
 {
-	coin_counter_w(0,data & 1);
+	coin_counter_w(space->machine, 0,data & 1);
 }
 
 static WRITE8_HANDLER( nmienable_w )

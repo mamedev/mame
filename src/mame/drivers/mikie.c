@@ -59,7 +59,7 @@ static WRITE8_HANDLER( mikie_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( mikie_coin_counter_w )
 {
-	coin_counter_w(offset, data);
+	coin_counter_w(space->machine, offset, data);
 }
 
 /* Memory Maps */

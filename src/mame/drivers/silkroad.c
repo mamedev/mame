@@ -154,8 +154,8 @@ static WRITE32_HANDLER(silk_coin_counter_w)
 {
 	if (ACCESSING_BITS_16_23)
 	{
-		coin_counter_w(0, data & 0x10000);
-		coin_counter_w(1, data & 0x80000);
+		coin_counter_w(space->machine, 0, data & 0x10000);
+		coin_counter_w(space->machine, 1, data & 0x80000);
 	}
 }
 

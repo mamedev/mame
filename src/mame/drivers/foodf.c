@@ -102,7 +102,7 @@ static UINT8 whichport = 0;
 
 static READ16_HANDLER( nvram_r )
 {
-	return generic_nvram16[offset] | 0xfff0;
+	return space->machine->generic.nvram.ptr.u16[offset] | 0xfff0;
 }
 
 
@@ -180,8 +180,8 @@ static WRITE16_HANDLER( digital_w )
 		output_set_led_value(0, (data >> 4) & 1);
 		output_set_led_value(1, (data >> 5) & 1);
 
-		coin_counter_w(0, (data >> 6) & 1);
-		coin_counter_w(1, (data >> 7) & 1);
+		coin_counter_w(space->machine, 0, (data >> 6) & 1);
+		coin_counter_w(space->machine, 1, (data >> 7) & 1);
 	}
 }
 
@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x018000, 0x018fff) AM_MIRROR(0x3e3000) AM_RAM
 	AM_RANGE(0x01c000, 0x01c0ff) AM_MIRROR(0x3e3f00) AM_RAM AM_BASE(&spriteram16)
 	AM_RANGE(0x800000, 0x8007ff) AM_MIRROR(0x03f800) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE(&atarigen_playfield)
-	AM_RANGE(0x900000, 0x9001ff) AM_MIRROR(0x03fe00) AM_READWRITE(nvram_r, SMH_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x900000, 0x9001ff) AM_MIRROR(0x03fe00) AM_READWRITE(nvram_r, SMH_RAM) AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x940000, 0x940007) AM_MIRROR(0x023ff8) AM_READ(analog_r)
 	AM_RANGE(0x944000, 0x944007) AM_MIRROR(0x023ff8) AM_WRITE(analog_w)
 	AM_RANGE(0x948000, 0x948001) AM_MIRROR(0x023ffe) AM_READ_PORT("SYSTEM") AM_WRITE(digital_w)

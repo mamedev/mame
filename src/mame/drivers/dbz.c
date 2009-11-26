@@ -109,8 +109,8 @@ static WRITE16_HANDLER( dbzcontrol_w )
 		K053246_set_OBJCHA_line(CLEAR_LINE);
 	}
 
-	coin_counter_w(0, data & 1);
-	coin_counter_w(1, data & 2);
+	coin_counter_w(space->machine, 0, data & 1);
+	coin_counter_w(space->machine, 1, data & 2);
 }
 
 static WRITE16_HANDLER( dbz_sound_command_w )

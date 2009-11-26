@@ -74,8 +74,8 @@ WRITE8_HANDLER( buggychl_ctrl_w )
 
 	sprite_color_base = (data & 0x10) ? 1*16 : 3*16;
 
-	coin_lockout_global_w((~data & 0x40) >> 6);
-	set_led_status(0,~data & 0x80);
+	coin_lockout_global_w(space->machine, (~data & 0x40) >> 6);
+	set_led_status(space->machine, 0,~data & 0x80);
 }
 
 WRITE8_HANDLER( buggychl_bg_scrollx_w )

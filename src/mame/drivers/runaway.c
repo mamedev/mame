@@ -80,7 +80,7 @@ static READ8_DEVICE_HANDLER( runaway_pot_r )
 
 static WRITE8_HANDLER( runaway_led_w )
 {
-	set_led_status(offset, ~data & 1);
+	set_led_status(space->machine, offset, ~data & 1);
 }
 
 

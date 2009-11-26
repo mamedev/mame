@@ -174,7 +174,7 @@ subs_lamp1_w
 ***************************************************************************/
 WRITE8_HANDLER( subs_lamp1_w )
 {
-	set_led_status(0,~offset & 1);
+	set_led_status(space->machine, 0,~offset & 1);
 }
 
 /***************************************************************************
@@ -182,5 +182,5 @@ subs_lamp2_w
 ***************************************************************************/
 WRITE8_HANDLER( subs_lamp2_w )
 {
-	set_led_status(1,~offset & 1);
+	set_led_status(space->machine, 1,~offset & 1);
 }

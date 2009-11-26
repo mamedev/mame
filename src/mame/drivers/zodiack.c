@@ -113,8 +113,8 @@ static MACHINE_RESET( percuss )
 static WRITE8_HANDLER( zodiack_control_w )
 {
 	/* Bit 0-1 - coin counters */
-	coin_counter_w(0, data & 0x02);
-	coin_counter_w(1, data & 0x01);
+	coin_counter_w(space->machine, 0, data & 0x02);
+	coin_counter_w(space->machine, 1, data & 0x01);
 
 	/* Bit 2 - ???? */
 }

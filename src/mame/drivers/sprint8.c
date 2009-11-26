@@ -90,7 +90,7 @@ static READ8_HANDLER( sprint8_input_r )
 
 static WRITE8_HANDLER( sprint8_lockout_w )
 {
-	coin_lockout_w(offset, !(data & 1));
+	coin_lockout_w(space->machine, offset, !(data & 1));
 }
 
 

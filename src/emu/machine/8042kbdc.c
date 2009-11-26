@@ -441,7 +441,7 @@ WRITE8_HANDLER(kbdc8042_8_w)
 			/* normal case */
 			kbdc8042.data = data;
 			kbdc8042.sending=1;
-			at_keyboard_write(data);
+			at_keyboard_write(space->machine, data);
 			break;
 
 		case 1:
@@ -462,7 +462,7 @@ WRITE8_HANDLER(kbdc8042_8_w)
 			/* preceeded by writing 0xD2 to port 60h */
 			kbdc8042.data = data;
 			kbdc8042.sending=1;
-			at_keyboard_write(data);
+			at_keyboard_write(space->machine, data);
 			break;
 
 		case 3:

@@ -194,7 +194,7 @@ static WRITE16_HANDLER(cyclwarr_sound_w)
 
 static ADDRESS_MAP_START( apache3_v30_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
-	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x08000, 0x08fff) AM_RAM_WRITE(apache3_palette_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0c000, 0x0dfff) AM_RAM_WRITE(roundup5_text_w) AM_BASE(&videoram16)
 	AM_RANGE(0x0e800, 0x0e803) AM_WRITENOP // CRT

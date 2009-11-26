@@ -69,12 +69,12 @@ static WRITE8_HANDLER( bladestl_bankswitch_w )
 	int bankaddress;
 
 	/* bits 0 & 1 = coin counters */
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+	coin_counter_w(space->machine, 0,data & 0x01);
+	coin_counter_w(space->machine, 1,data & 0x02);
 
 	/* bits 2 & 3 = lamps */
-	set_led_status(0,data & 0x04);
-	set_led_status(1,data & 0x08);
+	set_led_status(space->machine, 0,data & 0x04);
+	set_led_status(space->machine, 1,data & 0x08);
 
 	/* bit 4 = relay (???) */
 

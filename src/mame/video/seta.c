@@ -251,14 +251,14 @@ void seta_coin_lockout_w(running_machine *machine, int data)
 		}
 	}
 
-	coin_counter_w		(0, (( data) >> 0) & 1 );
-	coin_counter_w		(1, (( data) >> 1) & 1 );
+	coin_counter_w		(machine, 0, (( data) >> 0) & 1 );
+	coin_counter_w		(machine, 1, (( data) >> 1) & 1 );
 
 	/* blandia, gundhara, kamenrid & zingzip haven't the coin lockout device */
 	if (	!seta_coin_lockout )
 		return;
-	coin_lockout_w		(0, ((~data) >> 2) & 1 );
-	coin_lockout_w		(1, ((~data) >> 3) & 1 );
+	coin_lockout_w		(machine, 0, ((~data) >> 2) & 1 );
+	coin_lockout_w		(machine, 1, ((~data) >> 3) & 1 );
 }
 
 
@@ -283,8 +283,8 @@ WRITE16_HANDLER( seta_vregs_w )
 				seta_coin_lockout_w (space->machine, data & 0x0f);
 				if (x1_010 != NULL)
 					seta_sound_enable_w (x1_010, data & 0x20);
-				coin_counter_w(0,data & 0x01);
-				coin_counter_w(1,data & 0x02);
+				coin_counter_w(space->machine, 0,data & 0x01);
+				coin_counter_w(space->machine, 1,data & 0x02);
 			}
 			break;
 

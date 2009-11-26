@@ -764,29 +764,29 @@ static CUSTOM_INPUT( gwarb_rotary )
 
 static WRITE8_HANDLER( athena_coin_counter_w )
 {
-	coin_counter_w(0, ~data & 2);
-	coin_counter_w(1, ~data & 1);
+	coin_counter_w(space->machine, 0, ~data & 2);
+	coin_counter_w(space->machine, 1, ~data & 1);
 }
 
 static WRITE8_HANDLER( ikari_coin_counter_w )
 {
 	if (~data & 0x80)
 	{
-		coin_counter_w(0, 1);
-		coin_counter_w(0, 0);
+		coin_counter_w(space->machine, 0, 1);
+		coin_counter_w(space->machine, 0, 0);
 	}
 
 	if (~data & 0x40)
 	{
-		coin_counter_w(1, 1);
-		coin_counter_w(1, 0);
+		coin_counter_w(space->machine, 1, 1);
+		coin_counter_w(space->machine, 1, 0);
 	}
 }
 
 static WRITE8_HANDLER( tdfever_coin_counter_w )
 {
-	coin_counter_w(0, data & 1);
-	coin_counter_w(1, data & 2);
+	coin_counter_w(space->machine, 0, data & 1);
+	coin_counter_w(space->machine, 1, data & 2);
 }
 
 static WRITE8_HANDLER( countryc_trackball_w )

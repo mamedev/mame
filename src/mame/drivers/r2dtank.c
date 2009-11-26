@@ -412,7 +412,7 @@ static ADDRESS_MAP_START( r2dtank_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8004, 0x8004) AM_READWRITE(audio_answer_r, audio_command_w)
 	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE(0xc000, 0xc007) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xc000, 0xc007) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xc800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

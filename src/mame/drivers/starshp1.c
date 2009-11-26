@@ -54,8 +54,8 @@ static WRITE8_DEVICE_HANDLER( starshp1_audio_w )
 		break;
 	}
 
-	coin_lockout_w(0, !starshp1_attract);
-	coin_lockout_w(1, !starshp1_attract);
+	coin_lockout_w(device->machine, 0, !starshp1_attract);
+	coin_lockout_w(device->machine, 1, !starshp1_attract);
 }
 
 
@@ -158,7 +158,7 @@ static WRITE8_HANDLER( starshp1_misc_w )
 		starshp1_mux = data;
 		break;
 	case 7:
-		set_led_status(0, !data);
+		set_led_status(space->machine, 0, !data);
 		break;
 	}
 }

@@ -1331,12 +1331,12 @@ static CUSTOM_INPUT( ddenlovr_special_r )
 static WRITE16_HANDLER( ddenlovr_coincounter_0_w )
 {
 	if (ACCESSING_BITS_0_7)
-		coin_counter_w(0, data & 1);
+		coin_counter_w(space->machine, 0, data & 1);
 }
 static WRITE16_HANDLER( ddenlovr_coincounter_1_w )
 {
 	if (ACCESSING_BITS_0_7)
-		coin_counter_w(1, data & 1);
+		coin_counter_w(space->machine, 1, data & 1);
 }
 
 
@@ -1562,8 +1562,8 @@ static WRITE16_HANDLER( quiz365_coincounter_w )
 	{
 		if (ddenlovr_select2 == 0x1c)
 		{
-			coin_counter_w(0, ~data & 1);
-			coin_counter_w(1, ~data & 4);
+			coin_counter_w(space->machine, 0, ~data & 1);
+			coin_counter_w(space->machine, 1, ~data & 4);
 		}
 	}
 }
@@ -1640,8 +1640,8 @@ static WRITE16_HANDLER( ddenlvrj_coincounter_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0, data & 0x01);
-		coin_counter_w(1, data & 0x04);
+		coin_counter_w(space->machine, 0, data & 0x01);
+		coin_counter_w(space->machine, 1, data & 0x04);
 		//                data & 0x80 ?
 	}
 }
@@ -1817,8 +1817,8 @@ static WRITE16_HANDLER( nettoqc_coincounter_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0, data & 0x01);
-		coin_counter_w(1, data & 0x04);
+		coin_counter_w(space->machine, 0, data & 0x01);
+		coin_counter_w(space->machine, 1, data & 0x04);
 		//                data & 0x80 ?
 	}
 }
@@ -2002,22 +2002,22 @@ static WRITE8_HANDLER( mmpanic_blitter2_w )
 /* A led for each of the 9 buttons */
 static UINT16 mmpanic_leds;
 
-static void mmpanic_update_leds(void)
+static void mmpanic_update_leds(running_machine *machine)
 {
-	set_led_status(0,mmpanic_leds);
+	set_led_status(machine, 0,mmpanic_leds);
 }
 
 /* leds 1-8 */
 static WRITE8_HANDLER( mmpanic_leds_w )
 {
 	mmpanic_leds = (mmpanic_leds & 0xff00) | data;
-	mmpanic_update_leds();
+	mmpanic_update_leds(space->machine);
 }
 /* led 9 */
 static WRITE8_HANDLER( mmpanic_leds2_w )
 {
 	mmpanic_leds = (mmpanic_leds & 0xfeff) | (data ? 0x0100 : 0);
-	mmpanic_update_leds();
+	mmpanic_update_leds(space->machine);
 }
 
 
@@ -2025,9 +2025,9 @@ static WRITE8_HANDLER( mmpanic_lockout_w )
 {
 	if (ddenlovr_select == 0x0c)
 	{
-		coin_counter_w(0,(~data) & 0x01);
-		coin_lockout_w(0,(~data) & 0x02);
-		set_led_status(1,(~data) & 0x04);
+		coin_counter_w(space->machine, 0,(~data) & 0x01);
+		coin_lockout_w(space->machine, 0,(~data) & 0x02);
+		set_led_status(space->machine, 1,(~data) & 0x04);
 	}
 }
 
@@ -2185,8 +2185,8 @@ static WRITE8_HANDLER( funkyfig_lockout_w )
 	{
 		case 0x2c:
 			funkyfig_lockout = data;
-			coin_counter_w(0,  data  & 0x01);
-			coin_lockout_w(0,(~data) & 0x02);
+			coin_counter_w(space->machine, 0,  data  & 0x01);
+			coin_lockout_w(space->machine, 0,(~data) & 0x02);
 			if (data & ~0x03)
 				logerror("%06x: warning, unknown bits written, lockout = %02x\n", cpu_get_pc(space->cpu), data);
 			break;
@@ -2336,7 +2336,7 @@ static WRITE8_HANDLER( hanakanz_coincounter_w )
 	// bit 2 = 1 if bet on
 	// bit 3 = 1 if bet off
 
-	coin_counter_w(0, data & 1);
+	coin_counter_w(space->machine, 0, data & 1);
 
 	if (data & 0xf0)
 		logerror("%04x: warning, coin counter = %02x\n", cpu_get_pc(space->cpu), data);
@@ -2531,8 +2531,8 @@ static WRITE8_HANDLER( mjchuuka_coincounter_w )
 	// bit 3 = lockout
 	// bit 8?
 
-	coin_counter_w(0, data   & 0x01);
-	coin_lockout_w(0,(~data) & 0x08);
+	coin_counter_w(space->machine, 0, data   & 0x01);
+	coin_lockout_w(space->machine, 0,(~data) & 0x08);
 
 	if (data & 0x74)
 		logerror("%04x: warning, coin counter = %02x\n", cpu_get_pc(space->cpu), data);
@@ -2650,8 +2650,8 @@ static WRITE8_HANDLER( mjmyster_coincounter_w )
 	switch( ddenlovr_select2 )
 	{
 		case 0x0c:
-			coin_counter_w(0, (~data) & 0x01);	// coin in
-			coin_counter_w(0, (~data) & 0x02);	// coin out actually
+			coin_counter_w(space->machine, 0, (~data) & 0x01);	// coin in
+			coin_counter_w(space->machine, 0, (~data) & 0x02);	// coin out actually
 			#ifdef MAME_DEBUG
 //              popmessage("cc: %02x",data);
 			#endif
@@ -2775,7 +2775,7 @@ static WRITE8_HANDLER( hginga_coins_w )
 			// bit 2 = 1 if bet on
 			// bit 3 = 1 if bet on
 			// bit 7?
-			coin_counter_w(0, data & 1);
+			coin_counter_w(space->machine, 0, data & 1);
 #ifdef MAME_DEBUG
 //          popmessage("COINS %02x",data);
 #endif
@@ -2904,7 +2904,7 @@ static WRITE8_HANDLER( hgokou_input_w )
 			// bit 0 = coin counter
 			// bit 1 = out counter
 			// bit 2 = hopper
-			coin_counter_w(0, data & 1);
+			coin_counter_w(space->machine, 0, data & 1);
 			hgokou_hopper = data & 0x04;
 #ifdef MAME_DEBUG
 //          popmessage("COINS %02x",data);
@@ -3015,7 +3015,7 @@ static WRITE8_HANDLER( hparadis_coin_w )
 {
 	switch ( hginga_select )
 	{
-		case 0x0c:	coin_counter_w(0, data & 1);	break;
+		case 0x0c:	coin_counter_w(space->machine, 0, data & 1);	break;
 		case 0x0d:	break;
 		default:
 			logerror("%04x: coins_w with select = %02x, data = %02x\n",cpu_get_pc(space->cpu),hginga_select,data);
@@ -3245,7 +3245,7 @@ static WRITE8_HANDLER( mjflove_blitter_w )
 static WRITE8_HANDLER( mjflove_coincounter_w )
 {
 	// bit 0 = in counter
-	coin_counter_w(0, data   & 0x01);
+	coin_counter_w(space->machine, 0, data   & 0x01);
 
 	if (data & 0xfe)
 	{
@@ -3358,7 +3358,7 @@ static WRITE8_HANDLER( sryudens_coincounter_w )
 	// bit 4
 	// bit 7 = ? mostly on
 
-	coin_counter_w(0, data & 1);
+	coin_counter_w(space->machine, 0, data & 1);
 
 	if (data & 0x68)
 		logerror("%04x: warning, coin counter = %02x\n", cpu_get_pc(space->cpu), data);

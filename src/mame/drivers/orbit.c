@@ -81,11 +81,11 @@ static void update_misc_flags(running_machine *machine, UINT8 val)
 
 	discrete_sound_w(discrete, ORBIT_WARNING_EN, orbit_misc_flags & 0x80);
 
-	set_led_status(0, orbit_misc_flags & 0x08);
-	set_led_status(1, orbit_misc_flags & 0x40);
+	set_led_status(machine, 0, orbit_misc_flags & 0x08);
+	set_led_status(machine, 1, orbit_misc_flags & 0x40);
 
-	coin_lockout_w(0, !(orbit_misc_flags & 0x02));
-	coin_lockout_w(1, !(orbit_misc_flags & 0x02));
+	coin_lockout_w(machine, 0, !(orbit_misc_flags & 0x02));
+	coin_lockout_w(machine, 1, !(orbit_misc_flags & 0x02));
 }
 
 

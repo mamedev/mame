@@ -135,8 +135,8 @@ static WRITE8_HANDLER( superdq_io_w )
 	if ( data & 0x40 ) /* bit 6 = irqack */
 		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 
-	coin_counter_w( 0, data & 0x08 );
-	coin_counter_w( 1, data & 0x04 );
+	coin_counter_w( space->machine, 0, data & 0x08 );
+	coin_counter_w( space->machine, 1, data & 0x04 );
 
 	superdq_color_bank = ( data & 2 ) ? 1 : 0;
 

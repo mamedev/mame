@@ -55,7 +55,7 @@ static WRITE8_HANDLER( gng_bankswitch_w )
 
 static WRITE8_HANDLER( gng_coin_counter_w )
 {
-	coin_counter_w(offset,data);
+	coin_counter_w(space->machine, offset,data);
 }
 
 static MACHINE_START( gng )

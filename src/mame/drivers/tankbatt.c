@@ -74,7 +74,7 @@ extern VIDEO_UPDATE( tankbatt );
 
 static WRITE8_HANDLER( tankbatt_led_w )
 {
-	set_led_status(offset,data & 1);
+	set_led_status(space->machine, offset,data & 1);
 }
 
 static READ8_HANDLER( tankbatt_in0_r )
@@ -156,14 +156,14 @@ static WRITE8_HANDLER( tankbatt_irq_ack_w )
 
 static WRITE8_HANDLER( tankbatt_coin_counter_w )
 {
-	coin_counter_w(0,data & 1);
-	coin_counter_w(1,data & 1);
+	coin_counter_w(space->machine, 0,data & 1);
+	coin_counter_w(space->machine, 1,data & 1);
 }
 
 static WRITE8_HANDLER( tankbatt_coin_lockout_w )
 {
-	coin_lockout_w(0,data & 1);
-	coin_lockout_w(1,data & 1);
+	coin_lockout_w(space->machine, 0,data & 1);
+	coin_lockout_w(space->machine, 1,data & 1);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )

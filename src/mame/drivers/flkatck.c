@@ -47,8 +47,8 @@ static WRITE8_HANDLER( flkatck_bankswitch_w )
 	int bankaddress = 0;
 
 	/* bits 3-4: coin counters */
-	coin_counter_w(0,data & 0x08);
-	coin_counter_w(1,data & 0x10);
+	coin_counter_w(space->machine, 0,data & 0x08);
+	coin_counter_w(space->machine, 1,data & 0x10);
 
 	/* bits 0-1: bank # */
 	bankaddress += 0x10000 + (data & 0x03)*0x2000;

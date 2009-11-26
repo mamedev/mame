@@ -34,8 +34,8 @@ static WRITE8_HANDLER( rollerg_0010_w )
 logerror("%04x: write %02x to 0010\n",cpu_get_pc(space->cpu),data);
 
 	/* bits 0/1 are coin counters */
-	coin_counter_w(0,data & 0x01);
-	coin_counter_w(1,data & 0x02);
+	coin_counter_w(space->machine, 0,data & 0x01);
+	coin_counter_w(space->machine, 1,data & 0x02);
 
 	/* bit 2 enables 051316 ROM reading */
 	readzoomroms = data & 0x04;

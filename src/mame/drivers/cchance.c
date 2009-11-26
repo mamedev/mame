@@ -41,9 +41,9 @@ static WRITE8_HANDLER( output_0_w )
 {
 
 	//---- --x- divider?
-	coin_lockout_w(0, ~data & 1);
+	coin_lockout_w(space->machine, 0, ~data & 1);
 
-//  coin_counter_w(0, ~data & 1);
+//  coin_counter_w(space->machine, 0, ~data & 1);
 }
 
 

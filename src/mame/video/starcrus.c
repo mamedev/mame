@@ -93,8 +93,8 @@ WRITE8_HANDLER( starcrus_ship_parm_2_w )
 	const device_config *samples = devtag_get_device(space->machine, "samples");
 
     s2_sprite = data&0x1f;
-    set_led_status(2,~data & 0x80); 		/* game over lamp */
-    coin_counter_w(0, ((data&0x40)>>6)^0x01); 	/* coin counter */
+    set_led_status(space->machine, 2,~data & 0x80); 		/* game over lamp */
+    coin_counter_w(space->machine, 0, ((data&0x40)>>6)^0x01); 	/* coin counter */
     engine2_on = ((data&0x20)>>5)^0x01;
 
     if (engine1_on || engine2_on)

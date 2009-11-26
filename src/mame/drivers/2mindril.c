@@ -167,10 +167,10 @@ static WRITE16_HANDLER( drill_io_w )
 	switch(offset)
 	{
 		case 0x8/2:
-			coin_counter_w(0, state->iodata[offset] & 0x0400);
-			coin_counter_w(1, state->iodata[offset] & 0x0800);
-			coin_lockout_w(0, ~state->iodata[offset] & 0x0100);
-			coin_lockout_w(1, ~state->iodata[offset] & 0x0200);
+			coin_counter_w(space->machine, 0, state->iodata[offset] & 0x0400);
+			coin_counter_w(space->machine, 1, state->iodata[offset] & 0x0800);
+			coin_lockout_w(space->machine, 0, ~state->iodata[offset] & 0x0100);
+			coin_lockout_w(space->machine, 1, ~state->iodata[offset] & 0x0200);
 			break;
 	}
 

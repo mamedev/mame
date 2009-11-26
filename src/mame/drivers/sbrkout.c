@@ -245,7 +245,7 @@ static WRITE8_HANDLER( serve_led_w )
 
 static WRITE8_HANDLER( coincount_w )
 {
-	coin_counter_w(0, offset & 1);
+	coin_counter_w(space->machine, 0, offset & 1);
 }
 
 

@@ -96,8 +96,8 @@ static INPUT_CHANGED( coin_changed )
 	if (newval && !oldval)
 	{
 		/* increment the coin counter */
-		coin_counter_w(0, 1);
-		coin_counter_w(0, 0);
+		coin_counter_w(field->port->machine, 0, 1);
+		coin_counter_w(field->port->machine, 0, 0);
 
 		cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 

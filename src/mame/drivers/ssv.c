@@ -312,10 +312,10 @@ static WRITE16_HANDLER( ssv_lockout_w )
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(1,~data & 0x01);
-		coin_lockout_w(0,~data & 0x02);
-		coin_counter_w(1, data & 0x04);
-		coin_counter_w(0, data & 0x08);
+		coin_lockout_w(space->machine, 1,~data & 0x01);
+		coin_lockout_w(space->machine, 0,~data & 0x02);
+		coin_counter_w(space->machine, 1, data & 0x04);
+		coin_counter_w(space->machine, 0, data & 0x08);
 //                        data & 0x40?
 		ssv_enable_video( data & 0x80);
 	}
@@ -327,10 +327,10 @@ static WRITE16_HANDLER( ssv_lockout_inv_w )
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(1, data & 0x01);
-		coin_lockout_w(0, data & 0x02);
-		coin_counter_w(1, data & 0x04);
-		coin_counter_w(0, data & 0x08);
+		coin_lockout_w(space->machine, 1, data & 0x01);
+		coin_lockout_w(space->machine, 0, data & 0x02);
+		coin_counter_w(space->machine, 1, data & 0x04);
+		coin_counter_w(space->machine, 0, data & 0x08);
 //                        data & 0x40?
 		ssv_enable_video( data & 0x80);
 	}

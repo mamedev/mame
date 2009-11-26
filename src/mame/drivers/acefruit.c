@@ -255,7 +255,7 @@ static PALETTE_INIT( acefruit )
 
 static ADDRESS_MAP_START( acefruit_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(acefruit_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")

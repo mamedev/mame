@@ -312,7 +312,7 @@ static void speedfrk_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bi
 		sample_stop(samples, 0);
 
     /* start LED is controlled by bit 0x02 */
-    set_led_status(0, ~sound_val & 0x02);
+    set_led_status(machine, 0, ~sound_val & 0x02);
 }
 
 static MACHINE_RESET( speedfrk )
@@ -543,7 +543,7 @@ static void tailg_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_
 			sample_start(samples, 5, 5, 0);
 
 		/* LED */
-		set_led_status(0, current_shift & 0x40);
+		set_led_status(machine, 0, current_shift & 0x40);
 
 		/* remember the previous value */
 		last_shift = current_shift;

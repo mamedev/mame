@@ -856,7 +856,7 @@ static WRITE8_HANDLER( zpu_led_w )
 {
 	/* 0x6e - reset (offset = 0)*/
 	/* 0x6f - set */
-	set_led_status(0, offset&1 );
+	set_led_status(space->machine, 0, offset&1 );
 }
 
 static WRITE8_HANDLER( zpu_lamps_w)
@@ -864,26 +864,26 @@ static WRITE8_HANDLER( zpu_lamps_w)
 	/* bit 4 = /LAMP0 */
 	/* bit 5 = /LAMP1 */
 
-	/*set_led_status(0, (data&0x10)>>4 );*/
-	/*set_led_status(1, (data&0x20)>>4 );*/
+	/*set_led_status(space->machine, 0, (data&0x10)>>4 );*/
+	/*set_led_status(space->machine, 1, (data&0x20)>>4 );*/
 }
 
 static WRITE8_HANDLER( zpu_coin_counter_w )
 {
 	/* bit 6 = coin counter */
-	coin_counter_w(offset, (data&0x40)>>6 );
+	coin_counter_w(space->machine, offset, (data&0x40)>>6 );
 }
 
 static WRITE8_HANDLER(cfb_led_w)
 {
 	/* bit 7 - led on */
-	set_led_status(2,(data&0x80)>>7);
+	set_led_status(space->machine, 2,(data&0x80)>>7);
 }
 
 static WRITE8_DEVICE_HANDLER( gg_led_ctrl_w )
 {
 	/* bit 0, bit 1 - led on */
-	set_led_status(1,data&0x01);
+	set_led_status(device->machine,1,data&0x01);
 }
 
 
@@ -898,7 +898,7 @@ static WRITE8_HANDLER( vsb_ls273_audio_control_w )
 	vsb_ls273 = data;
 
 	/* bit 5 - led on */
-	set_led_status(1,(data&0x20)>>5);
+	set_led_status(space->machine, 1,(data&0x20)>>5);
 }
 
 static READ8_DEVICE_HANDLER( soundcommand_r )

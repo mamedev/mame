@@ -916,10 +916,10 @@ static WRITE32_HANDLER ( stv_io_w32 )
 			{
 				/*Why does the BIOS tests these as ACTIVE HIGH? A program bug?*/
 				ioga[1] = (data) & 0xff;
-				coin_counter_w(0,~data & 0x01);
-				coin_counter_w(1,~data & 0x02);
-				coin_lockout_w(0,~data & 0x04);
-				coin_lockout_w(1,~data & 0x08);
+				coin_counter_w(space->machine, 0,~data & 0x01);
+				coin_counter_w(space->machine, 1,~data & 0x02);
+				coin_lockout_w(space->machine, 0,~data & 0x04);
+				coin_lockout_w(space->machine, 1,~data & 0x08);
 				/*
                 other bits reserved
                 */

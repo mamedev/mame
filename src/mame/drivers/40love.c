@@ -276,7 +276,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 #if 0
 static WRITE8_HANDLER( fortyl_coin_counter_w )
 {
-	coin_counter_w(offset,data);
+	coin_counter_w(space->machine, offset,data);
 }
 #endif
 

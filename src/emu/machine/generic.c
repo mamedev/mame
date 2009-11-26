@@ -16,37 +16,33 @@
 
 
 /***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-/* These globals are only kept on a machine basis - LBO 042898 */
-UINT32 dispensed_tickets;
-UINT32 coin_count[COIN_COUNTERS];
-UINT32 coinlockedout[COIN_COUNTERS];
-static UINT32 lastcoin[COIN_COUNTERS];
-
-/* generic NVRAM */
-size_t generic_nvram_size;
-UINT8 *generic_nvram;
-UINT16 *generic_nvram16;
-UINT32 *generic_nvram32;
-UINT64 *generic_nvram64;
-
-/* memory card status */
-static int memcard_inserted;
-
-/* interrupt status for up to 8 CPUs */
-static UINT8 interrupt_enable[8];
-
-
-
-/***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
 static void counters_load(running_machine *machine, int config_type, xml_data_node *parentnode);
 static void counters_save(running_machine *machine, int config_type, xml_data_node *parentnode);
 static void interrupt_reset(running_machine *machine);
+
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+struct _generic_machine_private
+{
+	/* tickets and coin counters */
+	UINT32 		dispensed_tickets;
+	UINT32 		coin_count[COIN_COUNTERS];
+	UINT32 		coinlockedout[COIN_COUNTERS];
+	UINT32 		lastcoin[COIN_COUNTERS];
+
+	/* memory card status */
+	int 		memcard_inserted;
+
+	/* interrupt status for up to 8 CPUs */
+	UINT8 		interrupt_enable[8];
+};
 
 
 
@@ -61,8 +57,9 @@ static void interrupt_reset(running_machine *machine);
 
 INLINE int interrupt_enabled(const device_config *device)
 {
+	generic_machine_private *state = device->machine->generic_machine_data;
 	int cpunum = cpu_get_index(device);
-	return (cpunum >= ARRAY_LENGTH(interrupt_enable) || interrupt_enable[cpunum]);
+	return (cpunum >= ARRAY_LENGTH(state->interrupt_enable) || state->interrupt_enable[cpunum]);
 }
 
 
@@ -78,33 +75,35 @@ INLINE int interrupt_enabled(const device_config *device)
 
 void generic_machine_init(running_machine *machine)
 {
+	generic_machine_private *state;
 	int counternum;
+	
+	/* allocate our state */
+	machine->generic_machine_data = auto_alloc_clear(machine, generic_machine_private);
+	state = machine->generic_machine_data;
 
 	/* reset coin counters */
 	for (counternum = 0; counternum < COIN_COUNTERS; counternum++)
 	{
-		lastcoin[counternum] = 0;
-		coinlockedout[counternum] = 0;
+		state->lastcoin[counternum] = 0;
+		state->coinlockedout[counternum] = 0;
 	}
 
 	/* register coin save state */
-	state_save_register_item_array(machine, "coin", NULL, 0, coin_count);
-	state_save_register_item_array(machine, "coin", NULL, 0, coinlockedout);
-	state_save_register_item_array(machine, "coin", NULL, 0, lastcoin);
+	state_save_register_item_array(machine, "coin", NULL, 0, state->coin_count);
+	state_save_register_item_array(machine, "coin", NULL, 0, state->coinlockedout);
+	state_save_register_item_array(machine, "coin", NULL, 0, state->lastcoin);
 
 	/* reset NVRAM size and pointers */
-	generic_nvram_size = 0;
-	generic_nvram = NULL;
-	generic_nvram16 = NULL;
-	generic_nvram32 = NULL;
-	generic_nvram64 = NULL;
+	machine->generic.nvram.ptr.v = NULL;
+	machine->generic.nvram.size = 0;
 
 	/* reset memory card info */
-	memcard_inserted = -1;
+	state->memcard_inserted = -1;
 
 	/* register a reset callback and save state for interrupt enable */
 	add_reset_callback(machine, interrupt_reset);
-	state_save_register_item_array(machine, "cpu", NULL, 0, interrupt_enable);
+	state_save_register_item_array(machine, "cpu", NULL, 0, state->interrupt_enable);
 
 	/* register for configuration */
 	config_register(machine, "counters", counters_load, counters_save);
@@ -112,9 +111,38 @@ void generic_machine_init(running_machine *machine)
 	/* for memory cards, request save state and an exit callback */
 	if (machine->config->memcard_handler != NULL)
 	{
-		state_save_register_global(machine, memcard_inserted);
+		state_save_register_global(machine, state->memcard_inserted);
 		add_exit_callback(machine, memcard_eject);
 	}
+}
+
+
+
+/***************************************************************************
+    TICKETS
+***************************************************************************/
+
+/*-------------------------------------------------
+    get_dispensed_tickets - return the number of 
+    tickets dispensed
+-------------------------------------------------*/
+
+int get_dispensed_tickets(running_machine *machine)
+{
+	generic_machine_private *state = machine->generic_machine_data;
+	return state->dispensed_tickets;
+}
+
+
+/*-------------------------------------------------
+    increment_dispensed_tickets - increment the 
+    number of dispensed tickets
+-------------------------------------------------*/
+
+void increment_dispensed_tickets(running_machine *machine, int delta)
+{
+	generic_machine_private *state = machine->generic_machine_data;
+	state->dispensed_tickets += delta;
 }
 
 
@@ -130,13 +158,14 @@ void generic_machine_init(running_machine *machine)
 
 static void counters_load(running_machine *machine, int config_type, xml_data_node *parentnode)
 {
+	generic_machine_private *state = machine->generic_machine_data;
 	xml_data_node *coinnode, *ticketnode;
 
 	/* on init, reset the counters */
 	if (config_type == CONFIG_TYPE_INIT)
 	{
-		memset(coin_count, 0, sizeof(coin_count));
-		dispensed_tickets = 0;
+		memset(state->coin_count, 0, sizeof(state->coin_count));
+		state->dispensed_tickets = 0;
 	}
 
 	/* only care about game-specific data */
@@ -152,13 +181,13 @@ static void counters_load(running_machine *machine, int config_type, xml_data_no
 	{
 		int index = xml_get_attribute_int(coinnode, "index", -1);
 		if (index >= 0 && index < COIN_COUNTERS)
-			coin_count[index] = xml_get_attribute_int(coinnode, "number", 0);
+			state->coin_count[index] = xml_get_attribute_int(coinnode, "number", 0);
 	}
 
 	/* get the single tickets node */
 	ticketnode = xml_get_sibling(parentnode->child, "tickets");
 	if (ticketnode != NULL)
-		dispensed_tickets = xml_get_attribute_int(ticketnode, "number", 0);
+		state->dispensed_tickets = xml_get_attribute_int(ticketnode, "number", 0);
 }
 
 
@@ -169,6 +198,7 @@ static void counters_load(running_machine *machine, int config_type, xml_data_no
 
 static void counters_save(running_machine *machine, int config_type, xml_data_node *parentnode)
 {
+	generic_machine_private *state = machine->generic_machine_data;
 	int i;
 
 	/* only care about game-specific data */
@@ -177,22 +207,22 @@ static void counters_save(running_machine *machine, int config_type, xml_data_no
 
 	/* iterate over coin counters */
 	for (i = 0; i < COIN_COUNTERS; i++)
-		if (coin_count[i] != 0)
+		if (state->coin_count[i] != 0)
 		{
 			xml_data_node *coinnode = xml_add_child(parentnode, "coins", NULL);
 			if (coinnode != NULL)
 			{
 				xml_set_attribute_int(coinnode, "index", i);
-				xml_set_attribute_int(coinnode, "number", coin_count[i]);
+				xml_set_attribute_int(coinnode, "number", state->coin_count[i]);
 			}
 		}
 
 	/* output tickets */
-	if (dispensed_tickets != 0)
+	if (state->dispensed_tickets != 0)
 	{
 		xml_data_node *tickets = xml_add_child(parentnode, "tickets", NULL);
 		if (tickets != NULL)
-			xml_set_attribute_int(tickets, "number", dispensed_tickets);
+			xml_set_attribute_int(tickets, "number", state->dispensed_tickets);
 	}
 }
 
@@ -201,15 +231,30 @@ static void counters_save(running_machine *machine, int config_type, xml_data_no
     coin_counter_w - sets input for coin counter
 -------------------------------------------------*/
 
-void coin_counter_w(int num, int on)
+void coin_counter_w(running_machine *machine, int num, int on)
 {
-	if (num >= COIN_COUNTERS)
+	generic_machine_private *state = machine->generic_machine_data;
+	if (num >= ARRAY_LENGTH(state->coin_count))
 		return;
 
 	/* Count it only if the data has changed from 0 to non-zero */
-	if (on && (lastcoin[num] == 0))
-		coin_count[num]++;
-	lastcoin[num] = on;
+	if (on && (state->lastcoin[num] == 0))
+		state->coin_count[num]++;
+	state->lastcoin[num] = on;
+}
+
+
+/*-------------------------------------------------
+    coin_counter_get_count - return the coin count 
+    for a given coin
+-------------------------------------------------*/
+
+int coin_counter_get_count(running_machine *machine, int num)
+{
+	generic_machine_private *state = machine->generic_machine_data;
+	if (num >= ARRAY_LENGTH(state->coin_count))
+		return 0;
+	return state->coin_count[num];
 }
 
 
@@ -217,11 +262,26 @@ void coin_counter_w(int num, int on)
     coin_lockout_w - locks out one coin input
 -------------------------------------------------*/
 
-void coin_lockout_w(int num,int on)
+void coin_lockout_w(running_machine *machine, int num,int on)
 {
-	if (num >= COIN_COUNTERS)
+	generic_machine_private *state = machine->generic_machine_data;
+	if (num >= ARRAY_LENGTH(state->coinlockedout))
 		return;
-	coinlockedout[num] = on;
+	state->coinlockedout[num] = on;
+}
+
+
+/*-------------------------------------------------
+    coin_lockout_get_state - return current lockout 
+    state for a particular coin
+-------------------------------------------------*/
+
+int coin_lockout_get_state(running_machine *machine, int num)
+{
+	generic_machine_private *state = machine->generic_machine_data;
+	if (num >= ARRAY_LENGTH(state->coinlockedout))
+		return FALSE;
+	return state->coinlockedout[num];
 }
 
 
@@ -230,12 +290,13 @@ void coin_lockout_w(int num,int on)
     inputs
 -------------------------------------------------*/
 
-void coin_lockout_global_w(int on)
+void coin_lockout_global_w(running_machine *machine, int on)
 {
+	generic_machine_private *state = machine->generic_machine_data;
 	int i;
 
-	for (i = 0; i < COIN_COUNTERS; i++)
-		coin_lockout_w(i, on);
+	for (i = 0; i < ARRAY_LENGTH(state->coinlockedout); i++)
+		coin_lockout_w(machine, i, on);
 }
 
 
@@ -243,26 +304,6 @@ void coin_lockout_global_w(int on)
 /***************************************************************************
     NVRAM MANAGEMENT
 ***************************************************************************/
-
-/*-------------------------------------------------
-    nvram_select - select the right pointer based
-    on which ones are non-NULL
--------------------------------------------------*/
-
-INLINE void *nvram_select(void)
-{
-	if (generic_nvram != NULL)
-		return generic_nvram;
-	if (generic_nvram16 != NULL)
-		return generic_nvram16;
-	if (generic_nvram32 != NULL)
-		return generic_nvram32;
-	if (generic_nvram64 != NULL)
-		return generic_nvram64;
-	fatalerror("generic nvram handler called without nvram in the memory map");
-	return 0;
-}
-
 
 /*-------------------------------------------------
     nvram_fopen - open an NVRAM file directly
@@ -356,13 +397,13 @@ void nvram_save(running_machine *machine)
 NVRAM_HANDLER( generic_0fill )
 {
 	if (read_or_write)
-		mame_fwrite(file, nvram_select(), generic_nvram_size);
+		mame_fwrite(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
 	else if (file != NULL)
-		mame_fread(file, nvram_select(), generic_nvram_size);
-	else if (memory_region_length(machine, "nvram") == generic_nvram_size)
-		memcpy(generic_nvram, memory_region(machine, "nvram"), generic_nvram_size);
+		mame_fread(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
+	else if (memory_region_length(machine, "nvram") == machine->generic.nvram.size)
+		memcpy(machine->generic.nvram.ptr.v, memory_region(machine, "nvram"), machine->generic.nvram.size);
 	else
-		memset(nvram_select(), 0, generic_nvram_size);
+		memset(machine->generic.nvram.ptr.v, 0, machine->generic.nvram.size);
 }
 
 
@@ -374,13 +415,13 @@ NVRAM_HANDLER( generic_0fill )
 NVRAM_HANDLER( generic_1fill )
 {
 	if (read_or_write)
-		mame_fwrite(file, nvram_select(), generic_nvram_size);
+		mame_fwrite(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
 	else if (file != NULL)
-		mame_fread(file, nvram_select(), generic_nvram_size);
-	else if (memory_region_length(machine, "nvram") == generic_nvram_size)
-		memcpy(generic_nvram, memory_region(machine, "nvram"), generic_nvram_size);
+		mame_fread(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
+	else if (memory_region_length(machine, "nvram") == machine->generic.nvram.size)
+		memcpy(machine->generic.nvram.ptr.v, memory_region(machine, "nvram"), machine->generic.nvram.size);
 	else
-		memset(nvram_select(), 0xff, generic_nvram_size);
+		memset(machine->generic.nvram.ptr.v, 0xff, machine->generic.nvram.size);
 }
 
 
@@ -391,18 +432,17 @@ NVRAM_HANDLER( generic_1fill )
 
 NVRAM_HANDLER( generic_randfill )
 {
-	int i;
-
 	if (read_or_write)
-		mame_fwrite(file, nvram_select(), generic_nvram_size);
+		mame_fwrite(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
 	else if (file != NULL)
-		mame_fread(file, nvram_select(), generic_nvram_size);
-	else if (memory_region_length(machine, "nvram") == generic_nvram_size)
-		memcpy(generic_nvram, memory_region(machine, "nvram"), generic_nvram_size);
+		mame_fread(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
+	else if (memory_region_length(machine, "nvram") == machine->generic.nvram.size)
+		memcpy(machine->generic.nvram.ptr.v, memory_region(machine, "nvram"), machine->generic.nvram.size);
 	else
 	{
-		UINT8 *nvram = (UINT8 *)nvram_select();
-		for (i = 0; i < generic_nvram_size; i++)
+		UINT8 *nvram = (UINT8 *)machine->generic.nvram.ptr.v;
+		int i;
+		for (i = 0; i < machine->generic.nvram.size; i++)
 			nvram[i] = mame_rand(machine);
 	}
 }
@@ -475,15 +515,16 @@ int memcard_create(running_machine *machine, int index, int overwrite)
 
 int memcard_insert(running_machine *machine, int index)
 {
+	generic_machine_private *state = machine->generic_machine_data;
 	file_error filerr;
 	mame_file *file;
 	char name[16];
 	astring *fname;
 
 	/* if a card is already inserted, eject it first */
-	if (memcard_inserted != -1)
+	if (state->memcard_inserted != -1)
 		memcard_eject(machine);
-	assert(memcard_inserted == -1);
+	assert(state->memcard_inserted == -1);
 
 	/* create a name */
 	memcard_name(index, name);
@@ -501,7 +542,7 @@ int memcard_insert(running_machine *machine, int index)
 
 	/* close the file */
 	mame_fclose(file);
-	memcard_inserted = index;
+	state->memcard_inserted = index;
 	return 0;
 }
 
@@ -513,17 +554,18 @@ int memcard_insert(running_machine *machine, int index)
 
 void memcard_eject(running_machine *machine)
 {
+	generic_machine_private *state = machine->generic_machine_data;
 	file_error filerr;
 	mame_file *file;
 	char name[16];
 	astring *fname;
 
 	/* if no card is preset, just ignore */
-	if (memcard_inserted == -1)
+	if (state->memcard_inserted == -1)
 		return;
 
 	/* create a name */
-	memcard_name(memcard_inserted, name);
+	memcard_name(state->memcard_inserted, name);
 	fname = astring_assemble_3(astring_alloc(), machine->basename, PATH_SEPARATOR, name);
 
 	/* open the file; if we can't, it's an error */
@@ -541,7 +583,7 @@ void memcard_eject(running_machine *machine)
 
 	/* close the file */
 	mame_fclose(file);
-	memcard_inserted = -1;
+	state->memcard_inserted = -1;
 }
 
 
@@ -550,9 +592,10 @@ void memcard_eject(running_machine *machine)
     card index, or -1 if none
 -------------------------------------------------*/
 
-int memcard_present(void)
+int memcard_present(running_machine *machine)
 {
-	return memcard_inserted;
+	generic_machine_private *state = machine->generic_machine_data;
+	return state->memcard_inserted;
 }
 
 
@@ -565,7 +608,7 @@ int memcard_present(void)
     set_led_status - set the state of a given LED
 -------------------------------------------------*/
 
-void set_led_status(int num, int on)
+void set_led_status(running_machine *machine, int num, int on)
 {
 	output_set_led_value(num, on);
 }
@@ -583,11 +626,12 @@ void set_led_status(int num, int on)
 
 static void interrupt_reset(running_machine *machine)
 {
+	generic_machine_private *state = machine->generic_machine_data;
 	int cpunum;
 
 	/* on a reset, enable all interrupts */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(interrupt_enable); cpunum++)
-		interrupt_enable[cpunum] = 1;
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(state->interrupt_enable); cpunum++)
+		state->interrupt_enable[cpunum] = 1;
 }
 
 
@@ -658,14 +702,15 @@ void generic_pulse_irq_line_and_vector(const device_config *device, int irqline,
 
 void cpu_interrupt_enable(const device_config *device, int enabled)
 {
+	generic_machine_private *state = device->machine->generic_machine_data;
 	int cpunum = cpu_get_index(device);
 
 	assert_always(device != NULL, "cpu_interrupt_enable() called for invalid cpu!");
-	assert_always(cpunum < ARRAY_LENGTH(interrupt_enable), "cpu_interrupt_enable() called for a CPU > position 7!");
+	assert_always(cpunum < ARRAY_LENGTH(state->interrupt_enable), "cpu_interrupt_enable() called for a CPU > position 7!");
 
 	/* set the new state */
-	if (cpunum < ARRAY_LENGTH(interrupt_enable))
-		interrupt_enable[cpunum] = enabled;
+	if (cpunum < ARRAY_LENGTH(state->interrupt_enable))
+		state->interrupt_enable[cpunum] = enabled;
 
 	/* make sure there are no queued interrupts */
 	if (enabled == 0)

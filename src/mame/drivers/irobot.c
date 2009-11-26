@@ -89,7 +89,7 @@
 
 static WRITE8_HANDLER( irobot_nvram_w )
 {
-	generic_nvram[offset] = data & 0x0f;
+	space->machine->generic.nvram.ptr.u8[offset] = data & 0x0f;
 }
 
 
@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( irobot_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1140, 0x1140) AM_WRITE(irobot_statwr_w)
     AM_RANGE(0x1180, 0x1180) AM_WRITE(irobot_out0_w)
     AM_RANGE(0x11c0, 0x11c0) AM_WRITE(irobot_rom_banksel_w)
-    AM_RANGE(0x1200, 0x12ff) AM_RAM_WRITE(irobot_nvram_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+    AM_RANGE(0x1200, 0x12ff) AM_RAM_WRITE(irobot_nvram_w) AM_BASE_SIZE_GENERIC(nvram)
     AM_RANGE(0x1300, 0x13ff) AM_READ(irobot_control_r)
     AM_RANGE(0x1400, 0x143f) AM_READWRITE(quad_pokey_r, quad_pokey_w)
     AM_RANGE(0x1800, 0x18ff) AM_WRITE(irobot_paletteram_w)

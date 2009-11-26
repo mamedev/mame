@@ -90,12 +90,12 @@ static WRITE8_HANDLER( copsnrob_misc_w )
 {
 	copsnrob_state *state = (copsnrob_state *)space->machine->driver_data;
 	state->misc = data & 0x7f;
-	set_led_status(1, ~data & 0x40);
+	set_led_status(space->machine, 1, ~data & 0x40);
 }
 
 static WRITE8_HANDLER( copsnrob_led_w )
 {
-	set_led_status(0, ~data & 0x01);
+	set_led_status(space->machine, 0, ~data & 0x01);
 }
 
 

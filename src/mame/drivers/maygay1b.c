@@ -748,7 +748,7 @@ static WRITE8_HANDLER( m1_latch_w )
 
 
 static ADDRESS_MAP_START( m1_memmap, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(reel12_w)
 	AM_RANGE(0x2010, 0x2010) AM_WRITE(reel34_w)

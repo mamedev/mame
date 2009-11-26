@@ -188,20 +188,20 @@ static WRITE8_HANDLER( geebee_out7_w )
 	switch (offset & 7)
 	{
 		case 0:
-			set_led_status(0,data & 1);
+			set_led_status(space->machine, 0,data & 1);
 			break;
 		case 1:
-			set_led_status(1,data & 1);
+			set_led_status(space->machine, 1,data & 1);
 			break;
 		case 2:
-			set_led_status(2,data & 1);
+			set_led_status(space->machine, 2,data & 1);
 			break;
 		case 3:
-			coin_counter_w(0,data & 1);
+			coin_counter_w(space->machine, 0,data & 1);
 			break;
 		case 4:
 			if (strcmp(space->machine->gamedrv->name, "geebeeb"))
-				coin_lockout_global_w(~data & 1);
+				coin_lockout_global_w(space->machine, ~data & 1);
 			break;
 		case 5:
 			if( geebee_bgw != (data & 1) )
@@ -271,22 +271,22 @@ static WRITE8_HANDLER( warpwarp_out3_w )
 	switch (offset & 7)
 	{
 		case 0:
-			set_led_status(0,data & 1);
+			set_led_status(space->machine, 0,data & 1);
 			break;
 		case 1:
-			set_led_status(1,data & 1);
+			set_led_status(space->machine, 1,data & 1);
 			break;
 		case 2:
-			set_led_status(2,data & 1);
+			set_led_status(space->machine, 2,data & 1);
 			break;
 		case 3:
 			/* n.c. */
 			break;
 		case 4:
-			coin_lockout_global_w(~data & 1);
+			coin_lockout_global_w(space->machine, ~data & 1);
 			break;
 		case 5:
-			coin_counter_w(0,data & 1);
+			coin_counter_w(space->machine, 0,data & 1);
 			break;
 		case 6:
 			warpwarp_ball_on = data & 1;

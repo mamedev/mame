@@ -58,8 +58,8 @@ static void handle_coins(running_machine *machine, int coin)
 			credits += coinage_table[tmp][1];
 			coins -= coinage_table[tmp][0];
 		}
-		coin_lockout_global_w(0); /* Unlock all coin slots */
-		coin_counter_w(1,1); coin_counter_w(1,0); /* Count slot B */
+		coin_lockout_global_w(machine, 0); /* Unlock all coin slots */
+		coin_counter_w(machine,1,1); coin_counter_w(machine,1,0); /* Count slot B */
 	}
 
 	if (coin & 2)	// Coin 1 !
@@ -71,8 +71,8 @@ static void handle_coins(running_machine *machine, int coin)
 			credits += coinage_table[tmp][1];
 			coins -= coinage_table[tmp][0];
 		}
-		coin_lockout_global_w(0); /* Unlock all coin slots */
-		coin_counter_w(0,1); coin_counter_w(0,0); /* Count slot A */
+		coin_lockout_global_w(machine, 0); /* Unlock all coin slots */
+		coin_counter_w(machine,0,1); coin_counter_w(machine,0,0); /* Count slot A */
 	}
 
 	if (credits >= 9)

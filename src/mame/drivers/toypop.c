@@ -69,12 +69,12 @@ static READ8_HANDLER( in2_h )	{ return input_port_read(space->machine, "INPUT_LE
 static READ8_HANDLER( in3 )		{ return input_port_read(space->machine, "SERVICE"); }				// test, cocktail, optional buttons
 static WRITE8_HANDLER( out_coin0 )
 {
-	coin_lockout_global_w(data & 4);
-	coin_counter_w(0,~data & 8);
+	coin_lockout_global_w(space->machine, data & 4);
+	coin_counter_w(space->machine, 0,~data & 8);
 }
 static WRITE8_HANDLER( out_coin1 )
 {
-	coin_counter_w(1,~data & 1);
+	coin_counter_w(space->machine, 1,~data & 1);
 }
 static WRITE8_HANDLER( flip )
 {

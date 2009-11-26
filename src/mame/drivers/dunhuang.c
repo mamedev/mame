@@ -465,7 +465,7 @@ static WRITE8_HANDLER( dunhuang_rombank_w )
 	memory_set_bank(space->machine, 1, ((data >> 2) & 0x7));
 
 	// COIN OUT:        data & 0x20
-	coin_counter_w(0,	data & 0x40);
+	coin_counter_w(space->machine, 0,	data & 0x40);
 	state->hopper = data & 0x80;
 }
 

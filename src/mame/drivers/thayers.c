@@ -338,7 +338,7 @@ static WRITE8_HANDLER( laserdsc_control_w )
 
     */
 
-	coin_counter_w(0, BIT(data, 4));
+	coin_counter_w(space->machine, 0, BIT(data, 4));
 
 	if (BIT(data, 5))
 	{

@@ -419,7 +419,7 @@ static PALETTE_INIT( amaticmg )
 
 static ADDRESS_MAP_START( amaticmg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-//  AM_RANGE(0x0000, 0x0000) AM_RAM // AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+//  AM_RANGE(0x0000, 0x0000) AM_RAM // AM_BASE_SIZE_GENERIC(nvram)
 //  AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("crtc", mc6845_address_w)
 //  AM_RANGE(0x0000, 0x0000) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 //  AM_RANGE(0x0000, 0x0000) AM_RAM_WRITE(amaticmg_videoram_w) AM_BASE(&videoram)

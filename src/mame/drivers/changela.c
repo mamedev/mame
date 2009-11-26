@@ -215,7 +215,7 @@ static WRITE8_HANDLER( changela_collision_reset_1 )
 
 static WRITE8_HANDLER( changela_coin_counter_w )
 {
-	coin_counter_w(offset, data);
+	coin_counter_w(space->machine, offset, data);
 }
 
 

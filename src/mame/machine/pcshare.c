@@ -80,7 +80,7 @@ static TIMER_CALLBACK( pc_keyb_timer )
 		pc_keyboard();
 	} else {
 		/* Clock has been low for more than 5 msec, start diagnostic test */
-		at_keyboard_reset();
+		at_keyboard_reset(machine);
 		pc_keyb.self_test = 1;
 	}
 }

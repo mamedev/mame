@@ -52,11 +52,11 @@ static WRITE8_HANDLER( usgames_rombank_w )
 static WRITE8_HANDLER( lamps1_w )
 {
 	/* button lamps */
-	set_led_status(0,data & 0x01);
-	set_led_status(1,data & 0x02);
-	set_led_status(2,data & 0x04);
-	set_led_status(3,data & 0x08);
-	set_led_status(4,data & 0x10);
+	set_led_status(space->machine, 0,data & 0x01);
+	set_led_status(space->machine, 1,data & 0x02);
+	set_led_status(space->machine, 2,data & 0x04);
+	set_led_status(space->machine, 3,data & 0x08);
+	set_led_status(space->machine, 4,data & 0x10);
 
 	/* bit 5 toggles all the time - extra lamp? */
 }
@@ -69,7 +69,7 @@ static WRITE8_HANDLER( lamps2_w )
 
 
 static ADDRESS_MAP_START( usgames_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW")
 	AM_RANGE(0x2010, 0x2010) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x2020, 0x2020) AM_WRITE(lamps1_w)
@@ -88,7 +88,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( usg185_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("DSW")
 	AM_RANGE(0x2410, 0x2410) AM_READ_PORT("INPUTS")

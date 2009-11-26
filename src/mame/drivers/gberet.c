@@ -111,8 +111,8 @@ static INTERRUPT_GEN( gberet_interrupt )
 static WRITE8_HANDLER( gberet_coin_counter_w )
 {
 	/* bits 0/1 = coin counters */
-	coin_counter_w(0, data & 0x01);
-	coin_counter_w(1, data & 0x02);
+	coin_counter_w(space->machine, 0, data & 0x01);
+	coin_counter_w(space->machine, 1, data & 0x02);
 }
 
 static WRITE8_HANDLER( gberet_flipscreen_w )
@@ -128,8 +128,8 @@ static WRITE8_HANDLER( mrgoemon_coin_counter_w )
 	int offs;
 
 	/* bits 0/1 = coin counters */
-	coin_counter_w(0, data & 0x01);
-	coin_counter_w(1, data & 0x02);
+	coin_counter_w(space->machine, 0, data & 0x01);
+	coin_counter_w(space->machine, 1, data & 0x02);
 
 	/* bits 5-7 = ROM bank select */
 	offs = 0x10000 + ((data & 0xe0) >> 5) * 0x800;

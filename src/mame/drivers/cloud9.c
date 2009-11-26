@@ -200,11 +200,11 @@ static MACHINE_START( cloud9 )
 	schedule_next_irq(machine, 0-64);
 
 	/* allocate backing memory for the NVRAM */
-	generic_nvram = auto_alloc_array(machine, UINT8, generic_nvram_size);
+	machine->generic.nvram.ptr.u8 = auto_alloc_array(machine, UINT8, machine->generic.nvram.size);
 
 	/* setup for save states */
 	state_save_register_global(machine, state->irq_state);
-	state_save_register_global_pointer(machine, generic_nvram, generic_nvram_size);
+	state_save_register_global_pointer(machine, machine->generic.nvram.ptr.u8, machine->generic.nvram.size);
 }
 
 
@@ -236,13 +236,13 @@ static WRITE8_HANDLER( irq_ack_w )
 
 static WRITE8_HANDLER( cloud9_led_w )
 {
-	set_led_status(offset, ~data & 0x80);
+	set_led_status(space->machine, offset, ~data & 0x80);
 }
 
 
 static WRITE8_HANDLER( cloud9_coin_counter_w )
 {
-	coin_counter_w(offset, data & 0x80);
+	coin_counter_w(space->machine, offset, data & 0x80);
 }
 
 
@@ -264,25 +264,25 @@ static NVRAM_HANDLER( cloud9 )
 	if (read_or_write)
 	{
 		/* on power down, the EAROM is implicitly stored */
-		memcpy(generic_nvram, nvram_stage, generic_nvram_size);
-		mame_fwrite(file, generic_nvram, generic_nvram_size);
+		memcpy(machine->generic.nvram.ptr.v, nvram_stage, machine->generic.nvram.size);
+		mame_fwrite(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
 	}
 	else if (file)
-		mame_fread(file, generic_nvram, generic_nvram_size);
+		mame_fread(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
 	else
-		memset(generic_nvram, 0, generic_nvram_size);
+		memset(machine->generic.nvram.ptr.v, 0, machine->generic.nvram.size);
 }
 
 
 static WRITE8_HANDLER( nvram_recall_w )
 {
-	memcpy(nvram_stage, generic_nvram, generic_nvram_size);
+	memcpy(nvram_stage, space->machine->generic.nvram.ptr.v, space->machine->generic.nvram.size);
 }
 
 
 static WRITE8_HANDLER( nvram_store_w )
 {
-	memcpy(generic_nvram, nvram_stage, generic_nvram_size);
+	memcpy(space->machine->generic.nvram.ptr.v, nvram_stage, space->machine->generic.nvram.size);
 }
 
 
@@ -318,7 +318,7 @@ static ADDRESS_MAP_START( cloud9_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5900, 0x5903) AM_MIRROR(0x007c) AM_READ(leta_r)
 	AM_RANGE(0x5a00, 0x5a0f) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x5b00, 0x5b0f) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x5c00, 0x5cff) AM_MIRROR(0x0300) AM_READWRITE(nvram_r, SMH_RAM) AM_BASE(&nvram_stage) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x5c00, 0x5cff) AM_MIRROR(0x0300) AM_READWRITE(nvram_r, SMH_RAM) AM_BASE(&nvram_stage) AM_SIZE_GENERIC(nvram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

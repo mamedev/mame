@@ -53,10 +53,10 @@ static WRITE16_HANDLER( coinctrl_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0,data & 1);
-		coin_counter_w(1,data & 2);
-		coin_lockout_w(0,~data & 4);
-		coin_lockout_w(1,~data & 8);
+		coin_counter_w(space->machine, 0,data & 1);
+		coin_counter_w(space->machine, 1,data & 2);
+		coin_lockout_w(space->machine, 0,~data & 4);
+		coin_lockout_w(space->machine, 1,~data & 8);
 	}
 }
 

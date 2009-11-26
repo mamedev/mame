@@ -651,10 +651,10 @@ static WRITE32_HANDLER( skns_io_w )
 	case 2:
 		if(ACCESSING_BITS_24_31)
 		{ /* Coin Lock/Count */
-//          coin_counter_w(0, data & 0x01000000);
-//          coin_counter_w(1, data & 0x02000000);
-//          coin_lockout_w(0, ~data & 0x04000000);
-//          coin_lockout_w(1, ~data & 0x08000000); // Works in puzzloop, others behave strange.
+//          coin_counter_w(space->machine, 0, data & 0x01000000);
+//          coin_counter_w(space->machine, 1, data & 0x02000000);
+//          coin_lockout_w(space->machine, 0, ~data & 0x04000000);
+//          coin_lockout_w(space->machine, 1, ~data & 0x08000000); // Works in puzzloop, others behave strange.
 		}
 		if(ACCESSING_BITS_16_23)
 		{ /* Analogue Input Select */
@@ -772,7 +772,7 @@ static ADDRESS_MAP_START( skns_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00400004, 0x00400007) AM_READ_PORT("400004")
 	/* In between is write only */
 	AM_RANGE(0x0040000c, 0x0040000f) AM_READ_PORT("40000c")
-	AM_RANGE(0x00800000, 0x00801fff) AM_RAM AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size) /* 'backup' RAM */
+	AM_RANGE(0x00800000, 0x00801fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) /* 'backup' RAM */
 	AM_RANGE(0x00c00000, 0x00c00003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0xffff0000) /* ymz280_w (sound) */
 	AM_RANGE(0x01000000, 0x0100000f) AM_READWRITE(skns_msm6242_r, skns_msm6242_w)
 	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(skns_hit2_w)

@@ -67,22 +67,22 @@ static READ16_HANDLER(tomcat_inputs_r)
 
 static WRITE16_HANDLER(tomcat_led1on_w)
 {
-	set_led_status(1, 1);
+	set_led_status(space->machine, 1, 1);
 }
 
 static WRITE16_HANDLER(tomcat_led2on_w)
 {
-	set_led_status(2, 1);
+	set_led_status(space->machine, 2, 1);
 }
 
 static WRITE16_HANDLER(tomcat_led2off_w)
 {
-	set_led_status(2, 0);
+	set_led_status(space->machine, 2, 0);
 }
 
 static WRITE16_HANDLER(tomcat_led1off_w)
 {
-	set_led_status(1, 0);
+	set_led_status(space->machine, 1, 0);
 }
 
 static WRITE16_HANDLER(tomcat_lnkmodel_w)

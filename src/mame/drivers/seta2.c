@@ -570,8 +570,8 @@ static WRITE16_HANDLER( grdians_lockout_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		// initially 0, then either $25 (coin 1) or $2a (coin 2)
-		coin_counter_w(0,data & 0x01);	// or 0x04
-		coin_counter_w(1,data & 0x02);	// or 0x08
+		coin_counter_w(space->machine, 0,data & 0x01);	// or 0x04
+		coin_counter_w(space->machine, 1,data & 0x02);	// or 0x08
 	}
 //  popmessage("%04X", data & 0xffff);
 }
@@ -785,8 +785,8 @@ static WRITE16_HANDLER( pzlbowl_coin_counter_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0,data & 0x10);
-		coin_counter_w(1,data & 0x20);
+		coin_counter_w(space->machine, 0,data & 0x10);
+		coin_counter_w(space->machine, 1,data & 0x20);
 	}
 }
 
@@ -843,11 +843,11 @@ static WRITE16_HANDLER( samshoot_coin_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0, data & 0x10);
-		coin_counter_w(1, data & 0x20);
+		coin_counter_w(space->machine, 0, data & 0x10);
+		coin_counter_w(space->machine, 1, data & 0x20);
 		// Are these connected? They are set in I/O test
-		coin_lockout_w(0,~data & 0x40);
-		coin_lockout_w(1,~data & 0x80);
+		coin_lockout_w(space->machine, 0,~data & 0x40);
+		coin_lockout_w(space->machine, 1,~data & 0x80);
 	}
 //  popmessage("%04x",data);
 }
@@ -855,7 +855,7 @@ static WRITE16_HANDLER( samshoot_coin_w )
 static ADDRESS_MAP_START( samshoot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x1fffff ) AM_ROM
 	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM
-	AM_RANGE( 0x300000, 0x30ffff ) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x300000, 0x30ffff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 
 	AM_RANGE( 0x400000, 0x400001 ) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE( 0x400002, 0x400003 ) AM_READ_PORT("BUTTONS")			// Buttons
@@ -900,7 +900,7 @@ static UINT8 funcube_serial_count;
 // RAM shared with the sub CPU
 static READ32_HANDLER( funcube_nvram_dword_r )
 {
-	UINT16 val = generic_nvram16[offset];
+	UINT16 val = space->machine->generic.nvram.ptr.u16[offset];
 	return ((val & 0xff00) << 8) | (val & 0x00ff);
 }
 
@@ -908,11 +908,11 @@ static WRITE32_HANDLER( funcube_nvram_dword_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		generic_nvram16[offset] = (generic_nvram16[offset] & 0xff00) | (data & 0x000000ff);
+		space->machine->generic.nvram.ptr.u16[offset] = (space->machine->generic.nvram.ptr.u16[offset] & 0xff00) | (data & 0x000000ff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		generic_nvram16[offset] = (generic_nvram16[offset] & 0x00ff) | ((data & 0x00ff0000) >> 8);
+		space->machine->generic.nvram.ptr.u16[offset] = (space->machine->generic.nvram.ptr.u16[offset] & 0x00ff) | ((data & 0x00ff0000) >> 8);
 	}
 }
 
@@ -1004,7 +1004,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( funcube_sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x200000, 0x20017f ) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x200000, 0x20017f ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 ADDRESS_MAP_END
 
 
@@ -1073,14 +1073,14 @@ static WRITE8_HANDLER( funcube_leds_w )
 {
 	*funcube_leds = data;
 
-	set_led_status( 0, (~data) & 0x01 );	// win lamp (red)
-	set_led_status( 1, (~data) & 0x02 );	// win lamp (green)
+	set_led_status( space->machine, 0, (~data) & 0x01 );	// win lamp (red)
+	set_led_status( space->machine, 1, (~data) & 0x02 );	// win lamp (green)
 
 	// Set in a moving pattern: 0111 -> 1011 -> 1101 -> 1110
-	set_led_status( 2, (~data) & 0x10 );
-	set_led_status( 3, (~data) & 0x20 );
-	set_led_status( 4, (~data) & 0x40 );
-	set_led_status( 5, (~data) & 0x80 );
+	set_led_status( space->machine, 2, (~data) & 0x10 );
+	set_led_status( space->machine, 3, (~data) & 0x20 );
+	set_led_status( space->machine, 4, (~data) & 0x40 );
+	set_led_status( space->machine, 5, (~data) & 0x80 );
 
 	funcube_debug_outputs();
 }
@@ -1103,7 +1103,7 @@ static WRITE8_HANDLER( funcube_outputs_w )
 	// Bit 1: high on pay out
 
 	// Bit 3: low after coining up, blinks on pay out
-	set_led_status( 6, (~data) & 0x08 );
+	set_led_status( space->machine, 6, (~data) & 0x08 );
 
 	funcube_debug_outputs();
 }

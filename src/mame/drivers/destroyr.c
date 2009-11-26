@@ -159,8 +159,8 @@ static WRITE8_HANDLER( destroyr_misc_w )
 	state->wavemod = data & 0x10;
 	state->potmask[1] = data & 0x20;
 
-	coin_lockout_w(0, !state->attract);
-	coin_lockout_w(1, !state->attract);
+	coin_lockout_w(space->machine, 0, !state->attract);
+	coin_lockout_w(space->machine, 1, !state->attract);
 }
 
 
@@ -185,10 +185,10 @@ static WRITE8_HANDLER( destroyr_output_w )
 	switch (offset)
 	{
 	case 0:
-		set_led_status(0, data & 1);
+		set_led_status(space->machine, 0, data & 1);
 		break;
 	case 1:
-		set_led_status(1, data & 1); /* no second LED present on cab */
+		set_led_status(space->machine, 1, data & 1); /* no second LED present on cab */
 		break;
 	case 2:
 		/* bit 0 => songate */

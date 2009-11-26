@@ -415,16 +415,16 @@ static READ8_HANDLER( ts_r )
 
 static WRITE8_DEVICE_HANDLER( tx1_coin_cnt_w )
 {
-	coin_counter_w(0, data & 0x80);
-	coin_counter_w(1, data & 0x40);
-//  coin_counter_w(2, data & 0x40);
+	coin_counter_w(device->machine, 0, data & 0x80);
+	coin_counter_w(device->machine, 1, data & 0x40);
+//  coin_counter_w(device->machine, 2, data & 0x40);
 }
 
 static WRITE8_DEVICE_HANDLER( bb_coin_cnt_w )
 {
-	coin_counter_w(0, data & 0x01);
-	coin_counter_w(1, data & 0x02);
-//  coin_counter_w(2, data & 0x04);
+	coin_counter_w(device->machine, 0, data & 0x01);
+	coin_counter_w(device->machine, 1, data & 0x02);
+//  coin_counter_w(device->machine, 2, data & 0x04);
 }
 
 static WRITE8_HANDLER( tx1_ppi_latch_w )
@@ -508,7 +508,7 @@ static const ppi8255_interface tx1_ppi8255_intf =
 static ADDRESS_MAP_START( tx1_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x00fff) AM_MIRROR(0x1000) AM_RAM
 	AM_RANGE(0x02000, 0x02fff) AM_MIRROR(0x1000) AM_RAM
-	AM_RANGE(0x04000, 0x04fff) AM_MIRROR(0x1000) AM_RAM	AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x04000, 0x04fff) AM_MIRROR(0x1000) AM_RAM	AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x06000, 0x06fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
 	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_BASE(&tx1_vram)
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1) AM_BASE(&tx1_rcram)
@@ -559,7 +559,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( buggyboy_main, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
 	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_BASE(&buggyboy_vram)
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1) AM_BASE(&buggyboy_rcram) AM_SIZE(&buggyboy_rcram_size)
@@ -574,7 +574,7 @@ static ADDRESS_MAP_START( buggyboy_main, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( buggybjr_main, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_BASE(&buggyboy_vram)
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1) AM_BASE(&buggyboy_rcram) AM_SIZE(&buggyboy_rcram_size)

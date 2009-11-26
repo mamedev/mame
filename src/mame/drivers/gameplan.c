@@ -116,7 +116,7 @@ static READ8_DEVICE_HANDLER( io_port_r )
 
 static WRITE8_DEVICE_HANDLER( coin_w )
 {
-	coin_counter_w(0, ~data & 1);
+	coin_counter_w(device->machine, 0, ~data & 1);
 }
 
 

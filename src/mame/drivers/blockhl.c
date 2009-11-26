@@ -254,8 +254,8 @@ static KONAMI_SETLINES_CALLBACK( blockhl_banking )
 	memory_set_bankptr(device->machine, 1,&RAM[offs]);
 
 	/* bits 3/4 = coin counters */
-	coin_counter_w(0,lines & 0x08);
-	coin_counter_w(1,lines & 0x10);
+	coin_counter_w(device->machine, 0,lines & 0x08);
+	coin_counter_w(device->machine, 1,lines & 0x10);
 
 	/* bit 5 = select palette RAM or work RAM at 5800-5fff */
 	palette_selected = ~lines & 0x20;

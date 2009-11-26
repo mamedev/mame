@@ -415,7 +415,7 @@ static WRITE8_HANDLER( videomode_w )
 	videomode_prev = data;
 
 	/* bit 0 is for the coin counters */
-	coin_counter_w(0, data & 1);
+	coin_counter_w(space->machine, 0, data & 1);
 
 	/* remaining signals are video-related */
 	system1_videomode_w(space, 0, data);

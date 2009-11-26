@@ -162,8 +162,8 @@ static WRITE16_HANDLER( sandscrp_coin_counter_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(0,   data  & 0x0001);
-		coin_counter_w(1,   data  & 0x0002);
+		coin_counter_w(space->machine, 0,   data  & 0x0001);
+		coin_counter_w(space->machine, 1,   data  & 0x0002);
 	}
 }
 

@@ -73,11 +73,11 @@ static WRITE16_HANDLER( thoop2_coin_w )
 		switch ((offset >> 3)){
 			case 0x00:	/* Coin Lockouts */
 			case 0x01:
-				coin_lockout_w((offset >> 3) & 0x01, ~data & 0x01);
+				coin_lockout_w(space->machine, (offset >> 3) & 0x01, ~data & 0x01);
 				break;
 			case 0x02:	/* Coin Counters */
 			case 0x03:
-				coin_counter_w((offset >> 3) & 0x01, data & 0x01);
+				coin_counter_w(space->machine, (offset >> 3) & 0x01, data & 0x01);
 				break;
 		}
 	}

@@ -157,8 +157,8 @@ static WRITE16_HANDLER( srmp2_flags_w )
     x--- ---- : Palette Bank
 */
 
-	coin_counter_w( 0, ((data & 0x01) >> 0) );
-	coin_lockout_w( 0, (((~data) & 0x10) >> 4) );
+	coin_counter_w( space->machine, 0, ((data & 0x01) >> 0) );
+	coin_lockout_w( space->machine, 0, (((~data) & 0x10) >> 4) );
 	srmp2_adpcm_bank = ( (data & 0x20) >> 5 );
 	srmp2_color_bank = ( (data & 0x80) >> 7 );
 }
@@ -171,8 +171,8 @@ static WRITE16_HANDLER( mjyuugi_flags_w )
     ---x ---- : Coin Lock Out
 */
 
-	coin_counter_w( 0, ((data & 0x01) >> 0) );
-	coin_lockout_w( 0, (((~data) & 0x10) >> 4) );
+	coin_counter_w( space->machine, 0, ((data & 0x01) >> 0) );
+	coin_lockout_w( space->machine, 0, (((~data) & 0x10) >> 4) );
 }
 
 
@@ -384,7 +384,7 @@ static WRITE8_HANDLER( srmp3_rombank_w )
 
 static ADDRESS_MAP_START( srmp2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE(&spriteram16_2)		/* Sprites Code + X + Attr */
 	AM_RANGE(0x180000, 0x180609) AM_RAM AM_BASE(&spriteram16)		/* Sprites Y */
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITENOP						/* ??? */
@@ -427,7 +427,7 @@ static ADDRESS_MAP_START( mjyuugi_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd00000, 0xd00609) AM_RAM AM_BASE(&spriteram16)	/* Sprites Y */
 	AM_RANGE(0xd02000, 0xd023ff) AM_RAM							/* ??? only writes $00fa */
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM	AM_BASE(&spriteram16_2)	/* Sprites Code + X + Attr */
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 ADDRESS_MAP_END
 
 
@@ -532,8 +532,8 @@ static WRITE8_HANDLER( srmp3_flags_w )
     xx-- ---- : GFX Bank
 */
 
-	coin_counter_w( 0, ((data & 0x01) >> 0) );
-	coin_lockout_w( 0, (((~data) & 0x10) >> 4) );
+	coin_counter_w( space->machine, 0, ((data & 0x01) >> 0) );
+	coin_lockout_w( space->machine, 0, (((~data) & 0x10) >> 4) );
 	srmp3_gfx_bank = (data >> 6) & 0x03;
 }
 
@@ -541,7 +541,7 @@ static WRITE8_HANDLER( srmp3_flags_w )
 static ADDRESS_MAP_START( srmp3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)							/* rom bank */
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* work ram */
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* work ram */
 	AM_RANGE(0xa800, 0xa800) AM_WRITENOP							/* flag ? */
 	AM_RANGE(0xb000, 0xb303) AM_RAM AM_BASE(&spriteram)				/* Sprites Y */
 	AM_RANGE(0xb800, 0xb800) AM_WRITENOP							/* flag ? */

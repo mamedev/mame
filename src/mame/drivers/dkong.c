@@ -540,7 +540,7 @@ static WRITE8_DEVICE_HANDLER( p8257_ctl_w )
 
 static WRITE8_HANDLER( dkong3_coin_counter_w )
 {
-    coin_counter_w(offset, data & 0x01);
+    coin_counter_w(space->machine, offset, data & 0x01);
 }
 
 static WRITE8_DEVICE_HANDLER( p8257_drq_w )
@@ -558,7 +558,7 @@ static READ8_HANDLER( dkong_in2_r )
     UINT8 r;
 
     r = (input_port_read(space->machine, "IN2") & 0xBF) | (mcustatus << 6);
-    coin_counter_w(offset, r >> 7);
+    coin_counter_w(space->machine, offset, r >> 7);
     if (r & 0x10)
         r = (r & ~0x10) | 0x80; /* service ==> coin */
     return r;
@@ -571,7 +571,7 @@ static READ8_HANDLER( dkongjr_in2_r )
     UINT8 r;
 
     r = (input_port_read(space->machine, "IN2") & 0xBF) | 0x40;
-    coin_counter_w(offset, r >> 7);
+    coin_counter_w(space->machine, offset, r >> 7);
     if (r & 0x10)
         r = (r & ~0x10) | 0x80; /* service ==> coin */
     return r;

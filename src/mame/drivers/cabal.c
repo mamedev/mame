@@ -176,8 +176,8 @@ static READ8_HANDLER( cabalbl_snd1_r )
 
 static WRITE8_HANDLER( cabalbl_coin_w )
 {
-	coin_counter_w(0, data & 1);
-	coin_counter_w(1, data & 2);
+	coin_counter_w(space->machine, 0, data & 1);
+	coin_counter_w(space->machine, 1, data & 2);
 
 	//data & 0x40? video enable?
 }

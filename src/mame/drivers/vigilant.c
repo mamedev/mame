@@ -52,8 +52,8 @@ static WRITE8_HANDLER( vigilant_out2_w )
 	/* D2 = COB1 = Coin Counter B? */
 
 	/* The hardware has both coin counters hooked up to a single meter. */
-	coin_counter_w(0,data & 0x02);
-	coin_counter_w(1,data & 0x04);
+	coin_counter_w(space->machine, 0,data & 0x02);
+	coin_counter_w(space->machine, 1,data & 0x04);
 
 //  data & 0x01 cocktail mode
 }
@@ -65,8 +65,8 @@ static WRITE8_HANDLER( kikcubic_coin_w )
 	/* bit 1 is used but unknown */
 
 	/* bits 4/5 are coin counters */
-	coin_counter_w(0,data & 0x10);
-	coin_counter_w(1,data & 0x20);
+	coin_counter_w(space->machine, 0,data & 0x10);
+	coin_counter_w(space->machine, 1,data & 0x20);
 }
 
 

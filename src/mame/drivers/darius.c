@@ -230,10 +230,10 @@ static WRITE16_HANDLER( darius_ioc_w )
 		case 0x30:	/* coin control */
 			/* bits 7,5,4,0 used on reset */
 			/* bit 4 used whenever bg is blanked ? */
-			coin_lockout_w(0, ~data & 0x02);
-			coin_lockout_w(1, ~data & 0x04);
-			coin_counter_w(0, data & 0x08);
-			coin_counter_w(1, data & 0x40);
+			coin_lockout_w(space->machine, 0, ~data & 0x02);
+			coin_lockout_w(space->machine, 1, ~data & 0x04);
+			coin_counter_w(space->machine, 0, data & 0x08);
+			coin_counter_w(space->machine, 1, data & 0x40);
 			coin_word = data &0xffff;
 //popmessage(" address %04x value %04x",offset,data);
 			return;

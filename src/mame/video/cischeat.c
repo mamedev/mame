@@ -255,10 +255,10 @@ WRITE16_HANDLER( bigrun_vregs_w )
  		case 0x0000/2   :	// leds
 			if (ACCESSING_BITS_0_7)
 			{
-	 			coin_counter_w(0,new_data & 0x01);
-	 			coin_counter_w(1,new_data & 0x02);
-	 			set_led_status(0,new_data & 0x10);	// start button
-				set_led_status(1,new_data & 0x20);	// ?
+	 			coin_counter_w(space->machine, 0,new_data & 0x01);
+	 			coin_counter_w(space->machine, 1,new_data & 0x02);
+	 			set_led_status(space->machine, 0,new_data & 0x10);	// start button
+				set_led_status(space->machine, 1,new_data & 0x20);	// ?
 			}
 			break;
 
@@ -267,7 +267,7 @@ WRITE16_HANDLER( bigrun_vregs_w )
 
  		case 0x0004/2   :	// motor (seat?)
 			if (ACCESSING_BITS_0_7)
-				set_led_status(2, (new_data != old_data) ? 1 : 0);
+				set_led_status(space->machine, 2, (new_data != old_data) ? 1 : 0);
  			break;
 
  		case 0x0006/2   :	// motor (wheel?)
@@ -348,10 +348,10 @@ WRITE16_HANDLER( cischeat_vregs_w )
  		case 0x0000/2   :	// leds
 			if (ACCESSING_BITS_0_7)
 			{
-	 			coin_counter_w(0,new_data & 0x01);
-	 			coin_counter_w(1,new_data & 0x02);
-	 			set_led_status(0,new_data & 0x10);	// start button
-				set_led_status(1,new_data & 0x20);	// ?
+	 			coin_counter_w(space->machine, 0,new_data & 0x01);
+	 			coin_counter_w(space->machine, 1,new_data & 0x02);
+	 			set_led_status(space->machine, 0,new_data & 0x10);	// start button
+				set_led_status(space->machine, 1,new_data & 0x20);	// ?
 			}
 			break;
 
@@ -360,7 +360,7 @@ WRITE16_HANDLER( cischeat_vregs_w )
 
  		case 0x0004/2   :	// motor (seat?)
 			if (ACCESSING_BITS_0_7)
-				set_led_status(2, (new_data != old_data) ? 1 : 0);
+				set_led_status(space->machine, 2, (new_data != old_data) ? 1 : 0);
  			break;
 
  		case 0x0006/2   :	// motor (wheel?)
@@ -489,12 +489,12 @@ CPU #0 PC 00235C : Warning, vreg 0006 <- 0000
 		case 0x0004/2   :
 			if (ACCESSING_BITS_0_7)
 			{
-	 			coin_counter_w(0,new_data & 0x01);
-	 			coin_counter_w(1,new_data & 0x02);
-				set_led_status(0,new_data & 0x04);	// start button
-				set_led_status(1,new_data & 0x20);	// ?
+	 			coin_counter_w(space->machine, 0,new_data & 0x01);
+	 			coin_counter_w(space->machine, 1,new_data & 0x02);
+				set_led_status(space->machine, 0,new_data & 0x04);	// start button
+				set_led_status(space->machine, 1,new_data & 0x20);	// ?
 				// wheel | seat motor
-				set_led_status(2, ((new_data >> 3) | (new_data >> 4)) & 1 );
+				set_led_status(space->machine, 2, ((new_data >> 3) | (new_data >> 4)) & 1 );
 			}
 			break;
 		case 0x0014/2   :	break;

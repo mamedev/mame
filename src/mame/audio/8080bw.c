@@ -647,7 +647,7 @@ WRITE8_DEVICE_HANDLER( polaris_sh_port_2_w )
 WRITE8_DEVICE_HANDLER( polaris_sh_port_3_w )
 {
 
-	coin_lockout_global_w(data & 0x04);  /* SX8 */
+	coin_lockout_global_w(device->machine, data & 0x04);  /* SX8 */
 
 	c8080bw_flip_screen_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), data & 0x20);  /* SX11 */
 
@@ -883,7 +883,7 @@ WRITE8_HANDLER( schaser_sh_port_2_w )
 	discrete_sound_w(discrete, SCHASER_SND_EN, data & 0x02);
 	sound_global_enable(space->machine, data & 0x02);
 
-	coin_lockout_global_w(data & 0x04);
+	coin_lockout_global_w(space->machine, data & 0x04);
 
 	schaser_background_control_w(data & 0x18);
 

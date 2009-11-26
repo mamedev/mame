@@ -300,15 +300,15 @@ static WRITE8_HANDLER( watchdog2_w )
 
 static WRITE8_HANDLER( namcos86_coin_w )
 {
-	coin_lockout_global_w(data & 1);
-	coin_counter_w(0,~data & 2);
-	coin_counter_w(1,~data & 4);
+	coin_lockout_global_w(space->machine, data & 1);
+	coin_counter_w(space->machine, 0,~data & 2);
+	coin_counter_w(space->machine, 1,~data & 4);
 }
 
 static WRITE8_HANDLER( namcos86_led_w )
 {
-	set_led_status(0,data & 0x08);
-	set_led_status(1,data & 0x10);
+	set_led_status(space->machine, 0,data & 0x08);
+	set_led_status(space->machine, 1,data & 0x10);
 }
 
 

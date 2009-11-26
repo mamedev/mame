@@ -137,7 +137,7 @@ static WRITE8_HANDLER( tubep_LS259_w )
                     port b0: bit0 - coin 1 counter
                     port b1  bit0 - coin 2 counter
                 */
-				coin_counter_w(offset,data&1);
+				coin_counter_w(space->machine, offset,data&1);
 				break;
 		case 2:
 				//something...
@@ -391,7 +391,7 @@ static WRITE8_HANDLER( rjammer_LS259_w )
 	{
 		case 0:
 		case 1:
-				coin_counter_w(offset,data&1);	/* bit 0 = coin counter */
+				coin_counter_w(space->machine, offset,data&1);	/* bit 0 = coin counter */
 				break;
 		case 5:
 				//screen_flip_w(offset,data&1); /* bit 0 = screen flip, active high */

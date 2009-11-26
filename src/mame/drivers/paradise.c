@@ -64,7 +64,7 @@ static WRITE8_DEVICE_HANDLER( paradise_okibank_w )
 
 static WRITE8_HANDLER( torus_coin_counter_w )
 {
-	coin_counter_w(0, data ^ 0xff);
+	coin_counter_w(space->machine, 0, data ^ 0xff);
 }
 
 #define STANDARD_MAP	\

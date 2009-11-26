@@ -187,14 +187,14 @@ static WRITE8_HANDLER( sprint4_da_latch_w )
 
 static WRITE8_HANDLER( sprint4_lamp_w )
 {
-	set_led_status((offset >> 1) & 3, offset & 1);
+	set_led_status(space->machine, (offset >> 1) & 3, offset & 1);
 }
 
 
 #ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( sprint4_lockout_w )
 {
-	coin_lockout_global_w(~offset & 1);
+	coin_lockout_global_w(space->machine, ~offset & 1);
 }
 #endif
 

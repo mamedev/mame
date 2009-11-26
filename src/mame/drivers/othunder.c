@@ -360,8 +360,8 @@ static WRITE16_HANDLER( othunder_TC0220IOC_w )
                 0x000000    eeprom in data
                 x0000000    eeprom out data  */
 
-				set_led_status(0, data & 1);
-				set_led_status(1, data & 2);
+				set_led_status(space->machine, 0, data & 1);
+				set_led_status(space->machine, 1, data & 2);
 
 if (data & 4)
 	popmessage("OBPRI SET!");

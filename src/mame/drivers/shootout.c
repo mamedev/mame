@@ -68,7 +68,7 @@ static WRITE8_HANDLER( shootout_flipscreen_w )
 
 static WRITE8_HANDLER( shootout_coin_counter_w )
 {
-	coin_counter_w(0, data);
+	coin_counter_w(space->machine, 0, data);
 }
 
 /*******************************************************************************/

@@ -621,7 +621,7 @@ static READ8_HANDLER( bullsdrt_data_port_r )
 
 static WRITE8_HANDLER( led_w )
 {
-	set_led_status(offset, ~data & 0x80);
+	set_led_status(space->machine, offset, ~data & 0x80);
 }
 
 
@@ -633,13 +633,13 @@ static READ8_DEVICE_HANDLER( caterplr_rand_r )
 
 static WRITE8_HANDLER( coin_count_w )
 {
-	coin_counter_w(offset, data);
+	coin_counter_w(space->machine, offset, data);
 }
 
 
 static WRITE8_HANDLER( bullsdrt_coin_count_w )
 {
-	coin_counter_w(0, data);
+	coin_counter_w(space->machine, 0, data);
 }
 
 

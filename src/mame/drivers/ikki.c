@@ -36,8 +36,8 @@ static READ8_HANDLER( ikki_e000_r )
 
 static WRITE8_HANDLER( ikki_coin_counters )
 {
-	coin_counter_w( 0, data & 0x01 );
-	coin_counter_w( 1, data & 0x02 );
+	coin_counter_w( space->machine, 0, data & 0x01 );
+	coin_counter_w( space->machine, 1, data & 0x02 );
 }
 
 /****************************************************************************/
