@@ -2,6 +2,7 @@
 #include "hng64.h"
 
 #include <math.h>
+#include "drawgfxm.h"
 
 #define MAKE_MAME_REEEEAAALLLL_SLOW 0
 
@@ -111,6 +112,106 @@ static struct polygon *polys ;
 
 #define WORD_AT(BUFFER,OFFSET) ( (BUFFER[OFFSET] << 8) | BUFFER[OFFSET+1] )
 
+#define PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32(DEST, PRIORITY, SOURCE) 					\
+do																					\
+{																					\
+	UINT32 srcdata = (SOURCE);														\
+	if (srcdata != transpen)														\
+	{																				\
+		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)								\
+		{																			\
+			UINT32 srcdata2 = paldata[srcdata];										\
+																					\
+			UINT32 add;                                                             \
+			add = (srcdata2 & 0x00ff0000) + (DEST & 0x00ff0000);                    \
+			if (add & 0x01000000) DEST = (DEST & 0xff00ffff) | (0x00ff0000);        \
+			else DEST = (DEST & 0xff00ffff) | (add & 0x00ff0000);                   \
+			add = (srcdata2 & 0x000000ff) + (DEST & 0x000000ff);                    \
+			if (add & 0x00000100) DEST = (DEST & 0xffffff00) | (0x000000ff);        \
+			else DEST = (DEST & 0xffffff00) | (add & 0x000000ff);                   \
+			add = (srcdata2 & 0x0000ff00) + (DEST & 0x0000ff00);                    \
+			if (add & 0x00010000) DEST = (DEST & 0xffff00ff) | (0x0000ff00);        \
+			else DEST = (DEST & 0xffff00ff) | (add & 0x0000ff00);                   \
+		}																			\
+		(PRIORITY) = 31;															\
+	}																				\
+}																					\
+while (0)																			\
+
+
+void pdrawgfx_transpen_additive(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
+		bitmap_t *priority, UINT32 pmask, UINT32 transpen)
+{
+	const pen_t *paldata;
+
+	assert(dest != NULL);
+	assert(dest->bpp == 32);
+	assert(gfx != NULL);
+
+	/* get final code and color, and grab lookup tables */
+	code %= gfx->total_elements;
+	color %= gfx->total_colors;
+	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+
+	/* use pen usage to optimize */
+	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	{
+		UINT32 usage = gfx->pen_usage[code];
+
+		/* fully transparent; do nothing */
+		if ((usage & ~(1 << transpen)) == 0)
+			return;
+	}
+
+	/* high bit of the mask is implicitly on */
+	pmask |= 1 << 31;
+
+	/* render based on dest bitmap depth */
+	DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32, UINT8);
+}
+
+
+void pdrawgfxzoom_transpen_additive(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
+		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask,
+		UINT32 transpen)
+{
+	const pen_t *paldata;
+
+	/* non-zoom case */
+
+	if (scalex == 0x10000 && scaley == 0x10000)
+	{
+		pdrawgfx_transpen_additive(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, priority, pmask, transpen);
+		return;
+	}
+
+	assert(dest != NULL);
+	assert(dest->bpp == 32);
+	assert(gfx != NULL);
+
+	/* get final code and color, and grab lookup tables */
+	code %= gfx->total_elements;
+	color %= gfx->total_colors;
+	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+
+	/* use pen usage to optimize */
+	if (gfx->pen_usage != NULL && !gfx->dirty[code])
+	{
+		UINT32 usage = gfx->pen_usage[code];
+
+		/* fully transparent; do nothing */
+		if ((usage & ~(1 << transpen)) == 0)
+			return;
+	}
+
+	/* high bit of the mask is implicitly on */
+	pmask |= 1 << 31;
+
+	DRAWGFXZOOM_CORE(UINT32, PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32, UINT8);
+}
+
 
 /*
  * Sprite Format
@@ -178,6 +279,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int zbuf;
 		UINT32 zoomx,zoomy;
 		float foomX, foomY;
+		int blend;
 
 		zbuf = (source[2]&0x07ff0000)>>16;
 		#if 1
@@ -194,6 +296,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		ypos += (spriteoffsy);
 
 		tileno=(source[4]&0x0007ffff);
+		blend=(source[4] &0x00800000);
 		chainx=(source[2]&0x000000f0)>>4;
 		chainy=(source[2]&0x0000000f);
 		chaini=(source[2]&0x00000100);
@@ -284,7 +387,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 				if (!chaini)
 				{
-					pdrawgfxzoom_transpen(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,machine->priority_bitmap, 0,0);
+					if (!blend) pdrawgfxzoom_transpen(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,machine->priority_bitmap, 0,0);
+					else pdrawgfxzoom_transpen_additive(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,machine->priority_bitmap, 0,0);
 					tileno++;
 				}
 				else // inline chain mode, used by ss64
@@ -304,7 +408,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						pal&=0xf;
 					}
 
-					pdrawgfxzoom_transpen(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,machine->priority_bitmap, 0,0);
+					if (!blend) pdrawgfxzoom_transpen(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,machine->priority_bitmap, 0,0);
+					else pdrawgfxzoom_transpen_additive(bitmap,cliprect,gfx,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,machine->priority_bitmap, 0,0);
 					source +=8;
 				}
 
