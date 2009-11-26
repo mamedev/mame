@@ -343,18 +343,21 @@ static void execute_one(i8008_state *cpustate, int opcode)
 												tmp = GET_REG(cpustate,0) & ARG(cpustate);
 												SET_REG(cpustate,0,tmp & 0xff);
 												UPDATE_FLAGS(cpustate,tmp & 0xff);
+												cpustate->CF = 0;
 												break;
 											case 5 :
 												// XRI
 												tmp = GET_REG(cpustate,0) ^ ARG(cpustate);
 												SET_REG(cpustate,0,tmp & 0xff);
 												UPDATE_FLAGS(cpustate,tmp & 0xff);
+												cpustate->CF = 0;
 												break;
 											case 6 :
 												// ORI
 												tmp = GET_REG(cpustate,0) | ARG(cpustate);
 												SET_REG(cpustate,0,tmp & 0xff);
 												UPDATE_FLAGS(cpustate,tmp & 0xff);
+												cpustate->CF = 0;
 												break;
 											case 7 :
 												// CPI
@@ -374,12 +377,13 @@ static void execute_one(i8008_state *cpustate, int opcode)
 						case 6 : 	// LrI
 									cpustate->icount -= 8;
 									if (REG_1==7) cpustate->icount -= 1; // LMI
-									SET_REG(cpustate,REG_1, ARG(cpustate)); break;
+									SET_REG(cpustate,REG_1, ARG(cpustate)); 
+									break;
 						case 7 :	// RET
 									cpustate->icount -= 5;
 									POP_STACK(cpustate);
 									cpustate->PC = GET_PC;
-							break;
+									break;
 					}
 				   	break;
 
@@ -470,18 +474,21 @@ static void execute_one(i8008_state *cpustate, int opcode)
 							tmp = GET_REG(cpustate,0) & GET_REG(cpustate,opcode & 7);
 							SET_REG(cpustate,0,tmp & 0xff);
 							UPDATE_FLAGS(cpustate,tmp & 0xff);
+							cpustate->CF = 0;
 							break;
 						case 5 :
 							// XRx
 							tmp = GET_REG(cpustate,0) ^ GET_REG(cpustate,opcode & 7);
 							SET_REG(cpustate,0,tmp & 0xff);
 							UPDATE_FLAGS(cpustate,tmp & 0xff);
+							cpustate->CF = 0;
 							break;
 						case 6 :
 							// ORx
 							tmp = GET_REG(cpustate,0) | GET_REG(cpustate,opcode & 7);
 							SET_REG(cpustate,0,tmp & 0xff);
 							UPDATE_FLAGS(cpustate,tmp & 0xff);
+							cpustate->CF = 0;
 							break;
 						case 7 :
 							// CPx
