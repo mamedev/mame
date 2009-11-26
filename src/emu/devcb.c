@@ -104,6 +104,11 @@ void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_rea
     write line definition to a live definition
 -------------------------------------------------*/
 
+static WRITE_LINE_DEVICE_HANDLER( trampoline_write_port_to_write_line )
+{
+	input_port_write_direct((const input_port_config *)device, state, 0xffffffff);
+}
+
 static WRITE_LINE_DEVICE_HANDLER( trampoline_write8_to_write_line )
 {
 	const devcb_resolved_write_line *resolved = (const devcb_resolved_write_line *)device;
@@ -122,8 +127,16 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 	/* reset the resolved structure */
 	memset(resolved, 0, sizeof(*resolved));
 
+	if (config->type == DEVCB_TYPE_INPUT)
+	{
+		resolved->target = input_port_by_tag(&device->machine->portlist, config->tag);
+		if (resolved->target == NULL)
+			fatalerror("devcb_resolve_write_line: unable to find input port '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
+		resolved->write = trampoline_write_port_to_write_line;
+	}
+
 	/* address space handlers */
-	if (config->type >= DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->writespace != NULL)
+	else if (config->type >= DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->writespace != NULL)
 	{
 		FPTR space = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM);
 		const device_config *cpu;
@@ -269,6 +282,11 @@ void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *conf
     8-bit write definition to a live definition
 -------------------------------------------------*/
 
+static WRITE8_DEVICE_HANDLER( trampoline_write_port_to_write8 )
+{
+	input_port_write_direct((const input_port_config *)device, data, 0xff);
+}
+
 static WRITE8_DEVICE_HANDLER( trampoline_write_line_to_write8 )
 {
 	const devcb_resolved_write8 *resolved = (const devcb_resolved_write8 *)device;
@@ -280,8 +298,16 @@ void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *c
 	/* reset the resolved structure */
 	memset(resolved, 0, sizeof(*resolved));
 
+	if (config->type == DEVCB_TYPE_INPUT)
+	{
+		resolved->target = input_port_by_tag(&device->machine->portlist, config->tag);
+		if (resolved->target == NULL)
+			fatalerror("devcb_resolve_read_line: unable to find input port '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
+		resolved->write = trampoline_write_port_to_write8;
+	}
+
 	/* address space handlers */
-	if (config->type >= DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->writespace != NULL)
+	else if (config->type >= DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->writespace != NULL)
 	{
 		FPTR space = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM);
 		const device_config *cpu;
