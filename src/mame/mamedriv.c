@@ -9646,19 +9646,34 @@ Other Sun games
 	/* Hi-Soft */
 	DRIVER( himesiki )	/* (c) 1989 Hi-Soft */
 
-	/* Draw Poker Hi-Lo based */
-	DRIVER( norautp )	/* (c) 1988? Noraut Ltd */
-	DRIVER( norautjp )	/* (c) 1988? Noraut Ltd */
-	DRIVER( norautrh )	/* (c) 1988? Noraut Ltd */
-	DRIVER( norautu )	/* (c) 1988? Noraut Ltd */
-	DRIVER( norautv3 )	/* (c) 1988? Noraut Ltd */
-	DRIVER( norautpn )	/* (c) 1990? unknown */
-	DRIVER( pma )		/* PMA */
-	DRIVER( dphl )		/* (c) M. Kramer Inc. 1983 */
+	/* Draw Poker Hi-Lo based (z80) */
+	DRIVER( norautp )	/* (c) 1988 Noraut Ltd. */
+	DRIVER( norautdx )	/* (c) 198? Noraut Ltd. */
+	DRIVER( norautpn )	/* (c) 199? unknown */
+	DRIVER( norautjo )	/* (c) 198? Noraut Ltd. */
+	DRIVER( norautjp )	/* (c) 198? Noraut Ltd. */
+	DRIVER( norautrh )	/* (c) 198? Noraut Ltd. */
+	DRIVER( norautra )	/* (c) 198? Noraut Ltd. */
+	DRIVER( norautu )	/* (c) 198? Noraut Ltd. */
+	DRIVER( noraut3a )	/* (c) 2002 Noraut Ltd. */
+	DRIVER( noraut3b )	/* (c) 2003 Noraut Ltd. */
+	DRIVER( norautua )	/* (c) 198? Noraut Ltd. */
+	DRIVER( norautub )	/* (c) 198? Noraut Ltd. */
+	DRIVER( mainline )	/* (c) Mainline London */
+	DRIVER( df_djpkr )	/* (c) DellFern Ltd. */
+	DRIVER( ndxron10 )	/* 2005, unknown */
+	DRIVER( cgip30cs )	/* (c) 1999, CGI */
+	DRIVER( pma )		/* 1983, PMA */
+	DRIVER( bjpoker )	/* (c) M. Kramer Inc. */
+	DRIVER( kimblejp )	/* (c) 198?, Kimble Gaming */
+
+	/* Draw Poker Hi-Lo based (i8080) */
+	DRIVER( dphl )		/* (c) 1983 M. Kramer Inc. */
 	DRIVER( dphla )		/* unknown */
-	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
 	DRIVER( dphljp )	/* unknown */
+	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
 	DRIVER( smshilo )	/* (c) 1983 SMS Manufacturing Corp. */
+	DRIVER( drhl )		/* (c) Drew, Inc. */
 	DRIVER( tpoker2 )	/* (c) 1993 Micro Manufacturing, Inc. */
 
 	/* Sanki Denshi Kogyo */

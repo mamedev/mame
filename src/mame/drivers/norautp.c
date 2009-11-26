@@ -10,27 +10,51 @@
 
   -- Z80 based --
 
-   * Noraut Poker,                 1988,  Noraut Ltd.
-   * Noraut Joker Poker,           1988,  Noraut Ltd.
-   * Noraut Red Hot Joker Poker,   1988,  Noraut Ltd.
-   * Noraut Poker (NTX10A),        1988,  Noraut Ltd.
-   * Noraut Joker Poker (V3.010a), 1988,  Noraut Ltd.
-   * Noraut Poker (bootleg),       198?,  Unknown.
-   * PMA Poker,                    198?,  PMA.
+   * Noraut Poker,                        1988,  Noraut Ltd.
+   * Noraut Deluxe Poker (console),       198?,  Noraut Ltd.
+   * Noraut Deluxe Poker (bootleg),       198?,  Unknown.
+   * Noraut Joker Poker (original),       198?,  Noraut Ltd.
+   * Noraut Joker Poker (alt),            1988,  Noraut Ltd.
+   * Noraut Red Hot Joker Poker,          1988,  Noraut Ltd.
+   * Noraut Red Hot Joker Poker (alt HW), 198?,  Noraut Ltd.
+   * Noraut Poker (NTX10A),               1988,  Noraut Ltd.
+   * Noraut Joker Poker (V3.010a),        2002,  Noraut Ltd.
+   * Noraut Joker Poker (V3.011a),        2003,  Noraut Ltd.
+   * Noraut unknown set 1 (console),      198?,  Noraut Ltd.
+   * Noraut unknown set 2 (console),      198?,  Noraut Ltd.
+   * Mainline Double Joker Poker,         198?,  Mainline London.  
+   * Double Joker Poker (45%-75% payout), 199?,  DellFern Ltd.
+   * Royal on Ten (Noraut Deluxe hack),   2005,  Unknown.
+   * Credit Poker (ver.30c, standard),    1999,  CGI.
+   * PMA Poker,                           198?,  PMA.
+   * Poker / Black Jack (Model 7521),     198?,  M. Kramer Manufacturing.
+   * Kimble Joker Poker,                  198?,  Kimble Gaming.
 
   -- 8080A based --
 
-   * Draw Poker Hi-Lo,             1983,  M. Kramer Manufacturing.
-   * Draw Poker Hi-Lo (alt),       1983,  Unknown.
-   * GTI Poker,                    1983,  GTI Inc.
-   * Draw Poker Hi-Lo (Japanese),  198?,  Unknown.
-   * Hi-Lo Double Up Joker Poker,  1983,  SMS Manufacturing Corp.
-   * Turbo Poker 2,                1993,  Micro Manufacturing, Inc.
+   * Draw Poker Hi-Lo,                    1983,  M. Kramer Manufacturing.
+   * Draw Poker Hi-Lo (alt),              1983,  Unknown.
+   * Draw Poker Hi-Lo (Japanese),         198?,  Unknown.
+   * GTI Poker,                           1983,  GTI Inc.
+   * Hi-Lo Double Up Joker Poker,         1983,  SMS Manufacturing Corp.
+   * DRHL Poker (v.2.89),                 1986,  Drews Inc.
+   * Turbo Poker 2,                       1993,  Micro Manufacturing, Inc.
 
 
   This hardware emulation opened a big can of worms. :)
-  You can see the legal issues in the following link:
+
+  Seems that the original hardware/game was created by M.Kramer Manufacturing,
+  and then reprogrammed, copied, bootlegged, used & abused by other companies
+  like Noraut Ltd, Kimble Gaming, GTI, DellFern, Merit Industries, Red Card,
+  Blue Games, CGI, Micro Manufacturing, SMS Manufacturing, Drews Distributing,
+  Drew Industries, Lynch Enterprises Inc, Hillside Gaming Corp, Electro Sport,
+  Mainline London, Southern Systems, Americade Amusement Inc, Prologic Ireland,
+  Mosfat, Unique, GEI, etc...
+
+  You can see some legal issues in the following links:
   http://www.altlaw.org/v1/cases/533481
+  http://cases.justia.com/us-court-of-appeals/F2/783/421/41759/
+
 
   Special thanks to Alan Griffin, that kindly helped providing good references
   that allowed me to improve the Noraut system emulation.
@@ -118,20 +142,20 @@
   | |     2764     |     |    D8255AC-2   |          |74LS161AN|  |74LS157N |     .........       ___|
   | |______________|     |________________|          |_________|  |_________|     .........       ___|
   |                                                                              Resistor Array   ___|
-  |                                                                                               |
-  |                                                                                               | 1
-  |                      _________                    _________    _________    _________         |
-  |                     | 74LS32N |                  |74LS161AN|  | 74LS86P |  | 74LS04N |        |
-  |                     |_________|                  |_________|  |_________|  |_________|        |
-  |                                                                                               |
-  |                                             XTAL                                              |
-  |                                            .----.                                             |
-  |  ____________________     __________      _________    _________    _________    _________    |
-  | |                    |   |PALce16v8H|    | 74LS04N |  |74LS157N |  | 74LS11N |  |74LS74AN |   |
-  | |   TMPZ84C00AP-8    |   |__________|    |_________|  |_________|  |_________|  |_________|   |
-  | |____________________|                                                                        |
-  |                                                                                               |
-  |_______________________________________________________________________________________________|
+  |                                                                                              |
+  |                                                                                              | 1
+  |                      _________                    _________    _________    _________        |
+  |                     | 74LS32N |                  |74LS161AN|  | 74LS86P |  | 74LS04N |       |
+  |                     |_________|                  |_________|  |_________|  |_________|       |
+  |                                                                                              |
+  |                                             XTAL                                             |
+  |                                            .----.                                            |
+  |  ____________________     __________      _________    _________    _________    _________   |
+  | |                    |   |PALce16v8H|    | 74LS04N |  |74LS157N |  | 74LS11N |  |74LS74AN |  |
+  | |   TMPZ84C00AP-8    |   |__________|    |_________|  |_________|  |_________|  |_________|  |
+  | |____________________|                                                                       |
+  |                                                                                              |
+  |______________________________________________________________________________________________|
 
 
 
@@ -537,8 +561,8 @@
 
 
 
-  Noraut old Draw Poker Hi-Lo discrete audio circuitry
-  ----------------------------------------------------
+  Draw Poker Hi-Lo (alt) discrete audio circuitry
+  -----------------------------------------------
 
   3x ULN2003A (Darlington transistor array)
   1x NE555P   (Timer)
@@ -761,6 +785,7 @@
 
    Continuity errors when trying to read as a standard eprom.
    Silkscreened below the chip 'CUSTOM I.C.'. Looks like a normal EPROM.
+   * (from other board that match 100% the set, it's a custom 68705 MCU)
 
   .U39  27256    ; stickered  (c) 1993 MICRO MFG TURBO-2 U39-014 US UTBK 022190.
 
@@ -812,7 +837,7 @@
   |     U14          U15          U16          U17          U18       U19 (resnet)    U20              ___|
   |                                                                                                    ___|
   |  _________    _________    _________       _________________       _________    _______________    ___|
-  | |  74123  |  | 74LS174 |  | 82S131N |     | PLD ?? (R dot)  |     | CTS8427 |  |1|2|3|4|5|6|7|8|   ___|
+  | |  74123  |  | 74LS174 |  | 82S131N |     | 74LS541 (R dot) |     | CTS8427 |  |1|2|3|4|5|6|7|8|   ___|
   | |_________|  |_________|  |_________|     |_________________|     |_________|  |_|_|_|_|_|_|_|_|   ___|
   |     U21          U22          U23                 U24             U25 (resnet)  U26 (DIP SW x 8)   ___|
   |                                                                                                    ___|
@@ -822,8 +847,8 @@
   |     U27          U28          U29         |__________________|      |________________________|     ___|
   |                                                   U30                          U31                 ___|
   |  _________    __________   __________      ____________________      ________________________      ___|
-  | |  7474N  |  | SY2111-1 | | SY2111-1 |    |                    |    |                        |     ___|
-  | |_________|  |__________| |__________|    | Unknown custom ROM |    |     Intel  P8255A      |     ___|
+  | |  7474N  |  | SY2111-1 | | SY2111-1 |    | Unknown custom ROM |    |                        |     ___|
+  | |_________|  |__________| |__________|    |    (68705 MCU?)    |    |     Intel  P8255A      |     ___|
   |     U32          U33          U34         |____________________|    |________________________|     ___|
   |                                                    U35                         U36                 ___|
   |  _______________   ____________________    ____________________                                    ___|
@@ -841,6 +866,30 @@
   | |______|                                                                                          |
   |___________________________________________________________________________________________________|
 
+
+  Discrete sound circuitry:
+  -------------------------
+
+                           ___ ___
+  GND --------------------|1  U  8|-----VCC
+                    N/C---|2     7|------------------------------------|---|1K Ohm|--- VCC
+  Volume Pot -------------|3 555 6|--------------------|--|100K Ohm|---|
+  Pin 10 U36 (8255)-------|4     5|---|0.1uF|---GND    |
+                          |_______|                    |-|0.01uF|---- GND
+                                                       |-|0.01uF|---- pin 12 U13 (KA2667)
+                                                       |-|0.022uF|--- pin 11 U13 (KA2667)
+                                                       |-|0.05uF|---- pin 10 U13 (KA2667)
+
+  DIP Switches:
+
+  DIP #1: SETUP      ON/OFF         ;"setup menu to change all the settings"
+  DIP #2: RAISE      ON/OFF
+  DIP #3: XCARDS     ON/OFF
+  DIP #4: REPLAYS    ON/OFF
+  DIP #5: BONUS      ON/OFF
+  DIP #6: COIN TYPE  QUARTER/NICKEL
+  DIP #7: HISCORE    ON/OFF         ;game saves high scores
+  DIP #8: NOT USED
 
 
 *******************************************************************************
@@ -873,7 +922,7 @@
   Noraut HW:
 
   0x0000 - 0x1FFF    ; ROM space.
-  0x2000 - 0x23FF    ; NVRAM.
+  0x2000 - 0x27FF    ; NVRAM.
 
   0x60 - 0x63        ; PPI 8255 0 - DIP Switches, lamps & counters.
   0xA0 - 0xA3        ; PPI 8255 1 - Regular Inputs, sound lines & remaining lamps.
@@ -1019,11 +1068,40 @@
   - Added smshilo discrete sound circuitry scheme/documentation.
 
 
+  [2009-11-26]
+
+  - A lot of work in memory maps and machine driver stuff.
+  - Improved Inputs / DIP switches for some games.
+  - Added lamps support / layouts to new working games.
+  - Added preliminary support to Kimble hardware.
+  - Added support to CGI's Credit Poker 30x games.
+  - Added new (and fixed old) technical notes.
+  - Added Noraut Deluxe Poker (console).
+  - Added Noraut Joker Poker (original).
+  - Added Noraut Red Hot Joker Poker (alt HW).
+  - Added Noraut Joker Poker (V3.011a).
+  - Added Noraut unknown set 1 (console).
+  - Added Noraut unknown set 2 (console).
+  - Added Mainline Double Joker Poker.
+  - Added Double Joker Poker (45%-75% payout).
+  - Added Royal on Ten (Noraut Deluxe hack).
+  - Added Credit Poker (ver.30c, standard).
+  - Added Poker / Black Jack (Model 7521).
+  - Added Kimble Joker Poker.
+  - Added DRHL Poker (v.2.89).
+  - Renamed norautpn descripion to Noraut Deluxe Poker (bootleg).
+  - Added a placeholder for tpoker2's undumped 68705 MCU.
+  - Reorganized the driver, plus some clean-ups.
+
+
   TODO:
 
-  - Analize PPI-2 at 0xc0-0xc3. OBF handshake line (PC7) doesn't seems to work properly.
+  - Analize and hook the 3rd PPI device at 0xc0-0xc3.
+    /OBF handshake line (PC7) doesn't seems to work properly.
+  - Interrupts in i8080 based games.
   - Find if wide chars are hardcoded or tied to a bit.
   - Save support.
+  - Parent/clone relationship.
 
 
 *******************************************************************************/
@@ -1254,36 +1332,42 @@ static READ8_HANDLER( test2_r )
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | norautp  |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |  0xC1 (PC0-2 as input) |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | norautdx |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | norautpn |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | norautjp |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |  0xC1 (PC0-2 as input) |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | norautrh |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | norautu  | unknown |   unknown    |        |   unknown    |        |   unknown    |                        |
+  | norautu  |  BOXED  |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | norautv3 |   Z80   |   unknown    |        |   unknown    |        |   unknown    |                        |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | gtipoker |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  | pma      |   Z80   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | norautpn |   Z80   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
+  | bjpoker  |   Z80   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | dphl     |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | dphla    |  8080A  |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | pma      |   Z80   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
-  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | dphljp   |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | gtipoker |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | smshilo  |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | tpoker2  |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | drhl     |  8080A? |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
 
 */
 static ADDRESS_MAP_START( norautp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* 6116 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( norautp_portmap, ADDRESS_SPACE_IO, 8 )
@@ -1318,8 +1402,20 @@ static ADDRESS_MAP_START( nortest1_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( norautxp_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xcfff) AM_ROM	/* need to be checked */
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) /* need to be checked */
+//	ADDRESS_MAP_GLOBAL_MASK(~0x4000)
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* need to be checked */
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) /* HM6116 */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( norautx4_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* need to be checked */
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) /* 6116 */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( norautx8_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM	/* need to be checked */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) /* 6116 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( norautxp_portmap, ADDRESS_SPACE_IO, 8 )
@@ -1327,24 +1423,18 @@ static ADDRESS_MAP_START( norautxp_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-/***** 8080 based ****/
+/*********** 8080 based **********/
 
 static ADDRESS_MAP_START( dphl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 not connected */
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dphlnv_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 not connected */
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x5000, 0x53ff) AM_RAM	AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* should be 2x 0x100 segments (4x 2111) */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dphla_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dphltest_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1368,6 +1458,14 @@ DPHLA
   C3 -> C0 (hndshk)
 
 */
+
+static ADDRESS_MAP_START( drhl_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 not connected */
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x5400, 0x57ff) AM_RAM
+ADDRESS_MAP_END
+
 
 /*************************
 *      Input Ports       *
@@ -1469,7 +1567,7 @@ static INPUT_PORTS_START( norautrh )
 	PORT_DIPNAME( 0x08, 0x08, "Raise Ante" )		PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x08, "Random" )
 	PORT_DIPSETTING(    0x00, "Always" )
-	PORT_DIPNAME( 0x10, 0x10, "Type of Game" )		PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPNAME( 0x10, 0x00, "Type of Game" )		PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x10, "Jacks Plus" )
 	PORT_DIPSETTING(    0x00, "Joker Poker" )
 	PORT_DIPNAME( 0xa0, 0x20, DEF_STR( Coinage ) )	PORT_DIPLOCATION("DSW1:3,1")
@@ -1535,6 +1633,59 @@ static INPUT_PORTS_START( norautpn )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mainline )
+
+	PORT_INCLUDE( norautrh )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0xa0, 0x20, DEF_STR( Coinage ) )	PORT_DIPLOCATION("DSW1:3,1")
+	PORT_DIPSETTING(    0x00, "A=1; B=10" )
+	PORT_DIPSETTING(    0xa0, "A=1; B=25" )
+	PORT_DIPSETTING(    0x20, "A=10; B=10" )
+	PORT_DIPSETTING(    0x80, "A=50; B=25" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ndxron10 )
+
+	PORT_INCLUDE( norautpn )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x08, "A=1; B=5" )
+	PORT_DIPSETTING(    0x00, "A=1; B=25" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( norautkl )
+
+	PORT_INCLUDE( norautrh )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "Bet Max" )				PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, "25" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Raise Ante" )			PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x00, "Random" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown )  )		PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Type of Game" )			PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x10, "Deluxe Poker" )
+	PORT_DIPSETTING(    0x00, "Joker Poker" )
+	PORT_DIPNAME( 0x20, 0x20, "Min Bet for Jokers" )	PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPNAME( 0x40, 0x00, "Deal Speed")				PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x40, "Slow" )
+	PORT_DIPSETTING(    0x00, "Fast" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x00, "A=5; B=2" )
+	PORT_DIPSETTING(    0x80, "A=1; B=1" )
 INPUT_PORTS_END
 
 
@@ -1637,6 +1788,8 @@ static MACHINE_DRIVER_START( noraut_base )
 	MDRV_CPU_PROGRAM_MAP(norautp_map)
 	MDRV_CPU_IO_MAP(norautp_portmap)
 
+	MDRV_NVRAM_HANDLER(generic_0fill)	/* doesn't work if placed at derivative drivers */
+
 	/* 3x 8255 */
 	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
 	MDRV_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
@@ -1664,15 +1817,15 @@ static MACHINE_DRIVER_START( noraut_base )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+
 static MACHINE_DRIVER_START( norautp )
 	MDRV_IMPORT_FROM(noraut_base)
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-
-	MDRV_NVRAM_HANDLER(generic_0fill)
 MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( norautxp )
 	MDRV_IMPORT_FROM(noraut_base)
@@ -1681,9 +1834,8 @@ static MACHINE_DRIVER_START( norautxp )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(norautxp_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-
-	MDRV_NVRAM_HANDLER(generic_0fill)
 MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( nortest1 )
 	MDRV_IMPORT_FROM(noraut_base)
@@ -1692,8 +1844,26 @@ static MACHINE_DRIVER_START( nortest1 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(nortest1_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+MACHINE_DRIVER_END
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+
+static MACHINE_DRIVER_START( norautx4 )
+	MDRV_IMPORT_FROM(noraut_base)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(norautx4_map)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( norautx8 )
+	MDRV_IMPORT_FROM(noraut_base)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(norautx8_map)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_DRIVER_END
 
 
@@ -1712,6 +1882,7 @@ static MACHINE_DRIVER_START( dphl )
 	MDRV_SOUND_CONFIG_DISCRETE(dphl)
 MACHINE_DRIVER_END
 
+
 static MACHINE_DRIVER_START( dphla )
 	MDRV_IMPORT_FROM(noraut_base)
 
@@ -1724,19 +1895,6 @@ static MACHINE_DRIVER_START( dphla )
 	MDRV_SOUND_CONFIG_DISCRETE(dphl)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( dphlnv )
-	MDRV_IMPORT_FROM(noraut_base)
-
-	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(dphlnv_map)
-
-	MDRV_NVRAM_HANDLER(generic_0fill)
-
-	/* sound hardware */
-	MDRV_SOUND_MODIFY("discrete")
-	MDRV_SOUND_CONFIG_DISCRETE(dphl)
-MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dphltest )
 	MDRV_IMPORT_FROM(noraut_base)
@@ -1745,7 +1903,18 @@ static MACHINE_DRIVER_START( dphltest )
 	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(dphltest_map)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	/* sound hardware */
+	MDRV_SOUND_MODIFY("discrete")
+	MDRV_SOUND_CONFIG_DISCRETE(dphl)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( drhl )
+	MDRV_IMPORT_FROM(noraut_base)
+
+	/* basic machine hardware */
+	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(drhl_map)
 
 	/* sound hardware */
 	MDRV_SOUND_MODIFY("discrete")
@@ -1757,6 +1926,18 @@ MACHINE_DRIVER_END
 *        Rom Load        *
 *************************/
 
+/************************************** Z80 sets **************************************/
+/*  The following ones are 'Draw Poker Hi-Lo' type, running in a Z80 based hardware   */
+/**************************************************************************************/
+
+/*
+
+  Noraut Poker.
+
+  The First one released by Noraut.
+
+*/
+
 ROM_START( norautp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jpoker.bin",	    0x0000,  0x2000,  CRC(e22ed34d) SHA1(108f034335b5bed183ee316a61880f7b9485b34f) )
@@ -1765,29 +1946,49 @@ ROM_START( norautp )
 	ROM_LOAD( "displayrom.bin",	0x00000, 0x10000, CRC(ed3605bd) SHA1(0174e880835815558328789226234e36b673b249) )
 ROM_END
 
-/* Has (c)1983 GTI in the roms, and was called 'Poker.zip'  GFX roms contain 16x16 tiles of cards */
-/* Nothing else is known about this set / game */
+/*
 
-ROM_START( gtipoker )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u12.rom", 0x0000, 0x1000, CRC(abaa257a) SHA1(f830213ae0aaad5a9a44ec77c5a186e9e02fa041) )
-	ROM_LOAD( "u18.rom", 0x1000, 0x1000, CRC(1b7e2877) SHA1(717fb70889804baa468203f20b1e7f73b55cc21e) )
+  Noraut Deluxe Poker (console).
+  From PCB with daghterboard.
 
-	ROM_REGION( 0x1000, "gfx",0 )
-	ROM_LOAD( "u31.rom", 0x0000, 0x1000, CRC(2028db2c) SHA1(0f81bb71e88c60df3817f58c28715ce2ea01ad4d) )
+  ----
+
+  - Noraut deluxe 24 pin z80.bin
+
+  Norauts original or first launch into the market.
+  No Jokers, lose on same card in gamble.
+
+  - Noraut deluxe 24pin console.bin
+
+  Requires daughterboard console in z80 to run.
+  Same as Noraut 24 pin chip with z80, but more stable.
+
+*/
+
+ROM_START( norautdx )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* console version */
+	ROM_LOAD( "noraut_deluxe_24pin_console.bin", 0x0000, 0x1000, CRC(d41bd404) SHA1(52e984ca28a15a1485ca672dd1fef973cf0c7617) )
+	ROM_LOAD( "noraut_deluxe_24pin_z80.bin",     0x1000, 0x0800, CRC(c70bc8f9) SHA1(d947be4e6741f3a884ceca76d1a0fd13625a5f78) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                     0x0000, 0x0800, 0xff )
+	ROM_LOAD( "graphics2716.bin", 0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
 ROM_END
 
 /*
-Poker game - manufacturer unknown
 
-Z80 CPU
+  Poker game - manufacturer unknown.
+  Seems a bootleg of Noraut Deluxe poker.
 
-Program rom = 2764 (2nd Half blank)
-Character rom = 2732
+  Z80 CPU
 
-18.432 Mhz crystal
+  Program rom = 2764 (2nd Half blank)
+  Character rom = 2732
 
-sound probably discrete with ne555 timer chip (located near amp/volume control)
+  18.432 Mhz crystal
+
+  sound discrete with ne555 timer chip (located near amp/volume control).
+
 */
 
 ROM_START( norautpn )
@@ -1799,18 +2000,44 @@ ROM_START( norautpn )
 ROM_END
 
 /*
-Noraut Joker Poker
 
-Program:27C64
-Marked:
-"MX10A JOKER G.L
- N.C.R  C.C  M.S"
+  Noraut Joker Poker (original)
 
-Char:2732
-Marked:
-"N1-057-5"
+  Noraut 4bet joker chip U1 24pin z80.
+  Noraut 4bet joker chip U16 24pin z80.
 
-CPU: TMPZ84C00AP-8
+  ----
+
+  Above two program chips used in old boards
+  with 2x 32k program sockets.
+
+*/
+
+ROM_START( norautjo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "noraut4betjoker.u1",  0x0000, 0x1000, CRC(082f28c6) SHA1(995b991dad50373c8ba9b63002f124b3f87e7889) )
+	ROM_LOAD( "noraut4betjoker.u16", 0x1000, 0x1000, CRC(1452cac3) SHA1(ddc4b195c3bd8a3ff56f5c7da050d6136e442323) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                     0x0000, 0x0800, 0xff )
+	ROM_LOAD( "graphics2716.bin", 0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
+ROM_END
+
+/*
+
+  Noraut Joker Poker
+
+  Program:27C64
+  Marked:
+  "MX10A JOKER G.L
+   N.C.R  C.C  M.S"
+
+  Char:2732
+  Marked:
+  "N1-057-5"
+
+  CPU: TMPZ84C00AP-8
+
 */
 
 ROM_START( norautjp )
@@ -1828,16 +2055,18 @@ ROM_START( norautjp )
 ROM_END
 
 /*
-Noraut Red Hot Joker Poker
-Red hot joker poker scrolls across screen
-and eprom has Red Hot on sticker
-Char:
-Handwritten sticker with "Club250 grapics" on it
 
-Pressing the readout button brings you to a menu with RESET / READOUT
-pressing on Readout brings you to "coins in" and "coins out" and "balance".
+  Noraut Red Hot Joker Poker.
 
-No date info on board or found in rom
+  Red hot joker poker scrolls across screen.
+  Eprom has Red Hot on sticker.
+  Char: Handwritten sticker with "Club250 grapics" on it.
+
+  Pressing the readout button brings you to a menu with RESET / READOUT.
+  Pressing on Readout brings you to "coins in", "coins out" and "balance".
+
+  No date info on board or found in rom.
+
 */
 
 ROM_START( norautrh )
@@ -1849,38 +2078,59 @@ ROM_START( norautrh )
 ROM_END
 
 /*
-Unknown Noraut: "NTX10A  V6"
-None working old noraut board with daughter card upgrade
-daughter card looks like an old upgrade PCB marked:
-"Noraut LTD Game Module"
-half of which is incased in epoxy resin.
-only thing not visble on this board compared to others i have is the cpu
-with is under the epoxy not sure what else is their.
 
-D Card contains:
-Backup Battery
+  Noraut Red Hot 1-bet Joker Poker.
 
-Program Eprom:27C256
-Marked: "NTX10A  V6"
+  Last release of Noraut's Joker Poker. Always have joker with multi change card 
+  and hint card in gamble. Quite popular in Norther Ireland but some operators 
+  have the percentage to payout at less than 10%
+
+*/
+
+ROM_START( norautra )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* Program ROM is 0000-1fff and identical to norautrh, the rest is filled with FF's */
+	ROM_LOAD( "noraut_red_hot_1bet_joker_poker.bin", 0x0000, 0x8000, CRC(f284b574) SHA1(ff683731f3dbdaed5d0d25276ca90b68a422e403) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                     0x0000, 0x0800, 0xff )
+	ROM_LOAD( "graphics2716.bin", 0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
+ROM_END
+
+/*
+
+  Unknown Noraut: "NTX10A  V6"
+  None working old noraut board with daughter card upgrade
+  daughter card looks like an old upgrade PCB marked:
+  "Noraut LTD Game Module"
+  half of which is incased in epoxy resin.
+  only thing not visble on this board compared to others i have is the cpu
+  with is under the epoxy not sure what else is their.
+
+  D Card contains:
+  Backup Battery
+
+  Program Eprom:27C256
+  Marked: "NTX10A  V6"
            "C201"
 
-CPU:
-Unknown Incased in epoxy
+  CPU:
+  Unknown Incased in epoxy
 
-NVRAM: HY6264A
+  NVRAM: HY6264A
 
-PAL:
-PAL16L8ACN
+  PAL:
+  PAL16L8ACN
 
-Charcter Eprom is mounted on main board
-CHAR Eprom:2732
-Marked: "GU27"
+  Charcter Eprom is mounted on main board
+  CHAR Eprom:2732
+  Marked: "GU27"
 
-daughter card is connected on to another card containing only pcb tracks no components
-This second board connects to main board with ribbon cable to the 40pin socket where
-the original cpu would of been.
+  daughter card is connected on to another card containing only pcb tracks no components
+  This second board connects to main board with ribbon cable to the 40pin socket where
+  the original cpu would of been.
 
-No date info on board or found in rom.
+  No date info on board or found in rom.
+
 */
 
 ROM_START( norautu )
@@ -1893,52 +2143,57 @@ ROM_START( norautu )
 ROM_END
 
 
-/*NORAUT V3.010a:
-Board upgraded with daughter card.
-daughter card looks modern and is marked
-"memory expansion module"
-"Unique Ireland"
+/*
 
-D Card contains:
-Backup Battery
+  NORAUT V3.010a.
 
-Program Eprom:27C512
-Marked:
-"G45P A V3.010a GU27
- Euro 27C512 20MAR02"
+  Board upgraded with daughter card.
+  Daughter card looks modern and is marked
+  "memory expansion module"
+  "Unique Ireland"
+
+  D Card contains:
+  Backup Battery
+
+  Program Eprom:27C512
+  Marked:
+  "G45P A V3.010a GU27
+   Euro 27C512 20MAR02"
 
 
-PAL:PAL16l8ANC
-Marked VER.2
+  PAL:PAL16l8ANC
+  Marked VER.2
 
-CPU:
-Zilog
-Z8400APS
-Z80 CPU
+  CPU:
+  Zilog
+  Z8400APS
+  Z80 CPU
 
-NVRAM: 6116
+  NVRAM: 6116
 
-Two jumpers on card , game will not boot if these are removed or placed on other pins
-cabinet beeps and shows grapics on screen. Removing while game is on cause game to freeze.
-Unknown what their for.
+  Two jumpers on card , game will not boot if these are removed or placed on other pins
+  cabinet beeps and shows grapics on screen. Removing while game is on cause game to freeze.
+  Unknown what their for.
 
-Charcter Eprom is mounted on main board
-CHAR Eprom:2716
-Marked "GU27"
+  Charcter Eprom is mounted on main board
+  CHAR Eprom:2716
+  Marked "GU27"
 
-No date info found in rom,  program eprom sticker "Euro 27C512 20MAR02"
-This version contains a hidden menu with lots of differnt options
-to access this menu you must hold the HI and LOW button and press the readout/test switch
-the screen will go blank then you release the 3 buttons and the menu appears.
+  No date info found in rom. Program eprom sticker: "Euro 27C512 20MAR02"
 
-Pressing the readout button brings you to a menu with RESET / READOUT
-pressing on Readout brings you to "coins in" and "coins out" and "balance".
+  This version contains a hidden menu with lots of differnt options
+  to access this menu you must hold the HI and LOW button and press the readout/test switch
+  the screen will go blank then you release the 3 buttons and the menu appears.
 
-The daughter card connects direct to main pcb through 40 pins into original cpu socket
-and 12 pins to one side of original program eprom.
+  Pressing the readout button brings you to a menu with RESET / READOUT
+  Pressing on Readout brings you to "coins in", "coins out" and "balance".
+
+  The daughter card connects direct to main pcb through 40 pins into original cpu socket
+  and 12 pins to one side of original program eprom.
+
 */
 
-ROM_START( norautv3 )
+ROM_START( noraut3a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g45pa.bin", 0x0000, 0x10000, CRC(f966f4d2) SHA1(99c21ceb59664f32fd1269351fa976370d486f2e) )
 
@@ -1949,33 +2204,148 @@ ROM_END
 
 /*
 
-  Draw Poker Hi-Lo (1983).
-  "NYMF O II" hardware.
-  M. Kramer Inc.
+  V3011a 
+  cpu :Z84C0006PEC
+
+  Prog eprom marked
+  G45P A V3.011A GU27
+  EURO 27C512 10NOV03
+
+  char marked "GU27" same asv3010a
+  pal marked "VER 2" same as v3010a
+
+  Everything else the same as v3010a
 
 */
 
-ROM_START( dphl )
+ROM_START( noraut3b )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dphl_6468.u12", 0x0000, 0x1000, CRC(d8c4fe5c) SHA1(6bc745fefb8a3a21ca281d519895828047526de7) )
-	ROM_LOAD( "dphl_36e3.u18", 0x1000, 0x1000, CRC(06cf6789) SHA1(587d883c399348b518e3be4d1dc2581824055328) )
-
-	ROM_REGION( 0x1000,  "gfx", 0 )
-//  ROM_FILL(              0x0000, 0x0800, 0xff )
-	ROM_LOAD( "dphl_model_2_cgi_3939.u31",  0x0000, 0x1000, CRC(2028db2c) SHA1(0f81bb71e88c60df3817f58c28715ce2ea01ad4d) )
-
-	ROM_REGION( 0x0100,  "proms", 0 )
-	ROM_LOAD( "98ce.u51",  0x0000, 0x0100, CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
-ROM_END
-
-ROM_START( dphla )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2b27.u11", 0x0000, 0x0800, CRC(3a7ece95) SHA1(bc7c89e3f490da0723b3a7617ab9a747f8db7ea7) )
-	ROM_LOAD( "4d30.u16", 0x0800, 0x0800, CRC(32594684) SHA1(cda1ed09ec30082d23e690058261523e0d34938e) )
+	ROM_LOAD( "3.011a.bin", 0x0000, 0x10000, CRC(82407395) SHA1(b36ef466d7fbc236f24f70f80bd9cd24ed75f51c) )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_FILL(              0x0000, 0x0800, 0xff )
-	ROM_LOAD( "char.u27",  0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
+	ROM_LOAD( "gu27.bin",  0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
+ROM_END
+
+/*
+
+  Noraut 2 bet joker hard console.
+  From PCB with daghterboard.
+
+  ----
+
+  Requires daughterboard console in z80 to run.
+  Very old program.
+
+*/
+
+ROM_START( norautua )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "noraut_2_bet_joker_hard_console.bin", 0x0000, 0x2000, CRC(dd6b03a2) SHA1(221425534a255e5b8ef83fb567d578c127ba9a90) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                     0x0000, 0x0800, 0xff )
+	ROM_LOAD( "graphics2716.bin", 0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
+ROM_END
+
+/*
+
+  Noraut 4 bet joker console.
+  From PCB with daghterboard.
+
+  ----
+
+  Requires daughterboard console in z80 to run.
+
+*/
+
+ROM_START( norautub )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "noraut_4_bet_joker_console.bin", 0x0000, 0x2000, CRC(abf7725c) SHA1(997c7dbb4c4e5f1cdab28fefd17ab3c88bbc2531) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                     0x0000, 0x0800, 0xff )
+	ROM_LOAD( "graphics2716.bin", 0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
+ROM_END
+
+/*
+
+  Mainline 4 bet joker z80 28pin 60%-75% payout.
+  25% Payout Hard 27c 64K uses normal pal.
+
+*/
+
+ROM_START( mainline )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "25_payout_hard.bin", 0x0000, 0x2000, CRC(0d8a34f0) SHA1(b90c3b1949b7c2108d2202c8a5f1d54de4a572ce) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                     0x0000, 0x0800, 0xff )
+	ROM_LOAD( "graphics2716.bin", 0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
+
+	ROM_REGION( 0x0200,  "plds", 0 )
+	ROM_LOAD( "pal16l8_25.bin",  0x0000, 0x0104, CRC(7d9ab06c) SHA1(0f1936e24f77e95e5c95b50a421473f13929809e) )
+ROM_END
+
+/*
+
+  DellFern 4-bet Joker z80 28pin
+  45%-75% payout.
+
+  Board also made by DellFern.
+  UK company that gone bust many years ago.
+
+*/
+
+ROM_START( df_djpkr )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* Program ROM is 0000-1fff, copied along the 64K of the ROM */
+	ROM_LOAD( "dellfern_4bet_joker_z80_28pin_45-75_payout.bin", 0x0000, 0x10000, CRC(9d150a47) SHA1(da9c0d6632faab685dd061f39b01d8e65793e1e6) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                     0x0000, 0x0800, 0xff )
+	ROM_LOAD( "graphics2716.bin", 0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
+ROM_END
+
+/*
+
+  Deluxe Poker...
+
+  Stickered:
+  AM 42
+  RON 10
+
+  Running in a standard 24-pin sockets
+  Unmodified Noraut board.
+
+  Version 18/04/2005
+  New Gamble Limit=??
+  Message changed to ROYAL ON 10
+  CoinValue1 equ 020H ;DIP SW 2 - OFF
+  CoinValue2 equ 050H ;DIP SW 2 - ON
+
+*/
+
+ROM_START( ndxron10 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "am42_ron10.bin",  0x0000, 0x2000, CRC(7afe5bb6) SHA1(cd3ad96c0de6b58be7507526ff605a9b82894f5c) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "club250.bin",   0x0000, 0x1000, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )
+ROM_END
+
+/*
+
+   CGI - Credit Poker (v.30c, standard)
+
+*/
+
+ROM_START( cgip30cs )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* Program ROM is 0000-3fff, duplicated to fit the ROM size */
+	ROM_LOAD( "cgi_standard_no_bonus_30c_z80_28pin.bin", 0x0000, 0x8000, CRC(7c784964) SHA1(c3deeacc73493939a11dd4cdf0fe07fcd2a9ad8a) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                     0x0000, 0x0800, 0xff )
+	ROM_LOAD( "graphics2716.bin", 0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
 ROM_END
 
 /*
@@ -1994,6 +2364,7 @@ ROM_END
   PROM: tb24s10n (D3) read as 82s129.
 
 */
+
 ROM_START( pma )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pma.e5", 0x0000, 0x1000, CRC(e05ab5b9) SHA1(8bd13e8ed723ac256545f19bef4fa3fe507ab9d5) )
@@ -2010,83 +2381,128 @@ ROM_END
 
 /*
 
-Hi-Lo Double Up Joker Poker
-SMS Manufacturing Corp., 1983.
+  Poker / Black Jack (Model 7521)
 
-almost identical to DPHL.
-Only one different program rom.
-Seems to be patched with 2 extra subroutines.
+  PCB: Etched: KRAMER MFG  PWB - 000 - 40065 REV B
+
+  - 1x Z80 CPU
+  - 3x 8255
+  - 1x 6116 RAM.
+  - 1x Dallas DS1220Y Nonvolatile SRAM.
+  - 1x Xtal 18 MHz.
+  - 3x 8 DIP switches banks.
 
 */
-ROM_START( smshilo )
+
+ROM_START( bjpoker )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u12.bin", 0x0000, 0x1000, CRC(bd9acce8) SHA1(33e7e1805c03a704f9c8785b8e858310bfdc8b10) )
-	ROM_LOAD( "u18.bin", 0x1000, 0x1000, CRC(06cf6789) SHA1(587d883c399348b518e3be4d1dc2581824055328) )
+	ROM_LOAD( "7521-ver.1.u12", 0x0000, 0x2000, CRC(c7b16be0) SHA1(6c875acd4e8468afa1184863a2c6bd7eb086f6e1) )
+	ROM_LOAD( "7521-ver.1.u18", 0x2000, 0x2000, CRC(1eff06cc) SHA1(c2135883e14c156dbfd2f38594a896887acb5d2f) )
+	ROM_LOAD( "7521-ver.1.u19", 0x4000, 0x2000, CRC(cadfe6f4) SHA1(5a0881231fd84e270441973c9d08beee2a176cbc) )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
-	ROM_FILL(            0x0000, 0x0800, 0xff )
-	ROM_LOAD( "u31.bin", 0x0800, 0x0800, CRC(412fc492) SHA1(094ea0ffd0c22274cfe164f07c009ffe022331fd) )
+	ROM_LOAD( "cf7b.u31",  0x0000, 0x1000, CRC(fcfc4d25) SHA1(31455903244ec8ef9005748f265f561b7a082a9c) )
 
 	ROM_REGION( 0x0100,  "proms", 0 )
-	ROM_LOAD( "u51.bin", 0x0000, 0x0100, CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
+	ROM_LOAD( "077b.u51", 0x0000, 0x0100, NO_DUMP )
 ROM_END
 
 /*
 
-  Turbo Poker 2 by Micro MFG.
+  Kimble Poker
+  Older than Noraut stuff...
 
-  - CPU:             1x NEC D8080AFC-1 (U42).
-  - BUS:             1x 8224 (U43)
-  - RAM:             2x 2111-1 Static Random Access Memory 256 x 4 bit (U33 & U34).
-  - I/O:             3x Intel P8255A Peripeheral Interface Adapter (U31, U36 & U38).
-  - Prg ROMs:        1x 27256 (U39).
-  - Gfx ROMs:        1x 2732 (U30).
-  - Sound:           Discrete.
-  - Crystal:         1x 18.000 MHz.
+  - z80 based, with daughterboard.
+  - 8255 weren't initialized.
+  - RAM seems at c000-c7ff
 
 */
-ROM_START( tpoker2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tp2.u39", 0x0000, 0x8000, CRC(543149fe) SHA1(beb61a27c2797341e23e020e754d63fde3b4fbb2) )
+
+ROM_START( kimblejp )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* Program ROM is 0000-6e40 */
+	ROM_LOAD( "jpc525611.bin", 0x0000, 0x8000, CRC(4a3f1aef) SHA1(570ef733989da6e89f0387f1e80b934cec7a7663) )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
-	ROM_LOAD( "tp2.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
+	ROM_FILL(                     0x0000, 0x0800, 0xff )
+	ROM_LOAD( "quizcharll.bin", 0x0800, 0x0800, CRC(4edb4717) SHA1(466556595abfbc11e31f2b0d9ca0213bd649253c) )
+ROM_END
 
-	ROM_REGION( 0x0800,  "other", 0 )
-	ROM_LOAD( "tp2.u44", 0x0000, 0x0800, CRC(6b5453b7) SHA1(6793952800de067fd76b889f4f7c62c8474b8c3a) )
 
-	ROM_REGION( 0x0400,  "proms", 0 )
-	ROM_LOAD( "tp2.u23", 0x0000, 0x0400, CRC(0222124f) SHA1(5cd8d24ee8e6525a5f9e6a93fa8854f36f4319ee) )
+/************************************* i8080 sets *************************************/
+/* The following ones are 'Draw Poker Hi-Lo' type, running in a i8080a based hardware */
+/**************************************************************************************/
 
-	ROM_REGION( 0x0034,  "plds", 0 )
-	ROM_LOAD( "tp2_pld.u37",  0x0000, 0x0034, CRC(25651948) SHA1(62cd4d73c6ca8ea5d4beb9ae262d1383f8149462) )
+/*
+
+  Draw Poker Hi-Lo (1983).
+  "NYMF O II" hardware.
+  M. Kramer Inc.
+
+*/
+
+ROM_START( dphl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dphl_6468.u12", 0x0000, 0x1000, CRC(d8c4fe5c) SHA1(6bc745fefb8a3a21ca281d519895828047526de7) )
+	ROM_LOAD( "dphl_36e3.u18", 0x1000, 0x1000, CRC(06cf6789) SHA1(587d883c399348b518e3be4d1dc2581824055328) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "dphl_model_2_cgi_3939.u31",  0x0000, 0x1000, CRC(2028db2c) SHA1(0f81bb71e88c60df3817f58c28715ce2ea01ad4d) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "98ce.u51",  0x0000, 0x0100, CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
 ROM_END
 
 /*
 
-Etched on top of board in copper: "MADE IN JAPAN".
-Stickered on top: "Serial No. 10147".
+  Draw Poker Hi-Lo (alt).
 
-Orange dot sticker dot near pin 1.
-White dot sticker at other end of connector.
+  PCB silksceened: REV A.
+  PCB MARKED: Solderside "81 16".
+  Component side "J3 018".
 
-.u18    MB8516  read as 2716    stickered   13.
-.u19    MB8516  read as 2716    stickered   11.
-.u12    MB8516  read as 2716    stickered   12.
-.u31    MB8516  read as 2716    stickered   10.
-.u51    6301    read as 82s129
+  U11 2716 EPROM MARKED:"2B27".
+  U16 2716 EPROM MARKED:"4D30".
 
-1x 18.000 Crystal
-1x 8080
-3x 8255
-2x 5101
-1x 8228
-2x 2114
-1x 8 DIP Switches bank.
-
-Mini daughterboard attached.
+  Layout similar to noraut PCB's.
 
 */
+
+ROM_START( dphla )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2b27.u11", 0x0000, 0x0800, CRC(3a7ece95) SHA1(bc7c89e3f490da0723b3a7617ab9a747f8db7ea7) )
+	ROM_LOAD( "4d30.u16", 0x0800, 0x0800, CRC(32594684) SHA1(cda1ed09ec30082d23e690058261523e0d34938e) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(              0x0000, 0x0800, 0xff )
+	ROM_LOAD( "char.u27",  0x0800, 0x0800, CRC(174a5eec) SHA1(44d84a0cf29a0bf99674d95084c905d3bb0445ad) )
+ROM_END
+
+/*
+
+  Etched on top of board in copper: "MADE IN JAPAN".
+  Stickered on top: "Serial No. 10147".
+
+  Orange dot sticker dot near pin 1.
+  White dot sticker at other end of connector.
+
+  .u18    MB8516  read as 2716    stickered   13.
+  .u19    MB8516  read as 2716    stickered   11.
+  .u12    MB8516  read as 2716    stickered   12.
+  .u31    MB8516  read as 2716    stickered   10.
+  .u51    6301    read as 82s129
+
+  1x 18.000 Crystal
+  1x 8080
+  3x 8255
+  2x 5101
+  1x 8228
+  2x 2114
+  1x 8 DIP Switches bank.
+
+  Mini daughterboard attached.
+
+*/
+
 ROM_START( dphljp )	/* close to GTI Poker */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "japan_12.u12", 0x0000, 0x0800, CRC(086a2303) SHA1(900c7241c33a38fb1a791b311e50f7d7f43bb955) )
@@ -2103,66 +2519,228 @@ ROM_START( dphljp )	/* close to GTI Poker */
 	ROM_LOAD( "japan_6301.u51", 0x0000, 0x0100, CRC(88302127) SHA1(aed1273974917673405f1234ab64e6f8b3856c34) )
 ROM_END
 
+/*
+
+  Has (c)1983 GTI in the roms, and was called 'Poker.zip'
+  GFX roms contain 16x16 tiles of cards.
+  Nothing else is known about this set/game.
+
+*/
+
+ROM_START( gtipoker )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u12.rom", 0x0000, 0x1000, CRC(abaa257a) SHA1(f830213ae0aaad5a9a44ec77c5a186e9e02fa041) )
+	ROM_LOAD( "u18.rom", 0x1000, 0x1000, CRC(1b7e2877) SHA1(717fb70889804baa468203f20b1e7f73b55cc21e) )
+
+	ROM_REGION( 0x1000, "gfx",0 )
+	ROM_LOAD( "u31.rom", 0x0000, 0x1000, CRC(2028db2c) SHA1(0f81bb71e88c60df3817f58c28715ce2ea01ad4d) )
+ROM_END
+
+/*
+
+  Hi-Lo Double Up Joker Poker
+  SMS Manufacturing Corp., 1983.
+
+  almost identical to DPHL.
+  Only one different program rom.
+  Seems to be patched with 2 extra subroutines.
+
+*/
+
+ROM_START( smshilo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u12.bin", 0x0000, 0x1000, CRC(bd9acce8) SHA1(33e7e1805c03a704f9c8785b8e858310bfdc8b10) )
+	ROM_LOAD( "u18.bin", 0x1000, 0x1000, CRC(06cf6789) SHA1(587d883c399348b518e3be4d1dc2581824055328) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(            0x0000, 0x0800, 0xff )
+	ROM_LOAD( "u31.bin", 0x0800, 0x0800, CRC(412fc492) SHA1(094ea0ffd0c22274cfe164f07c009ffe022331fd) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "u51.bin", 0x0000, 0x0100, CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
+ROM_END
+
+/*
+
+  DRHL
+  poker looking board
+
+  .u26  2732  stickered DRHL V2.89 U-26
+  .u19  2732  stickered DRHL V2.89 U-19
+  .u12  2732  stickered DRHL V2.89 U-12
+  .u18  2732  stickered DRHL V2.89 U-18
+  .u31  2732  stickered DRHL V1.0  U 31
+  .u51  ampal16l8pc  printed 147-pal
+
+  ROM text showed poker text and
+  COPYRIGHT 1986 DREWS INC.
+  COPYRIGHT 1986 DREW'S DISTRIBUTING INC.
+ 
+*/
+
+ROM_START( drhl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "drhl_v2.89.u12", 0x0000, 0x1000, CRC(a0f63638) SHA1(e8046b4042ca1e203d831de70da2bf940b2094a0) )
+	ROM_LOAD( "drhl_v2.89.u18", 0x1000, 0x1000, CRC(f3590633) SHA1(bb4a186d13b24ffd22e291c8d6c67f5012aa8001) )
+	ROM_LOAD( "drhl_v2.89.u19", 0x2000, 0x1000, CRC(8abd7f40) SHA1(e8e489c670a17d4c48491b94bad1976cbb4742eb) )
+	ROM_LOAD( "drhl_v2.89.u26", 0x3000, 0x1000, CRC(44ae3cdc) SHA1(51090c737873b652ba95435d553fb88fac730892) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "drhl_v1.0.u31",  0x0000, 0x1000, CRC(bbc7c970) SHA1(9268a430764a5ea8ba7cd18944ec254a44d9dff2) )
+
+	ROM_REGION( 0x0200,  "plds", 0 )	/* possible bad dump. fusemap's 1st half is all 1's and 2nd half 0's */
+	ROM_LOAD( "drhl_ampal16l8pc.u51",  0x0000, 0x0104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
+ROM_END
+
+/*
+
+  Turbo Poker 2 by Micro MFG.
+
+  - CPU:             1x NEC D8080AFC-1 (U42).
+  - BUS:             1x 8224 (U43)
+  - RAM:             2x 2111-1 Static Random Access Memory 256 x 4 bit (U33 & U34).
+  - I/O:             3x Intel P8255A Peripeheral Interface Adapter (U31, U36 & U38).
+  - Prg ROMs:        1x 27256 (U39).
+  - Gfx ROMs:        1x 2732 (U30).
+  - Sound:           Discrete.
+  - Crystal:         1x 18.000 MHz.
+
+  - 1x Custom MCU based on 68705.
+
+*/
+
+ROM_START( tpoker2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tp2.u39", 0x0000, 0x8000, CRC(543149fe) SHA1(beb61a27c2797341e23e020e754d63fde3b4fbb2) )
+
+	ROM_REGION( 0x0800,  "mcu", 0 )	/* 68705 */
+	ROM_LOAD( "tp2.u35", 0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "tp2.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
+
+	ROM_REGION( 0x0800,  "other", 0 )
+	ROM_LOAD( "tp2.u44", 0x0000, 0x0800, CRC(6b5453b7) SHA1(6793952800de067fd76b889f4f7c62c8474b8c3a) )
+
+	ROM_REGION( 0x0400,  "proms", 0 )
+	ROM_LOAD( "tp2.u23", 0x0000, 0x0400, CRC(0222124f) SHA1(5cd8d24ee8e6525a5f9e6a93fa8854f36f4319ee) )
+
+	ROM_REGION( 0x0034,  "plds", 0 )
+	ROM_LOAD( "tp2_pld.u37",  0x0000, 0x0034, CRC(25651948) SHA1(62cd4d73c6ca8ea5d4beb9ae262d1383f8149462) )
+ROM_END
+
 
 /**************************
 *       Driver Init       *
 **************************/
 
-/* These are to patch the check for OBF handshake line,
+/* These are to patch the check for /OBF handshake line,
    that seems to be wrong. Otherwise will enter in an infinite loop.
 
   110D: DB C2      in   a,($C2)  ; read from PPI-2, portC. (OBF should be set, but isn't)
   110F: 07         rlca          ; rotate left.
   1110: 30 FB      jr   nc,$110D
 
+  This routine is to shift the handshaked lines, transferring the status
+  from /ACK (bit 6) to /OBF (bit 7).
+
 */
-static DRIVER_INIT( norautrh )
+//static DRIVER_INIT( norautrh )
+//{
+//	UINT8 *ROM = memory_region(machine, "maincpu");
+//	ROM[0x1110] = 0x00;
+//	ROM[0x1111] = 0x00;
+//}
+
+//static DRIVER_INIT( norautpn )
+//{
+//	UINT8 *ROM = memory_region(machine, "maincpu");
+//	ROM[0x0827] = 0x00;
+//	ROM[0x0828] = 0x00;
+//}
+
+//static DRIVER_INIT( norautu )
+//{
+//	UINT8 *ROM = memory_region(machine, "maincpu");
+//	ROM[0x083c] = 0x00;
+//	ROM[0x083d] = 0x00;
+//	ROM[0x083e] = 0x00;
+//}
+
+//static DRIVER_INIT( gtipoker )
+//{
+//	UINT8 *ROM = memory_region(machine, "maincpu");
+//	ROM[0x0cc6] = 0x00;
+//	ROM[0x0cc7] = 0x00;
+//	ROM[0x0cc8] = 0x00;
+//	ROM[0x10a5] = 0x00;
+//	ROM[0x10a6] = 0x00;
+//	ROM[0x10a7] = 0x00;
+//}
+
+//static DRIVER_INIT( dphl )
+//{
+//	UINT8 *ROM = memory_region(machine, "maincpu");
+//	ROM[0x1510] = 0x00;
+//	ROM[0x1511] = 0x00;
+//	ROM[0x1512] = 0x00;
+//}
+
+//static DRIVER_INIT( dphla )
+//{
+//	UINT8 *ROM = memory_region(machine, "maincpu");
+//	ROM[0x0b09] = 0x00;
+//	ROM[0x0b0a] = 0x00;
+//	ROM[0x0b0b] = 0x00;
+//}
+
+static DRIVER_INIT( enc )
 {
-//  UINT8 *ROM = memory_region(machine, "maincpu");
-//  ROM[0x1110] = 0x00;
-//  ROM[0x1111] = 0x00;
+/* Attempt to decrypt the program ROM */
+
+//	UINT8 *rom = memory_region(machine, "maincpu");
+//	UINT8 *buffer;
+//	int size = 0x2000; //memory_region_length(machine, "maincpu");
+//	int start = 0;
+//	int i;
+
+
+//	for (i = start; i < size; i++)
+//	{
+//		rom[i] = rom[i] ^ 0x09 ^ 0xff;
+//		rom[i+1] = rom[i+1] ^ 0xfb ^ 0xff;
+//		rom[i+2] = rom[i+2] ^ 0xb2 ^ 0xff;
+//		rom[i+3] = rom[i+3] ^ 0x60 ^ 0xff;
+//		rom[i+4] = rom[i+4] ^ 0xce ^ 0xff;
+//		rom[i+5] = rom[i+5] ^ 0x44 ^ 0xff;
+//		rom[i+6] = rom[i+6] ^ 0x6e ^ 0xff;
+//		rom[i+7] = rom[i+7] ^ 0x61 ^ 0xff;
+//		rom[i+8] = rom[i+8] ^ 0x37 ^ 0xff;
+//		rom[i+9] = rom[i+9] ^ 0x5e ^ 0xff;
+//		rom[i+10] = rom[i+10] ^ 0xfb ^ 0xff;
+//		rom[i+11] = rom[i+11] ^ 0xc6 ^ 0xff;
+//		rom[i+12] = rom[i+12] ^ 0x1d ^ 0xff;
+//		rom[i+13] = rom[i+13] ^ 0x33 ^ 0xff;
+//		rom[i+14] = rom[i+14] ^ 0x00 ^ 0xff;
+//		rom[i+15] = rom[i+15] ^ 0xff ^ 0xff;
+
+//		i = i + 16;
+//	}
+
+//	buffer = alloc_array_or_die(UINT8, size);
+//	memcpy(buffer, rom, size);
+
+//	free(buffer);
 }
 
-static DRIVER_INIT( norautpn )
+static DRIVER_INIT( deb )
+/* Just for debugging purposes */
+/*   Should be removed soon    */
 {
-//  UINT8 *ROM = memory_region(machine, "maincpu");
-//  ROM[0x0827] = 0x00;
-//  ROM[0x0828] = 0x00;
-}
-
-static DRIVER_INIT( norautu )
-{
-//  UINT8 *ROM = memory_region(machine, "maincpu");
-//  ROM[0x083c] = 0x00;
-//  ROM[0x083d] = 0x00;
-//  ROM[0x083e] = 0x00;
-}
-
-static DRIVER_INIT( gtipoker )
-{
-//  UINT8 *ROM = memory_region(machine, "maincpu");
-//  ROM[0x0cc6] = 0x00;
-//  ROM[0x0cc7] = 0x00;
-//  ROM[0x0cc8] = 0x00;
-//  ROM[0x10a5] = 0x00;
-//  ROM[0x10a6] = 0x00;
-//  ROM[0x10a7] = 0x00;
-}
-
-static DRIVER_INIT( dphl )
-{
-//  UINT8 *ROM = memory_region(machine, "maincpu");
-//  ROM[0x1510] = 0x00;
-//  ROM[0x1511] = 0x00;
-//  ROM[0x1512] = 0x00;
-}
-
-static DRIVER_INIT( dphla )
-{
-//  UINT8 *ROM = memory_region(machine, "maincpu");
-//  ROM[0x0b09] = 0x00;
-//  ROM[0x0b0a] = 0x00;
-//  ROM[0x0b0b] = 0x00;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	ROM[0x02f7] = 0xca;
+	ROM[0x02f8] = 0x18;
+	ROM[0x206c] = 0xff;
 }
 
 
@@ -2170,22 +2748,45 @@ static DRIVER_INIT( dphla )
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT      ROT    COMPANY                      FULLNAME                       FLAGS                  LAYOUT */
-GAMEL( 1988, norautp,  0,       norautp,  norautp,  0,        ROT0, "Noraut Ltd.",               "Noraut Poker",                 0,                     layout_noraut11 )
-GAMEL( 1988, norautjp, norautp, norautp,  norautp,  0,        ROT0, "Noraut Ltd.",               "Noraut Joker Poker",           0,                     layout_noraut11 )
-GAMEL( 1988, norautrh, 0,       norautp,  norautrh, norautrh, ROT0, "Noraut Ltd.",               "Noraut Red Hot Joker Poker",   0,                     layout_noraut12 )
-GAME(  1988, norautu,  0,       norautxp, norautp,  norautu,  ROT0, "Noraut Ltd.",               "Noraut Poker (NTX10A)",        GAME_NOT_WORKING )
-GAME(  1988, norautv3, 0,       norautxp, norautp,  0,        ROT0, "Noraut Ltd.",               "Noraut Joker Poker (V3.010a)", GAME_NOT_WORKING )
-GAME(  1983, pma,      0,       nortest1, norautp,  0,        ROT0, "PMA",                       "PMA Poker",                    GAME_NOT_WORKING )
+/************************************** Z80 sets **************************************/
+/*  The following ones are 'Draw Poker Hi-Lo' type, running in a Z80 based hardware   */
+/**************************************************************************************/
 
-/*The following has everything uncertain, seems a bootleg/hack and doesn't have any identification strings in program rom. */
-GAMEL( 198?, norautpn, norautp, norautp,  norautpn, norautpn, ROT0, "bootleg?",                  "Noraut Poker (bootleg)",       0,                     layout_noraut12 )
+/*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT ROT    COMPANY                      FULLNAME                              FLAGS             LAYOUT */
 
-/* The following ones are 'Draw Poker Hi-Lo', running in a i8080a based hardware */
-GAME(  1983, dphl,     0,       dphl,     norautp,  dphl,     ROT0, "M. Kramer Manufacturing.",  "Draw Poker Hi-Lo (M.Kramer)",  GAME_NOT_WORKING )
-GAME(  1983, dphla,    0,       dphla,    norautp,  dphla,    ROT0, "<unknown>",                 "Draw Poker Hi-Lo (Alt)",       GAME_NOT_WORKING )
+GAMEL( 1988, norautp,  0,       norautp,  norautp,  0,   ROT0, "Noraut Ltd.",               "Noraut Poker",                        0,                layout_noraut11 )
+GAMEL( 198?, norautdx, 0,       norautp,  norautpn, 0,   ROT0, "Noraut Ltd.",               "Noraut Deluxe Poker (console)",       0,                layout_noraut12 )
+GAMEL( 198?, norautpn, norautp, norautp,  norautpn, 0,   ROT0, "bootleg",                   "Noraut Deluxe Poker (bootleg)",       0,                layout_noraut12 )
+GAMEL( 198?, norautjo, 0,       norautp,  mainline, 0,   ROT0, "Noraut Ltd.",               "Noraut Joker Poker (original)",       0,                layout_noraut12 )
+GAMEL( 1988, norautjp, norautp, norautp,  norautp,  0,   ROT0, "Noraut Ltd.",               "Noraut Joker Poker (alt)",            0,                layout_noraut11 )
+GAMEL( 1988, norautrh, 0,       norautp,  norautrh, 0,   ROT0, "Noraut Ltd.",               "Noraut Red Hot Joker Poker",          0,                layout_noraut12 )
+GAMEL( 198?, norautra, 0,       norautp,  norautrh, 0,   ROT0, "Noraut Ltd.",               "Noraut Red Hot Joker Poker (alt HW)", 0,                layout_noraut12 ) // 1-bet?? where??...
+GAME(  1988, norautu,  0,       norautxp, norautp,  0,   ROT0, "Noraut Ltd.",               "Noraut Poker (NTX10A)",               GAME_NOT_WORKING )
+GAME(  2002, noraut3a, 0,       norautxp, norautp,  0,   ROT0, "Noraut Ltd.",               "Noraut Joker Poker (V3.010a)",        GAME_NOT_WORKING )
+GAME(  2003, noraut3b, 0,       norautxp, norautp,  0,   ROT0, "Noraut Ltd.",               "Noraut Joker Poker (V3.011a)",        GAME_NOT_WORKING )
+GAMEL( 198?, norautua, 0,       norautp,  norautp,  enc, ROT0, "Noraut Ltd.",               "Noraut unknown set 1 (console)",      GAME_NOT_WORKING, layout_noraut12 )
+GAMEL( 198?, norautub, 0,       norautp,  norautp,  enc, ROT0, "Noraut Ltd.",               "Noraut unknown set 2 (console)",      GAME_NOT_WORKING, layout_noraut12 )
+GAMEL( 198?, mainline, 0,       norautp,  mainline, 0,   ROT0, "Mainline London",           "Mainline Double Joker Poker",         0,                layout_noraut12 )
+GAMEL( 199?, df_djpkr, 0,       norautp,  mainline, 0,   ROT0, "DellFern Ltd.",             "Double Joker Poker (45%-75% payout)", 0,                layout_noraut12 )
+GAMEL( 2005, ndxron10, 0,       norautp,  ndxron10, 0,   ROT0, "<unknown>",                 "Royal on Ten (Noraut Deluxe hack)",   0,                layout_noraut12 )
+GAMEL( 1999, cgip30cs, 0,       norautx4, norautkl, deb, ROT0, "CGI",                       "Credit Poker (ver.30c, standard)",    0,                layout_noraut12 )
+GAME(  1983, pma,      0,       nortest1, norautp,  0,   ROT0, "PMA",                       "PMA Poker",                           GAME_NOT_WORKING )
+GAMEL( 198?, bjpoker,  0,       norautxp, norautrh, 0,   ROT0, "M. Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",     GAME_NOT_WORKING, layout_noraut12 )
+GAMEL( 198?, kimblejp, 0,       norautx8, norautkl, 0,   ROT0, "Kimble Gaming",             "Kimble Joker Poker",                  GAME_NOT_WORKING, layout_noraut12 )
 
-GAME(  1983, gtipoker, 0,       dphl,     norautp,  gtipoker, ROT0, "GTI Inc",                   "GTI Poker",                    GAME_NOT_WORKING )
-GAME(  1983, dphljp,   0,       dphl,     norautp,  0,        ROT0, "<unknown>",                 "Draw Poker Hi-Lo (Japanese)",  GAME_NOT_WORKING )
-GAME(  1983, smshilo,  0,       dphlnv,   norautp,  0,        ROT0, "SMS Manufacturing Corp.",   "Hi-Lo Double Up Joker Poker ", GAME_NOT_WORKING )
-GAME(  1993, tpoker2,  0,       dphltest, norautp,  0,        ROT0, "Micro Manufacturing, Inc.", "Turbo Poker 2",                GAME_NOT_WORKING )
+
+/************************************* i8080 sets *************************************/
+/* The following ones are 'Draw Poker Hi-Lo' type, running in a i8080a based hardware */
+/**************************************************************************************/
+
+/*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT ROT    COMPANY                      FULLNAME                              FLAGS             LAYOUT */
+
+GAME(  1983, dphl,     0,       dphl,     norautp,  0,   ROT0, "M. Kramer Manufacturing.",  "Draw Poker Hi-Lo (M.Kramer)",         GAME_NOT_WORKING )
+GAME(  1983, dphla,    0,       dphla,    norautp,  0,   ROT0, "<unknown>",                 "Draw Poker Hi-Lo (Alt)",              GAME_NOT_WORKING )
+GAME(  1983, dphljp,   0,       dphl,     norautp,  0,   ROT0, "<unknown>",                 "Draw Poker Hi-Lo (Japanese)",         GAME_NOT_WORKING )
+GAME(  1983, gtipoker, 0,       dphl,     norautp,  0,   ROT0, "GTI Inc",                   "GTI Poker",                           GAME_NOT_WORKING )
+GAME(  1983, smshilo,  0,       dphla,    norautp,  0,   ROT0, "SMS Manufacturing Corp.",   "Hi-Lo Double Up Joker Poker ",        GAME_NOT_WORKING )
+GAME(  1986, drhl,     0,       drhl,     norautp,  0,   ROT0, "Drews Inc.",                "DRHL Poker (v.2.89)",                 GAME_NOT_WORKING )
+
+/* The following one also has a custom 68705 MCU */
+GAME(  1993, tpoker2,  0,       dphltest, norautp,  0,   ROT0, "Micro Manufacturing, Inc.", "Turbo Poker 2",                       GAME_NOT_WORKING )
