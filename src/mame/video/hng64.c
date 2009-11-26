@@ -1416,8 +1416,26 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 	// buriki tm1 = roz
 
 	// my life would be easier if the roz we're talking about for complex zoom wasn't setting this as well
-	//if (!(tileregs & 0x1000)) // floor mode
+	if ((tileregs & 0x1800)==0x1000) // floor mode
 	{
+		/* Floor mode - per pixel simple / complex modes? -- every other line?
+		  (there doesn't seem to be enough data in Buriki for every line at least)
+	    */
+		if ((tileregs&0xf000) == 0x1000)
+		{
+			popmessage("Floor is Active");
+		}
+		else
+		{
+			popmessage("Unknown Floor/Mosaic combo %04x", tileregs&0xf800);
+		}
+	}
+	else
+	{
+		if ((tileregs&0xf000) > 0x1000)
+			popmessage("Tilemap Mosaic? %02x", tileregs>>12);
+		// 0x1000 is set up the buriki 2nd title screen with rotating logo and in fatal fury at various times?
+
 		if (global_tileregs&0x04000000) // globally selects alt scroll register layout???
 		{
 			/* complex zoom mode? */
@@ -1617,17 +1635,6 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 			}
 		}
 	}
-#if 0
-	else
-	{
-		/* Floor mode - per pixel simple / complex modes? -- every other line?
-		  (there doesn't seem to be enough data in Buriki for every line at least)
-	    */
-		popmessage("Floor is Active");
-
-
-	}
-#endif
 }
 
 
@@ -1672,12 +1679,16 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 	// 0940 - samurai shodown 64
 	// 0880 - buriki
 
-	// mmml ?br? ???? ????
+	// mmml dbr? ???? ????
 	// m = mosaic related?  (xrally, l maybe too)
 	// l = floor effects / linescroll enable  (buriki on tilemap1, fatal fury on tilemap3) - also enables for rotating logo on buriki ?!
 	// r = tile size (seems correct)
 	// b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
-
+	// d = floor / mosaic toggle
+	//  when d = 0 then l = floor enable
+	//  when d = 1 then l = lower part of mosaic?
+	//   (buriki one floor vs. 2nd game logo sequence seems a good example)
+	//    could have other meanings too?
 
 
  */
@@ -1686,22 +1697,29 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 
 static UINT32 old_animmask = -1;
 static UINT32 old_animbits = -1;
-static UINT32 old_tileflags0 = -1;
-static UINT32 old_tileflags1 = -1;
+static UINT16 old_tileflags0 = -1;
+static UINT16 old_tileflags1 = -1;
+static UINT16 old_tileflags2 = -1;
+static UINT16 old_tileflags3 = -1;
+
+#define IMPORTANT_DIRTY_TILEFLAG_MASK (0x0600)
 
 VIDEO_UPDATE( hng64 )
 {
 	UINT32 animmask;
 	UINT32 animbits;
-	UINT32 tileflags0, tileflags1;
+	UINT16 tileflags0, tileflags1;
+	UINT16 tileflags2, tileflags3;
 
 	bitmap_fill(bitmap, 0, screen->machine->pens[0]); //<- user selectable pen too?
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0x00);
 
 	animmask = hng64_videoregs[0x0b];
 	animbits = hng64_videoregs[0x0c];
-	tileflags0 = hng64_videoregs[0x02];
-	tileflags1 = hng64_videoregs[0x03];
+	tileflags0 = hng64_videoregs[0x02]>>16;
+	tileflags1 = hng64_videoregs[0x02]&0xffff;
+	tileflags2 = hng64_videoregs[0x03]>>16;
+	tileflags3 = hng64_videoregs[0x03]&0xffff;
 
 	/* if the auto-animation mask or bits have changed search for tiles using them and mark as dirty */
 	if ((old_animmask != animmask) || (old_animbits != animbits))
@@ -1731,18 +1749,28 @@ VIDEO_UPDATE( hng64 )
 		old_animbits = animbits;
 	}
 
-	if (old_tileflags0!=tileflags0)
+	if ((old_tileflags0&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags0&IMPORTANT_DIRTY_TILEFLAG_MASK))
 	{
 		hng64_mark_all_tiles_dirty (0);
-		hng64_mark_all_tiles_dirty (1);
 		old_tileflags0 = tileflags0;
 	}
 
-	if (old_tileflags1!=tileflags1)
+	if ((old_tileflags1&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags1&IMPORTANT_DIRTY_TILEFLAG_MASK))
+	{
+		hng64_mark_all_tiles_dirty (1);
+		old_tileflags1 = tileflags1;
+	}
+
+	if ((old_tileflags2&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags2&IMPORTANT_DIRTY_TILEFLAG_MASK))
 	{
 		hng64_mark_all_tiles_dirty (2);
+		old_tileflags2 = tileflags2;
+	}
+
+	if ((old_tileflags3&IMPORTANT_DIRTY_TILEFLAG_MASK)!=(tileflags3&IMPORTANT_DIRTY_TILEFLAG_MASK))
+	{
 		hng64_mark_all_tiles_dirty (3);
-		old_tileflags1 = tileflags1;
+		old_tileflags3 = tileflags3;
 	}
 
 	// mark all frames as dirty if for some reason we don't trust the above code
@@ -1766,7 +1794,7 @@ VIDEO_UPDATE( hng64 )
 	transition_control(bitmap, cliprect) ;
 #endif
 
-	if (1)
+	if (0)
 		popmessage("%08x %08x %08x %08x %08x", hng64_spriteregs[0], hng64_spriteregs[1], hng64_spriteregs[2], hng64_spriteregs[3], hng64_spriteregs[4]);
 
 	if (0)
