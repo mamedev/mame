@@ -123,13 +123,14 @@ static struct polygon *polys ;
  *   1    | YYYY YYYY YYYY YYYY XXXX XXXX XXXX XXXX | x/y zoom (*)
  *   2    | ---- -zzz zzzz zzzz ---- ---I cccc CCCC | Z-buffer value, 'Inline' chain flag, x/y chain
  *   3    | ---- ---- pppp pppp ---- ---- ---- ---- | palette entry
- *   4    | ---- --fF a??? tttt tttt tttt tttt tttt | flip bits, additive blending, unknown (**), tile number
+ *   4    | mmmm -?fF a??? tttt tttt tttt tttt tttt | mosaic, unknown (**) , flip bits, additive blending, unknown (***), tile number
  *   5    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
  *   6    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
  *   7    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
  *
  * (*) Fatal Fury WA standard elements are 0x1000-0x1000, all the other games sets 0x100-0x100, related to the bit 27 of sprite regs 0?
- * (**) bit 22 is setted on some Fatal Fury WA snow (not all of them), bit 21 is setted on Xrally how to play elements in attract mode
+ * (**) setted by black squares in ranking screen in Samurai Shodown 64 1, sprite disable?
+ * (***) bit 22 is setted on some Fatal Fury WA snow (not all of them), bit 21 is setted on Xrally how to play elements in attract mode
  *
  * Sprite Global Registers
  * -----------------------
@@ -204,6 +205,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		pal =(source[3]&0x00ff0000)>>16;
 		xflip=(source[4]&0x02000000)>>25;
 		yflip=(source[4]&0x01000000)>>24;
+
+		if(source[4]&0xf0000000)
+			printf("%08x\n",source[4]);
 
 //      if (!(source[4] == 0x00000000 || source[4] == 0x000000aa))
 //          mame_printf_debug("unknown : %.8x %.8x %.8x %.8x %.8x %.8x %.8x %.8x \n", source[0], source[1], source[2], source[3],
