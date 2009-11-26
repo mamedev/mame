@@ -120,16 +120,19 @@ static struct polygon *polys ;
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
  *   0    | yyyy yyyy yyyy yyyy xxxx xxxx xxxx xxxx | x/y position
- *   1    | YYYY YYYY YYYY YYYY XXXX XXXX XXXX XXXX | x/y zoom
+ *   1    | YYYY YYYY YYYY YYYY XXXX XXXX XXXX XXXX | x/y zoom (*)
  *   2    | ---- -zzz zzzz zzzz ---- ---I cccc CCCC | Z-buffer value, 'Inline' chain flag, x/y chain
  *   3    | ---- ---- pppp pppp ---- ---- ---- ---- | palette entry
- *   4    | ---- --fF ???? tttt tttt tttt tttt tttt | flip bits, unknown, tile number
+ *   4    | ---- --fF a??? tttt tttt tttt tttt tttt | flip bits, additive blending, unknown (**), tile number
  *   5    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
  *   6    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
  *   7    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
  *
- * Sprite global Video Registers
- * -----------------------------
+ * (*) Fatal Fury WA standard elements are 0x1000-0x1000, all the other games sets 0x100-0x100, related to the bit 27 of sprite regs 0?
+ * (**) bit 22 is setted on some Fatal Fury WA snow (not all of them), bit 21 is setted on Xrally how to play elements in attract mode
+ *
+ * Sprite Global Registers
+ * -----------------------
  *
  * UINT32 | Bits                                    | Use
  *        | 3322 2222 2222 1111 1111 11             |
@@ -140,9 +143,14 @@ static struct polygon *polys ;
  *   3    | ---- ---- ---- ---- ---- ---- ---- ---- |
  *   4    | ---- ---- ---- ---- ---- ---- ---- ---- |
  * (anything else is unknown at the current time)
- */
-
-/* xxxx---- | I think this part of UINT32 2 is interesting as more than just a list end marker (AJG)
+ * Notes:
+ * [0]
+ * 0xf0000000 setted in both Samurai Shodown
+ * 0x08000000 setted by Fatal Fury WA only, zooming mode?
+ * 0x00060000 always setted in all the games
+ * 0x00010000 setted in POST, sprite disable?
+ * [4]
+ * 0x0e0 in Samurai Shodown/Xrally games, 0x1c0 in all the others, zooming factor?
  */
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
