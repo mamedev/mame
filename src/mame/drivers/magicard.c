@@ -105,8 +105,8 @@
   |  |]_____[| |27C4002|                                                                              ___|
   |  |_______| |_______|                               ___________                                    ___|
   |    ___________________                            |RTC2421 A  |                                   ___|
-  |   |   :::::::::::::   |                           |___________|                                  Z___|    
-  |   |___________________|                                                                          |  
+  |   |   :::::::::::::   |                           |___________|                                  Z___|
+  |   |___________________|                                                                          |
   |__________________________________________________________________________________________________|
 
 
@@ -511,8 +511,6 @@ static UINT16 *scc68070_dma_ch1_regs;
 static UINT16 *scc68070_dma_ch2_regs;
 static UINT16 *scc68070_mmu_regs;
 
-//#define ENABLE_CDI_BIOS
-
 static READ16_HANDLER( scc68070_ext_irqc_r ) { return scc68070_ext_irqc_regs[offset]; }
 static WRITE16_HANDLER( scc68070_ext_irqc_w ){ scc68070_ext_irqc_regs[offset] = data; }
 static READ16_HANDLER( scc68070_iic_r )
@@ -727,31 +725,8 @@ static DRIVER_INIT( magicard )
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT  INIT      ROT    COMPANY   FULLNAME                    FLAGS... */
 
-GAME( 199?, magicard,  0,        magicard, 0,     magicard, ROT0, "Impera", "Magic Card (set 1)",        GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 199?, magicarda, magicard, magicard, 0,     magicard, ROT0, "Impera", "Magic Card (set 2)",        GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 199?, magicardb, magicard, magicard, 0,     magicard, ROT0, "Impera", "Magic Card (set 3)",        GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 1998, magicardj, magicard, magicard, 0,     magicard, ROT0, "Impera", "Magic Card Jackpot (4.01)", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2001, magicle,   0,        magicard, 0,     magicard, ROT0, "Impera", "Magic Lotto Export (5.03)", GAME_NO_SOUND | GAME_NOT_WORKING )
-
-
-/*Below here there are CD-I bios defines,to be removed in the end*/
-ROM_START( mcdi200 )
-    ROM_REGION( 0x80000, "maincpu", 0 )
-    ROM_LOAD16_WORD( "mgvx200.rom", 0x000000, 0x80000, CRC(40c4e6b9) SHA1(d961de803c89b3d1902d656ceb9ce7c02dccb40a) )
-ROM_END
-
-ROM_START( pcdi490 )
-    ROM_REGION( 0x80000, "maincpu", 0 )
-    ROM_LOAD16_WORD( "phlp490.rom", 0x000000, 0x80000, CRC(e115f45b) SHA1(f71be031a5dfa837de225081b2ddc8dcb74a0552) )
-ROM_END
-
-ROM_START( pcdi910m )
-    ROM_REGION( 0x80000, "maincpu", 0 )
-    ROM_LOAD16_WORD( "cdi910.rom", 0x000000, 0x80000,  CRC(8ee44ed6) SHA1(3fcdfa96f862b0cb7603fb6c2af84cac59527b05) )
-ROM_END
-
-#ifdef ENABLE_CDI_BIOS
-GAME( 199?, mcdi200, 0,     magicard, 0,     magicard,    ROT0, "Philips", "Magnavox CD-I 200 BIOS", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 199?, pcdi490, 0,     magicard, 0,     magicard,    ROT0, "Philips", "Philips CD-I 490 BIOS", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 199?, pcdi910m,0,     magicard, 0,     magicard,    ROT0, "Philips", "Philips CD-I 910 (Memorex-Tandy) BIOS", GAME_NO_SOUND | GAME_NOT_WORKING )
-#endif
+GAME( 199?, magicard,  0,        magicard, magicard,     magicard, ROT0, "Impera", "Magic Card (set 1)",        GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, magicarda, magicard, magicard, magicard,     magicard, ROT0, "Impera", "Magic Card (set 2)",        GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, magicardb, magicard, magicard, magicard,     magicard, ROT0, "Impera", "Magic Card (set 3)",        GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1998, magicardj, magicard, magicard, magicard,     magicard, ROT0, "Impera", "Magic Card Jackpot (4.01)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2001, magicle,   0,        magicard, magicard,     magicard, ROT0, "Impera", "Magic Lotto Export (5.03)", GAME_NO_SOUND | GAME_NOT_WORKING )
