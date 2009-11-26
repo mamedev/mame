@@ -280,8 +280,31 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		UINT32 zoomx,zoomy;
 		float foomX, foomY;
 		int blend;
+		int disable;
 
-		zbuf = (source[2]&0x07ff0000)>>16;
+
+
+		ypos = (source[0]&0xffff0000)>>16;
+		xpos = (source[0]&0x0000ffff)>>0;
+		xpos += (spriteoffsx);
+		ypos += (spriteoffsy);
+
+		tileno= (source[4]&0x0007ffff);
+		blend=  (source[4]&0x00800000);
+		yflip=  (source[4]&0x01000000)>>24;
+		xflip=  (source[4]&0x02000000)>>25;
+		disable=(source[4]&0x04000000)>>26; // ss64 rankings?
+
+		pal =(source[3]&0x00ff0000)>>16;
+
+		chainy=(source[2]&0x0000000f);
+		chainx=(source[2]&0x000000f0)>>4;
+		chaini=(source[2]&0x00000100);
+		zbuf = (source[2]&0x07ff0000)>>16; //?
+
+		zoomy = (source[1]&0xffff0000)>>16;
+		zoomx = (source[1]&0x0000ffff)>>0;
+
 		#if 1
 		if(zbuf == 0x7ff) //temp kludge to avoid garbage on screen
 		{
@@ -289,24 +312,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			continue;
 		}
 		#endif
+		if(disable)
+		{
+			source+=8;
+			continue;
+		}
 
-		ypos = (source[0]&0xffff0000)>>16;
-		xpos = (source[0]&0x0000ffff)>>0;
-		xpos += (spriteoffsx);
-		ypos += (spriteoffsy);
-
-		tileno=(source[4]&0x0007ffff);
-		blend=(source[4] &0x00800000);
-		chainx=(source[2]&0x000000f0)>>4;
-		chainy=(source[2]&0x0000000f);
-		chaini=(source[2]&0x00000100);
-
-		zoomy = (source[1]&0xffff0000)>>16;
-		zoomx = (source[1]&0x0000ffff)>>0;
-
-		pal =(source[3]&0x00ff0000)>>16;
-		xflip=(source[4]&0x02000000)>>25;
-		yflip=(source[4]&0x01000000)>>24;
 
 //      if (!(source[4] == 0x00000000 || source[4] == 0x000000aa))
 //          mame_printf_debug("unknown : %.8x %.8x %.8x %.8x %.8x %.8x %.8x %.8x \n", source[0], source[1], source[2], source[3],
@@ -1446,10 +1457,11 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 
 			   see 1:32 in http://www.youtube.com/watch?v=PoYaHOILuGs
 
-				the 8x8 tile mode might change how this works as the transitions
-				in fatal fury only cover 1/4 of the screen
+			   Xtreme Rally seems to have an issue with this mode on the communication check
+			   screen at startup, but according to videos that should scroll, and no scroll
+			   values are updated, so it might be an unrelated bug.
 
-			   */
+			*/
 
 			INT32 xtopleft,xmiddle, xalt;
 			INT32 ytopleft,ymiddle, yalt;
@@ -1797,14 +1809,14 @@ VIDEO_UPDATE( hng64 )
 	if (0)
 		popmessage("%08x %08x %08x %08x %08x", hng64_spriteregs[0], hng64_spriteregs[1], hng64_spriteregs[2], hng64_spriteregs[3], hng64_spriteregs[4]);
 
-	if (0)
+	if (1)
     popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x %08x",
     hng64_videoregs[0x00],
     hng64_videoregs[0x01],
-    (hng64_videoregs[0x02]>>16)&0xffff,
-    (hng64_videoregs[0x02]>>0)&0xffff,
-    (hng64_videoregs[0x03]>>16)&0xffff,
-    (hng64_videoregs[0x03]>>0)&0xffff,
+    (hng64_videoregs[0x02]>>16)&0xf9ff,
+    (hng64_videoregs[0x02]>>0)&0xf9ff,
+    (hng64_videoregs[0x03]>>16)&0xf9ff,
+    (hng64_videoregs[0x03]>>0)&0xf9ff,
 	(hng64_videoregs[0x04]>>16)&0xffff,
     (hng64_videoregs[0x04]>>0)&0xffff,
     (hng64_videoregs[0x05]>>16)&0xffff,
