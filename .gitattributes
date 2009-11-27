@@ -2361,6 +2361,7 @@ src/mame/includes/btime.h svneol=native#text/plain
 src/mame/includes/btoads.h svneol=native#text/plain
 src/mame/includes/bublbobl.h svneol=native#text/plain
 src/mame/includes/buggychl.h svneol=native#text/plain
+src/mame/includes/bwing.h svneol=native#text/plain
 src/mame/includes/bzone.h svneol=native#text/plain
 src/mame/includes/canyon.h svneol=native#text/plain
 src/mame/includes/capbowl.h svneol=native#text/plain

@@ -28,50 +28,25 @@ Known issues:
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "bwing.h"
 
-#define BW_DEBUG 0
-
-#define MAX_SOUNDS 16
-
-//****************************************************************************
-// Imports
-
-extern const gfx_layout bwing_tilelayout;
-
-extern WRITE8_HANDLER( bwing_paletteram_w );
-extern WRITE8_HANDLER( bwing_videoram_w );
-extern WRITE8_HANDLER( bwing_spriteram_w );
-extern WRITE8_HANDLER( bwing_scrollreg_w );
-extern WRITE8_HANDLER( bwing_scrollram_w );
-extern READ8_HANDLER( bwing_scrollram_r );
-extern VIDEO_START( bwing );
-extern VIDEO_UPDATE( bwing );
-
-//****************************************************************************
-// Local Vars
-
-static UINT8 sound_fifo[MAX_SOUNDS];
-static UINT8 *bwp123_membase[3], *bwp3_rombase;
-static UINT8 *bwp1_sharedram1, *bwp2_sharedram1;
-static size_t bwp3_romsize;
-static int bwp3_nmimask, bwp3_u8F_d, ffcount, ffhead, fftail;
 
 //****************************************************************************
 // Interrupt Handlers
 
 static INTERRUPT_GEN ( bwp1_interrupt )
 {
-	static int coin = 0;
+	bwing_state *state = (bwing_state *)device->machine->driver_data;
 	UINT8 latch_data;
 
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			if (ffcount)
+			if (state->ffcount)
 			{
-				ffcount--;
-				latch_data = sound_fifo[fftail];
-				fftail = (fftail + 1) & (MAX_SOUNDS - 1);
+				state->ffcount--;
+				latch_data = state->sound_fifo[state->fftail];
+				state->fftail = (state->fftail + 1) & (MAX_SOUNDS - 1);
 				soundlatch_w(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0, latch_data);
 				cputag_set_input_line(device->machine, "audiocpu", DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
 			}
@@ -79,43 +54,75 @@ static INTERRUPT_GEN ( bwp1_interrupt )
 
 		case 1:
 			if (~input_port_read(device->machine, "IN2") & 0x03)
-				{ if (!coin) { coin = 1; cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE); } }
+			{ 
+				if (!state->coin) 
+				{ 
+					state->coin = 1; 
+					cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE); 
+				} 
+			}
 			else
-				coin = 0;
+				state->coin = 0;
 		break;
 
 		case 2:
-			if (input_port_read(device->machine, "IN3")) cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
+			if (input_port_read(device->machine, "IN3")) 
+				cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 		break;
 	}
 }
 
 
-static INTERRUPT_GEN ( bwp3_interrupt ) { if (!bwp3_nmimask) cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE); }
+static INTERRUPT_GEN ( bwp3_interrupt ) 
+{ 
+	bwing_state *state = (bwing_state *)device->machine->driver_data;
+
+	if (!state->bwp3_nmimask) 
+		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE); 
+}
 
 //****************************************************************************
 // Memory and I/O Handlers
 
-static WRITE8_HANDLER( bwp12_sharedram1_w ) { bwp1_sharedram1[offset] = bwp2_sharedram1[offset] = data; }
-static WRITE8_HANDLER( bwp3_u8F_w ) { bwp3_u8F_d = data; } // prepares custom chip for various operations
+static WRITE8_HANDLER( bwp12_sharedram1_w )
+{ 
+	bwing_state *state = (bwing_state *)space->machine->driver_data;
+	state->bwp1_sharedram1[offset] = state->bwp2_sharedram1[offset] = data; 
+}
+
+static WRITE8_HANDLER( bwp3_u8F_w ) 
+{ 
+	bwing_state *state = (bwing_state *)space->machine->driver_data;
+	state->bwp3_u8F_d = data;  // prepares custom chip for various operations
+}
+
+static WRITE8_HANDLER( bwp3_nmimask_w ) 
+{ 
+	bwing_state *state = (bwing_state *)space->machine->driver_data;
+	state->bwp3_nmimask = data & 0x80; 
+}
+
 static WRITE8_HANDLER( bwp3_nmiack_w ) { cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE); }
-static WRITE8_HANDLER( bwp3_nmimask_w ) { bwp3_nmimask = data & 0x80; }
 
 
 static READ8_HANDLER( bwp1_io_r )
 {
+	bwing_state *state = (bwing_state *)space->machine->driver_data;
+
 	if (offset == 0) return(input_port_read(space->machine, "DSW0"));
 	if (offset == 1) return(input_port_read(space->machine, "DSW1"));
 	if (offset == 2) return(input_port_read(space->machine, "IN0"));
 	if (offset == 3) return(input_port_read(space->machine, "IN1"));
 	if (offset == 4) return(input_port_read(space->machine, "IN2"));
 
-	return((bwp123_membase[0])[0x1b00 + offset]);
+	return((state->bwp123_membase[0])[0x1b00 + offset]);
 }
 
 
 static WRITE8_HANDLER( bwp1_ctrl_w )
 {
+	bwing_state *state = (bwing_state *)space->machine->driver_data;
+
 	switch (offset)
 	{
 		// MSSTB
@@ -137,12 +144,11 @@ static WRITE8_HANDLER( bwp1_ctrl_w )
 		case 5:
 			if (data == 0x80) // protection trick to screw CPU1 & 3
 				cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, ASSERT_LINE); // SNMI
-			else
-			if (ffcount < MAX_SOUNDS)
+			else if (state->ffcount < MAX_SOUNDS)
 			{
-				ffcount++;
-				sound_fifo[ffhead] = data;
-				ffhead = (ffhead + 1) & (MAX_SOUNDS - 1);
+				state->ffcount++;
+				state->sound_fifo[state->ffhead] = data;
+				state->ffhead = (state->ffhead + 1) & (MAX_SOUNDS - 1);
 			}
 		break;
 
@@ -154,7 +160,7 @@ static WRITE8_HANDLER( bwp1_ctrl_w )
 	}
 
 	#if BW_DEBUG
-		(bwp123_membase[0])[0x1c00 + offset] = data;
+		(state->bwp123_membase[0])[0x1c00 + offset] = data;
 	#endif
 }
 
@@ -173,7 +179,10 @@ static WRITE8_HANDLER( bwp2_ctrl_w )
 	}
 
 	#if BW_DEBUG
-		(bwp123_membase[1])[0x1800 + offset] = data;
+	{
+		bwing_state *state = (bwing_state *)space->machine->driver_data;
+		(state->bwp123_membase[1])[0x1800 + offset] = data;
+	}
 	#endif
 }
 
@@ -183,12 +192,12 @@ static WRITE8_HANDLER( bwp2_ctrl_w )
 // Main CPU
 static ADDRESS_MAP_START( bwp1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1b00, 0x1b07) AM_READ(bwp1_io_r)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_BASE(&bwp1_sharedram1)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_BASE_MEMBER(bwing_state, bwp1_sharedram1)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(bwing_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(bwing_videoram_w) AM_BASE_MEMBER(bwing_state, videoram)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(bwing_spriteram_w) AM_BASE(&buffered_spriteram)
-	AM_RANGE(0x1a00, 0x1aff) AM_RAM_WRITE(bwing_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0x1a00, 0x1aff) AM_RAM_WRITE(bwing_paletteram_w) AM_BASE_MEMBER(bwing_state, paletteram)
 	AM_RANGE(0x1b00, 0x1b07) AM_RAM_WRITE(bwing_scrollreg_w)
 	AM_RANGE(0x1c00, 0x1c07) AM_RAM_WRITE(bwp1_ctrl_w)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(bwing_scrollram_r, bwing_scrollram_w)
@@ -198,7 +207,7 @@ ADDRESS_MAP_END
 
 // Sub CPU
 static ADDRESS_MAP_START( bwp2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_BASE(&bwp2_sharedram1)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_BASE_MEMBER(bwing_state, bwp2_sharedram1)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1800, 0x1803) AM_WRITE(bwp2_ctrl_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
@@ -216,7 +225,7 @@ static ADDRESS_MAP_START( bwp3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_address_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(bwp3_nmimask_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE(&bwp3_rombase) AM_SIZE(&bwp3_romsize)
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE_MEMBER(bwing_state, bwp3_rombase) AM_SIZE_MEMBER(bwing_state, bwp3_romsize)
 ADDRESS_MAP_END
 
 
@@ -359,15 +368,48 @@ GFXDECODE_END
 //****************************************************************************
 // Hardware Definitions
 
-static MACHINE_RESET( bwing )
+static MACHINE_START( bwing )
 {
-	bwp3_nmimask = 0;
-	fftail = ffhead = ffcount = 0;
+	bwing_state *state = (bwing_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->coin);
+	state_save_register_global(machine, state->palatch);
+	state_save_register_global(machine, state->srbank);
+	state_save_register_global(machine, state->mapmask);
+	state_save_register_global(machine, state->mapflip);
+	state_save_register_global(machine, state->bwp3_nmimask);
+	state_save_register_global(machine, state->bwp3_u8F_d);
+	state_save_register_global(machine, state->ffcount);
+	state_save_register_global(machine, state->ffhead);
+	state_save_register_global(machine, state->fftail);
+
+	state_save_register_global_array(machine, state->sreg);
+	state_save_register_global_array(machine, state->sound_fifo);
 }
 
+static MACHINE_RESET( bwing )
+{
+	bwing_state *state = (bwing_state *)machine->driver_data;
+	int i;
 
+	state->coin = 0;
+	state->palatch = 0;
+	state->srbank = 0; 
+	state->mapmask = 0; 
+	state->mapflip = 0;
+
+	for (i = 0; i < MAX_SOUNDS; i++)
+		state->sound_fifo[i] = 0;
+
+	state->bwp3_nmimask = 0;
+	state->bwp3_u8F_d = 0;
+	state->fftail = state->ffhead = state->ffcount = 0;
+}
 
 static MACHINE_DRIVER_START( bwing )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(bwing_state)
 
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)
@@ -385,6 +427,7 @@ static MACHINE_DRIVER_START( bwing )
 
 	MDRV_QUANTUM_TIME(HZ(18000))		// high enough?
 
+	MDRV_MACHINE_START(bwing)
 	MDRV_MACHINE_RESET(bwing)
 
 	// video hardware
@@ -576,28 +619,31 @@ ROM_END
 //****************************************************************************
 // Initializations
 
-static void fix_bwp3(void)
+static void fix_bwp3( running_machine *machine )
 {
-	UINT8 *rom = bwp3_rombase;
-	int i, j = bwp3_romsize;
+	bwing_state *state = (bwing_state *)machine->driver_data;
+	UINT8 *rom = state->bwp3_rombase;
+	int i, j = state->bwp3_romsize;
 	UINT8 ah, al;
 
 	// swap nibbles
-	for (i=0; i<j; i++) { ah = al = rom[i]; rom[i] = (ah >> 4) | (al << 4); }
+	for (i = 0; i < j; i++) { ah = al = rom[i]; rom[i] = (ah >> 4) | (al << 4); }
 
 	// relocate vectors
-	rom[j-(0x10-0x4)] = rom[j-(0x10-0xb)] = rom[j-(0x10-0x6)];
-	rom[j-(0x10-0x5)] = rom[j-(0x10-0xa)] = rom[j-(0x10-0x7)];
+	rom[j - (0x10 - 0x4)] = rom[j - (0x10 - 0xb)] = rom[j - (0x10 - 0x6)];
+	rom[j - (0x10 - 0x5)] = rom[j - (0x10 - 0xa)] = rom[j - (0x10 - 0x7)];
 }
 
 
 static DRIVER_INIT( bwing )
 {
-	bwp123_membase[0] = memory_region(machine, "maincpu");
-	bwp123_membase[1] = memory_region(machine, "sub");
-	bwp123_membase[2] = memory_region(machine, "audiocpu");
+	bwing_state *state = (bwing_state *)machine->driver_data;
 
-	fix_bwp3();
+	state->bwp123_membase[0] = memory_region(machine, "maincpu");
+	state->bwp123_membase[1] = memory_region(machine, "sub");
+	state->bwp123_membase[2] = memory_region(machine, "audiocpu");
+
+	fix_bwp3(machine);
 }
 
 //****************************************************************************
