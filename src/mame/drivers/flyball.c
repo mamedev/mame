@@ -9,36 +9,118 @@ Atari Flyball Driver
 
 #define MASTER_CLOCK ( XTAL_12_096MHz )
 
-extern VIDEO_START( flyball );
-extern VIDEO_UPDATE( flyball );
 
-extern UINT8 flyball_pitcher_pic;
-extern UINT8 flyball_pitcher_vert;
-extern UINT8 flyball_pitcher_horz;
-extern UINT8 flyball_ball_vert;
-extern UINT8 flyball_ball_horz;
 
-extern UINT8* flyball_playfield_ram;
+typedef struct _flyball_state flyball_state;
+struct _flyball_state
+{
+	/* memory pointers */
+	UINT8 *  rombase;
+	UINT8 *  playfield_ram;
 
-static UINT8 flyball_potmask;
-static UINT8 flyball_potsense;
+	/* video-related */
+	tilemap  *tmap;
+	UINT8    pitcher_vert;
+	UINT8    pitcher_horz;
+	UINT8    pitcher_pic;
+	UINT8    ball_vert;
+	UINT8    ball_horz;
 
-static UINT8 *rombase;
+	/* misc */
+	UINT8    potmask;
+	UINT8    potsense;
+
+	/* devices */
+	const device_config *maincpu;
+};
+
+
+/*************************************
+ *
+ *  Video emulation
+ *
+ *************************************/
+
+static TILEMAP_MAPPER( flyball_get_memory_offset )
+{
+	if (col == 0)
+		col = num_cols;
+
+	return num_cols * (num_rows - row) - col;
+}
+
+
+static TILE_GET_INFO( flyball_get_tile_info )
+{
+	flyball_state *state = (flyball_state *)machine->driver_data;
+	UINT8 data = state->playfield_ram[tile_index];
+	int flags = ((data & 0x40) ? TILE_FLIPX : 0) | ((data & 0x80) ? TILE_FLIPY : 0);
+	int code = data & 63;
+
+	if ((flags & TILE_FLIPX) && (flags & TILE_FLIPY))
+	{
+		code += 64;
+	}
+
+	SET_TILE_INFO(0, code, 0, flags);
+}
+
+
+VIDEO_START( flyball )
+{
+	flyball_state *state = (flyball_state *)machine->driver_data;
+	state->tmap = tilemap_create(machine, flyball_get_tile_info, flyball_get_memory_offset, 8, 16, 32, 16);
+}
+
+
+VIDEO_UPDATE( flyball )
+{
+	flyball_state *state = (flyball_state *)screen->machine->driver_data;
+	int pitcherx = state->pitcher_horz;
+	int pitchery = state->pitcher_vert - 31;
+
+	int ballx = state->ball_horz - 1;
+	int bally = state->ball_vert - 17;
+
+	int x;
+	int y;
+
+	tilemap_mark_all_tiles_dirty(state->tmap);
+
+	/* draw playfield */
+	tilemap_draw(bitmap, cliprect, state->tmap, 0, 0);
+
+	/* draw pitcher */
+	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], state->pitcher_pic ^ 0xf, 0, 1, 0, pitcherx, pitchery, 1);
+
+	/* draw ball */
+
+	for (y = bally; y < bally + 2; y++)
+		for (x = ballx; x < ballx + 2; x++)
+			if (x >= cliprect->min_x &&
+			    x <= cliprect->max_x &&
+			    y >= cliprect->min_y &&
+			    y <= cliprect->max_y)
+				*BITMAP_ADDR16(bitmap, y, x) = 1;
+	return 0;
+}
 
 
 static TIMER_CALLBACK( flyball_joystick_callback )
 {
+	flyball_state *state = (flyball_state *)machine->driver_data;
 	int potsense = param;
 
-	if (potsense & ~flyball_potmask)
-		generic_pulse_irq_line(cputag_get_cpu(machine, "maincpu"), 0);
+	if (potsense & ~state->potmask)
+		generic_pulse_irq_line(state->maincpu, 0);
 
-	flyball_potsense |= potsense;
+	state->potsense |= potsense;
 }
 
 
 static TIMER_CALLBACK( flyball_quarter_callback	)
 {
+	flyball_state *state = (flyball_state *)machine->driver_data;
 	int scanline = param;
 	int potsense[64], i;
 
@@ -58,29 +140,18 @@ static TIMER_CALLBACK( flyball_quarter_callback	)
 
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, flyball_quarter_callback);
 
-	flyball_potsense = 0;
-	flyball_potmask = 0;
+	state->potsense = 0;
+	state->potmask = 0;
 }
 
 
-static MACHINE_RESET( flyball )
-{
-	int i;
-
-	/* address bits 0 through 8 are inverted */
-
-	UINT8* ROM = memory_region(machine, "maincpu") + 0x2000;
-
-	for (i = 0; i < 0x1000; i++)
-		rombase[i] = ROM[i ^ 0x1ff];
-	device_reset(cputag_get_cpu(machine, "maincpu"));
-
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, flyball_quarter_callback);
-}
-
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 /* two physical buttons (start game and stop runner) share the same port bit */
-
 static READ8_HANDLER( flyball_input_r )
 {
 	return input_port_read(space->machine, "IN0") & input_port_read(space->machine, "IN1");
@@ -93,37 +164,44 @@ static READ8_HANDLER( flyball_scanline_r )
 
 static READ8_HANDLER( flyball_potsense_r )
 {
-	return flyball_potsense & ~flyball_potmask;
+	flyball_state *state = (flyball_state *)space->machine->driver_data;
+	return state->potsense & ~state->potmask;
 }
 
 static WRITE8_HANDLER( flyball_potmask_w )
 {
-	flyball_potmask |= data & 0xf;
+	flyball_state *state = (flyball_state *)space->machine->driver_data;
+	state->potmask |= data & 0xf;
 }
 
 static WRITE8_HANDLER( flyball_pitcher_pic_w )
 {
-	flyball_pitcher_pic = data & 0xf;
+	flyball_state *state = (flyball_state *)space->machine->driver_data;
+	state->pitcher_pic = data & 0xf;
 }
 
 static WRITE8_HANDLER( flyball_ball_vert_w )
 {
-	flyball_ball_vert = data;
+	flyball_state *state = (flyball_state *)space->machine->driver_data;
+	state->ball_vert = data;
 }
 
 static WRITE8_HANDLER( flyball_ball_horz_w )
 {
-	flyball_ball_horz = data;
+	flyball_state *state = (flyball_state *)space->machine->driver_data;
+	state->ball_horz = data;
 }
 
 static WRITE8_HANDLER( flyball_pitcher_vert_w )
 {
-	flyball_pitcher_vert = data;
+	flyball_state *state = (flyball_state *)space->machine->driver_data;
+	state->pitcher_vert = data;
 }
 
 static WRITE8_HANDLER( flyball_pitcher_horz_w )
 {
-	flyball_pitcher_horz = data;
+	flyball_state *state = (flyball_state *)space->machine->driver_data;
+	state->pitcher_horz = data;
 }
 
 static WRITE8_HANDLER( flyball_misc_w )
@@ -154,6 +232,12 @@ static WRITE8_HANDLER( flyball_misc_w )
 }
 
 
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
+
 static ADDRESS_MAP_START( flyball_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x100) AM_RAM
@@ -168,10 +252,16 @@ static ADDRESS_MAP_START( flyball_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0900, 0x0900) AM_WRITE(flyball_potmask_w)
 	AM_RANGE(0x0a00, 0x0a07) AM_WRITE(flyball_misc_w)
 	AM_RANGE(0x0b00, 0x0b00) AM_READ(flyball_input_r)
-	AM_RANGE(0x0d00, 0x0eff) AM_WRITE(SMH_RAM) AM_BASE(&flyball_playfield_ram)
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_BASE(&rombase) /* program */
+	AM_RANGE(0x0d00, 0x0eff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(flyball_state, playfield_ram)
+	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_BASE_MEMBER(flyball_state, rombase) /* program */
 ADDRESS_MAP_END
 
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( flyball )
 	PORT_START("IN0") /* IN0 */
@@ -205,6 +295,12 @@ static INPUT_PORTS_START( flyball )
 	PORT_BIT( 0xFE, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 static const gfx_layout flyball_tiles_layout =
 {
@@ -254,13 +350,63 @@ static PALETTE_INIT( flyball )
 }
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( flyball )
+{
+	flyball_state *state = (flyball_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+
+	state_save_register_global(machine, state->pitcher_vert);
+	state_save_register_global(machine, state->pitcher_horz);
+	state_save_register_global(machine, state->pitcher_pic);
+	state_save_register_global(machine, state->ball_vert);
+	state_save_register_global(machine, state->ball_horz);
+	state_save_register_global(machine, state->potmask);
+	state_save_register_global(machine, state->potsense);
+}
+
+static MACHINE_RESET( flyball )
+{
+	flyball_state *state = (flyball_state *)machine->driver_data;
+	int i;
+
+	/* address bits 0 through 8 are inverted */
+	UINT8* ROM = memory_region(machine, "maincpu") + 0x2000;
+
+	for (i = 0; i < 0x1000; i++)
+		state->rombase[i] = ROM[i ^ 0x1ff];
+
+	device_reset(devtag_get_device(machine, "maincpu"));
+
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, flyball_quarter_callback);
+
+	state->pitcher_vert = 0;
+	state->pitcher_horz = 0;
+	state->pitcher_pic = 0;
+	state->ball_vert = 0;
+	state->ball_horz = 0;
+	state->potmask = 0;
+	state->potsense = 0;
+}
+
+
 static MACHINE_DRIVER_START( flyball )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(flyball_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)
 	MDRV_CPU_PROGRAM_MAP(flyball_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
+	MDRV_MACHINE_START(flyball)
 	MDRV_MACHINE_RESET(flyball)
 
 	/* video hardware */
@@ -280,6 +426,12 @@ static MACHINE_DRIVER_START( flyball )
 	/* sound hardware */
 MACHINE_DRIVER_END
 
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( flyball )
 	ROM_REGION( 0x3000, "maincpu", 0 )                  /* program */
@@ -303,5 +455,11 @@ ROM_START( flyball )
 	ROM_LOAD16_BYTE( "6138.f2", 0x0001, 0x0200, CRC(aab314f6) SHA1(6625c719fdc000d6af94bc9474de8f7e977cee97) )
 ROM_END
 
+
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
 
 GAME( 1976, flyball, 0, flyball, flyball, 0, 0, "Atari", "Flyball", GAME_NO_SOUND )

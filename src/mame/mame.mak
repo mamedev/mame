@@ -407,7 +407,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/eprom.o $(VIDEO)/eprom.o \
 	$(DRIVERS)/firefox.o \
 	$(DRIVERS)/firetrk.o $(AUDIO)/firetrk.o $(VIDEO)/firetrk.o \
-	$(DRIVERS)/flyball.o $(VIDEO)/flyball.o \
+	$(DRIVERS)/flyball.o \
 	$(DRIVERS)/foodf.o $(VIDEO)/foodf.o \
 	$(DRIVERS)/gauntlet.o $(VIDEO)/gauntlet.o \
 	$(DRIVERS)/harddriv.o $(MACHINE)/harddriv.o $(AUDIO)/harddriv.o $(VIDEO)/harddriv.o \

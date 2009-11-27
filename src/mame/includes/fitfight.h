@@ -1,14 +1,27 @@
-/*----------- defined in drivers/fitfight.c -----------*/
 
-extern UINT16 *fitfight_spriteram;
-extern UINT16 *fof_700000;
-extern UINT16 *fof_900000;
-extern UINT16 *fof_a00000;
+typedef struct _fitfight_state fitfight_state;
+struct _fitfight_state
+{
+	/* memory pointers */
+	UINT16 *  fof_100000;
+	UINT16 *  fof_600000;
+	UINT16 *  fof_700000;
+	UINT16 *  fof_800000;
+	UINT16 *  fof_900000;
+	UINT16 *  fof_a00000;
+	UINT16 *  fof_bak_tileram;
+	UINT16 *  fof_mid_tileram;
+	UINT16 *  fof_txt_tileram;
+	UINT16 *  spriteram;
+//	UINT16 *  paletteram16;	// currently this uses generic palette handling
 
-extern UINT16 *fof_bak_tileram;
-extern UINT16 *fof_mid_tileram;
-extern UINT16 *fof_txt_tileram;
-extern char bbprot_kludge;
+	/* video-related */
+	tilemap  *fof_bak_tilemap, *fof_mid_tilemap, *fof_txt_tilemap;
+
+	/* misc */
+	int      bbprot_kludge;
+	UINT16   fof_700000_data;
+};
 
 
 /*----------- defined in video/fitfight.c -----------*/
@@ -16,5 +29,6 @@ extern char bbprot_kludge;
 WRITE16_HANDLER( fof_bak_tileram_w );
 WRITE16_HANDLER( fof_mid_tileram_w );
 WRITE16_HANDLER( fof_txt_tileram_w );
+
 VIDEO_START(fitfight);
 VIDEO_UPDATE(fitfight);

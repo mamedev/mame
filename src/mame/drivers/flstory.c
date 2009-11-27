@@ -1,11 +1,11 @@
 /***************************************************************************
 
-The FairyLand Story
+    The FairyLand Story
 
-  added Victorious Nine by BUT
+    added Victorious Nine by BUT
 
-TODO:
-- TA7630 emulation needs filter support (bass sounds from MSM5232 should be about 2 times louder)
+    TODO:
+    - TA7630 emulation needs filter support (bass sounds from MSM5232 should be about 2 times louder)
 
 ***************************************************************************/
 
@@ -18,37 +18,33 @@ TODO:
 #include "sound/dac.h"
 #include "includes/flstory.h"
 
-UINT8 *onna34ro_workram;
-UINT8 *victnine_workram;
-
-static UINT8 snd_data;
-static UINT8 snd_flag;
-
 static READ8_HANDLER( from_snd_r )
 {
-	snd_flag = 0;
-	return snd_data;
+	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	state->snd_flag = 0;
+	return state->snd_data;
 }
 
 static READ8_HANDLER( snd_flag_r )
 {
-	return snd_flag | 0xfd;
+	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	return state->snd_flag | 0xfd;
 }
 
 static WRITE8_HANDLER( to_main_w )
 {
-	snd_data = data;
-	snd_flag = 2;
+	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	state->snd_data = data;
+	state->snd_flag = 2;
 }
-
-
-static int sound_nmi_enable,pending_nmi;
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	if (sound_nmi_enable)
-		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-	else pending_nmi = 1;
+	flstory_state *state = (flstory_state *)machine->driver_data;
+	if (state->sound_nmi_enable)
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	else 
+		state->pending_nmi = 1;
 }
 
 static WRITE8_HANDLER( sound_command_w )
@@ -60,22 +56,24 @@ static WRITE8_HANDLER( sound_command_w )
 
 static WRITE8_HANDLER( nmi_disable_w )
 {
-	sound_nmi_enable = 0;
+	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	state->sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	sound_nmi_enable = 1;
-	if (pending_nmi)
+	flstory_state *state = (flstory_state *)space->machine->driver_data;
+	state->sound_nmi_enable = 1;
+	if (state->pending_nmi)
 	{
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-		pending_nmi = 0;
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->pending_nmi = 0;
 	}
 }
 
 static ADDRESS_MAP_START( flstory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_MEMBER(flstory_state, videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(flstory_mcu_r, flstory_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
@@ -91,8 +89,8 @@ static ADDRESS_MAP_START( flstory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE(&flstory_scrlram)
+	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_MEMBER(flstory_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, scrlram)
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
 	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
@@ -101,7 +99,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( onna34ro_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_MEMBER(flstory_state, videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM	/* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(onna34ro_mcu_r, onna34ro_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
@@ -117,24 +115,25 @@ static ADDRESS_MAP_START( onna34ro_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd805, 0xd805) AM_READ(onna34ro_mcu_status_r)
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE(&flstory_scrlram)
+	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_MEMBER(flstory_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, scrlram)
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
 	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM	AM_BASE(&onna34ro_workram) /* work RAM */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, workram) /* work RAM */
 ADDRESS_MAP_END
 
 static CUSTOM_INPUT( victnine_mcu_status_bit01_r )
 {
-	const address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	flstory_state *state = (flstory_state *)field->port->machine->driver_data;
+	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 
 	return (victnine_mcu_status_r(space, 0) & 3);
 }
 
 static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_MEMBER(flstory_state, videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM	/* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(victnine_mcu_r, victnine_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
@@ -151,82 +150,84 @@ static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 	AM_RANGE(0xd807, 0xd807) AM_READ_PORT("EXTRA_P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE(&flstory_scrlram)
+	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_MEMBER(flstory_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, scrlram)
 	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
 	AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP	/* unknown */
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM	AM_BASE(&victnine_workram) /* work RAM */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, workram) /* work RAM */
 ADDRESS_MAP_END
 
-static int vol_ctrl[16];
 
 static MACHINE_RESET( ta7630 )
 {
+	flstory_state *state = (flstory_state *)machine->driver_data;
 	int i;
 
 	double db			= 0.0;
 	double db_step		= 1.50;	/* 1.50 dB step (at least, maybe more) */
 	double db_step_inc	= 0.125;
-	for (i=0; i<16; i++)
+	for (i = 0; i < 16; i++)
 	{
 		double max = 100.0 / pow(10.0, db/20.0 );
-		vol_ctrl[ 15-i ] = max;
-		/*logerror("vol_ctrl[%x] = %i (%f dB)\n",15-i,vol_ctrl[ 15-i ],db);*/
+		state->vol_ctrl[15 - i] = max;
+		/*logerror("vol_ctrl[%x] = %i (%f dB)\n", 15 - i, state->vol_ctrl[15 - i], db);*/
 		db += db_step;
 		db_step += db_step_inc;
 	}
 
-	/* for (i=0; i<8; i++)
-        logerror("SOUND Chan#%i name=%s\n", i, mixer_get_name(i) ); */
+	/* for (i = 0; i < 8; i++)
+        logerror("SOUND Chan#%i name=%s\n", i, mixer_get_name(i)); */
 /*
   channels 0-2 AY#0
   channels 3,4 MSM5232 group1,group2
 */
 }
 
-static UINT8 snd_ctrl0=0;
-static UINT8 snd_ctrl1=0;
-static UINT8 snd_ctrl2=0;
-static UINT8 snd_ctrl3=0;
-
 static WRITE8_DEVICE_HANDLER( sound_control_0_w )
 {
-	snd_ctrl0 = data & 0xff;
-//  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", snd_ctrl0, snd_ctrl1, snd_ctrl2, snd_ctrl3);
+	flstory_state *state = (flstory_state *)device->machine->driver_data;
+
+	state->snd_ctrl0 = data & 0xff;
+	//  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
 
 	/* this definitely controls main melody voice on 2'-1 and 4'-1 outputs */
-	sound_set_output_gain(device, 0, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group1 from msm5232 */
-	sound_set_output_gain(device, 1, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group1 from msm5232 */
-	sound_set_output_gain(device, 2, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group1 from msm5232 */
-	sound_set_output_gain(device, 3, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group1 from msm5232 */
+	sound_set_output_gain(device, 0, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
+	sound_set_output_gain(device, 1, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
+	sound_set_output_gain(device, 2, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
+	sound_set_output_gain(device, 3, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group1 from msm5232 */
 
 }
 static WRITE8_DEVICE_HANDLER( sound_control_1_w )
 {
-	snd_ctrl1 = data & 0xff;
-//  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", snd_ctrl0, snd_ctrl1, snd_ctrl2, snd_ctrl3);
-	sound_set_output_gain(device, 4, vol_ctrl[ (snd_ctrl1>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
-	sound_set_output_gain(device, 5, vol_ctrl[ (snd_ctrl1>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
-	sound_set_output_gain(device, 6, vol_ctrl[ (snd_ctrl1>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
-	sound_set_output_gain(device, 7, vol_ctrl[ (snd_ctrl1>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
+	flstory_state *state = (flstory_state *)device->machine->driver_data;
+
+	state->snd_ctrl1 = data & 0xff;
+	//  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
+	sound_set_output_gain(device, 4, state->vol_ctrl[(state->snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound_set_output_gain(device, 5, state->vol_ctrl[(state->snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound_set_output_gain(device, 6, state->vol_ctrl[(state->snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound_set_output_gain(device, 7, state->vol_ctrl[(state->snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_2_w )
 {
+	flstory_state *state = (flstory_state *)device->machine->driver_data;
 	int i;
 
-	snd_ctrl2 = data & 0xff;
-//  popmessage("SND2 0=%02x 1=%02x 2=%02x 3=%02x", snd_ctrl0, snd_ctrl1, snd_ctrl2, snd_ctrl3);
+	state->snd_ctrl2 = data & 0xff;
+	//  popmessage("SND2 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
 
-	for (i=0; i<3; i++)
-		sound_set_output_gain (device, i, vol_ctrl[ (snd_ctrl2>>4) & 15 ] / 100.0);	/* ym2149f all */
+	for (i = 0; i < 3; i++)
+		sound_set_output_gain(device, i, state->vol_ctrl[(state->snd_ctrl2 >> 4) & 15] / 100.0);	/* ym2149f all */
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_3_w ) /* unknown */
 {
-	snd_ctrl3 = data & 0xff;
-//  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", snd_ctrl0, snd_ctrl1, snd_ctrl2, snd_ctrl3);
+	flstory_state *state = (flstory_state *)device->machine->driver_data;
+
+	state->snd_ctrl3 = data & 0xff;
+	//  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
 }
 
 
@@ -246,12 +247,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( flstory_m68705_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(flstory_68705_portA_r, flstory_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(flstory_68705_portB_r, flstory_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(flstory_68705_portC_r, flstory_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(flstory_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(flstory_68705_ddrB_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(flstory_68705_ddrC_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(flstory_68705_port_a_r, flstory_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(flstory_68705_port_b_r, flstory_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(flstory_68705_port_c_r, flstory_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(flstory_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(flstory_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(flstory_68705_ddr_c_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -653,7 +654,87 @@ static const msm5232_interface msm5232_config =
 };
 
 
+static MACHINE_START( flstory )
+{
+	flstory_state *state = (flstory_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->mcu = devtag_get_device(machine, "mcu");
+
+	/* video */
+	state_save_register_global(machine, state->char_bank);
+	state_save_register_global(machine, state->palette_bank);
+	state_save_register_global(machine, state->flipscreen);
+	state_save_register_global(machine, state->gfxctrl);
+	/* sound */
+	state_save_register_global(machine, state->snd_data);
+	state_save_register_global(machine, state->snd_flag);
+	state_save_register_global(machine, state->sound_nmi_enable);
+	state_save_register_global(machine, state->pending_nmi);
+	state_save_register_global_array(machine, state->vol_ctrl);
+	state_save_register_global(machine, state->snd_ctrl0);
+	state_save_register_global(machine, state->snd_ctrl1);
+	state_save_register_global(machine, state->snd_ctrl2);
+	state_save_register_global(machine, state->snd_ctrl3);
+	/* mcu */
+	state_save_register_global(machine, state->from_main);
+	state_save_register_global(machine, state->from_mcu);
+	state_save_register_global(machine, state->mcu_sent);
+	state_save_register_global(machine, state->main_sent);
+	state_save_register_global(machine, state->port_a_in);
+	state_save_register_global(machine, state->port_a_out);
+	state_save_register_global(machine, state->ddr_a);
+	state_save_register_global(machine, state->port_b_in);
+	state_save_register_global(machine, state->port_b_out);
+	state_save_register_global(machine, state->ddr_b);
+	state_save_register_global(machine, state->port_c_in);
+	state_save_register_global(machine, state->port_c_out);
+	state_save_register_global(machine, state->ddr_c);
+	state_save_register_global(machine, state->mcu_select);
+}
+
+static MACHINE_RESET( flstory )
+{
+	flstory_state *state = (flstory_state *)machine->driver_data;
+
+	MACHINE_RESET_CALL(ta7630);
+
+	/* video */
+	state->char_bank = 0;
+	state->palette_bank = 0;
+	state->flipscreen = 0;
+	state->gfxctrl = 0;
+	/* sound */
+	state->snd_data = 0;
+	state->snd_flag = 0;
+	state->sound_nmi_enable = 0;
+	state->pending_nmi = 0;
+	state->snd_ctrl0 = 0;
+	state->snd_ctrl1 = 0;
+	state->snd_ctrl2 = 0;
+	state->snd_ctrl3 = 0;
+	/* mcu */
+	state->from_main = 0;
+	state->from_mcu = 0;
+	state->mcu_sent = 0;
+	state->main_sent = 0;
+	state->port_a_in = 0;
+	state->port_a_out = 0;
+	state->ddr_a = 0;
+	state->port_b_in = 0;
+	state->port_b_out = 0;
+	state->ddr_b = 0;
+	state->port_c_in = 0;
+	state->port_c_out = 0;
+	state->ddr_c = 0;
+	state->mcu_select = 0;
+}
+
 static MACHINE_DRIVER_START( flstory )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(flstory_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_10_733MHz/2) /* verified on pcb */
@@ -670,7 +751,8 @@ static MACHINE_DRIVER_START( flstory )
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MDRV_MACHINE_RESET(ta7630)
+	MDRV_MACHINE_START(flstory)
+	MDRV_MACHINE_RESET(flstory)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -713,6 +795,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( onna34ro )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(flstory_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,10733000/2)		/* ??? */
 	MDRV_CPU_PROGRAM_MAP(onna34ro_map)
@@ -727,7 +812,8 @@ static MACHINE_DRIVER_START( onna34ro )
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MDRV_MACHINE_RESET(ta7630)
+	MDRV_MACHINE_START(flstory)
+	MDRV_MACHINE_RESET(flstory)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -770,6 +856,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( victnine )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(flstory_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2)		/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(victnine_map)
@@ -784,7 +873,8 @@ static MACHINE_DRIVER_START( victnine )
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MDRV_MACHINE_RESET(ta7630)
+	MDRV_MACHINE_START(flstory)
+	MDRV_MACHINE_RESET(flstory)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1050,8 +1140,8 @@ ROM_START( victnine )
 ROM_END
 
 
-GAME( 1985, flstory,  0,        flstory,  flstory,  0, ROT180, "Taito", "The FairyLand Story", GAME_IMPERFECT_SOUND )
-GAME( 1985, flstoryj, flstory,  flstory,  flstory,  0, ROT180, "Taito", "The FairyLand Story (Japan)", GAME_IMPERFECT_SOUND )
-GAME( 1985, onna34ro, 0,        onna34ro, onna34ro, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 1)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1985, onna34roa,onna34ro, onna34ro, onna34ro, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 2)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1984, victnine, 0,        victnine, victnine, 0, ROT0,   "Taito", "Victorious Nine", GAME_IMPERFECT_SOUND )
+GAME( 1985, flstory,   0,        flstory,  flstory,  0, ROT180, "Taito", "The FairyLand Story", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1985, flstoryj,  flstory,  flstory,  flstory,  0, ROT180, "Taito", "The FairyLand Story (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1985, onna34ro,  0,        onna34ro, onna34ro, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 1)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1985, onna34roa, onna34ro, onna34ro, onna34ro, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 2)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1984, victnine,  0,        victnine, victnine, 0, ROT0,   "Taito", "Victorious Nine", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

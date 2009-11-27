@@ -7,19 +7,16 @@
 ***************************************************************************/
 
 #include "driver.h"
-
-static int gfx_bank;
-static tilemap *bg_tilemap;
+#include "funkybee.h"
 
 PALETTE_INIT( funkybee )
 {
 	int i;
 
-
 	/* first, the character/sprite palette */
-	for (i = 0;i < 32;i++)
+	for (i = 0; i < 32; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2, r, g, b;
 
 		/* red component */
 		bit0 = (*color_prom >> 0) & 0x01;
@@ -37,35 +34,39 @@ PALETTE_INIT( funkybee )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine, i, MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
 
 WRITE8_HANDLER( funkybee_videoram_w )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	funkybee_state *state = (funkybee_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( funkybee_colorram_w )
 {
-	colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	funkybee_state *state = (funkybee_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( funkybee_gfx_bank_w )
 {
-	if (gfx_bank != (data & 0x01))
+	funkybee_state *state = (funkybee_state *)space->machine->driver_data;
+	if (state->gfx_bank != (data & 0x01))
 	{
-		gfx_bank = data & 0x01;
+		state->gfx_bank = data & 0x01;
 		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 
 WRITE8_HANDLER( funkybee_scroll_w )
 {
-	tilemap_set_scrollx(bg_tilemap, 0, flip_screen_get(space->machine) ? -data : data);
+	funkybee_state *state = (funkybee_state *)space->machine->driver_data;
+	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen_get(space->machine) ? -data : data);
 }
 
 WRITE8_HANDLER( funkybee_flipscreen_w )
@@ -75,10 +76,11 @@ WRITE8_HANDLER( funkybee_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index] + ((colorram[tile_index] & 0x80) << 1);
-	int color = colorram[tile_index] & 0x03;
+	funkybee_state *state = (funkybee_state *)machine->driver_data;
+	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x80) << 1);
+	int color = state->colorram[tile_index] & 0x03;
 
-	SET_TILE_INFO(gfx_bank, code, color, 0);
+	SET_TILE_INFO(state->gfx_bank, code, color, 0);
 }
 
 static TILEMAP_MAPPER( funkybee_tilemap_scan )
@@ -89,23 +91,25 @@ static TILEMAP_MAPPER( funkybee_tilemap_scan )
 
 VIDEO_START( funkybee )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, funkybee_tilemap_scan, 8, 8, 32, 32);
+	funkybee_state *state = (funkybee_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, funkybee_tilemap_scan, 8, 8, 32, 32);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	funkybee_state *state = (funkybee_state *)machine->driver_data;
 	int offs;
 
 	for (offs = 0x0f; offs >= 0; offs--)
 	{
 		int offs2 = offs + 0x1e00;
-		int attr = videoram[offs2];
+		int attr = state->videoram[offs2];
 		int code = (attr >> 2) | ((attr & 2) << 5);
-		int color = colorram[offs2 + 0x10];
+		int color = state->colorram[offs2 + 0x10];
 		int flipx = 0;
 		int flipy = attr & 0x01;
-		int sx = videoram[offs2 + 0x10];
-		int sy = 224 - colorram[offs2];
+		int sx = state->videoram[offs2 + 0x10];
+		int sy = 224 - state->colorram[offs2];
 
 		if (flip_screen_get(machine))
 		{
@@ -113,42 +117,43 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipx = !flipx;
 		}
 
-		drawgfx_transpen(bitmap,cliprect, machine->gfx[2+gfx_bank],
+		drawgfx_transpen(bitmap,cliprect, machine->gfx[2 + state->gfx_bank],
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
 	}
 }
 
-static void draw_columns(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_columns( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	funkybee_state *state = (funkybee_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0x1f;offs >= 0;offs--)
+	for (offs = 0x1f; offs >= 0; offs--)
 	{
 		int const flip = flip_screen_get(machine);
-		int code = videoram[0x1c00 + offs];
-		int color = colorram[0x1f10] & 0x03;
-		int sx = flip ? videoram[0x1f1f] : videoram[0x1f10];
+		int code = state->videoram[0x1c00 + offs];
+		int color = state->colorram[0x1f10] & 0x03;
+		int sx = flip ? state->videoram[0x1f1f] : state->videoram[0x1f10];
 		int sy = offs * 8;
 
 		if (flip)
 			sy = 248 - sy;
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx_bank],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[state->gfx_bank],
 				code, color,
 				flip, flip,
 				sx, sy,0);
 
-		code = videoram[0x1d00 + offs];
-		color = colorram[0x1f11] & 0x03;
-		sx = flip ? videoram[0x1f1e] : videoram[0x1f11];
+		code = state->videoram[0x1d00 + offs];
+		color = state->colorram[0x1f11] & 0x03;
+		sx = flip ? state->videoram[0x1f1e] : state->videoram[0x1f11];
 		sy = offs * 8;
 
 		if (flip)
 			sy = 248 - sy;
 
-		drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx_bank],
+		drawgfx_transpen(bitmap,cliprect,machine->gfx[state->gfx_bank],
 				code, color,
 				flip, flip,
 				sx, sy,0);
@@ -157,7 +162,8 @@ static void draw_columns(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( funkybee )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	funkybee_state *state = (funkybee_state *)screen->machine->driver_data;
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	draw_columns(screen->machine, bitmap, cliprect);
 	return 0;

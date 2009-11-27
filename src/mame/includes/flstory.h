@@ -1,20 +1,55 @@
-/*----------- defined in drivers/flstory.c -----------*/
 
-extern UINT8 *onna34ro_workram;
-extern UINT8 *victnine_workram;
+typedef struct _flstory_state flstory_state;
+struct _flstory_state
+{
+	/* memory pointers */
+	UINT8 *  videoram;
+	UINT8 *  workram;
+	UINT8 *  scrlram;
+	UINT8 *  spriteram;
+//	UINT8 *  paletteram;	// currently this uses generic palette handling
+//	UINT8 *  paletteram_2;	// currently this uses generic palette handling
+
+	/* video-related */
+	tilemap  *bg_tilemap;
+	int      char_bank, palette_bank, flipscreen, gfxctrl;
+
+	/* sound-related */
+	UINT8    snd_data;
+	UINT8    snd_flag;
+	int      sound_nmi_enable, pending_nmi;
+	int      vol_ctrl[16];
+	UINT8    snd_ctrl0;
+	UINT8    snd_ctrl1;
+	UINT8    snd_ctrl2;
+	UINT8    snd_ctrl3;
+
+	/* protection */
+	UINT8    from_main, from_mcu;
+	int      mcu_sent, main_sent;
+	UINT8    port_a_in, port_a_out, ddr_a;
+	UINT8    port_b_in, port_b_out, ddr_b;
+	UINT8    port_c_in, port_c_out, ddr_c;
+	int      mcu_select;
+
+	/* devices */
+	const device_config *maincpu;
+	const device_config *audiocpu;
+	const device_config *mcu;
+};
 
 
 /*----------- defined in machine/flstory.c -----------*/
 
-READ8_HANDLER( flstory_68705_portA_r );
-WRITE8_HANDLER( flstory_68705_portA_w );
-READ8_HANDLER( flstory_68705_portB_r );
-WRITE8_HANDLER( flstory_68705_portB_w );
-READ8_HANDLER( flstory_68705_portC_r );
-WRITE8_HANDLER( flstory_68705_portC_w );
-WRITE8_HANDLER( flstory_68705_ddrA_w );
-WRITE8_HANDLER( flstory_68705_ddrB_w );
-WRITE8_HANDLER( flstory_68705_ddrC_w );
+READ8_HANDLER( flstory_68705_port_a_r );
+WRITE8_HANDLER( flstory_68705_port_a_w );
+READ8_HANDLER( flstory_68705_port_b_r );
+WRITE8_HANDLER( flstory_68705_port_b_w );
+READ8_HANDLER( flstory_68705_port_c_r );
+WRITE8_HANDLER( flstory_68705_port_c_w );
+WRITE8_HANDLER( flstory_68705_ddr_a_w );
+WRITE8_HANDLER( flstory_68705_ddr_b_w );
+WRITE8_HANDLER( flstory_68705_ddr_c_w );
 WRITE8_HANDLER( flstory_mcu_w );
 READ8_HANDLER( flstory_mcu_r );
 READ8_HANDLER( flstory_mcu_status_r );
@@ -27,8 +62,6 @@ READ8_HANDLER( victnine_mcu_status_r );
 
 
 /*----------- defined in video/flstory.c -----------*/
-
-extern UINT8 *flstory_scrlram;
 
 VIDEO_START( flstory );
 VIDEO_UPDATE( flstory );
