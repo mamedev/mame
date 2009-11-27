@@ -139,12 +139,25 @@ INLINE speaker_state *get_safe_token(const device_config *device)
 static DEVICE_START( speaker )
 {
 	speaker_state *sp = get_safe_token(device);
+	const speaker_interface *intf = (const speaker_interface *) device->static_config;
 	int i;
 	double x;
 
 	sp->channel = stream_create(device, 0, 1, device->machine->sample_rate, sp, speaker_sound_update);
-	sp->num_levels = 2;
-	sp->levels = default_levels;
+
+	if (intf != NULL)
+	{
+		assert(intf->num_level > 1);
+		assert(intf->levels != NULL);
+		sp->num_levels = intf->num_level;
+		sp->levels = intf->levels;
+	}
+	else
+	{
+		sp->num_levels = 2;
+		sp->levels = default_levels;
+	}
+
 	sp->level = 0;
 	for (i = 0; i < FILTER_LENGTH; i++)
 		sp->composed_volume[i] = 0;
