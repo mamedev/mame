@@ -5,6 +5,31 @@
 **************************************************************************/
 
 
+typedef struct _dcheese_state dcheese_state;
+struct _dcheese_state
+{
+	/* video-related */
+	UINT16   blitter_color[2];
+	UINT16   blitter_xparam[16];
+	UINT16   blitter_yparam[16];
+	UINT16   blitter_vidparam[32];
+
+	bitmap_t *dstbitmap;
+	emu_timer *blitter_timer;
+
+	/* misc */
+	UINT8    irq_state[5];
+	UINT8    soundlatch_full;
+	UINT8    sound_control;
+	UINT8    sound_msb_latch;
+
+	/* devices */
+	const device_config *maincpu;
+	const device_config *audiocpu;
+	const device_config *bsmt;
+};
+
+
 /*----------- defined in drivers/dcheese.c -----------*/
 
 void dcheese_signal_irq(running_machine *machine, int which);

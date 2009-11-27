@@ -31,7 +31,7 @@
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "machine/ticket.h"
 #include "sound/bsmt2000.h"
 #include "dcheese.h"
@@ -41,38 +41,28 @@
 #define SOUND_OSC	24000000
 
 
-
-/*************************************
- *
- *  Local variables
- *
- *************************************/
-
-static UINT8 irq_state[5];
-static UINT8 soundlatch_full;
-static UINT8 sound_control;
-static UINT8 sound_msb_latch;
-
-
-
 /*************************************
  *
  *  Interrupts
  *
  *************************************/
 
-static void update_irq_state(const device_config *cpu)
+static void update_irq_state( const device_config *cpu )
 {
+	dcheese_state *state = (dcheese_state *)cpu->machine->driver_data;
+
 	int i;
 	for (i = 1; i < 5; i++)
-		cpu_set_input_line(cpu, i, irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(cpu, i, state->irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static IRQ_CALLBACK(irq_callback)
+static IRQ_CALLBACK( irq_callback )
 {
+	dcheese_state *state = (dcheese_state *)device->machine->driver_data;
+
 	/* auto-ack the IRQ */
-	irq_state[irqline] = 0;
+	state->irq_state[irqline] = 0;
 	update_irq_state(device);
 
 	/* vector is 0x40 + index */
@@ -80,10 +70,12 @@ static IRQ_CALLBACK(irq_callback)
 }
 
 
-void dcheese_signal_irq(running_machine *machine, int which)
+void dcheese_signal_irq( running_machine *machine, int which )
 {
-	irq_state[which] = 1;
-	update_irq_state(cputag_get_cpu(machine, "maincpu"));
+	dcheese_state *state = (dcheese_state *)machine->driver_data;
+
+	state->irq_state[which] = 1;
+	update_irq_state(state->maincpu);
 }
 
 
@@ -103,12 +95,18 @@ static INTERRUPT_GEN( dcheese_vblank )
 
 static MACHINE_START( dcheese )
 {
-	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
+	dcheese_state *state = (dcheese_state *)machine->driver_data;
 
-	state_save_register_global_array(machine, irq_state);
-	state_save_register_global(machine, soundlatch_full);
-	state_save_register_global(machine, sound_control);
-	state_save_register_global(machine, sound_msb_latch);
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->bsmt = devtag_get_device(machine, "bsmt");
+
+	cpu_set_irq_callback(state->maincpu, irq_callback);
+
+	state_save_register_global_array(machine, state->irq_state);
+	state_save_register_global(machine, state->soundlatch_full);
+	state_save_register_global(machine, state->sound_control);
+	state_save_register_global(machine, state->sound_msb_latch);
 }
 
 
@@ -121,7 +119,8 @@ static MACHINE_START( dcheese )
 
 static CUSTOM_INPUT( sound_latch_state_r )
 {
-	return soundlatch_full;
+	dcheese_state *state = (dcheese_state *)field->port->machine->driver_data;
+	return state->soundlatch_full;
 }
 
 
@@ -131,9 +130,7 @@ static WRITE16_HANDLER( eeprom_control_w )
 	/* bits $0080-$0010 are probably lamps */
 	if (ACCESSING_BITS_0_7)
 	{
-		eeprom_set_cs_line(~data & 8);
-		eeprom_write_bit(data & 2);
-		eeprom_set_clock_line(data & 4);
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
 		ticket_dispenser_w(space, 0, (data & 1) << 7);
 	}
 }
@@ -141,11 +138,13 @@ static WRITE16_HANDLER( eeprom_control_w )
 
 static WRITE16_HANDLER( sound_command_w )
 {
+	dcheese_state *state = (dcheese_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_0_7)
 	{
 		/* write the latch and set the IRQ */
-		soundlatch_full = 1;
-		cputag_set_input_line(space->machine, "audiocpu", 0, ASSERT_LINE);
+		state->soundlatch_full = 1;
+		cpu_set_input_line(state->audiocpu, 0, ASSERT_LINE);
 		soundlatch_w(space, 0, data & 0xff);
 	}
 }
@@ -160,9 +159,11 @@ static WRITE16_HANDLER( sound_command_w )
 
 static READ8_HANDLER( sound_command_r )
 {
+	dcheese_state *state = (dcheese_state *)space->machine->driver_data;
+
 	/* read the latch and clear the IRQ */
-	soundlatch_full = 0;
-	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
+	state->soundlatch_full = 0;
+	cpu_set_input_line(state->audiocpu, 0, CLEAR_LINE);
 	return soundlatch_r(space, 0);
 }
 
@@ -176,13 +177,14 @@ static READ8_HANDLER( sound_status_r )
 
 static WRITE8_HANDLER( sound_control_w )
 {
-	UINT8 diff = data ^ sound_control;
-	sound_control = data;
+	dcheese_state *state = (dcheese_state *)space->machine->driver_data;
+	UINT8 diff = data ^ state->sound_control;
+	state->sound_control = data;
 
 	/* bit 0x20 = LED */
 	/* bit 0x40 = BSMT2000 reset */
 	if ((diff & 0x40) && (data & 0x40))
-		devtag_reset(space->machine, "bsmt");
+		device_reset(state->bsmt);
 	if (data != 0x40 && data != 0x60)
 		logerror("%04X:sound_control_w = %02X\n", cpu_get_pc(space->cpu), data);
 }
@@ -190,11 +192,13 @@ static WRITE8_HANDLER( sound_control_w )
 
 static WRITE8_DEVICE_HANDLER( bsmt_data_w )
 {
+	dcheese_state *state = (dcheese_state *)device->machine->driver_data;
+
 	/* writes come in pairs; even bytes latch, odd bytes write */
 	if (offset % 2 == 0)
-		sound_msb_latch = data;
+		state->sound_msb_latch = data;
 	else
-		bsmt2000_data_w(device, offset/2, (sound_msb_latch << 8) | data, 0xffff);
+		bsmt2000_data_w(device, offset / 2, (state->sound_msb_latch << 8) | data, 0xffff);
 }
 
 
@@ -252,7 +256,7 @@ static INPUT_PORTS_START( dcheese )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE )		/* says tilt */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_TILT )			/* says test */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 )		/* bump left */
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 )		/* bump right */
@@ -288,6 +292,11 @@ static INPUT_PORTS_START( dcheese )
 	PORT_START("2a000e")
 	PORT_BIT( 0x00ff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_REVERSE
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
 
@@ -299,7 +308,7 @@ static INPUT_PORTS_START( lottof2 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x1f00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 )		/* button */
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 )		/* ticket */
@@ -331,6 +340,11 @@ static INPUT_PORTS_START( lottof2 )
 
 	PORT_START("2a000e")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
 
@@ -342,7 +356,7 @@ static INPUT_PORTS_START( fredmem )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x1f00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_5_PAD)
 	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -376,6 +390,11 @@ static INPUT_PORTS_START( fredmem )
 
 	PORT_START("2a000e")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
 
@@ -388,6 +407,9 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( dcheese )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(dcheese_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MAIN_OSC)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map)
@@ -399,7 +421,7 @@ static MACHINE_DRIVER_START( dcheese )
 
 	MDRV_MACHINE_START(dcheese)
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

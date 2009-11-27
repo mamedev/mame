@@ -7,15 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-
-
-
-UINT8 *firetrap_bg1videoram;
-UINT8 *firetrap_bg2videoram;
-UINT8 *firetrap_fgvideoram;
-
-static tilemap *fg_tilemap, *bg1_tilemap, *bg2_tilemap;
-
+#include "firetrap.h"
 
 
 /***************************************************************************
@@ -47,9 +39,9 @@ PALETTE_INIT( firetrap )
 	int i;
 
 
-	for (i = 0;i < machine->config->total_colors;i++)
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int bit0, bit1, bit2, bit3, r, g, b;
 
 
 		bit0 = (color_prom[i] >> 0) & 0x01;
@@ -68,7 +60,7 @@ PALETTE_INIT( firetrap )
 		bit3 = (color_prom[i + machine->config->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine, i, MAKE_RGB(r,g,b));
 	}
 }
 
@@ -93,10 +85,9 @@ static TILEMAP_MAPPER( get_bg_memory_offset )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code, color;
-
-	code = firetrap_fgvideoram[tile_index];
-	color = firetrap_fgvideoram[tile_index + 0x400];
+	firetrap_state *state = (firetrap_state *)machine->driver_data;
+	int code = state->fgvideoram[tile_index];
+	int color = state->fgvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			0,
 			code | ((color & 0x01) << 8),
@@ -106,10 +97,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 INLINE void get_bg_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index, UINT8 *bgvideoram, int gfx_region)
 {
-	int code, color;
-
-	code = bgvideoram[tile_index];
-	color = bgvideoram[tile_index + 0x100];
+	int code = bgvideoram[tile_index];
+	int color = bgvideoram[tile_index + 0x100];
 	SET_TILE_INFO(
 			gfx_region,
 			code + ((color & 0x03) << 8),
@@ -119,12 +108,14 @@ INLINE void get_bg_tile_info(running_machine *machine, tile_data *tileinfo, int 
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	get_bg_tile_info(machine, tileinfo, tile_index, firetrap_bg1videoram, 1);
+	firetrap_state *state = (firetrap_state *)machine->driver_data;
+	get_bg_tile_info(machine, tileinfo, tile_index, state->bg1videoram, 1);
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	get_bg_tile_info(machine, tileinfo, tile_index, firetrap_bg2videoram, 2);
+	firetrap_state *state = (firetrap_state *)machine->driver_data;
+	get_bg_tile_info(machine, tileinfo, tile_index, state->bg2videoram, 2);
 }
 
 
@@ -136,12 +127,13 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 VIDEO_START( firetrap )
 {
-	fg_tilemap  = tilemap_create(machine, get_fg_tile_info, get_fg_memory_offset, 8, 8,32,32);
-	bg1_tilemap = tilemap_create(machine, get_bg1_tile_info,get_bg_memory_offset,16,16,32,32);
-	bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,get_bg_memory_offset,     16,16,32,32);
+	firetrap_state *state = (firetrap_state *)machine->driver_data;
+	state->fg_tilemap  = tilemap_create(machine, get_fg_tile_info, get_fg_memory_offset, 8, 8, 32, 32);
+	state->bg1_tilemap = tilemap_create(machine, get_bg1_tile_info, get_bg_memory_offset, 16, 16, 32, 32);
+	state->bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, get_bg_memory_offset, 16, 16, 32, 32);
 
-	tilemap_set_transparent_pen(fg_tilemap,0);
-	tilemap_set_transparent_pen(bg1_tilemap,0);
+	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+	tilemap_set_transparent_pen(state->bg1_tilemap, 0);
 }
 
 
@@ -153,53 +145,52 @@ VIDEO_START( firetrap )
 
 WRITE8_HANDLER( firetrap_fgvideoram_w )
 {
-	firetrap_fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap,offset & 0x3ff);
+	firetrap_state *state = (firetrap_state *)space->machine->driver_data;
+	state->fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( firetrap_bg1videoram_w )
 {
-	firetrap_bg1videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg1_tilemap,offset & 0x6ff);
+	firetrap_state *state = (firetrap_state *)space->machine->driver_data;
+	state->bg1videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg1_tilemap, offset & 0x6ff);
 }
 
 WRITE8_HANDLER( firetrap_bg2videoram_w )
 {
-	firetrap_bg2videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg2_tilemap,offset & 0x6ff);
+	firetrap_state *state = (firetrap_state *)space->machine->driver_data;
+	state->bg2videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg2_tilemap, offset & 0x6ff);
 }
 
 
 WRITE8_HANDLER( firetrap_bg1_scrollx_w )
 {
-	static UINT8 scroll[2];
-
-	scroll[offset] = data;
-	tilemap_set_scrollx(bg1_tilemap,0,scroll[0] | (scroll[1] << 8));
+	firetrap_state *state = (firetrap_state *)space->machine->driver_data;
+	state->scroll1_x[offset] = data;
+	tilemap_set_scrollx(state->bg1_tilemap, 0, state->scroll1_x[0] | (state->scroll1_x[1] << 8));
 }
 
 WRITE8_HANDLER( firetrap_bg1_scrolly_w )
 {
-	static UINT8 scroll[2];
-
-	scroll[offset] = data;
-	tilemap_set_scrolly(bg1_tilemap,0,-(scroll[0] | (scroll[1] << 8)));
+	firetrap_state *state = (firetrap_state *)space->machine->driver_data;
+	state->scroll1_y[offset] = data;
+	tilemap_set_scrolly(state->bg1_tilemap, 0, -(state->scroll1_y[0] | (state->scroll1_y[1] << 8)));
 }
 
 WRITE8_HANDLER( firetrap_bg2_scrollx_w )
 {
-	static UINT8 scroll[2];
-
-	scroll[offset] = data;
-	tilemap_set_scrollx(bg2_tilemap,0,scroll[0] | (scroll[1] << 8));
+	firetrap_state *state = (firetrap_state *)space->machine->driver_data;
+	state->scroll2_x[offset] = data;
+	tilemap_set_scrollx(state->bg2_tilemap, 0, state->scroll2_x[0] | (state->scroll2_x[1] << 8));
 }
 
 WRITE8_HANDLER( firetrap_bg2_scrolly_w )
 {
-	static UINT8 scroll[2];
-
-	scroll[offset] = data;
-	tilemap_set_scrolly(bg2_tilemap,0,-(scroll[0] | (scroll[1] << 8)));
+	firetrap_state *state = (firetrap_state *)space->machine->driver_data;
+	state->scroll2_y[offset] = data;
+	tilemap_set_scrolly(state->bg2_tilemap, 0, -(state->scroll2_y[0] | (state->scroll2_y[1] << 8)));
 }
 
 
@@ -209,24 +200,24 @@ WRITE8_HANDLER( firetrap_bg2_scrolly_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	firetrap_state *state = (firetrap_state *)machine->driver_data;
 	int offs;
 
-
-	for (offs = 0;offs < spriteram_size; offs += 4)
+	for (offs = 0; offs < spriteram_size; offs += 4)
 	{
-		int sx,sy,flipx,flipy,code,color;
+		int sx, sy, flipx, flipy, code, color;
 
 
 		/* the meaning of bit 3 of [offs] is unknown */
 
-		sy = spriteram[offs];
-		sx = spriteram[offs + 2];
-		code = spriteram[offs + 3] + 4 * (spriteram[offs + 1] & 0xc0);
-		color = ((spriteram[offs + 1] & 0x08) >> 2) | (spriteram[offs + 1] & 0x01);
-		flipx = spriteram[offs + 1] & 0x04;
-		flipy = spriteram[offs + 1] & 0x02;
+		sy = state->spriteram[offs];
+		sx = state->spriteram[offs + 2];
+		code = state->spriteram[offs + 3] + 4 * (state->spriteram[offs + 1] & 0xc0);
+		color = ((state->spriteram[offs + 1] & 0x08) >> 2) | (state->spriteram[offs + 1] & 0x01);
+		flipx = state->spriteram[offs + 1] & 0x04;
+		flipy = state->spriteram[offs + 1] & 0x02;
 		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
@@ -235,7 +226,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		if (spriteram[offs + 1] & 0x10)	/* double width */
+		if (state->spriteram[offs + 1] & 0x10)	/* double width */
 		{
 			if (flip_screen_get(machine)) sy -= 16;
 
@@ -282,9 +273,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( firetrap )
 {
-	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+	firetrap_state *state = (firetrap_state *)screen->machine->driver_data;
+	tilemap_draw(bitmap, cliprect, state->bg2_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg1_tilemap, 0, 0);
+	draw_sprites(screen->machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;
 }
