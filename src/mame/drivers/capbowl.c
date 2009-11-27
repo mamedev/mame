@@ -346,10 +346,6 @@ static const ym2203_interface ym2203_config =
 static MACHINE_START( capbowl )
 {
 	capbowl_state *state = (capbowl_state *)machine->driver_data;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	/* configure ROM banks in 0x0000-0x3fff */
-	memory_configure_bank(machine, 1, 0, 6, &ROM[0x10000], 0x4000);
 
 	state_save_register_global(machine, state->blitter_addr);
 	state_save_register_global(machine, state->last_trackball_val[0]);

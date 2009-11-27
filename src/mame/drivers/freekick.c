@@ -33,30 +33,7 @@ TODO:
 #include "machine/8255ppi.h"
 #include "machine/mc8123.h"
 #include "sound/sn76496.h"
-
-
-extern UINT8 *freek_videoram;
-
-VIDEO_START(freekick);
-VIDEO_UPDATE(gigas);
-VIDEO_UPDATE(pbillrd);
-VIDEO_UPDATE(freekick);
-WRITE8_HANDLER( freek_videoram_w );
-
-
-
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-static int oigas_inval,oigas_outval,oigas_cnt;//oigas
-static int romaddr;
-static int spinner;
-static int nmi_en;
-static int ff_data;
-
+#include "freekick.h"
 
 
 /*************************************
@@ -81,17 +58,14 @@ static WRITE8_HANDLER( coin_w )
 
 static WRITE8_HANDLER( spinner_select_w )
 {
-	spinner = data & 1;
+	freekick_state *state = (freekick_state *)space->machine->driver_data;
+	state->spinner = data & 1;
 }
 
 static READ8_HANDLER( spinner_r )
 {
-	return input_port_read(space->machine, spinner ? "IN3" : "IN2");
-}
-
-static MACHINE_RESET( pbillrd )
-{
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	freekick_state *state = (freekick_state *)space->machine->driver_data;
+	return input_port_read(space->machine, state->spinner ? "IN3" : "IN2");
 }
 
 static WRITE8_HANDLER( pbillrd_bankswitch_w )
@@ -101,73 +75,83 @@ static WRITE8_HANDLER( pbillrd_bankswitch_w )
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	nmi_en = data & 1;
+	freekick_state *state = (freekick_state *)space->machine->driver_data;
+	state->nmi_en = data & 1;
 }
 
 static INTERRUPT_GEN( freekick_irqgen )
 {
-	if (nmi_en) cpu_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
+	freekick_state *state = (freekick_state *)device->machine->driver_data;
+	if (state->nmi_en) 
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_HANDLER(oigas_5_w)
+static WRITE8_HANDLER( oigas_5_w )
 {
-	if(data>0xc0&&data<0xe0)oigas_cnt=1;
-	switch(oigas_cnt)
+	freekick_state *state = (freekick_state *)space->machine->driver_data;
+	if (data > 0xc0 && data < 0xe0)
+		state->cnt = 1;
+
+	switch (state->cnt)
 	{
-	  case 1: oigas_inval=data<<8;break;
-	  case 2: oigas_inval|=data;break;
+		case 1: state->inval = data << 8  ; break;
+		case 2: state->inval |= data      ; break;
 	}
 }
 
-static READ8_HANDLER(oigas_3_r)
+static READ8_HANDLER( oigas_3_r )
 {
-	switch(++oigas_cnt)
+	freekick_state *state = (freekick_state *)space->machine->driver_data;
+	switch (++state->cnt)
 	{
-	  case 2: return ~(oigas_inval>>8);
-	  case 3: return ~(oigas_inval&0xff);
-	  case 4: switch(oigas_inval)
-	  {
-	    case 0xc500: oigas_outval=0x17ef;break;
-	    case 0xc520:
-	    case 0xc540: oigas_outval=0x19c1;break;
-	    case 0xc560: oigas_outval=0x1afc;break;
-	    case 0xc580:
-	    case 0xc5a0:
-	    case 0xc5c0: oigas_outval=0x1f28;break;
-	    case 0xc680: oigas_outval=0x2e8a;break;
-	    case 0xc5e0:
-	    case 0xc600:
-	    case 0xc620:
-	    case 0xc640:
-	    case 0xc660: oigas_outval=0x25cc;break;
-	    case 0xc6c0:
-	    case 0xc6e0: oigas_outval=0x09d7;break;
-	    case 0xc6a0: oigas_outval=0x3168;break;
-	    case 0xc720: oigas_outval=0x2207;break;
-     	    case 0xc700: oigas_outval=0x0e34;break;
-	    case 0xc710: oigas_outval=0x0fdd;break;
-	    case 0xc4f0: oigas_outval=0x05b6;break;
-	    case 0xc4e0: oigas_outval=0xae1e;break;
+	case 2: return ~(state->inval >> 8);
+	case 3: return ~(state->inval & 0xff);
+	case 4: 
+		switch (state->inval)
+		{
+		case 0xc500: state->outval = 0x17ef; break;
+		case 0xc520:
+		case 0xc540: state->outval = 0x19c1; break;
+		case 0xc560: state->outval = 0x1afc; break;
+		case 0xc580:
+		case 0xc5a0:
+		case 0xc5c0: state->outval = 0x1f28; break;
+		case 0xc680: state->outval = 0x2e8a; break;
+		case 0xc5e0:
+		case 0xc600:
+		case 0xc620:
+		case 0xc640:
+		case 0xc660: state->outval = 0x25cc; break;
+		case 0xc6c0:
+		case 0xc6e0: state->outval = 0x09d7; break;
+		case 0xc6a0: state->outval = 0x3168; break;
+		case 0xc720: state->outval = 0x2207; break;
+		case 0xc700: state->outval = 0x0e34; break;
+		case 0xc710: state->outval = 0x0fdd; break;
+		case 0xc4f0: state->outval = 0x05b6; break;
+		case 0xc4e0: state->outval = 0xae1e; break;
 	   }
-	   return oigas_outval>>8;
-	   case 5: oigas_cnt=0;return oigas_outval&0xff;
+	   return state->outval>>8;
+	case 5: state->cnt=0;return state->outval&0xff;
 	}
 	return 0;
 }
 
-static READ8_HANDLER(oigas_2_r)
+static READ8_HANDLER( oigas_2_r )
 {
 	return 1;
 }
 
-static READ8_HANDLER (freekick_ff_r)
+static READ8_HANDLER( freekick_ff_r )
 {
-	return ff_data;
+	freekick_state *state = (freekick_state *)space->machine->driver_data;
+	return state->ff_data;
 }
 
-static WRITE8_HANDLER (freekick_ff_w)
+static WRITE8_HANDLER( freekick_ff_w )
 {
-	ff_data = data;
+	freekick_state *state = (freekick_state *)space->machine->driver_data;
+	state->ff_data = data;
 }
 
 
@@ -182,8 +166,8 @@ static ADDRESS_MAP_START( pbillrd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE(&freek_videoram)
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE_MEMBER(freekick_state, videoram)
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_MEMBER(freekick_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd900, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0")
 	AM_RANGE(0xe000, 0xe001) AM_WRITE(flipscreen_w)
@@ -201,8 +185,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( freekckb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE(&freek_videoram)	// tilemap
-	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)		// sprites
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE_MEMBER(freekick_state, videoram)	// tilemap
+	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE_MEMBER(freekick_state, spriteram) AM_SIZE(&spriteram_size)		// sprites
 	AM_RANGE(0xec00, 0xec03) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("IN0") AM_WRITE(flipscreen_w)
@@ -221,8 +205,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gigas_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE(&freek_videoram)
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE_MEMBER(freekick_state, videoram)
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_MEMBER(freekick_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd900, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0") AM_WRITENOP // probably not flipscreen
 	AM_RANGE(0xe002, 0xe003) AM_WRITE(coin_w)
@@ -265,8 +249,6 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( pbillrd )
-
-
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -350,14 +332,13 @@ static INPUT_PORTS_START( pbillrd )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gigas )
+	PORT_INCLUDE( pbillrd )
 
 	PORT_START("IN2")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_REVERSE
 
 	PORT_START("IN3")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_REVERSE PORT_COCKTAIL
-
-	PORT_INCLUDE( pbillrd )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
@@ -390,7 +371,6 @@ static INPUT_PORTS_START( gigasm2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( freekck )
-
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x01, "3" )
@@ -533,17 +513,20 @@ INPUT_PORTS_END
 
 static WRITE8_DEVICE_HANDLER( snd_rom_addr_l_w )
 {
-	romaddr = (romaddr & 0xff00) | data;
+	freekick_state *state = (freekick_state *)device->machine->driver_data;
+	state->romaddr = (state->romaddr & 0xff00) | data;
 }
 
 static WRITE8_DEVICE_HANDLER( snd_rom_addr_h_w )
 {
-	romaddr = (romaddr & 0x00ff) | (data << 8);
+	freekick_state *state = (freekick_state *)device->machine->driver_data;
+	state->romaddr = (state->romaddr & 0x00ff) | (data << 8);
 }
 
 static READ8_DEVICE_HANDLER( snd_rom_r )
 {
-	return memory_region(device->machine, "user1")[romaddr & 0x7fff];
+	freekick_state *state = (freekick_state *)device->machine->driver_data;
+	return memory_region(device->machine, "user1")[state->romaddr & 0x7fff];
 }
 
 static const ppi8255_interface ppi8255_intf[2] =
@@ -611,14 +594,64 @@ GFXDECODE_END
  *
  *************************************/
 
+static MACHINE_START( freekick )
+{
+	freekick_state *state = (freekick_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->romaddr);
+	state_save_register_global(machine, state->spinner);
+	state_save_register_global(machine, state->nmi_en);
+	state_save_register_global(machine, state->ff_data);
+}
+
+static MACHINE_RESET( freekick )
+{
+	freekick_state *state = (freekick_state *)machine->driver_data;
+
+	state->romaddr = 0;
+	state->spinner = 0;
+	state->nmi_en = 0;
+	state->ff_data = 0;
+}
+
+static MACHINE_START( pbillrd )
+{
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+
+	MACHINE_START_CALL(freekick);
+}
+
+static MACHINE_START( oigas )
+{
+	freekick_state *state = (freekick_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->inval);
+	state_save_register_global(machine, state->outval);
+	state_save_register_global(machine, state->cnt);
+
+	MACHINE_START_CALL(freekick);
+}
+
+static MACHINE_RESET( oigas )
+{
+	freekick_state *state = (freekick_state *)machine->driver_data;
+
+	MACHINE_RESET_CALL(freekick);
+
+	state->inval = 0;
+	state->outval = 0;
+	state->cnt = 0;
+}
+
 static MACHINE_DRIVER_START( base )
+	MDRV_DRIVER_DATA(freekick_state)
+
 	MDRV_CPU_ADD("maincpu",Z80, 18432000/6)	//confirmed
 	MDRV_CPU_PROGRAM_MAP(pbillrd_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 50*3) //??
 	MDRV_CPU_VBLANK_INT("screen", freekick_irqgen)
 
 	MDRV_GFXDECODE(freekick)
-
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -652,7 +685,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pbillrd )
 	MDRV_IMPORT_FROM(base)
 
-	MDRV_MACHINE_RESET(pbillrd)
+	MDRV_MACHINE_START(pbillrd)
+	MDRV_MACHINE_RESET(freekick)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( freekckb )
@@ -661,6 +695,9 @@ static MACHINE_DRIVER_START( freekckb )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(freekckb_map)
 	MDRV_CPU_IO_MAP(freekckb_io_map)
+
+	MDRV_MACHINE_START(freekick)
+	MDRV_MACHINE_RESET(freekick)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
@@ -675,6 +712,9 @@ static MACHINE_DRIVER_START( gigas )
 	MDRV_CPU_PROGRAM_MAP(gigas_map)
 	MDRV_CPU_IO_MAP(gigas_io_map)
 
+	MDRV_MACHINE_START(freekick)
+	MDRV_MACHINE_RESET(freekick)
+
 	MDRV_VIDEO_UPDATE(gigas)
 MACHINE_DRIVER_END
 
@@ -682,6 +722,9 @@ static MACHINE_DRIVER_START( oigas )
 	MDRV_IMPORT_FROM(gigas)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(oigas_io_map)
+
+	MDRV_MACHINE_START(oigas)
+	MDRV_MACHINE_RESET(oigas)
 MACHINE_DRIVER_END
 
 
@@ -1092,16 +1135,16 @@ static DRIVER_INIT( gigas )
  *
  *************************************/
 /*    YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT     COMPANY   FULLNAME        FLAGS  */
-GAME( 1986, gigas,    0,        gigas,    gigas,    gigas,    ROT270, "Sega", "Gigas (MC-8123, 317-5002)", GAME_NOT_WORKING )
-GAME( 1986, gigasb,   gigas,    gigas,    gigas,    gigasb,   ROT270, "bootleg", "Gigas (bootleg)", GAME_NO_COCKTAIL )
-GAME( 1986, oigas,    gigas ,   oigas,    gigas,    gigasb,   ROT270, "bootleg", "Oigas (bootleg)", GAME_NO_COCKTAIL )
-GAME( 1986, gigasm2b, 0,        gigas,    gigasm2,  gigasb,   ROT270, "bootleg", "Gigas Mark II (bootleg)", GAME_NO_COCKTAIL )
-GAME( 1987, pbillrd,  0,        pbillrd,  pbillrd,  0,        ROT0,   "Nihon System", "Perfect Billiard", 0 )
-GAME( 1987, pbillrds, pbillrd,  pbillrd,  pbillrd,  pbillrds, ROT0,   "Nihon System", "Perfect Billiard (MC-8123, 317-0030)", 0 )
-GAME( 1987, freekick, 0,        freekckb, freekck,  0,        ROT270, "Nihon System (Sega license)", "Free Kick", GAME_NOT_WORKING )
-GAME( 1987, freekckb, freekick, freekckb, freekck,  0,        ROT270, "bootleg", "Free Kick (bootleg set 1)", 0 )
-GAME( 1987, freekcb2, freekick, freekckb, freekck,  0,        ROT270, "bootleg", "Free Kick (bootleg set 2)", 0 )
-GAME( 1988, countrun, 0,        freekckb, countrun, 0,        ROT0,   "Nihon System (Sega license)", "Counter Run", GAME_NOT_WORKING )
-GAME( 1988, countrnb, countrun, freekckb, countrun, 0,        ROT0,   "bootleg", "Counter Run (bootleg set 1)", 0 )
-GAME( 1988, countrb2, countrun, freekckb, countrun, 0,        ROT0,   "bootleg", "Counter Run (bootleg set 2)", GAME_NOT_WORKING )
+GAME( 1986, gigas,    0,        gigas,    gigas,    gigas,    ROT270, "Sega", "Gigas (MC-8123, 317-5002)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1986, gigasb,   gigas,    gigas,    gigas,    gigasb,   ROT270, "bootleg", "Gigas (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1986, oigas,    gigas ,   oigas,    gigas,    gigasb,   ROT270, "bootleg", "Oigas (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1986, gigasm2b, 0,        gigas,    gigasm2,  gigasb,   ROT270, "bootleg", "Gigas Mark II (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, pbillrd,  0,        pbillrd,  pbillrd,  0,        ROT0,   "Nihon System", "Perfect Billiard", GAME_SUPPORTS_SAVE )
+GAME( 1987, pbillrds, pbillrd,  pbillrd,  pbillrd,  pbillrds, ROT0,   "Nihon System", "Perfect Billiard (MC-8123, 317-0030)", GAME_SUPPORTS_SAVE )
+GAME( 1987, freekick, 0,        freekckb, freekck,  0,        ROT270, "Nihon System (Sega license)", "Free Kick", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1987, freekckb, freekick, freekckb, freekck,  0,        ROT270, "bootleg", "Free Kick (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, freekcb2, freekick, freekckb, freekck,  0,        ROT270, "bootleg", "Free Kick (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1988, countrun, 0,        freekckb, countrun, 0,        ROT0,   "Nihon System (Sega license)", "Counter Run", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1988, countrnb, countrun, freekckb, countrun, 0,        ROT0,   "bootleg", "Counter Run (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1988, countrb2, countrun, freekckb, countrun, 0,        ROT0,   "bootleg", "Counter Run (bootleg set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
