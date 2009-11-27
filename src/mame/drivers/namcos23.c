@@ -1591,7 +1591,7 @@ ROM_START( rapidrvr )
         ROM_LOAD( "rd1waveh.3s",  0x800000, 0x800000, CRC(ef0136b5) SHA1(a6d923ededca168fe555e0b86a72f53bec5424cc) )
 ROM_END
 
-ROM_START( finlflng )                                                                                                    
+ROM_START( finlflng )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
         ROM_LOAD16_BYTE( "ff2vera.ic2",  0x000000, 0x200000, CRC(e10f9dfa) SHA1(6f6989cd722fec5e3ed3ad1bb4866c5831041ae1) )
         ROM_LOAD16_BYTE( "ff2vera.ic1",  0x000001, 0x200000, CRC(5a90ffbf) SHA1(e22dc0ae2d3c3b3a521369fe3f63412ae2ae0a12) )
@@ -1606,14 +1606,14 @@ ROM_START( finlflng )
 	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
         ROM_LOAD( "ff2cguu.5b",   0x0000000, 0x400000, CRC(595deee4) SHA1(b29ff9c6ba17737f1f87c05b2d899d80b0b72dbb) )
         ROM_LOAD( "ff2cgum.6b",   0x0800000, 0x400000, CRC(b808be59) SHA1(906bfbb5d34feef9697da545a93930fe6e56685c) )
-        ROM_LOAD( "ff2cgll.8b",   0x1000000, 0x400000, CRC(8e6c34eb) SHA1(795631c8019011246ed1e5546de4433dc22dd9e7) )     
-        ROM_LOAD( "ff2cglm.7b",   0x1800000, 0x400000, CRC(406f321b) SHA1(41a2b0229d5370f141b9d6a4e1801e2f9973f660) )     
+        ROM_LOAD( "ff2cgll.8b",   0x1000000, 0x400000, CRC(8e6c34eb) SHA1(795631c8019011246ed1e5546de4433dc22dd9e7) )
+        ROM_LOAD( "ff2cglm.7b",   0x1800000, 0x400000, CRC(406f321b) SHA1(41a2b0229d5370f141b9d6a4e1801e2f9973f660) )
 
 	ROM_REGION( 0x2000000, "textiledup", 0 )	/* duplicate bank of texture tiles */
         ROM_LOAD( "ff2cguu.5f",   0x0000000, 0x400000, CRC(595deee4) SHA1(b29ff9c6ba17737f1f87c05b2d899d80b0b72dbb) )
         ROM_LOAD( "ff2cgum.6f",   0x0800000, 0x400000, CRC(b808be59) SHA1(906bfbb5d34feef9697da545a93930fe6e56685c) )
-        ROM_LOAD( "ff2cgll.8f",   0x1000000, 0x400000, CRC(8e6c34eb) SHA1(795631c8019011246ed1e5546de4433dc22dd9e7) )     
-        ROM_LOAD( "ff2cglm.7f",   0x1800000, 0x400000, CRC(406f321b) SHA1(41a2b0229d5370f141b9d6a4e1801e2f9973f660) )     
+        ROM_LOAD( "ff2cgll.8f",   0x1000000, 0x400000, CRC(8e6c34eb) SHA1(795631c8019011246ed1e5546de4433dc22dd9e7) )
+        ROM_LOAD( "ff2cglm.7f",   0x1800000, 0x400000, CRC(406f321b) SHA1(41a2b0229d5370f141b9d6a4e1801e2f9973f660) )
 
 	ROM_REGION( 0x4000000, "textile2", 0 )	/* texture tiles bank 2? */
         ROM_LOAD( "ff2spruu.9p",  0x0000000, 0x400000, CRC(c134b0de) SHA1(cea9d9f4ce2f45a93c797ed467d8458521db9b3d) )
@@ -1628,12 +1628,12 @@ ROM_START( finlflng )
         ROM_LOAD( "ff2sprlm.11t", 0x1800000, 0x400000, CRC(421a8fbf) SHA1(8bd6f3e1ac9c7b0ac9d25dfbce35f5b7a5d5bcc7) )
 
 	ROM_REGION( 0x400000, "textilemap", 0 )	/* texture tilemap */
-        ROM_LOAD( "ff2ccrl.11a",  0x000000, 0x200000, CRC(f1f9e77c) SHA1(adf659a4671ea066817e6620b7d7d5f60f6e01e5) )     
-        ROM_LOAD( "ff2ccrh.11b",  0x200000, 0x200000, CRC(71228c61) SHA1(b39d0b51f36c0d00a6144ae20613bebee3ed22bc) )     
+        ROM_LOAD( "ff2ccrl.11a",  0x000000, 0x200000, CRC(f1f9e77c) SHA1(adf659a4671ea066817e6620b7d7d5f60f6e01e5) )
+        ROM_LOAD( "ff2ccrh.11b",  0x200000, 0x200000, CRC(71228c61) SHA1(b39d0b51f36c0d00a6144ae20613bebee3ed22bc) )
 
 	ROM_REGION( 0x400000, "textilemp2", 0 )	/* duplicate texture tilemap */
-        ROM_LOAD( "ff2ccrl.11e",  0x000000, 0x200000, CRC(f1f9e77c) SHA1(adf659a4671ea066817e6620b7d7d5f60f6e01e5) )     
-        ROM_LOAD( "ff2ccrh.11f",  0x000000, 0x200000, CRC(71228c61) SHA1(b39d0b51f36c0d00a6144ae20613bebee3ed22bc) )     
+        ROM_LOAD( "ff2ccrl.11e",  0x000000, 0x200000, CRC(f1f9e77c) SHA1(adf659a4671ea066817e6620b7d7d5f60f6e01e5) )
+        ROM_LOAD( "ff2ccrh.11f",  0x000000, 0x200000, CRC(71228c61) SHA1(b39d0b51f36c0d00a6144ae20613bebee3ed22bc) )
 
 	ROM_REGION32_LE( 0x2000000, "pointrom", 0 )	/* 3D model data */
         ROM_LOAD32_WORD( "ff2pt0l.9j",   0x000000, 0x400000, CRC(7eeda441) SHA1(78648559abec5e1f04622cd1cfd5d94bddda7dbf) )
@@ -1904,6 +1904,7 @@ ROM_START( panicprk )
 	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	// i/o program from motoxgo, as it's "general". however, game crashes(H8 unknown opcode) if add this program
 //      ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
+		ROM_FILL( 0x00000, 0x40000, 0 ) // Temporary - fixes validity check warning
 
 	ROM_REGION( 0x2000000, "sprite", 0 )	/* sprite? tilemap? tiles */
         ROM_LOAD16_BYTE( "pnp1mtal.2h",  0x000000, 0x800000, CRC(6490faaa) SHA1(03443746009b434e5d4074ea6314910418907360) )
