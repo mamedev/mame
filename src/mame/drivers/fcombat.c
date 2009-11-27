@@ -31,39 +31,131 @@ inputs + notes by stephh
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-
-/* this is compied from Exerion, but it should be correct */
-#define FCOMBAT_MASTER_CLOCK	(20000000)
-#define FCOMBAT_CPU_CLOCK		(FCOMBAT_MASTER_CLOCK / 6)
-#define FCOMBAT_AY8910_CLOCK	(FCOMBAT_CPU_CLOCK / 2)
-#define FCOMBAT_PIXEL_CLOCK		(FCOMBAT_MASTER_CLOCK / 3)
-#define FCOMBAT_HCOUNT_START	(0x58)
-#define FCOMBAT_HTOTAL			(512-FCOMBAT_HCOUNT_START)
-#define FCOMBAT_HBEND			(12*8)	/* ?? */
-#define FCOMBAT_HBSTART			(52*8)	/* ?? */
-#define FCOMBAT_VTOTAL			(256)
-#define FCOMBAT_VBEND			(16)
-#define FCOMBAT_VBSTART			(240)
-
-
-PALETTE_INIT( fcombat );
-VIDEO_START( fcombat );
-VIDEO_UPDATE( fcombat );
-
-WRITE8_HANDLER( fcombat_videoreg_w );
-
-extern UINT8 fcombat_cocktail_flip;
-extern int fcombat_sh;
-extern int fcombat_sv;
+#include "fcombat.h"
 
 
 static INPUT_CHANGED( coin_inserted )
 {
+	fcombat_state *state = (fcombat_state *)field->port->machine->driver_data;
+
 	/* coin insertion causes an NMI */
-	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
+
+
+/* is it protection? */
+static READ8_HANDLER( fcombat_protection_r )
+{
+	/* Must match ONE of these values after a "and  $3E" intruction :
+
+        76F0: 1E 04 2E 26 34 32 3A 16 3E 36
+
+       Check code at 0x76c8 for more infos.
+    */
+	return 0xff;	// seems enough
+}
+
+
+/* same as exerion again */
+
+static READ8_HANDLER( fcombat_port01_r )
+{
+	fcombat_state *state = (fcombat_state *)space->machine->driver_data;
+	/* the cocktail flip bit muxes between ports 0 and 1 */
+	return state->cocktail_flip ? input_port_read(space->machine, "IN1") : input_port_read(space->machine, "IN0");
+}
+
+
+//bg scrolls
+
+static WRITE8_HANDLER(e900_w)
+{
+	fcombat_state *state = (fcombat_state *)space->machine->driver_data;
+	state->fcombat_sh = data;
+}
+
+static WRITE8_HANDLER(ea00_w)
+{
+	fcombat_state *state = (fcombat_state *)space->machine->driver_data;
+	state->fcombat_sv = (state->fcombat_sv & 0xff00) | data;
+}
+
+static WRITE8_HANDLER(eb00_w)
+{
+	fcombat_state *state = (fcombat_state *)space->machine->driver_data;
+	state->fcombat_sv = (state->fcombat_sv & 0xff) | (data << 8);
+}
+
+
+// terrain info (ec00=x, ed00=y, return val in e300
+
+static WRITE8_HANDLER(ec00_w)
+{
+	fcombat_state *state = (fcombat_state *)space->machine->driver_data;
+	state->tx = data;
+}
+
+static WRITE8_HANDLER(ed00_w)
+{
+	fcombat_state *state = (fcombat_state *)space->machine->driver_data;
+	state->ty = data;
+}
+
+static READ8_HANDLER(e300_r)
+{
+	fcombat_state *state = (fcombat_state *)space->machine->driver_data;
+	int wx = (state->tx + state->fcombat_sh) / 16;
+	int wy = (state->ty * 2 + state->fcombat_sv) / 16;
+
+	return memory_region(space->machine, "user2")[wx * 32 * 16 + wy];
+}
+
+static WRITE8_HANDLER(ee00_w)
+{
+
+}
+
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_MEMBER(fcombat_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_MEMBER(fcombat_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe000, 0xe000) AM_READ(fcombat_port01_r)
+	AM_RANGE(0xe100, 0xe100) AM_READ_PORT("DSW0")
+	AM_RANGE(0xe200, 0xe200) AM_READ_PORT("DSW1")
+	AM_RANGE(0xe300, 0xe300) AM_READ(e300_r)
+	AM_RANGE(0xe400, 0xe400) AM_READ(fcombat_protection_r) // protection?
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(fcombat_videoreg_w)	// at least bit 0 for flip screen and joystick input multiplexor
+	AM_RANGE(0xe900, 0xe900) AM_WRITE(e900_w)
+	AM_RANGE(0xea00, 0xea00) AM_WRITE(ea00_w)
+	AM_RANGE(0xeb00, 0xeb00) AM_WRITE(eb00_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(ec00_w)
+	AM_RANGE(0xed00, 0xed00) AM_WRITE(ed00_w)
+	AM_RANGE(0xee00, 0xee00) AM_WRITE(ee00_w)	// related to protection ? - doesn't seem to have any effect
+	AM_RANGE(0xef00, 0xef00) AM_WRITE(soundlatch_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay1", ay8910_data_address_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ay2", ay8910_data_address_w)
+	AM_RANGE(0xc001, 0xc001) AM_DEVREAD("ay3", ay8910_r)
+	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("ay3", ay8910_data_address_w)
+ADDRESS_MAP_END
+
+
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( fcombat )
 	PORT_START("IN0")      /* player 1 inputs (muxed on 0xe000) */
@@ -126,110 +218,6 @@ static INPUT_PORTS_START( fcombat )
 INPUT_PORTS_END
 
 
-
-/* is it protection? */
-
-static READ8_HANDLER( fcombat_protection_r )
-{
-	/* Must match ONE of these values after a "and  $3E" intruction :
-
-        76F0: 1E 04 2E 26 34 32 3A 16 3E 36
-
-       Check code at 0x76c8 for more infos.
-    */
-	return 0xff;	// seems enough
-}
-
-
-/* same as exerion again */
-
-static READ8_HANDLER( fcombat_port01_r )
-{
-	/* the cocktail flip bit muxes between ports 0 and 1 */
-	return fcombat_cocktail_flip ? input_port_read(space->machine, "IN1") : input_port_read(space->machine, "IN0");
-}
-
-
-//bg scrolls
-
-static WRITE8_HANDLER(e900_w)
-{
-	fcombat_sh=data;
-}
-
-static WRITE8_HANDLER(ea00_w)
-{
-	fcombat_sv=(fcombat_sv&0xff00)|data;
-}
-
-static WRITE8_HANDLER(eb00_w)
-{
-		fcombat_sv=(fcombat_sv&0xff)|(data<<8);
-}
-
-
-// terrain info (ec00=x, ed00=y, return val in e300
-
-static int tx=0,ty=0;
-
-static WRITE8_HANDLER(ec00_w)
-{
-	tx=data;
-}
-
-static WRITE8_HANDLER(ed00_w)
-{
-	ty=data;
-}
-
-static READ8_HANDLER(e300_r)
-{
-	int wx=(tx+fcombat_sh)/16;
-	int wy=(ty*2+fcombat_sv)/16;
-
-	return memory_region(space->machine, "user2")[wx*32*16+wy];
-}
-
-static WRITE8_HANDLER(ee00_w)
-{
-
-}
-
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xe000, 0xe000) AM_READ(fcombat_port01_r)
-	AM_RANGE(0xe100, 0xe100) AM_READ_PORT("DSW0")
-	AM_RANGE(0xe200, 0xe200) AM_READ_PORT("DSW1")
-	AM_RANGE(0xe300, 0xe300) AM_READ(e300_r)
-	AM_RANGE(0xe400, 0xe400) AM_READ(fcombat_protection_r) // protection?
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(fcombat_videoreg_w)	// at least bit 0 for flip screen and joystick input multiplexor
-	AM_RANGE(0xe900, 0xe900) AM_WRITE(e900_w)
-	AM_RANGE(0xea00, 0xea00) AM_WRITE(ea00_w)
-	AM_RANGE(0xeb00, 0xeb00) AM_WRITE(eb00_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(ec00_w)
-	AM_RANGE(0xed00, 0xed00) AM_WRITE(ed00_w)
-	AM_RANGE(0xee00, 0xee00) AM_WRITE(ee00_w)	// related to protection ? - doesn't seem to have any effect
-	AM_RANGE(0xef00, 0xef00) AM_WRITE(soundlatch_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay1", ay8910_data_address_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay2", ay8910_r)
-	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ay2", ay8910_data_address_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVREAD("ay3", ay8910_r)
-	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("ay3", ay8910_data_address_w)
-ADDRESS_MAP_END
-
-
-
 /*************************************
  *
  *  Graphics layouts
@@ -277,13 +265,50 @@ GFXDECODE_END
  *
  *************************************/
 
+static MACHINE_START( fcombat )
+{
+	fcombat_state *state = (fcombat_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+
+	state_save_register_global(machine, state->cocktail_flip);
+	state_save_register_global(machine, state->char_palette);
+	state_save_register_global(machine, state->sprite_palette);
+	state_save_register_global(machine, state->char_bank);
+	state_save_register_global(machine, state->fcombat_sh);
+	state_save_register_global(machine, state->fcombat_sv);
+	state_save_register_global(machine, state->tx);
+	state_save_register_global(machine, state->ty);
+}
+
+static MACHINE_RESET( fcombat )
+{
+	fcombat_state *state = (fcombat_state *)machine->driver_data;
+
+	state->cocktail_flip = 0;
+	state->char_palette = 0;
+	state->sprite_palette = 0;
+	state->char_bank = 0;
+	state->fcombat_sh = 0;
+	state->fcombat_sv = 0;
+	state->tx = 0;
+	state->ty = 0;
+}
+
 static MACHINE_DRIVER_START( fcombat )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(fcombat_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 10000000/3)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 10000000/3)
 	MDRV_CPU_PROGRAM_MAP(audio_map)
+
+	MDRV_MACHINE_START(fcombat)
+	MDRV_MACHINE_RESET(fcombat)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -390,8 +415,8 @@ static DRIVER_INIT( fcombat )
 
 	for (oldaddr = 0; oldaddr < 32; oldaddr++)
 	{
-		memcpy(&dst[oldaddr*32*8*2],&src[oldaddr*32*8],32*8);
-		memcpy(&dst[oldaddr*32*8*2+32*8],&src[oldaddr*32*8+0x2000],32*8);
+		memcpy(&dst[oldaddr * 32 * 8 * 2], &src[oldaddr * 32 * 8], 32 * 8);
+		memcpy(&dst[oldaddr * 32 * 8 * 2 + 32 * 8], &src[oldaddr * 32 * 8 + 0x2000], 32 * 8);
 	}
 
 
@@ -402,8 +427,8 @@ static DRIVER_INIT( fcombat )
 
 	for (oldaddr = 0; oldaddr < 32; oldaddr++)
 	{
-		memcpy(&dst[oldaddr*32*8*2],&src[oldaddr*32*8],32*8);
-		memcpy(&dst[oldaddr*32*8*2+32*8],&src[oldaddr*32*8+0x2000],32*8);
+		memcpy(&dst[oldaddr * 32 * 8 * 2], &src[oldaddr * 32 * 8], 32 * 8);
+		memcpy(&dst[oldaddr * 32 * 8 * 2 + 32 * 8], &src[oldaddr * 32 * 8 + 0x2000], 32 * 8);
 	}
 
 	free(temp);
@@ -441,4 +466,4 @@ ROM_START( fcombat )
 	ROM_LOAD( "fcprom_c.a9",  0x0220, 0x0100, CRC(768ac120) SHA1(ceede1d6cbeae08da96ef52bdca2718a839d88ab) ) /* bg char mixer */
 ROM_END
 
-GAME( 1985, fcombat,  0,       fcombat, fcombat, fcombat,  ROT90, "Jaleco", "Field Combat", GAME_WRONG_COLORS )
+GAME( 1985, fcombat,  0,       fcombat, fcombat, fcombat,  ROT90, "Jaleco", "Field Combat", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

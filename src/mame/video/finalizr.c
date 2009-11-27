@@ -7,16 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-
-
-
-UINT8 *finalizr_scroll;
-UINT8 *finalizr_videoram2,*finalizr_colorram2;
-static int spriterambank,charbank;
-
-static tilemap *bg_tilemap;
-static tilemap *fg_tilemap;
-
+#include "finalizr.h"
 
 
 PALETTE_INIT( finalizr )
@@ -54,8 +45,9 @@ PALETTE_INIT( finalizr )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = colorram[tile_index];
-	int code = videoram[tile_index] + ((attr & 0xc0) << 2) + (charbank<<10);
+	finalizr_state *state = (finalizr_state *)machine->driver_data;
+	int attr = state->colorram[tile_index];
+	int code = state->videoram[tile_index] + ((attr & 0xc0) << 2) + (state->charbank << 10);
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
@@ -64,8 +56,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int attr = finalizr_colorram2[tile_index];
-	int code = finalizr_videoram2[tile_index] + ((attr & 0xc0) << 2);
+	finalizr_state *state = (finalizr_state *)machine->driver_data;
+	int attr = state->colorram2[tile_index];
+	int code = state->videoram2[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
@@ -74,18 +67,19 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( finalizr )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	finalizr_state *state = (finalizr_state *)machine->driver_data;
+
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
 
 WRITE8_HANDLER( finalizr_videoctrl_w )
 {
-	charbank = data & 3;
-
-	spriterambank = data & 8;
-
+	finalizr_state *state = (finalizr_state *)space->machine->driver_data;
+	state->charbank = data & 3;
+	state->spriterambank = data & 8;
 	/* other bits unknown */
 }
 
@@ -93,37 +87,38 @@ WRITE8_HANDLER( finalizr_videoctrl_w )
 
 VIDEO_UPDATE( finalizr )
 {
+	finalizr_state *state = (finalizr_state *)screen->machine->driver_data;
 	int offs;
 
-	tilemap_mark_all_tiles_dirty(bg_tilemap);
-	tilemap_mark_all_tiles_dirty(fg_tilemap);
+	tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+	tilemap_mark_all_tiles_dirty(state->fg_tilemap);
 
-	tilemap_set_scrollx(bg_tilemap, 0, *finalizr_scroll-16);
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_set_scrollx(state->bg_tilemap, 0, *state->scroll - 16);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* Draw the sprites. */
 	{
 		const gfx_element *gfx1 = screen->machine->gfx[1];
 		const gfx_element *gfx2 = screen->machine->gfx[2];
 
-		UINT8 *sr = spriterambank ? spriteram_2 : spriteram;
+		UINT8 *sr = state->spriterambank ? state->spriteram_2 : state->spriteram;
 
 
-		for (offs = 0;offs <= spriteram_size-5;offs += 5)
+		for (offs = 0; offs <= spriteram_size - 5; offs += 5)
 		{
-			int sx,sy,flipx,flipy,code,color,size;
+			int sx, sy, flipx, flipy, code, color, size;
 
 
-			sx = 16 + sr[offs+3] - ((sr[offs+4] & 0x01) << 8);
-			sy = sr[offs+2];
-			flipx = sr[offs+4] & 0x20;
-			flipy = sr[offs+4] & 0x40;
-			code = sr[offs] + ((sr[offs+1] & 0x0f) << 8);
-			color = ((sr[offs+1] & 0xf0)>>4);
+			sx = 16 + sr[offs + 3] - ((sr[offs + 4] & 0x01) << 8);
+			sy = sr[offs + 2];
+			flipx = sr[offs + 4] & 0x20;
+			flipy = sr[offs + 4] & 0x40;
+			code = sr[offs] + ((sr[offs + 1] & 0x0f) << 8);
+			color = ((sr[offs + 1] & 0xf0)>>4);
 
-//          (sr[offs+4] & 0x02) is used, meaning unknown
+//          (sr[offs + 4] & 0x02) is used, meaning unknown
 
-			size = sr[offs+4] & 0x1c;
+			size = sr[offs + 4] & 0x1c;
 
 			if (size >= 0x10)	/* 32x32 */
 			{
@@ -224,14 +219,14 @@ VIDEO_UPDATE( finalizr )
 		/* draw top status region */
 		clip.min_x = visarea->min_x;
 		clip.max_x = visarea->min_x + 15;
-		tilemap_set_scrolldx(fg_tilemap,  0,-16);
-		tilemap_draw(bitmap, &clip, fg_tilemap, 0, 0);
+		tilemap_set_scrolldx(state->fg_tilemap,  0,-16);
+		tilemap_draw(bitmap, &clip, state->fg_tilemap, 0, 0);
 
 		/* draw bottom status region */
 		clip.min_x = visarea->max_x - 15;
 		clip.max_x = visarea->max_x;
-		tilemap_set_scrolldx(fg_tilemap,-16,  0);
-		tilemap_draw(bitmap, &clip, fg_tilemap, 0, 0);
+		tilemap_set_scrolldx(state->fg_tilemap,-16,  0);
+		tilemap_draw(bitmap, &clip, state->fg_tilemap, 0, 0);
 	}
 	return 0;
 }

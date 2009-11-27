@@ -5,69 +5,64 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "ddragon3.h"
 
-UINT16 *ddragon3_bg_videoram16;
-UINT16 *ddragon3_fg_videoram16;
-UINT16 ddragon3_vreg;
-
-static UINT16 ddragon3_bg_scrollx;
-static UINT16 ddragon3_bg_scrolly;
-static UINT16 ddragon3_fg_scrollx;
-static UINT16 ddragon3_fg_scrolly;
-static UINT16 ddragon3_bg_tilebase;
-
-static tilemap *bg_tilemap, *fg_tilemap;
-
-
-WRITE16_HANDLER( ddragon3_scroll16_w )
+WRITE16_HANDLER( ddragon3_scroll_w )
 {
+	ddragon3_state *state = (ddragon3_state *)space->machine->driver_data;
+
 	switch (offset)
 	{
-		case 0: COMBINE_DATA(&ddragon3_fg_scrollx);	break;	// Scroll X, BG1
-		case 1: COMBINE_DATA(&ddragon3_fg_scrolly);	break;	// Scroll Y, BG1
-		case 2: COMBINE_DATA(&ddragon3_bg_scrollx);	break;	// Scroll X, BG0
-		case 3: COMBINE_DATA(&ddragon3_bg_scrolly);	break;	// Scroll Y, BG0
+		case 0: COMBINE_DATA(&state->fg_scrollx);	break;	// Scroll X, BG1
+		case 1: COMBINE_DATA(&state->fg_scrolly);	break;	// Scroll Y, BG1
+		case 2: COMBINE_DATA(&state->bg_scrollx);	break;	// Scroll X, BG0
+		case 3: COMBINE_DATA(&state->bg_scrolly);	break;	// Scroll Y, BG0
 		case 4:										break;	// Unknown write
 		case 5: flip_screen_set(space->machine, data & 0x01);		break;	// Flip Screen
 		case 6:
-			COMBINE_DATA(&ddragon3_bg_tilebase);			// BG Tile Base
-			ddragon3_bg_tilebase &= 0x1ff;
-			tilemap_mark_all_tiles_dirty(bg_tilemap);
+			COMBINE_DATA(&state->bg_tilebase);			// BG Tile Base
+			state->bg_tilebase &= 0x1ff;
+			tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 			break;
 	}
 }
 
-READ16_HANDLER( ddragon3_scroll16_r )
+READ16_HANDLER( ddragon3_scroll_r )
 {
+	ddragon3_state *state = (ddragon3_state *)space->machine->driver_data;
+
 	switch (offset)
 	{
-		case 0: return ddragon3_fg_scrollx;
-		case 1: return ddragon3_fg_scrolly;
-		case 2: return ddragon3_bg_scrollx;
-		case 3: return ddragon3_bg_scrolly;
+		case 0: return state->fg_scrollx;
+		case 1: return state->fg_scrolly;
+		case 2: return state->bg_scrollx;
+		case 3: return state->bg_scrolly;
 		case 5: return flip_screen_get(space->machine);
-		case 6: return ddragon3_bg_tilebase;
+		case 6: return state->bg_tilebase;
 	}
 
 	return 0;
 }
 
-WRITE16_HANDLER( ddragon3_bg_videoram16_w )
+WRITE16_HANDLER( ddragon3_bg_videoram_w )
 {
-	COMBINE_DATA(&ddragon3_bg_videoram16[offset]);
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	ddragon3_state *state = (ddragon3_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->bg_videoram[offset]);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
-WRITE16_HANDLER( ddragon3_fg_videoram16_w )
+WRITE16_HANDLER( ddragon3_fg_videoram_w )
 {
-	COMBINE_DATA(&ddragon3_fg_videoram16[offset]);
-	tilemap_mark_tile_dirty(fg_tilemap, offset / 2);
+	ddragon3_state *state = (ddragon3_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->fg_videoram[offset]);
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset / 2);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT16 attr = ddragon3_bg_videoram16[tile_index];
-	int code = (attr & 0x0fff) | ((ddragon3_bg_tilebase & 0x01) << 12);
+	ddragon3_state *state = (ddragon3_state *)machine->driver_data;
+	UINT16 attr = state->bg_videoram[tile_index];
+	int code = (attr & 0x0fff) | ((state->bg_tilebase & 0x01) << 12);
 	int color = ((attr & 0xf000) >> 12) + 16;
 
 	SET_TILE_INFO(0, code, color, 0);
@@ -75,9 +70,10 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
+	ddragon3_state *state = (ddragon3_state *)machine->driver_data;
 	int offs = tile_index * 2;
-	UINT16 attr = ddragon3_fg_videoram16[offs];
-	int code = ddragon3_fg_videoram16[offs + 1] & 0x1fff;
+	UINT16 attr = state->fg_videoram[offs];
+	int code = state->fg_videoram[offs + 1] & 0x1fff;
 	int color = attr & 0xf;
 	int flags = (attr & 0x40) ? TILE_FLIPX : 0;
 
@@ -86,21 +82,13 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( ddragon3 )
 {
-    state_save_register_global(machine, ddragon3_vreg);
-    state_save_register_global(machine, ddragon3_bg_scrollx);
-    state_save_register_global(machine, ddragon3_bg_scrolly);
-    state_save_register_global(machine, ddragon3_fg_scrollx);
-    state_save_register_global(machine, ddragon3_fg_scrolly);
-    state_save_register_global(machine, ddragon3_bg_tilebase);
+	ddragon3_state *state = (ddragon3_state *)machine->driver_data;
 
-    bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
-		 16, 16, 32, 32);
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,
-		 16, 16, 32, 32);
-
-	tilemap_set_transparent_pen(bg_tilemap, 0);
-	tilemap_set_transparent_pen(fg_tilemap, 0);
+	tilemap_set_transparent_pen(state->bg_tilemap, 0);
+	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 }
 
 /*
@@ -128,9 +116,10 @@ VIDEO_START( ddragon3 )
  *   6,7| unused
  */
 
-static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT16 *source = spriteram16;
+	ddragon3_state *state = (ddragon3_state *)machine->driver_data;
+	UINT16 *source = state->spriteram;
 	UINT16 *finish = source + 0x800;
 
 	while (source < finish)
@@ -175,49 +164,53 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( ddragon3 )
 {
-	tilemap_set_scrollx(bg_tilemap, 0, ddragon3_bg_scrollx);
-	tilemap_set_scrolly(bg_tilemap, 0, ddragon3_bg_scrolly);
-	tilemap_set_scrollx(fg_tilemap, 0, ddragon3_fg_scrollx);
-	tilemap_set_scrolly(fg_tilemap, 0, ddragon3_fg_scrolly);
+	ddragon3_state *state = (ddragon3_state *)screen->machine->driver_data;
 
-	if ((ddragon3_vreg & 0x60) == 0x40)
+	tilemap_set_scrollx(state->bg_tilemap, 0, state->bg_scrollx);
+	tilemap_set_scrolly(state->bg_tilemap, 0, state->bg_scrolly);
+	tilemap_set_scrollx(state->fg_tilemap, 0, state->fg_scrollx);
+	tilemap_set_scrolly(state->fg_tilemap, 0, state->fg_scrolly);
+
+	if ((state->vreg & 0x60) == 0x40)
 	{
-		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-		tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 		draw_sprites(screen->machine, bitmap, cliprect);
 	}
-	else if ((ddragon3_vreg & 0x60) == 0x60)
+	else if ((state->vreg & 0x60) == 0x60)
 	{
-		tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->fg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 		draw_sprites(screen->machine, bitmap, cliprect);
 	}
 	else
 	{
-		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 		draw_sprites(screen->machine, bitmap, cliprect);
-		tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	}
 	return 0;
 }
 
 VIDEO_UPDATE( ctribe )
 {
-	tilemap_set_scrollx( bg_tilemap, 0, ddragon3_bg_scrollx );
-	tilemap_set_scrolly( bg_tilemap, 0, ddragon3_bg_scrolly );
-	tilemap_set_scrollx( fg_tilemap, 0, ddragon3_fg_scrollx );
-	tilemap_set_scrolly( fg_tilemap, 0, ddragon3_fg_scrolly );
+	ddragon3_state *state = (ddragon3_state *)screen->machine->driver_data;
 
-	if(ddragon3_vreg & 8)
+	tilemap_set_scrollx(state->bg_tilemap, 0, state->bg_scrollx);
+	tilemap_set_scrolly(state->bg_tilemap, 0, state->bg_scrolly);
+	tilemap_set_scrollx(state->fg_tilemap, 0, state->fg_scrollx);
+	tilemap_set_scrolly(state->fg_tilemap, 0, state->fg_scrolly);
+
+	if(state->vreg & 8)
 	{
-		tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+		tilemap_draw(bitmap, cliprect, state->fg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 		draw_sprites(screen->machine, bitmap, cliprect);
-		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	}
 	else
 	{
-		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-		tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 		draw_sprites(screen->machine, bitmap, cliprect);
 	}
 	return 0;

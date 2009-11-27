@@ -143,21 +143,10 @@ ROMs (All ROMs are 27C010 EPROM. - means not populated)
 #include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
+#include "ddragon3.h"
 
 #define PIXEL_CLOCK		(XTAL_28MHz / 4)
 
-extern UINT16 *ddragon3_bg_videoram16;
-extern UINT16 *ddragon3_fg_videoram16;
-extern UINT16 ddragon3_vreg;
-
-extern WRITE16_HANDLER( ddragon3_bg_videoram16_w );
-extern WRITE16_HANDLER( ddragon3_fg_videoram16_w );
-extern WRITE16_HANDLER( ddragon3_scroll16_w );
-extern READ16_HANDLER( ddragon3_scroll16_r );
-
-extern VIDEO_START( ddragon3 );
-extern VIDEO_UPDATE( ddragon3 );
-extern VIDEO_UPDATE( ctribe );
 
 /*************************************
  *
@@ -170,44 +159,44 @@ static WRITE8_DEVICE_HANDLER( oki_bankswitch_w )
 	okim6295_set_bank_base(device, (data & 1) * 0x40000);
 }
 
-static WRITE16_HANDLER( ddragon3_io16_w )
+static WRITE16_HANDLER( ddragon3_io_w )
 {
-	static UINT16 reg[8];
+	ddragon3_state *state = (ddragon3_state *)space->machine->driver_data;
 
-	COMBINE_DATA(&reg[offset]);
+	COMBINE_DATA(&state->io_reg[offset]);
 
 	switch (offset)
 	{
 		case 0:
-		ddragon3_vreg = reg[0];
-		break;
+			state->vreg = state->io_reg[0];
+			break;
 
 		case 1: /* soundlatch_w */
-		soundlatch_w(space, 1, reg[1] & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
+			soundlatch_w(space, 1, state->io_reg[1] & 0xff);
+			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 		case 2:
-		/*  this gets written to on startup and at the end of IRQ6
-        **  possibly trigger IRQ on sound CPU
-        */
-		cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
-		break;
+			/*  this gets written to on startup and at the end of IRQ6
+            **  possibly trigger IRQ on sound CPU
+            */
+			cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
+			break;
 
 		case 3:
-		/*  this gets written to on startup,
-        **  and at the end of IRQ5 (input port read) */
-		cputag_set_input_line(space->machine, "maincpu", 5, CLEAR_LINE);
-		break;
+			/*  this gets written to on startup,
+            **  and at the end of IRQ5 (input port read) */
+			cputag_set_input_line(space->machine, "maincpu", 5, CLEAR_LINE);
+			break;
 
 		case 4:
-		/* this gets written to at the end of IRQ6 only */
-		cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
-		break;
+			/* this gets written to at the end of IRQ6 only */
+			cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
+			break;
 
 		default:
-		logerror("OUTPUT 1400[%02x] %08x, pc=%06x \n", offset, (unsigned)data, cpu_get_pc(space->cpu) );
-		break;
+			logerror("OUTPUT 1400[%02x] %08x, pc=%06x \n", offset, (unsigned)data, cpu_get_pc(space->cpu) );
+			break;
 	}
 }
 
@@ -219,27 +208,27 @@ static WRITE16_HANDLER( ddragon3_io16_w )
 
 static ADDRESS_MAP_START( ddragon3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram16_w) AM_BASE(&ddragon3_fg_videoram16) /* Foreground (32x32 Tiles - 4 by per tile) */
-	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram16_w) AM_BASE(&ddragon3_bg_videoram16) /* Background (32x32 Tiles - 2 by per tile) */
-	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(ddragon3_scroll16_w)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram_w) AM_BASE_MEMBER(ddragon3_state, fg_videoram) /* Foreground (32x32 Tiles - 4 by per tile) */
+	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram_w) AM_BASE_MEMBER(ddragon3_state, bg_videoram) /* Background (32x32 Tiles - 2 by per tile) */
+	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(ddragon3_scroll_w)
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("DSW")
 	AM_RANGE(0x100006, 0x100007) AM_READ_PORT("P3")
-	AM_RANGE(0x100000, 0x10000f) AM_WRITE(ddragon3_io16_w)
+	AM_RANGE(0x100000, 0x10000f) AM_WRITE(ddragon3_io_w)
 	AM_RANGE(0x140000, 0x1405ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16) /* Palette RAM */
-	AM_RANGE(0x180000, 0x180fff) AM_RAM AM_BASE(&spriteram16)
+	AM_RANGE(0x180000, 0x180fff) AM_RAM AM_BASE_MEMBER(ddragon3_state, spriteram)
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dd3b_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram16_w) AM_BASE(&ddragon3_fg_videoram16) /* Foreground (32x32 Tiles - 4 by per tile) */
-	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_BASE(&spriteram16)
-	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram16_w) AM_BASE(&ddragon3_bg_videoram16) /* Background (32x32 Tiles - 2 by per tile) */
-	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(ddragon3_scroll16_w)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram_w) AM_BASE_MEMBER(ddragon3_state, fg_videoram) /* Foreground (32x32 Tiles - 4 by per tile) */
+	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_BASE_MEMBER(ddragon3_state, spriteram)
+	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram_w) AM_BASE_MEMBER(ddragon3_state, bg_videoram) /* Background (32x32 Tiles - 2 by per tile) */
+	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(ddragon3_scroll_w)
 	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16) /* Palette RAM */
-	AM_RANGE(0x140000, 0x14000f) AM_WRITE(ddragon3_io16_w)
+	AM_RANGE(0x140000, 0x14000f) AM_WRITE(ddragon3_io_w)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN0")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("IN1")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("IN2")
@@ -249,13 +238,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ctribe_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram16_w) AM_BASE(&ddragon3_fg_videoram16) /* Foreground (32x32 Tiles - 4 by per tile) */
-	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_BASE(&spriteram16)
-	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram16_w) AM_BASE(&ddragon3_bg_videoram16) /* Background (32x32 Tiles - 2 by per tile) */
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram_w) AM_BASE_MEMBER(ddragon3_state, fg_videoram) /* Foreground (32x32 Tiles - 4 by per tile) */
+	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_BASE_MEMBER(ddragon3_state, spriteram)
+	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram_w) AM_BASE_MEMBER(ddragon3_state, bg_videoram) /* Background (32x32 Tiles - 2 by per tile) */
 	AM_RANGE(0x082800, 0x082fff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0c000f) AM_READWRITE(ddragon3_scroll16_r, ddragon3_scroll16_w)
+	AM_RANGE(0x0c0000, 0x0c000f) AM_READWRITE(ddragon3_scroll_r, ddragon3_scroll_w)
 	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16) /* Palette RAM */
-	AM_RANGE(0x140000, 0x14000f) AM_WRITE(ddragon3_io16_w)
+	AM_RANGE(0x140000, 0x14000f) AM_WRITE(ddragon3_io_w)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN0")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("IN1")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("IN2")
@@ -566,7 +555,40 @@ static TIMER_DEVICE_CALLBACK( ddragon3_scanline )
  *
  *************************************/
 
+static MACHINE_START( ddragon3 )
+{
+	ddragon3_state *state = (ddragon3_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->vreg);
+	state_save_register_global(machine, state->bg_scrollx);
+	state_save_register_global(machine, state->bg_scrolly);
+	state_save_register_global(machine, state->fg_scrollx);	
+	state_save_register_global(machine, state->fg_scrolly);
+	state_save_register_global(machine, state->bg_tilebase);
+	state_save_register_global_array(machine, state->io_reg);
+}
+
+static MACHINE_RESET( ddragon3 )
+{
+	ddragon3_state *state = (ddragon3_state *)machine->driver_data;
+	int i;
+
+	state->vreg = 0;
+	state->bg_scrollx = 0;
+	state->bg_scrolly = 0;
+	state->fg_scrollx = 0;	
+	state->fg_scrolly = 0;
+	state->bg_tilebase = 0;
+
+	for (i = 0; i < 8; i++)
+		state->io_reg[i] = 0;
+}
+
 static MACHINE_DRIVER_START( ddragon3 )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ddragon3_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(ddragon3_map)
@@ -574,6 +596,9 @@ static MACHINE_DRIVER_START( ddragon3 )
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
+
+	MDRV_MACHINE_START(ddragon3)
+	MDRV_MACHINE_RESET(ddragon3)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -13,46 +13,32 @@
 
 #include "driver.h"
 #include "cpu/e132xs/e132xs.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 
-static UINT32 *mosaicf2_videoram;
-
-static READ32_HANDLER( eeprom_r )
+typedef struct _mosaicf2_state mosaicf2_state;
+struct _mosaicf2_state
 {
-	return eeprom_read_bit();
-}
-
-static WRITE32_HANDLER( eeprom_bit_w )
-{
-	eeprom_write_bit(data & 0x01);
-}
-
-static WRITE32_HANDLER( eeprom_cs_line_w )
-{
-	eeprom_set_cs_line( (data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
-}
-
-static WRITE32_HANDLER( eeprom_clock_line_w )
-{
-	eeprom_set_clock_line( (~data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
-}
+	/* memory pointers */
+	UINT32 *  videoram;
+};
 
 
 static VIDEO_UPDATE( mosaicf2 )
 {
+	mosaicf2_state *state = (mosaicf2_state *)screen->machine->driver_data;
 	offs_t offs;
 
 	for (offs = 0; offs < 0x10000; offs++)
 	{
-		int	y = offs >> 8;
+		int y = offs >> 8;
 		int x = offs & 0xff;
 
 		if ((x < 0xa0) && (y < 0xe0))
 		{
-			*BITMAP_ADDR16(bitmap, y, (x * 2) + 0) = (mosaicf2_videoram[offs] >> 16) & 0x7fff;
-			*BITMAP_ADDR16(bitmap, y, (x * 2) + 1) = (mosaicf2_videoram[offs] >>  0) & 0x7fff;
+			*BITMAP_ADDR16(bitmap, y, (x * 2) + 0) = (state->videoram[offs] >> 16) & 0x7fff;
+			*BITMAP_ADDR16(bitmap, y, (x * 2) + 1) = (state->videoram[offs] >>  0) & 0x7fff;
 		}
 	}
 
@@ -63,7 +49,7 @@ static VIDEO_UPDATE( mosaicf2 )
 
 static ADDRESS_MAP_START( common_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
-	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(&mosaicf2_videoram)
+	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE_MEMBER(mosaicf2_state, videoram)
 	AM_RANGE(0x80000000, 0x80ffffff) AM_ROM AM_REGION("user2",0)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
@@ -71,8 +57,8 @@ ADDRESS_MAP_END
 static READ32_HANDLER( f32_input_port_1_r )
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
-	if ((cpu_get_pc(space->cpu) == 0x000379de) ||
-	    (cpu_get_pc(space->cpu) == 0x000379cc) ) cpu_eat_cycles(space->cpu, 100);
+	if ((cpu_get_pc(space->cpu) == 0x000379de) || (cpu_get_pc(space->cpu) == 0x000379cc) ) 
+		cpu_eat_cycles(space->cpu, 100);
 	//else printf("PC %08x\n", cpu_get_pc(space->cpu) );
 	return input_port_read(space->machine, "SYSTEM_P2");
 }
@@ -83,13 +69,13 @@ static ADDRESS_MAP_START( mosaicf2_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x4810, 0x4813) AM_DEVREAD8("ymsnd", ym2151_status_port_r, 0x000000ff)
 	AM_RANGE(0x5000, 0x5003) AM_READ_PORT("P1")
 	AM_RANGE(0x5200, 0x5203) AM_READ(f32_input_port_1_r)
-	AM_RANGE(0x5400, 0x5403) AM_READ(eeprom_r)
+	AM_RANGE(0x5400, 0x5403) AM_READ_PORT("EEPROMIN")
 	AM_RANGE(0x6000, 0x6003) AM_DEVWRITE8("oki", okim6295_w, 0x000000ff)
 	AM_RANGE(0x6800, 0x6803) AM_DEVWRITE8("ymsnd", ym2151_data_port_w, 0x000000ff)
 	AM_RANGE(0x6810, 0x6813) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x000000ff)
-	AM_RANGE(0x7000, 0x7003) AM_WRITE(eeprom_clock_line_w)
-	AM_RANGE(0x7200, 0x7203) AM_WRITE(eeprom_cs_line_w)
-	AM_RANGE(0x7400, 0x7403) AM_WRITE(eeprom_bit_w)
+	AM_RANGE(0x7000, 0x7003) AM_WRITE_PORT("EEPROMCLK")
+	AM_RANGE(0x7200, 0x7203) AM_WRITE_PORT("EEPROMCS")
+	AM_RANGE(0x7400, 0x7403) AM_WRITE_PORT("EEPROMOUT")
 ADDRESS_MAP_END
 
 
@@ -122,15 +108,32 @@ static INPUT_PORTS_START( mosaicf2 )
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START( "EEPROMIN" )
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+
+	PORT_START( "EEPROMCLK" )
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+
+	PORT_START( "EEPROMCS" )
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( mosaicf2 )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(mosaicf2_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(common_map)
 	MDRV_CPU_IO_MAP(mosaicf2_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

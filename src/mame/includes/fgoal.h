@@ -1,7 +1,25 @@
-/*----------- defined in drivers/fgoal.c -----------*/
 
-extern UINT8* fgoal_video_ram;
-extern int fgoal_player;
+
+typedef struct _fgoal_state fgoal_state;
+struct _fgoal_state
+{
+	/* memory pointers */
+	UINT8 *    video_ram;
+
+	/* video-related */
+	bitmap_t   *bgbitmap, *fgbitmap;
+	UINT8      xpos, ypos;
+	int        current_color;
+
+	/* misc */
+	int        fgoal_player;
+	UINT8      row, col;
+	unsigned   shift_data, shift_bits;
+	int        prev_coin;
+
+	/* devices */
+	const device_config *maincpu;
+};
 
 
 /*----------- defined in video/fgoal.c -----------*/

@@ -20,18 +20,6 @@ Differences between these sets include
 #include "cpu/m6800/m6800.h"
 #include "includes/fgoal.h"
 
-UINT8* fgoal_video_ram;
-
-static UINT8 row;
-static UINT8 col;
-
-int fgoal_player;
-
-static unsigned shift_data;
-static unsigned shift_bits;
-
-static int prev_coin;
-
 
 static int intensity(int bits)
 {
@@ -81,15 +69,16 @@ static PALETTE_INIT( fgoal )
 
 static TIMER_CALLBACK( interrupt_callback )
 {
+	fgoal_state *state = (fgoal_state *)machine->driver_data;
 	int scanline;
 	int coin = (input_port_read(machine, "IN1") & 2);
 
-	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+	cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
 
-	if (!coin && prev_coin)
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+	if (!coin && state->prev_coin)
+		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
-	prev_coin = coin;
+	state->prev_coin = coin;
 
 	scanline = video_screen_get_vpos(machine->primary_screen) + 128;
 
@@ -100,21 +89,17 @@ static TIMER_CALLBACK( interrupt_callback )
 }
 
 
-static MACHINE_RESET( fgoal )
+static unsigned video_ram_address( running_machine *machine )
 {
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, interrupt_callback);
-}
-
-
-static unsigned video_ram_address(void)
-{
-	return 0x4000 | (row << 5) | (col >> 3);
+	fgoal_state *state = (fgoal_state *)machine->driver_data;
+	return 0x4000 | (state->row << 5) | (state->col >> 3);
 }
 
 
 static READ8_HANDLER( fgoal_analog_r )
 {
-	return input_port_read(space->machine, fgoal_player ? "PADDLE1" : "PADDLE0"); /* PCB can be jumpered to use a single dial */
+	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	return input_port_read(space->machine, state->fgoal_player ? "PADDLE1" : "PADDLE0"); /* PCB can be jumpered to use a single dial */
 }
 
 
@@ -127,7 +112,8 @@ static CUSTOM_INPUT( fgoal_80_r )
 
 static READ8_HANDLER( fgoal_nmi_reset_r )
 {
-	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 
 	return 0;
 }
@@ -135,7 +121,8 @@ static READ8_HANDLER( fgoal_nmi_reset_r )
 
 static READ8_HANDLER( fgoal_irq_reset_r )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 
 	return 0;
 }
@@ -143,49 +130,56 @@ static READ8_HANDLER( fgoal_irq_reset_r )
 
 static READ8_HANDLER( fgoal_row_r )
 {
-	return row;
+	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	return state->row;
 }
 
 
 static WRITE8_HANDLER( fgoal_row_w )
 {
-	row = data;
-
-	shift_data = shift_data >> 8;
+	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	state->row = data;
+	state->shift_data = state->shift_data >> 8;
 }
+
 static WRITE8_HANDLER( fgoal_col_w )
 {
-	col = data;
-
-	shift_bits = data & 7;
+	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	state->col = data;
+	state->shift_bits = data & 7;
 }
 
 
 static WRITE8_HANDLER( fgoal_shifter_w )
 {
-	shift_data = (shift_data >> 8) | (data << 8); /* MB14241 custom chip */
+	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	state->shift_data = (state->shift_data >> 8) | (data << 8); /* MB14241 custom chip */
 }
 
 
 static READ8_HANDLER( fgoal_address_hi_r )
 {
-	return video_ram_address() >> 8;
+	return video_ram_address(space->machine) >> 8;
 }
+
 static READ8_HANDLER( fgoal_address_lo_r )
 {
-	return video_ram_address() & 0xff;
+	return video_ram_address(space->machine) & 0xff;
 }
 
 
 static READ8_HANDLER( fgoal_shifter_r )
 {
-	UINT8 v = shift_data >> (8 - shift_bits);
+	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	UINT8 v = state->shift_data >> (8 - state->shift_bits);
 
 	return BITSWAP8(v, 7, 6, 5, 4, 3, 2, 1, 0);
 }
+
 static READ8_HANDLER( fgoal_shifter_reverse_r )
 {
-	UINT8 v = shift_data >> (8 - shift_bits);
+	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	UINT8 v = state->shift_data >> (8 - state->shift_bits);
 
 	return BITSWAP8(v, 0, 1, 2, 3, 4, 5, 6, 7);
 }
@@ -212,8 +206,8 @@ static WRITE8_HANDLER( fgoal_sound2_w )
 	/* BIT3 => SX5 */
 	/* BIT4 => SX4 */
 	/* BIT5 => SX3 */
-
-	fgoal_player = data & 1;
+	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+	state->fgoal_player = data & 1;
 }
 
 
@@ -241,7 +235,7 @@ static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00fc, 0x00ff) AM_WRITE(fgoal_sound2_w)
 
 	AM_RANGE(0x0100, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(&fgoal_video_ram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(fgoal_state, video_ram)
 
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(fgoal_ypos_w)
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(fgoal_xpos_w)
@@ -347,12 +341,51 @@ static GFXDECODE_START( fgoal )
 GFXDECODE_END
 
 
+
+static MACHINE_START( fgoal )
+{
+	fgoal_state *state = (fgoal_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+
+	state_save_register_global(machine, state->xpos);
+	state_save_register_global(machine, state->ypos);
+	state_save_register_global(machine, state->current_color);
+	state_save_register_global(machine, state->fgoal_player);
+	state_save_register_global(machine, state->row);
+	state_save_register_global(machine, state->col);
+	state_save_register_global(machine, state->shift_data);
+	state_save_register_global(machine, state->shift_bits);
+	state_save_register_global(machine, state->prev_coin);
+}
+
+static MACHINE_RESET( fgoal )
+{
+	fgoal_state *state = (fgoal_state *)machine->driver_data;
+
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, interrupt_callback);
+
+	state->xpos = 0;
+	state->ypos = 0;
+	state->current_color = 0;
+	state->fgoal_player = 0;
+	state->row = 0;
+	state->col = 0;
+	state->shift_data = 0;
+	state->shift_bits = 0;
+	state->prev_coin = 0;
+}
+
 static MACHINE_DRIVER_START( fgoal )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(fgoal_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 10065000 / 10) /* ? */
 	MDRV_CPU_PROGRAM_MAP(cpu_map)
 
+	MDRV_MACHINE_START(fgoal)
 	MDRV_MACHINE_RESET(fgoal)
 
 	/* video hardware */

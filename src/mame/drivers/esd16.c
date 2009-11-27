@@ -44,30 +44,11 @@ Head Panic
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "esd16.h"
 
-/* Variables defined in video: */
-
-extern UINT16 *esd16_vram_0, *esd16_scroll_0;
-extern UINT16 *esd16_vram_1, *esd16_scroll_1;
-extern UINT16 *head_layersize;
-extern tilemap *esdtilemap_1_16x16;
-
-/* Functions defined in video: */
-
-WRITE16_HANDLER( esd16_vram_0_w );
-WRITE16_HANDLER( esd16_vram_1_w );
-WRITE16_HANDLER( esd16_tilemap0_color_w );
-
-VIDEO_START( esd16 );
-VIDEO_UPDATE( esd16 );
-VIDEO_UPDATE( hedpanic );
-VIDEO_UPDATE( hedpanio );
-
-static UINT16 *headpanic_platform_x;
-static UINT16 *headpanic_platform_y;
 
 /***************************************************************************
 
@@ -77,14 +58,19 @@ static UINT16 *headpanic_platform_y;
 
 ***************************************************************************/
 
-static WRITE16_HANDLER( esd16_spriteram_w ) {	COMBINE_DATA(&spriteram16[offset]);	}
+static WRITE16_HANDLER( esd16_spriteram_w )
+{
+	esd16_state *state = (esd16_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->spriteram16[offset]);
+}
 
 static WRITE16_HANDLER( esd16_sound_command_w )
 {
+	esd16_state *state = (esd16_state *)space->machine->driver_data;
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", 0, ASSERT_LINE);		// Generate an IRQ
+		cpu_set_input_line(state->audio_cpu, 0, ASSERT_LINE);		// Generate an IRQ
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));	// Allow the other CPU to reply
 	}
 }
@@ -99,12 +85,12 @@ static ADDRESS_MAP_START( multchmp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																		// RAM
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
-/**/AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)						// Sprites
+/**/AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_BASE_MEMBER(esd16_state, spriteram16) AM_SIZE(&spriteram_size)						// Sprites
 	AM_RANGE(0x300800, 0x300807) AM_WRITE(esd16_spriteram_w)												// Sprites (Mirrored)
-/**/AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(esd16_vram_0_w) AM_BASE(&esd16_vram_0)						// Layers
-/**/AM_RANGE(0x420000, 0x423fff) AM_RAM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1)						//
-/**/AM_RANGE(0x500000, 0x500003) AM_RAM AM_BASE(&esd16_scroll_0)											// Scroll
-/**/AM_RANGE(0x500004, 0x500007) AM_RAM AM_BASE(&esd16_scroll_1)											//
+/**/AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(esd16_vram_0_w) AM_BASE_MEMBER(esd16_state, vram_0)						// Layers
+/**/AM_RANGE(0x420000, 0x423fff) AM_RAM_WRITE(esd16_vram_1_w) AM_BASE_MEMBER(esd16_state, vram_1)						//
+/**/AM_RANGE(0x500000, 0x500003) AM_RAM AM_BASE_MEMBER(esd16_state, scroll_0)											// Scroll
+/**/AM_RANGE(0x500004, 0x500007) AM_RAM AM_BASE_MEMBER(esd16_state, scroll_1)											//
 /**/AM_RANGE(0x500008, 0x50000b) AM_RAM																		//
 /**/AM_RANGE(0x50000c, 0x50000f) AM_RAM																		//
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(SMH_NOP)															// IRQ Ack
@@ -119,19 +105,20 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER(hedpanic_platform_w)
 {
-	int offsets = headpanic_platform_x[0]+0x40* headpanic_platform_y[0];
+	esd16_state *state = (esd16_state *)space->machine->driver_data;
+	int offsets = state->headpanic_platform_x[0] + 0x40 * state->headpanic_platform_y[0];
 
-	esd16_vram_1[offsets] = data;
-
-	tilemap_mark_tile_dirty(esdtilemap_1_16x16,offsets);
+	state->vram_1[offsets] = data;
+	tilemap_mark_tile_dirty(state->tilemap_1_16x16, offsets);
 }
 
 
 static READ16_HANDLER( esd_eeprom_r )
 {
+	esd16_state *state = (esd16_state *)space->machine->driver_data;
 	if (ACCESSING_BITS_8_15)
 	{
-		return ((eeprom_read_bit() & 0x01) << 15);
+		return ((eepromdev_read_bit(state->eeprom) & 0x01) << 15);
 	}
 
 //  logerror("(0x%06x) unk EEPROM read: %04x\n", cpu_get_pc(space->cpu), mem_mask);
@@ -141,16 +128,7 @@ static READ16_HANDLER( esd_eeprom_r )
 static WRITE16_HANDLER( esd_eeprom_w )
 {
 	if (ACCESSING_BITS_8_15)
-	{
-		// data line
-		eeprom_write_bit((data & 0x0400) >> 6);
-
-		// clock line asserted.
-		eeprom_set_clock_line((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE );
-
-		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x0100) ? CLEAR_LINE : ASSERT_LINE );
-	}
+		input_port_write(space->machine, "EEPROMOUT", data, 0xffff); 
 
 //  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", cpu_get_pc(space->cpu), data, mem_mask);
 }
@@ -159,24 +137,24 @@ static ADDRESS_MAP_START( hedpanic_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																		// RAM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x900000, 0x9007ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)			// Sprites
+	AM_RANGE(0x900000, 0x9007ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, spriteram16) AM_SIZE(&spriteram_size)			// Sprites
 	AM_RANGE(0x900800, 0x900807) AM_WRITE(esd16_spriteram_w)												// Sprites (Mirrored)
-	AM_RANGE(0xa00000, 0xa03fff) AM_WRITE(esd16_vram_0_w) AM_BASE(&esd16_vram_0)							// Layers
-	AM_RANGE(0xa20000, 0xa23fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1)							//
-	AM_RANGE(0xa24000, 0xa27fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1)							// mirror?
-	AM_RANGE(0xb00000, 0xb00003) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_0)									// Scroll
-	AM_RANGE(0xb00004, 0xb00007) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_1)									//
-	AM_RANGE(0xb00008, 0xb00009) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_x)
-	AM_RANGE(0xb0000a, 0xb0000b) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_y)
+	AM_RANGE(0xa00000, 0xa03fff) AM_WRITE(esd16_vram_0_w) AM_BASE_MEMBER(esd16_state, vram_0)							// Layers
+	AM_RANGE(0xa20000, 0xa23fff) AM_WRITE(esd16_vram_1_w) AM_BASE_MEMBER(esd16_state, vram_1)							//
+	AM_RANGE(0xa24000, 0xa27fff) AM_WRITE(esd16_vram_1_w) AM_BASE_MEMBER(esd16_state, vram_1)							// mirror?
+	AM_RANGE(0xb00000, 0xb00003) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, scroll_0)									// Scroll
+	AM_RANGE(0xb00004, 0xb00007) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, scroll_1)									//
+	AM_RANGE(0xb00008, 0xb00009) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, headpanic_platform_x)
+	AM_RANGE(0xb0000a, 0xb0000b) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, headpanic_platform_y)
 	AM_RANGE(0xb0000c, 0xb0000d) AM_WRITENOP 																// ??
-	AM_RANGE(0xb0000e, 0xb0000f) AM_WRITE(SMH_RAM) AM_BASE(&head_layersize) 								// ??
+	AM_RANGE(0xb0000e, 0xb0000f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, head_layersize) 								// ??
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP // IRQ Ack
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc00006, 0xc00007) AM_READ(esd_eeprom_r	)
+	AM_RANGE(0xc00006, 0xc00007) AM_READ(esd_eeprom_r)
 	AM_RANGE(0xc00008, 0xc00009) AM_WRITE(esd16_tilemap0_color_w)	// Flip Screen + Tileamp0 palette banking
 	AM_RANGE(0xc0000a, 0xc0000b) AM_WRITENOP	// ? 2 not checked
-	AM_RANGE(0xc0000c, 0xc0000d) AM_WRITE(esd16_sound_command_w			)	// To Sound CPU // ok
+	AM_RANGE(0xc0000c, 0xc0000d) AM_WRITE(esd16_sound_command_w)	// To Sound CPU // ok
 	AM_RANGE(0xc0000e, 0xc0000f) AM_WRITE(esd_eeprom_w)
 	AM_RANGE(0xd00008, 0xd00009) AM_WRITE(hedpanic_platform_w)
 ADDRESS_MAP_END
@@ -186,9 +164,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mchampdx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM																		// RAM
-	AM_RANGE(0x300000, 0x303fff) AM_WRITE(esd16_vram_0_w) AM_BASE(&esd16_vram_0)							// Layers
-	AM_RANGE(0x320000, 0x323fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1)							//
-	AM_RANGE(0x324000, 0x327fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1)							// mirror?
+	AM_RANGE(0x300000, 0x303fff) AM_WRITE(esd16_vram_0_w) AM_BASE_MEMBER(esd16_state, vram_0)							// Layers
+	AM_RANGE(0x320000, 0x323fff) AM_WRITE(esd16_vram_1_w) AM_BASE_MEMBER(esd16_state, vram_1)							//
+	AM_RANGE(0x324000, 0x327fff) AM_WRITE(esd16_vram_1_w) AM_BASE_MEMBER(esd16_state, vram_1)							// mirror?
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	// IRQ Ack
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P1_P2")
@@ -198,14 +176,14 @@ static ADDRESS_MAP_START( mchampdx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x50000a, 0x50000b) AM_WRITENOP																// ? 2 not checked
 	AM_RANGE(0x50000c, 0x50000d) AM_WRITE(esd16_sound_command_w)											// To Sound CPU // ok
 	AM_RANGE(0x50000e, 0x50000f) AM_WRITE(esd_eeprom_w)
-	AM_RANGE(0x600000, 0x6007ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)			// Sprites
+	AM_RANGE(0x600000, 0x6007ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, spriteram16) AM_SIZE(&spriteram_size)			// Sprites
 	AM_RANGE(0x600800, 0x600807) AM_WRITE(esd16_spriteram_w)												// Sprites (Mirrored)
-	AM_RANGE(0x700000, 0x700003) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_0)									// Scroll
-	AM_RANGE(0x700004, 0x700007) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_1)									//
-	AM_RANGE(0x700008, 0x700009) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_x) 							// not used in mchampdx?
-	AM_RANGE(0x70000a, 0x70000b) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_y) 							// not used in mchampdx?
+	AM_RANGE(0x700000, 0x700003) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, scroll_0)									// Scroll
+	AM_RANGE(0x700004, 0x700007) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, scroll_1)									//
+	AM_RANGE(0x700008, 0x700009) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, headpanic_platform_x) 							// not used in mchampdx?
+	AM_RANGE(0x70000a, 0x70000b) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, headpanic_platform_y) 							// not used in mchampdx?
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITENOP 																// ??
-	AM_RANGE(0x70000e, 0x70000f) AM_WRITE(SMH_RAM) AM_BASE(&head_layersize) 								// ??
+	AM_RANGE(0x70000e, 0x70000f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, head_layersize) 								// ??
 	AM_RANGE(0xd00008, 0xd00009) AM_WRITE(hedpanic_platform_w) 												// not used in mchampdx?
 ADDRESS_MAP_END
 
@@ -214,17 +192,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tangtang_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// RAM
-	AM_RANGE(0x200000, 0x2007ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)			// Sprites
+	AM_RANGE(0x200000, 0x2007ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, spriteram16) AM_SIZE(&spriteram_size)			// Sprites
 	AM_RANGE(0x200800, 0x200807) AM_WRITE(esd16_spriteram_w)												// Sprites (Mirrored)
-	AM_RANGE(0x300000, 0x303fff) AM_WRITE(esd16_vram_0_w) AM_BASE(&esd16_vram_0)							// Layers
-	AM_RANGE(0x320000, 0x323fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1)							//
-	AM_RANGE(0x324000, 0x327fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1)							// mirror?
-	AM_RANGE(0x400000, 0x400003) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_0)									// Scroll
-	AM_RANGE(0x400004, 0x400007) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_1)									//
-	AM_RANGE(0x400008, 0x400009) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_x) 							// not used in mchampdx?
-	AM_RANGE(0x40000a, 0x40000b) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_y) 							// not used in mchampdx?
+	AM_RANGE(0x300000, 0x303fff) AM_WRITE(esd16_vram_0_w) AM_BASE_MEMBER(esd16_state, vram_0)							// Layers
+	AM_RANGE(0x320000, 0x323fff) AM_WRITE(esd16_vram_1_w) AM_BASE_MEMBER(esd16_state, vram_1)							//
+	AM_RANGE(0x324000, 0x327fff) AM_WRITE(esd16_vram_1_w) AM_BASE_MEMBER(esd16_state, vram_1)							// mirror?
+	AM_RANGE(0x400000, 0x400003) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, scroll_0)									// Scroll
+	AM_RANGE(0x400004, 0x400007) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, scroll_1)									//
+	AM_RANGE(0x400008, 0x400009) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, headpanic_platform_x) 							// not used in mchampdx?
+	AM_RANGE(0x40000a, 0x40000b) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, headpanic_platform_y) 							// not used in mchampdx?
 	AM_RANGE(0x40000c, 0x40000d) AM_WRITENOP 																// ??
-	AM_RANGE(0x40000e, 0x40000f) AM_WRITE(SMH_RAM) AM_BASE(&head_layersize)									// ??
+	AM_RANGE(0x40000e, 0x40000f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(esd16_state, head_layersize)									// ??
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	// IRQ Ack
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
@@ -249,9 +227,9 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( esd16_sound_rombank_w )
 {
 	int bank = data & 0xf;
-	if (data != bank)	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	if (data != bank)	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(space->cpu), data);
 	if (bank >= 3)	bank += 1;
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "audiocpu") + 0x4000 * bank);
+	memory_set_bank(space->machine, 1, bank);
 }
 
 static ADDRESS_MAP_START( multchmp_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -262,19 +240,21 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( esd16_sound_command_r )
 {
+	esd16_state *state = (esd16_state *)space->machine->driver_data;
+
 	/* Clear IRQ only after reading the command, or some get lost */
-	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
+	cpu_set_input_line(state->audio_cpu, 0, CLEAR_LINE);
 	return soundlatch_r(space, 0);
 }
 
 static ADDRESS_MAP_START( multchmp_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3812_w	)	// YM3812
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3812_w)	// YM3812
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)	// M6295
-	AM_RANGE(0x03, 0x03) AM_READ(esd16_sound_command_r		)	// From Main CPU
-	AM_RANGE(0x04, 0x04) AM_WRITE(SMH_NOP					)	// ? $00, $30
-	AM_RANGE(0x05, 0x05) AM_WRITE(esd16_sound_rombank_w 	)	// ROM Bank
-	AM_RANGE(0x06, 0x06) AM_READWRITE(SMH_NOP, SMH_NOP		)	// ? At the start / ? 1 (End of NMI routine)
+	AM_RANGE(0x03, 0x03) AM_READ(esd16_sound_command_r)	// From Main CPU
+	AM_RANGE(0x04, 0x04) AM_WRITE(SMH_NOP)	// ? $00, $30
+	AM_RANGE(0x05, 0x05) AM_WRITE(esd16_sound_rombank_w)	// ROM Bank
+	AM_RANGE(0x06, 0x06) AM_READWRITE(SMH_NOP, SMH_NOP)	// ? At the start / ? 1 (End of NMI routine)
 ADDRESS_MAP_END
 
 
@@ -395,6 +375,11 @@ static INPUT_PORTS_START( hedpanic )
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x0040, IP_ACTIVE_LOW)
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
 INPUT_PORTS_END
 
 
@@ -427,6 +412,11 @@ static INPUT_PORTS_START( swatpolc )
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x0040, IP_ACTIVE_LOW)
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -526,7 +516,30 @@ GFXDECODE_END
 
 ***************************************************************************/
 
+static MACHINE_START( esd16 )
+{
+	esd16_state *state = (esd16_state *)machine->driver_data;
+	UINT8 *AUDIO = memory_region(machine, "audiocpu");
+
+	memory_configure_bank(machine, 1, 0, 9, &AUDIO[0x0000], 0x4000);
+
+	state->audio_cpu = devtag_get_device(machine, "audiocpu");
+	state->eeprom = devtag_get_device(machine, "eeprom");
+
+	state_save_register_global(machine, state->tilemap0_color);
+}
+
+static MACHINE_RESET( esd16 )
+{
+	esd16_state *state = (esd16_state *)machine->driver_data;
+
+	state->tilemap0_color = 0;
+}
+
 static MACHINE_DRIVER_START( multchmp )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(esd16_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, 16000000)
@@ -537,6 +550,9 @@ static MACHINE_DRIVER_START( multchmp )
 	MDRV_CPU_PROGRAM_MAP(multchmp_sound_map)
 	MDRV_CPU_IO_MAP(multchmp_sound_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,32)	/* IRQ By Main CPU */
+
+	MDRV_MACHINE_START(esd16)
+	MDRV_MACHINE_RESET(esd16)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -571,7 +587,7 @@ static MACHINE_DRIVER_START( hedpanic )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hedpanic_map)
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	MDRV_PALETTE_LENGTH(0x1000/2)
 
@@ -1128,17 +1144,17 @@ ROM_END
 ***************************************************************************/
 
 /* ESD 11-09-98 */
-GAME( 1999, multchmp, 0,        multchmp, multchmp, 0, ROT0, "ESD",         "Multi Champ (World)", 0 )
-GAME( 1998, multchmpk,multchmp, multchmp, multchmp, 0, ROT0, "ESD",         "Multi Champ (Korea)", 0 )
+GAME( 1999, multchmp, 0,        multchmp, multchmp, 0, ROT0, "ESD",         "Multi Champ (World)", GAME_SUPPORTS_SAVE )
+GAME( 1998, multchmpk,multchmp, multchmp, multchmp, 0, ROT0, "ESD",         "Multi Champ (Korea)", GAME_SUPPORTS_SAVE )
 
 /* ESD 08-26-1999 */
-GAME( 2000, mchampdx, 0,        mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", 0 ) // 06/01/2000 ?
-GAME( 1999, mchampdxa,mchampdx, mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", 0 ) // 26/11/1999 ?
-GAME( 2000, hedpanic, 0,        hedpanic, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)", 0 ) // 17/01/2000 ?
-GAME( 2000, hedpanicf,hedpanic, hedpanic, hedpanic, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)", 0 ) // 15/03/2000 ?
-GAME( 1999, hedpanico,hedpanic, hedpanio, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)", 0 ) // 15/06/1999 ?
+GAME( 2000, mchampdx, 0,        mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", GAME_SUPPORTS_SAVE ) // 06/01/2000 ?
+GAME( 1999, mchampdxa,mchampdx, mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", GAME_SUPPORTS_SAVE ) // 26/11/1999 ?
+GAME( 2000, hedpanic, 0,        hedpanic, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)", GAME_SUPPORTS_SAVE ) // 17/01/2000 ?
+GAME( 2000, hedpanicf,hedpanic, hedpanic, hedpanic, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)", GAME_SUPPORTS_SAVE ) // 15/03/2000 ?
+GAME( 1999, hedpanico,hedpanic, hedpanio, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)", GAME_SUPPORTS_SAVE ) // 15/06/1999 ?
 
 /* ESD - This PCB looks identical to the ESD 08-26-1999 PCB */
-GAME( 2000, tangtang, 0,        tangtang, hedpanic, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", 0 ) // 26/05/2000 ?
-GAME( 2001, swatpolc, 0,        swatpolc, swatpolc, 0, ROT0, "ESD",         "SWAT Police ", 0 )
+GAME( 2000, tangtang, 0,        tangtang, hedpanic, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", GAME_SUPPORTS_SAVE ) // 26/05/2000 ?
+GAME( 2001, swatpolc, 0,        swatpolc, swatpolc, 0, ROT0, "ESD",         "SWAT Police ", GAME_SUPPORTS_SAVE )
 

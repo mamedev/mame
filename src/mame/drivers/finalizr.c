@@ -1,12 +1,12 @@
 /***************************************************************************
 
-Finalizer (GX523) (c) 1985 Konami
+    Finalizer (GX523) (c) 1985 Konami
 
-driver by Nicola Salmoria
+    driver by Nicola Salmoria
 
-2009-03:
-Added dsw locations and verified factory setting based on Guru's notes
-(actually for finalizr only, finalizb locations assumed to be the same)
+    2009-03:
+    Added dsw locations and verified factory setting based on Guru's notes
+    (actually for finalizr only, finalizb locations assumed to be the same)
 
 ***************************************************************************/
 
@@ -18,67 +18,63 @@ Added dsw locations and verified factory setting based on Guru's notes
 #include "sound/sn76496.h"
 #include "sound/dac.h"
 #include "konamipt.h"
-
-extern UINT8 *finalizr_scroll;
-extern UINT8 *finalizr_videoram2,*finalizr_colorram2;
-static UINT8 nmi_enable,irq_enable;
-
-
-static int finalizr_T1_line;
-
-PALETTE_INIT( finalizr );
-VIDEO_START( finalizr );
-WRITE8_HANDLER( finalizr_videoctrl_w );
-VIDEO_UPDATE( finalizr );
-
+#include "finalizr.h"
 
 
 static INTERRUPT_GEN( finalizr_interrupt )
 {
+	finalizr_state *state = (finalizr_state *)device->machine->driver_data;
+
 	if (cpu_getiloops(device) == 0)
 	{
-		if (irq_enable)
+		if (state->irq_enable)
 			cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
-		if (nmi_enable)
+		if (state->nmi_enable)
 			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static WRITE8_HANDLER( finalizr_coin_w )
 {
-	coin_counter_w(space->machine, 0,data & 0x01);
-	coin_counter_w(space->machine, 1,data & 0x02);
+	coin_counter_w(space->machine, 0, data & 0x01);
+	coin_counter_w(space->machine, 1, data & 0x02);
 }
 
 static WRITE8_HANDLER( finalizr_flipscreen_w )
 {
-	nmi_enable = data & 0x01;
-	irq_enable = data & 0x02;
+	finalizr_state *state = (finalizr_state *)space->machine->driver_data;
+	state->nmi_enable = data & 0x01;
+	state->irq_enable = data & 0x02;
 
 	flip_screen_set(space->machine, ~data & 0x08);
 }
 
 static WRITE8_HANDLER( finalizr_i8039_irq_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", 0, ASSERT_LINE);
+	finalizr_state *state = (finalizr_state *)space->machine->driver_data;
+	cpu_set_input_line(state->audio_cpu, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_w )
 {
+	finalizr_state *state = (finalizr_state *)space->machine->driver_data;
+
 	/*  bit 0x80 goes active low, indicating that the
         external IRQ being serviced is complete
         bit 0x40 goes active high to enable the DAC ?
     */
 
 	if ((data & 0x80) == 0)
-		cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
+		cpu_set_input_line(state->audio_cpu, 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( i8039_T1_r )
 {
+	finalizr_state *state = (finalizr_state *)space->machine->driver_data;
+
 	/*  I suspect the clock-out from the I8039 T0 line should be connected
         here (See the i8039_T0_w handler below).
         The frequency of this clock cannot be greater than I8039 CLKIN / 45
@@ -89,9 +85,9 @@ static READ8_HANDLER( i8039_T1_r )
         based on the I8039 main xtal clock input frequency of 9.216MHz
     */
 
-	finalizr_T1_line++;
-	finalizr_T1_line %= 16;
-	return (!(finalizr_T1_line % 3) && (finalizr_T1_line > 0));
+	state->T1_line++;
+	state->T1_line %= 16;
+	return (!(state->T1_line % 3) && (state->T1_line > 0));
 }
 
 static WRITE8_HANDLER( i8039_T0_w )
@@ -105,10 +101,10 @@ static WRITE8_HANDLER( i8039_T0_w )
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(SMH_RAM) AM_BASE(&finalizr_scroll)
+	AM_RANGE(0x0001, 0x0001) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(finalizr_state, scroll)
 	AM_RANGE(0x0003, 0x0003) AM_WRITE(finalizr_videoctrl_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(finalizr_flipscreen_w)
-//  AM_RANGE(0x0020, 0x003f) AM_WRITE(SMH_RAM) AM_BASE(&finalizr_scroll)
+//  AM_RANGE(0x0020, 0x003f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(finalizr_state, scroll)
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0808, 0x0808) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0810, 0x0810) AM_READ_PORT("SYSTEM")
@@ -121,13 +117,13 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x081b, 0x081b) AM_WRITENOP		/* Loads the snd command into the snd latch */
 	AM_RANGE(0x081c, 0x081c) AM_WRITE(finalizr_i8039_irq_w)	/* custom sound chip */
 	AM_RANGE(0x081d, 0x081d) AM_WRITE(soundlatch_w)			/* custom sound chip */
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(&colorram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE(&finalizr_colorram2)
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE(&finalizr_videoram2)
-	AM_RANGE(0x3000, 0x31ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_MEMBER(finalizr_state, colorram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_MEMBER(finalizr_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE_MEMBER(finalizr_state, colorram2)
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE_MEMBER(finalizr_state, videoram2)
+	AM_RANGE(0x3000, 0x31ff) AM_RAM AM_BASE_MEMBER(finalizr_state, spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x3200, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE(&spriteram_2)
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE_MEMBER(finalizr_state, spriteram_2)
 	AM_RANGE(0x3a00, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -137,7 +133,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff)				   AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0xff)                   AM_READ(soundlatch_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_WRITE(i8039_T0_w)
@@ -247,7 +243,34 @@ GFXDECODE_END
 
 
 
+static MACHINE_START( finalizr )
+{
+	finalizr_state *state = (finalizr_state *)machine->driver_data;
+
+	state->audio_cpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->spriterambank);
+	state_save_register_global(machine, state->charbank);
+	state_save_register_global(machine, state->T1_line);
+	state_save_register_global(machine, state->nmi_enable);
+	state_save_register_global(machine, state->irq_enable);
+}
+
+static MACHINE_RESET( finalizr )
+{
+	finalizr_state *state = (finalizr_state *)machine->driver_data;
+
+	state->spriterambank = 0;
+	state->charbank = 0;
+	state->T1_line = 0;
+	state->nmi_enable = 0;
+	state->irq_enable = 0;
+}
+
 static MACHINE_DRIVER_START( finalizr )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(finalizr_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,XTAL_18_432MHz/6)	/* ??? */
@@ -257,6 +280,9 @@ static MACHINE_DRIVER_START( finalizr )
 	MDRV_CPU_ADD("audiocpu", I8039,XTAL_18_432MHz/2)	/* 9.216MHz clkin ?? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(sound_io_map)
+
+	MDRV_MACHINE_START(finalizr)
+	MDRV_MACHINE_RESET(finalizr)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -348,5 +374,5 @@ static DRIVER_INIT( finalizr )
 }
 
 
-GAME( 1985, finalizr, 0,        finalizr, finalizr, finalizr, ROT90, "Konami", "Finalizer - Super Transformation", GAME_IMPERFECT_SOUND )
-GAME( 1985, finalizrb,finalizr, finalizr, finalizb, finalizr, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", GAME_IMPERFECT_SOUND )
+GAME( 1985, finalizr,  0,        finalizr, finalizr, finalizr, ROT90, "Konami", "Finalizer - Super Transformation", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1985, finalizrb, finalizr, finalizr, finalizb, finalizr, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
