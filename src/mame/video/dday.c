@@ -10,19 +10,7 @@
 
 #include "driver.h"
 #include "sound/ay8910.h"
-
-
-UINT8 *dday_bgvideoram;
-UINT8 *dday_fgvideoram;
-UINT8 *dday_textvideoram;
-UINT8 *dday_colorram;
-
-static tilemap *fg_tilemap, *bg_tilemap, *text_tilemap, *sl_tilemap;
-static bitmap_t *main_bitmap;
-static int control;
-static int sl_image;
-static int sl_enable;
-static int timer_value;
+#include "dday.h"
 
 
 /* Note: There seems to be no way to reset this timer via hardware.
@@ -32,20 +20,24 @@ static int timer_value;
 
 READ8_HANDLER( dday_countdown_timer_r )
 {
-	return ((timer_value / 10) << 4) | (timer_value % 10);
+	dday_state *state = (dday_state *)space->machine->driver_data;
+	return ((state->timer_value / 10) << 4) | (state->timer_value % 10);
 }
 
 static TIMER_CALLBACK( countdown_timer_callback )
 {
-	timer_value--;
+	dday_state *state = (dday_state *)machine->driver_data;
+	state->timer_value--;
 
-	if (timer_value < 0)
-		timer_value = 99;
+	if (state->timer_value < 0)
+		state->timer_value = 99;
 }
 
 static void start_countdown_timer(running_machine *machine)
 {
-	timer_value = 0;
+	dday_state *state = (dday_state *)machine->driver_data;
+
+	state->timer_value = 0;
 
 	timer_pulse(machine, ATTOTIME_IN_SEC(1), NULL, 0, countdown_timer_callback);
 }
@@ -163,38 +155,42 @@ PALETTE_INIT( dday )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
+	dday_state *state = (dday_state *)machine->driver_data;
 	int code;
 
-	code = dday_bgvideoram[tile_index];
+	code = state->bgvideoram[tile_index];
 	SET_TILE_INFO(0, code, code >> 5, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
+	dday_state *state = (dday_state *)machine->driver_data;
 	int code, flipx;
 
-	flipx = dday_colorram[tile_index & 0x03e0] & 0x01;
-	code = dday_fgvideoram[flipx ? tile_index ^ 0x1f : tile_index];
+	flipx = state->colorram[tile_index & 0x03e0] & 0x01;
+	code = state->fgvideoram[flipx ? tile_index ^ 0x1f : tile_index];
 	SET_TILE_INFO(2, code, code >> 5, flipx ? TILE_FLIPX : 0);
 }
 
 static TILE_GET_INFO( get_text_tile_info )
 {
+	dday_state *state = (dday_state *)machine->driver_data;
 	int code;
 
-	code = dday_textvideoram[tile_index];
+	code = state->textvideoram[tile_index];
 	SET_TILE_INFO(1, code, code >> 5, 0);
 }
 
 static TILE_GET_INFO( get_sl_tile_info )
 {
+	dday_state *state = (dday_state *)machine->driver_data;
 	int code, sl_flipx, flipx;
 	UINT8* sl_map;
 
-	sl_map = &memory_region(machine, "user1")[(sl_image & 0x07) * 0x0200];
+	sl_map = &memory_region(machine, "user1")[(state->sl_image & 0x07) * 0x0200];
 
 	flipx = (tile_index >> 4) & 0x01;
-	sl_flipx = (sl_image >> 3) & 0x01;
+	sl_flipx = (state->sl_image >> 3) & 0x01;
 
 	/* bit 4 is really a flip indicator.  Need to shift bits 5-9 to the right by 1 */
 	tile_index = ((tile_index & 0x03e0) >> 1) | (tile_index & 0x0f);
@@ -217,76 +213,82 @@ static TILE_GET_INFO( get_sl_tile_info )
 
 VIDEO_START( dday )
 {
-	bg_tilemap   = tilemap_create(machine, get_bg_tile_info,  tilemap_scan_rows,8,8,32,32);
-	fg_tilemap   = tilemap_create(machine, get_fg_tile_info,  tilemap_scan_rows,8,8,32,32);
-	text_tilemap = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,8,8,32,32);
-	sl_tilemap   = tilemap_create(machine, get_sl_tile_info,  tilemap_scan_rows,8,8,32,32);
+	dday_state *state = (dday_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->text_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->sl_tilemap = tilemap_create(machine, get_sl_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	main_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->main_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	tilemap_set_transmask(bg_tilemap,0,0x00f0,0xff0f); /* pens 0-3 have priority over the foreground layer */
-
-	tilemap_set_transparent_pen(fg_tilemap, 0);
-
-	tilemap_set_transparent_pen(text_tilemap, 0);
-
-	control = 0;
-	sl_enable = 0;
-	sl_image = 0;
+	tilemap_set_transmask(state->bg_tilemap, 0, 0x00f0, 0xff0f); /* pens 0-3 have priority over the foreground layer */
+	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+	tilemap_set_transparent_pen(state->text_tilemap, 0);
 
 	start_countdown_timer(machine);
 }
 
 WRITE8_HANDLER( dday_bgvideoram_w )
 {
-	dday_bgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	dday_state *state = (dday_state *)space->machine->driver_data;
+
+	state->bgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( dday_fgvideoram_w )
 {
-	dday_fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
-	tilemap_mark_tile_dirty(fg_tilemap, offset ^ 0x1f);  /* for flipx case */
+	dday_state *state = (dday_state *)space->machine->driver_data;
+
+	state->fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset ^ 0x1f);  /* for flipx case */
 }
 
 WRITE8_HANDLER( dday_textvideoram_w )
 {
-	dday_textvideoram[offset] = data;
-	tilemap_mark_tile_dirty(text_tilemap, offset);
+	dday_state *state = (dday_state *)space->machine->driver_data;
+
+	state->textvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->text_tilemap, offset);
 }
 
 WRITE8_HANDLER( dday_colorram_w )
 {
+	dday_state *state = (dday_state *)space->machine->driver_data;
 	int i;
 
 	offset &= 0x03e0;
 
-	dday_colorram[offset & 0x3e0] = data;
+	state->colorram[offset & 0x3e0] = data;
 
 	for (i = 0; i < 0x20; i++)
-		tilemap_mark_tile_dirty(fg_tilemap, offset + i);
+		tilemap_mark_tile_dirty(state->fg_tilemap, offset + i);
 }
 
 READ8_HANDLER( dday_colorram_r )
 {
-	return dday_colorram[offset & 0x03e0];
+	dday_state *state = (dday_state *)space->machine->driver_data;
+	return state->colorram[offset & 0x03e0];
 }
 
 
 WRITE8_HANDLER( dday_sl_control_w )
 {
-	if (sl_image != data)
-	{
-		sl_image = data;
+	dday_state *state = (dday_state *)space->machine->driver_data;
 
-		tilemap_mark_all_tiles_dirty(sl_tilemap);
+	if (state->sl_image != data)
+	{
+		state->sl_image = data;
+		tilemap_mark_all_tiles_dirty(state->sl_tilemap);
 	}
 }
 
 
 WRITE8_HANDLER( dday_control_w )
 {
+	dday_state *state = (dday_state *)space->machine->driver_data;
+
 	//if (data & 0xac)  logerror("Control = %02X\n", data & 0xac);
 
 	/* bit 0 is coin counter 1 */
@@ -296,15 +298,15 @@ WRITE8_HANDLER( dday_control_w )
 	coin_counter_w(space->machine, 1, data & 0x02);
 
 	/* bit 4 is sound enable */
-	if (!(data & 0x10) && (control & 0x10))
-		devtag_reset(space->machine, "ay1");
+	if (!(data & 0x10) && (state->control & 0x10))
+		device_reset(state->ay1);
 
 	sound_global_enable(space->machine, data & 0x10);
 
 	/* bit 6 is search light enable */
-	sl_enable = data & 0x40;
+	state->sl_enable = data & 0x40;
 
-	control = data;
+	state->control = data;
 }
 
 /***************************************************************************
@@ -315,22 +317,24 @@ WRITE8_HANDLER( dday_control_w )
 
 VIDEO_UPDATE( dday )
 {
-	tilemap_draw(main_bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1,0);
-	tilemap_draw(main_bitmap,cliprect,fg_tilemap,0,0);
-	tilemap_draw(main_bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0,0);
-	tilemap_draw(main_bitmap,cliprect,text_tilemap,0,0);
+	dday_state *state = (dday_state *)screen->machine->driver_data;
 
-	if (sl_enable)
+	tilemap_draw(state->main_bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	tilemap_draw(state->main_bitmap, cliprect, state->fg_tilemap, 0, 0);
+	tilemap_draw(state->main_bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	tilemap_draw(state->main_bitmap, cliprect, state->text_tilemap, 0, 0);
+
+	if (state->sl_enable)
 	{
 		/* apply shadow */
 		int x, y;
 
-		bitmap_t *sl_bitmap = tilemap_get_pixmap(sl_tilemap);
+		bitmap_t *sl_bitmap = tilemap_get_pixmap(state->sl_tilemap);
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 			{
-				UINT16 src_pixel = *BITMAP_ADDR16(main_bitmap, y, x);
+				UINT16 src_pixel = *BITMAP_ADDR16(state->main_bitmap, y, x);
 
 				if (*BITMAP_ADDR16(sl_bitmap, y, x) == 0xff)
 					src_pixel += screen->machine->config->total_colors;
@@ -339,7 +343,7 @@ VIDEO_UPDATE( dday )
 			}
 	}
 	else
-		copybitmap(bitmap,main_bitmap,0,0,0,0,cliprect);
+		copybitmap(bitmap, state->main_bitmap, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }

@@ -52,32 +52,16 @@ write:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-extern UINT8 *dday_bgvideoram;
-extern UINT8 *dday_fgvideoram;
-extern UINT8 *dday_textvideoram;
-extern UINT8 *dday_colorram;
-
-PALETTE_INIT( dday );
-VIDEO_START( dday );
-VIDEO_UPDATE( dday );
-WRITE8_HANDLER( dday_bgvideoram_w );
-WRITE8_HANDLER( dday_fgvideoram_w );
-WRITE8_HANDLER( dday_textvideoram_w );
-WRITE8_HANDLER( dday_colorram_w );
-READ8_HANDLER( dday_colorram_r );
-WRITE8_HANDLER( dday_control_w );
-WRITE8_HANDLER( dday_sl_control_w );
-READ8_HANDLER( dday_countdown_timer_r );
+#include "dday.h"
 
 
 static ADDRESS_MAP_START( dday_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(dday_sl_control_w)
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(dday_textvideoram_w) AM_BASE(&dday_textvideoram)
-	AM_RANGE(0x5400, 0x57ff) AM_RAM_WRITE(dday_fgvideoram_w) AM_BASE(&dday_fgvideoram)
-	AM_RANGE(0x5800, 0x5bff) AM_RAM_WRITE(dday_bgvideoram_w) AM_BASE(&dday_bgvideoram)
-	AM_RANGE(0x5c00, 0x5fff) AM_READWRITE(dday_colorram_r, dday_colorram_w) AM_BASE(&dday_colorram)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(dday_textvideoram_w) AM_BASE_MEMBER(dday_state, textvideoram)
+	AM_RANGE(0x5400, 0x57ff) AM_RAM_WRITE(dday_fgvideoram_w) AM_BASE_MEMBER(dday_state, fgvideoram)
+	AM_RANGE(0x5800, 0x5bff) AM_RAM_WRITE(dday_bgvideoram_w) AM_BASE_MEMBER(dday_state, bgvideoram)
+	AM_RANGE(0x5c00, 0x5fff) AM_READWRITE(dday_colorram_r, dday_colorram_w) AM_BASE_MEMBER(dday_state, colorram)
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_RANGE(0x6400, 0x6401) AM_MIRROR(0x000e) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x6800, 0x6801) AM_DEVWRITE("ay2", ay8910_address_data_w)
@@ -186,7 +170,7 @@ static INPUT_PORTS_START( ddayc )
 	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )		// Easy   - No Bombs, No Troop Carriers
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )	// Normal - No Bombs, Troop Carriers
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )		// Hard   - Bombs, Troop Carriers
-    PORT_DIPSETTING(    0x00, "Hard (duplicate setting)" )     // Same as 0x10
+	PORT_DIPSETTING(    0x00, "Hard (duplicate setting)" )     // Same as 0x10
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )	// Doesn't seem to be used
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
@@ -236,11 +220,39 @@ GFXDECODE_END
 
 
 
+static MACHINE_START( dday )
+{
+	dday_state *state = (dday_state *)machine->driver_data;
+
+	state->ay1 = devtag_get_device(machine, "ay1");
+
+	state_save_register_global(machine, state->control);
+	state_save_register_global(machine, state->sl_enable);
+	state_save_register_global(machine, state->sl_image);
+	state_save_register_global(machine, state->timer_value);
+}
+
+static MACHINE_RESET( dday )
+{
+	dday_state *state = (dday_state *)machine->driver_data;
+
+	state->control = 0;
+	state->sl_enable = 0;
+	state->sl_image = 0;
+}
+
+
 static MACHINE_DRIVER_START( dday )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(dday_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)     /* 2 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(dday_map)
+
+	MDRV_MACHINE_START(dday)
+	MDRV_MACHINE_RESET(dday)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
