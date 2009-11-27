@@ -191,6 +191,14 @@ TODO:
 2008-07
 Dip location verified from manual for: cclimber, guzzler, swimmer
 
+ Cannon Ball
+ -----------
+
+ The Cannon Ball bootlegs on this Falcon (Crazy Kong) hardware don't correctly
+ handle the protection device found on the original pacman hardware conversion,
+ this causes them to crash after the a few rounds - confirmed on an original PCB.
+ They clearly weren't tested properly by the bootleggers.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -1643,14 +1651,16 @@ ROM_START( cannonb )
 	ROM_LOAD( "canballs.5f",  0x1000, 0x1000, CRC(3e0dacdd) SHA1(cdd3684a6962f2fb582b8a415383c06a5e5059dd) )
 	ROM_LOAD( "canballs.5h",  0x2000, 0x1000, CRC(e18a836b) SHA1(19b90a55db82914c5db18486e05d9f59aba1b442) )
 	ROM_LOAD( "canballs.5k",  0x3000, 0x0800, CRC(6ed3cbf4) SHA1(070ba61dc97df6be8004f7e052a4cef836234888) )
-	ROM_LOAD( "canballs.5m",  0x4000, 0x1000, CRC(4f0088ab) SHA1(a8009f5b8517ba4d84fbc483b199f2514f24eae8) )
-	ROM_LOAD( "canballs.5n",  0x5000, 0x1000, CRC(91570033) SHA1(7cd7fe9541da36c3919324bc65e6db1d1ca635e0) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "canballs.11n", 0x0000, 0x1000, CRC(a95b8e03) SHA1(e78125023e1af6de292292b875b45401b2173ca9) )
-	ROM_LOAD( "canballs.11l", 0x1000, 0x1000, CRC(060b044c) SHA1(3121f07adb661663a2303085eea1b662968f8f98) )
-	ROM_LOAD( "canballs.11k", 0x2000, 0x1000, CRC(dbbe8263) SHA1(efe4bba25a03261bc8309e6d83d5600def875b0c) )
-	ROM_LOAD( "canballs.11h", 0x3000, 0x1000, CRC(8043bc1a) SHA1(bd2f3dfe26cf8d987d9ecaa41eac4bdc4e16a692) )
+	ROM_REGION( 0x4000, "gfx1", 0 ) // using gfx roms from other sets because the ones in this set were bad
+	ROM_LOAD( "cb10.bin",   0x0000, 0x0800, CRC(602a6c2d) SHA1(788f83bcb0667d8a42c209f3d51708d496be58df) )
+	/* 0x0800-0x0fff - empty */
+	ROM_CONTINUE(           0x1000, 0x0800 )
+	/* 0x1800-0x0fff - empty */
+	ROM_LOAD( "cb9.bin",    0x2000, 0x0800, CRC(2d036026) SHA1(b6eada3e67edd7db59d9ca823b798cd20f0afca9) )
+	/* 0x2800-0x0fff - empty */
+	ROM_CONTINUE(           0x3000, 0x0800 )
+	/* 0x3800-0x0fff - empty */
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
 	ROM_LOAD( "canballs.11c", 0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
@@ -1664,6 +1674,14 @@ ROM_START( cannonb )
 	ROM_REGION( 0x2000, "samples", 0 )	/* samples */
 	ROM_LOAD( "canballs.5s",  0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "canballs.5p",  0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
+
+	ROM_REGION( 0x6000, "unused", 0 )	/* unused roms, don't seem to belong to this game, can probably remove them later */
+	ROM_LOAD( "canballs.5m",  0x0000, 0x1000, CRC(4f0088ab) SHA1(a8009f5b8517ba4d84fbc483b199f2514f24eae8) ) // patched 'le bagnard' cod rom
+	ROM_LOAD( "canballs.5n",  0x1000, 0x1000, CRC(91570033) SHA1(7cd7fe9541da36c3919324bc65e6db1d1ca635e0) ) // ?
+	ROM_LOAD( "canballs.11l", 0x2000, 0x1000, CRC(060b044c) SHA1(3121f07adb661663a2303085eea1b662968f8f98) ) // 'le bagnard gfx'
+	ROM_LOAD( "canballs.11h", 0x3000, 0x1000, CRC(8043bc1a) SHA1(bd2f3dfe26cf8d987d9ecaa41eac4bdc4e16a692) ) // 'le bagnard gfx'
+	ROM_LOAD( "canballs.11n", 0x4000, 0x1000, CRC(a95b8e03) SHA1(e78125023e1af6de292292b875b45401b2173ca9) ) // probably just bad dump (missing sprite data)
+	ROM_LOAD( "canballs.11k", 0x5000, 0x1000, CRC(dbbe8263) SHA1(efe4bba25a03261bc8309e6d83d5600def875b0c) ) // probably just bad dump (missing sprite data)
 ROM_END
 
 ROM_START( cannonb2 )
@@ -1695,6 +1713,37 @@ ROM_START( cannonb2 )
 	ROM_REGION( 0x2000, "samples", 0 )	/* samples */
 	ROM_LOAD( "cb6.bin",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "cb5.bin",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
+ROM_END
+
+ROM_START( cannonb3 )
+	ROM_REGION( 0x11000, "maincpu", 0 )
+	ROM_LOAD( "1 pos e5  2532.bin",  0x0000, 0x1000, CRC(4b482e80) SHA1(4c0e52016ed760d399e8d49f600d38c1b6ccf256) )
+	ROM_LOAD( "2 pos f5  2532.bin",  0x1000, 0x1000, CRC(1fa050af) SHA1(00244e19aee14ce980697136cddb6cb72a4d80da) )
+	ROM_LOAD( "3 pos h5  2532.bin",  0x2000, 0x1000, CRC(e18a836b) SHA1(19b90a55db82914c5db18486e05d9f59aba1b442) )
+	ROM_LOAD( "4 pos k5  2716.bin",  0x3000, 0x0800, CRC(58e04f41) SHA1(d1d0adb36bd509928c0e1a3a0ee9ba296aa530ab) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "b pos n11  2532.bin",   0x0000, 0x0800, CRC(602a6c2d) SHA1(788f83bcb0667d8a42c209f3d51708d496be58df) )
+	/* 0x0800-0x0fff - empty */
+	ROM_CONTINUE(           0x1000, 0x0800 )
+	/* 0x1800-0x0fff - empty */
+	ROM_LOAD( "a pos k11  2532.bin",    0x2000, 0x0800, CRC(2d036026) SHA1(b6eada3e67edd7db59d9ca823b798cd20f0afca9) )
+	/* 0x2800-0x0fff - empty */
+	ROM_CONTINUE(           0x3000, 0x0800 )
+	/* 0x3800-0x0fff - empty */
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "ck2 pos c11  2716.bin", 0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
+	ROM_LOAD( "ck1 pos a11  2716.bin", 0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
+
+	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_LOAD( "c pos v6  n82s123n.bin",      0x0000, 0x0020, CRC(b3fc1505) SHA1(5b94adde0428a26b815c7eb9b3f3716470d349c7) )
+	ROM_LOAD( "b pos u6  n82s123n.bin",      0x0020, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) )
+	ROM_LOAD( "a pos t6  n82s123n.bin",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
+
+	ROM_REGION( 0x2000, "samples", 0 )	/* samples */
+	ROM_LOAD( "ck14 pos s5  2532.bin",  0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
+	ROM_LOAD( "ck13 pos r5  2532.bin",  0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
 
 ROM_START( swimmer )
@@ -1955,8 +2004,9 @@ GAME( 198?, ckongb,   ckong,    cclimber, ckongb,   ckongb,   ROT270, "bootleg",
 GAME( 1981, rpatrol,  0,        cclimber, rpatrol,  0,        ROT0,   "Orca", "River Patrol (Orca)", 0 )
 GAME( 1981, rpatrolb, rpatrol,  cclimber, rpatrol,  0,        ROT0,   "bootleg", "River Patrol (bootleg)", 0 )
 GAME( 1981, silvland, rpatrol,  cclimber, rpatrol,  0,        ROT0,   "Falcon", "Silver Land", 0 )
-GAME( 1985, cannonb,  cannonbp, cannonb,  cannonb,  cannonb,  ROT90,  "Soft", "Cannon Ball (bootleg on Crazy Climber hardware, set 1)" , GAME_IMPERFECT_GRAPHICS )
-GAME( 1985, cannonb2, cannonbp, cannonb,  cannonb,  cannonb2, ROT90,  "TV Game Gruenberg", "Cannon Ball (bootleg on Crazy Climber hardware, set 2)", 0 )
+GAME( 1985, cannonb,  cannonbp, cannonb,  cannonb,  cannonb,  ROT90,  "Soft", "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)" , GAME_IMPERFECT_GRAPHICS ) // bootleggers missed protection after bonus game
+GAME( 1985, cannonb2, cannonbp, cannonb,  cannonb,  cannonb2, ROT90,  "TV Game Gruenberg", "Cannon Ball (bootleg on Crazy Kong hardware) (set 2, buggy)", 0 ) // bootleggers missed protection after bonus game
+GAME( 1985, cannonb3, cannonbp, cannonb,  cannonb,  cannonb2, ROT90,  "Soft", "Cannon Ball (bootleg on Crazy Kong hardware) (set 3, no bonus game)", 0 ) // the bonus game is patched out, thus avoiding the protection issue
 GAME( 1982, swimmer,  0,        swimmer,  swimmer,  0,        ROT0,   "Tehkan", "Swimmer (set 1)", 0 )
 GAME( 1982, swimmera, swimmer,  swimmer,  swimmer,  0,        ROT0,   "Tehkan", "Swimmer (set 2)", 0 )
 GAME( 1982, swimmerb, swimmer,  swimmer,  swimmerb, 0,        ROT0,   "Tehkan", "Swimmer (set 3)", 0 )

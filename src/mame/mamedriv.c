@@ -368,6 +368,7 @@ const game_driver * const drivers[] =
 	DRIVER( guzzler )	/* (c) 1983 Tehkan */
 	DRIVER( cannonb )	/* (c) 1985 Soft */
 	DRIVER( cannonb2 )	/* (c) 1985 TV Game Gruenberg */
+	DRIVER( cannonb3 )	/* (c) 1985 Soft */
 	DRIVER( ckongb )	/* bootleg */
 
 	/* Nichibutsu games */
