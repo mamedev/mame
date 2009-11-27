@@ -338,6 +338,9 @@ static UINT8 read_mode1(i8255a_t *i8255a, int port)
 
 		/* clear interrupt */
 		set_intr(i8255a, port, 0);
+
+		/* clear input latch */
+		i8255a->input[port] = 0;
 	}
 
 	return data;
@@ -355,6 +358,9 @@ static UINT8 read_mode2(i8255a_t *i8255a)
 
 	/* clear interrupt */
 	set_intr(i8255a, PORT_A, 0);
+
+	/* clear input latch */
+	i8255a->input[PORT_A] = 0;
 
 	return data;
 }
