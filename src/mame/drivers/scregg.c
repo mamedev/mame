@@ -57,9 +57,9 @@ it as ASCII text.
 
 static ADDRESS_MAP_START( dommy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE(&btime_colorram)
-	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(btime_mirrorvideoram_r,btime_mirrorvideoram_w)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_MEMBER(btime_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_MEMBER(btime_state, colorram)
+	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1") AM_WRITENOP
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2") AM_WRITE(btime_video_control_w)
 /*  AM_RANGE(0x4004, 0x4004)  */ /* this is read */
@@ -73,8 +73,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( eggs_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE(&btime_colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_MEMBER(btime_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE_MEMBER(btime_state, colorram)
 	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r,btime_mirrorvideoram_w)
 	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(btime_mirrorcolorram_r,btime_mirrorcolorram_w)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW1") AM_WRITE(btime_video_control_w)
@@ -200,12 +200,44 @@ GFXDECODE_END
 
 
 
+static MACHINE_START( scregg )
+{
+	btime_state *state = (btime_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = NULL;
+
+	state_save_register_global(machine, state->btime_palette);
+	state_save_register_global(machine, state->bnj_scroll1);
+	state_save_register_global(machine, state->bnj_scroll2);
+	state_save_register_global_array(machine, state->btime_tilemap);
+}
+
+MACHINE_RESET( scregg )
+{
+	btime_state *state = (btime_state *)machine->driver_data;
+
+	state->btime_palette = 0;
+	state->bnj_scroll1 = 0;
+	state->bnj_scroll2 = 0;
+	state->btime_tilemap[0] = 0;
+	state->btime_tilemap[1] = 0;
+	state->btime_tilemap[2] = 0;
+	state->btime_tilemap[3] = 0;
+}
+
 static MACHINE_DRIVER_START( dommy )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(btime_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(dommy_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,16*60) //???
+
+	MDRV_MACHINE_START(scregg)
+	MDRV_MACHINE_RESET(scregg)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -235,10 +267,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( scregg )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(btime_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(eggs_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,16*60) //???
+
+	MDRV_MACHINE_START(scregg)
+	MDRV_MACHINE_RESET(scregg)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -361,7 +399,7 @@ static DRIVER_INIT( rockduck )
 	int x;
 	UINT8 *src = memory_region( machine, "gfx1" );
 
-	for (x=0x2000;x<0x6000;x++)
+	for (x = 0x2000; x < 0x6000; x++)
 	{
 		src[x] = BITSWAP8(src[x],2,0,3,6,1,4,7,5);
 
@@ -369,7 +407,7 @@ static DRIVER_INIT( rockduck )
 }
 
 
-GAME( 1983, dommy,    0,        dommy,  scregg, 0, ROT270, "Technos Japan", "Dommy", 0 )
-GAME( 1983, scregg,   0,        scregg, scregg, 0, ROT270, "Technos Japan", "Scrambled Egg", 0 )
-GAME( 1983, eggs,     scregg,   scregg, scregg, 0, ROT270, "[Technos Japan] Universal USA", "Eggs", 0 )
-GAME( 1983, rockduck, 0,        scregg, rockduck, rockduck, ROT270, "Datel SAS", "Rock Duck (prototype?)", GAME_WRONG_COLORS )
+GAME( 1983, dommy,    0,        dommy,  scregg, 0, ROT270, "Technos Japan", "Dommy", GAME_SUPPORTS_SAVE )
+GAME( 1983, scregg,   0,        scregg, scregg, 0, ROT270, "Technos Japan", "Scrambled Egg", GAME_SUPPORTS_SAVE )
+GAME( 1983, eggs,     scregg,   scregg, scregg, 0, ROT270, "[Technos Japan] Universal USA", "Eggs", GAME_SUPPORTS_SAVE )
+GAME( 1983, rockduck, 0,        scregg, rockduck, rockduck, ROT270, "Datel SAS", "Rock Duck (prototype?)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
