@@ -1809,11 +1809,11 @@ VIDEO_UPDATE( hng64 )
 	if (0)
 		popmessage("%08x %08x %08x %08x %08x", hng64_spriteregs[0], hng64_spriteregs[1], hng64_spriteregs[2], hng64_spriteregs[3], hng64_spriteregs[4]);
 
-	if (1)
+	if (0)
     popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x %08x",
     hng64_videoregs[0x00],
     hng64_videoregs[0x01],
-    (hng64_videoregs[0x02]>>16)&0xf9ff,
+    (hng64_videoregs[0x02]>>16)&0xf9ff, // bits we're sure about are masked out
     (hng64_videoregs[0x02]>>0)&0xf9ff,
     (hng64_videoregs[0x03]>>16)&0xf9ff,
     (hng64_videoregs[0x03]>>0)&0xf9ff,
@@ -1831,10 +1831,33 @@ VIDEO_UPDATE( hng64 )
     hng64_videoregs[0x0d],
     hng64_videoregs[0x0e]);
 
+	if (1)
+		popmessage("TC: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
+		hng64_tcram[0x00/4],
+		hng64_tcram[0x04/4],
+		hng64_tcram[0x08/4], // tilemaps 0/1 ?
+		hng64_tcram[0x0c/4], // tilemaps 2/3 ?
+		hng64_tcram[0x10/4],
+		hng64_tcram[0x14/4],
+		hng64_tcram[0x18/4],
+		hng64_tcram[0x1c/4],
+		hng64_tcram[0x20/4],
+		hng64_tcram[0x24/4],
+		hng64_tcram[0x28/4],
+		hng64_tcram[0x2c/4],
+		hng64_tcram[0x30/4],
+		hng64_tcram[0x34/4],
+		hng64_tcram[0x38/4],
+		hng64_tcram[0x3c/4],
+		hng64_tcram[0x40/4],
+		hng64_tcram[0x44/4],
+		hng64_tcram[0x48/4],
+		hng64_tcram[0x4c/4],
+		hng64_tcram[0x50/4],
+		hng64_tcram[0x54/4],
+		hng64_tcram[0x58/4],
+		hng64_tcram[0x5c/4]);
 
-
-	if (0)
-	popmessage("0: %04x  1: %04x   2: %04x  3: %04x\n", (hng64_videoregs[0x02]&0xffff0000)>>16, (hng64_videoregs[0x02]&0x0000ffff)>>0, (hng64_videoregs[0x03]&0xffff0000)>>16, (hng64_videoregs[0x03]&0x0000ffff)>>0);
 
 
 
