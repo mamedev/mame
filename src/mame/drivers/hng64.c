@@ -27,11 +27,12 @@ Notes:
   * The Japanese text on the Roads Edge network screen says : "waiting to connect network... please wait without touching machine"
 
 ToDo:
-  * clean up I/O / MCU communication
+  * Buriki One / Xrally and Roads Edge doesn't coin it up, irq issue?
+  * sprite garbage in Beast Busters 2nd Nightmare, another irq issue?
+  * Samurai Shodown 64 2 puts "Press 1p & 2p button" msg in gameplay, known to be a MCU simulation issue, i/o port 4 doesn't
+    seem to be just an input port but controls program flow too.
   * work out the purpose of the interrupts and how many are needed
   * correct game speed (seems too fast)
-  * figure out what 'network' Road Edge needs to boot, it should run as a standalone
-  * make ss64 boot (io return 3 then 4 not just 4) then work out where the palette is
 
   2d:
   * scroll (base registers?)
@@ -469,6 +470,7 @@ extern WRITE32_HANDLER( hng64_videoram_w );
 extern UINT32 *hng64_spriteram, *hng64_videoregs, *hng64_spriteregs ;
 extern UINT32 *hng64_videoram ;
 extern UINT32 *hng64_tcram ;
+extern UINT32 *hng64_3dregs;
 
 extern UINT32 hng64_dls[2][0x81] ;
 
@@ -792,7 +794,7 @@ static READ32_HANDLER( racing_io_r )
 
 static READ32_HANDLER( hng64_dualport_r )
 {
-	printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+//	printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 
 	/*
 	command table:
@@ -830,7 +832,7 @@ Beast Busters 2 outputs (all at offset == 0x1c):
 
 static WRITE32_HANDLER( hng64_dualport_w )
 {
-	printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+//	printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 	COMBINE_DATA (&hng64_dualport[offset]);
 }
 
@@ -898,7 +900,6 @@ static WRITE32_HANDLER( dl_control_w )
 		activeBuffer = 0;
 	if (data & 2)
 		activeBuffer = 1;
-
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1071,7 +1072,7 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x20300218, 0x2030021b) AM_READ(unk_vreg_r)
 
 	// 3d?
-//  AM_RANGE(0x30000000, 0x3000002f) AM_READWRITE(q2_r, q2_w) AM_BASE(&hng64_q2)
+  	AM_RANGE(0x30000000, 0x3000002f) AM_RAM AM_BASE(&hng64_3dregs)
 	AM_RANGE(0x30100000, 0x3015ffff) AM_READWRITE(hng64_3d_1_r,hng64_3d_2_w) AM_BASE(&hng64_3d_1)		// 3D Display Buffer A
 	AM_RANGE(0x30200000, 0x3025ffff) AM_READWRITE(hng64_3d_2_r,hng64_3d_2_w) AM_BASE(&hng64_3d_2)		// 3D Display Buffer B
 
@@ -1079,10 +1080,11 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x60000000, 0x601fffff) AM_RAM																// Sound ??
 	AM_RANGE(0x60200000, 0x603fffff) AM_READWRITE(hng64_soundram_r, hng64_soundram_w)					// uploads the v53 sound program here, elsewhere on ss64-2 */
 
-	// ?
+	// These are sound ports of some sort
 //  AM_RANGE(0x68000000, 0x68000003) AM_WRITENOP                                                // ??
 //  AM_RANGE(0x68000004, 0x68000007) AM_READNOP                                                 // ??
 //  AM_RANGE(0x68000008, 0x6800000b) AM_WRITENOP                                                // ??
+//  AM_RANGE(0x6f000000, 0x6f000003) AM_WRITENOP                                                // halt / reset line for the sound CPU
 
 	// Communications
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_READWRITE(hng64_com_r, hng64_com_w) AM_BASE(&hng64_com_ram)

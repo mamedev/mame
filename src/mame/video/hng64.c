@@ -29,8 +29,10 @@ tilemap *hng64_tilemap3_16x16_alt;
 
 
 UINT32 *hng64_spriteram;
+
 UINT32 *hng64_videoregs;
 UINT32 *hng64_spriteregs;
+UINT32 *hng64_3dregs;
 
 UINT32 *hng64_tcram ;
 
@@ -435,24 +437,25 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 /* Transition_Control Memory Region Map
  * ------------------------------
  *
- *  UINT32 | Bytes    | Use
- *  -------+-76543210-+----------
- *       0 |          |
- *       1 |          |
- *       2 |          |
- *       3 |          |
- *       4 |          |
- *       5 |          |
- *       6 | --xxxxxx | I popped into Buriki and saw some of these values changing to the same as 7.  hmmmm...
- *       7 | --xxxxxx | Almost certainly RGB darkening
- *       8 |          |
- *       9 |          |
- *      10 | --xxxxxx | Almost certainly RGB brightening
- *      11 | xxxxxxxx | Unknown - looks like an ARGB value - it seems to change when the scene changes
- *      12 |          |
- *      13 |          |
- *      14 |          |
- *      15 |          |
+ * UINT32 | Bits                                    | Use
+ *        | 3322 2222 2222 1111 1111 11             |
+ * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
+ *      0 |                                         |
+ *      1 | xxxx xxxx xxxx xxxx yyyy yyyy yyyy yyyy | Min X / Min Y visible area rectangle values
+ *      2 | xxxx xxxx xxxx xxxx yyyy yyyy yyyy yyyy | Max X / Max Y visible area rectangle values (added up with the Min X / Min Y)
+ *      3 |                                         |
+ *      4 |                                         |
+ *      5 |                                         |
+ *      6 | ---- ---- xxxx xxxx xxxx xxxx xxxx xxxx | I popped into Buriki and saw some of these values changing to the same as 7.  hmmmm...
+ *      7 | ---- ---- xxxx xxxx xxxx xxxx xxxx xxxx | Almost certainly RGB darkening
+ *      8 |                                         |
+ *      9 |                                         |
+ *     10 | ---- ---- xxxx xxxx xxxx xxxx xxxx xxxx | Almost certainly RGB brightening
+ *     11 | xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx | Unknown - looks like an ARGB value - it seems to change when the scene changes
+ *     12 |                                         |
+ *     13 |                                         |
+ *     14 |                                         |
+ *     15 |                                         |
  *
  *  Various bits change depending on what is happening in the scene.
  *  These bits may set which 'layer' is affected by the blending.
@@ -597,6 +600,19 @@ static void PerformFrustumClip(struct polygon *p) ;
 //static void DrawWireframe(struct polygon *p, bitmap_t *bitmap) ;
 static void DrawShaded(running_machine *machine, struct polygon *p, bitmap_t *bitmap) ;
 
+/* 3D/framebuffer video registers
+ * ------------------------------
+ *
+ * UINT32 | Bits                                    | Use
+ *        | 3322 2222 2222 1111 1111 11             |
+ * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
+ *      0 | ???? ???? ???? ???? ccc? ???? ???? ???? | framebuffer color base, 0x311800 in Fatal Fury WA, 0x313800 in Buriki One
+ *      1 |                                         |
+ *      2 | ???? ???? ???? ???? ???? ???? ???? ???? | camera / framebuffer global x/y? Actively used by Samurai Shodown 64 2
+ *      3 | ---- --?x ---- ---- ---- ---- ---- ---- | unknown, unsetted by Buriki One and setted by Fatal Fury WA, buffering mode?
+ *   4-11 | ---- ???? ---- ???? ---- ???? ---- ???? | Table filled with 0x0? data
+ *
+ */
 
 static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
@@ -749,6 +765,8 @@ static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *
 				// 00110000 00000000 00000100 01000100 0400-0000 00007fff 00000000 00000020
 				// ----                                pal  ---- -------- -------- -------- not used (known)
 				paletteState = (workingList[i+4] & 0xff000000) >> 24 ;
+				paletteState+=((hng64_3dregs[0x00/4] & 0x2000) >> 9); //framebuffer base color reg? Used by Buriki One
+				/* FIXME: Buriki One door colors in attract mode still aren't quite right, investigate... */
 				break ;
 
 			case 0x0100:
@@ -1723,7 +1741,7 @@ VIDEO_UPDATE( hng64 )
 	UINT16 tileflags0, tileflags1;
 	UINT16 tileflags2, tileflags3;
 
-	bitmap_fill(bitmap, 0, screen->machine->pens[0]); //<- user selectable pen too?
+	bitmap_fill(bitmap, 0, screen->machine->pens[0]); //FIXME: Fatal Fury WA test mode doesn't use pen 0...
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0x00);
 
 	animmask = hng64_videoregs[0x0b];
@@ -1832,6 +1850,12 @@ VIDEO_UPDATE( hng64 )
     hng64_videoregs[0x0e]);
 
 	if (1)
+	popmessage("3D: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
+		hng64_3dregs[0x00/4],hng64_3dregs[0x04/4],hng64_3dregs[0x08/4],hng64_3dregs[0x0c/4],
+		hng64_3dregs[0x10/4],hng64_3dregs[0x14/4],hng64_3dregs[0x18/4],hng64_3dregs[0x1c/4],
+		hng64_3dregs[0x20/4],hng64_3dregs[0x24/4],hng64_3dregs[0x28/4],hng64_3dregs[0x2c/4]);
+
+	if (0)
 		popmessage("TC: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
 		hng64_tcram[0x00/4],
 		hng64_tcram[0x04/4],
