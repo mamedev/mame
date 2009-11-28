@@ -807,6 +807,7 @@ union _addrmap64_token
 #define AM_READNOP							AM_READ(SMH_NOP)
 #define AM_WRITENOP							AM_WRITE(SMH_NOP)
 
+#define AM_BASE_SIZE_MEMBER(_struct, _base, _size)	AM_BASE_MEMBER(_struct, _base) AM_SIZE_MEMBER(_struct, _size)
 #define AM_BASE_SIZE_GENERIC(_member)		AM_BASE_GENERIC(_member) AM_SIZE_GENERIC(_member)
 
 

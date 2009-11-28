@@ -147,7 +147,7 @@ static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_MEMBER(bublbobl_state, videoram) AM_SIZE_GENERIC(videoram)
-	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_MEMBER(bublbobl_state, objectram) AM_SIZE_MEMBER(bublbobl_state, objectram_size)
+	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, objectram, objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(bublbobl_sound_command_w)

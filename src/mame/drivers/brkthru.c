@@ -101,7 +101,7 @@ static INPUT_CHANGED( coin_inserted )
  *************************************/
 
 static ADDRESS_MAP_START( brkthru_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(brkthru_fgram_w) AM_BASE_MEMBER(brkthru_state, fg_videoram) AM_SIZE_MEMBER(brkthru_state, fg_videoram_size)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(brkthru_fgram_w) AM_BASE_SIZE_MEMBER(brkthru_state, fg_videoram, fg_videoram_size)
 	AM_RANGE(0x0400, 0x0bff) AM_RAM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(brkthru_bgram_w) AM_BASE_MEMBER(brkthru_state, videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_MEMBER(brkthru_state, spriteram) AM_SIZE_GENERIC(spriteram)
@@ -119,7 +119,7 @@ ADDRESS_MAP_END
 
 /* same as brktrhu, but xor 0x1000 below 8k */
 static ADDRESS_MAP_START( darwin_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(brkthru_fgram_w) AM_BASE_MEMBER(brkthru_state, fg_videoram) AM_SIZE_MEMBER(brkthru_state, fg_videoram_size)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(brkthru_fgram_w) AM_BASE_SIZE_MEMBER(brkthru_state, fg_videoram, fg_videoram_size)
 	AM_RANGE(0x1400, 0x1bff) AM_RAM
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(brkthru_bgram_w) AM_BASE_MEMBER(brkthru_state, videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_MEMBER(brkthru_state, spriteram) AM_SIZE_GENERIC(spriteram)

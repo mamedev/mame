@@ -519,7 +519,7 @@ static MACHINE_RESET( abattle )
 static ADDRESS_MAP_START( astrof_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_NOP
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(astrof_videoram_w) AM_BASE_MEMBER(astrof_state, videoram) AM_SIZE_MEMBER(astrof_state, videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(astrof_videoram_w) AM_BASE_SIZE_MEMBER(astrof_state, videoram, videoram_size)
 	AM_RANGE(0x6000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x8002) AM_MIRROR(0x1ff8) AM_NOP
 	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITEONLY AM_BASE_MEMBER(astrof_state, astrof_color)
@@ -538,7 +538,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spfghmk2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_NOP
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(astrof_videoram_w) AM_BASE_MEMBER(astrof_state, videoram) AM_SIZE_MEMBER(astrof_state, videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(astrof_videoram_w) AM_BASE_SIZE_MEMBER(astrof_state, videoram, videoram_size)
 	AM_RANGE(0x6000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x8002) AM_MIRROR(0x1ff8) AM_NOP
 	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITEONLY AM_BASE_MEMBER(astrof_state, astrof_color)
@@ -557,7 +557,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tomahawk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_NOP
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(tomahawk_videoram_w) AM_BASE_MEMBER(astrof_state, videoram) AM_SIZE_MEMBER(astrof_state, videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(tomahawk_videoram_w) AM_BASE_SIZE_MEMBER(astrof_state, videoram, videoram_size)
 	AM_RANGE(0x6000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x8002) AM_MIRROR(0x1ff8) AM_NOP
 	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITEONLY AM_BASE_MEMBER(astrof_state, astrof_color)

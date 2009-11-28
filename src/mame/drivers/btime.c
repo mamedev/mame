@@ -381,7 +381,7 @@ static ADDRESS_MAP_START( cookrace_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
 	AM_RANGE(0xd000, 0xd0ff) AM_RAM							/* background? */
 	AM_RANGE(0xd100, 0xd3ff) AM_RAM							/* ? */
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE_MEMBER(btime_state, bnj_backgroundram) AM_SIZE_MEMBER(btime_state, bnj_backgroundram_size)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, bnj_backgroundram, bnj_backgroundram_size)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW1") AM_WRITE(bnj_video_control_w)
 	AM_RANGE(0xe300, 0xe300) AM_READ_PORT("DSW1")	/* mirror address used on high score name entry */
 													/* screen */
@@ -475,7 +475,7 @@ static ADDRESS_MAP_START( bnj_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4400, 0x47ff) AM_RAM AM_BASE_MEMBER(btime_state, colorram)
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
 	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
-	AM_RANGE(0x5000, 0x51ff) AM_WRITE(bnj_background_w) AM_BASE_MEMBER(btime_state, bnj_backgroundram) AM_SIZE_MEMBER(btime_state, bnj_backgroundram_size)
+	AM_RANGE(0x5000, 0x51ff) AM_WRITE(bnj_background_w) AM_BASE_SIZE_MEMBER(btime_state, bnj_backgroundram, bnj_backgroundram_size)
 	AM_RANGE(0x5400, 0x5400) AM_WRITE(bnj_scroll1_w)
 	AM_RANGE(0x5800, 0x5800) AM_WRITE(bnj_scroll2_w)
 	AM_RANGE(0x5c00, 0x5c0f) AM_WRITE(btime_paletteram_w) AM_BASE_GENERIC(paletteram)

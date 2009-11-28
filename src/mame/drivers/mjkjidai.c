@@ -173,7 +173,7 @@ static ADDRESS_MAP_START( mjkjidai_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM	AM_BASE_MEMBER(mjkjidai_state,nvram) AM_SIZE_MEMBER(mjkjidai_state,nvram_size)	// cleared and initialized on startup if bit 6 if port 00 is 0
+	AM_RANGE(0xd000, 0xdfff) AM_RAM	AM_BASE_SIZE_MEMBER(mjkjidai_state,nvram,nvram_size)	// cleared and initialized on startup if bit 6 if port 00 is 0
 	AM_RANGE(0xe000, 0xe01f) AM_RAM AM_BASE_MEMBER(mjkjidai_state,spriteram1)			// shared with tilemap ram
 	AM_RANGE(0xe800, 0xe81f) AM_RAM AM_BASE_MEMBER(mjkjidai_state,spriteram2)		// shared with tilemap ram
 	AM_RANGE(0xf000, 0xf01f) AM_RAM AM_BASE_MEMBER(mjkjidai_state,spriteram3)		// shared with tilemap ram

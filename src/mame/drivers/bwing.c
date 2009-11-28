@@ -225,7 +225,7 @@ static ADDRESS_MAP_START( bwp3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_address_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(bwp3_nmimask_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE_MEMBER(bwing_state, bwp3_rombase) AM_SIZE_MEMBER(bwing_state, bwp3_romsize)
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE_SIZE_MEMBER(bwing_state, bwp3_rombase, bwp3_romsize)
 ADDRESS_MAP_END
 
 

@@ -91,12 +91,12 @@ static READ8_HANDLER( mirrorcolorram_r )
 static ADDRESS_MAP_START( decocass_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_RAM_WRITE(ram_w) AM_BASE_MEMBER(decocass_state, rambase)
 	AM_RANGE(0x6000, 0xbfff) AM_RAM_WRITE(charram_w) AM_BASE_MEMBER(decocass_state, charram) /* still RMS3 RAM */
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(fgvideoram_w) AM_BASE_MEMBER(decocass_state, fgvideoram) AM_SIZE_MEMBER(decocass_state, fgvideoram_size)  /* DSP3 RAM */
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(fgcolorram_w) AM_BASE_MEMBER(decocass_state, colorram) AM_SIZE_MEMBER(decocass_state, colorram_size)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(fgvideoram_w) AM_BASE_SIZE_MEMBER(decocass_state, fgvideoram, fgvideoram_size)  /* DSP3 RAM */
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(fgcolorram_w) AM_BASE_SIZE_MEMBER(decocass_state, colorram, colorram_size)
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(mirrorvideoram_r, mirrorvideoram_w)
 	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(mirrorcolorram_r, mirrorcolorram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(tileram_w) AM_BASE_MEMBER(decocass_state, tileram) AM_SIZE_MEMBER(decocass_state, tileram_size)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(objectram_w) AM_BASE_MEMBER(decocass_state, objectram) AM_SIZE_MEMBER(decocass_state, objectram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(tileram_w) AM_BASE_SIZE_MEMBER(decocass_state, tileram, tileram_size)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(objectram_w) AM_BASE_SIZE_MEMBER(decocass_state, objectram, objectram_size)
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM_WRITE(decocass_paletteram_w) AM_BASE_MEMBER(decocass_state, paletteram)
 	AM_RANGE(0xe300, 0xe300) AM_READ_PORT("DSW1") AM_WRITE(decocass_watchdog_count_w)
 	AM_RANGE(0xe301, 0xe301) AM_READ_PORT("DSW2") AM_WRITE(decocass_watchdog_flip_w)

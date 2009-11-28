@@ -748,8 +748,7 @@ static WRITE8_DEVICE_HANDLER( dkong_z80dma_rdy_w )
 static ADDRESS_MAP_START( dkong_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x3fff) AM_ROM
     AM_RANGE(0x6000, 0x6bff) AM_RAM
-    AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE_MEMBER(dkong_state, sprite_ram)
-                                    AM_SIZE_MEMBER(dkong_state, sprite_ram_size) /* sprite set 1 */
+    AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE_SIZE_MEMBER(dkong_state, sprite_ram, sprite_ram_size) /* sprite set 1 */
     AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w)
                                     AM_BASE_MEMBER(dkong_state, video_ram)
     AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE("dma8257", i8257_r, i8257_w)   /* P8257 control registers */
@@ -772,8 +771,7 @@ static ADDRESS_MAP_START( dkongjr_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x5fff) AM_ROM
     AM_RANGE(0x6000, 0x6bff) AM_RAM
     AM_RANGE(0x6c00, 0x6fff) AM_RAM                                              /* DK3 bootleg only */
-    AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE_MEMBER(dkong_state, sprite_ram)
-                                    AM_SIZE_MEMBER(dkong_state, sprite_ram_size) /* sprite set 1 */
+    AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE_SIZE_MEMBER(dkong_state, sprite_ram, sprite_ram_size) /* sprite set 1 */
     AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w)
                                     AM_BASE_MEMBER(dkong_state, video_ram)
     AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE("dma8257", i8257_r, i8257_w)   /* P8257 control registers */
@@ -803,8 +801,7 @@ static ADDRESS_MAP_START( dkong3_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x5fff) AM_ROM
     AM_RANGE(0x6000, 0x67ff) AM_RAM
     AM_RANGE(0x6800, 0x6fff) AM_RAM
-    AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE_MEMBER(dkong_state, sprite_ram)
-                                    AM_SIZE_MEMBER(dkong_state, sprite_ram_size) /* sprite set 1 */
+    AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE_SIZE_MEMBER(dkong_state, sprite_ram, sprite_ram_size) /* sprite set 1 */
     AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w)
                                     AM_BASE_MEMBER(dkong_state, video_ram)
     AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0")  AM_LATCH8_WRITE("latch1")
@@ -837,8 +834,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s2650_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x0fff) AM_ROM
-    AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_MEMBER(dkong_state, sprite_ram)
-                                    AM_SIZE_MEMBER(dkong_state, sprite_ram_size)  /* 0x7000 */
+    AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE_MEMBER(dkong_state, sprite_ram, sprite_ram_size)  /* 0x7000 */
     AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x007f) AM_READ_PORT("IN0") AM_DEVWRITE("ls175.3d", latch8_w)
     AM_RANGE(0x1480, 0x1480) AM_READ_PORT("IN1")
     AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x007f) AM_READ(dkong_in2_r)                                 /* IN2 */
