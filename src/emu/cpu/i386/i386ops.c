@@ -973,9 +973,9 @@ static void I386OP(outs_generic)(i386_state *cpustate, int size)
 	UINT32 vd;
 
 	if( cpustate->segment_prefix ) {
-		eas = i386_translate(cpustate, cpustate->segment_override, REG32(ESI) );
+		eas = i386_translate(cpustate, cpustate->segment_override, cpustate->address_size ? REG32(ESI) : REG16(SI) );
 	} else {
-		eas = i386_translate(cpustate, DS, REG32(ESI) );
+		eas = i386_translate(cpustate, DS, cpustate->address_size ? REG32(ESI) : REG16(SI) );
 	}
 
 	switch(size) {
