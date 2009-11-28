@@ -8,14 +8,7 @@ Functions to emulate the video hardware of the machine.
 
 
 #include "driver.h"
-
-
-
-
-int srmp2_color_bank;
-int srmp3_gfx_bank;
-int mjyuugi_gfx_bank;
-
+#include "includes/srmp2.h"
 
 PALETTE_INIT( srmp2 )
 {
@@ -68,7 +61,9 @@ static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
       ---- ----  -x-- ---- : Flip screen
 */
 
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	srmp2_state *state = (srmp2_state *)machine->driver_data;
+	UINT16 *spriteram16 = state->spriteram1.u16;
+	UINT16 *spriteram16_2 = state->spriteram2.u16;
 	int offs;
 	int xoffs, yoffs;
 
@@ -78,7 +73,7 @@ static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 	int flip	=	ctrl & 0x40;
 
 	/* Sprites Banking and/or Sprites Buffering */
-	UINT16 *src = machine->generic.spriteram2.u16 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
+	UINT16 *src = spriteram16_2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
 	int max_y = video_screen_get_height(machine->primary_screen);
 
@@ -106,7 +101,7 @@ static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 
 		code = code & 0x3fff;
 
-		if (srmp2_color_bank) color |= 0x20;
+		if (state->color_bank) color |= 0x20;
 
 		drawgfx_transpen(bitmap, cliprect, machine->gfx[0],
 				code,
@@ -120,9 +115,10 @@ static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 
 static void srmp3_draw_sprites_map(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
-	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
-	UINT8 *spriteram_3 = machine->generic.spriteram3.u8;
+	srmp2_state *state = (srmp2_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram1.u8;
+	UINT8 *spriteram_2 = state->spriteram2.u8;
+	UINT8 *spriteram_3 = state->spriteram3.u8;
 	int offs, col;
 	int xoffs, yoffs;
 
@@ -229,16 +225,17 @@ static void srmp3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
       -x-- ---- : Flip screen
 */
 
-	UINT8 *spriteram = machine->generic.spriteram.u8;
-	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
-	UINT8 *spriteram_3 = machine->generic.spriteram3.u8;
+	srmp2_state *state = (srmp2_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram1.u8;
+	UINT8 *spriteram_2 = state->spriteram2.u8;
+	UINT8 *spriteram_3 = state->spriteram3.u8;
 	int offs;
 	int xoffs, yoffs;
 
 	int max_y = video_screen_get_height(machine->primary_screen);
 
 	int ctrl	=	spriteram[ 0x600/2 ];
-//  int ctrl2   =   spriteram[ 0x602/2 ];
+	//int ctrl2   =   spriteram[ 0x602/2 ];
 
 	int flip	=	ctrl & 0x40;
 
@@ -261,7 +258,7 @@ static void srmp3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 		int flipy	=	code & 0x4000;
 
 		code = (code & 0x1fff);
-		if (gfxbank) code += ((srmp3_gfx_bank + 1) * 0x2000);
+		if (gfxbank) code += ((state->gfx_bank + 1) * 0x2000);
 
 		if (flip)
 		{
@@ -282,7 +279,9 @@ static void srmp3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 
 static void mjyuugi_draw_sprites_map(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	srmp2_state *state = (srmp2_state *)machine->driver_data;
+	UINT16 *spriteram16 = state->spriteram1.u16;
+	UINT16 *spriteram16_2 = state->spriteram2.u16;
 	int offs, col;
 	int xoffs, yoffs;
 
@@ -295,7 +294,7 @@ static void mjyuugi_draw_sprites_map(running_machine *machine, bitmap_t *bitmap,
 	int numcol	=	ctrl2 & 0x000f;
 
 	/* Sprites Banking and/or Sprites Buffering */
-	UINT16 *src = machine->generic.spriteram2.u16 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
+	UINT16 *src = spriteram16_2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
 	int upper	=	( spriteram16[ 0x604/2 ] & 0xFF ) +
 					( spriteram16[ 0x606/2 ] & 0xFF ) * 256;
@@ -385,7 +384,9 @@ static void mjyuugi_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
       ---- ----  -x-- ---- : Flip screen
 */
 
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	srmp2_state *state = (srmp2_state *)machine->driver_data;
+	UINT16 *spriteram16 = state->spriteram1.u16;
+	UINT16 *spriteram16_2 = state->spriteram2.u16;
 	int offs;
 	int xoffs, yoffs;
 
@@ -395,7 +396,7 @@ static void mjyuugi_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 	int flip	=	ctrl & 0x40;
 
 	/* Sprites Banking and/or Sprites Buffering */
-	UINT16 *src = machine->generic.spriteram2.u16 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
+	UINT16 *src = spriteram16_2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
 	int max_y = video_screen_get_height(machine->primary_screen);
 
@@ -418,7 +419,7 @@ static void mjyuugi_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 		int flipy	=	code & 0x4000;
 
 		code = (code & 0x1fff);
-		if (gfxbank) code += ((mjyuugi_gfx_bank + 1) * 0x2000);
+		if (gfxbank) code += ((state->gfx_bank + 1) * 0x2000);
 
 		if (flip)
 		{

@@ -445,11 +445,6 @@ VIDEO_START( galaga )
 
 	galaga_gfxbank = 0;
 
-	machine->generic.spriteram.u8   = galaga_ram1 + 0x380;
-	machine->generic.spriteram2.u8 = galaga_ram2 + 0x380;
-	machine->generic.spriteram3.u8 = galaga_ram3 + 0x380;
-
-
 	state_save_register_global_array(machine, galaga_starcontrol);
 	state_save_register_global(machine, stars_scrollx);
 	state_save_register_global(machine, stars_scrolly);
@@ -496,9 +491,9 @@ WRITE8_HANDLER ( gatsbee_bank_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
-	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
-	UINT8 *spriteram_3 = machine->generic.spriteram3.u8;
+	UINT8 *spriteram = galaga_ram1 + 0x380;
+	UINT8 *spriteram_2 = galaga_ram2 + 0x380;
+	UINT8 *spriteram_3 = galaga_ram3 + 0x380;
 	int offs;
 
 

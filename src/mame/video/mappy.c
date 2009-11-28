@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "video/resnet.h"
+#include "includes/mappy.h"
 
 
 UINT8 *mappy_videoram;
@@ -326,10 +327,6 @@ VIDEO_START( superpac )
 	sprite_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[0], 31);
-
-	machine->generic.spriteram.u8 = mappy_spriteram + 0x780;
-	machine->generic.spriteram2.u8 = machine->generic.spriteram.u8 + 0x800;
-	machine->generic.spriteram3.u8 = machine->generic.spriteram2.u8 + 0x800;
 }
 
 VIDEO_START( phozon )
@@ -338,11 +335,7 @@ VIDEO_START( phozon )
 
 	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[0], 15);
 
-	machine->generic.spriteram.u8 = mappy_spriteram + 0x780;
-	machine->generic.spriteram2.u8 = machine->generic.spriteram.u8 + 0x800;
-	machine->generic.spriteram3.u8 = machine->generic.spriteram2.u8 + 0x800;
-
-    state_save_register_global(machine, mappy_scroll);
+	state_save_register_global(machine, mappy_scroll);
 }
 
 VIDEO_START( mappy )
@@ -351,10 +344,6 @@ VIDEO_START( mappy )
 
 	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[0], 31);
 	tilemap_set_scroll_cols(bg_tilemap, 36);
-
-	machine->generic.spriteram.u8 = mappy_spriteram + 0x780;
-	machine->generic.spriteram2.u8 = machine->generic.spriteram.u8 + 0x800;
-	machine->generic.spriteram3.u8 = machine->generic.spriteram2.u8 + 0x800;
 }
 
 
@@ -404,9 +393,9 @@ WRITE8_HANDLER( mappy_scroll_w )
 /* also used by toypop.c */
 void mappy_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xoffs, int yoffs, int transcolor)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
-	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
-	UINT8 *spriteram_3 = machine->generic.spriteram3.u8;
+	UINT8 *spriteram = mappy_spriteram + 0x780;
+	UINT8 *spriteram_2 = spriteram + 0x800;
+	UINT8 *spriteram_3 = spriteram_2 + 0x800;
 	int offs;
 
 	for (offs = 0;offs < 0x80;offs += 2)
@@ -482,9 +471,9 @@ spriteram_3
 
 static void phozon_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
-	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
-	UINT8 *spriteram_3 = machine->generic.spriteram3.u8;
+	UINT8 *spriteram = mappy_spriteram + 0x780;
+	UINT8 *spriteram_2 = spriteram + 0x800;
+	UINT8 *spriteram_3 = spriteram_2 + 0x800;
 	int offs;
 
 	for (offs = 0;offs < 0x80;offs += 2)

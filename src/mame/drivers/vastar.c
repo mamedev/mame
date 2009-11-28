@@ -65,23 +65,7 @@ write:
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
-
-
-extern UINT8 *vastar_bg1videoram,*vastar_bg2videoram,*vastar_fgvideoram;
-extern UINT8 *vastar_bg1_scroll,*vastar_bg2_scroll;
-extern UINT8 *vastar_sprite_priority;
-
-WRITE8_HANDLER( vastar_bg1videoram_w );
-WRITE8_HANDLER( vastar_bg2videoram_w );
-WRITE8_HANDLER( vastar_fgvideoram_w );
-READ8_HANDLER( vastar_bg1videoram_r );
-READ8_HANDLER( vastar_bg2videoram_r );
-VIDEO_START( vastar );
-VIDEO_UPDATE( vastar );
-
-static UINT8 *vastar_sharedram;
-
-
+#include "includes/vastar.h"
 
 static MACHINE_RESET( vastar )
 {
@@ -100,12 +84,16 @@ static WRITE8_HANDLER( vastar_hold_cpu2_w )
 
 static READ8_HANDLER( vastar_sharedram_r )
 {
-	return vastar_sharedram[offset];
+	vastar_state *state = (vastar_state *)space->machine->driver_data;
+
+	return state->sharedram[offset];
 }
 
 static WRITE8_HANDLER( vastar_sharedram_w )
 {
-	vastar_sharedram[offset] = data;
+	vastar_state *state = (vastar_state *)space->machine->driver_data;
+
+	state->sharedram[offset] = data;
 }
 
 static WRITE8_HANDLER( flip_screen_w )
@@ -117,22 +105,22 @@ static WRITE8_HANDLER( flip_screen_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(vastar_bg2videoram_r, vastar_bg2videoram_w) AM_BASE(&vastar_bg2videoram)
-	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(vastar_bg1videoram_r, vastar_bg1videoram_w) AM_BASE(&vastar_bg1videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(vastar_bg2videoram_r, vastar_bg2videoram_w) AM_BASE_MEMBER(vastar_state,bg2videoram)
+	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(vastar_bg1videoram_r, vastar_bg1videoram_w) AM_BASE_MEMBER(vastar_state,bg1videoram)
 	AM_RANGE(0xa000, 0xafff) AM_READWRITE(vastar_bg2videoram_r, vastar_bg2videoram_w)	/* mirror address */
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(vastar_bg1videoram_r, vastar_bg1videoram_w)	/* mirror address */
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(SMH_RAM) AM_BASE(&vastar_sprite_priority)	/* sprite/BG priority */
-	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(vastar_fgvideoram_w) AM_BASE(&vastar_fgvideoram)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(vastar_state,sprite_priority)	/* sprite/BG priority */
+	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(vastar_fgvideoram_w) AM_BASE_MEMBER(vastar_state,fgvideoram)
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
-	AM_RANGE(0xf000, 0xf0ff) AM_READWRITE(vastar_sharedram_r, vastar_sharedram_w) AM_BASE(&vastar_sharedram)
+	AM_RANGE(0xf000, 0xf0ff) AM_READWRITE(vastar_sharedram_r, vastar_sharedram_w) AM_BASE_MEMBER(vastar_state,sharedram)
 	AM_RANGE(0xf100, 0xf7ff) AM_RAM
 
 	/* in hidden portions of video RAM: (fallthrough) */
-	AM_RANGE(0xc400, 0xc43f) AM_WRITE(SMH_RAM) AM_BASE_SIZE_GENERIC(spriteram)	/* actually c410-c41f and c430-c43f */
-	AM_RANGE(0xc7c0, 0xc7df) AM_WRITE(SMH_RAM) AM_BASE(&vastar_bg1_scroll)
-	AM_RANGE(0xc7e0, 0xc7ff) AM_WRITE(SMH_RAM) AM_BASE(&vastar_bg2_scroll)
-	AM_RANGE(0xc800, 0xc83f) AM_WRITE(SMH_RAM) AM_BASE_GENERIC(spriteram2)	/* actually c810-c81f and c830-c83f */
-	AM_RANGE(0xcc00, 0xcc3f) AM_WRITE(SMH_RAM) AM_BASE_GENERIC(spriteram3)	/* actually cc10-cc1f and cc30-cc3f */
+	AM_RANGE(0xc400, 0xc43f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(vastar_state,spriteram1)	/* actually c410-c41f and c430-c43f */
+	AM_RANGE(0xc7c0, 0xc7df) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(vastar_state,bg1_scroll)
+	AM_RANGE(0xc7e0, 0xc7ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(vastar_state,bg2_scroll)
+	AM_RANGE(0xc800, 0xc83f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(vastar_state,spriteram2)	/* actually c810-c81f and c830-c83f */
+	AM_RANGE(0xcc00, 0xcc3f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(vastar_state,spriteram3)	/* actually cc10-cc1f and cc30-cc3f */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_port_map, ADDRESS_SPACE_IO, 8 )
@@ -305,6 +293,8 @@ static const ay8910_interface ay8910_config =
 
 
 static MACHINE_DRIVER_START( vastar )
+
+	MDRV_DRIVER_DATA(vastar_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz ???? */

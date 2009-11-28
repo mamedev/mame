@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/mappy.h"
 
 UINT8 *toypop_videoram;
 
@@ -217,9 +218,6 @@ static void draw_background(bitmap_t *bitmap)
   Display refresh
 
 ***************************************************************************/
-
-/* from mappy.c */
-void mappy_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xoffs, int yoffs, int transcolor);
 
 
 VIDEO_UPDATE( toypop )

@@ -22,21 +22,15 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
-#include "cpu/z80/z80.h"
 #include "streams.h"
+#include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "sound/okim6295.h"
-
-extern UINT8 *mjkjidai_videoram;
-
-VIDEO_START( mjkjidai );
-VIDEO_UPDATE( mjkjidai );
-WRITE8_HANDLER( mjkjidai_videoram_w );
-WRITE8_HANDLER( mjkjidai_ctrl_w );
-
+#include "includes/mjkjidai.h"
 
 /* Start of ADPCM custom chip code */
-static struct mjkjidai_adpcm_state
+typedef struct _mjkjidai_adpcm_state mjkjidai_adpcm_state;
+struct _mjkjidai_adpcm_state
 {
 	struct adpcm_state adpcm;
 	sound_stream *stream;
@@ -44,11 +38,11 @@ static struct mjkjidai_adpcm_state
 	UINT8 nibble;
 	UINT8 playing;
 	UINT8 *base;
-} mjkjidai_adpcm;
+};
 
 static STREAM_UPDATE( mjkjidai_adpcm_callback )
 {
-	struct mjkjidai_adpcm_state *state = (struct mjkjidai_adpcm_state *)param;
+	mjkjidai_adpcm_state *state = (mjkjidai_adpcm_state *)param;
 	stream_sample_t *dest = outputs[0];
 
 	while (state->playing && samples > 0)
@@ -76,7 +70,8 @@ static STREAM_UPDATE( mjkjidai_adpcm_callback )
 static DEVICE_START( mjkjidai_adpcm )
 {
 	running_machine *machine = device->machine;
-	struct mjkjidai_adpcm_state *state = &mjkjidai_adpcm;
+	mjkjidai_adpcm_state *state = (mjkjidai_adpcm_state *)device->token;
+
 	state->playing = 0;
 	state->stream = stream_create(device, 0, 1, device->clock, state, mjkjidai_adpcm_callback);
 	state->base = memory_region(machine, "adpcm");
@@ -87,6 +82,8 @@ static DEVICE_GET_INFO( mjkjidai_adpcm )
 {
 	switch (state)
 	{
+		case DEVINFO_INT_TOKEN_BYTES: info->i = sizeof(mjkjidai_adpcm_state); break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mjkjidai_adpcm);break;
 
@@ -99,25 +96,25 @@ static DEVICE_GET_INFO( mjkjidai_adpcm )
 #define SOUND_MJKJIDAI DEVICE_GET_INFO_NAME(mjkjidai_adpcm)
 
 
-static void mjkjidai_adpcm_play (int offset, int lenght)
+static void mjkjidai_adpcm_play (mjkjidai_adpcm_state *state, int offset, int length)
 {
-	mjkjidai_adpcm.current = offset;
-	mjkjidai_adpcm.end = offset + lenght/2;
-	mjkjidai_adpcm.nibble = 4;
-	mjkjidai_adpcm.playing = 1;
+	state->current = offset;
+	state->end = offset + length/2;
+	state->nibble = 4;
+	state->playing = 1;
 }
 
-static WRITE8_HANDLER( adpcm_w )
+static WRITE8_DEVICE_HANDLER( adpcm_w )
 {
-	mjkjidai_adpcm_play ((data & 0x07) * 0x1000, 0x1000 * 2);
+	mjkjidai_adpcm_state *state = (mjkjidai_adpcm_state *)device->token;
+	mjkjidai_adpcm_play (state, (data & 0x07) * 0x1000, 0x1000 * 2);
 }
 /* End of ADPCM custom chip code */
 
 
-static int keyb,nvram_init_count;
-
 static READ8_HANDLER( keyboard_r )
 {
+	mjkjidai_state *state = (mjkjidai_state *)space->machine->driver_data;
 	int res = 0x3f,i;
 	static const char *const keynames[] = { "PL2_1", "PL2_2", "PL2_3", "PL2_4", "PL2_5", "PL2_6", "PL1_1", "PL1_2", "PL1_3", "PL1_4", "PL1_5", "PL1_6" };
 
@@ -125,7 +122,7 @@ static READ8_HANDLER( keyboard_r )
 
 	for (i = 0; i < 12; i++)
 	{
-		if (~keyb & (1 << i))
+		if (~state->keyb & (1 << i))
 		{
 			res = input_port_read(space->machine, keynames[i]) & 0x3f;
 			break;
@@ -134,9 +131,9 @@ static READ8_HANDLER( keyboard_r )
 
 	res |= (input_port_read(space->machine, "IN3") & 0xc0);
 
-	if (nvram_init_count)
+	if (state->nvram_init_count)
 	{
-		nvram_init_count--;
+		state->nvram_init_count--;
 		res &= 0xbf;
 	}
 
@@ -145,27 +142,28 @@ static READ8_HANDLER( keyboard_r )
 
 static WRITE8_HANDLER( keyboard_select_w )
 {
+	mjkjidai_state *state = (mjkjidai_state *)space->machine->driver_data;
+
 //  logerror("%04x: keyboard_select %d = %02x\n",cpu_get_pc(space->cpu),offset,data);
 
 	switch (offset)
 	{
-		case 0: keyb = (keyb & 0xff00) | (data);      break;
-		case 1: keyb = (keyb & 0x00ff) | (data << 8); break;
+		case 0: state->keyb = (state->keyb & 0xff00) | (data);      break;
+		case 1: state->keyb = (state->keyb & 0x00ff) | (data << 8); break;
 	}
 }
 
-static UINT8 *nvram;
-static size_t nvram_size;
-
 static NVRAM_HANDLER( mjkjidai )
 {
+	mjkjidai_state *state = (mjkjidai_state *)machine->driver_data;
+
 	if (read_or_write)
-		mame_fwrite(file, nvram, nvram_size);
+		mame_fwrite(file, state->nvram, state->nvram_size);
 	else if (file)
-		mame_fread(file, nvram, nvram_size);
+		mame_fread(file, state->nvram, state->nvram_size);
 	else
 	{
-		nvram_init_count = 1;
+		state->nvram_init_count = 1;
 	}
 }
 
@@ -175,11 +173,11 @@ static ADDRESS_MAP_START( mjkjidai_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM	AM_BASE(&nvram) AM_SIZE(&nvram_size)	// cleared and initialized on startup if bit 6 if port 00 is 0
-	AM_RANGE(0xe000, 0xe01f) AM_RAM AM_BASE_GENERIC(spriteram)			// shared with tilemap ram
-	AM_RANGE(0xe800, 0xe81f) AM_RAM AM_BASE_GENERIC(spriteram2)		// shared with tilemap ram
-	AM_RANGE(0xf000, 0xf01f) AM_RAM AM_BASE_GENERIC(spriteram3)		// shared with tilemap ram
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mjkjidai_videoram_w) AM_BASE(&mjkjidai_videoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM	AM_BASE_MEMBER(mjkjidai_state,nvram) AM_SIZE_MEMBER(mjkjidai_state,nvram_size)	// cleared and initialized on startup if bit 6 if port 00 is 0
+	AM_RANGE(0xe000, 0xe01f) AM_RAM AM_BASE_MEMBER(mjkjidai_state,spriteram1)			// shared with tilemap ram
+	AM_RANGE(0xe800, 0xe81f) AM_RAM AM_BASE_MEMBER(mjkjidai_state,spriteram2)		// shared with tilemap ram
+	AM_RANGE(0xf000, 0xf01f) AM_RAM AM_BASE_MEMBER(mjkjidai_state,spriteram3)		// shared with tilemap ram
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mjkjidai_videoram_w) AM_BASE_MEMBER(mjkjidai_state,videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjkjidai_io_map, ADDRESS_SPACE_IO, 8 )
@@ -193,7 +191,7 @@ static ADDRESS_MAP_START( mjkjidai_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0x30, 0x30) AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(adpcm_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("adpcm", adpcm_w)
 ADDRESS_MAP_END
 
 
@@ -374,6 +372,8 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( mjkjidai )
+
+	MDRV_DRIVER_DATA(mjkjidai_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,10000000/2)	/* 5 MHz ??? */

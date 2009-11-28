@@ -34,6 +34,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "machine/namcoio.h"
 #include "sound/namco.h"
+#include "includes/mappy.h"
 
 
 // video\toypop.c
@@ -253,12 +254,7 @@ static WRITE16_HANDLER( toypop_m68000_interrupt_disable_w )
 
 static ADDRESS_MAP_START( liblrabl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_BASE(&toypop_videoram)	/* video RAM */
-	AM_RANGE(0x0800, 0x0f7f) AM_RAM											/* general RAM, area 1 */
-	AM_RANGE(0x0f80, 0x0fff) AM_RAM AM_BASE_GENERIC(spriteram)						/* sprite RAM, area 1 */
-	AM_RANGE(0x1000, 0x177f) AM_RAM											/* general RAM, area 2 */
-	AM_RANGE(0x1780, 0x17ff) AM_RAM AM_BASE_GENERIC(spriteram2)					/* sprite RAM, area 2 */
-	AM_RANGE(0x1800, 0x1f7f) AM_RAM											/* general RAM, area 3 */
-	AM_RANGE(0x1f80, 0x1fff) AM_RAM AM_BASE_GENERIC(spriteram3)					/* sprite RAM, area 3 */
+	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_BASE(&mappy_spriteram)										/* general RAM, area 1 */
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(&toypop_m68000_sharedram)		/* shared RAM with the 68000 CPU */
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("namco", toypop_sound_sharedram_r, toypop_sound_sharedram_w) /* shared RAM with sound CPU */
 	AM_RANGE(0x6800, 0x683f) AM_READWRITE(namcoio_r, namcoio_w)				/* custom I/O */
@@ -274,12 +270,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( toypop_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_BASE(&toypop_videoram)	/* video RAM */
-	AM_RANGE(0x0800, 0x0f7f) AM_RAM											/* general RAM, area 1 */
-	AM_RANGE(0x0f80, 0x0fff) AM_RAM AM_BASE_GENERIC(spriteram)						/* sprite RAM, area 1 */
-	AM_RANGE(0x1000, 0x177f) AM_RAM											/* general RAM, area 2 */
-	AM_RANGE(0x1780, 0x17ff) AM_RAM AM_BASE_GENERIC(spriteram2)					/* sprite RAM, area 2 */
-	AM_RANGE(0x1800, 0x1f7f) AM_RAM											/* general RAM, area 3 */
-	AM_RANGE(0x1f80, 0x1fff) AM_RAM AM_BASE_GENERIC(spriteram3)					/* sprite RAM, area 3 */
+	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_BASE(&mappy_spriteram)										/* general RAM, area 1 */
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(&toypop_m68000_sharedram)		/* shared RAM with the 68000 CPU */
 	AM_RANGE(0x6000, 0x603f) AM_READWRITE(namcoio_r, namcoio_w)				/* custom I/O */
 	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE("namco", toypop_sound_sharedram_r, toypop_sound_sharedram_w) /* shared RAM with sound CPU */

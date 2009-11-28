@@ -230,10 +230,6 @@ VIDEO_START( xevious )
 	tilemap_set_scrolldy(fg_tilemap,-18,-10);
 	tilemap_set_transparent_pen(fg_tilemap,0);
 
-	machine->generic.spriteram2.u8 = xevious_sr1 + 0x780;
-	machine->generic.spriteram3.u8 = xevious_sr2 + 0x780;
-	machine->generic.spriteram.u8   = xevious_sr3 + 0x780;
-
 	state_save_register_global_array(machine, xevious_bs);
 }
 
@@ -426,11 +422,10 @@ ROM 3M,3L color replace table for sprite
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
-	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
-	UINT8 *spriteram_3 = machine->generic.spriteram3.u8;
+	UINT8 *spriteram = xevious_sr3 + 0x780;
+	UINT8 *spriteram_2 = xevious_sr1 + 0x780;
+	UINT8 *spriteram_3 = xevious_sr2 + 0x780;
 	int offs,sx,sy;
-
 
 	for (offs = 0;offs < 0x80;offs += 2)
 	{

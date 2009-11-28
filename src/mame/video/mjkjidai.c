@@ -1,7 +1,5 @@
 #include "driver.h"
-
-
-UINT8 *mjkjidai_videoram;
+#include "includes/mjkjidai.h"
 
 static int display_enable;
 static tilemap *bg_tilemap;
@@ -16,9 +14,11 @@ static tilemap *bg_tilemap;
 
 static TILE_GET_INFO( get_tile_info )
 {
-	int attr = mjkjidai_videoram[tile_index + 0x800];
-	int code = mjkjidai_videoram[tile_index] + ((attr & 0x1f) << 8);
-	int color = mjkjidai_videoram[tile_index + 0x1000];
+	mjkjidai_state *state = (mjkjidai_state *)machine->driver_data;
+
+	int attr = state->videoram[tile_index + 0x800];
+	int code = state->videoram[tile_index] + ((attr & 0x1f) << 8);
+	int color = state->videoram[tile_index + 0x1000];
 	SET_TILE_INFO(0,code,color >> 3,0);
 }
 
@@ -45,7 +45,9 @@ VIDEO_START( mjkjidai )
 
 WRITE8_HANDLER( mjkjidai_videoram_w )
 {
-	mjkjidai_videoram[offset] = data;
+	mjkjidai_state *state = (mjkjidai_state *)space->machine->driver_data;
+
+	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
 }
 
@@ -89,9 +91,10 @@ WRITE8_HANDLER( mjkjidai_ctrl_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
-	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
-	UINT8 *spriteram_3 = machine->generic.spriteram3.u8;
+	mjkjidai_state *state = (mjkjidai_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram1;
+	UINT8 *spriteram_2 = state->spriteram2;
+	UINT8 *spriteram_3 = state->spriteram3;
 	int offs;
 
 	for (offs = 0x20-2;offs >= 0;offs -= 2)
