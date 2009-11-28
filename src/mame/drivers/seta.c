@@ -2243,6 +2243,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( extdwnhl_map, ADDRESS_SPACE_PROGRAM, 16 )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM								// RAM
