@@ -1,6 +1,6 @@
 /* Hyper NeoGeo 64
 
-Driver by David Haywood, ElSemi, and Andrew Gardner.
+Driver by David Haywood, ElSemi, Andrew Gardner and Angelo Salese
 Rasterizing code provided in part by Andrew Zaferakis.
 
 
@@ -733,7 +733,16 @@ static READ32_HANDLER( shoot_io_r )
 			else
 				return 0x000;
 		}
-		case 0x010: return input_port_read(space->machine, "D_IN");
+		case 0x010:
+		{
+			static UINT32 p1_trig;
+
+			/* quick kludge for use the input test items */
+			if(input_port_read(space->machine, "D_IN") & 0x01000000)
+				p1_trig = mame_rand(space->machine) & 0x01000000;
+
+			return (input_port_read(space->machine, "D_IN") & ~0x01000000) | (p1_trig);
+		}
 		case 0x018:
 		{
 			UINT8 p1_x, p1_y, p2_x, p2_y;
@@ -783,7 +792,7 @@ static READ32_HANDLER( racing_io_r )
 
 static READ32_HANDLER( hng64_dualport_r )
 {
-//	printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+	printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 
 	/*
 	command table:
@@ -809,9 +818,19 @@ static READ32_HANDLER( hng64_dualport_r )
 	return hng64_dualport[offset];
 }
 
+/*
+Beast Busters 2 outputs (all at offset == 0x1c):
+0x00000001 start #1
+0x00000002 start #2
+0x00000004 start #3
+0x00001000 gun #1
+0x00002000 gun #2
+0x00004000 gun #3
+*/
+
 static WRITE32_HANDLER( hng64_dualport_w )
 {
-//	printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+	printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 	COMBINE_DATA (&hng64_dualport[offset]);
 }
 
@@ -894,25 +913,26 @@ WRITE32_HANDLER( activate_3d_buffer )
 static WRITE32_HANDLER( tcram_w )
 {
 	COMBINE_DATA (&hng64_tcram[offset]) ;
-//  mame_printf_debug("Q1 W : %.8x %.8x\n", offset, hng64_tcram[offset]) ;
 
-/*
-    if (offset == 0x00000007)
-    {
-        sprintf(writeString, "%.8x ", hng64_tcram[offset]) ;
-    }
+	if(offset == 0x02)
+	{
+		static UINT16 min_x,min_y,max_x,max_y;
+		rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen);
 
-    if (offset == 0x0000000a)
-    {
-        sprintf(writeString, "%s %.8x ", writeString, hng64_tcram[offset]) ;
-    }
+		min_x = (hng64_tcram[1] & 0xffff0000) >> 16;
+		min_y = (hng64_tcram[1] & 0x0000ffff) >> 0;
+		max_x = (hng64_tcram[2] & 0xffff0000) >> 16;
+		max_y = (hng64_tcram[2] & 0x0000ffff) >> 0;
 
-    if (offset == 0x0000000b)
-    {
-        sprintf(writeString, "%s %.8x ", writeString, hng64_tcram[offset]) ;
-//      _("%s", writeString) ;
-    }
-*/
+		if(max_x == 0 || max_y == 0) //bail out if values are invalid
+			return;
+
+		visarea.min_x = min_x;
+		visarea.max_x = min_x + max_x - 1;
+		visarea.min_y = min_y;
+		visarea.max_y = min_y + max_y - 1;
+		video_screen_configure(space->machine->primary_screen, 0x200, 0x1c0, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds );
+	}
 }
 
 static READ32_HANDLER( tcram_r )
@@ -1044,7 +1064,7 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_BASE(&hng64_spriteregs)							// Sprites Registers
 	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_BASE(&hng64_videoram)	// Tilemap
 	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_BASE(&hng64_videoregs)							// Video Registers
-	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_BASE_GENERIC(paletteram)			// Palette
+	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_BASE_GENERIC(paletteram)		// Palette
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(&hng64_tcram)		// Transition Control
 	AM_RANGE(0x20300000, 0x203001ff) AM_RAM_WRITE(dl_w) AM_BASE(&hng64_dl)						// 3d Display List
 	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)
@@ -1401,9 +1421,8 @@ static INPUT_PORTS_START( hng64 )
 	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40000000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x80000000, 0x00000000, "TST" )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x80000000, DEF_STR( On ) )
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SERVICE )
+
 
 	PORT_START("P1_P2")
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
@@ -1822,7 +1841,7 @@ static MACHINE_DRIVER_START( hng64 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(1024, 1024)
-	MDRV_SCREEN_VISIBLE_AREA(0, 511, 16, 447)
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x200-1, 0, 0x1c0-1)
 
 	MDRV_PALETTE_LENGTH(0x1000)
 
