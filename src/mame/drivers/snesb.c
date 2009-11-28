@@ -8,6 +8,7 @@
     - Killer Instinct
     - Final Fight 2
     - Sonic Blast Man 2
+    - Iron Commando
 
     Not dumped:
     - Final Fight 3
@@ -78,7 +79,63 @@ TODO:
 
     Data lines of eproms are bitswapped.
 
+***************************************************************************
+
+Iron Commando PCB (same as Final Fight 2?)
+ ______________________________________________________________________________________________
+|                                                                                              |
+|     _____________              XTAL1                    XTAL2                                |
+|    |             |             21.47727Mhz              24.576Mhz          _______           |
+|    |             |                                                        |86A619 |          |
+|    |   LATTICE   |                                                        |_______|          |
+|    |pLSL1024_60LJ|                                                                           |
+|    |   B611S01   |                                                         _______________   |
+|    |             |                       _________        _________       |               |  |
+|    |             |         ______       | 86A621  |      | 86A537  |      |HM65256BLP_12  |  |
+|    |             |        |      |      |  JDCF   |      |  JDCF   |      |   01002990    |  |
+|    |_____________|        |86A623|      |         |      |         |      |_______________|  |
+|                           | JDCF |      |_________|      |_________|       _______________   |
+|  ___________________      |      |                                        |               |  |
+| |4.C11              |     |      |                                        |HM65256BLP_12  |  |
+| |                   |     |______|                                        |   01002990    |  |
+| |AM27C020           |                                                     |_______________|  |
+| |___________________|                      ______           ______                           |
+|  ___________________                      |      |         |      |        _______________   |
+| |5.C10              |      ______         |86A617|         |86A618|       |               |  |
+| |                   |     |      |        | JDCF |         | JDCF |       | KM62256BLP_10 |  |
+| |27C4001            |     |86A540|        |      |         |      |       |  210Y  KOREA  |  |
+| |___________________|     | JDKF |        |      |         |      |       |_______________|  |
+|  ___________________      |      |        |______|         |______|        _______________   |
+| |6.C09              |     |      |                                        |               |  |
+| |                   |     |______|                                        | KM62256BLP_10 |  |
+| |27C4001            |                                                     |  210Y  KOREA  |  |
+| |___________________|                  ________     ________              |_______________|  |
+|                                       |D41464C |   |D41464C |                                |
+|  _______                              |________|   |________|                                |
+| | GL324 |                                                        ________    ________        |
+| |_______|                              ________     ________    |  DIP1  |  |  DIP2  |       |
+|                                       |D41464C |   |D41464C |   |1      8|  |1      8|       |
+|                                       |________|   |________|   |________|  |________|       |
+|                                                                                              |
+|                                           ______   _________    _________    _________       |
+|                                          |74LS14| |74LS245N |  |74LS245N |  |74LS245B |      |
+|                                          |______| |_________|  |_________|  |_________|      |
+|                                                                                              |
+|                                           ______     ______      ______       ______         |
+|                                          |GD4021|   |CD4021|    |CD4021|     |CD4021|        |
+|                                          |______|   |______|    |______|     |______|        |
+|                                                                                              |
+|                  _____ 1                                           28 _____                  |
+|                 |     || | | | | | | | | | | | | | | | | | | | | | | |     |                 |
+|                 |     || | | | | | | | | | | | | | | | | | | | | | | |     |                 |
+|_________________|     |______________________________________________|     |_________________|
+
+
 ***************************************************************************/
+
+
+
+
 #include "driver.h"
 #include "cpu/spc700/spc700.h"
 #include "cpu/g65816/g65816.h"
@@ -753,7 +810,48 @@ ROM_START( ffight2b )
 	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )
 
 	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
+ROM_END
 
+ROM_START( ironcomm )
+	ROM_REGION( 0x400000, "user3", 0 )
+	ROM_LOAD( "6.c09.bin", 0x000000, 0x008000, CRC(50ea1457) SHA1(092f9a0e34deeb090b8c88553be3b1596ded60ef) )
+	ROM_CONTINUE(          0x088000, 0x008000 )
+	ROM_CONTINUE(          0x010000, 0x008000 )
+	ROM_CONTINUE(          0x098000, 0x008000 )
+	ROM_CONTINUE(          0x020000, 0x008000 )
+	ROM_CONTINUE(          0x0a8000, 0x008000 )
+	ROM_CONTINUE(          0x030000, 0x008000 )
+	ROM_CONTINUE(          0x0b8000, 0x008000 )
+	ROM_CONTINUE(          0x040000, 0x008000 )
+	ROM_CONTINUE(          0x0c8000, 0x008000 )
+	ROM_CONTINUE(          0x050000, 0x008000 )
+	ROM_CONTINUE(          0x0d8000, 0x008000 )
+	ROM_CONTINUE(          0x060000, 0x008000 )
+	ROM_CONTINUE(          0x0e8000, 0x008000 )
+	ROM_CONTINUE(          0x070000, 0x008000 )
+	ROM_CONTINUE(          0x0f8000, 0x008000 )
+	ROM_LOAD( "5.c10.bin", 0x080000, 0x008000, CRC(0c3a0b5b) SHA1(1e8ab860689137e0e94731f1af2cfc561492b5bd) )
+	ROM_CONTINUE(          0x008000, 0x008000 )
+	ROM_CONTINUE(          0x090000, 0x008000 )
+	ROM_CONTINUE(          0x018000, 0x008000 )
+	ROM_CONTINUE(          0x0a0000, 0x008000 )
+	ROM_CONTINUE(          0x028000, 0x008000 )
+	ROM_CONTINUE(          0x0b0000, 0x008000 )
+	ROM_CONTINUE(          0x038000, 0x008000 )
+	ROM_CONTINUE(          0x0c0000, 0x008000 )
+	ROM_CONTINUE(          0x048000, 0x008000 )
+	ROM_CONTINUE(          0x0d0000, 0x008000 )
+	ROM_CONTINUE(          0x058000, 0x008000 )
+	ROM_CONTINUE(          0x0e0000, 0x008000 )
+	ROM_CONTINUE(          0x068000, 0x008000 )
+	ROM_CONTINUE(          0x0f0000, 0x008000 )
+	ROM_CONTINUE(          0x078000, 0x008000 )
+	ROM_LOAD( "4.c11.bin", 0x100000, 0x040000, CRC(2aa417c7) SHA1(24b375e5bbd4be5dcd31b63ea98fbbadd53d543e) )
+
+	ROM_REGION(0x100,           "user5", 0)
+	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )
+
+	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( sblast2b )
@@ -774,3 +872,4 @@ ROM_END
 GAME( 199?, kinstb,       0,     kinstb,	     kinstb,    kinstb,		ROT0, "bootleg",	"Killer Instinct (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, ffight2b,     0,     kinstb,	     ffight2b,  ffight2b,	ROT0, "bootleg",	"Final Fight 2 (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sblast2b,     0,     kinstb,	     sblast2b,  sblast2b,	ROT0, "bootleg",	"Sonic Blast Man 2 Special Turbo (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS)
+GAME( 1996, ironcomm,     0,     kinstb,	     ffight2b,  ffight2b,	ROT0, "bootleg",	"Iron Commando (SNES bootleg)", GAME_NOT_WORKING )
