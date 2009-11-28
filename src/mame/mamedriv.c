@@ -1342,8 +1342,10 @@ const game_driver * const drivers[] =
 	DRIVER( spacezap )	/* (c) 1980 */
 	DRIVER( ebases )	/* (c) 1980 */
 	DRIVER( wow )		/* (c) 1980 */
+	DRIVER( wowg )		/* (c) 1980 */
 	DRIVER( gorf )		/* (c) 1981 */
 	DRIVER( gorfpgm1 )	/* (c) 1981 */
+	DRIVER( gorfpgm1g )	/* (c) 1981 */
 	DRIVER( robby )		/* (c) 1981 Bally Midway */
 	DRIVER( demndrgn )	/* (c) 1982 Bally Midway */
 	DRIVER( profpac )	/* (c) 1983 Bally Midway */
