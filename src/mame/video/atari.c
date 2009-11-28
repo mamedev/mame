@@ -1043,7 +1043,7 @@ static void antic_linerefresh(running_machine *machine)
 	dst[2] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
 	dst[3] = antic.color_lookup[PBK] | antic.color_lookup[PBK] << 16;
 
-	draw_scanline8(tmpbitmap, 12, y, MIN(tmpbitmap->width - 12, sizeof(scanline)), (const UINT8 *) scanline, NULL);
+	draw_scanline8(machine->generic.tmpbitmap, 12, y, MIN(machine->generic.tmpbitmap->width - 12, sizeof(scanline)), (const UINT8 *) scanline, NULL);
 }
 
 static int cycle(running_machine *machine)

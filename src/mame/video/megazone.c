@@ -109,7 +109,7 @@ WRITE8_HANDLER( megazone_flipscreen_w )
 
 VIDEO_START( megazone )
 {
-	tmpbitmap = auto_bitmap_alloc(machine,256,256,video_screen_get_format(machine->primary_screen));
+	machine->generic.tmpbitmap = auto_bitmap_alloc(machine,256,256,video_screen_get_format(machine->primary_screen));
 }
 
 
@@ -135,7 +135,7 @@ VIDEO_UPDATE( megazone )
 			flipy = !flipy;
 		}
 
-		drawgfx_opaque(tmpbitmap,0,screen->machine->gfx[1],
+		drawgfx_opaque(screen->machine->generic.tmpbitmap,0,screen->machine->gfx[1],
 				((int)screen->machine->generic.videoram.u8[offs]) + ((screen->machine->generic.colorram.u8[offs] & (1<<7) ? 256 : 0) ),
 				(screen->machine->generic.colorram.u8[offs] & 0x0f) + 0x10,
 				flipx,flipy,
@@ -159,7 +159,7 @@ VIDEO_UPDATE( megazone )
 		}
 
 
-		copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,cliprect);
+		copyscrollbitmap(bitmap,screen->machine->generic.tmpbitmap,1,&scrollx,1,&scrolly,cliprect);
 	}
 
 

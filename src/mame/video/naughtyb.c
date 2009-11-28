@@ -110,7 +110,7 @@ VIDEO_START( naughtyb )
 	palreg = bankreg = 0;
 
 	/* Naughty Boy has a virtual screen twice as large as the visible screen */
-	tmpbitmap = auto_bitmap_alloc(machine,68*8,28*8,video_screen_get_format(machine->primary_screen));
+	machine->generic.tmpbitmap = auto_bitmap_alloc(machine,68*8,28*8,video_screen_get_format(machine->primary_screen));
 }
 
 
@@ -223,13 +223,13 @@ VIDEO_UPDATE( naughtyb )
 			}
 		}
 
-		drawgfx_opaque(tmpbitmap,0,screen->machine->gfx[0],
+		drawgfx_opaque(screen->machine->generic.tmpbitmap,0,screen->machine->gfx[0],
 				naughtyb_videoram2[offs] + 256 * bankreg,
 				(naughtyb_videoram2[offs] >> 5) + 8 * palreg,
 				naughtyb_cocktail,naughtyb_cocktail,
 				8*sx,8*sy);
 
-		drawgfx_transpen(tmpbitmap,0,screen->machine->gfx[1],
+		drawgfx_transpen(screen->machine->generic.tmpbitmap,0,screen->machine->gfx[1],
 				screen->machine->generic.videoram.u8[offs] + 256*bankreg,
 				(screen->machine->generic.videoram.u8[offs] >> 5) + 8 * palreg,
 				naughtyb_cocktail,naughtyb_cocktail,
@@ -240,11 +240,11 @@ VIDEO_UPDATE( naughtyb )
 	{
 		int scrollx;
 
-		copybitmap(bitmap,tmpbitmap,0,0,-66*8,0,&leftvisiblearea);
-		copybitmap(bitmap,tmpbitmap,0,0,-30*8,0,&rightvisiblearea);
+		copybitmap(bitmap,screen->machine->generic.tmpbitmap,0,0,-66*8,0,&leftvisiblearea);
+		copybitmap(bitmap,screen->machine->generic.tmpbitmap,0,0,-30*8,0,&rightvisiblearea);
 
 		scrollx = ( naughtyb_cocktail ) ? *naughtyb_scrollreg - 239 : -*naughtyb_scrollreg + 16;
-		copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,0,0,&scrollvisiblearea);
+		copyscrollbitmap(bitmap,screen->machine->generic.tmpbitmap,1,&scrollx,0,0,&scrollvisiblearea);
 	}
 	return 0;
 }

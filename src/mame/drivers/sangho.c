@@ -213,7 +213,7 @@ static INTERRUPT_GEN( sangho_interrupt )
 static VIDEO_START( sangho )
 {
 	VIDEO_START_CALL(generic_bitmapped);
-	v9938_init (machine, 0, machine->primary_screen, tmpbitmap, MODEL_V9938, 0x20000, msx_vdp_interrupt);
+	v9938_init (machine, 0, machine->primary_screen, machine->generic.tmpbitmap, MODEL_V9938, 0x20000, msx_vdp_interrupt);
 }
 
 static MACHINE_DRIVER_START(pzlestar)

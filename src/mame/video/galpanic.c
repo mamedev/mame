@@ -8,7 +8,7 @@ static bitmap_t *sprites_bitmap;
 
 VIDEO_START( galpanic )
 {
-	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	machine->generic.tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	sprites_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	pandora_start(machine,0,0, -16);
@@ -37,7 +37,7 @@ WRITE16_HANDLER( galpanic_bgvideoram_w )
 	sy = offset / 256;
 	sx = offset % 256;
 
-	*BITMAP_ADDR16(tmpbitmap, sy, sx) = 1024 + (data >> 1);
+	*BITMAP_ADDR16(space->machine->generic.tmpbitmap, sy, sx) = 1024 + (data >> 1);
 }
 
 WRITE16_HANDLER( galpanic_paletteram_w )
@@ -104,7 +104,7 @@ static void draw_fgbitmap(bitmap_t *bitmap, const rectangle *cliprect)
 VIDEO_UPDATE( galpanic )
 {
 	/* copy the temporary bitmap to the screen */
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect);
+	copybitmap(bitmap,screen->machine->generic.tmpbitmap,0,0,0,0,cliprect);
 
 	draw_fgbitmap(bitmap, cliprect);
 
@@ -116,7 +116,7 @@ VIDEO_UPDATE( galpanic )
 VIDEO_UPDATE( comad )
 {
 	/* copy the temporary bitmap to the screen */
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect);
+	copybitmap(bitmap,screen->machine->generic.tmpbitmap,0,0,0,0,cliprect);
 
 	draw_fgbitmap(bitmap,cliprect);
 

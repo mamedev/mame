@@ -50,7 +50,7 @@ WRITE8_HANDLER( mnchmobl_flipscreen_w )
 
 VIDEO_START( mnchmobl )
 {
-	tmpbitmap = auto_bitmap_alloc(machine,512,512,video_screen_get_format(machine->primary_screen));
+	machine->generic.tmpbitmap = auto_bitmap_alloc(machine,512,512,video_screen_get_format(machine->primary_screen));
 }
 
 static void draw_status(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -100,7 +100,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 		{
 			for( col=0; col<4; col++ )
 			{
-				drawgfx_opaque( tmpbitmap,0, gfx,
+				drawgfx_opaque( machine->generic.tmpbitmap,0, gfx,
 					rom[col+tile_number*4+row*0x400],
 					mnchmobl_palette_bank,
 					0,0, /* flip */
@@ -113,7 +113,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 		int scrollx = -(mnchmobl_vreg[6]*2+(mnchmobl_vreg[7]>>7))-64-128-16;
 		int scrolly = 0;
 
-		copyscrollbitmap(bitmap,tmpbitmap, 1,&scrollx,1,&scrolly, cliprect);
+		copyscrollbitmap(bitmap,machine->generic.tmpbitmap, 1,&scrollx,1,&scrolly, cliprect);
 	}
 }
 

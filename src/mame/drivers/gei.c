@@ -102,7 +102,7 @@ static WRITE8_HANDLER( gei_bitmap_w )
 
 
 	for (i = 0; i < 8; i++)
-		*BITMAP_ADDR16(tmpbitmap, sy, sx+i) = color[8-i-1];
+		*BITMAP_ADDR16(space->machine->generic.tmpbitmap, sy, sx+i) = color[8-i-1];
 }
 
 static PALETTE_INIT(gei)

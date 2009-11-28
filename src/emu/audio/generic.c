@@ -15,12 +15,15 @@
 
 
 /***************************************************************************
-    GLOBAL VARIABLES
+    TYPE DEFINITIONS
 ***************************************************************************/
 
-static UINT16 latch_clear_value = 0x00;
-static UINT16 latched_value[4];
-static UINT8 latch_read[4];
+struct _generic_audio_private
+{
+	UINT16 		latch_clear_value;
+	UINT16 		latched_value[4];
+	UINT8 		latch_read[4];
+};
 
 
 
@@ -35,14 +38,13 @@ static UINT8 latch_read[4];
 
 int generic_sound_init(running_machine *machine)
 {
-	/* reset latches */
-	latch_clear_value = 0;
-	memset(latched_value, 0, sizeof(latched_value));
-	memset(latch_read, 0, sizeof(latch_read));
+	generic_audio_private *state;
+	
+	state = machine->generic_audio_data = auto_alloc_clear(machine, generic_audio_private);
 
 	/* register globals with the save state system */
-	state_save_register_global_array(machine, latched_value);
-	state_save_register_global_array(machine, latch_read);
+	state_save_register_global_array(machine, state->latched_value);
+	state_save_register_global_array(machine, state->latch_read);
 
 	return 0;
 }
@@ -66,16 +68,17 @@ int generic_sound_init(running_machine *machine)
 
 static TIMER_CALLBACK( latch_callback )
 {
+	generic_audio_private *state = machine->generic_audio_data;
 	UINT16 value = param >> 8;
 	int which = param & 0xff;
 
 	/* if the latch hasn't been read and the value is changed, log a warning */
-	if (!latch_read[which] && latched_value[which] != value)
-		logerror("Warning: sound latch %d written before being read. Previous: %02x, new: %02x\n", which, latched_value[which], value);
+	if (!state->latch_read[which] && state->latched_value[which] != value)
+		logerror("Warning: sound latch %d written before being read. Previous: %02x, new: %02x\n", which, state->latched_value[which], value);
 
 	/* store the new value and mark it not read */
-	latched_value[which] = value;
-	latch_read[which] = 0;
+	state->latched_value[which] = value;
+	state->latch_read[which] = 0;
 }
 
 
@@ -93,10 +96,11 @@ INLINE void latch_w(const address_space *space, int which, UINT16 value)
     latch_r - handle a read from a given latch
 -------------------------------------------------*/
 
-INLINE UINT16 latch_r(int which)
+INLINE UINT16 latch_r(const address_space *space, int which)
 {
-	latch_read[which] = 1;
-	return latched_value[which];
+	generic_audio_private *state = space->machine->generic_audio_data;
+	state->latch_read[which] = 1;
+	return state->latched_value[which];
 }
 
 
@@ -104,9 +108,10 @@ INLINE UINT16 latch_r(int which)
     latch_clear - clear a given latch
 -------------------------------------------------*/
 
-INLINE void latch_clear(int which)
+INLINE void latch_clear(const address_space *space, int which)
 {
-	latched_value[which] = latch_clear_value;
+	generic_audio_private *state = space->machine->generic_audio_data;
+	state->latched_value[which] = state->latch_clear_value;
 }
 
 
@@ -130,14 +135,14 @@ WRITE16_HANDLER( soundlatch4_word_w ) { latch_w(space, 3, data); }
     reading from sound latches
 -------------------------------------------------*/
 
-READ8_HANDLER( soundlatch_r )         { return latch_r(0); }
-READ16_HANDLER( soundlatch_word_r )   { return latch_r(0); }
-READ8_HANDLER( soundlatch2_r )        { return latch_r(1); }
-READ16_HANDLER( soundlatch2_word_r )  { return latch_r(1); }
-READ8_HANDLER( soundlatch3_r )        { return latch_r(2); }
-READ16_HANDLER( soundlatch3_word_r )  { return latch_r(2); }
-READ8_HANDLER( soundlatch4_r )        { return latch_r(3); }
-READ16_HANDLER( soundlatch4_word_r )  { return latch_r(3); }
+READ8_HANDLER( soundlatch_r )         { return latch_r(space, 0); }
+READ16_HANDLER( soundlatch_word_r )   { return latch_r(space, 0); }
+READ8_HANDLER( soundlatch2_r )        { return latch_r(space, 1); }
+READ16_HANDLER( soundlatch2_word_r )  { return latch_r(space, 1); }
+READ8_HANDLER( soundlatch3_r )        { return latch_r(space, 2); }
+READ16_HANDLER( soundlatch3_word_r )  { return latch_r(space, 2); }
+READ8_HANDLER( soundlatch4_r )        { return latch_r(space, 3); }
+READ16_HANDLER( soundlatch4_word_r )  { return latch_r(space, 3); }
 
 
 /*-------------------------------------------------
@@ -145,10 +150,10 @@ READ16_HANDLER( soundlatch4_word_r )  { return latch_r(3); }
     for clearing sound latches
 -------------------------------------------------*/
 
-WRITE8_HANDLER( soundlatch_clear_w )  { latch_clear(0); }
-WRITE8_HANDLER( soundlatch2_clear_w ) { latch_clear(1); }
-WRITE8_HANDLER( soundlatch3_clear_w ) { latch_clear(2); }
-WRITE8_HANDLER( soundlatch4_clear_w ) { latch_clear(3); }
+WRITE8_HANDLER( soundlatch_clear_w )  { latch_clear(space, 0); }
+WRITE8_HANDLER( soundlatch2_clear_w ) { latch_clear(space, 1); }
+WRITE8_HANDLER( soundlatch3_clear_w ) { latch_clear(space, 2); }
+WRITE8_HANDLER( soundlatch4_clear_w ) { latch_clear(space, 3); }
 
 
 /*-------------------------------------------------
@@ -158,6 +163,7 @@ WRITE8_HANDLER( soundlatch4_clear_w ) { latch_clear(3); }
 
 void soundlatch_setclearedvalue(running_machine *machine, int value)
 {
+	generic_audio_private *state = machine->generic_audio_data;
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call soundlatch_setclearedvalue at init time!");
-	latch_clear_value = value;
+	state->latch_clear_value = value;
 }

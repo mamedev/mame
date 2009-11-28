@@ -141,6 +141,8 @@ typedef struct _cheat_private cheat_private;
 typedef struct _debugcpu_private debugcpu_private;
 typedef struct _debugvw_private debugvw_private;
 typedef struct _generic_machine_private generic_machine_private;
+typedef struct _generic_video_private generic_video_private;
+typedef struct _generic_audio_private generic_audio_private;
 
 
 /* structure to hold a pointer/size pair for generic pointers */
@@ -176,6 +178,7 @@ struct _generic_pointers
 	generic_ptr				buffered_spriteram3;/* tertiary buffered spriteram */
 	generic_ptr				paletteram;			/* palette RAM */
 	generic_ptr				paletteram2;		/* secondary palette RAM */
+	bitmap_t *				tmpbitmap;			/* temporary bitmap */
 };
 
 
@@ -233,6 +236,8 @@ struct _running_machine
 	debugcpu_private *		debugcpu_data;		/* internal data from debugcpu.c */
 	debugvw_private *		debugvw_data;		/* internal data from debugvw.c */
 	generic_machine_private *generic_machine_data; /* internal data from machine/generic.c */
+	generic_video_private *	generic_video_data;	/* internal data from video/generic.c */
+	generic_audio_private *	generic_audio_data;	/* internal data from audio/generic.c */
 #ifdef MESS
 	images_private *		images_data;		/* internal data from image.c */
 	ui_mess_private *		ui_mess_data;		/* internal data from uimess.c */

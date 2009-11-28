@@ -15,11 +15,14 @@
 
 
 /***************************************************************************
-    GLOBAL VARIABLES
+    TYPE DEFINITIONS
 ***************************************************************************/
 
-bitmap_t *tmpbitmap;
-static int flip_screen_x, flip_screen_y;
+struct _generic_video_private
+{
+	int 		flip_screen_x;
+	int			flip_screen_y;
+};
 
 
 
@@ -227,25 +230,12 @@ INLINE void set_color_888(running_machine *machine, pen_t color, int rshift, int
 
 void generic_video_init(running_machine *machine)
 {
-	machine->generic.paletteram.v = NULL;
-	machine->generic.paletteram2.v = NULL;
-	machine->generic.videoram.v = NULL;
-	machine->generic.videoram_size = 0;
-	machine->generic.colorram.v = NULL;
-	machine->generic.colorram_size = 0;
-	machine->generic.spriteram.v = NULL;
-	machine->generic.spriteram_size = 0;
-	machine->generic.spriteram2.v = NULL;
-	machine->generic.spriteram2_size = 0;
-	machine->generic.spriteram3.v = NULL;
-	machine->generic.spriteram3_size = 0;
-	machine->generic.buffered_spriteram.v = NULL;
-	machine->generic.buffered_spriteram2.v = NULL;
-	machine->generic.buffered_spriteram3.v = NULL;
-	tmpbitmap = NULL;
-	flip_screen_x = flip_screen_y = 0;
-	state_save_register_item(machine, "video", NULL, 0, flip_screen_x);
-	state_save_register_item(machine, "video", NULL, 0, flip_screen_y);
+	generic_video_private *state;
+	
+	state = machine->generic_video_data = auto_alloc_clear(machine, generic_video_private);
+
+	state_save_register_item(machine, "video", NULL, 0, state->flip_screen_x);
+	state_save_register_item(machine, "video", NULL, 0, state->flip_screen_y);
 }
 
 
@@ -262,10 +252,10 @@ void generic_video_init(running_machine *machine)
 VIDEO_START( generic_bitmapped )
 {
 	/* allocate the temporary bitmap */
-	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	machine->generic.tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	/* ensure the contents of the bitmap are saved */
-	state_save_register_bitmap(machine, "video", NULL, 0, "tmpbitmap", tmpbitmap);
+	state_save_register_bitmap(machine, "video", NULL, 0, "tmpbitmap", machine->generic.tmpbitmap);
 }
 
 
@@ -276,7 +266,7 @@ VIDEO_START( generic_bitmapped )
 
 VIDEO_UPDATE( generic_bitmapped )
 {
-	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, screen->machine->generic.tmpbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
@@ -399,14 +389,15 @@ void buffer_spriteram_2(running_machine *machine, UINT8 *ptr, int length)
 
 static void updateflip(running_machine *machine)
 {
+	generic_video_private *state = machine->generic_video_data;
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
 	attoseconds_t period = video_screen_get_frame_period(machine->primary_screen).attoseconds;
 	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
 
-	tilemap_set_flip_all(machine,(TILEMAP_FLIPX & flip_screen_x) | (TILEMAP_FLIPY & flip_screen_y));
+	tilemap_set_flip_all(machine,(TILEMAP_FLIPX & state->flip_screen_x) | (TILEMAP_FLIPY & state->flip_screen_y));
 
-	if (flip_screen_x)
+	if (state->flip_screen_x)
 	{
 		int temp;
 
@@ -414,7 +405,7 @@ static void updateflip(running_machine *machine)
 		visarea.min_x = width - visarea.max_x - 1;
 		visarea.max_x = temp;
 	}
-	if (flip_screen_y)
+	if (state->flip_screen_y)
 	{
 		int temp;
 
@@ -450,7 +441,8 @@ void flip_screen_set_no_update(running_machine *machine, int on)
      * where writing to flip_screen_x to
      * bypass update_flip
      */
-	flip_screen_x = on;
+	generic_video_private *state = machine->generic_video_data;
+	state->flip_screen_x = on;
 }
 
 
@@ -460,10 +452,11 @@ void flip_screen_set_no_update(running_machine *machine, int on)
 
 void flip_screen_x_set(running_machine *machine, int on)
 {
+	generic_video_private *state = machine->generic_video_data;
 	if (on) on = ~0;
-	if (flip_screen_x != on)
+	if (state->flip_screen_x != on)
 	{
-		flip_screen_x = on;
+		state->flip_screen_x = on;
 		updateflip(machine);
 	}
 }
@@ -475,10 +468,11 @@ void flip_screen_x_set(running_machine *machine, int on)
 
 void flip_screen_y_set(running_machine *machine, int on)
 {
+	generic_video_private *state = machine->generic_video_data;
 	if (on) on = ~0;
-	if (flip_screen_y != on)
+	if (state->flip_screen_y != on)
 	{
-		flip_screen_y = on;
+		state->flip_screen_y = on;
 		updateflip(machine);
 	}
 }
@@ -490,7 +484,8 @@ void flip_screen_y_set(running_machine *machine, int on)
 
 int flip_screen_get(running_machine *machine)
 {
-	return flip_screen_x;
+	generic_video_private *state = machine->generic_video_data;
+	return state->flip_screen_x;
 }
 
 
@@ -500,7 +495,8 @@ int flip_screen_get(running_machine *machine)
 
 int flip_screen_x_get(running_machine *machine)
 {
-	return flip_screen_x;
+	generic_video_private *state = machine->generic_video_data;
+	return state->flip_screen_x;
 }
 
 
@@ -510,7 +506,8 @@ int flip_screen_x_get(running_machine *machine)
 
 int flip_screen_y_get(running_machine *machine)
 {
-	return flip_screen_y;
+	generic_video_private *state = machine->generic_video_data;
+	return state->flip_screen_y;
 }
 
 

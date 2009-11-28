@@ -140,7 +140,7 @@ VIDEO_START( tinvader )
 		 24, 24, 32, 32);
 
 	spritebitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	machine->generic.tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	gfx_element_set_source(machine->gfx[1], zac2650_s2636_0_ram);
 	gfx_element_set_source(machine->gfx[2], zac2650_s2636_0_ram);
@@ -165,7 +165,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
     CollisionBackground = 0;	/* Read from 0x1e80 bit 7 */
 
 	// for collision detection checking
-	copybitmap(tmpbitmap,bitmap,0,0,0,0,visarea);
+	copybitmap(machine->generic.tmpbitmap,bitmap,0,0,0,0,visarea);
 
     for(offs=0;offs<0x50;offs+=0x10)
     {
@@ -196,7 +196,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 				        continue;
 			        }
 
-        	        if (*BITMAP_ADDR16(bitmap, y, x) != *BITMAP_ADDR16(tmpbitmap, y, x))
+        	        if (*BITMAP_ADDR16(bitmap, y, x) != *BITMAP_ADDR16(machine->generic.tmpbitmap, y, x))
         	        {
                     	CollisionBackground = 0x80;
 				        break;

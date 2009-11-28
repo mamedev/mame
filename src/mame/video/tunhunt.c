@@ -72,7 +72,7 @@ VIDEO_START( tunhunt )
     We keep track of dirty lines and cache the expanded bitmap.
     With max RLE expansion, bitmap size is 256x64.
     */
-	tmpbitmap = auto_bitmap_alloc(machine, 256, 64, video_screen_get_format(machine->primary_screen));
+	machine->generic.tmpbitmap = auto_bitmap_alloc(machine, 256, 64, video_screen_get_format(machine->primary_screen));
 
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 
@@ -196,7 +196,7 @@ static void set_pens(running_machine *machine)
 	}
 }
 
-static void draw_motion_object(bitmap_t *bitmap, const rectangle *cliprect, UINT8 *spriteram)
+static void draw_motion_object(bitmap_t *bitmap, bitmap_t *tmpbitmap, const rectangle *cliprect, UINT8 *spriteram)
 {
 /*
  *      VSTRLO  0x1202
@@ -371,7 +371,7 @@ VIDEO_UPDATE( tunhunt )
 
 	draw_box(bitmap, cliprect);
 
-	draw_motion_object(bitmap, cliprect, screen->machine->generic.spriteram.u8);
+	draw_motion_object(bitmap, screen->machine->generic.tmpbitmap, cliprect, screen->machine->generic.spriteram.u8);
 
 	draw_shell(screen->machine, bitmap, cliprect,
 		tunhunt_ram[SHL0PC],	/* picture code */

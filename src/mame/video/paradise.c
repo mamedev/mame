@@ -141,8 +141,8 @@ WRITE8_HANDLER( paradise_pixmap_w )
 	x = (offset & 0x7f) << 1;
 	y = (offset >> 7);
 
-	*BITMAP_ADDR16(tmpbitmap, y, x+0) = 0x80f - (data >> 4);
-	*BITMAP_ADDR16(tmpbitmap, y, x+1) = 0x80f - (data & 0x0f);
+	*BITMAP_ADDR16(space->machine->generic.tmpbitmap, y, x+0) = 0x80f - (data >> 4);
+	*BITMAP_ADDR16(space->machine->generic.tmpbitmap, y, x+1) = 0x80f - (data & 0x0f);
 }
 
 
@@ -159,7 +159,7 @@ VIDEO_START( paradise )
 	tilemap_2 = tilemap_create(	machine, get_tile_info_2, tilemap_scan_rows, 8,8, 0x20,0x20 );
 
 	/* pixmap */
-	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	machine->generic.tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	tilemap_set_transparent_pen(tilemap_0,0x0f);
 	tilemap_set_transparent_pen(tilemap_1,0xff);
@@ -251,7 +251,7 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 
 	if (layers_ctrl&1)	tilemap_draw(bitmap,cliprect, tilemap_0, 0,0);
 	if (layers_ctrl&2)	tilemap_draw(bitmap,cliprect, tilemap_1, 0,0);
-	if (layers_ctrl&4)	copybitmap_trans(bitmap,tmpbitmap,flip_screen_get(screen->machine),flip_screen_get(screen->machine),0,0,cliprect, 0x80f);
+	if (layers_ctrl&4)	copybitmap_trans(bitmap,screen->machine->generic.tmpbitmap,flip_screen_get(screen->machine),flip_screen_get(screen->machine),0,0,cliprect, 0x80f);
 
 	if (paradise_priority & 2)
 	{

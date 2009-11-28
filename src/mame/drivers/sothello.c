@@ -322,7 +322,7 @@ static const msm5205_interface msm_interface =
 static VIDEO_START( sothello )
 {
     VIDEO_START_CALL(generic_bitmapped);
-    v9938_init (machine, 0, machine->primary_screen, tmpbitmap, MODEL_V9938, VDP_MEM, sothello_vdp_interrupt);
+    v9938_init (machine, 0, machine->primary_screen, machine->generic.tmpbitmap, MODEL_V9938, VDP_MEM, sothello_vdp_interrupt);
     v9938_reset(0);
 }
 

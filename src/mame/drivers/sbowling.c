@@ -61,7 +61,7 @@ static TILE_GET_INFO( get_sb_tile_info )
 	SET_TILE_INFO(0, tileno, 0, 0);
 }
 
-static void plot_pixel_sbw(int x, int y, int col, int flip)
+static void plot_pixel_sbw(bitmap_t *tmpbitmap, int x, int y, int col, int flip)
 {
 	if (flip)
 	{
@@ -88,7 +88,7 @@ static WRITE8_HANDLER( sbw_videoram_w )
 
 	for(i = 0; i < 8; i++)
 	{
-		plot_pixel_sbw(x++, y, color_prom_address | ( ((v1&1)*0x20) | ((v2&1)*0x40) ), flip);
+		plot_pixel_sbw(space->machine->generic.tmpbitmap, x++, y, color_prom_address | ( ((v1&1)*0x20) | ((v2&1)*0x40) ), flip);
 		v1 >>= 1;
 		v2 >>= 1;
 	}
@@ -98,13 +98,13 @@ static VIDEO_UPDATE(sbowling)
 {
 	bitmap_fill(bitmap,cliprect,0x18);
 	tilemap_draw(bitmap,cliprect,sb_tilemap,0,0);
-	copybitmap_trans(bitmap,tmpbitmap,0,0,0,0,cliprect, color_prom_address);
+	copybitmap_trans(bitmap,screen->machine->generic.tmpbitmap,0,0,0,0,cliprect, color_prom_address);
 	return 0;
 }
 
 static VIDEO_START(sbowling)
 {
-	tmpbitmap = auto_bitmap_alloc(machine,32*8,32*8,video_screen_get_format(machine->primary_screen));
+	machine->generic.tmpbitmap = auto_bitmap_alloc(machine,32*8,32*8,video_screen_get_format(machine->primary_screen));
 	sb_tilemap = tilemap_create(machine, get_sb_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
