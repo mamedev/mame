@@ -8,7 +8,7 @@ static int flipscreen;
 
 WRITE8_HANDLER(ksayakyu_videoram_w)
 {
-	videoram[offset]=data;
+	space->machine->generic.videoram.u8[offset]=data;
 	tilemap_mark_tile_dirty(ksayakyu_textmap,offset>>1);
 }
 
@@ -56,8 +56,8 @@ static TILE_GET_INFO( get_ksayakyu_tile_info )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	int code = videoram[tile_index*2+1];
-	int attr = videoram[tile_index*2];
+	int code = machine->generic.videoram.u8[tile_index*2+1];
+	int attr = machine->generic.videoram.u8[tile_index*2];
 	int  flags=((attr&0x80) ? TILE_FLIPX : 0) | ((attr&0x40) ? TILE_FLIPY : 0);
 
 	code|=(attr&3)<<8;
@@ -67,8 +67,8 @@ static TILE_GET_INFO( get_text_tile_info )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	const UINT8 *source = spriteram+spriteram_size-4;
-	const UINT8 *finish = spriteram;
+	const UINT8 *source = machine->generic.spriteram.u8+machine->generic.spriteram_size-4;
+	const UINT8 *finish = machine->generic.spriteram.u8;
 
 	while( source>=finish ) /* is order correct ? */
 	{

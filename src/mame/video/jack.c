@@ -12,13 +12,13 @@ static tilemap *bg_tilemap;
 
 WRITE8_HANDLER( jack_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( jack_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -41,10 +41,10 @@ WRITE8_HANDLER( jack_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index] + ((colorram[tile_index] & 0x18) << 5);
-	int color = colorram[tile_index] & 0x07;
+	int code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x18) << 5);
+	int color = machine->generic.colorram.u8[tile_index] & 0x07;
 
-	// striv: colorram[tile_index] & 0x80 ???
+	// striv: machine->generic.colorram.u8[tile_index] & 0x80 ???
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -62,9 +62,10 @@ VIDEO_START( jack )
 
 static void jack_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,num, color,flipx,flipy;
 
@@ -129,8 +130,8 @@ PALETTE_INIT( joinem )
 
 static TILE_GET_INFO( joinem_get_bg_tile_info )
 {
-	int code = videoram[tile_index] + ((colorram[tile_index] & 0x03) << 8);
-	int color = (colorram[tile_index] & 0x38) >> 3;
+	int code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x03) << 8);
+	int color = (machine->generic.colorram.u8[tile_index] & 0x38) >> 3;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -142,9 +143,10 @@ VIDEO_START( joinem )
 
 static void joinem_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,num, color,flipx,flipy;
 

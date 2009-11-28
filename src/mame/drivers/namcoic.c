@@ -719,6 +719,7 @@ static int mGfxC355;	/* gfx bank for sprites */
 static void
 draw_spriteC355(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT16 *pSource, int pri, int zpos )
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	unsigned screen_height_remaining, screen_width_remaining;
 	unsigned source_height_remaining, source_width_remaining;
 	int hpos,vpos;
@@ -917,8 +918,8 @@ namco_obj_init( running_machine *machine, int gfxbank, int palXOR, int (*codeToT
 	{
 		mpCodeToTile = DefaultCodeToTile;
 	}
-	spriteram16 = auto_alloc_array(machine, UINT16, 0x20000/2);
-	memset( spriteram16, 0, 0x20000 ); /* needed for Nebulas Ray */
+	machine->generic.spriteram.u16 = auto_alloc_array(machine, UINT16, 0x20000/2);
+	memset( machine->generic.spriteram.u16, 0, 0x20000 ); /* needed for Nebulas Ray */
 	memset( mSpritePos,0x00,sizeof(mSpritePos) );
 } /* namcosC355_init */
 
@@ -950,26 +951,27 @@ namco_obj_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *clip
 	}
 //  if( offs==0 )
 	{ /* boot */
-		DrawObjectList(machine, bitmap,cliprect,pri,&spriteram16[0x02000/2], &spriteram16[0x00000/2] );
+		DrawObjectList(machine, bitmap,cliprect,pri,&machine->generic.spriteram.u16[0x02000/2], &machine->generic.spriteram.u16[0x00000/2] );
 	}
 //  else
 	{
-		DrawObjectList(machine, bitmap,cliprect,pri,&spriteram16[0x14000/2], &spriteram16[0x10000/2] );
+		DrawObjectList(machine, bitmap,cliprect,pri,&machine->generic.spriteram.u16[0x14000/2], &machine->generic.spriteram.u16[0x10000/2] );
 	}
 } /* namco_obj_draw */
 
 WRITE16_HANDLER( namco_obj16_w )
 {
-	COMBINE_DATA( &spriteram16[offset] );
+	COMBINE_DATA( &space->machine->generic.spriteram.u16[offset] );
 } /* namco_obj16_w */
 
 READ16_HANDLER( namco_obj16_r )
 {
-	return spriteram16[offset];
+	return space->machine->generic.spriteram.u16[offset];
 } /* namco_obj16_r */
 
 WRITE32_HANDLER( namco_obj32_w )
 {
+	UINT16 *spriteram16 = space->machine->generic.spriteram.u16;
 	UINT32 v;
 	offset *= 2;
 	v = (spriteram16[offset]<<16)|spriteram16[offset+1];
@@ -980,12 +982,14 @@ WRITE32_HANDLER( namco_obj32_w )
 
 READ32_HANDLER( namco_obj32_r )
 {
+	UINT16 *spriteram16 = space->machine->generic.spriteram.u16;
 	offset *= 2;
 	return (spriteram16[offset]<<16)|spriteram16[offset+1];
 } /* namco_obj32_r */
 
 WRITE32_HANDLER( namco_obj32_le_w )
 {
+	UINT16 *spriteram16 = space->machine->generic.spriteram.u16;
 	UINT32 v;
 	offset *= 2;
 	v = (spriteram16[offset+1]<<16)|spriteram16[offset];
@@ -996,6 +1000,7 @@ WRITE32_HANDLER( namco_obj32_le_w )
 
 READ32_HANDLER( namco_obj32_le_r )
 {
+	UINT16 *spriteram16 = space->machine->generic.spriteram.u16;
 	offset *= 2;
 	return (spriteram16[offset+1]<<16)|spriteram16[offset];
 } /* namco_obj32_r */

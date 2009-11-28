@@ -33,8 +33,8 @@ static ADDRESS_MAP_START( markham_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(markham_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(markham_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE(1)
 
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW2")

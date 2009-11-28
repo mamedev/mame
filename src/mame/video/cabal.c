@@ -13,7 +13,7 @@ static tilemap *background_layer,*text_layer;
 
 static TILE_GET_INFO( get_back_tile_info )
 {
-	int tile = videoram16[tile_index];
+	int tile = machine->generic.videoram.u16[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
@@ -27,7 +27,7 @@ static TILE_GET_INFO( get_back_tile_info )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	int tile = colorram16[tile_index];
+	int tile = machine->generic.colorram.u16[tile_index];
 	int color = (tile>>10);
 
 	tile &= 0x3ff;
@@ -66,13 +66,13 @@ WRITE16_HANDLER( cabal_flipscreen_w )
 
 WRITE16_HANDLER( cabal_background_videoram16_w )
 {
-	COMBINE_DATA(&videoram16[offset]);
+	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
 	tilemap_mark_tile_dirty(background_layer,offset);
 }
 
 WRITE16_HANDLER( cabal_text_videoram16_w )
 {
-	COMBINE_DATA(&colorram16[offset]);
+	COMBINE_DATA(&space->machine->generic.colorram.u16[offset]);
 	tilemap_mark_tile_dirty(text_layer,offset);
 }
 
@@ -100,9 +100,10 @@ WRITE16_HANDLER( cabal_text_videoram16_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs,data0,data1,data2;
 
-	for( offs = spriteram_size/2 - 4; offs >= 0; offs -= 4 )
+	for( offs = machine->generic.spriteram_size/2 - 4; offs >= 0; offs -= 4 )
 	{
 		data0 = spriteram16[offs];
 		data1 = spriteram16[offs+1];

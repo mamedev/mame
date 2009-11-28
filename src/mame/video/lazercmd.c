@@ -71,7 +71,7 @@ VIDEO_UPDATE( lazercmd )
 		sy *= VERT_CHR;
 
 		drawgfx_opaque(bitmap, cliprect,screen->machine->gfx[0],
-				videoram[i], video_inverted ? 1 : 0,
+				screen->machine->generic.videoram.u8[i], video_inverted ? 1 : 0,
 				0,0,
 				sx,sy);
 	}

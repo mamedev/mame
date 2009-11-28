@@ -111,7 +111,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	citycon_state *state = (citycon_state *)machine->driver_data;
 	int offs;
 
-	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int sx, sy, flipx;
 
@@ -136,7 +136,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 INLINE void changecolor_RRRRGGGGBBBBxxxx( running_machine *machine, int color, int indx )
 {
-	int data = paletteram[2 * indx | 1] | (paletteram[2 * indx] << 8);
+	int data = machine->generic.paletteram.u8[2 * indx | 1] | (machine->generic.paletteram.u8[2 * indx] << 8);
 	palette_set_color_rgb(machine, color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 

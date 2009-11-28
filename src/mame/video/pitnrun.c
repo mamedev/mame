@@ -33,7 +33,7 @@ UINT8* pitnrun_videoram2;
 static TILE_GET_INFO( get_tile_info1 )
 {
 	int code;
-	code = videoram[tile_index];
+	code = machine->generic.videoram.u8[tile_index];
 	SET_TILE_INFO(
 		0,
 		code,
@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_tile_info2 )
 
 WRITE8_HANDLER( pitnrun_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_all_tiles_dirty( fg );
 }
 
@@ -179,6 +179,7 @@ VIDEO_START(pitnrun)
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int sx, sy, flipx, flipy, offs,pal;
 
 	for (offs = 0 ; offs < 0x100; offs+=4)

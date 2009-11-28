@@ -61,9 +61,9 @@ UINT32 *unico_vram32_0, *unico_vram32_1, *unico_vram32_2, *unico_scroll32;
 WRITE16_HANDLER( unico_palette_w )
 {
 	UINT16 data1, data2;
-	COMBINE_DATA(&paletteram16[offset]);
-	data1 = paletteram16[offset & ~1];
-	data2 = paletteram16[offset |  1];
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	data1 = space->machine->generic.paletteram.u16[offset & ~1];
+	data2 = space->machine->generic.paletteram.u16[offset |  1];
 	palette_set_color_rgb( space->machine,offset/2,
 		 (data1 >> 8) & 0xFC,
 		 (data1 >> 0) & 0xFC,
@@ -72,7 +72,7 @@ WRITE16_HANDLER( unico_palette_w )
 
 WRITE32_HANDLER( unico_palette32_w )
 {
-	UINT32 rgb0 = COMBINE_DATA(&paletteram32[offset]);
+	UINT32 rgb0 = COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 	palette_set_color_rgb( space->machine,offset,
 		 (rgb0 >> 24) & 0xFC,
 		 (rgb0 >> 16) & 0xFC,
@@ -218,10 +218,11 @@ VIDEO_START( zeropnt2 )
 
 static void unico_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 
 	/* Draw them backwards, for pdrawgfx */
-	for ( offs = (spriteram_size-8)/2; offs >= 0 ; offs -= 8/2 )
+	for ( offs = (machine->generic.spriteram_size-8)/2; offs >= 0 ; offs -= 8/2 )
 	{
 		int x, startx, endx, incx;
 
@@ -271,10 +272,11 @@ static void unico_draw_sprites(running_machine *machine, bitmap_t *bitmap,const 
 
 static void zeropnt2_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT32 *spriteram32 = machine->generic.spriteram.u32;
 	int offs;
 
 	/* Draw them backwards, for pdrawgfx */
-	for ( offs = (spriteram_size-8)/4; offs >= 0 ; offs -= 8/4 )
+	for ( offs = (machine->generic.spriteram_size-8)/4; offs >= 0 ; offs -= 8/4 )
 	{
 		int x, startx, endx, incx;
 

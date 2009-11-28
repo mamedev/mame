@@ -139,8 +139,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	int attr = colorram[tile_index];
-	int code = videoram[tile_index] | ((attr & 0x01) << 8);
+	int attr = machine->generic.colorram.u8[tile_index];
+	int code = machine->generic.videoram.u8[tile_index] | ((attr & 0x01) << 8);
 	SET_TILE_INFO(
 			0,
 			code,
@@ -163,8 +163,8 @@ static TILE_GET_INFO( ninjemak_get_bg_tile_info )
 
 static TILE_GET_INFO( ninjemak_get_tx_tile_info )
 {
-	int attr = colorram[tile_index];
-	int code = videoram[tile_index] | ((attr & 0x03) << 8);
+	int attr = machine->generic.colorram.u8[tile_index];
+	int code = machine->generic.videoram.u8[tile_index] | ((attr & 0x03) << 8);
 	SET_TILE_INFO(
 			0,
 			code,
@@ -227,13 +227,13 @@ VIDEO_START( ninjemak )
 
 WRITE8_HANDLER( galivan_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
 WRITE8_HANDLER( galivan_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
@@ -275,11 +275,11 @@ WRITE8_HANDLER( ninjemak_gfxbank_w )
 
 logerror("%04x: write %02x to port 80\n",cpu_get_pc(space->cpu),data);
 
-		for (offs = 0; offs < videoram_size; offs++)
+		for (offs = 0; offs < space->machine->generic.videoram_size; offs++)
 		{
 			galivan_videoram_w(space, offs, 0x20);
 		}
-		for (offs = 0; offs < videoram_size; offs++)
+		for (offs = 0; offs < space->machine->generic.videoram_size; offs++)
 		{
 			galivan_colorram_w(space, offs, 0x03);
 		}
@@ -351,10 +351,11 @@ WRITE8_HANDLER( ninjemak_scrolly_w )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const UINT8 *spritepalettebank = memory_region(machine, "user1");
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
 	/* draw the sprites */
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size;offs += 4)
 	{
 		int code;
 		int attr = spriteram[offs+2];

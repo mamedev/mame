@@ -244,7 +244,7 @@ static READ8_HANDLER( vblank_r )
 
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_BASE_MEMBER(exprraid_state, main_ram)
-	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE_MEMBER(exprraid_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE_MEMBER(exprraid_state, spriteram) AM_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(exprraid_videoram_w) AM_BASE_MEMBER(exprraid_state, videoram)
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(exprraid_colorram_w) AM_BASE_MEMBER(exprraid_state, colorram)
 	AM_RANGE(0x1317, 0x1317) AM_READNOP // ???

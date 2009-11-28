@@ -85,7 +85,7 @@ static VIDEO_UPDATE( dorachan )
 
 	color_map_base = memory_region(screen->machine, "proms");
 
-	for (offs = 0; offs < videoram_size; offs++)
+	for (offs = 0; offs < screen->machine->generic.videoram_size; offs++)
 	{
 		int i;
 		UINT8 fore_color;
@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( dorachan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_READ_PORT("JOY")
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_READ_PORT("V128")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(dorachan_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(dorachan_state, videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0x6000, 0x77ff) AM_ROM
 ADDRESS_MAP_END
 

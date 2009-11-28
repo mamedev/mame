@@ -123,7 +123,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
 
-	for (offs = videoram_size - 1;offs >= 0;offs--)
+	for (offs = machine->generic.videoram_size - 1;offs >= 0;offs--)
 	{
 		int scroll,sx,sy,col;
 
@@ -136,7 +136,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 		}
 		else
 		{
-			col = (wiz_attributesram[2 * (offs % 32) + 1] & 0x04) + (videoram[offs] & 3);
+			col = (wiz_attributesram[2 * (offs % 32) + 1] & 0x04) + (machine->generic.videoram.u8[offs] & 3);
 		}
 
 		scroll = (8*sy + 256 - wiz_attributesram[2 * sx]) % 256;
@@ -148,7 +148,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 
 
 		drawgfx_transpen(bitmap,cliprect,machine->gfx[bank],
-			videoram[offs],
+			machine->generic.videoram.u8[offs],
 			col + 8 * palette_bank,
 			flipx,flipy,
 			8*sx,scroll,0);
@@ -160,7 +160,7 @@ static void draw_foreground(running_machine *machine, bitmap_t *bitmap, const re
 	int offs;
 
 	/* draw the frontmost playfield. They are characters, but draw them as sprites. */
-	for (offs = videoram_size - 1;offs >= 0;offs--)
+	for (offs = machine->generic.videoram_size - 1;offs >= 0;offs--)
 	{
 		int scroll,sx,sy,col;
 
@@ -199,7 +199,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,
 {
 	int offs;
 
-	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy;
 
@@ -226,8 +226,8 @@ VIDEO_UPDATE( kungfut )
 	bitmap_fill(bitmap,cliprect,bgpen);
 	draw_background(screen->machine, bitmap, cliprect, 2 + char_bank[0] , 0);
 	draw_foreground(screen->machine, bitmap, cliprect, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, spriteram_2, 4);
-	draw_sprites(screen->machine, bitmap, cliprect, spriteram  , 5);
+	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.spriteram2.u8, 4);
+	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.spriteram.u8  , 5);
 	return 0;
 }
 
@@ -244,8 +244,8 @@ VIDEO_UPDATE( wiz )
 
     bank = 7 + *wiz_sprite_bank;
 
-	draw_sprites(screen->machine, bitmap, visible_area, spriteram_2, 6);
-	draw_sprites(screen->machine, bitmap, visible_area, spriteram  , bank);
+	draw_sprites(screen->machine, bitmap, visible_area, screen->machine->generic.spriteram2.u8, 6);
+	draw_sprites(screen->machine, bitmap, visible_area, screen->machine->generic.spriteram.u8  , bank);
 	return 0;
 }
 
@@ -255,7 +255,7 @@ VIDEO_UPDATE( stinger )
 	bitmap_fill(bitmap,cliprect,bgpen);
 	draw_background(screen->machine, bitmap, cliprect, 2 + char_bank[0], 1);
 	draw_foreground(screen->machine, bitmap, cliprect, 1);
-	draw_sprites(screen->machine, bitmap, cliprect, spriteram_2, 4);
-	draw_sprites(screen->machine, bitmap, cliprect, spriteram  , 5);
+	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.spriteram2.u8, 4);
+	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.spriteram.u8  , 5);
 	return 0;
 }

@@ -208,6 +208,7 @@ static TILE_GET_INFO( seibucrtc_sc3_tile_info )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs,fx,fy,x,y,color,sprite;
 	int dx,dy,ax,ay;
 

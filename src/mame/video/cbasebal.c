@@ -140,11 +140,12 @@ WRITE8_HANDLER( cbasebal_scrolly_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs,sx,sy;
 
 	/* the last entry is not a sprite, we skip it otherwise spang shows a bubble */
 	/* moving diagonally across the screen */
-	for (offs = spriteram_size-8;offs >= 0;offs -= 4)
+	for (offs = machine->generic.spriteram_size-8;offs >= 0;offs -= 4)
 	{
 		int code = spriteram[offs];
 		int attr = spriteram[offs+1];

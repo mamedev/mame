@@ -750,7 +750,7 @@ WRITE16_HANDLER( batrider_textdata_decode )
 
 	memcpy(dest, toaplan2_txvideoram16, toaplan2_tx_vram_size);
 	dest += (toaplan2_tx_vram_size/2);
-	memcpy(dest, paletteram16, batrider_paletteram16_size);
+	memcpy(dest, space->machine->generic.paletteram.u16, batrider_paletteram16_size);
 	dest += (batrider_paletteram16_size/2);
 	memcpy(dest, toaplan2_txvideoram16_offs, toaplan2_tx_offs_vram_size);
 	dest += (toaplan2_tx_offs_vram_size/2);

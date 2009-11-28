@@ -166,6 +166,7 @@ Offset:         Value:
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
 	int width = video_screen_get_width(machine->primary_screen);
@@ -174,7 +175,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	/* The 32x32 tiles in the 80-ff range are bankswitched */
 	int shift	=	(skyfox_bg_ctrl & 0x80) ? (4-1) : 4;
 
-	for (offs = 0; offs < spriteram_size; offs += 4)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
 	{
 		int xstart, ystart, xend, yend;
 		int xinc, yinc, dx, dy;

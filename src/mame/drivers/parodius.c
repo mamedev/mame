@@ -33,9 +33,9 @@ static READ8_HANDLER( bankedram_r )
 	if (videobank & 0x01)
 	{
 		if (videobank & 0x04)
-			return paletteram[offset + 0x0800];
+			return space->machine->generic.paletteram.u8[offset + 0x0800];
 		else
-			return paletteram[offset];
+			return space->machine->generic.paletteram.u8[offset];
 	}
 	else
 		return ram[offset];
@@ -335,7 +335,7 @@ static MACHINE_RESET( parodius )
 
 	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), parodius_banking);
 
-	paletteram = &memory_region(machine, "maincpu")[0x48000];
+	machine->generic.paletteram.u8 = &memory_region(machine, "maincpu")[0x48000];
 
 	videobank = 0;
 

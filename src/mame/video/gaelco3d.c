@@ -431,17 +431,17 @@ WRITE32_HANDLER( gaelco3d_render_w )
 WRITE16_HANDLER( gaelco3d_paletteram_w )
 {
 	poly_wait(poly, "Palette change");
-	COMBINE_DATA(&paletteram16[offset]);
-	palette[offset] = ((paletteram16[offset] & 0x7fe0) << 6) | (paletteram16[offset] & 0x1f);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	palette[offset] = ((space->machine->generic.paletteram.u16[offset] & 0x7fe0) << 6) | (space->machine->generic.paletteram.u16[offset] & 0x1f);
 }
 
 
 WRITE32_HANDLER( gaelco3d_paletteram_020_w )
 {
 	poly_wait(poly, "Palette change");
-	COMBINE_DATA(&paletteram32[offset]);
-	palette[offset*2+0] = ((paletteram32[offset] & 0x7fe00000) >> 10) | ((paletteram32[offset] & 0x1f0000) >> 16);
-	palette[offset*2+1] = ((paletteram32[offset] & 0x7fe0) << 6) | (paletteram32[offset] & 0x1f);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+	palette[offset*2+0] = ((space->machine->generic.paletteram.u32[offset] & 0x7fe00000) >> 10) | ((space->machine->generic.paletteram.u32[offset] & 0x1f0000) >> 16);
+	palette[offset*2+1] = ((space->machine->generic.paletteram.u32[offset] & 0x7fe0) << 6) | (space->machine->generic.paletteram.u32[offset] & 0x1f);
 }
 
 

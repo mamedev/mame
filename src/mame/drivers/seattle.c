@@ -1575,14 +1575,14 @@ static WRITE32_DEVICE_HANDLER( widget_w )
 static WRITE32_HANDLER( cmos_w )
 {
 	if (cmos_write_enabled)
-		COMBINE_DATA(space->machine->generic.nvram.ptr.u32 + offset);
+		COMBINE_DATA(space->machine->generic.nvram.u32 + offset);
 	cmos_write_enabled = FALSE;
 }
 
 
 static READ32_HANDLER( cmos_r )
 {
-	return space->machine->generic.nvram.ptr.u32[offset];
+	return space->machine->generic.nvram.u32[offset];
 }
 
 

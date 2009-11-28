@@ -251,6 +251,7 @@ WRITE8_HANDLER( gondo_scroll_w )
 /* 'Karnov' sprites, used by Gondomania, Last Mission, Shackled, Ghostbusters */
 static void draw_sprites1( running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
+	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
 	int offs, x, y, sprite, sprite2, colour, extra, fx, fy;
 
 	for (offs = 0; offs < 0x800; offs += 8)
@@ -314,6 +315,7 @@ static void draw_sprites1( running_machine* machine, bitmap_t *bitmap, const rec
 /* 'Dec0' sprites, used by Cobra Command, Oscar */
 static void draw_sprites2( running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
+	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
 	int offs, x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
 
 	/* Sprites */
@@ -377,6 +379,7 @@ static void draw_sprites2( running_machine* machine, bitmap_t *bitmap, const rec
 
 static void srdarwin_draw_sprites( running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
+	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
 	int offs;
 
 	/* Sprites */

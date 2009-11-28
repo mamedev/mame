@@ -663,13 +663,13 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x30ffff) AM_READWRITE(TC0100SCN_word_0_r,TC0100SCN_word_0_w)			/* tilemaps */
 	AM_RANGE(0x320000, 0x32000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r,TC0100SCN_ctrl_word_0_w)
 	AM_RANGE(0x400000, 0x40bfff) AM_RAM AM_BASE(&wgp_spritemap) AM_SIZE(&wgp_spritemap_size)	/* sprite tilemaps */
-	AM_RANGE(0x40c000, 0x40dfff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)			/* sprite ram */
+	AM_RANGE(0x40c000, 0x40dfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)			/* sprite ram */
 	AM_RANGE(0x40fff0, 0x40fff1) AM_WRITENOP	/* ?? (writes 0x8000 and 0 alternately - Wgp2 just 0) */
 	AM_RANGE(0x500000, 0x501fff) AM_RAM					/* unknown/unused */
 	AM_RANGE(0x502000, 0x517fff) AM_READWRITE(wgp_pivram_word_r,wgp_pivram_word_w) AM_BASE(&wgp_pivram) /* piv tilemaps */
 	AM_RANGE(0x520000, 0x52001f) AM_READWRITE(wgp_piv_ctrl_word_r,wgp_piv_ctrl_word_w) AM_BASE(&wgp_piv_ctrlram)
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(rotate_port_w)	/* rotation control ? */
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 16 )	/* LAN areas not mapped... */

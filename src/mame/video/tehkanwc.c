@@ -21,13 +21,13 @@ static tilemap *bg_tilemap, *fg_tilemap;
 
 WRITE8_HANDLER( tehkanwc_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( tehkanwc_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -79,8 +79,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int attr = colorram[tile_index];
-	int code = videoram[tile_index] + ((attr & 0x10) << 4);
+	int attr = machine->generic.colorram.u8[tile_index];
+	int code = machine->generic.videoram.u8[tile_index] + ((attr & 0x10) << 4);
 	int color = attr & 0x0f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
@@ -127,9 +127,10 @@ static void gridiron_draw_led(running_machine *machine, bitmap_t *bitmap, const 
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size;offs += 4)
 	{
 		int attr = spriteram[offs + 1];
 		int code = spriteram[offs] + ((attr & 0x08) << 5);

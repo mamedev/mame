@@ -20,8 +20,8 @@ static tilemap *bg_tilemap;
 
 static TILE_GET_INFO( holeland_get_tile_info )
 {
-	int attr = colorram[tile_index];
-	int tile_number = videoram[tile_index] | ((attr & 0x03) << 8);
+	int attr = machine->generic.colorram.u8[tile_index];
+	int tile_number = machine->generic.videoram.u8[tile_index] | ((attr & 0x03) << 8);
 
 /*if (input_code_pressed(machine, KEYCODE_Q) && (attr & 0x10)) tile_number = rand(); */
 /*if (input_code_pressed(machine, KEYCODE_W) && (attr & 0x20)) tile_number = rand(); */
@@ -37,8 +37,8 @@ static TILE_GET_INFO( holeland_get_tile_info )
 
 static TILE_GET_INFO( crzrally_get_tile_info )
 {
-	int attr = colorram[tile_index];
-	int tile_number = videoram[tile_index] | ((attr & 0x03) << 8);
+	int attr = machine->generic.colorram.u8[tile_index];
+	int tile_number = machine->generic.videoram.u8[tile_index] | ((attr & 0x03) << 8);
 
 	SET_TILE_INFO(
 			0,
@@ -69,13 +69,13 @@ VIDEO_START( crzrally )
 
 WRITE8_HANDLER( holeland_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty( bg_tilemap, offset );
 }
 
 WRITE8_HANDLER( holeland_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty( bg_tilemap, offset );
 }
 
@@ -104,10 +104,11 @@ WRITE8_HANDLER( holeland_flipscreen_w )
 
 static void holeland_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs,code,sx,sy,color,flipx, flipy;
 
 	/* Weird, sprites entries don't start on DWORD boundary */
-	for (offs = 3;offs < spriteram_size - 1;offs += 4)
+	for (offs = 3;offs < machine->generic.spriteram_size - 1;offs += 4)
 	{
 		sy = 236 - spriteram[offs];
 		sx = spriteram[offs+2];
@@ -142,10 +143,11 @@ static void holeland_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 static void crzrally_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs,code,sx,sy,color,flipx, flipy;
 
 	/* Weird, sprites entries don't start on DWORD boundary */
-	for (offs = 3;offs < spriteram_size - 1;offs += 4)
+	for (offs = 3;offs < machine->generic.spriteram_size - 1;offs += 4)
 	{
 		sy = 236 - spriteram[offs];
 		sx = spriteram[offs+2];

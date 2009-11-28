@@ -60,7 +60,7 @@ static ADDRESS_MAP_START( hexa_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xd008, 0xd008) AM_WRITE(hexa_d008_w)
 	AM_RANGE(0xd010, 0xd010) AM_WRITE(watchdog_reset_w)	/* or IRQ acknowledge, or both */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(hexa_videoram_w) AM_BASE_MEMBER(hexa_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(hexa_videoram_w) AM_BASE_MEMBER(hexa_state, videoram) AM_SIZE_GENERIC(videoram)
 ADDRESS_MAP_END
 
 

@@ -437,8 +437,8 @@ static DRIVER_INIT( iqblock )
 	}
 
 	/* initialize pointers for I/O mapped RAM */
-	paletteram         = rom + 0x12000;
-	paletteram_2       = rom + 0x12800;
+	machine->generic.paletteram.u8         = rom + 0x12000;
+	machine->generic.paletteram2.u8       = rom + 0x12800;
 	iqblock_fgvideoram = rom + 0x16800;
 	iqblock_bgvideoram = rom + 0x17000;
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfe26, 0xfe26, 0, 0, iqblock_prot_w);
@@ -459,8 +459,8 @@ static DRIVER_INIT( grndtour )
 	}
 
 	/* initialize pointers for I/O mapped RAM */
-	paletteram         = rom + 0x12000;
-	paletteram_2       = rom + 0x12800;
+	machine->generic.paletteram.u8         = rom + 0x12000;
+	machine->generic.paletteram2.u8       = rom + 0x12800;
 	iqblock_fgvideoram = rom + 0x16800;
 	iqblock_bgvideoram = rom + 0x17000;
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfe39, 0xfe39, 0, 0, grndtour_prot_w);

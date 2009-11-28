@@ -324,10 +324,11 @@ VIDEO_RESET( bombsa )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
 	/* Draw the sprites */
-	for (offs = 0; offs < spriteram_size; offs += 16)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 16)
 	{
 		int attr  = spriteram[offs + 13];
 		int code  = spriteram[offs + 14] | ((attr & 0xc0) << 2);
@@ -376,6 +377,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	static int sx1 = 0, sy1 = 0, sy2 = 0;
 
 	rectangle clip = *cliprect;

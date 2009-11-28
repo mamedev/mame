@@ -67,6 +67,7 @@ WRITE8_HANDLER( ikki_scrn_ctrl_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int y;
 	offs_t offs;
 
@@ -130,7 +131,7 @@ VIDEO_UPDATE( ikki )
 
 	/* draw bg layer */
 
-	for (offs=0; offs<(videoram_size/2); offs++)
+	for (offs=0; offs<(screen->machine->generic.videoram_size/2); offs++)
 	{
 		int color, bank;
 
@@ -172,12 +173,12 @@ VIDEO_UPDATE( ikki )
 			y = 248-y;
 		}
 
-		color = videoram[offs*2];
+		color = screen->machine->generic.videoram.u8[offs*2];
 		bank = (color & 0xe0) << 3;
 		color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
 		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
-			videoram[offs*2+1] + bank,
+			screen->machine->generic.videoram.u8[offs*2+1] + bank,
 			color,
 			ikki_flipscreen,ikki_flipscreen,
 			x,y);
@@ -187,7 +188,7 @@ VIDEO_UPDATE( ikki )
 
 	/* mask sprites */
 
-	for (offs=0; offs<(videoram_size/2); offs++)
+	for (offs=0; offs<(screen->machine->generic.videoram_size/2); offs++)
 	{
 		int sx = offs / 32;
 		int sy = offs % 32;
@@ -207,12 +208,12 @@ VIDEO_UPDATE( ikki )
 				y = 248-y;
 			}
 
-			color = videoram[offs*2];
+			color = screen->machine->generic.videoram.u8[offs*2];
 			bank = (color & 0xe0) << 3;
 			color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
 			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
-				videoram[offs*2+1] + bank,
+				screen->machine->generic.videoram.u8[offs*2+1] + bank,
 				color,
 				ikki_flipscreen,ikki_flipscreen,
 				x,y);

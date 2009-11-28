@@ -106,8 +106,8 @@ LAYER_4BPP( 3 )
 
 VIDEO_START( fuuki32 )
 {
-	buffered_spriteram32   = auto_alloc_array(machine, UINT32, spriteram_size/4);
-	buffered_spriteram32_2 = auto_alloc_array(machine, UINT32, spriteram_size/4);
+	machine->generic.buffered_spriteram.u32   = auto_alloc_array(machine, UINT32, machine->generic.spriteram_size/4);
+	machine->generic.buffered_spriteram2.u32 = auto_alloc_array(machine, UINT32, machine->generic.spriteram_size/4);
 
 	tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 								 16, 16, 64,32);
@@ -168,10 +168,10 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 	int max_x =	visarea->max_x+1;
 	int max_y =	visarea->max_y+1;
 
-	UINT32 *src = buffered_spriteram32_2; /* Use spriteram buffered by 2 frames, need palette buffered by one frame? */
+	UINT32 *src = screen->machine->generic.buffered_spriteram2.u32; /* Use spriteram buffered by 2 frames, need palette buffered by one frame? */
 
 	/* Draw them backwards, for pdrawgfx */
-	for ( offs = (spriteram_size-8)/4; offs >=0; offs -= 8/4 )
+	for ( offs = (screen->machine->generic.spriteram_size-8)/4; offs >=0; offs -= 8/4 )
 	{
 		int x, y, xstart, ystart, xend, yend, xinc, yinc;
 		int xnum, ynum, xzoom, yzoom, flipx, flipy;
@@ -384,6 +384,6 @@ VIDEO_EOF( fuuki32 )
 
 	spr_buffered_tilebank[1] = spr_buffered_tilebank[0];
 	spr_buffered_tilebank[0] = fuuki32_tilebank[0];
-	memcpy(buffered_spriteram32_2,buffered_spriteram32,spriteram_size);
-	memcpy(buffered_spriteram32,spriteram32,spriteram_size);
+	memcpy(machine->generic.buffered_spriteram2.u32,machine->generic.buffered_spriteram.u32,machine->generic.spriteram_size);
+	memcpy(machine->generic.buffered_spriteram.u32,machine->generic.spriteram.u32,machine->generic.spriteram_size);
 }

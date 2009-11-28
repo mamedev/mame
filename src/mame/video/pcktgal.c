@@ -32,7 +32,7 @@ PALETTE_INIT( pcktgal )
 
 WRITE8_HANDLER( pcktgal_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
@@ -47,8 +47,8 @@ WRITE8_HANDLER( pcktgal_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index*2+1] + ((videoram[tile_index*2] & 0x0f) << 8);
-	int color = videoram[tile_index*2] >> 4;
+	int code = machine->generic.videoram.u8[tile_index*2+1] + ((machine->generic.videoram.u8[tile_index*2] & 0x0f) << 8);
+	int color = machine->generic.videoram.u8[tile_index*2] >> 4;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -61,9 +61,10 @@ VIDEO_START( pcktgal )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size;offs += 4)
 	{
 		if (spriteram[offs] != 0xf8)
 		{

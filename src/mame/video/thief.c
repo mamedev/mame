@@ -79,13 +79,13 @@ WRITE8_HANDLER( thief_color_plane_w ){
 }
 
 READ8_HANDLER( thief_videoram_r ){
-	UINT8 *source = &videoram[offset];
+	UINT8 *source = &space->machine->generic.videoram.u8[offset];
 	if( thief_video_control&0x02 ) source+=0x2000*4; /* foreground/background */
 	return source[thief_read_mask*0x2000];
 }
 
 WRITE8_HANDLER( thief_videoram_w ){
-	UINT8 *dest = &videoram[offset];
+	UINT8 *dest = &space->machine->generic.videoram.u8[offset];
 	if( thief_video_control&0x02 )
 		dest+=0x2000*4; /* foreground/background */
 	if( thief_write_mask&0x1 ) dest[0x2000*0] = data;
@@ -99,7 +99,7 @@ WRITE8_HANDLER( thief_videoram_w ){
 VIDEO_START( thief ){
 	memset( &thief_coprocessor, 0x00, sizeof(thief_coprocessor) );
 
-	videoram = auto_alloc_array_clear(machine, UINT8, 0x2000*4*2 );
+	machine->generic.videoram.u8 = auto_alloc_array_clear(machine, UINT8, 0x2000*4*2 );
 
 	thief_coprocessor.image_ram = auto_alloc_array(machine, UINT8, 0x2000 );
 	thief_coprocessor.context_ram = auto_alloc_array(machine, UINT8, 0x400 );
@@ -108,7 +108,7 @@ VIDEO_START( thief ){
 VIDEO_UPDATE( thief ){
 	UINT32 offs;
 	int flipscreen = thief_video_control&1;
-	const UINT8 *source = videoram;
+	const UINT8 *source = screen->machine->generic.videoram.u8;
 
 	if (tms9927_screen_reset(devtag_get_device(screen->machine, "tms")))
 	{

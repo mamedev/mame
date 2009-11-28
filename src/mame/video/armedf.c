@@ -224,10 +224,11 @@ WRITE16_HANDLER( armedf_mcu_cmd )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
+	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	armedf_state *state = (armedf_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0; offs < spriteram_size / 2; offs += 4)
+	for (offs = 0; offs < machine->generic.spriteram_size / 2; offs += 4)
 	{
 		int code = buffered_spriteram16[offs + 1]; /* ??YX?TTTTTTTTTTT */
 		int flipx = code & 0x2000;

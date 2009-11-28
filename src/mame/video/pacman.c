@@ -152,8 +152,8 @@ static TILEMAP_MAPPER( pacman_scan_rows )
 
 static TILE_GET_INFO( pacman_get_tile_info )
 {
-	int code = videoram[tile_index] | (charbank << 8);
-	int attr = (colorram[tile_index] & 0x1f) | (colortablebank << 5) | (palettebank << 6 );
+	int code = machine->generic.videoram.u8[tile_index] | (charbank << 8);
+	int attr = (machine->generic.colorram.u8[tile_index] & 0x1f) | (colortablebank << 5) | (palettebank << 6 );
 
 	SET_TILE_INFO(0,code,attr,0);
 }
@@ -198,13 +198,13 @@ VIDEO_START( pacman )
 
 WRITE8_HANDLER( pacman_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty( bg_tilemap, offset );
 }
 
 WRITE8_HANDLER( pacman_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty( bg_tilemap, offset );
 }
 
@@ -222,8 +222,10 @@ VIDEO_UPDATE( pacman )
 	else
 		tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 
-	if( spriteram_size )
+	if( screen->machine->generic.spriteram_size )
 	{
+		UINT8 *spriteram = screen->machine->generic.spriteram.u8;
+		UINT8 *spriteram_2 = screen->machine->generic.spriteram2.u8;
 		int offs;
 
 		rectangle spriteclip = spritevisiblearea;
@@ -231,7 +233,7 @@ VIDEO_UPDATE( pacman )
 
 		/* Draw the sprites. Note that it is important to draw them exactly in this */
 		/* order, to have the correct priorities. */
-		for (offs = spriteram_size - 2;offs > 2*2;offs -= 2)
+		for (offs = screen->machine->generic.spriteram_size - 2;offs > 2*2;offs -= 2)
 		{
 			int color;
 			int sx,sy;
@@ -365,8 +367,8 @@ static TILE_GET_INFO( s2650_get_tile_info )
 
 	colbank = s2650games_tileram[tile_index & 0x1f] & 0x3;
 
-	code = videoram[tile_index] + (colbank << 8);
-	attr = colorram[tile_index & 0x1f];
+	code = machine->generic.videoram.u8[tile_index] + (colbank << 8);
+	attr = machine->generic.colorram.u8[tile_index & 0x1f];
 
 	SET_TILE_INFO(0,code,attr & 0x1f,0);
 }
@@ -391,11 +393,13 @@ VIDEO_START( s2650games )
 
 VIDEO_UPDATE( s2650games )
 {
+	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
+	UINT8 *spriteram_2 = screen->machine->generic.spriteram2.u8;
 	int offs;
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	for (offs = spriteram_size - 2;offs > 2*2;offs -= 2)
+	for (offs = screen->machine->generic.spriteram_size - 2;offs > 2*2;offs -= 2)
 	{
 		int color;
 		int sx,sy;
@@ -438,14 +442,14 @@ VIDEO_UPDATE( s2650games )
 
 WRITE8_HANDLER( s2650games_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( s2650games_colorram_w )
 {
 	int i;
-	colorram[offset & 0x1f] = data;
+	space->machine->generic.colorram.u8[offset & 0x1f] = data;
 	for (i = offset; i < 0x0400; i += 32)
 		tilemap_mark_tile_dirty(bg_tilemap, i);
 }
@@ -508,8 +512,8 @@ static TILE_GET_INFO( jrpacman_get_tile_info )
 		color_index = tile_index + 0x80;
 	}
 
-	code = videoram[tile_index] | (charbank << 8);
-	attr = (videoram[color_index] & 0x1f) | (colortablebank << 5) | (palettebank << 6 );
+	code = machine->generic.videoram.u8[tile_index] | (charbank << 8);
+	attr = (machine->generic.videoram.u8[color_index] & 0x1f) | (colortablebank << 5) | (palettebank << 6 );
 
 	SET_TILE_INFO(0,code,attr,0);
 }
@@ -563,7 +567,7 @@ VIDEO_START( jrpacman )
 
 WRITE8_HANDLER( jrpacman_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	jrpacman_mark_tile_dirty(offset);
 }
 

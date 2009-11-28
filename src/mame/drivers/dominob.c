@@ -58,7 +58,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	dominob_state *state = (dominob_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0; offs < spriteram_size; offs += 4)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
 	{
 		int sx, sy, code;
 
@@ -142,11 +142,11 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd018, 0xd018) AM_READ_PORT("IN2") AM_WRITENOP
 
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(dominob_state, videoram)
-	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_MEMBER(dominob_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_MEMBER(dominob_state, spriteram) AM_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf07f) AM_RAM AM_BASE_MEMBER(dominob_state, bgram)
 	AM_RANGE(0xf080, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfbff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_READ(SMH_RAM) AM_BASE(&paletteram)
+	AM_RANGE(0xf800, 0xfbff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_READ(SMH_RAM) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

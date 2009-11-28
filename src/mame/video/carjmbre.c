@@ -118,11 +118,11 @@ VIDEO_UPDATE( carjmbre )
 	//----x--- ?? probably colour
 	//-----xxx colour
 	//+3       x pos
-	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = screen->machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		//before copying the sprites to spriteram the game reorders the first
 		//sprite to last, sprite ordering is incorrect if this isn't undone
-		troffs = (offs - 4 + spriteram_size) % spriteram_size;
+		troffs = (offs - 4 + screen->machine->generic.spriteram_size) % screen->machine->generic.spriteram_size;
 
 		//unused sprites are marked with ypos <= 0x02 (or >= 0xfd if screen flipped)
 		if (state->spriteram[troffs] > 0x02 && state->spriteram[troffs] < 0xfd)

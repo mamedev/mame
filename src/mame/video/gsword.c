@@ -102,7 +102,7 @@ PALETTE_INIT( gsword )
 
 WRITE8_HANDLER( gsword_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -150,7 +150,7 @@ WRITE8_HANDLER( gsword_scroll_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index] + ((charbank & 0x03) << 8);
+	int code = machine->generic.videoram.u8[tile_index] + ((charbank & 0x03) << 8);
 	int color = ((code & 0x3c0) >> 6) + 16 * charpalbank;
 	int flags = flipscreen ? (TILE_FLIPX | TILE_FLIPY) : 0;
 

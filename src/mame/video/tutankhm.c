@@ -47,13 +47,13 @@ WRITE8_HANDLER( tutankhm_flip_screen_y_w )
  *
  *************************************/
 
-static void get_pens(pen_t *pens)
+static void get_pens(running_machine *machine, pen_t *pens)
 {
 	offs_t i;
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
-		UINT8 data = paletteram[i];
+		UINT8 data = machine->generic.paletteram.u8[i];
 
 		pens[i] = MAKE_RGB(pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
@@ -89,7 +89,7 @@ VIDEO_UPDATE( tutankhm )
 	pen_t pens[NUM_PENS];
 	int x, y;
 
-	get_pens(pens);
+	get_pens(screen->machine, pens);
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
@@ -100,7 +100,7 @@ VIDEO_UPDATE( tutankhm )
 			UINT8 effx = x ^ xorx;
 			UINT8 yscroll = (effx < 192) ? *tutankhm_scroll : 0;
 			UINT8 effy = (y ^ xory) + yscroll;
-			UINT8 vrambyte = videoram[effy * 128 + effx / 2];
+			UINT8 vrambyte = screen->machine->generic.videoram.u8[effy * 128 + effx / 2];
 			UINT8 shifted = vrambyte >> (4 * (effx % 2));
 			dst[x] = pens[shifted & 0x0f];
 		}
@@ -168,9 +168,9 @@ WRITE8_HANDLER( junofrst_blitter_w )
 						data = 0;
 
 					if (dest & 1)
-						videoram[dest >> 1] = (videoram[dest >> 1] & 0x0f) | (data << 4);
+						space->machine->generic.videoram.u8[dest >> 1] = (space->machine->generic.videoram.u8[dest >> 1] & 0x0f) | (data << 4);
 					else
-						videoram[dest >> 1] = (videoram[dest >> 1] & 0xf0) | data;
+						space->machine->generic.videoram.u8[dest >> 1] = (space->machine->generic.videoram.u8[dest >> 1] & 0xf0) | data;
 				}
 
 				dest = dest + 1;

@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( darius2d_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x260000, 0x26000f) AM_READWRITE(TC0100SCN_ctrl_word_1_r, TC0100SCN_ctrl_word_1_w)
 	AM_RANGE(0x400000, 0x400007) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_word_w)		/* palette (1st screen) */
 	AM_RANGE(0x420000, 0x420007) AM_READWRITE(TC0110PCR_word_1_r, TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
-	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x800000, 0x80000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ???
 	AM_RANGE(0x830000, 0x830003) AM_READWRITE(warriorb_sound_r, warriorb_sound_w)
@@ -239,7 +239,7 @@ static ADDRESS_MAP_START( warriorb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x360000, 0x36000f) AM_READWRITE(TC0100SCN_ctrl_word_1_r, TC0100SCN_ctrl_word_1_w)
 	AM_RANGE(0x400000, 0x400007) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_word_w)		/* palette (1st screen) */
 	AM_RANGE(0x420000, 0x420007) AM_READWRITE(TC0110PCR_word_1_r, TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
-	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x800000, 0x80000f) AM_READWRITE(TC0510NIO_halfword_r, TC0510NIO_halfword_w)
 //  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ? uses bits 0,2,3
 	AM_RANGE(0x830000, 0x830003) AM_READWRITE(warriorb_sound_r, warriorb_sound_w)

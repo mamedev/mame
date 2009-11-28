@@ -40,20 +40,20 @@ PALETTE_INIT( jailbrek )
 
 WRITE8_HANDLER( jailbrek_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( jailbrek_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = colorram[tile_index];
-	int code = videoram[tile_index] + ((attr & 0xc0) << 2);
+	int attr = machine->generic.colorram.u8[tile_index];
+	int code = machine->generic.videoram.u8[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x0f;
 
 	SET_TILE_INFO(0, code, color, 0);
@@ -68,9 +68,10 @@ VIDEO_START( jailbrek )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int i;
 
-	for (i = 0; i < spriteram_size; i += 4)
+	for (i = 0; i < machine->generic.spriteram_size; i += 4)
 	{
 		int attr = spriteram[i + 1];	// attributes = ?tyxcccc
 		int code = spriteram[i] + ((attr & 0x40) << 2);

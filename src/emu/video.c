@@ -431,29 +431,23 @@ static void video_exit(running_machine *machine)
 
 static void init_buffered_spriteram(running_machine *machine)
 {
-	assert_always(spriteram_size != 0, "Video buffers spriteram but spriteram_size is 0");
+	assert_always(machine->generic.spriteram_size != 0, "Video buffers spriteram but spriteram size is 0");
 
 	/* allocate memory for the back buffer */
-	buffered_spriteram = auto_alloc_array(machine, UINT8, spriteram_size);
+	machine->generic.buffered_spriteram.u8 = auto_alloc_array(machine, UINT8, machine->generic.spriteram_size);
 
 	/* register for saving it */
-	state_save_register_global_pointer(machine, buffered_spriteram, spriteram_size);
+	state_save_register_global_pointer(machine, machine->generic.buffered_spriteram.u8, machine->generic.spriteram_size);
 
 	/* do the same for the second back buffer, if present */
-	if (spriteram_2_size)
+	if (machine->generic.spriteram2_size)
 	{
 		/* allocate memory */
-		buffered_spriteram_2 = auto_alloc_array(machine, UINT8, spriteram_2_size);
+		machine->generic.buffered_spriteram2.u8 = auto_alloc_array(machine, UINT8, machine->generic.spriteram2_size);
 
 		/* register for saving it */
-		state_save_register_global_pointer(machine, buffered_spriteram_2, spriteram_2_size);
+		state_save_register_global_pointer(machine, machine->generic.buffered_spriteram2.u8, machine->generic.spriteram2_size);
 	}
-
-	/* make 16-bit and 32-bit pointer variants */
-	buffered_spriteram16 = (UINT16 *)buffered_spriteram;
-	buffered_spriteram32 = (UINT32 *)buffered_spriteram;
-	buffered_spriteram16_2 = (UINT16 *)buffered_spriteram_2;
-	buffered_spriteram32_2 = (UINT32 *)buffered_spriteram_2;
 }
 
 

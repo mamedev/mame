@@ -93,16 +93,16 @@ static UINT8 last_coin;
 
 static TILE_GET_INFO( horizontal_tile_info )
 {
-	int code = videoram[0x400+tile_index];
-	int attr = videoram[tile_index] & 0x3f;
+	int code = machine->generic.videoram.u8[0x400+tile_index];
+	int attr = machine->generic.videoram.u8[tile_index] & 0x3f;
 
 	SET_TILE_INFO(0, code, attr, 0);
 }
 
 static TILE_GET_INFO( vertical_tile_info )
 {
-	int code = videoram[0x400+tile_index];
-	int attr = videoram[tile_index] & 0x3f;
+	int code = machine->generic.videoram.u8[0x400+tile_index];
+	int attr = machine->generic.videoram.u8[tile_index] & 0x3f;
 
 	SET_TILE_INFO(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), attr, 0);
 }
@@ -146,7 +146,7 @@ static VIDEO_START( vertical )
 
 static WRITE8_HANDLER( statriv2_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(statriv2_tilemap, offset & 0x3ff);
 }
 
@@ -268,7 +268,7 @@ static ADDRESS_MAP_START( statriv2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x48ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(statriv2_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(statriv2_videoram_w) AM_BASE_GENERIC(videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( statriv2_io_map, ADDRESS_SPACE_IO, 8 )

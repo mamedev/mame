@@ -323,10 +323,11 @@ static const draw_sprites_func draw_sprites_proc[16] = {
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs, sx,sy, flags, which;
 
 	/* draw all visible sprites of specified priority */
-	for (offs = 0;offs < spriteram_size;offs += 16){
+	for (offs = 0;offs < machine->generic.spriteram_size;offs += 16){
 		int bank = spriteram[offs+0];
 
 		if ( ( bank >> 4 ) == priority ) {

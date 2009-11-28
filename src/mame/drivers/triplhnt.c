@@ -23,8 +23,8 @@ static UINT8 triplhnt_hit_code;
 
 static DRIVER_INIT( triplhnt )
 {
-	machine->generic.nvram.ptr.u8 = triplhnt_cmos;
-	machine->generic.nvram.size = sizeof triplhnt_cmos;
+	machine->generic.nvram.u8 = triplhnt_cmos;
+	machine->generic.nvram_size = sizeof triplhnt_cmos;
 }
 
 

@@ -71,7 +71,7 @@ WRITE16_HANDLER( roundup5_palette_w )
 //  static int hack=0;
 	int word;
 
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 
 //  if (offset==0xbfe)
 //      hack++;
@@ -93,7 +93,7 @@ bit 0:  3.9kOhm resistor
 //  logerror("PAL: %04x %02x\n",offset,data);
 
 	offset&=~1;
-	word = ((paletteram16[offset] & 0xff)<<8) | (paletteram16[offset+1] & 0xff);
+	word = ((space->machine->generic.paletteram.u16[offset] & 0xff)<<8) | (space->machine->generic.paletteram.u16[offset+1] & 0xff);
 	palette_set_color_rgb(space->machine,offset/2,pal5bit(word >> 10),pal5bit(word >> 5),pal5bit(word >> 0));
 }
 
@@ -102,7 +102,7 @@ WRITE16_HANDLER( apache3_palette_w )
 {
 //  static int hack=0;
 
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 
 //  if (offset==0xbfe)
 //      hack++;
@@ -123,14 +123,14 @@ bit 0:  3.9kOhm resistor
 
 //  logerror("PAL: %04x %02x\n",offset,data);
 
-	data = paletteram16[offset];
+	data = space->machine->generic.paletteram.u16[offset];
 	palette_set_color_rgb(space->machine,offset,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
 }
 
 
 WRITE16_HANDLER( roundup5_text_w )
 {
-	COMBINE_DATA(&videoram16[offset]);
+	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
 	tilemap_mark_tile_dirty( tx_layer,offset);
 }
 
@@ -179,7 +179,7 @@ WRITE16_HANDLER( roundup5_crt_w )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	int tile = videoram16[tile_index];
+	int tile = machine->generic.videoram.u16[tile_index];
 	SET_TILE_INFO(
 			1,
 			tile & 0xfff,
@@ -525,6 +525,7 @@ static void mycopyrozbitmap_core(bitmap_t *bitmap,bitmap_t *srcbitmap,
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int write_priority_only, int rambank)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs,fx,x,y,color;
 	int w,h,index,lines,scale,rotate;
 	UINT8 *src1, *src2;

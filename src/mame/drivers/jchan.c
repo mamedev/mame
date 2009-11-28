@@ -349,7 +349,7 @@ static VIDEO_START(jchan)
 	jchan_sprite_ram32_1 = auto_alloc_array(machine, UINT32, 0x4000/4);
 	jchan_sprite_ram32_2 = auto_alloc_array(machine, UINT32, 0x4000/4);
 
-	spriteram_size = 0x4000;
+	machine->generic.spriteram_size = 0x4000;
 	jchan_sprite_regs32_1 = auto_alloc_array(machine, UINT32, 0x40/4);
 	jchan_sprite_regs32_2 = auto_alloc_array(machine, UINT32, 0x40/4);
 
@@ -511,7 +511,7 @@ static ADDRESS_MAP_START( jchan_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(jchan_suprnova_sprite32_1_w) AM_BASE(&jchan_spriteram_1)
 	AM_RANGE(0x600000, 0x60003f) AM_RAM_WRITE(jchan_suprnova_sprite32regs_1_w) AM_BASE(&jchan_sprregs_1)
 
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // palette for sprites?
+	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram) // palette for sprites?
 
 	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE(jchan_ctrl_r, jchan_ctrl_w) AM_BASE(&jchan_ctrl)
 

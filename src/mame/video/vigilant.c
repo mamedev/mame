@@ -110,14 +110,14 @@ WRITE8_HANDLER( vigilant_paletteram_w )
 	int bank,r,g,b;
 
 
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 
 	bank = offset & 0x400;
 	offset &= 0xff;
 
-	r = (paletteram[bank + offset + 0x000] << 3) & 0xFF;
-	g = (paletteram[bank + offset + 0x100] << 3) & 0xFF;
-	b = (paletteram[bank + offset + 0x200] << 3) & 0xFF;
+	r = (space->machine->generic.paletteram.u8[bank + offset + 0x000] << 3) & 0xFF;
+	g = (space->machine->generic.paletteram.u8[bank + offset + 0x100] << 3) & 0xFF;
+	b = (space->machine->generic.paletteram.u8[bank + offset + 0x200] << 3) & 0xFF;
 
 	palette_set_color(space->machine, (bank >> 2) + offset,MAKE_RGB(r,g,b));
 }
@@ -185,13 +185,13 @@ static void draw_foreground(running_machine *machine, bitmap_t *bitmap, const re
 	int scroll = -(horiz_scroll_low + horiz_scroll_high);
 
 
-	for (offs = 0; offs<videoram_size; offs+=2 )
+	for (offs = 0; offs<machine->generic.videoram_size; offs+=2 )
 	{
 		int sy = 8 * ((offs/2) / 64);
 		int sx = 8 * ((offs/2) % 64);
-		int attributes = videoram[offs+1];
+		int attributes = machine->generic.videoram.u8[offs+1];
 		int color = attributes & 0x0F;
-		int tile_number = videoram[offs] | ((attributes & 0xF0) << 4);
+		int tile_number = machine->generic.videoram.u8[offs] | ((attributes & 0xF0) << 4);
 
 		if (priority)	 /* foreground */
 		{
@@ -243,9 +243,10 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = 0;offs < spriteram_size;offs += 8)
+	for (offs = 0;offs < machine->generic.spriteram_size;offs += 8)
 	{
 		int code,color,sx,sy,flipx,flipy,h,y;
 
@@ -280,13 +281,13 @@ VIDEO_UPDATE( kikcubic )
 {
 	int offs;
 
-	for (offs = 0; offs<videoram_size; offs+=2 )
+	for (offs = 0; offs<screen->machine->generic.videoram_size; offs+=2 )
 	{
 		int sy = 8 * ((offs/2) / 64);
 		int sx = 8 * ((offs/2) % 64);
-		int attributes = videoram[offs+1];
+		int attributes = screen->machine->generic.videoram.u8[offs+1];
 		int color = (attributes & 0xF0) >> 4;
-		int tile_number = videoram[offs] | ((attributes & 0x0F) << 8);
+		int tile_number = screen->machine->generic.videoram.u8[offs] | ((attributes & 0x0F) << 8);
 
 		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
 				tile_number,
@@ -309,15 +310,15 @@ VIDEO_UPDATE( vigilant )
 		int r,g,b;
 
 
-		r = (paletteram[0x400 + 16 * rear_color + i] << 3) & 0xFF;
-		g = (paletteram[0x500 + 16 * rear_color + i] << 3) & 0xFF;
-		b = (paletteram[0x600 + 16 * rear_color + i] << 3) & 0xFF;
+		r = (screen->machine->generic.paletteram.u8[0x400 + 16 * rear_color + i] << 3) & 0xFF;
+		g = (screen->machine->generic.paletteram.u8[0x500 + 16 * rear_color + i] << 3) & 0xFF;
+		b = (screen->machine->generic.paletteram.u8[0x600 + 16 * rear_color + i] << 3) & 0xFF;
 
 		palette_set_color(screen->machine,512 + i,MAKE_RGB(r,g,b));
 
-		r = (paletteram[0x400 + 16 * rear_color + 32 + i] << 3) & 0xFF;
-		g = (paletteram[0x500 + 16 * rear_color + 32 + i] << 3) & 0xFF;
-		b = (paletteram[0x600 + 16 * rear_color + 32 + i] << 3) & 0xFF;
+		r = (screen->machine->generic.paletteram.u8[0x400 + 16 * rear_color + 32 + i] << 3) & 0xFF;
+		g = (screen->machine->generic.paletteram.u8[0x500 + 16 * rear_color + 32 + i] << 3) & 0xFF;
+		b = (screen->machine->generic.paletteram.u8[0x600 + 16 * rear_color + 32 + i] << 3) & 0xFF;
 
 		palette_set_color(screen->machine,512 + 16 + i,MAKE_RGB(r,g,b));
 	}

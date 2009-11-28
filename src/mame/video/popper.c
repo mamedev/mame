@@ -213,7 +213,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 	popper_state *state = (popper_state *)machine->driver_data;
 	int offs, sx, sy, flipx, flipy;
 
-	for (offs = 0; offs < spriteram_size - 4; offs += 4)
+	for (offs = 0; offs < machine->generic.spriteram_size - 4; offs += 4)
 	{
 		//if y position is in the current strip
 		if (state->spriteram[offs + 1] && (((state->spriteram[offs] + (state->flipscreen ? 2 : 0)) & 0xf0) == (0x0f - offs / 0x80) << 4))

@@ -25,17 +25,17 @@ PALETTE_INIT( bladestl )
 }
 
 
-static void set_pens(colortable_t *colortable)
+static void set_pens(running_machine *machine)
 {
 	int i;
 
 	for (i = 0x00; i < 0x60; i += 2)
 	{
-		UINT16 data = paletteram[i | 1] | (paletteram[i] << 8);
+		UINT16 data = machine->generic.paletteram.u8[i | 1] | (machine->generic.paletteram.u8[i] << 8);
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(colortable, i >> 1, color);
+		colortable_palette_set_color(machine->colortable, i >> 1, color);
 	}
 }
 
@@ -90,7 +90,7 @@ VIDEO_START( bladestl )
 
 VIDEO_UPDATE( bladestl )
 {
-	set_pens(screen->machine->colortable);
+	set_pens(screen->machine);
 
 	K007342_tilemap_update();
 

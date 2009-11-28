@@ -135,9 +135,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bombjack_videoram_w) AM_BASE_MEMBER(bombjack_state, videoram)
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(bombjack_colorram_w) AM_BASE_MEMBER(bombjack_state, colorram)
-	AM_RANGE(0x9820, 0x987f) AM_WRITEONLY AM_BASE_MEMBER(bombjack_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9820, 0x987f) AM_WRITEONLY AM_BASE_MEMBER(bombjack_state, spriteram) AM_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITENOP
-	AM_RANGE(0x9c00, 0x9cff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0x9c00, 0x9cff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x9e00, 0x9e00) AM_WRITE(bombjack_background_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("P1")
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(interrupt_enable_w)

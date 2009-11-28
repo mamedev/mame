@@ -39,6 +39,7 @@ WRITE8_HANDLER( subs_invert2_w )
 
 VIDEO_UPDATE( subs )
 {
+	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	int offs;
 
 	const device_config *left_screen  = devtag_get_device(screen->machine, "lscreen");
@@ -47,7 +48,7 @@ VIDEO_UPDATE( subs )
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
-	for (offs = videoram_size - 1;offs >= 0;offs--)
+	for (offs = screen->machine->generic.videoram_size - 1;offs >= 0;offs--)
 	{
 		int charcode;
 		int sx,sy;
@@ -57,7 +58,7 @@ VIDEO_UPDATE( subs )
 		left_sonar_window = 0;
 		right_sonar_window = 0;
 
-		charcode = videoram[offs];
+		charcode = screen->machine->generic.videoram.u8[offs];
 
 		/* Which monitor is this for? */
 		right_enable = charcode & 0x40;

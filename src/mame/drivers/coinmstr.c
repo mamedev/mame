@@ -36,7 +36,7 @@ static UINT8 question_adr[4];
 
 static WRITE8_HANDLER( quizmstr_bg_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 
 	if(offset >= 0x0240)
 		tilemap_mark_tile_dirty(bg_tilemap,offset - 0x0240);
@@ -184,7 +184,7 @@ static READ8_HANDLER( ff_r )
 static ADDRESS_MAP_START( coinmstr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_BASE(&videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(quizmstr_attr1_w) AM_BASE(&attr_ram1)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(quizmstr_attr2_w) AM_BASE(&attr_ram2)
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(quizmstr_attr3_w) AM_BASE(&attr_ram3)
@@ -878,7 +878,7 @@ GFXDECODE_END
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int tile = videoram[tile_index + 0x0240];
+	int tile = machine->generic.videoram.u8[tile_index + 0x0240];
 	int color = tile_index;
 
 	tile |= (attr_ram1[tile_index + 0x0240] & 0x80) << 1;

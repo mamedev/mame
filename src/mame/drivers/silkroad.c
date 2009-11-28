@@ -136,8 +136,8 @@ VIDEO_UPDATE(silkroad);
 
 static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 {
-	COMBINE_DATA(&paletteram32[offset]);
-	palette_set_color_rgb(space->machine,offset,pal5bit(paletteram32[offset] >> (10+16)),pal5bit(paletteram32[offset] >> (5+16)),pal5bit(paletteram32[offset] >> (0+16)));
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+	palette_set_color_rgb(space->machine,offset,pal5bit(space->machine->generic.paletteram.u32[offset] >> (10+16)),pal5bit(space->machine->generic.paletteram.u32[offset] >> (5+16)),pal5bit(space->machine->generic.paletteram.u32[offset] >> (0+16)));
 }
 
 static WRITE32_DEVICE_HANDLER(silk_6295_bank_w)
@@ -162,7 +162,7 @@ static WRITE32_HANDLER(silk_coin_counter_w)
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x40c000, 0x40cfff) AM_RAM AM_BASE(&silkroad_sprram) // sprites
-	AM_RANGE(0x600000, 0x603fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE(&paletteram32) // palette
+	AM_RANGE(0x600000, 0x603fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE_GENERIC(paletteram) // palette
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(silkroad_fgram_w) AM_BASE(&silkroad_vidram)  // lower Layer
 	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(silkroad_fgram2_w) AM_BASE(&silkroad_vidram2)  // mid layer
 	AM_RANGE(0x808000, 0x80bfff) AM_RAM_WRITE(silkroad_fgram3_w) AM_BASE(&silkroad_vidram3) // higher layer

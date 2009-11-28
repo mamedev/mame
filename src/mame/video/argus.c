@@ -873,10 +873,11 @@ static void argus_bg0_scroll_handle(running_machine *machine)
 
 static void argus_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
 	/* Draw the sprites */
-	for (offs = 0; offs < spriteram_size; offs += 16)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 16)
 	{
 		if (!(spriteram[offs+15] == 0 && spriteram[offs+11] == 0xf0))
 		{
@@ -1007,10 +1008,11 @@ static void valtric_draw_mosaic(const device_config *screen, bitmap_t *bitmap, c
 
 static void valtric_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
 	/* Draw the sprites */
-	for (offs = 0; offs < spriteram_size; offs += 16)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 16)
 	{
 		if (!(spriteram[offs+15] == 0 && spriteram[offs+11] == 0xf0))
 		{
@@ -1045,10 +1047,11 @@ static void valtric_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
 	/* Draw the sprites */
-	for (offs = 0; offs < spriteram_size; offs += 16)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 16)
 	{
 		int sx, sy, tile, flipx, flipy, color;
 		int fx, fy;
@@ -1159,11 +1162,12 @@ static void butasan_log_vram(running_machine *machine)
 
 	if (input_code_pressed(machine, KEYCODE_M))
 	{
+		UINT8 *spriteram = machine->generic.spriteram.u8;
 		int i;
 		logerror("\nSprite RAM\n");
 		logerror("---------------------------------------\n");
 		logerror("       +0 +1 +2 +3 +4 +5 +6 +7  +8 +9 +a +b +c +d +e +f\n");
-		for (offs = 0; offs < spriteram_size; offs += 16)
+		for (offs = 0; offs < machine->generic.spriteram_size; offs += 16)
 		{
 			for (i = 0; i < 16; i++)
 			{

@@ -125,7 +125,7 @@ static VIDEO_START(galpani3)
 {
 	/* so we can use suprnova.c */
 	galpani3_spriteram32 = auto_alloc_array(machine, UINT32, 0x4000/4);
-	spriteram_size = 0x4000;
+	machine->generic.spriteram_size = 0x4000;
 	galpani3_spc_regs = auto_alloc_array(machine, UINT32, 0x40/4);
 	suprnova_alt_enable_sprites = 1;
 
@@ -135,13 +135,13 @@ static VIDEO_START(galpani3)
 }
 
 
-static int gp3_is_alpha_pen(int pen)
+static int gp3_is_alpha_pen(running_machine *machine, int pen)
 {
 	UINT16 dat = 0;
 
 	if (pen<0x4000)
 	{
-		dat = paletteram16[pen];
+		dat = machine->generic.paletteram.u16[pen];
 	}
 	else if (pen<0x4100)
 	{
@@ -239,7 +239,7 @@ static VIDEO_UPDATE(galpani3)
 						UINT16 pen = dat1+0x4000;
 						UINT32 pal = paldata[pen];
 
-						if (gp3_is_alpha_pen(pen))
+						if (gp3_is_alpha_pen(screen->machine, pen))
 						{
 							int r,g,b;
 							r = (pal & 0x00ff0000)>>16;
@@ -267,7 +267,7 @@ static VIDEO_UPDATE(galpani3)
 						UINT16 pen = dat2+0x4100;
 						UINT32 pal = paldata[pen];
 
-						if (gp3_is_alpha_pen(pen))
+						if (gp3_is_alpha_pen(screen->machine, pen))
 						{
 							int r,g,b;
 							r = (pal & 0x00ff0000)>>16;
@@ -325,7 +325,7 @@ static VIDEO_UPDATE(galpani3)
 
 	bitmap_fill(sprite_bitmap_1, cliprect, 0x0000);
 
-	skns_draw_sprites(screen->machine, sprite_bitmap_1, cliprect, galpani3_spriteram32, spriteram_size, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), galpani3_spc_regs );
+	skns_draw_sprites(screen->machine, sprite_bitmap_1, cliprect, galpani3_spriteram32, screen->machine->generic.spriteram_size, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), galpani3_spc_regs );
 
 	// ignoring priority bits for now..
 	for (y=0;y<240;y++)
@@ -820,7 +820,7 @@ static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x17ffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // area [B] - Work RAM
-	AM_RANGE(0x280000, 0x287fff) AM_RAM AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w)   AM_BASE(&paletteram16) // area [A] - palette for sprites
+	AM_RANGE(0x280000, 0x287fff) AM_RAM AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w)   AM_BASE_GENERIC(paletteram) // area [A] - palette for sprites
 
 	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE(galpani3_suprnova_sprite32_w) AM_BASE(&galpani3_spriteram)
 	AM_RANGE(0x380000, 0x38003f) AM_RAM_WRITE(galpani3_suprnova_sprite32regs_w) AM_BASE(&galpani3_sprregs)

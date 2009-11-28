@@ -31,6 +31,7 @@ static int sprite_yoffset;
 
 static void tumblepb_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 
 	for (offs = 0;offs < 0x400;offs += 4)
@@ -92,9 +93,10 @@ static void tumblepb_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 static void jumpkids_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 
-	for (offs = 0;offs < spriteram_size/2;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size/2;offs += 4)
 	{
 		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
 
@@ -154,6 +156,7 @@ static void jumpkids_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 static void fncywld_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 
 	for (offs = 0;offs < 0x400;offs += 4)

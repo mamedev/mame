@@ -89,8 +89,8 @@ static ADDRESS_MAP_START( kingobox_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE(1) /* shared with main */
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM_WRITE(kingofb_videoram_w) AM_BASE(&videoram) /* background vram */
-	AM_RANGE(0xc400, 0xc4ff) AM_RAM_WRITE(kingofb_colorram_w) AM_BASE(&colorram) /* background colorram */
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM_WRITE(kingofb_videoram_w) AM_BASE_GENERIC(videoram) /* background vram */
+	AM_RANGE(0xc400, 0xc4ff) AM_RAM_WRITE(kingofb_colorram_w) AM_BASE_GENERIC(colorram) /* background colorram */
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(kingofb_videoram2_w) AM_BASE(&kingofb_videoram2) /* foreground vram */
 	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(kingofb_colorram2_w) AM_BASE(&kingofb_colorram2) /* foreground colorram */
 ADDRESS_MAP_END
@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( kingobox_sprite_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE(2) /* shared with main */
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite ram */
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* sprite ram */
 	AM_RANGE(0xc400, 0xc43f) AM_RAM  /* something related to scroll? */
 ADDRESS_MAP_END
 
@@ -140,8 +140,8 @@ static ADDRESS_MAP_START( ringking_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE(1) /* shared with main */
-	AM_RANGE(0xa800, 0xa8ff) AM_RAM_WRITE(kingofb_videoram_w) AM_BASE(&videoram) /* background vram */
-	AM_RANGE(0xac00, 0xacff) AM_RAM_WRITE(kingofb_colorram_w) AM_BASE(&colorram) /* background colorram */
+	AM_RANGE(0xa800, 0xa8ff) AM_RAM_WRITE(kingofb_videoram_w) AM_BASE_GENERIC(videoram) /* background vram */
+	AM_RANGE(0xac00, 0xacff) AM_RAM_WRITE(kingofb_colorram_w) AM_BASE_GENERIC(colorram) /* background colorram */
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(kingofb_videoram2_w) AM_BASE(&kingofb_videoram2) /* foreground vram */
 	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE(kingofb_colorram2_w) AM_BASE(&kingofb_colorram2) /* foreground colorram */
 ADDRESS_MAP_END
@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( ringking_sprite_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE(2) /* shared with main */
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite ram */
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* sprite ram */
 	AM_RANGE(0xa400, 0xa43f) AM_RAM /* something related to scroll? */
 ADDRESS_MAP_END
 

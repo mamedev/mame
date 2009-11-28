@@ -107,8 +107,8 @@ static WRITE32_HANDLER( darkhors_tmapram2_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT32 *s		=	spriteram32;
-	UINT32 *end		=	spriteram32 + 0x02000/4;
+	UINT32 *s		=	machine->generic.spriteram.u32;
+	UINT32 *end		=	machine->generic.spriteram.u32 + 0x02000/4;
 
 	for ( ; s < end; s += 8/4 )
 	{
@@ -254,7 +254,6 @@ static WRITE32_HANDLER( darkhors_eeprom_w )
 
 static WRITE32_HANDLER( paletteram32_xBBBBBGGGGGRRRRR_dword_w )
 {
-	paletteram16 = (UINT16 *)paletteram32;
 	if (ACCESSING_BITS_16_31)	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset*2, data >> 16, mem_mask >> 16);
 	if (ACCESSING_BITS_0_15)	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset*2+1, data, mem_mask);
 }
@@ -319,8 +318,8 @@ static ADDRESS_MAP_START( darkhors_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x86c000, 0x86ffff) AM_RAM_WRITE(darkhors_tmapram_w) AM_BASE(&darkhors_tmapram)
 	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(darkhors_tmapram2_w) AM_BASE(&darkhors_tmapram2)
 	AM_RANGE(0x874000, 0x87dfff) AM_RAM
-	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_BASE(&spriteram32)
-	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITE(SMH_RAM)	// this should still be palette ram!
 	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITE(SMH_RAM) AM_BASE(&darkhors_tmapscroll)
 	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITE(SMH_RAM) AM_BASE(&darkhors_tmapscroll2)
@@ -351,9 +350,9 @@ static ADDRESS_MAP_START( jclub2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x580400, 0x580403) AM_READ_PORT("580400")
 	AM_RANGE(0x580420, 0x580423) AM_READ_PORT("580420")
 
-	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_BASE(&spriteram32)
+	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_BASE_GENERIC(spriteram)
 
-	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITE(SMH_RAM)	// this should still be palette ram!
 
 	AM_RANGE(0x8C0000, 0x8C01ff) AM_RAM

@@ -80,7 +80,7 @@ static int hyprduel_sprite_yoffs_sub;
 
 WRITE16_HANDLER( hyprduel_paletteram_w )
 {
-	data = COMBINE_DATA(&paletteram16[offset]);
+	data = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 	palette_set_color_rgb(space->machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
@@ -438,7 +438,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	int max_x = video_screen_get_width(machine->primary_screen);
 	int max_y = video_screen_get_height(machine->primary_screen);
 
-	int max_sprites			=	spriteram_size / 8;
+	int max_sprites			=	machine->generic.spriteram_size / 8;
 	int sprites				=	hyprduel_videoregs[0x00/2] % max_sprites;
 
 	int color_start			=	((hyprduel_videoregs[0x08/2] & 0xf) << 4 ) + 0x100;
@@ -458,10 +458,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		if (!(hyprduel_videoregs[0x02/2] & 0x8000))
 		{
-			src = spriteram16 + (sprites - 1) * (8/2);
+			src = machine->generic.spriteram.u16 + (sprites - 1) * (8/2);
 			inc = -(8/2);
 		} else {
-			src = spriteram16;
+			src = machine->generic.spriteram.u16;
 			inc = (8/2);
 		}
 

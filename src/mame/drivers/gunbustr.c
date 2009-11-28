@@ -76,12 +76,12 @@ static INTERRUPT_GEN( gunbustr_interrupt )
 static WRITE32_HANDLER( gunbustr_palette_w )
 {
 	int a;
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
-	a = paletteram32[offset] >> 16;
+	a = space->machine->generic.paletteram.u32[offset] >> 16;
 	palette_set_color_rgb(space->machine,offset*2,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
 
-	a = paletteram32[offset] &0xffff;
+	a = space->machine->generic.paletteram.u32[offset] &0xffff;
 	palette_set_color_rgb(space->machine,offset*2+1,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
 }
 
@@ -177,7 +177,7 @@ static WRITE32_HANDLER( gunbustr_gun_w )
 static ADDRESS_MAP_START( gunbustr_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&gunbustr_ram)										/* main CPUA ram */
-	AM_RANGE(0x300000, 0x301fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)				/* Sprite ram */
+	AM_RANGE(0x300000, 0x301fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)				/* Sprite ram */
 	AM_RANGE(0x380000, 0x380003) AM_WRITE(motor_control_w)											/* motor, lamps etc. */
 	AM_RANGE(0x390000, 0x3907ff) AM_RAM AM_BASE(&f3_shared_ram)										/* Sound shared ram */
 	AM_RANGE(0x400000, 0x400003) AM_READ_PORT("P1_P2")
@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( gunbustr_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x500000, 0x500003) AM_READWRITE(gunbustr_gun_r, gunbustr_gun_w)						/* gun coord read */
 	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0480SCP_long_r, TC0480SCP_long_w)
 	AM_RANGE(0x830000, 0x83002f) AM_READWRITE(TC0480SCP_ctrl_long_r, TC0480SCP_ctrl_long_w)
-	AM_RANGE(0x900000, 0x901fff) AM_RAM_WRITE(gunbustr_palette_w) AM_BASE(&paletteram32)			/* Palette ram */
+	AM_RANGE(0x900000, 0x901fff) AM_RAM_WRITE(gunbustr_palette_w) AM_BASE_GENERIC(paletteram)			/* Palette ram */
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM																/* network ram ?? */
 ADDRESS_MAP_END
 

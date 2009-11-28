@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( inufuku_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(inufuku_eeprom_w)			// eeprom
 	AM_RANGE(0x280000, 0x280001) AM_WRITE(inufuku_soundcommand_w)	// sound command
 
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE(&paletteram16)						// palette ram
+	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)						// palette ram
 	AM_RANGE(0x380000, 0x3801ff) AM_WRITE(SMH_RAM) AM_BASE(&inufuku_bg_rasterram)												// bg raster ram
 	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(inufuku_bg_videoram_r, inufuku_bg_videoram_w) AM_BASE(&inufuku_bg_videoram)		// bg ram
 	AM_RANGE(0x402000, 0x403fff) AM_READWRITE(inufuku_text_videoram_r, inufuku_text_videoram_w) AM_BASE(&inufuku_text_videoram)	// text ram

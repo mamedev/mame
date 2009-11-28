@@ -150,11 +150,12 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 	const gfx_element *gfx = screen->machine->gfx[0];
 	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
 	const rectangle *visarea = video_screen_get_visible_area(screen);
+	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
 	int max_x =	visarea->max_x+1;
 	int max_y =	visarea->max_y+1;
 
 	/* Draw them backwards, for pdrawgfx */
-	for ( offs = (spriteram_size-8)/2; offs >=0; offs -= 8/2 )
+	for ( offs = (screen->machine->generic.spriteram_size-8)/2; offs >=0; offs -= 8/2 )
 	{
 		int x, y, xstart, ystart, xend, yend, xinc, yinc;
 		int xnum, ynum, xzoom, yzoom, flipx, flipy;

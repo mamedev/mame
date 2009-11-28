@@ -15,8 +15,8 @@ WRITE16_HANDLER( rohga_buffer_spriteram16_w )
 {
 	// Spriteram seems to be triple buffered (no sprite lag on real pcb, but there
 	// is on driver with only double buffering)
-	memcpy(rohga_spriteram, buffered_spriteram16, 0x800);
-	memcpy(buffered_spriteram16, spriteram16, 0x800);
+	memcpy(rohga_spriteram, space->machine->generic.buffered_spriteram.u16, 0x800);
+	memcpy(space->machine->generic.buffered_spriteram.u16, space->machine->generic.spriteram.u16, 0x800);
 }
 
 static int wizdfire_bank_callback(const int bank)
@@ -500,9 +500,9 @@ VIDEO_UPDATE( wizdfire )
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[512]);
 
 	deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,4,3);
+	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.buffered_spriteram.u16,4,3);
 	deco16_tilemap_2_draw(screen,bitmap,cliprect,0,0);
-	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,3,3);
+	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.buffered_spriteram.u16,3,3);
 
 	if ((deco16_priority&0x1f)==0x1f) /* Wizdfire has bit 0x40 always set, Dark Seal 2 doesn't?! */
 		deco16_tilemap_3_draw(screen,bitmap,cliprect,TILEMAP_DRAW_ALPHA(0x80),0);
@@ -510,9 +510,9 @@ VIDEO_UPDATE( wizdfire )
 		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,0);
 
 	/* See notes in wizdfire_draw_sprites about this */
-	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,0,3);
-	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16_2,2,4);
-	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16_2,1,4);
+	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.buffered_spriteram.u16,0,3);
+	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.buffered_spriteram2.u16,2,4);
+	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.buffered_spriteram2.u16,1,4);
 
 	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
 	return 0;
@@ -534,8 +534,8 @@ VIDEO_UPDATE( nitrobal )
 	deco16_tilemap_34_combine_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 
 	deco16_tilemap_2_draw(screen,bitmap,cliprect,0,16);
-	nitrobal_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,3);
-	nitrobal_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16_2,4);
+	nitrobal_draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.buffered_spriteram.u16,3);
+	nitrobal_draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.buffered_spriteram2.u16,4);
 
 	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
 	return 0;

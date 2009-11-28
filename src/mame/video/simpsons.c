@@ -77,9 +77,9 @@ static READ8_HANDLER( simpsons_K053247_r )
 		offs = offset >> 1;
 
 		if (offset & 1)
-			return(spriteram16[offs] & 0xff);
+			return(space->machine->generic.spriteram.u16[offs] & 0xff);
 		else
-			return(spriteram16[offs] >> 8);
+			return(space->machine->generic.spriteram.u16[offs] >> 8);
 	}
 	else return simpsons_xtraram[offset - 0x1000];
 }
@@ -90,6 +90,7 @@ static WRITE8_HANDLER( simpsons_K053247_w )
 
 	if (offset < 0x1000)
 	{
+		UINT16 *spriteram16 = space->machine->generic.spriteram.u16;
 		offs = offset >> 1;
 
 		if (offset & 1)
@@ -105,7 +106,7 @@ void simpsons_video_banking(running_machine *machine, int bank)
 	if (bank & 1)
 	{
 		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0, (read8_space_func)SMH_BANK(5), paletteram_xBBBBBGGGGGRRRRR_be_w);
-		memory_set_bankptr(machine, 5, paletteram);
+		memory_set_bankptr(machine, 5, machine->generic.paletteram.v);
 	}
 	else
 		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0, K052109_r, K052109_w);

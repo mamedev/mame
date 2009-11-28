@@ -78,10 +78,10 @@ static void tilemap_get_info(
 	}
 } /* tilemap_get_info */
 
-static TILE_GET_INFO( tilemap_get_info0 ){ tilemap_get_info(machine,tileinfo,tile_index,0*0x1000+videoram16,tilemap_palette_bank[0],namcona1_vreg[0xbc/2]&1); }
-static TILE_GET_INFO( tilemap_get_info1 ){ tilemap_get_info(machine,tileinfo,tile_index,1*0x1000+videoram16,tilemap_palette_bank[1],namcona1_vreg[0xbc/2]&2); }
-static TILE_GET_INFO( tilemap_get_info2 ){ tilemap_get_info(machine,tileinfo,tile_index,2*0x1000+videoram16,tilemap_palette_bank[2],namcona1_vreg[0xbc/2]&4); }
-static TILE_GET_INFO( tilemap_get_info3 ){ tilemap_get_info(machine,tileinfo,tile_index,3*0x1000+videoram16,tilemap_palette_bank[3],namcona1_vreg[0xbc/2]&8); }
+static TILE_GET_INFO( tilemap_get_info0 ){ tilemap_get_info(machine,tileinfo,tile_index,0*0x1000+machine->generic.videoram.u16,tilemap_palette_bank[0],namcona1_vreg[0xbc/2]&1); }
+static TILE_GET_INFO( tilemap_get_info1 ){ tilemap_get_info(machine,tileinfo,tile_index,1*0x1000+machine->generic.videoram.u16,tilemap_palette_bank[1],namcona1_vreg[0xbc/2]&2); }
+static TILE_GET_INFO( tilemap_get_info2 ){ tilemap_get_info(machine,tileinfo,tile_index,2*0x1000+machine->generic.videoram.u16,tilemap_palette_bank[2],namcona1_vreg[0xbc/2]&4); }
+static TILE_GET_INFO( tilemap_get_info3 ){ tilemap_get_info(machine,tileinfo,tile_index,3*0x1000+machine->generic.videoram.u16,tilemap_palette_bank[3],namcona1_vreg[0xbc/2]&8); }
 
 static TILE_GET_INFO( roz_get_info )
 {
@@ -90,7 +90,7 @@ static TILE_GET_INFO( roz_get_info )
 	int use_4bpp_gfx = namcona1_vreg[0xbc/2]&16; /* ? */
 	int c = tile_index%0x40;
 	int r = tile_index/0x40;
-	int data = videoram16[0x8000/2+(r/4)*0x40+c/4]&0xfbf; /* mask out bit 0x40 - patch for Emeraldia Japan */
+	int data = machine->generic.videoram.u16[0x8000/2+(r/4)*0x40+c/4]&0xfbf; /* mask out bit 0x40 - patch for Emeraldia Japan */
 	int tile = (data+(c%4)+(r%4)*0x40)&0xfff;
 	int gfx = use_4bpp_gfx;
 	if( use_4bpp_gfx )
@@ -129,7 +129,7 @@ static TILE_GET_INFO( roz_get_info )
 
 WRITE16_HANDLER( namcona1_videoram_w )
 {
-	COMBINE_DATA( &videoram16[offset] );
+	COMBINE_DATA( &space->machine->generic.videoram.u16[offset] );
 	if( offset<0x8000/2 )
 	{
 		tilemap_mark_tile_dirty( bg_tilemap[offset/0x1000], offset&0xfff );
@@ -142,7 +142,7 @@ WRITE16_HANDLER( namcona1_videoram_w )
 
 READ16_HANDLER( namcona1_videoram_r )
 {
-	return videoram16[offset];
+	return space->machine->generic.videoram.u16[offset];
 } /* namcona1_videoram_r */
 
 /*************************************************************************/
@@ -150,7 +150,7 @@ READ16_HANDLER( namcona1_videoram_r )
 static void
 UpdatePalette(running_machine *machine, int offset )
 {
-	UINT16 data = paletteram16[offset]; /* -RRRRRGG GGGBBBBB */
+	UINT16 data = machine->generic.paletteram.u16[offset]; /* -RRRRRGG GGGBBBBB */
 	/**
      * sprites can be configured to use an alternate interpretation of palette ram
      * (used in-game in Emeraldia)
@@ -167,12 +167,12 @@ UpdatePalette(running_machine *machine, int offset )
 
 READ16_HANDLER( namcona1_paletteram_r )
 {
-	return paletteram16[offset];
+	return space->machine->generic.paletteram.u16[offset];
 } /* namcona1_paletteram_r */
 
 WRITE16_HANDLER( namcona1_paletteram_w )
 {
-	COMBINE_DATA( &paletteram16[offset] );
+	COMBINE_DATA( &space->machine->generic.paletteram.u16[offset] );
 	if( namcona1_vreg[0x8e/2] )
 	{ /* graphics enabled; update palette immediately */
 		UpdatePalette(space->machine, offset );
@@ -442,7 +442,7 @@ static void pdraw_tile(running_machine *machine,
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int which;
-	const UINT16 *source = spriteram16;
+	const UINT16 *source = machine->generic.spriteram.u16;
 	UINT16 sprite_control;
 	UINT16 ypos,tile,color,xpos;
 	int priority;
@@ -587,7 +587,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 				draw_pixel_line(
 					BITMAP_ADDR16(bitmap, line, 0),
 					BITMAP_ADDR8(machine->priority_bitmap, line, 0),
-					videoram16 + ydata + 25,
+					machine->generic.videoram.u16 + ydata + 25,
 					paldata );
 			}
 			else

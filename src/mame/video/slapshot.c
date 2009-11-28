@@ -34,8 +34,8 @@ static VIDEO_START( slapshot_core )
 {
 	int i;
 
-	spriteram_delayed = auto_alloc_array(machine, UINT16, spriteram_size/2);
-	spriteram_buffered = auto_alloc_array(machine, UINT16, spriteram_size/2);
+	spriteram_delayed = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
+	spriteram_buffered = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
 	spritelist = auto_alloc_array(machine, struct tempsprite, 0x400);
 
 	if (has_TC0480SCP(machine))	/* it's a tc0480scp game */
@@ -56,8 +56,8 @@ static VIDEO_START( slapshot_core )
 	state_save_register_global_array(machine, spritebank);
 	state_save_register_global(machine, sprites_disabled);
 	state_save_register_global(machine, sprites_active_area);
-	state_save_register_global_pointer(machine, spriteram_delayed, spriteram_size/2);
-	state_save_register_global_pointer(machine, spriteram_buffered, spriteram_size/2);
+	state_save_register_global_pointer(machine, spriteram_delayed, machine->generic.spriteram_size/2);
+	state_save_register_global_pointer(machine, spriteram_buffered, machine->generic.spriteram_size/2);
 }
 
 VIDEO_START( slapshot )
@@ -438,22 +438,22 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 static int prepare_sprites;
 
-static void taito_handle_sprite_buffering(void)
+static void taito_handle_sprite_buffering(running_machine *machine)
 {
 	if (prepare_sprites)	/* no buffering */
 	{
-		memcpy(spriteram_buffered,spriteram16,spriteram_size);
+		memcpy(spriteram_buffered,machine->generic.spriteram.u16,machine->generic.spriteram_size);
 		prepare_sprites = 0;
 	}
 }
 
-static void taito_update_sprites_active_area(void)
+static void taito_update_sprites_active_area(running_machine *machine)
 {
 	int off;
 
 
 	/* if the frame was skipped, we'll have to do the buffering now */
-	taito_handle_sprite_buffering();
+	taito_handle_sprite_buffering(machine);
 
 	/* safety check to avoid getting stuck in bank 2 for games using only one bank */
 	if (sprites_active_area == 0x8000 &&
@@ -486,7 +486,7 @@ static void taito_update_sprites_active_area(void)
 
 VIDEO_EOF( taito_no_buffer )
 {
-	taito_update_sprites_active_area();
+	taito_update_sprites_active_area(machine);
 
 	prepare_sprites = 1;
 }
@@ -551,7 +551,7 @@ VIDEO_UPDATE( slapshot )
 	}
 #endif
 
-	taito_handle_sprite_buffering();
+	taito_handle_sprite_buffering(screen->machine);
 
 	TC0480SCP_tilemap_update(screen->machine);
 

@@ -101,12 +101,12 @@ static ADDRESS_MAP_START( powerins_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100018, 0x100019) AM_WRITE(powerins_tilebank_w)									// Tiles Banking (VRAM 0)
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITE(powerins_soundlatch_w)								// Sound Latch
 	AM_RANGE(0x100030, 0x100031) AM_WRITE(powerins_okibank_w)									// Sound
-	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(powerins_paletteram16_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(powerins_paletteram16_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0x130000, 0x130007) AM_RAM AM_BASE(&powerins_vctrl_0)								// VRAM 0 Control
 	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(powerins_vram_0_w) AM_BASE(&powerins_vram_0)		// VRAM 0
 	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(powerins_vram_1_w) AM_BASE(&powerins_vram_1)		// VRAM 1
 	AM_RANGE(0x171000, 0x171fff) AM_WRITE(powerins_vram_1_w)									// Mirror of VRAM 1?
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(&spriteram16)									// RAM + Sprites
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE_GENERIC(spriteram)									// RAM + Sprites
 ADDRESS_MAP_END
 
 /* powerina: same as the original one but without the sound cpu (and inferior sound HW) */
@@ -122,12 +122,12 @@ static ADDRESS_MAP_START( powerina_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITENOP													// Sound Latch, NOPed since there is no sound cpu
 	AM_RANGE(0x100030, 0x100031) AM_WRITE(powerins_okibank_w)									// Sound
 	AM_RANGE(0x10003e, 0x10003f) AM_DEVREADWRITE8("oki1", okim6295_r,okim6295_w, 0x00ff)		// (used by powerina)
-	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(powerins_paletteram16_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(powerins_paletteram16_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0x130000, 0x130007) AM_RAM AM_BASE(&powerins_vctrl_0)								// VRAM 0 Control
 	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(powerins_vram_0_w) AM_BASE(&powerins_vram_0)		// VRAM 0
 	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(powerins_vram_1_w) AM_BASE(&powerins_vram_1)		// VRAM 1
 	AM_RANGE(0x171000, 0x171fff) AM_WRITE(powerins_vram_1_w)									// Mirror of VRAM 1?
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(&spriteram16)									// RAM + Sprites
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE_GENERIC(spriteram)									// RAM + Sprites
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( powerins_sound_map, ADDRESS_SPACE_PROGRAM, 8 )

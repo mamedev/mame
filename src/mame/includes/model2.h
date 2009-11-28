@@ -7,6 +7,7 @@ extern UINT32 *model2_colorxlat;
 extern UINT32 *model2_textureram0;
 extern UINT32 *model2_textureram1;
 extern UINT32 *model2_lumaram;
+extern UINT32 *model2_paletteram32;
 
 
 /*----------- defined in video/model2.c -----------*/

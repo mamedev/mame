@@ -28,7 +28,7 @@ static tilemap *bg_tilemap;
  */
 static TILE_GET_INFO( mcr_90009_get_tile_info )
 {
-	SET_TILE_INFO(0, videoram[tile_index], 0, 0);
+	SET_TILE_INFO(0, machine->generic.videoram.u8[tile_index], 0, 0);
 
 	/* sprite color base is constant 0x10 */
 	tileinfo->category = 1;
@@ -50,7 +50,7 @@ static TILE_GET_INFO( mcr_90009_get_tile_info )
  */
 static TILE_GET_INFO( mcr_90010_get_tile_info )
 {
-	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
+	int data = machine->generic.videoram.u8[tile_index * 2] | (machine->generic.videoram.u8[tile_index * 2 + 1] << 8);
 	int code = data & 0x1ff;
 	int color = (data >> 11) & 3;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 9) & 3));
@@ -75,7 +75,7 @@ static TILE_GET_INFO( mcr_90010_get_tile_info )
  */
 static TILE_GET_INFO( mcr_91490_get_tile_info )
 {
-	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
+	int data = machine->generic.videoram.u8[tile_index * 2] | (machine->generic.videoram.u8[tile_index * 2 + 1] << 8);
 	int code = data & 0x3ff;
 	int color = (data >> 12) & 3;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 10) & 3));
@@ -164,7 +164,7 @@ static void journey_set_color(running_machine *machine, int index, int data)
 
 WRITE8_HANDLER( mcr_91490_paletteram_w )
 {
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 	offset &= 0x7f;
 	mcr_set_color(space->machine, (offset / 2) & 0x3f, data | ((offset & 1) << 8));
 }
@@ -179,14 +179,14 @@ WRITE8_HANDLER( mcr_91490_paletteram_w )
 
 WRITE8_HANDLER( mcr_90009_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 
 WRITE8_HANDLER( mcr_90010_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 
 	/* palette RAM is mapped into the upper 0x80 bytes here */
@@ -204,7 +204,7 @@ READ8_HANDLER( twotiger_videoram_r )
 {
 	/* Two Tigers swizzles the address bits on videoram */
 	int effoffs = ((offset << 1) & 0x7fe) | ((offset >> 10) & 1);
-	return videoram[effoffs];
+	return space->machine->generic.videoram.u8[effoffs];
 }
 
 WRITE8_HANDLER( twotiger_videoram_w )
@@ -212,7 +212,7 @@ WRITE8_HANDLER( twotiger_videoram_w )
 	/* Two Tigers swizzles the address bits on videoram */
 	int effoffs = ((offset << 1) & 0x7fe) | ((offset >> 10) & 1);
 
-	videoram[effoffs] = data;
+	space->machine->generic.videoram.u8[effoffs] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, effoffs / 2);
 
 	/* palette RAM is mapped into the upper 0x80 bytes here */
@@ -223,7 +223,7 @@ WRITE8_HANDLER( twotiger_videoram_w )
 
 WRITE8_HANDLER( mcr_91490_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
@@ -241,11 +241,12 @@ WRITE8_HANDLER( mcr_91490_videoram_w )
 
 static void render_sprites_91399(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	const gfx_element *gfx = machine->gfx[1];
 	int offs;
 
 	/* render the sprites into the bitmap, ORing together */
-	for (offs = 0; offs < spriteram_size; offs += 4)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
 	{
 		int code, x, y, sx, sy, hflip, vflip;
 
@@ -312,11 +313,12 @@ static void render_sprites_91399(running_machine *machine, bitmap_t *bitmap, con
 
 static void render_sprites_91464(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int primask, int sprmask, int colormask)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	const gfx_element *gfx = machine->gfx[1];
 	int offs;
 
 	/* render the sprites into the bitmap, working from topmost to bottommost */
-	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int code, color, x, y, sx, sy, hflip, vflip;
 

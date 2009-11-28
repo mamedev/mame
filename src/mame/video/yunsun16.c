@@ -165,7 +165,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			break;
 	}
 
-	for (offs = (spriteram_size - 8) / 2 ; offs >= 0; offs -= 8 / 2)
+	for (offs = (machine->generic.spriteram_size - 8) / 2 ; offs >= 0; offs -= 8 / 2)
 	{
 		int x = state->spriteram16[offs + 0];
 		int y = state->spriteram16[offs + 1];

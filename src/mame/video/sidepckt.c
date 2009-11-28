@@ -46,10 +46,10 @@ PALETTE_INIT( sidepckt )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	UINT8 attr = colorram[tile_index];
+	UINT8 attr = machine->generic.colorram.u8[tile_index];
 	SET_TILE_INFO(
 			0,
-			videoram[tile_index] + ((attr & 0x07) << 8),
+			machine->generic.videoram.u8[tile_index] + ((attr & 0x07) << 8),
 			((attr & 0x10) >> 3) | ((attr & 0x20) >> 5),
 			TILE_FLIPX);
 	tileinfo->group = (attr & 0x80) >> 7;
@@ -83,13 +83,13 @@ VIDEO_START( sidepckt )
 
 WRITE8_HANDLER( sidepckt_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( sidepckt_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
@@ -108,9 +108,10 @@ WRITE8_HANDLER( sidepckt_flipscreen_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = 0;offs < spriteram_size; offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size; offs += 4)
 	{
 		int sx,sy,code,color,flipx,flipy;
 

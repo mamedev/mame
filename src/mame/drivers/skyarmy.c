@@ -95,6 +95,7 @@ static VIDEO_START( skyarmy )
 
 static VIDEO_UPDATE( skyarmy )
 {
+	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
         int sx, sy, flipx, flipy, offs,pal;
         int i;
 	for(i=0;i<0x20;i++)tilemap_set_scrolly( skyarmy_tilemap,i,skyarmy_scrollram[i]);
@@ -146,7 +147,7 @@ static ADDRESS_MAP_START( skyarmy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(skyarmy_videoram_w) AM_BASE(&skyarmy_videoram) /* Video RAM */
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(skyarmy_colorram_w) AM_BASE(&skyarmy_colorram) /* Color RAM */
-	AM_RANGE(0x9800, 0x983f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* Sprites */
+	AM_RANGE(0x9800, 0x983f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Sprites */
 	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(&skyarmy_scrollram)  /* Scroll RAM */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P1")

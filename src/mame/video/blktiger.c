@@ -197,10 +197,11 @@ WRITE8_HANDLER( blktiger_screen_layout_w )
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 //	blktiger_state *state = (blktiger_state *)machine->driver_data;
+	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
 	int offs;
 
 	/* Draw the sprites. */
-	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int attr = buffered_spriteram[offs+1];
 		int sx = buffered_spriteram[offs + 3] - ((attr & 0x10) << 4);

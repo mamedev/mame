@@ -248,7 +248,7 @@ static WRITE32_HANDLER( eeprom_data_w )
 	if (eeprom_enabled)
 	{
 		mem_mask &= 0x000000ff;
-		COMBINE_DATA(space->machine->generic.nvram.ptr.u32 + offset);
+		COMBINE_DATA(space->machine->generic.nvram.u32 + offset);
 		eeprom_enabled = 0;
 	}
 }
@@ -340,12 +340,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x41000500, 0x41000503) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0x41000600, 0x41000603) AM_WRITE(beathead_finescroll_w)
 	AM_RANGE(0x41000700, 0x41000703) AM_WRITE(watchdog_reset32_w)
-	AM_RANGE(0x42000000, 0x4201ffff) AM_RAM_WRITE(beathead_palette_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x42000000, 0x4201ffff) AM_RAM_WRITE(beathead_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x43000000, 0x43000007) AM_READWRITE(beathead_hsync_ram_r, beathead_hsync_ram_w)
 	AM_RANGE(0x8df80000, 0x8df80003) AM_READNOP	/* noisy x4 during scanline int */
 	AM_RANGE(0x8f380000, 0x8f3fffff) AM_WRITE(beathead_vram_latch_w)
 	AM_RANGE(0x8f900000, 0x8f97ffff) AM_WRITE(beathead_vram_transparent_w)
-	AM_RANGE(0x8f980000, 0x8f9fffff) AM_RAM AM_BASE(&videoram32)
+	AM_RANGE(0x8f980000, 0x8f9fffff) AM_RAM AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x8fb80000, 0x8fbfffff) AM_WRITE(beathead_vram_bulk_w)
 	AM_RANGE(0x8fff8000, 0x8fff8003) AM_WRITEONLY AM_BASE(&beathead_vram_bulk_latch)
 	AM_RANGE(0x9e280000, 0x9e2fffff) AM_WRITE(beathead_vram_copy_w)

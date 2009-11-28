@@ -69,13 +69,13 @@ PALETTE_INIT( gotya )
 
 WRITE8_HANDLER( gotya_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( gotya_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -96,8 +96,8 @@ WRITE8_HANDLER( gotya_video_control_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index];
-	int color = colorram[tile_index] & 0x0f;
+	int code = machine->generic.videoram.u8[tile_index];
+	int color = machine->generic.colorram.u8[tile_index] & 0x0f;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -149,6 +149,7 @@ static void draw_status_row(running_machine *machine, bitmap_t *bitmap, const re
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
 	for (offs = 2; offs < 0x0e; offs += 2)

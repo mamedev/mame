@@ -189,11 +189,11 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 	if(ACCESSING_BITS_16_31)
 	{
 		int r,g,b;
-		COMBINE_DATA(&paletteram32[offset]);
+		COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
-		r = (paletteram32[offset] & 0x7c000000) >> (10+16);
-		g = (paletteram32[offset] & 0x03e00000) >> (5+16);
-		b = (paletteram32[offset] & 0x001f0000) >> (0+16);
+		r = (space->machine->generic.paletteram.u32[offset] & 0x7c000000) >> (10+16);
+		g = (space->machine->generic.paletteram.u32[offset] & 0x03e00000) >> (5+16);
+		b = (space->machine->generic.paletteram.u32[offset] & 0x001f0000) >> (0+16);
 
 		palette_set_color_rgb(space->machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
@@ -201,11 +201,11 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 	if(ACCESSING_BITS_0_15)
 	{
 		int r,g,b;
-		COMBINE_DATA(&paletteram32[offset]);
+		COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
-		r = (paletteram32[offset] & 0x00007c00) >> (10);
-		g = (paletteram32[offset] & 0x000003e0) >> (5);
-		b = (paletteram32[offset] & 0x0000001f) >> (0);
+		r = (space->machine->generic.paletteram.u32[offset] & 0x00007c00) >> (10);
+		g = (space->machine->generic.paletteram.u32[offset] & 0x000003e0) >> (5);
+		b = (space->machine->generic.paletteram.u32[offset] & 0x0000001f) >> (0);
 
 		palette_set_color_rgb(space->machine,offset*2+1,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
@@ -267,8 +267,8 @@ static ADDRESS_MAP_START( fuuki32_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(fuuki32_vram_3_w) AM_BASE(&fuuki32_vram_3)					// Tilemap bg2
 	AM_RANGE(0x508000, 0x517fff) AM_RAM																		// More tilemap, or linescroll? Seems to be empty all of the time
 
-	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)						// Sprites
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE(&paletteram32)	// Palette
+	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)						// Sprites
+	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE_GENERIC(paletteram)	// Palette
 
 	AM_RANGE(0x800000, 0x800003) AM_READ_PORT("800000") AM_WRITENOP											// Coin
 	AM_RANGE(0x810000, 0x810003) AM_READ_PORT("810000") AM_WRITENOP											// Player Inputs

@@ -95,7 +95,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	int offs,sx,sy,tile,palette;
 
-	for (offs = 0 ;offs < spriteram_size; offs+=4)
+	for (offs = 0 ;offs < machine->generic.spriteram_size; offs+=4)
 	{
 		sx = sprite_ram[offs];
 		sy = 240-sprite_ram[offs+1];
@@ -135,7 +135,7 @@ VIDEO_UPDATE( goindol )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect,1,spriteram);
-	draw_sprites(screen->machine,bitmap,cliprect,0,spriteram_2);
+	draw_sprites(screen->machine,bitmap,cliprect,1,screen->machine->generic.spriteram.u8);
+	draw_sprites(screen->machine,bitmap,cliprect,0,screen->machine->generic.spriteram2.u8);
 	return 0;
 }

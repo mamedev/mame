@@ -23,7 +23,7 @@ static UINT8 tile_bank = 0;
 
 static WRITE8_HANDLER( bgram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( wink_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_RAM	AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(bgram_w) AM_BASE(&videoram)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(bgram_w) AM_BASE_GENERIC(videoram)
 ADDRESS_MAP_END
 
 
@@ -104,7 +104,7 @@ either from the system-bus for loading the palet-data or from the xor-registers
 for displaying the content.
 so it's a palet-ram write-enable.
 */
-	AM_RANGE(0x00, 0x1f) AM_RAM AM_BASE(&colorram)	//?
+	AM_RANGE(0x00, 0x1f) AM_RAM AM_BASE_GENERIC(colorram)	//?
 	AM_RANGE(0x20, 0x20) AM_WRITENOP				//??? seems unused..
 	AM_RANGE(0x21, 0x21) AM_WRITE(player_mux_w)		//??? no mux on the pcb.
 	AM_RANGE(0x22, 0x22) AM_WRITE(tile_banking_w)
@@ -256,7 +256,7 @@ INPUT_PORTS_END
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index];
+	int code = machine->generic.videoram.u8[tile_index];
 	code |= 0x200 * tile_bank;
 
 	// the 2 parts of the screen use different tile banking

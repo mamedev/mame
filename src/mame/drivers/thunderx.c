@@ -47,7 +47,7 @@ static UINT8 *ram,*pmcram;
 static READ8_HANDLER( scontra_bankedram_r )
 {
 	if (palette_selected)
-		return paletteram[offset];
+		return space->machine->generic.paletteram.u8[offset];
 	else
 		return ram[offset];
 }
@@ -78,7 +78,7 @@ static READ8_HANDLER( thunderx_bankedram_r )
 		}
 	}
 	else
-		return paletteram[offset];
+		return space->machine->generic.paletteram.u8[offset];
 }
 
 static WRITE8_HANDLER( thunderx_bankedram_w )
@@ -917,7 +917,7 @@ static MACHINE_RESET( scontra )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
 
-	paletteram = &RAM[0x30000];
+	machine->generic.paletteram.u8 = &RAM[0x30000];
 }
 
 static MACHINE_RESET( thunderx )
@@ -927,7 +927,7 @@ static MACHINE_RESET( thunderx )
 	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), thunderx_banking);
 	memory_set_bankptr(machine, 1, &RAM[0x10000] ); /* init the default bank */
 
-	paletteram = &RAM[0x28000];
+	machine->generic.paletteram.u8 = &RAM[0x28000];
 	pmcram = &RAM[0x28800];
 }
 

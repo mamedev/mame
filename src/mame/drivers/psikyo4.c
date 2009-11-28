@@ -250,11 +250,11 @@ static CUSTOM_INPUT( mahjong_ctrl_r ) /* used by hotgmck/hgkairak */
 static WRITE32_HANDLER( ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w )
 {
 	int r,g,b;
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
-	b = ((paletteram32[offset] & 0x0000ff00) >>8);
-	g = ((paletteram32[offset] & 0x00ff0000) >>16);
-	r = ((paletteram32[offset] & 0xff000000) >>24);
+	b = ((space->machine->generic.paletteram.u32[offset] & 0x0000ff00) >>8);
+	g = ((space->machine->generic.paletteram.u32[offset] & 0x00ff0000) >>16);
+	r = ((space->machine->generic.paletteram.u32[offset] & 0xff000000) >>24);
 
 	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 	palette_set_color(space->machine,offset+0x800,MAKE_RGB(r,g,b)); // For screen 2
@@ -394,7 +394,7 @@ static WRITE32_HANDLER( hotgmck_pcm_bank_w )
 static ADDRESS_MAP_START( ps4_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM		// program ROM (1 meg)
 	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK(1) // data ROM
-	AM_RANGE(0x03000000, 0x030037ff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x03000000, 0x030037ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x03003fe0, 0x03003fe3) AM_READWRITE(ps4_eeprom_r,ps4_eeprom_w)
 	AM_RANGE(0x03003fe4, 0x03003fe7) AM_READNOP // also writes to this address - might be vblank?
 //  AM_RANGE(0x03003fe4, 0x03003fe7) AM_WRITENOP // might be vblank?
@@ -403,7 +403,7 @@ static ADDRESS_MAP_START( ps4_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03003ff4, 0x03003ff7) AM_WRITE(ps4_bgpen_1_dword_w) AM_BASE(&bgpen_1) // screen 1 clear colour
 	AM_RANGE(0x03003ff8, 0x03003ffb) AM_WRITE(ps4_screen2_brt_w) // screen 2 brightness
 	AM_RANGE(0x03003ffc, 0x03003fff) AM_WRITE(ps4_bgpen_2_dword_w) AM_BASE(&bgpen_2) // screen 2 clear colour
-	AM_RANGE(0x03004000, 0x03005fff) AM_RAM_WRITE(ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE(&paletteram32) // palette
+	AM_RANGE(0x03004000, 0x03005fff) AM_RAM_WRITE(ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_GENERIC(paletteram) // palette
 	AM_RANGE(0x05000000, 0x05000003) AM_DEVREAD8("ymf", ymf278b_r, 0xffffffff) // read YMF status
 	AM_RANGE(0x05000000, 0x05000007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
 	AM_RANGE(0x05800000, 0x05800003) AM_READ_PORT("P1_P2")

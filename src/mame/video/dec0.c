@@ -117,7 +117,7 @@ static UINT16 dec0_pri;
 
 WRITE16_HANDLER( dec0_update_sprites_w )
 {
-	memcpy(dec0_spriteram,spriteram16,0x800);
+	memcpy(dec0_spriteram,space->machine->generic.spriteram.u16,0x800);
 }
 
 /******************************************************************************/
@@ -126,22 +126,22 @@ static void update_24bitcol(running_machine *machine, int offset)
 {
 	int r,g,b;
 
-	r = (paletteram16[offset] >> 0) & 0xff;
-	g = (paletteram16[offset] >> 8) & 0xff;
-	b = (paletteram16_2[offset] >> 0) & 0xff;
+	r = (machine->generic.paletteram.u16[offset] >> 0) & 0xff;
+	g = (machine->generic.paletteram.u16[offset] >> 8) & 0xff;
+	b = (machine->generic.paletteram2.u16[offset] >> 0) & 0xff;
 
 	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( dec0_paletteram_rg_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 	update_24bitcol(space->machine, offset);
 }
 
 WRITE16_HANDLER( dec0_paletteram_b_w )
 {
-	COMBINE_DATA(&paletteram16_2[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram2.u16[offset]);
 	update_24bitcol(space->machine, offset);
 }
 
@@ -708,7 +708,7 @@ VIDEO_START( dec0_nodma )
 	pf3_tilemap_1 = tilemap_create(machine, get_pf3_tile_info,tile_shape1_scan,    16,16, 32, 32);
 	pf3_tilemap_2 = tilemap_create(machine, get_pf3_tile_info,tile_shape2_scan,    16,16, 16, 64);
 
-	dec0_spriteram=spriteram16;
+	dec0_spriteram=machine->generic.spriteram.u16;
 }
 
 VIDEO_START( dec0 )

@@ -96,13 +96,13 @@ PALETTE_INIT( sonson )
 
 WRITE8_HANDLER( sonson_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( sonson_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -121,8 +121,8 @@ WRITE8_HANDLER( sonson_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = colorram[tile_index];
-	int code = videoram[tile_index] + 256 * (attr & 0x03);
+	int attr = machine->generic.colorram.u8[tile_index];
+	int code = machine->generic.videoram.u8[tile_index] + 256 * (attr & 0x03);
 	int color = attr >> 2;
 
 	SET_TILE_INFO(0, code, color, 0);
@@ -137,9 +137,10 @@ VIDEO_START( sonson )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int code = spriteram[offs + 2] + ((spriteram[offs + 1] & 0x20) << 3);
 		int color = spriteram[offs + 1] & 0x1f;

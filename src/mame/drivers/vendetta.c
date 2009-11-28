@@ -211,7 +211,7 @@ static void vendetta_video_banking( running_machine *machine, int select )
 	{
 		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, (read8_space_func)SMH_BANK(4), paletteram_xBBBBBGGGGGRRRRR_be_w );
 		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), video_banking_base + 0x0000, video_banking_base + 0x0fff, 0, 0, K053247_r, K053247_w );
-		memory_set_bankptr(machine, 4, paletteram);
+		memory_set_bankptr(machine, 4, machine->generic.paletteram.v);
 	}
 	else
 	{
@@ -703,7 +703,7 @@ static MACHINE_RESET( vendetta )
 {
 	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), vendetta_banking);
 
-	paletteram = &memory_region(machine, "maincpu")[0x48000];
+	machine->generic.paletteram.u8 = &memory_region(machine, "maincpu")[0x48000];
 	irq_enabled = 0;
 
 	/* init banks */

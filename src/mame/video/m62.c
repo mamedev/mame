@@ -338,7 +338,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	irem_z80_state *state = (irem_z80_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0; offs < spriteram_size; offs += 8)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 8)
 	{
 		int i, incr, code, col, flipx, flipy, sx, sy;
 

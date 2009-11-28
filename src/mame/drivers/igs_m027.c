@@ -121,10 +121,10 @@ static TILE_GET_INFO( get_bg_tilemap_tile_info )
 /* Pallete Layer */
 static WRITE32_HANDLER( igs_pallete32_w )
 {
-	paletteram16=(UINT16 *)igs_pallete32;
+	space->machine->generic.paletteram.u16=(UINT16 *)igs_pallete32;
 	COMBINE_DATA(&igs_pallete32[offset]);
-	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2,paletteram16[offset*2],0);
-	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2+1,paletteram16[offset*2+1],0);
+	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2,space->machine->generic.paletteram.u16[offset*2],0);
+	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2+1,space->machine->generic.paletteram.u16[offset*2+1],0);
 	//if(data!=0)
 	//fprintf(stdout,"PALLETE RAM OFFSET %x ,data %x!\n",offset ,igs_pallete32[offset]);
 }

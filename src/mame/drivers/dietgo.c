@@ -24,8 +24,8 @@ static ADDRESS_MAP_START( dietgo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x212000, 0x213fff) AM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
 	AM_RANGE(0x220000, 0x2207ff) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf1_rowscroll)
 	AM_RANGE(0x222000, 0x2227ff) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf2_rowscroll)
-	AM_RANGE(0x280000, 0x2807ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x300000, 0x300bff) AM_READ(SMH_RAM) AM_WRITE(deco16_nonbuffered_palette_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x280000, 0x2807ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x300000, 0x300bff) AM_READ(SMH_RAM) AM_WRITE(deco16_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x340000, 0x3407ff) AM_READ(dietgo_104_prot_r) AM_WRITE(dietgo_104_prot_w)
 	AM_RANGE(0x380000, 0x38ffff) AM_RAM // mainram
 ADDRESS_MAP_END

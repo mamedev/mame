@@ -100,10 +100,10 @@ static const ppi8255_interface ppi8255_intf[2] =
 static VIDEO_START( spaceint )
 {
 	astinvad_state *state = (astinvad_state *)machine->driver_data;
-	state->colorram = auto_alloc_array(machine, UINT8, videoram_size);
+	state->colorram = auto_alloc_array(machine, UINT8, machine->generic.videoram_size);
 
 	state_save_register_global(machine, state->color_latch);
-	state_save_register_global_pointer(machine, state->colorram, videoram_size);
+	state_save_register_global_pointer(machine, state->colorram, machine->generic.videoram_size);
 }
 
 
@@ -172,7 +172,7 @@ static VIDEO_UPDATE( spaceint )
 	const UINT8 *color_prom = memory_region(screen->machine, "proms");
 	int offs;
 
-	for (offs = 0; offs < videoram_size; offs++)
+	for (offs = 0; offs < screen->machine->generic.videoram_size; offs++)
 	{
 		UINT8 data = state->videoram[offs];
 		UINT8 color = state->colorram[offs];
@@ -389,14 +389,14 @@ static ADDRESS_MAP_START( kamikaze_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1bff) AM_ROM
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(astinvad_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(astinvad_state, videoram) AM_SIZE_GENERIC(videoram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( spaceint_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(spaceint_videoram_w) AM_BASE_MEMBER(astinvad_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(spaceint_videoram_w) AM_BASE_MEMBER(astinvad_state, videoram) AM_SIZE_GENERIC(videoram)
 ADDRESS_MAP_END
 
 

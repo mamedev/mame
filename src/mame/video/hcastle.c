@@ -46,17 +46,17 @@ PALETTE_INIT( hcastle )
 }
 
 
-static void set_pens(colortable_t *colortable)
+static void set_pens(running_machine *machine)
 {
 	int i;
 
 	for (i = 0x00; i < 0x100; i += 2)
 	{
-		UINT16 data = paletteram[i | 1] | (paletteram[i] << 8);
+		UINT16 data = machine->generic.paletteram.u8[i | 1] | (machine->generic.paletteram.u8[i] << 8);
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(colortable, i >> 1, color);
+		colortable_palette_set_color(machine->colortable, i >> 1, color);
 	}
 }
 
@@ -169,9 +169,9 @@ WRITE8_HANDLER( hcastle_pf1_control_w )
 	if (offset==3)
 	{
 		if ((data&0x8)==0)
-			buffer_spriteram(spriteram+0x800,0x800);
+			buffer_spriteram(space->machine, space->machine->generic.spriteram.u8+0x800,0x800);
 		else
-			buffer_spriteram(spriteram,0x800);
+			buffer_spriteram(space->machine, space->machine->generic.spriteram.u8,0x800);
 	}
 	else if (offset == 7)
 	{
@@ -185,9 +185,9 @@ WRITE8_HANDLER( hcastle_pf2_control_w )
 	if (offset==3)
 	{
 		if ((data&0x8)==0)
-			buffer_spriteram_2(spriteram_2+0x800,0x800);
+			buffer_spriteram_2(space->machine,space->machine->generic.spriteram2.u8+0x800,0x800);
 		else
-			buffer_spriteram_2(spriteram_2,0x800);
+			buffer_spriteram_2(space->machine,space->machine->generic.spriteram2.u8,0x800);
 	}
 	else if (offset == 7)
 	{
@@ -210,7 +210,7 @@ VIDEO_UPDATE( hcastle )
 {
 	static int old_pf1,old_pf2;
 
-	set_pens(screen->machine->colortable);
+	set_pens(screen->machine);
 
 	pf1_bankbase = 0x0000;
 	pf2_bankbase = 0x4000 * ((gfx_bank & 2) >> 1);
@@ -237,16 +237,16 @@ VIDEO_UPDATE( hcastle )
 	if ((gfx_bank & 0x04) == 0)
 	{
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-		draw_sprites(screen->machine,bitmap,cliprect, buffered_spriteram, 0 );
-		draw_sprites(screen->machine,bitmap,cliprect, buffered_spriteram_2, 1 );
+		draw_sprites(screen->machine,bitmap,cliprect, screen->machine->generic.buffered_spriteram.u8, 0 );
+		draw_sprites(screen->machine,bitmap,cliprect, screen->machine->generic.buffered_spriteram2.u8, 1 );
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	}
 	else
 	{
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-		draw_sprites(screen->machine,bitmap,cliprect, buffered_spriteram, 0 );
-		draw_sprites(screen->machine,bitmap,cliprect, buffered_spriteram_2, 1 );
+		draw_sprites(screen->machine,bitmap,cliprect, screen->machine->generic.buffered_spriteram.u8, 0 );
+		draw_sprites(screen->machine,bitmap,cliprect, screen->machine->generic.buffered_spriteram2.u8, 1 );
 	}
 	return 0;
 }

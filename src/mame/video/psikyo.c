@@ -602,5 +602,5 @@ VIDEO_UPDATE( psikyo )
 VIDEO_EOF( psikyo )
 {
 	memcpy(spritebuf2, spritebuf1, 0x2000);
-	memcpy(spritebuf1, spriteram32, 0x2000);
+	memcpy(spritebuf1, machine->generic.spriteram.u32, 0x2000);
 }

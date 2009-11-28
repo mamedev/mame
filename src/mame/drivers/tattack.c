@@ -26,8 +26,8 @@ static tilemap *tmap;
 
 static TILE_GET_INFO( get_tile_info )
 {
-	int code = videoram[tile_index];
-	int color=colorram[tile_index];
+	int code = machine->generic.videoram.u8[tile_index];
+	int color=machine->generic.colorram.u8[tile_index];
 
 	if((color&1 ) || (color>15) )
 		logerror("COLOR %i\n",color);
@@ -56,8 +56,8 @@ static VIDEO_START( tattack )
 static ADDRESS_MAP_START( mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 //  AM_RANGE(0x4000, 0x4000) AM_READNOP $315
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE(&videoram)
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE(&colorram)	// color map ? something else .. only bits 1-3 are used
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE_GENERIC(colorram)	// color map ? something else .. only bits 1-3 are used
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")		// dsw ? something else ?
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("INPUTS") AM_WRITENOP

@@ -370,9 +370,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
        height only used by pollux, bluehawk and flytiger
        x flip and y flip only used by pollux and flytiger */
 
+	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
 	int offs;
 
-	for (offs = 0; offs < spriteram_size; offs += 32)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 32)
 	{
 		int sx, sy, code, color, pri;
 		int flipx = 0, flipy = 0, height = 0, y;
@@ -437,6 +438,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static void rshark_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
+	
 	/* Sprites take 8 16-bit words each in memory:
                   MSB             LSB
        [offs + 0] ???? ???? ???? ???E
@@ -458,7 +461,7 @@ static void rshark_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 
 	int offs;
 
-	for (offs = (spriteram_size / 2) - 8; offs >= 0; offs -= 8)
+	for (offs = (machine->generic.spriteram_size / 2) - 8; offs >= 0; offs -= 8)
 	{
 		if (buffered_spriteram16[offs] & 0x0001)	/* enable */
 		{

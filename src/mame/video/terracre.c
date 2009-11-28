@@ -28,7 +28,7 @@ TILE_GET_INFO( get_bg_tile_info )
 static
 TILE_GET_INFO( get_fg_tile_info )
 {
-	int data = videoram16[tile_index];
+	int data = machine->generic.videoram.u16[tile_index];
 	SET_TILE_INFO( 0,data&0xff,0,0 );
 }
 
@@ -36,7 +36,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	const UINT8 *spritepalettebank = memory_region(machine, "user1");
 	const gfx_element *pGfx = machine->gfx[2];
-	const UINT16 *pSource = spriteram16;
+	const UINT16 *pSource = machine->generic.spriteram.u16;
 	int i;
 	int transparent_pen;
 
@@ -159,7 +159,7 @@ WRITE16_HANDLER( amazon_background_w )
 
 WRITE16_HANDLER( amazon_foreground_w )
 {
-	COMBINE_DATA( &videoram16[offset] );
+	COMBINE_DATA( &space->machine->generic.videoram.u16[offset] );
 	tilemap_mark_tile_dirty( foreground, offset );
 }
 

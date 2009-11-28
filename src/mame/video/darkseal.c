@@ -142,22 +142,22 @@ static void update_24bitcol(running_machine *machine, int offset)
 {
 	int r,g,b;
 
-	r = (paletteram16[offset] >> 0) & 0xff;
-	g = (paletteram16[offset] >> 8) & 0xff;
-	b = (paletteram16_2[offset] >> 0) & 0xff;
+	r = (machine->generic.paletteram.u16[offset] >> 0) & 0xff;
+	g = (machine->generic.paletteram.u16[offset] >> 8) & 0xff;
+	b = (machine->generic.paletteram2.u16[offset] >> 0) & 0xff;
 
 	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( darkseal_palette_24bit_rg_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 	update_24bitcol(space->machine, offset);
 }
 
 WRITE16_HANDLER( darkseal_palette_24bit_b_w )
 {
-	COMBINE_DATA(&paletteram16_2[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram2.u16[offset]);
 	update_24bitcol(space->machine, offset);
 }
 
@@ -165,6 +165,7 @@ WRITE16_HANDLER( darkseal_palette_24bit_b_w )
 
 static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	int offs;
 
 	for (offs = 0;offs < 0x400;offs += 4)

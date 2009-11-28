@@ -143,7 +143,7 @@ static MACHINE_RESET( sprint4 )
 
 static READ8_HANDLER( sprint4_wram_r )
 {
-	return videoram[0x380 + offset];
+	return space->machine->generic.videoram.u8[0x380 + offset];
 }
 
 
@@ -169,7 +169,7 @@ static READ8_HANDLER( sprint4_options_r )
 
 static WRITE8_HANDLER( sprint4_wram_w )
 {
-	videoram[0x380 + offset] = data;
+	space->machine->generic.videoram.u8[0x380 + offset] = data;
 }
 
 
@@ -242,7 +242,7 @@ static ADDRESS_MAP_START( sprint4_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x700) AM_READWRITE(sprint4_wram_r, sprint4_wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(sprint4_video_ram_w) AM_BASE(&videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(sprint4_video_ram_w) AM_BASE_GENERIC(videoram)
 
 	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x718) AM_READ(sprint4_analog_r)
 	AM_RANGE(0x0020, 0x0027) AM_MIRROR(0x718) AM_READ(sprint4_coin_r)

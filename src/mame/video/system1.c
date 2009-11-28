@@ -131,14 +131,14 @@ static void video_start_common(running_machine *machine, int pagecount)
 
 	/* allocate memory for videoram */
 	tilemap_pages = pagecount;
-	videoram = auto_alloc_array_clear(machine, UINT8, 0x800 * pagecount);
+	machine->generic.videoram.u8 = auto_alloc_array_clear(machine, UINT8, 0x800 * pagecount);
 
 	/* create the tilemap pages */
 	for (pagenum = 0; pagenum < pagecount; pagenum++)
 	{
 		tilemap_page[pagenum] = tilemap_create(machine, tile_get_info, tilemap_scan_rows, 8,8, 32,32);
 		tilemap_set_transparent_pen(tilemap_page[pagenum], 0);
-		tilemap_set_user_data(tilemap_page[pagenum], videoram + 0x800 * pagenum);
+		tilemap_set_user_data(tilemap_page[pagenum], machine->generic.videoram.u8 + 0x800 * pagenum);
 	}
 
 	/* allocate a temporary bitmap for sprite rendering */
@@ -148,7 +148,7 @@ static void video_start_common(running_machine *machine, int pagecount)
 	state_save_register_global(machine, system1_video_mode);
 	state_save_register_global(machine, mix_collide_summary);
 	state_save_register_global(machine, sprite_collide_summary);
-	state_save_register_global_pointer(machine, videoram, 0x800 * pagecount);
+	state_save_register_global_pointer(machine, machine->generic.videoram.u8, 0x800 * pagecount);
 	state_save_register_global_pointer(machine, mix_collide, 64);
 	state_save_register_global_pointer(machine, sprite_collide, 1024);
 }
@@ -263,14 +263,14 @@ READ8_HANDLER( system1_videoram_r )
 {
 	videoram_wait_states(space->cpu);
 	offset |= 0x1000 * ((videoram_bank >> 1) % (tilemap_pages / 2));
-	return videoram[offset];
+	return space->machine->generic.videoram.u8[offset];
 }
 
 WRITE8_HANDLER( system1_videoram_w )
 {
 	videoram_wait_states(space->cpu);
 	offset |= 0x1000 * ((videoram_bank >> 1) % (tilemap_pages / 2));
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 
 	tilemap_mark_tile_dirty(tilemap_page[offset / 0x800], (offset % 0x800) / 2);
 
@@ -318,7 +318,7 @@ WRITE8_HANDLER( system1_paletteram_w )
       accurate to +/- .003K ohms.
     */
 
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 
 	if (color_prom != NULL)
 	{
@@ -367,6 +367,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	UINT32 gfxbanks = memory_region_length(machine, "sprites") / 0x8000;
 	const UINT8 *gfxbase = memory_region(machine, "sprites");
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int flipscreen = flip_screen_get(machine);
 	int spritenum;
 
@@ -566,8 +567,8 @@ VIDEO_UPDATE( system1 )
 	fgpixmap = tilemap_get_pixmap(tilemap_page[1]);
 
 	/* get fixed scroll offsets */
-	xscroll = (videoram[0xffc] | (videoram[0xffd] << 8)) / 2 + 14;
-	yscroll = videoram[0xfbd];
+	xscroll = (screen->machine->generic.videoram.u8[0xffc] | (screen->machine->generic.videoram.u8[0xffd] << 8)) / 2 + 14;
+	yscroll = screen->machine->generic.videoram.u8[0xfbd];
 
 	/* adjust for flipping */
 	if (flip_screen_get(screen->machine))
@@ -595,10 +596,10 @@ VIDEO_UPDATE( system2 )
 	int y;
 
 	/* 4 independent background pages */
-	bgpixmaps[0] = tilemap_get_pixmap(tilemap_page[videoram[0x740] & 7]);
-	bgpixmaps[1] = tilemap_get_pixmap(tilemap_page[videoram[0x742] & 7]);
-	bgpixmaps[2] = tilemap_get_pixmap(tilemap_page[videoram[0x744] & 7]);
-	bgpixmaps[3] = tilemap_get_pixmap(tilemap_page[videoram[0x746] & 7]);
+	bgpixmaps[0] = tilemap_get_pixmap(tilemap_page[screen->machine->generic.videoram.u8[0x740] & 7]);
+	bgpixmaps[1] = tilemap_get_pixmap(tilemap_page[screen->machine->generic.videoram.u8[0x742] & 7]);
+	bgpixmaps[2] = tilemap_get_pixmap(tilemap_page[screen->machine->generic.videoram.u8[0x744] & 7]);
+	bgpixmaps[3] = tilemap_get_pixmap(tilemap_page[screen->machine->generic.videoram.u8[0x746] & 7]);
 
 	/* foreground is fixed to page 0 */
 	fgpixmap = tilemap_get_pixmap(tilemap_page[0]);
@@ -606,14 +607,14 @@ VIDEO_UPDATE( system2 )
 	/* get scroll offsets */
 	if (!flip_screen_get(screen->machine))
 	{
-		xscroll = (((videoram[0x7c0] | (videoram[0x7c1] << 8)) / 2) & 0xff) - 256 + 5;
-		yscroll = videoram[0x7ba];
+		xscroll = (((screen->machine->generic.videoram.u8[0x7c0] | (screen->machine->generic.videoram.u8[0x7c1] << 8)) / 2) & 0xff) - 256 + 5;
+		yscroll = screen->machine->generic.videoram.u8[0x7ba];
 		sprxoffset = 7;
 	}
 	else
 	{
-		xscroll = 262+256 - ((((videoram[0x7f6] | (videoram[0x7f7] << 8)) / 2) & 0xff) - 256 + 5);
-		yscroll = 256+256 - videoram[0x784];
+		xscroll = 262+256 - ((((screen->machine->generic.videoram.u8[0x7f6] | (screen->machine->generic.videoram.u8[0x7f7] << 8)) / 2) & 0xff) - 256 + 5);
+		yscroll = 256+256 - screen->machine->generic.videoram.u8[0x784];
 		sprxoffset = -7;
 	}
 
@@ -635,10 +636,10 @@ VIDEO_UPDATE( system2_rowscroll )
 	int y;
 
 	/* 4 independent background pages */
-	bgpixmaps[0] = tilemap_get_pixmap(tilemap_page[videoram[0x740] & 7]);
-	bgpixmaps[1] = tilemap_get_pixmap(tilemap_page[videoram[0x742] & 7]);
-	bgpixmaps[2] = tilemap_get_pixmap(tilemap_page[videoram[0x744] & 7]);
-	bgpixmaps[3] = tilemap_get_pixmap(tilemap_page[videoram[0x746] & 7]);
+	bgpixmaps[0] = tilemap_get_pixmap(tilemap_page[screen->machine->generic.videoram.u8[0x740] & 7]);
+	bgpixmaps[1] = tilemap_get_pixmap(tilemap_page[screen->machine->generic.videoram.u8[0x742] & 7]);
+	bgpixmaps[2] = tilemap_get_pixmap(tilemap_page[screen->machine->generic.videoram.u8[0x744] & 7]);
+	bgpixmaps[3] = tilemap_get_pixmap(tilemap_page[screen->machine->generic.videoram.u8[0x746] & 7]);
 
 	/* foreground is fixed to page 0 */
 	fgpixmap = tilemap_get_pixmap(tilemap_page[0]);
@@ -647,14 +648,14 @@ VIDEO_UPDATE( system2_rowscroll )
 	if (!flip_screen_get(screen->machine))
 	{
 		for (y = 0; y < 32; y++)
-			rowscroll[y] = (((videoram[0x7c0 + y * 2] | (videoram[0x7c1 + y * 2] << 8)) / 2) & 0xff) - 256 + 5;
-		yscroll = videoram[0x7ba];
+			rowscroll[y] = (((screen->machine->generic.videoram.u8[0x7c0 + y * 2] | (screen->machine->generic.videoram.u8[0x7c1 + y * 2] << 8)) / 2) & 0xff) - 256 + 5;
+		yscroll = screen->machine->generic.videoram.u8[0x7ba];
 	}
 	else
 	{
 		for (y = 0; y < 32; y++)
-			rowscroll[y] = 262+256 - ((((videoram[0x7fe - y * 2] | (videoram[0x7ff - y * 2] << 8)) / 2) & 0xff) - 256 + 5);
-		yscroll = 256+256 - videoram[0x784];
+			rowscroll[y] = 262+256 - ((((screen->machine->generic.videoram.u8[0x7fe - y * 2] | (screen->machine->generic.videoram.u8[0x7ff - y * 2] << 8)) / 2) & 0xff) - 256 + 5);
+		yscroll = 256+256 - screen->machine->generic.videoram.u8[0x784];
 	}
 
 	/* common update */

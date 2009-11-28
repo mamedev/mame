@@ -142,13 +142,13 @@ PALETTE_INIT( ringking )
 
 WRITE8_HANDLER( kingofb_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( kingofb_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -183,9 +183,9 @@ WRITE8_HANDLER( kingofb_f800_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = colorram[tile_index];
+	int attr = machine->generic.colorram.u8[tile_index];
 	int bank = ((attr & 0x04) >> 2) + 2;
-	int code = (tile_index / 16) ? videoram[tile_index] + ((attr & 0x03) << 8) : 0;
+	int code = (tile_index / 16) ? machine->generic.videoram.u8[tile_index] + ((attr & 0x03) << 8) : 0;
 	int color = ((attr & 0x70) >> 4) + 8 * palette_bank;
 
 	SET_TILE_INFO(bank, code, color, 0);
@@ -211,9 +211,10 @@ VIDEO_START( kingofb )
 
 static void kingofb_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = 0; offs < spriteram_size; offs += 4)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
 	{
 		int roffs,bank,code,color,flipx,flipy,sx,sy;
 
@@ -257,8 +258,8 @@ VIDEO_UPDATE( kingofb )
 
 static TILE_GET_INFO( ringking_get_bg_tile_info )
 {
-	int code = (tile_index / 16) ? videoram[tile_index] : 0;
-	int color = ((colorram[tile_index] & 0x70) >> 4) + 8 * palette_bank;
+	int code = (tile_index / 16) ? machine->generic.videoram.u8[tile_index] : 0;
+	int color = ((machine->generic.colorram.u8[tile_index] & 0x70) >> 4) + 8 * palette_bank;
 
 	SET_TILE_INFO(4, code, color, 0);
 }
@@ -276,9 +277,10 @@ VIDEO_START( ringking )
 
 static void ringking_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = 0; offs < spriteram_size; offs += 4)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
 	{
 		int bank = (spriteram[offs + 1] & 0x04) >> 2;
 		int code = spriteram[offs + 3] + ((spriteram[offs + 1] & 0x03) << 8);

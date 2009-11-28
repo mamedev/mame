@@ -87,6 +87,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
 	UINT16 tile_mask = (machine->gfx[0]->total_elements) - 1;
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -98,7 +99,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
        while processing sprite ram and then draw them all at the end */
 	struct tempsprite *sprite_ptr = spritelist;
 
-	for (offs = (spriteram_size/2)-4;offs >=0;offs -= 4)
+	for (offs = (machine->generic.spriteram_size/2)-4;offs >=0;offs -= 4)
 	{
 		data = spriteram16[offs+0];
 		zoomy = (data & 0xfe00) >> 9;

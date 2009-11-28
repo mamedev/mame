@@ -449,18 +449,18 @@ logerror("%04x: bank select %02x\n",cpu_get_pc(device),lines);
 	memcpy(banked_rom,&RAM[offs],0x1000);
 	if (lines & 0x08)
 	{
-		if (paletteram != paletteram_1000)
+		if (device->machine->generic.paletteram.u8 != paletteram_1000)
 		{
-			memcpy(paletteram_1000,paletteram,0x1000);
-			paletteram = paletteram_1000;
+			memcpy(paletteram_1000,device->machine->generic.paletteram.u8,0x1000);
+			device->machine->generic.paletteram.u8 = paletteram_1000;
 		}
 	}
 	else
 	{
-		if (paletteram != &RAM[0x20000])
+		if (device->machine->generic.paletteram.u8 != &RAM[0x20000])
 		{
-			memcpy(&RAM[0x20000],paletteram,0x1000);
-			paletteram = &RAM[0x20000];
+			memcpy(&RAM[0x20000],device->machine->generic.paletteram.u8,0x1000);
+			device->machine->generic.paletteram.u8 = &RAM[0x20000];
 		}
 		memcpy(paletteram_1000,&RAM[offs+0x1000],0x1000);
 	}
@@ -478,7 +478,7 @@ logerror("%04x: bank select %02x\n",cpu_get_pc(device),lines);
 static MACHINE_RESET( 88games )
 {
 	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), k88games_banking);
-	paletteram = &memory_region(machine, "maincpu")[0x20000];
+	machine->generic.paletteram.u8 = &memory_region(machine, "maincpu")[0x20000];
 }
 
 static MACHINE_START( 88games )

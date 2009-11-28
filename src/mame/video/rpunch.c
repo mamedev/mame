@@ -41,7 +41,7 @@ static UINT8 bins, gins;
 
 static TILE_GET_INFO( get_bg0_tile_info )
 {
-	int data = videoram16[tile_index];
+	int data = machine->generic.videoram.u16[tile_index];
 	int code;
 	if (videoflags & 0x0400)	code = (data & 0x0fff) | 0x2000;
 	else						code = (data & 0x1fff);
@@ -55,7 +55,7 @@ static TILE_GET_INFO( get_bg0_tile_info )
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	int data = videoram16[videoram_size / 4 + tile_index];
+	int data = machine->generic.videoram.u16[machine->generic.videoram_size / 4 + tile_index];
 	int code;
 	if (videoflags & 0x0800)	code = (data & 0x0fff) | 0x2000;
 	else						code = (data & 0x1fff);
@@ -110,7 +110,7 @@ WRITE16_HANDLER( rpunch_videoram_w )
 {
 	int tmap = offset >> 12;
 	int tile_index = offset & 0xfff;
-	COMBINE_DATA(&videoram16[offset]);
+	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
 	tilemap_mark_tile_dirty(background[tmap],tile_index);
 }
 
@@ -208,6 +208,7 @@ WRITE16_HANDLER( rpunch_ins_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int start, int stop)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 
 	start *= 4;

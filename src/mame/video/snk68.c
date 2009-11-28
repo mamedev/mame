@@ -87,13 +87,14 @@ READ16_HANDLER( pow_spriteram_r )
 	// streetsj expects the MSB of every 32-bit word to be FF. Presumably RAM
 	// exists only for 3 bytes out of 4 and the fourth is unmapped.
 	if (!(offset & 1))
-		return spriteram16[offset] | 0xff00;
+		return space->machine->generic.spriteram.u16[offset] | 0xff00;
 	else
-		return spriteram16[offset];
+		return space->machine->generic.spriteram.u16[offset];
 }
 
 WRITE16_HANDLER( pow_spriteram_w )
 {
+	UINT16 *spriteram16 = space->machine->generic.spriteram.u16;
 	UINT16 newword = spriteram16[offset];
 
 	if (!(offset & 1))
@@ -165,8 +166,8 @@ WRITE16_HANDLER( pow_paletteram16_word_w )
 	UINT16 newword;
 	int r,g,b;
 
-	COMBINE_DATA(&paletteram16[offset]);
-	newword = paletteram16[offset];
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	newword = space->machine->generic.paletteram.u16[offset];
 
 	r = ((newword >> 7) & 0x1e) | ((newword >> 14) & 0x01);
 	g = ((newword >> 3) & 0x1e) | ((newword >> 13) & 0x01) ;
@@ -184,6 +185,7 @@ WRITE16_HANDLER( pow_paletteram16_word_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int group)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	const UINT16* tiledata = &spriteram16[0x800*group];
 
 	// pow has 0x4000 tiles and independent x/y flipping

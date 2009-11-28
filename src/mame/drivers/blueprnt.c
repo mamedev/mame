@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( blueprnt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(blueprnt_videoram_w) AM_MIRROR(0x400) AM_BASE_MEMBER(blueprnt_state, videoram)
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE_MEMBER(blueprnt_state, scrollram)
-	AM_RANGE(0xb000, 0xb0ff) AM_RAM AM_BASE_MEMBER(blueprnt_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xb000, 0xb0ff) AM_RAM AM_BASE_MEMBER(blueprnt_state, spriteram) AM_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1") AM_WRITE(blueprnt_coin_counter_w)
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ(blueprnt_sh_dipsw_r)

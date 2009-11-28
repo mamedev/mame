@@ -187,6 +187,7 @@ VIDEO_START( exedexes )
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	exedexes_state *state = (exedexes_state *)machine->driver_data;
+	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
 	int offs;
 
 	if (!state->objon) 
@@ -194,7 +195,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 	priority = priority ? 0x40 : 0x00;
 
-	for (offs = spriteram_size - 32;offs >= 0;offs -= 32)
+	for (offs = machine->generic.spriteram_size - 32;offs >= 0;offs -= 32)
 	{
 		if ((buffered_spriteram[offs + 1] & 0x40) == priority)
 		{

@@ -26,13 +26,13 @@ PALETTE_INIT( kchamp )
 
 WRITE8_HANDLER( kchamp_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( kchamp_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -43,8 +43,8 @@ WRITE8_HANDLER( kchamp_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index] + ((colorram[tile_index] & 7) << 8);
-	int color = (colorram[tile_index] >> 3) & 0x1f;
+	int code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 7) << 8);
+	int color = (machine->generic.colorram.u8[tile_index] >> 3) & 0x1f;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -67,6 +67,7 @@ VIDEO_START( kchamp )
 
 static void kchamp_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
     for (offs = 0; offs < 0x100; offs += 4)
@@ -94,6 +95,7 @@ static void kchamp_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 
 static void kchampvs_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
     for (offs = 0; offs < 0x100; offs += 4)

@@ -82,7 +82,7 @@ static WRITE16_HANDLER( gp_control_w )
 
 	if (control & 0x0100)
 	{
-		int vol = space->machine->generic.nvram.ptr.u16[0x10] & 0xff;
+		int vol = space->machine->generic.nvram.u16[0x10] & 0xff;
 		if (vol)
 		{
 			const device_config *k054539 = devtag_get_device(space->machine, "konami");
@@ -112,7 +112,7 @@ static WRITE16_HANDLER( gp2_control_w )
 
 	if (control & 0x0100)
 	{
-		int vol = space->machine->generic.nvram.ptr.u16[0x8] & 0xff;
+		int vol = space->machine->generic.nvram.u16[0x8] & 0xff;
 		if (vol)
 		{
 			const device_config *k054539 = devtag_get_device(space->machine, "konami");
@@ -333,7 +333,7 @@ static ADDRESS_MAP_START( qdrmfgp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&workram) 										/* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* backup ram */
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300000, 0x30003f) AM_WRITE(K056832_word_w)										/* video reg */
 	AM_RANGE(0x320000, 0x32001f) AM_READWRITE(K053252_word_r,K053252_word_w)					/* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")											/* battery power & service sw */
@@ -356,7 +356,7 @@ static ADDRESS_MAP_START( qdrmfgp2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x110fff) AM_RAM AM_BASE(&workram)										/* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* backup ram */
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300000, 0x30003f) AM_WRITE(K056832_word_w)										/* video reg */
 	AM_RANGE(0x320000, 0x32001f) AM_READWRITE(K053252_word_r,K053252_word_w)					/* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")											/* battery power & service */

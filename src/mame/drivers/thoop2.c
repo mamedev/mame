@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( thoop2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(thoop2_vram_w) AM_BASE(&thoop2_videoram)	/* Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE(&thoop2_vregs)					/* Video Registers */
 	AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset16_w)							/* INT 6 ACK/Watchdog timer */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)/* Palette */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)/* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&thoop2_spriteram)						/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")

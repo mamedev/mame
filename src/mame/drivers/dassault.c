@@ -213,7 +213,7 @@ static READ16_HANDLER( shared_ram_r )
 static ADDRESS_MAP_START( dassault_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(deco16_nonbuffered_palette_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(deco16_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x140004, 0x140007) AM_WRITENOP /* ? */
 	AM_RANGE(0x180000, 0x180001) AM_WRITE(dassault_sound_w)
@@ -234,7 +234,7 @@ static ADDRESS_MAP_START( dassault_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x260000, 0x26000f) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf34_control)
 
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE(&dassault_ram) /* Main ram */
-	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_BASE(&spriteram16_2) AM_SIZE(&spriteram_2_size) /* Spriteram (2nd) */
+	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2) /* Spriteram (2nd) */
 	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE(dassault_irq_r, dassault_irq_w)
 	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&shared_ram) /* Shared ram */
 ADDRESS_MAP_END
@@ -247,7 +247,7 @@ static ADDRESS_MAP_START( dassault_sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100004, 0x100005) AM_READ(dassault_sub_control_r)
 
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE(&dassault_ram2) /* Sub cpu ram */
-	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size) /* Sprite ram */
+	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Sprite ram */
 	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE(dassault_irq_r, dassault_irq_w)
 	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w)
 ADDRESS_MAP_END

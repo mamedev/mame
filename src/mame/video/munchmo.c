@@ -93,7 +93,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 	{
 		int sy = (offs%16)*32;
 		int sx = (offs/16)*32;
-		int tile_number = videoram[offs];
+		int tile_number = machine->generic.videoram.u8[offs];
 		int row,col;
 
 		for( row=0; row<4; row++ )

@@ -512,8 +512,8 @@ static ADDRESS_MAP_START( kickgoal_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa08000, 0xa0bfff) AM_RAM_WRITE(kickgoal_bg2ram_w) AM_BASE(&kickgoal_bg2ram) /* Lower BG Layer */
 	AM_RANGE(0xa0c000, 0xa0ffff) AM_RAM_WRITE(SMH_RAM) // more tilemap?
 	AM_RANGE(0xa10000, 0xa1000f) AM_WRITE(SMH_RAM) AM_BASE(&kickgoal_scrram) /* Scroll Registers */
-	AM_RANGE(0xb00000, 0xb007ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size) /* Sprites */
-	AM_RANGE(0xc00000, 0xc007ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16) /* Palette */ // actionhw reads this
+	AM_RANGE(0xb00000, 0xb007ff) AM_WRITE(SMH_RAM) AM_BASE_SIZE_GENERIC(spriteram) /* Sprites */
+	AM_RANGE(0xc00000, 0xc007ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram) /* Palette */ // actionhw reads this
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

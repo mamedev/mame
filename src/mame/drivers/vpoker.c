@@ -84,7 +84,7 @@ mm74c920J/mmc6551j-9    x2
 
 static VIDEO_START( vpoker )
 {
-	videoram = auto_alloc_array(machine, UINT8, 0x200);
+	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 0x200);
 }
 
 static VIDEO_UPDATE( vpoker )
@@ -98,7 +98,7 @@ static VIDEO_UPDATE( vpoker )
 	{
 		for (x=0;x<0x20;x++)
 		{
-			int tile = videoram[count];
+			int tile = screen->machine->generic.videoram.u8[count];
 			//int colour = tile>>12;
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*16,y*16);
 
@@ -129,7 +129,7 @@ static WRITE8_HANDLER( blitter_w )
 
 		blit_offs = (blit_ram[1] & 0x01)<<8|(blit_ram[2] & 0xff);
 
-		videoram[blit_offs] = blit_ram[0];
+		space->machine->generic.videoram.u8[blit_offs] = blit_ram[0];
 //      printf("%02x %02x %02x %02x %02x %02x %02x %02x\n",blit_ram[0],blit_ram[1],blit_ram[2],blit_ram[3],blit_ram[4],blit_ram[5],blit_ram[6],blit_ram[7]);
 	}
 }

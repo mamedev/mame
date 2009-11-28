@@ -390,12 +390,12 @@ WRITE16_HANDLER( paletteram16_xrgb_swap_word_w )
 	int r, g, b;
 	UINT16 data0, data1;
 
-	COMBINE_DATA(paletteram16 + offset);
+	COMBINE_DATA(space->machine->generic.paletteram.u16 + offset);
 
 	offset &= ~1;
 
-	data0 = paletteram16[offset + 1];
-	data1 = paletteram16[offset];
+	data0 = space->machine->generic.paletteram.u16[offset + 1];
+	data1 = space->machine->generic.paletteram.u16[offset];
 
 	r = data0 & 0xff;
 	g = data1 >> 8;
@@ -594,6 +594,7 @@ From the above some noteworthy cases are:
 
 static void draw_row(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int sx, int sy, int scroll)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	rectangle clip;
 	int attr, code, color, mode, size, page, shadow;
 	int x, x1, sx1, flipx, xnum, xstart, xend, xinc;
@@ -729,6 +730,7 @@ static void draw_layer(running_machine *machine, bitmap_t *bitmap, const rectang
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* Sprites list */
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 
 	UINT16 *s1	=	spriteram16;
 	UINT16 *end1	=	spriteram16 + 0x02000/2;
@@ -985,6 +987,7 @@ static void gdfs_draw_zooming_sprites(running_machine *machine, bitmap_t *bitmap
 {
 	/* Sprites list */
 
+	UINT16 *spriteram16_2 = machine->generic.spriteram2.u16;
 	UINT16 *s1	=	spriteram16_2;
 	UINT16 *end1	=	spriteram16_2 + 0x02000/2;
 	UINT16 *s2;

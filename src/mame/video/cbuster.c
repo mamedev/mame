@@ -37,22 +37,22 @@ static void update_24bitcol(running_machine *machine, int offset)
 {
 	UINT8 r,g,b; /* The highest palette value seems to be 0x8e */
 
-	r = (UINT8)((float)((paletteram16[offset] >> 0) & 0xff)*1.75);
-	g = (UINT8)((float)((paletteram16[offset] >> 8) & 0xff)*1.75);
-	b = (UINT8)((float)((paletteram16_2[offset] >> 0) & 0xff)*1.75);
+	r = (UINT8)((float)((machine->generic.paletteram.u16[offset] >> 0) & 0xff)*1.75);
+	g = (UINT8)((float)((machine->generic.paletteram.u16[offset] >> 8) & 0xff)*1.75);
+	b = (UINT8)((float)((machine->generic.paletteram2.u16[offset] >> 0) & 0xff)*1.75);
 
 	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( twocrude_palette_24bit_rg_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 	update_24bitcol(space->machine, offset);
 }
 
 WRITE16_HANDLER( twocrude_palette_24bit_b_w )
 {
-	COMBINE_DATA(&paletteram16_2[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram2.u16[offset]);
 	update_24bitcol(space->machine, offset);
 }
 
@@ -67,6 +67,7 @@ void twocrude_pri_w(int pri)
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
 {
+	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	int offs;
 
 	for (offs = 0;offs < 0x400;offs += 4)

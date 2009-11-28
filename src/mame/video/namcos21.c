@@ -53,14 +53,14 @@ WRITE16_HANDLER( winrun_gpu_videoram_w)
 	{
 		if( mask&(0x01<<i) )
 		{
-			videoram[(offset+i)&0x7ffff] = color;
+			space->machine->generic.videoram.u8[(offset+i)&0x7ffff] = color;
 		}
 	}
 } /* winrun_gpu_videoram_w */
 
 READ16_HANDLER( winrun_gpu_videoram_r )
 {
-	return videoram[offset]<<8;
+	return space->machine->generic.videoram.u8[offset]<<8;
 } /* winrun_gpu_videoram_r */
 
 static void
@@ -129,7 +129,7 @@ VIDEO_START( namcos21 )
 {
 	if( namcos2_gametype == NAMCOS21_WINRUN91 )
 	{
-		videoram = auto_alloc_array(machine, UINT8, 0x80000);
+		machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 0x80000);
 	}
 	AllocatePolyFrameBuffer(machine);
 	namco_obj_init(machine,
@@ -164,8 +164,8 @@ update_palette( running_machine *machine )
     */
 	for( i=0; i<NAMCOS21_NUM_COLORS; i++ )
 	{
-		data1 = paletteram16[0x00000/2+i];
-		data2 = paletteram16[0x10000/2+i];
+		data1 = machine->generic.paletteram.u16[0x00000/2+i];
+		data2 = machine->generic.paletteram.u16[0x10000/2+i];
 
 		r = data1>>8;
 		g = data1&0xff;
@@ -215,7 +215,7 @@ VIDEO_UPDATE( namcos21 )
 		int sx,sy;
 		for( sy=cliprect->min_y; sy<=cliprect->max_y; sy++ )
 		{
-			const UINT8 *pSource = &videoram[((yscroll+sy)&0x3ff)*0x200];
+			const UINT8 *pSource = &screen->machine->generic.videoram.u8[((yscroll+sy)&0x3ff)*0x200];
 			UINT16 *pDest = BITMAP_ADDR16(bitmap, sy, 0);
 			for( sx=cliprect->min_x; sx<=cliprect->max_x; sx++ )
 			{

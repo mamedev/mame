@@ -89,6 +89,9 @@ WRITE8_HANDLER( mjkjidai_ctrl_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
+	UINT8 *spriteram_3 = machine->generic.spriteram3.u8;
 	int offs;
 
 	for (offs = 0x20-2;offs >= 0;offs -= 2)

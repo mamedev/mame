@@ -81,14 +81,15 @@ WRITE16_HANDLER( ohmygod_scrolly_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 
-	for (offs = 0;offs < spriteram_size/4;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size/4;offs += 4)
 	{
 		int sx,sy,code,color,flipx;
 		UINT16 *sr;
 
-		sr = spritebank ? (spriteram16+spriteram_size/4) : spriteram16;
+		sr = spritebank ? (spriteram16+machine->generic.spriteram_size/4) : spriteram16;
 
 		code = sr[offs+3] & 0x0fff;
 		color = sr[offs+2] & 0x000f;

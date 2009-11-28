@@ -58,7 +58,7 @@ static WRITE8_HANDLER( bottom9_bankedram1_w )
 static READ8_HANDLER( bottom9_bankedram2_r )
 {
 	if (K052109_selected) return K052109_051960_r(space,offset + 0x2000);
-	else return paletteram[offset];
+	else return space->machine->generic.paletteram.u8[offset];
 }
 
 static WRITE8_HANDLER( bottom9_bankedram2_w )
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1fd3, 0x1fd3) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1fe0, 0x1fe0) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1ff0, 0x1fff) AM_WRITE(K051316_ctrl_0_w)
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(bottom9_bankedram2_r, bottom9_bankedram2_w) AM_BASE(&paletteram)
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(bottom9_bankedram2_r, bottom9_bankedram2_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)

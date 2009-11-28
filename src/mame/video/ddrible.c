@@ -41,17 +41,17 @@ PALETTE_INIT( ddrible )
 }
 
 
-static void set_pens(colortable_t *colortable)
+static void set_pens(running_machine *machine)
 {
 	int i;
 
 	for (i = 0x00; i < 0x80; i += 2)
 	{
-		UINT16 data = paletteram[i | 1] | (paletteram[i] << 8);
+		UINT16 data = machine->generic.paletteram.u8[i | 1] | (machine->generic.paletteram.u8[i] << 8);
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(colortable, i >> 1, color);
+		colortable_palette_set_color(machine->colortable, i >> 1, color);
 	}
 }
 
@@ -251,7 +251,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( ddrible )
 {
-	set_pens(screen->machine->colortable);
+	set_pens(screen->machine);
 
 	tilemap_set_flip(fg_tilemap, (ddribble_vregs[0][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	tilemap_set_flip(bg_tilemap, (ddribble_vregs[1][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);

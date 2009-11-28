@@ -117,7 +117,7 @@ static WRITE8_HANDLER( lkage_sh_nmi_enable_w )
 static ADDRESS_MAP_START( lkage_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram */
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf000, 0xf003) AM_RAM AM_BASE(&lkage_vreg) /* video registers */
 	AM_RANGE(0xf060, 0xf060) AM_WRITE(lkage_sound_command_w)
 	AM_RANGE(0xf061, 0xf061) AM_WRITENOP
@@ -133,8 +133,8 @@ static ADDRESS_MAP_START( lkage_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf0a0, 0xf0a3) AM_RAM /* unknown */
 	AM_RANGE(0xf0c0, 0xf0c5) AM_RAM AM_BASE(&lkage_scroll)
 	AM_RANGE(0xf0e1, 0xf0e1) AM_WRITENOP /* pulsed */
-	AM_RANGE(0xf100, 0xf15f) AM_RAM AM_BASE(&spriteram)
-	AM_RANGE(0xf400, 0xffff) AM_RAM_WRITE(lkage_videoram_w) AM_BASE(&videoram) /* videoram */
+	AM_RANGE(0xf100, 0xf15f) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0xf400, 0xffff) AM_RAM_WRITE(lkage_videoram_w) AM_BASE_GENERIC(videoram) /* videoram */
 ADDRESS_MAP_END
 
 static READ8_HANDLER( port_fetch_r )

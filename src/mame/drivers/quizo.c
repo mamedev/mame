@@ -70,8 +70,8 @@ static VIDEO_UPDATE( quizo )
 	{
 		for(x=0;x<80;x++)
 		{
-			int data=videoram[y*80+x];
-			int data1=videoram[y*80+x+0x4000];
+			int data=screen->machine->generic.videoram.u8[y*80+x];
+			int data1=screen->machine->generic.videoram.u8[y*80+x+0x4000];
 			int pix;
 
 			pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
@@ -96,7 +96,7 @@ static VIDEO_UPDATE( quizo )
 static WRITE8_HANDLER(vram_w)
 {
 	int bank=(port70&8)?1:0;
-	videoram[offset+bank*0x4000]=data;
+	space->machine->generic.videoram.u8[offset+bank*0x4000]=data;
 }
 
 static WRITE8_HANDLER(port70_w)
@@ -244,7 +244,7 @@ ROM_END
 
 static DRIVER_INIT(quizo)
 {
-	videoram=auto_alloc_array(machine, UINT8, 0x4000*2);
+	machine->generic.videoram.u8=auto_alloc_array(machine, UINT8, 0x4000*2);
 }
 
 GAME( 1985, quizo,  0,       quizo,  quizo,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 1)", 0 )

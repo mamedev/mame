@@ -248,10 +248,11 @@ static void f1gp_draw_sprites(running_machine *machine,bitmap_t *bitmap,const re
 
 static void f1gpb_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	int attr_start, start_offset = spriteram_size/2 - 4;
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	int attr_start, start_offset = machine->generic.spriteram_size/2 - 4;
 
 	// find the "end of list" to draw the sprites in reverse order
-	for (attr_start = 4;attr_start < spriteram_size/2;attr_start += 4)
+	for (attr_start = 4;attr_start < machine->generic.spriteram_size/2;attr_start += 4)
 	{
 		if (spriteram16[attr_start+3-4] == 0xffff) /* end of list marker */
 		{

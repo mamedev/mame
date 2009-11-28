@@ -104,7 +104,7 @@ VIDEO_UPDATE( finalizr )
 		UINT8 *sr = state->spriterambank ? state->spriteram_2 : state->spriteram;
 
 
-		for (offs = 0; offs <= spriteram_size - 5; offs += 5)
+		for (offs = 0; offs <= screen->machine->generic.spriteram_size - 5; offs += 5)
 		{
 			int sx, sy, flipx, flipy, code, color, size;
 

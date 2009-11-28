@@ -125,9 +125,9 @@ MACHINE_RESET( simpsons )
 
 	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), simpsons_banking);
 
-	paletteram = &RAM[0x88000];
+	machine->generic.paletteram.u8 = &RAM[0x88000];
 	simpsons_xtraram = &RAM[0x89000];
-	spriteram16 = (UINT16 *)&RAM[0x8a000];
+	machine->generic.spriteram.u16 = (UINT16 *)&RAM[0x8a000];
 
 	simpsons_firq_enabled = 0;
 

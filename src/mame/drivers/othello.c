@@ -67,7 +67,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 	for(cx=0;cx<x_count;++cx)
 	{
-		data_address=((videoram[ma+cx]+tile_bank)<<4)|ra;
+		data_address=((device->machine->generic.videoram.u8[ma+cx]+tile_bank)<<4)|ra;
 		tmp=gfx[data_address]|(gfx[data_address+0x2000]<<8)|(gfx[data_address+0x4000]<<16);
 
 		for(x=0;x<TILE_WIDTH;++x)
@@ -106,7 +106,7 @@ VIDEO_UPDATE( othello )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_NOP /* not populated */
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE_GENERIC(videoram)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

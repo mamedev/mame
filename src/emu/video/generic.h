@@ -22,46 +22,6 @@
     GLOBAL VARIABLES
 ***************************************************************************/
 
-extern UINT8 *videoram;
-extern UINT16 *videoram16;
-extern UINT32 *videoram32;
-extern size_t videoram_size;
-
-extern UINT8 *colorram;
-extern UINT16 *colorram16;
-extern UINT32 *colorram32;
-
-extern UINT8 *spriteram;
-extern UINT16 *spriteram16;
-extern UINT32 *spriteram32;
-
-extern UINT8 *spriteram_2;
-extern UINT16 *spriteram16_2;
-extern UINT32 *spriteram32_2;
-
-extern UINT8 *spriteram_3;
-extern UINT16 *spriteram16_3;
-extern UINT32 *spriteram32_3;
-
-extern UINT8 *buffered_spriteram;
-extern UINT16 *buffered_spriteram16;
-extern UINT32 *buffered_spriteram32;
-
-extern UINT8 *buffered_spriteram_2;
-extern UINT16 *buffered_spriteram16_2;
-extern UINT32 *buffered_spriteram32_2;
-
-extern size_t spriteram_size;
-extern size_t spriteram_2_size;
-extern size_t spriteram_3_size;
-
-extern UINT8 *paletteram;
-extern UINT16 *paletteram16;
-extern UINT32 *paletteram32;
-
-extern UINT8 *paletteram_2;	/* use when palette RAM is split in two parts */
-extern UINT16 *paletteram16_2;
-
 extern bitmap_t *tmpbitmap;
 
 
@@ -109,8 +69,8 @@ WRITE16_HANDLER( buffer_spriteram16_2_w );
 WRITE32_HANDLER( buffer_spriteram32_2_w );
 
 /* perform the actual buffering */
-void buffer_spriteram(UINT8 *ptr, int length);
-void buffer_spriteram_2(UINT8 *ptr, int length);
+void buffer_spriteram(running_machine *machine, UINT8 *ptr, int length);
+void buffer_spriteram_2(running_machine *machine, UINT8 *ptr, int length);
 
 
 
@@ -153,28 +113,28 @@ WRITE8_HANDLER( paletteram_IIBBGGRR_w );
 /* 4-4-4 RGB palette write handlers */
 WRITE8_HANDLER( paletteram_xxxxBBBBGGGGRRRR_le_w );
 WRITE8_HANDLER( paletteram_xxxxBBBBGGGGRRRR_be_w );
-WRITE8_HANDLER( paletteram_xxxxBBBBGGGGRRRR_split1_w );	/* uses paletteram[] */
-WRITE8_HANDLER( paletteram_xxxxBBBBGGGGRRRR_split2_w );	/* uses paletteram_2[] */
+WRITE8_HANDLER( paletteram_xxxxBBBBGGGGRRRR_split1_w );	/* uses paletteram */
+WRITE8_HANDLER( paletteram_xxxxBBBBGGGGRRRR_split2_w );	/* uses paletteram2 */
 WRITE16_HANDLER( paletteram16_xxxxBBBBGGGGRRRR_word_w );
 
 WRITE8_HANDLER( paletteram_xxxxBBBBRRRRGGGG_le_w );
 WRITE8_HANDLER( paletteram_xxxxBBBBRRRRGGGG_be_w );
-WRITE8_HANDLER( paletteram_xxxxBBBBRRRRGGGG_split1_w );	/* uses paletteram[] */
-WRITE8_HANDLER( paletteram_xxxxBBBBRRRRGGGG_split2_w );	/* uses paletteram_2[] */
+WRITE8_HANDLER( paletteram_xxxxBBBBRRRRGGGG_split1_w );	/* uses paletteram */
+WRITE8_HANDLER( paletteram_xxxxBBBBRRRRGGGG_split2_w );	/* uses paletteram2 */
 WRITE16_HANDLER( paletteram16_xxxxBBBBRRRRGGGG_word_w );
 
-WRITE8_HANDLER( paletteram_xxxxRRRRBBBBGGGG_split1_w );	/* uses paletteram[] */
-WRITE8_HANDLER( paletteram_xxxxRRRRBBBBGGGG_split2_w );	/* uses paletteram_2[] */
+WRITE8_HANDLER( paletteram_xxxxRRRRBBBBGGGG_split1_w );	/* uses paletteram */
+WRITE8_HANDLER( paletteram_xxxxRRRRBBBBGGGG_split2_w );	/* uses paletteram2 */
 
 WRITE8_HANDLER( paletteram_xxxxRRRRGGGGBBBB_le_w );
 WRITE8_HANDLER( paletteram_xxxxRRRRGGGGBBBB_be_w );
-WRITE8_HANDLER( paletteram_xxxxRRRRGGGGBBBB_split1_w );	/* uses paletteram[] */
-WRITE8_HANDLER( paletteram_xxxxRRRRGGGGBBBB_split2_w );	/* uses paletteram_2[] */
+WRITE8_HANDLER( paletteram_xxxxRRRRGGGGBBBB_split1_w );	/* uses paletteram */
+WRITE8_HANDLER( paletteram_xxxxRRRRGGGGBBBB_split2_w );	/* uses paletteram2 */
 WRITE16_HANDLER( paletteram16_xxxxRRRRGGGGBBBB_word_w );
 
 WRITE8_HANDLER( paletteram_RRRRGGGGBBBBxxxx_be_w );
-WRITE8_HANDLER( paletteram_RRRRGGGGBBBBxxxx_split1_w );	/* uses paletteram[] */
-WRITE8_HANDLER( paletteram_RRRRGGGGBBBBxxxx_split2_w );	/* uses paletteram_2[] */
+WRITE8_HANDLER( paletteram_RRRRGGGGBBBBxxxx_split1_w );	/* uses paletteram */
+WRITE8_HANDLER( paletteram_RRRRGGGGBBBBxxxx_split2_w );	/* uses paletteram2 */
 WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBxxxx_word_w );
 
 /* 4-4-4-4 IRGB palette write handlers */
@@ -184,12 +144,12 @@ WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBIIII_word_w );
 /* 5-5-5 RGB palette write handlers */
 WRITE8_HANDLER( paletteram_xBBBBBGGGGGRRRRR_le_w );
 WRITE8_HANDLER( paletteram_xBBBBBGGGGGRRRRR_be_w );
-WRITE8_HANDLER( paletteram_xBBBBBGGGGGRRRRR_split1_w );	/* uses paletteram[] */
-WRITE8_HANDLER( paletteram_xBBBBBGGGGGRRRRR_split2_w );	/* uses paletteram_2[] */
+WRITE8_HANDLER( paletteram_xBBBBBGGGGGRRRRR_split1_w );	/* uses paletteram */
+WRITE8_HANDLER( paletteram_xBBBBBGGGGGRRRRR_split2_w );	/* uses paletteram2 */
 WRITE16_HANDLER( paletteram16_xBBBBBGGGGGRRRRR_word_w );
 
-WRITE8_HANDLER( paletteram_xBBBBBRRRRRGGGGG_split1_w );  /* uses paletteram[] */
-WRITE8_HANDLER( paletteram_xBBBBBRRRRRGGGGG_split2_w );  /* uses paletteram_2[] */
+WRITE8_HANDLER( paletteram_xBBBBBRRRRRGGGGG_split1_w );  /* uses paletteram */
+WRITE8_HANDLER( paletteram_xBBBBBRRRRRGGGGG_split2_w );  /* uses paletteram2 */
 
 WRITE8_HANDLER( paletteram_xRRRRRGGGGGBBBBB_le_w );
 WRITE8_HANDLER( paletteram_xRRRRRGGGGGBBBBB_split1_w );

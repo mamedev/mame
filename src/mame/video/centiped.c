@@ -23,14 +23,14 @@ static UINT8 penmask[64];
 
 static TILE_GET_INFO( centiped_get_tile_info )
 {
-	int data = videoram[tile_index];
+	int data = machine->generic.videoram.u8[tile_index];
 	SET_TILE_INFO(0, (data & 0x3f) + 0x40, 0, TILE_FLIPYX(data >> 6));
 }
 
 
 static TILE_GET_INFO( warlords_get_tile_info )
 {
-	int data = videoram[tile_index];
+	int data = machine->generic.videoram.u8[tile_index];
 	int color = ((tile_index & 0x10) >> 4) | ((tile_index & 0x200) >> 8) | (centiped_flipscreen >> 5);
 	SET_TILE_INFO(0, data & 0x3f, color, TILE_FLIPYX(data >> 6));
 }
@@ -38,7 +38,7 @@ static TILE_GET_INFO( warlords_get_tile_info )
 
 static TILE_GET_INFO( milliped_get_tile_info )
 {
-	int data = videoram[tile_index];
+	int data = machine->generic.videoram.u8[tile_index];
 	int bank = (data >> 6) & 1;
 	int color = (data >> 6) & 3;
 	/* Flip both x and y if flipscreen is non-zero */
@@ -49,7 +49,7 @@ static TILE_GET_INFO( milliped_get_tile_info )
 
 static TILE_GET_INFO( bullsdrt_get_tile_info )
 {
-	int data = videoram[tile_index];
+	int data = machine->generic.videoram.u8[tile_index];
 	int bank = bullsdrt_tiles_bankram[tile_index & 0x1f] & 0x0f;
 	SET_TILE_INFO(0, (data & 0x3f) + 0x40 * bank, 0, TILE_FLIPYX(data >> 6));
 }
@@ -136,7 +136,7 @@ VIDEO_START( bullsdrt )
 
 WRITE8_HANDLER( centiped_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -207,7 +207,7 @@ WRITE8_HANDLER( bullsdrt_sprites_bank_w )
 
 WRITE8_HANDLER( centiped_paletteram_w )
 {
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 
 	/* bit 2 of the output palette RAM is always pulled high, so we ignore */
 	/* any palette changes unless the write is to a palette RAM address */
@@ -385,7 +385,7 @@ static void melliped_mazeinv_set_color(running_machine *machine, offs_t offset, 
 
 WRITE8_HANDLER( milliped_paletteram_w )
 {
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 
 	melliped_mazeinv_set_color(space->machine, offset, data);
 }
@@ -393,7 +393,7 @@ WRITE8_HANDLER( milliped_paletteram_w )
 
 WRITE8_HANDLER( mazeinv_paletteram_w )
 {
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 
 	/* the value passed in is a look-up index into the color PROM */
 	melliped_mazeinv_set_color(space->machine, offset, ~memory_region(space->machine, "proms")[~data & 0x0f]);
@@ -409,6 +409,7 @@ WRITE8_HANDLER( mazeinv_paletteram_w )
 
 VIDEO_UPDATE( centiped )
 {
+	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	rectangle spriteclip = *cliprect;
 	int offs;
 
@@ -439,6 +440,7 @@ VIDEO_UPDATE( centiped )
 
 VIDEO_UPDATE( warlords )
 {
+	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	int upright_mode = input_port_read(screen->machine, "IN0") & 0x80;
 	int offs;
 
@@ -483,6 +485,7 @@ VIDEO_UPDATE( warlords )
 
 VIDEO_UPDATE( bullsdrt )
 {
+	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	rectangle spriteclip = *cliprect;
 
 	int offs;
@@ -516,6 +519,7 @@ VIDEO_UPDATE( bullsdrt )
  */
 VIDEO_UPDATE( milliped )
 {
+	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	rectangle spriteclip = *cliprect;
 	int offs;
 

@@ -991,7 +991,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
     **- End Sprite Format -*/
 
 	const gfx_element *gfx;
-	UINT32 *src = buffered_spriteram32; /* Use buffered spriteram */
+	UINT32 *src = machine->generic.buffered_spriteram.u32; /* Use buffered spriteram */
 	UINT16 *list = (UINT16 *)src + 0x3800/2;
 	UINT16 listlen=0x800/2, listcntr=0;
 	UINT16 *zoom_table = (UINT16 *)psikyosh_zoomram;

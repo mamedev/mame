@@ -104,7 +104,7 @@ PALETTE_INIT( redclash )
 
 WRITE8_HANDLER( redclash_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -159,8 +159,8 @@ WRITE8_HANDLER( redclash_star_reset_w )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code = videoram[tile_index];
-	int color = (videoram[tile_index] & 0x70) >> 4; // ??
+	int code = machine->generic.videoram.u8[tile_index];
+	int color = (machine->generic.videoram.u8[tile_index] & 0x70) >> 4; // ??
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -175,9 +175,10 @@ VIDEO_START( redclash )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int i, offs;
 
-	for (offs = spriteram_size - 0x20;offs >= 0;offs -= 0x20)
+	for (offs = machine->generic.spriteram_size - 0x20;offs >= 0;offs -= 0x20)
 	{
 		i = 0;
 		while (i < 0x20 && spriteram[offs + i] != 0)
@@ -261,9 +262,9 @@ static void draw_bullets(running_machine *machine, bitmap_t *bitmap, const recta
 
 	for (offs = 0; offs < 0x20; offs++)
 	{
-//      sx = videoram[offs];
-		int sx = 8 * offs + (videoram[offs] & 0x07);	/* ?? */
-		int sy = 0xff - videoram[offs + 0x20];
+//      sx =machine->generic.videoram.u8offs];
+		int sx = 8 * offs + (machine->generic.videoram.u8[offs] & 0x07);	/* ?? */
+		int sy = 0xff - machine->generic.videoram.u8[offs + 0x20];
 
 		if (flip_screen_get(machine))
 		{

@@ -118,7 +118,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(SMH_RAM) AM_BASE(&paletteram)	// self test only checks 0x4000-0x423f, 007327 should actually go up to 4fff
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(SMH_RAM) AM_BASE_GENERIC(paletteram)	// self test only checks 0x4000-0x423f, 007327 should actually go up to 4fff
 	AM_RANGE(0x6000, 0x605f) AM_RAM																	// SOUND RAM (Self test check 0x6000-605f, 0x7c00-0x7fff)
 	AM_RANGE(0x6060, 0x7fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x8000, 0xffff) AM_ROM

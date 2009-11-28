@@ -5,6 +5,7 @@
 
 VIDEO_UPDATE( honeydol )
 {
+	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
 	int sx=0, sy=0, x=0, y=0, offs;
 	/* sprites clip on left / right edges when scrolling, but it seems correct,
        no extra sprite attribute bits are set during this time, the sprite co-ordinates
@@ -89,6 +90,7 @@ VIDEO_UPDATE( honeydol )
 
 VIDEO_UPDATE( twinadv )
 {
+	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
 	int sx=0, sy=0, x=0, y=0, offs;
 	/* sprites clip on left / right edges when scrolling, but it seems correct,
        no extra sprite attribute bits are set during this time, the sprite co-ordinates
@@ -143,11 +145,12 @@ VIDEO_UPDATE( twinadv )
 
 VIDEO_UPDATE( wintbob )
 {
+	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
 	int offs;
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
-	for (offs = 0;offs < spriteram_size/2;offs += 8)
+	for (offs = 0;offs < screen->machine->generic.spriteram_size/2;offs += 8)
 	{
 		int xpos  = spriteram16[offs] & 0xff;
 		int ypos  = spriteram16[offs+4] & 0xff;
@@ -185,7 +188,7 @@ VIDEO_UPDATE( wintbob )
 
 VIDEO_UPDATE( snowbro3 )
 {
-
+	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
 	int sx=0, sy=0, x=0, y=0, offs;
 
 	/*
@@ -214,7 +217,7 @@ VIDEO_UPDATE( snowbro3 )
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
-	for (offs = 0;offs < spriteram_size/2;offs += 8)
+	for (offs = 0;offs < screen->machine->generic.spriteram_size/2;offs += 8)
 	{
 		gfx_element *gfx = screen->machine->gfx[0];
 		int dx = spriteram16[offs+4] & 0xff;

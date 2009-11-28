@@ -55,20 +55,20 @@ WRITE8_HANDLER( cm_outport0_w )
 
 WRITE8_HANDLER( goldstar_fg_vidram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(goldstar_fg_tilemap,offset);
 }
 
 WRITE8_HANDLER( goldstar_fg_atrram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(goldstar_fg_tilemap,offset);
 }
 
 static TILE_GET_INFO( get_goldstar_fg_tile_info )
 {
-	int code = videoram[tile_index];
-	int attr = colorram[tile_index];
+	int code = machine->generic.videoram.u8[tile_index];
+	int attr = machine->generic.colorram.u8[tile_index];
 
 	SET_TILE_INFO(
 			0,
@@ -80,8 +80,8 @@ static TILE_GET_INFO( get_goldstar_fg_tile_info )
 // colour / high tile bits are swapped around
 static TILE_GET_INFO( get_cherrym_fg_tile_info )
 {
-	int code = videoram[tile_index];
-	int attr = colorram[tile_index];
+	int code = machine->generic.videoram.u8[tile_index];
+	int attr = machine->generic.colorram.u8[tile_index];
 
 	SET_TILE_INFO(
 			0,

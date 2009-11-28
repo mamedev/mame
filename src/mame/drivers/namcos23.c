@@ -975,23 +975,23 @@ INLINE void UpdatePalette( running_machine *machine, int entry )
 	for( j=0; j<2; j++ )
 	{
 		int which = (entry*2)+(j*2);
-		int r = nthbyte(paletteram32, which+0x00001);
-		int g = nthbyte(paletteram32, which+0x10001);
-		int b = nthbyte(paletteram32, which+0x20001);
+		int r = nthbyte(machine->generic.paletteram.u32, which+0x00001);
+		int g = nthbyte(machine->generic.paletteram.u32, which+0x10001);
+		int b = nthbyte(machine->generic.paletteram.u32, which+0x20001);
 		palette_set_color( machine, which/2, MAKE_RGB(r,g,b) );
 	}
 }
 
 static READ32_HANDLER( namcos23_paletteram_r )
 {
-	return paletteram32[offset];
+	return space->machine->generic.paletteram.u32[offset];
 }
 
 /* each LONGWORD is 2 colors.  each OFFSET is 2 colors */
 
 static WRITE32_HANDLER( namcos23_paletteram_w )
 {
-	COMBINE_DATA( &paletteram32[offset] );
+	COMBINE_DATA( &space->machine->generic.paletteram.u32[offset] );
 
 	UpdatePalette(space->machine, (offset % (0x10000/4))*2);
 }
@@ -1066,7 +1066,7 @@ static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x06804000, 0x0681dfff) AM_RAM
 	AM_RANGE(0x0681e000, 0x0681ffff) AM_READ(namcos23_textram_r) AM_WRITE(namcos23_textram_w) AM_BASE(&namcos23_textram)
 	AM_RANGE(0x06a08000, 0x06a0ffff) AM_RAM	//gamma?
-	AM_RANGE(0x06a10000, 0x06a3ffff) AM_READ(namcos23_paletteram_r) AM_WRITE(namcos23_paletteram_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x06a10000, 0x06a3ffff) AM_READ(namcos23_paletteram_r) AM_WRITE(namcos23_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x06820008, 0x0682000f) AM_READ( ss23_vstat_r )	// vblank status?
 	AM_RANGE(0x08000000, 0x08017fff) AM_RAM
 	AM_RANGE(0x0d000000, 0x0d000007) AM_READ(sysctl_stat_r) AM_WRITENOP

@@ -51,11 +51,11 @@ WRITE8_HANDLER( tgtball_flipscreen_w )
 /* 800 bytes for red, followed by 800 bytes for green & 800 bytes for blue */
 WRITE8_HANDLER( paradise_palette_w )
 {
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 	offset %= 0x800;
-	palette_set_color_rgb(space->machine,offset,	paletteram[offset + 0x800 * 0],
-											paletteram[offset + 0x800 * 1],
-											paletteram[offset + 0x800 * 2]	);
+	palette_set_color_rgb(space->machine,offset,	space->machine->generic.paletteram.u8[offset + 0x800 * 0],
+											space->machine->generic.paletteram.u8[offset + 0x800 * 1],
+											space->machine->generic.paletteram.u8[offset + 0x800 * 2]	);
 }
 
 /***************************************************************************
@@ -86,9 +86,9 @@ WRITE8_HANDLER( paradise_palbank_w )
 	int bank2 = (data & 0xf0);
 
 	for (i = 0; i < 15; i++)
-		palette_set_color_rgb(space->machine,0x800+i,	paletteram[0x200 + bank2 + i + 0x800 * 0],
-												paletteram[0x200 + bank2 + i + 0x800 * 1],
-												paletteram[0x200 + bank2 + i + 0x800 * 2]	);
+		palette_set_color_rgb(space->machine,0x800+i,	space->machine->generic.paletteram.u8[0x200 + bank2 + i + 0x800 * 0],
+												space->machine->generic.paletteram.u8[0x200 + bank2 + i + 0x800 * 1],
+												space->machine->generic.paletteram.u8[0x200 + bank2 + i + 0x800 * 2]	);
 	if (paradise_palbank != bank1)
 	{
 		paradise_palbank = bank1;
@@ -136,7 +136,7 @@ WRITE8_HANDLER( paradise_pixmap_w )
 {
 	int x,y;
 
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 
 	x = (offset & 0x7f) << 1;
 	y = (offset >> 7);
@@ -181,8 +181,9 @@ WRITE8_HANDLER( paradise_priority_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int i;
-	for (i = 0; i < spriteram_size ; i += paradise_sprite_inc)
+	for (i = 0; i < machine->generic.spriteram_size ; i += paradise_sprite_inc)
 	{
 		int code	=	spriteram[i+0];
 		int x		=	spriteram[i+1];

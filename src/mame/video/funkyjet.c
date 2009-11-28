@@ -16,6 +16,7 @@ VIDEO_START( funkyjet )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 
 	for (offs = 0;offs < 0x400;offs += 4)

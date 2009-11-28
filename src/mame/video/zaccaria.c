@@ -206,6 +206,8 @@ WRITE8_HANDLER( zaccaria_flip_screen_y_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
 	int offs;
 	rectangle clip = *cliprect;
 
@@ -228,7 +230,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
       which masks the holes when you fall in them. The hardware is probably
       similar to Amidar, but the code in the Amidar driver is not good either.
     */
-	for (offs = 0;offs < spriteram_2_size;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram2_size;offs += 4)
 	{
 		int sx = spriteram_2[offs + 3] + 1;
 		int sy = 242 - spriteram_2[offs];
@@ -253,7 +255,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				sx,sy,0);
 	}
 
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size;offs += 4)
 	{
 		int sx = spriteram[offs + 3] + 1;
 		int sy = 242 - spriteram[offs];

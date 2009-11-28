@@ -351,11 +351,12 @@ WRITE8_HANDLER( wardner_videoram_w )
 READ8_HANDLER( wardner_sprite_r )
 {
 	int shift = (offset & 1) * 8;
-	return spriteram16[offset/2] >> shift;
+	return space->machine->generic.spriteram.u16[offset/2] >> shift;
 }
 
 WRITE8_HANDLER( wardner_sprite_w )
 {
+	UINT16 *spriteram16 = space->machine->generic.spriteram.u16;
 	if (offset & 1)
 		spriteram16[offset/2] = (spriteram16[offset/2] & 0x00ff) | (data << 8);
 	else
@@ -377,9 +378,10 @@ WRITE8_HANDLER( wardner_CRTC_data_w )
     Ugly sprite hack for Wardner when hero is in shop
 ***************************************************************************/
 
-static void wardner_sprite_priority_hack(void)
+static void wardner_sprite_priority_hack(running_machine *machine)
 {
 	if (fgscrollx != bgscrollx) {
+		UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 		if ((fgscrollx==0x1c9) || (twincobr_flip_screen && (fgscrollx==0x17a))) {	/* in the shop ? */
 			int wardner_hack = buffered_spriteram16[0x0b04/2];
 		/* sprite position 0x6300 to 0x8700 -- hero on shop keeper (normal) */
@@ -453,7 +455,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 	if (twincobr_display_on)
 	{
-		for (offs = 0;offs < spriteram_size/2;offs += 4)
+		UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
+		for (offs = 0;offs < machine->generic.spriteram_size/2;offs += 4)
 		{
 			int attribute,sx,sy,flipx,flipy;
 			int sprite, color;
@@ -488,7 +491,7 @@ VIDEO_UPDATE( toaplan0 )
 {
 	twincobr_log_vram(screen->machine);
 
-	if (wardner_sprite_hack) wardner_sprite_priority_hack();
+	if (wardner_sprite_hack) wardner_sprite_priority_hack(screen->machine);
 
 	bitmap_fill(bitmap,cliprect,0);
 

@@ -432,8 +432,8 @@ static ADDRESS_MAP_START( hyprduel_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM_WRITE(hyprduel_vram_1_w) AM_BASE(&hyprduel_vram_1)		/* Layer 1 */
 	AM_RANGE(0x440000, 0x45ffff) AM_RAM_WRITE(hyprduel_vram_2_w) AM_BASE(&hyprduel_vram_2)		/* Layer 2 */
 	AM_RANGE(0x460000, 0x46ffff) AM_READ(hyprduel_bankedrom_r)		/* Banked ROM */
-	AM_RANGE(0x470000, 0x473fff) AM_RAM AM_WRITE(hyprduel_paletteram_w) AM_BASE(&paletteram16)	/* Palette */
-	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)			/* Sprites */
+	AM_RANGE(0x470000, 0x473fff) AM_RAM AM_WRITE(hyprduel_paletteram_w) AM_BASE_GENERIC(paletteram)	/* Palette */
+	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)			/* Sprites */
 	AM_RANGE(0x475000, 0x477fff) AM_RAM			/* only used memory test */
 	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_BASE(&hyprduel_tiletable) AM_SIZE(&hyprduel_tiletable_size)	/* Tiles Set */
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(hyprduel_blitter_w) AM_BASE(&hyprduel_blitter_regs)	/* Tiles Blitter */
@@ -479,8 +479,8 @@ static ADDRESS_MAP_START( magerror_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x820000, 0x83ffff) AM_RAM_WRITE(hyprduel_vram_1_w) AM_BASE(&hyprduel_vram_1)		/* Layer 1 */
 	AM_RANGE(0x840000, 0x85ffff) AM_RAM_WRITE(hyprduel_vram_2_w) AM_BASE(&hyprduel_vram_2)		/* Layer 2 */
 	AM_RANGE(0x860000, 0x86ffff) AM_READ(hyprduel_bankedrom_r)		/* Banked ROM */
-	AM_RANGE(0x870000, 0x873fff) AM_RAM AM_WRITE(hyprduel_paletteram_w) AM_BASE(&paletteram16)	/* Palette */
-	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)		/* Sprites */
+	AM_RANGE(0x870000, 0x873fff) AM_RAM AM_WRITE(hyprduel_paletteram_w) AM_BASE_GENERIC(paletteram)	/* Palette */
+	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)		/* Sprites */
 	AM_RANGE(0x875000, 0x877fff) AM_RAM			/* only used memory test */
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_BASE(&hyprduel_tiletable) AM_SIZE(&hyprduel_tiletable_size)	/* Tiles Set */
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(hyprduel_blitter_w) AM_BASE(&hyprduel_blitter_regs)	/* Tiles Blitter */

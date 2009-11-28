@@ -169,6 +169,7 @@ confirmed
 static void contcirc_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -177,7 +178,7 @@ static void contcirc_draw_sprites_16x8(running_machine *machine, bitmap_t *bitma
 	int bad_chunks;
 	static const int primasks[2] = {0xf0,0xfc};
 
-	for (offs = 0;offs < spriteram_size/2;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size/2;offs += 4)
 	{
 		data = spriteram16[offs+0];
 		zoomy = (data & 0xfe00) >> 9;
@@ -260,6 +261,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 static void chasehq_draw_sprites_16x16(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -268,7 +270,7 @@ static void chasehq_draw_sprites_16x16(running_machine *machine, bitmap_t *bitma
 	int bad_chunks;
 	static const int primasks[2] = {0xf0,0xfc};
 
-	for (offs = spriteram_size/2-4;offs >=0;offs -= 4)
+	for (offs = machine->generic.spriteram_size/2-4;offs >=0;offs -= 4)
 	{
 		data = spriteram16[offs+0];
 		zoomy = (data & 0xfe00) >> 9;
@@ -442,6 +444,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 static void bshark_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -450,7 +453,7 @@ static void bshark_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,
 	int bad_chunks;
 	static const int primasks[2] = {0xf0,0xfc};
 
-	for (offs = spriteram_size/2-4;offs >= 0;offs -= 4)
+	for (offs = machine->generic.spriteram_size/2-4;offs >= 0;offs -= 4)
 	{
 		data = spriteram16[offs+0];
 		zoomy = (data & 0x7e00) >> 9;
@@ -534,6 +537,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 static void sci_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs, start_offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -635,6 +639,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 static void aquajack_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -643,7 +648,7 @@ static void aquajack_draw_sprites_16x8(running_machine *machine, bitmap_t *bitma
 	int bad_chunks;
 	static const int primasks[2] = {0xf0,0xfc};
 
-	for (offs = 0;offs < spriteram_size/2;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size/2;offs += 4)
 	{
 		data = spriteram16[offs+0];
 		zoomy = (data & 0x7e00) >> 9;
@@ -726,6 +731,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 static void spacegun_draw_sprites_16x8(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
 	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -734,7 +740,7 @@ static void spacegun_draw_sprites_16x8(running_machine *machine, bitmap_t *bitma
 	int bad_chunks;
 	static const int primasks[2] = {0xf0,0xfc};
 
-	for (offs = 0; offs < spriteram_size/2-4;offs += 4)
+	for (offs = 0; offs < machine->generic.spriteram_size/2-4;offs += 4)
 	{
 		data = spriteram16[offs+0];
 		zoomy = (data & 0xfe00) >> 9;

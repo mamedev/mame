@@ -54,11 +54,11 @@ VIDEO_UPDATE( polyplay )
 	offs_t offs;
 
 
-	for (offs = 0; offs < videoram_size; offs++)
+	for (offs = 0; offs < screen->machine->generic.videoram_size; offs++)
 	{
 		int sx = (offs & 0x3f) << 3;
 		int sy = offs >> 6 << 3;
-		UINT8 code = videoram[offs];
+		UINT8 code = screen->machine->generic.videoram.u8[offs];
 
 		drawgfx_opaque(bitmap,cliprect, screen->machine->gfx[(code >> 7) & 0x01],
 				code, 0, 0, 0, sx, sy);

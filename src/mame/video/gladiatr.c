@@ -106,16 +106,16 @@ WRITE8_HANDLER( gladiatr_paletteram_w )
 {
 	int r,g,b;
 
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 	offset &= 0x3ff;
 
-	r = (paletteram[offset] >> 0) & 0x0f;
-	g = (paletteram[offset] >> 4) & 0x0f;
-	b = (paletteram[offset + 0x400] >> 0) & 0x0f;
+	r = (space->machine->generic.paletteram.u8[offset] >> 0) & 0x0f;
+	g = (space->machine->generic.paletteram.u8[offset] >> 4) & 0x0f;
+	b = (space->machine->generic.paletteram.u8[offset + 0x400] >> 0) & 0x0f;
 
-	r = (r << 1) + ((paletteram[offset + 0x400] >> 4) & 0x01);
-	g = (g << 1) + ((paletteram[offset + 0x400] >> 5) & 0x01);
-	b = (b << 1) + ((paletteram[offset + 0x400] >> 6) & 0x01);
+	r = (r << 1) + ((space->machine->generic.paletteram.u8[offset + 0x400] >> 4) & 0x01);
+	g = (g << 1) + ((space->machine->generic.paletteram.u8[offset + 0x400] >> 5) & 0x01);
+	b = (b << 1) + ((space->machine->generic.paletteram.u8[offset + 0x400] >> 6) & 0x01);
 
 	palette_set_color_rgb(space->machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
@@ -209,7 +209,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			{0x0,0x1},
 			{0x2,0x3},
 		};
-		UINT8 *src = &spriteram[offs + (sprite_buffer << 7)];
+		UINT8 *src = &machine->generic.spriteram.u8[offs + (sprite_buffer << 7)];
 		int attributes = src[0x800];
 		int size = (attributes & 0x10) >> 4;
 		int bank = (attributes & 0x01) + ((attributes & 0x02) ? sprite_bank : 0);

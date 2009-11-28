@@ -95,7 +95,7 @@ static TILE_GET_INFO( zaxxon_get_fg_tile_info )
 {
 	int sx = tile_index % 32;
 	int sy = tile_index / 32;
-	int code = videoram[tile_index];
+	int code = machine->generic.videoram.u8[tile_index];
 	int color = color_codes[sx + 32 * (sy / 4)] & 0x0f;
 	SET_TILE_INFO(0, code, color * 2, 0);
 }
@@ -103,7 +103,7 @@ static TILE_GET_INFO( zaxxon_get_fg_tile_info )
 
 static TILE_GET_INFO( razmataz_get_fg_tile_info )
 {
-	int code = videoram[tile_index];
+	int code = machine->generic.videoram.u8[tile_index];
 	int color = color_codes[code] & 0x0f;
 	SET_TILE_INFO(0, code, color * 2, 0);
 }
@@ -111,8 +111,8 @@ static TILE_GET_INFO( razmataz_get_fg_tile_info )
 
 static TILE_GET_INFO( congo_get_fg_tile_info )
 {
-	int code = videoram[tile_index] + (congo_fg_bank << 8);
-	int color = colorram[tile_index] & 0x1f;
+	int code = machine->generic.videoram.u8[tile_index] + (congo_fg_bank << 8);
+	int color = machine->generic.colorram.u8[tile_index] & 0x1f;
 	SET_TILE_INFO(0, code, color * 2, 0);
 }
 
@@ -167,13 +167,13 @@ VIDEO_START( razmataz )
 VIDEO_START( congo )
 {
 	/* allocate our own spriteram since it is not accessible by the main CPU */
-	spriteram = auto_alloc_array(machine, UINT8, 0x100);
+	machine->generic.spriteram.u8 = auto_alloc_array(machine, UINT8, 0x100);
 
 	/* register for save states */
 	state_save_register_global(machine, congo_fg_bank);
 	state_save_register_global(machine, congo_color_bank);
 	state_save_register_global_array(machine, congo_custom);
-	state_save_register_global_pointer(machine, spriteram, 0x100);
+	state_save_register_global_pointer(machine, machine->generic.spriteram.u8, 0x100);
 
 	video_start_common(machine, congo_get_fg_tile_info);
 }
@@ -251,14 +251,14 @@ WRITE8_HANDLER( congo_color_bank_w )
 
 WRITE8_HANDLER( zaxxon_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 
 WRITE8_HANDLER( congo_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -277,6 +277,7 @@ WRITE8_HANDLER( congo_sprite_custom_w )
 	/* seems to trigger on a write of 1 to the 4th byte */
 	if (offset == 3 && data == 0x01)
 	{
+		UINT8 *spriteram = space->machine->generic.spriteram.u8;
 		UINT16 saddr = congo_custom[0] | (congo_custom[1] << 8);
 		int count = congo_custom[2];
 
@@ -422,6 +423,7 @@ INLINE int find_minimum_x(UINT8 value, int flip)
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 flipxmask, UINT16 flipymask)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int flip = flip_screen_get(machine);
 	int flipmask = flip ? 0xff : 0x00;
 	int offs;

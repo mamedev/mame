@@ -149,13 +149,13 @@ PALETTE_INIT( sraider )
 
 WRITE8_HANDLER( ladybug_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( ladybug_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -271,8 +271,8 @@ WRITE8_HANDLER( sraider_io_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index] + 32 * (colorram[tile_index] & 0x08);
-	int color = colorram[tile_index] & 0x07;
+	int code = machine->generic.videoram.u8[tile_index] + 32 * (machine->generic.colorram.u8[tile_index] & 0x08);
+	int color = machine->generic.colorram.u8[tile_index] & 0x07;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -309,9 +309,10 @@ VIDEO_START( sraider )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = spriteram_size - 2*0x40;offs >= 2*0x40;offs -= 0x40)
+	for (offs = machine->generic.spriteram_size - 2*0x40;offs >= 2*0x40;offs -= 0x40)
 	{
 		int i = 0;
 
@@ -369,9 +370,9 @@ VIDEO_UPDATE( ladybug )
 		int sy = offs / 4;
 
 		if (flip_screen_get(screen->machine))
-			tilemap_set_scrollx(bg_tilemap, offs, -videoram[32 * sx + sy]);
+			tilemap_set_scrollx(bg_tilemap, offs, -screen->machine->generic.videoram.u8[32 * sx + sy]);
 		else
-			tilemap_set_scrollx(bg_tilemap, offs, videoram[32 * sx + sy]);
+			tilemap_set_scrollx(bg_tilemap, offs, screen->machine->generic.videoram.u8[32 * sx + sy]);
 	}
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
@@ -398,9 +399,9 @@ VIDEO_UPDATE( sraider )
 		int sy = offs / 4;
 
 		if (flip_screen_get(screen->machine))
-			tilemap_set_scrollx(bg_tilemap, offs, -videoram[32 * sx + sy]);
+			tilemap_set_scrollx(bg_tilemap, offs, -screen->machine->generic.videoram.u8[32 * sx + sy]);
 		else
-			tilemap_set_scrollx(bg_tilemap, offs, videoram[32 * sx + sy]);
+			tilemap_set_scrollx(bg_tilemap, offs, screen->machine->generic.videoram.u8[32 * sx + sy]);
 	}
 
 	// clear the bg bitmap

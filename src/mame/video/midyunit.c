@@ -260,8 +260,8 @@ WRITE16_HANDLER( midyunit_paletteram_w )
 {
 	int newword;
 
-	COMBINE_DATA(&paletteram16[offset]);
-	newword = paletteram16[offset];
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	newword = space->machine->generic.paletteram.u16[offset];
 	palette_set_color_rgb(space->machine, offset & palette_mask, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
 }
 

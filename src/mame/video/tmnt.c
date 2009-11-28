@@ -319,10 +319,10 @@ VIDEO_START( prmrsocr )
 
 WRITE16_HANDLER( tmnt_paletteram_word_w )
 {
-	COMBINE_DATA(paletteram16 + offset);
+	COMBINE_DATA(space->machine->generic.paletteram.u16 + offset);
 	offset &= ~1;
 
-	data = (paletteram16[offset] << 8) | paletteram16[offset+1];
+	data = (space->machine->generic.paletteram.u16[offset] << 8) | space->machine->generic.paletteram.u16[offset+1];
 	palette_set_color_rgb(space->machine,offset / 2,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 }
 

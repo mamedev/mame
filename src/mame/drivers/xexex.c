@@ -126,7 +126,7 @@ static NVRAM_HANDLER( xexex )
 static READ16_HANDLER( K053247_scattered_word_r )
 {
 	if (offset & 0x0031)
-		return spriteram16[offset];
+		return space->machine->generic.spriteram.u16[offset];
 	else
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x3fc0) >> 3);
@@ -137,7 +137,7 @@ static READ16_HANDLER( K053247_scattered_word_r )
 static WRITE16_HANDLER( K053247_scattered_word_w )
 {
 	if (offset & 0x0031)
-		COMBINE_DATA(spriteram16+offset);
+		COMBINE_DATA(space->machine->generic.spriteram.u16+offset);
 	else
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x3fc0) >> 3);
@@ -158,7 +158,7 @@ static void xexex_objdma(running_machine *machine, int limiter)
 	if (limiter && counter == frame) return; // make sure we only do DMA transfer once per frame
 
 	K053247_export_config(&dst, 0, 0, 0, &counter);
-	src = spriteram16;
+	src = machine->generic.spriteram.u16;
 	num_inactive = counter = 256;
 
 	do
@@ -181,12 +181,12 @@ static void xexex_objdma(running_machine *machine, int limiter)
 
 static READ16_HANDLER( spriteram16_mirror_r )
 {
-	return(spriteram16[offset]);
+	return(space->machine->generic.spriteram.u16[offset]);
 }
 
 static WRITE16_HANDLER( spriteram16_mirror_w )
 {
-	COMBINE_DATA(spriteram16+offset);
+	COMBINE_DATA(space->machine->generic.spriteram.u16+offset);
 }
 
 static READ16_HANDLER( xexex_waitskip_r )
@@ -352,7 +352,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080014, 0x080015) AM_READ(xexex_waitskip_r)				// helps sound CPU by giving back control as early as possible
 #endif
 
-	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_BASE(&spriteram16)			// K053247 sprite RAM
+	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_BASE_GENERIC(spriteram)			// K053247 sprite RAM
 	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(spriteram16_mirror_r, spriteram16_mirror_w)	// K053247 sprite RAM mirror read
 	AM_RANGE(0x0c0000, 0x0c003f) AM_WRITE(K056832_word_w)				// VACSET (K054157)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_WRITE(K053246_word_w)				// OBJSET1
@@ -378,7 +378,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x182000, 0x183fff) AM_READWRITE(K056832_ram_word_r, K056832_ram_word_w)
 	AM_RANGE(0x190000, 0x191fff) AM_READWRITE(K056832_rom_word_r, SMH_ROM)		// Passthrough to tile roms
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_READ(K053250_0_rom_r)
-	AM_RANGE(0x1b0000, 0x1b1fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x1b0000, 0x1b1fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)
 
 #if XE_DEBUG
 	AM_RANGE(0x0c0000, 0x0c003f) AM_READ(K056832_word_r)

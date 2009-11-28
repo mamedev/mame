@@ -68,6 +68,7 @@ static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
       ---- ----  -x-- ---- : Flip screen
 */
 
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 	int xoffs, yoffs;
 
@@ -77,7 +78,7 @@ static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 	int flip	=	ctrl & 0x40;
 
 	/* Sprites Banking and/or Sprites Buffering */
-	UINT16 *src = spriteram16_2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
+	UINT16 *src = machine->generic.spriteram2.u16 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
 	int max_y = video_screen_get_height(machine->primary_screen);
 
@@ -119,6 +120,9 @@ static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 
 static void srmp3_draw_sprites_map(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
+	UINT8 *spriteram_3 = machine->generic.spriteram3.u8;
 	int offs, col;
 	int xoffs, yoffs;
 
@@ -225,6 +229,9 @@ static void srmp3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
       -x-- ---- : Flip screen
 */
 
+	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
+	UINT8 *spriteram_3 = machine->generic.spriteram3.u8;
 	int offs;
 	int xoffs, yoffs;
 
@@ -275,6 +282,7 @@ static void srmp3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 
 static void mjyuugi_draw_sprites_map(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs, col;
 	int xoffs, yoffs;
 
@@ -287,7 +295,7 @@ static void mjyuugi_draw_sprites_map(running_machine *machine, bitmap_t *bitmap,
 	int numcol	=	ctrl2 & 0x000f;
 
 	/* Sprites Banking and/or Sprites Buffering */
-	UINT16 *src = spriteram16_2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
+	UINT16 *src = machine->generic.spriteram2.u16 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
 	int upper	=	( spriteram16[ 0x604/2 ] & 0xFF ) +
 					( spriteram16[ 0x606/2 ] & 0xFF ) * 256;
@@ -377,6 +385,7 @@ static void mjyuugi_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
       ---- ----  -x-- ---- : Flip screen
 */
 
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 	int xoffs, yoffs;
 
@@ -386,7 +395,7 @@ static void mjyuugi_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 	int flip	=	ctrl & 0x40;
 
 	/* Sprites Banking and/or Sprites Buffering */
-	UINT16 *src = spriteram16_2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
+	UINT16 *src = machine->generic.spriteram2.u16 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
 	int max_y = video_screen_get_height(machine->primary_screen);
 

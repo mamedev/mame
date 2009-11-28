@@ -335,7 +335,7 @@ static INTERRUPT_GEN( namconb1_interrupt )
      * 40001e 0x00
      * 40001f 0x00
      */
-	int scanline = (paletteram32[0x1808/4]&0xffff)-32;
+	int scanline = (device->machine->generic.paletteram.u32[0x1808/4]&0xffff)-32;
 
 	if((!vblank_irq_active) && (namconb_cpureg[0x04] & 0xf0)) {
 		cpu_set_input_line(device, namconb_cpureg[0x04] & 0xf, ASSERT_LINE);
@@ -406,7 +406,7 @@ static INTERRUPT_GEN( namconb2_interrupt )
      * f0001e 0x00
      * f0001f 0x01
      */
-	int scanline = (paletteram32[0x1808/4]&0xffff)-32;
+	int scanline = (device->machine->generic.paletteram.u32[0x1808/4]&0xffff)-32;
 
 	if((!vblank_irq_active) && namconb_cpureg[0x00]) {
 		cpu_set_input_line(device, namconb_cpureg[0x00], ASSERT_LINE);
@@ -864,7 +864,7 @@ static ADDRESS_MAP_START( namconb1_am, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x660000, 0x66003f) AM_READWRITE(namco_tilemapcontrol32_r,namco_tilemapcontrol32_w)
 	AM_RANGE(0x680000, 0x68000f) AM_RAM AM_BASE(&namconb1_spritebank32)
 	AM_RANGE(0x6e0000, 0x6e001f) AM_READ(custom_key_r) AM_WRITENOP
-	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_BASE(&paletteram32)
+	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( namconb2_am, ADDRESS_SPACE_PROGRAM, 32 )
@@ -881,7 +881,7 @@ static ADDRESS_MAP_START( namconb2_am, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x6c0000, 0x6c003f) AM_READWRITE(namco_tilemapcontrol32_r, namco_tilemapcontrol32_w )
 	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE(namco_rozvideoram32_r,namco_rozvideoram32_w)
 	AM_RANGE(0x740000, 0x74001f) AM_READWRITE(namco_rozcontrol32_r,namco_rozcontrol32_w)
-	AM_RANGE(0x800000, 0x807fff) AM_RAM AM_BASE(&paletteram32)
+	AM_RANGE(0x800000, 0x807fff) AM_RAM AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x900008, 0x90000f) AM_RAM AM_BASE(&namconb1_spritebank32)
 	AM_RANGE(0x940000, 0x94000f) AM_RAM AM_BASE(&namconb1_tilebank32)
 	AM_RANGE(0x980000, 0x98000f) AM_READ(namco_rozbank32_r) AM_WRITE(namco_rozbank32_w)

@@ -93,16 +93,19 @@ static WRITE16_HANDLER( fantland_soundlatch_16_w )
 
 static READ16_HANDLER( spriteram_16_r )
 {
+	UINT8 *spriteram = space->machine->generic.spriteram.u8;
 	return spriteram[2 * offset + 0] | (spriteram[2 * offset + 1] << 8);
 }
 
 static READ16_HANDLER( spriteram2_16_r )
 {
+	UINT8 *spriteram_2 = space->machine->generic.spriteram2.u8;
 	return spriteram_2[2 * offset + 0] | (spriteram_2[2 * offset + 1] << 8);
 }
 
 static WRITE16_HANDLER( spriteram_16_w )
 {
+	UINT8 *spriteram = space->machine->generic.spriteram.u8;
 	if (ACCESSING_BITS_0_7)
 		spriteram[2 * offset + 0] = data;
 	if (ACCESSING_BITS_8_15)
@@ -111,6 +114,7 @@ static WRITE16_HANDLER( spriteram_16_w )
 
 static WRITE16_HANDLER( spriteram2_16_w )
 {
+	UINT8 *spriteram_2 = space->machine->generic.spriteram2.u8;
 	if (ACCESSING_BITS_0_7)
 		spriteram_2[2 * offset + 0] = data;
 	if (ACCESSING_BITS_8_15)
@@ -121,13 +125,13 @@ static ADDRESS_MAP_START( fantland_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x08000, 0x7ffff ) AM_ROM
 
-	AM_RANGE( 0xa2000, 0xa21ff ) AM_READWRITE( SMH_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w ) AM_BASE( &paletteram16 )
+	AM_RANGE( 0xa2000, 0xa21ff ) AM_READWRITE( SMH_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w ) AM_BASE_GENERIC( paletteram )
 
 	AM_RANGE( 0xa3000, 0xa3001 ) AM_READ_PORT("a3000") AM_WRITE( fantland_nmi_enable_16_w )
 	AM_RANGE( 0xa3002, 0xa3003 ) AM_READ_PORT("a3002") AM_WRITE( fantland_soundlatch_16_w )
 
-	AM_RANGE( 0xa4000, 0xa67ff ) AM_READWRITE( spriteram_16_r,  spriteram_16_w  ) AM_BASE( (UINT16 **)&spriteram   )
-	AM_RANGE( 0xc0000, 0xcffff ) AM_READWRITE( spriteram2_16_r, spriteram2_16_w ) AM_BASE( (UINT16 **)&spriteram_2 )
+	AM_RANGE( 0xa4000, 0xa67ff ) AM_READWRITE( spriteram_16_r,  spriteram_16_w  ) AM_BASE_GENERIC( spriteram )
+	AM_RANGE( 0xc0000, 0xcffff ) AM_READWRITE( spriteram2_16_r, spriteram2_16_w ) AM_BASE_GENERIC( spriteram2 )
 
 	AM_RANGE( 0xe0000, 0xfffff ) AM_ROM
 ADDRESS_MAP_END
@@ -141,15 +145,15 @@ static ADDRESS_MAP_START( galaxygn_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x10000, 0x2ffff ) AM_ROM
 
-	AM_RANGE( 0x52000, 0x521ff ) AM_READWRITE( SMH_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE( &paletteram )
+	AM_RANGE( 0x52000, 0x521ff ) AM_READWRITE( SMH_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE_GENERIC( paletteram )
 
 	AM_RANGE( 0x53000, 0x53000 ) AM_READ_PORT("P1") AM_WRITE( fantland_nmi_enable_w )
 	AM_RANGE( 0x53001, 0x53001 ) AM_READ_PORT("P2")
 	AM_RANGE( 0x53002, 0x53002 ) AM_READ_PORT("DSW1") AM_WRITE( fantland_soundlatch_w )
 	AM_RANGE( 0x53003, 0x53003 ) AM_READ_PORT("P2")
 
-	AM_RANGE( 0x54000, 0x567ff ) AM_RAM AM_BASE( &spriteram )
-	AM_RANGE( 0x60000, 0x6ffff ) AM_RAM AM_BASE( &spriteram_2 )
+	AM_RANGE( 0x54000, 0x567ff ) AM_RAM AM_BASE_GENERIC( spriteram )
+	AM_RANGE( 0x60000, 0x6ffff ) AM_RAM AM_BASE_GENERIC( spriteram2 )
 
 	AM_RANGE( 0x70000, 0x7ffff ) AM_ROM
 	AM_RANGE( 0xf0000, 0xfffff ) AM_ROM
@@ -235,19 +239,19 @@ static ADDRESS_MAP_START( borntofi_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x10000, 0x2ffff ) AM_ROM
 
-	AM_RANGE( 0x52000, 0x521ff ) AM_READWRITE( SMH_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE( &paletteram )
+	AM_RANGE( 0x52000, 0x521ff ) AM_READWRITE( SMH_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x53000, 0x53001 ) AM_READWRITE( borntofi_inputs_r, borntofi_nmi_enable_w )
 	AM_RANGE( 0x53002, 0x53002 ) AM_READ_PORT( "DSW" ) AM_WRITE( fantland_soundlatch_w )
 	AM_RANGE( 0x53003, 0x53003 ) AM_READ_PORT( "Controls" )
 
-	AM_RANGE( 0x54000, 0x567ff ) AM_RAM AM_BASE( &spriteram )
+	AM_RANGE( 0x54000, 0x567ff ) AM_RAM AM_BASE_GENERIC( spriteram )
 
 	AM_RANGE( 0x57000, 0x57000 ) AM_READ_PORT( "P1 Lightgun Y" )
 	AM_RANGE( 0x57001, 0x57001 ) AM_READ_PORT( "P1 Lightgun X" )
 	AM_RANGE( 0x57002, 0x57002 ) AM_READ_PORT( "P2 Lightgun Y" )
 	AM_RANGE( 0x57003, 0x57003 ) AM_READ_PORT( "P2 Lightgun X" )
 
-	AM_RANGE( 0x60000, 0x6ffff ) AM_RAM AM_BASE( &spriteram_2 )
+	AM_RANGE( 0x60000, 0x6ffff ) AM_RAM AM_BASE_GENERIC( spriteram2 )
 
 	AM_RANGE( 0x70000, 0x7ffff ) AM_ROM
 	AM_RANGE( 0xf0000, 0xfffff ) AM_ROM
@@ -264,15 +268,15 @@ static ADDRESS_MAP_START( wheelrun_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x30000, 0x3ffff) AM_ROM
 	AM_RANGE(0x70000, 0x7ffff) AM_ROM
 
-	AM_RANGE(0x52000, 0x521ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w	) AM_BASE(&paletteram	)
+	AM_RANGE(0x52000, 0x521ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w	) AM_BASE_GENERIC( paletteram	)
 
 	AM_RANGE(0x53000, 0x53000) AM_READ_PORT( "53000" ) AM_WRITE( borntofi_nmi_enable_w )
 	AM_RANGE(0x53001, 0x53001) AM_READ_PORT( "53001" )
 	AM_RANGE(0x53002, 0x53002) AM_READ_PORT( "53002" ) AM_WRITE( fantland_soundlatch_w )
 	AM_RANGE(0x53003, 0x53003) AM_READ_PORT( "53003" ) AM_WRITENOP
 
-	AM_RANGE(0x54000, 0x567ff) AM_RAM AM_BASE(&spriteram	)
-	AM_RANGE(0x60000, 0x6ffff) AM_RAM AM_BASE(&spriteram_2	)
+	AM_RANGE(0x54000, 0x567ff) AM_RAM AM_BASE_GENERIC(spriteram	)
+	AM_RANGE(0x60000, 0x6ffff) AM_RAM AM_BASE_GENERIC(spriteram2	)
 
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END

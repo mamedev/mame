@@ -409,8 +409,8 @@ PALETTE_INIT( pteacher )
 INLINE void mrokumei_info0( running_machine *machine, tile_data *tileinfo, int tile_index, int page, int gfxbank )
 {
 	int addr  = tile_index * 2 + 0x2000 * page;
-	int attr  = videoram[addr];
-	int code  = videoram[addr + 1] + ((attr & 0x03) << 8) + (gfxbank << 10);
+	int attr  = machine->generic.videoram.u8[addr];
+	int code  = machine->generic.videoram.u8[addr + 1] + ((attr & 0x03) << 8) + (gfxbank << 10);
 	int color = (attr >> 2) + (gfxbank << 6);
 
 	SET_TILE_INFO( 0, code, color, homedata_flipscreen );
@@ -418,8 +418,8 @@ INLINE void mrokumei_info0( running_machine *machine, tile_data *tileinfo, int t
 INLINE void mrokumei_info1( running_machine *machine, tile_data *tileinfo, int tile_index, int page, int gfxbank )
 {
 	int addr  = tile_index * 2 + 0x1000 + 0x2000 * page;
-	int attr  = videoram[addr];
-	int code  = videoram[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
+	int attr  = machine->generic.videoram.u8[addr];
+	int code  = machine->generic.videoram.u8[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
 	int color = (attr >> 3) + ((gfxbank & 3) << 6);
 
 	SET_TILE_INFO( 1, code, color, homedata_flipscreen );
@@ -434,8 +434,8 @@ static TILE_GET_INFO( mrokumei_get_info1_1 ) { mrokumei_info1( machine, tileinfo
 INLINE void reikaids_info( running_machine *machine, tile_data *tileinfo, int tile_index, int page, int layer, int gfxbank )
 {
 	int addr  = tile_index * 4 + layer + 0x2000 * page;
-	int attr  = videoram[addr];
-	int code  = videoram[addr + 0x1000] + ((attr & 0x03) << 8) + (gfxbank << 10);
+	int attr  = machine->generic.videoram.u8[addr];
+	int code  = machine->generic.videoram.u8[addr + 0x1000] + ((attr & 0x03) << 8) + (gfxbank << 10);
 	int color = (attr & 0x7c) >> 2;
 	int flags = homedata_flipscreen;
 
@@ -465,8 +465,8 @@ static TILE_GET_INFO( reikaids_get_info1_3 ) { reikaids_info( machine, tileinfo,
 INLINE void pteacher_info( running_machine *machine, tile_data *tileinfo, int tile_index, int page, int layer, int gfxbank )
 {
 	int addr  = tile_index * 2 + 0x1000 * layer + 0x2000 * page;
-	int attr  = videoram[addr];
-	int code  = videoram[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
+	int attr  = machine->generic.videoram.u8[addr];
+	int code  = machine->generic.videoram.u8[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
 	int color = (attr >> 3) + ((gfxbank & 1) << 5);
 
 	SET_TILE_INFO( layer, code, color, homedata_flipscreen );
@@ -481,8 +481,8 @@ static TILE_GET_INFO( pteacher_get_info1_1 ) { pteacher_info( machine, tileinfo,
 INLINE void lemnangl_info( running_machine *machine, tile_data *tileinfo, int tile_index, int page, int layer, int gfxset, int gfxbank )
 {
 	int addr  = tile_index * 2 + 0x1000 * layer + 0x2000 * page;
-	int attr  = videoram[addr];
-	int code  = videoram[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
+	int attr  = machine->generic.videoram.u8[addr];
+	int code  = machine->generic.videoram.u8[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
 	int color = 16 * (attr >> 3) + gfxbank;
 
 	SET_TILE_INFO( 2*layer + gfxset, code, color, homedata_flipscreen );
@@ -564,19 +564,19 @@ VIDEO_START( lemnangl )
 
 WRITE8_HANDLER( mrokumei_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty( bg_tilemap[(offset & 0x2000) >> 13][(offset & 0x1000) >> 12], (offset & 0xffe) >> 1 );
 }
 
 WRITE8_HANDLER( reikaids_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty( bg_tilemap[(offset & 0x2000) >> 13][offset & 3], (offset & 0xffc) >> 2 );
 }
 
 WRITE8_HANDLER( pteacher_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty( bg_tilemap[(offset & 0x2000) >> 13][(offset & 0x1000) >> 12], (offset & 0xffe) >> 1 );
 }
 

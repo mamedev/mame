@@ -91,6 +91,7 @@ static TILE_GET_INFO( get_fore_tile_info )
 
 static void draw_sprites(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
+	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	int offs,fx,fy,x,y,color,sprite;
 
 	for (offs = 3;offs <= 0x400-5;offs += 4)
@@ -138,7 +139,7 @@ VIDEO_START( goal92 )
 	foreground_layer = tilemap_create(machine, get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
 	text_layer       = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
 
-	buffered_spriteram16 = auto_alloc_array(machine, UINT16, 0x400*2);
+	machine->generic.buffered_spriteram.u16 = auto_alloc_array(machine, UINT16, 0x400*2);
 
 	tilemap_set_transparent_pen(background_layer,15);
 	tilemap_set_transparent_pen(foreground_layer,15);
@@ -182,5 +183,5 @@ VIDEO_UPDATE( goal92 )
 
 VIDEO_EOF( goal92 )
 {
-	memcpy(buffered_spriteram16,spriteram16,0x400*2);
+	memcpy(machine->generic.buffered_spriteram.u16,machine->generic.spriteram.u16,0x400*2);
 }

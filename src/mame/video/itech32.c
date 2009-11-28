@@ -204,12 +204,12 @@ VIDEO_START( itech32 )
 	int i;
 
 	/* allocate memory */
-	videoram16 = auto_alloc_array(machine, UINT16, VRAM_WIDTH * (itech32_vram_height + 16) * 2);
-	memset(videoram16, 0xff, VRAM_WIDTH * (itech32_vram_height + 16) * 2 * 2);
+	machine->generic.videoram.u16 = auto_alloc_array(machine, UINT16, VRAM_WIDTH * (itech32_vram_height + 16) * 2);
+	memset(machine->generic.videoram.u16, 0xff, VRAM_WIDTH * (itech32_vram_height + 16) * 2 * 2);
 
 	/* videoplane[0] is the foreground; videoplane[1] is the background */
-	videoplane[0] = &videoram16[0 * VRAM_WIDTH * (itech32_vram_height + 16) + 8 * VRAM_WIDTH];
-	videoplane[1] = &videoram16[1 * VRAM_WIDTH * (itech32_vram_height + 16) + 8 * VRAM_WIDTH];
+	videoplane[0] = &machine->generic.videoram.u16[0 * VRAM_WIDTH * (itech32_vram_height + 16) + 8 * VRAM_WIDTH];
+	videoplane[1] = &machine->generic.videoram.u16[1 * VRAM_WIDTH * (itech32_vram_height + 16) + 8 * VRAM_WIDTH];
 
 	/* set the masks */
 	vram_mask = VRAM_WIDTH * itech32_vram_height - 1;
@@ -343,11 +343,11 @@ WRITE16_HANDLER( timekill_paletteram_w )
 {
 	int r, g, b;
 
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 
-	r = paletteram16[offset & ~1] & 0xff;
-	g = paletteram16[offset & ~1] >> 8;
-	b = paletteram16[offset |  1] >> 8;
+	r = space->machine->generic.paletteram.u16[offset & ~1] & 0xff;
+	g = space->machine->generic.paletteram.u16[offset & ~1] >> 8;
+	b = space->machine->generic.paletteram.u16[offset |  1] >> 8;
 
 	palette_set_color(space->machine, offset / 2, MAKE_RGB(r, g, b));
 }
@@ -360,11 +360,11 @@ WRITE16_HANDLER( bloodstm_paletteram_w )
 	/* in test mode, the LSB is used; in game mode, the MSB is used */
 	if (!ACCESSING_BITS_0_7 && (offset & 1))
 		data >>= 8, mem_mask >>= 8;
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 
-	r = paletteram16[offset & ~1] & 0xff;
-	g = paletteram16[offset & ~1] >> 8;
-	b = paletteram16[offset |  1] & 0xff;
+	r = space->machine->generic.paletteram.u16[offset & ~1] & 0xff;
+	g = space->machine->generic.paletteram.u16[offset & ~1] >> 8;
+	b = space->machine->generic.paletteram.u16[offset |  1] & 0xff;
 
 	palette_set_color(space->machine, offset / 2, MAKE_RGB(r, g, b));
 }
@@ -374,11 +374,11 @@ WRITE32_HANDLER( drivedge_paletteram_w )
 {
 	int r, g, b;
 
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
-	r = paletteram32[offset] & 0xff;
-	g = (paletteram32[offset] >> 8) & 0xff;
-	b = (paletteram32[offset] >> 16) & 0xff;
+	r = space->machine->generic.paletteram.u32[offset] & 0xff;
+	g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
+	b = (space->machine->generic.paletteram.u32[offset] >> 16) & 0xff;
 
 	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
 }
@@ -388,11 +388,11 @@ WRITE32_HANDLER( itech020_paletteram_w )
 {
 	int r, g, b;
 
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
-	r = (paletteram32[offset] >> 16) & 0xff;
-	g = (paletteram32[offset] >> 8) & 0xff;
-	b = paletteram32[offset] & 0xff;
+	r = (space->machine->generic.paletteram.u32[offset] >> 16) & 0xff;
+	g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
+	b = space->machine->generic.paletteram.u32[offset] & 0xff;
 
 	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
 }

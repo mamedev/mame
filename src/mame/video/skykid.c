@@ -116,9 +116,9 @@ VIDEO_START( skykid )
 
 	tilemap_set_transparent_pen(tx_tilemap, 0);
 
-	spriteram = skykid_spriteram + 0x780;
-	spriteram_2 = spriteram + 0x0800;
-	spriteram_3 = spriteram_2 + 0x0800;
+	machine->generic.spriteram.u8 = skykid_spriteram + 0x780;
+	machine->generic.spriteram2.u8 = machine->generic.spriteram.u8 + 0x0800;
+	machine->generic.spriteram3.u8 = machine->generic.spriteram2.u8 + 0x0800;
 
 	state_save_register_global(machine, priority);
 	state_save_register_global(machine, scroll_x);
@@ -184,6 +184,9 @@ WRITE8_HANDLER( skykid_flipscreen_priority_w )
 /* the sprite generator IC is the same as Mappy */
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
+	UINT8 *spriteram_3 = machine->generic.spriteram3.u8;
 	int offs;
 
 	for (offs = 0;offs < 0x80;offs += 2)

@@ -91,6 +91,7 @@ VIDEO_START( magmax )
 
 VIDEO_UPDATE( magmax )
 {
+	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
 	int offs;
 
 	/* bit 2 flip screen */
@@ -175,7 +176,7 @@ VIDEO_UPDATE( magmax )
 	}
 
 	/* draw the sprites */
-	for (offs = 0; offs < spriteram_size/2; offs += 4)
+	for (offs = 0; offs < screen->machine->generic.spriteram_size/2; offs += 4)
 	{
 		int sx, sy;
 
@@ -221,7 +222,7 @@ VIDEO_UPDATE( magmax )
 		//int page = (*magmax_vreg>>3) & 0x1;
 		int code;
 
-		code = videoram16[offs /*+ page*/] & 0xff;
+		code = screen->machine->generic.videoram.u16[offs /*+ page*/] & 0xff;
 		if (code)
 		{
 			int sx = (offs % 32);

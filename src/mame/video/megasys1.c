@@ -247,7 +247,7 @@ VIDEO_START( megasys1 )
 {
 	int i;
 
-	spriteram16 = &megasys1_ram[0x8000/2];
+	machine->generic.spriteram.u16 = &megasys1_ram[0x8000/2];
 
 	megasys1_buffer_objectram = auto_alloc_array(machine, UINT16, 0x2000);
 	megasys1_buffer_spriteram16 = auto_alloc_array(machine, UINT16, 0x2000);
@@ -633,6 +633,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}	/* non Z hw */
 	else
 	{
+		UINT16 *spriteram16 = machine->generic.spriteram.u16;
 
 		/* MS1-Z just draws Sprite Data, and in reverse order */
 
@@ -1036,7 +1037,7 @@ VIDEO_EOF( megasys1 )
 	memcpy(megasys1_buffer_objectram, megasys1_objectram, 0x2000);
 //spriteram16
 	memcpy(megasys1_buffer2_spriteram16, megasys1_buffer_spriteram16, 0x2000);
-	memcpy(megasys1_buffer_spriteram16, spriteram16, 0x2000);
+	memcpy(megasys1_buffer_spriteram16, machine->generic.spriteram.u16, 0x2000);
 
 }
 

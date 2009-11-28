@@ -128,7 +128,7 @@ PALETTE_INIT( portrait )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 *source = spriteram;
+	UINT8 *source = machine->generic.spriteram.u8;
 	UINT8 *finish = source + 0x200;
 
 	while( source < finish )
@@ -151,7 +151,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		if(attr & 0x08) sy |= 0x100;
 
-		sx += (source - spriteram) - 8;
+		sx += (source - machine->generic.spriteram.u8) - 8;
 		sx &= 0x1ff;
 
 		sy = (512 - 64) - sy;

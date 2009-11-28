@@ -341,7 +341,7 @@ VIDEO_UPDATE( astrocde )
 			int xx;
 
 			/* select either video data or background data */
-			data = (effx >= 0 && effx < 80 && effy >= 0 && effy < vblank) ? videoram[offset++] : bgdata;
+			data = (effx >= 0 && effx < 80 && effy >= 0 && effy < vblank) ? screen->machine->generic.videoram.u8[offset++] : bgdata;
 
 			/* iterate over the 4 pixels */
 			for (xx = 0; xx < 4; xx++)

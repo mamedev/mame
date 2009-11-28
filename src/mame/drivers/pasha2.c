@@ -110,14 +110,14 @@ static WRITE16_HANDLER( pasha2_misc_w )
 static WRITE16_HANDLER( pasha2_palette_w )
 {
 	int color;
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 
 	offset &= 0xff;
 
-	color = (paletteram16[offset] >> 8) | (paletteram16[offset+0x100] & 0xff00);
+	color = (space->machine->generic.paletteram.u16[offset] >> 8) | (space->machine->generic.paletteram.u16[offset+0x100] & 0xff00);
 	palette_set_color_rgb(space->machine,offset*2+0,pal5bit(color),pal5bit(color >> 5),pal5bit(color >> 10));
 
-	color = (paletteram16[offset] & 0xff) | ((paletteram16[offset+0x100] & 0xff) << 8);
+	color = (space->machine->generic.paletteram.u16[offset] & 0xff) | ((space->machine->generic.paletteram.u16[offset+0x100] & 0xff) << 8);
 	palette_set_color_rgb(space->machine,offset*2+1,pal5bit(color),pal5bit(color >> 5),pal5bit(color >> 10));
 }
 
@@ -207,7 +207,7 @@ static ADDRESS_MAP_START( pasha2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x40074000, 0x40074001) AM_WRITE(vbuffer_set_w)
 	AM_RANGE(0x40078000, 0x40078001) AM_WRITENOP //once at startup -> to disable the eeprom?
 	AM_RANGE(0x80000000, 0x803fffff) AM_ROMBANK(1)
-	AM_RANGE(0xe0000000, 0xe00003ff) AM_RAM_WRITE(pasha2_palette_w) AM_BASE(&paletteram16) //tilemap? palette?
+	AM_RANGE(0xe0000000, 0xe00003ff) AM_RAM_WRITE(pasha2_palette_w) AM_BASE_GENERIC(paletteram) //tilemap? palette?
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 

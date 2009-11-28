@@ -31,7 +31,7 @@ PALETTE_INIT( truco );
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM										/* general purpose ram */
-	AM_RANGE(0x1800, 0x7bff) AM_RAM AM_BASE(&videoram)					/* video ram */
+	AM_RANGE(0x1800, 0x7bff) AM_RAM AM_BASE_GENERIC(videoram)					/* video ram */
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_BASE(&battery_ram)				/* battery backed ram */
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P1") AM_WRITENOP				/* controls (and irq ack?) */
 	AM_RANGE(0x8001, 0x8001) AM_READWRITE(SMH_NOP, SMH_NOP)				/* unknown */

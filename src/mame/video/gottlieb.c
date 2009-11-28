@@ -32,15 +32,15 @@ WRITE8_HANDLER( gottlieb_paletteram_w )
 {
 	int r, g, b, a, val;
 
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 
 	/* blue & green are encoded in the even bytes */
-	val = paletteram[offset & ~1];
+	val = space->machine->generic.paletteram.u8[offset & ~1];
 	g = combine_4_weights(weights, (val >> 4) & 1, (val >> 5) & 1, (val >> 6) & 1, (val >> 7) & 1);
 	b = combine_4_weights(weights, (val >> 0) & 1, (val >> 1) & 1, (val >> 2) & 1, (val >> 3) & 1);
 
 	/* red is encoded in the odd bytes */
-	val = paletteram[offset | 1];
+	val = space->machine->generic.paletteram.u8[offset | 1];
 	r = combine_4_weights(weights, (val >> 0) & 1, (val >> 1) & 1, (val >> 2) & 1, (val >> 3) & 1);
 
 	/* alpha is set to 0 if laserdisc video is enabled */
@@ -99,7 +99,7 @@ WRITE8_HANDLER( gottlieb_laserdisc_video_control_w )
 
 	/* configure the palette if the laserdisc is enabled */
 	transparent0 = (data >> 3) & 1;
-	gottlieb_paletteram_w(space, 0, paletteram[0]);
+	gottlieb_paletteram_w(space, 0, space->machine->generic.paletteram.u8[0]);
 }
 
 
@@ -112,7 +112,7 @@ WRITE8_HANDLER( gottlieb_laserdisc_video_control_w )
 
 WRITE8_HANDLER( gottlieb_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -136,7 +136,7 @@ WRITE8_HANDLER( gottlieb_charram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index];
+	int code = machine->generic.videoram.u8[tile_index];
 	if ((code & 0x80) == 0)
 		SET_TILE_INFO(gottlieb_gfxcharlo, code, 0, 0);
 	else
@@ -145,7 +145,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_screwloo_bg_tile_info )
 {
-	int code = videoram[tile_index];
+	int code = machine->generic.videoram.u8[tile_index];
 	if ((code & 0xc0) == 0)
 		SET_TILE_INFO(gottlieb_gfxcharlo, code, 0, 0);
 	else
@@ -215,6 +215,7 @@ VIDEO_START( screwloo )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	rectangle clip = *cliprect;
     int offs;
 

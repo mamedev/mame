@@ -60,7 +60,7 @@ VIDEO_START( balsente )
 
 WRITE8_HANDLER( balsente_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 
 	/* expand the two pixel values into two bytes */
 	local_videoram[offset * 2 + 0] = data >> 4;
@@ -100,11 +100,11 @@ WRITE8_HANDLER( balsente_paletteram_w )
 {
 	int r, g, b;
 
-	paletteram[offset] = data & 0x0f;
+	space->machine->generic.paletteram.u8[offset] = data & 0x0f;
 
-	r = paletteram[(offset & ~3) + 0];
-	g = paletteram[(offset & ~3) + 1];
-	b = paletteram[(offset & ~3) + 2];
+	r = space->machine->generic.paletteram.u8[(offset & ~3) + 0];
+	g = space->machine->generic.paletteram.u8[(offset & ~3) + 1];
+	b = space->machine->generic.paletteram.u8[(offset & ~3) + 2];
 
 	palette_set_color_rgb(space->machine, offset / 4, pal4bit(r), pal4bit(g), pal4bit(b));
 }
@@ -231,7 +231,7 @@ VIDEO_UPDATE( balsente )
 
 	/* draw the sprite images */
 	for (i = 0; i < 40; i++)
-		draw_one_sprite(screen->machine, bitmap, cliprect, &spriteram[(0xe0 + i * 4) & 0xff]);
+		draw_one_sprite(screen->machine, bitmap, cliprect, &screen->machine->generic.spriteram.u8[(0xe0 + i * 4) & 0xff]);
 
 	return 0;
 }

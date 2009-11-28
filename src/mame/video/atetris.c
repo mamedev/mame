@@ -19,8 +19,8 @@ static tilemap *bg_tilemap;
 
 static TILE_GET_INFO( get_tile_info )
 {
-	int code = videoram[tile_index * 2] | ((videoram[tile_index * 2 + 1] & 7) << 8);
-	int color = (videoram[tile_index * 2 + 1] & 0xf0) >> 4;
+	int code = machine->generic.videoram.u8[tile_index * 2] | ((machine->generic.videoram.u8[tile_index * 2 + 1] & 7) << 8);
+	int color = (machine->generic.videoram.u8[tile_index * 2 + 1] & 0xf0) >> 4;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -35,7 +35,7 @@ static TILE_GET_INFO( get_tile_info )
 
 WRITE8_HANDLER( atetris_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 

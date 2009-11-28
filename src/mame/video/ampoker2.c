@@ -114,15 +114,15 @@ PALETTE_INIT( ampoker2 )
 
 WRITE8_HANDLER( ampoker2_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int offs = tile_index * 2;
-	int attr = videoram[offs + 1];
-	int code = videoram[offs];
+	int attr = machine->generic.videoram.u8[offs + 1];
+	int code = machine->generic.videoram.u8[offs];
 	int color = attr;
 	code = code + (256 * (color & 0x03));   /* code = color.bit1 + color.bit0 + code */
 	color = color >> 1;	                    /* color = color - bit0 (bit1..bit7) */
@@ -133,8 +133,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( s2k_get_bg_tile_info )
 {
 	int offs = tile_index * 2;
-	int attr = videoram[offs + 1];
-	int code = videoram[offs];
+	int attr = machine->generic.videoram.u8[offs + 1];
+	int code = machine->generic.videoram.u8[offs];
 	int color = attr;
 	code = code + (256 * (color & 0x0f));	/* the game uses 2 extra bits */
 	color = color >> 1;

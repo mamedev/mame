@@ -129,10 +129,13 @@ READ8_HANDLER( vastar_bg2videoram_r )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
+	UINT8 *spriteram_3 = machine->generic.spriteram3.u8;
 	int offs;
 
 
-	for (offs = 0; offs < spriteram_size; offs += 2)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 2)
 	{
 		int code, sx, sy, color, flipx, flipy;
 

@@ -233,8 +233,8 @@ WRITE16_HANDLER( atarisy2_paletteram_w )
 
 	int newword, inten, red, green, blue;
 
-	COMBINE_DATA(&paletteram16[offset]);
-	newword = paletteram16[offset];
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	newword = space->machine->generic.paletteram.u16[offset];
 
 	inten = intensity_table[newword & 15];
 	red = (color_table[(newword >> 12) & 15] * inten) >> 4;

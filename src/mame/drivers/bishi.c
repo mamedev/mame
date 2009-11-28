@@ -141,7 +141,7 @@ static INTERRUPT_GEN(bishi_interrupt)
 /* compensate for a bug in the ram/rom test */
 static READ16_HANDLER( bishi_mirror_r )
 {
-	return paletteram16[offset];
+	return space->machine->generic.paletteram.u16[offset];
 }
 
 static READ16_HANDLER( bishi_K056832_rom_r )
@@ -177,7 +177,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x870000, 0x8700ff) AM_WRITE(K055555_word_w)	// PCU2
 	AM_RANGE(0x880000, 0x880003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0xff00)
 	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(K056832_ram_word_r, K056832_ram_word_w)	// Graphic planes
-	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xb04000, 0xb047ff) AM_READ(bishi_mirror_r)	// bug in the ram/rom test?
 	AM_RANGE(0xc00000, 0xc01fff) AM_READ(bishi_K056832_rom_r)
 ADDRESS_MAP_END

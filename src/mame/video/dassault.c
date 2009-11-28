@@ -11,6 +11,7 @@
 
 static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int pf_priority)
 {
+	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
 	int offs, bank, gfxbank;
 	const UINT16 *spritebase;
@@ -30,7 +31,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 			}
 			else
 			{
-				spritebase=buffered_spriteram16_2;
+				spritebase=machine->generic.buffered_spriteram2.u16;
 				gfxbank=4;
 			}
 

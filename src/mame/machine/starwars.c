@@ -71,7 +71,7 @@ static TIMER_CALLBACK( math_run_clear )
 
 WRITE8_HANDLER( starwars_nstore_w )
 {
-	memcpy (space->machine->generic.nvram.ptr.v, starwars_ram_overlay, space->machine->generic.nvram.size);
+	memcpy (space->machine->generic.nvram.v, starwars_ram_overlay, space->machine->generic.nvram_size);
 }
 
 /*************************************
@@ -113,7 +113,7 @@ WRITE8_HANDLER( starwars_out_w )
 			break;
 
 		case 7:		/* NVRAM array recall */
-			memcpy (starwars_ram_overlay, space->machine->generic.nvram.ptr.v, space->machine->generic.nvram.size);
+			memcpy (starwars_ram_overlay, space->machine->generic.nvram.v, space->machine->generic.nvram_size);
 			break;
 	}
 }

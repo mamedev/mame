@@ -154,6 +154,8 @@ VIDEO_UPDATE(sub)
 	1 --cc cccc color
 	*/
 	{
+		UINT8 *spriteram = screen->machine->generic.spriteram.u8;
+		UINT8 *spriteram_2 = screen->machine->generic.spriteram2.u8;
 		UINT8 x,y,spr_offs,i,col,fx,fy;
 
 		for(i=0;i<0x40;i+=2)
@@ -202,8 +204,8 @@ static ADDRESS_MAP_START( subm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE(&sub_attr)
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE(&sub_vid)
-	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_BASE(&spriteram)
-	AM_RANGE(0xd800, 0xd83f) AM_RAM AM_BASE(&spriteram_2)
+	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0xd800, 0xd83f) AM_RAM AM_BASE_GENERIC(spriteram2)
 	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE(&sub_scrolly)
 
 	AM_RANGE(0xe000, 0xe000) AM_NOP

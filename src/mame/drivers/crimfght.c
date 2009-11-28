@@ -345,7 +345,7 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 	if (lines & 0x20)
 	{
 		memory_install_readwrite8_handler(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, (read8_space_func)SMH_BANK(3), paletteram_xBBBBBGGGGGRRRRR_be_w);
-		memory_set_bankptr(device->machine, 3, paletteram);
+		memory_set_bankptr(device->machine, 3, device->machine->generic.paletteram.v);
 	}
 	else
 		memory_install_readwrite8_handler(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));								/* RAM */

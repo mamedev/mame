@@ -100,9 +100,9 @@ static void update_palette(running_machine *machine)
 
 	for(i = 0; i < 0x800; i++)
 	{
-		r = paletteram16[i] >>  0 & 0x1F;
-		g = paletteram16[i] >>  5 & 0x1F;
-		b = paletteram16[i] >> 10 & 0x1F;
+		r = machine->generic.paletteram.u16[i] >>  0 & 0x1F;
+		g = machine->generic.paletteram.u16[i] >>  5 & 0x1F;
+		b = machine->generic.paletteram.u16[i] >> 10 & 0x1F;
 
 		if(brg < 0) {
 			r += (r * brg) >> 5;
@@ -517,7 +517,7 @@ static ADDRESS_MAP_START( srmp6, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0)
 
 	AM_RANGE(0x300000, 0x300005) AM_READWRITE(srmp6_inputs_r, srmp6_input_select_w)		// inputs
-	AM_RANGE(0x480000, 0x480fff) AM_RAM_WRITE(paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x480000, 0x480fff) AM_RAM_WRITE(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x4d0000, 0x4d0001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
 
 	// OBJ RAM: checked [$400000-$47dfff]

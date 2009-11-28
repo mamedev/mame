@@ -25,7 +25,7 @@ static tilemap *bg_tilemap;
 
 WRITE8_HANDLER( tinvader_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -129,7 +129,7 @@ static int SpriteCollision(running_machine *machine, int first,int second)
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index];
+	int code = machine->generic.videoram.u8[tile_index];
 
 	SET_TILE_INFO(0, code, 0, 0);
 }

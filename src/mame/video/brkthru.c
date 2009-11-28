@@ -189,7 +189,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
         ---- ---- ---- ---- ---- ---- xxxx xxxx = X position
     */
 
-	for (offs = 0;offs < spriteram_size; offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size; offs += 4)
 	{
 		if ((state->spriteram[offs] & 0x09) == prio)	/* Enable && Low Priority */
 		{

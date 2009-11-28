@@ -92,18 +92,18 @@ WRITE16_HANDLER( bestbest_flipscreen_w )
 
 VIDEO_START( suna16 )
 {
-	paletteram16 = auto_alloc_array(machine, UINT16, machine->config->total_colors);
+	machine->generic.paletteram.u16 = auto_alloc_array(machine, UINT16, machine->config->total_colors);
 }
 
 READ16_HANDLER( suna16_paletteram16_r )
 {
-	return paletteram16[offset + color_bank * 256];
+	return space->machine->generic.paletteram.u16[offset + color_bank * 256];
 }
 
 WRITE16_HANDLER( suna16_paletteram16_w )
 {
 	offset += color_bank * 256;
-	data = COMBINE_DATA(&paletteram16[offset]);
+	data = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 	palette_set_color_rgb( space->machine, offset, pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 }
 
@@ -219,7 +219,7 @@ VIDEO_UPDATE( suna16 )
 {
 	/* Suna Quiz indicates the background is the last pen */
 	bitmap_fill(bitmap,cliprect,0xff);
-	draw_sprites(screen->machine, bitmap, cliprect, spriteram16, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.spriteram.u16, 0);
 	return 0;
 }
 
@@ -238,7 +238,7 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 
 	/* Suna Quiz indicates the background is the last pen */
 	bitmap_fill(bitmap,cliprect,0xff);
-	if (layers_ctrl & 1)	draw_sprites(screen->machine, bitmap, cliprect, spriteram16,   0);
-	if (layers_ctrl & 2)	draw_sprites(screen->machine, bitmap, cliprect, spriteram16_2, 1);
+	if (layers_ctrl & 1)	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.spriteram.u16,   0);
+	if (layers_ctrl & 2)	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.spriteram2.u16, 1);
 	return 0;
 }

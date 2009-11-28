@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(sound_command_w)
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(mainsnk_bgram_w) AM_BASE(&mainsnk_bgram)
 	AM_RANGE(0xdc00, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(mainsnk_fgram_w) AM_BASE(&mainsnk_fgram)	// + work RAM
 ADDRESS_MAP_END
 

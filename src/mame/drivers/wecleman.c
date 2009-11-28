@@ -543,9 +543,9 @@ static ADDRESS_MAP_START( wecleman_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_BASE(&blitter_regs)	// Blitter
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(wecleman_pageram_w) AM_BASE(&wecleman_pageram)	// Background Layers
 	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(wecleman_txtram_w) AM_BASE(&wecleman_txtram)	// Text Layer
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x124000, 0x127fff) AM_RAM AM_SHARE(1)	// Shared with main CPU
-	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE(&spriteram16)	// Sprites
+	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(wecleman_soundlatch_w)	// To sound CPU
 	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)	// Selects accelerator / wheel / ..
 	AM_RANGE(0x140004, 0x140005) AM_WRITE(irqctrl_w)	// Main CPU controls the other CPUs
@@ -604,9 +604,9 @@ static ADDRESS_MAP_START( hotchase_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x101000, 0x10101f) AM_WRITE(hotchase_K051316_ctrl_0_w)	// Background Ctrl
 	AM_RANGE(0x102000, 0x102fff) AM_READWRITE(hotchase_K051316_1_r, hotchase_K051316_1_w)	// Foreground
 	AM_RANGE(0x103000, 0x10301f) AM_WRITE(hotchase_K051316_ctrl_1_w)	// Foreground Ctrl
-	AM_RANGE(0x110000, 0x111fff) AM_RAM_WRITE(hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x110000, 0x111fff) AM_RAM_WRITE(hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE(1)					// Shared with sub CPU
-	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE(&spriteram16)	// Sprites
+	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE_GENERIC(spriteram)	// Sprites
 	// Input Ports:
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(hotchase_soundlatch_w)	// To sound CPU
 	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)	// Selects accelerator / wheel /

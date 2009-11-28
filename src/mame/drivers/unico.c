@@ -80,8 +80,8 @@ static ADDRESS_MAP_START( burglarx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(unico_vram_2_w) AM_BASE(&unico_vram_2	)		//
 	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(unico_vram_0_w) AM_BASE(&unico_vram_0	)		//
 	AM_RANGE(0x920000, 0x923fff) AM_RAM														// ? 0
-	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE(unico_palette_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE(unico_palette_w) AM_BASE_GENERIC(paletteram)	// Palette
 ADDRESS_MAP_END
 
 
@@ -175,8 +175,8 @@ static ADDRESS_MAP_START( zeropnt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(unico_vram_2_w) AM_BASE(&unico_vram_2	)	//
 	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(unico_vram_0_w) AM_BASE(&unico_vram_0	)	//
 	AM_RANGE(0x920000, 0x923fff) AM_RAM	// ? 0
-	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE(unico_palette_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE(unico_palette_w) AM_BASE_GENERIC(paletteram)	// Palette
 ADDRESS_MAP_END
 
 
@@ -250,8 +250,8 @@ static ADDRESS_MAP_START( zeropnt2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(unico_vram32_2_w) AM_BASE(&unico_vram32_2	)	//
 	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(unico_vram32_0_w) AM_BASE(&unico_vram32_0	)	//
 	AM_RANGE(0x920000, 0x923fff) AM_RAM											// ? 0
-	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE(unico_palette32_w) AM_BASE(&paletteram32	)	// Palette
+	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE(unico_palette32_w) AM_BASE_GENERIC(paletteram )	// Palette
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM											// RAM
 ADDRESS_MAP_END
 

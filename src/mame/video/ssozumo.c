@@ -46,13 +46,13 @@ PALETTE_INIT( ssozumo )
 
 WRITE8_HANDLER( ssozumo_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( ssozumo_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -74,24 +74,24 @@ WRITE8_HANDLER( ssozumo_paletteram_w )
 	int	r, g, b;
 	int	offs2;
 
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 	offs2 = offset & 0x0f;
 
-	val = paletteram[offs2];
+	val = space->machine->generic.paletteram.u8[offs2];
 	bit0 = (val >> 0) & 0x01;
 	bit1 = (val >> 1) & 0x01;
 	bit2 = (val >> 2) & 0x01;
 	bit3 = (val >> 3) & 0x01;
 	r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	val = paletteram[offs2 | 0x10];
+	val = space->machine->generic.paletteram.u8[offs2 | 0x10];
 	bit0 = (val >> 0) & 0x01;
 	bit1 = (val >> 1) & 0x01;
 	bit2 = (val >> 2) & 0x01;
 	bit3 = (val >> 3) & 0x01;
 	g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	val = paletteram[offs2 | 0x20];
+	val = space->machine->generic.paletteram.u8[offs2 | 0x20];
 	bit0 = (val >> 0) & 0x01;
 	bit1 = (val >> 1) & 0x01;
 	bit2 = (val >> 2) & 0x01;
@@ -113,8 +113,8 @@ WRITE8_HANDLER( ssozumo_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index] + ((colorram[tile_index] & 0x08) << 5);
-	int color = (colorram[tile_index] & 0x30) >> 4;
+	int code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x08) << 5);
+	int color = (machine->generic.colorram.u8[tile_index] & 0x30) >> 4;
 	int flags = ((tile_index % 32) >= 16) ? TILE_FLIPY : 0;
 
 	SET_TILE_INFO(1, code, color, flags);
@@ -141,9 +141,10 @@ VIDEO_START( ssozumo )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = 0; offs < spriteram_size; offs += 4)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
 	{
 		if (spriteram[offs] & 0x01)
 		{

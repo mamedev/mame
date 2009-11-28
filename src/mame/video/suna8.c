@@ -95,8 +95,8 @@ static TILE_GET_INFO( get_tile_info )
 		code = rom[ 2 * tile_index + 0 ];
 		attr = rom[ 2 * tile_index + 1 ];	}
 	else
-	{	code = spriteram[ 2 * tile_index + 0 ];
-		attr = spriteram[ 2 * tile_index + 1 ];	}
+	{	code = machine->generic.spriteram.u8[ 2 * tile_index + 0 ];
+		attr = machine->generic.spriteram.u8[ 2 * tile_index + 1 ];	}
 	SET_TILE_INFO(
 			0,
 			( (attr & 0x03) << 8 ) + code + tiles*0x400,
@@ -109,18 +109,18 @@ static TILE_GET_INFO( get_tile_info )
 READ8_HANDLER( suna8_banked_paletteram_r )
 {
 	offset += suna8_palettebank * 0x200;
-	return paletteram[offset];
+	return space->machine->generic.paletteram.u8[offset];
 }
 
 READ8_HANDLER( suna8_banked_spriteram_r )
 {
 	offset += suna8_spritebank * 0x2000;
-	return spriteram[offset];
+	return space->machine->generic.spriteram.u8[offset];
 }
 
 WRITE8_HANDLER( suna8_spriteram_w )
 {
-	spriteram[offset] = data;
+	space->machine->generic.spriteram.u8[offset] = data;
 #if TILEMAPS
 	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
 #endif
@@ -129,7 +129,7 @@ WRITE8_HANDLER( suna8_spriteram_w )
 WRITE8_HANDLER( suna8_banked_spriteram_w )
 {
 	offset += suna8_spritebank * 0x2000;
-	spriteram[offset] = data;
+	space->machine->generic.spriteram.u8[offset] = data;
 #if TILEMAPS
 	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
 #endif
@@ -143,8 +143,8 @@ WRITE8_HANDLER( brickzn_banked_paletteram_w )
 	int r,g,b;
 	UINT16 rgb;
 	offset += suna8_palettebank * 0x200;
-	paletteram[offset] = data;
-	rgb = (paletteram[offset&~1] << 8) + paletteram[offset|1];
+	space->machine->generic.paletteram.u8[offset] = data;
+	rgb = (space->machine->generic.paletteram.u8[offset&~1] << 8) + space->machine->generic.paletteram.u8[offset|1];
 	r	=	(((rgb & (1<<0xc))?1:0)<<0) |
 			(((rgb & (1<<0xb))?1:0)<<1) |
 			(((rgb & (1<<0xe))?1:0)<<2) |
@@ -168,8 +168,8 @@ static void suna8_vh_start_common(running_machine *machine, int dim)
 	suna8_text_dim = dim;
 	if (!(suna8_text_dim > 0))
 	{
-		paletteram	=	auto_alloc_array(machine, UINT8, 0x200 * 2);
-		spriteram	=	auto_alloc_array(machine, UINT8, 0x2000 * 2);
+		machine->generic.paletteram.u8	=	auto_alloc_array(machine, UINT8, 0x200 * 2);
+		machine->generic.spriteram.u8	=	auto_alloc_array(machine, UINT8, 0x2000 * 2);
 		suna8_spritebank  = 0;
 		suna8_palettebank = 0;
 	}
@@ -197,6 +197,7 @@ VIDEO_START( suna8_textdim12 )	{ suna8_vh_start_common(machine, 12); }
 
 static void draw_normal_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int i;
 	int mx = 0;	// multisprite x counter
 
@@ -327,6 +328,7 @@ static void draw_normal_sprites(running_machine *machine, bitmap_t *bitmap,const
 
 static void draw_text_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int i;
 
 	int max_x = video_screen_get_width(machine->primary_screen) - 8;

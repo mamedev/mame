@@ -64,7 +64,7 @@ static ADDRESS_MAP_START( clshroad_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x95ff) AM_RAM
 	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x9800, 0x9dff) AM_RAM
-	AM_RANGE(0x9e00, 0x9fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9e00, 0x9fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	// ? Interrupt related
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(clshroad_flipscreen_w)
 	AM_RANGE(0xa100, 0xa107) AM_READ(clshroad_input_r)

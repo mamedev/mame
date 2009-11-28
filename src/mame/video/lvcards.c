@@ -82,20 +82,20 @@ PALETTE_INIT( lvcards ) //Ever so slightly different, but different enough.
 
 WRITE8_HANDLER( lvcards_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( lvcards_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = colorram[tile_index];
-	int code = videoram[tile_index] + ((attr & 0x30) << 4) + ((attr & 0x80) << 3);
+	int attr = machine->generic.colorram.u8[tile_index];
+	int code = machine->generic.videoram.u8[tile_index] + ((attr & 0x30) << 4) + ((attr & 0x80) << 3);
 	int color = attr & 0x0f;
 	int flags = (attr & 0x40) ? TILE_FLIPX : 0;
 

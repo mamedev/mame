@@ -523,7 +523,7 @@ static ADDRESS_MAP_START( arkanoid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd018, 0xd018) AM_READWRITE(arkanoid_Z80_mcu_r, arkanoid_Z80_mcu_w)  /* input from the 68705 */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE_MEMBER(arkanoid_state, videoram)
-	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_MEMBER(arkanoid_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_MEMBER(arkanoid_state, spriteram) AM_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READNOP	/* fixes instant death in final level */
 ADDRESS_MAP_END
@@ -538,7 +538,7 @@ static ADDRESS_MAP_START( bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd018, 0xd018) AM_READ_PORT("MUX") AM_WRITENOP
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE_MEMBER(arkanoid_state, videoram)
-	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_MEMBER(arkanoid_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_MEMBER(arkanoid_state, spriteram) AM_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READNOP	/* fixes instant death in final level */
 ADDRESS_MAP_END

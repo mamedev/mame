@@ -36,7 +36,7 @@ WRITE8_HANDLER( zodiack_attributes_w )
 	{
 		int i;
 
-		for (i = offset / 2; i < videoram_size; i += 32)
+		for (i = offset / 2; i < space->machine->generic.videoram_size; i += 32)
 		{
 			tilemap_mark_tile_dirty(state->bg_tilemap, i);
 			tilemap_mark_tile_dirty(state->fg_tilemap, i);
@@ -173,7 +173,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	espial_state *state = (espial_state *)machine->driver_data;
 	int offs;
 
-	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int flipx, flipy, sx, sy, spritecode;
 

@@ -951,7 +951,7 @@ static WRITE16_HANDLER( atomicp_sound_w );
 static const segaic16_memory_map_entry rom_171_5358_info_small[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,                       misc_io_w,                        NULL,                  "I/O space" },
-	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, (read16_space_func)SMH_BANK(10), segaic16_paletteram_w,            &paletteram16,         "color RAM" },
+	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, (read16_space_func)SMH_BANK(10), segaic16_paletteram_w,            &segaic16_paletteram,  "color RAM" },
 	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, (read16_space_func)SMH_BANK(11), segaic16_tileram_0_w,             &segaic16_tileram_0,   "tile RAM" },
 	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, (read16_space_func)SMH_BANK(12), segaic16_textram_0_w,             &segaic16_textram_0,   "text RAM" },
 	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, (read16_space_func)SMH_BANK(13), (write16_space_func)SMH_BANK(13), &segaic16_spriteram_0, "object RAM" },
@@ -965,7 +965,7 @@ static const segaic16_memory_map_entry rom_171_5358_info_small[] =
 static const segaic16_memory_map_entry rom_171_5358_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,                       misc_io_w,                        NULL,                  "I/O space" },
-	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, (read16_space_func)SMH_BANK(10), segaic16_paletteram_w,            &paletteram16,         "color RAM" },
+	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, (read16_space_func)SMH_BANK(10), segaic16_paletteram_w,            &segaic16_paletteram,  "color RAM" },
 	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, (read16_space_func)SMH_BANK(11), segaic16_tileram_0_w,             &segaic16_tileram_0,   "tile RAM" },
 	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, (read16_space_func)SMH_BANK(12), segaic16_textram_0_w,             &segaic16_textram_0,   "text RAM" },
 	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, (read16_space_func)SMH_BANK(13), (write16_space_func)SMH_BANK(13), &segaic16_spriteram_0, "object RAM" },
@@ -979,7 +979,7 @@ static const segaic16_memory_map_entry rom_171_5358_info[] =
 static const segaic16_memory_map_entry rom_171_5704_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,                       misc_io_w,                        NULL,                  "I/O space" },
-	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, (read16_space_func)SMH_BANK(10), segaic16_paletteram_w,            &paletteram16,         "color RAM" },
+	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, (read16_space_func)SMH_BANK(10), segaic16_paletteram_w,            &segaic16_paletteram,  "color RAM" },
 	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, (read16_space_func)SMH_BANK(11), segaic16_tileram_0_w,             &segaic16_tileram_0,   "tile RAM" },
 	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, (read16_space_func)SMH_BANK(12), segaic16_textram_0_w,             &segaic16_textram_0,   "text RAM" },
 	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, (read16_space_func)SMH_BANK(13), (write16_space_func)SMH_BANK(13), &segaic16_spriteram_0, "object RAM" },
@@ -993,7 +993,7 @@ static const segaic16_memory_map_entry rom_171_5704_info[] =
 static const segaic16_memory_map_entry rom_atomicp_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,                       misc_io_w,                        NULL,                  "I/O space" },
-	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, (read16_space_func)SMH_BANK(10), segaic16_paletteram_w,            &paletteram16,         "color RAM" },
+	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, (read16_space_func)SMH_BANK(10), segaic16_paletteram_w,            &segaic16_paletteram,  "color RAM" },
 	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, (read16_space_func)SMH_BANK(11), segaic16_tileram_0_w,             &segaic16_tileram_0,   "tile RAM" },
 	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, (read16_space_func)SMH_BANK(12), segaic16_textram_0_w,             &segaic16_textram_0,   "text RAM" },
 	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, (read16_space_func)SMH_BANK(13), (write16_space_func)SMH_BANK(13), &segaic16_spriteram_0, "object RAM" },
@@ -1007,7 +1007,7 @@ static const segaic16_memory_map_entry rom_atomicp_info[] =
 static const segaic16_memory_map_entry rom_171_5797_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,                       misc_io_w,                        NULL,                  "I/O space" },
-	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, (read16_space_func)SMH_BANK(10), segaic16_paletteram_w,            &paletteram16,         "color RAM" },
+	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, (read16_space_func)SMH_BANK(10), segaic16_paletteram_w,            &segaic16_paletteram,  "color RAM" },
 	{ 0x35/2, 0x00000, 0x10000, 0xfe0000,      ~0, (read16_space_func)SMH_BANK(11), segaic16_tileram_0_w,             &segaic16_tileram_0,   "tile RAM" },
 	{ 0x35/2, 0x10000, 0x01000, 0xfef000,      ~0, (read16_space_func)SMH_BANK(12), segaic16_textram_0_w,             &segaic16_textram_0,   "text RAM" },
 	{ 0x31/2, 0x00000, 0x00800, 0xfff800,      ~0, (read16_space_func)SMH_BANK(13), (write16_space_func)SMH_BANK(13), &segaic16_spriteram_0, "object RAM" },
@@ -1053,7 +1053,7 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 
 	/* allocate memory for regions not autmatically assigned */
 	segaic16_spriteram_0 = auto_alloc_array(machine, UINT16, 0x00800/2);
-	paletteram16         = auto_alloc_array(machine, UINT16, 0x01000/2);
+	segaic16_paletteram  = auto_alloc_array(machine, UINT16, 0x01000/2);
 	segaic16_tileram_0   = auto_alloc_array(machine, UINT16, 0x10000/2);
 	segaic16_textram_0   = auto_alloc_array(machine, UINT16, 0x01000/2);
 	workram              = auto_alloc_array(machine, UINT16, 0x04000/2);

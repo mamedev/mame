@@ -913,7 +913,7 @@ static void RenderSprite(running_machine *machine, bitmap_t *bitmap, struct Scen
          }
          else
          {
-            code += nthword( &spriteram32[0x800/4], i+node->data.sprite.linkType*4 );
+            code += nthword( &machine->generic.spriteram.u32[0x800/4], i+node->data.sprite.linkType*4 );
          }
          poly3d_Draw3dSprite(
                bitmap,
@@ -1415,6 +1415,7 @@ DrawSprites( running_machine *machine, bitmap_t *bitmap, const rectangle *clipre
         0x9a0004:   palette, C381 ZC (depth cueing)
         ...
     */
+	UINT32 *spriteram32 = machine->generic.spriteram.u32;
 	int num_sprites = ((spriteram32[0x04/4]>>16)&0x3ff)+1;
 	const UINT32 *pSource = &spriteram32[0x4000/4];
 	const UINT32 *pPal = &spriteram32[0x20000/4];
@@ -1484,9 +1485,9 @@ static void UpdatePaletteS(running_machine *machine) /* for Super System22 - app
 			for( j=0; j<4; j++ )
 			{
 				int which = i*4+j;
-				int r = nthbyte(paletteram32,which+0x00000);
-				int g = nthbyte(paletteram32,which+0x08000);
-				int b = nthbyte(paletteram32,which+0x10000);
+				int r = nthbyte(machine->generic.paletteram.u32,which+0x00000);
+				int g = nthbyte(machine->generic.paletteram.u32,which+0x08000);
+				int b = nthbyte(machine->generic.paletteram.u32,which+0x10000);
 				palette_set_color( machine,which,MAKE_RGB(r,g,b) );
 			}
 			dirtypal[i] = 0;
@@ -1504,9 +1505,9 @@ static void UpdatePalette(running_machine *machine) /* for System22 - ignore gam
 			for( j=0; j<4; j++ )
 			{
 				int which = i*4+j;
-				int r = nthbyte(paletteram32,which+0x00000);
-				int g = nthbyte(paletteram32,which+0x08000);
-				int b = nthbyte(paletteram32,which+0x10000);
+				int r = nthbyte(machine->generic.paletteram.u32,which+0x00000);
+				int g = nthbyte(machine->generic.paletteram.u32,which+0x08000);
+				int b = nthbyte(machine->generic.paletteram.u32,which+0x10000);
 				palette_set_color( machine,which,MAKE_RGB(r,g,b) );
 			}
 			dirtypal[i] = 0;
@@ -2190,12 +2191,12 @@ WRITE32_HANDLER( namcos22_gamma_w )
 
 READ32_HANDLER( namcos22_paletteram_r )
 {
-	return paletteram32[offset];
+	return space->machine->generic.paletteram.u32[offset];
 }
 
 WRITE32_HANDLER( namcos22_paletteram_w )
 {
-	COMBINE_DATA( &paletteram32[offset] );
+	COMBINE_DATA( &space->machine->generic.paletteram.u32[offset] );
 	dirtypal[offset&(0x7fff/4)] = 1;
 }
 

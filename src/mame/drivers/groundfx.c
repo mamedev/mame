@@ -88,10 +88,10 @@ Extract a standard version of this
 static WRITE32_HANDLER( color_ram_w )
 {
 	int a,r,g,b;
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
 	{
-		a = paletteram32[offset];
+		a = space->machine->generic.paletteram.u32[offset];
 		r = (a &0xff0000) >> 16;
 		g = (a &0xff00) >> 8;
 		b = (a &0xff);
@@ -233,7 +233,7 @@ static WRITE32_HANDLER( motor_control_w )
 static ADDRESS_MAP_START( groundfx_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM	AM_BASE(&groundfx_ram) /* main CPUA ram */
-	AM_RANGE(0x300000, 0x303fff) AM_RAM	AM_BASE(&spriteram32) AM_SIZE(&spriteram_size) /* sprite ram */
+	AM_RANGE(0x300000, 0x303fff) AM_RAM	AM_BASE_SIZE_GENERIC(spriteram) /* sprite ram */
 	AM_RANGE(0x400000, 0x400003) AM_WRITE(motor_control_w)	/* gun vibration */
 	AM_RANGE(0x500000, 0x500003) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0x500004, 0x500007) AM_READ_PORT("SYSTEM")
@@ -244,7 +244,7 @@ static ADDRESS_MAP_START( groundfx_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x830000, 0x83002f) AM_READWRITE(TC0480SCP_ctrl_long_r,TC0480SCP_ctrl_long_w)	// debugging
 	AM_RANGE(0x900000, 0x90ffff) AM_READWRITE(TC0100SCN_long_r,TC0100SCN_long_w)	/* piv tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_READWRITE(TC0100SCN_ctrl_long_r,TC0100SCN_ctrl_long_w)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE(color_ram_w) AM_BASE(&paletteram32) /* palette ram */
+	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE(color_ram_w) AM_BASE_GENERIC(paletteram) /* palette ram */
 	AM_RANGE(0xb00000, 0xb003ff) AM_RAM						// ?? single bytes, blending ??
 	AM_RANGE(0xc00000, 0xc00007) AM_READNOP /* Network? */
 	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w)	/* perhaps port based rotate control? */

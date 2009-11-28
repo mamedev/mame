@@ -213,13 +213,13 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static void simpsons_objdma(void)
+static void simpsons_objdma(running_machine *machine)
 {
 	int counter, num_inactive;
 	UINT16 *src, *dst;
 
 	K053247_export_config(&dst, 0, 0, 0, &counter);
-	src = spriteram16;
+	src = machine->generic.spriteram.u16;
 	num_inactive = counter = 256;
 
 	do {
@@ -246,7 +246,7 @@ static INTERRUPT_GEN( simpsons_irq )
 {
 	if (K053246_is_IRQ_enabled())
 	{
-		simpsons_objdma();
+		simpsons_objdma(device->machine);
 
 		// 32+256us delay at 8MHz dotclock; artificially shortened since actual V-blank length is unknown
 		timer_set(device->machine, ATTOTIME_IN_USEC(30), NULL, 0, dmaend_callback);

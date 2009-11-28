@@ -80,7 +80,7 @@ static VIDEO_START( lastfght )
 	for (i = 0; i < 2; i++)
 		lastfght_bitmap[i] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	colorram = auto_alloc_array(machine, UINT8, 256*3);
+	machine->generic.colorram.u8 = auto_alloc_array(machine, UINT8, 256*3);
 }
 
 
@@ -131,11 +131,11 @@ static WRITE16_HANDLER(colordac_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		colorram[clr_offset] = data;
+		space->machine->generic.colorram.u8[clr_offset] = data;
 		palette_set_color_rgb(space->machine, clr_offset/3,
-			pal6bit(colorram[(clr_offset/3)*3+0]),
-			pal6bit(colorram[(clr_offset/3)*3+1]),
-			pal6bit(colorram[(clr_offset/3)*3+2])
+			pal6bit(space->machine->generic.colorram.u8[(clr_offset/3)*3+0]),
+			pal6bit(space->machine->generic.colorram.u8[(clr_offset/3)*3+1]),
+			pal6bit(space->machine->generic.colorram.u8[(clr_offset/3)*3+2])
 		);
 		clr_offset = (clr_offset+1) % (256*3);
 	}

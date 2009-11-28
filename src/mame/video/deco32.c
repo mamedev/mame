@@ -66,8 +66,8 @@ WRITE32_HANDLER( dragngun_sprite_control_w )
 WRITE32_HANDLER( dragngun_spriteram_dma_w )
 {
 	/* DMA spriteram to private sprite chip area, and clear cpu ram */
-	memcpy(buffered_spriteram32,spriteram32,spriteram_size);
-	memset(spriteram32,0,0x2000);
+	memcpy(space->machine->generic.buffered_spriteram.u32,space->machine->generic.spriteram.u32,space->machine->generic.spriteram_size);
+	memset(space->machine->generic.spriteram.u32,0,0x2000);
 }
 
 WRITE32_HANDLER( deco32_ace_ram_w )
@@ -125,9 +125,9 @@ static void updateAceRam(running_machine* machine)
 	for (i=0; i<2048; i++)
 	{
 		/* Lerp palette entry to 'fadept' according to 'fadeps' */
-		b = (paletteram32[i] >>16) & 0xff;
-		g = (paletteram32[i] >> 8) & 0xff;
-		r = (paletteram32[i] >> 0) & 0xff;
+		b = (machine->generic.paletteram.u32[i] >>16) & 0xff;
+		g = (machine->generic.paletteram.u32[i] >> 8) & 0xff;
+		r = (machine->generic.paletteram.u32[i] >> 0) & 0xff;
 
 		if (i>255) /* Screenshots seem to suggest ACE fades do not affect playfield 1 palette (0-255) */
 		{
@@ -150,18 +150,18 @@ WRITE32_HANDLER( deco32_nonbuffered_palette_w )
 {
 	int r,g,b;
 
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
-	b = (paletteram32[offset] >>16) & 0xff;
-	g = (paletteram32[offset] >> 8) & 0xff;
-	r = (paletteram32[offset] >> 0) & 0xff;
+	b = (space->machine->generic.paletteram.u32[offset] >>16) & 0xff;
+	g = (space->machine->generic.paletteram.u32[offset] >> 8) & 0xff;
+	r = (space->machine->generic.paletteram.u32[offset] >> 0) & 0xff;
 
 	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE32_HANDLER( deco32_buffered_palette_w )
 {
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 	dirty_palette[offset]=1;
 }
 
@@ -180,9 +180,9 @@ WRITE32_HANDLER( deco32_palette_dma_w )
 			}
 			else
 			{
-				b = (paletteram32[i] >>16) & 0xff;
-				g = (paletteram32[i] >> 8) & 0xff;
-				r = (paletteram32[i] >> 0) & 0xff;
+				b = (space->machine->generic.paletteram.u32[i] >>16) & 0xff;
+				g = (space->machine->generic.paletteram.u32[i] >> 8) & 0xff;
+				r = (space->machine->generic.paletteram.u32[i] >> 0) & 0xff;
 
 				palette_set_color(space->machine,i,MAKE_RGB(r,g,b));
 			}
@@ -1083,7 +1083,7 @@ VIDEO_START( nslasher )
 
 VIDEO_EOF( captaven )
 {
-	memcpy(buffered_spriteram32,spriteram32,spriteram_size);
+	memcpy(machine->generic.buffered_spriteram.u32,machine->generic.spriteram.u32,machine->generic.spriteram_size);
 	deco32_raster_display_position=0;
 }
 
@@ -1288,7 +1288,7 @@ VIDEO_UPDATE( captaven )
 	else
 		tilemap_draw(bitmap,cliprect,pf1a_tilemap,0,4);
 
-	captaven_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram32,3);
+	captaven_draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.buffered_spriteram.u32,3);
 
 	return 0;
 }
@@ -1368,7 +1368,7 @@ VIDEO_UPDATE( dragngun )
 		tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
 	}
 
-	dragngun_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram32);
+	dragngun_draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.buffered_spriteram.u32);
 
 	/* PF1 can be in 8x8 mode or 16x16 mode */
 	if (deco32_pf12_control[6]&0x80)
@@ -1428,7 +1428,7 @@ VIDEO_UPDATE( fghthist )
 		tilemap_draw(bitmap,cliprect,pf3_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,pf2_tilemap,0,2);
 	}
-	fghthist_draw_sprites(screen->machine, bitmap, cliprect, buffered_spriteram32,3,0, 0xf);
+	fghthist_draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u32,3,0, 0xf);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	return 0;
 }
@@ -1620,8 +1620,8 @@ VIDEO_UPDATE( nslasher )
 		bitmap_fill(bitmap,cliprect,screen->machine->pens[0x200]);
 
 	/* Draw sprites to temporary bitmaps, saving alpha & priority info for later mixing */
-	nslasher_draw_sprites(screen->machine,sprite0_mix_bitmap,cliprect,buffered_spriteram32,3);
-	nslasher_draw_sprites(screen->machine,sprite1_mix_bitmap,cliprect,buffered_spriteram32_2,4);
+	nslasher_draw_sprites(screen->machine,sprite0_mix_bitmap,cliprect,screen->machine->generic.buffered_spriteram.u32,3);
+	nslasher_draw_sprites(screen->machine,sprite1_mix_bitmap,cliprect,screen->machine->generic.buffered_spriteram2.u32,4);
 
 	/* Render alpha-blended tilemap to seperate buffer for proper mixing */
 	bitmap_fill(tilemap_alpha_bitmap,cliprect,0);

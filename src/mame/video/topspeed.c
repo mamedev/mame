@@ -37,6 +37,7 @@ VIDEO_START( topspeed )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs,map_offset,x,y,curx,cury,sprite_chunk;
 	UINT16 *spritemap = topspeed_spritemap;
 	UINT16 data,tilenum,code,color;

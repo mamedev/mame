@@ -24,8 +24,8 @@ VIDEO_UPDATE( beezer )
 	for (y = cliprect->min_y; y <= cliprect->max_y; y+=2)
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-			*BITMAP_ADDR16(bitmap, y+1, x) = videoram[0x80*y+x] & 0x0f;
-			*BITMAP_ADDR16(bitmap, y,   x) = videoram[0x80*y+x] >> 4;
+			*BITMAP_ADDR16(bitmap, y+1, x) = screen->machine->generic.videoram.u8[0x80*y+x] & 0x0f;
+			*BITMAP_ADDR16(bitmap, y,   x) = screen->machine->generic.videoram.u8[0x80*y+x] >> 4;
 		}
 
 	return 0;

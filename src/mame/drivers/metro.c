@@ -880,8 +880,8 @@ static ADDRESS_MAP_START( balcube_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x620000, 0x63ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1)	// Layer 1
 	AM_RANGE(0x640000, 0x65ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2)	// Layer 2
 	AM_RANGE(0x660000, 0x66ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0x670000, 0x673fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x674000, 0x674fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0x670000, 0x673fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x674000, 0x674fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x678000, 0x6787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0x678840, 0x67884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
 	AM_RANGE(0x678860, 0x67886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window)		// Tilemap Window
@@ -911,8 +911,8 @@ static ADDRESS_MAP_START( daitoa_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1	)	// Layer 1
 	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2	)	// Layer 2
 	AM_RANGE(0x160000, 0x16ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0x170000, 0x173fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0x170000, 0x173fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0x178840, 0x17884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
 	AM_RANGE(0x178860, 0x17886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window)		// Tilemap Window
@@ -950,8 +950,8 @@ static ADDRESS_MAP_START( bangball_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe20000, 0xe3ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1)	// Layer 1
 	AM_RANGE(0xe40000, 0xe5ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2)	// Layer 2
 	AM_RANGE(0xe60000, 0xe6ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0xe70000, 0xe73fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0xe74000, 0xe74fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0xe70000, 0xe73fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0xe74000, 0xe74fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0xe78000, 0xe787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0xe78840, 0xe7884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
 	AM_RANGE(0xe78860, 0xe7886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window)		// Tilemap Window
@@ -976,8 +976,8 @@ static ADDRESS_MAP_START( batlbubl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1)	// Layer 1
 	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2)	// Layer 2
 	AM_RANGE(0x160000, 0x16ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0x170000, 0x173fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0x170000, 0x173fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0x178840, 0x17884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
 	AM_RANGE(0x178860, 0x17886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window)		// Tilemap Window
@@ -1012,8 +1012,8 @@ static ADDRESS_MAP_START( daitorid_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1	)	// Layer 1
 	AM_RANGE(0x440000, 0x45ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2	)	// Layer 2
 	AM_RANGE(0x460000, 0x46ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0x470000, 0x473fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0x470000, 0x473fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
 	AM_RANGE(0x478860, 0x47886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window)		// Tilemap Window
@@ -1045,8 +1045,8 @@ static ADDRESS_MAP_START( dharma_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x820000, 0x83ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1	)	// Layer 1
 	AM_RANGE(0x840000, 0x85ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2	)	// Layer 2
 	AM_RANGE(0x860000, 0x86ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size	)	// Tiles Set
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window	)		// Tilemap Window
@@ -1102,8 +1102,8 @@ static ADDRESS_MAP_START( karatour_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x40000a, 0x40000b) AM_READ_PORT("DSW1")									//
 	AM_RANGE(0x40000c, 0x40000d) AM_READ_PORT("IN2")									//
 	AM_RANGE(0x860000, 0x86ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x875000, 0x875fff) AM_READWRITE(karatour_vram_0_r,karatour_vram_0_w)		// Layer 0 (Part of)
 	AM_RANGE(0x876000, 0x876fff) AM_READWRITE(karatour_vram_1_r,karatour_vram_1_w)		// Layer 1 (Part of)
 	AM_RANGE(0x877000, 0x877fff) AM_READWRITE(karatour_vram_2_r,karatour_vram_2_w)		// Layer 2 (Part of)
@@ -1132,8 +1132,8 @@ static ADDRESS_MAP_START( kokushi_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM													// ROM
 	AM_RANGE(0x7fc000, 0x7fffff) AM_RAM													// RAM
 	AM_RANGE(0x860000, 0x86ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x875000, 0x875fff) AM_READWRITE(karatour_vram_0_r,karatour_vram_0_w)		// Layer 0 (Part of)
 	AM_RANGE(0x876000, 0x876fff) AM_READWRITE(karatour_vram_1_r,karatour_vram_1_w)		// Layer 1 (Part of)
 	AM_RANGE(0x877000, 0x877fff) AM_READWRITE(karatour_vram_2_r,karatour_vram_2_w)		// Layer 2 (Part of)
@@ -1167,8 +1167,8 @@ static ADDRESS_MAP_START( lastfort_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x820000, 0x83ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1)	// Layer 1
 	AM_RANGE(0x840000, 0x85ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2)	// Layer 2
 	AM_RANGE(0x860000, 0x86ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0x878800, 0x878813) AM_WRITEONLY AM_BASE(&metro_videoregs)					// Video Registers
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
@@ -1207,8 +1207,8 @@ static ADDRESS_MAP_START( lastforg_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x8a0000, 0x8bffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1)	// Layer 1
 	AM_RANGE(0x8c0000, 0x8dffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2)	// Layer 2
 	AM_RANGE(0x8e0000, 0x8effff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0x8f0000, 0x8f3fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x8f4000, 0x8f4fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0x8f0000, 0x8f3fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x8f4000, 0x8f4fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x8f8000, 0x8f87ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0x8f8800, 0x8f8813) AM_WRITEONLY AM_BASE(&metro_videoregs)					// Video Registers
 	AM_RANGE(0x8f8840, 0x8f884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
@@ -1296,8 +1296,8 @@ static ADDRESS_MAP_START( gakusai_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x220000, 0x23ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1)	// Layer 1
 	AM_RANGE(0x240000, 0x25ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2)	// Layer 2
 	AM_RANGE(0x260000, 0x26ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0x270000, 0x273fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x274000, 0x274fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0x270000, 0x273fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x274000, 0x274fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x278000, 0x2787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0x27880e, 0x27880f) AM_RAM AM_BASE(&metro_screenctrl)						// Screen Control
 	AM_RANGE(0x278810, 0x27881f) AM_WRITEONLY AM_BASE(&metro_irq_levels)				// IRQ Levels
@@ -1333,8 +1333,8 @@ static ADDRESS_MAP_START( gakusai2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x620000, 0x63ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1)	// Layer 1
 	AM_RANGE(0x640000, 0x65ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2)	// Layer 2
 	AM_RANGE(0x660000, 0x66ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0x670000, 0x673fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x674000, 0x674fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0x670000, 0x673fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x674000, 0x674fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x675000, 0x675fff) AM_RAM													// Sprites?
 	AM_RANGE(0x678000, 0x6787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0x67880e, 0x67880f) AM_RAM AM_BASE(&metro_screenctrl)						// Screen Control
@@ -1402,8 +1402,8 @@ static ADDRESS_MAP_START( dokyusp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x220000, 0x23ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1)	// Layer 1
 	AM_RANGE(0x240000, 0x25ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2)	// Layer 2
 	AM_RANGE(0x260000, 0x26ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0x270000, 0x273fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x274000, 0x274fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0x270000, 0x273fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x274000, 0x274fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x278000, 0x2787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0x278810, 0x27881f) AM_WRITEONLY AM_BASE(&metro_irq_levels)				// IRQ Levels
 	AM_RANGE(0x278820, 0x27882f) AM_WRITEONLY AM_BASE(&metro_irq_vectors)				// IRQ Vectors
@@ -1440,8 +1440,8 @@ static ADDRESS_MAP_START( dokyusei_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x440000, 0x45ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2)	// Layer 2
 	AM_RANGE(0x460000, 0x46ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
 	AM_RANGE(0x460000, 0x46ffff) AM_WRITENOP											// DSW Selection
-	AM_RANGE(0x470000, 0x473fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0x470000, 0x473fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0x47880e, 0x47880f) AM_WRITEONLY AM_BASE(&metro_screenctrl)				// Screen Control
 	AM_RANGE(0x478810, 0x47881f) AM_WRITEONLY AM_BASE(&metro_irq_levels)				// IRQ Levels
@@ -1479,8 +1479,8 @@ static ADDRESS_MAP_START( pangpoms_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1)	// Layer 1
 	AM_RANGE(0x440000, 0x45ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2)	// Layer 2
 	AM_RANGE(0x460000, 0x46ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0x470000, 0x473fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0x470000, 0x473fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0x478800, 0x478813) AM_RAM AM_BASE(&metro_videoregs)						// Video Registers
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
@@ -1515,8 +1515,8 @@ static ADDRESS_MAP_START( poitto_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc20000, 0xc3ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1)	// Layer 1
 	AM_RANGE(0xc40000, 0xc5ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2)	// Layer 2
 	AM_RANGE(0xc60000, 0xc6ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0xc70000, 0xc73fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0xc74000, 0xc74fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0xc70000, 0xc73fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0xc74000, 0xc74fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0xc78000, 0xc787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0xc78800, 0xc78813) AM_WRITEONLY AM_BASE(&metro_videoregs)					// Video Registers
 	AM_RANGE(0xc78840, 0xc7884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
@@ -1548,8 +1548,8 @@ static ADDRESS_MAP_START( skyalert_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x820000, 0x83ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1)	// Layer 1
 	AM_RANGE(0x840000, 0x85ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2)	// Layer 2
 	AM_RANGE(0x860000, 0x86ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0x878800, 0x878813) AM_WRITEONLY AM_BASE(&metro_videoregs)					// Video Registers
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
@@ -1584,8 +1584,8 @@ static ADDRESS_MAP_START( pururun_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc20000, 0xc3ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1)	// Layer 1
 	AM_RANGE(0xc40000, 0xc5ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2)	// Layer 2
 	AM_RANGE(0xc60000, 0xc6ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0xc70000, 0xc73fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0xc74000, 0xc74fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0xc70000, 0xc73fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0xc74000, 0xc74fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0xc78000, 0xc787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0xc78840, 0xc7884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
 	AM_RANGE(0xc78860, 0xc7886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window)		// Tilemap Window
@@ -1617,8 +1617,8 @@ static ADDRESS_MAP_START( toride2g_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc20000, 0xc3ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1)	// Layer 1
 	AM_RANGE(0xc40000, 0xc5ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2)	// Layer 2
 	AM_RANGE(0xc60000, 0xc6ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
-	AM_RANGE(0xc70000, 0xc73fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0xc74000, 0xc74fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0xc70000, 0xc73fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0xc74000, 0xc74fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0xc78000, 0xc787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0xc78840, 0xc7884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
 	AM_RANGE(0xc78860, 0xc7886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window)		// Tilemap Window
@@ -1692,8 +1692,8 @@ static ADDRESS_MAP_START( blzntrnd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x240000, 0x25ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2)	// Layer 2
 	AM_RANGE(0x260000, 0x26ffff) AM_READ(metro_bankedrom_r)								// Banked ROM
 	AM_RANGE(0x260000, 0x26ffff) AM_WRITENOP											// ??????
-	AM_RANGE(0x270000, 0x273fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x274000, 0x274fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0x270000, 0x273fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x274000, 0x274fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x278000, 0x2787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0x278860, 0x27886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window)		// Tilemap Window
 	AM_RANGE(0x278870, 0x27887b) AM_WRITEONLY AM_BASE(&metro_scroll)					// Scroll
@@ -1732,8 +1732,8 @@ static ADDRESS_MAP_START( mouja_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(metro_vram_0_w) AM_BASE(&metro_vram_0	)	// Layer 0
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1	)	// Layer 1
 	AM_RANGE(0x440000, 0x45ffff) AM_RAM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2	)	// Layer 2
-	AM_RANGE(0x470000, 0x473fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0x470000, 0x473fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0x47880e, 0x47880f) AM_WRITEONLY AM_BASE(&metro_screenctrl)				// Screen Control
 	AM_RANGE(0x478810, 0x47881f) AM_WRITEONLY AM_BASE(&metro_irq_levels)				// IRQ Levels
@@ -1784,12 +1784,12 @@ static ADDRESS_MAP_START( puzzlet_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x700000, 0x71ffff ) AM_READWRITE( SMH_RAM, metro_vram_0_w ) AM_BASE( &metro_vram_0 )	// Layer 0
 	AM_RANGE( 0x720000, 0x73ffff ) AM_READWRITE( SMH_RAM, metro_vram_1_w ) AM_BASE( &metro_vram_1 )	// Layer 1
 	AM_RANGE( 0x740000, 0x75ffff ) AM_READWRITE( SMH_RAM, metro_vram_2_w ) AM_BASE( &metro_vram_2 )	// Layer 2
-	AM_RANGE( 0x774000, 0x774fff ) AM_RAM	AM_BASE( &spriteram16 )	AM_SIZE( &spriteram_size )			// Sprites
-
+	AM_RANGE( 0x774000, 0x774fff ) AM_RAM	AM_BASE_SIZE_GENERIC( spriteram )
+	
 	AM_RANGE( 0x760000, 0x76ffff ) AM_READ( metro_bankedrom_r )	// Banked ROM
 
 //  AM_RANGE( 0x772000, 0x773fff ) AM_RAM
-	AM_RANGE( 0x770000, 0x773fff ) AM_RAM_WRITE( paletteram16_GGGGGRRRRRBBBBBx_word_w   ) AM_BASE( &paletteram16 )	// Palette
+	AM_RANGE( 0x770000, 0x773fff ) AM_RAM_WRITE( paletteram16_GGGGGRRRRRBBBBBx_word_w   ) AM_BASE_GENERIC( paletteram )	// Palette
 
 	AM_RANGE( 0x775000, 0x777fff ) AM_RAM
 

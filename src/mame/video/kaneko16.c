@@ -391,12 +391,13 @@ Offset:         Format:                     Value:
 
 static int kaneko16_parse_sprite_type012(running_machine *machine, int i, struct tempsprite *s)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int attr, xoffs, offs;
 
 	if (kaneko16_sprite_type == 2)	offs = i * 16/2 + 0x8/2;
 	else							offs = i * 8/2;
 
-	if (offs >= (spriteram_size/2))	return -1;
+	if (offs >= (machine->generic.spriteram_size/2))	return -1;
 
 	attr			=		spriteram16[offs + 0];
 	s->code			=		spriteram16[offs + 1];

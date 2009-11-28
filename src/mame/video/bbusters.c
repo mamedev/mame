@@ -33,7 +33,7 @@ UINT16 *bbusters_pf1_data,*bbusters_pf2_data,*bbusters_pf1_scroll_data,*bbusters
 
 static TILE_GET_INFO( get_bbusters_tile_info )
 {
-	UINT16 tile=videoram16[tile_index];
+	UINT16 tile=machine->generic.videoram.u16[tile_index];
 	SET_TILE_INFO(0,tile&0xfff,tile>>12,0);
 }
 
@@ -51,7 +51,7 @@ static TILE_GET_INFO( get_pf2_tile_info )
 
 WRITE16_HANDLER( bbusters_video_w )
 {
-	COMBINE_DATA(&videoram16[offset]);
+	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
 	tilemap_mark_tile_dirty(fix_tilemap,offset);
 }
 
@@ -273,10 +273,10 @@ VIDEO_UPDATE( bbuster )
 	tilemap_set_scrolly( pf2_tilemap,0, bbusters_pf2_scroll_data[1] );
 
 	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
-//  draw_sprites(screen->machine,bitmap,buffered_spriteram16_2,2,0x8,0x8);
+//  draw_sprites(screen->machine,bitmap,screen->machine->generic.buffered_spriteram2.u16,2,0x8,0x8);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,buffered_spriteram16_2,2,0,0);
-	draw_sprites(screen->machine,bitmap,buffered_spriteram16,1,0,0);
+	draw_sprites(screen->machine,bitmap,screen->machine->generic.buffered_spriteram2.u16,2,0,0);
+	draw_sprites(screen->machine,bitmap,screen->machine->generic.buffered_spriteram.u16,1,0,0);
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 	return 0;
 }
@@ -290,7 +290,7 @@ VIDEO_UPDATE( mechatt )
 
 	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,buffered_spriteram16,1,0,0);
+	draw_sprites(screen->machine,bitmap,screen->machine->generic.buffered_spriteram.u16,1,0,0);
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 	return 0;
 }

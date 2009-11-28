@@ -10,8 +10,8 @@ int shangkid_gfx_type;
 
 
 static TILE_GET_INFO( get_bg_tile_info ){
-	int attributes = videoram[tile_index+0x800];
-	int tile_number = videoram[tile_index]+0x100*(attributes&0x3);
+	int attributes = machine->generic.videoram.u8[tile_index+0x800];
+	int tile_number = machine->generic.videoram.u8[tile_index]+0x100*(attributes&0x3);
 	int color;
 
 	if( shangkid_gfx_type==1 )
@@ -55,7 +55,7 @@ VIDEO_START( shangkid )
 
 WRITE8_HANDLER( shangkid_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty( background, offset&0x7ff );
 }
 
@@ -155,8 +155,8 @@ static void shangkid_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 {
 	const UINT8 *source, *finish;
 
-	finish = spriteram;
-	source = spriteram+0x200;
+	finish = machine->generic.spriteram.u8;
+	source = machine->generic.spriteram.u8+0x200;
 	while( source>finish ){
 		source -= 8;
 		draw_sprite(machine, source, bitmap,cliprect );
@@ -242,8 +242,8 @@ static void dynamski_draw_background(running_machine *machine, bitmap_t *bitmap,
 			sx+=16;
 		}
 
-		tile = videoram[i];
-		attr = videoram[i+0x400];
+		tile = machine->generic.videoram.u8[i];
+		attr = machine->generic.videoram.u8[i+0x400];
 		/*
             x---.----   priority?
             -xx-.----   bank
@@ -274,13 +274,13 @@ static void dynamski_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 	int color;
 	for( i=0x7e; i>=0x00; i-=2 )
 	{
-		bank = videoram[0x1b80+i];
-		attr = videoram[0x1b81+i];
-		tile = videoram[0xb80+i];
-		color = videoram[0xb81+i];
-		sy = 240-videoram[0x1380+i];
+		bank = machine->generic.videoram.u8[0x1b80+i];
+		attr = machine->generic.videoram.u8[0x1b81+i];
+		tile = machine->generic.videoram.u8[0xb80+i];
+		color = machine->generic.videoram.u8[0xb81+i];
+		sy = 240-machine->generic.videoram.u8[0x1380+i];
 
-		sx = videoram[0x1381+i]-64+8+16;
+		sx = machine->generic.videoram.u8[0x1381+i]-64+8+16;
 		if( attr&1 ) sx += 0x100;
 
 		drawgfx_transpen(

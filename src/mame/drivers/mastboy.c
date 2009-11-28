@@ -583,14 +583,14 @@ static WRITE8_HANDLER( mastboy_bank_w )
 
 static READ8_HANDLER( mastboy_backupram_r )
 {
-	return space->machine->generic.nvram.ptr.u8[offset];
+	return space->machine->generic.nvram.u8[offset];
 }
 
 static WRITE8_HANDLER( mastboy_backupram_w )
 {
 //  if (mastboy_backupram_enabled)
 //  {
-		space->machine->generic.nvram.ptr.u8[offset] = data;
+		space->machine->generic.nvram.u8[offset] = data;
 //  }
 //  else
 //  {

@@ -19,8 +19,8 @@ WRITE8_HANDLER( mrflea_gfx_bank_w ){
 WRITE8_HANDLER( mrflea_videoram_w ){
 	int bank = offset/0x400;
 	offset &= 0x3ff;
-	videoram[offset] = data;
-	videoram[offset+0x400] = bank;
+	space->machine->generic.videoram.u8[offset] = data;
+	space->machine->generic.videoram.u8[offset+0x400] = bank;
 	/*  the address range that tile data is written to sets one bit of
     **  the bank select.  The remaining bits are from a video register.
     */
@@ -28,16 +28,16 @@ WRITE8_HANDLER( mrflea_videoram_w ){
 
 WRITE8_HANDLER( mrflea_spriteram_w ){
 	if( offset&2 ){ /* tile_number */
-		spriteram[offset|1] = offset&1;
+		space->machine->generic.spriteram.u8[offset|1] = offset&1;
 		offset &= ~1;
 	}
-	spriteram[offset] = data;
+	space->machine->generic.spriteram.u8[offset] = data;
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const gfx_element *gfx = machine->gfx[0];
-	const UINT8 *source = spriteram;
+	const UINT8 *source = machine->generic.spriteram.u8;
 	const UINT8 *finish = source+0x100;
 	rectangle clip = *video_screen_get_visible_area(machine->primary_screen);
 	clip.max_x -= 24;
@@ -63,7 +63,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	const UINT8 *source = videoram;
+	const UINT8 *source = machine->generic.videoram.u8;
 	const gfx_element *gfx = machine->gfx[1];
 	int sx,sy;
 	int base = 0;

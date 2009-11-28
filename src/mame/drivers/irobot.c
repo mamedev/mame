@@ -89,7 +89,7 @@
 
 static WRITE8_HANDLER( irobot_nvram_w )
 {
-	space->machine->generic.nvram.ptr.u8[offset] = data & 0x0f;
+	space->machine->generic.nvram.u8[offset] = data & 0x0f;
 }
 
 
@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( irobot_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1900, 0x19ff) AM_WRITE(SMH_RAM)            /* Watchdog reset */
     AM_RANGE(0x1a00, 0x1a00) AM_WRITE(irobot_clearfirq_w)
     AM_RANGE(0x1b00, 0x1bff) AM_WRITE(irobot_control_w)
-    AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+    AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
     AM_RANGE(0x2000, 0x3fff) AM_READWRITE(irobot_sharedmem_r, irobot_sharedmem_w)
     AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)
     AM_RANGE(0x6000, 0xffff) AM_ROM

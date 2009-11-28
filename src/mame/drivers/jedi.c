@@ -248,7 +248,7 @@ static WRITE8_HANDLER( nvram_data_w )
 	jedi_state *state = (jedi_state *)space->machine->driver_data;
 
 	if (state->nvram_enabled)
-		space->machine->generic.nvram.ptr.u8[offset] = data;
+		space->machine->generic.nvram.u8[offset] = data;
 }
 
 

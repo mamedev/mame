@@ -62,9 +62,10 @@
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT8	*indx_ram	=	spriteram + 0x2000,	// this ram contains indexes into offs_ram
-			*offs_ram	=	spriteram + 0x2400,	// this ram contains x,y offsets or indexes into spriteram_2
-			*ram		=	spriteram,			// current sprite pointer in spriteram
+	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
+	UINT8	*indx_ram	=	machine->generic.spriteram.u8 + 0x2000,	// this ram contains indexes into offs_ram
+			*offs_ram	=	machine->generic.spriteram.u8 + 0x2400,	// this ram contains x,y offsets or indexes into spriteram_2
+			*ram		=	machine->generic.spriteram.u8,			// current sprite pointer in spriteram
 			*ram2		=	indx_ram;			// current sprite pointer in indx_ram
 
 	// wheelrun is the only game with a smaller visible area

@@ -214,15 +214,15 @@ static void firqhandler( const device_config *device, int irq )
 static NVRAM_HANDLER( capbowl )
 {
 	if (read_or_write)
-		mame_fwrite(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
+		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
 	else if (file)
-		mame_fread(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
+		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
 	else
 	{
 		/* invalidate nvram to make the game initialize it.
            A 0xff fill will cause the game to malfunction, so we use a
            0x01 fill which seems OK */
-		memset(machine->generic.nvram.ptr.v, 0x01, machine->generic.nvram.size);
+		memset(machine->generic.nvram.v, 0x01, machine->generic.nvram_size);
 	}
 }
 

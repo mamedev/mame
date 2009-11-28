@@ -161,8 +161,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 {
 	/* Sprites list */
 
+	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	UINT16 *s1  = buffered_spriteram16 + 0x3000/2;
-	UINT16 *end = &buffered_spriteram16[spriteram_size/2];
+	UINT16 *end = &buffered_spriteram16[machine->generic.spriteram_size/2];
 
 	for ( ; s1 < end; s1+=4 )
 	{
@@ -357,7 +358,7 @@ VIDEO_START( seta2 )
 	machine->gfx[4]->color_granularity = 16;
 	machine->gfx[5]->color_granularity = 16;
 
-	buffered_spriteram16 = auto_alloc_array(machine, UINT16, spriteram_size/2);
+	machine->generic.buffered_spriteram.u16 = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
 
 	yoffset = 0;
 }
@@ -383,5 +384,5 @@ VIDEO_UPDATE( seta2 )
 VIDEO_EOF( seta2 )
 {
 	/* Buffer sprites by 1 frame */
-	memcpy(buffered_spriteram16,spriteram16,spriteram_size);
+	memcpy(machine->generic.buffered_spriteram.u16,machine->generic.spriteram.u16,machine->generic.spriteram_size);
 }

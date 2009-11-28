@@ -24,7 +24,7 @@ WRITE16_HANDLER( prehisle_bg_videoram16_w )
 
 WRITE16_HANDLER( prehisle_fg_videoram16_w )
 {
-	COMBINE_DATA(&videoram16[offset]);
+	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -85,7 +85,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int attr = videoram16[tile_index];
+	int attr = machine->generic.videoram.u16[tile_index];
 	int code = attr & 0xfff;
 	int color = attr >> 12;
 
@@ -112,6 +112,7 @@ VIDEO_START( prehisle )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int foreground )
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 
 	for (offs = 0; offs < 1024; offs += 4)

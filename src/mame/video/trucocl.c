@@ -46,22 +46,22 @@ PALETTE_INIT( trucocl )
 
 WRITE8_HANDLER( trucocl_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( trucocl_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int gfxsel = colorram[tile_index] & 1;
-	int bank = ( ( colorram[tile_index] >> 2 ) & 0x07 );
-	int code = videoram[tile_index];
-	int colour = (colorram[tile_index] & 2) >> 1;
+	int gfxsel = machine->generic.colorram.u8[tile_index] & 1;
+	int bank = ( ( machine->generic.colorram.u8[tile_index] >> 2 ) & 0x07 );
+	int code = machine->generic.videoram.u8[tile_index];
+	int colour = (machine->generic.colorram.u8[tile_index] & 2) >> 1;
 
 	code |= ( bank & 1 ) << 10;
 	code |= ( bank & 2 ) << 8;

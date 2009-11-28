@@ -32,7 +32,7 @@ PALETTE_INIT( truco )
 
 VIDEO_UPDATE( truco )
 {
-	UINT8		*vid = videoram;
+	UINT8		*vid = screen->machine->generic.videoram.u8;
 	int x, y;
 
 	for( y = 0; y < 192; y++ )

@@ -44,6 +44,7 @@ VIDEO_START( warriorb )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int x_offs,int y_offs)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs, data, data2, tilenum, color, flipx, flipy;
 	int x, y, priority, pri_mask;
 
@@ -52,7 +53,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 #endif
 
 	/* pdrawgfx() needs us to draw sprites front to back */
-	for (offs = 0;offs < spriteram_size/2;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size/2;offs += 4)
 	{
 		data = spriteram16[offs+1];
 		tilenum = data & 0x7fff;

@@ -54,7 +54,7 @@ static void sprite_callback(int *code,int *color,int *priority,int *shadow)
 
 VIDEO_START( crimfght )
 {
-	paletteram = auto_alloc_array(machine, UINT8, 0x400);
+	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x400);
 
 	layer_colorbase[0] = 0;
 	layer_colorbase[1] = 4;

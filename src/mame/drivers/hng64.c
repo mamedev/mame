@@ -555,12 +555,12 @@ static READ32_HANDLER( hng64_com_share_r )
 static WRITE32_HANDLER( hng64_pal_w )
 {
 	int r,g,b,a;
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
-	b = ((paletteram32[offset] & 0x000000ff) >>0);
-	g = ((paletteram32[offset] & 0x0000ff00) >>8);
-	r = ((paletteram32[offset] & 0x00ff0000) >>16);
-	a = ((paletteram32[offset] & 0xff000000) >>24);
+	b = ((space->machine->generic.paletteram.u32[offset] & 0x000000ff) >>0);
+	g = ((space->machine->generic.paletteram.u32[offset] & 0x0000ff00) >>8);
+	r = ((space->machine->generic.paletteram.u32[offset] & 0x00ff0000) >>16);
+	a = ((space->machine->generic.paletteram.u32[offset] & 0xff000000) >>24);
 
 	// a sure ain't alpha.
 	// mame_printf_debug("Alpha : %d %d %d %d\n", a, b, g, r) ;
@@ -1044,7 +1044,7 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_BASE(&hng64_spriteregs)							// Sprites Registers
 	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_BASE(&hng64_videoram)	// Tilemap
 	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_BASE(&hng64_videoregs)							// Video Registers
-	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_BASE(&paletteram32)			// Palette
+	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_BASE_GENERIC(paletteram)			// Palette
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(&hng64_tcram)		// Transition Control
 	AM_RANGE(0x20300000, 0x203001ff) AM_RAM_WRITE(dl_w) AM_BASE(&hng64_dl)						// 3d Display List
 	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)

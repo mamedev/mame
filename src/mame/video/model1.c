@@ -18,6 +18,7 @@ enum { FRAC_SHIFT = 16 };
 static int render_done;
 static UINT16 *tgp_ram;
 static float trans_mat[12];
+static UINT16 *paletteram16;
 
 static float vxx, vyy, vzz, ayy, ayyc, ayys;
 
@@ -1436,6 +1437,8 @@ static void tgp_scan(void)
 
 VIDEO_START(model1)
 {
+	paletteram16 = machine->generic.paletteram.u16;
+	
 	vxx=vyy=vzz=0;
 	ayy = 0;
 

@@ -150,6 +150,7 @@ static void raster_pf3_draw(bitmap_t *bitmap, const rectangle *cliprect, int fla
 
 static void cninja_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	int offs;
 
 	for (offs = 0x400-4;offs >=0 ;offs -= 4)
@@ -219,6 +220,7 @@ static void cninja_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 
 static void robocop2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	int offs;
 
 	for (offs = 0x400-4;offs >=0 ;offs -= 4)
@@ -511,14 +513,14 @@ VIDEO_UPDATE( mutantf )
         transparent against the background, rather than 50% */
 	if (deco16_priority&1) {
 		bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-		mutantf_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,3);
+		mutantf_draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.buffered_spriteram.u16,3);
 		bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-		mutantf_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16_2,4);
+		mutantf_draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.buffered_spriteram2.u16,4);
 	} else {
 		bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-		mutantf_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16_2,4);
+		mutantf_draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.buffered_spriteram2.u16,4);
 		bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-		mutantf_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,3);
+		mutantf_draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.buffered_spriteram.u16,3);
 	}
 	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
 	return 0;

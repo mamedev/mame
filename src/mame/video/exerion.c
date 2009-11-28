@@ -359,7 +359,7 @@ VIDEO_UPDATE( exerion )
 	draw_background(screen->machine, bitmap, cliprect);
 
 	/* draw sprites */
-	for (i = 0; i < spriteram_size; i += 4)
+	for (i = 0; i < screen->machine->generic.spriteram_size; i += 4)
 	{
 		int flags = state->spriteram[i + 0];
 		int y = state->spriteram[i + 1] ^ 255;

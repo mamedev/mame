@@ -88,21 +88,21 @@ static WRITE8_HANDLER( onetwo_soundlatch_w )
 static void setColor(running_machine *machine, int offset)
 {
 		int r, g, b;
-		r = paletteram[offset] & 0x1f;
-		g = paletteram_2[offset] & 0x1f;
-		b = ((paletteram[offset] & 0x60) >> 2) | ((paletteram_2[offset] & 0xe0) >> 5);
+		r = machine->generic.paletteram.u8[offset] & 0x1f;
+		g = machine->generic.paletteram2.u8[offset] & 0x1f;
+		b = ((machine->generic.paletteram.u8[offset] & 0x60) >> 2) | ((machine->generic.paletteram2.u8[offset] & 0xe0) >> 5);
 		palette_set_color_rgb(machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 static WRITE8_HANDLER(palette1_w)
 {
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 	setColor(space->machine, offset);
 }
 
 static WRITE8_HANDLER(palette2_w)
 {
-	paletteram_2[offset] = data;
+	space->machine->generic.paletteram2.u8[offset] = data;
 	setColor(space->machine, offset);
 }
 
@@ -111,8 +111,8 @@ static WRITE8_HANDLER(palette2_w)
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc800, 0xc87f) AM_RAM_WRITE(palette1_w) AM_BASE(&paletteram)
-	AM_RANGE(0xc900, 0xc97f) AM_RAM_WRITE(palette2_w) AM_BASE(&paletteram_2)
+	AM_RANGE(0xc800, 0xc87f) AM_RAM_WRITE(palette1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xc900, 0xc97f) AM_RAM_WRITE(palette2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(onetwo_fgram_w) AM_BASE(&fgram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END

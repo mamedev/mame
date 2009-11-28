@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( carjmbre_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8fc1, 0x8fc1) AM_WRITENOP			//overrun during initial screen clear
 	AM_RANGE(0x8fe1, 0x8fe1) AM_WRITENOP			//overrun during initial screen clear
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(carjmbre_videoram_w) AM_BASE_MEMBER(carjmbre_state, videoram)
-	AM_RANGE(0x9800, 0x985f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(carjmbre_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9800, 0x985f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(carjmbre_state, spriteram) AM_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x9880, 0x98df) AM_WRITE(SMH_RAM)			//spriteram mirror
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2")

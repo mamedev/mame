@@ -59,6 +59,7 @@ VIDEO_START( ninjaw )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int primask,int x_offs,int y_offs)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int code;
@@ -71,7 +72,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
        while processing sprite ram and then draw them all at the end */
 	struct tempsprite *sprite_ptr = spritelist;
 
-	for (offs = (spriteram_size/2)-4;offs >=0;offs -= 4)
+	for (offs = (machine->generic.spriteram_size/2)-4;offs >=0;offs -= 4)
 	{
 		data = spriteram16[offs+2];
 		tilenum = data & 0x7fff;

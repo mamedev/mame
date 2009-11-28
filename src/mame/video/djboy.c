@@ -26,8 +26,8 @@ WRITE8_HANDLER( djboy_scrolly_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 attr = videoram[tile_index + 0x800];
-	int code = videoram[tile_index] + (attr&0xf)*256;
+	UINT8 attr = machine->generic.videoram.u8[tile_index + 0x800];
+	int code = machine->generic.videoram.u8[tile_index] + (attr&0xf)*256;
 	int color = attr>>4;
 	if( color&8 )
 	{
@@ -38,7 +38,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 WRITE8_HANDLER( djboy_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty( background, offset & 0x7ff);
 }
 
@@ -52,9 +52,9 @@ WRITE8_HANDLER( djboy_paletteram_w )
 {
 	int val;
 
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 	offset &= ~1;
-	val = (paletteram[offset]<<8) | paletteram[offset+1];
+	val = (space->machine->generic.paletteram.u8[offset]<<8) | space->machine->generic.paletteram.u8[offset+1];
 
 	palette_set_color_rgb(space->machine,offset/2,pal4bit(val >> 8),pal4bit(val >> 4),pal4bit(val >> 0));
 }

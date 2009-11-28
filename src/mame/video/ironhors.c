@@ -83,13 +83,13 @@ PALETTE_INIT( ironhors )
 
 WRITE8_HANDLER( ironhors_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( ironhors_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -135,11 +135,11 @@ WRITE8_HANDLER( ironhors_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index] + ((colorram[tile_index] & 0x40) << 2) +
-		((colorram[tile_index] & 0x20) << 4) + (charbank << 10);
-	int color = (colorram[tile_index] & 0x0f) + 16 * palettebank;
-	int flags = ((colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |
-		((colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
+	int code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x40) << 2) +
+		((machine->generic.colorram.u8[tile_index] & 0x20) << 4) + (charbank << 10);
+	int color = (machine->generic.colorram.u8[tile_index] & 0x0f) + 16 * palettebank;
+	int flags = ((machine->generic.colorram.u8[tile_index] & 0x10) ? TILE_FLIPX : 0) |
+		((machine->generic.colorram.u8[tile_index] & 0x20) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(0, code, color, flags);
 }
@@ -158,11 +158,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	UINT8 *sr;
 
 	if (spriterambank != 0)
-		sr = spriteram;
+		sr = machine->generic.spriteram.u8;
 	else
-		sr = spriteram_2;
+		sr = machine->generic.spriteram2.u8;
 
-	for (offs = 0;offs < spriteram_size;offs += 5)
+	for (offs = 0;offs < machine->generic.spriteram_size;offs += 5)
 	{
 		int sx = sr[offs+3];
 		int sy = sr[offs+2];
@@ -249,10 +249,10 @@ VIDEO_UPDATE( ironhors )
 
 static TILE_GET_INFO( farwest_get_bg_tile_info )
 {
-	int code = videoram[tile_index] + ((colorram[tile_index] & 0x40) << 2) +
-		((colorram[tile_index] & 0x20) << 4) + (charbank << 10);
-	int color = (colorram[tile_index] & 0x0f) + 16 * palettebank;
-	int flags = 0;//((colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |  ((colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
+	int code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x40) << 2) +
+		((machine->generic.colorram.u8[tile_index] & 0x20) << 4) + (charbank << 10);
+	int color = (machine->generic.colorram.u8[tile_index] & 0x0f) + 16 * palettebank;
+	int flags = 0;//((machine->generic.colorram.u8[tile_index] & 0x10) ? TILE_FLIPX : 0) |  ((machine->generic.colorram.u8[tile_index] & 0x20) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(0, code, color, flags);
 }
@@ -268,15 +268,15 @@ VIDEO_START( farwest )
 static void farwest_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
-	UINT8 *sr=spriteram_2;
-	UINT8 *sr2=spriteram;
+	UINT8 *sr=machine->generic.spriteram2.u8;
+	UINT8 *sr2=machine->generic.spriteram.u8;
 
 //  if (spriterambank != 0)
 	//  sr = spriteram;
 	//else
 		//sr = ;
 
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size;offs += 4)
 	{
 		int sx = sr[offs+2];
 		int sy = sr[offs+1];

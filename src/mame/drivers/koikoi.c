@@ -51,16 +51,16 @@ static const int inputTab[]= {	0x22,	0x64, 0x44, 0x68, 0x30, 0x50, 0x70, 0x48, 0
 
 static TILE_GET_INFO( get_tile_info )
 {
-	int code  = videoram[tile_index]|((videoram[tile_index+0x400] & 0x40)<<2);
-	int color = (videoram[tile_index+0x400]&0x1f);
-	int flip  = (videoram[tile_index+0x400]&0x80)?(TILEMAP_FLIPX|TILEMAP_FLIPY):0;
+	int code  = machine->generic.videoram.u8[tile_index]|((machine->generic.videoram.u8[tile_index+0x400] & 0x40)<<2);
+	int color = (machine->generic.videoram.u8[tile_index+0x400]&0x1f);
+	int flip  = (machine->generic.videoram.u8[tile_index+0x400]&0x80)?(TILEMAP_FLIPX|TILEMAP_FLIPY):0;
 
 	SET_TILE_INFO(	0,	code,	color, flip);
 }
 
 static WRITE8_HANDLER(vram_w)
 {
-	videoram[offset]=data;
+	space->machine->generic.videoram.u8[offset]=data;
 	tilemap_mark_tile_dirty(koikoi_tilemap,offset&0x3ff);
 }
 
@@ -122,7 +122,7 @@ static WRITE8_HANDLER(io_w)
 static ADDRESS_MAP_START( koikoi_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(vram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(vram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW")
 	AM_RANGE(0x9000, 0x9007) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END

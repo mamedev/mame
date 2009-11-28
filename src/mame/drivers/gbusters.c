@@ -37,7 +37,7 @@ static INTERRUPT_GEN( gbusters_interrupt )
 static READ8_HANDLER( bankedram_r )
 {
 	if (palette_selected)
-		return paletteram[offset];
+		return space->machine->generic.paletteram.u8[offset];
 	else
 		return ram[offset];
 }
@@ -369,7 +369,7 @@ static MACHINE_RESET( gbusters )
 	/* mirror address for banked ROM */
 	memcpy(&RAM[0x18000], &RAM[0x10000], 0x08000 );
 
-	paletteram = &RAM[0x30000];
+	machine->generic.paletteram.u8 = &RAM[0x30000];
 }
 
 

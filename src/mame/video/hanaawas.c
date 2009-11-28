@@ -65,13 +65,13 @@ PALETTE_INIT( hanaawas )
 
 WRITE8_HANDLER( hanaawas_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( hanaawas_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 
 	/* dirty both current and next offsets */
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
@@ -92,10 +92,10 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	/* the color is determined by the current color byte, but the bank is via the previous one!!! */
 	int offset = (tile_index + (flip_screen_get(machine) ? 1 : -1)) & 0x3ff;
-	int attr = colorram[offset];
+	int attr = machine->generic.colorram.u8[offset];
 	int gfxbank = (attr & 0x40) >> 6;
-	int code = videoram[tile_index] + ((attr & 0x20) << 3);
-	int color = colorram[tile_index] & 0x1f;
+	int code = machine->generic.videoram.u8[tile_index] + ((attr & 0x20) << 3);
+	int color = machine->generic.colorram.u8[tile_index] & 0x1f;
 
 	SET_TILE_INFO(gfxbank, code, color, 0);
 }

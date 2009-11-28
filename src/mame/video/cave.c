@@ -249,7 +249,7 @@ static void set_pens(running_machine *machine)
 
 	for (pen = 0; pen < machine->config->total_colors; pen++)
 	{
-		UINT16 data = paletteram16[palette_map[pen]];
+		UINT16 data = machine->generic.paletteram.u16[palette_map[pen]];
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
 
@@ -577,12 +577,12 @@ static void get_sprite_info_cave(running_machine *machine)
 	int max_x		=	video_screen_get_width(machine->primary_screen);
 	int max_y		=	video_screen_get_height(machine->primary_screen);
 
-	source = spriteram16 + ((spriteram_size/2) / 2) * spriteram_bank;
+	source = machine->generic.spriteram.u16 + ((machine->generic.spriteram_size/2) / 2) * spriteram_bank;
 
 	if (cave_videoregs[ 4 ] & 0x02)
-		if (cave_spriteram16_2) source = cave_spriteram16_2 + ((spriteram_size/2) / 2) * spriteram_bank;
+		if (cave_spriteram16_2) source = cave_spriteram16_2 + ((machine->generic.spriteram_size/2) / 2) * spriteram_bank;
 
-	finish = source + ((spriteram_size/2) / 2);
+	finish = source + ((machine->generic.spriteram_size/2) / 2);
 
 
 	for (; source < finish; source+=8 )
@@ -704,12 +704,12 @@ static void get_sprite_info_donpachi(running_machine *machine)
 	int max_x		=	video_screen_get_width(machine->primary_screen);
 	int max_y		=	video_screen_get_height(machine->primary_screen);
 
-	source = spriteram16 + ((spriteram_size/2) / 2) * spriteram_bank;
+	source = machine->generic.spriteram.u16 + ((machine->generic.spriteram_size/2) / 2) * spriteram_bank;
 
 	if (cave_videoregs[ 4 ] & 0x02)
-		if (cave_spriteram16_2) source = cave_spriteram16_2 + ((spriteram_size/2) / 2) * spriteram_bank;
+		if (cave_spriteram16_2) source = cave_spriteram16_2 + ((machine->generic.spriteram_size/2) / 2) * spriteram_bank;
 
-	finish = source + ((spriteram_size/2) / 2);
+	finish = source + ((machine->generic.spriteram_size/2) / 2);
 
 	for (; source < finish; source+=8 )
 	{
@@ -793,7 +793,7 @@ static void sprite_init_cave(running_machine *machine)
 	blit.baseaddr_zbuf = (UINT8 *)sprite_zbuf->base;
 	blit.line_offset_zbuf = sprite_zbuf->rowpixels * sprite_zbuf->bpp / 8;
 
-	num_sprites = spriteram_size / 0x10 / 2;
+	num_sprites = machine->generic.spriteram_size / 0x10 / 2;
 	sprite_cave = auto_alloc_array_clear(machine, struct sprite_cave, num_sprites);
 
 	memset(sprite_table,0,sizeof(sprite_table));

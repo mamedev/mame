@@ -131,7 +131,7 @@ static MACHINE_START( segac2 )
 
 static MACHINE_RESET( segac2 )
 {
-	megadrive_ram = machine->generic.nvram.ptr.u16;
+	megadrive_ram = machine->generic.nvram.u16;
 
 	/* set up interrupts and such */
 	MACHINE_RESET_CALL(megadriv);
@@ -212,7 +212,7 @@ static READ16_HANDLER( palette_r )
 	offset &= 0x1ff;
 	if (segac2_alt_palette_mode)
 		offset = ((offset << 1) & 0x100) | ((offset << 2) & 0x80) | ((~offset >> 2) & 0x40) | ((offset >> 1) & 0x20) | (offset & 0x1f);
-	return paletteram16[offset + palbank * 0x200];
+	return space->machine->generic.paletteram.u16[offset + palbank * 0x200];
 }
 
 /* handle writes to the paletteram */
@@ -228,8 +228,8 @@ static WRITE16_HANDLER( palette_w )
 	offset += palbank * 0x200;
 
 	/* combine data */
-	COMBINE_DATA(&paletteram16[offset]);
-	newword = paletteram16[offset];
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	newword = space->machine->generic.paletteram.u16[offset];
 
 	/* up to 8 bits */
 	r = ((newword << 1) & 0x1e) | ((newword >> 12) & 0x01);
@@ -627,7 +627,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x840000, 0x84001f) AM_MIRROR(0x13fee0) AM_READWRITE(io_chip_r, io_chip_w)
 	AM_RANGE(0x840100, 0x840107) AM_MIRROR(0x13fef8) AM_DEVREADWRITE8("ymsnd", ym3438_r, ym3438_w, 0x00ff)
 	AM_RANGE(0x880100, 0x880101) AM_MIRROR(0x13fefe) AM_WRITE(counter_timer_w)
-	AM_RANGE(0x8c0000, 0x8c0fff) AM_MIRROR(0x13f000) AM_READWRITE(palette_r, palette_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x8c0000, 0x8c0fff) AM_MIRROR(0x13f000) AM_READWRITE(palette_r, palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x18ff00) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w)
 	AM_RANGE(0xe00000, 0xe0ffff) AM_MIRROR(0x1f0000) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 ADDRESS_MAP_END

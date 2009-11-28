@@ -96,15 +96,15 @@ static WRITE32_HANDLER(sysh1_ioga_w)
 static WRITE32_HANDLER( paletteram32_sysh1_w )
 {
 	int r,g,b;
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
-	b = ((paletteram32[offset] & 0x00007c00) >> 10);
-	g = ((paletteram32[offset] & 0x000003e0) >> 5);
-	r = ((paletteram32[offset] & 0x0000001f) >> 0);
+	b = ((space->machine->generic.paletteram.u32[offset] & 0x00007c00) >> 10);
+	g = ((space->machine->generic.paletteram.u32[offset] & 0x000003e0) >> 5);
+	r = ((space->machine->generic.paletteram.u32[offset] & 0x0000001f) >> 0);
 	palette_set_color_rgb(space->machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
-	b = ((paletteram32[offset] & 0x7c000000) >> 26);
-	g = ((paletteram32[offset] & 0x03e00000) >> 21);
-	r = ((paletteram32[offset] & 0x001f0000) >> 16);
+	b = ((space->machine->generic.paletteram.u32[offset] & 0x7c000000) >> 26);
+	g = ((space->machine->generic.paletteram.u32[offset] & 0x03e00000) >> 21);
+	r = ((space->machine->generic.paletteram.u32[offset] & 0x001f0000) >> 16);
 	palette_set_color_rgb(space->machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 

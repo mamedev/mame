@@ -103,7 +103,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	blueprnt_state *state = (blueprnt_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0; offs < spriteram_size; offs += 4)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
 	{
 		int code = state->spriteram[offs + 1];
 		int sx = state->spriteram[offs + 3];

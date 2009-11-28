@@ -105,14 +105,14 @@ static tilemap *bg_tilemap;
 
 static WRITE8_HANDLER( jokrwild_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 
 static WRITE8_HANDLER( jokrwild_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -125,8 +125,8 @@ static TILE_GET_INFO( get_bg_tile_info )
     ---- ----   color code.
     ---- ----   seems unused.
 */
-//  int attr = colorram[tile_index];
-	int code = videoram[tile_index];
+//  int attr = machine->generic.colorram.u8[tile_index];
+	int code = machine->generic.videoram.u8[tile_index];
 //  int bank = (attr & 0x08) >> 3;
 //  int color = (attr & 0x03);
 
@@ -173,8 +173,8 @@ static PALETTE_INIT( jokrwild )
 *************************/
 
 static ADDRESS_MAP_START( jokrwild_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_WRITE(jokrwild_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_WRITE(jokrwild_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_WRITE(jokrwild_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_WRITE(jokrwild_colorram_w) AM_BASE_GENERIC(colorram)
 //  AM_RANGE(0x0010, 0x0010) AM_READ(random_gen_r)
 //  AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 //  AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)

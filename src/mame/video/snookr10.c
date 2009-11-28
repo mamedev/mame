@@ -45,13 +45,13 @@ static tilemap *bg_tilemap;
 
 WRITE8_HANDLER( snookr10_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( snookr10_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -102,9 +102,9 @@ static TILE_GET_INFO( get_bg_tile_info )
     ---- xxxx   seems unused.
 */
 	int offs = tile_index;
-	int attr = videoram[offs] + (colorram[offs] << 8);
+	int attr = machine->generic.videoram.u8[offs] + (machine->generic.colorram.u8[offs] << 8);
 	int code = attr & 0xfff;
-	int color = colorram[offs] >> 4;
+	int color = machine->generic.colorram.u8[offs] >> 4;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -164,9 +164,9 @@ static TILE_GET_INFO( apple10_get_bg_tile_info )
     ---- xxxx   seems unused.
 */
 	int offs = tile_index;
-	int attr = videoram[offs] + (colorram[offs] << 8);
+	int attr = machine->generic.videoram.u8[offs] + (machine->generic.colorram.u8[offs] << 8);
 	int code = BITSWAP16((attr & 0xfff),15,14,13,12,8,9,10,11,0,1,2,3,4,5,6,7);	/* encrypted tile matrix */
-	int color = colorram[offs] >> 4;
+	int color = machine->generic.colorram.u8[offs] >> 4;
 
 	SET_TILE_INFO(0, code, color, 0);
 }

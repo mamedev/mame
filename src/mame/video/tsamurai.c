@@ -36,13 +36,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int tile_number = videoram[tile_index];
+	int tile_number = machine->generic.videoram.u8[tile_index];
 	if (textbank1 & 0x01) tile_number += 256; /* legacy */
 	if (textbank2 & 0x01) tile_number += 512; /* Mission 660 add-on */
 	SET_TILE_INFO(
 			1,
 			tile_number,
-			colorram[((tile_index&0x1f)*2)+1] & 0x1f,
+			machine->generic.colorram.u8[((tile_index&0x1f)*2)+1] & 0x1f,
 			0);
 }
 
@@ -110,14 +110,14 @@ WRITE8_HANDLER( tsamurai_bg_videoram_w )
 }
 WRITE8_HANDLER( tsamurai_fg_videoram_w )
 {
-	videoram[offset]=data;
+	space->machine->generic.videoram.u8[offset]=data;
 	tilemap_mark_tile_dirty(foreground,offset);
 }
 WRITE8_HANDLER( tsamurai_fg_colorram_w )
 {
-	if( colorram[offset]!=data )
+	if( space->machine->generic.colorram.u8[offset]!=data )
 	{
-		colorram[offset]=data;
+		space->machine->generic.colorram.u8[offset]=data;
 		if (offset & 1)
 		{
 			int col = offset/2;
@@ -137,6 +137,7 @@ WRITE8_HANDLER( tsamurai_fg_colorram_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	gfx_element *gfx = machine->gfx[2];
 	const UINT8 *source = spriteram+32*4-4;
 	const UINT8 *finish = spriteram; /* ? */
@@ -202,7 +203,7 @@ VIDEO_UPDATE( tsamurai )
 	tilemap_set_scroll_cols(foreground, 32);
 	for (i = 0 ; i < 32 ; i++)
 	{
-		tilemap_set_scrolly(foreground, i, colorram[i*2]);
+		tilemap_set_scrolly(foreground, i, screen->machine->generic.colorram.u8[i*2]);
 	}
 /* end of column scroll code */
 
@@ -241,7 +242,7 @@ WRITE8_HANDLER( vsgongf_color_w )
 
 static TILE_GET_INFO( get_vsgongf_tile_info )
 {
-	int tile_number = videoram[tile_index];
+	int tile_number = machine->generic.videoram.u8[tile_index];
 	int color = vsgongf_color&0x1f;
 	if( textbank1 ) tile_number += 0x100;
 	SET_TILE_INFO(

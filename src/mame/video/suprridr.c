@@ -167,6 +167,7 @@ WRITE8_HANDLER( suprridr_fgram_w )
 
 VIDEO_UPDATE( suprridr )
 {
+	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	rectangle subclip;
 	int i;
 	const rectangle *visarea = video_screen_get_visible_area(screen);

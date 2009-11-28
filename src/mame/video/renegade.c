@@ -13,7 +13,7 @@ static tilemap *fg_tilemap;
 
 WRITE8_HANDLER( renegade_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	offset = offset % (64 * 16);
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
@@ -42,7 +42,7 @@ WRITE8_HANDLER( renegade_scroll1_w )
 
 static TILE_GET_INFO( get_bg_tilemap_info )
 {
-	const UINT8 *source = &videoram[tile_index];
+	const UINT8 *source = &machine->generic.videoram.u8[tile_index];
 	UINT8 attributes = source[0x400]; /* CCC??BBB */
 	SET_TILE_INFO(
 		1 + (attributes & 0x7),
@@ -75,7 +75,7 @@ VIDEO_START( renegade )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 *source = spriteram;
+	UINT8 *source = machine->generic.spriteram.u8;
 	UINT8 *finish = source + 96 * 4;
 
 	while (source < finish)

@@ -2237,15 +2237,6 @@ static void map_detokenize(address_map *map, const game_driver *driver, const ch
 				entry->gensizeptroffs_plus1++;
 				break;
 
-			case ADDRMAP_TOKEN_BASE_SIZE_GENERIC:
-				check_entry_field(genbaseptroffs_plus1);
-				check_entry_field(gensizeptroffs_plus1);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->genbaseptroffs_plus1, 24);
-				entry->genbaseptroffs_plus1++;
-				entry->gensizeptroffs_plus1 = entry->genbaseptroffs_plus1 + offsetof(generic_ptr, size);
-				break;
-
 			default:
 				fatalerror("Invalid token %d in address map\n", entrytype);
 				break;

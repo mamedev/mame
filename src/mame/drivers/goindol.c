@@ -107,10 +107,10 @@ static ADDRESS_MAP_START( goindol_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc830, 0xc830) AM_READ_PORT("P1")
 	AM_RANGE(0xc830, 0xd830) AM_WRITE(SMH_RAM) AM_BASE(&goindol_fg_scrollx)
 	AM_RANGE(0xc834, 0xc834) AM_READ_PORT("P2")
-	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xd040, 0xd7ff) AM_RAM
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(goindol_bg_videoram_w) AM_BASE(&goindol_bg_videoram) AM_SIZE(&goindol_bg_videoram_size)
-	AM_RANGE(0xe000, 0xe03f) AM_RAM AM_BASE(&spriteram_2)
+	AM_RANGE(0xe000, 0xe03f) AM_RAM AM_BASE_GENERIC(spriteram2)
 	AM_RANGE(0xe040, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goindol_fg_videoram_w) AM_BASE(&goindol_fg_videoram) AM_SIZE(&goindol_fg_videoram_size)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW1")

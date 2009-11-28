@@ -195,6 +195,7 @@ WRITE16_HANDLER( gcpinbal_ctrl_word_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs,chain_pos;
 	int x,y,curx,cury;
 	int priority=0;
@@ -204,7 +205,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	/* According to Raine, word in ioc_ram determines sprite/tile priority... */
 	priority = (gcpinbal_ioc_ram[0x68/2] & 0x8800) ? 0 : 1;
 
-	for (offs = spriteram_size/2-8;offs >= 0;offs -= 8)
+	for (offs = machine->generic.spriteram_size/2-8;offs >= 0;offs -= 8)
 	{
 		code = ((spriteram16[offs+5])&0xff) + (((spriteram16[offs+6]) &0xff) << 8);
 		code &= 0x3fff;

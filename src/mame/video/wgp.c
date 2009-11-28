@@ -355,6 +355,7 @@ static const UINT8 ylookup[16] =
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs,i,j,k;
 	int x,y,curx,cury;
 	int zx,zy,zoomx,zoomy,priority=0;

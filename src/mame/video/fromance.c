@@ -310,10 +310,11 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 {
 	static const UINT8 zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 	const rectangle *visarea = video_screen_get_visible_area(screen);
+	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	int offs;
 
 	/* draw the sprites */
-	for (offs = 0; offs < spriteram_size; offs += 8)
+	for (offs = 0; offs < screen->machine->generic.spriteram_size; offs += 8)
 	{
 		int data2 = spriteram[offs + 4] | (spriteram[offs + 5] << 8);
 		int priority = (data2 >> 4) & 1;

@@ -136,7 +136,7 @@ VIDEO_START( namcos86 )
 	tilemap_set_transparent_pen(bg_tilemap[2],7);
 	tilemap_set_transparent_pen(bg_tilemap[3],7);
 
-	spriteram = rthunder_spriteram + 0x1800;
+	machine->generic.spriteram.u8 = rthunder_spriteram + 0x1800;
 }
 
 
@@ -264,12 +264,12 @@ sprite format:
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	const UINT8 *source = &spriteram[0x0800-0x20];	/* the last is NOT a sprite */
-	const UINT8 *finish = &spriteram[0];
+	const UINT8 *source = &machine->generic.spriteram.u8[0x0800-0x20];	/* the last is NOT a sprite */
+	const UINT8 *finish = &machine->generic.spriteram.u8[0];
 	gfx_element *gfx = machine->gfx[2];
 
-	int sprite_xoffs = spriteram[0x07f5] + ((spriteram[0x07f4] & 1) << 8);
-	int sprite_yoffs = spriteram[0x07f7];
+	int sprite_xoffs = machine->generic.spriteram.u8[0x07f5] + ((machine->generic.spriteram.u8[0x07f4] & 1) << 8);
+	int sprite_yoffs = machine->generic.spriteram.u8[0x07f7];
 
 	int bank_sprites = machine->gfx[2]->total_elements / 8;
 
@@ -346,7 +346,7 @@ VIDEO_UPDATE( namcos86 )
 
 	/* flip screen is embedded in the sprite control registers */
 	/* can't use flip_screen_set(screen->machine, ) because the visible area is asymmetrical */
-	flip_screen_set_no_update(screen->machine, spriteram[0x07f6] & 1);
+	flip_screen_set_no_update(screen->machine, screen->machine->generic.spriteram.u8[0x07f6] & 1);
 	tilemap_set_flip_all(screen->machine,flip_screen_get(screen->machine) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	set_scroll(screen->machine, 0);
 	set_scroll(screen->machine, 1);
@@ -377,6 +377,7 @@ VIDEO_EOF( namcos86 )
 {
 	if (copy_sprites)
 	{
+		UINT8 *spriteram = machine->generic.spriteram.u8;
 		int i,j;
 
 		for (i = 0;i < 0x800;i += 16)

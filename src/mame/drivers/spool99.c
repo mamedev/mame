@@ -97,8 +97,8 @@ static tilemap *sc0_tilemap;
 
 static TILE_GET_INFO( get_spool99_tile_info )
 {
-	int code = ((videoram[tile_index*2+1]<<8) | (videoram[tile_index*2+0]));
-	int color = colorram[tile_index*2+0];
+	int code = ((machine->generic.videoram.u8[tile_index*2+1]<<8) | (machine->generic.videoram.u8[tile_index*2+0]));
+	int color = machine->generic.colorram.u8[tile_index*2+0];
 
 	SET_TILE_INFO(
 			0,
@@ -120,13 +120,13 @@ static VIDEO_UPDATE(spool99)
 
 static WRITE8_HANDLER( spool99_vram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(sc0_tilemap,offset/2);
 }
 
 static WRITE8_HANDLER( spool99_cram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(sc0_tilemap,offset/2);
 }
 
@@ -190,11 +190,11 @@ static ADDRESS_MAP_START( spool99_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xafef, 0xafef) AM_WRITE(eeprom_dataline_w )
 	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_w)
 
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram) // palette
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram) // palette
 
 	AM_RANGE(0xb800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE(&videoram)
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_BASE(&colorram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_BASE_GENERIC(colorram)
 ADDRESS_MAP_END
 
 

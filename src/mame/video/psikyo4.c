@@ -54,8 +54,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
     **- End Sprite Format -*/
 
 	const gfx_element *gfx = machine->gfx[0];
-	UINT32 *source = spriteram32;
-	UINT16 *list = (UINT16 *)spriteram32 + 0x2c00/2 + 0x04/2; /* 0x2c00/0x2c02 what are these for, pointers? one for each screen */
+	UINT32 *source = machine->generic.spriteram.u32;
+	UINT16 *list = (UINT16 *)machine->generic.spriteram.u32 + 0x2c00/2 + 0x04/2; /* 0x2c00/0x2c02 what are these for, pointers? one for each screen */
 	UINT16 listlen=(0xc00/2 - 0x04/2), listcntr=0;
 	int flipscreen1, flipscreen2;
 

@@ -128,10 +128,10 @@ WRITE8_HANDLER( paletteram_xBGR_RRRR_GGGG_BBBB_w )
 	int r,g,b,d0,d1;
 	int offs = offset & ~1;
 
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 
-	d0 = paletteram[offs];
-	d1 = paletteram[offs+1];
+	d0 = space->machine->generic.paletteram.u8[offs];
+	d1 = space->machine->generic.paletteram.u8[offs+1];
 
 	r = ((d1 << 1) & 0x1e) | ((d1 >> 4) & 1);
 	g = ((d0 >> 3) & 0x1e) | ((d1 >> 5) & 1);
@@ -142,9 +142,10 @@ WRITE8_HANDLER( paletteram_xBGR_RRRR_GGGG_BBBB_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = 0; offs<spriteram_size; offs+=8)
+	for (offs = 0; offs<machine->generic.spriteram_size; offs+=8)
 	{
 		int i;
 

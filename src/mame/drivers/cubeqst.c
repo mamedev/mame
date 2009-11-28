@@ -90,7 +90,7 @@ static PALETTE_INIT( cubeqst )
 static WRITE16_HANDLER( palette_w )
 {
 	video_screen_update_now(space->machine->primary_screen);
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 }
 
 /* TODO: This is a simplified version of what actually happens */
@@ -153,7 +153,7 @@ static VIDEO_UPDATE( cubeqst )
 				}
 
 				/* Draw the span, testing for depth */
-				pen = colormap[paletteram16[color]];
+				pen = colormap[screen->machine->generic.paletteram.u16[color]];
 				for (x = h1; x <= h2; ++x)
 				{
 					if (!(depth_buffer[x] < depth))
@@ -402,7 +402,7 @@ static ADDRESS_MAP_START( m68k_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x038002, 0x038003) AM_READWRITE(chop_r, ldaud_w)
 	AM_RANGE(0x038008, 0x038009) AM_READWRITE(line_r, reset_w)
 	AM_RANGE(0x03800e, 0x03800f) AM_READWRITE(laserdisc_r, laserdisc_w)
-	AM_RANGE(0x03c800, 0x03c9ff) AM_RAM_WRITE(palette_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x03c800, 0x03c9ff) AM_RAM_WRITE(palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x03cc00, 0x03cc01) AM_WRITE(control_w)
 	AM_RANGE(0x03e000, 0x03efff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x03f000, 0x03ffff) AM_RAM

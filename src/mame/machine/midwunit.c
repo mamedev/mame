@@ -67,7 +67,7 @@ WRITE16_HANDLER( midwunit_cmos_w )
 {
 	if (cmos_write_enable)
 	{
-		COMBINE_DATA(space->machine->generic.nvram.ptr.u16+offset);
+		COMBINE_DATA(space->machine->generic.nvram.u16+offset);
 		cmos_write_enable = 0;
 	}
 	else
@@ -80,13 +80,13 @@ WRITE16_HANDLER( midwunit_cmos_w )
 
 WRITE16_HANDLER( midxunit_cmos_w )
 {
-	COMBINE_DATA(space->machine->generic.nvram.ptr.u16+offset);
+	COMBINE_DATA(space->machine->generic.nvram.u16+offset);
 }
 
 
 READ16_HANDLER( midwunit_cmos_r )
 {
-	return space->machine->generic.nvram.ptr.u16[offset];
+	return space->machine->generic.nvram.u16[offset];
 }
 
 

@@ -88,8 +88,8 @@ static void taitof2_core_vh_start (running_machine *machine, int sprite_type,int
 	f2_hide_pixels = hide;
 	f2_flip_hide_pixels = flip_hide;
 
-	spriteram_delayed = auto_alloc_array(machine, UINT16, spriteram_size/2);
-	spriteram_buffered = auto_alloc_array(machine, UINT16, spriteram_size/2);
+	spriteram_delayed = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
+	spriteram_buffered = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
 	spritelist = auto_alloc_array(machine, struct tempsprite, 0x400);
 
 	chips = TC0100SCN_count(machine);
@@ -135,8 +135,8 @@ static void taitof2_core_vh_start (running_machine *machine, int sprite_type,int
 	state_save_register_global_array(machine, spritebank);
 	state_save_register_global(machine, sprites_disabled);
 	state_save_register_global(machine, sprites_active_area);
-	state_save_register_global_pointer(machine, spriteram_delayed, spriteram_size/2);
-	state_save_register_global_pointer(machine, spriteram_buffered, spriteram_size/2);
+	state_save_register_global_pointer(machine, spriteram_delayed, machine->generic.spriteram_size/2);
+	state_save_register_global_pointer(machine, spriteram_buffered, machine->generic.spriteram_size/2);
 }
 
 
@@ -902,23 +902,23 @@ static void update_spritebanks(void)
 #endif
 }
 
-static void taitof2_handle_sprite_buffering(void)
+static void taitof2_handle_sprite_buffering(running_machine *machine)
 {
 	if (prepare_sprites)	/* no buffering */
 	{
-		memcpy(spriteram_buffered,spriteram16,spriteram_size);
+		memcpy(spriteram_buffered,machine->generic.spriteram.u16,machine->generic.spriteram_size);
 		prepare_sprites = 0;
 	}
 }
 
-static void taitof2_update_sprites_active_area(void)
+static void taitof2_update_sprites_active_area(running_machine *machine)
 {
 	int off;
 
 	update_spritebanks();
 
 	/* if the frame was skipped, we'll have to do the buffering now */
-	taitof2_handle_sprite_buffering();
+	taitof2_handle_sprite_buffering(machine);
 
 	/* safety check to avoid getting stuck in bank 2 for games using only one bank */
 	if (sprites_active_area == 0x8000 &&
@@ -958,52 +958,55 @@ static void taitof2_update_sprites_active_area(void)
 
 VIDEO_EOF( taitof2_no_buffer )
 {
-	taitof2_update_sprites_active_area();
+	taitof2_update_sprites_active_area(machine);
 
 	prepare_sprites = 1;
 }
 
 VIDEO_EOF( taitof2_full_buffer_delayed )
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int i;
 
-	taitof2_update_sprites_active_area();
+	taitof2_update_sprites_active_area(machine);
 
 	prepare_sprites = 0;
-	memcpy(spriteram_buffered,spriteram_delayed,spriteram_size);
-	for (i = 0;i < spriteram_size/2;i++)
+	memcpy(spriteram_buffered,spriteram_delayed,machine->generic.spriteram_size);
+	for (i = 0;i < machine->generic.spriteram_size/2;i++)
 		spriteram_buffered[i] = spriteram16[i];
-	memcpy(spriteram_delayed,spriteram16,spriteram_size);
+	memcpy(spriteram_delayed,spriteram16,machine->generic.spriteram_size);
 }
 
 VIDEO_EOF( taitof2_partial_buffer_delayed )
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int i;
 
-	taitof2_update_sprites_active_area();
+	taitof2_update_sprites_active_area(machine);
 
 	prepare_sprites = 0;
-	memcpy(spriteram_buffered,spriteram_delayed,spriteram_size);
-	for (i = 0;i < spriteram_size/2;i += 4)
+	memcpy(spriteram_buffered,spriteram_delayed,machine->generic.spriteram_size);
+	for (i = 0;i < machine->generic.spriteram_size/2;i += 4)
 		spriteram_buffered[i] = spriteram16[i];
-	memcpy(spriteram_delayed,spriteram16,spriteram_size);
+	memcpy(spriteram_delayed,spriteram16,machine->generic.spriteram_size);
 }
 
 VIDEO_EOF( taitof2_partial_buffer_delayed_thundfox )
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int i;
 
-	taitof2_update_sprites_active_area();
+	taitof2_update_sprites_active_area(machine);
 
 	prepare_sprites = 0;
-	memcpy(spriteram_buffered,spriteram_delayed,spriteram_size);
-	for (i = 0;i < spriteram_size/2;i += 8)
+	memcpy(spriteram_buffered,spriteram_delayed,machine->generic.spriteram_size);
+	for (i = 0;i < machine->generic.spriteram_size/2;i += 8)
 	{
 		spriteram_buffered[i]   = spriteram16[i];
 		spriteram_buffered[i+1] = spriteram16[i+1];
 		spriteram_buffered[i+4] = spriteram16[i+4];
 	}
-	memcpy(spriteram_delayed,spriteram16,spriteram_size);
+	memcpy(spriteram_delayed,spriteram16,machine->generic.spriteram_size);
 }
 
 VIDEO_EOF( taitof2_partial_buffer_delayed_qzchikyu )
@@ -1011,13 +1014,14 @@ VIDEO_EOF( taitof2_partial_buffer_delayed_qzchikyu )
 	/* spriteram[2] and [3] are 1 frame behind...
        probably thundfox_eof_callback would work fine */
 
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int i;
 
-	taitof2_update_sprites_active_area();
+	taitof2_update_sprites_active_area(machine);
 
 	prepare_sprites = 0;
-	memcpy(spriteram_buffered,spriteram_delayed,spriteram_size);
-	for (i = 0;i < spriteram_size/2;i += 8)
+	memcpy(spriteram_buffered,spriteram_delayed,machine->generic.spriteram_size);
+	for (i = 0;i < machine->generic.spriteram_size/2;i += 8)
 	{
 		spriteram_buffered[i]   = spriteram16[i];
 		spriteram_buffered[i+1] = spriteram16[i+1];
@@ -1026,14 +1030,14 @@ VIDEO_EOF( taitof2_partial_buffer_delayed_qzchikyu )
 		spriteram_buffered[i+6] = spriteram16[i+6];	// not needed?
 		spriteram_buffered[i+7] = spriteram16[i+7];	// not needed?
 	}
-	memcpy(spriteram_delayed,spriteram16,spriteram_size);
+	memcpy(spriteram_delayed,spriteram16,machine->generic.spriteram_size);
 }
 
 
 /* SSI */
 VIDEO_UPDATE( taitof2_ssi )
 {
-	taitof2_handle_sprite_buffering();
+	taitof2_handle_sprite_buffering(screen->machine);
 
 	/* SSI only uses sprites, the tilemap registers are not even initialized.
        (they are in Majestic 12, but the tilemaps are not used anyway) */
@@ -1046,7 +1050,7 @@ VIDEO_UPDATE( taitof2_ssi )
 
 VIDEO_UPDATE( taitof2_yesnoj )
 {
-	taitof2_handle_sprite_buffering();
+	taitof2_handle_sprite_buffering(screen->machine);
 
 	TC0100SCN_tilemap_update(screen->machine);
 
@@ -1062,7 +1066,7 @@ VIDEO_UPDATE( taitof2_yesnoj )
 
 VIDEO_UPDATE( taitof2 )
 {
-	taitof2_handle_sprite_buffering();
+	taitof2_handle_sprite_buffering(screen->machine);
 
 	TC0100SCN_tilemap_update(screen->machine);
 
@@ -1080,7 +1084,7 @@ VIDEO_UPDATE( taitof2_pri )
 {
 	int layer[3];
 
-	taitof2_handle_sprite_buffering();
+	taitof2_handle_sprite_buffering(screen->machine);
 
 	TC0100SCN_tilemap_update(screen->machine);
 
@@ -1129,7 +1133,7 @@ VIDEO_UPDATE( taitof2_pri_roz )
 	int i,j;
 	int roz_base_color = (TC0360PRI_regs[1] & 0x3f) << 2;
 
-	taitof2_handle_sprite_buffering();
+	taitof2_handle_sprite_buffering(screen->machine);
 
 	if (has_TC0280GRD(screen->machine))
 		TC0280GRD_tilemap_update(roz_base_color);
@@ -1196,7 +1200,7 @@ VIDEO_UPDATE( taitof2_thundfox )
 	int drawn[2];
 
 
-	taitof2_handle_sprite_buffering();
+	taitof2_handle_sprite_buffering(screen->machine);
 
 	TC0100SCN_tilemap_update(screen->machine);
 
@@ -1323,7 +1327,7 @@ VIDEO_UPDATE( taitof2_metalb )
 	UINT8 layer[5], invlayer[4];
 	UINT16 priority;
 
-	taitof2_handle_sprite_buffering();
+	taitof2_handle_sprite_buffering(screen->machine);
 
 	TC0480SCP_tilemap_update(screen->machine);
 
@@ -1375,7 +1379,7 @@ VIDEO_UPDATE( taitof2_deadconx )
 	UINT8 spritepri[4];
 	UINT16 priority;
 
-	taitof2_handle_sprite_buffering();
+	taitof2_handle_sprite_buffering(screen->machine);
 
 	TC0480SCP_tilemap_update(screen->machine);
 

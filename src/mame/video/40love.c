@@ -82,8 +82,8 @@ colorram format (2 bytes per one tilemap character line, 8 pixels height):
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int tile_number = videoram[tile_index];
-	int tile_attrib = colorram[(tile_index/64)*2];
+	int tile_number = machine->generic.videoram.u8[tile_index];
+	int tile_attrib = machine->generic.colorram.u8[(tile_index/64)*2];
 	int tile_h_bank = (tile_attrib&0x40)<<3;	/* 0x40->0x200 */
 	int tile_l_bank = (tile_attrib&0x18)<<3;	/* 0x10->0x80, 0x08->0x40 */
 
@@ -147,10 +147,10 @@ VIDEO_START( fortyl )
 
 ***************************************************************************/
 
-static void fortyl_set_scroll_x(int offset)
+static void fortyl_set_scroll_x(running_machine *machine, int offset)
 {
 	int	i = offset & ~1;
-	int x = ((colorram[i] & 0x80) << 1) | colorram[i+1];	/* 9 bits signed */
+	int x = ((machine->generic.colorram.u8[i] & 0x80) << 1) | machine->generic.colorram.u8[i+1];	/* 9 bits signed */
 
 	if (fortyl_flipscreen)
 		x += 0x51;
@@ -177,7 +177,7 @@ WRITE8_HANDLER( fortyl_pixram_sel_w )
 		fortyl_pix_redraw = 1;
 
 		for (offs=0;offs<32;offs++)
-			fortyl_set_scroll_x(offs*2);
+			fortyl_set_scroll_x(space->machine, offs*2);
 	}
 }
 
@@ -231,30 +231,30 @@ WRITE8_HANDLER( fortyl_pixram_w )
 
 WRITE8_HANDLER( fortyl_bg_videoram_w )
 {
-	videoram[offset]=data;
+	space->machine->generic.videoram.u8[offset]=data;
 	tilemap_mark_tile_dirty(background,offset);
 }
 READ8_HANDLER( fortyl_bg_videoram_r )
 {
-	return videoram[offset];
+	return space->machine->generic.videoram.u8[offset];
 }
 
 WRITE8_HANDLER( fortyl_bg_colorram_w )
 {
-	if( colorram[offset]!=data )
+	if( space->machine->generic.colorram.u8[offset]!=data )
 	{
 		int i;
 
-		colorram[offset] = data;
+		space->machine->generic.colorram.u8[offset] = data;
 		for (i=(offset/2)*64; i<(offset/2)*64+64; i++)
 			tilemap_mark_tile_dirty(background,i);
 
-		fortyl_set_scroll_x(offset);
+		fortyl_set_scroll_x(space->machine, offset);
 	}
 }
 READ8_HANDLER( fortyl_bg_colorram_r )
 {
-	return colorram[offset];
+	return space->machine->generic.colorram.u8[offset];
 }
 
 /***************************************************************************
@@ -280,10 +280,12 @@ spriteram format (4 bytes per sprite):
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
 	int offs;
 
 	/* spriteram #1 */
-	for (offs = 0; offs < spriteram_size; offs += 4)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
 	{
 		int code,color,sx,sy,flipx,flipy;
 
@@ -311,7 +313,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 
 	/* spriteram #2 */
-	for (offs = 0; offs < spriteram_2_size; offs += 4)
+	for (offs = 0; offs < machine->generic.spriteram2_size; offs += 4)
 	{
 		int code,color,sx,sy,flipx,flipy;
 

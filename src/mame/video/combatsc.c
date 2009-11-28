@@ -103,17 +103,17 @@ PALETTE_INIT( combascb )
 }
 
 
-static void set_pens(colortable_t *colortable)
+static void set_pens(running_machine *machine)
 {
 	int i;
 
 	for (i = 0x00; i < 0x100; i += 2)
 	{
-		UINT16 data = paletteram[i] | (paletteram[i | 1] << 8);
+		UINT16 data = machine->generic.paletteram.u8[i] | (machine->generic.paletteram.u8[i | 1] << 8);
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(colortable, i >> 1, color);
+		colortable_palette_set_color(machine->colortable, i >> 1, color);
 	}
 }
 
@@ -301,12 +301,12 @@ VIDEO_START( combascb )
 
 READ8_HANDLER( combasc_video_r )
 {
-	return videoram[offset];
+	return space->machine->generic.videoram.u8[offset];
 }
 
 WRITE8_HANDLER( combasc_video_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	if( offset<0x800 )
 	{
 		if (combasc_video_circuit)
@@ -359,13 +359,13 @@ WRITE8_HANDLER( combasc_bankselect_w )
 	if (data & 0x40)
 	{
 		combasc_video_circuit = 1;
-		videoram = combasc_page[1];
+		space->machine->generic.videoram.u8 = combasc_page[1];
 		combasc_scrollram = combasc_scrollram1;
 	}
 	else
 	{
 		combasc_video_circuit = 0;
-		videoram = combasc_page[0];
+		space->machine->generic.videoram.u8 = combasc_page[0];
 		combasc_scrollram = combasc_scrollram0;
 	}
 
@@ -386,12 +386,12 @@ WRITE8_HANDLER( combascb_bankselect_w )
 	if (data & 0x40)
 	{
 		combasc_video_circuit = 1;
-		videoram = combasc_page[1];
+		space->machine->generic.videoram.u8 = combasc_page[1];
 	}
 	else
 	{
 		combasc_video_circuit = 0;
-		videoram = combasc_page[0];
+		space->machine->generic.videoram.u8 = combasc_page[0];
 	}
 
 	data = data & 0x1f;
@@ -487,7 +487,7 @@ VIDEO_UPDATE( combasc )
 {
 	int i;
 
-	set_pens(screen->machine->colortable);
+	set_pens(screen->machine);
 
 	if (K007121_ctrlram[0][0x01] & 0x02)
 	{
@@ -643,7 +643,7 @@ VIDEO_UPDATE( combascb )
 {
 	int i;
 
-	set_pens(screen->machine->colortable);
+	set_pens(screen->machine);
 
 	for( i=0; i<32; i++ )
 	{

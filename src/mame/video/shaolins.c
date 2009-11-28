@@ -93,13 +93,13 @@ PALETTE_INIT( shaolins )
 
 WRITE8_HANDLER( shaolins_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( shaolins_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -133,8 +133,8 @@ WRITE8_HANDLER( shaolins_nmi_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = colorram[tile_index];
-	int code = videoram[tile_index] + ((attr & 0x40) << 2);
+	int attr = machine->generic.colorram.u8[tile_index];
+	int code = machine->generic.videoram.u8[tile_index] + ((attr & 0x40) << 2);
 	int color = (attr & 0x0f) + 16 * palettebank;
 	int flags = (attr & 0x20) ? TILE_FLIPY : 0;
 
@@ -151,9 +151,10 @@ VIDEO_START( shaolins )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = spriteram_size-32; offs >= 0; offs-=32 ) /* max 24 sprites */
+	for (offs = machine->generic.spriteram_size-32; offs >= 0; offs-=32 ) /* max 24 sprites */
 	{
 		if (spriteram[offs] && spriteram[offs + 6]) /* stop rogue sprites on high score screen */
 		{

@@ -66,8 +66,8 @@ static STATE_POSTLOAD( expand_pixels )
 
     for(offset = 0; offset < 0x77ff; offset++)
     {
-        local_videoram[offset * 2 + 0] = videoram[offset] >> 4;
-        local_videoram[offset * 2 + 1] = videoram[offset] & 15;
+        local_videoram[offset * 2 + 0] = machine->generic.videoram.u8[offset] >> 4;
+        local_videoram[offset * 2 + 1] = machine->generic.videoram.u8[offset] & 15;
     }
 }
 
@@ -115,7 +115,7 @@ WRITE8_HANDLER( gridlee_cocktail_flip_w )
 
 WRITE8_HANDLER( gridlee_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 
 	/* expand the two pixel values into two bytes */
 	local_videoram[offset * 2 + 0] = data >> 4;
@@ -178,7 +178,7 @@ VIDEO_UPDATE( gridlee )
 	gfx = memory_region(screen->machine, "gfx1");
 	for (i = 0; i < 32; i++)
 	{
-		UINT8 *sprite = spriteram + i * 4;
+		UINT8 *sprite = screen->machine->generic.spriteram.u8 + i * 4;
 		UINT8 *src;
 		int image = sprite[0];
 		int ypos = sprite[2] + 17 + BALSENTE_VBEND;

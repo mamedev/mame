@@ -45,7 +45,7 @@ static tilemap *alpha_tilemap;
 #ifdef UNUSED_FUNCTION
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
+	int data = machine->generic.videoram.u8[tile_index * 2] | (machine->generic.videoram.u8[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0x400);
 	int color = (data >> 12) & 3;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 10) & 3));
@@ -55,7 +55,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( mcrmono_get_bg_tile_info )
 {
-	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
+	int data = machine->generic.videoram.u8[tile_index * 2] | (machine->generic.videoram.u8[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0x400);
 	int color = ((data >> 12) & 3) ^ 3;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 10) & 3));
@@ -71,7 +71,7 @@ static TILEMAP_MAPPER( spyhunt_bg_scan )
 
 static TILE_GET_INFO( spyhunt_get_bg_tile_info )
 {
-	int data = videoram[tile_index];
+	int data = machine->generic.videoram.u8[tile_index];
 	int code = (data & 0x3f) | ((data >> 1) & 0x40);
 	SET_TILE_INFO(0, code, 0, (data & 0x40) ? TILE_FLIPY : 0);
 }
@@ -149,7 +149,7 @@ VIDEO_START( spyhunt )
 
 WRITE8_HANDLER( mcr3_paletteram_w )
 {
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 	offset &= 0x7f;
 
 	/* high bit of red comes from low bit of address */
@@ -166,14 +166,14 @@ WRITE8_HANDLER( mcr3_paletteram_w )
 
 WRITE8_HANDLER( mcr3_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
 
 WRITE8_HANDLER( spyhunt_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -194,12 +194,13 @@ WRITE8_HANDLER( spyhunt_alpharam_w )
 
 static void mcr3_update_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int color_mask, int code_xor, int dx, int dy)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
 	bitmap_fill(machine->priority_bitmap, cliprect, 1);
 
 	/* loop over sprite RAM */
-	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int code, color, flipx, flipy, sx, sy, flags;
 

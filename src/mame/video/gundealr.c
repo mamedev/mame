@@ -90,13 +90,13 @@ WRITE8_HANDLER( gundealr_paletteram_w )
 	int r,g,b,val;
 
 
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 
-	val = paletteram[offset & ~1];
+	val = space->machine->generic.paletteram.u8[offset & ~1];
 	r = (val >> 4) & 0x0f;
 	g = (val >> 0) & 0x0f;
 
-	val = paletteram[offset | 1];
+	val = space->machine->generic.paletteram.u8[offset | 1];
 	b = (val >> 4) & 0x0f;
 	/* TODO: the bottom 4 bits are used as well, but I'm not sure about the meaning */
 

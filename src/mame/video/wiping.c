@@ -90,9 +90,10 @@ WRITE8_HANDLER( wiping_flipscreen_w )
 
 VIDEO_UPDATE( wiping )
 {
+	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = videoram_size - 1; offs > 0; offs--)
+	for (offs = screen->machine->generic.videoram_size - 1; offs > 0; offs--)
 	{
 		int mx,my,sx,sy;
 
@@ -122,8 +123,8 @@ VIDEO_UPDATE( wiping )
 		}
 
 		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
-				videoram[offs],
-				colorram[offs] & 0x3f,
+				screen->machine->generic.videoram.u8[offs],
+				screen->machine->generic.colorram.u8[offs] & 0x3f,
 				flipscreen,flipscreen,
 				sx*8,sy*8);
 	}
@@ -158,9 +159,9 @@ VIDEO_UPDATE( wiping )
 	}
 
 	/* redraw high priority chars */
-	for (offs = videoram_size - 1; offs > 0; offs--)
+	for (offs = screen->machine->generic.videoram_size - 1; offs > 0; offs--)
 	{
-		if (colorram[offs] & 0x80)
+		if (screen->machine->generic.colorram.u8[offs] & 0x80)
 		{
 			int mx,my,sx,sy;
 
@@ -190,8 +191,8 @@ VIDEO_UPDATE( wiping )
 			}
 
 			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
-					videoram[offs],
-					colorram[offs] & 0x3f,
+					screen->machine->generic.videoram.u8[offs],
+					screen->machine->generic.colorram.u8[offs] & 0x3f,
 					flipscreen,flipscreen,
 					sx*8,sy*8);
         	}

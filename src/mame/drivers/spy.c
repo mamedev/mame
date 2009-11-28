@@ -45,7 +45,7 @@ static READ8_HANDLER( spy_bankedram1_r )
 {
 	if (rambank & 1)
 	{
-		return paletteram[offset];
+		return space->machine->generic.paletteram.u8[offset];
 	}
 	else if (rambank & 2)
 	{
@@ -583,7 +583,7 @@ static void gfx_untangle(running_machine *machine)
 
 static DRIVER_INIT( spy )
 {
-	paletteram = &memory_region(machine, "maincpu")[0x28000];
+	machine->generic.paletteram.u8 = &memory_region(machine, "maincpu")[0x28000];
 	pmcram =     &memory_region(machine, "maincpu")[0x28800];
 	gfx_untangle(machine);
 }

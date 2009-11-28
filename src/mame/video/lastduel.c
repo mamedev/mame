@@ -188,7 +188,7 @@ WRITE16_HANDLER( madgear_scroll2_w )
 WRITE16_HANDLER( lastduel_palette_word_w )
 {
 	int red, green, blue, bright;
-	data = COMBINE_DATA(&paletteram16[offset]);
+	data = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 
 	// Brightness parameter interpreted same way as CPS1
 	bright = 0x10 + (data&0x0f);
@@ -208,6 +208,7 @@ WRITE16_HANDLER( lastduel_palette_word_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
 {
+	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	int offs;
 
 	if (!sprite_pri_mask)

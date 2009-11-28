@@ -57,8 +57,8 @@ static TILE_GET_INFO( get_txttile_info )
 {
 	int code,attr,pal;
 
-	code=videoram[tile_index];
-	attr=videoram[tile_index+0x400];
+	code=machine->generic.videoram.u8[tile_index];
+	attr=machine->generic.videoram.u8[tile_index+0x400];
 	pal=(attr>>1);
 
 	code+=(attr&1)<<8;
@@ -103,20 +103,20 @@ PALETTE_INIT(darkmist)
 }
 
 
-static void set_pens(colortable_t *colortable)
+static void set_pens(running_machine *machine)
 {
 	int i;
 
 	for (i = 0; i < 0x100; i++)
 	{
-		int r = pal4bit(paletteram[i | 0x200] >> 0);
-		int g = pal4bit(paletteram[i | 0x000] >> 4);
-		int b = pal4bit(paletteram[i | 0x000] >> 0);
+		int r = pal4bit(machine->generic.paletteram.u8[i | 0x200] >> 0);
+		int g = pal4bit(machine->generic.paletteram.u8[i | 0x000] >> 4);
+		int b = pal4bit(machine->generic.paletteram.u8[i | 0x000] >> 0);
 
-		colortable_palette_set_color(colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	colortable_palette_set_color(colortable, 0x100, RGB_BLACK);
+	colortable_palette_set_color(machine->colortable, 0x100, RGB_BLACK);
 }
 
 
@@ -131,10 +131,11 @@ VIDEO_START(darkmist)
 
 VIDEO_UPDATE( darkmist)
 {
+	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 
 #define DM_GETSCROLL(n) (((darkmist_scroll[(n)]<<1)&0xff) + ((darkmist_scroll[(n)]&0x80)?1:0) +( ((darkmist_scroll[(n)-1]<<4) | (darkmist_scroll[(n)-1]<<12) )&0xff00))
 
-	set_pens(screen->machine->colortable);
+	set_pens(screen->machine);
 
 	tilemap_set_scrollx(bgtilemap, 0, DM_GETSCROLL(0x2));
 	tilemap_set_scrolly(bgtilemap, 0, DM_GETSCROLL(0x6));
@@ -163,7 +164,7 @@ VIDEO_UPDATE( darkmist)
 
 */
 	int i,fx,fy,tile,palette;
-	for(i=0;i<spriteram_size;i+=32)
+	for(i=0;i<screen->machine->generic.spriteram_size;i+=32)
 	{
 		fy=spriteram[i+1]&0x40;
 		fx=spriteram[i+1]&0x80;

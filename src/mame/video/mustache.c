@@ -46,7 +46,7 @@ PALETTE_INIT(mustache)
 
 WRITE8_HANDLER( mustache_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
@@ -77,8 +77,8 @@ WRITE8_HANDLER( mustache_scroll_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = videoram[2 * tile_index + 1];
-	int code = videoram[2 * tile_index] + ((attr & 0x60) << 3) + ((control_byte & 0x08) << 7);
+	int attr = machine->generic.videoram.u8[2 * tile_index + 1];
+	int code = machine->generic.videoram.u8[2 * tile_index] + ((attr & 0x60) << 3) + ((control_byte & 0x08) << 7);
 	int color = attr & 0x0f;
 
 	SET_TILE_INFO(0, code, color, ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0)   );
@@ -99,9 +99,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	rectangle clip = *cliprect;
 	const gfx_element *gfx = machine->gfx[1];
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size;offs += 4)
 	{
 		int sy = 240-spriteram[offs];
 		int sx = 240-spriteram[offs+3];

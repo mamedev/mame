@@ -39,7 +39,7 @@ UINT8 *lkage_scroll, *lkage_vreg;
 
 WRITE8_HANDLER( lkage_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 
 	switch( offset/0x400 )
 	{
@@ -62,19 +62,19 @@ WRITE8_HANDLER( lkage_videoram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index + 0x800] + 256 * (bg_tile_bank?5:1);
+	int code = machine->generic.videoram.u8[tile_index + 0x800] + 256 * (bg_tile_bank?5:1);
 	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/ );
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code = videoram[tile_index + 0x400] + 256 * (fg_tile_bank?1:0);
+	int code = machine->generic.videoram.u8[tile_index + 0x400] + 256 * (fg_tile_bank?1:0);
 	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/);
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	int code = videoram[tile_index];
+	int code = machine->generic.videoram.u8[tile_index];
 	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/);
 }
 
@@ -97,7 +97,7 @@ VIDEO_START( lkage )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	const UINT8 *source = spriteram;
+	const UINT8 *source = machine->generic.spriteram.u8;
 	const UINT8 *finish = source+0x60;
 	while( source<finish )
 	{

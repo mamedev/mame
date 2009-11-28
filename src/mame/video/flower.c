@@ -31,7 +31,7 @@ PALETTE_INIT( flower )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	const gfx_element *gfx = machine->gfx[1];
-	UINT8 *source = spriteram + 0x200;
+	UINT8 *source = machine->generic.spriteram.u8 + 0x200;
 	UINT8 *finish = source - 0x200;
 
 	source -= 8;

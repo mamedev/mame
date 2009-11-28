@@ -56,10 +56,10 @@ WRITE16_HANDLER( twin16_text_ram_w )
 
 WRITE16_HANDLER( twin16_paletteram_word_w )
 { 	// identical to tmnt_paletteram_w
-	COMBINE_DATA(paletteram16 + offset);
+	COMBINE_DATA(space->machine->generic.paletteram.u16 + offset);
 	offset &= ~1;
 
-	data = ((paletteram16[offset] & 0xff) << 8) | (paletteram16[offset + 1] & 0xff);
+	data = ((space->machine->generic.paletteram.u16[offset] & 0xff) << 8) | (space->machine->generic.paletteram.u16[offset + 1] & 0xff);
 	palette_set_color_rgb(space->machine, offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
@@ -163,6 +163,7 @@ static int twin16_set_sprite_timer( running_machine *machine )
 
 void twin16_spriteram_process( running_machine *machine )
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	UINT16 dx = scrollx[0];
 	UINT16 dy = scrolly[0];
 
@@ -223,8 +224,8 @@ void twin16_spriteram_process( running_machine *machine )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap )
 {
-	const UINT16 *source = 0x1800+buffered_spriteram16 + 0x800 - 4;
-	const UINT16 *finish = 0x1800+buffered_spriteram16;
+	const UINT16 *source = 0x1800+machine->generic.buffered_spriteram.u16 + 0x800 - 4;
+	const UINT16 *finish = 0x1800+machine->generic.buffered_spriteram.u16;
 
 	for (; source >= finish; source -= 4)
 	{
@@ -346,7 +347,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap )
 static void draw_layer( running_machine *machine, bitmap_t *bitmap, int opaque )
 {
 	const UINT16 *gfx_base;
-	const UINT16 *source = videoram16;
+	const UINT16 *source = machine->generic.videoram.u16;
 	int i, xxor, yxor;
 	int bank_table[4];
 	int dx, dy, palette;
@@ -542,8 +543,8 @@ VIDEO_EOF( twin16 )
 		/* if the sprite preprocessor is used, sprite ram is copied to an external buffer first,
         as evidenced by 1-frame sprite lag in gradius2 and devilw otherwise, though there's probably
         more to it than that */
-		memcpy(&buffered_spriteram16[0x1800],twin16_sprite_buffer,0x800*sizeof(UINT16));
-		memcpy(twin16_sprite_buffer,&spriteram16[0x1800],0x800*sizeof(UINT16));
+		memcpy(&machine->generic.buffered_spriteram.u16[0x1800],twin16_sprite_buffer,0x800*sizeof(UINT16));
+		memcpy(twin16_sprite_buffer,&machine->generic.spriteram.u16[0x1800],0x800*sizeof(UINT16));
 	}
 	else {
 		const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);

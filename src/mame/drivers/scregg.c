@@ -57,7 +57,7 @@ it as ASCII text.
 
 static ADDRESS_MAP_START( dommy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_MEMBER(btime_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_MEMBER(btime_state, videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_MEMBER(btime_state, colorram)
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1") AM_WRITENOP
@@ -73,7 +73,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( eggs_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_MEMBER(btime_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_MEMBER(btime_state, videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE_MEMBER(btime_state, colorram)
 	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r,btime_mirrorvideoram_w)
 	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(btime_mirrorcolorram_r,btime_mirrorcolorram_w)

@@ -70,7 +70,7 @@ static VIDEO_START( progolf )
 	scrollx_lo = 0;
 
 	progolf_fg_fb = auto_alloc_array(machine, UINT8, 0x2000*8);
-	videoram = auto_alloc_array(machine, UINT8, 0x1000);
+	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 0x1000);
 }
 
 
@@ -87,7 +87,7 @@ static VIDEO_UPDATE( progolf )
 		{
 			for(y=0;y<32;y++)
 			{
-				int tile = videoram[count];
+				int tile = screen->machine->generic.videoram.u8[count];
 
 				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,1,0,0,(256-x*8)+scroll,y*8);
 				/* wrap-around */
@@ -196,7 +196,7 @@ static READ8_HANDLER( progolf_videoram_r )
 		else if (progolf_gfx_switch == 0x70)
 			return gfx_rom[offset + 0x2000];
 		else
-			return videoram[offset];
+			return space->machine->generic.videoram.u8[offset];
 	} else {
 		if      (progolf_gfx_switch == 0x10)
 			return gfx_rom[offset];
@@ -205,14 +205,14 @@ static READ8_HANDLER( progolf_videoram_r )
 		else if (progolf_gfx_switch == 0x30)
 			return gfx_rom[offset + 0x2000];
 		else
-			return videoram[offset];
+			return space->machine->generic.videoram.u8[offset];
 	}
 }
 
 static WRITE8_HANDLER( progolf_videoram_w )
 {
 	//if(progolf_gfx_switch & 0x40)
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 }
 
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )

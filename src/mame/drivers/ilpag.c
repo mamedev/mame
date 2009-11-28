@@ -468,19 +468,19 @@ static TIMER_DEVICE_CALLBACK( steaser_mcu_sim )
 {
 //  static int i;
 	/*first off, signal the "MCU is running" flag*/
-	timer->machine->generic.nvram.ptr.u16[0x932/2] = 0xffff;
+	timer->machine->generic.nvram.u16[0x932/2] = 0xffff;
 	/*clear the inputs (they are impulsed)*/
 //  for(i=0;i<8;i+=2)
-//      timer->machine->generic.nvram.ptr.u16[((0x8a0)+i)/2] = 0;
+//      timer->machine->generic.nvram.u16[((0x8a0)+i)/2] = 0;
 	/*finally, read the inputs*/
-	timer->machine->generic.nvram.ptr.u16[0x89e/2] = input_port_read(timer->machine, "MENU") & 0xffff;
-	timer->machine->generic.nvram.ptr.u16[0x8a0/2] = input_port_read(timer->machine, "STAT") & 0xffff;
-	timer->machine->generic.nvram.ptr.u16[0x8a2/2] = input_port_read(timer->machine, "BET_DEAL") & 0xffff;
-	timer->machine->generic.nvram.ptr.u16[0x8a4/2] = input_port_read(timer->machine, "TAKE_DOUBLE") & 0xffff;
-	timer->machine->generic.nvram.ptr.u16[0x8a6/2] = input_port_read(timer->machine, "SMALL_BIG") & 0xffff;
-	timer->machine->generic.nvram.ptr.u16[0x8a8/2] = input_port_read(timer->machine, "CANCEL_HOLD1") & 0xffff;
-	timer->machine->generic.nvram.ptr.u16[0x8aa/2] = input_port_read(timer->machine, "HOLD2_HOLD3") & 0xffff;
-	timer->machine->generic.nvram.ptr.u16[0x8ac/2] = input_port_read(timer->machine, "HOLD4_HOLD5") & 0xffff;
+	timer->machine->generic.nvram.u16[0x89e/2] = input_port_read(timer->machine, "MENU") & 0xffff;
+	timer->machine->generic.nvram.u16[0x8a0/2] = input_port_read(timer->machine, "STAT") & 0xffff;
+	timer->machine->generic.nvram.u16[0x8a2/2] = input_port_read(timer->machine, "BET_DEAL") & 0xffff;
+	timer->machine->generic.nvram.u16[0x8a4/2] = input_port_read(timer->machine, "TAKE_DOUBLE") & 0xffff;
+	timer->machine->generic.nvram.u16[0x8a6/2] = input_port_read(timer->machine, "SMALL_BIG") & 0xffff;
+	timer->machine->generic.nvram.u16[0x8a8/2] = input_port_read(timer->machine, "CANCEL_HOLD1") & 0xffff;
+	timer->machine->generic.nvram.u16[0x8aa/2] = input_port_read(timer->machine, "HOLD2_HOLD3") & 0xffff;
+	timer->machine->generic.nvram.u16[0x8ac/2] = input_port_read(timer->machine, "HOLD4_HOLD5") & 0xffff;
 }
 
 /* TODO: remove this hack.*/

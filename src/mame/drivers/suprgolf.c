@@ -35,8 +35,8 @@ static UINT8 suprgolf_vreg_pen;
 
 static TILE_GET_INFO( get_tile_info )
 {
-	int code = videoram[tile_index*2]+256*(videoram[tile_index*2+1]);
-	int color = videoram[tile_index*2+0x800] & 0x7f;
+	int code = machine->generic.videoram.u8[tile_index*2]+256*(machine->generic.videoram.u8[tile_index*2+1]);
+	int color = machine->generic.videoram.u8[tile_index*2+0x800] & 0x7f;
 
 	SET_TILE_INFO(
 		0,
@@ -48,7 +48,7 @@ static TILE_GET_INFO( get_tile_info )
 static VIDEO_START( suprgolf )
 {
 	suprgolf_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
-	paletteram = auto_alloc_array(machine, UINT8, 0x1000);
+	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x1000);
 	suprgolf_bg_vram = auto_alloc_array(machine, UINT8, 0x2000*0x20);
 	suprgolf_bg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
 	suprgolf_fg_fb = auto_alloc_array(machine, UINT16, 0x2000*0x20);
@@ -105,9 +105,9 @@ static UINT8 palette_switch;
 static READ8_HANDLER( suprgolf_videoram_r )
 {
 	if(palette_switch)
-		return paletteram[offset];
+		return space->machine->generic.paletteram.u8[offset];
 	else
-		return videoram[offset];
+		return space->machine->generic.videoram.u8[offset];
 }
 
 static WRITE8_HANDLER( suprgolf_videoram_w )
@@ -115,9 +115,9 @@ static WRITE8_HANDLER( suprgolf_videoram_w )
 	if(palette_switch)
 	{
 		int r,g,b,datax;
-		paletteram[offset] = data;
+		space->machine->generic.paletteram.u8[offset] = data;
 		offset>>=1;
-		datax=paletteram[offset*2]+256*paletteram[offset*2+1];
+		datax=space->machine->generic.paletteram.u8[offset*2]+256*space->machine->generic.paletteram.u8[offset*2+1];
 
 		b = (datax & 0x8000) ? 0 : ((datax)&0x001f)>>0;
 		g = (datax & 0x8000) ? 0 : ((datax)&0x03e0)>>5;
@@ -127,7 +127,7 @@ static WRITE8_HANDLER( suprgolf_videoram_w )
 	}
 	else
 	{
-		videoram[offset] = data;
+		space->machine->generic.videoram.u8[offset] = data;
 		tilemap_mark_tile_dirty(suprgolf_tilemap, (offset & 0x7fe) >> 1);
 	}
 }
@@ -269,7 +269,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4000) AM_WRITE( rom2_bank_select_w )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE( suprgolf_bg_vram_r, suprgolf_bg_vram_w ) // banked background vram
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE( suprgolf_videoram_r, suprgolf_videoram_w ) AM_BASE(&videoram) //foreground vram + paletteram
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE( suprgolf_videoram_r, suprgolf_videoram_w ) AM_BASE_GENERIC(videoram) //foreground vram + paletteram
 	AM_RANGE(0xf000, 0xf000) AM_WRITE( suprgolf_pen_w )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END

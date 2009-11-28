@@ -128,7 +128,7 @@ static WRITE8_DEVICE_HANDLER( ddrible_vlm5030_ctrl_w )
 static ADDRESS_MAP_START( cpu0_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0004) AM_WRITE(K005885_0_w)												/* video registers (005885 #1) */
 	AM_RANGE(0x0800, 0x0804) AM_WRITE(K005885_1_w)												/* video registers (005885 #2) */
-	AM_RANGE(0x1800, 0x187f) AM_RAM AM_BASE(&paletteram)										/* palette */
+	AM_RANGE(0x1800, 0x187f) AM_RAM AM_BASE_GENERIC(paletteram)										/* palette */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(ddrible_fg_videoram_w) AM_BASE(&ddrible_fg_videoram)	/* Video RAM 1 */
 	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE(&ddrible_spriteram_1)								/* Object RAM 1 */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&ddrible_sharedram)									/* shared RAM with CPU #1 */

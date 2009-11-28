@@ -107,6 +107,7 @@ static struct tempsprite *sprite_ptr_pre;
 
 static void draw_sprites_pre(running_machine *machine, int x_offs, int y_offs)
 {
+	UINT32 *spriteram32 = machine->generic.spriteram.u32;
 	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
@@ -119,7 +120,7 @@ static void draw_sprites_pre(running_machine *machine, int x_offs, int y_offs)
        while processing sprite ram and then draw them all at the end */
 	sprite_ptr_pre = spritelist;
 
-	for (offs = (spriteram_size/4-4);offs >= 0;offs -= 4)
+	for (offs = (machine->generic.spriteram_size/4-4);offs >= 0;offs -= 4)
 	{
 		data = spriteram32[offs+0];
 		flipx =    (data & 0x00800000) >> 23;

@@ -107,7 +107,7 @@ static UINT8 *jollyjgr_bitmap;
 
 static WRITE8_HANDLER( jollyjgr_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
@@ -126,7 +126,7 @@ static WRITE8_HANDLER( jollyjgr_attrram_w )
 		tilemap_set_scrolly(bg_tilemap, offset >> 1, data);
 	}
 
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 }
 
 static WRITE8_HANDLER( jollyjgr_misc_w )
@@ -156,9 +156,9 @@ static ADDRESS_MAP_START( jollyjgr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8fff, 0x8fff) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE(jollyjgr_misc_w)
 	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE(jollyjgr_coin_lookout_w)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_BASE(&colorram)
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x9880, 0x9bff) AM_RAM
 	AM_RANGE(0xa000, 0xffff) AM_RAM AM_BASE(&jollyjgr_bitmap)
 ADDRESS_MAP_END
@@ -268,8 +268,8 @@ static PALETTE_INIT( jollyjgr )
 /* Tilemap is the same as in Galaxian */
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int color = colorram[((tile_index & 0x1f) << 1) | 1] & 7;
-	SET_TILE_INFO(0, videoram[tile_index], color, 0);
+	int color = machine->generic.colorram.u8[((tile_index & 0x1f) << 1) | 1] & 7;
+	SET_TILE_INFO(0, machine->generic.videoram.u8[tile_index], color, 0);
 }
 
 static VIDEO_START( jollyjgr )
@@ -318,6 +318,7 @@ static void draw_bitmap(bitmap_t *bitmap)
 
 static VIDEO_UPDATE( jollyjgr )
 {
+	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	int offs;
 
 	bitmap_fill(bitmap,cliprect,32);

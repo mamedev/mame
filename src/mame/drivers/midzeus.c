@@ -129,7 +129,7 @@ static INTERRUPT_GEN( display_irq )
 static WRITE32_HANDLER( cmos_w )
 {
 	if (bitlatch[2] && !cmos_protected)
-		COMBINE_DATA(&space->machine->generic.nvram.ptr.u32[offset]);
+		COMBINE_DATA(&space->machine->generic.nvram.u32[offset]);
 	else
 		logerror("%06X:timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", cpu_get_pc(space->cpu), bitlatch[2], cmos_protected);
 	cmos_protected = TRUE;
@@ -138,7 +138,7 @@ static WRITE32_HANDLER( cmos_w )
 
 static READ32_HANDLER( cmos_r )
 {
-	return space->machine->generic.nvram.ptr.u32[offset] | 0xffffff00;
+	return space->machine->generic.nvram.u32[offset] | 0xffffff00;
 }
 
 

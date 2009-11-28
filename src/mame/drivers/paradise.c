@@ -78,25 +78,25 @@ static WRITE8_HANDLER( torus_coin_counter_w )
 static ADDRESS_MAP_START( paradise_map, ADDRESS_SPACE_PROGRAM, 8 )
 	STANDARD_MAP
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM	// RAM
-	AM_RANGE(0xd900, 0xe0ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size	)	// Sprites
+	AM_RANGE(0xd900, 0xe0ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0xe100, 0xffff) AM_RAM	// RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tgtball_map, ADDRESS_SPACE_PROGRAM, 8 )
 	STANDARD_MAP
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM	// RAM
-	AM_RANGE(0xd900, 0xd9ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size	)	// Sprites
+	AM_RANGE(0xd900, 0xd9ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0xda00, 0xffff) AM_RAM	// RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( torus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	STANDARD_MAP
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size	)	// Sprites
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0xe000, 0xffff) AM_RAM	// RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( paradise_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(paradise_palette_w) AM_BASE(&paletteram)	// Palette
+	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(paradise_palette_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(paradise_priority_w	)	// Layers priority
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w	)	// Flip Screen
 	AM_RANGE(0x2004, 0x2004) AM_WRITE(paradise_palbank_w	)	// Layers palette bank
@@ -109,11 +109,11 @@ static ADDRESS_MAP_START( paradise_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2"				)
 	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM"			)
 	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)	// OKI 1
-	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w	) AM_BASE(&videoram) 	// Pixmap
+	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w	) AM_BASE_GENERIC(videoram) 	// Pixmap
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( torus_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(paradise_palette_w) AM_BASE(&paletteram)	// Palette
+	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(paradise_palette_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(paradise_priority_w	)	// Layers priority
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w	)	// Flip Screen
 	AM_RANGE(0x2004, 0x2004) AM_WRITE(paradise_palbank_w	)	// Layers palette bank
@@ -124,7 +124,7 @@ static ADDRESS_MAP_START( torus_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2022, 0x2022) AM_READ_PORT("P1"				)
 	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2"				)
 	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM"			)
-	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w	) AM_BASE(&videoram) 	// Pixmap
+	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w	) AM_BASE_GENERIC(videoram) 	// Pixmap
 ADDRESS_MAP_END
 
 

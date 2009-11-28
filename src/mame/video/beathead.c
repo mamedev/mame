@@ -61,7 +61,7 @@ WRITE32_HANDLER( beathead_vram_transparent_w )
 	if (!(data & 0x0000ff00)) mem_mask &= ~0x0000ff00;
 	if (!(data & 0x00ff0000)) mem_mask &= ~0x00ff0000;
 	if (!(data & 0xff000000)) mem_mask &= ~0xff000000;
-	COMBINE_DATA(&videoram32[offset]);
+	COMBINE_DATA(&space->machine->generic.videoram.u32[offset]);
 }
 
 
@@ -74,10 +74,10 @@ WRITE32_HANDLER( beathead_vram_bulk_w )
 
 	/* for now, just handle the bulk fill case; the others we'll catch later */
 	if (data == 0x0f0f0f0f)
-		videoram32[offset+0] =
-		videoram32[offset+1] =
-		videoram32[offset+2] =
-		videoram32[offset+3] = *beathead_vram_bulk_latch;
+		space->machine->generic.videoram.u32[offset+0] =
+		space->machine->generic.videoram.u32[offset+1] =
+		space->machine->generic.videoram.u32[offset+2] =
+		space->machine->generic.videoram.u32[offset+3] = *beathead_vram_bulk_latch;
 	else
 		logerror("Detected bulk VRAM write with mask %08x\n", data);
 }
@@ -94,7 +94,7 @@ WRITE32_HANDLER( beathead_vram_copy_w )
 {
 	/* copy from VRAM to VRAM, for 1024 bytes */
 	offs_t dest_offset = (4 * offset) & 0x7ffff;
-	memcpy(&videoram32[dest_offset / 4], &videoram32[vram_latch_offset / 4], 0x400);
+	memcpy(&space->machine->generic.videoram.u32[dest_offset / 4], &space->machine->generic.videoram.u32[vram_latch_offset / 4], 0x400);
 }
 
 
@@ -128,7 +128,7 @@ WRITE32_HANDLER( beathead_finescroll_w )
 
 WRITE32_HANDLER( beathead_palette_w )
 {
-	int newword = COMBINE_DATA(&paletteram32[offset]);
+	int newword = COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 	int r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 0x01);
 	int g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 0x01);
 	int b = ((newword << 1) & 0x3e) | ((newword >> 15) & 0x01);
@@ -181,6 +181,7 @@ WRITE32_HANDLER( beathead_hsync_ram_w )
 
 VIDEO_UPDATE( beathead )
 {
+	UINT8 *videoram = screen->machine->generic.videoram.u8;
 	int x, y;
 
 	/* generate the final screen */
@@ -202,7 +203,7 @@ VIDEO_UPDATE( beathead )
 
 			/* unswizzle the scanline first */
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-				scanline[x] = pen_base | ((UINT8 *)videoram32)[BYTE4_XOR_LE(src++)];
+				scanline[x] = pen_base | videoram[BYTE4_XOR_LE(src++)];
 		}
 
 		/* then draw it */

@@ -21,13 +21,13 @@ static tilemap *bg_tilemap, *fg_tilemap;
 
 WRITE8_HANDLER( sidearms_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( sidearms_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -128,8 +128,8 @@ static TILE_GET_INFO( get_philko_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int attr = colorram[tile_index];
-	int code = videoram[tile_index] + (attr<<2 & 0x300);
+	int attr = machine->generic.colorram.u8[tile_index];
+	int code = machine->generic.videoram.u8[tile_index] + (attr<<2 & 0x300);
 	int color = attr & 0x3f;
 
 	SET_TILE_INFO(0, code, color, 0);
@@ -173,6 +173,7 @@ VIDEO_START( sidearms )
 
 static void draw_sprites_region(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int start_offset, int end_offset )
 {
+	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
 	const gfx_element *gfx = machine->gfx[2];
 	int offs, attr, color, code, x, y, flipx, flipy;
 

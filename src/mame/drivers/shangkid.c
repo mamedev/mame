@@ -257,9 +257,9 @@ static ADDRESS_MAP_START( chinhero_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
 	AM_RANGE(0xc000, 0xc002) AM_WRITE(SMH_RAM) AM_BASE(&shangkid_videoreg)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE(&videoram) AM_SHARE(1)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_GENERIC(videoram) AM_SHARE(1)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE(&spriteram) AM_SHARE(3)
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_GENERIC(spriteram) AM_SHARE(3)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shangkid_main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -278,9 +278,9 @@ static ADDRESS_MAP_START( shangkid_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
 	AM_RANGE(0xc000, 0xc002) AM_WRITE(SMH_RAM) AM_BASE(&shangkid_videoreg)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE(&videoram) AM_SHARE(1)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_GENERIC(videoram) AM_SHARE(1)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE(&spriteram) AM_SHARE(3)
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_GENERIC(spriteram) AM_SHARE(3)
 ADDRESS_MAP_END
 
 /***************************************************************************************/
@@ -447,7 +447,7 @@ MACHINE_DRIVER_END
 
 static ADDRESS_MAP_START( dynamski_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(&videoram) /* tilemap */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_GENERIC(videoram) /* tilemap */
 	AM_RANGE(0xc800, 0xcbff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM
 	AM_RANGE(0xd800, 0xdbff) AM_RAM

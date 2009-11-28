@@ -44,8 +44,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code, attr, color;
 
-	code = videoram[tile_index];
-	attr = videoram[tile_index + 0x400];
+	code = machine->generic.videoram.u8[tile_index];
+	attr = machine->generic.videoram.u8[tile_index + 0x400];
 	code |= ((attr & 0x03) << 8);
 	color = ((attr & 0x4)>>2)+6;
 
@@ -64,7 +64,7 @@ READ8_HANDLER( tryout_vram_r )
 
 WRITE8_HANDLER( tryout_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset & 0x3ff);
 }
 
@@ -178,6 +178,8 @@ VIDEO_START( tryout )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
 	int offs,fx,fy,x,y,color,sprite,inc;
 
 	for (offs = 0;offs < 0x7f;offs += 4)

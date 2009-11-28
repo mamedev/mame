@@ -70,7 +70,7 @@ static MACHINE_RESET( ultratnk )
 
 static READ8_HANDLER( ultratnk_wram_r )
 {
-	return videoram[0x380 + offset];
+	return space->machine->generic.videoram.u8[0x380 + offset];
 }
 
 
@@ -96,7 +96,7 @@ static READ8_HANDLER( ultratnk_options_r )
 
 static WRITE8_HANDLER( ultratnk_wram_w )
 {
-	videoram[0x380 + offset] = data;
+	space->machine->generic.videoram.u8[0x380 + offset] = data;
 }
 
 
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( ultratnk_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x700) AM_RAM
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x700) AM_READWRITE(ultratnk_wram_r, ultratnk_wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(ultratnk_video_ram_w) AM_BASE(&videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(ultratnk_video_ram_w) AM_BASE_GENERIC(videoram)
 
 	AM_RANGE(0x1000, 0x17ff) AM_READ_PORT("IN0")
 	AM_RANGE(0x1800, 0x1fff) AM_READ_PORT("IN1")

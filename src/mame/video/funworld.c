@@ -119,13 +119,13 @@ PALETTE_INIT(funworld)
 
 WRITE8_HANDLER( funworld_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( funworld_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -146,9 +146,9 @@ static TILE_GET_INFO( get_bg_tile_info )
     ---- xxxx   unused.
 */
 	int offs = tile_index;
-	int attr = videoram[offs] + (colorram[offs] << 8);
+	int attr = machine->generic.videoram.u8[offs] + (machine->generic.colorram.u8[offs] << 8);
 	int code = attr & 0xfff;
-	int color = colorram[offs] >> 4;	// 4 bits for color.
+	int color = machine->generic.colorram.u8[offs] >> 4;	// 4 bits for color.
 
 	SET_TILE_INFO(0, code, color, 0);
 }

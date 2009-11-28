@@ -50,12 +50,12 @@ static WRITE8_HANDLER( laserbat_videoram_w )
 {
 	if(laserbat_video_page == 0)
 	{
-		videoram[offset] = data;
+		space->machine->generic.videoram.u8[offset] = data;
 		tilemap_mark_tile_dirty(bg_tilemap,offset);
 	}
 	else if(laserbat_video_page == 1)
 	{
-		colorram[offset] = data;
+		space->machine->generic.colorram.u8[offset] = data;
 		tilemap_mark_tile_dirty(bg_tilemap,offset); // wrong!
 	}
 }
@@ -498,7 +498,7 @@ GFXDECODE_END
 static TILE_GET_INFO( get_tile_info )
 {
 	// wrong color index!
-	SET_TILE_INFO(0, videoram[tile_index], colorram[tile_index] & 0x7f, 0);
+	SET_TILE_INFO(0, machine->generic.videoram.u8[tile_index], machine->generic.colorram.u8[tile_index] & 0x7f, 0);
 }
 
 static VIDEO_START( laserbat )
@@ -508,8 +508,8 @@ static VIDEO_START( laserbat )
 
 	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 
-	videoram = auto_alloc_array(machine, UINT8, 0x400);
-	colorram = auto_alloc_array(machine, UINT8, 0x400);
+	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 0x400);
+	machine->generic.colorram.u8 = auto_alloc_array(machine, UINT8, 0x400);
 
 	/* configure the S2636 chips */
 	s2636_0 = s2636_config(machine, s2636_0_ram, screen_height, screen_width, 0, -19);

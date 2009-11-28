@@ -836,7 +836,7 @@ static void cischeat_draw_sprites(running_machine *machine, bitmap_t *bitmap , c
 
 	int min_priority, max_priority, high_sprites;
 
-	UINT16		*source	=	spriteram16;
+	UINT16		*source	=	machine->generic.spriteram.u16;
 	const UINT16	*finish	=	source + 0x1000/2;
 
 
@@ -991,7 +991,7 @@ static void bigrun_draw_sprites(running_machine *machine, bitmap_t *bitmap , con
 
 	int min_priority, max_priority, high_sprites;
 
-	UINT16		*source	=	spriteram16;
+	UINT16		*source	=	machine->generic.spriteram.u16;
 	const UINT16	*finish	=	source + 0x1000/2;
 
 	/* Move the priority values in place */

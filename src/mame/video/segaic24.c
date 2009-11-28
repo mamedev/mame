@@ -47,15 +47,15 @@ static void set_color(running_machine *machine, int color, UINT8 r, UINT8 g, UIN
 // qgh expects to be able to read the palette shared between CPUs
 READ16_HANDLER( system24temp_sys16_paletteram1_r )
 {
-	return paletteram16[offset];
+	return space->machine->generic.paletteram.u16[offset];
 }
 
 
 WRITE16_HANDLER (system24temp_sys16_paletteram1_w)
 {
 	int r, g, b;
-	COMBINE_DATA (paletteram16 + offset);
-	data = paletteram16[offset];
+	COMBINE_DATA (space->machine->generic.paletteram.u16 + offset);
+	data = space->machine->generic.paletteram.u16[offset];
 
 	r = (data & 0x00f) << 4;
 	if(data & 0x1000)

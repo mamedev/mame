@@ -124,12 +124,12 @@ static WRITE16_HANDLER( control2_w )
 	}
 }
 
-static void gijoe_objdma(void)
+static void gijoe_objdma(running_machine *machine)
 {
 	UINT16 *src_head, *src_tail, *dst_head, *dst_tail;
 
-	src_head = spriteram16;
-	src_tail = spriteram16 + 255*8;
+	src_head = machine->generic.spriteram.u16;
+	src_tail = machine->generic.spriteram.u16 + 255*8;
 	K053247_export_config(&dst_head, 0, 0, 0, 0);
 	dst_tail = dst_head + 255*8;
 
@@ -161,7 +161,7 @@ static INTERRUPT_GEN( gijoe_interrupt )
 
 	if (K053246_is_IRQ_enabled())
 	{
-		gijoe_objdma();
+		gijoe_objdma(device->machine);
 
 		// 42.7us(clr) + 341.3us(xfer) delay at 6Mhz dotclock
 		timer_adjust_oneshot(dmadelay_timer, JOE_DMADELAY, 0);
@@ -205,7 +205,7 @@ static MACHINE_START( gijoe )
 
 static ADDRESS_MAP_START( gijoe_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE(&spriteram16)								// Sprites
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE_GENERIC(spriteram)								// Sprites
 	AM_RANGE(0x110000, 0x110007) AM_WRITE(K053246_word_w)
 	AM_RANGE(0x120000, 0x121fff) AM_READWRITE(K056832_ram_word_r, K056832_ram_word_w)		// Graphic planes
 	AM_RANGE(0x122000, 0x123fff) AM_READWRITE(K056832_ram_word_r, K056832_ram_word_w)		// Graphic planes mirror read
@@ -213,7 +213,7 @@ static ADDRESS_MAP_START( gijoe_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x160000, 0x160007) AM_WRITE(K056832_b_word_w)									// VSCCS (board dependent)
 	AM_RANGE(0x170000, 0x170001) AM_WRITENOP												// Watchdog
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(&gijoe_workram)					// Main RAM.  Spec. 180000-1803ff, 180400-187fff
-	AM_RANGE(0x190000, 0x190fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x190000, 0x190fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1a0000, 0x1a001f) AM_WRITE(K053251_lsb_w)
 	AM_RANGE(0x1b0000, 0x1b003f) AM_WRITE(K056832_word_w)
 	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE(sound_cmd_w)

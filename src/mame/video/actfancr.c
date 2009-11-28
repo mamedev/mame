@@ -153,6 +153,7 @@ READ8_HANDLER( actfancr_pf2_data_r )
 VIDEO_UPDATE( actfancr )
 {
 	actfancr_state *state = (actfancr_state *)screen->machine->driver_data;
+	UINT8 *buffered_spriteram = screen->machine->generic.buffered_spriteram.u8;
 	int offs, mult;
 	int scrollx = (state->control_1[0x10] + (state->control_1[0x11] << 8));
 	int scrolly = (state->control_1[0x12] + (state->control_1[0x13] << 8));
@@ -238,6 +239,7 @@ VIDEO_UPDATE( actfancr )
 VIDEO_UPDATE( triothep )
 {
 	actfancr_state *state = (actfancr_state *)screen->machine->driver_data;
+	UINT8 *buffered_spriteram = screen->machine->generic.buffered_spriteram.u8;
 	int offs, i, mult;
 	int scrollx = (state->control_1[0x10] + (state->control_1[0x11] << 8));
 	int scrolly = (state->control_1[0x12] + (state->control_1[0x13] << 8));

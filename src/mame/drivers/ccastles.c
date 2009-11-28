@@ -234,12 +234,12 @@ static MACHINE_START( ccastles )
 	schedule_next_irq(machine, 0);
 
 	/* allocate backing memory for the NVRAM */
-	machine->generic.nvram.ptr.u8 = auto_alloc_array(machine, UINT8, machine->generic.nvram.size);
+	machine->generic.nvram.u8 = auto_alloc_array(machine, UINT8, machine->generic.nvram_size);
 
 	/* setup for save states */
 	state_save_register_global(machine, state->irq_state);
 	state_save_register_global_array(machine, state->nvram_store);
-	state_save_register_global_pointer(machine, machine->generic.nvram.ptr.u8, machine->generic.nvram.size);
+	state_save_register_global_pointer(machine, machine->generic.nvram.u8, machine->generic.nvram_size);
 }
 
 
@@ -307,19 +307,19 @@ static NVRAM_HANDLER( ccastles )
 	if (read_or_write)
 	{
 		/* on power down, the EAROM is implicitly stored */
-		memcpy(machine->generic.nvram.ptr.v, nvram_stage, machine->generic.nvram.size);
-		mame_fwrite(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
+		memcpy(machine->generic.nvram.v, nvram_stage, machine->generic.nvram_size);
+		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
 	}
 	else if (file)
-		mame_fread(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
+		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
 	else
-		memset(machine->generic.nvram.ptr.v, 0, machine->generic.nvram.size);
+		memset(machine->generic.nvram.v, 0, machine->generic.nvram_size);
 }
 
 
 static WRITE8_HANDLER( nvram_recall_w )
 {
-	memcpy(nvram_stage, space->machine->generic.nvram.ptr.v, space->machine->generic.nvram.size);
+	memcpy(nvram_stage, space->machine->generic.nvram.v, space->machine->generic.nvram_size);
 }
 
 
@@ -329,7 +329,7 @@ static WRITE8_HANDLER( nvram_store_w )
 
 	state->nvram_store[offset] = data & 1;
 	if (!state->nvram_store[0] && state->nvram_store[1])
-		memcpy(space->machine->generic.nvram.ptr.v, nvram_stage, space->machine->generic.nvram.size);
+		memcpy(space->machine->generic.nvram.v, nvram_stage, space->machine->generic.nvram_size);
 }
 
 

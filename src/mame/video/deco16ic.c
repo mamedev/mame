@@ -190,19 +190,19 @@ WRITE16_HANDLER( deco16_nonbuffered_palette_w )
 {
 	int r,g,b;
 
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 	if (offset&1) offset--;
 
-	b = (paletteram16[offset] >> 0) & 0xff;
-	g = (paletteram16[offset+1] >> 8) & 0xff;
-	r = (paletteram16[offset+1] >> 0) & 0xff;
+	b = (space->machine->generic.paletteram.u16[offset] >> 0) & 0xff;
+	g = (space->machine->generic.paletteram.u16[offset+1] >> 8) & 0xff;
+	r = (space->machine->generic.paletteram.u16[offset+1] >> 0) & 0xff;
 
 	palette_set_color(space->machine,offset/2,MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( deco16_buffered_palette_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 	dirty_palette[offset/2]=1;
 }
 
@@ -215,9 +215,9 @@ WRITE16_HANDLER( deco16_palette_dma_w )
 		if (dirty_palette[i]) {
 			dirty_palette[i]=0;
 
-			b = (paletteram16[i*2] >> 0) & 0xff;
-			g = (paletteram16[i*2+1] >> 8) & 0xff;
-			r = (paletteram16[i*2+1] >> 0) & 0xff;
+			b = (space->machine->generic.paletteram.u16[i*2] >> 0) & 0xff;
+			g = (space->machine->generic.paletteram.u16[i*2+1] >> 8) & 0xff;
+			r = (space->machine->generic.paletteram.u16[i*2+1] >> 0) & 0xff;
 
 			palette_set_color(space->machine,i,MAKE_RGB(r,g,b));
 		}

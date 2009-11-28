@@ -650,7 +650,7 @@ WRITE8_HANDLER( tdfever_sp_scroll_msb_w )
 WRITE8_HANDLER( tdfever_spriteram_w )
 {
 	/*  partial updates avoid flickers in the fsoccer radar. */
-	if (offset < 0x80 && spriteram[offset] != data)
+	if (offset < 0x80 && space->machine->generic.spriteram.u8[offset] != data)
 	{
 		int vpos = video_screen_get_vpos(space->machine->primary_screen);
 
@@ -658,7 +658,7 @@ WRITE8_HANDLER( tdfever_spriteram_w )
 			video_screen_update_partial(space->machine->primary_screen, vpos - 1);
 	}
 
-	spriteram[offset] = data;
+	space->machine->generic.spriteram.u8[offset] = data;
 }
 
 /**************************************************************************************/
@@ -669,8 +669,8 @@ static void marvins_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 	const gfx_element *gfx = machine->gfx[3];
 	const UINT8 *source, *finish;
 
-	source = spriteram + from*4;
-	finish = spriteram + to*4;
+	source = machine->generic.spriteram.u8 + from*4;
+	finish = machine->generic.spriteram.u8 + to*4;
 
 	while( source<finish )
 	{
@@ -709,6 +709,7 @@ static void marvins_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 static void tnk3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const int xscroll, const int yscroll)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	const gfx_element *gfx = machine->gfx[2];
 	const int size = gfx->width;
 	int tile_number, attributes, color, sx, sy;
@@ -941,9 +942,9 @@ VIDEO_UPDATE( ikari )
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	ikari_draw_sprites(screen->machine, bitmap, cliprect,  0, sp16_scrollx, sp16_scrolly, spriteram + 0x800, 2 );
-	ikari_draw_sprites(screen->machine, bitmap, cliprect,  0, sp32_scrollx, sp32_scrolly, spriteram,         3 );
-	ikari_draw_sprites(screen->machine, bitmap, cliprect, 25, sp16_scrollx, sp16_scrolly, spriteram + 0x800, 2 );
+	ikari_draw_sprites(screen->machine, bitmap, cliprect,  0, sp16_scrollx, sp16_scrolly, screen->machine->generic.spriteram.u8 + 0x800, 2 );
+	ikari_draw_sprites(screen->machine, bitmap, cliprect,  0, sp32_scrollx, sp32_scrolly, screen->machine->generic.spriteram.u8,         3 );
+	ikari_draw_sprites(screen->machine, bitmap, cliprect, 25, sp16_scrollx, sp16_scrolly, screen->machine->generic.spriteram.u8 + 0x800, 2 );
 
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
 	return 0;
@@ -957,9 +958,9 @@ VIDEO_UPDATE( gwar )
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	tdfever_draw_sprites(screen->machine, bitmap, cliprect, sp16_scrollx, sp16_scrolly, spriteram + 0x800, 2, 0, 0, sprite_split_point );
-	tdfever_draw_sprites(screen->machine, bitmap, cliprect, sp32_scrollx, sp32_scrolly, spriteram,         3, 0, 0, 32 );
-	tdfever_draw_sprites(screen->machine, bitmap, cliprect, sp16_scrollx, sp16_scrolly, spriteram + 0x800, 2, 0, sprite_split_point, 64 );
+	tdfever_draw_sprites(screen->machine, bitmap, cliprect, sp16_scrollx, sp16_scrolly, screen->machine->generic.spriteram.u8 + 0x800, 2, 0, 0, sprite_split_point );
+	tdfever_draw_sprites(screen->machine, bitmap, cliprect, sp32_scrollx, sp32_scrolly, screen->machine->generic.spriteram.u8,         3, 0, 0, 32 );
+	tdfever_draw_sprites(screen->machine, bitmap, cliprect, sp16_scrollx, sp16_scrolly, screen->machine->generic.spriteram.u8 + 0x800, 2, 0, sprite_split_point, 64 );
 
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
 
@@ -974,7 +975,7 @@ VIDEO_UPDATE( tdfever )
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	tdfever_draw_sprites(screen->machine, bitmap, cliprect, sp32_scrollx, sp32_scrolly, spriteram, 2, 1, 0, 32 );
+	tdfever_draw_sprites(screen->machine, bitmap, cliprect, sp32_scrollx, sp32_scrolly, screen->machine->generic.spriteram.u8, 2, 1, 0, 32 );
 
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
 

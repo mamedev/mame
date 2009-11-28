@@ -172,7 +172,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	else
 		sr = state->spriteram_2;
 
-	for (offs = 0; offs < spriteram_size; offs += 4)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
 	{
 		int code = sr[offs + 0] + 8 * (sr[offs + 1] & 0x20);
 		int color = sr[offs + 1] & 0x0f;

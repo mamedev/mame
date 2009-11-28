@@ -76,15 +76,15 @@ static WRITE8_HANDLER( sbw_videoram_w )
 	int flip = flip_screen_get(space->machine);
 	int x,y,i,v1,v2;
 
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 
 	offset &= 0x1fff;
 
 	y = offset / 32;
 	x = (offset % 32) * 8;
 
-	v1 = videoram[offset];
-	v2 = videoram[offset+0x2000];
+	v1 = space->machine->generic.videoram.u8[offset];
+	v2 = space->machine->generic.videoram.u8[offset+0x2000];
 
 	for(i = 0; i < 8; i++)
 	{
@@ -154,8 +154,8 @@ static WRITE8_HANDLER (system_w)
 	if((sbw_system^data)&1)
 	{
 		int offs;
-		for (offs = 0;offs < videoram_size; offs++)
-			sbw_videoram_w(space, offs, videoram[offs]);
+		for (offs = 0;offs < space->machine->generic.videoram_size; offs++)
+			sbw_videoram_w(space, offs, space->machine->generic.videoram.u8[offs]);
 	}
 	sbw_system = data;
 }
@@ -186,7 +186,7 @@ static READ8_HANDLER (controls_r)
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(sbw_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(sbw_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xf801, 0xf801) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM

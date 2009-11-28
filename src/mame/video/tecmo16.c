@@ -331,6 +331,7 @@ static void blendbitmaps(running_machine *machine,
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t *bitmap_fg, bitmap_t *bitmap_sp, const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 	static const UINT8 layout[8][8] =
 	{
@@ -346,7 +347,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t
 
 	bitmap_t *bitmap = bitmap_bg;
 
-	for (offs = spriteram_size/2 - 8;offs >= 0;offs -= 8)
+	for (offs = machine->generic.spriteram_size/2 - 8;offs >= 0;offs -= 8)
 	{
 		if (spriteram16[offs] & 0x04)	/* enable */
 		{

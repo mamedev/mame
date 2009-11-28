@@ -94,7 +94,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	const gfx_element *gfx = machine->gfx[1];
 	const UINT8 *source, *finish;
-	source =  spriteram;
+	source =  machine->generic.spriteram.u8;
 	finish =  source + 25*4;
 
 	while( source<finish )

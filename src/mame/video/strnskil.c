@@ -48,7 +48,7 @@ PALETTE_INIT( strnskil )
 
 WRITE8_HANDLER( strnskil_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
@@ -65,8 +65,8 @@ WRITE8_HANDLER( strnskil_scrl_ctrl_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = videoram[tile_index * 2];
-	int code = videoram[(tile_index * 2) + 1] + ((attr & 0x60) << 3);
+	int attr = machine->generic.videoram.u8[tile_index * 2];
+	int code = machine->generic.videoram.u8[(tile_index * 2) + 1] + ((attr & 0x60) << 3);
 	int color = (attr & 0x1f) | ((attr & 0x80) >> 2);
 
 	SET_TILE_INFO(0, code, color, 0);
@@ -82,6 +82,7 @@ VIDEO_START( strnskil )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
 	for (offs = 0x60; offs < 0x100; offs += 4)

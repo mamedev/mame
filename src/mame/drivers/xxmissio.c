@@ -117,7 +117,7 @@ static ADDRESS_MAP_START( map1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xcfff) AM_SHARE(2) AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w) AM_BASE(&xxmissio_bgram)
 	AM_RANGE(0xd000, 0xd7ff) AM_SHARE(3) AM_RAM AM_BASE(&xxmissio_spriteram)
 
-	AM_RANGE(0xd800, 0xdaff) AM_SHARE(4) AM_RAM_WRITE(xxmissio_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xd800, 0xdaff) AM_SHARE(4) AM_RAM_WRITE(xxmissio_paletteram_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0xe000, 0xefff) AM_SHARE(5) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_SHARE(6) AM_RAM

@@ -59,7 +59,7 @@ WRITE8_HANDLER( rollrace_flipx_w )
 
 VIDEO_UPDATE( rollrace )
 {
-
+	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	int offs;
 	int sx, sy;
 	int scroll;
@@ -70,7 +70,7 @@ VIDEO_UPDATE( rollrace )
 	bitmap_fill(bitmap,cliprect,ra_bkgpen);
 
 	/* draw road */
-	for (offs = videoram_size - 1;offs >= 0;offs--)
+	for (offs = screen->machine->generic.videoram_size - 1;offs >= 0;offs--)
 		{
 			if(!(ra_bkgflip))
 				{
@@ -138,14 +138,14 @@ VIDEO_UPDATE( rollrace )
 
 
 	/* draw foreground characters */
-	for (offs = videoram_size - 1;offs >= 0;offs--)
+	for (offs = screen->machine->generic.videoram_size - 1;offs >= 0;offs--)
 	{
 
 		sx =  offs % 32;
 		sy =  offs / 32;
 
-		scroll = ( 8 * sy + colorram[2 * sx] ) % 256;
-		col = colorram[ sx * 2 + 1 ]&0x1f;
+		scroll = ( 8 * sy + screen->machine->generic.colorram.u8[2 * sx] ) % 256;
+		col = screen->machine->generic.colorram.u8[ sx * 2 + 1 ]&0x1f;
 
 		if (!ra_flipy)
 		{
@@ -155,7 +155,7 @@ VIDEO_UPDATE( rollrace )
 		if (ra_flipx) sx = 31 - sx;
 
 		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[RA_FGCHAR_BASE + ra_chrbank]  ,
-			videoram[ offs ]  ,
+			screen->machine->generic.videoram.u8[ offs ]  ,
 			col,
 			ra_flipx,ra_flipy,
 			8*sx,scroll,0);

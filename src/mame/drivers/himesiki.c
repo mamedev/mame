@@ -118,8 +118,8 @@ static WRITE8_HANDLER( himesiki_sound_w )
 static ADDRESS_MAP_START( himesiki_prm0, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xa800, 0xafff) AM_RAM AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xa800, 0xafff) AM_RAM AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_WRITE(himesiki_bg_ram_w) AM_BASE(&himesiki_bg_ram)
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(1)
 ADDRESS_MAP_END

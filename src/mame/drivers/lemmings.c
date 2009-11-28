@@ -63,12 +63,12 @@ static WRITE16_HANDLER( lemmings_palette_24bit_w )
 {
 	int r,g,b;
 
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 	if (offset&1) offset--;
 
-	b = (paletteram16[offset] >> 0) & 0xff;
-	g = (paletteram16[offset+1] >> 8) & 0xff;
-	r = (paletteram16[offset+1] >> 0) & 0xff;
+	b = (space->machine->generic.paletteram.u16[offset] >> 0) & 0xff;
+	g = (space->machine->generic.paletteram.u16[offset+1] >> 8) & 0xff;
+	r = (space->machine->generic.paletteram.u16[offset+1] >> 0) & 0xff;
 
 	palette_set_color(space->machine,offset/2,MAKE_RGB(r,g,b));
 }
@@ -89,9 +89,9 @@ static WRITE8_HANDLER( lemmings_sound_ack_w )
 static ADDRESS_MAP_START( lemmings_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_BASE(&spriteram16_2) AM_SIZE(&spriteram_2_size)
-	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(lemmings_palette_24bit_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
+	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(lemmings_palette_24bit_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x170000, 0x17000f) AM_RAM_WRITE(lemmings_control_w) AM_BASE(&lemmings_control_data)
 	AM_RANGE(0x190000, 0x19000f) AM_READ(lemmings_trackball_r)
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_READ(lemmings_prot_r)

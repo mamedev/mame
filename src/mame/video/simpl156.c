@@ -37,6 +37,7 @@ x = xpos
  its the same sprite chip Data East used on many, many 16-bit era titles */
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT32 *spriteram32 = machine->generic.spriteram.u32;
 	int offs;
 
 	//FIXME: flip_screen_x should not be written!
@@ -140,7 +141,7 @@ VIDEO_START( simpl156 )
 	deco16_pf1_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
 	deco16_pf2_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
 	deco16_pf12_control = auto_alloc_array(machine, UINT16, 0x10/2);
-	paletteram16 =  auto_alloc_array(machine, UINT16, 0x1000/2);
+	machine->generic.paletteram.u16 =  auto_alloc_array(machine, UINT16, 0x1000/2);
 
 	/* and register the allocated ram so that save states still work */
 	state_save_register_global_pointer(machine, deco16_pf1_data, 0x2000/2);
@@ -148,7 +149,7 @@ VIDEO_START( simpl156 )
 	state_save_register_global_pointer(machine, deco16_pf1_rowscroll, 0x800/2);
 	state_save_register_global_pointer(machine, deco16_pf2_rowscroll, 0x800/2);
 	state_save_register_global_pointer(machine, deco16_pf12_control, 0x10/2);
-	state_save_register_global_pointer(machine, paletteram16, 0x1000/2);
+	state_save_register_global_pointer(machine, machine->generic.paletteram.u16, 0x1000/2);
 
 	deco16_1_video_init(machine);
 

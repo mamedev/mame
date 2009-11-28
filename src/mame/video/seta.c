@@ -679,7 +679,7 @@ static void set_pens(running_machine *machine)
 
 	for (i = 0; i < seta_paletteram_size / 2; i++)
 	{
-		UINT16 data = paletteram16[i];
+		UINT16 data = machine->generic.paletteram.u16[i];
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
@@ -691,20 +691,20 @@ static void set_pens(running_machine *machine)
 }
 
 
-static void usclssic_set_pens(colortable_t *colortable)
+static void usclssic_set_pens(running_machine *machine)
 {
 	offs_t i;
 
 	for (i = 0; i < 0x200; i++)
 	{
-		UINT16 data = paletteram16[i];
+		UINT16 data = machine->generic.paletteram.u16[i];
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
 		if (i >= 0x100)
-			colortable_palette_set_color(colortable, i - 0x100, color);
+			colortable_palette_set_color(machine->colortable, i - 0x100, color);
 		else
-			colortable_palette_set_color(colortable, i + 0x200, color);
+			colortable_palette_set_color(machine->colortable, i + 0x200, color);
 	}
 }
 
@@ -721,6 +721,7 @@ static void usclssic_set_pens(colortable_t *colortable)
 
 static void draw_sprites_map(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs, col;
 	int xoffs, yoffs;
 
@@ -733,7 +734,7 @@ static void draw_sprites_map(running_machine *machine, bitmap_t *bitmap,const re
 	int numcol	=	ctrl2 & 0x000f;
 
 	/* Sprites Banking and/or Sprites Buffering */
-	UINT16 *src = spriteram16_2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
+	UINT16 *src = machine->generic.spriteram2.u16 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
 	int upper	=	( spriteram16[ 0x604/2 ] & 0xFF ) +
 					( spriteram16[ 0x606/2 ] & 0xFF ) * 256;
@@ -824,6 +825,7 @@ twineagl:   000 027 00 0f   (test mode)
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 	int xoffs, yoffs;
 
@@ -835,7 +837,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	int flip	=	ctrl & 0x40;
 
 	/* Sprites Banking and/or Sprites Buffering */
-	UINT16 *src = spriteram16_2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
+	UINT16 *src = machine->generic.spriteram2.u16 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
 	int max_y	=	0xf0;
 
@@ -908,7 +910,7 @@ static VIDEO_UPDATE( seta_layers )
 	int enab_0, enab_1, x_0, x_1, y_0, y_1;
 
 	int order	= 	0;
-	int flip	=	(spriteram16[ 0x600/2 ] & 0x40) >> 6;
+	int flip	=	(screen->machine->generic.spriteram.u16[ 0x600/2 ] & 0x40) >> 6;
 
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 	int vis_dimy = visarea->max_y - visarea->min_y + 1;
@@ -1047,7 +1049,7 @@ VIDEO_UPDATE( seta )
 
 VIDEO_UPDATE( usclssic )
 {
-	usclssic_set_pens(screen->machine->colortable);
+	usclssic_set_pens(screen->machine);
 	return VIDEO_UPDATE_CALL(seta_layers);
 }
 

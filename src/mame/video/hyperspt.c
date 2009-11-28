@@ -93,13 +93,13 @@ PALETTE_INIT( hyperspt )
 
 WRITE8_HANDLER( hyperspt_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( hyperspt_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -114,9 +114,9 @@ WRITE8_HANDLER( hyperspt_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index] + ((colorram[tile_index] & 0x80) << 1) + ((colorram[tile_index] & 0x40) << 3);
-	int color = colorram[tile_index] & 0x0f;
-	int flags = ((colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) | ((colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
+	int code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x80) << 1) + ((machine->generic.colorram.u8[tile_index] & 0x40) << 3);
+	int color = machine->generic.colorram.u8[tile_index] & 0x0f;
+	int flags = ((machine->generic.colorram.u8[tile_index] & 0x10) ? TILE_FLIPX : 0) | ((machine->generic.colorram.u8[tile_index] & 0x20) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(1, code, color, flags);
 }
@@ -130,9 +130,10 @@ VIDEO_START( hyperspt )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int sx = spriteram[offs + 3];
 		int sy = 240 - spriteram[offs + 1];
@@ -190,9 +191,9 @@ VIDEO_UPDATE( hyperspt )
 
 static TILE_GET_INFO( roadf_get_bg_tile_info )
 {
-	int code = videoram[tile_index] + ((colorram[tile_index] & 0x80) << 1) + ((colorram[tile_index] & 0x60) << 4);
-	int color = colorram[tile_index] & 0x0f;
-	int flags = (colorram[tile_index] & 0x10) ? TILE_FLIPX : 0;
+	int code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x80) << 1) + ((machine->generic.colorram.u8[tile_index] & 0x60) << 4);
+	int color = machine->generic.colorram.u8[tile_index] & 0x0f;
+	int flags = (machine->generic.colorram.u8[tile_index] & 0x10) ? TILE_FLIPX : 0;
 
 	SET_TILE_INFO(1, code, color, flags);
 }

@@ -60,17 +60,17 @@ PALETTE_INIT( contra )
 }
 
 
-static void set_pens(colortable_t *colortable)
+static void set_pens(running_machine *machine)
 {
 	int i;
 
 	for (i = 0x00; i < 0x100; i += 2)
 	{
-		UINT16 data = paletteram[i] | (paletteram[i | 1] << 8);
+		UINT16 data = machine->generic.paletteram.u8[i] | (machine->generic.paletteram.u8[i | 1] << 8);
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(colortable, i >> 1, color);
+		colortable_palette_set_color(machine->colortable, i >> 1, color);
 	}
 }
 
@@ -224,9 +224,9 @@ WRITE8_HANDLER( contra_K007121_ctrl_0_w )
 	if (offset == 3)
 	{
 		if ((data&0x8)==0)
-			memcpy(private_spriteram,spriteram+0x800,0x800);
+			memcpy(private_spriteram,space->machine->generic.spriteram.u8+0x800,0x800);
 		else
-			memcpy(private_spriteram,spriteram,0x800);
+			memcpy(private_spriteram,space->machine->generic.spriteram.u8,0x800);
 	}
 	if (offset == 6)
 	{
@@ -244,9 +244,9 @@ WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 	if (offset == 3)
 	{
 		if ((data&0x8)==0)
-			memcpy(private_spriteram_2,spriteram+0x2800,0x800);
+			memcpy(private_spriteram_2,space->machine->generic.spriteram.u8+0x2800,0x800);
 		else
-			memcpy(private_spriteram_2,spriteram+0x2000,0x800);
+			memcpy(private_spriteram_2,space->machine->generic.spriteram.u8+0x2000,0x800);
 	}
 	if (offset == 6)
 	{
@@ -288,7 +288,7 @@ VIDEO_UPDATE( contra )
 	sect_rect(&fg_finalclip, cliprect);
 	sect_rect(&tx_finalclip, cliprect);
 
-	set_pens(screen->machine->colortable);
+	set_pens(screen->machine);
 
 	tilemap_set_scrollx( fg_tilemap,0, K007121_ctrlram[0][0x00] - 40 );
 	tilemap_set_scrolly( fg_tilemap,0, K007121_ctrlram[0][0x02] );

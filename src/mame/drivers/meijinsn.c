@@ -147,7 +147,7 @@ static READ16_HANDLER( alpha_mcu_r )
 static ADDRESS_MAP_START( meijinsn_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080e00, 0x080fff) AM_READ(alpha_mcu_r) AM_WRITENOP
-	AM_RANGE(0x100000, 0x107fff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&videoram16)
+	AM_RANGE(0x100000, 0x107fff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x180000, 0x180dff) AM_RAM
 	AM_RANGE(0x180e00, 0x180fff) AM_RAM AM_BASE(&shared_ram)
 	AM_RANGE(0x181000, 0x181fff) AM_RAM
@@ -269,8 +269,8 @@ static VIDEO_UPDATE(meijinsn)
 		sx = offs >> 8;
 		sy = offs & 0xff;
 
-		data1 = videoram16[offs]>>8;
-		data2 = videoram16[offs]&0xff;
+		data1 = screen->machine->generic.videoram.u16[offs]>>8;
+		data2 = screen->machine->generic.videoram.u16[offs]&0xff;
 
 		for (x=0; x<4; x++)
 		{

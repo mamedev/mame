@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( wrally_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_READWRITE(SMH_RAM, wrally_vram_w) AM_BASE(&wrally_videoram)	/* encrypted Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_RAM AM_BASE(&wrally_vregs)									/* Video Registers */
 	AM_RANGE(0x10800c, 0x10800d) AM_WRITENOP												/* CLR INT Video */
-	AM_RANGE(0x200000, 0x203fff) AM_READWRITE(SMH_RAM, paletteram16_xxxxBBBBRRRRGGGG_word_w) AM_BASE(&paletteram16)	/* Palette */
+	AM_RANGE(0x200000, 0x203fff) AM_READWRITE(SMH_RAM, paletteram16_xxxxBBBBRRRRGGGG_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&wrally_spriteram)								/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")

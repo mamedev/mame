@@ -75,7 +75,7 @@ VIDEO_START( shadfrce )
 
 	shadfrce_bg1tilemap = tilemap_create(machine, get_shadfrce_bg1tile_info,tilemap_scan_rows, 16, 16,32,32);
 
-	shadfrce_spvideoram_old = auto_alloc_array(machine, UINT16, spriteram_size/2);
+	shadfrce_spvideoram_old = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
 }
 
 WRITE16_HANDLER ( shadfrce_bg0scrollx_w )
@@ -171,5 +171,5 @@ VIDEO_UPDATE( shadfrce )
 VIDEO_EOF( shadfrce )
 {
 	/* looks like sprites are *two* frames ahead */
-	memcpy(shadfrce_spvideoram_old,shadfrce_spvideoram,spriteram_size);
+	memcpy(shadfrce_spvideoram_old,shadfrce_spvideoram,machine->generic.spriteram_size);
 }

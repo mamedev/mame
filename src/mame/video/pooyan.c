@@ -102,8 +102,8 @@ PALETTE_INIT( pooyan )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = colorram[tile_index];
-	int code = videoram[tile_index];
+	int attr = machine->generic.colorram.u8[tile_index];
+	int code = machine->generic.videoram.u8[tile_index];
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX(attr >> 6);
 
@@ -133,14 +133,14 @@ VIDEO_START( pooyan )
 
 WRITE8_HANDLER( pooyan_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 
 WRITE8_HANDLER( pooyan_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -160,6 +160,8 @@ WRITE8_HANDLER( pooyan_flipscreen_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
 	int offs;
 
 	for (offs = 0x10;offs < 0x40;offs += 2)

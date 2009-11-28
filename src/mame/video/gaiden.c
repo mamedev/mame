@@ -307,7 +307,7 @@ static void gaiden_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 	};
 
 	const gfx_element *gfx = machine->gfx[3];
-	const UINT16 *source = (NUM_SPRITES - 1) * 8 + spriteram16;
+	const UINT16 *source = (NUM_SPRITES - 1) * 8 + machine->generic.spriteram.u16;
 	int count = NUM_SPRITES;
 
 	/* draw all sprites from front to back */
@@ -405,7 +405,7 @@ static void raiga_draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bi
 	};
 
 	const gfx_element *gfx = machine->gfx[3];
-	const UINT16 *source = (NUM_SPRITES - 1) * 8 + spriteram16;
+	const UINT16 *source = (NUM_SPRITES - 1) * 8 + machine->generic.spriteram.u16;
 	int count = NUM_SPRITES;
 
 	/* draw all sprites from front to back */
@@ -531,6 +531,7 @@ static void raiga_draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bi
 
 static void drgnbowl_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int i, code, color, x, y, flipx, flipy, priority_mask;
 
 	for( i = 0; i < 0x800/2; i += 4 )

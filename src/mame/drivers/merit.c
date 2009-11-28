@@ -1153,16 +1153,16 @@ static NVRAM_HANDLER(dodge)
 {
 	if (read_or_write)
 	{
-		mame_fwrite(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
+		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
 	}
 	else if (file)
 	{
-		mame_fread(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
+		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
 	}
 	else
 	{
-		memset(machine->generic.nvram.ptr.v, 0x00, machine->generic.nvram.size);
-		machine->generic.nvram.ptr.u8[0x1040] = 0xc9; /* ret */
+		memset(machine->generic.nvram.v, 0x00, machine->generic.nvram_size);
+		machine->generic.nvram.u8[0x1040] = 0xc9; /* ret */
 	}
 }
 

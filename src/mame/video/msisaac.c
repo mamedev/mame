@@ -24,7 +24,7 @@ static tilemap *background, *background2, *foreground;
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int tile_number = videoram[tile_index];
+	int tile_number = machine->generic.videoram.u8[tile_index];
 	SET_TILE_INFO(	0,
 			tile_number,
 			0x10,
@@ -147,7 +147,7 @@ WRITE8_HANDLER( msisaac_bg2_videoram_w )
 
 WRITE8_HANDLER( msisaac_fg_videoram_w )
 {
-	videoram[offset]=data;
+	space->machine->generic.videoram.u8[offset]=data;
 	tilemap_mark_tile_dirty(foreground,offset);
 }
 
@@ -159,8 +159,8 @@ WRITE8_HANDLER( msisaac_fg_videoram_w )
 ***************************************************************************/
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	const UINT8 *source = spriteram+32*4-4;
-	const UINT8 *finish = spriteram; /* ? */
+	const UINT8 *source = machine->generic.spriteram.u8+32*4-4;
+	const UINT8 *finish = machine->generic.spriteram.u8; /* ? */
 
 	while( source>=finish )
 	{

@@ -155,9 +155,9 @@ static WRITE32_HANDLER( avengrs_eprom_w )
 
 static WRITE32_HANDLER( avengrs_palette_w )
 {
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 	/* x bbbbb ggggg rrrrr */
-	palette_set_color_rgb(space->machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
+	palette_set_color_rgb(space->machine,offset,pal5bit(space->machine->generic.paletteram.u32[offset] >> 0),pal5bit(space->machine->generic.paletteram.u32[offset] >> 5),pal5bit(space->machine->generic.paletteram.u32[offset] >> 10));
 }
 
 static READ32_HANDLER( decomlc_vbl_r )
@@ -229,7 +229,7 @@ static WRITE32_HANDLER( mlc_irq_w )
 
 static READ32_HANDLER(mlc_spriteram_r)
 {
-	return spriteram32[offset]&0xffff;
+	return space->machine->generic.spriteram.u32[offset]&0xffff;
 }
 
 static READ32_HANDLER(mlc_vram_r)
@@ -273,9 +273,9 @@ static ADDRESS_MAP_START( decomlc_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0200078, 0x020007f) AM_READ(test2_r)	AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(mlc_irq_w) AM_BASE(&irq_ram) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200080, 0x02000ff) AM_RAM AM_BASE(&mlc_clip_ram) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0204000, 0x0206fff) AM_READWRITE(mlc_spriteram_r, SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0204000, 0x0206fff) AM_READWRITE(mlc_spriteram_r, SMH_RAM) AM_BASE_SIZE_GENERIC(spriteram) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0280000, 0x029ffff) AM_READWRITE(mlc_vram_r, SMH_RAM) AM_BASE(&mlc_vram) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0300000, 0x0307fff) AM_RAM_WRITE(avengrs_palette_w) AM_BASE(&paletteram32) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0300000, 0x0307fff) AM_RAM_WRITE(avengrs_palette_w) AM_BASE_GENERIC(paletteram) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0400000, 0x0400003) AM_READ_PORT("INPUTS") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0440000, 0x044001f) AM_READ(test3_r)	AM_MIRROR(0xff000000)
 	AM_RANGE(0x044001c, 0x044001f) AM_WRITENOP AM_MIRROR(0xff000000)

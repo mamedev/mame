@@ -148,10 +148,10 @@ static WRITE8_HANDLER( mrgoemon_flipscreen_w )
 
 static ADDRESS_MAP_START( gberet_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xd000, 0xd0ff) AM_RAM AM_BASE(&spriteram_2)
-	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xd000, 0xd0ff) AM_RAM AM_BASE_GENERIC(spriteram2)
+	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xd200, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE(gberet_scroll_w) AM_BASE(&gberet_scrollram)
 	AM_RANGE(0xe040, 0xe042) AM_WRITENOP // ???
@@ -169,14 +169,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gberetb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe03f) AM_RAM
 	AM_RANGE(0xe040, 0xe043) AM_WRITENOP // ???
 	AM_RANGE(0xe044, 0xe044) AM_WRITE(gberet_flipscreen_w)
 	AM_RANGE(0xe800, 0xe8ff) AM_RAM
-	AM_RANGE(0xe900, 0xe9ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe900, 0xe9ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP				// coin counter not supported
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("snsnd", sn76496_w)
@@ -190,10 +190,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrgoemon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xd000, 0xd0ff) AM_RAM AM_BASE(&spriteram_2)
-	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xd000, 0xd0ff) AM_RAM AM_BASE_GENERIC(spriteram2)
+	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xd200, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE(gberet_scroll_w) AM_BASE(&gberet_scrollram)
 	AM_RANGE(0xe040, 0xe042) AM_WRITENOP // ???

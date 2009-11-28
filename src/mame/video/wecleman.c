@@ -100,7 +100,7 @@ static void get_sprite_info(running_machine *machine)
 	UINT8 *base_gfx = memory_region(machine, "gfx1");
 	int gfx_max     = memory_region_length(machine, "gfx1");
 
-	UINT16 *source = spriteram16;
+	UINT16 *source = machine->generic.spriteram.u16;
 
 	struct sprite *sprite = sprite_list;
 	struct sprite *finish = sprite_list + NUM_SPRITES;
@@ -869,7 +869,7 @@ WRITE16_HANDLER( hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w )
 {
 	int newword, r, g, b;
 
-	newword = COMBINE_DATA(&paletteram16[offset]);
+	newword = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 
 	r = ((newword << 1) & 0x1E ) | ((newword >> 12) & 0x01);
 	g = ((newword >> 3) & 0x1E ) | ((newword >> 13) & 0x01);
@@ -882,7 +882,7 @@ WRITE16_HANDLER( hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w )
 
 WRITE16_HANDLER( wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w )
 {
-	int newword = COMBINE_DATA(&paletteram16[offset]);
+	int newword = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 
 	// the highest nibble has some unknown functions
 //  if (newword & 0xf000) logerror("MSN set on color %03x: %1x\n", offset, newword>>12);

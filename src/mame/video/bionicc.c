@@ -209,11 +209,12 @@ WRITE16_HANDLER( bionicc_gfxctrl_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 //  bionicc_state *state = (bionicc_state *)machine->driver_data;
 	int offs;
 	const gfx_element *gfx = machine->gfx[3];
 
-	for (offs = (spriteram_size - 8) / 2; offs >= 0; offs -= 4)
+	for (offs = (machine->generic.spriteram_size - 8) / 2; offs >= 0; offs -= 4)
 	{
 		int tile_number = buffered_spriteram16[offs] & 0x7ff;
 		if( tile_number != 0x7ff )

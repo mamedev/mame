@@ -118,10 +118,10 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x081c, 0x081c) AM_WRITE(finalizr_i8039_irq_w)	/* custom sound chip */
 	AM_RANGE(0x081d, 0x081d) AM_WRITE(soundlatch_w)			/* custom sound chip */
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_MEMBER(finalizr_state, colorram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_MEMBER(finalizr_state, videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_MEMBER(finalizr_state, videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE_MEMBER(finalizr_state, colorram2)
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE_MEMBER(finalizr_state, videoram2)
-	AM_RANGE(0x3000, 0x31ff) AM_RAM AM_BASE_MEMBER(finalizr_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3000, 0x31ff) AM_RAM AM_BASE_MEMBER(finalizr_state, spriteram) AM_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x3200, 0x37ff) AM_RAM
 	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE_MEMBER(finalizr_state, spriteram_2)
 	AM_RANGE(0x3a00, 0x3fff) AM_RAM

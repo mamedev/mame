@@ -323,11 +323,11 @@ VIDEO_EOF(macrossp);
 static WRITE32_HANDLER( paletteram32_macrossp_w )
 {
 	int r,g,b;
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
-	b = ((paletteram32[offset] & 0x0000ff00) >>8);
-	g = ((paletteram32[offset] & 0x00ff0000) >>16);
-	r = ((paletteram32[offset] & 0xff000000) >>24);
+	b = ((space->machine->generic.paletteram.u32[offset] & 0x0000ff00) >>8);
+	g = ((space->machine->generic.paletteram.u32[offset] & 0x00ff0000) >>16);
+	r = ((space->machine->generic.paletteram.u32[offset] & 0xff000000) >>24);
 
 	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
@@ -377,13 +377,13 @@ static void update_colors(running_machine *machine)
 
 	for(i=0;i<0x1000;i++)
 	{
-		b = ((paletteram32[i] & 0x0000ff00) >> 8);
+		b = ((machine->generic.paletteram.u32[i] & 0x0000ff00) >> 8);
 		if(fade_effect > b) { b = 0; }
 		else				{ b-=fade_effect; }
-		g = ((paletteram32[i] & 0x00ff0000) >>16);
+		g = ((machine->generic.paletteram.u32[i] & 0x00ff0000) >>16);
 		if(fade_effect > g) { g = 0; }
 		else			 	{ g-=fade_effect; }
-		r = ((paletteram32[i] & 0xff000000) >>24);
+		r = ((machine->generic.paletteram.u32[i] & 0xff000000) >>24);
 		if(fade_effect > r) { r = 0; }
 		else				{ r-=fade_effect; }
 
@@ -406,7 +406,7 @@ static WRITE32_HANDLER( macrossp_palette_fade_w )
 
 static ADDRESS_MAP_START( macrossp_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x800000, 0x802fff) AM_RAM AM_BASE(&macrossp_spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x800000, 0x802fff) AM_RAM AM_BASE(&macrossp_spriteram) AM_SIZE_GENERIC(spriteram)
 	/* SCR A Layer */
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(macrossp_scra_videoram_w) AM_BASE(&macrossp_scra_videoram)
 	AM_RANGE(0x904200, 0x9043ff) AM_WRITEONLY /* W/O? */
@@ -424,7 +424,7 @@ static ADDRESS_MAP_START( macrossp_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x91c200, 0x91c3ff) AM_WRITEONLY /* W/O? */
 	AM_RANGE(0x91d000, 0x91d00b) AM_WRITEONLY AM_BASE(&macrossp_text_videoregs) /* W/O? */
 
-	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(paletteram32_macrossp_w) AM_BASE(&paletteram32)
+	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(paletteram32_macrossp_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0xb00000, 0xb00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xb00004, 0xb00007) AM_READ(macrossp_soundstatus_r) AM_WRITENOP // irq related?

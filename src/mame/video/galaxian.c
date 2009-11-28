@@ -509,11 +509,11 @@ VIDEO_UPDATE( galaxian )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	/* render the sprites next */
-	sprites_draw(screen->machine, bitmap, cliprect, &spriteram[0x40]);
+	sprites_draw(screen->machine, bitmap, cliprect, &screen->machine->generic.spriteram.u8[0x40]);
 
 	/* if we have bullets to draw, render them following */
 	if (galaxian_draw_bullet_ptr != NULL)
-		bullets_draw(screen->machine, bitmap, cliprect, &spriteram[0x60]);
+		bullets_draw(screen->machine, bitmap, cliprect, &screen->machine->generic.spriteram.u8[0x60]);
 
 	return 0;
 }
@@ -530,8 +530,8 @@ static TILE_GET_INFO( bg_get_tile_info )
 {
 	UINT8 x = tile_index & 0x1f;
 
-	UINT16 code = videoram[tile_index];
-	UINT8 attrib = spriteram[x*2+1];
+	UINT16 code = machine->generic.videoram.u8[tile_index];
+	UINT8 attrib = machine->generic.spriteram.u8[x*2+1];
 	UINT8 color = attrib & 7;
 
 	if (galaxian_extend_tile_info_ptr != NULL)
@@ -547,7 +547,7 @@ WRITE8_HANDLER( galaxian_videoram_w )
 	video_screen_update_now(space->machine->primary_screen);
 
 	/* store the data and mark the corresponding tile dirty */
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -558,7 +558,7 @@ WRITE8_HANDLER( galaxian_objram_w )
 	video_screen_update_now(space->machine->primary_screen);
 
 	/* store the data */
-	spriteram[offset] = data;
+	space->machine->generic.spriteram.u8[offset] = data;
 
 	/* the first $40 bytes affect the tilemap */
 	if (offset < 0x40)

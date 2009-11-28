@@ -174,10 +174,11 @@ VIDEO_START( metlclsh )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	gfx_element *gfx = machine->gfx[0];
 	int offs;
 
-	for (offs = 0;offs < spriteram_size; offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size; offs += 4)
 	{
 		int attr,code,color,sx,sy,flipx,flipy,wrapy,sizey;
 

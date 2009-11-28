@@ -10,7 +10,7 @@ WRITE8_HANDLER( playch10_videoram_w )
 {
 	if (pc10_sdcs)
 	{
-		videoram[offset] = data;
+		space->machine->generic.videoram.u8[offset] = data;
 		tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 	}
 }
@@ -86,8 +86,8 @@ const ppu2c0x_interface playch10_ppu_interface_hboard =
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int offs = tile_index * 2;
-	int code = videoram[offs] + ((videoram[offs + 1] & 0x07) << 8);
-	int color = (videoram[offs + 1] >> 3) & 0x1f;
+	int code = machine->generic.videoram.u8[offs] + ((machine->generic.videoram.u8[offs + 1] & 0x07) << 8);
+	int color = (machine->generic.videoram.u8[offs + 1] >> 3) & 0x1f;
 
 	SET_TILE_INFO(0, code, color, 0);
 }

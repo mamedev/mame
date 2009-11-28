@@ -171,7 +171,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	UINT16 *source, *finish;
 
 	source = state->spriteram16 + 0x6 / 2;				// !
-	finish = state->spriteram16 + spriteram_size / 2 - 8 / 2;
+	finish = state->spriteram16 + machine->generic.spriteram_size / 2 - 8 / 2;
 
 	/* Find "the end of sprites" marker */
 

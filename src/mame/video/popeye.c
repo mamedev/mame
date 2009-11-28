@@ -173,13 +173,13 @@ static void set_background_palette(running_machine *machine,int bank)
 
 WRITE8_HANDLER( popeye_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( popeye_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -236,8 +236,8 @@ WRITE8_HANDLER( skyskipr_bitmap_w )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code = videoram[tile_index];
-	int color = colorram[tile_index] & 0x0f;
+	int code = machine->generic.videoram.u8[tile_index];
+	int color = machine->generic.colorram.u8[tile_index] & 0x0f;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -315,9 +315,10 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size;offs += 4)
 	{
 		int code,color,flipx,flipy,sx,sy;
 

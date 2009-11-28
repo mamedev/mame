@@ -34,9 +34,9 @@ static READ8_HANDLER( bankedram_r )
 	if (videobank & 0x02)
 	{
 		if (videobank & 0x04)
-			return paletteram[offset + 0x0800];
+			return space->machine->generic.paletteram.u8[offset + 0x0800];
 		else
-			return paletteram[offset];
+			return space->machine->generic.paletteram.u8[offset];
 	}
 	else if (videobank & 0x01)
 		return K053245_r(space,offset);
@@ -282,7 +282,7 @@ static MACHINE_RESET( surpratk )
 {
 	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), surpratk_banking);
 
-	paletteram = &memory_region(machine, "maincpu")[0x48000];
+	machine->generic.paletteram.u8 = &memory_region(machine, "maincpu")[0x48000];
 }
 
 static DRIVER_INIT( surpratk )

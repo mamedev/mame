@@ -85,7 +85,7 @@ static TIMER_CALLBACK( pot_trigger_callback );
 
 static MACHINE_START( sbrkout )
 {
-	memory_set_bankptr(machine, 1, &videoram[0x380]);
+	memory_set_bankptr(machine, 1, &machine->generic.videoram.u8[0x380]);
 	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
 	pot_timer = timer_alloc(machine, pot_trigger_callback, NULL);
 
@@ -120,7 +120,7 @@ static TIMER_CALLBACK( scanline_callback )
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
 	/* update the DAC state */
-	dac_data_w(devtag_get_device(machine, "dac"), (videoram[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
+	dac_data_w(devtag_get_device(machine, "dac"), (machine->generic.videoram.u8[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
 
 	/* on the VBLANK, read the pot and schedule an interrupt time for it */
 	if (scanline == video_screen_get_visible_area(machine->primary_screen)->max_y + 1)
@@ -279,7 +279,7 @@ static READ8_HANDLER( sync2_r )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = (videoram[tile_index] & 0x80) ? videoram[tile_index] : 0;
+	int code = (machine->generic.videoram.u8[tile_index] & 0x80) ? machine->generic.videoram.u8[tile_index] : 0;
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
@@ -292,7 +292,7 @@ static VIDEO_START( sbrkout )
 
 static WRITE8_HANDLER( sbrkout_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -312,9 +312,9 @@ static VIDEO_UPDATE( sbrkout )
 
 	for (ball = 2; ball >= 0; ball--)
 	{
-		int code = ((videoram[0x380 + 0x18 + ball * 2 + 1] & 0x80) >> 7);
-		int sx = 31 * 8 - videoram[0x380 + 0x10 + ball * 2];
-		int sy = 30 * 8 - videoram[0x380 + 0x18 + ball * 2];
+		int code = ((screen->machine->generic.videoram.u8[0x380 + 0x18 + ball * 2 + 1] & 0x80) >> 7);
+		int sx = 31 * 8 - screen->machine->generic.videoram.u8[0x380 + 0x10 + ball * 2];
+		int sy = 30 * 8 - screen->machine->generic.videoram.u8[0x380 + 0x18 + ball * 2];
 
 		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], code, 0, 0, 0, sx, sy, 0);
 	}
@@ -333,7 +333,7 @@ static VIDEO_UPDATE( sbrkout )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x380) AM_RAMBANK(1)
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sbrkout_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sbrkout_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x0800, 0x083f) AM_READ(switches_r)
 	AM_RANGE(0x0840, 0x0840) AM_MIRROR(0x003f) AM_READ_PORT("COIN")
 	AM_RANGE(0x0880, 0x0880) AM_MIRROR(0x003f) AM_READ_PORT("START")

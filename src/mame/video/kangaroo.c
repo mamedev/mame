@@ -24,8 +24,8 @@ static void blitter_execute(running_machine *machine);
 VIDEO_START( kangaroo )
 {
 	/* video RAM is accessed 32 bits at a time (two planes, 4bpp each, 4 pixels) */
-	videoram32 = auto_alloc_array(machine, UINT32, 256 * 64);
-	state_save_register_global_pointer(machine, videoram32, 256 * 64);
+	machine->generic.videoram.u32 = auto_alloc_array(machine, UINT32, 256 * 64);
+	state_save_register_global_pointer(machine, machine->generic.videoram.u32, 256 * 64);
 }
 
 
@@ -36,7 +36,7 @@ VIDEO_START( kangaroo )
  *
  *************************************/
 
-static void videoram_write(UINT16 offset, UINT8 data, UINT8 mask)
+static void videoram_write(running_machine *machine, UINT16 offset, UINT8 data, UINT8 mask)
 {
 	UINT32 expdata, layermask;
 
@@ -59,13 +59,13 @@ static void videoram_write(UINT16 offset, UINT8 data, UINT8 mask)
 	if (mask & 0x01) layermask |= 0x0c0c0c0c;
 
 	/* update layers */
-	videoram32[offset] = (videoram32[offset] & ~layermask) | (expdata & layermask);
+	machine->generic.videoram.u32[offset] = (machine->generic.videoram.u32[offset] & ~layermask) | (expdata & layermask);
 }
 
 
 WRITE8_HANDLER( kangaroo_videoram_w )
 {
-	videoram_write(offset, data, kangaroo_video_control[8]);
+	videoram_write(space->machine, offset, data, kangaroo_video_control[8]);
 }
 
 
@@ -122,8 +122,8 @@ static void blitter_execute(running_machine *machine)
 		{
 			UINT16 effdst = (dst + x) & 0x3fff;
 			UINT16 effsrc = src++ & (gfxhalfsize - 1);
-			videoram_write(effdst, gfxbase[0*gfxhalfsize + effsrc], mask & 0x05);
-			videoram_write(effdst, gfxbase[1*gfxhalfsize + effsrc], mask & 0x0a);
+			videoram_write(machine, effdst, gfxbase[0*gfxhalfsize + effsrc], mask & 0x05);
+			videoram_write(machine, effdst, gfxbase[1*gfxhalfsize + effsrc], mask & 0x0a);
 		}
 }
 
@@ -165,8 +165,8 @@ VIDEO_UPDATE( kangaroo )
 			UINT8 effya = scrolly + (y ^ xora);
 			UINT8 effxb = (x / 2) ^ xorb;
 			UINT8 effyb = y ^ xorb;
-			UINT8 pixa = (videoram32[effya + 256 * (effxa / 4)] >> (8 * (effxa % 4) + 0)) & 0x0f;
-			UINT8 pixb = (videoram32[effyb + 256 * (effxb / 4)] >> (8 * (effxb % 4) + 4)) & 0x0f;
+			UINT8 pixa = (screen->machine->generic.videoram.u32[effya + 256 * (effxa / 4)] >> (8 * (effxa % 4) + 0)) & 0x0f;
+			UINT8 pixb = (screen->machine->generic.videoram.u32[effyb + 256 * (effxb / 4)] >> (8 * (effxb % 4) + 4)) & 0x0f;
 			UINT8 finalpens;
 
 			/* for each layer, contribute bits if (a) enabled, and (b) either has priority or the opposite plane is 0 */

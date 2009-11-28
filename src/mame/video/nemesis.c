@@ -172,8 +172,8 @@ WRITE16_HANDLER( nemesis_palette_word_w )
 {
 	int r,g,b,bit1,bit2,bit3,bit4,bit5;
 
-	COMBINE_DATA(paletteram16 + offset);
-	data = paletteram16[offset];
+	COMBINE_DATA(space->machine->generic.paletteram.u16 + offset);
+	data = space->machine->generic.paletteram.u16[offset];
 
 	/* Mish, 30/11/99 - Schematics show the resistor values are:
         300 Ohms
@@ -214,10 +214,10 @@ WRITE16_HANDLER( nemesis_palette_word_w )
 
 WRITE16_HANDLER( salamander_palette_word_w )
 {
-	COMBINE_DATA(paletteram16 + offset);
+	COMBINE_DATA(space->machine->generic.paletteram.u16 + offset);
 	offset &= ~1;
 
-	data = ((paletteram16[offset] << 8) & 0xff00) | (paletteram16[offset+1] & 0xff);
+	data = ((space->machine->generic.paletteram.u16[offset] << 8) & 0xff00) | (space->machine->generic.paletteram.u16[offset+1] & 0xff);
 	palette_set_color_rgb(space->machine,offset / 2,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 }
 
@@ -288,7 +288,7 @@ static STATE_POSTLOAD( nemesis_postload )
 /* claim a palette dirty array */
 VIDEO_START( nemesis )
 {
-	spriteram_words = spriteram_size / 2;
+	spriteram_words = machine->generic.spriteram_size / 2;
 
 	background = tilemap_create(machine,
 		get_bg_tile_info, tilemap_scan_rows,  8,8, 64,32 );
@@ -342,6 +342,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
      *  byte    E : not used.
      */
 
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int adress;	/* start of sprite in spriteram */
 	int sx;	/* sprite X-pos */
 	int sy;	/* sprite Y-pos */

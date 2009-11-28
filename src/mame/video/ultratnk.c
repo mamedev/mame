@@ -41,7 +41,7 @@ PALETTE_INIT( ultratnk )
 
 static TILE_GET_INFO( ultratnk_tile_info )
 {
-	UINT8 code = videoram[tile_index];
+	UINT8 code = machine->generic.videoram.u8[tile_index];
 
 	if (code & 0x20)
 		SET_TILE_INFO(0, code, code >> 6, 0);
@@ -60,6 +60,7 @@ VIDEO_START( ultratnk )
 
 VIDEO_UPDATE( ultratnk )
 {
+	UINT8 *videoram = screen->machine->generic.videoram.u8;
 	int i;
 
 	tilemap_draw(bitmap, cliprect, playfield, 0, 0);
@@ -96,6 +97,7 @@ VIDEO_EOF( ultratnk )
 	int i;
 	UINT16 BG = colortable_entry_get_value(machine->colortable, 0);
 	const device_config *discrete = devtag_get_device(machine, "discrete");
+	UINT8 *videoram = machine->generic.videoram.u8;
 
 	/* check for sprite-playfield collisions */
 
@@ -139,13 +141,13 @@ VIDEO_EOF( ultratnk )
 
 	/* update sound status */
 
-	discrete_sound_w(discrete, ULTRATNK_MOTOR_DATA_1, videoram[0x391] & 15);
-	discrete_sound_w(discrete, ULTRATNK_MOTOR_DATA_2, videoram[0x393] & 15);
+	discrete_sound_w(discrete, ULTRATNK_MOTOR_DATA_1, machine->generic.videoram.u8[0x391] & 15);
+	discrete_sound_w(discrete, ULTRATNK_MOTOR_DATA_2, machine->generic.videoram.u8[0x393] & 15);
 }
 
 
 WRITE8_HANDLER( ultratnk_video_ram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(playfield, offset);
 }

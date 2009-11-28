@@ -283,7 +283,7 @@ static READ8_HANDLER( le_4800_r )
 {
 	if (cur_control2 & 0x10)	// RAM enable
 	{
-		return paletteram[offset];
+		return space->machine->generic.paletteram.u8[offset];
 	}
 	else
 	{
@@ -496,7 +496,7 @@ static ADDRESS_MAP_START( le_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x40db, 0x40db) AM_READ(gunsaux_r)		// top X bit of guns
 	AM_RANGE(0x40dc, 0x40dc) AM_WRITE(le_bankswitch_w)
 	AM_RANGE(0x47fe, 0x47ff) AM_WRITE(le_bgcolor_w)		// BG color
-	AM_RANGE(0x4800, 0x7fff) AM_READWRITE(le_4800_r, le_4800_w)	AM_BASE(&paletteram) // bankswitched: RAM and registers
+	AM_RANGE(0x4800, 0x7fff) AM_READWRITE(le_4800_r, le_4800_w)	AM_BASE_GENERIC(paletteram) // bankswitched: RAM and registers
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK(2)) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 

@@ -62,13 +62,13 @@ WRITE8_HANDLER( mermaid_videoram2_w )
 
 WRITE8_HANDLER( mermaid_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( mermaid_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -143,8 +143,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int attr = colorram[tile_index];
-	int code = videoram[tile_index] + ((attr & 0x30) << 4);
+	int attr = machine->generic.colorram.u8[tile_index];
+	int code = machine->generic.videoram.u8[tile_index] + ((attr & 0x30) << 4);
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0xc0) >> 6);
 
@@ -169,9 +169,10 @@ VIDEO_START( mermaid )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int attr = spriteram[offs + 2];
 		int bank = (attr & 0x30) >> 4;
@@ -236,6 +237,7 @@ static UINT8 collision_check(colortable_t *colortable, rectangle* rect)
 VIDEO_EOF( mermaid )
 {
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 
 	int offs,offs2;
 
@@ -247,7 +249,7 @@ VIDEO_EOF( mermaid )
 
 	// check for bit 0 (sprite-sprite), 1 (sprite-foreground), 2 (sprite-background)
 
-	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int attr = spriteram[offs + 2];
 		int bank = (attr & 0x30) >> 4;
@@ -318,7 +320,7 @@ VIDEO_EOF( mermaid )
 		bitmap_fill(helper,&rect,0);
 		bitmap_fill(helper2,&rect,0);
 
-		for (offs2 = spriteram_size - 4; offs2 >= 0; offs2 -= 4)
+		for (offs2 = machine->generic.spriteram_size - 4; offs2 >= 0; offs2 -= 4)
 			if (offs != offs2)
 			{
 				int attr2 = spriteram[offs2 + 2];
@@ -357,7 +359,7 @@ VIDEO_EOF( mermaid )
 
 	// check for bit 3 (sprite-sprite)
 
-	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int attr = spriteram[offs + 2];
 		int bank = (attr & 0x30) >> 4;
@@ -406,7 +408,7 @@ VIDEO_EOF( mermaid )
 		bitmap_fill(helper,&rect,0);
 		bitmap_fill(helper2,&rect,0);
 
-		for (offs2 = spriteram_size - 4; offs2 >= 0; offs2 -= 4)
+		for (offs2 = machine->generic.spriteram_size - 4; offs2 >= 0; offs2 -= 4)
 			if (offs != offs2)
 			{
 				int attr2 = spriteram[offs2 + 2];
@@ -445,7 +447,7 @@ VIDEO_EOF( mermaid )
 
 	// check for bit 6
 
-	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int attr = spriteram[offs + 2];
 		int bank = (attr & 0x30) >> 4;
@@ -494,7 +496,7 @@ VIDEO_EOF( mermaid )
 		bitmap_fill(helper,&rect,0);
 		bitmap_fill(helper2,&rect,0);
 
-		for (offs2 = spriteram_size - 4; offs2 >= 0; offs2 -= 4)
+		for (offs2 = machine->generic.spriteram_size - 4; offs2 >= 0; offs2 -= 4)
 			if (offs != offs2)
 			{
 				int attr2 = spriteram[offs2 + 2];

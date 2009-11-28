@@ -14,7 +14,7 @@ WRITE16_HANDLER( deadang_foreground_w )
 
 WRITE16_HANDLER( deadang_text_w )
 {
-	COMBINE_DATA(&videoram16[offset]);
+	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
 	tilemap_mark_tile_dirty( text_layer, offset );
 }
 
@@ -63,8 +63,8 @@ static TILE_GET_INFO( get_pf1_tile_info )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	int tile=(videoram16[tile_index] & 0xff) | ((videoram16[tile_index] >> 6) & 0x300);
-	int color=(videoram16[tile_index] >> 8)&0xf;
+	int tile=(machine->generic.videoram.u16[tile_index] & 0xff) | ((machine->generic.videoram.u16[tile_index] >> 6) & 0x300);
+	int color=(machine->generic.videoram.u16[tile_index] >> 8)&0xf;
 
 	SET_TILE_INFO(0,tile,color,0);
 }
@@ -83,6 +83,7 @@ VIDEO_START( deadang )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs,fx,fy,x,y,color,sprite,pri;
 
 	for (offs = 0; offs<0x800/2; offs+=4)

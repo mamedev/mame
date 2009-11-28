@@ -119,8 +119,8 @@ WRITE16_HANDLER( toobin_paletteram_w )
 {
 	int newword;
 
-	COMBINE_DATA(&paletteram16[offset]);
-	newword = paletteram16[offset];
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	newword = space->machine->generic.paletteram.u16[offset];
 
 	{
 		int red =   (((newword >> 10) & 31) * 224) >> 5;
@@ -149,7 +149,7 @@ WRITE16_HANDLER( toobin_intensity_w )
 		brightness = (double)(~data & 0x1f) / 31.0;
 
 		for (i = 0; i < 0x400; i++)
-			if (!(paletteram16[i] & 0x8000))
+			if (!(space->machine->generic.paletteram.u16[i] & 0x8000))
 				palette_set_pen_contrast(space->machine, i, brightness);
 	}
 }

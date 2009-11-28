@@ -92,8 +92,8 @@ static TILEMAP_MAPPER( omegaf_bg_scan )
 
 static void robokid_get_bg_tile_info(running_machine* machine, tile_data* const tileinfo, tilemap_memory_index const tile_index, int const gfxnum, const UINT8* const videoram)
 {
-	int const lo = videoram[(tile_index << 1)];
-	int const hi = videoram[(tile_index << 1) | 1];
+	int const lo = machine->generic.videoram.u8[(tile_index << 1)];
+	int const hi = machine->generic.videoram.u8[(tile_index << 1) | 1];
 	int const tile = ((hi & 0x10) << 7) | ((hi & 0x20) << 5) | ((hi & 0xc0) << 2) | lo;
 	int const color = hi & 0x0f;
 
@@ -361,7 +361,7 @@ static void draw_sprites(running_machine* machine, bitmap_t* bitmap)
 	int const big_xshift = robokid_sprites ? 1 : 0;
 	int const big_yshift = robokid_sprites ? 0 : 1;
 
-	UINT8* sprptr = &spriteram[11];
+	UINT8* sprptr = &machine->generic.spriteram.u8[11];
 	int sprites_drawn = 0;
 
 	// the sprite generator draws exactly 96 16x16 sprites per frame. When big

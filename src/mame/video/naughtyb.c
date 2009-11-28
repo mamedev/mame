@@ -192,7 +192,7 @@ VIDEO_UPDATE( naughtyb )
 
 	// for every character in the Video RAM
 
-	for (offs = videoram_size - 1;offs >= 0;offs--)
+	for (offs = screen->machine->generic.videoram_size - 1;offs >= 0;offs--)
 	{
 		int sx,sy;
 
@@ -230,8 +230,8 @@ VIDEO_UPDATE( naughtyb )
 				8*sx,8*sy);
 
 		drawgfx_transpen(tmpbitmap,0,screen->machine->gfx[1],
-				videoram[offs] + 256*bankreg,
-				(videoram[offs] >> 5) + 8 * palreg,
+				screen->machine->generic.videoram.u8[offs] + 256*bankreg,
+				(screen->machine->generic.videoram.u8[offs] >> 5) + 8 * palreg,
 				naughtyb_cocktail,naughtyb_cocktail,
 				8*sx,8*sy,0);
 	}

@@ -149,7 +149,7 @@ WRITE8_HANDLER( graph_processor_w )
 
 WRITE8_HANDLER( cloak_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -160,7 +160,7 @@ WRITE8_HANDLER( cloak_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index];
+	int code = machine->generic.videoram.u8[tile_index];
 
 	SET_TILE_INFO(0, code, 0, 0);
 }
@@ -205,9 +205,10 @@ static void draw_bitmap(bitmap_t *bitmap, const rectangle *cliprect)
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = (spriteram_size / 4) - 1; offs >= 0; offs--)
+	for (offs = (machine->generic.spriteram_size / 4) - 1; offs >= 0; offs--)
 	{
 		int code = spriteram[offs + 64] & 0x7f;
 		int flipx = spriteram[offs + 64] & 0x80;

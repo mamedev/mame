@@ -51,13 +51,13 @@ static tilemap *fg_tilemap;
 
 WRITE8_HANDLER( tunhunt_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int attr = videoram[tile_index];
+	int attr = machine->generic.videoram.u8[tile_index];
 	int code = attr & 0x3f;
 	int color = attr >> 6;
 	int flags = color ? TILE_FORCE_LAYER0 : 0;
@@ -138,7 +138,7 @@ Color Array Ram Assignments:
         8-E             Lines (as normal) background
         F               Hilight 3
 */
-static void set_pens(colortable_t *colortable)
+static void set_pens(running_machine *machine)
 {
 //  const UINT8 *color_prom = memory_region( machine, "proms" );
 /*
@@ -160,7 +160,7 @@ static void set_pens(colortable_t *colortable)
 
 	for( i=0; i<16; i++ )
 	{
-		color = paletteram[i];
+		color = machine->generic.paletteram.u8[i];
 		shade = 0xf^(color>>4);
 
 		color &= 0xf; /* hue select */
@@ -192,11 +192,11 @@ static void set_pens(colortable_t *colortable)
 		green	= APPLY_SHADE(green,shade);
 		blue	= APPLY_SHADE(blue,shade);
 
-		colortable_palette_set_color( colortable,i,MAKE_RGB(red,green,blue) );
+		colortable_palette_set_color( machine->colortable,i,MAKE_RGB(red,green,blue) );
 	}
 }
 
-static void draw_motion_object(bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_motion_object(bitmap_t *bitmap, const rectangle *cliprect, UINT8 *spriteram)
 {
 /*
  *      VSTRLO  0x1202
@@ -367,11 +367,11 @@ static void draw_shell(running_machine *machine,
 
 VIDEO_UPDATE( tunhunt )
 {
-	set_pens(screen->machine->colortable);
+	set_pens(screen->machine);
 
 	draw_box(bitmap, cliprect);
 
-	draw_motion_object(bitmap, cliprect);
+	draw_motion_object(bitmap, cliprect, screen->machine->generic.spriteram.u8);
 
 	draw_shell(screen->machine, bitmap, cliprect,
 		tunhunt_ram[SHL0PC],	/* picture code */

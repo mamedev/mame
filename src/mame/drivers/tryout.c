@@ -65,11 +65,11 @@ static WRITE8_HANDLER( tryout_bankswitch_w )
 
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(tryout_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(tryout_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0xc800, 0xc87f) AM_RAM AM_BASE(&spriteram)
-	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_BASE(&spriteram_2)
+	AM_RANGE(0xc800, 0xc87f) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_BASE_GENERIC(spriteram2)
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(tryout_vram_r, tryout_vram_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW")
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("P1")

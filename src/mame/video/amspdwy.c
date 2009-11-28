@@ -47,8 +47,8 @@ WRITE8_HANDLER( amspdwy_flipscreen_w )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	UINT8 code	=	videoram[ tile_index ];
-	UINT8 color	=	colorram[ tile_index ];
+	UINT8 code	=	machine->generic.videoram.u8[ tile_index ];
+	UINT8 color	=	machine->generic.colorram.u8[ tile_index ];
 	SET_TILE_INFO(
 			0,
 			code + ((color & 0x18)<<5),
@@ -58,13 +58,13 @@ static TILE_GET_INFO( get_tile_info )
 
 WRITE8_HANDLER( amspdwy_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( amspdwy_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -104,11 +104,12 @@ Offset:     Format:     Value:
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int i;
 	int max_x = video_screen_get_width(machine->primary_screen)  - 1;
 	int max_y = video_screen_get_height(machine->primary_screen) - 1;
 
-	for (i = 0; i < spriteram_size ; i += 4)
+	for (i = 0; i < machine->generic.spriteram_size ; i += 4)
 	{
 		int y		=	spriteram[i+0];
 		int x		=	spriteram[i+1];

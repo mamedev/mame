@@ -93,11 +93,11 @@ static ADDRESS_MAP_START( fastlane_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0d00, 0x0d0d) AM_DEVREADWRITE("konami1", fastlane_k007232_r, fastlane_k007232_w)	/* 007232 registers (chip 1) */
 	AM_RANGE(0x0e00, 0x0e0d) AM_DEVREADWRITE("konami2", fastlane_k007232_r, fastlane_k007232_w)	/* 007232 registers (chip 2) */
 	AM_RANGE(0x0f00, 0x0f1f) AM_READWRITE(K051733_r, K051733_w)									/* 051733 (protection) */
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_BASE(&paletteram)										/* Palette RAM */
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_BASE_GENERIC(paletteram)										/* Palette RAM */
 	AM_RANGE(0x1800, 0x1fff) AM_RAM																/* Work RAM */
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(fastlane_vram1_w) AM_BASE(&fastlane_videoram1) 		/* Video RAM (chip 1) */
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(fastlane_vram2_w) AM_BASE(&fastlane_videoram2) 		/* Video RAM (chip 2) */
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE(&spriteram)											/* Sprite RAM */
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE_GENERIC(spriteram)											/* Sprite RAM */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)														/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM																/* ROM */
 ADDRESS_MAP_END

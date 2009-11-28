@@ -86,10 +86,11 @@ WRITE16_HANDLER( kickgoal_bg2ram_w )
 
 static void kickgoal_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	const gfx_element *gfx = machine->gfx[1];
 	int offs;
 
-	for (offs = 0;offs < spriteram_size/2;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size/2;offs += 4)
 	{
 		int xpos = spriteram16[offs+3];
 		int ypos = spriteram16[offs+0] & 0x00ff;
@@ -210,10 +211,11 @@ VIDEO_START( actionhw )
 
 static void actionhw_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	const gfx_element *gfx = machine->gfx[1];
 	int offs;
 
-	for (offs = 0;offs < spriteram_size/2;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size/2;offs += 4)
 	{
 		int xpos = spriteram16[offs+3];
 		int ypos = spriteram16[offs+0] & 0x00ff;

@@ -130,7 +130,7 @@ VIDEO_START( baraduke )
 	tilemap_set_scrolldx(tx_tilemap,0,512-288);
 	tilemap_set_scrolldy(tx_tilemap,16,16);
 
-	spriteram = baraduke_spriteram + 0x1800;
+	machine->generic.spriteram.u8 = baraduke_spriteram + 0x1800;
 }
 
 
@@ -216,11 +216,11 @@ WRITE8_HANDLER( baraduke_spriteram_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int sprite_priority)
 {
-	const UINT8 *source = &spriteram[0];
-	const UINT8 *finish = &spriteram[0x0800-16];	/* the last is NOT a sprite */
+	const UINT8 *source = &machine->generic.spriteram.u8[0];
+	const UINT8 *finish = &machine->generic.spriteram.u8[0x0800-16];	/* the last is NOT a sprite */
 
-	int sprite_xoffs = spriteram[0x07f5] - 256 * (spriteram[0x07f4] & 1);
-	int sprite_yoffs = spriteram[0x07f7];
+	int sprite_xoffs = machine->generic.spriteram.u8[0x07f5] - 256 * (machine->generic.spriteram.u8[0x07f4] & 1);
+	int sprite_yoffs = machine->generic.spriteram.u8[0x07f7];
 
 	while( source<finish )
 	{
@@ -312,7 +312,7 @@ VIDEO_UPDATE( baraduke )
 
 	/* flip screen is embedded in the sprite control registers */
 	/* can't use flip_screen_set(screen->machine, ) because the visible area is asymmetrical */
-	flip_screen_set_no_update(screen->machine, spriteram[0x07f6] & 0x01);
+	flip_screen_set_no_update(screen->machine, screen->machine->generic.spriteram.u8[0x07f6] & 0x01);
 	tilemap_set_flip_all(screen->machine,flip_screen_get(screen->machine) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	set_scroll(screen->machine, 0);
 	set_scroll(screen->machine, 1);
@@ -341,7 +341,7 @@ VIDEO_EOF( baraduke )
 		for (i = 0;i < 0x800;i += 16)
 		{
 			for (j = 10;j < 16;j++)
-				spriteram[i+j] = spriteram[i+j - 6];
+				machine->generic.spriteram.u8[i+j] = machine->generic.spriteram.u8[i+j - 6];
 		}
 
 		copy_sprites = 0;

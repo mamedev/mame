@@ -23,7 +23,7 @@ static tilemap *bg_tilemap;
 
 static TILE_GET_INFO( get_tile_info )
 {
-	SET_TILE_INFO(0, videoram[tile_index] & 0x7f, 0, 0);
+	SET_TILE_INFO(0, machine->generic.videoram.u8[tile_index] & 0x7f, 0, 0);
 }
 
 
@@ -49,7 +49,7 @@ VIDEO_START( meadows )
 
 WRITE8_HANDLER( meadows_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -64,7 +64,7 @@ WRITE8_HANDLER( meadows_videoram_w )
 WRITE8_HANDLER( meadows_spriteram_w )
 {
 	video_screen_update_now(space->machine->primary_screen);
-	spriteram[offset] = data;
+	space->machine->generic.spriteram.u8[offset] = data;
 }
 
 
@@ -77,6 +77,7 @@ WRITE8_HANDLER( meadows_spriteram_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *clip)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int i;
 
 	for (i = 0; i < 4; i++)

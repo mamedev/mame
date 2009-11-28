@@ -18,13 +18,13 @@ static tilemap *bg_tilemap;
 
 WRITE8_HANDLER( bagman_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( bagman_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -95,9 +95,9 @@ WRITE8_HANDLER( bagman_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int gfxbank = (machine->gfx[2] && (colorram[tile_index] & 0x10)) ? 2 : 0;
-	int code = videoram[tile_index] + 8 * (colorram[tile_index] & 0x20);
-	int color = colorram[tile_index] & 0x0f;
+	int gfxbank = (machine->gfx[2] && (machine->generic.colorram.u8[tile_index] & 0x10)) ? 2 : 0;
+	int code = machine->generic.videoram.u8[tile_index] + 8 * (machine->generic.colorram.u8[tile_index] & 0x20);
+	int color = machine->generic.colorram.u8[tile_index] & 0x0f;
 
 	SET_TILE_INFO(gfxbank, code, color, 0);
 }
@@ -110,9 +110,10 @@ VIDEO_START( bagman )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy;
 

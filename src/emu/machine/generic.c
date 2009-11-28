@@ -95,8 +95,8 @@ void generic_machine_init(running_machine *machine)
 	state_save_register_item_array(machine, "coin", NULL, 0, state->lastcoin);
 
 	/* reset NVRAM size and pointers */
-	machine->generic.nvram.ptr.v = NULL;
-	machine->generic.nvram.size = 0;
+	machine->generic.nvram.v = NULL;
+	machine->generic.nvram_size = 0;
 
 	/* reset memory card info */
 	state->memcard_inserted = -1;
@@ -397,13 +397,13 @@ void nvram_save(running_machine *machine)
 NVRAM_HANDLER( generic_0fill )
 {
 	if (read_or_write)
-		mame_fwrite(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
+		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
 	else if (file != NULL)
-		mame_fread(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
-	else if (memory_region_length(machine, "nvram") == machine->generic.nvram.size)
-		memcpy(machine->generic.nvram.ptr.v, memory_region(machine, "nvram"), machine->generic.nvram.size);
+		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
+	else if (memory_region_length(machine, "nvram") == machine->generic.nvram_size)
+		memcpy(machine->generic.nvram.v, memory_region(machine, "nvram"), machine->generic.nvram_size);
 	else
-		memset(machine->generic.nvram.ptr.v, 0, machine->generic.nvram.size);
+		memset(machine->generic.nvram.v, 0, machine->generic.nvram_size);
 }
 
 
@@ -415,13 +415,13 @@ NVRAM_HANDLER( generic_0fill )
 NVRAM_HANDLER( generic_1fill )
 {
 	if (read_or_write)
-		mame_fwrite(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
+		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
 	else if (file != NULL)
-		mame_fread(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
-	else if (memory_region_length(machine, "nvram") == machine->generic.nvram.size)
-		memcpy(machine->generic.nvram.ptr.v, memory_region(machine, "nvram"), machine->generic.nvram.size);
+		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
+	else if (memory_region_length(machine, "nvram") == machine->generic.nvram_size)
+		memcpy(machine->generic.nvram.v, memory_region(machine, "nvram"), machine->generic.nvram_size);
 	else
-		memset(machine->generic.nvram.ptr.v, 0xff, machine->generic.nvram.size);
+		memset(machine->generic.nvram.v, 0xff, machine->generic.nvram_size);
 }
 
 
@@ -433,16 +433,16 @@ NVRAM_HANDLER( generic_1fill )
 NVRAM_HANDLER( generic_randfill )
 {
 	if (read_or_write)
-		mame_fwrite(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
+		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
 	else if (file != NULL)
-		mame_fread(file, machine->generic.nvram.ptr.v, machine->generic.nvram.size);
-	else if (memory_region_length(machine, "nvram") == machine->generic.nvram.size)
-		memcpy(machine->generic.nvram.ptr.v, memory_region(machine, "nvram"), machine->generic.nvram.size);
+		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
+	else if (memory_region_length(machine, "nvram") == machine->generic.nvram_size)
+		memcpy(machine->generic.nvram.v, memory_region(machine, "nvram"), machine->generic.nvram_size);
 	else
 	{
-		UINT8 *nvram = (UINT8 *)machine->generic.nvram.ptr.v;
+		UINT8 *nvram = (UINT8 *)machine->generic.nvram.v;
 		int i;
-		for (i = 0; i < machine->generic.nvram.size; i++)
+		for (i = 0; i < machine->generic.nvram_size; i++)
 			nvram[i] = mame_rand(machine);
 	}
 }

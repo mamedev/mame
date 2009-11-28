@@ -191,7 +191,7 @@ static void esd16_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 	int max_x = video_screen_get_width(machine->primary_screen);
 	int max_y = video_screen_get_height(machine->primary_screen);
 
-	for (offs = spriteram_size / 2 - 8 / 2; offs >= 0 ; offs -= 8 / 2)
+	for (offs = machine->generic.spriteram_size / 2 - 8 / 2; offs >= 0 ; offs -= 8 / 2)
 	{
 		int y, starty, endy, incy;
 
@@ -255,7 +255,7 @@ static void hedpanic_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	int max_x = video_screen_get_width(machine->primary_screen);
 	int max_y = video_screen_get_height(machine->primary_screen);
 
-	for (offs = spriteram_size / 2 - 8 / 2; offs >= 0 ; offs -= 8 / 2)
+	for (offs = machine->generic.spriteram_size / 2 - 8 / 2; offs >= 0 ; offs -= 8 / 2)
 	{
 		int y, starty, endy, incy;
 

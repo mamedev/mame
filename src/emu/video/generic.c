@@ -18,46 +18,6 @@
     GLOBAL VARIABLES
 ***************************************************************************/
 
-UINT8 *videoram;
-UINT16 *videoram16;
-UINT32 *videoram32;
-size_t videoram_size;
-
-UINT8 *colorram;
-UINT16 *colorram16;
-UINT32 *colorram32;
-
-UINT8 *spriteram;			/* not used in this module... */
-UINT16 *spriteram16;		/* ... */
-UINT32 *spriteram32;		/* ... */
-
-UINT8 *spriteram_2;
-UINT16 *spriteram16_2;
-UINT32 *spriteram32_2;
-
-UINT8 *spriteram_3;
-UINT16 *spriteram16_3;
-UINT32 *spriteram32_3;
-
-UINT8 *buffered_spriteram;
-UINT16 *buffered_spriteram16;
-UINT32 *buffered_spriteram32;
-
-UINT8 *buffered_spriteram_2;
-UINT16 *buffered_spriteram16_2;
-UINT32 *buffered_spriteram32_2;
-
-size_t spriteram_size;		/* ... here just for convenience */
-size_t spriteram_2_size;
-size_t spriteram_3_size;
-
-UINT8 *paletteram;
-UINT16 *paletteram16;
-UINT32 *paletteram32;
-
-UINT8 *paletteram_2;	/* use when palette RAM is split in two parts */
-UINT16 *paletteram16_2;
-
 bitmap_t *tmpbitmap;
 static int flip_screen_x, flip_screen_y;
 
@@ -156,9 +116,9 @@ const gfx_layout gfx_16x16x4_planar =
     palette RAM referenced by offset
 -------------------------------------------------*/
 
-INLINE UINT16 paletteram16_le(offs_t offset)
+INLINE UINT16 paletteram16_le(running_machine *machine, offs_t offset)
 {
-	return paletteram[offset & ~1] | (paletteram[offset | 1] << 8);
+	return machine->generic.paletteram.u8[offset & ~1] | (machine->generic.paletteram.u8[offset | 1] << 8);
 }
 
 
@@ -168,9 +128,9 @@ INLINE UINT16 paletteram16_le(offs_t offset)
     palette RAM referenced by offset
 -------------------------------------------------*/
 
-INLINE UINT16 paletteram16_be(offs_t offset)
+INLINE UINT16 paletteram16_be(running_machine *machine, offs_t offset)
 {
-	return paletteram[offset | 1] | (paletteram[offset & ~1] << 8);
+	return machine->generic.paletteram.u8[offset | 1] | (machine->generic.paletteram.u8[offset & ~1] << 8);
 }
 
 
@@ -180,9 +140,9 @@ INLINE UINT16 paletteram16_be(offs_t offset)
     RAM referenced by offset
 -------------------------------------------------*/
 
-INLINE UINT16 paletteram16_split(offs_t offset)
+INLINE UINT16 paletteram16_split(running_machine *machine, offs_t offset)
 {
-	return paletteram[offset] | (paletteram_2[offset] << 8);
+	return machine->generic.paletteram.u8[offset] | (machine->generic.paletteram2.u8[offset] << 8);
 }
 
 
@@ -192,9 +152,9 @@ INLINE UINT16 paletteram16_split(offs_t offset)
     palette RAM referenced by offset
 -------------------------------------------------*/
 
-INLINE UINT32 paletteram32_be(offs_t offset)
+INLINE UINT32 paletteram32_be(running_machine *machine, offs_t offset)
 {
-	return paletteram16[offset | 1] | (paletteram16[offset & ~1] << 16);
+	return machine->generic.paletteram.u16[offset | 1] | (machine->generic.paletteram.u16[offset & ~1] << 16);
 }
 
 
@@ -267,31 +227,21 @@ INLINE void set_color_888(running_machine *machine, pen_t color, int rshift, int
 
 void generic_video_init(running_machine *machine)
 {
-	videoram = NULL;
-	videoram16 = NULL;
-	videoram32 = NULL;
-	videoram_size = 0;
-	colorram = NULL;
-	colorram16 = NULL;
-	colorram32 = NULL;
-	spriteram = NULL;
-	spriteram16 = NULL;
-	spriteram32 = NULL;
-	spriteram_2 = NULL;
-	spriteram16_2 = NULL;
-	spriteram32_2 = NULL;
-	spriteram_3 = NULL;
-	spriteram16_3 = NULL;
-	spriteram32_3 = NULL;
-	buffered_spriteram = NULL;
-	buffered_spriteram16 = NULL;
-	buffered_spriteram32 = NULL;
-	buffered_spriteram_2 = NULL;
-	buffered_spriteram16_2 = NULL;
-	buffered_spriteram32_2 = NULL;
-	spriteram_size = 0;		/* ... here just for convenience */
-	spriteram_2_size = 0;
-	spriteram_3_size = 0;
+	machine->generic.paletteram.v = NULL;
+	machine->generic.paletteram2.v = NULL;
+	machine->generic.videoram.v = NULL;
+	machine->generic.videoram_size = 0;
+	machine->generic.colorram.v = NULL;
+	machine->generic.colorram_size = 0;
+	machine->generic.spriteram.v = NULL;
+	machine->generic.spriteram_size = 0;
+	machine->generic.spriteram2.v = NULL;
+	machine->generic.spriteram2_size = 0;
+	machine->generic.spriteram3.v = NULL;
+	machine->generic.spriteram3_size = 0;
+	machine->generic.buffered_spriteram.v = NULL;
+	machine->generic.buffered_spriteram2.v = NULL;
+	machine->generic.buffered_spriteram3.v = NULL;
 	tmpbitmap = NULL;
 	flip_screen_x = flip_screen_y = 0;
 	state_save_register_item(machine, "video", NULL, 0, flip_screen_x);
@@ -387,17 +337,17 @@ more control is needed over what is buffered.
 
 WRITE8_HANDLER( buffer_spriteram_w )
 {
-	memcpy(buffered_spriteram, spriteram, spriteram_size);
+	memcpy(space->machine->generic.buffered_spriteram.u8, space->machine->generic.spriteram.u8, space->machine->generic.spriteram_size);
 }
 
 WRITE16_HANDLER( buffer_spriteram16_w )
 {
-	memcpy(buffered_spriteram16, spriteram16, spriteram_size);
+	memcpy(space->machine->generic.buffered_spriteram.u16, space->machine->generic.spriteram.u16, space->machine->generic.spriteram_size);
 }
 
 WRITE32_HANDLER( buffer_spriteram32_w )
 {
-	memcpy(buffered_spriteram32, spriteram32, spriteram_size);
+	memcpy(space->machine->generic.buffered_spriteram.u32, space->machine->generic.spriteram.u32, space->machine->generic.spriteram_size);
 }
 
 
@@ -408,17 +358,17 @@ WRITE32_HANDLER( buffer_spriteram32_w )
 
 WRITE8_HANDLER( buffer_spriteram_2_w )
 {
-	memcpy(buffered_spriteram_2, spriteram_2, spriteram_2_size);
+	memcpy(space->machine->generic.buffered_spriteram2.u8, space->machine->generic.spriteram2.u8, space->machine->generic.spriteram2_size);
 }
 
 WRITE16_HANDLER( buffer_spriteram16_2_w )
 {
-	memcpy(buffered_spriteram16_2, spriteram16_2, spriteram_2_size);
+	memcpy(space->machine->generic.buffered_spriteram2.u16, space->machine->generic.spriteram2.u16, space->machine->generic.spriteram2_size);
 }
 
 WRITE32_HANDLER( buffer_spriteram32_2_w )
 {
-	memcpy(buffered_spriteram32_2, spriteram32_2, spriteram_2_size);
+	memcpy(space->machine->generic.buffered_spriteram2.u32, space->machine->generic.spriteram2.u32, space->machine->generic.spriteram2_size);
 }
 
 
@@ -427,14 +377,14 @@ WRITE32_HANDLER( buffer_spriteram32_2_w )
     spriteram
 -------------------------------------------------*/
 
-void buffer_spriteram(UINT8 *ptr, int length)
+void buffer_spriteram(running_machine *machine, UINT8 *ptr, int length)
 {
-	memcpy(buffered_spriteram, ptr, length);
+	memcpy(machine->generic.buffered_spriteram.u8, ptr, length);
 }
 
-void buffer_spriteram_2(UINT8 *ptr, int length)
+void buffer_spriteram_2(running_machine *machine, UINT8 *ptr, int length)
 {
-	memcpy(buffered_spriteram_2, ptr, length);
+	memcpy(machine->generic.buffered_spriteram2.u8, ptr, length);
 }
 
 
@@ -713,7 +663,7 @@ PALETTE_INIT( RRRRR_GGGGGG_BBBBB )
 
 WRITE8_HANDLER( paletteram_RRRGGGBB_w )
 {
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 	palette_set_color_rgb(space->machine, offset, pal3bit(data >> 5), pal3bit(data >> 2), pal2bit(data >> 0));
 }
 
@@ -724,7 +674,7 @@ WRITE8_HANDLER( paletteram_RRRGGGBB_w )
 
 WRITE8_HANDLER( paletteram_BBGGGRRR_w )
 {
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 	palette_set_color_rgb(space->machine, offset, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 }
 
@@ -737,7 +687,7 @@ WRITE8_HANDLER( paletteram_BBGGRRII_w )
 {
 	int i = (data >> 0) & 3;
 
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 	palette_set_color_rgb(space->machine, offset, pal4bit(((data >> 0) & 0x0c) | i),
 	                                   pal4bit(((data >> 2) & 0x0c) | i),
 	                                   pal4bit(((data >> 4) & 0x0c) | i));
@@ -751,7 +701,7 @@ WRITE8_HANDLER( paletteram_IIBBGGRR_w )
 {
 	int i = (data >> 6) & 3;
 
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 	palette_set_color_rgb(space->machine, offset, pal4bit(((data << 2) & 0x0c) | i),
 	                                   pal4bit(((data >> 0) & 0x0c) | i),
 	                                   pal4bit(((data >> 2) & 0x0c) | i));
@@ -769,32 +719,32 @@ WRITE8_HANDLER( paletteram_IIBBGGRR_w )
 
 WRITE8_HANDLER( paletteram_xxxxBBBBGGGGRRRR_le_w )
 {
-	paletteram[offset] = data;
-	set_color_444(space->machine, offset / 2, 0, 4, 8, paletteram16_le(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_444(space->machine, offset / 2, 0, 4, 8, paletteram16_le(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxBBBBGGGGRRRR_be_w )
 {
-	paletteram[offset] = data;
-	set_color_444(space->machine, offset / 2, 0, 4, 8, paletteram16_be(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_444(space->machine, offset / 2, 0, 4, 8, paletteram16_be(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxBBBBGGGGRRRR_split1_w )
 {
-	paletteram[offset] = data;
-	set_color_444(space->machine, offset, 0, 4, 8, paletteram16_split(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_444(space->machine, offset, 0, 4, 8, paletteram16_split(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxBBBBGGGGRRRR_split2_w )
 {
-	paletteram_2[offset] = data;
-	set_color_444(space->machine, offset, 0, 4, 8, paletteram16_split(offset));
+	space->machine->generic.paletteram2.u8[offset] = data;
+	set_color_444(space->machine, offset, 0, 4, 8, paletteram16_split(space->machine, offset));
 }
 
 WRITE16_HANDLER( paletteram16_xxxxBBBBGGGGRRRR_word_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
-	set_color_444(space->machine, offset, 0, 4, 8, paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	set_color_444(space->machine, offset, 0, 4, 8, space->machine->generic.paletteram.u16[offset]);
 }
 
 
@@ -804,32 +754,32 @@ WRITE16_HANDLER( paletteram16_xxxxBBBBGGGGRRRR_word_w )
 
 WRITE8_HANDLER( paletteram_xxxxBBBBRRRRGGGG_le_w )
 {
-	paletteram[offset] = data;
-	set_color_444(space->machine, offset / 2, 4, 0, 8, paletteram16_le(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_444(space->machine, offset / 2, 4, 0, 8, paletteram16_le(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxBBBBRRRRGGGG_be_w )
 {
-	paletteram[offset] = data;
-	set_color_444(space->machine, offset / 2, 4, 0, 8, paletteram16_be(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_444(space->machine, offset / 2, 4, 0, 8, paletteram16_be(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxBBBBRRRRGGGG_split1_w )
 {
-	paletteram[offset] = data;
-	set_color_444(space->machine, offset, 4, 0, 8, paletteram16_split(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_444(space->machine, offset, 4, 0, 8, paletteram16_split(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxBBBBRRRRGGGG_split2_w )
 {
-	paletteram_2[offset] = data;
-	set_color_444(space->machine, offset, 4, 0, 8, paletteram16_split(offset));
+	space->machine->generic.paletteram2.u8[offset] = data;
+	set_color_444(space->machine, offset, 4, 0, 8, paletteram16_split(space->machine, offset));
 }
 
 WRITE16_HANDLER( paletteram16_xxxxBBBBRRRRGGGG_word_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
-	set_color_444(space->machine, offset, 4, 0, 8, paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	set_color_444(space->machine, offset, 4, 0, 8, space->machine->generic.paletteram.u16[offset]);
 }
 
 
@@ -839,14 +789,14 @@ WRITE16_HANDLER( paletteram16_xxxxBBBBRRRRGGGG_word_w )
 
 WRITE8_HANDLER( paletteram_xxxxRRRRBBBBGGGG_split1_w )
 {
-	paletteram[offset] = data;
-	set_color_444(space->machine, offset, 8, 0, 4, paletteram16_split(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_444(space->machine, offset, 8, 0, 4, paletteram16_split(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxRRRRBBBBGGGG_split2_w )
 {
-	paletteram_2[offset] = data;
-	set_color_444(space->machine, offset, 8, 0, 4, paletteram16_split(offset));
+	space->machine->generic.paletteram2.u8[offset] = data;
+	set_color_444(space->machine, offset, 8, 0, 4, paletteram16_split(space->machine, offset));
 }
 
 
@@ -856,32 +806,32 @@ WRITE8_HANDLER( paletteram_xxxxRRRRBBBBGGGG_split2_w )
 
 WRITE8_HANDLER( paletteram_xxxxRRRRGGGGBBBB_le_w )
 {
-	paletteram[offset] = data;
-	set_color_444(space->machine, offset / 2, 8, 4, 0, paletteram16_le(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_444(space->machine, offset / 2, 8, 4, 0, paletteram16_le(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxRRRRGGGGBBBB_be_w )
 {
-	paletteram[offset] = data;
-	set_color_444(space->machine, offset / 2, 8, 4, 0, paletteram16_be(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_444(space->machine, offset / 2, 8, 4, 0, paletteram16_be(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxRRRRGGGGBBBB_split1_w )
 {
-	paletteram[offset] = data;
-	set_color_444(space->machine, offset, 8, 4, 0, paletteram16_split(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_444(space->machine, offset, 8, 4, 0, paletteram16_split(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_xxxxRRRRGGGGBBBB_split2_w )
 {
-	paletteram_2[offset] = data;
-	set_color_444(space->machine, offset, 8, 4, 0, paletteram16_split(offset));
+	space->machine->generic.paletteram2.u8[offset] = data;
+	set_color_444(space->machine, offset, 8, 4, 0, paletteram16_split(space->machine, offset));
 }
 
 WRITE16_HANDLER( paletteram16_xxxxRRRRGGGGBBBB_word_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
-	set_color_444(space->machine, offset, 8, 4, 0, paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	set_color_444(space->machine, offset, 8, 4, 0, space->machine->generic.paletteram.u16[offset]);
 }
 
 
@@ -891,26 +841,26 @@ WRITE16_HANDLER( paletteram16_xxxxRRRRGGGGBBBB_word_w )
 
 WRITE8_HANDLER( paletteram_RRRRGGGGBBBBxxxx_be_w )
 {
-	paletteram[offset] = data;
-	set_color_444(space->machine, offset / 2, 12, 8, 4, paletteram16_be(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_444(space->machine, offset / 2, 12, 8, 4, paletteram16_be(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_RRRRGGGGBBBBxxxx_split1_w )
 {
-	paletteram[offset] = data;
-	set_color_444(space->machine, offset, 12, 8, 4, paletteram16_split(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_444(space->machine, offset, 12, 8, 4, paletteram16_split(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_RRRRGGGGBBBBxxxx_split2_w )
 {
-	paletteram_2[offset] = data;
-	set_color_444(space->machine, offset, 12, 8, 4, paletteram16_split(offset));
+	space->machine->generic.paletteram2.u8[offset] = data;
+	set_color_444(space->machine, offset, 12, 8, 4, paletteram16_split(space->machine, offset));
 }
 
 WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBxxxx_word_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
-	set_color_444(space->machine, offset, 12, 8, 4, paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	set_color_444(space->machine, offset, 12, 8, 4, space->machine->generic.paletteram.u16[offset]);
 }
 
 
@@ -925,32 +875,32 @@ WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBxxxx_word_w )
 
 WRITE8_HANDLER( paletteram_xBBBBBGGGGGRRRRR_le_w )
 {
-	paletteram[offset] = data;
-	set_color_555(space->machine, offset / 2, 0, 5, 10, paletteram16_le(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_555(space->machine, offset / 2, 0, 5, 10, paletteram16_le(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_xBBBBBGGGGGRRRRR_be_w )
 {
-	paletteram[offset] = data;
-	set_color_555(space->machine, offset / 2, 0, 5, 10, paletteram16_be(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_555(space->machine, offset / 2, 0, 5, 10, paletteram16_be(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_xBBBBBGGGGGRRRRR_split1_w )
 {
-	paletteram[offset] = data;
-	set_color_555(space->machine, offset, 0, 5, 10, paletteram16_split(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_555(space->machine, offset, 0, 5, 10, paletteram16_split(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_xBBBBBGGGGGRRRRR_split2_w )
 {
-	paletteram_2[offset] = data;
-	set_color_555(space->machine, offset, 0, 5, 10, paletteram16_split(offset));
+	space->machine->generic.paletteram2.u8[offset] = data;
+	set_color_555(space->machine, offset, 0, 5, 10, paletteram16_split(space->machine, offset));
 }
 
 WRITE16_HANDLER( paletteram16_xBBBBBGGGGGRRRRR_word_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
-	set_color_555(space->machine, offset, 0, 5, 10, paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	set_color_555(space->machine, offset, 0, 5, 10, space->machine->generic.paletteram.u16[offset]);
 }
 
 
@@ -960,14 +910,14 @@ WRITE16_HANDLER( paletteram16_xBBBBBGGGGGRRRRR_word_w )
 
 WRITE8_HANDLER( paletteram_xBBBBBRRRRRGGGGG_split1_w )
 {
-	paletteram[offset] = data;
-	set_color_555(space->machine, offset, 5, 0, 10, paletteram16_split(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_555(space->machine, offset, 5, 0, 10, paletteram16_split(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_xBBBBBRRRRRGGGGG_split2_w )
 {
-	paletteram_2[offset] = data;
-	set_color_555(space->machine, offset, 5, 0, 10, paletteram16_split(offset));
+	space->machine->generic.paletteram2.u8[offset] = data;
+	set_color_555(space->machine, offset, 5, 0, 10, paletteram16_split(space->machine, offset));
 }
 
 
@@ -977,26 +927,26 @@ WRITE8_HANDLER( paletteram_xBBBBBRRRRRGGGGG_split2_w )
 
 WRITE8_HANDLER( paletteram_xRRRRRGGGGGBBBBB_le_w )
 {
-	paletteram[offset] = data;
-	set_color_555(space->machine, offset / 2, 10, 5, 0, paletteram16_le(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_555(space->machine, offset / 2, 10, 5, 0, paletteram16_le(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_xRRRRRGGGGGBBBBB_split1_w )
 {
-	paletteram[offset] = data;
-	set_color_555(space->machine, offset, 10, 5, 0, paletteram16_split(offset));
+	space->machine->generic.paletteram.u8[offset] = data;
+	set_color_555(space->machine, offset, 10, 5, 0, paletteram16_split(space->machine, offset));
 }
 
 WRITE8_HANDLER( paletteram_xRRRRRGGGGGBBBBB_split2_w )
 {
-	paletteram_2[offset] = data;
-	set_color_555(space->machine, offset, 10, 5, 0, paletteram16_split(offset));
+	space->machine->generic.paletteram2.u8[offset] = data;
+	set_color_555(space->machine, offset, 10, 5, 0, paletteram16_split(space->machine, offset));
 }
 
 WRITE16_HANDLER( paletteram16_xRRRRRGGGGGBBBBB_word_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
-	set_color_555(space->machine, offset, 10, 5, 0, paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	set_color_555(space->machine, offset, 10, 5, 0, space->machine->generic.paletteram.u16[offset]);
 }
 
 
@@ -1006,8 +956,8 @@ WRITE16_HANDLER( paletteram16_xRRRRRGGGGGBBBBB_word_w )
 
 WRITE16_HANDLER( paletteram16_xGGGGGRRRRRBBBBB_word_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
-	set_color_555(space->machine, offset, 5, 10, 0, paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	set_color_555(space->machine, offset, 5, 10, 0, space->machine->generic.paletteram.u16[offset]);
 }
 
 
@@ -1017,8 +967,8 @@ WRITE16_HANDLER( paletteram16_xGGGGGRRRRRBBBBB_word_w )
 
 WRITE16_HANDLER( paletteram16_xGGGGGBBBBBRRRRR_word_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
-	set_color_555(space->machine, offset, 0, 10, 5, paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	set_color_555(space->machine, offset, 0, 10, 5, space->machine->generic.paletteram.u16[offset]);
 }
 
 
@@ -1028,8 +978,8 @@ WRITE16_HANDLER( paletteram16_xGGGGGBBBBBRRRRR_word_w )
 
 WRITE16_HANDLER( paletteram16_GGGGGRRRRRBBBBBx_word_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
-	set_color_555(space->machine, offset, 6, 11, 1, paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	set_color_555(space->machine, offset, 6, 11, 1, space->machine->generic.paletteram.u16[offset]);
 }
 
 /*-------------------------------------------------
@@ -1038,8 +988,8 @@ WRITE16_HANDLER( paletteram16_GGGGGRRRRRBBBBBx_word_w )
 
 WRITE16_HANDLER( paletteram16_RRRRRGGGGGBBBBBx_word_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
-	set_color_555(space->machine, offset, 11, 6, 1, paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	set_color_555(space->machine, offset, 11, 6, 1, space->machine->generic.paletteram.u16[offset]);
 }
 
 
@@ -1049,8 +999,8 @@ WRITE16_HANDLER( paletteram16_RRRRRGGGGGBBBBBx_word_w )
 
 WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBRGBx_word_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
-	data = paletteram16[offset];
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	data = space->machine->generic.paletteram.u16[offset];
 	palette_set_color_rgb(space->machine, offset, pal5bit(((data >> 11) & 0x1e) | ((data >> 3) & 0x01)),
 	                                       pal5bit(((data >>  7) & 0x1e) | ((data >> 2) & 0x01)),
 	                                       pal5bit(((data >>  3) & 0x1e) | ((data >> 1) & 0x01)));
@@ -1068,8 +1018,8 @@ WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBRGBx_word_w )
 
 WRITE16_HANDLER( paletteram16_IIIIRRRRGGGGBBBB_word_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
-	set_color_4444(space->machine, offset, 12, 8, 4, 0, paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	set_color_4444(space->machine, offset, 12, 8, 4, 0, space->machine->generic.paletteram.u16[offset]);
 }
 
 
@@ -1079,8 +1029,8 @@ WRITE16_HANDLER( paletteram16_IIIIRRRRGGGGBBBB_word_w )
 
 WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBIIII_word_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
-	set_color_4444(space->machine, offset, 0, 12, 8, 4, paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	set_color_4444(space->machine, offset, 0, 12, 8, 4, space->machine->generic.paletteram.u16[offset]);
 }
 
 
@@ -1095,8 +1045,8 @@ WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBIIII_word_w )
 
 WRITE16_HANDLER( paletteram16_xrgb_word_be_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
-	set_color_888(space->machine, offset / 2, 16, 8, 0, paletteram32_be(offset));
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	set_color_888(space->machine, offset / 2, 16, 8, 0, paletteram32_be(space->machine, offset));
 }
 
 
@@ -1106,6 +1056,6 @@ WRITE16_HANDLER( paletteram16_xrgb_word_be_w )
 
 WRITE16_HANDLER( paletteram16_xbgr_word_be_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
-	set_color_888(space->machine, offset / 2, 0, 8, 16, paletteram32_be(offset));
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	set_color_888(space->machine, offset / 2, 0, 8, 16, paletteram32_be(space->machine, offset));
 }

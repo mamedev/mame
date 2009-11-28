@@ -220,11 +220,11 @@ static WRITE8_HANDLER( skylncr_paletteram_w )
 	else
 	{
 		int r,g,b;
-		paletteram[color] = data;
+		space->machine->generic.paletteram.u8[color] = data;
 
-		r = paletteram[(color/3 * 3) + 0];
-		g = paletteram[(color/3 * 3) + 1];
-		b = paletteram[(color/3 * 3) + 2];
+		r = space->machine->generic.paletteram.u8[(color/3 * 3) + 0];
+		g = space->machine->generic.paletteram.u8[(color/3 * 3) + 1];
+		b = space->machine->generic.paletteram.u8[(color/3 * 3) + 2];
 		r = (r << 2) | (r >> 4);
 		g = (g << 2) | (g >> 4);
 		b = (b << 2) | (b >> 4);
@@ -245,11 +245,11 @@ static WRITE8_HANDLER( skylncr_paletteram2_w )
 	else
 	{
 		int r,g,b;
-		paletteram_2[color] = data;
+		space->machine->generic.paletteram2.u8[color] = data;
 
-		r = paletteram_2[(color/3 * 3) + 0];
-		g = paletteram_2[(color/3 * 3) + 1];
-		b = paletteram_2[(color/3 * 3) + 2];
+		r = space->machine->generic.paletteram2.u8[(color/3 * 3) + 0];
+		g = space->machine->generic.paletteram2.u8[(color/3 * 3) + 1];
+		b = space->machine->generic.paletteram2.u8[(color/3 * 3) + 2];
 		r = (r << 2) | (r >> 4);
 		g = (g << 2) | (g >> 4);
 		b = (b << 2) | (b >> 4);
@@ -824,8 +824,8 @@ ROM_END
 
 static DRIVER_INIT( skylncr )
 {
-	paletteram   = auto_alloc_array(machine, UINT8, 0x100 * 3);
-	paletteram_2 = auto_alloc_array(machine, UINT8, 0x100 * 3);
+	machine->generic.paletteram.u8   = auto_alloc_array(machine, UINT8, 0x100 * 3);
+	machine->generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x100 * 3);
 }
 
 

@@ -85,9 +85,9 @@ static WRITE8_HANDLER( subcpu_reset_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_BASE(&videoram) AM_SIZE(&videoram_size)		/* Fallthrough */
-	AM_RANGE(0x8400, 0x87ff) AM_BASE(&colorram)
-	AM_RANGE(0x8800, 0x88ff) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x8000, 0x83ff) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)		/* Fallthrough */
+	AM_RANGE(0x8400, 0x87ff) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0x8800, 0x88ff) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x8000, 0x8bff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(shared1_r,shared1_w) AM_BASE(&sharedram1)
 	AM_RANGE(0x9800, 0x9bff) AM_READWRITE(shared2_r,shared2_w) AM_BASE(&sharedram2)

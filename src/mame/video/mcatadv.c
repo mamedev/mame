@@ -59,7 +59,7 @@ WRITE16_HANDLER( mcatadv_videoram2_w )
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	UINT16 *source = spriteram_old;
-	UINT16 *finish = source + (spriteram_size/2)/2;
+	UINT16 *finish = source + (machine->generic.spriteram_size/2)/2;
 	int global_x = mcatadv_vidregs[0]-0x184;
 	int global_y = mcatadv_vidregs[1]-0x1f1;
 
@@ -72,8 +72,8 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 	if( vidregs_old[2] == 0x0001 ) /* Double Buffered */
 	{
-		source += (spriteram_size/2)/2;
-		finish += (spriteram_size/2)/2;
+		source += (machine->generic.spriteram_size/2)/2;
+		finish += (machine->generic.spriteram_size/2)/2;
 	}
 	else if( vidregs_old[2] ) /* I suppose it's possible that there is 4 banks, haven't seen it used though */
 	{
@@ -252,7 +252,7 @@ VIDEO_START( mcatadv )
 	mcatadv_tilemap2 = tilemap_create(machine, get_mcatadv_tile_info2,tilemap_scan_rows, 16, 16,32,32);
 	tilemap_set_transparent_pen(mcatadv_tilemap2,0);
 
-	spriteram_old = auto_alloc_array_clear(machine, UINT16, spriteram_size/2);
+	spriteram_old = auto_alloc_array_clear(machine, UINT16, machine->generic.spriteram_size/2);
 	vidregs_old = auto_alloc_array(machine, UINT16, (0xf+1)/2);
 
 	palette_bank1 = 0;
@@ -261,6 +261,6 @@ VIDEO_START( mcatadv )
 
 VIDEO_EOF( mcatadv )
 {
-	memcpy(spriteram_old,spriteram16,spriteram_size);
+	memcpy(spriteram_old,machine->generic.spriteram.u16,machine->generic.spriteram_size);
 	memcpy(vidregs_old,mcatadv_vidregs,0xf);
 }

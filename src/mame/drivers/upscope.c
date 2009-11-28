@@ -194,7 +194,7 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 		else if ((data & 5) == 1)
 		{
 			if (LOG_IO) logerror("NVRAM data write @ %02X = %02X\n", nvram_address_latch, parallel_data);
-			device->machine->generic.nvram.ptr.u8[nvram_address_latch] = parallel_data;
+			device->machine->generic.nvram.u8[nvram_address_latch] = parallel_data;
 		}
 
 		/* if SEL == 0 && BUSY == 0, who knows? */
@@ -217,7 +217,7 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 		/* if SEL == 0, we read NVRAM */
 		else
 		{
-			nvram_data_latch = device->machine->generic.nvram.ptr.u8[nvram_address_latch];
+			nvram_data_latch = device->machine->generic.nvram.u8[nvram_address_latch];
 			if (LOG_IO) logerror("NVRAM data read @ %02X = %02X\n", nvram_address_latch, nvram_data_latch);
 		}
 	}
@@ -387,8 +387,8 @@ static DRIVER_INIT( upscope )
 	amiga_machine_config(machine, &upscope_intf);
 
 	/* allocate NVRAM */
-	machine->generic.nvram.size = 0x100;
-	machine->generic.nvram.ptr.u8 = auto_alloc_array(machine, UINT8, machine->generic.nvram.size);
+	machine->generic.nvram_size = 0x100;
+	machine->generic.nvram.u8 = auto_alloc_array(machine, UINT8, machine->generic.nvram_size);
 
 	/* set up memory */
 	memory_configure_bank(machine, 1, 0, 1, amiga_chip_ram, 0);

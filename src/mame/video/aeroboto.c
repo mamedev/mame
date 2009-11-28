@@ -134,7 +134,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	aeroboto_state *state = (aeroboto_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0; offs < spriteram_size; offs += 4)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
 	{
 		int x = state->spriteram[offs + 3];
 		int y = 240 - state->spriteram[offs];

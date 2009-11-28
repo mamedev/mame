@@ -213,9 +213,10 @@ Offset:         Values:         Format:
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 int offs;
 
-	for ( offs = 0 ; offs < (spriteram_size >> 1); offs += 4 )
+	for ( offs = 0 ; offs < (machine->generic.spriteram_size >> 1); offs += 4 )
 	{
 		int y		=	spriteram16[offs + 0];
 		int x		=	spriteram16[offs + 1];

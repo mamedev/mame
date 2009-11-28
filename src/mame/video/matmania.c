@@ -90,24 +90,24 @@ WRITE8_HANDLER( matmania_paletteram_w )
 	int offs2;
 
 
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 	offs2 = offset & 0x0f;
 
-	val = paletteram[offs2];
+	val = space->machine->generic.paletteram.u8[offs2];
 	bit0 = (val >> 0) & 0x01;
 	bit1 = (val >> 1) & 0x01;
 	bit2 = (val >> 2) & 0x01;
 	bit3 = (val >> 3) & 0x01;
 	r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	val = paletteram[offs2 | 0x10];
+	val = space->machine->generic.paletteram.u8[offs2 | 0x10];
 	bit0 = (val >> 0) & 0x01;
 	bit1 = (val >> 1) & 0x01;
 	bit2 = (val >> 2) & 0x01;
 	bit3 = (val >> 3) & 0x01;
 	g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	val = paletteram[offs2 | 0x20];
+	val = space->machine->generic.paletteram.u8[offs2 | 0x20];
 	bit0 = (val >> 0) & 0x01;
 	bit1 = (val >> 1) & 0x01;
 	bit2 = (val >> 2) & 0x01;
@@ -138,11 +138,12 @@ VIDEO_START( matmania )
 
 VIDEO_UPDATE( matmania )
 {
+	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	int offs;
 
 
 	/* Update the tiles in the left tile ram bank */
-	for (offs = videoram_size - 1;offs >= 0;offs--)
+	for (offs = screen->machine->generic.videoram_size - 1;offs >= 0;offs--)
 	{
 		int sx,sy;
 
@@ -151,8 +152,8 @@ VIDEO_UPDATE( matmania )
 		sy = offs % 32;
 
 		drawgfx_opaque(tmpbitmap,0,screen->machine->gfx[1],
-				videoram[offs] + ((colorram[offs] & 0x08) << 5),
-				(colorram[offs] & 0x30) >> 4,
+				screen->machine->generic.videoram.u8[offs] + ((screen->machine->generic.colorram.u8[offs] & 0x08) << 5),
+				(screen->machine->generic.colorram.u8[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
 				16*sx,16*sy);
 	}
@@ -188,7 +189,7 @@ VIDEO_UPDATE( matmania )
 
 
 	/* Draw the sprites */
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0;offs < screen->machine->generic.spriteram_size;offs += 4)
 	{
 		if (spriteram[offs] & 0x01)
 		{
@@ -221,11 +222,12 @@ VIDEO_UPDATE( matmania )
 
 VIDEO_UPDATE( maniach )
 {
+	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	int offs;
 
 
 	/* Update the tiles in the left tile ram bank */
-	for (offs = videoram_size - 1;offs >= 0;offs--)
+	for (offs = screen->machine->generic.videoram_size - 1;offs >= 0;offs--)
 	{
 		int sx,sy;
 
@@ -234,8 +236,8 @@ VIDEO_UPDATE( maniach )
 		sy = offs % 32;
 
 		drawgfx_opaque(tmpbitmap,0,screen->machine->gfx[1],
-				videoram[offs] + ((colorram[offs] & 0x03) << 8),
-				(colorram[offs] & 0x30) >> 4,
+				screen->machine->generic.videoram.u8[offs] + ((screen->machine->generic.colorram.u8[offs] & 0x03) << 8),
+				(screen->machine->generic.colorram.u8[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
 				16*sx,16*sy);
 	}
@@ -272,7 +274,7 @@ VIDEO_UPDATE( maniach )
 
 
 	/* Draw the sprites */
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0;offs < screen->machine->generic.spriteram_size;offs += 4)
 	{
 		if (spriteram[offs] & 0x01)
 		{

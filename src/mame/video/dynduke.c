@@ -13,8 +13,8 @@ WRITE16_HANDLER( dynduke_paletteram_w )
 {
 	int color;
 
-	COMBINE_DATA(&paletteram16[offset]);
-	color=paletteram16[offset];
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	color=space->machine->generic.paletteram.u16[offset];
 	palette_set_color_rgb(space->machine,offset,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
 }
 
@@ -32,7 +32,7 @@ WRITE16_HANDLER( dynduke_foreground_w )
 
 WRITE16_HANDLER( dynduke_text_w )
 {
-	COMBINE_DATA(&videoram16[offset]);
+	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
 	tilemap_mark_tile_dirty(tx_layer,offset);
 }
 
@@ -66,7 +66,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	int tile=videoram16[tile_index];
+	int tile=machine->generic.videoram.u16[tile_index];
 	int color=(tile >> 8) & 0x0f;
 
 	tile = (tile & 0xff) | ((tile & 0xc000) >> 6);
@@ -133,6 +133,7 @@ WRITE16_HANDLER( dynduke_control_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
+	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	int offs,fx,fy,x,y,color,sprite;
 
 	if (!sprite_enable) return;

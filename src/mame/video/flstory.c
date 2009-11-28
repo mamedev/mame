@@ -50,10 +50,10 @@ VIDEO_START( flstory )
 	tilemap_set_transmask(state->bg_tilemap, 1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
 	tilemap_set_scroll_cols(state->bg_tilemap, 32);
 
-	paletteram = auto_alloc_array(machine, UINT8, 0x200);
-	paletteram_2 = auto_alloc_array(machine, UINT8, 0x200);
-	state_save_register_global_pointer(machine, paletteram, 0x200);
-	state_save_register_global_pointer(machine, paletteram_2, 0x200);
+	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
+	machine->generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x200);
+	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x200);
+	state_save_register_global_pointer(machine, machine->generic.paletteram2.u8, 0x200);
 }
 
 VIDEO_START( victnine )
@@ -62,10 +62,10 @@ VIDEO_START( victnine )
 	state->bg_tilemap = tilemap_create(machine, victnine_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_cols(state->bg_tilemap, 32);
 
-	paletteram = auto_alloc_array(machine, UINT8, 0x200);
-	paletteram_2 = auto_alloc_array(machine, UINT8, 0x200);
-	state_save_register_global_pointer(machine, paletteram, 0x200);
-	state_save_register_global_pointer(machine, paletteram_2, 0x200);
+	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
+	machine->generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x200);
+	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x200);
+	state_save_register_global_pointer(machine, machine->generic.paletteram2.u8, 0x200);
 }
 
 WRITE8_HANDLER( flstory_videoram_w )
@@ -88,9 +88,9 @@ READ8_HANDLER( flstory_palette_r )
 {
 	flstory_state *state = (flstory_state *)space->machine->driver_data;
 	if (offset & 0x100)
-		return paletteram_2[ (offset & 0xff) + (state->palette_bank << 8) ];
+		return space->machine->generic.paletteram2.u8[ (offset & 0xff) + (state->palette_bank << 8) ];
 	else
-		return paletteram  [ (offset & 0xff) + (state->palette_bank << 8) ];
+		return space->machine->generic.paletteram.u8  [ (offset & 0xff) + (state->palette_bank << 8) ];
 }
 
 WRITE8_HANDLER( flstory_gfxctrl_w )
@@ -154,7 +154,7 @@ static void flstory_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 
 	for (i = 0; i < 0x20; i++)
 	{
-		int pr = state->spriteram[spriteram_size - 1 - i];
+		int pr = state->spriteram[machine->generic.spriteram_size - 1 - i];
 		int offs = (pr & 0x1f) * 4;
 
 		if ((pr & 0x80) == pri)
@@ -211,7 +211,7 @@ static void victnine_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 	for (i = 0; i < 0x20; i++)
 	{
-		int pr = state->spriteram[spriteram_size - 1 - i];
+		int pr = state->spriteram[machine->generic.spriteram_size - 1 - i];
 		int offs = (pr & 0x1f) * 4;
 
 		//if ((pr & 0x80) == pri)

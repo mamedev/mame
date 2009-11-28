@@ -152,11 +152,11 @@ static WRITE8_HANDLER( trvmadns_palette_w )
 {
 	int r, g, b;
 
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 
-	r = paletteram[offset & ~1] & 0xf;
-	g = (paletteram[offset | 1] & 0xf0) >> 4;
-	b = paletteram[offset | 1] & 0xf;
+	r = space->machine->generic.paletteram.u8[offset & ~1] & 0xf;
+	g = (space->machine->generic.paletteram.u8[offset | 1] & 0xf0) >> 4;
+	b = space->machine->generic.paletteram.u8[offset | 1] & 0xf;
 
 	palette_set_color_rgb(space->machine, offset >> 1, pal4bit(r), pal4bit(g), pal4bit(b));
 }
@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x7fff) AM_READ(SMH_BANK(2))
 	AM_RANGE(0x6000, 0x7fff) AM_WRITE(trvmadns_gfxram_w) AM_BASE(&trvmadns_gfxram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xc01f) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0xc000, 0xc01f) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(trvmadns_tileram_w) AM_BASE(&trvmadns_tileram)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(w2)//NOP
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(w3)//NOP

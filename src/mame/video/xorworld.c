@@ -50,7 +50,7 @@ PALETTE_INIT( xorworld )
 
 WRITE16_HANDLER( xorworld_videoram16_w )
 {
-	COMBINE_DATA(&videoram16[offset]);
+	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -66,7 +66,7 @@ WRITE16_HANDLER( xorworld_videoram16_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int data = videoram16[tile_index];
+	int data = machine->generic.videoram.u16[tile_index];
 	int code = data & 0x0fff;
 
 	SET_TILE_INFO(0, code, data >> 12, 0);
@@ -93,6 +93,7 @@ VIDEO_START( xorworld )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int i;
 
 	for (i = 0; i < 0x40; i += 2)

@@ -144,18 +144,14 @@ typedef struct _generic_machine_private generic_machine_private;
 
 
 /* structure to hold a pointer/size pair for generic pointers */
-typedef struct _generic_ptr generic_ptr;
-struct _generic_ptr
+typedef union _generic_ptr generic_ptr;
+union _generic_ptr
 {
-	union
-	{
-		void *		v;
-		UINT8 *		u8;
-		UINT16 *	u16;
-		UINT32 *	u32;
-		UINT64 *	u64;
-	} ptr;
-	size_t			size;
+	void *		v;
+	UINT8 *		u8;
+	UINT16 *	u16;
+	UINT32 *	u32;
+	UINT64 *	u64;
 };
 
 
@@ -164,6 +160,22 @@ typedef struct _generic_pointers generic_pointers;
 struct _generic_pointers
 {
 	generic_ptr				nvram;				/* generic NVRAM */
+	UINT32					nvram_size;
+	generic_ptr				videoram;			/* videoram */
+	UINT32					videoram_size;
+	generic_ptr				colorram;			/* color ram */
+	UINT32					colorram_size;
+	generic_ptr				spriteram;			/* spriteram */
+	UINT32					spriteram_size;
+	generic_ptr				spriteram2;			/* secondary spriteram */
+	UINT32					spriteram2_size;
+	generic_ptr				spriteram3;			/* tertiary spriteram */
+	UINT32					spriteram3_size;
+	generic_ptr				buffered_spriteram;	/* buffered spriteram */
+	generic_ptr				buffered_spriteram2;/* secondary buffered spriteram */
+	generic_ptr				buffered_spriteram3;/* tertiary buffered spriteram */
+	generic_ptr				paletteram;			/* palette RAM */
+	generic_ptr				paletteram2;		/* secondary palette RAM */
 };
 
 

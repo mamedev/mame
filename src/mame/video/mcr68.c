@@ -27,7 +27,7 @@ static tilemap *fg_tilemap;
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int data = LOW_BYTE(videoram16[tile_index * 2]) | (LOW_BYTE(videoram16[tile_index * 2 + 1]) << 8);
+	int data = LOW_BYTE(machine->generic.videoram.u16[tile_index * 2]) | (LOW_BYTE(machine->generic.videoram.u16[tile_index * 2 + 1]) << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0xc00);
 	int color = (~data >> 12) & 3;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 10) & 3));
@@ -38,7 +38,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( zwackery_get_bg_tile_info )
 {
-	int data = videoram16[tile_index];
+	int data = machine->generic.videoram.u16[tile_index];
 	int color = (data >> 13) & 7;
 	SET_TILE_INFO(0, data & 0x3ff, color, TILE_FLIPYX((data >> 11) & 3));
 }
@@ -46,7 +46,7 @@ static TILE_GET_INFO( zwackery_get_bg_tile_info )
 
 static TILE_GET_INFO( zwackery_get_fg_tile_info )
 {
-	int data = videoram16[tile_index];
+	int data = machine->generic.videoram.u16[tile_index];
 	int color = (data >> 13) & 7;
 	SET_TILE_INFO(2, data & 0x3ff, color, TILE_FLIPYX((data >> 11) & 3));
 	tileinfo->category = (color != 0);
@@ -153,8 +153,8 @@ WRITE16_HANDLER( mcr68_paletteram_w )
 {
 	int newword;
 
-	COMBINE_DATA(&paletteram16[offset]);
-	newword = paletteram16[offset];
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	newword = space->machine->generic.paletteram.u16[offset];
 	palette_set_color_rgb(space->machine, offset, pal3bit(newword >> 6), pal3bit(newword >> 0), pal3bit(newword >> 3));
 }
 
@@ -163,8 +163,8 @@ WRITE16_HANDLER( zwackery_paletteram_w )
 {
 	int newword;
 
-	COMBINE_DATA(&paletteram16[offset]);
-	newword = paletteram16[offset];
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	newword = space->machine->generic.paletteram.u16[offset];
 	palette_set_color_rgb(space->machine, offset, pal5bit(~newword >> 10), pal5bit(~newword >> 0), pal5bit(~newword >> 5));
 }
 
@@ -178,14 +178,14 @@ WRITE16_HANDLER( zwackery_paletteram_w )
 
 WRITE16_HANDLER( mcr68_videoram_w )
 {
-	COMBINE_DATA(&videoram16[offset]);
+	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
 
 WRITE16_HANDLER( zwackery_videoram_w )
 {
-	COMBINE_DATA(&videoram16[offset]);
+	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
@@ -195,8 +195,8 @@ WRITE16_HANDLER( zwackery_spriteram_w )
 {
 	/* yech -- Zwackery relies on the upper 8 bits of a spriteram read being $ff! */
 	/* to make this happen we always write $ff in the upper 8 bits */
-	COMBINE_DATA(&spriteram16[offset]);
-	spriteram16[offset] |= 0xff00;
+	COMBINE_DATA(&space->machine->generic.spriteram.u16[offset]);
+	space->machine->generic.spriteram.u16[offset] |= 0xff00;
 }
 
 
@@ -210,6 +210,7 @@ WRITE16_HANDLER( zwackery_spriteram_w )
 static void mcr68_update_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	rectangle sprite_clip = *video_screen_get_visible_area(machine->primary_screen);
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 
 	/* adjust for clipping */
@@ -220,7 +221,7 @@ static void mcr68_update_sprites(running_machine *machine, bitmap_t *bitmap, con
 	bitmap_fill(machine->priority_bitmap,&sprite_clip,1);
 
 	/* loop over sprite RAM */
-	for (offs = spriteram_size / 2 - 4;offs >= 0;offs -= 4)
+	for (offs = machine->generic.spriteram_size / 2 - 4;offs >= 0;offs -= 4)
 	{
 		int code, color, flipx, flipy, x, y, flags;
 
@@ -261,12 +262,13 @@ static void mcr68_update_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 static void zwackery_update_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 
 	bitmap_fill(machine->priority_bitmap,cliprect,1);
 
 	/* loop over sprite RAM */
-	for (offs = spriteram_size / 2 - 4;offs >= 0;offs -= 4)
+	for (offs = machine->generic.spriteram_size / 2 - 4;offs >= 0;offs -= 4)
 	{
 		int code, color, flipx, flipy, x, y, flags;
 

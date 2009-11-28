@@ -70,7 +70,7 @@ static ADDRESS_MAP_START( c1943_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd888, 0xd888) AM_WRITENOP // ???
 	AM_RANGE(0xd8a8, 0xd8a8) AM_WRITENOP // ???
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(_1943_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(_1943_state, spriteram) AM_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )

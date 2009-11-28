@@ -351,8 +351,8 @@ static WRITE8_HANDLER( airbustr_paletteram_w )
 	/*  xGGG GGRR   RRRB BBBB   */
 	/*  x432 1043   2104 3210   */
 
-	paletteram[offset] = data;
-	val = (paletteram[offset | 1] << 8) | paletteram[offset & ~1];
+	space->machine->generic.paletteram.u8[offset] = data;
+	val = (space->machine->generic.paletteram.u8[offset | 1] << 8) | space->machine->generic.paletteram.u8[offset & ~1];
 
 	palette_set_color_rgb(space->machine, offset/2, pal5bit(val >> 5), pal5bit(val >> 10), pal5bit(val >> 0));
 }
@@ -388,9 +388,9 @@ static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(airbustr_videoram2_w) AM_BASE(&airbustr_videoram2)
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(airbustr_colorram2_w) AM_BASE(&airbustr_colorram2)
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(airbustr_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(airbustr_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xd000, 0xd5ff) AM_RAM_WRITE(airbustr_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(airbustr_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(airbustr_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xd000, 0xd5ff) AM_RAM_WRITE(airbustr_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd600, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE(1)

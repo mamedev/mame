@@ -7344,7 +7344,7 @@ void K054338_fill_backcolor(running_machine *machine, bitmap_t *bitmap, int mode
 	dst_ptr += clipx;
 
 	BGC_SET = 0;
-	pal_ptr = paletteram32;
+	pal_ptr = machine->generic.paletteram.u32;
 
 	if (!mode)
 	{

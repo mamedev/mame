@@ -6,7 +6,7 @@ static tilemap *bg_tilemap;
 
 WRITE8_HANDLER( sichuan2_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
@@ -36,18 +36,18 @@ WRITE8_HANDLER( sichuan2_bankswitch_w )
 
 WRITE8_HANDLER( sichuan2_paletteram_w )
 {
-	paletteram[offset] = data;
+	space->machine->generic.paletteram.u8[offset] = data;
 
 	offset &= 0xff;
 
-	palette_set_color_rgb(space->machine, offset, pal5bit(paletteram[offset + 0x000]), pal5bit(paletteram[offset + 0x100]), pal5bit(paletteram[offset + 0x200]));
+	palette_set_color_rgb(space->machine, offset, pal5bit(space->machine->generic.paletteram.u8[offset + 0x000]), pal5bit(space->machine->generic.paletteram.u8[offset + 0x100]), pal5bit(space->machine->generic.paletteram.u8[offset + 0x200]));
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int offs = tile_index * 2;
-	int code = videoram[offs] + ((videoram[offs + 1] & 0x0f) << 8) + (gfxbank << 12);
-	int color = (videoram[offs + 1] & 0xf0) >> 4;
+	int code = machine->generic.videoram.u8[offs] + ((machine->generic.videoram.u8[offs + 1] & 0x0f) << 8) + (gfxbank << 12);
+	int color = (machine->generic.videoram.u8[offs + 1] & 0xf0) >> 4;
 
 	SET_TILE_INFO(0, code, color, 0);
 }

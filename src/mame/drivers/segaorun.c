@@ -103,7 +103,7 @@ static const segaic16_memory_map_entry outrun_info[] =
 	{ 0x35/2, 0x00000, 0x60000, 0xf00000,      ~0, (read16_space_func)SMH_BANK(12), (write16_space_func)SMH_UNMAP,    &cpu1rom,              "CPU 1 ROM" },
 	{ 0x31/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,                       misc_io_w,                        NULL,                  "I/O space" },
 	{ 0x2d/2, 0x00000, 0x01000, 0xfff000,      ~0, (read16_space_func)SMH_BANK(13), (write16_space_func)SMH_BANK(13), &segaic16_spriteram_0, "object RAM" },
-	{ 0x29/2, 0x00000, 0x02000, 0xffe000,      ~0, (read16_space_func)SMH_BANK(14), segaic16_paletteram_w,            &paletteram16,         "color RAM" },
+	{ 0x29/2, 0x00000, 0x02000, 0xffe000,      ~0, (read16_space_func)SMH_BANK(14), segaic16_paletteram_w,            &segaic16_paletteram,  "color RAM" },
 	{ 0x25/2, 0x00000, 0x10000, 0xfe0000,      ~0, (read16_space_func)SMH_BANK(15), segaic16_tileram_0_w,             &segaic16_tileram_0,   "tile RAM" },
 	{ 0x25/2, 0x10000, 0x01000, 0xfef000,      ~0, (read16_space_func)SMH_BANK(16), segaic16_textram_0_w,             &segaic16_textram_0,   "text RAM" },
 	{ 0x21/2, 0x60000, 0x08000, 0xf98000,      ~0, (read16_space_func)SMH_BANK(17), (write16_space_func)SMH_BANK(17), &workram,              "CPU 0 RAM" },
@@ -145,7 +145,7 @@ static void outrun_generic_init(running_machine *machine)
 {
 	/* allocate memory for regions not automatically assigned */
 	segaic16_spriteram_0 = auto_alloc_array(machine, UINT16, 0x01000/2);
-	paletteram16         = auto_alloc_array(machine, UINT16, 0x02000/2);
+	segaic16_paletteram  = auto_alloc_array(machine, UINT16, 0x02000/2);
 	segaic16_tileram_0   = auto_alloc_array(machine, UINT16, 0x10000/2);
 	segaic16_textram_0   = auto_alloc_array(machine, UINT16, 0x01000/2);
 	workram              = auto_alloc_array(machine, UINT16, 0x08000/2);

@@ -442,11 +442,11 @@ static WRITE32_HANDLER( psikyosh_irqctrl_w )
 static WRITE32_HANDLER( paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w )
 {
 	int r,g,b;
-	COMBINE_DATA(&paletteram32[offset]); /* is this ok .. */
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]); /* is this ok .. */
 
-	b = ((paletteram32[offset] & 0x0000ff00) >>8);
-	g = ((paletteram32[offset] & 0x00ff0000) >>16);
-	r = ((paletteram32[offset] & 0xff000000) >>24);
+	b = ((space->machine->generic.paletteram.u32[offset] & 0x0000ff00) >>8);
+	g = ((space->machine->generic.paletteram.u32[offset] & 0x00ff0000) >>16);
+	r = ((space->machine->generic.paletteram.u32[offset] & 0xff000000) >>24);
 
 	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
@@ -482,9 +482,9 @@ static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 static ADDRESS_MAP_START( ps3v1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM					// program ROM (1 meg)
 	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK(1) // data ROM
-	AM_RANGE(0x03000000, 0x03003fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)	// sprites (might be a bit longer)
+	AM_RANGE(0x03000000, 0x03003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// sprites (might be a bit longer)
 	AM_RANGE(0x03004000, 0x0300ffff) AM_RAM AM_BASE(&psikyosh_bgram) // backgrounds
-	AM_RANGE(0x03040000, 0x03044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE(&paletteram32) // palette..
+	AM_RANGE(0x03040000, 0x03044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_GENERIC(paletteram) // palette..
 	AM_RANGE(0x03050000, 0x030501ff) AM_RAM AM_BASE(&psikyosh_zoomram) // a gradient sometimes ...
 	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_READNOP AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
 	AM_RANGE(0x0305ffe0, 0x0305ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_BASE(&psikyosh_vidregs) //  video registers
@@ -507,9 +507,9 @@ static ADDRESS_MAP_START( ps5_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03000004, 0x03000007) AM_READ_PORT("JP4") AM_WRITE(psh_eeprom_w)
 	AM_RANGE(0x03100000, 0x03100003) AM_DEVREAD8("ymf", ymf278b_r, 0xffffffff)
 	AM_RANGE(0x03100000, 0x03100007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
-	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x04004000, 0x0400ffff) AM_RAM AM_BASE(&psikyosh_bgram) // backgrounds
-	AM_RANGE(0x04040000, 0x04044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x04040000, 0x04044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x04050000, 0x040501ff) AM_RAM AM_BASE(&psikyosh_zoomram)
 	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_READNOP AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
 	AM_RANGE(0x0405ffe0, 0x0405ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_BASE(&psikyosh_vidregs) // video registers

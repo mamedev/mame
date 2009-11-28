@@ -19,13 +19,13 @@ static tilemap *bg_tilemap;
 
 WRITE8_HANDLER( calomega_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( calomega_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -37,8 +37,8 @@ static TILE_GET_INFO( get_bg_tile_info )
     ---- --x-   tiles bank.
     xx-- ---x   seems unused. */
 
-	int attr = colorram[tile_index];
-	int code = videoram[tile_index];
+	int attr = machine->generic.colorram.u8[tile_index];
+	int code = machine->generic.videoram.u8[tile_index];
 	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */
 	int color = (attr & 0x3c);	/* bits 2-3-4-5 for color */
 

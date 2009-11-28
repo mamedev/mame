@@ -36,6 +36,7 @@ PALETTE_INIT( galspnbl )
  */
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 	static const UINT8 layout[8][8] =
 	{
@@ -49,7 +50,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{42,43,46,47,58,59,62,63}
 	};
 
-	for (offs = (spriteram_size-16)/2;offs >= 0;offs -= 8)
+	for (offs = (machine->generic.spriteram_size-16)/2;offs >= 0;offs -= 8)
 	{
 		int sx,sy,code,color,size,attr,flipx,flipy;
 		int col,row;

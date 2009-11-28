@@ -269,7 +269,7 @@ static void toaplan1_create_tilemaps(running_machine *machine)
 
 static void toaplan1_paletteram_alloc(running_machine *machine)
 {
-	paletteram16 = auto_alloc_array(machine, UINT16, (toaplan1_colorram1_size + toaplan1_colorram2_size)/2);
+	machine->generic.paletteram.u16 = auto_alloc_array(machine, UINT16, (toaplan1_colorram1_size + toaplan1_colorram2_size)/2);
 }
 
 static void toaplan1_vram_alloc(running_machine *machine)
@@ -290,12 +290,12 @@ static void toaplan1_vram_alloc(running_machine *machine)
 
 static void toaplan1_spritevram_alloc(running_machine *machine)
 {
-	spriteram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITERAM_SIZE/2);
-	buffered_spriteram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITERAM_SIZE/2);
+	machine->generic.spriteram.u16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITERAM_SIZE/2);
+	machine->generic.buffered_spriteram.u16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITERAM_SIZE/2);
 	toaplan1_spritesizeram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
 	toaplan1_buffered_spritesizeram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
 
-	spriteram_size = TOAPLAN1_SPRITERAM_SIZE;
+	machine->generic.spriteram_size = TOAPLAN1_SPRITERAM_SIZE;
 }
 
 static void toaplan1_set_scrolls(void)
@@ -338,7 +338,7 @@ VIDEO_START( rallybik )
 	bcu_flipscreen = -1;
 	toaplan1_reset = 0;
 
-	state_save_register_global_pointer(machine, paletteram16, (toaplan1_colorram1_size + toaplan1_colorram2_size)/2);
+	state_save_register_global_pointer(machine, machine->generic.paletteram.u16, (toaplan1_colorram1_size + toaplan1_colorram2_size)/2);
 	state_save_register_global_pointer(machine, pf1_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
 	state_save_register_global_pointer(machine, pf2_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
 	state_save_register_global_pointer(machine, pf3_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
@@ -383,13 +383,13 @@ VIDEO_START( toaplan1 )
 	fcu_flipscreen = 0;
 	toaplan1_reset = 1;
 
-	state_save_register_global_pointer(machine, paletteram16, (toaplan1_colorram1_size + toaplan1_colorram2_size)/2);
+	state_save_register_global_pointer(machine, machine->generic.paletteram.u16, (toaplan1_colorram1_size + toaplan1_colorram2_size)/2);
 	state_save_register_global_pointer(machine, pf1_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
 	state_save_register_global_pointer(machine, pf2_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
 	state_save_register_global_pointer(machine, pf3_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
 	state_save_register_global_pointer(machine, pf4_tilevram16, TOAPLAN1_TILEVRAM_SIZE/2);
-	state_save_register_global_pointer(machine, spriteram16, TOAPLAN1_SPRITERAM_SIZE/2);
-	state_save_register_global_pointer(machine, buffered_spriteram16, TOAPLAN1_SPRITERAM_SIZE/2);
+	state_save_register_global_pointer(machine, machine->generic.spriteram.u16, TOAPLAN1_SPRITERAM_SIZE/2);
+	state_save_register_global_pointer(machine, machine->generic.buffered_spriteram.u16, TOAPLAN1_SPRITERAM_SIZE/2);
 	state_save_register_global_pointer(machine, toaplan1_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
 	state_save_register_global_pointer(machine, toaplan1_buffered_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
 
@@ -544,12 +544,12 @@ WRITE16_HANDLER( toaplan1_colorram2_w )
 
 READ16_HANDLER( toaplan1_spriteram16_r )
 {
-	return spriteram16[spriteram_offs & ((TOAPLAN1_SPRITERAM_SIZE/2)-1)];
+	return space->machine->generic.spriteram.u16[spriteram_offs & ((TOAPLAN1_SPRITERAM_SIZE/2)-1)];
 }
 
 WRITE16_HANDLER( toaplan1_spriteram16_w )
 {
-	COMBINE_DATA(&spriteram16[spriteram_offs & ((TOAPLAN1_SPRITERAM_SIZE/2)-1)]);
+	COMBINE_DATA(&space->machine->generic.spriteram.u16[spriteram_offs & ((TOAPLAN1_SPRITERAM_SIZE/2)-1)]);
 
 #ifdef MAME_DEBUG
 	if (spriteram_offs >= (TOAPLAN1_SPRITERAM_SIZE/2))
@@ -751,6 +751,8 @@ static void toaplan1_log_vram(running_machine *machine)
 #ifdef MAME_DEBUG
 	if ( input_code_pressed(machine, KEYCODE_M) )
 	{
+		UINT16 *spriteram16 = machine->generic.spriteram.u16;
+		UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 		offs_t sprite_voffs;
 		while (input_code_pressed(machine, KEYCODE_M)) ;
 		if (toaplan1_spritesizeram16)			/* FCU controller */
@@ -760,7 +762,7 @@ static void toaplan1_log_vram(running_machine *machine)
 			UINT16 *bsize = (UINT16 *)(toaplan1_buffered_spritesizeram16);
 			logerror("Scrolls    PF1-X  PF1-Y     PF2-X  PF2-Y     PF3-X  PF3-Y     PF4-X  PF4-Y\n");
 			logerror("------>    #%04x  #%04x     #%04x  #%04x     #%04x  #%04x     #%04x  #%04x\n",pf1_scrollx,pf1_scrolly,pf2_scrollx,pf2_scrolly,pf3_scrollx,pf3_scrolly,pf4_scrollx,pf4_scrolly);
-			for ( sprite_voffs = 0; sprite_voffs < (spriteram_size/2); sprite_voffs += 4 )
+			for ( sprite_voffs = 0; sprite_voffs < (machine->generic.spriteram_size/2); sprite_voffs += 4 )
 			{
 				bschar = buffered_spriteram16[sprite_voffs];
 				bsattr = buffered_spriteram16[sprite_voffs + 1];
@@ -780,7 +782,7 @@ static void toaplan1_log_vram(running_machine *machine)
 			int schar,sattr,sxpos,sypos,bschar,bsattr,bsxpos,bsypos;
 			logerror("Scrolls    PF1-X  PF1-Y     PF2-X  PF2-Y     PF3-X  PF3-Y     PF4-X  PF4-Y\n");
 			logerror("------>    #%04x  #%04x     #%04x  #%04x     #%04x  #%04x     #%04x  #%04x\n",pf1_scrollx,pf1_scrolly,pf2_scrollx,pf2_scrolly,pf3_scrollx,pf3_scrolly,pf4_scrollx,pf4_scrolly);
-			for ( sprite_voffs = 0; sprite_voffs < (spriteram_size/2); sprite_voffs += 4 )
+			for ( sprite_voffs = 0; sprite_voffs < (machine->generic.spriteram_size/2); sprite_voffs += 4 )
 			{
 				bschar = buffered_spriteram16[sprite_voffs];
 				bsattr = buffered_spriteram16[sprite_voffs + 1];
@@ -1038,12 +1040,12 @@ static void toaplan1_draw_sprite_custom(bitmap_t *dest_bmp,const rectangle *clip
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT16 *source = (UINT16 *)(buffered_spriteram16);
+	UINT16 *source = (UINT16 *)(machine->generic.buffered_spriteram.u16);
 	UINT16 *size   = (UINT16 *)(toaplan1_buffered_spritesizeram16);
 
 	int offs;
 
-	for (offs = spriteram_size/2 - 4; offs >= 0; offs -= 4)
+	for (offs = machine->generic.spriteram_size/2 - 4; offs >= 0; offs -= 4)
 	{
 		if (!(source[offs] & 0x8000))
 		{
@@ -1104,9 +1106,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static void rallybik_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
+	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	int offs;
 
-	for (offs = 0; offs < (spriteram_size/2); offs += 4)
+	for (offs = 0; offs < (machine->generic.spriteram_size/2); offs += 4)
 	{
 		int attrib, sx, sy, flipx, flipy;
 		int sprite, color;

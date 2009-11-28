@@ -103,9 +103,9 @@ static WRITE32_HANDLER( cpua_ctrl_w )
 static WRITE32_HANDLER( superchs_palette_w )
 {
 	int a,r,g,b;
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
-	a = paletteram32[offset];
+	a = space->machine->generic.paletteram.u32[offset];
 	r = (a &0xff0000) >> 16;
 	g = (a &0xff00) >> 8;
 	b = (a &0xff);
@@ -233,12 +233,12 @@ static WRITE32_HANDLER( superchs_stick_w )
 static ADDRESS_MAP_START( superchs_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_BASE(&superchs_ram)
-	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x180000, 0x18ffff) AM_READWRITE(TC0480SCP_long_r, TC0480SCP_long_w)
 	AM_RANGE(0x1b0000, 0x1b002f) AM_READWRITE(TC0480SCP_ctrl_long_r, TC0480SCP_ctrl_long_w)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&shared_ram)
 	AM_RANGE(0x240000, 0x240003) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE(superchs_palette_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE(superchs_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x2c0000, 0x2c07ff) AM_RAM AM_BASE(&f3_shared_ram)
 	AM_RANGE(0x300000, 0x300007) AM_READWRITE(superchs_input_r, superchs_input_w)	/* eerom etc. */
 	AM_RANGE(0x340000, 0x340003) AM_READWRITE(superchs_stick_r, superchs_stick_w)	/* stick int request */

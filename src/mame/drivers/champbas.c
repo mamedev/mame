@@ -216,7 +216,7 @@ static ADDRESS_MAP_START( talbot_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE_MEMBER(champbas_state, bg_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_MEMBER(champbas_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_MEMBER(champbas_state, spriteram) AM_SIZE_GENERIC(spriteram)
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
@@ -244,7 +244,7 @@ static ADDRESS_MAP_START( champbas_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7800, 0x7fff) AM_ROM	// champbb2 only
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE_MEMBER(champbas_state, bg_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_MEMBER(champbas_state, spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_MEMBER(champbas_state, spriteram) AM_SIZE_GENERIC(spriteram)
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")

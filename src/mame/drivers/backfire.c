@@ -261,8 +261,8 @@ static WRITE32_HANDLER(backfire_eeprom_w)
 
 static WRITE32_HANDLER(wcvol95_nonbuffered_palette_w)
 {
-	COMBINE_DATA(&paletteram32[offset]);
-	palette_set_color_rgb(space->machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+	palette_set_color_rgb(space->machine,offset,pal5bit(space->machine->generic.paletteram.u32[offset] >> 0),pal5bit(space->machine->generic.paletteram.u32[offset] >> 5),pal5bit(space->machine->generic.paletteram.u32[offset] >> 10));
 }
 
 /* map 32-bit writes to 16-bit */
@@ -318,7 +318,7 @@ static ADDRESS_MAP_START( backfire_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x144000, 0x145fff) AM_READWRITE( backfire_pf4_data_r, backfire_pf4_data_w)
 	AM_RANGE(0x150000, 0x150fff) AM_READWRITE( backfire_pf3_rowscroll_r, backfire_pf3_rowscroll_w)
 	AM_RANGE(0x154000, 0x154fff) AM_READWRITE( backfire_pf4_rowscroll_r, backfire_pf4_rowscroll_w)
-	AM_RANGE(0x160000, 0x161fff) AM_WRITE(wcvol95_nonbuffered_palette_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x160000, 0x161fff) AM_WRITE(wcvol95_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x170000, 0x177fff) AM_RAM AM_BASE( &backfire_mainram )// main ram
 
 //  AM_RANGE(0x180010, 0x180013) AM_RAM AM_BASE(&backfire_180010) // always 180010 ?

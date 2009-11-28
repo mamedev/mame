@@ -55,12 +55,13 @@ WRITE8_HANDLER( mouser_flip_screen_y_w )
 
 VIDEO_UPDATE( mouser )
 {
+	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	int offs;
 	int sx,sy;
 	int flipx,flipy;
 
 	/* for every character in the Video RAM  */
-	for (offs = videoram_size - 1;offs >= 0;offs--)
+	for (offs = screen->machine->generic.videoram_size - 1;offs >= 0;offs--)
 	{
 		int scrolled_y_position;
 		int color_offs;
@@ -88,8 +89,8 @@ VIDEO_UPDATE( mouser )
 		color_offs = offs%32 + ((256 + 8*(offs/32) - spriteram[offs%32])%256)/8*32;
 
 		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
-				videoram[offs] | (colorram[color_offs]>>5)*256 | ((colorram[color_offs]>>4)&1)*512,
-				colorram[color_offs]%16,
+				screen->machine->generic.videoram.u8[offs] | (screen->machine->generic.colorram.u8[color_offs]>>5)*256 | ((screen->machine->generic.colorram.u8[color_offs]>>4)&1)*512,
+				screen->machine->generic.colorram.u8[color_offs]%16,
 				flip_screen_x_get(screen->machine),flip_screen_y_get(screen->machine),
 				8*sx,scrolled_y_position);
 	}

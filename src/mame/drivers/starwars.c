@@ -505,7 +505,7 @@ ROM_END
 static DRIVER_INIT( starwars )
 {
 	/* X2212 nvram */
-	machine->generic.nvram.ptr.u8 = auto_alloc_array(machine, UINT8, machine->generic.nvram.size);
+	machine->generic.nvram.u8 = auto_alloc_array(machine, UINT8, machine->generic.nvram_size);
 
 	/* prepare the mathbox */
 	starwars_is_esb = 0;
@@ -522,7 +522,7 @@ static DRIVER_INIT( esb )
 	UINT8 *rom = memory_region(machine, "maincpu");
 
 	/* X2212 nvram */
-	machine->generic.nvram.ptr.u8 = auto_alloc_array(machine, UINT8, machine->generic.nvram.size);
+	machine->generic.nvram.u8 = auto_alloc_array(machine, UINT8, machine->generic.nvram_size);
 
 	/* init the slapstic */
 	slapstic_init(machine, 101);

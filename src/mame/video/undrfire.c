@@ -82,6 +82,7 @@ Heavy use is made of sprite zooming.
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
 {
+	UINT32 *spriteram32 = machine->generic.spriteram.u32;
 	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
@@ -94,7 +95,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
        while processing sprite ram and then draw them all at the end */
 	struct tempsprite *sprite_ptr = spritelist;
 
-	for (offs = (spriteram_size/4-4);offs >= 0;offs -= 4)
+	for (offs = (machine->generic.spriteram_size/4-4);offs >= 0;offs -= 4)
 	{
 		data = spriteram32[offs+0];
 		flipx =    (data & 0x00800000) >> 23;
@@ -224,6 +225,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 
 static void draw_sprites_cbombers(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
 {
+	UINT32 *spriteram32 = machine->generic.spriteram.u32;
 	UINT16 *spritemap = (UINT16 *)memory_region(machine, "user1");
 	UINT8 *spritemapHibit = (UINT8 *)memory_region(machine, "user2");
 
@@ -238,7 +240,7 @@ static void draw_sprites_cbombers(running_machine *machine, bitmap_t *bitmap,con
        while processing sprite ram and then draw them all at the end */
 	struct tempsprite *sprite_ptr = spritelist;
 
-	for (offs = (spriteram_size/4-4);offs >= 0;offs -= 4)
+	for (offs = (machine->generic.spriteram_size/4-4);offs >= 0;offs -= 4)
 	{
 		data = spriteram32[offs+0];
 		flipx =    (data & 0x00800000) >> 23;

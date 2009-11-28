@@ -38,7 +38,7 @@ PALETTE_INIT( kopunch )
 
 WRITE8_HANDLER( kopunch_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -71,7 +71,7 @@ WRITE8_HANDLER( kopunch_gfxbank_w )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code = videoram[tile_index];
+	int code = machine->generic.videoram.u8[tile_index];
 
 	SET_TILE_INFO(0, code, 0, 0);
 }

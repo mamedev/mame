@@ -120,8 +120,8 @@ static WRITE16_HANDLER( paletteram_w )
 {
 	UINT16 word;
 
-	COMBINE_DATA(&paletteram16[offset]);
-	word = paletteram16[offset];
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	word = space->machine->generic.paletteram.u16[offset];
 	palette_set_color_rgb(space->machine, offset, pal5bit(word >> 6), pal5bit(word >> 1), pal5bit(word >> 11));
 }
 
@@ -579,7 +579,7 @@ static ADDRESS_MAP_START( vgbmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00800000, 0x00bfffff) AM_RAM
 	AM_RANGE(0x00c00000, 0x00c0000f) AM_READ_PORT("VGB_SW")
 	AM_RANGE(0x00e00000, 0x00e0000f) AM_NOP				/* XFER3dk???? 16-bit write */
-	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM_WRITE(paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM_WRITE(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x02600000, 0x0260000f) AM_WRITE(creg_w)
 	AM_RANGE(0x02c00000, 0x02c0003f) AM_READ(ti_uart_r)
 	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE(ti_uart_w)

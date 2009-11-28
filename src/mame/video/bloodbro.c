@@ -145,8 +145,9 @@ WRITE16_HANDLER( bloodbro_txvideoram_w )
 
 static void bloodbro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
-	for (offs = 0;offs < spriteram_size/2;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size/2;offs += 4)
 	{
 		int sx,sy,x,y,width,height,attributes,tile_number,color,flipx,flipy,pri_mask;
 
@@ -192,10 +193,11 @@ static void bloodbro_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 static void weststry_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs;
 
 	/* TODO: the last two entries are not sprites - control registers? */
-	for (offs = 0;offs < spriteram_size/2 - 8;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size/2 - 8;offs += 4)
 	{
 		int data = spriteram16[offs+2];
 		int data0 = spriteram16[offs+0];

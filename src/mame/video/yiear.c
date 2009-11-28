@@ -63,7 +63,7 @@ PALETTE_INIT( yiear )
 
 WRITE8_HANDLER( yiear_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
@@ -94,8 +94,8 @@ WRITE8_HANDLER( yiear_control_w )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int offs = tile_index * 2;
-	int attr = videoram[offs];
-	int code = videoram[offs + 1] | ((attr & 0x10) << 4);
+	int attr = machine->generic.videoram.u8[offs];
+	int code = machine->generic.videoram.u8[offs + 1] | ((attr & 0x10) << 4);
 //  int color = (attr & 0xf0) >> 4;
 	int flags = ((attr & 0x80) ? TILE_FLIPX : 0) | ((attr & 0x40) ? TILE_FLIPY : 0);
 
@@ -110,9 +110,11 @@ VIDEO_START( yiear )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
 	int offs;
 
-	for (offs = spriteram_size - 2;offs >= 0;offs -= 2)
+	for (offs = machine->generic.spriteram_size - 2;offs >= 0;offs -= 2)
 	{
 		int attr = spriteram[offs];
 		int code = spriteram_2[offs + 1] + 256 * (attr & 0x01);

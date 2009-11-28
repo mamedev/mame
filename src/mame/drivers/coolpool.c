@@ -194,7 +194,7 @@ static WRITE16_HANDLER( nvram_data_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		if (nvram_write_enable)
-			space->machine->generic.nvram.ptr.u16[offset] = data & 0xff;
+			space->machine->generic.nvram.u16[offset] = data & 0xff;
 	}
 }
 

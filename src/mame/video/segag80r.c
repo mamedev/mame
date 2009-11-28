@@ -208,10 +208,10 @@ VIDEO_START( segag80r )
 			3,	rg_resistances, gweights, 220, 0,
 			2,	b_resistances,  bweights, 220, 0);
 
-	gfx_element_set_source(machine->gfx[0], &videoram[0x800]);
+	gfx_element_set_source(machine->gfx[0], &machine->generic.videoram.u8[0x800]);
 
 	/* allocate paletteram */
-	paletteram = auto_alloc_array(machine, UINT8, 0x80);
+	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x80);
 
 	/* initialize the particulars for each type of background PCB */
 	switch (segag80r_background_pcb)
@@ -241,7 +241,7 @@ VIDEO_START( segag80r )
 	}
 
 	/* register for save states */
-	state_save_register_global_pointer(machine, paletteram, 0x80);
+	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x80);
 
 	state_save_register_global(machine, video_control);
 	state_save_register_global(machine, video_flip);
@@ -275,13 +275,13 @@ WRITE8_HANDLER( segag80r_videoram_w )
 	if ((offset & 0x1000) && (video_control & 0x02))
 	{
 		offset &= 0x3f;
-		paletteram[offset] = data;
+		space->machine->generic.paletteram.u8[offset] = data;
 		g80_set_palette_entry(space->machine, offset, data);
 		return;
 	}
 
 	/* all other accesses go to videoram */
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 
 	/* track which characters are dirty */
 	if (offset & 0x800)
@@ -439,7 +439,7 @@ WRITE8_HANDLER( monsterb_videoram_w )
 	if ((offset & 0x1fc0) == 0x1040 && (video_control & 0x40))
 	{
 		offs_t paloffs = offset & 0x3f;
-		paletteram[paloffs | 0x40] = data;
+		space->machine->generic.paletteram.u8[paloffs | 0x40] = data;
 		g80_set_palette_entry(space->machine, paloffs | 0x40, data);
 		/* note that since the background board is not integrated with the main board */
 		/* writes here also write through to regular videoram */
@@ -509,7 +509,7 @@ WRITE8_HANDLER( pignewt_videoram_w )
 	if ((offset & 0x1fc0) == 0x1040 && (video_control & 0x02))
 	{
 		offs_t paloffs = offset & 0x3f;
-		paletteram[paloffs | 0x40] = data;
+		space->machine->generic.paletteram.u8[paloffs | 0x40] = data;
 		g80_set_palette_entry(space->machine, paloffs | 0x40, data);
 		return;
 	}
@@ -592,7 +592,7 @@ WRITE8_HANDLER( sindbadm_videoram_w )
 	if ((offset & 0x1fc0) == 0x1000 && (video_control & 0x02))
 	{
 		offs_t paloffs = offset & 0x3f;
-		paletteram[paloffs | 0x40] = data;
+		space->machine->generic.paletteram.u8[paloffs | 0x40] = data;
 		g80_set_palette_entry(space->machine, paloffs | 0x40, data);
 		return;
 	}
@@ -653,7 +653,7 @@ static void draw_videoram(running_machine *machine, bitmap_t *bitmap, const rect
 		for (x = cliprect->min_x / 8; x <= cliprect->max_x / 8; x++)
 		{
 			int offs = effy * 32 + (x ^ flipmask);
-			UINT8 tile = videoram[offs];
+			UINT8 tile = machine->generic.videoram.u8[offs];
 
 			/* draw the tile */
 			drawgfx_transmask(bitmap, cliprect, machine->gfx[0], tile, tile >> 4, video_flip, video_flip, x*8, y*8, transparent_pens[tile >> 4]);
@@ -669,7 +669,7 @@ static void draw_videoram(running_machine *machine, bitmap_t *bitmap, const rect
  *
  *************************************/
 
-static void draw_background_spaceod(bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_background_spaceod(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	bitmap_t *pixmap = tilemap_get_pixmap(!(spaceod_bg_control & 0x02) ? spaceod_bg_htilemap : spaceod_bg_vtilemap);
 	int flipmask = (spaceod_bg_control & 0x01) ? 0xff : 0x00;
@@ -695,7 +695,7 @@ static void draw_background_spaceod(bitmap_t *bitmap, const rectangle *cliprect)
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
 			int effx = ((x + spaceod_hcounter) ^ flipmask) + xoffset;
-			UINT8 fgpix = paletteram[dst[x]];
+			UINT8 fgpix = machine->generic.paletteram.u8[dst[x]];
 			UINT8 bgpix = src[effx & xmask] & 0x3f;
 
 			/* the background detect flag is set if:
@@ -824,7 +824,7 @@ VIDEO_UPDATE( segag80r )
 		case G80_BACKGROUND_SPACEOD:
 			memset(transparent_pens, 0, 16);
 			draw_videoram(screen->machine, bitmap, cliprect, transparent_pens);
-			draw_background_spaceod(bitmap, cliprect);
+			draw_background_spaceod(screen->machine, bitmap, cliprect);
 			break;
 
 		/* foreground: visible except for pen 0 (this disagrees with schematics) */

@@ -92,13 +92,13 @@ PALETTE_INIT( mikie )
 
 WRITE8_HANDLER( mikie_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( mikie_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -122,9 +122,9 @@ WRITE8_HANDLER( mikie_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index] + ((colorram[tile_index] & 0x20) << 3);
-	int color = (colorram[tile_index] & 0x0f) + 16 * palettebank;
-	int flags = ((colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
+	int code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x20) << 3);
+	int color = (machine->generic.colorram.u8[tile_index] & 0x0f) + 16 * palettebank;
+	int flags = ((machine->generic.colorram.u8[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((machine->generic.colorram.u8[tile_index] & 0x80) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(0, code, color, flags);
 }
@@ -137,9 +137,10 @@ VIDEO_START( mikie )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size;offs += 4)
 	{
 		int gfxbank = (spriteram[offs+2] & 0x40) ? 2 : 1;
 		int code = (spriteram[offs + 2] & 0x3f) + ((spriteram[offs + 2] & 0x80) >> 1) + ((spriteram[offs] & 0x40) << 1);

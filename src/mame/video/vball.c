@@ -120,13 +120,13 @@ void vb_mark_all_dirty( void )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const gfx_element *gfx = machine->gfx[1];
-	UINT8 *src = spriteram;
+	UINT8 *src = machine->generic.spriteram.u8;
 	int i;
 
 /*  240-Y    S|X|CLR|WCH WHICH    240-X
     xxxxxxxx x|x|xxx|xxx xxxxxxxx xxxxxxxx
 */
-	for (i = 0;i < spriteram_size;i += 4)
+	for (i = 0;i < machine->generic.spriteram_size;i += 4)
 	{
 		int attr = src[i+1];
 		int which = src[i+2]+((attr & 0x07)<<8);

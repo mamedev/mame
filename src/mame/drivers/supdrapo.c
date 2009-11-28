@@ -45,7 +45,7 @@ static ADDRESS_MAP_START( sdpoker_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x57ff, 0x57ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x5800, 0x58ff) AM_RAM AM_SHARE(1) AM_BASE(&col_line)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM //work ram
-	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x6c00, 0x6fff) AM_RAM AM_BASE(&char_bank)
 	AM_RANGE(0x7000, 0x7bff) AM_RAM //$7600 seems watchdog
 	AM_RANGE(0x7c00, 0x7c00) AM_WRITENOP //?
@@ -204,7 +204,7 @@ static VIDEO_UPDATE( supdrapo )
 	{
 		for(x=0;x<32;x++)
 		{
-			int tile = videoram[count] + char_bank[count] * 0x100;
+			int tile = screen->machine->generic.videoram.u8[count] + char_bank[count] * 0x100;
 			/* Global Column Coloring, GUESS! */
 			color = col_line[(x*2)+1] ? (col_line[(x*2)+1]-1) & 0x7 : 0;
 

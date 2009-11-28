@@ -107,8 +107,8 @@ VIDEO_START( lemmings )
 
 VIDEO_EOF( lemmings )
 {
-	memcpy(sprite_triple_buffer_0,buffered_spriteram16,0x800);
-	memcpy(sprite_triple_buffer_1,buffered_spriteram16_2,0x800);
+	memcpy(sprite_triple_buffer_0,machine->generic.buffered_spriteram.u16,0x800);
+	memcpy(sprite_triple_buffer_1,machine->generic.buffered_spriteram2.u16,0x800);
 }
 
 /******************************************************************************/

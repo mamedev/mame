@@ -89,6 +89,7 @@ static VIDEO_UPDATE( pzletime )
 	tilemap_draw(bitmap,cliprect,mid_tilemap, 0,0);
 
 	{
+		UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
 		int offs,spr_offs,colour,sx,sy;
 
 		for(offs = 0; offs < 0x2000/2; offs += 4)
@@ -186,12 +187,12 @@ static ADDRESS_MAP_START( pzletime_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x700000, 0x700005) AM_RAM_WRITE(video_regs_w) AM_BASE(&video_regs)
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
-	AM_RANGE(0x900000, 0x9005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x900000, 0x9005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xa00000, 0xa00007) AM_RAM AM_BASE(&tilemap_regs)
 	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_BASE(&bg_videoram)
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(mid_videoram_w) AM_BASE(&mid_videoram)
 	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(txt_videoram_w) AM_BASE(&txt_videoram)
-	AM_RANGE(0xd00000, 0xd01fff) AM_RAM AM_BASE(&spriteram16)
+	AM_RANGE(0xd00000, 0xd01fff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("INPUT") AM_WRITE(eeprom_w)
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("SYSTEM") AM_WRITE(ticket_w)
 	AM_RANGE(0xe00004, 0xe00005) AM_DEVWRITE("oki", oki_bank_w)

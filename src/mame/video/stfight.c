@@ -75,16 +75,16 @@ PALETTE_INIT( stfight )
 }
 
 
-static void set_pens(colortable_t *colortable)
+static void set_pens(running_machine *machine)
 {
 	int i;
 
 	for (i = 0; i < 0x100; i++)
 	{
-		UINT16 data = paletteram[i] | (paletteram_2[i] << 8);
+		UINT16 data = machine->generic.paletteram.u8[i] | (machine->generic.paletteram2.u8[i] << 8);
 		rgb_t color = MAKE_RGB(pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
 
-		colortable_palette_set_color(colortable, i, color);
+		colortable_palette_set_color(machine->colortable, i, color);
 	}
 }
 
@@ -295,7 +295,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( stfight )
 {
-	set_pens(screen->machine->colortable);
+	set_pens(screen->machine);
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 

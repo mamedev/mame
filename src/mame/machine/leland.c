@@ -1303,7 +1303,7 @@ WRITE8_HANDLER( leland_gated_paletteram_w )
 READ8_HANDLER( leland_gated_paletteram_r )
 {
 	if (wcol_enable)
-		return paletteram[offset];
+		return space->machine->generic.paletteram.u8[offset];
 	return 0xff;
 }
 
@@ -1342,7 +1342,7 @@ WRITE8_HANDLER( ataxx_paletteram_and_misc_w )
 READ8_HANDLER( ataxx_paletteram_and_misc_r )
 {
 	if (wcol_enable)
-		return paletteram[offset];
+		return space->machine->generic.paletteram.u8[offset];
 	else if (offset == 0x7fc || offset == 0x7fd)
 	{
 		int result = xrom_base[0x00000 | xrom1_addr | ((offset & 1) << 16)];

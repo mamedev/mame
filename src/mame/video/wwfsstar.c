@@ -130,7 +130,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
     **- End of Comments -*/
 
 	const gfx_element *gfx = machine->gfx[1];
-	UINT16 *source = spriteram16;
+	UINT16 *source = machine->generic.spriteram.u16;
 	UINT16 *finish = source + 0x3ff/2;
 
 	while (source < finish)

@@ -62,7 +62,7 @@ static void namcofl_install_palette(running_machine *machine)
 	pen = 0;
 	for( page=0; page<4; page++ )
 	{
-		pSource = &paletteram32[page*0x2000/4];
+		pSource = &machine->generic.paletteram.u32[page*0x2000/4];
 		for( dword_offset=0; dword_offset<0x800/4; dword_offset++ )
 		{
 			r = pSource[dword_offset+0x0000/4];

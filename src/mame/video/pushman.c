@@ -31,7 +31,7 @@ static TILE_GET_INFO( get_back_tile_info )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	int tile = videoram16[tile_index];
+	int tile = machine->generic.videoram.u16[tile_index];
 	SET_TILE_INFO(
 			0,
 			(tile&0xff)|((tile&0xc000)>>6)|((tile&0x2000)>>3),
@@ -70,7 +70,7 @@ WRITE16_HANDLER( pushman_scroll_w )
 
 WRITE16_HANDLER( pushman_videoram_w )
 {
-	COMBINE_DATA(&videoram16[offset]);
+	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
 	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
@@ -84,6 +84,7 @@ WRITE16_HANDLER( pushman_videoram_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs,x,y,color,sprite,flipx,flipy;
 
 	for (offs = 0x0800-4;offs >=0;offs -= 4)

@@ -302,7 +302,7 @@ WRITE16_HANDLER( m107_spritebuffer_w )
 {
 	if (ACCESSING_BITS_0_7) {
 //      logerror("%04x: buffered spriteram\n",cpu_get_pc(space->cpu));
-		memcpy(m107_spriteram,spriteram16,0x1000);
+		memcpy(m107_spriteram,space->machine->generic.spriteram.u16,0x1000);
 	}
 }
 

@@ -528,7 +528,7 @@ WRITE8_HANDLER( williams2_bank_select_w )
 		case 3:
 			memory_install_readwrite8_handler(space, 0x8000, 0x87ff, 0, 0, (read8_space_func)SMH_BANK(4), williams2_paletteram_w);
 			memory_set_bank(space->machine, 1, 1 + ((vram_bank & 4) >> 1));
-			memory_set_bankptr(space->machine, 4, paletteram);
+			memory_set_bankptr(space->machine, 4, space->machine->generic.paletteram.v);
 			break;
 	}
 }
@@ -647,14 +647,14 @@ READ8_DEVICE_HANDLER( williams_input_port_49way_0_5_r )
 WRITE8_HANDLER( williams_cmos_w )
 {
 	/* only 4 bits are valid */
-	space->machine->generic.nvram.ptr.u8[offset] = data | 0xf0;
+	space->machine->generic.nvram.u8[offset] = data | 0xf0;
 }
 
 
 WRITE8_HANDLER( bubbles_cmos_w )
 {
 	/* bubbles has additional CMOS for a full 8 bits */
-	space->machine->generic.nvram.ptr.u8[offset] = data;
+	space->machine->generic.nvram.u8[offset] = data;
 }
 
 

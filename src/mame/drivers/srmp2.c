@@ -385,8 +385,8 @@ static WRITE8_HANDLER( srmp3_rombank_w )
 static ADDRESS_MAP_START( srmp2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE(&spriteram16_2)		/* Sprites Code + X + Attr */
-	AM_RANGE(0x180000, 0x180609) AM_RAM AM_BASE(&spriteram16)		/* Sprites Y */
+	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE_GENERIC(spriteram2)		/* Sprites Code + X + Attr */
+	AM_RANGE(0x180000, 0x180609) AM_RAM AM_BASE_GENERIC(spriteram)		/* Sprites Y */
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITENOP						/* ??? */
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(srmp2_flags_w)			/* ADPCM bank, Color bank, etc. */
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("SYSTEM")				/* Coinage */
@@ -414,7 +414,7 @@ static ADDRESS_MAP_START( mjyuugi_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x300001) AM_READNOP							/* ??? */
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW3-1")				/* DSW 3-1 */
 	AM_RANGE(0x500010, 0x500011) AM_READ_PORT("DSW3-2")				/* DSW 3-2 */
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x800000, 0x800001) AM_READNOP				/* ??? */
 	AM_RANGE(0x900000, 0x900001) AM_READWRITE(srmp2_input_1_r,srmp2_input_1_w)		/* I/O port 1 */
 	AM_RANGE(0x900002, 0x900003) AM_READWRITE(srmp2_input_2_r,srmp2_input_2_w)		/* I/O port 2 */
@@ -424,9 +424,9 @@ static ADDRESS_MAP_START( mjyuugi_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
 	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP					/* ??? */
-	AM_RANGE(0xd00000, 0xd00609) AM_RAM AM_BASE(&spriteram16)	/* Sprites Y */
+	AM_RANGE(0xd00000, 0xd00609) AM_RAM AM_BASE_GENERIC(spriteram)	/* Sprites Y */
 	AM_RANGE(0xd02000, 0xd023ff) AM_RAM							/* ??? only writes $00fa */
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM	AM_BASE(&spriteram16_2)	/* Sprites Code + X + Attr */
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM	AM_BASE_GENERIC(spriteram2)	/* Sprites Code + X + Attr */
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 ADDRESS_MAP_END
 
@@ -543,10 +543,10 @@ static ADDRESS_MAP_START( srmp3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)							/* rom bank */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* work ram */
 	AM_RANGE(0xa800, 0xa800) AM_WRITENOP							/* flag ? */
-	AM_RANGE(0xb000, 0xb303) AM_RAM AM_BASE(&spriteram)				/* Sprites Y */
+	AM_RANGE(0xb000, 0xb303) AM_RAM AM_BASE_GENERIC(spriteram)				/* Sprites Y */
 	AM_RANGE(0xb800, 0xb800) AM_WRITENOP							/* flag ? */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&spriteram_2)			/* Sprites Code + X + Attr */
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE(&spriteram_3)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_GENERIC(spriteram2)			/* Sprites Code + X + Attr */
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_GENERIC(spriteram3)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srmp3_io_map, ADDRESS_SPACE_IO, 8 )

@@ -98,9 +98,10 @@ VIDEO_START( sauro )
 
 static void sauro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs,code,sx,sy,color,flipx;
 
-	for (offs = 3;offs < spriteram_size - 1;offs += 4)
+	for (offs = 3;offs < machine->generic.spriteram_size - 1;offs += 4)
 	{
 		sy = spriteram[offs];
 		if (sy == 0xf8) continue;
@@ -159,10 +160,11 @@ VIDEO_START( trckydoc )
 
 static void trckydoc_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs,code,sy,color,flipx,sx;
 
 	/* Weird, sprites entries don't start on DWORD boundary */
-	for (offs = 3;offs < spriteram_size - 1;offs += 4)
+	for (offs = 3;offs < machine->generic.spriteram_size - 1;offs += 4)
 	{
 		sy = spriteram[offs];
 

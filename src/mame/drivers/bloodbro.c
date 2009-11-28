@@ -133,14 +133,14 @@ extern VIDEO_START( bloodbro );
 static ADDRESS_MAP_START( bloodbro_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08afff) AM_RAM
-	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x08c000, 0x08c3ff) AM_RAM_WRITE(bloodbro_bgvideoram_w) AM_BASE(&bloodbro_bgvideoram)
 	AM_RANGE(0x08c400, 0x08cfff) AM_RAM
 	AM_RANGE(0x08d000, 0x08d3ff) AM_RAM_WRITE(bloodbro_fgvideoram_w) AM_BASE(&bloodbro_fgvideoram)
 	AM_RANGE(0x08d400, 0x08d7ff) AM_RAM
 	AM_RANGE(0x08d800, 0x08dfff) AM_RAM_WRITE(bloodbro_txvideoram_w) AM_BASE(&bloodbro_txvideoram)
 	AM_RANGE(0x08e000, 0x08e7ff) AM_RAM
-	AM_RANGE(0x08e800, 0x08f7ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x08e800, 0x08f7ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08f800, 0x08ffff) AM_RAM
 	AM_RANGE(0x0a0000, 0x0a000d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0x0c0000, 0x0c007f) AM_RAM AM_BASE(&bloodbro_scroll)
@@ -155,7 +155,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( weststry_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08afff) AM_RAM
-	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x08c000, 0x08c3ff) AM_RAM_WRITE(bloodbro_bgvideoram_w) AM_BASE(&bloodbro_bgvideoram)
 	AM_RANGE(0x08c400, 0x08cfff) AM_RAM
 	AM_RANGE(0x08d000, 0x08d3ff) AM_RAM_WRITE(bloodbro_fgvideoram_w) AM_BASE(&bloodbro_fgvideoram)
@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( weststry_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c1002, 0x0c1003) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c1004, 0x0c1005) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c1000, 0x0c17ff) AM_RAM
-	AM_RANGE(0x128000, 0x1287ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x128000, 0x1287ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x120000, 0x128fff) AM_RAM
 ADDRESS_MAP_END
 

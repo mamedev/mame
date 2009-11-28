@@ -302,8 +302,8 @@ static double weights[2][3][6];
 WRITE16_HANDLER( sys16_paletteram_w )
 {
 	UINT16 newword;
-	COMBINE_DATA( &paletteram16[offset] );
-	newword = paletteram16[offset];
+	COMBINE_DATA( &space->machine->generic.paletteram.u16[offset] );
+	newword = space->machine->generic.paletteram.u16[offset];
 
 	/*  sBGR BBBB GGGG RRRR */
 	/*  x000 4321 4321 4321 */

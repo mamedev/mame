@@ -61,14 +61,14 @@ static int flipscreen_old;
 /* BBBBBGGGGGRRRRRx xxxxxxxxxxxxxxxx */
 WRITE16_HANDLER( tetrisp2_palette_w )
 {
-	data = COMBINE_DATA(&paletteram16[offset]);
+	data = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 	if ((offset & 1) == 0)
 		palette_set_color_rgb(space->machine,offset/2,pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
 }
 
 WRITE16_HANDLER( rocknms_sub_palette_w )
 {
-	data = COMBINE_DATA(&paletteram16_2[offset]);
+	data = COMBINE_DATA(&space->machine->generic.paletteram2.u16[offset]);
 	if ((offset & 1) == 0)
 		palette_set_color_rgb(space->machine,(0x8000 + (offset/2)),pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
 }
@@ -583,7 +583,7 @@ VIDEO_UPDATE( tetrisp2 )
 	else if (asc_pri == 2)
 		tilemap_draw(bitmap,cliprect, tilemap_fg,  0, 1 << 2);
 
-	tetrisp2_draw_sprites(screen->machine, bitmap,screen->machine->priority_bitmap, cliprect, tetrisp2_priority, spriteram16, spriteram_size, 0, 0, (tetrisp2_systemregs[0x00] & 0x02), 0);
+	tetrisp2_draw_sprites(screen->machine, bitmap,screen->machine->priority_bitmap, cliprect, tetrisp2_priority, screen->machine->generic.spriteram.u16, screen->machine->generic.spriteram_size, 0, 0, (tetrisp2_systemregs[0x00] & 0x02), 0);
 	return 0;
 }
 
@@ -667,7 +667,7 @@ VIDEO_UPDATE( rockntread )
 	else if (asc_pri == 2)
 		tilemap_draw(bitmap,cliprect, tilemap_fg,  0, 1 << 2);
 
-	tetrisp2_draw_sprites(screen->machine, bitmap,screen->machine->priority_bitmap,cliprect, tetrisp2_priority, spriteram16, spriteram_size, 0, 0, (tetrisp2_systemregs[0x00] & 0x02), 0);
+	tetrisp2_draw_sprites(screen->machine, bitmap,screen->machine->priority_bitmap,cliprect, tetrisp2_priority, screen->machine->generic.spriteram.u16, screen->machine->generic.spriteram_size, 0, 0, (tetrisp2_systemregs[0x00] & 0x02), 0);
 	return 0;
 }
 
@@ -734,7 +734,7 @@ VIDEO_UPDATE( rocknms )
 		else if (asc_pri == 2)
 			tilemap_draw(bitmap,cliprect, tilemap_sub_fg,  0, 1 << 2);
 
-		tetrisp2_draw_sprites(screen->machine, bitmap,screen->machine->priority_bitmap,cliprect, tetrisp2_priority, spriteram16_2, spriteram_2_size, 4, 0, (tetrisp2_systemregs[0x00] & 0x02), 0);
+		tetrisp2_draw_sprites(screen->machine, bitmap,screen->machine->priority_bitmap,cliprect, tetrisp2_priority, screen->machine->generic.spriteram2.u16, screen->machine->generic.spriteram2_size, 4, 0, (tetrisp2_systemregs[0x00] & 0x02), 0);
 	}
 	else if (screen == right_screen) /* game screen */
 	{
@@ -787,7 +787,7 @@ VIDEO_UPDATE( rocknms )
 		else if (asc_pri == 2)
 			tilemap_draw(bitmap,cliprect, tilemap_fg,  0, 1 << 2);
 
-		tetrisp2_draw_sprites(screen->machine, bitmap,screen->machine->priority_bitmap,cliprect, tetrisp2_priority, spriteram16, spriteram_size, 0, 0, (tetrisp2_systemregs[0x00] & 0x02), 0);
+		tetrisp2_draw_sprites(screen->machine, bitmap,screen->machine->priority_bitmap,cliprect, tetrisp2_priority, screen->machine->generic.spriteram.u16, screen->machine->generic.spriteram_size, 0, 0, (tetrisp2_systemregs[0x00] & 0x02), 0);
 	}
 
 	return 0;

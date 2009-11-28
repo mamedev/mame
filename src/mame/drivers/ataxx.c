@@ -50,7 +50,7 @@ static ADDRESS_MAP_START( master_map_program, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK(2)
 	AM_RANGE(0xa000, 0xdfff) AM_WRITE(ataxx_battery_ram_w)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(ataxx_paletteram_and_misc_r, ataxx_paletteram_and_misc_w) AM_BASE(&paletteram)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(ataxx_paletteram_and_misc_r, ataxx_paletteram_and_misc_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
 

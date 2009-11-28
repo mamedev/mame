@@ -37,7 +37,7 @@ static INTERRUPT_GEN( aliens_interrupt )
 static READ8_HANDLER( bankedram_r )
 {
 	if (palette_selected)
-		return paletteram[offset];
+		return space->machine->generic.paletteram.u8[offset];
 	else
 		return ram[offset];
 }

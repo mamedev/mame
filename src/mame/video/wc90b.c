@@ -107,10 +107,11 @@ WRITE8_HANDLER( wc90b_txvideoram_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs, sx, sy;
 
 	/* draw all visible sprites of specified priority */
-	for ( offs = spriteram_size - 8 ; offs >= 0 ; offs -= 8 )
+	for ( offs = machine->generic.spriteram_size - 8 ; offs >= 0 ; offs -= 8 )
 	{
 		if ( ( ~( spriteram[offs+3] >> 7 ) & 1 ) == priority )
 		{

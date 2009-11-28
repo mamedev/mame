@@ -345,8 +345,8 @@ VIDEO_START( rallyx )
 
 	spriteram_base = 0x14;
 
-	spriteram = rallyx_videoram + 0x00;
-	spriteram_2 = spriteram + 0x800;
+	machine->generic.spriteram.u8 = rallyx_videoram + 0x00;
+	machine->generic.spriteram2.u8 = machine->generic.spriteram.u8 + 0x800;
 	rallyx_radarx = rallyx_videoram + 0x20;
 	rallyx_radary = rallyx_radarx + 0x800;
 
@@ -372,8 +372,8 @@ VIDEO_START( jungler )
 
 	spriteram_base = 0x14;
 
-	spriteram = rallyx_videoram + 0x00;
-	spriteram_2 = spriteram + 0x800;
+	machine->generic.spriteram.u8 = rallyx_videoram + 0x00;
+	machine->generic.spriteram2.u8 = machine->generic.spriteram.u8 + 0x800;
 	rallyx_radarx = rallyx_videoram + 0x20;
 	rallyx_radary = rallyx_radarx + 0x800;
 
@@ -408,8 +408,8 @@ VIDEO_START( locomotn )
 
 	spriteram_base = 0x14;
 
-	spriteram = rallyx_videoram + 0x00;
-	spriteram_2 = spriteram + 0x800;
+	machine->generic.spriteram.u8 = rallyx_videoram + 0x00;
+	machine->generic.spriteram2.u8 = machine->generic.spriteram.u8 + 0x800;
 	rallyx_radarx = rallyx_videoram + 0x20;
 	rallyx_radary = rallyx_radarx + 0x800;
 
@@ -445,8 +445,8 @@ VIDEO_START( commsega )
 	/* commsega has more sprites and bullets than the other games */
 	spriteram_base = 0x00;
 
-	spriteram = rallyx_videoram + 0x00;
-	spriteram_2 = spriteram + 0x800;
+	machine->generic.spriteram.u8 = rallyx_videoram + 0x00;
+	machine->generic.spriteram2.u8 = machine->generic.spriteram.u8 + 0x800;
 	rallyx_radarx = rallyx_videoram + 0x20;
 	rallyx_radary = rallyx_radarx + 0x800;
 
@@ -532,6 +532,8 @@ static void draw_stars(running_machine *machine, bitmap_t *bitmap, const rectang
 
 static void rallyx_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int displacement )
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
 	int offs;
 
 	for (offs = 0x20-2;offs >= spriteram_base;offs -= 2)
@@ -555,6 +557,8 @@ static void rallyx_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 
 static void locomotn_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int displacement )
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
 	int offs;
 
 	for (offs = 0x20-2;offs >= spriteram_base;offs -= 2)

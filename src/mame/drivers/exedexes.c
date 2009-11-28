@@ -43,7 +43,7 @@ static ADDRESS_MAP_START( exedexes_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd804, 0xd805) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(exedexes_state, bg_scroll)
 	AM_RANGE(0xd807, 0xd807) AM_WRITE(exedexes_gfxctrl_w)							/* layer enables */
 	AM_RANGE(0xe000, 0xefff) AM_RAM													/* Work RAM */
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)	/* Sprite RAM */
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	/* Sprite RAM */
 ADDRESS_MAP_END
 
 

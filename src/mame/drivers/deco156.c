@@ -36,7 +36,7 @@ static VIDEO_START( wcvol95 )
 	deco16_pf1_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
 	deco16_pf2_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
 	deco16_pf12_control = auto_alloc_array(machine, UINT16, 0x10/2);
-	paletteram16 =  auto_alloc_array(machine, UINT16, 0x1000/2);
+	machine->generic.paletteram.u16 =  auto_alloc_array(machine, UINT16, 0x1000/2);
 
 	/* and register the allocated ram so that save states still work */
 	state_save_register_global_pointer(machine, deco16_pf1_data, 0x2000/2);
@@ -44,7 +44,7 @@ static VIDEO_START( wcvol95 )
 	state_save_register_global_pointer(machine, deco16_pf1_rowscroll, 0x800/2);
 	state_save_register_global_pointer(machine, deco16_pf2_rowscroll, 0x800/2);
 	state_save_register_global_pointer(machine, deco16_pf12_control, 0x10/2);
-	state_save_register_global_pointer(machine, paletteram16, 0x1000/2);
+	state_save_register_global_pointer(machine, machine->generic.paletteram.u16, 0x1000/2);
 
 	deco16_1_video_init(machine);
 
@@ -56,6 +56,7 @@ static VIDEO_START( wcvol95 )
  its the same sprite chip Data East used on many, many 16-bit era titles */
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT32 *spriteram32 = machine->generic.spriteram.u32;
 	int offs;
 
 	flip_screen_set_no_update(machine, 1);
@@ -161,8 +162,8 @@ static WRITE32_DEVICE_HANDLER( hvysmsh_oki_0_bank_w )
 
 static WRITE32_HANDLER(wcvol95_nonbuffered_palette_w)
 {
-	COMBINE_DATA(&paletteram32[offset]);
-	palette_set_color_rgb(space->machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+	palette_set_color_rgb(space->machine,offset,pal5bit(space->machine->generic.paletteram.u32[offset] >> 0),pal5bit(space->machine->generic.paletteram.u32[offset] >> 5),pal5bit(space->machine->generic.paletteram.u32[offset] >> 10));
 }
 
 /***************************************************************************/
@@ -193,9 +194,9 @@ static ADDRESS_MAP_START( hvysmsh_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x194000, 0x195fff) AM_READWRITE( wcvol95_pf2_data_r, wcvol95_pf2_data_w )
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_READWRITE( wcvol95_pf1_rowscroll_r, wcvol95_pf1_rowscroll_w )
 	AM_RANGE(0x1a4000, 0x1a4fff) AM_READWRITE( wcvol95_pf2_rowscroll_r, wcvol95_pf2_rowscroll_w )
-	AM_RANGE(0x1c0000, 0x1c0fff) AM_READ(SMH_RAM) AM_WRITE(deco32_nonbuffered_palette_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x1c0000, 0x1c0fff) AM_READ(SMH_RAM) AM_WRITE(deco32_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1d0010, 0x1d002f) AM_READNOP // Check for DMA complete?
-	AM_RANGE(0x1e0000, 0x1e1fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1e0000, 0x1e1fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wcvol95_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -208,9 +209,9 @@ static ADDRESS_MAP_START( wcvol95_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x130000, 0x137fff) AM_RAM
 	AM_RANGE(0x140000, 0x140003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x150000, 0x150003) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x160000, 0x161fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x160000, 0x161fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x170000, 0x170003) AM_NOP // Irq ack?
-	AM_RANGE(0x180000, 0x180fff) AM_READ(SMH_RAM) AM_WRITE(wcvol95_nonbuffered_palette_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x180000, 0x180fff) AM_READ(SMH_RAM) AM_WRITE(wcvol95_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x000000ff)
 ADDRESS_MAP_END
 

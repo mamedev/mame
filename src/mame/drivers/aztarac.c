@@ -49,7 +49,7 @@ static MACHINE_RESET( aztarac )
 
 static READ16_HANDLER( nvram_r )
 {
-	return space->machine->generic.nvram.ptr.u16[offset] | 0xfff0;
+	return space->machine->generic.nvram.u16[offset] | 0xfff0;
 }
 
 

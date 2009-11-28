@@ -1495,8 +1495,8 @@ WRITE16_HANDLER( atarigen_666_paletteram_w )
 {
 	int newword, r, g, b;
 
-	COMBINE_DATA(&paletteram16[offset]);
-	newword = paletteram16[offset];
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	newword = space->machine->generic.paletteram.u16[offset];
 
 	r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 1);
 	g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
@@ -1513,12 +1513,12 @@ WRITE16_HANDLER( atarigen_666_paletteram_w )
 
 WRITE16_HANDLER( atarigen_expanded_666_paletteram_w )
 {
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 
 	if (ACCESSING_BITS_8_15)
 	{
 		int palentry = offset / 2;
-		int newword = (paletteram16[palentry * 2] & 0xff00) | (paletteram16[palentry * 2 + 1] >> 8);
+		int newword = (space->machine->generic.paletteram.u16[palentry * 2] & 0xff00) | (space->machine->generic.paletteram.u16[palentry * 2 + 1] >> 8);
 
 		int r, g, b;
 
@@ -1539,11 +1539,11 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 {
 	int newword, r, g, b;
 
-	COMBINE_DATA(&paletteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
 	if (ACCESSING_BITS_16_31)
 	{
-		newword = paletteram32[offset] >> 16;
+		newword = space->machine->generic.paletteram.u32[offset] >> 16;
 
 		r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 1);
 		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
@@ -1554,7 +1554,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 
 	if (ACCESSING_BITS_0_15)
 	{
-		newword = paletteram32[offset] & 0xffff;
+		newword = space->machine->generic.paletteram.u32[offset] & 0xffff;
 
 		r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 1);
 		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);

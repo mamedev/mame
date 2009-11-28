@@ -186,10 +186,10 @@ static ADDRESS_MAP_START( mcatadv_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(mcatadv_videoram1_w) AM_BASE(&mcatadv_videoram1) // Tilemap 0
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(mcatadv_videoram2_w) AM_BASE(&mcatadv_videoram2) // Tilemap 1
 
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x602000, 0x602fff) AM_RAM // Bigger than needs to be?
 
-	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size) // Sprites, two halves for double buffering
+	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) // Sprites, two halves for double buffering
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM // Tests more than is needed?
 
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1")

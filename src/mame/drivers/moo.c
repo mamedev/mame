@@ -140,13 +140,13 @@ static WRITE16_HANDLER( control2_w )
 }
 
 
-static void moo_objdma(int type)
+static void moo_objdma(running_machine *machine, int type)
 {
 	int counter, num_inactive;
 	UINT16 *src, *dst, zmask;
 
 	K053247_export_config(&dst, 0, 0, 0, &counter);
-	src = spriteram16;
+	src = machine->generic.spriteram.u16;
 	num_inactive = counter = 256;
 
 	zmask = (type) ? 0x00ff : 0xffff;
@@ -175,7 +175,7 @@ static INTERRUPT_GEN(moo_interrupt)
 {
 	if (K053246_is_IRQ_enabled())
 	{
-		moo_objdma(game_type);
+		moo_objdma(device->machine, game_type);
 
 		// schedule DMA end interrupt (delay shortened to catch up with V-blank)
 		timer_set(device->machine, ATTOTIME_IN_USEC(MOO_DMADELAY), NULL, 0, dmaend_callback);
@@ -188,7 +188,7 @@ static INTERRUPT_GEN(moo_interrupt)
 
 static INTERRUPT_GEN(moobl_interrupt)
 {
-	moo_objdma(game_type);
+	moo_objdma(device->machine, game_type);
 
 	// schedule DMA end interrupt (delay shortened to catch up with V-blank)
 	timer_set(device->machine, ATTOTIME_IN_USEC(MOO_DMADELAY), NULL, 0, dmaend_callback);
@@ -235,7 +235,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 static READ16_HANDLER( K053247_scattered_word_r )
 {
 	if (offset & 0x0078)
-		return spriteram16[offset];
+		return space->machine->generic.spriteram.u16[offset];
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
@@ -246,7 +246,7 @@ static READ16_HANDLER( K053247_scattered_word_r )
 static WRITE16_HANDLER( K053247_scattered_word_w )
 {
 	if (offset & 0x0078)
-		COMBINE_DATA(spriteram16+offset);
+		COMBINE_DATA(space->machine->generic.spriteram.u16+offset);
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
@@ -318,11 +318,11 @@ static ADDRESS_MAP_START( moo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r,control2_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM	AM_BASE(&workram)		/* Work RAM */
-	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_BASE(&spriteram16)	/* Sprite RAM */
+	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_BASE_GENERIC(spriteram)	/* Sprite RAM */
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)	/* Graphic planes */
 	AM_RANGE(0x1a2000, 0x1a3fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)	/* Graphic planes mirror */
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_READ(K056832_rom_word_r)	/* Passthrough to tile roms */
-	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)
 #if MOO_DEBUG
 	AM_RANGE(0x0c0000, 0x0c003f) AM_READ(K056832_word_r)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_READ(K053246_reg_word_r)
@@ -352,17 +352,17 @@ static ADDRESS_MAP_START( moobl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r,control2_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(&workram)		 /* Work RAM */
-	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_BASE(&spriteram16) 	 /* Sprite RAM */
+	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_BASE_GENERIC(spriteram) 	 /* Sprite RAM */
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w) /* Graphic planes */
 	AM_RANGE(0x1a2000, 0x1a3fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)	/* Graphic planes mirror */
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_READ(K056832_rom_word_r)	/* Passthrough to tile roms */
-	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bucky_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x090000, 0x09ffff) AM_RAM AM_BASE(&spriteram16)	/* Sprite RAM */
+	AM_RANGE(0x090000, 0x09ffff) AM_RAM AM_BASE_GENERIC(spriteram)	/* Sprite RAM */
 	AM_RANGE(0x0a0000, 0x0affff) AM_RAM							/* extra sprite RAM? */
 	AM_RANGE(0x0c0000, 0x0c003f) AM_WRITE(K056832_word_w)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_WRITE(K053246_word_w)
@@ -387,7 +387,7 @@ static ADDRESS_MAP_START( bucky_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x182000, 0x183fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)	/* Graphic planes mirror */
 	AM_RANGE(0x184000, 0x187fff) AM_RAM							/* extra tile RAM? */
 	AM_RANGE(0x190000, 0x191fff) AM_READ(K056832_rom_word_r)	/* Passthrough to tile roms */
-	AM_RANGE(0x1b0000, 0x1b3fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x1b0000, 0x1b3fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x200000, 0x23ffff) AM_ROM							/* data */
 #if MOO_DEBUG
 	AM_RANGE(0x0c0000, 0x0c003f) AM_READ(K056832_word_r)

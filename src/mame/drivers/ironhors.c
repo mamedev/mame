@@ -74,12 +74,12 @@ static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1800) AM_WRITENOP // ???
 	AM_RANGE(0x1a00, 0x1a01) AM_WRITENOP // ???
 	AM_RANGE(0x1c00, 0x1dff) AM_WRITENOP // ???
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ironhors_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ironhors_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ironhors_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ironhors_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_BASE(&spriteram_2)
+	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_BASE_GENERIC(spriteram2)
 	AM_RANGE(0x3100, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x3900, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -119,12 +119,12 @@ static ADDRESS_MAP_START( farwest_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1a02, 0x1a02) AM_WRITE(ironhors_palettebank_w)
 	AM_RANGE(0x0000, 0x1bff) AM_ROM
 //  AM_RANGE(0x1c00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ironhors_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ironhors_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ironhors_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ironhors_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM
-	AM_RANGE(0x1c00, 0x1dff) AM_RAM AM_BASE(&spriteram_2)
+	AM_RANGE(0x1c00, 0x1dff) AM_RAM AM_BASE_GENERIC(spriteram2)
 	AM_RANGE(0x3000, 0x38ff) AM_RAM
-	AM_RANGE(0x1e00, 0x1eff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1e00, 0x1eff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x3900, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END

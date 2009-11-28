@@ -30,8 +30,8 @@ static TILE_GET_INFO( get_pf_tile_info )	/* For Performan only */
 {
 	int tile,color;
 
-	tile=videoram[tile_index] + ((colorram[tile_index] & 0x03) << 8);
-	color=(colorram[tile_index] >> 3) & 0x0f;
+	tile=machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x03) << 8);
+	color=(machine->generic.colorram.u8[tile_index] >> 3) & 0x0f;
 	SET_TILE_INFO(
 			0,
 			tile,
@@ -43,8 +43,8 @@ static TILE_GET_INFO( get_pf1_tile_info )
 {
 	int tile,color;
 
-	tile=videoram[tile_index] + ((colorram[tile_index] & 0x0f) << 8);
-	color=(colorram[tile_index] & 0xf0) >> 4;
+	tile=machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x0f) << 8);
+	color=(machine->generic.colorram.u8[tile_index] & 0xf0) >> 4;
 
 	SET_TILE_INFO(
 			1,
@@ -98,13 +98,13 @@ VIDEO_START( slapfight )
 
 WRITE8_HANDLER( slapfight_videoram_w )
 {
-	videoram[offset]=data;
+	space->machine->generic.videoram.u8[offset]=data;
 	tilemap_mark_tile_dirty(pf1_tilemap,offset);
 }
 
 WRITE8_HANDLER( slapfight_colorram_w )
 {
-	colorram[offset]=data;
+	space->machine->generic.colorram.u8[offset]=data;
 	tilemap_mark_tile_dirty(pf1_tilemap,offset);
 }
 
@@ -140,7 +140,7 @@ static void slapfght_log_vram(running_machine *machine)
 		int i;
 		for (i=0; i<0x800; i++)
 		{
-			logerror("Offset:%03x   TileRAM:%02x   AttribRAM:%02x   SpriteRAM:%02x\n",i, videoram[i],colorram[i],spriteram[i]);
+			logerror("Offset:%03x   TileRAM:%02x   AttribRAM:%02x   SpriteRAM:%02x\n",i, machine->generic.videoram.u8[i],machine->generic.colorram.u8[i],machine->generic.spriteram.u8[i]);
 		}
 	}
 #endif
@@ -153,9 +153,10 @@ static void slapfght_log_vram(running_machine *machine)
 ***************************************************************************/
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority_to_display )
 {
+	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
 	int offs;
 
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size;offs += 4)
 	{
 		int sx, sy;
 
@@ -206,6 +207,7 @@ VIDEO_UPDATE( perfrman )
 
 VIDEO_UPDATE( slapfight )
 {
+	UINT8 *buffered_spriteram = screen->machine->generic.buffered_spriteram.u8;
 	int offs;
 
 	tilemap_set_flip_all(screen->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -225,7 +227,7 @@ VIDEO_UPDATE( slapfight )
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 
 	/* Draw the sprites */
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0;offs < screen->machine->generic.spriteram_size;offs += 4)
 	{
 		if (flipscreen)
 			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[2],

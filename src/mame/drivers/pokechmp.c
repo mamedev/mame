@@ -106,15 +106,15 @@ INLINE void pokechmp_set_color(running_machine *machine, pen_t color, int rshift
 
 static WRITE8_HANDLER( pokechmp_paletteram_w )
 {
-	paletteram[offset] = data;
-	pokechmp_set_color(space->machine, offset &0x3ff, 0, 5, 10, (paletteram[offset&0x3ff]<<8) | ( paletteram[ (offset&0x3ff)+0x400 ] )  );
+	space->machine->generic.paletteram.u8[offset] = data;
+	pokechmp_set_color(space->machine, offset &0x3ff, 0, 5, 10, (space->machine->generic.paletteram.u8[offset&0x3ff]<<8) | ( space->machine->generic.paletteram.u8[ (offset&0x3ff)+0x400 ] )  );
 }
 
 
 static ADDRESS_MAP_START( pokechmp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(pokechmp_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(pokechmp_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
 	AM_RANGE(0x1801, 0x1801) AM_WRITE(pokechmp_flipscreen_w)
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( pokechmp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW") AM_WRITE(pokechmp_bank_w)
 
 	/* Extra on Poke Champ (not on Pocket Gal) */
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(pokechmp_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(pokechmp_paletteram_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(2)

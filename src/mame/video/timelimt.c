@@ -67,7 +67,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	SET_TILE_INFO(0, videoram[tile_index], 0, 0);
+	SET_TILE_INFO(0, machine->generic.videoram.u8[tile_index], 0, 0);
 }
 
 VIDEO_START( timelimt )
@@ -85,7 +85,7 @@ VIDEO_START( timelimt )
 
 WRITE8_HANDLER( timelimt_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -115,9 +115,10 @@ WRITE8_HANDLER( timelimt_scroll_y_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 
-	for( offs = spriteram_size; offs >= 0; offs -= 4 )
+	for( offs = machine->generic.spriteram_size; offs >= 0; offs -= 4 )
 	{
 		int sy = 240 - spriteram[offs];
 		int sx = spriteram[offs+3];

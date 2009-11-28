@@ -184,7 +184,7 @@ READ8_HANDLER( exidy440_vertical_pos_r )
 WRITE8_HANDLER( exidy440_spriteram_w )
 {
 	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
-	spriteram[offset] = data;
+	space->machine->generic.spriteram.u8[offset] = data;
 }
 
 
@@ -316,7 +316,7 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 	int count = 0;
 
 	/* draw the sprite images, checking for collisions along the way */
-	UINT8 *sprite = spriteram + (SPRITE_COUNT - 1) * 4;
+	UINT8 *sprite = screen->machine->generic.spriteram.u8 + (SPRITE_COUNT - 1) * 4;
 
 	for (i = 0; i < SPRITE_COUNT; i++, sprite -= 4)
 	{

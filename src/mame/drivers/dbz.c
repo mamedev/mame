@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( dbz_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x498000, 0x49ffff) AM_READ(K056832_rom_word_8000_r)	// code near a60 in dbz2, subroutine at 730 in dbz
 	AM_RANGE(0x4a0000, 0x4a0fff) AM_READWRITE(K053247_word_r, K053247_word_w)
 	AM_RANGE(0x4a1000, 0x4a3fff) AM_RAM
-	AM_RANGE(0x4a8000, 0x4abfff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16) // palette
+	AM_RANGE(0x4a8000, 0x4abfff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram) // palette
 	AM_RANGE(0x4c0000, 0x4c0001) AM_READ(K053246_word_r)
 	AM_RANGE(0x4c0000, 0x4c0007) AM_WRITE(K053246_word_w)
 	AM_RANGE(0x4c4000, 0x4c4007) AM_WRITE(K053246_word_w)

@@ -80,8 +80,7 @@ enum
 	ADDRMAP_TOKEN_BASE_GENERIC,
 	ADDRMAP_TOKEN_SIZEPTR,
 	ADDRMAP_TOKEN_SIZE_MEMBER,
-	ADDRMAP_TOKEN_SIZE_GENERIC,
-	ADDRMAP_TOKEN_BASE_SIZE_GENERIC
+	ADDRMAP_TOKEN_SIZE_GENERIC
 };
 
 
@@ -771,7 +770,7 @@ union _addrmap64_token
 	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_BASE_MEMBER, 8, offsetof(_struct, _member), 24),
 
 #define AM_BASE_GENERIC(_member) \
-	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_BASE_GENERIC, 8, offsetof(generic_pointers, _member.ptr), 24),
+	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_BASE_GENERIC, 8, offsetof(generic_pointers, _member), 24),
 
 #define AM_SIZE(_size) \
 	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_SIZEPTR, 8), \
@@ -781,10 +780,7 @@ union _addrmap64_token
 	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_SIZE_MEMBER, 8, offsetof(_struct, _member), 24),
 
 #define AM_SIZE_GENERIC(_member) \
-	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_SIZE_GENERIC, 8, offsetof(generic_pointers, _member.size), 24),
-
-#define AM_BASE_SIZE_GENERIC(_member) \
-	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_BASE_SIZE_GENERIC, 8, offsetof(generic_pointers, _member), 24),
+	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_SIZE_GENERIC, 8, offsetof(generic_pointers, _member##_size), 24),
 
 
 /* common shortcuts */
@@ -810,6 +806,8 @@ union _addrmap64_token
 #define AM_NOP								AM_READWRITE(SMH_NOP, SMH_NOP)
 #define AM_READNOP							AM_READ(SMH_NOP)
 #define AM_WRITENOP							AM_WRITE(SMH_NOP)
+
+#define AM_BASE_SIZE_GENERIC(_member)		AM_BASE_GENERIC(_member) AM_SIZE_GENERIC(_member)
 
 
 

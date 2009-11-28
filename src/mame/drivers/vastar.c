@@ -128,11 +128,11 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf100, 0xf7ff) AM_RAM
 
 	/* in hidden portions of video RAM: (fallthrough) */
-	AM_RANGE(0xc400, 0xc43f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)	/* actually c410-c41f and c430-c43f */
+	AM_RANGE(0xc400, 0xc43f) AM_WRITE(SMH_RAM) AM_BASE_SIZE_GENERIC(spriteram)	/* actually c410-c41f and c430-c43f */
 	AM_RANGE(0xc7c0, 0xc7df) AM_WRITE(SMH_RAM) AM_BASE(&vastar_bg1_scroll)
 	AM_RANGE(0xc7e0, 0xc7ff) AM_WRITE(SMH_RAM) AM_BASE(&vastar_bg2_scroll)
-	AM_RANGE(0xc800, 0xc83f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)	/* actually c810-c81f and c830-c83f */
-	AM_RANGE(0xcc00, 0xcc3f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_3)	/* actually cc10-cc1f and cc30-cc3f */
+	AM_RANGE(0xc800, 0xc83f) AM_WRITE(SMH_RAM) AM_BASE_GENERIC(spriteram2)	/* actually c810-c81f and c830-c83f */
+	AM_RANGE(0xcc00, 0xcc3f) AM_WRITE(SMH_RAM) AM_BASE_GENERIC(spriteram3)	/* actually cc10-cc1f and cc30-cc3f */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_port_map, ADDRESS_SPACE_IO, 8 )

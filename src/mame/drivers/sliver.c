@@ -183,7 +183,7 @@ static WRITE16_HANDLER( sliver_RAMDAC_offset_w )
 
 static WRITE16_HANDLER( sliver_RAMDAC_color_w )
 {
-	colorram[clr_offset]=data;
+	space->machine->generic.colorram.u8[clr_offset]=data;
 	clr_offset=(clr_offset+1)%768;
 }
 
@@ -207,16 +207,16 @@ static void plot_pixel_rgb(int x, int y, UINT32 r, UINT32 g, UINT32 b)
 	}
 }
 
-static void plot_pixel_pal(int x, int y, int addr)
+static void plot_pixel_pal(running_machine *machine, int x, int y, int addr)
 {
 	UINT32 r,g,b;
 	UINT16 color;
 	if(y<0 ||x<0 || x>383 || y> 255) return;
 	addr*=3;
 
-	b=colorram[addr]<<2;
-	g=colorram[addr+1]<<2;
-	r=colorram[addr+2]<<2;
+	b=machine->generic.colorram.u8[addr]<<2;
+	g=machine->generic.colorram.u8[addr+1]<<2;
+	r=machine->generic.colorram.u8[addr+2]<<2;
 
 	if (sliver_bitmap_fg->bpp == 32)
 	{
@@ -277,7 +277,7 @@ static void blit_gfx(running_machine *machine)
 					romdata = rom[romoffs&0x1fffff];
 					if(romdata)
 					{
-						plot_pixel_pal(fifo[tmpptr+5]+fifo[tmpptr+3]-x, fifo[tmpptr+6]+fifo[tmpptr+4]-y, romdata);
+						plot_pixel_pal(machine, fifo[tmpptr+5]+fifo[tmpptr+3]-x, fifo[tmpptr+6]+fifo[tmpptr+4]-y, romdata);
 					}
 					romoffs++;
 				}
@@ -590,7 +590,7 @@ ROM_END
 static DRIVER_INIT(sliver)
 {
 	jpeg_addr = -1;
-	colorram=auto_alloc_array(machine, UINT8, 256*3);
+	machine->generic.colorram.u8=auto_alloc_array(machine, UINT8, 256*3);
 }
 
 GAME( 1996, sliver, 0,        sliver, sliver, sliver, ROT0,  "Hollow Corp", "Sliver", GAME_IMPERFECT_GRAPHICS )

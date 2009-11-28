@@ -35,8 +35,8 @@ WRITE16_HANDLER( alpha68k_paletteram_w )
 	int newword;
 	int r,g,b;
 
-	COMBINE_DATA(paletteram16 + offset);
-	newword = paletteram16[offset];
+	COMBINE_DATA(space->machine->generic.paletteram.u16 + offset);
+	newword = space->machine->generic.paletteram.u16[offset];
 
 	r = ((newword >> 7) & 0x1e) | ((newword >> 14) & 0x01);
 	g = ((newword >> 3) & 0x1e) | ((newword >> 13) & 0x01);
@@ -49,8 +49,8 @@ WRITE16_HANDLER( alpha68k_paletteram_w )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	int tile  = videoram16[2*tile_index]   &0xff;
-	int color = videoram16[2*tile_index+1] &0x0f;
+	int tile  = machine->generic.videoram.u16[2*tile_index]   &0xff;
+	int color = machine->generic.videoram.u16[2*tile_index+1] &0x0f;
 
 	tile=tile | (bank_base<<8);
 
@@ -62,11 +62,11 @@ WRITE16_HANDLER( alpha68k_videoram_w )
 	/* Doh. */
 	if(ACCESSING_BITS_0_7)
 		if(ACCESSING_BITS_8_15)
-			videoram16[offset] = data;
+			space->machine->generic.videoram.u16[offset] = data;
 		else
-			videoram16[offset] = data & 0xff;
+			space->machine->generic.videoram.u16[offset] = data & 0xff;
 	else
-		videoram16[offset] = (data >> 8) & 0xff;
+		space->machine->generic.videoram.u16[offset] = (data >> 8) & 0xff;
 
 	tilemap_mark_tile_dirty(fix_tilemap,offset/2);
 }
@@ -87,6 +87,7 @@ VIDEO_START( alpha68k )
 //AT
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int j, int s, int e)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs,mx,my,color,tile,fx,fy,i;
 
 	for (offs = s; offs < e; offs += 0x40 )
@@ -225,6 +226,7 @@ WRITE16_HANDLER( alpha68k_V_video_control_w )
 
 static void draw_sprites_V(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int j, int s, int e, int fx_mask, int fy_mask, int sprite_mask)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs,mx,my,color,tile,fx,fy,i;
 
 	for (offs = s; offs < e; offs += 0x40 )
@@ -272,6 +274,7 @@ static void draw_sprites_V(running_machine *machine, bitmap_t *bitmap, const rec
 
 VIDEO_UPDATE( alpha68k_V )
 {
+	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
 	static int last_bank=0;
 
 	if (last_bank!=bank_base)
@@ -331,6 +334,7 @@ VIDEO_UPDATE( alpha68k_V_sb )
 //AT
 static void draw_sprites_I(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int c, int d, int yshift)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int data, offs, mx, my, tile, color, fy, i;
 	UINT8 *color_prom = memory_region(machine, "user1");
 	gfx_element *gfx = machine->gfx[0];
@@ -436,6 +440,7 @@ void jongbou_video_banking(int *bank, int data)
 
 static void kyros_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int c,int d)
 {
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs,mx,my,color,tile,i,bank,fy,fx;
 	int data;
 	UINT8 *color_prom = memory_region(machine, "user1");
@@ -484,7 +489,7 @@ static void kyros_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 
 VIDEO_UPDATE( kyros )
 {
-	colortable_entry_set_value(screen->machine->colortable, 0x100, *videoram16 & 0xff);
+	colortable_entry_set_value(screen->machine->colortable, 0x100, *screen->machine->generic.videoram.u16 & 0xff);
 	bitmap_fill(bitmap, cliprect, 0x100); //AT
 
 	kyros_draw_sprites(screen->machine, bitmap,cliprect,2,0x0800);
@@ -498,6 +503,7 @@ VIDEO_UPDATE( kyros )
 static void sstingry_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int c,int d)
 {
 //AT
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int data,offs,mx,my,color,tile,i,bank,fy,fx;
 
 	for (offs=0; offs<0x400; offs+=0x20)
@@ -541,7 +547,7 @@ static void sstingry_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 VIDEO_UPDATE( sstingry )
 {
-	colortable_entry_set_value(screen->machine->colortable, 0x100, *videoram16 & 0xff);
+	colortable_entry_set_value(screen->machine->colortable, 0x100, *screen->machine->generic.videoram.u16 & 0xff);
 	bitmap_fill(bitmap, cliprect, 0x100); //AT
 
 	sstingry_draw_sprites(screen->machine, bitmap,cliprect,2,0x0800);

@@ -109,6 +109,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	int offs;
 
 	for (offs = 0;offs <0x800;offs += 4) {
@@ -176,7 +177,7 @@ VIDEO_UPDATE( karnov )
 
 static TILE_GET_INFO( get_fix_tile_info )
 {
-	int tile=videoram16[tile_index];
+	int tile=machine->generic.videoram.u16[tile_index];
 	SET_TILE_INFO(
 			0,
 			tile&0xfff,
@@ -186,7 +187,7 @@ static TILE_GET_INFO( get_fix_tile_info )
 
 WRITE16_HANDLER( karnov_videoram_w )
 {
-	COMBINE_DATA(&videoram16[offset]);
+	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
 	tilemap_mark_tile_dirty(fix_tilemap,offset);
 }
 

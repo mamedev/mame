@@ -47,8 +47,8 @@ READ8_HANDLER(nycaptor_spriteram_r)
 static TILE_GET_INFO( get_tile_info )
 {
 	int pal;
-	tileinfo->category = (videoram[tile_index*2 + 1] & 0x30)>>4;
-	pal=videoram[tile_index*2+1]&0x0f;
+	tileinfo->category = (machine->generic.videoram.u8[tile_index*2 + 1] & 0x30)>>4;
+	pal=machine->generic.videoram.u8[tile_index*2+1]&0x0f;
   tileinfo->group=0;
   if((!nycaptor_spot())&&(pal==6))tileinfo->group=1;
 	if(((nycaptor_spot()==3)&&(pal==8))||((nycaptor_spot()==1)&&(pal==0xc)))tileinfo->group=2;
@@ -62,7 +62,7 @@ static TILE_GET_INFO( get_tile_info )
 
 	SET_TILE_INFO(
 			0,
-			videoram[tile_index*2] + ((videoram[tile_index*2+1] & 0xc0) << 2) +0x400 * char_bank,
+			machine->generic.videoram.u8[tile_index*2] + ((machine->generic.videoram.u8[tile_index*2+1] & 0xc0) << 2) +0x400 * char_bank,
 			pal,0
 			);
 }
@@ -78,20 +78,20 @@ VIDEO_START( nycaptor )
   tilemap_set_transmask(bg_tilemap,2,0xfffc,0x0003);//split 2
   tilemap_set_transmask(bg_tilemap,3,0xfff0,0x000f);//split 3
 
-	paletteram = auto_alloc_array(machine, UINT8, 0x200);
-	paletteram_2 = auto_alloc_array(machine, UINT8, 0x200);
+	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
+	machine->generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x200);
 	tilemap_set_scroll_cols(bg_tilemap,32);
 }
 
 WRITE8_HANDLER( nycaptor_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset>>1);
 }
 
 READ8_HANDLER( nycaptor_videoram_r )
 {
-	return videoram[offset];
+	return space->machine->generic.videoram.u8[offset];
 }
 
 WRITE8_HANDLER( nycaptor_palette_w )
@@ -108,9 +108,9 @@ WRITE8_HANDLER( nycaptor_palette_w )
 READ8_HANDLER( nycaptor_palette_r )
 {
 	if (offset & 0x100)
-		return paletteram_2[ (offset & 0xff) + (palette_bank << 8) ];
+		return space->machine->generic.paletteram2.u8[ (offset & 0xff) + (palette_bank << 8) ];
 	else
-		return paletteram  [ (offset & 0xff) + (palette_bank << 8) ];
+		return space->machine->generic.paletteram.u8  [ (offset & 0xff) + (palette_bank << 8) ];
 }
 
 WRITE8_HANDLER( nycaptor_gfxctrl_w )

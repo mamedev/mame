@@ -144,8 +144,8 @@ static TILE_GET_INFO( get_bgtile_info )
 
 static TILE_GET_INFO( get_txttile_info )
 {
-	int code=videoram[tile_index*4];
-	int attr=videoram[tile_index*4+2];
+	int code=machine->generic.videoram.u8[tile_index*4];
+	int attr=machine->generic.videoram.u8[tile_index*4+2];
 	int color = attr & 0x07;
 
 	tileinfo->group = color;
@@ -174,10 +174,10 @@ static WRITE8_HANDLER(t5182shared_w)
 
 static ADDRESS_MAP_START( panicr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_BASE(&mainram)
-	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x03000, 0x03fff) AM_RAM
 	AM_RANGE(0x08000, 0x0bfff) AM_RAM AM_REGION("user3", 0) //attribue map ?
-	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x0d000, 0x0d000) AM_WRITE(t5182_sound_irq_w)
 	AM_RANGE(0x0d002, 0x0d002) AM_READ(t5182_sharedram_semaphore_snd_r)
 	AM_RANGE(0x0d004, 0x0d004) AM_WRITE(t5182_sharedram_semaphore_main_acquire_w)
@@ -202,6 +202,7 @@ static VIDEO_START( panicr )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs,fx,fy,x,y,color,sprite;
 
 	for (offs = 0; offs<0x1000; offs+=16)

@@ -75,13 +75,13 @@ PALETTE_INIT( speedatk )
 
 WRITE8_HANDLER( speedatk_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( speedatk_colorram_w )
 {
-	colorram[offset] = data;
+	space->machine->generic.colorram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -89,9 +89,9 @@ static TILE_GET_INFO( get_tile_info )
 {
 	int code, color, region;
 
-	code = videoram[tile_index] + ((colorram[tile_index] & 0xe0) << 3);
-	color = colorram[tile_index] & 0x1f;
-	region = (colorram[tile_index] & 0x10) >> 4;
+	code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0xe0) << 3);
+	color = machine->generic.colorram.u8[tile_index] & 0x1f;
+	region = (machine->generic.colorram.u8[tile_index] & 0x10) >> 4;
 
 	SET_TILE_INFO(region, code, color, 0);
 }

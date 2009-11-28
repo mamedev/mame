@@ -49,7 +49,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( pang )
 {
 	pang_objram=NULL;
-	paletteram=NULL;
+	machine->generic.paletteram.u8=NULL;
 
 
 	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,64,32);
@@ -64,7 +64,7 @@ VIDEO_START( pang )
 	/*
         Palette RAM
     */
-	paletteram = auto_alloc_array_clear(machine, UINT8, 2*machine->config->total_colors);
+	machine->generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 2*machine->config->total_colors);
 }
 
 
@@ -230,8 +230,8 @@ WRITE8_HANDLER( pang_paletteram_w )
 
 READ8_HANDLER( pang_paletteram_r )
 {
-	if (paletteram_bank) return paletteram[offset + 0x800];
-	return paletteram[offset];
+	if (paletteram_bank) return space->machine->generic.paletteram.u8[offset + 0x800];
+	return space->machine->generic.paletteram.u8[offset];
 }
 
 WRITE8_HANDLER( mgakuen_paletteram_w )
@@ -241,7 +241,7 @@ WRITE8_HANDLER( mgakuen_paletteram_w )
 
 READ8_HANDLER( mgakuen_paletteram_r )
 {
-	return paletteram[offset];
+	return space->machine->generic.paletteram.u8[offset];
 }
 
 

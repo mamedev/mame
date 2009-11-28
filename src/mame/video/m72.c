@@ -115,7 +115,7 @@ static void register_savestate(running_machine *machine)
 	state_save_register_global(machine, scrolly1);
 	state_save_register_global(machine, scrollx2);
 	state_save_register_global(machine, scrolly2);
-	state_save_register_global_pointer(machine, m72_spriteram, spriteram_size/2);
+	state_save_register_global_pointer(machine, m72_spriteram, machine->generic.spriteram_size/2);
 }
 
 
@@ -124,7 +124,7 @@ VIDEO_START( m72 )
 	bg_tilemap = tilemap_create(machine, m72_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 	fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	m72_spriteram = auto_alloc_array(machine, UINT16, spriteram_size/2);
+	m72_spriteram = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
 
 	tilemap_set_transmask(fg_tilemap,0,0xffff,0x0001);
 	tilemap_set_transmask(fg_tilemap,1,0x00ff,0xff01);
@@ -135,7 +135,7 @@ VIDEO_START( m72 )
 	//tilemap_set_transmask(bg_tilemap,2,0x0001,0xfffe);
 	tilemap_set_transmask(bg_tilemap,2,0x0007,0xfff8);
 
-	memset(m72_spriteram,0,spriteram_size);
+	memset(m72_spriteram,0,machine->generic.spriteram_size);
 
 	tilemap_set_scrolldx(fg_tilemap,0,0);
 	tilemap_set_scrolldy(fg_tilemap,-128,16);
@@ -151,7 +151,7 @@ VIDEO_START( rtype2 )
 	bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 	fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	m72_spriteram = auto_alloc_array(machine, UINT16, spriteram_size/2);
+	m72_spriteram = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
 
 	tilemap_set_transmask(fg_tilemap,0,0xffff,0x0001);
 	tilemap_set_transmask(fg_tilemap,1,0x00ff,0xff01);
@@ -161,7 +161,7 @@ VIDEO_START( rtype2 )
 	tilemap_set_transmask(bg_tilemap,1,0x00ff,0xff00);
 	tilemap_set_transmask(bg_tilemap,2,0x0001,0xfffe);
 
-	memset(m72_spriteram,0,spriteram_size);
+	memset(m72_spriteram,0,machine->generic.spriteram_size);
 
 	tilemap_set_scrolldx(fg_tilemap,4,0);
 	tilemap_set_scrolldy(fg_tilemap,-128,16);
@@ -190,7 +190,7 @@ VIDEO_START( majtitle )
 	bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,majtitle_scan_rows,8,8,128,64);
 	fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	m72_spriteram = auto_alloc_array(machine, UINT16, spriteram_size/2);
+	m72_spriteram = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
 
 	tilemap_set_transmask(fg_tilemap,0,0xffff,0x0001);
 	tilemap_set_transmask(fg_tilemap,1,0x00ff,0xff01);
@@ -200,7 +200,7 @@ VIDEO_START( majtitle )
 	tilemap_set_transmask(bg_tilemap,1,0x00ff,0xff00);
 	tilemap_set_transmask(bg_tilemap,2,0x0001,0xfffe);
 
-	memset(m72_spriteram,0,spriteram_size);
+	memset(m72_spriteram,0,machine->generic.spriteram_size);
 
 	tilemap_set_scrolldx(fg_tilemap,4,0);
 	tilemap_set_scrolldy(fg_tilemap,-128,16);
@@ -216,7 +216,7 @@ VIDEO_START( hharry )
 	bg_tilemap = tilemap_create(machine, hharry_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 	fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,   tilemap_scan_rows,8,8,64,64);
 
-	m72_spriteram = auto_alloc_array(machine, UINT16, spriteram_size/2);
+	m72_spriteram = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
 
 	tilemap_set_transmask(fg_tilemap,0,0xffff,0x0001);
 	tilemap_set_transmask(fg_tilemap,1,0x00ff,0xff01);
@@ -226,7 +226,7 @@ VIDEO_START( hharry )
 	tilemap_set_transmask(bg_tilemap,1,0x00ff,0xff00);
 	tilemap_set_transmask(bg_tilemap,2,0x0001,0xfffe);
 
-	memset(m72_spriteram,0,spriteram_size);
+	memset(m72_spriteram,0,machine->generic.spriteram_size);
 
 	tilemap_set_scrolldx(fg_tilemap,4,0);
 	tilemap_set_scrolldy(fg_tilemap,-128,16);
@@ -249,7 +249,7 @@ READ16_HANDLER( m72_palette1_r )
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	return paletteram16[offset] | 0xffe0;	/* only D0-D4 are connected */
+	return space->machine->generic.paletteram.u16[offset] | 0xffe0;	/* only D0-D4 are connected */
 }
 
 READ16_HANDLER( m72_palette2_r )
@@ -257,7 +257,7 @@ READ16_HANDLER( m72_palette2_r )
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	return paletteram16_2[offset] | 0xffe0;	/* only D0-D4 are connected */
+	return space->machine->generic.paletteram2.u16[offset] | 0xffe0;	/* only D0-D4 are connected */
 }
 
 INLINE void changecolor(running_machine *machine,int color,int r,int g,int b)
@@ -270,13 +270,13 @@ WRITE16_HANDLER( m72_palette1_w )
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 	offset &= 0x0ff;
 	changecolor(space->machine,
 			offset,
-			paletteram16[offset + 0x000],
-			paletteram16[offset + 0x200],
-			paletteram16[offset + 0x400]);
+			space->machine->generic.paletteram.u16[offset + 0x000],
+			space->machine->generic.paletteram.u16[offset + 0x200],
+			space->machine->generic.paletteram.u16[offset + 0x400]);
 }
 
 WRITE16_HANDLER( m72_palette2_w )
@@ -284,13 +284,13 @@ WRITE16_HANDLER( m72_palette2_w )
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	COMBINE_DATA(&paletteram16_2[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram2.u16[offset]);
 	offset &= 0x0ff;
 	changecolor(space->machine,
 			offset + 256,
-			paletteram16_2[offset + 0x000],
-			paletteram16_2[offset + 0x200],
-			paletteram16_2[offset + 0x400]);
+			space->machine->generic.paletteram2.u16[offset + 0x000],
+			space->machine->generic.paletteram2.u16[offset + 0x200],
+			space->machine->generic.paletteram2.u16[offset + 0x400]);
 }
 
 WRITE16_HANDLER( m72_videoram1_w )
@@ -333,7 +333,7 @@ WRITE16_HANDLER( m72_scrolly2_w )
 WRITE16_HANDLER( m72_dmaon_w )
 {
 	if (ACCESSING_BITS_0_7)
-		memcpy(m72_spriteram,spriteram16,spriteram_size);
+		memcpy(m72_spriteram,space->machine->generic.spriteram.u16,space->machine->generic.spriteram_size);
 }
 
 
@@ -408,7 +408,7 @@ static void m72_draw_sprites(running_machine *machine, bitmap_t *bitmap,const re
 	int offs;
 
 	offs = 0;
-	while (offs < spriteram_size/2)
+	while (offs < machine->generic.spriteram_size/2)
 	{
 		int code,color,sx,sy,flipx,flipy,w,h,x,y;
 
@@ -457,9 +457,10 @@ static void m72_draw_sprites(running_machine *machine, bitmap_t *bitmap,const re
 
 static void majtitle_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	UINT16 *spriteram16_2 = machine->generic.spriteram2.u16;
 	int offs;
 
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size;offs += 4)
 	{
 		int code,color,sx,sy,flipx,flipy,w,h,x,y;
 

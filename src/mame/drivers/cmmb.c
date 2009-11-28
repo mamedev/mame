@@ -47,8 +47,8 @@ static VIDEO_UPDATE( cmmb )
 	{
 		for (x=0;x<32;x++)
 		{
-			int tile = videoram[count] & 0x3f;
-			int colour = (videoram[count] & 0xc0)>>6;
+			int tile = screen->machine->generic.videoram.u8[count] & 0x3f;
+			int colour = (screen->machine->generic.videoram.u8[count] & 0xc0)>>6;
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,colour,0,0,x*8,y*8);
 
 			count++;
@@ -142,8 +142,8 @@ static READ8_HANDLER( kludge_r )
 static ADDRESS_MAP_START( cmmb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM /* zero page address */
 //  AM_RANGE(0x13c0, 0x13ff) AM_RAM //spriteram
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE(&videoram)
-	AM_RANGE(0x2480, 0x249f) AM_RAM_WRITE(cmmb_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x2480, 0x249f) AM_RAM_WRITE(cmmb_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x4000, 0x400f) AM_READWRITE(cmmb_input_r,cmmb_output_w) //i/o
 	AM_RANGE(0x4900, 0x4900) AM_READ(kludge_r)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)

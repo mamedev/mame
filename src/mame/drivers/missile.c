@@ -454,7 +454,7 @@ static DIRECT_UPDATE_HANDLER( missile_direct_handler )
 	/* RAM? */
 	if (address < 0x4000)
 	{
-		direct->raw = direct->decrypted = videoram - offset;
+		direct->raw = direct->decrypted = space->machine->generic.videoram.u8 - offset;
 		return ~0;
 	}
 
@@ -561,7 +561,7 @@ static void write_vram(const address_space *space, offs_t address, UINT8 data)
 	vramaddr = address >> 2;
 	vramdata = data_lookup[data >> 6];
 	vrammask = writeprom[(address & 7) | 0x10];
-	videoram[vramaddr] = (videoram[vramaddr] & vrammask) | (vramdata & ~vrammask);
+	space->machine->generic.videoram.u8[vramaddr] = (space->machine->generic.videoram.u8[vramaddr] & vrammask) | (vramdata & ~vrammask);
 
 	/* 3-bit VRAM writes use an extra clock to write the 3rd bit elsewhere */
 	/* on the schematics, this is the MUSHROOM == 1 case */
@@ -570,7 +570,7 @@ static void write_vram(const address_space *space, offs_t address, UINT8 data)
 		vramaddr = get_bit3_addr(address);
 		vramdata = -((data >> 5) & 1);
 		vrammask = writeprom[(address & 7) | 0x18];
-		videoram[vramaddr] = (videoram[vramaddr] & vrammask) | (vramdata & ~vrammask);
+		space->machine->generic.videoram.u8[vramaddr] = (space->machine->generic.videoram.u8[vramaddr] & vrammask) | (vramdata & ~vrammask);
 
 		/* account for the extra clock cycle */
 		cpu_adjust_icount(space->cpu, -1);
@@ -590,7 +590,7 @@ static UINT8 read_vram(const address_space *space, offs_t address)
 	/* this should only be called if MADSEL == 1 */
 	vramaddr = address >> 2;
 	vrammask = 0x11 << (address & 3);
-	vramdata = videoram[vramaddr] & vrammask;
+	vramdata = space->machine->generic.videoram.u8[vramaddr] & vrammask;
 	if ((vramdata & 0xf0) == 0)
 		result &= ~0x80;
 	if ((vramdata & 0x0f) == 0)
@@ -602,7 +602,7 @@ static UINT8 read_vram(const address_space *space, offs_t address)
 	{
 		vramaddr = get_bit3_addr(address);
 		vrammask = 1 << (address & 7);
-		vramdata = videoram[vramaddr] & vrammask;
+		vramdata = space->machine->generic.videoram.u8[vramaddr] & vrammask;
 		if (vramdata == 0)
 			result &= ~0x20;
 
@@ -630,12 +630,12 @@ static VIDEO_UPDATE( missile )
 		UINT16 *dst = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
 
 		int effy = flipscreen ? ((256+24 - y) & 0xff) : y;
-		UINT8 *src = &videoram[effy * 64];
+		UINT8 *src = &screen->machine->generic.videoram.u8[effy * 64];
 		UINT8 *src3 = NULL;
 
 		/* compute the base of the 3rd pixel row */
 		if (effy >= 224)
-			src3 = &videoram[get_bit3_addr(effy << 8)];
+			src3 = &screen->machine->generic.videoram.u8[get_bit3_addr(effy << 8)];
 
 		/* loop over X */
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
@@ -675,7 +675,7 @@ static WRITE8_HANDLER( missile_w )
 
 	/* RAM */
 	if (offset < 0x4000)
-		videoram[offset] = data;
+		space->machine->generic.videoram.u8[offset] = data;
 
 	/* POKEY */
 	else if (offset < 0x4800)
@@ -730,7 +730,7 @@ static READ8_HANDLER( missile_r )
 
 	/* RAM */
 	if (offset < 0x4000)
-		result = videoram[offset];
+		result = space->machine->generic.videoram.u8[offset];
 
 	/* ROM */
 	else if (offset >= 0x5000)
@@ -778,7 +778,7 @@ static READ8_HANDLER( missile_r )
 
 /* complete memory map derived from schematics (implemented above) */
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(missile_r, missile_w) AM_BASE(&videoram)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(missile_r, missile_w) AM_BASE_GENERIC(videoram)
 ADDRESS_MAP_END
 
 

@@ -117,13 +117,13 @@ static PALETTE_INIT( wallc )
 
 static WRITE8_HANDLER( wallc_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	SET_TILE_INFO(0, videoram[tile_index] + 0x100, 1, 0);
+	SET_TILE_INFO(0, machine->generic.videoram.u8[tile_index] + 0x100, 1, 0);
 }
 
 static VIDEO_START( wallc )
@@ -144,7 +144,7 @@ static WRITE8_HANDLER( wallc_coin_counter_w )
 
 static ADDRESS_MAP_START( wallc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(wallc_videoram_w) AM_MIRROR(0xc00) AM_BASE(&videoram)	/* 2114, 2114 */
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(wallc_videoram_w) AM_MIRROR(0xc00) AM_BASE_GENERIC(videoram)	/* 2114, 2114 */
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM		/* 2114, 2114 */
 
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")

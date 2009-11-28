@@ -142,7 +142,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0; offs < spriteram_size; offs += 4)
+	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
 	{
 		int sx, sy, code;
 

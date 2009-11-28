@@ -104,6 +104,7 @@ static void momoko_draw_bg_pri(running_machine *machine, bitmap_t *bitmap, int c
 VIDEO_UPDATE( momoko )
 {
 	int x, y, dx, dy, rx, ry, radr, chr, sy, fx, fy, px, py, offs, col, pri, flip ;
+	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 
 	UINT8 *BG_MAP     = memory_region( screen->machine, "user1" );
 	UINT8 *BG_COL_MAP = memory_region( screen->machine, "user2" );
@@ -220,7 +221,7 @@ VIDEO_UPDATE( momoko )
 
 /* draw sprites (others) */
 
-	for (offs=9*4; offs<spriteram_size; offs +=4)
+	for (offs=9*4; offs<screen->machine->generic.spriteram_size; offs +=4)
 	{
 		chr = spriteram[offs+1] | ((spriteram[offs+2]&0x60)<<3);
 		chr = ((chr & 0x380) << 1) | (chr & 0x7f);
@@ -274,7 +275,7 @@ VIDEO_UPDATE( momoko )
 				py = 255-y;
 			}
 			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
-				videoram[(sy>>3)*32+x]*8+dy,
+				screen->machine->generic.videoram.u8[(sy>>3)*32+x]*8+dy,
 				col,
 				flip,0,
 				px,py,0);

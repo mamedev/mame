@@ -64,6 +64,7 @@
 UINT32 *model2_bufferram, *model2_colorxlat;
 static UINT32 *model2_workram, *model2_backup1, *model2_backup2;
 UINT32 *model2_textureram0, *model2_textureram1, *model2_lumaram;
+UINT32 *model2_paletteram32;
 static UINT32 model2_intreq;
 static UINT32 model2_intena;
 static UINT32 model2_coproctl, model2_coprocnt, model2_geoctl, model2_geocnt;
@@ -397,11 +398,11 @@ static void chcolor(running_machine *machine, pen_t color, UINT16 data)
 
 static WRITE32_HANDLER( pal32_w )
 {
-	COMBINE_DATA(paletteram32 + offset);
+	COMBINE_DATA(model2_paletteram32 + offset);
 	if(ACCESSING_BITS_0_15)
-		chcolor(space->machine, offset * 2, paletteram32[offset]);
+		chcolor(space->machine, offset * 2, model2_paletteram32[offset]);
 	if(ACCESSING_BITS_16_31)
-		chcolor(space->machine, offset * 2 + 1, paletteram32[offset] >> 16);
+		chcolor(space->machine, offset * 2 + 1, model2_paletteram32[offset] >> 16);
 }
 
 static WRITE32_HANDLER( ctrl0_w )
@@ -1241,7 +1242,7 @@ static ADDRESS_MAP_START( model2_base_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01100000, 0x0110ffff) AM_READWRITE(sys24_tile32_r, sys24_tile32_w) AM_MIRROR(0x10000)
 	AM_RANGE(0x01180000, 0x011fffff) AM_READWRITE(sys24_char32_r, sys24_char32_w) AM_MIRROR(0x100000)
 
-	AM_RANGE(0x01800000, 0x01803fff) AM_RAM_WRITE(pal32_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x01800000, 0x01803fff) AM_RAM_WRITE(pal32_w) AM_BASE(&model2_paletteram32)
 	AM_RANGE(0x01810000, 0x0181bfff) AM_RAM AM_BASE(&model2_colorxlat)
 	AM_RANGE(0x0181c000, 0x0181c003) AM_WRITE(model2_3d_zclip_w)
 	AM_RANGE(0x01a10000, 0x01a1ffff) AM_READWRITE(network_r, network_w)

@@ -176,9 +176,9 @@ static ADDRESS_MAP_START( mjkjidai_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM	AM_BASE(&nvram) AM_SIZE(&nvram_size)	// cleared and initialized on startup if bit 6 if port 00 is 0
-	AM_RANGE(0xe000, 0xe01f) AM_RAM AM_BASE(&spriteram)			// shared with tilemap ram
-	AM_RANGE(0xe800, 0xe81f) AM_RAM AM_BASE(&spriteram_2)		// shared with tilemap ram
-	AM_RANGE(0xf000, 0xf01f) AM_RAM AM_BASE(&spriteram_3)		// shared with tilemap ram
+	AM_RANGE(0xe000, 0xe01f) AM_RAM AM_BASE_GENERIC(spriteram)			// shared with tilemap ram
+	AM_RANGE(0xe800, 0xe81f) AM_RAM AM_BASE_GENERIC(spriteram2)		// shared with tilemap ram
+	AM_RANGE(0xf000, 0xf01f) AM_RAM AM_BASE_GENERIC(spriteram3)		// shared with tilemap ram
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mjkjidai_videoram_w) AM_BASE(&mjkjidai_videoram)
 ADDRESS_MAP_END
 

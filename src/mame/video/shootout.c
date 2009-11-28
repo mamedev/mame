@@ -41,8 +41,8 @@ PALETTE_INIT( shootout )
 
 
 static TILE_GET_INFO( get_bg_tile_info ){
-	int attributes = videoram[tile_index+0x400]; /* CCCC -TTT */
-	int tile_number = videoram[tile_index] + 256*(attributes&7);
+	int attributes = machine->generic.videoram.u8[tile_index+0x400]; /* CCCC -TTT */
+	int tile_number = machine->generic.videoram.u8[tile_index] + 256*(attributes&7);
 	int color = attributes>>4;
 	SET_TILE_INFO(
 			2,
@@ -63,7 +63,7 @@ static TILE_GET_INFO( get_fg_tile_info ){
 }
 
 WRITE8_HANDLER( shootout_videoram_w ){
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty( background, offset&0x3ff );
 }
 WRITE8_HANDLER( shootout_textram_w ){
@@ -78,6 +78,7 @@ VIDEO_START( shootout ){
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_bits ){
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	static int bFlicker;
 	const gfx_element *gfx = machine->gfx[1];
 	const UINT8 *source = spriteram+127*4;

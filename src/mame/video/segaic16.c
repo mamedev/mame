@@ -470,6 +470,7 @@ UINT16 *segaic16_spriteram_0;
 UINT16 *segaic16_spriteram_1;
 UINT16 *segaic16_roadram_0;
 UINT16 *segaic16_rotateram_0;
+UINT16 *segaic16_paletteram;
 
 
 
@@ -578,9 +579,9 @@ WRITE16_HANDLER( segaic16_paletteram_w )
 	int r, g, b;
 
 	/* get the new value */
-	newval = paletteram16[offset];
+	newval = segaic16_paletteram[offset];
 	COMBINE_DATA(&newval);
-	paletteram16[offset] = newval;
+	segaic16_paletteram[offset] = newval;
 
 	/*     byte 0    byte 1 */
 	/*  sBGR BBBB GGGG RRRR */
@@ -1653,7 +1654,7 @@ static void segaic16_sprites_hangon_draw(running_machine *machine, struct sprite
 		{																	\
 			/* shadow/hilight mode? */										\
 			if (shadow && pix == 0xa)										\
-				dest[x] += (paletteram16[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries;	\
+				dest[x] += (segaic16_paletteram[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries;	\
 																			\
 			/* regular draw */												\
 			else															\
@@ -1823,7 +1824,7 @@ static void segaic16_sprites_sharrier_draw(running_machine *machine, struct spri
 		{																	\
 			/* shadow/hilight mode? */										\
 			if (color == info->colorbase + (0x3f << 4))						\
-				dest[x] += (paletteram16[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries;	\
+				dest[x] += (segaic16_paletteram[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries;	\
 																			\
 			/* regular draw */												\
 			else															\
@@ -1982,7 +1983,7 @@ static void segaic16_sprites_16a_draw(running_machine *machine, struct sprite_in
 				/* we have to check this for System 18 so that we don't */  \
 				/* attempt to shadow VDP pixels */							\
 				if (dest[x] < palette.entries)								\
-					dest[x] += (paletteram16[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries; \
+					dest[x] += (segaic16_paletteram[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries; \
 			}																\
 																			\
 			/* regular draw */												\
@@ -2148,7 +2149,7 @@ static void segaic16_sprites_16b_draw(running_machine *machine, struct sprite_in
 		{																	\
 			/* shadow/hilight mode? */										\
 			if (pix == 14)													\
-				dest[x] += (paletteram16[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries;	\
+				dest[x] += (segaic16_paletteram[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries;	\
 																			\
 			/* regular draw */												\
 			else															\
@@ -2325,7 +2326,7 @@ static void segaic16_sprites_yboard_16b_draw(running_machine *machine, struct sp
 		{																	\
 			/* shadow/hilight mode? */										\
 			if (shadow && pix == 0xa)										\
-				dest[x] += (paletteram16[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries;	\
+				dest[x] += (segaic16_paletteram[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries;	\
 																			\
 			/* regular draw */												\
 			else															\
@@ -2681,7 +2682,7 @@ static void segaic16_sprites_yboard_draw(running_machine *machine, struct sprite
 		{																	\
 			/* shadow/hilight mode? */										\
 			if (color == info->colorbase + (0x3f << 4))						\
-				dest[x] += (paletteram16[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries;	\
+				dest[x] += (segaic16_paletteram[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries;	\
 																			\
 			/* regular draw */												\
 			else															\

@@ -103,7 +103,7 @@ static void draw_bg(running_machine *machine, bitmap_t *bitmap, const rectangle 
 
 	for (offs = 0;offs < 0x400;offs++)
 	{
-		int code = videoram[0x400+offs];
+		int code = machine->generic.videoram.u8[0x400+offs];
 
 		int sx = offs % 32;
 		int sy = offs / 32;
@@ -146,7 +146,7 @@ static void draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle 
 		/* the following line is most likely wrong */
 		int transpen = (bg_on && sx >= 22) ? -1 : 0;
 
-		int code = videoram[offs];
+		int code = machine->generic.videoram.u8[offs];
 
 		if (flipx) sx = 31 - sx;
 		if (flipy) sy = 31 - sy;
@@ -163,13 +163,14 @@ static void draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle 
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs;
 	const UINT8 *gfx;
 
 	profiler_mark_start(PROFILER_USER1);
 
 	gfx = memory_region(machine, "gfx2");
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size;offs += 4)
 	{
 		int sx,sy,flipy,zoom,ch,x,px,y;
 		const UINT8 *lookup;

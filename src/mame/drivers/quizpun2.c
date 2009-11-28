@@ -298,7 +298,7 @@ static ADDRESS_MAP_START( quizpun2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0xc000, 0xc7ff ) AM_RAM_WRITE( bg_ram_w ) AM_BASE( &bg_ram )	// 4 * 400
 	AM_RANGE( 0xc800, 0xcfff ) AM_RAM										//
 
-	AM_RANGE( 0xd000, 0xd3ff ) AM_RAM_WRITE( paletteram_xRRRRRGGGGGBBBBB_le_w )  AM_BASE( &paletteram )
+	AM_RANGE( 0xd000, 0xd3ff ) AM_RAM_WRITE( paletteram_xRRRRRGGGGGBBBBB_le_w )  AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0xe000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 

@@ -202,8 +202,8 @@ static WRITE16_HANDLER( bmc_RAMDAC_offset_w )
 
 static WRITE16_HANDLER( bmc_RAMDAC_color_w )
 {
-		colorram[clr_offset]=data;
-		palette_set_color_rgb(space->machine,clr_offset/3,pal6bit(colorram[(clr_offset/3)*3]),pal6bit(colorram[(clr_offset/3)*3+1]),pal6bit(colorram[(clr_offset/3)*3+2]));
+		space->machine->generic.colorram.u8[clr_offset]=data;
+		palette_set_color_rgb(space->machine,clr_offset/3,pal6bit(space->machine->generic.colorram.u8[(clr_offset/3)*3]),pal6bit(space->machine->generic.colorram.u8[(clr_offset/3)*3+1]),pal6bit(space->machine->generic.colorram.u8[(clr_offset/3)*3+2]));
 		clr_offset=(clr_offset+1)%768;
 }
 
@@ -551,7 +551,7 @@ ROM_END
 
 static DRIVER_INIT(bmcbowl)
 {
-	colorram = auto_alloc_array(machine, UINT8, 768);
+	machine->generic.colorram.u8 = auto_alloc_array(machine, UINT8, 768);
 }
 
 GAME( 1994, bmcbowl,    0, bmcbowl,    bmcbowl,    bmcbowl, ROT0,  "BMC", "BMC Bowling", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

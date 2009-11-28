@@ -48,7 +48,7 @@ VIDEO_EOF( tokib )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	int tile = videoram16[tile_index];
+	int tile = machine->generic.videoram.u16[tile_index];
 	int color = (tile >> 12) & 0xf;
 
 	tile &= 0xfff;
@@ -110,7 +110,7 @@ VIDEO_START( toki )
 
 WRITE16_HANDLER( toki_foreground_videoram16_w )
 {
-	COMBINE_DATA(&videoram16[offset]);
+	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
 	tilemap_mark_tile_dirty(text_layer,offset);
 }
 
@@ -180,9 +180,9 @@ static void toki_draw_sprites(running_machine *machine, bitmap_t *bitmap,const r
 	int x,y,xoffs,yoffs,tile,flipx,flipy,color,offs;
 	UINT16 *sprite_word;
 
-	for (offs = (spriteram_size/2)-4;offs >= 0;offs -= 4)
+	for (offs = (machine->generic.spriteram_size/2)-4;offs >= 0;offs -= 4)
 	{
-		sprite_word = &buffered_spriteram16[offs];
+		sprite_word = &machine->generic.buffered_spriteram.u16[offs];
 
 		if ((sprite_word[2] != 0xf000) && (sprite_word[0] != 0xffff))
 		{
@@ -223,9 +223,9 @@ static void tokib_draw_sprites(running_machine *machine, bitmap_t *bitmap,const 
 	int x,y,tile,flipx,color,offs;
 	UINT16 *sprite_word;
 
-	for (offs = 0;offs < spriteram_size / 2;offs += 4)
+	for (offs = 0;offs < machine->generic.spriteram_size / 2;offs += 4)
 	{
-		sprite_word = &buffered_spriteram16[offs];
+		sprite_word = &machine->generic.buffered_spriteram.u16[offs];
 
 		if (sprite_word[0] == 0xf100)
 			break;

@@ -86,8 +86,8 @@ WRITE16_HANDLER( foodf_paletteram_w )
 {
 	int newword, r, g, b, bit0, bit1, bit2;
 
-	COMBINE_DATA(&paletteram16[offset]);
-	newword = paletteram16[offset];
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	newword = space->machine->generic.paletteram.u16[offset];
 
 	/* only the bottom 8 bits are used */
 	/* red component */
@@ -123,6 +123,7 @@ VIDEO_UPDATE( foodf )
 	int offs;
 	const gfx_element *gfx = screen->machine->gfx[1];
 	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
+	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
 
 	/* first draw the playfield opaquely */
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, TILEMAP_DRAW_OPAQUE, 0);

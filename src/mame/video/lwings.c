@@ -172,7 +172,7 @@ WRITE8_HANDLER( trojan_bg2_image_w )
 
 ***************************************************************************/
 
-INLINE int is_sprite_on(int offs)
+INLINE int is_sprite_on(UINT8 *buffered_spriteram, int offs)
 {
 	int sx,sy;
 
@@ -185,12 +185,13 @@ INLINE int is_sprite_on(int offs)
 
 static void lwings_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
 	int offs;
 
 
-	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4;offs >= 0;offs -= 4)
 	{
-		if (is_sprite_on(offs))
+		if (is_sprite_on(buffered_spriteram, offs))
 		{
 			int code,color,sx,sy,flipx,flipy;
 
@@ -221,12 +222,13 @@ static void lwings_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 
 static void trojan_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
 	int offs;
 
 
-	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4;offs >= 0;offs -= 4)
 	{
-		if (is_sprite_on(offs))
+		if (is_sprite_on(buffered_spriteram, offs))
 		{
 			int code,color,sx,sy,flipx,flipy;
 

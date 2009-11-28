@@ -146,7 +146,7 @@ static READ32_HANDLER( simpl156_inputs_read )
 
 static READ32_HANDLER( simpl156_palette_r )
 {
-	return paletteram16[offset]^0xffff0000;
+	return space->machine->generic.paletteram.u16[offset]^0xffff0000;
 }
 
 static WRITE32_HANDLER( simpl156_palette_w )
@@ -157,10 +157,10 @@ static WRITE32_HANDLER( simpl156_palette_w )
 	data &=0x0000ffff;
 	mem_mask &=0x0000ffff;
 
-	COMBINE_DATA(&paletteram16[offset]);
+	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
 	color = offset;
 
-	dat = paletteram16[offset]&0xffff;
+	dat = space->machine->generic.paletteram.u16[offset]&0xffff;
 	palette_set_color_rgb(space->machine,color,pal5bit(dat >> 0),pal5bit(dat >> 5),pal5bit(dat >> 10));
 }
 
@@ -192,7 +192,7 @@ static WRITE32_HANDLER( simpl156_eeprom_w )
 
 static READ32_HANDLER( simpl156_spriteram_r )
 {
-	return spriteram32[offset]^0xffff0000;
+	return space->machine->generic.spriteram.u32[offset]^0xffff0000;
 }
 
 static WRITE32_HANDLER( simpl156_spriteram_w )
@@ -200,7 +200,7 @@ static WRITE32_HANDLER( simpl156_spriteram_w )
 	data &=0x0000ffff;
 	mem_mask &=0x0000ffff;
 
-	COMBINE_DATA(&spriteram32[offset]);
+	COMBINE_DATA(&space->machine->generic.spriteram.u32[offset]);
 }
 
 static UINT32*simpl156_mainram;
@@ -291,7 +291,7 @@ static WRITE32_HANDLER( simpl156_pf2_data_w )
 static ADDRESS_MAP_START( joemacr_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE(&simpl156_mainram) // main ram
-	AM_RANGE(0x110000, 0x111fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x110000, 0x111fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x130000, 0x130003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
 	AM_RANGE(0x140000, 0x14001f) AM_READWRITE(simpl156_pf12_control_r, simpl156_pf12_control_w)
@@ -315,7 +315,7 @@ static ADDRESS_MAP_START( chainrec_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE(&simpl156_systemram) // work ram (32-bit)
 	AM_RANGE(0x3c0000, 0x3c0003) AM_DEVREADWRITE8("okimusic", okim6295_r, okim6295_w, 0x000000ff)
 	AM_RANGE(0x400000, 0x407fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE(&simpl156_mainram) // main ram?
-	AM_RANGE(0x410000, 0x411fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x410000, 0x411fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x420000, 0x420fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x430000, 0x430003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
 	AM_RANGE(0x440000, 0x44001f) AM_READWRITE(simpl156_pf12_control_r, simpl156_pf12_control_w)
@@ -336,7 +336,7 @@ static ADDRESS_MAP_START( magdrop_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE(&simpl156_systemram) // work ram (32-bit)
 	AM_RANGE(0x340000, 0x340003) AM_DEVREADWRITE8("okimusic", okim6295_r, okim6295_w, 0x000000ff)
 	AM_RANGE(0x380000, 0x387fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE(&simpl156_mainram) // main ram?
-	AM_RANGE(0x390000, 0x391fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x390000, 0x391fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x3a0000, 0x3a0fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x3b0000, 0x3b0003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
 	AM_RANGE(0x3c0000, 0x3c001f) AM_READWRITE(simpl156_pf12_control_r, simpl156_pf12_control_w)
@@ -357,7 +357,7 @@ static ADDRESS_MAP_START( magdropp_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE(&simpl156_systemram) // work ram (32-bit)
 	AM_RANGE(0x4c0000, 0x4c0003) AM_DEVREADWRITE8("okimusic", okim6295_r, okim6295_w, 0x000000ff)
 	AM_RANGE(0x680000, 0x687fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE(&simpl156_mainram) // main ram?
-	AM_RANGE(0x690000, 0x691fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x690000, 0x691fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x6a0000, 0x6a0fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x6b0000, 0x6b0003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
 	AM_RANGE(0x6c0000, 0x6c001f) AM_READWRITE(simpl156_pf12_control_r, simpl156_pf12_control_w)
@@ -377,7 +377,7 @@ static ADDRESS_MAP_START( mitchell156_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8("okisfx", okim6295_r, okim6295_w, 0x000000ff)
 	AM_RANGE(0x140000, 0x140003) AM_DEVREADWRITE8("okimusic", okim6295_r, okim6295_w, 0x000000ff)
 	AM_RANGE(0x180000, 0x187fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE(&simpl156_mainram) // main ram
-	AM_RANGE(0x190000, 0x191fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x190000, 0x191fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x1b0000, 0x1b0003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
 	AM_RANGE(0x1c0000, 0x1c001f) AM_READWRITE(simpl156_pf12_control_r, simpl156_pf12_control_w)

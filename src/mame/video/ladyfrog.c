@@ -30,8 +30,8 @@ READ8_HANDLER(ladyfrog_spriteram_r)
 static TILE_GET_INFO( get_tile_info )
 {
 	int pal,tile;
-	pal=videoram[tile_index*2+1]&0x0f;
-	tile=videoram[tile_index*2] + ((videoram[tile_index*2+1] & 0xc0) << 2)+ ((videoram[tile_index*2+1] & 0x30) <<6 );
+	pal=machine->generic.videoram.u8[tile_index*2+1]&0x0f;
+	tile=machine->generic.videoram.u8[tile_index*2] + ((machine->generic.videoram.u8[tile_index*2+1] & 0xc0) << 2)+ ((machine->generic.videoram.u8[tile_index*2+1] & 0x30) <<6 );
 	SET_TILE_INFO(
 			0,
 			tile +0x1000 * tilebank,
@@ -41,13 +41,13 @@ static TILE_GET_INFO( get_tile_info )
 
 WRITE8_HANDLER( ladyfrog_videoram_w )
 {
-	videoram[offset] = data;
+	space->machine->generic.videoram.u8[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset>>1);
 }
 
 READ8_HANDLER( ladyfrog_videoram_r )
 {
-	return videoram[offset];
+	return space->machine->generic.videoram.u8[offset];
 }
 
 WRITE8_HANDLER( ladyfrog_palette_w )
@@ -61,9 +61,9 @@ WRITE8_HANDLER( ladyfrog_palette_w )
 READ8_HANDLER( ladyfrog_palette_r )
 {
 	if (offset & 0x100)
-		return paletteram_2[ (offset & 0xff) + (palette_bank << 8) ];
+		return space->machine->generic.paletteram2.u8[ (offset & 0xff) + (palette_bank << 8) ];
 	else
-		return paletteram  [ (offset & 0xff) + (palette_bank << 8) ];
+		return space->machine->generic.paletteram.u8  [ (offset & 0xff) + (palette_bank << 8) ];
 }
 
 WRITE8_HANDLER( ladyfrog_gfxctrl_w )
@@ -137,8 +137,8 @@ VIDEO_START( ladyfrog_common )
   ladyfrog_spriteram = auto_alloc_array(machine, UINT8, 160);
   bg_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
 
-  paletteram = auto_alloc_array(machine, UINT8, 0x200);
-  paletteram_2 = auto_alloc_array(machine, UINT8, 0x200);
+  machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
+  machine->generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x200);
   tilemap_set_scroll_cols(bg_tilemap,32);
   tilemap_set_scrolldy( bg_tilemap,   15, 15 );
 }
