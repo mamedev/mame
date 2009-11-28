@@ -9668,12 +9668,12 @@ Other Sun games
 	DRIVER( cgip30cs )	/* (c) 1999, CGI */
 	DRIVER( pma )		/* 1983, PMA */
 	DRIVER( bjpoker )	/* (c) M. Kramer Inc. */
-	DRIVER( kimblejp )	/* (c) 198?, Kimble Gaming */
 
 	/* Draw Poker Hi-Lo based (i8080) */
 	DRIVER( dphl )		/* (c) 1983 M. Kramer Inc. */
 	DRIVER( dphla )		/* unknown */
 	DRIVER( dphljp )	/* unknown */
+	DRIVER( kimbldhl )	/* (c) 198?, Kimble Ireland */
 	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
 	DRIVER( smshilo )	/* (c) 1983 SMS Manufacturing Corp. */
 	DRIVER( drhl )		/* (c) Drew, Inc. */

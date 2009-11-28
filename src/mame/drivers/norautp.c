@@ -28,13 +28,13 @@
    * Credit Poker (ver.30c, standard),    1999,  CGI.
    * PMA Poker,                           198?,  PMA.
    * Poker / Black Jack (Model 7521),     198?,  M. Kramer Manufacturing.
-   * Kimble Joker Poker,                  198?,  Kimble Gaming.
 
   -- 8080A based --
 
    * Draw Poker Hi-Lo,                    1983,  M. Kramer Manufacturing.
    * Draw Poker Hi-Lo (alt),              1983,  Unknown.
    * Draw Poker Hi-Lo (Japanese),         198?,  Unknown.
+   * Kimble Double Hi-Lo,                 198?,  Kimble Ireland.
    * GTI Poker,                           1983,  GTI Inc.
    * Hi-Lo Double Up Joker Poker,         1983,  SMS Manufacturing Corp.
    * DRHL Poker (v.2.89),                 1986,  Drews Inc.
@@ -1092,6 +1092,10 @@
   - Renamed norautpn descripion to Noraut Deluxe Poker (bootleg).
   - Added a placeholder for tpoker2's undumped 68705 MCU.
   - Reorganized the driver, plus some clean-ups.
+  - Renamed kimblejp to kimbldhl. Changed game description to Kimble Double Hi-Lo.
+  - Added specific memory map & machine driver to Kimble Double Hi-Lo.
+  - Fix the Kimble Double Hi-Lo CPU type.
+  - Added notes about the code obfuscation and PPI's handling/offsets.
 
 
   TODO:
@@ -1354,6 +1358,8 @@ static READ8_HANDLER( test2_r )
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | dphljp   |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | kimbldhl |  8080A  |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | gtipoker |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | smshilo  |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
@@ -1445,19 +1451,23 @@ static ADDRESS_MAP_START( dphltest_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /*
-DPHL
+Kimble:
 
-  7F -> 90
-  BF -> 92
-  DF -> C0 (hndshk)
+Program obfuscation to transfer the flow control.
+Has involved calculations and boolean operations
+to modify the PC and transfer the control.
 
-DPHLA
+Create dynamic code in RAM at $C276 to handle the I/O through the PPI8255's.
+Also initialize the devices and handle the handshaking lines in the same way.
 
-  63 -> 90
-  A3 -> 92
-  C3 -> C0 (hndshk)
+The code read on $62, when is suppossed to set as output.
 
 */
+static ADDRESS_MAP_START( kimbldhl_map, ADDRESS_SPACE_PROGRAM, 8 )
+//  ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 not connected */
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drhl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 not connected */
@@ -1889,6 +1899,19 @@ static MACHINE_DRIVER_START( dphla )
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(dphla_map)
+
+	/* sound hardware */
+	MDRV_SOUND_MODIFY("discrete")
+	MDRV_SOUND_CONFIG_DISCRETE(dphl)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( kimbldhl )
+	MDRV_IMPORT_FROM(noraut_base)
+
+	/* basic machine hardware */
+	MDRV_CPU_REPLACE("maincpu", 8080, DPHL_CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(kimbldhl_map)
 
 	/* sound hardware */
 	MDRV_SOUND_MODIFY("discrete")
@@ -2407,26 +2430,6 @@ ROM_START( bjpoker )
 	ROM_LOAD( "077b.u51", 0x0000, 0x0100, NO_DUMP )
 ROM_END
 
-/*
-
-  Kimble Poker
-  Older than Noraut stuff...
-
-  - z80 based, with daughterboard.
-  - 8255 weren't initialized.
-  - RAM seems at c000-c7ff
-
-*/
-
-ROM_START( kimblejp )
-	ROM_REGION( 0x10000, "maincpu", 0 )	/* Program ROM is 0000-6e40 */
-	ROM_LOAD( "jpc525611.bin", 0x0000, 0x8000, CRC(4a3f1aef) SHA1(570ef733989da6e89f0387f1e80b934cec7a7663) )
-
-	ROM_REGION( 0x1000,  "gfx", 0 )
-	ROM_FILL(                     0x0000, 0x0800, 0xff )
-	ROM_LOAD( "quizcharll.bin", 0x0800, 0x0800, CRC(4edb4717) SHA1(466556595abfbc11e31f2b0d9ca0213bd649253c) )
-ROM_END
-
 
 /************************************* i8080 sets *************************************/
 /* The following ones are 'Draw Poker Hi-Lo' type, running in a i8080a based hardware */
@@ -2517,6 +2520,32 @@ ROM_START( dphljp )	/* close to GTI Poker */
 
 	ROM_REGION( 0x0100,  "proms", 0 )
 	ROM_LOAD( "japan_6301.u51", 0x0000, 0x0100, CRC(88302127) SHA1(aed1273974917673405f1234ab64e6f8b3856c34) )
+ROM_END
+
+/*
+
+  Kimble Ireland:
+
+  CPU: 8080
+  pcb marked "KIMBLE DOUBLE HI-LO"
+  prog eprom marked "JPC 525611"
+  char eprom marked "QUIZ CHAR II"
+  pcb marked "Card Game"
+
+  ----
+
+  - Older than Noraut stuff...
+  - RAM seems at c000-c7ff
+
+*/
+
+ROM_START( kimbldhl )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* Program ROM is 0000-6e40 */
+	ROM_LOAD( "jpc525611.bin", 0x0000, 0x8000, CRC(4a3f1aef) SHA1(570ef733989da6e89f0387f1e80b934cec7a7663) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                     0x0000, 0x0800, 0xff )
+	ROM_LOAD( "quizcharll.bin", 0x0800, 0x0800, CRC(4edb4717) SHA1(466556595abfbc11e31f2b0d9ca0213bd649253c) )
 ROM_END
 
 /*
@@ -2772,7 +2801,6 @@ GAMEL( 2005, ndxron10, 0,       norautp,  ndxron10, 0,   ROT0, "<unknown>",     
 GAMEL( 1999, cgip30cs, 0,       norautx4, norautkl, deb, ROT0, "CGI",                       "Credit Poker (ver.30c, standard)",    0,                layout_noraut12 )
 GAME(  1983, pma,      0,       nortest1, norautp,  0,   ROT0, "PMA",                       "PMA Poker",                           GAME_NOT_WORKING )
 GAMEL( 198?, bjpoker,  0,       norautxp, norautrh, 0,   ROT0, "M. Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",     GAME_NOT_WORKING, layout_noraut12 )
-GAMEL( 198?, kimblejp, 0,       norautx8, norautkl, 0,   ROT0, "Kimble Gaming",             "Kimble Joker Poker",                  GAME_NOT_WORKING, layout_noraut12 )
 
 
 /************************************* i8080 sets *************************************/
@@ -2784,6 +2812,7 @@ GAMEL( 198?, kimblejp, 0,       norautx8, norautkl, 0,   ROT0, "Kimble Gaming", 
 GAME(  1983, dphl,     0,       dphl,     norautp,  0,   ROT0, "M. Kramer Manufacturing.",  "Draw Poker Hi-Lo (M.Kramer)",         GAME_NOT_WORKING )
 GAME(  1983, dphla,    0,       dphla,    norautp,  0,   ROT0, "<unknown>",                 "Draw Poker Hi-Lo (Alt)",              GAME_NOT_WORKING )
 GAME(  1983, dphljp,   0,       dphl,     norautp,  0,   ROT0, "<unknown>",                 "Draw Poker Hi-Lo (Japanese)",         GAME_NOT_WORKING )
+GAME(  198?, kimbldhl, 0,       kimbldhl, norautp,  0,   ROT0, "Kimble Ireland",            "Kimble Double Hi-Lo",                 GAME_NOT_WORKING )
 GAME(  1983, gtipoker, 0,       dphl,     norautp,  0,   ROT0, "GTI Inc",                   "GTI Poker",                           GAME_NOT_WORKING )
 GAME(  1983, smshilo,  0,       dphla,    norautp,  0,   ROT0, "SMS Manufacturing Corp.",   "Hi-Lo Double Up Joker Poker ",        GAME_NOT_WORKING )
 GAME(  1986, drhl,     0,       drhl,     norautp,  0,   ROT0, "Drews Inc.",                "DRHL Poker (v.2.89)",                 GAME_NOT_WORKING )
