@@ -36,6 +36,8 @@ UINT32 *hng64_3dregs;
 
 UINT32 *hng64_tcram ;
 
+UINT8 hng64_screen_dis;
+
 void hng64_mark_all_tiles_dirty( int tilemap )
 {
 	if (tilemap == 0)
@@ -434,8 +436,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-/* Transition_Control Memory Region Map
- * ------------------------------
+/* Transition Control Video Registers
+ * ----------------------------------
  *
  * UINT32 | Bits                                    | Use
  *        | 3322 2222 2222 1111 1111 11             |
@@ -445,17 +447,28 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
  *      2 | xxxx xxxx xxxx xxxx yyyy yyyy yyyy yyyy | Max X / Max Y visible area rectangle values (added up with the Min X / Min Y)
  *      3 |                                         |
  *      4 |                                         |
- *      5 |                                         |
- *      6 | ---- ---- xxxx xxxx xxxx xxxx xxxx xxxx | I popped into Buriki and saw some of these values changing to the same as 7.  hmmmm...
- *      7 | ---- ---- xxxx xxxx xxxx xxxx xxxx xxxx | Almost certainly RGB darkening
+ *      5 | ---- ---- ---- ---? ---- --?? ???? ???? | Global Fade In/Fade Out control
+ *      6 |                                         |
+ *      7 | ---- ---- xxxx xxxx xxxx xxxx xxxx xxxx | Port A of RGB fade (subtraction)
  *      8 |                                         |
- *      9 |                                         |
- *     10 | ---- ---- xxxx xxxx xxxx xxxx xxxx xxxx | Almost certainly RGB brightening
+ *      9 | ---- ---- ---- ---? ---- ---- ---- ???? | Per-layer Fade In/Fade Out control
+ *     10 | ---- ---- xxxx xxxx xxxx xxxx xxxx xxxx | Port B of RGB fade (additive)
  *     11 | xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx | Unknown - looks like an ARGB value - it seems to change when the scene changes
  *     12 |                                         |
  *     13 |                                         |
  *     14 |                                         |
  *     15 |                                         |
+ *     16 |                                         |
+ *     17 |                                         |
+ *     18 | xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx | V-Blank related stuff
+ *     19 |                                         |
+ *     20 | ---- ---- ---- ---x ---- ---- ---- ---- | Back layer control register?
+ *     21 |                                         |
+ *     22 |                                         |
+ *     23 |                                         |
+ *     24 |                                         |
+ *
+ *
  *
  *  Various bits change depending on what is happening in the scene.
  *  These bits may set which 'layer' is affected by the blending.
@@ -465,7 +478,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
  */
 
 /* this is broken for the 'How to Play' screen in Buriki after attract, disabled for now */
-#if 0
 static void transition_control(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i, j ;
@@ -557,7 +569,6 @@ static void transition_control(bitmap_t *bitmap, const rectangle *cliprect)
 		}
 	}
 }
-#endif
 
 /*
  * 3d 'Sprite' Format
@@ -1741,8 +1752,11 @@ VIDEO_UPDATE( hng64 )
 	UINT16 tileflags0, tileflags1;
 	UINT16 tileflags2, tileflags3;
 
-	bitmap_fill(bitmap, 0, screen->machine->pens[0]); //FIXME: Fatal Fury WA test mode doesn't use pen 0...
+	bitmap_fill(bitmap, 0, hng64_tcram[0x50/4] & 0x10000 ? get_black_pen(screen->machine) : screen->machine->pens[0]); //FIXME: Is the register correct? check with HW tests
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0x00);
+
+	if(hng64_screen_dis)
+		return 0;
 
 	animmask = hng64_videoregs[0x0b];
 	animbits = hng64_videoregs[0x0c];
@@ -1820,9 +1834,8 @@ VIDEO_UPDATE( hng64 )
 	if (hng64_mcu_type != RACING_MCU) // disable on racing games until it stops crashing MAME!
 		draw3d(screen->machine, bitmap, cliprect);
 
-#if 0
-	transition_control(bitmap, cliprect) ;
-#endif
+	if(0)
+		transition_control(bitmap, cliprect) ;
 
 	if (0)
 		popmessage("%08x %08x %08x %08x %08x", hng64_spriteregs[0], hng64_spriteregs[1], hng64_spriteregs[2], hng64_spriteregs[3], hng64_spriteregs[4]);
@@ -1849,13 +1862,13 @@ VIDEO_UPDATE( hng64 )
     hng64_videoregs[0x0d],
     hng64_videoregs[0x0e]);
 
-	if (1)
+	if (0)
 	popmessage("3D: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
 		hng64_3dregs[0x00/4],hng64_3dregs[0x04/4],hng64_3dregs[0x08/4],hng64_3dregs[0x0c/4],
 		hng64_3dregs[0x10/4],hng64_3dregs[0x14/4],hng64_3dregs[0x18/4],hng64_3dregs[0x1c/4],
 		hng64_3dregs[0x20/4],hng64_3dregs[0x24/4],hng64_3dregs[0x28/4],hng64_3dregs[0x2c/4]);
 
-	if (0)
+	if (1)
 		popmessage("TC: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
 		hng64_tcram[0x00/4],
 		hng64_tcram[0x04/4],

@@ -474,10 +474,12 @@ extern UINT32 *hng64_3dregs;
 
 extern UINT32 hng64_dls[2][0x81] ;
 
+extern UINT8 hng64_screen_dis;
+
 VIDEO_START( hng64 ) ;
 VIDEO_UPDATE( hng64 ) ;
 
-static UINT32 activeBuffer ;
+static UINT32 activeBuffer;
 
 
 static UINT32 no_machine_error_code;
@@ -925,8 +927,13 @@ static WRITE32_HANDLER( tcram_w )
 		max_x = (hng64_tcram[2] & 0xffff0000) >> 16;
 		max_y = (hng64_tcram[2] & 0x0000ffff) >> 0;
 
-		if(max_x == 0 || max_y == 0) //bail out if values are invalid
+		if(max_x == 0 || max_y == 0) //bail out if values are invalid, Fatal Fury WA sets this to disable the screen.
+		{
+			hng64_screen_dis = 1;
 			return;
+		}
+
+		hng64_screen_dis = 0;
 
 		visarea.min_x = min_x;
 		visarea.max_x = min_x + max_x - 1;
