@@ -27,7 +27,7 @@ static ADDRESS_MAP_START( yard_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(yard_videoram_w) AM_BASE_MEMBER(irem_z80_state, videoram)
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(yard_scroll_panel_w)
-	AM_RANGE(0xc820, 0xc87f) AM_RAM AM_BASE_MEMBER(irem_z80_state, spriteram) AM_SIZE_MEMBER(irem_z80_state, spriteram_size)
+	AM_RANGE(0xc820, 0xc87f) AM_RAM AM_BASE_SIZE_MEMBER(irem_z80_state, spriteram, spriteram_size)
 	AM_RANGE(0xa000, 0xa000) AM_RAM AM_BASE_MEMBER(irem_z80_state, yard_scroll_x_low)
 	AM_RANGE(0xa200, 0xa200) AM_RAM AM_BASE_MEMBER(irem_z80_state, yard_scroll_x_high)
 	AM_RANGE(0xa400, 0xa400) AM_RAM AM_BASE_MEMBER(irem_z80_state, yard_scroll_y_low)

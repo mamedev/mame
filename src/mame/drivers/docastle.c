@@ -213,7 +213,7 @@ static WRITE8_DEVICE_HANDLER( idsoccer_adpcm_w )
 static ADDRESS_MAP_START( docastle_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM
-	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_BASE_MEMBER(docastle_state, spriteram) AM_SIZE_MEMBER(docastle_state, spriteram_size)
+	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_BASE_SIZE_MEMBER(docastle_state, spriteram, spriteram_size)
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_BASE_MEMBER(docastle_state, videoram)
@@ -256,7 +256,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dorunrun_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE_MEMBER(docastle_state, spriteram) AM_SIZE_MEMBER(docastle_state, spriteram_size)
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE_SIZE_MEMBER(docastle_state, spriteram, spriteram_size)
 	AM_RANGE(0x4000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
@@ -286,7 +286,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( idsoccer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
-	AM_RANGE(0x5800, 0x59ff) AM_RAM AM_BASE_MEMBER(docastle_state, spriteram) AM_SIZE_MEMBER(docastle_state, spriteram_size)
+	AM_RANGE(0x5800, 0x59ff) AM_RAM AM_BASE_SIZE_MEMBER(docastle_state, spriteram, spriteram_size)
 	AM_RANGE(0x6000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)

@@ -93,7 +93,7 @@ VIDEO_UPDATE( dotrikun )
 
 static ADDRESS_MAP_START( dotrikun_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(dotrikun_state, videoram) AM_SIZE_MEMBER(dotrikun_state, videoram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_SIZE_MEMBER(dotrikun_state, videoram, videoram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )

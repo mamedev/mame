@@ -138,7 +138,7 @@ static WRITE8_DEVICE_HANDLER( okibank_w )
 static ADDRESS_MAP_START( diverboy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE_MEMBER(diverboy_state, spriteram) AM_SIZE_MEMBER(diverboy_state, spriteram_size)
+	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE_SIZE_MEMBER(diverboy_state, spriteram, spriteram_size)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(soundcmd_w)
 	AM_RANGE(0x140000, 0x1407ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P1_P2")

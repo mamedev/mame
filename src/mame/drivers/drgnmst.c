@@ -212,7 +212,7 @@ static ADDRESS_MAP_START( drgnmst_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(drgnmst_bg_videoram_w) AM_BASE_MEMBER(drgnmst_state, bg_videoram)
 	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(drgnmst_fg_videoram_w) AM_BASE_MEMBER(drgnmst_state, fg_videoram)
 	AM_RANGE(0x920000, 0x923fff) AM_RAM AM_BASE_MEMBER(drgnmst_state, rowscrollram) // rowscroll ram
-	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_MEMBER(drgnmst_state, spriteram) AM_SIZE_MEMBER(drgnmst_state, spriteram_size)	// Sprites
+	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE_MEMBER(drgnmst_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

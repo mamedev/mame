@@ -164,7 +164,7 @@ static ADDRESS_MAP_START( circusc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(circusc_colorram_w) AM_BASE_MEMBER(circusc_state, colorram) /* colorram */
 	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(circusc_videoram_w) AM_BASE_MEMBER(circusc_state, videoram) /* videoram */
 	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_BASE_MEMBER(circusc_state, spriteram_2) /* spriteram2 */
-	AM_RANGE(0x3900, 0x39ff) AM_RAM AM_BASE_MEMBER(circusc_state, spriteram) AM_SIZE_MEMBER(circusc_state, spriteram_size) /* spriteram */
+	AM_RANGE(0x3900, 0x39ff) AM_RAM AM_BASE_SIZE_MEMBER(circusc_state, spriteram, spriteram_size) /* spriteram */
 	AM_RANGE(0x3a00, 0x3fff) AM_RAM
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END

@@ -92,8 +92,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6008, 0x600b) AM_READ(exerion_protection_r)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_MEMBER(exerion_state, main_ram)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(exerion_state, videoram) AM_SIZE_MEMBER(exerion_state, videoram_size)
-	AM_RANGE(0x8800, 0x887f) AM_RAM AM_BASE_MEMBER(exerion_state, spriteram) AM_SIZE_MEMBER(exerion_state, spriteram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_SIZE_MEMBER(exerion_state, videoram, videoram_size)
+	AM_RANGE(0x8800, 0x887f) AM_RAM AM_BASE_SIZE_MEMBER(exerion_state, spriteram, spriteram_size)
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(exerion_port01_r)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW0")

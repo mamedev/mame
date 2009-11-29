@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd018, 0xd018) AM_READ_PORT("IN2") AM_WRITENOP
 
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(dominob_state, videoram)
-	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_MEMBER(dominob_state, spriteram) AM_SIZE_MEMBER(dominob_state, spriteram_size)
+	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_SIZE_MEMBER(dominob_state, spriteram, spriteram_size)
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf07f) AM_RAM AM_BASE_MEMBER(dominob_state, bgram)
 	AM_RANGE(0xf080, 0xf7ff) AM_RAM

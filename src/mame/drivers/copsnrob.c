@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0900, 0x0903) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(copsnrob_state, carimage)
 	AM_RANGE(0x0a00, 0x0a03) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(copsnrob_state, cary)
 	AM_RANGE(0x0b00, 0x0bff) AM_RAM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_BASE_MEMBER(copsnrob_state, videoram) AM_SIZE_MEMBER(copsnrob_state, videoram_size)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_BASE_SIZE_MEMBER(copsnrob_state, videoram, videoram_size)
 //  AM_RANGE(0x1000, 0x1003) AM_WRITENOP
 //  AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN0")
 	AM_RANGE(0x1000, 0x1000) AM_READ(copsnrob_misc_r)

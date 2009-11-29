@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(aquarium_mid_videoram_w) AM_BASE_MEMBER(aquarium_state, mid_videoram)
 	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(aquarium_bak_videoram_w) AM_BASE_MEMBER(aquarium_state, bak_videoram)
 	AM_RANGE(0xc02000, 0xc03fff) AM_RAM_WRITE(aquarium_txt_videoram_w) AM_BASE_MEMBER(aquarium_state, txt_videoram)
-	AM_RANGE(0xc80000, 0xc81fff) AM_RAM AM_BASE_MEMBER(aquarium_state, spriteram) AM_SIZE_MEMBER(aquarium_state, spriteram_size)
+	AM_RANGE(0xc80000, 0xc81fff) AM_RAM AM_BASE_SIZE_MEMBER(aquarium_state, spriteram, spriteram_size)
 	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd80014, 0xd8001f) AM_WRITEONLY AM_BASE_MEMBER(aquarium_state, scroll)
 	AM_RANGE(0xd80068, 0xd80069) AM_WRITENOP		/* probably not used */

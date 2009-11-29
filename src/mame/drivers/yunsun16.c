@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(yunsun16_vram_1_w) AM_BASE_MEMBER(yunsun16_state, vram_1)	// Layer 1
 	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(yunsun16_vram_0_w) AM_BASE_MEMBER(yunsun16_state, vram_0)	// Layer 0
-	AM_RANGE(0x910000, 0x910fff) AM_RAM	AM_BASE_MEMBER(yunsun16_state, spriteram) AM_SIZE_MEMBER(yunsun16_state, spriteram_size)	// Sprites
+	AM_RANGE(0x910000, 0x910fff) AM_RAM	AM_BASE_SIZE_MEMBER(yunsun16_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

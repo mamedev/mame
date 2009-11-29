@@ -431,7 +431,7 @@ static ADDRESS_MAP_START( m63_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM
-	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE_MEMBER(m63_state, spriteram) AM_SIZE_MEMBER(m63_state, spriteram_size)
+	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE_SIZE_MEMBER(m63_state, spriteram, spriteram_size)
 	AM_RANGE(0xe300, 0xe3ff) AM_RAM AM_BASE_MEMBER(m63_state, scrollram)
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(m63_videoram2_w) AM_BASE_MEMBER(m63_state, videoram2)
 	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(m63_videoram_w) AM_BASE_MEMBER(m63_state, videoram)
@@ -452,7 +452,7 @@ static ADDRESS_MAP_START( fghtbskt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM
-	AM_RANGE(0xd200, 0xd2ff) AM_RAM AM_BASE_MEMBER(m63_state, spriteram) AM_SIZE_MEMBER(m63_state, spriteram_size)
+	AM_RANGE(0xd200, 0xd2ff) AM_RAM AM_BASE_SIZE_MEMBER(m63_state, spriteram, spriteram_size)
 	AM_RANGE(0xd300, 0xd3ff) AM_RAM AM_BASE_MEMBER(m63_state, scrollram)
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(m63_videoram2_w) AM_BASE_MEMBER(m63_state, videoram2)
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(m63_videoram_w) AM_BASE_MEMBER(m63_state, videoram)

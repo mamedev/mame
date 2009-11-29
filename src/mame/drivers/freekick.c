@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( pbillrd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE_MEMBER(freekick_state, videoram)
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_MEMBER(freekick_state, spriteram) AM_SIZE_MEMBER(freekick_state, spriteram_size)
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE_MEMBER(freekick_state, spriteram, spriteram_size)
 	AM_RANGE(0xd900, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0")
 	AM_RANGE(0xe000, 0xe001) AM_WRITE(flipscreen_w)
@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( freekckb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE_MEMBER(freekick_state, videoram)	// tilemap
-	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE_MEMBER(freekick_state, spriteram) AM_SIZE_MEMBER(freekick_state, spriteram_size)	// sprites
+	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE_SIZE_MEMBER(freekick_state, spriteram, spriteram_size)	// sprites
 	AM_RANGE(0xec00, 0xec03) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("IN0") AM_WRITE(flipscreen_w)
@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( gigas_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE_MEMBER(freekick_state, videoram)
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_MEMBER(freekick_state, spriteram) AM_SIZE_MEMBER(freekick_state, spriteram_size)
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE_MEMBER(freekick_state, spriteram, spriteram_size)
 	AM_RANGE(0xd900, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0") AM_WRITENOP // probably not flipscreen
 	AM_RANGE(0xe002, 0xe003) AM_WRITE(coin_w)

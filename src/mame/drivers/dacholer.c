@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x97ff) AM_RAM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(background_w) AM_BASE_MEMBER(dacholer_state, bgvideoram)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(foreground_w) AM_BASE_MEMBER(dacholer_state, fgvideoram)
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_MEMBER(dacholer_state, spriteram) AM_SIZE_MEMBER(dacholer_state, spriteram_size)
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE_MEMBER(dacholer_state, spriteram, spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )

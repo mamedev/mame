@@ -76,7 +76,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x183f) AM_RAM AM_BASE_MEMBER(aeroboto_state, hscroll)	// horizontal scroll regs
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(aeroboto_tilecolor_w) AM_BASE_MEMBER(aeroboto_state, tilecolor)	// tile color RAM
 	AM_RANGE(0x1840, 0x27ff) AM_WRITENOP					// cleared during custom LSI test
-	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_BASE_MEMBER(aeroboto_state, spriteram) AM_SIZE_MEMBER(aeroboto_state, spriteram_size)	// sprite RAM
+	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_BASE_SIZE_MEMBER(aeroboto_state, spriteram, spriteram_size)	// sprite RAM
 	AM_RANGE(0x2900, 0x2fff) AM_WRITENOP					// cleared along with sprite RAM
 	AM_RANGE(0x2973, 0x2973) AM_READ(aeroboto_2973_r)			// protection read
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(aeroboto_in0_r, aeroboto_3000_w)
