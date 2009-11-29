@@ -7731,7 +7731,7 @@ GAME( 1996, sfz2alb,  sfz2al,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "St
 GAME( 1996, spf2t,    0,        cps2, cps2_2p2b, cps2,     ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (USA 960620)", 0 )
 GAME( 1996, spf2xj,   spf2t,    cps2, cps2_2p2b, cps2,     ROT0,   "Capcom", "Super Puzzle Fighter II X (Japan 960531)", 0 )
 GAME( 1996, spf2ta,   spf2t,    cps2, cps2_2p2b, cps2,     ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (Asia 960529)", 0 )
-GAME( 1996, spf2th,   spf2t,    cps2, cps2_2p2b, cps2,     ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (Hispanic 960529)", GAME_NOT_WORKING ) // No key for this one
+GAME( 1996, spf2th,   spf2t,    cps2, cps2_2p2b, cps2,     ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (Hispanic 960531)", 0 )
 GAME( 1996, megaman2, 0,        cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Mega Man 2: The Power Fighters (USA 960708)", 0 )
 GAME( 1996, megaman2a,megaman2, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Mega Man 2: The Power Fighters (Asia 960708)", 0 )
 GAME( 1996, rckman2j, megaman2, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Rockman 2: The Power Fighters (Japan 960708)", 0 )

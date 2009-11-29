@@ -2808,7 +2808,7 @@ V-V                           TP-027
 	DRIVER( spf2t )		/* 20/06/1996 (c) 1996 (US) */
 	DRIVER( spf2xj )	/* 31/05/1996 (c) 1996 (Japan) */
 	DRIVER( spf2ta )	/* 29/05/1996 (c) 1996 (Asia) */
-	DRIVER( spf2th )	/* 29/05/1996 (c) 1996 (Hispanic) */
+	DRIVER( spf2th )	/* 31/05/1996 (c) 1996 (Hispanic) */
 	DRIVER( qndream )	/* 26/06/1996 (c) 1996 (Japan) */
 	DRIVER( megaman2 )	/* 08/07/1996 (c) 1996 (US) */
 	DRIVER( megaman2a )	/* 08/07/1996 (c) 1996 (Asia) */
