@@ -8,7 +8,7 @@
     - Killer Instinct
     - Final Fight 2
     - Sonic Blast Man 2
-    - Iron Commando
+    - Iron (bootleg of Iron Commando)
 
     Not dumped:
     - Final Fight 3
@@ -81,7 +81,7 @@ TODO:
 
 ***************************************************************************
 
-Iron Commando PCB (same as Final Fight 2?)
+Iron PCB (same as Final Fight 2?)
  ______________________________________________________________________________________________
 |                                                                                              |
 |     _____________              XTAL1                    XTAL2                                |
@@ -226,6 +226,26 @@ static READ8_HANDLER(sb2b_7xxx_r)
 {
 	return snes_ram[0xc07000 + offset];
 }
+
+/* Iron */
+
+static READ8_HANDLER(iron_770071_r)
+{
+ 	return input_port_read(space->machine, "DSW1");
+}
+
+static READ8_HANDLER(iron_770073_r)
+{
+ 	return input_port_read(space->machine, "DSW2");
+}
+
+static READ8_HANDLER(iron_770079_r)
+{
+ 	return input_port_read(space->machine, "COIN");
+}
+
+
+
 
 static ADDRESS_MAP_START( snesb_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE(snes_r_bank1, snes_w_bank1)	/* I/O and ROM (repeats for each bank) */
@@ -598,6 +618,129 @@ static INPUT_PORTS_START( sblast2b )
 
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( iron )
+	PORT_START("PAD1L")		/* IN 0 : Joypad 1 - L */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button A") PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 Button X") PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Button L") PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P1 Button R") PORT_PLAYER(1)
+	PORT_START("PAD1H")		/* IN 1 : Joypad 1 - H */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Button B") PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Button Y") PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("P1 Select")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("P1 Start")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+
+	PORT_START("PAD2L")		/* IN 2 : Joypad 2 - L */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P2 Button A") PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P2 Button X") PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P2 Button L") PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P2 Button R") PORT_PLAYER(2)
+	PORT_START("PAD2H")		/* IN 3 : Joypad 2 - H */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Button B") PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Button Y") PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("P2 Select")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("P2 Start")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+
+	PORT_START("PAD3L")		/* IN 4 : Joypad 3 - L */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P3 Button A") PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P3 Button X") PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P3 Button L") PORT_PLAYER(3)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P3 Button R") PORT_PLAYER(3)
+	PORT_START("PAD3H")		/* IN 5 : Joypad 3 - H */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P3 Button B") PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P3 Button Y") PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_NAME("P3 Select")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START3 ) PORT_NAME("P3 Start")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
+
+	PORT_START("PAD4L")		/* IN 6 : Joypad 4 - L */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P4 Button A") PORT_PLAYER(4)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P4 Button X") PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P4 Button L") PORT_PLAYER(4)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P4 Button R") PORT_PLAYER(4)
+	PORT_START("PAD4H")		/* IN 7 : Joypad 4 - H */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P4 Button B") PORT_PLAYER(4)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P4 Button Y") PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_NAME("P4 Select")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START4 ) PORT_NAME("P4 Start")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(4)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
+
+	PORT_START("INTERNAL")		/* IN 8 : Internal switches */
+	PORT_DIPNAME( 0x1, 0x1, "Enforce 32 sprites/line" )
+	PORT_DIPSETTING(   0x0, DEF_STR( No )  )
+	PORT_DIPSETTING(   0x1, DEF_STR( Yes ) )
+
+#ifdef MAME_DEBUG
+	PORT_START("DEBUG1")	/* IN 9 : debug switches */
+	PORT_DIPNAME( 0x3, 0x0, "Browse tiles" )
+	PORT_DIPSETTING(   0x0, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x1, "2bpl"  )
+	PORT_DIPSETTING(   0x2, "4bpl"  )
+	PORT_DIPSETTING(   0x3, "8bpl"  )
+	PORT_DIPNAME( 0xc, 0x0, "Browse maps" )
+	PORT_DIPSETTING(   0x0, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x4, "2bpl"  )
+	PORT_DIPSETTING(   0x8, "4bpl"  )
+	PORT_DIPSETTING(   0xc, "8bpl"  )
+
+	PORT_START("DEBUG2")	/* IN 10 : debug switches */
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Toggle BG 1") PORT_PLAYER(2)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Toggle BG 2") PORT_PLAYER(2)
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Toggle BG 3") PORT_PLAYER(2)
+	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Toggle BG 4") PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Toggle Objects") PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Toggle Main/Sub") PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Toggle Back col") PORT_PLAYER(3)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Toggle Windows") PORT_PLAYER(3)
+
+	PORT_START("DEBUG3")	/* IN 11 : debug input */
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Pal prev")
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Pal next")
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Toggle Transparency") PORT_PLAYER(4)
+#endif
+
+	PORT_START("DSW1")	/* IN 12 : dip-switches */
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
+	
+	PORT_START("DSW2")	/* IN 13 : dip-switches */
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+
+	PORT_START("COIN")	/* IN 14 : coins */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+
+INPUT_PORTS_END
+
+
 static MACHINE_DRIVER_START( kinstb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", G65816, 3580000)	/* 2.68Mhz, also 3.58Mhz */
@@ -756,6 +899,32 @@ static DRIVER_INIT( sblast2b )
 	DRIVER_INIT_CALL(snes_hirom);
 }
 
+static DRIVER_INIT( iron )
+{
+	INT32 i;
+	UINT8 *rom = memory_region(machine, "user3");
+
+	for(i=0;i<0x140000;i++)
+	{
+		if(i<0x80000)
+		{
+			rom[i]=BITSWAP8(rom[i]^0xff,2,7,1,6,3,0,5,4);
+		}
+		else
+		{
+			rom[i]=BITSWAP8(rom[i],6,3,0,5,1,4,7,2);
+		}
+	}
+
+	/* extra inputs */
+   	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770071, 0x770071, 0, 0, iron_770071_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770073, 0x770073, 0, 0, iron_770073_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770079, 0x770079, 0, 0, iron_770079_r);
+
+	DRIVER_INIT_CALL(snes);
+}
+
+
 ROM_START( kinstb )
 	ROM_REGION( 0x400000, "user3", 0 )
 	ROM_LOAD( "1.u14", 0x000000, 0x100000, CRC(70889919) SHA1(1451714cbdacb7f6ced2bc7afa478ad7264cf3b7) )
@@ -812,40 +981,10 @@ ROM_START( ffight2b )
 	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
 ROM_END
 
-ROM_START( ironcomm )
+ROM_START( iron )
 	ROM_REGION( 0x400000, "user3", 0 )
-	ROM_LOAD( "6.c09.bin", 0x000000, 0x008000, CRC(50ea1457) SHA1(092f9a0e34deeb090b8c88553be3b1596ded60ef) )
-	ROM_CONTINUE(          0x088000, 0x008000 )
-	ROM_CONTINUE(          0x010000, 0x008000 )
-	ROM_CONTINUE(          0x098000, 0x008000 )
-	ROM_CONTINUE(          0x020000, 0x008000 )
-	ROM_CONTINUE(          0x0a8000, 0x008000 )
-	ROM_CONTINUE(          0x030000, 0x008000 )
-	ROM_CONTINUE(          0x0b8000, 0x008000 )
-	ROM_CONTINUE(          0x040000, 0x008000 )
-	ROM_CONTINUE(          0x0c8000, 0x008000 )
-	ROM_CONTINUE(          0x050000, 0x008000 )
-	ROM_CONTINUE(          0x0d8000, 0x008000 )
-	ROM_CONTINUE(          0x060000, 0x008000 )
-	ROM_CONTINUE(          0x0e8000, 0x008000 )
-	ROM_CONTINUE(          0x070000, 0x008000 )
-	ROM_CONTINUE(          0x0f8000, 0x008000 )
-	ROM_LOAD( "5.c10.bin", 0x080000, 0x008000, CRC(0c3a0b5b) SHA1(1e8ab860689137e0e94731f1af2cfc561492b5bd) )
-	ROM_CONTINUE(          0x008000, 0x008000 )
-	ROM_CONTINUE(          0x090000, 0x008000 )
-	ROM_CONTINUE(          0x018000, 0x008000 )
-	ROM_CONTINUE(          0x0a0000, 0x008000 )
-	ROM_CONTINUE(          0x028000, 0x008000 )
-	ROM_CONTINUE(          0x0b0000, 0x008000 )
-	ROM_CONTINUE(          0x038000, 0x008000 )
-	ROM_CONTINUE(          0x0c0000, 0x008000 )
-	ROM_CONTINUE(          0x048000, 0x008000 )
-	ROM_CONTINUE(          0x0d0000, 0x008000 )
-	ROM_CONTINUE(          0x058000, 0x008000 )
-	ROM_CONTINUE(          0x0e0000, 0x008000 )
-	ROM_CONTINUE(          0x068000, 0x008000 )
-	ROM_CONTINUE(          0x0f0000, 0x008000 )
-	ROM_CONTINUE(          0x078000, 0x008000 )
+	ROM_LOAD( "6.c09.bin", 0x000000, 0x080000, CRC(50ea1457) SHA1(092f9a0e34deeb090b8c88553be3b1596ded60ef) )
+	ROM_LOAD( "5.c10.bin", 0x080000, 0x080000, CRC(0c3a0b5b) SHA1(1e8ab860689137e0e94731f1af2cfc561492b5bd) )
 	ROM_LOAD( "4.c11.bin", 0x100000, 0x040000, CRC(2aa417c7) SHA1(24b375e5bbd4be5dcd31b63ea98fbbadd53d543e) )
 
 	ROM_REGION(0x100,           "user5", 0)
@@ -872,4 +1011,4 @@ ROM_END
 GAME( 199?, kinstb,       0,     kinstb,	     kinstb,    kinstb,		ROT0, "bootleg",	"Killer Instinct (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, ffight2b,     0,     kinstb,	     ffight2b,  ffight2b,	ROT0, "bootleg",	"Final Fight 2 (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sblast2b,     0,     kinstb,	     sblast2b,  sblast2b,	ROT0, "bootleg",	"Sonic Blast Man 2 Special Turbo (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS)
-GAME( 1996, ironcomm,     0,     kinstb,	     ffight2b,  ffight2b,	ROT0, "bootleg",	"Iron Commando (SNES bootleg)", GAME_NOT_WORKING )
+GAME( 1996, iron,         0,     kinstb,	     iron,      iron,		ROT0, "bootleg",	"Iron (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
