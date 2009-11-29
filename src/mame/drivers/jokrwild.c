@@ -162,10 +162,16 @@ static PALETTE_INIT( jokrwild )
 *    Read/Write  Handlers    *
 *****************************/
 
-//static READ8_HANDLER( random_gen_r )
-//{
-//  return mame_rand(machine) & 0xff;
-//}
+static READ8_HANDLER( rng_r )
+{
+	if(cpu_get_pc(space->cpu) == 0xab32)
+		return (offset == 0) ? 0x9e : 0x27;
+
+	if(cpu_get_pc(space->cpu) == 0xab3a)
+		return (offset == 2) ? 0x49 : 0x92;
+
+	return mame_rand(space->machine) & 0xff;
+}
 
 
 /*************************
@@ -182,7 +188,7 @@ static ADDRESS_MAP_START( jokrwild_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x6001, 0x6001) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 //  AM_RANGE(0x6100, 0x6100) AM_READWRITENOP    /* R/W ???? */
-//  AM_RANGE(0x6200, 0x6203) another PIA?
+	AM_RANGE(0x6200, 0x6203) AM_READ(rng_r)//another PIA?
 //  AM_RANGE(0x6300, 0x6300) unknown
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -366,7 +372,7 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_DRIVER_START( jokrwild )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/8)	/* guess */
+	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(jokrwild_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
