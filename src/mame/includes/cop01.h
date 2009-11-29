@@ -11,6 +11,7 @@ struct _cop01_state
 	UINT8 *        bgvideoram;
 	UINT8 *        fgvideoram;
 	UINT8 *        spriteram;
+	size_t         spriteram_size;
 
 	/* video-related */
 	tilemap        *bg_tilemap, *fg_tilemap;
@@ -19,6 +20,9 @@ struct _cop01_state
 	/* sound-related */
 	int            pulse;
 	int            timer; 	// kludge for ym3526 in mightguy
+
+	/* devices */
+	const device_config *audiocpu;
 };
 
 

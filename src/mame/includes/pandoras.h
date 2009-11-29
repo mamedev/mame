@@ -19,6 +19,12 @@ struct _pandoras_state
 	int irq_enable_a, irq_enable_b;
 	int firq_old_data_a, firq_old_data_b;
 	int i8039_status;
+
+	/* devices */
+	const device_config *maincpu;
+	const device_config *subcpu;
+	const device_config *audiocpu;
+	const device_config *mcu;
 };
 
 

@@ -42,8 +42,8 @@ WRITE16_HANDLER( blockout_paletteram_w )
 {
 	blockout_state *state = (blockout_state *)space->machine->driver_data;
 
-	COMBINE_DATA(&state->paletteram16[offset]);
-	setcolor(space->machine, offset, state->paletteram16[offset]);
+	COMBINE_DATA(&state->paletteram[offset]);
+	setcolor(space->machine, offset, state->paletteram[offset]);
 }
 
 WRITE16_HANDLER( blockout_frontcolor_w )
@@ -68,8 +68,6 @@ VIDEO_START( blockout )
 	/* Allocate temporary bitmaps */
 	state->tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	state_save_register_global_bitmap(machine, state->tmpbitmap);
-
-	state_save_register_global(machine, state->color);
 }
 
 static void update_pixels( running_machine *machine, int x, int y )

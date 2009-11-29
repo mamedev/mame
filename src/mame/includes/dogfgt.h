@@ -7,10 +7,11 @@ typedef struct _dogfgt_state dogfgt_state;
 struct _dogfgt_state
 {
 	/* memory pointers */
-	UINT8 *    spriteram;
 	UINT8 *    bgvideoram;
+	UINT8 *    spriteram;
 	UINT8 *    sharedram;
 //	UINT8 *    paletteram;	// currently this uses generic palette handling
+	size_t     spriteram_size;
 
 	/* video-related */
 	bitmap_t  *pixbitmap;
@@ -22,6 +23,9 @@ struct _dogfgt_state
 
 	/* sound-related */
 	int       soundlatch, last_snd_ctrl;
+
+	/* devices */
+	const device_config *subcpu;
 };
 
 

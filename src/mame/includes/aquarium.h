@@ -10,13 +10,17 @@ struct _aquarium_state
 	UINT16 *  mid_videoram;
 	UINT16 *  bak_videoram;
 	UINT16 *  spriteram;
-//	UINT16 *  paletteram16;	// currently this uses generic palette handling
+//	UINT16 *  paletteram;	// currently this uses generic palette handling
+	size_t    spriteram_size;
 
 	/* video-related */
 	tilemap  *txt_tilemap, *mid_tilemap, *bak_tilemap;
 
 	/* misc */
 	int aquarium_snd_ack;
+
+	/* devices */
+	const device_config *audiocpu;
 };
 
 

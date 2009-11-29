@@ -14,14 +14,16 @@ struct _circusc_state
 	UINT8 *        spriteram_2;
 	UINT8 *        spritebank;
 	UINT8 *        scroll;
+	size_t         spriteram_size;
 
 	/* video-related */
-	tilemap  *bg_tilemap;
+	tilemap        *bg_tilemap;
 
 	/* sound-related */
 	UINT8          sn_latch;
 
 	/* devices */
+	const device_config *audiocpu;
 	const device_config *sn1;
 	const device_config *sn2;
 	const device_config *dac;

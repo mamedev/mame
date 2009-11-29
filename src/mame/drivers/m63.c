@@ -129,6 +129,7 @@ struct _m63_state
 	UINT8 *  spriteram;
 	UINT8 *  videoram2;
 	UINT8 *  scrollram;
+	size_t   spriteram_size;
 
 	/* video-related */
 	tilemap  *bg_tilemap, *fg_tilemap;
@@ -141,6 +142,7 @@ struct _m63_state
 	INT16    *samplebuf;
 
 	/* sound devices */
+	const device_config *soundcpu;
 	const device_config *ay1;
 	const device_config *ay2;
 	const device_config *samples;
@@ -286,12 +288,12 @@ static VIDEO_START( m63 )
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	m63_state *state = (m63_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
+	for (offs = 0; offs < state->spriteram_size; offs += 4)
 	{
 		int code = state->spriteram[offs + 1] | ((state->spriteram[offs + 2] & 0x10) << 4);
 		int color = (state->spriteram[offs + 2] & 0x0f) + (state->pal_bank << 4);
@@ -315,7 +317,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			sx, sy, 0);
 
 		/* sprite wrapping - verified on real hardware*/
-		if(sx>0xf0)
+		if (sx > 0xf0)
 		{
 			drawgfx_transpen(bitmap, cliprect,
 			machine->gfx[2],
@@ -350,7 +352,8 @@ static WRITE8_HANDLER( coin_w )
 
 static WRITE8_HANDLER( snd_irq_w )
 {
-	cputag_set_input_line(space->machine, "soundcpu", 0, ASSERT_LINE);
+	m63_state *state = (m63_state *)space->machine->driver_data;
+	cpu_set_input_line(state->soundcpu, 0, ASSERT_LINE);
 	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 }
 
@@ -383,7 +386,7 @@ static WRITE8_HANDLER( p2_w )
 	state->p2 = data;
 	if((state->p2 & 0xf0) == 0x50)
 	{
-		cputag_set_input_line(space->machine, "soundcpu", 0, CLEAR_LINE);
+		cpu_set_input_line(state->soundcpu, 0, CLEAR_LINE);
 	}
 }
 
@@ -428,7 +431,7 @@ static ADDRESS_MAP_START( m63_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM
-	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE_MEMBER(m63_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE_MEMBER(m63_state, spriteram) AM_SIZE_MEMBER(m63_state, spriteram_size)
 	AM_RANGE(0xe300, 0xe3ff) AM_RAM AM_BASE_MEMBER(m63_state, scrollram)
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(m63_videoram2_w) AM_BASE_MEMBER(m63_state, videoram2)
 	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(m63_videoram_w) AM_BASE_MEMBER(m63_state, videoram)
@@ -449,7 +452,7 @@ static ADDRESS_MAP_START( fghtbskt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM
-	AM_RANGE(0xd200, 0xd2ff) AM_RAM AM_BASE_MEMBER(m63_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xd200, 0xd2ff) AM_RAM AM_BASE_MEMBER(m63_state, spriteram) AM_SIZE_MEMBER(m63_state, spriteram_size)
 	AM_RANGE(0xd300, 0xd3ff) AM_RAM AM_BASE_MEMBER(m63_state, scrollram)
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(m63_videoram2_w) AM_BASE_MEMBER(m63_state, videoram2)
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(m63_videoram_w) AM_BASE_MEMBER(m63_state, videoram)
@@ -696,6 +699,7 @@ static MACHINE_START( m63 )
 {
 	m63_state *state = (m63_state *)machine->driver_data;
 
+	state->soundcpu = devtag_get_device(machine, "soundcpu");
 	state->ay1 = devtag_get_device(machine, "ay1");
 	state->ay2 = devtag_get_device(machine, "ay2");
 	state->samples = devtag_get_device(machine, "samples");

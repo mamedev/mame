@@ -5,6 +5,7 @@ struct _hexa_state
 {
 	/* memory pointers */
 	UINT8 *  videoram;
+	size_t   videoram_size;
 
 	/* video-related */
 	tilemap  *bg_tilemap;

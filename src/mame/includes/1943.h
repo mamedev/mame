@@ -14,6 +14,7 @@ struct __1943_state
 	UINT8 * scrollx;
 	UINT8 * scrolly;
 	UINT8 * bgscrollx;
+	size_t  spriteram_size;
 
 	/* video-related */
 	tilemap *fg_tilemap, *bg_tilemap, *bg2_tilemap;

@@ -24,6 +24,10 @@ struct _crgolf_state
 	UINT8    main_to_sound_data, sound_to_main_data;
 	UINT16   sample_offset;
 	UINT8    sample_count;
+
+	/* devices */
+	const device_config *maincpu;
+	const device_config *audiocpu;
 };
 
 /*----------- defined in video/crgolf.c -----------*/

@@ -29,14 +29,16 @@ static WRITE8_HANDLER( sharedram_w )
 
 static WRITE8_HANDLER( subirqtrigger_w )
 {
+	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
 	/* bit 0 used but unknown */
 	if (data & 0x04)
-		cputag_set_input_line(space->machine, "sub", 0, ASSERT_LINE);
+		cpu_set_input_line(state->subcpu, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sub_irqack_w )
 {
-	cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
+	dogfgt_state *state = (dogfgt_state *)space->machine->driver_data;
+	cpu_set_input_line(state->subcpu, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( dogfgt_soundlatch_w )
@@ -64,7 +66,7 @@ static WRITE8_HANDLER( dogfgt_soundcontrol_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(dogfgt_state, sharedram)
-	AM_RANGE(0x0f80, 0x0fdf) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(dogfgt_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x0f80, 0x0fdf) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(dogfgt_state, spriteram) AM_SIZE_MEMBER(dogfgt_state, spriteram_size)
 	AM_RANGE(0x1000, 0x17ff) AM_WRITE(dogfgt_bgvideoram_w) AM_BASE_MEMBER(dogfgt_state, bgvideoram)
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(dogfgt_1800_w)	/* text color, flip screen & coin counters */
@@ -214,6 +216,8 @@ GFXDECODE_END
 static MACHINE_START( dogfgt )
 {
 	dogfgt_state *state = (dogfgt_state *)machine->driver_data;
+
+	state->subcpu = devtag_get_device(machine, "sub");
 
 	state_save_register_global(machine, state->bm_plane);
 	state_save_register_global(machine, state->lastflip);

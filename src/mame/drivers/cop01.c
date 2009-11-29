@@ -68,8 +68,9 @@ Mighty Guy board layout:
 
 static WRITE8_HANDLER( cop01_sound_command_w )
 {
+	cop01_state *state = (cop01_state *)space->machine->driver_data;
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
+	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static READ8_HANDLER( cop01_sound_command_r )
@@ -109,7 +110,7 @@ static ADDRESS_MAP_START( cop01_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM /* c000-c7ff in cop01 */
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(cop01_background_w) AM_BASE_MEMBER(cop01_state, bgvideoram)
-	AM_RANGE(0xe000, 0xe0ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(cop01_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xe000, 0xe0ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(cop01_state, spriteram) AM_SIZE_MEMBER(cop01_state, spriteram_size)
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(cop01_foreground_w) AM_BASE_MEMBER(cop01_state, fgvideoram)
 ADDRESS_MAP_END
 
@@ -414,6 +415,8 @@ GFXDECODE_END
 static MACHINE_START( cop01 )
 {
 	cop01_state *state = (cop01_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
 
 	state_save_register_global(machine, state->pulse);
 	state_save_register_global(machine, state->timer);

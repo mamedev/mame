@@ -117,7 +117,7 @@ static TIMER_CALLBACK( nmi_callback )
 	bigevglf_state *state = (bigevglf_state *)machine->driver_data;
 
 	if (state->sound_nmi_enable) 
-		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else 
 		state->pending_nmi = 1;
 	state->sound_state &= ~1;
@@ -149,7 +149,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 	state->sound_nmi_enable = 1;
 	if (state->pending_nmi)
 	{
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 		state->pending_nmi = 0;
 	}
 }
@@ -433,6 +433,9 @@ static const msm5232_interface msm5232_config =
 static MACHINE_START( bigevglf )
 {
 	bigevglf_state *state = (bigevglf_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->mcu = devtag_get_device(machine, "mcu");
 
 	state_save_register_global(machine, state->vidram_bank);
 	state_save_register_global(machine, state->plane_selected);

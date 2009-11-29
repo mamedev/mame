@@ -154,7 +154,7 @@ static ADDRESS_MAP_START( atarifb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0260, 0x039f) AM_RAM
 	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_BASE_MEMBER(atarifb_state, alphap2_videoram)
 	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_BASE_MEMBER(atarifb_state, field_videoram)
-	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE_MEMBER(atarifb_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE_MEMBER(atarifb_state, spriteram) AM_SIZE_MEMBER(atarifb_state, spriteram_size)
 	AM_RANGE(0x2000, 0x2000) AM_WRITEONLY AM_BASE_MEMBER(atarifb_state, scroll_register) /* OUT 0 */
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(atarifb_out1_w) /* OUT 1 */
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
@@ -174,7 +174,7 @@ static ADDRESS_MAP_START( atarifb4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0260, 0x039f) AM_RAM
 	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_BASE_MEMBER(atarifb_state, alphap2_videoram)
 	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_BASE_MEMBER(atarifb_state, field_videoram)
-	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE_MEMBER(atarifb_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE_MEMBER(atarifb_state, spriteram) AM_SIZE_MEMBER(atarifb_state, spriteram_size)
 	AM_RANGE(0x2000, 0x2000) AM_WRITEONLY AM_BASE_MEMBER(atarifb_state, scroll_register) /* OUT 0 */
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(atarifb4_out1_w) /* OUT 1 */
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( abaseb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0260, 0x039f) AM_RAM
 	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_BASE_MEMBER(atarifb_state, alphap2_videoram)
 	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_BASE_MEMBER(atarifb_state, field_videoram)
-	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE_MEMBER(atarifb_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE_MEMBER(atarifb_state, spriteram) AM_SIZE_MEMBER(atarifb_state, spriteram_size)
 	AM_RANGE(0x2000, 0x2000) AM_WRITEONLY AM_BASE_MEMBER(atarifb_state, scroll_register) /* OUT 0 */
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(abaseb_out1_w) /* OUT 1 */
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
@@ -215,7 +215,7 @@ static ADDRESS_MAP_START( soccer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0260, 0x039f) AM_RAM
 	AM_RANGE(0x03a0, 0x03ff) AM_RAM_WRITE(atarifb_alpha2_videoram_w) AM_BASE_MEMBER(atarifb_state, alphap2_videoram)
 	AM_RANGE(0x0800, 0x0bbf) AM_RAM_WRITE(atarifb_field_videoram_w) AM_BASE_MEMBER(atarifb_state, field_videoram)
-	AM_RANGE(0x0bc0, 0x0bff) AM_RAM AM_BASE_MEMBER(atarifb_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x0bc0, 0x0bff) AM_RAM AM_BASE_MEMBER(atarifb_state, spriteram) AM_SIZE_MEMBER(atarifb_state, spriteram_size)
 	AM_RANGE(0x1000, 0x1000) AM_WRITEONLY AM_BASE_MEMBER(atarifb_state, scroll_register) /* OUT 0 */
 	AM_RANGE(0x1001, 0x1001) AM_WRITE(soccer_out1_w) /* OUT 1 */
 	AM_RANGE(0x1002, 0x1002) AM_WRITE(soccer_out2_w) /* OUT 2 */
@@ -508,6 +508,8 @@ GFXDECODE_END
 static MACHINE_START( atarifb )
 {
 	atarifb_state *state = (atarifb_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
 
 	state_save_register_global(machine, state->CTRLD);
 	state_save_register_global(machine, state->sign_x_1);

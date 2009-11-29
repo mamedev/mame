@@ -202,10 +202,6 @@ VIDEO_START( popper )
 	tilemap_set_transmask(state->ol_p0_tilemap,   1, 0x0e, 0x0f);
 
 	state->tilemap_clip = *video_screen_get_visible_area(machine->primary_screen);
-
-	state_save_register_global(machine, state->flipscreen);
-	state_save_register_global(machine, state->e002);
-	state_save_register_global(machine, state->gfx_bank);
 }
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
@@ -213,7 +209,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 	popper_state *state = (popper_state *)machine->driver_data;
 	int offs, sx, sy, flipx, flipy;
 
-	for (offs = 0; offs < machine->generic.spriteram_size - 4; offs += 4)
+	for (offs = 0; offs < state->spriteram_size - 4; offs += 4)
 	{
 		//if y position is in the current strip
 		if (state->spriteram[offs + 1] && (((state->spriteram[offs] + (state->flipscreen ? 2 : 0)) & 0xf0) == (0x0f - offs / 0x80) << 4))

@@ -76,6 +76,9 @@ struct _ddayjlc_state
 	INT32    e00x_l[4];
 	INT32    e00x_d[4][2];
 	UINT8    prot_addr;
+
+	/* devices */
+	const device_config *audiocpu;
 };
 
 
@@ -195,8 +198,10 @@ static WRITE8_HANDLER( bg2_w )
 
 static WRITE8_HANDLER( sound_w )
 {
+	ddayjlc_state *state = (ddayjlc_state *)space->machine->driver_data;
+
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
+	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( i8257_CH0_w )
@@ -434,6 +439,8 @@ static INTERRUPT_GEN( ddayjlc_snd_interrupt )
 static MACHINE_START( ddayjlc )
 {
 	ddayjlc_state *state = (ddayjlc_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
 
 	state_save_register_global(machine, state->char_bank);
 	state_save_register_global(machine, state->bgadr);

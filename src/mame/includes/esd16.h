@@ -12,11 +12,12 @@ struct _esd16_state
 	UINT16 *       vram_1;
 	UINT16 *       scroll_0;
 	UINT16 *       scroll_1;
-	UINT16 *       spriteram16;
+	UINT16 *       spriteram;
 	UINT16 *       head_layersize;
 	UINT16 *       headpanic_platform_x;
 	UINT16 *       headpanic_platform_y;
-//	UINT16 *       paletteram16;	// currently this uses generic palette handling
+//	UINT16 *       paletteram;	// currently this uses generic palette handling
+	size_t         spriteram_size;
 
 	/* video-related */
 	tilemap       *tilemap_0_16x16, *tilemap_1_16x16;

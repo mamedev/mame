@@ -63,12 +63,13 @@
 
 static WRITE8_HANDLER( irqack_w )
 {
+	_20pacgal_state *state = (_20pacgal_state *)space->machine->driver_data;
 	int bit = data & 1;
 
-	cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), bit);
+	cpu_interrupt_enable(state->maincpu, bit);
 
 	if (!bit)
-		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -262,6 +263,10 @@ INPUT_PORTS_END
 static MACHINE_START( 20pacgal )
 {
 	_20pacgal_state *state = (_20pacgal_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->eeprom = devtag_get_device(machine, "eeprom");
+
 	state_save_register_global(machine, state->game_selected);
 }
 

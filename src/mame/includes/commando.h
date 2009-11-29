@@ -18,6 +18,9 @@ struct _commando_state
 	tilemap  *bg_tilemap, *fg_tilemap;
 	UINT8 scroll_x[2];
 	UINT8 scroll_y[2];
+
+	/* devices */
+	const device_config *audiocpu;
 };
 
 

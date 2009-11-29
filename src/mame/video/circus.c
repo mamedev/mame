@@ -248,8 +248,8 @@ static void ripcord_draw_skydiver( running_machine *machine, bitmap_t *bitmap, c
 	// report collision only when the character is not blank and within display area
 	if (collision && code != 0xf && state->clown_x > 0 && state->clown_x < 240 && state->clown_y > -12 && state->clown_y < 240)
 	{
-		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE); // interrupt accuracy is critical in Ripcord
-		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE); // interrupt accuracy is critical in Ripcord
+		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 	}
 }
 

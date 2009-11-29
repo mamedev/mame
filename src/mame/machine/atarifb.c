@@ -123,7 +123,8 @@ WRITE8_HANDLER( soccer_out2_w )
 
 WRITE8_HANDLER( atarifb_out3_w )
 {
-	int loop = cpu_getiloops(cputag_get_cpu(space->machine, "maincpu"));
+	atarifb_state *state = (atarifb_state *)space->machine->driver_data;
+	int loop = cpu_getiloops(state->maincpu);
 
 	switch (loop)
 	{

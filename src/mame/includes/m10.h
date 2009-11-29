@@ -36,6 +36,7 @@ struct _m10_state
 	UINT8 *             rom;
 	UINT8 *             videoram;
 	UINT8 *             colorram;
+	size_t              videoram_size;
 
 	/* video-related */
 	tilemap *           tx_tilemap;
@@ -52,6 +53,7 @@ struct _m10_state
 	int                 last;
 
 	/* devices */
+	const device_config *maincpu;
 	const device_config *ic8j1;
 	const device_config *ic8j2;
 	const device_config *samples;

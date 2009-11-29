@@ -17,6 +17,7 @@ struct _circus_state
 	int      clown_x, clown_y, clown_z;
 
 	/* devices */
+	const device_config *maincpu;
 	const device_config *samples;
 	const device_config *discrete;
 

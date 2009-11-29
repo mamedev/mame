@@ -68,11 +68,14 @@ struct __2mindril_state
 	UINT16 *      charram;
 	UINT16 *      textram;
 	UINT16 *      unkram;
-//	UINT16 *      paletteram16;	// currently this uses generic palette handling
+//	UINT16 *      paletteram;	// currently this uses generic palette handling
 	UINT16 *      iodata;
 
 	/* input-related */
 	UINT16        defender_sensor, shutter_sensor;
+
+	/* devices */
+	const device_config *maincpu;
 };
 
 
@@ -415,7 +418,8 @@ static INTERRUPT_GEN( drill_interrupt )
 /* WRONG,it does something with 60000c & 700002,likely to be called when the player throws the ball.*/
 static void irqhandler(const device_config *device, int irq)
 {
-//  cputag_set_input_line(device->machine, "maincpu", 5, irq ? ASSERT_LINE : CLEAR_LINE);
+//  _2mindril_state *state = (_2mindril_state *)machine->driver_data;
+//  cpu_set_input_line(state->maincpu, 5, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -427,6 +431,8 @@ static const ym2610_interface ym2610_config =
 static MACHINE_START( drill )
 {
 	_2mindril_state *state = (_2mindril_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
 
 	state_save_register_global(machine, state->defender_sensor);
 	state_save_register_global(machine, state->shutter_sensor);

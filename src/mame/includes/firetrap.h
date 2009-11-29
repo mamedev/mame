@@ -12,6 +12,7 @@ struct _firetrap_state
 	UINT8 *       bg2videoram;
 	UINT8 *       fgvideoram;
 	UINT8 *       spriteram;
+	size_t        spriteram_size;
 
 	/* video-related */
 	tilemap       *fg_tilemap, *bg1_tilemap, *bg2_tilemap;

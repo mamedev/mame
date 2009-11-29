@@ -158,6 +158,7 @@ struct _adp_state
 	UINT8 register_active;
 
 	/* devices */
+	const device_config *maincpu;
 	const device_config *duart;
 };
 
@@ -170,7 +171,8 @@ struct _adp_state
 
 static void duart_irq_handler( const device_config *device, UINT8 vector )
 {
-	cputag_set_input_line_and_vector(device->machine, "maincpu", 4, HOLD_LINE, vector);
+	adp_state *state = (adp_state *)device->machine->driver_data;
+	cpu_set_input_line_and_vector(state->maincpu, 4, HOLD_LINE, vector);
 };
 
 static void duart_tx( const device_config *device, int channel, UINT8 data )
@@ -197,6 +199,7 @@ static MACHINE_START( skattv )
 	adp_state *state = (adp_state *)machine->driver_data;
 	microtouch_init(machine, microtouch_tx, 0);
 
+	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->duart = devtag_get_device(machine, "duart68681");
 
 	state_save_register_global(machine, state->mux_data);

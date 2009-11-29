@@ -205,7 +205,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	firetrap_state *state = (firetrap_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
+	for (offs = 0; offs < state->spriteram_size; offs += 4)
 	{
 		int sx, sy, flipx, flipy, code, color;
 

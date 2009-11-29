@@ -125,16 +125,18 @@ static CUSTOM_INPUT( champbas_watchdog_bit2 )
 
 static WRITE8_HANDLER( irq_enable_w )
 {
+	champbas_state *state = (champbas_state *)space->machine->driver_data;
 	int bit = data & 1;
 
-	cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), bit);
+	cpu_interrupt_enable(state->maincpu, bit);
 	if (!bit)
-		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( exctsccr_fm_callback )
 {
-	cputag_set_input_line_and_vector(machine, "audiocpu", 0, HOLD_LINE, 0xff);
+	champbas_state *state = (champbas_state *)machine->driver_data;
+	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 // Champion Baseball has only one DAC
@@ -216,7 +218,7 @@ static ADDRESS_MAP_START( talbot_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE_MEMBER(champbas_state, bg_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_MEMBER(champbas_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_MEMBER(champbas_state, spriteram) AM_SIZE_MEMBER(champbas_state, spriteram_size)
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
@@ -244,7 +246,7 @@ static ADDRESS_MAP_START( champbas_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7800, 0x7fff) AM_ROM	// champbb2 only
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE_MEMBER(champbas_state, bg_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_MEMBER(champbas_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_MEMBER(champbas_state, spriteram) AM_SIZE_MEMBER(champbas_state, spriteram_size)
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
@@ -565,7 +567,8 @@ static MACHINE_START( champbas )
 {
 	champbas_state *state = (champbas_state *)machine->driver_data;
 
-	state->mcu = cputag_get_cpu(machine, CPUTAG_MCU);
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->mcu = devtag_get_device(machine, CPUTAG_MCU);
 
 	state_save_register_global(machine, state->watchdog_count);
 	state_save_register_global(machine, state->palette_bank);
@@ -574,6 +577,9 @@ static MACHINE_START( champbas )
 
 static MACHINE_START( exctsccr )
 {
+	champbas_state *state = (champbas_state *)machine->driver_data;
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
 	// FIXME
 	timer_pulse(machine, ATTOTIME_IN_HZ(75), NULL, 0, exctsccr_fm_callback); /* updates fm */
 

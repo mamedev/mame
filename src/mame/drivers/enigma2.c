@@ -69,6 +69,10 @@ struct _enigma2_state
 
 	emu_timer *interrupt_clear_timer;
 	emu_timer *interrupt_assert_timer;
+
+	/* devices */
+	const device_config *maincpu;
+	const device_config *audiocpu;
 };
 
 
@@ -93,7 +97,8 @@ INLINE int vysnc_chain_counter_to_vpos( UINT16 counter )
 
 static TIMER_CALLBACK( interrupt_clear_callback )
 {
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	enigma2_state *state = (enigma2_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -107,7 +112,7 @@ static TIMER_CALLBACK( interrupt_assert_callback )
 	int vpos = video_screen_get_vpos(machine->primary_screen);
 	UINT16 counter = vpos_to_vysnc_chain_counter(vpos);
 	UINT8 vector = 0xc7 | ((counter & 0x80) >> 3) | ((~counter & 0x80) >> 4);
-	cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, vector);
+	cpu_set_input_line_and_vector(state->maincpu, 0, ASSERT_LINE, vector);
 
 	/* set up for next interrupt */
 	if (counter == INT_TRIGGER_COUNT_1)
@@ -142,6 +147,9 @@ static MACHINE_START( enigma2 )
 {
 	enigma2_state *state = (enigma2_state *)machine->driver_data;
 	create_interrupt_timers(machine);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
 
 	state_save_register_global(machine, state->blink_count);
 	state_save_register_global(machine, state->sound_latch);
@@ -372,7 +380,7 @@ static WRITE8_HANDLER( sound_data_w )
 	if (!(data & 0x04) && (state->last_sound_data & 0x04))
 		state->sound_latch = (state->sound_latch << 1) | (~data & 0x01);
 
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
 	state->last_sound_data = data;
 }

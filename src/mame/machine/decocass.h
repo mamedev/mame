@@ -98,6 +98,8 @@ struct _decocass_state
 	INT32     type5_latch; 		/* latched enable PROM (1100xxxx written to E5x1) */
 
 	/* devices */
+	const device_config *maincpu;
+	const device_config *audiocpu;
 	const device_config *mcu;
 	const device_config *cassette;
 };

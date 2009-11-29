@@ -52,10 +52,11 @@ Notes:
 
 static WRITE16_HANDLER( sound_command_w )
 {
+	deniam_state *state = (deniam_state *)space->machine->driver_data;
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space,offset, (data >> 8) & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(state->audio_cpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -75,7 +76,7 @@ static ADDRESS_MAP_START( deniam16b_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_BASE_MEMBER(deniam_state, videoram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_BASE_MEMBER(deniam_state, textram)
-	AM_RANGE(0x440000, 0x4407ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(deniam_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x440000, 0x4407ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(deniam_state, spriteram) AM_SIZE_MEMBER(deniam_state, spriteram_size)
 	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_BASE_MEMBER(deniam_state, paletteram)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_w)
 	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE(deniam_coinctrl_r, deniam_coinctrl_w)
@@ -105,7 +106,7 @@ static ADDRESS_MAP_START( deniam16c_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_BASE_MEMBER(deniam_state, videoram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_BASE_MEMBER(deniam_state, textram)
-	AM_RANGE(0x440000, 0x4407ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(deniam_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x440000, 0x4407ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(deniam_state, spriteram) AM_SIZE_MEMBER(deniam_state, spriteram_size)
 	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_BASE_MEMBER(deniam_state, paletteram)
 	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE(deniam_coinctrl_r, deniam_coinctrl_w)
@@ -218,7 +219,7 @@ static void irqhandler( const device_config *device, int linestate )
 
 	/* system 16c doesn't have the sound CPU */
 	if (state->audio_cpu != NULL)
-		cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
+		cpu_set_input_line(state->audio_cpu, 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =

@@ -31,6 +31,7 @@ struct _dacholer_state
 	UINT8 *  bgvideoram;
 	UINT8 *  fgvideoram;
 	UINT8 *  spriteram;
+	size_t   spriteram_size;
 
 	/* video-related */
 	tilemap  *bg_tilemap,*fg_tilemap;
@@ -42,6 +43,9 @@ struct _dacholer_state
 	UINT8 snd_interrupt_enable;
 	UINT8 music_interrupt_enable;
 	UINT8 snd_ack;
+
+	/* devices */
+	const device_config *audiocpu;
 };
 
 
@@ -84,8 +88,9 @@ static WRITE8_HANDLER( coins_w )
 
 static WRITE8_HANDLER(snd_w)
 {
+	dacholer_state *state = (dacholer_state *)space->machine->driver_data;
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -93,7 +98,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x97ff) AM_RAM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(background_w) AM_BASE_MEMBER(dacholer_state, bgvideoram)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(foreground_w) AM_BASE_MEMBER(dacholer_state, fgvideoram)
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_MEMBER(dacholer_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_MEMBER(dacholer_state, spriteram) AM_SIZE_MEMBER(dacholer_state, spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
@@ -326,7 +331,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	dacholer_state *state = (dacholer_state *)machine->driver_data;
 	int offs, code, attr, sx, sy, flipx, flipy;
 
-	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
+	for (offs = 0; offs < state->spriteram_size; offs += 4)
 	{
 		code = state->spriteram[offs + 1];
 		attr = state->spriteram[offs + 2];
@@ -411,7 +416,7 @@ static void adpcm_int( const device_config *device )
 		state->msm_toggle ^= 1;
 		if (state->msm_toggle == 0)
 		{
-			cputag_set_input_line_and_vector(device->machine, "audiocpu", 0, HOLD_LINE, 0x38);
+			cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0x38);
 		}
 	}
 }
@@ -427,6 +432,8 @@ static const msm5205_interface msm_interface =
 static MACHINE_START( dacholer )
 {
 	dacholer_state *state = (dacholer_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
 
 	state_save_register_global(machine, state->bg_bank);
 	state_save_register_global(machine, state->msm_data);

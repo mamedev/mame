@@ -16,9 +16,10 @@
  *
  *************************************/
 
-static void generate_interrupt(running_machine *machine, int state)
+static void generate_interrupt( running_machine *machine, int state )
 {
-	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, state);
+	capbowl_state *driver = (capbowl_state *)machine->driver_data;
+	cpu_set_input_line(driver->maincpu, M6809_FIRQ_LINE, state);
 }
 
 static const struct tms34061_interface tms34061intf =

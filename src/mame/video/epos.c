@@ -80,7 +80,7 @@ VIDEO_UPDATE( epos )
 
 	get_pens(screen->machine, pens);
 
-	for (offs = 0; offs < screen->machine->generic.videoram_size; offs++)
+	for (offs = 0; offs < state->videoram_size; offs++)
 	{
 		UINT8 data = state->videoram[offs];
 

@@ -112,10 +112,10 @@ static ADDRESS_MAP_START( blmbycar_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, scroll_0)				// Scroll 0
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(blmbycar_palette_w)							// Palette
 	AM_RANGE(0x200600, 0x203fff) AM_RAM
-	AM_RANGE(0x204000, 0x2045ff) AM_RAM_WRITE(blmbycar_palette_w) AM_BASE_MEMBER(blmbycar_state, paletteram16)	// Palette
+	AM_RANGE(0x204000, 0x2045ff) AM_RAM_WRITE(blmbycar_palette_w) AM_BASE_MEMBER(blmbycar_state, paletteram)	// Palette
 	AM_RANGE(0x204600, 0x207fff) AM_RAM
 	AM_RANGE(0x440000, 0x441fff) AM_RAM
-	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, spriteram16) AM_SIZE_GENERIC(spriteram)// Sprites (size?)
+	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, spriteram) AM_SIZE_MEMBER(blmbycar_state, spriteram_size)// Sprites (size?)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x700004, 0x700005) AM_READ(blmbycar_opt_wheel_r)								// Wheel (optical)
@@ -147,10 +147,10 @@ static ADDRESS_MAP_START( watrball_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, scroll_0)					// Scroll 0
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(blmbycar_palette_w)							// Palette
 	AM_RANGE(0x200600, 0x203fff) AM_RAM
-	AM_RANGE(0x204000, 0x2045ff) AM_RAM_WRITE(blmbycar_palette_w) AM_BASE_MEMBER(blmbycar_state, paletteram16)	// Palette
+	AM_RANGE(0x204000, 0x2045ff) AM_RAM_WRITE(blmbycar_palette_w) AM_BASE_MEMBER(blmbycar_state, paletteram)	// Palette
 	AM_RANGE(0x204600, 0x207fff) AM_RAM
 	AM_RANGE(0x440000, 0x441fff) AM_RAM
-	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, spriteram16) AM_SIZE_GENERIC(spriteram)// Sprites (size?)
+	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_BASE_MEMBER(blmbycar_state, spriteram) AM_SIZE_MEMBER(blmbycar_state, spriteram_size)// Sprites (size?)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x700006, 0x700007) AM_READNOP													// read

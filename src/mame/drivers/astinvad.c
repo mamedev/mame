@@ -46,6 +46,7 @@ struct _astinvad_state
 {
 	UINT8 *    colorram;
 	UINT8 *    videoram;
+	size_t     videoram_size;
 
 	emu_timer  *int_timer;
 	UINT8      sound_state[2];
@@ -54,6 +55,7 @@ struct _astinvad_state
 	UINT8      flip_yoffs;
 	UINT8      color_latch;
 
+	const device_config *maincpu;
 	const device_config *ppi8255_0;
 	const device_config *ppi8255_1;
 	const device_config *samples;
@@ -100,10 +102,10 @@ static const ppi8255_interface ppi8255_intf[2] =
 static VIDEO_START( spaceint )
 {
 	astinvad_state *state = (astinvad_state *)machine->driver_data;
-	state->colorram = auto_alloc_array(machine, UINT8, machine->generic.videoram_size);
+	state->colorram = auto_alloc_array(machine, UINT8, state->videoram_size);
 
 	state_save_register_global(machine, state->color_latch);
-	state_save_register_global_pointer(machine, state->colorram, machine->generic.videoram_size);
+	state_save_register_global_pointer(machine, state->colorram, state->videoram_size);
 }
 
 
@@ -172,7 +174,7 @@ static VIDEO_UPDATE( spaceint )
 	const UINT8 *color_prom = memory_region(screen->machine, "proms");
 	int offs;
 
-	for (offs = 0; offs < screen->machine->generic.videoram_size; offs++)
+	for (offs = 0; offs < state->videoram_size; offs++)
 	{
 		UINT8 data = state->videoram[offs];
 		UINT8 color = state->colorram[offs];
@@ -200,7 +202,8 @@ static VIDEO_UPDATE( spaceint )
 
 static TIMER_CALLBACK( kamikaze_int_off )
 {
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	astinvad_state *state = (astinvad_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -208,7 +211,7 @@ static TIMER_CALLBACK( kamizake_int_gen )
 {
 	astinvad_state *state = (astinvad_state *)machine->driver_data;
 	/* interrupts are asserted on every state change of the 128V line */
-	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+	cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
 	param ^= 128;
 	timer_adjust_oneshot(state->int_timer, video_screen_get_time_until_pos(machine->primary_screen, param, 0), param);
 
@@ -221,6 +224,7 @@ static MACHINE_START( kamikaze )
 {
 	astinvad_state *state = (astinvad_state *)machine->driver_data;
 
+	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->ppi8255_0 = devtag_get_device(machine, "ppi8255_0");
 	state->ppi8255_1 = devtag_get_device(machine, "ppi8255_1");
 	state->samples = devtag_get_device(machine, "samples");
@@ -248,6 +252,7 @@ static MACHINE_START( spaceint )
 {
 	astinvad_state *state = (astinvad_state *)machine->driver_data;
 
+	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->samples = devtag_get_device(machine, "samples");
 
 	state_save_register_global(machine, state->screen_flip);
@@ -267,8 +272,9 @@ static MACHINE_RESET( spaceint )
 
 static INPUT_CHANGED( spaceint_coin_inserted )
 {
+	astinvad_state *state = (astinvad_state *)field->port->machine->driver_data;
 	/* coin insertion causes an NMI */
-	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -389,14 +395,14 @@ static ADDRESS_MAP_START( kamikaze_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1bff) AM_ROM
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(astinvad_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(astinvad_state, videoram) AM_SIZE_MEMBER(astinvad_state, videoram_size)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( spaceint_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(spaceint_videoram_w) AM_BASE_MEMBER(astinvad_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(spaceint_videoram_w) AM_BASE_MEMBER(astinvad_state, videoram) AM_SIZE_MEMBER(astinvad_state, videoram_size)
 ADDRESS_MAP_END
 
 

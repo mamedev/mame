@@ -14,6 +14,7 @@ struct _bogeyman_state
 	UINT8 *    colorram2;
 	UINT8 *    spriteram;
 //	UINT8 *    paletteram;	// currently this uses generic palette handling
+	size_t     spriteram_size;
 
 	/* video-related */
 	tilemap    *bg_tilemap, *fg_tilemap;

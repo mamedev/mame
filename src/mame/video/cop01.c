@@ -171,7 +171,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	cop01_state *state = (cop01_state *)machine->driver_data;
 	int offs, code, attr, sx, sy, flipx, flipy, color;
 
-	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
+	for (offs = 0; offs < state->spriteram_size; offs += 4)
 	{
 		code = state->spriteram[offs + 1];
 		attr = state->spriteram[offs + 2];

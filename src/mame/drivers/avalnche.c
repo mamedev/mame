@@ -63,7 +63,7 @@ static VIDEO_UPDATE( avalnche )
 	avalnche_state *state = (avalnche_state *)screen->machine->driver_data;
 	offs_t offs;
 
-	for (offs = 0; offs < screen->machine->generic.videoram_size; offs++)
+	for (offs = 0; offs < state->videoram_size; offs++)
 	{
 		int i;
 
@@ -132,7 +132,7 @@ static WRITE8_HANDLER( avalance_start_lamp_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(avalnche_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(avalnche_state, videoram) AM_SIZE_MEMBER(avalnche_state, videoram_size)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffc) AM_READ_PORT("IN0")
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffc) AM_READ_PORT("IN1")
 	AM_RANGE(0x2002, 0x2002) AM_MIRROR(0x0ffc) AM_READ_PORT("PADDLE")

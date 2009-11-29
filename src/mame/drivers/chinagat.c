@@ -110,6 +110,7 @@ INLINE int scanline_to_vcount( int scanline )
 
 static TIMER_DEVICE_CALLBACK( chinagat_scanline )
 {
+	ddragon_state *state = (ddragon_state *)timer->machine->driver_data;
 	int scanline = param;
 	int screen_height = video_screen_get_height(timer->machine->primary_screen);
 	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
@@ -117,27 +118,19 @@ static TIMER_DEVICE_CALLBACK( chinagat_scanline )
 
 	/* update to the current point */
 	if (scanline > 0)
-	{
 		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
-	}
 
 	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
 	if (vcount == 0xf8)
-	{
-		cputag_set_input_line(timer->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
-	}
+		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
 	/* set 1ms signal on rising edge of vcount & 8 */
 	if (!(vcount_old & 8) && (vcount & 8))
-	{
-		cputag_set_input_line(timer->machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
-	}
+		cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* adjust for next scanline */
 	if (++scanline >= screen_height)
-	{
 		scanline = 0;
-	}
 }
 
 static WRITE8_HANDLER( chinagat_interrupt_w )
@@ -148,23 +141,23 @@ static WRITE8_HANDLER( chinagat_interrupt_w )
 	{
 		case 0: /* 3e00 - SND irq */
 			soundlatch_w(space, 0, data);
-			cputag_set_input_line(space->machine, "audiocpu", state->sound_irq, (state->sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+			cpu_set_input_line(state->snd_cpu, state->sound_irq, (state->sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 			break;
 
 		case 1: /* 3e01 - NMI ack */
-			cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+			cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 2: /* 3e02 - FIRQ ack */
-			cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
+			cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 3: /* 3e03 - IRQ ack */
-			cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
+			cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 4: /* 3e04 - sub CPU IRQ ack */
-			cputag_set_input_line(space->machine, "sub", state->sprite_irq, (state->sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+			cpu_set_input_line(state->sub_cpu, state->sprite_irq, (state->sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 			break;
 	}
 }
@@ -318,7 +311,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(ddragon_bgvideoram_w) AM_BASE_MEMBER(ddragon_state, bgvideoram)
 	AM_RANGE(0x3000, 0x317f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3400, 0x357f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0x3800, 0x397f) AM_WRITE(SMH_BANK(3)) AM_BASE_MEMBER(ddragon_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x3800, 0x397f) AM_WRITE(SMH_BANK(3)) AM_BASE_MEMBER(ddragon_state, spriteram) AM_SIZE_MEMBER(ddragon_state, spriteram_size)
 	AM_RANGE(0x3e00, 0x3e04) AM_WRITE(chinagat_interrupt_w)
 	AM_RANGE(0x3e06, 0x3e06) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(ddragon_state, scrolly_lo)
 	AM_RANGE(0x3e07, 0x3e07) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(ddragon_state, scrollx_lo)
@@ -501,7 +494,8 @@ GFXDECODE_END
 
 static void chinagat_irq_handler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	ddragon_state *state = (ddragon_state *)device->machine->driver_data;
+	cpu_set_input_line(state->snd_cpu, 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -531,6 +525,10 @@ static const ym2203_interface ym2203_config =
 static MACHINE_START( chinagat )
 {
 	ddragon_state *state = (ddragon_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->sub_cpu = devtag_get_device(machine, "sub");
+	state->snd_cpu = devtag_get_device(machine, "audiocpu");
 
 	/* configure banks */
 	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);

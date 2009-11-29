@@ -185,7 +185,8 @@ static WRITE8_HANDLER( track_reset_w )
 
 static WRITE8_HANDLER( capbowl_sndcmd_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
+	capbowl_state *state = (capbowl_state *)space->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 	soundlatch_w(space, offset, data);
 }
 
@@ -200,7 +201,8 @@ static WRITE8_HANDLER( capbowl_sndcmd_w )
 
 static void firqhandler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 1, irq ? ASSERT_LINE : CLEAR_LINE);
+	capbowl_state *state = (capbowl_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 1, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -346,6 +348,9 @@ static const ym2203_interface ym2203_config =
 static MACHINE_START( capbowl )
 {
 	capbowl_state *state = (capbowl_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
 
 	state_save_register_global(machine, state->blitter_addr);
 	state_save_register_global(machine, state->last_trackball_val[0]);

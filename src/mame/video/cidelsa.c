@@ -130,7 +130,7 @@ static WRITE_LINE_DEVICE_HANDLER( cidelsa_prd_w )
 	cidelsa_state *driver_state = (cidelsa_state *)device->machine->driver_data;
 
 	/* invert PRD signal */
-	cputag_set_input_line(device->machine, CDP1802_TAG, INPUT_LINE_IRQ0, !state);
+	cpu_set_input_line(driver_state->cdp1802, INPUT_LINE_IRQ0, !state);
 	driver_state->cdp1869_prd = !state;
 }
 

@@ -13,23 +13,27 @@ struct _bigevglf_state
 	UINT32   vidram_bank, plane_selected, plane_visible;
 
 	/* sound-related */
-	int sound_nmi_enable, pending_nmi;
-	UINT8 for_sound;
-	UINT8 from_sound;
-	UINT8 sound_state;
+	int      sound_nmi_enable, pending_nmi;
+	UINT8    for_sound;
+	UINT8    from_sound;
+	UINT8    sound_state;
 
 	/* MCU related */
-	UINT8 from_mcu;
-	int mcu_sent, main_sent;
-	UINT8 port_a_in, port_a_out, ddr_a;
-	UINT8 port_b_in, port_b_out, ddr_b;
-	UINT8 port_c_in, port_c_out, ddr_c;
-	int mcu_coin_bit5;
+	UINT8    from_mcu;
+	int      mcu_sent, main_sent;
+	UINT8    port_a_in, port_a_out, ddr_a;
+	UINT8    port_b_in, port_b_out, ddr_b;
+	UINT8    port_c_in, port_c_out, ddr_c;
+	int      mcu_coin_bit5;
 
 	/* misc */
-	UINT32 beg_bank;
-	UINT8 beg13_ls74[2];
-	UINT8 port_select;     /* for muxed controls */
+	UINT32   beg_bank;
+	UINT8    beg13_ls74[2];
+	UINT8    port_select;     /* for muxed controls */
+
+	/* devices */
+	const device_config *audiocpu;
+	const device_config *mcu;
 };
 
 

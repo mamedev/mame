@@ -162,7 +162,7 @@ VIDEO_UPDATE( m10 )
 			plot_pixel_m10(screen->machine, bitmap, 16, y, 1);
 	}
 
-	for (offs = screen->machine->generic.videoram_size - 1; offs >= 0; offs--)
+	for (offs = state->videoram_size - 1; offs >= 0; offs--)
 		tilemap_mark_tile_dirty(state->tx_tilemap, offs);
 
 	tilemap_set_flip(state->tx_tilemap, state->flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -183,7 +183,7 @@ VIDEO_UPDATE( m15 )
 	m10_state *state = (m10_state *)screen->machine->driver_data;
 	int offs;
 
-	for (offs = screen->machine->generic.videoram_size - 1; offs >= 0; offs--)
+	for (offs = state->videoram_size - 1; offs >= 0; offs--)
 		tilemap_mark_tile_dirty(state->tx_tilemap, offs);
 
 	//tilemap_mark_all_tiles_dirty(state->tx_tilemap);

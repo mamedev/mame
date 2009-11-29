@@ -83,10 +83,12 @@ static INTERRUPT_GEN( blockout_interrupt )
 
 static WRITE16_HANDLER( blockout_sound_command_w )
 {
+	blockout_state *state = (blockout_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space,offset,data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(space, offset, data & 0xff);
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -112,7 +114,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_MEMBER(blockout_state, frontvideoram)
 	AM_RANGE(0x208000, 0x21ffff) AM_RAM	/* ??? */
 	AM_RANGE(0x280002, 0x280003) AM_WRITE(blockout_frontcolor_w)
-	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_BASE_MEMBER(blockout_state, paletteram16)
+	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_BASE_MEMBER(blockout_state, paletteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -235,7 +237,8 @@ INPUT_PORTS_END
 /* handler called by the 2151 emulator when the internal timers cause an IRQ */
 static void blockout_irq_handler(const device_config *device, int irq)
 {
-	cputag_set_input_line_and_vector(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
+	blockout_state *state = (blockout_state *)device->machine->driver_data;
+	cpu_set_input_line_and_vector(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
 
 static const ym2151_interface ym2151_config =
@@ -249,6 +252,15 @@ static const ym2151_interface ym2151_config =
  *  Machine driver
  *
  *************************************/
+
+static MACHINE_START( blockout )
+{
+	blockout_state *state = (blockout_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->color);
+}
 
 static MACHINE_RESET( blockout )
 {
@@ -270,6 +282,7 @@ static MACHINE_DRIVER_START( blockout )
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map)
 
+	MDRV_MACHINE_START(blockout)
 	MDRV_MACHINE_RESET(blockout)
 
 	/* video hardware */

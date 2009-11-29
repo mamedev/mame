@@ -44,8 +44,6 @@ VIDEO_START( zerozone )
 	// i'm not 100% sure it should be opaque, pink title screen looks strange in las vegas girls
 	// but if its transparent other things look incorrect
 	state->zz_tilemap = tilemap_create(machine, get_zerozone_tile_info, tilemap_scan_cols, 8, 8, 64, 32);
-
-	state_save_register_global(machine, state->tilebank);
 }
 
 VIDEO_UPDATE( zerozone )

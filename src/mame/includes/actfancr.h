@@ -22,6 +22,10 @@ struct _actfancr_state
 
 	/* misc */
 	int            trio_control_select;
+
+	/* devices */
+	const device_config *maincpu;
+	const device_config *audiocpu;
 };
 
 

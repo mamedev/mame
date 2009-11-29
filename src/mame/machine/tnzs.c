@@ -676,7 +676,8 @@ MACHINE_START( tnzs )
 	memory_set_bank(machine, 1, 2);
 	memory_set_bank(machine, 2, 0);
 
-	state->mcu = cputag_get_cpu(machine, "mcu"); 
+	state->audiocpu = devtag_get_device(machine, "audiocpu"); 
+	state->mcu = devtag_get_device(machine, "mcu"); 
 
 	state_save_register_global(machine, state->screenflip);
 	state_save_register_global(machine, state->kageki_csport_sel);

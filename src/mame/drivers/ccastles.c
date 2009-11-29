@@ -168,7 +168,7 @@ static TIMER_CALLBACK( clock_irq )
 	/* assert the IRQ if not already asserted */
 	if (!state->irq_state)
 	{
-		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
 		state->irq_state = 1;
 	}
 
@@ -201,6 +201,7 @@ static MACHINE_START( ccastles )
 	rectangle visarea;
 
 	/* initialize globals */
+	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->syncprom = memory_region(machine, "proms") + 0x000;
 
 	/* find the start of VBLANK in the SYNC PROM */
@@ -263,7 +264,7 @@ static WRITE8_HANDLER( irq_ack_w )
 	ccastles_state *state = (ccastles_state *)space->machine->driver_data;
 	if (state->irq_state)
 	{
-		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 		state->irq_state = 0;
 	}
 }

@@ -392,7 +392,8 @@ D                                                                               
 
 static TIMER_CALLBACK( equites_nmi_callback )
 {
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
+	equites_state *state = (equites_state *)machine->driver_data;
+	cpu_set_input_line(state->audio_cpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static TIMER_CALLBACK( equites_frq_adjuster_callback )
@@ -425,7 +426,7 @@ static WRITE8_HANDLER(equites_c0f8_w)
 	switch (offset)
 	{
 		case 0:	// c0f8: NMI ack (written by NMI handler)
-			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+			cpu_set_input_line(state->audio_cpu, INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
@@ -435,7 +436,7 @@ static WRITE8_HANDLER(equites_c0f8_w)
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)
 			// verified on PCB:
-			cputag_set_input_line(space->machine, "audiocpu", I8085_INTR_LINE, HOLD_LINE);
+			cpu_set_input_line(state->audio_cpu, I8085_INTR_LINE, HOLD_LINE);
 			break;
 
 		case 3: // c0fb: n.c.
@@ -681,12 +682,14 @@ static WRITE16_HANDLER(mcu_w)
 
 static WRITE16_HANDLER( mcu_halt_assert_w )
 {
-	cputag_set_input_line(space->machine, "mcu", INPUT_LINE_HALT, ASSERT_LINE);
+	equites_state *state = (equites_state *)space->machine->driver_data;
+	cpu_set_input_line(state->mcu, INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( mcu_halt_clear_w )
 {
-	cputag_set_input_line(space->machine, "mcu", INPUT_LINE_HALT, CLEAR_LINE);
+	equites_state *state = (equites_state *)space->machine->driver_data;
+	cpu_set_input_line(state->mcu, INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 
@@ -1182,6 +1185,7 @@ static MACHINE_START( equites )
 {
 	equites_state *state = (equites_state *)machine->driver_data;
 
+ 	state->mcu = devtag_get_device(machine, "mcu");
  	state->audio_cpu = devtag_get_device(machine, "audiocpu");
  	state->msm = devtag_get_device(machine, "msm");
 	state->dac_1 = devtag_get_device(machine, "dac1");

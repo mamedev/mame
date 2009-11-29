@@ -64,6 +64,9 @@ struct _m14_state
 
 	/* input-related */
 	UINT8 hop_mux;
+
+	/* devices */
+	const device_config *maincpu;
 };
 
 
@@ -216,16 +219,18 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( left_coin_inserted )
 {
+	m14_state *state = (m14_state *)field->port->machine->driver_data;
 	/* left coin insertion causes a rst6.5 (vector 0x34) */
 	if (newval)
-		cputag_set_input_line(field->port->machine, "maincpu", I8085_RST65_LINE, HOLD_LINE);
+		cpu_set_input_line(state->maincpu, I8085_RST65_LINE, HOLD_LINE);
 }
 
 static INPUT_CHANGED( right_coin_inserted )
 {
+	m14_state *state = (m14_state *)field->port->machine->driver_data;
 	/* right coin insertion causes a rst5.5 (vector 0x2c) */
 	if (newval)
-		cputag_set_input_line(field->port->machine, "maincpu", I8085_RST55_LINE, HOLD_LINE);
+		cpu_set_input_line(state->maincpu, I8085_RST55_LINE, HOLD_LINE);
 }
 
 static INPUT_PORTS_START( m14 )
@@ -307,6 +312,8 @@ static INTERRUPT_GEN( m14_irq )
 static MACHINE_START( m14 )
 {
 	m14_state *state = (m14_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
 
 	state_save_register_global(machine, state->hop_mux);
 }

@@ -16,8 +16,9 @@ Espial: The Orca logo is displayed, but looks to be "blacked out" via the
 
 static TIMER_CALLBACK( interrupt_disable )
 {
+	espial_state *state = (espial_state *)machine->driver_data;
 	//interrupt_enable = 0;
-	cpu_interrupt_enable(cputag_get_cpu(machine, "maincpu"), 0);
+	cpu_interrupt_enable(state->maincpu, 0);
 }
 
 MACHINE_RESET( espial )
@@ -34,6 +35,9 @@ MACHINE_RESET( espial )
 MACHINE_START( espial )
 {
 	espial_state *state = (espial_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
 
 	//state_save_register_global_array(machine, mcu_out[1]);
 	state_save_register_global(machine, state->sound_nmi_enabled);
@@ -73,8 +77,9 @@ INTERRUPT_GEN( zodiac_master_interrupt )
 
 WRITE8_HANDLER( zodiac_master_soundlatch_w )
 {
+	espial_state *state = (espial_state *)space->machine->driver_data;
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 

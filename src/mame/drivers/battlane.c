@@ -49,8 +49,8 @@ static WRITE8_HANDLER( battlane_cpu_command_w )
     /*
     if (~state->cpu_control & 0x08)
     {
-        cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-        cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
+        cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
+        cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
     }
     */
 
@@ -58,7 +58,7 @@ static WRITE8_HANDLER( battlane_cpu_command_w )
         CPU2's SWI will trigger an 6809 IRQ on the master by resetting 0x04
         Master will respond by setting the bit back again
     */
-    cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE,  data & 0x04 ? CLEAR_LINE : HOLD_LINE);
+    cpu_set_input_line(state->maincpu, M6809_IRQ_LINE,  data & 0x04 ? CLEAR_LINE : HOLD_LINE);
 
 	/*
     Slave function call (e.g. ROM test):
@@ -76,7 +76,7 @@ static WRITE8_HANDLER( battlane_cpu_command_w )
     FA96: 27 FA       BEQ   $FA92   ; Wait for bit to be set
     */
 
-	cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, data & 0x02 ? CLEAR_LINE : HOLD_LINE);
+	cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, data & 0x02 ? CLEAR_LINE : HOLD_LINE);
 }
 
 static INTERRUPT_GEN( battlane_cpu1_interrupt )
@@ -87,7 +87,7 @@ static INTERRUPT_GEN( battlane_cpu1_interrupt )
 	if (~state->cpu_control & 0x08)
 	{
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-		cputag_set_input_line(device->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -258,7 +258,8 @@ GFXDECODE_END
 
 static void irqhandler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "maincpu", M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	battlane_state *state = (battlane_state *)device->machine->driver_data;
+	cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3526_interface ym3526_config =
@@ -272,6 +273,17 @@ static const ym3526_interface ym3526_config =
  *  Machine driver
  *
  *************************************/
+
+static MACHINE_START( battlane )
+{
+	battlane_state *state = (battlane_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->subcpu = devtag_get_device(machine, "sub");
+
+	state_save_register_global(machine, state->video_ctrl);
+	state_save_register_global(machine, state->cpu_control);
+}
 
 static MACHINE_RESET( battlane )
 {
@@ -296,6 +308,7 @@ static MACHINE_DRIVER_START( battlane )
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
+	MDRV_MACHINE_START(battlane)
 	MDRV_MACHINE_RESET(battlane)
 
 	/* video hardware */

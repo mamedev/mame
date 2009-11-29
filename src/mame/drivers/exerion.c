@@ -35,8 +35,9 @@ static READ8_HANDLER( exerion_port01_r )
 
 static INPUT_CHANGED( coin_inserted )
 {
+	exerion_state *state = (exerion_state *)field->port->machine->driver_data;
 	/* coin insertion causes an NMI */
-	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -91,8 +92,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6008, 0x600b) AM_READ(exerion_protection_r)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_MEMBER(exerion_state, main_ram)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(exerion_state, videoram) AM_SIZE_GENERIC(videoram)
-	AM_RANGE(0x8800, 0x887f) AM_RAM AM_BASE_MEMBER(exerion_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(exerion_state, videoram) AM_SIZE_MEMBER(exerion_state, videoram_size)
+	AM_RANGE(0x8800, 0x887f) AM_RAM AM_BASE_MEMBER(exerion_state, spriteram) AM_SIZE_MEMBER(exerion_state, spriteram_size)
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(exerion_port01_r)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW0")
@@ -277,6 +278,8 @@ static const ay8910_interface ay8910_config =
 static MACHINE_START( exerion )
 {
 	exerion_state *state = (exerion_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
 
 	state_save_register_global(machine, state->porta);
 	state_save_register_global(machine, state->portb);

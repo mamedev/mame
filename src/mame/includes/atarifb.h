@@ -24,6 +24,7 @@ struct _atarifb_state
 	UINT8 *  field_videoram;
 	UINT8 *  spriteram;
 	UINT8 *  scroll_register;
+	size_t   spriteram_size;
 
 	tilemap  *alpha1_tilemap;
 	tilemap  *alpha2_tilemap;
@@ -39,6 +40,9 @@ struct _atarifb_state
 	int counter_x_in0b, counter_y_in0b;
 	int counter_x_in2, counter_y_in2;
 	int counter_x_in2b, counter_y_in2b;
+
+	/* devices */
+	const device_config *maincpu;
 };
 
 

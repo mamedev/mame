@@ -34,7 +34,7 @@ static void gigas_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 	freekick_state *state = (freekick_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
+	for (offs = 0; offs < state->spriteram_size; offs += 4)
 	{
 		int xpos = state->spriteram[offs + 3];
 		int ypos = state->spriteram[offs + 2];
@@ -69,7 +69,7 @@ static void pbillrd_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 	freekick_state *state = (freekick_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
+	for (offs = 0; offs < state->spriteram_size; offs += 4)
 	{
 		int xpos = state->spriteram[offs + 3];
 		int ypos = state->spriteram[offs + 2];
@@ -105,7 +105,7 @@ static void freekick_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	freekick_state *state = (freekick_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
+	for (offs = 0; offs < state->spriteram_size; offs += 4)
 	{
 		int xpos = state->spriteram[offs + 3];
 		int ypos = state->spriteram[offs + 0];

@@ -228,6 +228,8 @@ static MACHINE_START( commando )
 {
 	commando_state *state = (commando_state *)machine->driver_data;
 
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
 	state_save_register_global_array(machine, state->scroll_x);
 	state_save_register_global_array(machine, state->scroll_y);
 }

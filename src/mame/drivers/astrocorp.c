@@ -20,8 +20,9 @@ typedef struct _astrocrp_state astrocrp_state;
 struct _astrocrp_state
 {
 	/* memory pointers */
-	UINT16 *   spriteram16;
-	UINT16 *   paletteram16;
+	UINT16 *   spriteram;
+	UINT16 *   paletteram;
+	size_t     spriteram_size;
 
 	/* video-related */
 	UINT16     screen_enable;
@@ -49,8 +50,8 @@ struct _astrocrp_state
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
 	astrocrp_state *state = (astrocrp_state *)machine->driver_data;
-	UINT16 *source = state->spriteram16;
-	UINT16 *finish = state->spriteram16 + machine->generic.spriteram_size / 2;
+	UINT16 *source = state->spriteram;
+	UINT16 *finish = state->spriteram + state->spriteram_size / 2;
 
 	for ( ; source < finish; source += 8 / 2 )
 	{
@@ -162,23 +163,23 @@ static READ16_HANDLER( astrocorp_unk_r )
 static WRITE16_HANDLER( astrocorp_palette_w )
 {
 	astrocrp_state *state = (astrocrp_state *)space->machine->driver_data;
-	COMBINE_DATA(&state->paletteram16[offset]);
+	COMBINE_DATA(&state->paletteram[offset]);
 	palette_set_color_rgb(space->machine, offset,
-		pal5bit((state->paletteram16[offset] >>  0) & 0x1f),
-		pal6bit((state->paletteram16[offset] >>  5) & 0x3f),
-		pal5bit((state->paletteram16[offset] >> 11) & 0x1f)
+		pal5bit((state->paletteram[offset] >>  0) & 0x1f),
+		pal6bit((state->paletteram[offset] >>  5) & 0x3f),
+		pal5bit((state->paletteram[offset] >> 11) & 0x1f)
 	);
 }
 
 static ADDRESS_MAP_START( showhand_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x050000, 0x050fff ) AM_RAM AM_BASE_MEMBER(astrocrp_state, spriteram16) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE( 0x050000, 0x050fff ) AM_RAM AM_BASE_MEMBER(astrocrp_state, spriteram) AM_SIZE_MEMBER(astrocrp_state, spriteram_size)
 	AM_RANGE( 0x052000, 0x052001 ) AM_WRITENOP
 	AM_RANGE( 0x054000, 0x054001 ) AM_READ_PORT("INPUTS")
 	AM_RANGE( 0x058000, 0x058001 ) AM_WRITE(astrocorp_eeprom_w)
 	AM_RANGE( 0x05a000, 0x05a001 ) AM_WRITE(astrocorp_outputs_w)
 	AM_RANGE( 0x05e000, 0x05e001 ) AM_READ_PORT("EEPROMIN")
-	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocrp_state, paletteram16)
+	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocrp_state, paletteram)
 	AM_RANGE( 0x070000, 0x073fff ) AM_RAM
 	AM_RANGE( 0x080000, 0x080001 ) AM_DEVWRITE("oki", astrocorp_sound_bank_w)
 	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE(astrocorp_enable_w)
@@ -187,9 +188,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( showhanc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocrp_state, paletteram16)
+	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocrp_state, paletteram)
 	AM_RANGE( 0x070000, 0x070001 ) AM_DEVWRITE("oki", astrocorp_sound_bank_w)
-	AM_RANGE( 0x080000, 0x080fff ) AM_RAM AM_BASE_MEMBER(astrocrp_state, spriteram16) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE( 0x080000, 0x080fff ) AM_RAM AM_BASE_MEMBER(astrocrp_state, spriteram) AM_SIZE_MEMBER(astrocrp_state, spriteram_size)
 	AM_RANGE( 0x082000, 0x082001 ) AM_WRITENOP
 	AM_RANGE( 0x084000, 0x084001 ) AM_READ_PORT("INPUTS")
 	AM_RANGE( 0x088000, 0x088001 ) AM_WRITE(astrocorp_eeprom_w)

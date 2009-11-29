@@ -19,8 +19,8 @@ struct _dribling_state
 	UINT8    input_mux;
 	UINT8    di;
 
-
 	/* devices */
+	const device_config *maincpu;
 	const device_config *ppi_0;
 	const device_config *ppi_1;
 };

@@ -13,10 +13,14 @@ struct _citycon_state
 	UINT8 *        scroll;
 	UINT8 *        spriteram;
 //	UINT8 *        paletteram;	// currently this uses generic palette handling
+	size_t         spriteram_size;
 
 	/* video-related */
 	tilemap        *bg_tilemap,*fg_tilemap;
 	int            bg_image;
+
+	/* devices */
+	const device_config *maincpu;
 };
 
 

@@ -60,7 +60,7 @@ static WRITE8_HANDLER( dealer_decrypt_rom )
 static ADDRESS_MAP_START( epos_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_MEMBER(epos_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_MEMBER(epos_state, videoram) AM_SIZE_MEMBER(epos_state, videoram_size)
 ADDRESS_MAP_END
 
 
@@ -68,7 +68,7 @@ static ADDRESS_MAP_START( dealer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK(1)
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK(2)
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_MEMBER(epos_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_MEMBER(epos_state, videoram) AM_SIZE_MEMBER(epos_state, videoram_size)
 ADDRESS_MAP_END
 
 /*************************************

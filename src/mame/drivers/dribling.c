@@ -91,7 +91,7 @@ static WRITE8_DEVICE_HANDLER( misc_w )
 	/* bit 7 = di */
 	state->di = (data >> 7) & 1;
 	if (!state->di)
-		cputag_set_input_line(device->machine, "maincpu", 0, CLEAR_LINE);
+		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 
 	/* bit 6 = parata */
 
@@ -287,6 +287,7 @@ static MACHINE_START( dribling )
 {
 	dribling_state *state = (dribling_state *)machine->driver_data;
 
+	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->ppi_0 = devtag_get_device(machine, "ppi8255_0");
 	state->ppi_1 = devtag_get_device(machine, "ppi8255_1");
 

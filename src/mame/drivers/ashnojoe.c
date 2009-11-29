@@ -274,9 +274,10 @@ static GFXDECODE_START( ashnojoe )
 GFXDECODE_END
 
 
-static void ym2203_irq_handler(const device_config *device, int irq)
+static void ym2203_irq_handler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	ashnojoe_state *state = (ashnojoe_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( ym2203_write_a )
@@ -316,7 +317,7 @@ static void ashnojoe_vclk_cb( const device_config *device )
 	else
 	{
 		msm5205_data_w(device, state->adpcm_byte & 0xf);
-		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	state->msm5205_vclk_toggle ^= 1;
@@ -332,6 +333,8 @@ static const msm5205_interface msm5205_config =
 static MACHINE_START( ashnojoe )
 {
 	ashnojoe_state *state = (ashnojoe_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
 
 	state_save_register_global(machine, state->adpcm_byte);
 	state_save_register_global(machine, state->soundlatch_status);

@@ -13,6 +13,7 @@ struct _exprraid_state
 	UINT8 *        videoram;
 	UINT8 *        colorram;
 	UINT8 *        spriteram;
+	size_t         spriteram_size;
 
 	/* video-related */
 	tilemap        *bg_tilemap, *fg_tilemap;
@@ -20,6 +21,10 @@ struct _exprraid_state
 
 	/* misc */
 	//int          coin;	// used in the commented out INTERRUPT_GEN - can this be removed?
+
+	/* devices */
+	const device_config *maincpu;
+	const device_config *slave;
 };
 
 

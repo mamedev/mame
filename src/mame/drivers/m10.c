@@ -130,8 +130,9 @@ Notes (couriersud)
 
 static WRITE8_DEVICE_HANDLER( ic8j1_output_changed )
 {
+	m10_state *state = (m10_state *)device->machine->driver_data;
 	LOG(("ic8j1: %d %d\n", data, video_screen_get_vpos(device->machine->primary_screen)));
-	cputag_set_input_line(device->machine, "maincpu", 0, !data ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(state->maincpu, 0, !data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( ic8j2_output_changed )
@@ -195,6 +196,7 @@ static MACHINE_START( m10 )
 {
 	m10_state *state = (m10_state *)machine->driver_data;
 
+	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->ic8j1 = devtag_get_device(machine, "ic8j1");
 	state->ic8j2 = devtag_get_device(machine, "ic8j2");
 	state->samples = devtag_get_device(machine, "samples");
@@ -491,7 +493,7 @@ static READ8_HANDLER( m11_a700_r )
 {
 	m10_state *state = (m10_state *)space->machine->driver_data;
    	//LOG(("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen)));
-	//cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	//cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 	LOG(("clear\n"));
 	ttl74123_clear_w(state->ic8j1, 0, 0);
 	ttl74123_clear_w(state->ic8j1, 0, 1);
@@ -506,25 +508,27 @@ static READ8_HANDLER( m11_a700_r )
 
 static INPUT_CHANGED( coin_inserted )
 {
+	m10_state *state = (m10_state *)field->port->machine->driver_data;
 	/* coin insertion causes an NMI */
-	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static TIMER_CALLBACK( interrupt_callback )
 {
+	m10_state *state = (m10_state *)machine->driver_data;
 	if (param == 0)
 	{
-		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
 		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART + 16, 0), NULL, 1, interrupt_callback);
 	}
 	if (param == 1)
 	{
-		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
 		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART + 24, 0), NULL, 2, interrupt_callback);
 	}
 	if (param == -1)
-		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 
 }
 
@@ -556,7 +560,7 @@ static INTERRUPT_GEN( m15_interrupt )
 static ADDRESS_MAP_START( m10_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_READ(SMH_ROM) AM_BASE_MEMBER(m10_state, rom)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(m10_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(m10_state, videoram) AM_SIZE_MEMBER(m10_state, videoram_size)
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE_MEMBER(m10_state, colorram) /* foreground colour  */
 	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(m10_chargen_w) AM_BASE_MEMBER(m10_state, chargen) /* background ????? */
 	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
@@ -570,7 +574,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( m11_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_READ(SMH_ROM) AM_BASE_MEMBER(m10_state, rom)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(m10_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(m10_state, videoram) AM_SIZE_MEMBER(m10_state, videoram_size)
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE_MEMBER(m10_state, colorram) /* foreground colour  */
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(m10_state, chargen) /* background ????? */
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(m11_a100_w) /* sound writes ???? */
@@ -584,7 +588,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( m15_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x33ff) AM_READ(SMH_ROM) AM_BASE_MEMBER(m10_state, rom)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(m10_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(m10_state, videoram) AM_SIZE_MEMBER(m10_state, videoram_size)
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE_MEMBER(m10_state, colorram) /* foreground colour  */
 	AM_RANGE(0x5000, 0x57ff) AM_RAM_WRITE(m15_chargen_w) AM_BASE_MEMBER(m10_state, chargen) /* background ????? */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P2")

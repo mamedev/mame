@@ -220,7 +220,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	int offs;
 	UINT8 *gfx = memory_region(machine, "gfx2");
 
-	for (offs = machine->generic.spriteram_size / 2 - 8; offs >= 0; offs -= 8)
+	for (offs = state->spriteram_size / 2 - 8; offs >= 0; offs -= 8)
 	{
 		int sx, starty, endy, x, y, start, color, width, flipx, primask;
 		UINT8 *rom = gfx;

@@ -61,6 +61,7 @@ static MACHINE_START( circusc )
 {
 	circusc_state *state = (circusc_state *)machine->driver_data;
 
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
 	state->sn1 = devtag_get_device(machine, "sn1");
 	state->sn2 = devtag_get_device(machine, "sn2");
 	state->dac = devtag_get_device(machine, "dac");
@@ -97,7 +98,8 @@ static READ8_HANDLER( circusc_sh_timer_r )
 
 static WRITE8_HANDLER( circusc_sh_irqtrigger_w )
 {
-	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
+	circusc_state *state = (circusc_state *)space->machine->driver_data;
+	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( circusc_coin_counter_w )
@@ -162,7 +164,7 @@ static ADDRESS_MAP_START( circusc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(circusc_colorram_w) AM_BASE_MEMBER(circusc_state, colorram) /* colorram */
 	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(circusc_videoram_w) AM_BASE_MEMBER(circusc_state, videoram) /* videoram */
 	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_BASE_MEMBER(circusc_state, spriteram_2) /* spriteram2 */
-	AM_RANGE(0x3900, 0x39ff) AM_RAM AM_BASE_MEMBER(circusc_state, spriteram) AM_SIZE_GENERIC(spriteram) /* spriteram */
+	AM_RANGE(0x3900, 0x39ff) AM_RAM AM_BASE_MEMBER(circusc_state, spriteram) AM_SIZE_MEMBER(circusc_state, spriteram_size) /* spriteram */
 	AM_RANGE(0x3a00, 0x3fff) AM_RAM
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END

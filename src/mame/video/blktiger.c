@@ -157,7 +157,7 @@ WRITE8_HANDLER( blktiger_video_control_w )
 	coin_counter_w(space->machine, 1,data & 2);
 
 	/* bit 5 resets the sound CPU */
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 6 flips screen */
 	flip_screen_set(space->machine, data & 0x40);

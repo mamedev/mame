@@ -46,7 +46,7 @@ WRITE16_HANDLER( blmbycar_palette_w )
 {
 	blmbycar_state *state = (blmbycar_state *)space->machine->driver_data;
 
-	data = COMBINE_DATA(&state->paletteram16[offset]);
+	data = COMBINE_DATA(&state->paletteram[offset]);
 	palette_set_color_rgb( space->machine, offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
 }
 
@@ -170,8 +170,8 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	blmbycar_state *state = (blmbycar_state *)machine->driver_data;
 	UINT16 *source, *finish;
 
-	source = state->spriteram16 + 0x6 / 2;				// !
-	finish = state->spriteram16 + machine->generic.spriteram_size / 2 - 8 / 2;
+	source = state->spriteram + 0x6 / 2;				// !
+	finish = state->spriteram + state->spriteram_size / 2 - 8 / 2;
 
 	/* Find "the end of sprites" marker */
 
@@ -181,7 +181,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	/* Draw sprites in reverse order for pdrawfgfx */
 
 	source -= 8 / 2;
-	finish = state->spriteram16;
+	finish = state->spriteram;
 
 	for ( ; source >= finish; source -= 8 / 2 )
 	{

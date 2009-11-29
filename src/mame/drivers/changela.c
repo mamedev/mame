@@ -422,6 +422,7 @@ static const ay8910_interface ay8910_interface_2 =
 
 static INTERRUPT_GEN( chl_interrupt )
 {
+	changela_state *state = (changela_state *)device->machine->driver_data;
 	int vector = video_screen_get_vblank(device->machine->primary_screen) ? 0xdf : 0xcf; /* 4 irqs per frame: 3 times 0xcf, 1 time 0xdf */
 
 //    video_screen_update_partial(device->machine->primary_screen, video_screen_get_vpos(device->machine->primary_screen));
@@ -432,13 +433,15 @@ static INTERRUPT_GEN( chl_interrupt )
 	//so we should cause an INT on the MCU cpu here, as well.
 	//but only once per frame !
 	if (vector == 0xdf) /* only on vblank */
-		generic_pulse_irq_line(cputag_get_cpu(device->machine, "mcu"), 0);
+		generic_pulse_irq_line(state->mcu, 0);
 
 }
 
 static MACHINE_START(changela)
 {
 	changela_state *state = (changela_state *)machine->driver_data;
+
+	state->mcu = devtag_get_device(machine, "mcu");
 
 	/* video */
 	state_save_register_global(machine, state->slopeROM_bank);

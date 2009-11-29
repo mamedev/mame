@@ -173,25 +173,25 @@ static WRITE16_HANDLER( ddragon3_io_w )
 
 		case 1: /* soundlatch_w */
 			soundlatch_w(space, 1, state->io_reg[1] & 0xff);
-			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
+			cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 		case 2:
 			/*  this gets written to on startup and at the end of IRQ6
             **  possibly trigger IRQ on sound CPU
             */
-			cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
+			cpu_set_input_line(state->maincpu, 6, CLEAR_LINE);
 			break;
 
 		case 3:
 			/*  this gets written to on startup,
             **  and at the end of IRQ5 (input port read) */
-			cputag_set_input_line(space->machine, "maincpu", 5, CLEAR_LINE);
+			cpu_set_input_line(state->maincpu, 5, CLEAR_LINE);
 			break;
 
 		case 4:
 			/* this gets written to at the end of IRQ6 only */
-			cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
+			cpu_set_input_line(state->maincpu, 6, CLEAR_LINE);
 			break;
 
 		default:
@@ -515,7 +515,8 @@ GFXDECODE_END
 
 static void dd3_ymirq_handler(const device_config *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	ddragon3_state *state = (ddragon3_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -531,6 +532,7 @@ static const ym2151_interface ym2151_config =
 
 static TIMER_DEVICE_CALLBACK( ddragon3_scanline )
 {
+	ddragon3_state *state = (ddragon3_state *)timer->machine->driver_data;
 	int scanline = param;
 
 	/* An interrupt is generated every 16 scanlines */
@@ -538,14 +540,14 @@ static TIMER_DEVICE_CALLBACK( ddragon3_scanline )
 	{
 		if (scanline > 0)
 			video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
-		cputag_set_input_line(timer->machine, "maincpu", 5, ASSERT_LINE);
+		cpu_set_input_line(state->maincpu, 5, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 248 */
 	if (scanline == 248)
 	{
 		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
-		cputag_set_input_line(timer->machine, "maincpu", 6, ASSERT_LINE);
+		cpu_set_input_line(state->maincpu, 6, ASSERT_LINE);
 	}
 }
 
@@ -558,6 +560,9 @@ static TIMER_DEVICE_CALLBACK( ddragon3_scanline )
 static MACHINE_START( ddragon3 )
 {
 	ddragon3_state *state = (ddragon3_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
 
 	state_save_register_global(machine, state->vreg);
 	state_save_register_global(machine, state->bg_scrollx);

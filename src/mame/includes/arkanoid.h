@@ -16,6 +16,7 @@ struct _arkanoid_state
 	/* memory pointers */
 	UINT8 *  videoram;
 	UINT8 *  spriteram;
+	size_t   spriteram_size;
 
 	/* video-related */
 	tilemap  *bg_tilemap;
@@ -30,6 +31,9 @@ struct _arkanoid_state
 	UINT8    port_a_in, port_a_out, ddr_a;
 	UINT8    port_c_out, ddr_c;
 	UINT8    bootleg_cmd;
+
+	/* devices */
+	const device_config *mcu;
 };
 
 

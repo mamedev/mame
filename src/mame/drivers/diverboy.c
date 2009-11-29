@@ -58,7 +58,11 @@ struct _diverboy_state
 {
 	/* memory pointers */
 	UINT16 *  spriteram;
-//	UINT16 *  paletteram16;	// currently this uses generic palette handling
+//	UINT16 *  paletteram;	// currently this uses generic palette handling
+	size_t    spriteram_size;
+
+	/* devices */
+	const device_config *audiocpu;
 };
 
 
@@ -70,7 +74,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 {
 	diverboy_state *state = (diverboy_state *)machine->driver_data;
 	UINT16 *source = state->spriteram;
-	UINT16 *finish = source + (machine->generic.spriteram_size / 2);
+	UINT16 *finish = source + (state->spriteram_size / 2);
 
 	while (source < finish)
 	{
@@ -112,10 +116,12 @@ VIDEO_UPDATE(diverboy)
 
 static WRITE16_HANDLER( soundcmd_w )
 {
+	diverboy_state *state = (diverboy_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+		cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 	}
 }
 
@@ -132,7 +138,7 @@ static WRITE8_DEVICE_HANDLER( okibank_w )
 static ADDRESS_MAP_START( diverboy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE_MEMBER(diverboy_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE_MEMBER(diverboy_state, spriteram) AM_SIZE_MEMBER(diverboy_state, spriteram_size)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(soundcmd_w)
 	AM_RANGE(0x140000, 0x1407ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P1_P2")
@@ -232,6 +238,12 @@ static GFXDECODE_START( diverboy )
 GFXDECODE_END
 
 
+static MACHINE_START( diverboy )
+{
+	diverboy_state *state = (diverboy_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+}
 
 static MACHINE_DRIVER_START( diverboy )
 	MDRV_DRIVER_DATA(diverboy_state)
@@ -243,8 +255,9 @@ static MACHINE_DRIVER_START( diverboy )
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(snd_map)
 
-	MDRV_GFXDECODE(diverboy)
+	MDRV_MACHINE_START(diverboy)
 
+	MDRV_GFXDECODE(diverboy)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

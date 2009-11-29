@@ -131,9 +131,6 @@ VIDEO_START( 1942 )
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 16);
 
 	tilemap_set_transparent_pen(state->fg_tilemap,0);
-
-	state_save_register_global(machine, state->palette_bank);
-	state_save_register_global_array(machine, state->scroll);
 }
 
 
@@ -182,13 +179,14 @@ WRITE8_HANDLER( c1942_scroll_w )
 
 WRITE8_HANDLER( c1942_c804_w )
 {
+	_1942_state *state = (_1942_state *)space->machine->driver_data;
 	/* bit 7: flip screen
        bit 4: cpu B reset
        bit 0: coin counter */
 
 	coin_counter_w(space->machine, 0,data & 0x01);
 
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	flip_screen_set(space->machine, data & 0x80);
 }
@@ -205,7 +203,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	_1942_state *state = (_1942_state *)machine->driver_data;
 	int offs;
 
-	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int i, code, col, sx, sy, dir;
 

@@ -11,12 +11,16 @@ struct _crospang_state
 	UINT16 *  bg_videoram;
 	UINT16 *  fg_videoram;
 	UINT16 *  spriteram;
-//	UINT16 *  paletteram16;		// currently this uses generic palette handling
+//	UINT16 *  paletteram;		// currently this uses generic palette handling
+	size_t    spriteram_size;
 
 	/* video-related */
 	tilemap   *bg_layer,*fg_layer;
 	int       xsproff, ysproff;
 	int       bestri_tilebank;
+
+	/* devices */
+	const device_config *audiocpu;
 };
 
 

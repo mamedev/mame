@@ -132,13 +132,14 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(yunsun16_vram_1_w) AM_BASE_MEMBER(yunsun16_state, vram_1)	// Layer 1
 	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(yunsun16_vram_0_w) AM_BASE_MEMBER(yunsun16_state, vram_0)	// Layer 0
-	AM_RANGE(0x910000, 0x910fff) AM_RAM	AM_BASE_MEMBER(yunsun16_state, spriteram16) AM_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0x910000, 0x910fff) AM_RAM	AM_BASE_MEMBER(yunsun16_state, spriteram) AM_SIZE_MEMBER(yunsun16_state, spriteram_size)	// Sprites
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 
 static WRITE16_HANDLER( magicbub_sound_command_w )
 {
+	yunsun16_state *state = (yunsun16_state *)space->machine->driver_data;
 	if (ACCESSING_BITS_0_7)
 	{
 /*
@@ -148,7 +149,7 @@ number 0 on each voice. That sample is 00000-00000.
 		if ((data & 0xff) != 0x3a)
 		{
 			soundlatch_w(space, 0, data & 0xff);
-			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 }
@@ -554,6 +555,16 @@ GFXDECODE_END
 
 ***************************************************************************/
 
+static MACHINE_START( yunsun16 )
+{
+	yunsun16_state *state = (yunsun16_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->sprites_scrolldx);
+	state_save_register_global(machine, state->sprites_scrolldy);
+}
+
 static MACHINE_RESET( yunsun16 )
 {
 	yunsun16_state *state = (yunsun16_state *)machine->driver_data;
@@ -568,7 +579,8 @@ static MACHINE_RESET( yunsun16 )
 
 static void soundirq(const device_config *device, int state)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, state);
+	yunsun16_state *yunsun16 = (yunsun16_state *)device->machine->driver_data;
+	cpu_set_input_line(yunsun16->audiocpu, 0, state);
 }
 
 static const ym3812_interface magicbub_ym3812_intf =
@@ -590,6 +602,7 @@ static MACHINE_DRIVER_START( magicbub )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(sound_port_map)
 
+	MDRV_MACHINE_START(yunsun16)
 	MDRV_MACHINE_RESET(yunsun16)
 
 	/* video hardware */
@@ -635,6 +648,7 @@ static MACHINE_DRIVER_START( shocking )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
+	MDRV_MACHINE_START(yunsun16)
 	MDRV_MACHINE_RESET(yunsun16)
 
 	/* video hardware */

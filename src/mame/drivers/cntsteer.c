@@ -50,6 +50,11 @@ struct _cntsteer_state
 
 	/* misc */
 	int      nmimask;	// zerotrgt only
+
+	/* devices */
+	const device_config *maincpu;
+	const device_config *audiocpu;
+	const device_config *subcpu;
 };
 
 
@@ -434,42 +439,47 @@ static WRITE8_HANDLER( cntsteer_background_w )
 
 static WRITE8_HANDLER( gekitsui_sub_irq_ack )
 {
-	cputag_set_input_line(space->machine, "subcpu", M6809_IRQ_LINE, CLEAR_LINE);
+	cntsteer_state *state = (cntsteer_state *)space->machine->driver_data;
+	cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( cntsteer_sound_w )
 {
+	cntsteer_state *state = (cntsteer_state *)space->machine->driver_data;
  	soundlatch_w(space, 0, data);
- 	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+ 	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( zerotrgt_ctrl_w )
 {
+	cntsteer_state *state = (cntsteer_state *)space->machine->driver_data;
 	/*TODO: check this.*/
 	logerror("CTRL: %04x: %04x: %04x\n", cpu_get_pc(space->cpu), offset, data);
-//  if (offset == 0) cputag_set_input_line(space->machine, "subcpu", INPUT_LINE_RESET, ASSERT_LINE);
+//  if (offset == 0) cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Wrong - bits 0 & 1 used on this
-	if (offset == 1) cputag_set_input_line(space->machine, "subcpu", M6809_IRQ_LINE, ASSERT_LINE);
-//  if (offset == 2) cputag_set_input_line(space->machine, "subcpu", INPUT_LINE_RESET, CLEAR_LINE);
+	if (offset == 1) cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+//  if (offset == 2) cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( cntsteer_sub_irq_w )
 {
-	cputag_set_input_line(space->machine, "subcpu", M6809_IRQ_LINE, ASSERT_LINE);
+	cntsteer_state *state = (cntsteer_state *)space->machine->driver_data;
+	cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
 //  printf("%02x IRQ\n", data);
 }
 
 static WRITE8_HANDLER( cntsteer_sub_nmi_w )
 {
 //  if (data)
-//  cputag_set_input_line(space->machine, "subcpu", INPUT_LINE_NMI, PULSE_LINE);
+//  cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
 //  popmessage("%02x", data);
 }
 
 static WRITE8_HANDLER( cntsteer_main_irq_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
+	cntsteer_state *state = (cntsteer_state *)space->machine->driver_data;
+	cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 /* Convert weird input handling with MAME standards.*/
@@ -640,7 +650,8 @@ INPUT_PORTS_END
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cputag_set_input_line(field->port->machine, "subcpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cntsteer_state *state = (cntsteer_state *)field->port->machine->driver_data;
+	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( cntsteer )
@@ -773,6 +784,10 @@ GFXDECODE_END
 static MACHINE_START( cntsteer )
 {
 	cntsteer_state *state = (cntsteer_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->subcpu = devtag_get_device(machine, "subcpu");
 
 	state_save_register_global(machine, state->flipscreen);
 	state_save_register_global(machine, state->bg_bank);

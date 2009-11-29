@@ -57,7 +57,7 @@ static ADDRESS_MAP_START( crospang_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_BASE_MEMBER(crospang_state, fg_videoram)
 	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_BASE_MEMBER(crospang_state, bg_videoram)
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE_MEMBER(crospang_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE_MEMBER(crospang_state, spriteram) AM_SIZE_MEMBER(crospang_state, spriteram_size)
 	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")
@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( bestri_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_BASE_MEMBER(crospang_state, fg_videoram)
 	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_BASE_MEMBER(crospang_state, bg_videoram)
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE_MEMBER(crospang_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE_MEMBER(crospang_state, spriteram) AM_SIZE_MEMBER(crospang_state, spriteram_size)
 	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
 	AM_RANGE(0x270004, 0x270005) AM_WRITENOP
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
@@ -275,7 +275,8 @@ GFXDECODE_END
 
 static void irqhandler( const device_config *device, int linestate )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
+	crospang_state *state = (crospang_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =
@@ -287,6 +288,8 @@ static const ym3812_interface ym3812_config =
 static MACHINE_START( crospang )
 {
 	crospang_state *state = (crospang_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
 
 	state_save_register_global(machine, state->bestri_tilebank);
 	state_save_register_global(machine, state->xsproff);

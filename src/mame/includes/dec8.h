@@ -10,6 +10,7 @@ struct _dec8_state
 //	UINT8 *  paletteram;	// currently this uses generic palette handling
 //	UINT8 *  paletteram_2;	// currently this uses generic palette handling
 //	UINT8 *  spriteram;	// currently this uses buffered_spriteram in some games
+	size_t   videoram_size;
 
 	/* video-related */
 	tilemap  *pf0_tilemap, *pf1_tilemap, *fix_tilemap;
@@ -24,6 +25,12 @@ struct _dec8_state
 	int      coin1, coin2, latch, snd;
 	int      msm5205next;
 	int      toggle;
+
+	/* devices */
+	const device_config *maincpu;
+	const device_config *subcpu;
+	const device_config *audiocpu;
+	const device_config *mcu;
 };
 
 /*----------- defined in video/dec8.c -----------*/

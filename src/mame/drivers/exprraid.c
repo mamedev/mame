@@ -233,8 +233,9 @@ static READ8_HANDLER( exprraid_protection_r )
 
 static WRITE8_HANDLER( sound_cpu_command_w )
 {
+	exprraid_state *state = (exprraid_state *)space->machine->driver_data;
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "slave", INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(state->slave, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( vblank_r )
@@ -244,7 +245,7 @@ static READ8_HANDLER( vblank_r )
 
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_BASE_MEMBER(exprraid_state, main_ram)
-	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE_MEMBER(exprraid_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE_MEMBER(exprraid_state, spriteram) AM_SIZE_MEMBER(exprraid_state, spriteram_size)
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(exprraid_videoram_w) AM_BASE_MEMBER(exprraid_state, videoram)
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(exprraid_colorram_w) AM_BASE_MEMBER(exprraid_state, colorram)
 	AM_RANGE(0x1317, 0x1317) AM_READNOP // ???
@@ -279,12 +280,14 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( coin_inserted_deco16 )
 {
-	cputag_set_input_line(field->port->machine, "maincpu", DECO16_IRQ_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
+	exprraid_state *state = (exprraid_state *)field->port->machine->driver_data;
+	cpu_set_input_line(state->maincpu, DECO16_IRQ_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted_nmi )
 {
-	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	exprraid_state *state = (exprraid_state *)field->port->machine->driver_data;
+	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( exprraid )
@@ -438,7 +441,8 @@ GFXDECODE_END
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler( const device_config *device, int linestate )
 {
-	cputag_set_input_line_and_vector(device->machine, "slave", 0, linestate, 0xff);
+	exprraid_state *state = (exprraid_state *)device->machine->driver_data;
+	cpu_set_input_line_and_vector(state->slave, 0, linestate, 0xff);
 }
 
 static const ym3526_interface ym3526_config =
@@ -472,6 +476,9 @@ static INTERRUPT_GEN( exprraid_interrupt )
 static MACHINE_START( exprraid )
 {
 	exprraid_state *state = (exprraid_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->slave = devtag_get_device(machine, "slave");
 
 	state_save_register_global_array(machine, state->bg_index);
 }

@@ -12,6 +12,7 @@ struct _irem_z80_state
 	/* memory pointers */
 	UINT8 *              videoram;	// m52, m57, m58
 	UINT8 *              spriteram;	// m52, m57, m58, m62
+	size_t               spriteram_size;
 
 	UINT8 *              colorram;	// m52
 	UINT8 *              m62_tileram;	// m62

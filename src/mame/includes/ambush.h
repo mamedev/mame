@@ -13,6 +13,9 @@ struct _ambush_state
 	UINT8 *    colorram;
 	UINT8 *    scrollram;
 	UINT8 *    colorbank;
+
+	size_t     videoram_size;
+	size_t     spriteram_size;
 };
 
 

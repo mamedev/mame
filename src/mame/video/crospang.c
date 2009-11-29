@@ -146,7 +146,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	int offs;
 	int flipscreen = 0;
 
-	for (offs = 0; offs < machine->generic.spriteram_size / 2; offs += 4)
+	for (offs = 0; offs < state->spriteram_size / 2; offs += 4)
 	{
 		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
 

@@ -146,9 +146,6 @@ VIDEO_START( battlane )
 	battlane_state *state = (battlane_state *)machine->driver_data;
 	state->bg_tilemap = tilemap_create(machine, get_tile_info_bg, battlane_tilemap_scan_rows_2x2, 16, 16, 32, 32);
 	state->screen_bitmap = auto_bitmap_alloc(machine, 32 * 8, 32 * 8, BITMAP_FORMAT_INDEXED8);
-
-	state_save_register_global(machine, state->video_ctrl);
-	state_save_register_global(machine, state->cpu_control);
 }
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )

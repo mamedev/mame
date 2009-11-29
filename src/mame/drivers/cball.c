@@ -16,6 +16,9 @@ struct _cball_state
 
 	/* video-related */
 	tilemap* bg_tilemap;
+
+	/* devices */
+	const device_config *maincpu;
 };
 
 
@@ -64,9 +67,10 @@ static VIDEO_UPDATE( cball )
 
 static TIMER_CALLBACK( interrupt_callback )
 {
+	cball_state *state = (cball_state *)machine->driver_data;
 	int scanline = param;
 
-	generic_pulse_irq_line(cputag_get_cpu(machine, "maincpu"), 0);
+	generic_pulse_irq_line(state->maincpu, 0);
 
 	scanline = scanline + 32;
 
@@ -76,6 +80,12 @@ static TIMER_CALLBACK( interrupt_callback )
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, interrupt_callback);
 }
 
+
+static MACHINE_START( cball )
+{
+	cball_state *state = (cball_state *)machine->driver_data;
+	state->maincpu = devtag_get_device(machine, "maincpu");
+}
 
 static MACHINE_RESET( cball )
 {
@@ -219,6 +229,7 @@ static MACHINE_DRIVER_START( cball )
 	MDRV_CPU_ADD("maincpu", M6800, 12096000 / 16) /* ? */
 	MDRV_CPU_PROGRAM_MAP(cpu_map)
 
+	MDRV_MACHINE_START(cball)
 	MDRV_MACHINE_RESET(cball)
 
 	/* video hardware */

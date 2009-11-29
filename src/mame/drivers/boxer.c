@@ -30,6 +30,9 @@ struct _boxer_state
 	/* misc */
 	UINT8 pot_state;
 	UINT8 pot_latch;
+
+	/* devices */
+	const device_config *maincpu;
 };
 
 /*************************************
@@ -44,7 +47,7 @@ static TIMER_CALLBACK( pot_interrupt )
 	int mask = param;
 
 	if (state->pot_latch & mask)
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
 	state->pot_state |= mask;
 }
@@ -55,7 +58,7 @@ static TIMER_CALLBACK( periodic_callback )
 	boxer_state *state = (boxer_state *)machine->driver_data;
 	int scanline = param;
 
-	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+	cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
 
 	if (scanline == 0)
 	{
@@ -248,13 +251,14 @@ static WRITE8_HANDLER( boxer_pot_w )
 
 	state->pot_latch = data & 0x3f;
 
-	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( boxer_irq_reset_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	boxer_state *state = (boxer_state *)space->machine->driver_data;
+	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -411,6 +415,8 @@ GFXDECODE_END
 static MACHINE_START( boxer )
 {
 	boxer_state *state = (boxer_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
 
 	state_save_register_global(machine, state->pot_state);
 	state_save_register_global(machine, state->pot_latch);

@@ -35,14 +35,14 @@ static READ8_HANDLER( blktiger_from_mcu_r )
 static WRITE8_HANDLER( blktiger_to_mcu_w )
 {
 	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
-	cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, ASSERT_LINE);
+	cpu_set_input_line(state->mcu, MCS51_INT1_LINE, ASSERT_LINE);
 	state->z80_latch = data;
 }
 
 static READ8_HANDLER( blktiger_from_main_r )
 {
 	blktiger_state *state = (blktiger_state *)space->machine->driver_data;
-	cputag_set_input_line(space->machine, "mcu", MCS51_INT1_LINE, CLEAR_LINE);
+	cpu_set_input_line(state->mcu, MCS51_INT1_LINE, CLEAR_LINE);
 	//printf("%02x read\n",latch);
 	return state->z80_latch;
 }
@@ -263,9 +263,10 @@ GFXDECODE_END
 
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	blktiger_state *state = (blktiger_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -281,6 +282,9 @@ static const ym2203_interface ym2203_config =
 static MACHINE_START( blktiger )
 {
 	blktiger_state *state = (blktiger_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->mcu = devtag_get_device(machine, "mcu");
 
 	/* configure bankswitching */
 	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);

@@ -10,6 +10,7 @@ struct _carjmbre_state
 	/* memory pointers */
 	UINT8 * videoram;
 	UINT8 * spriteram;
+	size_t  spriteram_size;
 
 	/* video-related */
 	tilemap *cj_tilemap;

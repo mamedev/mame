@@ -118,6 +118,7 @@ INLINE int scanline_to_vcount( int scanline )
 
 static TIMER_DEVICE_CALLBACK( ddragon_scanline )
 {
+	ddragon_state *state = (ddragon_state *)timer->machine->driver_data;
 	int scanline = param;
 	int screen_height = video_screen_get_height(timer->machine->primary_screen);
 	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
@@ -129,11 +130,11 @@ static TIMER_DEVICE_CALLBACK( ddragon_scanline )
 
 	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
 	if (vcount == 0xf8)
-		cputag_set_input_line(timer->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
 	/* set 1ms signal on rising edge of vcount & 8 */
 	if (!(vcount_old & 8) && (vcount & 8))
-		cputag_set_input_line(timer->machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -151,6 +152,7 @@ static MACHINE_START( ddragon )
 	/* configure banks */
 	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
+	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->sub_cpu = devtag_get_device(machine, "sub");
 	state->snd_cpu = devtag_get_device(machine, "soundcpu");
 	state->adpcm_1 = devtag_get_device(machine, "adpcm1");
@@ -200,7 +202,7 @@ static WRITE8_HANDLER( ddragon_bankswitch_w )
 	if (data & 0x10)
 		state->dd_sub_cpu_busy = 0;
 	else if (state->dd_sub_cpu_busy == 0)
-		cputag_set_input_line(space->machine, "sub", state->sprite_irq, (state->sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+		cpu_set_input_line(state->sub_cpu, state->sprite_irq, (state->sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
 	memory_set_bank(space->machine, 1, (data & 0xe0) >> 5);
 }
@@ -279,7 +281,7 @@ static WRITE8_HANDLER( darktowr_bankswitch_w )
 	if (data & 0x10)
 		state->dd_sub_cpu_busy = 0;
 	else if (state->dd_sub_cpu_busy == 0)
-		cputag_set_input_line(space->machine, "sub", state->sprite_irq, (state->sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+		cpu_set_input_line(state->sub_cpu, state->sprite_irq, (state->sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
 	memory_set_bank(space->machine, 1, newbank);
 	if (newbank == 4 && oldbank != 4)
@@ -302,15 +304,15 @@ static WRITE8_HANDLER( ddragon_interrupt_w )
 	switch (offset)
 	{
 		case 0: /* 380b - NMI ack */
-			cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+			cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 1: /* 380c - FIRQ ack */
-			cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
+			cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 2: /* 380d - IRQ ack */
-			cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
+			cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 3: /* 380e - SND irq */
@@ -328,13 +330,14 @@ static WRITE8_HANDLER( ddragon_interrupt_w )
 static WRITE8_HANDLER( ddragon2_sub_irq_ack_w )
 {
 	ddragon_state *state = (ddragon_state *)space->machine->driver_data;
-	cputag_set_input_line(space->machine, "sub", state->sprite_irq, CLEAR_LINE );
+	cpu_set_input_line(state->sub_cpu, state->sprite_irq, CLEAR_LINE );
 }
 
 
 static WRITE8_HANDLER( ddragon2_sub_irq_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
+	ddragon_state *state = (ddragon_state *)space->machine->driver_data;
+	cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -386,8 +389,8 @@ static WRITE8_HANDLER( ddragon_hd63701_internal_registers_w )
         it's quite obvious from the Double Dragon 2 code, below). */
 		if (data & 3)
 		{
-			cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
-			cputag_set_input_line(space->machine, "sub", state->sprite_irq, CLEAR_LINE);
+			cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
+			cpu_set_input_line(state->sub_cpu, state->sprite_irq, CLEAR_LINE);
 		}
 	}
 }
@@ -574,8 +577,8 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( ddragnba_port_w )
 {
 	ddragon_state *state = (ddragon_state *)space->machine->driver_data;
-	cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
-	cputag_set_input_line(space->machine, "sub", state->sprite_irq, CLEAR_LINE );
+	cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(state->sub_cpu, state->sprite_irq, CLEAR_LINE );
 }
 
 static ADDRESS_MAP_START( ddragnba_sub_portmap, ADDRESS_SPACE_IO, 8 )

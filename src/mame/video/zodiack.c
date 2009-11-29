@@ -9,9 +9,6 @@
 #include "driver.h"
 #include "includes/espial.h"
 
-size_t zodiack_bulletsram_size;
-
-
 WRITE8_HANDLER( zodiack_videoram_w )
 {
 	espial_state *state = (espial_state *)space->machine->driver_data;
@@ -36,7 +33,7 @@ WRITE8_HANDLER( zodiack_attributes_w )
 	{
 		int i;
 
-		for (i = offset / 2; i < space->machine->generic.videoram_size; i += 32)
+		for (i = offset / 2; i < state->videoram_size; i += 32)
 		{
 			tilemap_mark_tile_dirty(state->bg_tilemap, i);
 			tilemap_mark_tile_dirty(state->fg_tilemap, i);
@@ -141,12 +138,12 @@ VIDEO_START( zodiack )
 	flip_screen_set_no_update(machine, 0);
 }
 
-static void draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_bullets( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	espial_state *state = (espial_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0; offs < zodiack_bulletsram_size; offs += 4)
+	for (offs = 0; offs < state->bulletsram_size; offs += 4)
 	{
 		int x, y;
 
@@ -168,12 +165,12 @@ static void draw_bullets(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	espial_state *state = (espial_state *)machine->driver_data;
 	int offs;
 
-	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int flipx, flipy, sx, sy, spritecode;
 

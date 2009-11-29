@@ -13,6 +13,7 @@ struct _embargo_state
 {
 	/* memory pointers */
 	UINT8 *  videoram;
+	size_t   videoram_size;
 
 	/* misc */
 	UINT8    dial_enable_1;
@@ -32,7 +33,7 @@ static VIDEO_UPDATE( embargo )
 	embargo_state *state = (embargo_state *)screen->machine->driver_data;
 	offs_t offs;
 
-	for (offs = 0; offs < screen->machine->generic.videoram_size; offs++)
+	for (offs = 0; offs < state->videoram_size; offs++)
 	{
 		int i;
 
@@ -151,7 +152,7 @@ static WRITE8_HANDLER( input_select_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(embargo_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(embargo_state, videoram) AM_SIZE_MEMBER(embargo_state, videoram_size)
 ADDRESS_MAP_END
 
 

@@ -17,6 +17,7 @@ struct _aeroboto_state
 	UINT8 * starx;
 	UINT8 * stary;
 	UINT8 * bgcolor;
+	size_t  spriteram_size;
 
 	/* stars layout */
 	UINT8 * stars_rom;

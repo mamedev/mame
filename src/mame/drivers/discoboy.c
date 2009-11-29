@@ -58,6 +58,9 @@ struct _discoboy_state
 	UINT8    gfxbank;
 	UINT8    port_00;
 	int      adpcm_data;
+
+	/* devices */
+	const device_config *audiocpu;
 };
 
 
@@ -210,10 +213,11 @@ static WRITE8_HANDLER( discoboy_port_01_w )
 
 static WRITE8_HANDLER( discoboy_port_03_w ) // sfx? (to sound cpu)
 {
-//  printf("unk discoboy_port_03_w %02x\n", data);
-//  cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, HOLD_LINE);
+	discoboy_state *state = (discoboy_state *)space->machine->driver_data;
+	//  printf("unk discoboy_port_03_w %02x\n", data);
+	//  cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, HOLD_LINE);
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( discoboy_port_06_w )
@@ -436,6 +440,8 @@ static const msm5205_interface discoboy_msm5205_interface =
 static MACHINE_START( discoboy )
 {
 	discoboy_state *state = (discoboy_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
 
 	state_save_register_global(machine, state->ram_bank);
 	state_save_register_global(machine, state->port_00);

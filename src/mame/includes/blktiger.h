@@ -15,15 +15,19 @@ struct _blktiger_state
 
 	/* video-related */
 	tilemap *tx_tilemap, *bg_tilemap8x4, *bg_tilemap4x8;
-	UINT32 scroll_bank;
-	UINT8 scroll_x[2];
-	UINT8 scroll_y[2];
-	UINT8 *scroll_ram;
-	UINT8 screen_layout;
-	UINT8 chon, objon, bgon;
+	UINT32  scroll_bank;
+	UINT8   scroll_x[2];
+	UINT8   scroll_y[2];
+	UINT8   *scroll_ram;
+	UINT8   screen_layout;
+	UINT8   chon, objon, bgon;
 
 	/* mcu-related */
-	UINT8 z80_latch, i8751_latch;
+	UINT8   z80_latch, i8751_latch;
+
+	/* devices */
+	const device_config *mcu;
+	const device_config *audiocpu;
 };
 
 

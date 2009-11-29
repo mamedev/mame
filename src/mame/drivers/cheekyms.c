@@ -14,9 +14,11 @@
 
 static INPUT_CHANGED( coin_inserted )
 {
+	cheekyms_state *state = (cheekyms_state *)field->port->machine->driver_data;
+
 	/* this starts a 556 one-shot timer (and triggers a sound effect) */
 	if (newval)
-		cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -111,6 +113,7 @@ static MACHINE_START( cheekyms )
 {
 	cheekyms_state *state = (cheekyms_state *)machine->driver_data;
 
+	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->dac = devtag_get_device(machine, "dac");
 }
 

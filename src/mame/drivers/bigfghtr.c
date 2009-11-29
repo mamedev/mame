@@ -124,9 +124,9 @@ struct _bigfghtr_state
 	UINT16 *      text_videoram;
 	UINT16 *      bg_videoram;
 	UINT16 *      fg_videoram;
-	UINT16 *      sharedram16;
-//	UINT16 *      spriteram16;	// currently this uses generic buffer_spriteram_w
-//	UINT16 *      paletteram16;	// currently this uses generic palette handling
+	UINT16 *      sharedram;
+//	UINT16 *      spriteram;	// currently this uses generic buffer_spriteram_w
+//	UINT16 *      paletteram;	// currently this uses generic palette handling
 
 	/* video-related */
 	tilemap       *bg_tilemap, *fg_tilemap, *tx_tilemap;
@@ -243,18 +243,18 @@ static WRITE16_HANDLER( bg_scrolly_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
+	UINT16 *buffered_spriteram = machine->generic.buffered_spriteram.u16;
 	int offs;
 	for (offs = 0; offs < machine->generic.spriteram_size / 2; offs += 4)
 	{
-		int code = buffered_spriteram16[offs + 1]; /* ??YX?TTTTTTTTTTT */
+		int code = buffered_spriteram[offs + 1]; /* ??YX?TTTTTTTTTTT */
 		int flipx = code & 0x2000;
 		int flipy = code & 0x1000;
-		int color = (buffered_spriteram16[offs + 2] >> 8) & 0x1f;
-		int sx = buffered_spriteram16[offs + 3];
-		int sy = 240 - (buffered_spriteram16[offs + 0] & 0x1ff);
+		int color = (buffered_spriteram[offs + 2] >> 8) & 0x1f;
+		int sx = buffered_spriteram[offs + 3];
+		int sy = 240 - (buffered_spriteram[offs + 0] & 0x1ff);
 
-		if (((buffered_spriteram16[offs + 0] & 0x3000) >> 12) == priority)
+		if (((buffered_spriteram[offs + 0] & 0x3000) >> 12) == priority)
 		{
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 				code & 0xfff,
@@ -334,7 +334,7 @@ static READ16_HANDLER( latch_r )
 static WRITE16_HANDLER( sharedram_w )
 {
 	bigfghtr_state *state = (bigfghtr_state *)space->machine->driver_data;
-	COMBINE_DATA(&state->sharedram16[offset]);
+	COMBINE_DATA(&state->sharedram[offset]);
 }
 
 static READ16_HANDLER(sharedram_r)
@@ -354,13 +354,13 @@ static READ16_HANDLER(sharedram_r)
 		return (input_port_read(space->machine, "P1") & 0xffff) ^ 0xffff;
 
 	}
-	return state->sharedram16[offset];
+	return state->sharedram[offset];
 }
 
 static ADDRESS_MAP_START( mainmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0805ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x080600, 0x080fff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(bigfghtr_state, sharedram16)
+	AM_RANGE(0x080600, 0x080fff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(bigfghtr_state, sharedram)
 	AM_RANGE(0x081000, 0x085fff) AM_RAM //??
 	AM_RANGE(0x086000, 0x086fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE_MEMBER(bigfghtr_state, bg_videoram)
 	AM_RANGE(0x087000, 0x087fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE_MEMBER(bigfghtr_state, fg_videoram)

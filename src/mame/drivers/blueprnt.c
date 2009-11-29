@@ -78,8 +78,9 @@ static READ8_HANDLER( blueprnt_sh_dipsw_r )
 
 static WRITE8_HANDLER( blueprnt_sound_command_w )
 {
+	blueprnt_state *state = (blueprnt_state *)space->machine->driver_data;
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( blueprnt_coin_counter_w )
@@ -99,7 +100,7 @@ static ADDRESS_MAP_START( blueprnt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(blueprnt_videoram_w) AM_MIRROR(0x400) AM_BASE_MEMBER(blueprnt_state, videoram)
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE_MEMBER(blueprnt_state, scrollram)
-	AM_RANGE(0xb000, 0xb0ff) AM_RAM AM_BASE_MEMBER(blueprnt_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xb000, 0xb0ff) AM_RAM AM_BASE_MEMBER(blueprnt_state, spriteram) AM_SIZE_MEMBER(blueprnt_state, spriteram_size)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1") AM_WRITE(blueprnt_coin_counter_w)
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ(blueprnt_sh_dipsw_r)
@@ -287,6 +288,8 @@ static const ay8910_interface ay8910_interface_2 =
 static MACHINE_START( blueprnt )
 {
 	blueprnt_state *state = (blueprnt_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
 
 	state_save_register_global(machine, state->dipsw);
 }

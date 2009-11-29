@@ -6,6 +6,7 @@ struct _freekick_state
 	/* memory pointers */
 	UINT8 *    videoram;
 	UINT8 *    spriteram;
+	size_t     spriteram_size;
 
 	/* video-related */
 	tilemap    *freek_tilemap;

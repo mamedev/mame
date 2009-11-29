@@ -16,6 +16,10 @@ struct _capbowl_state
 
 	/* input-related */
 	UINT8 last_trackball_val[2];
+
+	/* devices */
+	const device_config *maincpu;
+	const device_config *audiocpu;
 };
 
 /*----------- defined in video/capbowl.c -----------*/

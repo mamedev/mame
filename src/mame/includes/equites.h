@@ -34,6 +34,7 @@ struct _equites_state
 #endif
 
 	/* devices */
+	const device_config *mcu;
 	const device_config *audio_cpu;
 	const device_config *msm;
 	const device_config *dac_1;

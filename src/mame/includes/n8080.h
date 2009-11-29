@@ -32,6 +32,9 @@ struct _n8080_state
 	unsigned shift_data;
 	unsigned shift_bits;
 	int inte;
+
+	/* devices */
+	const device_config *maincpu;
 };
 
 

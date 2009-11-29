@@ -199,9 +199,9 @@ WRITE8_HANDLER( lastmiss_control_w )
 	state->scroll2[2] = (data >> 6) & 1;
 
 	if (data & 0x80)
-		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE8_HANDLER( shackled_control_w )

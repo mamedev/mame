@@ -132,10 +132,10 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(zodiac_master_interrupt_enable_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(zodiack_flipscreen_w)
 	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(zodiack_attributes_w) AM_BASE_MEMBER(espial_state, attributeram)
-	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE_MEMBER(espial_state, spriteram) AM_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE_MEMBER(espial_state, bulletsram) AM_SIZE(&zodiack_bulletsram_size)
+	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE_MEMBER(espial_state, spriteram) AM_SIZE_MEMBER(espial_state, spriteram_size)
+	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE_MEMBER(espial_state, bulletsram) AM_SIZE_MEMBER(espial_state, bulletsram_size)
 	AM_RANGE(0x9080, 0x93ff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(zodiack_videoram_w) AM_BASE_MEMBER(espial_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(zodiack_videoram_w) AM_BASE_MEMBER(espial_state, videoram) AM_SIZE_MEMBER(espial_state, videoram_size)
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(zodiack_videoram2_w) AM_BASE_MEMBER(espial_state, videoram_2)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 ADDRESS_MAP_END

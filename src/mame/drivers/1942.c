@@ -97,7 +97,7 @@ static ADDRESS_MAP_START( c1942_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(c1942_c804_w)
 	AM_RANGE(0xc805, 0xc805) AM_WRITE(c1942_palette_bank_w)
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(c1942_bankswitch_w)
-	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_BASE_MEMBER(_1942_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_BASE_MEMBER(_1942_state, spriteram) AM_SIZE_MEMBER(_1942_state, spriteram_size)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(c1942_fgvideoram_w) AM_BASE_MEMBER(_1942_state, fg_videoram)
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(c1942_bgvideoram_w) AM_BASE_MEMBER(_1942_state, bg_videoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
@@ -234,6 +234,16 @@ static GFXDECODE_START( 1942 )
 GFXDECODE_END
 
 
+static MACHINE_START( 1942 )
+{
+	_1942_state *state = (_1942_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->palette_bank);
+	state_save_register_global_array(machine, state->scroll);
+}
+
 static MACHINE_RESET( 1942 )
 {
 	_1942_state *state = (_1942_state *)machine->driver_data;
@@ -256,6 +266,7 @@ static MACHINE_DRIVER_START( 1942 )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
+	MDRV_MACHINE_START(1942)
 	MDRV_MACHINE_RESET(1942)
 
 	/* video hardware */

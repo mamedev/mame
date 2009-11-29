@@ -16,6 +16,10 @@ struct _battlane_state
 	bitmap_t    *screen_bitmap;
 	int         video_ctrl;
 	int         cpu_control;	/* CPU interrupt control register */
+
+	/* devices */
+	const device_config *maincpu;
+	const device_config *subcpu;
 };
 
 

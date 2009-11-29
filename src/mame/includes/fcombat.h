@@ -28,6 +28,8 @@ struct _fcombat_state
 	/* memory pointers */
 	UINT8 *    videoram;
 	UINT8 *    spriteram;
+	size_t     videoram_size;
+	size_t     spriteram_size;
 
 	/* video-related */
 	tilemap    *bgmap;

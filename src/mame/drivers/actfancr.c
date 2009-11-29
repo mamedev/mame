@@ -56,8 +56,9 @@ static READ8_HANDLER( triothep_control_r )
 
 static WRITE8_HANDLER( actfancr_sound_w )
 {
+	actfancr_state *state = (actfancr_state *)space->machine->driver_data;
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /******************************************************************************/
@@ -264,7 +265,8 @@ GFXDECODE_END
 
 static void sound_irq(const device_config *device, int linestate)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, linestate); /* IRQ */
+	actfancr_state *state = (actfancr_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, linestate); /* IRQ */
 }
 
 static const ym3812_interface ym3812_config =
@@ -277,6 +279,10 @@ static const ym3812_interface ym3812_config =
 static MACHINE_START( triothep )
 {
  	actfancr_state *state = (actfancr_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
 	state_save_register_global(machine, state->trio_control_select);
 }
 

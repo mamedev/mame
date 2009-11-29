@@ -29,6 +29,7 @@ struct _dotrikun_state
 {
 	/* memory pointers */
 	UINT8 *        videoram;
+	size_t         videoram_size;
 
 	/* video-related */
 	UINT8          color;
@@ -57,7 +58,7 @@ VIDEO_UPDATE( dotrikun )
 	pen_t back_pen = MAKE_RGB(pal1bit(state->color >> 3), pal1bit(state->color >> 4), pal1bit(state->color >> 5));
 	pen_t fore_pen = MAKE_RGB(pal1bit(state->color >> 0), pal1bit(state->color >> 1), pal1bit(state->color >> 2));
 
-	for (offs = 0; offs < screen->machine->generic.videoram_size; offs++)
+	for (offs = 0; offs < state->videoram_size; offs++)
 	{
 		int i;
 		UINT8 data = state->videoram[offs];
@@ -92,7 +93,7 @@ VIDEO_UPDATE( dotrikun )
 
 static ADDRESS_MAP_START( dotrikun_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(dotrikun_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(dotrikun_state, videoram) AM_SIZE_MEMBER(dotrikun_state, videoram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )

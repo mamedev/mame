@@ -15,7 +15,7 @@ VIDEO_UPDATE( copsnrob )
 
 	/* redrawing the entire display is faster in this case */
 
-	for (offs = screen->machine->generic.videoram_size; offs >= 0; offs--)
+	for (offs = state->videoram_size; offs >= 0; offs--)
 	{
 		int sx,sy;
 

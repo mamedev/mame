@@ -27,6 +27,9 @@ struct _destroyr_state
 	int            attract;
 	int            motor_speed;
 	int            noise;
+
+	/* devices */
+	const device_config *maincpu;
 };
 
 
@@ -112,7 +115,7 @@ static TIMER_CALLBACK( destroyr_dial_callback )
 
 	if (state->potmask[dial])
 	{
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -174,7 +177,8 @@ static WRITE8_HANDLER( destroyr_cursor_load_w )
 
 static WRITE8_HANDLER( destroyr_interrupt_ack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	destroyr_state *state = (destroyr_state *)space->machine->driver_data;
+	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -427,6 +431,8 @@ static PALETTE_INIT( destroyr )
 static MACHINE_START( destroyr )
 {
 	destroyr_state *state = (destroyr_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
 
 	state_save_register_global(machine, state->cursor);
 	state_save_register_global(machine, state->wavemod);

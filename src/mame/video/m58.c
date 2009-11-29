@@ -225,7 +225,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	int offs;
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int attr = state->spriteram[offs + 1];
 		int bank = (attr & 0x20) >> 5;

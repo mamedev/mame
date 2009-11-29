@@ -199,7 +199,7 @@ static void champbas_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	int offs;
 	const gfx_element* const gfx = machine->gfx[1];
 
-	for (offs = machine->generic.spriteram_size - 2; offs >= 0; offs -= 2)
+	for (offs = state->spriteram_size - 2; offs >= 0; offs -= 2)
 	{
 		int code = (state->spriteram[offs] >> 2) | (state->gfx_bank << 6);
 		int color = (state->spriteram[offs + 1] & 0x1f) | (state->palette_bank << 6);

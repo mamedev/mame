@@ -7,6 +7,7 @@ struct _docastle_state
 	UINT8 *  videoram;
 	UINT8 *  colorram;
 	UINT8 *  spriteram;
+	size_t   spriteram_size;
 
 	/* video-related */
 	tilemap  *do_tilemap;
@@ -16,6 +17,9 @@ struct _docastle_state
 	int      adpcm_data;
 	int      adpcm_status;
 	UINT8    buffer0[9], buffer1[9];
+
+	/* devices */
+	const device_config *slave;
 };
 
 

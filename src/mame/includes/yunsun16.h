@@ -13,12 +13,16 @@ struct _yunsun16_state
 	UINT16 *    scrollram_0;
 	UINT16 *    scrollram_1;
 	UINT16 *    priorityram;
-//	UINT16 *    paletteram16;	// currently this uses generic palette handling
-	UINT16 *    spriteram16;
+//	UINT16 *    paletteram;	// currently this uses generic palette handling
+	UINT16 *    spriteram;
+	size_t      spriteram_size;
 
 	/* other video-related elements */
 	tilemap     *tilemap_0, *tilemap_1;
 	int         sprites_scrolldx, sprites_scrolldy;
+
+	/* devices */
+	const device_config *audiocpu;
 };
 
 

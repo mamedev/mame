@@ -397,7 +397,7 @@ static TIMER_DEVICE_CALLBACK( rst1_tick )
 	int state = n8080->inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* V7 = 1, V6 = 0 */
-	cputag_set_input_line_and_vector(timer->machine, "maincpu", INPUT_LINE_IRQ0, state, 0xcf);
+	cpu_set_input_line_and_vector(n8080->maincpu, INPUT_LINE_IRQ0, state, 0xcf);
 }
 
 static TIMER_DEVICE_CALLBACK( rst2_tick )
@@ -406,7 +406,7 @@ static TIMER_DEVICE_CALLBACK( rst2_tick )
 	int state = n8080->inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* vblank */
-	cputag_set_input_line_and_vector(timer->machine, "maincpu", INPUT_LINE_IRQ0, state, 0xd7);
+	cpu_set_input_line_and_vector(n8080->maincpu, INPUT_LINE_IRQ0, state, 0xd7);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( n8080_inte_callback )
@@ -435,6 +435,8 @@ static I8085_CONFIG( n8080_cpu_config )
 static MACHINE_START( n8080 )
 {
 	n8080_state *state = (n8080_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
 
 	state_save_register_global(machine, state->shift_data);
 	state_save_register_global(machine, state->shift_bits);

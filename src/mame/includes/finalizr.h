@@ -15,6 +15,8 @@ struct _finalizr_state
 	UINT8 *       scroll;
 	UINT8 *       spriteram;
 	UINT8 *       spriteram_2;
+	size_t        videoram_size;
+	size_t        spriteram_size;
 
 	/* video-related */
 	tilemap       *fg_tilemap, *bg_tilemap;

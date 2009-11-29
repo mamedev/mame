@@ -54,10 +54,12 @@ static READ16_HANDLER( zerozone_input_r )
 
 static WRITE16_HANDLER( zerozone_sound_w )
 {
+	zerozone_state *state = (zerozone_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space, offset, data >> 8);
-		cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
+		cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 	}
 }
 
@@ -67,7 +69,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x084000, 0x084001) AM_WRITE(zerozone_sound_w)
 	AM_RANGE(0x088000, 0x0881ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x098000, 0x098001) AM_RAM		/* Watchdog? */
-	AM_RANGE(0x09ce00, 0x09ffff) AM_RAM_WRITE(zerozone_tilemap_w) AM_BASE_MEMBER(zerozone_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x09ce00, 0x09ffff) AM_RAM_WRITE(zerozone_tilemap_w) AM_BASE_MEMBER(zerozone_state, videoram) AM_SIZE_MEMBER(zerozone_state, videoram_size)
 	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITE(zerozone_tilebank_w)
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM
 	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM		/* Never read from */
@@ -167,6 +169,15 @@ static GFXDECODE_START( zerozone )
 GFXDECODE_END
 
 
+static MACHINE_START( zerozone )
+{
+	zerozone_state *state = (zerozone_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->tilebank);
+}
+
 static MACHINE_RESET( zerozone )
 {
 	zerozone_state *state = (zerozone_state *)machine->driver_data;
@@ -188,6 +199,7 @@ static MACHINE_DRIVER_START( zerozone )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
+	MDRV_MACHINE_START(zerozone)
 	MDRV_MACHINE_RESET(zerozone)
 
 	/* video hardware */

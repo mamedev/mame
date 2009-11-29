@@ -64,6 +64,9 @@ struct _chanbara_state
 	/* video-related */
 	tilemap  *bg_tilemap,*bg2_tilemap;
 	UINT8    scroll, scrollhi;
+
+	/* devices */
+	const device_config *maincpu;
 };
 
 
@@ -339,7 +342,8 @@ static WRITE8_DEVICE_HANDLER( chanbara_ay_out_1_w )
 
 static void sound_irq( const device_config *device, int linestate )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, linestate);
+	chanbara_state *state = (chanbara_state *)device->machine->driver_data;
+	cpu_set_input_line(state->maincpu, 0, linestate);
 }
 
 
@@ -360,6 +364,8 @@ static const ym2203_interface ym2203_config =
 static MACHINE_START( chanbara )
 {
 	chanbara_state *state = (chanbara_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
 
 	state_save_register_global(machine, state->scroll);
 	state_save_register_global(machine, state->scrollhi);

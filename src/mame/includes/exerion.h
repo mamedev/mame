@@ -25,6 +25,8 @@ struct _exerion_state
 	UINT8 *  main_ram;
 	UINT8 *  videoram;
 	UINT8 *  spriteram;
+	size_t   videoram_size;
+	size_t   spriteram_size;
 
 	/* video-related */
 	UINT8    cocktail_flip;
@@ -37,6 +39,9 @@ struct _exerion_state
 	/* protection? */
 	UINT8 porta;
 	UINT8 portb;
+
+	/* devices */
+	const device_config *maincpu;
 };
 
 

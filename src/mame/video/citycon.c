@@ -111,7 +111,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	citycon_state *state = (citycon_state *)machine->driver_data;
 	int offs;
 
-	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int sx, sy, flipx;
 

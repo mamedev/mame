@@ -17,6 +17,9 @@ struct _espial_state
 	UINT8 *   spriteram;	// zodiack, marineb (hoccer only)
 	UINT8 *   videoram_2;	// zodiack
 	UINT8 *   bulletsram;	// zodiack
+	size_t    videoram_size;	// zodiack
+	size_t    spriteram_size;	// zodiack
+	size_t    bulletsram_size;	// zodiack
 
 	/* video-related */
 	tilemap   *bg_tilemap, *fg_tilemap;
@@ -32,6 +35,9 @@ struct _espial_state
 	/* misc */
 	int       percuss_hardware;	// zodiack
 
+	/* devices */
+	const device_config *maincpu;
+	const device_config *audiocpu;
 };
 
 /*----------- defined in drivers/espial.c -----------*/
@@ -78,8 +84,6 @@ VIDEO_UPDATE( hopprobo );
 
 
 /*----------- defined in video/zodiack.c -----------*/
-
-extern size_t zodiack_bulletsram_size;
 
 WRITE8_HANDLER( zodiack_videoram_w );
 WRITE8_HANDLER( zodiack_videoram2_w );

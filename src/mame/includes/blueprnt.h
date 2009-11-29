@@ -12,6 +12,7 @@ struct _blueprnt_state
 	UINT8 * colorram;
 	UINT8 * spriteram;
 	UINT8 * scrollram;
+	size_t  spriteram_size;
 
 	/* video-related */
 	tilemap *bg_tilemap;
@@ -19,6 +20,9 @@ struct _blueprnt_state
 
 	/* misc */
 	int     dipsw;
+
+	/* devices */
+	const device_config *audiocpu;
 };
 
 

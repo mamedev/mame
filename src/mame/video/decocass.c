@@ -526,7 +526,7 @@ VIDEO_UPDATE( decocass )
 	rectangle clip;
 
 	if (0xc0 != (input_port_read(screen->machine, "IN2") & 0xc0))  /* coin slots assert an NMI */
-		cputag_set_input_line(screen->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
 	if (0 == (state->watchdog_flip & 0x04))
 		watchdog_reset(screen->machine);

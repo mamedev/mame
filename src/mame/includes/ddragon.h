@@ -18,6 +18,7 @@ struct _ddragon_state
 	UINT8 *        darktowr_mcu_ports;
 //	UINT8 *        paletteram;	// currently this uses generic palette handling
 //	UINT8 *        paletteram_2;	// currently this uses generic palette handling
+	size_t         spriteram_size;	// FIXME: this appears in chinagat.c, but is it really used?
 
 	/* video-related */
 	tilemap        *fg_tilemap, *bg_tilemap;
@@ -44,6 +45,7 @@ struct _ddragon_state
 #endif
 
 	/* devices */
+	const device_config *maincpu;
 	const device_config *snd_cpu;
 	const device_config *sub_cpu;
 	const device_config *adpcm_1;

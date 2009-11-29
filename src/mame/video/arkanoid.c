@@ -68,8 +68,8 @@ WRITE8_HANDLER( arkanoid_d008_w )
      leaving the tilt screen (as the MCU is now out of sync with main CPU
      which resets itself).  This bit is the likely candidate as it is flipped
      early in bootup just prior to accessing the MCU for the first time. */
-	if (cputag_get_cpu(space->machine, "mcu") != NULL)	// Bootlegs don't have the MCU but still set this bit
-		cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	if (state->mcu != NULL)	// Bootlegs don't have the MCU but still set this bit
+		cpu_set_input_line(state->mcu, INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* different hook-up, everything except for bits 0-1 and 7 aren't tested afaik. */
@@ -142,7 +142,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	arkanoid_state *state = (arkanoid_state *)machine->driver_data;
 	int offs;
 
-	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
+	for (offs = 0; offs < state->spriteram_size; offs += 4)
 	{
 		int sx, sy, code;
 

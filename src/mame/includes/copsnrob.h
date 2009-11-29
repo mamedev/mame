@@ -14,6 +14,7 @@ struct _copsnrob_state
 	UINT8 *        bulletsram;
 	UINT8 *        cary;
 	UINT8 *        carimage;
+	size_t         videoram_size;
 
 	/* misc */
 	UINT8          misc;

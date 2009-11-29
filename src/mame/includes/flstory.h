@@ -9,6 +9,8 @@ struct _flstory_state
 	UINT8 *  spriteram;
 //	UINT8 *  paletteram;	// currently this uses generic palette handling
 //	UINT8 *  paletteram_2;	// currently this uses generic palette handling
+	size_t   videoram_size;
+	size_t   spriteram_size;
 
 	/* video-related */
 	tilemap  *bg_tilemap;

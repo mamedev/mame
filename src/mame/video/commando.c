@@ -60,12 +60,14 @@ WRITE8_HANDLER( commando_scrolly_w )
 
 WRITE8_HANDLER( commando_c804_w )
 {
+	commando_state *state = (commando_state *)space->machine->driver_data;
+
 	// bits 0 and 1 are coin counters
 	coin_counter_w(space->machine, 0, data & 0x01);
 	coin_counter_w(space->machine, 1, data & 0x02);
 
 	// bit 4 resets the sound CPU
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 7 flips screen
 	flip_screen_set(space->machine, data & 0x80);

@@ -13,6 +13,7 @@ struct _deniam_state
 	UINT16 *       textram;
 	UINT16 *       spriteram;
 	UINT16 *       paletteram;
+	size_t         spriteram_size;
 
 	/* video-related */
 	tilemap        *fg_tilemap, *bg_tilemap, *tx_tilemap;

@@ -73,7 +73,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 
 static ADDRESS_MAP_START( flstory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_MEMBER(flstory_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_MEMBER(flstory_state, videoram) AM_SIZE_MEMBER(flstory_state, videoram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(flstory_mcu_r, flstory_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( flstory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_MEMBER(flstory_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_MEMBER(flstory_state, spriteram) AM_SIZE_MEMBER(flstory_state, spriteram_size)
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, scrlram)
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
@@ -99,7 +99,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( onna34ro_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_MEMBER(flstory_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_MEMBER(flstory_state, videoram) AM_SIZE_MEMBER(flstory_state, videoram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM	/* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(onna34ro_mcu_r, onna34ro_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( onna34ro_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd805, 0xd805) AM_READ(onna34ro_mcu_status_r)
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_MEMBER(flstory_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_MEMBER(flstory_state, spriteram) AM_SIZE_MEMBER(flstory_state, spriteram_size)
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, scrlram)
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
@@ -133,7 +133,7 @@ static CUSTOM_INPUT( victnine_mcu_status_bit01_r )
 
 static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_MEMBER(flstory_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_MEMBER(flstory_state, videoram) AM_SIZE_MEMBER(flstory_state, videoram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM	/* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(victnine_mcu_r, victnine_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 	AM_RANGE(0xd807, 0xd807) AM_READ_PORT("EXTRA_P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_MEMBER(flstory_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_MEMBER(flstory_state, spriteram) AM_SIZE_MEMBER(flstory_state, spriteram_size)
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, scrlram)
 	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
 	AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP	/* unknown */

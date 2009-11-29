@@ -12,8 +12,9 @@ struct _blmbycar_state
 	UINT16 *    scroll_0;
 	UINT16 *    vram_1;
 	UINT16 *    scroll_1;
-	UINT16 *    spriteram16;
-	UINT16 *    paletteram16;
+	UINT16 *    spriteram;
+	UINT16 *    paletteram;
+	size_t      spriteram_size;
 
 	/* video-related */
 	tilemap     *tilemap_0, *tilemap_1;

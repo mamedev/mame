@@ -28,6 +28,9 @@ struct _cloud9_state
 	int         vblank_end;
 	emu_timer   *irq_timer;
 	UINT8       irq_state;
+
+	/* devices */
+	const device_config *maincpu;
 };
 
 

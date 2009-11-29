@@ -191,14 +191,14 @@ static void esd16_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 	int max_x = video_screen_get_width(machine->primary_screen);
 	int max_y = video_screen_get_height(machine->primary_screen);
 
-	for (offs = machine->generic.spriteram_size / 2 - 8 / 2; offs >= 0 ; offs -= 8 / 2)
+	for (offs = state->spriteram_size / 2 - 8 / 2; offs >= 0 ; offs -= 8 / 2)
 	{
 		int y, starty, endy, incy;
 
-		int sy = state->spriteram16[offs + 0];
-		int code = state->spriteram16[offs + 1];
-		int sx = state->spriteram16[offs + 2];
-		int attr = state->spriteram16[offs + 3];
+		int sy = state->spriteram[offs + 0];
+		int code = state->spriteram[offs + 1];
+		int sx = state->spriteram[offs + 2];
+		int attr = state->spriteram[offs + 3];
 
 		int dimy = 1 << ((sy >> 9) & 3);
 
@@ -255,14 +255,14 @@ static void hedpanic_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	int max_x = video_screen_get_width(machine->primary_screen);
 	int max_y = video_screen_get_height(machine->primary_screen);
 
-	for (offs = machine->generic.spriteram_size / 2 - 8 / 2; offs >= 0 ; offs -= 8 / 2)
+	for (offs = state->spriteram_size / 2 - 8 / 2; offs >= 0 ; offs -= 8 / 2)
 	{
 		int y, starty, endy, incy;
 
-		int sy = state->spriteram16[offs + 0];
-		int code = state->spriteram16[offs + 1];
-		int sx = state->spriteram16[offs + 2];
-//      int attr = state->spriteram16[offs + 3];
+		int sy = state->spriteram[offs + 0];
+		int code = state->spriteram[offs + 1];
+		int sx = state->spriteram[offs + 2];
+//      int attr = state->spriteram[offs + 3];
 
 		int dimy = 1 << ((sy >> 9) & 3);
 

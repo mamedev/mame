@@ -105,9 +105,6 @@ VIDEO_START( yunsun16 )
 	state->tilemap_1 = tilemap_create(machine, get_tile_info_1,yunsun16_tilemap_scan_pages,
 								16,16, TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 
-	state_save_register_global(machine, state->sprites_scrolldx);
-	state_save_register_global(machine, state->sprites_scrolldy);
-
 	tilemap_set_scrolldx(state->tilemap_0, -0x34, 0);
 	tilemap_set_scrolldx(state->tilemap_1, -0x38, 0);
 
@@ -165,12 +162,12 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			break;
 	}
 
-	for (offs = (machine->generic.spriteram_size - 8) / 2 ; offs >= 0; offs -= 8 / 2)
+	for (offs = (state->spriteram_size - 8) / 2 ; offs >= 0; offs -= 8 / 2)
 	{
-		int x = state->spriteram16[offs + 0];
-		int y = state->spriteram16[offs + 1];
-		int code = state->spriteram16[offs + 2];
-		int attr = state->spriteram16[offs + 3];
+		int x = state->spriteram[offs + 0];
+		int y = state->spriteram[offs + 1];
+		int code = state->spriteram[offs + 2];
+		int attr = state->spriteram[offs + 3];
 		int flipx = attr & 0x20;
 		int flipy = attr & 0x40;
 

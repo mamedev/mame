@@ -9,6 +9,7 @@ struct _epos_state
 {
 	/* memory pointers */
 	UINT8 *  videoram;
+	size_t   videoram_size;
 
 	/* video-related */
 	UINT8    palette;

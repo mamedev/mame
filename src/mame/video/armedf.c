@@ -224,18 +224,18 @@ WRITE16_HANDLER( armedf_mcu_cmd )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
+	UINT16 *buffered_spriteram = machine->generic.buffered_spriteram.u16;
 	armedf_state *state = (armedf_state *)machine->driver_data;
 	int offs;
 
 	for (offs = 0; offs < machine->generic.spriteram_size / 2; offs += 4)
 	{
-		int code = buffered_spriteram16[offs + 1]; /* ??YX?TTTTTTTTTTT */
+		int code = buffered_spriteram[offs + 1]; /* ??YX?TTTTTTTTTTT */
 		int flipx = code & 0x2000;
 		int flipy = code & 0x1000;
-		int color = (buffered_spriteram16[offs + 2] >> 8) & 0x1f;
-		int sx = buffered_spriteram16[offs + 3];
-		int sy = state->sprite_offy + 240 - (buffered_spriteram16[offs + 0] & 0x1ff);
+		int color = (buffered_spriteram[offs + 2] >> 8) & 0x1f;
+		int sx = buffered_spriteram[offs + 3];
+		int sy = state->sprite_offy + 240 - (buffered_spriteram[offs + 0] & 0x1ff);
 
 		if (flip_screen_get(machine)) 
 		{
@@ -245,7 +245,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			flipy = !flipy;		/* in all the games supported by this driver */
 		}
 
-		if (((buffered_spriteram16[offs + 0] & 0x3000) >> 12) == priority)
+		if (((buffered_spriteram[offs + 0] & 0x3000) >> 12) == priority)
 		{
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
 				code & 0xfff,

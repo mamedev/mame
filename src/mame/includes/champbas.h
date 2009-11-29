@@ -15,6 +15,7 @@ struct _champbas_state
 	UINT8 *        bg_videoram;
 	UINT8 *        spriteram;
 	UINT8 *        spriteram_2;
+	size_t         spriteram_size;
 
 	/* video-related */
 	tilemap        *bg_tilemap;
@@ -25,6 +26,8 @@ struct _champbas_state
 	int            watchdog_count;
 
 	/* devices */
+	const device_config *maincpu;
+	const device_config *audiocpu;
 	const device_config *mcu;
 };
 

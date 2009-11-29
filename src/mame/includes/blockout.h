@@ -10,11 +10,14 @@ struct _blockout_state
 	/* memory pointers */
 	UINT16 * videoram;
 	UINT16 * frontvideoram;
-	UINT16 * paletteram16;
+	UINT16 * paletteram;
 
 	/* video-related */
 	bitmap_t *tmpbitmap;
 	UINT16   color;
+
+	/* devices */
+	const device_config *audiocpu;
 };
 
 

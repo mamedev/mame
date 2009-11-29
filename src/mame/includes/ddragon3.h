@@ -12,7 +12,7 @@ struct _ddragon3_state
 	UINT16 *        bg_videoram;
 	UINT16 *        fg_videoram;
 	UINT16 *        spriteram;
-//	UINT16 *        paletteram16;	// currently this uses generic palette handling
+//	UINT16 *        paletteram;	// currently this uses generic palette handling
 
 	/* video-related */
 	tilemap         *fg_tilemap, *bg_tilemap;
@@ -25,6 +25,10 @@ struct _ddragon3_state
 
 	/* misc */
 	UINT16          io_reg[8];
+
+	/* devices */
+	const device_config *maincpu;
+	const device_config *audiocpu;
 };
 
 

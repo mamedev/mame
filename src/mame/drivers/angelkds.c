@@ -514,9 +514,10 @@ static READ8_HANDLER( angelkds_sub_sound_r )
 }
 
 
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "sub", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	angelkds_state *state = (angelkds_state *)device->machine->driver_data;
+	cpu_set_input_line(state->subcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -577,6 +578,8 @@ GFXDECODE_END
 static MACHINE_START( angelkds )
 {
 	angelkds_state *state = (angelkds_state *)machine->driver_data;
+
+	state->subcpu = devtag_get_device(machine, "sub");
 
 	state_save_register_global(machine, state->layer_ctrl);
 	state_save_register_global(machine, state->txbank);

@@ -11,11 +11,15 @@ struct __1942_state
 	UINT8 * fg_videoram;
 	UINT8 * bg_videoram;
 	UINT8 * spriteram;
+	size_t  spriteram_size;
 
 	/* video-related */
 	tilemap *fg_tilemap, *bg_tilemap;
 	int palette_bank;
 	UINT8 scroll[2];
+
+	/* devices */
+	const device_config *audiocpu;
 };
 
 

@@ -229,7 +229,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	_1943_state *state = (_1943_state *)machine->driver_data;
 	int offs;
 
-	for (offs = machine->generic.spriteram_size - 32; offs >= 0; offs -= 32)
+	for (offs = state->spriteram_size - 32; offs >= 0; offs -= 32)
 	{
 		int attr = state->spriteram[offs + 1];
 		int code = state->spriteram[offs] + ((attr & 0xe0) << 3);

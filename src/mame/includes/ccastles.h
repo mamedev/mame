@@ -30,6 +30,9 @@ struct _ccastles_state
 	emu_timer *irq_timer;
 	UINT8    irq_state;
 	UINT8    nvram_store[2];
+
+	/* devices */
+	const device_config *maincpu;
 };
 
 

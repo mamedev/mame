@@ -142,7 +142,7 @@ WRITE16_HANDLER( bionicc_paletteram_w )
 {
 	bionicc_state *state = (bionicc_state *)space->machine->driver_data;
 	int r, g, b, bright;
-	data = COMBINE_DATA(&state->paletteram16[offset]);
+	data = COMBINE_DATA(&state->paletteram[offset]);
 
 	bright = (data & 0x0f);
 
@@ -209,22 +209,22 @@ WRITE16_HANDLER( bionicc_gfxctrl_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
+	UINT16 *buffered_spriteram = machine->generic.buffered_spriteram.u16;
 //  bionicc_state *state = (bionicc_state *)machine->driver_data;
 	int offs;
 	const gfx_element *gfx = machine->gfx[3];
 
 	for (offs = (machine->generic.spriteram_size - 8) / 2; offs >= 0; offs -= 4)
 	{
-		int tile_number = buffered_spriteram16[offs] & 0x7ff;
+		int tile_number = buffered_spriteram[offs] & 0x7ff;
 		if( tile_number != 0x7ff )
 		{
-			int attr = buffered_spriteram16[offs + 1];
+			int attr = buffered_spriteram[offs + 1];
 			int color = (attr & 0x3c) >> 2;
 			int flipx = attr & 0x02;
 			int flipy = 0;
-			int sx = (INT16)buffered_spriteram16[offs + 3];	/* signed */
-			int sy = (INT16)buffered_spriteram16[offs + 2];	/* signed */
+			int sx = (INT16)buffered_spriteram[offs + 3];	/* signed */
+			int sy = (INT16)buffered_spriteram[offs + 2];	/* signed */
 
 			if (sy > 512 - 16)
 				sy -= 512;

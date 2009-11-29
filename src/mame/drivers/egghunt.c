@@ -61,8 +61,10 @@ struct _egghunt_state
 	/* misc */
 	UINT8     okibanking;
 	UINT8     gfx_banking;
-};
 
+	/* devices */
+	const device_config *audiocpu;
+};
 
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
@@ -196,8 +198,9 @@ static WRITE8_HANDLER( egghunt_vidram_bank_w )
 
 static WRITE8_HANDLER( egghunt_soundlatch_w )
 {
+	egghunt_state *state = (egghunt_state *)space->machine->driver_data;
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static READ8_DEVICE_HANDLER( egghunt_okibanking_r )
@@ -385,6 +388,8 @@ GFXDECODE_END
 static MACHINE_START( egghunt )
 {
 	egghunt_state *state = (egghunt_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
 
 	state_save_register_global(machine, state->gfx_banking);
 	state_save_register_global(machine, state->okibanking);

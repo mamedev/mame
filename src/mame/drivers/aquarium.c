@@ -93,9 +93,10 @@ static WRITE8_HANDLER( aquarium_snd_ack_w )
 static WRITE16_HANDLER( aquarium_sound_w )
 {
 //  popmessage("sound write %04x",data);
+	aquarium_state *state = (aquarium_state *)space->machine->driver_data;
 
 	soundlatch_w(space, 1, data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE8_HANDLER( aquarium_z80_bank_w )
@@ -138,7 +139,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(aquarium_mid_videoram_w) AM_BASE_MEMBER(aquarium_state, mid_videoram)
 	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(aquarium_bak_videoram_w) AM_BASE_MEMBER(aquarium_state, bak_videoram)
 	AM_RANGE(0xc02000, 0xc03fff) AM_RAM_WRITE(aquarium_txt_videoram_w) AM_BASE_MEMBER(aquarium_state, txt_videoram)
-	AM_RANGE(0xc80000, 0xc81fff) AM_RAM AM_BASE_MEMBER(aquarium_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xc80000, 0xc81fff) AM_RAM AM_BASE_MEMBER(aquarium_state, spriteram) AM_SIZE_MEMBER(aquarium_state, spriteram_size)
 	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd80014, 0xd8001f) AM_WRITEONLY AM_BASE_MEMBER(aquarium_state, scroll)
 	AM_RANGE(0xd80068, 0xd80069) AM_WRITENOP		/* probably not used */
@@ -327,7 +328,8 @@ GFXDECODE_END
 
 static void irq_handler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE);
+	aquarium_state *state = (aquarium_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -339,6 +341,9 @@ static const ym2151_interface ym2151_config =
 static MACHINE_START( aquarium )
 {
 	aquarium_state *state = (aquarium_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
 	state_save_register_global(machine, state->aquarium_snd_ack);
 }
 
