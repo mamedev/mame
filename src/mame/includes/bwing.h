@@ -32,6 +32,11 @@ struct _bwing_state
 	/* misc */
 	UINT8 *bwp123_membase[3];
 	int coin;
+
+	/* device */
+	const device_config *maincpu;
+	const device_config *subcpu;
+	const device_config *audiocpu;
 };
 
 

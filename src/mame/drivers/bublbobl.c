@@ -288,7 +288,7 @@ TODO:
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_MEMBER(bublbobl_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_MEMBER(bublbobl_state, videoram) AM_SIZE_MEMBER(bublbobl_state, videoram_size)
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, objectram, objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
@@ -344,7 +344,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_MEMBER(bublbobl_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_MEMBER(bublbobl_state, videoram) AM_SIZE_MEMBER(bublbobl_state, videoram_size)
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, objectram, objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
@@ -368,7 +368,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tokio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_MEMBER(bublbobl_state, videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_MEMBER(bublbobl_state, videoram) AM_SIZE_MEMBER(bublbobl_state, videoram_size)
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, objectram, objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
@@ -699,7 +699,8 @@ GFXDECODE_END
 // handler called by the 2203 emulator when the internal timers cause an IRQ
 static void irqhandler(const device_config *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	bublbobl_state *state = (bublbobl_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -724,7 +725,10 @@ static MACHINE_START( common )
 {
 	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
 
-	state->mcu = cputag_get_cpu(machine, "mcu"); 
+	state->maincpu = devtag_get_device(machine, "maincpu"); 
+	state->mcu = devtag_get_device(machine, "mcu"); 
+	state->audiocpu = devtag_get_device(machine, "audiocpu"); 
+	state->slave = devtag_get_device(machine, "slave"); 
 
 	state_save_register_global(machine, state->sound_nmi_enable);
 	state_save_register_global(machine, state->pending_nmi);

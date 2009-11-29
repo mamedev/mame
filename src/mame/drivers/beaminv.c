@@ -67,6 +67,9 @@ struct _beaminv_state
 
 	/* input-related */
 	UINT8      controller_select;
+
+	/* devices */
+	const device_config *maincpu;
 };
 
 
@@ -91,7 +94,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	int next_interrupt_number;
 	int next_vpos;
 
-	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+	cpu_set_input_line(state->maincpu, 0, HOLD_LINE);
 
 	/* set up for next interrupt */
 	next_interrupt_number = (interrupt_number + 1) % INTERRUPTS_PER_FRAME;
@@ -127,6 +130,8 @@ static MACHINE_START( beaminv )
 {
 	beaminv_state *state = (beaminv_state *)machine->driver_data;
 	create_interrupt_timer(machine);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
 
 	/* setup for save states */
 	state_save_register_global(machine, state->controller_select);

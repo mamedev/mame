@@ -23,11 +23,11 @@ WRITE8_HANDLER( bublbobl_bankswitch_w )
 	/* bit 3 n.c. */
 
 	/* bit 4 resets second Z80 */
-	cputag_set_input_line(space->machine, "slave", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(state->slave, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 5 resets mcu */
 	if (state->mcu != NULL) // only if we have a MCU
-		cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(state->mcu, INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 6 enables display */
 	state->video_enable = data & 0x40;
@@ -54,7 +54,8 @@ WRITE8_HANDLER( tokio_videoctrl_w )
 
 WRITE8_HANDLER( bublbobl_nmitrigger_w )
 {
-	cputag_set_input_line(space->machine, "slave", INPUT_LINE_NMI, PULSE_LINE);
+	bublbobl_state *state = (bublbobl_state *)space->machine->driver_data;
+	cpu_set_input_line(state->slave, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -94,7 +95,7 @@ static TIMER_CALLBACK( nmi_callback )
 	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
 
 	if (state->sound_nmi_enable) 
-		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else 
 		state->pending_nmi = 1;
 }
@@ -118,14 +119,15 @@ WRITE8_HANDLER( bublbobl_sh_nmi_enable_w )
 	state->sound_nmi_enable = 1;
 	if (state->pending_nmi)
 	{
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 		state->pending_nmi = 0;
 	}
 }
 
 WRITE8_HANDLER( bublbobl_soundcpu_reset_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, data ? ASSERT_LINE : CLEAR_LINE);
+	bublbobl_state *state = (bublbobl_state *)space->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_HANDLER( bublbobl_sound_status_r )
@@ -220,8 +222,8 @@ WRITE8_HANDLER( bublbobl_mcu_port1_w )
 	if ((state->port1_out & 0x40) && (~data & 0x40))
 	{
 		// logerror("triggering IRQ on main CPU\n");
-		cpu_set_input_line_vector(cputag_get_cpu(space->machine, "maincpu"), 0, state->mcu_sharedram[0]);
-		cputag_set_input_line(space->machine, "maincpu", 0, HOLD_LINE);
+		cpu_set_input_line_vector(state->maincpu, 0, state->mcu_sharedram[0]);
+		cpu_set_input_line(state->maincpu, 0, HOLD_LINE);
 	}
 
 	// bit 7: select read or write shared RAM
@@ -505,8 +507,8 @@ WRITE8_HANDLER( bublbobl_68705_port_b_w )
 		/* hack to get random EXTEND letters (who is supposed to do this? 68705? PAL?) */
 		state->mcu_sharedram[0x7c] = mame_rand(space->machine) % 6;
 
-		cpu_set_input_line_vector(cputag_get_cpu(space->machine, "maincpu"), 0, state->mcu_sharedram[0]);
-		cputag_set_input_line(space->machine, "maincpu", 0, HOLD_LINE);
+		cpu_set_input_line_vector(state->maincpu, 0, state->mcu_sharedram[0]);
+		cpu_set_input_line(state->maincpu, 0, HOLD_LINE);
 	}
 	if ((state->ddr_b & 0x40) && (~data & 0x40) && (state->port_b_out & 0x40))
 	{

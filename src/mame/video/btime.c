@@ -304,7 +304,7 @@ static void draw_chars( running_machine *machine, bitmap_t *bitmap, const rectan
 	btime_state *state = (btime_state *)machine->driver_data;
 	offs_t offs;
 
-	for (offs = 0; offs < machine->generic.videoram_size; offs++)
+	for (offs = 0; offs < state->videoram_size; offs++)
 	{
 		UINT8 x = 31 - (offs / 32);
 		UINT8 y = offs % 32;

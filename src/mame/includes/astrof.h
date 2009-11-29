@@ -29,6 +29,7 @@ struct _astrof_state
 	UINT8      astrof_bosskill_playing;
 
 	/* devices */
+	const device_config *maincpu;
 	const device_config *samples;	// astrof & abattle
 	const device_config *sn;	// tomahawk
 };

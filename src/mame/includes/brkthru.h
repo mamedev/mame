@@ -11,6 +11,8 @@ struct _brkthru_state
 	UINT8 * videoram;
 	UINT8 * spriteram;
 	UINT8 * fg_videoram;
+	size_t  videoram_size;
+	size_t  spriteram_size;
 	size_t  fg_videoram_size;
 
 	/* video-related */
@@ -19,9 +21,11 @@ struct _brkthru_state
 	int     bgbasecolor;
 	int     flipscreen;
 	//UINT8 *brkthru_nmi_enable; /* needs to be tracked down */
+
+	/* devices */
+	const device_config *maincpu;
+	const device_config *audiocpu;
 };
-
-
 
 
 /*----------- defined in video/brkthru.c -----------*/

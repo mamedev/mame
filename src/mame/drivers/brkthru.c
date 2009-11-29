@@ -67,30 +67,34 @@
 
 static WRITE8_HANDLER( brkthru_1803_w )
 {
+	brkthru_state *state = (brkthru_state *)space->machine->driver_data;
 	/* bit 0 = NMI enable */
-	cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), ~data & 1);
+	cpu_interrupt_enable(state->maincpu, ~data & 1);
 
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
 static WRITE8_HANDLER( darwin_0803_w )
 {
+	brkthru_state *state = (brkthru_state *)space->machine->driver_data;
 	/* bit 0 = NMI enable */
-	/*cpu_interrupt_enable(cputag_get_cpu(space->machine, "audiocpu"), ~data & 1);*/
+	/*cpu_interrupt_enable(state->audiocpu, ~data & 1);*/
 	logerror("0803 %02X\n",data);
-	cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), data & 1);
+	cpu_interrupt_enable(state->maincpu, data & 1);
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
 
 static WRITE8_HANDLER( brkthru_soundlatch_w )
 {
+	brkthru_state *state = (brkthru_state *)space->machine->driver_data;
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted )
 {
+	brkthru_state *state = (brkthru_state *)field->port->machine->driver_data;
 	/* coin insertion causes an IRQ */
-	cputag_set_input_line(field->port->machine, "maincpu", 0, newval ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(state->maincpu, 0, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -103,8 +107,8 @@ static INPUT_CHANGED( coin_inserted )
 static ADDRESS_MAP_START( brkthru_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(brkthru_fgram_w) AM_BASE_SIZE_MEMBER(brkthru_state, fg_videoram, fg_videoram_size)
 	AM_RANGE(0x0400, 0x0bff) AM_RAM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(brkthru_bgram_w) AM_BASE_MEMBER(brkthru_state, videoram) AM_SIZE_GENERIC(videoram)
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_MEMBER(brkthru_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(brkthru_bgram_w) AM_BASE_MEMBER(brkthru_state, videoram) AM_SIZE_MEMBER(brkthru_state, videoram_size)
+	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_MEMBER(brkthru_state, spriteram) AM_SIZE_MEMBER(brkthru_state, spriteram_size)
 	AM_RANGE(0x1100, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("P2")
@@ -121,8 +125,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( darwin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(brkthru_fgram_w) AM_BASE_SIZE_MEMBER(brkthru_state, fg_videoram, fg_videoram_size)
 	AM_RANGE(0x1400, 0x1bff) AM_RAM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(brkthru_bgram_w) AM_BASE_MEMBER(brkthru_state, videoram) AM_SIZE_GENERIC(videoram)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_MEMBER(brkthru_state, spriteram) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(brkthru_bgram_w) AM_BASE_MEMBER(brkthru_state, videoram) AM_SIZE_MEMBER(brkthru_state, videoram_size)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_MEMBER(brkthru_state, spriteram) AM_SIZE_MEMBER(brkthru_state, spriteram_size)
 	AM_RANGE(0x0100, 0x01ff) AM_WRITENOP /*tidyup, nothing realy here?*/
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("P1")
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("P2")
@@ -340,9 +344,10 @@ GFXDECODE_END
  *************************************/
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
-static void irqhandler(const device_config *device, int linestate)
+static void irqhandler( const device_config *device, int linestate )
 {
-	cputag_set_input_line(device->machine, "audiocpu", M6809_IRQ_LINE, linestate);
+	brkthru_state *state = (brkthru_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, linestate);
 }
 
 static const ym3526_interface ym3526_config =
@@ -357,6 +362,18 @@ static const ym3526_interface ym3526_config =
  *  Machine driver
  *
  *************************************/
+
+static MACHINE_START( brkthru )
+{
+	brkthru_state *state = (brkthru_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->bgscroll);
+	state_save_register_global(machine, state->bgbasecolor);
+	state_save_register_global(machine, state->flipscreen);
+}
 
 static MACHINE_RESET( brkthru )
 {
@@ -380,6 +397,7 @@ static MACHINE_DRIVER_START( brkthru )
 	MDRV_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/8)		/* 1.5 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
+	MDRV_MACHINE_START(brkthru)
 	MDRV_MACHINE_RESET(brkthru)
 
 	/* video hardware */

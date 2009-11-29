@@ -11,10 +11,12 @@ struct _btime_state
 	UINT8 *  zoar_scrollram;
 	UINT8 *  deco_charram;
 	UINT8 *  spriteram;	// used by disco
-	size_t   bnj_backgroundram_size;
 //	UINT8 *  decrypted;
 	UINT8 *  rambase;
 	UINT8 *  audio_rambase;
+	size_t   videoram_size;
+	size_t   spriteram_size;
+	size_t   bnj_backgroundram_size;
 
 	/* video-related */
 	bitmap_t *background_bitmap;

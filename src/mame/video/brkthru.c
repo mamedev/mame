@@ -119,10 +119,6 @@ VIDEO_START( brkthru )
 
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 	tilemap_set_transparent_pen(state->bg_tilemap, 0);
-
-	state_save_register_global(machine, state->bgscroll);
-	state_save_register_global(machine, state->bgbasecolor);
-	state_save_register_global(machine, state->flipscreen);
 }
 
 
@@ -189,7 +185,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
         ---- ---- ---- ---- ---- ---- xxxx xxxx = X position
     */
 
-	for (offs = 0;offs < machine->generic.spriteram_size; offs += 4)
+	for (offs = 0;offs < state->spriteram_size; offs += 4)
 	{
 		if ((state->spriteram[offs] & 0x09) == prio)	/* Enable && Low Priority */
 		{

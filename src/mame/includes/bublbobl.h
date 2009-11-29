@@ -6,8 +6,9 @@ struct _bublbobl_state
 	UINT8 *  mcu_sharedram;
 	UINT8 *  videoram;
 	UINT8 *  objectram;
-	size_t   objectram_size;
 //	UINT8 *  paletteram;	// currently this uses generic palette handling
+	size_t   videoram_size;
+	size_t   objectram_size;
 
 	/* missb2.c also needs the following */
 	UINT8 *  bgvram;
@@ -34,7 +35,10 @@ struct _bublbobl_state
 	int      ic43_a, ic43_b;
 
 	/* devices */
+	const device_config *maincpu;
 	const device_config *mcu;
+	const device_config *audiocpu;
+	const device_config *slave;
 };
 
 
