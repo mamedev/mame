@@ -5,7 +5,6 @@ Kusayakyuu (Sandlot Baseball)
 driver by Tomasz Slanina
 
 TODO:
-- colors
 - correct communication between main and the sound cpu
 - DAC
 - sprite glitches (sometimes) .. missing vertical flip flag?
@@ -120,7 +119,7 @@ static ADDRESS_MAP_START( maincpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa807, 0xa807) AM_READNOP /* watchdog ? */
 	AM_RANGE(0xa808, 0xa808) AM_WRITE(bank_select_w)
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(ksayakyu_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(SMH_RAM) AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundcpu_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -235,7 +234,7 @@ static const gfx_layout spritelayout =
 
 static GFXDECODE_START( ksayakyu )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, charlayout2,  16*4, 32 )
+	GFXDECODE_ENTRY( "gfx3", 0, charlayout2,  0x80, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 16 )
 GFXDECODE_END
 
@@ -244,7 +243,7 @@ static MACHINE_DRIVER_START( ksayakyu )
 	MDRV_CPU_PROGRAM_MAP(maincpu_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 80000000/2)
+	MDRV_CPU_ADD("audiocpu", Z80, 8000000/2)
 	MDRV_CPU_PROGRAM_MAP(soundcpu_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
@@ -322,4 +321,4 @@ static DRIVER_INIT( ksayakyu )
 	sound_status = 0xff;
 }
 
-GAME( 1985, ksayakyu, 0, ksayakyu, ksayakyu, ksayakyu, ORIENTATION_FLIP_Y, "Taito Corporation", "Kusayakyuu",GAME_IMPERFECT_SOUND|GAME_WRONG_COLORS )
+GAME( 1985, ksayakyu, 0, ksayakyu, ksayakyu, ksayakyu, ORIENTATION_FLIP_Y, "Taito Corporation", "Kusayakyuu",GAME_IMPERFECT_SOUND )

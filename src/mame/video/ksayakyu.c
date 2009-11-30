@@ -25,25 +25,28 @@ WRITE8_HANDLER(ksayakyu_videoctrl_w)
      */
     video_ctrl=data;
 
-    flipscreen = (data&4)?(TILEMAP_FLIPX|TILEMAP_FLIPY):0;
-	tilemap_set_flip_all( space->machine,flipscreen );
+    flipscreen = data & 4;
+	flip_screen_set( space->machine,flipscreen );
 	tilemap_set_scrolly( ksayakyu_tilemap, 0, (data&0xe0)<<3 );
+	if(flipscreen)
+		tilemap_set_flip( ksayakyu_tilemap, (data & 2) ? TILEMAP_FLIPY : TILEMAP_FLIPX | TILEMAP_FLIPY);
+	else
+		tilemap_set_flip( ksayakyu_tilemap, (data & 2) ? TILEMAP_FLIPX : 0);
 }
 
 PALETTE_INIT( ksayakyu )
 {
-	int i,j,b1,b2;
 	const UINT8 *prom = memory_region(machine, "proms");
+	int r,g,b,i;
 
-	for(j=0;j<16;j++)
-		for(i=0;i<8;i++)
-		{
-			b1=prom[j*16+i];
-			b2=prom[j*16+i+8];
+	for (i=0;i<0x100;i++)
+	{
+		r = (prom[i] & 0x07) >> 0;
+		g = (prom[i] & 0x38) >> 3;
+		b = (prom[i] & 0xc0) >> 6;
 
-			b1=b2|(b1<<8);
-			palette_set_color_rgb(machine,j*8+i,pal5bit(b1 >> 10),pal5bit(b1 >> 0),pal5bit(b1 >> 5));
-		}
+		palette_set_color_rgb(machine,i,pal3bit(r),pal3bit(g),pal2bit(b));
+	}
 }
 
 static TILE_GET_INFO( get_ksayakyu_tile_info )
@@ -51,19 +54,33 @@ static TILE_GET_INFO( get_ksayakyu_tile_info )
 	int code = memory_region(machine, "user1")[tile_index];
 	int attr = memory_region(machine, "user1")[tile_index+0x2000];
 	code+=(attr&3)<<8;
-	SET_TILE_INFO(1,code,((attr>>2)&0x07)*2,(attr&0x80) ? TILE_FLIPX : 0);
+	SET_TILE_INFO(1,code,((attr>>2)&0x0f)*2,(attr&0x80) ? TILE_FLIPX : 0);
 }
 
+/*
+xy-- ---- flip bits
+--cc cc-- color
+---- --bb bank select
+*/
 static TILE_GET_INFO( get_text_tile_info )
 {
 	int code = machine->generic.videoram.u8[tile_index*2+1];
 	int attr = machine->generic.videoram.u8[tile_index*2];
-	int  flags=((attr&0x80) ? TILE_FLIPX : 0) | ((attr&0x40) ? TILE_FLIPY : 0);
+	int flags=((attr&0x80) ? TILE_FLIPX : 0) | ((attr&0x40) ? TILE_FLIPY : 0);
+	int color = (attr & 0x3c) >> 2;
 
 	code|=(attr&3)<<8;
 
-	SET_TILE_INFO(0,code,((attr>>2)&7),flags);
+	SET_TILE_INFO(0,code,color,flags);
 }
+
+/*
+[0] X--- ---- flip x
+    -ttt tttt tile number
+[1] yyyy yyyy Y offset
+[2] xxxx xxxx X offset
+[3]
+*/
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
@@ -91,7 +108,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			drawgfx_transpen(bitmap,cliprect,gfx,
 				tile&0x7f,
-				(attributes) & 7,
+				(attributes & 0x78) >> 3,
 				flipx,flipy,
 				sx,sy,0 );
 
