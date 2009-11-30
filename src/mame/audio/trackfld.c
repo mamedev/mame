@@ -7,8 +7,6 @@
 #define TIMER_RATE (4096/4)
 
 
-static int SN76496_latch;
-
 /* The timer port on TnF and HyperSports sound hardware is derived from
    a 14.318 MHz clock crystal which is passed  through a couple of 74ls393
     ripple counters.
@@ -22,91 +20,94 @@ static int SN76496_latch;
 
 READ8_HANDLER( trackfld_sh_timer_r )
 {
-    UINT32 clock = cpu_get_total_cycles(space->cpu) / TIMER_RATE;
+	UINT32 clock = cpu_get_total_cycles(space->cpu) / TIMER_RATE;
 
-    return clock & 0xF;
+	return clock & 0xF;
 }
 
 READ8_DEVICE_HANDLER( trackfld_speech_r )
 {
-    return vlm5030_bsy(device) ? 0x10 : 0;
+	return vlm5030_bsy(device) ? 0x10 : 0;
 }
-
-static int last_addr = 0;
 
 WRITE8_DEVICE_HANDLER( trackfld_sound_w )
 {
-   int changes = offset^last_addr;
-   /* A7 = data enable for VLM5030 (don't care )          */
-   /* A8 = STA pin (1->0 data data  , 0->1 start speech   */
-   /* A9 = RST pin 1=reset                                */
+	trackfld_state *state = (trackfld_state *)device->machine->driver_data;
+	int changes = offset ^ state->last_addr;
 
-   /* A8 VLM5030 ST pin */
-   if( changes & 0x100 )
-       vlm5030_st( device, offset&0x100 );
-   /* A9 VLM5030 RST pin */
-   if( changes & 0x200 )
-       vlm5030_rst( device, offset&0x200 );
-    last_addr = offset;
+	/* A7 = data enable for VLM5030 (don't care )          */
+	/* A8 = STA pin (1->0 data data  , 0->1 start speech   */
+	/* A9 = RST pin 1=reset                                */
+
+	/* A8 VLM5030 ST pin */
+	if (changes & 0x100)
+		vlm5030_st(device, offset & 0x100);
+
+	/* A9 VLM5030 RST pin */
+	if (changes & 0x200)
+		vlm5030_rst(device, offset & 0x200);
+
+	state->last_addr = offset;
 }
 
 READ8_HANDLER( hyperspt_sh_timer_r )
 {
-    UINT32 clock = cpu_get_total_cycles(space->cpu) / TIMER_RATE;
+	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	UINT32 clock = cpu_get_total_cycles(space->cpu) / TIMER_RATE;
 
-	if (devtag_get_device(space->machine, "vlm"))
-	{
-		return (clock & 0x3) | (vlm5030_bsy(devtag_get_device(space->machine, "vlm"))? 0x04 : 0);
-	}
+	if (state->vlm != NULL)
+		return (clock & 0x3) | (vlm5030_bsy(state->vlm) ? 0x04 : 0);
 	else
-	{
 		return (clock & 0x3);
-	}
 }
 
 WRITE8_DEVICE_HANDLER( hyperspt_sound_w )
 {
-    int changes = offset^last_addr;
-    /* A3 = data enable for VLM5030 (don't care )          */
-    /* A4 = STA pin (1->0 data data  , 0->1 start speech   */
-    /* A5 = RST pin 1=reset                                */
-    /* A6 = VLM5030    output disable (don't care ) */
-    /* A7 = kONAMI DAC output disable (don't care ) */
-    /* A8 = SN76489    output disable (don't care ) */
+	trackfld_state *state = (trackfld_state *)device->machine->driver_data;
+	int changes = offset ^ state->last_addr;
 
-    /* A4 VLM5030 ST pin */
-    if( changes & 0x10 )
-        vlm5030_st( device, offset&0x10 );
-    /* A5 VLM5030 RST pin */
-    if( changes & 0x20 )
-        vlm5030_rst( device, offset&0x20 );
+	/* A3 = data enable for VLM5030 (don't care )          */
+	/* A4 = STA pin (1->0 data data  , 0->1 start speech   */
+	/* A5 = RST pin 1=reset                                */
+	/* A6 = VLM5030    output disable (don't care ) */
+	/* A7 = kONAMI DAC output disable (don't care ) */
+	/* A8 = SN76489    output disable (don't care ) */
 
-    last_addr = offset;
+	/* A4 VLM5030 ST pin */
+	if (changes & 0x10)
+		vlm5030_st(device, offset & 0x10);
+
+	/* A5 VLM5030 RST pin */
+	if( changes & 0x20 )
+		vlm5030_rst(device, offset & 0x20);
+
+	state->last_addr = offset;
 }
 
 
 
 WRITE8_HANDLER( konami_sh_irqtrigger_w )
 {
-    static int last;
+	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	if (state->last_irq == 0 && data)
+	{
+		/* setting bit 0 low then high triggers IRQ on the sound CPU */
+		cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	}
 
-    if (last == 0 && data)
-    {
-        /* setting bit 0 low then high triggers IRQ on the sound CPU */
-        cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
-    }
-
-    last = data;
+	state->last_irq = data;
 }
 
 
 WRITE8_HANDLER( konami_SN76496_latch_w )
 {
-    SN76496_latch = data;
+	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	state->SN76496_latch = data;
 }
 
 
 WRITE8_DEVICE_HANDLER( konami_SN76496_w )
 {
-    sn76496_w(device, offset, SN76496_latch);
+ 	trackfld_state *state = (trackfld_state *)device->machine->driver_data;
+	sn76496_w(device, offset, state->SN76496_latch);
 }

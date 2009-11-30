@@ -8,10 +8,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
-
-UINT8 *hyperspt_scroll;
-
-static tilemap *bg_tilemap;
+#include "includes/trackfld.h"
 
 /***************************************************************************
 
@@ -31,10 +28,11 @@ static tilemap *bg_tilemap;
   bit 0 -- 1  kohm resistor  -- RED
 
 ***************************************************************************/
+
 PALETTE_INIT( hyperspt )
 {
 	static const int resistances_rg[3] = { 1000, 470, 220 };
-	static const int resistances_b [2] = { 470, 220 };
+	static const int resistances_b[2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
 
@@ -93,14 +91,16 @@ PALETTE_INIT( hyperspt )
 
 WRITE8_HANDLER( hyperspt_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( hyperspt_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( hyperspt_flipscreen_w )
@@ -114,26 +114,29 @@ WRITE8_HANDLER( hyperspt_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x80) << 1) + ((machine->generic.colorram.u8[tile_index] & 0x40) << 3);
-	int color = machine->generic.colorram.u8[tile_index] & 0x0f;
-	int flags = ((machine->generic.colorram.u8[tile_index] & 0x10) ? TILE_FLIPX : 0) | ((machine->generic.colorram.u8[tile_index] & 0x20) ? TILE_FLIPY : 0);
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x80) << 1) + ((state->colorram[tile_index] & 0x40) << 3);
+	int color = state->colorram[tile_index] & 0x0f;
+	int flags = ((state->colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) | ((state->colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(1, code, color, flags);
 }
 
 VIDEO_START( hyperspt )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
 
-	tilemap_set_scroll_rows(bg_tilemap, 32);
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	tilemap_set_scroll_rows(state->bg_tilemap, 32);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
-	for (offs = machine->generic.spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = state->spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int sx = spriteram[offs + 3];
 		int sy = 240 - spriteram[offs + 1];
@@ -173,34 +176,36 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( hyperspt )
 {
+	trackfld_state *state = (trackfld_state *)screen->machine->driver_data;
 	int row;
 
 	for (row = 0; row < 32; row++)
 	{
-		int scrollx = hyperspt_scroll[row * 2] + (hyperspt_scroll[(row * 2) + 1] & 0x01) * 256;
+		int scrollx = state->scroll[row * 2] + (state->scroll[(row * 2) + 1] & 0x01) * 256;
 		if (flip_screen_get(screen->machine)) scrollx = -scrollx;
-		tilemap_set_scrollx(bg_tilemap, row, scrollx);
+		tilemap_set_scrollx(state->bg_tilemap, row, scrollx);
 	}
 
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
 /* Road Fighter */
-
 static TILE_GET_INFO( roadf_get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x80) << 1) + ((machine->generic.colorram.u8[tile_index] & 0x60) << 4);
-	int color = machine->generic.colorram.u8[tile_index] & 0x0f;
-	int flags = (machine->generic.colorram.u8[tile_index] & 0x10) ? TILE_FLIPX : 0;
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x80) << 1) + ((state->colorram[tile_index] & 0x60) << 4);
+	int color = state->colorram[tile_index] & 0x0f;
+	int flags = (state->colorram[tile_index] & 0x10) ? TILE_FLIPX : 0;
 
 	SET_TILE_INFO(1, code, color, flags);
 }
 
 VIDEO_START( roadf )
 {
-	bg_tilemap = tilemap_create(machine, roadf_get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
 
-	tilemap_set_scroll_rows(bg_tilemap, 32);
+	state->bg_tilemap = tilemap_create(machine, roadf_get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	tilemap_set_scroll_rows(state->bg_tilemap, 32);
 }

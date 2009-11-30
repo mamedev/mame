@@ -7,10 +7,8 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/trackfld.h"
 
-int yiear_nmi_enable;
-
-static tilemap *bg_tilemap;
 
 /***************************************************************************
 
@@ -29,14 +27,14 @@ static tilemap *bg_tilemap;
   bit 0 -- 1  kohm resistor  -- RED
 
 ***************************************************************************/
+
 PALETTE_INIT( yiear )
 {
 	int i;
 
-
-	for (i = 0;i < machine->config->total_colors;i++)
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2, r, g, b;
 
 		/* red component */
 		bit0 = (*color_prom >> 0) & 0x01;
@@ -56,21 +54,22 @@ PALETTE_INIT( yiear )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine, i, MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 }
 
 WRITE8_HANDLER( yiear_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
+	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( yiear_control_w )
 {
+	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
 	/* bit 0 flips screen */
-
 	if (flip_screen_get(space->machine) != (data & 0x01))
 	{
 		flip_screen_set(space->machine, data & 0x01);
@@ -78,24 +77,22 @@ WRITE8_HANDLER( yiear_control_w )
 	}
 
 	/* bit 1 is NMI enable */
-
-	yiear_nmi_enable = data & 0x02;
+	state->yiear_nmi_enable = data & 0x02;
 
 	/* bit 2 is IRQ enable */
-
 	interrupt_enable_w(space, 0, data & 0x04);
 
 	/* bits 3 and 4 are coin counters */
-
 	coin_counter_w(space->machine, 0, data & 0x08);
 	coin_counter_w(space->machine, 1, data & 0x10);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
 	int offs = tile_index * 2;
-	int attr = machine->generic.videoram.u8[offs];
-	int code = machine->generic.videoram.u8[offs + 1] | ((attr & 0x10) << 4);
+	int attr = state->videoram[offs];
+	int code = state->videoram[offs + 1] | ((attr & 0x10) << 4);
 //  int color = (attr & 0xf0) >> 4;
 	int flags = ((attr & 0x80) ? TILE_FLIPX : 0) | ((attr & 0x40) ? TILE_FLIPY : 0);
 
@@ -104,17 +101,18 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( yiear )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
-	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram_2 = state->spriteram2;
 	int offs;
 
-	for (offs = machine->generic.spriteram_size - 2;offs >= 0;offs -= 2)
+	for (offs = state->spriteram_size - 2; offs >= 0; offs -= 2)
 	{
 		int attr = spriteram[offs];
 		int code = spriteram_2[offs + 1] + 256 * (attr & 0x01);
@@ -145,7 +143,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( yiear )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	trackfld_state *state = (trackfld_state *)screen->machine->driver_data;
+
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

@@ -48,39 +48,35 @@ The 6809 NMI is used for sound timing.
 ***************************************************************************/
 
 #include "driver.h"
-#include "trackfld.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
-#include "konamipt.h"
-
-extern int yiear_nmi_enable;
-
-extern WRITE8_HANDLER( yiear_videoram_w );
-extern WRITE8_HANDLER( yiear_control_w );
-
-extern PALETTE_INIT( yiear );
-extern VIDEO_START( yiear );
-extern VIDEO_UPDATE( yiear );
+#include "includes/konamipt.h"
+#include "includes/trackfld.h"
 
 
 static READ8_DEVICE_HANDLER( yiear_speech_r )
 {
-	if (vlm5030_bsy(device)) return 1;
-	else return 0;
+	if (vlm5030_bsy(device)) 
+		return 1;
+	else 
+		return 0;
 }
 
 static WRITE8_DEVICE_HANDLER( yiear_VLM5030_control_w )
 {
 	/* bit 0 is latch direction */
-	vlm5030_st( device, ( data >> 1 ) & 1 );
-	vlm5030_rst( device, ( data >> 2 ) & 1 );
+	vlm5030_st(device, (data >> 1) & 1);
+	vlm5030_rst(device, (data >> 2) & 1);
 }
 
 static INTERRUPT_GEN( yiear_nmi_interrupt )
 {
+	trackfld_state *state = (trackfld_state *)device->machine->driver_data;
+
 	/* can't use nmi_line_pulse() because interrupt_enable_w() effects it */
-	if (yiear_nmi_enable) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	if (state->yiear_nmi_enable) 
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -98,9 +94,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4e02, 0x4e02) AM_READ_PORT("P2")
 	AM_RANGE(0x4e03, 0x4e03) AM_READ_PORT("DSW3")
 	AM_RANGE(0x4f00, 0x4f00) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x5000, 0x502f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x5400, 0x542f) AM_RAM AM_BASE_GENERIC(spriteram2)
-	AM_RANGE(0x5800, 0x5fff) AM_WRITE(yiear_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x5000, 0x502f) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, spriteram, spriteram_size)
+	AM_RANGE(0x5400, 0x542f) AM_RAM AM_BASE_MEMBER(trackfld_state, spriteram2)
+	AM_RANGE(0x5800, 0x5fff) AM_WRITE(yiear_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -193,13 +189,44 @@ GFXDECODE_END
 
 
 
+static MACHINE_START( yiear )
+{
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
+
+	state->audiocpu = NULL;
+	state->vlm = devtag_get_device(machine, "vlm");
+
+	state_save_register_global(machine, state->yiear_nmi_enable);
+
+	/* sound */
+	state_save_register_global(machine, state->SN76496_latch);
+	state_save_register_global(machine, state->last_addr);
+	state_save_register_global(machine, state->last_irq);
+}
+
+static MACHINE_RESET( yiear )
+{
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
+
+	state->yiear_nmi_enable = 0;
+	state->SN76496_latch = 0;
+	state->last_addr = 0;
+	state->last_irq = 0;
+}
+
 static MACHINE_DRIVER_START( yiear )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(trackfld_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,XTAL_18_432MHz/16)   /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_CPU_PERIODIC_INT(yiear_nmi_interrupt,500)	/* music tempo (correct frequency unknown) */
+
+	MDRV_MACHINE_START(yiear)
+	MDRV_MACHINE_RESET(yiear)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -279,5 +306,5 @@ ROM_END
 
 
 
-GAME( 1985, yiear,  0,     yiear, yiear, 0, ROT0, "Konami", "Yie Ar Kung-Fu (set 1)", 0 )
-GAME( 1985, yiear2, yiear, yiear, yiear, 0, ROT0, "Konami", "Yie Ar Kung-Fu (set 2)", 0 )
+GAME( 1985, yiear,  0,     yiear, yiear, 0, ROT0, "Konami", "Yie Ar Kung-Fu (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, yiear2, yiear, yiear, yiear, 0, ROT0, "Konami", "Yie Ar Kung-Fu (set 2)", GAME_SUPPORTS_SAVE )

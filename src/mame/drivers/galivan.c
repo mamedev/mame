@@ -31,50 +31,24 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/17 -
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/3526intf.h"
+#include "includes/galivan.h"
 
-WRITE8_HANDLER( galivan_scrollx_w );
-WRITE8_HANDLER( galivan_scrolly_w );
-WRITE8_HANDLER( galivan_videoram_w );
-WRITE8_HANDLER( galivan_colorram_w );
-WRITE8_HANDLER( galivan_gfxbank_w );
-PALETTE_INIT( galivan );
-VIDEO_START( galivan );
-VIDEO_UPDATE( galivan );
-
-WRITE8_HANDLER( ninjemak_scrollx_w );
-WRITE8_HANDLER( ninjemak_scrolly_w );
-WRITE8_HANDLER( ninjemak_gfxbank_w );
-VIDEO_START( ninjemak );
-VIDEO_UPDATE( ninjemak );
-
-
-
-static MACHINE_RESET( galivan )
-{
-	UINT8 *RAM = memory_region(machine, "maincpu");
-
-	memory_set_bankptr(machine, 1,&RAM[0x10000]);
-	device_reset(cputag_get_cpu(machine, "maincpu"));
-//  layers = 0x60;
-}
 
 static WRITE8_HANDLER( galivan_sound_command_w )
 {
-	soundlatch_w(space,offset,(data << 1) | 1);
+	soundlatch_w(space, offset, (data << 1) | 1);
 }
 
 static READ8_HANDLER( galivan_sound_command_r )
 {
-	int data;
-
-	data = soundlatch_r(space,offset);
-	soundlatch_clear_w(space,0,0);
+	int data = soundlatch_r(space, offset);
+	soundlatch_clear_w(space, 0, 0);
 	return data;
 }
 
 static READ8_HANDLER( IO_port_c0_r )
 {
-  return (0x58); /* To Avoid Reset on Ufo Robot dangar */
+	return (0x58); /* To Avoid Reset on Ufo Robot dangar */
 }
 
 
@@ -106,11 +80,11 @@ static ADDRESS_MAP_START( galivan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	// The next three entires need to be looked at.  It's ugly.
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0xd800, 0xdbff) AM_WRITE(galivan_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
-	AM_RANGE(0xdc00, 0xdfff) AM_WRITE(galivan_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(1)
+	AM_RANGE(0xd800, 0xdbff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE_MEMBER(galivan_state, videoram, videoram_size)
+	AM_RANGE(0xdc00, 0xdfff) AM_WRITE(galivan_colorram_w) AM_BASE_MEMBER(galivan_state, colorram)
 
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE_MEMBER(galivan_state, spriteram, spriteram_size)
 	AM_RANGE(0xe100, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -118,12 +92,12 @@ static ADDRESS_MAP_START( ninjemak_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	// The next three entires need to be looked at.  It's ugly.
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_BANK(1))
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(1)
 	AM_RANGE(0xd800, 0xd81f) AM_WRITE(ninjemak_videoreg_w)
-	AM_RANGE(0xd800, 0xdbff) AM_WRITE(galivan_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
-	AM_RANGE(0xdc00, 0xdfff) AM_WRITE(galivan_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xd800, 0xdbff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE_MEMBER(galivan_state, videoram, videoram_size)
+	AM_RANGE(0xdc00, 0xdfff) AM_WRITE(galivan_colorram_w) AM_BASE_MEMBER(galivan_state, colorram)
 
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_SIZE_MEMBER(galivan_state, spriteram, spriteram_size)
 	AM_RANGE(0xe200, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -434,7 +408,69 @@ GFXDECODE_END
 
 
 
+static MACHINE_START( galivan )
+{
+	galivan_state *state = (galivan_state *)machine->driver_data;
+
+	/* configure ROM banking */
+	UINT8 *rombase = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, 1, 0, 2, &rombase[0x10000], 0x2000);
+	memory_set_bank(machine, 1, 0);
+
+	/* register for saving */
+	state_save_register_global_array(machine, state->scrollx);
+	state_save_register_global_array(machine, state->scrolly);
+	state_save_register_global(machine, state->flipscreen);
+	state_save_register_global(machine, state->write_layers);
+	state_save_register_global(machine, state->layers);
+}
+
+static MACHINE_START( ninjemak )
+{
+	galivan_state *state = (galivan_state *)machine->driver_data;
+
+	/* configure ROM banking */
+	UINT8 *rombase = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, 1, 0, 4, &rombase[0x10000], 0x2000);
+	memory_set_bank(machine, 1, 0);
+
+	/* register for saving */
+	state_save_register_global_array(machine, state->scrollx);
+	state_save_register_global_array(machine, state->scrolly);
+	state_save_register_global(machine, state->flipscreen);
+	state_save_register_global(machine, state->ninjemak_dispdisable);
+}
+
+static MACHINE_RESET( galivan )
+{
+	galivan_state *state = (galivan_state *)machine->driver_data;
+
+	device_reset(cputag_get_cpu(machine, "maincpu"));
+
+//  state->layers = 0x60;
+	state->layers = 0;
+	state->write_layers = 0;
+	state->scrollx[0] = state->scrollx[1] = 0;
+	state->scrolly[0] = state->scrolly[1] = 0;
+	state->flipscreen = 0;
+}
+
+static MACHINE_RESET( ninjemak )
+{
+	galivan_state *state = (galivan_state *)machine->driver_data;
+
+	device_reset(cputag_get_cpu(machine, "maincpu"));
+
+	state->scrollx[0] = state->scrollx[1] = 0;
+	state->scrolly[0] = state->scrolly[1] = 0;
+	state->flipscreen = 0;
+	state->ninjemak_dispdisable = 0;
+}
+
 static MACHINE_DRIVER_START( galivan )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(galivan_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6 MHz? */
@@ -447,6 +483,7 @@ static MACHINE_DRIVER_START( galivan )
 	MDRV_CPU_IO_MAP(sound_io_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 7250)  /* timed interrupt, ?? Hz */
 
+	MDRV_MACHINE_START(galivan)
 	MDRV_MACHINE_RESET(galivan)
 
 	/* video hardware */
@@ -479,6 +516,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ninjemak )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(galivan_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(ninjemak_map)
@@ -490,7 +530,8 @@ static MACHINE_DRIVER_START( ninjemak )
 	MDRV_CPU_IO_MAP(sound_io_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 7250)	/* timed interrupt, ?? Hz */
 
-	MDRV_MACHINE_RESET(galivan)
+	MDRV_MACHINE_START(ninjemak)
+	MDRV_MACHINE_RESET(ninjemak)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -953,18 +994,12 @@ ROM_END
 
 static WRITE8_HANDLER( youmab_extra_bank_w )
 {
-	if (data==0xff)
-	{
-		memory_set_bankptr(space->machine,  2, memory_region(space->machine, "user2")+0x4000 );
-	}
-	else if (data==0x00)
-	{
-		memory_set_bankptr(space->machine,  2, memory_region(space->machine, "user2") );
-	}
+	if (data == 0xff)
+		memory_set_bank(space->machine, 2, 1);
+	else if (data == 0x00)
+		memory_set_bank(space->machine, 2, 0);
 	else
-	{
-		printf("data %03x\n",data);
-	}
+		printf("data %03x\n", data);
 }
 
 static READ8_HANDLER( youmab_8a_r )
@@ -986,9 +1021,11 @@ static DRIVER_INIT( youmab )
 {
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x82, 0x82, 0, 0, youmab_extra_bank_w); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, (read8_space_func)SMH_BANK(3));
-	memory_set_bankptr(machine,  3, memory_region(machine, "maincpu") );
+	memory_set_bankptr(machine,  3, memory_region(machine, "maincpu"));
+
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, (read8_space_func)SMH_BANK(2));
-	memory_set_bankptr(machine,  2, memory_region(machine, "user2") );
+	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "user2"), 0x4000);
+	memory_set_bank(machine, 2, 0);
 
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x81, 0x81, 0, 0, youmab_81_w); // ?? often, alternating values
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x84, 0x84, 0, 0, youmab_84_w); // ?? often, sequence..
@@ -1008,5 +1045,3 @@ GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, 0, ROT270, "Nichibutsu", "Ni
 GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, 0, ROT270, "Nichibutsu", "Youma Ninpou Chou (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1986, youmab,   ninjemak, ninjemak, ninjemak, youmab, ROT270, "bootleg", "Youma Ninpou Chou (Game Electronics bootleg, set 1)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE ) // scrolling doesn't work
 GAME( 1986, youmab2,  ninjemak, ninjemak, ninjemak, youmab, ROT270, "bootleg", "Youma Ninpou Chou (Game Electronics bootleg, set 2)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE ) // scrolling doesn't work
-
-

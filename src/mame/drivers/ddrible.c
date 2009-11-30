@@ -1,11 +1,11 @@
 /***************************************************************************
 
-Double Dribble(GX690) (c) Konami 1986
+    Double Dribble (GX690) (c) Konami 1986
 
-Driver by Manuel Abadia <manu@teleline.es>
+    Driver by Manuel Abadia <manu@teleline.es>
 
-2008-08
-Dip locations and suggested settings verified with US manual.
+    2008-08
+    Dip locations and suggested settings verified with US manual.
 
 ***************************************************************************/
 
@@ -14,40 +14,21 @@ Dip locations and suggested settings verified with US manual.
 #include "sound/2203intf.h"
 #include "sound/vlm5030.h"
 #include "sound/flt_rc.h"
-#include "konamipt.h"
-
-int ddrible_int_enable_0;
-int ddrible_int_enable_1;
-
-static UINT8 *ddrible_sharedram;
-static UINT8 *ddrible_snd_sharedram;
-
-extern UINT8 *ddrible_spriteram_1;
-extern UINT8 *ddrible_spriteram_2;
-extern UINT8 *ddrible_fg_videoram;
-extern UINT8 *ddrible_bg_videoram;
-
-/* video hardware memory handlers */
-WRITE8_HANDLER( ddrible_fg_videoram_w );
-WRITE8_HANDLER( ddrible_bg_videoram_w );
-
-/* video hardware functions */
-PALETTE_INIT( ddrible );
-VIDEO_START( ddrible );
-VIDEO_UPDATE( ddrible );
-WRITE8_HANDLER( K005885_0_w );
-WRITE8_HANDLER( K005885_1_w );
+#include "includes/konamipt.h"
+#include "includes/ddrible.h"
 
 
 static INTERRUPT_GEN( ddrible_interrupt_0 )
 {
-	if (ddrible_int_enable_0)
+	ddrible_state *state = (ddrible_state *)device->machine->driver_data;
+	if (state->int_enable_0)
 		cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( ddrible_interrupt_1 )
 {
-	if (ddrible_int_enable_1)
+	ddrible_state *state = (ddrible_state *)device->machine->driver_data;
+	if (state->int_enable_1)
 		cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
@@ -57,29 +38,33 @@ static WRITE8_HANDLER( ddrible_bankswitch_w )
 	int bankaddress;
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
-	bankaddress = 0x10000 + (data & 0x0f)*0x2000;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	bankaddress = 0x10000 + (data & 0x0f) * 0x2000;
+	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
 }
 
 
 static READ8_HANDLER( ddrible_sharedram_r )
 {
-	return ddrible_sharedram[offset];
+	ddrible_state *state = (ddrible_state *)space->machine->driver_data;
+	return state->sharedram[offset];
 }
 
 static WRITE8_HANDLER( ddrible_sharedram_w )
 {
-	ddrible_sharedram[offset] = data;
+	ddrible_state *state = (ddrible_state *)space->machine->driver_data;
+	state->sharedram[offset] = data;
 }
 
 static READ8_HANDLER( ddrible_snd_sharedram_r )
 {
-	return ddrible_snd_sharedram[offset];
+	ddrible_state *state = (ddrible_state *)space->machine->driver_data;
+	return state->snd_sharedram[offset];
 }
 
 static WRITE8_HANDLER( ddrible_snd_sharedram_w )
 {
-	ddrible_snd_sharedram[offset] = data;
+	ddrible_state *state = (ddrible_state *)space->machine->driver_data;
+	state->snd_sharedram[offset] = data;
 }
 
 static WRITE8_HANDLER( ddrible_coin_counter_w )
@@ -104,36 +89,43 @@ static READ8_DEVICE_HANDLER( ddrible_vlm5030_busy_r )
 
 static WRITE8_DEVICE_HANDLER( ddrible_vlm5030_ctrl_w )
 {
+	ddrible_state *state = (ddrible_state *)device->machine->driver_data;
 	UINT8 *SPEECH_ROM = memory_region(device->machine, "vlm");
 
 	/* b7 : vlm data bus OE   */
+
 	/* b6 : VLM5030-RST       */
+	vlm5030_rst(device, data & 0x40 ? 1 : 0);
+
 	/* b5 : VLM5030-ST        */
+	vlm5030_st(device, data & 0x20 ? 1 : 0);
+
 	/* b4 : VLM5300-VCU       */
+	vlm5030_vcu(device, data & 0x10 ? 1 : 0);
+
 	/* b3 : ROM bank select   */
-	vlm5030_rst( device, data & 0x40 ? 1 : 0 );
-	vlm5030_st(  device, data & 0x20 ? 1 : 0 );
-	vlm5030_vcu( device, data & 0x10 ? 1 : 0 );
 	vlm5030_set_rom(device, &SPEECH_ROM[data & 0x08 ? 0x10000 : 0]);
 
 	/* b2 : SSG-C rc filter enable */
+	filter_rc_set_RC(state->filter3, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
+
 	/* b1 : SSG-B rc filter enable */
+	filter_rc_set_RC(state->filter2, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
+
 	/* b0 : SSG-A rc filter enable */
-	filter_rc_set_RC(devtag_get_device(device->machine, "filter3"),FLT_RC_LOWPASS, 1000,2200,1000,data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
-	filter_rc_set_RC(devtag_get_device(device->machine, "filter2"),FLT_RC_LOWPASS, 1000,2200,1000,data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
-	filter_rc_set_RC(devtag_get_device(device->machine, "filter1"),FLT_RC_LOWPASS, 1000,2200,1000,data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
+	filter_rc_set_RC(state->filter1, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
 }
 
 
 static ADDRESS_MAP_START( cpu0_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0004) AM_WRITE(K005885_0_w)												/* video registers (005885 #1) */
 	AM_RANGE(0x0800, 0x0804) AM_WRITE(K005885_1_w)												/* video registers (005885 #2) */
-	AM_RANGE(0x1800, 0x187f) AM_RAM AM_BASE_GENERIC(paletteram)										/* palette */
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(ddrible_fg_videoram_w) AM_BASE(&ddrible_fg_videoram)	/* Video RAM 1 */
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE(&ddrible_spriteram_1)								/* Object RAM 1 */
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&ddrible_sharedram)									/* shared RAM with CPU #1 */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(ddrible_bg_videoram_w) AM_BASE(&ddrible_bg_videoram)	/* Video RAM 2 */
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE(&ddrible_spriteram_2)								/* Object RAM 2 */
+	AM_RANGE(0x1800, 0x187f) AM_RAM AM_BASE_MEMBER(ddrible_state, paletteram)										/* palette */
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(ddrible_fg_videoram_w) AM_BASE_MEMBER(ddrible_state, fg_videoram)	/* Video RAM 1 */
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE_MEMBER(ddrible_state, spriteram_1)								/* Object RAM 1 */
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(ddrible_state, sharedram)									/* shared RAM with CPU #1 */
+	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(ddrible_bg_videoram_w) AM_BASE_MEMBER(ddrible_state, bg_videoram)	/* Video RAM 2 */
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE_MEMBER(ddrible_state, spriteram_2)								/* Object RAM 2 */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(ddrible_bankswitch_w)										/* bankswitch control */
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)														/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)													/* ROM */
@@ -155,7 +147,7 @@ static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&ddrible_snd_sharedram)		/* shared RAM with CPU #1 */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(ddrible_state, snd_sharedram)		/* shared RAM with CPU #1 */
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)	/* YM2203 */
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("vlm", vlm5030_data_w)			/* Speech data */
 	AM_RANGE(0x8000, 0xffff) AM_ROM										/* ROM */
@@ -259,7 +251,44 @@ static const vlm5030_interface vlm5030_config =
 	0x10000     /* memory size 64Kbyte * 2 bank */
 };
 
+
+
+static MACHINE_START( ddrible )
+{
+	ddrible_state *state = (ddrible_state *)machine->driver_data;
+
+	state->filter1 = devtag_get_device(machine, "filter1");
+	state->filter2 = devtag_get_device(machine, "filter2");
+	state->filter3 = devtag_get_device(machine, "filter3");
+
+	state_save_register_global(machine, state->int_enable_0);
+	state_save_register_global(machine, state->int_enable_1);
+	state_save_register_global_array(machine, state->vregs[0]);
+	state_save_register_global_array(machine, state->vregs[1]);
+	state_save_register_global_array(machine, state->charbank);
+}
+
+static MACHINE_RESET( ddrible )
+{
+	ddrible_state *state = (ddrible_state *)machine->driver_data;
+	int i;
+
+	for (i = 0; i < 5; i++)
+	{
+		state->vregs[0][i] = 0;
+		state->vregs[1][i] = 0;
+	}
+
+	state->int_enable_0 = 0;
+	state->int_enable_1 = 0;
+	state->charbank[0] = 0;
+	state->charbank[1] = 0;
+}
+
 static MACHINE_DRIVER_START( ddribble )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ddrible_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
@@ -274,6 +303,9 @@ static MACHINE_DRIVER_START( ddribble )
 	MDRV_CPU_PROGRAM_MAP(cpu2_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* we need heavy synch */
+
+	MDRV_MACHINE_START(ddrible)
+	MDRV_MACHINE_RESET(ddrible)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -347,4 +379,4 @@ ROM_START( ddribble )
 ROM_END
 
 
-GAME( 1986, ddribble, 0, ddribble, ddribble, 0, ROT0, "Konami", "Double Dribble", 0)
+GAME( 1986, ddribble, 0, ddribble, ddribble, 0, ROT0, "Konami", "Double Dribble", GAME_SUPPORTS_SAVE )

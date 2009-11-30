@@ -10,12 +10,6 @@
 #include "video/resnet.h"
 #include "includes/trackfld.h"
 
-UINT8 *trackfld_scroll;
-UINT8 *trackfld_scroll2;
-
-static tilemap *bg_tilemap;
-static int bg_bank = 0, sprite_bank1 = 0, sprite_bank2 = 0;
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -34,6 +28,7 @@ static int bg_bank = 0, sprite_bank1 = 0, sprite_bank2 = 0;
   bit 0 -- 1  kohm resistor  -- RED
 
 ***************************************************************************/
+
 PALETTE_INIT( trackfld )
 {
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -96,14 +91,16 @@ PALETTE_INIT( trackfld )
 
 WRITE8_HANDLER( trackfld_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( trackfld_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( trackfld_flipscreen_w )
@@ -117,65 +114,61 @@ WRITE8_HANDLER( trackfld_flipscreen_w )
 
 WRITE8_HANDLER( atlantol_gfxbank_w )
 {
-	static int old = 0;
-
-	if( data & 1 )
+	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	if (data & 1)
 	{
 		/* male / female sprites switch */
-		if( (old == 1 && (data & 1) == 1) ||
-			(old == 0 && (data & 1) == 1) )
-			sprite_bank2 = 0x200;
+		if ((state->old_gfx_bank == 1 && (data & 1) == 1) || (state->old_gfx_bank == 0 && (data & 1) == 1))
+			state->sprite_bank2 = 0x200;
 		else
-			sprite_bank2 = 0;
+			state->sprite_bank2 = 0;
 
-		sprite_bank1 = 0;
-
-		old = data & 1;
+		state->sprite_bank1 = 0;
+		state->old_gfx_bank = data & 1;
 	}
 	else
 	{
 		/* male / female sprites switch */
-		if( (old == 0 && (data & 1) == 0) ||
-			(old == 1 && (data & 1) == 0) )
-			sprite_bank2 = 0;
+		if ((state->old_gfx_bank == 0 && (data & 1) == 0) || (state->old_gfx_bank == 1 && (data & 1) == 0))
+			state->sprite_bank2 = 0;
 		else
-			sprite_bank2 = 0x200;
+			state->sprite_bank2 = 0x200;
 
-		sprite_bank1 = 0;
-
-		old = data & 1;
+		state->sprite_bank1 = 0;
+		state->old_gfx_bank = data & 1;
 	}
 
-	if( (data & 3) == 3 )
+	if ((data & 3) == 3)
 	{
-		if( sprite_bank2 )
-			sprite_bank1 = 0x500;
+		if (state->sprite_bank2)
+			state->sprite_bank1 = 0x500;
 		else
-			sprite_bank1 = 0x300;
+			state->sprite_bank1 = 0x300;
 	}
-	else if( (data & 3) == 2 )
+	else if ((data & 3) == 2)
 	{
-		if( sprite_bank2 )
-			sprite_bank1 = 0x300;
+		if (state->sprite_bank2)
+			state->sprite_bank1 = 0x300;
 		else
-			sprite_bank1 = 0x100;
+			state->sprite_bank1 = 0x100;
 	}
 
-	if( bg_bank != (data & 0x8) )
+	if (state->bg_bank != (data & 0x8))
 	{
-		bg_bank = data & 0x8;
-		tilemap_mark_all_tiles_dirty(bg_tilemap);
+		state->bg_bank = data & 0x8;
+		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 	}
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = machine->generic.colorram.u8[tile_index];
-	int code = machine->generic.videoram.u8[tile_index] + 4 * (attr & 0xc0);
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	int attr = state->colorram[tile_index];
+	int code = state->videoram[tile_index] + 4 * (attr & 0xc0);
 	int color = attr & 0x0f;
 	int flags = ((attr & 0x10) ? TILE_FLIPX : 0) | ((attr & 0x20) ? TILE_FLIPY : 0);
 
-	if( bg_bank )
+	if (state->bg_bank)
 		code |= 0x400;
 
 	SET_TILE_INFO(1, code, color, flags);
@@ -183,19 +176,19 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( trackfld )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 64, 32);
-
-	tilemap_set_scroll_rows(bg_tilemap, 32);
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
+	tilemap_set_scroll_rows(state->bg_tilemap, 32);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
-	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram_2 = state->spriteram2;
 	int offs;
 
-	for (offs = machine->generic.spriteram_size - 2; offs >= 0; offs -= 2)
+	for (offs = state->spriteram_size - 2; offs >= 0; offs -= 2)
 	{
 		int attr = spriteram_2[offs];
 		int code = spriteram[offs + 1];
@@ -217,7 +210,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		drawgfx_transmask(bitmap, cliprect,
 			machine->gfx[0],
-			code + sprite_bank1 + sprite_bank2, color,
+			code + state->sprite_bank1 + state->sprite_bank2, color,
 			flipx, flipy,
 			sx, sy,
 			colortable_get_transpen_mask(machine->colortable, machine->gfx[0], color, 0));
@@ -225,7 +218,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		/* redraw with wraparound */
 		drawgfx_transmask(bitmap,cliprect,
 			machine->gfx[0],
-			code + sprite_bank1 + sprite_bank2, color,
+			code + state->sprite_bank1 + state->sprite_bank2, color,
 			flipx, flipy,
 			sx - 256, sy,
 			colortable_get_transpen_mask(machine->colortable, machine->gfx[0], color, 0));
@@ -234,16 +227,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( trackfld )
 {
+	trackfld_state *state = (trackfld_state *)screen->machine->driver_data;
 	int row, scrollx;
 
 	for (row = 0; row < 32; row++)
 	{
-		scrollx = trackfld_scroll[row] + 256 * (trackfld_scroll2[row] & 0x01);
+		scrollx = state->scroll[row] + 256 * (state->scroll2[row] & 0x01);
 		if (flip_screen_get(screen->machine)) scrollx = -scrollx;
-		tilemap_set_scrollx(bg_tilemap, row, scrollx);
+		tilemap_set_scrollx(state->bg_tilemap, row, scrollx);
 	}
 
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

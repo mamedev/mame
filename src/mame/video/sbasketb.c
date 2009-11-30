@@ -8,12 +8,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
-
-UINT8 *sbasketb_scroll;
-UINT8 *sbasketb_palettebank;
-UINT8 *sbasketb_spriteram_select;
-
-static tilemap *bg_tilemap;
+#include "includes/trackfld.h"
 
 /***************************************************************************
 
@@ -30,6 +25,7 @@ static tilemap *bg_tilemap;
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
+
 PALETTE_INIT( sbasketb )
 {
 	static const int resistances[4] = { 2000, 1000, 470, 220 };
@@ -100,14 +96,16 @@ PALETTE_INIT( sbasketb )
 
 WRITE8_HANDLER( sbasketb_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( sbasketb_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( sbasketb_flipscreen_w )
@@ -121,24 +119,27 @@ WRITE8_HANDLER( sbasketb_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x20) << 3);
-	int color = machine->generic.colorram.u8[tile_index] & 0x0f;
-	int flags = ((machine->generic.colorram.u8[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((machine->generic.colorram.u8[tile_index] & 0x80) ? TILE_FLIPY : 0);
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x20) << 3);
+	int color = state->colorram[tile_index] & 0x0f;
+	int flags = ((state->colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((state->colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(0, code, color, flags);
 }
 
 VIDEO_START( sbasketb )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
 
-	tilemap_set_scroll_cols(bg_tilemap, 32);
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_scroll_cols(state->bg_tilemap, 32);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
-	int offs = (*sbasketb_spriteram_select & 0x01) * 0x100;
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
+	int offs = (*state->spriteram_select & 0x01) * 0x100;
 	int i;
 
 	for (i = 0; i < 64; i++, offs += 4)
@@ -149,7 +150,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (sx || sy)
 		{
 			int code  =  spriteram[offs + 0] | ((spriteram[offs + 1] & 0x20) << 3);
-			int color = (spriteram[offs + 1] & 0x0f) + 16 * *sbasketb_palettebank;
+			int color = (spriteram[offs + 1] & 0x0f) + 16 * *state->palettebank;
 			int flipx =  spriteram[offs + 1] & 0x40;
 			int flipy =  spriteram[offs + 1] & 0x80;
 
@@ -172,12 +173,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( sbasketb )
 {
+	trackfld_state *state = (trackfld_state *)screen->machine->driver_data;
 	int col;
 
 	for (col = 6; col < 32; col++)
-		tilemap_set_scrolly(bg_tilemap, col, *sbasketb_scroll);
+		tilemap_set_scrolly(state->bg_tilemap, col, *state->scroll);
 
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

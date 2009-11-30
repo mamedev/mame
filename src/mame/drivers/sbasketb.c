@@ -39,52 +39,41 @@ CPU/Video Board Parts:
 ***************************************************************************/
 
 #include "driver.h"
-#include "trackfld.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
 #include "machine/konami1.h"
-#include "konamipt.h"
-
-extern UINT8 *sbasketb_scroll;
-extern UINT8 *sbasketb_palettebank;
-extern UINT8 *sbasketb_spriteram_select;
-
-WRITE8_HANDLER( sbasketb_videoram_w );
-WRITE8_HANDLER( sbasketb_colorram_w );
-WRITE8_HANDLER( sbasketb_flipscreen_w );
-
-PALETTE_INIT( sbasketb );
-VIDEO_START( sbasketb );
-VIDEO_UPDATE( sbasketb );
+#include "includes/konamipt.h"
+#include "includes/trackfld.h"
 
 
 static WRITE8_HANDLER( sbasketb_sh_irqtrigger_w )
 {
-	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
+	trackfld_state *state = (trackfld_state *)space->machine->driver_data;
+	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( sbasketb_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset,data);
+	coin_counter_w(space->machine, offset, data);
 }
 
 
 static ADDRESS_MAP_START( sbasketb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(sbasketb_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(sbasketb_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(sbasketb_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
+	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(sbasketb_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, spriteram, spriteram_size)
 	AM_RANGE(0x3a00, 0x3bff) AM_RAM           /* Probably unused, but initialized */
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3c10, 0x3c10) AM_READNOP    /* ???? */
-	AM_RANGE(0x3c20, 0x3c20) AM_WRITEONLY AM_BASE(&sbasketb_palettebank)
+	AM_RANGE(0x3c20, 0x3c20) AM_WRITEONLY AM_BASE_MEMBER(trackfld_state, palettebank)
 	AM_RANGE(0x3c80, 0x3c80) AM_WRITE(sbasketb_flipscreen_w)
 	AM_RANGE(0x3c81, 0x3c81) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x3c83, 0x3c84) AM_WRITE(sbasketb_coin_counter_w)
-	AM_RANGE(0x3c85, 0x3c85) AM_WRITE(SMH_RAM) AM_BASE(&sbasketb_spriteram_select)
+	AM_RANGE(0x3c85, 0x3c85) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(trackfld_state, spriteram_select)
 	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(sbasketb_sh_irqtrigger_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_READ_PORT("SYSTEM")
@@ -93,8 +82,8 @@ static ADDRESS_MAP_START( sbasketb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3e03, 0x3e03) AM_READNOP
 	AM_RANGE(0x3e80, 0x3e80) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3f00, 0x3f00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3f80, 0x3f80) AM_WRITEONLY AM_BASE(&sbasketb_scroll)
-	AM_RANGE(0x6000, 0xffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x3f80, 0x3f80) AM_WRITEONLY AM_BASE_MEMBER(trackfld_state, scroll)
+	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sbasketb_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -183,7 +172,32 @@ static GFXDECODE_START( sbasketb )
 GFXDECODE_END
 
 
+static MACHINE_START( sbasketb )
+{
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->vlm = devtag_get_device(machine, "vlm");
+
+	/* sound */
+	state_save_register_global(machine, state->SN76496_latch);
+	state_save_register_global(machine, state->last_addr);
+	state_save_register_global(machine, state->last_irq);
+}
+
+static MACHINE_RESET( sbasketb )
+{
+	trackfld_state *state = (trackfld_state *)machine->driver_data;
+
+	state->SN76496_latch = 0;
+	state->last_addr = 0;
+	state->last_irq = 0;
+}
+
 static MACHINE_DRIVER_START( sbasketb )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(trackfld_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1400000)        /* 1.400 MHz ??? */
@@ -192,6 +206,9 @@ static MACHINE_DRIVER_START( sbasketb )
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz / 4)	/* 3.5795 MHz */
 	MDRV_CPU_PROGRAM_MAP(sbasketb_sound_map)
+
+	MDRV_MACHINE_START(sbasketb)
+	MDRV_MACHINE_RESET(sbasketb)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -400,7 +417,7 @@ static DRIVER_INIT( sbasketb )
 	konami1_decode(machine, "maincpu");
 }
 
-GAME( 1984, sbasketb, 0,        sbasketb, sbasketb, sbasketb, ROT90, "Konami", "Super Basketball (version I, encrypted)",   GAME_SUPPORTS_SAVE )
+GAME( 1984, sbasketb, 0,        sbasketb, sbasketb, sbasketb, ROT90, "Konami", "Super Basketball (version I, encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1984, sbasketh, sbasketb, sbasketb, sbasketb, 0,        ROT90, "Konami", "Super Basketball (version H, unprotected)", GAME_SUPPORTS_SAVE )
-GAME( 1984, sbasketg, sbasketb, sbasketb, sbasketb, sbasketb, ROT90, "Konami", "Super Basketball (version G, encrypted)",   GAME_SUPPORTS_SAVE )
-GAME( 1984, sbaskete, sbasketb, sbasketb, sbasketb, sbasketb, ROT90, "Konami", "Super Basketball (version E, encrypted)",   GAME_SUPPORTS_SAVE )
+GAME( 1984, sbasketg, sbasketb, sbasketb, sbasketb, sbasketb, ROT90, "Konami", "Super Basketball (version G, encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1984, sbaskete, sbasketb, sbasketb, sbasketb, sbasketb, ROT90, "Konami", "Super Basketball (version E, encrypted)", GAME_SUPPORTS_SAVE )
