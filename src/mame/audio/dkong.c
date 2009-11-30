@@ -1068,7 +1068,6 @@ static SOUND_START( dkong)
 	dkong_state *state = (dkong_state *)machine->driver_data;
 
 	state->snd_rom = memory_region(machine, "soundcpu");
-	state->dev_vp2 = devtag_get_device(machine, "virtual_p2");
 }
 
 

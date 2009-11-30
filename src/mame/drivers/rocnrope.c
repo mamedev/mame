@@ -11,27 +11,31 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 #include "machine/konami1.h"
 #include "audio/timeplt.h"
 #include "konamipt.h"
+#include "rocnrope.h"
 
-#define MASTER_CLOCK		XTAL_18_432MHz
+#define MASTER_CLOCK          XTAL_18_432MHz
 
-extern WRITE8_HANDLER( rocnrope_videoram_w );
-extern WRITE8_HANDLER( rocnrope_colorram_w );
-extern WRITE8_HANDLER( rocnrope_flipscreen_w );
 
-extern PALETTE_INIT( rocnrope );
-extern VIDEO_START( rocnrope );
-extern VIDEO_UPDATE( rocnrope );
-
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 /* Roc'n'Rope has the IRQ vectors in RAM. The rom contains $FFFF at this address! */
 static WRITE8_HANDLER( rocnrope_interrupt_vector_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
-
-	RAM[0xFFF2+offset] = data;
+	RAM[0xfff2 + offset] = data;
 }
 
+
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( rocnrope_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3080, 0x3080) AM_READ_PORT("SYSTEM")
@@ -40,11 +44,11 @@ static ADDRESS_MAP_START( rocnrope_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3083, 0x3083) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW3")
-	AM_RANGE(0x4000, 0x402f) AM_RAM AM_BASE_GENERIC(spriteram2)
-	AM_RANGE(0x4400, 0x442f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x4000, 0x402f) AM_RAM AM_BASE_MEMBER(rocnrope_state, spriteram2)
+	AM_RANGE(0x4400, 0x442f) AM_RAM AM_BASE_SIZE_MEMBER(rocnrope_state, spriteram, spriteram_size)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(rocnrope_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0x4c00, 0x4fff) AM_RAM_WRITE(rocnrope_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(rocnrope_colorram_w) AM_BASE_MEMBER(rocnrope_state, colorram)
+	AM_RANGE(0x4c00, 0x4fff) AM_RAM_WRITE(rocnrope_videoram_w) AM_BASE_MEMBER(rocnrope_state, videoram)
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(rocnrope_flipscreen_w)
@@ -58,6 +62,12 @@ static ADDRESS_MAP_START( rocnrope_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( rocnrope )
 	PORT_START("SYSTEM")
@@ -130,6 +140,12 @@ INPUT_PORTS_END
 
 
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
 static const gfx_layout charlayout =
 {
 	8,8,	/* 8*8 sprites */
@@ -161,7 +177,16 @@ GFXDECODE_END
 
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
 static MACHINE_DRIVER_START( rocnrope )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(rocnrope_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
@@ -187,11 +212,11 @@ static MACHINE_DRIVER_START( rocnrope )
 	MDRV_IMPORT_FROM(timeplt_sound)
 MACHINE_DRIVER_END
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 /*
     Roc'n Rope
@@ -264,6 +289,12 @@ ROM_END
 
 
 
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
+
 static DRIVER_INIT( rocnrope )
 {
 	UINT8 *decrypted = konami1_decode(machine, "maincpu");
@@ -277,5 +308,11 @@ static DRIVER_INIT( rocnropk )
 }
 
 
-GAME( 1983, rocnrope, 0,        rocnrope, rocnrope, rocnrope, ROT270, "Konami", "Roc'n Rope", 0 )
-GAME( 1983, rocnropek,rocnrope, rocnrope, rocnrope, rocnropk, ROT270, "Konami + Kosuka", "Roc'n Rope (Kosuka)", 0 )
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1983, rocnrope, 0,        rocnrope, rocnrope, rocnrope, ROT270, "Konami", "Roc'n Rope", GAME_SUPPORTS_SAVE )
+GAME( 1983, rocnropek,rocnrope, rocnrope, rocnrope, rocnropk, ROT270, "Konami + Kosuka", "Roc'n Rope (Kosuka)", GAME_SUPPORTS_SAVE )

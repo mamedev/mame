@@ -714,8 +714,6 @@ INLINE double CD4049(running_machine *machine, double x)
 static void radarscp_step(running_machine *machine, int line_cnt)
 {
 	dkong_state *state = (dkong_state *)machine->driver_data;
-	const device_config *dev6h = devtag_get_device(machine, "ls259.6h");
-	const device_config *devvp2 = devtag_get_device(machine, "virtual_p2");
 
 	/* Condensator is illegible in schematics for TRS2 board.
      * TRS1 board states 3.3u.
@@ -744,7 +742,7 @@ static void radarscp_step(running_machine *machine, int line_cnt)
 		state->sig30Hz = (1-state->sig30Hz);
 
 	/* Now mix with SND02 (sound 2) line - on 74ls259, bit2 */
-	state->rflip_sig = latch8_bit2_r(dev6h, 0) & state->sig30Hz;
+	state->rflip_sig = latch8_bit2_r(state->dev_6h, 0) & state->sig30Hz;
 
 	sig = state->rflip_sig ^ ((line_cnt & 0x80)>>7);
 
@@ -778,7 +776,7 @@ static void radarscp_step(running_machine *machine, int line_cnt)
      *
      * Mixed with ANS line (bit 5) from Port B of 8039
      */
-	if (state->grid_on && latch8_bit5_r(devvp2, 0))
+	if (state->grid_on && latch8_bit5_r(state->dev_vp2, 0))
 	{
 		diff = (0.0 - cv3);
 		diff = diff - diff*exp(0.0 - (1.0/RC32 * dt) );

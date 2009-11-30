@@ -8,8 +8,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
-
-static tilemap *bg_tilemap;
+#include "rocnrope.h"
 
 /***************************************************************************
 
@@ -29,6 +28,7 @@ static tilemap *bg_tilemap;
   bit 0 -- 1  kohm resistor  -- RED
 
 ***************************************************************************/
+
 PALETTE_INIT( rocnrope )
 {
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -84,14 +84,16 @@ PALETTE_INIT( rocnrope )
 
 WRITE8_HANDLER( rocnrope_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	rocnrope_state *state = (rocnrope_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( rocnrope_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	rocnrope_state *state = (rocnrope_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( rocnrope_flipscreen_w )
@@ -105,8 +107,9 @@ WRITE8_HANDLER( rocnrope_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = machine->generic.colorram.u8[tile_index];
-	int code = machine->generic.videoram.u8[tile_index] + 2 * (attr & 0x80);
+	rocnrope_state *state = (rocnrope_state *)machine->driver_data;
+	int attr = state->colorram[tile_index];
+	int code = state->videoram[tile_index] + 2 * (attr & 0x80);
 	int color = attr & 0x0f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x20) ? TILE_FLIPY : 0);
 
@@ -115,31 +118,34 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( rocnrope )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	rocnrope_state *state = (rocnrope_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
-	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
+	rocnrope_state *state = (rocnrope_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram_2 = state->spriteram2;
 	int offs;
 
-	for (offs = machine->generic.spriteram_size - 2;offs >= 0;offs -= 2)
+	for (offs = state->spriteram_size - 2;offs >= 0;offs -= 2)
 	{
 		int color = spriteram_2[offs] & 0x0f;
 
-		drawgfx_transmask(bitmap,cliprect,machine->gfx[0],
+		drawgfx_transmask(bitmap, cliprect, machine->gfx[0],
 				spriteram[offs + 1],
 				color,
 				spriteram_2[offs] & 0x40,~spriteram_2[offs] & 0x80,
-				240-spriteram[offs],spriteram_2[offs + 1],
+				240 - spriteram[offs], spriteram_2[offs + 1],
 				colortable_get_transpen_mask(machine->colortable, machine->gfx[0], color, 0));
 	}
 }
 
 VIDEO_UPDATE( rocnrope )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	rocnrope_state *state = (rocnrope_state *)screen->machine->driver_data;
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

@@ -40,24 +40,8 @@ To Do:
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "fuukifg2.h"
 
-static emu_timer *raster_interrupt_timer;
-
-/* Variables defined in video: */
-
-extern UINT16 *fuuki16_vram_0, *fuuki16_vram_1;
-extern UINT16 *fuuki16_vram_2, *fuuki16_vram_3;
-extern UINT16 *fuuki16_vregs,  *fuuki16_priority, *fuuki16_unknown;
-
-/* Functions defined in video: */
-
-WRITE16_HANDLER( fuuki16_vram_0_w );
-WRITE16_HANDLER( fuuki16_vram_1_w );
-WRITE16_HANDLER( fuuki16_vram_2_w );
-WRITE16_HANDLER( fuuki16_vram_3_w );
-
-VIDEO_START( fuuki16 );
-VIDEO_UPDATE( fuuki16 );
 
 /***************************************************************************
 
@@ -69,22 +53,24 @@ VIDEO_UPDATE( fuuki16 );
 
 static WRITE16_HANDLER( fuuki16_vregs_w )
 {
-	UINT16 old_data	=	fuuki16_vregs[offset];
-	UINT16 new_data	=	COMBINE_DATA(&fuuki16_vregs[offset]);
+	fuuki16_state *state = (fuuki16_state *)space->machine->driver_data;
+	UINT16 old_data = state->vregs[offset];
+	UINT16 new_data = COMBINE_DATA(&state->vregs[offset]);
 	if ((offset == 0x1c/2) && old_data != new_data)
 	{
 		const rectangle *visarea = video_screen_get_visible_area(space->machine->primary_screen);
 		attotime period = video_screen_get_frame_period(space->machine->primary_screen);
-		timer_adjust_periodic(raster_interrupt_timer, video_screen_get_time_until_pos(space->machine->primary_screen, new_data, visarea->max_x + 1), 0, period);
+		timer_adjust_periodic(state->raster_interrupt_timer, video_screen_get_time_until_pos(space->machine->primary_screen, new_data, visarea->max_x + 1), 0, period);
 	}
 }
 
 static WRITE16_HANDLER( fuuki16_sound_command_w )
 {
+	fuuki16_state *state = (fuuki16_state *)space->machine->driver_data;
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space,0,data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 //      cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));   // Allow the other CPU to reply
 		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(50)); // Fixes glitching in rasters
 	}
@@ -93,19 +79,19 @@ static WRITE16_HANDLER( fuuki16_sound_command_w )
 static ADDRESS_MAP_START( fuuki16_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																		// ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM																		// RAM
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(fuuki16_vram_0_w) AM_BASE(&fuuki16_vram_0)					// Layers
-	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(fuuki16_vram_1_w) AM_BASE(&fuuki16_vram_1)					//
-	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(fuuki16_vram_2_w) AM_BASE(&fuuki16_vram_2)					//
-	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(fuuki16_vram_3_w) AM_BASE(&fuuki16_vram_3)					//
-	AM_RANGE(0x600000, 0x601fff) AM_MIRROR(0x008000) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites, mirrored?
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(fuuki16_vram_0_w) AM_BASE_MEMBER(fuuki16_state, vram_0)					// Layers
+	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(fuuki16_vram_1_w) AM_BASE_MEMBER(fuuki16_state, vram_1)					//
+	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(fuuki16_vram_2_w) AM_BASE_MEMBER(fuuki16_state, vram_2)					//
+	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(fuuki16_vram_3_w) AM_BASE_MEMBER(fuuki16_state, vram_3)					//
+	AM_RANGE(0x600000, 0x601fff) AM_MIRROR(0x008000) AM_RAM AM_BASE_SIZE_MEMBER(fuuki16_state, spriteram, spriteram_size)	// Sprites, mirrored?
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x810000, 0x810001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x880000, 0x880001) AM_READ_PORT("DSW")
 	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE(fuuki16_sound_command_w)											// To Sound CPU
-	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE(fuuki16_vregs_w) AM_BASE(&fuuki16_vregs )						// Video Registers
-/**/AM_RANGE(0x8d0000, 0x8d0003) AM_RAM AM_BASE(&fuuki16_unknown)											//
-/**/AM_RANGE(0x8e0000, 0x8e0001) AM_RAM AM_BASE(&fuuki16_priority)											//
+	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE(fuuki16_vregs_w) AM_BASE_MEMBER(fuuki16_state, vregs )						// Video Registers
+	AM_RANGE(0x8d0000, 0x8d0003) AM_RAM AM_BASE_MEMBER(fuuki16_state, unknown)											//
+	AM_RANGE(0x8e0000, 0x8e0001) AM_RAM AM_BASE_MEMBER(fuuki16_state, priority)											//
 ADDRESS_MAP_END
 
 
@@ -120,9 +106,9 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( fuuki16_sound_rombank_w )
 {
 	if (data <= 2)
-		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "audiocpu") + 0x8000 * data + 0x10000);
+		memory_set_bank(space->machine, 1, data);
 	else
-	 	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	 	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(space->cpu), data);
 }
 
 static WRITE8_DEVICE_HANDLER( fuuki16_oki_banking_w )
@@ -143,12 +129,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fuuki16_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki16_sound_rombank_w 	)	// ROM Bank
-	AM_RANGE(0x11, 0x11) AM_READWRITE(soundlatch_r, SMH_NOP	)	// From Main CPU / ? To Main CPU ?
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("oki", fuuki16_oki_banking_w		)	// Oki Banking
-	AM_RANGE(0x30, 0x30) AM_WRITE(SMH_NOP					)	// ? In the NMI routine
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ym1", ym2203_w	)
-	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ym2", ym3812_r, ym3812_w		)
+	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki16_sound_rombank_w)	// ROM Bank
+	AM_RANGE(0x11, 0x11) AM_READWRITE(soundlatch_r, SMH_NOP)	// From Main CPU / ? To Main CPU ?
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("oki", fuuki16_oki_banking_w)	// Oki Banking
+	AM_RANGE(0x30, 0x30) AM_WRITE(SMH_NOP)	// ? In the NMI routine
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ym1", ym2203_w)
+	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ym2", ym3812_r, ym3812_w)
 	AM_RANGE(0x60, 0x60) AM_DEVREAD("oki", okim6295_r)	// M6295
 	AM_RANGE(0x61, 0x61) AM_DEVWRITE("oki", okim6295_w)	// M6295
 ADDRESS_MAP_END
@@ -387,9 +373,10 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void soundirq(const device_config *device, int state)
+static void soundirq( const device_config *device, int state )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, state);
+	fuuki16_state *fuuki16 = (fuuki16_state *)device->machine->driver_data;
+	cpu_set_input_line(fuuki16->audiocpu, 0, state);
 }
 
 static const ym3812_interface fuuki16_ym3812_intf =
@@ -411,43 +398,58 @@ static const ym3812_interface fuuki16_ym3812_intf =
 
 static TIMER_CALLBACK( level_1_interrupt_callback )
 {
-	cputag_set_input_line(machine, "maincpu", 1, HOLD_LINE);
+	fuuki16_state *state = (fuuki16_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 1, HOLD_LINE);
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 248, 0), NULL, 0, level_1_interrupt_callback);
 }
 
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
-	cputag_set_input_line(machine, "maincpu", 3, HOLD_LINE);	// VBlank IRQ
+	fuuki16_state *state = (fuuki16_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 3, HOLD_LINE);	// VBlank IRQ
 	timer_set(machine, video_screen_get_time_until_vblank_start(machine->primary_screen), NULL, 0, vblank_interrupt_callback);
 }
 
 
 static TIMER_CALLBACK( raster_interrupt_callback )
 {
-	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);	// Raster Line IRQ
+	fuuki16_state *state = (fuuki16_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 5, HOLD_LINE);	// Raster Line IRQ
 	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
-	timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_frame_period(machine->primary_screen), 0);
+	timer_adjust_oneshot(state->raster_interrupt_timer, video_screen_get_frame_period(machine->primary_screen), 0);
 }
 
 
 static MACHINE_START( fuuki16 )
 {
-	raster_interrupt_timer = timer_alloc(machine, raster_interrupt_callback, NULL);
+	fuuki16_state *state = (fuuki16_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "audiocpu");
+
+	memory_configure_bank(machine, 1, 0, 3, &ROM[0x10000], 0x8000);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state->raster_interrupt_timer = timer_alloc(machine, raster_interrupt_callback, NULL);
 }
 
 
 static MACHINE_RESET( fuuki16 )
 {
+	fuuki16_state *state = (fuuki16_state *)machine->driver_data;
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 248, 0), NULL, 0, level_1_interrupt_callback);
 	timer_set(machine, video_screen_get_time_until_vblank_start(machine->primary_screen), NULL, 0, vblank_interrupt_callback);
-	timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, visarea->max_x + 1), 0);
+	timer_adjust_oneshot(state->raster_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, visarea->max_x + 1), 0);
 }
 
 
 static MACHINE_DRIVER_START( fuuki16 )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(fuuki16_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -668,4 +670,3 @@ ROM_END
 GAME( 1995, gogomile, 0,        fuuki16, gogomile, 0, ROT0, "Fuuki", "Go Go! Mile Smile", GAME_IMPERFECT_SOUND )
 GAME( 1995, gogomilej,gogomile, fuuki16, gogomilj, 0, ROT0, "Fuuki", "Susume! Mile Smile (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1996, pbancho,  0,        fuuki16, pbancho,  0, ROT0, "Fuuki", "Gyakuten!! Puzzle Bancho (Japan)", 0)
-
