@@ -116,9 +116,9 @@ static TIMER_CALLBACK( nmi_callback )
 {
 	bigevglf_state *state = (bigevglf_state *)machine->driver_data;
 
-	if (state->sound_nmi_enable) 
+	if (state->sound_nmi_enable)
 		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-	else 
+	else
 		state->pending_nmi = 1;
 	state->sound_state &= ~1;
 }

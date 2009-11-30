@@ -38,7 +38,7 @@ static VIDEO_UPDATE( missb2 )
 
 	bitmap_fill(bitmap, cliprect, 255);
 
-	if (!state->video_enable) 
+	if (!state->video_enable)
 		return 0;
 
 	/* background map register */
@@ -359,7 +359,7 @@ static MACHINE_START( missb2 )
 {
 	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
 
-	state->mcu = NULL; 
+	state->mcu = NULL;
 
 	state_save_register_global(machine, state->sound_nmi_enable);
 	state_save_register_global(machine, state->pending_nmi);

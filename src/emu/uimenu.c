@@ -2431,7 +2431,7 @@ static void menu_bookkeeping_populate(running_machine *machine, ui_menu *menu, a
 	for (ctrnum = 0; ctrnum < COIN_COUNTERS; ctrnum++)
 	{
 		int count = coin_counter_get_count(machine, ctrnum);
-		
+
 		/* display the coin counter number */
 		astring_catprintf(tempstring, "Coin %c: ", ctrnum + 'A');
 

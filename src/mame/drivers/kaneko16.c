@@ -335,7 +335,7 @@ static WRITE16_HANDLER( kaneko16_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 	}
 
 	if (ACCESSING_BITS_8_15)

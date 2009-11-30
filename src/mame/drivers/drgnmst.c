@@ -52,7 +52,7 @@ static WRITE16_HANDLER( drgnmst_snd_command_w )
 {
 	drgnmst_state *state = (drgnmst_state *)space->machine->driver_data;
 
-	if (ACCESSING_BITS_0_7) 
+	if (ACCESSING_BITS_0_7)
 	{
 		state->snd_command = (data & 0xff);
 		cpu_yield(space->cpu);
@@ -95,7 +95,7 @@ static READ8_HANDLER( drgnmst_snd_command_r )
 static READ8_HANDLER( drgnmst_snd_flag_r )
 {
 	drgnmst_state *state = (drgnmst_state *)space->machine->driver_data;
-	if (state->snd_flag) 
+	if (state->snd_flag)
 	{
 		state->snd_flag = 0;
 		return 0x40;
@@ -152,16 +152,16 @@ static WRITE8_HANDLER( drgnmst_snd_control_w )
 
 
 	oki_new_bank = ((state->pic16c5x_port0 & 0xc) >> 2) | ((state->oki_control & 0x80) >> 5);
-	if (oki_new_bank != state->oki0_bank) 
+	if (oki_new_bank != state->oki0_bank)
 	{
 		state->oki0_bank = oki_new_bank;
-		if (state->oki0_bank) 
+		if (state->oki0_bank)
 			oki_new_bank--;
 		okim6295_set_bank_base(state->oki_1, (oki_new_bank * 0x40000));
 	}
 
 	oki_new_bank = ((state->pic16c5x_port0 & 0x3) >> 0) | ((state->oki_control & 0x20) >> 3);
-	if (oki_new_bank != state->oki1_bank) 
+	if (oki_new_bank != state->oki1_bank)
 	{
 		state->oki1_bank = oki_new_bank;
 		okim6295_set_bank_base(state->oki_2, (oki_new_bank * 0x40000));

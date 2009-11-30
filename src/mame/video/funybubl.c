@@ -17,7 +17,7 @@ WRITE8_HANDLER ( funybubl_paldatawrite )
 
 	state->paletteram[offset] = data;
 	colchanged = offset >> 2;
-	coldat = state->paletteram[colchanged * 4] | (state->paletteram[colchanged * 4 + 1] << 8) | 
+	coldat = state->paletteram[colchanged * 4] | (state->paletteram[colchanged * 4 + 1] << 8) |
 			(state->paletteram[colchanged * 4 + 2] << 16) | (state->paletteram[colchanged * 4 + 3] << 24);
 
 	palette_set_color_rgb(space->machine, colchanged, pal6bit(coldat >> 12), pal6bit(coldat >> 0), pal6bit(coldat >> 6));
@@ -59,9 +59,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		xpos = source[3];
 		tile = source[0] | ( (source[1] & 0x0f) << 8);
 		if (source[1] & 0x80) tile += 0x1000;
-		if (source[1] & 0x20) 
+		if (source[1] & 0x20)
 		{
-			if (xpos < 0xe0) 
+			if (xpos < 0xe0)
 				xpos += 0x100;
 		}
 

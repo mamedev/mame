@@ -6,7 +6,7 @@ struct _bublbobl_state
 	UINT8 *  mcu_sharedram;
 	UINT8 *  videoram;
 	UINT8 *  objectram;
-//	UINT8 *  paletteram;	// currently this uses generic palette handling
+//  UINT8 *  paletteram;    // currently this uses generic palette handling
 	size_t   videoram_size;
 	size_t   objectram_size;
 

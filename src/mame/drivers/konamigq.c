@@ -118,7 +118,7 @@ static const UINT8 konamigq_def_eeprom[128] =
 
 static WRITE32_HANDLER( eeprom_w )
 {
-	input_port_write(space->machine, "EEPROMOUT", data & 0x07, 0xff); 
+	input_port_write(space->machine, "EEPROMOUT", data & 0x07, 0xff);
 	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 

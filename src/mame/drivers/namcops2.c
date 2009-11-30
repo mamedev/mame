@@ -4,7 +4,7 @@
 
     Namco System 246 / System 256 games (Sony PS2 based)
 
-    PS2 baseboard includes: 
+    PS2 baseboard includes:
     * R5900 "Emotion Engine" - MIPS III with 128-bit integer regs & SIMD
     * R3000 IOP - Stock R3000 with cache, not like the PSXCPU
     * VU0 - can operate either as in-line R5900 coprocessor or run independently
@@ -191,12 +191,12 @@ ROM_START( taiko9 )
 	DISK_REGION("dvd")
 ROM_END
 
-ROM_START( tekken4 )                                                                                                     
+ROM_START( tekken4 )
 	ROM_REGION(0x200000, "bios", 0)
 	SYSTEM246_BIOS
 
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
-        ROM_LOAD( "tef3verc.ic002", 0x000000, 0x800000, CRC(8a41290c) SHA1(2c674e3203c7b5302430b1c1115fcf591a0dcbf2) )   
+        ROM_LOAD( "tef3verc.ic002", 0x000000, 0x800000, CRC(8a41290c) SHA1(2c674e3203c7b5302430b1c1115fcf591a0dcbf2) )
         ROM_LOAD( "tef3verc_spr.ic002", 0x800000, 0x040000, CRC(af248bf7) SHA1(b99193fcdad683c0bbd684f37dfea5c5412b398e) )
 
 	DISK_REGION("dvd")

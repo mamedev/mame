@@ -56,7 +56,7 @@ static WRITE8_HANDLER( panic_sound_output_w )
 	{
 		int count;
 		if (data == 0)
-			for (count = 0; count < 9; count++) 
+			for (count = 0; count < 9; count++)
 				sample_stop(state->samples, count);
 
 		state->sound_enabled = data;
@@ -134,7 +134,7 @@ static WRITE8_HANDLER( cosmicg_output_w )
 
 		state->sound_enabled = data;
 		if (data == 0)
-			for (count = 0; count < 9; count++) 
+			for (count = 0; count < 9; count++)
 				sample_stop(state->samples, count);
 	}
 
@@ -196,7 +196,7 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 	{
 		int count;
 		if (data == 0)
-			for (count = 0; count < 12; count++) 
+			for (count = 0; count < 12; count++)
 				sample_stop(state->samples, count);
 		else
 		{

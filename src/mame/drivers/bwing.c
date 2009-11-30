@@ -54,58 +54,58 @@ static INTERRUPT_GEN ( bwp1_interrupt )
 
 		case 1:
 			if (~input_port_read(device->machine, "IN2") & 0x03)
-			{ 
-				if (!state->coin) 
-				{ 
-					state->coin = 1; 
-					cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE); 
-				} 
+			{
+				if (!state->coin)
+				{
+					state->coin = 1;
+					cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+				}
 			}
 			else
 				state->coin = 0;
 		break;
 
 		case 2:
-			if (input_port_read(device->machine, "IN3")) 
+			if (input_port_read(device->machine, "IN3"))
 				cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 		break;
 	}
 }
 
 
-static INTERRUPT_GEN ( bwp3_interrupt ) 
-{ 
+static INTERRUPT_GEN ( bwp3_interrupt )
+{
 	bwing_state *state = (bwing_state *)device->machine->driver_data;
 
-	if (!state->bwp3_nmimask) 
-		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE); 
+	if (!state->bwp3_nmimask)
+		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 //****************************************************************************
 // Memory and I/O Handlers
 
 static WRITE8_HANDLER( bwp12_sharedram1_w )
-{ 
+{
 	bwing_state *state = (bwing_state *)space->machine->driver_data;
-	state->bwp1_sharedram1[offset] = state->bwp2_sharedram1[offset] = data; 
+	state->bwp1_sharedram1[offset] = state->bwp2_sharedram1[offset] = data;
 }
 
-static WRITE8_HANDLER( bwp3_u8F_w ) 
-{ 
+static WRITE8_HANDLER( bwp3_u8F_w )
+{
 	bwing_state *state = (bwing_state *)space->machine->driver_data;
 	state->bwp3_u8F_d = data;  // prepares custom chip for various operations
 }
 
-static WRITE8_HANDLER( bwp3_nmimask_w ) 
-{ 
+static WRITE8_HANDLER( bwp3_nmimask_w )
+{
 	bwing_state *state = (bwing_state *)space->machine->driver_data;
-	state->bwp3_nmimask = data & 0x80; 
+	state->bwp3_nmimask = data & 0x80;
 }
 
-static WRITE8_HANDLER( bwp3_nmiack_w ) 
-{ 
+static WRITE8_HANDLER( bwp3_nmiack_w )
+{
 	bwing_state *state = (bwing_state *)space->machine->driver_data;
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE); 
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -402,8 +402,8 @@ static MACHINE_RESET( bwing )
 
 	state->coin = 0;
 	state->palatch = 0;
-	state->srbank = 0; 
-	state->mapmask = 0; 
+	state->srbank = 0;
+	state->mapmask = 0;
 	state->mapflip = 0;
 
 	for (i = 0; i < MAX_SOUNDS; i++)

@@ -195,11 +195,11 @@ static READ8_HANDLER( champbja_alt_protection_r )
     */
 
 	/* bit7 =  bit0 */
-	if ((offset & 0x01)) 
+	if ((offset & 0x01))
 		data |= 0x80;
 
 	/* bit4,3,0 =  bit6 */
-	if ((offset & 0x40)) 
+	if ((offset & 0x40))
 		data |= 0x19;
 
 	return data;

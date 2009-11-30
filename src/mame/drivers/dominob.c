@@ -41,7 +41,7 @@ struct _dominob_state
 	UINT8 *  spriteram;
 	UINT8 *  videoram;
 	UINT8 *  bgram;
-//	UINT8 *  paletteram;	// currently this uses generic palette handling
+//  UINT8 *  paletteram;    // currently this uses generic palette handling
 	size_t   spriteram_size;
 
 	/* input-related */

@@ -1,6 +1,6 @@
 /*************************************************************************
 
-    Cosmic Guerilla & other Universal boards (in cosmic.c) 
+    Cosmic Guerilla & other Universal boards (in cosmic.c)
 
 *************************************************************************/
 

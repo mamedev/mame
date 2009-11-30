@@ -67,7 +67,7 @@ struct _k3_state
 	UINT16 *  spriteram_1;
 	UINT16 *  spriteram_2;
 	UINT16 *  bgram;
-//	UINT16 *  paletteram16;	// currently this uses generic palette handling
+//  UINT16 *  paletteram16; // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap  *bg_tilemap;

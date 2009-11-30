@@ -20,7 +20,7 @@ struct _exprraid_state
 	int            bg_index[4];
 
 	/* misc */
-	//int          coin;	// used in the commented out INTERRUPT_GEN - can this be removed?
+	//int          coin;    // used in the commented out INTERRUPT_GEN - can this be removed?
 
 	/* devices */
 	const device_config *maincpu;

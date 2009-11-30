@@ -12,11 +12,11 @@ READ8_HANDLER( mmonkey_protection_r )
 
 	if (offset == 0x0000)
 		ret = state->protection_status;
-	else if (offset == 0x0e00) 
+	else if (offset == 0x0e00)
 		ret = state->protection_ret;
 	else if (offset >= 0x0d00 && offset <= 0x0d02)
 		ret = RAM[BASE + offset];  /* addition result */
-	else 
+	else
 		logerror("Unknown protection read.  PC=%04X  Offset=%04X\n", cpu_get_pc(space->cpu), offset);
 
 	return ret;
@@ -88,7 +88,7 @@ WRITE8_HANDLER( mmonkey_protection_w )
 		RAM[BASE + offset] = data;   /* decrypt table */
 	else if (offset >= 0x0d00 && offset <= 0x0d05)
 		RAM[BASE + offset] = data;   /* source table */
-	else 
+	else
 		logerror("Unknown protection write=%02X.  PC=%04X  Offset=%04X\n", data, cpu_get_pc(space->cpu), offset);
 }
 

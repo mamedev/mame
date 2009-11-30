@@ -164,10 +164,10 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap,const recta
 
 	if (state->technos_video_hw == 1)		/* China Gate Sprite RAM */
 		src = (UINT8 *) (state->spriteram);
-	else 
+	else
 		src = (UINT8 *) (&(state->spriteram[0x800]));
 
-	for (i = 0; i < (64 * 5); i += 5) 
+	for (i = 0; i < (64 * 5); i += 5)
 	{
 		int attr = src[i + 1];
 		if (attr & 0x80)  /* visible */
@@ -210,7 +210,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap,const recta
 
 			which &= ~size;
 
-			switch (size) 
+			switch (size)
 			{
 				case 0: /* normal */
 				DRAW_SPRITE(0, sx, sy);

@@ -47,7 +47,7 @@ WRITE8_HANDLER( docastle_shared0_w )
 {
 	docastle_state *state = (docastle_state *)space->machine->driver_data;
 	if (offset == 8) logerror("CPU #1 shared0w %02x %02x %02x %02x %02x %02x %02x %02x %02x clock = %d\n",
-		state->buffer0[0], state->buffer0[1], state->buffer0[2], state->buffer0[3], 
+		state->buffer0[0], state->buffer0[1], state->buffer0[2], state->buffer0[3],
 		state->buffer0[4], state->buffer0[5], state->buffer0[6], state->buffer0[7],
 		data, (UINT32)cpu_get_total_cycles(space->cpu));
 
@@ -67,7 +67,7 @@ WRITE8_HANDLER( docastle_shared1_w )
 	if (offset == 8)
 	{
 		logerror("CPU #0 shared1w %02x %02x %02x %02x %02x %02x %02x %02x %02x clock = %d\n",
-				state->buffer1[0], state->buffer1[1], state->buffer1[2], state->buffer1[3], 
+				state->buffer1[0], state->buffer1[1], state->buffer1[2], state->buffer1[3],
 				state->buffer1[4], state->buffer1[5], state->buffer1[6], state->buffer1[7],
 				data, (UINT32)cpu_get_total_cycles(space->cpu));
 

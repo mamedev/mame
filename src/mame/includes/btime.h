@@ -5,13 +5,13 @@ struct _btime_state
 	/* memory pointers */
 	UINT8 *  videoram;
 	UINT8 *  colorram;
-//	UINT8 *  paletteram;	// currently this uses generic palette handling
+//  UINT8 *  paletteram;    // currently this uses generic palette handling
 	UINT8 *  lnc_charbank;
 	UINT8 *  bnj_backgroundram;
 	UINT8 *  zoar_scrollram;
 	UINT8 *  deco_charram;
 	UINT8 *  spriteram;	// used by disco
-//	UINT8 *  decrypted;
+//  UINT8 *  decrypted;
 	UINT8 *  rambase;
 	UINT8 *  audio_rambase;
 	size_t   videoram_size;

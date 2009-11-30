@@ -90,9 +90,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 		if (!flipy) { incy = 16;} else { incy = -16; ypos += 16 * high; }
 
 
-		for (y = 0; y <= high; y++) 
+		for (y = 0; y <= high; y++)
 		{
-			for (x = 0; x <= wide; x++) 
+			for (x = 0; x <= wide; x++)
 			{
 				int realx, realy, realnumber;
 

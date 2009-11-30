@@ -10,8 +10,8 @@ struct _ccastles_state
 	/* memory pointers */
 	UINT8 *  videoram;
 	UINT8 *  spriteram;
-//	UINT8 *  nvram_stage;	// currently this uses generic nvram handlers
-//	UINT8 *  nvram;		// currently this uses generic nvram handlers
+//  UINT8 *  nvram_stage;   // currently this uses generic nvram handlers
+//  UINT8 *  nvram;     // currently this uses generic nvram handlers
 
 	/* video-related */
 	const UINT8 *syncprom;

@@ -326,7 +326,7 @@ static int validate_driver(int drivnum, const machine_config *config, tagmap *na
 		mame_printf_error("%s: %s is a duplicate name (%s, %s)\n", driver->source_file, driver->name, match->source_file, match->name);
 		error = TRUE;
 	}
-	
+
 	/* check for duplicate descriptions */
 	if (tagmap_add(descriptions, driver->description, (void *)driver) == TMERR_DUPLICATE)
 	{
@@ -1058,7 +1058,7 @@ static int validate_inputs(int drivnum, const machine_config *config, tagmap *de
 		mame_printf_error("%s: %s has input port errors:\n%s\n", driver->source_file, driver->name, errorbuf);
 		error = TRUE;
 	}
-	
+
 	/* check for duplicate tags */
 	for (port = portlist->head; port != NULL; port = port->next)
 		if (port->tag != NULL)
@@ -1420,7 +1420,7 @@ int mame_validitychecks(const game_driver *curdriver)
 	int error = FALSE;
 	UINT16 lsbtest;
 	UINT8 a, b;
-	
+
 	tagmap *names = tagmap_alloc();
 	tagmap *descriptions = tagmap_alloc();
 	tagmap *roms = tagmap_alloc();
@@ -1472,7 +1472,7 @@ int mame_validitychecks(const game_driver *curdriver)
 			tagmap_add(defstr, string, (void *)(FPTR)strnum);
 	}
 	prep += get_profile_ticks();
-	
+
 	/* iterate over all drivers */
 	for (drivnum = 0; drivers[drivnum]; drivnum++)
 	{

@@ -1438,7 +1438,7 @@ static void tgp_scan(void)
 VIDEO_START(model1)
 {
 	paletteram16 = machine->generic.paletteram.u16;
-	
+
 	vxx=vyy=vzz=0;
 	ayy = 0;
 

@@ -24,7 +24,7 @@ struct _tnzs_state
 	UINT8 *  scrollram;
 	UINT8 *  objctrl;
 	UINT8 *  bg_flag;
-//	UINT8 *  paletteram;	// currently this uses generic palette handling
+//  UINT8 *  paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	int      screenflip;
@@ -46,7 +46,7 @@ struct _tnzs_state
 	/* game-specific */
 	// champbwl
 	UINT8    last_trackball_val[2];
-//	UINT8 *  nvram;	// currently this uses generic_nvram
+//  UINT8 *  nvram; // currently this uses generic_nvram
 	// cchance
 	UINT8    hop_io, bell_io;
 

@@ -148,10 +148,10 @@ static VIDEO_UPDATE( wcvol95 )
 
 static WRITE32_HANDLER(hvysmsh_eeprom_w)
 {
-	if (ACCESSING_BITS_0_7) 
+	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_set_bank_base(devtag_get_device(space->machine, "oki2"), 0x40000 * (data & 0x7) );
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 	}
 }
 

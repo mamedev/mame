@@ -582,10 +582,10 @@ static READ8_HANDLER( cycle_r )
 	int pc = cpu_get_pc(space->cpu);
 	int ret = state->main_ram[0x26];
 
-	if (offset == 1) 
+	if (offset == 1)
 		return state->main_ram[0x27];
 
-	if (pc == 0xe29a && ret == 0) 
+	if (pc == 0xe29a && ret == 0)
 	{
 		cpu_spinuntil_int(space->cpu);
 		return 1;
@@ -600,10 +600,10 @@ static READ8_HANDLER( cyclej_r )
 	int pc = cpu_get_pc(space->cpu);
 	int ret = state->main_ram[0x26];
 
-	if (offset == 1) 
+	if (offset == 1)
 		return state->main_ram[0x27];
 
-	if (pc == 0xe2b1 && ret == 0) 
+	if (pc == 0xe2b1 && ret == 0)
 	{
 		cpu_spinuntil_int(space->cpu);
 		return 1;

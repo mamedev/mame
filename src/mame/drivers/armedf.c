@@ -493,12 +493,12 @@ static INPUT_PORTS_START( armedf )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
 	/* SW1:3,4 defined in manual/test-mode as:
-	PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )            	PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, "20k" )
-	PORT_DIPSETTING(    0x00, "40k" )
-	PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )            	PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, "60k" )
-	PORT_DIPSETTING(    0x00, "80k" )*/
+    PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )                PORT_DIPLOCATION("SW1:3")
+    PORT_DIPSETTING(    0x04, "20k" )
+    PORT_DIPSETTING(    0x00, "40k" )
+    PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )                PORT_DIPLOCATION("SW1:4")
+    PORT_DIPSETTING(    0x08, "60k" )
+    PORT_DIPSETTING(    0x00, "80k" )*/
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )			PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x0c, "20k then every 60k" )
 	PORT_DIPSETTING(    0x04, "20k then every 80k" )
@@ -586,12 +586,12 @@ static INPUT_PORTS_START( terraf )
 
 	PORT_MODIFY("DSW1")
 	/* SW1:3,4 defined in manual/test-mode as:
-	PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )            	PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, "20k" )
-	PORT_DIPSETTING(    0x00, "50k" )
-	PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )            	PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, "60k" )
-	PORT_DIPSETTING(    0x00, "90k" )*/
+    PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )                PORT_DIPLOCATION("SW1:3")
+    PORT_DIPSETTING(    0x04, "20k" )
+    PORT_DIPSETTING(    0x00, "50k" )
+    PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )                PORT_DIPLOCATION("SW1:4")
+    PORT_DIPSETTING(    0x08, "60k" )
+    PORT_DIPSETTING(    0x00, "90k" )*/
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )			PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x0c, "20k then every 60k" )
 	PORT_DIPSETTING(    0x04, "20k then every 90k" )
@@ -619,12 +619,12 @@ static INPUT_PORTS_START( kodure )
 
 	PORT_MODIFY("DSW1")
 	/* SW1:3,4 defined in manual/test-mode as:
-	PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )            	PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( None ) )
-	PORT_DIPSETTING(    0x00, "50k" )
-	PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )            	PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, "60k" )
-	PORT_DIPSETTING(    0x00, "90k" )*/
+    PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )                PORT_DIPLOCATION("SW1:3")
+    PORT_DIPSETTING(    0x04, DEF_STR( None ) )
+    PORT_DIPSETTING(    0x00, "50k" )
+    PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )                PORT_DIPLOCATION("SW1:4")
+    PORT_DIPSETTING(    0x08, "60k" )
+    PORT_DIPSETTING(    0x00, "90k" )*/
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )			PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x08, "50k then every 60k" )
 	PORT_DIPSETTING(    0x00, "50k then every 90k" )
@@ -671,12 +671,12 @@ static INPUT_PORTS_START( cclimbr2 )
 
 	PORT_MODIFY("DSW1")
 	/* SW1:3,4 defined in manual/test-mode as:
-	PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )                	PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, "30k" )
-	PORT_DIPSETTING(    0x00, "60k" )
-	PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )                	PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, "70k" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )*/
+    PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )                    PORT_DIPLOCATION("SW1:3")
+    PORT_DIPSETTING(    0x04, "30k" )
+    PORT_DIPSETTING(    0x00, "60k" )
+    PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )                    PORT_DIPLOCATION("SW1:4")
+    PORT_DIPSETTING(    0x08, "70k" )
+    PORT_DIPSETTING(    0x00, DEF_STR( None ) )*/
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )				PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x0c, "30K and 100k" )
 	PORT_DIPSETTING(    0x08, "60k and 130k" )
@@ -769,7 +769,7 @@ static MACHINE_START( armedf )
 	state_save_register_global(machine, state->scroll_msb);
 	state_save_register_global(machine, state->waiting_msb);
 	state_save_register_global(machine, state->vreg);
-	state_save_register_global(machine, state->fg_scrollx); 
+	state_save_register_global(machine, state->fg_scrollx);
 	state_save_register_global(machine, state->fg_scrolly);
 	state_save_register_global(machine, state->bg_scrollx);
 	state_save_register_global(machine, state->bg_scrolly);
@@ -784,7 +784,7 @@ static MACHINE_RESET( armedf )
 	state->scroll_msb = 0;
 	state->waiting_msb = 0;
 	state->vreg = 0;
-	state->fg_scrollx = 0; 
+	state->fg_scrollx = 0;
 	state->fg_scrolly = 0;
 	state->bg_scrollx = 0;
 	state->bg_scrolly = 0;

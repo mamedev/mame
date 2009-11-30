@@ -62,14 +62,14 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 				{
 					if (flipy)
 						cury -= 16;
-					else 
+					else
 						cury += 16;
 				}
 				else	/* X chain */
 				{
-					if (flipx)	
+					if (flipx)
 						curx -= 16;
-					else 
+					else
 						curx += 16;
 				}
 			}

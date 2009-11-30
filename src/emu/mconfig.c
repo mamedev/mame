@@ -70,7 +70,7 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 
 	/* allocate a new configuration object */
 	config = alloc_clear_or_die(machine_config);
-	
+
 	/* initialize the device list */
 	device_list_init(&config->devicelist, TRUE);
 

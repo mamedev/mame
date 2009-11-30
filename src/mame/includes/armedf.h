@@ -10,8 +10,8 @@ struct _armedf_state
 	UINT16 *  bg_videoram;
 	UINT16 *  fg_videoram;
 	UINT16 *  legion_cmd;	// legion only!
-//	UINT16 *  spriteram;	// currently this uses generic buffered_spriteram
-//	UINT16 *  paletteram;	// currently this uses generic palette handling
+//  UINT16 *  spriteram;    // currently this uses generic buffered_spriteram
+//  UINT16 *  paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap  *bg_tilemap,*fg_tilemap, *tx_tilemap;

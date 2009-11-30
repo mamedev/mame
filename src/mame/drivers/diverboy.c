@@ -58,7 +58,7 @@ struct _diverboy_state
 {
 	/* memory pointers */
 	UINT16 *  spriteram;
-//	UINT16 *  paletteram;	// currently this uses generic palette handling
+//  UINT16 *  paletteram;   // currently this uses generic palette handling
 	size_t    spriteram_size;
 
 	/* devices */

@@ -237,7 +237,7 @@ static READ8_HANDLER( drw80pkr_io_r )
 	{
 		ret = pkr_io_ram[offset];
 	}
-	
+
 	if (p2 == 0xf7)
 	{
 		// unknown
@@ -260,10 +260,10 @@ static READ8_HANDLER( drw80pkr_io_r )
 			// Dip switches tied to sound chip
 			//
 			// TODO: Unknown switch positions, but found the following flipping bits:
-			//		SW.? = Double Up Option
-			//		SW.? = Coin Denomination
-			//		SW.4 = Payout Type (0=cash, 1=credit)
-			//		SW.? = Use Joker in Deck
+			//      SW.? = Double Up Option
+			//      SW.? = Coin Denomination
+			//      SW.4 = Payout Type (0=cash, 1=credit)
+			//      SW.? = Use Joker in Deck
 			//
 			ret = 0x77; // double-up with credit payout
 		}
@@ -276,7 +276,7 @@ static READ8_HANDLER( drw80pkr_io_r )
 
 			switch (kbdin)
 			{
-				// The following is very incorrect, but does allow you to 
+				// The following is very incorrect, but does allow you to
 				// play slightly with very messed up hold buttons etc.
 				//
 				// Open/Close the door with 'O'

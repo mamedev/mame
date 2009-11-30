@@ -725,10 +725,10 @@ static MACHINE_START( common )
 {
 	bublbobl_state *state = (bublbobl_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu"); 
-	state->mcu = devtag_get_device(machine, "mcu"); 
-	state->audiocpu = devtag_get_device(machine, "audiocpu"); 
-	state->slave = devtag_get_device(machine, "slave"); 
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->mcu = devtag_get_device(machine, "mcu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->slave = devtag_get_device(machine, "slave");
 
 	state_save_register_global(machine, state->sound_nmi_enable);
 	state_save_register_global(machine, state->pending_nmi);

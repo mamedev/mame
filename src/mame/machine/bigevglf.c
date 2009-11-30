@@ -65,7 +65,7 @@ READ8_HANDLER( bigevglf_68705_port_c_r )
 	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
 
 	state->port_c_in = 0;
-	if (state->main_sent) 
+	if (state->main_sent)
 		state->port_c_in |= 0x01;
 	if (state->mcu_sent)
 		state->port_c_in |= 0x02;
@@ -108,9 +108,9 @@ READ8_HANDLER( bigevglf_mcu_status_r )
 	bigevglf_state *state = (bigevglf_state *)space->machine->driver_data;
 	int res = 0;
 
-	if (!state->main_sent) 
+	if (!state->main_sent)
 		res |= 0x08;
-	if (!state->mcu_sent) 
+	if (!state->mcu_sent)
 		res |= 0x10;
 
 	return res;

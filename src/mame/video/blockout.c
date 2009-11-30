@@ -83,16 +83,16 @@ static void update_pixels( running_machine *machine, int x, int y )
 	front = state->videoram[y * 256 + x / 2];
 	back = state->videoram[0x10000 + y * 256 + x / 2];
 
-	if (front >> 8) 
+	if (front >> 8)
 		color = front >> 8;
-	else 
+	else
 		color = (back >> 8) + 256;
 
 	*BITMAP_ADDR16(state->tmpbitmap, y, x) = color;
 
-	if (front & 0xff) 
+	if (front & 0xff)
 		color = front & 0xff;
-	else 
+	else
 		color = (back & 0xff) + 256;
 
 	*BITMAP_ADDR16(state->tmpbitmap, y, x + 1) = color;

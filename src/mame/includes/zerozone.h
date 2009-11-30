@@ -1,6 +1,6 @@
 /*************************************************************************
 
-	Zero Zone
+    Zero Zone
 
 *************************************************************************/
 
@@ -9,7 +9,7 @@ struct _zerozone_state
 {
 	/* memory pointers */
 	UINT16 *    videoram;
-//	UINT16 *    paletteram;	// currently this uses generic palette handling
+//  UINT16 *    paletteram; // currently this uses generic palette handling
 	size_t      videoram_size;
 
 	/* video-related */

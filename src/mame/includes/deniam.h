@@ -18,7 +18,7 @@ struct _deniam_state
 	/* video-related */
 	tilemap        *fg_tilemap, *bg_tilemap, *tx_tilemap;
 	int            display_enable;
-	int            bg_scrollx_offs, bg_scrolly_offs; 
+	int            bg_scrollx_offs, bg_scrolly_offs;
 	int            fg_scrollx_offs, fg_scrolly_offs;
 	int            bg_scrollx_reg, bg_scrolly_reg, bg_page_reg;
 	int            fg_scrollx_reg, fg_scrolly_reg, fg_page_reg;

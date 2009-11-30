@@ -210,7 +210,7 @@ static void esd16_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 
 		int pri_mask;
 
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
 			continue;
 
 		if (sx & 0x8000)
@@ -283,7 +283,7 @@ static void hedpanic_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 			pri_mask = 0; // above everything
 
 		sx = sx & 0x1ff;
-		if (sx >= 0x180)	
+		if (sx >= 0x180)
 			sx -= 0x200;
 
 		sy &= 0x1ff;
@@ -343,7 +343,7 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 	if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
 	if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
 	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 4;
-	if (msk != 0) layers_ctrl &= msk;	
+	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
 
@@ -434,7 +434,7 @@ if ( input_code_pressed(screen->machine, KEYCODE_Z) )
 	if (input_code_pressed(screen->machine, KEYCODE_Q))	msk |= 1;
 	if (input_code_pressed(screen->machine, KEYCODE_W))	msk |= 2;
 	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 4;
-	if (msk != 0) layers_ctrl &= msk;	
+	if (msk != 0) layers_ctrl &= msk;
 }
 #endif
 

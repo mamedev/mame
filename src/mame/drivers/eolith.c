@@ -102,7 +102,7 @@ static WRITE32_HANDLER( systemcontrol_w )
 	coin_counter_w(space->machine, 0, data & coin_counter_bit);
 	set_led_status(space->machine, 0, data & 1);
 
-	input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
+	input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 
 	// bit 0x100 and 0x040 ?
 }

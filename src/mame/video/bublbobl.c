@@ -27,7 +27,7 @@ VIDEO_UPDATE( bublbobl )
 	/* This clears & redraws the entire screen each pass */
 	bitmap_fill(bitmap, cliprect, 255);
 
-	if (!state->video_enable) 
+	if (!state->video_enable)
 		return 0;
 
 	sx = 0;

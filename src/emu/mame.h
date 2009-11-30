@@ -211,7 +211,7 @@ struct _running_machine
 
 	/* debugger-related information */
 	UINT32					debug_flags;		/* the current debug flags */
-	
+
 	/* generic pointers */
 	generic_pointers		generic;			/* generic pointers */
 

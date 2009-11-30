@@ -94,10 +94,10 @@ READ8_HANDLER( flstory_68705_port_c_r )
 	flstory_state *state = (flstory_state *)space->machine->driver_data;
 
 	state->port_c_in = 0;
-	if (state->main_sent) 
+	if (state->main_sent)
 		state->port_c_in |= 0x01;
 
-	if (!state->mcu_sent) 
+	if (!state->mcu_sent)
 		state->port_c_in |= 0x02;
 
 	//logerror("%04x: 68705 port C read %02x\n", cpu_get_pc(space->cpu), port_c_in);
@@ -144,9 +144,9 @@ READ8_HANDLER( flstory_mcu_status_r )
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 1, mcu has sent data to the main cpu */
 	//logerror("%04x: mcu_status_r\n", cpu_get_pc(space->cpu));
-	if (!state->main_sent) 
+	if (!state->main_sent)
 		res |= 0x01;
-	if (state->mcu_sent) 
+	if (state->mcu_sent)
 		res |= 0x02;
 
 	return res;

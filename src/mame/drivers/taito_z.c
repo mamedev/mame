@@ -1060,7 +1060,7 @@ static WRITE16_HANDLER( spacegun_output_bypass_w )
             x0000000    (unused)                  */
 
 			COMBINE_DATA(&eep_latch);
-			input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
+			input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 			break;
 
 		default:

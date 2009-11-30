@@ -13,7 +13,7 @@ struct _fitfight_state
 	UINT16 *  fof_mid_tileram;
 	UINT16 *  fof_txt_tileram;
 	UINT16 *  spriteram;
-//	UINT16 *  paletteram;	// currently this uses generic palette handling
+//  UINT16 *  paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap  *fof_bak_tilemap, *fof_mid_tilemap, *fof_txt_tilemap;

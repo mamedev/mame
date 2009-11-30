@@ -81,12 +81,12 @@ static READ8_HANDLER( cop01_sound_command_r )
 	/* bit 0 seems to be a timer */
 	if ((cpu_get_total_cycles(space->cpu) / TIMER_RATE) & 1)
 	{
-		if (state->pulse == 0) 
+		if (state->pulse == 0)
 			res |= 1;
 
 		state->pulse = 1;
 	}
-	else 
+	else
 		state->pulse = 0;
 
 	return res;
@@ -154,10 +154,10 @@ ADDRESS_MAP_END
 
 
 /* this just gets some garbage out of the YM3526 */
-static READ8_HANDLER( kludge ) 
-{ 
+static READ8_HANDLER( kludge )
+{
 	cop01_state *state = (cop01_state *)space->machine->driver_data;
-	return state->timer++; 
+	return state->timer++;
 }
 
 static ADDRESS_MAP_START( mightguy_audio_io_map, ADDRESS_SPACE_IO, 8 )
@@ -241,14 +241,14 @@ static INPUT_PORTS_START( cop01 )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
 	/* DP2:3,4,5 defined in manual/test-mode as:
-	PORT_DIPNAME( 0x10, 0x10, "1st Bonus Life" )
-	PORT_DIPSETTING(    0x10, "20000" )
-	PORT_DIPSETTING(    0x00, "30000" )
-	PORT_DIPNAME( 0x60, 0x60, "2nd Bonus Life" )
-	PORT_DIPSETTING(    0x60, "30000" )
-	PORT_DIPSETTING(    0x20, "50000" )
-	PORT_DIPSETTING(    0x40, "100000" )
-	PORT_DIPSETTING(    0x00, "150000" ) */
+    PORT_DIPNAME( 0x10, 0x10, "1st Bonus Life" )
+    PORT_DIPSETTING(    0x10, "20000" )
+    PORT_DIPSETTING(    0x00, "30000" )
+    PORT_DIPNAME( 0x60, 0x60, "2nd Bonus Life" )
+    PORT_DIPSETTING(    0x60, "30000" )
+    PORT_DIPSETTING(    0x20, "50000" )
+    PORT_DIPSETTING(    0x40, "100000" )
+    PORT_DIPSETTING(    0x00, "150000" ) */
 	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x70, "20k 50k 30k+" )
 	PORT_DIPSETTING(    0x30, "20k 70k 50k+" )

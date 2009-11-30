@@ -335,7 +335,7 @@ static MACHINE_START( champbwl )
 	tnzs_state *state = (tnzs_state *)machine->driver_data;
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	state->mcu = NULL; 
+	state->mcu = NULL;
 
 	memory_configure_bank(machine, 1, 0, 4, &ROM[0x10000], 0x4000);
 

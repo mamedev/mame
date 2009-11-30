@@ -18,7 +18,7 @@ struct _drtomy_state
 	UINT16 *  spriteram;
 	UINT16 *  videoram_bg;
 	UINT16 *  videoram_fg;
-//	UINT16 *  paletteram16;	// currently this uses generic palette handling
+//  UINT16 *  paletteram16; // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap   *tilemap_bg,*tilemap_fg;

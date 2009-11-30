@@ -184,7 +184,7 @@ static const ay8910_interface ay8910_config =
 static MACHINE_START( cchance )
 {
 	tnzs_state *state = (tnzs_state *)machine->driver_data;
-	state->mcu = NULL; 
+	state->mcu = NULL;
 
 	state_save_register_global(machine, state->screenflip);
 	state_save_register_global(machine, state->hop_io);

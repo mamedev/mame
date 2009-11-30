@@ -522,7 +522,7 @@ static INPUT_PORTS_START( legendoh )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-//	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // 0x80000 -> video disabled?
+//  PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // 0x80000 -> video disabled?
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sb2003 )
@@ -567,7 +567,7 @@ static INPUT_PORTS_START( sb2003 )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-//	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // 0x80000 -> video disabled?
+//  PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // 0x80000 -> video disabled?
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spotty )
@@ -611,7 +611,7 @@ static INPUT_PORTS_START( spotty )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
-//	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // 0x80000 -> video disabled?
+//  PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // 0x80000 -> video disabled?
 INPUT_PORTS_END
 
 /*****************************************************************************************************

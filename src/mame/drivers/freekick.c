@@ -82,7 +82,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 static INTERRUPT_GEN( freekick_irqgen )
 {
 	freekick_state *state = (freekick_state *)device->machine->driver_data;
-	if (state->nmi_en) 
+	if (state->nmi_en)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -106,7 +106,7 @@ static READ8_HANDLER( oigas_3_r )
 	{
 	case 2: return ~(state->inval >> 8);
 	case 3: return ~(state->inval & 0xff);
-	case 4: 
+	case 4:
 		switch (state->inval)
 		{
 		case 0xc500: state->outval = 0x17ef; break;

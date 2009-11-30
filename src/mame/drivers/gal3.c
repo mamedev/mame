@@ -5,24 +5,24 @@
 
 
   System Overview:
-  
-  This is a Scaleable, Multi-CPU and Multi-User System. 
-  The largest scale configuration known so far was capable of 28(!) players and 16 screens wraped around. (retaired in the early 2000's) 
-  
+
+  This is a Scaleable, Multi-CPU and Multi-User System.
+  The largest scale configuration known so far was capable of 28(!) players and 16 screens wraped around. (retaired in the early 2000's)
+
   System has one Master 68020 CPU Board for game play, and one or more Slave 68020 CPU Boards for graphics.
 
   The Master CPU communicates with (one or more)Slave CPUs via multi-port shared RAM, the "C-RAM board".
   Each C-RAM board is configured as 2 banks of Triple-Port Static RAM Units. The 2 Master-CPU-Port of the 2 RAM banks
   are joined together, leaving 4 Slave-CPU-Ports. More than one C-RAM boards can be chained together.
 
-  The Master CPU controls a Sound Board and a RSO board. RSO board contains Namco 139 serial communication ICs (x9 pieces), 
-  connecting to several "Personal Boards" (Player-Terminals), which handle players' input and vibration/lamp feedback. 
+  The Master CPU controls a Sound Board and a RSO board. RSO board contains Namco 139 serial communication ICs (x9 pieces),
+  connecting to several "Personal Boards" (Player-Terminals), which handle players' input and vibration/lamp feedback.
   Each the Sound board, the RSO board, and the Personal board has their own 68000 CPU.
 
   Slave CPU connects to a cluster of namcos21-type video board sets: DSP-PGN-OBJ. A DSP board has 5x TMS320C25 running at 40MHz.
 
-  Every 68020 CPU board has 512KB of local Hi-Speed SRAM. Most code/data required by the Slave CPU sub-system are 
-  uploaded from the Master CPU's ROM. Among them are: 
+  Every 68020 CPU board has 512KB of local Hi-Speed SRAM. Most code/data required by the Slave CPU sub-system are
+  uploaded from the Master CPU's ROM. Among them are:
   Slave CPU program, DSP program, Calculation Tables, Vertex Array Index, Palette, 2D Sprite Data, etc.
 
   The current dumped system supports 6 players. It has 2x 68020, 5x 68000 and 10x TMS320C25.
@@ -30,27 +30,27 @@
 
   System Diagram:
   ---------------
-	  																Serial Comm Cable
-	 Master 68020 -------- RSO 68000, 9x Namco 139 SCI ICs <==============================> Personal Board 68000
-		  |						|										........ more personal boards.........
-		  |						|										........ more personal boards.........
-		  |						|	
-		  |						|-------- Sound 68000, 4x Namco 140 ICs
-	 |---------|		
-	 |  C-RAM  |		
-	 | #-# #-# |		
-	 |---------|
-	   | | | |		
-	   | | | |------- Slave 68020
-	   | | |				|-------- 1x master DSP, 4x slave DSPs, Polygon, 2D Sprite ------> V-MIX board -----> SCREEN
-	   | | |				|-------- ........ more video boards .........						 	|
-	   | | |				|-------- ........ more video boards .........						LD Player
-	   | | |
-	   | | |------- ........ more slave 68020s .........
-	   | |
-	   | |------- ........ more slave 68020s .........
-	   |
-	   |------- ........ more slave 68020s .........
+                                                                    Serial Comm Cable
+     Master 68020 -------- RSO 68000, 9x Namco 139 SCI ICs <==============================> Personal Board 68000
+          |                     |                                       ........ more personal boards.........
+          |                     |                                       ........ more personal boards.........
+          |                     |
+          |                     |-------- Sound 68000, 4x Namco 140 ICs
+     |---------|
+     |  C-RAM  |
+     | #-# #-# |
+     |---------|
+       | | | |
+       | | | |------- Slave 68020
+       | | |                |-------- 1x master DSP, 4x slave DSPs, Polygon, 2D Sprite ------> V-MIX board -----> SCREEN
+       | | |                |-------- ........ more video boards .........                          |
+       | | |                |-------- ........ more video boards .........                      LD Player
+       | | |
+       | | |------- ........ more slave 68020s .........
+       | |
+       | |------- ........ more slave 68020s .........
+       |
+       |------- ........ more slave 68020s .........
 
 
 
@@ -194,16 +194,16 @@ static VIDEO_UPDATE(gal3)
 		namco_obj_draw(screen->machine, bitmap, cliprect, pri );
 	}
 
-/*	CopyVisiblePolyFrameBuffer( bitmap, cliprect,0,0x7fbf );
+/*  CopyVisiblePolyFrameBuffer( bitmap, cliprect,0,0x7fbf );
 
-	for( pri=pivot; pri<15; pri++ )
-	{
-		namco_obj_draw(screen->machine, bitmap, cliprect, pri );
-	}*/
+    for( pri=pivot; pri<15; pri++ )
+    {
+        namco_obj_draw(screen->machine, bitmap, cliprect, pri );
+    }*/
 
 	// CPU Diag LEDs
 	mst[17]='\0', slv[17]='\0';
-///	printf("mst=0x%x\tslv=0x%x\n", led_mst, led_slv);
+/// printf("mst=0x%x\tslv=0x%x\n", led_mst, led_slv);
 	for(i=16;i<32;i++)
 	{
 		int t;
@@ -211,7 +211,7 @@ static VIDEO_UPDATE(gal3)
 			t=i;
 		else
 			t=i+1;
-		mst[8]=' '; slv[8]=' '; 
+		mst[8]=' '; slv[8]=' ';
 
 		if(led_mst&(1<<i))
 			mst[t-16]='*';
@@ -278,12 +278,12 @@ static WRITE32_HANDLER( shareram0_w )
 /*
 static READ32_HANDLER( shareram1_r )
 {
-	return mpSharedRAM1[offset];
+    return mpSharedRAM1[offset];
 }
 
 static WRITE32_HANDLER( shareram1_w )
 {
-	COMBINE_DATA( &mpSharedRAM1[offset] );
+    COMBINE_DATA( &mpSharedRAM1[offset] );
 }*/
 
 /***************************************************************************************/
@@ -342,9 +342,9 @@ static WRITE32_HANDLER(namcos21_video_enable_w)
 static READ32_HANDLER(rso_r)
 {
 	/*store $5555 @$0046, and readback @$0000
-	read @$0144 and store at A6_21e & A4_5c
-	Check @$009a==1 to start DEMO
-	HACK*/
+    read @$0144 and store at A6_21e & A4_5c
+    Check @$009a==1 to start DEMO
+    HACK*/
 	offset *= 2;
 	return (rsoSharedRAM[offset]<<16)|rsoSharedRAM[offset+1];
 }
@@ -362,7 +362,7 @@ static WRITE32_HANDLER(rso_w)
 static ADDRESS_MAP_START( cpu_mst_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x20000000, 0x20001fff) AM_RAM AM_BASE(&gal3_nvmem) AM_SIZE(&gal3_nvmem_size)	//NVRAM
-///	AM_RANGE(0x40000000, 0x4000ffff) AM_WRITE()	//
+/// AM_RANGE(0x40000000, 0x4000ffff) AM_WRITE() //
 	AM_RANGE(0x44000000, 0x44000003) AM_READ_PORT("DSW_CPU_mst"	)
 	AM_RANGE(0x44800000, 0x44800003) AM_READ(led_mst_r) AM_WRITE(led_mst_w)	//LEDs
 	AM_RANGE(0x48000000, 0x48000003) AM_READ(SMH_NOP)	//irq1 v-blank ack
@@ -370,46 +370,46 @@ static ADDRESS_MAP_START( cpu_mst_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x60000000, 0x60007fff) AM_READ(shareram0_r) AM_WRITE(shareram0_w) AM_BASE(&mpSharedRAM0)	//CRAM
 	AM_RANGE(0x60010000, 0x60017fff) AM_READ(shareram0_r) AM_WRITE(shareram0_w)	//Mirror
 	AM_RANGE(0x80000000, 0x8007ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//512K Local RAM
-///	AM_RANGE(0xc0000000, 0xc000000b) AM_WRITENOP	//upload?
+/// AM_RANGE(0xc0000000, 0xc000000b) AM_WRITENOP    //upload?
 	AM_RANGE(0xc000000c, 0xc000000f) AM_READNOP	//irq2 ack
-///	AM_RANGE(0xd8000000, 0xd800000f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	// protection or 68681?
+/// AM_RANGE(0xd8000000, 0xd800000f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) // protection or 68681?
 	AM_RANGE(0xf2800000, 0xf2800fff) AM_READWRITE(rso_r, rso_w)	//RSO PCB
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu_slv_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
-///	AM_RANGE(0x40000000, 0x4000ffff) AM_WRITE()	//
+/// AM_RANGE(0x40000000, 0x4000ffff) AM_WRITE() //
 	AM_RANGE(0x44000000, 0x44000003) AM_READ_PORT("DSW_CPU_slv"	)
 	AM_RANGE(0x44800000, 0x44800003) AM_READ(led_slv_r) AM_WRITE(led_slv_w)	//LEDs
 	AM_RANGE(0x48000000, 0x48000003) AM_READ(SMH_NOP)	//irq1 ack
-///	AM_RANGE(0x50000000, 0x50000003) AM_READ() AM_WRITE()
-///	AM_RANGE(0x54000000, 0x54000003) AM_READ() AM_WRITE()
+/// AM_RANGE(0x50000000, 0x50000003) AM_READ() AM_WRITE()
+/// AM_RANGE(0x54000000, 0x54000003) AM_READ() AM_WRITE()
 	AM_RANGE(0x60000000, 0x60007fff) AM_READ(shareram0_r) AM_WRITE(shareram0_w)
 	AM_RANGE(0x60010000, 0x60017fff) AM_READ(shareram0_r) AM_WRITE(shareram0_w)
 	AM_RANGE(0x80000000, 0x8007ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//512K Local RAM
 
-	AM_RANGE(0xf1200000, 0xf120ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//DSP RAM 
-///	AM_RANGE(0xf1400000, 0xf1400003) AM_WRITE(pointram_control_w) 
-///	AM_RANGE(0xf1440000, 0xf1440003) AM_READWRITE(pointram_data_r,pointram_data_w) 
-///	AM_RANGE(0x440002, 0x47ffff) AM_WRITENOP /* (frame buffer?) */ 
-///	AM_RANGE(0xf1480000, 0xf14807ff) AM_READWRITE(namcos21_depthcue_r,namcos21_depthcue_w)
-	AM_RANGE(0xf1700000, 0xf170ffff) AM_READWRITE(namco_obj32_r,namco_obj32_w) 
-	AM_RANGE(0xf1720000, 0xf1720007) AM_READWRITE(namco_spritepos32_r,namco_spritepos32_w) 
-	AM_RANGE(0xf1740000, 0xf175ffff) AM_READWRITE(paletteram32_r,paletteram32_w) AM_BASE_GENERIC(paletteram) 
-	AM_RANGE(0xf1760000, 0xf1760003) AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w) 
+	AM_RANGE(0xf1200000, 0xf120ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//DSP RAM
+/// AM_RANGE(0xf1400000, 0xf1400003) AM_WRITE(pointram_control_w)
+/// AM_RANGE(0xf1440000, 0xf1440003) AM_READWRITE(pointram_data_r,pointram_data_w)
+/// AM_RANGE(0x440002, 0x47ffff) AM_WRITENOP /* (frame buffer?) */
+/// AM_RANGE(0xf1480000, 0xf14807ff) AM_READWRITE(namcos21_depthcue_r,namcos21_depthcue_w)
+	AM_RANGE(0xf1700000, 0xf170ffff) AM_READWRITE(namco_obj32_r,namco_obj32_w)
+	AM_RANGE(0xf1720000, 0xf1720007) AM_READWRITE(namco_spritepos32_r,namco_spritepos32_w)
+	AM_RANGE(0xf1740000, 0xf175ffff) AM_READWRITE(paletteram32_r,paletteram32_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf1760000, 0xf1760003) AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w)
 
 	AM_RANGE(0xf2200000, 0xf220ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf2700000, 0xf270ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//AM_READWRITE(namco_obj16_r,namco_obj16_w) 
-	AM_RANGE(0xf2720000, 0xf2720007) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//AM_READWRITE(namco_spritepos16_r,namco_spritepos16_w) 
-	AM_RANGE(0xf2740000, 0xf275ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//AM_READWRITE(paletteram16_r,paletteram16_w) AM_BASE_GENERIC(paletteram) 
-	AM_RANGE(0xf2760000, 0xf2760003) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w) 
+	AM_RANGE(0xf2700000, 0xf270ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//AM_READWRITE(namco_obj16_r,namco_obj16_w)
+	AM_RANGE(0xf2720000, 0xf2720007) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//AM_READWRITE(namco_spritepos16_r,namco_spritepos16_w)
+	AM_RANGE(0xf2740000, 0xf275ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//AM_READWRITE(paletteram16_r,paletteram16_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf2760000, 0xf2760003) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rs_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) //64K working RAM
 
-///	AM_RANGE(0x180000, 0x183fff) AM_RAM //Nvram
+/// AM_RANGE(0x180000, 0x183fff) AM_RAM //Nvram
 
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) //148?
 	AM_RANGE(0x1c2000, 0x1c2001) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) //?
@@ -466,23 +466,23 @@ static ADDRESS_MAP_START( rs_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc0000f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) //?
 	AM_RANGE(0xc40000, 0xc43fff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) //8 bit
 
-///	AM_RANGE(0xc44000, 0xffffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	/////////////
+/// AM_RANGE(0xc44000, 0xffffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /////////////
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
-///	AM_RANGE(0x0c0000, 0x0cffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//00, 20, 30, 40, 50
-///	AM_RANGE(0x100000, 0x10000f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
+/// AM_RANGE(0x0c0000, 0x0cffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) //00, 20, 30, 40, 50
+/// AM_RANGE(0x100000, 0x10000f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x110000, 0x113fff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
-///	AM_RANGE(0x120000, 0x120003) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//2ieme byte
-///	AM_RANGE(0x200000, 0x20017f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//C140
+/// AM_RANGE(0x120000, 0x120003) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) //2ieme byte
+/// AM_RANGE(0x200000, 0x20017f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) //C140
 	AM_RANGE(0x200000, 0x2037ff) AM_DEVREADWRITE8("c140_16a", c140_r, c140_w, 0x00ff)	//C140///////////
-///	AM_RANGE(0x201000, 0x20117f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//C140
-///	AM_RANGE(0x202000, 0x20217f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//C140
-///	AM_RANGE(0x203000, 0x20317f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)	//C140
+/// AM_RANGE(0x201000, 0x20117f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) //C140
+/// AM_RANGE(0x202000, 0x20217f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) //C140
+/// AM_RANGE(0x203000, 0x20317f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) //C140
 	AM_RANGE(0x204000, 0x2047ff) AM_DEVREADWRITE8("c140_16g", c140_r, c140_w, 0x00ff)	//C140
-///	AM_RANGE(0x090000, 0xffffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
+/// AM_RANGE(0x090000, 0xffffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( psn_b1_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -650,11 +650,11 @@ static MACHINE_DRIVER_START( gal3 )
 	MDRV_CPU_ADD("psn_b1_cpu", M68000, 12000000) // ??
 	MDRV_CPU_PROGRAM_MAP(psn_b1_cpu_map)
 /*
-	MDRV_CPU_ADD("psn_b2_cpu", M68000, 12000000) // ??
-	MDRV_CPU_PROGRAM_MAP(psn_b1_cpu_map,0)
+    MDRV_CPU_ADD("psn_b2_cpu", M68000, 12000000) // ??
+    MDRV_CPU_PROGRAM_MAP(psn_b1_cpu_map,0)
 
-	MDRV_CPU_ADD("psn_b3_cpu", M68000, 12000000) // ??
-	MDRV_CPU_PROGRAM_MAP(psn_b1_cpu_map,0)
+    MDRV_CPU_ADD("psn_b3_cpu", M68000, 12000000) // ??
+    MDRV_CPU_PROGRAM_MAP(psn_b1_cpu_map,0)
 */
 	MDRV_QUANTUM_TIME(HZ(60*8000)) /* 8000 CPU slices per frame */
 
@@ -905,6 +905,6 @@ ROM_START( gal3 )
 	DISK_IMAGE_READONLY( "gal3_ld2", 0, NO_DUMP )
 ROM_END
 
-/*    YEAR, NAME,     PARENT, MACHINE,	INPUT,	INIT, MONITOR,  COMPANY,   FULLNAME,                       FLAGS */
+/*    YEAR, NAME,     PARENT, MACHINE,  INPUT,  INIT, MONITOR,  COMPANY,   FULLNAME,                       FLAGS */
 GAMEL( 199?, gal3,    0,	 gal3,    gal3,    0,	ROT0,  "Namco", "Galaxian 3 - Theater 6 : Project Dragoon", GAME_NOT_WORKING | GAME_NO_SOUND, layout_dualhsxs )
 //GAMEL( 199?, gal3zlgr,    0,        gal3,    gal3,    0, ROT0,  "Namco", "Galaxian 3 - Theater 6 J2 : Attack of The Zolgear", GAME_NOT_WORKING | GAME_NO_SOUND, layout_dualhsxs )

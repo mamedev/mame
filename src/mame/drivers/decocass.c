@@ -29,62 +29,62 @@ INLINE int swap_bits_5_6(int data)
 }
 
 static WRITE8_HANDLER( ram_w )
-{ 
+{
 	decocass_state *state = (decocass_state *)space->machine->driver_data;
-	state->decrypted[0x0000 + offset] = swap_bits_5_6(data); 
-	state->rambase[0x0000 + offset] = data;  
+	state->decrypted[0x0000 + offset] = swap_bits_5_6(data);
+	state->rambase[0x0000 + offset] = data;
 }
 
-static WRITE8_HANDLER( charram_w )    
-{ 
+static WRITE8_HANDLER( charram_w )
+{
 	decocass_state *state = (decocass_state *)space->machine->driver_data;
-	state->decrypted[0x6000 + offset] = swap_bits_5_6(data); 
-	decocass_charram_w(space, offset, data); 
+	state->decrypted[0x6000 + offset] = swap_bits_5_6(data);
+	decocass_charram_w(space, offset, data);
 }
 
-static WRITE8_HANDLER( fgvideoram_w ) 
-{ 
+static WRITE8_HANDLER( fgvideoram_w )
+{
 	decocass_state *state = (decocass_state *)space->machine->driver_data;
-	state->decrypted[0xc000 + offset] = swap_bits_5_6(data); 
-	decocass_fgvideoram_w(space, offset, data); 
+	state->decrypted[0xc000 + offset] = swap_bits_5_6(data);
+	decocass_fgvideoram_w(space, offset, data);
 }
 
-static WRITE8_HANDLER( fgcolorram_w ) 
-{ 
+static WRITE8_HANDLER( fgcolorram_w )
+{
 	decocass_state *state = (decocass_state *)space->machine->driver_data;
-	state->decrypted[0xc400 + offset] = swap_bits_5_6(data); 
-	decocass_colorram_w(space, offset, data); 
+	state->decrypted[0xc400 + offset] = swap_bits_5_6(data);
+	decocass_colorram_w(space, offset, data);
 }
 
-static WRITE8_HANDLER( tileram_w )    
-{ 
+static WRITE8_HANDLER( tileram_w )
+{
 	decocass_state *state = (decocass_state *)space->machine->driver_data;
-	state->decrypted[0xd000 + offset] = swap_bits_5_6(data); 
-	decocass_tileram_w(space, offset, data); 
+	state->decrypted[0xd000 + offset] = swap_bits_5_6(data);
+	decocass_tileram_w(space, offset, data);
 }
 
-static WRITE8_HANDLER( objectram_w )  
-{ 
+static WRITE8_HANDLER( objectram_w )
+{
 	decocass_state *state = (decocass_state *)space->machine->driver_data;
-	state->decrypted[0xd800 + offset] = swap_bits_5_6(data); 
-	decocass_objectram_w(space, offset, data); 
+	state->decrypted[0xd800 + offset] = swap_bits_5_6(data);
+	decocass_objectram_w(space, offset, data);
 }
 
 static WRITE8_HANDLER( mirrorvideoram_w ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); fgvideoram_w(space, offset, data); }
 static WRITE8_HANDLER( mirrorcolorram_w ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); fgcolorram_w(space, offset, data); }
 
-static READ8_HANDLER( mirrorvideoram_r ) 
-{ 
-	decocass_state *state = (decocass_state *)space->machine->driver_data;
-	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); 
-	return state->fgvideoram[offset]; 
-}
-
-static READ8_HANDLER( mirrorcolorram_r ) 
+static READ8_HANDLER( mirrorvideoram_r )
 {
 	decocass_state *state = (decocass_state *)space->machine->driver_data;
-	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); 
-	return state->colorram[offset]; 
+	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5);
+	return state->fgvideoram[offset];
+}
+
+static READ8_HANDLER( mirrorcolorram_r )
+{
+	decocass_state *state = (decocass_state *)space->machine->driver_data;
+	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5);
+	return state->colorram[offset];
 }
 
 

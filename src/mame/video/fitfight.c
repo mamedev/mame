@@ -23,7 +23,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		prio = (source[1] & 0x0400) >> 10;
 		colr = (source[1] & 0x00fc) >> 2;
 
-		if (state->bbprot_kludge == 1) 
+		if (state->bbprot_kludge == 1)
 			colr = (source[1] & 0x00f8) >> 3;
 
 		end = source[0] & 0x8000;

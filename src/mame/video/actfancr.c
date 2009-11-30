@@ -125,7 +125,7 @@ WRITE8_HANDLER( actfancr_pf1_data_w )
 	actfancr_state *state = (actfancr_state *)space->machine->driver_data;
 	state->pf1_data[offset] = data;
 	tilemap_mark_tile_dirty(state->pf1_tilemap, offset / 2);
-	if (state->pf1_alt_tilemap) 
+	if (state->pf1_alt_tilemap)
 		tilemap_mark_tile_dirty(state->pf1_alt_tilemap, offset / 2);
 }
 
@@ -178,13 +178,13 @@ VIDEO_UPDATE( actfancr )
 		int x, y, sprite, colour, multi, fx, fy, inc, flash;
 
 		y = buffered_spriteram[offs] + (buffered_spriteram[offs + 1] << 8);
- 		if ((y & 0x8000) == 0) 
+ 		if ((y & 0x8000) == 0)
 			continue;
 
 		x = buffered_spriteram[offs + 4] + (buffered_spriteram[offs + 5] << 8);
 		colour = ((x & 0xf000) >> 12);
 		flash = x & 0x800;
-		if (flash && (video_screen_get_frame_number(screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(screen) & 1))
 			continue;
 
 		fx = y & 0x2000;
@@ -211,7 +211,7 @@ VIDEO_UPDATE( actfancr )
 			inc = 1;
 		}
 
-		if (state->flipscreen) 
+		if (state->flipscreen)
 		{
 			y = 240 - y;
 			x = 240 - x;
@@ -248,14 +248,14 @@ VIDEO_UPDATE( triothep )
 	state->flipscreen = state->control_2[0] & 0x80;
 	tilemap_set_flip_all(screen->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	if (state->control_2[0] & 0x4) 
+	if (state->control_2[0] & 0x4)
 	{
 		tilemap_set_scroll_rows(state->pf1_tilemap, 32);
 		tilemap_set_scrolly(state->pf1_tilemap, 0, scrolly);
 		for (i = 0; i < 32; i++)
 			tilemap_set_scrollx(state->pf1_tilemap, i, scrollx + (state->pf1_rowscroll_data[i * 2] | state->pf1_rowscroll_data[i * 2 + 1] << 8) );
 	}
-	else 
+	else
 	{
 		tilemap_set_scroll_rows(state->pf1_tilemap, 1);
 		tilemap_set_scrollx(state->pf1_tilemap, 0, scrollx);
@@ -270,13 +270,13 @@ VIDEO_UPDATE( triothep )
 		int x, y, sprite, colour, multi, fx, fy, inc, flash;
 
 		y = buffered_spriteram[offs] + (buffered_spriteram[offs + 1] << 8);
- 		if ((y & 0x8000) == 0) 
+ 		if ((y & 0x8000) == 0)
 			continue;
 
 		x = buffered_spriteram[offs + 4] + (buffered_spriteram[offs + 5] << 8);
 		colour = ((x & 0xf000) >> 12);
 		flash = x & 0x800;
-		if (flash && (video_screen_get_frame_number(screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(screen) & 1))
 			continue;
 
 		fx = y & 0x2000;
@@ -303,7 +303,7 @@ VIDEO_UPDATE( triothep )
 			inc = 1;
 		}
 
-		if (state->flipscreen) 
+		if (state->flipscreen)
 		{
 			y = 240 - y;
 			x = 240 - x;

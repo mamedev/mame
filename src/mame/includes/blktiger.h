@@ -9,9 +9,9 @@ struct _blktiger_state
 {
 	/* memory pointers */
 	UINT8 * txvideoram;
-//	UINT8 * spriteram;	// currently this uses generic buffer_spriteram_w
-//	UINT8 * paletteram;	// currently this uses generic palette handling
-//	UINT8 * paletteram2;	// currently this uses generic palette handling
+//  UINT8 * spriteram;  // currently this uses generic buffer_spriteram_w
+//  UINT8 * paletteram; // currently this uses generic palette handling
+//  UINT8 * paletteram2;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap *tx_tilemap, *bg_tilemap8x4, *bg_tilemap4x8;

@@ -8,7 +8,7 @@
 
     TODO:
 
-	- remove CDP1802 dependency
+    - remove CDP1802 dependency
     - white noise
     - scanline based update
     - CMSEL output

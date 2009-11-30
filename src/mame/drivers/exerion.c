@@ -298,7 +298,7 @@ static MACHINE_RESET( exerion )
 	state->porta = 0;
 	state->portb = 0;
 	state->cocktail_flip = 0;
-	state->char_palette = 0; 
+	state->char_palette = 0;
 	state->sprite_palette = 0;
 	state->char_bank = 0;
 

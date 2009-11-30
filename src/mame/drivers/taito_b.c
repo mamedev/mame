@@ -394,7 +394,7 @@ static WRITE16_HANDLER( eeprom_w )
 		/* bit 7 - set all the time (Chip Select?) */
 
 		/* EEPROM */
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 	}
 }
 

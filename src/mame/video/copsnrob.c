@@ -110,7 +110,7 @@ VIDEO_UPDATE( copsnrob )
 		val = state->bulletsram[x];
 
 		// Check for the most common case
-		if (!(val & 0x0f)) 
+		if (!(val & 0x0f))
 			continue;
 
 		mask1 = 0x01;

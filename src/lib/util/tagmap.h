@@ -127,7 +127,7 @@ INLINE UINT32 tagmap_hash(const char *string)
 {
 	UINT32 hash = (string[0] << 5) + string[1];
 	char c;
-	
+
 	string += 2;
 	while ((c = *string++) != 0)
 		hash = ((hash << 5) | (hash >> 27)) + c;
@@ -136,7 +136,7 @@ INLINE UINT32 tagmap_hash(const char *string)
 
 
 /*-------------------------------------------------
-    tagmap_find_prehashed - find an object 
+    tagmap_find_prehashed - find an object
     associated with a tag, given the tag's
     hash
 -------------------------------------------------*/
@@ -144,7 +144,7 @@ INLINE UINT32 tagmap_hash(const char *string)
 INLINE void *tagmap_find_prehashed(tagmap *map, const char *tag, UINT32 fullhash)
 {
 	tagmap_entry *entry;
-	
+
 	for (entry = map->table[fullhash % ARRAY_LENGTH(map->table)]; entry != NULL; entry = entry->next)
 		if (entry->fullhash == fullhash && strcmp(entry->tag, tag) == 0)
 			return entry->object;
@@ -153,7 +153,7 @@ INLINE void *tagmap_find_prehashed(tagmap *map, const char *tag, UINT32 fullhash
 
 
 /*-------------------------------------------------
-    tagmap_find - find an object associated 
+    tagmap_find - find an object associated
     with a tag
 -------------------------------------------------*/
 
@@ -164,7 +164,7 @@ INLINE void *tagmap_find(tagmap *map, const char *tag)
 
 
 /*-------------------------------------------------
-    tagmap_find_hash_only - find an object 
+    tagmap_find_hash_only - find an object
     associated with a tag using only the hash;
     this generally works well but may occasionally
     return a false positive
@@ -174,7 +174,7 @@ INLINE void *tagmap_find_hash_only(tagmap *map, const char *tag)
 {
 	UINT32 fullhash = tagmap_hash(tag);
 	tagmap_entry *entry;
-	
+
 	for (entry = map->table[fullhash % ARRAY_LENGTH(map->table)]; entry != NULL; entry = entry->next)
 		if (entry->fullhash == fullhash)
 			return entry->object;

@@ -135,9 +135,9 @@ static WRITE16_HANDLER( gaiden_sound_command_w )
 {
 	gaiden_state *state = (gaiden_state *)space->machine->driver_data;
 
-	if (ACCESSING_BITS_0_7) 
+	if (ACCESSING_BITS_0_7)
 		soundlatch_w(space, 0, data & 0xff);	/* Ninja Gaiden */
-	if (ACCESSING_BITS_8_15) 
+	if (ACCESSING_BITS_8_15)
 		soundlatch_w(space, 0, data >> 8);	/* Tecmo Knight */
 	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }

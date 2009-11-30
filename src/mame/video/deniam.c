@@ -383,7 +383,7 @@ VIDEO_UPDATE( deniam )
 	int bg_scrollx, bg_scrolly, fg_scrollx, fg_scrolly;
 	int page;
 
-	if (!state->display_enable) 
+	if (!state->display_enable)
 		return 0;	/* don't update (freeze display) */
 
 	bg_scrollx = state->textram[state->bg_scrollx_reg] - state->bg_scrollx_offs;

@@ -167,20 +167,20 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 
 // Tilemaps access
 
-static WRITE8_HANDLER( dunhuang_pos_x_w )	
-{	
+static WRITE8_HANDLER( dunhuang_pos_x_w )
+{
 	dunhuang_state *state = (dunhuang_state *)space->machine->driver_data;
 	state->pos_x = data & 0x3f;
 	state->written = 0;
 	state->written2 = 0;
 }
 
-static WRITE8_HANDLER( dunhuang_pos_y_w )	
+static WRITE8_HANDLER( dunhuang_pos_y_w )
 {
 	dunhuang_state *state = (dunhuang_state *)space->machine->driver_data;
 	state->pos_y = data;
 	state->written = 0;
-	state->written2 = 0;	
+	state->written2 = 0;
 }
 
 static WRITE8_HANDLER( dunhuang_tile_w )
@@ -282,46 +282,46 @@ static WRITE8_HANDLER( dunhuang_vert_clear_w )
 // The tiles codes are read from the graphics roms too!
 //
 
-static WRITE8_HANDLER( dunhuang_block_dest_w )		
+static WRITE8_HANDLER( dunhuang_block_dest_w )
 {
 	dunhuang_state *state = (dunhuang_state *)space->machine->driver_data;
-	state->block_dest = data;		
+	state->block_dest = data;
 }
 
-static WRITE8_HANDLER( dunhuang_block_x_w )			
+static WRITE8_HANDLER( dunhuang_block_x_w )
 {
 	dunhuang_state *state = (dunhuang_state *)space->machine->driver_data;
-	state->block_x = data;		
+	state->block_x = data;
 }
 
-static WRITE8_HANDLER( dunhuang_block_y_w )			
+static WRITE8_HANDLER( dunhuang_block_y_w )
 {
 	dunhuang_state *state = (dunhuang_state *)space->machine->driver_data;
-	state->block_y = data;		
+	state->block_y = data;
 }
 
-static WRITE8_HANDLER( dunhuang_block_w_w )			
+static WRITE8_HANDLER( dunhuang_block_w_w )
 {
 	dunhuang_state *state = (dunhuang_state *)space->machine->driver_data;
-	state->block_w = data;		
+	state->block_w = data;
 }
 
-static WRITE8_HANDLER( dunhuang_block_c_w )			
+static WRITE8_HANDLER( dunhuang_block_c_w )
 {
 	dunhuang_state *state = (dunhuang_state *)space->machine->driver_data;
-	state->block_c = data;		
+	state->block_c = data;
 }
 
-static WRITE8_HANDLER( dunhuang_block_addr_lo_w )	
+static WRITE8_HANDLER( dunhuang_block_addr_lo_w )
 {
 	dunhuang_state *state = (dunhuang_state *)space->machine->driver_data;
-	state->block_addr_lo = data;	
+	state->block_addr_lo = data;
 }
 
-static WRITE8_HANDLER( dunhuang_block_addr_hi_w )	
+static WRITE8_HANDLER( dunhuang_block_addr_hi_w )
 {
 	dunhuang_state *state = (dunhuang_state *)space->machine->driver_data;
-	state->block_addr_hi = data;	
+	state->block_addr_hi = data;
 }
 
 
@@ -376,10 +376,10 @@ static WRITE8_HANDLER( dunhuang_block_h_w )
 
 // Palette: HMC HM86171 VGA 256 colour RAMDAC
 
-static WRITE8_HANDLER( dunhuang_paloffs_w )	
+static WRITE8_HANDLER( dunhuang_paloffs_w )
 {
 	dunhuang_state *state = (dunhuang_state *)space->machine->driver_data;
-	state->paloffs = data * 3;	
+	state->paloffs = data * 3;
 }
 
 static WRITE8_HANDLER( dunhuang_paldata_w )
@@ -417,10 +417,10 @@ ADDRESS_MAP_END
 
 // Inputs
 
-static WRITE8_HANDLER( dunhuang_input_w )	
+static WRITE8_HANDLER( dunhuang_input_w )
 {
 	dunhuang_state *state = (dunhuang_state *)space->machine->driver_data;
-	state->input = data;	
+	state->input = data;
 }
 
 static READ8_HANDLER( dunhuang_service_r )

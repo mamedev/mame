@@ -55,16 +55,16 @@ const gfx_layout bwing_tilelayout =
 };
 
 
-WRITE8_HANDLER( bwing_spriteram_w ) 
-{ 
-	space->machine->generic.buffered_spriteram.u8[offset] = data; 
+WRITE8_HANDLER( bwing_spriteram_w )
+{
+	space->machine->generic.buffered_spriteram.u8[offset] = data;
 }
 
-WRITE8_HANDLER( bwing_videoram_w )  
-{ 
+WRITE8_HANDLER( bwing_videoram_w )
+{
 	bwing_state *state = (bwing_state *)space->machine->driver_data;
-	state->videoram[offset] = data; 
-	tilemap_mark_tile_dirty(state->charmap, offset); 
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->charmap, offset);
 }
 
 
@@ -73,7 +73,7 @@ READ8_HANDLER ( bwing_scrollram_r )
 	bwing_state *state = (bwing_state *)space->machine->driver_data;
 	int offs;
 
-	if (!state->srbank) 
+	if (!state->srbank)
 		offs = state->srxlat[offset];
 	else
 		offs = offset;
@@ -137,9 +137,9 @@ WRITE8_HANDLER( bwing_scrollreg_w )
 WRITE8_HANDLER( bwing_paletteram_w )
 {
 	bwing_state *state = (bwing_state *)space->machine->driver_data;
-	static const float rgb[4][3] = {{0.85f, 0.95f, 1.00f}, 
-						{0.90f, 1.00f, 1.00f}, 
-						{0.80f, 1.00f, 1.00f}, 
+	static const float rgb[4][3] = {{0.85f, 0.95f, 1.00f},
+						{0.90f, 1.00f, 1.00f},
+						{0.80f, 1.00f, 1.00f},
 						{0.75f, 0.90f, 1.10f}};
 	int r, g, b, i;
 
@@ -220,23 +220,23 @@ VIDEO_START( bwing )
 	state->fgdata = memory_region(machine, "gpu");
 	state->bgdata = state->fgdata + 0x1000;
 
-	for (i = 0; i < 4; i++) 
+	for (i = 0; i < 4; i++)
 		state->srbase[i] = state->fgdata + i * 0x2000;
 
-	for (i = 0; i < 8; i++) 
+	for (i = 0; i < 8; i++)
 		state->sreg[i] = 0;
 
-//	state->fgfx = machine->gfx[2];
+//  state->fgfx = machine->gfx[2];
 	gfx_element_set_source(machine->gfx[2], state->srbase[1]);
 
-//	state->bgfx = machine->gfx[3];
+//  state->bgfx = machine->gfx[3];
 	gfx_element_set_source(machine->gfx[3], state->srbase[1] + 0x1000);
 
 	dwptr = machine->gfx[2]->pen_usage;
 	if (dwptr)
 	{
 		dwptr[0] = 0;
-		for(i = 1; i < BW_NTILES; i++) 
+		for(i = 1; i < BW_NTILES; i++)
 			dwptr[i] = -1;
 	}
 }
@@ -258,7 +258,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bmp, const rectang
 		x      = ram[i + 3];
 		color  = (attrib >> 3) & 1;
 
-		if (!(attrib & 1) || color != pri) 
+		if (!(attrib & 1) || color != pri)
 			continue;
 
 		code += (attrib << 3) & 0x100;
@@ -269,12 +269,12 @@ static void draw_sprites( running_machine *machine, bitmap_t *bmp, const rectang
 		fy = ~attrib & 0x02;
 
 		// normal/cocktail
-		if (state->mapmask & 0x20) 
-		{ 
-			fx = !fx; 
-			fy = !fy; 
-			x = 240 - x; 
-			y = 240 - y; 
+		if (state->mapmask & 0x20)
+		{
+			fx = !fx;
+			fy = !fy;
+			x = 240 - x;
+			y = 240 - y;
 		}
 
 		// single/double
@@ -292,14 +292,14 @@ VIDEO_UPDATE( bwing )
 	unsigned x, y, shiftx;
 
 	if (state->mapmask & 0x20)
-	{ 
-		state->mapflip = TILEMAP_FLIPX; 
-		shiftx = -8; 
+	{
+		state->mapflip = TILEMAP_FLIPX;
+		shiftx = -8;
 	}
 	else
-	{ 
-		state->mapflip = TILEMAP_FLIPY; 
-		shiftx = 8; 
+	{
+		state->mapflip = TILEMAP_FLIPY;
+		shiftx = 8;
 	}
 
 	// draw background

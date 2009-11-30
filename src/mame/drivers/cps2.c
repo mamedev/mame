@@ -722,7 +722,7 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 		/* bit 7 - */
 
 		/* EEPROM */
-		input_port_write(space->machine, "EEPROMOUT", data, 0xffff); 
+		input_port_write(space->machine, "EEPROMOUT", data, 0xffff);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -768,10 +768,10 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 		}
 
 		/*
-	    set_led_status(space->machine, 0,data & 0x01);
-	    set_led_status(space->machine, 1,data & 0x10);
-	    set_led_status(space->machine, 2,data & 0x20);
-	    */
+        set_led_status(space->machine, 0,data & 0x01);
+        set_led_status(space->machine, 1,data & 0x10);
+        set_led_status(space->machine, 2,data & 0x20);
+        */
     }
 }
 

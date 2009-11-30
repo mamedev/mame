@@ -39,7 +39,7 @@ struct _generic_audio_private
 int generic_sound_init(running_machine *machine)
 {
 	generic_audio_private *state;
-	
+
 	state = machine->generic_audio_data = auto_alloc_clear(machine, generic_audio_private);
 
 	/* register globals with the save state system */

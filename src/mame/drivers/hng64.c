@@ -580,8 +580,8 @@ static READ32_HANDLER( hng64_sysregs_r )
 	mame_system_time systime;
 	mame_get_base_datetime(space->machine, &systime);
 
-//	if((offset*4) != 0x1084)
-//	  printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);
+//  if((offset*4) != 0x1084)
+//    printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);
 
 	switch(offset*4)
 	{
@@ -612,7 +612,7 @@ static READ32_HANDLER( hng64_sysregs_r )
 		case 0x217c: return 0; //RTC status?
 	}
 
-//	printf("%08x\n",offset*4);
+//  printf("%08x\n",offset*4);
 
 	//return mame_rand(space->machine)&0xffffffff;
 	return hng64_sysregs[offset];
@@ -654,8 +654,8 @@ static WRITE32_HANDLER( hng64_sysregs_w )
 {
 	COMBINE_DATA (&hng64_sysregs[offset]);
 
-//	if(((offset*4) & 0x1200) == 0x1200)
-//	printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
+//  if(((offset*4) & 0x1200) == 0x1200)
+//  printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
 
 	switch(offset*4)
 	{
@@ -796,17 +796,17 @@ static READ32_HANDLER( racing_io_r )
 
 static READ32_HANDLER( hng64_dualport_r )
 {
-//	printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+//  printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 
 	/*
-	command table:
-	0x0b = ? mode input polling (sams64, bbust2, sams64_2 & roadedge) (*)
-	0x0c = cut down connections, treats the dualport to be normal RAM
-	0x11 = ? mode input polling (fatfurwa, xrally, buriki) (*)
-	0x20 = asks for MCU machine code
+    command table:
+    0x0b = ? mode input polling (sams64, bbust2, sams64_2 & roadedge) (*)
+    0x0c = cut down connections, treats the dualport to be normal RAM
+    0x11 = ? mode input polling (fatfurwa, xrally, buriki) (*)
+    0x20 = asks for MCU machine code
 
-	(*) 0x11 is followed by 0x0b if the latter is used, JVS-esque indirect/direct mode?
-	*/
+    (*) 0x11 is followed by 0x0b if the latter is used, JVS-esque indirect/direct mode?
+    */
 
 	if(hng_mcu_en == 0x0c)
 		return hng64_dualport[offset];
@@ -834,7 +834,7 @@ Beast Busters 2 outputs (all at offset == 0x1c):
 
 static WRITE32_HANDLER( hng64_dualport_w )
 {
-//	printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+//  printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 	COMBINE_DATA (&hng64_dualport[offset]);
 }
 
@@ -945,7 +945,7 @@ static WRITE32_HANDLER( tcram_w )
 
 static READ32_HANDLER( tcram_r )
 {
-//  	printf("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]) ;
+//      printf("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]) ;
 
 	if(offset == 0x12)
 		return input_port_read(space->machine, "VBLANK");
@@ -1691,11 +1691,11 @@ static DRIVER_INIT( hng64 )
 	// region hacking, english error messages are more useful to us, but no english bios is dumped...
 #ifdef HACK_REGION
 // versions according to fatal fury test mode
-//	hng64_patch_bios_region(machine, 0); // 'Others Ver' (invalid?)
+//  hng64_patch_bios_region(machine, 0); // 'Others Ver' (invalid?)
 	hng64_patch_bios_region(machine, 1); // Japan
-//	hng64_patch_bios_region(machine, 2); // USA
-//	hng64_patch_bios_region(machine, 3); // Korea
-//	hng64_patch_bios_region(machine, 4); // 'Others'
+//  hng64_patch_bios_region(machine, 2); // USA
+//  hng64_patch_bios_region(machine, 3); // Korea
+//  hng64_patch_bios_region(machine, 4); // 'Others'
 #endif
 
 	hng64_soundram=auto_alloc_array(machine, UINT16, 0x200000/2);

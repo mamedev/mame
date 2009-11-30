@@ -439,7 +439,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 static void rshark_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
-	
+
 	/* Sprites take 8 16-bit words each in memory:
                   MSB             LSB
        [offs + 0] ???? ???? ???? ???E

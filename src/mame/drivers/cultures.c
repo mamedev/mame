@@ -22,7 +22,7 @@ struct _cultures_state
 	UINT8 *   paletteram;
 	UINT8 *   bg0_regs_x;
 	UINT8 *   bg1_regs_x;
-	UINT8 *   bg2_regs_x; 
+	UINT8 *   bg2_regs_x;
 	UINT8 *   bg0_regs_y;
 	UINT8 *   bg1_regs_y;
 	UINT8 *   bg2_regs_y;

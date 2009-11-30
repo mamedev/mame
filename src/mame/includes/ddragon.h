@@ -16,8 +16,8 @@ struct _ddragon_state
 	UINT8 *        scrollx_lo;
 	UINT8 *        scrolly_lo;
 	UINT8 *        darktowr_mcu_ports;
-//	UINT8 *        paletteram;	// currently this uses generic palette handling
-//	UINT8 *        paletteram_2;	// currently this uses generic palette handling
+//  UINT8 *        paletteram;  // currently this uses generic palette handling
+//  UINT8 *        paletteram_2;    // currently this uses generic palette handling
 	size_t         spriteram_size;	// FIXME: this appears in chinagat.c, but is it really used?
 
 	/* video-related */

@@ -12,7 +12,7 @@ struct _equites_state
 	UINT16 *  spriteram_2;
 	UINT16 *  workram;
 	UINT8  *  mcu_ram;	// 8bits
-//	UINT16 *  nvram;	// currently this uses generic nvram handling
+//  UINT16 *  nvram;    // currently this uses generic nvram handling
 
 	/* video-related */
 	tilemap   *fg_tilemap, *bg_tilemap;

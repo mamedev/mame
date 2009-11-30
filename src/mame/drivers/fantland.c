@@ -201,14 +201,14 @@ static READ8_HANDLER( borntofi_inputs_r )
 	x = (x & 0x7f) - (x & 0x80);
 	y = (y & 0x7f) - (y & 0x80);
 
-	if (state->old_x[offset] > 0)	
+	if (state->old_x[offset] > 0)
 	{
-		state->input_ret[offset] = (state->input_ret[offset] ^ 0x04) | ((state->input_ret[offset] & 0x04) << 1);	
-		state->old_x[offset]--;	
+		state->input_ret[offset] = (state->input_ret[offset] ^ 0x04) | ((state->input_ret[offset] & 0x04) << 1);
+		state->old_x[offset]--;
 	}
 	else if (state->old_x[offset] < 0)
 	{
-		state->input_ret[offset] = (state->input_ret[offset] ^ 0x04) | (((~state->input_ret[offset]) & 0x04) << 1);	
+		state->input_ret[offset] = (state->input_ret[offset] ^ 0x04) | (((~state->input_ret[offset]) & 0x04) << 1);
 		state->old_x[offset]++;
 	}
 

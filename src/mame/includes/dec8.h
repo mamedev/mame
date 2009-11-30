@@ -7,9 +7,9 @@ struct _dec8_state
 	UINT8 *  pf0_data;
 	UINT8 *  pf1_data;
 	UINT8 *  row;
-//	UINT8 *  paletteram;	// currently this uses generic palette handling
-//	UINT8 *  paletteram_2;	// currently this uses generic palette handling
-//	UINT8 *  spriteram;	// currently this uses buffered_spriteram in some games
+//  UINT8 *  paletteram;    // currently this uses generic palette handling
+//  UINT8 *  paletteram_2;  // currently this uses generic palette handling
+//  UINT8 *  spriteram; // currently this uses buffered_spriteram in some games
 	size_t   videoram_size;
 
 	/* video-related */

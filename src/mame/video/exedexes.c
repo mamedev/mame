@@ -190,7 +190,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
 	int offs;
 
-	if (!state->objon) 
+	if (!state->objon)
 		return;
 
 	priority = priority ? 0x40 : 0x00;

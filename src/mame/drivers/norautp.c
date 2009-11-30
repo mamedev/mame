@@ -22,7 +22,7 @@
    * Noraut Joker Poker (V3.011a),        2003,  Noraut Ltd.
    * Noraut unknown set 1 (console),      198?,  Noraut Ltd.
    * Noraut unknown set 2 (console),      198?,  Noraut Ltd.
-   * Mainline Double Joker Poker,         198?,  Mainline London.  
+   * Mainline Double Joker Poker,         198?,  Mainline London.
    * Double Joker Poker (45%-75% payout), 199?,  DellFern Ltd.
    * Royal on Ten (Noraut Deluxe hack),   2005,  Unknown.
    * Credit Poker (ver.30c, standard),    1999,  CGI.
@@ -1408,7 +1408,7 @@ static ADDRESS_MAP_START( nortest1_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( norautxp_map, ADDRESS_SPACE_PROGRAM, 8 )
-//	ADDRESS_MAP_GLOBAL_MASK(~0x4000)
+//  ADDRESS_MAP_GLOBAL_MASK(~0x4000)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* need to be checked */
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) /* HM6116 */
@@ -2104,8 +2104,8 @@ ROM_END
 
   Noraut Red Hot 1-bet Joker Poker.
 
-  Last release of Noraut's Joker Poker. Always have joker with multi change card 
-  and hint card in gamble. Quite popular in Norther Ireland but some operators 
+  Last release of Noraut's Joker Poker. Always have joker with multi change card
+  and hint card in gamble. Quite popular in Norther Ireland but some operators
   have the percentage to payout at less than 10%
 
 */
@@ -2227,7 +2227,7 @@ ROM_END
 
 /*
 
-  V3011a 
+  V3011a
   cpu :Z84C0006PEC
 
   Prog eprom marked
@@ -2604,7 +2604,7 @@ ROM_END
   ROM text showed poker text and
   COPYRIGHT 1986 DREWS INC.
   COPYRIGHT 1986 DREW'S DISTRIBUTING INC.
- 
+
 */
 
 ROM_START( drhl )
@@ -2676,90 +2676,90 @@ ROM_END
 */
 //static DRIVER_INIT( norautrh )
 //{
-//	UINT8 *ROM = memory_region(machine, "maincpu");
-//	ROM[0x1110] = 0x00;
-//	ROM[0x1111] = 0x00;
+//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  ROM[0x1110] = 0x00;
+//  ROM[0x1111] = 0x00;
 //}
 
 //static DRIVER_INIT( norautpn )
 //{
-//	UINT8 *ROM = memory_region(machine, "maincpu");
-//	ROM[0x0827] = 0x00;
-//	ROM[0x0828] = 0x00;
+//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  ROM[0x0827] = 0x00;
+//  ROM[0x0828] = 0x00;
 //}
 
 //static DRIVER_INIT( norautu )
 //{
-//	UINT8 *ROM = memory_region(machine, "maincpu");
-//	ROM[0x083c] = 0x00;
-//	ROM[0x083d] = 0x00;
-//	ROM[0x083e] = 0x00;
+//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  ROM[0x083c] = 0x00;
+//  ROM[0x083d] = 0x00;
+//  ROM[0x083e] = 0x00;
 //}
 
 //static DRIVER_INIT( gtipoker )
 //{
-//	UINT8 *ROM = memory_region(machine, "maincpu");
-//	ROM[0x0cc6] = 0x00;
-//	ROM[0x0cc7] = 0x00;
-//	ROM[0x0cc8] = 0x00;
-//	ROM[0x10a5] = 0x00;
-//	ROM[0x10a6] = 0x00;
-//	ROM[0x10a7] = 0x00;
+//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  ROM[0x0cc6] = 0x00;
+//  ROM[0x0cc7] = 0x00;
+//  ROM[0x0cc8] = 0x00;
+//  ROM[0x10a5] = 0x00;
+//  ROM[0x10a6] = 0x00;
+//  ROM[0x10a7] = 0x00;
 //}
 
 //static DRIVER_INIT( dphl )
 //{
-//	UINT8 *ROM = memory_region(machine, "maincpu");
-//	ROM[0x1510] = 0x00;
-//	ROM[0x1511] = 0x00;
-//	ROM[0x1512] = 0x00;
+//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  ROM[0x1510] = 0x00;
+//  ROM[0x1511] = 0x00;
+//  ROM[0x1512] = 0x00;
 //}
 
 //static DRIVER_INIT( dphla )
 //{
-//	UINT8 *ROM = memory_region(machine, "maincpu");
-//	ROM[0x0b09] = 0x00;
-//	ROM[0x0b0a] = 0x00;
-//	ROM[0x0b0b] = 0x00;
+//  UINT8 *ROM = memory_region(machine, "maincpu");
+//  ROM[0x0b09] = 0x00;
+//  ROM[0x0b0a] = 0x00;
+//  ROM[0x0b0b] = 0x00;
 //}
 
 static DRIVER_INIT( enc )
 {
 /* Attempt to decrypt the program ROM */
 
-//	UINT8 *rom = memory_region(machine, "maincpu");
-//	UINT8 *buffer;
-//	int size = 0x2000; //memory_region_length(machine, "maincpu");
-//	int start = 0;
-//	int i;
+//  UINT8 *rom = memory_region(machine, "maincpu");
+//  UINT8 *buffer;
+//  int size = 0x2000; //memory_region_length(machine, "maincpu");
+//  int start = 0;
+//  int i;
 
 
-//	for (i = start; i < size; i++)
-//	{
-//		rom[i] = rom[i] ^ 0x09 ^ 0xff;
-//		rom[i+1] = rom[i+1] ^ 0xfb ^ 0xff;
-//		rom[i+2] = rom[i+2] ^ 0xb2 ^ 0xff;
-//		rom[i+3] = rom[i+3] ^ 0x60 ^ 0xff;
-//		rom[i+4] = rom[i+4] ^ 0xce ^ 0xff;
-//		rom[i+5] = rom[i+5] ^ 0x44 ^ 0xff;
-//		rom[i+6] = rom[i+6] ^ 0x6e ^ 0xff;
-//		rom[i+7] = rom[i+7] ^ 0x61 ^ 0xff;
-//		rom[i+8] = rom[i+8] ^ 0x37 ^ 0xff;
-//		rom[i+9] = rom[i+9] ^ 0x5e ^ 0xff;
-//		rom[i+10] = rom[i+10] ^ 0xfb ^ 0xff;
-//		rom[i+11] = rom[i+11] ^ 0xc6 ^ 0xff;
-//		rom[i+12] = rom[i+12] ^ 0x1d ^ 0xff;
-//		rom[i+13] = rom[i+13] ^ 0x33 ^ 0xff;
-//		rom[i+14] = rom[i+14] ^ 0x00 ^ 0xff;
-//		rom[i+15] = rom[i+15] ^ 0xff ^ 0xff;
+//  for (i = start; i < size; i++)
+//  {
+//      rom[i] = rom[i] ^ 0x09 ^ 0xff;
+//      rom[i+1] = rom[i+1] ^ 0xfb ^ 0xff;
+//      rom[i+2] = rom[i+2] ^ 0xb2 ^ 0xff;
+//      rom[i+3] = rom[i+3] ^ 0x60 ^ 0xff;
+//      rom[i+4] = rom[i+4] ^ 0xce ^ 0xff;
+//      rom[i+5] = rom[i+5] ^ 0x44 ^ 0xff;
+//      rom[i+6] = rom[i+6] ^ 0x6e ^ 0xff;
+//      rom[i+7] = rom[i+7] ^ 0x61 ^ 0xff;
+//      rom[i+8] = rom[i+8] ^ 0x37 ^ 0xff;
+//      rom[i+9] = rom[i+9] ^ 0x5e ^ 0xff;
+//      rom[i+10] = rom[i+10] ^ 0xfb ^ 0xff;
+//      rom[i+11] = rom[i+11] ^ 0xc6 ^ 0xff;
+//      rom[i+12] = rom[i+12] ^ 0x1d ^ 0xff;
+//      rom[i+13] = rom[i+13] ^ 0x33 ^ 0xff;
+//      rom[i+14] = rom[i+14] ^ 0x00 ^ 0xff;
+//      rom[i+15] = rom[i+15] ^ 0xff ^ 0xff;
 
-//		i = i + 16;
-//	}
+//      i = i + 16;
+//  }
 
-//	buffer = alloc_array_or_die(UINT8, size);
-//	memcpy(buffer, rom, size);
+//  buffer = alloc_array_or_die(UINT8, size);
+//  memcpy(buffer, rom, size);
 
-//	free(buffer);
+//  free(buffer);
 }
 
 static DRIVER_INIT( deb )

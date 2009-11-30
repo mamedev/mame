@@ -12,7 +12,7 @@ struct _commando_state
 	UINT8 *  colorram;
 	UINT8 *  videoram2;
 	UINT8 *  colorram2;
-//	UINT8 *  spriteram;	// currently this uses generic buffered_spriteram
+//  UINT8 *  spriteram; // currently this uses generic buffered_spriteram
 
 	/* video-related */
 	tilemap  *bg_tilemap, *fg_tilemap;

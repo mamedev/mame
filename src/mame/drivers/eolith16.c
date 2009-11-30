@@ -36,7 +36,7 @@ static WRITE16_HANDLER( eeprom_w )
 	vbuffer = (data & 0x80) >> 7;
 	coin_counter_w(space->machine, 0, data & 1);
 
-	input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
+	input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 
 	//data & 0x100 and data & 0x004 always set
 }

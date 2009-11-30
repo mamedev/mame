@@ -77,7 +77,7 @@ void generic_machine_init(running_machine *machine)
 {
 	generic_machine_private *state;
 	int counternum;
-	
+
 	/* allocate our state */
 	machine->generic_machine_data = auto_alloc_clear(machine, generic_machine_private);
 	state = machine->generic_machine_data;
@@ -123,7 +123,7 @@ void generic_machine_init(running_machine *machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    get_dispensed_tickets - return the number of 
+    get_dispensed_tickets - return the number of
     tickets dispensed
 -------------------------------------------------*/
 
@@ -135,7 +135,7 @@ int get_dispensed_tickets(running_machine *machine)
 
 
 /*-------------------------------------------------
-    increment_dispensed_tickets - increment the 
+    increment_dispensed_tickets - increment the
     number of dispensed tickets
 -------------------------------------------------*/
 
@@ -245,7 +245,7 @@ void coin_counter_w(running_machine *machine, int num, int on)
 
 
 /*-------------------------------------------------
-    coin_counter_get_count - return the coin count 
+    coin_counter_get_count - return the coin count
     for a given coin
 -------------------------------------------------*/
 
@@ -272,7 +272,7 @@ void coin_lockout_w(running_machine *machine, int num,int on)
 
 
 /*-------------------------------------------------
-    coin_lockout_get_state - return current lockout 
+    coin_lockout_get_state - return current lockout
     state for a particular coin
 -------------------------------------------------*/
 

@@ -89,7 +89,7 @@ struct _calorie_state
 	/* memory pointers */
 	UINT8 *  fg_ram;
 	UINT8 *  sprites;
-//	UINT8 *  paletteram;	// currently this uses generic palette handling
+//  UINT8 *  paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap  *bg_tilemap,*fg_tilemap;

@@ -297,19 +297,19 @@ ROM_START( portrait )
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "port_00.a1", 0x00000, 0x2000, CRC(eb3e1c12) SHA1(2d38b66f52546b40553244c8a5c961279559f5b6) )	/*bit plane 1*/
 	ROM_LOAD( "port_10.b1", 0x02000, 0x2000, CRC(0f44e377) SHA1(1955f9f4deab2166f637f43c1f326bd65fc90f6a) )	/*bit plane 1*/
-	
+
 	ROM_LOAD( "port_02.d1", 0x04000, 0x2000, CRC(bd93a3f9) SHA1(9cb479b8840cafd6043ff0cb9d5ca031dcd332ba) )	/*bit plane 2*/
 	ROM_LOAD( "port_12.e1", 0x06000, 0x2000, CRC(656b9f20) SHA1(c1907aba3d19be79d92cd73784b8e7ae94910da6) )	/*bit plane 2*/
-	
+
 	ROM_LOAD( "port_04.g1", 0x08000, 0x2000, CRC(2a99feb5) SHA1(b373d2a2bd28aad6dd7a15a2166e03a8b7a34d9b) )	/*bit plane 3*/
 	ROM_LOAD( "port_14.g1", 0x0a000, 0x2000, CRC(224b7a58) SHA1(b84e70d22d1cab41e5773fc9daa2e4e55ec9d96e) )	/*bit plane 3*/
 
 	ROM_LOAD( "port_01.a2", 0x10000, 0x2000, CRC(70d27508) SHA1(d011f85b31bb3aa6f386e8e0edb91df10f4c4eb6) )	/*bit plane 1*/
 	ROM_LOAD( "port_11.b2", 0x12000, 0x2000, CRC(f498e395) SHA1(beb1d12433a350e5b773126de3f2803a9f5620c1) )	/*bit plane 1*/
-	
+
 	ROM_LOAD( "port_03.d2", 0x14000, 0x2000, CRC(03d4153a) SHA1(7ce69ce6a101870dbfca1a9787fb1e660024bc02) )	/*bit plane 2*/
 	ROM_LOAD( "port_13.e2", 0x16000, 0x2000, CRC(10fa22b8) SHA1(e8f4c24fcdda0ce5e33bc600acd574a232a9bb21) )	/*bit plane 2*/
-	
+
 	ROM_LOAD( "port_05.g2", 0x18000, 0x2000, CRC(43ea7951) SHA1(df0ae7fa802365979514063e1d67cdd45ecada90) )	/*bit plane 3*/
 	ROM_LOAD( "port_15.h2", 0x1a000, 0x2000, CRC(ab20b438) SHA1(ea5d60f6a9f06397bd0c6ee028b463c684090c01) )	/*bit plane 3*/
 
@@ -361,33 +361,33 @@ ROM_END
 /* tileattr rom
 
   this appears to be divided into 2 0x400 banks
-  
+
   0x000 - 0x3ff relates to tiles 0x000-0x0ff
-  
+
   0x400 - 0x7ff relates to tiles 0x100-0x1ff, 0x200-0x2ff, and 0x300-0x3ff
-  
+
   every 2 tiles are somehow related to 8 bytes in the data
-   
+
    so tiles 0x00 and 0x01 use bytes 0x000-0x007
             0x02                    0x008
-			0x04                    0x010
-			0x06                    0x018
-			0x08                    0x020
-			0x0a                    0x028
-			0x0c                    0x030
-			0x0e                    0x038
+            0x04                    0x010
+            0x06                    0x018
+            0x08                    0x020
+            0x0a                    0x028
+            0x0c                    0x030
+            0x0e                    0x038
             0x10                    0x040
                .......
             0xfe and 0xff use bytes 0x3f8-0x3ff
-			etc.
-			
-	it's probably some kind of lookup table for the colours (6bpp = 8 colours, maybe every 2 tiles share the same 8 colours)
-	I guess either the bank (0/1) can be selected, or bank 0 is hardcoded to tiles 0x000-0x0ff (because tilemaps can use
-	 these tiles too, so it's not a case of it being a sprite/tilemap lookup split)
-	
-	anyway.. this is why the portraits logo is broken across 3 areas (0x1f2, 0x2f2, 0x3f2) so that they can share the same
-	attributes from this rom
-  
+            etc.
+
+    it's probably some kind of lookup table for the colours (6bpp = 8 colours, maybe every 2 tiles share the same 8 colours)
+    I guess either the bank (0/1) can be selected, or bank 0 is hardcoded to tiles 0x000-0x0ff (because tilemaps can use
+     these tiles too, so it's not a case of it being a sprite/tilemap lookup split)
+
+    anyway.. this is why the portraits logo is broken across 3 areas (0x1f2, 0x2f2, 0x3f2) so that they can share the same
+    attributes from this rom
+
   */
 
 

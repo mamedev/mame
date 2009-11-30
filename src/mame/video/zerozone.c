@@ -31,7 +31,7 @@ static TILE_GET_INFO( get_zerozone_tile_info )
 	int tileno = state->videoram[tile_index] & 0x07ff;
 	int colour = state->videoram[tile_index] & 0xf000;
 
-	if (state->videoram[tile_index] & 0x0800) 
+	if (state->videoram[tile_index] & 0x0800)
 		tileno += state->tilebank * 0x800;
 
 	SET_TILE_INFO(0, tileno, colour >> 12, 0);

@@ -939,22 +939,22 @@ static stream_sample_t *generate_resampled_data(stream_input *input, UINT32 nums
 		while (numsamples != 0)
 		{
 			int nextfrac, startfrac, endfrac;
-		
+
 			/* fill in with point samples until we hit a boundary */
 			while ((nextfrac = basefrac + step) < FRAC_ONE && numsamples--)
 			{
 				*dest++ = (source[0] * gain) >> 8;
 				basefrac = nextfrac;
 			}
-			
+
 			/* if we're done, we're done */
 			if ((INT32)numsamples-- < 0)
 				break;
-		
+
 			/* compute starting and ending fractional positions */
 			startfrac = basefrac >> (FRAC_BITS - 12);
 			endfrac = nextfrac >> (FRAC_BITS - 12);
-			
+
 			/* blend between the two samples accordingly */
 			sample = (source[0] * (0x1000 - startfrac) + source[1] * (endfrac - 0x1000)) / (endfrac - startfrac);
 			*dest++ = (sample * gain) >> 8;

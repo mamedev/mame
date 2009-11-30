@@ -1152,7 +1152,7 @@ const char *input_port_string_from_token(const input_port_token token);
 ***************************************************************************/
 
 /*-------------------------------------------------
-    input_port_by_tag - return the config that 
+    input_port_by_tag - return the config that
     matches the given tag
 -------------------------------------------------*/
 
@@ -1161,7 +1161,7 @@ INLINE const input_port_config *input_port_by_tag(const input_port_list *portlis
 	/* use the map if we have it */
 	if (portlist->map != NULL)
 		return tagmap_find_hash_only(portlist->map, tag);
-	
+
 	/* otherwise, do it the slow way */
 	return input_port_by_tag_slow(portlist, tag);
 }

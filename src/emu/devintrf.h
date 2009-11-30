@@ -347,10 +347,10 @@ struct _device_list
 /* ----- device configuration ----- */
 
 /* initialize a device list structure, optionally allocating a map for it */
-void device_list_init(device_list *devlist, int allocmap); 
+void device_list_init(device_list *devlist, int allocmap);
 
 /* free memory attached to a device list and clear out the structure */
-void device_list_deinit(device_list *devlist); 
+void device_list_deinit(device_list *devlist);
 
 /* add a new device to the end of a device list */
 device_config *device_list_add(device_list *devlist, const device_config *owner, device_type type, const char *tag, UINT32 clock);

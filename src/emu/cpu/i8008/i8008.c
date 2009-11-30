@@ -377,7 +377,7 @@ static void execute_one(i8008_state *cpustate, int opcode)
 						case 6 : 	// LrI
 									cpustate->icount -= 8;
 									if (REG_1==7) cpustate->icount -= 1; // LMI
-									SET_REG(cpustate,REG_1, ARG(cpustate)); 
+									SET_REG(cpustate,REG_1, ARG(cpustate));
 									break;
 						case 7 :	// RET
 									cpustate->icount -= 5;

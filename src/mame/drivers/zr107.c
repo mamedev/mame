@@ -328,7 +328,7 @@ static WRITE8_HANDLER( sysreg_w )
                 0x02 = EEPCLK
                 0x01 = EEPDI
             */
-			input_port_write(space->machine, "EEPROMOUT", data & 0x07, 0xff); 
+			input_port_write(space->machine, "EEPROMOUT", data & 0x07, 0xff);
 			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 0 = %02X\n", data);
 			break;

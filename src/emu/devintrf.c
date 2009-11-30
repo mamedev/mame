@@ -88,7 +88,7 @@ INLINE int device_matches_type(const device_config *device, device_type type)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    device_list_init - initialize a device list 
+    device_list_init - initialize a device list
     structure, optionally allocating a map for it
 -------------------------------------------------*/
 
@@ -107,7 +107,7 @@ void device_list_init(device_list *devlist, int allocmap)
 
 
 /*-------------------------------------------------
-    device_list_deinit - free memory attached to 
+    device_list_deinit - free memory attached to
     a device list and clear out the structure
 -------------------------------------------------*/
 
@@ -116,7 +116,7 @@ void device_list_deinit(device_list *devlist)
 	/* release all devices */
 	while (devlist->head != NULL)
 		device_list_remove(devlist, devlist->head->tag);
-	
+
 	/* release the map memory */
 	if (devlist->map != NULL)
 		tagmap_free(devlist->map);
@@ -148,7 +148,7 @@ device_config *device_list_add(device_list *devlist, const device_config *owner,
 
 	/* allocate a new device */
 	device = (device_config *)alloc_array_or_die(UINT8, sizeof(*device) + strlen(tag) + configlen);
-	
+
 	/* add to the map */
 	tmerr = tagmap_add_unique_hash(devlist->map, tag, device);
 	if (tmerr == TMERR_DUPLICATE)
@@ -391,7 +391,7 @@ const device_config *device_list_next(const device_config *prevdevice, device_ty
 
 
 /*-------------------------------------------------
-    device_list_find_by_tag_slow - retrieve a 
+    device_list_find_by_tag_slow - retrieve a
     device configuration based on a tag
 -------------------------------------------------*/
 

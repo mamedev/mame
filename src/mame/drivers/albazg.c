@@ -68,8 +68,8 @@ struct _albazg_state
 	UINT8 *  cus_ram;
 	UINT8 *  videoram;
 	UINT8 *  colorram;
-//	UINT8 *  paletteram;	// currently this uses generic palette handling
-//	UINT8 *  paletteram_2;	// currently this uses generic palette handling
+//  UINT8 *  paletteram;    // currently this uses generic palette handling
+//  UINT8 *  paletteram_2;  // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap  *bg_tilemap;
@@ -154,7 +154,7 @@ static WRITE8_HANDLER( custom_ram_w )
 {
 	albazg_state *state = (albazg_state *)space->machine->driver_data;
 //  logerror("Custom RAM write at %02x : %02x PC = %x\n", offset + 0xaf80, data, cpu_get_pc(space->cpu));
-	if(state->prot_lock) 
+	if(state->prot_lock)
 		state->cus_ram[offset] = data;
 }
 
@@ -192,7 +192,7 @@ static WRITE8_DEVICE_HANDLER( mux_w )
 	//0x12000 gameplay
 	//0x14000 bonus game
 	//0x16000 ?
-	if( state->bank != new_bank) 
+	if( state->bank != new_bank)
 	{
 		state->bank = new_bank;
 		memory_set_bank(device->machine, 1, state->bank);

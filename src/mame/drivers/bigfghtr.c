@@ -125,8 +125,8 @@ struct _bigfghtr_state
 	UINT16 *      bg_videoram;
 	UINT16 *      fg_videoram;
 	UINT16 *      sharedram;
-//	UINT16 *      spriteram;	// currently this uses generic buffer_spriteram_w
-//	UINT16 *      paletteram;	// currently this uses generic palette handling
+//  UINT16 *      spriteram;    // currently this uses generic buffer_spriteram_w
+//  UINT16 *      paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap       *bg_tilemap, *fg_tilemap, *tx_tilemap;
@@ -283,17 +283,17 @@ static VIDEO_UPDATE( bigfghtr )
 	else
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
-	if(sprite_enable) 
+	if(sprite_enable)
 		draw_sprites(screen->machine, bitmap, cliprect, 2);
 
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 
-	if(sprite_enable) 
+	if(sprite_enable)
 		draw_sprites(screen->machine, bitmap, cliprect, 1);
 
 	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 
-	if (sprite_enable) 
+	if (sprite_enable)
 		draw_sprites(screen->machine, bitmap, cliprect, 0);
 
 	return 0;

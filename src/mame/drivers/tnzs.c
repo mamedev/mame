@@ -650,7 +650,7 @@ static SAMPLES_START( kageki_init_samples )
 		{
 			if (*scan++ == 0x00)
 				break;
-			else 
+			else
 				size++;
 		}
 
@@ -659,7 +659,7 @@ static SAMPLES_START( kageki_init_samples )
 		state->samplesize[i] = size;
 
 
-		if (start < 0x100) 
+		if (start < 0x100)
 			start = size = 0;
 
 		// signed 8-bit sample to unsigned 8-bit sample convert
@@ -713,8 +713,8 @@ static WRITE8_DEVICE_HANDLER( kageki_csport_w )
 	{
 		// read dipsw port
 		state->kageki_csport_sel = (data & 0x03);
-	} 
-	else 
+	}
+	else
 	{
 		if (data > MAX_SAMPLES)
 		{

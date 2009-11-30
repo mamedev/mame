@@ -52,7 +52,7 @@ struct _egghunt_state
 	UINT8 *   bgram;
 	UINT8 *   atram;
 	UINT8 *   spram;
-//	UINT8 *   paletteram;	// currently this uses generic palette handling
+//  UINT8 *   paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap   *bg_tilemap;

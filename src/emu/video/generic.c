@@ -231,7 +231,7 @@ INLINE void set_color_888(running_machine *machine, pen_t color, int rshift, int
 void generic_video_init(running_machine *machine)
 {
 	generic_video_private *state;
-	
+
 	state = machine->generic_video_data = auto_alloc_clear(machine, generic_video_private);
 
 	state_save_register_item(machine, "video", NULL, 0, state->flip_screen_x);

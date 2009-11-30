@@ -11,7 +11,7 @@ struct _crospang_state
 	UINT16 *  bg_videoram;
 	UINT16 *  fg_videoram;
 	UINT16 *  spriteram;
-//	UINT16 *  paletteram;		// currently this uses generic palette handling
+//  UINT16 *  paletteram;       // currently this uses generic palette handling
 	size_t    spriteram_size;
 
 	/* video-related */

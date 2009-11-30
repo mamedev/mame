@@ -484,7 +484,7 @@ static WRITE32_HANDLER ( jc_control_w )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				input_port_write(space->machine, "EEPROMOUT", data >> 24, 0xff); 
+				input_port_write(space->machine, "EEPROMOUT", data >> 24, 0xff);
 			}
 			return;
 		}

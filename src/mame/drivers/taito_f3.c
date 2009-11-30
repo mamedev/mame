@@ -99,7 +99,7 @@ static WRITE32_HANDLER( f3_control_w )
 		case 0x04: /* Eeprom */
 			if (ACCESSING_BITS_0_7)
 			{
-				input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
+				input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 			}
 			return;
 

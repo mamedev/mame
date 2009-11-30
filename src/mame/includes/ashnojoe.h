@@ -17,7 +17,7 @@ struct _ashnojoe_state
 	UINT16 *    tileram_6;
 	UINT16 *    tileram_7;
 	UINT16 *    tilemap_reg;
-//	UINT16 *    paletteram;	// currently this uses generic palette handling
+//  UINT16 *    paletteram; // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap     *joetilemap, *joetilemap2, *joetilemap3, *joetilemap4, *joetilemap5, *joetilemap6, *joetilemap7;

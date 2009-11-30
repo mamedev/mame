@@ -1,6 +1,6 @@
 /*************************************************************************
 
-	Yun Sung 16 Bit Games
+    Yun Sung 16 Bit Games
 
 *************************************************************************/
 
@@ -13,7 +13,7 @@ struct _yunsun16_state
 	UINT16 *    scrollram_0;
 	UINT16 *    scrollram_1;
 	UINT16 *    priorityram;
-//	UINT16 *    paletteram;	// currently this uses generic palette handling
+//  UINT16 *    paletteram; // currently this uses generic palette handling
 	UINT16 *    spriteram;
 	size_t      spriteram_size;
 

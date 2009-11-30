@@ -125,7 +125,7 @@ struct _ddealer_state
 	UINT16 *  left_fg_vram_bottom;
 	UINT16 *  right_fg_vram_bottom;
 	UINT16 *  vregs;
-//	UINT16 *  paletteram16;	// currently this uses generic palette handling
+//  UINT16 *  paletteram16; // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap  *back_tilemap;

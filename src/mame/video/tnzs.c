@@ -71,7 +71,7 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 
 	/* f301 controls how many columns are drawn. */
 	tot = state->objctrl[1] & 0x1f;
-	if (tot == 1) 
+	if (tot == 1)
 		tot = 16;
 
 	upperbits = state->objctrl[2] + state->objctrl[3] * 256;

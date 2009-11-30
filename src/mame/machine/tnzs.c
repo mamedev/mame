@@ -276,7 +276,7 @@ static WRITE8_HANDLER( mcu_arknoid2_w )
 		{
 			/* set up coin/credit settings */
 			state->mcu_coinage[state->mcu_coinage_init++] = data;
-			if (state->mcu_coinage_init == 4) 
+			if (state->mcu_coinage_init == 4)
 				state->mcu_coinage_init = 0;	/* must not happen */
 		}
 
@@ -286,7 +286,7 @@ static WRITE8_HANDLER( mcu_arknoid2_w )
 		if (data == 0x15)
 		{
 			state->mcu_credits = (state->mcu_credits - 1) & 0xff;
-			if (state->mcu_credits == 0xff) 
+			if (state->mcu_credits == 0xff)
 				state->mcu_credits = 0;
 		}
 		state->mcu_command = data;
@@ -412,7 +412,7 @@ static WRITE8_HANDLER( mcu_extrmatn_w )
 		{
 			/* set up coin/credit settings */
 			state->mcu_coinage[state->mcu_coinage_init++] = data;
-			if (state->mcu_coinage_init == 4) 
+			if (state->mcu_coinage_init == 4)
 				state->mcu_coinage_init = 0;	/* must not happen */
 		}
 
@@ -676,8 +676,8 @@ MACHINE_START( tnzs )
 	memory_set_bank(machine, 1, 2);
 	memory_set_bank(machine, 2, 0);
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu"); 
-	state->mcu = devtag_get_device(machine, "mcu"); 
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->mcu = devtag_get_device(machine, "mcu");
 
 	state_save_register_global(machine, state->screenflip);
 	state_save_register_global(machine, state->kageki_csport_sel);
@@ -703,7 +703,7 @@ MACHINE_START( jpopnics )
 	memory_configure_bank(machine, 1, 0, 8, &ROM[0x10000], 0x4000);
 	memory_configure_bank(machine, 2, 0, 4, &SUB[0x10000], 0x2000);
 
-	state->mcu = NULL; 
+	state->mcu = NULL;
 
 	state_save_register_global(machine, state->screenflip);
 }

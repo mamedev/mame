@@ -83,27 +83,27 @@ PALETTE_INIT( portrait )
 	machine->colortable = colortable_alloc(machine, 0x40);
 
 /*
-	for (i = 0;i < 0x40;i++)
-	{
-		int r,g,b,data;
-		data = color_prom[0];
-		
-		
-		r = (data >> 0) & 0x7;
-		g = (data >> 3) & 0x3;
-		b = (data >> 5) & 0x7;
+    for (i = 0;i < 0x40;i++)
+    {
+        int r,g,b,data;
+        data = color_prom[0];
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(pal3bit(r), pal2bit(g), pal3bit(b)));
 
-		color_prom++;
-	}
+        r = (data >> 0) & 0x7;
+        g = (data >> 3) & 0x3;
+        b = (data >> 5) & 0x7;
+
+        colortable_palette_set_color(machine->colortable, i, MAKE_RGB(pal3bit(r), pal2bit(g), pal3bit(b)));
+
+        color_prom++;
+    }
 */
 
 	for (i=0;i<0x20;i++)
 	{
 		int r,g,b,data;
 		data = (color_prom[0]<<0) | (color_prom[0x20]<<8);
-		
+
 		r = (data >> 0) & 0x1f;
 		g = (data >> 5) & 0x1f;
 		b = (data >> 10) & 0x1f;
@@ -113,7 +113,7 @@ PALETTE_INIT( portrait )
 		// ?? the lookup seems to reference 0x3f colours, unless 1 bit is priority or similar?
 		colortable_palette_set_color(machine->colortable, i+0x20, MAKE_RGB(pal5bit(r>>1), pal5bit(g>>1), pal5bit(b>>1)));
 
-		color_prom++;	
+		color_prom++;
 	}
 
 
@@ -142,9 +142,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
              * -----x-- msb source[1]
              */
 		int tilenum = source[3];
-		
+
 		int color = ((tilenum&0xff)>>1)+0x00;
-		
+
 		int fy = attr & 0x20;
 
 		if(attr & 0x04) sx |= 0x100;

@@ -218,7 +218,7 @@ WRITE8_HANDLER( btime_mirrorcolorram_w )
 WRITE8_HANDLER( deco_charram_w )
 {
 	btime_state *state = (btime_state *)space->machine->driver_data;
-	if (state->deco_charram[offset] == data)  
+	if (state->deco_charram[offset] == data)
 		return;
 
 	state->deco_charram[offset] = data;
@@ -312,7 +312,7 @@ static void draw_chars( running_machine *machine, bitmap_t *bitmap, const rectan
 		UINT16 code = state->videoram[offs] + 256 * (state->colorram[offs] & 3);
 
 		/* check priority */
-		if ((priority != -1) && (priority != ((code >> 7) & 0x01)))  
+		if ((priority != -1) && (priority != ((code >> 7) & 0x01)))
 			continue;
 
 		if (flip_screen_get(machine))
@@ -394,9 +394,9 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 		offs_t tileoffset = tmap[i & 3] * 0x100;
 
 		// Skip if this tile is completely off the screen
-		if (scroll > 256)  
+		if (scroll > 256)
 			break;
-		if (scroll < -256) 
+		if (scroll < -256)
 			continue;
 
 		for (offs = 0; offs < 0x100; offs++)
@@ -525,7 +525,7 @@ VIDEO_UPDATE( bnj )
 		copyscrollbitmap(bitmap, state->background_bitmap, 1, &scroll, 0, 0, cliprect);
 
 		/* copy the low priority characters followed by the sprites
-		   then the high priority characters */
+           then the high priority characters */
 		draw_chars(screen->machine, bitmap, cliprect, TRUE, 0, 1);
 		draw_sprites(screen->machine, bitmap, cliprect, 0, 0, 0, state->videoram, 0x20);
 		draw_chars(screen->machine, bitmap, cliprect, TRUE, 0, 0);

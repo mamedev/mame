@@ -165,7 +165,7 @@ static WRITE32_HANDLER( groundfx_input_w )
 
 			if (ACCESSING_BITS_0_7)
 			{
-				input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
+				input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 			}
 
 			break;
@@ -375,7 +375,7 @@ static MACHINE_DRIVER_START( groundfx )
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
 	MDRV_MACHINE_RESET(groundfx)
-//	MDRV_NVRAM_HANDLER(groundfx)
+//  MDRV_NVRAM_HANDLER(groundfx)
 	MDRV_EEPROM_ADD("eeprom", groundfx_eeprom_interface, 128, default_eeprom)
 
 	/* video hardware */

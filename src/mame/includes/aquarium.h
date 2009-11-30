@@ -10,7 +10,7 @@ struct _aquarium_state
 	UINT16 *  mid_videoram;
 	UINT16 *  bak_videoram;
 	UINT16 *  spriteram;
-//	UINT16 *  paletteram;	// currently this uses generic palette handling
+//  UINT16 *  paletteram;   // currently this uses generic palette handling
 	size_t    spriteram_size;
 
 	/* video-related */

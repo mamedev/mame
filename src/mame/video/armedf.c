@@ -237,7 +237,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int sx = buffered_spriteram[offs + 3];
 		int sy = state->sprite_offy + 240 - (buffered_spriteram[offs + 0] & 0x1ff);
 
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 		{
 			sx = 320 - sx + 176;	/* don't ask where 176 comes from, just tried it out */
 			sy = 240 - sy + 1;	/* don't ask where 1 comes from, just tried it out */
@@ -267,17 +267,17 @@ VIDEO_UPDATE( armedf )
 	tilemap_set_enable(state->fg_tilemap, state->vreg & 0x400);
 	tilemap_set_enable(state->tx_tilemap, state->vreg & 0x100);
 
-	if ((state->scroll_type == 0)||(state->scroll_type == 5 )) 
+	if ((state->scroll_type == 0)||(state->scroll_type == 5 ))
 	{
-		if (state->old_mcu_mode != state->mcu_mode) 
+		if (state->old_mcu_mode != state->mcu_mode)
 		{
-			if ((state->mcu_mode & 0x000f) == 0x0004) 
+			if ((state->mcu_mode & 0x000f) == 0x0004)
 			{	// transparent tx
 				tilemap_set_transparent_pen(state->tx_tilemap, 0x0f);
 				tilemap_mark_all_tiles_dirty(state->tx_tilemap);
 				//logerror("? Transparent TX 0x0f\n");
 			}
-			if ((state->mcu_mode & 0x000f) == 0x000f) 
+			if ((state->mcu_mode & 0x000f) == 0x000f)
 			{		// opaque tx
 				tilemap_set_transparent_pen(state->tx_tilemap, 0x10);
 				tilemap_mark_all_tiles_dirty(state->tx_tilemap);
@@ -328,7 +328,7 @@ VIDEO_UPDATE( armedf )
 
 
 	bitmap_fill(bitmap, cliprect , 0xff);
-	if (state->vreg & 0x0800) 
+	if (state->vreg & 0x0800)
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	/*
     if(state->vreg & 0x0800)
@@ -340,27 +340,27 @@ VIDEO_UPDATE( armedf )
         bitmap_fill(bitmap, cliprect , get_black_pen(screen->machine) & 0x0f);
     }*/
 
-	if ((state->mcu_mode & 0x0030) == 0x0030) 
+	if ((state->mcu_mode & 0x0030) == 0x0030)
 		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 
-	if (sprite_enable) 
+	if (sprite_enable)
 		draw_sprites(screen->machine, bitmap, cliprect, 2);
 
-	if ((state->mcu_mode & 0x0030) == 0x0020) 
+	if ((state->mcu_mode & 0x0030) == 0x0020)
 		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 
 	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 
-	if ((state->mcu_mode & 0x0030) == 0x0010) 
+	if ((state->mcu_mode & 0x0030) == 0x0010)
 		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 
-	if (sprite_enable) 
+	if (sprite_enable)
 		draw_sprites(screen->machine, bitmap, cliprect, 1);
 
-	if ((state->mcu_mode & 0x0030) == 0x0000) 
+	if ((state->mcu_mode & 0x0030) == 0x0000)
 		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 
-	if (sprite_enable) 
+	if (sprite_enable)
 		draw_sprites(screen->machine, bitmap, cliprect, 0);
 
 	return 0;

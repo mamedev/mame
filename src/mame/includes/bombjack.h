@@ -11,7 +11,7 @@ struct _bombjack_state
 	UINT8 *    videoram;
 	UINT8 *    colorram;
 	UINT8 *    spriteram;
-//	UINT8 *    paletteram;	// currently this uses generic palette handling
+//  UINT8 *    paletteram;  // currently this uses generic palette handling
 	size_t     spriteram_size;
 
 	/* video-related */

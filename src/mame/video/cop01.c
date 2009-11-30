@@ -77,7 +77,7 @@ static TILE_GET_INFO( get_bg_tile_info )
      * the screen right at the beginning of mightguy. cop01 doesn't seem to
      * use priority at all.
      */
-	if (attr & 0x10) 
+	if (attr & 0x10)
 		pri = 0;
 
 	SET_TILE_INFO(1, tile + ((attr & 0x03) << 8), (attr & 0x1c) >> 2, 0);

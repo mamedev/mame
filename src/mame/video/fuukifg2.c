@@ -182,7 +182,7 @@ static void draw_sprites( const device_config *screen, bitmap_t *bitmap, const r
 		if (flip_screen_get(screen->machine))
 		{
 			flipx = !flipx;		sx = max_x - sx - xnum * 16;
-			flipy = !flipy;		sy = max_y - sy - ynum * 16;	
+			flipy = !flipy;		sy = max_y - sy - ynum * 16;
 		}
 
 		if (flipx)	{ xstart = xnum-1;  xend = -1;    xinc = -1; }

@@ -9,7 +9,7 @@ struct _capbowl_state
 {
 	/* memory pointers */
 	UINT8 *  rowaddress;
-//	UINT8 *  nvram;	// currently this uses generic_nvram
+//  UINT8 *  nvram; // currently this uses generic_nvram
 
 	/* video-related */
 	offs_t blitter_addr;

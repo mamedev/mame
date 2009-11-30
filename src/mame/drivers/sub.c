@@ -144,15 +144,15 @@ VIDEO_UPDATE(sub)
 
 
 	/*
-	sprite bank 1
-	0 xxxx xxxx X offset
-	1 tttt tttt tile offset
-	sprite bank 2
-	0 yyyy yyyy Y offset
-	1 f--- ---- flips the X offset
-	1 -f-- ---- flip y, inverted
-	1 --cc cccc color
-	*/
+    sprite bank 1
+    0 xxxx xxxx X offset
+    1 tttt tttt tile offset
+    sprite bank 2
+    0 yyyy yyyy Y offset
+    1 f--- ---- flips the X offset
+    1 -f-- ---- flip y, inverted
+    1 --cc cccc color
+    */
 	{
 		UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 		UINT8 *spriteram_2 = screen->machine->generic.spriteram2.u8;
@@ -300,11 +300,11 @@ static INPUT_PORTS_START( sub )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 // Duplicates
-//	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
-//	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
-//	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
-//	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
+//  PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
+//  PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
+//  PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
+//  PORT_DIPSETTING(    0xd0, DEF_STR( 1C_1C ) )
+//  PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )

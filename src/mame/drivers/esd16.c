@@ -128,7 +128,7 @@ static READ16_HANDLER( esd_eeprom_r )
 static WRITE16_HANDLER( esd_eeprom_w )
 {
 	if (ACCESSING_BITS_8_15)
-		input_port_write(space->machine, "EEPROMOUT", data, 0xffff); 
+		input_port_write(space->machine, "EEPROMOUT", data, 0xffff);
 
 //  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", cpu_get_pc(space->cpu), data, mem_mask);
 }

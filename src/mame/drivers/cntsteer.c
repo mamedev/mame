@@ -165,7 +165,7 @@ static void zerotrgt_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
-			if (fx) fx = 0; 
+			if (fx) fx = 0;
 			else fx = 1;
 			//sy2 = sy - 16;
 		}
@@ -223,7 +223,7 @@ static void cntsteer_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
-			if (fx) fx = 0; 
+			if (fx) fx = 0;
 			else fx = 1;
 			//sy2 = sy - 16;
 		}
@@ -371,15 +371,15 @@ static WRITE8_HANDLER(zerotrgt_vregs_w)
 	{
 		case 0:	state->scrolly = data; break;
 		case 1:	state->scrollx = data; break;
-		case 2:	state->bg_bank = (data & 0x30) << 4; 
-				state->bg_color_bank = (data & 7); 
-				state->disable_roz = (data & 0x40); 
-				tilemap_mark_all_tiles_dirty(state->bg_tilemap); 
+		case 2:	state->bg_bank = (data & 0x30) << 4;
+				state->bg_color_bank = (data & 7);
+				state->disable_roz = (data & 0x40);
+				tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 				break;
-		case 3:	state->rotation_sign = (data & 1); 
-				flip_screen_set(space->machine, !(data & 4)); 
-				state->scrolly_hi = (data & 0x30) << 4; 
-				state->scrollx_hi = (data & 0xc0) << 2; 
+		case 3:	state->rotation_sign = (data & 1);
+				flip_screen_set(space->machine, !(data & 4));
+				state->scrolly_hi = (data & 0x30) << 4;
+				state->scrollx_hi = (data & 0xc0) << 2;
 				break;
 		case 4:	state->rotation_x = data; break;
 	}
@@ -397,14 +397,14 @@ static WRITE8_HANDLER(cntsteer_vregs_w)
 	{
 		case 0:	state->scrolly = data; break;
 		case 1:	state->scrollx = data; break;
-		case 2:	state->bg_bank = (data & 0x01) << 8; 
-				state->bg_color_bank = (data & 6) >> 1; 
-				tilemap_mark_all_tiles_dirty(state->bg_tilemap); 
+		case 2:	state->bg_bank = (data & 0x01) << 8;
+				state->bg_color_bank = (data & 6) >> 1;
+				tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 				break;
-		case 3:	state->rotation_sign = (data & 7);  
-				state->disable_roz = (~data & 0x08); 
-				state->scrolly_hi = (data & 0x30) << 4; 
-				state->scrollx_hi = (data & 0xc0) << 2; 
+		case 3:	state->rotation_sign = (data & 7);
+				state->disable_roz = (~data & 0x08);
+				state->scrolly_hi = (data & 0x30) << 4;
+				state->scrollx_hi = (data & 0xc0) << 2;
 				break;
 		case 4:	state->rotation_x = data; break;
 	}
@@ -569,17 +569,17 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static WRITE8_HANDLER( nmimask_w ) 
-{ 
+static WRITE8_HANDLER( nmimask_w )
+{
 	cntsteer_state *state = (cntsteer_state *)space->machine->driver_data;
-	state->nmimask = data & 0x80; 
+	state->nmimask = data & 0x80;
 }
 
-static INTERRUPT_GEN ( sound_interrupt ) 
-{ 
+static INTERRUPT_GEN ( sound_interrupt )
+{
 	cntsteer_state *state = (cntsteer_state *)device->machine->driver_data;
-	if (!state->nmimask) 
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE); 
+	if (!state->nmimask)
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -791,7 +791,7 @@ static MACHINE_START( cntsteer )
 
 	state_save_register_global(machine, state->flipscreen);
 	state_save_register_global(machine, state->bg_bank);
-	state_save_register_global(machine, state->scrolly); 
+	state_save_register_global(machine, state->scrolly);
 	state_save_register_global(machine, state->scrollx);
 	state_save_register_global(machine, state->scrollx_hi);
 	state_save_register_global(machine, state->scrolly_hi);
@@ -817,7 +817,7 @@ static MACHINE_RESET( cntsteer )
 
 	state->flipscreen = 0;
 	state->bg_bank = 0;
-	state->scrolly = 0; 
+	state->scrolly = 0;
 	state->scrollx = 0;
 	state->scrollx_hi = 0;
 	state->scrolly_hi = 0;

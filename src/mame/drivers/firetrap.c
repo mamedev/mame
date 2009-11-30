@@ -81,7 +81,7 @@ static READ8_HANDLER( firetrap_8751_bootleg_r )
 	/* Check for coin insertion */
 	/* the following only works in the bootleg version, which doesn't have an */
 	/* 8751 - the real thing is much more complicated than that. */
-	if ((input_port_read(space->machine, "IN2") & 0x70) != 0x70) 
+	if ((input_port_read(space->machine, "IN2") & 0x70) != 0x70)
 		return 0xff;
 
 	return 0;
@@ -119,7 +119,7 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	firetrap_state *state = (firetrap_state *)space->machine->driver_data;
 
 	/* End of command - important to note, as coin input is supressed while commands are pending */
-	if (data == 0x26) 
+	if (data == 0x26)
 	{
 		state->i8751_current_command = 0;
 		state->i8751_return = 0xff; /* This value is XOR'd and must equal 0 */
@@ -128,7 +128,7 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	}
 
 	/* Init sequence command */
-	else if (data == 0x13) 
+	else if (data == 0x13)
 	{
 		if (!state->i8751_current_command)
 			state->i8751_init_ptr = 0;
@@ -136,14 +136,14 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	}
 
 	/* Used to calculate a jump address when coins are inserted */
-	else if (data == 0xbd) 
+	else if (data == 0xbd)
 	{
 		if (!state->i8751_current_command)
 			state->i8751_init_ptr = 0;
 		state->i8751_return = i8751_coin_data[state->i8751_init_ptr++];
 	}
 
-	else if (data == 0x36) 
+	else if (data == 0x36)
 	{
 		if (!state->i8751_current_command)
 			state->i8751_init_ptr = 0;
@@ -167,7 +167,7 @@ static WRITE8_HANDLER( firetrap_8751_w )
 		state->i8751_return = 2;
 	else if (data == 0x88)
 		state->i8751_return = 3;
-	else 
+	else
 	{
 		state->i8751_return = 0xff;
 		logerror("%04x: Unknown i8751 command %02x!\n",cpu_get_pc(space->cpu),data);
@@ -516,7 +516,7 @@ static INTERRUPT_GEN( firetrap )
 
 		/* Make sure coin IRQ's aren't generated when another command is pending, the main cpu
             definitely doesn't expect them as it locks out the coin routine */
-		if (state->coin_command_pending && !state->i8751_current_command) 
+		if (state->coin_command_pending && !state->i8751_current_command)
 		{
 			state->i8751_return = state->coin_command_pending;
 			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xff);

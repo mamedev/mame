@@ -14,7 +14,7 @@ struct _exedexes_state
 	UINT8 *        bg_scroll;
 	UINT8 *        nbg_yscroll;
 	UINT8 *        nbg_xscroll;
-//	UINT8 *        spriteram;	// currently this uses generic buffered_spriteram
+//  UINT8 *        spriteram;   // currently this uses generic buffered_spriteram
 
 	/* video-related */
 	tilemap        *bg_tilemap, *fg_tilemap, *tx_tilemap;

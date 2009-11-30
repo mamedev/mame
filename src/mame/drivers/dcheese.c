@@ -130,7 +130,7 @@ static WRITE16_HANDLER( eeprom_control_w )
 	/* bits $0080-$0010 are probably lamps */
 	if (ACCESSING_BITS_0_7)
 	{
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 		ticket_dispenser_w(space, 0, (data & 1) << 7);
 	}
 }

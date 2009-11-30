@@ -1402,7 +1402,7 @@ static running_machine *create_machine(const game_driver *driver)
 	if (machine->mame_data == NULL)
 		goto error;
 	memset(machine->mame_data, 0, sizeof(*machine->mame_data));
-	
+
 	/* allocate memory for the memory region map */
 	machine->mame_data->regionmap = tagmap_alloc();
 	if (machine->mame_data->regionmap == NULL)

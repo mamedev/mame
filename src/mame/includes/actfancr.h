@@ -1,6 +1,6 @@
 /*************************************************************************
 
-    Act Fancer 
+    Act Fancer
 
 *************************************************************************/
 
@@ -12,8 +12,8 @@ struct _actfancr_state
 	UINT8 *        pf2_data;
 	UINT8 *        pf1_rowscroll_data;
 	UINT8 *        main_ram;
-//	UINT8 *        spriteram;	// currently this uses buffered_spriteram
-//	UINT8 *        paletteram;	// currently this uses generic palette handling
+//  UINT8 *        spriteram;   // currently this uses buffered_spriteram
+//  UINT8 *        paletteram;  // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap        *pf1_tilemap, *pf1_alt_tilemap, *pf2_tilemap;

@@ -250,7 +250,7 @@ struct _input_port_private
 {
 	/* global state */
 	UINT8						safe_to_read;		/* clear at start; set after state is loaded */
-	
+
 	/* types */
 	input_type_state *			typestatelist;		/* list of live type states */
 	input_type_state *			type_to_typestate[__ipt_max][MAX_PLAYERS]; /* map from type/player to type state */
@@ -743,7 +743,7 @@ void input_port_list_deinit(input_port_list *portlist)
 	/* iterate over all ports and free them */
 	while (portlist->head != NULL)
 		port_config_free(&portlist->head);
-	
+
 	/* free the map if present */
 	if (portlist->map != NULL)
 		tagmap_free(portlist->map);
@@ -752,8 +752,8 @@ void input_port_list_deinit(input_port_list *portlist)
 
 
 /*-------------------------------------------------
-    input_port_by_tag_slow - return a pointer to 
-    the port_config associated with the given 
+    input_port_by_tag_slow - return a pointer to
+    the port_config associated with the given
     port tag
 -------------------------------------------------*/
 
@@ -1463,7 +1463,7 @@ static INT32 apply_analog_settings(INT32 value, analog_field_state *analog)
 
 /*-------------------------------------------------
     input_port_write_direct - write a value
-	to a port
+    to a port
 -------------------------------------------------*/
 
 void input_port_write_direct(const input_port_config *port, input_port_value data, input_port_value mem_mask)
@@ -1491,7 +1491,7 @@ void input_port_write_direct(const input_port_config *port, input_port_value dat
 
 /*-------------------------------------------------
     input_port_write - write a value to a
-	port specified by tag
+    port specified by tag
 -------------------------------------------------*/
 
 void input_port_write(running_machine *machine, const char *tag, input_port_value value, input_port_value mask)
@@ -1505,7 +1505,7 @@ void input_port_write(running_machine *machine, const char *tag, input_port_valu
 
 /*-------------------------------------------------
     input_port_write_safe - write a value to
-	a port, ignore if the port does not exist
+    a port, ignore if the port does not exist
 -------------------------------------------------*/
 
 void input_port_write_safe(running_machine *machine, const char *tag, input_port_value value, input_port_value mask)

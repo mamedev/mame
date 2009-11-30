@@ -16,7 +16,7 @@ struct _esd16_state
 	UINT16 *       head_layersize;
 	UINT16 *       headpanic_platform_x;
 	UINT16 *       headpanic_platform_y;
-//	UINT16 *       paletteram;	// currently this uses generic palette handling
+//  UINT16 *       paletteram;  // currently this uses generic palette handling
 	size_t         spriteram_size;
 
 	/* video-related */

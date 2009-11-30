@@ -66,7 +66,7 @@ tagmap *tagmap_alloc(void)
 
 
 /*-------------------------------------------------
-    tagmap_free - free a tagmap, and all 
+    tagmap_free - free a tagmap, and all
     entries within it
 -------------------------------------------------*/
 
@@ -78,14 +78,14 @@ void tagmap_free(tagmap *map)
 
 
 /*-------------------------------------------------
-    tagmap_reset - reset a tagmap by freeing 
+    tagmap_reset - reset a tagmap by freeing
     all entries
 -------------------------------------------------*/
 
 void tagmap_reset(tagmap *map)
 {
 	UINT32 hashindex;
-	
+
 	for (hashindex = 0; hashindex < ARRAY_LENGTH(map->table); hashindex++)
 	{
 		tagmap_entry *entry, *next;
@@ -116,7 +116,7 @@ tagmap_error tagmap_add(tagmap *map, const char *tag, void *object)
 
 
 /*-------------------------------------------------
-    tagmap_add_unique_hash - add a new entry to a 
+    tagmap_add_unique_hash - add a new entry to a
     tagmap, ensuring it has a unique hash value
 -------------------------------------------------*/
 
@@ -135,7 +135,7 @@ void tagmap_remove(tagmap *map, const char *tag)
 {
 	UINT32 fullhash = tagmap_hash(tag);
 	tagmap_entry **entryptr;
-	
+
 	for (entryptr = &map->table[fullhash % ARRAY_LENGTH(map->table)]; *entryptr != NULL; entryptr = &(*entryptr)->next)
 		if ((*entryptr)->fullhash == fullhash && strcmp((*entryptr)->tag, tag) == 0)
 		{
@@ -170,7 +170,7 @@ static tagmap_error tagmap_add_common(tagmap *map, const char *tag, void *object
 			/* if we require a unique hash, fail here */
 			if (unique_hash)
 				return TMERR_DUPLICATE;
-		
+
 			/* validate the string */
 			if (strcmp(tag, entry->tag) == 0)
 				return TMERR_DUPLICATE;
@@ -180,7 +180,7 @@ static tagmap_error tagmap_add_common(tagmap *map, const char *tag, void *object
 	entry = malloc(sizeof(*entry) + strlen(tag));
 	if (entry == NULL)
 		return TMERR_OUT_OF_MEMORY;
-	
+
 	/* fill in the entry */
 	entry->object = object;
 	entry->fullhash = fullhash;

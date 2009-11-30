@@ -5159,16 +5159,16 @@ static RDP_COMMAND( rdp_load_tlut )
 			break;
 		}
 		/*
-		case PIXEL_SIZE_16BIT:
-		{
-			UINT16 *src = (UINT16*)&rdram[(ti_address + (tl >> 2) * (ti_width << 1) + (sl >> 1)) >> 2];
+        case PIXEL_SIZE_16BIT:
+        {
+            UINT16 *src = (UINT16*)&rdram[(ti_address + (tl >> 2) * (ti_width << 1) + (sl >> 1)) >> 2];
 
-			for (i = (sl >> 2); i <= (sh >> 2); i++)
-			{
-				tlut[i] = src[i];
-			}
-			break;
-		}*/
+            for (i = (sl >> 2); i <= (sh >> 2); i++)
+            {
+                tlut[i] = src[i];
+            }
+            break;
+        }*/
 		default:	stricterror("RDP: load_tlut: size = %d\n", ti_size);
 	}
 

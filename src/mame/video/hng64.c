@@ -1459,8 +1459,8 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 	if ((tileregs & 0x1800)==0x1000) // floor mode
 	{
 		/* Floor mode - per pixel simple / complex modes? -- every other line?
-		  (there doesn't seem to be enough data in Buriki for every line at least)
-	    */
+          (there doesn't seem to be enough data in Buriki for every line at least)
+        */
 		if ((tileregs&0xf000) == 0x1000)
 		{
 			popmessage("Floor is Active");
@@ -1480,17 +1480,17 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 		{
 			/* complex zoom mode? */
 			/* with this scroll register layout rotation effects are possible
-			   the most obvious use of rotation is the Buriki One logo after
-			   attract mode; the text around the outside of the logo is rotated
-			   onto the screen
+               the most obvious use of rotation is the Buriki One logo after
+               attract mode; the text around the outside of the logo is rotated
+               onto the screen
 
-			   see 1:32 in http://www.youtube.com/watch?v=PoYaHOILuGs
+               see 1:32 in http://www.youtube.com/watch?v=PoYaHOILuGs
 
-			   Xtreme Rally seems to have an issue with this mode on the communication check
-			   screen at startup, but according to videos that should scroll, and no scroll
-			   values are updated, so it might be an unrelated bug.
+               Xtreme Rally seems to have an issue with this mode on the communication check
+               screen at startup, but according to videos that should scroll, and no scroll
+               values are updated, so it might be an unrelated bug.
 
-			*/
+            */
 
 			INT32 xtopleft,xmiddle, xalt;
 			INT32 ytopleft,ymiddle, yalt;
@@ -1584,8 +1584,8 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 		{
 			/* simple zoom mode? - only 4 regs? */
 			/* in this mode they can only specify the top left and middle screen points for each tilemap,
-			   this allows simple zooming, but not rotation
-		   */
+               this allows simple zooming, but not rotation
+           */
 
 
 			INT32 xtopleft,xmiddle;
@@ -1603,9 +1603,9 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 			if (hng64_videoregs[0x00]&0x00010000) // disable all scrolling / zoom (test screen) (maybe)
 			{
 				/* If this bit is active the scroll registers don't seem valid at all?
-				   It either disables zooming, or disables use of the scroll registers completely
-				   - used at startup
-			   */
+                   It either disables zooming, or disables use of the scroll registers completely
+                   - used at startup
+               */
 
 				xtopleft = 0;
 				xmiddle = 256<<16;
@@ -1689,7 +1689,7 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
  *   0    | ---- -C-- ---- -??Z ---- ---- ---- ---- | unknown (scroll control?) C = Global Complex zoom, ? = Always Set?, Z = Global Zoom Disable?
             0000 0011  - road edge alt 1
-			0000 0111  - road edge alt 2
+            0000 0111  - road edge alt 2
  *   1    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | looks like it's 0001 most (all) of the time - turns off in buriki intro
  *   1    | ---- ---- ---- ---- oooo oooo oooo oooo | unknown - always seems to be 0000 (fatfurwa)
  *   2    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap0 per layer flags
@@ -1710,26 +1710,26 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
  *   d    | oooo oooo oooo oooo oooo oooo oooo oooo | not used ??
  *   e    | oooo oooo oooo oooo oooo oooo oooo oooo | not used ??
 
-	per tile regs (0x2/0x3)
+    per tile regs (0x2/0x3)
 
-	// tilemap0 per layer flags
-	// 0840 - startup tests, 8x8x4 layer
-	// 0cc0 - beast busters 2, 8x8x8 layer
-	// 0860 - fatal fury wa
-	// 08e0 - fatal fury wa during transitions
-	// 0940 - samurai shodown 64
-	// 0880 - buriki
+    // tilemap0 per layer flags
+    // 0840 - startup tests, 8x8x4 layer
+    // 0cc0 - beast busters 2, 8x8x8 layer
+    // 0860 - fatal fury wa
+    // 08e0 - fatal fury wa during transitions
+    // 0940 - samurai shodown 64
+    // 0880 - buriki
 
-	// mmml dbr? ???? ????
-	// m = mosaic related?  (xrally, l maybe too)
-	// l = floor effects / linescroll enable  (buriki on tilemap1, fatal fury on tilemap3) - also enables for rotating logo on buriki ?!
-	// r = tile size (seems correct)
-	// b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
-	// d = floor / mosaic toggle
-	//  when d = 0 then l = floor enable
-	//  when d = 1 then l = lower part of mosaic?
-	//   (buriki one floor vs. 2nd game logo sequence seems a good example)
-	//    could have other meanings too?
+    // mmml dbr? ???? ????
+    // m = mosaic related?  (xrally, l maybe too)
+    // l = floor effects / linescroll enable  (buriki on tilemap1, fatal fury on tilemap3) - also enables for rotating logo on buriki ?!
+    // r = tile size (seems correct)
+    // b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
+    // d = floor / mosaic toggle
+    //  when d = 0 then l = floor enable
+    //  when d = 1 then l = lower part of mosaic?
+    //   (buriki one floor vs. 2nd game logo sequence seems a good example)
+    //    could have other meanings too?
 
 
  */

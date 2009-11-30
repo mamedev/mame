@@ -10,7 +10,7 @@ struct _dogfgt_state
 	UINT8 *    bgvideoram;
 	UINT8 *    spriteram;
 	UINT8 *    sharedram;
-//	UINT8 *    paletteram;	// currently this uses generic palette handling
+//  UINT8 *    paletteram;  // currently this uses generic palette handling
 	size_t     spriteram_size;
 
 	/* video-related */

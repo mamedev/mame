@@ -53,8 +53,8 @@ struct _galaxi_state
 	UINT16 *  bg3_ram;
 	UINT16 *  bg4_ram;
 	UINT16 *  fg_ram;
-//	UINT16 *  paletteram;	// currently this uses generic palette handling
-//	UINT16 *  nvram;		// currently this uses generic nvram handling
+//  UINT16 *  paletteram;   // currently this uses generic palette handling
+//  UINT16 *  nvram;        // currently this uses generic nvram handling
 
 	/* video-related */
 	tilemap   *bg1_tmap, *bg2_tmap, *bg3_tmap, *bg4_tmap, *fg_tmap;
@@ -195,7 +195,7 @@ static VIDEO_UPDATE(galaxi)
 
 static void show_out( running_machine *machine )
 {
-//	galaxi_state *state = (galaxi_state *)machine->driver_data;
+//  galaxi_state *state = (galaxi_state *)machine->driver_data;
 //  popmessage("%04x %04x %04x", state->out[0], state->out[1], state->out[2]);
 }
 

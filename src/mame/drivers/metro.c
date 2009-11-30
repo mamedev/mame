@@ -1785,7 +1785,7 @@ static ADDRESS_MAP_START( puzzlet_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x720000, 0x73ffff ) AM_READWRITE( SMH_RAM, metro_vram_1_w ) AM_BASE( &metro_vram_1 )	// Layer 1
 	AM_RANGE( 0x740000, 0x75ffff ) AM_READWRITE( SMH_RAM, metro_vram_2_w ) AM_BASE( &metro_vram_2 )	// Layer 2
 	AM_RANGE( 0x774000, 0x774fff ) AM_RAM	AM_BASE_SIZE_GENERIC( spriteram )
-	
+
 	AM_RANGE( 0x760000, 0x76ffff ) AM_READ( metro_bankedrom_r )	// Banked ROM
 
 //  AM_RANGE( 0x772000, 0x773fff ) AM_RAM

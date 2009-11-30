@@ -1290,7 +1290,7 @@ static WRITE16_HANDLER( bbakraid_nvram_w )
 		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",cpu_get_pc(space->cpu),data);
 
 	if ( ACCESSING_BITS_0_7 )
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 
 	raizing_Z80_busreq = data & 0x10;	/* see bbakraid_nvram_r above */
 }

@@ -157,7 +157,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			pri_mask = (1 << 2) | (1 << 3);
 			break;
 		case 3:
-		default:		
+		default:
 			pri_mask = 0;
 			break;
 	}

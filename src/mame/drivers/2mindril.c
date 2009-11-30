@@ -68,7 +68,7 @@ struct __2mindril_state
 	UINT16 *      charram;
 	UINT16 *      textram;
 	UINT16 *      unkram;
-//	UINT16 *      paletteram;	// currently this uses generic palette handling
+//  UINT16 *      paletteram;   // currently this uses generic palette handling
 	UINT16 *      iodata;
 
 	/* input-related */
@@ -120,7 +120,7 @@ static VIDEO_UPDATE( drill )
 	 		}
 	}
 	/*printf("%.4X %.4X %.4X %.4X %.4X %.4X\n", state->unkram[0x60000 / 2], state->unkram[0x60000 / 2 + 1], state->unkram[0x60000 / 2 + 2],
-									state->unkram[0x60000 / 2 + 3], state->unkram[0x60000 / 2 + 4], state->unkram[0x60000 / 2 + 5]);*/
+                                    state->unkram[0x60000 / 2 + 3], state->unkram[0x60000 / 2 + 4], state->unkram[0x60000 / 2 + 5]);*/
 	return 0;
 }
 
@@ -138,7 +138,7 @@ static READ16_HANDLER( drill_io_r )
 
 //  if (offset * 2 == 0x4)
 	/*popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x", cpu_get_pc(space->cpu), state->iodata[0/2], state->iodata[2/2], state->iodata[4/2], state->iodata[6/2],
-										state->iodata[8/2], state->iodata[0xa/2], state->iodata[0xc/2], state->iodata[0xe/2]);*/
+                                        state->iodata[8/2], state->iodata[0xa/2], state->iodata[0xc/2], state->iodata[0xe/2]);*/
 
 	switch(offset)
 	{

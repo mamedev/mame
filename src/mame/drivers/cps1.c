@@ -448,7 +448,7 @@ static WRITE16_HANDLER( cps1_eeprom_port_w )
         bit 6 = clock
         bit 7 = cs
         */
-		input_port_write(space->machine, "EEPROMOUT", data, 0xff); 
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 	}
 }
 
@@ -2314,7 +2314,7 @@ static INPUT_PORTS_START( punisher )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
-/* Needs further checking */	
+/* Needs further checking */
 static INPUT_PORTS_START( slammast )
 	PORT_INCLUDE( cps1_4players )
 
