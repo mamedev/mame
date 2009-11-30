@@ -52,7 +52,6 @@
                 - calls sound_init() [sound.c] to start the audio system
                 - calls debugger_init() [debugger.c] to set up the debugger
                 - calls the driver's MACHINE_START, SOUND_START, and VIDEO_START callbacks
-                - disposes of regions marked as disposable
                 - calls saveload_init() [mame.c] to set up for save/load
                 - calls cheat_init() [cheat.c] to initialize the cheat system
 
@@ -151,8 +150,9 @@ struct _mame_private
 	void 			(*saveload_schedule_callback)(running_machine *);
 	attotime		saveload_schedule_time;
 
-	/* array of memory regions */
-	region_info	*	regions;
+	/* list of memory regions, and a map for lookups */
+	region_info	*	regionlist;
+	tagmap *		regionmap;
 
 	/* error recovery and exiting */
 	jmp_buf			fatal_error_jmpbuf;
@@ -778,9 +778,10 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
 {
 	mame_private *mame = machine->mame_data;
 	region_info **infoptr, *info;
+	tagmap_error tagerr;
 
     /* make sure we don't have a region of the same name; also find the end of the list */
-    for (infoptr = &mame->regions; *infoptr != NULL; infoptr = &(*infoptr)->next)
+    for (infoptr = &mame->regionlist; *infoptr != NULL; infoptr = &(*infoptr)->next)
     	if (astring_cmpc((*infoptr)->name, name) == 0)
     		fatalerror("memory_region_alloc called with duplicate region name \"%s\"\n", name);
 
@@ -790,6 +791,14 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
 	info->name = astring_dupc(name);
 	info->length = length;
 	info->flags = flags;
+
+	/* attempt to put is in the hash table */
+	tagerr = tagmap_add_unique_hash(mame->regionmap, name, info);
+	if (tagerr == TMERR_DUPLICATE)
+	{
+		region_info *match = tagmap_find_hash_only(mame->regionmap, name);
+		fatalerror("Memory region '%s' has same hash as tag '%s'; please change one of them", name, astring_c(match->name));
+	}
 
 	/* hook us into the list */
 	*infoptr = info;
@@ -808,13 +817,14 @@ void memory_region_free(running_machine *machine, const char *name)
 	region_info **infoptr;
 
 	/* find the region */
-	for (infoptr = &mame->regions; *infoptr != NULL; infoptr = &(*infoptr)->next)
+	for (infoptr = &mame->regionlist; *infoptr != NULL; infoptr = &(*infoptr)->next)
 		if (astring_cmpc((*infoptr)->name, name) == 0)
 		{
 			region_info *info = *infoptr;
 
-			/* remove us from the list */
+			/* remove us from the list and the map */
 			*infoptr = info->next;
+			tagmap_remove(mame->regionmap, astring_c(info->name));
 
 			/* free the region */
 			astring_free(info->name);
@@ -838,12 +848,9 @@ UINT8 *memory_region(running_machine *machine, const char *name)
     if (name == NULL)
     	return NULL;
 
-    /* make sure we don't have a region of the same name */
-    for (info = mame->regions; info != NULL; info = info->next)
-    	if (astring_cmpc(info->name, name) == 0)
-    		return info->base;
-
-    return NULL;
+    /* look up the region and return the base */
+	info = tagmap_find_hash_only(mame->regionmap, name);
+	return (info != NULL) ? info->base : NULL;
 }
 
 
@@ -861,12 +868,9 @@ UINT32 memory_region_length(running_machine *machine, const char *name)
     if (name == NULL)
     	return 0;
 
-    /* make sure we don't have a region of the same name */
-    for (info = mame->regions; info != NULL; info = info->next)
-    	if (astring_cmpc(info->name, name) == 0)
-    		return info->length;
-
-    return 0;
+    /* look up the region and return the length */
+	info = tagmap_find_hash_only(mame->regionmap, name);
+	return (info != NULL) ? info->length : 0;
 }
 
 
@@ -884,12 +888,9 @@ UINT32 memory_region_flags(running_machine *machine, const char *name)
     if (name == NULL)
     	return 0;
 
-    /* make sure we don't have a region of the same name */
-    for (info = mame->regions; info != NULL; info = info->next)
-    	if (astring_cmpc(info->name, name) == 0)
-    		return info->flags;
-
-    return 0;
+    /* look up the region and return the flags */
+	info = tagmap_find_hash_only(mame->regionmap, name);
+	return (info != NULL) ? info->flags : 0;
 }
 
 
@@ -904,20 +905,16 @@ const char *memory_region_next(running_machine *machine, const char *name)
 	region_info *info;
 
 	/* if there's nothing in this class, fail immediately */
-    info = mame->regions;
-	if (info == NULL)
+	if (mame->regionlist == NULL)
 		return NULL;
 
 	/* NULL means return the first */
     if (name == NULL)
-    	return astring_c(info->name);
+    	return astring_c(mame->regionlist->name);
 
-    /* make sure we don't have a region of the same name */
-    for ( ; info != NULL; info = info->next)
-    	if (astring_cmpc(info->name, name) == 0)
-    		return (info->next != NULL) ? astring_c(info->next->name) : NULL;
-
-    return NULL;
+    /* look up the region and return the next guy */
+	info = tagmap_find_hash_only(mame->regionmap, name);
+	return (info != NULL && info->next != NULL) ? astring_c(info->next->name) : NULL;
 }
 
 
@@ -1405,6 +1402,11 @@ static running_machine *create_machine(const game_driver *driver)
 	if (machine->mame_data == NULL)
 		goto error;
 	memset(machine->mame_data, 0, sizeof(*machine->mame_data));
+	
+	/* allocate memory for the memory region map */
+	machine->mame_data->regionmap = tagmap_alloc();
+	if (machine->mame_data->regionmap == NULL)
+		goto error;
 
 	/* initialize the driver-related variables in the machine */
 	machine->gamedrv = driver;
@@ -1459,7 +1461,11 @@ static void destroy_machine(running_machine *machine)
 	if (machine->config != NULL)
 		machine_config_free((machine_config *)machine->config);
 	if (machine->mame_data != NULL)
+	{
+		if (machine->mame_data->regionmap != NULL)
+			tagmap_free(machine->mame_data->regionmap);
 		free(machine->mame_data);
+	}
 	if (machine->basename != NULL)
 		free((void *)machine->basename);
 	free(machine);
