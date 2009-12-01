@@ -1,32 +1,17 @@
 /*
 
-Sun Mixing board, looks like a hacked up Genesis clone.
+ Sun Mixing board, looks like a hacked up Genesis clone.
 
+ Driver by David Haywood
+ Inputs by Mariusz Wojcieszek
 
-Top Shooter - (c)1995  - older board, look more like an actual hacked cart system, has an MCU, doesn't
-                         work in MAME due to VDP status etc.  boots in Kega Fusion but has no inputs
-                         (MCU related?)
+ Top Shooter - (c)1995  - older board, look more like an actual hacked cart system, has an MCU
 
-*/
-
-#define MASTER_CLOCK		53693100
-
-
-/* Not Dumped
+ Not Dumped
 
  Super Bubble Bobble (a bubble bobble rip-off from Sun Mixing, looks like it may be on this hardware)
 
  */
-
-/*
-
-note:
-
-inputs don't work.. (MCU related?)
-no sprites in MAME (VDP related? they show in Kega Fusion)
-
-*/
-
 
 /*
 
@@ -133,63 +118,28 @@ connector, but of course, I can be wrong.
 */
 
 #include "driver.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/sn76496.h"
-#include "sound/2612intf.h"
-
 #include "megadriv.h"
 
 static INPUT_PORTS_START( topshoot ) /* Top Shooter Input Ports */
-	PORT_START("IN0")	/* 16bit */
-	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_START("IN0")
+	PORT_BIT( 0x4f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Bet") PORT_IMPULSE(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Start") PORT_IMPULSE(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Fire") PORT_IMPULSE(1)
+
+	PORT_START("IN1")
+	PORT_BIT( 0xe7, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Test mode down") PORT_IMPULSE(1)
+
+	PORT_START("IN2")
+	PORT_BIT( 0xfd, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 INPUT_PORTS_END
 
 
@@ -199,15 +149,22 @@ ROM_START( topshoot ) /* Top Shooter (c)1995 Sun Mixing */
 	ROM_LOAD16_BYTE( "tc574000ad_u12_1.bin", 0x000001, 0x080000, CRC(e826f6ad) SHA1(23ec8bb608f954d3b915f061e7076c0c63b8259e) )
 ROM_END
 
+static READ16_HANDLER(topshoot_200051_r)
+{
+	return -0x5b;
+}
+
 static DRIVER_INIT(topshoot)
 {
-	/* set up preliminary input ports (not working yet!) */
-	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400004, 0x400005, 0, 0, "IN0");	//correct?
-	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa11100, 0xa11101, 0, 0, "IN0");	//correct?
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200050, 0x200051, 0, 0, topshoot_200051_r );
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200042, 0x200043, 0, 0, "IN0");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200044, 0x200045, 0, 0, "IN1");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200046, 0x200047, 0, 0, "IN2");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200048, 0x200049, 0, 0, "IN3");
 
 	DRIVER_INIT_CALL(megadriv);
 }
 
 
 /* Sun Mixing Hardware, very close to actual Genesis */
-GAME( 1995, topshoot,  0,        md_bootleg, topshoot, topshoot, ROT0, "Sun Mixing",                  "Top Shooter",GAME_NOT_WORKING )
+GAME( 1995, topshoot,  0,        md_bootleg, topshoot, topshoot, ROT0, "Sun Mixing", "Top Shooter", 0 )
