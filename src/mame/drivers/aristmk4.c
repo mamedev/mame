@@ -713,7 +713,7 @@ ROM_START( kgbird )
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(ef25f5cc) SHA1(51d12f4b8b8712cbd18ec97ec04e1340cd85fc67))
 ROM_END
 
 ROM_START( kgbirda )
@@ -737,7 +737,7 @@ ROM_START( kgbirda )
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(ef25f5cc) SHA1(51d12f4b8b8712cbd18ec97ec04e1340cd85fc67))
 ROM_END
 
 ROM_START( phantomp )
@@ -788,6 +788,30 @@ ROM_START( topgear )
 	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
 ROM_END
 
+ROM_START( wtigernz )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+
+	 /* GAME EPROMS */
+	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(9492b242) SHA1(26bb14cba8e8c3cdbcb4b4903da9592b0a1f8cb3)) // game code
+	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(f639ef56) SHA1(5d49deee95df29cd4f5c69fea01bb752aaf2ce99)) // game code
+
+	/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(08624625) SHA1(3c052220b171f8ef009484f0ea38074b538f542b)) // gfx
+	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(4bce2fa1) SHA1(8c25cd51ea61a4a9ff1238d1617e38b2cd298c53))
+   	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(da141f20) SHA1(e0ebeeff2e085a30032d29748f5aa6116428aaa8))
+	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(13783f87) SHA1(662f6afdd027c3d139d7dfcd45a4a2a5a2bf2101))
+	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(7dfd06ec) SHA1(51fbc3d24e270edb8de432a99ca28695e42e72a6))
+	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(177a45ea) SHA1(6b044f88c79de571a007fb71ff2f99587babe474))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+ROM_END
+
 static DRIVER_INIT( aristmk4 )
 {
 	//...
@@ -803,5 +827,6 @@ GAME( 1996, kgbirda,kgbird,   aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat",
 GAME( 1998, swtht2nz,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Sweet Hearts II - 1VXFC5461 (New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1996, goldenc,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Golden Canaries - 1VXFC5462", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1996, topgear,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Top Gear - 4VXFC969", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1996, wtigernz,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "White Tiger - 3VXFC5342 (New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1998, phantomp,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Phantom Pays - 4VXFC5431 (New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, coralr2,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Coral Riches II - 1VXFC5472 (New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )

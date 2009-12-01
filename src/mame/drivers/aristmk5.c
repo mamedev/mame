@@ -161,6 +161,24 @@ ROM_START( dmdtouch )
 	ROM_LOAD32_WORD( "dmdtouch.u12", 0x100002, 0x80000, CRC(9e0d08e2) SHA1(38b10f7c37f1cefe9271549073dc0a4fed409aec) )
 ROM_END
 
+ROM_START( magicmsk )
+	ROM_REGION( 0x800000, "maincpu", 0 ) /* ARM Code */
+	ROM_LOAD32_WORD( "magicmsk.u7",  0x000000, 0x80000, CRC(17317eb9) SHA1(3ddb8d61f23461c3194af534928164550208bbee) )
+	ROM_LOAD32_WORD( "magicmsk.u11", 0x000002, 0x80000, CRC(23aefb5a) SHA1(ba4488754794f75f53b9c81b74b6ccd992c64acc) )
+	ROM_LOAD32_WORD( "magicmsk.u8",  0x100000, 0x80000, CRC(971bbf63) SHA1(082f81115209c7089c76fb207248da3c347a080b) )
+	ROM_LOAD32_WORD( "magicmsk.u12", 0x100002, 0x80000, CRC(6829a7bf) SHA1(97eed83763d0ec5e753d6ad194e906b1307c4940) )
+ROM_END
+
+ROM_START( geishanz )
+	ROM_REGION( 0x800000, "maincpu", 0 ) /* ARM Code */
+	ROM_LOAD32_WORD( "0101408.u7",  0x000000, 0x80000, CRC(ebdde248) SHA1(83f4f4deb5c6f5b33ae066d50e043a24cb0cbfe0) )
+	ROM_LOAD32_WORD( "0101408.u11", 0x000002, 0x80000, CRC(2f9e7cd4) SHA1(e9498879c9ca66740856c00fda0416f5d9f7c823) )
+	ROM_LOAD32_WORD( "0101408.u8",  0x100000, 0x80000, CRC(87e41b1b) SHA1(029687aeaed701e0f4b8da9d1d60a5a0a9445518) )
+	ROM_LOAD32_WORD( "0101408.u12", 0x100002, 0x80000, CRC(255f2368) SHA1(eb955452e1ed8d9d4f30f3372d7321f01d3654d3) )
+	ROM_LOAD32_WORD( "0101408.u9",  0x200000, 0x80000, CRC(5f161953) SHA1(d07353d006811813b94cb022857f49c4906fd87b) )
+	ROM_LOAD32_WORD( "0101408.u13", 0x200002, 0x80000, CRC(5ef6323e) SHA1(82a720d814ca06c6d286c59bbf325d9a1034375a) )
+ROM_END
+
 
 GAME( 1995, swthrt2v, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Sweet Hearts II (C - 07/09/95, Venezuela version)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1995, enchfrst, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Enchanted Forest (E - 23/06/95, Local)", GAME_NOT_WORKING|GAME_NO_SOUND )
@@ -172,4 +190,6 @@ GAME( 1997, dmdtouch, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Dia
 GAME( 1998, adonis,   0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Adonis (A - 25-05-98, NSW/ACT)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1998, reelrock, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (A - 13/07/98, Local)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1998, indiandr, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Indian Dreaming (B - 15/12/98, Local)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, magicmsk, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Magic Mask (A - 09/05/2000, Export))", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, margmgc,  0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (A - 07/07/2000, NSW/ACT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, geishanz, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Geisha (A - 05/03/01, New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )

@@ -9365,6 +9365,7 @@ Other Sun games
 	DRIVER( phantomp )	/* (c) 1998 */
 	DRIVER( swtht2nz )	/* (c) 1998 */
 	DRIVER( topgear )	/* (c) 1996 */
+	DRIVER( wtigernz )	/* (c) 1996 */
 
 	/* Aristocrat Mk5 hardware */
 	DRIVER( swthrt2v )	/* (c) 1995 */
@@ -9377,7 +9378,9 @@ Other Sun games
 	DRIVER( adonis )	/* (c) 1998 */
 	DRIVER( reelrock )	/* (c) 1998 */
 	DRIVER( indiandr )	/* (c) 1998 */
+	DRIVER( magicmsk )	/* (c) 2000 */
 	DRIVER( margmgc )	/* (c) 2000 */
+	DRIVER( geishanz )	/* (c) 2001 */
 
 	/* Eagle */
 	DRIVER( janshi )
