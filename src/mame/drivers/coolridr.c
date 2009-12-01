@@ -215,6 +215,8 @@ static GFXDECODE_START( coolridr )
 
 GFXDECODE_END
 
+static INPUT_PORTS_START( coolridr )
+INPUT_PORTS_END
 
 // IRQs 4 & 6 are valid on SH-2
 static INTERRUPT_GEN( system_h1 )
@@ -325,4 +327,4 @@ static DRIVER_INIT( coolridr )
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60d88a4, 0x060d88a7, 0, 0, coolridr_hack_r );
 }
 
-GAME( 1995, coolridr,    0, coolridr,    0,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, coolridr,    0, coolridr,    coolridr,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND )
