@@ -35,11 +35,7 @@ static INTERRUPT_GEN( ddrible_interrupt_1 )
 
 static WRITE8_HANDLER( ddrible_bankswitch_w )
 {
-	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
-
-	bankaddress = 0x10000 + (data & 0x0f) * 0x2000;
-	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
+	memory_set_bank(space->machine, 1, data & 0x0f);
 }
 
 
@@ -256,6 +252,8 @@ static const vlm5030_interface vlm5030_config =
 static MACHINE_START( ddrible )
 {
 	ddrible_state *state = (ddrible_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, 1, 0, 5, &ROM[0x10000], 0x2000);
 
 	state->filter1 = devtag_get_device(machine, "filter1");
 	state->filter2 = devtag_get_device(machine, "filter2");

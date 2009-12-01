@@ -1,12 +1,5 @@
 #include "driver.h"
-
-UINT8 *gunsmoke_scrollx;
-UINT8 *gunsmoke_scrolly;
-
-static UINT8 chon, objon, bgon;
-static UINT8 sprite3bank;
-
-static tilemap *bg_tilemap, *fg_tilemap;
+#include "includes/gunsmoke.h"
 
 /***************************************************************************
 
@@ -22,6 +15,7 @@ static tilemap *bg_tilemap, *fg_tilemap;
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
+
 PALETTE_INIT( gunsmoke )
 {
 	int i;
@@ -66,18 +60,22 @@ PALETTE_INIT( gunsmoke )
 
 WRITE8_HANDLER( gunsmoke_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	gunsmoke_state *state = (gunsmoke_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( gunsmoke_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	gunsmoke_state *state = (gunsmoke_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( gunsmoke_c804_w )
 {
+	gunsmoke_state *state = (gunsmoke_state *)space->machine->driver_data;
+
 	/* bits 0 and 1 are for coin counters */
 	coin_counter_w(space->machine, 1, data & 0x01);
 	coin_counter_w(space->machine, 0, data & 0x02);
@@ -91,19 +89,21 @@ WRITE8_HANDLER( gunsmoke_c804_w )
 	flip_screen_set(space->machine, data & 0x40);
 
 	/* bit 7 enables characters? */
-	chon = data & 0x80;
+	state->chon = data & 0x80;
 }
 
 WRITE8_HANDLER( gunsmoke_d806_w )
 {
+	gunsmoke_state *state = (gunsmoke_state *)space->machine->driver_data;
+
 	/* bits 0-2 select the sprite 3 bank */
-	sprite3bank = data & 0x07;
+	state->sprite3bank = data & 0x07;
 
 	/* bit 4 enables bg 1? */
-	bgon = data & 0x10;
+	state->bgon = data & 0x10;
 
 	/* bit 5 enables sprites? */
-	objon = data & 0x20;
+	state->objon = data & 0x20;
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -121,8 +121,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int attr = machine->generic.colorram.u8[tile_index];
-	int code = machine->generic.videoram.u8[tile_index] + ((attr & 0xe0) << 2);
+	gunsmoke_state *state = (gunsmoke_state *)machine->driver_data;
+	int attr = state->colorram[tile_index];
+	int code = state->videoram[tile_index] + ((attr & 0xe0) << 2);
 	int color = attr & 0x1f;
 
 	tileinfo->group = color;
@@ -132,29 +133,20 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( gunsmoke )
 {
-	/* configure ROM banking */
-	UINT8 *rombase = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 4, &rombase[0x10000], 0x4000);
+	gunsmoke_state *state = (gunsmoke_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,  32, 32, 2048, 8);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 
-	/* create tilemaps */
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,  32, 32, 2048, 8);
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-
-	colortable_configure_tilemap_groups(machine->colortable, fg_tilemap, machine->gfx[0], 0x4f);
-
-	/* register for saving */
-	state_save_register_global(machine, chon);
-	state_save_register_global(machine, objon);
-	state_save_register_global(machine, bgon);
-	state_save_register_global(machine, sprite3bank);
+	colortable_configure_tilemap_groups(machine->colortable, state->fg_tilemap, machine->gfx[0], 0x4f);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	gunsmoke_state *state = (gunsmoke_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
-	for (offs = machine->generic.spriteram_size - 32; offs >= 0; offs -= 32)
+	for (offs = state->spriteram_size - 32; offs >= 0; offs -= 32)
 	{
 		int attr = spriteram[offs + 1];
 		int bank = (attr & 0xc0) >> 6;
@@ -165,7 +157,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int sx = spriteram[offs + 3] - ((attr & 0x20) << 3);
 		int sy = spriteram[offs + 2];
 
-		if (bank == 3) bank += sprite3bank;
+		if (bank == 3) 
+			bank += state->sprite3bank;
+
 		code += 256 * bank;
 
 		if (flip_screen_get(machine))
@@ -176,22 +170,26 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine->gfx[2], code, color, flipx, flipy,
-			sx, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine->gfx[2], code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
 VIDEO_UPDATE( gunsmoke )
 {
-	tilemap_set_scrollx(bg_tilemap, 0, gunsmoke_scrollx[0] + 256 * gunsmoke_scrollx[1]);
-	tilemap_set_scrolly(bg_tilemap, 0, gunsmoke_scrolly[0]);
+	gunsmoke_state *state = (gunsmoke_state *)screen->machine->driver_data;
+	tilemap_set_scrollx(state->bg_tilemap, 0, state->scrollx[0] + 256 * state->scrollx[1]);
+	tilemap_set_scrolly(state->bg_tilemap, 0, state->scrolly[0]);
 
-	if (bgon)
-		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	if (state->bgon)
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	else
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
-	if (objon) draw_sprites(screen->machine, bitmap, cliprect);
-	if (chon)  tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	if (state->objon) 
+		draw_sprites(screen->machine, bitmap, cliprect);
+
+	if (state->chon)  
+		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+
 	return 0;
 }

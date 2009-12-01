@@ -28,24 +28,15 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-
-extern WRITE8_HANDLER( hanaawas_videoram_w );
-extern WRITE8_HANDLER( hanaawas_colorram_w );
-extern WRITE8_DEVICE_HANDLER( hanaawas_portB_w );
-
-extern PALETTE_INIT( hanaawas );
-extern VIDEO_START( hanaawas );
-extern VIDEO_UPDATE( hanaawas );
-
-static int mux;
+#include "includes/hanaawas.h"
 
 static READ8_HANDLER( hanaawas_input_port_0_r )
 {
-	int i,ordinal = 0;
+	hanaawas_state *state = (hanaawas_state *)space->machine->driver_data;
+	int i, ordinal = 0;
 	UINT16 buttons = 0;
 
-	switch( mux )
+	switch (state->mux)
 	{
 	case 1: /* start buttons */
 		buttons = input_port_read(space->machine, "START");
@@ -75,15 +66,16 @@ static READ8_HANDLER( hanaawas_input_port_0_r )
 
 static WRITE8_HANDLER( hanaawas_inputs_mux_w )
 {
-	mux = data;
+	hanaawas_state *state = (hanaawas_state *)space->machine->driver_data;
+	state->mux = data;
 }
 
 static ADDRESS_MAP_START( hanaawas_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(hanaawas_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(hanaawas_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(hanaawas_videoram_w) AM_BASE_MEMBER(hanaawas_state, videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(hanaawas_colorram_w) AM_BASE_MEMBER(hanaawas_state, colorram)
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
 ADDRESS_MAP_END
 
@@ -192,13 +184,33 @@ static const ay8910_interface ay8910_config =
 };
 
 
+static MACHINE_START( hanaawas )
+{
+	hanaawas_state *state = (hanaawas_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->mux);
+}
+
+static MACHINE_RESET( hanaawas )
+{
+	hanaawas_state *state = (hanaawas_state *)machine->driver_data;
+
+	state->mux = 0;
+}
+
 static MACHINE_DRIVER_START( hanaawas )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(hanaawas_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,18432000/6)	/* 3.072 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(hanaawas_map)
 	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_MACHINE_START(hanaawas)
+	MDRV_MACHINE_RESET(hanaawas)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -250,4 +262,4 @@ ROM_START( hanaawas )
 ROM_END
 
 
-GAME( 1982, hanaawas, 0, hanaawas, hanaawas, 0, ROT0, "Setakikaku, Ltd.", "Hana Awase", 0 )
+GAME( 1982, hanaawas, 0, hanaawas, hanaawas, 0, ROT0, "Setakikaku, Ltd.", "Hana Awase", GAME_SUPPORTS_SAVE )

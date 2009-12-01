@@ -52,47 +52,38 @@ TODO:
 #include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
+#include "includes/sonson.h"
 
-
-WRITE8_HANDLER( sonson_videoram_w );
-WRITE8_HANDLER( sonson_colorram_w );
-WRITE8_HANDLER( sonson_scrollx_w );
-WRITE8_HANDLER( sonson_flipscreen_w );
-
-PALETTE_INIT( sonson );
-VIDEO_START( sonson );
-VIDEO_UPDATE( sonson );
 
 static WRITE8_HANDLER( sonson_sh_irqtrigger_w )
 {
-	static int last;
-
+	sonson_state *state = (sonson_state *)space->machine->driver_data;
 	data &= 1;
 
-	if (last == 0 && data == 1)
+	if (state->last_irq == 0 && data == 1)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		cputag_set_input_line(space->machine, "audiocpu", M6809_FIRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(state->audiocpu, M6809_FIRQ_LINE, HOLD_LINE);
 	}
 
-	last = data;
+	state->last_irq = data;
 }
 
 static WRITE8_HANDLER( sonson_coin1_counter_w )
 {
-	coin_counter_w(space->machine, 0,data & 1);
+	coin_counter_w(space->machine, 0, data & 1);
 }
 
 static WRITE8_HANDLER( sonson_coin2_counter_w )
 {
-	coin_counter_w(space->machine, 1,data & 1);
+	coin_counter_w(space->machine, 1, data & 1);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sonson_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(sonson_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0x2020, 0x207f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sonson_videoram_w) AM_BASE_SIZE_MEMBER(sonson_state, videoram, videoram_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(sonson_colorram_w) AM_BASE_MEMBER(sonson_state, colorram)
+	AM_RANGE(0x2020, 0x207f) AM_RAM AM_BASE_SIZE_MEMBER(sonson_state, spriteram, spriteram_size)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(sonson_scrollx_w)
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("P2")
@@ -236,7 +227,26 @@ GFXDECODE_END
 
 
 
+static MACHINE_START( sonson )
+{
+	sonson_state *state = (sonson_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->last_irq);
+}
+
+static MACHINE_RESET( sonson )
+{
+	sonson_state *state = (sonson_state *)machine->driver_data;
+
+	state->last_irq = 0;
+}
+
 static MACHINE_DRIVER_START( sonson )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(sonson_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,12000000/6)	/* 2 MHz ??? */
@@ -247,6 +257,8 @@ static MACHINE_DRIVER_START( sonson )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* FIRQs are triggered by the main CPU */
 
+	MDRV_MACHINE_START(sonson)
+	MDRV_MACHINE_RESET(sonson)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -342,5 +354,5 @@ ROM_START( sonsonj )
 ROM_END
 
 
-GAME( 1984, sonson,  0,      sonson, sonson, 0, ROT0, "Capcom", "Son Son", 0 )
-GAME( 1984, sonsonj, sonson, sonson, sonson, 0, ROT0, "Capcom", "Son Son (Japan)", 0 )
+GAME( 1984, sonson,  0,      sonson, sonson, 0, ROT0, "Capcom", "Son Son", GAME_SUPPORTS_SAVE )
+GAME( 1984, sonsonj, sonson, sonson, sonson, 0, ROT0, "Capcom", "Son Son (Japan)", GAME_SUPPORTS_SAVE )

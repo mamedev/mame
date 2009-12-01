@@ -16,17 +16,7 @@ Sound:  YM2151
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
-
-/* Variables & functions defined in video: */
-
-WRITE8_HANDLER( amspdwy_videoram_w );
-WRITE8_HANDLER( amspdwy_colorram_w );
-WRITE8_HANDLER( amspdwy_paletteram_w );
-WRITE8_HANDLER( amspdwy_flipscreen_w );
-
-VIDEO_START( amspdwy );
-VIDEO_UPDATE( amspdwy );
-
+#include "includes/amspdwy.h"
 
 /***************************************************************************
 
@@ -44,50 +34,51 @@ VIDEO_UPDATE( amspdwy );
     Or last value when wheel delta = 0
 */
 
-static UINT8 wheel_old[2];
-static UINT8 wheel_return[2];
-
-static UINT8 amspdwy_wheel_r(running_machine *machine, int index)
+static UINT8 amspdwy_wheel_r( running_machine *machine, int index )
 {
-    static const char *const portnames[] = { "WHEEL1", "WHEEL2", "AN1", "AN2" };
-    UINT8 wheel;
-    wheel = input_port_read(machine, portnames[2 + index]);
-    if (wheel != wheel_old[index])
-    {
-        wheel = (wheel & 0x7fff) - (wheel & 0x8000);
-        if (wheel > wheel_old[index])  wheel_return[index] = ((+wheel) & 0xf) | 0x00;
-        else                           wheel_return[index] = ((-wheel) & 0xf) | 0x10;
-        wheel_old[index] = wheel;
-    }
-    return wheel_return[index] | input_port_read(machine, portnames[index]);
+	amspdwy_state *state = (amspdwy_state *)machine->driver_data;
+	static const char *const portnames[] = { "WHEEL1", "WHEEL2", "AN1", "AN2" };
+	UINT8 wheel = input_port_read(machine, portnames[2 + index]);
+	if (wheel != state->wheel_old[index])
+	{
+		wheel = (wheel & 0x7fff) - (wheel & 0x8000);
+		if (wheel > state->wheel_old[index])  
+		state->wheel_return[index] = ((+wheel) & 0xf) | 0x00;
+		else						   
+		state->wheel_return[index] = ((-wheel) & 0xf) | 0x10;
+
+	state->wheel_old[index] = wheel;
+	}
+	return state->wheel_return[index] | input_port_read(machine, portnames[index]);
 }
 
 static READ8_HANDLER( amspdwy_wheel_0_r )
 {
-    return amspdwy_wheel_r(space->machine, 0);
+	return amspdwy_wheel_r(space->machine, 0);
 }
 
 static READ8_HANDLER( amspdwy_wheel_1_r )
 {
-    return amspdwy_wheel_r(space->machine, 1);
+	return amspdwy_wheel_r(space->machine, 1);
 }
 
 static READ8_DEVICE_HANDLER( amspdwy_sound_r )
 {
-	return (ym2151_status_port_r(device,0) & ~ 0x30) | input_port_read(device->machine, "IN0");
+	return (ym2151_status_port_r(device, 0) & ~ 0x30) | input_port_read(device->machine, "IN0");
 }
 
 static WRITE8_HANDLER( amspdwy_sound_w )
 {
+	amspdwy_state *state = (amspdwy_state *)space->machine->driver_data;
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( amspdwy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM												// ROM
 	AM_RANGE(0x8000, 0x801f) AM_WRITE(amspdwy_paletteram_w) AM_BASE_GENERIC(paletteram)// Palette
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(amspdwy_videoram_w) AM_BASE_GENERIC(videoram)	// Layer, mirrored?
-	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(amspdwy_colorram_w) AM_BASE_GENERIC(colorram)	// Layer
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(amspdwy_videoram_w) AM_BASE_MEMBER(amspdwy_state, videoram)	// Layer, mirrored?
+	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(amspdwy_colorram_w) AM_BASE_MEMBER(amspdwy_state, colorram)	// Layer
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM												// Unused?
 //  AM_RANGE(0xa000, 0xa000) AM_WRITENOP                                        // ?
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")
@@ -96,15 +87,15 @@ static ADDRESS_MAP_START( amspdwy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xac00, 0xac00) AM_READ(amspdwy_wheel_1_r)							// Player 2
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP										// ? Exiting IRQ
 	AM_RANGE(0xb400, 0xb400) AM_DEVREAD("ymsnd", amspdwy_sound_r) AM_WRITE(amspdwy_sound_w)		// YM2151 status, To Sound CPU
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)// Sprites
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE_SIZE_MEMBER(amspdwy_state, spriteram, spriteram_size)// Sprites
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM												// Work RAM
 ADDRESS_MAP_END
 
 
 static READ8_HANDLER( amspdwy_port_r )
 {
-	UINT8 *Tracks = memory_region(space->machine, "maincpu")+0x10000;
-	return Tracks[offset];
+	UINT8 *tracks = memory_region(space->machine, "maincpu") + 0x10000;
+	return tracks[offset];
 }
 
 static ADDRESS_MAP_START( amspdwy_portmap, ADDRESS_SPACE_IO, 8 )
@@ -248,9 +239,10 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-static void irq_handler(const device_config *device, int irq)
+static void irq_handler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	amspdwy_state *state = (amspdwy_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface amspdwy_ym2151_interface =
@@ -260,13 +252,29 @@ static const ym2151_interface amspdwy_ym2151_interface =
 
 static MACHINE_START( amspdwy )
 {
-    wheel_old[0]    = wheel_old[1]    = 0;
-    wheel_return[0] = wheel_return[1] = 0;
-    state_save_register_global_array(machine, wheel_old);
-    state_save_register_global_array(machine, wheel_return);
+	amspdwy_state *state = (amspdwy_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->flipscreen);
+	state_save_register_global_array(machine, state->wheel_old);
+	state_save_register_global_array(machine, state->wheel_return);
+}
+
+static MACHINE_RESET( amspdwy )
+{
+	amspdwy_state *state = (amspdwy_state *)machine->driver_data;
+	state->flipscreen = 0;
+	state->wheel_old[0] = 0;
+	state->wheel_old[1] = 0;
+	state->wheel_return[0] = 0;
+	state->wheel_return[1] = 0;
 }
 
 static MACHINE_DRIVER_START( amspdwy )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(amspdwy_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,3000000)
@@ -277,7 +285,8 @@ static MACHINE_DRIVER_START( amspdwy )
 	MDRV_CPU_ADD("audiocpu", Z80,3000000)	/* Can't be disabled: the YM2151 timers must work */
 	MDRV_CPU_PROGRAM_MAP(amspdwy_sound_map)
 
-    MDRV_MACHINE_START(amspdwy)
+	MDRV_MACHINE_START(amspdwy)
+	MDRV_MACHINE_RESET(amspdwy)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -36,29 +36,21 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
+#include "includes/hnayayoi.h"
 
-
-VIDEO_START( hnayayoi );
-VIDEO_START( untoucha );
-VIDEO_UPDATE( hnayayoi );
-
-WRITE8_HANDLER( dynax_blitter_rev1_param_w );
-WRITE8_HANDLER( dynax_blitter_rev1_start_w );
-WRITE8_HANDLER( dynax_blitter_rev1_clear_w );
-WRITE8_HANDLER( hnayayoi_palbank_w );
-
-
-
-static int keyb;
 
 static READ8_HANDLER( keyboard_0_r )
 {
+	hnayayoi_state *state = (hnayayoi_state *)space->machine->driver_data;
 	int res = 0x3f;
 	int i;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 
-	for (i = 0;i < 5;i++)
-		if (~keyb & (1 << i)) res &= input_port_read(space->machine, keynames[i]);
+	for (i = 0; i < 5; i++)
+	{
+		if (~state->keyb & (1 << i)) 
+			res &= input_port_read(space->machine, keynames[i]);
+	}
 
 	return res;
 }
@@ -71,36 +63,30 @@ static READ8_HANDLER( keyboard_1_r )
 
 static WRITE8_HANDLER( keyboard_w )
 {
-	keyb = data;
+	hnayayoi_state *state = (hnayayoi_state *)space->machine->driver_data;
+	state->keyb = data;
 }
 
 
 static WRITE8_DEVICE_HANDLER( adpcm_data_w )
 {
-	msm5205_data_w(device,data);
+	msm5205_data_w(device, data);
 }
 
 static WRITE8_DEVICE_HANDLER( adpcm_vclk_w )
 {
-	msm5205_vclk_w(device,data & 1);
+	msm5205_vclk_w(device, data & 1);
 }
 
 static WRITE8_DEVICE_HANDLER( adpcm_reset_w )
 {
-	msm5205_reset_w(device,data & 1);
+	msm5205_reset_w(device, data & 1);
 }
 
 static WRITE8_DEVICE_HANDLER( adpcm_reset_inv_w )
 {
-	msm5205_reset_w(device,~data & 1);
+	msm5205_reset_w(device, ~data & 1);
 }
-
-static MACHINE_RESET( hnayayoi )
-{
-	/* start with the MSM5205 reset */
-	msm5205_reset_w(devtag_get_device(machine, "msm"),1);
-}
-
 
 
 static ADDRESS_MAP_START( hnayayoi_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -516,7 +502,7 @@ INPUT_PORTS_END
 static void irqhandler(const device_config *device, int irq)
 {
 	popmessage("irq");
-//  cputag_set_input_line(device->machine, "maincpu",0,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cputag_set_input_line(device->machine, "maincpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -541,7 +527,37 @@ static const msm5205_interface msm5205_config =
 
 
 
+static MACHINE_START( hnayayoi )
+{
+	hnayayoi_state *state = (hnayayoi_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->palbank);
+	state_save_register_global(machine, state->blit_layer);
+	state_save_register_global(machine, state->blit_dest);
+	state_save_register_global(machine, state->blit_src);
+	state_save_register_global(machine, state->keyb);
+}
+
+static MACHINE_RESET( hnayayoi )
+{
+	hnayayoi_state *state = (hnayayoi_state *)machine->driver_data;
+
+	/* start with the MSM5205 reset */
+	msm5205_reset_w(devtag_get_device(machine, "msm"), 1);
+
+	state->palbank = 0;
+	state->blit_layer = 0;
+	state->blit_dest = 0;
+	state->blit_src = 0;
+	state->keyb = 0;
+}
+
+
 static MACHINE_DRIVER_START( hnayayoi )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(hnayayoi_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 20000000/4 )        /* 5 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(hnayayoi_map)
@@ -549,6 +565,7 @@ static MACHINE_DRIVER_START( hnayayoi )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 8000)
 
+	MDRV_MACHINE_START(hnayayoi)
 	MDRV_MACHINE_RESET(hnayayoi)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -666,14 +683,14 @@ static DRIVER_INIT( hnfubuki )
 {
 	UINT8 *rom = memory_region(machine, "gfx1");
 	int len = memory_region_length(machine, "gfx1");
-	int i,j;
+	int i, j;
 
 	/* interestingly, the blitter data has a slight encryption */
 
 	/* swap address bits 4 and 5 */
-	for (i = 0;i < len;i += 0x40)
+	for (i = 0; i < len; i += 0x40)
 	{
-		for (j = 0;j < 0x10;j++)
+		for (j = 0; j < 0x10; j++)
 		{
 			UINT8 t = rom[i + j + 0x10];
 			rom[i + j + 0x10] = rom[i + j + 0x20];
@@ -682,13 +699,13 @@ static DRIVER_INIT( hnfubuki )
 	}
 
 	/* swap data bits 0 and 1 */
-	for (i = 0;i < len;i++)
+	for (i = 0; i < len; i++)
 	{
 		rom[i] = BITSWAP8(rom[i],7,6,5,4,3,2,0,1);
 	}
 }
 
 
-GAME( 1987, hnayayoi, 0,        hnayayoi, hnayayoi, 0,        ROT0, "Dyna Electronics", "Hana Yayoi (Japan)", 0 )
-GAME( 1987, hnfubuki, hnayayoi, hnfubuki, hnfubuki, hnfubuki, ROT0, "Dynax", "Hana Fubuki [BET] (Japan)", 0 )
-GAME( 1987, untoucha, 0,        untoucha, untoucha, 0,        ROT0, "Dynax", "Untouchable (Japan)", 0 )
+GAME( 1987, hnayayoi, 0,        hnayayoi, hnayayoi, 0,        ROT0, "Dyna Electronics", "Hana Yayoi (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, hnfubuki, hnayayoi, hnfubuki, hnfubuki, hnfubuki, ROT0, "Dynax", "Hana Fubuki [BET] (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, untoucha, 0,        untoucha, untoucha, 0,        ROT0, "Dynax", "Untouchable (Japan)", GAME_SUPPORTS_SAVE )

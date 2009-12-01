@@ -25,52 +25,27 @@ Notes:
 #include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
-
-
-
-extern UINT8 *gng_fgvideoram;
-extern UINT8 *gng_bgvideoram;
-WRITE8_HANDLER( gng_fgvideoram_w );
-WRITE8_HANDLER( gng_bgvideoram_w );
-WRITE8_HANDLER( gng_bgscrollx_w );
-WRITE8_HANDLER( gng_bgscrolly_w );
-WRITE8_HANDLER( gng_flipscreen_w );
-VIDEO_START( gng );
-VIDEO_UPDATE( gng );
-VIDEO_EOF( gng );
-
+#include "includes/gng.h"
 
 
 static WRITE8_HANDLER( gng_bankswitch_w )
 {
 	if (data == 4)
-	{
-		memory_set_bank(space->machine, 1,4);
-	}
+		memory_set_bank(space->machine, 1, 4);
 	else
-	{
-		memory_set_bank(space->machine, 1,(data & 0x03));
-	}
+		memory_set_bank(space->machine, 1, (data & 0x03));
 }
 
 static WRITE8_HANDLER( gng_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset,data);
-}
-
-static MACHINE_START( gng )
-{
-	/* configure ROM banking */
-	UINT8 *rombase = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1,0,4,&rombase[0x10000],0x2000);
-	memory_configure_bank(machine, 1,4,1,&rombase[0x4000],0x2000);
+	coin_counter_w(space->machine, offset, data);
 }
 
 static ADDRESS_MAP_START( gng_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1dff) AM_RAM
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(gng_fgvideoram_w) AM_BASE(&gng_fgvideoram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(gng_bgvideoram_w) AM_BASE(&gng_bgvideoram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(gng_fgvideoram_w) AM_BASE_MEMBER(gng_state, fgvideoram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(gng_bgvideoram_w) AM_BASE_MEMBER(gng_state, bgvideoram)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P1")
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P2")
@@ -326,7 +301,32 @@ GFXDECODE_END
 
 
 
+static MACHINE_START( gng )
+{
+	gng_state *state = (gng_state *)machine->driver_data;
+
+	UINT8 *rombase = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, 1, 0, 4, &rombase[0x10000], 0x2000);
+	memory_configure_bank(machine, 1, 4, 1, &rombase[0x4000], 0x2000);
+
+	state_save_register_global_array(machine, state->scrollx);
+	state_save_register_global_array(machine, state->scrolly);
+}
+
+static MACHINE_RESET( gng )
+{
+	gng_state *state = (gng_state *)machine->driver_data;
+
+	state->scrollx[0] = 0;
+	state->scrollx[1] = 0;
+	state->scrolly[0] = 0;
+	state->scrolly[1] = 0;
+}
+
 static MACHINE_DRIVER_START( gng )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(gng_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_12MHz/8)		/* verified on pcb */
@@ -338,6 +338,7 @@ static MACHINE_DRIVER_START( gng )
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	MDRV_MACHINE_START(gng)
+	MDRV_MACHINE_RESET(gng)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

@@ -14,23 +14,15 @@ Use Player 1 joystick and button, then press START1 to go to next screen.
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
-
-
-extern WRITE8_HANDLER( higemaru_videoram_w );
-extern WRITE8_HANDLER( higemaru_colorram_w );
-extern WRITE8_HANDLER( higemaru_c800_w );
-
-extern PALETTE_INIT( higemaru );
-extern VIDEO_START( higemaru );
-extern VIDEO_UPDATE( higemaru );
+#include "includes/higemaru.h"
 
 
 static INTERRUPT_GEN( higemaru_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
-		cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xcf);	/* RST 08h */
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
 	else
-		cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xd7);	/* RST 10h */
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h */
 }
 
 
@@ -44,9 +36,9 @@ static ADDRESS_MAP_START( higemaru_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(higemaru_c800_w)
 	AM_RANGE(0xc801, 0xc802) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0xc803, 0xc804) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(higemaru_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(higemaru_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0xd880, 0xd9ff) AM_RAM_WRITE(SMH_RAM) AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(higemaru_videoram_w) AM_BASE_MEMBER(higemaru_state, videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(higemaru_colorram_w) AM_BASE_MEMBER(higemaru_state, colorram)
+	AM_RANGE(0xd880, 0xd9ff) AM_RAM_WRITE(SMH_RAM) AM_BASE_SIZE_MEMBER(higemaru_state, spriteram, spriteram_size)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -165,6 +157,9 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( higemaru )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(higemaru_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)	/* 3 MHz Sharp LH0080A Z80A-CPU-D */
 	MDRV_CPU_PROGRAM_MAP(higemaru_map)
@@ -224,4 +219,4 @@ ROM_START( higemaru )
 ROM_END
 
 
-GAME( 1984, higemaru, 0, higemaru, higemaru, 0, ROT0, "Capcom", "Pirate Ship Higemaru", 0 )
+GAME( 1984, higemaru, 0, higemaru, higemaru, 0, ROT0, "Capcom", "Pirate Ship Higemaru", GAME_SUPPORTS_SAVE )

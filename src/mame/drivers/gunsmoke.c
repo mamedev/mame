@@ -70,18 +70,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/2203intf.h"
+#include "includes/gunsmoke.h"
 
-extern UINT8 *gunsmoke_scrollx;
-extern UINT8 *gunsmoke_scrolly;
-
-extern WRITE8_HANDLER( gunsmoke_c804_w );
-extern WRITE8_HANDLER( gunsmoke_d806_w );
-extern WRITE8_HANDLER( gunsmoke_videoram_w );
-extern WRITE8_HANDLER( gunsmoke_colorram_w );
-
-extern PALETTE_INIT( gunsmoke );
-extern VIDEO_START( gunsmoke );
-extern VIDEO_UPDATE( gunsmoke );
 
 /* Read/Write Handlers */
 
@@ -103,8 +93,7 @@ static READ8_HANDLER( gunsmoke_protection_r )
     */
 
 	static const UINT8 gunsmoke_fixed_data[] = { 0xff, 0x00, 0x00 };
-
-    return gunsmoke_fixed_data[offset];
+	return gunsmoke_fixed_data[offset];
 }
 
 /* Memory Maps */
@@ -121,13 +110,13 @@ static ADDRESS_MAP_START( gunsmoke_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(gunsmoke_c804_w)	// ROM bank switch, screen flip
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(gunsmoke_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(gunsmoke_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0xd800, 0xd801) AM_RAM AM_BASE(&gunsmoke_scrollx)
-	AM_RANGE(0xd802, 0xd802) AM_RAM AM_BASE(&gunsmoke_scrolly)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(gunsmoke_videoram_w) AM_BASE_MEMBER(gunsmoke_state, videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(gunsmoke_colorram_w) AM_BASE_MEMBER(gunsmoke_state, colorram)
+	AM_RANGE(0xd800, 0xd801) AM_RAM AM_BASE_MEMBER(gunsmoke_state, scrollx)
+	AM_RANGE(0xd802, 0xd802) AM_RAM AM_BASE_MEMBER(gunsmoke_state, scrolly)
 	AM_RANGE(0xd806, 0xd806) AM_WRITE(gunsmoke_d806_w)	// sprites and bg enable
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(gunsmoke_state, spriteram, spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -283,8 +272,35 @@ GFXDECODE_END
 
 /* Machine Driver */
 
+static MACHINE_START( gunsmoke )
+{
+	gunsmoke_state *state = (gunsmoke_state *)machine->driver_data;
+	UINT8 *rombase = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, 1, 0, 4, &rombase[0x10000], 0x4000);
+
+	state_save_register_global(machine, state->chon);
+	state_save_register_global(machine, state->objon);
+	state_save_register_global(machine, state->bgon);
+	state_save_register_global(machine, state->sprite3bank);
+}
+
+static MACHINE_RESET( gunsmoke )
+{
+	gunsmoke_state *state = (gunsmoke_state *)machine->driver_data;
+
+	state->chon = 0;
+	state->objon = 0;
+	state->bgon = 0;
+	state->sprite3bank = 0;
+}
+
 static MACHINE_DRIVER_START( gunsmoke )
-	// basic machine hardware
+
+	/* driver data */
+	MDRV_DRIVER_DATA(gunsmoke_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	// 4 MHz
 	MDRV_CPU_PROGRAM_MAP(gunsmoke_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -293,8 +309,10 @@ static MACHINE_DRIVER_START( gunsmoke )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
 
-	// video hardware
+	MDRV_MACHINE_START(gunsmoke)
+	MDRV_MACHINE_RESET(gunsmoke)
 
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -309,7 +327,7 @@ static MACHINE_DRIVER_START( gunsmoke )
 	MDRV_VIDEO_START(gunsmoke)
 	MDRV_VIDEO_UPDATE(gunsmoke)
 
-	// sound hardware
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM2203, 1500000)

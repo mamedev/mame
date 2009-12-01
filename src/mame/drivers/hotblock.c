@@ -45,28 +45,37 @@ so it could be by them instead
 #include "cpu/i86/i86.h"
 #include "sound/ay8910.h"
 
-static UINT8 *hotblock_ram;
-static UINT8 *hotblock_pal;
-static int hotblock_port0;
-static int hotblock_port4;
+typedef struct _hotblock_state hotblock_state;
+struct _hotblock_state
+{
+	/* memory pointers */
+	UINT8 *  vram;
+	UINT8 *  pal;
+
+	/* misc */
+	int      port0;
+	int      port4;
+};
+
+
 
 static READ8_HANDLER( hotblock_video_read )
 {
+	hotblock_state *state = (hotblock_state *)space->machine->driver_data;
 	/* right?, anything else?? */
-	if(hotblock_port0 &0x20) // port 0 = a8 e8 -- palette
+	if (state->port0 & 0x20) // port 0 = a8 e8 -- palette
 	{
-		return hotblock_pal[offset];
+		return state->pal[offset];
 	}
 	else // port 0 = 88 c8
 	{
-		return hotblock_ram[offset];
+		return state->vram[offset];
 	}
 }
 
 /* port 4 is some kind of eeprom / storage .. used to store the scores */
 static READ8_HANDLER( hotblock_port4_r )
 {
-
 //  mame_printf_debug("port4_r\n");
 	return 0x00;
 }
@@ -74,41 +83,44 @@ static READ8_HANDLER( hotblock_port4_r )
 
 static WRITE8_HANDLER( hotblock_port4_w )
 {
-//  mame_printf_debug("port4_w: pc = %06x : data %04x\n",cpu_get_pc(space->cpu),data);
-//  popmessage("port4_w: pc = %06x : data %04x",cpu_get_pc(space->cpu),data);
-	hotblock_port4=data;
+//  mame_printf_debug("port4_w: pc = %06x : data %04x\n", cpu_get_pc(space->cpu), data);
+//  popmessage("port4_w: pc = %06x : data %04x", cpu_get_pc(space->cpu), data);
+	hotblock_state *state = (hotblock_state *)space->machine->driver_data;
+	state->port4 = data;
 }
 
 
 
 static WRITE8_HANDLER( hotblock_port0_w )
 {
-//  popmessage("port4_w: pc = %06x : data %04x",cpu_get_pc(space->cpu),data);
-	hotblock_port0=data;
+//  popmessage("port4_w: pc = %06x : data %04x", cpu_get_pc(space->cpu), data);
+	hotblock_state *state = (hotblock_state *)space->machine->driver_data;
+	state->port0 = data;
 }
 
 static WRITE8_HANDLER( hotblock_video_write )
 {
+	hotblock_state *state = (hotblock_state *)space->machine->driver_data;
 	/* right?, anything else?? */
-	if(hotblock_port0 &0x20) // port 0 = a8 e8 -- palette
+	if (state->port0 & 0x20) // port 0 = a8 e8 -- palette
 	{
-		hotblock_pal[offset]=data;
+		state->pal[offset] = data;
 	}
 	else // port 0 = 88 c8
 	{
-		hotblock_ram[offset]=data;
+		state->vram[offset] = data;
 	}
 }
 
 static ADDRESS_MAP_START( hotblock_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x10000, 0x1ffff) AM_READ(hotblock_video_read) AM_WRITE(hotblock_video_write) AM_BASE(&hotblock_ram)
+	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(hotblock_video_read, hotblock_video_write) AM_BASE_MEMBER(hotblock_state, vram)
 	AM_RANGE(0x20000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotblock_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(hotblock_port0_w)
-	AM_RANGE(0x0004, 0x0004) AM_READ(hotblock_port4_r) AM_WRITE(hotblock_port4_w)
+	AM_RANGE(0x0004, 0x0004) AM_READWRITE(hotblock_port4_r, hotblock_port4_w)
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("aysnd", ay8910_r)
 ADDRESS_MAP_END
@@ -117,41 +129,43 @@ ADDRESS_MAP_END
 
 static VIDEO_START(hotblock)
 {
-	hotblock_pal=auto_alloc_array(machine, UINT8, 0x10000);
+	hotblock_state *state = (hotblock_state *)machine->driver_data;
+	state->pal = auto_alloc_array(machine, UINT8, 0x10000);
+	state_save_register_global_pointer(machine, state->pal, 0x10000);
 }
 
 static VIDEO_UPDATE(hotblock)
 {
-
-	int y,x,count;
+	hotblock_state *state = (hotblock_state *)screen->machine->driver_data;
+	int y, x, count;
 	int i;
-	static const int xxx=320,yyy=204;
+	static const int xxx = 320, yyy = 204;
 
 	bitmap_fill(bitmap, 0, get_black_pen(screen->machine));
 
-	for (i=0;i<256;i++)
+	for (i = 0; i < 256; i++)
 	{
-		int dat=(hotblock_pal[i*2+1]<<8)|hotblock_pal[i*2];
-		palette_set_color_rgb(screen->machine,i,pal5bit(dat>>0),pal5bit(dat>>5),pal5bit(dat>>10));
+		int dat = (state->pal[i * 2 + 1] << 8) | state->pal[i * 2];
+		palette_set_color_rgb(screen->machine, i, pal5bit(dat >> 0), pal5bit(dat >> 5), pal5bit(dat >> 10));
 	}
 
-	count=0;
-	for (y=0;y<yyy;y++)
+	count = 0;
+	for (y = 0; y < yyy; y++)
 	{
-		for(x=0;x<xxx;x++)
+		for(x = 0; x < xxx; x++)
 		{
-			if(hotblock_port0&0x40) *BITMAP_ADDR16(bitmap, y, x) = hotblock_ram[count];
+			if (state->port0 & 0x40) 
+				*BITMAP_ADDR16(bitmap, y, x) = state->vram[count];
 			count++;
 		}
 	}
-
 
 	return 0;
 }
 
 
-static INPUT_PORTS_START(hotblock)
-	PORT_START("P1")	/* 8bit */
+static INPUT_PORTS_START( hotblock )
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
@@ -161,7 +175,7 @@ static INPUT_PORTS_START(hotblock)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // unused?
 
-	PORT_START("P2")	/* 8bit */
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
@@ -171,6 +185,7 @@ static INPUT_PORTS_START(hotblock)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // used to get test mode
 INPUT_PORTS_END
+
 
 static INTERRUPT_GEN( hotblocks_irq ) /* right? */
 {
@@ -189,6 +204,10 @@ static const ay8910_interface ay8910_config =
 
 
 static MACHINE_DRIVER_START( hotblock )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(hotblock_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8088, 10000000)
 	MDRV_CPU_PROGRAM_MAP(hotblock_map)

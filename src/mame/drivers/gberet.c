@@ -120,15 +120,12 @@ static WRITE8_HANDLER( gberet_flipscreen_w )
 
 static WRITE8_HANDLER( mrgoemon_coin_counter_w )
 {
-	int offs;
-
 	/* bits 0/1 = coin counters */
 	coin_counter_w(space->machine, 0, data & 0x01);
 	coin_counter_w(space->machine, 1, data & 0x02);
 
 	/* bits 5-7 = ROM bank select */
-	offs = 0x10000 + ((data & 0xe0) >> 5) * 0x800;
-	memory_set_bankptr(space->machine, 1, &memory_region(space->machine, "maincpu")[offs]);
+	memory_set_bank(space->machine, 1, ((data & 0xe0) >> 5));
 }
 
 static WRITE8_HANDLER( mrgoemon_flipscreen_w )
@@ -537,13 +534,26 @@ ROM_START( mrgoemon )
 	ROM_LOAD( "621a07.6f",    0x0120, 0x0100, CRC(3980acdc) SHA1(f4e0bd74bccd77b84096c38bc70cf488a42d9562) ) // sprites
 ROM_END
 
+
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
+
+static DRIVER_INIT( mrgoemon )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	memory_configure_bank(machine, 1, 0, 8, &ROM[0x10000], 0x800);
+}
+
 /*************************************
  *
  *  Game driver(s)
  *
  *************************************/
 
-GAME( 1985, gberet,   0,      gberet,   gberet,   0, ROT0, "Konami",  "Green Beret", GAME_SUPPORTS_SAVE )
-GAME( 1985, rushatck, gberet, gberet,   gberet,   0, ROT0, "Konami",  "Rush'n Attack (US)", GAME_SUPPORTS_SAVE )
-GAME( 1985, gberetb,  gberet, gberetb,  gberetb,  0, ROT0, "bootleg", "Green Beret (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1986, mrgoemon, 0,      mrgoemon, mrgoemon, 0, ROT0, "Konami",  "Mr. Goemon (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1985, gberet,   0,      gberet,   gberet,   0,        ROT0, "Konami",  "Green Beret", GAME_SUPPORTS_SAVE )
+GAME( 1985, rushatck, gberet, gberet,   gberet,   0,        ROT0, "Konami",  "Rush'n Attack (US)", GAME_SUPPORTS_SAVE )
+GAME( 1985, gberetb,  gberet, gberetb,  gberetb,  0,        ROT0, "bootleg", "Green Beret (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, mrgoemon, 0,      mrgoemon, mrgoemon, mrgoemon, ROT0, "Konami",  "Mr. Goemon (Japan)", GAME_SUPPORTS_SAVE )

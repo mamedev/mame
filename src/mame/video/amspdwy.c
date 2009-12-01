@@ -11,25 +11,23 @@
     - 64 (32?) Sprites
 
 ***************************************************************************/
+
 #include "driver.h"
-
-/* Variables only used here: */
-
-static tilemap *bg_tilemap;
+#include "includes/amspdwy.h"
 
 
 WRITE8_HANDLER( amspdwy_paletteram_w )
 {
 	data ^= 0xff;
-	paletteram_BBGGGRRR_w(space,offset,data);
-//  paletteram_RRRGGGBB_w(offset,data);
+	paletteram_BBGGGRRR_w(space, offset, data);
+//  paletteram_RRRGGGBB_w(offset, data);
 }
 
 WRITE8_HANDLER( amspdwy_flipscreen_w )
 {
-	static int flip = 0;
-	flip ^= 1;
-	flip_screen_set(space->machine,  flip );
+	amspdwy_state *state = (amspdwy_state *)space->machine->driver_data;
+	state->flipscreen ^= 1;
+	flip_screen_set(space->machine, state->flipscreen);
 }
 
 /***************************************************************************
@@ -47,8 +45,9 @@ WRITE8_HANDLER( amspdwy_flipscreen_w )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	UINT8 code	=	machine->generic.videoram.u8[ tile_index ];
-	UINT8 color	=	machine->generic.colorram.u8[ tile_index ];
+	amspdwy_state *state = (amspdwy_state *)machine->driver_data;
+	UINT8 code = state->videoram[tile_index];
+	UINT8 color = state->colorram[tile_index];
 	SET_TILE_INFO(
 			0,
 			code + ((color & 0x18)<<5),
@@ -58,28 +57,30 @@ static TILE_GET_INFO( get_tile_info )
 
 WRITE8_HANDLER( amspdwy_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	amspdwy_state *state = (amspdwy_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( amspdwy_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	amspdwy_state *state = (amspdwy_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
 /* logical (col,row) -> memory offset */
 static TILEMAP_MAPPER( tilemap_scan_cols_back )
 {
-	return col*num_rows + (num_rows - row - 1);
+	return col * num_rows + (num_rows - row - 1);
 }
 
 
 VIDEO_START( amspdwy )
 {
-	bg_tilemap	=	tilemap_create(	machine, get_tile_info,	tilemap_scan_cols_back,
-									8,8,	0x20, 0x20 );
+	amspdwy_state *state = (amspdwy_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols_back, 8, 8, 0x20, 0x20);
 }
 
 
@@ -102,26 +103,29 @@ Offset:     Format:     Value:
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	amspdwy_state *state = (amspdwy_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
 	int i;
 	int max_x = video_screen_get_width(machine->primary_screen)  - 1;
 	int max_y = video_screen_get_height(machine->primary_screen) - 1;
 
-	for (i = 0; i < machine->generic.spriteram_size ; i += 4)
+	for (i = 0; i < state->spriteram_size ; i += 4)
 	{
-		int y		=	spriteram[i+0];
-		int x		=	spriteram[i+1];
-		int code	=	spriteram[i+2];
-		int attr	=	spriteram[i+3];
-		int flipx	=	attr & 0x80;
-		int flipy	=	attr & 0x40;
+		int y = spriteram[i + 0];
+		int x = spriteram[i + 1];
+		int code = spriteram[i + 2];
+		int attr = spriteram[i + 3];
+		int flipx = attr & 0x80;
+		int flipy = attr & 0x40;
 
 		if (flip_screen_get(machine))
 		{
-			x = max_x - x - 8;	y = max_y - y - 8;
-			flipx = !flipx;	flipy = !flipy;
+			x = max_x - x - 8;	
+			y = max_y - y - 8;
+			flipx = !flipx;	
+			flipy = !flipy;
 		}
 
 		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
@@ -144,7 +148,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( amspdwy )
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect);
+	amspdwy_state *state = (amspdwy_state *)screen->machine->driver_data;
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
