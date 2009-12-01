@@ -5,10 +5,11 @@ Kusayakyuu (Sandlot Baseball)
 driver by Tomasz Slanina
 
 TODO:
-- correct communication between main and the sound cpu
-- DAC
-- sprite glitches (sometimes) .. missing vertical flip flag?
-- sound cpu int freq (timer ? $a008/$a010 writes ?)
+- sprite glitches (sometimes) .. missing vertical flip flag? <- (*)
+- sound cpu int freq (timer ? $a010 writes ?)
+
+(*) this looks a BTANB, when the player slide the relative sand drawing is made with the text tilemap and it's virtually impossible
+to fix it without breaking anything else. -AS
 
 M6100097A
 
@@ -64,9 +65,10 @@ SRAM:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+
+#define MAIN_CLOCK XTAL_18_432MHz
 
 WRITE8_HANDLER( ksayakyu_videoram_w );
 WRITE8_HANDLER( ksayakyu_videoctrl_w );
@@ -102,11 +104,12 @@ static READ8_HANDLER (sound_status_r)
 static WRITE8_HANDLER(tomaincpu_w)
 {
 	sound_status|=0x80;
+	soundlatch_w(space,0,data);
 }
 
 static ADDRESS_MAP_START( maincpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK(1), SMH_NOP)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P1")
@@ -127,10 +130,10 @@ static ADDRESS_MAP_START( soundcpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay1", ay8910_r)
 	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ay1", ay8910_data_address_w)
-	AM_RANGE(0xa006, 0xa006) AM_DEVWRITE("ay2", ay8910_data_address_w)
-	AM_RANGE(0xa008, 0xa008) AM_WRITENOP
+	AM_RANGE(0xa006, 0xa007) AM_DEVWRITE("ay2", ay8910_data_address_w)
+	AM_RANGE(0xa008, 0xa008) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0xa00c, 0xa00c) AM_WRITE(tomaincpu_w)
-	AM_RANGE(0xa010, 0xa010) AM_WRITENOP
+	AM_RANGE(0xa010, 0xa010) AM_WRITENOP //a timer of some sort?
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ksayakyu )
@@ -171,10 +174,21 @@ static INPUT_PORTS_START( ksayakyu )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
-static WRITE8_DEVICE_HANDLER(dummy_w)
+static WRITE8_DEVICE_HANDLER(dummy1_w)
 {
-	//DAC ? communication with main cpu ?
+//	printf("%02x 1\n",data);
 }
+
+static WRITE8_DEVICE_HANDLER(dummy2_w)
+{
+//	printf("%02x 2\n",data);
+}
+
+static WRITE8_DEVICE_HANDLER(dummy3_w)
+{
+//	printf("%02x 3\n",data);
+}
+
 
 static const ay8910_interface ay8910_interface_1 =
 {
@@ -183,7 +197,7 @@ static const ay8910_interface ay8910_interface_1 =
 	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(dummy_w)
+	DEVCB_HANDLER(dummy1_w)
 };
 
 static const ay8910_interface ay8910_interface_2 =
@@ -192,8 +206,8 @@ static const ay8910_interface ay8910_interface_2 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(dummy_w),
-	DEVCB_HANDLER(dummy_w)
+	DEVCB_HANDLER(dummy2_w),
+	DEVCB_HANDLER(dummy3_w)
 };
 
 static const gfx_layout charlayout =
@@ -202,7 +216,7 @@ static const gfx_layout charlayout =
 	RGN_FRAC(1,3),
 	3,
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
-	{ 0,1,2,3, 4,5,6,7 },
+	{ 0,1,2,3,4,5,6,7 },
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
 	8*8
 };
@@ -214,7 +228,7 @@ static const gfx_layout charlayout2 =
 	RGN_FRAC(1,2),
 	2,
 	{ RGN_FRAC(0,2), RGN_FRAC(1,2)},
-	{ 0,1,2,3, 4,5,6,7 },
+	{ 0,1,2,3,4,5,6,7 },
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
 	8*8
 };
@@ -225,7 +239,7 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,3),
 	3,
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
-	{ 0, 1, 2, 3, 4,5, 6, 7,
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
 		8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
@@ -239,13 +253,13 @@ static GFXDECODE_START( ksayakyu )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( ksayakyu )
-	MDRV_CPU_ADD("maincpu", Z80,8000000/2)
+	MDRV_CPU_ADD("maincpu", Z80,MAIN_CLOCK/8) //divider is guessed
 	MDRV_CPU_PROGRAM_MAP(maincpu_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 8000000/2)
+	MDRV_CPU_ADD("audiocpu", Z80, MAIN_CLOCK/8) //divider is guessed, controls DAC tempo
 	MDRV_CPU_PROGRAM_MAP(soundcpu_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,60) //guess, controls music tempo
 
 	MDRV_QUANTUM_TIME(HZ(60000))
 
@@ -267,11 +281,11 @@ static MACHINE_DRIVER_START( ksayakyu )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 2000000)
+	MDRV_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/16) //unknown clock
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 2000000)
+	MDRV_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/16) //unknown clock
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -281,10 +295,9 @@ MACHINE_DRIVER_END
 
 ROM_START( ksayakyu )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-
 	ROM_LOAD( "1.3a", 0x00000, 0x4000, CRC(6607976d) SHA1(23b15cae04922e54faf35a5a499ba5064b18ed46) )
 	ROM_LOAD( "2.3b", 0x04000, 0x4000, CRC(a289de5c) SHA1(d3b14364ef77ca74ac79c5099cf0e8f3baa97612) )
-	ROM_RELOAD(               0x10000, 0x04000 )
+	ROM_RELOAD(       0x10000, 0x4000 )
 	ROM_LOAD( "4.3d", 0x08000, 0x2000, CRC(db0ca023) SHA1(1356fa0239209dea6a4ac0af177fe8be47f12cd0) )
 	ROM_LOAD( "3.3c", 0x14000, 0x4000, CRC(bb4104a5) SHA1(1f793c4431a3476eeb92556228bf855efb73fb83) )
 
@@ -321,4 +334,4 @@ static DRIVER_INIT( ksayakyu )
 	sound_status = 0xff;
 }
 
-GAME( 1985, ksayakyu, 0, ksayakyu, ksayakyu, ksayakyu, ORIENTATION_FLIP_Y, "Taito Corporation", "Kusayakyuu",GAME_IMPERFECT_SOUND )
+GAME( 1985, ksayakyu, 0, ksayakyu, ksayakyu, ksayakyu, ORIENTATION_FLIP_Y, "Taito Corporation", "Kusayakyuu",0 )
