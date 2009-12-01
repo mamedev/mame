@@ -7,13 +7,13 @@
 ***************************************************************************/
 
 #include "driver.h"
-
-static tilemap *background_layer,*text_layer;
-
+#include "includes/cabal.h"
 
 static TILE_GET_INFO( get_back_tile_info )
 {
-	int tile = machine->generic.videoram.u16[tile_index];
+	cabal_state *state = (cabal_state *)machine->driver_data;
+
+	int tile = state->videoram[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
@@ -27,7 +27,9 @@ static TILE_GET_INFO( get_back_tile_info )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	int tile = machine->generic.colorram.u16[tile_index];
+	cabal_state *state = (cabal_state *)machine->driver_data;
+
+	int tile = state->colorram[tile_index];
 	int color = (tile>>10);
 
 	tile &= 0x3ff;
@@ -42,11 +44,13 @@ static TILE_GET_INFO( get_text_tile_info )
 
 VIDEO_START( cabal )
 {
-	background_layer = tilemap_create(machine, get_back_tile_info,tilemap_scan_rows,16,16,16,16);
-	text_layer       = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,32,32);
+	cabal_state *state = (cabal_state *)machine->driver_data;
 
-	tilemap_set_transparent_pen(text_layer,3);
-	tilemap_set_transparent_pen(background_layer,15);
+	state->background_layer = tilemap_create(machine, get_back_tile_info,tilemap_scan_rows,16,16,16,16);
+	state->text_layer       = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,32,32);
+
+	tilemap_set_transparent_pen(state->text_layer,3);
+	tilemap_set_transparent_pen(state->background_layer,15);
 }
 
 
@@ -56,9 +60,10 @@ WRITE16_HANDLER( cabal_flipscreen_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
+		cabal_state *state = (cabal_state *)space->machine->driver_data;
 		int flip = (data & 0x20) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
-		tilemap_set_flip(background_layer,flip);
-		tilemap_set_flip(text_layer,flip);
+		tilemap_set_flip(state->background_layer,flip);
+		tilemap_set_flip(state->text_layer,flip);
 
 		flip_screen_set(space->machine, data & 0x20);
 	}
@@ -66,14 +71,16 @@ WRITE16_HANDLER( cabal_flipscreen_w )
 
 WRITE16_HANDLER( cabal_background_videoram16_w )
 {
-	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
-	tilemap_mark_tile_dirty(background_layer,offset);
+	cabal_state *state = (cabal_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->videoram[offset]);
+	tilemap_mark_tile_dirty(state->background_layer,offset);
 }
 
 WRITE16_HANDLER( cabal_text_videoram16_w )
 {
-	COMBINE_DATA(&space->machine->generic.colorram.u16[offset]);
-	tilemap_mark_tile_dirty(text_layer,offset);
+	cabal_state *state = (cabal_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->colorram[offset]);
+	tilemap_mark_tile_dirty(state->text_layer,offset);
 }
 
 
@@ -100,10 +107,11 @@ WRITE16_HANDLER( cabal_text_videoram16_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	cabal_state *state = (cabal_state *)machine->driver_data;
 	int offs,data0,data1,data2;
+	UINT16 *spriteram16 = state->spriteram;
 
-	for( offs = machine->generic.spriteram_size/2 - 4; offs >= 0; offs -= 4 )
+	for( offs = state->spriteram_size/2 - 4; offs >= 0; offs -= 4 )
 	{
 		data0 = spriteram16[offs];
 		data1 = spriteram16[offs+1];
@@ -140,9 +148,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( cabal )
 {
-	tilemap_draw(bitmap,cliprect,background_layer,TILEMAP_DRAW_OPAQUE,0);
+	cabal_state *state = (cabal_state *)screen->machine->driver_data;
+	tilemap_draw(bitmap,cliprect,state->background_layer,TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(screen->machine,bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,text_layer,0,0);
+	tilemap_draw(bitmap,cliprect,state->text_layer,0,0);
 	return 0;
 }
 

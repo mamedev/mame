@@ -8,13 +8,7 @@
 
 #include "driver.h"
 #include "includes/mappy.h"
-
-UINT8 *toypop_videoram;
-
-static tilemap *bg_tilemap;
-UINT16 *toypop_bg_image;
-static int bitmapflip,palettebank;
-
+#include "includes/toypop.h"
 
 /***************************************************************************
 
@@ -102,11 +96,12 @@ static TILEMAP_MAPPER( tilemap_scan )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	UINT8 attr = toypop_videoram[tile_index + 0x400];
+	toypop_state *state = (toypop_state *)machine->driver_data;
+	UINT8 attr = state->videoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			0,
-			toypop_videoram[tile_index],
-			(attr & 0x3f) + 0x40 * palettebank,
+			state->videoram[tile_index],
+			(attr & 0x3f) + 0x40 * state->palettebank,
 			0);
 }
 
@@ -120,9 +115,10 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( toypop )
 {
-	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan,8,8,36,28);
+	toypop_state *state = (toypop_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine,get_tile_info,tilemap_scan,8,8,36,28);
 
-	tilemap_set_transparent_pen(bg_tilemap, 0);
+	tilemap_set_transparent_pen(state->bg_tilemap, 0);
 }
 
 
@@ -135,51 +131,58 @@ VIDEO_START( toypop )
 
 WRITE8_HANDLER( toypop_videoram_w )
 {
-	toypop_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
+	toypop_state *state = (toypop_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( toypop_palettebank_w )
 {
-	if (palettebank != (offset & 1))
+	toypop_state *state = (toypop_state *)space->machine->driver_data;
+	if (state->palettebank != (offset & 1))
 	{
-		palettebank = offset & 1;
+		state->palettebank = offset & 1;
 		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 
 WRITE16_HANDLER( toypop_flipscreen_w )
 {
-	bitmapflip = offset & 1;
+	toypop_state *state = (toypop_state *)space->machine->driver_data;
+	state->bitmapflip = offset & 1;
 }
 
 READ16_HANDLER( toypop_merged_background_r )
 {
+	toypop_state *state = (toypop_state *)space->machine->driver_data;
 	int data1, data2;
 
 	// 0x0a0b0c0d is read as 0xabcd
-	data1 = toypop_bg_image[2*offset];
-	data2 = toypop_bg_image[2*offset + 1];
+	data1 = state->bg_image[2*offset];
+	data2 = state->bg_image[2*offset + 1];
 	return ((data1 & 0xf00) << 4) | ((data1 & 0xf) << 8) | ((data2 & 0xf00) >> 4) | (data2 & 0xf);
 }
 
 WRITE16_HANDLER( toypop_merged_background_w )
 {
+	toypop_state *state = (toypop_state *)space->machine->driver_data;
+
 	// 0xabcd is written as 0x0a0b0c0d in the background image
 	if (ACCESSING_BITS_8_15)
-		toypop_bg_image[2*offset] = ((data & 0xf00) >> 8) | ((data & 0xf000) >> 4);
+		state->bg_image[2*offset] = ((data & 0xf00) >> 8) | ((data & 0xf000) >> 4);
 
 	if (ACCESSING_BITS_0_7)
-		toypop_bg_image[2*offset+1] = (data & 0xf) | ((data & 0xf0) << 4);
+		state->bg_image[2*offset+1] = (data & 0xf) | ((data & 0xf0) << 4);
 }
 
-static void draw_background(bitmap_t *bitmap)
+static void draw_background(running_machine *machine, bitmap_t *bitmap)
 {
+	toypop_state *state = (toypop_state *)machine->driver_data;
 	int offs, x, y;
-	pen_t pen_base = 0x300 + 0x10*palettebank;
+	pen_t pen_base = 0x300 + 0x10*state->palettebank;
 
 	// copy the background image from RAM (0x190200-0x19FDFF) to bitmap
-	if (bitmapflip)
+	if (state->bitmapflip)
 	{
 		offs = 0xFDFE/2;
 		for (y = 0; y < 224; y++)
@@ -187,7 +190,7 @@ static void draw_background(bitmap_t *bitmap)
 			UINT16 *scanline = BITMAP_ADDR16(bitmap, y, 0);
 			for (x = 0; x < 288; x+=2)
 			{
-				UINT16 data = toypop_bg_image[offs];
+				UINT16 data = state->bg_image[offs];
 				scanline[x]   = pen_base | (data & 0x0f);
 				scanline[x+1] = pen_base | (data >> 8);
 				offs--;
@@ -202,7 +205,7 @@ static void draw_background(bitmap_t *bitmap)
 			UINT16 *scanline = BITMAP_ADDR16(bitmap, y, 0);
 			for (x = 0; x < 288; x+=2)
 			{
-				UINT16 data = toypop_bg_image[offs];
+				UINT16 data = state->bg_image[offs];
 				scanline[x]   = pen_base | (data >> 8);
 				scanline[x+1] = pen_base | (data & 0x0f);
 				offs++;
@@ -222,8 +225,9 @@ static void draw_background(bitmap_t *bitmap)
 
 VIDEO_UPDATE( toypop )
 {
-	draw_background(bitmap);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	mappy_draw_sprites(screen->machine, bitmap, cliprect, -31, -8, 0xff);
+	toypop_state *state = (toypop_state *)screen->machine->driver_data;
+	draw_background(screen->machine, bitmap);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
+	mappy_draw_sprites(screen->machine, bitmap, cliprect, state->spriteram, -31, -8, 0xff);
 	return 0;
 }

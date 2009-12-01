@@ -34,21 +34,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "machine/namcoio.h"
 #include "sound/namco.h"
-#include "includes/mappy.h"
-
-
-// video\toypop.c
-extern UINT16 *toypop_bg_image;
-extern UINT8 *toypop_videoram;
-WRITE8_HANDLER( toypop_videoram_w );
-READ16_HANDLER( toypop_merged_background_r );
-WRITE16_HANDLER( toypop_merged_background_w );
-WRITE8_HANDLER( toypop_palettebank_w );
-WRITE16_HANDLER( toypop_flipscreen_w );
-VIDEO_START( toypop );
-VIDEO_UPDATE( toypop );
-PALETTE_INIT( toypop );
-
+#include "includes/toypop.h"
 
 
 /***************************************************************************
@@ -126,10 +112,6 @@ static DRIVER_INIT( 58_56_56 )
 /***************************************************************************/
 
 
-static int interrupt_enable_68k;
-static UINT8 *toypop_m68000_sharedram;
-
-
 static READ8_DEVICE_HANDLER( toypop_sound_sharedram_r )
 {
 	return namco_soundregs[offset];
@@ -145,13 +127,17 @@ static WRITE8_DEVICE_HANDLER( toypop_sound_sharedram_w )
 
 static READ16_HANDLER( toypop_m68000_sharedram_r )
 {
-	return toypop_m68000_sharedram[offset];
+	toypop_state *state = (toypop_state *)space->machine->driver_data;
+	return state->m68000_sharedram[offset];
 }
 
 static WRITE16_HANDLER( toypop_m68000_sharedram_w )
 {
 	if (ACCESSING_BITS_0_7)
-		toypop_m68000_sharedram[offset] = data & 0xff;
+	{
+		toypop_state *state = (toypop_state *)space->machine->driver_data;
+		state->m68000_sharedram[offset] = data & 0xff;
+	}
 }
 
 static READ8_HANDLER( toypop_main_interrupt_enable_r )
@@ -214,11 +200,12 @@ static WRITE8_HANDLER( toypop_m68000_assert_w )
 
 static TIMER_CALLBACK( disable_interrupts )
 {
+	toypop_state *state = (toypop_state *)machine->driver_data;
 	cpu_interrupt_enable(cputag_get_cpu(machine, "maincpu"), 0);
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	cpu_interrupt_enable(cputag_get_cpu(machine, "audiocpu"), 0);
 	cputag_set_input_line(machine, "audiocpu", 0, CLEAR_LINE);
-	interrupt_enable_68k = 0;
+	state->interrupt_enable_68k = 0;
 }
 
 static MACHINE_RESET( toypop )
@@ -230,18 +217,21 @@ static MACHINE_RESET( toypop )
 
 static INTERRUPT_GEN( toypop_m68000_interrupt )
 {
-	if (interrupt_enable_68k)
+	toypop_state *state = (toypop_state *)device->machine->driver_data;
+	if (state->interrupt_enable_68k)
 		cpu_set_input_line(device, 6, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( toypop_m68000_interrupt_enable_w )
 {
-	interrupt_enable_68k = 1;
+	toypop_state *state = (toypop_state *)space->machine->driver_data;
+	state->interrupt_enable_68k = 1;
 }
 
 static WRITE16_HANDLER( toypop_m68000_interrupt_disable_w )
 {
-	interrupt_enable_68k = 0;
+	toypop_state *state = (toypop_state *)space->machine->driver_data;
+	state->interrupt_enable_68k = 0;
 }
 
 
@@ -253,9 +243,9 @@ static WRITE16_HANDLER( toypop_m68000_interrupt_disable_w )
  *************************************/
 
 static ADDRESS_MAP_START( liblrabl_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_BASE(&toypop_videoram)	/* video RAM */
-	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_BASE(&mappy_spriteram)										/* general RAM, area 1 */
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(&toypop_m68000_sharedram)		/* shared RAM with the 68000 CPU */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_BASE_MEMBER(toypop_state,videoram)	/* video RAM */
+	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_BASE_MEMBER(toypop_state,spriteram)										/* general RAM, area 1 */
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_MEMBER(toypop_state,m68000_sharedram)		/* shared RAM with the 68000 CPU */
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("namco", toypop_sound_sharedram_r, toypop_sound_sharedram_w) /* shared RAM with sound CPU */
 	AM_RANGE(0x6800, 0x683f) AM_READWRITE(namcoio_r, namcoio_w)				/* custom I/O */
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(toypop_main_interrupt_enable_w)		/* enable interrupt */
@@ -269,9 +259,9 @@ static ADDRESS_MAP_START( liblrabl_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( toypop_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_BASE(&toypop_videoram)	/* video RAM */
-	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_BASE(&mappy_spriteram)										/* general RAM, area 1 */
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(&toypop_m68000_sharedram)		/* shared RAM with the 68000 CPU */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_BASE_MEMBER(toypop_state,videoram)	/* video RAM */
+	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_BASE_MEMBER(toypop_state,spriteram)										/* general RAM, area 1 */
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_MEMBER(toypop_state,m68000_sharedram)		/* shared RAM with the 68000 CPU */
 	AM_RANGE(0x6000, 0x603f) AM_READWRITE(namcoio_r, namcoio_w)				/* custom I/O */
 	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE("namco", toypop_sound_sharedram_r, toypop_sound_sharedram_w) /* shared RAM with sound CPU */
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(toypop_main_interrupt_enable_r, toypop_main_interrupt_disable_w) /* disable interrupt */
@@ -312,7 +302,7 @@ static ADDRESS_MAP_START( m68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(toypop_m68000_sharedram_r, toypop_m68000_sharedram_w)	/* shared RAM with the main CPU */
 	AM_RANGE(0x180000, 0x187fff) AM_READWRITE(toypop_merged_background_r, toypop_merged_background_w) /* RAM that has to be merged with the background image */
 	AM_RANGE(0x18fffc, 0x18ffff) AM_WRITE(toypop_flipscreen_w)				/* flip mode */
-	AM_RANGE(0x190000, 0x1dffff) AM_RAM AM_BASE(&toypop_bg_image)			/* RAM containing the background image */
+	AM_RANGE(0x190000, 0x1dffff) AM_RAM AM_BASE_MEMBER(toypop_state,bg_image)			/* RAM containing the background image */
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(toypop_m68000_interrupt_enable_w)	/* interrupt enable */
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(toypop_m68000_interrupt_disable_w)/* interrupt disable */
 ADDRESS_MAP_END
@@ -539,6 +529,8 @@ static const namco_interface namco_config =
 
 
 static MACHINE_DRIVER_START( liblrabl )
+
+	MDRV_DRIVER_DATA(toypop_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1536000)	/* 1.536 MHz (measured on Libble Rabble board) */

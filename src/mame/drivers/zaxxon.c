@@ -306,12 +306,12 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "sound/sn76496.h"
+#include "sound/samples.h"
 #include "machine/segacrpt.h"
 #include "machine/8255ppi.h"
 #include "audio/segasnd.h"
-#include "sound/sn76496.h"
-#include "sound/samples.h"
-#include "zaxxon.h"
+#include "includes/zaxxon.h"
 
 
 
@@ -338,21 +338,6 @@
 
 /*************************************
  *
- *  Global variables
- *
- *************************************/
-
-static UINT8 int_enabled;
-static UINT8 coin_status[3];
-static UINT8 coin_enable[3];
-
-static UINT8 razmataz_dial_pos[2];
-static UINT16 razmataz_counter;
-
-
-
-/*************************************
- *
  *  Interrupt generation
  *
  *************************************/
@@ -367,15 +352,19 @@ static INPUT_CHANGED( service_switch )
 
 static INTERRUPT_GEN( vblank_int )
 {
-	if (int_enabled)
+	zaxxon_state *state = (zaxxon_state *)device->machine->driver_data;
+
+	if (state->int_enabled)
 		cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( int_enable_w )
 {
-	int_enabled = data & 1;
-	if (!int_enabled)
+	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+
+	state->int_enabled = data & 1;
+	if (!state->int_enabled)
 		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
@@ -389,10 +378,12 @@ static WRITE8_HANDLER( int_enable_w )
 
 static MACHINE_START( zaxxon )
 {
+	zaxxon_state *state = (zaxxon_state *)machine->driver_data;
+
 	/* register for save states */
-	state_save_register_global(machine, int_enabled);
-	state_save_register_global_array(machine, coin_status);
-	state_save_register_global_array(machine, coin_enable);
+	state_save_register_global(machine, state->int_enabled);
+	state_save_register_global_array(machine, state->coin_status);
+	state_save_register_global_array(machine, state->coin_enable);
 }
 
 
@@ -412,16 +403,19 @@ static MACHINE_RESET( razmataz )
 
 static READ8_HANDLER( razmataz_counter_r )
 {
+	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+
 	/* this behavior is really unknown; however, the code is using this */
 	/* counter as a sort of timeout when talking to the sound board */
 	/* it needs to be increasing at a reasonable rate but not too fast */
 	/* or else the sound will mess up */
-	return razmataz_counter++ >> 8;
+	return state->razmataz_counter++ >> 8;
 }
 
 
 static CUSTOM_INPUT( razmataz_dial_r )
 {
+	zaxxon_state *state = (zaxxon_state *)field->port->machine->driver_data;
 	static const char *const dialname[2] = { "DIAL0", "DIAL1" };
 	int num = (FPTR)param;
 	int delta, res;
@@ -431,14 +425,14 @@ static CUSTOM_INPUT( razmataz_dial_r )
 	if (delta < 0x80)
 	{
 		// right
-		razmataz_dial_pos[num] -= delta;
-		res = (razmataz_dial_pos[num] << 1) | 1;
+		state->razmataz_dial_pos[num] -= delta;
+		res = (state->razmataz_dial_pos[num] << 1) | 1;
 	}
 	else
 	{
 		// left
-		razmataz_dial_pos[num] += delta;
-		res = (razmataz_dial_pos[num] << 1);
+		state->razmataz_dial_pos[num] += delta;
+		res = (state->razmataz_dial_pos[num] << 1);
 	}
 
 	return res;
@@ -462,22 +456,30 @@ static WRITE8_HANDLER( zaxxon_coin_counter_w )
 // the coin input, which then needs to be explicitly cleared by the game.
 static WRITE8_HANDLER( zaxxon_coin_enable_w )
 {
-	coin_enable[offset] = data & 1;
-	if (!coin_enable[offset])
-		coin_status[offset] = 0;
+	zaxxon_state *state = (zaxxon_state *)space->machine->driver_data;
+
+	state->coin_enable[offset] = data & 1;
+	if (!state->coin_enable[offset])
+		state->coin_status[offset] = 0;
 }
 
 
 static INPUT_CHANGED( zaxxon_coin_inserted )
 {
 	if (newval)
-		coin_status[(int)(FPTR)param] = coin_enable[(int)(FPTR)param];
+	{
+		zaxxon_state *state = (zaxxon_state *)field->port->machine->driver_data;
+
+		state->coin_status[(int)(FPTR)param] = state->coin_enable[(int)(FPTR)param];
+	}
 }
 
 
 static CUSTOM_INPUT( zaxxon_coin_r )
 {
-	return coin_status[(int)(FPTR)param];
+	zaxxon_state *state = (zaxxon_state *)field->port->machine->driver_data;
+
+	return state->coin_status[(int)(FPTR)param];
 }
 
 
@@ -492,8 +494,8 @@ static CUSTOM_INPUT( zaxxon_coin_r )
 static ADDRESS_MAP_START( zaxxon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x1f00) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE_MEMBER(zaxxon_state,videoram)
+	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x1f00) AM_RAM AM_BASE_MEMBER(zaxxon_state,spriteram)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x18fc) AM_READ_PORT("SW00")
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x18fc) AM_READ_PORT("SW01")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x18fc) AM_READ_PORT("DSW02")
@@ -515,8 +517,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( congo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x1800) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xa400, 0xa7ff) AM_MIRROR(0x1800) AM_RAM_WRITE(congo_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x1800) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE_MEMBER(zaxxon_state,videoram)
+	AM_RANGE(0xa400, 0xa7ff) AM_MIRROR(0x1800) AM_RAM_WRITE(congo_colorram_w) AM_BASE_MEMBER(zaxxon_state,colorram)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fc4) AM_READ_PORT("SW00")
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x1fc4) AM_READ_PORT("SW01")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x1fc4) AM_READ_PORT("DSW02")
@@ -983,6 +985,8 @@ GFXDECODE_END
  *************************************/
 
 static MACHINE_DRIVER_START( root )
+
+	MDRV_DRIVER_DATA(zaxxon_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/16)
@@ -1556,6 +1560,8 @@ static DRIVER_INIT( futspy )
 
 static DRIVER_INIT( razmataz )
 {
+	zaxxon_state *state = (zaxxon_state *)machine->driver_data;
+
 	nprinces_decode(machine, "maincpu");
 
 	/* additional input ports are wired */
@@ -1570,8 +1576,8 @@ static DRIVER_INIT( razmataz )
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r, sega_usb_data_w);
 
 	/* additional state saving */
-	state_save_register_global_array(machine, razmataz_dial_pos);
-	state_save_register_global(machine, razmataz_counter);
+	state_save_register_global_array(machine, state->razmataz_dial_pos);
+	state_save_register_global(machine, state->razmataz_counter);
 }
 
 

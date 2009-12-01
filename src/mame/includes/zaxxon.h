@@ -4,6 +4,36 @@
 
 ***************************************************************************/
 
+typedef struct _zaxxon_state zaxxon_state;
+struct _zaxxon_state
+{
+	UINT8 *colorram;
+	UINT8 *videoram;
+	UINT8 *spriteram;
+
+	UINT8 int_enabled;
+	UINT8 coin_status[3];
+	UINT8 coin_enable[3];
+
+	UINT8 razmataz_dial_pos[2];
+	UINT16 razmataz_counter;
+
+	UINT8 sound_state[3];
+	UINT8 bg_enable;
+	UINT8 bg_color;
+	UINT16 bg_position;
+	UINT8 fg_color;
+
+	UINT8 congo_fg_bank;
+	UINT8 congo_color_bank;
+	UINT8 congo_custom[4];
+
+	const UINT8 *color_codes;
+	tilemap *fg_tilemap;
+	tilemap *bg_tilemap;
+};
+
+
 /*----------- defined in audio/zaxxon.c -----------*/
 
 WRITE8_DEVICE_HANDLER( zaxxon_sound_a_w );

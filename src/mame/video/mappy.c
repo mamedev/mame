@@ -3,15 +3,6 @@
 #include "includes/mappy.h"
 
 
-UINT8 *mappy_videoram;
-UINT8 *mappy_spriteram;
-
-static UINT8 mappy_scroll;
-static tilemap *bg_tilemap;
-
-static bitmap_t *sprite_bitmap;
-
-
 /***************************************************************************
 
   Convert the color PROMs.
@@ -279,36 +270,42 @@ static TILEMAP_MAPPER( mappy_tilemap_scan )
 
 static TILE_GET_INFO( superpac_get_tile_info )
 {
-	UINT8 attr = mappy_videoram[tile_index + 0x400];
+	mappy_state *state = (mappy_state *)machine->driver_data;
+	UINT8 attr = state->videoram[tile_index + 0x400];
+
 	tileinfo->category = (attr & 0x40) >> 6;
 	tileinfo->group = attr & 0x3f;
 	SET_TILE_INFO(
 			0,
-			mappy_videoram[tile_index],
+			state->videoram[tile_index],
 			attr & 0x3f,
 			0);
 }
 
 static TILE_GET_INFO( phozon_get_tile_info )
 {
-	UINT8 attr = mappy_videoram[tile_index + 0x400];
+	mappy_state *state = (mappy_state *)machine->driver_data;
+	UINT8 attr = state->videoram[tile_index + 0x400];
+
 	tileinfo->category = (attr & 0x40) >> 6;
 	tileinfo->group = attr & 0x3f;
 	SET_TILE_INFO(
 			0,
-			mappy_videoram[tile_index] + ((attr & 0x80) << 1),
+			state->videoram[tile_index] + ((attr & 0x80) << 1),
 			attr & 0x3f,
 			0);
 }
 
 static TILE_GET_INFO( mappy_get_tile_info )
 {
-	UINT8 attr = mappy_videoram[tile_index + 0x800];
+	mappy_state *state = (mappy_state *)machine->driver_data;
+	UINT8 attr = state->videoram[tile_index + 0x800];
+
 	tileinfo->category = (attr & 0x40) >> 6;
 	tileinfo->group = attr & 0x3f;
 	SET_TILE_INFO(
 			0,
-			mappy_videoram[tile_index],
+			state->videoram[tile_index],
 			attr & 0x3f,
 			0);
 }
@@ -323,27 +320,33 @@ static TILE_GET_INFO( mappy_get_tile_info )
 
 VIDEO_START( superpac )
 {
-	bg_tilemap = tilemap_create(machine, superpac_get_tile_info,superpac_tilemap_scan,8,8,36,28);
-	sprite_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	mappy_state *state = (mappy_state *)machine->driver_data;
 
-	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[0], 31);
+	state->bg_tilemap = tilemap_create(machine, superpac_get_tile_info,superpac_tilemap_scan,8,8,36,28);
+	state->sprite_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+
+	colortable_configure_tilemap_groups(machine->colortable, state->bg_tilemap, machine->gfx[0], 31);
 }
 
 VIDEO_START( phozon )
 {
-	bg_tilemap = tilemap_create(machine, phozon_get_tile_info,superpac_tilemap_scan,8,8,36,28);
+	mappy_state *state = (mappy_state *)machine->driver_data;
 
-	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[0], 15);
+	state->bg_tilemap = tilemap_create(machine, phozon_get_tile_info,superpac_tilemap_scan,8,8,36,28);
 
-	state_save_register_global(machine, mappy_scroll);
+	colortable_configure_tilemap_groups(machine->colortable, state->bg_tilemap, machine->gfx[0], 15);
+
+	state_save_register_global(machine, state->scroll);
 }
 
 VIDEO_START( mappy )
 {
-	bg_tilemap = tilemap_create(machine, mappy_get_tile_info,mappy_tilemap_scan,8,8,36,60);
+	mappy_state *state = (mappy_state *)machine->driver_data;
 
-	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[0], 31);
-	tilemap_set_scroll_cols(bg_tilemap, 36);
+	state->bg_tilemap = tilemap_create(machine, mappy_get_tile_info,mappy_tilemap_scan,8,8,36,60);
+
+	colortable_configure_tilemap_groups(machine->colortable, state->bg_tilemap, machine->gfx[0], 31);
+	tilemap_set_scroll_cols(state->bg_tilemap, 36);
 }
 
 
@@ -356,14 +359,18 @@ VIDEO_START( mappy )
 
 WRITE8_HANDLER( superpac_videoram_w )
 {
-	mappy_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x3ff);
+	mappy_state *state = (mappy_state *)space->machine->driver_data;
+
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x3ff);
 }
 
 WRITE8_HANDLER( mappy_videoram_w )
 {
-	mappy_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
+	mappy_state *state = (mappy_state *)space->machine->driver_data;
+
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x7ff);
 }
 
 WRITE8_HANDLER( superpac_flipscreen_w )
@@ -379,7 +386,9 @@ READ8_HANDLER( superpac_flipscreen_r )
 
 WRITE8_HANDLER( mappy_scroll_w )
 {
-	mappy_scroll = offset >> 3;
+	mappy_state *state = (mappy_state *)space->machine->driver_data;
+
+	state->scroll = offset >> 3;
 }
 
 
@@ -391,9 +400,9 @@ WRITE8_HANDLER( mappy_scroll_w )
 ***************************************************************************/
 
 /* also used by toypop.c */
-void mappy_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xoffs, int yoffs, int transcolor)
+void mappy_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *spriteram_base, int xoffs, int yoffs, int transcolor)
 {
-	UINT8 *spriteram = mappy_spriteram + 0x780;
+	UINT8 *spriteram = spriteram_base + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x800;
 	int offs;
@@ -469,9 +478,9 @@ spriteram_3
 1   -------x  X position MSB
 */
 
-static void phozon_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void phozon_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *spriteram_base )
 {
-	UINT8 *spriteram = mappy_spriteram + 0x780;
+	UINT8 *spriteram = spriteram_base + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x800;
 	int offs;
@@ -528,19 +537,21 @@ static void phozon_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 
 VIDEO_UPDATE( superpac )
 {
+	mappy_state *state = (mappy_state *)screen->machine->driver_data;
+	bitmap_t *sprite_bitmap = state->sprite_bitmap;
 	int x,y;
 
-	tilemap_set_scrolldx(bg_tilemap, 0, 96);
-	tilemap_set_scrolldy(bg_tilemap, 0, 0);
+	tilemap_set_scrolldx(state->bg_tilemap, 0, 96);
+	tilemap_set_scrolldy(state->bg_tilemap, 0, 0);
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
 	bitmap_fill(sprite_bitmap,cliprect,15);
-	mappy_draw_sprites(screen->machine,sprite_bitmap,cliprect,0,0,15);
+	mappy_draw_sprites(screen->machine,sprite_bitmap,cliprect,state->spriteram,0,0,15);
 	copybitmap_trans(bitmap,sprite_bitmap,0,0,0,0,cliprect,15);
 
 	/* Redraw the high priority characters */
-	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,1,0);
 
 	/* sprite color 0 still has priority over that (ghost eyes in Pac 'n Pal) */
 	for (y = 0;y < sprite_bitmap->height;y++)
@@ -556,36 +567,39 @@ VIDEO_UPDATE( superpac )
 
 VIDEO_UPDATE( phozon )
 {
+	mappy_state *state = (mappy_state *)screen->machine->driver_data;
+
 	/* flip screen control is embedded in RAM */
-	flip_screen_set(screen->machine, mappy_spriteram[0x1f7f-0x800] & 1);
+	flip_screen_set(screen->machine, state->spriteram[0x1f7f-0x800] & 1);
 
-	tilemap_set_scrolldx(bg_tilemap, 0, 96);
-	tilemap_set_scrolldy(bg_tilemap, 0, 0);
+	tilemap_set_scrolldx(state->bg_tilemap, 0, 96);
+	tilemap_set_scrolldy(state->bg_tilemap, 0, 0);
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
-	phozon_draw_sprites(screen->machine,bitmap,cliprect);
+	phozon_draw_sprites(screen->machine,bitmap,cliprect,state->spriteram);
 
 	/* Redraw the high priority characters */
-	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,1,0);
 	return 0;
 }
 
 VIDEO_UPDATE( mappy )
 {
+	mappy_state *state = (mappy_state *)screen->machine->driver_data;
 	int offs;
 
-	tilemap_set_scrolldx(bg_tilemap, 0, 96);
-	tilemap_set_scrolldy(bg_tilemap, 0, 0);
+	tilemap_set_scrolldx(state->bg_tilemap, 0, 96);
+	tilemap_set_scrolldy(state->bg_tilemap, 0, 0);
 
 	for (offs = 2;offs < 34;offs++)
-		tilemap_set_scrolly(bg_tilemap,offs,mappy_scroll);
+		tilemap_set_scrolly(state->bg_tilemap,offs,state->scroll);
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
-	mappy_draw_sprites(screen->machine,bitmap,cliprect,0,0,15);
+	mappy_draw_sprites(screen->machine,bitmap,cliprect,state->spriteram,0,0,15);
 
 	/* Redraw the high priority characters */
-	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,1,0);
 	return 0;
 }
