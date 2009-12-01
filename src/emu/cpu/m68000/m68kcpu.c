@@ -561,6 +561,7 @@ INLINE m68ki_cpu_core *get_safe_token(const device_config *device)
 		   cpu_get_type(device) == CPU_M68010 ||
 		   cpu_get_type(device) == CPU_M68EC020 ||
 		   cpu_get_type(device) == CPU_M68020 ||
+		   cpu_get_type(device) == CPU_M68020_68851 ||
 		   cpu_get_type(device) == CPU_M68EC030 ||
 		   cpu_get_type(device) == CPU_M68030 ||
 		   cpu_get_type(device) == CPU_M68EC040 ||
