@@ -9232,7 +9232,8 @@ Other Sun games
 	DRIVER( pexmp017 )	/* (c) 1997 IGT - International Gaming Technology */
 	DRIVER( pexmp024 )	/* (c) 1997 IGT - International Gaming Technology */
 	DRIVER( mirage )	/* (c) 1994 Mitchell */
-	DRIVER( dominob )	/* (c) 1990 Wonwoo Systems */
+	DRIVER( dominob )	/* (c) 1996 Wonwoo Systems */
+	DRIVER( dominobv2 )	/* (c) 1996 Wonwoo Systems */
 	DRIVER( jongkyo )	/* (c) 1985 Kiwako */
 	DRIVER( gamecstl )	/* MAME based bootleg */
 	DRIVER( gamecst2 )	/* MAME based bootleg, version 2.613 */

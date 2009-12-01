@@ -1,6 +1,7 @@
 /***************************************************************************
 
      Domino Block
+     Domino Block ver.2
 
      Driver by Tomasz Slanina
      some bits by David Haywood
@@ -27,6 +28,35 @@
 
     It's funny to see that this game, as 'arkanoid', does NOT allow you
     to enter "SEX" as initials (which will be replaced by "H !") ;)
+	
+PCB Layout:
+	
+	
+|--------------------------------------|
+|UPC1241       U114            2016    |
+|DSW(8) VOL    U113                    |
+| YM2149       U112                    |
+|              U111        6116        |
+|                          6116        |
+|      6116                            |
+|J MC4584                              |
+|A     6116      6116                  |
+|M     |-------|                       |
+|M     |ACTEL  |                       |
+|A     |A1020B |                       |
+|      |       |                       |
+|      |-------|                       |
+|           6116             U35       |
+|CN1                         U34  12MHz|
+|   Z80     U83              U33       |
+|--------------------------------------|
+Notes:
+      CN1 - 4 pin connector for spinner controls
+      Z80 - clock 6.000MHz [12/2]
+   YM2149 - clock 3.000MHz [12/4]
+    VSync - 59.1524Hz
+    HSync - 15.616kHz
+
 
 ***************************************************************************/
 
@@ -261,14 +291,14 @@ static MACHINE_DRIVER_START( dominob )
 	MDRV_DRIVER_DATA(dominob_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,8000000/2)
+	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)
 	MDRV_CPU_PROGRAM_MAP(memmap)
 	MDRV_CPU_IO_MAP(portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(59.1524)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
@@ -282,7 +312,7 @@ static MACHINE_DRIVER_START( dominob )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4 /* guess */)
+	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_12MHz/4)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -313,4 +343,22 @@ ROM_START( dominob )
 	ROM_CONTINUE(0xc0000,0x40000) // 1ST AND 2ND HALF IDENTICAL
 ROM_END
 
-GAME( 1990, dominob,  0,       dominob,  dominob,  0, ROT0, "Wonwoo Systems", "Domino Block", GAME_SUPPORTS_SAVE )
+
+ROM_START( dominobv2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u81v2",   0x0000, 0x10000, CRC(a27473c0) SHA1(87b4da27e5279fefb6ce37b3ed94a800b1d105c3) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "u33",   0x00000, 0x8000, CRC(359c98de) SHA1(5c96dfb538c6b25530582f8c2a0cb20d85c39f68) )
+	ROM_LOAD( "u34",   0x08000, 0x8000, CRC(0031f713) SHA1(9341f84081e2d8954e476236e93e49b4d8819b8f) )
+	ROM_LOAD( "u35",   0x10000, 0x8000, CRC(6eb87657) SHA1(40ff9d6f21ade48b16f0cefea08a9364a4ee9144) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "u111v2",   0x00000, 0x40000, CRC(597e43bf) SHA1(782661c0dacff39d8bf9100a4edc60284bb3b558) )
+	ROM_LOAD( "u112v2",   0x40000, 0x40000, CRC(b149b015) SHA1(e062eab8c61350ca996afd0fc8b2e78fda312d32) )
+	ROM_LOAD( "u113v2",   0x80000, 0x40000, CRC(0b804675) SHA1(284eb4377f8334ec09be9a9ba9faad854ab5385e) )
+	ROM_LOAD( "u114v2",   0xc0000, 0x40000, CRC(df17ee65) SHA1(1cb434719a8c406726d2c966392be03a2dc1d758) )
+ROM_END
+
+GAME( 1996, dominob,  0,       dominob,  dominob,  0, ROT0, "Wonwoo Systems", "Domino Block", GAME_SUPPORTS_SAVE )
+GAME( 1996, dominobv2,dominob, dominob,  dominob,  0, ROT0, "Wonwoo Systems", "Domino Block ver.2", GAME_SUPPORTS_SAVE )
