@@ -289,6 +289,7 @@ static const naomibd_config_table naomibd_translate_tbl[] =
 	{ "crzytaxi", 0,{ 0x0219, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "jambo",    0,{ 0x0223, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "18wheelr", 0,{ 0x1502, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "sgtetris", 0,{ 0x1234, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 };
 
 /***************************************************************************

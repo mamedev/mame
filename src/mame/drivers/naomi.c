@@ -3491,6 +3491,10 @@ ROM_START( sgtetris )
         ROM_LOAD( "mpr-22913.ic4", 0x2000000, 0x800000, CRC(1fbdc41a) SHA1(eb8b9577b7677b9e9aec05ae950dee516ae15bf5) )
         ROM_LOAD( "mpr-22914.ic5", 0x2800000, 0x800000, CRC(77844b60) SHA1(65d71febb8a160d00778ac7b53e082253cad9834) )
         ROM_LOAD( "mpr-22915.ic6", 0x3000000, 0x800000, CRC(e48148ac) SHA1(c1273353eeaf9bb6b185f133281d7d04271bc895) )
+
+	// trojaned protection data (filename is address read from)
+	ROM_REGION( 0x200000, "naomibd_prot", ROMREGION_ERASE00 )
+        ROM_LOAD( "a0cad0c0.bin", 0x000000, 0x0101b2, CRC(0db80e6d) SHA1(74f8e817e3e69c64391b2eff2c8c504dcad9f84f) )
 ROM_END
 
 /*
