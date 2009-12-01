@@ -66,7 +66,7 @@ static TILE_GET_INFO( get_text_tile_info )
 {
 	int code = machine->generic.videoram.u8[tile_index*2+1];
 	int attr = machine->generic.videoram.u8[tile_index*2];
-	int flags=((attr&0x80) ? TILE_FLIPX : 0) | ((attr&0x40) ? TILE_FLIPY : 0);
+	int flags = ((attr&0x80) ? TILE_FLIPX : 0) | ((attr&0x40) ? TILE_FLIPY : 0);
 	int color = (attr & 0x3c) >> 2;
 
 	code|=(attr&3)<<8;
@@ -128,7 +128,7 @@ VIDEO_UPDATE(ksayakyu)
 	bitmap_fill(bitmap,cliprect,0);
 	if(video_ctrl&1)
 		tilemap_draw(bitmap,cliprect,ksayakyu_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,ksayakyu_textmap, 0,0);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
