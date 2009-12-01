@@ -69,11 +69,33 @@ static VIDEO_UPDATE(coolridr)
 	0x3e0bc00-0x3e0cbff and 0x3e0cc00-0x3e0dbff looks like tilemap planes.
 	0x3e00000 onward seems to contain video registers, I've seen MAP registers that clearly points to the aforementioned planes.
 	*/
+	const gfx_element *gfx = screen->machine->gfx[5];
+	int count = 0x0bc00/4;
+	int y,x;
+
+	for (y=0;y<64;y++)
+	{
+		for (x=0;x<64;x+=2)
+		{
+			int tile;
+
+			tile = (framebuffer_vram[count] & 0x0fff0000) >> 16;
+			//int colour = tile>>12;
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,(x+0)*8,y*8);
+
+			tile = (framebuffer_vram[count] & 0x00000fff) >> 0;
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,(x+1)*8,y*8);
+
+			count++;
+		}
+	}
+
 	return 0;
 }
 
 /* end video */
 
+/* same as ST-V? */
 static READ32_HANDLER(sysh1_ioga_r)
 {
 	switch(offset)
@@ -86,14 +108,25 @@ static READ32_HANDLER(sysh1_ioga_r)
 
 			return (h1_ioga[offset] & 0xfdffffff) | (vblank<<25);
 		}
+		case 0x14/4:
+			return h1_ioga[offset];
+		//case 0x20/4:
 	}
 
-	return h1_ioga[offset];
+	return 0xffffffff;//h1_ioga[offset];
 }
 
 static WRITE32_HANDLER(sysh1_ioga_w)
 {
 	COMBINE_DATA(&h1_ioga[offset]);
+
+	switch(offset)
+	{
+		case 0x14/4: //likely to be a serial port
+			/*  "THIS MACHINE IS STAND-ALONE." written here, amongst with non-ASCII chars. */
+			//printf("%c%c%c%c\n",(data >> 24) & 0xff,(data >> 16) & 0xff,(data >> 8) & 0xff,(data >> 0) & 0xff);
+			break;
+	}
 }
 
 #ifdef UNUSED_FUNCTION
@@ -166,8 +199,7 @@ static ADDRESS_MAP_START( system_h1_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE(3) /*Communication area RAM*/
 	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM_WRITE(coolridr_pal_w) AM_BASE_GENERIC(paletteram)
-//  AM_RANGE(0x04000000, 0x0400001f) AM_RAM /*???*/
-	AM_RANGE(0x04000000, 0x0400ffff) AM_RAM /*dunno what it is,might be palette RAM*/
+	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE(sysh1_ioga_r,sysh1_ioga_w) AM_BASE(&h1_ioga) /*input area?*/
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE(&sysh1_workram_h)
 	AM_RANGE(0x20000000, 0x200fffff) AM_ROM AM_SHARE(1)
 
@@ -179,8 +211,10 @@ static ADDRESS_MAP_START( coolridr_submap, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM
 
+	AM_RANGE(0x03008800, 0x03008803) AM_RAM /*???*/
 	AM_RANGE(0x03008900, 0x03008903) AM_RAM /*???*/
 	AM_RANGE(0x03100400, 0x03100403) AM_RAM /*irq enable?*/
+	AM_RANGE(0x03208800, 0x03208803) AM_RAM /*???*/
 	AM_RANGE(0x03208900, 0x03208903) AM_RAM /*???*/
 	AM_RANGE(0x03300400, 0x03300403) AM_RAM /*irq enable?*/
 
@@ -253,10 +287,13 @@ INPUT_PORTS_END
 // IRQs 4 & 6 are valid on SH-2
 static INTERRUPT_GEN( system_h1 )
 {
-//  if (cpu_getiloops(device))
-//      cpu_set_input_line(device, 4, HOLD_LINE);
-//  else
-//      cpu_set_input_line(device, 6, HOLD_LINE);
+	cpu_set_input_line(device, 4, HOLD_LINE);
+/*	switch(cpu_getiloops(device))
+	{
+      	case 0: break;
+        case 1:cpu_set_input_line(device, 6, HOLD_LINE); break;
+//      case 2:cpu_set_input_line(device, 8, HOLD_LINE); break;
+	}*/
 }
 
 //IRQs 10,12 and 14 are valid on SH-1 instead
@@ -281,7 +318,7 @@ static MACHINE_RESET ( coolridr )
 static MACHINE_DRIVER_START( coolridr )
 	MDRV_CPU_ADD("maincpu", SH2, 28000000)	// ?? mhz
 	MDRV_CPU_PROGRAM_MAP(system_h1_map)
-	MDRV_CPU_VBLANK_INT_HACK(system_h1, 2)
+	MDRV_CPU_VBLANK_INT("screen",system_h1)
 
 	MDRV_CPU_ADD("soundcpu", M68000, 12000000)	// ?? mhz
 	MDRV_CPU_PROGRAM_MAP(system_h1_sound_map)
@@ -314,10 +351,12 @@ ROM_START( coolridr )
 	ROM_LOAD32_WORD_SWAP( "ep17660.31", 0x0100002, 0x080000, CRC(27b7a507) SHA1(4c28b1d18d75630a73194b5d4fd166f3b647c595) )
 
 	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )	/* 68000 */
+	/* uploaded by the main CPU */
 
 	ROM_REGION( 0x100000, "sub", 0 ) /* SH1 */
 	ROM_LOAD16_WORD_SWAP( "ep17662.12", 0x000000, 0x020000,  CRC(50d66b1f) SHA1(f7b7f2f5b403a13b162f941c338a3e1207762a0b) )
 
+	/* Page 12 of the service manual states that these 4 regions are tested, so I believe that they are read by the SH-2 */
 	ROM_REGION( 0x0400000, "gfx1", 0 ) /* Tiles. . at least 1 format */
 	ROM_LOAD32_WORD_SWAP( "mp17650.11",0x000000, 0x0200000, CRC(0ccc84a1) SHA1(65951685b0c8073f6bd1cf9959e1b4d0fc6031d8) )
 	ROM_LOAD32_WORD_SWAP( "mp17651.12",0x000002, 0x0200000, CRC(25fd7dde) SHA1(a1c3f3d947ce20fbf61ea7ab235259be9b7d35a8) )
@@ -349,14 +388,25 @@ ROM_START( coolridr )
 ROM_END
 
 /*TODO: there must be an irq line with custom vector located somewhere that writes to here...*/
-static READ32_HANDLER( coolridr_hack_r )
+#if 0
+static READ32_HANDLER( coolridr_hack1_r )
 {
-	return 0;
+	return sysh1_workram_h[0xd88a4/4];
+}
+#endif
+
+static READ32_HANDLER( coolridr_hack2_r )
+{
+	if(cpu_get_pc(space->cpu) == 0x6002cba || cpu_get_pc(space->cpu) == 0x6002d42)
+		return 0;
+
+	return sysh1_workram_h[0xd8894/4];
 }
 
 static DRIVER_INIT( coolridr )
 {
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60d88a4, 0x060d88a7, 0, 0, coolridr_hack_r );
+//	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60d88a4, 0x060d88a7, 0, 0, coolridr_hack1_r );
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60d8894, 0x060d8897, 0, 0, coolridr_hack2_r );
 }
 
 GAME( 1995, coolridr,    0, coolridr,    coolridr,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND )
