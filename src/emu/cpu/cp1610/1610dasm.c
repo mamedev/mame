@@ -4,8 +4,8 @@
 
 CPU_DISASSEMBLE( cp1610 )
 {
-	UINT16 op = oprom[0];
-	UINT16 subop;
+	UINT16 oprom16[4]={ (oprom[0] << 8) | oprom[1], (oprom[2] << 8) | oprom[3], (oprom[4] << 8) | oprom[5], (oprom[6] << 8) | oprom[7] };
+	UINT16 op = oprom16[0];	UINT16 subop;
 	UINT16 ea, ea1, ea2;
 	unsigned size = 1;
 //  const char *sym, *sym2;
@@ -18,7 +18,7 @@ CPU_DISASSEMBLE( cp1610 )
         sprintf(buffer, "HLT");
 		break;
 	case 0x001: /* 0 000 000 001 */
-		subop = oprom[1];
+		subop = oprom16[1];
 		switch (subop & 0x3f8)
 		{
 			case 0x280: /* 1 010 000 xxx */
@@ -32,8 +32,8 @@ CPU_DISASSEMBLE( cp1610 )
 				size += 1;
 				break;
 			case 0x2b8: /* 1 010 111 xxx */
-				ea1 = oprom[2];
-				ea2 = oprom[3];
+				ea1 = oprom16[2];
+				ea2 = oprom16[3];
 				ea = ((ea2&0xff)<<8) | (ea1&0xff);
 				sprintf(buffer,"MVII #%04X, R%01d",ea,subop&7);
 				size += 3;
@@ -49,8 +49,8 @@ CPU_DISASSEMBLE( cp1610 )
 				size += 1;
 				break;
 			case 0x2f8: /* 1 011 111 xxx */
-				ea1 = oprom[2];
-				ea2 = oprom[3];
+				ea1 = oprom16[2];
+				ea2 = oprom16[3];
 				ea = ((ea2&0xff)<<8) | (ea1&0xff);
 				sprintf(buffer,"ADDI #%04X, R%01d",ea,subop&7);
 				size += 3;
@@ -66,8 +66,8 @@ CPU_DISASSEMBLE( cp1610 )
 				size += 1;
 				break;
 			case 0x338: /* 1 100 111 xxx */
-				ea1 = oprom[2];
-				ea2 = oprom[3];
+				ea1 = oprom16[2];
+				ea2 = oprom16[3];
 				ea = ((ea2&0xff)<<8) | (ea1&0xff);
 				sprintf(buffer,"SUBI #%04X, R%01d",ea,subop&7);
 				size += 3;
@@ -83,8 +83,8 @@ CPU_DISASSEMBLE( cp1610 )
 				size += 1;
 				break;
 			case 0x378: /* 1 101 111 xxx */
-				ea1 = oprom[2];
-				ea2 = oprom[3];
+				ea1 = oprom16[2];
+				ea2 = oprom16[3];
 				ea = ((ea2&0xff)<<8) | (ea1&0xff);
 				sprintf(buffer,"CMPI #%04X, R%01d",ea,subop&7);
 				size += 3;
@@ -100,8 +100,8 @@ CPU_DISASSEMBLE( cp1610 )
 				size += 1;
 				break;
 			case 0x3b8: /* 1 110 111 xxx */
-				ea1 = oprom[2];
-				ea2 = oprom[3];
+				ea1 = oprom16[2];
+				ea2 = oprom16[3];
 				ea = ((ea2&0xff)<<8) | (ea1&0xff);
 				sprintf(buffer,"ANDI #%04X, R%01d",ea,subop&7);
 				size += 3;
@@ -117,8 +117,8 @@ CPU_DISASSEMBLE( cp1610 )
 				size += 1;
 				break;
 			case 0x3f8: /* 1 111 111 xxx */
-				ea1 = oprom[2];
-				ea2 = oprom[3];
+				ea1 = oprom16[2];
+				ea2 = oprom16[3];
 				ea = ((ea2&0xff)<<8) | (ea1&0xff);
 				sprintf(buffer,"XORI #%04X, R%01d",ea,subop&7);
 				size += 3;
@@ -136,8 +136,8 @@ CPU_DISASSEMBLE( cp1610 )
 		break;
 	case 0x004: /* 0 000 000 100 */
 		size += 2;
-		ea1 = oprom[1];
-		ea2 = oprom[2];
+		ea1 = oprom16[1];
+		ea2 = oprom16[2];
 		ea = ((ea1<<8)&0xfc00) + (ea2&0x3ff);
 		if ((ea1&0x300) == 0x300)
 		{
@@ -761,82 +761,82 @@ CPU_DISASSEMBLE( cp1610 )
 		break;
 	case 0x200: /* 1 000 000 000 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "B    %04X",pc+2+ea);
 		break;
 	case 0x201: /* 1 000 000 001 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BC   %04X",pc+2+ea);
 		break;
 	case 0x202: /* 1 000 000 010 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BOV  %04X",pc+2+ea);
 		break;
 	case 0x203: /* 1 000 000 011 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BPL  %04X",pc+2+ea);
 		break;
 	case 0x204: /* 1 000 000 100 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BZE  %04X",pc+2+ea);
 		break;
 	case 0x205: /* 1 000 000 101 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BLT  %04X",pc+2+ea);
 		break;
 	case 0x206: /* 1 000 000 110 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BLE  %04X",pc+2+ea);
 		break;
 	case 0x207: /* 1 000 000 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BUSC %04X",pc+2+ea);
 		break;
 	case 0x208: /* 1 000 001 000 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "NOPP %04X",pc+2+ea);
 		break;
 	case 0x209: /* 1 000 001 001 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BNC  %04X",pc+2+ea);
 		break;
 	case 0x20a: /* 1 000 001 010 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BNOV %04X",pc+2+ea);
 		break;
 	case 0x20b: /* 1 000 001 011 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BMI  %04X",pc+2+ea);
 		break;
 	case 0x20c: /* 1 000 001 100 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BNZE %04X",pc+2+ea);
 		break;
 	case 0x20d: /* 1 000 001 101 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BGE  %04X",pc+2+ea);
 		break;
 	case 0x20e: /* 1 000 001 110 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BGT  %04X",pc+2+ea);
 		break;
 	case 0x20f: /* 1 000 001 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BESC %04X",pc+2+ea);
 		break;
 	case 0x210: /* 1 000 010 000 */
@@ -856,87 +856,87 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x21e: /* 1 000 011 110 */
 	case 0x21f: /* 1 000 011 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BEXT %04X,%01X",pc+2+ea,op&0x0f);
 		break;
 	case 0x220: /* 1 000 100 000 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "B    %04X",pc+1-ea);
 		break;
 	case 0x221: /* 1 000 100 001 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BC   %04X",pc+1-ea);
 		break;
 	case 0x222: /* 1 000 100 010 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BOV  %04X",pc+1-ea);
 		break;
 	case 0x223: /* 1 000 100 011 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BPL  %04X",pc+1-ea);
 		break;
 	case 0x224: /* 1 000 100 100 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BZE  %04X",pc+1-ea);
 		break;
 	case 0x225: /* 1 000 100 101 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BLT  %04X",pc+1-ea);
 		break;
 	case 0x226: /* 1 000 100 110 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BLE  %04X",pc+1-ea);
 		break;
 	case 0x227: /* 1 000 100 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BUSC %04X",pc+1-ea);
 		break;
 	case 0x228: /* 1 000 101 000 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "NOPP %04X",pc+1-ea);
 		break;
 	case 0x229: /* 1 000 101 001 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BNC  %04X",pc+1-ea);
 		break;
 	case 0x22a: /* 1 000 101 010 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BNOV %04X",pc+1-ea);
 		break;
 	case 0x22b: /* 1 000 101 011 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BMI  %04X",pc+1-ea);
 		break;
 	case 0x22c: /* 1 000 101 100 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BNZE %04X",pc+1-ea);
 		break;
 	case 0x22d: /* 1 000 101 101 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BGE  %04X",pc+1-ea);
 		break;
 	case 0x22e: /* 1 000 101 110 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BGT  %04X",pc+1-ea);
 		break;
 	case 0x22f: /* 1 000 101 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BESC %04X",pc+1-ea);
 		break;
 	case 0x230: /* 1 000 110 000 */
@@ -956,7 +956,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x23e: /* 1 000 111 110 */
 	case 0x23f: /* 1 000 111 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "BEXT %04X,%01X",pc+1-ea,op&0x0f);
 		break;
 	case 0x240: /* 1 001 000 000 */
@@ -968,7 +968,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x246: /* 1 001 000 110 */
 	case 0x247: /* 1 001 000 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "MVO  R%01d,(%04X)",op&0x7,ea);
 		break;
 	case 0x248: /* 1 001 001 000 */
@@ -1043,7 +1043,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x286: /* 1 010 000 110 */
 	case 0x287: /* 1 010 000 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "MVI  (%04X),R%01d",ea,op&0x7);
 		break;
 	case 0x288: /* 1 010 001 000 */
@@ -1107,7 +1107,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x2be: /* 1 010 111 110 */
 	case 0x2bf: /* 1 010 111 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "MVII #%04X,R%01d",ea,op&0x7);
 		break;
 	case 0x2c0: /* 1 011 010 000 */
@@ -1119,7 +1119,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x2c6: /* 1 011 010 110 */
 	case 0x2c7: /* 1 011 010 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "ADD  (%04X),R%01d",ea,op&0x7);
 		break;
 	case 0x2c8: /* 1 011 001 000 */
@@ -1181,7 +1181,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x2fe: /* 1 011 111 110 */
 	case 0x2ff: /* 1 011 111 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "ADDI #%04X,R%01d",ea,op&0x7);
 		break;
 	case 0x300: /* 1 100 000 000 */
@@ -1193,7 +1193,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x306: /* 1 100 000 110 */
 	case 0x307: /* 1 100 000 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "SUB  (%04X),R%01d",ea,op&0x7);
 		break;
 	case 0x308: /* 1 100 001 000 */
@@ -1255,7 +1255,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x33e: /* 1 100 111 110 */
 	case 0x33f: /* 1 100 111 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "SUBI #%04X,R%01d",ea,op&0x7);
 		break;
 	case 0x340: /* 1 101 000 000 */
@@ -1267,7 +1267,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x346: /* 1 101 000 110 */
 	case 0x347: /* 1 101 000 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "CMP  (%04X),R%01d",ea,op&0x7);
 		break;
 	case 0x348: /* 1 101 001 000 */
@@ -1329,7 +1329,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x37e: /* 1 101 111 110 */
 	case 0x37f: /* 1 101 111 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "CMPI #%04X,R%01d",ea,op&0x7);
 		break;
 	case 0x380: /* 1 110 000 000 */
@@ -1341,7 +1341,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x386: /* 1 110 000 110 */
 	case 0x387: /* 1 110 000 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "AND  (%04X),R%01d",ea,op&0x7);
 		break;
 	case 0x388: /* 1 110 001 000 */
@@ -1403,7 +1403,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x3be: /* 1 110 111 110 */
 	case 0x3bf: /* 1 110 111 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "ANDI #%04X,R%01d",ea,op&0x7);
 		break;
 	case 0x3c0: /* 1 111 000 000 */
@@ -1415,7 +1415,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x3c6: /* 1 111 000 110 */
 	case 0x3c7: /* 1 111 000 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "XOR  (%04X),R%01d",ea,op&0x7);
 		break;
 	case 0x3c8: /* 1 111 001 000 */
@@ -1477,7 +1477,7 @@ CPU_DISASSEMBLE( cp1610 )
 	case 0x3fe: /* 1 111 111 110 */
 	case 0x3ff: /* 1 111 111 111 */
 		size += 1;
-		ea = oprom[1];
+		ea = oprom16[1];
 		sprintf(buffer, "XORI #%04X,R%01d",ea,op&0x7);
 		break;
 	default:

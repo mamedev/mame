@@ -3512,7 +3512,7 @@ CPU_GET_INFO( cp1610 )
 			sprintf(info->s, "%c%c%c%c",
 				cpustate->flags & 0x80 ? 'S':'.',
 				cpustate->flags & 0x40 ? 'Z':'.',
-				cpustate->flags & 0x10 ? 'V':'.',
+				cpustate->flags & 0x20 ? 'V':'.',
 				cpustate->flags & 0x10 ? 'C':'.');
 			break;
 	case CPUINFO_STR_REGISTER+CP1610_R0: sprintf(info->s, "R0:%04X", cpustate->r[0]); break;
