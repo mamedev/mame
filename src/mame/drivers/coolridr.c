@@ -65,6 +65,10 @@ static VIDEO_START(coolridr)
 
 static VIDEO_UPDATE(coolridr)
 {
+	/*
+	0x3e0bc00-0x3e0cbff and 0x3e0cc00-0x3e0dbff looks like tilemap planes.
+	0x3e00000 onward seems to contain video registers, I've seen MAP registers that clearly points to the aforementioned planes.
+	*/
 	return 0;
 }
 
