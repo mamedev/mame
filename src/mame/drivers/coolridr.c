@@ -139,13 +139,29 @@ static WRITE32_HANDLER( sysh1_dmac_w )
 // SH-1 waits for "SEGA" at 0530008c after writing it to 6000020 and 600010c
 // SH-2 writes 0x01 to 060d88a5, expects something (SH-1?) to change that
 
+/* likely that this is NOT paletteram */
+static WRITE32_HANDLER( coolridr_pal_w )
+{
+	int r,g,b,a;
+	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
+
+	b = ((space->machine->generic.paletteram.u32[offset] & 0x000000ff) >>0);
+	g = ((space->machine->generic.paletteram.u32[offset] & 0x0000ff00) >>8);
+	r = ((space->machine->generic.paletteram.u32[offset] & 0x00ff0000) >>16);
+	a = ((space->machine->generic.paletteram.u32[offset] & 0xff000000) >>24);
+
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
+}
+
 static ADDRESS_MAP_START( system_h1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_SHARE(1)
+	AM_RANGE(0x01000000, 0x010fffff) AM_ROM AM_REGION("maincpu",0x0100000) //correct?
 	/*WARNING: boundaries of these two are WRONG!*/
 	AM_RANGE(0x03e00000, 0x03e0ffff) AM_RAM AM_BASE(&framebuffer_vram)/*Buffer VRAM Chains*/
 	AM_RANGE(0x03e10000, 0x03e11fff) AM_RAM AM_BASE(&framebuffer_data)/*Buffer data should go here*/
 
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE(3) /*Communication area RAM*/
+	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM_WRITE(coolridr_pal_w) AM_BASE_GENERIC(paletteram)
 //  AM_RANGE(0x04000000, 0x0400001f) AM_RAM /*???*/
 	AM_RANGE(0x04000000, 0x0400ffff) AM_RAM /*dunno what it is,might be palette RAM*/
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE(&sysh1_workram_h)
@@ -206,13 +222,25 @@ static const gfx_layout tiles8x8_layout =
 	16*128
 };
 
+
+static const gfx_layout test =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ 0*4,1*4,2*4,3*4,4*4,5*4,6*4, 7*4 },
+	{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 },
+	8*8*4
+};
+
 static GFXDECODE_START( coolridr )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx5", 0, tiles8x8_layout, 0, 16 )
-
+	GFXDECODE_ENTRY( "maincpu", 0x56840, test, 0, 16 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( coolridr )
@@ -278,10 +306,10 @@ ROM_START( coolridr )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* SH2 code */
 	ROM_LOAD32_WORD_SWAP( "ep17659.30", 0x0000000, 0x080000, CRC(473027b0) SHA1(acaa212869dd79550235171b9f054e82750f74c3) )
 	ROM_LOAD32_WORD_SWAP( "ep17658.29", 0x0000002, 0x080000, CRC(7ecfdfcc) SHA1(97cb3e6cf9764c8db06de12e4e958148818ef737) )
+	ROM_LOAD32_WORD_SWAP( "ep17661.32", 0x0100000, 0x080000, CRC(81a7d90b) SHA1(99f8c3e75b94dd1b60455c26dc38ce08db82fe32) )
+	ROM_LOAD32_WORD_SWAP( "ep17660.31", 0x0100002, 0x080000, CRC(27b7a507) SHA1(4c28b1d18d75630a73194b5d4fd166f3b647c595) )
 
-	ROM_REGION( 0x100000, "soundcpu", 0 )	/* 68000 */
-	ROM_LOAD32_WORD_SWAP( "ep17661.32", 0x0000000, 0x080000, CRC(81a7d90b) SHA1(99f8c3e75b94dd1b60455c26dc38ce08db82fe32) )
-	ROM_LOAD32_WORD_SWAP( "ep17660.31", 0x0000002, 0x080000, CRC(27b7a507) SHA1(4c28b1d18d75630a73194b5d4fd166f3b647c595) )
+	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )	/* 68000 */
 
 	ROM_REGION( 0x100000, "sub", 0 ) /* SH1 */
 	ROM_LOAD16_WORD_SWAP( "ep17662.12", 0x000000, 0x020000,  CRC(50d66b1f) SHA1(f7b7f2f5b403a13b162f941c338a3e1207762a0b) )
