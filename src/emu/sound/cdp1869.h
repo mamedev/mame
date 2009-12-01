@@ -113,6 +113,12 @@
 #define CDP1869_CHAR_RAM_WRITE(name) void name(const device_config *device, UINT16 pma, UINT8 cma, UINT8 data)
 #define CDP1869_PCB_READ(name) int name(const device_config *device, UINT16 pma, UINT8 cma)
 
+#define CDP1869_PAL \
+	DEVCB_LINE_VCC
+
+#define CDP1869_NTSC \
+	DEVCB_LINE_GND
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -120,12 +126,6 @@
 typedef UINT8 (*cdp1869_char_ram_read_func)(const device_config *device, UINT16 pma, UINT8 cma);
 typedef void (*cdp1869_char_ram_write_func)(const device_config *device, UINT16 pma, UINT8 cma, UINT8 data);
 typedef int (*cdp1869_pcb_read_func)(const device_config *device, UINT16 pma, UINT8 cma);
-
-enum _cdp1869_format {
-	CDP1869_NTSC = 0,
-	CDP1869_PAL
-};
-typedef enum _cdp1869_format cdp1869_format;
 
 /* interface */
 typedef struct _cdp1869_interface cdp1869_interface;
@@ -137,7 +137,8 @@ struct _cdp1869_interface
 	/* pixel clock of the chip is the device clock */
 	int color_clock;			/* the chroma clock of the chip */
 
-	cdp1869_format pal_ntsc;	/* screen format */
+	/* screen format */
+	devcb_read_line					in_pal_ntsc_func;
 
 	/* page memory read function */
 	devcb_read8						in_page_ram_func;

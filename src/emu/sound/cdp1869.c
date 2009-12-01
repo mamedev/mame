@@ -8,7 +8,8 @@
 
     TODO:
 
-    - remove CDP1802 dependency
+	- remove CDP1802 dependency
+	- sound base frequencies are TPA/TPB
     - white noise
     - scanline based update
     - CMSEL output
@@ -51,6 +52,7 @@ struct _cdp1869_t
 	devcb_resolved_read8		in_page_ram_func;
 	devcb_resolved_write8		out_page_ram_func;
 	devcb_resolved_write_line	out_prd_func;
+	devcb_resolved_read_line	in_pal_ntsc_func;
 
 	const device_config *device;
 	const cdp1869_interface *intf;	/* interface */
@@ -104,6 +106,9 @@ INLINE cdp1869_t *get_safe_token(const device_config *device)
     IMPLEMENTATION
 ***************************************************************************/
 
+#define CDP1869_IS_NTSC \
+	(!devcb_call_read_line(&cdp1869->in_pal_ntsc_func))
+
 /*-------------------------------------------------
     update_prd_changed_timer - update predisplay
     changed timer
@@ -118,7 +123,7 @@ static void update_prd_changed_timer(cdp1869_t *cdp1869)
 		int scanline = video_screen_get_vpos(cdp1869->screen);
 		int next_scanline;
 
-		if (cdp1869->intf->pal_ntsc == CDP1869_NTSC)
+		if (CDP1869_IS_NTSC)
 		{
 			start = CDP1869_SCANLINE_PREDISPLAY_START_NTSC;
 			end = CDP1869_SCANLINE_PREDISPLAY_END_NTSC;
@@ -507,7 +512,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out5_w )
 	cdp1869->cmem = BIT(word, 0);
 	cdp1869->line9 = BIT(word, 3);
 
-	if (cdp1869->intf->pal_ntsc == CDP1869_NTSC)
+	if (CDP1869_IS_NTSC)
 	{
 		cdp1869->line16 = BIT(word, 5);
 	}
@@ -719,9 +724,8 @@ void cdp1869_update(const device_config *device, bitmap_t *bitmap, const rectang
 
 	rectangle screen_rect, outer;
 
-	switch (cdp1869->intf->pal_ntsc)
+	if (CDP1869_IS_NTSC)
 	{
-	case CDP1869_NTSC:
 		outer.min_x = CDP1869_HBLANK_END;
 		outer.max_x = CDP1869_HBLANK_START - 1;
 		outer.min_y = CDP1869_SCANLINE_VBLANK_END_NTSC;
@@ -730,10 +734,9 @@ void cdp1869_update(const device_config *device, bitmap_t *bitmap, const rectang
 		screen_rect.max_x = CDP1869_SCREEN_END - 1;
 		screen_rect.min_y = CDP1869_SCANLINE_DISPLAY_START_NTSC;
 		screen_rect.max_y = CDP1869_SCANLINE_DISPLAY_END_NTSC - 1;
-		break;
-
-	default:
-	case CDP1869_PAL:
+	}
+	else
+	{
 		outer.min_x = CDP1869_HBLANK_END;
 		outer.max_x = CDP1869_HBLANK_START - 1;
 		outer.min_y = CDP1869_SCANLINE_VBLANK_END_PAL;
@@ -742,7 +745,6 @@ void cdp1869_update(const device_config *device, bitmap_t *bitmap, const rectang
 		screen_rect.max_x = CDP1869_SCREEN_END - 1;
 		screen_rect.min_y = CDP1869_SCANLINE_DISPLAY_START_PAL;
 		screen_rect.max_y = CDP1869_SCANLINE_DISPLAY_END_PAL - 1;
-		break;
 	}
 
 	sect_rect(&outer, cliprect);
@@ -869,6 +871,7 @@ static DEVICE_START( cdp1869 )
 	devcb_resolve_read8(&cdp1869->in_page_ram_func, &cdp1869->intf->in_page_ram_func, device);
 	devcb_resolve_write8(&cdp1869->out_page_ram_func, &cdp1869->intf->out_page_ram_func, device);
 	devcb_resolve_write_line(&cdp1869->out_prd_func, &cdp1869->intf->out_prd_func, device);
+	devcb_resolve_read_line(&cdp1869->in_pal_ntsc_func, &cdp1869->intf->in_pal_ntsc_func, device);
 
 	/* set initial values */
 	cdp1869->device = device;
