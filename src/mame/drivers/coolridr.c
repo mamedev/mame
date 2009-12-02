@@ -66,25 +66,27 @@ static VIDEO_START(coolridr)
 static VIDEO_UPDATE(coolridr)
 {
 	/*
-	0x3e0bc00-0x3e0cbff and 0x3e0cc00-0x3e0dbff looks like tilemap planes.
+	0x3e0bc00-0x3e0dbff looks like tilemap planes.
 	0x3e00000 onward seems to contain video registers, I've seen MAP registers that clearly points to the aforementioned planes.
 	*/
 	const gfx_element *gfx = screen->machine->gfx[5];
 	int count = 0x0bc00/4;
 	int y,x;
 
+
+	/* The following is just a hack to draw the FBI logo */
 	for (y=0;y<64;y++)
 	{
-		for (x=0;x<64;x+=2)
+		for (x=0;x<128;x+=2)
 		{
 			int tile;
 
 			tile = (framebuffer_vram[count] & 0x0fff0000) >> 16;
 			//int colour = tile>>12;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,(x+0)*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile|0x1000,0,0,0,(x+0)*16,y*16);
 
 			tile = (framebuffer_vram[count] & 0x00000fff) >> 0;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,(x+1)*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile|0x1000,0,0,0,(x+1)*16,y*16);
 
 			count++;
 		}
@@ -260,7 +262,7 @@ static const gfx_layout tiles8x8_layout =
 	16*128
 };
 
-
+#if 0
 static const gfx_layout test =
 {
 	8,8,
@@ -271,6 +273,7 @@ static const gfx_layout test =
 	{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 },
 	8*8*4
 };
+#endif
 
 static GFXDECODE_START( coolridr )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
@@ -278,7 +281,7 @@ static GFXDECODE_START( coolridr )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx5", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "maincpu", 0x56840, test, 0, 16 )
+	GFXDECODE_ENTRY( "maincpu", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( coolridr )
@@ -333,8 +336,8 @@ static MACHINE_DRIVER_START( coolridr )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
+	MDRV_SCREEN_SIZE(128*8, 64*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 64*8-1) //TODO: these are just two different screens
 
 	MDRV_PALETTE_LENGTH(0x10000)
 	MDRV_MACHINE_RESET(coolridr)
@@ -409,4 +412,4 @@ static DRIVER_INIT( coolridr )
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60d8894, 0x060d8897, 0, 0, coolridr_hack2_r );
 }
 
-GAME( 1995, coolridr,    0, coolridr,    coolridr,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, coolridr,    0, coolridr,    coolridr,    coolridr, ROT0,  "Sega", "Cool Riders (US)",GAME_NOT_WORKING|GAME_NO_SOUND )
