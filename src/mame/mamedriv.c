@@ -1924,6 +1924,7 @@ const game_driver * const drivers[] =
 	DRIVER( cubybop )	/* ??? no copyright message */
 	DRIVER( plgirls )	/* (c) 1992 Hot-B. */
 	DRIVER( plgirls2 )	/* (c) 1993 Hot-B. */
+	DRIVER( lagirl )	/* plgirls bootleg? */
 
 	/* Taito H-System games */
 	DRIVER( syvalion )	/* B51 (c) 1988 Taito Corporation (Japan) */

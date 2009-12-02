@@ -9,6 +9,7 @@
   - American Horseshoes
   - Play Girls
   - Play Girls 2
+  - LA Girl
   - Cuby Bop
 
   Dual processor games (1 main TC0090LVC (z80 core), 1 sound z80)
@@ -2731,6 +2732,54 @@ ROM_START( evilston )
 	ROM_LOAD( "c67-02.ic5",  0x80000, 0x80000, CRC(eb4f895c) SHA1(2c902572fe5a5d4442e4dd29e8a85cb40c384140) )
 ROM_END
 
+/*
+
+LA Girl
+(no manufacturer/year?)
+
+PCB Layout
+----------
+
+|------------------------------------------|
+|VOL 4558 YM3014                 ROM4      |
+|UPC1241              2018            ROM5 |
+|     YM2203             TPC1020           |
+|            DSW1(8)                       |
+|            DSW2(8)                       |
+|                         6264    ROM3     |
+|J                                ROM2     |
+|A  27.2109MHz                             |
+|M                                         |
+|M                                PAL      |
+|A                                PAL      |
+|        6264            TPC1020  PAL      |
+|            ROM1                          |
+|                                  6264    |
+|                                  6264    |
+|              PAL       TPC1020           |
+|        Z80B                              |
+|                 44256           44256    |
+|PAL              44256           44256    |
+|------------------------------------------|
+Notes:
+      Z80 - clock 6.802725MHz [27.2109/4]
+   YM2203 - clocks 3.4013625 [27/2109/8] & 1.1337875 [27.2109/24]
+    VSync - 55.8268Hz  \ possibly sync/PCB fault, had to adjust 
+    HSync - 14.7739kHz / h/v syncs on monitor to get a stable picture
+
+*/
+
+ROM_START( lagirl )
+	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_LOAD( "rom1",  0x00000, 0x40000, CRC(ba1acfdb) SHA1(ff1093c2d0887287ce451417bd373e00f2881ce7) )
+	ROM_RELOAD(           0x10000, 0x40000 )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "rom2",   0x40001, 0x20000, CRC(4c739a30) SHA1(4426f51aac9bb39f5d1a7616d183ff6c76749dc2) )
+	ROM_LOAD16_BYTE( "rom3",   0x40000, 0x20000, CRC(4cf22a4b) SHA1(1c933ccbb6a5b8a6795385d7970db5f7138e572e) )
+	ROM_LOAD16_BYTE( "rom4",   0x00001, 0x20000, CRC(7dcd6696) SHA1(8f3b1fe669520142668af6dc2d04f13767048989) )
+	ROM_LOAD16_BYTE( "rom5",   0x00000, 0x20000, CRC(b1782816) SHA1(352663974886e1e4358e55b87c8bf0cdb979f177) )
+ROM_END
 
 
 
@@ -2793,5 +2842,7 @@ GAME( 199?, cubybop,   0,        cachat,   cubybop,  0,        ROT0,   "Taito Co
 
 GAME( 1992, plgirls,   0,        cachat,   plgirls,  0,        ROT270, "Hot-B.", "Play Girls", 0 )
 GAME( 1993, plgirls2,  0,        cachat,   plgirls2, 0,        ROT270, "Hot-B.", "Play Girls 2", 0 )
+
+GAME( 199?, lagirl,   0,         cachat,   plgirls,  0,        ROT270, "<unknown>", "LA Girl", 0 )
 
 GAME( 1990, evilston,  0,        evilston, evilston, evilston, ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 )
