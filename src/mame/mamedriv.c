@@ -680,6 +680,7 @@ const game_driver * const drivers[] =
 	DRIVER( digdug2o )	/* (c) 1985 */
 	DRIVER( todruaga )	/* (c) 1984 */
 	DRIVER( todruagao )	/* (c) 1984 */
+	DRIVER( todruagas )	/* (c) 1984 pcb manufactured by Sidam */
 	DRIVER( motos )		/* (c) 1985 */
 	DRIVER( grobda )	/* (c) 1984 */
 	DRIVER( grobda2 )	/* (c) 1984 */

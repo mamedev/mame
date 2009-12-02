@@ -1987,6 +1987,30 @@ ROM_START( todruagao )
 	ROM_LOAD( "td1-3.3m",	0x0000, 0x0100, CRC(07104c40) SHA1(16db55525034bacb71e7dc8bd2a7c3c4464d4808) )
 ROM_END
 
+ROM_START( todruagas )
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
+	ROM_LOAD( "3b.bin",	0x8000, 0x4000, CRC(85d052d9) SHA1(03d4d4b5b0cd49d2a4acd8479bc9975a5fde6c4c) )
+	ROM_LOAD( "1b.bin",	0xc000, 0x4000, CRC(a5db267a) SHA1(f140fd7b4d7e939f3a20ca5a15c16e5b8999c47d) )
+
+	ROM_REGION( 0x10000, "sub", 0 )     /* 64k for the second CPU */
+	ROM_LOAD( "td1_4.1k",	0xe000, 0x2000, CRC(ae9d06d9) SHA1(3d8621fdd74fafa61f342886faa37f0aab50c5a7) )
+
+	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "td1_5.3b",	0x0000, 0x1000, CRC(d32b249f) SHA1(7d7cee4101ef615fb92c3702f89a9823a6231195) )
+
+	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_LOAD( "td1_6.3m",	0x0000, 0x2000, CRC(e827e787) SHA1(74e0af4c7d6e334bcd211a33eb18dddc8a182aa7) )
+	ROM_LOAD( "td1_7.3n",	0x2000, 0x2000, CRC(962bd060) SHA1(74cdcafc26475bda085bf62ed17e6474ed782453) )
+
+	ROM_REGION( 0x0520, "proms", 0 )
+	ROM_LOAD( "td1-5.5b",	0x0000, 0x0020, CRC(122cc395) SHA1(a648c53f2e95634bb5b27d79be3fd908021d056e) ) /* palette */
+	ROM_LOAD( "td1-6.4c",	0x0020, 0x0100, CRC(8c661d6a) SHA1(1340e4f657f4f2c4ef651a441c3b51632e757d0b) ) /* characters */
+	ROM_LOAD( "td1-7.5k",	0x0120, 0x0400, CRC(a86c74dd) SHA1(dfd7d6b2740761c3bcab4c7999d2699d920843e7) ) /* sprites */
+
+	ROM_REGION( 0x0100, "namco", 0 )	/* sound prom */
+	ROM_LOAD( "td1-3.3m",	0x0000, 0x0100, CRC(07104c40) SHA1(16db55525034bacb71e7dc8bd2a7c3c4464d4808) )
+ROM_END
+
 ROM_START( digdug2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "d23_3.1d",	0x8000, 0x4000, CRC(cc155338) SHA1(d6796479ebb00081e9ae281380a4ce75f730766e) )
@@ -2109,6 +2133,7 @@ GAME( 1983, mappy,    0,        mappy,    mappy,    58_58,    ROT90, "Namco", "M
 GAME( 1983, mappyj,   mappy,    mappy,    mappy,    58_58,    ROT90, "Namco", "Mappy (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1984, todruaga, 0,        todruaga, todruaga, 58_56,    ROT90, "Namco", "Tower of Druaga (New Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1984, todruagao,todruaga, todruaga, todruaga, 58_56,    ROT90, "Namco", "Tower of Druaga (Old Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1984, todruagas,todruaga, todruaga, todruaga, 58_56,    ROT90, "Namco", "Tower of Druaga (Manufactured by Sidam)", GAME_SUPPORTS_SAVE )
 GAME( 1985, digdug2,  0,        digdug2,  digdug2,  digdug2,  ROT90, "Namco", "Dig Dug II (New Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1985, digdug2o, digdug2,  digdug2,  digdug2,  digdug2,  ROT90, "Namco", "Dig Dug II (Old Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1985, motos,    0,        mappy,    motos,    56out_56, ROT90, "Namco", "Motos", GAME_SUPPORTS_SAVE )
