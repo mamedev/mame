@@ -1,10 +1,5 @@
 #include "driver.h"
-
-
-UINT16 *galspnbl_bgvideoram;
-UINT16 *galspnbl_videoram;
-UINT16 *galspnbl_colorram;
-UINT16 *galspnbl_scroll;
+#include "includes/galspnbl.h"
 
 
 PALETTE_INIT( galspnbl )
@@ -12,8 +7,8 @@ PALETTE_INIT( galspnbl )
 	int i;
 
 	/* initialize 555 RGB lookup */
-	for (i = 0;i < 32768;i++)
-		palette_set_color_rgb(machine,i+1024,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+	for (i = 0; i < 32768; i++)
+		palette_set_color_rgb(machine, i + 1024, pal5bit(i >> 5), pal5bit(i >> 10), pal5bit(i >> 0));
 }
 
 
@@ -34,9 +29,10 @@ PALETTE_INIT( galspnbl )
  *    4    | xxxxxxxxxxxxxxxx | x position
  *    5,6,7|                  | unused
  */
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	galspnbl_state *state = (galspnbl_state *)machine->driver_data;
+	UINT16 *spriteram = state->spriteram;
 	int offs;
 	static const UINT8 layout[8][8] =
 	{
@@ -50,32 +46,32 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{42,43,46,47,58,59,62,63}
 	};
 
-	for (offs = (machine->generic.spriteram_size-16)/2;offs >= 0;offs -= 8)
+	for (offs = (state->spriteram_size - 16) / 2; offs >= 0; offs -= 8)
 	{
-		int sx,sy,code,color,size,attr,flipx,flipy;
-		int col,row;
+		int sx, sy, code, color, size, attr, flipx, flipy;
+		int col, row;
 
-		attr = spriteram16[offs];
+		attr = spriteram[offs];
 		if ((attr & 0x0004) && ((attr & 0x0040) == 0 || (video_screen_get_frame_number(machine->primary_screen) & 1))
 //              && ((attr & 0x0030) >> 4) == priority)
 				&& ((attr & 0x0020) >> 5) == priority)
 		{
-			code = spriteram16[offs+1];
-			color = spriteram16[offs+2];
+			code = spriteram[offs + 1];
+			color = spriteram[offs + 2];
 			size = 1 << (color & 0x0003); // 1,2,4,8
 			color = (color & 0x00f0) >> 4;
-//          sx = spriteram16[offs+4] + screenscroll;
-			sx = spriteram16[offs+4];
-			sy = spriteram16[offs+3];
+//          sx = spriteram[offs + 4] + screenscroll;
+			sx = spriteram[offs + 4];
+			sy = spriteram[offs + 3];
 			flipx = attr & 0x0001;
 			flipy = attr & 0x0002;
 
-			for (row = 0;row < size;row++)
+			for (row = 0; row < size; row++)
 			{
-				for (col = 0;col < size;col++)
+				for (col = 0; col < size; col++)
 				{
-					int x = sx + 8*(flipx?(size-1-col):col);
-					int y = sy + 8*(flipy?(size-1-row):row);
+					int x = sx + 8 * (flipx ? (size - 1 - col) : col);
+					int y = sy + 8 * (flipy ? (size - 1 - row) : row);
 					drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 						code + layout[row][col],
 						color,
@@ -88,36 +84,38 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-static void draw_background(bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_background( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	galspnbl_state *state = (galspnbl_state *)machine->driver_data;
 	offs_t offs;
 
-//  int screenscroll = 4 - (galspnbl_scroll[0] & 0xff);
+//  int screenscroll = 4 - (state->scroll[0] & 0xff);
 
 	for (offs = 0; offs < 0x20000; offs++)
 	{
 		int y = offs >> 9;
 		int x = offs & 0x1ff;
 
-		*BITMAP_ADDR16(bitmap, y, x) = 1024 + (galspnbl_bgvideoram[offs] >> 1);
+		*BITMAP_ADDR16(bitmap, y, x) = 1024 + (state->bgvideoram[offs] >> 1);
 	}
 }
 
 
 VIDEO_UPDATE( galspnbl )
 {
+	galspnbl_state *state = (galspnbl_state *)screen->machine->driver_data;
 	int offs;
 
-	draw_background(bitmap, cliprect);
+	draw_background(screen->machine, bitmap, cliprect);
 
-	draw_sprites(screen->machine,bitmap,cliprect,0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0);
 
-	for (offs = 0;offs < 0x1000/2;offs++)
+	for (offs = 0; offs < 0x1000 / 2; offs++)
 	{
-		int sx,sy,code,attr,color;
+		int sx, sy, code, attr, color;
 
-		code = galspnbl_videoram[offs];
-		attr = galspnbl_colorram[offs];
+		code = state->videoram[offs];
+		attr = state->colorram[offs];
 		color = (attr & 0x00f0) >> 4;
 		sx = offs % 64;
 		sy = offs / 64;
@@ -134,6 +132,6 @@ VIDEO_UPDATE( galspnbl )
 		}
 	}
 
-	draw_sprites(screen->machine,bitmap,cliprect,1);
+	draw_sprites(screen->machine, bitmap, cliprect, 1);
 	return 0;
 }

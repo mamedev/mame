@@ -32,14 +32,11 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "gcpinbal.h"
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"
+#include "includes/gcpinbal.h"
 
-/* M6585 */
 
-static UINT32 msm_start, msm_end, msm_bank;
-static UINT32 adpcm_start, adpcm_end, adpcm_idle;
 
 /***********************************************************
                       INTERRUPTS
@@ -47,16 +44,18 @@ static UINT32 adpcm_start, adpcm_end, adpcm_idle;
 
 static TIMER_CALLBACK( gcpinbal_interrupt1 )
 {
-	cputag_set_input_line(machine, "maincpu", 1, HOLD_LINE);
+	gcpinbal_state *state = (gcpinbal_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 1, HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
 static TIMER_CALLBACK( gcpinbal_interrupt3 )
 {
+	gcpinbal_state *state = (gcpinbal_state *)machine->driver_data;
 	// IRQ3 is from the M6585
 //  if (!ADPCM_playing(0))
 	{
-		cputag_set_input_line(machine, "maincpu", 3, HOLD_LINE);
+		cpu_set_input_line(state->maincpu, 3, HOLD_LINE);
 	}
 }
 #endif
@@ -65,8 +64,8 @@ static INTERRUPT_GEN( gcpinbal_interrupt )
 {
 	/* Unsure of actual sequence */
 
-	timer_set(device->machine, cpu_clocks_to_attotime(device,500), NULL, 0, gcpinbal_interrupt1);
-//  timer_set(device->machine, cpu_clocks_to_attotime(device,1000), NULL, 0, gcpinbal_interrupt3);
+	timer_set(device->machine, cpu_clocks_to_attotime(device, 500), NULL, 0, gcpinbal_interrupt1);
+//  timer_set(device->machine, cpu_clocks_to_attotime(device, 1000), NULL, 0, gcpinbal_interrupt3);
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -77,6 +76,8 @@ static INTERRUPT_GEN( gcpinbal_interrupt )
 
 static READ16_HANDLER( ioc_r )
 {
+	gcpinbal_state *state = (gcpinbal_state *)space->machine->driver_data;
+
 	/* 20 (only once), 76, a0 are read in log */
 
 	switch (offset)
@@ -92,19 +93,20 @@ static READ16_HANDLER( ioc_r )
 
 		case 0x50:
 		case 0x51:
-			return okim6295_r(devtag_get_device(space->machine, "oki"),0)<<8;
+			return okim6295_r(state->oki, 0) << 8;
 
 	}
 
 //logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(space->cpu),offset);
 
-	return gcpinbal_ioc_ram[offset];
+	return state->ioc_ram[offset];
 }
 
 
 static WRITE16_HANDLER( ioc_w )
 {
-	COMBINE_DATA(&gcpinbal_ioc_ram[offset]);
+	gcpinbal_state *state = (gcpinbal_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->ioc_ram[offset]);
 
 //  switch (offset)
 //  {
@@ -114,7 +116,7 @@ static WRITE16_HANDLER( ioc_w )
 //      case 0x88/2:    /* coin control (+ others) ??? */
 //          coin_lockout_w(space->machine, 0, ~data & 0x01);
 //          coin_lockout_w(space->machine, 1, ~data & 0x02);
-//popmessage(" address %04x value %04x",offset,data);
+//popmessage(" address %04x value %04x", offset, data);
 //  }
 
 	switch (offset)
@@ -133,61 +135,61 @@ static WRITE16_HANDLER( ioc_w )
 
 		// MSM6585 bank, coin LEDs, maybe others?
 		case 0x44:
-			msm_bank = data & 0x1000 ? 0x100000 : 0;
-			okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), 0x40000 * ((data & 0x800)>>11));
+			state->msm_bank = data & 0x1000 ? 0x100000 : 0;
+			okim6295_set_bank_base(state->oki, 0x40000 * ((data & 0x800 )>> 11));
 			break;
 
 		case 0x45:
-			//adpcm_idle = 1;
+			//state->adpcm_idle = 1;
 			break;
 
 		// OKIM6295
 		case 0x50:
 		case 0x51:
-			okim6295_w(devtag_get_device(space->machine, "oki"), 0, data>>8);
+			okim6295_w(state->oki, 0, data >> 8);
 			break;
 
 		// MSM6585 ADPCM - mini emulation
 		case 0x60:
-			msm_start &= 0xffff00;
-			msm_start |= (data>>8);
+			state->msm_start &= 0xffff00;
+			state->msm_start |= (data >> 8);
 			break;
 		case 0x61:
-			msm_start &= 0xff00ff;
-			msm_start |= data;
+			state->msm_start &= 0xff00ff;
+			state->msm_start |= data;
 			break;
 		case 0x62:
-			msm_start &= 0x00ffff;
-			msm_start |= (data<<8);
+			state->msm_start &= 0x00ffff;
+			state->msm_start |= (data << 8);
 			break;
 		case 0x63:
-			msm_end &= 0xffff00;
-			msm_end |= (data>>8);
+			state->msm_end &= 0xffff00;
+			state->msm_end |= (data >> 8);
 			break;
 		case 0x64:
-			msm_end &= 0xff00ff;
-			msm_end |= data;
+			state->msm_end &= 0xff00ff;
+			state->msm_end |= data;
 			break;
 		case 0x65:
-			msm_end &= 0x00ffff;
-			msm_end |= (data<<8);
+			state->msm_end &= 0x00ffff;
+			state->msm_end |= (data << 8);
 			break;
 		case 0x66:
-			if (msm_start < msm_end)
+			if (state->msm_start < state->msm_end)
 			{
 				/* data written here is adpcm param? */
-				//popmessage("%08x %08x",msm_start+msm_bank,msm_end);
-				adpcm_idle = 0;
-				msm5205_reset_w(devtag_get_device(space->machine, "msm"),0);
-				adpcm_start = msm_start+msm_bank;
-				adpcm_end = msm_end;
+				//popmessage("%08x %08x", state->msm_start + state->msm_bank, state->msm_end);
+				state->adpcm_idle = 0;
+				msm5205_reset_w(state->msm, 0);
+				state->adpcm_start = state->msm_start + state->msm_bank;
+				state->adpcm_end = state->msm_end;
 //              ADPCM_stop(0);
 //              ADPCM_play(0, start+bank, end-start);
 			}
 			break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n",cpu_get_pc(space->cpu),offset,data);
+			logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", cpu_get_pc(space->cpu), offset, data);
 			break;
 	}
 
@@ -200,26 +202,27 @@ static WRITE16_HANDLER( ioc_w )
 
 
 /* Controlled through ioc? */
-static void gcp_adpcm_int(const device_config *device)
+static void gcp_adpcm_int( const device_config *device )
 {
-	static UINT8 trigger,adpcm_data;
+	gcpinbal_state *state = (gcpinbal_state *)device->machine->driver_data;
 
-	if (adpcm_idle)
-		msm5205_reset_w(device,1);
-	if (adpcm_start >= 0x200000 || adpcm_start > adpcm_end)
+	if (state->adpcm_idle)
+		msm5205_reset_w(device, 1);
+	if (state->adpcm_start >= 0x200000 || state->adpcm_start > state->adpcm_end)
 	{
 		//msm5205_reset_w(device,1);
-		adpcm_start = msm_start+msm_bank;
-		trigger = 0;
+		state->adpcm_start = state->msm_start + state->msm_bank;
+		state->adpcm_trigger = 0;
 	}
 	else
 	{
 		UINT8 *ROM = memory_region(device->machine, "msm");
 
-		adpcm_data = ((trigger ? (ROM[adpcm_start] & 0x0f) : (ROM[adpcm_start] & 0xf0)>>4) );
-		msm5205_data_w(device,adpcm_data & 0xf);
-		trigger^=1;
-		if(trigger == 0) { adpcm_start++; }
+		state->adpcm_data = ((state->adpcm_trigger ? (ROM[state->adpcm_start] & 0x0f) : (ROM[state->adpcm_start] & 0xf0) >> 4));
+		msm5205_data_w(device, state->adpcm_data & 0xf);
+		state->adpcm_trigger ^= 1;
+		if (state->adpcm_trigger == 0) 
+			state->adpcm_start++;
 	}
 }
 
@@ -230,10 +233,10 @@ static void gcp_adpcm_int(const device_config *device)
 
 static ADDRESS_MAP_START( gcpinbal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(gcpinbal_tilemaps_word_r, gcpinbal_tilemaps_word_w) AM_BASE(&gcpinbal_tilemapram)
-	AM_RANGE(0xc80000, 0xc80fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	/* sprite ram */
+	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(gcpinbal_tilemaps_word_r, gcpinbal_tilemaps_word_w) AM_BASE_MEMBER(gcpinbal_state, tilemapram)
+	AM_RANGE(0xc80000, 0xc80fff) AM_RAM AM_BASE_SIZE_MEMBER(gcpinbal_state, spriteram, spriteram_size)	/* sprite ram */
 	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd80000, 0xd800ff) AM_READWRITE(ioc_r, ioc_w) AM_BASE(&gcpinbal_ioc_ram)
+	AM_RANGE(0xd80000, 0xd800ff) AM_READWRITE(ioc_r, ioc_w) AM_BASE_MEMBER(gcpinbal_state, ioc_ram)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM	/* RAM */
 ADDRESS_MAP_END
 
@@ -244,7 +247,7 @@ ADDRESS_MAP_END
 ***********************************************************/
 
 static INPUT_PORTS_START( gcpinbal )
-	PORT_START("DSW")	/* DSW */
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
@@ -291,7 +294,7 @@ static INPUT_PORTS_START( gcpinbal )
 	PORT_DIPSETTING(      0x8000, "4" )
 	PORT_DIPSETTING(      0x4000, "5" )
 
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -309,7 +312,7 @@ static INPUT_PORTS_START( gcpinbal )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1)	// Tilt left
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -385,16 +388,59 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B		/* 8 kHz */
 };
 
-static MACHINE_RESET( gcpinbal )
-{
-	adpcm_idle = 1;
-}
-
 /***********************************************************
                         MACHINE DRIVERS
 ***********************************************************/
 
+static MACHINE_START( gcpinbal )
+{
+	gcpinbal_state *state = (gcpinbal_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->oki = devtag_get_device(machine, "oki");
+	state->msm = devtag_get_device(machine, "msm");
+
+	state_save_register_global_array(machine, state->scrollx);
+	state_save_register_global_array(machine, state->scrolly);
+	state_save_register_global(machine, state->bg0_gfxset);
+	state_save_register_global(machine, state->bg1_gfxset);
+	state_save_register_global(machine, state->msm_start);
+	state_save_register_global(machine, state->msm_end);
+	state_save_register_global(machine, state->msm_bank);
+	state_save_register_global(machine, state->adpcm_start);
+	state_save_register_global(machine, state->adpcm_end);
+	state_save_register_global(machine, state->adpcm_idle);
+	state_save_register_global(machine, state->adpcm_trigger);
+	state_save_register_global(machine, state->adpcm_data);
+}
+
+static MACHINE_RESET( gcpinbal )
+{
+	gcpinbal_state *state = (gcpinbal_state *)machine->driver_data;
+	int i;
+
+	for (i = 0; i < 3; i++)
+	{
+		state->scrollx[i] = 0;
+		state->scrolly[i] = 0;
+	}
+
+	state->adpcm_idle = 1;
+	state->adpcm_start = 0;
+	state->adpcm_end = 0;
+	state->adpcm_trigger = 0;
+	state->adpcm_data = 0;
+	state->bg0_gfxset = 0;
+	state->bg1_gfxset = 0;
+	state->msm_start = 0;
+	state->msm_end = 0;
+	state->msm_bank = 0;
+}
+
 static MACHINE_DRIVER_START( gcpinbal )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(gcpinbal_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)	/* 16 MHz ? */
@@ -409,10 +455,11 @@ static MACHINE_DRIVER_START( gcpinbal )
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 
+	MDRV_MACHINE_START(gcpinbal)
+	MDRV_MACHINE_RESET(gcpinbal)
+
 	MDRV_GFXDECODE(gcpinbal)
 	MDRV_PALETTE_LENGTH(4096)
-
-	MDRV_MACHINE_RESET(gcpinbal)
 
 	MDRV_VIDEO_START(gcpinbal)
 	MDRV_VIDEO_UPDATE(gcpinbal)
@@ -461,4 +508,4 @@ ROM_END
 
 
 
-GAME( 1994, gcpinbal, 0, gcpinbal, gcpinbal, 0, ROT270, "Excellent System", "Grand Cross", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
+GAME( 1994, gcpinbal, 0, gcpinbal, gcpinbal, 0, ROT270, "Excellent System", "Grand Cross", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

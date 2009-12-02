@@ -3,18 +3,12 @@
 #include "includes/gotya.h"
 
 
-UINT8 *gotya_scroll;
-UINT8 *gotya_videoram2;
-
-static int scroll_bit_8;
-
-static tilemap *bg_tilemap;
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
 
 ***************************************************************************/
+
 PALETTE_INIT( gotya )
 {
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -69,23 +63,27 @@ PALETTE_INIT( gotya )
 
 WRITE8_HANDLER( gotya_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	gotya_state *state = (gotya_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( gotya_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	gotya_state *state = (gotya_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( gotya_video_control_w )
 {
+	gotya_state *state = (gotya_state *)space->machine->driver_data;
+
 	/* bit 0 - scroll bit 8
        bit 1 - flip screen
        bit 2 - sound disable ??? */
 
-	scroll_bit_8 = data & 0x01;
+	state->scroll_bit_8 = data & 0x01;
 
 	if (flip_screen_get(space->machine) != (data & 0x02))
 	{
@@ -96,8 +94,9 @@ WRITE8_HANDLER( gotya_video_control_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index];
-	int color = machine->generic.colorram.u8[tile_index] & 0x0f;
+	gotya_state *state = (gotya_state *)machine->driver_data;
+	int code = state->videoram[tile_index];
+	int color = state->colorram[tile_index] & 0x0f;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -105,19 +104,20 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILEMAP_MAPPER( tilemap_scan_rows_thehand )
 {
 	/* logical (col,row) -> memory offset */
-	row = 31-row;
-	col = 63-col;
-	return ((row)*(num_cols>>1)) + (col&31) + ((col>>5)*0x400);
+	row = 31 - row;
+	col = 63 - col;
+	return ((row) * (num_cols >> 1)) + (col & 31) + ((col >> 5) * 0x400);
 }
 
 VIDEO_START( gotya )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_thehand,
-		 8, 8, 64, 32);
+	gotya_state *state = (gotya_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_thehand, 8, 8, 64, 32);
 }
 
-static void draw_status_row(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int sx, int col)
+static void draw_status_row( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int sx, int col )
 {
+	gotya_state *state = (gotya_state *)machine->driver_data;
 	int row;
 
 	if (flip_screen_get(machine))
@@ -130,26 +130,23 @@ static void draw_status_row(running_machine *machine, bitmap_t *bitmap, const re
 		int sy;
 
 		if (flip_screen_get(machine))
-		{
 			sy = row;
-		}
 		else
-		{
 			sy = 31 - row;
-		}
 
 		drawgfx_opaque(bitmap,cliprect,
 			machine->gfx[0],
-			gotya_videoram2[row * 32 + col],
-			gotya_videoram2[row * 32 + col + 0x10] & 0x0f,
+			state->videoram2[row * 32 + col],
+			state->videoram2[row * 32 + col + 0x10] & 0x0f,
 			flip_screen_x_get(machine), flip_screen_y_get(machine),
 			8 * sx, 8 * sy);
 	}
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	gotya_state *state = (gotya_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
 	for (offs = 2; offs < 0x0e; offs += 2)
@@ -160,9 +157,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int sy = spriteram[offs + 0x00];
 
 		if (flip_screen_get(machine))
-		{
 			sy = 240 - sy;
-		}
 
 		drawgfx_transpen(bitmap,cliprect,
 			machine->gfx[1],
@@ -172,7 +167,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-static void draw_status(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_status( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	draw_status_row(machine, bitmap, cliprect, 0,  1);
 	draw_status_row(machine, bitmap, cliprect, 1,  0);
@@ -184,8 +179,9 @@ static void draw_status(running_machine *machine, bitmap_t *bitmap, const rectan
 
 VIDEO_UPDATE( gotya )
 {
-	tilemap_set_scrollx(bg_tilemap, 0, -(*gotya_scroll + (scroll_bit_8 * 256)) - 2 * 8);
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	gotya_state *state = (gotya_state *)screen->machine->driver_data;
+	tilemap_set_scrollx(state->bg_tilemap, 0, -(*state->scroll + (state->scroll_bit_8 * 256)) - 2 * 8);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	draw_status(screen->machine, bitmap, cliprect);
 	return 0;

@@ -47,12 +47,12 @@ static ADDRESS_MAP_START( gotya_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("DSW")
 	AM_RANGE(0x6004, 0x6004) AM_WRITE(gotya_video_control_w)
 	AM_RANGE(0x6005, 0x6005) AM_WRITE(gotya_soundlatch_w)
-	AM_RANGE(0x6006, 0x6006) AM_WRITE(SMH_RAM) AM_BASE(&gotya_scroll)
+	AM_RANGE(0x6006, 0x6006) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(gotya_state, scroll)
 	AM_RANGE(0x6007, 0x6007) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gotya_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gotya_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0xd000, 0xd3df) AM_RAM AM_BASE(&gotya_videoram2)
-	AM_RANGE(0xd3e0, 0xd3ff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gotya_videoram_w) AM_BASE_MEMBER(gotya_state, videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gotya_colorram_w) AM_BASE_MEMBER(gotya_state, colorram)
+	AM_RANGE(0xd000, 0xd3df) AM_RAM AM_BASE_MEMBER(gotya_state, videoram2)
+	AM_RANGE(0xd3e0, 0xd3ff) AM_RAM AM_BASE_MEMBER(gotya_state, spriteram)
 ADDRESS_MAP_END
 
 
@@ -174,12 +174,36 @@ static const samples_interface gotya_samples_interface =
 };
 
 
+static MACHINE_START( gotya )
+{
+	gotya_state *state = (gotya_state *)machine->driver_data;
+
+	state->samples = devtag_get_device(machine, "samples");
+
+	state_save_register_global(machine, state->scroll_bit_8);
+	state_save_register_global(machine, state->theme_playing);
+}
+
+static MACHINE_RESET( gotya )
+{
+	gotya_state *state = (gotya_state *)machine->driver_data;
+
+	state->scroll_bit_8 = 0;
+	state->theme_playing = 0;
+}
+
 static MACHINE_DRIVER_START( gotya )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(gotya_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,18432000/6)	/* 3.072 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(gotya_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_MACHINE_START(gotya)
+	MDRV_MACHINE_RESET(gotya)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -266,5 +290,5 @@ ROM_START( gotya )
 	ROM_LOAD( "gb-07.bin",	0x3000, 0x1000, CRC(92a9f8bf) SHA1(9231cd86f24f1e6a585c3a919add50c1f8e42a4c) )
 ROM_END
 
-GAME( 1981, thehand, 0,       gotya, gotya, 0, ROT270, "T.I.C."     , "The Hand", GAME_IMPERFECT_SOUND )
-GAME( 1981, gotya,   thehand, gotya, gotya, 0, ROT270, "Game-A-Tron", "Got-Ya (12/24/1981, prototype?)", GAME_IMPERFECT_SOUND )
+GAME( 1981, thehand, 0,       gotya, gotya, 0, ROT270, "T.I.C.",      "The Hand",                        GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1981, gotya,   thehand, gotya, gotya, 0, ROT270, "Game-A-Tron", "Got-Ya (12/24/1981, prototype?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

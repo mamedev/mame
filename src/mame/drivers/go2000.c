@@ -34,20 +34,31 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 
-static UINT16* go2000_video;
-static UINT16* go2000_video2;
+typedef struct _go2000_state go2000_state;
+struct _go2000_state
+{
+	/* memory pointers */
+	UINT16 *  videoram;
+	UINT16 *  videoram2;
+//	UINT16 *  paletteram;	// currently this uses generic palette handling
+
+	/* devices */
+	const device_config *soundcpu;
+};
+
 
 static WRITE16_HANDLER( sound_cmd_w )
 {
+	go2000_state *state = (go2000_state *)space->machine->driver_data;
 	soundlatch_w(space, offset, data & 0xff);
-	cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
+	cpu_set_input_line(state->soundcpu, 0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( go2000_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE(&go2000_video)
-	AM_RANGE(0x610000, 0x61ffff) AM_RAM AM_BASE(&go2000_video2)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_MEMBER(go2000_state, videoram)
+	AM_RANGE(0x610000, 0x61ffff) AM_RAM AM_BASE_MEMBER(go2000_state, videoram2)
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW")
@@ -59,10 +70,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( go2000_pcm_1_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "soundcpu");
-	int bank = data & 7;
-
-	memory_set_bankptr(space->machine, 1, &RAM[bank * 0x10000 + 0x400]);
+	memory_set_bank(space->machine, 1, data & 0x07);
 }
 
 static ADDRESS_MAP_START( go2000_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -79,7 +87,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( go2000 )
-	PORT_START("INPUTS")	/* 16bit */
+	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) // continue
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) // korean symbol
@@ -160,29 +168,30 @@ static VIDEO_START(go2000)
 
 static VIDEO_UPDATE(go2000)
 {
+	go2000_state *state = (go2000_state *)screen->machine->driver_data;
 	int x,y;
 	int count = 0;
 
 	/* 0x600000 - 0x601fff / 0x610000 - 0x611fff */
-	for (x=0;x<64;x++)
+	for (x = 0; x < 64; x++)
 	{
-		for (y=0;y<32;y++)
+		for (y = 0; y < 32; y++)
 		{
-			int tile = go2000_video[count];
-			int attr = go2000_video2[count];
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,attr,0,0,x*8,y*8);
+			int tile = state->videoram[count];
+			int attr = state->videoram2[count];
+			drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], tile, attr, 0, 0, x * 8, y * 8);
 			count++;
 		}
 	}
 
 	/* 0x602000 - 0x603fff / 0x612000 - 0x613fff */
-	for (x=0;x<64;x++)
+	for (x = 0; x < 64; x++)
 	{
-		for (y=0;y<32;y++)
+		for (y = 0; y < 32; y++)
 		{
-			int tile = go2000_video[count];
-			int attr = go2000_video2[count];
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tile,attr,0,0,x*8,y*8,0xf);
+			int tile = state->videoram[count];
+			int attr = state->videoram2[count];
+			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0], tile, attr, 0, 0, x * 8, y * 8, 0xf);
 			count++;
 		}
 	}
@@ -194,43 +203,57 @@ static VIDEO_UPDATE(go2000)
 	int max_x = video_screen_get_width(screen->machine->primary_screen) - 8;
 	int max_y = video_screen_get_height(screen->machine->primary_screen) - 8;
 
-	for ( offs = 0xf800/2; offs < 0x10000/2 ; offs += 4/2 )
+	for (offs = 0xf800 / 2; offs < 0x10000 / 2 ; offs += 4/2)
 	{
-		int srcpg, srcx,srcy, dimx,dimy;
+		int srcpg, srcx, srcy, dimx, dimy;
 		int tile_x, tile_xinc, tile_xstart;
 		int tile_y, tile_yinc;
 		int dx, dy;
 		int flipx, y0;
 
-		int y		=	go2000_video[ offs + 0 + 0x00000 / 2 ];
-		int x		=	go2000_video[ offs + 1 + 0x00000 / 2 ];
-		int dim 	=	go2000_video2[ offs + 0 + 0x00000 / 2 ];
+		int y = state->videoram[offs + 0 + 0x00000 / 2];
+		int x = state->videoram[offs + 1 + 0x00000 / 2];
+		int dim = state->videoram2[offs + 0 + 0x00000 / 2];
 
 		int bank	=	(x >> 12) & 0xf;
 
-		srcpg	=	((y & 0xf000) >> 12) + ((x & 0x0200) >> 5); // src page
-		srcx	=	((y   >> 8) & 0xf) * 2; 					// src col
-		srcy	=	((dim >> 0) & 0xf) * 2; 					// src row
+		srcpg = ((y & 0xf000) >> 12) + ((x & 0x0200) >> 5); // src page
+		srcx = ((y >> 8) & 0xf) * 2; 					// src col
+		srcy = ((dim >> 0) & 0xf) * 2; 					// src row
 
-		switch ( (dim >> 4) & 0xc )
+		switch ((dim >> 4) & 0xc)
 		{
-			case 0x0:	dimx = 2;	dimy =	2;	y0 = 0x100; break;
-			case 0x4:	dimx = 4;	dimy =	4;	y0 = 0x100; break;
+			case 0x0:	dimx = 2;	dimy = 2;	y0 = 0x100; break;
+			case 0x4:	dimx = 4;	dimy = 4;	y0 = 0x100; break;
 			case 0x8:	dimx = 2;	dimy = 32;	y0 = 0x130; break;
 			default:
 			case 0xc:	dimx = 4;	dimy = 32;	y0 = 0x120; break;
 		}
 
-		if (dimx==4)	{ flipx = srcx & 2; 	srcx &= ~2; }
-		else			{ flipx = 0; }
+		if (dimx == 4)	
+		{ 
+			flipx = srcx & 2; 	
+			srcx &= ~2; 
+		}
+		else			
+			flipx = 0;
 
 		x = (x & 0xff) - (x & 0x100);
-		y = (y0 - (y & 0xff) - dimy*8 ) & 0xff;
+		y = (y0 - (y & 0xff) - dimy * 8) & 0xff;
 
-		if (flipx)	{ tile_xstart = dimx-1; tile_xinc = -1; }
-		else		{ tile_xstart = 0;		tile_xinc = +1; }
+		if (flipx)	
+		{ 
+			tile_xstart = dimx - 1; 
+			tile_xinc = -1; 
+		}
+		else
+		{ 
+			tile_xstart = 0;		
+			tile_xinc = +1; 
+		}
 
-		tile_y = 0; 	tile_yinc = +1;
+		tile_y = 0; 	
+		tile_yinc = +1;
 
 		for (dy = 0; dy < dimy * 8; dy += 8)
 		{
@@ -238,20 +261,18 @@ static VIDEO_UPDATE(go2000)
 
 			for (dx = 0; dx < dimx * 8; dx += 8)
 			{
-				int addr	=	(srcpg * 0x20 * 0x20) +
-								((srcx + tile_x) & 0x1f) * 0x20 +
-								((srcy + tile_y) & 0x1f);
+				int addr = (srcpg * 0x20 * 0x20) + ((srcx + tile_x) & 0x1f) * 0x20 + ((srcy + tile_y) & 0x1f);
+				int tile = state->videoram[addr + 0x00000 / 2];
+				int attr = state->videoram2[addr + 0x00000 / 2];
 
-				int tile	=	go2000_video[ addr + 0x00000 / 2 ];
-				int attr	=	go2000_video2[ addr + 0x00000 / 2 ];
+				int sx = x + dx;
+				int sy = (y + dy) & 0xff;
 
-				int sx		=	x + dx;
-				int sy		=	(y + dy) & 0xff;
+				int tile_flipx = tile & 0x4000;
+				int tile_flipy = tile & 0x8000;
 
-				int tile_flipx	=	tile & 0x4000;
-				int tile_flipy	=	tile & 0x8000;
-
-				if (flipx)	tile_flipx = !tile_flipx;
+				if (flipx)	
+					tile_flipx = !tile_flipx;
 
 				if (flip_screen_get(screen->machine))
 				{
@@ -280,13 +301,23 @@ static VIDEO_UPDATE(go2000)
 }
 
 
-static MACHINE_RESET(go2000)
+static MACHINE_START( go2000 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	go2000_pcm_1_bankswitch_w(space, 0, 0);
+	go2000_state *state = (go2000_state *)machine->driver_data;
+	UINT8 *SOUND = memory_region(machine, "soundcpu");
+	int i;
+
+	for (i = 0; i < 8; i++)
+		memory_configure_bank(machine, 1, i, 1, &SOUND[0x00400 + i * 0x10000], 0x10000 - 0x400);
+
+	memory_set_bank(machine, 1, 0);
+
+	state->soundcpu = devtag_get_device(machine, "soundcpu");
 }
 
 static MACHINE_DRIVER_START( go2000 )
+	MDRV_DRIVER_DATA(go2000_state)
+
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(go2000_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -295,8 +326,9 @@ static MACHINE_DRIVER_START( go2000 )
 	MDRV_CPU_PROGRAM_MAP(go2000_sound_map)
 	MDRV_CPU_IO_MAP(go2000_sound_io)
 
+	MDRV_MACHINE_START(go2000)
+
 	MDRV_GFXDECODE(go2000)
-	MDRV_MACHINE_RESET(go2000)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -331,4 +363,4 @@ ROM_START( go2000 )
 ROM_END
 
 
-GAME( 2000, go2000,    0, go2000,    go2000,    0, ROT0,  "SA", "Go 2000", 0 )
+GAME( 2000, go2000,    0, go2000,    go2000,    0, ROT0,  "SA", "Go 2000", GAME_SUPPORTS_SAVE )

@@ -19,19 +19,28 @@ Todo :
 #include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "sound/2203intf.h"
+#include "includes/homerun.h"
 
-extern int homerun_xpa,homerun_xpb,homerun_xpc;
-extern UINT8 *homerun_videoram;
 
-WRITE8_HANDLER( homerun_videoram_w );
-WRITE8_HANDLER( homerun_color_w );
-WRITE8_DEVICE_HANDLER( homerun_banking_w );
-VIDEO_START(homerun);
-VIDEO_UPDATE(homerun);
+static WRITE8_DEVICE_HANDLER(pa_w)
+{
+	homerun_state *state = (homerun_state *)device->machine->driver_data;
+	state->xpa = data;
+}
 
-static WRITE8_DEVICE_HANDLER(pa_w){homerun_xpa=data;}
-static WRITE8_DEVICE_HANDLER(pb_w){homerun_xpb=data;}
-static WRITE8_DEVICE_HANDLER(pc_w){homerun_xpc=data;}
+static WRITE8_DEVICE_HANDLER(pb_w)
+{
+	homerun_state *state = (homerun_state *)device->machine->driver_data;
+	state->xpb = data;
+}
+
+static WRITE8_DEVICE_HANDLER(pc_w)
+{
+	homerun_state *state = (homerun_state *)device->machine->driver_data;
+	state->xpc = data;
+}
+
+
 
 static const ppi8255_interface ppi8255_intf =
 {
@@ -44,44 +53,11 @@ static const ppi8255_interface ppi8255_intf =
 };
 
 
-static MACHINE_RESET( homerun )
-{
-}
-
-static const gfx_layout gfxlayout =
-{
-   8,8,
-   RGN_FRAC(1,1),
-   2,
-   { 8*8,0},
-   { 0, 1, 2, 3, 4, 5, 6, 7},
-   { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
-   8*8*2
-};
-
-
-
-static const gfx_layout spritelayout =
-{
-   16,16,
-   RGN_FRAC(1,1),
-   2,
-   { 8*8,0},
-   { 0, 1, 2, 3, 4, 5, 6, 7,0+8*8*2,1+8*8*2,2+8*8*2,3+8*8*2,4+8*8*2,5+8*8*2,6+8*8*2,7+8*8*2},
-   { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 0*8+2*8*8*2,1*8+2*8*8*2,2*8+2*8*8*2,3*8+2*8*8*2,4*8+2*8*8*2,5*8+2*8*8*2,6*8+2*8*8*2,7*8+2*8*8*2},
-   8*8*2*4
-};
-
-static GFXDECODE_START( homerun )
-	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 16 )
-GFXDECODE_END
-
 static ADDRESS_MAP_START( homerun_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(homerun_videoram_w) AM_BASE(&homerun_videoram)
-	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(homerun_videoram_w) AM_BASE_MEMBER(homerun_state, videoram)
+	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE_SIZE_MEMBER(homerun_state, spriteram, spriteram_size)
 	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(homerun_color_w)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
@@ -184,12 +160,76 @@ static INPUT_PORTS_START( dynashot )
 INPUT_PORTS_END
 
 
+static const gfx_layout gfxlayout =
+{
+   8,8,
+   RGN_FRAC(1,1),
+   2,
+   { 8*8,0},
+   { 0, 1, 2, 3, 4, 5, 6, 7},
+   { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
+   8*8*2
+};
+
+
+
+static const gfx_layout spritelayout =
+{
+   16,16,
+   RGN_FRAC(1,1),
+   2,
+   { 8*8,0},
+   { 0, 1, 2, 3, 4, 5, 6, 7,0+8*8*2,1+8*8*2,2+8*8*2,3+8*8*2,4+8*8*2,5+8*8*2,6+8*8*2,7+8*8*2},
+   { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 0*8+2*8*8*2,1*8+2*8*8*2,2*8+2*8*8*2,3*8+2*8*8*2,4*8+2*8*8*2,5*8+2*8*8*2,6*8+2*8*8*2,7*8+2*8*8*2},
+   8*8*2*4
+};
+
+static GFXDECODE_START( homerun )
+	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,   0, 16 )
+GFXDECODE_END
+
+
+static MACHINE_START( homerun )
+{
+	homerun_state *state = (homerun_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, 1, 0, 1, &ROM[0x00000], 0x4000);
+	memory_configure_bank(machine, 1, 1, 7, &ROM[0x10000], 0x4000);
+
+	state_save_register_global(machine, state->gfx_ctrl);
+	state_save_register_global(machine, state->gc_up);
+	state_save_register_global(machine, state->gc_down);
+	state_save_register_global(machine, state->xpa);
+	state_save_register_global(machine, state->xpb);
+	state_save_register_global(machine, state->xpc);
+}
+
+static MACHINE_RESET( homerun )
+{
+	homerun_state *state = (homerun_state *)machine->driver_data;
+
+	state->gfx_ctrl = 0;
+	state->gc_up = 0;
+	state->gc_down = 0;
+	state->xpa = 0;
+	state->xpb = 0;
+	state->xpc = 0;
+}
+
 static MACHINE_DRIVER_START( homerun )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(homerun_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(homerun_memmap)
 	MDRV_CPU_IO_MAP(homerun_iomap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+	MDRV_MACHINE_START(homerun)
 	MDRV_MACHINE_RESET(homerun)
 
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
@@ -279,5 +319,5 @@ ROM_START( dynashot )
 ROM_END
 
 
-GAME( 1988, homerun, 0, homerun, homerun, 0, ROT0, "Jaleco", "Moero Pro Yakyuu Homerun",GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND)
-GAME( 1988, dynashot, 0, homerun, dynashot, 0, ROT0, "Jaleco", "Dynamic Shooting",GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND)
+GAME( 1988, homerun,  0, homerun, homerun,  0, ROT0, "Jaleco", "Moero Pro Yakyuu Homerun", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1988, dynashot, 0, homerun, dynashot, 0, ROT0, "Jaleco", "Dynamic Shooting",         GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

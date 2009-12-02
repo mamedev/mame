@@ -34,52 +34,66 @@ voice.rom - VOICE ROM
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 
-static tilemap *bg_tilemap;
-static tilemap *fg_tilemap;
-static UINT16 *bg_tilemapram;
-static UINT16 *fg_tilemapram;
+
+typedef struct _good_state good_state;
+struct _good_state
+{
+	/* memory pointers */
+	UINT16 *  bg_tilemapram;
+	UINT16 *  fg_tilemapram;
+	UINT16 *  sprites;
+//	UINT16 *  paletteram;	// currently this uses generic palette handling
+
+	/* video-related */
+	tilemap  *bg_tilemap,*fg_tilemap;
+};
+
 
 static WRITE16_HANDLER( fg_tilemapram_w )
 {
-	COMBINE_DATA(&fg_tilemapram[offset]);
-	tilemap_mark_tile_dirty(fg_tilemap,offset/2);
+	good_state *state = (good_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->fg_tilemapram[offset]);
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset / 2);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int tileno, attr;
-	tileno = fg_tilemapram[tile_index*2];
-	attr = fg_tilemapram[tile_index*2+1]&0xf;
-	SET_TILE_INFO(0,tileno,attr,0);
+	good_state *state = (good_state *)machine->driver_data;
+	int tileno = state->fg_tilemapram[tile_index * 2];
+	int attr = state->fg_tilemapram[tile_index * 2 + 1] & 0xf;
+	SET_TILE_INFO(0, tileno, attr, 0);
 }
 
 static WRITE16_HANDLER( bg_tilemapram_w )
 {
-	COMBINE_DATA(&bg_tilemapram[offset]);
-	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
+	good_state *state = (good_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->bg_tilemapram[offset]);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int tileno, attr;
-	tileno = bg_tilemapram[tile_index*2];
-	attr = bg_tilemapram[tile_index*2+1]&0xf;
-	SET_TILE_INFO(1,tileno,attr,0);
+	good_state *state = (good_state *)machine->driver_data;
+	int tileno = state->bg_tilemapram[tile_index * 2];
+	int attr = state->bg_tilemapram[tile_index * 2 + 1] & 0xf;
+	SET_TILE_INFO(1, tileno, attr, 0);
 }
 
 
 
 static VIDEO_START( good )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows, 16, 16, 32,32);
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows, 16, 16, 32,32);
-	tilemap_set_transparent_pen(fg_tilemap,0xf);
+	good_state *state = (good_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	tilemap_set_transparent_pen(state->fg_tilemap, 0xf);
 }
 
 static VIDEO_UPDATE( good )
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+	good_state *state = (good_state *)screen->machine->driver_data;
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -95,8 +109,8 @@ static ADDRESS_MAP_START( good_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x800000, 0x8007ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE(fg_tilemapram_w) AM_BASE(&fg_tilemapram)
-	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE(bg_tilemapram_w) AM_BASE(&bg_tilemapram)
+	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE(fg_tilemapram_w) AM_BASE_MEMBER(good_state, fg_tilemapram)
+	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE(bg_tilemapram_w) AM_BASE_MEMBER(good_state, bg_tilemapram)
 
 	AM_RANGE(0xff0000, 0xffefff) AM_RAM
 ADDRESS_MAP_END
@@ -256,12 +270,13 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( good )
+	MDRV_DRIVER_DATA(good_state)
+
 	MDRV_CPU_ADD("maincpu", M68000, 16000000 /2)
 	MDRV_CPU_PROGRAM_MAP(good_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_GFXDECODE(good)
-
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -299,4 +314,4 @@ ROM_START( good )
 	ROM_LOAD16_BYTE( "grp-04", 0x40001, 0x20000, CRC(83dbbb52) SHA1(e597f3cbb54b5cdf2230ea6318f970319061e31b) )
 ROM_END
 
-GAME( 1998, good,0,good,good,0, ROT0,  "<unknown>", "Good (Korea)", 0 )
+GAME( 1998, good,   0,   good,   good,   0,  ROT0,  "<unknown>", "Good (Korea)", GAME_SUPPORTS_SAVE )

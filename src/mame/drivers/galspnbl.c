@@ -23,23 +23,17 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
-
-
-extern UINT16 *galspnbl_bgvideoram;
-extern UINT16 *galspnbl_videoram;
-extern UINT16 *galspnbl_colorram;
-extern UINT16 *galspnbl_scroll;
-
-PALETTE_INIT( galspnbl );
-VIDEO_UPDATE( galspnbl );
+#include "includes/galspnbl.h"
 
 
 static WRITE16_HANDLER( soundcommand_w )
 {
+	galspnbl_state *state = (galspnbl_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space,offset,data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -50,13 +44,13 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM		/* galspnbl work RAM, bitmaps are decompressed here */
 	AM_RANGE(0x800000, 0x803fff) AM_RAM		/* hotpinbl work RAM */
 	AM_RANGE(0x808000, 0x80ffff) AM_RAM		/* hotpinbl work RAM, bitmaps are decompressed here */
-	AM_RANGE(0x880000, 0x880fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x880000, 0x880fff) AM_RAM AM_BASE_SIZE_MEMBER(galspnbl_state, spriteram, spriteram_size)
 	AM_RANGE(0x8ff400, 0x8fffff) AM_WRITENOP	/* ??? */
-	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_BASE(&galspnbl_colorram)
+	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_BASE_MEMBER(galspnbl_state, colorram)
 	AM_RANGE(0x901000, 0x903fff) AM_WRITENOP	/* ??? */
-	AM_RANGE(0x904000, 0x904fff) AM_RAM AM_BASE(&galspnbl_videoram)
+	AM_RANGE(0x904000, 0x904fff) AM_RAM AM_BASE_MEMBER(galspnbl_state, videoram)
 	AM_RANGE(0x905000, 0x907fff) AM_WRITENOP	/* ??? */
-	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_BASE(&galspnbl_bgvideoram)
+	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_BASE_MEMBER(galspnbl_state, bgvideoram)
 	AM_RANGE(0xa00000, 0xa00fff) AM_WRITENOP	/* more palette ? */
 	AM_RANGE(0xa01000, 0xa017ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xa01800, 0xa027ff) AM_WRITENOP	/* more palette ? */
@@ -65,7 +59,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa80020, 0xa80021) AM_READ_PORT("SYSTEM") AM_WRITENOP		/* w - could be watchdog, but causes resets when picture is shown */
 	AM_RANGE(0xa80030, 0xa80031) AM_READ_PORT("DSW1") AM_WRITENOP		/* w - irq ack? */
 	AM_RANGE(0xa80040, 0xa80041) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa80050, 0xa80051) AM_WRITE(SMH_RAM) AM_BASE(&galspnbl_scroll)	/* ??? */
+	AM_RANGE(0xa80050, 0xa80051) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(galspnbl_state, scroll)	/* ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -194,9 +188,10 @@ GFXDECODE_END
 
 
 
-static void irqhandler(const device_config *device, int linestate)
+static void irqhandler( const device_config *device, int linestate )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
+	galspnbl_state *state = (galspnbl_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =
@@ -205,8 +200,17 @@ static const ym3812_interface ym3812_config =
 };
 
 
+static MACHINE_START( galspnbl )
+{
+	galspnbl_state *state = (galspnbl_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+}
 
 static MACHINE_DRIVER_START( galspnbl )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(galspnbl_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz ??? */
@@ -216,6 +220,8 @@ static MACHINE_DRIVER_START( galspnbl )
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(audio_map)
 								/* NMI is caused by the main CPU */
+
+	MDRV_MACHINE_START(galspnbl)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -304,5 +310,5 @@ ROM_START( hotpinbl )
 ROM_END
 
 
-GAME( 1995, hotpinbl, 0, galspnbl, hotpinbl, 0, ROT90, "Comad & New Japan System", "Hot Pinball", 0 )
-GAME( 1996, galspnbl, 0, galspnbl, galspnbl, 0, ROT90, "Comad", "Gals Pinball", 0 )
+GAME( 1995, hotpinbl, 0, galspnbl, hotpinbl, 0, ROT90, "Comad & New Japan System", "Hot Pinball", GAME_SUPPORTS_SAVE )
+GAME( 1996, galspnbl, 0, galspnbl, galspnbl, 0, ROT90, "Comad", "Gals Pinball", GAME_SUPPORTS_SAVE )

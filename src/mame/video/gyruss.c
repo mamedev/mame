@@ -8,15 +8,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
-
-
-UINT8 *gyruss_videoram;
-UINT8 *gyruss_colorram;
-UINT8 *gyruss_spriteram;
-UINT8 *gyruss_flipscreen;
-
-static tilemap *gyruss_tilemap;
-
+#include "includes/gyruss.h"
 
 /***************************************************************************
 
@@ -101,18 +93,20 @@ PALETTE_INIT( gyruss )
 
 WRITE8_HANDLER( gyruss_spriteram_w )
 {
+	gyruss_state *state = (gyruss_state *)space->machine->driver_data;
 	video_screen_update_now(space->machine->primary_screen);
-	gyruss_spriteram[offset] = data;
+	state->spriteram[offset] = data;
 }
 
 
 static TILE_GET_INFO( gyruss_get_tile_info )
 {
-	int code = ((gyruss_colorram[tile_index] & 0x20) << 3) | gyruss_videoram[tile_index];
-	int color = gyruss_colorram[tile_index] & 0x0f;
-	int flags = TILE_FLIPYX(gyruss_colorram[tile_index] >> 6);
+	gyruss_state *state = (gyruss_state *)machine->driver_data;
+	int code = ((state->colorram[tile_index] & 0x20) << 3) | state->videoram[tile_index];
+	int color = state->colorram[tile_index] & 0x0f;
+	int flags = TILE_FLIPYX(state->colorram[tile_index] >> 6);
 
-	tileinfo->group = (gyruss_colorram[tile_index] & 0x10) ? 0 : 1;
+	tileinfo->group = (state->colorram[tile_index] & 0x10) ? 0 : 1;
 
 	SET_TILE_INFO(2, code, color, flags);
 }
@@ -120,9 +114,10 @@ static TILE_GET_INFO( gyruss_get_tile_info )
 
 VIDEO_START( gyruss )
 {
-	gyruss_tilemap = tilemap_create(machine, gyruss_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	tilemap_set_transmask(gyruss_tilemap, 0, 0x00, 0);	/* opaque */
-	tilemap_set_transmask(gyruss_tilemap, 1, 0x0f, 0);  /* transparent */
+	gyruss_state *state = (gyruss_state *)machine->driver_data;
+	state->tilemap = tilemap_create(machine, gyruss_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_transmask(state->tilemap, 0, 0x00, 0);	/* opaque */
+	tilemap_set_transmask(state->tilemap, 1, 0x0f, 0);  /* transparent */
 }
 
 
@@ -134,20 +129,21 @@ READ8_HANDLER( gyruss_scanline_r )
 }
 
 
-static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, gfx_element **gfx)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, gfx_element **gfx )
 {
+	gyruss_state *state = (gyruss_state *)machine->driver_data;
 	int offs;
 
 	for (offs = 0xbc; offs >= 0; offs -= 4)
 	{
-		int x = gyruss_spriteram[offs];
-		int y = 241 - gyruss_spriteram[offs + 3];
+		int x = state->spriteram[offs];
+		int y = 241 - state->spriteram[offs + 3];
 
-		int gfx_bank = gyruss_spriteram[offs + 1] & 0x01;
-		int code = ((gyruss_spriteram[offs + 2] & 0x20) << 2) | ( gyruss_spriteram[offs + 1] >> 1);
-		int color = gyruss_spriteram[offs + 2] & 0x0f;
-		int flip_x = ~gyruss_spriteram[offs + 2] & 0x40;
-		int flip_y =  gyruss_spriteram[offs + 2] & 0x80;
+		int gfx_bank = state->spriteram[offs + 1] & 0x01;
+		int code = ((state->spriteram[offs + 2] & 0x20) << 2) | ( state->spriteram[offs + 1] >> 1);
+		int color = state->spriteram[offs + 2] & 0x0f;
+		int flip_x = ~state->spriteram[offs + 2] & 0x40;
+		int flip_y =  state->spriteram[offs + 2] & 0x80;
 
 		drawgfx_transpen(bitmap, cliprect, gfx[gfx_bank], code, color, flip_x, flip_y, x, y, 0);
 	}
@@ -156,15 +152,17 @@ static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, gfx_elemen
 
 VIDEO_UPDATE( gyruss )
 {
+	gyruss_state *state = (gyruss_state *)screen->machine->driver_data;
+
 	if (cliprect->min_y == video_screen_get_visible_area(screen)->min_y)
 	{
 		tilemap_mark_all_tiles_dirty_all(screen->machine);
-		tilemap_set_flip_all(screen->machine, (*gyruss_flipscreen & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		tilemap_set_flip_all(screen->machine, (*state->flipscreen & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 
-	tilemap_draw(bitmap, cliprect, gyruss_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-	draw_sprites(bitmap, cliprect, screen->machine->gfx);
-	tilemap_draw(bitmap, cliprect, gyruss_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->tilemap, TILEMAP_DRAW_OPAQUE, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->gfx);
+	tilemap_draw(bitmap, cliprect, state->tilemap, 0, 0);
 
 	return 0;
 }

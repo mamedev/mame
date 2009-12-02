@@ -44,14 +44,7 @@ PCB Layout
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-
-UINT16 *gumbo_bg_videoram;
-UINT16 *gumbo_fg_videoram;
-
-WRITE16_HANDLER( gumbo_bg_videoram_w );
-WRITE16_HANDLER( gumbo_fg_videoram_w );
-VIDEO_START( gumbo );
-VIDEO_UPDATE( gumbo );
+#include "includes/gumbo.h"
 
 static ADDRESS_MAP_START( gumbo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -60,8 +53,8 @@ static ADDRESS_MAP_START( gumbo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1c0200, 0x1c0201) AM_READ_PORT("DSW")
 	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
-	AM_RANGE(0x1e0000, 0x1e0fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_BASE(&gumbo_bg_videoram) // bg tilemap
-	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_BASE(&gumbo_fg_videoram) // fg tilemap
+	AM_RANGE(0x1e0000, 0x1e0fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_BASE_MEMBER(gumbo_state, bg_videoram) // bg tilemap
+	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_BASE_MEMBER(gumbo_state, fg_videoram) // fg tilemap
 ADDRESS_MAP_END
 
 /* Miss Puzzle has a different memory map */
@@ -69,12 +62,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mspuzzle_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM // main ram
-	AM_RANGE(0x190000, 0x197fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_BASE(&gumbo_fg_videoram) // fg tilemap
+	AM_RANGE(0x190000, 0x197fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_BASE_MEMBER(gumbo_state, fg_videoram) // fg tilemap
 	AM_RANGE(0x1a0000, 0x1a03ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1b0100, 0x1b0101) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1b0200, 0x1b0201) AM_READ_PORT("DSW")
 	AM_RANGE(0x1b0300, 0x1b0301) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
-	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_BASE(&gumbo_bg_videoram) // bg tilemap
+	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_BASE_MEMBER(gumbo_state, bg_videoram) // bg tilemap
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dblpoint_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -84,8 +77,8 @@ static ADDRESS_MAP_START( dblpoint_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1c0200, 0x1c0201) AM_READ_PORT("DSW")
 	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
-	AM_RANGE(0x1e0000, 0x1e3fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_BASE(&gumbo_fg_videoram) // fg tilemap
-	AM_RANGE(0x1f0000, 0x1f0fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_BASE(&gumbo_bg_videoram) // bg tilemap
+	AM_RANGE(0x1e0000, 0x1e3fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_BASE_MEMBER(gumbo_state, fg_videoram) // fg tilemap
+	AM_RANGE(0x1f0000, 0x1f0fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_BASE_MEMBER(gumbo_state, bg_videoram) // bg tilemap
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gumbo )
@@ -235,12 +228,13 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( gumbo )
+	MDRV_DRIVER_DATA(gumbo_state)
+
 	MDRV_CPU_ADD("maincpu", M68000, 14318180 /2)	 // or 10mhz? ?
 	MDRV_CPU_PROGRAM_MAP(gumbo_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold) // all the same
 
 	MDRV_GFXDECODE(gumbo)
-
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -264,12 +258,14 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mspuzzle )
 	MDRV_IMPORT_FROM(gumbo)
+
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mspuzzle_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dblpoint )
 	MDRV_IMPORT_FROM(gumbo)
+
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dblpoint_map)
 MACHINE_DRIVER_END
@@ -400,10 +396,10 @@ ROM_START( dblpointd )
 	ROM_LOAD( "d15.bin", 0x40000, 0x40000, CRC(6b899a51) SHA1(04114ec9695caaac722800ac1a4ffb563ec433c9) )
 ROM_END
 
-GAME( 1994, gumbo,    0,        gumbo,    gumbo,    0, ROT0,  "Min Corp.", "Gumbo", 0 )
-GAME( 1994, mspuzzleg,gumbo,    gumbo,    gumbo,    0, ROT0,  "Min Corp.", "Miss Puzzle (Clone of Gumbo)", 0 )
-GAME( 1994, msbingo,  0,        mspuzzle, msbingo,  0, ROT0,  "Min Corp.", "Miss Bingo", 0 )
-GAME( 1994, mspuzzle, 0,        mspuzzle, mspuzzle, 0, ROT90, "Min Corp.", "Miss Puzzle", 0 )
-GAME( 1994, mspuzzlen,mspuzzle, mspuzzle, mspuzzle, 0, ROT90, "Min Corp.", "Miss Puzzle (Nudes)", GAME_NOT_WORKING )
-GAME( 1995, dblpoint, 0,        dblpoint, dblpoint, 0, ROT0,  "Min Corp.", "Double Point", 0 )
-GAME( 1995, dblpointd,dblpoint, dblpoint, dblpoint, 0, ROT0,  "Dong Bang Electron", "Double Point (Dong Bang Electron, bootleg?)", 0 )
+GAME( 1994, gumbo,    0,        gumbo,    gumbo,    0, ROT0,  "Min Corp.", "Gumbo", GAME_SUPPORTS_SAVE )
+GAME( 1994, mspuzzleg,gumbo,    gumbo,    gumbo,    0, ROT0,  "Min Corp.", "Miss Puzzle (Clone of Gumbo)", GAME_SUPPORTS_SAVE )
+GAME( 1994, msbingo,  0,        mspuzzle, msbingo,  0, ROT0,  "Min Corp.", "Miss Bingo", GAME_SUPPORTS_SAVE )
+GAME( 1994, mspuzzle, 0,        mspuzzle, mspuzzle, 0, ROT90, "Min Corp.", "Miss Puzzle", GAME_SUPPORTS_SAVE )
+GAME( 1994, mspuzzlen,mspuzzle, mspuzzle, mspuzzle, 0, ROT90, "Min Corp.", "Miss Puzzle (Nudes)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1995, dblpoint, 0,        dblpoint, dblpoint, 0, ROT0,  "Min Corp.", "Double Point", GAME_SUPPORTS_SAVE )
+GAME( 1995, dblpointd,dblpoint, dblpoint, dblpoint, 0, ROT0,  "Dong Bang Electron", "Double Point (Dong Bang Electron, bootleg?)", GAME_SUPPORTS_SAVE )

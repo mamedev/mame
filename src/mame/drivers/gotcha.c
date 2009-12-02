@@ -62,18 +62,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-
-
-VIDEO_START( gotcha );
-VIDEO_UPDATE( gotcha );
-WRITE16_HANDLER( gotcha_fgvideoram_w );
-WRITE16_HANDLER( gotcha_bgvideoram_w );
-WRITE16_HANDLER( gotcha_gfxbank_select_w );
-WRITE16_HANDLER( gotcha_gfxbank_w );
-WRITE16_HANDLER( gotcha_scroll_w );
-
-extern UINT16 *gotcha_fgvideoram,*gotcha_bgvideoram;
-
+#include "includes/gotcha.h"
 
 
 static WRITE16_HANDLER( gotcha_lamps_w )
@@ -105,7 +94,6 @@ static WRITE16_DEVICE_HANDLER( gotcha_oki_bank_w )
 }
 
 
-
 static ADDRESS_MAP_START( gotcha_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(soundlatch_word_w)
@@ -113,7 +101,7 @@ static ADDRESS_MAP_START( gotcha_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100004, 0x100005) AM_DEVWRITE("oki", gotcha_oki_bank_w)
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
 	AM_RANGE(0x140000, 0x1405ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_MEMBER(gotcha_state, spriteram, spriteram_size)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("DSW")
@@ -121,8 +109,8 @@ static ADDRESS_MAP_START( gotcha_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300002, 0x300009) AM_WRITE(gotcha_scroll_w)
 //  { 0x30000c, 0x30000d,
 	AM_RANGE(0x30000e, 0x30000f) AM_WRITE(gotcha_gfxbank_w)
-	AM_RANGE(0x320000, 0x320fff) AM_WRITE(gotcha_fgvideoram_w) AM_BASE(&gotcha_fgvideoram)
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE(gotcha_bgvideoram_w) AM_BASE(&gotcha_bgvideoram)
+	AM_RANGE(0x320000, 0x320fff) AM_WRITE(gotcha_fgvideoram_w) AM_BASE_MEMBER(gotcha_state, fgvideoram)
+	AM_RANGE(0x322000, 0x322fff) AM_WRITE(gotcha_bgvideoram_w) AM_BASE_MEMBER(gotcha_state, bgvideoram)
 ADDRESS_MAP_END
 
 
@@ -247,9 +235,10 @@ GFXDECODE_END
 
 
 
-static void irqhandler(const device_config *device, int linestate)
+static void irqhandler( const device_config *device, int linestate )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
+	gotcha_state *state = (gotcha_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, linestate);
 }
 
 static const ym2151_interface ym2151_config =
@@ -258,8 +247,35 @@ static const ym2151_interface ym2151_config =
 };
 
 
+static MACHINE_START( gotcha )
+{
+	gotcha_state *state = (gotcha_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->banksel);
+	state_save_register_global_array(machine, state->gfxbank);
+	state_save_register_global_array(machine, state->scroll);
+}
+
+static MACHINE_RESET( gotcha )
+{
+	gotcha_state *state = (gotcha_state *)machine->driver_data;
+	int i;
+
+	for (i = 0; i < 4; i++)
+	{
+		state->gfxbank[i] = 0;
+		state->scroll[i] = 0;
+	}
+
+	state->banksel = 0;
+}
 
 static MACHINE_DRIVER_START( gotcha )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(gotcha_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,14318180)	/* 14.31818 MHz */
@@ -269,6 +285,9 @@ static MACHINE_DRIVER_START( gotcha )
 	MDRV_CPU_ADD("audiocpu", Z80,6000000)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 //  MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+
+	MDRV_MACHINE_START(gotcha)
+	MDRV_MACHINE_RESET(gotcha)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -377,5 +396,5 @@ ROM_START( ppchamp )
 	ROM_LOAD( "uz11", 0x00000, 0x80000, CRC(3d96274c) SHA1(c7a670af86194c370bf8fb30afbe027ab78a0227) )
 ROM_END
 
-GAME( 1997, gotcha,  0,      gotcha, gotcha, 0, ROT0, "Dongsung", "Got-cha Mini Game Festival", 0 )
-GAME( 1997, ppchamp, gotcha, gotcha, gotcha, 0, ROT0, "Dongsung", "Pasha Pasha Champ Mini Game Festival (Korea)", 0 )
+GAME( 1997, gotcha,  0,      gotcha, gotcha, 0, ROT0, "Dongsung", "Got-cha Mini Game Festival", GAME_SUPPORTS_SAVE )
+GAME( 1997, ppchamp, gotcha, gotcha, gotcha, 0, ROT0, "Dongsung", "Pasha Pasha Champ Mini Game Festival (Korea)", GAME_SUPPORTS_SAVE )

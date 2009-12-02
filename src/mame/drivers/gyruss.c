@@ -62,17 +62,8 @@ and 1 SFX channel controlled by an 8039:
 #include "cpu/mcs48/mcs48.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
+#include "includes/gyruss.h"
 
-extern UINT8 *gyruss_videoram;
-extern UINT8 *gyruss_colorram;
-extern UINT8 *gyruss_spriteram;
-extern UINT8 *gyruss_flipscreen;
-
-WRITE8_HANDLER( gyruss_spriteram_w );
-READ8_HANDLER( gyruss_scanline_r );
-VIDEO_START( gyruss );
-PALETTE_INIT( gyruss );
-VIDEO_UPDATE( gyruss );
 
 /* The timer clock which feeds the upper 4 bits of                      */
 /* AY-3-8910 port A is based on the same clock                          */
@@ -98,7 +89,8 @@ static const int gyruss_timer[10] =
 
 static READ8_DEVICE_HANDLER( gyruss_portA_r )
 {
-	return gyruss_timer[(cputag_get_total_cycles(device->machine, "audiocpu") / 1024) % 10];
+	gyruss_state *state = (gyruss_state *)device->machine->driver_data;
+	return gyruss_timer[(cpu_get_total_cycles(state->audiocpu) / 1024) % 10];
 }
 
 
@@ -109,15 +101,16 @@ static WRITE8_DEVICE_HANDLER( gyruss_dac_w )
 
 static WRITE8_HANDLER( gyruss_irq_clear_w )
 {
-	cputag_set_input_line(space->machine, "audio2", 0, CLEAR_LINE);
+	gyruss_state *state = (gyruss_state *)space->machine->driver_data;
+	cpu_set_input_line(state->audiocpu_2, 0, CLEAR_LINE);
 }
 
-static void filter_w(const device_config *device, int chip, int data)
+static void filter_w( const device_config *device, int chip, int data )
 {
 	int i;
 
 	//printf("chip %d - %02x\n", chip, data);
-	for (i = 0;i < 3;i++)
+	for (i = 0; i < 3; i++)
 	{
 		/* low bit: 47000pF = 0.047uF */
 		/* high bit: 220000pF = 0.22uF */
@@ -128,31 +121,33 @@ static void filter_w(const device_config *device, int chip, int data)
 
 static WRITE8_DEVICE_HANDLER( gyruss_filter0_w )
 {
-	filter_w(device, 0,data);
+	filter_w(device, 0, data);
 }
 
 static WRITE8_DEVICE_HANDLER( gyruss_filter1_w )
 {
-	filter_w(device, 1,data);
+	filter_w(device, 1, data);
 }
 
 
 static WRITE8_HANDLER( gyruss_sh_irqtrigger_w )
 {
+	gyruss_state *state = (gyruss_state *)space->machine->driver_data;
 	/* writing to this register triggers IRQ on the sound CPU */
-	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
+	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( gyruss_i8039_irq_w )
 {
-	cputag_set_input_line(space->machine, "audio2", 0, ASSERT_LINE);
+	gyruss_state *state = (gyruss_state *)space->machine->driver_data;
+	cpu_set_input_line(state->audiocpu_2, 0, ASSERT_LINE);
 }
 
 
 static ADDRESS_MAP_START( main_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(&gyruss_colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE(&gyruss_videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE_MEMBER(gyruss_state, colorram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE_MEMBER(gyruss_state, videoram)
 	AM_RANGE(0x9000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW2") AM_WRITENOP	/* watchdog reset */
@@ -162,14 +157,14 @@ static ADDRESS_MAP_START( main_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc0e0, 0xc0e0) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("DSW3") AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc180, 0xc180) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0xc185, 0xc185) AM_WRITE(SMH_RAM) AM_BASE(&gyruss_flipscreen)
+	AM_RANGE(0xc185, 0xc185) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(gyruss_state, flipscreen)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_READ(gyruss_scanline_r)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x4000, 0x403f) AM_RAM
-	AM_RANGE(0x4040, 0x40ff) AM_RAM_WRITE(gyruss_spriteram_w) AM_BASE(&gyruss_spriteram)
+	AM_RANGE(0x4040, 0x40ff) AM_RAM_WRITE(gyruss_spriteram_w) AM_BASE_MEMBER(gyruss_state, spriteram)
 	AM_RANGE(0x4100, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -242,7 +237,7 @@ static INPUT_PORTS_START( gyruss )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW1")   /* 8P Dip Switch */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -278,7 +273,7 @@ static INPUT_PORTS_START( gyruss )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 
-	PORT_START("DSW2")   /* 8P Dip Switch */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -303,7 +298,7 @@ static INPUT_PORTS_START( gyruss )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW3")   /* 1P Dip Switch */
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x00, "Demo Music" )                PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -502,7 +497,18 @@ static DISCRETE_SOUND_START( gyruss_sound )
 DISCRETE_SOUND_END
 
 
+static MACHINE_START( gyruss )
+{
+	gyruss_state *state = (gyruss_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu_2 = devtag_get_device(machine, "audio2");
+}
+
 static MACHINE_DRIVER_START( gyruss )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(gyruss_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz (?) */
@@ -522,6 +528,8 @@ static MACHINE_DRIVER_START( gyruss )
 	MDRV_CPU_IO_MAP(audio_cpu2_io_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
+
+	MDRV_MACHINE_START(gyruss)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

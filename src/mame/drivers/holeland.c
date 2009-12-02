@@ -1,30 +1,20 @@
 /***************************************************************************
 
-Hole Land
+    Hole Land
 
-driver by Mathis Rosenhauer
+    driver by Mathis Rosenhauer
 
-TODO:
-- tile/sprite priority in holeland
-- missing high bit of sprite X coordinate? (see round 2 and 3 of attract mode
-  in crzrally)
+    TODO:
+    - tile/sprite priority in holeland
+    - missing high bit of sprite X coordinate? (see round 2 and 3 of attract mode
+      in crzrally)
 
 ***************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-VIDEO_START( holeland );
-VIDEO_START( crzrally );
-VIDEO_UPDATE( holeland );
-VIDEO_UPDATE( crzrally );
-
-WRITE8_HANDLER( holeland_videoram_w );
-WRITE8_HANDLER( holeland_colorram_w );
-WRITE8_HANDLER( holeland_flipscreen_w );
-WRITE8_HANDLER( holeland_pal_offs_w );
-WRITE8_HANDLER( holeland_scroll_w );
+#include "includes/holeland.h"
 
 
 static ADDRESS_MAP_START( holeland_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -33,17 +23,17 @@ static ADDRESS_MAP_START( holeland_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(holeland_pal_offs_w)
 	AM_RANGE(0xc006, 0xc007) AM_WRITE(holeland_flipscreen_w)
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(holeland_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(holeland_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(holeland_colorram_w) AM_BASE_MEMBER(holeland_state, colorram)
+	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(holeland_videoram_w) AM_BASE_SIZE_MEMBER(holeland_state, videoram, videoram_size)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_BASE_SIZE_MEMBER(holeland_state, spriteram, spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crzrally_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(holeland_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(holeland_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
-	AM_RANGE(0xe800, 0xebff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(holeland_colorram_w) AM_BASE_MEMBER(holeland_state, colorram)
+	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(holeland_videoram_w) AM_BASE_SIZE_MEMBER(holeland_state, videoram, videoram_size)
+	AM_RANGE(0xe800, 0xebff) AM_RAM AM_BASE_SIZE_MEMBER(holeland_state, spriteram, spriteram_size)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(holeland_scroll_w)
 	AM_RANGE(0xf800, 0xf801) AM_WRITE(holeland_pal_offs_w)
 ADDRESS_MAP_END
@@ -285,6 +275,9 @@ static const ay8910_interface ay8910_interface_2 =
 
 static MACHINE_DRIVER_START( holeland )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(holeland_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(holeland_map)
@@ -353,6 +346,9 @@ Notes:
 */
 
 static MACHINE_DRIVER_START( crzrally )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(holeland_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 20000000/4)        /* 5 MHz */
@@ -507,8 +503,7 @@ ROM_START( crzrallyg )
 ROM_END
 
 
-GAME( 1984, holeland, 0,        holeland, holeland, 0, ROT0,   "Tecfri", "Hole Land", GAME_IMPERFECT_GRAPHICS )
-GAME( 1985, crzrally, 0,        crzrally, crzrally, 0, ROT270, "Tecfri", "Crazy Rally (set 1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1985, crzrallya,crzrally, crzrally, crzrally, 0, ROT270, "Tecfri", "Crazy Rally (set 2)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1985, crzrallyg,crzrally, crzrally, crzrally, 0, ROT270, "Tecfri (Gecas license)", "Crazy Rally (Gecas license)", GAME_IMPERFECT_GRAPHICS )
-
+GAME( 1984, holeland,  0,        holeland, holeland, 0, ROT0,   "Tecfri", "Hole Land",           GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1985, crzrally,  0,        crzrally, crzrally, 0, ROT270, "Tecfri", "Crazy Rally (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1985, crzrallya, crzrally, crzrally, crzrally, 0, ROT270, "Tecfri", "Crazy Rally (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1985, crzrallyg, crzrally, crzrally, crzrally, 0, ROT270, "Tecfri (Gecas license)", "Crazy Rally (Gecas license)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

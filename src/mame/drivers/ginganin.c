@@ -54,18 +54,7 @@ f5d6    print 7 digit BCD number: d0.l to (a1)+ color $3000
 #include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/8950intf.h"
-
-/* Variables only used here */
-
-/* Variables defined in video */
-extern UINT16 *ginganin_fgram16, *ginganin_txtram16, *ginganin_vregs16;
-
-/* Functions defined in video */
-WRITE16_HANDLER( ginganin_fgram16_w );
-WRITE16_HANDLER( ginganin_txtram16_w );
-WRITE16_HANDLER( ginganin_vregs16_w );
-VIDEO_START( ginganin );
-VIDEO_UPDATE( ginganin );
+#include "includes/ginganin.h"
 
 
 /*
@@ -79,11 +68,11 @@ static ADDRESS_MAP_START( ginganin_map, ADDRESS_SPACE_PROGRAM, 16 )
 /* The ROM area: 10000-13fff is written with: 0000 0000 0000 0001, at startup only. Why? */
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x020000, 0x023fff) AM_RAM
-	AM_RANGE(0x030000, 0x0307ff) AM_RAM_WRITE(ginganin_txtram16_w) AM_BASE(&ginganin_txtram16)
-	AM_RANGE(0x040000, 0x0407ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x030000, 0x0307ff) AM_RAM_WRITE(ginganin_txtram16_w) AM_BASE_MEMBER(ginganin_state, txtram)
+	AM_RANGE(0x040000, 0x0407ff) AM_RAM AM_BASE_SIZE_MEMBER(ginganin_state, spriteram, spriteram_size)
 	AM_RANGE(0x050000, 0x0507ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x060000, 0x06000f) AM_RAM_WRITE(ginganin_vregs16_w) AM_BASE(&ginganin_vregs16)
-	AM_RANGE(0x068000, 0x06bfff) AM_RAM_WRITE(ginganin_fgram16_w) AM_BASE(&ginganin_fgram16)
+	AM_RANGE(0x060000, 0x06000f) AM_RAM_WRITE(ginganin_vregs16_w) AM_BASE_MEMBER(ginganin_state, vregs)
+	AM_RANGE(0x068000, 0x06bfff) AM_RAM_WRITE(ginganin_fgram16_w) AM_BASE_MEMBER(ginganin_state, fgram)
 	AM_RANGE(0x070000, 0x070001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x070002, 0x070003) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
@@ -95,43 +84,30 @@ ADDRESS_MAP_END
 **
 */
 
-/* based on snk.c: */
-
-/* Added by Takahiro Nogi. 1999/09/27 */
-static UINT8 MC6840_index0;
-static UINT8 MC6840_register0;
-static UINT8 MC6840_index1;
-static UINT8 MC6840_register1;
-static int S_TEMPO = 0;
-static int S_TEMPO_OLD = 0;
-static int MC6809_CTR = 0;
-static int MC6809_FLAG = 0;
-
-
 static WRITE8_HANDLER( MC6840_control_port_0_w )
 {
 	/* MC6840 Emulation by Takahiro Nogi. 1999/09/27
     (This routine hasn't been completed yet.) */
 
-	MC6840_index0 = data;
+	ginganin_state *state = (ginganin_state *)space->machine->driver_data;
+	state->MC6840_index0 = data;
 
-	if (MC6840_index0 & 0x80)	/* enable timer output */
+	if (state->MC6840_index0 & 0x80)	/* enable timer output */
 	{
-		if ((MC6840_register0 != S_TEMPO) && (MC6840_register0 != 0))
+		if ((state->MC6840_register0 != state->S_TEMPO) && (state->MC6840_register0 != 0))
 		{
-			S_TEMPO = MC6840_register0;
+			state->S_TEMPO = state->MC6840_register0;
 #ifdef MAME_DEBUG
-			popmessage("I0:0x%02X R0:0x%02X I1:0x%02X R1:0x%02X", MC6840_index0, MC6840_register0, MC6840_index1, MC6840_register1);
+			popmessage("I0:0x%02X R0:0x%02X I1:0x%02X R1:0x%02X", state->MC6840_index0, state->MC6840_register0, state->MC6840_index1, state->MC6840_register1);
 #endif
 		}
-		MC6809_FLAG = 1;
+		state->MC6809_FLAG = 1;
 	}
 	else
-	{
-		MC6809_FLAG = 0;
-	}
+		state->MC6809_FLAG = 0;
+
 #ifdef MAME_DEBUG
-	logerror("MC6840 Write:(0x%02X)0x%02X\n", MC6840_register0, data);
+	logerror("MC6840 Write:(0x%02X)0x%02X\n", state->MC6840_register0,  data);
 #endif
 }
 
@@ -140,7 +116,8 @@ static WRITE8_HANDLER( MC6840_control_port_1_w )
 	/* MC6840 Emulation by Takahiro Nogi. 1999/09/27
     (This routine hasn't been completed yet.) */
 
-	MC6840_index1 = data;
+	ginganin_state *state = (ginganin_state *)space->machine->driver_data;
+	state->MC6840_index1 = data;
 }
 
 static WRITE8_HANDLER( MC6840_write_port_0_w )
@@ -148,7 +125,8 @@ static WRITE8_HANDLER( MC6840_write_port_0_w )
 	/* MC6840 Emulation by Takahiro Nogi. 1999/09/27
     (This routine hasn't been completed yet.) */
 
-	MC6840_register0 = data;
+	ginganin_state *state = (ginganin_state *)space->machine->driver_data;
+	state->MC6840_register0 = data;
 }
 
 static WRITE8_HANDLER( MC6840_write_port_1_w )
@@ -156,7 +134,8 @@ static WRITE8_HANDLER( MC6840_write_port_1_w )
 	/* MC6840 Emulation by Takahiro Nogi. 1999/09/27
     (This routine hasn't been completed yet.) */
 
-	MC6840_register1 = data;
+	ginganin_state *state = (ginganin_state *)space->machine->driver_data;
+	state->MC6840_register1 = data;
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -299,31 +278,69 @@ static INTERRUPT_GEN( ginganin_sound_interrupt )
 	/* MC6840 Emulation by Takahiro Nogi. 1999/09/27
     (This routine hasn't been completed yet.) */
 
-	if (S_TEMPO_OLD != S_TEMPO)
+	ginganin_state *state = (ginganin_state *)device->machine->driver_data;
+
+	if (state->S_TEMPO_OLD != state->S_TEMPO)
 	{
-		S_TEMPO_OLD = S_TEMPO;
-		MC6809_CTR = 0;
+		state->S_TEMPO_OLD = state->S_TEMPO;
+		state->MC6809_CTR = 0;
 	}
 
-	if (MC6809_FLAG != 0)
+	if (state->MC6809_FLAG != 0)
 	{
-		if (MC6809_CTR > S_TEMPO)
+		if (state->MC6809_CTR > state->S_TEMPO)
 		{
-			MC6809_CTR = 0;
+			state->MC6809_CTR = 0;
 			cpu_set_input_line(device, 0, HOLD_LINE);
 		}
 		else
-		{
-			MC6809_CTR++;
-		}
+			state->MC6809_CTR++;
 	}
 }
 
 
 
-/* The Y8950 is basically a YM3526 with ADPCM built in */
+
+
+static MACHINE_START( ginganin )
+{
+	ginganin_state *state = (ginganin_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->layers_ctrl); 
+	state_save_register_global(machine, state->flipscreen);
+	state_save_register_global(machine, state->MC6840_index0);
+	state_save_register_global(machine, state->MC6840_register0);
+	state_save_register_global(machine, state->MC6840_index1);
+	state_save_register_global(machine, state->MC6840_register1);
+	state_save_register_global(machine, state->S_TEMPO);
+	state_save_register_global(machine, state->S_TEMPO_OLD);
+	state_save_register_global(machine, state->MC6809_CTR);
+	state_save_register_global(machine, state->MC6809_FLAG);
+}
+
+static MACHINE_RESET( ginganin )
+{
+	ginganin_state *state = (ginganin_state *)machine->driver_data;
+
+	state->layers_ctrl = 0; 
+	state->flipscreen = 0;
+	state->MC6840_index0 = 0;
+	state->MC6840_register0 = 0;
+	state->MC6840_index1 = 0;
+	state->MC6840_register1 = 0;
+	state->S_TEMPO = 0;
+	state->S_TEMPO_OLD = 0;
+	state->MC6809_CTR = 0;
+	state->MC6809_FLAG = 0;
+}
+
 
 static MACHINE_DRIVER_START( ginganin )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ginganin_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 6000000)	/* ? */
@@ -333,6 +350,9 @@ static MACHINE_DRIVER_START( ginganin )
 	MDRV_CPU_ADD("audiocpu", M6809, 1000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(ginganin_sound_interrupt,60)	/* Takahiro Nogi. 1999/09/27 (1 -> 60) */
+
+	MDRV_MACHINE_START(ginganin)
+	MDRV_MACHINE_RESET(ginganin)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -354,7 +374,7 @@ static MACHINE_DRIVER_START( ginganin )
 	MDRV_SOUND_ADD("aysnd", AY8910, 3579545 / 2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD("ymsnd", Y8950, 3579545)
+	MDRV_SOUND_ADD("ymsnd", Y8950, 3579545)	/* The Y8950 is basically a YM3526 with ADPCM built in */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -444,15 +464,15 @@ static DRIVER_INIT( ginganin )
 	/* main cpu patches */
 	rom = (UINT16 *)memory_region(machine, "maincpu");
 	/* avoid writes to rom getting to the log */
-	rom[0x408/2] = 0x6000;
-	rom[0x40a/2] = 0x001c;
+	rom[0x408 / 2] = 0x6000;
+	rom[0x40a / 2] = 0x001c;
 
 
 	/* sound cpu patches */
 	/* let's clear the RAM: ROM starts at 0x4000 */
-	memset(memory_region(machine, "audiocpu"),0,0x800);
+	memset(memory_region(machine, "audiocpu"), 0, 0x800);
 }
 
 
-GAME( 1987, ginganin, 0,        ginganin, ginganin, ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 1)", 0 )
-GAME( 1987, ginganina,ginganin, ginganin, ginganin, ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 2)", 0 )
+GAME( 1987, ginganin,  0,        ginganin, ginganin, ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ginganina, ginganin, ginganin, ginganin, ginganin, ROT0, "Jaleco", "Ginga NinkyouDen (set 2)", GAME_SUPPORTS_SAVE )

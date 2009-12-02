@@ -21,32 +21,18 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/2203intf.h"
-
-VIDEO_START( goindol );
-WRITE8_HANDLER( goindol_fg_videoram_w );
-WRITE8_HANDLER( goindol_bg_videoram_w );
-VIDEO_UPDATE( goindol );
-
-extern UINT8 *goindol_fg_scrollx;
-extern UINT8 *goindol_fg_scrolly;
-extern UINT8 *goindol_fg_videoram;
-extern UINT8 *goindol_bg_videoram;
-extern size_t goindol_fg_videoram_size;
-extern size_t goindol_bg_videoram_size;
-extern int goindol_char_bank;
+#include "includes/goindol.h"
 
 
 static WRITE8_HANDLER( goindol_bankswitch_w )
 {
-	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	goindol_state *state = (goindol_state *)space->machine->driver_data;
 
-	bankaddress = 0x10000 + ((data & 3) * 0x4000);
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bank(space->machine, 1, data & 0x03);
 
-	if (goindol_char_bank != ((data & 0x10) >> 4))
+	if (state->char_bank != ((data & 0x10) >> 4))
 	{
-		goindol_char_bank = (data & 0x10) >> 4;
+		state->char_bank = (data & 0x10) >> 4;
 		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
@@ -57,41 +43,47 @@ static WRITE8_HANDLER( goindol_bankswitch_w )
 
 static READ8_HANDLER( prot_f422_r )
 {
-	static int toggle;
+	goindol_state *state = (goindol_state *)space->machine->driver_data;
 
 	/* bit 7 = vblank? */
-	toggle ^= 0x80;
+	state->prot_toggle ^= 0x80;
 
-	return toggle;
+	return state->prot_toggle;
 }
 
 
-static UINT8 *ram;
-
 static WRITE8_HANDLER( prot_fc44_w )
 {
-logerror("%04x: prot_fc44_w(%02x)\n",cpu_get_pc(space->cpu),data);
-	ram[0x0419] = 0x5b;
-	ram[0x041a] = 0x3f;
-	ram[0x041b] = 0x6d;
+	goindol_state *state = (goindol_state *)space->machine->driver_data;
+
+	logerror("%04x: prot_fc44_w(%02x)\n", cpu_get_pc(space->cpu), data);
+	state->ram[0x0419] = 0x5b;
+	state->ram[0x041a] = 0x3f;
+	state->ram[0x041b] = 0x6d;
 }
 
 static WRITE8_HANDLER( prot_fd99_w )
 {
-logerror("%04x: prot_fd99_w(%02x)\n",cpu_get_pc(space->cpu),data);
-	ram[0x0421] = 0x3f;
+	goindol_state *state = (goindol_state *)space->machine->driver_data;
+
+	logerror("%04x: prot_fd99_w(%02x)\n", cpu_get_pc(space->cpu), data);
+	state->ram[0x0421] = 0x3f;
 }
 
 static WRITE8_HANDLER( prot_fc66_w )
 {
-logerror("%04x: prot_fc66_w(%02x)\n",cpu_get_pc(space->cpu),data);
-	ram[0x0423] = 0x06;
+	goindol_state *state = (goindol_state *)space->machine->driver_data;
+
+	logerror("%04x: prot_fc66_w(%02x)\n", cpu_get_pc(space->cpu), data);
+	state->ram[0x0423] = 0x06;
 }
 
 static WRITE8_HANDLER( prot_fcb0_w )
 {
-logerror("%04x: prot_fcb0_w(%02x)\n",cpu_get_pc(space->cpu),data);
-	ram[0x0425] = 0x06;
+	goindol_state *state = (goindol_state *)space->machine->driver_data;
+
+	logerror("%04x: prot_fcb0_w(%02x)\n", cpu_get_pc(space->cpu), data);
+	state->ram[0x0425] = 0x06;
 }
 
 
@@ -99,20 +91,20 @@ logerror("%04x: prot_fcb0_w(%02x)\n",cpu_get_pc(space->cpu),data);
 static ADDRESS_MAP_START( goindol_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(&ram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_MEMBER(goindol_state, ram)
 	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_WRITE(soundlatch_w) // watchdog?
 	AM_RANGE(0xc810, 0xc810) AM_WRITE(goindol_bankswitch_w)
 	AM_RANGE(0xc820, 0xc820) AM_READ_PORT("DIAL")
-	AM_RANGE(0xc820, 0xd820) AM_WRITE(SMH_RAM) AM_BASE(&goindol_fg_scrolly)
+	AM_RANGE(0xc820, 0xd820) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(goindol_state, fg_scrolly)
 	AM_RANGE(0xc830, 0xc830) AM_READ_PORT("P1")
-	AM_RANGE(0xc830, 0xd830) AM_WRITE(SMH_RAM) AM_BASE(&goindol_fg_scrollx)
+	AM_RANGE(0xc830, 0xd830) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(goindol_state, fg_scrollx)
 	AM_RANGE(0xc834, 0xc834) AM_READ_PORT("P2")
-	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_BASE_SIZE_MEMBER(goindol_state, spriteram, spriteram_size)
 	AM_RANGE(0xd040, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(goindol_bg_videoram_w) AM_BASE(&goindol_bg_videoram) AM_SIZE(&goindol_bg_videoram_size)
-	AM_RANGE(0xe000, 0xe03f) AM_RAM AM_BASE_GENERIC(spriteram2)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(goindol_bg_videoram_w) AM_BASE_SIZE_MEMBER(goindol_state, bg_videoram, bg_videoram_size)
+	AM_RANGE(0xe000, 0xe03f) AM_RAM AM_BASE_MEMBER(goindol_state, spriteram2)
 	AM_RANGE(0xe040, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goindol_fg_videoram_w) AM_BASE(&goindol_fg_videoram) AM_SIZE(&goindol_fg_videoram_size)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goindol_fg_videoram_w) AM_BASE_SIZE_MEMBER(goindol_state, fg_videoram, fg_videoram_size)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf422, 0xf422) AM_READ(prot_f422_r)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW2")
@@ -232,7 +224,29 @@ GFXDECODE_END
 
 
 
+static MACHINE_START( goindol )
+{
+	goindol_state *state = (goindol_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, 1, 0, 4, &ROM[0x10000], 0x4000);
+
+	state_save_register_global(machine, state->char_bank);
+	state_save_register_global(machine, state->prot_toggle);
+}
+
+static MACHINE_RESET( goindol )
+{
+	goindol_state *state = (goindol_state *)machine->driver_data;
+
+	state->char_bank = 0;
+	state->prot_toggle = 0;
+}
+
 static MACHINE_DRIVER_START( goindol )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(goindol_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)        /* 6 MHz (?) */
@@ -242,6 +256,9 @@ static MACHINE_DRIVER_START( goindol )
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+
+	MDRV_MACHINE_START(goindol)
+	MDRV_MACHINE_RESET(goindol)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -382,7 +399,7 @@ static DRIVER_INIT( goindol )
 
 	/* I hope that's all patches to avoid protection */
 
-	rom[0x18e9] = 0x18;	// ROM 1 check
+	rom[0x18e9] = 0x18; // ROM 1 check
 	rom[0x1964] = 0x00; // ROM 9 error (MCU?)
 	rom[0x1965] = 0x00; //
 	rom[0x1966] = 0x00; //
@@ -406,7 +423,7 @@ static DRIVER_INIT( goindol )
 
 
 
-GAME( 1987, goindol,  0,       goindol, goindol, goindol, ROT90, "Sun a Electronics", "Goindol (World)", GAME_UNEMULATED_PROTECTION )
-GAME( 1987, goindolu, goindol, goindol, goindol, goindol, ROT90, "Sun a Electronics", "Goindol (US)",    GAME_UNEMULATED_PROTECTION )
-GAME( 1987, goindolk, goindol, goindol, goindol, goindol, ROT90, "Sun a Electronics", "Goindol (Korea)", GAME_UNEMULATED_PROTECTION )
-GAME( 1987, homo,     goindol, goindol, homo,    0,       ROT90, "bootleg", "Homo", 0 )
+GAME( 1987, goindol,  0,       goindol, goindol, goindol, ROT90, "Sun a Electronics", "Goindol (World)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1987, goindolu, goindol, goindol, goindol, goindol, ROT90, "Sun a Electronics", "Goindol (US)",    GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1987, goindolk, goindol, goindol, goindol, goindol, ROT90, "Sun a Electronics", "Goindol (Korea)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1987, homo,     goindol, goindol, homo,    0,       ROT90, "bootleg", "Homo", GAME_SUPPORTS_SAVE )

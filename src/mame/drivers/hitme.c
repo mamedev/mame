@@ -16,15 +16,10 @@
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
-#include "hitme.h"
+#include "includes/hitme.h"
 #include "sound/discrete.h"
 
 #define MASTER_CLOCK (XTAL_8_945MHz) /* confirmed on schematic */
-
-static tilemap *hitme_tilemap;
-static attotime timeout_time;
-static UINT8 *hitme_vidram;
-
 
 
 /*************************************
@@ -35,17 +30,21 @@ static UINT8 *hitme_vidram;
 
 static TILE_GET_INFO( get_hitme_tile_info )
 {
+	hitme_state *state = (hitme_state *)machine->driver_data;
+
 	/* the code is the low 6 bits */
-	UINT8 code = hitme_vidram[tile_index] & 0x3f;
+	UINT8 code = state->videoram[tile_index] & 0x3f;
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
 
 static WRITE8_HANDLER( hitme_vidram_w )
 {
+	hitme_state *state = (hitme_state *)space->machine->driver_data;
+
 	/* mark this tile dirty */
-	hitme_vidram[offset] = data;
-	tilemap_mark_tile_dirty(hitme_tilemap, offset);
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->tilemap, offset);
 }
 
 
@@ -56,20 +55,23 @@ static WRITE8_HANDLER( hitme_vidram_w )
  *
  *************************************/
 
-static VIDEO_START(hitme)
+static VIDEO_START( hitme )
 {
-	hitme_tilemap = tilemap_create(machine, get_hitme_tile_info,tilemap_scan_rows, 8,10, 40,19);
+	hitme_state *state = (hitme_state *)machine->driver_data;
+	state->tilemap = tilemap_create(machine, get_hitme_tile_info, tilemap_scan_rows, 8, 10, 40, 19);
 }
 
 
-static VIDEO_START(barricad)
+static VIDEO_START( barricad )
 {
-	hitme_tilemap = tilemap_create(machine, get_hitme_tile_info,tilemap_scan_rows, 8,8, 32,24);
+	hitme_state *state = (hitme_state *)machine->driver_data;
+	state->tilemap = tilemap_create(machine, get_hitme_tile_info, tilemap_scan_rows, 8, 8, 32, 24);
 }
 
 
-static VIDEO_UPDATE(hitme)
+static VIDEO_UPDATE( hitme )
 {
+	hitme_state *state = (hitme_state *)screen->machine->driver_data;
 	/* the card width resistor comes from an input port, scaled to the range 0-25 kOhms */
 	double width_resist = input_port_read(screen->machine, "WIDTH") * 25000 / 100;
 	/* this triggers a oneshot for the following length of time */
@@ -82,7 +84,7 @@ static VIDEO_UPDATE(hitme)
 	offs_t offs = 0;
 
 	/* start by drawing the tilemap */
-	tilemap_draw(bitmap,cliprect,hitme_tilemap,0,0);
+	tilemap_draw(bitmap, cliprect, state->tilemap, 0, 0);
 
 	/* now loop over and invert anything */
 	for (y = 0; y < 19; y++)
@@ -91,23 +93,23 @@ static VIDEO_UPDATE(hitme)
 		for (inv = x = 0; x < 40; x++, offs++)
 		{
 			/* if the high bit is set, reset the oneshot */
-			if (hitme_vidram[y*40+x] & 0x80)
+			if (state->videoram[y * 40 + x] & 0x80)
 				inv = width_pixels;
 
 			/* invert pixels until we run out */
 			for (xx = 0; xx < 8 && inv; xx++, inv--)
 			{
-				UINT16 *dest = BITMAP_ADDR16(bitmap, y*10, x*8 + xx);
-				dest[0*dy] ^= 1;
-				dest[1*dy] ^= 1;
-				dest[2*dy] ^= 1;
-				dest[3*dy] ^= 1;
-				dest[4*dy] ^= 1;
-				dest[5*dy] ^= 1;
-				dest[6*dy] ^= 1;
-				dest[7*dy] ^= 1;
-				dest[8*dy] ^= 1;
-				dest[9*dy] ^= 1;
+				UINT16 *dest = BITMAP_ADDR16(bitmap, y * 10, x * 8 + xx);
+				dest[0 * dy] ^= 1;
+				dest[1 * dy] ^= 1;
+				dest[2 * dy] ^= 1;
+				dest[3 * dy] ^= 1;
+				dest[4 * dy] ^= 1;
+				dest[5 * dy] ^= 1;
+				dest[6 * dy] ^= 1;
+				dest[7 * dy] ^= 1;
+				dest[8 * dy] ^= 1;
+				dest[9 * dy] ^= 1;
 			}
 		}
 	}
@@ -115,9 +117,10 @@ static VIDEO_UPDATE(hitme)
 }
 
 
-static VIDEO_UPDATE(barricad)
+static VIDEO_UPDATE( barricad )
 {
-	tilemap_draw(bitmap,cliprect,hitme_tilemap,0,0);
+	hitme_state *state = (hitme_state *)screen->machine->driver_data;
+	tilemap_draw(bitmap, cliprect, state->tilemap, 0, 0);
 	return 0;
 }
 
@@ -129,18 +132,19 @@ static VIDEO_UPDATE(barricad)
  *
  *************************************/
 
-static UINT8 read_port_and_t0(running_machine *machine, int port)
+static UINT8 read_port_and_t0( running_machine *machine, int port )
 {
+	hitme_state *state = (hitme_state *)machine->driver_data;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	UINT8 val = input_port_read(machine, portnames[port]);
-	if (attotime_compare(timer_get_time(machine), timeout_time) > 0)
+	if (attotime_compare(timer_get_time(machine), state->timeout_time) > 0)
 		val ^= 0x80;
 	return val;
 }
 
 
-static UINT8 read_port_and_t0_and_hblank(running_machine *machine, int port)
+static UINT8 read_port_and_t0_and_hblank( running_machine *machine, int port )
 {
 	UINT8 val = read_port_and_t0(machine, port);
 	if (video_screen_get_hpos(machine->primary_screen) < (video_screen_get_width(machine->primary_screen) * 9 / 10))
@@ -188,10 +192,11 @@ static WRITE8_DEVICE_HANDLER( output_port_0_w )
         In fact, it is very important that our timing calculation timeout AFTER the sound
         system's equivalent computation, or else we will hang notes.
     */
+	hitme_state *state = (hitme_state *)device->machine->driver_data;
 	UINT8 raw_game_speed = input_port_read(device->machine, "R3");
 	double resistance = raw_game_speed * 25000 / 100;
-	attotime duration = attotime_make(0, ATTOSECONDS_PER_SECOND * 0.45 * 6.8e-6 * resistance * (data+1));
-	timeout_time = attotime_add(timer_get_time(device->machine), duration);
+	attotime duration = attotime_make(0, ATTOSECONDS_PER_SECOND * 0.45 * 6.8e-6 * resistance * (data + 1));
+	state->timeout_time = attotime_add(timer_get_time(device->machine), duration);
 
 	discrete_sound_w(device, HITME_DOWNCOUNT_VAL, data);
 	discrete_sound_w(device, HITME_OUT0, 1);
@@ -222,7 +227,7 @@ static WRITE8_DEVICE_HANDLER( output_port_1_w )
 static ADDRESS_MAP_START( hitme_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0c00, 0x0eff) AM_RAM_WRITE(hitme_vidram_w) AM_BASE(&hitme_vidram)
+	AM_RANGE(0x0c00, 0x0eff) AM_RAM_WRITE(hitme_vidram_w) AM_BASE_MEMBER(hitme_state, videoram)
 	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x300) AM_RAM
 	AM_RANGE(0x1400, 0x14ff) AM_READ(hitme_port_0_r)
 	AM_RANGE(0x1500, 0x15ff) AM_READ(hitme_port_1_r)
@@ -300,12 +305,29 @@ GFXDECODE_END
  *
  *************************************/
 
+static MACHINE_START( hitme )
+{
+}
+
+static MACHINE_RESET( hitme )
+{
+	hitme_state *state = (hitme_state *)machine->driver_data;
+
+	state->timeout_time = attotime_zero;
+}
+
 static MACHINE_DRIVER_START( hitme )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(hitme_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK/16)
 	MDRV_CPU_PROGRAM_MAP(hitme_map)
 	MDRV_CPU_IO_MAP(hitme_portmap)
+
+	MDRV_MACHINE_START(hitme)
+	MDRV_MACHINE_RESET(hitme)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -529,7 +551,7 @@ ROM_START( hitme )
 	ROM_LOAD( "hm6.e7", 0x0600, 0x0200, CRC(8aa87118) SHA1(aca395a4f6a1981cd89ca99e05935d72adcb69ca) )
 
 	ROM_REGION( 0x0400, "gfx1", ROMREGION_ERASE00 )
-    ROM_LOAD( "hmcg.h7", 0x0000, 0x0200, CRC(818f5fbe) SHA1(e2b3349e51ba57d14f3388ba93891bc6274b7a14) )
+	ROM_LOAD( "hmcg.h7", 0x0000, 0x0200, CRC(818f5fbe) SHA1(e2b3349e51ba57d14f3388ba93891bc6274b7a14) )
 ROM_END
 
 
@@ -541,7 +563,7 @@ ROM_START( m21 )
 	ROM_LOAD( "hm6.e7", 0x0600, 0x0200, CRC(8aa87118) SHA1(aca395a4f6a1981cd89ca99e05935d72adcb69ca) )
 
 	ROM_REGION( 0x0400, "gfx1", ROMREGION_ERASE00 )
-    ROM_LOAD( "hmcg.h7", 0x0000, 0x0200, CRC(818f5fbe) SHA1(e2b3349e51ba57d14f3388ba93891bc6274b7a14) )
+	ROM_LOAD( "hmcg.h7", 0x0000, 0x0200, CRC(818f5fbe) SHA1(e2b3349e51ba57d14f3388ba93891bc6274b7a14) )
 ROM_END
 
 
@@ -576,7 +598,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1976, hitme,    0,        hitme,    hitme,    0, ROT0, "RamTek", "Hit Me", 0 )
-GAME( 1976, m21,      hitme,    hitme,    hitme,    0, ROT0, "Mirco", "21 (Mirco)", 0 )
-GAME( 1976, barricad, 0,        barricad, barricad, 0, ROT0, "RamTek", "Barricade", GAME_IMPERFECT_SOUND  )
-GAME( 1976, brickyrd, barricad, barricad, barricad, 0, ROT0, "RamTek", "Brickyard", GAME_IMPERFECT_SOUND  )
+GAME( 1976, hitme,    0,        hitme,    hitme,    0, ROT0, "RamTek", "Hit Me",     GAME_SUPPORTS_SAVE )
+GAME( 1976, m21,      hitme,    hitme,    hitme,    0, ROT0, "Mirco",  "21 (Mirco)", GAME_SUPPORTS_SAVE )
+GAME( 1976, barricad, 0,        barricad, barricad, 0, ROT0, "RamTek", "Barricade",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1976, brickyrd, barricad, barricad, barricad, 0, ROT0, "RamTek", "Brickyard",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

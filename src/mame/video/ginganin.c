@@ -58,15 +58,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 **************************************************************************/
 
 #include "driver.h"
-
-/* Variables only used here */
-static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
-static int layers_ctrl, flipscreen;
-
-/* Variables that driver has access to */
-UINT16 *ginganin_fgram16, *ginganin_txtram16, *ginganin_vregs16;
-
-/* Variables defined in drivers */
+#include "includes/ginganin.h"
 
 
 /***************************************************************************
@@ -85,7 +77,7 @@ UINT16 *ginganin_fgram16, *ginganin_txtram16, *ginganin_vregs16;
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	UINT8 *gfx = memory_region(machine, "gfx5");
-	int code = gfx[2*tile_index + 0] * 256 + gfx[2*tile_index + 1];
+	int code = gfx[2 * tile_index + 0] * 256 + gfx[2 * tile_index + 1];
 	SET_TILE_INFO(
 			BG_GFX,
 			code,
@@ -102,7 +94,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	UINT16 code = ginganin_fgram16[tile_index];
+	ginganin_state *state = (ginganin_state *)machine->driver_data;
+	UINT16 code = state->fgram[tile_index];
 	SET_TILE_INFO(
 			FG_GFX,
 			code,
@@ -112,8 +105,9 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 WRITE16_HANDLER( ginganin_fgram16_w )
 {
-	COMBINE_DATA(&ginganin_fgram16[offset]);
-	tilemap_mark_tile_dirty(fg_tilemap,offset);
+	ginganin_state *state = (ginganin_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->fgram[offset]);
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 
@@ -125,7 +119,8 @@ WRITE16_HANDLER( ginganin_fgram16_w )
 
 static TILE_GET_INFO( get_txt_tile_info )
 {
-	UINT16 code = ginganin_txtram16[tile_index];
+	ginganin_state *state = (ginganin_state *)machine->driver_data;
+	UINT16 code = state->txtram[tile_index];
 	SET_TILE_INFO(
 			TXT_GFX,
 			code,
@@ -135,57 +130,60 @@ static TILE_GET_INFO( get_txt_tile_info )
 
 WRITE16_HANDLER( ginganin_txtram16_w )
 {
-	COMBINE_DATA(&ginganin_txtram16[offset]);
-	tilemap_mark_tile_dirty(tx_tilemap,offset);
+	ginganin_state *state = (ginganin_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->txtram[offset]);
+	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
 }
 
 
 VIDEO_START( ginganin )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,BG_NX,BG_NY);
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,16,16,FG_NX,FG_NY);
-	tx_tilemap = tilemap_create(machine, get_txt_tile_info,tilemap_scan_rows,8,8,TXT_NX,TXT_NY);
+	ginganin_state *state = (ginganin_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols, 16, 16, BG_NX, BG_NY);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols, 16, 16, FG_NX, FG_NY);
+	state->tx_tilemap = tilemap_create(machine, get_txt_tile_info, tilemap_scan_rows, 8, 8, TXT_NX, TXT_NY);
 
-	tilemap_set_transparent_pen(fg_tilemap,15);
-	tilemap_set_transparent_pen(tx_tilemap,15);
+	tilemap_set_transparent_pen(state->fg_tilemap, 15);
+	tilemap_set_transparent_pen(state->tx_tilemap, 15);
 }
 
 
 WRITE16_HANDLER( ginganin_vregs16_w )
 {
-	COMBINE_DATA(&ginganin_vregs16[offset]);
-	data = ginganin_vregs16[offset];
+	ginganin_state *state = (ginganin_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->vregs[offset]);
+	data = state->vregs[offset];
 
 	switch (offset)
 	{
 	case 0:
-		tilemap_set_scrolly(fg_tilemap, 0, data);
+		tilemap_set_scrolly(state->fg_tilemap, 0, data);
 		break;
 	case 1:
-		tilemap_set_scrollx(fg_tilemap, 0, data);
+		tilemap_set_scrollx(state->fg_tilemap, 0, data);
 		break;
 	case 2:
-		tilemap_set_scrolly(bg_tilemap, 0, data);
+		tilemap_set_scrolly(state->bg_tilemap, 0, data);
 		break;
 	case 3:
-		tilemap_set_scrollx(bg_tilemap, 0, data);
+		tilemap_set_scrollx(state->bg_tilemap, 0, data);
 		break;
 	case 4:
-		layers_ctrl = data;
+		state->layers_ctrl = data;
 		break;
 /*  case 5:
  *      break;
  */
 	case 6:
-		flipscreen = !(data & 1);
-		tilemap_set_flip_all(space->machine,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		state->flipscreen = !(data & 1);
+		tilemap_set_flip_all(space->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 		break;
 	case 7:
 		soundlatch_w(space, 0, data);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 		break;
 	default:
-		logerror("CPU #0 PC %06X : Warning, videoreg %04X <- %04X\n",cpu_get_pc(space->cpu),offset,data);
+		logerror("CPU #0 PC %06X : Warning, videoreg %04X <- %04X\n", cpu_get_pc(space->cpu), offset, data);
 	}
 }
 
@@ -211,27 +209,30 @@ Offset:         Values:         Format:
 
 ------------------------------------------------------------------------ */
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
-int offs;
+	ginganin_state *state = (ginganin_state *)machine->driver_data;
+	UINT16 *spriteram = state->spriteram;
+	int offs;
 
-	for ( offs = 0 ; offs < (machine->generic.spriteram_size >> 1); offs += 4 )
+	for (offs = 0; offs < (state->spriteram_size >> 1); offs += 4)
 	{
-		int y		=	spriteram16[offs + 0];
-		int x		=	spriteram16[offs + 1];
-		int code	=	spriteram16[offs + 2];
-		int attr	=	spriteram16[offs + 3];
-		int flipx	=	code & 0x4000;
-		int flipy	=	code & 0x8000;
+		int y = spriteram[offs + 0];
+		int x = spriteram[offs + 1];
+		int code = spriteram[offs + 2];
+		int attr = spriteram[offs + 3];
+		int flipx = code & 0x4000;
+		int flipy = code & 0x8000;
 
-		x = (x & 0xFF) - (x & 0x100);
-		y = (y & 0xFF) - (y & 0x100);
+		x = (x & 0xff) - (x & 0x100);
+		y = (y & 0xff) - (y & 0x100);
 
-		if (flipscreen)
+		if (state->flipscreen)
 		{
-			x = 240 - x;		y = 240 - y;
-			flipx = !flipx; 	flipy = !flipy;
+			x = 240 - x;	
+			y = 240 - y;
+			flipx = !flipx; 	
+			flipy = !flipy;
 		}
 
 		drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
@@ -246,15 +247,13 @@ int offs;
 
 VIDEO_UPDATE( ginganin )
 {
-	int layers_ctrl1;
-
-	layers_ctrl1 = layers_ctrl;
+	ginganin_state *state = (ginganin_state *)screen->machine->driver_data;
+	int layers_ctrl1 = state->layers_ctrl;
 
 #ifdef MAME_DEBUG
 if (input_code_pressed(screen->machine, KEYCODE_Z))
 {
 	int msk = 0;
-	static int posx,posy;
 
 	if (input_code_pressed(screen->machine, KEYCODE_Q)) { msk |= 0xfff1;}
 	if (input_code_pressed(screen->machine, KEYCODE_W)) { msk |= 0xfff2;}
@@ -263,28 +262,33 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 	if (msk != 0) layers_ctrl1 &= msk;
 
 #define SETSCROLL \
-	tilemap_set_scrollx(bg_tilemap, 0, posx); \
-	tilemap_set_scrolly(bg_tilemap, 0, posy); \
-	tilemap_set_scrollx(fg_tilemap, 0, posx); \
-	tilemap_set_scrolly(fg_tilemap, 0, posy); \
-	popmessage("B>%04X:%04X F>%04X:%04X",posx%(BG_NX*16),posy%(BG_NY*16),posx%(FG_NX*16),posy%(FG_NY*16));
+	tilemap_set_scrollx(state->bg_tilemap, 0, state->posx); \
+	tilemap_set_scrolly(state->bg_tilemap, 0, state->posy); \
+	tilemap_set_scrollx(state->fg_tilemap, 0, state->posx); \
+	tilemap_set_scrolly(state->fg_tilemap, 0, state->posy); \
+	popmessage("B>%04X:%04X F>%04X:%04X",state->posx%(BG_NX*16),state->posy%(BG_NY*16),state->posx%(FG_NX*16),state->posy%(FG_NY*16));
 
-	if (input_code_pressed(screen->machine, KEYCODE_L))	{ posx +=8; SETSCROLL }
-	if (input_code_pressed(screen->machine, KEYCODE_J))	{ posx -=8; SETSCROLL }
-	if (input_code_pressed(screen->machine, KEYCODE_K))	{ posy +=8; SETSCROLL }
-	if (input_code_pressed(screen->machine, KEYCODE_I))	{ posy -=8; SETSCROLL }
-	if (input_code_pressed(screen->machine, KEYCODE_H))	{ posx = posy = 0;	SETSCROLL }
+	if (input_code_pressed(screen->machine, KEYCODE_L))	{ state->posx +=8; SETSCROLL }
+	if (input_code_pressed(screen->machine, KEYCODE_J))	{ state->posx -=8; SETSCROLL }
+	if (input_code_pressed(screen->machine, KEYCODE_K))	{ state->posy +=8; SETSCROLL }
+	if (input_code_pressed(screen->machine, KEYCODE_I))	{ state->posy -=8; SETSCROLL }
+	if (input_code_pressed(screen->machine, KEYCODE_H))	{ state->posx = state->posy = 0;	SETSCROLL }
 
 }
 #endif
 
 
-	if (layers_ctrl1 & 1)	tilemap_draw(bitmap,cliprect, bg_tilemap,  0,0);
-	else					bitmap_fill(bitmap,cliprect,0);
+	if (layers_ctrl1 & 1)
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	else	
+		bitmap_fill(bitmap, cliprect, 0);
 
-	if (layers_ctrl1 & 2)	tilemap_draw(bitmap,cliprect, fg_tilemap,  0,0);
-	if (layers_ctrl1 & 8)	draw_sprites(screen->machine, bitmap,cliprect);
-	if (layers_ctrl1 & 4)	tilemap_draw(bitmap,cliprect, tx_tilemap, 0,0);
+	if (layers_ctrl1 & 2)	
+		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
+	if (layers_ctrl1 & 8)	
+		draw_sprites(screen->machine, bitmap, cliprect);
+	if (layers_ctrl1 & 4)	
+		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 
 	return 0;
 }

@@ -13,27 +13,15 @@
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"
-
-extern WRITE16_HANDLER( goal92_background_w );
-extern WRITE16_HANDLER( goal92_foreground_w );
-extern WRITE16_HANDLER( goal92_text_w );
-extern WRITE16_HANDLER( goal92_fg_bank_w );
-extern READ16_HANDLER( goal92_fg_bank_r );
-
-extern VIDEO_START( goal92 );
-extern VIDEO_UPDATE( goal92 );
-extern VIDEO_EOF( goal92 );
-
-extern UINT16 *goal92_back_data,*goal92_fore_data,*goal92_textram,*goal92_scrollram16;
-
-static int msm5205next;
+#include "includes/goal92.h"
 
 static WRITE16_HANDLER( goal92_sound_command_w )
 {
+	goal92_state *state = (goal92_state *)space->machine->driver_data;
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space, 0, (data >> 8) & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+		cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 	}
 }
 
@@ -53,7 +41,7 @@ static READ16_HANDLER( goal92_inputs_r )
 			return input_port_read(space->machine, "DSW2");
 
 		default:
-			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n",offset, mem_mask,cpu_get_pc(space->cpu));
+			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n", offset, mem_mask,cpu_get_pc(space->cpu));
 	}
 
 	return 0;
@@ -62,10 +50,10 @@ static READ16_HANDLER( goal92_inputs_r )
 static ADDRESS_MAP_START( goal92_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(goal92_background_w) AM_BASE(&goal92_back_data)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(goal92_foreground_w) AM_BASE(&goal92_fore_data)
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(goal92_background_w) AM_BASE_MEMBER(goal92_state, bg_data)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(goal92_foreground_w) AM_BASE_MEMBER(goal92_state, fg_data)
 	AM_RANGE(0x101800, 0x101fff) AM_RAM // it has tiles for clouds, but they aren't used
-	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(goal92_text_w) AM_BASE(&goal92_textram)
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(goal92_text_w) AM_BASE_MEMBER(goal92_state, tx_data)
 	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x104000, 0x13ffff) AM_RAM
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -74,7 +62,7 @@ static ADDRESS_MAP_START( goal92_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x18000f) AM_READ(goal92_inputs_r)
 	AM_RANGE(0x180008, 0x180009) AM_WRITE(goal92_sound_command_w)
 	AM_RANGE(0x18000a, 0x18000b) AM_WRITENOP
-	AM_RANGE(0x180010, 0x180017) AM_WRITEONLY AM_BASE(&goal92_scrollram16)
+	AM_RANGE(0x180010, 0x180017) AM_WRITEONLY AM_BASE_MEMBER(goal92_state, scrollram)
 	AM_RANGE(0x18001c, 0x18001d) AM_READWRITE(goal92_fg_bank_r, goal92_fg_bank_w)
 ADDRESS_MAP_END
 
@@ -82,19 +70,15 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( adpcm_control_w )
 {
-	int bankaddress;
-	UINT8 *RAM = memory_region(device->machine, "audiocpu");
+	memory_set_bank(device->machine, 1, data & 0x01);
 
-	/* the code writes either 2 or 3 in the bottom two bits */
-	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	memory_set_bankptr(device->machine, 1,&RAM[bankaddress]);
-
-	msm5205_reset_w(device,data & 0x08);
+	msm5205_reset_w(device, data & 0x08);
 }
 
 static WRITE8_HANDLER( adpcm_data_w )
 {
-	msm5205next = data;
+	goal92_state *state = (goal92_state *)space->machine->driver_data;
+	state->msm5205next = data;
 }
 
 static ADDRESS_MAP_START( sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
@@ -226,10 +210,11 @@ static INPUT_PORTS_START( goal92 )
 INPUT_PORTS_END
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler( const device_config *device, int irq )
 {
 	/* NMI writes to MSM ports *only*! -AS */
-	//cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	//goal92_state *state = (goal92_state *)device->machine->driver_data;
+	//cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -242,16 +227,15 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
-static void goal92_adpcm_int(const device_config *device)
+static void goal92_adpcm_int( const device_config *device )
 {
-	static int toggle = 0;
+	goal92_state *state = (goal92_state *)device->machine->driver_data;
+	msm5205_data_w(device, state->msm5205next);
+	state->msm5205next >>= 4;
+	state->adpcm_toggle^= 1;
 
-	msm5205_data_w (device,msm5205next);
-	msm5205next>>=4;
-
-	toggle ^= 1;
-	if(toggle)
-		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	if (state->adpcm_toggle)
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface msm5205_config =
@@ -306,7 +290,33 @@ static GFXDECODE_START( goal92 )
 GFXDECODE_END
 
 
+static MACHINE_START( goal92 )
+{
+	goal92_state *state = (goal92_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "audiocpu");
+
+	memory_configure_bank(machine, 1, 0, 2, &ROM[0x10000], 0x4000);
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->fg_bank);
+	state_save_register_global(machine, state->msm5205next);
+	state_save_register_global(machine, state->adpcm_toggle);
+}
+
+static MACHINE_RESET( goal92 )
+{
+	goal92_state *state = (goal92_state *)machine->driver_data;
+
+	state->fg_bank = 0;
+	state->msm5205next = 0;
+	state->adpcm_toggle = 0;
+}
+
 static MACHINE_DRIVER_START( goal92 )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(goal92_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)
@@ -316,6 +326,9 @@ static MACHINE_DRIVER_START( goal92 )
 	MDRV_CPU_ADD("audiocpu", Z80, 2500000)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu)
 								/* IRQs are triggered by the main CPU */
+
+	MDRV_MACHINE_START(goal92)
+	MDRV_MACHINE_RESET(goal92)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -410,4 +423,4 @@ ROM_END
 
 
 
-GAME( 1992, goal92,   cupsoc, goal92,   goal92, 0, ROT0, "bootleg", "Goal! '92", GAME_IMPERFECT_SOUND )
+GAME( 1992, goal92,   cupsoc, goal92,   goal92, 0, ROT0, "bootleg", "Goal! '92", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
