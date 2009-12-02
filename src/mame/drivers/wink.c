@@ -6,9 +6,9 @@
     TODO:
     - better interrupts?
     - finish sound
-    - colors?
     - fix protection properly
     - better handling of nvram? it loses the default values
+    - I need a better comparison screenshot to be sure about the colors.
 */
 
 #include "driver.h"
@@ -20,6 +20,30 @@ static UINT8 sound_flag;
 static UINT8 tile_bank = 0;
 //static UINT8 player_mux = 0;
 
+static TILE_GET_INFO( get_bg_tile_info )
+{
+	int code = machine->generic.videoram.u8[tile_index];
+	code |= 0x200 * tile_bank;
+
+	// the 2 parts of the screen use different tile banking
+	if(tile_index < 0x360)
+	{
+		code |= 0x100;
+	}
+
+	SET_TILE_INFO(0, code, 0, 0);
+}
+
+static VIDEO_START( wink )
+{
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+}
+
+static VIDEO_UPDATE( wink )
+{
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	return 0;
+}
 
 static WRITE8_HANDLER( bgram_w )
 {
@@ -94,22 +118,14 @@ static WRITE8_HANDLER( prot_w )
 	//take a9-a15 and stuff them in a variable for later use.
 }
 
-
 static ADDRESS_MAP_START( wink_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-/*
-i/o 00-1F is used by the video circuits.
-it is used to select access to the palet-ram address-bus.
-either from the system-bus for loading the palet-data or from the xor-registers
-for displaying the content.
-so it's a palet-ram write-enable.
-*/
-	AM_RANGE(0x00, 0x1f) AM_RAM AM_BASE_GENERIC(colorram)	//?
-	AM_RANGE(0x20, 0x20) AM_WRITENOP				//??? seems unused..
+	AM_RANGE(0x00, 0x1f) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_le_w) AM_BASE_GENERIC(paletteram) //0x10-0x1f is likely to be something else
+//	AM_RANGE(0x20, 0x20) AM_WRITENOP				//??? seems unused..
 	AM_RANGE(0x21, 0x21) AM_WRITE(player_mux_w)		//??? no mux on the pcb.
 	AM_RANGE(0x22, 0x22) AM_WRITE(tile_banking_w)
-	AM_RANGE(0x23, 0x23) AM_WRITENOP				//?
-	AM_RANGE(0x24, 0x24) AM_WRITENOP				//cab Knocker like in q-bert!
+//	AM_RANGE(0x23, 0x23) AM_WRITENOP				//?
+//	AM_RANGE(0x24, 0x24) AM_WRITENOP				//cab Knocker like in q-bert!
 	AM_RANGE(0x25, 0x27) AM_WRITE(wink_coin_counter_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(sound_irq_w)
@@ -117,7 +133,7 @@ so it's a palet-ram write-enable.
 	AM_RANGE(0xa0, 0xa0) AM_READ(player_inputs_r)
 	AM_RANGE(0xa4, 0xa4) AM_READ_PORT("DSW1")	//dipswitch bank2
 	AM_RANGE(0xa8, 0xa8) AM_READ_PORT("DSW2")	//dipswitch bank1
-	AM_RANGE(0xac, 0xac) AM_WRITENOP			//protection - loads video xor unit (written only once at startup)
+//	AM_RANGE(0xac, 0xac) AM_WRITENOP			//protection - loads video xor unit (written only once at startup)
 	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("DSW3")	//unused inputs
 	AM_RANGE(0xb4, 0xb4) AM_READ_PORT("DSW4")	//dipswitch bank3
 	AM_RANGE(0xc0, 0xdf) AM_WRITE(prot_w)		//load load protection-buffer from upper address bus
@@ -254,37 +270,12 @@ static INPUT_PORTS_START( wink )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static TILE_GET_INFO( get_bg_tile_info )
-{
-	int code = machine->generic.videoram.u8[tile_index];
-	code |= 0x200 * tile_bank;
-
-	// the 2 parts of the screen use different tile banking
-	if(tile_index < 0x360)
-	{
-		code |= 0x100;
-	}
-
-	SET_TILE_INFO(0, code, 0, 0);
-}
-
-static VIDEO_START( wink )
-{
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-}
-
-static VIDEO_UPDATE( wink )
-{
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	return 0;
-}
-
 static const gfx_layout charlayout =
 {
 	8,8,	/* 8*8 characters */
 	RGN_FRAC(1,3),
 	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8 /* every char takes 8 consecutive bytes */
@@ -320,21 +311,6 @@ static MACHINE_RESET( wink )
 	sound_flag = 0;
 }
 
-static PALETTE_INIT( wink )
-{
-	int i;
-
-	/* Correct? */
-	for (i = 0; i < 8; i++)
-	{
-		rgb_t color;
-
-		color = MAKE_RGB(pal1bit(i >> 1), pal1bit(i >> 0), pal1bit(i >> 2));
-
-		palette_set_color(machine, i, color);
-	}
-}
-
 static MACHINE_DRIVER_START( wink )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12000000 / 4)
@@ -359,8 +335,7 @@ static MACHINE_DRIVER_START( wink )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
 	MDRV_GFXDECODE(wink)
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_PALETTE_INIT(wink)
+	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_VIDEO_START(wink)
 	MDRV_VIDEO_UPDATE(wink)
@@ -434,5 +409,5 @@ static DRIVER_INIT( wink )
 		ROM[i] += BITSWAP8(i & 0xff, 7,5,3,1,6,4,2,0);
 }
 
-GAME( 1985, wink,  0,    wink, wink, wink, ROT0, "Midcoin", "Wink (set 1)", GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION )
-GAME( 1985, winka, wink, wink, wink, wink, ROT0, "Midcoin", "Wink (set 2)", GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION )
+GAME( 1985, wink,  0,    wink, wink, wink, ROT0, "Midcoin", "Wink (set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1985, winka, wink, wink, wink, wink, ROT0, "Midcoin", "Wink (set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
