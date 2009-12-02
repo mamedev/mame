@@ -276,12 +276,19 @@ static const ym3812_interface ym3812_config =
 
 /******************************************************************************/
 
-static MACHINE_START( triothep )
+static MACHINE_START( actfancr )
 {
  	actfancr_state *state = (actfancr_state *)machine->driver_data;
 
 	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->audiocpu = devtag_get_device(machine, "audiocpu");
+}
+
+static MACHINE_START( triothep )
+{
+ 	actfancr_state *state = (actfancr_state *)machine->driver_data;
+
+	MACHINE_START_CALL(actfancr);
 
 	state_save_register_global(machine, state->trio_control_select);
 }
@@ -322,6 +329,7 @@ static MACHINE_DRIVER_START( actfancr )
 	MDRV_CPU_ADD("audiocpu",M6502, 1500000) /* Should be accurate */
 	MDRV_CPU_PROGRAM_MAP(dec0_s_map)
 
+	MDRV_MACHINE_START(actfancr)
 	MDRV_MACHINE_RESET(actfancr)
 
 	/* video hardware */

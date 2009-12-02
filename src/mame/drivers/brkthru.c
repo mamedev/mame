@@ -441,6 +441,7 @@ static MACHINE_DRIVER_START( darwin )
 	MDRV_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/8)		/* 1.5 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
+	MDRV_MACHINE_START(brkthru)
 	MDRV_MACHINE_RESET(brkthru)
 
 	/* video hardware */
