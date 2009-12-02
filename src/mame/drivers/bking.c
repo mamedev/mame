@@ -22,71 +22,50 @@ DIP Locations verified for:
 #include "sound/dac.h"
 #include "includes/buggychl.h"
 
-extern PALETTE_INIT( bking );
-
-extern VIDEO_START( bking );
-extern VIDEO_UPDATE( bking );
-extern VIDEO_EOF( bking );
-
-extern WRITE8_HANDLER( bking_xld1_w );
-extern WRITE8_HANDLER( bking_yld1_w );
-extern WRITE8_HANDLER( bking_xld2_w );
-extern WRITE8_HANDLER( bking_yld2_w );
-extern WRITE8_HANDLER( bking_xld3_w );
-extern WRITE8_HANDLER( bking_yld3_w );
-extern WRITE8_HANDLER( bking_msk_w );
-extern WRITE8_HANDLER( bking_cont1_w );
-extern WRITE8_HANDLER( bking_cont2_w );
-extern WRITE8_HANDLER( bking_cont3_w );
-extern WRITE8_HANDLER( bking_hitclr_w );
-extern WRITE8_HANDLER( bking_playfield_w );
-
-extern READ8_HANDLER( bking_input_port_5_r );
-extern READ8_HANDLER( bking_input_port_6_r );
-extern READ8_HANDLER( bking_pos_r );
-
-UINT8 *bking_playfield_ram;
-
-static int bking3_addr_h, bking3_addr_l;
-static int sndnmi_enable;
-
 static READ8_HANDLER( bking_sndnmi_disable_r )
 {
-	sndnmi_enable = 0;
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->sound_nmi_enable = 0;
 	return 0;
 }
 
 static WRITE8_HANDLER( bking_sndnmi_enable_w )
 {
-	sndnmi_enable = 1;
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->sound_nmi_enable = 1;
 }
 
 static WRITE8_HANDLER( bking_soundlatch_w )
 {
-	int i,code;
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	int i, code = 0;
 
-	code = 0;
 	for (i = 0;i < 8;i++)
-		if (data & (1 << i)) code |= 0x80 >> i;
+		if (data & (1 << i)) 
+			code |= 0x80 >> i;
 
-	soundlatch_w(space,offset,code);
-	if (sndnmi_enable) cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, offset, code);
+	if (state->sound_nmi_enable) 
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( bking3_addr_l_w )
 {
-	bking3_addr_l = data;
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->addr_l = data;
 }
 
 static WRITE8_HANDLER( bking3_addr_h_w )
 {
-	bking3_addr_h = data;
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->addr_h = data;
 }
 
 static READ8_HANDLER( bking3_extrarom_r )
 {
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
 	UINT8 *rom = memory_region(space->machine, "user2");
-	return rom[bking3_addr_h * 256 + bking3_addr_l];
+	return rom[state->addr_h * 256 + state->addr_l];
 }
 
 static WRITE8_HANDLER( unk_w )
@@ -105,7 +84,7 @@ static READ8_HANDLER( bking3_ext_check_r )
 static ADDRESS_MAP_START( bking_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(bking_playfield_w) AM_BASE(&bking_playfield_ram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(bking_playfield_w) AM_BASE_MEMBER(buggychl_state, playfield_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bking_io_map, ADDRESS_SPACE_IO, 8 )
@@ -165,40 +144,40 @@ static ADDRESS_MAP_START( bking_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 #if 0
-static UINT8 portA_in,portA_out,ddrA;
+static UINT8 port_a_in,port_a_out,ddr_a;
 
-static READ8_HANDLER( bking3_68705_portA_r )
+static READ8_HANDLER( bking3_68705_port_a_r )
 {
-	//printf("portA_r = %02X\n",(portA_out & ddrA) | (portA_in & ~ddrA));
-	return (portA_out & ddrA) | (portA_in & ~ddrA);
+	//printf("port_a_r = %02X\n",(port_a_out & ddr_a) | (port_a_in & ~ddr_a));
+	return (port_a_out & ddr_a) | (port_a_in & ~ddr_a);
 }
 
-static WRITE8_HANDLER( bking3_68705_portA_w )
+static WRITE8_HANDLER( bking3_68705_port_a_w )
 {
-	portA_out = data;
-//  printf("portA_out = %02X\n",data);
+	port_a_out = data;
+//  printf("port_a_out = %02X\n",data);
 }
 
-static WRITE8_HANDLER( bking3_68705_ddrA_w )
+static WRITE8_HANDLER( bking3_68705_ddr_a_w )
 {
-	ddrA = data;
+	ddr_a = data;
 }
 
-static UINT8 portB_in,portB_out,ddrB;
+static UINT8 port_b_in,port_b_out,ddr_b;
 
-static READ8_HANDLER( bking3_68705_portB_r )
+static READ8_HANDLER( bking3_68705_port_b_r )
 {
-	return (portB_out & ddrB) | (portB_in & ~ddrB);
+	return (port_b_out & ddr_b) | (port_b_in & ~ddr_b);
 }
 
-static WRITE8_HANDLER( bking3_68705_portB_w )
+static WRITE8_HANDLER( bking3_68705_port_b_w )
 {
 //  if(data != 0xff)
-//      printf("portB_out = %02X\n",data);
+//      printf("port_b_out = %02X\n",data);
 
 	if (~data & 0x02)
 	{
-		portA_in = from_main;
+		port_a_in = from_main;
 		if (main_sent) cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 		main_sent = 0;
 	}
@@ -206,44 +185,45 @@ static WRITE8_HANDLER( bking3_68705_portB_w )
 	if (~data & 0x04)
 	{
 		/* 68705 is writing data for the Z80 */
-		from_mcu = portA_out;
+		from_mcu = port_a_out;
 		mcu_sent = 1;
 	}
 
 	if(data != 0xff && data != 0xfb && data != 0xfd)
-		printf("portB_w = %X\n",data);
+		printf("port_b_w = %X\n",data);
 
-	portB_out = data;
+	port_b_out = data;
 }
 
-static WRITE8_HANDLER( bking3_68705_ddrB_w )
+static WRITE8_HANDLER( bking3_68705_ddr_b_w )
 {
-	ddrB = data;
+	ddr_b = data;
 }
 
-static READ8_HANDLER( bking3_68705_portC_r )
+static READ8_HANDLER( bking3_68705_port_c_r )
 {
-	int portC_in = 0;
-	if (main_sent) portC_in |= 0x01;
-	if (!mcu_sent) portC_in |= 0x02;
-//logerror("%04x: 68705 port C read %02x\n",cpu_get_pc(space->cpu),portC_in);
-	return portC_in;
+	int port_c_in = 0;
+	if (main_sent) port_c_in |= 0x01;
+	if (!mcu_sent) port_c_in |= 0x02;
+//logerror("%04x: 68705 port C read %02x\n",cpu_get_pc(space->cpu),port_c_in);
+	return port_c_in;
 }
 #endif
+
 static ADDRESS_MAP_START( m68705_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(buggychl_68705_portA_r, buggychl_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(buggychl_68705_portB_r, buggychl_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(buggychl_68705_portC_r, buggychl_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(buggychl_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(buggychl_68705_ddrB_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(buggychl_68705_ddrC_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(buggychl_68705_port_a_r, buggychl_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(buggychl_68705_port_b_r, buggychl_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(buggychl_68705_port_c_r, buggychl_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(buggychl_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(buggychl_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(buggychl_68705_ddr_c_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( bking )
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -251,7 +231,7 @@ static INPUT_PORTS_START( bking )
 	/* continue inputs are labelled in schematics. */
 	/* They are not connected though to any button */
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )	/* Continue 1 */
@@ -260,7 +240,7 @@ static INPUT_PORTS_START( bking )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )	/* Not Connected */
 
-	PORT_START("DSWA")	/* IN2 - DIP Switch A */
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, "Holes Awarded" ) PORT_DIPLOCATION("SWA:1")
 	PORT_DIPSETTING(    0x00, "Par Play: 0 Holes/Birdie: 1 Hole/Eagle: 2 Holes/Double Eagle: 4 Holes" )
 	PORT_DIPSETTING(    0x01, "Par Play: 1 Hole/Birdie: 2 Holes/Eagle: 3 Holes/Double Eagle: 4 Holes" )
@@ -285,7 +265,7 @@ static INPUT_PORTS_START( bking )
 	PORT_DIPSETTING(    0x00, DEF_STR(Upright) )
 	PORT_DIPSETTING(    0x80, DEF_STR(Cocktail) )
 
-	PORT_START("DSWB")	/* IN3 - DIP Switch B */
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWB:1,2,3,4")
 	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 8C_1C ) )
@@ -321,7 +301,7 @@ static INPUT_PORTS_START( bking )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
-	PORT_START("DSWC")	/* IN4 - DIP Switch C */
+	PORT_START("DSWC")
 	PORT_DIPNAME( 0x01, 0x01, "Appearance of Crow" ) PORT_DIPLOCATION("SWC:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -344,16 +324,16 @@ static INPUT_PORTS_START( bking )
 	PORT_DIPSETTING(    0x00, "1 Way" )
 	PORT_DIPSETTING(    0x80, "2 Way" )
 
-	PORT_START("TRACK0_X")	/* IN5 */
+	PORT_START("TRACK0_X")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) /* Sensitivity, clip, min, max */
 
-	PORT_START("TRACK0_Y")	/* IN6 */
+	PORT_START("TRACK0_Y")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE /* Sensitivity, clip, min, max */
 
-	PORT_START("TRACK1_X")	/* IN7 */
+	PORT_START("TRACK1_X")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_COCKTAIL /* Sensitivity, clip, min, max */
 
-	PORT_START("TRACK1_Y")	/* IN8 */
+	PORT_START("TRACK1_Y")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL /* Sensitivity, clip, min, max */
 INPUT_PORTS_END
 
@@ -412,10 +392,11 @@ static GFXDECODE_START( bking )
 GFXDECODE_END
 
 
-static WRITE8_DEVICE_HANDLER( portb_w )
+static WRITE8_DEVICE_HANDLER( port_b_w )
 {
 	/* don't know what this is... could be a filter */
-	if (data != 0x00) logerror("portB = %02x\n",data);
+	if (data != 0x00) 
+		logerror("port_b = %02x\n", data);
 }
 
 static const ay8910_interface ay8910_config =
@@ -425,10 +406,122 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("dac", dac_signed_w),
-	DEVCB_HANDLER(portb_w)
+	DEVCB_HANDLER(port_b_w)
 };
 
+static MACHINE_START( bking )
+{
+	buggychl_state *state = (buggychl_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	/* video */
+	state_save_register_global_array(machine, state->pc3259_output);
+	state_save_register_global(machine, state->pc3259_mask);
+	state_save_register_global(machine, state->xld1);
+	state_save_register_global(machine, state->xld2);
+	state_save_register_global(machine, state->xld3);
+	state_save_register_global(machine, state->yld1);
+	state_save_register_global(machine, state->yld2);
+	state_save_register_global(machine, state->yld3);
+	state_save_register_global(machine, state->ball1_pic);
+	state_save_register_global(machine, state->ball2_pic);
+	state_save_register_global(machine, state->crow_pic);
+	state_save_register_global(machine, state->crow_flip);
+	state_save_register_global(machine, state->palette_bank);
+	state_save_register_global(machine, state->controller);
+	state_save_register_global(machine, state->hit);
+	/* sound */
+	state_save_register_global(machine, state->sound_nmi_enable);
+}
+
+static MACHINE_START( bking3 )
+{
+	buggychl_state *state = (buggychl_state *)machine->driver_data;
+
+	state->mcu = devtag_get_device(machine, "mcu");
+
+	MACHINE_START_CALL(bking);
+
+	/* misc */
+	state_save_register_global(machine, state->addr_h);
+	state_save_register_global(machine, state->addr_l);
+
+	/* mcu */
+	state_save_register_global(machine, state->from_main);
+	state_save_register_global(machine, state->from_mcu);
+	state_save_register_global(machine, state->mcu_sent);
+	state_save_register_global(machine, state->main_sent);
+	state_save_register_global(machine, state->port_a_in);
+	state_save_register_global(machine, state->port_a_out);
+	state_save_register_global(machine, state->ddr_a);
+	state_save_register_global(machine, state->port_b_in);
+	state_save_register_global(machine, state->port_b_out);
+	state_save_register_global(machine, state->ddr_b);
+	state_save_register_global(machine, state->port_c_in);
+	state_save_register_global(machine, state->port_c_out);
+	state_save_register_global(machine, state->ddr_c);
+}
+
+static MACHINE_RESET( bking )
+{
+	buggychl_state *state = (buggychl_state *)machine->driver_data;
+
+	/* video */
+	state->pc3259_output[0] = 0;
+	state->pc3259_output[1] = 0;
+	state->pc3259_output[2] = 0;
+	state->pc3259_output[3] = 0;
+	state->pc3259_mask = 0;
+	state->xld1 = 0;
+	state->xld2 = 0;
+	state->xld3 = 0;
+	state->yld1 = 0;
+	state->yld2 = 0;
+	state->yld3 = 0;
+	state->ball1_pic = 0;
+	state->ball2_pic = 0;
+	state->crow_pic = 0;
+	state->crow_flip = 0;
+	state->palette_bank = 0;
+	state->controller = 0;
+	state->hit = 0;
+	/* sound */
+	state->sound_nmi_enable = 1;
+}
+
+static MACHINE_RESET( bking3 )
+{
+	buggychl_state *state = (buggychl_state *)machine->driver_data;
+
+	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
+
+	MACHINE_RESET_CALL(bking);
+
+	/* misc */
+	state->addr_h = 0;
+	state->addr_l = 0;
+
+	/* mcu */
+	state->mcu_sent = 0;
+	state->main_sent = 0;
+	state->from_main = 0;
+	state->from_mcu = 0;
+	state->port_a_in = 0;
+	state->port_a_out = 0;
+	state->ddr_a = 0;
+	state->port_b_in = 0;
+	state->port_b_out = 0;
+	state->ddr_b = 0;
+	state->port_c_in = 0;
+	state->port_c_out = 0;
+	state->ddr_c = 0;
+}
+
 static MACHINE_DRIVER_START( bking )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(buggychl_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main_cpu", Z80, XTAL_12MHz/4)	/* 3 MHz */
@@ -443,6 +536,9 @@ static MACHINE_DRIVER_START( bking )
 	/* - NMI triggered by the main CPU */
 	/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
+
+	MDRV_MACHINE_START(bking)
+	MDRV_MACHINE_RESET(bking)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -482,7 +578,8 @@ static MACHINE_DRIVER_START( bking3 )
 	MDRV_CPU_ADD("mcu", M68705, XTAL_3MHz)      /* xtal is 3MHz, divided by 4 internally */
 	MDRV_CPU_PROGRAM_MAP(m68705_map)
 
-	MDRV_MACHINE_RESET(buggychl)
+	MDRV_MACHINE_START(bking3)
+	MDRV_MACHINE_RESET(bking3)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 MACHINE_DRIVER_END
@@ -775,11 +872,7 @@ ROM_START( bking3 )
 	ROM_LOAD( "a24-21.25",    0x0000, 0x1000, CRC(3106fcac) SHA1(08454adfb58e5df84140d86ed52fa4ef684df9f1) ) /* extra rom on the same SUB PCB where is the mcu */
 ROM_END
 
-static DRIVER_INIT( bking )
-{
-	sndnmi_enable = 1;
-}
 
-GAME( 1982, bking,  0, bking,  bking,  bking, ROT270, "Taito Corporation", "Birdie King", 0 )
-GAME( 1983, bking2, 0, bking,  bking2, bking, ROT90,  "Taito Corporation", "Birdie King 2", 0 )
-GAME( 1984, bking3, 0, bking3, bking2, bking, ROT90,  "Taito Corporation", "Birdie King 3", 0 )
+GAME( 1982, bking,  0, bking,  bking,  0, ROT270, "Taito Corporation", "Birdie King", GAME_SUPPORTS_SAVE )
+GAME( 1983, bking2, 0, bking,  bking2, 0, ROT90,  "Taito Corporation", "Birdie King 2", GAME_SUPPORTS_SAVE )
+GAME( 1984, bking3, 0, bking3, bking2, 0, ROT90,  "Taito Corporation", "Birdie King 3", GAME_SUPPORTS_SAVE )

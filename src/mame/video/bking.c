@@ -8,33 +8,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
-
-
-extern UINT8* bking_playfield_ram;
-
-
-static int pc3259_output[4];
-static int pc3259_mask;
-
-static UINT8 xld1;
-static UINT8 xld2;
-static UINT8 xld3;
-static UINT8 yld1;
-static UINT8 yld2;
-static UINT8 yld3;
-
-static int ball1_pic;
-static int ball2_pic;
-static int crow_pic;
-static int crow_flip;
-static int palette_bank;
-static int controller;
-static int hit;
-
-static bitmap_t *helper0;
-static bitmap_t *helper1;
-
-static tilemap *bg_tilemap;
+#include "includes/buggychl.h"
 
 
 /***************************************************************************
@@ -110,37 +84,45 @@ PALETTE_INIT( bking )
 
 WRITE8_HANDLER( bking_xld1_w )
 {
-	xld1 = -data;
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->xld1 = -data;
 }
 
 WRITE8_HANDLER( bking_yld1_w )
 {
-	yld1 = -data;
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->yld1 = -data;
 }
 
 WRITE8_HANDLER( bking_xld2_w )
 {
-	xld2 = -data;
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->xld2 = -data;
 }
 
 WRITE8_HANDLER( bking_yld2_w )
 {
-	yld2 = -data;
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->yld2 = -data;
 }
 
 WRITE8_HANDLER( bking_xld3_w )
 {
-	xld3 = -data;
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->xld3 = -data;
 }
 
 WRITE8_HANDLER( bking_yld3_w )
 {
-	yld3 = -data;
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->yld3 = -data;
 }
 
 
 WRITE8_HANDLER( bking_cont1_w )
 {
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+
 	/* D0 = COIN LOCK */
 	/* D1 = BALL 5 (Controller selection) */
 	/* D2 = VINV (flip screen) */
@@ -153,38 +135,42 @@ WRITE8_HANDLER( bking_cont1_w )
 
 	tilemap_set_flip_all(space->machine, flip_screen_get(space->machine) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
-	controller = data & 0x02;
+	state->controller = data & 0x02;
 
-	crow_pic = (data >> 4) & 0x0f;
+	state->crow_pic = (data >> 4) & 0x0f;
 }
 
 WRITE8_HANDLER( bking_cont2_w )
 {
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+
 	/* D0-D2 = BALL10 - BALL12 (Selects player 1 ball picture) */
 	/* D3-D5 = BALL20 - BALL22 (Selects player 2 ball picture) */
 	/* D6 = HIT1 */
 	/* D7 = HIT2 */
 
-	ball1_pic = (data >> 0) & 0x07;
-	ball2_pic = (data >> 3) & 0x07;
+	state->ball1_pic = (data >> 0) & 0x07;
+	state->ball2_pic = (data >> 3) & 0x07;
 
-	hit = data >> 6;
+	state->hit = data >> 6;
 }
 
 WRITE8_HANDLER( bking_cont3_w )
 {
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+
 	/* D0 = CROW INV (inverts Crow picture and coordinates) */
 	/* D1-D2 = COLOR 0 - COLOR 1 (switches 4 color palettes, global across all graphics) */
 	/* D3 = SOUND STOP */
 
-	crow_flip = ~data & 0x01;
+	state->crow_flip = ~data & 0x01;
 
-	if (palette_bank != ((data >> 1) & 0x03))
+	if (state->palette_bank != ((data >> 1) & 0x03))
 	{
-		tilemap_mark_all_tiles_dirty(bg_tilemap);
+		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 	}
 
-	palette_bank = (data >> 1) & 0x03;
+	state->palette_bank = (data >> 1) & 0x03;
 
 	sound_global_enable(space->machine, ~data & 0x08);
 }
@@ -192,97 +178,109 @@ WRITE8_HANDLER( bking_cont3_w )
 
 WRITE8_HANDLER( bking_msk_w )
 {
-	pc3259_mask++;
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->pc3259_mask++;
 }
 
 
 WRITE8_HANDLER( bking_hitclr_w )
 {
-	pc3259_mask = 0;
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->pc3259_mask = 0;
 
-	pc3259_output[0] = 0;
-	pc3259_output[1] = 0;
-	pc3259_output[2] = 0;
-	pc3259_output[3] = 0;
+	state->pc3259_output[0] = 0;
+	state->pc3259_output[1] = 0;
+	state->pc3259_output[2] = 0;
+	state->pc3259_output[3] = 0;
 }
 
 
 WRITE8_HANDLER( bking_playfield_w )
 {
-	bking_playfield_ram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->playfield_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 
 READ8_HANDLER( bking_input_port_5_r )
 {
-	return input_port_read(space->machine, controller ? "TRACK1_X" : "TRACK0_X");
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	return input_port_read(space->machine, state->controller ? "TRACK1_X" : "TRACK0_X");
 }
 
 READ8_HANDLER( bking_input_port_6_r )
 {
-	return input_port_read(space->machine, controller ? "TRACK1_Y" : "TRACK0_Y");
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	return input_port_read(space->machine, state->controller ? "TRACK1_Y" : "TRACK0_Y");
 }
 
 READ8_HANDLER( bking_pos_r )
 {
-	return pc3259_output[offset / 8] << 4;
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	return state->pc3259_output[offset / 8] << 4;
 }
 
 
 static TILE_GET_INFO( get_tile_info )
 {
-	UINT8 code0 = bking_playfield_ram[2 * tile_index + 0];
-	UINT8 code1 = bking_playfield_ram[2 * tile_index + 1];
+	buggychl_state *state = (buggychl_state *)machine->driver_data;
+	UINT8 code0 = state->playfield_ram[2 * tile_index + 0];
+	UINT8 code1 = state->playfield_ram[2 * tile_index + 1];
 
 	int flags = 0;
 
 	if (code1 & 4) flags |= TILE_FLIPX;
 	if (code1 & 8) flags |= TILE_FLIPY;
 
-	SET_TILE_INFO(0, code0 + 256 * code1, palette_bank, flags);
+	SET_TILE_INFO(0, code0 + 256 * code1, state->palette_bank, flags);
 }
 
 
 VIDEO_START( bking )
 {
-	bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	helper0 = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	helper1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	buggychl_state *state = (buggychl_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->tmp_bitmap1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->tmp_bitmap2 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+
+	state_save_register_global_bitmap(machine, state->tmp_bitmap1);
+	state_save_register_global_bitmap(machine, state->tmp_bitmap2);
 }
 
 
 VIDEO_UPDATE( bking )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	buggychl_state *state = (buggychl_state *)screen->machine->driver_data;
+
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* draw the balls */
-
 	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[2],
-		ball1_pic,
-		palette_bank,
+		state->ball1_pic,
+		state->palette_bank,
 		0, 0,
-		xld1, yld1, 0);
+		state->xld1, state->yld1, 0);
 
 	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[3],
-		ball2_pic,
-		palette_bank,
+		state->ball2_pic,
+		state->palette_bank,
 		0, 0,
-		xld2, yld2, 0);
+		state->xld2, state->yld2, 0);
 
 	/* draw the crow */
-
 	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1],
-		crow_pic,
-		palette_bank,
-		crow_flip, crow_flip,
-		crow_flip ? xld3 - 16 : 256 - xld3, crow_flip ? yld3 - 16 : 256 - yld3, 0);
+		state->crow_pic,
+		state->palette_bank,
+		state->crow_flip, state->crow_flip,
+		state->crow_flip ? state->xld3 - 16 : 256 - state->xld3, state->crow_flip ? state->yld3 - 16 : 256 - state->yld3, 0);
 	return 0;
 }
 
 
 VIDEO_EOF( bking )
 {
+	buggychl_state *state = (buggychl_state *)machine->driver_data;
 	static const rectangle rect = { 0, 7, 0, 15 };
 
 	int xld = 0;
@@ -290,27 +288,27 @@ VIDEO_EOF( bking )
 
 	UINT32 latch = 0;
 
-	if (pc3259_mask == 6)	/* player 1 */
+	if (state->pc3259_mask == 6)	/* player 1 */
 	{
-		xld = xld1;
-		yld = yld1;
+		xld = state->xld1;
+		yld = state->yld1;
 
-		drawgfx_opaque(helper1, &rect, machine->gfx[2],
-			ball1_pic,
+		drawgfx_opaque(state->tmp_bitmap2, &rect, machine->gfx[2],
+			state->ball1_pic,
 			0,
 			0, 0,
 			0, 0);
 
-		latch = 0x0C00;
+		latch = 0x0c00;
 	}
 
-	if (pc3259_mask == 3)	/* player 2 */
+	if (state->pc3259_mask == 3)	/* player 2 */
 	{
-		xld = xld2;
-		yld = yld2;
+		xld = state->xld2;
+		yld = state->yld2;
 
-		drawgfx_opaque(helper1, &rect, machine->gfx[3],
-			ball2_pic,
+		drawgfx_opaque(state->tmp_bitmap2, &rect, machine->gfx[3],
+			state->ball2_pic,
 			0,
 			0, 0,
 			0, 0);
@@ -318,25 +316,25 @@ VIDEO_EOF( bking )
 		latch = 0x0400;
 	}
 
-	tilemap_set_scrollx(bg_tilemap, 0, flip_screen_get(machine) ? -xld : xld);
-	tilemap_set_scrolly(bg_tilemap, 0, flip_screen_get(machine) ? -yld : yld);
+	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen_get(machine) ? -xld : xld);
+	tilemap_set_scrolly(state->bg_tilemap, 0, flip_screen_get(machine) ? -yld : yld);
 
-	tilemap_draw(helper0, &rect, bg_tilemap, 0, 0);
+	tilemap_draw(state->tmp_bitmap1, &rect, state->bg_tilemap, 0, 0);
 
-	tilemap_set_scrollx(bg_tilemap, 0, 0);
-	tilemap_set_scrolly(bg_tilemap, 0, 0);
+	tilemap_set_scrollx(state->bg_tilemap, 0, 0);
+	tilemap_set_scrolly(state->bg_tilemap, 0, 0);
 
 	if (latch != 0)
 	{
-		const UINT8* MASK = memory_region(machine, "user1") + 8 * hit;
+		const UINT8* MASK = memory_region(machine, "user1") + 8 * state->hit;
 
 		int x;
 		int y;
 
 		for (y = rect.min_y; y <= rect.max_y; y++)
 		{
-			const UINT16* p0 = BITMAP_ADDR16(helper0, y, 0);
-			const UINT16* p1 = BITMAP_ADDR16(helper1, y, 0);
+			const UINT16* p0 = BITMAP_ADDR16(state->tmp_bitmap1, y, 0);
+			const UINT16* p1 = BITMAP_ADDR16(state->tmp_bitmap2, y, 0);
 
 			for (x = rect.min_x; x <= rect.max_x; x++)
 			{
@@ -348,10 +346,10 @@ VIDEO_EOF( bking )
 					latch |= (flip_screen_get(machine) ? 31 - col : col) << 0;
 					latch |= (flip_screen_get(machine) ? 31 - row : row) << 5;
 
-					pc3259_output[0] = (latch >> 0x0) & 0xf;
-					pc3259_output[1] = (latch >> 0x4) & 0xf;
-					pc3259_output[2] = (latch >> 0x8) & 0xf;
-					pc3259_output[3] = (latch >> 0xc) & 0xf;
+					state->pc3259_output[0] = (latch >> 0x0) & 0xf;
+					state->pc3259_output[1] = (latch >> 0x4) & 0xf;
+					state->pc3259_output[2] = (latch >> 0x8) & 0xf;
+					state->pc3259_output[3] = (latch >> 0xc) & 0xf;
 
 					return;
 				}

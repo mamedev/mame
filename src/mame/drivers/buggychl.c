@@ -95,13 +95,14 @@ static WRITE8_HANDLER( bankswitch_w )
 	memory_set_bankptr(space->machine, 1,&memory_region(space->machine, "maincpu")[0x10000 + (data & 7) * 0x2000]);
 }
 
-
-static int sound_nmi_enable,pending_nmi;
-
 static TIMER_CALLBACK( nmi_callback )
 {
-	if (sound_nmi_enable) cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-	else pending_nmi = 1;
+	buggychl_state *state = (buggychl_state *)machine->driver_data;
+
+	if (state->sound_nmi_enable) 
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	else 
+		state->pending_nmi = 1;
 }
 
 static WRITE8_HANDLER( sound_command_w )
@@ -112,16 +113,18 @@ static WRITE8_HANDLER( sound_command_w )
 
 static WRITE8_HANDLER( nmi_disable_w )
 {
-	sound_nmi_enable = 0;
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	sound_nmi_enable = 1;
-	if (pending_nmi)
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->sound_nmi_enable = 1;
+	if (state->pending_nmi)
 	{
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-		pending_nmi = 0;
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->pending_nmi = 0;
 	}
 }
 
@@ -138,15 +141,15 @@ static ADDRESS_MAP_START( buggychl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* 6116 SRAM (36) */
 	AM_RANGE(0x8800, 0x8fff) AM_RAM /* 6116 SRAM (35) */
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(buggychl_sprite_lookup_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1) AM_WRITE(buggychl_chargen_w) AM_BASE(&buggychl_character_ram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1) AM_WRITE(buggychl_chargen_w) AM_BASE_MEMBER(buggychl_state, charram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE_SIZE_MEMBER(buggychl_state, videoram, videoram_size)
 	AM_RANGE(0xd100, 0xd100) AM_WRITE(buggychl_ctrl_w)
 	AM_RANGE(0xd200, 0xd200) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xd300, 0xd300) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd303, 0xd303) AM_WRITE(buggychl_sprite_lookup_bank_w)
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE(buggychl_mcu_r, buggychl_mcu_w)
 	AM_RANGE(0xd401, 0xd401) AM_READ(buggychl_mcu_status_r)
-	AM_RANGE(0xd500, 0xd57f) AM_WRITEONLY AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xd500, 0xd57f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(buggychl_state, spriteram, spriteram_size)
 	AM_RANGE(0xd600, 0xd600) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd601, 0xd601) AM_READ_PORT("DSW2")
 	AM_RANGE(0xd602, 0xd602) AM_READ_PORT("DSW3")
@@ -158,8 +161,8 @@ static ADDRESS_MAP_START( buggychl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd610, 0xd610) AM_WRITE(sound_command_w)
 	AM_RANGE(0xd618, 0xd618) AM_WRITENOP	/* accelerator clear */
 	AM_RANGE(0xd700, 0xd7ff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd840, 0xd85f) AM_WRITEONLY AM_BASE(&buggychl_scrollv)
-	AM_RANGE(0xdb00, 0xdbff) AM_WRITEONLY AM_BASE(&buggychl_scrollh)
+	AM_RANGE(0xd840, 0xd85f) AM_WRITEONLY AM_BASE_MEMBER(buggychl_state, scrollv)
+	AM_RANGE(0xdb00, 0xdbff) AM_WRITEONLY AM_BASE_MEMBER(buggychl_state, scrollh)
 	AM_RANGE(0xdc04, 0xdc04) AM_WRITEONLY /* should be fg scroll */
 	AM_RANGE(0xdc06, 0xdc06) AM_WRITE(buggychl_bg_scrollx_w)
 ADDRESS_MAP_END
@@ -182,12 +185,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(buggychl_68705_portA_r, buggychl_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(buggychl_68705_portB_r, buggychl_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(buggychl_68705_portC_r, buggychl_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(buggychl_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(buggychl_68705_ddrB_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(buggychl_68705_ddrC_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(buggychl_68705_port_a_r, buggychl_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(buggychl_68705_port_b_r, buggychl_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(buggychl_68705_port_c_r, buggychl_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(buggychl_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(buggychl_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(buggychl_68705_ddr_c_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -327,19 +330,19 @@ GFXDECODE_END
 
 
 
-static WRITE8_DEVICE_HANDLER( portA_0_w )
+static WRITE8_DEVICE_HANDLER( port_a_0_w )
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
 }
-static WRITE8_DEVICE_HANDLER( portB_0_w )
+static WRITE8_DEVICE_HANDLER( port_b_0_w )
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
 }
-static WRITE8_DEVICE_HANDLER( portA_1_w )
+static WRITE8_DEVICE_HANDLER( port_a_1_w )
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
 }
-static WRITE8_DEVICE_HANDLER( portB_1_w )
+static WRITE8_DEVICE_HANDLER( port_b_1_w )
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
 }
@@ -351,8 +354,8 @@ static const ay8910_interface ay8910_interface_1 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(portA_0_w),
-	DEVCB_HANDLER(portB_0_w)
+	DEVCB_HANDLER(port_a_0_w),
+	DEVCB_HANDLER(port_b_0_w)
 };
 
 static const ay8910_interface ay8910_interface_2 =
@@ -361,8 +364,8 @@ static const ay8910_interface ay8910_interface_2 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(portA_1_w),
-	DEVCB_HANDLER(portB_1_w)
+	DEVCB_HANDLER(port_a_1_w),
+	DEVCB_HANDLER(port_b_1_w)
 };
 
 static const msm5232_interface msm5232_config =
@@ -371,7 +374,70 @@ static const msm5232_interface msm5232_config =
 };
 
 
+static MACHINE_START( buggychl )
+{
+	buggychl_state *state = (buggychl_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->mcu = devtag_get_device(machine, "mcu");
+
+	state_save_register_global(machine, state->sound_nmi_enable);
+	state_save_register_global(machine, state->pending_nmi);
+	state_save_register_global_array(machine, state->sprite_lookup);
+	state_save_register_global(machine, state->sl_bank);
+	state_save_register_global(machine, state->bg_on);
+	state_save_register_global(machine, state->sky_on);
+	state_save_register_global(machine, state->sprite_color_base);
+	state_save_register_global(machine, state->bg_scrollx);
+	/* mcu */
+	state_save_register_global(machine, state->from_main);
+	state_save_register_global(machine, state->from_mcu);
+	state_save_register_global(machine, state->mcu_sent);
+	state_save_register_global(machine, state->main_sent);
+	state_save_register_global(machine, state->port_a_in);
+	state_save_register_global(machine, state->port_a_out);
+	state_save_register_global(machine, state->ddr_a);
+	state_save_register_global(machine, state->port_b_in);
+	state_save_register_global(machine, state->port_b_out);
+	state_save_register_global(machine, state->ddr_b);
+	state_save_register_global(machine, state->port_c_in);
+	state_save_register_global(machine, state->port_c_out);
+	state_save_register_global(machine, state->ddr_c);
+}
+
+static MACHINE_RESET( buggychl )
+{
+	buggychl_state *state = (buggychl_state *)machine->driver_data;
+
+	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
+
+	state->sound_nmi_enable = 0;
+	state->pending_nmi = 0;
+	state->sl_bank = 0;
+	state->bg_on = 0;
+	state->sky_on = 0;
+	state->sprite_color_base = 0;
+	state->bg_scrollx = 0;
+	/* mcu */
+	state->mcu_sent = 0;
+	state->main_sent = 0;
+	state->from_main = 0;
+	state->from_mcu = 0;
+	state->port_a_in = 0;
+	state->port_a_out = 0;
+	state->ddr_a = 0;
+	state->port_b_in = 0;
+	state->port_b_out = 0;
+	state->ddr_b = 0;
+	state->port_c_in = 0;
+	state->port_c_out = 0;
+	state->ddr_c = 0;
+}
+
 static MACHINE_DRIVER_START( buggychl )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(buggychl_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz??? */
@@ -386,6 +452,9 @@ static MACHINE_DRIVER_START( buggychl )
 	MDRV_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(mcu_map)
 
+	MDRV_MACHINE_START(buggychl)
+	MDRV_MACHINE_RESET(buggychl)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -396,8 +465,6 @@ static MACHINE_DRIVER_START( buggychl )
 
 	MDRV_GFXDECODE(buggychl)
 	MDRV_PALETTE_LENGTH(128+128)
-
-	MDRV_MACHINE_RESET(buggychl)
 
 	MDRV_PALETTE_INIT(buggychl)
 	MDRV_VIDEO_START(buggychl)

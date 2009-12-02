@@ -20,56 +20,36 @@ TO DO:
   - TA7630 volume table is hand tuned to match the sample, but still slighty off.
 */
 
-//not used
-//WRITE8_HANDLER( msisaac_textbank1_w );
-
-//used
-WRITE8_HANDLER( msisaac_fg_scrolly_w );
-WRITE8_HANDLER( msisaac_fg_scrollx_w );
-WRITE8_HANDLER( msisaac_bg_scrolly_w );
-WRITE8_HANDLER( msisaac_bg_scrollx_w );
-WRITE8_HANDLER( msisaac_bg2_scrolly_w );
-WRITE8_HANDLER( msisaac_bg2_scrollx_w );
-
-WRITE8_HANDLER( msisaac_bg2_textbank_w );
-
-WRITE8_HANDLER( msisaac_bg_videoram_w );
-WRITE8_HANDLER( msisaac_bg2_videoram_w );
-WRITE8_HANDLER( msisaac_fg_videoram_w );
-
-extern VIDEO_UPDATE( msisaac );
-extern VIDEO_START( msisaac );
-extern UINT8 *msisaac_videoram;
-extern UINT8 *msisaac_videoram2;
-
-
-
-static int sound_nmi_enable,pending_nmi;
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	if (sound_nmi_enable) cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-	else pending_nmi = 1;
+	buggychl_state *state = (buggychl_state *)machine->driver_data;
+	if (state->sound_nmi_enable) 
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	else 
+		state->pending_nmi = 1;
 }
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(space,0,data);
-	timer_call_after_resynch(space->machine, NULL, data,nmi_callback);
+	soundlatch_w(space, 0, data);
+	timer_call_after_resynch(space->machine, NULL, data, nmi_callback);
 }
 
 static WRITE8_HANDLER( nmi_disable_w )
 {
-	sound_nmi_enable = 0;
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	sound_nmi_enable = 1;
-	if (pending_nmi)
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->sound_nmi_enable = 1;
+	if (state->pending_nmi)
 	{
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-		pending_nmi = 0;
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->pending_nmi = 0;
 	}
 }
 
@@ -84,10 +64,11 @@ static WRITE8_HANDLER( msisaac_coin_counter_w )
 	coin_counter_w(space->machine, offset,data);
 }
 #endif
+
 static WRITE8_HANDLER( ms_unknown_w )
 {
-	if (data!=0x08)
-		popmessage("CPU #0 write to 0xf0a3 data=%2x",data);
+	if (data != 0x08)
+		popmessage("CPU #0 write to 0xf0a3 data=%2x", data);
 }
 
 
@@ -99,11 +80,6 @@ static WRITE8_HANDLER( ms_unknown_w )
 
 /* Disabled because the mcu dump is currently unavailable. -AS */
 //#define USE_MCU
-
-#ifndef USE_MCU
-static UINT8 mcu_val = 0;
-static UINT8 direction = 0;
-#endif
 
 
 static READ8_HANDLER( msisaac_mcu_r )
@@ -117,11 +93,12 @@ MCU simulation TODO:
 \-Fix some graphics imperfections(*not* confirmed if they are caused by unhandled
   commands or imperfect video emulation).
 */
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
 
-	switch(mcu_val)
+	switch (state->mcu_val)
 	{
 		/*Start-up check*/
-		case 0x5f:  return (mcu_val+0x6b);
+		case 0x5f:  return (state->mcu_val + 0x6b);
 		/*These interferes with RAM operations(setting them to non-zero you  *
          * will have unexpected results,such as infinite lives or score not  *
          * incremented properly).*/
@@ -143,7 +120,7 @@ MCU simulation TODO:
  			//6-down
  			//7-leftdwn
 
- 			UINT8 val= (input_port_read(space->machine, "IN1")>>2) & 0x0f;
+ 			UINT8 val= (input_port_read(space->machine, "IN1") >> 2) & 0x0f;
  			/* bit0 = left
                bit1 = right
                bit2 = down
@@ -161,10 +138,10 @@ MCU simulation TODO:
 
  			static const INT8 table[16] = { -1,    2,    6,     -1,       0,   1,      7,      0,       4,     3,     5,    4,     -1,     2,     6,    -1 };
 
- 			if (table[val] >= 0 )
- 				direction = table[val];
+ 			if (table[val] >= 0)
+ 				state->direction = table[val];
 
- 			return direction;
+ 			return state->direction;
  		}
 
 		/*This controls the arms when they return to the player.            */
@@ -172,8 +149,8 @@ MCU simulation TODO:
  			return 0x45;
 
  		default:
- 			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", cpu_get_pc(space->cpu), mcu_val );
- 		   	return mcu_val;
+ 			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", cpu_get_pc(space->cpu), state->mcu_val);
+ 		   	return state->mcu_val;
 	}
 #endif
 }
@@ -192,9 +169,10 @@ static WRITE8_HANDLER( msisaac_mcu_w )
 #ifdef USE_MCU
 	buggychl_mcu_w(offset,data);
 #else
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
 	//if(data != 0x0a && data != 0x42 && data != 0x02)
-	//  popmessage("PC = %04x %02x",cpu_get_pc(space->cpu),data);
-	mcu_val = data;
+	//  popmessage("PC = %04x %02x", cpu_get_pc(space->cpu), data);
+	state->mcu_val = data;
 #endif
 }
 
@@ -218,7 +196,7 @@ static ADDRESS_MAP_START( msisaac_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf0c4, 0xf0c4) AM_WRITE(msisaac_bg_scrollx_w)
 	AM_RANGE(0xf0c5, 0xf0c5) AM_WRITE(msisaac_bg_scrolly_w)
 
-	AM_RANGE(0xf0e0, 0xf0e0) AM_READWRITE(msisaac_mcu_r,msisaac_mcu_w)
+	AM_RANGE(0xf0e0, 0xf0e0) AM_READWRITE(msisaac_mcu_r, msisaac_mcu_w)
 	AM_RANGE(0xf0e1, 0xf0e1) AM_READ(msisaac_mcu_status_r)
 
 	AM_RANGE(0xf080, 0xf080) AM_READ_PORT("DSW1")
@@ -228,19 +206,18 @@ static ADDRESS_MAP_START( msisaac_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf084, 0xf084) AM_READ_PORT("IN1")
 //  AM_RANGE(0xf086, 0xf086) AM_READ_PORT("IN2")
 
-	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE_GENERIC(spriteram)	//sprites
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(msisaac_fg_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(msisaac_bg2_videoram_w) AM_BASE(&msisaac_videoram2)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(msisaac_bg_videoram_w) AM_BASE(&msisaac_videoram)
+	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE_MEMBER(buggychl_state, spriteram)	//sprites
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(msisaac_fg_videoram_w) AM_BASE_MEMBER(buggychl_state, videoram)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(msisaac_bg2_videoram_w) AM_BASE_MEMBER(buggychl_state, videoram3)
+	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(msisaac_bg_videoram_w) AM_BASE_MEMBER(buggychl_state, videoram2)
 //  AM_RANGE(0xf801, 0xf801) AM_WRITE(msisaac_bgcolor_w)
 //  AM_RANGE(0xfc00, 0xfc00) AM_WRITE(flip_screen_w)
 //  AM_RANGE(0xfc03, 0xfc04) AM_WRITE(msisaac_coin_counter_w)
 ADDRESS_MAP_END
 
-static int vol_ctrl[16];
-
 static MACHINE_RESET( ta7630 )
 {
+	buggychl_state *state = (buggychl_state *)machine->driver_data;
 	int i;
 
 	double db			= 0.0;
@@ -249,8 +226,8 @@ static MACHINE_RESET( ta7630 )
 	for (i=0; i<16; i++)
 	{
 		double max = 100.0 / pow(10.0, db/20.0 );
-		vol_ctrl[ 15-i ] = max;
-		/*logerror("vol_ctrl[%x] = %i (%f dB)\n",15-i,vol_ctrl[ 15-i ],db);*/
+		state->vol_ctrl[15 - i] = max;
+		/*logerror("vol_ctrl[%x] = %i (%f dB)\n",15 - i, state->vol_ctrl[15 - i], db);*/
 		db += db_step;
 		db_step += db_step_inc;
 	}
@@ -264,27 +241,26 @@ static MACHINE_RESET( ta7630 )
 */
 }
 
-static UINT8 snd_ctrl0=0;
-static UINT8 snd_ctrl1=0;
-
 static WRITE8_DEVICE_HANDLER( sound_control_0_w )
 {
-	snd_ctrl0 = data & 0xff;
-	//popmessage("SND0 0=%2x 1=%2x", snd_ctrl0, snd_ctrl1);
+	buggychl_state *state = (buggychl_state *)device->machine->driver_data;
+	state->snd_ctrl0 = data & 0xff;
+	//popmessage("SND0 0=%2x 1=%2x", state->snd_ctrl0, state->snd_ctrl1);
 
-	sound_set_output_gain(device, 0, vol_ctrl[  snd_ctrl0     & 15 ] / 100.0);	/* group1 from msm5232 */
-	sound_set_output_gain(device, 1, vol_ctrl[  snd_ctrl0     & 15 ] / 100.0);	/* group1 from msm5232 */
-	sound_set_output_gain(device, 2, vol_ctrl[  snd_ctrl0     & 15 ] / 100.0);	/* group1 from msm5232 */
-	sound_set_output_gain(device, 3, vol_ctrl[  snd_ctrl0     & 15 ] / 100.0);	/* group1 from msm5232 */
-	sound_set_output_gain(device, 4, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
-	sound_set_output_gain(device, 5, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
-	sound_set_output_gain(device, 6, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
-	sound_set_output_gain(device, 7, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
+	sound_set_output_gain(device, 0, state->vol_ctrl[state->snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
+	sound_set_output_gain(device, 1, state->vol_ctrl[state->snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
+	sound_set_output_gain(device, 2, state->vol_ctrl[state->snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
+	sound_set_output_gain(device, 3, state->vol_ctrl[state->snd_ctrl0 & 15] / 100.0);	/* group1 from msm5232 */
+	sound_set_output_gain(device, 4, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound_set_output_gain(device, 5, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound_set_output_gain(device, 6, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
+	sound_set_output_gain(device, 7, state->vol_ctrl[(state->snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
 }
 static WRITE8_HANDLER( sound_control_1_w )
 {
-	snd_ctrl1 = data & 0xff;
-	//popmessage("SND1 0=%2x 1=%2x", snd_ctrl0, snd_ctrl1);
+	buggychl_state *state = (buggychl_state *)space->machine->driver_data;
+	state->snd_ctrl1 = data & 0xff;
+	//popmessage("SND1 0=%2x 1=%2x", state->snd_ctrl0, state->snd_ctrl1);
 }
 
 static ADDRESS_MAP_START( msisaac_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -306,12 +282,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( msisaac_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READ(buggychl_68705_portA_r,buggychl_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READ(buggychl_68705_portB_r,buggychl_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READ(buggychl_68705_portC_r,buggychl_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(buggychl_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(buggychl_68705_ddrB_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(buggychl_68705_ddrC_w)
+	AM_RANGE(0x0000, 0x0000) AM_READ(buggychl_68705_port_a_r,buggychl_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READ(buggychl_68705_port_b_r,buggychl_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READ(buggychl_68705_port_c_r,buggychl_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(buggychl_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(buggychl_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(buggychl_68705_ddr_c_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -475,7 +451,85 @@ static const msm5232_interface msm5232_config =
 
 /*******************************************************************************/
 
+static MACHINE_START( msisaac )
+{
+	buggychl_state *state = (buggychl_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	/* video */
+	state_save_register_global(machine, state->bg2_textbank);
+	/* sound */
+	state_save_register_global(machine, state->sound_nmi_enable);
+	state_save_register_global(machine, state->pending_nmi);
+	state_save_register_global_array(machine, state->vol_ctrl);
+	state_save_register_global(machine, state->snd_ctrl0);
+	state_save_register_global(machine, state->snd_ctrl1);
+
+#ifdef USE_MCU
+	state->mcu = devtag_get_device(machine, "mcu");
+
+	/* mcu */
+	state_save_register_global(machine, state->from_main);
+	state_save_register_global(machine, state->from_mcu);
+	state_save_register_global(machine, state->mcu_sent);
+	state_save_register_global(machine, state->main_sent);
+	state_save_register_global(machine, state->port_a_in);
+	state_save_register_global(machine, state->port_a_out);
+	state_save_register_global(machine, state->ddr_a);
+	state_save_register_global(machine, state->port_b_in);
+	state_save_register_global(machine, state->port_b_out);
+	state_save_register_global(machine, state->ddr_b);
+	state_save_register_global(machine, state->port_c_in);
+	state_save_register_global(machine, state->port_c_out);
+	state_save_register_global(machine, state->ddr_c);
+#else
+	state_save_register_global(machine, state->mcu_val);
+	state_save_register_global(machine, state->direction);
+#endif
+}
+
+static MACHINE_RESET( msisaac )
+{
+	buggychl_state *state = (buggychl_state *)machine->driver_data;
+
+	MACHINE_RESET_CALL(ta7630);
+
+	/* video */
+	state->bg2_textbank = 0;
+	/* sound */
+	state->sound_nmi_enable = 0;
+	state->pending_nmi = 0;
+	state->snd_ctrl0 = 0;
+	state->snd_ctrl1 = 0;
+
+#ifdef USE_MCU
+	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
+
+	/* mcu */
+	state->mcu_sent = 0;
+	state->main_sent = 0;
+	state->from_main = 0;
+	state->from_mcu = 0;
+	state->port_a_in = 0;
+	state->port_a_out = 0;
+	state->ddr_a = 0;
+	state->port_b_in = 0;
+	state->port_b_out = 0;
+	state->ddr_b = 0;
+	state->port_c_in = 0;
+	state->port_c_out = 0;
+	state->ddr_c = 0;
+#else
+	state->mcu_val = 0;
+	state->direction = 0;
+#endif
+}
+
 static MACHINE_DRIVER_START( msisaac )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(buggychl_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
@@ -491,7 +545,8 @@ static MACHINE_DRIVER_START( msisaac )
 	MDRV_CPU_PROGRAM_MAP(msisaac_mcu_map)
 #endif
 
-	MDRV_MACHINE_RESET(ta7630)
+	MDRV_MACHINE_START(msisaac)
+	MDRV_MACHINE_RESET(msisaac)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -567,4 +622,5 @@ ROM_START( msisaac )
 
 ROM_END
 
-GAME( 1985, msisaac, 0,        msisaac, msisaac, 0, ROT270, "Taito Corporation", "Metal Soldier Isaac II", GAME_UNEMULATED_PROTECTION | GAME_NO_COCKTAIL)
+
+GAME( 1985, msisaac, 0,     msisaac, msisaac, 0, ROT270, "Taito Corporation", "Metal Soldier Isaac II", GAME_UNEMULATED_PROTECTION | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
