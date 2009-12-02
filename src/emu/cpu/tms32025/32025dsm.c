@@ -478,8 +478,8 @@ CPU_DISASSEMBLE( tms32025 )
 			cp++;
 			switch (*cp++)
 			{
-				case 'A': sprintf(num,"$%02X",a); break;
-				case 'B': sprintf(num,"$%04X",b); break;
+				case 'A': sprintf(num,"%02Xh",a); break;
+				case 'B': sprintf(num,"%04Xh",b); break;
 				case 'C': sprintf(num,"%s",cmpmode[c]); break;
 				case 'D': sprintf(num,"%02Xh",d); break;
 				case 'K': sprintf(num,"%d",k); break;
