@@ -1359,9 +1359,9 @@ static void DSP1_project(INT16 *input, INT16 *output)
    Py=shiftR(Py,E-refE);
    Pz=shiftR(Pz,E3-refE);
 
-   C11=- (Px*shared.Nx>>15);
-   C8=- (Py*shared.Ny>>15);
-   C9=- (Pz*shared.Nz>>15);
+   C11= -(Px*shared.Nx>>15);
+   C8= -(Py*shared.Ny>>15);
+   C9= -(Pz*shared.Nz>>15);
    C12=C11+C8+C9;   // this cannot overflow!
 
    aux4=C12;   // de-normalization with 32-bits arithmetic

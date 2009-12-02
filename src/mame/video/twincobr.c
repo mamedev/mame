@@ -320,9 +320,9 @@ WRITE8_HANDLER( wardner_exscroll_w )	/* Extra unused video layer */
 {
 	switch (offset)
 	{
-		case 01:	data <<= 8;
+		case 01:	//data <<= 8;
 		case 00:	logerror("PC - write %04x to unknown video scroll X register\n",data); break;
-		case 03:	data <<= 8;
+		case 03:	//data <<= 8;
 		case 02:	logerror("PC - write %04x to unknown video scroll Y register\n",data); break;
 	}
 }

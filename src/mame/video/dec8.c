@@ -363,7 +363,7 @@ static void draw_sprites2( running_machine* machine, bitmap_t *bitmap, const rec
 			if (fy) fy = 0; else fy = 1;
 			mult = 16;
 		}
-		else mult =- 16;
+		else mult = -16;
 
 		while (multi >= 0)
 		{

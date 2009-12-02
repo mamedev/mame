@@ -631,7 +631,9 @@ static WRITE8_HANDLER( nob_mcu_control_p2_w )
 
 	/* bit 3 is toggled once at the start of an IRQ, and again at the end */
 	if (((mcu_control ^ data) & 0x08) && !(data & 0x08))
-		;//logerror("MCU IRQ(8) toggle\n");
+	{
+		//logerror("MCU IRQ(8) toggle\n");
+	}
 
 	mcu_control = data;
 }
