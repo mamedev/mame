@@ -1314,6 +1314,12 @@ static MACHINE_RESET( common )
 {
 	aerofgt_state *state = (aerofgt_state *)machine->driver_data;
 	state->pending_command = 0;
+}
+
+static MACHINE_RESET( aerofgt )
+{
+	MACHINE_RESET_CALL(common);
+
 	memory_set_bank(machine, 1, 0);	/* needed by spinlbrk */
 }
 
@@ -1333,7 +1339,7 @@ static MACHINE_DRIVER_START( pspikes )
 								/* IRQs are triggered by the YM2610 */
 
 	MDRV_MACHINE_START(aerofgt)
-	MDRV_MACHINE_RESET(common)
+	MDRV_MACHINE_RESET(aerofgt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1467,6 +1473,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( karatblz )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(aerofgt_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(karatblz_map)
@@ -1478,7 +1487,7 @@ static MACHINE_DRIVER_START( karatblz )
 								/* IRQs are triggered by the YM2610 */
 
 	MDRV_MACHINE_START(aerofgt)
-	MDRV_MACHINE_RESET(common)
+	MDRV_MACHINE_RESET(aerofgt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1520,7 +1529,7 @@ static MACHINE_DRIVER_START( spinlbrk )
 								/* IRQs are triggered by the YM2610 */
 
 	MDRV_MACHINE_START(aerofgt)
-	MDRV_MACHINE_RESET(common)
+	MDRV_MACHINE_RESET(aerofgt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1562,7 +1571,7 @@ static MACHINE_DRIVER_START( turbofrc )
 								/* IRQs are triggered by the YM2610 */
 
 	MDRV_MACHINE_START(aerofgt)
-	MDRV_MACHINE_RESET(common)
+	MDRV_MACHINE_RESET(aerofgt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1604,7 +1613,7 @@ static MACHINE_DRIVER_START( aerofgtb )
 								/* IRQs are triggered by the YM2610 */
 
 	MDRV_MACHINE_START(aerofgt)
-	MDRV_MACHINE_RESET(common)
+	MDRV_MACHINE_RESET(aerofgt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1647,7 +1656,7 @@ static MACHINE_DRIVER_START( aerofgt )
 								/* IRQs are triggered by the YM2610 */
 
 	MDRV_MACHINE_START(aerofgt)
-	MDRV_MACHINE_RESET(common)
+	MDRV_MACHINE_RESET(aerofgt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
