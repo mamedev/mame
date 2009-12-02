@@ -635,6 +635,9 @@ static MACHINE_DRIVER_START( saiyugb1 )
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* heavy interleaving to sync up sprite<->main cpu's */
 
+	MDRV_MACHINE_START(chinagat)
+	MDRV_MACHINE_RESET(chinagat)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -676,6 +679,9 @@ static MACHINE_DRIVER_START( saiyugb2 )
 	MDRV_CPU_PROGRAM_MAP(ym2203c_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
+
+	MDRV_MACHINE_START(chinagat)
+	MDRV_MACHINE_RESET(chinagat)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
