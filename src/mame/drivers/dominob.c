@@ -162,7 +162,7 @@ static WRITE8_HANDLER( dominob_d008_w )
 }
 
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(SMH_ROM, SMH_NOP) // there are some garbage writes to ROM
+	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_WRITENOP // there are some garbage writes to ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
@@ -177,7 +177,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf07f) AM_RAM AM_BASE_MEMBER(dominob_state, bgram)
 	AM_RANGE(0xf080, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfbff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_READ(SMH_RAM) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

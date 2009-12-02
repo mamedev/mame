@@ -80,7 +80,7 @@ static WRITE8_HANDLER( pcm_set_w )
 static ADDRESS_MAP_START( drmicro_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(SMH_RAM, drmicro_videoram_w)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(drmicro_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn3", sn76496_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(pcm_set_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2") AM_WRITE(nmi_enable_w)
-	AM_RANGE(0x05, 0x05) AM_READWRITE(SMH_NOP, SMH_NOP) // unused? / watchdog?
+	AM_RANGE(0x05, 0x05) AM_NOP // unused? / watchdog?
 ADDRESS_MAP_END
 
 /*************************************

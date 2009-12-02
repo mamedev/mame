@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( champbwl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, vdcram)
 	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE_MEMBER(tnzs_state, scrollram) /* scrolling info */
 	AM_RANGE(0xe300, 0xe303) AM_MIRROR(0xfc) AM_WRITE(champbwl_objctrl_w) AM_BASE_MEMBER(tnzs_state, objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(tnzs_state, bg_flag)	/* enable / disable background transparency */
+	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, bg_flag)	/* enable / disable background transparency */
 
 	AM_RANGE(0xf000, 0xf000) AM_READ(trackball_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN0")

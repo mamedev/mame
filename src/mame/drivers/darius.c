@@ -477,7 +477,7 @@ static ADDRESS_MAP_START( darius_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
-	AM_RANGE(0xb000, 0xb000) AM_READWRITE(SMH_NOP, taitosound_slave_port_w)
+	AM_RANGE(0xb000, 0xb000) AM_READNOP AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xb001, 0xb001) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(darius_fm0_pan)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(darius_fm1_pan)
@@ -490,7 +490,7 @@ static ADDRESS_MAP_START( darius_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darius_sound2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(SMH_ROM, SMH_NOP)
+	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
 	/* yes, no RAM */
 ADDRESS_MAP_END
 

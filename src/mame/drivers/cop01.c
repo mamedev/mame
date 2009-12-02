@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( cop01_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM /* c000-c7ff in cop01 */
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(cop01_background_w) AM_BASE_MEMBER(cop01_state, bgvideoram)
-	AM_RANGE(0xe000, 0xe0ff) AM_WRITE(SMH_RAM) AM_BASE_SIZE_MEMBER(cop01_state, spriteram, spriteram_size)
+	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(cop01_state, spriteram, spriteram_size)
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(cop01_foreground_w) AM_BASE_MEMBER(cop01_state, fgvideoram)
 ADDRESS_MAP_END
 

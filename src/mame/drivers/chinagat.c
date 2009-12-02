@@ -313,8 +313,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3400, 0x357f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x3800, 0x397f) AM_WRITE(SMH_BANK(3)) AM_BASE_SIZE_MEMBER(ddragon_state, spriteram, spriteram_size)
 	AM_RANGE(0x3e00, 0x3e04) AM_WRITE(chinagat_interrupt_w)
-	AM_RANGE(0x3e06, 0x3e06) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(ddragon_state, scrolly_lo)
-	AM_RANGE(0x3e07, 0x3e07) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(ddragon_state, scrollx_lo)
+	AM_RANGE(0x3e06, 0x3e06) AM_WRITEONLY AM_BASE_MEMBER(ddragon_state, scrolly_lo)
+	AM_RANGE(0x3e07, 0x3e07) AM_WRITEONLY AM_BASE_MEMBER(ddragon_state, scrollx_lo)
 	AM_RANGE(0x3f00, 0x3f00) AM_WRITE(chinagat_video_ctrl_w)
 	AM_RANGE(0x3f01, 0x3f01) AM_WRITE(chinagat_bankswitch_w)
 	AM_RANGE(0x3f00, 0x3f00) AM_READ_PORT("SYSTEM")
@@ -329,7 +329,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(chinagat_sub_bankswitch_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(SMH_RAM) /* Called on CPU start and after return from jump table */
+	AM_RANGE(0x2800, 0x2800) AM_WRITEONLY /* Called on CPU start and after return from jump table */
 //  AM_RANGE(0x2a2b, 0x2a2b) AM_READNOP /* What lives here? */
 //  AM_RANGE(0x2a30, 0x2a30) AM_READNOP /* What lives here? */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(4)
@@ -354,8 +354,8 @@ static ADDRESS_MAP_START( ym2203c_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x8802, 0x8802) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 //  AM_RANGE(0x8803, 0x8803) AM_DEVWRITE("oki", okim6295_w)
 	AM_RANGE(0x8804, 0x8805) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
-//  AM_RANGE(0x8804, 0x8804) AM_WRITE(SMH_RAM)
-//  AM_RANGE(0x8805, 0x8805) AM_WRITE(SMH_RAM)
+//  AM_RANGE(0x8804, 0x8804) AM_WRITEONLY
+//  AM_RANGE(0x8805, 0x8805) AM_WRITEONLY
 
 //  AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 //  AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)

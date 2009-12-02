@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( circusc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0001, 0x0001) AM_MIRROR(0x03f8) AM_WRITE(interrupt_enable_w)			/* INTST */
 //  AM_RANGE(0x0002, 0x0002) AM_MIRROR(0x03f8) AM_WRITENOP                          /* MUT - not used /*
 	AM_RANGE(0x0003, 0x0004) AM_MIRROR(0x03f8) AM_WRITE(circusc_coin_counter_w)		/* COIN1, COIN2 */
-	AM_RANGE(0x0005, 0x0005) AM_MIRROR(0x03f8) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(circusc_state, spritebank) /* OBJ CHENG */
+	AM_RANGE(0x0005, 0x0005) AM_MIRROR(0x03f8) AM_WRITEONLY AM_BASE_MEMBER(circusc_state, spritebank) /* OBJ CHENG */
 	AM_RANGE(0x0400, 0x0400) AM_MIRROR(0x03ff) AM_WRITE(watchdog_reset_w)			/* WDOG */
 	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x03ff) AM_WRITE(soundlatch_w)				/* SOUND DATA */
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03ff) AM_WRITE(circusc_sh_irqtrigger_w)	/* SOUND-ON causes interrupt on audio CPU */
@@ -159,7 +159,7 @@ static ADDRESS_MAP_START( circusc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1003, 0x1003) AM_MIRROR(0x03fc) AM_READNOP              /* unpopulated DIPSW 3*/
 	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x03ff) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x03ff) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1c00, 0x1c00) AM_MIRROR(0x03ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(circusc_state, scroll) /* VGAP */
+	AM_RANGE(0x1c00, 0x1c00) AM_MIRROR(0x03ff) AM_WRITEONLY AM_BASE_MEMBER(circusc_state, scroll) /* VGAP */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(circusc_colorram_w) AM_BASE_MEMBER(circusc_state, colorram) /* colorram */
 	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(circusc_videoram_w) AM_BASE_MEMBER(circusc_state, videoram) /* videoram */

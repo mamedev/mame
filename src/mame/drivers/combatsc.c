@@ -269,7 +269,7 @@ static READ8_DEVICE_HANDLER ( combasc_ym2203_r )
 static ADDRESS_MAP_START( combasc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(combasc_pf_control_w)
 	AM_RANGE(0x0020, 0x005f) AM_READWRITE(combasc_scrollram_r, combasc_scrollram_w)
-//  AM_RANGE(0x0060, 0x00ff) AM_WRITE(SMH_RAM)                 /* RAM */
+//  AM_RANGE(0x0060, 0x00ff) AM_WRITEONLY                 /* RAM */
 
 	AM_RANGE(0x0200, 0x0201) AM_READWRITE(protection_r, protection_w)
 	AM_RANGE(0x0206, 0x0206) AM_WRITE(protection_clock_w)

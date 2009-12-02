@@ -47,7 +47,7 @@ static WRITE16_HANDLER ( crospang_soundlatch_w )
 /* main cpu */
 
 static ADDRESS_MAP_START( crospang_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM) AM_WRITENOP // writes to rom quite often
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_WRITENOP // writes to rom quite often
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(crospang_fg_scrolly_w)
 	AM_RANGE(0x100004, 0x100005) AM_WRITE(crospang_bg_scrollx_w)
@@ -66,7 +66,7 @@ static ADDRESS_MAP_START( crospang_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bestri_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM) AM_WRITENOP // writes to rom quite often
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_WRITENOP // writes to rom quite often
 
 	AM_RANGE(0x100004, 0x100005) AM_WRITE(bestri_fg_scrollx_w)
 	AM_RANGE(0x100006, 0x100007) AM_WRITE(bestri_fg_scrolly_w)

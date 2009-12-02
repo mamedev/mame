@@ -541,7 +541,7 @@ static ADDRESS_MAP_START( cobra_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, videoram, videoram_size)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3200, 0x37ff) AM_WRITE(SMH_RAM) /* Unused */
+	AM_RANGE(0x3200, 0x37ff) AM_WRITEONLY /* Unused */
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")	/* Player 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")	/* Player 2 */
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW0")	/* Dip 1 */
@@ -720,7 +720,7 @@ static ADDRESS_MAP_START( lastmiss_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
-	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM) AM_WRITE(dec8_videoram_w)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w)
 	AM_RANGE(0x2800, 0x2fff) AM_WRITE(shackled_sprite_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE(2)
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w)
@@ -743,7 +743,7 @@ static ADDRESS_MAP_START( shackled_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x180b, 0x180b) AM_WRITE(lastmiss_scrolly_w) /* Scroll LSB */
 	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x180d, 0x180d) AM_WRITE(shackled_control_w) /* Bank switch + Scroll MSB */
-	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM) AM_WRITE(dec8_videoram_w)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w)
 	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(shackled_sprite_r, shackled_sprite_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE(2)
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE_MEMBER(dec8_state, pf0_data)
@@ -793,7 +793,7 @@ static ADDRESS_MAP_START( csilver_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x180e, 0x180f) AM_WRITE(csilver_i8751_w)
 	AM_RANGE(0x1c00, 0x1c00) AM_READ(i8751_h_r)
 	AM_RANGE(0x1e00, 0x1e00) AM_READ(i8751_l_r)
-	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM) AM_WRITE(dec8_videoram_w)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w)
 	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(shackled_sprite_r, shackled_sprite_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE(2)
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE_MEMBER(dec8_state, pf0_data)

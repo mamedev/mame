@@ -109,14 +109,14 @@ static WRITE8_HANDLER( copsnrob_led_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0500, 0x0503) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x0500, 0x0503) AM_WRITEONLY
 //  AM_RANGE(0x0504, 0x0507) AM_WRITENOP  // ???
 	AM_RANGE(0x0506, 0x0506) AM_WRITE(copsnrob_led_w)
-	AM_RANGE(0x0600, 0x0600) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(copsnrob_state, trucky)
-	AM_RANGE(0x0700, 0x07ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(copsnrob_state, truckram)
+	AM_RANGE(0x0600, 0x0600) AM_WRITEONLY AM_BASE_MEMBER(copsnrob_state, trucky)
+	AM_RANGE(0x0700, 0x07ff) AM_WRITEONLY AM_BASE_MEMBER(copsnrob_state, truckram)
 	AM_RANGE(0x0800, 0x08ff) AM_RAM AM_BASE_MEMBER(copsnrob_state, bulletsram)
-	AM_RANGE(0x0900, 0x0903) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(copsnrob_state, carimage)
-	AM_RANGE(0x0a00, 0x0a03) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(copsnrob_state, cary)
+	AM_RANGE(0x0900, 0x0903) AM_WRITEONLY AM_BASE_MEMBER(copsnrob_state, carimage)
+	AM_RANGE(0x0a00, 0x0a03) AM_WRITEONLY AM_BASE_MEMBER(copsnrob_state, cary)
 	AM_RANGE(0x0b00, 0x0bff) AM_RAM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_BASE_SIZE_MEMBER(copsnrob_state, videoram, videoram_size)
 //  AM_RANGE(0x1000, 0x1003) AM_WRITENOP

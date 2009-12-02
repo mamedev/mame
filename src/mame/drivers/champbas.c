@@ -234,7 +234,7 @@ static ADDRESS_MAP_START( talbot_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(champbas_mcu_switch_w)
 
-	AM_RANGE(0xa060, 0xa06f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(champbas_state, spriteram_2)
+	AM_RANGE(0xa060, 0xa06f) AM_WRITEONLY AM_BASE_MEMBER(champbas_state, spriteram_2)
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(champbas_watchdog_reset_w)
 ADDRESS_MAP_END
 
@@ -291,7 +291,7 @@ static ADDRESS_MAP_START( exctsccb_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa006, 0xa006) AM_WRITENOP	/* MCU is not used, but some leftover code still writes here */
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP	/* MCU is not used, but some leftover code still writes here */
 
-	AM_RANGE(0xa040, 0xa06f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(champbas_state, spriteram) /* Sprite Pos */
+	AM_RANGE(0xa040, 0xa06f) AM_WRITEONLY AM_BASE_MEMBER(champbas_state, spriteram) /* Sprite Pos */
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
@@ -316,7 +316,7 @@ static ADDRESS_MAP_START( exctsccr_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP /* This is also MCU control, but i dont need it */
 
-	AM_RANGE(0xa040, 0xa06f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(champbas_state, spriteram) /* Sprite pos */
+	AM_RANGE(0xa040, 0xa06f) AM_WRITEONLY AM_BASE_MEMBER(champbas_state, spriteram) /* Sprite pos */
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END

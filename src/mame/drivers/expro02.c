@@ -363,18 +363,18 @@ static ADDRESS_MAP_START( galsnew_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(&galsnew_bg_pixram)
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_BASE(&galsnew_fg_pixram)
 
-	AM_RANGE(0x580000, 0x580fff) AM_READWRITE(SMH_RAM,kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1)	// Layers 0
-	AM_RANGE(0x581000, 0x581fff) AM_READWRITE(SMH_RAM,kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0)	//
+	AM_RANGE(0x580000, 0x580fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1)	// Layers 0
+	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0)	//
 	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE(&kaneko16_vscroll_1)									//
 	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE(&kaneko16_vscroll_0)									//
 
-	AM_RANGE(0x600000, 0x600fff) AM_READWRITE(SMH_RAM,galsnew_paletteram_w) AM_BASE_GENERIC(paletteram) // palette?
+	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(galsnew_paletteram_w) AM_BASE_GENERIC(paletteram) // palette?
 
-	AM_RANGE(0x680000, 0x68001f) AM_READWRITE(SMH_RAM,kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs) // sprite regs? tileregs?
+	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs) // sprite regs? tileregs?
 
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	 // sprites? 0x72f words tested
 
-	AM_RANGE(0x780000, 0x78001f) AM_READWRITE(SMH_RAM,kaneko16_sprites_regs_w) AM_BASE(&kaneko16_sprites_regs) // sprite regs? tileregs?
+	AM_RANGE(0x780000, 0x78001f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_BASE(&kaneko16_sprites_regs) // sprite regs? tileregs?
 
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
@@ -400,14 +400,14 @@ static ADDRESS_MAP_START( fantasia_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(&galsnew_bg_pixram)
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_BASE(&galsnew_fg_pixram)
-	AM_RANGE(0x580000, 0x580fff) AM_READWRITE(SMH_RAM,kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1)	// Layers 0
-	AM_RANGE(0x581000, 0x581fff) AM_READWRITE(SMH_RAM,kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0)	//
+	AM_RANGE(0x580000, 0x580fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1)	// Layers 0
+	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0)	//
 	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE(&kaneko16_vscroll_1)									//
 	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE(&kaneko16_vscroll_0)									//
-	AM_RANGE(0x600000, 0x600fff) AM_READWRITE(SMH_RAM,galsnew_paletteram_w) AM_BASE_GENERIC(paletteram) // palette?
-	AM_RANGE(0x680000, 0x68001f) AM_READWRITE(SMH_RAM,kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs) // sprite regs? tileregs?
+	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(galsnew_paletteram_w) AM_BASE_GENERIC(paletteram) // palette?
+	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs) // sprite regs? tileregs?
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	 // sprites? 0x72f words tested
-	AM_RANGE(0x780000, 0x78001f) AM_READWRITE(SMH_RAM,kaneko16_sprites_regs_w) AM_BASE(&kaneko16_sprites_regs) // sprite regs? tileregs?
+	AM_RANGE(0x780000, 0x78001f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_BASE(&kaneko16_sprites_regs) // sprite regs? tileregs?
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW3")

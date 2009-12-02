@@ -156,13 +156,13 @@ static READ16_HANDLER( robocop2_prot_r )
 static ADDRESS_MAP_START( cninja_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 
-	AM_RANGE(0x140000, 0x14000f) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x140000, 0x14000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x144000, 0x144fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
 	AM_RANGE(0x146000, 0x146fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x14c000, 0x14c7ff) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf1_rowscroll)
+	AM_RANGE(0x14c000, 0x14c7ff) AM_WRITEONLY AM_BASE(&deco16_pf1_rowscroll)
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 
-	AM_RANGE(0x150000, 0x15000f) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x150000, 0x15000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
 	AM_RANGE(0x154000, 0x154fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
 	AM_RANGE(0x156000, 0x156fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
@@ -183,13 +183,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( edrandy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
-	AM_RANGE(0x140000, 0x14000f) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x140000, 0x14000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x144000, 0x144fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
 	AM_RANGE(0x146000, 0x146fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
 	AM_RANGE(0x14c000, 0x14c7ff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 
-	AM_RANGE(0x150000, 0x15000f) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x150000, 0x15000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
 	AM_RANGE(0x154000, 0x154fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
 	AM_RANGE(0x156000, 0x156fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
@@ -210,13 +210,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( robocop2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
-	AM_RANGE(0x140000, 0x14000f) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x140000, 0x14000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x144000, 0x144fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
 	AM_RANGE(0x146000, 0x146fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
 	AM_RANGE(0x14c000, 0x14c7ff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 
-	AM_RANGE(0x150000, 0x15000f) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x150000, 0x15000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
 	AM_RANGE(0x154000, 0x154fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
 	AM_RANGE(0x156000, 0x156fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
@@ -246,13 +246,13 @@ static ADDRESS_MAP_START( mutantf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READWRITE(deco16_71_r, buffer_spriteram16_w)
 	AM_RANGE(0x1e0000, 0x1e0001) AM_WRITE(buffer_spriteram16_2_w)
 
-	AM_RANGE(0x300000, 0x30000f) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x300000, 0x30000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x304000, 0x305fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
 	AM_RANGE(0x306000, 0x307fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
 	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
 	AM_RANGE(0x30a000, 0x30a7ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 
-	AM_RANGE(0x310000, 0x31000f) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x310000, 0x31000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
 	AM_RANGE(0x314000, 0x315fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
 	AM_RANGE(0x316000, 0x317fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
 	AM_RANGE(0x318000, 0x3187ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)

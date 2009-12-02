@@ -223,7 +223,7 @@ static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0x00, 0x00) AM_WRITENOP	/* not connected */
 	AM_RANGE(0x01, 0x01) AM_WRITENOP /* watchdog */
-	AM_RANGE(0x02, 0x04) AM_WRITE(SMH_RAM) AM_BASE(&crbaloon_spriteram)
+	AM_RANGE(0x02, 0x04) AM_WRITEONLY AM_BASE(&crbaloon_spriteram)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE("discrete", crbaloon_audio_set_music_freq)
 	AM_RANGE(0x06, 0x06) AM_WRITE(port_sound_w)
 	AM_RANGE(0x07, 0x0b) AM_WRITE(pc3092_w) AM_BASE(&pc3092_data)

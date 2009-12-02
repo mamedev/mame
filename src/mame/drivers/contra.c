@@ -94,11 +94,11 @@ static ADDRESS_MAP_START( contra_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2400, 0x27ff) AM_WRITE(contra_fg_vram_w) AM_BASE(&contra_fg_vram)
 	AM_RANGE(0x2800, 0x2bff) AM_WRITE(contra_text_cram_w) AM_BASE(&contra_text_cram)
 	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(contra_text_vram_w) AM_BASE(&contra_text_vram)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(SMH_RAM) AM_BASE_GENERIC(spriteram)/* 2nd bank is at 0x5000 */
-	AM_RANGE(0x3800, 0x3fff) AM_WRITE(SMH_RAM) // second sprite buffer
+	AM_RANGE(0x3000, 0x37ff) AM_WRITEONLY AM_BASE_GENERIC(spriteram)/* 2nd bank is at 0x5000 */
+	AM_RANGE(0x3800, 0x3fff) AM_WRITEONLY // second sprite buffer
 	AM_RANGE(0x4000, 0x43ff) AM_WRITE(contra_bg_cram_w) AM_BASE(&contra_bg_cram)
 	AM_RANGE(0x4400, 0x47ff) AM_WRITE(contra_bg_vram_w) AM_BASE(&contra_bg_vram)
-	AM_RANGE(0x4800, 0x5fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x4800, 0x5fff) AM_WRITEONLY
 
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
  	AM_RANGE(0x7000, 0x7000) AM_WRITE(contra_bankswitch_w)

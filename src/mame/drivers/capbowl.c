@@ -238,7 +238,7 @@ static NVRAM_HANDLER( capbowl )
 
 static ADDRESS_MAP_START( capbowl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(1)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(capbowl_state, rowaddress)
+	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_BASE_MEMBER(capbowl_state, rowaddress)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(capbowl_rom_select_w)
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(capbowl_tms34061_r, capbowl_tms34061_w)
@@ -252,7 +252,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bowlrama_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(bowlrama_blitter_r, bowlrama_blitter_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(capbowl_state, rowaddress)
+	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_BASE_MEMBER(capbowl_state, rowaddress)
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(capbowl_tms34061_r, capbowl_tms34061_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(capbowl_sndcmd_w)

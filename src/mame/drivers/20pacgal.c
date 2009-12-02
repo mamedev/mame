@@ -172,9 +172,9 @@ static ADDRESS_MAP_START( 20pacgal_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x46000, 0x46fff) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, char_gfx_ram)
 	AM_RANGE(0x47100, 0x47100) AM_RAM	/* leftover from original Galaga code */
 	AM_RANGE(0x48000, 0x49fff) AM_ROM AM_WRITE(rom_48000_w)	/* this should be a mirror of 08000-09ffff */
-	AM_RANGE(0x4c000, 0x4dfff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(_20pacgal_state, sprite_gfx_ram)
-	AM_RANGE(0x4e000, 0x4e17f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(_20pacgal_state, sprite_ram)
-	AM_RANGE(0x4ff00, 0x4ffff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(_20pacgal_state, sprite_color_lookup)
+	AM_RANGE(0x4c000, 0x4dfff) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, sprite_gfx_ram)
+	AM_RANGE(0x4e000, 0x4e17f) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, sprite_ram)
+	AM_RANGE(0x4ff00, 0x4ffff) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, sprite_color_lookup)
 ADDRESS_MAP_END
 
 
@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( 20pacgal_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x88, 0x88) AM_WRITE(rom_bank_select_w)
 	AM_RANGE(0x89, 0x89) AM_DEVWRITE("dac", dac_signed_w)
 	AM_RANGE(0x8a, 0x8a) AM_WRITENOP				/* stars: bits 3-4 = active set; bit 5 = enable */
-	AM_RANGE(0x8b, 0x8b) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(_20pacgal_state, flip)
+	AM_RANGE(0x8b, 0x8b) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, flip)
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(_20pacgal_coin_counter_w)
 ADDRESS_MAP_END
 

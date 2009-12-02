@@ -66,7 +66,7 @@ static WRITE8_HANDLER( dogfgt_soundcontrol_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(dogfgt_state, sharedram)
-	AM_RANGE(0x0f80, 0x0fdf) AM_WRITE(SMH_RAM) AM_BASE_SIZE_MEMBER(dogfgt_state, spriteram, spriteram_size)
+	AM_RANGE(0x0f80, 0x0fdf) AM_WRITEONLY AM_BASE_SIZE_MEMBER(dogfgt_state, spriteram, spriteram_size)
 	AM_RANGE(0x1000, 0x17ff) AM_WRITE(dogfgt_bgvideoram_w) AM_BASE_MEMBER(dogfgt_state, bgvideoram)
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(dogfgt_1800_w)	/* text color, flip screen & coin counters */

@@ -206,8 +206,8 @@ static ADDRESS_MAP_START( crshrace_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("P3")
-	AM_RANGE(0xfff020, 0xfff03f) AM_WRITE(SMH_RAM) AM_BASE(&K053936_0_ctrl)
-	AM_RANGE(0xfff044, 0xfff047) AM_WRITE(SMH_RAM)	// ??? moves during race
+	AM_RANGE(0xfff020, 0xfff03f) AM_WRITEONLY AM_BASE(&K053936_0_ctrl)
+	AM_RANGE(0xfff044, 0xfff047) AM_WRITEONLY	// ??? moves during race
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
