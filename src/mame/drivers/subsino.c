@@ -218,7 +218,12 @@ static INPUT_PORTS_START( smoto )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
+static INPUT_PORTS_START( victor5 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( crsbingo )
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -790,9 +795,9 @@ ROM_START( crsbingo )
 ROM_END
 
 
-GAME( 1990, victor5,  0,        victor5,  0,        0,        ROT0, "Subsino", "Victor 5",                  GAME_NOT_WORKING )
-GAME( 1990, victor21, 0,        victor21, 0,        0,        ROT0, "Subsino", "Victor 21",                 GAME_NOT_WORKING )
-GAME( 1991, crsbingo, 0,        crsbingo, 0,        0,        ROT0, "Subsino", "Cross Bingo",               GAME_NOT_WORKING )
+GAME( 1990, victor5,  0,        victor5,  victor5,  0,        ROT0, "Subsino", "Victor 5",                  GAME_NOT_WORKING )
+GAME( 1990, victor21, 0,        victor21, victor5,  0,        ROT0, "Subsino", "Victor 21",                 GAME_NOT_WORKING )
+GAME( 1991, crsbingo, 0,        crsbingo, crsbingo, 0,        ROT0, "Subsino", "Cross Bingo",               GAME_NOT_WORKING )
 GAME( 1993, sharkpy,  0,        srider,   smoto,    0,        ROT0, "Subsino", "Shark Party",               GAME_NOT_WORKING )
 GAME( 1993, sharkpya, sharkpy,  srider,   smoto,    0,        ROT0, "Subsino", "Shark Party (alt)",         GAME_NOT_WORKING )
 GAME( 1996, smoto20,  0,        srider,   smoto,    smoto20,  ROT0, "Subsino", "Super Rider (Italy, v2.0)", GAME_WRONG_COLORS )
