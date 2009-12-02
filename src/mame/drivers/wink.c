@@ -320,6 +320,21 @@ static MACHINE_RESET( wink )
 	sound_flag = 0;
 }
 
+static PALETTE_INIT( wink )
+{
+	int i;
+
+	/* Correct? */
+	for (i = 0; i < 8; i++)
+	{
+		rgb_t color;
+
+		color = MAKE_RGB(pal1bit(i >> 1), pal1bit(i >> 0), pal1bit(i >> 2));
+
+		palette_set_color(machine, i, color);
+	}
+}
+
 static MACHINE_DRIVER_START( wink )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12000000 / 4)
@@ -345,6 +360,7 @@ static MACHINE_DRIVER_START( wink )
 
 	MDRV_GFXDECODE(wink)
 	MDRV_PALETTE_LENGTH(32)
+	MDRV_PALETTE_INIT(wink)
 
 	MDRV_VIDEO_START(wink)
 	MDRV_VIDEO_UPDATE(wink)
