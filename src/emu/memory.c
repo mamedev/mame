@@ -2049,7 +2049,7 @@ static void memory_exit(running_machine *machine)
 
 
 #define check_entry_handler(handler) do { \
-	if (entry->handler.generic != NULL && entry->handler.generic != SMH_RAM) \
+	if (entry->handler.generic != NULL && entry->handler.generic != (genf *)SMH_RAM) \
 		fatalerror("%s: %s AM_RANGE(0x%x, 0x%x) %s handler already set!\n", driver->source_file, driver->name, entry->addrstart, entry->addrend, #handler); \
 	} while (0)
 
