@@ -55,7 +55,7 @@ SEGA CUSTOM IC :
 #include "deprecat.h"
 #include "sound/scsp.h"
 
-static UINT32* sysh1_workram_h,*h1_ioga,*framebuffer_data,*framebuffer_vram;
+static UINT32* sysh1_workram_h,*h1_ioga,*framebuffer_vram;
 
 /* video */
 
@@ -146,29 +146,6 @@ static WRITE32_HANDLER( paletteram32_sysh1_w )
 	r = ((space->machine->generic.paletteram.u32[offset] & 0x001f0000) >> 16);
 	palette_set_color_rgb(space->machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 }
-
-static WRITE32_HANDLER( sysh1_dmac_w )
-{
-	static UINT32 src,dst,size;
-	COMBINE_DATA(&dma_data[offset]);
-
-	if(offset == 0x10/4)
-		src = dma_data[offset] & 0x7fffff0;
-	if(offset == 0x14/4)
-	{
-		dst = dma_data[offset] & 0x7fffff0;
-		if(dma_data[offset] & 0x40000000)
-		{
-			for(size=0;size<0x800;size+=4)
-			{
-				program_write_dword(dst,program_read_dword(src));
-				dst+=4;
-				src+=4;
-			}
-			popmessage("!");
-		}
-	}
-}
 #endif
 
 //UINT16* sysh1_soundram;
@@ -192,6 +169,28 @@ static WRITE32_HANDLER( coolridr_pal_w )
 	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
+
+/* FIXME: this copies some (wrong) data, src doesn't seem to point to the right data at the current time... */
+static void sysh1_dma_transfer( const address_space *space, UINT8 ch )
+{
+	static UINT32 src,dst,size,type,s_i;
+
+	src = (framebuffer_vram[(0x6c0+ch*0xc)/4] & 0x0fffffff);
+	dst = (framebuffer_vram[(0x6c4+ch*0xc)/4] & 0xfffff) | 0x03e00000;
+	size = framebuffer_vram[(0x6c8+ch*0xc)/4]*2;
+	type = (framebuffer_vram[(0x6c0+ch*0xc)/4] & 0xf0000000) >> 28;
+
+	if(type == 0xd)
+	{
+		for(s_i=0;s_i<size;s_i+=4)
+		{
+			memory_write_dword(space,dst,memory_read_dword(space,src));
+			dst+=4;
+			src+=4;
+		}
+	}
+}
+
 static WRITE32_HANDLER( sysh1_dma_w )
 {
 	COMBINE_DATA(&framebuffer_vram[offset]);
@@ -201,16 +200,32 @@ static WRITE32_HANDLER( sysh1_dma_w )
 		if(!(offset*4 == 0x6c0 && data == 0))
 			printf("%08x -> [%04x]\n",framebuffer_vram[offset],(offset*4));
 	}
+
+	if(offset*4 == 0x6d8)
+	{
+		sysh1_dma_transfer(space, 0);
+		sysh1_dma_transfer(space, 1);
+	}
+
+	{
+		UINT8 *gfx = memory_region(space->machine, "ram_gfx");
+
+		gfx[offset*4+0] = (framebuffer_vram[offset] & 0xff000000) >> 24;
+		gfx[offset*4+1] = (framebuffer_vram[offset] & 0x00ff0000) >> 16;
+		gfx[offset*4+2] = (framebuffer_vram[offset] & 0x0000ff00) >> 8;
+		gfx[offset*4+3] = (framebuffer_vram[offset] & 0x000000ff) >> 0;
+
+		gfx_element_mark_dirty(space->machine->gfx[3], offset/16);
+	}
 }
 
 static ADDRESS_MAP_START( system_h1_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_SHARE(1)
+	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_SHARE(1) AM_WRITENOP
 	AM_RANGE(0x01000000, 0x010fffff) AM_ROM AM_REGION("maincpu_data",0x0000000) //correct?
-	AM_RANGE(0x01400000, 0x023fffff) AM_ROM AM_REGION("gfx_data",0x0000000) //correct?
+	AM_RANGE(0x01200000, 0x021fffff) AM_ROM AM_REGION("gfx_data",0x0000000) //correct?
 
 	/*WARNING: boundaries of these two are WRONG!*/
-	AM_RANGE(0x03e00000, 0x03e0ffff) AM_RAM_WRITE(sysh1_dma_w) AM_BASE(&framebuffer_vram)/*Buffer VRAM Chains*/
-	AM_RANGE(0x03e10000, 0x03e11fff) AM_RAM AM_BASE(&framebuffer_data)/*Buffer data should go here*/
+	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_BASE(&framebuffer_vram)
 
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE(3) /*Communication area RAM*/
 	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM_WRITE(coolridr_pal_w) AM_BASE_GENERIC(paletteram)
@@ -292,6 +307,7 @@ static GFXDECODE_START( coolridr )
 	GFXDECODE_ENTRY( "maincpu_data", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx_data", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx5", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "ram_gfx", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( coolridr )
@@ -375,6 +391,9 @@ ROM_START( coolridr )
 	ROM_LOAD32_WORD_SWAP( "mp17655.16", 0x0800002, 0x0200000, CRC(02903cf2) SHA1(16d555fda144e0f1b62b428e9158a0e8ebf7084e) )
 	ROM_LOAD32_WORD_SWAP( "mp17656.17", 0x0c00000, 0x0200000, CRC(945c89e3) SHA1(8776d74f73898d948aae3c446d7c710ad0407603) )
 	ROM_LOAD32_WORD_SWAP( "mp17657.18", 0x0c00002, 0x0200000, CRC(74676b1f) SHA1(b4a9003a052bde93bebfa4bef9e8dff65003c3b2) )
+
+	ROM_REGION32_BE( 0x100000, "ram_gfx", ROMREGION_ERASE00 ) /* SH2 code */
+
 
 	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )	/* 68000 */
 	/* uploaded by the main CPU */
