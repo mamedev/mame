@@ -69,7 +69,7 @@ static VIDEO_UPDATE(coolridr)
 	0x3e0bc00-0x3e0dbff looks like tilemap planes.
 	0x3e00000 onward seems to contain video registers, I've seen MAP registers that clearly points to the aforementioned planes.
 	*/
-	const gfx_element *gfx = screen->machine->gfx[1];
+	const gfx_element *gfx = screen->machine->gfx[0];
 	int count = 0x0bc00/4;
 	int y,x;
 
@@ -198,7 +198,8 @@ static WRITE32_HANDLER( sysh1_dma_w )
 
 	if(offset*4 >= 0x6c0 && offset*4 <= 0x6df)
 	{
-		printf("%08x -> [%04x]\n",framebuffer_vram[offset],(offset*4));
+		if(!(offset*4 == 0x6c0 && data == 0))
+			printf("%08x -> [%04x]\n",framebuffer_vram[offset],(offset*4));
 	}
 }
 
@@ -288,13 +289,9 @@ static const gfx_layout test =
 #endif
 
 static GFXDECODE_START( coolridr )
-//	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
-//	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
-//	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 0, 16 )
-//	GFXDECODE_ENTRY( "gfx4", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx5", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "maincpu_data", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx_data", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx5", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( coolridr )
@@ -364,13 +361,12 @@ ROM_START( coolridr )
 	ROM_LOAD32_WORD_SWAP( "ep17659.30", 0x0000000, 0x080000, CRC(473027b0) SHA1(acaa212869dd79550235171b9f054e82750f74c3) )
 	ROM_LOAD32_WORD_SWAP( "ep17658.29", 0x0000002, 0x080000, CRC(7ecfdfcc) SHA1(97cb3e6cf9764c8db06de12e4e958148818ef737) )
 
-	ROM_REGION( 0x100000, "maincpu_data", 0 ) /* SH2 code */
+	ROM_REGION32_BE( 0x100000, "maincpu_data", 0 )
 	ROM_LOAD32_WORD_SWAP( "ep17661.32", 0x0000000, 0x0080000, CRC(81a7d90b) SHA1(99f8c3e75b94dd1b60455c26dc38ce08db82fe32) )
 	ROM_LOAD32_WORD_SWAP( "ep17660.31", 0x0000002, 0x0080000, CRC(27b7a507) SHA1(4c28b1d18d75630a73194b5d4fd166f3b647c595) )
 
-
 	/* Page 12 of the service manual states that these 4 regions are tested, so I believe that they are read by the SH-2 */
-	ROM_REGION( 0x1000000, "gfx_data", 0 ) /* SH2 code */
+	ROM_REGION32_BE( 0x1000000, "gfx_data", 0 ) /* SH2 code */
 	ROM_LOAD32_WORD_SWAP( "mp17650.11", 0x0000000, 0x0200000, CRC(0ccc84a1) SHA1(65951685b0c8073f6bd1cf9959e1b4d0fc6031d8) )
 	ROM_LOAD32_WORD_SWAP( "mp17651.12", 0x0000002, 0x0200000, CRC(25fd7dde) SHA1(a1c3f3d947ce20fbf61ea7ab235259be9b7d35a8) )
 	ROM_LOAD32_WORD_SWAP( "mp17652.13", 0x0400000, 0x0200000, CRC(be9b4d05) SHA1(0252ba647434f69d6eacb4efc6f55e6af534c7c5) )
