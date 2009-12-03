@@ -36,7 +36,7 @@ static WRITE8_HANDLER( battlnts_sh_irqtrigger_w )
 static WRITE8_HANDLER( battlnts_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
-	int bankaddress;
+	UINT32 bankaddress;
 
 	/* bits 6 & 7 = bank number */
 	bankaddress = 0x10000 + ((data & 0xc0) >> 6) * 0x4000;
@@ -195,11 +195,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( battlnts )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)		/* ? */
+	MDRV_CPU_ADD("maincpu", HD6309, XTAL_24MHz / 2 /* 3000000*4? */)
 	MDRV_CPU_PROGRAM_MAP(battlnts_map)
 	MDRV_CPU_VBLANK_INT("screen", battlnts_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_24MHz / 6 /* 3579545? */)
 	MDRV_CPU_PROGRAM_MAP(battlnts_sound_map)
 
 	/* video hardware */
@@ -218,10 +218,10 @@ static MACHINE_DRIVER_START( battlnts )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM3812, 3000000)
+	MDRV_SOUND_ADD("ym1", YM3812, XTAL_24MHz / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
+	MDRV_SOUND_ADD("ym2", YM3812, XTAL_24MHz / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

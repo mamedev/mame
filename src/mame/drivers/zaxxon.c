@@ -172,73 +172,20 @@
     The Video boards are exactly the same between the two boardset versions (bottom
     board) nothing changed with the video boards.
 
-    The biggest difference to me seems to be the ROM at U87 on Control Board II,
-    The part number for this ROM is different on the control board 1 three-stack
-    set at U68.
+    Both the 2-stack control board and 3-stack control board use a PROM that's contents
+    are identical between the two.  Apparently the 3-Stack Control Board prom was
+    dumped as a TBP28L22, because that is how the 2-Stack Control board prom was dumped.
 
-    Schematic part number for U68 (3-stack) is TBP28S42 PR-5308, and the chip has a
-    decal with "MR020" on it.
+    Board                  Location  Label            PROM Type
+    ---------------------  --------  ---------------  ---------
+    3-Stack Control Board  U68       MR020 (PR-5308)  TBP28S42?
+    2-Stack Control Board  U87       MR019 (PR-5315)  TBP28L22?
 
-    The 2-stack U87 ROM numbers are TBP28L22 PR-5315. Unknown what the decal or the
-    top of that chip reads. Schematic shows only U87 and the part number.
+    For the 3-stack control board PROM sheet 2 of 6 for the 834-5212 board lists the pinouts
+    and they match the physical board.  The PROM also has the TI logo and a date code? of J810A.
 
     ROM locations are different with ROMs 1-5 on control board II and a different
     numbered ROM in U87.
-
-    Possibly an undumped ROM or just a larger capacity bipolar PROM... (?)
-
-    3-stack control board U68 MR020 =   TBP28S42 PR-5308
-
-    2-stack control board U87 unknown = TBP28L22 PR-5315 *BIPOLAR PROM* Xref=National 74LS471
-
-
-    some pinout differences between the two:
-
-    512*8
-       +------+
-    A0 |1   20| Vcc
-    A1 |2   19| A8
-    A2 |3   18| A7
-    A3 |4   17| A6
-    A4 |5   16| A5
-    O1 |6   15| CE/
-    O2 |7   14| O8
-    O3 |8   13| O7
-    O4 |9   12| O6
-    GND|10  11| O5
-       +------+
-
-    cross ref:
-       Signetics     MMI     TI       Harris  Raytheon  AMD      National  Intel   Fujitsu
-       ---------     ---     --       ------  --------  ---      --------  -----   -------
-    TS 82S147 (60ns) 6349-1  28S42    7649-5  29621     -        74S472    -       TS MB7124
-       82S147A(45ns) 6349-2  -        7649A-5 29621A    27S29    74S472A   -
-                     63S481
-    OC -             -       -        -       -         -        74S473
-
-
-    ----------------------------------------------------------------------
-
-    256*8
-       +------+
-    A0 |1   20| Vcc
-    A1 |2   19| A7
-    A2 |3   18| A6
-    A3 |4   17| A5
-    A4 |5   16| CE1/
-    O1 |6   15| CE2/
-    O2 |7   14| O8
-    O3 |8   13| O7
-    O4 |9   12| O6
-    GND|10  11| O5
-       +------+
-
-    cross ref:
-       Signetics     MMI     TI       Harris  Raytheon  AMD      National  Intel
-       ---------     ---     --       ------  --------  ---      --------  -----
-    TS 82S135 (45ns) 6309-1  18S22    -       -         -        -         -
-       82LS135(100ns)-       28L22    -       -         -        74LS471   -
-
 
     ----ROM--NAMES-------------------------------------
 
@@ -283,7 +230,7 @@
        Names       Names     Location (2-stack)
     ------------      ---------     -------------------
 
-    not dumped (?)          U87  control board
+    congo.u68    =    MR019     U87  control board
     congo1.bin   =    ROM 1     U21  control board
     congo2.bin   =    ROM 2     U22  control board
     congo3.bin   =    ROM 3     U23  control board

@@ -15,6 +15,10 @@ TODO:
 Added dsw locations and verified factory setting based on Guru's notes
 (DSW3 not mentioned)
 
+Boards:
+- CPU/Video board labeled PWB(A)2000109B
+- Sound board labeled PWB(B)3000154A
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -25,6 +29,10 @@ Added dsw locations and verified factory setting based on Guru's notes
 #include "sound/dac.h"
 #include "konamipt.h"
 #include "pandoras.h"
+
+
+#define MASTER_CLOCK		XTAL_18_432MHz
+
 
 static INTERRUPT_GEN( pandoras_master_interrupt )
 {
@@ -170,7 +178,7 @@ static ADDRESS_MAP_START( pandoras_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pandoras_i8039_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pandoras_i8039_io_map, ADDRESS_SPACE_IO, 8 )
@@ -346,18 +354,18 @@ static MACHINE_DRIVER_START( pandoras )
 	MDRV_DRIVER_DATA(pandoras_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809,18432000/6)	/* CPU A */
+	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6)	/* CPU A */
 	MDRV_CPU_PROGRAM_MAP(pandoras_master_map)
 	MDRV_CPU_VBLANK_INT("screen", pandoras_master_interrupt)
 
-	MDRV_CPU_ADD("sub", M6809,18432000/6)		/* CPU B */
+	MDRV_CPU_ADD("sub", M6809, MASTER_CLOCK/6)		/* CPU B */
 	MDRV_CPU_PROGRAM_MAP(pandoras_slave_map)
 	MDRV_CPU_VBLANK_INT("screen", pandoras_slave_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80,14318000/8)
+	MDRV_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(pandoras_sound_map)
 
-	MDRV_CPU_ADD("mcu", I8039,14318000/2)
+	MDRV_CPU_ADD("mcu", I8039, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(pandoras_i8039_map)
 	MDRV_CPU_IO_MAP(pandoras_i8039_io_map)
 
@@ -384,7 +392,7 @@ static MACHINE_DRIVER_START( pandoras )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 14318000/8)
+	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
@@ -412,8 +420,8 @@ ROM_START( pandoras )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64K for the Sound CPU */
 	ROM_LOAD( "pand_6c.snd",	0x00000, 0x02000, CRC(0c1f109d) SHA1(4e6cdee99261764bd2fea5abbd49d800baba0dc5) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* 4K for the Sound CPU 2 */
-	ROM_LOAD( "pand_7e.snd",	0x00000, 0x01000, CRC(18b0f9d0) SHA1(2a6119423222577a4c2b99ed78f61ba387eec7f8) )
+	ROM_REGION( 0x2000, "mcu", 0 ) /* 4K for the Sound CPU 2 (Data is mirrored to fit into an 8K rom) */
+	ROM_LOAD( "pand_7e.snd",	0x00000, 0x02000, CRC(1071c1ba) SHA1(3693be69f4b32fb3031bcdee8cac0d46ec8c2804) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "pand_j18.cpu",	0x00000, 0x02000, CRC(99a696c5) SHA1(35a27cd5ecc51a9a1acf01eb8078a1028f03be32) )	/* sprites */

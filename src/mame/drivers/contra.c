@@ -42,7 +42,7 @@ VIDEO_START( contra );
 
 static WRITE8_HANDLER( contra_bankswitch_w )
 {
-	int bankaddress;
+	UINT32 bankaddress;
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 
@@ -189,11 +189,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( contra )
 
 	/* basic machine hardware */
- 	MDRV_CPU_ADD("maincpu", M6809, 1500000)
+ 	MDRV_CPU_ADD("maincpu", M6809, XTAL_24MHz/16) /* 1500000? */
 	MDRV_CPU_PROGRAM_MAP(contra_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
- 	MDRV_CPU_ADD("audiocpu", M6809, 2000000)
+ 	MDRV_CPU_ADD("audiocpu", M6809, XTAL_24MHz/12) /* 2000000? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
@@ -216,7 +216,7 @@ static MACHINE_DRIVER_START( contra )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 3582071)
+	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_DRIVER_END
@@ -244,6 +244,9 @@ ROM_START( contra )
 	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #0 char lookup table */
 	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )	/* 007121 #1 sprite lookup table */
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
+
+	ROM_REGION( 0x0001, "pals", 0 )
+    ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 ROM_START( contra1 )
@@ -268,6 +271,9 @@ ROM_START( contra1 )
 	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #0 char lookup table */
 	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )	/* 007121 #1 sprite lookup table */
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
+
+	ROM_REGION( 0x0001, "pals", 0 )
+    ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 ROM_START( contrab )
@@ -331,6 +337,9 @@ ROM_START( contraj )
 	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #0 char lookup table */
 	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )	/* 007121 #1 sprite lookup table */
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
+
+	ROM_REGION( 0x0001, "pals", 0 )
+    ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 ROM_START( contrajb )
@@ -394,6 +403,9 @@ ROM_START( gryzor )
 	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #0 char lookup table */
 	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )	/* 007121 #1 sprite lookup table */
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
+
+	ROM_REGION( 0x0001, "pals", 0 )
+    ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 ROM_START( gryzora )
@@ -418,6 +430,9 @@ ROM_START( gryzora )
 	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #0 char lookup table */
 	ROM_LOAD( "633f10.18g",   0x0200, 0x0100, CRC(2b244d84) SHA1(c3bde7afb501bae58d07721c637dc06938c22150) )	/* 007121 #1 sprite lookup table */
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
+
+	ROM_REGION( 0x0001, "pals", 0 )
+    ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 
