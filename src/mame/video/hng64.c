@@ -3,11 +3,16 @@
 
 #include <math.h>
 #include "drawgfxm.h"
+#include "tilemap.h"
 
 #define MAKE_MAME_REEEEAAALLLL_SLOW 0
 
+
+
+
 // !!! I'm sure this isn't right !!!
 UINT32 hng64_dls[2][0x81] ;
+UINT8 additive_tilemap_debug;
 
 static int frameCount = 0 ;
 
@@ -499,7 +504,7 @@ static void transition_control(bitmap_t *bitmap, const rectangle *cliprect)
 		brigR = (INT32)( hng64_tcram[0x0000000a]        & 0xff) ;
 		brigG = (INT32)((hng64_tcram[0x0000000a] >> 8)  & 0xff) ;
 		brigB = (INT32)((hng64_tcram[0x0000000a] >> 16) & 0xff) ;
-
+								 
 		for (i = cliprect->min_x; i < cliprect->max_x; i++)
 		{
 			for (j = cliprect->min_y; j < cliprect->max_y; j++)
@@ -1368,6 +1373,328 @@ WRITE32_HANDLER( hng64_videoram_w )
 	/* 400000 - 7fffff is scroll regs etc. */
 }
 
+/* internal set of transparency states for rendering */
+typedef enum
+{
+	HNG64_TILEMAP_NORMAL = 1,
+	HNG64_TILEMAP_ADDITIVE,
+	HNG64_TILEMAP_ALPHA
+} hng64trans_t;
+
+
+typedef struct _blit_parameters blit_parameters;
+struct _blit_parameters
+{
+	bitmap_t *			bitmap;
+	rectangle			cliprect;
+	UINT32 				tilemap_priority_code;
+	UINT8				mask;
+	UINT8				value;
+	UINT8				alpha;
+	hng64trans_t		drawformat;
+};
+
+
+
+static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap *tmap, bitmap_t *dest, const rectangle *cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat)
+{
+	/* start with nothing */
+	memset(blit, 0, sizeof(*blit));
+
+	/* set the target bitmap */
+	blit->bitmap = dest;
+
+	/* if we have a cliprect, copy */
+	if (cliprect != NULL)
+		blit->cliprect = *cliprect;
+
+	/* otherwise, make one up */
+	else
+	{
+		blit->cliprect.min_x = blit->cliprect.min_y = 0;
+		blit->cliprect.max_x = dest->width - 1;
+		blit->cliprect.max_y = dest->height - 1;
+	}
+
+	/* set the priority code and alpha */
+	//blit->tilemap_priority_code = priority | (priority_mask << 8) | (tmap->palette_offset << 16); // fixit
+	blit->alpha = (flags & TILEMAP_DRAW_ALPHA_FLAG) ? (flags >> 24) : 0xff;
+	
+	blit->drawformat = drawformat;
+
+	/* tile priority; unless otherwise specified, draw anything in layer 0 */
+	blit->mask = TILEMAP_PIXEL_CATEGORY_MASK;
+	blit->value	= flags & TILEMAP_PIXEL_CATEGORY_MASK;
+
+	/* if no layers specified, draw layer 0 */
+	if ((flags & (TILEMAP_DRAW_LAYER0 | TILEMAP_DRAW_LAYER1 | TILEMAP_DRAW_LAYER2)) == 0)
+		flags |= TILEMAP_DRAW_LAYER0;
+
+	/* OR in the bits from the draw masks */
+	blit->mask |= flags & (TILEMAP_DRAW_LAYER0 | TILEMAP_DRAW_LAYER1 | TILEMAP_DRAW_LAYER2);
+	blit->value |= flags & (TILEMAP_DRAW_LAYER0 | TILEMAP_DRAW_LAYER1 | TILEMAP_DRAW_LAYER2);
+
+	/* for all-opaque rendering, don't check any of the layer bits */
+	if (flags & TILEMAP_DRAW_OPAQUE)
+	{
+		blit->mask &= ~(TILEMAP_PIXEL_LAYER0 | TILEMAP_PIXEL_LAYER1 | TILEMAP_PIXEL_LAYER2);
+		blit->value &= ~(TILEMAP_PIXEL_LAYER0 | TILEMAP_PIXEL_LAYER1 | TILEMAP_PIXEL_LAYER2);
+	}
+
+	/* don't check category if requested */
+	if (flags & TILEMAP_DRAW_ALL_CATEGORIES)
+	{
+		blit->mask &= ~TILEMAP_PIXEL_CATEGORY_MASK;
+		blit->value &= ~TILEMAP_PIXEL_CATEGORY_MASK;
+	}
+}
+
+INLINE UINT32 alpha_additive_r32(UINT32 d, UINT32 s, UINT8 level)
+{
+	UINT32 add;
+	add = (s & 0x00ff0000) + (d & 0x00ff0000);
+	if (add & 0x01000000) d = (d & 0xff00ffff) | (0x00ff0000);
+	else d = (d & 0xff00ffff) | (add & 0x00ff0000);
+	add = (s & 0x000000ff) + (d & 0x000000ff);
+	if (add & 0x00000100) d = (d & 0xffffff00) | (0x000000ff); 
+	else d = (d & 0xffffff00) | (add & 0x000000ff); 
+	add = (s & 0x0000ff00) + (d & 0x0000ff00);
+	if (add & 0x00010000) d = (d & 0xffff00ff) | (0x0000ff00);
+	else d = (d & 0xffff00ff) | (add & 0x0000ff00);
+	return d;
+}
+
+
+/*-------------------------------------------------
+    tilemap_draw_roz_core - render the tilemap's
+    pixmap to the destination with rotation
+    and zoom
+-------------------------------------------------*/
+
+#define HNG64_ROZ_PLOT_PIXEL(INPUT_VAL)											        \
+do {																	  	        \
+	if (blit->drawformat == HNG64_TILEMAP_NORMAL)									\
+		*(UINT32 *)dest = clut[INPUT_VAL];								  	        \
+	else if (blit->drawformat == HNG64_TILEMAP_ADDITIVE)			                \
+		*(UINT32 *)dest = alpha_additive_r32(*(UINT32 *)dest, clut[INPUT_VAL], alpha);	\
+	else if (blit->drawformat == HNG64_TILEMAP_ALPHA)		                        \
+		*(UINT32 *)dest = alpha_blend_r32(*(UINT32 *)dest, clut[INPUT_VAL], alpha);	\
+} while (0)
+
+static void hng64_tilemap_draw_roz_core(running_machine* machine, tilemap *tmap, const blit_parameters *blit,
+		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound)
+{
+	const pen_t *clut = &machine->pens[blit->tilemap_priority_code >> 16];
+	bitmap_t *priority_bitmap = machine->priority_bitmap;
+	bitmap_t *destbitmap = blit->bitmap;
+	bitmap_t *srcbitmap = tilemap_get_pixmap(tmap);
+	bitmap_t *flagsmap = tilemap_get_flagsmap(tmap);
+	const int xmask = srcbitmap->width-1;
+	const int ymask = srcbitmap->height-1;
+	const int widthshifted = srcbitmap->width << 16;
+	const int heightshifted = srcbitmap->height << 16;
+	UINT32 priority = blit->tilemap_priority_code;
+	UINT8 mask = blit->mask;
+	UINT8 value = blit->value;
+	UINT8 alpha = blit->alpha;
+	UINT32 cx;
+	UINT32 cy;
+	int x;
+	int sx;
+	int sy;
+	int ex;
+	int ey;
+	void *dest;
+	UINT8 *pri;
+	const UINT16 *src;
+	const UINT8 *maskptr;
+	int destadvance = destbitmap->bpp / 8;
+
+	/* pre-advance based on the cliprect */
+	startx += blit->cliprect.min_x * incxx + blit->cliprect.min_y * incyx;
+	starty += blit->cliprect.min_x * incxy + blit->cliprect.min_y * incyy;
+
+	/* extract start/end points */
+	sx = blit->cliprect.min_x;
+	sy = blit->cliprect.min_y;
+	ex = blit->cliprect.max_x;
+	ey = blit->cliprect.max_y;
+
+	/* optimized loop for the not rotated case */
+	if (incxy == 0 && incyx == 0 && !wraparound)
+	{
+		/* skip without drawing until we are within the bitmap */
+		while (startx >= widthshifted && sx <= ex)
+		{
+			startx += incxx;
+			sx++;
+		}
+
+		/* early exit if we're done already */
+		if (sx > ex)
+			return;
+
+		/* loop over rows */
+		while (sy <= ey)
+		{
+			/* only draw if Y is within range */
+			if (starty < heightshifted)
+			{
+				/* initialize X counters */
+				x = sx;
+				cx = startx;
+				cy = starty >> 16;
+
+				/* get source and priority pointers */
+				pri = BITMAP_ADDR8(priority_bitmap, sy, sx);
+				src = BITMAP_ADDR16(srcbitmap, cy, 0);
+				maskptr = BITMAP_ADDR8(flagsmap, cy, 0);
+				dest = (UINT8 *)destbitmap->base + (destbitmap->rowpixels * sy + sx) * destadvance;
+
+				/* loop over columns */
+				while (x <= ex && cx < widthshifted)
+				{
+					/* plot if we match the mask */
+					if ((maskptr[cx >> 16] & mask) == value)
+					{
+						HNG64_ROZ_PLOT_PIXEL(src[cx >> 16]);
+						*pri = (*pri & (priority >> 8)) | priority;
+					}
+
+					/* advance in X */
+					cx += incxx;
+					x++;
+					dest = (UINT8 *)dest + destadvance;
+					pri++;
+				}
+			}
+
+			/* advance in Y */
+			starty += incyy;
+			sy++;
+		}
+	}
+
+	/* wraparound case */
+	else if (wraparound)
+	{
+		/* loop over rows */
+		while (sy <= ey)
+		{
+			/* initialize X counters */
+			x = sx;
+			cx = startx;
+			cy = starty;
+
+			/* get dest and priority pointers */
+			dest = (UINT8 *)destbitmap->base + (destbitmap->rowpixels * sy + sx) * destadvance;
+			pri = BITMAP_ADDR8(priority_bitmap, sy, sx);
+
+			/* loop over columns */
+			while (x <= ex)
+			{
+				/* plot if we match the mask */
+				if ((*BITMAP_ADDR8(flagsmap, (cy >> 16) & ymask, (cx >> 16) & xmask) & mask) == value)
+				{
+					HNG64_ROZ_PLOT_PIXEL(*BITMAP_ADDR16(srcbitmap, (cy >> 16) & ymask, (cx >> 16) & xmask));
+					*pri = (*pri & (priority >> 8)) | priority;
+				}
+
+				/* advance in X */
+				cx += incxx;
+				cy += incxy;
+				x++;
+				dest = (UINT8 *)dest + destadvance;
+				pri++;
+			}
+
+			/* advance in Y */
+			startx += incyx;
+			starty += incyy;
+			sy++;
+		}
+	}
+
+	/* non-wraparound case */
+	else
+	{
+		/* loop over rows */
+		while (sy <= ey)
+		{
+			/* initialize X counters */
+			x = sx;
+			cx = startx;
+			cy = starty;
+
+			/* get dest and priority pointers */
+			dest = (UINT8 *)destbitmap->base + (destbitmap->rowpixels * sy + sx) * destadvance;
+			pri = BITMAP_ADDR8(priority_bitmap, sy, sx);
+
+			/* loop over columns */
+			while (x <= ex)
+			{
+				/* plot if we're within the bitmap and we match the mask */
+				if (cx < widthshifted && cy < heightshifted)
+					if ((*BITMAP_ADDR8(flagsmap, cy >> 16, cx >> 16) & mask) == value)
+					{
+						HNG64_ROZ_PLOT_PIXEL(*BITMAP_ADDR16(srcbitmap, cy >> 16, cx >> 16));
+						*pri = (*pri & (priority >> 8)) | priority;
+					}
+
+				/* advance in X */
+				cx += incxx;
+				cy += incxy;
+				x++;
+				dest = (UINT8 *)dest + destadvance;
+				pri++;
+			}
+
+			/* advance in Y */
+			startx += incyx;
+			starty += incyy;
+			sy++;
+		}
+	}
+}
+
+
+
+void hng64_tilemap_draw_roz_primask(running_machine* machine, bitmap_t *dest, const rectangle *cliprect, tilemap *tmap,
+		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
+		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat)
+{
+	blit_parameters blit;
+
+/* notes:
+   - startx and starty MUST be UINT32 for calculations to work correctly
+   - srcbitmap->width and height are assumed to be a power of 2 to speed up wraparound
+   */
+
+	/* skip if disabled */
+	//if (!tmap->enable)
+	//	return;
+
+profiler_mark_start(PROFILER_TILEMAP_DRAW_ROZ);
+	/* configure the blit parameters */
+	hng64_configure_blit_parameters(&blit, tmap, dest, cliprect, flags, priority, priority_mask, drawformat);
+
+	/* get the full pixmap for the tilemap */
+	tilemap_get_pixmap(tmap);
+
+	/* then do the roz copy */
+	hng64_tilemap_draw_roz_core(machine, tmap, &blit, startx, starty, incxx, incxy, incyx, incyy, wraparound);
+profiler_mark_end();
+}
+
+
+INLINE void hng64_tilemap_draw_roz(running_machine* machine, bitmap_t *dest, const rectangle *cliprect, tilemap *tmap,
+		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
+		int wraparound, UINT32 flags, UINT8 priority, hng64trans_t drawformat)
+{
+	hng64_tilemap_draw_roz_primask(machine, dest, cliprect, tmap, startx, starty, incxx, incxy, incyx, incyy, wraparound, flags, priority, 0xff, drawformat);
+}
+
+
 
 static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int tm )
 {
@@ -1377,7 +1704,12 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 	int transmask;
 	UINT32 global_tileregs = hng64_videoregs[0x00];
 
+	int debug_blend_enabled = 0;
+
 	int global_dimensions = (global_tileregs&0x03000000)>>24;
+
+	if ( (additive_tilemap_debug&(1 << tm)))
+		debug_blend_enabled = 1;
 
 	if ((global_dimensions != 0) && (global_dimensions != 3))
  		popmessage("unsupported global_dimensions on tilemaps");
@@ -1573,10 +1905,10 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 			}
 			else
 			{
-				tilemap_draw_roz(bitmap,cliprect,tilemap,xtopleft,ytopleft,
+				hng64_tilemap_draw_roz(machine, bitmap,cliprect,tilemap,xtopleft,ytopleft,
 						xinc<<1,yinc2<<1,xinc2<<1,yinc<<1,
 						1,
-						0,0);
+						0,0, debug_blend_enabled?HNG64_TILEMAP_ADDITIVE:HNG64_TILEMAP_NORMAL);
 			}
 
 		}
@@ -1669,10 +2001,10 @@ static void hng64_drawtilemap(running_machine* machine, bitmap_t *bitmap, const 
 			}
 			else
 			{
-				tilemap_draw_roz(bitmap,cliprect,tilemap,xtopleft,ytopleft,
+				hng64_tilemap_draw_roz(machine, bitmap,cliprect,tilemap,xtopleft,ytopleft,
 						xinc<<1,0,0,yinc<<1,
 						1,
-						0,0);
+						0,0, debug_blend_enabled?HNG64_TILEMAP_ADDITIVE:HNG64_TILEMAP_NORMAL);
 			}
 		}
 	}
@@ -1868,7 +2200,7 @@ VIDEO_UPDATE( hng64 )
 		hng64_3dregs[0x10/4],hng64_3dregs[0x14/4],hng64_3dregs[0x18/4],hng64_3dregs[0x1c/4],
 		hng64_3dregs[0x20/4],hng64_3dregs[0x24/4],hng64_3dregs[0x28/4],hng64_3dregs[0x2c/4]);
 
-	if (1)
+	if (0)
 		popmessage("TC: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
 		hng64_tcram[0x00/4],
 		hng64_tcram[0x04/4],
@@ -1895,8 +2227,26 @@ VIDEO_UPDATE( hng64 )
 		hng64_tcram[0x58/4],
 		hng64_tcram[0x5c/4]);
 
-
-
+	if ( input_code_pressed_once(screen->machine, KEYCODE_T) )
+	{
+		additive_tilemap_debug ^= 1;
+		popmessage("blend changed %02x", additive_tilemap_debug);
+	}
+	if ( input_code_pressed_once(screen->machine, KEYCODE_Y) )
+	{
+		additive_tilemap_debug ^= 2;
+		popmessage("blend changed %02x", additive_tilemap_debug);
+	}
+	if ( input_code_pressed_once(screen->machine, KEYCODE_U) )
+	{
+		additive_tilemap_debug ^= 4;
+		popmessage("blend changed %02x", additive_tilemap_debug);
+	}
+	if ( input_code_pressed_once(screen->machine, KEYCODE_I) )
+	{
+		additive_tilemap_debug ^= 8;
+		popmessage("blend changed %02x", additive_tilemap_debug);
+	}
 
 //  mame_printf_debug("FRAME DONE %d\n", frameCount) ;
 	frameCount++ ;
@@ -1941,6 +2291,9 @@ VIDEO_START( hng64 )
 	tilemap_set_transparent_pen(hng64_tilemap3_8x8,0);
 	tilemap_set_transparent_pen(hng64_tilemap3_16x16,0);
 	tilemap_set_transparent_pen(hng64_tilemap3_16x16_alt,0);
+
+	// debug switch, turn on / off additive blending on a per-tilemap basis
+	additive_tilemap_debug = 0;
 
 	// 3d Buffer Allocation
 	depthBuffer = auto_alloc_array(machine, float, (visarea->max_x)*(visarea->max_y)) ;
