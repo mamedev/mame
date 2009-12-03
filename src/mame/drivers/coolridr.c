@@ -69,7 +69,7 @@ static VIDEO_UPDATE(coolridr)
 	0x3e0bc00-0x3e0dbff looks like tilemap planes.
 	0x3e00000 onward seems to contain video registers, I've seen MAP registers that clearly points to the aforementioned planes.
 	*/
-	const gfx_element *gfx = screen->machine->gfx[5];
+	const gfx_element *gfx = screen->machine->gfx[1];
 	int count = 0x0bc00/4;
 	int y,x;
 
@@ -83,10 +83,10 @@ static VIDEO_UPDATE(coolridr)
 
 			tile = (framebuffer_vram[count] & 0x0fff0000) >> 16;
 			//int colour = tile>>12;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile|0x1000,0,0,0,(x+0)*16,y*16);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,(x+0)*16,y*16);
 
 			tile = (framebuffer_vram[count] & 0x00000fff) >> 0;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile|0x1000,0,0,0,(x+1)*16,y*16);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,(x+1)*16,y*16);
 
 			count++;
 		}
@@ -192,11 +192,23 @@ static WRITE32_HANDLER( coolridr_pal_w )
 	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
+static WRITE32_HANDLER( sysh1_dma_w )
+{
+	COMBINE_DATA(&framebuffer_vram[offset]);
+
+	if(offset*4 >= 0x6c0 && offset*4 <= 0x6df)
+	{
+		printf("%08x -> [%04x]\n",framebuffer_vram[offset],(offset*4));
+	}
+}
+
 static ADDRESS_MAP_START( system_h1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_SHARE(1)
-	AM_RANGE(0x01000000, 0x010fffff) AM_ROM AM_REGION("maincpu",0x0100000) //correct?
+	AM_RANGE(0x01000000, 0x010fffff) AM_ROM AM_REGION("maincpu_data",0x0000000) //correct?
+	AM_RANGE(0x01400000, 0x023fffff) AM_ROM AM_REGION("gfx_data",0x0000000) //correct?
+
 	/*WARNING: boundaries of these two are WRONG!*/
-	AM_RANGE(0x03e00000, 0x03e0ffff) AM_RAM AM_BASE(&framebuffer_vram)/*Buffer VRAM Chains*/
+	AM_RANGE(0x03e00000, 0x03e0ffff) AM_RAM_WRITE(sysh1_dma_w) AM_BASE(&framebuffer_vram)/*Buffer VRAM Chains*/
 	AM_RANGE(0x03e10000, 0x03e11fff) AM_RAM AM_BASE(&framebuffer_data)/*Buffer data should go here*/
 
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE(3) /*Communication area RAM*/
@@ -276,12 +288,13 @@ static const gfx_layout test =
 #endif
 
 static GFXDECODE_START( coolridr )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, tiles8x8_layout, 0, 16 )
+//	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
+//	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
+//	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8_layout, 0, 16 )
+//	GFXDECODE_ENTRY( "gfx4", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx5", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "maincpu", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "maincpu_data", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx_data", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( coolridr )
@@ -350,31 +363,28 @@ ROM_START( coolridr )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* SH2 code */
 	ROM_LOAD32_WORD_SWAP( "ep17659.30", 0x0000000, 0x080000, CRC(473027b0) SHA1(acaa212869dd79550235171b9f054e82750f74c3) )
 	ROM_LOAD32_WORD_SWAP( "ep17658.29", 0x0000002, 0x080000, CRC(7ecfdfcc) SHA1(97cb3e6cf9764c8db06de12e4e958148818ef737) )
-	ROM_LOAD32_WORD_SWAP( "ep17661.32", 0x0100000, 0x080000, CRC(81a7d90b) SHA1(99f8c3e75b94dd1b60455c26dc38ce08db82fe32) )
-	ROM_LOAD32_WORD_SWAP( "ep17660.31", 0x0100002, 0x080000, CRC(27b7a507) SHA1(4c28b1d18d75630a73194b5d4fd166f3b647c595) )
+
+	ROM_REGION( 0x100000, "maincpu_data", 0 ) /* SH2 code */
+	ROM_LOAD32_WORD_SWAP( "ep17661.32", 0x0000000, 0x0080000, CRC(81a7d90b) SHA1(99f8c3e75b94dd1b60455c26dc38ce08db82fe32) )
+	ROM_LOAD32_WORD_SWAP( "ep17660.31", 0x0000002, 0x0080000, CRC(27b7a507) SHA1(4c28b1d18d75630a73194b5d4fd166f3b647c595) )
+
+
+	/* Page 12 of the service manual states that these 4 regions are tested, so I believe that they are read by the SH-2 */
+	ROM_REGION( 0x1000000, "gfx_data", 0 ) /* SH2 code */
+	ROM_LOAD32_WORD_SWAP( "mp17650.11", 0x0000000, 0x0200000, CRC(0ccc84a1) SHA1(65951685b0c8073f6bd1cf9959e1b4d0fc6031d8) )
+	ROM_LOAD32_WORD_SWAP( "mp17651.12", 0x0000002, 0x0200000, CRC(25fd7dde) SHA1(a1c3f3d947ce20fbf61ea7ab235259be9b7d35a8) )
+	ROM_LOAD32_WORD_SWAP( "mp17652.13", 0x0400000, 0x0200000, CRC(be9b4d05) SHA1(0252ba647434f69d6eacb4efc6f55e6af534c7c5) )
+	ROM_LOAD32_WORD_SWAP( "mp17653.14", 0x0400002, 0x0200000, CRC(64d1406d) SHA1(779dbbf42a14a6be1de9afbae5bbb18f8f36ceb3) )
+	ROM_LOAD32_WORD_SWAP( "mp17654.15", 0x0800000, 0x0200000, CRC(5dee5cba) SHA1(6e6ec8574bdd35cc27903fc45f0d4a36ce9df103) )
+	ROM_LOAD32_WORD_SWAP( "mp17655.16", 0x0800002, 0x0200000, CRC(02903cf2) SHA1(16d555fda144e0f1b62b428e9158a0e8ebf7084e) )
+	ROM_LOAD32_WORD_SWAP( "mp17656.17", 0x0c00000, 0x0200000, CRC(945c89e3) SHA1(8776d74f73898d948aae3c446d7c710ad0407603) )
+	ROM_LOAD32_WORD_SWAP( "mp17657.18", 0x0c00002, 0x0200000, CRC(74676b1f) SHA1(b4a9003a052bde93bebfa4bef9e8dff65003c3b2) )
 
 	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )	/* 68000 */
 	/* uploaded by the main CPU */
 
 	ROM_REGION( 0x100000, "sub", 0 ) /* SH1 */
 	ROM_LOAD16_WORD_SWAP( "ep17662.12", 0x000000, 0x020000,  CRC(50d66b1f) SHA1(f7b7f2f5b403a13b162f941c338a3e1207762a0b) )
-
-	/* Page 12 of the service manual states that these 4 regions are tested, so I believe that they are read by the SH-2 */
-	ROM_REGION( 0x0400000, "gfx1", 0 ) /* Tiles. . at least 1 format */
-	ROM_LOAD32_WORD_SWAP( "mp17650.11",0x000000, 0x0200000, CRC(0ccc84a1) SHA1(65951685b0c8073f6bd1cf9959e1b4d0fc6031d8) )
-	ROM_LOAD32_WORD_SWAP( "mp17651.12",0x000002, 0x0200000, CRC(25fd7dde) SHA1(a1c3f3d947ce20fbf61ea7ab235259be9b7d35a8) )
-
-	ROM_REGION( 0x0400000, "gfx2", 0 ) /* Tiles. . at least 1 format */
-	ROM_LOAD32_WORD_SWAP( "mp17652.13",0x000000, 0x0200000, CRC(be9b4d05) SHA1(0252ba647434f69d6eacb4efc6f55e6af534c7c5) )
-	ROM_LOAD32_WORD_SWAP( "mp17653.14",0x000002, 0x0200000, CRC(64d1406d) SHA1(779dbbf42a14a6be1de9afbae5bbb18f8f36ceb3) )
-
-	ROM_REGION( 0x0400000, "gfx3", 0 ) /*Tiles. . at least 1 format + sprites (non-tile data)? */
-	ROM_LOAD32_WORD_SWAP( "mp17654.15",0x000000, 0x0200000, CRC(5dee5cba) SHA1(6e6ec8574bdd35cc27903fc45f0d4a36ce9df103) )
-	ROM_LOAD32_WORD_SWAP( "mp17655.16",0x000002, 0x0200000, CRC(02903cf2) SHA1(16d555fda144e0f1b62b428e9158a0e8ebf7084e) )
-
-	ROM_REGION( 0x0400000, "gfx4", 0 ) /* sprites (non-tile data?) */
-	ROM_LOAD32_WORD_SWAP( "mp17656.17",0x000000, 0x0200000, CRC(945c89e3) SHA1(8776d74f73898d948aae3c446d7c710ad0407603) )
-	ROM_LOAD32_WORD_SWAP( "mp17657.18",0x000002, 0x0200000, CRC(74676b1f) SHA1(b4a9003a052bde93bebfa4bef9e8dff65003c3b2) )
 
 	/* these 10 interleave somehow?? */
 	ROM_REGION( 0x1600000, "gfx5", ROMREGION_ERASEFF ) /* Other Roms */
