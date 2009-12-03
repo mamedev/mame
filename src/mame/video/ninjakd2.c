@@ -92,8 +92,8 @@ static TILEMAP_MAPPER( omegaf_bg_scan )
 
 static void robokid_get_bg_tile_info(running_machine* machine, tile_data* const tileinfo, tilemap_memory_index const tile_index, int const gfxnum, const UINT8* const videoram)
 {
-	int const lo = machine->generic.videoram.u8[(tile_index << 1)];
-	int const hi = machine->generic.videoram.u8[(tile_index << 1) | 1];
+	int const lo = videoram[(tile_index << 1)];
+	int const hi = videoram[(tile_index << 1) | 1];
 	int const tile = ((hi & 0x10) << 7) | ((hi & 0x20) << 5) | ((hi & 0xc0) << 2) | lo;
 	int const color = hi & 0x0f;
 
