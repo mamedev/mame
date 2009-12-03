@@ -1243,6 +1243,10 @@ const game_driver * const drivers[] =
 	DRIVER( sinvzen )	/* Zenitone-Microsec Ltd */
 	DRIVER( superinv )	/* bootleg */
 	DRIVER( invasion )	/* Sidam */
+	DRIVER( invasiona )	/* bootleg */
+	DRIVER( invasionb )	/* bootleg */
+	DRIVER( invasionrz ) /* bootleg */
+	DRIVER( invasionrza )/* bootleg */
 	DRIVER( sstrangr )	/* (c) 1978 Yachiyo Electronics, Ltd. */
 	DRIVER( sstrangr2 )	/* (c) 1979 Yachiyo Electronics, Ltd. */
 	DRIVER( sinvemag )	/* Zenitone-Microsec Ltd. */
@@ -1797,6 +1801,7 @@ const game_driver * const drivers[] =
 	DRIVER( arkblock )	/* bootleg */
 	DRIVER( arkbloc2 )	/* bootleg */
 	DRIVER( arkgcbl )	/* bootleg */
+	DRIVER( arkgcbla )	/* bootleg */
 	DRIVER( paddle2 )	/* bootleg */
 	DRIVER( block2 )	/* bootleg */
 	DRIVER( arkatayt )	/* bootleg */
@@ -3525,8 +3530,10 @@ V-V                           TP-027
 	DRIVER( headon )	/* 163-167/192-193 (c) Gremlin */
 	DRIVER( headonb )	/* 163-167/192-193 (c) Gremlin */
 	DRIVER( headons )	/* Sidam bootleg */
+	DRIVER( headonsa )	/* Sidam bootleg */
 	DRIVER( supcrash )	/* bootleg */
 	DRIVER( headon2 )	/* ???-??? (c) 1979 Sega */
+	DRIVER( headon2s )	/* Sidam bootleg */
 	DRIVER( car2 )		/* bootleg */
 						/* ???-??? Fortress */
 						/* ???-??? Gee Bee */

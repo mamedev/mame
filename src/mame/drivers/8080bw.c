@@ -2456,6 +2456,49 @@ ROM_START( invasion )
 	ROM_LOAD( "10136-7.7k",   0x1c00, 0x0400, CRC(75d7acaf) SHA1(977d146d7df555cea1bb2156d29d88bec9731f98) )
 ROM_END
 
+ROM_START( invasiona )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "invasiona_0.bin",   0x0000, 0x0400, CRC(c2fe6197) SHA1(823d02c2790711f40c167544a55e1669a97d93b4) )
+	ROM_LOAD( "invasiona_1.bin",   0x0400, 0x0400, CRC(7c86620d) SHA1(9e92ec0aa4eee96a7fa115a14a611c488d13b9dd) )
+	ROM_LOAD( "invasiona_2.bin",   0x0800, 0x0400, CRC(ccaf38f6) SHA1(8eb0456e8abdba0d1dda20a335a9ecbe7c38f9ed) )
+	ROM_LOAD( "invasiona_3.bin",   0x1400, 0x0400, CRC(8ec9eae2) SHA1(48d7a7dc61e0417ca4093e5c2a36efd96e359233) )
+	ROM_LOAD( "invasiona_4.bin",   0x1800, 0x0400, CRC(24b39879) SHA1(c93530ac20c412b516fbcba8220d85a9bd4fa804) )
+	ROM_LOAD( "invasiona_5.bin",   0x1c00, 0x0400, CRC(59134ff8) SHA1(2e6a040066b35b10f867a3e500e3b13922c0eb7a) )
+ROM_END
+
+ROM_START( invasionb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "invasionb_0.bin",   0x0000, 0x0400, CRC(7a9b4485) SHA1(dde918ec106971972bf7c7e5085c1262522f7e35) )
+	ROM_LOAD( "invasionb_1.bin",   0x0400, 0x0400, CRC(7c86620d) SHA1(9e92ec0aa4eee96a7fa115a14a611c488d13b9dd) )
+	ROM_LOAD( "invasionb_2.bin",   0x0800, 0x0400, CRC(ccaf38f6) SHA1(8eb0456e8abdba0d1dda20a335a9ecbe7c38f9ed) )
+	ROM_LOAD( "invasionb_5.bin",   0x1400, 0x0400, CRC(8ec9eae2) SHA1(48d7a7dc61e0417ca4093e5c2a36efd96e359233) )
+	ROM_LOAD( "invasionb_6.bin",   0x1800, 0x0400, CRC(ec0edb4a) SHA1(8c6946b50ba5c319fe03c55b43c4e714387719b8) )
+	ROM_LOAD( "invasionb_7.bin",   0x1c00, 0x0400, CRC(6aac1281) SHA1(f071a21de72d2c9f7851195592c828fa501197ce) )
+ROM_END
+
+ROM_START( invasionrz )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rz0.0k",   0x0000, 0x0400, CRC(7a9b4485) SHA1(dde918ec106971972bf7c7e5085c1262522f7e35) )
+	ROM_LOAD( "rz1.1k",   0x0400, 0x0400, CRC(7c86620d) SHA1(9e92ec0aa4eee96a7fa115a14a611c488d13b9dd) )
+	ROM_LOAD( "rz2.2k",   0x0800, 0x0400, CRC(ccaf38f6) SHA1(8eb0456e8abdba0d1dda20a335a9ecbe7c38f9ed) )
+	ROM_LOAD( "rz5.5k",   0x1400, 0x0400, CRC(8ec9eae2) SHA1(48d7a7dc61e0417ca4093e5c2a36efd96e359233) )
+	ROM_LOAD( "rz6.6k",   0x1800, 0x0400, CRC(ec0edb4a) SHA1(8c6946b50ba5c319fe03c55b43c4e714387719b8) )
+	ROM_LOAD( "rz7.7k",   0x1c00, 0x0400, CRC(e4ab9012) SHA1(4f54e3fd3e3835a7b7d3b8d77929f4d9e42a4917) )
+ROM_END
+
+ROM_START( invasionrza )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rz0-0.9k",   0x0000, 0x0400, CRC(3044806f) SHA1(7eaedd7fd7fcfd421432d5f6970ede12f586f644) )
+	ROM_LOAD( "rz1-1.8k",   0x0400, 0x0400, CRC(7c86620d) SHA1(9e92ec0aa4eee96a7fa115a14a611c488d13b9dd) )
+	ROM_LOAD( "rz2-2.7k",   0x0800, 0x0400, CRC(c808e941) SHA1(c17f2171d82df1984c4b048f2664dea5bd9c136b) )
+	ROM_LOAD( "rz5-5.4k",   0x1400, 0x0400, CRC(8ec9eae2) SHA1(48d7a7dc61e0417ca4093e5c2a36efd96e359233) )
+	// 2 reads of the bad rom
+	ROM_LOAD( "rz6-6.3k",   0x1800, 0x0400, BAD_DUMP CRC(c48df3ca) SHA1(d92064d171e099a45821c944324b993e39d894f7) )
+	ROM_LOAD( "rz6-6.3ka",  0x1800, 0x0400, BAD_DUMP CRC(aa51b2c3) SHA1(bb30f3827a66ec3cb8436566f6b865995d702f76) )	
+	ROM_LOAD( "rz7-7.2k",   0x1c00, 0x0400, CRC(27dbea48) SHA1(f0bf5d31424dc72ac2e6fa01c528365efff838d2) )
+ROM_END
+
+
 ROM_START( rollingc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rc01.bin",     0x0000, 0x0400, CRC(66fa50bf) SHA1(7451d4ff8d3b351a324aaecdbdc5b46672f5fdd0) )
@@ -2792,7 +2835,11 @@ GAMEL(1979, jspecter2,invaders, invaders, jspecter, 0, ROT270, "Jatre", "Jatre S
 GAMEL(1979, cosmicmo, invaders, invaders, cosmicmo, 0, ROT270, "Universal", "Cosmic Monsters", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1979, cosmicm2, invaders, invaders, cosmicmo, 0, ROT270, "Universal", "Cosmic Monsters 2", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, superinv, invaders, invaders, superinv, 0, ROT270, "bootleg", "Super Invaders", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(19??, invasion, invaders, invaders, invasion, 0, ROT270, "Sidam", "Invasion", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(19??, invasion, invaders, invaders, invasion, 0, ROT270, "Sidam",   "Invasion (Sidam)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(19??, invasiona,invaders, invaders, invasion, 0, ROT270, "bootleg", "Invasion (bootleg, set 1, normal graphics)", GAME_SUPPORTS_SAVE, layout_invaders ) // has Sidam replaced with 'Ufo Monster Attack' and standard GFX
+GAMEL(19??, invasionb,invaders, invaders, invasion, 0, ROT270, "bootleg", "Invasion (bootleg, set 2, no copyright)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(19??, invasionrz,invaders,invaders, invasion, 0, ROT270, "bootleg", "Invasion (bootleg, set 3, R Z SRL BOLOGNA)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_invaders )
+GAMEL(19??, invasionrza,invaders,invaders,invasion, 0, ROT270, "bootleg", "Invasion (bootleg, set 4, R Z SRL BOLOGNA)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_invaders )
 GAME( 19??, darthvdr, invaders, darthvdr, darthvdr, 0, ROT270, "bootleg", "Darth Vader", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
 GAME( 1979, moonbase, invadpt2, invadpt2, invadpt2, 0, ROT270, "Nichibutsu", "Moon Base", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAMEL(19??, invrvnge, 0,        invrvnge, invrvnge, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge",  GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_invrvnge )

@@ -719,6 +719,14 @@ static MACHINE_DRIVER_START( headon )
 
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( headons )
+	MDRV_IMPORT_FROM(headon)
+
+	/* video hardware */
+	MDRV_VIDEO_UPDATE(vicdual_bw) // no colour prom on PCB, must be bw?
+MACHINE_DRIVER_END
+
+
 
 static MACHINE_DRIVER_START( sspaceat )
 
@@ -929,6 +937,13 @@ static MACHINE_DRIVER_START( headon2 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_IMPORT_FROM(headon_audio)
 
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( headon2bw )
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(headon2)
+	/* video hardware */
+	MDRV_VIDEO_UPDATE(vicdual_bw)
 MACHINE_DRIVER_END
 
 
@@ -2652,12 +2667,42 @@ ROM_START( headons )
 	ROM_LOAD( "5.9a",         0x1400, 0x0400, CRC(ed4666f2) SHA1(a12c22bfbb027eab3181627804b69129e89bd22c) )
 	ROM_LOAD( "6.11a",        0x1800, 0x0400, CRC(7a709d68) SHA1(c1f0178c7a8cb39948e52e91a841401cfd932271) )
 
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "316-0138.u44", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )    /* not in this dump, but colour prom so needed! */
-
 	ROM_REGION( 0x0040, "user1", 0 )	/* timing PROMs */
 	ROM_LOAD( "316-0043.u87", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )	/* control PROM */
 	ROM_LOAD( "316-0042.u88", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )	/* sequence PROM */
+ROM_END
+
+/* this one is the same PCB but does show the Sidam copyright */
+ROM_START( headonsa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "10305.0.9a",         0x0000, 0x0400, CRC(9a37407b) SHA1(3cd3dbd13c76d01b7541307de92f69d6779046f5) )
+	ROM_LOAD( "10305.1.8a",         0x0400, 0x0400, CRC(aeac8c5f) SHA1(ef9ad63d13076a559ba12c6421ad61de21dd4c90) )
+	ROM_LOAD( "10305.2.7a",         0x0800, 0x0400, CRC(f1a0cb72) SHA1(540b30225ef176c416ea5b142fe7dbb67b7a78fb) )
+	ROM_LOAD( "10305.3.6a",         0x0c00, 0x0400, CRC(ae33fcc4) SHA1(7e0a27f1f502c5293f294875b49186e800a2c749) )
+	ROM_LOAD( "10305.4.5a",         0x1000, 0x0400, CRC(e87f6fd8) SHA1(7fc1ade66c6783861ab310790f023b02a8db7e08) )
+	ROM_LOAD( "10305.5.4a",         0x1400, 0x0400, CRC(387e2eba) SHA1(9feca874e795710884d17ca5122280c30c6b6af0) )
+	ROM_LOAD( "10305.6b.3a",        0x1800, 0x0400, CRC(18749071) SHA1(6badb5cf6f6017d884492e9ef16195f1112d23b5) )
+
+	ROM_REGION( 0x0040, "user1", 0 )	/* timing PROMs */
+	ROM_LOAD( "10303.3e", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )	/* control PROM */
+	ROM_LOAD( "10302.2e", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )	/* sequence PROM */
+ROM_END
+
+
+ROM_START( headon2s )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "10304.0.9a",      0x0000, 0x0400, CRC(256a1fc8) SHA1(2ff621d7160e1420fd2cd9ad62d134e22b1650b3) )
+	ROM_LOAD( "10304.1.8a",      0x0400, 0x0400, CRC(61c47b15) SHA1(47619bd51fcaf47dd72e940c474f310c9287f2f4) )
+	ROM_LOAD( "10304.2.7a",      0x0800, 0x0400, CRC(a6c268d4) SHA1(3b6c27f700ea4474f5354bbdcce82883c2e7e6e9) )
+	ROM_LOAD( "10304.3.6a",      0x0c00, 0x0400, CRC(17a09f24) SHA1(0cb40ec185f2ee3a26e943d84e8e2834d5f9d3ed) )
+	ROM_LOAD( "10304.4.5a",      0x1000, 0x0400, CRC(9af8a2e0) SHA1(92f45bc593fabf7a30615820b4b91677071bc67e) )
+	ROM_LOAD( "10304.5.4a",      0x1400, 0x0400, CRC(6975286c) SHA1(bcb5af18a991b9898fe28e69575c89c7b02d762d) )
+	ROM_LOAD( "10304.6.3a",      0x1800, 0x0400, CRC(06fbcdce) SHA1(821b501dbf59c45d5e03afa3c786fca727da9cd6) )
+	ROM_LOAD( "10304.7b.2a",     0x1c00, 0x0400, CRC(3588fc8f) SHA1(4529b79a1b654591ee2e879922a5377edc1faee5) )
+
+	ROM_REGION( 0x0040, "user1", 0 )	/* timing PROMs */
+	ROM_LOAD( "10303.3e", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )	/* control PROM */
+	ROM_LOAD( "10302.2e", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )	/* sequence PROM */
 ROM_END
 
 
@@ -2689,9 +2734,6 @@ ROM_START( supcrash )
 	ROM_LOAD( "5-6-scrash.bin", 0x1000, 0x0800, CRC(62d33c09) SHA1(ade49f417380f64212491f6be16de39c0c00a364) )
 	ROM_LOAD( "7-8-scrash.bin", 0x1800, 0x0400, CRC(0f8ea335) SHA1(cf2d6cd54dbf689bc0f23aa908bffb0766e8bbd3) )
 
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "316-0138.u44",   0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )    /* not in this dump, but colour prom so needed! */
-
 	ROM_REGION( 0x0040, "user1", 0 )	/* timing PROMs */
 	ROM_LOAD( "316-0043.u87",   0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )	/* control PROM */
 	ROM_LOAD( "316-0042.u88",   0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )	/* sequence PROM */
@@ -2716,6 +2758,7 @@ ROM_START( headon2 )
 	ROM_LOAD( "316-0206.u65", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )	/* control PROM */
 ROM_END
 
+
 /*
     Car 2 (Headon 2)
 
@@ -2735,9 +2778,6 @@ ROM_START( car2 )
 	ROM_LOAD( "car2.5",      0x1400, 0x0400, CRC(6975286c) SHA1(bcb5af18a991b9898fe28e69575c89c7b02d762d) )
 	ROM_LOAD( "car2.6",      0x1800, 0x0400, CRC(4c19dd40) SHA1(0bdfed47594c7aa5ff655b507350fc6a912b6855) )
 	ROM_LOAD( "car2.7",      0x1c00, 0x0400, CRC(41a93920) SHA1(e63df556f998b5e5d99d69a9fd200aaf0403f3f7) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "316-0138.u44", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )
 
 	ROM_REGION( 0x0020, "user1", 0 )	/* timing PROM */
 	ROM_LOAD( "316-0206.u65", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )	/* control PROM */
@@ -3232,10 +3272,12 @@ GAME( 1979, sspaceatc,sspaceat, sspaceat, sspaceat, 0, ROT270, "Sega", "Space At
 GAME( 1979, sspacaho, 0,        sspacaho, sspacaho, 0, ROT270, "Sega", "Space Attack / Head On", GAME_NO_SOUND )
 GAME( 1979, headon,   0,        headon,   headon,   0, ROT0,   "Gremlin", "Head On (2 players)",  GAME_IMPERFECT_SOUND )
 GAME( 1979, headonb,  headon,   headon,   headon,   0, ROT0,   "Gremlin", "Head On (1 player)",  GAME_IMPERFECT_SOUND )
-GAME( 1979, headons,  headon,   headon,   headon,   0, ROT0,   "[Gremlin] (Sidam bootleg)", "Head On (Sidam bootleg)",  GAME_IMPERFECT_SOUND )
-GAME( 1979, supcrash, headon,   headon,   supcrash, 0, ROT0,   "[Gremlim] (Video G Electronic Games bootleg)", "Super Crash (bootleg of Head On)", GAME_NO_SOUND )
+GAME( 1979, headons,  headon,   headons,  headon,   0, ROT0,   "[Gremlin] (Sidam bootleg)", "Head On (Sidam bootleg, set 1)",  GAME_IMPERFECT_SOUND )
+GAME( 1979, headonsa, headon,   headons,  headon,   0, ROT0,   "Sidam (bootleg)",           "Head On (Sidam bootleg, set 2)",  GAME_NOT_WORKING ) // won't coin up?
+GAME( 1979, supcrash, headon,   headons,  supcrash, 0, ROT0,   "[Gremlim] (Video G Electronic Games bootleg)", "Super Crash (bootleg of Head On)", GAME_NO_SOUND )
 GAME( 1979, headon2,  0,        headon2,  headon2,  0, ROT0,   "Sega", "Head On 2",  GAME_IMPERFECT_SOUND )
-GAME( 1979, car2,     headon2,  headon2,  car2,     0, ROT0,   "[Sega] (RZ Bologna bootleg)", "Car 2 (bootleg of Head On 2)",  GAME_IMPERFECT_SOUND ) // title still says 'HeadOn 2'
+GAME( 1979, headon2s, headon2,  headon2bw,car2,     0, ROT0,   "Sidam (bootleg)", "Head On 2 (Sidam bootleg)",  GAME_NOT_WORKING ) // won't coin up?
+GAME( 1979, car2,     headon2,  headon2bw,car2,     0, ROT0,   "[Sega] (RZ Bologna bootleg)", "Car 2 (bootleg of Head On 2)",  GAME_IMPERFECT_SOUND ) // title still says 'HeadOn 2'
 GAME( 1979, invho2,   0,        invho2,   invho2,   0, ROT270, "Sega", "Invinco / Head On 2", GAME_IMPERFECT_SOUND )
 GAME( 1980, nsub,     0,        nsub,     nsub,     0, ROT270, "Sega", "N-Sub (upright)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 1980, samurai,  0,        samurai,  samurai,  0, ROT270, "Sega", "Samurai", GAME_NO_SOUND )
