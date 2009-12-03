@@ -80,7 +80,7 @@ static WRITE8_HANDLER( bladestl_bankswitch_w )
 
 	/* bits 5-6 = bank number */
 	bankaddress = 0x10000 + ((data & 0x60) >> 5) * 0x2000;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
 
 	/* bit 7 = select sprite bank */
 	bladestl_spritebank = (data & 0x80) << 3;
@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2f80, 0x2f9f) AM_READWRITE(K051733_r, K051733_w)	/* Protection: 051733 */
 	AM_RANGE(0x2fc0, 0x2fc0) AM_WRITENOP						/* ??? */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM								/* Work RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)						/* banked ROM */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")						/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

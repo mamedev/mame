@@ -116,7 +116,7 @@ static UINT8 pang_port5_kludge = 0;
 
 static WRITE8_HANDLER( pang_bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x0f);
+	memory_set_bank(space->machine, "bank1", data & 0x0f);
 }
 
 
@@ -349,7 +349,7 @@ logerror("PC %04x: write %02x to port 01\n",cpu_get_pc(space->cpu),data);
 
 static ADDRESS_MAP_START( mgakuen_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(mgakuen_paletteram_r,mgakuen_paletteram_w)	/* palette RAM */
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r,pang_colorram_w) AM_BASE(&pang_colorram) /* Attribute RAM */
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(mgakuen_videoram_r,mgakuen_videoram_w) AM_BASE(&pang_videoram) AM_SIZE(&pang_videoram_size) /* char RAM */
@@ -359,7 +359,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mitchell_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r,pang_paletteram_w) /* Banked palette RAM */
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r,pang_colorram_w) AM_BASE(&pang_colorram) /* Attribute RAM */
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r,pang_videoram_w) AM_BASE(&pang_videoram) AM_SIZE(&pang_videoram_size)/* Banked char / OBJ RAM */
@@ -387,7 +387,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spangbl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1) AM_WRITENOP
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r, pang_paletteram_w)	/* Banked palette RAM */
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w)	AM_BASE(&pang_colorram)/* Attribute RAM */
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r, pang_videoram_w)	AM_BASE(&pang_videoram) AM_SIZE(&pang_videoram_size) /* Banked char / OBJ RAM */
@@ -1971,13 +1971,13 @@ static void bootleg_decode(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x50000);
-	memory_configure_bank_decrypted(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x60000, 0x4000);
+	memory_configure_bank_decrypted(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x60000, 0x4000);
 }
 
 
 static void configure_banks(running_machine *machine)
 {
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 	pang_port5_kludge = 0;
 }
 

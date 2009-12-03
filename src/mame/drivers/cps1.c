@@ -285,7 +285,7 @@ static WRITE8_HANDLER( cps1_snd_bankswitch_w )
 	int bankaddr;
 
 	bankaddr = ((data & 1) * 0x4000);
-	memory_set_bankptr(space->machine, 1,&RAM[0x10000 + bankaddr]);
+	memory_set_bankptr(space->machine, "bank1",&RAM[0x10000 + bankaddr]);
 }
 
 static WRITE8_DEVICE_HANDLER( cps1_oki_pin7_w )
@@ -398,7 +398,7 @@ static WRITE8_HANDLER( qsound_banksw_w )
 		logerror("WARNING: Q sound bank overflow (%02x)\n", data);
 		bankaddress=0x10000;
 	}
-	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1", &RAM[bankaddress]);
 }
 
 
@@ -604,7 +604,7 @@ SOUNDA15   = pin13 =   (  I1 )
 
 static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("2151", ym2151_r, ym2151_w)
 	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
@@ -635,7 +635,7 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START( qsound_sub_map, ADDRESS_SPACE_PROGRAM, 8 )	// used by cps2.c too
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)	/* banked (contains music data) */
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	/* banked (contains music data) */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&qsound_sharedram1)
 	AM_RANGE(0xd000, 0xd002) AM_DEVWRITE("qsound", qsound_w)
 	AM_RANGE(0xd003, 0xd003) AM_WRITE(qsound_banksw_w)

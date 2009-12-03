@@ -1026,7 +1026,7 @@ static WRITE8_HANDLER( z80_bank_w )
 	if ((data & 7) != z80_lastbank)
 	{
 		z80_lastbank = (data & 7);
-		memory_set_bankptr(space->machine, 4, z80_rom + (0x8000 * z80_lastbank));
+		memory_set_bankptr(space->machine, "bank4", z80_rom + (0x8000 * z80_lastbank));
 	}
 }
 
@@ -1101,7 +1101,7 @@ static ADDRESS_MAP_START( spi_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spisound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK(5)
+	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank5")
 	AM_RANGE(0x4002, 0x4002) AM_WRITENOP			/* ack RST 10 */
 	AM_RANGE(0x4003, 0x4003) AM_WRITENOP			/* Unknown */
 	AM_RANGE(0x4004, 0x4004) AM_WRITE(sb_coin_w)	/* single board systems */
@@ -1112,7 +1112,7 @@ static ADDRESS_MAP_START( spisound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4013, 0x4013) AM_READ(z80_coin_r)
 	AM_RANGE(0x401b, 0x401b) AM_WRITE(z80_bank_w)		/* control register: bits 0-2 = bank @ 8000, bit 3 = watchdog? */
 	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("ymf", ymf271_r, ymf271_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(4)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
 static READ8_DEVICE_HANDLER( flashrom_read )
@@ -1890,8 +1890,8 @@ static MACHINE_RESET( spi )
 	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000068c, 0x0000068f, 0, 0, z80_enable_w);
 
 	z80_rom = auto_alloc_array(machine, UINT8, 0x40000);
-	memory_set_bankptr(machine, 4, z80_rom);
-	memory_set_bankptr(machine, 5, z80_rom);
+	memory_set_bankptr(machine, "bank4", z80_rom);
+	memory_set_bankptr(machine, "bank5", z80_rom);
 
 	/* If the first value doesn't match, the game shows a checksum error */
 	/* If any of the other values are wrong, the game goes to update mode */
@@ -1953,8 +1953,8 @@ static MACHINE_RESET( sxx2f )
 	UINT8 *rom = memory_region(machine, "soundcpu");
 
 	z80_rom = auto_alloc_array(machine, UINT8, 0x40000);
-	memory_set_bankptr(machine, 4, z80_rom);
-	memory_set_bankptr(machine, 5, z80_rom);
+	memory_set_bankptr(machine, "bank4", z80_rom);
+	memory_set_bankptr(machine, "bank5", z80_rom);
 
 	memcpy(z80_rom, rom, 0x40000);
 

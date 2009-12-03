@@ -412,7 +412,7 @@ static WRITE8_HANDLER( dunhuang_layers_w )
 static ADDRESS_MAP_START( dunhuang_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK(1) )
+	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "bank1" )
 ADDRESS_MAP_END
 
 // Inputs
@@ -462,7 +462,7 @@ static WRITE8_HANDLER( dunhuang_rombank_w )
 	// ?                data & 0x01
 	// ?                data & 0x02
 
-	memory_set_bank(space->machine, 1, ((data >> 2) & 0x7));
+	memory_set_bank(space->machine, "bank1", ((data >> 2) & 0x7));
 
 	// COIN OUT:        data & 0x20
 	coin_counter_w(space->machine, 0,	data & 0x40);
@@ -764,7 +764,7 @@ static MACHINE_START( dunhuang )
 	dunhuang_state *state = (dunhuang_state *)machine->driver_data;
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	memory_configure_bank(machine, 1, 0, 8, &ROM[0x10000], 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x8000);
 
 	state_save_register_global(machine, state->written);
 	state_save_register_global(machine, state->written2);

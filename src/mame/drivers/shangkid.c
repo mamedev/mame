@@ -73,7 +73,7 @@ static UINT8 sound_latch;
 
 static WRITE8_HANDLER( shangkid_maincpu_bank_w )
 {
-	memory_set_bank(space->machine, 1, data & 1);
+	memory_set_bank(space->machine, "bank1", data & 1);
 }
 
 static WRITE8_HANDLER( shangkid_bbx_enable_w )
@@ -117,7 +117,7 @@ static WRITE8_DEVICE_HANDLER( shangkid_ay8910_porta_w )
 			cputag_set_input_line(device->machine, "audiocpu", 0, HOLD_LINE );
 	}
 	else
-		memory_set_bank(device->machine, 2, data ? 0 : 1);
+		memory_set_bank(device->machine, "bank2", data ? 0 : 1);
 }
 
 static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
@@ -144,8 +144,8 @@ static DRIVER_INIT( shangkid )
 	shangkid_gfx_type = 1;
 
 	/* set up banking */
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x8000, 0x8000);
-	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "audiocpu") + 0x0000, 0x10000);
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x8000, 0x8000);
+	memory_configure_bank(machine, "bank2", 0, 2, memory_region(machine, "audiocpu") + 0x0000, 0x10000);
 }
 
 /***************************************************************************************/
@@ -159,8 +159,8 @@ static MACHINE_RESET( shangkid )
 {
 	cputag_set_input_line(machine, "bbx", INPUT_LINE_HALT, 1 );
 
-	memory_set_bank(machine, 1, 0);
-	memory_set_bank(machine, 2, 0);
+	memory_set_bank(machine, "bank1", 0);
+	memory_set_bank(machine, "bank2", 0);
 }
 
 /***************************************************************************************/
@@ -264,7 +264,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shangkid_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
@@ -340,7 +340,7 @@ static ADDRESS_MAP_START( chinhero_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shangkid_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_ROMBANK(2) /* sample player writes to ROM area */
+	AM_RANGE(0x0000, 0xdfff) AM_ROMBANK("bank2") /* sample player writes to ROM area */
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 

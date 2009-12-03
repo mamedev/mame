@@ -209,9 +209,10 @@ static void vendetta_video_banking( running_machine *machine, int select )
 {
 	if ( select & 1 )
 	{
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, (read8_space_func)SMH_BANK(4), paletteram_xBBBBBGGGGGRRRRR_be_w );
+		memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, "bank4" );
+		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, paletteram_xBBBBBGGGGGRRRRR_be_w );
 		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), video_banking_base + 0x0000, video_banking_base + 0x0fff, 0, 0, K053247_r, K053247_w );
-		memory_set_bankptr(machine, 4, machine->generic.paletteram.v);
+		memory_set_bankptr(machine, "bank4", machine->generic.paletteram.v);
 	}
 	else
 	{
@@ -268,7 +269,7 @@ static READ8_DEVICE_HANDLER( vendetta_sound_r )
 /********************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK(1)
+	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x5f80, 0x5f9f) AM_READWRITE(K054000_r, K054000_w)
 	AM_RANGE(0x5fa0, 0x5faf) AM_WRITE(K053251_w)
@@ -286,8 +287,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5fe8, 0x5fe9) AM_READ(K053246_r)
 	AM_RANGE(0x5fea, 0x5fea) AM_READ(watchdog_reset_r)
 	/* what is the desired effect of overlapping these memory regions anyway? */
-	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK(3)
-	AM_RANGE(0x6000, 0x6fff) AM_RAMBANK(2)
+	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank3")
+	AM_RANGE(0x6000, 0x6fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(K052109_r, K052109_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -310,10 +311,10 @@ static ADDRESS_MAP_START( esckids_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3fd8, 0x3fd9) AM_READ(K053246_r)				// 053246 (Sprite)
 	AM_RANGE(0x3fda, 0x3fda) AM_WRITENOP				// Not Emulated (Watchdog ???)
 	/* what is the desired effect of overlapping these memory regions anyway? */
-	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK(3)					// 052109 (Tilemap) 0x0000-0x0fff
-	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK(2)					// 052109 (Tilemap) 0x2000-0x3fff, Tilemap MASK-ROM bank selector (MASK-ROM Test)
+	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK("bank3")					// 052109 (Tilemap) 0x0000-0x0fff
+	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank2")					// 052109 (Tilemap) 0x2000-0x3fff, Tilemap MASK-ROM bank selector (MASK-ROM Test)
 	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(K052109_r, K052109_w)			// 052109 (Tilemap)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)					// 053248 '975r01' 1M ROM (Banked)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")					// 053248 '975r01' 1M ROM (Banked)
 	AM_RANGE(0x8000, 0xffff) AM_ROM							// 053248 '975r01' 1M ROM (0x18000-0x1ffff)
 ADDRESS_MAP_END
 
@@ -696,7 +697,7 @@ static KONAMI_SETLINES_CALLBACK( vendetta_banking )
 		logerror("PC = %04x : Unknown bank selected %02x\n", cpu_get_pc(device), lines );
 	}
 	else
-		memory_set_bankptr(device->machine,  1, &RAM[ 0x10000 + ( lines * 0x2000 ) ] );
+		memory_set_bankptr(device->machine,  "bank1", &RAM[ 0x10000 + ( lines * 0x2000 ) ] );
 }
 
 static MACHINE_RESET( vendetta )
@@ -707,7 +708,7 @@ static MACHINE_RESET( vendetta )
 	irq_enabled = 0;
 
 	/* init banks */
-	memory_set_bankptr(machine,  1, &memory_region(machine, "maincpu")[0x10000] );
+	memory_set_bankptr(machine,  "bank1", &memory_region(machine, "maincpu")[0x10000] );
 	vendetta_video_banking( machine, 0 );
 }
 

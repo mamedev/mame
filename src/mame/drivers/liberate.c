@@ -85,7 +85,7 @@ static WRITE8_HANDLER( deco16_bank_w )
 	if (deco16_bank)
 		memory_install_read8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, deco16_io_r);
 	else
-		memory_install_read8_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, (read8_space_func)SMH_BANK(1));
+		memory_install_read_bank_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, "bank1");
 }
 
 static UINT8 gfx_rom_readback;
@@ -250,7 +250,7 @@ static ADDRESS_MAP_START( prosport_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(liberate_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x8000, 0x800f) AM_WRITE(prosport_io_w)
-	AM_RANGE(0x8000, 0x800f) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0x800f) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( liberate_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x6200, 0x67ff) AM_RAM AM_BASE(&scratchram)
 	AM_RANGE(0x8000, 0x800f) AM_WRITE(deco16_io_w)
-	AM_RANGE(0x8000, 0x800f) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0x800f) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1373,7 +1373,7 @@ static DRIVER_INIT( liberate )
 		decrypted[A] = (decrypted[A] & 0x7d) | ((decrypted[A] & 0x02) << 6) | ((decrypted[A] & 0x80) >> 6);
 	}
 
-	memory_configure_bank_decrypted(machine, 1, 0, 1, decrypted + 0x8000, 0x10);
+	memory_configure_bank_decrypted(machine, "bank1", 0, 1, decrypted + 0x8000, 0x10);
 
 	sound_cpu_decrypt(machine);
 }

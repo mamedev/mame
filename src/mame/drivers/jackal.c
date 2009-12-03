@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0060, 0x1fff) AM_RAM AM_SHARE(1)										// M COMMON RAM,S COMMON RAM
 	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(jackal_voram_r, jackal_voram_w)			// MAIN V O RAM,SUB  V O RAM
 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(jackal_spriteram_r, jackal_spriteram_w)	// MAIN V O RAM,SUB  V O RAM
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -179,7 +179,7 @@ static UINT8 kangaroo_clock;
 
 static MACHINE_START( kangaroo )
 {
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "gfx1"), 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "gfx1"), 0x2000);
 	state_save_register_global(machine, kangaroo_clock);
 }
 
@@ -254,7 +254,7 @@ static WRITE8_HANDLER( kangaroo_coin_counter_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(kangaroo_videoram_w)
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM
 	AM_RANGE(0xe400, 0xe400) AM_MIRROR(0x03ff) AM_READ_PORT("DSW0")
 	AM_RANGE(0xe800, 0xe80a) AM_MIRROR(0x03f0) AM_WRITE(kangaroo_video_control_w) AM_BASE(&kangaroo_video_control)

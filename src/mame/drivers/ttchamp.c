@@ -98,7 +98,7 @@ static WRITE16_HANDLER( pcup_prgbank_w )
     if (ACCESSING_BITS_0_7)
     {
         bank = (data>>4) &0x07;
-        memory_set_bankptr(space->machine, 2,&ROM1[0x80000*(bank)]);
+        memory_set_bankptr(space->machine, "bank2",&ROM1[0x80000*(bank)]);
     }
 }
 #endif
@@ -123,8 +123,8 @@ static READ16_HANDLER( peno_rand2 )
 static ADDRESS_MAP_START( ttchamp_map, ADDRESS_SPACE_PROGRAM, 16 )
     AM_RANGE(0x00000, 0x0ffff) AM_RAM
     AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE(&peno_vram)
-    AM_RANGE(0x20000, 0x7ffff) AM_READ(SMH_BANK(1)) // ?
-    AM_RANGE(0x80000, 0xfffff) AM_READ(SMH_BANK(2)) // ?
+    AM_RANGE(0x20000, 0x7ffff) AM_ROMBANK("bank1") // ?
+    AM_RANGE(0x80000, 0xfffff) AM_ROMBANK("bank2") // ?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ttchamp_io, ADDRESS_SPACE_IO, 16 )
@@ -323,8 +323,8 @@ ROM_END
 static DRIVER_INIT (ttchamp)
 {
 	UINT8 *ROM1 = memory_region(machine, "user1");
-	memory_set_bankptr(machine, 1,&ROM1[0x120000]);
-	memory_set_bankptr(machine, 2,&ROM1[0x180000]);
+	memory_set_bankptr(machine, "bank1",&ROM1[0x120000]);
+	memory_set_bankptr(machine, "bank2",&ROM1[0x180000]);
 }
 
 GAME( 199?, ttchamp, 0,        ttchamp, ttchamp, ttchamp, ROT0,  "Gamart?", "Table Tennis Champions (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )

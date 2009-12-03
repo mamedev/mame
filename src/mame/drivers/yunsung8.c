@@ -85,7 +85,7 @@ static WRITE8_HANDLER( yunsung8_bankswitch_w )
 	if (bank < 3)	RAM = &RAM[0x4000 * bank];
 	else			RAM = &RAM[0x4000 * (bank-3) + 0x10000];
 
-	memory_set_bankptr(space->machine, 1, RAM);
+	memory_set_bankptr(space->machine, "bank1", RAM);
 }
 
 /*
@@ -99,7 +99,7 @@ static WRITE8_HANDLER( yunsung8_bankswitch_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(yunsung8_bankswitch_w	)	// ROM Bank (again?)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1)				)	// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1"				)	// Banked ROM
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(yunsung8_videoram_r, yunsung8_videoram_w	)	// Video RAM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
@@ -140,7 +140,7 @@ static WRITE8_DEVICE_HANDLER( yunsung8_sound_bankswitch_w )
 	if (bank < 3)	RAM = &RAM[0x4000 * bank];
 	else			RAM = &RAM[0x4000 * (bank-3) + 0x10000];
 
-	memory_set_bankptr(device->machine, 2, RAM);
+	memory_set_bankptr(device->machine, "bank2", RAM);
 
 	msm5205_reset_w(device,data & 0x20);
 }
@@ -155,7 +155,7 @@ static WRITE8_HANDLER( yunsung8_adpcm_w )
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(2),SMH_ROM		)	// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")	// Banked ROM
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", yunsung8_sound_bankswitch_w	)	// ROM Bank
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(yunsung8_adpcm_w				)
 	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_w		)

@@ -88,7 +88,7 @@ static WRITE8_HANDLER( surpratk_5fc0_w )
 static ADDRESS_MAP_START( surpratk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(&ram)
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)					/* banked ROM */
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")					/* banked ROM */
 	AM_RANGE(0x5f8c, 0x5f8c) AM_READ_PORT("P1")
 	AM_RANGE(0x5f8d, 0x5f8d) AM_READ_PORT("P2")
 	AM_RANGE(0x5f8e, 0x5f8e) AM_READ_PORT("DSW3")
@@ -275,7 +275,7 @@ logerror("%04x: setlines %02x\n",cpu_get_pc(device),lines);
 
 	offs = 0x10000 + ((lines & 0x1f) * 0x2000);
 	if (offs >= 0x48000) offs -= 0x40000;
-	memory_set_bankptr(device->machine, 1,&RAM[offs]);
+	memory_set_bankptr(device->machine, "bank1",&RAM[offs]);
 }
 
 static MACHINE_RESET( surpratk )

@@ -26,8 +26,8 @@ static UINT32 address;
 
 MACHINE_START( taitosj )
 {
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "maincpu") + 0x6000, 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "maincpu") + 0x10000, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "maincpu") + 0x6000, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "maincpu") + 0x10000, 0);
 
 	state_save_register_global(machine, fromz80);
 	state_save_register_global(machine, toz80);
@@ -64,8 +64,8 @@ WRITE8_HANDLER( taitosj_bankswitch_w )
 {
 	coin_lockout_global_w(space->machine, ~data & 1);
 
-	if(data & 0x80) memory_set_bank(space->machine, 1, 1);
-	else memory_set_bank(space->machine, 1, 0);
+	if(data & 0x80) memory_set_bank(space->machine, "bank1", 1);
+	else memory_set_bank(space->machine, "bank1", 0);
 }
 
 

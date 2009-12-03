@@ -56,7 +56,7 @@ static WRITE8_HANDLER( tbowlb_bankswitch_w )
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
 }
 
 static WRITE8_HANDLER( tbowlc_bankswitch_w )
@@ -68,7 +68,7 @@ static WRITE8_HANDLER( tbowlc_bankswitch_w )
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
 
 
-	memory_set_bankptr(space->machine, 2, &RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank2", &RAM[bankaddress]);
 }
 
 /*** Shared Ram Handlers
@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( 6206B_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(tbowl_bgvideoram_w) AM_BASE(&tbowl_bgvideoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(tbowl_txvideoram_w) AM_BASE(&tbowl_txvideoram)
 //  AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown_write) * written during start-up, not again */
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w) AM_BASE(&shared_ram) /* check */
 	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1") AM_WRITE(tbowlb_bankswitch_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_READ_PORT("P2")
@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( 6206C_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xd7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xd800, 0xdfff) AM_WRITE(SMH_RAM) AM_BASE(&tbowl_spriteram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE_GENERIC(paletteram) // 2x palettes, one for each monitor?
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK(2), SMH_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank2")
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(tbowlc_bankswitch_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITENOP /* ? */

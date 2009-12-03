@@ -276,7 +276,7 @@ static WRITE8_HANDLER( bssoccer_pcm_1_bankswitch_w )
 	UINT8 *RAM = memory_region(space->machine, "pcm1");
 	int bank = data & 7;
 	if (bank & ~7)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(space->cpu), data);
-	memory_set_bankptr(space->machine, 1, &RAM[bank * 0x10000 + 0x1000]);
+	memory_set_bankptr(space->machine, "bank1", &RAM[bank * 0x10000 + 0x1000]);
 }
 
 static WRITE8_HANDLER( bssoccer_pcm_2_bankswitch_w )
@@ -284,7 +284,7 @@ static WRITE8_HANDLER( bssoccer_pcm_2_bankswitch_w )
 	UINT8 *RAM = memory_region(space->machine, "pcm2");
 	int bank = data & 7;
 	if (bank & ~7)	logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(space->cpu), data);
-	memory_set_bankptr(space->machine, 2, &RAM[bank * 0x10000 + 0x1000]);
+	memory_set_bankptr(space->machine, "bank2", &RAM[bank * 0x10000 + 0x1000]);
 }
 
 
@@ -293,12 +293,12 @@ static WRITE8_HANDLER( bssoccer_pcm_2_bankswitch_w )
 
 static ADDRESS_MAP_START( bssoccer_pcm_1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM	// ROM
-	AM_RANGE(0x1000, 0xffff) AM_ROMBANK(1)	// Banked ROM
+	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	// Banked ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bssoccer_pcm_2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM	// ROM
-	AM_RANGE(0x1000, 0xffff) AM_ROMBANK(2)	// Banked ROM
+	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank2")	// Banked ROM
 ADDRESS_MAP_END
 
 
@@ -338,14 +338,14 @@ static WRITE8_HANDLER( uballoon_pcm_1_bankswitch_w )
 	UINT8 *RAM = memory_region(space->machine, "pcm1");
 	int bank = data & 1;
 	if (bank & ~1)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(space->cpu), data);
-	memory_set_bankptr(space->machine, 1, &RAM[bank * 0x10000 + 0x400]);
+	memory_set_bankptr(space->machine, "bank1", &RAM[bank * 0x10000 + 0x400]);
 }
 
 /* Memory maps: Yes, *no* RAM */
 
 static ADDRESS_MAP_START( uballoon_pcm_1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM	// ROM
-	AM_RANGE(0x0400, 0xffff) AM_ROMBANK(1)	// Banked ROM
+	AM_RANGE(0x0400, 0xffff) AM_ROMBANK("bank1")	// Banked ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( uballoon_pcm_1_io_map, ADDRESS_SPACE_IO, 8 )

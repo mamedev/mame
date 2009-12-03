@@ -53,7 +53,7 @@ static WRITE8_DEVICE_HANDLER( crimfght_snd_bankswitch_w )
 /********************************************/
 
 static ADDRESS_MAP_START( crimfght_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK(1)					/* banked RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1")					/* banked RAM */
 	AM_RANGE(0x0400, 0x1fff) AM_RAM												/* RAM */
 	AM_RANGE(0x3f80, 0x3f80) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3f81, 0x3f81) AM_READ_PORT("P1")
@@ -66,7 +66,7 @@ static ADDRESS_MAP_START( crimfght_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3f88, 0x3f88) AM_READWRITE(watchdog_reset_r, crimfght_coin_w)	/* watchdog reset */
 	AM_RANGE(0x3f8c, 0x3f8c) AM_WRITE(crimfght_sh_irqtrigger_w)	/* cause interrupt on audio CPU? */
 	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)	/* video RAM + sprite RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(2)						/* banked ROM */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank2")						/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM												/* ROM */
 ADDRESS_MAP_END
 
@@ -344,17 +344,18 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 	/* bit 5 = select work RAM or palette */
 	if (lines & 0x20)
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, (read8_space_func)SMH_BANK(3), paletteram_xBBBBBGGGGGRRRRR_be_w);
-		memory_set_bankptr(device->machine, 3, device->machine->generic.paletteram.v);
+		memory_install_read_bank_handler(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank3");
+		memory_install_write8_handler(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, paletteram_xBBBBBGGGGGRRRRR_be_w);
+		memory_set_bankptr(device->machine, "bank3", device->machine->generic.paletteram.v);
 	}
 	else
-		memory_install_readwrite8_handler(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));								/* RAM */
+		memory_install_readwrite_bank_handler(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank1");								/* RAM */
 
 	/* bit 6 = enable char ROM reading through the video RAM */
 	K052109_set_RMRD_line((lines & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 	offs = 0x10000 + ((lines & 0x0f) * 0x2000);
-	memory_set_bankptr(device->machine, 2, &RAM[offs]);
+	memory_set_bankptr(device->machine, "bank2", &RAM[offs]);
 }
 
 static MACHINE_RESET( crimfght )
@@ -364,7 +365,7 @@ static MACHINE_RESET( crimfght )
 	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), crimfght_banking);
 
 	/* init the default bank */
-	memory_set_bankptr(machine,  2, &RAM[0x10000] );
+	memory_set_bankptr(machine,  "bank2", &RAM[0x10000] );
 }
 
 static DRIVER_INIT( crimfght )

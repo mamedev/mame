@@ -176,7 +176,7 @@ static WRITE8_HANDLER( cham24_mapper_w )
 	UINT8* src = memory_region(space->machine, "user1");
 
 	// switch PPU VROM bank
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "gfx1") + (0x2000 * gfx_bank));
+	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "gfx1") + (0x2000 * gfx_bank));
 
 	// set gfx mirroring
 	cham24_set_mirroring(gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -287,8 +287,8 @@ static MACHINE_START( cham24 )
 	memcpy(&dst[0xc000], &src[0x0f8000], 0x4000);
 
 	/* uses 8K swapping, all ROM!*/
-	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(1), 0);
-	memory_set_bankptr(machine, 1, memory_region(machine, "gfx1"));
+	memory_install_read_bank_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "gfx1"));
 
 	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
 	nt_ram = auto_alloc_array(machine, UINT8, 0x1000);

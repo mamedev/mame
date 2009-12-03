@@ -841,7 +841,7 @@ static INPUT_CHANGED( gmgalax_game_changed )
 	gmgalax_selected_game = newval;
 
 	/* select the bank and graphics bank based on it */
-	memory_set_bank(field->port->machine, 1, gmgalax_selected_game);
+	memory_set_bank(field->port->machine, "bank1", gmgalax_selected_game);
 	galaxian_gfxbank_w(space, 0, gmgalax_selected_game);
 
 	/* reset the stars */
@@ -870,8 +870,8 @@ static CUSTOM_INPUT( gmgalax_port_r )
 
 static WRITE8_HANDLER( zigzag_bankswap_w )
 {
-	memory_set_bank(space->machine, 1, data & 1);
-	memory_set_bank(space->machine, 2, ~data & 1);
+	memory_set_bank(space->machine, "bank1", data & 1);
+	memory_set_bank(space->machine, "bank2", ~data & 1);
 }
 
 
@@ -2481,8 +2481,8 @@ static DRIVER_INIT( gmgalax )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, gmgalax_extend_tile_info, gmgalax_extend_sprite_info);
 
 	/* ROM is banked */
-	memory_install_read8_handler(space, 0x0000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(1));
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_install_read_bank_handler(space, 0x0000, 0x3fff, 0, 0, "bank1");
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
 	gmgalax_game_changed(machine->portlist.head->fieldlist, NULL, 0, 0);
@@ -2522,9 +2522,9 @@ static DRIVER_INIT( frogg )
 	common_init(machine, galaxian_draw_bullet, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
 
 	/* ...but needs a full 2k of RAM */
-	memory_install_readwrite8_handler(space, 0x4000, 0x47ff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
+	memory_install_readwrite_bank_handler(space, 0x4000, 0x47ff, 0, 0, "bank1");
 	frogg_ram = auto_alloc_array(machine, UINT8, 0x800);
-	memory_set_bankptr(machine, 1, frogg_ram);
+	memory_set_bankptr(machine, "bank1", frogg_ram);
 
 	state_save_register_global_pointer(machine, frogg_ram, 0x800);
 }
@@ -2695,15 +2695,15 @@ static DRIVER_INIT( zigzag )
 	common_init(machine, NULL, galaxian_draw_background, NULL, NULL);
 
 	/* make ROMs 2 & 3 swappable */
-	memory_install_read8_handler(space, 0x2000, 0x2fff, 0, 0, (read8_space_func)SMH_BANK(1));
-	memory_install_read8_handler(space, 0x3000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(2));
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x2000, 0x1000);
-	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "maincpu") + 0x2000, 0x1000);
+	memory_install_read_bank_handler(space, 0x2000, 0x2fff, 0, 0, "bank1");
+	memory_install_read_bank_handler(space, 0x3000, 0x3fff, 0, 0, "bank2");
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x2000, 0x1000);
+	memory_configure_bank(machine, "bank2", 0, 2, memory_region(machine, "maincpu") + 0x2000, 0x1000);
 
 	/* also re-install the fixed ROM area as a bank in order to inform the memory system that
        the fixed area only extends to 0x1fff */
-	memory_install_read8_handler(space, 0x0000, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(3));
-	memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0x0000);
+	memory_install_read_bank_handler(space, 0x0000, 0x1fff, 0, 0, "bank3");
+	memory_set_bankptr(machine, "bank3", memory_region(machine, "maincpu") + 0x0000);
 
 	/* handler for doing the swaps */
 	memory_install_write8_handler(space, 0x7002, 0x7002, 0, 0x07f8, zigzag_bankswap_w);
@@ -2810,12 +2810,12 @@ static DRIVER_INIT( skybase )
 	memory_install_write8_handler(space, 0xa002, 0xa002, 0, 0x7f8, galaxian_gfxbank_w);
 
 	/* needs a full 2k of RAM */
-	memory_install_readwrite8_handler(space, 0x8000, 0x87ff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
-	memory_set_bankptr(machine, 1, auto_alloc_array(machine, UINT8, 0x800));
+	memory_install_readwrite_bank_handler(space, 0x8000, 0x87ff, 0, 0, "bank1");
+	memory_set_bankptr(machine, "bank1", auto_alloc_array(machine, UINT8, 0x800));
 
 	/* extend ROM */
-	memory_install_read8_handler(space, 0x0000, 0x5fff, 0, 0, (read8_space_func)SMH_BANK(2));
-	memory_set_bankptr(machine, 2, memory_region(machine, "maincpu"));
+	memory_install_read_bank_handler(space, 0x0000, 0x5fff, 0, 0, "bank2");
+	memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu"));
 }
 
 
@@ -2874,12 +2874,12 @@ static DRIVER_INIT( scorpnmc )
 	memory_install_write8_handler(space, 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
 
 	/* extra ROM */
-	memory_install_read8_handler(space, 0x5000, 0x67ff, 0, 0, (read8_space_func)SMH_BANK(1));
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x5000);
+	memory_install_read_bank_handler(space, 0x5000, 0x67ff, 0, 0, "bank1");
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x5000);
 
 	/* install RAM at $4000-$4800 */
-	memory_install_readwrite8_handler(space, 0x4000, 0x47ff, 0, 0, (read8_space_func)SMH_BANK(2), (write8_space_func)SMH_BANK(2));
-	memory_set_bankptr(machine, 2, auto_alloc_array(machine, UINT8, 0x800));
+	memory_install_readwrite_bank_handler(space, 0x4000, 0x47ff, 0, 0, "bank2");
+	memory_set_bankptr(machine, "bank2", auto_alloc_array(machine, UINT8, 0x800));
 
 	/* doesn't appear to use original RAM */
 	memory_install_readwrite8_handler(space, 0x8000, 0x87ff, 0, 0, (read8_space_func)SMH_UNMAP, (write8_space_func)SMH_UNMAP);
@@ -2940,8 +2940,8 @@ static DRIVER_INIT( sfx )
 	galaxian_sfx_tilemap = TRUE;
 
 	/* sound board has space for extra ROM */
-	memory_install_read8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(1));
-	memory_set_bankptr(machine, 1, memory_region(machine, "audiocpu"));
+	memory_install_read_bank_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "audiocpu"));
 }
 
 
@@ -2998,9 +2998,9 @@ static DRIVER_INIT( froggrmc )
 	memory_install_write8_handler(space, 0xb001, 0xb001, 0, 0x7f8, froggrmc_sound_control_w);
 
 	/* actually needs 2k of RAM */
-	memory_install_readwrite8_handler(space, 0x8000, 0x87ff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
+	memory_install_readwrite_bank_handler(space, 0x8000, 0x87ff, 0, 0, "bank1");
 	frogg_ram = auto_alloc_array(machine, UINT8, 0x800);
-	memory_set_bankptr(machine, 1, frogg_ram);
+	memory_set_bankptr(machine, "bank1", frogg_ram);
 
 	state_save_register_global_pointer(machine, frogg_ram, 0x800);
 
@@ -3046,8 +3046,8 @@ static DRIVER_INIT( scorpion )
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_IO), 0x00, 0xff, 0, 0, scorpion_ay8910_r, scorpion_ay8910_w);
 
 	/* extra ROM */
-	memory_install_read8_handler(space, 0x5800, 0x67ff, 0, 0, (read8_space_func)SMH_BANK(1));
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x5800);
+	memory_install_read_bank_handler(space, 0x5800, 0x67ff, 0, 0, "bank1");
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x5800);
 
 	/* no background related */
 //  memory_install_write8_handler(space, 0x6803, 0x6803, 0, 0, (write8_space_func)SMH_NOP);

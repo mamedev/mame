@@ -61,7 +61,7 @@ static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 	sound_set_output_gain(devtag_get_device(space->machine, "msm2"), 0, (data & 0x10) ? 0.0 : 1.0);
 
 	bankaddr = ((data & 7) * 0x4000);
-	memory_set_bankptr(space->machine, 1,&RAM[0x10000 + bankaddr]);
+	memory_set_bankptr(space->machine, "bank1",&RAM[0x10000 + bankaddr]);
 }
 
 static void m5205_int1(const device_config *device)
@@ -362,7 +362,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xd800, 0xd801) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xdc00, 0xdc01) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)

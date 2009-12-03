@@ -92,7 +92,7 @@ static int i8039_status;
 
 static WRITE8_HANDLER( junofrst_bankselect_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x0f);
+	memory_set_bank(space->machine, "bank1", data & 0x0f);
 }
 
 
@@ -194,7 +194,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(junofrst_bankselect_w)
 	AM_RANGE(0x8070, 0x8073) AM_WRITE(junofrst_blitter_w)
 	AM_RANGE(0x8100, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9fff) AM_READ(SMH_BANK(1))
+	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -378,8 +378,8 @@ static DRIVER_INIT( junofrst )
 {
 	UINT8 *decrypted = konami1_decode(machine, "maincpu");
 
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x1000);
-	memory_configure_bank_decrypted(machine, 1, 0, 16, decrypted + 0x10000, 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x1000);
+	memory_configure_bank_decrypted(machine, "bank1", 0, 16, decrypted + 0x10000, 0x1000);
 }
 
 

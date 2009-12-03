@@ -79,7 +79,7 @@
 
 static ADDRESS_MAP_START( mainmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
-	AM_RANGE(0x10000, 0x1ffff) AM_READ(SMH_BANK(1))
+	AM_RANGE(0x10000, 0x1ffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM
 	AM_RANGE(0x0f000, 0x0ffff) AM_RAM
 	AM_RANGE(0xf0000, 0xfffff) AM_RAM
@@ -171,7 +171,7 @@ static DRIVER_INIT( luckgrln )
 	#endif
 
 	// ??
-	memory_set_bankptr(machine, 1,&rom[0x010000]);
+	memory_set_bankptr(machine, "bank1",&rom[0x010000]);
 }
 
 ROM_START( luckgrln )

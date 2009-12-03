@@ -375,7 +375,7 @@ static UINT8 mc8123_decrypt(offs_t addr,UINT8 val,const UINT8 *key,int opcode)
 }
 
 
-void mc8123_decrypt_rom(running_machine *machine, const char *cpu, const char *keyrgn, int banknum, int numbanks)
+void mc8123_decrypt_rom(running_machine *machine, const char *cpu, const char *keyrgn, const char *bankname, int numbanks)
 {
 	const address_space *space = cputag_get_address_space(machine, cpu, ADDRESS_SPACE_PROGRAM);
 	int fixed_length = numbanks == 1 ? 0xc000 : 0x8000;
@@ -398,9 +398,9 @@ void mc8123_decrypt_rom(running_machine *machine, const char *cpu, const char *k
 		rom[A] = mc8123_decrypt(A,src,key,0);
 	}
 
-	if (numbanks > 1)
+	if (bankname != NULL)
 	{
-		memory_configure_bank_decrypted(machine, banknum, 0, numbanks, decrypted2, 0x4000);
+		memory_configure_bank_decrypted(machine, bankname, 0, numbanks, decrypted2, 0x4000);
 
 		for (bank = 0; bank < numbanks; ++bank)
 		{

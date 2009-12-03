@@ -246,7 +246,7 @@ ADDRESS_MAP_END
 // 7759
 static ADDRESS_MAP_START( sound_7759_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -258,7 +258,7 @@ static WRITE8_DEVICE_HANDLER( upd7759_bank_w ) //*
 
 	upd7759_reset_w(device, data & 0x40);
 	offs = 0x10000 + (data * 0x4000) % size;
-	memory_set_bankptr(device->machine, 1, memory_region(device->machine, "soundcpu") + offs);
+	memory_set_bankptr(device->machine, "bank1", memory_region(device->machine, "soundcpu") + offs);
 }
 
 

@@ -92,7 +92,7 @@ A                                                   12.000MHz
 
 static WRITE8_HANDLER( himesiki_rombank_w )
 {
-	memory_set_bank(space->machine, 1, ((data & 0x08) >> 3));
+	memory_set_bank(space->machine, "bank1", ((data & 0x08) >> 3));
 
 	if (data & 0xf7)
 		logerror("p06_w %02x\n", data);
@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( himesiki_prm0, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(himesiki_state, spriteram)
 	AM_RANGE(0xa800, 0xafff) AM_RAM AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_WRITE(himesiki_bg_ram_w) AM_BASE_MEMBER(himesiki_state, bg_ram)
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( himesiki_iom0, ADDRESS_SPACE_IO, 8 )
@@ -273,7 +273,7 @@ static MACHINE_START( himesiki )
 	himesiki_state *state = (himesiki_state *)machine->driver_data;
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	memory_configure_bank(machine, 1, 0, 2, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
 
 	state->subcpu = devtag_get_device(machine, "sub");
 

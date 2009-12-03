@@ -443,9 +443,9 @@ static MACHINE_RESET( mpu4 )
 	{
 		UINT8 *rom = memory_region(machine, "maincpu");
 
-		memory_configure_bank(machine, 1, 0, 8, &rom[0x01000], 0x10000);
+		memory_configure_bank(machine, "bank1", 0, 8, &rom[0x01000], 0x10000);
 
-		memory_set_bank(machine, 1,0);
+		memory_set_bank(machine, "bank1",0);
 		device_reset(cputag_get_cpu(machine, "maincpu"));
 	}
 
@@ -493,13 +493,13 @@ static WRITE_LINE_DEVICE_HANDLER( cpu0_irq_m6840 )
 /* Bankswitching */
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bank(space->machine, 1,data & 0x07);
+	memory_set_bank(space->machine, "bank1",data & 0x07);
 }
 
 
 static READ8_HANDLER( bankswitch_r )
 {
-	return memory_get_bank(space->machine, 1);
+	return memory_get_bank(space->machine, "bank1");
 }
 
 
@@ -1764,7 +1764,7 @@ static ADDRESS_MAP_START( mod2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_r, pia6821_w)		/* PIA6821 IC7 */
 	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_r, pia6821_w)		/* PIA6821 IC8 */
 
-	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK(1))	/* 64k  paged ROM (4 pages)  */
+	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	/* 64k  paged ROM (4 pages)  */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mod4_yam_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1787,7 +1787,7 @@ static ADDRESS_MAP_START( mod4_yam_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_r, pia6821_w)		/* PIA6821 IC7 */
 	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_r, pia6821_w)		/* PIA6821 IC8 */
 
-	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK(1))	// 64k  paged ROM (4 pages)
+	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	// 64k  paged ROM (4 pages)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mod4_oki_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1812,7 +1812,7 @@ static ADDRESS_MAP_START( mod4_oki_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_r, pia6821_w)		/* PIA6821 IC7 */
 	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_r, pia6821_w)		/* PIA6821 IC8 */
 
-	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK(1))	// 64k  paged ROM (4 pages)
+	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	// 64k  paged ROM (4 pages)
 ADDRESS_MAP_END
 
 // memory map for barcrest mpu4 board /////////////////////////////////////
@@ -1839,7 +1839,7 @@ static ADDRESS_MAP_START( dutch_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_r, pia6821_w)		/* PIA6821 IC7 */
 	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_r, pia6821_w)		/* PIA6821 IC8 */
 
-	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK(1))	// 64k paged ROM (4 pages)
+	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	// 64k paged ROM (4 pages)
 ADDRESS_MAP_END
 
 static const ay8910_interface ay8910_config =

@@ -46,7 +46,7 @@ if (data & 0xe0) popmessage("bankswitch %02x",data);
 
 	/* bits 0-2 = bank number */
 	bankaddress = 0x10000 + (data & 0x07) * 0x4000;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
 
 	/* bits 3 and 4 are coin counters */
 	coin_counter_w(space->machine, 0,data & 0x08);
@@ -71,7 +71,7 @@ static ADDRESS_MAP_START( labyrunr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(labyrunr_vram1_w) AM_BASE(&labyrunr_videoram1)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(labyrunr_vram2_w) AM_BASE(&labyrunr_videoram2)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

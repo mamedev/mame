@@ -379,7 +379,7 @@ static WRITE8_HANDLER( psychic5_bankselect_w )
 	{
 		psychic5_bank_latch = data;
 		bankaddress = 0x10000 + ((data & 3) * 0x4000);
-		memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);	 /* Select 4 banks of 16k */
+		memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);	 /* Select 4 banks of 16k */
 	}
 }
 
@@ -392,7 +392,7 @@ static WRITE8_HANDLER( bombsa_bankselect_w )
 	{
 		psychic5_bank_latch = data;
 		bankaddress = 0x10000 + ((data & 7) * 0x4000);
-		memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);	 /* Select 8 banks of 16k */
+		memory_set_bankptr(space->machine, "bank1", &RAM[bankaddress]);	 /* Select 8 banks of 16k */
 	}
 }
 
@@ -426,7 +426,7 @@ static WRITE8_HANDLER( bombsa_flipscreen_w )
 
 static ADDRESS_MAP_START( psychic5_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(psychic5_paged_ram_r, psychic5_paged_ram_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_RAM_WRITE(soundlatch_w)
@@ -455,7 +455,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bombsa_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 
 	/* ports look like the other games */

@@ -125,7 +125,7 @@ static WRITE8_HANDLER( mrgoemon_coin_counter_w )
 	coin_counter_w(space->machine, 1, data & 0x02);
 
 	/* bits 5-7 = ROM bank select */
-	memory_set_bank(space->machine, 1, ((data & 0xe0) >> 5));
+	memory_set_bank(space->machine, "bank1", ((data & 0xe0) >> 5));
 }
 
 static WRITE8_HANDLER( mrgoemon_flipscreen_w )
@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( mrgoemon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf601, 0xf601) AM_READ_PORT("P2")
 	AM_RANGE(0xf602, 0xf602) AM_READ_PORT("P1")
 	AM_RANGE(0xf603, 0xf603) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf800, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0xf800, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 /*************************************
@@ -544,7 +544,7 @@ ROM_END
 static DRIVER_INIT( mrgoemon )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 8, &ROM[0x10000], 0x800);
+	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x800);
 }
 
 /*************************************

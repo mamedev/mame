@@ -227,7 +227,7 @@ static MACHINE_START( ccastles )
 	video_screen_configure(machine->primary_screen, 320, 256, &visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* configure the ROM banking */
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0xa000, 0x6000);
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0xa000, 0x6000);
 
 	/* create a timer for IRQs and set up the first callback */
 	state->irq_timer = timer_alloc(machine, clock_irq, NULL);
@@ -284,7 +284,7 @@ static WRITE8_HANDLER( ccounter_w )
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, data & 1);
+	memory_set_bank(space->machine, "bank1", data & 1);
 }
 
 
@@ -364,7 +364,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9e87, 0x9e87) AM_MIRROR(0x0078) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x9f00, 0x9f07) AM_MIRROR(0x0078) AM_WRITE(ccastles_video_control_w)
 	AM_RANGE(0x9f80, 0x9fbf) AM_MIRROR(0x0040) AM_WRITE(ccastles_paletteram_w)
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK(1)
+	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

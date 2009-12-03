@@ -173,7 +173,7 @@ static READ16_HANDLER( button2_r )
 
 static WRITE8_HANDLER( sound2_bank_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "audio2")+0x8000*(data+1));
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "audio2")+0x8000*(data+1));
 }
 
 
@@ -264,7 +264,7 @@ ADDRESS_MAP_END
 /* Yes, _no_ ram */
 static ADDRESS_MAP_START( sound2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x0000, 0xffff) AM_WRITENOP /* avoid cluttering up error.log */
 ADDRESS_MAP_END
 

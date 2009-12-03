@@ -121,7 +121,7 @@ static UINT32 mux_outputlatch;
 /*
     Function prototypes
 */
-INLINE void z80_bank(running_machine *machine, int num, int data);
+INLINE void z80_bank(running_machine *machine, const char *bank, int data);
 
 
 static void update_irqs(running_machine *machine)
@@ -882,12 +882,13 @@ static WRITE8_HANDLER( chipset_w )
 		case 0x02:
 		case 0x03:
 		{
+			static const char * const bankname[] = { "bank1", "bank2", "bank3" };
 			if (data > 0x3f)
 				popmessage("%x: Unusual bank access (%x)\n", cpu_get_previouspc(space->cpu), data);
 
 			data &= 0x3f;
 			bank[offset] = data;
-			z80_bank(space->machine, offset, data);
+			z80_bank(space->machine, bankname[offset - 1], data);
 			break;
 		}
 
@@ -962,7 +963,7 @@ static WRITE8_HANDLER( chipset_w )
 	}
 }
 
-INLINE void z80_bank(running_machine *machine, int num, int data)
+INLINE void z80_bank(running_machine *machine, const char *bank, int data)
 {
 	if (data < 0x08)
 	{
@@ -975,24 +976,24 @@ INLINE void z80_bank(running_machine *machine, int num, int data)
 
 		UINT32 offset = ((bank[0] >> 1) * 0x20000) + offs_table[bank[0] & 0x1][data];
 
-		memory_set_bankptr(machine, num, memory_region(machine, "user1") + offset);
+		memory_set_bankptr(machine, bank, memory_region(machine, "user1") + offset);
 	}
 	else if (data < 0x10)
 	{
-		memory_set_bankptr(machine, num, &video_ram[(data - 0x08) * 0x4000]);
+		memory_set_bankptr(machine, bank, &video_ram[(data - 0x08) * 0x4000]);
 	}
 	else
 	{
-		memory_set_bankptr(machine, num, &work_ram[(data - 0x10) * 0x4000]);
+		memory_set_bankptr(machine, bank, &work_ram[(data - 0x10) * 0x4000]);
 	}
 }
 
 static WRITE8_HANDLER( rombank_w )
 {
 	bank[0] = data;
-	z80_bank(space->machine, 1, bank[1]);
-	z80_bank(space->machine, 2, bank[2]);
-	z80_bank(space->machine, 3, bank[3]);
+	z80_bank(space->machine, "bank1", bank[1]);
+	z80_bank(space->machine, "bank2", bank[2]);
+	z80_bank(space->machine, "bank3", bank[3]);
 }
 
 
@@ -1306,10 +1307,10 @@ static MACHINE_RESET( bfcobra )
 ***************************************************************************/
 
 static ADDRESS_MAP_START( z80_prog_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(4)
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(1)
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(2)
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK(3)
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank4")
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank2")
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1700,7 +1701,7 @@ static DRIVER_INIT( bfcobra )
 	bank[3] = 0;
 
 	/* Fixed 16kB ROM region */
-	memory_set_bankptr(machine, 4, memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank4", memory_region(machine, "user1"));
 
 	/* TODO: Properly sort out the data ACIA */
 	data_r = 1;

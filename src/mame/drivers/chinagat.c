@@ -180,12 +180,12 @@ static WRITE8_HANDLER( chinagat_video_ctrl_w )
 
 static WRITE8_HANDLER( chinagat_bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
+	memory_set_bank(space->machine, "bank1", data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
 }
 
 static WRITE8_HANDLER( chinagat_sub_bankswitch_w )
 {
-	memory_set_bank(space->machine, 4, data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
+	memory_set_bank(space->machine, "bank4", data & 0x07);	// shall we check (data & 7) < 6 (# of banks)?
 }
 
 static READ8_HANDLER( saiyugb1_mcu_command_r )
@@ -311,7 +311,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(ddragon_bgvideoram_w) AM_BASE_MEMBER(ddragon_state, bgvideoram)
 	AM_RANGE(0x3000, 0x317f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3400, 0x357f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0x3800, 0x397f) AM_WRITE(SMH_BANK(3)) AM_BASE_SIZE_MEMBER(ddragon_state, spriteram, spriteram_size)
+	AM_RANGE(0x3800, 0x397f) AM_WRITE_BANK("bank3") AM_BASE_SIZE_MEMBER(ddragon_state, spriteram, spriteram_size)
 	AM_RANGE(0x3e00, 0x3e04) AM_WRITE(chinagat_interrupt_w)
 	AM_RANGE(0x3e06, 0x3e06) AM_WRITEONLY AM_BASE_MEMBER(ddragon_state, scrolly_lo)
 	AM_RANGE(0x3e07, 0x3e07) AM_WRITEONLY AM_BASE_MEMBER(ddragon_state, scrollx_lo)
@@ -322,7 +322,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3f02, 0x3f02) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3f03, 0x3f03) AM_READ_PORT("P1")
 	AM_RANGE(0x3f04, 0x3f04) AM_READ_PORT("P2")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -332,7 +332,7 @@ static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_WRITEONLY /* Called on CPU start and after return from jump table */
 //  AM_RANGE(0x2a2b, 0x2a2b) AM_READNOP /* What lives here? */
 //  AM_RANGE(0x2a30, 0x2a30) AM_READNOP /* What lives here? */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(4)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank4")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -531,7 +531,7 @@ static MACHINE_START( chinagat )
 	state->snd_cpu = devtag_get_device(machine, "audiocpu");
 
 	/* configure banks */
-	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	/* register for save states */
 	state_save_register_global(machine, state->scrollx_hi);
@@ -932,8 +932,8 @@ static DRIVER_INIT( chinagat )
 	state->sprite_irq = M6809_IRQ_LINE;
 	state->sound_irq = INPUT_LINE_NMI;
 
-	memory_configure_bank(machine, 1, 0, 6, &MAIN[0x10000], 0x4000);
-	memory_configure_bank(machine, 4, 0, 6, &SUB[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 6, &MAIN[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank4", 0, 6, &SUB[0x10000], 0x4000);
 }
 
 

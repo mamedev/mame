@@ -117,7 +117,7 @@ static ADDRESS_MAP_START( brkthru_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1801) AM_WRITE(brkthru_1800_w)	/* bg scroll and color, ROM bank selection, flip screen */
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(brkthru_soundlatch_w)
 	AM_RANGE(0x1803, 0x1803) AM_WRITE(brkthru_1803_w)	/* NMI enable, + ? */
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( darwin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0801) AM_WRITE(brkthru_1800_w)     /* bg scroll and color, ROM bank selection, flip screen */
 	AM_RANGE(0x0802, 0x0802) AM_WRITE(brkthru_soundlatch_w)
 	AM_RANGE(0x0803, 0x0803) AM_WRITE(darwin_0803_w)     /* NMI enable, + ? */
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -661,7 +661,7 @@ ROM_END
 static DRIVER_INIT( brkthru )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 8, &ROM[0x10000], 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x2000);
 }
 
 /*************************************

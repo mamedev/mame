@@ -42,21 +42,21 @@ static WRITE8_HANDLER( coin_w )
 static WRITE8_HANDLER( questions_bank_w )
 {
 	if (!(data & 0x01))
-		memory_set_bank(space->machine, 1, 0);
+		memory_set_bank(space->machine, "bank1", 0);
 	else if (!(data & 0x02))
-		memory_set_bank(space->machine, 1, 1);
+		memory_set_bank(space->machine, "bank1", 1);
 	else if (!(data & 0x04))
-		memory_set_bank(space->machine, 1, 2);
+		memory_set_bank(space->machine, "bank1", 2);
 	else if (!(data & 0x08))
-		memory_set_bank(space->machine, 1, 3);
+		memory_set_bank(space->machine, "bank1", 3);
 	else if (!(data & 0x10))
-		memory_set_bank(space->machine, 1, 4);
+		memory_set_bank(space->machine, "bank1", 4);
 	else if (!(data & 0x20))
-		memory_set_bank(space->machine, 1, 5);
+		memory_set_bank(space->machine, "bank1", 5);
 	else if (!(data & 0x40))
-		memory_set_bank(space->machine, 1, 6);
+		memory_set_bank(space->machine, "bank1", 6);
 	else if (!(data & 0x80))
-		memory_set_bank(space->machine, 1, 7);
+		memory_set_bank(space->machine, "bank1", 7);
 }
 
 WRITE8_HANDLER( hyprolyb_adpcm_w )
@@ -213,7 +213,7 @@ static ADDRESS_MAP_START( wizzquiz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM) AM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_READ(SMH_RAM) AM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(questions_bank_w)
-	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK(1)
+	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1193,14 +1193,14 @@ static DRIVER_INIT( atlantol )
 	memory_install_write8_handler(space, 0x1000, 0x1000, 0, 0, (write8_space_func)SMH_NOP);
 
 	/* unmapped areas read as ROM */
-	memory_install_read8_handler(space, 0x0000, 0x11ff, 0, 0, (read8_space_func)SMH_BANK(10));
-	memory_install_read8_handler(space, 0x1380, 0x17ff, 0, 0, (read8_space_func)SMH_BANK(11));
-	memory_install_read8_handler(space, 0x2000, 0x27ff, 0, 0, (read8_space_func)SMH_BANK(12));
-	memory_install_read8_handler(space, 0x4000, 0x5fff, 0, 0, (read8_space_func)SMH_BANK(13));
-	memory_set_bankptr(machine, 10, &rom[0x0000]);
-	memory_set_bankptr(machine, 11, &rom[0x1380]);
-	memory_set_bankptr(machine, 12, &rom[0x2000]);
-	memory_set_bankptr(machine, 13, &rom[0x4000]);
+	memory_install_read_bank_handler(space, 0x0000, 0x11ff, 0, 0, "bank10");
+	memory_install_read_bank_handler(space, 0x1380, 0x17ff, 0, 0, "bank11");
+	memory_install_read_bank_handler(space, 0x2000, 0x27ff, 0, 0, "bank12");
+	memory_install_read_bank_handler(space, 0x4000, 0x5fff, 0, 0, "bank13");
+	memory_set_bankptr(machine, "bank10", &rom[0x0000]);
+	memory_set_bankptr(machine, "bank11", &rom[0x1380]);
+	memory_set_bankptr(machine, "bank12", &rom[0x2000]);
+	memory_set_bankptr(machine, "bank13", &rom[0x4000]);
 }
 
 static DRIVER_INIT( mastkin )
@@ -1239,7 +1239,7 @@ static DRIVER_INIT( wizzquiz )
 	for (i = 0; i < 0x40000; i++)
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
-	memory_configure_bank(machine, 1, 0, 8, ROM, 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 8, ROM, 0x8000);
 }
 
 

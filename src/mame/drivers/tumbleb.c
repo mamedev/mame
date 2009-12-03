@@ -824,12 +824,12 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(jumppop_z80_bank_w)
 {
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "audiocpu") + 0x10000 + (0x4000 * data));
+	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "audiocpu") + 0x10000 + (0x4000 * data));
 }
 
 static ADDRESS_MAP_START( jumppop_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

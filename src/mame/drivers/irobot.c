@@ -121,7 +121,7 @@ static WRITE8_HANDLER( irobot_clearfirq_w )
 
 static ADDRESS_MAP_START( irobot_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x07ff) AM_RAM
-    AM_RANGE(0x0800, 0x0fff) AM_RAMBANK(2)
+    AM_RANGE(0x0800, 0x0fff) AM_RAMBANK("bank2")
     AM_RANGE(0x1000, 0x103f) AM_READ_PORT("IN0")
     AM_RANGE(0x1040, 0x1040) AM_READ_PORT("IN1")
     AM_RANGE(0x1080, 0x1080) AM_READ(irobot_status_r)
@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( irobot_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1b00, 0x1bff) AM_WRITE(irobot_control_w)
     AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
     AM_RANGE(0x2000, 0x3fff) AM_READWRITE(irobot_sharedmem_r, irobot_sharedmem_w)
-    AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)
+    AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
     AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -491,10 +491,10 @@ void toprollr_decode(running_machine *machine, const char *cputag, const char *r
 		rom[A+bankstart] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xorval);
 	}
 
-	memory_configure_bank(machine, 1,0,3, memory_region(machine, regiontag),0x6000);
-	memory_configure_bank_decrypted(machine, 1,0,3,decrypted,0x6000);
+	memory_configure_bank(machine, "bank1",0,3, memory_region(machine, regiontag),0x6000);
+	memory_configure_bank_decrypted(machine, "bank1",0,3,decrypted,0x6000);
 	memory_set_decrypted_region(space, 0x0000, 0x5fff, decrypted);
-	memory_set_bank(space->machine, 1, 0);
+	memory_set_bank(space->machine, "bank1", 0);
 }
 
 
@@ -850,10 +850,10 @@ void jongkyo_decode(running_machine *machine, const char *cputag)
 		rom[A] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xorval);
 	}
 
-	memory_configure_bank(machine, 1,0,8, memory_region(machine, cputag)+0x7000,0x0400);
-	memory_configure_bank_decrypted(machine, 1,0,8,decrypted+0x7000,0x0400);
+	memory_configure_bank(machine, "bank1",0,8, memory_region(machine, cputag)+0x7000,0x0400);
+	memory_configure_bank_decrypted(machine, "bank1",0,8,decrypted+0x7000,0x0400);
 	memory_set_decrypted_region(space, 0x0000, 0x6bff, decrypted);
-	memory_set_bank(space->machine, 1, 0);
+	memory_set_bank(space->machine, "bank1", 0);
 }
 
 

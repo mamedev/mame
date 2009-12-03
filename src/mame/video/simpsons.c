@@ -105,8 +105,9 @@ void simpsons_video_banking(running_machine *machine, int bank)
 {
 	if (bank & 1)
 	{
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0, (read8_space_func)SMH_BANK(5), paletteram_xBBBBBGGGGGRRRRR_be_w);
-		memory_set_bankptr(machine, 5, machine->generic.paletteram.v);
+		memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0, "bank5");
+		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0, paletteram_xBBBBBGGGGGRRRRR_be_w);
+		memory_set_bankptr(machine, "bank5", machine->generic.paletteram.v);
 	}
 	else
 		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0, K052109_r, K052109_w);

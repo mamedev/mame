@@ -182,7 +182,7 @@ Notes:
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, (data - 1) & 3);
+	memory_set_bank(space->machine, "bank1", (data - 1) & 3);
 }
 
 static TIMER_CALLBACK( rsaga2_interrupt2  )
@@ -657,7 +657,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( masterw_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
@@ -666,7 +666,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_WRITE(taitosound_slave_port_w)
@@ -681,7 +681,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( viofight_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)		/* yes, both addresses for the same chip */
@@ -3570,7 +3570,7 @@ ROM_END
 
 static DRIVER_INIT( taito_b )
 {
-	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
 }
 
 GAME( 1989, masterw,  0,       masterw,  masterw,  taito_b, ROT270, "Taito Corporation Japan", "Master of Weapon (World)", GAME_SUPPORTS_SAVE )

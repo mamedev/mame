@@ -216,7 +216,7 @@ static WRITE16_HANDLER( tv_vcf_bankselect_w )
 	/* bits 0, 1 select the ROM bank */
 	bankaddress = (data & 0x03) * 0x40000;
 
-	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1", &ROM[bankaddress]);
 }
 
 
@@ -257,7 +257,7 @@ static ADDRESS_MAP_START( tv_vcf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
-	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK(1)
+	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
@@ -332,7 +332,7 @@ static WRITE16_HANDLER( tv_tcf_bankselect_w )
 	/* bits 0, 1, 2 select the ROM bank */
 	bankaddress = (data & 0x07) * 0x40000;
 
-	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1", &ROM[bankaddress]);
 }
 
 static ADDRESS_MAP_START( tv_tcf_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -340,7 +340,7 @@ static ADDRESS_MAP_START( tv_tcf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
 	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_WRITE( tv_tcf_paletteram_w ) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK(1)
+	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
@@ -397,7 +397,7 @@ static ADDRESS_MAP_START( newmcard_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
-	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK(1)
+	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
@@ -456,7 +456,7 @@ static WRITE16_HANDLER( brasil_status_w )
 
 	bankaddress = (data & 0x07) * 0x40000;
 
-	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1", &ROM[bankaddress]);
 
 //  popmessage("%04x",data);
 }
@@ -465,7 +465,7 @@ static ADDRESS_MAP_START( brasil_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
 	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
-	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK(1)
+	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 

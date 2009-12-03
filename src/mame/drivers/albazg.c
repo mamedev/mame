@@ -195,7 +195,7 @@ static WRITE8_DEVICE_HANDLER( mux_w )
 	if( state->bank != new_bank)
 	{
 		state->bank = new_bank;
-		memory_set_bank(device->machine, 1, state->bank);
+		memory_set_bank(device->machine, "bank1", state->bank);
 	}
 
 	state->mux_data = data & ~0xc0;
@@ -249,7 +249,7 @@ static const ppi8255_interface ppi8255_intf =
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa7fc, 0xa7fc) AM_WRITE(prot_lock_w)
 	AM_RANGE(0xa7ff, 0xa7ff) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0xaf80, 0xafff) AM_READWRITE(custom_ram_r, custom_ram_w) AM_BASE_MEMBER(albazg_state, cus_ram)
@@ -375,7 +375,7 @@ static MACHINE_START( yumefuda )
 	albazg_state *state = (albazg_state *)machine->driver_data;
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	memory_configure_bank(machine, 1, 0, 4, &ROM[0x10000], 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
 
 	state_save_register_global(machine, state->mux_data);
 	state_save_register_global(machine, state->bank);

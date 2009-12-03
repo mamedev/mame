@@ -144,7 +144,7 @@ static WRITE8_HANDLER( g_status_w )
 	g_status = data;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x10000;
-	memory_set_bankptr(space->machine, 1, &rom[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1", &rom[bankaddress]);
 
 	cputag_set_input_line(space->machine, "frame_cpu", M6809_FIRQ_LINE, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
 	cputag_set_input_line(space->machine, "frame_cpu", INPUT_LINE_NMI,  data & 0x80 ? CLEAR_LINE : ASSERT_LINE);
@@ -537,9 +537,9 @@ static WRITE8_HANDLER( s_200f_w )
 		u56b = 1;
 
 	/* Speech data resides in the upper 8kB of the ROMs */
-	memory_set_bankptr(space->machine, 2, &rom[0x0000 + rombank]);
-	memory_set_bankptr(space->machine, 3, &rom[0x4000 + rombank]);
-	memory_set_bankptr(space->machine, 4, &rom[0x8000 + rombank]);
+	memory_set_bankptr(space->machine, "bank2", &rom[0x0000 + rombank]);
+	memory_set_bankptr(space->machine, "bank3", &rom[0x4000 + rombank]);
+	memory_set_bankptr(space->machine, "bank4", &rom[0x8000 + rombank]);
 
 	s_to_g_latch2 = data;
 }
@@ -630,7 +630,7 @@ static ADDRESS_MAP_START( game_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5000, 0x53ff) AM_WRITE(g_ioadd_w)
 	AM_RANGE(0x5400, 0x57ff) AM_NOP
 	AM_RANGE(0x5c00, 0x5fff) AM_READWRITE(uart_r, uart_w)
-	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK(1)
+	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -654,9 +654,9 @@ static ADDRESS_MAP_START( sound_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x200e, 0x200e) AM_READWRITE(s_200e_r, s_200e_w)
 	AM_RANGE(0x200f, 0x200f) AM_READWRITE(s_200f_r, s_200f_w)
 	AM_RANGE(0x2020, 0x2027) AM_DEVREADWRITE("6840ptm", ptm6840_read, ptm6840_write)
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(2)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(3)
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(4)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank3")
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -680,9 +680,9 @@ static DRIVER_INIT( esripsys )
 	fdt_b = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
 	cmos_ram = auto_alloc_array(machine, UINT8, CMOS_RAM_SIZE);
 
-	memory_set_bankptr(machine, 2, &rom[0x0000]);
-	memory_set_bankptr(machine, 3, &rom[0x4000]);
-	memory_set_bankptr(machine, 4, &rom[0x8000]);
+	memory_set_bankptr(machine, "bank2", &rom[0x0000]);
+	memory_set_bankptr(machine, "bank3", &rom[0x4000]);
+	memory_set_bankptr(machine, "bank4", &rom[0x8000]);
 
 	/* Register stuff for state saving */
 	state_save_register_global_pointer(machine, fdt_a, FDT_RAM_SIZE);

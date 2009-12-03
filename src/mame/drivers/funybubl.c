@@ -56,12 +56,12 @@ Note: SW2, SW3 & SW4 not populated
 
 static WRITE8_HANDLER ( funybubl_vidram_bank_w )
 {
-	memory_set_bank(space->machine, 1, data & 1);
+	memory_set_bank(space->machine, "bank1", data & 1);
 }
 
 static WRITE8_HANDLER ( funybubl_cpurombank_w )
 {
-	memory_set_bank(space->machine, 2, data & 0x3f);	// should we add a check that (data&0x3f) < #banks?
+	memory_set_bank(space->machine, "bank2", data & 0x3f);	// should we add a check that (data&0x3f) < #banks?
 }
 
 
@@ -80,9 +80,9 @@ static WRITE8_DEVICE_HANDLER( funybubl_oki_bank_sw )
 
 static ADDRESS_MAP_START( funybubl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2) // banked port 1?
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2") // banked port 1?
 	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(funybubl_paldatawrite) AM_BASE_MEMBER(funybubl_state, paletteram) // palette
-	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK(1) // banked port 0?
+	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK("bank1") // banked port 0?
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -209,10 +209,10 @@ static MACHINE_START( funybubl )
 	state->banked_vram = auto_alloc_array(machine, UINT8, 0x2000);
 	state_save_register_global_pointer(machine, state->banked_vram, 0x2000);
 
-	memory_configure_bank(machine, 1, 0, 2, &state->banked_vram[0x0000], 0x1000);
-	memory_configure_bank(machine, 2, 0, 0x10, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, &state->banked_vram[0x0000], 0x1000);
+	memory_configure_bank(machine, "bank2", 0, 0x10, &ROM[0x10000], 0x4000);
 
-	memory_set_bank(machine, 1, 0);
+	memory_set_bank(machine, "bank1", 0);
 }
 
 

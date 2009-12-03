@@ -45,10 +45,10 @@ static READ8_HANDLER( c1943_protection_r )
 
 static ADDRESS_MAP_START( c1943_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK(1)
-	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK(2)
-	AM_RANGE(0xa000, 0xafff) AM_ROMBANK(3)
-	AM_RANGE(0xb000, 0xbfff) AM_ROMBANK(4)
+	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")
+	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("bank3")
+	AM_RANGE(0xb000, 0xbfff) AM_ROMBANK("bank4")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
@@ -464,10 +464,10 @@ ROM_END
 static DRIVER_INIT( 1943 )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 28, &ROM[0x10000], 0x1000);
-	memory_configure_bank(machine, 2, 0, 28, &ROM[0x11000], 0x1000);
-	memory_configure_bank(machine, 3, 0, 28, &ROM[0x12000], 0x1000);
-	memory_configure_bank(machine, 4, 0, 28, &ROM[0x13000], 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 28, &ROM[0x10000], 0x1000);
+	memory_configure_bank(machine, "bank2", 0, 28, &ROM[0x11000], 0x1000);
+	memory_configure_bank(machine, "bank3", 0, 28, &ROM[0x12000], 0x1000);
+	memory_configure_bank(machine, "bank4", 0, 28, &ROM[0x13000], 0x1000);
 }
 
 /* Game Drivers */

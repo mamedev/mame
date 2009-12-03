@@ -160,8 +160,8 @@ void cage_init(running_machine *machine, offs_t speedup)
 
 	cage_irqhandler = NULL;
 
-	memory_set_bankptr(machine, 10, memory_region(machine, "cageboot"));
-	memory_set_bankptr(machine, 11, memory_region(machine, "cage"));
+	memory_set_bankptr(machine, "bank10", memory_region(machine, "cageboot"));
+	memory_set_bankptr(machine, "bank11", memory_region(machine, "cage"));
 
 	cage_cpu = cputag_get_cpu(machine, "cage");
 	cage_cpu_clock_period = ATTOTIME_IN_HZ(cpu_get_clock(cage_cpu));
@@ -619,24 +619,24 @@ static const tms32031_config cage_config =
 static ADDRESS_MAP_START( cage_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200000) AM_WRITENOP
-	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK(10)
+	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK("bank10")
 	AM_RANGE(0x808000, 0x8080ff) AM_READWRITE(tms32031_io_r, tms32031_io_w) AM_BASE(&tms32031_io_regs)
 	AM_RANGE(0x809800, 0x809fff) AM_RAM
 	AM_RANGE(0xa00000, 0xa00000) AM_READWRITE(cage_from_main_r, cage_to_main_w)
-	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK(11)
+	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cage_map_seattle, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200000) AM_WRITENOP
-	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK(10)
+	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK("bank10")
 	AM_RANGE(0x808000, 0x8080ff) AM_READWRITE(tms32031_io_r, tms32031_io_w) AM_BASE(&tms32031_io_regs)
 	AM_RANGE(0x809800, 0x809fff) AM_RAM
 	AM_RANGE(0xa00000, 0xa00000) AM_READWRITE(cage_from_main_r, cage_from_main_ack_w)
 	AM_RANGE(0xa00001, 0xa00001) AM_WRITE(cage_to_main_w)
 	AM_RANGE(0xa00003, 0xa00003) AM_READ(cage_io_status_r)
-	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK(11)
+	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
 

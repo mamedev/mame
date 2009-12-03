@@ -255,7 +255,7 @@ static const UINT8 kuniokun_xor_table[0x2a] =
 static void setbank(running_machine *machine)
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, 1, &RAM[bank ? 0x10000 : 0x4000]);
+	memory_set_bankptr(machine, "bank1", &RAM[bank ? 0x10000 : 0x4000]);
 }
 
 static STATE_POSTLOAD( renegade_postload )
@@ -550,7 +550,7 @@ static ADDRESS_MAP_START( renegade_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3805, 0x3805) AM_READWRITE(mcu_reset_r,bankswitch_w)
 	AM_RANGE(0x3806, 0x3806) AM_WRITENOP // ?? watchdog
 	AM_RANGE(0x3807, 0x3807) AM_WRITE(renegade_coin_counter_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

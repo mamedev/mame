@@ -207,7 +207,7 @@ static WRITE8_HANDLER( astron_FIX_write )
 static WRITE8_HANDLER( astron_io_bankswitch_w )
 {
 	logerror("Banking 0x%x\n", data);
-	memory_set_bank(space->machine, 1, data & 0xff);
+	memory_set_bank(space->machine, "bank1", data & 0xff);
 }
 
 
@@ -216,7 +216,7 @@ static WRITE8_HANDLER( astron_io_bankswitch_w )
 /* PROGRAM MAP */
 static ADDRESS_MAP_START( mainmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(astron_OBJ_read,astron_OBJ_write) AM_BASE(&obj_RAM)	/* OBJ according to the schematics (sprite) */
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(astron_DISC_read,astron_DISC_write)					/* DISC interface according to schematics */
@@ -568,7 +568,7 @@ ROM_END
 static DRIVER_INIT( astron )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 2, &ROM[0x8000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x8000], 0x4000);
 }
 
 

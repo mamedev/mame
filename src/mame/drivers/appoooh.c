@@ -216,7 +216,7 @@ static WRITE8_HANDLER( appoooh_adpcm_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK(1)
+	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM /* RAM ? */
 

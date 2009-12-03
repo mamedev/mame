@@ -181,12 +181,12 @@ static UINT8 sound_command;
 static MACHINE_RESET( pipedrm )
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x2000);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+	memory_set_bank(machine, "bank1", 0);
 
 	/* initialize sound bank */
-	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "sub") + 0x10000, 0x8000);
-	memory_set_bank(machine, 2, 0);
+	memory_configure_bank(machine, "bank2", 0, 2, memory_region(machine, "sub") + 0x10000, 0x8000);
+	memory_set_bank(machine, "bank2", 0);
 	/* state save */
 	state_save_register_global(machine, pending_command);
 	state_save_register_global(machine, sound_command);
@@ -208,7 +208,7 @@ static WRITE8_HANDLER( pipedrm_bankswitch_w )
     */
 
 	/* set the memory bank on the Z80 using the low 3 bits */
-	memory_set_bank(space->machine, 1, data & 0x7);
+	memory_set_bank(space->machine, "bank1", data & 0x7);
 
 	/* map to the fromance gfx register */
 	fromance_gfxreg_w(space, offset, ((data >> 6) & 0x01) | 	/* flipscreen */
@@ -218,7 +218,7 @@ static WRITE8_HANDLER( pipedrm_bankswitch_w )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bank(space->machine, 2, data & 0x01);
+	memory_set_bank(space->machine, "bank2", data & 0x01);
 }
 
 
@@ -283,7 +283,7 @@ static READ8_HANDLER( sound_command_r )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
 ADDRESS_MAP_END
@@ -313,7 +313,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(2)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
 
@@ -848,8 +848,8 @@ static DRIVER_INIT( pipedrm )
 	/* sprite RAM lives at the end of palette RAM */
 	machine->generic.spriteram.u8 = &machine->generic.paletteram.u8[0xc00];
 	machine->generic.spriteram_size = 0x400;
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xcc00, 0xcfff, 0, 0, (read8_space_func)SMH_BANK(3), (write8_space_func)SMH_BANK(3));
-	memory_set_bankptr(machine, 3, machine->generic.spriteram.v);
+	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xcc00, 0xcfff, 0, 0, "bank3");
+	memory_set_bankptr(machine, "bank3", machine->generic.spriteram.v);
 }
 
 

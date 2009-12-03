@@ -107,7 +107,7 @@ static UINT8 irq_mask;
         UINT32 bankaddress;
 
         bankaddress = 0x10000 + (0x10000 * (data & 0x03));
-        memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
+        memory_set_bankptr(space->machine, "bank1", &ROM[bankaddress]);
     }
 */
 
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( cmmb_output_w )
 				UINT32 bankaddress;
 
 				bankaddress = 0x1c000 + (0x10000 * (data & 0x03));
-				memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
+				memory_set_bankptr(space->machine, "bank1", &ROM[bankaddress]);
 			}
 			break;
 		case 0x03:
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( cmmb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2480, 0x249f) AM_RAM_WRITE(cmmb_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x4000, 0x400f) AM_READWRITE(cmmb_input_r,cmmb_output_w) //i/o
 	AM_RANGE(0x4900, 0x4900) AM_READ(kludge_r)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xafff) AM_RAM
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(cmmb_charram_r,cmmb_charram_w)
 	AM_RANGE(0xc000, 0xc00f) AM_READWRITE(cmmb_input_r,cmmb_output_w) //i/o

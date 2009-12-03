@@ -324,11 +324,11 @@ static void mxtc_config_w(const device_config *busdevice, const device_config *d
 		{
 			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
 			{
-				memory_set_bankptr(busdevice->machine, 1, bios_ram);
+				memory_set_bankptr(busdevice->machine, "bank1", bios_ram);
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				memory_set_bankptr(busdevice->machine, 1, memory_region(busdevice->machine, "bios") + 0x10000);
+				memory_set_bankptr(busdevice->machine, "bank1", memory_region(busdevice->machine, "bios") + 0x10000);
 			}
 			break;
 		}
@@ -459,7 +459,7 @@ static ADDRESS_MAP_START( calchase_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM AM_BASE(&vga_vram)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
-	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK(1)
+	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
 	AM_RANGE(0x04000000, 0x040001ff) AM_RAM
@@ -622,7 +622,7 @@ static const struct pit8253_config calchase_pit8254_config =
 
 static MACHINE_RESET(calchase)
 {
-	memory_set_bankptr(machine, 1, memory_region(machine, "bios") + 0x10000);
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "bios") + 0x10000);
 }
 
 static void set_gate_a20(running_machine *machine, int a20)

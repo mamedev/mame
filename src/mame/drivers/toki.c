@@ -91,7 +91,7 @@ static WRITE8_DEVICE_HANDLER( toki_adpcm_control_w )
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	memory_set_bankptr(device->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(device->machine, "bank1",&RAM[bankaddress]);
 
 	msm5205_reset_w(device,data & 0x08);
 }
@@ -146,7 +146,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tokib_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", toki_adpcm_control_w)	/* MSM5205 + ROM bank */
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(toki_adpcm_data_w)

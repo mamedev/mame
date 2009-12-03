@@ -72,7 +72,10 @@ static UINT8 coin_counter[2];
 
 static WRITE16_HANDLER( arcadia_multibios_change_game )
 {
-	memory_install_read16_handler(space, 0x800000, 0x97ffff, 0, 0, (read16_space_func)((data == 0) ? SMH_BANK(2) : SMH_NOP));
+	if (data == 0)
+		memory_install_read_bank_handler(space, 0x800000, 0x97ffff, 0, 0, "bank2");
+	else
+		memory_install_read16_handler(space, 0x800000, 0x97ffff, 0, 0, (read16_space_func)SMH_NOP);
 }
 
 
@@ -95,12 +98,12 @@ static WRITE16_HANDLER( arcadia_multibios_change_game )
 static WRITE8_DEVICE_HANDLER( arcadia_cia_0_porta_w )
 {
 	/* switch banks as appropriate */
-	memory_set_bank(device->machine, 1, data & 1);
+	memory_set_bank(device->machine, "bank1", data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write16_handler(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, (write16_space_func)SMH_BANK(1));
+		memory_install_write_bank_handler(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, "bank1");
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
@@ -180,13 +183,13 @@ static void arcadia_reset_coins(running_machine *machine)
 
 static ADDRESS_MAP_START( amiga_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)		/* Kickstart BIOS */
 
-	AM_RANGE(0x800000, 0x97ffff) AM_ROMBANK(2) AM_REGION("user3", 0)
+	AM_RANGE(0x800000, 0x97ffff) AM_ROMBANK("bank2") AM_REGION("user3", 0)
 	AM_RANGE(0x980000, 0x9fbfff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0x9fc000, 0x9ffffd) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x9ffffe, 0x9fffff) AM_WRITE(arcadia_multibios_change_game)
@@ -760,8 +763,8 @@ static void arcadia_init(running_machine *machine)
 	amiga_machine_config(machine, &arcadia_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, 1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, amiga_chip_ram, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
 
 	/* OnePlay bios is encrypted, TenPlay is not */
 	biosrom = (UINT16 *)memory_region(machine, "user2");

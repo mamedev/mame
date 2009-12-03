@@ -50,7 +50,7 @@ static WRITE8_HANDLER( ajax_bankswitch_w )
 
 	/* bank # (ROMS N11 and N12) */
 	bankaddress += 0x10000 + (data & 0x07)*0x2000;
-	memory_set_bankptr(space->machine, 2,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank2",&RAM[bankaddress]);
 }
 
 /*  ajax_lamps_w:
@@ -194,7 +194,7 @@ WRITE8_HANDLER( ajax_bankswitch_2_w )
 
 	/* bank # (ROMS G16 and I16) */
 	bankaddress = 0x10000 + (data & 0x0f)*0x2000;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
 }
 
 MACHINE_START( ajax )

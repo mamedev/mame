@@ -285,7 +285,7 @@ static WRITE8_HANDLER( macross2_sound_bank_w )
 {
 	UINT8 *rom = memory_region(space->machine, "audiocpu") + 0x10000;
 
-	memory_set_bankptr(space->machine, 1,rom + (data & 0x07) * 0x4000);
+	memory_set_bankptr(space->machine, "bank1",rom + (data & 0x07) * 0x4000);
 }
 
 static WRITE8_HANDLER( tharrier_oki6295_bankswitch_0_w )
@@ -1078,12 +1078,12 @@ static WRITE8_HANDLER( okibank_w )
 
 static WRITE8_HANDLER( raphero_sound_rombank_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "audiocpu") + 0x10000 + (data & 0x07) * 0x4000);
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "audiocpu") + 0x10000 + (data & 0x07) * 0x4000);
 }
 
 static ADDRESS_MAP_START( raphero_sound_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
-	AM_RANGE( 0x8000, 0xbfff ) AM_READ( SMH_BANK(1) )
+	AM_RANGE( 0x8000, 0xbfff ) AM_ROMBANK( "bank1" )
 	AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w )
 	AM_RANGE( 0xc800, 0xc800 ) AM_DEVREADWRITE( "oki1", okim6295_r, okim6295_w )
 	AM_RANGE( 0xc808, 0xc808 ) AM_DEVREADWRITE( "oki2", okim6295_r, okim6295_w )
@@ -1096,7 +1096,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( macross2_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)	/* banked ROM */
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	/* banked ROM */
 	AM_RANGE(0xa000, 0xa000) AM_READNOP	/* IRQ ack? watchdog? */
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(macross2_sound_bank_w)

@@ -337,7 +337,7 @@ static WRITE8_HANDLER( welltris_sh_bankswitch_w )
 {
 	UINT8 *rom = memory_region(space->machine, "audiocpu") + 0x10000;
 
-	memory_set_bankptr(space->machine, 1,rom + (data & 0x03) * 0x8000);
+	memory_set_bankptr(space->machine, "bank1",rom + (data & 0x03) * 0x8000);
 }
 
 
@@ -391,7 +391,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK(1))
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )

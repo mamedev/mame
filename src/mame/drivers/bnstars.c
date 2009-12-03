@@ -1265,7 +1265,7 @@ static ADDRESS_MAP_START( bnstars_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfec08000, 0xfec0ffff) AM_RAM_WRITE(ms32_bg0_ram_w) AM_BASE(&ms32_bg0_ram)
 
 	AM_RANGE(0xfee00000, 0xfee1ffff) AM_RAM
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROMBANK(1)
+	AM_RANGE(0xffe00000, 0xffffffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 #if 0
@@ -1438,7 +1438,7 @@ static DRIVER_INIT (bnstars)
 	decrypt_ms32_tx(machine, 0x00020,0x7e, "gfx7");
 	decrypt_ms32_bg(machine, 0x00001,0x9b, "gfx6");
 
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
 }
 
 GAME( 1997, bnstars1, 0,        bnstars, bnstars, bnstars, ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars", GAME_NO_SOUND )

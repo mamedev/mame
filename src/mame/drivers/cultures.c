@@ -112,7 +112,7 @@ static VIDEO_UPDATE( cultures )
 static WRITE8_HANDLER( cpu_bankswitch_w )
 {
 	cultures_state *state = (cultures_state *)space->machine->driver_data;
-	memory_set_bank(space->machine, 1, data & 0x0f);
+	memory_set_bank(space->machine, "bank1", data & 0x0f);
 	state->video_bank = ~data & 0x20;
 }
 
@@ -176,7 +176,7 @@ static WRITE8_HANDLER( bg_bank_w )
 
 static ADDRESS_MAP_START( cultures_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(bg0_videoram_w) AM_BASE_MEMBER(cultures_state, bg0_videoram)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
@@ -359,7 +359,7 @@ static MACHINE_START( cultures )
 	cultures_state *state = (cultures_state *)machine->driver_data;
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	memory_configure_bank(machine, 1, 0, 16, &ROM[0x0000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x0000], 0x4000);
 
 	state->paletteram = auto_alloc_array(machine, UINT8, 0x4000);
 	state_save_register_global_pointer(machine, state->paletteram, 0x4000);

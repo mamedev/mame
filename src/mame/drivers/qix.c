@@ -1314,9 +1314,9 @@ static DRIVER_INIT( kram3 )
 static DRIVER_INIT( zookeep )
 {
 	/* configure the banking */
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "videocpu") + 0xa000, 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "videocpu") + 0x10000, 0);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "videocpu") + 0xa000, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "videocpu") + 0x10000, 0);
+	memory_set_bank(machine, "bank1", 0);
 }
 
 

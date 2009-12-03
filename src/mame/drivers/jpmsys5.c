@@ -213,7 +213,7 @@ static WRITE16_HANDLER( rombank_w )
 {
 	UINT8 *rom = memory_region(space->machine, "maincpu");
 	data &= 0x1f;
-	memory_set_bankptr(space->machine, 1, &rom[0x20000 + 0x20000 * data]);
+	memory_set_bankptr(space->machine, "bank1", &rom[0x20000 + 0x20000 * data]);
 }
 
 static READ16_HANDLER( coins_r )
@@ -281,7 +281,7 @@ static READ16_DEVICE_HANDLER( jpm_upd7759_r )
 static ADDRESS_MAP_START( 68000_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x01fffe, 0x01ffff) AM_WRITE(rombank_w)
-	AM_RANGE(0x020000, 0x03ffff) AM_ROMBANK(1)
+	AM_RANGE(0x020000, 0x03ffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x046000, 0x046001) AM_WRITENOP
 	AM_RANGE(0x046020, 0x046021) AM_DEVREADWRITE8("acia6850_0", acia6850_stat_r, acia6850_ctrl_w, 0xff)
@@ -575,7 +575,7 @@ static ACIA6850_INTERFACE( acia2_if )
 
 static MACHINE_START( jpmsys5v )
 {
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
 	touch_timer = timer_alloc(machine, touch_cb, NULL);
 }
 

@@ -46,8 +46,8 @@
 
 static ADDRESS_MAP_START( master_map_program, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK(1)
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK(2)
+	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank1")
+	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xa000, 0xdfff) AM_WRITE(ataxx_battery_ram_w)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(ataxx_paletteram_and_misc_r, ataxx_paletteram_and_misc_w) AM_BASE_GENERIC(paletteram)
@@ -76,7 +76,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map_program, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK(3)
+	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank3")
 	AM_RANGE(0xa000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xfffc, 0xfffd) AM_WRITE(leland_slave_video_addr_w)
@@ -777,8 +777,8 @@ static DRIVER_INIT( asylum )
 	leland_rotate_memory(machine, "slave");
 
 	/* asylum appears to have some extra RAM for the slave CPU */
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "slave", ADDRESS_SPACE_PROGRAM), 0xf000, 0xfffb, 0, 0, (read8_space_func)SMH_BANK(4), (write8_space_func)SMH_BANK(4));
-	memory_set_bankptr(machine, 4, auto_alloc_array(machine, UINT8, 0x1000));
+	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "slave", ADDRESS_SPACE_PROGRAM), 0xf000, 0xfffb, 0, 0, "bank4");
+	memory_set_bankptr(machine, "bank4", auto_alloc_array(machine, UINT8, 0x1000));
 
 	/* set up additional input ports */
 	memory_install_read_port_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x0d, 0x0d, 0, 0, "P2");

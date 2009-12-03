@@ -62,7 +62,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 static MACHINE_START( tutankhm )
 {
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x1000);
 	state_save_register_global(machine, irq_toggle);
 	state_save_register_global(machine, irq_enable);
 }
@@ -70,7 +70,7 @@ static MACHINE_START( tutankhm )
 
 static WRITE8_HANDLER( tutankhm_bankselect_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x0f);
+	memory_set_bank(space->machine, "bank1", data & 0x0f);
 }
 
 
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8600, 0x8600) AM_MIRROR(0x00ff) AM_WRITE(timeplt_sh_irqtrigger_w)
 	AM_RANGE(0x8700, 0x8700) AM_MIRROR(0x00ff) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK(1)
+	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

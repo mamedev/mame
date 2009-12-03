@@ -1386,8 +1386,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hng_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x3ffff) AM_READ(SMH_BANK(2))
-	AM_RANGE(0xe0000, 0xfffff) AM_READ(SMH_BANK(1))
+	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank2")
+	AM_RANGE(0xe0000, 0xfffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 
@@ -1794,8 +1794,8 @@ static MACHINE_RESET(hyperneo)
 
 	/* Sound CPU */
 	UINT8 *RAM = (UINT8*)hng64_soundram;
-	memory_set_bankptr(machine, 1,&RAM[0x1e0000]);
-	memory_set_bankptr(machine, 2,&RAM[0x001000]); // where..
+	memory_set_bankptr(machine, "bank1",&RAM[0x1e0000]);
+	memory_set_bankptr(machine, "bank2",&RAM[0x001000]); // where..
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_HALT, ASSERT_LINE);
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 

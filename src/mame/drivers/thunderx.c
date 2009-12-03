@@ -325,7 +325,7 @@ static WRITE8_HANDLER( scontra_bankswitch_w )
 
 	/* bits 0-3 ROM bank */
 	offs = 0x10000 + (data & 0x0f)*0x2000;
-	memory_set_bankptr(space->machine,  1, &RAM[offs] );
+	memory_set_bankptr(space->machine,  "bank1", &RAM[offs] );
 
 	/* bit 4 select work RAM or palette RAM at 5800-5fff */
 	palette_selected = ~data & 0x10;
@@ -387,7 +387,7 @@ static ADDRESS_MAP_START( scontra_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(scontra_bankedram_r, scontra_bankedram_w) AM_BASE(&ram)			/* palette + work RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -407,7 +407,7 @@ static ADDRESS_MAP_START( thunderx_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(thunderx_bankedram_r, thunderx_bankedram_w) AM_BASE(&ram)			/* palette + work RAM + unknown RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -910,7 +910,7 @@ static KONAMI_SETLINES_CALLBACK( thunderx_banking )
 
 	offs = 0x10000 + (((lines & 0x0f) ^ 0x08) * 0x2000);
 	if (offs >= 0x28000) offs -= 0x20000;
-	memory_set_bankptr(device->machine,  1, &RAM[offs] );
+	memory_set_bankptr(device->machine,  "bank1", &RAM[offs] );
 }
 
 static MACHINE_RESET( scontra )
@@ -925,7 +925,7 @@ static MACHINE_RESET( thunderx )
 	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), thunderx_banking);
-	memory_set_bankptr(machine, 1, &RAM[0x10000] ); /* init the default bank */
+	memory_set_bankptr(machine, "bank1", &RAM[0x10000] ); /* init the default bank */
 
 	machine->generic.paletteram.u8 = &RAM[0x28000];
 	pmcram = &RAM[0x28800];

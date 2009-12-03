@@ -204,21 +204,18 @@ void namcos2_adjust_posirq_timer( running_machine *machine, int scanline );
 /* MASTER CPU RAM MEMORY                                      */
 /**************************************************************/
 
-#define NAMCOS2_68K_MASTER_RAM_W	SMH_BANK(3)
-#define NAMCOS2_68K_MASTER_RAM_R	SMH_BANK(3)
+#define NAMCOS2_68K_MASTER_RAM	"bank3"
 
 /**************************************************************/
 /* SLAVE CPU RAM MEMORY                                       */
 /**************************************************************/
 
-#define NAMCOS2_68K_SLAVE_RAM_W 	SMH_BANK(4)
-#define NAMCOS2_68K_SLAVE_RAM_R 	SMH_BANK(4)
+#define NAMCOS2_68K_SLAVE_RAM 	"bank4"
 
 /**************************************************************/
 /*                                                            */
 /**************************************************************/
-#define BANKED_SOUND_ROM_R		SMH_BANK(6)
-#define CPU3_ROM1				6			/* Bank number */
+#define BANKED_SOUND_ROM		"bank6"
 
 /**************************************************************/
 /* Sound CPU support handlers - 6809                          */

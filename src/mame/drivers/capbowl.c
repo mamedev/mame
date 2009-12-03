@@ -139,7 +139,7 @@ static TIMER_CALLBACK( capbowl_update )
 static WRITE8_HANDLER( capbowl_rom_select_w )
 {
 	// 2009-11 FP: shall we add a check to be sure that bank < 6?
-	memory_set_bank(space->machine, 1, ((data & 0x0c) >> 1) + (data & 0x01));
+	memory_set_bank(space->machine, "bank1", ((data & 0x0c) >> 1) + (data & 0x01));
 }
 
 
@@ -237,7 +237,7 @@ static NVRAM_HANDLER( capbowl )
  *************************************/
 
 static ADDRESS_MAP_START( capbowl_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(1)
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_BASE_MEMBER(capbowl_state, rowaddress)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(capbowl_rom_select_w)
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
@@ -523,7 +523,7 @@ static DRIVER_INIT( capbowl )
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	/* configure ROM banks in 0x0000-0x3fff */
-	memory_configure_bank(machine, 1, 0, 6, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);
 
 	DRIVER_INIT_CALL(bowlrama);
 }

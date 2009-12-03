@@ -408,7 +408,7 @@ logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",cpu_get_pc(s
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(machine,  10, memory_region(machine, "audiocpu") + (banknum * 0x4000) + 0x10000 );
+	memory_set_bankptr(machine,  "bank10", memory_region(machine, "audiocpu") + (banknum * 0x4000) + 0x10000 );
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )	/* assumes Z80 sandwiched between 68Ks */
@@ -484,7 +484,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(10)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)

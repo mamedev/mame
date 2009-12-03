@@ -97,13 +97,13 @@ WRITE8_HANDLER( asteroid_bank_switch_w )
 {
 	if (data & 4)
 	{
-		memory_set_bankptr(space->machine, 1, asteroid_ram2);
-		memory_set_bankptr(space->machine, 2, asteroid_ram1);
+		memory_set_bankptr(space->machine, "bank1", asteroid_ram2);
+		memory_set_bankptr(space->machine, "bank2", asteroid_ram1);
 	}
 	else
 	{
-		memory_set_bankptr(space->machine, 1, asteroid_ram1);
-		memory_set_bankptr(space->machine, 2, asteroid_ram2);
+		memory_set_bankptr(space->machine, "bank1", asteroid_ram1);
+		memory_set_bankptr(space->machine, "bank2", asteroid_ram2);
 	}
 
 	set_led_status (space->machine, 0, ~data & 0x02);
@@ -115,13 +115,13 @@ WRITE8_HANDLER( astdelux_bank_switch_w )
 {
 	if (data & 0x80)
 	{
-		memory_set_bankptr(space->machine, 1, asteroid_ram2);
-		memory_set_bankptr(space->machine, 2, asteroid_ram1);
+		memory_set_bankptr(space->machine, "bank1", asteroid_ram2);
+		memory_set_bankptr(space->machine, "bank2", asteroid_ram1);
 	}
 	else
 	{
-		memory_set_bankptr(space->machine, 1, asteroid_ram1);
-		memory_set_bankptr(space->machine, 2, asteroid_ram2);
+		memory_set_bankptr(space->machine, "bank1", asteroid_ram1);
+		memory_set_bankptr(space->machine, "bank2", asteroid_ram2);
 	}
 }
 

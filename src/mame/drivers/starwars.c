@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4703, 0x4703) AM_READ(starwars_prng_r)			/* pseudo random number generator */
 	AM_RANGE(0x4800, 0x4fff) AM_RAM								/* CPU and Math RAM */
 	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE(&starwars_mathram)	/* CPU and Math RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)						/* banked ROM */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")						/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* rest of main_rom */
 ADDRESS_MAP_END
 
@@ -512,8 +512,8 @@ static DRIVER_INIT( starwars )
 	starwars_mproc_init(machine);
 
 	/* initialize banking */
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x6000, 0x10000 - 0x6000);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x6000, 0x10000 - 0x6000);
+	memory_set_bank(machine, "bank1", 0);
 }
 
 
@@ -536,17 +536,17 @@ static DRIVER_INIT( esb )
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, esb_slapstic_r, esb_slapstic_w);
 
 	/* install additional banking */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xffff, 0, 0, (read8_space_func)SMH_BANK(2));
+	memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xffff, 0, 0, "bank2");
 
 	/* prepare the matrix processor */
 	starwars_is_esb = 1;
 	starwars_mproc_init(machine);
 
 	/* initialize banking */
-	memory_configure_bank(machine, 1, 0, 2, rom + 0x6000, 0x10000 - 0x6000);
-	memory_set_bank(machine, 1, 0);
-	memory_configure_bank(machine, 2, 0, 2, rom + 0xa000, 0x1c000 - 0xa000);
-	memory_set_bank(machine, 2, 0);
+	memory_configure_bank(machine, "bank1", 0, 2, rom + 0x6000, 0x10000 - 0x6000);
+	memory_set_bank(machine, "bank1", 0);
+	memory_configure_bank(machine, "bank2", 0, 2, rom + 0xa000, 0x1c000 - 0xa000);
+	memory_set_bank(machine, "bank2", 0);
 
 	/* additional globals for state saving */
 	state_save_register_global(machine, slapstic_current_bank);

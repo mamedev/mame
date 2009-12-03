@@ -1366,12 +1366,13 @@ static DRIVER_INIT( decocrom )
 		state->decrypted2[i] = swap_bits_5_6(rom[i]);
 
 	/* convert charram to a banked ROM */
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0xafff, 0, 0, (read8_space_func)SMH_BANK(1), decocass_de0091_w);
-	memory_configure_bank(machine, 1, 0, 1, state->charram, 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user3"), 0);
-	memory_configure_bank_decrypted(machine, 1, 0, 1, &state->decrypted[0x6000], 0);
-	memory_configure_bank_decrypted(machine, 1, 1, 1, state->decrypted2, 0);
-	memory_set_bank(machine, 1, 0);
+	memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0xafff, 0, 0, "bank1");
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0xafff, 0, 0, decocass_de0091_w);
+	memory_configure_bank(machine, "bank1", 0, 1, state->charram, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user3"), 0);
+	memory_configure_bank_decrypted(machine, "bank1", 0, 1, &state->decrypted[0x6000], 0);
+	memory_configure_bank_decrypted(machine, "bank1", 1, 1, state->decrypted2, 0);
+	memory_set_bank(machine, "bank1", 0);
 
 	/* install the bank selector */
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe900, 0xe900, 0, 0, decocass_e900_w);

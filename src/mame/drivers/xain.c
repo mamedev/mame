@@ -231,12 +231,12 @@ static TIMER_DEVICE_CALLBACK( xain_scanline )
 static WRITE8_HANDLER( xainCPUA_bankswitch_w )
 {
 	xain_pri = data & 0x7;
-	memory_set_bank(space->machine, 1, (data >> 3) & 1);
+	memory_set_bank(space->machine, "bank1", (data >> 3) & 1);
 }
 
 static WRITE8_HANDLER( xainCPUB_bankswitch_w )
 {
-	memory_set_bank(space->machine, 2, data & 1);
+	memory_set_bank(space->machine, "bank2", data & 1);
 }
 
 static WRITE8_HANDLER( xain_sound_command_w )
@@ -315,7 +315,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3a0f, 0x3a0f) AM_WRITE(xainCPUA_bankswitch_w)
 	AM_RANGE(0x3c00, 0x3dff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3e00, 0x3fff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -324,7 +324,7 @@ static ADDRESS_MAP_START( cpu_map_B, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(xain_irqA_assert_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(xain_irqB_clear_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(xainCPUB_bankswitch_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(2)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -469,10 +469,10 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( xsleena )
 {
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x4000, 0xc000);
-	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "sub")  + 0x4000, 0xc000);
-	memory_set_bank(machine, 1, 0);
-	memory_set_bank(machine, 2, 0);
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x4000, 0xc000);
+	memory_configure_bank(machine, "bank2", 0, 2, memory_region(machine, "sub")  + 0x4000, 0xc000);
+	memory_set_bank(machine, "bank1", 0);
+	memory_set_bank(machine, "bank2", 0);
 }
 
 static MACHINE_DRIVER_START( xsleena )

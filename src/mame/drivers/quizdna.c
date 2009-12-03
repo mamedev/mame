@@ -30,20 +30,20 @@ WRITE8_HANDLER( paletteram_xBGR_RRRR_GGGG_BBBB_w );
 static WRITE8_HANDLER( quizdna_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine, 1,&ROM[0x10000+0x4000*(data & 0x3f)]);
+	memory_set_bankptr(space->machine, "bank1",&ROM[0x10000+0x4000*(data & 0x3f)]);
 }
 
 static WRITE8_HANDLER( gekiretu_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine, 1,&ROM[0x10000+0x4000*((data & 0x3f) ^ 0x0a)]);
+	memory_set_bankptr(space->machine, "bank1",&ROM[0x10000+0x4000*((data & 0x3f) ^ 0x0a)]);
 }
 
 /****************************************************************************/
 
 static ADDRESS_MAP_START( quizdna_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(quizdna_fg_ram_w)
 	AM_RANGE(0xa000, 0xbfff) AM_WRITE(quizdna_bg_ram_w)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -54,7 +54,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gekiretu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(quizdna_fg_ram_w)
 	AM_RANGE(0xa000, 0xbfff) AM_WRITE(quizdna_bg_ram_w)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM

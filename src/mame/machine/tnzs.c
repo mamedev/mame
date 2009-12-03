@@ -546,7 +546,7 @@ DRIVER_INIT( kabukiz )
 	UINT8 *SOUND = memory_region(machine, "audiocpu");
 	state->mcu_type = MCU_NONE_KABUKIZ;
 
-	memory_configure_bank(machine, 3, 0, 8, &SOUND[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank3", 0, 8, &SOUND[0x10000], 0x4000);
 }
 
 DRIVER_INIT( insectx )
@@ -670,11 +670,11 @@ MACHINE_START( tnzs )
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	UINT8 *SUB = memory_region(machine, "sub");
 
-	memory_configure_bank(machine, 1, 0, 8, &ROM[0x10000], 0x4000);
-	memory_configure_bank(machine, 2, 0, 4, &SUB[0x10000], 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank2", 0, 4, &SUB[0x10000], 0x2000);
 
-	memory_set_bank(machine, 1, 2);
-	memory_set_bank(machine, 2, 0);
+	memory_set_bank(machine, "bank1", 2);
+	memory_set_bank(machine, "bank2", 0);
 
 	state->audiocpu = devtag_get_device(machine, "audiocpu");
 	state->mcu = devtag_get_device(machine, "mcu");
@@ -700,8 +700,8 @@ MACHINE_START( jpopnics )
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	UINT8 *SUB = memory_region(machine, "sub");
 
-	memory_configure_bank(machine, 1, 0, 8, &ROM[0x10000], 0x4000);
-	memory_configure_bank(machine, 2, 0, 4, &SUB[0x10000], 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank2", 0, 4, &SUB[0x10000], 0x2000);
 
 	state->mcu = NULL;
 
@@ -720,7 +720,7 @@ WRITE8_HANDLER( tnzs_bankswitch_w )
 		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* bits 0-2 select RAM/ROM bank */
-	memory_set_bank(space->machine, 1, data & 0x07);
+	memory_set_bank(space->machine, "bank1", data & 0x07);
 }
 
 WRITE8_HANDLER( tnzs_bankswitch1_w )
@@ -771,5 +771,5 @@ WRITE8_HANDLER( tnzs_bankswitch1_w )
 	}
 
 	/* bits 0-1 select ROM bank */
-	memory_set_bank(space->machine, 2, data & 0x03);
+	memory_set_bank(space->machine, "bank2", data & 0x03);
 }

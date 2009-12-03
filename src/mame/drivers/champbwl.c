@@ -179,7 +179,7 @@ static WRITE8_HANDLER( champbwl_misc_w )
 	coin_lockout_w(space->machine, 0, ~data & 8);
 	coin_lockout_w(space->machine, 1, ~data & 4);
 
-	memory_set_bank(space->machine, 1, (data & 0x30) >> 4);
+	memory_set_bank(space->machine, "bank1", (data & 0x30) >> 4);
 }
 
 static WRITE8_HANDLER( champbwl_objctrl_w )
@@ -193,7 +193,7 @@ static WRITE8_HANDLER( champbwl_objctrl_w )
 
 static ADDRESS_MAP_START( champbwl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x10000)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_MEMBER(tnzs_state, objram)
 	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("x1snd", seta_sound_r, seta_sound_w)
@@ -337,7 +337,7 @@ static MACHINE_START( champbwl )
 
 	state->mcu = NULL;
 
-	memory_configure_bank(machine, 1, 0, 4, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 
 	state_save_register_global(machine, state->screenflip);
 	state_save_register_global_array(machine, state->last_trackball_val);

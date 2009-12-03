@@ -101,25 +101,19 @@ const pia6821_interface atarixl_pia_interface =
 
 void a600xl_mmu(running_machine *machine, UINT8 new_mmu)
 {
-	read8_space_func rbank2;
-	write8_space_func wbank2;
-
 	/* check if self-test ROM changed */
 	if ( new_mmu & 0x80 )
 	{
 		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
-		rbank2 = (read8_space_func)SMH_NOP;
-		wbank2 = (write8_space_func)SMH_NOP;
+		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, (read8_space_func)SMH_NOP, (write8_space_func)SMH_NOP);
 	}
 	else
 	{
 		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
-		rbank2 = (read8_space_func)SMH_BANK(2);
-		wbank2 = (write8_space_func)SMH_UNMAP;
+		memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
+		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, (write8_space_func)SMH_UNMAP);
+		memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu") + 0x5000);
 	}
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
-	if (rbank2 == (read8_space_func)SMH_BANK(2))
-		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x5000);
 }
 
 

@@ -736,7 +736,7 @@ static WRITE8_DEVICE_HANDLER( kabukiz_sound_bank_w )
 {
 	// to avoid the write when the sound chip is initialized
 	if (data != 0xff)
-		memory_set_bank(device->machine, 3, data & 0x07);
+		memory_set_bank(device->machine, "bank3", data & 0x07);
 }
 
 static WRITE8_DEVICE_HANDLER( kabukiz_sample_w )
@@ -748,7 +748,7 @@ static WRITE8_DEVICE_HANDLER( kabukiz_sample_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)	/* ROM + RAM */
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")	/* ROM + RAM */
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(tnzs_state, objram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, vdcram)
@@ -764,7 +764,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu0_type2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)	/* ROM + RAM */
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")	/* ROM + RAM */
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(tnzs_state, objram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, vdcram)
@@ -778,7 +778,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(2)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tnzs_bankswitch1_w)
 	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xc000, 0xc001) AM_READWRITE(tnzs_mcu_r, tnzs_mcu_w)	/* not present in insectx */
@@ -791,7 +791,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kageki_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(2)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tnzs_bankswitch1_w)
 	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
@@ -812,7 +812,7 @@ static WRITE8_HANDLER( tnzsb_sound_command_w )
 
 static ADDRESS_MAP_START( tnzsb_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(2)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tnzs_bankswitch1_w)
 	AM_RANGE(0xb002, 0xb002) AM_READ_PORT("DSWA")
 	AM_RANGE(0xb003, 0xb003) AM_READ_PORT("DSWB")
@@ -828,7 +828,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kabukiz_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(2)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tnzs_bankswitch1_w)
 	AM_RANGE(0xb002, 0xb002) AM_READ_PORT("DSWA")
 	AM_RANGE(0xb003, 0xb003) AM_READ_PORT("DSWB")
@@ -848,7 +848,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kabukiz_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(3)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -886,7 +886,7 @@ static WRITE8_HANDLER( jpopnics_palette_w )
 
 static ADDRESS_MAP_START( jpopnics_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(tnzs_state, objram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1) /* WORK RAM (shared by the 2 z80's) */
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, vdcram) 	/* VDC RAM */
@@ -900,12 +900,12 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( jpopnics_subbankswitch_w )
 {
 	/* bits 0-1 select ROM bank */
-	memory_set_bank(space->machine, 2, data & 0x03);
+	memory_set_bank(space->machine, "bank2", data & 0x03);
 }
 
 static ADDRESS_MAP_START( jpopnics_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(SMH_BANK(2), SMH_ROM)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")
 
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(jpopnics_subbankswitch_w)
 	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)

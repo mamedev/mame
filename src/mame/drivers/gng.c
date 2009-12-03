@@ -31,9 +31,9 @@ Notes:
 static WRITE8_HANDLER( gng_bankswitch_w )
 {
 	if (data == 4)
-		memory_set_bank(space->machine, 1, 4);
+		memory_set_bank(space->machine, "bank1", 4);
 	else
-		memory_set_bank(space->machine, 1, (data & 0x03));
+		memory_set_bank(space->machine, "bank1", (data & 0x03));
 }
 
 static WRITE8_HANDLER( gng_coin_counter_w )
@@ -61,7 +61,7 @@ static ADDRESS_MAP_START( gng_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  { 0x3d01, 0x3d01, reset sound cpu?
 	AM_RANGE(0x3d02, 0x3d03) AM_WRITE(gng_coin_counter_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(gng_bankswitch_w)
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -306,8 +306,8 @@ static MACHINE_START( gng )
 	gng_state *state = (gng_state *)machine->driver_data;
 
 	UINT8 *rombase = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 4, &rombase[0x10000], 0x2000);
-	memory_configure_bank(machine, 1, 4, 1, &rombase[0x4000], 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 4, &rombase[0x10000], 0x2000);
+	memory_configure_bank(machine, "bank1", 4, 1, &rombase[0x4000], 0x2000);
 
 	state_save_register_global_array(machine, state->scrollx);
 	state_save_register_global_array(machine, state->scrolly);

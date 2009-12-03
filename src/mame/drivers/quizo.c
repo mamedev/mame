@@ -112,13 +112,13 @@ static WRITE8_HANDLER(port60_w)
 		data=0;
 	}
 	port60=data;
-	memory_set_bankptr(space->machine,  1, &memory_region(space->machine, "user1")[rombankLookup[data]*0x4000] );
+	memory_set_bankptr(space->machine,  "bank1", &memory_region(space->machine, "user1")[rombankLookup[data]*0x4000] );
 }
 
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_WRITE(vram_w)
 
 ADDRESS_MAP_END

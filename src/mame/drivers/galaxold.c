@@ -541,7 +541,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( _4in1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(1)	/* banked game code */
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")	/* banked game code */
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
 	AM_RANGE(0x5400, 0x57ff) AM_READ(galaxold_videoram_r)

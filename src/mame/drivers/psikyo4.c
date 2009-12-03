@@ -347,7 +347,7 @@ static WRITE32_HANDLER( ps4_vidregs_w )
 		if (ACCESSING_BITS_0_15)	// Bank
 		{
 			UINT8 *ROM = memory_region(space->machine, "gfx1");
-			memory_set_bankptr(space->machine, 2,&ROM[0x2000 * (psikyo4_vidregs[offset]&0x1fff)]); /* Bank comes from vidregs */
+			memory_set_bankptr(space->machine, "bank2",&ROM[0x2000 * (psikyo4_vidregs[offset]&0x1fff)]); /* Bank comes from vidregs */
 		}
 	}
 #endif
@@ -393,7 +393,7 @@ static WRITE32_HANDLER( hotgmck_pcm_bank_w )
 
 static ADDRESS_MAP_START( ps4_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM		// program ROM (1 meg)
-	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK(1) // data ROM
+	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK("bank1") // data ROM
 	AM_RANGE(0x03000000, 0x030037ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x03003fe0, 0x03003fe3) AM_READWRITE(ps4_eeprom_r,ps4_eeprom_w)
 	AM_RANGE(0x03003fe4, 0x03003fe7) AM_READNOP // also writes to this address - might be vblank?
@@ -414,7 +414,7 @@ static ADDRESS_MAP_START( ps4_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 #if ROMTEST
 	AM_RANGE(0x05000004, 0x05000007) AM_READ(ps4_sample_r) // data for rom tests (Used to verify Sample rom)
-	AM_RANGE(0x03006000, 0x03007fff) AM_ROMBANK(2) // data for rom tests (gfx), data is controlled by vidreg
+	AM_RANGE(0x03006000, 0x03007fff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
 #endif
 ADDRESS_MAP_END
 
@@ -1053,7 +1053,7 @@ static void install_hotgmck_pcm_bank(running_machine *machine)
 static DRIVER_INIT( hotgmck )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, 1, &RAM[0x100000]);
+	memory_set_bankptr(machine, "bank1", &RAM[0x100000]);
 	install_hotgmck_pcm_bank(machine);	// Banked PCM ROM
 }
 

@@ -246,7 +246,7 @@ static WRITE8_HANDLER( z80ctrl_w )
 {
 	rng_z80_control = data;
 
-	memory_set_bankptr(space->machine, 2, memory_region(space->machine, "soundcpu") + 0x10000 + (data & 0x07) * 0x4000);
+	memory_set_bankptr(space->machine, "bank2", memory_region(space->machine, "soundcpu") + 0x10000 + (data & 0x07) * 0x4000);
 
 	if (data & 0x10)
 		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, CLEAR_LINE);
@@ -263,7 +263,7 @@ static INTERRUPT_GEN(audio_interrupt)
 
 static ADDRESS_MAP_START( rungun_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("konami1", k054539_r,k054539_w)
 	AM_RANGE(0xe230, 0xe3ff) AM_RAM

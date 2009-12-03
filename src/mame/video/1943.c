@@ -137,7 +137,7 @@ WRITE8_HANDLER( c1943_colorram_w )
 WRITE8_HANDLER( c1943_c804_w )
 {
 	_1943_state *state = (_1943_state *)space->machine->driver_data;
-	int bank, i;
+	int bank;
 
 	/* bits 0 and 1 are coin counters */
 	coin_counter_w(space->machine, 0, data & 0x01);
@@ -145,8 +145,10 @@ WRITE8_HANDLER( c1943_c804_w )
 
 	/* bits 2, 3 and 4 select the ROM bank */
 	bank = data & 0x1c;
-	for (i = 1; i < 5; i++)
-		memory_set_bank(space->machine, i, bank);
+	memory_set_bank(space->machine, "bank1", bank);
+	memory_set_bank(space->machine, "bank2", bank);
+	memory_set_bank(space->machine, "bank3", bank);
+	memory_set_bank(space->machine, "bank4", bank);
 
 	/* bit 5 resets the sound CPU - we ignore it */
 

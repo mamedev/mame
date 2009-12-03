@@ -668,7 +668,7 @@ static WRITE8_HANDLER( cpu0_bankswitch_w )
 {
 	unsigned char *RAM = memory_region(space->machine, "maincpu");
 	data ^= bankxor;
-	memory_set_bankptr(space->machine, 4,&RAM[0x10000]); /* unsure if/how this area is banked */
+	memory_set_bankptr(space->machine, "bank4",&RAM[0x10000]); /* unsure if/how this area is banked */
 	if( data < 4 )
 	{
 		RAM = &RAM[0x2000 * data];
@@ -677,7 +677,7 @@ static WRITE8_HANDLER( cpu0_bankswitch_w )
 	{
 		RAM = &RAM[0x10000 + 0x2000 * (data-4)];
 	}
-	memory_set_bankptr(space->machine, 1,RAM);
+	memory_set_bankptr(space->machine, "bank1",RAM);
 }
 
 /******************************************************************************/
@@ -695,20 +695,20 @@ static WRITE8_HANDLER( cpu1_bankswitch_w )
 	switch( data&0xf )
 	{
 	/* bs65.5y */
-	case 0x00: memory_set_bankptr(space->machine, 2,&RAM[0x00000]); break;
-	case 0x01: memory_set_bankptr(space->machine, 2,&RAM[0x04000]); break;
-	case 0x02: memory_set_bankptr(space->machine, 2,&RAM[0x10000]); break;
-	case 0x03: memory_set_bankptr(space->machine, 2,&RAM[0x14000]); break;
+	case 0x00: memory_set_bankptr(space->machine, "bank2",&RAM[0x00000]); break;
+	case 0x01: memory_set_bankptr(space->machine, "bank2",&RAM[0x04000]); break;
+	case 0x02: memory_set_bankptr(space->machine, "bank2",&RAM[0x10000]); break;
+	case 0x03: memory_set_bankptr(space->machine, "bank2",&RAM[0x14000]); break;
 
 	/* bs101.6w */
-	case 0x08: memory_set_bankptr(space->machine, 2,&RAM[0x18000]); break;
-	case 0x09: memory_set_bankptr(space->machine, 2,&RAM[0x1c000]); break;
-	case 0x0a: memory_set_bankptr(space->machine, 2,&RAM[0x20000]); break;
-	case 0x0b: memory_set_bankptr(space->machine, 2,&RAM[0x24000]); break;
-	case 0x0c: memory_set_bankptr(space->machine, 2,&RAM[0x28000]); break;
-	case 0x0d: memory_set_bankptr(space->machine, 2,&RAM[0x2c000]); break;
-	case 0x0e: memory_set_bankptr(space->machine, 2,&RAM[0x30000]); break;
-	case 0x0f: memory_set_bankptr(space->machine, 2,&RAM[0x34000]); break;
+	case 0x08: memory_set_bankptr(space->machine, "bank2",&RAM[0x18000]); break;
+	case 0x09: memory_set_bankptr(space->machine, "bank2",&RAM[0x1c000]); break;
+	case 0x0a: memory_set_bankptr(space->machine, "bank2",&RAM[0x20000]); break;
+	case 0x0b: memory_set_bankptr(space->machine, "bank2",&RAM[0x24000]); break;
+	case 0x0c: memory_set_bankptr(space->machine, "bank2",&RAM[0x28000]); break;
+	case 0x0d: memory_set_bankptr(space->machine, "bank2",&RAM[0x2c000]); break;
+	case 0x0e: memory_set_bankptr(space->machine, "bank2",&RAM[0x30000]); break;
+	case 0x0f: memory_set_bankptr(space->machine, "bank2",&RAM[0x34000]); break;
 
 	default:
 		break;
@@ -735,16 +735,16 @@ static WRITE8_HANDLER( cpu2_bankswitch_w )
 	{
 		RAM = &RAM[0x10000 + 0x4000 * (data - 3)];
 	}
-	memory_set_bankptr(space->machine, 3, RAM);
+	memory_set_bankptr(space->machine, "bank3", RAM);
 }
 
 /******************************************************************************/
 
 static ADDRESS_MAP_START( cpu0_am, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xafff) AM_ROMBANK(4)
+	AM_RANGE(0x8000, 0xafff) AM_ROMBANK("bank4")
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE( pandora_spriteram_r, pandora_spriteram_w )
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -759,7 +759,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_am, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(djboy_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(djboy_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd400, 0xd8ff) AM_RAM
@@ -782,7 +782,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_am, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(3)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 

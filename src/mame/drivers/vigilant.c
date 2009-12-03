@@ -39,7 +39,7 @@ static WRITE8_HANDLER( vigilant_bank_select_w )
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	bankaddress = 0x10000 + (data & 0x07) * 0x4000;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
 }
 
 /***************************************************************************
@@ -72,7 +72,7 @@ static WRITE8_HANDLER( kikcubic_coin_w )
 
 
 static ADDRESS_MAP_START( vigilant_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))		/* Fallthrough */
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")		/* Fallthrough */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc020, 0xc0df) AM_RAM_WRITE(SMH_RAM) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(vigilant_paletteram_w) AM_BASE_GENERIC(paletteram)
@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( vigilant_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kikcubic_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))		/* Fallthrough */
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")		/* Fallthrough */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(vigilant_paletteram_w) AM_BASE_GENERIC(paletteram)

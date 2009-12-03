@@ -395,7 +395,7 @@ static ADDRESS_MAP_START( zookeep_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(SMH_RAM) AM_BASE_MEMBER(qix_state, scanline_latch)
 	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE("vid_u18", mc6845_address_w)
 	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE("vid_u18", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -141,7 +141,7 @@ static READ8_HANDLER( sound_latch_status_r )
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(4)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
@@ -291,7 +291,7 @@ static WRITE8_DEVICE_HANDLER( ym2203_write_a )
 
 static WRITE8_DEVICE_HANDLER( ym2203_write_b )
 {
-	memory_set_bank(device->machine, 4, data & 0x0f);
+	memory_set_bank(device->machine, "bank4", data & 0x0f);
 }
 
 static const ym2203_interface ym2203_config =
@@ -471,9 +471,9 @@ ROM_END
 static DRIVER_INIT( ashnojoe )
 {
 	UINT8 *ROM = memory_region(machine, "adpcm");
-	memory_configure_bank(machine, 4, 0, 16, &ROM[0x00000], 0x8000);
+	memory_configure_bank(machine, "bank4", 0, 16, &ROM[0x00000], 0x8000);
 
-	memory_set_bank(machine, 4, 0);
+	memory_set_bank(machine, "bank4", 0);
 }
 
 GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe, ROT0, "WAVE / Taito Corporation", "Success Joe (World)",   GAME_SUPPORTS_SAVE )

@@ -70,12 +70,12 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( go2000_pcm_1_bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x07);
+	memory_set_bank(space->machine, "bank1", data & 0x07);
 }
 
 static ADDRESS_MAP_START( go2000_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x0400, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x0400, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( go2000_sound_io, ADDRESS_SPACE_IO, 8 )
@@ -308,9 +308,9 @@ static MACHINE_START( go2000 )
 	int i;
 
 	for (i = 0; i < 8; i++)
-		memory_configure_bank(machine, 1, i, 1, &SOUND[0x00400 + i * 0x10000], 0x10000 - 0x400);
+		memory_configure_bank(machine, "bank1", i, 1, &SOUND[0x00400 + i * 0x10000], 0x10000 - 0x400);
 
-	memory_set_bank(machine, 1, 0);
+	memory_set_bank(machine, "bank1", 0);
 
 	state->soundcpu = devtag_get_device(machine, "soundcpu");
 }

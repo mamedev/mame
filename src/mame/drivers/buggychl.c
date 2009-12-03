@@ -92,7 +92,7 @@ Dip locations and factory settings verified from dip listing
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bankptr(space->machine, 1,&memory_region(space->machine, "maincpu")[0x10000 + (data & 7) * 0x2000]);
+	memory_set_bankptr(space->machine, "bank1",&memory_region(space->machine, "maincpu")[0x10000 + (data & 7) * 0x2000]);
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -141,7 +141,7 @@ static ADDRESS_MAP_START( buggychl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* 6116 SRAM (36) */
 	AM_RANGE(0x8800, 0x8fff) AM_RAM /* 6116 SRAM (35) */
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(buggychl_sprite_lookup_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1) AM_WRITE(buggychl_chargen_w) AM_BASE_MEMBER(buggychl_state, charram)
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1") AM_WRITE(buggychl_chargen_w) AM_BASE_MEMBER(buggychl_state, charram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE_SIZE_MEMBER(buggychl_state, videoram, videoram_size)
 	AM_RANGE(0xd100, 0xd100) AM_WRITE(buggychl_ctrl_w)
 	AM_RANGE(0xd200, 0xd200) AM_WRITE(bankswitch_w)

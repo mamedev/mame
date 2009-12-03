@@ -152,10 +152,10 @@ static void machine_init(running_machine *machine)
 		cur_rambank[i] = 0x80;
 		current_base[i] = palette_ram;
 		current_notifier[i] = palette_notifier;
-		memory_set_bankptr(machine, 2+i, current_base[i]);
+		memory_set_bankptr(machine, "bank2"+i, current_base[i]);
 	}
 	cur_rombank = cur_rombank2 = 0;
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x10000);
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x10000);
 
 	gfx_element_set_source(machine->gfx[2], taitol_rambanks);
 
@@ -336,7 +336,7 @@ static WRITE8_HANDLER( rombankswitch_w )
 
 //      logerror("robs %d, %02x (%04x)\n", offset, data, cpu_get_pc(space->cpu));
 		cur_rombank = data;
-		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu")+0x10000+0x2000*cur_rombank);
+		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu")+0x10000+0x2000*cur_rombank);
 	}
 }
 
@@ -355,7 +355,7 @@ static WRITE8_HANDLER( rombank2switch_w )
 //      logerror("robs2 %02x (%04x)\n", data, cpu_get_pc(space->cpu));
 
 		cur_rombank2 = data;
-		memory_set_bankptr(space->machine, 6, memory_region(space->machine, "slave")+0x10000+0x4000*cur_rombank2);
+		memory_set_bankptr(space->machine, "bank6", memory_region(space->machine, "slave")+0x10000+0x4000*cur_rombank2);
 	}
 }
 
@@ -392,7 +392,7 @@ logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, cpu_get_pc(spa
 			current_notifier[offset] = 0;
 			current_base[offset] = empty_ram;
 		}
-		memory_set_bankptr(space->machine, 2+offset, current_base[offset]);
+		memory_set_bankptr(space->machine, "bank2"+offset, current_base[offset]);
 	}
 }
 
@@ -640,11 +640,11 @@ static READ8_HANDLER( horshoes_trackx_hi_r )
 
 #define COMMON_BANKS_MAP \
 	AM_RANGE(0x0000, 0x5fff) AM_ROM			\
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1) 			\
-	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK(2) AM_WRITE(bank0_w) \
-	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK(3) AM_WRITE(bank1_w) \
-	AM_RANGE(0xe000, 0xefff) AM_ROMBANK(4) AM_WRITE(bank2_w) \
-	AM_RANGE(0xf000, 0xfdff) AM_ROMBANK(5) AM_WRITE(bank3_w) \
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1") 			\
+	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank2") AM_WRITE(bank0_w) \
+	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK("bank3") AM_WRITE(bank1_w) \
+	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank4") AM_WRITE(bank2_w) \
+	AM_RANGE(0xf000, 0xfdff) AM_ROMBANK("bank5") AM_WRITE(bank3_w) \
 	AM_RANGE(0xfe00, 0xfe03) AM_READWRITE(taitol_bankc_r, taitol_bankc_w)		\
 	AM_RANGE(0xfe04, 0xfe04) AM_READWRITE(taitol_control_r, taitol_control_w)	\
 	AM_RANGE(0xff00, 0xff02) AM_READWRITE(irq_adr_r, irq_adr_w)			\
@@ -666,7 +666,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fhawk_2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(6)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
 	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_WRITE(taitosound_port_w)
 	AM_RANGE(0xc801, 0xc801) AM_READWRITE(taitosound_comm_r, taitosound_comm_w)
@@ -682,7 +682,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fhawk_3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(7)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READNOP AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe001, 0xe001) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
@@ -712,12 +712,12 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 	UINT8 *RAM = memory_region(space->machine, "audiocpu");
 	int banknum = (data - 1) & 3;
 
-	memory_set_bankptr (space->machine, 7, &RAM [0x10000 + (banknum * 0x4000)]);
+	memory_set_bankptr (space->machine, "bank7", &RAM [0x10000 + (banknum * 0x4000)]);
 }
 
 static ADDRESS_MAP_START( raimais_3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(7)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_WRITE(taitosound_slave_port_w)
@@ -738,7 +738,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( champwr_2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(6)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(shared_r, shared_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSWA") AM_WRITENOP	// Watchdog
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSWB")
@@ -754,7 +754,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( champwr_3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(7)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_WRITE(taitosound_slave_port_w)
@@ -888,7 +888,7 @@ static ADDRESS_MAP_START( evilston_2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(shared_r, shared_w)
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK(7)
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank7")
 ADDRESS_MAP_END
 
 
@@ -1890,7 +1890,7 @@ static WRITE8_DEVICE_HANDLER( portA_w )
 
 		cur_bank = data & 0x03;
 		bankaddress = 0x10000 + (cur_bank-1) * 0x4000;
-		memory_set_bankptr(device->machine, 7, &RAM[bankaddress]);
+		memory_set_bankptr(device->machine, "bank7", &RAM[bankaddress]);
 		//logerror ("YM2203 bank change val=%02x  pc=%04x\n", cur_bank, cpu_get_pc(space->cpu) );
 	}
 }

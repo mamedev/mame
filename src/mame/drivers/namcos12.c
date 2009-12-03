@@ -992,7 +992,7 @@ static WRITE32_HANDLER( bankoffset_w )
 		m_n_bankoffset = data;
 	}
 
-	memory_set_bank(space->machine,  1, m_n_bankoffset );
+	memory_set_bank(space->machine,  "bank1", m_n_bankoffset );
 
 	verboselog( space->machine, 1, "bankoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_bankoffset );
 }
@@ -1103,7 +1103,7 @@ static ADDRESS_MAP_START( namcos12_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801c00, 0x1f801dff) AM_NOP
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
-	AM_RANGE(0x1fa00000, 0x1fbfffff) AM_ROMBANK(1) /* banked roms */
+	AM_RANGE(0x1fa00000, 0x1fbfffff) AM_ROMBANK("bank1") /* banked roms */
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_SHARE(2) AM_REGION("user1", 0) /* bios */
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE(1) /* ram mirror */
 	AM_RANGE(0x9fc00000, 0x9fffffff) AM_ROM AM_SHARE(2) /* bios mirror */
@@ -1164,12 +1164,12 @@ static UINT8 kcram[ 12 ];
 
 static WRITE32_HANDLER( kcoff_w )
 {
-	memory_set_bankptr(space->machine,  2, memory_region( space->machine, "user1" ) + 0x20280 );
+	memory_set_bankptr(space->machine,  "bank2", memory_region( space->machine, "user1" ) + 0x20280 );
 }
 
 static WRITE32_HANDLER( kcon_w )
 {
-	memory_set_bankptr(space->machine,  2, kcram );
+	memory_set_bankptr(space->machine,  "bank2", kcram );
 }
 
 static int ttt_cnt;
@@ -1260,12 +1260,12 @@ static MACHINE_RESET( namcos12 )
 		strcmp( machine->gamedrv->name, "ghlpanic" ) == 0 )
 	{
 		/* this is based on guesswork, it might not even be keycus. */
-		memory_install_read32_handler (space, 0x1fc20280, 0x1fc2028b, 0, 0, (read32_space_func)SMH_BANK(2) );
+		memory_install_read_bank_handler (space, 0x1fc20280, 0x1fc2028b, 0, 0, "bank2" );
 		memory_install_write32_handler(space, 0x1f008000, 0x1f008003, 0, 0, kcon_w );
 		memory_install_write32_handler(space, 0x1f018000, 0x1f018003, 0, 0, kcoff_w );
 
 		memset( kcram, 0, sizeof( kcram ) );
-		memory_set_bankptr(space->machine,  2, kcram );
+		memory_set_bankptr(space->machine,  "bank2", kcram );
 	}
 }
 
@@ -1461,7 +1461,7 @@ static DRIVER_INIT( namcos12 )
 
 	psx_dma_install_read_handler( 5, namcos12_rom_read );
 
-	memory_configure_bank(machine,  1, 0, memory_region_length( machine, "user2" ) / 0x200000, memory_region( machine, "user2" ), 0x200000 );
+	memory_configure_bank(machine,  "bank1", 0, memory_region_length( machine, "user2" ) / 0x200000, memory_region( machine, "user2" ), 0x200000 );
 
 	s12_porta = 0;
 	s12_rtcstate = 0;
@@ -1474,7 +1474,7 @@ static DRIVER_INIT( namcos12 )
 	m_n_dmaoffset = 0;
 	m_n_dmabias = 0;
 	m_n_bankoffset = 0;
-	memory_set_bank(machine,  1, 0 );
+	memory_set_bank(machine,  "bank1", 0 );
 
 	state_save_register_global(machine,  m_n_dmaoffset );
 	state_save_register_global(machine,  m_n_dmabias );

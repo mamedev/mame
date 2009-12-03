@@ -232,7 +232,7 @@ static WRITE16_HANDLER(ml_output_w)
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
 	data=0;
-	memory_set_bankptr(device->machine,  1, memory_region(device->machine, "audiocpu") + ((data) & 0x03) * 0x4000 + 0x10000 );
+	memory_set_bankptr(device->machine,  "bank1", memory_region(device->machine, "audiocpu") + ((data) & 0x03) * 0x4000 + 0x10000 );
 }
 
 static void ml_msm5205_vck(const device_config *device)
@@ -490,7 +490,7 @@ static WRITE8_HANDLER( ml_msm_start_msb_w )
 
 static ADDRESS_MAP_START( mlanding_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_MIRROR(0x00fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xa000, 0xa001) AM_WRITE(ml_sound_to_main_w)

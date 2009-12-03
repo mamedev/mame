@@ -37,12 +37,12 @@ WRITE8_HANDLER( metlclsh_rambank_w )
 	if (data & 1)
 	{
 		metlclsh_write_mask = 0;
-		memory_set_bankptr(space->machine, 1, metlclsh_bgram);
+		memory_set_bankptr(space->machine, "bank1", metlclsh_bgram);
 	}
 	else
 	{
 		metlclsh_write_mask = 1 << (data >> 1);
-		memory_set_bankptr(space->machine, 1, metlclsh_otherram);
+		memory_set_bankptr(space->machine, "bank1", metlclsh_otherram);
 	}
 }
 

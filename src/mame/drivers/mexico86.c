@@ -69,7 +69,7 @@ static READ8_DEVICE_HANDLER( kiki_ym2203_r )
 
 static ADDRESS_MAP_START( mexico86_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)  	 				/* banked roms */
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")  	 				/* banked roms */
 	AM_RANGE(0xc000, 0xe7ff) AM_RAM AM_SHARE(1)  				/* shared with sound cpu */
 	AM_RANGE(0xd500, 0xd7ff) AM_RAM AM_BASE(&mexico86_objectram) AM_SIZE(&mexico86_objectram_size)
 	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE(&mexico86_protection_ram)  /* shared with mcu */

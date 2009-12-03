@@ -50,7 +50,7 @@ static WRITE8_HANDLER( sichuan2_coin_w )
 
 static ADDRESS_MAP_START( shisen_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(sichuan2_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(sichuan2_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM

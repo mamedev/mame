@@ -461,7 +461,7 @@ static WRITE32_HANDLER( psikyosh_vidregs_w )
 		if (ACCESSING_BITS_0_15)	// Bank
 		{
 			UINT8 *ROM = memory_region(space->machine, "gfx1");
-			memory_set_bankptr(space->machine, 2,&ROM[0x20000 * (psikyosh_vidregs[offset]&0xfff)]); /* Bank comes from vidregs */
+			memory_set_bankptr(space->machine, "bank2",&ROM[0x20000 * (psikyosh_vidregs[offset]&0xfff)]); /* Bank comes from vidregs */
 		}
 	}
 #endif
@@ -481,7 +481,7 @@ static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 
 static ADDRESS_MAP_START( ps3v1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM					// program ROM (1 meg)
-	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK(1) // data ROM
+	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK("bank1") // data ROM
 	AM_RANGE(0x03000000, 0x03003fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// sprites (might be a bit longer)
 	AM_RANGE(0x03004000, 0x0300ffff) AM_RAM AM_BASE(&psikyosh_bgram) // backgrounds
 	AM_RANGE(0x03040000, 0x03044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_GENERIC(paletteram) // palette..
@@ -496,8 +496,8 @@ static ADDRESS_MAP_START( ps3v1_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 #if ROMTEST
 	AM_RANGE(0x05000004, 0x05000007) AM_READ(psh_sample_r) // data for rom tests (Used to verify Sample rom)
-	AM_RANGE(0x03060000, 0x0307ffff) AM_ROMBANK(2) // data for rom tests (gfx), data is controlled by vidreg
-	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK(2) // data for rom tests (gfx) (Mirrored?)
+	AM_RANGE(0x03060000, 0x0307ffff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
+	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK("bank2") // data for rom tests (gfx) (Mirrored?)
 #endif
 ADDRESS_MAP_END
 
@@ -513,12 +513,12 @@ static ADDRESS_MAP_START( ps5_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04050000, 0x040501ff) AM_RAM AM_BASE(&psikyosh_zoomram)
 	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_READNOP AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
 	AM_RANGE(0x0405ffe0, 0x0405ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_BASE(&psikyosh_vidregs) // video registers
-	AM_RANGE(0x05000000, 0x0507ffff) AM_ROMBANK(1) // data ROM
+	AM_RANGE(0x05000000, 0x0507ffff) AM_ROMBANK("bank1") // data ROM
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM  AM_BASE(&psh_ram)
 
 #if ROMTEST
 	AM_RANGE(0x03100004, 0x03100007) AM_READ(psh_sample_r) // data for rom tests (Used to verify Sample rom)
-	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK(2) // data for rom tests (gfx), data is controlled by vidreg
+	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
 #endif
 ADDRESS_MAP_END
 
@@ -1080,7 +1080,7 @@ static DRIVER_INIT( s1945ii )
 static DRIVER_INIT( daraku )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, 1, &RAM[0x100000]);
+	memory_set_bankptr(machine, "bank1", &RAM[0x100000]);
 	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom = eeprom_DARAKU;
 }
@@ -1094,7 +1094,7 @@ static DRIVER_INIT( sbomberb )
 static DRIVER_INIT( gunbird2 )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, 1, &RAM[0x100000]);
+	memory_set_bankptr(machine, "bank1", &RAM[0x100000]);
 	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom = eeprom_DEFAULT;
 }
@@ -1102,7 +1102,7 @@ static DRIVER_INIT( gunbird2 )
 static DRIVER_INIT( s1945iii )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, 1, &RAM[0x100000]);
+	memory_set_bankptr(machine, "bank1", &RAM[0x100000]);
 	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom = eeprom_S1945III;
 }

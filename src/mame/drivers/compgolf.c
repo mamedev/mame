@@ -45,7 +45,7 @@ static WRITE8_HANDLER( compgolf_ctrl_w )
 	if (state->bank != new_bank)
 	{
 		state->bank = new_bank;
-		memory_set_bank(space->machine, 1, state->bank);
+		memory_set_bank(space->machine, "bank1", state->bank);
 	}
 
 	state->scrollx_hi = (data & 1) << 8;
@@ -70,7 +70,7 @@ static ADDRESS_MAP_START( compgolf_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3800, 0x3801) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -365,7 +365,7 @@ static void compgolf_expand_bg(running_machine *machine)
 
 static DRIVER_INIT( compgolf )
 {
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "user1"), 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "user1"), 0x4000);
 	compgolf_expand_bg(machine);
 }
 

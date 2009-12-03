@@ -193,7 +193,7 @@ static WRITE8_HANDLER( bg2_w )
 	if (state->bgadr > 2)
 		state->bgadr = 0;
 
-	memory_set_bank(space->machine, 1, state->bgadr);
+	memory_set_bank(space->machine, "bank1", state->bgadr);
 }
 
 static WRITE8_HANDLER( sound_w )
@@ -243,7 +243,7 @@ static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE_MEMBER(ddayjlc_state, spriteram)
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(ddayjlc_videoram_w) AM_BASE_MEMBER(ddayjlc_state, videoram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(ddayjlc_bgram_w) AM_BASE_MEMBER(ddayjlc_state, bgram) /* 9800-981f - videoregs */
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK(1) AM_WRITENOP
+	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1") AM_WRITENOP
 	AM_RANGE(0xe000, 0xe003) AM_WRITE(i8257_CH0_w)
 	AM_RANGE(0xe008, 0xe008) AM_WRITENOP
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_w)
@@ -655,8 +655,8 @@ static DRIVER_INIT( ddayjlc )
 		free(temp);
 	}
 
-	memory_configure_bank(machine, 1, 0, 3, memory_region(machine, "user1"), 0x4000);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 3, memory_region(machine, "user1"), 0x4000);
+	memory_set_bank(machine, "bank1", 0);
 }
 
 GAME( 1984, ddayjlc,  0,       ddayjlc, ddayjlc, ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 1)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

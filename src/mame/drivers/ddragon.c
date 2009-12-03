@@ -150,7 +150,7 @@ static MACHINE_START( ddragon )
 	ddragon_state *state = (ddragon_state *)machine->driver_data;
 
 	/* configure banks */
-	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->sub_cpu = devtag_get_device(machine, "sub");
@@ -204,7 +204,7 @@ static WRITE8_HANDLER( ddragon_bankswitch_w )
 	else if (state->dd_sub_cpu_busy == 0)
 		cpu_set_input_line(state->sub_cpu, state->sprite_irq, (state->sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
-	memory_set_bank(space->machine, 1, (data & 0xe0) >> 5);
+	memory_set_bank(space->machine, "bank1", (data & 0xe0) >> 5);
 }
 
 
@@ -219,7 +219,7 @@ static WRITE8_HANDLER( toffy_bankswitch_w )
 	/* bit 3 unknown */
 
 	/* I don't know ... */
-	memory_set_bank(space->machine, 1, (data & 0x20) >> 5);
+	memory_set_bank(space->machine, "bank1", (data & 0x20) >> 5);
 }
 
 
@@ -268,7 +268,7 @@ static WRITE8_HANDLER( darktowr_mcu_bank_w )
 static WRITE8_HANDLER( darktowr_bankswitch_w )
 {
 	ddragon_state *state = (ddragon_state *)space->machine->driver_data;
-	int oldbank = memory_get_bank(space->machine, 1);
+	int oldbank = memory_get_bank(space->machine, "bank1");
 	int newbank = (data & 0xe0) >> 5;
 
 	state->scrollx_hi = (data & 0x01);
@@ -283,11 +283,11 @@ static WRITE8_HANDLER( darktowr_bankswitch_w )
 	else if (state->dd_sub_cpu_busy == 0)
 		cpu_set_input_line(state->sub_cpu, state->sprite_irq, (state->sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
-	memory_set_bank(space->machine, 1, newbank);
+	memory_set_bank(space->machine, "bank1", newbank);
 	if (newbank == 4 && oldbank != 4)
 		memory_install_readwrite8_handler(space, 0x4000, 0x7fff, 0, 0, darktowr_mcu_bank_r, darktowr_mcu_bank_w);
 	else if (newbank != 4 && oldbank == 4)
-		memory_install_readwrite8_handler(space, 0x4000, 0x7fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
+		memory_install_readwrite_bank_handler(space, 0x4000, 0x7fff, 0, 0, "bank1");
 }
 
 
@@ -518,7 +518,7 @@ static ADDRESS_MAP_START( ddragon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3809, 0x3809) AM_WRITEONLY AM_BASE_MEMBER(ddragon_state, scrollx_lo)
 	AM_RANGE(0x380a, 0x380a) AM_WRITEONLY AM_BASE_MEMBER(ddragon_state, scrolly_lo)
 	AM_RANGE(0x380b, 0x380f) AM_WRITE(ddragon_interrupt_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -539,7 +539,7 @@ static ADDRESS_MAP_START( dd2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x380b, 0x380f) AM_WRITE(ddragon_interrupt_w)
 	AM_RANGE(0x3c00, 0x3dff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3e00, 0x3fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

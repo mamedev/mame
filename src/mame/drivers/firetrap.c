@@ -73,7 +73,7 @@ static WRITE8_HANDLER( firetrap_nmi_disable_w )
 
 static WRITE8_HANDLER( firetrap_bankselect_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x03);
+	memory_set_bank(space->machine, "bank1", data & 0x03);
 }
 
 static READ8_HANDLER( firetrap_8751_bootleg_r )
@@ -194,7 +194,7 @@ static WRITE8_HANDLER( firetrap_sound_2400_w )
 
 static WRITE8_HANDLER( firetrap_sound_bankselect_w )
 {
-	memory_set_bank(space->machine, 2, data & 0x01);
+	memory_set_bank(space->machine, "bank2", data & 0x01);
 }
 
 static void firetrap_adpcm_int( const device_config *device )
@@ -223,7 +223,7 @@ static WRITE8_HANDLER( flip_screen_w )
 
 static ADDRESS_MAP_START( firetrap_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(firetrap_bg1videoram_w) AM_BASE_MEMBER(firetrap_state, bg1videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(firetrap_bg2videoram_w) AM_BASE_MEMBER(firetrap_state, bg2videoram)
@@ -249,7 +249,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( firetrap_bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(firetrap_bg1videoram_w) AM_BASE_MEMBER(firetrap_state, bg1videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(firetrap_bg2videoram_w) AM_BASE_MEMBER(firetrap_state, bg2videoram)
@@ -281,7 +281,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2400, 0x2400) AM_WRITE(firetrap_sound_2400_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(firetrap_sound_bankselect_w)
 	AM_RANGE(0x3400, 0x3400) AM_READ(soundlatch_r)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(2)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -547,8 +547,8 @@ static MACHINE_START( firetrap )
 	state->audiocpu = devtag_get_device(machine, "audiocpu");
 	state->msm = devtag_get_device(machine, "msm");
 
-	memory_configure_bank(machine, 1, 0, 4, &MAIN[0x10000], 0x4000);
-	memory_configure_bank(machine, 2, 0, 2, &SOUND[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 4, &MAIN[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank2", 0, 2, &SOUND[0x10000], 0x4000);
 
 	state_save_register_global(machine, state->i8751_current_command);
 	state_save_register_global(machine, state->irq_enable);

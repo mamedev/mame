@@ -37,7 +37,7 @@ static WRITE8_HANDLER( cbasebal_bankswitch_w )
 {
 	/* bits 0-4 select ROM bank */
 //logerror("%04x: bankswitch %02x\n",cpu_get_pc(space->cpu),data);
-	memory_set_bank(space->machine, 1, data & 0x1f);
+	memory_set_bank(space->machine, "bank1", data & 0x1f);
 
 	/* bit 5 used but unknown */
 
@@ -133,7 +133,7 @@ static WRITE8_HANDLER( eeprom_serial_w )
 
 static ADDRESS_MAP_START( cbasebal_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_GENERIC(paletteram)	/* palette + vram + scrollram */
 	AM_RANGE(0xe000, 0xfdff) AM_RAM		/* work RAM */
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -306,7 +306,7 @@ ROM_END
 
 static DRIVER_INIT( cbasebal )
 {
-	memory_configure_bank(machine, 1, 0, 32, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 32, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 	pang_decode(machine);
 }
 

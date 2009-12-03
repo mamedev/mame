@@ -73,7 +73,7 @@ static INTERRUPT_GEN( yamyam_interrupt )
 
 static WRITE8_HANDLER( yamyam_bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x07);
+	memory_set_bank(space->machine, "bank1", data & 0x07);
 }
 
 static WRITE8_HANDLER( yamyam_protection_w )
@@ -143,7 +143,7 @@ static WRITE8_HANDLER( yamyam_protection_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("IN0")
@@ -449,7 +449,7 @@ static MACHINE_START( gundealr )
 	gundealr_state *state = (gundealr_state *)machine->driver_data;
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	memory_configure_bank(machine, 1, 0, 8, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 
 	state_save_register_global(machine, state->flipscreen);
 	state_save_register_global_array(machine, state->scroll);

@@ -113,7 +113,7 @@ static WRITE8_HANDLER( stfight_bank_w )
 {
 	UINT8   *ROM2 = memory_region(space->machine, "maincpu") + 0x10000;
 
-	memory_set_bankptr(space->machine,  1, &ROM2[data<<14] );
+	memory_set_bankptr(space->machine,  "bank1", &ROM2[data<<14] );
 }
 
 /*

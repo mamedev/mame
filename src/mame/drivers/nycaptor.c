@@ -286,12 +286,12 @@ static READ8_HANDLER ( nycaptor_generic_control_r )
 static WRITE8_HANDLER( nycaptor_generic_control_w )
 {
 	generic_control_reg = data;
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + 0x10000 + ((data&0x08)>>3)*0x4000 );
+	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu") + 0x10000 + ((data&0x08)>>3)*0x4000 );
 }
 
 static ADDRESS_MAP_START( nycaptor_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(nycaptor_videoram_r) AM_WRITE(nycaptor_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0xd000, 0xd000) AM_READ(nycaptor_mcu_r) AM_WRITE(nycaptor_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(sub_cpu_halt_w)
@@ -390,13 +390,13 @@ static WRITE8_HANDLER( cyclshtg_generic_control_w )
 {
 	int bank=(data>>2)&3;
 	generic_control_reg = data;
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + 0x10000 + bank*0x4000 );
+	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu") + 0x10000 + bank*0x4000 );
 }
 
 
 static ADDRESS_MAP_START( cyclshtg_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READ(nycaptor_videoram_r) AM_WRITE(nycaptor_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0xd000, 0xd000) AM_READ(cyclshtg_mcu_r) AM_WRITE(cyclshtg_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(sub_cpu_halt_w)
@@ -445,7 +445,7 @@ static READ8_HANDLER(unk_r)
 
 static ADDRESS_MAP_START( bronx_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READ(nycaptor_videoram_r) AM_WRITE(nycaptor_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0xd000, 0xd000) AM_READ(cyclshtg_mcu_r) AM_WRITENOP
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(sub_cpu_halt_w)

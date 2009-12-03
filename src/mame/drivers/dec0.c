@@ -209,7 +209,7 @@ static ADDRESS_MAP_START( hippodrm_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1a0000, 0x1a001f) AM_WRITE(dec0_pf3_control_8bit_w)
 	AM_RANGE(0x1a1000, 0x1a17ff) AM_READWRITE(dec0_pf3_data_8bit_r, dec0_pf3_data_8bit_w)
 	AM_RANGE(0x1d0000, 0x1d00ff) AM_READWRITE(hippodrm_prot_r, hippodrm_prot_w)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK(8) /* Main ram */
+	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8") /* Main ram */
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 	AM_RANGE(0x1ff402, 0x1ff403) AM_READ_PORT("VBLANK")
 ADDRESS_MAP_END
@@ -302,7 +302,7 @@ static ADDRESS_MAP_START( slyspy_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0b0000, 0x0b0001) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x0e0000, 0x0e0001) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ(soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK(8)
+	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
@@ -312,7 +312,7 @@ static ADDRESS_MAP_START( midres_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x118000, 0x118001) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0x138000, 0x138001) AM_READ(soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK(8)
+	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 

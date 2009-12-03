@@ -101,7 +101,7 @@ static WRITE16_HANDLER( aquarium_sound_w )
 
 static WRITE8_HANDLER( aquarium_z80_bank_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x07);
+	memory_set_bank(space->machine, "bank1", data & 0x07);
 }
 
 static UINT8 aquarium_snd_bitswap( UINT8 scrambled_data )
@@ -155,7 +155,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( snd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( snd_portmap, ADDRESS_SPACE_IO, 8 )
@@ -314,8 +314,8 @@ static DRIVER_INIT( aquarium )
 	}
 
 	/* configure and set up the sound bank */
-	memory_configure_bank(machine, 1, 0, 7, &Z80[0x18000], 0x8000);
-	memory_set_bank(machine, 1, 1);
+	memory_configure_bank(machine, "bank1", 0, 7, &Z80[0x18000], 0x8000);
+	memory_set_bank(machine, "bank1", 1);
 }
 
 

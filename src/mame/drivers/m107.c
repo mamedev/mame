@@ -51,7 +51,7 @@ static WRITE16_HANDLER( bankswitch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		UINT8 *RAM = memory_region(space->machine, "maincpu");
-		memory_set_bankptr(space->machine, 1,&RAM[0x100000 + ((data&0x7)*0x10000)]);
+		memory_set_bankptr(space->machine, "bank1",&RAM[0x100000 + ((data&0x7)*0x10000)]);
 	}
 }
 
@@ -163,7 +163,7 @@ static WRITE16_HANDLER( m107_sound_status_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK(1)
+	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m107_vram_w) AM_BASE(&m107_vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf8fff) AM_RAM AM_BASE_GENERIC(spriteram)
@@ -630,7 +630,7 @@ static DRIVER_INIT( firebarr )
 	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	memcpy(RAM + 0xffff0, RAM + 0x7fff0, 0x10); /* Start vector */
-	memory_set_bankptr(machine, 1, &RAM[0xa0000]); /* Initial bank */
+	memory_set_bankptr(machine, "bank1", &RAM[0xa0000]); /* Initial bank */
 
 	RAM = memory_region(machine, "soundcpu");
 	memcpy(RAM + 0xffff0,RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
@@ -644,7 +644,7 @@ static DRIVER_INIT( dsoccr94 )
 	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	memcpy(RAM + 0xffff0, RAM + 0x7fff0, 0x10); /* Start vector */
-	memory_set_bankptr(machine, 1, &RAM[0xa0000]); /* Initial bank */
+	memory_set_bankptr(machine, "bank1", &RAM[0xa0000]); /* Initial bank */
 
 	RAM = memory_region(machine, "soundcpu");
 	memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */
@@ -658,7 +658,7 @@ static DRIVER_INIT( wpksoc )
 	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	memcpy(RAM + 0xffff0, RAM + 0x7fff0, 0x10); /* Start vector */
-	memory_set_bankptr(machine, 1, &RAM[0xa0000]); /* Initial bank */
+	memory_set_bankptr(machine, "bank1", &RAM[0xa0000]); /* Initial bank */
 
 	RAM = memory_region(machine, "soundcpu");
 	memcpy(RAM + 0xffff0, RAM + 0x1fff0, 0x10); /* Sound cpu Start vector */

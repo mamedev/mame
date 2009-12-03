@@ -44,7 +44,7 @@
 
 static WRITE8_HANDLER( rom_bank_select_w )
 {
-	memory_set_bank(space->machine, 1, data & 15);
+	memory_set_bank(space->machine, "bank1", data & 15);
 }
 
 
@@ -56,8 +56,8 @@ static MACHINE_START( crgolf )
 	state->audiocpu = devtag_get_device(machine, "audiocpu");
 
 	/* configure the banking */
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x2000);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+	memory_set_bank(machine, "bank1", 0);
 
 	/* register for save states */
 	state_save_register_global(machine, state->port_select);
@@ -255,7 +255,7 @@ static WRITE8_DEVICE_HANDLER( crgolfhi_sample_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, color_select)
 	AM_RANGE(0x8004, 0x8004) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, screen_flip)
 	AM_RANGE(0x8005, 0x8005) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, screen_select)

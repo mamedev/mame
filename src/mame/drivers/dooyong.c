@@ -61,14 +61,14 @@ Flying Tiger
 
 static WRITE8_HANDLER( lastday_bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x07);
+	memory_set_bank(space->machine, "bank1", data & 0x07);
 
 	if (data & 0xf8) popmessage("bankswitch %02x",data);
 }
 
 static MACHINE_START( lastday )
 {
-	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
 static WRITE8_HANDLER( flip_screen_w )
@@ -84,7 +84,7 @@ static WRITE8_HANDLER( flip_screen_w )
 
 static ADDRESS_MAP_START( lastday_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc007) AM_WRITE(dooyong_bgscroll8_w)
 	AM_RANGE(0xc008, 0xc00f) AM_WRITE(dooyong_fgscroll8_w)
 	AM_RANGE(0xc010, 0xc010) AM_READ_PORT("SYSTEM")
@@ -103,7 +103,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pollux_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE(&dooyong_txvideoram)
@@ -121,7 +121,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gulfstrm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE(&dooyong_txvideoram)
@@ -140,7 +140,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bluehawk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSWA")
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(flip_screen_w)
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("DSWB")
@@ -160,7 +160,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( flytiger_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("P1")
@@ -179,7 +179,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( primella_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM /* what is this? looks like a palette? scratchpad RAM maybe? */
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE(&dooyong_txvideoram)

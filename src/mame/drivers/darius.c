@@ -285,8 +285,7 @@ static UINT8 nmi_enable = 0;
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(machine,  STATIC_BANK1, memory_region(machine, "audiocpu") + (banknum * 0x8000) + 0x10000 );
-//  memory_set_bankptr(machine,  1, memory_region(machine, "audiocpu") + (banknum * 0x8000) + 0x10000 );
+	memory_set_bankptr(machine,  "bank1", memory_region(machine, "audiocpu") + (banknum * 0x8000) + 0x10000 );
 
 }
 
@@ -473,7 +472,7 @@ static WRITE8_DEVICE_HANDLER( darius_write_portB1 )
 *****************************************************/
 
 static ADDRESS_MAP_START( darius_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
@@ -1201,7 +1200,7 @@ static MACHINE_RESET( darius )
 		memcpy( RAM + 0x8000*i + 0x10000, RAM,            0x4000 );
 		memcpy( RAM + 0x8000*i + 0x14000, RAM + 0x4000*i, 0x4000 );
 	}
-	memory_set_bankptr(machine, 1, RAM);
+	memory_set_bankptr(machine, "bank1", RAM);
 
 	sound_global_enable( machine, 1 );	/* mixer enabled */
 

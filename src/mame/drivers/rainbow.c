@@ -406,7 +406,7 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( bankswitch_w )
 {
-	memory_set_bankptr(device->machine, 1, memory_region(device->machine, "audiocpu") + ((data - 1) & 3) * 0x4000 + 0x10000);
+	memory_set_bankptr(device->machine, "bank1", memory_region(device->machine, "audiocpu") + ((data - 1) & 3) * 0x4000 + 0x10000);
 }
 
 static READ8_HANDLER( jumping_latch_r )
@@ -417,7 +417,7 @@ static READ8_HANDLER( jumping_latch_r )
 
 static ADDRESS_MAP_START( rainbow_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_r,ym2151_w)
 	AM_RANGE(0x9002, 0x9100) AM_READNOP

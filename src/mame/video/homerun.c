@@ -15,7 +15,7 @@ WRITE8_DEVICE_HANDLER(homerun_banking_w)
   	tilemap_mark_all_tiles_dirty(state->tilemap);
 
 	data >>= 5;
-	memory_set_bank(device->machine, 1, data & 0x07);
+	memory_set_bank(device->machine, "bank1", data & 0x07);
 }
 
 WRITE8_HANDLER( homerun_videoram_w )

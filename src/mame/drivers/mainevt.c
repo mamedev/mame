@@ -65,7 +65,7 @@ static WRITE8_HANDLER( mainevt_bankswitch_w )
 
 	/* bit 0-1 ROM bank select */
 	bankaddress = 0x10000 + (data & 0x03) * 0x2000;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
 
 	/* TODO: bit 5 = select work RAM or palette? */
 //  palette_selected = data & 0x20;
@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( mainevt_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x4000, 0x5dff) AM_RAM
 	AM_RANGE(0x5e00, 0x5fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( devstors_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x4000, 0x5dff) AM_RAM
 	AM_RANGE(0x5e00, 0x5fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -61,7 +61,7 @@ static WRITE8_HANDLER( draco_sound_bankswitch_w )
 
 	int bank = BIT(data, 3);
 
-	memory_set_bank(space->machine, 1, bank);
+	memory_set_bank(space->machine, "bank1", bank);
 }
 
 static WRITE8_DEVICE_HANDLER( draco_sound_g_w )
@@ -292,7 +292,7 @@ static ADDRESS_MAP_START( draco_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( draco_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000, 0x3ff) AM_ROMBANK(1)
+	AM_RANGE(0x000, 0x3ff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( draco_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -492,8 +492,8 @@ static MACHINE_START( draco )
 	MACHINE_START_CALL( cidelsa );
 
 	/* setup COP402 memory banking */
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "audiocpu"), 0x400);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "audiocpu"), 0x400);
+	memory_set_bank(machine, "bank1", 0);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->draco_sound);

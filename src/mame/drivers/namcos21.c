@@ -1406,7 +1406,7 @@ ADDRESS_MAP_END
 /*************************************************************/
 
 static ADDRESS_MAP_START( am_sound_winrun, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(6) /* banked */
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank6") /* banked */
 	AM_RANGE(0x3000, 0x3003) AM_WRITENOP /* ? */
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2151_r,ym2151_w)
 	AM_RANGE(0x5000, 0x6fff) AM_DEVREADWRITE("c140", c140_r,c140_w)

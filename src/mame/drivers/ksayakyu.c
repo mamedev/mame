@@ -87,7 +87,7 @@ static WRITE8_HANDLER( bank_select_w )
         xxxxxxx  - unused ?
 
     */
-	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "maincpu") + ((data&1) * 0x4000) + 0x10000 );
+	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "maincpu") + ((data&1) * 0x4000) + 0x10000 );
 }
 
 static WRITE8_HANDLER( latch_w )
@@ -109,7 +109,7 @@ static WRITE8_HANDLER(tomaincpu_w)
 
 static ADDRESS_MAP_START( maincpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P1")

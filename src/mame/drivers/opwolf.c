@@ -360,7 +360,7 @@ static READ8_HANDLER( z80_input2_r )
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bank(device->machine, 10, (data-1) & 0x03);
+	memory_set_bank(device->machine, "bank10", (data-1) & 0x03);
 }
 
 /***********************************************************
@@ -534,7 +534,7 @@ static WRITE8_HANDLER( opwolf_adpcm_e_w )
 
 static ADDRESS_MAP_START( opwolf_sound_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(10)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_r,ym2151_w)
 	AM_RANGE(0x9002, 0x9100) AM_READNOP
@@ -961,7 +961,7 @@ static DRIVER_INIT( opwolf )
 	opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
 	opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
 
-	memory_configure_bank(machine, 10, 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank10", 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
 }
 
 
@@ -975,7 +975,7 @@ static DRIVER_INIT( opwolfb )
 	opwolf_gun_xoffs = -2;
 	opwolf_gun_yoffs = 17;
 
-	memory_configure_bank(machine, 10, 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank10", 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
 }
 
 

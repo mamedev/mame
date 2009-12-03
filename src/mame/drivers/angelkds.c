@@ -143,7 +143,7 @@ static WRITE8_HANDLER( angelkds_sub_sound_w );
 
 static WRITE8_HANDLER( angelkds_cpu_bank_write )
 {
-	memory_set_bank(space->machine, 1, data & 0x0f);	// shall we check (data & 0x0f) < # of available banks (8 or 10 resp.)?
+	memory_set_bank(space->machine, "bank1", data & 0x0f);	// shall we check (data & 0x0f) < # of available banks (8 or 10 resp.)?
 }
 
 
@@ -197,7 +197,7 @@ contain a level.
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(angelkds_bgtopvideoram_w) AM_BASE_MEMBER(angelkds_state, bgtopvideoram) /* Top Half of Screen */
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(angelkds_bgbotvideoram_w) AM_BASE_MEMBER(angelkds_state, bgbotvideoram) /* Bottom Half of Screen */
@@ -755,7 +755,7 @@ ROM_END
 static DRIVER_INIT( angelkds )
 {
 	UINT8 *RAM = memory_region(machine, "user1");
-	memory_configure_bank(machine, 1, 0, 8, &RAM[0x0000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, &RAM[0x0000], 0x4000);
 }
 
 static DRIVER_INIT( spcpostn )
@@ -763,7 +763,7 @@ static DRIVER_INIT( spcpostn )
 	UINT8 *RAM = memory_region(machine, "user1");
 
 	spcpostn_decode(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 10, &RAM[0x0000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 10, &RAM[0x0000], 0x4000);
 }
 
 

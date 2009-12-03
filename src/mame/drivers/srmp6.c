@@ -308,7 +308,7 @@ static WRITE16_HANDLER( video_regs_w )
 		case 0x5e/2: // bank switch, used by ROM check
 			LOG(("%x\n",data));
 
-			memory_set_bankptr(space->machine, 1,(UINT16 *)(memory_region(space->machine, "nile") + (data & 0x0f)*0x200000));
+			memory_set_bankptr(space->machine, "bank1",(UINT16 *)(memory_region(space->machine, "nile") + (data & 0x0f)*0x200000));
 			break;
 
 		// set by IT4
@@ -513,7 +513,7 @@ static WRITE16_HANDLER(paletteram_w)
 static ADDRESS_MAP_START( srmp6, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM					// work RAM
-	AM_RANGE(0x600000, 0x7fffff) AM_READ(SMH_BANK(1))		// banked ROM (used by ROM check)
+	AM_RANGE(0x600000, 0x7fffff) AM_ROMBANK("bank1")		// banked ROM (used by ROM check)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0)
 
 	AM_RANGE(0x300000, 0x300005) AM_READWRITE(srmp6_inputs_r, srmp6_input_select_w)		// inputs

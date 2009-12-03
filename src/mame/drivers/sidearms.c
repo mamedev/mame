@@ -64,7 +64,7 @@ static WRITE8_HANDLER( sidearms_bankswitch_w )
 
 	/* bits 0 and 1 select the ROM bank */
 	bankaddress = 0x10000 + (data & 0x0f) * 0x4000;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
 }
 
 
@@ -86,7 +86,7 @@ static READ8_HANDLER( turtship_ports_r )
 
 static ADDRESS_MAP_START( sidearms_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("SYSTEM") AM_WRITE(soundlatch_w)
@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( turtship_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
@@ -151,12 +151,12 @@ static WRITE8_HANDLER( whizz_bankswitch_w )
 	}
 
 	bankaddress = 0x10000 + bank * 0x4000;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
 }
 
 static ADDRESS_MAP_START( whizz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("DSW0") AM_WRITE(soundlatch_w)

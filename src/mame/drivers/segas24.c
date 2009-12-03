@@ -713,8 +713,8 @@ static void reset_bank(running_machine *machine)
 {
 	if (memory_region(machine, "romboard"))
 	{
-		memory_set_bank(machine, 1, curbank & 15);
-		memory_set_bank(machine, 2, curbank & 15);
+		memory_set_bank(machine, "bank1", curbank & 15);
+		memory_set_bank(machine, "bank2", curbank & 15);
 	}
 }
 
@@ -1011,11 +1011,11 @@ static ADDRESS_MAP_START( system24_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00007) AM_MIRROR(0x0ffff8) AM_READWRITE(irq_r, irq_w)
 	AM_RANGE(0xb00000, 0xb00007) AM_MIRROR(0x07fff0) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0xb00008, 0xb0000f) AM_MIRROR(0x07fff0) AM_READWRITE(fdc_status_r, fdc_ctrl_w)
-	AM_RANGE(0xb80000, 0xbbffff) AM_ROMBANK(1)
+	AM_RANGE(0xb80000, 0xbbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xbc0000, 0xbc0001) AM_MIRROR(0x03fff8) AM_READWRITE(curbank_r, curbank_w)
 	AM_RANGE(0xbc0006, 0xbc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
 	AM_RANGE(0xc00000, 0xc00011) AM_MIRROR(0x07ffe0) AM_READWRITE(hotrod3_ctrl_r, hotrod3_ctrl_w)
-	AM_RANGE(0xc80000, 0xcbffff) AM_ROMBANK(2)
+	AM_RANGE(0xc80000, 0xcbffff) AM_ROMBANK("bank2")
 	AM_RANGE(0xcc0000, 0xcc0001) AM_MIRROR(0x03fff8) AM_READWRITE(curbank_r, curbank_w)
 	AM_RANGE(0xcc0006, 0xcc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
 	AM_RANGE(0xf00000, 0xf3ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(2)
@@ -1048,11 +1048,11 @@ static ADDRESS_MAP_START( system24_cpu2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00007) AM_MIRROR(0x0ffff8) AM_READWRITE(irq_r, irq_w)
 	AM_RANGE(0xb00000, 0xb00007) AM_MIRROR(0x07fff0) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0xb00008, 0xb0000f) AM_MIRROR(0x07fff0) AM_READWRITE(fdc_status_r, fdc_ctrl_w)
-	AM_RANGE(0xb80000, 0xbbffff) AM_ROMBANK(1)
+	AM_RANGE(0xb80000, 0xbbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xbc0000, 0xbc0001) AM_MIRROR(0x03fff8) AM_READWRITE(curbank_r, curbank_w)
 	AM_RANGE(0xbc0006, 0xbc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
 	AM_RANGE(0xc00000, 0xc00011) AM_MIRROR(0x07ffe0) AM_READWRITE(hotrod3_ctrl_r, hotrod3_ctrl_w)
-	AM_RANGE(0xc80000, 0xcbffff) AM_ROMBANK(2)
+	AM_RANGE(0xc80000, 0xcbffff) AM_ROMBANK("bank2")
 	AM_RANGE(0xcc0000, 0xcc0001) AM_MIRROR(0x03fff8) AM_READWRITE(curbank_r, curbank_w)
 	AM_RANGE(0xcc0006, 0xcc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
 	AM_RANGE(0xf00000, 0xf3ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(2)
@@ -1082,8 +1082,8 @@ static MACHINE_START( system24 )
 	UINT8 *usr1 = memory_region(machine, "romboard");
 	if (usr1)
 	{
-		memory_configure_bank(machine, 1, 0, 16, usr1, 0x40000);
-		memory_configure_bank(machine, 2, 0, 16, usr1, 0x40000);
+		memory_configure_bank(machine, "bank1", 0, 16, usr1, 0x40000);
+		memory_configure_bank(machine, "bank2", 0, 16, usr1, 0x40000);
 	}
 }
 

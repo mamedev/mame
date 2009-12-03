@@ -137,7 +137,7 @@ static WRITE8_HANDLER( fromance_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "sub");
 
-	memory_set_bankptr(space->machine, 1, &ROM[0x010000 + (0x4000 * data)]);
+	memory_set_bankptr(space->machine, "bank1", &ROM[0x010000 + (0x4000 * data)]);
 }
 
 
@@ -269,7 +269,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nekkyoku_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xefff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(fromance_paletteram_r, fromance_paletteram_w)
@@ -277,7 +277,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(fromance_paletteram_r, fromance_paletteram_w)
 	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w)

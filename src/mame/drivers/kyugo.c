@@ -1212,12 +1212,12 @@ static DRIVER_INIT( gyrodine )
 static DRIVER_INIT( srdmissn )
 {
 	/* shared RAM is mapped at 0xe000 as well  */
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xe7ff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
-	memory_set_bankptr(machine, 1, shared_ram);
+	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xe7ff, 0, 0, "bank1");
+	memory_set_bankptr(machine, "bank1", shared_ram);
 
 	/* extra RAM on sub CPU  */
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x8800, 0x8fff, 0, 0, (read8_space_func)SMH_BANK(2), (write8_space_func)SMH_BANK(2));
-	memory_set_bankptr(machine, 2, auto_alloc_array(machine, UINT8, 0x800));
+	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x8800, 0x8fff, 0, 0, "bank2");
+	memory_set_bankptr(machine, "bank2", auto_alloc_array(machine, UINT8, 0x800));
 }
 
 

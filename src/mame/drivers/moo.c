@@ -224,7 +224,7 @@ static READ16_HANDLER( sound_status_r )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "soundcpu") + 0x10000 + (data&0xf)*0x4000);
+	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "soundcpu") + 0x10000 + (data&0xf)*0x4000);
 }
 
 
@@ -401,7 +401,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("konami", k054539_r,k054539_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ymsnd", ym2151_r,ym2151_w)

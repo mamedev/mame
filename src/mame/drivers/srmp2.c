@@ -353,7 +353,7 @@ static WRITE8_HANDLER( srmp3_rombank_w )
 	if (data & 0x1f) addr = ((0x10000 + (0x2000 * (data & 0x0f))) - 0x8000);
 	else addr = 0x10000;
 
-	memory_set_bankptr(space->machine, 1, &ROM[addr]);
+	memory_set_bankptr(space->machine, "bank1", &ROM[addr]);
 }
 
 /**************************************************************************
@@ -525,7 +525,7 @@ static WRITE8_HANDLER( srmp3_flags_w )
 
 static ADDRESS_MAP_START( srmp3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)							/* rom bank */
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")							/* rom bank */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* work ram */
 	AM_RANGE(0xa800, 0xa800) AM_WRITENOP							/* flag ? */
 	AM_RANGE(0xb000, 0xb303) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram1.u8)				/* Sprites Y */

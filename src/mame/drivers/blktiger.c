@@ -58,7 +58,7 @@ static WRITE8_HANDLER( blktiger_to_main_w )
 
 static WRITE8_HANDLER( blktiger_bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x0f);
+	memory_set_bank(space->machine, "bank1", data & 0x0f);
 }
 
 static WRITE8_HANDLER( blktiger_coinlockout_w )
@@ -73,7 +73,7 @@ static WRITE8_HANDLER( blktiger_coinlockout_w )
 
 static ADDRESS_MAP_START( blktiger_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(blktiger_bgvideoram_r, blktiger_bgvideoram_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(blktiger_txvideoram_w) AM_BASE_MEMBER(blktiger_state, txvideoram)
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
@@ -287,7 +287,7 @@ static MACHINE_START( blktiger )
 	state->mcu = devtag_get_device(machine, "mcu");
 
 	/* configure bankswitching */
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	state_save_register_global(machine, state->scroll_bank);
 	state_save_register_global(machine, state->screen_layout);
@@ -305,7 +305,7 @@ static MACHINE_RESET( blktiger )
 	blktiger_state *state = (blktiger_state *)machine->driver_data;
 
 	/* configure bankswitching */
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	state->scroll_x[0] = 0;
 	state->scroll_x[1] = 0;

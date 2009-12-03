@@ -152,7 +152,7 @@ static int Scorpion1_GetSwitchState(int strobe, int data)
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bank(space->machine,1,data & 0x03);
+	memory_set_bank(space->machine,"bank1",data & 0x03);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -752,10 +752,10 @@ static MACHINE_RESET( bfm_sc1 )
 	{
 		UINT8 *rom = memory_region(machine, "maincpu");
 
-		memory_configure_bank(machine,1, 0, 1, &rom[0x10000], 0);
-		memory_configure_bank(machine,1, 1, 3, &rom[0x02000], 0x02000);
+		memory_configure_bank(machine,"bank1", 0, 1, &rom[0x10000], 0);
+		memory_configure_bank(machine,"bank1", 1, 3, &rom[0x02000], 0x02000);
 
-		memory_set_bank(machine,1,3);
+		memory_set_bank(machine,"bank1",3);
 	}
 }
 
@@ -797,7 +797,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3800, 0x39FF) AM_WRITE(reel56_w)	 			// reel 5+6 latch
 
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM							// 8k  ROM
-	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK(1)					// 8k  paged ROM (4 pages)
+	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")					// 8k  paged ROM (4 pages)
 	AM_RANGE(0x8000, 0xFFFF) AM_RAM AM_WRITE(watchdog_w)	// 32k ROM
 
 ADDRESS_MAP_END
@@ -845,7 +845,7 @@ static ADDRESS_MAP_START( memmap_adder2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3E01, 0x3E01) AM_READWRITE(vid_uart_rx_r,vid_uart_tx_w)		// video uart receive  reg
 
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM							// 8k  ROM
-	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK(1)					// 8k  paged ROM (4 pages)
+	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")					// 8k  paged ROM (4 pages)
 	AM_RANGE(0x8000, 0xFFFF) AM_ROM AM_WRITE(watchdog_w)	// 32k ROM
 
 ADDRESS_MAP_END
@@ -890,7 +890,7 @@ static ADDRESS_MAP_START( sc1_nec_uk, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3800, 0x39FF) AM_DEVWRITE("upd", nec_latch_w)
 
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM							// 8k  ROM
-	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK(1)					// 8k  paged ROM (4 pages)
+	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")					// 8k  paged ROM (4 pages)
 	AM_RANGE(0x8000, 0xFFFF) AM_ROM AM_WRITE(watchdog_w)	// 32k ROM
 
 ADDRESS_MAP_END

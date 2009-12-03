@@ -69,7 +69,7 @@ static MACHINE_RESET(macs);
 
 static ADDRESS_MAP_START( macs_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram ? */
@@ -77,13 +77,13 @@ static ADDRESS_MAP_START( macs_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE("stsnd", st0016_snd_r, st0016_snd_w)
 	AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
 	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAMBANK(3) /* common /backup ram ?*/
-	AM_RANGE(0xf800, 0xffff) AM_RAMBANK(2) /* common /backup ram ?*/
+	AM_RANGE(0xf000, 0xf7ff) AM_RAMBANK("bank3") /* common /backup ram ?*/
+	AM_RANGE(0xf800, 0xffff) AM_RAMBANK("bank2") /* common /backup ram ?*/
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER(rambank_w)
 {
-	memory_set_bankptr(space->machine,  3, &macs_ram1[0x10000+(data&1)*0x800] );
+	memory_set_bankptr(space->machine,  "bank3", &macs_ram1[0x10000+(data&1)*0x800] );
 }
 
 static READ8_HANDLER( macs_input_r )
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( macs_output_w )
 {
 	switch(offset)
 	{
-		case 0: memory_set_bankptr(space->machine,  2, &macs_ram1[((data&0x20)>>5)*0x1000+0x800] );break;
+		case 0: memory_set_bankptr(space->machine,  "bank2", &macs_ram1[((data&0x20)>>5)*0x1000+0x800] );break;
 		case 2: macs_mux_data = data; break;
 
 	}
@@ -636,9 +636,9 @@ static MACHINE_RESET(macs)
 		macs_ram1[0x0ff9]=0x07;
 		macs_ram1[0x1ff9]=0x07;
 
-		memory_set_bankptr(machine,  1, memory_region(machine, "maincpu") + 0x10000 );
-		memory_set_bankptr(machine,  2, macs_ram1+0x800);
-		memory_set_bankptr(machine,  3, macs_ram1+0x10000);
+		memory_set_bankptr(machine,  "bank1", memory_region(machine, "maincpu") + 0x10000 );
+		memory_set_bankptr(machine,  "bank2", macs_ram1+0x800);
+		memory_set_bankptr(machine,  "bank3", macs_ram1+0x10000);
 }
 
 static DRIVER_INIT(macs)

@@ -211,13 +211,13 @@ static WRITE8_HANDLER ( mcatadv_sound_bw_w )
 {
 	UINT8 *rom = memory_region(space->machine, "soundcpu") + 0x10000;
 
-	memory_set_bankptr(space->machine, 1,rom + data * 0x4000);
+	memory_set_bankptr(space->machine, "bank1",rom + data * 0x4000);
 }
 
 
 static ADDRESS_MAP_START( mcatadv_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM						// ROM
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK(1)				// ROM
+	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")				// ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM						// RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_r,ym2610_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mcatadv_sound_bw_w)
@@ -231,7 +231,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nost_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM						// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)				// ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")				// ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM						// RAM
 ADDRESS_MAP_END
 
@@ -480,7 +480,7 @@ static DRIVER_INIT( mcatadv )
 {
 	UINT8 *z80rom = memory_region(machine, "soundcpu") + 0x10000;
 
-	memory_set_bankptr(machine, 1, z80rom + 0x4000);
+	memory_set_bankptr(machine, "bank1", z80rom + 0x4000);
 }
 
 

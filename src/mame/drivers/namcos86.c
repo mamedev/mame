@@ -209,7 +209,7 @@ static WRITE8_HANDLER( bankswitch1_w )
 	/* with bankswitch1_ext_w() in wndrmomo */
 	if (memory_region(space->machine, "user1")) return;
 
-	memory_set_bankptr(space->machine, 1,base + ((data & 0x03) * 0x2000));
+	memory_set_bankptr(space->machine, "bank1",base + ((data & 0x03) * 0x2000));
 }
 
 static WRITE8_HANDLER( bankswitch1_ext_w )
@@ -218,14 +218,14 @@ static WRITE8_HANDLER( bankswitch1_ext_w )
 
 	if (base == 0) return;
 
-	memory_set_bankptr(space->machine, 1,base + ((data & 0x1f) * 0x2000));
+	memory_set_bankptr(space->machine, "bank1",base + ((data & 0x1f) * 0x2000));
 }
 
 static WRITE8_HANDLER( bankswitch2_w )
 {
 	UINT8 *base = memory_region(space->machine, "cpu2") + 0x10000;
 
-	memory_set_bankptr(space->machine, 2,base + ((data & 0x03) * 0x2000));
+	memory_set_bankptr(space->machine, "bank2",base + ((data & 0x03) * 0x2000));
 }
 
 /* Stubs to pass the correct Dip Switch setup to the MCU */
@@ -347,7 +347,7 @@ static MACHINE_RESET( namco86 )
 {
 	UINT8 *base = memory_region(machine, "cpu1") + 0x10000;
 
-	memory_set_bankptr(machine, 1,base);
+	memory_set_bankptr(machine, "bank1",base);
 }
 
 
@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(rthunder_spriteram_r,rthunder_spriteram_w)
 
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK(1))
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 
 	/* ROM & Voice expansion board - only some games have it */
@@ -387,7 +387,7 @@ static ADDRESS_MAP_START( NAME##_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )							\
 	AM_RANGE(ADDR_SPRITE+0x0000, ADDR_SPRITE+0x1fff) AM_READWRITE(rthunder_spriteram_r,rthunder_spriteram_w) AM_BASE(&rthunder_spriteram)	\
 	AM_RANGE(ADDR_VIDEO1+0x0000, ADDR_VIDEO1+0x1fff) AM_READWRITE(rthunder_videoram1_r,rthunder_videoram1_w)	\
 	AM_RANGE(ADDR_VIDEO2+0x0000, ADDR_VIDEO2+0x1fff) AM_READWRITE(rthunder_videoram2_r,rthunder_videoram2_w)	\
-	AM_RANGE(ADDR_ROM+0x0000, ADDR_ROM+0x1fff) AM_READ(SMH_BANK(2))								\
+	AM_RANGE(ADDR_ROM+0x0000, ADDR_ROM+0x1fff) AM_ROMBANK("bank2")								\
 	AM_RANGE(0x8000, 0xffff) AM_ROM																\
 /*  { ADDR_BANK+0x00, ADDR_BANK+0x02 } layer 2 scroll registers would be here */				\
 	AM_RANGE(ADDR_BANK+0x03, ADDR_BANK+0x03) AM_WRITE(bankswitch2_w)							\

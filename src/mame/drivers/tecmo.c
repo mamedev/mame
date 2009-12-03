@@ -75,7 +75,7 @@ static WRITE8_HANDLER( tecmo_bankswitch_w )
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1", &RAM[bankaddress]);
 }
 
 static WRITE8_HANDLER( tecmo_sound_command_w )
@@ -154,7 +154,7 @@ static ADDRESS_MAP_START( rygar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(tecmo_bgvideoram_w) AM_BASE(&tecmo_bgvideoram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK(1)
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("JOY1")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("BUTTONS1")
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("JOY2")
@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( gemini_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(tecmo_bgvideoram_w) AM_BASE(&tecmo_bgvideoram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK(1)
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("JOY1")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("BUTTONS1")
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("JOY2")
@@ -210,7 +210,7 @@ static ADDRESS_MAP_START( silkworm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK(1)
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("JOY1")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("BUTTONS1")
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("JOY2")

@@ -90,7 +90,7 @@ static READ8_HANDLER( ldrun2_bankswitch_r )
 
 		/* swap to bank #1 on second read */
 		if (state->ldrun2_bankswap == 0)
-			memory_set_bank(space->machine, 1, 1);
+			memory_set_bank(space->machine, "bank1", 1);
 	}
 	return 0;
 }
@@ -115,7 +115,7 @@ static WRITE8_HANDLER( ldrun2_bankswitch_w )
 			logerror("unknown bank select %02x\n",data);
 			return;
 		}
-		memory_set_bank(space->machine, 1, banks[data - 1]);
+		memory_set_bank(space->machine, "bank1", banks[data - 1]);
 	}
 	else
 	{
@@ -144,30 +144,30 @@ static READ8_HANDLER( ldrun3_prot_7_r )
 
 static WRITE8_HANDLER( ldrun4_bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x01);
+	memory_set_bank(space->machine, "bank1", data & 0x01);
 }
 
 static WRITE8_HANDLER( kidniki_bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x0f);
+	memory_set_bank(space->machine, "bank1", data & 0x0f);
 }
 
 #define battroad_bankswitch_w kidniki_bankswitch_w
 
 static WRITE8_HANDLER( spelunkr_bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x03);
+	memory_set_bank(space->machine, "bank1", data & 0x03);
 }
 
 static WRITE8_HANDLER( spelunk2_bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, (data & 0xc0) >> 6);
-	memory_set_bank(space->machine, 2, (data & 0x3c) >> 2);
+	memory_set_bank(space->machine, "bank1", (data & 0xc0) >> 6);
+	memory_set_bank(space->machine, "bank2", (data & 0x3c) >> 2);
 }
 
 static WRITE8_HANDLER( youjyudn_bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x01);
+	memory_set_bank(space->machine, "bank1", data & 0x01);
 }
 
 
@@ -193,7 +193,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( battroad_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(irem_z80_state, spriteram, spriteram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(m62_textram_w) AM_BASE_MEMBER(irem_z80_state, m62_textram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
@@ -222,7 +222,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ldrun2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(irem_z80_state, spriteram, spriteram_size)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
@@ -262,7 +262,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ldrun4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(irem_z80_state, spriteram, spriteram_size)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(ldrun4_bankswitch_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
@@ -290,7 +290,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kidniki_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(irem_z80_state, spriteram, spriteram_size)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_textram_w) AM_BASE_MEMBER(irem_z80_state, m62_textram)
@@ -314,7 +314,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spelunkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(irem_z80_state, spriteram, spriteram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(m62_textram_w) AM_BASE_MEMBER(irem_z80_state, m62_textram)
@@ -329,8 +329,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spelunk2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK(1)
-	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK(2)
+	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(irem_z80_state, spriteram, spriteram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(m62_textram_w) AM_BASE_MEMBER(irem_z80_state, m62_textram)
@@ -343,7 +343,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( youjyudn_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(irem_z80_state, spriteram, spriteram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(m62_textram_w) AM_BASE_MEMBER(irem_z80_state, m62_textram)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(m62_tileram_w) AM_BASE_MEMBER(irem_z80_state, m62_tileram)
@@ -2164,19 +2164,19 @@ ROM_END
 static DRIVER_INIT( battroad )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( ldrun2 )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( ldrun4 )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
 static DRIVER_INIT( kidniki )
@@ -2188,26 +2188,26 @@ static DRIVER_INIT( kidniki )
 	memcpy(ROM + 0x08000, ROM + 0x10000, 0x2000);
 
 	/* configure memory banks */
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( spelunkr )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( spelunk2 )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, 1, 0,  4, memory_region(machine, "maincpu") + 0x20000, 0x1000);
-	memory_configure_bank(machine, 2, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x1000);
+	memory_configure_bank(machine, "bank1", 0,  4, memory_region(machine, "maincpu") + 0x20000, 0x1000);
+	memory_configure_bank(machine, "bank2", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x1000);
 }
 
 static DRIVER_INIT( youjyudn )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
 GAME( 1984, kungfum,  0,        kungfum,  kungfum,  0,        ROT0,   "Irem", "Kung-Fu Master", GAME_SUPPORTS_SAVE )

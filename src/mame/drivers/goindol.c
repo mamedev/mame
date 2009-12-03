@@ -28,7 +28,7 @@ static WRITE8_HANDLER( goindol_bankswitch_w )
 {
 	goindol_state *state = (goindol_state *)space->machine->driver_data;
 
-	memory_set_bank(space->machine, 1, data & 0x03);
+	memory_set_bank(space->machine, "bank1", data & 0x03);
 
 	if (state->char_bank != ((data & 0x10) >> 4))
 	{
@@ -90,7 +90,7 @@ static WRITE8_HANDLER( prot_fcb0_w )
 
 static ADDRESS_MAP_START( goindol_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_MEMBER(goindol_state, ram)
 	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_WRITE(soundlatch_w) // watchdog?
 	AM_RANGE(0xc810, 0xc810) AM_WRITE(goindol_bankswitch_w)
@@ -229,7 +229,7 @@ static MACHINE_START( goindol )
 	goindol_state *state = (goindol_state *)machine->driver_data;
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	memory_configure_bank(machine, 1, 0, 4, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
 
 	state_save_register_global(machine, state->char_bank);
 	state_save_register_global(machine, state->prot_toggle);

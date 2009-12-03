@@ -269,7 +269,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER ( fuuki32_sound_bw_w )
 {
-	memory_set_bank(space->machine, 1, data);
+	memory_set_bank(space->machine, "bank1", data);
 }
 
 static READ8_HANDLER( snd_z80_r )
@@ -289,7 +289,7 @@ static ADDRESS_MAP_START( fuuki32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM								// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM								// RAM
 	AM_RANGE(0x7ff0, 0x7fff) AM_READWRITE(snd_z80_r, snd_z80_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)						// ROM
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")						// ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fuuki32_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -513,7 +513,7 @@ static MACHINE_START( fuuki32 )
 	fuuki32_state *state = (fuuki32_state *)machine->driver_data;
 	UINT8 *ROM = memory_region(machine, "soundcpu");
 
-	memory_configure_bank(machine, 1, 0, 0x3e, &ROM[0x10000], 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 0x3e, &ROM[0x10000], 0x8000);
 
 	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->audiocpu = devtag_get_device(machine, "soundcpu");

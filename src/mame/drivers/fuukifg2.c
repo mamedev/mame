@@ -106,7 +106,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( fuuki16_sound_rombank_w )
 {
 	if (data <= 2)
-		memory_set_bank(space->machine, 1, data);
+		memory_set_bank(space->machine, "bank1", data);
 	else
 	 	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(space->cpu), data);
 }
@@ -124,7 +124,7 @@ static WRITE8_DEVICE_HANDLER( fuuki16_oki_banking_w )
 static ADDRESS_MAP_START( fuuki16_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM			// ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM			// RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)	// Banked ROM
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")	// Banked ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fuuki16_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -426,7 +426,7 @@ static MACHINE_START( fuuki16 )
 	fuuki16_state *state = (fuuki16_state *)machine->driver_data;
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
-	memory_configure_bank(machine, 1, 0, 3, &ROM[0x10000], 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x10000], 0x8000);
 
 	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->audiocpu = devtag_get_device(machine, "audiocpu");

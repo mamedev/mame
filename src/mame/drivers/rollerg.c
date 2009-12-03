@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( rollerg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(K053245_r,K053245_w)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x2000, 0x3aff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -318,7 +318,7 @@ static KONAMI_SETLINES_CALLBACK( rollerg_banking )
 
 	offs = 0x10000 + ((lines & 0x07) * 0x4000);
 	if (offs >= 0x28000) offs -= 0x20000;
-	memory_set_bankptr(device->machine, 1,&RAM[offs]);
+	memory_set_bankptr(device->machine, "bank1",&RAM[offs]);
 }
 
 static MACHINE_RESET( rollerg )

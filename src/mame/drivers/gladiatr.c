@@ -210,7 +210,7 @@ static WRITE8_HANDLER( gladiatr_bankswitch_w )
 {
 	UINT8 *rom = memory_region(space->machine, "maincpu") + 0x10000;
 
-	memory_set_bankptr(space->machine, 1, rom + 0x6000 * (data & 0x01));
+	memory_set_bankptr(space->machine, "bank1", rom + 0x6000 * (data & 0x01));
 }
 
 
@@ -271,7 +271,7 @@ static MACHINE_RESET( gladiator )
 	/* 6809 bank memory set */
 	{
 		UINT8 *rom = memory_region(machine, "audiocpu") + 0x10000;
-		memory_set_bankptr(machine, 2,rom);
+		memory_set_bankptr(machine, "bank2",rom);
 		device_reset(cputag_get_cpu(machine, "audiocpu"));
 	}
 }
@@ -296,7 +296,7 @@ static WRITE8_DEVICE_HANDLER( glad_adpcm_w )
 	UINT8 *rom = memory_region(device->machine, "audiocpu") + 0x10000;
 
 	/* bit6 = bank offset */
-	memory_set_bankptr(device->machine, 2,rom + ((data & 0x40) ? 0xc000 : 0));
+	memory_set_bankptr(device->machine, "bank2",rom + ((data & 0x40) ? 0xc000 : 0));
 
 	msm5205_data_w(device,data);         /* bit0..3  */
 	msm5205_reset_w(device,(data>>5)&1); /* bit 5    */
@@ -423,7 +423,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gladiatr_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x6000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(gladiatr_video_registers_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(gladiatr_paletteram_w) AM_BASE_GENERIC(paletteram)
@@ -441,7 +441,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gladiatr_cpu3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1fff) AM_DEVWRITE("msm", glad_adpcm_w)
 	AM_RANGE(0x2000, 0x2fff) AM_READ(glad_cpu_sound_command_r)
-	AM_RANGE(0x4000, 0xffff) AM_ROMBANK(2)
+	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
 
@@ -1004,7 +1004,7 @@ static DRIVER_INIT( gladiatr )
 
 	/* make sure bank is valid in cpu-reset */
 	rom = memory_region(machine, "audiocpu") + 0x10000;
-	memory_set_bankptr(machine, 2,rom);
+	memory_set_bankptr(machine, "bank2",rom);
 }
 
 

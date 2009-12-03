@@ -147,23 +147,23 @@ WRITE8_HANDLER( zigzag_sillyprotection_w )
 	if (data)
 	{
 		/* swap ROM 2 and 3! */
-		memory_set_bank(space->machine, 1, 1);
-		memory_set_bank(space->machine, 2, 0);
+		memory_set_bank(space->machine, "bank1", 1);
+		memory_set_bank(space->machine, "bank2", 0);
 	}
 	else
 	{
-		memory_set_bank(space->machine, 1, 0);
-		memory_set_bank(space->machine, 2, 1);
+		memory_set_bank(space->machine, "bank1", 0);
+		memory_set_bank(space->machine, "bank2", 1);
 	}
 }
 
 DRIVER_INIT( zigzag )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 2, &RAM[0x2000], 0x1000);
-	memory_configure_bank(machine, 2, 0, 2, &RAM[0x2000], 0x1000);
-	memory_set_bank(machine, 1, 0);
-	memory_set_bank(machine, 2, 1);
+	memory_configure_bank(machine, "bank1", 0, 2, &RAM[0x2000], 0x1000);
+	memory_configure_bank(machine, "bank2", 0, 2, &RAM[0x2000], 0x1000);
+	memory_set_bank(machine, "bank1", 0);
+	memory_set_bank(machine, "bank2", 1);
 }
 
 
@@ -244,7 +244,7 @@ WRITE8_HANDLER( _4in1_bank_w )
 {
 	_4in1_bank = data & 0x03;
 	galaxold_gfxbank_w(space, 0, _4in1_bank);
-	memory_set_bank(space->machine, 1, _4in1_bank);
+	memory_set_bank(space->machine, "bank1", _4in1_bank);
 }
 
 CUSTOM_INPUT( _4in1_fake_port_r )
@@ -399,7 +399,7 @@ DRIVER_INIT( 4in1 )
 		RAM[i] = RAM[i] ^ (i & 0xff);
 
 	/* games are banked at 0x0000 - 0x3fff */
-	memory_configure_bank(machine, 1, 0, 4, &RAM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 4, &RAM[0x10000], 0x4000);
 
 	_4in1_bank_w(space, 0, 0); /* set the initial CPU bank */
 

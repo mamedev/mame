@@ -330,7 +330,7 @@ static WRITE8_HANDLER( master_bankswitch_w )
 
 	ROM = &ROM[0x4000 * bank];
 
-	memory_set_bankptr(space->machine, 1,ROM);
+	memory_set_bankptr(space->machine, "bank1",ROM);
 }
 
 
@@ -348,7 +348,7 @@ static WRITE8_HANDLER( hu_colorram_w )
 
 static ADDRESS_MAP_START( master_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE( pandora_spriteram_r, pandora_spriteram_w )
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
@@ -369,7 +369,7 @@ static WRITE8_HANDLER( slave_bankswitch_w )
 	port0_data=data;
 	ROM = &ROM[0x4000 * bank];
 
-	memory_set_bankptr(space->machine, 2,ROM);
+	memory_set_bankptr(space->machine, "bank2",ROM);
 }
 
 static WRITE8_HANDLER( hu_scrollx_w)
@@ -384,7 +384,7 @@ static WRITE8_HANDLER( hu_scrolly_w)
 
 static ADDRESS_MAP_START( slave_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(hu_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(hu_colorram_w) AM_BASE_GENERIC(colorram)
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_split2_w) AM_BASE_GENERIC(paletteram2)
@@ -416,12 +416,12 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 	ROM = &ROM[0x4000 * bank];
 
-	memory_set_bankptr(space->machine, 3,ROM);
+	memory_set_bankptr(space->machine, "bank3",ROM);
 }
 
 static ADDRESS_MAP_START( sound_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(3)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 

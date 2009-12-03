@@ -313,7 +313,7 @@ static UINT8 f7_bank_value;
 /* we have to fill in the ROM addresses for systeme due to the encrypted games */
 static ADDRESS_MAP_START( systeme_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								/* Fixed ROM */
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)						/* Banked ROM */
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")						/* Banked ROM */
 ADDRESS_MAP_END
 
 
@@ -354,7 +354,7 @@ static WRITE8_HANDLER( systeme_bank_w )
 	segae_set_vram_banks(data);
 
 	//memcpy(sms_rom+0x8000, memory_region(space->machine, "user1")+0x10000+rombank*0x4000, 0x4000);
-	memory_set_bank(space->machine, 1, rombank);
+	memory_set_bank(space->machine, "bank1", rombank);
 
 }
 
@@ -390,15 +390,15 @@ static void init_ports_systeme(running_machine *machine)
 
 static void init_systeme_map(running_machine *machine)
 {
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	/* alternate way of accessing video ram */
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, segasyse_videoram_w);
 
 	/* main ram area */
 	sms_mainram = auto_alloc_array(machine, UINT8, 0x4000);
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, (read8_space_func)SMH_BANK(2), (write8_space_func)SMH_BANK(2));
-	memory_set_bankptr(machine,  2, sms_mainram );
+	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, "bank2");
+	memory_set_bankptr(machine,  "bank2", sms_mainram );
 	memset(sms_mainram,0x00,0x4000);
 
 	init_ports_systeme(machine);
@@ -984,14 +984,14 @@ static DRIVER_INIT( opaopa )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	mc8123_decrypt_rom(machine, "maincpu", "user1", 1, 8);
+	mc8123_decrypt_rom(machine, "maincpu", "user1", "bank1", 8);
 }
 
 static DRIVER_INIT( fantzn2 )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	mc8123_decrypt_rom(machine, "maincpu", "user1", 0, 0);
+	mc8123_decrypt_rom(machine, "maincpu", "user1", NULL, 0);
 }
 
 static DRIVER_INIT( astrofl )

@@ -226,7 +226,7 @@ static WRITE8_HANDLER( rom_bank_select_w )
 	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
 
 	mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
-	memory_set_bankptr(space->machine, 2, region_base + (data&0x3f ) * 0x4000);
+	memory_set_bankptr(space->machine, "bank2", region_base + (data&0x3f ) * 0x4000);
 
 	msm_nmi_mask = data & 0x40;
 	flip_screen_set(space->machine, data & 0x80);
@@ -237,7 +237,7 @@ static WRITE8_HANDLER( rom2_bank_select_w )
 	UINT8 *region_base = memory_region(space->machine, "user2");
 	mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
 
-	memory_set_bankptr(space->machine, 1, region_base + (data&0x0f ) * 0x4000);
+	memory_set_bankptr(space->machine, "bank1", region_base + (data&0x0f ) * 0x4000);
 
 	if(data & 0xf0)
 		printf("Rom bank select 2 with data %02x activated\n",data);
@@ -265,9 +265,9 @@ static READ8_HANDLER( p2_r )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x4000) AM_WRITE( rom2_bank_select_w )
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE( suprgolf_bg_vram_r, suprgolf_bg_vram_w ) // banked background vram
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE( suprgolf_videoram_r, suprgolf_videoram_w ) AM_BASE_GENERIC(videoram) //foreground vram + paletteram
 	AM_RANGE(0xf000, 0xf000) AM_WRITE( suprgolf_pen_w )

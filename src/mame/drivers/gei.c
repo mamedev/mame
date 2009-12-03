@@ -200,68 +200,68 @@ static READ8_DEVICE_HANDLER( portC_r )
 
 static WRITE8_HANDLER( banksel_main_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x8000);
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "cpu") + 0x8000);
 }
 static WRITE8_HANDLER( banksel_1_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x10000);
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "cpu") + 0x10000);
 }
 static WRITE8_HANDLER( banksel_2_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x18000);
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "cpu") + 0x18000);
 }
 static WRITE8_HANDLER( banksel_3_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x20000);
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "cpu") + 0x20000);
 }
 static WRITE8_HANDLER( banksel_4_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x28000);
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "cpu") + 0x28000);
 }
 static WRITE8_HANDLER( banksel_5_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x30000);
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "cpu") + 0x30000);
 }
 
 static WRITE8_HANDLER( banksel_1_1_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x10000);
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "cpu") + 0x10000);
 }
 static WRITE8_HANDLER( banksel_2_1_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x14000);
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "cpu") + 0x14000);
 }
 static WRITE8_HANDLER( banksel_3_1_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x18000);
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "cpu") + 0x18000);
 }
 static WRITE8_HANDLER( banksel_4_1_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x1c000);
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "cpu") + 0x1c000);
 }
 static WRITE8_HANDLER( banksel_5_1_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x20000);
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "cpu") + 0x20000);
 }
 static WRITE8_HANDLER( banksel_1_2_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x12000);
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "cpu") + 0x12000);
 }
 static WRITE8_HANDLER( banksel_2_2_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x16000);
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "cpu") + 0x16000);
 }
 static WRITE8_HANDLER( banksel_3_2_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x1a000);
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "cpu") + 0x1a000);
 }
 static WRITE8_HANDLER( banksel_4_2_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x1e000);
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "cpu") + 0x1e000);
 }
 static WRITE8_HANDLER( banksel_5_2_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "cpu") + 0x22000);
+	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "cpu") + 0x22000);
 }
 
 static WRITE8_HANDLER(geimulti_bank_w)
@@ -289,7 +289,7 @@ static WRITE8_HANDLER(geimulti_bank_w)
 	}
 
 	if (bank != -1)
-		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "bank") + bank*0x8000);
+		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "bank") + bank*0x8000);
 }
 
 /* This signature is used to validate the ROMs in sportauth. Simple protection check? */
@@ -328,7 +328,7 @@ static WRITE8_HANDLER( signature2_w )
 
 static ADDRESS_MAP_START( getrivia_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
@@ -350,7 +350,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gselect_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x4400, 0x4400) AM_WRITE(banksel_1_1_w)
 	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_1_2_w)
@@ -365,7 +365,7 @@ ADDRESS_MAP_END
 // TODO: where are mapped the lower 0x2000 bytes of the banks?
 static ADDRESS_MAP_START( amuse_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
@@ -381,7 +381,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gepoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
@@ -398,7 +398,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( amuse1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x4400, 0x4400) AM_WRITE(banksel_1_1_w)
 	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_2_1_w)
@@ -428,7 +428,7 @@ static ADDRESS_MAP_START( findout_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6200, 0x6200) AM_WRITE(signature_w)
 	AM_RANGE(0x6400, 0x6400) AM_READ(signature_r)
 	AM_RANGE(0x7800, 0x7fff) AM_ROM /*space for diagnostic ROM?*/
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
 	AM_RANGE(0xc000, 0xffff) AM_WRITE(gei_bitmap_w)  AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x0000, 0xffff) AM_READ(catchall)
@@ -457,7 +457,7 @@ static ADDRESS_MAP_START( geimulti_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5a00, 0x5cff) AM_WRITE(geimulti_bank_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w) AM_BASE_GENERIC(videoram)
 ADDRESS_MAP_END
 
@@ -471,7 +471,7 @@ static ADDRESS_MAP_START( sprtauth_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5a00, 0x5cff) AM_WRITE(geimulti_bank_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w) AM_BASE_GENERIC(videoram)
 ADDRESS_MAP_END
 
@@ -1730,12 +1730,12 @@ ROM_END
 
 static DRIVER_INIT( setbank )
 {
-	memory_set_bankptr(machine, 1,memory_region(machine, "cpu") + 0x2000);
+	memory_set_bankptr(machine, "bank1",memory_region(machine, "cpu") + 0x2000);
 }
 
 static DRIVER_INIT( geimulti )
 {
-	memory_set_bankptr(machine, 1,memory_region(machine, "bank") + 0x0000);
+	memory_set_bankptr(machine, "bank1",memory_region(machine, "bank") + 0x0000);
 }
 
 GAME( 1982, jokpoker, 0,        gselect,  gselect,  setbank, ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03B)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

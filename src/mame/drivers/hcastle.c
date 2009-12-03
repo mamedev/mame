@@ -33,7 +33,7 @@ static WRITE8_HANDLER( hcastle_bankswitch_w )
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x1f) * 0x2000;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
 }
 
 static WRITE8_HANDLER( hcastle_soundirq_w )
@@ -71,7 +71,7 @@ static ADDRESS_MAP_START( hcastle_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(hcastle_pf2_video_w) AM_BASE(&hcastle_pf2_videoram)
 	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

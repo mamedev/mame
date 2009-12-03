@@ -346,12 +346,12 @@ static WRITE32_HANDLER( aga_overlay_w )
 		data = (data >> 16) & 1;
 
 		/* switch banks as appropriate */
-		memory_set_bank(space->machine, 1, data & 1);
+		memory_set_bank(space->machine, "bank1", data & 1);
 
 		/* swap the write handlers between ROM and bank 1 based on the bit */
 		if ((data & 1) == 0)
 			/* overlay disabled, map RAM on 0x000000 */
-			memory_install_write32_handler(space, 0x000000, 0x1fffff, 0, 0, (write32_space_func)SMH_BANK(1));
+			memory_install_write_bank_handler(space, 0x000000, 0x1fffff, 0, 0, "bank1");
 		else
 			/* overlay enabled, map Amiga system ROM on 0x000000 */
 			memory_install_write32_handler(space, 0x000000, 0x1fffff, 0, 0, (write32_space_func)SMH_UNMAP);
@@ -414,7 +414,7 @@ static WRITE8_DEVICE_HANDLER( cd32_cia_0_portb_w )
 
 static ADDRESS_MAP_START( cd32_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram32) AM_SIZE(&amiga_chip_ram_size)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE(&amiga_chip_ram32) AM_SIZE(&amiga_chip_ram_size)
 	AM_RANGE(0x800000, 0x800003) AM_READ_PORT("DIPSW1")
 	AM_RANGE(0x800010, 0x800013) AM_READ_PORT("DIPSW2")
 	AM_RANGE(0xb80000, 0xb8003f) AM_READWRITE(amiga_akiko32_r, amiga_akiko32_w)
@@ -1157,8 +1157,8 @@ static DRIVER_INIT( cd32 )
 	amiga_machine_config(machine, &cubocd32_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, 1, 0, 1, amiga_chip_ram32, 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, amiga_chip_ram32, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
 
 	/* intialize akiko */
 	amiga_akiko_init(machine);

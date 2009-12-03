@@ -70,7 +70,7 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( adpcm_control_w )
 {
-	memory_set_bank(device->machine, 1, data & 0x01);
+	memory_set_bank(device->machine, "bank1", data & 0x01);
 
 	msm5205_reset_w(device, data & 0x08);
 }
@@ -83,7 +83,7 @@ static WRITE8_HANDLER( adpcm_data_w )
 
 static ADDRESS_MAP_START( sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", adpcm_control_w)
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(adpcm_data_w)
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
@@ -295,7 +295,7 @@ static MACHINE_START( goal92 )
 	goal92_state *state = (goal92_state *)machine->driver_data;
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
-	memory_configure_bank(machine, 1, 0, 2, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
 
 	state->audiocpu = devtag_get_device(machine, "audiocpu");
 

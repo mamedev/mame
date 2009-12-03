@@ -695,7 +695,7 @@ static ADDRESS_MAP_START( alpha68k_II_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_MEMBER(alpha68k_state, spriteram)
 	AM_RANGE(0x300000, 0x3001ff) AM_READWRITE(alpha_II_trigger_r, alpha_microcontroller_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(alpha68k_paletteram_w) AM_BASE_MEMBER(alpha68k_state, paletteram)
-	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK(8)
+	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK("bank8")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( alpha68k_V_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -713,7 +713,7 @@ static ADDRESS_MAP_START( alpha68k_V_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x3001ff) AM_WRITE(alpha_microcontroller_w)
 	AM_RANGE(0x303e00, 0x303fff) AM_WRITE(alpha_microcontroller_w) /* Gang Wars mirror */
 	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(alpha68k_paletteram_w) AM_BASE_MEMBER(alpha68k_state, paletteram)
-	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK(8)
+	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK("bank8")
 ADDRESS_MAP_END
 
 static READ16_HANDLER(sound_cpu_r) { return 1; }
@@ -740,13 +740,13 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sound_bank_w )
 {
-	memory_set_bank(space->machine, 7, data);
+	memory_set_bank(space->machine, "bank7", data);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(7)
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank7")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kyros_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1889,7 +1889,7 @@ static MACHINE_START( alpha68k_V )
 	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
-	memory_configure_bank(machine, 7, 0, 32, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank7", 0, 32, &ROM[0x10000], 0x4000);
 
 	MACHINE_START_CALL(common);
 
@@ -1925,7 +1925,7 @@ static MACHINE_START( alpha68k_II )
 	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
-	memory_configure_bank(machine, 7, 0, 28, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank7", 0, 28, &ROM[0x10000], 0x4000);
 
 	MACHINE_START_CALL(common);
 
@@ -3300,7 +3300,7 @@ static DRIVER_INIT( skysoldr )
 {
 	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x40008, 0x40009, 0, 0, skysoldr_cycle_r);
-	memory_set_bankptr(machine, 8, (memory_region(machine, "user1")) + 0x40000);
+	memory_set_bankptr(machine, "bank8", (memory_region(machine, "user1")) + 0x40000);
 	state->invert_controls = 0;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8);
@@ -3317,7 +3317,7 @@ static DRIVER_INIT( goldmedl )
 static DRIVER_INIT( goldmeda )
 {
 	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
-	memory_set_bankptr(machine, 8, memory_region(machine, "maincpu") + 0x20000);
+	memory_set_bankptr(machine, "bank8", memory_region(machine, "maincpu") + 0x20000);
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8803; //Guess - routine to handle coinage is the same as in 'goldmedl'
 	state->coin_id = 0x23 | (0x24 << 8);
@@ -3345,7 +3345,7 @@ static DRIVER_INIT( gangwars )
 {
 	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x40206, 0x40207, 0, 0, gangwars_cycle_r);
-	memory_set_bankptr(machine, 8, memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank8", memory_region(machine, "user1"));
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8512;
 	state->coin_id = 0x23 | (0x24 << 8);
@@ -3355,7 +3355,7 @@ static DRIVER_INIT( gangwarb )
 {
 	alpha68k_state *state = (alpha68k_state *)machine->driver_data;
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x40206, 0x40207, 0, 0, gangwarb_cycle_r);
-	memory_set_bankptr(machine, 8, memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank8", memory_region(machine, "user1"));
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8512;
 	state->coin_id = 0x23 | (0x24 << 8);

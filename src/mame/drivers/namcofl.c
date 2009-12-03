@@ -199,13 +199,13 @@ static WRITE32_HANDLER( namcofl_sysreg_w )
 	{
 		if (data == 0)	// RAM at 00000000, ROM at 10000000
 		{
-			memory_set_bankptr(space->machine,  1, namcofl_workram );
-			memory_set_bankptr(space->machine,  2, memory_region(space->machine, "maincpu") );
+			memory_set_bankptr(space->machine,  "bank1", namcofl_workram );
+			memory_set_bankptr(space->machine,  "bank2", memory_region(space->machine, "maincpu") );
 		}
 		else		// ROM at 00000000, RAM at 10000000
 		{
-			memory_set_bankptr(space->machine,  1, memory_region(space->machine, "maincpu") );
-			memory_set_bankptr(space->machine,  2, namcofl_workram );
+			memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "maincpu") );
+			memory_set_bankptr(space->machine,  "bank2", namcofl_workram );
 		}
 	}
 }
@@ -237,8 +237,8 @@ static WRITE32_HANDLER( namcofl_share_w )
 }
 
 static ADDRESS_MAP_START( namcofl_mem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_READWRITE(SMH_BANK(1), SMH_BANK(1))
-	AM_RANGE(0x10000000, 0x100fffff) AM_READWRITE(SMH_BANK(2), SMH_BANK(2))
+	AM_RANGE(0x00000000, 0x000fffff) AM_RAMBANK("bank1")
+	AM_RANGE(0x10000000, 0x100fffff) AM_RAMBANK("bank2")
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_REGION("user1", 0)	/* data */
 	AM_RANGE(0x30000000, 0x30001fff) AM_RAM	AM_BASE_SIZE_GENERIC(nvram) /* nvram */
 	AM_RANGE(0x30100000, 0x30100003) AM_WRITE(namcofl_spritebank_w)
@@ -725,8 +725,8 @@ static void namcofl_common_init(running_machine *machine)
 {
 	namcofl_workram = auto_alloc_array(machine, UINT32, 0x100000/4);
 
-	memory_set_bankptr(machine,  1, memory_region(machine, "maincpu") );
-	memory_set_bankptr(machine,  2, namcofl_workram );
+	memory_set_bankptr(machine,  "bank1", memory_region(machine, "maincpu") );
+	memory_set_bankptr(machine,  "bank2", namcofl_workram );
 }
 
 static DRIVER_INIT(speedrcr)

@@ -280,7 +280,7 @@ static ADDRESS_MAP_START( spdodgeb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3006, 0x3006) AM_WRITE(spdodgeb_ctrl_w)	/* scroll hi, flip screen, bank switch, palette select */
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(mcu63701_w)
 	AM_RANGE(0x3801, 0x3805) AM_READ(mcu63701_r)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -73,14 +73,14 @@ static WRITE8_HANDLER( ojankohs_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
-	memory_set_bankptr(space->machine, 1, &ROM[0x10000 + (0x4000 * (data & 0x3f))]);
+	memory_set_bankptr(space->machine, "bank1", &ROM[0x10000 + (0x4000 * (data & 0x3f))]);
 }
 
 static WRITE8_HANDLER( ojankoy_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
-	memory_set_bankptr(space->machine, 1, &ROM[0x10000 + (0x4000 * (data & 0x1f))]);
+	memory_set_bankptr(space->machine, "bank1", &ROM[0x10000 + (0x4000 * (data & 0x1f))]);
 
 	ojankohs_adpcm_reset = ((data & 0x20) >> 5);
 	if (!ojankohs_adpcm_reset) ojankohs_vclk_left = 0;
@@ -125,7 +125,7 @@ static WRITE8_HANDLER( ojankoc_ctrl_w )
 	UINT8 *BANKROM = memory_region(space->machine, "user1");
 	UINT32 bank_address = (data & 0x0f) * 0x8000;
 
-	memory_set_bankptr(space->machine, 1, &BANKROM[bank_address]);
+	memory_set_bankptr(space->machine, "bank1", &BANKROM[bank_address]);
 
 	ojankohs_adpcm_reset = ((data & 0x10) >> 4);
 	msm5205_reset_w(devtag_get_device(space->machine, "msm"), (!(data & 0x10) >> 4));
@@ -226,7 +226,7 @@ static ADDRESS_MAP_START( ojankohs_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(ojankohs_colorram_w)
 	AM_RANGE(0xa000, 0xb7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(ojankohs_palette_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 
@@ -235,14 +235,14 @@ static ADDRESS_MAP_START( ojankoy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(ojankohs_videoram_w)
 	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(ojankohs_colorram_w)
 	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( ojankoc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1) AM_WRITE(ojankoc_videoram_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(ojankoc_videoram_w)
 ADDRESS_MAP_END
 
 

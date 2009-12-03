@@ -286,7 +286,7 @@ static WRITE32_HANDLER( bitlatches_w )
 
 		/* ROM bank selection on Zeus 2 */
 		case 5:
-			memory_set_bank(space->machine, 1, bitlatch[offset] & 3);
+			memory_set_bank(space->machine, "bank1", bitlatch[offset] & 3);
 			break;
 
 		/* unknown purpose; crusnexo/thegrid write 1 at startup */
@@ -608,7 +608,7 @@ static ADDRESS_MAP_START( zeus2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x9f0000, 0x9f7fff) AM_DEVREADWRITE("m48t35", zeus2_timekeeper_r, zeus2_timekeeper_w)
 	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
 	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK(1) AM_REGION("user2", 0)
+	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK("bank1") AM_REGION("user2", 0)
 ADDRESS_MAP_END
 
 /*
@@ -1394,7 +1394,7 @@ static DRIVER_INIT( crusnexo )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
-	memory_configure_bank(machine, 1, 0, 3, memory_region(machine, "user2"), 0x400000*4);
+	memory_configure_bank(machine, "bank1", 0, 3, memory_region(machine, "user2"), 0x400000*4);
 
 	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9b0004, 0x9b0007, 0, 0, crusnexo_leds_r, crusnexo_leds_w);
 	memory_install_write32_handler    (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8d0009, 0x8d000a, 0, 0, keypad_select_w);
@@ -1405,7 +1405,7 @@ static DRIVER_INIT( thegrid )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 474/* or 491 */, 99, NULL);
-	memory_configure_bank(machine, 1, 0, 3, memory_region(machine, "user2"), 0x400000*4);
+	memory_configure_bank(machine, "bank1", 0, 3, memory_region(machine, "user2"), 0x400000*4);
 }
 
 

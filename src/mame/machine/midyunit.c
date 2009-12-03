@@ -298,20 +298,20 @@ static void init_generic(running_machine *machine, int bpp, int sound, int prot_
 
 		case SOUND_CVSD:
 			williams_cvsd_init(machine);
-			memory_install_readwrite8_handler(cputag_get_address_space(machine, "cvsdcpu", ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, (read8_space_func)SMH_BANK(9), (write8_space_func)SMH_BANK(9));
-			memory_set_bankptr(machine, 9, auto_alloc_array(machine, UINT8, 0x80));
+			memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "cvsdcpu", ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, "bank9");
+			memory_set_bankptr(machine, "bank9", auto_alloc_array(machine, UINT8, 0x80));
 			break;
 
 		case SOUND_ADPCM:
 			williams_adpcm_init(machine);
-			memory_install_readwrite8_handler(cputag_get_address_space(machine, "adpcm", ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, (read8_space_func)SMH_BANK(9), (write8_space_func)SMH_BANK(9));
-			memory_set_bankptr(machine, 9, auto_alloc_array(machine, UINT8, 0x80));
+			memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "adpcm", ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, "bank9");
+			memory_set_bankptr(machine, "bank9", auto_alloc_array(machine, UINT8, 0x80));
 			break;
 
 		case SOUND_NARC:
 			williams_narc_init(machine);
-			memory_install_readwrite8_handler(cputag_get_address_space(machine, "narc1cpu", ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, (read8_space_func)SMH_BANK(9), (write8_space_func)SMH_BANK(9));
-			memory_set_bankptr(machine, 9, auto_alloc_array(machine, UINT8, 0x80));
+			memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "narc1cpu", ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, "bank9");
+			memory_set_bankptr(machine, "bank9", auto_alloc_array(machine, UINT8, 0x80));
 			break;
 
 		case SOUND_YAWDIM:

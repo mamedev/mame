@@ -83,7 +83,7 @@ static WRITE8_HANDLER( exzisus_cpua_bankswitch_w )
 		exzisus_cpua_bank = data & 0x0f;
 		if (exzisus_cpua_bank >= 2)
 		{
-			memory_set_bankptr(space->machine,  2, &RAM[ 0x10000 + ( (exzisus_cpua_bank - 2) * 0x4000 ) ] );
+			memory_set_bankptr(space->machine,  "bank2", &RAM[ 0x10000 + ( (exzisus_cpua_bank - 2) * 0x4000 ) ] );
 		}
 	}
 
@@ -100,7 +100,7 @@ static WRITE8_HANDLER( exzisus_cpub_bankswitch_w )
 		exzisus_cpub_bank = data & 0x0f;
 		if (exzisus_cpub_bank >= 2)
 		{
-			memory_set_bankptr(space->machine,  1, &RAM[ 0x10000 + ( (exzisus_cpub_bank - 2) * 0x4000 ) ] );
+			memory_set_bankptr(space->machine,  "bank1", &RAM[ 0x10000 + ( (exzisus_cpub_bank - 2) * 0x4000 ) ] );
 		}
 	}
 
@@ -165,7 +165,7 @@ static DRIVER_INIT( exzisus )
 
 static ADDRESS_MAP_START( cpua_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xc5ff) AM_READWRITE(exzisus_objectram_1_r, exzisus_objectram_1_w) AM_BASE(&exzisus_objectram1) AM_SIZE(&exzisus_objectram_size1)
 	AM_RANGE(0xc600, 0xdfff) AM_READWRITE(exzisus_videoram_1_r, exzisus_videoram_1_w) AM_BASE(&exzisus_videoram1)
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(exzisus_sharedram_ac_r, exzisus_sharedram_ac_w) AM_BASE(&exzisus_sharedram_ac)
@@ -176,7 +176,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc5ff) AM_READWRITE(exzisus_objectram_0_r, exzisus_objectram_0_w) AM_BASE(&exzisus_objectram0) AM_SIZE(&exzisus_objectram_size0)
 	AM_RANGE(0xc600, 0xdfff) AM_READWRITE(exzisus_videoram_0_r, exzisus_videoram_0_w) AM_BASE(&exzisus_videoram0)
 	AM_RANGE(0xe000, 0xefff) AM_RAM

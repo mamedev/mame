@@ -257,12 +257,12 @@ static INTERRUPT_GEN( cadash_interrupt )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "audiocpu") + ((data-1) & 0x03) * 0x4000 + 0x10000 );
+	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "audiocpu") + ((data-1) & 0x03) * 0x4000 + 0x10000 );
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_2151_w )
 {
-	memory_set_bankptr(device->machine,  1, memory_region(device->machine, "audiocpu") + ((data-1) & 0x03) * 0x4000 + 0x10000 );
+	memory_set_bankptr(device->machine,  "bank1", memory_region(device->machine, "audiocpu") + ((data-1) & 0x03) * 0x4000 + 0x10000 );
 }
 
 
@@ -303,8 +303,8 @@ static WRITE8_DEVICE_HANDLER( asuka_msm5205_stop_w )
 static MACHINE_START( asuka )
 {
 	/* configure the banks */
-    memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "audiocpu"), 0);
-	memory_configure_bank(machine, 1, 1, 3, memory_region(machine, "audiocpu") + 0x10000, 0x04000);
+    memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "audiocpu"), 0);
+	memory_configure_bank(machine, "bank1", 1, 3, memory_region(machine, "audiocpu") + 0x10000, 0x04000);
 
 	state_save_register_global(machine, adpcm_pos);
 }
@@ -389,7 +389,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bonzeadv_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
@@ -403,7 +403,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 //  AM_RANGE(0x9002, 0x9100) AM_READNOP
@@ -417,7 +417,7 @@ ADDRESS_MAP_END
 /* no MSM5205 */
 static ADDRESS_MAP_START( cadash_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)

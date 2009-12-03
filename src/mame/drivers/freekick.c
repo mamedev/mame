@@ -70,7 +70,7 @@ static READ8_HANDLER( spinner_r )
 
 static WRITE8_HANDLER( pbillrd_bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, data & 1);
+	memory_set_bank(space->machine, "bank1", data & 1);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
@@ -164,7 +164,7 @@ static WRITE8_HANDLER( freekick_ff_w )
 
 static ADDRESS_MAP_START( pbillrd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE_MEMBER(freekick_state, videoram)
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE_MEMBER(freekick_state, spriteram, spriteram_size)
@@ -616,7 +616,7 @@ static MACHINE_RESET( freekick )
 
 static MACHINE_START( pbillrd )
 {
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	MACHINE_START_CALL(freekick);
 }
@@ -1118,12 +1118,12 @@ static DRIVER_INIT(gigasb)
 
 static DRIVER_INIT( pbillrds )
 {
-	mc8123_decrypt_rom(machine, "maincpu", "user1", 1, 2);
+	mc8123_decrypt_rom(machine, "maincpu", "user1", "bank1", 2);
 }
 
 static DRIVER_INIT( gigas )
 {
-	mc8123_decrypt_rom(machine, "maincpu", "user1", 0, 1);
+	mc8123_decrypt_rom(machine, "maincpu", "user1", NULL, 1);
 }
 
 

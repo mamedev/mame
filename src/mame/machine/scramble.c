@@ -112,7 +112,7 @@ static void cavelon_banksw(running_machine *machine)
        to keep the CPU core happy at the boundaries */
 
 	cavelon_bank = !cavelon_bank;
-	memory_set_bank(machine, 1, cavelon_bank);
+	memory_set_bank(machine, "bank1", cavelon_bank);
 }
 
 static READ8_HANDLER( cavelon_banksw_r )
@@ -242,8 +242,9 @@ DRIVER_INIT( ckongs )
 DRIVER_INIT( mariner )
 {
 	/* extra ROM */
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5800, 0x67ff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_UNMAP);
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x5800);
+	memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5800, 0x67ff, 0, 0, "bank1");
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5800, 0x67ff, 0, 0, (write8_space_func)SMH_UNMAP);
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x5800);
 
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9008, 0x9008, 0, 0, mariner_protection_2_r);
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb401, 0xb401, 0, 0, mariner_protection_1_r);
@@ -327,8 +328,8 @@ DRIVER_INIT( cavelon )
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	/* banked ROM */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(1));
-	memory_configure_bank(machine, 1, 0, 2, &ROM[0x00000], 0x10000);
+	memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
+	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x00000], 0x10000);
 	cavelon_banksw(machine);
 
 	/* A15 switches memory banks */

@@ -769,7 +769,7 @@ static WRITE32_HANDLER( comm_rombank_w )
 	int bank = data >> 24;
 	UINT8 *usr3 = memory_region(space->machine, "user3");
 	if (usr3 != NULL)
-		memory_set_bank(space->machine, 1, bank & 0x7f);
+		memory_set_bank(space->machine, "bank1", bank & 0x7f);
 }
 
 static READ32_HANDLER( comm0_unk_r )
@@ -812,7 +812,7 @@ static ADDRESS_MAP_START( hornet_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x7d044000, 0x7d044007) AM_READ(comm0_unk_r)
 	AM_RANGE(0x7d048000, 0x7d048003) AM_WRITE(comm1_w)
 	AM_RANGE(0x7d04a000, 0x7d04a003) AM_WRITE(comm_rombank_w)
-	AM_RANGE(0x7d050000, 0x7d05ffff) AM_ROMBANK(1)		/* COMM BOARD 1 */
+	AM_RANGE(0x7d050000, 0x7d05ffff) AM_ROMBANK("bank1")		/* COMM BOARD 1 */
 	AM_RANGE(0x7e000000, 0x7e7fffff) AM_ROM AM_REGION("user2", 0)		/* Data ROM */
 	AM_RANGE(0x7f000000, 0x7f3fffff) AM_ROM AM_SHARE(2)
 	AM_RANGE(0x7fc00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE(2)	/* Program ROM */
@@ -899,7 +899,7 @@ static ADDRESS_MAP_START( sharc0_map, ADDRESS_SPACE_DATA, 32 )
 	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("voodoo0", voodoo_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
 	AM_RANGE(0x3500000, 0x35000ff) AM_READWRITE(K033906_0_r, K033906_0_w)
-	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK(5)
+	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sharc1_map, ADDRESS_SPACE_DATA, 32 )
@@ -909,7 +909,7 @@ static ADDRESS_MAP_START( sharc1_map, ADDRESS_SPACE_DATA, 32 )
 	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("voodoo1", voodoo_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_1_comm_sharc_r, cgboard_1_comm_sharc_w)
 	AM_RANGE(0x3500000, 0x35000ff) AM_READWRITE(K033906_1_r, K033906_1_w)
-	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK(6)
+	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank6")
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -1054,14 +1054,14 @@ static MACHINE_RESET( hornet )
 	UINT8 *usr5 = memory_region(machine, "user5");
 	if (usr3 != NULL)
 	{
-		memory_configure_bank(machine, 1, 0, memory_region_length(machine, "user3") / 0x40000, usr3, 0x40000);
-		memory_set_bank(machine, 1, 0);
+		memory_configure_bank(machine, "bank1", 0, memory_region_length(machine, "user3") / 0x40000, usr3, 0x40000);
+		memory_set_bank(machine, "bank1", 0);
 	}
 
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
-		memory_set_bankptr(machine, 5, usr5);
+		memory_set_bankptr(machine, "bank5", usr5);
 }
 
 static NVRAM_HANDLER( hornet )
@@ -1133,14 +1133,14 @@ static MACHINE_RESET( hornet_2board )
 
 	if (usr3 != NULL)
 	{
-		memory_configure_bank(machine, 1, 0, memory_region_length(machine, "user3") / 0x40000, usr3, 0x40000);
-		memory_set_bank(machine, 1, 0);
+		memory_configure_bank(machine, "bank1", 0, memory_region_length(machine, "user3") / 0x40000, usr3, 0x40000);
+		memory_set_bank(machine, "bank1", 0);
 	}
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 	cputag_set_input_line(machine, "dsp2", INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
-		memory_set_bankptr(machine, 5, usr5);
+		memory_set_bankptr(machine, "bank5", usr5);
 }
 
 static MACHINE_DRIVER_START( hornet_2board )
@@ -1367,7 +1367,7 @@ static void sound_irq_callback(running_machine *machine, int irq)
 static DRIVER_INIT(hornet)
 {
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_HORNET);
-	set_cgboard_texture_bank(machine, 0, 5, memory_region(machine, "user5"));
+	set_cgboard_texture_bank(machine, 0, "bank5", memory_region(machine, "user5"));
 
 	K056800_init(machine, sound_irq_callback);
 	K033906_init(machine);
@@ -1380,8 +1380,8 @@ static DRIVER_INIT(hornet)
 static DRIVER_INIT(hornet_2board)
 {
 	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HORNET);
-	set_cgboard_texture_bank(machine, 0, 5, memory_region(machine, "user5"));
-	set_cgboard_texture_bank(machine, 1, 6, memory_region(machine, "user5"));
+	set_cgboard_texture_bank(machine, 0, "bank5", memory_region(machine, "user5"));
+	set_cgboard_texture_bank(machine, 1, "bank6", memory_region(machine, "user5"));
 
 	K056800_init(machine, sound_irq_callback);
 	K033906_init(machine);

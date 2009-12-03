@@ -60,13 +60,13 @@ static WRITE8_HANDLER( tryout_bankswitch_w )
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x01) * 0x2000;
-	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1", &RAM[bankaddress]);
 }
 
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(tryout_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xc800, 0xc87f) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_BASE_GENERIC(spriteram2)

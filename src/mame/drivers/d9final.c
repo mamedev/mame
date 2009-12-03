@@ -73,7 +73,7 @@ static WRITE8_HANDLER( d9final_bank_w )
 	UINT32 bankaddress;
 
 	bankaddress = 0x10000+(0x4000 * (data & 0x7));
-	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1", &ROM[bankaddress]);
 }
 
 /* game checks this after three attract cycles, otherwise coin inputs stop to work. */
@@ -87,7 +87,7 @@ static READ8_HANDLER( prot_latch_r )
 
 static ADDRESS_MAP_START( d9final_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
@@ -252,7 +252,7 @@ static MACHINE_RESET( d9final )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	memory_set_bankptr(machine, 1, &ROM[0x10000]);
+	memory_set_bankptr(machine, "bank1", &ROM[0x10000]);
 }
 
 static MACHINE_DRIVER_START( d9final )

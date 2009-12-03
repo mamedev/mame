@@ -163,7 +163,7 @@ if ((data & 1) == 0) popmessage("bankswitch RAM bank 0");
 	/* bit 1-4 = ROM bank */
 	if (data & 0x10) offs = 0x20000 + (data & 0x06) * 0x1000;
 	else offs = 0x10000 + (data & 0x0e) * 0x1000;
-	memory_set_bankptr(space->machine, 1,&rom[offs]);
+	memory_set_bankptr(space->machine, "bank1",&rom[offs]);
 }
 
 //AT
@@ -365,7 +365,7 @@ static ADDRESS_MAP_START( spy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3fd3, 0x3fd3) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3fe0, 0x3fe0) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(K052109_051960_r,K052109_051960_w)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

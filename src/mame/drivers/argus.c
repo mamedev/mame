@@ -169,7 +169,7 @@ static WRITE8_HANDLER( argus_bankselect_w )
 	int bankaddress;
 
 	bankaddress = 0x10000 + ((data & 7) * 0x4000);
-	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);	 /* Select 8 banks of 16k */
+	memory_set_bankptr(space->machine, "bank1", &RAM[bankaddress]);	 /* Select 8 banks of 16k */
 }
 
 
@@ -181,7 +181,7 @@ static WRITE8_HANDLER( argus_bankselect_w )
 
 static ADDRESS_MAP_START( argus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
@@ -205,7 +205,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( valtric_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
@@ -229,7 +229,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( butasan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")

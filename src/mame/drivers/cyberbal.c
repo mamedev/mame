@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2c02, 0x2c03) AM_READ(cyberbal_special_port3_r)
 	AM_RANGE(0x2c04, 0x2c05) AM_READ(cyberbal_sound_68k_6502_r)
 	AM_RANGE(0x2c06, 0x2c07) AM_READ(cyberbal_sound_6502_stat_r)
-	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK(8)
+	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("bank8")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

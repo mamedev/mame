@@ -16,7 +16,7 @@
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
-	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd000, 0xffff) AM_ROM AM_WRITE(beezer_bankswitch_w)
 ADDRESS_MAP_END
 

@@ -175,7 +175,7 @@ static WRITE8_HANDLER( fax_bank_select_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
-	memory_set_bankptr(space->machine, 1, &RAM[0x10000 + (0x2000 * (data & 0x1f))]);
+	memory_set_bankptr(space->machine, "bank1", &RAM[0x10000 + (0x2000 * (data & 0x1f))]);
 	if ((data & 0x1f) > 0x17)
 		logerror("Banking to unpopulated ROM bank %02X!\n",data & 0x1f);
 }
@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( fax_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("IN4")
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("IN3")
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(fax_bank_select_w)
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x5213, 0x5217) AM_WRITENOP		/* empty control lines on color/sound board */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_BASE(&exidy_characterram)
@@ -1392,8 +1392,8 @@ static DRIVER_INIT( phantoma )
 	exidy_color_latch[0] = 0x09;
 
 	/* the ROM is actually mapped high */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf800, 0xffff, 0, 0, (read8_space_func)SMH_BANK(1));
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0xf800);
+	memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf800, 0xffff, 0, 0, "bank1");
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0xf800);
 }
 
 

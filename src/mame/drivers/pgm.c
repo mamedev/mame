@@ -536,7 +536,7 @@ static NVRAM_HANDLER( pgm )
 
 static ADDRESS_MAP_START( pgm_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM   /* BIOS ROM */
-	AM_RANGE(0x100000, 0x5fffff) AM_ROMBANK(1) /* Game ROM */
+	AM_RANGE(0x100000, 0x5fffff) AM_ROMBANK("bank1") /* Game ROM */
 
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
@@ -568,7 +568,7 @@ static UINT16 *killbld_sharedprotram;
 
 static ADDRESS_MAP_START( killbld_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM   /* BIOS ROM */
-	AM_RANGE(0x100000, 0x2fffff) AM_ROMBANK(1) /* Game ROM */
+	AM_RANGE(0x100000, 0x2fffff) AM_ROMBANK("bank1") /* Game ROM */
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE(&killbld_sharedprotram) // Shared with protection device
 
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
@@ -601,7 +601,7 @@ static UINT16 *olds_sharedprotram;
 
 static ADDRESS_MAP_START( olds_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM   /* BIOS ROM */
-	AM_RANGE(0x100000, 0x3fffff) AM_ROMBANK(1) /* Game ROM */
+	AM_RANGE(0x100000, 0x3fffff) AM_ROMBANK("bank1") /* Game ROM */
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE(&olds_sharedprotram) // Shared with protection device
 
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
@@ -632,7 +632,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kov2_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM   /* BIOS ROM */
-	AM_RANGE(0x100000, 0x5fffff) AM_ROMBANK(1) /* Game ROM */
+	AM_RANGE(0x100000, 0x5fffff) AM_ROMBANK("bank1") /* Game ROM */
 
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
@@ -665,7 +665,7 @@ ADDRESS_MAP_END
 #if 0
 static ADDRESS_MAP_START( cavepgm_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM   /* larger BIOS ROM */
-	AM_RANGE(0xfffffe, 0xffffff) AM_ROMBANK(1) /* Game ROM (unmapped for now, might not even have it) */
+	AM_RANGE(0xfffffe, 0xffffff) AM_ROMBANK("bank1") /* Game ROM (unmapped for now, might not even have it) */
 	AM_RANGE(0x400000, 0x4fffff) AM_RAM AM_BASE(&olds_sharedprotram) // Shared with protection device
 
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
@@ -793,7 +793,7 @@ static WRITE16_HANDLER( kovsh_arm7_ram_w )
 
 static ADDRESS_MAP_START( kovsh_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM   /* BIOS ROM */
-	AM_RANGE(0x100000, 0x4effff) AM_ROMBANK(1) /* Game ROM */
+	AM_RANGE(0x100000, 0x4effff) AM_ROMBANK("bank1") /* Game ROM */
 
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
@@ -902,7 +902,7 @@ static WRITE16_HANDLER( svg_latch_68k_w )
 
 static ADDRESS_MAP_START( svg_68k_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM         /* BIOS ROM */
-	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK(1)  /* Game ROM */
+	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")  /* Game ROM */
 
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
@@ -1449,7 +1449,7 @@ static void expand_colourdata(running_machine *machine)
 static void pgm_basic_init(running_machine *machine)
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, 1,&ROM[0x100000]);
+	memory_set_bankptr(machine, "bank1",&ROM[0x100000]);
 
 	expand_32x32x5bpp(machine);
 	expand_colourdata(machine);

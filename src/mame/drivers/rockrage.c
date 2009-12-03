@@ -73,7 +73,7 @@ static WRITE8_HANDLER( rockrage_bankswitch_w )
 
 	/* bits 4-6 = bank number */
 	bankaddress = 0x10000 + ((data & 0x70) >> 4) * 0x2000;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
 
 	/* bits 0 & 1 = coin counters */
 	coin_counter_w(space->machine, 0,data & 0x01);
@@ -116,7 +116,7 @@ static ADDRESS_MAP_START( rockrage_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2f00, 0x2f00) AM_WRITE(rockrage_vreg_w)							/* ??? */
 	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(rockrage_bankswitch_w)					/* bankswitch control */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM												/* RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)										/* banked ROM */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")										/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM												/* ROM */
 ADDRESS_MAP_END
 

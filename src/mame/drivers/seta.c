@@ -2889,7 +2889,7 @@ static WRITE8_HANDLER( sub_bankswitch_w )
 	UINT8 *rom = memory_region(space->machine, "sub");
 	int bank = data >> 4;
 
-	memory_set_bankptr(space->machine, 1, &rom[bank * 0x4000 + 0xc000]);
+	memory_set_bankptr(space->machine, "bank1", &rom[bank * 0x4000 + 0xc000]);
 }
 
 static WRITE8_HANDLER( sub_bankswitch_lockout_w )
@@ -2918,7 +2918,7 @@ static ADDRESS_MAP_START( tndrcade_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3001) AM_DEVWRITE("ym2", ym3812_w)
 	AM_RANGE(0x5000, 0x57ff) AM_RAM	 AM_BASE(&sharedram)		// Shared RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROM								// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)						// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")						// Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM								// ROM
 ADDRESS_MAP_END
 
@@ -2937,7 +2937,7 @@ static ADDRESS_MAP_START( twineagl_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("COINS")			// Coins
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(&sharedram)		// Shared RAM
 	AM_RANGE(0x7000, 0x7fff) AM_ROM							// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)					// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")					// Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM							// ROM
 ADDRESS_MAP_END
 
@@ -2977,7 +2977,7 @@ static ADDRESS_MAP_START( downtown_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w)	// ROM Bank + Coin Lockout
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(&sharedram)		// Shared RAM
 	AM_RANGE(0x7000, 0x7fff) AM_ROM							// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)					// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")					// Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM							// ROM
 ADDRESS_MAP_END
 
@@ -3002,7 +3002,7 @@ static ADDRESS_MAP_START( calibr50_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("x1snd", seta_sound_r,seta_sound_w)	// Sound
 	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)				// From Main CPU
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_bankswitch_w)			// Bankswitching
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)						// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")						// Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM								// ROM
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(calibr50_soundlatch2_w)	// To Main CPU
 ADDRESS_MAP_END
@@ -3023,7 +3023,7 @@ static ADDRESS_MAP_START( metafox_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("P2")				// P2
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(&sharedram)		// Shared RAM
 	AM_RANGE(0x7000, 0x7fff) AM_ROM							// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)					// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")					// Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM							// ROM
 ADDRESS_MAP_END
 

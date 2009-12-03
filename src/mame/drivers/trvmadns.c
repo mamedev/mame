@@ -96,8 +96,8 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 
 		address |= (data & 0x10) ? 0x10000 : 0;
 
-		memory_set_bankptr(space->machine, 1, &rom[address]);
-		memory_set_bankptr(space->machine, 2, &rom[address + 0x1000]);
+		memory_set_bankptr(space->machine, "bank1", &rom[address]);
+		memory_set_bankptr(space->machine, "bank2", &rom[address + 0x1000]);
 	}
 	else
 	{
@@ -136,7 +136,7 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 
 //      logerror("add = %X\n",address);
 
-		memory_set_bankptr(space->machine, 1, &rom[address]);
+		memory_set_bankptr(space->machine, "bank1", &rom[address]);
 	}
 }
 
@@ -198,8 +198,8 @@ static WRITE8_HANDLER( trvmadns_tileram_w )
 
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0x7000, 0x7fff) AM_READ(SMH_BANK(2))
+	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x6000, 0x7fff) AM_WRITE(trvmadns_gfxram_w) AM_BASE(&trvmadns_gfxram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc01f) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_le_w) AM_BASE_GENERIC(paletteram)

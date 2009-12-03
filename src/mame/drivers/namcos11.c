@@ -638,10 +638,12 @@ static TIMER_CALLBACK( mcu_timer )
 
 static UINT32 m_n_bankoffset;
 
-INLINE void bankswitch_rom8( const address_space *space, int n_bank, int n_data )
+INLINE void bankswitch_rom8( const address_space *space, const char *bank, int n_data )
 {
-	memory_set_bank( space->machine,  n_bank + 1, ( ( n_data & 0xc0 ) >> 4 ) + ( n_data & 0x03 ) );
+	memory_set_bank( space->machine, bank, ( ( n_data & 0xc0 ) >> 4 ) + ( n_data & 0x03 ) );
 }
+
+static const char * const bankname[] = { "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
 
 static WRITE32_HANDLER( bankswitch_rom32_w )
 {
@@ -649,11 +651,11 @@ static WRITE32_HANDLER( bankswitch_rom32_w )
 
 	if( ACCESSING_BITS_0_15 )
 	{
-		bankswitch_rom8( space, ( offset * 2 ), data & 0xffff );
+		bankswitch_rom8( space, bankname[offset * 2], data & 0xffff );
 	}
 	if( ACCESSING_BITS_16_31 )
 	{
-		bankswitch_rom8( space, ( offset * 2 ) + 1, data >> 16 );
+		bankswitch_rom8( space, bankname[offset * 2 + 1], data >> 16 );
 	}
 }
 
@@ -671,10 +673,10 @@ static WRITE32_HANDLER( bankswitch_rom64_upper_w )
 	}
 }
 
-INLINE void bankswitch_rom64( const address_space *space, int n_bank, int n_data )
+INLINE void bankswitch_rom64( const address_space *space, const char *bank, int n_data )
 {
 	/* todo: verify behaviour */
-	memory_set_bank( space->machine,  n_bank + 1, ( ( ( ( n_data & 0xc0 ) >> 3 ) + ( n_data & 0x07 ) ) ^ m_n_bankoffset ) );
+	memory_set_bank( space->machine,  bank, ( ( ( ( n_data & 0xc0 ) >> 3 ) + ( n_data & 0x07 ) ) ^ m_n_bankoffset ) );
 }
 
 static WRITE32_HANDLER( bankswitch_rom64_w )
@@ -683,11 +685,11 @@ static WRITE32_HANDLER( bankswitch_rom64_w )
 
 	if( ACCESSING_BITS_0_15 )
 	{
-		bankswitch_rom64( space, ( offset * 2 ), data & 0xffff );
+		bankswitch_rom64( space, bankname[offset * 2], data & 0xffff );
 	}
 	if( ACCESSING_BITS_16_31 )
 	{
-		bankswitch_rom64( space, ( offset * 2 ) + 1, data >> 16 );
+		bankswitch_rom64( space, bankname[offset * 2 + 1], data >> 16 );
 	}
 }
 
@@ -818,19 +820,19 @@ static DRIVER_INIT( namcos11 )
 				UINT32 len = memory_region_length( machine, "user2" );
 				UINT8 *rgn = memory_region( machine, "user2" );
 
-				memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f0fffff, 0, 0, (read32_space_func)SMH_BANK(1) );
-				memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f100000, 0x1f1fffff, 0, 0, (read32_space_func)SMH_BANK(2) );
-				memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f200000, 0x1f2fffff, 0, 0, (read32_space_func)SMH_BANK(3) );
-				memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f300000, 0x1f3fffff, 0, 0, (read32_space_func)SMH_BANK(4) );
-				memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f400000, 0x1f4fffff, 0, 0, (read32_space_func)SMH_BANK(5) );
-				memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f500000, 0x1f5fffff, 0, 0, (read32_space_func)SMH_BANK(6) );
-				memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6fffff, 0, 0, (read32_space_func)SMH_BANK(7) );
-				memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f700000, 0x1f7fffff, 0, 0, (read32_space_func)SMH_BANK(8) );
+				memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f0fffff, 0, 0, "bank1" );
+				memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f100000, 0x1f1fffff, 0, 0, "bank2" );
+				memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f200000, 0x1f2fffff, 0, 0, "bank3" );
+				memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f300000, 0x1f3fffff, 0, 0, "bank4" );
+				memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f400000, 0x1f4fffff, 0, 0, "bank5" );
+				memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f500000, 0x1f5fffff, 0, 0, "bank6" );
+				memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6fffff, 0, 0, "bank7" );
+				memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f700000, 0x1f7fffff, 0, 0, "bank8" );
 
 				for( bank = 0; bank < 8; bank++ )
 				{
-					memory_configure_bank(machine,  bank + 1, 0, len / ( 1024 * 1024 ), rgn, 1024 * 1024 );
-					memory_set_bank(machine,  bank + 1, 0 );
+					memory_configure_bank(machine, bankname[bank], 0, len / ( 1024 * 1024 ), rgn, 1024 * 1024 );
+					memory_set_bank(machine, bankname[bank], 0 );
 				}
 
 				if( namcos11_config_table[ n_game ].n_daughterboard == 32 )

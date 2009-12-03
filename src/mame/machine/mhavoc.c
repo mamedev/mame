@@ -87,9 +87,9 @@ MACHINE_RESET( mhavoc )
 	const address_space *space = cputag_get_address_space(machine, "alpha", ADDRESS_SPACE_PROGRAM);
 	has_gamma_cpu = (cputag_get_cpu(machine, "gamma") != NULL);
 
-	memory_configure_bank(machine, 1, 0, 1, mhavoc_zram0, 0);
-	memory_configure_bank(machine, 1, 1, 1, mhavoc_zram1, 0);
-	memory_configure_bank(machine, 2, 0, 4, memory_region(machine, "alpha") + 0x10000, 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 1, mhavoc_zram0, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, mhavoc_zram1, 0);
+	memory_configure_bank(machine, "bank2", 0, 4, memory_region(machine, "alpha") + 0x10000, 0x2000);
 
 	/* reset RAM/ROM banks to 0 */
 	mhavoc_ram_banksel_w(space, 0, 0);
@@ -203,13 +203,13 @@ READ8_HANDLER( mhavoc_gamma_r )
 
 WRITE8_HANDLER( mhavoc_ram_banksel_w )
 {
-	memory_set_bank(space->machine, 1, data & 1);
+	memory_set_bank(space->machine, "bank1", data & 1);
 }
 
 
 WRITE8_HANDLER( mhavoc_rom_banksel_w )
 {
-	memory_set_bank(space->machine, 2, data & 3);
+	memory_set_bank(space->machine, "bank2", data & 3);
 }
 
 

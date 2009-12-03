@@ -65,7 +65,7 @@ static WRITE8_HANDLER( momoko_bg_read_bank_w )
 {
 	UINT8 *BG_MAP = memory_region(space->machine, "user1");
 	int bank_address = (data & 0x1f) * 0x1000;
-	memory_set_bankptr(space->machine, 1, &BG_MAP[bank_address]);
+	memory_set_bankptr(space->machine, "bank1", &BG_MAP[bank_address]);
 }
 
 /****************************************************************************/
@@ -86,7 +86,7 @@ static ADDRESS_MAP_START( momoko_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(momoko_text_scrolly_w)
 	AM_RANGE(0xe801, 0xe801) AM_WRITE(momoko_text_mode_w)
-	AM_RANGE(0xf000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0xf000, 0xffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf000, 0xf001) AM_WRITE(momoko_bg_scrolly_w) AM_BASE(&momoko_bg_scrolly)
 	AM_RANGE(0xf002, 0xf003) AM_WRITE(momoko_bg_scrollx_w) AM_BASE(&momoko_bg_scrollx)
 	AM_RANGE(0xf004, 0xf004) AM_WRITE(momoko_bg_read_bank_w)

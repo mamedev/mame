@@ -45,7 +45,7 @@ static WRITE8_HANDLER( dealer_decrypt_rom )
 
 //  logerror("PC %08x: ctr=%04x\n",cpu_get_pc(space->cpu), state->counter);
 
-	memory_set_bank(space->machine, 1, state->counter);
+	memory_set_bank(space->machine, "bank1", state->counter);
 
 	// is the 2nd bank changed by the counter or it always uses the 1st key?
 }
@@ -65,8 +65,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( dealer_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK(1)
-	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK(2)
+	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(epos_state, videoram, videoram_size)
 ADDRESS_MAP_END
@@ -102,7 +102,7 @@ ADDRESS_MAP_END
 */
 static WRITE8_DEVICE_HANDLER( write_prtc )
 {
-	memory_set_bank(device->machine, 2, data & 0x01);
+	memory_set_bank(device->machine, "bank2", data & 0x01);
 }
 
 static const ppi8255_interface ppi8255_intf =
@@ -383,11 +383,11 @@ static MACHINE_RESET( epos )
 static MACHINE_START( dealer )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 4, &ROM[0x0000], 0x10000);
-	memory_configure_bank(machine, 2, 0, 2, &ROM[0x6000], 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x0000], 0x10000);
+	memory_configure_bank(machine, "bank2", 0, 2, &ROM[0x6000], 0x1000);
 
-	memory_set_bank(machine, 1, 0);
-	memory_set_bank(machine, 2, 0);
+	memory_set_bank(machine, "bank1", 0);
+	memory_set_bank(machine, "bank2", 0);
 
 	MACHINE_START_CALL(epos);
 }

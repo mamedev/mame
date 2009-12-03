@@ -562,7 +562,7 @@ WRITE8_HANDLER( namcos1_sound_bankswitch_w )
 	UINT8 *rom = memory_region(space->machine, "audiocpu") + 0xc000;
 
 	int bank = (data & 0x70) >> 4;
-	memory_set_bankptr(space->machine, 17,rom + 0x4000 * bank);
+	memory_set_bankptr(space->machine, "bank17",rom + 0x4000 * bank);
 }
 
 
@@ -667,19 +667,21 @@ static WRITE8_HANDLER( unknown_w )
 /* Main bankswitching routine */
 static void set_bank(running_machine *machine, int banknum, const bankhandler *handler)
 {
+	static const char *const banktags[] ={ "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8",
+	                                       "bank9", "bank10", "bank11", "bank12", "bank13", "bank14", "bank15", "bank16" };
 	static const char *const cputags[] = { "maincpu", "sub" };
 	const address_space *space = cputag_get_address_space(machine, cputags[(banknum >> 3) & 1], ADDRESS_SPACE_PROGRAM);
 	int bankstart = (banknum & 7) * 0x2000;
 
 	/* for BANK handlers , memory direct and OP-code base */
 	if (handler->bank_pointer)
-		memory_set_bankptr(machine, banknum + 1, handler->bank_pointer);
+		memory_set_bankptr(machine, banktags[banknum], handler->bank_pointer);
 
 	/* read handlers */
 	if (!handler->bank_handler_r)
 	{
 		if (namcos1_active_bank[banknum].bank_handler_r)
-			memory_install_read8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, (read8_space_func)SMH_BANK(banknum + 1));
+			memory_install_read_bank_handler(space, bankstart, bankstart + 0x1fff, 0, 0, banktags[banknum]);
 	}
 	else
 	{
@@ -693,7 +695,7 @@ static void set_bank(running_machine *machine, int banknum, const bankhandler *h
 		if (!handler->bank_handler_w)
 		{
 			if (namcos1_active_bank[banknum].bank_handler_w)
-				memory_install_write8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, (write8_space_func)SMH_BANK(banknum + 1));
+				memory_install_write_bank_handler(space, bankstart, bankstart + 0x1fff, 0, 0, banktags[banknum]);
 		}
 		else
 		{
@@ -909,7 +911,7 @@ WRITE8_HANDLER( namcos1_mcu_bankswitch_w )
 	/* bit 0-1 : address line A15-A16 */
 	addr += (data & 3) * 0x8000;
 
-	memory_set_bankptr(space->machine, 20, memory_region(space->machine, "mcu") + addr);
+	memory_set_bankptr(space->machine, "bank20", memory_region(space->machine, "mcu") + addr);
 }
 
 
@@ -985,8 +987,8 @@ static void namcos1_driver_init( running_machine *machine, const struct namcos1_
 	state_save_register_global_pointer(machine, namcos1_paletteram, 0x8000);
 
 	/* Point mcu & sound shared RAM to destination */
-	memory_set_bankptr(machine,  18, namcos1_triram );
-	memory_set_bankptr(machine,  19, namcos1_triram );
+	memory_set_bankptr(machine,  "bank18", namcos1_triram );
+	memory_set_bankptr(machine,  "bank19", namcos1_triram );
 
 	/* build bank elements */
 	namcos1_build_banks(machine,specific->key_r,specific->key_w);

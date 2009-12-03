@@ -935,7 +935,7 @@ static ADDRESS_MAP_START( sharc_map, ADDRESS_SPACE_DATA, 32 )
 	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("voodoo", nwk_voodoo_0_r, nwk_voodoo_0_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
 	AM_RANGE(0x3500000, 0x35000ff) AM_READWRITE(K033906_0_r, K033906_0_w)
-	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK(5)
+	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -1095,7 +1095,7 @@ static void sound_irq_callback(running_machine *machine, int irq)
 static DRIVER_INIT(nwktr)
 {
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_NWKTR);
-	set_cgboard_texture_bank(machine, 0, 5, memory_region(machine, "user5"));
+	set_cgboard_texture_bank(machine, 0, "bank5", memory_region(machine, "user5"));
 
 	sharc_dataram = auto_alloc_array(machine, UINT32, 0x100000/4);
 	led_reg0 = led_reg1 = 0x7f;

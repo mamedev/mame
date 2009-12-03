@@ -163,7 +163,7 @@ static WRITE8_HANDLER( vball_irq_ack_w )
 static WRITE8_HANDLER( vb_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine, 1, &RAM[0x10000 + (0x4000 * (data & 1))]);
+	memory_set_bankptr(space->machine, "bank1", &RAM[0x10000 + (0x4000 * (data & 1))]);
 
 	if (vball_gfxset != ((data  & 0x20) ^ 0x20))
 	{
@@ -225,7 +225,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x100e, 0x100e) AM_WRITE(SMH_RAM) AM_BASE(&vb_scrolly_lo)
 	AM_RANGE(0x2000, 0x2fff) AM_WRITE(vb_videoram_w) AM_BASE(&vb_videoram)
 	AM_RANGE(0x3000, 0x3fff) AM_WRITE(vb_attrib_w) AM_BASE(&vb_attribram)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

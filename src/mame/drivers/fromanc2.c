@@ -247,11 +247,11 @@ static WRITE8_HANDLER( fromanc2_subcpu_rombank_w )
 	int rambank = (data & 0x0c) >> 2;
 
 	// Change ROM BANK
-	memory_set_bankptr(space->machine, 1, &RAM[rombank * 0x4000]);
+	memory_set_bankptr(space->machine, "bank1", &RAM[rombank * 0x4000]);
 
 	// Change RAM BANK
-	if (rambank != 0) memory_set_bankptr(space->machine, 2, &RAM[0x10000 + (rambank * 0x4000)]);
-	else memory_set_bankptr(space->machine, 2, &RAM[0x8000]);
+	if (rambank != 0) memory_set_bankptr(space->machine, "bank2", &RAM[0x10000 + (rambank * 0x4000)]);
+	else memory_set_bankptr(space->machine, "bank2", &RAM[0x8000]);
 }
 
 
@@ -362,9 +362,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromanc2_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM								// ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(1)						// ROM(BANK) (is this comment correct?  It was in the split address maps in a RAM configuration...
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank1")						// ROM(BANK) (is this comment correct?  It was in the split address maps in a RAM configuration...
 	AM_RANGE(0x8000, 0xbfff) AM_RAM								// RAM(WORK)
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK(2)						// RAM(BANK)
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank2")						// RAM(BANK)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromanc2_sub_io_map, ADDRESS_SPACE_IO, 8 )

@@ -242,7 +242,7 @@ static WRITE8_HANDLER( sandscrp_bankswitch_w )
 	if (bank < 3)	RAM = &RAM[0x4000 * bank];
 	else			RAM = &RAM[0x4000 * (bank-3) + 0x10000];
 
-	memory_set_bankptr(space->machine, 1, RAM);
+	memory_set_bankptr(space->machine, "bank1", RAM);
 }
 
 static READ8_HANDLER( sandscrp_latchstatus_r )
@@ -265,7 +265,7 @@ static WRITE8_HANDLER( sandscrp_soundlatch_w )
 
 static ADDRESS_MAP_START( sandscrp_soundmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM		// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(1), SMH_ROM)	// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	// Banked ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM		// RAM
 ADDRESS_MAP_END
 

@@ -160,16 +160,16 @@ static INTERRUPT_GEN( ninjakd2_interrupt )
 static MACHINE_RESET( ninjakd2 )
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_set_bank(machine, "bank1", 0);
 }
 
 static void robokid_init_banks(running_machine *machine)
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(machine, 1, 0,  2, memory_region(machine, "maincpu"), 0x4000);
-	memory_configure_bank(machine, 1, 2, 14, memory_region(machine, "maincpu") + 0x10000, 0x4000);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0,  2, memory_region(machine, "maincpu"), 0x4000);
+	memory_configure_bank(machine, "bank1", 2, 14, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_set_bank(machine, "bank1", 0);
 }
 
 static MACHINE_RESET( robokid )
@@ -187,12 +187,12 @@ static MACHINE_RESET( omegaf )
 
 static WRITE8_HANDLER( ninjakd2_bankselect_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x7);
+	memory_set_bank(space->machine, "bank1", data & 0x7);
 }
 
 static WRITE8_HANDLER( robokid_bankselect_w )
 {
-	memory_set_bank(space->machine, 1, data & 0xf);
+	memory_set_bank(space->machine, "bank1", data & 0xf);
 }
 
 
@@ -374,7 +374,7 @@ static WRITE8_HANDLER( omegaf_io_protection_w )
 
 static ADDRESS_MAP_START( ninjakd2_main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("KEYCOIN")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("PAD1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("PAD2")
@@ -395,7 +395,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mnight_main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xd9ff) AM_RAM
 	AM_RANGE(0xda00, 0xdfff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ninjakd2_bgvideoram_w) AM_BASE(&ninjakd2_bg_videoram)
@@ -416,7 +416,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( robokid_main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE(&ninjakd2_fg_videoram)
 	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(robokid_bg2_videoram_r, robokid_bg2_videoram_w)	// banked
@@ -444,7 +444,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( omegaf_main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("KEYCOIN")
 	AM_RANGE(0xc001, 0xc003) AM_READ(omegaf_io_protection_r)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(soundlatch_w)
@@ -1439,7 +1439,7 @@ static void gfx_unscramble(running_machine *machine)
 
 static DRIVER_INIT( ninjakd2 )
 {
-	mc8123_decrypt_rom(machine, "soundcpu", "user1", 0, 0);
+	mc8123_decrypt_rom(machine, "soundcpu", "user1", NULL, 0);
 
 	gfx_unscramble(machine);
 }

@@ -280,7 +280,7 @@ static WRITE8_HANDLER( master_nmi_trigger_w )
 	cputag_set_input_line(space->machine, "slave", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void airbustr_bankswitch(running_machine *machine, const char *cpu, int bank, int data)
+static void airbustr_bankswitch(running_machine *machine, const char *cpu, const char *bank, int data)
 {
 	UINT8 *ROM = memory_region(machine, cpu);
 
@@ -294,12 +294,12 @@ static void airbustr_bankswitch(running_machine *machine, const char *cpu, int b
 
 static WRITE8_HANDLER( master_bankswitch_w )
 {
-	airbustr_bankswitch(space->machine, "master", 1, data);
+	airbustr_bankswitch(space->machine, "master", "bank1", data);
 }
 
 static WRITE8_HANDLER( slave_bankswitch_w )
 {
-	airbustr_bankswitch(space->machine, "slave", 2, data);
+	airbustr_bankswitch(space->machine, "slave", "bank2", data);
 
 	flip_screen_set(space->machine, data & 0x10);
 
@@ -309,7 +309,7 @@ static WRITE8_HANDLER( slave_bankswitch_w )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	airbustr_bankswitch(space->machine, "audiocpu", 3, data);
+	airbustr_bankswitch(space->machine, "audiocpu", "bank3", data);
 }
 
 static READ8_HANDLER( soundcommand_status_r )
@@ -369,7 +369,7 @@ static WRITE8_HANDLER( airbustr_coin_counter_w )
 
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(pandora_spriteram_r, pandora_spriteram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE(&devram) // shared with protection device
@@ -385,7 +385,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(airbustr_videoram2_w) AM_BASE(&airbustr_videoram2)
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(airbustr_colorram2_w) AM_BASE(&airbustr_colorram2)
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(airbustr_videoram_w) AM_BASE_GENERIC(videoram)
@@ -411,7 +411,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(3)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 

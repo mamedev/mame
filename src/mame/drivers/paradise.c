@@ -52,7 +52,7 @@ static WRITE8_HANDLER( paradise_rombank_w )
 	}
 
 	if (bank >= 3)	bank+=1;
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + bank * 0x4000);
+	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu") + bank * 0x4000);
 }
 
 static WRITE8_DEVICE_HANDLER( paradise_okibank_w )
@@ -69,7 +69,7 @@ static WRITE8_HANDLER( torus_coin_counter_w )
 
 #define STANDARD_MAP	\
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	/* ROM */	\
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)	/* ROM (banked) */ \
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	/* ROM (banked) */ \
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paradise_vram_2_w) AM_BASE(&paradise_vram_2	)	/* Background */ \
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paradise_vram_1_w) AM_BASE(&paradise_vram_1	)	/* Midground */ \
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(paradise_vram_0_w) AM_BASE(&paradise_vram_0	)	/* Foreground */ \

@@ -72,7 +72,7 @@ correctly.
 
 static WRITE8_HANDLER( c1942_bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x03);
+	memory_set_bank(space->machine, "bank1", data & 0x03);
 }
 
 static INTERRUPT_GEN( c1942_interrupt )
@@ -86,7 +86,7 @@ static INTERRUPT_GEN( c1942_interrupt )
 
 static ADDRESS_MAP_START( c1942_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
@@ -507,7 +507,7 @@ ROM_END
 static DRIVER_INIT( 1942 )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 3, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x10000], 0x4000);
 }
 
 

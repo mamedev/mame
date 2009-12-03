@@ -34,7 +34,7 @@ WRITE8_HANDLER( xxmissio_paletteram_w );
 
 static WRITE8_HANDLER( xxmissio_bank_sel_w )
 {
-	memory_set_bank(space->machine, 1, data & 7);
+	memory_set_bank(space->machine, "bank1", data & 7);
 }
 
 static CUSTOM_INPUT( xxmissio_status_r )
@@ -95,8 +95,8 @@ static INTERRUPT_GEN( xxmissio_interrupt_s )
 
 static MACHINE_START( xxmissio )
 {
-	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "user1"), 0x4000);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "user1"), 0x4000);
+	memory_set_bank(machine, "bank1", 0);
 }
 
 /****************************************************************************/
@@ -126,7 +126,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( map2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x8002, 0x8003) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)

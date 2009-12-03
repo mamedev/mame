@@ -23,7 +23,7 @@ static UINT32 *dsp_shared_ram[MAX_CG_BOARDS];
 static UINT32 dsp_state[MAX_CG_BOARDS];
 static UINT32 pci_bridge_enable[MAX_CG_BOARDS];
 static UINT32 nwk_device_sel[MAX_CG_BOARDS];
-static INT32 texture_bank[MAX_CG_BOARDS];
+static const char *texture_bank[MAX_CG_BOARDS];
 
 static int nwk_fifo_half_full_r;
 static int nwk_fifo_half_full_w;
@@ -51,7 +51,7 @@ void init_konami_cgboard(running_machine *machine, int num_boards, int type)
 		dsp_shared_ram_bank[i] = 0;
 
 		dsp_state[i] = 0x80;
-		texture_bank[i] = -1;
+		texture_bank[i] = NULL;
 
 		pci_bridge_enable[i] = 0;
 		nwk_device_sel[i] = 0;
@@ -66,7 +66,6 @@ void init_konami_cgboard(running_machine *machine, int num_boards, int type)
 		state_save_register_item(machine, "konppc", NULL, i, dsp_shared_ram_bank[i]);
 		state_save_register_item_pointer(machine, "konppc", NULL, i, dsp_shared_ram[i], DSP_BANK_SIZE * 2 / sizeof(dsp_shared_ram[i][0]));
 		state_save_register_item(machine, "konppc", NULL, i, dsp_state[i]);
-		state_save_register_item(machine, "konppc", NULL, i, texture_bank[i]);
 		state_save_register_item(machine, "konppc", NULL, i, pci_bridge_enable[i]);
 		state_save_register_item(machine, "konppc", NULL, i, nwk_device_sel[i]);
 		state_save_register_item(machine, "konppc", NULL, i, nwk_fifo_read_ptr[i]);
@@ -117,7 +116,7 @@ int get_cgboard_id(void)
 	}
 }
 
-void set_cgboard_texture_bank(running_machine *machine, int board, int bank, UINT8 *rom)
+void set_cgboard_texture_bank(running_machine *machine, int board, const char *bank, UINT8 *rom)
 {
 	texture_bank[board] = bank;
 
@@ -249,7 +248,7 @@ static void dsp_comm_sharc_w(const address_space *space, int board, int offset, 
 					sharc_set_flag_input(device, 1, ASSERT_LINE);
 				}
 
-				if (texture_bank[board] != -1)
+				if (texture_bank[board] != NULL)
 				{
 					int offset = (data & 0x08) ? 1 : 0;
 
@@ -263,7 +262,7 @@ static void dsp_comm_sharc_w(const address_space *space, int board, int offset, 
 		{
 			if (offset == 1)
 			{
-				if (texture_bank[board] != -1)
+				if (texture_bank[board] != NULL)
 				{
 					int offset = (data & 0x08) ? 1 : 0;
 

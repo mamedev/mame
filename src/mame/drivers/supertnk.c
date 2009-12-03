@@ -127,7 +127,7 @@ static WRITE8_HANDLER( supertnk_bankswitch_0_w )
 
 	bank_address = 0x10000 + (supertnk_rom_bank * 0x1000);
 
-	memory_set_bankptr(space->machine, 1, &memory_region(space->machine, "maincpu")[bank_address]);
+	memory_set_bankptr(space->machine, "bank1", &memory_region(space->machine, "maincpu")[bank_address]);
 }
 
 
@@ -139,7 +139,7 @@ static WRITE8_HANDLER( supertnk_bankswitch_1_w )
 
 	bank_address = 0x10000 + (supertnk_rom_bank * 0x1000);
 
-	memory_set_bankptr(space->machine, 1, &memory_region(space->machine, "maincpu")[bank_address]);
+	memory_set_bankptr(space->machine, "bank1", &memory_region(space->machine, "maincpu")[bank_address]);
 }
 
 
@@ -292,7 +292,7 @@ static MACHINE_RESET( supertnk )
 
 static ADDRESS_MAP_START( supertnk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x17ff) AM_ROMBANK(1)
+	AM_RANGE(0x0800, 0x17ff) AM_ROMBANK("bank1")
 	AM_RANGE(0x1800, 0x1bff) AM_RAM
 	AM_RANGE(0x1efc, 0x1efc) AM_READ_PORT("JOYS")
 	AM_RANGE(0x1efd, 0x1efd) AM_READ_PORT("INPUTS")

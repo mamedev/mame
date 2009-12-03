@@ -61,17 +61,17 @@ static WRITE8_HANDLER(sangho_ram_w)
 
 static ADDRESS_MAP_START( pzlestar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(sangho_ram_w)
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(1)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(2)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(3)
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(4)
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
 /* Wrong ! */
 static WRITE8_HANDLER(pzlestar_bank_w)
 {
-	memory_set_bankptr(space->machine, 2,&memory_region(space->machine, "user1")[0x20000+ ( ((0x8000*data)^0x10000))  ]);
-	memory_set_bankptr(space->machine, 3,&memory_region(space->machine, "user1")[  0x18000  ]);
+	memory_set_bankptr(space->machine, "bank2",&memory_region(space->machine, "user1")[0x20000+ ( ((0x8000*data)^0x10000))  ]);
+	memory_set_bankptr(space->machine, "bank3",&memory_region(space->machine, "user1")[  0x18000  ]);
 }
 
 /* Puzzle Star Ports */
@@ -166,10 +166,10 @@ INPUT_PORTS_END
 
 static void sangho_common_machine_reset(running_machine *machine)
 {
-	memory_set_bankptr(machine, 1,&sangho_ram[0]);
-	memory_set_bankptr(machine, 2,&sangho_ram[0x4000]);
-	memory_set_bankptr(machine, 3,&sangho_ram[0x8000]);
-	memory_set_bankptr(machine, 4,&sangho_ram[0xc000]);
+	memory_set_bankptr(machine, "bank1",&sangho_ram[0]);
+	memory_set_bankptr(machine, "bank2",&sangho_ram[0x4000]);
+	memory_set_bankptr(machine, "bank3",&sangho_ram[0x8000]);
+	memory_set_bankptr(machine, "bank4",&sangho_ram[0xc000]);
 	v9938_reset(0);
 }
 

@@ -29,11 +29,11 @@ VIDEO_UPDATE( tail2nos );
 static MACHINE_RESET( tail2nos )
 {
 	/* point to the extra ROMs */
-	memory_set_bankptr(machine, 1,memory_region(machine, "user1"));
-	memory_set_bankptr(machine, 2,memory_region(machine, "user2"));
+	memory_set_bankptr(machine, "bank1",memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank2",memory_region(machine, "user2"));
 
 	/* initialize sound bank */
-	memory_set_bankptr(machine, 3,memory_region(machine, "audiocpu") + 0x10000);
+	memory_set_bankptr(machine, "bank3",memory_region(machine, "audiocpu") + 0x10000);
 }
 
 
@@ -65,13 +65,13 @@ static WRITE16_HANDLER( tail2nos_K051316_ctrl_0_w )
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bankptr(device->machine, 3,memory_region(device->machine, "audiocpu") + 0x10000 + (data & 0x01) * 0x8000);
+	memory_set_bankptr(device->machine, "bank3",memory_region(device->machine, "audiocpu") + 0x10000 + (data & 0x01) * 0x8000);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x200000, 0x27ffff) AM_READWRITE(SMH_BANK(1), SMH_ROM)	/* extra ROM */
-	AM_RANGE(0x2c0000, 0x2dffff) AM_READWRITE(SMH_BANK(2), SMH_ROM)
+	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK("bank1")	/* extra ROM */
+	AM_RANGE(0x2c0000, 0x2dffff) AM_ROMBANK("bank2")
 	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE(tail2nos_zoomdata_r, tail2nos_zoomdata_w)
 	AM_RANGE(0x500000, 0x500fff) AM_READWRITE(tail2nos_K051316_0_r, tail2nos_K051316_0_w)
 	AM_RANGE(0x510000, 0x51001f) AM_WRITE(tail2nos_K051316_ctrl_0_w)
@@ -88,7 +88,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(SMH_BANK(3), SMH_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )

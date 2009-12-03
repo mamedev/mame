@@ -7684,7 +7684,7 @@ static DRIVER_INIT( kf2k3pcb )
 	neogeo_fixed_layer_bank_type = 2;
 	DRIVER_INIT_CALL(neogeo);
 	install_pvc_protection(machine);
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc7ffff, 0, 0, (read16_space_func)SMH_BANK(6) );  // 512k bios
+	memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc7ffff, 0, 0, "bank6" );  // 512k bios
 }
 
 static DRIVER_INIT( kof2003 )
@@ -7760,7 +7760,7 @@ static DRIVER_INIT( jockeygp )
 	extra_ram = auto_alloc_array(machine, UINT16, 0x2000/2);
 	state_save_register_global_pointer(machine, extra_ram, 0x2000 / 2);
 
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x201fff, 0, 0, (read16_space_func)SMH_BANK(8), (write16_space_func)SMH_BANK(8));
+	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x201fff, 0, 0, "bank8");
 	memory_set_bankptr(machine, NEOGEO_BANK_EXTRA_RAM, extra_ram);
 
 //  memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x280000, 0x280001, 0, 0, "IN5");
@@ -7777,7 +7777,7 @@ static DRIVER_INIT( vliner )
 	extra_ram = auto_alloc_array(machine, UINT16, 0x2000/2);
 	state_save_register_global_pointer(machine, extra_ram, 0x2000 / 2);
 
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x201fff, 0, 0, (read16_space_func)SMH_BANK(8), (write16_space_func)SMH_BANK(8));
+	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x201fff, 0, 0, "bank8");
 	memory_set_bankptr(machine, NEOGEO_BANK_EXTRA_RAM, extra_ram);
 
 	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x280000, 0x280001, 0, 0, "IN5");

@@ -460,7 +460,7 @@ static MACHINE_RESET(skns)
 	timer_pulse(machine, ATTOTIME_IN_MSEC(8), NULL, 11, interrupt_callback);
 	timer_pulse(machine, cputag_clocks_to_attotime(machine, "maincpu", 1824), NULL, 9, interrupt_callback);
 
-	memory_set_bankptr(machine, 1,memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank1",memory_region(machine, "user1"));
 }
 
 
@@ -785,7 +785,7 @@ static ADDRESS_MAP_START( skns_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x02a00000, 0x02a0001f) AM_RAM_WRITE(skns_pal_regs_w) AM_BASE(&skns_pal_regs)
 	AM_RANGE(0x02a40000, 0x02a5ffff) AM_RAM_WRITE(skns_palette_ram_w) AM_BASE(&skns_palette_ram)
 	AM_RANGE(0x02f00000, 0x02f000ff) AM_READWRITE(skns_hit_r, skns_hit_w)
-	AM_RANGE(0x04000000, 0x041fffff) AM_ROMBANK(1) /* GAME ROM */
+	AM_RANGE(0x04000000, 0x041fffff) AM_ROMBANK("bank1") /* GAME ROM */
 	AM_RANGE(0x04800000, 0x0483ffff) AM_RAM_WRITE(skns_v3t_w) AM_BASE(&skns_v3t_ram) /* tilemap b ram based tiles */
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE(&skns_main_ram)
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM AM_BASE(&skns_cache_ram) /* 'cache' RAM */

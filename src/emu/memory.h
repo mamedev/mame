@@ -73,6 +73,8 @@ enum
 	ADDRMAP_TOKEN_DEVICE_WRITE,
 	ADDRMAP_TOKEN_READ_PORT,
 	ADDRMAP_TOKEN_WRITE_PORT,
+	ADDRMAP_TOKEN_READ_BANK,
+	ADDRMAP_TOKEN_WRITE_BANK,
 	ADDRMAP_TOKEN_REGION,
 	ADDRMAP_TOKEN_SHARE,
 	ADDRMAP_TOKEN_BASEPTR,
@@ -229,6 +231,8 @@ struct _address_map_entry
 	const char *			read_devtag;		/* read tag for the relevant device */
 	const char *			read_porttag;		/* tag for input port reading */
 	const char *			write_porttag;		/* tag for output port writing */
+	const char *			read_banktag;		/* tag for bank reading */
+	const char *			write_banktag;		/* tag for bank writing */
 	write_handler 			write;				/* write handler callback */
 	UINT8					write_bits;			/* bits for the write handler callback (0=default, 1=8, 2=16, 3=32) */
 	UINT8					write_mask;			/* mask bits indicating which subunits to process */
@@ -502,6 +506,8 @@ union _addrmap64_token
 
 #define memory_install_read_port_handler(space, start, end, mask, mirror, rtag) \
 	_memory_install_port_handler(space, start, end, mask, mirror, rtag, NULL)
+#define memory_install_read_bank_handler(space, start, end, mask, mirror, rtag) \
+	_memory_install_bank_handler(space, start, end, mask, mirror, rtag, NULL)
 
 /* wrappers for dynamic write handler installation */
 #define memory_install_write_handler(space, start, end, mask, mirror, whandler) \
@@ -528,6 +534,8 @@ union _addrmap64_token
 
 #define memory_install_write_port_handler(space, start, end, mask, mirror, wtag) \
 	_memory_install_port_handler(space, start, end, mask, mirror, NULL, wtag)
+#define memory_install_write_bank_handler(space, start, end, mask, mirror, wtag) \
+	_memory_install_bank_handler(space, start, end, mask, mirror, NULL, wtag)
 
 /* wrappers for dynamic read/write handler installation */
 #define memory_install_readwrite_handler(space, start, end, mask, mirror, rhandler, whandler) \
@@ -554,6 +562,8 @@ union _addrmap64_token
 
 #define memory_install_readwrite_port_handler(space, start, end, mask, mirror, rtag, wtag) \
 	_memory_install_port_handler(space, start, end, mask, mirror, rtag, wtag)
+#define memory_install_readwrite_bank_handler(space, start, end, mask, mirror, tag) \
+	_memory_install_bank_handler(space, start, end, mask, mirror, tag, tag)
 
 
 /* macros for accessing bytes and words within larger chunks */
@@ -755,6 +765,14 @@ union _addrmap64_token
 	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE_PORT, 8, 0, 8, 0, 8), \
 	TOKEN_STRING(_tag),
 
+#define AM_READ_BANK(_tag) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ_BANK, 8, 0, 8, 0, 8), \
+	TOKEN_STRING(_tag),
+
+#define AM_WRITE_BANK(_tag) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE_BANK, 8, 0, 8, 0, 8), \
+	TOKEN_STRING(_tag),
+
 #define AM_REGION(_tag, _offs) \
 	TOKEN_UINT64_PACK2(ADDRMAP_TOKEN_REGION, 8, _offs, 32), \
 	TOKEN_STRING(_tag),
@@ -795,10 +813,10 @@ union _addrmap64_token
 #define AM_DEVREADWRITE32(_tag,_read,_write,_mask) AM_DEVREAD32(_tag,_read,_mask) AM_DEVWRITE32(_tag,_write,_mask)
 
 #define AM_ROM								AM_READ(SMH_ROM)
-#define AM_ROMBANK(_bank)					AM_READ(SMH_BANK(_bank))
+#define AM_ROMBANK(_bank)					AM_READ_BANK(_bank)
 
 #define AM_RAM								AM_READWRITE(SMH_RAM, SMH_RAM)
-#define AM_RAMBANK(_bank)					AM_READWRITE(SMH_BANK(_bank), SMH_BANK(_bank))
+#define AM_RAMBANK(_bank)					AM_READ_BANK(_bank) AM_WRITE_BANK(_bank)
 #define AM_RAM_WRITE(_write)				AM_READWRITE(SMH_RAM, _write)
 #define AM_WRITEONLY						AM_WRITE(SMH_RAM)
 
@@ -867,22 +885,19 @@ void *memory_get_write_ptr(const address_space *space, offs_t byteaddress) ATTR_
 /* ----- memory banking ----- */
 
 /* configure the addresses for a bank */
-void memory_configure_bank(running_machine *machine, int banknum, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(1, 5);
+void memory_configure_bank(running_machine *machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(1, 5);
 
 /* configure the decrypted addresses for a bank */
-void memory_configure_bank_decrypted(running_machine *machine, int banknum, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(1, 5);
+void memory_configure_bank_decrypted(running_machine *machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(1, 5);
 
 /* select one pre-configured entry to be the new bank base */
-void memory_set_bank(running_machine *machine, int banknum, int entrynum) ATTR_NONNULL(1);
+void memory_set_bank(running_machine *machine, const char *tag, int entrynum) ATTR_NONNULL(1);
 
 /* return the currently selected bank */
-int memory_get_bank(running_machine *machine, int banknum) ATTR_NONNULL(1);
+int memory_get_bank(running_machine *machine, const char *tag) ATTR_NONNULL(1);
 
 /* set the absolute address of a bank base */
-void memory_set_bankptr(running_machine *machine, int banknum, void *base) ATTR_NONNULL(1, 3);
-
-/* return the index of an unused bank */
-int memory_find_unused_bank(running_machine *machine) ATTR_NONNULL(1);
+void memory_set_bankptr(running_machine *machine, const char *tag, void *base) ATTR_NONNULL(1, 3);
 
 
 
@@ -920,6 +935,9 @@ UINT64 *_memory_install_device_handler64(const address_space *space, const devic
 
 /* install a new port handler into the given address space */
 void _memory_install_port_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag) ATTR_NONNULL(1);
+
+/* install a new bank handler into the given address space */
+void _memory_install_bank_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag) ATTR_NONNULL(1);
 
 
 

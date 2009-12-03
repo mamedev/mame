@@ -50,7 +50,7 @@ struct _okim6295_state
 	struct ADPCMVoice voice[OKIM6295_VOICES];
 	const device_config *device;
 	INT32 command;
-	INT32 bank_num;
+	UINT8 bank_installed;
 	INT32 bank_offs;
 	sound_stream *stream;	/* which stream are we playing on? */
 	UINT32 master_clock;	/* master clock frequency */
@@ -352,7 +352,7 @@ static DEVICE_START( okim6295 )
 	compute_tables();
 
 	info->command = -1;
-	info->bank_num = -1;
+	info->bank_installed = FALSE;
 	info->bank_offs = 0;
 	info->device = device;
 
@@ -404,21 +404,18 @@ void okim6295_set_bank_base(const device_config *device, int base)
 	stream_update(info->stream);
 
 	/* if we are setting a non-zero base, and we have no bank, allocate one */
-	if (info->bank_num == -1 && base != 0)
+	if (!info->bank_installed && base != 0)
 	{
-		info->bank_num = memory_find_unused_bank(device->machine);
-		if (info->bank_num == -1)
-			fatalerror("Unable to allocate bank for oki6295 device '%s'", device->tag);
-
 		/* override our memory map with a bank */
-		memory_install_read8_handler(device->space[0], 0x00000, 0x3ffff, 0, 0, (read8_space_func)SMH_BANK(info->bank_num));
+		memory_install_read_bank_handler(device->space[0], 0x00000, 0x3ffff, 0, 0, device->tag);
+		info->bank_installed = TRUE;
 	}
 
 	/* if we have a bank number, set the base pointer */
-	if (info->bank_num != -1)
+	if (info->bank_installed)
 	{
 		info->bank_offs = base;
-		memory_set_bankptr(device->machine, info->bank_num, device->region + base);
+		memory_set_bankptr(device->machine, device->tag, device->region + base);
 	}
 }
 

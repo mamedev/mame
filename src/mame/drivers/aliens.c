@@ -93,7 +93,7 @@ static WRITE8_DEVICE_HANDLER( aliens_snd_bankswitch_w )
 static ADDRESS_MAP_START( aliens_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(&ram)		/* palette + work RAM */
 	AM_RANGE(0x0400, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)												/* banked ROM */
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")												/* banked ROM */
 	AM_RANGE(0x5f80, 0x5f80) AM_READ_PORT("DSW3")
 	AM_RANGE(0x5f81, 0x5f81) AM_READ_PORT("P1")
 	AM_RANGE(0x5f82, 0x5f82) AM_READ_PORT("P2")
@@ -476,7 +476,7 @@ static KONAMI_SETLINES_CALLBACK( aliens_banking )
 	if (lines & 0x10) offs -= 0x8000;
 
 	offs += (lines & 0x0f)*0x2000;
-	memory_set_bankptr(device->machine,  1, &RAM[offs] );
+	memory_set_bankptr(device->machine,  "bank1", &RAM[offs] );
 }
 
 static MACHINE_RESET( aliens )
@@ -486,7 +486,7 @@ static MACHINE_RESET( aliens )
 	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), aliens_banking);
 
 	/* init the default bank */
-	memory_set_bankptr(machine,  1, &RAM[0x10000]);
+	memory_set_bankptr(machine,  "bank1", &RAM[0x10000]);
 }
 
 

@@ -225,10 +225,10 @@ READ8_HANDLER( theglobp_decrypt_rom )
 
 	switch(counter)
 	{
-		case 0x08:	memory_set_bank (space->machine, 1, 0);		break;
-		case 0x09:	memory_set_bank (space->machine, 1, 1);		break;
-		case 0x0A:	memory_set_bank (space->machine, 1, 2);		break;
-		case 0x0B:	memory_set_bank (space->machine, 1, 3);		break;
+		case 0x08:	memory_set_bank (space->machine, "bank1", 0);		break;
+		case 0x09:	memory_set_bank (space->machine, "bank1", 1);		break;
+		case 0x0A:	memory_set_bank (space->machine, "bank1", 2);		break;
+		case 0x0B:	memory_set_bank (space->machine, "bank1", 3);		break;
 		default:
 			logerror("Invalid counter = %02X\n",counter);
 			break;
@@ -252,8 +252,8 @@ MACHINE_RESET( theglobp )
 
 	/* The initial state of the counter is 0x0A */
 	counter = 0x0A;
-	memory_configure_bank(machine, 1, 0, 4, &RAM[0x10000], 0x4000);
-	memory_set_bank(machine, 1, 2);
+	memory_configure_bank(machine, "bank1", 0, 4, &RAM[0x10000], 0x4000);
+	memory_set_bank(machine, "bank1", 2);
 
 	state_save_register_global(machine, counter);
 }

@@ -390,13 +390,13 @@ static WRITE8_HANDLER( sngkace_sound_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "audiocpu");
 	int bank = data & 3;
-	memory_set_bankptr(space->machine, 1, &RAM[bank * 0x8000 + 0x10000]);
+	memory_set_bankptr(space->machine, "bank1", &RAM[bank * 0x8000 + 0x10000]);
 }
 
 static ADDRESS_MAP_START( sngkace_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM							// ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM							// RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)					// Banked ROM
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")					// Banked ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sngkace_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -420,13 +420,13 @@ static WRITE8_HANDLER( gunbird_sound_bankswitch_w )
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes
        of the rom not reachable. */
 
-	memory_set_bankptr(space->machine, 1, &RAM[bank * 0x8000 + 0x10000 + 0x200]);
+	memory_set_bankptr(space->machine, "bank1", &RAM[bank * 0x8000 + 0x10000 + 0x200]);
 }
 
 static ADDRESS_MAP_START( gunbird_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM							// ROM
 	AM_RANGE(0x8000, 0x81ff) AM_RAM							// RAM
-	AM_RANGE(0x8200, 0xffff) AM_ROMBANK(1)					// Banked ROM
+	AM_RANGE(0x8200, 0xffff) AM_ROMBANK("bank1")					// Banked ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gunbird_sound_io_map, ADDRESS_SPACE_IO, 8 )

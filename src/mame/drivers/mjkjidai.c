@@ -171,7 +171,7 @@ static NVRAM_HANDLER( mjkjidai )
 
 static ADDRESS_MAP_START( mjkjidai_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM	AM_BASE_SIZE_MEMBER(mjkjidai_state,nvram,nvram_size)	// cleared and initialized on startup if bit 6 if port 00 is 0
 	AM_RANGE(0xe000, 0xe01f) AM_RAM AM_BASE_MEMBER(mjkjidai_state,spriteram1)			// shared with tilemap ram

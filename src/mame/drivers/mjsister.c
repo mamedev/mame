@@ -100,7 +100,7 @@ static WRITE8_HANDLER( mjsister_banksel1_w )
 	if (tmp != mjsister_colorbank)
 		mjsister_screen_redraw = 1;
 
-	memory_set_bankptr(space->machine, 1,&BANKROM[rombank0*0x10000+rombank1*0x8000]+0x10000);
+	memory_set_bankptr(space->machine, "bank1",&BANKROM[rombank0*0x10000+rombank1*0x8000]+0x10000);
 }
 
 static WRITE8_HANDLER( mjsister_banksel2_w )
@@ -119,7 +119,7 @@ static WRITE8_HANDLER( mjsister_banksel2_w )
 			logerror("%04x p31_w:%02x\n",cpu_get_pc(space->cpu),data);
 	}
 
-	memory_set_bankptr(space->machine, 1,&BANKROM[rombank0*0x10000+rombank1*0x8000]+0x10000);
+	memory_set_bankptr(space->machine, "bank1",&BANKROM[rombank0*0x10000+rombank1*0x8000]+0x10000);
 }
 
 static WRITE8_HANDLER( mjsister_input_sel1_w )
@@ -154,7 +154,7 @@ static READ8_HANDLER( mjsister_keys_r )
 static ADDRESS_MAP_START( mjsister_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1) AM_WRITE(mjsister_videoram_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(mjsister_videoram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjsister_io_map, ADDRESS_SPACE_IO, 8 )

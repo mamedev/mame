@@ -248,7 +248,7 @@ static WRITE8_HANDLER( multfish_vid_w )
 
 static WRITE8_HANDLER( multfish_bank_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x0f);
+	memory_set_bank(space->machine, "bank1", data & 0x0f);
 }
 
 static UINT8 rambk = 0;
@@ -354,7 +354,7 @@ static WRITE8_HANDLER(multfish_rtc_w)
 
 static ADDRESS_MAP_START( multfish_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(SMH_ROM, multfish_vid_w)
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(1), SMH_ROM )
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdff7) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xdff8, 0xdfff) AM_READWRITE(multfish_rtc_r, multfish_rtc_w)
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(bankedram_r, bankedram_w)
@@ -591,8 +591,8 @@ GFXDECODE_END
 
 static MACHINE_RESET( multfish )
 {
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu"), 0x4000);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu"), 0x4000);
+	memory_set_bank(machine, "bank1", 0);
 }
 
 static const ay8910_interface ay8910_config =

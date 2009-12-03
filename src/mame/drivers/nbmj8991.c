@@ -48,7 +48,7 @@ Notes:
 static WRITE8_HANDLER( nbmj8991_soundbank_w )
 {
 	if (!(data & 0x80)) soundlatch_clear_w(space, 0, 0);
-	memory_set_bank(space->machine, 1, data & 0x03);
+	memory_set_bank(space->machine, "bank1", data & 0x03);
 }
 
 static WRITE8_HANDLER( nbmj8991_sound_w )
@@ -68,8 +68,8 @@ static MACHINE_RESET( nbmj8991 )
 {
 	if (cputag_get_cpu(machine, "audiocpu") != NULL && cpu_get_type(cputag_get_cpu(machine, "audiocpu")) == CPU_Z80)
 	{
-		memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "audiocpu") + 0x8000, 0x8000);
-		memory_set_bank(machine, 1, 0);
+		memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "audiocpu") + 0x8000, 0x8000);
+		memory_set_bank(machine, "bank1", 0);
 	}
 	MACHINE_RESET_CALL(nb1413m3);
 }
@@ -311,7 +311,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( nbmj8991_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nbmj8991_sound_io_map, ADDRESS_SPACE_IO, 8 )

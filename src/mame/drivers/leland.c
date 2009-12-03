@@ -63,8 +63,8 @@
 
 static ADDRESS_MAP_START( master_map_program, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK(1)
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK(2)
+	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank1")
+	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xa000, 0xdfff) AM_WRITE(leland_battery_ram_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(leland_gated_paletteram_r, leland_gated_paletteram_w) AM_BASE_GENERIC(paletteram)
@@ -90,7 +90,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_small_map_program, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0xdfff) AM_ROMBANK(3)
+	AM_RANGE(0x2000, 0xdfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_slave_video_addr_w)
 	AM_RANGE(0xf802, 0xf802) AM_READ(leland_raster_r)
@@ -100,7 +100,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_large_map_program, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK(3)
+	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(leland_slave_large_banksw_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_slave_video_addr_w)
@@ -1922,9 +1922,9 @@ static DRIVER_INIT( cerberus )
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = cerberus_bankswitch;
-	memory_set_bankptr(machine, 1, memory_region(machine, "master") + 0x2000);
-	memory_set_bankptr(machine, 2, memory_region(machine, "master") + 0xa000);
-	memory_set_bankptr(machine, 3, memory_region(machine, "slave") + 0x2000);
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "master") + 0x2000);
+	memory_set_bankptr(machine, "bank2", memory_region(machine, "master") + 0xa000);
+	memory_set_bankptr(machine, "bank3", memory_region(machine, "slave") + 0x2000);
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x40, 0x80);

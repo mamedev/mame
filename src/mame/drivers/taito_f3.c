@@ -142,7 +142,7 @@ static WRITE32_HANDLER( f3_sound_bankswitch_w )
 
 		/* Banks are 0x20000 bytes each, divide by two to get data16
         pointer rather than byte pointer */
-		memory_set_bankptr(space->machine, 2, &rom[(idx*0x20000)/2 + 0x80000]);
+		memory_set_bankptr(space->machine, "bank2", &rom[(idx*0x20000)/2 + 0x80000]);
 
 	} else {
 		logerror("Sound bankswitch in unsupported game\n");

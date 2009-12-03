@@ -63,31 +63,31 @@ static WRITE8_HANDLER( pokechmp_bank_w )
 
 	if (data == 0x00)
 	{
-		memory_set_bankptr(space->machine, 1,&RAM[0x10000]);
-		memory_set_bankptr(space->machine, 2,&RAM[0x12000]);
+		memory_set_bankptr(space->machine, "bank1",&RAM[0x10000]);
+		memory_set_bankptr(space->machine, "bank2",&RAM[0x12000]);
 	}
 	if (data == 0x01)
 	{
-		memory_set_bankptr(space->machine, 1,&RAM[0x14000]);
-		memory_set_bankptr(space->machine, 2,&RAM[0x16000]);
+		memory_set_bankptr(space->machine, "bank1",&RAM[0x14000]);
+		memory_set_bankptr(space->machine, "bank2",&RAM[0x16000]);
 	}
 	if (data == 0x02)
 	{
-		memory_set_bankptr(space->machine, 1,&RAM[0x20000]);
-		memory_set_bankptr(space->machine, 2,&RAM[0x22000]);
+		memory_set_bankptr(space->machine, "bank1",&RAM[0x20000]);
+		memory_set_bankptr(space->machine, "bank2",&RAM[0x22000]);
 	}
 
 	if (data == 0x03)
 	{
-		memory_set_bankptr(space->machine, 1,&RAM[0x04000]);
-		memory_set_bankptr(space->machine, 2,&RAM[0x06000]);
+		memory_set_bankptr(space->machine, "bank1",&RAM[0x04000]);
+		memory_set_bankptr(space->machine, "bank2",&RAM[0x06000]);
 	}
 }
 
 #ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( pokechmp_sound_bank_w )
 {
-	memory_set_bank(space->machine, 3, (data >> 2) & 1);
+	memory_set_bank(space->machine, "bank3", (data >> 2) & 1);
 }
 #endif
 
@@ -127,8 +127,8 @@ static ADDRESS_MAP_START( pokechmp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	/* Extra on Poke Champ (not on Pocket Gal) */
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(pokechmp_paletteram_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(2)
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( pokechmp_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_DEVREADWRITE("oki", okim6295_r,okim6295_w) // extra
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
 //  AM_RANGE(0x3400, 0x3400) AM_READ(pokechmp_adpcm_reset_r)    /* ? not sure */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(3)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank3")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -270,7 +270,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( pokechmp )
 {
-	memory_configure_bank(machine, 3, 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank3", 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
 }
 
 

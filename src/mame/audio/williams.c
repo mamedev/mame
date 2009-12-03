@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( williams_cvsd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x07ff) AM_DEVWRITE("cvsd", cvsd_digit_clock_clear_w)
 	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07ff) AM_DEVWRITE("cvsd", cvsd_clock_set_w)
 	AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x07ff) AM_WRITE(cvsd_bank_select_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(5)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
 
 
@@ -116,8 +116,8 @@ static ADDRESS_MAP_START( williams_narc_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_READ(narc_command_r)
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_WRITE(narc_master_bank_select_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x03ff) AM_WRITE(narc_master_sync_w)
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK(5)
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(6)
+	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank5")
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank6")
 ADDRESS_MAP_END
 
 /* NARC slave readmem/writemem structures */
@@ -130,8 +130,8 @@ static ADDRESS_MAP_START( williams_narc_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_READ(narc_command2_r)
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_WRITE(narc_slave_bank_select_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x03ff) AM_WRITE(narc_slave_sync_w)
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK(7)
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(8)
+	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank7")
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank8")
 ADDRESS_MAP_END
 
 
@@ -145,8 +145,8 @@ static ADDRESS_MAP_START( williams_adpcm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_READ(adpcm_command_r)
 	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_DEVWRITE("oki", adpcm_6295_bank_select_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x03ff) AM_WRITE(adpcm_talkback_w)
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK(5)
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(6)
+	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank5")
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank6")
 ADDRESS_MAP_END
 
 
@@ -284,9 +284,9 @@ void williams_cvsd_init(running_machine *machine)
             D3 -> A16
          */
 		offs_t offset = 0x8000 * ((bank >> 2) & 3) + 0x20000 * (bank & 3);
-		memory_configure_bank(machine, 5, bank, 1, &ROM[0x10000 + offset], 0);
+		memory_configure_bank(machine, "bank5", bank, 1, &ROM[0x10000 + offset], 0);
 	}
-	memory_set_bank(machine, 5, 0);
+	memory_set_bank(machine, "bank5", 0);
 
 	/* reset the IRQ state */
 	pia6821_ca1_w(devtag_get_device(machine, "cvsdpia"), 0, 1);
@@ -316,9 +316,9 @@ void williams_narc_init(running_machine *machine)
             D3 -> A16
          */
 		offs_t offset = 0x8000 * (bank & 1) + 0x10000 * ((bank >> 3) & 1) + 0x20000 * ((bank >> 1) & 3);
-		memory_configure_bank(machine, 5, bank, 1, &ROM[0x10000 + offset], 0);
+		memory_configure_bank(machine, "bank5", bank, 1, &ROM[0x10000 + offset], 0);
 	}
-	memory_set_bankptr(machine, 6, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
+	memory_set_bankptr(machine, "bank6", &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
 	/* configure slave CPU banks */
 	ROM = memory_region(machine, "narc2cpu");
@@ -330,9 +330,9 @@ void williams_narc_init(running_machine *machine)
             D3 -> A16
         */
 		offs_t offset = 0x8000 * (bank & 1) + 0x10000 * ((bank >> 3) & 1) + 0x20000 * ((bank >> 1) & 3);
-		memory_configure_bank(machine, 7, bank, 1, &ROM[0x10000 + offset], 0);
+		memory_configure_bank(machine, "bank7", bank, 1, &ROM[0x10000 + offset], 0);
 	}
-	memory_set_bankptr(machine, 8, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
+	memory_set_bankptr(machine, "bank8", &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
 	/* register for save states */
 	state_save_register_global(machine, williams_sound_int_state);
@@ -351,8 +351,8 @@ void williams_adpcm_init(running_machine *machine)
 
 	/* configure banks */
 	ROM = memory_region(machine, "adpcm");
-	memory_configure_bank(machine, 5, 0, 8, &ROM[0x10000], 0x8000);
-	memory_set_bankptr(machine, 6, &ROM[0x10000 + 0x4000 + 7 * 0x8000]);
+	memory_configure_bank(machine, "bank5", 0, 8, &ROM[0x10000], 0x8000);
+	memory_set_bankptr(machine, "bank6", &ROM[0x10000 + 0x4000 + 7 * 0x8000]);
 
 	/* expand ADPCM data */
 	/* it is assumed that U12 is loaded @ 0x00000 and U13 is loaded @ 0x40000 */
@@ -442,7 +442,7 @@ static void adpcm_ym2151_irq(const device_config *device, int state)
 
 static WRITE8_HANDLER( cvsd_bank_select_w )
 {
-	memory_set_bank(space->machine, 5, data & 0x0f);
+	memory_set_bank(space->machine, "bank5", data & 0x0f);
 }
 
 
@@ -509,13 +509,13 @@ void williams_cvsd_reset_w(int state)
 
 static WRITE8_HANDLER( narc_master_bank_select_w )
 {
-	memory_set_bank(space->machine, 5, data & 0x0f);
+	memory_set_bank(space->machine, "bank5", data & 0x0f);
 }
 
 
 static WRITE8_HANDLER( narc_slave_bank_select_w )
 {
-	memory_set_bank(space->machine, 7, data & 0x0f);
+	memory_set_bank(space->machine, "bank7", data & 0x0f);
 }
 
 
@@ -628,7 +628,7 @@ int williams_narc_talkback_r(void)
 
 static WRITE8_HANDLER( adpcm_bank_select_w )
 {
-	memory_set_bank(space->machine, 5, data & 0x07);
+	memory_set_bank(space->machine, "bank5", data & 0x07);
 }
 
 

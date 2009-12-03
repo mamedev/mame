@@ -232,7 +232,7 @@ static WRITE8_HANDLER ( cshooter_c700_w )
 
 static WRITE8_HANDLER ( bank_w )
 {
-	memory_set_bankptr(space->machine, 1,&memory_region(space->machine, "user1")[0x4000*((data>>4)&3)]);
+	memory_set_bankptr(space->machine, "bank1",&memory_region(space->machine, "user1")[0x4000*((data>>4)&3)]);
 }
 
 
@@ -257,7 +257,7 @@ static READ8_HANDLER(pal_r)
 
 static ADDRESS_MAP_START( cshooter_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xafff) AM_READWRITE(SMH_BANK(1), SMH_RAM)
+	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank1") AM_WRITE(SMH_RAM)
 	AM_RANGE(0xb000, 0xb0ff) AM_READ(SMH_RAM)			// sound related ?
 	AM_RANGE(0xc000, 0xc1ff) AM_WRITE(pal_w) AM_READ(pal_r) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN0")
@@ -277,9 +277,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( airraid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xb000, 0xb0ff) AM_RAM			// sound related ?
-	AM_RANGE(0xb100, 0xb1ff) AM_RAM//READ(SMH_BANK(1))           // sound related ?
+	AM_RANGE(0xb100, 0xb1ff) AM_RAM//ROMBANK("bank1")           // sound related ?
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
@@ -655,7 +655,7 @@ static DRIVER_INIT( cshooter )
 	rom[0xa2] = 0x00;
 	rom[0xa3] = 0x00;
 	rom[0xa4] = 0x00;
-	memory_set_bankptr(machine, 1,&memory_region(machine, "user1")[0]);
+	memory_set_bankptr(machine, "bank1",&memory_region(machine, "user1")[0]);
 }
 
 static DRIVER_INIT( cshootre )
@@ -692,7 +692,7 @@ static DRIVER_INIT( cshootre )
 			rom[A] = BITSWAP8(rom[A],7,6,1,4,3,2,5,0);
 	}
 
-	memory_set_bankptr(machine, 1,&memory_region(machine, "user1")[0]);
+	memory_set_bankptr(machine, "bank1",&memory_region(machine, "user1")[0]);
 	seibu_sound_decrypt(machine,"audiocpu",0x2000);
 }
 

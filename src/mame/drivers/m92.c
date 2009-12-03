@@ -222,7 +222,7 @@ static TIMER_CALLBACK( m92_scanline_interrupt );
 static void set_m92_bank(running_machine *machine)
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(machine, "bank1",&RAM[bankaddress]);
 }
 
 static STATE_POSTLOAD( m92_postload )
@@ -387,8 +387,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m92_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK(1)
-	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK(2)	/* Mirror of rom:  Used by In The Hunt as protection */
+	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
+	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK("bank2")	/* Mirror of rom:  Used by In The Hunt as protection */
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m92_vram_w) AM_BASE(&m92_vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf87ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -2066,7 +2066,7 @@ static void init_m92(running_machine *machine, int hasbanks)
 
 		/* Mirror used by In The Hunt for protection */
 		memcpy(RAM + 0xc0000, RAM + 0x00000, 0x10000);
-		memory_set_bankptr(machine, 2, &RAM[0xc0000]);
+		memory_set_bankptr(machine, "bank2", &RAM[0xc0000]);
 	}
 
 	RAM = memory_region(machine, "soundcpu");

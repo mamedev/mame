@@ -673,7 +673,7 @@ static ADDRESS_MAP_START( hangplt_sharc0_map, ADDRESS_SPACE_DATA, 32 )
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
 	AM_RANGE(0x3401000, 0x34fffff) AM_DEVWRITE("voodoo0", nwk_fifo_0_w)
 	AM_RANGE(0x3500000, 0x3507fff) AM_READWRITE(K033906_0_r, K033906_0_w)
-	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK(5)
+	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hangplt_sharc1_map, ADDRESS_SPACE_DATA, 32 )
@@ -684,7 +684,7 @@ static ADDRESS_MAP_START( hangplt_sharc1_map, ADDRESS_SPACE_DATA, 32 )
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_1_comm_sharc_r, cgboard_1_comm_sharc_w)
 	AM_RANGE(0x3401000, 0x34fffff) AM_DEVWRITE("voodoo1", nwk_fifo_1_w)
 	AM_RANGE(0x3500000, 0x3507fff) AM_READWRITE(K033906_1_r, K033906_1_w)
-	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK(6)
+	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank6")
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -1230,8 +1230,8 @@ static DRIVER_INIT(gticlub)
 static DRIVER_INIT(hangplt)
 {
 	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HANGPLT);
-	set_cgboard_texture_bank(machine, 0, 5, memory_region(machine, "user5"));
-	set_cgboard_texture_bank(machine, 1, 6, memory_region(machine, "user5"));
+	set_cgboard_texture_bank(machine, 0, "bank5", memory_region(machine, "user5"));
+	set_cgboard_texture_bank(machine, 1, "bank6", memory_region(machine, "user5"));
 
 	sharc_dataram_0 = auto_alloc_array(machine, UINT32, 0x100000/4);
 	sharc_dataram_1 = auto_alloc_array(machine, UINT32, 0x100000/4);

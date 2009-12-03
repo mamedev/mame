@@ -276,7 +276,7 @@ static WRITE8_HANDLER( le_bankswitch_w )
 {
 	UINT8 *prgrom = (UINT8 *)memory_region(space->machine, "maincpu")+0x10000;
 
-	memory_set_bankptr(space->machine, 1, &prgrom[data * 0x2000]);
+	memory_set_bankptr(space->machine, "bank1", &prgrom[data * 0x2000]);
 }
 
 static READ8_HANDLER( le_4800_r )
@@ -481,7 +481,7 @@ static READ8_HANDLER(gunsaux_r)
 }
 
 static ADDRESS_MAP_START( le_main, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_BANK(1)) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM				// work RAM
 	AM_RANGE(0x4000, 0x403f) AM_WRITE(K056832_w)
 	AM_RANGE(0x4040, 0x404f) AM_WRITE(K056832_b_w)
@@ -497,7 +497,7 @@ static ADDRESS_MAP_START( le_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x40dc, 0x40dc) AM_WRITE(le_bankswitch_w)
 	AM_RANGE(0x47fe, 0x47ff) AM_WRITE(le_bgcolor_w)		// BG color
 	AM_RANGE(0x4800, 0x7fff) AM_READWRITE(le_4800_r, le_4800_w)	AM_BASE_GENERIC(paletteram) // bankswitched: RAM and registers
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK(2)) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( le_sound, ADDRESS_SPACE_PROGRAM, 8 )
@@ -585,8 +585,8 @@ static MACHINE_RESET( lethalen )
 {
 	UINT8 *prgrom = (UINT8 *)memory_region(machine, "maincpu");
 
-	memory_set_bankptr(machine, 1, &prgrom[0x10000]);
-	memory_set_bankptr(machine, 2, &prgrom[0x48000]);
+	memory_set_bankptr(machine, "bank1", &prgrom[0x10000]);
+	memory_set_bankptr(machine, "bank2", &prgrom[0x48000]);
 	/* force reset again to read proper reset vector */
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 }

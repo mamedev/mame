@@ -287,7 +287,7 @@ TODO:
 
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, videoram, videoram_size)
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, objectram, objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(1)
@@ -343,7 +343,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, videoram, videoram_size)
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, objectram, objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(1)
@@ -367,7 +367,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tokio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, videoram, videoram_size)
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, objectram, objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(1)
@@ -1496,7 +1496,7 @@ ROM_END
 static void configure_banks( running_machine* machine )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 8, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 }
 
 static DRIVER_INIT( bublbobl )

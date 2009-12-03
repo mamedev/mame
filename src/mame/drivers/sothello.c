@@ -68,7 +68,7 @@ static WRITE8_HANDLER(bank_w)
         case 4: bank=2; break;
         case 8: bank=3; break;
     }
-    memory_set_bankptr(space->machine,1,&RAM[bank*0x4000+0x10000]);
+    memory_set_bankptr(space->machine,"bank1",&RAM[bank*0x4000+0x10000]);
 }
 
 static TIMER_CALLBACK( subcpu_suspend )
@@ -109,7 +109,7 @@ static READ8_HANDLER( soundcpu_status_r )
 
 static ADDRESS_MAP_START( maincpu_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x7fff) AM_ROM
-    AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+    AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
     AM_RANGE(0xc000, 0xdfff) AM_RAM AM_MIRROR(0x1800) AM_SHARE(1)
     AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END

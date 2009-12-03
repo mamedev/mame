@@ -492,9 +492,9 @@ static WRITE32_HANDLER ( rabbit_rombank_w )
 	printf("rabbit rombank %08x\n",data);
 	bank = data & 0x3ff;
 
-	memory_set_bankptr(space->machine, 1,&dataroms[0x40000*(bank&0x3ff)]);
+	memory_set_bankptr(space->machine, "bank1",&dataroms[0x40000*(bank&0x3ff)]);
 #else
-	memory_set_bankptr(space->machine, 1,&dataroms[0]);
+	memory_set_bankptr(space->machine, "bank1",&dataroms[0]);
 #endif
 
 }
@@ -731,7 +731,7 @@ static ADDRESS_MAP_START( rabbit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	/* hmm */
 	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_BASE( &rabbit_viewregs10 )
 
-	AM_RANGE(0x440000, 0x47ffff) AM_ROMBANK(1) // data (gfx / sound) rom readback for ROM testing
+	AM_RANGE(0x440000, 0x47ffff) AM_ROMBANK("bank1") // data (gfx / sound) rom readback for ROM testing
 	/* tilemaps */
 	AM_RANGE(0x480000, 0x483fff) AM_READWRITE(rabbit_tilemap0_r,rabbit_tilemap0_w)
 	AM_RANGE(0x484000, 0x487fff) AM_READWRITE(rabbit_tilemap1_r,rabbit_tilemap1_w)

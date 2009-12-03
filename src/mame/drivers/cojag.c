@@ -351,17 +351,17 @@ static MACHINE_RESET( cojag )
 		/* graphics banks */
 		if (cojag_is_r3000)
 		{
-			memory_configure_bank(machine, 1, 0, 2, rom + 0x800000, 0x400000);
-			memory_set_bank(machine, 1, 0);
+			memory_configure_bank(machine, "bank1", 0, 2, rom + 0x800000, 0x400000);
+			memory_set_bank(machine, "bank1", 0);
 		}
-		memory_configure_bank(machine, 8, 0, 2, rom + 0x800000, 0x400000);
-		memory_set_bank(machine, 8, 0);
+		memory_configure_bank(machine, "bank8", 0, 2, rom + 0x800000, 0x400000);
+		memory_set_bank(machine, "bank8", 0);
 
 		/* sound banks */
-		memory_configure_bank(machine, 2, 0, 8, rom + 0x000000, 0x200000);
-		memory_configure_bank(machine, 9, 0, 8, rom + 0x000000, 0x200000);
-		memory_set_bank(machine, 2, 0);
-		memory_set_bank(machine, 9, 0);
+		memory_configure_bank(machine, "bank2", 0, 8, rom + 0x000000, 0x200000);
+		memory_configure_bank(machine, "bank9", 0, 8, rom + 0x000000, 0x200000);
+		memory_set_bank(machine, "bank2", 0);
+		memory_set_bank(machine, "bank9", 0);
 	}
 
 	/* clear any spinuntil stuff */
@@ -426,8 +426,8 @@ static WRITE32_HANDLER( misc_control_w )
 	/* adjust banking */
 	if (memory_region(space->machine, "user2"))
 	{
-		memory_set_bank(space->machine, 2, (data >> 1) & 7);
-		memory_set_bank(space->machine, 9, (data >> 1) & 7);
+		memory_set_bank(space->machine, "bank2", (data >> 1) & 7);
+		memory_set_bank(space->machine, "bank9", (data >> 1) & 7);
 	}
 
 	COMBINE_DATA(&misc_control_data);
@@ -493,8 +493,8 @@ static WRITE32_HANDLER( latch_w )
 	if (memory_region(space->machine, "user2"))
 	{
 		if (cojag_is_r3000)
-			memory_set_bank(space->machine, 1, data & 1);
-		memory_set_bank(space->machine, 8, data & 1);
+			memory_set_bank(space->machine, "bank1", data & 1);
+		memory_set_bank(space->machine, "bank8", data & 1);
 	}
 }
 
@@ -783,8 +783,8 @@ static WRITE32_HANDLER( area51mx_main_speedup_w )
 
 static ADDRESS_MAP_START( r3000_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_SHARE(1)
-	AM_RANGE(0x04800000, 0x04bfffff) AM_ROMBANK(1)
-	AM_RANGE(0x04c00000, 0x04dfffff) AM_ROMBANK(2)
+	AM_RANGE(0x04800000, 0x04bfffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x04c00000, 0x04dfffff) AM_ROMBANK("bank2")
 	AM_RANGE(0x04e00000, 0x04e003ff) AM_DEVREADWRITE("ide", ide_controller32_r, ide_controller32_w)
 	AM_RANGE(0x04f00000, 0x04f003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
 	AM_RANGE(0x04f00400, 0x04f007ff) AM_RAM AM_BASE(&jaguar_gpu_clut) AM_SHARE(2)
@@ -818,7 +818,7 @@ static ADDRESS_MAP_START( m68020_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xa30000, 0xa30003) AM_WRITE(watchdog_reset32_w)
 	AM_RANGE(0xa40000, 0xa40003) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0xb70000, 0xb70003) AM_READWRITE(misc_control_r, misc_control_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK(2)
+	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("bank2")
 	AM_RANGE(0xe00000, 0xe003ff) AM_DEVREADWRITE("ide",  ide_controller32_r, ide_controller32_w)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
 	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_BASE(&jaguar_gpu_clut) AM_SHARE(2)
@@ -845,8 +845,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gpu_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x800000, 0xbfffff) AM_ROMBANK(8)
-	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK(9)
+	AM_RANGE(0x800000, 0xbfffff) AM_ROMBANK("bank8")
+	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("bank9")
 	AM_RANGE(0xe00000, 0xe003ff) AM_DEVREADWRITE("ide", ide_controller32_r, ide_controller32_w)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
 	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_SHARE(2)
@@ -866,8 +866,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x800000, 0xbfffff) AM_ROMBANK(8)
-	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK(9)
+	AM_RANGE(0x800000, 0xbfffff) AM_ROMBANK("bank8")
+	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("bank9")
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
 	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)

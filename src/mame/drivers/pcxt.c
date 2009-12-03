@@ -383,7 +383,7 @@ static WRITE8_HANDLER( disk_iobank_w )
 	if (newbank != bank)
 	{
 		bank = newbank;
-		memory_set_bankptr(space->machine,  1,memory_region(space->machine, "user1") + 0x10000 * bank );
+		memory_set_bankptr(space->machine,  "bank1",memory_region(space->machine, "user1") + 0x10000 * bank );
 	}
 
 	lastvalue = data;
@@ -677,7 +677,7 @@ static ADDRESS_MAP_START( filetto_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00400, 0x007ff) AM_RAM AM_BASE(&work_ram)
 	AM_RANGE(0x00800, 0x9ffff) AM_RAM //work RAM 640KB
 	AM_RANGE(0xa0000, 0xbffff) AM_RAM_WRITE(vga_vram_w) AM_BASE(&vga_vram)//VGA RAM
-	AM_RANGE(0xc0000, 0xcffff) AM_READ(SMH_BANK(1))
+	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 

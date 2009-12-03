@@ -85,7 +85,7 @@ static TIMER_CALLBACK( pot_trigger_callback );
 
 static MACHINE_START( sbrkout )
 {
-	memory_set_bankptr(machine, 1, &machine->generic.videoram.u8[0x380]);
+	memory_set_bankptr(machine, "bank1", &machine->generic.videoram.u8[0x380]);
 	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
 	pot_timer = timer_alloc(machine, pot_trigger_callback, NULL);
 
@@ -332,7 +332,7 @@ static VIDEO_UPDATE( sbrkout )
 /* full memory map derived from schematics */
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x380) AM_RAMBANK(1)
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x380) AM_RAMBANK("bank1")
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sbrkout_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x0800, 0x083f) AM_READ(switches_r)
 	AM_RANGE(0x0840, 0x0840) AM_MIRROR(0x003f) AM_READ_PORT("COIN")

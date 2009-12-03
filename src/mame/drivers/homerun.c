@@ -55,7 +55,7 @@ static const ppi8255_interface ppi8255_intf =
 
 static ADDRESS_MAP_START( homerun_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(homerun_videoram_w) AM_BASE_MEMBER(homerun_state, videoram)
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE_SIZE_MEMBER(homerun_state, spriteram, spriteram_size)
 	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(homerun_color_w)
@@ -195,8 +195,8 @@ static MACHINE_START( homerun )
 	homerun_state *state = (homerun_state *)machine->driver_data;
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	memory_configure_bank(machine, 1, 0, 1, &ROM[0x00000], 0x4000);
-	memory_configure_bank(machine, 1, 1, 7, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 1, &ROM[0x00000], 0x4000);
+	memory_configure_bank(machine, "bank1", 1, 7, &ROM[0x10000], 0x4000);
 
 	state_save_register_global(machine, state->gfx_ctrl);
 	state_save_register_global(machine, state->gc_up);

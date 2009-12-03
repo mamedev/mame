@@ -53,7 +53,7 @@ static WRITE8_HANDLER( flkatck_bankswitch_w )
 	/* bits 0-1: bank # */
 	bankaddress += 0x10000 + (data & 0x03)*0x2000;
 	if ((data & 0x03) != 0x03)	/* for safety */
-		memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+		memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
 }
 
 static READ8_HANDLER( flkatck_ls138_r )
@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( flkatck_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE_GENERIC(paletteram)	/* palette */
 	AM_RANGE(0x1000, 0x1fff) AM_RAM																	/* RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(flkatck_k007121_w) AM_BASE(&k007121_ram)					/* Video RAM (007121) */
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)															/* banked ROM */
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")															/* banked ROM */
 	AM_RANGE(0x6000, 0xffff) AM_ROM																	/* ROM */
 ADDRESS_MAP_END
 

@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( gbusters_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)		/* tiles + sprites (RAM H21, G21 & H6) */
 	AM_RANGE(0x4000, 0x57ff) AM_RAM													/* RAM I12 */
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(&ram)	/* palette + work RAM (RAM D16 & C16) */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)											/* banked ROM */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")											/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM													/* ROM 878n02.rom */
 ADDRESS_MAP_END
 
@@ -350,7 +350,7 @@ static KONAMI_SETLINES_CALLBACK( gbusters_banking )
 
 	/* bits 0-3 ROM bank */
 	offs += (lines & 0x0f)*0x2000;
-	memory_set_bankptr(device->machine,  1, &RAM[offs] );
+	memory_set_bankptr(device->machine,  "bank1", &RAM[offs] );
 
 	if (lines & 0xf0){
 		//logerror("%04x: (lines) write %02x\n",cpu_get_pc(device), lines);

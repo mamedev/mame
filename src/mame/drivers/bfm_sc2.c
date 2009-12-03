@@ -369,10 +369,10 @@ send data to them, although obviously there's no response. */
 	{
 		UINT8 *rom = memory_region(machine, "maincpu");
 
-		memory_configure_bank(machine, 1, 0, 1, &rom[0x10000], 0);
-		memory_configure_bank(machine, 1, 1, 3, &rom[0x02000], 0x02000);
+		memory_configure_bank(machine, "bank1", 0, 1, &rom[0x10000], 0);
+		memory_configure_bank(machine, "bank1", 1, 3, &rom[0x02000], 0x02000);
 
-		memory_set_bank(machine, 1,3);
+		memory_set_bank(machine, "bank1",3);
 	}
 }
 
@@ -487,7 +487,7 @@ static WRITE8_HANDLER( watchdog_w )
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bank(space->machine, 1,data & 0x03);
+	memory_set_bank(space->machine, "bank1",data & 0x03);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1556,7 +1556,7 @@ static ADDRESS_MAP_START( memmap_vid, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3FFF, 0x3FFF) AM_READ(coin_input_r)
 	AM_RANGE(0x4000, 0x5fff) AM_ROM							// 8k  fixed ROM
 	AM_RANGE(0x4000, 0xFFFF) AM_WRITE(unknown_w)			// contains unknown I/O registers
-	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK(1)					// 8k  paged ROM (4 pages)
+	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")					// 8k  paged ROM (4 pages)
 	AM_RANGE(0x8000, 0xFFFF) AM_ROM							// 32k ROM
 
 ADDRESS_MAP_END
@@ -2790,7 +2790,7 @@ static ADDRESS_MAP_START( sc2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x3FFF, 0x3FFF) AM_READ( coin_input_r)
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM									/* 8k  fixed ROM */
-	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK(1)							/* 8k  paged ROM (4 pages) */
+	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")							/* 8k  paged ROM (4 pages) */
 	AM_RANGE(0x8000, 0xFFFF) AM_ROM									/* 32k ROM */
 ADDRESS_MAP_END
 
@@ -2839,7 +2839,7 @@ static ADDRESS_MAP_START( sc3_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3FFF, 0x3FFF) AM_READ( coin_input_r)
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM
 //  AM_RANGE(0x4000, 0xFFFF) AM_WRITE(unknown_w)
-	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK(1)
+	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xFFFF) AM_ROM
 ADDRESS_MAP_END
 
@@ -2889,7 +2889,7 @@ static ADDRESS_MAP_START( memmap_sc2_dm01, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3FFF, 0x3FFF) AM_READ( coin_input_r)
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM
 //  AM_RANGE(0x4000, 0xFFFF) AM_WRITE(unknown_w)
-	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK(1)
+	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xFFFF) AM_ROM
 ADDRESS_MAP_END
 

@@ -56,7 +56,7 @@ static int rombank;
 
 static MACHINE_RESET( thedeep )
 {
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x10000 + 0 * 0x4000);
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x10000 + 0 * 0x4000);
 	thedeep_scroll[0] = 0;
 	thedeep_scroll[1] = 0;
 	thedeep_scroll[2] = 0;
@@ -90,7 +90,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 			if (rombank == new_rombank)	break;
 			rombank = new_rombank;
 			rom = memory_region(space->machine, "maincpu");
-			memory_set_bankptr(space->machine, 1, rom + 0x10000 + rombank * 0x4000);
+			memory_set_bankptr(space->machine, "bank1", rom + 0x10000 + rombank * 0x4000);
 			/* there's code which falls through from the fixed ROM to bank #1, I have to */
 			/* copy it there otherwise the CPU bank switching support will not catch it. */
 			memcpy(rom + 0x08000, rom + 0x10000 + rombank * 0x4000, 0x4000);
@@ -151,7 +151,7 @@ static WRITE8_HANDLER( thedeep_e100_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(1), SMH_ROM)	// ROM (banked)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	// ROM (banked)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM				            	// RAM (MCU data copied here)
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(thedeep_protection_r, thedeep_protection_w	)	// To MCU

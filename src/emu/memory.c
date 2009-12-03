@@ -134,9 +134,7 @@
 ***************************************************************************/
 
 /* banking constants */
-#define MAX_BANKS				(STATIC_BANKMAX - STATIC_BANK1) /* maximum number of banks */
 #define MAX_BANK_ENTRIES		4096					/* maximum number of possible bank values */
-#define MAX_EXPLICIT_BANKS		96						/* maximum number of explicitly-defined banks */
 
 /* address map lookup table definitions */
 #define LEVEL1_BITS				18						/* number of address bits in the level 1 table */
@@ -176,7 +174,6 @@ typedef enum _read_or_write read_or_write;
 #define HANDLER_IS_STATIC(h)	((FPTR)(h) < STATIC_COUNT)
 
 #define HANDLER_TO_BANK(h)		((UINT32)(FPTR)(h))
-#define BANK_TO_HANDLER(b)		((genf *)(FPTR)(b))
 
 #define SUBTABLE_PTR(tabledata, entry) (&(tabledata)->table[(1 << LEVEL1_BITS) + (((entry) - SUBTABLE_BASE) << LEVEL2_BITS)])
 
@@ -206,19 +203,22 @@ struct _bank_reference
 };
 
 /* a bank is a global pointer to memory that can be shared across devices and changed dynamically */
-typedef struct _bank_data bank_info;
-struct _bank_data
+typedef struct _bank_info bank_info;
+struct _bank_info
 {
-	UINT8 					used;					/* is this bank used? */
-	UINT8 					dynamic;				/* is this bank allocated dynamically? */
-	bank_reference *		reflist;				/* linked list of address spaces referencing this bank */
+	bank_info *				next;					/* next bank in sequence */
+	UINT8					index;					/* array index for this handler */
 	UINT8 					read;					/* is this bank used for reads? */
 	UINT8 					write;					/* is this bank used for writes? */
+	void *					handler;				/* SMH_BANK(n) handler for this bank */
+	bank_reference *		reflist;				/* linked list of address spaces referencing this bank */
 	offs_t 					bytestart;				/* byte-adjusted start offset */
 	offs_t 					byteend;				/* byte-adjusted end offset */
 	UINT16					curentry;				/* current entry */
 	void *					entry[MAX_BANK_ENTRIES];/* array of entries for this bank */
 	void *					entryd[MAX_BANK_ENTRIES];/* array of decrypted entries for this bank */
+	char *					name;					/* friendly name for this bank */
+	char					tag[1];					/* tag associated with this bank */
 };
 
 /* In memory.h: typedef struct _direct_range direct_range; */
@@ -263,7 +263,11 @@ struct _memory_private
 
 	memory_block *			memory_block_list;				/* head of the list of memory blocks */
 
-	bank_info 				bankdata[STATIC_COUNT];			/* data gathered for each bank */
+	tagmap *				bankmap;						/* map for fast bank lookups */
+	bank_info * 			banklist;						/* data gathered for each bank */
+	UINT8					banknext;						/* next bank to allocate */
+	
+	tagmap *				sharemap;						/* map for share lookups */
 
 	UINT8 *					wptable;						/* watchpoint-fill table */
 };
@@ -326,8 +330,7 @@ static void *space_find_backing_memory(const address_space *space, offs_t bytead
 static int space_needs_backing_store(const address_space *space, const address_map_entry *entry);
 
 /* banking helpers */
-static void bank_assign_static(int banknum, const address_space *space, read_or_write readorwrite, offs_t bytestart, offs_t byteend);
-static genf *bank_assign_dynamic(const address_space *space, read_or_write readorwrite, offs_t bytestart, offs_t byteend);
+static void *bank_find_or_allocate(const address_space *space, const char *tag, offs_t bytestart, offs_t byteend, read_or_write readorwrite);
 static STATE_POSTLOAD( bank_reattach );
 
 /* table management */
@@ -358,7 +361,7 @@ static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits
 static genf *get_static_handler(int handlerbits, int readorwrite, int which);
 
 /* debugging */
-static const char *handler_to_string(const address_table *table, UINT8 entry);
+static const char *handler_to_string(const address_space *space, const address_table *table, UINT8 entry);
 static void dump_map(FILE *file, const address_space *space, const address_table *table);
 static void mem_dump(running_machine *machine);
 
@@ -720,6 +723,10 @@ void memory_init(running_machine *machine)
 
 	/* allocate our private data */
 	memdata = machine->memory_data = auto_alloc_clear(machine, memory_private);
+	memdata->bankmap = tagmap_alloc();
+	memdata->sharemap = tagmap_alloc();
+	if (memdata->bankmap == NULL || memdata->sharemap == NULL)
+		fatalerror("Out of memory allocating maps for memory constructs!");
 
 	/* build up the list of address spaces */
 	memory_init_spaces(machine);
@@ -836,25 +843,24 @@ void memory_set_decrypted_region(const address_space *space, offs_t addrstart, o
 {
 	offs_t bytestart = memory_address_to_byte(space, addrstart);
 	offs_t byteend = memory_address_to_byte_end(space, addrend);
-	int banknum, found = FALSE;
+	int found = FALSE;
+	bank_info *bank;
 
 	/* loop over banks looking for a match */
-	for (banknum = 0; banknum < STATIC_COUNT; banknum++)
+	for (bank = space->machine->memory_data->banklist; bank != NULL; bank = bank->next)
 	{
-		bank_info *bank = &space->machine->memory_data->bankdata[banknum];
-
 		/* consider this bank if it is used for reading and matches the address space */
-		if (bank->used && bank->read && bank_references_space(bank, space))
+		if (bank->read && bank_references_space(bank, space))
 		{
 			/* verify that the region fully covers the decrypted range */
 			if (bank->bytestart >= bytestart && bank->byteend <= byteend)
 			{
 				/* set the decrypted pointer for the corresponding memory bank */
-				space->machine->memory_data->bankd_ptr[banknum] = (UINT8 *)base + bank->bytestart - bytestart;
+				space->machine->memory_data->bankd_ptr[bank->index] = (UINT8 *)base + bank->bytestart - bytestart;
 				found = TRUE;
 
 				/* if we are executing from here, force an opcode base update */
-				if (space->direct.entry == banknum)
+				if (space->direct.entry == bank->index)
 					force_opbase_update(space);
 			}
 
@@ -1014,17 +1020,15 @@ void *memory_get_write_ptr(const address_space *space, offs_t byteaddress)
     addresses for a bank
 -------------------------------------------------*/
 
-void memory_configure_bank(running_machine *machine, int banknum, int startentry, int numentries, void *base, offs_t stride)
+void memory_configure_bank(running_machine *machine, const char *tag, int startentry, int numentries, void *base, offs_t stride)
 {
 	memory_private *memdata = machine->memory_data;
-	bank_info *bank = &memdata->bankdata[banknum];
+	bank_info *bank = tagmap_find_hash_only(memdata->bankmap, tag);
 	int entrynum;
-
+	
 	/* validation checks */
-	if (banknum < STATIC_BANK1 || banknum > MAX_EXPLICIT_BANKS || !bank->used)
-		fatalerror("memory_configure_bank called with invalid bank %d", banknum);
-	if (bank->dynamic)
-		fatalerror("memory_configure_bank called with dynamic bank %d", banknum);
+	if (bank == NULL)
+		fatalerror("memory_configure_bank called for unknown bank '%s'", tag);
 	if (startentry < 0 || startentry + numentries > MAX_BANK_ENTRIES)
 		fatalerror("memory_configure_bank called with out-of-range entries %d-%d", startentry, startentry + numentries - 1);
 	if (!base)
@@ -1035,8 +1039,8 @@ void memory_configure_bank(running_machine *machine, int banknum, int startentry
 		bank->entry[entrynum] = (UINT8 *)base + (entrynum - startentry) * stride;
 
 	/* if we have no bankptr yet, set it to the first entry */
-	if (memdata->bank_ptr[banknum] == NULL)
-		memdata->bank_ptr[banknum] = (UINT8 *)bank->entry[0];
+	if (memdata->bank_ptr[bank->index] == NULL)
+		memdata->bank_ptr[bank->index] = (UINT8 *)bank->entry[0];
 }
 
 
@@ -1045,19 +1049,17 @@ void memory_configure_bank(running_machine *machine, int banknum, int startentry
     the decrypted addresses for a bank
 -------------------------------------------------*/
 
-void memory_configure_bank_decrypted(running_machine *machine, int banknum, int startentry, int numentries, void *base, offs_t stride)
+void memory_configure_bank_decrypted(running_machine *machine, const char *tag, int startentry, int numentries, void *base, offs_t stride)
 {
 	memory_private *memdata = machine->memory_data;
-	bank_info *bank = &memdata->bankdata[banknum];
+	bank_info *bank = tagmap_find_hash_only(memdata->bankmap, tag);
 	int entrynum;
 
 	/* validation checks */
-	if (banknum < STATIC_BANK1 || banknum > MAX_EXPLICIT_BANKS || !bank->used)
-		fatalerror("memory_configure_bank called with invalid bank %d", banknum);
-	if (bank->dynamic)
-		fatalerror("memory_configure_bank called with dynamic bank %d", banknum);
+	if (bank == NULL)
+		fatalerror("memory_configure_bank_decrypted called for unknown bank '%s'", tag);
 	if (startentry < 0 || startentry + numentries > MAX_BANK_ENTRIES)
-		fatalerror("memory_configure_bank called with out-of-range entries %d-%d", startentry, startentry + numentries - 1);
+		fatalerror("memory_configure_bank_decrypted called with out-of-range entries %d-%d", startentry, startentry + numentries - 1);
 	if (!base)
 		fatalerror("memory_configure_bank_decrypted called NULL base");
 
@@ -1066,8 +1068,8 @@ void memory_configure_bank_decrypted(running_machine *machine, int banknum, int 
 		bank->entryd[entrynum] = (UINT8 *)base + (entrynum - startentry) * stride;
 
 	/* if we have no bankptr yet, set it to the first entry */
-	if (memdata->bankd_ptr[banknum] == NULL)
-		memdata->bankd_ptr[banknum] = (UINT8 *)bank->entryd[0];
+	if (memdata->bankd_ptr[bank->index] == NULL)
+		memdata->bankd_ptr[bank->index] = (UINT8 *)bank->entryd[0];
 }
 
 
@@ -1076,26 +1078,24 @@ void memory_configure_bank_decrypted(running_machine *machine, int banknum, int 
     entry to be the new bank base
 -------------------------------------------------*/
 
-void memory_set_bank(running_machine *machine, int banknum, int entrynum)
+void memory_set_bank(running_machine *machine, const char *tag, int entrynum)
 {
 	memory_private *memdata = machine->memory_data;
-	bank_info *bank = &memdata->bankdata[banknum];
+	bank_info *bank = tagmap_find_hash_only(memdata->bankmap, tag);
 	bank_reference *ref;
 
 	/* validation checks */
-	if (banknum < STATIC_BANK1 || banknum > MAX_EXPLICIT_BANKS || !bank->used)
-		fatalerror("memory_set_bank called with invalid bank %d", banknum);
-	if (bank->dynamic)
-		fatalerror("memory_set_bank called with dynamic bank %d", banknum);
+	if (bank == NULL)
+		fatalerror("memory_set_bank called for unknown bank '%s'", tag);
 	if (entrynum < 0 || entrynum > MAX_BANK_ENTRIES)
 		fatalerror("memory_set_bank called with out-of-range entry %d", entrynum);
 	if (!bank->entry[entrynum])
-		fatalerror("memory_set_bank called for bank %d with invalid bank entry %d", banknum, entrynum);
+		fatalerror("memory_set_bank called for bank '%s' with invalid bank entry %d", tag, entrynum);
 
 	/* set the base */
 	bank->curentry = entrynum;
-	memdata->bank_ptr[banknum] = (UINT8 *)bank->entry[entrynum];
-	memdata->bankd_ptr[banknum] = (UINT8 *)bank->entryd[entrynum];
+	memdata->bank_ptr[bank->index] = (UINT8 *)bank->entry[entrynum];
+	memdata->bankd_ptr[bank->index] = (UINT8 *)bank->entryd[entrynum];
 
 	/* invalidate all the direct references to any referenced address spaces */
 	for (ref = bank->reflist; ref != NULL; ref = ref->next)
@@ -1108,16 +1108,14 @@ void memory_set_bank(running_machine *machine, int banknum, int entrynum)
     selected bank
 -------------------------------------------------*/
 
-int memory_get_bank(running_machine *machine, int banknum)
+int memory_get_bank(running_machine *machine, const char *tag)
 {
 	memory_private *memdata = machine->memory_data;
-	bank_info *bank = &memdata->bankdata[banknum];
+	bank_info *bank = tagmap_find_hash_only(memdata->bankmap, tag);
 
 	/* validation checks */
-	if (banknum < STATIC_BANK1 || banknum > MAX_EXPLICIT_BANKS || !bank->used)
-		fatalerror("memory_get_bank called with invalid bank %d", banknum);
-	if (bank->dynamic)
-		fatalerror("memory_get_bank called with dynamic bank %d", banknum);
+	if (bank == NULL)
+		fatalerror("memory_get_bank called for unknown bank '%s'", tag);
 	return bank->curentry;
 }
 
@@ -1126,46 +1124,26 @@ int memory_get_bank(running_machine *machine, int banknum)
     memory_set_bankptr - set the base of a bank
 -------------------------------------------------*/
 
-void memory_set_bankptr(running_machine *machine, int banknum, void *base)
+void memory_set_bankptr(running_machine *machine, const char *tag, void *base)
 {
 	memory_private *memdata = machine->memory_data;
-	bank_info *bank = &memdata->bankdata[banknum];
+	bank_info *bank = tagmap_find_hash_only(memdata->bankmap, tag);
 	bank_reference *ref;
 
 	/* validation checks */
-	if (banknum < STATIC_BANK1 || banknum > MAX_EXPLICIT_BANKS || !bank->used)
-		fatalerror("memory_set_bankptr called with invalid bank %d", banknum);
-	if (bank->dynamic)
-		fatalerror("memory_set_bankptr called with dynamic bank %d", banknum);
+	if (bank == NULL)
+		fatalerror("memory_set_bankptr called for unknown bank '%s'", tag);
 	if (base == NULL)
 		fatalerror("memory_set_bankptr called NULL base");
 	if (ALLOW_ONLY_AUTO_MALLOC_BANKS)
 		validate_auto_malloc_memory(base, bank->byteend - bank->bytestart + 1);
 
 	/* set the base */
-	memdata->bank_ptr[banknum] = (UINT8 *)base;
+	memdata->bank_ptr[bank->index] = (UINT8 *)base;
 
 	/* invalidate all the direct references to any referenced address spaces */
 	for (ref = bank->reflist; ref != NULL; ref = ref->next)
 		force_opbase_update(ref->space);
-}
-
-
-/*-------------------------------------------------
-    memory_find_unused_bank - return the index of
-    an unused bank
--------------------------------------------------*/
-
-int memory_find_unused_bank(running_machine *machine)
-{
-	memory_private *memdata = machine->memory_data;
-	int banknum;
-
-	for (banknum = STATIC_BANK1; banknum <= MAX_EXPLICIT_BANKS; banknum++)
-		if (!memdata->bankdata[banknum].used)
-			return banknum;
-
-	return -1;
 }
 
 
@@ -1393,6 +1371,31 @@ void _memory_install_port_handler(const address_space *space, offs_t addrstart, 
 }
 
 
+/*-------------------------------------------------
+    _memory_install_bank_handler - install a
+    new port handler into the given address space
+-------------------------------------------------*/
+
+void _memory_install_bank_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag)
+{
+	address_space *spacerw = (address_space *)space;
+
+	if (rtag != NULL)
+	{
+		void *handler = bank_find_or_allocate(space, rtag, addrstart, addrend, ROW_READ);
+		space_map_range(spacerw, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, spacerw, rtag);
+	}
+
+	if (wtag != NULL)
+	{
+		void *handler = bank_find_or_allocate(space, wtag, addrstart, addrend, ROW_WRITE);
+		space_map_range(spacerw, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, spacerw, wtag);
+	}
+
+	mem_dump(space->machine);
+}
+
+
 
 /***************************************************************************
     DEBUGGER HELPERS
@@ -1415,7 +1418,7 @@ const char *memory_get_handler_string(const address_space *space, int read0_or_w
 		entry = table->table[LEVEL2_INDEX(entry, byteaddress)];
 
 	/* 8-bit case: RAM/ROM */
-	return handler_to_string(table, entry);
+	return handler_to_string(space, table, entry);
 }
 
 
@@ -1640,9 +1643,9 @@ static void memory_init_preflight(running_machine *machine)
 {
 	memory_private *memdata = machine->memory_data;
 	address_space *space;
-
-	/* zap the bank data */
-	memset(&memdata->bankdata, 0, sizeof(memdata->bankdata));
+	
+	/* reset the banking state */
+	memdata->banknext = STATIC_BANK1;
 
 	/* loop over valid address spaces */
 	for (space = (address_space *)memdata->spacelist; space != NULL; space = (address_space *)space->next)
@@ -1699,12 +1702,6 @@ static void memory_init_preflight(running_machine *machine)
 			/* convert any region-relative entries to their memory pointers */
 			if (entry->region != NULL)
 				entry->memory = memory_region(machine, entry->region) + entry->rgnoffs;
-
-			/* assign static banks for explicitly specified entries */
-			if (HANDLER_IS_BANK(entry->read.generic))
-				bank_assign_static(HANDLER_TO_BANK(entry->read.generic), space, ROW_READ, entry->bytestart, entry->byteend);
-			if (HANDLER_IS_BANK(entry->write.generic))
-				bank_assign_static(HANDLER_TO_BANK(entry->write.generic), space, ROW_WRITE, entry->bytestart, entry->byteend);
 		}
 
 		/* now loop over all the handlers and enforce the address mask */
@@ -1783,6 +1780,20 @@ static void memory_init_populate(running_machine *machine)
 						case 64:	handler = (genf *)input_port_write64; 	break;
 					}
 					space_map_range_private(space, ROW_WRITE, bits, entry->write_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, handler, (void *)port, entry->write_porttag);
+				}
+
+				/* if we have a read bank tag, look it up */
+				if (entry->read_banktag != NULL)
+				{
+					void *handler = bank_find_or_allocate(space, entry->read_banktag, entry->addrstart, entry->addrend, ROW_READ);
+					space_map_range_private(space, ROW_READ, space->dbits, entry->read_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, handler, space, entry->read_banktag);
+				}
+
+				/* if we have a write bank tag, look it up */
+				if (entry->write_banktag != NULL)
+				{
+					void *handler = bank_find_or_allocate(space, entry->write_banktag, entry->addrstart, entry->addrend, ROW_WRITE);
+					space_map_range_private(space, ROW_WRITE, space->dbits, entry->write_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, handler, space, entry->write_banktag);
 				}
 
 				/* install the read handler if present */
@@ -1907,7 +1918,7 @@ static void memory_init_locate(running_machine *machine)
 {
 	memory_private *memdata = machine->memory_data;
 	address_space *space;
-	int banknum;
+	bank_info *bank;
 
 	/* loop over valid address spaces */
 	for (space = (address_space *)memdata->spacelist; space != NULL; space = (address_space *)space->next)
@@ -1934,30 +1945,26 @@ static void memory_init_locate(running_machine *machine)
 	}
 
 	/* once this is done, find the starting bases for the banks */
-	for (banknum = 1; banknum <= MAX_BANKS; banknum++)
+	for (bank = memdata->banklist; bank != NULL; bank = bank->next)
 	{
-		bank_info *bank = &memdata->bankdata[banknum];
-		if (bank->used)
-		{
-			address_map_entry *entry;
-			bank_reference *ref;
-			int foundit = FALSE;
+		address_map_entry *entry;
+		bank_reference *ref;
+		int foundit = FALSE;
 
-			/* set the initial bank pointer */
-			for (ref = bank->reflist; !foundit && ref != NULL; ref = ref->next)
-				for (entry = ref->space->map->entrylist; entry != NULL; entry = entry->next)
-					if (entry->bytestart == bank->bytestart)
-					{
-						memdata->bank_ptr[banknum] = (UINT8 *)entry->memory;
-						foundit = TRUE;
-		 				VPRINTF(("assigned bank %d pointer to memory from range %08X-%08X [%p]\n", banknum, entry->addrstart, entry->addrend, entry->memory));
-						break;
-					}
+		/* set the initial bank pointer */
+		for (ref = bank->reflist; !foundit && ref != NULL; ref = ref->next)
+			for (entry = ref->space->map->entrylist; entry != NULL; entry = entry->next)
+				if (entry->bytestart == bank->bytestart && entry->memory != NULL)
+				{
+					memdata->bank_ptr[bank->index] = (UINT8 *)entry->memory;
+					foundit = TRUE;
+	 				VPRINTF(("assigned bank '%s' pointer to memory from range %08X-%08X [%p]\n", bank->tag, entry->addrstart, entry->addrend, entry->memory));
+					break;
+				}
 
-			/* if the entry was set ahead of time, override the automatically found pointer */
-			if (!bank->dynamic && bank->curentry != MAX_BANK_ENTRIES)
-				memdata->bank_ptr[banknum] = (UINT8 *)bank->entry[bank->curentry];
-		}
+		/* if the entry was set ahead of time, override the automatically found pointer */
+		if (bank->tag[0] != '~' && bank->curentry != MAX_BANK_ENTRIES)
+			memdata->bank_ptr[bank->index] = (UINT8 *)bank->entry[bank->curentry];
 	}
 
 	/* request a callback to fix up the banks when done */
@@ -1973,7 +1980,6 @@ static void memory_exit(running_machine *machine)
 {
 	memory_private *memdata = machine->memory_data;
 	address_space *space, *nextspace;
-	int banknum;
 
 	/* free the memory blocks */
 	while (memdata->memory_block_list != NULL)
@@ -1982,17 +1988,22 @@ static void memory_exit(running_machine *machine)
 		memdata->memory_block_list = block->next;
 		free(block);
 	}
-
-	/* free all the bank references */
-	for (banknum = 0; banknum < STATIC_COUNT; banknum++)
+	
+	/* free banks */
+	while (memdata->banklist != NULL)
 	{
-		bank_info *bank = &memdata->bankdata[banknum];
+		bank_info *bank = memdata->banklist;
+		
+		/* free references within each bank */
 		while (bank->reflist != NULL)
 		{
 			bank_reference *ref = bank->reflist;
 			bank->reflist = ref->next;
 			free(ref);
 		}
+		
+		memdata->banklist = bank->next;
+		free(bank);
 	}
 
 	/* free all the address spaces and tables */
@@ -2029,6 +2040,12 @@ static void memory_exit(running_machine *machine)
 
 		free(space);
 	}
+
+	/* free the maps */
+	if (memdata->bankmap != NULL)
+		tagmap_free(memdata->bankmap);
+	if (memdata->sharemap != NULL)
+		tagmap_free(memdata->sharemap);
 }
 
 
@@ -2184,6 +2201,16 @@ static void map_detokenize(address_map *map, const game_driver *driver, const ch
 				entry->write_porttag = TOKEN_GET_STRING(tokens);
 				break;
 
+			case ADDRMAP_TOKEN_READ_BANK:
+				check_entry_field(read_banktag);
+				entry->read_banktag = TOKEN_GET_STRING(tokens);
+				break;
+
+			case ADDRMAP_TOKEN_WRITE_BANK:
+				check_entry_field(write_banktag);
+				entry->write_banktag = TOKEN_GET_STRING(tokens);
+				break;
+
 			case ADDRMAP_TOKEN_REGION:
 				check_entry_field(region);
 				TOKEN_UNGET_UINT32(tokens);
@@ -2276,7 +2303,7 @@ static void space_map_range_private(address_space *space, read_or_write readorwr
 		adjust_addresses(space, &bytestart, &byteend, &bytemask, &bytemirror);
 
 		/* assign a bank to the adjusted addresses */
-		handler = (genf *)bank_assign_dynamic(space, readorwrite, bytestart, byteend);
+		handler = bank_find_or_allocate(space, NULL, bytestart, byteend, readorwrite);
 		if (memdata->bank_ptr[HANDLER_TO_BANK(handler)] == NULL)
 			memdata->bank_ptr[HANDLER_TO_BANK(handler)] = (UINT8 *)space_find_backing_memory(space, bytestart);
 	}
@@ -2318,10 +2345,6 @@ static void space_map_range(address_space *space, read_or_write readorwrite, int
 	assert_always(handlerbits <= space->dbits, "space_map_range called with handlers larger than the address space");
 	assert_always((bytestart & (space->dbits / 8 - 1)) == 0, "space_map_range called with misaligned start address");
 	assert_always((byteend & (space->dbits / 8 - 1)) == (space->dbits / 8 - 1), "space_map_range called with misaligned end address");
-
-	/* if we're installing a new bank, make sure we mark it */
-	if (HANDLER_IS_BANK(handler))
-		bank_assign_static(HANDLER_TO_BANK(handler), space, readorwrite, bytestart, byteend);
 
 	/* get the final handler index */
 	entry = table_assign_handler(space, tabledata->handlers, object, handler, handler_name, bytestart, byteend, bytemask);
@@ -2395,32 +2418,20 @@ static void *space_find_backing_memory(const address_space *space, offs_t bytead
 
 static int space_needs_backing_store(const address_space *space, const address_map_entry *entry)
 {
-	FPTR handler;
-
+	/* if we are asked to provide a base pointer, then yes, we do need backing */
 	if (entry->baseptr != NULL || entry->baseptroffs_plus1 != 0 || entry->genbaseptroffs_plus1 != 0)
 		return TRUE;
 
-	handler = (FPTR)entry->write.generic;
-	if (handler < STATIC_COUNT)
-	{
-		if (handler != STATIC_INVALID &&
-			handler != STATIC_ROM &&
-			handler != STATIC_NOP &&
-			handler != STATIC_UNMAP)
-			return TRUE;
-	}
-
-	handler = (FPTR)entry->read.generic;
-	if (handler < STATIC_COUNT)
-	{
-		if (handler != STATIC_INVALID &&
-			(handler < STATIC_BANK1 || handler > STATIC_BANK1 + MAX_BANKS - 1) &&
-			(handler != STATIC_ROM || space->spacenum != ADDRESS_SPACE_0 || entry->addrstart >= memory_region_length(space->machine, space->cpu->tag)) &&
-			handler != STATIC_NOP &&
-			handler != STATIC_UNMAP)
-			return TRUE;
-	}
-
+	/* if we're writing to any sort of bank or RAM, then yes, we do need backing */
+	if (entry->write_banktag != NULL || (FPTR)entry->write.generic == STATIC_RAM)
+		return TRUE;
+	
+	/* if we're reading from RAM or from ROM outside of address space 0 or its region, then yes, we do need backing */
+	if ((FPTR)entry->read.generic == STATIC_RAM ||
+		((FPTR)entry->read.generic == STATIC_ROM && (space->spacenum != ADDRESS_SPACE_0 || entry->addrstart >= memory_region_length(space->machine, space->cpu->tag))))
+		return TRUE;
+	
+	/* all other cases don't need backing */
 	return FALSE;
 }
 
@@ -2431,66 +2442,89 @@ static int space_needs_backing_store(const address_space *space, const address_m
 ***************************************************************************/
 
 /*-------------------------------------------------
-    bank_assign_static - assign and tag a static
-    bank
+    bank_find_or_allocate - allocate a new 
+    bank, or find an existing one, and return the 
+    SMH_BANK(n) handler
 -------------------------------------------------*/
 
-static void bank_assign_static(int banknum, const address_space *space, read_or_write readorwrite, offs_t bytestart, offs_t byteend)
+void *bank_find_or_allocate(const address_space *space, const char *tag, offs_t bytestart, offs_t byteend, read_or_write readorwrite)
 {
-	bank_info *bank = &space->machine->memory_data->bankdata[banknum];
-
-	/* if we're not yet used, fill in the data */
-	if (!bank->used)
+	memory_private *memdata = space->machine->memory_data;
+	bank_info *bank = NULL;
+	char temptag[10];
+	char name[30];
+	
+	/* if this bank is named, look it up */
+	if (tag != NULL)
+		bank = tagmap_find_hash_only(memdata->bankmap, tag);
+	
+	/* else try to find an exact match */
+	else
 	{
-		/* if we're allowed to, wire up state saving for the entry */
-		if (state_save_registration_allowed(space->machine))
-			state_save_register_item(space->machine, "memory", NULL, banknum, bank->curentry);
-
-		/* fill in information about the bank */
-		bank->used = TRUE;
-		bank->dynamic = FALSE;
-		add_bank_reference(bank, space);
+		for (bank = memdata->banklist; bank != NULL; bank = bank->next)
+			if (bank->tag[0] == '~' && bank->bytestart == bytestart && bank->byteend == byteend && bank->reflist != NULL && bank->reflist->space == space)
+				break;
+	}
+	
+	/* if we don't have a bank yet, find a free one */
+	if (bank == NULL)
+	{
+		int banknum = memdata->banknext++;
+		
+		/* handle failure */
+		if (banknum > STATIC_BANKMAX)
+		{
+			if (tag != NULL)
+				fatalerror("Unable to allocate new bank '%s'", tag);
+			else
+				fatalerror("Unable to allocate bank for RAM/ROM area %X-%X\n", bytestart, byteend);
+		}
+		
+		/* generate an internal tag if we don't have one */
+		if (tag == NULL)
+		{
+			sprintf(temptag, "~%d~", banknum);
+			tag = temptag;
+			sprintf(name, "Internal bank #%d", banknum);
+		}
+		else
+			sprintf(name, "Bank '%s'", tag);
+		
+		/* allocate the bank */
+		bank = (bank_info *)alloc_array_clear_or_die(UINT8, sizeof(bank_info) + strlen(tag) + 1 + strlen(name));
+			
+		/* populate it */
+		bank->index = banknum;
+		bank->handler = SMH_BANK(banknum);
 		bank->bytestart = bytestart;
 		bank->byteend = byteend;
 		bank->curentry = MAX_BANK_ENTRIES;
-	}
-
-	/* update the read/write status of the bank */
-	if (readorwrite == ROW_READ)
-		bank->read = TRUE;
-	else
-		bank->write = TRUE;
-}
-
-
-/*-------------------------------------------------
-    bank_assign_dynamic - finds a free or exact
-    matching bank
--------------------------------------------------*/
-
-static genf *bank_assign_dynamic(const address_space *space, read_or_write readorwrite, offs_t bytestart, offs_t byteend)
-{
-	int banknum;
-
-	/* loop over banks, searching for an exact match or an empty */
-	for (banknum = MAX_BANKS; banknum >= 1; banknum--)
-	{
-		bank_info *bank = &space->machine->memory_data->bankdata[banknum];
-		if (!bank->used || (bank->dynamic && bank_references_space(bank, space) && bank->bytestart == bytestart))
+		strcpy(bank->tag, tag);
+		bank->name = bank->tag + strlen(tag) + 1;
+		strcpy(bank->name, name);
+		
+		/* add us to the list */
+		bank->next = memdata->banklist;
+		memdata->banklist = bank;
+		
+		/* for named banks, add to the map and register for save states */
+		if (tag[0] != '~')
 		{
-			bank->used = TRUE;
-			bank->dynamic = TRUE;
-			add_bank_reference(bank, space);
-			bank->bytestart = bytestart;
-			bank->byteend = byteend;
-			VPRINTF(("Assigned bank %d to '%s',%s,%08X\n", banknum, space->cpu->tag, space->name, bytestart));
-			return BANK_TO_HANDLER(banknum);
+			tagmap_add_unique_hash(memdata->bankmap, tag, bank);
+			if (state_save_registration_allowed(space->machine))
+				state_save_register_item(space->machine, "memory", bank->tag, 0, bank->curentry);
 		}
 	}
+		
+	/* update the read/write state for this bank */
+	if (readorwrite == ROW_READ)
+		bank->read = TRUE;
+	if (readorwrite == ROW_WRITE)
+		bank->write = TRUE;
 
-	/* if we got here, we failed */
-	fatalerror("Device '%s': ran out of banks for RAM/ROM regions!", space->cpu->tag);
-	return NULL;
+	/* add a reference for this space */
+	add_bank_reference(bank, space);
+	return bank->handler;
 }
 
 
@@ -2501,19 +2535,16 @@ static genf *bank_assign_dynamic(const address_space *space, read_or_write reado
 static STATE_POSTLOAD( bank_reattach )
 {
 	memory_private *memdata = machine->memory_data;
-	int banknum;
+	bank_info *bank;
 
 	/* once this is done, find the starting bases for the banks */
-	for (banknum = 1; banknum <= MAX_BANKS; banknum++)
-	{
-		bank_info *bank = &memdata->bankdata[banknum];
-		if (bank->used && !bank->dynamic)
+	for (bank = memdata->banklist; bank != NULL; bank = bank->next)
+		if (bank->tag[0] != '~')
 		{
 			/* if this entry has a changed entry, set the appropriate pointer */
 			if (bank->curentry != MAX_BANK_ENTRIES)
-				memdata->bank_ptr[banknum] = (UINT8 *)bank->entry[bank->curentry];
+				memdata->bank_ptr[bank->index] = (UINT8 *)bank->entry[bank->curentry];
 		}
-	}
 }
 
 
@@ -3480,7 +3511,7 @@ static genf *get_static_handler(int handlerbits, int readorwrite, int which)
     description of a handler
 -------------------------------------------------*/
 
-static const char *handler_to_string(const address_table *table, UINT8 entry)
+static const char *handler_to_string(const address_space *space, const address_table *table, UINT8 entry)
 {
 	static const char *const strings[] =
 	{
@@ -3508,16 +3539,25 @@ static const char *handler_to_string(const address_table *table, UINT8 entry)
 		"bank 84",		"bank 85",		"bank 86",		"bank 87",
 		"bank 88",		"bank 89",		"bank 90",		"bank 91",
 		"bank 92",		"bank 93",		"bank 94",		"bank 95",
-		"bank 96",		"ram[97]",		"ram[98]",		"ram[99]",
-		"ram[100]",		"ram[101]",		"ram[102]",		"ram[103]",
-		"ram[104]",		"ram[105]",		"ram[106]",		"ram[107]",
-		"ram[108]",		"ram[109]",		"ram[110]",		"ram[111]",
-		"ram[112]",		"ram[113]",		"ram[114]",		"ram[115]",
-		"ram[116]",		"ram[117]",		"ram[118]",		"ram[119]",
-		"ram[120]",		"ram[121]",		"ram[122]",		"ram",
+		"bank 96",		"bank 97",		"bank 98",		"bank 99",
+		"bank 100",		"bank 101",		"bank 102",		"bank 103",
+		"bank 104",		"bank 105",		"bank 106",		"bank 107",
+		"bank 108",		"bank 109",		"bank 110",		"bank 111",
+		"bank 112",		"bank 113",		"bank 114",		"bank 115",
+		"bank 116",		"bank 117",		"bank 118",		"bank 119",
+		"bank 120",		"bank 121",		"bank 122",		"ram",
 		"rom",			"nop",			"unmapped",     "watchpoint"
 	};
-
+	
+	/* banks have names */
+	if (entry >= STATIC_BANK1 && entry <= STATIC_BANKMAX)
+	{
+		bank_info *info;
+		for (info = space->machine->memory_data->banklist; info != NULL; info = info->next)
+			if (info->index == entry)
+				return info->name;
+	}
+		
 	/* constant strings for lower entries */
 	if (entry < STATIC_COUNT)
 		return strings[entry];
@@ -3548,7 +3588,7 @@ static void dump_map(FILE *file, const address_space *space, const address_table
 	{
 		UINT8 entry = table_derive_range(table, byteaddress, &bytestart, &byteend);
 		fprintf(file, "%08X-%08X    = %02X: %s [offset=%08X]\n",
-						bytestart, byteend, entry, handler_to_string(table, entry), table->handlers[entry]->bytestart);
+						bytestart, byteend, entry, handler_to_string(space, table, entry), table->handlers[entry]->bytestart);
 	}
 }
 

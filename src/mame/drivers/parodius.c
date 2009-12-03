@@ -145,7 +145,7 @@ static ADDRESS_MAP_START( parodius_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3fcc, 0x3fcd) AM_DEVREADWRITE("konami", parodius_sound_r,k053260_w)	/* K053260 */
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(parodius_052109_053245_r,parodius_052109_053245_w)
 	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(K052109_r,K052109_w)
-	AM_RANGE(0x6000, 0x9fff) AM_ROMBANK(1)			/* banked ROM */
+	AM_RANGE(0x6000, 0x9fff) AM_ROMBANK("bank1")			/* banked ROM */
 	AM_RANGE(0xa000, 0xffff) AM_ROM					/* ROM */
 ADDRESS_MAP_END
 
@@ -326,7 +326,7 @@ static KONAMI_SETLINES_CALLBACK( parodius_banking )
 
 	offs = 0x10000 + (((lines & 0x0f)^0x0f) * 0x4000);
 	if (offs >= 0x48000) offs -= 0x40000;
-	memory_set_bankptr(device->machine,  1, &RAM[offs] );
+	memory_set_bankptr(device->machine,  "bank1", &RAM[offs] );
 }
 
 static MACHINE_RESET( parodius )
@@ -340,7 +340,7 @@ static MACHINE_RESET( parodius )
 	videobank = 0;
 
 	/* init the default bank */
-	memory_set_bankptr(machine, 1,&RAM[0x10000]);
+	memory_set_bankptr(machine, "bank1",&RAM[0x10000]);
 }
 
 

@@ -158,7 +158,7 @@ static WRITE8_HANDLER( lsasquad_bankswitch_w )
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
 	/* bits 0-2 select ROM bank */
-	memory_set_bankptr(space->machine, 1,&ROM[0x10000 + 0x2000 * (data & 7)]);
+	memory_set_bankptr(space->machine, "bank1",&ROM[0x10000 + 0x2000 * (data & 7)]);
 
 	/* bit 3 is zeroed on startup, maybe reset sound CPU */
 
@@ -170,7 +170,7 @@ static WRITE8_HANDLER( lsasquad_bankswitch_w )
 
 static ADDRESS_MAP_START( lsasquad_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)	/* SCREEN RAM */
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(&lsasquad_scrollram)	/* SCROLL RAM */
@@ -340,7 +340,7 @@ INPUT_PORTS_END
 
 static ADDRESS_MAP_START( daikaiju_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK(1))
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)	/* SCREEN RAM */
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(&lsasquad_scrollram)	/* SCROLL RAM */

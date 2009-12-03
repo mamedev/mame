@@ -192,11 +192,11 @@ static void mxtc_config_w(const device_config *busdevice, const device_config *d
 		{
 			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
 			{
-				memory_set_bankptr(busdevice->machine, 1, bios_ram);
+				memory_set_bankptr(busdevice->machine, "bank1", bios_ram);
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				memory_set_bankptr(busdevice->machine, 1, memory_region(busdevice->machine, "user1") + 0x30000);
+				memory_set_bankptr(busdevice->machine, "bank1", memory_region(busdevice->machine, "user1") + 0x30000);
 			}
 			break;
 		}
@@ -498,7 +498,7 @@ static ADDRESS_MAP_START( gamecstl_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
 	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_BASE(&cga_ram)
 	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
-	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK(1)
+	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user1", 0)	/* System BIOS */
@@ -603,7 +603,7 @@ static MACHINE_START(gamecstl)
 
 static MACHINE_RESET(gamecstl)
 {
-	memory_set_bankptr(machine, 1, memory_region(machine, "user1") + 0x30000);
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + 0x30000);
 
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
 }

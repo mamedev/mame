@@ -131,7 +131,7 @@ WRITE8_HANDLER( brkthru_1800_w )
 	else if (offset == 1)
 	{
 		/* bit 0-2 = ROM bank select */
-		memory_set_bank(space->machine, 1, data & 0x07);
+		memory_set_bank(space->machine, "bank1", data & 0x07);
 
 		/* bit 3-5 = background tiles color code */
 		if (((data & 0x38) >> 2) != state->bgbasecolor)

@@ -392,7 +392,7 @@ static WRITE8_HANDLER( metro_sound_rombank_w )
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x03) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x0000;
 
-	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1", &ROM[bankaddress]);
 }
 
 static WRITE8_HANDLER( daitorid_sound_rombank_w )
@@ -403,7 +403,7 @@ static WRITE8_HANDLER( daitorid_sound_rombank_w )
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x07) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x10000;
 
-	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1", &ROM[bankaddress]);
 }
 
 
@@ -810,7 +810,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 
 static ADDRESS_MAP_START( metro_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM			/* External ROM */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)	/* External ROM (Banked) */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")	/* External ROM (Banked) */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM			/* External RAM */
 	AM_RANGE(0xff00, 0xffff) AM_RAM			/* Internal RAM */
 ADDRESS_MAP_END
@@ -1657,7 +1657,7 @@ static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x4000;
-	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1", &RAM[bankaddress]);
 }
 
 static void blzntrnd_irqhandler(const device_config *device, int irq)
@@ -1672,7 +1672,7 @@ static const ym2610_interface blzntrnd_ym2610_interface =
 
 static ADDRESS_MAP_START( blzntrnd_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

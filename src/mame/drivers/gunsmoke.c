@@ -100,7 +100,7 @@ static READ8_HANDLER( gunsmoke_protection_r )
 
 static ADDRESS_MAP_START( gunsmoke_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
@@ -277,7 +277,7 @@ static MACHINE_START( gunsmoke )
 	gunsmoke_state *state = (gunsmoke_state *)machine->driver_data;
 	UINT8 *rombase = memory_region(machine, "maincpu");
 
-	memory_configure_bank(machine, 1, 0, 4, &rombase[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 4, &rombase[0x10000], 0x4000);
 
 	state_save_register_global(machine, state->chon);
 	state_save_register_global(machine, state->objon);

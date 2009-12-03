@@ -380,11 +380,11 @@ static MACHINE_RESET( mschamp )
 	UINT8 *rom = memory_region(machine, "maincpu") + 0x10000;
 	int whichbank = input_port_read(machine, "GAME") & 1;
 
-	memory_configure_bank(machine, 1, 0, 2, &rom[0x0000], 0x8000);
-	memory_configure_bank(machine, 2, 0, 2, &rom[0x4000], 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 2, &rom[0x0000], 0x8000);
+	memory_configure_bank(machine, "bank2", 0, 2, &rom[0x4000], 0x8000);
 
-	memory_set_bank(machine, 1, whichbank);
-	memory_set_bank(machine, 2, whichbank);
+	memory_set_bank(machine, "bank1", whichbank);
+	memory_set_bank(machine, "bank2", whichbank);
 }
 
 
@@ -695,9 +695,10 @@ static INTERRUPT_GEN( s2650_interrupt )
 
 static WRITE8_HANDLER( porky_banking_w )
 {
-	int i;
-	for(i = 0; i < 4; i++)
-		memory_set_bank(space->machine, i + 1, data & 1);
+	memory_set_bank(space->machine, "bank1", data & 1);
+	memory_set_bank(space->machine, "bank2", data & 1);
+	memory_set_bank(space->machine, "bank3", data & 1);
+	memory_set_bank(space->machine, "bank4", data & 1);
 }
 
 static READ8_HANDLER( drivfrcp_port1_r )
@@ -863,8 +864,8 @@ static READ8_HANDLER( pacman_read_nop )
   vias required to lay out the aux PCB.
 */
 
-#define mspacman_enable_decode_latch(m)  memory_set_bank(m, 1, 1)
-#define mspacman_disable_decode_latch(m) memory_set_bank(m, 1, 0)
+#define mspacman_enable_decode_latch(m)  memory_set_bank(m, "bank1", 1)
+#define mspacman_disable_decode_latch(m) memory_set_bank(m, "bank1", 0)
 
 // any access to these ROM addresses disables the decoder, and all you see is the original Pac-Man code
 static READ8_HANDLER(  mspacman_disable_decode_r_0x0038 ) { mspacman_disable_decode_latch(space->machine); return memory_region(space->machine, "maincpu")[offset+0x0038]; }
@@ -952,7 +953,7 @@ static ADDRESS_MAP_START( mspacman_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	/* start with 0000-3fff and 8000-bfff mapped to the ROMs */
 	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_UNMAP
-	AM_RANGE(0x0000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x0000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 
@@ -1042,7 +1043,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( epos_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROMBANK(1)
+	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_colorram_w) AM_BASE_GENERIC(colorram)
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,SMH_NOP)
@@ -1097,7 +1098,7 @@ static ADDRESS_MAP_START( vanvan_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s2650games_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x8000) AM_ROMBANK(1)
+	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x8000) AM_ROMBANK("bank1")
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0xe000) AM_WRITE(s2650games_colorram_w) AM_BASE_GENERIC(colorram)
 	AM_RANGE(0x1400, 0x141f) AM_MIRROR(0xe000) AM_WRITE(s2650games_scroll_w)
 	AM_RANGE(0x1420, 0x148f) AM_MIRROR(0xe000) AM_WRITE(SMH_RAM)
@@ -1120,9 +1121,9 @@ static ADDRESS_MAP_START( s2650games_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0xe000) AM_WRITE(s2650games_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x1c00, 0x1fef) AM_MIRROR(0xe000) AM_RAM
 	AM_RANGE(0x1ff0, 0x1fff) AM_MIRROR(0xe000) AM_WRITE(SMH_RAM) AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0x8000) AM_ROMBANK(2)
-	AM_RANGE(0x4000, 0x4fff) AM_MIRROR(0x8000) AM_ROMBANK(3)
-	AM_RANGE(0x6000, 0x6fff) AM_MIRROR(0x8000) AM_ROMBANK(4)
+	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0x8000) AM_ROMBANK("bank2")
+	AM_RANGE(0x4000, 0x4fff) AM_MIRROR(0x8000) AM_ROMBANK("bank3")
+	AM_RANGE(0x6000, 0x6fff) AM_MIRROR(0x8000) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
 
@@ -1175,7 +1176,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mschamp_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(1)
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_colorram_w) AM_BASE_GENERIC(colorram)
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,SMH_NOP)
@@ -1197,7 +1198,7 @@ static ADDRESS_MAP_START( mschamp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0xaf3f) AM_READ_PORT("IN1")		/* IN1 */
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_READ_PORT("DSW1")		/* DSW1 */
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_READ_PORT("DSW2")		/* DSW2 */
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crushs_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -5569,8 +5570,8 @@ static DRIVER_INIT( mspacman )
 	}
 
 	/* initialize the banks */
-	memory_configure_bank(machine, 1, 0, 2, &ROM[0x00000], 0x10000);
-	memory_set_bank(machine, 1, 1);
+	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x00000], 0x10000);
+	memory_set_bank(machine, "bank1", 1);
 }
 
 static DRIVER_INIT( woodpek )
@@ -5600,10 +5601,10 @@ static DRIVER_INIT( jumpshot )
 static DRIVER_INIT( drivfrcp )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	int i;
-
-	for( i = 0; i < 4; i++)
-		memory_set_bankptr(machine, i + 1, &ROM[i * 0x2000]);
+	memory_set_bankptr(machine, "bank1", &ROM[0 * 0x2000]);
+	memory_set_bankptr(machine, "bank2", &ROM[1 * 0x2000]);
+	memory_set_bankptr(machine, "bank3", &ROM[2 * 0x2000]);
+	memory_set_bankptr(machine, "bank4", &ROM[3 * 0x2000]);
 }
 
 static DRIVER_INIT( 8bpm )
@@ -5617,8 +5618,10 @@ static DRIVER_INIT( 8bpm )
 		ROM[i] = BITSWAP8(ROM[i],7,0,5,4,3,2,1,6);
 	}
 
-	for( i = 0; i < 4; i++)
-		memory_set_bankptr(machine, i + 1, &ROM[i * 0x2000]);
+	memory_set_bankptr(machine, "bank1", &ROM[0 * 0x2000]);
+	memory_set_bankptr(machine, "bank2", &ROM[1 * 0x2000]);
+	memory_set_bankptr(machine, "bank3", &ROM[2 * 0x2000]);
+	memory_set_bankptr(machine, "bank4", &ROM[3 * 0x2000]);
 }
 
 static DRIVER_INIT( porky )
@@ -5632,11 +5635,15 @@ static DRIVER_INIT( porky )
 		ROM[i] = BITSWAP8(ROM[i],7,6,5,0,3,2,1,4);
 	}
 
-	for( i = 0; i < 4; i++)
-		memory_configure_bank(machine, i + 1, 0, 2, &ROM[i * 0x2000], 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0 * 0x2000], 0x8000);
+	memory_configure_bank(machine, "bank2", 0, 2, &ROM[1 * 0x2000], 0x8000);
+	memory_configure_bank(machine, "bank3", 0, 2, &ROM[2 * 0x2000], 0x8000);
+	memory_configure_bank(machine, "bank4", 0, 2, &ROM[3 * 0x2000], 0x8000);
 
-	for( i = 0; i < 4; i++)
-		memory_set_bankptr(machine, i + 1, &ROM[i * 0x2000]);
+	memory_set_bank(machine, "bank1", 0);
+	memory_set_bank(machine, "bank2", 0);
+	memory_set_bank(machine, "bank3", 0);
+	memory_set_bank(machine, "bank4", 0);
 }
 
 static DRIVER_INIT( rocktrv2 )
@@ -5717,8 +5724,8 @@ static READ8_HANDLER( cannonbp_protection_r )
 static DRIVER_INIT( cannonbp )
 {
 	/* extra memory */
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4800, 0x4bff, 0, 0, (read8_space_func)SMH_BANK(5), (write8_space_func)SMH_BANK(5));
-	memory_set_bankptr(machine, 5, auto_alloc_array(machine, UINT8, 0x400));
+	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4800, 0x4bff, 0, 0, "bank5");
+	memory_set_bankptr(machine, "bank5", auto_alloc_array(machine, UINT8, 0x400));
 
 	/* protection? */
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3000, 0x3fff, 0, 0, cannonbp_protection_r);

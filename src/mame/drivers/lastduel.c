@@ -194,12 +194,12 @@ static WRITE8_HANDLER( mg_bankswitch_w )
 	UINT8 *RAM = memory_region(space->machine, "audiocpu");
 
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
 }
 
 static ADDRESS_MAP_START( madgear_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xcfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xcfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)
 	AM_RANGE(0xf002, 0xf003) AM_DEVREADWRITE("ym2", ym2203_r,ym2203_w)

@@ -237,7 +237,7 @@ static WRITE8_HANDLER( prmrsocr_audio_bankswitch_w )
 {
 	UINT8 *rom = memory_region(space->machine, "audiocpu") + 0x10000;
 
-	memory_set_bankptr(space->machine, 1,rom + (data & 7) * 0x4000);
+	memory_set_bankptr(space->machine, "bank1",rom + (data & 7) * 0x4000);
 }
 
 
@@ -1229,7 +1229,7 @@ static WRITE8_DEVICE_HANDLER( k054539_ctrl_w )
 
 static ADDRESS_MAP_START( prmrsocr_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe0ff) AM_DEVREADWRITE("konami", k054539_r, k054539_w)
 	AM_RANGE(0xe100, 0xe12f) AM_DEVREADWRITE("konami", k054539_ctrl_r, k054539_ctrl_w)

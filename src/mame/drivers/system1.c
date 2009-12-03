@@ -351,10 +351,10 @@ static MACHINE_START( system1 )
 	UINT32 numbanks = (memory_region_length(machine, "maincpu") - 0x10000) / 0x4000;
 
 	if (numbanks > 0)
-		memory_configure_bank(machine, 1, 0, numbanks, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+		memory_configure_bank(machine, "bank1", 0, numbanks, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 	else
-		memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "maincpu") + 0x8000, 0);
-	memory_set_bank(machine, 1, 0);
+		memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "maincpu") + 0x8000, 0);
+	memory_set_bank(machine, "bank1", 0);
 
 	z80_set_cycle_tables(cputag_get_cpu(machine, "maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
 
@@ -390,14 +390,14 @@ static MACHINE_RESET( system1 )
 static void bank44_custom_w(running_machine *machine, UINT8 data, UINT8 prevdata)
 {
 	/* bank bits are bits 6 and 2 */
-	memory_set_bank(machine, 1, ((data & 0x40) >> 5) | ((data & 0x04) >> 2));
+	memory_set_bank(machine, "bank1", ((data & 0x40) >> 5) | ((data & 0x04) >> 2));
 }
 
 
 static void bank0c_custom_w(running_machine *machine, UINT8 data, UINT8 prevdata)
 {
 	/* bank bits are bits 3 and 2 */
-	memory_set_bank(machine, 1, (data & 0x0c) >> 2);
+	memory_set_bank(machine, "bank1", (data & 0x0c) >> 2);
 }
 
 
@@ -704,7 +704,7 @@ static WRITE8_HANDLER( nobb_outport24_w )
 /* main memory map */
 static ADDRESS_MAP_START( system1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&system1_ram)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_BASE_GENERIC(paletteram)
@@ -718,7 +718,7 @@ ADDRESS_MAP_END
 /* same as normal System 1 except address map is shuffled (RAM/collision are swapped) */
 static ADDRESS_MAP_START( nobo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(system1_mixer_collision_r, system1_mixer_collision_w)
 	AM_RANGE(0xc400, 0xc7ff) AM_WRITE(system1_mixer_collision_reset_w)
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(system1_sprite_collision_r, system1_sprite_collision_w)
@@ -4514,14 +4514,14 @@ static DRIVER_INIT( 4dwarrio )	{ DRIVER_INIT_CALL(bank00); fdwarrio_decode(machi
 static DRIVER_INIT( wboy )		{ DRIVER_INIT_CALL(bank00); astrofl_decode(machine, "maincpu"); }
 static DRIVER_INIT( wboy2 )		{ DRIVER_INIT_CALL(bank00); wboy2_decode(machine, "maincpu"); }
 static DRIVER_INIT( wboyo )		{ DRIVER_INIT_CALL(bank00); hvymetal_decode(machine, "maincpu"); }
-static DRIVER_INIT( blockgal )	{ DRIVER_INIT_CALL(bank00); mc8123_decrypt_rom(machine, "maincpu", "key", 0, 0); }
+static DRIVER_INIT( blockgal )	{ DRIVER_INIT_CALL(bank00); mc8123_decrypt_rom(machine, "maincpu", "key", NULL, 0); }
 
 static DRIVER_INIT( hvymetal )	{ DRIVER_INIT_CALL(bank44); hvymetal_decode(machine, "maincpu"); }
 static DRIVER_INIT( gardia )	{ DRIVER_INIT_CALL(bank44); gardia_decode(machine, "maincpu"); }
 static DRIVER_INIT( gardiab )	{ DRIVER_INIT_CALL(bank44); gardiab_decode(machine, "maincpu"); }
 
-static DRIVER_INIT( wbml )		{ DRIVER_INIT_CALL(bank0c); mc8123_decrypt_rom(machine, "maincpu", "key", 1, 4); }
-static DRIVER_INIT( ufosensi )  { DRIVER_INIT_CALL(bank0c); mc8123_decrypt_rom(machine, "maincpu", "key", 1, 4); }
+static DRIVER_INIT( wbml )		{ DRIVER_INIT_CALL(bank0c); mc8123_decrypt_rom(machine, "maincpu", "key", "bank1", 4); }
+static DRIVER_INIT( ufosensi )  { DRIVER_INIT_CALL(bank0c); mc8123_decrypt_rom(machine, "maincpu", "key", "bank1", 4); }
 static DRIVER_INIT( wboysys2 )	{ DRIVER_INIT_CALL(bank0c); astrofl_decode(machine, "maincpu"); }
 
 
@@ -4530,7 +4530,7 @@ static DRIVER_INIT( dakkochn )
 	DRIVER_INIT_CALL(bank0c);
 	videomode_custom = dakkochn_custom_w;
 
-	mc8123_decrypt_rom(machine, "maincpu", "key", 1, 4);
+	mc8123_decrypt_rom(machine, "maincpu", "key", "bank1", 4);
 
 //  memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, dakkochn_port_00_r);
 //  memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, dakkochn_port_03_r);
@@ -4652,7 +4652,7 @@ static DRIVER_INIT( bootsys2 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x20000);
-	memory_configure_bank_decrypted(machine, 1, 0, 4, memory_region(machine, "maincpu") + 0x30000, 0x4000);
+	memory_configure_bank_decrypted(machine, "bank1", 0, 4, memory_region(machine, "maincpu") + 0x30000, 0x4000);
 	DRIVER_INIT_CALL(bank0c);
 }
 

@@ -129,13 +129,13 @@ WRITE8_HANDLER( irobot_out0_w )
 	switch (data & 0x60)
 	{
 		case 0:
-			memory_set_bankptr(space->machine, 2, &RAM[0x1C000]);
+			memory_set_bankptr(space->machine, "bank2", &RAM[0x1C000]);
 			break;
 		case 0x20:
-			memory_set_bankptr(space->machine, 2, &RAM[0x1C800]);
+			memory_set_bankptr(space->machine, "bank2", &RAM[0x1C800]);
 			break;
 		case 0x40:
-			memory_set_bankptr(space->machine, 2, &RAM[0x1D000]);
+			memory_set_bankptr(space->machine, "bank2", &RAM[0x1D000]);
 			break;
 	}
 	irobot_outx = (data & 0x18) >> 3;
@@ -150,22 +150,22 @@ WRITE8_HANDLER( irobot_rom_banksel_w )
 	switch ((data & 0x0E) >> 1)
 	{
 		case 0:
-			memory_set_bankptr(space->machine, 1, &RAM[0x10000]);
+			memory_set_bankptr(space->machine, "bank1", &RAM[0x10000]);
 			break;
 		case 1:
-			memory_set_bankptr(space->machine, 1, &RAM[0x12000]);
+			memory_set_bankptr(space->machine, "bank1", &RAM[0x12000]);
 			break;
 		case 2:
-			memory_set_bankptr(space->machine, 1, &RAM[0x14000]);
+			memory_set_bankptr(space->machine, "bank1", &RAM[0x14000]);
 			break;
 		case 3:
-			memory_set_bankptr(space->machine, 1, &RAM[0x16000]);
+			memory_set_bankptr(space->machine, "bank1", &RAM[0x16000]);
 			break;
 		case 4:
-			memory_set_bankptr(space->machine, 1, &RAM[0x18000]);
+			memory_set_bankptr(space->machine, "bank1", &RAM[0x18000]);
 			break;
 		case 5:
-			memory_set_bankptr(space->machine, 1, &RAM[0x1A000]);
+			memory_set_bankptr(space->machine, "bank1", &RAM[0x1A000]);
 			break;
 	}
 	set_led_status(space->machine, 0,data & 0x10);

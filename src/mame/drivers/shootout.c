@@ -52,7 +52,7 @@ extern VIDEO_UPDATE( shootouj );
 
 static WRITE8_HANDLER( shootout_bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x0f);
+	memory_set_bank(space->machine, "bank1", data & 0x0f);
 }
 
 static WRITE8_HANDLER( sound_cpu_command_w )
@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( shootout_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x19ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(shootout_textram_w) AM_BASE(&shootout_textram)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(shootout_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( shootouj_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym2203_r,ym2203_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(shootout_textram_w) AM_BASE(&shootout_textram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(shootout_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -429,13 +429,13 @@ static DRIVER_INIT( shootout )
 	for (A = 0x8000;A < length;A++)
 		decrypt[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x40) >> 1) | ((rom[A] & 0x20) << 1);
 
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
-	memory_configure_bank_decrypted(machine, 1, 0, 16, decrypt + 0x8000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank_decrypted(machine, "bank1", 0, 16, decrypt + 0x8000, 0x4000);
 }
 
 static DRIVER_INIT( shootouj )
 {
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
 

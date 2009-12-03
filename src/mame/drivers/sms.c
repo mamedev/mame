@@ -226,7 +226,7 @@ U145        1Brown          PAL14H4CN
 
 static WRITE8_HANDLER(bankswitch_w)
 {
-	memory_set_bank(space->machine, 1, data);
+	memory_set_bank(space->machine, "bank1", data);
 }
 
 /*************************************
@@ -483,7 +483,7 @@ static ADDRESS_MAP_START( sms_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00800, 0x00803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x01000, 0x01007) AM_WRITE(video_w)
 	AM_RANGE(0x01800, 0x01803) AM_READWRITE(link_r, link_w)
-	AM_RANGE(0x04000, 0x07fff) AM_ROMBANK(1)
+	AM_RANGE(0x04000, 0x07fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x04000, 0x04000) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x08000, 0x0ffff) AM_ROM
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM // mirror for vectors
@@ -515,7 +515,7 @@ ADDRESS_MAP_END
 
 static MACHINE_START( sms )
 {
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "questions"), 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "questions"), 0x4000);
 }
 
 static MACHINE_START( sureshot )

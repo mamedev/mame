@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(&ram)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -251,7 +251,7 @@ static KONAMI_SETLINES_CALLBACK( blockhl_banking )
 	/* bits 0-1 = ROM bank */
 	rombank = lines & 0x03;
 	offs = 0x10000 + (lines & 0x03) * 0x2000;
-	memory_set_bankptr(device->machine, 1,&RAM[offs]);
+	memory_set_bankptr(device->machine, "bank1",&RAM[offs]);
 
 	/* bits 3/4 = coin counters */
 	coin_counter_w(device->machine, 0,lines & 0x08);

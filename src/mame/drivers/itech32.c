@@ -655,7 +655,7 @@ static READ32_HANDLER( gtclass_prot_result_r )
 
 static WRITE8_HANDLER( sound_bank_w )
 {
-	memory_set_bankptr(space->machine, 1, &memory_region(space->machine, "soundcpu")[0x10000 + data * 0x4000]);
+	memory_set_bankptr(space->machine, "bank1", &memory_region(space->machine, "soundcpu")[0x10000 + data * 0x4000]);
 }
 
 
@@ -1108,7 +1108,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP	/* noisy */
 	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1121,7 +1121,7 @@ static ADDRESS_MAP_START( sound_020_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(firq_clear_w)
 	AM_RANGE(0x1800, 0x1800) AM_READWRITE(sound_data_buffer_r, SMH_NOP)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

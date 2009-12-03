@@ -54,7 +54,7 @@
 
 static ADDRESS_MAP_START( hexa_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd001, 0xd001) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
@@ -224,7 +224,7 @@ static DRIVER_INIT( hexa )
 	RAM[0x0126] = 0x00;
 #endif
 
-	memory_configure_bank(machine, 1, 0, 2, &RAM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, &RAM[0x10000], 0x4000);
 }
 
 

@@ -182,7 +182,7 @@ static WRITE8_HANDLER(photon2_membank_w)
 		logerror( "Unknown banking write: %02X\n", data);
 	}
 
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + 0x4000*bank );
+	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu") + 0x4000*bank );
 }
 
 static READ8_HANDLER(photon2_fe_r)
@@ -210,7 +210,7 @@ static WRITE8_HANDLER(photon2_misc_w)
  *************************************/
 
 static ADDRESS_MAP_START (spectrum_mem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(1)
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_BASE(&spectrum_video_ram )
 	AM_RANGE(0x5b00, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -293,7 +293,7 @@ static INTERRUPT_GEN( spec_interrupt_hack )
 
 static MACHINE_RESET( photon2 )
 {
-	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
 }
 
 static MACHINE_DRIVER_START( photon2 )

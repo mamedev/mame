@@ -99,7 +99,7 @@ static WRITE8_HANDLER( bank_select_w )
 	if (offset & 1)
 		rom_bank |= mask;
 
-	memory_set_bank(space->machine, 1, rom_bank);
+	memory_set_bank(space->machine, "bank1", rom_bank);
 }
 
 static UINT8 mux_data;
@@ -195,7 +195,7 @@ static WRITE8_HANDLER( unknown_w )
 static ADDRESS_MAP_START( jongkyo_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM) AM_WRITE(videoram2_w) // wrong, this doesn't seem to be video ram on write..
 	AM_RANGE(0x4000, 0x6bff) AM_READ(SMH_ROM) // fixed rom
-	AM_RANGE(0x6c00, 0x6fff) AM_READ(SMH_BANK(1))	// banked (8 banks)
+	AM_RANGE(0x6c00, 0x6fff) AM_ROMBANK("bank1")	// banked (8 banks)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_GENERIC(videoram)
 ADDRESS_MAP_END

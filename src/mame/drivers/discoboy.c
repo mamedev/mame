@@ -181,7 +181,7 @@ void discoboy_setrombank( running_machine *machine, UINT8 data )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	data &= 0x2f;
-	memory_set_bankptr(space->machine, 1, &ROM[0x6000 + (data * 0x1000)] );
+	memory_set_bankptr(space->machine, "bank1", &ROM[0x6000 + (data * 0x1000)] );
 }
 #endif
 
@@ -208,7 +208,7 @@ static WRITE8_HANDLER( discoboy_port_01_w )
 	// discoboy gfxbank
 	state->gfxbank = data & 0xf0;
 
-	memory_set_bank(space->machine, 1, data & 0x07);
+	memory_set_bank(space->machine, "bank1", data & 0x07);
 }
 
 static WRITE8_HANDLER( discoboy_port_03_w ) // sfx? (to sound cpu)
@@ -287,7 +287,7 @@ static WRITE8_HANDLER( discoboy_ram_att_w )
 
 static ADDRESS_MAP_START( discoboy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(rambank_r, rambank_w)
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(discoboy_ram_att_r, discoboy_ram_att_w)
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(rambank2_r, rambank2_w)
@@ -557,8 +557,8 @@ static DRIVER_INIT( discoboy )
 	state_save_register_global_pointer(machine, state->ram_3, 0x1000);
 	state_save_register_global_pointer(machine, state->ram_4, 0x1000);
 
-	memory_configure_bank(machine, 1, 0, 8, &ROM[0x10000], 0x4000);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
+	memory_set_bank(machine, "bank1", 0);
 }
 
 

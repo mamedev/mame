@@ -112,7 +112,7 @@ static WRITE8_HANDLER( pending_command_clear_w )
 
 static WRITE8_HANDLER( aerofgt_sh_bankswitch_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x03);
+	memory_set_bank(space->machine, "bank1", data & 0x03);
 }
 
 
@@ -380,7 +380,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( turbofrc_sound_portmap, ADDRESS_SPACE_IO, 8 )
@@ -1305,7 +1305,7 @@ static MACHINE_START( aerofgt )
 {
 	UINT8 *rom = memory_region(machine, "audiocpu");
 
-	memory_configure_bank(machine, 1, 0, 4, &rom[0x10000], 0x8000);
+	memory_configure_bank(machine, "bank1", 0, 4, &rom[0x10000], 0x8000);
 
 	MACHINE_START_CALL(common);
 }
@@ -1320,7 +1320,7 @@ static MACHINE_RESET( aerofgt )
 {
 	MACHINE_RESET_CALL(common);
 
-	memory_set_bank(machine, 1, 0);	/* needed by spinlbrk */
+	memory_set_bank(machine, "bank1", 0);	/* needed by spinlbrk */
 }
 
 static MACHINE_DRIVER_START( pspikes )

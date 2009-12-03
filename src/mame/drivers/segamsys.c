@@ -1601,7 +1601,8 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 			}
 			else
 			{
-				memory_install_readwrite8_handler(space, 0x0000, 0xbfff, 0, 0, (read8_space_func)SMH_BANK(5), (write8_space_func)SMH_UNMAP);
+				memory_install_read_bank_handler(space, 0x0000, 0xbfff, 0, 0, "bank5");
+				memory_install_write8_handler(space, 0x0000, 0xbfff, 0, 0, (write8_space_func)SMH_UNMAP);
 			}
 
 			//printf("bank ram??\n");
@@ -1669,10 +1670,10 @@ void megatech_set_genz80_as_sms_standard_map(running_machine *machine, const cha
 
 	/* main ram area */
 	sms_mainram = auto_alloc_array(machine, UINT8, 0x2000); // 8kb of main ram
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0, (read8_space_func)SMH_BANK(6), (write8_space_func)SMH_BANK(6));
-	memory_set_bankptr(machine,  6, sms_mainram );
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, (read8_space_func)SMH_BANK(7), (write8_space_func)SMH_BANK(7));
-	memory_set_bankptr(machine,  7, sms_mainram );
+	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0, "bank6");
+	memory_set_bankptr(machine,  "bank6", sms_mainram );
+	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, "bank7");
+	memory_set_bankptr(machine,  "bank7", sms_mainram );
 	memset(sms_mainram,0x00,0x2000);
 
 	megatech_set_genz80_as_sms_standard_ports(machine,  tag);
@@ -1681,8 +1682,9 @@ void megatech_set_genz80_as_sms_standard_map(running_machine *machine, const cha
 	{
 		/* fixed rom bank area */
 		sms_rom = auto_alloc_array(machine, UINT8, 0x400000);
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, (read8_space_func)SMH_BANK(5), (write8_space_func)SMH_UNMAP);
-		memory_set_bankptr(machine,  5, sms_rom );
+		memory_install_read_bank_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, "bank5");
+		memory_install_write8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, (write8_space_func)SMH_UNMAP);
+		memory_set_bankptr(machine,  "bank5", sms_rom );
 
 		memcpy(sms_rom, memory_region(machine, "maincpu"), 0x400000);
 
@@ -1694,8 +1696,9 @@ void megatech_set_genz80_as_sms_standard_map(running_machine *machine, const cha
 	{
 		/* fixed rom bank area */
 		sms_rom = auto_alloc_array(machine, UINT8, 0xc000);
-		memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, (read8_space_func)SMH_BANK(5), (write8_space_func)SMH_UNMAP);
-		memory_set_bankptr(machine,  5, sms_rom );
+		memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, "bank5");
+		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, (write8_space_func)SMH_UNMAP);
+		memory_set_bankptr(machine,  "bank5", sms_rom );
 
 		memcpy(sms_rom, memory_region(machine, "maincpu"), 0xc000);
 

@@ -22,7 +22,7 @@ VIDEO_START( cloud9 )
 
 	/* allocate second bank of videoram */
 	state->videoram = auto_alloc_array(machine, UINT8, 0x8000);
-	memory_set_bankptr(machine, 1, state->videoram);
+	memory_set_bankptr(machine, "bank1", state->videoram);
 
 	/* get pointers to our PROMs */
 	state->syncprom = memory_region(machine, "proms") + 0x000;

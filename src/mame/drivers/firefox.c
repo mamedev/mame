@@ -383,7 +383,7 @@ static WRITE8_HANDLER( novram_store_w )
 
 static WRITE8_HANDLER( rom_bank_w )
 {
-	memory_set_bank(space->machine, 1, data & 0x1f);
+	memory_set_bank(space->machine, "bank1", data & 0x1f);
 }
 
 static WRITE8_HANDLER( main_irq_clear_w )
@@ -430,7 +430,7 @@ static void firq_gen(const device_config *device, int state)
 
 static MACHINE_START( firefox )
 {
-	memory_configure_bank(machine, 1, 0, 32, memory_region(machine, "maincpu") + 0x10000, 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 32, memory_region(machine, "maincpu") + 0x10000, 0x1000);
 	nvram_1c = devtag_get_device(machine, "nvram_1c");
 	nvram_1d = devtag_get_device(machine, "nvram_1d");
 
@@ -455,7 +455,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x2800, 0x2aff) AM_READWRITE(SMH_RAM, sprite_palette_w) AM_BASE(&sprite_palette)
 	AM_RANGE(0x2b00, 0x2b00) AM_MIRROR(0x04ff) AM_WRITE(firefox_objram_bank_w)
 	AM_RANGE(0x2c00, 0x2eff) AM_READWRITE(SMH_RAM, tile_palette_w) AM_BASE(&tile_palette)
-	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK(1)
+	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x40ff) AM_READWRITE(nvram_r, nvram_w)						/* NOVRAM */
 	AM_RANGE(0x4100, 0x4100) AM_MIRROR(0x00f8) AM_READ_PORT("rdin0")			/* RDIN0 */
 	AM_RANGE(0x4101, 0x4101) AM_MIRROR(0x00f8) AM_READ_PORT("rdin1")			/* RDIN1 */

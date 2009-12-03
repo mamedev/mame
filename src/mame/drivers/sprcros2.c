@@ -89,7 +89,7 @@ static WRITE8_HANDLER( sprcros2_m_port7_w )
 	//-------x nmi enable
 
 	if((sprcros2_m_port7^data)&0x40)
-		memory_set_bankptr(space->machine, 1,&RAM[0x10000+((data&0x40)<<7)]);
+		memory_set_bankptr(space->machine, "bank1",&RAM[0x10000+((data&0x40)<<7)]);
 
 	tilemap_set_flip_all( space->machine,data&0x02?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
 
@@ -107,14 +107,14 @@ static WRITE8_HANDLER( sprcros2_s_port3_w )
 	//-------x nmi enable
 
 	if((sprcros2_s_port3^data)&0x08)
-		memory_set_bankptr(space->machine, 2,&RAM[0x10000+((data&0x08)<<10)]);
+		memory_set_bankptr(space->machine, "bank2",&RAM[0x10000+((data&0x08)<<10)]);
 
 	sprcros2_s_port3 = data;
 }
 
 static ADDRESS_MAP_START( sprcros2_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_fgvideoram_w) AM_BASE(&sprcros2_fgvideoram)
 	AM_RANGE(0xe800, 0xe817) AM_RAM						//always zero
 	AM_RANGE(0xe818, 0xe83f) AM_RAM AM_BASE(&sprcros2_spriteram) AM_SIZE(&sprcros2_spriteram_size)
@@ -135,7 +135,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprcros2_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(2)
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_bgvideoram_w) AM_BASE(&sprcros2_bgvideoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM						//always zero
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM

@@ -391,8 +391,8 @@ MACHINE_RESET( williams )
 	MACHINE_RESET_CALL(williams_common);
 
 	/* configure the memory bank */
-	memory_configure_bank(machine, 1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "maincpu") + 0x10000, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, williams_videoram, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "maincpu") + 0x10000, 0);
 }
 
 
@@ -463,8 +463,8 @@ MACHINE_RESET( williams2 )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* configure memory banks */
-	memory_configure_bank(machine, 1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(machine, 1, 1, 4, memory_region(machine, "maincpu") + 0x10000, 0x10000);
+	memory_configure_bank(machine, "bank1", 0, 1, williams_videoram, 0);
+	memory_configure_bank(machine, "bank1", 1, 4, memory_region(machine, "maincpu") + 0x10000, 0x10000);
 
 	/* make sure our banking is reset */
 	williams2_bank_select_w(space, 0, 0);
@@ -493,7 +493,7 @@ WRITE8_HANDLER( williams_vram_select_w )
 {
 	/* VRAM/ROM banking from bit 0 */
 	vram_bank = data & 0x01;
-	memory_set_bank(space->machine, 1, vram_bank);
+	memory_set_bank(space->machine, "bank1", vram_bank);
 
 	/* cocktail flip from bit 1 */
 	williams_cocktail = data & 0x02;
@@ -509,26 +509,27 @@ WRITE8_HANDLER( williams2_bank_select_w )
 	{
 		/* page 0 is video ram */
 		case 0:
-			memory_install_read8_handler(space, 0x0000, 0x8fff, 0, 0, (read8_space_func)SMH_BANK(1));
-			memory_install_write8_handler(space, 0x8000, 0x87ff, 0, 0, (write8_space_func)SMH_BANK(4));
-			memory_set_bank(space->machine, 1, 0);
-			memory_set_bankptr(space->machine, 4, &williams_videoram[0x8000]);
+			memory_install_read_bank_handler(space, 0x0000, 0x8fff, 0, 0, "bank1");
+			memory_install_write_bank_handler(space, 0x8000, 0x87ff, 0, 0, "bank4");
+			memory_set_bank(space->machine, "bank1", 0);
+			memory_set_bankptr(space->machine, "bank4", &williams_videoram[0x8000]);
 			break;
 
 		/* pages 1 and 2 are ROM */
 		case 1:
 		case 2:
-			memory_install_read8_handler(space, 0x0000, 0x8fff, 0, 0, (read8_space_func)(read8_space_func)(read8_space_func)(read8_space_func)(read8_space_func)(read8_space_func)(read8_space_func)(read8_space_func)(read8_space_func)(read8_space_func)(read8_space_func)(read8_space_func)(read8_space_func)(read8_space_func)(read8_space_func)(read8_space_func)(read8_space_func)SMH_BANK(1));
-			memory_install_write8_handler(space, 0x8000, 0x87ff, 0, 0, (write8_space_func)(write8_space_func)(write8_space_func)(write8_space_func)(write8_space_func)(write8_space_func)(write8_space_func)(write8_space_func)(write8_space_func)(write8_space_func)(write8_space_func)(write8_space_func)(write8_space_func)(write8_space_func)(write8_space_func)(write8_space_func)(write8_space_func)SMH_BANK(4));
-			memory_set_bank(space->machine, 1, 1 + ((vram_bank & 6) >> 1));
-			memory_set_bankptr(space->machine, 4, &williams_videoram[0x8000]);
+			memory_install_read_bank_handler(space, 0x0000, 0x8fff, 0, 0, "bank1");
+			memory_install_write_bank_handler(space, 0x8000, 0x87ff, 0, 0, "bank4");
+			memory_set_bank(space->machine, "bank1", 1 + ((vram_bank & 6) >> 1));
+			memory_set_bankptr(space->machine, "bank4", &williams_videoram[0x8000]);
 			break;
 
 		/* page 3 accesses palette RAM; the remaining areas are as if page 1 ROM was selected */
 		case 3:
-			memory_install_readwrite8_handler(space, 0x8000, 0x87ff, 0, 0, (read8_space_func)SMH_BANK(4), williams2_paletteram_w);
-			memory_set_bank(space->machine, 1, 1 + ((vram_bank & 4) >> 1));
-			memory_set_bankptr(space->machine, 4, space->machine->generic.paletteram.v);
+			memory_install_read_bank_handler(space, 0x8000, 0x87ff, 0, 0, "bank4");
+			memory_install_write8_handler(space, 0x8000, 0x87ff, 0, 0, williams2_paletteram_w);
+			memory_set_bank(space->machine, "bank1", 1 + ((vram_bank & 4) >> 1));
+			memory_set_bankptr(space->machine, "bank4", space->machine->generic.paletteram.v);
 			break;
 	}
 }
@@ -743,7 +744,7 @@ MACHINE_RESET( defender )
 	MACHINE_RESET_CALL(williams_common);
 
 	/* configure the banking and make sure it is reset to 0 */
-	memory_configure_bank(machine, 1, 0, 9, &memory_region(machine, "maincpu")[0x10000], 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 9, &memory_region(machine, "maincpu")[0x10000], 0x1000);
 	defender_bank_select_w(space, 0, 0);
 
 	state_save_register_postload(machine, defender_postload, NULL);
@@ -778,8 +779,9 @@ WRITE8_HANDLER( defender_bank_select_w )
 		case 7:
 		case 8:
 		case 9:
-			memory_install_readwrite8_handler(space, 0xc000, 0xcfff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_UNMAP);
-			memory_set_bank(space->machine, 1, vram_bank - 1);
+			memory_install_read_bank_handler(space, 0xc000, 0xcfff, 0, 0, "bank1");
+			memory_install_write8_handler(space, 0xc000, 0xcfff, 0, 0, (write8_space_func)SMH_UNMAP);
+			memory_set_bank(space->machine, "bank1", vram_bank - 1);
 			break;
 
 		/* pages A-F are not connected */
@@ -837,11 +839,11 @@ MACHINE_RESET( blaster )
 	MACHINE_RESET_CALL(williams_common);
 
 	/* banking is different for blaster */
-	memory_configure_bank(machine, 1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(machine, 1, 1, 16, memory_region(machine, "maincpu") + 0x18000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 1, williams_videoram, 0);
+	memory_configure_bank(machine, "bank1", 1, 16, memory_region(machine, "maincpu") + 0x18000, 0x4000);
 
-	memory_configure_bank(machine, 2, 0, 1, williams_videoram + 0x4000, 0);
-	memory_configure_bank(machine, 2, 1, 16, memory_region(machine, "maincpu") + 0x10000, 0x0000);
+	memory_configure_bank(machine, "bank2", 0, 1, williams_videoram + 0x4000, 0);
+	memory_configure_bank(machine, "bank2", 1, 16, memory_region(machine, "maincpu") + 0x10000, 0x0000);
 
 	state_save_register_global(machine, blaster_bank);
 }
@@ -849,8 +851,8 @@ MACHINE_RESET( blaster )
 
 INLINE void update_blaster_banking(running_machine *machine)
 {
-	memory_set_bank(machine, 1, vram_bank * (blaster_bank + 1));
-	memory_set_bank(machine, 2, vram_bank * (blaster_bank + 1));
+	memory_set_bank(machine, "bank1", vram_bank * (blaster_bank + 1));
+	memory_set_bank(machine, "bank2", vram_bank * (blaster_bank + 1));
 }
 
 

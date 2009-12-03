@@ -1136,14 +1136,14 @@ static void ym3438_irq_handler(const device_config *device, int state)
 static WRITE8_HANDLER( sound_bank_lo_w )
 {
 	sound_bank = (sound_bank & ~0x3f) | (data & 0x3f);
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "soundcpu") + 0x100000 + 0x2000 * sound_bank);
+	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "soundcpu") + 0x100000 + 0x2000 * sound_bank);
 }
 
 
 static WRITE8_HANDLER( sound_bank_hi_w )
 {
 	sound_bank = (sound_bank & 0x3f) | ((data & 0x04) << 4) | ((data & 0x03) << 7);
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "soundcpu") + 0x100000 + 0x2000 * sound_bank);
+	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "soundcpu") + 0x100000 + 0x2000 * sound_bank);
 }
 
 
@@ -1258,7 +1258,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( system32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0x100000)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE("rfsnd", rf5c68_w)
 	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE("rfsnd", rf5c68_mem_r, rf5c68_mem_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE(&z80_shared_ram)
@@ -1279,7 +1279,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( multi32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0x100000)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("sega", multipcm_r, multipcm_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE(&z80_shared_ram)
 ADDRESS_MAP_END

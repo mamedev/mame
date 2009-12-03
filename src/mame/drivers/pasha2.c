@@ -100,7 +100,7 @@ static WRITE16_HANDLER( pasha2_misc_w )
 					case 0xb000:
 					case 0xc000:
 					case 0xd000:
-						memory_set_bankptr(space->machine, 1, memory_region(space->machine, "user2") + 0x400 * (bank - 0x8000)); break;
+						memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "user2") + 0x400 * (bank - 0x8000)); break;
 				}
 			}
 		}
@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( pasha2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x40070000, 0x40070001) AM_WRITE(vbuffer_clear_w)
 	AM_RANGE(0x40074000, 0x40074001) AM_WRITE(vbuffer_set_w)
 	AM_RANGE(0x40078000, 0x40078001) AM_WRITENOP //once at startup -> to disable the eeprom?
-	AM_RANGE(0x80000000, 0x803fffff) AM_ROMBANK(1)
+	AM_RANGE(0x80000000, 0x803fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe0000000, 0xe00003ff) AM_RAM_WRITE(pasha2_palette_w) AM_BASE_GENERIC(paletteram) //tilemap? palette?
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
@@ -447,7 +447,7 @@ static DRIVER_INIT( pasha2 )
 {
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x95744, 0x95747, 0, 0, pasha2_speedup_r );
 
-	memory_set_bankptr(machine, 1, memory_region(machine, "user2"));
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "user2"));
 }
 
 GAME( 1998, pasha2, 0, pasha2, pasha2, pasha2, ROT0, "Dong Sung", "Pasha Pasha 2", GAME_IMPERFECT_SOUND )

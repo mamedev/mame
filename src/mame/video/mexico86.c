@@ -14,7 +14,7 @@ WRITE8_HANDLER( mexico86_bankswitch_w )
 	if ((data & 7) > 5)
 		popmessage( "Switching to invalid bank!" );
 
-	memory_set_bankptr(space->machine, 1, &RAM[0x10000 + 0x4000 * (data & 0x07)]);
+	memory_set_bankptr(space->machine, "bank1", &RAM[0x10000 + 0x4000 * (data & 0x07)]);
 
 	charbank = (data & 0x20) >> 5;
 }

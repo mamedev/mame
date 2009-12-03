@@ -524,7 +524,7 @@ GFXDECODE_END
 
 static WRITE8_HANDLER( deroon_bankswitch_w )
 {
-	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "audiocpu") + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
+	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "audiocpu") + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
 }
 
 static WRITE8_HANDLER( tecmosys_oki_bank_w )
@@ -539,7 +539,7 @@ static WRITE8_HANDLER( tecmosys_oki_bank_w )
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 

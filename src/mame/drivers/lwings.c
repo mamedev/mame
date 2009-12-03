@@ -85,7 +85,7 @@ static WRITE8_HANDLER( lwings_bankswitch_w )
 	/* bits 1 and 2 select ROM bank */
 	RAM = memory_region(space->machine, "maincpu");
 	bank = (data & 0x06) >> 1;
-	memory_set_bankptr(space->machine, 1,&RAM[0x10000 + bank*0x4000]);
+	memory_set_bankptr(space->machine, "bank1",&RAM[0x10000 + bank*0x4000]);
 
 	/* bit 3 enables NMI */
 	interrupt_enable_w(space,0,data & 0x08);
@@ -269,7 +269,7 @@ static WRITE8_DEVICE_HANDLER( msm5205_w )
 
 static ADDRESS_MAP_START( avengers_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
 	AM_RANGE(0xde00, 0xdf7f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xdf80, 0xdfff) AM_RAM
@@ -293,7 +293,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lwings_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
 	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_BASE(&lwings_fgvideoram)
@@ -314,7 +314,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trojan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
 	AM_RANGE(0xde00, 0xdf7f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xdf80, 0xdfff) AM_RAM

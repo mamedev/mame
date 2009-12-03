@@ -625,7 +625,7 @@ static INTERRUPT_GEN( taitof2_interrupt )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bank(space->machine, 2, (data - 1) & 7);
+	memory_set_bank(space->machine, "bank2", (data - 1) & 7);
 
 #ifdef MAME_DEBUG
 	if (((data - 1) & 7)>2) logerror("CPU #1 switch to ROM bank %06x: should only happen if Z80 prg rom is 128K!\n",(data - 1) & 7);
@@ -1164,7 +1164,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(2)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_WRITE(taitosound_slave_port_w)
@@ -3163,7 +3163,7 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( f2 )
 {
-	memory_configure_bank(machine, 2, 0, 8, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank2", 0, 8, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
 }
 
 

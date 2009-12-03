@@ -46,7 +46,7 @@ static WRITE8_HANDLER( usgames_rombank_w )
 //  logerror ("BANK WRITE? -%02x-\n",data);
 //popmessage("%02x",data);
 
-	memory_set_bankptr(space->machine,  1,&RAM[ 0x10000 + 0x4000 * data] );
+	memory_set_bankptr(space->machine,  "bank1",&RAM[ 0x10000 + 0x4000 * data] );
 }
 
 static WRITE8_HANDLER( lamps1_w )
@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( usgames_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(usgames_charram_w) AM_BASE(&usgames_charram)
 	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(usgames_videoram_w) AM_BASE(&usgames_videoram)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( usg185_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2470, 0x2470) AM_READ_PORT("UNK2")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(usgames_charram_w) AM_BASE(&usgames_charram)
 	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(usgames_videoram_w) AM_BASE(&usgames_videoram)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

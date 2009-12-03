@@ -31,16 +31,16 @@ static WRITE8_HANDLER( pcktgal_bank_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
-	if (data & 1) { memory_set_bankptr(space->machine, 1, &RAM[0x4000]); }
-	else { memory_set_bankptr(space->machine, 1, &RAM[0x10000]); }
+	if (data & 1) { memory_set_bankptr(space->machine, "bank1", &RAM[0x4000]); }
+	else { memory_set_bankptr(space->machine, "bank1", &RAM[0x10000]); }
 
-	if (data & 2) { memory_set_bankptr(space->machine, 2, &RAM[0x6000]); }
-	else { memory_set_bankptr(space->machine, 2, &RAM[0x12000]); }
+	if (data & 2) { memory_set_bankptr(space->machine, "bank2", &RAM[0x6000]); }
+	else { memory_set_bankptr(space->machine, "bank2", &RAM[0x12000]); }
 }
 
 static WRITE8_HANDLER( pcktgal_sound_bank_w )
 {
-	memory_set_bank(space->machine, 3, (data >> 2) & 1);
+	memory_set_bank(space->machine, "bank3", (data >> 2) & 1);
 }
 
 static WRITE8_HANDLER( pcktgal_sound_w )
@@ -85,8 +85,8 @@ static ADDRESS_MAP_START( pcktgal_map, ADDRESS_SPACE_PROGRAM, 8 )
 	/* 1800 - 0x181f are unused BAC-06 registers, see video/dec0.c */
 	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("P2") AM_WRITE(pcktgal_sound_w)
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW") AM_WRITE(pcktgal_bank_w)
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(2)
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( pcktgal_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(pcktgal_sound_bank_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
 	AM_RANGE(0x3400, 0x3400) AM_DEVREAD("msm", pcktgal_adpcm_reset_r)	/* ? not sure */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(3)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank3")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -424,8 +424,8 @@ static DRIVER_INIT( deco222 )
 	for (A = 0x8000;A < 0x18000;A++)
 		decrypted[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x20) << 1) | ((rom[A] & 0x40) >> 1);
 
-	memory_configure_bank(machine, 3, 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
-	memory_configure_bank_decrypted(machine, 3, 0, 2, &decrypted[0x8000], 0x4000);
+	memory_configure_bank(machine, "bank3", 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank_decrypted(machine, "bank3", 0, 2, &decrypted[0x8000], 0x4000);
 }
 
 static DRIVER_INIT( graphics )
@@ -434,7 +434,7 @@ static DRIVER_INIT( graphics )
 	int len = memory_region_length(machine, "gfx1");
 	int i,j,temp[16];
 
-	memory_configure_bank(machine, 3, 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank3", 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
 
 	/* Tile graphics roms have some swapped lines, original version only */
 	for (i = 0x00000;i < len;i += 32)

@@ -350,8 +350,8 @@ static MACHINE_RESET( bgaregga )
 
 	// Set Z80 bank switch - default bank is 2
 	current_bank = 4;
-	memory_configure_bank(machine, 1, 0, 16, Z80, 0x4000);
-	memory_set_bank(machine, 1, 4);
+	memory_configure_bank(machine, "bank1", 0, 16, Z80, 0x4000);
+	memory_set_bank(machine, "bank1", 4);
 
 	if (memory_region(machine, "oki1") != NULL)
 		NMK112_init(0, "oki1", "oki2");
@@ -406,8 +406,8 @@ static DRIVER_INIT( fixeight )
 
 	if (fixeight_sec_cpu_mem)
 	{
-		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x28f002, 0x28fbff, 0, 0, (read16_space_func)SMH_BANK(2), (write16_space_func)SMH_BANK(2) );
-		memory_set_bankptr(machine, 2, fixeight_sec_cpu_mem);
+		memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x28f002, 0x28fbff, 0, 0, "bank2" );
+		memory_set_bankptr(machine, "bank2", fixeight_sec_cpu_mem);
 	}
 
 	toaplan2_sub_cpu = CPU_2_V25;
@@ -417,7 +417,7 @@ static DRIVER_INIT( fixeight )
 static DRIVER_INIT( fixeighb )
 {
 	UINT16 *bgdata = (UINT16 *)memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, 1, &bgdata[0x40000]); /* $80000 - $fffff */
+	memory_set_bankptr(machine, "bank1", &bgdata[0x40000]); /* $80000 - $fffff */
 
 	toaplan2_sub_cpu = CPU_2_NONE;
 	register_state_save(machine);
@@ -936,8 +936,8 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 			/* game keeping service mode. It writes/reads the settings to/from */
 			/* these shared RAM locations. The secondary CPU reads/writes them */
 			/* from/to nvram to store the settings (a 93C45 EEPROM) */
-			//memory_install_readwrite16_handler(space, 0x28f002, 0x28fbff, 0, 0, (read16_space_func)SMH_BANK(2), (write16_space_func)SMH_BANK(2));
-			//memory_set_bankptr(space->machine, 2, fixeight_sec_cpu_mem);
+			//memory_install_readwrite_bank_handler(space, 0x28f002, 0x28fbff, 0, 0, "bank2");
+			//memory_set_bankptr(space->machine, "bank2", fixeight_sec_cpu_mem);
 			memory_install_read_port_handler(space, 0x28f004, 0x28f005, 0, 0, "DSWA");	/* Dip Switch A - Wrong !!! */
 			memory_install_read_port_handler(space, 0x28f006, 0x28f007, 0, 0, "DSWB");	/* Dip Switch B - Wrong !!! */
 			memory_install_read_port_handler(space, 0x28f008, 0x28f009, 0, 0, "JMPR");	/* Territory Jumper block - Wrong !!! */
@@ -1081,7 +1081,7 @@ static WRITE8_HANDLER( bgaregga_bankswitch_w )
 	if (bank != current_bank)
 	{
 		current_bank = bank;
-		memory_set_bank(space->machine, 1, bank);
+		memory_set_bank(space->machine, "bank1", bank);
 	}
 }
 
@@ -1124,7 +1124,7 @@ static WRITE8_HANDLER( batrider_bankswitch_w )
 	if (bank != current_bank)
 	{
 		current_bank = bank;
-		memory_set_bank(space->machine, 1, bank);
+		memory_set_bank(space->machine, "bank1", bank);
 	}
 }
 
@@ -1567,7 +1567,7 @@ static ADDRESS_MAP_START( fixeighb_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x502000, 0x5021ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE(&toaplan2_txvideoram16_offs) AM_SIZE(&toaplan2_tx_offs_vram_size)
 	AM_RANGE(0x503000, 0x5031ff) AM_READWRITE(toaplan2_txscrollram16_r, toaplan2_txscrollram16_w) AM_BASE(&toaplan2_txscrollram16) AM_SIZE(&toaplan2_tx_scroll_vram_size)
 	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
-	AM_RANGE(0x800000, 0x87ffff) AM_READ(SMH_BANK(1))
+	AM_RANGE(0x800000, 0x87ffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 
@@ -1865,7 +1865,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bgaregga_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&raizing_shared_ram)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
@@ -1880,7 +1880,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( batrider_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1906,7 +1906,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bbakraid_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM			/* Only 2FFFh valid code */
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

@@ -201,7 +201,7 @@ WRITE8_HANDLER( appoooh_out_w )
 	{
 		UINT8 *RAM = memory_region(space->machine, "maincpu");
 
-		memory_set_bankptr(space->machine, 1,&RAM[data&0x40 ? 0x10000 : 0x0a000]);
+		memory_set_bankptr(space->machine, "bank1",&RAM[data&0x40 ? 0x10000 : 0x0a000]);
 	}
 
 	/* bit 7 unknown (used) */

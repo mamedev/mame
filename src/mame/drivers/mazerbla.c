@@ -312,14 +312,14 @@ static WRITE8_HANDLER(cfb_rom_bank_sel_w)	/* mazer blazer */
 {
 	gfx_rom_bank = data;
 
-	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
+	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
 }
 
 static WRITE8_HANDLER(cfb_rom_bank_sel_w_gg)	/* great guns */
 {
 	gfx_rom_bank = data>>1;
 
-	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
+	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
 }
 
 
@@ -969,7 +969,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mazerbla_cpu3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)					/* GFX roms */
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")					/* GFX roms */
 	AM_RANGE(0x4000, 0x4003) AM_WRITE(VCU_video_reg_w)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(&cfb_ram)		/* Color Frame Buffer PCB, a.k.a. RAM for VCU commands and parameters */
 	AM_RANGE(0xa000, 0xa7ff) AM_READ(VCU_set_cmd_param_r)	/* VCU command and parameters LOAD */

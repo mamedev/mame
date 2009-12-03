@@ -232,9 +232,9 @@ static WRITE8_HANDLER( dual_pokey_w )
 
 static ADDRESS_MAP_START( alpha_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x07ff) AM_RAMBANK(1) AM_BASE(&mhavoc_zram0)
+	AM_RANGE(0x0200, 0x07ff) AM_RAMBANK("bank1") AM_BASE(&mhavoc_zram0)
 	AM_RANGE(0x0800, 0x09ff) AM_RAM
-	AM_RANGE(0x0a00, 0x0fff) AM_RAMBANK(1) AM_BASE(&mhavoc_zram1)
+	AM_RANGE(0x0a00, 0x0fff) AM_RAMBANK("bank1") AM_BASE(&mhavoc_zram1)
 	AM_RANGE(0x1000, 0x1000) AM_READ(mhavoc_gamma_r)			/* Gamma Read Port */
 	AM_RANGE(0x1200, 0x1200) AM_READ_PORT("IN0") AM_WRITENOP	/* Alpha Input Port 0 */
 	AM_RANGE(0x1400, 0x141f) AM_RAM AM_BASE(&mhavoc_colorram)	/* ColorRAM */
@@ -247,7 +247,7 @@ static ADDRESS_MAP_START( alpha_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1780, 0x1780) AM_WRITE(mhavoc_ram_banksel_w)		/* Program RAM Page Select */
 	AM_RANGE(0x17c0, 0x17c0) AM_WRITE(mhavoc_gamma_w)			/* Gamma Communication Write Port */
 	AM_RANGE(0x1800, 0x1fff) AM_RAM								/* Shared Beta Ram */
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(2)						/* Paged Program ROM (32K) */
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2")						/* Paged Program ROM (32K) */
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("alpha", 0x4000)	/* Vector Generator RAM */
 	AM_RANGE(0x5000, 0x7fff) AM_ROM								/* Vector ROM */
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)					/* Program ROM (32K) */
@@ -286,9 +286,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( alphaone_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x07ff) AM_RAMBANK(1) AM_BASE(&mhavoc_zram0)
+	AM_RANGE(0x0200, 0x07ff) AM_RAMBANK("bank1") AM_BASE(&mhavoc_zram0)
 	AM_RANGE(0x0800, 0x09ff) AM_RAM
-	AM_RANGE(0x0a00, 0x0fff) AM_RAMBANK(1) AM_BASE(&mhavoc_zram1)
+	AM_RANGE(0x0a00, 0x0fff) AM_RAMBANK("bank1") AM_BASE(&mhavoc_zram1)
 	AM_RANGE(0x1020, 0x103f) AM_READWRITE(dual_pokey_r, dual_pokey_w)
 	AM_RANGE(0x1040, 0x1040) AM_READ_PORT("IN0") AM_WRITENOP	/* Alpha Input Port 0 */
 	AM_RANGE(0x1060, 0x1060) AM_READ_PORT("IN1")				/* Gamma Input Port */
@@ -302,7 +302,7 @@ static ADDRESS_MAP_START( alphaone_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x10b8, 0x10b8) AM_WRITE(mhavoc_ram_banksel_w)
 	AM_RANGE(0x10e0, 0x10ff) AM_WRITE(SMH_RAM) AM_BASE(&mhavoc_colorram)	/* ColorRAM */
 	AM_RANGE(0x1800, 0x18ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* EEROM */
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(2)						/* Paged Program ROM (32K) */
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2")						/* Paged Program ROM (32K) */
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("alpha", 0x4000) /* Vector Generator RAM */
 	AM_RANGE(0x5000, 0x7fff) AM_ROM								/* Vector ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* Program ROM (32K) */

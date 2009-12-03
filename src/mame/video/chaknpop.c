@@ -82,7 +82,7 @@ WRITE8_HANDLER( chaknpop_gfxmode_w )
 		int all_dirty = 0;
 
 		state->gfxmode = data;
-		memory_set_bank(space->machine, 1, (state->gfxmode & GFX_VRAM_BANK) ? 1 : 0); 	/* Select 2 banks of 16k */
+		memory_set_bank(space->machine, "bank1", (state->gfxmode & GFX_VRAM_BANK) ? 1 : 0); 	/* Select 2 banks of 16k */
 
 		if (state->flip_x != (state->gfxmode & GFX_FLIP_X))
 		{
@@ -178,7 +178,7 @@ VIDEO_START( chaknpop )
 	state_save_register_global_pointer(machine, state->vram3, 0x2000);
 	state_save_register_global_pointer(machine, state->vram4, 0x2000);
 
-	memory_set_bank(machine, 1, 0);
+	memory_set_bank(machine, "bank1", 0);
 	tx_tilemap_mark_all_dirty(machine);
 
 	state_save_register_postload(machine, chaknpop_postload, NULL);

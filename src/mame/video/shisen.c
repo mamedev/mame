@@ -20,7 +20,7 @@ WRITE8_HANDLER( sichuan2_bankswitch_w )
 
 	/* bits 0-2 select ROM bank */
 	bankaddress = 0x10000 + (data & 0x07) * 0x4000;
-	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
+	memory_set_bankptr(space->machine, "bank1", &RAM[bankaddress]);
 
 	/* bits 3-5 select gfx bank */
 	bank = (data & 0x38) >> 3;

@@ -789,7 +789,7 @@ ADDRESS_MAP_END
                                 Shogun Warriors
 ***************************************************************************/
 
-static void kaneko16_common_oki_bank_w( running_machine* machine, int bankindex, const char* tag, int bank, size_t fixedsize, size_t bankedsize )
+static void kaneko16_common_oki_bank_w( running_machine* machine, const char *bankname, const char* tag, int bank, size_t fixedsize, size_t bankedsize )
 {
 	UINT32 bankaddr;
 	UINT8* samples = memory_region(machine,tag);
@@ -799,7 +799,7 @@ static void kaneko16_common_oki_bank_w( running_machine* machine, int bankindex,
 
 	if (bankaddr <= (length-bankedsize))
 	{
-		memory_set_bankptr(machine, bankindex, samples + bankaddr);
+		memory_set_bankptr(machine, bankname, samples + bankaddr);
 	}
 }
 
@@ -807,8 +807,8 @@ static WRITE16_HANDLER( shogwarr_oki_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		kaneko16_common_oki_bank_w(space->machine, 10, "oki1", (data >> 4) & 0xf, 0x30000, 0x10000);
-		kaneko16_common_oki_bank_w(space->machine, 11, "oki2", (data & 0xf)     , 0x00000, 0x40000);
+		kaneko16_common_oki_bank_w(space->machine, "bank10", "oki1", (data >> 4) & 0xf, 0x30000, 0x10000);
+		kaneko16_common_oki_bank_w(space->machine, "bank11", "oki2", (data & 0xf)     , 0x00000, 0x40000);
 	}
 }
 
@@ -816,8 +816,8 @@ static WRITE16_HANDLER( brapboys_oki_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		kaneko16_common_oki_bank_w(space->machine, 10, "oki1", (data >> 4) & 0xf, 0x30000, 0x10000);
-		kaneko16_common_oki_bank_w(space->machine, 11, "oki2", (data & 0xf)     , 0x20000, 0x20000);
+		kaneko16_common_oki_bank_w(space->machine, "bank10", "oki1", (data >> 4) & 0xf, 0x30000, 0x10000);
+		kaneko16_common_oki_bank_w(space->machine, "bank11", "oki2", (data & 0xf)     , 0x20000, 0x20000);
 	}
 }
 
@@ -2152,11 +2152,11 @@ static const UINT8 shogwarr_default_eeprom[128] = {
 
 static ADDRESS_MAP_START( shogwarr_oki1_map, 0, 8 )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK(10)
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("bank10")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shogwarr_oki2_map, 0, 8 )
-	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK(11)
+	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( shogwarr )
@@ -2211,7 +2211,7 @@ static const UINT8 brapboys_default_eeprom[128] = {
 
 static ADDRESS_MAP_START( brapboys_oki2_map, 0, 8 )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK(11)
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( brapboys )
@@ -3821,8 +3821,8 @@ static DRIVER_INIT( calc3 )
 static DRIVER_INIT( shogwarr )
 {
 	// default sample banks
-	kaneko16_common_oki_bank_w(machine, 10, "oki1", 0, 0x30000, 0x10000);
-	kaneko16_common_oki_bank_w(machine, 11, "oki2", 0, 0x00000, 0x40000);
+	kaneko16_common_oki_bank_w(machine, "bank10", "oki1", 0, 0x30000, 0x10000);
+	kaneko16_common_oki_bank_w(machine, "bank11", "oki2", 0, 0x00000, 0x40000);
 
 	DRIVER_INIT_CALL(calc3);
 }
@@ -3834,8 +3834,8 @@ static DRIVER_INIT( brapboys )
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe00000, 0xe00001, 0, 0, brapboys_oki_bank_w);
 
 	// default sample banks
-	kaneko16_common_oki_bank_w(machine, 10, "oki1", 0, 0x30000, 0x10000);
-	kaneko16_common_oki_bank_w(machine, 11, "oki2", 0, 0x20000, 0x20000);
+	kaneko16_common_oki_bank_w(machine, "bank10", "oki1", 0, 0x30000, 0x10000);
+	kaneko16_common_oki_bank_w(machine, "bank11", "oki2", 0, 0x20000, 0x20000);
 
 	DRIVER_INIT_CALL(calc3);
 }

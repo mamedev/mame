@@ -92,32 +92,32 @@ static void sfkick_remap_banks(running_machine *machine)
 		case 0: /* bios */
 		{
 			UINT8 *mem = memory_region(machine, "bios");
-			memory_set_bankptr(machine,1, mem);
-			memory_set_bankptr(machine,2, mem+0x2000);
+			memory_set_bankptr(machine,"bank1", mem);
+			memory_set_bankptr(machine,"bank2", mem+0x2000);
 		}
 		break;
 
 		case 1: /* ext rom */
 		{
 			UINT8 *mem = memory_region(machine, "extrom");
-			memory_set_bankptr(machine,1, mem+0x4000);
-			memory_set_bankptr(machine,2, mem+0x6000);
+			memory_set_bankptr(machine,"bank1", mem+0x4000);
+			memory_set_bankptr(machine,"bank2", mem+0x6000);
 		}
 		break;
 
 		case 2: /* banked */
 		{
 			UINT8 *mem = memory_region(machine, "banked");
-			memory_set_bankptr(machine,1, mem+0x2000*sfkick_bank[0]);
-			memory_set_bankptr(machine,2, mem+0x2000*sfkick_bank[1]);
+			memory_set_bankptr(machine,"bank1", mem+0x2000*sfkick_bank[0]);
+			memory_set_bankptr(machine,"bank2", mem+0x2000*sfkick_bank[1]);
 		}
 		break;
 
 		case 3: /* unknown */
 		{
 			UINT8 *mem = memory_region(machine, "banked");
-			memory_set_bankptr(machine,1, mem+0x18000);
-			memory_set_bankptr(machine,2, mem+0x18000);
+			memory_set_bankptr(machine,"bank1", mem+0x18000);
+			memory_set_bankptr(machine,"bank2", mem+0x18000);
 		}
 		break;
 	}
@@ -128,8 +128,8 @@ static void sfkick_remap_banks(running_machine *machine)
 		case 0: /* bios - upper part */
 		{
 			UINT8 *mem = memory_region(machine, "bios");
-			memory_set_bankptr(machine,3, mem+0x4000);
-			memory_set_bankptr(machine,4, mem+0x6000);
+			memory_set_bankptr(machine,"bank3", mem+0x4000);
+			memory_set_bankptr(machine,"bank4", mem+0x6000);
 		}
 		break;
 
@@ -137,16 +137,16 @@ static void sfkick_remap_banks(running_machine *machine)
 		case 3:
 		{
 			UINT8 *mem = memory_region(machine, "banked");
-			memory_set_bankptr(machine,3, mem+0x18000);
-			memory_set_bankptr(machine,4, mem+0x18000);
+			memory_set_bankptr(machine,"bank3", mem+0x18000);
+			memory_set_bankptr(machine,"bank4", mem+0x18000);
 		}
 		break;
 
 		case 2: /* banked */
 		{
 			UINT8 *mem = memory_region(machine, "banked");
-			memory_set_bankptr(machine,3, mem+0x2000*sfkick_bank[2]);
-			memory_set_bankptr(machine,4, mem+0x2000*sfkick_bank[3]);
+			memory_set_bankptr(machine,"bank3", mem+0x2000*sfkick_bank[2]);
+			memory_set_bankptr(machine,"bank4", mem+0x2000*sfkick_bank[3]);
 		}
 		break;
 	}
@@ -157,8 +157,8 @@ static void sfkick_remap_banks(running_machine *machine)
 		case 0: /* cartridge */
 		{
 			UINT8 *mem = memory_region(machine, "cartridge");
-			memory_set_bankptr(machine,5, mem+0x4000);
-			memory_set_bankptr(machine,6, mem+0x6000);
+			memory_set_bankptr(machine,"bank5", mem+0x4000);
+			memory_set_bankptr(machine,"bank6", mem+0x6000);
 		}
 		break;
 
@@ -166,16 +166,16 @@ static void sfkick_remap_banks(running_machine *machine)
 		case 3:
 		{
 			UINT8 *mem = memory_region(machine, "banked");
-			memory_set_bankptr(machine,5, mem+0x18000);
-			memory_set_bankptr(machine,6, mem+0x18000);
+			memory_set_bankptr(machine,"bank5", mem+0x18000);
+			memory_set_bankptr(machine,"bank6", mem+0x18000);
 		}
 		break;
 
 		case 2: /* banked */
 		{
 			UINT8 *mem = memory_region(machine, "banked");
-			memory_set_bankptr(machine,5, mem+0x2000*sfkick_bank[4]);
-			memory_set_bankptr(machine,6, mem+0x2000*sfkick_bank[5]);
+			memory_set_bankptr(machine,"bank5", mem+0x2000*sfkick_bank[4]);
+			memory_set_bankptr(machine,"bank6", mem+0x2000*sfkick_bank[5]);
 		}
 		break;
 	}
@@ -187,23 +187,23 @@ static void sfkick_remap_banks(running_machine *machine)
 		case 1:
 		{
 			UINT8 *mem = memory_region(machine, "banked");
-			memory_set_bankptr(machine,7, mem+0x18000);
-			memory_set_bankptr(machine,8, mem+0x18000);
+			memory_set_bankptr(machine,"bank7", mem+0x18000);
+			memory_set_bankptr(machine,"bank8", mem+0x18000);
 		}
 		break;
 
 		case 2: /* banked */
 		{
 			UINT8 *mem = memory_region(machine, "banked");
-			memory_set_bankptr(machine,7, mem+0x2000*sfkick_bank[6]);
-			memory_set_bankptr(machine,8, mem+0x2000*sfkick_bank[7]);
+			memory_set_bankptr(machine,"bank7", mem+0x2000*sfkick_bank[6]);
+			memory_set_bankptr(machine,"bank8", mem+0x2000*sfkick_bank[7]);
 		}
 		break;
 
 		case 3: /* RAM */
 		{
-			memory_set_bankptr(machine,7, main_mem);
-			memory_set_bankptr(machine,8, main_mem+0x2000);
+			memory_set_bankptr(machine,"bank7", main_mem);
+			memory_set_bankptr(machine,"bank8", main_mem+0x2000);
 		}
 		break;
 	}
@@ -296,14 +296,14 @@ static WRITE8_HANDLER(page3_w)
 
 
 static ADDRESS_MAP_START( sfkick_map, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x1fff) AM_ROMBANK(1)
-	AM_RANGE( 0x2000, 0x3fff) AM_ROMBANK(2)
-	AM_RANGE( 0x4000, 0x5fff) AM_ROMBANK(3)
-	AM_RANGE( 0x6000, 0x7fff) AM_ROMBANK(4)
-	AM_RANGE( 0x8000, 0x9fff) AM_ROMBANK(5)
-	AM_RANGE( 0xa000, 0xbfff) AM_ROMBANK(6)
-	AM_RANGE( 0xc000, 0xdfff) AM_ROMBANK(7)
-	AM_RANGE( 0xe000, 0xffff) AM_ROMBANK(8)
+	AM_RANGE( 0x0000, 0x1fff) AM_ROMBANK("bank1")
+	AM_RANGE( 0x2000, 0x3fff) AM_ROMBANK("bank2")
+	AM_RANGE( 0x4000, 0x5fff) AM_ROMBANK("bank3")
+	AM_RANGE( 0x6000, 0x7fff) AM_ROMBANK("bank4")
+	AM_RANGE( 0x8000, 0x9fff) AM_ROMBANK("bank5")
+	AM_RANGE( 0xa000, 0xbfff) AM_ROMBANK("bank6")
+	AM_RANGE( 0xc000, 0xdfff) AM_ROMBANK("bank7")
+	AM_RANGE( 0xe000, 0xffff) AM_ROMBANK("bank8")
 	AM_RANGE( 0x0000, 0x3fff) AM_WRITE( page0_w )
 	AM_RANGE( 0x4000, 0x7fff) AM_WRITE( page1_w )
 	AM_RANGE( 0x8000, 0xbfff) AM_WRITE( page2_w )

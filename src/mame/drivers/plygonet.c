@@ -585,7 +585,7 @@ static int cur_sound_region;
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(machine, 2, memory_region(machine, "soundcpu") + 0x10000 + cur_sound_region*0x4000);
+	memory_set_bankptr(machine, "bank2", memory_region(machine, "soundcpu") + 0x10000 + cur_sound_region*0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -601,7 +601,7 @@ static INTERRUPT_GEN(audio_interrupt)
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(2))
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0x0000, 0xbfff) AM_WRITENOP
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("konami1", k054539_r, k054539_w)

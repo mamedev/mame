@@ -559,7 +559,7 @@ static void machine_init_common(running_machine *machine)
 static MACHINE_START( superqix )
 {
 	/* configure the banks */
-	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	machine_init_common(machine);
 }
@@ -567,7 +567,7 @@ static MACHINE_START( superqix )
 static MACHINE_START( pbillian )
 {
 	/* configure the banks */
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	machine_init_common(machine);
 }
@@ -575,7 +575,7 @@ static MACHINE_START( pbillian )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe100, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(superqix_videoram_w) AM_BASE(&superqix_videoram)

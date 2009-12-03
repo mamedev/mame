@@ -366,7 +366,7 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
 //  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n",cpu_get_pc(space->cpu),data,BIT(data,2),BIT(data,6));
 
 
-	memory_set_bankptr(space->machine, 2,memory_region(space->machine, "audiocpu") + 0x10000 * (data & 0x03));
+	memory_set_bankptr(space->machine, "bank2",memory_region(space->machine, "audiocpu") + 0x10000 * (data & 0x03));
 
 	coin_counter_w(space->machine, 0,~data & 0x80);
 
@@ -522,7 +522,7 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 
 //  logerror("%04x: port C wr %02x\n",cpu_get_pc(space->cpu),data);
 
-	memory_set_bankptr(space->machine, 2,memory_region(space->machine, "audiocpu") + 0x10000 * ((data & 0x0c) >> 2));
+	memory_set_bankptr(space->machine, "bank2",memory_region(space->machine, "audiocpu") + 0x10000 * ((data & 0x0c) >> 2));
 
 	coin_counter_w(space->machine, 0,~data & 0x80);
 
@@ -552,11 +552,11 @@ static WRITE8_HANDLER( bankswitch_w )
 	/* last bank is fixed */
 	if (offs < len - 0x4000)
 	{
-		memory_set_bankptr(space->machine, 1, &rom[offs + 0x10000]);
+		memory_set_bankptr(space->machine, "bank1", &rom[offs + 0x10000]);
 	}
 	else
 	{
-		memory_set_bankptr(space->machine, 1, &rom[0xc000]);
+		memory_set_bankptr(space->machine, "bank1", &rom[0xc000]);
 	}
 }
 
@@ -613,12 +613,12 @@ static ADDRESS_MAP_START( reikaids_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(reikaids_snd_command_w)
 	AM_RANGE(0x8005, 0x8005) AM_WRITE(reikaids_gfx_bank_w)
 	AM_RANGE(0x8006, 0x8006) AM_WRITE(homedata_blitter_param_w)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( reikaids_upd7807_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK(2)	/* External ROM (Banked) */
+	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK("bank2")	/* External ROM (Banked) */
 	AM_RANGE(0xff00, 0xffff) AM_RAM	/* Internal RAM */
 ADDRESS_MAP_END
 
@@ -647,13 +647,13 @@ static ADDRESS_MAP_START( pteacher_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8005, 0x8005) AM_WRITE(pteacher_blitter_bank_w)
 	AM_RANGE(0x8006, 0x8006) AM_WRITE(homedata_blitter_param_w)
 	AM_RANGE(0x8007, 0x8007) AM_WRITE(pteacher_gfx_bank_w)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pteacher_upd7807_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(pteacher_snd_answer_w)
-	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK(2)	/* External ROM (Banked) */
+	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK("bank2")	/* External ROM (Banked) */
 	AM_RANGE(0xff00, 0xffff) AM_RAM	/* Internal RAM */
 ADDRESS_MAP_END
 

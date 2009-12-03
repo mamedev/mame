@@ -313,13 +313,13 @@ static WRITE8_HANDLER(casino5_bank_w)
 {
 	if ( data == 0 )
 	{
-		memory_set_bank(space->machine, 1, 1);
-		memory_set_bank(space->machine, 2, 1);
+		memory_set_bank(space->machine, "bank1", 1);
+		memory_set_bank(space->machine, "bank2", 1);
 	}
 	else if ( data == 0xff )
 	{
-		memory_set_bank(space->machine, 1, 0);
-		memory_set_bank(space->machine, 2, 0);
+		memory_set_bank(space->machine, "bank1", 0);
+		memory_set_bank(space->machine, "bank2", 0);
 	}
 	else
 	{
@@ -346,8 +346,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( casino5_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(2)
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(casino5_bank_w)
 	AM_RANGE(0x7001, 0x7fff) AM_RAM
@@ -469,7 +469,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( couple_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(&backup_ram)
 	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
@@ -1169,10 +1169,10 @@ static NVRAM_HANDLER(dodge)
 static MACHINE_START(casino5)
 {
 	MACHINE_START_CALL(merit);
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x2000, 0x2000);
-	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "maincpu") + 0x6000, 0x2000);
-	memory_set_bank(machine, 1, 0);
-	memory_set_bank(machine, 2, 0);
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x2000, 0x2000);
+	memory_configure_bank(machine, "bank2", 0, 2, memory_region(machine, "maincpu") + 0x6000, 0x2000);
+	memory_set_bank(machine, "bank1", 0);
+	memory_set_bank(machine, "bank2", 0);
 }
 
 static MACHINE_DRIVER_START( pitboss )
@@ -1881,7 +1881,7 @@ static DRIVER_INIT( couple )
       dumpers it's just the way it is,a.k.a. it's an "hardware" banking.
       update 20060118 by f205v: now we have 3 dumps from 3 different boards and they
       all behave the same...*/
-	memory_set_bankptr(machine, 1,ROM + 0x10000 + (0x2000 * 2));
+	memory_set_bankptr(machine, "bank1",ROM + 0x10000 + (0x2000 * 2));
 }
 
 GAME( 1983, pitboss,  0,       pitboss,  pitboss,  0,      ROT0,  "Merit", "The Pit Boss (Set 1)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )

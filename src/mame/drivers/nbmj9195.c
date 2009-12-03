@@ -63,7 +63,7 @@ static WRITE8_HANDLER( nbmj9195_soundbank_w )
 {
 	UINT8 *SNDROM = memory_region(space->machine, "audiocpu");
 
-	memory_set_bankptr(space->machine, 1, &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
+	memory_set_bankptr(space->machine, "bank1", &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
 
 static READ8_HANDLER( nbmj9195_sound_r )
@@ -994,7 +994,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sailorws_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailorws_sound_io_map, ADDRESS_SPACE_IO, 8 )

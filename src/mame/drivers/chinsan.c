@@ -80,7 +80,7 @@ static VIDEO_UPDATE(chinsan)
 
 static MACHINE_RESET( chinsan )
 {
-	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	adpcm_idle = 1;
 }
@@ -88,7 +88,7 @@ static MACHINE_RESET( chinsan )
 
 static WRITE8_HANDLER(ctrl_w)
 {
-	memory_set_bank(space->machine, 1, data >> 6);
+	memory_set_bank(space->machine, "bank1", data >> 6);
 }
 
 static WRITE8_DEVICE_HANDLER( ym_port_w1 )
@@ -202,7 +202,7 @@ static WRITE8_DEVICE_HANDLER( chin_adpcm_w )
 
 static ADDRESS_MAP_START( chinsan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_BASE(&chinsan_video)
 ADDRESS_MAP_END
@@ -585,7 +585,7 @@ ROM_END
 
 static DRIVER_INIT( chinsan )
 {
-	mc8123_decrypt_rom(machine, "maincpu", "user1", 1, 4);
+	mc8123_decrypt_rom(machine, "maincpu", "user1", "bank1", 4);
 }
 
 

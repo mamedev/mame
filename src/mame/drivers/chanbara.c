@@ -209,7 +209,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("JOY")
 	AM_RANGE(0x3800, 0x3801) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -335,7 +335,7 @@ static WRITE8_DEVICE_HANDLER( chanbara_ay_out_1_w )
 
 	state->scrollhi = data & 0x03;
 
-	memory_set_bank(device->machine, 1, (data & 0x04) >> 2);
+	memory_set_bank(device->machine, "bank1", (data & 0x04) >> 2);
 
 	//if (data & 0xf8)    printf("chanbara_ay_out_1_w unused bits set %02x\n", data & 0xf8);
 }
@@ -466,7 +466,7 @@ static DRIVER_INIT(chanbara )
 		dst[i + 0x2000] = (src[i + 0x1000] & 0x0f) << 4;
 	}
 
-	memory_configure_bank(machine, 1, 0, 2, &bg[0x0000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 2, &bg[0x0000], 0x4000);
 }
 
 GAME( 1985, chanbara, 0,  chanbara, chanbara, chanbara, ROT270, "Data East", "Chanbara", GAME_SUPPORTS_SAVE )

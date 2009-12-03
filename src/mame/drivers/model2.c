@@ -349,8 +349,8 @@ static MACHINE_RESET(model2o)
 
 static MACHINE_RESET(model2_scsp)
 {
-	memory_set_bankptr(machine, 4, memory_region(machine, "scsp") + 0x200000);
-	memory_set_bankptr(machine, 5, memory_region(machine, "scsp") + 0x600000);
+	memory_set_bankptr(machine, "bank4", memory_region(machine, "scsp") + 0x200000);
+	memory_set_bankptr(machine, "bank5", memory_region(machine, "scsp") + 0x600000);
 
 	// copy the 68k vector table into RAM
 	memcpy(model2_soundram, memory_region(machine, "audiocpu") + 0x80000, 16);
@@ -1714,13 +1714,13 @@ static WRITE16_HANDLER( model2snd_ctrl )
 		UINT8 *snd = memory_region(space->machine, "scsp");
 		if (data & 0x20)
 		{
-	  		memory_set_bankptr(space->machine, 4, snd + 0x200000);
-			memory_set_bankptr(space->machine, 5, snd + 0x600000);
+	  		memory_set_bankptr(space->machine, "bank4", snd + 0x200000);
+			memory_set_bankptr(space->machine, "bank5", snd + 0x600000);
 		}
 		else
 		{
-			memory_set_bankptr(space->machine, 4, snd + 0x800000);
-			memory_set_bankptr(space->machine, 5, snd + 0xa00000);
+			memory_set_bankptr(space->machine, "bank4", snd + 0x800000);
+			memory_set_bankptr(space->machine, "bank5", snd + 0xa00000);
 		}
 	}
 }
@@ -1731,8 +1731,8 @@ static ADDRESS_MAP_START( model2_snd, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(model2snd_ctrl)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("audiocpu", 0x80000)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("scsp", 0)
-	AM_RANGE(0xa00000, 0xdfffff) AM_READ(SMH_BANK(4))
-	AM_RANGE(0xe00000, 0xffffff) AM_READ(SMH_BANK(5))
+	AM_RANGE(0xa00000, 0xdfffff) AM_ROMBANK("bank4")
+	AM_RANGE(0xe00000, 0xffffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
 
 static int scsp_last_line = 0;

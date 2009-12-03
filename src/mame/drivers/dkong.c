@@ -477,9 +477,9 @@ static MACHINE_RESET( strtheat )
     MACHINE_RESET_CALL(dkong);
 
     /* The initial state of the counter is 0x08 */
-    memory_configure_bank(machine, 1, 0, 4, &ROM[0x10000], 0x4000);
+    memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
     state->decrypt_counter = 0x08;
-    memory_set_bank(machine, 1, 0);
+    memory_set_bank(machine, "bank1", 0);
 }
 
 static MACHINE_RESET( drakton )
@@ -490,9 +490,9 @@ static MACHINE_RESET( drakton )
     MACHINE_RESET_CALL(dkong);
 
     /* The initial state of the counter is 0x09 */
-    memory_configure_bank(machine, 1, 0, 4, &ROM[0x10000], 0x4000);
+    memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
     state->decrypt_counter = 0x09;
-    memory_set_bank(machine, 1, 1);
+    memory_set_bank(machine, "bank1", 1);
 }
 
 
@@ -616,10 +616,10 @@ static READ8_HANDLER( epos_decrypt_rom )
 
     switch(state->decrypt_counter)
     {
-        case 0x08:  memory_set_bank(space->machine, 1, 0);      break;
-        case 0x09:  memory_set_bank(space->machine, 1, 1);      break;
-        case 0x0A:  memory_set_bank(space->machine, 1, 2);      break;
-        case 0x0B:  memory_set_bank(space->machine, 1, 3);      break;
+        case 0x08:  memory_set_bank(space->machine, "bank1", 0);      break;
+        case 0x09:  memory_set_bank(space->machine, "bank1", 1);      break;
+        case 0x0A:  memory_set_bank(space->machine, "bank1", 2);      break;
+        case 0x0B:  memory_set_bank(space->machine, "bank1", 3);      break;
         default:
             logerror("Invalid counter = %02X\n",state->decrypt_counter);
             break;
@@ -2904,7 +2904,7 @@ static DRIVER_INIT( drakton )
             {7,1,4,0,3,6,2,5},
     };
 
-    memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(1) );
+    memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1" );
 
     /* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -2926,7 +2926,7 @@ static DRIVER_INIT( strtheat )
             {6,3,4,1,0,7,2,5},
     };
 
-    memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(1) );
+    memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1" );
 
     /* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little

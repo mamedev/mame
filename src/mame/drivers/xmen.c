@@ -148,7 +148,7 @@ static UINT8 sound_curbank;
 
 static void sound_reset_bank(running_machine *machine)
 {
-	memory_set_bankptr(machine, 4, memory_region(machine, "audiocpu") + 0x10000 + (sound_curbank & 0x07) * 0x4000);
+	memory_set_bankptr(machine, "bank4", memory_region(machine, "audiocpu") + 0x10000 + (sound_curbank & 0x07) * 0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -181,7 +181,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(4))
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank4")
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("konami", k054539_r, k054539_w)

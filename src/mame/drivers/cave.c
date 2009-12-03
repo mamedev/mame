@@ -779,7 +779,7 @@ static ADDRESS_MAP_START( mazinger_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("IN1")											// Inputs + EEPROM
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(cave_eeprom_msb_w)									// EEPROM
 /**/AM_RANGE(0xc08000, 0xc0ffff) AM_RAM AM_BASE_GENERIC(paletteram) AM_SIZE(&cave_paletteram_size)	// Palette
-	AM_RANGE(0xd00000, 0xd7ffff) AM_ROMBANK(1)													// ROM
+	AM_RANGE(0xd00000, 0xd7ffff) AM_ROMBANK("bank1")													// ROM
 ADDRESS_MAP_END
 
 
@@ -964,7 +964,7 @@ static WRITE8_HANDLER( hotdogst_rombank_w )
 	int bank = data & 0x0f;
 	if ( data & ~0x0f )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(space->cpu),data);
 	if (bank > 1)	bank+=2;
-	memory_set_bankptr(space->machine, 2, &RAM[ 0x4000 * bank ]);
+	memory_set_bankptr(space->machine, "bank2", &RAM[ 0x4000 * bank ]);
 }
 
 static WRITE8_HANDLER( hotdogst_okibank_w )
@@ -978,7 +978,7 @@ static WRITE8_HANDLER( hotdogst_okibank_w )
 
 static ADDRESS_MAP_START( hotdogst_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM								// ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(2)						// ROM (Banked)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")						// ROM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM								// RAM
 ADDRESS_MAP_END
 
@@ -1003,12 +1003,12 @@ static WRITE8_HANDLER( mazinger_rombank_w )
 	int bank = data & 0x07;
 	if ( data & ~0x07 )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(space->cpu),data);
 	if (bank > 1)	bank+=2;
-	memory_set_bankptr(space->machine, 2, &RAM[ 0x4000 * bank ]);
+	memory_set_bankptr(space->machine, "bank2", &RAM[ 0x4000 * bank ]);
 }
 
 static ADDRESS_MAP_START( mazinger_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM								// ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(2)						// ROM (Banked)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")						// ROM (Banked)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM								// RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM								// RAM
 ADDRESS_MAP_END
@@ -1035,7 +1035,7 @@ static WRITE8_HANDLER( metmqstr_rombank_w )
 	int bank = data & 0xf;
 	if ( bank != data )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(space->cpu),data);
 	if (bank >= 2)	bank += 2;
-	memory_set_bankptr(space->machine, 1, &ROM[ 0x4000 * bank ]);
+	memory_set_bankptr(space->machine, "bank1", &ROM[ 0x4000 * bank ]);
 }
 
 static WRITE8_HANDLER( metmqstr_okibank0_w )
@@ -1058,7 +1058,7 @@ static WRITE8_HANDLER( metmqstr_okibank1_w )
 
 static ADDRESS_MAP_START( metmqstr_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM								// ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)						// ROM (Banked)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")						// ROM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM								// RAM
 ADDRESS_MAP_END
 
@@ -1086,12 +1086,12 @@ static WRITE8_HANDLER( pwrinst2_rombank_w )
 	int bank = data & 0x07;
 	if ( data & ~0x07 )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(space->cpu),data);
 	if (bank > 2)	bank+=1;
-	memory_set_bankptr(space->machine, 1, &ROM[ 0x4000 * bank ]);
+	memory_set_bankptr(space->machine, "bank1", &ROM[ 0x4000 * bank ]);
 }
 
 static ADDRESS_MAP_START( pwrinst2_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)						// ROM (Banked)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")						// ROM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM								// RAM
 ADDRESS_MAP_END
 
@@ -1129,7 +1129,7 @@ static WRITE8_HANDLER( sailormn_rombank_w )
 	int bank = data & 0x1f;
 	if ( data & ~0x1f )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(space->cpu),data);
 	if (bank > 1)	bank+=2;
-	memory_set_bankptr(space->machine, 1, &RAM[ 0x4000 * bank ]);
+	memory_set_bankptr(space->machine, "bank1", &RAM[ 0x4000 * bank ]);
 }
 
 static WRITE8_HANDLER( sailormn_okibank0_w )
@@ -1152,7 +1152,7 @@ static WRITE8_HANDLER( sailormn_okibank1_w )
 
 static ADDRESS_MAP_START( sailormn_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM															// ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)													// ROM (Banked)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")													// ROM (Banked)
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(mirror_ram_r, mirror_ram_w) AM_BASE(&mirror_ram)	// RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(mirror_ram_r, mirror_ram_w)						// Mirrored RAM (agallet)
 ADDRESS_MAP_END
@@ -3966,7 +3966,7 @@ static DRIVER_INIT( mazinger )
 	time_vblank_irq = 2100;
 
 	/* setup extra ROM */
-	memory_set_bankptr(machine, 1,memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank1",memory_region(machine, "user1"));
 }
 
 

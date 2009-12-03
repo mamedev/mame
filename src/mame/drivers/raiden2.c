@@ -851,8 +851,8 @@ static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x10000, 0x1efff) AM_RAM_WRITE(w1x) AM_BASE(&w1ram)
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK(1)
-	AM_RANGE(0x40000, 0xfffff) AM_ROMBANK(2)
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x40000, 0xfffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
 /* new zero team uses the copd3 protection... and uploads a 0x400 byte table, probably the mcu code, encrypted */
@@ -959,8 +959,8 @@ static ADDRESS_MAP_START( nzerotea_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x10000, 0x1efff) AM_RAM_WRITE(w1x) AM_BASE(&w1ram)
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK(1)
-	AM_RANGE(0x40000, 0xfffff) AM_ROMBANK(2)
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x40000, 0xfffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
 
@@ -2052,8 +2052,8 @@ static DRIVER_INIT (raiden2)
 	/* wrong , there must be some banking this just stops it crashing */
 	UINT8 *RAM = memory_region(machine, "user1");
 
-	memory_set_bankptr(machine, 1,&RAM[0x100000]);
-	memory_set_bankptr(machine, 2,&RAM[0x040000]);
+	memory_set_bankptr(machine, "bank1",&RAM[0x100000]);
+	memory_set_bankptr(machine, "bank2",&RAM[0x040000]);
 
 	raiden2_decrypt_sprites(machine);
 }
@@ -2062,8 +2062,8 @@ static DRIVER_INIT (xsedae)
 {
 	/* wrong , there must be some banking this just stops it crashing */
 	UINT8 *RAM = memory_region(machine, "user1");
-	memory_set_bankptr(machine, 1,&RAM[0x100000]);
-	memory_set_bankptr(machine, 2,&RAM[0x040000]);
+	memory_set_bankptr(machine, "bank1",&RAM[0x100000]);
+	memory_set_bankptr(machine, "bank2",&RAM[0x040000]);
 }
 
 
@@ -2154,20 +2154,20 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 
 	/* not sure of bank sizes etc. */
-	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK(1)
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK(2)
-	AM_RANGE(0x40000, 0x4ffff) AM_ROMBANK(3)
-	AM_RANGE(0x50000, 0x5ffff) AM_ROMBANK(4)
-	AM_RANGE(0x60000, 0x6ffff) AM_ROMBANK(5)
-	AM_RANGE(0x70000, 0x7ffff) AM_ROMBANK(6)
-	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK(7)
-	AM_RANGE(0x90000, 0x9ffff) AM_ROMBANK(8)
-	AM_RANGE(0xa0000, 0xaffff) AM_ROMBANK(9)
-	AM_RANGE(0xb0000, 0xbffff) AM_ROMBANK(10)
-	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK(11)
-	AM_RANGE(0xd0000, 0xdffff) AM_ROMBANK(12)
-	AM_RANGE(0xe0000, 0xeffff) AM_ROMBANK(13)
-	AM_RANGE(0xf0000, 0xfffff) AM_ROMBANK(14)
+	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("bank2")
+	AM_RANGE(0x40000, 0x4ffff) AM_ROMBANK("bank3")
+	AM_RANGE(0x50000, 0x5ffff) AM_ROMBANK("bank4")
+	AM_RANGE(0x60000, 0x6ffff) AM_ROMBANK("bank5")
+	AM_RANGE(0x70000, 0x7ffff) AM_ROMBANK("bank6")
+	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK("bank7")
+	AM_RANGE(0x90000, 0x9ffff) AM_ROMBANK("bank8")
+	AM_RANGE(0xa0000, 0xaffff) AM_ROMBANK("bank9")
+	AM_RANGE(0xb0000, 0xbffff) AM_ROMBANK("bank10")
+	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK("bank11")
+	AM_RANGE(0xd0000, 0xdffff) AM_ROMBANK("bank12")
+	AM_RANGE(0xe0000, 0xeffff) AM_ROMBANK("bank13")
+	AM_RANGE(0xf0000, 0xfffff) AM_ROMBANK("bank14")
 ADDRESS_MAP_END
 
 
@@ -2296,20 +2296,20 @@ MACHINE_DRIVER_END
 static DRIVER_INIT(rdx_v33)
 {
 	UINT8 *prg = memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, 1,&prg[0x020000]);
-	memory_set_bankptr(machine, 2,&prg[0x030000]);
-	memory_set_bankptr(machine, 3,&prg[0x040000]);
-	memory_set_bankptr(machine, 4,&prg[0x050000]);
-	memory_set_bankptr(machine, 5,&prg[0x060000]);
-	memory_set_bankptr(machine, 6,&prg[0x070000]);
-	memory_set_bankptr(machine, 7,&prg[0x080000]);
-	memory_set_bankptr(machine, 8,&prg[0x090000]);
-	memory_set_bankptr(machine, 9,&prg[0x0a0000]);
-	memory_set_bankptr(machine, 10,&prg[0x0b0000]);
-	memory_set_bankptr(machine, 11,&prg[0x0c0000]);
-	memory_set_bankptr(machine, 12,&prg[0x0d0000]);
-	memory_set_bankptr(machine, 13,&prg[0x0e0000]);
-	memory_set_bankptr(machine, 14,&prg[0x0f0000]);
+	memory_set_bankptr(machine, "bank1",&prg[0x020000]);
+	memory_set_bankptr(machine, "bank2",&prg[0x030000]);
+	memory_set_bankptr(machine, "bank3",&prg[0x040000]);
+	memory_set_bankptr(machine, "bank4",&prg[0x050000]);
+	memory_set_bankptr(machine, "bank5",&prg[0x060000]);
+	memory_set_bankptr(machine, "bank6",&prg[0x070000]);
+	memory_set_bankptr(machine, "bank7",&prg[0x080000]);
+	memory_set_bankptr(machine, "bank8",&prg[0x090000]);
+	memory_set_bankptr(machine, "bank9",&prg[0x0a0000]);
+	memory_set_bankptr(machine, "bank10",&prg[0x0b0000]);
+	memory_set_bankptr(machine, "bank11",&prg[0x0c0000]);
+	memory_set_bankptr(machine, "bank12",&prg[0x0d0000]);
+	memory_set_bankptr(machine, "bank13",&prg[0x0e0000]);
+	memory_set_bankptr(machine, "bank14",&prg[0x0f0000]);
 
 	raiden2_decrypt_sprites(machine);
 }

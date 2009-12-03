@@ -229,12 +229,12 @@ static WRITE8_HANDLER( esd16_sound_rombank_w )
 	int bank = data & 0xf;
 	if (data != bank)	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(space->cpu), data);
 	if (bank >= 3)	bank += 1;
-	memory_set_bank(space->machine, 1, bank);
+	memory_set_bank(space->machine, "bank1", bank);
 }
 
 static ADDRESS_MAP_START( multchmp_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)						// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")						// Banked ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM								// RAM
 ADDRESS_MAP_END
 
@@ -521,7 +521,7 @@ static MACHINE_START( esd16 )
 	esd16_state *state = (esd16_state *)machine->driver_data;
 	UINT8 *AUDIO = memory_region(machine, "audiocpu");
 
-	memory_configure_bank(machine, 1, 0, 9, &AUDIO[0x0000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 9, &AUDIO[0x0000], 0x4000);
 
 	state->audio_cpu = devtag_get_device(machine, "audiocpu");
 	state->eeprom = devtag_get_device(machine, "eeprom");

@@ -48,7 +48,7 @@ static WRITE8_HANDLER( contra_bankswitch_w )
 
 	bankaddress = 0x10000 + (data & 0x0f) * 0x2000;
 	if (bankaddress < 0x28000)	/* for safety */
-		memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+		memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
 }
 
 static WRITE8_HANDLER( contra_sh_irqtrigger_w )
@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( contra_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4400, 0x47ff) AM_WRITE(contra_bg_vram_w) AM_BASE(&contra_bg_vram)
 	AM_RANGE(0x4800, 0x5fff) AM_WRITEONLY
 
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
  	AM_RANGE(0x7000, 0x7000) AM_WRITE(contra_bankswitch_w)
 
 	AM_RANGE(0x8000, 0xffff) AM_ROM

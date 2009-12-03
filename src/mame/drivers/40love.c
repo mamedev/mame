@@ -291,7 +291,7 @@ static WRITE8_HANDLER( bank_select_w )
 //      popmessage("WRONG BANK SELECT = %x !!!!\n",data);
 	}
 
-	memory_set_bank(space->machine, 1, data & 1);
+	memory_set_bank(space->machine, "bank1", data & 1);
 }
 
 static WRITE8_HANDLER( pix1_w )
@@ -580,7 +580,7 @@ static DRIVER_INIT( undoukai )
 {
 	buggychl_state *state = (buggychl_state *)machine->driver_data;
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 2, &ROM[0x10000], 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x2000);
 
 	state->pix_color[0] = 0x000;
 	state->pix_color[1] = 0x1e3;
@@ -592,7 +592,7 @@ static DRIVER_INIT( 40love )
 {
 	buggychl_state *state = (buggychl_state *)machine->driver_data;
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 2, &ROM[0x10000], 0x2000);
+	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x2000);
 
 	#if 0
 		/* character ROM hack
@@ -657,13 +657,13 @@ static ADDRESS_MAP_START( 40love_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE_SIZE_MEMBER(buggychl_state, spriteram, spriteram_size)	/* sprites part 1 */
 	AM_RANGE(0x9880, 0x98bf) AM_READWRITE(fortyl_bg_colorram_r, fortyl_bg_colorram_w) AM_BASE_MEMBER(buggychl_state, colorram)		/* background attributes (2 bytes per line) */
 	AM_RANGE(0x98c0, 0x98ff) AM_RAM AM_BASE_SIZE_MEMBER(buggychl_state, spriteram2, spriteram2_size)/* sprites part 2 */
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(fortyl_pixram_r, fortyl_pixram_w) /* banked pixel layer */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( undoukai_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(buggychl_state, mcu_ram) /* M5517P on main board */
 	AM_RANGE(0xa800, 0xa800) AM_READWRITE(undoukai_mcu_r, undoukai_mcu_w)
 	AM_RANGE(0xa801, 0xa801) AM_READWRITE(undoukai_mcu_status_r, pix1_w)		//pixel layer related

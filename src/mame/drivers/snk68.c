@@ -161,7 +161,7 @@ static ADDRESS_MAP_START( searchar_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0f8000, 0x0f8001) AM_READ(sound_status_r)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(pow_spriteram_r, pow_spriteram_w) AM_BASE_GENERIC(spriteram)	// only partially populated
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(searchar_fg_videoram_w) AM_MIRROR(0x1000) AM_BASE(&pow_fg_videoram) /* Mirror is used by Ikari 3 */
-	AM_RANGE(0x300000, 0x33ffff) AM_ROMBANK(1) /* Extra code bank */
+	AM_RANGE(0x300000, 0x33ffff) AM_ROMBANK("bank1") /* Extra code bank */
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(pow_paletteram16_word_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
@@ -1010,7 +1010,7 @@ ROM_END
 
 static DRIVER_INIT( searchar )
 {
-	memory_set_bankptr(machine, 1, memory_region(machine, "user1"));
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));
 }
 
 /******************************************************************************/

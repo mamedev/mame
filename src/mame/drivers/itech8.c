@@ -676,7 +676,7 @@ static MACHINE_RESET( itech8 )
 	/* make sure bank 0 is selected */
 	if (main_cpu_type == CPU_M6809 || main_cpu_type == CPU_HD6309)
 	{
-		memory_set_bankptr(machine, 1, &memory_region(machine, "maincpu")[0x4000]);
+		memory_set_bankptr(machine, "bank1", &memory_region(machine, "maincpu")[0x4000]);
 		device_reset(cputag_get_cpu(machine, "maincpu"));
 	}
 
@@ -730,7 +730,7 @@ static WRITE8_HANDLER( blitter_w )
 {
 	/* bit 0x20 on address 7 controls CPU banking */
 	if (offset / 2 == 7)
-		memory_set_bankptr(space->machine, 1, &memory_region(space->machine, "maincpu")[0x4000 + 0xc000 * ((data >> 5) & 1)]);
+		memory_set_bankptr(space->machine, "bank1", &memory_region(space->machine, "maincpu")[0x4000 + 0xc000 * ((data >> 5) & 1)]);
 
 	/* the rest is handled by the video hardware */
 	itech8_blitter_w(space, offset, data);
@@ -740,7 +740,7 @@ static WRITE8_HANDLER( blitter_w )
 static WRITE8_HANDLER( rimrockn_bank_w )
 {
 	/* banking is controlled here instead of by the blitter output */
-	memory_set_bankptr(space->machine, 1, &memory_region(space->machine, "maincpu")[0x4000 + 0xc000 * (data & 3)]);
+	memory_set_bankptr(space->machine, "bank1", &memory_region(space->machine, "maincpu")[0x4000 + 0xc000 * (data & 3)]);
 }
 
 
@@ -904,7 +904,7 @@ static ADDRESS_MAP_START( tmslo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x11c0, 0x11df) AM_READWRITE(itech8_blitter_r, blitter_w)
 	AM_RANGE(0x11e0, 0x11ff) AM_WRITE(itech8_palette_w)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&main_ram) AM_SIZE(&main_ram_size)
-	AM_RANGE(0x4000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 
@@ -920,7 +920,7 @@ static ADDRESS_MAP_START( tmshi_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x01c0, 0x01df) AM_READWRITE(itech8_blitter_r, blitter_w)
 	AM_RANGE(0x01e0, 0x01ff) AM_WRITE(itech8_palette_w)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&main_ram) AM_SIZE(&main_ram_size)
-	AM_RANGE(0x4000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 
@@ -936,7 +936,7 @@ static ADDRESS_MAP_START( gtg2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x01e0, 0x01e0) AM_WRITE(tms34061_latch_w)
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&main_ram) AM_SIZE(&main_ram_size)
-	AM_RANGE(0x4000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 

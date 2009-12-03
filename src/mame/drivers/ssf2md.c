@@ -19,9 +19,10 @@ static READ16_HANDLER( ssf2ghw_dsw_r )
 static DRIVER_INIT( ssf2ghw )
 {
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xA130F0, 0xA130FF, 0, 0, (write16_space_func)SMH_NOP); // custom banking is disabled (!)
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x5fffff, 0, 0, (read16_space_func)SMH_BANK(5), (write16_space_func)SMH_UNMAP);
+	memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x5fffff, 0, 0, "bank5");
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x5fffff, 0, 0, (write16_space_func)SMH_UNMAP);
 
-	memory_set_bankptr(machine,  5, memory_region( machine, "maincpu" ) + 0x400000 );
+	memory_set_bankptr(machine,  "bank5", memory_region( machine, "maincpu" ) + 0x400000 );
 
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770070, 0x770075, 0, 0, ssf2ghw_dsw_r );
 

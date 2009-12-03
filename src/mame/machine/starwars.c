@@ -101,9 +101,9 @@ WRITE8_HANDLER( starwars_out_w )
 			break;
 
 		case 4:		/* bank switch */
-			memory_set_bank(space->machine, 1, (data >> 7) & 1);
+			memory_set_bank(space->machine, "bank1", (data >> 7) & 1);
 			if (starwars_is_esb)
-				memory_set_bank(space->machine, 2, (data >> 7) & 1);
+				memory_set_bank(space->machine, "bank2", (data >> 7) & 1);
 			break;
 		case 5:		/* reset PRNG */
 			break;

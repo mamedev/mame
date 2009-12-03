@@ -104,7 +104,7 @@ static WRITE8_HANDLER( prog_w )
 	{
 		active_bank = active_bank ^ 0x01;
 
-		memory_set_bank(space->machine, 1, active_bank);
+		memory_set_bank(space->machine, "bank1", active_bank);
 	}
 }
 
@@ -389,7 +389,7 @@ GFXDECODE_END
 
 static DRIVER_INIT( drw80pkr )
 {
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu"), 0x1000);
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu"), 0x1000);
 }
 
 
@@ -398,7 +398,7 @@ static DRIVER_INIT( drw80pkr )
 *************************/
 
 static ADDRESS_MAP_START( drw80pkr_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK(1)
+	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drw80pkr_io_map, ADDRESS_SPACE_IO, 8 )

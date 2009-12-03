@@ -137,15 +137,15 @@ static WRITE8_HANDLER( missb2_bg_bank_w )
 	// I don't know how this is really connected, bit 1 is always high afaik...
 	bank = ((data & 2) ? 1 : 0) | ((data & 1) ? 4 : 0);
 
-	memory_set_bank(space->machine, 2, bank);
-	memory_set_bank(space->machine, 3, bank);
+	memory_set_bank(space->machine, "bank2", bank);
+	memory_set_bank(space->machine, "bank3", bank);
 }
 
 /* Memory Maps */
 
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, videoram, videoram_size)
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, objectram, objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(1)
@@ -168,8 +168,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK(2)	// ROM data for the background palette ram
-	AM_RANGE(0xa000, 0xafff) AM_ROMBANK(3)	// ROM data for the background palette ram
+	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")	// ROM data for the background palette ram
+	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("bank3")	// ROM data for the background palette ram
 	AM_RANGE(0xb000, 0xb1ff) AM_ROM			// banked ???
 	AM_RANGE(0xc000, 0xc1ff) AM_RAM_WRITE(bg_paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_MEMBER(bublbobl_state, bg_paletteram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM			// main ???
@@ -468,11 +468,11 @@ static void configure_banks( running_machine* machine )
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	UINT8 *SLAVE = memory_region(machine, "slave");
 
-	memory_configure_bank(machine, 1, 0, 8, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 
 	/* 2009-11 FP: isn't there a way to configure both at once? */
-	memory_configure_bank(machine, 2, 0, 7, &SLAVE[0x8000], 0x1000);
-	memory_configure_bank(machine, 3, 0, 7, &SLAVE[0x9000], 0x1000);
+	memory_configure_bank(machine, "bank2", 0, 7, &SLAVE[0x8000], 0x1000);
+	memory_configure_bank(machine, "bank3", 0, 7, &SLAVE[0x9000], 0x1000);
 }
 
 static DRIVER_INIT( missb2 )

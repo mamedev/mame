@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( galivan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	// The next three entires need to be looked at.  It's ugly.
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd800, 0xdbff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE_MEMBER(galivan_state, videoram, videoram_size)
 	AM_RANGE(0xdc00, 0xdfff) AM_WRITE(galivan_colorram_w) AM_BASE_MEMBER(galivan_state, colorram)
 
@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( ninjemak_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	// The next three entires need to be looked at.  It's ugly.
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd800, 0xd81f) AM_WRITE(ninjemak_videoreg_w)
 	AM_RANGE(0xd800, 0xdbff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE_MEMBER(galivan_state, videoram, videoram_size)
 	AM_RANGE(0xdc00, 0xdfff) AM_WRITE(galivan_colorram_w) AM_BASE_MEMBER(galivan_state, colorram)
@@ -414,8 +414,8 @@ static MACHINE_START( galivan )
 
 	/* configure ROM banking */
 	UINT8 *rombase = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 2, &rombase[0x10000], 0x2000);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 2, &rombase[0x10000], 0x2000);
+	memory_set_bank(machine, "bank1", 0);
 
 	/* register for saving */
 	state_save_register_global_array(machine, state->scrollx);
@@ -431,8 +431,8 @@ static MACHINE_START( ninjemak )
 
 	/* configure ROM banking */
 	UINT8 *rombase = memory_region(machine, "maincpu");
-	memory_configure_bank(machine, 1, 0, 4, &rombase[0x10000], 0x2000);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 4, &rombase[0x10000], 0x2000);
+	memory_set_bank(machine, "bank1", 0);
 
 	/* register for saving */
 	state_save_register_global_array(machine, state->scrollx);
@@ -995,9 +995,9 @@ ROM_END
 static WRITE8_HANDLER( youmab_extra_bank_w )
 {
 	if (data == 0xff)
-		memory_set_bank(space->machine, 2, 1);
+		memory_set_bank(space->machine, "bank2", 1);
 	else if (data == 0x00)
-		memory_set_bank(space->machine, 2, 0);
+		memory_set_bank(space->machine, "bank2", 0);
 	else
 		printf("data %03x\n", data);
 }
@@ -1020,12 +1020,12 @@ static WRITE8_HANDLER( youmab_84_w )
 static DRIVER_INIT( youmab )
 {
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x82, 0x82, 0, 0, youmab_extra_bank_w); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, (read8_space_func)SMH_BANK(3));
-	memory_set_bankptr(machine,  3, memory_region(machine, "maincpu"));
+	memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, "bank3");
+	memory_set_bankptr(machine,  "bank3", memory_region(machine, "maincpu"));
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, (read8_space_func)SMH_BANK(2));
-	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "user2"), 0x4000);
-	memory_set_bank(machine, 2, 0);
+	memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank2");
+	memory_configure_bank(machine, "bank2", 0, 2, memory_region(machine, "user2"), 0x4000);
+	memory_set_bank(machine, "bank2", 0);
 
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x81, 0x81, 0, 0, youmab_81_w); // ?? often, alternating values
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x84, 0x84, 0, 0, youmab_84_w); // ?? often, sequence..

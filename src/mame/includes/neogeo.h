@@ -19,13 +19,13 @@
 #define NEOGEO_VSSTART						(0x000)
 #define NEOGEO_VBLANK_RELOAD_HPOS			(0x11f)
 
-#define NEOGEO_BANK_AUDIO_CPU_CART_BANK		(1)
+#define NEOGEO_BANK_AUDIO_CPU_CART_BANK		"audio_cart"
 /* do not use 2, 3 and 4 */
-#define NEOGEO_BANK_CARTRIDGE				(5)
-#define NEOGEO_BANK_BIOS					(6)
-#define NEOGEO_BANK_VECTORS					(7)
-#define NEOGEO_BANK_EXTRA_RAM				(8)
-#define NEOGEO_BANK_AUDIO_CPU_MAIN_BANK		(9)
+#define NEOGEO_BANK_CARTRIDGE				"cartridge"
+#define NEOGEO_BANK_BIOS					"bios"
+#define NEOGEO_BANK_VECTORS					"vectors"
+#define NEOGEO_BANK_EXTRA_RAM				"extra_ram"
+#define NEOGEO_BANK_AUDIO_CPU_MAIN_BANK		"audio_main"
 
 
 /*----------- defined in drivers/neogeo.c -----------*/

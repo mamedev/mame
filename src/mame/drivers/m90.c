@@ -56,7 +56,7 @@ static void set_m90_bank(running_machine *machine)
 	if (!rom)
 		popmessage("bankswitch with no banked ROM!");
 	else
-		memory_set_bankptr(machine, 1,rom + bankaddress);
+		memory_set_bankptr(machine, "bank1",rom + bankaddress);
 }
 
 /***************************************************************************/
@@ -92,7 +92,7 @@ static WRITE16_HANDLER( unknown_w )
 
 static ADDRESS_MAP_START( m90_main_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK(1)	/* Quiz F1 only */
+	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK("bank1")	/* Quiz F1 only */
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_BASE(&m90_video_data)
 	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)

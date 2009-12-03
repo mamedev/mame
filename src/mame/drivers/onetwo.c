@@ -69,7 +69,7 @@ static WRITE8_HANDLER( onetwo_cpubank_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "maincpu") + 0x10000;
 
-	memory_set_bankptr(space->machine, 1, &RAM[data * 0x4000]);
+	memory_set_bankptr(space->machine, "bank1", &RAM[data * 0x4000]);
 }
 
 static WRITE8_HANDLER( onetwo_coin_counters_w )
@@ -110,7 +110,7 @@ static WRITE8_HANDLER(palette2_w)
 
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x10000)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc800, 0xc87f) AM_RAM_WRITE(palette1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc900, 0xc97f) AM_RAM_WRITE(palette2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(onetwo_fgram_w) AM_BASE(&fgram)

@@ -428,8 +428,8 @@ static WRITE8_HANDLER( profpac_banksw_w )
 	profpac_bank = data;
 
 	/* set the main banking */
-	memory_install_read8_handler(space, 0x4000, 0xbfff, 0, 0, (read8_space_func)SMH_BANK(1));
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "user1") + 0x8000 * bank);
+	memory_install_read_bank_handler(space, 0x4000, 0xbfff, 0, 0, "bank1");
+	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "user1") + 0x8000 * bank);
 
 	/* bank 0 reads video RAM in the 4000-7FFF range */
 	if (bank == 0)
@@ -444,8 +444,8 @@ static WRITE8_HANDLER( profpac_banksw_w )
 		/* if the bank is in range, map the appropriate bank */
 		if (bank < 0x28)
 		{
-			memory_install_read8_handler(space, 0x4000, 0x7fff, 0, 0, (read8_space_func)SMH_BANK(2));
-			memory_set_bankptr(space->machine, 2, memory_region(space->machine, "user2") + 0x4000 * bank);
+			memory_install_read_bank_handler(space, 0x4000, 0x7fff, 0, 0, "bank2");
+			memory_set_bankptr(space->machine, "bank2", memory_region(space->machine, "user2") + 0x4000 * bank);
 		}
 		else
 			memory_install_read8_handler(space, 0x4000, 0x7fff, 0, 0, (read8_space_func)SMH_UNMAP);
@@ -629,7 +629,7 @@ static ADDRESS_MAP_START( profpac_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(profpac_videoram_r, profpac_videoram_w)
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
   	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(protected_ram_r, protected_ram_w) AM_BASE(&protected_ram)
   	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
@@ -641,7 +641,7 @@ static ADDRESS_MAP_START( demndrgn_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(profpac_videoram_r, profpac_videoram_w)
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
   	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xe800, 0xffff) AM_RAM

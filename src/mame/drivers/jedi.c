@@ -161,7 +161,7 @@ static MACHINE_START( jedi )
 	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 32, 0), 32);
 
 	/* configure the banks */
-	memory_configure_bank(machine, 1, 0, 3, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+	memory_configure_bank(machine, "bank1", 0, 3, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	/* set up save state */
 	state_save_register_global(machine, state->nvram_enabled);
@@ -194,9 +194,9 @@ static MACHINE_RESET( jedi )
 
 static WRITE8_HANDLER( rom_banksel_w )
 {
-	if (data & 0x01) memory_set_bank(space->machine, 1, 0);
-	if (data & 0x02) memory_set_bank(space->machine, 1, 1);
-	if (data & 0x04) memory_set_bank(space->machine, 1, 2);
+	if (data & 0x01) memory_set_bank(space->machine, "bank1", 0);
+	if (data & 0x02) memory_set_bank(space->machine, "bank1", 1);
+	if (data & 0x04) memory_set_bank(space->machine, "bank1", 2);
 }
 
 
@@ -296,7 +296,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3c00, 0x3c01) AM_MIRROR(0x00fe) AM_READWRITE(SMH_NOP, jedi_vscroll_w)
 	AM_RANGE(0x3d00, 0x3d01) AM_MIRROR(0x00fe) AM_READWRITE(SMH_NOP, jedi_hscroll_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x01ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(jedi_state, smoothing_table)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

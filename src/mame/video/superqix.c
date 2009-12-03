@@ -135,7 +135,7 @@ WRITE8_HANDLER( pbillian_0410_w )
 	coin_counter_w(space->machine, 0,data & 0x02);
 	coin_counter_w(space->machine, 1,data & 0x04);
 
-	memory_set_bank(space->machine, 1, (data & 0x08) >> 3);
+	memory_set_bank(space->machine, "bank1", (data & 0x08) >> 3);
 
 	interrupt_enable_w(space,0,data & 0x10);
 	flip_screen_set(space->machine, data & 0x20);
@@ -157,7 +157,7 @@ WRITE8_HANDLER( superqix_0410_w )
 	interrupt_enable_w(space,offset,data & 0x08);
 
 	/* bits 4-5 control ROM bank */
-	memory_set_bank(space->machine, 1, (data & 0x30) >> 4);
+	memory_set_bank(space->machine, "bank1", (data & 0x30) >> 4);
 }
 
 

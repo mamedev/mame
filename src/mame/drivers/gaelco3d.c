@@ -199,8 +199,8 @@ static MACHINE_RESET( common )
 	/* allocate a timer for feeding the autobuffer */
 	adsp_autobuffer_timer = timer_alloc(machine, adsp_autobuffer_irq, NULL);
 
-	memory_configure_bank(machine, 1, 0, 256, memory_region(machine, "user1"), 0x4000);
-	memory_set_bank(machine, 1, 0);
+	memory_configure_bank(machine, "bank1", 0, 256, memory_region(machine, "user1"), 0x4000);
+	memory_set_bank(machine, "bank1", 0);
 
 	/* keep the TMS32031 halted until the code is ready to go */
 	cputag_set_input_line(machine, "tms", INPUT_LINE_RESET, ASSERT_LINE);
@@ -557,7 +557,7 @@ static WRITE16_HANDLER( adsp_rombank_w )
 {
 	if (LOG)
 		logerror("adsp_rombank_w(%d) = %04X\n", offset, data);
-	memory_set_bank(space->machine, 1, (offset & 1) * 0x80 + (data & 0x7f));
+	memory_set_bank(space->machine, "bank1", (offset & 1) * 0x80 + (data & 0x7f));
 }
 
 
@@ -802,7 +802,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( adsp_data_map, ADDRESS_SPACE_DATA, 16 )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(adsp_rombank_w)
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK(1)
+	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x2000) AM_READWRITE(sound_data_r, sound_status_w)
 	AM_RANGE(0x3800, 0x39ff) AM_RAM	AM_BASE(&adsp_fastram_base)	/* 512 words internal RAM */
 	AM_RANGE(0x3fe0, 0x3fff) AM_WRITE(adsp_control_w) AM_BASE(&adsp_control_regs)

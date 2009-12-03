@@ -84,12 +84,12 @@ static void upscope_reset(running_machine *machine)
 static WRITE8_DEVICE_HANDLER( upscope_cia_0_porta_w )
 {
 	/* switch banks as appropriate */
-	memory_set_bank(device->machine, 1, data & 1);
+	memory_set_bank(device->machine, "bank1", data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write16_handler(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, (write16_space_func)SMH_BANK(1));
+		memory_install_write_bank_handler(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, "bank1");
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
@@ -236,7 +236,7 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK(1) AM_BASE(&amiga_chip_ram)	AM_SIZE(&amiga_chip_ram_size)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE(&amiga_chip_ram)	AM_SIZE(&amiga_chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
@@ -391,8 +391,8 @@ static DRIVER_INIT( upscope )
 	machine->generic.nvram.u8 = auto_alloc_array(machine, UINT8, machine->generic.nvram_size);
 
 	/* set up memory */
-	memory_configure_bank(machine, 1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, amiga_chip_ram, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
 }
 
 

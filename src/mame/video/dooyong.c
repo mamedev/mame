@@ -163,7 +163,7 @@ WRITE8_HANDLER( pollux_ctrl_w )
 WRITE8_HANDLER( primella_ctrl_w )
 {
 	/* bits 0-2 select ROM bank */
-	memory_set_bank(space->machine, 1, data & 0x07);
+	memory_set_bank(space->machine, "bank1", data & 0x07);
 
 	/* bit 3 disables tx layer */
 	tx_pri = data & 0x08;
