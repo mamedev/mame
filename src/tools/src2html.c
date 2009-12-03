@@ -528,7 +528,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
 		case FILE_TYPE_C:
 			color_quotes = TRUE;
 			comment_start = comment_start_esc = "/*";
-            comment_end = comment_end_esc = "*/";
+			comment_end = comment_end_esc = "*/";
 			comment_inline = comment_inline_esc = "//";
 			token_table = c_token_table;
 			break;

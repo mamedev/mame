@@ -68,7 +68,7 @@ static UINT8 modified[MAX_FILE_SIZE];
 int main(int argc, char *argv[])
 {
 	int removed_tabs = 0, removed_spaces = 0, fixed_mac_style = 0, fixed_nix_style = 0;
-	int src = 0, dst = 0, in_c_comment = FALSE, in_cpp_comment = FALSE;
+	int src = 0, dst = 0, in_c_comment = FALSE, in_cpp_comment = FALSE, in_c_string = FALSE;
 	int hichars = 0;
 	int is_c_file;
 	const char *ext;
@@ -109,18 +109,33 @@ int main(int argc, char *argv[])
 			hichars++;
 		}
 
-		/* track whether or not we are within a C-style comment */
-		if (is_c_file && !in_cpp_comment)
+		/* C-specific handling */
+		if (is_c_file)
 		{
-			if (!in_c_comment && ch == '/' && original[src] == '*')
-				in_c_comment = TRUE;
-			else if (in_c_comment && ch == '*' && original[src] == '/')
-				in_c_comment = FALSE;
-		}
+			/* check for string literals */
+			if (ch == '"' && !in_c_comment && !in_cpp_comment )
+			{
+				UINT8 lastch = (src > 1) ? original[src-2] : '\0';
 
-		/* track whether or not we are within a C++-style comment */
-		if (is_c_file && !in_c_comment && ch == '/' && original[src] == '/')
-			in_cpp_comment = TRUE;
+				if (in_c_string && lastch != '\\')
+					in_c_string = FALSE;
+				else if (!in_c_string && lastch != '\'')
+					in_c_string = TRUE;
+			}
+
+			if (!in_c_string && !in_cpp_comment)
+			{
+				/* track whether or not we are within a C-style comment */
+				if (!in_c_comment && ch == '/' && original[src] == '*')
+					in_c_comment = TRUE;
+				else if (in_c_comment && ch == '*' && original[src] == '/')
+					in_c_comment = FALSE;
+
+				/* track whether or not we are within a C++-style comment */
+				if (!in_c_comment && ch == '/' && original[src] == '/')
+					in_cpp_comment = TRUE;
+			}
+		}
 
 		/* if we hit a LF without a CR, back up and act like we hit a CR */
 		if (ch == 0x0a)
@@ -153,6 +168,12 @@ int main(int argc, char *argv[])
 
 			/* we are no longer in a C++-style comment */
 			in_cpp_comment = FALSE;
+
+			if (in_c_string)
+			{
+				printf("Error: unterminated string literal: %x\n", src);
+				return 1;
+			}
 		}
 
 		/* if we hit a tab... */
