@@ -2819,7 +2819,7 @@ V-V                           TP-027
 	DRIVER( qndream )	/* 26/06/1996 (c) 1996 (Japan) */
 	DRIVER( megaman2 )	/* 08/07/1996 (c) 1996 (US) */
 	DRIVER( megaman2a )	/* 08/07/1996 (c) 1996 (Asia) */
-	DRIVER( rckman2j )	/* 08/07/1996 (c) 1996 (Japan) */
+	DRIVER( rockman2j )	/* 08/07/1996 (c) 1996 (Japan) */
 	DRIVER( megaman2h )	/* 12/07/1996 (c) 1996 (Hispanic) */
 	DRIVER( gigamn2 )	/* bootleg */
 	DRIVER( sfz2al )	/* 26/08/1996 (c) 1996 (Asia) */

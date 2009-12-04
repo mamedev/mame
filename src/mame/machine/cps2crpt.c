@@ -863,7 +863,7 @@ static const struct game_keys keys_table[] =
 	{ "ddsomb",   { 0x7149a782,0xf3a5bfce }, 0x100000 },	// 0C81 1966 0419  cmpi.l  #$19660419,D1
 	{ "megaman2", { 0x50501cac,0xed346550 }, 0x100000 },	// 0C80 0164 7101  cmpi.l  #$01647101,D0
 	{ "megaman2a",{ 0x3f148a2b,0xd6790a15 }, 0x100000 },	// 0C80 0164 7101  cmpi.l  #$01647101,D0
-	{ "rckman2j", { 0x319eca73,0x10551270 }, 0x100000 },	// 0C80 0164 7101  cmpi.l  #$01647101,D0
+	{ "rockman2j",{ 0x319eca73,0x10551270 }, 0x100000 },	// 0C80 0164 7101  cmpi.l  #$01647101,D0
 	{ "megaman2h",{ 0x765573ca,0x250210d0 }, 0x100000 },	// 0C80 0164 7101  cmpi.l  #$01647101,D0
 	{ "qndream",  { 0x5804ea73,0xf66b0798 }, 0x080000 },	// 0C81 1973 0827  cmpi.l  #$19730827,D1
 	{ "sfa2",     { 0xfc4acf9c,0x3bfbe1f9 }, 0x100000 },	// 0C80 3039 9783  cmpi.l  #$30399783,D0
