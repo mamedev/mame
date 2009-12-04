@@ -193,7 +193,7 @@ Notes:
       R4543        : EPSON Real Time Clock Module (SOIC14)
       DSW(2)       : 2-Position DIP Switch (All OFF)
       N341256      : NKK N341256 32k x8 SRAM (x2, SOJ28)
-      H8/3002      : Sound CPU, Hitachi H8/3002 HD6413002F17 (QFP100), clocked at 14.7456MHz.
+      H8/3002      : Sound CPU, Hitachi H8/3002 HD6413002F17 (QFP100), clocked at 16.737MHz
       C416         : Namco custom C416 (QFP176)
       C352         : Namco custom C352 PCM sound chip (QFP100)
       MOT1         : PALCE 22V10H (PLCC28, labelled 'S12MOT1A')
@@ -1504,7 +1504,7 @@ static MACHINE_DRIVER_START( coh700 )
 	MDRV_CPU_PROGRAM_MAP( namcos12_map)
 	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
 
-	MDRV_CPU_ADD("sub", H83002, 14745600 )	/* verified 14.7456 MHz */
+	MDRV_CPU_ADD("sub", H83002, 16737350 )
 	MDRV_CPU_PROGRAM_MAP( s12h8rwmap)
 	MDRV_CPU_IO_MAP( s12h8iomap)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
@@ -1528,7 +1528,7 @@ static MACHINE_DRIVER_START( coh700 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c352", C352, 14745600)
+	MDRV_SOUND_ADD("c352", C352, 16737350)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
