@@ -56,6 +56,7 @@ SEGA CUSTOM IC :
 #include "sound/scsp.h"
 
 static UINT32* sysh1_workram_h,*h1_ioga,*framebuffer_vram;
+static UINT32* sysh1_txt_blit;
 
 /* video */
 
@@ -121,12 +122,28 @@ static READ32_HANDLER(sysh1_ioga_r)
 static WRITE32_HANDLER(sysh1_ioga_w)
 {
 	COMBINE_DATA(&h1_ioga[offset]);
+}
+
+
+/* this looks like an exotic I/O-based tilemap blitter, very unusual from Sega... */
+static WRITE32_HANDLER( sysh1_txt_blit_w )
+{
+	static UINT16 cmd,param;
+
+	COMBINE_DATA(&sysh1_txt_blit[offset]);
 
 	switch(offset)
 	{
-		case 0x14/4: //likely to be a serial port
-			/*  "THIS MACHINE IS STAND-ALONE." written here, amongst with non-ASCII chars. */
-			//printf("%c%c%c%c\n",(data >> 24) & 0xff,(data >> 16) & 0xff,(data >> 8) & 0xff,(data >> 0) & 0xff);
+		case 0x10/4: //cmd + param?
+			cmd = (sysh1_txt_blit[offset] & 0xffff0000) >> 16;
+			param = (sysh1_txt_blit[offset] & 0x0000ffff) >> 0;
+			break;
+		case 0x14/4: //data
+			/*  "THIS MACHINE IS STAND-ALONE." / disclaimer written with this CMD */
+			if((cmd & 0xff) == 0xf4)
+				printf("PARAM = %04x | %c%c%c%c\n",param,(data >> 24) & 0xff,(data >> 16) & 0xff,(data >> 8) & 0xff,(data >> 0) & 0xff);
+			else
+				printf("CMD = %04x PARAM = %04x DATA = %08x\n",cmd,param,data);
 			break;
 	}
 }
@@ -197,8 +214,8 @@ static WRITE32_HANDLER( sysh1_dma_w )
 
 	if(offset*4 >= 0x6c0 && offset*4 <= 0x6df)
 	{
-		if(!(offset*4 == 0x6c0 && data == 0))
-			printf("%08x -> [%04x]\n",framebuffer_vram[offset],(offset*4));
+		//if(!(offset*4 == 0x6c0 && data == 0))
+		//	printf("%08x -> [%04x]\n",framebuffer_vram[offset],(offset*4));
 	}
 
 	if(offset*4 == 0x6d8)
@@ -229,7 +246,7 @@ static ADDRESS_MAP_START( system_h1_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE(3) /*Communication area RAM*/
 	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM_WRITE(coolridr_pal_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE(sysh1_ioga_r,sysh1_ioga_w) AM_BASE(&h1_ioga) /*input area?*/
+	AM_RANGE(0x04000000, 0x0400003f) AM_RAM_WRITE(sysh1_txt_blit_w) AM_BASE(&sysh1_txt_blit)
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE(&sysh1_workram_h)
 	AM_RANGE(0x20000000, 0x200fffff) AM_ROM AM_SHARE(1)
 
