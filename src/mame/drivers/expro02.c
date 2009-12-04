@@ -647,6 +647,45 @@ ROM_START( galsnewj ) /* EXPRO-02 PCB */
 	ROM_LOAD( "pm007j.u47", 0xc0000, 0x80000, CRC(06780287) SHA1(8b9b57f6604b86d6dff42e5e51cd59a7111e1e79) )
 ROM_END
 
+ROM_START( galsnewk ) /* EXPRO-02 PCB */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 code */
+	ROM_LOAD16_BYTE( "pm110k.u87", 0x000000, 0x20000, CRC(babe6a71) SHA1(91a5fc5e93affd01f8c6d5a4851233edcf8746f0) ) 
+	ROM_LOAD16_BYTE( "pm109k.u88", 0x000001, 0x20000, CRC(e486d98f) SHA1(9923f1dc69bd2746c06da6a5e518211391052259) )
+
+	ROM_REGION16_BE( 0x300000, "user1", 0 )	/* 68000 data */
+	ROM_LOAD16_BYTE( "pm004k.u86", 0x000001, 0x80000, CRC(9a14c8a3) SHA1(c3992eceb8d7d65f781b31dc77bebc73cf9303b6) )
+	ROM_LOAD16_BYTE( "pm005k.u85", 0x000000, 0x80000, CRC(33b5d0e3) SHA1(88eef6aff8054b07173da3bb1383fb47a1f7980c) )
+	ROM_LOAD16_BYTE( "pm000e.u74", 0x100001, 0x80000, CRC(5d220f3f) SHA1(7ff373e01027c8832712f7a2d732f8e49b875878) )
+	ROM_LOAD16_BYTE( "pm001e.u73", 0x100000, 0x80000, CRC(90433eb1) SHA1(8688a85747ad9ecac395d782f130baa64fb9d12b) )
+	ROM_LOAD16_BYTE( "pm002e.u76", 0x200001, 0x80000, CRC(713ee898) SHA1(c9f608a57fb90e5ee15eb76a74a7afcc406d5b4e) )
+	ROM_LOAD16_BYTE( "pm003e.u75", 0x200000, 0x80000, CRC(6bb060fd) SHA1(4fc3946866c5a55e8340b62b5ad9beae723ce0da) )
+
+	ROM_REGION16_BE( 0x80000, "user2", 0 )	/* contains real (non-cartoon) women, used after each 3rd round */
+	ROM_LOAD16_WORD_SWAP( "pm017k.u84", 0x00000, 0x80000, CRC(0c656fb5) SHA1(4610800a460c9f50f7a2ee7b2984bf8e79b62124) )
+
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASEFF )	/* sprites */
+	/* the 06e rom from the other type gals panic board ends up split across 2 roms here */
+	ROM_LOAD( "pm006e.u83",        0x000000, 0x080000, CRC(a7555d9a) SHA1(f95821b3358d9ab03ca9ead38fd358062259d89d) )
+	ROM_LOAD( "pm206e.u82",        0x080000, 0x080000, CRC(cc978baa) SHA1(59a95bcbaeca9d356f61ea42af4da116afbb1491) )
+	ROM_LOAD( "pm018e.u94",        0x100000, 0x080000, CRC(f542d708) SHA1(f515cca9e96401303ed45b4372f6079f29b7a999) )
+	ROM_LOAD( "pm19k.u93",         0x180000, 0x010000, CRC(c17d2989) SHA1(895f44a58dcf0065d42125d439dcc10f41563a94) ) // ?? seems to be an extra / replacement enemy?, not sure where it maps, or when it's used, it might load over another rom
+
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_ERASEFF )	/* sprites */
+
+	ROM_REGION( 0x200000, "gfx3", 0 )	/* sprites - encrypted */
+	ROM_LOAD( "pm013e.u89", 0x000000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
+	ROM_LOAD( "pm014e.u90", 0x080000, 0x080000, CRC(2f367106) SHA1(1cd16e286e77e8e1b7668bbb6f2978101656b720) )
+	ROM_LOAD( "pm015e.u91", 0x100000, 0x080000, CRC(a563f8ef) SHA1(6e4171746e4d401992bf3a7619d5bed0063d57e5) )
+	ROM_LOAD( "pm016e.u92", 0x180000, 0x080000, CRC(c0b9494c) SHA1(f0b066dd78eb9fcf947da90ddb6c7b62299c5743) )
+
+
+	ROM_REGION( 0x140000, "oki", 0 )	/* OKIM6295 samples */
+	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "pm008k.u46", 0x00000, 0x80000, CRC(7498483f) SHA1(d1f7461c8d1469704cc34460d7283f0a914afc29) )
+	ROM_RELOAD(             0x40000, 0x80000 )
+	ROM_LOAD( "pm007k.u47", 0xc0000, 0x80000, CRC(a8dc1fd5) SHA1(c324f7eab7302e4a71d505c915ab2ad591b8ff33) )
+ROM_END
+
 
 ROM_START( fantasia )
 	ROM_REGION( 0x500000, "maincpu", 0 )	/* 68000 code */
@@ -725,5 +764,6 @@ static DRIVER_INIT(galsnew)
 GAME( 1990, galsnew,  0,       galsnew, galsnew,  galsnew, ROT90, "Kaneko", "Gals Panic (US, EXPRO-02 PCB)", 0 )
 GAME( 1990, galsnewa, galsnew, galsnew, galsnewa, galsnew, ROT90, "Kaneko", "Gals Panic (Export, EXPRO-02 PCB)", 0 )
 GAME( 1990, galsnewj, galsnew, galsnew, galsnewj, galsnew, ROT90, "Kaneko (Taito license)", "Gals Panic (Japan, EXPRO-02 PCB)", 0 )
+GAME( 1990, galsnewk, galsnew, galsnew, galsnewj, galsnew, ROT90, "Kaneko (Inter license)", "Gals Panic (Korea, EXPRO-02 PCB)", 0 )
 
 GAME( 1994, fantasia, 0,       fantasia,fantasia, galsnew, ROT90, "Comad & New Japan System", "Fantasia", GAME_NO_COCKTAIL )

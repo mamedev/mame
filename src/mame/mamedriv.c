@@ -7520,6 +7520,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( galsnew )	/* (c) 1990 Kaneko */
 	DRIVER( galsnewa )	/* (c) 1990 Kaneko */
 	DRIVER( galsnewj )	/* (c) 1990 Kaneko */
+	DRIVER( galsnewk )	/* (c) 1990 Kaneko */
 	DRIVER( galpani2 )	/* (c) 1993 Kaneko */
 	DRIVER( galpani2g )	/* (c) 1993 Kaneko */
 	DRIVER( galpani2t )	/* (c) 1993 Kaneko */
