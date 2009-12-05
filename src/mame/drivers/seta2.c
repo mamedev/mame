@@ -986,9 +986,9 @@ static ADDRESS_MAP_START( funcube_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE( 0x00200000, 0x0020ffff ) AM_RAM
 
 	AM_RANGE( 0x00500000, 0x00500003 ) AM_READ( funcube_debug_r )
-	AM_RANGE( 0x00500004, 0x00500007 ) AM_READWRITE( watchdog_reset32_r, SMH_NOP )
+	AM_RANGE( 0x00500004, 0x00500007 ) AM_READ( watchdog_reset32_r ) AM_WRITENOP
 
-	AM_RANGE( 0x00600000, 0x00600003 ) AM_WRITE( SMH_NOP )	// sound chip
+	AM_RANGE( 0x00600000, 0x00600003 ) AM_WRITENOP	// sound chip
 
 	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE( spriteram32_dword_r,  spriteram32_dword_w  ) AM_BASE_GENERIC(spriteram) AM_SIZE_GENERIC(spriteram)
 	AM_RANGE( 0x00840000, 0x0084ffff ) AM_READWRITE( paletteram32_dword_r, paletteram32_dword_w ) AM_BASE_GENERIC(paletteram)

@@ -943,7 +943,7 @@ static ADDRESS_MAP_START( urashima, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(urashima_sc2_vram_w) AM_BASE(&sc2_vram)/*unused*/
 	/*$9c000-$9cfff Video Registers*/
 /**/AM_RANGE(0x09c000, 0x09dfff) AM_WRITE(urashima_vregs_w)
-/**///AM_RANGE(0x09c480, 0x09c49f) AM_READ(SMH_RAM) AM_WRITE(urashima_sc2vregs_w)
+/**///AM_RANGE(0x09c480, 0x09c49f) AM_RAM_WRITE(urashima_sc2vregs_w)
 	AM_RANGE(0x09e000, 0x0a1fff) AM_RAM_WRITE(urashima_sc3_vram_w) AM_BASE(&sc3_vram)
 	AM_RANGE(0x0f0000, 0x0f0fff) AM_RAM AM_BASE(&jm_shared_ram)/*shared with MCU*/
 	AM_RANGE(0x0f1000, 0x0fffff) AM_RAM /*Work Ram*/

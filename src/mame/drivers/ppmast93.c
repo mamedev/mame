@@ -164,7 +164,7 @@ static WRITE8_HANDLER( ppmast93_port4_w )
 }
 
 static ADDRESS_MAP_START( ppmast93_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM) AM_WRITENOP AM_REGION("maincpu", 0x10000)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ppmast93_bgram_w) AM_BASE(&ppmast93_bgram) AM_SHARE(1)
 	AM_RANGE(0xd800, 0xdfff) AM_WRITENOP
@@ -203,7 +203,7 @@ static WRITE8_HANDLER(ppmast_sound_w)
 }
 
 static ADDRESS_MAP_START( ppmast93_cpu2_io, ADDRESS_SPACE_IO, 8 )
-	  AM_RANGE(0x0000, 0xffff) AM_READ(SMH_ROM) AM_WRITE(ppmast_sound_w) AM_REGION("sub", 0x20000)
+	  AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITE(ppmast_sound_w) AM_REGION("sub", 0x20000)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ppmast93 )

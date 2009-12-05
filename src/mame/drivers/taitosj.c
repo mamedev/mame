@@ -211,8 +211,8 @@ static ADDRESS_MAP_START( taitosj_main_nomcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd05f) AM_RAM AM_BASE(&taitosj_colscrolly)
 	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE(&taitosj_spriteram)
 	AM_RANGE(0xd200, 0xd27f) AM_MIRROR(0x0080) AM_RAM AM_BASE(&taitosj_paletteram)
-	AM_RANGE(0xd300, 0xd300) AM_MIRROR(0x00ff) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_video_priority)
-	AM_RANGE(0xd400, 0xd403) AM_MIRROR(0x00f0) AM_READ(SMH_RAM) AM_BASE(&taitosj_collision_reg)
+	AM_RANGE(0xd300, 0xd300) AM_MIRROR(0x00ff) AM_WRITEONLY AM_BASE(&taitosj_video_priority)
+	AM_RANGE(0xd400, 0xd403) AM_MIRROR(0x00f0) AM_READONLY AM_BASE(&taitosj_collision_reg)
 	AM_RANGE(0xd404, 0xd404) AM_MIRROR(0x00f3) AM_READ(taitosj_gfxrom_r)
 	AM_RANGE(0xd408, 0xd408) AM_MIRROR(0x00f0) AM_READ_PORT("IN0")
 	AM_RANGE(0xd409, 0xd409) AM_MIRROR(0x00f0) AM_READ_PORT("IN1")
@@ -222,15 +222,15 @@ static ADDRESS_MAP_START( taitosj_main_nomcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ_PORT("IN4")
 	AM_RANGE(0xd40e, 0xd40f) AM_MIRROR(0x00f0) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_DEVREAD("ay1", ay8910_r)	/* DSW2 and DSW3 */
-	AM_RANGE(0xd500, 0xd505) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_scroll)
-	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_colorbank)
+	AM_RANGE(0xd500, 0xd505) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE(&taitosj_scroll)
+	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE(&taitosj_colorbank)
 	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE(taitosj_collision_reg_clear_w)
-	AM_RANGE(0xd509, 0xd50a) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_gfxpointer)
+	AM_RANGE(0xd509, 0xd50a) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE(&taitosj_gfxpointer)
 	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(taitosj_soundcommand_w)
-	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) /*watchdog_reset_w*/  /* Bio Attack sometimes resets after you die */
+	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_WRITEONLY /*watchdog_reset_w*/  /* Bio Attack sometimes resets after you die */
 	AM_RANGE(0xd50e, 0xd50e) AM_MIRROR(0x00f0) AM_WRITE(taitosj_bankswitch_w)
 	AM_RANGE(0xd50f, 0xd50f) AM_MIRROR(0x00f0) AM_WRITENOP
-	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x00ff) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_video_mode)
+	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x00ff) AM_WRITEONLY AM_BASE(&taitosj_video_mode)
 	AM_RANGE(0xd700, 0xdfff) AM_NOP
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -251,8 +251,8 @@ static ADDRESS_MAP_START( taitosj_main_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd05f) AM_RAM AM_BASE(&taitosj_colscrolly)
 	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE(&taitosj_spriteram)
 	AM_RANGE(0xd200, 0xd27f) AM_MIRROR(0x0080) AM_RAM AM_BASE(&taitosj_paletteram)
-	AM_RANGE(0xd300, 0xd300) AM_MIRROR(0x00ff) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_video_priority)
-	AM_RANGE(0xd400, 0xd403) AM_MIRROR(0x00f0) AM_READ(SMH_RAM) AM_BASE(&taitosj_collision_reg)
+	AM_RANGE(0xd300, 0xd300) AM_MIRROR(0x00ff) AM_WRITEONLY AM_BASE(&taitosj_video_priority)
+	AM_RANGE(0xd400, 0xd403) AM_MIRROR(0x00f0) AM_READONLY AM_BASE(&taitosj_collision_reg)
 	AM_RANGE(0xd404, 0xd404) AM_MIRROR(0x00f3) AM_READ(taitosj_gfxrom_r)
 	AM_RANGE(0xd408, 0xd408) AM_MIRROR(0x00f0) AM_READ_PORT("IN0")
 	AM_RANGE(0xd409, 0xd409) AM_MIRROR(0x00f0) AM_READ_PORT("IN1")
@@ -262,15 +262,15 @@ static ADDRESS_MAP_START( taitosj_main_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ_PORT("IN4")
 	AM_RANGE(0xd40e, 0xd40f) AM_MIRROR(0x00f0) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_DEVREAD("ay1", ay8910_r)	/* DSW2 and DSW3 */
-	AM_RANGE(0xd500, 0xd505) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_scroll)
-	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_colorbank)
+	AM_RANGE(0xd500, 0xd505) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE(&taitosj_scroll)
+	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE(&taitosj_colorbank)
 	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE(taitosj_collision_reg_clear_w)
-	AM_RANGE(0xd509, 0xd50a) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_gfxpointer)
+	AM_RANGE(0xd509, 0xd50a) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE(&taitosj_gfxpointer)
 	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(taitosj_soundcommand_w)
-	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) /*watchdog_reset_w*/  /* Bio Attack sometimes resets after you die */
+	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_WRITEONLY /*watchdog_reset_w*/  /* Bio Attack sometimes resets after you die */
 	AM_RANGE(0xd50e, 0xd50e) AM_MIRROR(0x00f0) AM_WRITE(taitosj_bankswitch_w)
 	AM_RANGE(0xd50f, 0xd50f) AM_MIRROR(0x00f0) AM_WRITENOP
-	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x00ff) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_video_mode)
+	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x00ff) AM_WRITEONLY AM_BASE(&taitosj_video_mode)
 	AM_RANGE(0xd700, 0xdfff) AM_NOP
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -306,19 +306,19 @@ static ADDRESS_MAP_START( kikstart_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_READWRITE(taitosj_mcu_data_r, taitosj_mcu_data_w)
 	AM_RANGE(0x8801, 0x8801) AM_READ(taitosj_mcu_status_r)
-	AM_RANGE(0x8802, 0x8802) AM_READWRITE(SMH_NOP, SMH_NOP)
-	AM_RANGE(0x8a00, 0x8a5f) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_colscrolly)
+	AM_RANGE(0x8802, 0x8802) AM_NOP
+	AM_RANGE(0x8a00, 0x8a5f) AM_WRITEONLY AM_BASE(&taitosj_colscrolly)
 	AM_RANGE(0x9000, 0xbfff) AM_WRITE(taitosj_characterram_w) AM_BASE(&taitosj_characterram)
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE(&taitosj_videoram_1)
 	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_BASE(&taitosj_videoram_2)
 	AM_RANGE(0xcc00, 0xcfff) AM_RAM AM_BASE(&taitosj_videoram_3)
-	AM_RANGE(0xd000, 0xd001) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_colorbank)
-	AM_RANGE(0xd002, 0xd007) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_scroll)
+	AM_RANGE(0xd000, 0xd001) AM_WRITEONLY AM_BASE(&taitosj_colorbank)
+	AM_RANGE(0xd002, 0xd007) AM_WRITEONLY AM_BASE(&taitosj_scroll)
 	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE(&taitosj_spriteram)
 	AM_RANGE(0xd200, 0xd27f) AM_RAM AM_BASE(&taitosj_paletteram)
-	AM_RANGE(0xd300, 0xd300) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_video_priority)
-	AM_RANGE(0xd400, 0xd403) AM_READ(SMH_RAM) AM_BASE(&taitosj_collision_reg)
+	AM_RANGE(0xd300, 0xd300) AM_WRITEONLY AM_BASE(&taitosj_video_priority)
+	AM_RANGE(0xd400, 0xd403) AM_READONLY AM_BASE(&taitosj_collision_reg)
 	AM_RANGE(0xd404, 0xd404) AM_READ(taitosj_gfxrom_r)
 	AM_RANGE(0xd408, 0xd408) AM_MIRROR(0x00f0) AM_READ_PORT("IN0")
 	AM_RANGE(0xd409, 0xd409) AM_MIRROR(0x00f0) AM_READ_PORT("IN1")
@@ -329,11 +329,11 @@ static ADDRESS_MAP_START( kikstart_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd40e, 0xd40f) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0xd40f, 0xd40f) AM_DEVREAD("ay1", ay8910_r)	/* DSW2 and DSW3 */
 	AM_RANGE(0xd508, 0xd508) AM_WRITE(taitosj_collision_reg_clear_w)
-	AM_RANGE(0xd509, 0xd50a) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_gfxpointer)
+	AM_RANGE(0xd509, 0xd50a) AM_WRITEONLY AM_BASE(&taitosj_gfxpointer)
 	AM_RANGE(0xd50b, 0xd50b) AM_WRITE(taitosj_soundcommand_w)
 	AM_RANGE(0xd50d, 0xd50d) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd50e, 0xd50e) AM_WRITE(taitosj_bankswitch_w)
-	AM_RANGE(0xd600, 0xd600) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_video_mode)
+	AM_RANGE(0xd600, 0xd600) AM_WRITEONLY AM_BASE(&taitosj_video_mode)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE(&kikstart_scrollram)// scroll ram + ???
 	AM_RANGE(0xe000, 0xefff) AM_ROM
 ADDRESS_MAP_END

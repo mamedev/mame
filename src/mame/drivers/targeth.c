@@ -71,12 +71,12 @@ static WRITE16_HANDLER( targeth_coin_counter_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(targeth_vram_w) AM_BASE(&targeth_videoram)	/* Video RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITE(SMH_RAM) AM_BASE(&targeth_vregs)	/* Video Registers */
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE(&targeth_vregs)	/* Video Registers */
 	AM_RANGE(0x108000, 0x108001) AM_READ_PORT("GUNX1")
 	AM_RANGE(0x108002, 0x108003) AM_READ_PORT("GUNY1")
 	AM_RANGE(0x108004, 0x108005) AM_READ_PORT("GUNX2")
 	AM_RANGE(0x108006, 0x108007) AM_READ_PORT("GUNY2")
-	AM_RANGE(0x108000, 0x108007) AM_WRITE(SMH_RAM) AM_BASE(&targeth_vregs)	/* Video Registers */
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE(&targeth_vregs)	/* Video Registers */
 	AM_RANGE(0x10800c, 0x10800d) AM_WRITENOP					/* CLR Video INT */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&targeth_spriteram)	/* Sprite RAM */

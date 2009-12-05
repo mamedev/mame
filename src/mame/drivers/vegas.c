@@ -310,6 +310,8 @@
 
 #define MAX_DYNAMIC_ADDRESSES	32
 
+#define NOP_HANDLER			((read32_space_func)-1)
+
 
 
 /*************************************
@@ -1557,7 +1559,7 @@ static void remap_dynamic_addresses(running_machine *machine)
 
 	/* unmap everything we know about */
 	for (addr = 0; addr < dynamic_count; addr++)
-		memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, (read32_space_func)SMH_UNMAP, (write32_space_func)SMH_UNMAP);
+		memory_unmap_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0);
 
 	/* the build the list of stuff */
 	dynamic_count = 0;
@@ -1571,7 +1573,7 @@ static void remap_dynamic_addresses(running_machine *machine)
 		add_dynamic_address(base + 0x2000, base + 0x2003, sio_irq_cause_r, NULL);
 		add_dynamic_address(base + 0x3000, base + 0x3003, sio_irq_status_r, NULL);
 		add_dynamic_address(base + 0x4000, base + 0x4003, sio_led_r, sio_led_w);
-		add_dynamic_address(base + 0x5000, base + 0x5007, (read32_space_func)SMH_NOP, NULL);
+		add_dynamic_address(base + 0x5000, base + 0x5007, NOP_HANDLER, NULL);
 		add_dynamic_address(base + 0x6000, base + 0x6003, NULL, cmos_unlock_w);
 		add_dynamic_address(base + 0x7000, base + 0x7003, NULL, vegas_watchdog_w);
 	}
@@ -1676,8 +1678,14 @@ static void remap_dynamic_addresses(running_machine *machine)
 	for (addr = 0; addr < dynamic_count; addr++)
 	{
 		if (LOG_DYNAMIC) logerror("  installing: %08X-%08X %s,%s\n", dynamic[addr].start, dynamic[addr].end, dynamic[addr].rdname, dynamic[addr].wrname);
-		if (dynamic[addr].mread != NULL || dynamic[addr].mwrite != NULL)
-			_memory_install_handler32(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].mread, dynamic[addr].mwrite, dynamic[addr].rdname, dynamic[addr].wrname);
+
+		if (dynamic[addr].mread == NOP_HANDLER)
+			memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0);
+		else if (dynamic[addr].mread != NULL)
+			_memory_install_handler32(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].mread, NULL, dynamic[addr].rdname, NULL);
+		if (dynamic[addr].mwrite != NULL)
+			_memory_install_handler32(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, NULL, dynamic[addr].mwrite, NULL, dynamic[addr].wrname);
+
 		if (dynamic[addr].dread != NULL || dynamic[addr].dwrite != NULL)
 			_memory_install_device_handler32(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].device, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].dread, dynamic[addr].dwrite, dynamic[addr].rdname, dynamic[addr].wrname);
 	}

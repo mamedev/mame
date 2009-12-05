@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( main_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc0e0, 0xc0e0) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("DSW3") AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc180, 0xc180) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0xc185, 0xc185) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(gyruss_state, flipscreen)
+	AM_RANGE(0xc185, 0xc185) AM_WRITEONLY AM_BASE_MEMBER(gyruss_state, flipscreen)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )

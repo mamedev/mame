@@ -2145,7 +2145,7 @@ static DRIVER_INIT( lethalth )
 	m92_irq_vectorbase = 0x20;
 
 	/* NOP out the bankswitcher */
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x20, 0x21, 0, 0, (write16_space_func)SMH_NOP);
+	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x20, 0x21, 0, 0);
 }
 
 static DRIVER_INIT( nbbatman )

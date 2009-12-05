@@ -389,19 +389,19 @@ static ADDRESS_MAP_START( nndmseal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(nndmseal_coincounter_w)	// Coin Counter
 	AM_RANGE(0xb20000, 0xb20001) AM_WRITE(nndmseal_b20000_w)		// ???
 
-	AM_RANGE(0xb40000, 0xb4000b) AM_WRITE(SMH_RAM) AM_BASE(&tetrisp2_scroll_fg	)	// Foreground Scrolling
-	AM_RANGE(0xb40010, 0xb4001b) AM_WRITE(SMH_RAM) AM_BASE(&tetrisp2_scroll_bg	)	// Background Scrolling
+	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_BASE(&tetrisp2_scroll_fg	)	// Foreground Scrolling
+	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_BASE(&tetrisp2_scroll_bg	)	// Background Scrolling
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP	// scr_size
 
-	AM_RANGE(0xb60000, 0xb6002f) AM_WRITE(SMH_RAM) AM_BASE(&tetrisp2_rotregs)	// Rotation Registers
+	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_BASE(&tetrisp2_rotregs)	// Rotation Registers
 
 	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(nndmseal_sound_bank_w)
 
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w	)	// system param
-	AM_RANGE(0xba001a, 0xba001b) AM_WRITE(SMH_NOP				)	// Lev 4 irq ack
-	AM_RANGE(0xba001e, 0xba001f) AM_WRITE(SMH_NOP				)	// Lev 2 irq ack
+	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP	// Lev 4 irq ack
+	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP	// Lev 2 irq ack
 
-	AM_RANGE(0xbe0000, 0xbe0001) AM_READ     (SMH_NOP			)	// INT-level1 dummy read
+	AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP	// INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("BUTTONS"			)	// Inputs
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_PORT("COINS"			)	// ""
 	AM_RANGE(0xbe0006, 0xbe0007) AM_READ_PORT("PRINT"			)	// ""
@@ -464,10 +464,10 @@ static ADDRESS_MAP_START( rockn2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa48000, 0xa48001) AM_WRITENOP													// YMZ280 Reset
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(tetrisp2_coincounter_w)								// Coin Counter
 	AM_RANGE(0xb20000, 0xb20001) AM_WRITENOP													// ???
-	AM_RANGE(0xb40000, 0xb4000b) AM_WRITE(SMH_RAM) AM_BASE(&tetrisp2_scroll_fg)					// Foreground Scrolling
-	AM_RANGE(0xb40010, 0xb4001b) AM_WRITE(SMH_RAM) AM_BASE(&tetrisp2_scroll_bg)					// Background Scrolling
+	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_BASE(&tetrisp2_scroll_fg)					// Foreground Scrolling
+	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_BASE(&tetrisp2_scroll_bg)					// Background Scrolling
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP													// scr_size
-	AM_RANGE(0xb60000, 0xb6002f) AM_WRITE(SMH_RAM) AM_BASE(&tetrisp2_rotregs)					// Rotation Registers
+	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_BASE(&tetrisp2_rotregs)					// Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w)									// system param
 	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP													// Lev 4 irq ack
 	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP													// Lev 2 irq ack

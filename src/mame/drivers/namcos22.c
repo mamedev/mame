@@ -1807,12 +1807,12 @@ static WRITE16_HANDLER( master_render_device_w )
 }
 
 static ADDRESS_MAP_START( master_dsp_program, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM) /* internal ROM (4k words) */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_ROM) AM_BASE(&mpMasterExternalRAM)
+	AM_RANGE(0x0000, 0x0fff) AM_ROM /* internal ROM (4k words) */
+	AM_RANGE(0x4000, 0x7fff) AM_ROM AM_BASE(&mpMasterExternalRAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_dsp_data, ADDRESS_SPACE_DATA, 16 )
-	AM_RANGE(0x1000, 0x3fff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x1000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_READ(master_external_ram_r) AM_WRITE(master_external_ram_w)
 	AM_RANGE(0x8000, 0xffff) AM_READ(namcos22_dspram16_r) AM_WRITE(namcos22_dspram16_w)
 ADDRESS_MAP_END
@@ -1900,8 +1900,8 @@ static WRITE16_HANDLER( dsp_slave_portb_w )
 }
 
 static ADDRESS_MAP_START( slave_dsp_program, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM) /* internal ROM */
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_ROM) AM_BASE(&mpSlaveExternalRAM)
+	AM_RANGE(0x0000, 0x0fff) AM_ROM /* internal ROM */
+	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_BASE(&mpSlaveExternalRAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_dsp_data, ADDRESS_SPACE_DATA, 16 )
@@ -2450,7 +2450,7 @@ static ADDRESS_MAP_START( namcos22s_am, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x824000, 0x8243ff) AM_READ(namcos22_gamma_r) AM_WRITE(namcos22_gamma_w) AM_BASE(&namcos22_gamma)
 	AM_RANGE(0x828000, 0x83ffff) AM_READ(namcos22_paletteram_r) AM_WRITE(namcos22_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x860000, 0x860007) AM_READ(spotram_r) AM_WRITE(spotram_w)
-	AM_RANGE(0x880000, 0x89dfff) AM_READ(SMH_RAM) AM_WRITE(namcos22_cgram_w) AM_BASE(&namcos22_cgram)
+	AM_RANGE(0x880000, 0x89dfff) AM_RAM_WRITE(namcos22_cgram_w) AM_BASE(&namcos22_cgram)
 	AM_RANGE(0x89e000, 0x89ffff) AM_READ(namcos22_textram_r) AM_WRITE(namcos22_textram_w) AM_BASE(&namcos22_textram)
 	AM_RANGE(0x8a0000, 0x8a000f) AM_RAM AM_BASE(&namcos22_tilemapattr)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE(&namcos22_vics_data)
@@ -2982,7 +2982,7 @@ static ADDRESS_MAP_START( namcos22_am, ADDRESS_SPACE_PROGRAM, 32 )
      *     2002000c  2  R/W RX FIFO Pointer (0x0000 - 0x0fff)
      *     2002000e  2  W   TX FIFO Pointer (0x0000 - 0x1fff)
      */
-	AM_RANGE(0x20020000, 0x2002000f) AM_READ(namcos22_C139_SCI_r) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x20020000, 0x2002000f) AM_READ(namcos22_C139_SCI_r) AM_WRITEONLY
 
 	/**
      * System Controller: Interrupt Control, Peripheral Control
@@ -3144,7 +3144,7 @@ static ADDRESS_MAP_START( namcos22_am, ADDRESS_SPACE_PROGRAM, 32 )
      * Mounted position: VIDEO 6B, 7B, 8B (near C305)
      * Note: 0xff00-0xffff are for Tilemap (16 x 16)
      */
-	AM_RANGE(0x90028000, 0x9003ffff) AM_READ(SMH_RAM) AM_WRITE(namcos22_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x90028000, 0x9003ffff) AM_RAM_WRITE(namcos22_paletteram_w) AM_BASE_GENERIC(paletteram)
 
 	/**
      * unknown (option)
@@ -3155,7 +3155,7 @@ static ADDRESS_MAP_START( namcos22_am, ADDRESS_SPACE_PROGRAM, 32 )
 	/**
      * Tilemap PCG Memory
      */
-	AM_RANGE(0x90080000, 0x9009dfff) AM_READ(SMH_RAM) AM_WRITE(namcos22_cgram_w) AM_BASE(&namcos22_cgram)
+	AM_RANGE(0x90080000, 0x9009dfff) AM_RAM_WRITE(namcos22_cgram_w) AM_BASE(&namcos22_cgram)
 
 	/**
      * Tilemap Memory (64 x 64)
@@ -3163,7 +3163,7 @@ static ADDRESS_MAP_START( namcos22_am, ADDRESS_SPACE_PROGRAM, 32 )
      * Known chip type: HM511664 (64k x 16bit SRAM)
      * Note: Self test: 90084000 - 9009ffff
      */
-	AM_RANGE(0x9009e000, 0x9009ffff) AM_READ(SMH_RAM) AM_WRITE(namcos22_textram_w) AM_BASE(&namcos22_textram)
+	AM_RANGE(0x9009e000, 0x9009ffff) AM_RAM_WRITE(namcos22_textram_w) AM_BASE(&namcos22_textram)
 
 	/**
      * Tilemap Register

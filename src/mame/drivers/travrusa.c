@@ -57,7 +57,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(travrusa_videoram_w) AM_BASE_MEMBER(irem_z80_state, videoram)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(travrusa_scroll_x_low_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(travrusa_scroll_x_high_w)
-	AM_RANGE(0xc800, 0xc9ff) AM_WRITE(SMH_RAM) AM_BASE_SIZE_MEMBER(irem_z80_state, spriteram, spriteram_size)
+	AM_RANGE(0xc800, 0xc9ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(irem_z80_state, spriteram, spriteram_size)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(irem_sound_cmd_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(travrusa_flipscreen_w)	/* + coin counters - not written by shtrider */
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("SYSTEM")		/* IN0 */

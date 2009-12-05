@@ -1311,7 +1311,8 @@ static void mips_update_scratchpad( const address_space *space )
 	}
 	else if( ( psxcpu->biu & BIU_DS ) == 0 )
 	{
-		memory_install_readwrite32_handler( space, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r, (write32_space_func)SMH_NOP );
+		memory_install_read32_handler( space, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r );
+		memory_nop_write( space, 0x1f800000, 0x1f8003ff, 0, 0 );
 	}
 	else
 	{

@@ -1050,7 +1050,7 @@ static ADDRESS_MAP_START( dharma_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size	)	// Tiles Set
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window	)		// Tilemap Window
-	AM_RANGE(0x878870, 0x87887b) AM_WRITE(SMH_RAM) AM_BASE(&metro_scroll)				// Scroll Regs
+	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_BASE(&metro_scroll)				// Scroll Regs
 	AM_RANGE(0x878880, 0x878881) AM_WRITENOP											// ? increasing
 	AM_RANGE(0x878890, 0x878891) AM_WRITENOP											// ? increasing
 	AM_RANGE(0x8788a4, 0x8788a5) AM_WRITEONLY AM_BASE(&metro_irq_enable)				// IRQ Enable
@@ -1589,7 +1589,7 @@ static ADDRESS_MAP_START( pururun_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc78000, 0xc787ff) AM_RAM AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size)	// Tiles Set
 	AM_RANGE(0xc78840, 0xc7884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs)	// Tiles Blitter
 	AM_RANGE(0xc78860, 0xc7886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window)		// Tilemap Window
-	AM_RANGE(0xc78870, 0xc7887b) AM_WRITE(SMH_RAM) AM_BASE(&metro_scroll)				// Scroll Regs
+	AM_RANGE(0xc78870, 0xc7887b) AM_WRITEONLY AM_BASE(&metro_scroll)				// Scroll Regs
 	AM_RANGE(0xc78880, 0xc78881) AM_WRITENOP											// ? increasing
 	AM_RANGE(0xc78890, 0xc78891) AM_WRITENOP											// ? increasing
 	AM_RANGE(0xc788a2, 0xc788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)		// IRQ Cause / IRQ Acknowledge
@@ -1781,9 +1781,9 @@ static ADDRESS_MAP_START( puzzlet_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x500000, 0x500001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0xff00 )
 	AM_RANGE( 0x580000, 0x580003 ) AM_DEVWRITE8( "ymsnd", ym2413_w, 0xff00 )
 
-	AM_RANGE( 0x700000, 0x71ffff ) AM_READWRITE( SMH_RAM, metro_vram_0_w ) AM_BASE( &metro_vram_0 )	// Layer 0
-	AM_RANGE( 0x720000, 0x73ffff ) AM_READWRITE( SMH_RAM, metro_vram_1_w ) AM_BASE( &metro_vram_1 )	// Layer 1
-	AM_RANGE( 0x740000, 0x75ffff ) AM_READWRITE( SMH_RAM, metro_vram_2_w ) AM_BASE( &metro_vram_2 )	// Layer 2
+	AM_RANGE( 0x700000, 0x71ffff ) AM_RAM_WRITE( metro_vram_0_w ) AM_BASE( &metro_vram_0 )	// Layer 0
+	AM_RANGE( 0x720000, 0x73ffff ) AM_RAM_WRITE( metro_vram_1_w ) AM_BASE( &metro_vram_1 )	// Layer 1
+	AM_RANGE( 0x740000, 0x75ffff ) AM_RAM_WRITE( metro_vram_2_w ) AM_BASE( &metro_vram_2 )	// Layer 2
 	AM_RANGE( 0x774000, 0x774fff ) AM_RAM	AM_BASE_SIZE_GENERIC( spriteram )
 
 	AM_RANGE( 0x760000, 0x76ffff ) AM_READ( metro_bankedrom_r )	// Banked ROM

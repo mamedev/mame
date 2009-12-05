@@ -1710,11 +1710,11 @@ static WRITE16_HANDLER( ddenlvrk_protection2_w )
 static ADDRESS_MAP_START( ddenlvrk_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM														// ROM
 
-	AM_RANGE(0x100000, 0x100001) AM_READWRITE(ddenlvrk_protection1_r, SMH_RAM)					AM_BASE(&ddenlvrk_protection1)
+	AM_RANGE(0x100000, 0x100001) AM_RAM_READ(ddenlvrk_protection1_r)							AM_BASE(&ddenlvrk_protection1)
 	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ddenlvrk_protection2_r, ddenlvrk_protection2_w)	AM_BASE(&ddenlvrk_protection2)
 
 	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
-//  AM_RANGE(0xd01000, 0xd017ff) SMH_RAM)                                                   // ? B0 on startup, then 00
+//  AM_RANGE(0xd01000, 0xd017ff) AM_RAM                                                    // ? B0 on startup, then 00
 
 	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr16_palette_base_w)
 	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr16_palette_mask_w)
@@ -1752,7 +1752,7 @@ static ADDRESS_MAP_START( ddenlovr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE("oki", ddenlovr_oki_bank_w)
 
 	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
-//  AM_RANGE(0xd01000, 0xd017ff) SMH_RAM)                                                   // ? B0 on startup, then 00
+//  AM_RANGE(0xd01000, 0xd017ff) AM_RAM                                                   // ? B0 on startup, then 00
 
 	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr16_palette_base_w)
 	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr16_palette_mask_w)
@@ -8649,7 +8649,7 @@ static DRIVER_INIT( rongrong )
        version of the game might be a bootleg with the protection
        patched. (both sets need this)
      */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60d4, 0x60d4, 0, 0, (read8_space_func)SMH_NOP);
+	memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60d4, 0x60d4, 0, 0);
 }
 
 /***************************************************************************

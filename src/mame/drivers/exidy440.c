@@ -479,10 +479,10 @@ static ADDRESS_MAP_START( exidy440_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2c00, 0x2dff) AM_READWRITE(exidy440_paletteram_r, exidy440_paletteram_w)
 	AM_RANGE(0x2e00, 0x2e1f) AM_RAM_WRITE(sound_command_w)
 	AM_RANGE(0x2e20, 0x2e3f) AM_READWRITE(exidy440_input_port_3_r, exidy440_input_port_3_w)
-	AM_RANGE(0x2e40, 0x2e5f) AM_READWRITE(SMH_NOP, exidy440_coin_counter_w)	/* read: clear coin counters I/O2 */
+	AM_RANGE(0x2e40, 0x2e5f) AM_READNOP AM_WRITE(exidy440_coin_counter_w)	/* read: clear coin counters I/O2 */
 	AM_RANGE(0x2e60, 0x2e7f) AM_READ_PORT("IN1") AM_WRITENOP
 	AM_RANGE(0x2e80, 0x2e9f) AM_READ_PORT("IN2") AM_WRITENOP
-	AM_RANGE(0x2ea0, 0x2ebf) AM_READWRITE(sound_command_ack_r, SMH_NOP)
+	AM_RANGE(0x2ea0, 0x2ebf) AM_READ(sound_command_ack_r) AM_WRITENOP
 	AM_RANGE(0x2ec0, 0x2eff) AM_NOP
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE(bankram_w)

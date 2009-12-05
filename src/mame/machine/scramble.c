@@ -243,14 +243,14 @@ DRIVER_INIT( mariner )
 {
 	/* extra ROM */
 	memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5800, 0x67ff, 0, 0, "bank1");
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5800, 0x67ff, 0, 0, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5800, 0x67ff, 0, 0);
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x5800);
 
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9008, 0x9008, 0, 0, mariner_protection_2_r);
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb401, 0xb401, 0, 0, mariner_protection_1_r);
 
 	/* ??? (it's NOT a background enable) */
-	/*memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6803, 0x6803, 0, 0, (write8_space_func)SMH_NOP);*/
+	/*memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6803, 0x6803, 0, 0);*/
 }
 
 #ifdef UNUSED_FUNCTION
@@ -335,8 +335,8 @@ DRIVER_INIT( cavelon )
 	/* A15 switches memory banks */
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, cavelon_banksw_r, cavelon_banksw_w);
 
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x2000, 0, 0, (write8_space_func)SMH_NOP);	/* ??? */
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3800, 0x3801, 0, 0, (write8_space_func)SMH_NOP);  /* looks suspicously like
+	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x2000, 0, 0);	/* ??? */
+	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3800, 0x3801, 0, 0);  /* looks suspicously like
                                                                an AY8910, but not sure */
 	state_save_register_global(machine, cavelon_bank);
 }

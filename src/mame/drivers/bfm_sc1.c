@@ -798,7 +798,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM							// 8k  ROM
 	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")					// 8k  paged ROM (4 pages)
-	AM_RANGE(0x8000, 0xFFFF) AM_RAM AM_WRITE(watchdog_w)	// 32k ROM
+	AM_RANGE(0x8000, 0xFFFF) AM_RAM_WRITE(watchdog_w)	// 32k ROM
 
 ADDRESS_MAP_END
 

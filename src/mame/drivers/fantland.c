@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( fantland_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x08000, 0x7ffff ) AM_ROM
 
-	AM_RANGE( 0xa2000, 0xa21ff ) AM_READWRITE( SMH_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0xa2000, 0xa21ff ) AM_RAM_WRITE( paletteram16_xRRRRRGGGGGBBBBB_word_w ) AM_BASE_GENERIC( paletteram )
 
 	AM_RANGE( 0xa3000, 0xa3001 ) AM_READ_PORT("a3000") AM_WRITE( fantland_nmi_enable_16_w )
 	AM_RANGE( 0xa3002, 0xa3003 ) AM_READ_PORT("a3002") AM_WRITE( fantland_soundlatch_16_w )
@@ -145,7 +145,7 @@ static ADDRESS_MAP_START( galaxygn_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x10000, 0x2ffff ) AM_ROM
 
-	AM_RANGE( 0x52000, 0x521ff ) AM_READWRITE( SMH_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0x52000, 0x521ff ) AM_RAM_WRITE( paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE_GENERIC( paletteram )
 
 	AM_RANGE( 0x53000, 0x53000 ) AM_READ_PORT("P1") AM_WRITE( fantland_nmi_enable_w )
 	AM_RANGE( 0x53001, 0x53001 ) AM_READ_PORT("P2")
@@ -239,7 +239,7 @@ static ADDRESS_MAP_START( borntofi_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x10000, 0x2ffff ) AM_ROM
 
-	AM_RANGE( 0x52000, 0x521ff ) AM_READWRITE( SMH_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0x52000, 0x521ff ) AM_RAM_WRITE( paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x53000, 0x53001 ) AM_READWRITE( borntofi_inputs_r, borntofi_nmi_enable_w )
 	AM_RANGE( 0x53002, 0x53002 ) AM_READ_PORT( "DSW" ) AM_WRITE( fantland_soundlatch_w )
 	AM_RANGE( 0x53003, 0x53003 ) AM_READ_PORT( "Controls" )
@@ -421,8 +421,8 @@ static ADDRESS_MAP_START( wheelrun_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3526_r, ym3526_w )
 
-	AM_RANGE(0xb000, 0xb000) AM_WRITE( SMH_NOP )	// on a car crash / hit
-	AM_RANGE(0xc000, 0xc000) AM_WRITE( SMH_NOP )	// ""
+	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// on a car crash / hit
+	AM_RANGE(0xc000, 0xc000) AM_WRITENOP	// ""
 
 	AM_RANGE(0xd000, 0xd000) AM_READ( soundlatch_r )	// during NMI
 ADDRESS_MAP_END

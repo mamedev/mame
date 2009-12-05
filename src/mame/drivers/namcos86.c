@@ -394,7 +394,6 @@ static ADDRESS_MAP_START( NAME##_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )							\
 /*  { ADDR_BANK+0x04, ADDR_BANK+0x06 } layer 3 scroll registers would be here */				\
 	AM_RANGE(ADDR_WDOG, ADDR_WDOG) AM_WRITE(watchdog2_w)										\
 	AM_RANGE(ADDR_INT, ADDR_INT) AM_WRITE(int_ack2_w)	/* IRQ acknowledge */					\
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)													\
 ADDRESS_MAP_END
 
 #define UNUSED 0x4000

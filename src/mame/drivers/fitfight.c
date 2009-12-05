@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( bbprot_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb08000, 0xb0bfff) AM_RAM_WRITE(fof_mid_tileram_w) AM_BASE_MEMBER(fitfight_state, fof_mid_tileram)
 	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE(fof_txt_tileram_w) AM_BASE_MEMBER(fitfight_state, fof_txt_tileram)
 
-	AM_RANGE(0xc00000, 0xc00fff) AM_READ(SMH_RAM)
+	AM_RANGE(0xc00000, 0xc00fff) AM_READONLY
 	AM_RANGE(0xc00000, 0xc03fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_MEMBER(fitfight_state, spriteram)

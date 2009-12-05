@@ -363,14 +363,14 @@ static ADDRESS_MAP_START( galpani2_mem2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_BASE(&galpani2_ram2)										// Work RAM
 	AM_RANGE(0x400000, 0x4fffff) AM_RAM_WRITE(galpani2_bg15_w) AM_BASE(&galpani2_bg15)	// bg15
 	AM_RANGE(0x500000, 0x5fffff) AM_RAM																// bg15
-	AM_RANGE(0x600000, 0x600001) AM_READWRITE(SMH_NOP, SMH_NOP			)	// ? 0 at startup only
+	AM_RANGE(0x600000, 0x600001) AM_NOP	// ? 0 at startup only
 	AM_RANGE(0x640000, 0x640001) AM_WRITENOP								// ? 0 at startup only
 	AM_RANGE(0x680000, 0x680001) AM_WRITENOP								// ? 0 at startup only
 	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITENOP								// ? 0 at startup only
 	AM_RANGE(0x700000, 0x700001) AM_WRITENOP								// Watchdog
 //  AM_RANGE(0x740000, 0x740001) AM_WRITENOP                                // ? Reset mcu
 	AM_RANGE(0x780000, 0x780001) AM_WRITE8(galpani2_mcu_nmi2_w, 0x00ff)				// ? 0 -> 1 -> 0 (lev 5)
-	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITE(SMH_RAM) AM_BASE(&galpani2_rombank	)	// Rom Bank
+	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITEONLY AM_BASE(&galpani2_rombank	)	// Rom Bank
 	AM_RANGE(0x800000, 0xffffff) AM_READ(galpani2_bankedrom_r		)		// Banked ROM
 ADDRESS_MAP_END
 

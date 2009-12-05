@@ -471,7 +471,7 @@ static ADDRESS_MAP_START( dfeveron_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0)				// Layer 0
 /**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE(&cave_vram_1)				// Layer 1
 /**/AM_RANGE(0x708000, 0x708fff) AM_RAM AM_BASE_GENERIC(paletteram) AM_SIZE(&cave_paletteram_size)	// Palette
-/**/AM_RANGE(0x710000, 0x710bff) AM_READ(SMH_RAM)												// ?
+/**/AM_RANGE(0x710000, 0x710bff) AM_READONLY												// ?
 	AM_RANGE(0x710c00, 0x710fff) AM_RAM															// ?
 	AM_RANGE(0x800000, 0x800007) AM_READ(cave_irq_cause_r)										// IRQ Cause
 	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_BASE(&cave_videoregs)						// Video Regs
@@ -543,13 +543,13 @@ static ADDRESS_MAP_START( donpachi_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x207fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE(&cave_vram_1)						// Layer 1
 	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0)						// Layer 0
 	AM_RANGE(0x400000, 0x407fff) AM_RAM_WRITE(cave_vram_2_8x8_w) AM_BASE(&cave_vram_2)					// Layer 2
-	AM_RANGE(0x500000, 0x507fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)					// Sprites
+	AM_RANGE(0x500000, 0x507fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)									// Sprites
 	AM_RANGE(0x508000, 0x50ffff) AM_RAM AM_BASE(&cave_spriteram16_2)									// Sprites?
 /**/AM_RANGE(0x600000, 0x600005) AM_RAM AM_BASE(&cave_vctrl_1)											// Layer 1 Control
 /**/AM_RANGE(0x700000, 0x700005) AM_RAM AM_BASE(&cave_vctrl_0)											// Layer 0 Control
 /**/AM_RANGE(0x800000, 0x800005) AM_RAM AM_BASE(&cave_vctrl_2)											// Layer 2 Control
-	AM_RANGE(0x900000, 0x90007f) AM_READWRITE(donpachi_videoregs_r, SMH_RAM) AM_BASE(&cave_videoregs)	// Video Regs
-/**/AM_RANGE(0xa08000, 0xa08fff) AM_RAM AM_BASE_GENERIC(paletteram) AM_SIZE(&cave_paletteram_size)			// Palette
+	AM_RANGE(0x900000, 0x90007f) AM_RAM_READ(donpachi_videoregs_r) AM_BASE(&cave_videoregs)				// Video Regs
+/**/AM_RANGE(0xa08000, 0xa08fff) AM_RAM AM_BASE_GENERIC(paletteram) AM_SIZE(&cave_paletteram_size)		// Palette
 	AM_RANGE(0xb00000, 0xb00003) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)				// M6295
 	AM_RANGE(0xb00010, 0xb00013) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)				//
 	AM_RANGE(0xb00020, 0xb0002f) AM_WRITE(NMK112_okibank_lsb_w)											//
@@ -737,15 +737,15 @@ static CUSTOM_INPUT( korokoro_hopper_r )
 
 static ADDRESS_MAP_START( korokoro_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
-//  AM_RANGE(0x100000, 0x107fff) AM_READ(SMH_RAM)                                                           // Layer 0
+//  AM_RANGE(0x100000, 0x107fff) AM_READONLY                                                           // Layer 0
 	AM_RANGE(0x100000, 0x107fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0)								// Layer 0
-//  AM_RANGE(0x140000, 0x140005) AM_READ(SMH_RAM)                                                           // Layer 0 Control
+//  AM_RANGE(0x140000, 0x140005) AM_READONLY                                                           // Layer 0 Control
 	AM_RANGE(0x140000, 0x140005) AM_WRITEONLY AM_BASE(&cave_vctrl_0)									// Layer 0 Control
-//  AM_RANGE(0x180000, 0x187fff) AM_READ(SMH_RAM)                                                           // Sprites
+//  AM_RANGE(0x180000, 0x187fff) AM_READONLY                                                           // Sprites
 	AM_RANGE(0x180000, 0x187fff) AM_WRITEONLY AM_BASE_SIZE_GENERIC(spriteram)			// Sprites
 	AM_RANGE(0x1c0000, 0x1c0007) AM_READ(cave_irq_cause_r)													// IRQ Cause
 	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITEONLY AM_BASE(&cave_videoregs)									// Video Regs
-//  AM_RANGE(0x200000, 0x207fff) AM_READ(SMH_RAM)                                                           // Palette
+//  AM_RANGE(0x200000, 0x207fff) AM_READONLY                                                           // Palette
 	AM_RANGE(0x200000, 0x207fff) AM_WRITEONLY AM_BASE_GENERIC(paletteram) AM_SIZE(&cave_paletteram_size)	// Palette
 //  AM_RANGE(0x240000, 0x240003) AM_DEVREAD8( "ymz", ymz280b_r, 0x00ff)                                     // YMZ280
 	AM_RANGE(0x240000, 0x240003) AM_DEVWRITE8( "ymz", ymz280b_w, 0x00ff)									// YMZ280
@@ -849,16 +849,16 @@ static ADDRESS_MAP_START( pwrinst2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM																	// RAM
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN0")													// Inputs
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("IN1")													//
-	AM_RANGE(0x600000, 0x6fffff) AM_ROM AM_REGION("user1", 0)									// extra data ROM space
+	AM_RANGE(0x600000, 0x6fffff) AM_ROM AM_REGION("user1", 0)											// extra data ROM space
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(cave_eeprom_msb_w)											// EEPROM
 	AM_RANGE(0x800000, 0x807fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE(&cave_vram_2)						// Layer 2
 	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0)						// Layer 0
 	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE(&cave_vram_1)						// Layer 1
 	AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE(cave_vram_3_8x8_w) AM_BASE(&cave_vram_3)					// Layer 3
-	AM_RANGE(0xa00000, 0xa07fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)					// Sprites
+	AM_RANGE(0xa00000, 0xa07fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)									// Sprites
 	AM_RANGE(0xa08000, 0xa0ffff) AM_RAM AM_BASE(&cave_spriteram16_2)									// Sprites?
 	AM_RANGE(0xa10000, 0xa1ffff) AM_RAM																	// Sprites?
-	AM_RANGE(0xa80000, 0xa8007f) AM_READWRITE(donpachi_videoregs_r, SMH_RAM) AM_BASE(&cave_videoregs)	// Video Regs
+	AM_RANGE(0xa80000, 0xa8007f) AM_RAM_READ(donpachi_videoregs_r) AM_BASE(&cave_videoregs)				// Video Regs
 /**/AM_RANGE(0xb00000, 0xb00005) AM_RAM_WRITE(pwrinst2_vctrl_2_w) AM_BASE(&cave_vctrl_2)				// Layer 2 Control
 /**/AM_RANGE(0xb80000, 0xb80005) AM_RAM_WRITE(pwrinst2_vctrl_0_w) AM_BASE(&cave_vctrl_0)				// Layer 0 Control
 /**/AM_RANGE(0xc00000, 0xc00005) AM_RAM_WRITE(pwrinst2_vctrl_1_w) AM_BASE(&cave_vctrl_1)				// Layer 1 Control

@@ -190,7 +190,7 @@ static ADDRESS_MAP_START( spool99_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xafef, 0xafef) AM_WRITE(eeprom_dataline_w )
 	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_w)
 
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram) // palette
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram) // palette
 
 	AM_RANGE(0xb800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE_GENERIC(videoram)

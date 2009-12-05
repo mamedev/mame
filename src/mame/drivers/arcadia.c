@@ -75,7 +75,7 @@ static WRITE16_HANDLER( arcadia_multibios_change_game )
 	if (data == 0)
 		memory_install_read_bank_handler(space, 0x800000, 0x97ffff, 0, 0, "bank2");
 	else
-		memory_install_read16_handler(space, 0x800000, 0x97ffff, 0, 0, (read16_space_func)SMH_NOP);
+		memory_nop_read(space, 0x800000, 0x97ffff, 0, 0);
 }
 
 
@@ -107,7 +107,7 @@ static WRITE8_DEVICE_HANDLER( arcadia_cia_0_porta_w )
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_install_write16_handler(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, (write16_space_func)SMH_UNMAP);
+		memory_unmap_write(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0);
 
 	/* bit 2 = Power Led on Amiga */
 	set_led_status(device->machine, 0, (data & 2) ? 0 : 1);

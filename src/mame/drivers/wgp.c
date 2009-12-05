@@ -677,8 +677,8 @@ static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 16 )	/* LAN areas not
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x140000, 0x143fff) AM_READWRITE(sharedram_r,sharedram_w)
 	AM_RANGE(0x200000, 0x200003) AM_READWRITE(wgp_sound_r,wgp_sound_w)
-//  AM_RANGE(0x380000, 0x383fff) AM_READ(SMH_RAM)       // LAN RAM
-//  AM_RANGE(0x380000, 0x383fff) AM_WRITE(SMH_RAM)    // LAN RAM
+//  AM_RANGE(0x380000, 0x383fff) AM_READONLY       // LAN RAM
+//  AM_RANGE(0x380000, 0x383fff) AM_WRITEONLY    // LAN RAM
 	AM_RANGE(0x380000, 0x380001) AM_READ(lan_status_r)	// ??
 	// a lan input area is read somewhere above the status
 	// (make the status return 0 and log)...
@@ -692,7 +692,7 @@ static ADDRESS_MAP_START( z80_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
-	AM_RANGE(0xe200, 0xe200) AM_READWRITE(SMH_NOP,taitosound_slave_port_w)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r,taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
 	AM_RANGE(0xea00, 0xea00) AM_READNOP

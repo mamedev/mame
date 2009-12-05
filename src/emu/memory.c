@@ -156,6 +156,20 @@ enum _read_or_write
 };
 typedef enum _read_or_write read_or_write;
 
+/* static data access handler constants */
+enum
+{
+	STATIC_INVALID = 0,									/* invalid - should never be used */
+	STATIC_BANK1 = 1,									/* first memory bank */
+	STATIC_BANKMAX = 122,								/* last memory bank */
+	STATIC_RAM,											/* RAM - reads/writes map to dynamic banks */
+	STATIC_ROM,											/* ROM - reads = RAM; writes = UNMAP */
+	STATIC_NOP,											/* NOP - reads = unmapped value; writes = no-op */
+	STATIC_UNMAP,										/* unmapped - same as NOP except we log errors */
+	STATIC_WATCHPOINT,									/* watchpoint - used internally */
+	STATIC_COUNT										/* total number of static handlers */
+};
+
 
 
 /***************************************************************************
@@ -169,7 +183,6 @@ typedef enum _read_or_write read_or_write;
 /* helper macros */
 #define HANDLER_IS_RAM(h)		((FPTR)(h) == STATIC_RAM)
 #define HANDLER_IS_ROM(h)		((FPTR)(h) == STATIC_ROM)
-#define HANDLER_IS_NOP(h)		((FPTR)(h) == STATIC_NOP)
 #define HANDLER_IS_BANK(h)		((FPTR)(h) >= STATIC_BANK1 && (FPTR)(h) <= STATIC_BANKMAX)
 #define HANDLER_IS_STATIC(h)	((FPTR)(h) < STATIC_COUNT)
 
@@ -210,7 +223,7 @@ struct _bank_info
 	UINT8					index;					/* array index for this handler */
 	UINT8 					read;					/* is this bank used for reads? */
 	UINT8 					write;					/* is this bank used for writes? */
-	void *					handler;				/* SMH_BANK(n) handler for this bank */
+	void *					handler;				/* handler for this bank */
 	bank_reference *		reflist;				/* linked list of address spaces referencing this bank */
 	offs_t 					bytestart;				/* byte-adjusted start offset */
 	offs_t 					byteend;				/* byte-adjusted end offset */
@@ -316,6 +329,7 @@ const char *const address_space_names[ADDRESS_SPACES] = { "program", "data", "I/
 static void memory_init_spaces(running_machine *machine);
 static void memory_init_preflight(running_machine *machine);
 static void memory_init_populate(running_machine *machine);
+static void memory_init_map_entry(address_space *space, const address_map_entry *entry, read_or_write readorwrite);
 static void memory_init_allocate(running_machine *machine);
 static void memory_init_locate(running_machine *machine);
 static void memory_exit(running_machine *machine);
@@ -814,10 +828,10 @@ void address_map_free(address_map *map)
 	{
 		address_map_entry *entry = map->entrylist;
 		map->entrylist = entry->next;
-		if (entry->read_devtag_string != NULL)
-			astring_free(entry->read_devtag_string);
-		if (entry->write_devtag_string != NULL)
-			astring_free(entry->write_devtag_string);
+		if (entry->read.derived_tag != NULL)
+			astring_free(entry->read.derived_tag);
+		if (entry->write.derived_tag != NULL)
+			astring_free(entry->write.derived_tag);
 		if (entry->region_string != NULL)
 			astring_free(entry->region_string);
 		free(entry);
@@ -1396,6 +1410,22 @@ void _memory_install_bank_handler(const address_space *space, offs_t addrstart, 
 }
 
 
+/*-------------------------------------------------
+    _memory_unmap - unmap a section of address 
+    space
+-------------------------------------------------*/
+
+void _memory_unmap(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT8 unmap_read, UINT8 unmap_write, UINT8 quiet)
+{
+	address_space *spacerw = (address_space *)space;
+
+	if (unmap_read)
+		space_map_range(spacerw, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(quiet ? STATIC_NOP : STATIC_UNMAP), spacerw, "unmapped");
+	if (unmap_write)
+		space_map_range(spacerw, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(quiet ? STATIC_NOP : STATIC_UNMAP), spacerw, "unmapped");
+}
+
+
 
 /***************************************************************************
     DEBUGGER HELPERS
@@ -1676,7 +1706,7 @@ static void memory_init_preflight(running_machine *machine)
 			adjust_addresses(space, &entry->bytestart, &entry->byteend, &entry->bytemask, &entry->bytemirror);
 
 			/* if this is a ROM handler without a specified region, attach it to the implicit region */
-			if (space->spacenum == ADDRESS_SPACE_0 && HANDLER_IS_ROM(entry->read.generic) && entry->region == NULL)
+			if (space->spacenum == ADDRESS_SPACE_0 && entry->read.type == AMH_ROM && entry->region == NULL)
 			{
 				/* make sure it fits within the memory region before doing so, however */
 				if (entry->byteend < regionsize)
@@ -1735,96 +1765,95 @@ static void memory_init_populate(running_machine *machine)
 			while (last_entry != space->map->entrylist)
 			{
 				const address_map_entry *entry;
-				read_handler rhandler;
-				write_handler whandler;
 
 				/* find the entry before the last one we processed */
 				for (entry = space->map->entrylist; entry->next != last_entry; entry = entry->next) ;
 				last_entry = entry;
-				rhandler = entry->read;
-				whandler = entry->write;
-
-				/* if we have a read port tag, look it up */
-				if (entry->read_porttag != NULL)
-				{
-					const input_port_config *port = input_port_by_tag(&machine->portlist, entry->read_porttag);
-					int bits = (entry->read_bits == 0) ? space->dbits : entry->read_bits;
-					genf *handler = NULL;
-
-					if (port == NULL)
-						fatalerror("Non-existent port referenced: '%s'\n", entry->read_porttag);
-					switch (bits)
-					{
-						case 8:		handler = (genf *)input_port_read8; 	break;
-						case 16:	handler = (genf *)input_port_read16; 	break;
-						case 32:	handler = (genf *)input_port_read32; 	break;
-						case 64:	handler = (genf *)input_port_read64; 	break;
-					}
-					space_map_range_private(space, ROW_READ, bits, entry->read_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, handler, (void *)port, entry->read_porttag);
-				}
-
-				/* if we have a write port tag, look it up */
-				if (entry->write_porttag != NULL)
-				{
-					const input_port_config *port = input_port_by_tag(&machine->portlist, entry->write_porttag);
-					int bits = (entry->write_bits == 0) ? space->dbits : entry->write_bits;
-					genf *handler = NULL;
-
-					if (port == NULL)
-						fatalerror("Non-existent port referenced: '%s'\n", entry->write_porttag);
-					switch (bits)
-					{
-						case 8:		handler = (genf *)input_port_write8; 	break;
-						case 16:	handler = (genf *)input_port_write16; 	break;
-						case 32:	handler = (genf *)input_port_write32; 	break;
-						case 64:	handler = (genf *)input_port_write64; 	break;
-					}
-					space_map_range_private(space, ROW_WRITE, bits, entry->write_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, handler, (void *)port, entry->write_porttag);
-				}
-
-				/* if we have a read bank tag, look it up */
-				if (entry->read_banktag != NULL)
-				{
-					void *handler = bank_find_or_allocate(space, entry->read_banktag, entry->addrstart, entry->addrend, ROW_READ);
-					space_map_range_private(space, ROW_READ, space->dbits, entry->read_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, handler, space, entry->read_banktag);
-				}
-
-				/* if we have a write bank tag, look it up */
-				if (entry->write_banktag != NULL)
-				{
-					void *handler = bank_find_or_allocate(space, entry->write_banktag, entry->addrstart, entry->addrend, ROW_WRITE);
-					space_map_range_private(space, ROW_WRITE, space->dbits, entry->write_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, handler, space, entry->write_banktag);
-				}
-
-				/* install the read handler if present */
-				if (rhandler.generic != NULL)
-				{
-					int bits = (entry->read_bits == 0) ? space->dbits : entry->read_bits;
-					void *object = space;
-					if (entry->read_devtag != NULL)
-					{
-						object = (void *)device_list_find_by_tag(&machine->config->devicelist, entry->read_devtag);
-						if (object == NULL)
-							fatalerror("Unidentified object in memory map: tag=%s\n", entry->read_devtag);
-					}
-					space_map_range_private(space, ROW_READ, bits, entry->read_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, rhandler.generic, object, entry->read_name);
-				}
-
-				/* install the write handler if present */
-				if (whandler.generic != NULL)
-				{
-					int bits = (entry->write_bits == 0) ? space->dbits : entry->write_bits;
-					void *object = space;
-					if (entry->write_devtag != NULL)
-					{
-						object = (void *)device_list_find_by_tag(&machine->config->devicelist, entry->write_devtag);
-						if (object == NULL)
-							fatalerror("Unidentified object in memory map: tag=%s\n", entry->write_devtag);
-					}
-					space_map_range_private(space, ROW_WRITE, bits, entry->write_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, whandler.generic, object, entry->write_name);
-				}
+				
+				/* map both read and write halves */
+				memory_init_map_entry(space, entry, ROW_READ);
+				memory_init_map_entry(space, entry, ROW_WRITE);
 			}
 		}
+}
+
+
+/*-------------------------------------------------
+    memory_init_map_entry - map a single read or
+    write entry based on information from an
+    address map entry
+-------------------------------------------------*/
+
+static void memory_init_map_entry(address_space *space, const address_map_entry *entry, read_or_write readorwrite)
+{
+	const map_handler_data *handler = (readorwrite == ROW_READ) ? &entry->read : &entry->write;
+	int bits = (handler->bits != 0) ? handler->bits : space->dbits;
+	genf *funcptr = handler->handler.generic;
+	const char *name = handler->name;
+	void *object = space;
+
+	/* based on the handler type, alter the bits, name, funcptr, and object */
+	switch (handler->type)
+	{
+		case AMH_NONE:
+			return;
+			
+		case AMH_RAM:
+			bits = space->dbits;
+			name = "RAM";
+			funcptr = (genf *)STATIC_RAM;
+			break;
+	
+		case AMH_ROM:
+			bits = space->dbits;
+			name = "ROM";
+			funcptr = (genf *)STATIC_ROM;
+			break;
+		
+		case AMH_NOP:
+			bits = space->dbits;
+			name = "nop";
+			funcptr = (genf *)STATIC_NOP;
+			break;
+	
+		case AMH_UNMAP:
+			bits = space->dbits;
+			name = "unmapped";
+			funcptr = (genf *)STATIC_NOP;
+			break;
+
+		case AMH_DEVICE_HANDLER:
+			object = (void *)device_list_find_by_tag(&space->machine->config->devicelist, handler->tag);
+			if (object == NULL)
+				fatalerror("Non-existent device '%s' referenced in memory map\n", handler->tag);
+			break;
+		
+		case AMH_HANDLER:
+			break;
+	
+		case AMH_PORT:
+			name = handler->tag;
+			switch (bits)
+			{
+				case 8:		funcptr = (readorwrite == ROW_READ) ? (genf *)input_port_read8  : (genf *)input_port_write8;	break;
+				case 16:	funcptr = (readorwrite == ROW_READ) ? (genf *)input_port_read16 : (genf *)input_port_write16;	break;
+				case 32:	funcptr = (readorwrite == ROW_READ) ? (genf *)input_port_read32 : (genf *)input_port_write32;	break;
+				case 64:	funcptr = (readorwrite == ROW_READ) ? (genf *)input_port_read64 : (genf *)input_port_write64;	break;
+			}
+			object = (void *)input_port_by_tag(&space->machine->portlist, handler->tag);
+			if (object == NULL)
+				fatalerror("Non-existent port '%s' referenced in memory map\n", handler->tag);
+			break;
+		
+		case AMH_BANK:
+			bits = space->dbits;
+			name = handler->tag;
+			funcptr = (genf *)bank_find_or_allocate(space, handler->tag, entry->addrstart, entry->addrend, readorwrite);
+			break;		
+	}
+	
+	/* do the actual mapping */
+	space_map_range_private(space, readorwrite, bits, handler->mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, funcptr, object, name);
 }
 
 
@@ -2064,10 +2093,9 @@ static void memory_exit(running_machine *machine)
 		fatalerror("%s: %s included a mismatched address map (%s %d) for an existing map with %s %d!\n", driver->source_file, driver->name, #field, tmap.field, #field, map->field); \
 	} while (0)
 
-
-#define check_entry_handler(handler) do { \
-	if (entry->handler.generic != NULL && entry->handler.generic != (genf *)SMH_RAM) \
-		fatalerror("%s: %s AM_RANGE(0x%x, 0x%x) %s handler already set!\n", driver->source_file, driver->name, entry->addrstart, entry->addrend, #handler); \
+#define check_entry_handler(row) do { \
+	if (entry->row.type != AMH_NONE) \
+		fatalerror("%s: %s AM_RANGE(0x%x, 0x%x) %s handler already set!\n", driver->source_file, driver->name, entry->addrstart, entry->addrend, #row); \
 	} while (0)
 
 #define check_entry_field(field) do { \
@@ -2156,59 +2184,62 @@ static void map_detokenize(address_map *map, const game_driver *driver, const ch
 			case ADDRMAP_TOKEN_READ:
 				check_entry_handler(read);
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->read_bits, 8, entry->read_mask, 8);
-				entry->read = TOKEN_GET_PTR(tokens, read);
-				entry->read_name = TOKEN_GET_STRING(tokens);
+				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, entry->read.type, 8, entry->read.bits, 8, entry->read.mask, 8);
+				if (entry->read.type == AMH_HANDLER || entry->read.type == AMH_DEVICE_HANDLER)
+				{
+					entry->read.handler.read = TOKEN_GET_PTR(tokens, read);
+					entry->read.name = TOKEN_GET_STRING(tokens);
+				}
+				if (entry->read.type == AMH_DEVICE_HANDLER || entry->read.type == AMH_PORT || entry->read.type == AMH_BANK)
+				{
+					if (entry->read.derived_tag == NULL)
+						entry->read.derived_tag = astring_alloc();
+					entry->read.tag = device_inherit_tag(entry->read.derived_tag, devtag, TOKEN_GET_STRING(tokens));
+				}
 				break;
 
 			case ADDRMAP_TOKEN_WRITE:
 				check_entry_handler(write);
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->write_bits, 8, entry->write_mask, 8);
-				entry->write = TOKEN_GET_PTR(tokens, write);
-				entry->write_name = TOKEN_GET_STRING(tokens);
+				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, entry->write.type, 8, entry->write.bits, 8, entry->write.mask, 8);
+				if (entry->write.type == AMH_HANDLER || entry->write.type == AMH_DEVICE_HANDLER)
+				{
+					entry->write.handler.write = TOKEN_GET_PTR(tokens, write);
+					entry->write.name = TOKEN_GET_STRING(tokens);
+				}
+				if (entry->write.type == AMH_DEVICE_HANDLER || entry->write.type == AMH_PORT || entry->write.type == AMH_BANK)
+				{
+					if (entry->write.derived_tag == NULL)
+						entry->write.derived_tag = astring_alloc();
+					entry->write.tag = device_inherit_tag(entry->write.derived_tag, devtag, TOKEN_GET_STRING(tokens));
+				}
 				break;
 
-			case ADDRMAP_TOKEN_DEVICE_READ:
+			case ADDRMAP_TOKEN_READWRITE:
 				check_entry_handler(read);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->read_bits, 8, entry->read_mask, 8);
-				entry->read = TOKEN_GET_PTR(tokens, read);
-				entry->read_name = TOKEN_GET_STRING(tokens);
-				if (entry->read_devtag_string == NULL)
-					entry->read_devtag_string = astring_alloc();
-				entry->read_devtag = device_inherit_tag(entry->read_devtag_string, devtag, TOKEN_GET_STRING(tokens));
-				break;
-
-			case ADDRMAP_TOKEN_DEVICE_WRITE:
 				check_entry_handler(write);
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->write_bits, 8, entry->write_mask, 8);
-				entry->write = TOKEN_GET_PTR(tokens, write);
-				entry->write_name = TOKEN_GET_STRING(tokens);
-				if (entry->write_devtag_string == NULL)
-					entry->write_devtag_string = astring_alloc();
-				entry->write_devtag = device_inherit_tag(entry->write_devtag_string, devtag, TOKEN_GET_STRING(tokens));
-				break;
-
-			case ADDRMAP_TOKEN_READ_PORT:
-				check_entry_field(read_porttag);
-				entry->read_porttag = TOKEN_GET_STRING(tokens);
-				break;
-
-			case ADDRMAP_TOKEN_WRITE_PORT:
-				check_entry_field(write_porttag);
-				entry->write_porttag = TOKEN_GET_STRING(tokens);
-				break;
-
-			case ADDRMAP_TOKEN_READ_BANK:
-				check_entry_field(read_banktag);
-				entry->read_banktag = TOKEN_GET_STRING(tokens);
-				break;
-
-			case ADDRMAP_TOKEN_WRITE_BANK:
-				check_entry_field(write_banktag);
-				entry->write_banktag = TOKEN_GET_STRING(tokens);
+				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, entry->read.type, 8, entry->read.bits, 8, entry->read.mask, 8);
+				entry->write.type = entry->read.type;
+				entry->write.bits = entry->read.bits;
+				entry->write.mask = entry->read.mask;
+				if (entry->read.type == AMH_HANDLER || entry->read.type == AMH_DEVICE_HANDLER)
+				{
+					entry->read.handler.read = TOKEN_GET_PTR(tokens, read);
+					entry->read.name = TOKEN_GET_STRING(tokens);
+					entry->write.handler.write = TOKEN_GET_PTR(tokens, write);
+					entry->write.name = TOKEN_GET_STRING(tokens);
+				}
+				if (entry->read.type == AMH_DEVICE_HANDLER || entry->read.type == AMH_PORT || entry->read.type == AMH_BANK)
+				{
+					const char *basetag = TOKEN_GET_STRING(tokens);
+					if (entry->read.derived_tag == NULL)
+						entry->read.derived_tag = astring_alloc();
+					entry->read.tag = device_inherit_tag(entry->read.derived_tag, devtag, basetag);
+					if (entry->write.derived_tag == NULL)
+						entry->write.derived_tag = astring_alloc();
+					entry->write.tag = device_inherit_tag(entry->write.derived_tag, devtag, basetag);
+				}
 				break;
 
 			case ADDRMAP_TOKEN_REGION:
@@ -2288,7 +2319,7 @@ static void space_map_range_private(address_space *space, read_or_write readorwr
 {
 	/* translate ROM to RAM/UNMAP here */
 	if (HANDLER_IS_ROM(handler))
-		handler = (readorwrite == ROW_WRITE) ? (genf *)STATIC_UNMAP : (genf *)SMH_RAM;
+		handler = (readorwrite == ROW_WRITE) ? (genf *)STATIC_UNMAP : (genf *)STATIC_RAM;
 
 	/* assign banks for RAM/ROM areas */
 	if (HANDLER_IS_RAM(handler))
@@ -2423,12 +2454,12 @@ static int space_needs_backing_store(const address_space *space, const address_m
 		return TRUE;
 
 	/* if we're writing to any sort of bank or RAM, then yes, we do need backing */
-	if (entry->write_banktag != NULL || (FPTR)entry->write.generic == STATIC_RAM)
+	if (entry->write.type == AMH_BANK || entry->write.type == AMH_RAM)
 		return TRUE;
 	
 	/* if we're reading from RAM or from ROM outside of address space 0 or its region, then yes, we do need backing */
-	if ((FPTR)entry->read.generic == STATIC_RAM ||
-		((FPTR)entry->read.generic == STATIC_ROM && (space->spacenum != ADDRESS_SPACE_0 || entry->addrstart >= memory_region_length(space->machine, space->cpu->tag))))
+	if (entry->read.type == AMH_RAM || 
+		(entry->read.type == AMH_ROM && (space->spacenum != ADDRESS_SPACE_0 || entry->addrstart >= memory_region_length(space->machine, space->cpu->tag))))
 		return TRUE;
 	
 	/* all other cases don't need backing */
@@ -2444,7 +2475,7 @@ static int space_needs_backing_store(const address_space *space, const address_m
 /*-------------------------------------------------
     bank_find_or_allocate - allocate a new 
     bank, or find an existing one, and return the 
-    SMH_BANK(n) handler
+    read/write handler
 -------------------------------------------------*/
 
 void *bank_find_or_allocate(const address_space *space, const char *tag, offs_t bytestart, offs_t byteend, read_or_write readorwrite)
@@ -2495,7 +2526,7 @@ void *bank_find_or_allocate(const address_space *space, const char *tag, offs_t 
 			
 		/* populate it */
 		bank->index = banknum;
-		bank->handler = SMH_BANK(banknum);
+		bank->handler = (void *)(FPTR)(STATIC_BANK1 + banknum - 1);
 		bank->bytestart = bytestart;
 		bank->byteend = byteend;
 		bank->curentry = MAX_BANK_ENTRIES;

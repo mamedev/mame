@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( irobot_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1300, 0x13ff) AM_READ(irobot_control_r)
     AM_RANGE(0x1400, 0x143f) AM_READWRITE(quad_pokey_r, quad_pokey_w)
     AM_RANGE(0x1800, 0x18ff) AM_WRITE(irobot_paletteram_w)
-    AM_RANGE(0x1900, 0x19ff) AM_WRITE(SMH_RAM)            /* Watchdog reset */
+    AM_RANGE(0x1900, 0x19ff) AM_WRITEONLY            /* Watchdog reset */
     AM_RANGE(0x1a00, 0x1a00) AM_WRITE(irobot_clearfirq_w)
     AM_RANGE(0x1b00, 0x1bff) AM_WRITE(irobot_control_w)
     AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)

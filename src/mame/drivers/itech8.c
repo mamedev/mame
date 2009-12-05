@@ -930,7 +930,7 @@ static ADDRESS_MAP_START( gtg2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0120, 0x0120) AM_READ_PORT("60") AM_WRITE(itech8_page_w)
 	AM_RANGE(0x0140, 0x015f) AM_WRITE(itech8_palette_w)
 	AM_RANGE(0x0140, 0x0140) AM_READ_PORT("80")
-	AM_RANGE(0x0160, 0x0160) AM_WRITE(SMH_RAM) AM_BASE(&itech8_grom_bank)
+	AM_RANGE(0x0160, 0x0160) AM_WRITEONLY AM_BASE(&itech8_grom_bank)
 	AM_RANGE(0x0180, 0x019f) AM_READWRITE(itech8_blitter_r, blitter_w)
 	AM_RANGE(0x01c0, 0x01c0) AM_WRITE(gtg2_sound_data_w)
 	AM_RANGE(0x01e0, 0x01e0) AM_WRITE(tms34061_latch_w)
@@ -2664,7 +2664,7 @@ static DRIVER_INIT( grmatch )
 {
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0160, 0x0160, 0, 0, grmatch_palette_w);
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0180, 0x0180, 0, 0, grmatch_xscroll_w);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01e0, 0x01ff, 0, 0, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01e0, 0x01ff, 0, 0);
 }
 
 

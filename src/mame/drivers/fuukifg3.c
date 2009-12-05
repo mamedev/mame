@@ -255,9 +255,9 @@ static ADDRESS_MAP_START( fuuki32_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x903fe0, 0x903fff) AM_READWRITE(snd_020_r, snd_020_w) 											// Shared with Z80
 //  AM_RANGE(0x903fe0, 0x903fe3) AM_READ(fuuki32_sound_command_r)                                           // Shared with Z80
-//  AM_RANGE(0x903fe4, 0x903fff) AM_READ(SMH_RAM)                                                           // ??
+//  AM_RANGE(0x903fe4, 0x903fff) AM_READONLY                                                           // ??
 
-	AM_RANGE(0xa00000, 0xa00003) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(fuuki32_state, tilebank)
+	AM_RANGE(0xa00000, 0xa00003) AM_WRITEONLY AM_BASE_MEMBER(fuuki32_state, tilebank)
 ADDRESS_MAP_END
 
 

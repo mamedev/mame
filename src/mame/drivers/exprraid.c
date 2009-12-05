@@ -18,7 +18,7 @@ Main CPU: ( DECO CPU-16 )
 2100-2100 Sound latch write
 2800-2801 Protection
 3800-3800 VBlank ( bootleg 1 only )
-4000-ffff SMH_ROM
+4000-ffff ROM
 ffc0-ffc0 VBlank ( bootleg 2 only )
 
 Sound Cpu: ( 6809 )

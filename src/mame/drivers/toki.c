@@ -130,10 +130,10 @@ static ADDRESS_MAP_START( tokib_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x071000, 0x071001) AM_WRITENOP	/* sprite related? seems another scroll register */
 				/* gets written the same value as 75000a (bg2 scrollx) */
 	AM_RANGE(0x071804, 0x071807) AM_WRITENOP	/* sprite related, always 01be0100 */
-	AM_RANGE(0x07180e, 0x071e45) AM_WRITE(SMH_RAM) AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x07180e, 0x071e45) AM_WRITEONLY AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x072000, 0x072001) AM_READ(watchdog_reset16_r)   /* probably */
 	AM_RANGE(0x075000, 0x075001) AM_WRITE(tokib_soundcommand16_w)
-	AM_RANGE(0x075004, 0x07500b) AM_WRITE(SMH_RAM) AM_BASE(&toki_scrollram16)
+	AM_RANGE(0x075004, 0x07500b) AM_WRITEONLY AM_BASE(&toki_scrollram16)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("SYSTEM")
@@ -145,9 +145,8 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( tokib_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", toki_adpcm_control_w)	/* MSM5205 + ROM bank */
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(toki_adpcm_data_w)
 	AM_RANGE(0xec00, 0xec01) AM_MIRROR(0x0008) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)

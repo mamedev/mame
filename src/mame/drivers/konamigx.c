@@ -1342,7 +1342,7 @@ static WRITE16_HANDLER(tms57002_control_word_w)
 
 /* 68000 memory handling */
 static ADDRESS_MAP_START( gxsndmap, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&gx_sndram)
 	AM_RANGE(0x200000, 0x2004ff) AM_READWRITE(dual539_r, dual539_w)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(tms57002_data_word_r, tms57002_data_word_w)

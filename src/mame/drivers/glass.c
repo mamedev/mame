@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( glass_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		/* ROM */
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(glass_vram_w) AM_BASE(&glass_videoram)						/* Video RAM */
 	AM_RANGE(0x102000, 0x102fff) AM_RAM																		/* Extra Video RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITE(SMH_RAM) AM_BASE(&glass_vregs)									/* Video Registers */
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE(&glass_vregs)									/* Video Registers */
 	AM_RANGE(0x108008, 0x108009) AM_WRITE(clr_int_w)														/* CLR INT Video */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&glass_spriteram)											/* Sprite RAM */

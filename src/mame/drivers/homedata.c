@@ -606,7 +606,7 @@ static ADDRESS_MAP_START( reikaids_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7801, 0x7801) AM_READ_PORT("IN0")
 	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("IN1")
 	AM_RANGE(0x7803, 0x7803) AM_READ(reikaids_io_r)	// coin, blitter, upd7807
-	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITE(SMH_RAM) AM_BASE(&homedata_vreg)
+	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_BASE(&homedata_vreg)
 	AM_RANGE(0x7ffe, 0x7ffe) AM_WRITE(reikaids_blitter_bank_w)
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(reikaids_blitter_start_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(bankswitch_w)

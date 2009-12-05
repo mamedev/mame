@@ -822,7 +822,7 @@ static ADDRESS_MAP_START( tnzsb_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0xf000, 0xf003) AM_READ(SMH_RAM)
+	AM_RANGE(0xf000, 0xf003) AM_READONLY
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
@@ -891,9 +891,9 @@ static ADDRESS_MAP_START( jpopnics_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1) /* WORK RAM (shared by the 2 z80's) */
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, vdcram) 	/* VDC RAM */
 	AM_RANGE(0xf200, 0xf2ff) AM_RAM AM_BASE_MEMBER(tnzs_state, scrollram) /* scrolling info */
-	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(tnzs_state, objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(tnzs_state, bg_flag)	/* enable / disable background transparency */
-	AM_RANGE(0xf600, 0xf600) AM_READWRITE(SMH_NOP, tnzs_bankswitch_w)
+	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xf400, 0xf400) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, bg_flag)	/* enable / disable background transparency */
+	AM_RANGE(0xf600, 0xf600) AM_READNOP AM_WRITE(tnzs_bankswitch_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(jpopnics_palette_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 

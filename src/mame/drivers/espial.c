@@ -95,7 +95,7 @@ static ADDRESS_MAP_START( espial_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(zodiac_master_interrupt_enable_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(espial_flipscreen_w)
 	AM_RANGE(0x8000, 0x801f) AM_RAM AM_BASE_MEMBER(espial_state, spriteram_1)
-	AM_RANGE(0x8020, 0x803f) AM_READ(SMH_RAM)
+	AM_RANGE(0x8020, 0x803f) AM_READONLY
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(espial_videoram_w) AM_BASE_MEMBER(espial_state, videoram)
 	AM_RANGE(0x8800, 0x880f) AM_WRITEONLY AM_BASE_MEMBER(espial_state, spriteram_3)
 	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE(espial_attributeram_w) AM_BASE_MEMBER(espial_state, attributeram)

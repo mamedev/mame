@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( f1superb_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfd140000, 0xfd143fff) AM_RAM // used when you start enabling fpu ints
 	AM_RANGE(0xfd144000, 0xfd145fff) AM_RAM // same data here
 
- 	AM_RANGE(0xfdc00000, 0xfdc007ff) AM_RAM AM_READWRITE16(ms32_extra_r16, ms32_extra_w16, 0x0000ffff) // definitely line ram
+ 	AM_RANGE(0xfdc00000, 0xfdc007ff) AM_READWRITE16(ms32_extra_r16, ms32_extra_w16, 0x0000ffff) // definitely line ram
 	AM_RANGE(0xfde00000, 0xfde01fff) AM_RAM // scroll info for lineram?
 
 	AM_IMPORT_FROM(ms32_map)

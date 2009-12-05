@@ -239,7 +239,7 @@ static ADDRESS_MAP_START( bigrun_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x09c000, 0x09ffff) AM_WRITE(bigrun_paletteram16_w) AM_BASE_GENERIC(paletteram)				// Palettes
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&megasys1_ram)											// RAM
-	AM_RANGE(0x100000, 0x13ffff) AM_READWRITE(rom_1_r, SMH_ROM)											// ROM
+	AM_RANGE(0x100000, 0x13ffff) AM_READ(rom_1_r)														// ROM
 ADDRESS_MAP_END
 
 
@@ -300,7 +300,7 @@ static ADDRESS_MAP_START( cischeat_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(cischeat_paletteram16_w) AM_BASE_GENERIC(paletteram) 				// Palettes
 
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&megasys1_ram)												// RAM
-	AM_RANGE(0x100000, 0x17ffff) AM_READWRITE(rom_1_r, SMH_ROM)												// ROM
+	AM_RANGE(0x100000, 0x17ffff) AM_READ(rom_1_r)															// ROM
 ADDRESS_MAP_END
 
 
@@ -354,7 +354,7 @@ static ADDRESS_MAP_START( f1gpstar_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(f1gpstar_paletteram16_w) AM_BASE_GENERIC(paletteram)				// Palettes
 
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&megasys1_ram)												// RAM
-	AM_RANGE(0x100000, 0x17ffff) AM_READWRITE(rom_1_r, SMH_ROM)												// ROM
+	AM_RANGE(0x100000, 0x17ffff) AM_READ(rom_1_r)															// ROM
 ADDRESS_MAP_END
 
 
@@ -380,7 +380,7 @@ static ADDRESS_MAP_START( f1gpstr2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(f1gpstar_paletteram16_w) AM_BASE_GENERIC(paletteram)				// Palettes
 
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&megasys1_ram)												// RAM
-	AM_RANGE(0x100000, 0x17ffff) AM_READWRITE(rom_1_r, SMH_ROM)												// ROM
+	AM_RANGE(0x100000, 0x17ffff) AM_READ(rom_1_r)															// ROM
 ADDRESS_MAP_END
 
 
@@ -639,7 +639,7 @@ static ADDRESS_MAP_START( cischeat_map2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE(&cischeat_roadram[0])		// Road RAM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM										// RAM
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP							// watchdog
-	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE(rom_2_r, SMH_ROM)				// ROM
+	AM_RANGE(0x200000, 0x23ffff) AM_READ(rom_2_r)							// ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cischeat_map3, ADDRESS_SPACE_PROGRAM, 16 )
@@ -648,7 +648,7 @@ static ADDRESS_MAP_START( cischeat_map3, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE(&cischeat_roadram[1])		// Road RAM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM										// RAM
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP							// watchdog
-	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE(rom_3_r, SMH_ROM)				// ROM
+	AM_RANGE(0x200000, 0x23ffff) AM_READ(rom_3_r)							// ROM
 ADDRESS_MAP_END
 
 

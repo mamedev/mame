@@ -146,9 +146,9 @@ static WRITE8_HANDLER ( tbowl_trigger_nmi )
 
 static ADDRESS_MAP_START( 6206C_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc000, 0xd7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE(SMH_RAM) AM_BASE(&tbowl_spriteram)
+	AM_RANGE(0xc000, 0xdfff) AM_READONLY
+	AM_RANGE(0xc000, 0xd7ff) AM_WRITEONLY
+	AM_RANGE(0xd800, 0xdfff) AM_WRITEONLY AM_BASE(&tbowl_spriteram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE_GENERIC(paletteram) // 2x palettes, one for each monitor?
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank2")
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w)

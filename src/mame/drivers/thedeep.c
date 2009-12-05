@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe00b, 0xe00b) AM_READ_PORT("e00b")			// DSW2
 	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(thedeep_sound_w		)	// To Sound CPU
 	AM_RANGE(0xe100, 0xe100) AM_WRITE(thedeep_e100_w		)	// ?
-	AM_RANGE(0xe210, 0xe213) AM_WRITE(SMH_RAM) AM_BASE(&thedeep_scroll				)	// Scroll
+	AM_RANGE(0xe210, 0xe213) AM_WRITEONLY AM_BASE(&thedeep_scroll				)	// Scroll
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(thedeep_vram_1_w) AM_BASE(&thedeep_vram_1		)	// Text Layer
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(thedeep_vram_0_w) AM_BASE(&thedeep_vram_0		)	// Background Layer

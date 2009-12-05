@@ -331,7 +331,7 @@ static WRITE8_HANDLER( vsgongf_sound_command_w )
 
 static ADDRESS_MAP_START( vsgongf_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa003, 0xa003) AM_READ(SMH_RAM)
+	AM_RANGE(0xa003, 0xa003) AM_READONLY
 	AM_RANGE(0xa006, 0xa006) AM_READ(vsgongf_a006_r) /* protection */
 	AM_RANGE(0xa100, 0xa100) AM_READ(vsgongf_a100_r) /* protection */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM					 /* work ram */
@@ -339,9 +339,9 @@ static ADDRESS_MAP_START( vsgongf_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe400, 0xe43f) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xe440, 0xe47b) AM_RAM
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(vsgongf_sound_command_w)
-	AM_RANGE(0xec00, 0xec06) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xec00, 0xec06) AM_WRITEONLY
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(vsgongf_color_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(SMH_RAM) /* vreg? always 0 */
+	AM_RANGE(0xf400, 0xf400) AM_WRITEONLY /* vreg? always 0 */
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2")
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM")

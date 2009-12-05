@@ -109,18 +109,18 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(vastar_bg1videoram_r, vastar_bg1videoram_w) AM_BASE_MEMBER(vastar_state,bg1videoram)
 	AM_RANGE(0xa000, 0xafff) AM_READWRITE(vastar_bg2videoram_r, vastar_bg2videoram_w)	/* mirror address */
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(vastar_bg1videoram_r, vastar_bg1videoram_w)	/* mirror address */
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(vastar_state,sprite_priority)	/* sprite/BG priority */
+	AM_RANGE(0xc000, 0xc000) AM_WRITEONLY AM_BASE_MEMBER(vastar_state,sprite_priority)	/* sprite/BG priority */
 	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(vastar_fgvideoram_w) AM_BASE_MEMBER(vastar_state,fgvideoram)
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
 	AM_RANGE(0xf000, 0xf0ff) AM_READWRITE(vastar_sharedram_r, vastar_sharedram_w) AM_BASE_MEMBER(vastar_state,sharedram)
 	AM_RANGE(0xf100, 0xf7ff) AM_RAM
 
 	/* in hidden portions of video RAM: (fallthrough) */
-	AM_RANGE(0xc400, 0xc43f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(vastar_state,spriteram1)	/* actually c410-c41f and c430-c43f */
-	AM_RANGE(0xc7c0, 0xc7df) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(vastar_state,bg1_scroll)
-	AM_RANGE(0xc7e0, 0xc7ff) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(vastar_state,bg2_scroll)
-	AM_RANGE(0xc800, 0xc83f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(vastar_state,spriteram2)	/* actually c810-c81f and c830-c83f */
-	AM_RANGE(0xcc00, 0xcc3f) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(vastar_state,spriteram3)	/* actually cc10-cc1f and cc30-cc3f */
+	AM_RANGE(0xc400, 0xc43f) AM_WRITEONLY AM_BASE_MEMBER(vastar_state,spriteram1)	/* actually c410-c41f and c430-c43f */
+	AM_RANGE(0xc7c0, 0xc7df) AM_WRITEONLY AM_BASE_MEMBER(vastar_state,bg1_scroll)
+	AM_RANGE(0xc7e0, 0xc7ff) AM_WRITEONLY AM_BASE_MEMBER(vastar_state,bg2_scroll)
+	AM_RANGE(0xc800, 0xc83f) AM_WRITEONLY AM_BASE_MEMBER(vastar_state,spriteram2)	/* actually c810-c81f and c830-c83f */
+	AM_RANGE(0xcc00, 0xcc3f) AM_WRITEONLY AM_BASE_MEMBER(vastar_state,spriteram3)	/* actually cc10-cc1f and cc30-cc3f */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_port_map, ADDRESS_SPACE_IO, 8 )

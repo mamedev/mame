@@ -1786,7 +1786,7 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 			cheat_region[region_count].offset = memory_address_to_byte(space, entry->addrstart) & space->bytemask;
 			cheat_region[region_count].endoffset = memory_address_to_byte(space, entry->addrend) & space->bytemask;
 			cheat_region[region_count].share = entry->share;
-			cheat_region[region_count].disabled = (entry->write.shandler8 == SMH_RAM) ? FALSE : TRUE;
+			cheat_region[region_count].disabled = (entry->write.type == AMH_RAM) ? FALSE : TRUE;
 
 			/* disable double share regions */
 			if (entry->share != 0)

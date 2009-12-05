@@ -42,7 +42,7 @@ static WRITE8_DEVICE_HANDLER( mquake_cia_0_porta_w )
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_install_write16_handler(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, (write16_space_func)SMH_UNMAP);
+		memory_unmap_write(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0);
 }
 
 

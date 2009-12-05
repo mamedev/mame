@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffff86, 0xffff87) AM_READ_PORT("DSW1")
 	AM_RANGE(0xffff88, 0xffff89) AM_READ_PORT("DSW2")
 	AM_RANGE(0xffff8a, 0xffff8b) AM_READ_PORT("DSW3")
-	AM_RANGE(0xffff8c, 0xffff8d) AM_READ(SMH_RAM)						// unknown
+	AM_RANGE(0xffff8c, 0xffff8d) AM_READONLY						// unknown
 	AM_RANGE(0xffff8e, 0xffff8f) AM_READ_PORT("JP")
 	AM_RANGE(0xffffa0, 0xffffa1) AM_READ_PORT("P3")						// used only by taotaida
 	AM_RANGE(0xffffa2, 0xffffa3) AM_READ_PORT("P4")						// used only by taotaida

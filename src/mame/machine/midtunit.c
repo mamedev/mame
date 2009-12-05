@@ -520,7 +520,7 @@ DRIVER_INIT( jdreddp )
 	init_tunit_generic(machine, SOUND_ADPCM_LARGE);
 
 	/* looks like the watchdog needs to be disabled */
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d81060, 0x01d8107f, 0, 0, (write16_space_func)SMH_NOP);
+	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d81060, 0x01d8107f, 0, 0);
 
 	/* protection */
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1b00000, 0x1bfffff, 0, 0, jdredd_prot_r, jdredd_prot_w);

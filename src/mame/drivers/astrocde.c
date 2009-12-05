@@ -448,7 +448,7 @@ static WRITE8_HANDLER( profpac_banksw_w )
 			memory_set_bankptr(space->machine, "bank2", memory_region(space->machine, "user2") + 0x4000 * bank);
 		}
 		else
-			memory_install_read8_handler(space, 0x4000, 0x7fff, 0, 0, (read8_space_func)SMH_UNMAP);
+			memory_unmap_read(space, 0x4000, 0x7fff, 0, 0);
 	}
 }
 

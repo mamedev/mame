@@ -2733,7 +2733,7 @@ static ADDRESS_MAP_START( crazyfgt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x610006, 0x610007) AM_WRITENOP
 	AM_RANGE(0x620000, 0x620003) AM_WRITENOP	// protection
 	AM_RANGE(0x630000, 0x630003) AM_READ(seta_dsw_r)
-	AM_RANGE(0x640400, 0x640fff) AM_WRITE(SMH_RAM) AM_BASE_GENERIC(paletteram) AM_SIZE(&seta_paletteram_size)	// Palette
+	AM_RANGE(0x640400, 0x640fff) AM_WRITEONLY AM_BASE_GENERIC(paletteram) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0x650000, 0x650003) AM_DEVWRITE8("ymsnd", ym3812_w, 0x00ff)
 	AM_RANGE(0x658000, 0x658001) AM_DEVWRITE8("oki", okim6295_w, 0x00ff)
 	AM_RANGE(0x670000, 0x670001) AM_READNOP		// watchdog?
@@ -2783,7 +2783,7 @@ static READ16_HANDLER( inttoote_700000_r )
 static ADDRESS_MAP_START( inttoote_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM	// ROM (up to 2MB)
 
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE(inttoote_key_r, SMH_RAM) AM_BASE(&inttoote_key_select)
+	AM_RANGE(0x200000, 0x200001) AM_RAM_READ(inttoote_key_r) AM_BASE(&inttoote_key_select)
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("P1")
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("P2") AM_WRITENOP
 
@@ -2796,14 +2796,14 @@ static ADDRESS_MAP_START( inttoote_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x500000, 0x500003) AM_READ(inttoote_dsw_r)	// DSW x 3
 
-	AM_RANGE(0x700000, 0x700101) AM_READWRITE(inttoote_700000_r,SMH_RAM) AM_BASE(&inttoote_700000)
+	AM_RANGE(0x700000, 0x700101) AM_RAM_READ(inttoote_700000_r) AM_BASE(&inttoote_700000)
 
 	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE8("rtc", msm6242_r, msm6242_w, 0x00ff)   // 6242RTC
 
 	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE( "x1snd", seta_sound_word_r, seta_sound_word_w		)	// Sound
 
-	AM_RANGE(0xa00000, 0xa00005) AM_WRITE(SMH_RAM) AM_BASE(&seta_vctrl_0		)	// VRAM 0&1 Ctrl
-	AM_RANGE(0xb00000, 0xb03fff) AM_READWRITE(SMH_RAM,seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM 0&1
+	AM_RANGE(0xa00000, 0xa00005) AM_WRITEONLY AM_BASE(&seta_vctrl_0		)	// VRAM 0&1 Ctrl
+	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM 0&1
 
 	AM_RANGE(0xc00000, 0xc00001) AM_RAM		// ? 0x4000
 
@@ -9789,7 +9789,7 @@ static DRIVER_INIT( metafox )
 	UINT16 *RAM = (UINT16 *) memory_region(machine, "maincpu");
 
 	/* This game uses the 21c000-21ffff area for protection? */
-//  memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x21c000, 0x21ffff, 0, 0, (read16_space_func)SMH_NOP, (write16_space_func)SMH_NOP);
+//  memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x21c000, 0x21ffff, 0, 0);
 
 	RAM[0x8ab1c/2] = 0x4e71;	// patch protection test: "cp error"
 	RAM[0x8ab1e/2] = 0x4e71;
@@ -9833,7 +9833,7 @@ static DRIVER_INIT ( blandia )
 
 static DRIVER_INIT( eightfrc )
 {
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x500004, 0x500005, 0, 0, (read16_space_func)SMH_NOP);	// watchdog??
+	memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x500004, 0x500005, 0, 0);	// watchdog??
 }
 
 
@@ -9858,7 +9858,7 @@ static DRIVER_INIT( kiwame )
 
 static DRIVER_INIT( rezon )
 {
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x500006, 0x500007, 0, 0, (read16_space_func)SMH_NOP);	// irq ack?
+	memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x500006, 0x500007, 0, 0);	// irq ack?
 }
 
 static DRIVER_INIT(wiggie)
@@ -9890,7 +9890,7 @@ static DRIVER_INIT(wiggie)
 	}
 
 	/* X1_010 is not used. */
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x100000, 0x103fff, 0, 0, (read16_space_func)SMH_NOP, (write16_space_func)SMH_NOP);
+	memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x100000, 0x103fff, 0, 0);
 
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xB00008, 0xB00009, 0, 0, wiggie_soundlatch_w);
 

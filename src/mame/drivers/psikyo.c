@@ -53,7 +53,7 @@ The Following Section of Code in Gunbird causes reads from the
 0028B6: 720FC041           moveq   #$f, D1
 
 This causes Gunbird to crash if the ROM Region Size
-allocated during loading is smaller than the SMH_ROM
+allocated during loading is smaller than the ROM
 region as it trys to read beyond the allocated rom region
 
 This was pointed out by Bart Puype

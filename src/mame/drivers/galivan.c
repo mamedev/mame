@@ -1030,7 +1030,7 @@ static DRIVER_INIT( youmab )
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x81, 0x81, 0, 0, youmab_81_w); // ?? often, alternating values
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x84, 0x84, 0, 0, youmab_84_w); // ?? often, sequence..
 
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xd81f, 0, 0, (write8_space_func)SMH_NOP); // scrolling isn't here..
+	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd800, 0xd81f, 0, 0); // scrolling isn't here..
 
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x8a, 0x8a, 0, 0, youmab_8a_r); // ???
 

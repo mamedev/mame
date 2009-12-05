@@ -843,13 +843,14 @@ static DRIVER_INIT( namcos11 )
 				{
 					m_n_bankoffset = 0;
 					memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f080000, 0x1f080003, 0, 0, bankswitch_rom64_upper_w );
-					memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0, (read32_space_func)SMH_NOP, bankswitch_rom64_w );
+					memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0 );
+					memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0, bankswitch_rom64_w );
 					state_save_register_global(machine,  m_n_bankoffset );
 				}
 			}
 			else
 			{
-				memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0, (write32_space_func)SMH_NOP );
+				memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0 );
 			}
 			break;
 		}

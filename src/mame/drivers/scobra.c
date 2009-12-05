@@ -324,7 +324,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hustlerb_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(frogger_filter_w)
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(scobra_soundram_r, SMH_RAM) AM_BASE(&scobra_soundram)  /* only here to initialize pointer */
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_READ(scobra_soundram_r) AM_BASE(&scobra_soundram)  /* only here to initialize pointer */
 ADDRESS_MAP_END
 
 

@@ -324,7 +324,7 @@ static ADDRESS_MAP_START( rallyx_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("P2")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW")
-	AM_RANGE(0xa000, 0xa00f) AM_WRITE(SMH_RAM) AM_BASE(&rallyx_radarattr)
+	AM_RANGE(0xa000, 0xa00f) AM_WRITEONLY AM_BASE(&rallyx_radarattr)
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xa100, 0xa11f) AM_DEVWRITE("namco", pacman_sound_w) AM_BASE(&namco_soundregs)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)
@@ -347,7 +347,7 @@ static ADDRESS_MAP_START( jungler_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("P2")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa180, 0xa180) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa000, 0xa00f) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) AM_BASE(&rallyx_radarattr)	// jungler writes to a03x
+	AM_RANGE(0xa000, 0xa00f) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE(&rallyx_radarattr)	// jungler writes to a03x
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)	/* only jungler and tactcian */

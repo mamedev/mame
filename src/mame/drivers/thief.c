@@ -173,10 +173,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thief_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(thief_blit_w)
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x0001, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM		/* 2114 */
-	AM_RANGE(0xa000, 0xafff) AM_READ(SMH_ROM)		/* NATO Defense diagnostic ROM */
+	AM_RANGE(0xa000, 0xafff) AM_ROM		/* NATO Defense diagnostic ROM */
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(thief_videoram_r, thief_videoram_w)	/* 4116 */
 	AM_RANGE(0xe000, 0xe008) AM_READWRITE(thief_coprocessor_r, thief_coprocessor_w)
 	AM_RANGE(0xe010, 0xe02f) AM_ROM

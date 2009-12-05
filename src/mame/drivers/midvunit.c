@@ -493,7 +493,7 @@ static ADDRESS_MAP_START( midvunit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x980082, 0x980083) AM_READ(midvunit_dma_trigger_r)
 	AM_RANGE(0x990000, 0x990000) AM_READNOP	// link PAL (low 4 bits must == 4)
 	AM_RANGE(0x991030, 0x991030) AM_READ_PORT("991030")
-//  AM_RANGE(0x991050, 0x991050) AM_READ(SMH_RAM) // seems to be another port
+//  AM_RANGE(0x991050, 0x991050) AM_READONLY // seems to be another port
 	AM_RANGE(0x991060, 0x991060) AM_READ(port0_r)
 	AM_RANGE(0x992000, 0x992000) AM_READ_PORT("992000")
 	AM_RANGE(0x993000, 0x993000) AM_READWRITE(midvunit_adc_r, midvunit_adc_w)

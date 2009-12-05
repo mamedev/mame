@@ -62,7 +62,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(m52_videoram_w) AM_BASE_MEMBER(irem_z80_state, videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(m52_colorram_w) AM_BASE_MEMBER(irem_z80_state, colorram)
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07ff) AM_READ(m52_protection_r)
-	AM_RANGE(0xc800, 0xcbff) AM_MIRROR(0x0400) AM_WRITE(SMH_RAM) AM_BASE_SIZE_MEMBER(irem_z80_state, spriteram, spriteram_size)
+	AM_RANGE(0xc800, 0xcbff) AM_MIRROR(0x0400) AM_WRITEONLY AM_BASE_SIZE_MEMBER(irem_z80_state, spriteram, spriteram_size)
 	AM_RANGE(0xd000, 0xd000) AM_MIRROR(0x07fc) AM_WRITE(irem_sound_cmd_w)
 	AM_RANGE(0xd001, 0xd001) AM_MIRROR(0x07fc) AM_WRITE(m52_flipscreen_w)	/* + coin counters */
 	AM_RANGE(0xd000, 0xd000) AM_MIRROR(0x07f8) AM_READ_PORT("IN0")
@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( alpha1v_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(m52_videoram_w) AM_BASE_MEMBER(irem_z80_state, videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(m52_colorram_w) AM_BASE_MEMBER(irem_z80_state, colorram)
-	AM_RANGE(0xc800, 0xc9ff) AM_WRITE(SMH_RAM) AM_BASE_SIZE_MEMBER(irem_z80_state, spriteram, spriteram_size) AM_SHARE(1) // bigger or mirrored?
+	AM_RANGE(0xc800, 0xc9ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(irem_z80_state, spriteram, spriteram_size) AM_SHARE(1) // bigger or mirrored?
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0") AM_WRITE(irem_sound_cmd_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("IN1") AM_WRITE(alpha1v_flipscreen_w)
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN2")

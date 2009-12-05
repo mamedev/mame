@@ -304,7 +304,7 @@ static ADDRESS_MAP_START( cannonb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x8800, 0x88ff) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&cclimber_bigsprite_videoram) /* must not return what's written (game will reset after coin insert if it returns 0xff)*/
+	AM_RANGE(0x8800, 0x88ff) AM_READNOP AM_WRITEONLY AM_BASE(&cclimber_bigsprite_videoram) /* must not return what's written (game will reset after coin insert if it returns 0xff)*/
 //  AM_RANGE(0x8900, 0x8bff) AM_WRITEONLY  /* not used, but initialized */
 	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&cclimber_videoram)
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
@@ -337,7 +337,7 @@ static ADDRESS_MAP_START( swimmer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa004, 0xa004) AM_WRITEONLY AM_BASE(&swimmer_palettebank)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P1") AM_WRITE(swimmer_sh_soundlatch_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW2") AM_WRITE(SMH_RAM) AM_BASE(&swimmer_background_color)
+	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE(&swimmer_background_color)
 	AM_RANGE(0xb880, 0xb880) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM					/* ??? used by Guzzler */
 	AM_RANGE(0xe000, 0xffff) AM_ROM					/* Guzzler only */

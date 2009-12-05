@@ -221,13 +221,12 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( map_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_WRITENOP	/* garbage, written in initialization loop */
 	//0x4000 and 0x4040-0x4045 seem to be used (referenced in the code)
 	AM_RANGE(0x4000, 0x7fff) AM_WRITENOP	/* garbage, written in initialization loop */
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x8000, 0x87ff) AM_READONLY
+	AM_RANGE(0x8000, 0x87ff) AM_WRITEONLY
 ADDRESS_MAP_END
 
 

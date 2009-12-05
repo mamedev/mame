@@ -950,7 +950,7 @@ static ADDRESS_MAP_START( bosco_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(bosco_videoram_r, bosco_videoram_w) AM_BASE(&bosco_videoram)	/* + sprite registers */
 	AM_RANGE(0x9000, 0x90ff) AM_DEVREADWRITE("06xx_1", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x9100, 0x9100) AM_DEVREADWRITE("06xx_1", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
-	AM_RANGE(0x9800, 0x980f) AM_WRITE(SMH_RAM) AM_SHARE(2) AM_BASE(&bosco_radarattr)
+	AM_RANGE(0x9800, 0x980f) AM_WRITEONLY AM_SHARE(2) AM_BASE(&bosco_radarattr)
 	AM_RANGE(0x9810, 0x9810) AM_WRITE(bosco_scrollx_w)
 	AM_RANGE(0x9820, 0x9820) AM_WRITE(bosco_scrolly_w)
 	AM_RANGE(0x9830, 0x9830) AM_WRITE(bosco_starcontrol_w)
@@ -1019,24 +1019,24 @@ ADDRESS_MAP_END
 
 /* bootleg 4th CPU replacing the 5xXX chips */
 static ADDRESS_MAP_START( galaga_mem4, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(SMH_ROM, SMH_ROM)
-	AM_RANGE(0x1000, 0x107f) AM_READWRITE(SMH_RAM, SMH_RAM)
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x1000, 0x107f) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( battles_mem4, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x4003) AM_READ(battles_input_port_r)
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(battles_CPU4_coin_w)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(battles_noise_sound_w)
 	AM_RANGE(0x6000, 0x6000) AM_READWRITE(battles_customio3_r, battles_customio3_w)
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(battles_customio_data3_r, battles_customio_data3_w)
-	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(SMH_RAM, SMH_RAM)
+	AM_RANGE(0x8000, 0x80ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dzigzag_mem4, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(SMH_ROM, SMH_ROM)
-	AM_RANGE(0x1000, 0x107f) AM_READWRITE(SMH_RAM, SMH_RAM)
-	AM_RANGE(0x4000, 0x4007) AM_READ(SMH_RAM)	// dip switches? bits 0 & 1 used
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x1000, 0x107f) AM_RAM
+	AM_RANGE(0x4000, 0x4007) AM_READONLY	// dip switches? bits 0 & 1 used
 ADDRESS_MAP_END
 
 

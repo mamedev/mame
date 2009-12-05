@@ -59,7 +59,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa80020, 0xa80021) AM_READ_PORT("SYSTEM") AM_WRITENOP		/* w - could be watchdog, but causes resets when picture is shown */
 	AM_RANGE(0xa80030, 0xa80031) AM_READ_PORT("DSW1") AM_WRITENOP		/* w - irq ack? */
 	AM_RANGE(0xa80040, 0xa80041) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa80050, 0xa80051) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(galspnbl_state, scroll)	/* ??? */
+	AM_RANGE(0xa80050, 0xa80051) AM_WRITEONLY AM_BASE_MEMBER(galspnbl_state, scroll)	/* ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ymsnd", ym3812_w)
-	AM_RANGE(0xfc00, 0xfc00) AM_READWRITE(SMH_NOP, SMH_NOP)	/* irq ack ?? */
+	AM_RANGE(0xfc00, 0xfc00) AM_NOP	/* irq ack ?? */
 	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 

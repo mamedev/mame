@@ -566,7 +566,7 @@ static DRIVER_INIT( xfiles )
 	rom[BYTE4_XOR_BE(0x3aa933)] = 0;
 
 //  protection related ?
-//  memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0c8b440, 0xf0c8b447, 0, 0, (read32_space_func)SMH_NOP );
+//  memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0c8b440, 0xf0c8b447, 0, 0);
 
 	flash_roms = 2;
 }
@@ -586,7 +586,7 @@ static DRIVER_INIT( kdynastg )
 	rom[BYTE4_XOR_BE(0x3a45c9)] = 0;
 
 //  protection related ?
-//  memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x12341234, 0x12341243, 0, 0, (read32_space_func)SMH_NOP );
+//  memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x12341234, 0x12341243, 0, 0);
 
 	flash_roms = 4;
 }

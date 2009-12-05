@@ -210,8 +210,8 @@ static ADDRESS_MAP_START( wizzquiz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c60, 0x1fff) AM_RAM
 	AM_RANGE(0x2800, 0x2bff) AM_RAM
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM) AM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
-	AM_RANGE(0x3800, 0x3fff) AM_READ(SMH_RAM) AM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(questions_bank_w)
 	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -1190,7 +1190,7 @@ static DRIVER_INIT( atlantol )
 	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypt);
 
 	memory_install_write8_handler(space, 0x0800, 0x0800, 0, 0, atlantol_gfxbank_w);
-	memory_install_write8_handler(space, 0x1000, 0x1000, 0, 0, (write8_space_func)SMH_NOP);
+	memory_nop_write(space, 0x1000, 0x1000, 0, 0);
 
 	/* unmapped areas read as ROM */
 	memory_install_read_bank_handler(space, 0x0000, 0x11ff, 0, 0, "bank10");

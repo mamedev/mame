@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff6000, 0xff6fff) AM_RAM_WRITE(atarigen_alpha_w)        AM_SHARE(8) AM_BASE(&atarigen_alpha)
 	AM_RANGE(0xff7000, 0xff77ff) AM_RAM_WRITE(atarimo_0_spriteram_w)   AM_SHARE(9) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0xff7800, 0xff9fff) AM_RAM                                           AM_SHARE(10)
-	AM_RANGE(0xffa000, 0xffbfff) AM_RAM_WRITE(SMH_NOP)               AM_SHARE(11)
+	AM_RANGE(0xffa000, 0xffbfff) AM_READONLY AM_WRITENOP               AM_SHARE(11)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM                                           AM_SHARE(12)
 ADDRESS_MAP_END
 
@@ -174,7 +174,7 @@ static ADDRESS_MAP_START( extra_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff7000, 0xff77ff) AM_RAM_WRITE(atarimo_0_spriteram_w)   AM_SHARE(9)
 	AM_RANGE(0xff7800, 0xff9fff) AM_RAM                                           AM_SHARE(10)
 	AM_RANGE(0xffa000, 0xffbfff) AM_RAM                                           AM_SHARE(11)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM_WRITE(SMH_NOP)               AM_SHARE(12)
+	AM_RANGE(0xffc000, 0xffffff) AM_READONLY AM_WRITENOP               AM_SHARE(12)
 ADDRESS_MAP_END
 
 

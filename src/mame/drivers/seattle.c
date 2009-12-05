@@ -2778,7 +2778,7 @@ static void init_common(running_machine *machine, int ioasic, int serialnum, int
 	{
 		case PHOENIX_CONFIG:
 			/* original Phoenix board only has 4MB of RAM */
-			memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00400000, 0x007fffff, 0, 0, (read32_space_func)SMH_UNMAP, (write32_space_func)SMH_UNMAP);
+			memory_unmap_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00400000, 0x007fffff, 0, 0);
 			break;
 
 		case SEATTLE_WIDGET_CONFIG:

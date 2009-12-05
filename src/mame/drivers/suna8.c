@@ -513,7 +513,7 @@ static ADDRESS_MAP_START( hardhead_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")						// Banked ROM
 	AM_RANGE(0xc000, 0xd7ff) AM_RAM								// RAM
 	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0xda00, 0xda00) AM_READWRITE(hardhead_ip_r, SMH_RAM) AM_BASE(&hardhead_ip)	// Input Port Select
+	AM_RANGE(0xda00, 0xda00) AM_RAM_READ(hardhead_ip_r) AM_BASE(&hardhead_ip)	// Input Port Select
 	AM_RANGE(0xda80, 0xda80) AM_READWRITE(soundlatch2_r, hardhead_bankswitch_w	)	// ROM Banking
 	AM_RANGE(0xdb00, 0xdb00) AM_WRITE(soundlatch_w			)	// To Sound CPU
 	AM_RANGE(0xdb80, 0xdb80) AM_WRITE(hardhead_flipscreen_w	)	// Flip Screen + Coin Lockout
@@ -527,7 +527,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hardhead_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(SMH_NOP	)	// ? IRQ Ack
+	AM_RANGE(0x00, 0x00) AM_READNOP	// ? IRQ Ack
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -578,7 +578,7 @@ static ADDRESS_MAP_START( rranger_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0xc004, 0xc004) AM_READ(rranger_soundstatus_r	)	// Latch Status?
 	AM_RANGE(0xc200, 0xc200) AM_NOP								// Protection?
-	AM_RANGE(0xc280, 0xc280) AM_WRITE(SMH_NOP				)	// ? NMI Ack
+	AM_RANGE(0xc280, 0xc280) AM_WRITENOP	// ? NMI Ack
 	AM_RANGE(0xc280, 0xc280) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0xc2c0, 0xc2c0) AM_READ_PORT("DSW2")				// DSW 2
 	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)	// Palette
@@ -589,7 +589,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rranger_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(SMH_NOP	)	// ? IRQ Ack
+	AM_RANGE(0x00, 0x00) AM_READNOP	// ? IRQ Ack
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -759,7 +759,7 @@ static ADDRESS_MAP_START( hardhea2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc300, 0xc300) AM_WRITE(hardhea2_flipscreen_w		)	// Flip Screen
 	AM_RANGE(0xc380, 0xc380) AM_WRITE(hardhea2_nmi_w				)	// ? NMI related ?
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(hardhea2_leds_w				)	// Leds + Coin Counter
-	AM_RANGE(0xc480, 0xc480) AM_WRITE(SMH_NOP					)	// ~ROM Bank
+	AM_RANGE(0xc480, 0xc480) AM_WRITENOP	// ~ROM Bank
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_w				)	// To Sound CPU
 
 	// *** Protection
@@ -922,7 +922,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hardhead_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(SMH_NOP	)	// ? IRQ Ack
+	AM_RANGE(0x01, 0x01) AM_READNOP	// ? IRQ Ack
 ADDRESS_MAP_END
 
 

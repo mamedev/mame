@@ -1086,7 +1086,7 @@ static DRIVER_INIT( stinger )
 
 static DRIVER_INIT( scion )
 {
-	memory_install_write8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x4001, 0, 0, (write8_space_func)SMH_NOP);
+	memory_nop_write(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x4001, 0, 0);
 }
 
 

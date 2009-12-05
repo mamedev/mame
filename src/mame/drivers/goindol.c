@@ -95,9 +95,9 @@ static ADDRESS_MAP_START( goindol_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_WRITE(soundlatch_w) // watchdog?
 	AM_RANGE(0xc810, 0xc810) AM_WRITE(goindol_bankswitch_w)
 	AM_RANGE(0xc820, 0xc820) AM_READ_PORT("DIAL")
-	AM_RANGE(0xc820, 0xd820) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(goindol_state, fg_scrolly)
+	AM_RANGE(0xc820, 0xd820) AM_WRITEONLY AM_BASE_MEMBER(goindol_state, fg_scrolly)
 	AM_RANGE(0xc830, 0xc830) AM_READ_PORT("P1")
-	AM_RANGE(0xc830, 0xd830) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(goindol_state, fg_scrollx)
+	AM_RANGE(0xc830, 0xd830) AM_WRITEONLY AM_BASE_MEMBER(goindol_state, fg_scrollx)
 	AM_RANGE(0xc834, 0xc834) AM_READ_PORT("P2")
 	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_BASE_SIZE_MEMBER(goindol_state, spriteram, spriteram_size)
 	AM_RANGE(0xd040, 0xd7ff) AM_RAM

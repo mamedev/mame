@@ -587,7 +587,7 @@ static int has_write_handler8(const device_config *cpu, write8_space_func handle
 
 		if (space != NULL && space->map != NULL)
 			for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
-				if (entry->write.shandler8 == handler)
+				if (entry->write.type == AMH_HANDLER && entry->write.handler.write.shandler8 == handler)
 					return 1;
 	}
 
@@ -603,7 +603,7 @@ static int has_write_handler(const device_config *cpu, write16_space_func handle
 
 		if (space != NULL && space->map != NULL)
 			for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
-				if (entry->write.shandler16 == handler)
+				if (entry->write.type == AMH_HANDLER && entry->write.handler.write.shandler16 == handler)
 					return 1;
 	}
 

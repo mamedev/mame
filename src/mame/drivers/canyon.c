@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0680, 0x0683) AM_WRITE(canyon_led_w)
 	AM_RANGE(0x0700, 0x0703) AM_DEVWRITE("discrete", canyon_attract_w)
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(canyon_videoram_w) AM_BASE_MEMBER(canyon_state, videoram)
-	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(canyon_switches_r, SMH_NOP)  /* sloppy code writes here */
+	AM_RANGE(0x1000, 0x17ff) AM_READ(canyon_switches_r) AM_WRITENOP  /* sloppy code writes here */
 	AM_RANGE(0x1800, 0x1fff) AM_READ(canyon_options_r)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END

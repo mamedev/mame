@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( contra_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x1000, 0x1fff) AM_RAM
 
-	AM_RANGE(0x2000, 0x5fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x2000, 0x5fff) AM_READONLY
 	AM_RANGE(0x2000, 0x23ff) AM_WRITE(contra_fg_cram_w) AM_BASE(&contra_fg_cram)
 	AM_RANGE(0x2400, 0x27ff) AM_WRITE(contra_fg_vram_w) AM_BASE(&contra_fg_vram)
 	AM_RANGE(0x2800, 0x2bff) AM_WRITE(contra_text_cram_w) AM_BASE(&contra_text_cram)

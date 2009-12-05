@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x06, 0x06) AM_WRITE(yunsung8_flipscreen_w						)	// Flip Screen
-	AM_RANGE(0x07, 0x07) AM_WRITE(SMH_NOP									)	// ? (end of IRQ, random value)
+	AM_RANGE(0x07, 0x07) AM_WRITENOP	// ? (end of IRQ, random value)
 ADDRESS_MAP_END
 
 

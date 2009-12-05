@@ -257,8 +257,8 @@ static READ8_HANDLER(pal_r)
 
 static ADDRESS_MAP_START( cshooter_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank1") AM_WRITE(SMH_RAM)
-	AM_RANGE(0xb000, 0xb0ff) AM_READ(SMH_RAM)			// sound related ?
+	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank1") AM_WRITEONLY
+	AM_RANGE(0xb000, 0xb0ff) AM_READONLY			// sound related ?
 	AM_RANGE(0xc000, 0xc1ff) AM_WRITE(pal_w) AM_READ(pal_r) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN0")
 	AM_RANGE(0xc201, 0xc201) AM_READ_PORT("IN1")

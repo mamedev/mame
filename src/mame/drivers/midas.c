@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE( livequiz_gfxregs_w ) AM_BASE( &livequiz_gfxregs )
 
-	AM_RANGE(0xa00000, 0xa3ffff) AM_READWRITE( SMH_RAM, paletteram16_xrgb_word_be_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_WRITE( paletteram16_xrgb_word_be_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE(0xa40000, 0xa7ffff) AM_RAM
 
 	AM_RANGE(0xb00000, 0xb00001) AM_READ( ret_ffff )

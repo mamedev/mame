@@ -1325,7 +1325,7 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 				}
 
 				/* if this is a program space, auto-assign implicit ROM entries */
-				if ((FPTR)entry->read.generic == STATIC_ROM && entry->region == NULL)
+				if (entry->read.type == AMH_ROM && entry->region == NULL)
 				{
 					entry->region = device->tag;
 					entry->rgnoffs = entry->addrstart;
@@ -1362,30 +1362,26 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 				}
 
 				/* make sure all devices exist */
-				if (entry->read_devtag != NULL && device_list_find_by_tag(&config->devicelist, entry->read_devtag) == NULL)
+				if ((entry->read.type == AMH_DEVICE_HANDLER && entry->read.tag != NULL && device_list_find_by_tag(&config->devicelist, entry->read.tag) == NULL) ||
+					(entry->write.type == AMH_DEVICE_HANDLER && entry->write.tag != NULL && device_list_find_by_tag(&config->devicelist, entry->write.tag) == NULL))
 				{
-					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant device '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->read_devtag);
-					error = TRUE;
-				}
-				if (entry->write_devtag != NULL && device_list_find_by_tag(&config->devicelist, entry->write_devtag) == NULL)
-				{
-					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant device '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->write_devtag);
+					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant device '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->write.tag);
 					error = TRUE;
 				}
 
 				/* make sure ports exist */
-				if (entry->read_porttag != NULL && input_port_by_tag(portlist, entry->read_porttag) == NULL)
+				if ((entry->read.type == AMH_PORT && entry->read.tag != NULL && input_port_by_tag(portlist, entry->read.tag) == NULL) ||
+					(entry->write.type == AMH_PORT && entry->write.tag != NULL && input_port_by_tag(portlist, entry->write.tag) == NULL))
 				{
-					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->read_porttag);
+					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->read.tag);
 					error = TRUE;
 				}
 
-				/* make sure ports exist */
-				if (entry->write_porttag != NULL && input_port_by_tag(portlist, entry->write_porttag) == NULL)
-				{
-					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->write_porttag);
-					error = TRUE;
-				}
+				/* validate bank tags */
+				if (entry->read.type == AMH_BANK)
+					error |= validate_tag(driver, "bank", entry->read.tag);
+				if (entry->write.type == AMH_BANK)
+					error |= validate_tag(driver, "bank", entry->write.tag);
 			}
 
 			/* release the address map */

@@ -354,7 +354,7 @@ static WRITE32_HANDLER( aga_overlay_w )
 			memory_install_write_bank_handler(space, 0x000000, 0x1fffff, 0, 0, "bank1");
 		else
 			/* overlay enabled, map Amiga system ROM on 0x000000 */
-			memory_install_write32_handler(space, 0x000000, 0x1fffff, 0, 0, (write32_space_func)SMH_UNMAP);
+			memory_unmap_write(space, 0x000000, 0x1fffff, 0, 0);
 	}
 }
 

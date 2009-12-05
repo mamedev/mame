@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( mnchmobl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xbe31, 0xbe31) AM_WRITENOP /* ? */
 	AM_RANGE(0xbe41, 0xbe41) AM_WRITE(mnchmobl_flipscreen_w)
 	AM_RANGE(0xbe61, 0xbe61) AM_WRITE(mnchmobl_nmi_enable_w) /* ENI 1-10C */
-	AM_RANGE(0xbf00, 0xbf07) AM_WRITE(SMH_RAM) AM_BASE(&mnchmobl_vreg) /* MY0 1-8C */
+	AM_RANGE(0xbf00, 0xbf07) AM_WRITEONLY AM_BASE(&mnchmobl_vreg) /* MY0 1-8C */
 	AM_RANGE(0xbf01, 0xbf01) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xbf02, 0xbf02) AM_READ_PORT("P1")
 	AM_RANGE(0xbf03, 0xbf03) AM_READ_PORT("P2")

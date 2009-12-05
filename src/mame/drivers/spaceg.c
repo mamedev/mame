@@ -320,11 +320,11 @@ static ADDRESS_MAP_START( spaceg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
 
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(spaceg_colorram_r, SMH_RAM) AM_BASE_MEMBER(spaceg_state, unkram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_READ(spaceg_colorram_r) AM_BASE_MEMBER(spaceg_state, unkram)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(zvideoram_w) AM_BASE_MEMBER(spaceg_state, videoram)
 
-	AM_RANGE(0x9400, 0x9400) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(spaceg_state, io9400) /* gfx ctrl */
-	AM_RANGE(0x9401, 0x9401) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(spaceg_state, io9401) /* gfx ctrl */
+	AM_RANGE(0x9400, 0x9400) AM_WRITEONLY AM_BASE_MEMBER(spaceg_state, io9400) /* gfx ctrl */
+	AM_RANGE(0x9401, 0x9401) AM_WRITEONLY AM_BASE_MEMBER(spaceg_state, io9401) /* gfx ctrl */
 	/* 9402 -
         bits 0 and 1 probably control the lamps under the player 1 and player 2 start buttons
         bit 2 - unknown -

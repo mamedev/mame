@@ -554,7 +554,7 @@ static ADDRESS_MAP_START( wecleman_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140012, 0x140013) AM_READ_PORT("IN1")	// ??
 	AM_RANGE(0x140014, 0x140015) AM_READ_PORT("DSWA")	// DSW 2
 	AM_RANGE(0x140016, 0x140017) AM_READ_PORT("DSWB")	// DSW 1
-	AM_RANGE(0x140020, 0x140021) AM_WRITE(SMH_RAM)	// Paired with writes to $140003
+	AM_RANGE(0x140020, 0x140021) AM_WRITEONLY	// Paired with writes to $140003
 	AM_RANGE(0x140020, 0x140021) AM_READ(selected_ip_r)	// Accelerator or Wheel or ..
 	AM_RANGE(0x140030, 0x140031) AM_WRITENOP	// toggles between 0 & 1 on hitting bumps and crashes (vibration?)
 ADDRESS_MAP_END
@@ -616,7 +616,7 @@ static ADDRESS_MAP_START( hotchase_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140012, 0x140013) AM_READ_PORT("IN1")	// ?? bit 4 from sound cpu
 	AM_RANGE(0x140014, 0x140015) AM_READ_PORT("DSW2")	// DSW 2
 	AM_RANGE(0x140016, 0x140017) AM_READ_PORT("DSW1")	// DSW 1
-	AM_RANGE(0x140020, 0x140021) AM_READWRITE(selected_ip_r, SMH_NOP)	// Paired with writes to $140003
+	AM_RANGE(0x140020, 0x140021) AM_READ(selected_ip_r) AM_WRITENOP	// Paired with writes to $140003
 	AM_RANGE(0x140022, 0x140023) AM_READNOP	// ??
 	AM_RANGE(0x140030, 0x140031) AM_WRITENOP	// signal to cabinet vibration motors?
 ADDRESS_MAP_END

@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN0")
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW")
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)   /* mirror for 6502 vectors */
+	AM_RANGE(0xe000, 0xffff) AM_ROM   /* mirror for 6502 vectors */
 ADDRESS_MAP_END
 
 

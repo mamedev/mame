@@ -249,7 +249,7 @@ static WRITE8_HANDLER( mcu_pa_write )
 
 /* H8/3002 MCU stuff */
 static ADDRESS_MAP_START( nd1h8rwmap, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE( sharedram_sub_r, sharedram_sub_w )
 	AM_RANGE(0xa00000, 0xa07fff) AM_DEVREADWRITE( "c352", c352_r, c352_w )
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("DSW")

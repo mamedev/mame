@@ -780,13 +780,13 @@ WRITE8_HANDLER( defender_bank_select_w )
 		case 8:
 		case 9:
 			memory_install_read_bank_handler(space, 0xc000, 0xcfff, 0, 0, "bank1");
-			memory_install_write8_handler(space, 0xc000, 0xcfff, 0, 0, (write8_space_func)SMH_UNMAP);
+			memory_unmap_write(space, 0xc000, 0xcfff, 0, 0);
 			memory_set_bank(space->machine, "bank1", vram_bank - 1);
 			break;
 
 		/* pages A-F are not connected */
 		default:
-			memory_install_readwrite8_handler(space, 0xc000, 0xcfff, 0, 0, (read8_space_func)SMH_NOP, (write8_space_func)SMH_NOP);
+			memory_nop_readwrite(space, 0xc000, 0xcfff, 0, 0);
 			break;
 	}
 }

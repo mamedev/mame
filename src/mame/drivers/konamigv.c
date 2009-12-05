@@ -636,7 +636,7 @@ static DRIVER_INIT( btchamp )
 	intelflash_init( machine, 0, FLASH_SHARP_LH28F400, NULL );
 
 	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f68008f, 0, 0, btc_trackball_r, btc_trackball_w );
-	memory_install_write32_handler    ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800e0, 0x1f6800e3, 0, 0, (write32_space_func)SMH_NOP );
+	memory_nop_write                  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800e0, 0x1f6800e3, 0, 0 );
 	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f380000, 0x1f3fffff, 0, 0, btcflash_r, btcflash_w );
 
 	DRIVER_INIT_CALL(konamigv);

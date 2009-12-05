@@ -50,7 +50,7 @@ static WRITE8_HANDLER( srumbler_bankswitch_w )
 		char bankname[10];
 		/* bit 2 of prom1 selects ROM or RAM - not supported */
 
-		sprintf(bankname, "%04X", i*0x1000);
+		sprintf(bankname, "%04x", i*0x1000);
 		memory_set_bankptr(space->machine, bankname,&ROM[bank*0x1000]);
 	}
 }
@@ -98,12 +98,12 @@ static ADDRESS_MAP_START( srumbler_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x73ff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("8000")	/* Banked ROM */
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("9000")	/* Banked ROM */
-	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("A000")	/* Banked ROM */
-	AM_RANGE(0xb000, 0xbfff) AM_ROMBANK("B000")	/* Banked ROM */
-	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("C000")	/* Banked ROM */
-	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK("D000")	/* Banked ROM */
-	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("E000")	/* Banked ROM */
-	AM_RANGE(0xf000, 0xffff) AM_ROMBANK("F000")	/* Banked ROM */
+	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("a000")	/* Banked ROM */
+	AM_RANGE(0xb000, 0xbfff) AM_ROMBANK("b000")	/* Banked ROM */
+	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("c000")	/* Banked ROM */
+	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK("d000")	/* Banked ROM */
+	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("e000")	/* Banked ROM */
+	AM_RANGE(0xf000, 0xffff) AM_ROMBANK("f000")	/* Banked ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srumbler_sound_map, ADDRESS_SPACE_PROGRAM, 8 )

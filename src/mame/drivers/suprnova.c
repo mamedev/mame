@@ -781,7 +781,7 @@ static ADDRESS_MAP_START( skns_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x02400000, 0x0240007f) AM_RAM_WRITE(skns_v3_regs_w) AM_BASE(&skns_v3_regs) /* tilemap registers */
 	AM_RANGE(0x02500000, 0x02503fff) AM_RAM_WRITE(skns_tilemapA_w) AM_BASE(&skns_tilemapA_ram) /* tilemap A */
 	AM_RANGE(0x02504000, 0x02507fff) AM_RAM_WRITE(skns_tilemapB_w) AM_BASE(&skns_tilemapB_ram) /* tilemap B */
-	AM_RANGE(0x02600000, 0x02607fff) AM_RAM_WRITE(SMH_RAM) AM_BASE(&skns_v3slc_ram) /* tilemap linescroll */
+	AM_RANGE(0x02600000, 0x02607fff) AM_RAM AM_BASE(&skns_v3slc_ram) /* tilemap linescroll */
 	AM_RANGE(0x02a00000, 0x02a0001f) AM_RAM_WRITE(skns_pal_regs_w) AM_BASE(&skns_pal_regs)
 	AM_RANGE(0x02a40000, 0x02a5ffff) AM_RAM_WRITE(skns_palette_ram_w) AM_BASE(&skns_palette_ram)
 	AM_RANGE(0x02f00000, 0x02f000ff) AM_READWRITE(skns_hit_r, skns_hit_w)

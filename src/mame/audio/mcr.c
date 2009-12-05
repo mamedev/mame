@@ -459,7 +459,7 @@ static ADDRESS_MAP_START( ssio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x0ffc) AM_DEVWRITE("ssio.2", ay8910_address_w)
 	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x0ffc) AM_DEVREAD("ssio.2", ay8910_r)
 	AM_RANGE(0xb002, 0xb002) AM_MIRROR(0x0ffc) AM_DEVWRITE("ssio.2", ay8910_data_w)
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(SMH_NOP, ssio_status_w)
+	AM_RANGE(0xc000, 0xcfff) AM_READNOP AM_WRITE(ssio_status_w)
 	AM_RANGE(0xd000, 0xdfff) AM_WRITENOP	/* low bit controls yellow LED */
 	AM_RANGE(0xe000, 0xefff) AM_READ(ssio_irq_clear)
 	AM_RANGE(0xf000, 0xffff) AM_READ_PORT("SSIO.DIP")	/* 6 DIP switches */

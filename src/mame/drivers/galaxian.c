@@ -2430,9 +2430,9 @@ static void unmap_galaxian_sound(running_machine *machine, offs_t base)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	memory_install_write8_handler(space, base + 0x0004, base + 0x0007, 0, 0x07f8, (write8_space_func)SMH_UNMAP);
-	memory_install_write8_handler(space, base + 0x0800, base + 0x0807, 0, 0x07f8, (write8_space_func)SMH_UNMAP);
-	memory_install_write8_handler(space, base + 0x1800, base + 0x1800, 0, 0x07ff, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(space, base + 0x0004, base + 0x0007, 0, 0x07f8);
+	memory_unmap_write(space, base + 0x0800, base + 0x0807, 0, 0x07f8);
+	memory_unmap_write(space, base + 0x1800, base + 0x1800, 0, 0x07ff);
 }
 
 
@@ -2457,7 +2457,7 @@ static DRIVER_INIT( nolock )
 	DRIVER_INIT_CALL(galaxian);
 
 	/* ...but coin lockout disabled/disconnected */
-	memory_install_write8_handler(space, 0x6002, 0x6002, 0, 0x7f8, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(space, 0x6002, 0x6002, 0, 0x7f8);
 }
 
 
@@ -2469,7 +2469,7 @@ static DRIVER_INIT( azurian )
 	common_init(machine, scramble_draw_bullet, galaxian_draw_background, NULL, NULL);
 
 	/* coin lockout disabled */
-	memory_install_write8_handler(space, 0x6002, 0x6002, 0, 0x7f8, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(space, 0x6002, 0x6002, 0, 0x7f8);
 }
 
 
@@ -2710,7 +2710,7 @@ static DRIVER_INIT( zigzag )
 	zigzag_bankswap_w(space, 0, 0);
 
 	/* coin lockout disabled */
-	memory_install_write8_handler(space, 0x6002, 0x6002, 0, 0x7f8, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(space, 0x6002, 0x6002, 0, 0x7f8);
 
 	/* remove the galaxian sound hardware */
 	unmap_galaxian_sound(machine, 0x6000);
@@ -2736,7 +2736,7 @@ static DRIVER_INIT( checkman )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 
 	/* move the interrupt enable from $b000 to $b001 */
-	memory_install_write8_handler(space, 0xb000, 0xb000, 0, 0x7f8, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(space, 0xb000, 0xb000, 0, 0x7f8);
 	memory_install_write8_handler(space, 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
 
 	/* attach the sound command handler */
@@ -2786,7 +2786,7 @@ static DRIVER_INIT( dingoe )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 
 	/* move the interrupt enable from $b000 to $b001 */
-	memory_install_write8_handler(space, 0xb000, 0xb000, 0, 0x7f8, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(space, 0xb000, 0xb000, 0, 0x7f8);
 	memory_install_write8_handler(space, 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
 
 	/* attach the sound command handler */
@@ -2870,7 +2870,7 @@ static DRIVER_INIT( scorpnmc )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
 
 	/* move the interrupt enable from $b000 to $b001 */
-	memory_install_write8_handler(space, 0xb000, 0xb000, 0, 0x7f8, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(space, 0xb000, 0xb000, 0, 0x7f8);
 	memory_install_write8_handler(space, 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
 
 	/* extra ROM */
@@ -2882,7 +2882,7 @@ static DRIVER_INIT( scorpnmc )
 	memory_set_bankptr(machine, "bank2", auto_alloc_array(machine, UINT8, 0x800));
 
 	/* doesn't appear to use original RAM */
-	memory_install_readwrite8_handler(space, 0x8000, 0x87ff, 0, 0, (read8_space_func)SMH_UNMAP, (write8_space_func)SMH_UNMAP);
+	memory_unmap_readwrite(space, 0x8000, 0x87ff, 0, 0);
 }
 
 
@@ -2901,7 +2901,7 @@ static DRIVER_INIT( theend )
 	common_init(machine, theend_draw_bullet, galaxian_draw_background, NULL, NULL);
 
 	/* coin counter on the upper bit of port C */
-	memory_install_write8_handler(space, 0x6802, 0x6802, 0, 0x7f8, (write8_space_func)SMH_UNMAP);
+	memory_unmap_write(space, 0x6802, 0x6802, 0, 0x7f8);
 }
 
 
@@ -2923,7 +2923,7 @@ static DRIVER_INIT( explorer )
 	memory_install_write8_handler(space, 0x7000, 0x7000, 0, 0x7ff, watchdog_reset_w);
 
 	/* I/O appears to be direct, not via PPIs */
-	memory_install_readwrite8_handler(space, 0x8000, 0xffff, 0, 0, (read8_space_func)SMH_UNMAP, (write8_space_func)SMH_UNMAP);
+	memory_unmap_readwrite(space, 0x8000, 0xffff, 0, 0);
 	memory_install_read_port_handler(space, 0x8000, 0x8000, 0, 0xffc, "IN0");
 	memory_install_read_port_handler(space, 0x8001, 0x8001, 0, 0xffc, "IN1");
 	memory_install_read_port_handler(space, 0x8002, 0x8002, 0, 0xffc, "IN2");
@@ -2953,7 +2953,7 @@ static DRIVER_INIT( atlantis )
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
 	/* watchdog is at $7800? (or is it just disabled?) */
-	memory_install_read8_handler(space, 0x7000, 0x7000, 0, 0x7ff, (read8_space_func)SMH_UNMAP);
+	memory_unmap_read(space, 0x7000, 0x7000, 0, 0x7ff);
 	memory_install_read8_handler(space, 0x7800, 0x7800, 0, 0x7ff, watchdog_reset_r);
 }
 
@@ -3050,7 +3050,7 @@ static DRIVER_INIT( scorpion )
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x5800);
 
 	/* no background related */
-//  memory_install_write8_handler(space, 0x6803, 0x6803, 0, 0, (write8_space_func)SMH_NOP);
+//  memory_nop_write(space, 0x6803, 0x6803, 0, 0);
 
 	memory_install_read8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x3000, 0x3000, 0, 0, scorpion_digitalker_intr_r);
 /*

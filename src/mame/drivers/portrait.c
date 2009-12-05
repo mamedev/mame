@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( portrait_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa004, 0xa004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa008, 0xa008) AM_READ_PORT("SYSTEM") AM_WRITE(portrait_ctrl_w)
 	AM_RANGE(0xa010, 0xa010) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xa018, 0xa018) AM_READWRITE(SMH_NOP, portrait_positive_scroll_w)
+	AM_RANGE(0xa018, 0xa018) AM_READNOP AM_WRITE(portrait_positive_scroll_w)
 	AM_RANGE(0xa019, 0xa019) AM_WRITE(portrait_negative_scroll_w)
 	AM_RANGE(0xa800, 0xa83f) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xffff, 0xffff) AM_READNOP

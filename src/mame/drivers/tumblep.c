@@ -106,8 +106,8 @@ static READ16_HANDLER( tumblepop_controls_r )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 #if TUMBLEP_HACK
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_RAM)	// To write levels modifications
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x000000, 0x07ffff) AM_WRITEONLY	// To write levels modifications
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 #else
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 #endif
@@ -117,11 +117,11 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepop_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x300000, 0x30000f) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x300000, 0x30000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x320000, 0x320fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
 	AM_RANGE(0x322000, 0x322fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x340000, 0x3407ff) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf1_rowscroll) // unused
-	AM_RANGE(0x342000, 0x3427ff) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf2_rowscroll) // unused
+	AM_RANGE(0x340000, 0x3407ff) AM_WRITEONLY AM_BASE(&deco16_pf1_rowscroll) // unused
+	AM_RANGE(0x342000, 0x3427ff) AM_WRITEONLY AM_BASE(&deco16_pf2_rowscroll) // unused
 ADDRESS_MAP_END
 
 /******************************************************************************/

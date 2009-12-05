@@ -1114,8 +1114,8 @@ static void sdrc_remap_memory(running_machine *machine)
 	/* if SRAM disabled, clean it out */
 	if (SDRC_SM_EN == 0)
 	{
-		memory_install_readwrite32_handler(dcs.program, 0x0800, 0x3fff, 0, 0, (read32_space_func)SMH_UNMAP, (write32_space_func)SMH_UNMAP);
-		memory_install_readwrite16_handler(dcs.data, 0x0800, 0x37ff, 0, 0, (read16_space_func)SMH_UNMAP, (write16_space_func)SMH_UNMAP);
+		memory_unmap_readwrite(dcs.program, 0x0800, 0x3fff, 0, 0);
+		memory_unmap_readwrite(dcs.data, 0x0800, 0x37ff, 0, 0);
 	}
 
 	/* otherwise, map the SRAM */
@@ -1140,7 +1140,7 @@ static void sdrc_remap_memory(running_machine *machine)
 		/* map 1: nothing from 0800-17ff, alternate RAM at 1800-27ff, same RAM at 2800-37ff */
 		else
 		{
-			memory_install_readwrite16_handler(dcs.data, 0x0800, 0x17ff, 0, 0, (read16_space_func)SMH_UNMAP, (write16_space_func)SMH_UNMAP);
+			memory_unmap_readwrite(dcs.data, 0x0800, 0x17ff, 0, 0);
 			memory_install_readwrite_bank_handler(dcs.data, 0x1800, 0x27ff, 0, 0, "bank23");
 			memory_install_readwrite_bank_handler(dcs.data, 0x2800, 0x37ff, 0, 0, "bank24");
 			memory_set_bankptr(machine, "bank23", dcs_sram + 0x3000);

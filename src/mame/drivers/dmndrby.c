@@ -123,7 +123,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("DSW2")
 	AM_RANGE(0xca00, 0xca00) AM_WRITENOP//(vblank_irq_w) //???
 	AM_RANGE(0xca01, 0xca01) AM_WRITENOP //watchdog
-	AM_RANGE(0xca02, 0xca02) AM_RAM AM_WRITE(dderby_sound_w)
+	AM_RANGE(0xca02, 0xca02) AM_RAM_WRITE(dderby_sound_w)
 	AM_RANGE(0xca03, 0xca03) AM_WRITENOP//(timer_irq_w) //???
 	AM_RANGE(0xcc00, 0xcc05) AM_RAM AM_BASE(&scroll_ram)
 	AM_RANGE(0xce08, 0xce1f) AM_RAM AM_BASE(&sprite_ram) // horse sprites

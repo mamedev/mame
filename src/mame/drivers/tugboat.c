@@ -206,9 +206,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	//AM_RANGE(0x1700, 0x1fff) AM_RAM
 	AM_RANGE(0x18e0, 0x18ef) AM_WRITE(tugboat_score_w)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM	/* tilemap RAM */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_ROM)
-    AM_RANGE(0x5000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xfff0, 0xffff) AM_READ(SMH_ROM)	/* vectors */
+	AM_RANGE(0x4000, 0x7fff) AM_ROM
+	AM_RANGE(0xfff0, 0xffff) AM_ROM	/* vectors */
 ADDRESS_MAP_END
 
 

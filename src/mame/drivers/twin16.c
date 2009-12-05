@@ -76,8 +76,8 @@ int twin16_spriteram_process_enable( void )
 
 /******************************************************************************************/
 
-#define COMRAM_r					"COMRAM"
-#define COMRAM_w					"COMRAM"
+#define COMRAM_r					"comram"
+#define COMRAM_w					"comram"
 
 /* Read/Write Handlers */
 

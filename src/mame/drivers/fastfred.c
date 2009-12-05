@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( jumpcoas_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd040, 0xd05f) AM_RAM AM_BASE(&fastfred_spriteram) AM_SIZE(&fastfred_spriteram_size)
 	AM_RANGE(0xd060, 0xd3ff) AM_RAM
 	AM_RANGE(0xd800, 0xdbff) AM_MIRROR(0x400) AM_RAM_WRITE(fastfred_videoram_w) AM_BASE(&fastfred_videoram)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(SMH_RAM) AM_BASE(&fastfred_background_color)
+	AM_RANGE(0xe000, 0xe000) AM_WRITEONLY AM_BASE(&fastfred_background_color)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("BUTTONS")
@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( jumpcoas_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf116, 0xf116) AM_WRITE(fastfred_flip_screen_x_w)
 	AM_RANGE(0xf117, 0xf117) AM_WRITE(fastfred_flip_screen_y_w)
 	//AM_RANGE(0xf800, 0xf800) AM_READ(watchdog_reset_r)  // Why doesn't this work???
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ay8910.1", SMH_NOP, ay8910_address_data_w)
+	AM_RANGE(0xf800, 0xf801) AM_READNOP AM_DEVWRITE("ay8910.1", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 
@@ -230,14 +230,14 @@ static ADDRESS_MAP_START( imago_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf007, 0xf007) AM_WRITE(fastfred_flip_screen_y_w)
 	AM_RANGE(0xf400, 0xf400) AM_WRITENOP // writes 0 or 2
 	AM_RANGE(0xf401, 0xf401) AM_WRITE(imago_sprites_bank_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(SMH_NOP, soundlatch_w)
+	AM_RANGE(0xf800, 0xf800) AM_READNOP AM_WRITE(soundlatch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r, interrupt_enable_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(SMH_RAM)  // Reset PSG's
+	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY  // Reset PSG's
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay8910.1", ay8910_address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay8910.2", ay8910_address_data_w)
 	AM_RANGE(0x7000, 0x7000) AM_READNOP // only for Imago, read but not used
@@ -965,19 +965,22 @@ static DRIVER_INIT( flyboyb )
 
 static DRIVER_INIT( fastfred )
 {
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, fastfred_custom_io_r, (write8_space_func)SMH_NOP);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, fastfred_custom_io_r);
+	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0);
 	fastfred_hardware_type = 1;
 }
 
 static DRIVER_INIT( jumpcoas )
 {
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r, (write8_space_func)SMH_NOP);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r);
+	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0);
 	fastfred_hardware_type = 0;
 }
 
 static DRIVER_INIT( boggy84 )
 {
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r, (write8_space_func)SMH_NOP);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r);
+	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0);
 	fastfred_hardware_type = 2;
 }
 

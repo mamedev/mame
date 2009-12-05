@@ -46,7 +46,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(mrdo_bgvideoram_w) AM_BASE(&mrdo_bgvideoram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(mrdo_fgvideoram_w) AM_BASE(&mrdo_fgvideoram)
-	AM_RANGE(0x9000, 0x90ff) AM_WRITE(SMH_RAM) AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x9000, 0x90ff) AM_WRITEONLY AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(mrdo_flipscreen_w)	/* screen flip + playfield priority */
 	AM_RANGE(0x9801, 0x9801) AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0x9802, 0x9802) AM_DEVWRITE("sn2", sn76496_w)

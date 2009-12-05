@@ -93,7 +93,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x07, 0x07) AM_READWRITE(soundlatch_r, SMH_NOP)	/* the write is a clear pending command */
+	AM_RANGE(0x07, 0x07) AM_READ(soundlatch_r) AM_WRITENOP	/* the write is a clear pending command */
 	AM_RANGE(0x08, 0x0b) AM_DEVWRITE("ymsnd", ym2608_w)
 #if 0
 	AM_RANGE(0x18, 0x1b) AM_DEVREAD("ymsnd", ym2608_r)

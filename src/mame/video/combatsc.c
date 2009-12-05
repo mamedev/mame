@@ -420,7 +420,7 @@ WRITE8_HANDLER( combascb_bankselect_w )
 		else
 		{
 			memory_install_read_bank_handler(space, 0x4000, 0x7fff, 0, 0, "bank1");	/* banked ROM */
-			memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, (write8_space_func)SMH_UNMAP);	/* banked ROM */
+			memory_unmap_write(space, 0x4000, 0x7fff, 0, 0);	/* banked ROM */
 		}
 	}
 }

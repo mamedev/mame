@@ -430,11 +430,11 @@ static ADDRESS_MAP_START( psychic5_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(psychic5_paged_ram_r, psychic5_paged_ram_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_RAM_WRITE(soundlatch_w)
-	AM_RANGE(0xf001, 0xf001) AM_READWRITE(SMH_NOP, psychic5_coin_counter_w)
+	AM_RANGE(0xf001, 0xf001) AM_READNOP AM_WRITE(psychic5_coin_counter_w)
 	AM_RANGE(0xf002, 0xf002) AM_READWRITE(psychic5_bankselect_r, psychic5_bankselect_w)
 	AM_RANGE(0xf003, 0xf003) AM_READWRITE(psychic5_vram_page_select_r, psychic5_vram_page_select_w)
 	AM_RANGE(0xf004, 0xf004) AM_NOP	// ???
-	AM_RANGE(0xf005, 0xf005) AM_READWRITE(SMH_NOP, psychic5_title_screen_w)
+	AM_RANGE(0xf005, 0xf005) AM_READNOP AM_WRITE(psychic5_title_screen_w)
 	AM_RANGE(0xf006, 0xf1ff) AM_NOP
 	AM_RANGE(0xf200, 0xf7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xf800, 0xffff) AM_RAM

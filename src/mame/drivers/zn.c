@@ -1215,7 +1215,7 @@ static ADDRESS_MAP_START( fx1a_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
-	AM_RANGE(0xe200, 0xe200) AM_READWRITE(SMH_NOP, taitosound_slave_port_w)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
 	AM_RANGE(0xee00, 0xee00) AM_NOP /* ? */
@@ -1477,10 +1477,10 @@ static DRIVER_INIT( coh1000w )
 {
 	const device_config *ide = devtag_get_device(machine, "ide");
 
-	memory_install_read_bank_handler            ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f1fffff, 0, 0, "bank1" );
-	memory_install_write32_handler           ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f000003, 0, 0, (write32_space_func)SMH_NOP );
+	memory_install_read_bank_handler         ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f1fffff, 0, 0, "bank1" );
+	memory_nop_write                         ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f000003, 0, 0 );
 	memory_install_readwrite32_device_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), ide, 0x1f7e4000, 0x1f7e4fff, 0, 0, ide_controller32_r, ide_controller32_w );
-	memory_install_readwrite32_handler       ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f7e8000, 0x1f7e8003, 0, 0, (read32_space_func)SMH_NOP, (write32_space_func)SMH_NOP );
+	memory_nop_readwrite                     ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f7e8000, 0x1f7e8003, 0, 0 );
 	memory_install_readwrite32_device_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), ide, 0x1f7f4000, 0x1f7f4fff, 0, 0, ide_controller32_r, ide_controller32_w );
 
 	zn_driver_init(machine);
@@ -2151,7 +2151,7 @@ static DRIVER_INIT( coh1000a )
 		const device_config *ide = devtag_get_device(machine, "ide");
 
 		memory_install_read32_device_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), ide, 0x1fbfff8c, 0x1fbfff8f, 0, 0, jdredd_idestat_r );
-		memory_install_write32_handler      ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fbfff8c, 0x1fbfff8f, 0, 0, (write32_space_func)SMH_NOP );
+		memory_nop_write                    ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fbfff8c, 0x1fbfff8f, 0, 0 );
 		memory_install_readwrite32_device_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), ide, 0x1fbfff90, 0x1fbfff9f, 0, 0, jdredd_ide_r, jdredd_ide_w );
 	}
 

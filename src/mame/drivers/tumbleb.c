@@ -661,17 +661,15 @@ static WRITE16_DEVICE_HANDLER( tumbleb2_soundmcu_w )
 /******************************************************************************/
 
 static ADDRESS_MAP_START( tumblepopb_main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 #if TUMBLEP_HACK
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_RAM)	/* To write levels modifications */
-#else
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x000000, 0x07ffff) AM_WRITEONLY	/* To write levels modifications */
 #endif
 	AM_RANGE(0x100000, 0x100001) AM_READ(tumblepb_prot_r) AM_DEVWRITE("oki", tumblepb_oki_w)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(&tumblepb_mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Bootleg sprite buffer */
-	AM_RANGE(0x160800, 0x160807) AM_WRITE(SMH_RAM) /* writes past the end of spriteram */
+	AM_RANGE(0x160800, 0x160807) AM_WRITEONLY /* writes past the end of spriteram */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
@@ -685,17 +683,15 @@ static ADDRESS_MAP_START( tumblepopb_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fncywld_main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 #if FNCYWLD_HACK
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_RAM)	/* To write levels modifications */
-#else
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITEONLY	/* To write levels modifications */
 #endif
 	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff)
 	AM_RANGE(0x100004, 0x100005) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* sprites */
-	AM_RANGE(0x160800, 0x16080f) AM_WRITE(SMH_RAM) /* goes slightly past the end of spriteram? */
+	AM_RANGE(0x160800, 0x16080f) AM_WRITEONLY /* goes slightly past the end of spriteram? */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
@@ -721,7 +717,7 @@ static ADDRESS_MAP_START( htchctch_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(bcstory_tilebank_w)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(&tumblepb_mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(SMH_RAM) AM_BASE_SIZE_GENERIC(spriteram) /* Bootleg sprite buffer */
+	AM_RANGE(0x160000, 0x160fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Bootleg sprite buffer */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_RAM
@@ -745,7 +741,7 @@ static ADDRESS_MAP_START( jumppop_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1a0000, 0x1a7fff) AM_RAM
 	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE(tumblepb_pf2_data_w) AM_BASE(&tumblepb_pf2_data)
 	AM_RANGE(0x320000, 0x323fff) AM_RAM_WRITE(tumblepb_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
-	AM_RANGE(0x380000, 0x38000f) AM_WRITE(SMH_RAM) AM_BASE(&jumppop_control)
+	AM_RANGE(0x380000, 0x38000f) AM_WRITEONLY AM_BASE(&jumppop_control)
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER( jumpkids_sound_w )
@@ -774,7 +770,7 @@ static ADDRESS_MAP_START( pangpang_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(&tumblepb_mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Bootleg sprite buffer */
-	AM_RANGE(0x160800, 0x160807) AM_WRITE(SMH_RAM) // writes past the end of spriteram
+	AM_RANGE(0x160800, 0x160807) AM_WRITEONLY // writes past the end of spriteram
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
@@ -857,7 +853,7 @@ static ADDRESS_MAP_START( jumpkids_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(&tumblepb_mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Bootleg sprite buffer */
-	AM_RANGE(0x160800, 0x160807) AM_WRITE(SMH_RAM) /* writes past the end of spriteram */
+	AM_RANGE(0x160800, 0x160807) AM_WRITEONLY /* writes past the end of spriteram */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
@@ -3574,7 +3570,7 @@ static DRIVER_INIT( htchctch )
 
 	HCROM[0x1e228/2] = 0x4e75;
 
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x140000, 0x1407ff, 0, 0, (write16_space_func)SMH_NOP ); // kill palette writes as the interrupt code we don't have controls them
+	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x140000, 0x1407ff, 0, 0 ); // kill palette writes as the interrupt code we don't have controls them
 
 
 	{

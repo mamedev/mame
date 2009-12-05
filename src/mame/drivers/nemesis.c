@@ -480,7 +480,7 @@ static ADDRESS_MAP_START( blkpnthr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x081fff) AM_RAM_WRITE(salamander_palette_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x090000, 0x097fff) AM_RAM
-	AM_RANGE(0x0a0000, 0x0a0001) AM_RAM AM_WRITE(salamand_control_port_word_w)		/* irq enable, flipscreen, etc. */
+	AM_RANGE(0x0a0000, 0x0a0001) AM_RAM_WRITE(salamand_control_port_word_w)		/* irq enable, flipscreen, etc. */
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(nemesis_soundlatch_word_w)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_WRITE(watchdog_reset16_w)	/* probably */

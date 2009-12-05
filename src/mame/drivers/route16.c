@@ -227,7 +227,7 @@ static WRITE8_HANDLER ( speakres_out2_w )
 
 static ADDRESS_MAP_START( route16_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-  /*AM_RANGE(0x3000, 0x3001) AM_READWRITE(SMH_NOP, SMH_NOP)   protection device */
+  /*AM_RANGE(0x3000, 0x3001) AM_NOP   protection device */
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, route16_sharedram_w) AM_BASE(&sharedram)
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(route16_out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(route16_out1_w)

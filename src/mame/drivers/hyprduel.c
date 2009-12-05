@@ -432,7 +432,7 @@ static ADDRESS_MAP_START( hyprduel_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM_WRITE(hyprduel_vram_1_w) AM_BASE(&hyprduel_vram_1)		/* Layer 1 */
 	AM_RANGE(0x440000, 0x45ffff) AM_RAM_WRITE(hyprduel_vram_2_w) AM_BASE(&hyprduel_vram_2)		/* Layer 2 */
 	AM_RANGE(0x460000, 0x46ffff) AM_READ(hyprduel_bankedrom_r)		/* Banked ROM */
-	AM_RANGE(0x470000, 0x473fff) AM_RAM AM_WRITE(hyprduel_paletteram_w) AM_BASE_GENERIC(paletteram)	/* Palette */
+	AM_RANGE(0x470000, 0x473fff) AM_RAM_WRITE(hyprduel_paletteram_w) AM_BASE_GENERIC(paletteram)	/* Palette */
 	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)			/* Sprites */
 	AM_RANGE(0x475000, 0x477fff) AM_RAM			/* only used memory test */
 	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_BASE(&hyprduel_tiletable) AM_SIZE(&hyprduel_tiletable_size)	/* Tiles Set */
@@ -460,7 +460,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyprduel_map2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE(1)						/* shadow ($c00000 - $c03fff : vector) */
-	AM_RANGE(0x004000, 0x007fff) AM_RAM AM_WRITENOP AM_SHARE(3)			/* shadow ($fe4000 - $fe7fff : read only) */
+	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE(3)			/* shadow ($fe4000 - $fe7fff : read only) */
 	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff )
 	AM_RANGE(0x400004, 0x400005) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_NOP
@@ -479,7 +479,7 @@ static ADDRESS_MAP_START( magerror_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x820000, 0x83ffff) AM_RAM_WRITE(hyprduel_vram_1_w) AM_BASE(&hyprduel_vram_1)		/* Layer 1 */
 	AM_RANGE(0x840000, 0x85ffff) AM_RAM_WRITE(hyprduel_vram_2_w) AM_BASE(&hyprduel_vram_2)		/* Layer 2 */
 	AM_RANGE(0x860000, 0x86ffff) AM_READ(hyprduel_bankedrom_r)		/* Banked ROM */
-	AM_RANGE(0x870000, 0x873fff) AM_RAM AM_WRITE(hyprduel_paletteram_w) AM_BASE_GENERIC(paletteram)	/* Palette */
+	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(hyprduel_paletteram_w) AM_BASE_GENERIC(paletteram)	/* Palette */
 	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)		/* Sprites */
 	AM_RANGE(0x875000, 0x877fff) AM_RAM			/* only used memory test */
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_BASE(&hyprduel_tiletable) AM_SIZE(&hyprduel_tiletable_size)	/* Tiles Set */
@@ -506,7 +506,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magerror_map2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE(1)						/* shadow ($c00000 - $c03fff : vector) */
-	AM_RANGE(0x004000, 0x007fff) AM_RAM AM_WRITENOP AM_SHARE(3)			/* shadow ($fe4000 - $fe7fff : read only) */
+	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE(3)			/* shadow ($fe4000 - $fe7fff : read only) */
 	AM_RANGE(0x400000, 0x400003) AM_NOP
 	AM_RANGE(0x800000, 0x800003) AM_READNOP AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0x800004, 0x800005) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
