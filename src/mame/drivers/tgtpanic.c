@@ -120,7 +120,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( tgtpanic )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("cpu", Z80, XTAL_4MHz)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(prg_map)
 	MDRV_CPU_IO_MAP(io_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 20) /* Unverified */
@@ -144,7 +144,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( tgtpanic )
-	ROM_REGION( 0x10000, "cpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "601_ja_a01.13e", 0x0000, 0x8000, CRC(ece71952) SHA1(0f9cbd8adac2b1950bc608d51f0f122399c8f00f) )
 ROM_END
 

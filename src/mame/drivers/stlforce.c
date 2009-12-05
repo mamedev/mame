@@ -236,7 +236,7 @@ static NVRAM_HANDLER( stlforce )
 
 static MACHINE_DRIVER_START( stlforce )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("cpu", M68000, 15000000)
+	MDRV_CPU_ADD("maincpu", M68000, 15000000)
 	MDRV_CPU_PROGRAM_MAP(stlforce_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
@@ -267,14 +267,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( twinbrat )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(stlforce)
-	MDRV_CPU_REPLACE("cpu", M68000, 14745600)
+	MDRV_CPU_REPLACE("maincpu", M68000, 14745600)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(3*8, 45*8-1, 0*8, 30*8-1)
 MACHINE_DRIVER_END
 
 ROM_START( stlforce )
-	ROM_REGION( 0x80000, "cpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "stlforce.105", 0x00000, 0x20000, CRC(3ec804ca) SHA1(4efcf3321b7111644ac3ee0a83ad95d0571a4021) )
 	ROM_LOAD16_BYTE( "stlforce.104", 0x00001, 0x20000, CRC(69b5f429) SHA1(5bd20fad91a22f4d62f85a5190d72dd824ee26a5) )
 
@@ -336,7 +336,7 @@ Notes:
 
 
 ROM_START( twinbrat )
-	ROM_REGION( 0x40000, "cpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "2.u105", 0x00000, 0x20000, CRC(33a9bb82) SHA1(0f54239397c93e264b9b211f67bf626acf1246a9) )
 	ROM_LOAD16_BYTE( "3.u104", 0x00001, 0x20000, CRC(b1186a67) SHA1(502074063101885874db76ae707db1082313efcf) )
 
@@ -369,7 +369,7 @@ ROM_START( twinbrat )
 ROM_END
 
 ROM_START( twinbrata )
-	ROM_REGION( 0x40000, "cpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x20000, CRC(5e75f568) SHA1(f42d2a73d737e6b01dd049eea2a10fc8c8096d8f) )
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x20000, CRC(0e3fa9b0) SHA1(0148cc616eac84dc16415e1557ec6040d14392d4) )
 

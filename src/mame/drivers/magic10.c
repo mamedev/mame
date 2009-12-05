@@ -647,7 +647,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( magic10 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("cpu", M68000, 10000000) // ?
+	MDRV_CPU_ADD("maincpu", M68000, 10000000) // ?
 	MDRV_CPU_PROGRAM_MAP(magic10_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
@@ -677,7 +677,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( magic10a )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(magic10)
-	MDRV_CPU_MODIFY("cpu")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(magic10a_map)
 MACHINE_DRIVER_END
 
@@ -685,7 +685,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( magic102 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(magic10)
-	MDRV_CPU_MODIFY("cpu")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(magic102_map)
 
 	MDRV_SCREEN_MODIFY("screen")
@@ -696,7 +696,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hotslot )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(magic10)
-	MDRV_CPU_MODIFY("cpu")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hotslot_map)
 
 	MDRV_SCREEN_MODIFY("screen")
@@ -707,7 +707,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sgsafari )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(magic10)
-	MDRV_CPU_MODIFY("cpu")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sgsafari_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)	/* L1 interrupts */
 
@@ -734,7 +734,7 @@ Magic 10 (videopoker)
 
 */
 ROM_START( magic10 )
-	ROM_REGION( 0x40000, "cpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "u3.bin", 0x000000, 0x20000, CRC(191a46f4) SHA1(65bc22cdcc4b2f102d3eef595626819af709cacb) )
 	ROM_LOAD16_BYTE( "u2.bin", 0x000001, 0x20000, CRC(a03a80bc) SHA1(a21da8912f1d2c8c2fa4a8d3ce4d43da8a934e21) )
 
@@ -749,7 +749,7 @@ ROM_START( magic10 )
 ROM_END
 
 ROM_START( magic10a )
-	ROM_REGION( 0x40000, "cpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "u3_1645.bin",  0x00000, 0x20000, CRC(7f2549e4) SHA1(6578ad29273c357faae7c6be3fa1b49087e088a2) )
 	ROM_LOAD16_BYTE( "u2_1645.bin",  0x00001, 0x20000, CRC(c075234e) SHA1(d9bc38f0b984082a77088fbb52b02c8f5c49846c) )
 
@@ -797,7 +797,7 @@ Note:
 
 */
 ROM_START( magic10b )
-	ROM_REGION( 0x40000, "cpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "2.u3", 0x000000, 0x20000, CRC(32c12ad6) SHA1(93340df2c0f4c260837bd6649008e26a17a22015) )
 	ROM_LOAD16_BYTE( "3.u2", 0x000001, 0x20000, CRC(a9945aaa) SHA1(97d4f6441b96618f2e3ce14095ffc5628cb14f0e) )
 
@@ -826,7 +826,7 @@ pcb is marked: Copyright ABM - 9605 Rev.02
 
 */
 ROM_START( magic102 )
-	ROM_REGION( 0x40000, "cpu", 0 )		/* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_BYTE( "2.u3",  0x00000, 0x20000, CRC(6fc55fe4) SHA1(392ad92e55aeac9bf5235cceb6b0b415942105a4) )
 	ROM_LOAD16_BYTE( "1.u2",  0x00001, 0x20000, CRC(501507af) SHA1(ceed50c9380a9838cd3d171d2387334edfeff77f) )
 
@@ -885,7 +885,7 @@ ABM (Nazionale Elettronica Giochi S.A.S.), 1998.
 
 */
 ROM_START( suprpool )
-	ROM_REGION( 0x40000, "cpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "2-1.22a.u3", 0x00000, 0x20000,CRC(5d15037a) SHA1(74cab79a1b08910267262a4c6b501126a4df6cda) )
 	ROM_LOAD16_BYTE( "3-1.22a.u2", 0x00001, 0x20000,CRC(c762cd1c) SHA1(ee05a9e8147d613eb14333e6e7b743fc05982e7c) )
 
@@ -958,7 +958,7 @@ Note:
 
 */
 ROM_START( hotslot )
-	ROM_REGION( 0x40000, "cpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "hotslot2.u3", 0x00000, 0x20000, CRC(676cbe32) SHA1(78721326f3334fcdfdaffb72dbcacfb8bb591d51) )
 	ROM_LOAD16_BYTE( "hotslot3.u2", 0x00001, 0x20000, CRC(2c362765) SHA1(c41741c97fe8e5b3a66eb08ebf68d24c6c771ba8) )
 
@@ -1015,7 +1015,7 @@ Note:
 
 */
 ROM_START( mcolors )
-	ROM_REGION( 0x40000, "cpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "m.colors1.7a-2.u3", 0x00000, 0x20000, CRC(02ce6aab) SHA1(349cb639024a818cb88e911788a0146f48d25333) )
 	ROM_LOAD16_BYTE( "m.colors1.7a-3.u2", 0x00001, 0x20000, CRC(076b9680) SHA1(856d1cfaca886d78a36e129a7b41455362932e66) )
 
@@ -1073,7 +1073,7 @@ Note:
 
 */
 ROM_START( sgsafari )
-	ROM_REGION( 0x40000, "cpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "2.u7", 0x00000, 0x10000, CRC(797ceeac) SHA1(19055b6700f8523785790992adfeb67faa2358e0) )
 	ROM_LOAD16_BYTE( "1.u2", 0x00001, 0x10000, CRC(549872f5) SHA1(2228c51541e3b059d5b16f50387e4215b82f78f6) )
 

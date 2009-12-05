@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( eolith_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfca00000, 0xfca00003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfcc00000, 0xfcc0005b) AM_WRITENOP // crt registers ?
 	AM_RANGE(0xfd000000, 0xfeffffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("cpu", 0)
+	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 
@@ -324,7 +324,7 @@ INPUT_PORTS_END
 
 
 static MACHINE_DRIVER_START( eolith45 )
-	MDRV_CPU_ADD("cpu", E132N, 45000000)		 /* 45 MHz */
+	MDRV_CPU_ADD("maincpu", E132N, 45000000)		 /* 45 MHz */
 	MDRV_CPU_PROGRAM_MAP(eolith_map)
 	MDRV_CPU_VBLANK_INT_HACK(eolith_speedup,262)
 
@@ -351,12 +351,12 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( eolith50 )
 	MDRV_IMPORT_FROM(eolith45)
-	MDRV_CPU_REPLACE("cpu", E132N, 50000000)		 /* 50 MHz */
+	MDRV_CPU_REPLACE("maincpu", E132N, 50000000)		 /* 50 MHz */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ironfort )
 	MDRV_IMPORT_FROM(eolith45)
-	MDRV_CPU_REPLACE("cpu", E132N, 44900000) /* Normaly 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
+	MDRV_CPU_REPLACE("maincpu", E132N, 44900000) /* Normaly 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
 MACHINE_DRIVER_END
 
 
@@ -418,7 +418,7 @@ Notes:
 */
 
 ROM_START( ironfort )
-	ROM_REGION( 0x80000, "cpu", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u43", 0x00000, 0x80000, CRC(29f55825) SHA1(e048ec0f5d83d4b64aa48d706fa0947afcdc1a3d) ) /* 27C040 eprom with no label */
 
 	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
@@ -446,7 +446,7 @@ ROM_END
 /* Hidden Catch */
 
 ROM_START( hidnctch )
-	ROM_REGION( 0x80000, "cpu", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "hc_u43.bin", 0x00000, 0x80000, CRC(635b4478) SHA1(31ea4a9725e0c329447c7d221c22494c905f6940) )
 
 	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
@@ -519,7 +519,7 @@ Notes:
 */
 
 ROM_START( nhidctch )
-	ROM_REGION( 0x80000, "cpu", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u43",        0x00000, 0x80000, CRC(44296fdb) SHA1(1faf7061342d4c86f6ca416d922cb98ffb72f250) )
 
 	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
@@ -595,7 +595,7 @@ Notes:
 */
 
 ROM_START( hidctch2 )
-	ROM_REGION( 0x80000, "cpu", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u43",        0x00000, 0x80000, CRC(326d1dbc) SHA1(b33434cd263dc40ee2b6562f72a87a0439a9833e) )
 
 	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
@@ -698,7 +698,7 @@ All ROMs 27C160 EPROM
 */
 
 ROM_START( raccoon )
-	ROM_REGION( 0x80000, "cpu", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "racoon-u.43", 0x00000, 0x80000, CRC(711ee026) SHA1(c55dfaa24cbaa7a613657cfb25e7f0085f1e4cbf) )
 
 	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
@@ -729,7 +729,7 @@ ROM_END
 /* Land Breaker */
 
 ROM_START( landbrk )
-	ROM_REGION( 0x80000, "cpu", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "rom3.u43", 0x00000, 0x80000, CRC(8429189a) SHA1(f38e4792426ca2c138c44053a6c7525906281dff) )
 
 	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
@@ -767,7 +767,7 @@ ROM_START( landbrk )
 ROM_END
 
 ROM_START( landbrka )
-	ROM_REGION( 0x80000, "cpu", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "lb_1.u43", 0x00000, 0x80000, CRC(f8bbcf44) SHA1(ad85a890ae2f921cd08c1897b4d9a230ccf9e072) )
 
 	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
@@ -800,7 +800,7 @@ ROM_END
 /* Fortress 2 Blue */
 
 ROM_START( fort2b )
-	ROM_REGION( 0x80000, "cpu", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "1.u43",        0x00000, 0x80000, CRC(b2279485) SHA1(022591b260be28820f04a1c1fdd61cb9b68d6703) )
 
 	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
@@ -838,7 +838,7 @@ ROM_START( fort2b )
 ROM_END
 
 ROM_START( fort2ba )
-	ROM_REGION( 0x80000, "cpu", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "ftii012.u43", 0x00000, 0x80000, CRC(6424e05f) SHA1(2f02f103de180561e372ce897f8410a11c4cb58d) )
 
 	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
@@ -870,7 +870,7 @@ ROM_END
 /* Puzzle King */
 
 ROM_START( puzzlekg )
-	ROM_REGION( 0x80000, "cpu", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u43.bin",      0x00000, 0x80000, CRC(c3db7424) SHA1(5ee2be0f06fddb0c74fc6e82679b275cc4e86bcc) )
 
 	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
@@ -959,7 +959,7 @@ Notes:
 */
 
 ROM_START( hidctch3 )
-	ROM_REGION( 0x80000, "cpu", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u43",        0x00000, 0x80000, CRC(7b861339) SHA1(fca7d47d7d538774ec6462deebc0a367ac073b67) )
 
 	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
@@ -1012,7 +1012,7 @@ static DRIVER_INIT( landbrka )
 	//it fails compares with memories:
 	//$4002d338 -> $4002d348 .... $4002d33f -> $4002d34f
 	//related with bits 0x100 - 0x200 read at startup from input(0) ?
-	UINT32 *rombase = (UINT32*)memory_region(machine, "cpu");
+	UINT32 *rombase = (UINT32*)memory_region(machine, "maincpu");
 	rombase[0x14f00/4] = (rombase[0x14f00/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 
 	coin_counter_bit = 0x2000;
@@ -1022,22 +1022,22 @@ static DRIVER_INIT( landbrka )
 static DRIVER_INIT( hidctch2 )
 {
 	//it fails compares in memory like in landbrka
-	UINT32 *rombase = (UINT32*)memory_region(machine, "cpu");
+	UINT32 *rombase = (UINT32*)memory_region(machine, "maincpu");
 	rombase[0xbcc8/4] = (rombase[0xbcc8/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 	init_eolith_speedup(machine);
 }
 
 static DRIVER_INIT( hidctch3 )
 {
-	memory_nop_write(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0xfc200000, 0xfc200003, 0, 0); // this generates pens vibration
+	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfc200000, 0xfc200003, 0, 0); // this generates pens vibration
 
 	// It is not clear why the first reads are needed too
 
-	memory_install_read32_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0xfce00000, 0xfce00003, 0, 0, hidctch3_pen1_r);
-	memory_install_read32_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0xfce80000, 0xfce80003, 0, 0, hidctch3_pen1_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfce00000, 0xfce00003, 0, 0, hidctch3_pen1_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfce80000, 0xfce80003, 0, 0, hidctch3_pen1_r);
 
-	memory_install_read32_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0xfcf00000, 0xfcf00003, 0, 0, hidctch3_pen2_r);
-	memory_install_read32_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0xfcf80000, 0xfcf80003, 0, 0, hidctch3_pen2_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfcf00000, 0xfcf00003, 0, 0, hidctch3_pen2_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfcf80000, 0xfcf80003, 0, 0, hidctch3_pen2_r);
 
 	init_eolith_speedup(machine);
 }

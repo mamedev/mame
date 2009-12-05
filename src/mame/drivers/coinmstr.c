@@ -981,7 +981,7 @@ static const mc6845_interface h46505_intf =
 
 
 static MACHINE_DRIVER_START( coinmstr )
-	MDRV_CPU_ADD("cpu",Z80,8000000) // ?
+	MDRV_CPU_ADD("maincpu",Z80,8000000) // ?
 	MDRV_CPU_PROGRAM_MAP(coinmstr_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -1015,25 +1015,25 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( quizmstr )
 	MDRV_IMPORT_FROM(coinmstr)
-	MDRV_CPU_MODIFY("cpu")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(quizmstr_io_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( trailblz )
 	MDRV_IMPORT_FROM(coinmstr)
-	MDRV_CPU_MODIFY("cpu")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(trailblz_io_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( supnudg2 )
 	MDRV_IMPORT_FROM(coinmstr)
-	MDRV_CPU_MODIFY("cpu")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(supnudg2_io_map)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pokeroul )
 	MDRV_IMPORT_FROM(coinmstr)
-	MDRV_CPU_MODIFY("cpu")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(pokeroul_io_map)
 MACHINE_DRIVER_END
 
@@ -1080,7 +1080,7 @@ CN1/2 is connector for top ROM board                    * - unpopulated socket
 */
 
 ROM_START( quizmstr )
-	ROM_REGION( 0x10000, "cpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "nm_qm4_11.ic9", 0x0000, 0x4000, CRC(3a233bf0) SHA1(7b91b6f19093e67dd5513a000138421d4ef6f0af) )
 	ROM_LOAD( "np_qm4_21.ic6", 0x4000, 0x4000, CRC(a1cd39e4) SHA1(420b0726577471c762ae470bc2138c035f295ad9) )
 	/* 0x8000 - 0xbfff empty */
@@ -1114,7 +1114,7 @@ ROM_END
 
 
 ROM_START( trailblz )
-	ROM_REGION( 0x10000, "cpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "1-4.09",       0x0000, 0x4000, CRC(7c34749c) SHA1(3847188a734b32979f376f51f74dff050b610dfb) )
 	ROM_LOAD( "2-4.06",       0x4000, 0x4000, CRC(81a9809b) SHA1(4d2bfd5223713a9e2e15130a3176118d400ee63e) )
 	/* 0x8000 - 0xbfff empty */
@@ -1129,7 +1129,7 @@ ROM_END
 
 
 ROM_START( supnudg2 )
-	ROM_REGION( 0x10000, "cpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u3.bin",       0x0000, 0x8000, CRC(ed04e2cc) SHA1(7d90a588cca2d113487710e897771f9d99e37e62) )
 	ROM_LOAD( "u4.bin",       0x8000, 0x8000, CRC(0551e859) SHA1(b71640097cc75b78f3013f0e77de328bf1a205b1) )
 
@@ -1182,7 +1182,7 @@ ROM_END
 */
 
 ROM_START( pokeroul )
-	ROM_REGION( 0x10000, "cpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "poker1.ic3",   0x0000, 0x8000, CRC(bfe78d09) SHA1(7cc0f57714ff808a41ce20027a283e5dff60f752) )
 	ROM_LOAD( "poker2.ic4",   0x8000, 0x8000, CRC(34c1b55c) SHA1(fa562d230a57dce3fff176c21c86b461a02749f6) )
 

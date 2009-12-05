@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( vega_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfcc00000, 0xfcc00003) AM_READ(vegaeo_custom_read)
 	AM_RANGE(0xfce00000, 0xfce00003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xfd000000, 0xfeffffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("cpu", 0)
+	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( crazywar )
@@ -163,7 +163,7 @@ static VIDEO_UPDATE( vega )
 
 
 static MACHINE_DRIVER_START( vega )
-	MDRV_CPU_ADD("cpu", GMS30C2132, 55000000)	/* 55 MHz */
+	MDRV_CPU_ADD("maincpu", GMS30C2132, 55000000)	/* 55 MHz */
 	MDRV_CPU_PROGRAM_MAP(vega_map)
 	MDRV_CPU_VBLANK_INT_HACK(eolith_speedup,262)
 
@@ -233,7 +233,7 @@ Notes:
 
 
 ROM_START( crazywar )
-	ROM_REGION( 0x80000, "cpu", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "u7",         0x00000, 0x80000, CRC(697c2505) SHA1(c787007f05d2ddf1706e15e9d9ef9b2479708f12) )
 
 	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */

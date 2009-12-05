@@ -273,7 +273,7 @@ static PALETTE_INIT( pzletime )
 static MACHINE_DRIVER_START( pzletime )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("cpu",M68000,10000000)
+	MDRV_CPU_ADD("maincpu",M68000,10000000)
 	MDRV_CPU_PROGRAM_MAP(pzletime_map)
 	MDRV_CPU_VBLANK_INT("screen",irq4_line_hold)
 
@@ -306,7 +306,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( pzletime )
-	ROM_REGION( 0x400000, "cpu", 0 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "5.bin", 0x000000, 0x80000, CRC(78b027dc) SHA1(6719908a075ecf0666bb817ac8a31056a7f315c6) )
 	ROM_LOAD16_BYTE( "1.bin", 0x000001, 0x80000, CRC(0a69cbc7) SHA1(bae8b5746209c6773da27acaec7bd535a69019d2) )
 	ROM_LOAD16_BYTE( "6.bin", 0x100000, 0x80000, CRC(526733ef) SHA1(21a921416d1ae7b9d49789d70ae99f240b012489) )

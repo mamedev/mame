@@ -944,6 +944,59 @@ static INPUT_PORTS_START( tron )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tron3 )
+	PORT_START("SSIO.IP0")	/* J4 1-8 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE
+
+	PORT_START("SSIO.IP2")	/* J5 1-8 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+//	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+//	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+//	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+//	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+
+	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
+	PORT_DIPNAME( 0x01, 0x00, "Coin Meters" )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW1:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW1:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW1:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW1:7" )
+//	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+
+	// According to the manual, SW1 is a bank of *10* switches (9 is unused and 10 is freeze)
+	// Where are the values for the other two bits read?
+
+	PORT_START("SSIO.IP4")	/* J6 1-8 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+//	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
+
+	PORT_START("SSIO.DIP")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+INPUT_PORTS_END
+
+
 
 /* verified from wiring diagram, plus DIP switches from manual */
 static INPUT_PORTS_START( kroozr )
@@ -2623,8 +2676,8 @@ GAME( 1981, shollow,  0,        mcr_90010,     shollow,  mcr_90010, ROT90, "Ball
 GAME( 1981, shollow2, shollow,  mcr_90010,     shollow,  mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, tron,     0,        mcr_90010,     tron,     mcr_90010, ROT90, "Bally Midway", "Tron (8/9)", GAME_SUPPORTS_SAVE )
 GAME( 1982, tron2,    tron,     mcr_90010,     tron,     mcr_90010, ROT90, "Bally Midway", "Tron (6/25)", GAME_SUPPORTS_SAVE )
-GAME( 1982, tron3,    tron,     mcr_90010,     tron,     mcr_90010, ROT90, "Bally Midway", "Tron (6/17)", GAME_SUPPORTS_SAVE )
-GAME( 1982, tron4,    tron,     mcr_90010,     tron,     mcr_90010, ROT90, "Bally Midway", "Tron (6/15)", GAME_SUPPORTS_SAVE )
+GAME( 1982, tron3,    tron,     mcr_90010,     tron3,    mcr_90010, ROT90, "Bally Midway", "Tron (6/17)", GAME_SUPPORTS_SAVE )
+GAME( 1982, tron4,    tron,     mcr_90010,     tron3,    mcr_90010, ROT90, "Bally Midway", "Tron (6/15)", GAME_SUPPORTS_SAVE )
 GAME( 1982, domino,   0,        mcr_90010,     domino,   mcr_90010, ROT0,  "Bally Midway", "Domino Man", GAME_SUPPORTS_SAVE )
 GAME( 1982, wacko,    0,        mcr_90010,     wacko,    wacko,     ROT0,  "Bally Midway", "Wacko", GAME_SUPPORTS_SAVE )
 GAME( 1984, twotigerc,twotiger, mcr_90010,     twotigrc, mcr_90010, ROT0,  "Bally Midway", "Two Tigers (Tron conversion)", GAME_SUPPORTS_SAVE )
