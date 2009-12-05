@@ -599,14 +599,14 @@ static DRIVER_INIT( cashquiz )
 	memory_install_write8_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x4001, 0x4001, 0, 0, cashquiz_question_bank_low_w);
 
 	// 8 independents banks for questions
-	memory_install_read_bank_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x50ff, 0, 0, "bank1");
-	memory_install_read_bank_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5100, 0x51ff, 0, 0, "bank2");
-	memory_install_read_bank_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5200, 0x52ff, 0, 0, "bank3");
-	memory_install_read_bank_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5300, 0x53ff, 0, 0, "bank4");
-	memory_install_read_bank_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5400, 0x54ff, 0, 0, "bank5");
-	memory_install_read_bank_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5500, 0x55ff, 0, 0, "bank6");
-	memory_install_read_bank_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5600, 0x56ff, 0, 0, "bank7");
-	memory_install_read_bank_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5700, 0x57ff, 0, 0, "bank8");
+	memory_install_read_bank(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x50ff, 0, 0, "bank1");
+	memory_install_read_bank(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5100, 0x51ff, 0, 0, "bank2");
+	memory_install_read_bank(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5200, 0x52ff, 0, 0, "bank3");
+	memory_install_read_bank(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5300, 0x53ff, 0, 0, "bank4");
+	memory_install_read_bank(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5400, 0x54ff, 0, 0, "bank5");
+	memory_install_read_bank(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5500, 0x55ff, 0, 0, "bank6");
+	memory_install_read_bank(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5600, 0x56ff, 0, 0, "bank7");
+	memory_install_read_bank(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5700, 0x57ff, 0, 0, "bank8");
 
 	// setup default banks
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + 0x100*0 );

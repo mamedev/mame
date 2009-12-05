@@ -5724,7 +5724,7 @@ static READ8_HANDLER( cannonbp_protection_r )
 static DRIVER_INIT( cannonbp )
 {
 	/* extra memory */
-	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4800, 0x4bff, 0, 0, "bank5");
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4800, 0x4bff, 0, 0, "bank5");
 	memory_set_bankptr(machine, "bank5", auto_alloc_array(machine, UINT8, 0x400));
 
 	/* protection? */

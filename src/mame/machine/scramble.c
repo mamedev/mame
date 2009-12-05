@@ -242,7 +242,7 @@ DRIVER_INIT( ckongs )
 DRIVER_INIT( mariner )
 {
 	/* extra ROM */
-	memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5800, 0x67ff, 0, 0, "bank1");
+	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5800, 0x67ff, 0, 0, "bank1");
 	memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5800, 0x67ff, 0, 0);
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x5800);
 
@@ -328,7 +328,7 @@ DRIVER_INIT( cavelon )
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	/* banked ROM */
-	memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
+	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x00000], 0x10000);
 	cavelon_banksw(machine);
 

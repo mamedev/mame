@@ -56,7 +56,7 @@ static WRITE8_HANDLER( chqflag_bankswitch_w )
 	/* bit 5 = memory bank select */
 	if (data & 0x20)
 	{
-		memory_install_read_bank_handler(space, 0x1800, 0x1fff, 0, 0, "bank5");
+		memory_install_read_bank(space, 0x1800, 0x1fff, 0, 0, "bank5");
 		memory_install_write8_handler(space, 0x1800, 0x1fff, 0, 0, paletteram_xBBBBBGGGGGRRRRR_be_w);
 		memory_set_bankptr(space->machine, "bank5", space->machine->generic.paletteram.v);
 
@@ -67,8 +67,8 @@ static WRITE8_HANDLER( chqflag_bankswitch_w )
 	}
 	else
 	{
-		memory_install_readwrite_bank_handler(space, 0x1000, 0x17ff, 0, 0, "bank1");				/* RAM */
-		memory_install_readwrite_bank_handler(space, 0x1800, 0x1fff, 0, 0, "bank2");				/* RAM */
+		memory_install_readwrite_bank(space, 0x1000, 0x17ff, 0, 0, "bank1");				/* RAM */
+		memory_install_readwrite_bank(space, 0x1800, 0x1fff, 0, 0, "bank2");				/* RAM */
 	}
 
 	/* other bits unknown/unused */

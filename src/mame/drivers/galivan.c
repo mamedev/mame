@@ -1020,10 +1020,10 @@ static WRITE8_HANDLER( youmab_84_w )
 static DRIVER_INIT( youmab )
 {
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x82, 0x82, 0, 0, youmab_extra_bank_w); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
-	memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, "bank3");
+	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, "bank3");
 	memory_set_bankptr(machine,  "bank3", memory_region(machine, "maincpu"));
 
-	memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank2");
+	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank2");
 	memory_configure_bank(machine, "bank2", 0, 2, memory_region(machine, "user2"), 0x4000);
 	memory_set_bank(machine, "bank2", 0);
 

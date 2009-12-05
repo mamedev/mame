@@ -527,10 +527,10 @@ void defender_install_io_space(const address_space *space)
 	const device_config *pia_1 = devtag_get_device(space->machine, "pia_1");
 
 	/* this routine dynamically installs the memory mapped above from c000-cfff */
-	memory_install_write_bank_handler    (space, 0xc000, 0xc00f, 0, 0x03e0, "bank4");
+	memory_install_write_bank    (space, 0xc000, 0xc00f, 0, 0x03e0, "bank4");
 	memory_install_write8_handler    (space, 0xc010, 0xc01f, 0, 0x03e0, defender_video_control_w);
 	memory_install_write8_handler    (space, 0xc3ff, 0xc3ff, 0, 0,      williams_watchdog_reset_w);
-	memory_install_read_bank_handler(space, 0xc400, 0xc4ff, 0, 0x0300, "bank3");
+	memory_install_read_bank(space, 0xc400, 0xc4ff, 0, 0x0300, "bank3");
 	memory_install_write8_handler(space, 0xc400, 0xc4ff, 0, 0x0300, williams_cmos_w);
 	memory_install_read8_handler     (space, 0xc800, 0xcbff, 0, 0x03e0, williams_video_counter_r);
 	memory_install_readwrite8_device_handler(space, pia_1, 0xcc00, 0xcc03, 0, 0x03e0, pia6821_r, pia6821_w);
@@ -2802,10 +2802,10 @@ static DRIVER_INIT( spdball )
 	memory_install_readwrite8_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), pia_3, 0xc808, 0xc80b, 0, 0, pia6821_r, pia6821_w);
 
 	/* install extra input handlers */
-	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xc800, 0, 0, "AN0");
-	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc801, 0xc801, 0, 0, "AN1");
-	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc802, 0xc802, 0, 0, "AN2");
-	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc803, 0xc803, 0, 0, "AN3");
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xc800, 0, 0, "AN0");
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc801, 0xc801, 0, 0, "AN1");
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc802, 0xc802, 0, 0, "AN2");
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc803, 0xc803, 0, 0, "AN3");
 }
 
 

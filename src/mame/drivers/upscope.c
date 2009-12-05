@@ -89,7 +89,7 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_0_porta_w )
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write_bank_handler(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, "bank1");
+		memory_install_write_bank(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, "bank1");
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */

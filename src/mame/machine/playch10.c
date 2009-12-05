@@ -708,7 +708,7 @@ DRIVER_INIT( pcdboard )
 DRIVER_INIT( pcdboard_2 )
 {
 	/* extra ram at $6000-$7fff */
-	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
 	memory_set_bankptr(machine, "bank1", auto_alloc_array(machine, UINT8, 0x2000));
 
 	/* common init */
@@ -811,7 +811,7 @@ DRIVER_INIT( pceboard )
 	ppu_latch = mapper9_latch;
 
 	/* nvram at $6000-$6fff */
-	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x6fff, 0, 0, "bank1" );
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x6fff, 0, 0, "bank1" );
 	memory_set_bankptr(machine, "bank1", auto_alloc_array(machine, UINT8, 0x1000));
 
 	/* common init */
@@ -846,7 +846,7 @@ DRIVER_INIT( pcfboard )
 DRIVER_INIT( pcfboard_2 )
 {
 	/* extra ram at $6000-$6fff */
-	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x6fff, 0, 0, "bank1" );
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x6fff, 0, 0, "bank1" );
 	memory_set_bankptr(machine, "bank1", auto_alloc_array(machine, UINT8, 0x1000));
 
 	vram = NULL;
@@ -1026,7 +1026,7 @@ DRIVER_INIT( pcgboard )
 	memory_install_write8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, gboard_rom_switch_w );
 
 	/* extra ram at $6000-$7fff */
-	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
 	memory_set_bankptr(machine, "bank1", auto_alloc_array(machine, UINT8, 0x2000));
 
 	gboard_banks[0] = 0x1e;
@@ -1144,7 +1144,7 @@ DRIVER_INIT( pchboard )
 	memory_install_write8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, hboard_rom_switch_w );
 
 	/* extra ram at $6000-$7fff */
-	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
 	memory_set_bankptr(machine, "bank1", auto_alloc_array(machine, UINT8, 0x2000));
 
 	gboard_banks[0] = 0x1e;
@@ -1172,7 +1172,7 @@ DRIVER_INIT( pckboard )
 	mmc1_rom_mask = 0x0f;
 
 	/* extra ram at $6000-$7fff */
-	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
 	memory_set_bankptr(machine, "bank1", auto_alloc_array(machine, UINT8, 0x2000));
 
 	/* Roms are banked at $8000 to $bfff */

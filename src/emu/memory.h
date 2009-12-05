@@ -490,10 +490,10 @@ union _addrmap64_token
 #define memory_install_read64_device_handler(space, device, start, end, mask, mirror, rhandler) \
 	_memory_install_device_handler64(space, device, start, end, mask, mirror, rhandler, NULL, #rhandler, NULL)
 
-#define memory_install_read_port_handler(space, start, end, mask, mirror, rtag) \
-	_memory_install_port_handler(space, start, end, mask, mirror, rtag, NULL)
-#define memory_install_read_bank_handler(space, start, end, mask, mirror, rtag) \
-	_memory_install_bank_handler(space, start, end, mask, mirror, rtag, NULL)
+#define memory_install_read_port(space, start, end, mask, mirror, rtag) \
+	_memory_install_port(space, start, end, mask, mirror, rtag, NULL)
+#define memory_install_read_bank(space, start, end, mask, mirror, rtag) \
+	_memory_install_bank(space, start, end, mask, mirror, rtag, NULL)
 #define memory_unmap_read(space, start, end, mask, mirror) \
 	_memory_unmap(space, start, end, mask, mirror, TRUE, FALSE, FALSE)
 #define memory_nop_read(space, start, end, mask, mirror) \
@@ -522,10 +522,10 @@ union _addrmap64_token
 #define memory_install_write64_device_handler(space, device, start, end, mask, mirror, whandler) \
 	_memory_install_device_handler64(space, device, start, end, mask, mirror, NULL, whandler, NULL, #whandler)
 
-#define memory_install_write_port_handler(space, start, end, mask, mirror, wtag) \
-	_memory_install_port_handler(space, start, end, mask, mirror, NULL, wtag)
-#define memory_install_write_bank_handler(space, start, end, mask, mirror, wtag) \
-	_memory_install_bank_handler(space, start, end, mask, mirror, NULL, wtag)
+#define memory_install_write_port(space, start, end, mask, mirror, wtag) \
+	_memory_install_port(space, start, end, mask, mirror, NULL, wtag)
+#define memory_install_write_bank(space, start, end, mask, mirror, wtag) \
+	_memory_install_bank(space, start, end, mask, mirror, NULL, wtag)
 #define memory_unmap_write(space, start, end, mask, mirror) \
 	_memory_unmap(space, start, end, mask, mirror, FALSE, TRUE, FALSE)
 #define memory_nop_write(space, start, end, mask, mirror) \
@@ -554,10 +554,10 @@ union _addrmap64_token
 #define memory_install_readwrite64_device_handler(space, device, start, end, mask, mirror, rhandler, whandler) \
 	_memory_install_device_handler64(space, device, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
 
-#define memory_install_readwrite_port_handler(space, start, end, mask, mirror, rtag, wtag) \
-	_memory_install_port_handler(space, start, end, mask, mirror, rtag, wtag)
-#define memory_install_readwrite_bank_handler(space, start, end, mask, mirror, tag) \
-	_memory_install_bank_handler(space, start, end, mask, mirror, tag, tag)
+#define memory_install_readwrite_port(space, start, end, mask, mirror, rtag, wtag) \
+	_memory_install_port(space, start, end, mask, mirror, rtag, wtag)
+#define memory_install_readwrite_bank(space, start, end, mask, mirror, tag) \
+	_memory_install_bank(space, start, end, mask, mirror, tag, tag)
 #define memory_unmap_readwrite(space, start, end, mask, mirror) \
 	_memory_unmap(space, start, end, mask, mirror, TRUE, TRUE, FALSE)
 #define memory_nop_readwrite(space, start, end, mask, mirror) \
@@ -1019,11 +1019,11 @@ UINT32 *_memory_install_device_handler32(const address_space *space, const devic
 /* same as above but explicitly for 64-bit handlers */
 UINT64 *_memory_install_device_handler64(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, write64_device_func whandler, const char *rhandler_name, const char *whandler_name) ATTR_NONNULL(1, 2);
 
-/* install a new port handler into the given address space */
-void _memory_install_port_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag) ATTR_NONNULL(1);
+/* install a new port into the given address space */
+void _memory_install_port(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag) ATTR_NONNULL(1);
 
-/* install a new bank handler into the given address space */
-void _memory_install_bank_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag) ATTR_NONNULL(1);
+/* install a new bank into the given address space */
+void _memory_install_bank(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag) ATTR_NONNULL(1);
 
 /* unmap a section of address space */
 void _memory_unmap(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT8 unmap_read, UINT8 unmap_write, UINT8 quiet) ATTR_NONNULL(1);

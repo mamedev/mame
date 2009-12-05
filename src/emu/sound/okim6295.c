@@ -407,7 +407,7 @@ void okim6295_set_bank_base(const device_config *device, int base)
 	if (!info->bank_installed && base != 0)
 	{
 		/* override our memory map with a bank */
-		memory_install_read_bank_handler(device->space[0], 0x00000, 0x3ffff, 0, 0, device->tag);
+		memory_install_read_bank(device->space[0], 0x00000, 0x3ffff, 0, 0, device->tag);
 		info->bank_installed = TRUE;
 	}
 

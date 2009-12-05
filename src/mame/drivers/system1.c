@@ -4671,10 +4671,10 @@ static DRIVER_INIT( choplift )
 static DRIVER_INIT( shtngmst )
 {
 	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
-	memory_install_read_port_handler(iospace, 0x12, 0x12, 0x00, 0x00, "TRIGGER");
-	memory_install_read_port_handler(iospace, 0x18, 0x18, 0x00, 0x03, "18");
-	memory_install_read_port_handler(iospace, 0x1c, 0x1c, 0x00, 0x02, "GUNX");
-	memory_install_read_port_handler(iospace, 0x1d, 0x1d, 0x00, 0x02, "GUNY");
+	memory_install_read_port(iospace, 0x12, 0x12, 0x00, 0x00, "TRIGGER");
+	memory_install_read_port(iospace, 0x18, 0x18, 0x00, 0x03, "18");
+	memory_install_read_port(iospace, 0x1c, 0x1c, 0x00, 0x02, "GUNX");
+	memory_install_read_port(iospace, 0x1d, 0x1d, 0x00, 0x02, "GUNY");
 	DRIVER_INIT_CALL(bank0c);
 }
 

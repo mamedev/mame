@@ -357,11 +357,11 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 		if (read != NULL)
 			memory_install_read16_handler(cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM), region_start, region_end, 0, region_mirror, read);
 		else if (readbank != NULL)
-			memory_install_read_bank_handler(cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM), region_start, region_end, 0, region_mirror, readbank);
+			memory_install_read_bank(cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM), region_start, region_end, 0, region_mirror, readbank);
 		if (write != NULL)
 			memory_install_write16_handler(cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM), region_start, region_end, 0, region_mirror, write);
 		else if (writebank != NULL)
-			memory_install_write_bank_handler(cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM), region_start, region_end, 0, region_mirror, writebank);
+			memory_install_write_bank(cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM), region_start, region_end, 0, region_mirror, writebank);
 
 		/* set the bank pointer */
 		if (readbank != NULL)

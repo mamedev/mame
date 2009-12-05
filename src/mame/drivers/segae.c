@@ -377,11 +377,11 @@ static void init_ports_systeme(running_machine *machine)
 	memory_install_readwrite8_handler(io, 0xbe, 0xbe, 0, 0, sms_vdp_2_data_r, sms_vdp_2_data_w);
 	memory_install_readwrite8_handler(io, 0xbf, 0xbf, 0, 0, sms_vdp_2_ctrl_r, sms_vdp_2_ctrl_w);
 
-	memory_install_read_port_handler     (io, 0xe0, 0xe0, 0, 0, "e0");
-	memory_install_read_port_handler     (io, 0xe1, 0xe1, 0, 0, "e1");
-	memory_install_read_port_handler     (io, 0xe2, 0xe2, 0, 0, "e2");
-	memory_install_read_port_handler     (io, 0xf2, 0xf2, 0, 0, "f2");
-	memory_install_read_port_handler     (io, 0xf3, 0xf3, 0, 0, "f3");
+	memory_install_read_port     (io, 0xe0, 0xe0, 0, 0, "e0");
+	memory_install_read_port     (io, 0xe1, 0xe1, 0, 0, "e1");
+	memory_install_read_port     (io, 0xe2, 0xe2, 0, 0, "e2");
+	memory_install_read_port     (io, 0xf2, 0xf2, 0, 0, "f2");
+	memory_install_read_port     (io, 0xf3, 0xf3, 0, 0, "f3");
 
 	memory_install_write8_handler    (io, 0xf7, 0xf7, 0, 0, systeme_bank_w );
 }
@@ -397,7 +397,7 @@ static void init_systeme_map(running_machine *machine)
 
 	/* main ram area */
 	sms_mainram = auto_alloc_array(machine, UINT8, 0x4000);
-	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, "bank2");
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, "bank2");
 	memory_set_bankptr(machine,  "bank2", sms_mainram );
 	memset(sms_mainram,0x00,0x4000);
 

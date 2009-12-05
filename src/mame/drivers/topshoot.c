@@ -157,10 +157,10 @@ static READ16_HANDLER(topshoot_200051_r)
 static DRIVER_INIT(topshoot)
 {
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200050, 0x200051, 0, 0, topshoot_200051_r );
-	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200042, 0x200043, 0, 0, "IN0");
-	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200044, 0x200045, 0, 0, "IN1");
-	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200046, 0x200047, 0, 0, "IN2");
-	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200048, 0x200049, 0, 0, "IN3");
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200042, 0x200043, 0, 0, "IN0");
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200044, 0x200045, 0, 0, "IN1");
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200046, 0x200047, 0, 0, "IN2");
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200048, 0x200049, 0, 0, "IN3");
 
 	DRIVER_INIT_CALL(megadriv);
 }

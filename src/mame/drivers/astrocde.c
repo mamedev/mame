@@ -428,7 +428,7 @@ static WRITE8_HANDLER( profpac_banksw_w )
 	profpac_bank = data;
 
 	/* set the main banking */
-	memory_install_read_bank_handler(space, 0x4000, 0xbfff, 0, 0, "bank1");
+	memory_install_read_bank(space, 0x4000, 0xbfff, 0, 0, "bank1");
 	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "user1") + 0x8000 * bank);
 
 	/* bank 0 reads video RAM in the 4000-7FFF range */
@@ -444,7 +444,7 @@ static WRITE8_HANDLER( profpac_banksw_w )
 		/* if the bank is in range, map the appropriate bank */
 		if (bank < 0x28)
 		{
-			memory_install_read_bank_handler(space, 0x4000, 0x7fff, 0, 0, "bank2");
+			memory_install_read_bank(space, 0x4000, 0x7fff, 0, 0, "bank2");
 			memory_set_bankptr(space->machine, "bank2", memory_region(space->machine, "user2") + 0x4000 * bank);
 		}
 		else
@@ -1784,8 +1784,8 @@ static DRIVER_INIT( demndrgn )
 
 	astrocade_video_config = 0x00;
 	memory_install_read8_handler(iospace, 0x14, 0x14, 0x1fff, 0xff00, demndrgn_io_r);
-	memory_install_read_port_handler(iospace, 0x1c, 0x1c, 0x0000, 0xff00, "FIREX");
-	memory_install_read_port_handler(iospace, 0x1d, 0x1d, 0x0000, 0xff00, "FIREY");
+	memory_install_read_port(iospace, 0x1c, 0x1c, 0x0000, 0xff00, "FIREX");
+	memory_install_read_port(iospace, 0x1d, 0x1d, 0x0000, 0xff00, "FIREY");
 	memory_install_write8_handler(iospace, 0x97, 0x97, 0x0000, 0xff00, demndrgn_sound_w);
 
 	/* reset banking */
@@ -1799,11 +1799,11 @@ static DRIVER_INIT( tenpindx )
 	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	astrocade_video_config = 0x00;
-	memory_install_read_port_handler(iospace, 0x60, 0x60, 0x0000, 0xff00, "P60");
-	memory_install_read_port_handler(iospace, 0x61, 0x61, 0x0000, 0xff00, "P61");
-	memory_install_read_port_handler(iospace, 0x62, 0x62, 0x0000, 0xff00, "P62");
-	memory_install_read_port_handler(iospace, 0x63, 0x63, 0x0000, 0xff00, "P63");
-	memory_install_read_port_handler(iospace, 0x64, 0x64, 0x0000, 0xff00, "P64");
+	memory_install_read_port(iospace, 0x60, 0x60, 0x0000, 0xff00, "P60");
+	memory_install_read_port(iospace, 0x61, 0x61, 0x0000, 0xff00, "P61");
+	memory_install_read_port(iospace, 0x62, 0x62, 0x0000, 0xff00, "P62");
+	memory_install_read_port(iospace, 0x63, 0x63, 0x0000, 0xff00, "P63");
+	memory_install_read_port(iospace, 0x64, 0x64, 0x0000, 0xff00, "P64");
 	memory_install_write8_handler(iospace, 0x65, 0x66, 0x0000, 0xff00, tenpindx_lamp_w);
 	memory_install_write8_handler(iospace, 0x67, 0x67, 0x0000, 0xff00, tenpindx_counter_w);
 	memory_install_write8_handler(iospace, 0x68, 0x68, 0x0000, 0xff00, tenpindx_lights_w);

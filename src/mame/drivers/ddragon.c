@@ -287,7 +287,7 @@ static WRITE8_HANDLER( darktowr_bankswitch_w )
 	if (newbank == 4 && oldbank != 4)
 		memory_install_readwrite8_handler(space, 0x4000, 0x7fff, 0, 0, darktowr_mcu_bank_r, darktowr_mcu_bank_w);
 	else if (newbank != 4 && oldbank == 4)
-		memory_install_readwrite_bank_handler(space, 0x4000, 0x7fff, 0, 0, "bank1");
+		memory_install_readwrite_bank(space, 0x4000, 0x7fff, 0, 0, "bank1");
 }
 
 

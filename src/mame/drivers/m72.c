@@ -328,7 +328,7 @@ INLINE DRIVER_INIT( m72_8751 )
 	const device_config *dac = devtag_get_device(machine, "dac");
 
 	protection_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
-	memory_install_read_bank_handler(program, 0xb0000, 0xbffff, 0, 0, "bank1");
+	memory_install_read_bank(program, 0xb0000, 0xbffff, 0, 0, "bank1");
 	memory_install_write16_handler(program, 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
 	memory_set_bankptr(machine, "bank1", protection_ram);
 
@@ -701,7 +701,7 @@ static void install_protection_handler(running_machine *machine, const UINT8 *co
 	protection_ram = auto_alloc_array(machine, UINT16, 0x1000/2);
 	protection_code = code;
 	protection_crc =  crc;
-	memory_install_read_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, "bank1");
+	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, "bank1");
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb0ffa, 0xb0ffb, 0, 0, protection_r);
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, protection_w);
 	memory_set_bankptr(machine, "bank1", protection_ram);

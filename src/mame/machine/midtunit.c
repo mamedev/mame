@@ -465,7 +465,7 @@ DRIVER_INIT( mktunit )
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1b00000, 0x1b6ffff, 0, 0, mk_prot_r, mk_prot_w);
 
 	/* sound chip protection (hidden RAM) */
-	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "adpcm", ADDRESS_SPACE_PROGRAM), 0xfb9c, 0xfbc6, 0, 0, "bank9");
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "adpcm", ADDRESS_SPACE_PROGRAM), 0xfb9c, 0xfbc6, 0, 0, "bank9");
 	memory_set_bankptr(machine, "bank9", auto_alloc_array(machine, UINT8, 0x80));
 }
 
@@ -498,9 +498,9 @@ static void init_nbajam_common(running_machine *machine, int te_protection)
 
 	/* sound chip protection (hidden RAM) */
 	if (!te_protection)
-		memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "adpcm", ADDRESS_SPACE_PROGRAM), 0xfbaa, 0xfbd4, 0, 0, "bank9");
+		memory_install_readwrite_bank(cputag_get_address_space(machine, "adpcm", ADDRESS_SPACE_PROGRAM), 0xfbaa, 0xfbd4, 0, 0, "bank9");
 	else
-		memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "adpcm", ADDRESS_SPACE_PROGRAM), 0xfbec, 0xfc16, 0, 0, "bank9");
+		memory_install_readwrite_bank(cputag_get_address_space(machine, "adpcm", ADDRESS_SPACE_PROGRAM), 0xfbec, 0xfc16, 0, 0, "bank9");
 	memory_set_bankptr(machine, "bank9", auto_alloc_array(machine, UINT8, 0x80));
 }
 
@@ -526,8 +526,8 @@ DRIVER_INIT( jdreddp )
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1b00000, 0x1bfffff, 0, 0, jdredd_prot_r, jdredd_prot_w);
 
 	/* sound chip protection (hidden RAM) */
-	memory_install_read_bank_handler(cputag_get_address_space(machine, "adpcm", ADDRESS_SPACE_PROGRAM), 0xfbcf, 0xfbf9, 0, 0, "bank7");
-	memory_install_write_bank_handler(cputag_get_address_space(machine, "adpcm", ADDRESS_SPACE_PROGRAM), 0xfbcf, 0xfbf9, 0, 0, "bank9");
+	memory_install_read_bank(cputag_get_address_space(machine, "adpcm", ADDRESS_SPACE_PROGRAM), 0xfbcf, 0xfbf9, 0, 0, "bank7");
+	memory_install_write_bank(cputag_get_address_space(machine, "adpcm", ADDRESS_SPACE_PROGRAM), 0xfbcf, 0xfbf9, 0, 0, "bank9");
 	memory_set_bankptr(machine, "bank9", auto_alloc_array(machine, UINT8, 0x80));
 
 #if ENABLE_ALL_JDREDD_LEVELS

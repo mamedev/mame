@@ -300,19 +300,19 @@ MACHINE_START( vsnes )
 	/* DRIVER_INIT is called first - means we can handle this different for VRAM games! */
 	if (NULL != vrom[0])
 	{
-		memory_install_read_bank_handler(ppu1_space, 0x0000, 0x03ff, 0, 0, "bank2");
-		memory_install_read_bank_handler(ppu1_space, 0x0400, 0x07ff, 0, 0, "bank3");
-		memory_install_read_bank_handler(ppu1_space, 0x0800, 0x0bff, 0, 0, "bank4");
-		memory_install_read_bank_handler(ppu1_space, 0x0c00, 0x0fff, 0, 0, "bank5");
-		memory_install_read_bank_handler(ppu1_space, 0x1000, 0x13ff, 0, 0, "bank6");
-		memory_install_read_bank_handler(ppu1_space, 0x1400, 0x17ff, 0, 0, "bank7");
-		memory_install_read_bank_handler(ppu1_space, 0x1800, 0x1bff, 0, 0, "bank8");
-		memory_install_read_bank_handler(ppu1_space, 0x1c00, 0x1fff, 0, 0, "bank9");
+		memory_install_read_bank(ppu1_space, 0x0000, 0x03ff, 0, 0, "bank2");
+		memory_install_read_bank(ppu1_space, 0x0400, 0x07ff, 0, 0, "bank3");
+		memory_install_read_bank(ppu1_space, 0x0800, 0x0bff, 0, 0, "bank4");
+		memory_install_read_bank(ppu1_space, 0x0c00, 0x0fff, 0, 0, "bank5");
+		memory_install_read_bank(ppu1_space, 0x1000, 0x13ff, 0, 0, "bank6");
+		memory_install_read_bank(ppu1_space, 0x1400, 0x17ff, 0, 0, "bank7");
+		memory_install_read_bank(ppu1_space, 0x1800, 0x1bff, 0, 0, "bank8");
+		memory_install_read_bank(ppu1_space, 0x1c00, 0x1fff, 0, 0, "bank9");
 		v_set_videorom_bank(machine, 0, 8, 0, 8);
 	}
 	else
 	{
-		memory_install_readwrite_bank_handler(ppu1_space, 0x0000, 0x1fff, 0, 0, "bank2");
+		memory_install_readwrite_bank(ppu1_space, 0x0000, 0x1fff, 0, 0, "bank2");
 		memory_set_bankptr(machine, "bank2", vram);
 	}
 }
@@ -344,9 +344,9 @@ MACHINE_START( vsdual )
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, vsnes_nt0_r, vsnes_nt0_w);
 	memory_install_readwrite8_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu2"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, vsnes_nt1_r, vsnes_nt1_w);
 	// read only!
-	memory_install_read_bank_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank2");
+	memory_install_read_bank(cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank2");
 	// read only!
-	memory_install_read_bank_handler(cpu_get_address_space(cputag_get_cpu(machine, "ppu2"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank3");
+	memory_install_read_bank(cpu_get_address_space(cputag_get_cpu(machine, "ppu2"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank3");
 	memory_set_bankptr(machine, "bank2", vrom[0]);
 	memory_set_bankptr(machine, "bank3", vrom[1]);
 }
@@ -495,7 +495,7 @@ DRIVER_INIT( suprmrio )
 	DRIVER_INIT_CALL(vsnormal);
 
 	/* extra ram at $6000 is enabled with bit 1 of $4016 */
-	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
 	memory_set_bankptr(machine, "bank1", auto_alloc_array(machine, UINT8, 0x2000));
 
 	/* now override the vidaccess callback */
@@ -1148,7 +1148,7 @@ DRIVER_INIT( MMC3 )
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, mapper4_w );
 
 	/* extra ram at $6000-$7fff */
-	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
 	memory_set_bankptr(machine, "bank1", auto_alloc_array(machine, UINT8, 0x2000));
 
 	/* common init */
@@ -1372,7 +1372,7 @@ DRIVER_INIT( bnglngby )
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0231, 0x0231, 0, 0, set_bnglngby_irq_r, set_bnglngby_irq_w );
 
 	/* extra ram */
-	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
 	memory_set_bankptr(machine, "bank1", auto_alloc_array(machine, UINT8, 0x2000));
 
 	ret = 0;
@@ -1460,8 +1460,8 @@ DRIVER_INIT( vstennis )
 	memory_install_write8_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, vstennis_vrom_banking );
 
 	/* shared ram at $6000 */
-	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
-	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
 
 	memory_set_bankptr(machine, "bank1", &prg[0x6000]);
 }
@@ -1527,7 +1527,7 @@ DRIVER_INIT( btlecity )
 DRIVER_INIT( vstetris )
 {
 	/* extra ram at $6000 is enabled with bit 1 of $4016 */
-	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
 	memory_set_bankptr(machine, "bank1", auto_alloc_array(machine, UINT8, 0x2000));
 
 	init_vsnes(machine);

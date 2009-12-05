@@ -892,7 +892,7 @@ static DRIVER_INIT (megaplay)
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa10000, 0xa1001f, 0, 0, megaplay_io_read, megaplay_io_write);
 
 	/* megaplay has ram shared with the bios cpu here */
-	memory_install_readwrite_bank_handler(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, "bank7");
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, "bank7");
 	memory_set_bankptr(machine, "bank7", &ic36_ram[0]);
 
 	/* instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too */

@@ -1345,11 +1345,11 @@ UINT64 *_memory_install_device_handler64(const address_space *space, const devic
 
 
 /*-------------------------------------------------
-    _memory_install_port_handler - install a
+    _memory_install_port - install a
     new port handler into the given address space
 -------------------------------------------------*/
 
-void _memory_install_port_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag)
+void _memory_install_port(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag)
 {
 	address_space *spacerw = (address_space *)space;
 	genf *rhandler = NULL;
@@ -1386,11 +1386,11 @@ void _memory_install_port_handler(const address_space *space, offs_t addrstart, 
 
 
 /*-------------------------------------------------
-    _memory_install_bank_handler - install a
+    _memory_install_bank - install a
     new port handler into the given address space
 -------------------------------------------------*/
 
-void _memory_install_bank_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag)
+void _memory_install_bank(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag)
 {
 	address_space *spacerw = (address_space *)space;
 
