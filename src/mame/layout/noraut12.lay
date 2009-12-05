@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
-	<element name="L0" defstate="1">
+	<element name="L0" defstate="0">
 		<disk state="1">
 			<color red="1.0" green="0.5" blue="0.0" />
 		</disk>
@@ -13,7 +13,7 @@
 		</text>
 	</element>
 
-	<element name="L1" defstate="1">
+	<element name="L1" defstate="0">
 		<disk state="1">
 			<color red="0.0" green="1.0" blue="0.5" />
 		</disk>
@@ -26,7 +26,7 @@
 		</text>
 	</element>
 
-	<element name="L2" defstate="1">
+	<element name="L2" defstate="0">
 		<disk state = "1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</disk>
@@ -39,7 +39,7 @@
 		</text>
 	</element>
 
-	<element name="L3" defstate="1">
+	<element name="L3" defstate="0">
 		<disk state = "1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</disk>
@@ -52,7 +52,7 @@
 		</text>
 	</element>
 
-	<element name="L4" defstate="1">
+	<element name="L4" defstate="0">
 		<disk state = "1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</disk>
@@ -65,7 +65,7 @@
 		</text>
 	</element>
 
-	<element name="L5" defstate="1">
+	<element name="L5" defstate="0">
 		<disk state = "1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</disk>
@@ -78,7 +78,7 @@
 		</text>
 	</element>
 
-	<element name="L6" defstate="1">
+	<element name="L6" defstate="0">
 		<disk state = "1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</disk>
@@ -91,7 +91,7 @@
 		</text>
 	</element>
 
-	<element name="L7" defstate="1">
+	<element name="L7" defstate="0">
 		<disk state="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</disk>
@@ -105,7 +105,7 @@
 	</element>
 
 
-	<element name="L8" defstate="1">
+	<element name="L8" defstate="0">
 		<disk state="1">
 			<color red="1.0" green="0.5" blue="0.0" />
 		</disk>
@@ -118,7 +118,7 @@
 		</text>
 	</element>
 
-	<element name="L9" defstate="1">
+	<element name="L9" defstate="0">
 		<disk state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</disk>
@@ -131,7 +131,7 @@
 		</text>
 	</element>
 
-	<element name="L10" defstate="1">
+	<element name="L10" defstate="0">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</rect>
@@ -144,7 +144,7 @@
 		</text>
 	</element>
 
-	<element name="L11" defstate="1">
+	<element name="L11" defstate="0">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</rect>

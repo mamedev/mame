@@ -9673,6 +9673,7 @@ Other Sun games
 	DRIVER( norautdx )	/* (c) 198? Noraut Ltd. */
 	DRIVER( norautpn )	/* (c) 199? unknown */
 	DRIVER( norautjo )	/* (c) 198? Noraut Ltd. */
+	DRIVER( norautpl )	/* (c) 198? Prologic / Noraut Ltd. */
 	DRIVER( norautjp )	/* (c) 198? Noraut Ltd. */
 	DRIVER( norautrh )	/* (c) 198? Noraut Ltd. */
 	DRIVER( norautra )	/* (c) 198? Noraut Ltd. */
@@ -9685,6 +9686,7 @@ Other Sun games
 	DRIVER( df_djpkr )	/* (c) DellFern Ltd. */
 	DRIVER( ndxron10 )	/* 2005, unknown */
 	DRIVER( cgip30cs )	/* (c) 1999, CGI */
+	DRIVER( kimblz80 )	/* (c) 198?, Kimble Ireland */
 	DRIVER( pma )		/* 1983, PMA */
 	DRIVER( bjpoker )	/* (c) M. Kramer Inc. */
 
