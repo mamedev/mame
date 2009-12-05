@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( sprcros2_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe818, 0xe83f) AM_RAM AM_BASE(&sprcros2_spriteram) AM_SIZE(&sprcros2_spriteram_size)
 	AM_RANGE(0xe840, 0xefff) AM_RAM						//always zero
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE(1)			//shared with slave cpu
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")			//shared with slave cpu
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprcros2_master_io_map, ADDRESS_SPACE_IO, 8 )
@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( sprcros2_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_bgvideoram_w) AM_BASE(&sprcros2_bgvideoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM						//always zero
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprcros2_slave_io_map, ADDRESS_SPACE_IO, 8 )

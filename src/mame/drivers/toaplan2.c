@@ -1947,8 +1947,8 @@ static ADDRESS_MAP_START( V25_kbash_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM							/* Internal 512 bytes of RAM */
 //  AM_RANGE(0x80000, 0x87fff) AM_RAM AM_BASE(&V25_sharedram)   /* External shared RAM (ROM for KBASH) */
 
-    AM_RANGE(0xa0000, 0xa7fff) AM_ROM AM_SHARE(10)
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_SHARE(10) AM_REGION("mcu", 0)
+    AM_RANGE(0xa0000, 0xa7fff) AM_ROM AM_SHARE("share10")
+	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_SHARE("share10") AM_REGION("mcu", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( V25_kbash_port, ADDRESS_SPACE_IO, 8 )
@@ -2002,19 +2002,19 @@ static READ8_HANDLER( kludge_r )
 
 static ADDRESS_MAP_START( V25_rambased_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE(6) AM_BASE(&batsugun_share)
+	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE("share6") AM_BASE(&batsugun_share)
 
-//  AM_RANGE(0x40000, 0x477ff) AM_RAM AM_SHARE(7)
+//  AM_RANGE(0x40000, 0x477ff) AM_RAM AM_SHARE("share7")
 	AM_RANGE(0x40e00, 0x40eff) AM_RAM //internal V25 RAM
 	#ifdef USE_ENCRYPTED_V25S
 	AM_RANGE(0x40f00, 0x40fff) AM_READWRITE(v25s_internal_io_r,v25s_internal_io_w)
 	AM_RANGE(0x87ff9, 0x87ff9) AM_READ(kludge_r)
 	#endif
 
-	AM_RANGE(0x80000, 0x87fff) AM_RAM AM_SHARE(6)
-	AM_RANGE(0xa0000, 0xa7fff) AM_RAM AM_SHARE(6)
+	AM_RANGE(0x80000, 0x87fff) AM_RAM AM_SHARE("share6")
+	AM_RANGE(0xa0000, 0xa7fff) AM_RAM AM_SHARE("share6")
 
-	AM_RANGE(0xf8000, 0xfffff) AM_RAM AM_SHARE(6)
+	AM_RANGE(0xf8000, 0xfffff) AM_RAM AM_SHARE("share6")
 ADDRESS_MAP_END
 
 /*****************************************************************************

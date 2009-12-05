@@ -366,7 +366,7 @@ static VIDEO_UPDATE( qix )
 
 static ADDRESS_MAP_START( qix_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE(qix_palettebank_w)
 	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
@@ -383,7 +383,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zookeep_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03fe) AM_WRITE(qix_palettebank_w)
 	AM_RANGE(0x8801, 0x8801) AM_MIRROR(0x03fe) AM_WRITE(zookeep_bankswitch_w)
@@ -402,7 +402,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slither_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, slither_videoram_w)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE(qix_palettebank_w)
 	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)

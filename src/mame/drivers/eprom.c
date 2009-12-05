@@ -166,8 +166,8 @@ static WRITE16_HANDLER( sync_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
-	AM_RANGE(0x16cc00, 0x16cc01) AM_RAM AM_SHARE(2)
-	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x16cc00, 0x16cc01) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x26001f) AM_READ(special_port1_r)
@@ -191,8 +191,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( guts_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
-	AM_RANGE(0x16cc00, 0x16cc01) AM_RAM AM_SHARE(2)
-	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x16cc00, 0x16cc01) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x26001f) AM_READ(special_port1_r)
@@ -223,8 +223,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( extra_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x16cc00, 0x16cc01) AM_READWRITE(sync_r, sync_w) AM_SHARE(2) AM_BASE(&sync_data)
-	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x16cc00, 0x16cc01) AM_READWRITE(sync_r, sync_w) AM_SHARE("share2") AM_BASE(&sync_data)
+	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x26001f) AM_READ(special_port1_r)
 	AM_RANGE(0x260020, 0x26002f) AM_READ(adc_r)

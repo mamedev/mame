@@ -292,7 +292,7 @@ static CUSTOM_INPUT( xain_vblank_r )
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(xain_charram_w) AM_BASE(&xain_charram)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(xain_bgram1_w) AM_BASE(&xain_bgram1)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(xain_bgram0_w) AM_BASE(&xain_bgram0)
@@ -320,7 +320,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu_map_B, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(xain_irqA_assert_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(xain_irqB_clear_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(xainCPUB_bankswitch_w)

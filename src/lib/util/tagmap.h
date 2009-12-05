@@ -105,10 +105,10 @@ void tagmap_reset(tagmap *map);
 /* ----- object management ----- */
 
 /* add a new entry to a tagmap */
-tagmap_error tagmap_add(tagmap *map, const char *tag, void *object);
+tagmap_error tagmap_add(tagmap *map, const char *tag, void *object, UINT8 replace_if_duplicate);
 
 /* add a new entry to a tagmap, ensuring it has a unique hash value */
-tagmap_error tagmap_add_unique_hash(tagmap *map, const char *tag, void *object);
+tagmap_error tagmap_add_unique_hash(tagmap *map, const char *tag, void *object, UINT8 replace_if_duplicate);
 
 /* remove an entry from a tagmap */
 void tagmap_remove(tagmap *map, const char *tag);

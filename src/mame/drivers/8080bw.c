@@ -1777,8 +1777,8 @@ INPUT_PORTS_END
 static ADDRESS_MAP_START( shuttlei_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&mw8080bw_ram) AM_SIZE(&mw8080bw_ram_size)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE(1) // shuttlei
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1) // skylove (is it mirrored, or different PCB hookup?)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("share1") // shuttlei
+	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1") // skylove (is it mirrored, or different PCB hookup?)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shuttlei_io_map, ADDRESS_SPACE_IO, 8 )

@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( main_program_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xadff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xae00, 0xafff) AM_RAM AM_BASE(&rambase_ae00)
 	AM_RANGE(0xb000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(&rambase_c000) AM_SHARE(1)	/* Shared RAM with Sound Z80 */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(&rambase_c000) AM_SHARE("share1")	/* Shared RAM with Sound Z80 */
 	AM_RANGE(0xc800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -228,7 +228,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_program_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x807f) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE(1)	/* Shared RAM with Main Z80 */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")	/* Shared RAM with Main Z80 */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM
 
 ADDRESS_MAP_END

@@ -311,18 +311,18 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(main_video_write)
 
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(&vid_0_shared_RAM) AM_SHARE(2)	/* First i860 shared RAM */
-	AM_RANGE(0x440000, 0x440003) AM_RAM AM_SHARE(6)		/* M0->P0 i860 #1 com 1 */
-	AM_RANGE(0x480000, 0x480003) AM_RAM AM_SHARE(7)		/* M0<-P0 i860 #1 com 2 */
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(&vid_0_shared_RAM) AM_SHARE("share2")	/* First i860 shared RAM */
+	AM_RANGE(0x440000, 0x440003) AM_RAM AM_SHARE("share6")		/* M0->P0 i860 #1 com 1 */
+	AM_RANGE(0x480000, 0x480003) AM_RAM AM_SHARE("share7")		/* M0<-P0 i860 #1 com 2 */
 	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE(wiggle_i860p0_pins_w)	/* i860 #1 stop/start/reset */
 
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_BASE(&vid_1_shared_RAM) AM_SHARE(3)	/* Second i860 shared RAM */
-	AM_RANGE(0x540000, 0x540003) AM_RAM AM_SHARE(8)		/* M0->P1 i860 #2 com 1 */
-	AM_RANGE(0x580000, 0x580003) AM_RAM AM_SHARE(9)		/* M0<-P1 i860 #2 com 2 */
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_BASE(&vid_1_shared_RAM) AM_SHARE("share3")	/* Second i860 shared RAM */
+	AM_RANGE(0x540000, 0x540003) AM_RAM AM_SHARE("share8")		/* M0->P1 i860 #2 com 1 */
+	AM_RANGE(0x580000, 0x580003) AM_RAM AM_SHARE("share9")		/* M0<-P1 i860 #2 com 2 */
 	AM_RANGE(0x5c0000, 0x5c0003) AM_WRITE(wiggle_i860p1_pins_w)	/* i860 #2 stop/start/reset */
 
 	AM_RANGE(0x600000, 0x600001) AM_READ(control_1_r)	/* IN0 port */
-	AM_RANGE(0x600004, 0x600005) AM_RAM AM_SHARE(5)		/* M0<-M1 */
+	AM_RANGE(0x600004, 0x600005) AM_RAM AM_SHARE("share5")		/* M0<-M1 */
 	AM_RANGE(0x600008, 0x600009) AM_READ(control_2_r)	/* IN1 port */
 	AM_RANGE(0x60001c, 0x60001d) AM_NOP
 
@@ -331,7 +331,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x701000, 0x701001) AM_READ(main_irqiack_r)
 	AM_RANGE(0x702000, 0x702001) AM_READ(control_3_r)
-	AM_RANGE(0x705000, 0x705001) AM_RAM AM_SHARE(4)		/* M1->M0 */
+	AM_RANGE(0x705000, 0x705001) AM_RAM AM_SHARE("share4")		/* M1->M0 */
 
 	//AM_RANGE(0x703000, 0x703001)      /* Headset rotation axis? */
 	//AM_RANGE(0x704000, 0x704001)      /* Headset rotation axis? */
@@ -343,22 +343,22 @@ ADDRESS_MAP_END
 /* The first i860 - middle board */
 static ADDRESS_MAP_START( vid_0_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM_WRITE(v0_fb_w)		/* Shared framebuffer - half of the bits lost to 32-bit bus */
-	AM_RANGE(0x20000000, 0x20000007) AM_RAM AM_SHARE(6) 		/* M0<-P0 com 1 (0x440000 in 68k-land) */
+	AM_RANGE(0x20000000, 0x20000007) AM_RAM AM_SHARE("share6") 		/* M0<-P0 com 1 (0x440000 in 68k-land) */
 	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("gfx", 0)
-	AM_RANGE(0x80000000, 0x80000007) AM_RAM AM_SHARE(7) 		/* M0->P0 com 2 (0x480000 in 68k-land) */
+	AM_RANGE(0x80000000, 0x80000007) AM_RAM AM_SHARE("share7") 		/* M0->P0 com 2 (0x480000 in 68k-land) */
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_NOP       				/* Dummy D$ flush page. */
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_SHARE(2)			/* Shared RAM with main */
+	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_SHARE("share2")			/* Shared RAM with main */
 ADDRESS_MAP_END
 
 
 /* The second i860 - top board */
 static ADDRESS_MAP_START( vid_1_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM_WRITE(v1_fb_w)		/* Half of the bits lost to 32-bit bus */
-	AM_RANGE(0x20000000, 0x20000007) AM_RAM AM_SHARE(8) 		/* M0->P1 com 1 (0x540000 in 68k-land) */
+	AM_RANGE(0x20000000, 0x20000007) AM_RAM AM_SHARE("share8") 		/* M0->P1 com 1 (0x540000 in 68k-land) */
 	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("gfx", 0)
-	AM_RANGE(0x80000000, 0x80000007) AM_RAM AM_SHARE(9)			/* M0<-P1 com 2      (0x580000 in 68k-land) */
+	AM_RANGE(0x80000000, 0x80000007) AM_RAM AM_SHARE("share9")			/* M0<-P1 com 2      (0x580000 in 68k-land) */
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_NOP       				/* Dummy D$ flush page. */
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_SHARE(3)			/* Shared RAM with main */
+	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_SHARE("share3")			/* Shared RAM with main */
 ADDRESS_MAP_END
 
 
@@ -368,8 +368,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVWRITE("dac", vcombat_dac_w)
 	AM_RANGE(0x140000, 0x140001) AM_READ(sound_resetmain_r)   /* Ping M0's reset line */
-	AM_RANGE(0x180000, 0x180001) AM_RAM AM_SHARE(4)   /* M1<-M0 */
-	AM_RANGE(0x1c0000, 0x1c0001) AM_RAM AM_SHARE(5)   /* M1->M0 */
+	AM_RANGE(0x180000, 0x180001) AM_RAM AM_SHARE("share4")   /* M1<-M0 */
+	AM_RANGE(0x1c0000, 0x1c0001) AM_RAM AM_SHARE("share5")   /* M1->M0 */
 	AM_RANGE(0x200000, 0x37ffff) AM_ROM AM_REGION("samples", 0)
 ADDRESS_MAP_END
 

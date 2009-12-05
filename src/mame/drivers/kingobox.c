@@ -68,8 +68,8 @@ static WRITE8_HANDLER( sound_command_w )
 static ADDRESS_MAP_START( kingobox_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM /* work ram */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE(2) /* shared with sprite cpu */
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE(1) /* shared with video cpu */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share2") /* shared with sprite cpu */
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("share1") /* shared with video cpu */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM /* ???? */
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(kingofb_f800_w)	/* NMI enable, palette bank */
 	AM_RANGE(0xf801, 0xf801) AM_WRITENOP /* ???? */
@@ -88,7 +88,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kingobox_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE(1) /* shared with main */
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1") /* shared with main */
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM_WRITE(kingofb_videoram_w) AM_BASE_GENERIC(videoram) /* background vram */
 	AM_RANGE(0xc400, 0xc4ff) AM_RAM_WRITE(kingofb_colorram_w) AM_BASE_GENERIC(colorram) /* background colorram */
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(kingofb_videoram2_w) AM_BASE(&kingofb_videoram2) /* foreground vram */
@@ -98,7 +98,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kingobox_sprite_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE(2) /* shared with main */
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share2") /* shared with main */
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* sprite ram */
 	AM_RANGE(0xc400, 0xc43f) AM_RAM  /* something related to scroll? */
 ADDRESS_MAP_END
@@ -120,8 +120,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ringking_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM /* work ram */
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE(2) /* shared with sprite cpu */
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE(1) /* shared with video cpu */
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share2") /* shared with sprite cpu */
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("share1") /* shared with video cpu */
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(kingofb_f800_w)
 	AM_RANGE(0xd801, 0xd801) AM_WRITE(sprite_interrupt_w)
 	AM_RANGE(0xd802, 0xd802) AM_WRITE(video_interrupt_w)
@@ -139,7 +139,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ringking_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE(1) /* shared with main */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1") /* shared with main */
 	AM_RANGE(0xa800, 0xa8ff) AM_RAM_WRITE(kingofb_videoram_w) AM_BASE_GENERIC(videoram) /* background vram */
 	AM_RANGE(0xac00, 0xacff) AM_RAM_WRITE(kingofb_colorram_w) AM_BASE_GENERIC(colorram) /* background colorram */
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(kingofb_videoram2_w) AM_BASE(&kingofb_videoram2) /* foreground vram */
@@ -149,7 +149,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ringking_sprite_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE(2) /* shared with main */
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share2") /* shared with main */
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* sprite ram */
 	AM_RANGE(0xa400, 0xa43f) AM_RAM /* something related to scroll? */
 ADDRESS_MAP_END

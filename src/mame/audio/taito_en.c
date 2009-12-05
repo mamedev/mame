@@ -234,7 +234,7 @@ static WRITE16_HANDLER(es5510_dsp_w)
 static UINT16 *sound_ram;
 
 ADDRESS_MAP_START( f3_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE(1) AM_BASE(&sound_ram)
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE("share1") AM_BASE(&sound_ram)
 	AM_RANGE(0x140000, 0x140fff) AM_READWRITE(f3_68000_share_r, f3_68000_share_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("ensoniq", es5505_r, es5505_w)
 	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE(es5510_dsp_r, es5510_dsp_w)
@@ -244,7 +244,7 @@ ADDRESS_MAP_START( f3_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc1ffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc20000, 0xc3ffff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc40000, 0xc7ffff) AM_ROMBANK("bank3")
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE(1)	// mirror
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("share1")	// mirror
 ADDRESS_MAP_END
 
 void taito_f3_soundsystem_reset(running_machine *machine)

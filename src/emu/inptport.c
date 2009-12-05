@@ -2492,7 +2492,7 @@ static void port_config_detokenize(input_port_list *portlist, const input_port_t
 				curport->tag = TOKEN_GET_STRING(ipt);
 				if (portlist->map != NULL)
 				{
-					tagmap_error err = tagmap_add_unique_hash(portlist->map, curport->tag, curport);
+					tagmap_error err = tagmap_add_unique_hash(portlist->map, curport->tag, curport, FALSE);
 					if (err == TMERR_DUPLICATE)
 					{
 						const input_port_config *match = tagmap_find_hash_only(portlist->map, curport->tag);

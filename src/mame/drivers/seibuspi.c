@@ -1095,9 +1095,9 @@ static ADDRESS_MAP_START( spi_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000006d8, 0x000006db) AM_WRITE(ds2404_clk_w)
 	AM_RANGE(0x000006dc, 0x000006df) AM_READ(ds2404_data_r)
 	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE(&spimainram)
-	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE(2)
+	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x00a00000, 0x013fffff) AM_READ(soundrom_r)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE(2)		/* ROM location in real-mode */
+	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")		/* ROM location in real-mode */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spisound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1183,10 +1183,10 @@ static ADDRESS_MAP_START( seibu386_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(spi_controls2_r)	/* Player controls (start) */
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE(eeprom_w)
 	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE(&spimainram)
-	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE(2)
+	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x000000ff)
 	AM_RANGE(0x01200004, 0x01200007) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x000000ff)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE(2)		/* ROM location in real-mode */
+	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")		/* ROM location in real-mode */
 ADDRESS_MAP_END
 
 static WRITE32_HANDLER(input_select_w)
@@ -1210,8 +1210,8 @@ static ADDRESS_MAP_START( sys386f2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(spi_controls1_r)	/* Player controls */
 	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE(&spimainram)
-	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE(2)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE(2)		/* ROM location in real-mode */
+	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share2")
+	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")		/* ROM location in real-mode */
 ADDRESS_MAP_END
 
 

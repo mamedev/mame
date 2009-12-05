@@ -117,7 +117,7 @@ static ADDRESS_MAP_START( wc90_map_1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(wc90_txvideoram_w) AM_BASE(&wc90_txvideoram)	/* tx video ram */
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1")
 	AM_RANGE(0xfc02, 0xfc02) AM_READ_PORT("P2")
 	AM_RANGE(0xfc05, 0xfc05) AM_READ_PORT("SYSTEM")
@@ -147,7 +147,7 @@ static ADDRESS_MAP_START( wc90_map_2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank2")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90_bankswitch1_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END

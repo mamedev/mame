@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( lasso_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(lasso_videoram_w) AM_BASE(&lasso_videoram)
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_BASE(&lasso_colorram)
 	AM_RANGE(0x0c00, 0x0c7f) AM_RAM AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
 	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_BASE(&lasso_back_color)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(lasso_video_control_w)
@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( lasso_coprocessor_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&lasso_bitmap_ram)
 	AM_RANGE(0x8000, 0x8fff) AM_MIRROR(0x7000) AM_ROM
 ADDRESS_MAP_END

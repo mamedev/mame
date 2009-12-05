@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( megazone_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE_GENERIC(colorram)
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE(&megazone_colorram2)
 	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x4000, 0xffff) AM_ROM		/* 4000->5FFF is a debug rom */
 ADDRESS_MAP_END
 
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( megazone_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP					/* INTMAIN - Interrupts main CPU (unused) */
 	AM_RANGE(0xc000, 0xc000) AM_WRITENOP					/* INT (Actually is NMI) enable/disable (unused)*/
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megazone_sound_io_map, ADDRESS_SPACE_IO, 8 )

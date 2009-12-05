@@ -74,7 +74,7 @@ static WRITE8_HANDLER( speedbal_coincounter_w )
 
 static ADDRESS_MAP_START( main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdbff) AM_ROM
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE(1) // shared with SOUND
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE("share1") // shared with SOUND
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(speedbal_background_videoram_w) AM_BASE(&speedbal_background_videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(speedbal_foreground_videoram_w) AM_BASE(&speedbal_foreground_videoram)
 	AM_RANGE(0xf000, 0xf5ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
@@ -95,7 +95,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xd000, 0xdbff) AM_RAM
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE(1) // shared with MAIN CPU
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE("share1") // shared with MAIN CPU
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

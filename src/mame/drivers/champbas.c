@@ -214,7 +214,7 @@ static READ8_HANDLER( champbja_alt_protection_r )
 
 static ADDRESS_MAP_START( talbot_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1) /* MCU shared RAM */
+	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1") /* MCU shared RAM */
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE_MEMBER(champbas_state, bg_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
@@ -241,7 +241,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( champbas_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x7800, 0x7fff) AM_ROM	// champbb2 only
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE_MEMBER(champbas_state, bg_videoram)
@@ -273,7 +273,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exctsccb_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-//  AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1) // MCU not used (though it's present on the board)
+//  AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1") // MCU not used (though it's present on the board)
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 //  AM_RANGE(0x7800, 0x7fff) AM_ROM // champbb2 only
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE_MEMBER(champbas_state, bg_videoram)
@@ -299,7 +299,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exctsccr_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE_MEMBER(champbas_state, bg_videoram)
 	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_BASE_MEMBER(champbas_state, spriteram_2) /* ??? */
@@ -353,7 +353,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE(1) /* main CPU shared RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share1") /* main CPU shared RAM */
 ADDRESS_MAP_END
 
 

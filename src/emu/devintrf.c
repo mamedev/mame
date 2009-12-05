@@ -150,7 +150,7 @@ device_config *device_list_add(device_list *devlist, const device_config *owner,
 	device = (device_config *)alloc_array_or_die(UINT8, sizeof(*device) + strlen(tag) + configlen);
 
 	/* add to the map */
-	tmerr = tagmap_add_unique_hash(devlist->map, tag, device);
+	tmerr = tagmap_add_unique_hash(devlist->map, tag, device, FALSE);
 	if (tmerr == TMERR_DUPLICATE)
 	{
 		device_config *match = tagmap_find_hash_only(devlist->map, tag);

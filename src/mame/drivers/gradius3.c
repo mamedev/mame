@@ -186,9 +186,9 @@ static ADDRESS_MAP_START( gradius3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x0e8000, 0x0e8001) AM_WRITE(sound_command_w)
 	AM_RANGE(0x0f0000, 0x0f0001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x14c000, 0x153fff) AM_READWRITE(K052109_halfword_r, K052109_halfword_w)
-	AM_RANGE(0x180000, 0x19ffff) AM_RAM_WRITE(gradius3_gfxram_w) AM_BASE(&gradius3_gfxram) AM_SHARE(2)
+	AM_RANGE(0x180000, 0x19ffff) AM_RAM_WRITE(gradius3_gfxram_w) AM_BASE(&gradius3_gfxram) AM_SHARE("share2")
 ADDRESS_MAP_END
 
 
@@ -196,9 +196,9 @@ static ADDRESS_MAP_START( gradius3_map2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(cpuB_irqenable_w)
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x24c000, 0x253fff) AM_READWRITE(K052109_halfword_r, K052109_halfword_w)
-	AM_RANGE(0x280000, 0x29ffff) AM_RAM_WRITE(gradius3_gfxram_w) AM_SHARE(2)
+	AM_RANGE(0x280000, 0x29ffff) AM_RAM_WRITE(gradius3_gfxram_w) AM_SHARE("share2")
 	AM_RANGE(0x2c0000, 0x2c000f) AM_READWRITE(K051937_halfword_r, K051937_halfword_w)
 	AM_RANGE(0x2c0800, 0x2c0fff) AM_READWRITE(K051960_halfword_r, K051960_halfword_w)
 	AM_RANGE(0x400000, 0x5fffff) AM_READ(gradius3_gfxrom_r)		/* gfx ROMs are mapped here, and copied to RAM */

@@ -392,7 +392,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jngolady_cpu0_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(master_com_r,master_com_w)
 ADDRESS_MAP_END
 
@@ -413,7 +413,7 @@ static ADDRESS_MAP_START( nsc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM //internal ram for irq etc.
 	AM_RANGE(0x8000, 0x8000) AM_WRITENOP //write-only,irq related?
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(slave_com_r,slave_com_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

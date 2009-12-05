@@ -745,7 +745,7 @@ static ADDRESS_MAP_START( cpu0_am, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xafff) AM_ROMBANK("bank4")
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE( pandora_spriteram_r, pandora_spriteram_w )
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -763,7 +763,7 @@ static ADDRESS_MAP_START( cpu1_am, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(djboy_videoram_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(djboy_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd400, 0xd8ff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_port_am, ADDRESS_SPACE_IO, 8 )

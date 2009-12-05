@@ -490,8 +490,8 @@ static ADDRESS_MAP_START( calchase_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE("ide", fdc_r, fdc_w)
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITENOP//AM_WRITE(pnp_data_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_32le_r,	pci_32le_w)
-	AM_RANGE(0x43c0, 0x43cf) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x83c0, 0x83cf) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x43c0, 0x43cf) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x83c0, 0x83cf) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 

@@ -946,11 +946,11 @@ static ADDRESS_MAP_START( bosco_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE("06xx_0", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE("06xx_0", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(bosco_videoram_r, bosco_videoram_w) AM_BASE(&bosco_videoram)	/* + sprite registers */
 	AM_RANGE(0x9000, 0x90ff) AM_DEVREADWRITE("06xx_1", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x9100, 0x9100) AM_DEVREADWRITE("06xx_1", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
-	AM_RANGE(0x9800, 0x980f) AM_WRITEONLY AM_SHARE(2) AM_BASE(&bosco_radarattr)
+	AM_RANGE(0x9800, 0x980f) AM_WRITEONLY AM_SHARE("share2") AM_BASE(&bosco_radarattr)
 	AM_RANGE(0x9810, 0x9810) AM_WRITE(bosco_scrollx_w)
 	AM_RANGE(0x9820, 0x9820) AM_WRITE(bosco_scrolly_w)
 	AM_RANGE(0x9830, 0x9830) AM_WRITE(bosco_starcontrol_w)
@@ -969,9 +969,9 @@ static ADDRESS_MAP_START( galaga_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE("06xx", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(galaga_videoram_r, galaga_videoram_w) AM_BASE(&galaga_videoram)
-	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE(1) AM_BASE(&galaga_ram1)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE(2) AM_BASE(&galaga_ram2)
-	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE(3) AM_BASE(&galaga_ram3)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE("share1") AM_BASE(&galaga_ram1)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share2") AM_BASE(&galaga_ram2)
+	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share3") AM_BASE(&galaga_ram3)
 	AM_RANGE(0xa000, 0xa005) AM_WRITE(galaga_starcontrol_w)
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(galaga_flip_screen_w)
 ADDRESS_MAP_END
@@ -985,10 +985,10 @@ static ADDRESS_MAP_START( xevious_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE("06xx", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE(1)							/* work RAM */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE(2) AM_BASE(&xevious_sr1)	/* work RAM + sprite registers */
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE(3) AM_BASE(&xevious_sr2)	/* work RAM + sprite registers */
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE(4) AM_BASE(&xevious_sr3)	/* work RAM + sprite registers */
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("share1")							/* work RAM */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share2") AM_BASE(&xevious_sr1)	/* work RAM + sprite registers */
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("share3") AM_BASE(&xevious_sr2)	/* work RAM + sprite registers */
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share4") AM_BASE(&xevious_sr3)	/* work RAM + sprite registers */
 	AM_RANGE(0xb000, 0xb7ff) AM_READWRITE(xevious_fg_colorram_r, xevious_fg_colorram_w) AM_BASE(&xevious_fg_colorram)
 	AM_RANGE(0xb800, 0xbfff) AM_READWRITE(xevious_bg_colorram_r, xevious_bg_colorram_w) AM_BASE(&xevious_bg_colorram)
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(xevious_fg_videoram_r, xevious_fg_videoram_w) AM_BASE(&xevious_fg_videoram)
@@ -1006,10 +1006,10 @@ static ADDRESS_MAP_START( digdug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE("06xx", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(digdug_videoram_r, digdug_videoram_w) AM_BASE(&digdug_videoram)	/* tilemap RAM (bottom half of RAM 0 */
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE(1)							/* work RAM (top half for RAM 0 */
-	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE(2) AM_BASE(&digdug_objram)	/* work RAM + sprite registers */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE(3) AM_BASE(&digdug_posram)	/* work RAM + sprite registers */
-	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE(4) AM_BASE(&digdug_flpram)	/* work RAM + sprite registers */
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("share1")							/* work RAM (top half for RAM 0 */
+	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE("share2") AM_BASE(&digdug_objram)	/* work RAM + sprite registers */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share3") AM_BASE(&digdug_posram)	/* work RAM + sprite registers */
+	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share4") AM_BASE(&digdug_flpram)	/* work RAM + sprite registers */
 	AM_RANGE(0xa000, 0xa007) AM_READNOP AM_WRITE(digdug_PORT_w)		/* video latches (spurious reads when setting latch bits) */
 	AM_RANGE(0xb800, 0xb83f) AM_DEVREADWRITE("earom", atari_vg_earom_r, atari_vg_earom_w)	/* non volatile memory data */
 	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("earom", atari_vg_earom_ctrl_w)					/* non volatile memory control */

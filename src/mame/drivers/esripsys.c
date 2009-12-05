@@ -621,7 +621,7 @@ static WRITE8_HANDLER( volume_dac_w )
  *************************************/
 
 static ADDRESS_MAP_START( game_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x4000, 0x42ff) AM_RAM AM_BASE(&esripsys_pal_ram)
 	AM_RANGE(0x4300, 0x4300) AM_WRITE(esripsys_bg_intensity_w)
 	AM_RANGE(0x4400, 0x47ff) AM_NOP /* Collision detection RAM */
@@ -636,7 +636,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( frame_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(fdt_r, fdt_w)
 	AM_RANGE(0x6000, 0x6000) AM_READWRITE(f_status_r, f_status_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(frame_w)

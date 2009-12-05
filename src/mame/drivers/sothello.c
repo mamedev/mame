@@ -110,7 +110,7 @@ static READ8_HANDLER( soundcpu_status_r )
 static ADDRESS_MAP_START( maincpu_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x7fff) AM_ROM
     AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-    AM_RANGE(0xc000, 0xdfff) AM_RAM AM_MIRROR(0x1800) AM_SHARE(1)
+    AM_RANGE(0xc000, 0xdfff) AM_RAM AM_MIRROR(0x1800) AM_SHARE("share1")
     AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -211,7 +211,7 @@ static READ8_HANDLER(subcpu_status_r)
 static ADDRESS_MAP_START( subcpu_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x1fff) AM_READWRITE(subcpu_status_r,subcpu_status_w)
     AM_RANGE(0x2000, 0x77ff) AM_RAM
-    AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE(1)  /* upper 0x800 of 6264 is shared  with main cpu */
+    AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("share1")  /* upper 0x800 of 6264 is shared  with main cpu */
     AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

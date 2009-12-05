@@ -115,14 +115,14 @@ static ADDRESS_MAP_START( flower_cpu1_2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa102, 0xa102) AM_READ_PORT("IN0CPU0")
 	AM_RANGE(0xa103, 0xa103) AM_READ_PORT("IN1CPU0")
 	AM_RANGE(0xa400, 0xa400) AM_WRITE(sound_command_w)
-	AM_RANGE(0xc000, 0xddff) AM_SHARE(1) AM_RAM
-	AM_RANGE(0xde00, 0xdfff) AM_SHARE(2) AM_RAM AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0xe000, 0xe7ff) AM_SHARE(3) AM_RAM_WRITE(flower_textram_w)  AM_BASE(&flower_textram)
-	AM_RANGE(0xe000, 0xefff) AM_SHARE(4) AM_RAM //only cleared?
-	AM_RANGE(0xf000, 0xf1ff) AM_SHARE(5) AM_RAM_WRITE(flower_bg0ram_w)   AM_BASE(&flower_bg0ram)
-	AM_RANGE(0xf200, 0xf200) AM_SHARE(6) AM_RAM  AM_BASE(&flower_bg0_scroll)
-	AM_RANGE(0xf800, 0xf9ff) AM_SHARE(7) AM_RAM_WRITE(flower_bg1ram_w)  AM_BASE(&flower_bg1ram)
-	AM_RANGE(0xfa00, 0xfa00) AM_SHARE(8) AM_RAM AM_BASE(&flower_bg1_scroll)
+	AM_RANGE(0xc000, 0xddff) AM_SHARE("share1") AM_RAM
+	AM_RANGE(0xde00, 0xdfff) AM_SHARE("share2") AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0xe000, 0xe7ff) AM_SHARE("share3") AM_RAM_WRITE(flower_textram_w)  AM_BASE(&flower_textram)
+	AM_RANGE(0xe000, 0xefff) AM_SHARE("share4") AM_RAM //only cleared?
+	AM_RANGE(0xf000, 0xf1ff) AM_SHARE("share5") AM_RAM_WRITE(flower_bg0ram_w)   AM_BASE(&flower_bg0ram)
+	AM_RANGE(0xf200, 0xf200) AM_SHARE("share6") AM_RAM  AM_BASE(&flower_bg0_scroll)
+	AM_RANGE(0xf800, 0xf9ff) AM_SHARE("share7") AM_RAM_WRITE(flower_bg1ram_w)  AM_BASE(&flower_bg1ram)
+	AM_RANGE(0xfa00, 0xfa00) AM_SHARE("share8") AM_RAM AM_BASE(&flower_bg1_scroll)
 ADDRESS_MAP_END
 
 

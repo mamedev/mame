@@ -44,7 +44,7 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static tagmap_error tagmap_add_common(tagmap *map, const char *tag, void *object, int unique_hash);
+static tagmap_error tagmap_add_common(tagmap *map, const char *tag, void *object, UINT8 replace_if_duplicate, UINT8 unique_hash);
 
 
 
@@ -109,9 +109,9 @@ void tagmap_reset(tagmap *map)
     tagmap
 -------------------------------------------------*/
 
-tagmap_error tagmap_add(tagmap *map, const char *tag, void *object)
+tagmap_error tagmap_add(tagmap *map, const char *tag, void *object, UINT8 replace_if_duplicate)
 {
-	return tagmap_add_common(map, tag, object, FALSE);
+	return tagmap_add_common(map, tag, object, replace_if_duplicate, FALSE);
 }
 
 
@@ -120,9 +120,9 @@ tagmap_error tagmap_add(tagmap *map, const char *tag, void *object)
     tagmap, ensuring it has a unique hash value
 -------------------------------------------------*/
 
-tagmap_error tagmap_add_unique_hash(tagmap *map, const char *tag, void *object)
+tagmap_error tagmap_add_unique_hash(tagmap *map, const char *tag, void *object, UINT8 replace_if_duplicate)
 {
-	return tagmap_add_common(map, tag, object, TRUE);
+	return tagmap_add_common(map, tag, object, replace_if_duplicate, TRUE);
 }
 
 
@@ -157,7 +157,7 @@ void tagmap_remove(tagmap *map, const char *tag)
     a tagmap addition
 -------------------------------------------------*/
 
-static tagmap_error tagmap_add_common(tagmap *map, const char *tag, void *object, int unique_hash)
+static tagmap_error tagmap_add_common(tagmap *map, const char *tag, void *object, UINT8 replace_if_duplicate, UINT8 unique_hash)
 {
 	UINT32 fullhash = tagmap_hash(tag);
 	UINT32 hashindex = fullhash % ARRAY_LENGTH(map->table);
@@ -166,15 +166,12 @@ static tagmap_error tagmap_add_common(tagmap *map, const char *tag, void *object
 	/* first make sure we don't have a duplicate */
 	for (entry = map->table[hashindex]; entry != NULL; entry = entry->next)
 		if (entry->fullhash == fullhash)
-		{
-			/* if we require a unique hash, fail here */
-			if (unique_hash)
+			if (unique_hash || strcmp(tag, entry->tag) == 0)
+			{
+				if (replace_if_duplicate)
+					entry->object = object;
 				return TMERR_DUPLICATE;
-
-			/* validate the string */
-			if (strcmp(tag, entry->tag) == 0)
-				return TMERR_DUPLICATE;
-		}
+			}
 
 	/* now allocate a new entry */
 	entry = malloc(sizeof(*entry) + strlen(tag));

@@ -1254,8 +1254,8 @@ static ADDRESS_MAP_START( model2_base_mem, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x10000000, 0x101fffff) AM_WRITE(mode_w)
 
-	AM_RANGE(0x11600000, 0x1167ffff) AM_RAM	AM_SHARE(1) // framebuffer (last bronx)
-	AM_RANGE(0x11680000, 0x116fffff) AM_RAM	AM_SHARE(1) // FB mirror
+	AM_RANGE(0x11600000, 0x1167ffff) AM_RAM	AM_SHARE("share1") // framebuffer (last bronx)
+	AM_RANGE(0x11680000, 0x116fffff) AM_RAM	AM_SHARE("share1") // FB mirror
 ADDRESS_MAP_END
 
 /* original Model 2 overrides */

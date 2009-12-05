@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( popper_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xca00, 0xce1f) AM_RAM_WRITE(popper_attribram_w) AM_BASE_MEMBER(popper_state, attribram)
 	AM_RANGE(0xce20, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(popper_state, spriteram, spriteram_size)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xe007) AM_READ(popper_input_ports_r)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(popper_flipscreen_w)
@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( popper_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0xa002, 0xa002) AM_READNOP					//?? of AY8910 initialisation
 	AM_RANGE(0xa002, 0xa002) AM_WRITENOP				//?? same writes as 0xa000
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 /*************************************

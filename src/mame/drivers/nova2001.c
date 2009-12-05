@@ -202,12 +202,12 @@ static ADDRESS_MAP_START( ninjakun_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2") AM_WRITE(ninjakun_cpu1_io_A002_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(pkunwar_flipscreen_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_BASE(&nova2001_fg_videoram) AM_SHARE(1)
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_BASE(&nova2001_bg_videoram) AM_SHARE(2)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_GENERIC(spriteram) AM_SHARE(3)
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_BASE_GENERIC(paletteram) AM_SHARE(4)
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE(5)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE(6)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_BASE(&nova2001_fg_videoram) AM_SHARE("share1")
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_BASE(&nova2001_bg_videoram) AM_SHARE("share2")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_GENERIC(spriteram) AM_SHARE("share3")
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_BASE_GENERIC(paletteram) AM_SHARE("share4")
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("share5")
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("share6")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ninjakun_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -221,12 +221,12 @@ static ADDRESS_MAP_START( ninjakun_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2") AM_WRITE(ninjakun_cpu2_io_A002_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(nova2001_flipscreen_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_SHARE(1)
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_SHARE(2)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE(3)
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_SHARE(4)
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE(6) /* swapped wrt CPU1 */
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE(5) /* swapped wrt CPU1 */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_SHARE("share1")
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_SHARE("share2")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("share3")
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_SHARE("share4")
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("share6") /* swapped wrt CPU1 */
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("share5") /* swapped wrt CPU1 */
 ADDRESS_MAP_END
 
 
@@ -261,7 +261,7 @@ static ADDRESS_MAP_START( raiders5_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0xc003, 0xc003) AM_DEVREAD("ay2", ay8910_r)
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raiders5_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -271,7 +271,7 @@ static ADDRESS_MAP_START( raiders5_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0x8003, 0x8003) AM_DEVREAD("ay2", ay8910_r)
 	AM_RANGE(0x9000, 0x9000) AM_READNOP /* unknown */
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc000, 0xc000) AM_READNOP /* unknown */
 	AM_RANGE(0xc800, 0xc800) AM_READNOP /* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READNOP /* unknown */

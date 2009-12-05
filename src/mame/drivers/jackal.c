@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0019, 0x0019) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x001c, 0x001c) AM_WRITE(jackal_rambank_w)
 	AM_RANGE(0x0020, 0x005f) AM_READWRITE(jackal_zram_r, jackal_zram_w)				// MAIN   Z RAM,SUB    Z RAM
-	AM_RANGE(0x0060, 0x1fff) AM_RAM AM_SHARE(1)										// M COMMON RAM,S COMMON RAM
+	AM_RANGE(0x0060, 0x1fff) AM_RAM AM_SHARE("share1")										// M COMMON RAM,S COMMON RAM
 	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(jackal_voram_r, jackal_voram_w)			// MAIN V O RAM,SUB  V O RAM
 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(jackal_spriteram_r, jackal_spriteram_w)	// MAIN V O RAM,SUB  V O RAM
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")
@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_GENERIC(paletteram)	// self test only checks 0x4000-0x423f, 007327 should actually go up to 4fff
 	AM_RANGE(0x6000, 0x605f) AM_RAM																	// SOUND RAM (Self test check 0x6000-605f, 0x7c00-0x7fff)
-	AM_RANGE(0x6060, 0x7fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x6060, 0x7fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

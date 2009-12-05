@@ -311,7 +311,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_SHARE(1) /* only half of the RAM is accessible, line a10 of IC73 (6116) is GNDed */
+	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_SHARE("share1") /* only half of the RAM is accessible, line a10 of IC73 (6116) is GNDed */
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(bigevglf_palette_w) AM_BASE_MEMBER(bigevglf_state, paletteram)
 	AM_RANGE(0xe800, 0xefff) AM_WRITEONLY AM_BASE_MEMBER(bigevglf_state, spriteram1) /* sprite 'templates' */
 	AM_RANGE(0xf000, 0xf0ff) AM_READWRITE(bigevglf_vidram_r, bigevglf_vidram_w) /* 41464 (64kB * 8 chips), addressed using ports 1 and 5 */
@@ -336,7 +336,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE(1) /* shared with main CPU */
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1") /* shared with main CPU */
 ADDRESS_MAP_END
 
 

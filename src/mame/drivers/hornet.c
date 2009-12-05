@@ -814,8 +814,8 @@ static ADDRESS_MAP_START( hornet_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x7d04a000, 0x7d04a003) AM_WRITE(comm_rombank_w)
 	AM_RANGE(0x7d050000, 0x7d05ffff) AM_ROMBANK("bank1")		/* COMM BOARD 1 */
 	AM_RANGE(0x7e000000, 0x7e7fffff) AM_ROM AM_REGION("user2", 0)		/* Data ROM */
-	AM_RANGE(0x7f000000, 0x7f3fffff) AM_ROM AM_SHARE(2)
-	AM_RANGE(0x7fc00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE(2)	/* Program ROM */
+	AM_RANGE(0x7f000000, 0x7f3fffff) AM_ROM AM_SHARE("share2")
+	AM_RANGE(0x7fc00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")	/* Program ROM */
 ADDRESS_MAP_END
 
 /*****************************************************************************/

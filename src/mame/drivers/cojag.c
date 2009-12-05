@@ -782,15 +782,15 @@ static WRITE32_HANDLER( area51mx_main_speedup_w )
  *************************************/
 
 static ADDRESS_MAP_START( r3000_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_SHARE(1)
+	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_SHARE("share1")
 	AM_RANGE(0x04800000, 0x04bfffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x04c00000, 0x04dfffff) AM_ROMBANK("bank2")
 	AM_RANGE(0x04e00000, 0x04e003ff) AM_DEVREADWRITE("ide", ide_controller32_r, ide_controller32_w)
 	AM_RANGE(0x04f00000, 0x04f003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
-	AM_RANGE(0x04f00400, 0x04f007ff) AM_RAM AM_BASE(&jaguar_gpu_clut) AM_SHARE(2)
+	AM_RANGE(0x04f00400, 0x04f007ff) AM_RAM AM_BASE(&jaguar_gpu_clut) AM_SHARE("share2")
 	AM_RANGE(0x04f02100, 0x04f021ff) AM_READWRITE(gpuctrl_r, gpuctrl_w)
 	AM_RANGE(0x04f02200, 0x04f022ff) AM_READWRITE(jaguar_blitter_r, jaguar_blitter_w)
-	AM_RANGE(0x04f03000, 0x04f03fff) AM_MIRROR(0x00008000) AM_RAM AM_BASE(&jaguar_gpu_ram) AM_SHARE(3)
+	AM_RANGE(0x04f03000, 0x04f03fff) AM_MIRROR(0x00008000) AM_RAM AM_BASE(&jaguar_gpu_ram) AM_SHARE("share3")
 	AM_RANGE(0x04f10000, 0x04f103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
 	AM_RANGE(0x04f16000, 0x04f1600b) AM_READ(cojag_gun_input_r)	// GPI02
 	AM_RANGE(0x04f17000, 0x04f17003) AM_READ_PORT("SYSTEM")		// GPI03
@@ -798,7 +798,7 @@ static ADDRESS_MAP_START( r3000_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04f17c00, 0x04f17c03) AM_READ_PORT("P1_P2")		// GPI05
 	AM_RANGE(0x04f1a100, 0x04f1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0x04f1a140, 0x04f1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
-	AM_RANGE(0x04f1b000, 0x04f1cfff) AM_RAM AM_BASE(&jaguar_dsp_ram) AM_SHARE(4)
+	AM_RANGE(0x04f1b000, 0x04f1cfff) AM_RAM AM_BASE(&jaguar_dsp_ram) AM_SHARE("share4")
 
 	AM_RANGE(0x06000000, 0x06000003) AM_READWRITE(misc_control_r, misc_control_w)
 	AM_RANGE(0x10000000, 0x1007ffff) AM_RAM
@@ -811,7 +811,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( m68020_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_SHARE(1)
+	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_SHARE("share1")
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0) AM_BASE(&rom_base)
 	AM_RANGE(0xa00000, 0xa1ffff) AM_RAM
 	AM_RANGE(0xa20000, 0xa21fff) AM_READWRITE(eeprom_data_r, eeprom_data_w) AM_BASE_SIZE_GENERIC(nvram)
@@ -821,10 +821,10 @@ static ADDRESS_MAP_START( m68020_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("bank2")
 	AM_RANGE(0xe00000, 0xe003ff) AM_DEVREADWRITE("ide",  ide_controller32_r, ide_controller32_w)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
-	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_BASE(&jaguar_gpu_clut) AM_SHARE(2)
+	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_BASE(&jaguar_gpu_clut) AM_SHARE("share2")
 	AM_RANGE(0xf02100, 0xf021ff) AM_READWRITE(gpuctrl_r, gpuctrl_w)
 	AM_RANGE(0xf02200, 0xf022ff) AM_READWRITE(jaguar_blitter_r, jaguar_blitter_w)
-	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_RAM AM_BASE(&jaguar_gpu_ram) AM_SHARE(3)
+	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_RAM AM_BASE(&jaguar_gpu_ram) AM_SHARE("share3")
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
 	AM_RANGE(0xf16000, 0xf1600b) AM_READ(cojag_gun_input_r)	// GPI02
 	AM_RANGE(0xf17000, 0xf17003) AM_READ_PORT("SYSTEM")		// GPI03
@@ -832,7 +832,7 @@ static ADDRESS_MAP_START( m68020_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xf17c00, 0xf17c03) AM_READ_PORT("P1_P2")		// GPI05
 	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
-	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_BASE(&jaguar_dsp_ram) AM_SHARE(4)
+	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_BASE(&jaguar_dsp_ram) AM_SHARE("share4")
 ADDRESS_MAP_END
 
 
@@ -844,15 +844,15 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( gpu_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x800000, 0xbfffff) AM_ROMBANK("bank8")
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("bank9")
 	AM_RANGE(0xe00000, 0xe003ff) AM_DEVREADWRITE("ide", ide_controller32_r, ide_controller32_w)
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
-	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xf02100, 0xf021ff) AM_READWRITE(gpuctrl_r, gpuctrl_w)
 	AM_RANGE(0xf02200, 0xf022ff) AM_READWRITE(jaguar_blitter_r, jaguar_blitter_w)
-	AM_RANGE(0xf03000, 0xf03fff) AM_RAM AM_SHARE(3)
+	AM_RANGE(0xf03000, 0xf03fff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
 ADDRESS_MAP_END
 
@@ -865,13 +865,13 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( dsp_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x800000, 0xbfffff) AM_ROMBANK("bank8")
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("bank9")
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
 	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
-	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_SHARE(4)
+	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_SHARE("share4")
 	AM_RANGE(0xf1d000, 0xf1dfff) AM_READ(jaguar_wave_rom_r) AM_BASE(&jaguar_wave_rom)
 ADDRESS_MAP_END
 

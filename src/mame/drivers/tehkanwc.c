@@ -231,13 +231,13 @@ static void tehkanwc_adpcm_int(const device_config *device)
 static ADDRESS_MAP_START( main_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(tehkanwc_videoram_w) AM_SHARE(2) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(tehkanwc_colorram_w) AM_SHARE(3) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0xd800, 0xddff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_SHARE(4) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_SHARE(5) /* unused part of the palette RAM, I think? Gridiron uses it */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(tehkanwc_videoram2_w) AM_SHARE(6) AM_BASE(&tehkanwc_videoram2)
-	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE(7) AM_BASE_SIZE_GENERIC(spriteram) /* sprites */
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(tehkanwc_videoram_w) AM_SHARE("share2") AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(tehkanwc_colorram_w) AM_SHARE("share3") AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xd800, 0xddff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_SHARE("share4") AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_SHARE("share5") /* unused part of the palette RAM, I think? Gridiron uses it */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(tehkanwc_videoram2_w) AM_SHARE("share6") AM_BASE(&tehkanwc_videoram2)
+	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("share7") AM_BASE_SIZE_GENERIC(spriteram) /* sprites */
 	AM_RANGE(0xec00, 0xec01) AM_RAM_WRITE(tehkanwc_scroll_x_w)
 	AM_RANGE(0xec02, 0xec02) AM_RAM_WRITE(tehkanwc_scroll_y_w)
 	AM_RANGE(0xf800, 0xf801) AM_READWRITE(tehkanwc_track_0_r, tehkanwc_track_0_reset_w)	/* track 0 x/y */
@@ -257,13 +257,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(tehkanwc_videoram_w) AM_SHARE(2)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(tehkanwc_colorram_w) AM_SHARE(3)
-	AM_RANGE(0xd800, 0xddff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_SHARE(4) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_SHARE(5) /* unused part of the palette RAM, I think? Gridiron uses it */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(tehkanwc_videoram2_w) AM_SHARE(6)
-	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE(7) /* sprites */
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(tehkanwc_videoram_w) AM_SHARE("share2")
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(tehkanwc_colorram_w) AM_SHARE("share3")
+	AM_RANGE(0xd800, 0xddff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_SHARE("share4") AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_SHARE("share5") /* unused part of the palette RAM, I think? Gridiron uses it */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(tehkanwc_videoram2_w) AM_SHARE("share6")
+	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("share7") /* sprites */
 	AM_RANGE(0xec00, 0xec01) AM_RAM_WRITE(tehkanwc_scroll_x_w)
 	AM_RANGE(0xec02, 0xec02) AM_RAM_WRITE(tehkanwc_scroll_y_w)
 	AM_RANGE(0xf860, 0xf860) AM_READ(watchdog_reset_r)

@@ -1590,8 +1590,8 @@ static ADDRESS_MAP_START( tndrcade_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800007) AM_WRITE(sub_ctrl_w)				// Sub CPU Control?
 	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(sharedram_68000_r,sharedram_68000_w)	// Shared RAM
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM	AM_BASE_GENERIC(spriteram2)		// Sprites Code + X + Attr
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_SHARE(1)					// RAM (Mirrored?)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE(1)					// RAM (Mirrored?)
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_SHARE("share1")					// RAM (Mirrored?)
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("share1")					// RAM (Mirrored?)
 ADDRESS_MAP_END
 
 

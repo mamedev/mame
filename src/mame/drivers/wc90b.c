@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( wc90b_map1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(wc90b_bgvideoram_w) AM_BASE(&wc90b_bgvideoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(wc90b_txvideoram_w) AM_BASE(&wc90b_txvideoram)
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90b_bankswitch_w)
 	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(wc90b_sound_command_w)
 	AM_RANGE(0xfd04, 0xfd04) AM_WRITEONLY AM_BASE(&wc90b_scroll1y)
@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( wc90b_map2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe800, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank2")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90b_bankswitch1_w)
 ADDRESS_MAP_END
 

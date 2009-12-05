@@ -41,9 +41,9 @@ static READ8_HANDLER( sdpoker_rng_r )
 
 static ADDRESS_MAP_START( sdpoker_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0x5000, 0x50ff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x57ff, 0x57ff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x5800, 0x58ff) AM_RAM AM_SHARE(1) AM_BASE(&col_line)
+	AM_RANGE(0x5000, 0x50ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x57ff, 0x57ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x5800, 0x58ff) AM_RAM AM_SHARE("share1") AM_BASE(&col_line)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM //work ram
 	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x6c00, 0x6fff) AM_RAM AM_BASE(&char_bank)

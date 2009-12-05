@@ -30,7 +30,7 @@ static ADDRESS_MAP_START( ajax_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0807) AM_READWRITE(K051937_r, K051937_w)					/* sprite control registers */
 	AM_RANGE(0x0c00, 0x0fff) AM_READWRITE(K051960_r, K051960_w)					/* sprite RAM 2128SL at J7 */
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE_GENERIC(paletteram)/* palette */
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE(1)									/* shared RAM with the 6809 */
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("share1")									/* shared RAM with the 6809 */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM												/* RAM 6264L at K10 */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank2")										/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM												/* ROM N11 */
@@ -41,7 +41,7 @@ static ADDRESS_MAP_START( ajax_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x080f) AM_WRITE(K051316_ctrl_0_w)				/* 051316 control registers */
 	AM_RANGE(0x1000, 0x17ff) AM_READ(K051316_rom_0_r)				/* 051316 (ROM test) */
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(ajax_bankswitch_2_w)			/* bankswitch control */
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE(1)						/* shared RAM with the 052001 */
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("share1")						/* shared RAM with the 052001 */
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(K052109_r, K052109_w)		/* video RAM + color RAM + video registers */
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")							/* banked ROM */
 	AM_RANGE(0xa000, 0xffff) AM_ROM									/* ROM I16 */

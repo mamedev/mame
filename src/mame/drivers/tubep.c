@@ -161,8 +161,8 @@ static ADDRESS_MAP_START( tubep_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_BASE(&tubep_textram)	/* RAM on GFX PCB @B13 */
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITEONLY AM_SHARE(1)
-	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE(4)				/* row of 8 x 2147 RAMs on main PCB */
+	AM_RANGE(0xe000, 0xe7ff) AM_WRITEONLY AM_SHARE("share1")
+	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("share4")				/* row of 8 x 2147 RAMs on main PCB */
 ADDRESS_MAP_END
 
 
@@ -214,10 +214,10 @@ static ADDRESS_MAP_START( tubep_second_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tubep_background_a000_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(tubep_background_c000_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE(1) 								/* 6116 #1 */
-	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE(4) AM_BASE(&tubep_backgroundram)	/* row of 8 x 2147 RAMs on main PCB */
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_SHARE(3)						/* sprites color lookup table */
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE(2)									/* program copies here part of shared ram ?? */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1") 								/* 6116 #1 */
+	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("share4") AM_BASE(&tubep_backgroundram)	/* row of 8 x 2147 RAMs on main PCB */
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_SHARE("share3")						/* sprites color lookup table */
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share2")									/* program copies here part of shared ram ?? */
 ADDRESS_MAP_END
 
 
@@ -370,8 +370,8 @@ static MACHINE_RESET( tubep )
 
 /* MS2010-A CPU (equivalent to NSC8105 with one new opcode: 0xec) on graphics PCB */
 static ADDRESS_MAP_START( nsc_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE(3) AM_BASE(&tubep_sprite_colorsharedram)
-	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share3") AM_BASE(&tubep_sprite_colorsharedram)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x2000, 0x2009) AM_WRITE(tubep_sprite_control_w)
 	AM_RANGE(0x200a, 0x200b) AM_WRITENOP /* not used by the games - perhaps designed for debugging */
 	AM_RANGE(0xc000, 0xffff) AM_ROM
@@ -413,7 +413,7 @@ static ADDRESS_MAP_START( rjammer_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM									/* MB8416 SRAM on daughterboard on main PCB (there are two SRAMs, this is the one on the left) */
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_BASE(&tubep_textram)/* RAM on GFX PCB @B13 */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE(1)						/* MB8416 SRAM on daughterboard (the one on the right) */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")						/* MB8416 SRAM on daughterboard (the one on the right) */
 ADDRESS_MAP_END
 
 
@@ -435,9 +435,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rjammer_second_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM							/* M5M5117P @21G */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE(1)				/* MB8416 on daughterboard (the one on the right) */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")				/* MB8416 on daughterboard (the one on the right) */
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&rjammer_backgroundram)/* M5M5117P @19B (background) */
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share2")
 ADDRESS_MAP_END
 
 

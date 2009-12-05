@@ -411,7 +411,7 @@ int getstar_id;
 static ADDRESS_MAP_START( perfrman_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x880f) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x8800, 0x880f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8810, 0x8fff) AM_RAMBANK("bank1") /* Shared RAM with sound CPU */
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_GENERIC(colorram)
@@ -421,7 +421,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tigerh_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc810, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_GENERIC(colorram)
@@ -437,7 +437,7 @@ static ADDRESS_MAP_START( slapfght_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc810, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_GENERIC(colorram)
@@ -454,7 +454,7 @@ static ADDRESS_MAP_START( slapbtuk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc810, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_GENERIC(colorram)
@@ -518,7 +518,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( perfrman_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8800, 0x880f) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x8800, 0x880f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8810, 0x8fff) AM_RAMBANK("bank1") /* Shared RAM with main CPU */
 	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("ay1", ay8910_address_w)
 	AM_RANGE(0xa081, 0xa081) AM_DEVREAD("ay1", ay8910_r)
@@ -540,7 +540,7 @@ static ADDRESS_MAP_START( slapfght_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE("ay2", ay8910_data_w)
 	AM_RANGE(0xa0e0, 0xa0e0) AM_WRITE(getstar_sh_intenable_w) /* maybe a0f0 also -LE */
 //  AM_RANGE(0xa0f0, 0xa0f0) AM_WRITENOP
-	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc810, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xffff) AM_RAM
 ADDRESS_MAP_END

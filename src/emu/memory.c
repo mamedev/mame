@@ -79,28 +79,76 @@
         value of 0x14000 would map the bucket at 0x00000, 0x04000, 0x10000,
         and 0x14000.
 
+   	AM_ROM
+   		Specifies that this bucket contains ROM data by attaching an 
+   		internal read handler. If this address space describes the first
+   		address space for a device, and if there is a region whose name
+   		matches the device's name, and if the bucket start/end range is
+   		within the bounds of that region, then this bucket will automatically
+   		map to the memory contained in that region.
+    
+    AM_RAM
+    AM_READONLY
+    AM_WRITEONLY
+    	Specifies that this bucket contains RAM data by attaching internal
+    	read and/or write handlers. Memory is automatically allocated to back
+    	this area. AM_RAM maps both reads and writes, while AM_READONLY only
+    	maps reads and AM_WRITEONLY only maps writes.
+
+	AM_NOP
+	AM_READNOP
+	AM_WRITENOP
+		Specifies that reads and/or writes in this bucket are unmapped, but 
+		that accesses to them should not be logged. AM_NOP unmaps both reads
+		and writes, while AM_READNOP only unmaps reads, and AM_WRITENOP only
+		unmaps writes.
+	
+	AM_UNMAP
+		Specifies that both reads and writes in thus bucket are unmapeed,
+		and that accesses to them should be logged. There is rarely a need
+		for this, as the entire address space is initialized to behave this
+		way by default.
+    
+    AM_READ_BANK(tag)
+    AM_WRITE_BANK(tag)
+    AM_READWRITE_BANK(tag)
+    	Specifies that reads and/or writes in this bucket map to a memory 
+    	bank with the provided 'tag'. The actual memory this bank points to 
+    	can be later controlled via the same tag.
+
     AM_READ(read)
-        Specifies the read handler for this bucket. All reads will pass
-        through the given callback handler. Special static values representing
-        RAM, ROM, or BANKs are also allowed here.
-
     AM_WRITE(write)
-        Specifies the write handler for this bucket. All writes will pass
-        through the given callback handler. Special static values representing
-        RAM, ROM, or BANKs are also allowed here.
-
+    AM_READWRITE(read, write)
+        Specifies read and/or write handler callbacks for this bucket. All 
+        reads and writes in this bucket will trigger a call to the provided
+        functions.
+   	
+   	AM_DEVREAD(tag, read)
+   	AM_DEVWRITE(tag, read)
+   	AM_DEVREADWRITE(tag, read)
+   		Specifies a device-specific read and/or write handler for this 
+   		bucket, automatically bound to the device specified by the provided 
+   		'tag'.
+   	
+   	AM_READ_PORT(tag)
+   	AM_WRITE_PORT(tag)
+   	AM_READWRITE_PORT(tag)
+   		Specifies that read and/or write accesses in this bucket will map 
+   		to the I/O port with the provided 'tag'. An internal read/write 
+   		handler is set up to handle this mapping.
+   	
     AM_REGION(class, tag, offs)
-        Only useful if AM_READ/WRITE point to RAM, ROM, or BANK memory. By
-        default, memory is allocated to back each bucket. By specifying
-        AM_REGION, you can tell the memory system to point the base of the
-        memory backing this bucket to a given memory 'region' at the
-        specified 'offs'.
+        Only useful if used in conjunction with AM_ROM, AM_RAM, or
+        AM_READ/WRITE_BANK. By default, memory is allocated to back each 
+        bucket. By specifying AM_REGION, you can tell the memory system to 
+        point the base of the memory backing this bucket to a given memory 
+        'region' at the specified 'offs' instead of allocating it.
 
-    AM_SHARE(index)
+    AM_SHARE(tag)
         Similar to AM_REGION, this specifies that the memory backing the
         current bucket is shared with other buckets. The first bucket to
-        specify the share 'index' will use its memory as backing for all
-        future buckets that specify AM_SHARE with the same 'index'.
+        specify the share 'tag' will use its memory as backing for all
+        future buckets that specify AM_SHARE with the same 'tag'.
 
     AM_BASE(base)
         Specifies a pointer to a pointer to the base of the memory backing
@@ -109,6 +157,18 @@
     AM_SIZE(size)
         Specifies a pointer to a size_t variable which will be filled in
         with the size, in bytes, of the current bucket.
+
+    AM_BASE_MEMBER(struct, basefield)
+	AM_SIZE_MEMBER(struct, sizefield)
+		Specifies a field within a given struct as where to store the base
+		or size of the current bucket. The struct is assumed to be hanging
+		off of the machine->driver_data pointer.
+	
+	AM_BASE_GENERIC(basefield)
+	AM_SIZE_GENERIC(sizefield)
+		Specifies a field within the global generic_pointers struct as
+		where to store the base or size of the current bucket. The global
+		generic_pointer struct lives in machine->generic.
 
 ***************************************************************************/
 
@@ -144,8 +204,10 @@
 #define ENTRY_COUNT				(SUBTABLE_BASE)			/* number of legitimate (non-subtable) entries */
 #define SUBTABLE_ALLOC			8						/* number of subtables to allocate at a time */
 
+/* shares are initially mapped to this invalid pointer */
+#define UNMAPPED_SHARE_PTR		((void *)-1)
+
 /* other address map constants */
-#define MAX_SHARED_POINTERS		256						/* maximum number of shared pointers in memory maps */
 #define MEMORY_BLOCK_CHUNK		65536					/* minimum chunk size of allocated memory blocks */
 
 /* read or write constants */
@@ -272,7 +334,6 @@ struct _memory_private
 
 	UINT8 *					bank_ptr[STATIC_COUNT];			/* array of bank pointers */
 	UINT8 *					bankd_ptr[STATIC_COUNT];		/* array of decrypted bank pointers */
-	void *					shared_ptr[MAX_SHARED_POINTERS];/* array of shared pointers */
 
 	memory_block *			memory_block_list;				/* head of the list of memory blocks */
 
@@ -335,7 +396,7 @@ static void memory_init_locate(running_machine *machine);
 static void memory_exit(running_machine *machine);
 
 /* address map helpers */
-static void map_detokenize(address_map *map, const game_driver *driver, const char *devtag, const addrmap_token *tokens);
+static void map_detokenize(memory_private *memdata, address_map *map, const game_driver *driver, const char *devtag, const addrmap_token *tokens);
 
 /* memory mapping helpers */
 static void space_map_range_private(address_space *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
@@ -790,7 +851,7 @@ const address_space *memory_find_address_space(const device_config *device, int 
     address map for a device's address space
 -------------------------------------------------*/
 
-address_map *address_map_alloc(const device_config *device, const game_driver *driver, int spacenum)
+address_map *address_map_alloc(const device_config *device, const game_driver *driver, int spacenum, void *memdata)
 {
 	const addrmap_token *internal_map;
 	const addrmap_token *default_map;
@@ -801,16 +862,16 @@ address_map *address_map_alloc(const device_config *device, const game_driver *d
 	/* append the internal device map (first so it takes priority) */
 	internal_map = (const addrmap_token *)device_get_info_ptr(device, DEVINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
 	if (internal_map != NULL)
-		map_detokenize(map, driver, device->tag, internal_map);
+		map_detokenize(memdata, map, driver, device->tag, internal_map);
 
 	/* construct the standard map */
 	if (device->address_map[spacenum] != NULL)
-		map_detokenize(map, driver, device->tag, device->address_map[spacenum]);
+		map_detokenize(memdata, map, driver, device->tag, device->address_map[spacenum]);
 
 	/* append the default device map (last so it can be overridden) */
 	default_map = (const addrmap_token *)device_get_info_ptr(device, DEVINFO_PTR_DEFAULT_MEMORY_MAP + spacenum);
 	if (default_map != NULL)
-		map_detokenize(map, driver, device->tag, default_map);
+		map_detokenize(memdata, map, driver, device->tag, default_map);
 
 	return map;
 }
@@ -1685,7 +1746,7 @@ static void memory_init_preflight(running_machine *machine)
 		int entrynum;
 
 		/* allocate the address map */
-		space->map = address_map_alloc(space->cpu, machine->gamedrv, space->spacenum);
+		space->map = address_map_alloc(space->cpu, machine->gamedrv, space->spacenum, memdata);
 
 		/* extract global parameters specified by the map */
 		space->unmap = (space->map->unmapval == 0) ? 0 : ~0;
@@ -1717,7 +1778,7 @@ static void memory_init_preflight(running_machine *machine)
 			}
 
 			/* validate adjusted addresses against implicit regions */
-			if (entry->region != NULL && entry->share == 0 && entry->baseptr == NULL)
+			if (entry->region != NULL && entry->share == NULL && entry->baseptr == NULL)
 			{
 				UINT8 *base = memory_region(machine, entry->region);
 				offs_t length = memory_region_length(machine, entry->region);
@@ -1954,10 +2015,9 @@ static void memory_init_locate(running_machine *machine)
 	{
 		const address_map_entry *entry;
 
-		/* fill in base/size entries, and handle shared memory */
+		/* fill in base/size entries */
 		for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
 		{
-			/* assign base/size values */
 			if (entry->baseptr != NULL)
 				*entry->baseptr = entry->memory;
 			if (entry->baseptroffs_plus1 != 0)
@@ -2103,7 +2163,7 @@ static void memory_exit(running_machine *machine)
 		fatalerror("%s: %s AM_RANGE(0x%x, 0x%x) setting %s already set!\n", driver->source_file, driver->name, entry->addrstart, entry->addrend, #field); \
 	} while (0)
 
-static void map_detokenize(address_map *map, const game_driver *driver, const char *devtag, const addrmap_token *tokens)
+static void map_detokenize(memory_private *memdata, address_map *map, const game_driver *driver, const char *devtag, const addrmap_token *tokens)
 {
 	address_map_entry **entryptr;
 	address_map_entry *entry;
@@ -2142,7 +2202,7 @@ static void map_detokenize(address_map *map, const game_driver *driver, const ch
 
 			/* including */
 			case ADDRMAP_TOKEN_INCLUDE:
-				map_detokenize(map, driver, devtag, TOKEN_GET_PTR(tokens, tokenptr));
+				map_detokenize(memdata, map, driver, devtag, TOKEN_GET_PTR(tokens, tokenptr));
 				for (entryptr = &map->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next) ;
 				entry = NULL;
 				break;
@@ -2253,8 +2313,9 @@ static void map_detokenize(address_map *map, const game_driver *driver, const ch
 
 			case ADDRMAP_TOKEN_SHARE:
 				check_entry_field(share);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->share, 24);
+				entry->share = TOKEN_GET_STRING(tokens);
+				if (memdata != NULL)
+					tagmap_add(memdata->sharemap, entry->share, UNMAPPED_SHARE_PTR, FALSE);
 				break;
 
 			case ADDRMAP_TOKEN_BASEPTR:
@@ -2541,7 +2602,7 @@ void *bank_find_or_allocate(const address_space *space, const char *tag, offs_t 
 		/* for named banks, add to the map and register for save states */
 		if (tag[0] != '~')
 		{
-			tagmap_add_unique_hash(memdata->bankmap, tag, bank);
+			tagmap_add_unique_hash(memdata->bankmap, tag, bank, FALSE);
 			if (state_save_registration_allowed(space->machine))
 				state_save_register_item(space->machine, "memory", bank->tag, 0, bank->curentry);
 		}
@@ -3296,27 +3357,31 @@ static address_map_entry *block_assign_intersecting(address_space *space, offs_t
 	/* loop over the adjusted map and assign memory to any blocks we can */
 	for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
 	{
-		/* if we haven't assigned this block yet, do it against the last block */
-		if (entry->memory == NULL)
+		/* if we haven't assigned this block yet, see if we have a mapped shared pointer for it */
+		if (entry->memory == NULL && entry->share != NULL)
 		{
-			/* inherit shared pointers first */
-			if (entry->share != 0 && memdata->shared_ptr[entry->share] != NULL)
+			void *shareptr = tagmap_find(memdata->sharemap, entry->share);
+			if (shareptr != UNMAPPED_SHARE_PTR)
 			{
-				entry->memory = memdata->shared_ptr[entry->share];
- 				VPRINTF(("memory range %08X-%08X -> shared_ptr[%d] [%p]\n", entry->addrstart, entry->addrend, entry->share, entry->memory));
+				entry->memory = shareptr;
+ 				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' [%p]\n", entry->addrstart, entry->addrend, entry->share, entry->memory));
  			}
+		}
 
-			/* otherwise, look for a match in this block */
-			else if (entry->bytestart >= bytestart && entry->byteend <= byteend)
-			{
-				entry->memory = base + (entry->bytestart - bytestart);
-				VPRINTF(("memory range %08X-%08X -> found in block from %08X-%08X [%p]\n", entry->addrstart, entry->addrend, bytestart, byteend, entry->memory));
-			}
+		/* otherwise, look for a match in this block */
+		if (entry->memory == NULL && entry->bytestart >= bytestart && entry->byteend <= byteend)
+		{
+			entry->memory = base + (entry->bytestart - bytestart);
+			VPRINTF(("memory range %08X-%08X -> found in block from %08X-%08X [%p]\n", entry->addrstart, entry->addrend, bytestart, byteend, entry->memory));
 		}
 
 		/* if we're the first match on a shared pointer, assign it now */
-		if (entry->memory != NULL && entry->share && memdata->shared_ptr[entry->share] == NULL)
-			memdata->shared_ptr[entry->share] = entry->memory;
+		if (entry->memory != NULL && entry->share != NULL)
+		{
+			void *shareptr = tagmap_find(memdata->sharemap, entry->share);
+			if (shareptr == UNMAPPED_SHARE_PTR)
+				tagmap_add(memdata->sharemap, entry->share, entry->memory, TRUE);
+		}
 
 		/* keep track of the first unassigned entry */
 		if (entry->memory == NULL && unassigned == NULL && space_needs_backing_store(space, entry))

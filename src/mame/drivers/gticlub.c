@@ -618,8 +618,8 @@ static ADDRESS_MAP_START( gticlub_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_READ(K056800_host_r)		// Hang Pilot
 	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_READ(K056800_host_r)
 	AM_RANGE(0x7f000000, 0x7f3fffff) AM_ROM AM_REGION("user2", 0)	/* Data ROM */
-	AM_RANGE(0x7f800000, 0x7f9fffff) AM_ROM AM_SHARE(2)
-	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE(2)	/* Program ROM */
+	AM_RANGE(0x7f800000, 0x7f9fffff) AM_ROM AM_SHARE("share2")
+	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")	/* Program ROM */
 ADDRESS_MAP_END
 
 /**********************************************************************/

@@ -433,9 +433,9 @@ static int preprocess_write(running_machine *machine, UINT16 data);
 /* DCS 2k memory map */
 static ADDRESS_MAP_START( dcs_2k_program_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(&dcs_internal_program_ram)
-	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE(1) AM_BASE(&dcs_external_program_ram)
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("share1") AM_BASE(&dcs_external_program_ram)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dcs_2k_data_map, ADDRESS_SPACE_DATA, 16 )

@@ -793,7 +793,7 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
 	info->flags = flags;
 
 	/* attempt to put is in the hash table */
-	tagerr = tagmap_add_unique_hash(mame->regionmap, name, info);
+	tagerr = tagmap_add_unique_hash(mame->regionmap, name, info, FALSE);
 	if (tagerr == TMERR_DUPLICATE)
 	{
 		region_info *match = tagmap_find_hash_only(mame->regionmap, name);

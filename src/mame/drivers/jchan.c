@@ -505,7 +505,7 @@ static ADDRESS_MAP_START( jchan_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(jchan_mcu_com3_w)	//  [ for mcu to return its status ?
 	AM_RANGE(0x370000, 0x370001) AM_READ(jchan_mcu_status_r)
 
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE(&mainsub_shared_ram) AM_SHARE(1)
+	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE(&mainsub_shared_ram) AM_SHARE("share1")
 
 	/* 1st sprite layer */
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(jchan_suprnova_sprite32_1_w) AM_BASE(&jchan_spriteram_1)
@@ -523,7 +523,7 @@ static ADDRESS_MAP_START( jchan_sub, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Work RAM - grid tested, cleared ($612-$6dc)
 
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE(&mainsub_shared_ram) AM_SHARE(1)
+	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE(&mainsub_shared_ram) AM_SHARE("share1")
 
 	/* VIEW2 Tilemap - [D] grid tested, cleared ($1d84), also cleared at startup ($810-$826) */
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1)	// Layers 0

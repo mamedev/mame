@@ -750,7 +750,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")	/* ROM + RAM */
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(tnzs_state, objram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, vdcram)
 	AM_RANGE(0xf200, 0xf2ff) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, scrollram) /* scrolling info */
 	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
@@ -766,7 +766,7 @@ static ADDRESS_MAP_START( cpu0_type2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")	/* ROM + RAM */
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(tnzs_state, objram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, vdcram)
 	AM_RANGE(0xf200, 0xf2ff) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, scrollram) /* scrolling info */
 	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
@@ -783,7 +783,7 @@ static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xc000, 0xc001) AM_READWRITE(tnzs_mcu_r, tnzs_mcu_w)	/* not present in insectx */
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf000, 0xf003) AM_READ(arknoid2_sh_f000_r)	/* paddles in arkanoid2/plumppop. The ports are */
 						/* read but not used by the other games, and are not read at */
 						/* all by insectx. */
@@ -798,7 +798,7 @@ static ADDRESS_MAP_START( kageki_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 /* the later board is different, it has a third CPU (and of course no mcu) */
@@ -821,7 +821,7 @@ static ADDRESS_MAP_START( tnzsb_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf000, 0xf003) AM_READONLY
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
@@ -837,7 +837,7 @@ static ADDRESS_MAP_START( kabukiz_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf800, 0xfbff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
@@ -888,7 +888,7 @@ static ADDRESS_MAP_START( jpopnics_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(tnzs_state, objram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1) /* WORK RAM (shared by the 2 z80's) */
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1") /* WORK RAM (shared by the 2 z80's) */
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, vdcram) 	/* VDC RAM */
 	AM_RANGE(0xf200, 0xf2ff) AM_RAM AM_BASE_MEMBER(tnzs_state, scrollram) /* scrolling info */
 	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
@@ -915,7 +915,7 @@ static ADDRESS_MAP_START( jpopnics_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc601, 0xc601) AM_READ_PORT("DSWB")
 
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 
 	AM_RANGE(0xf000, 0xf003) AM_READ(arknoid2_sh_f000_r)
 ADDRESS_MAP_END

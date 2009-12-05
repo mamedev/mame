@@ -168,7 +168,7 @@ static WRITE8_HANDLER( cloak_nvram_enable_w )
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(cloak_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)		/* DSW0 also */
 	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)		/* DSW1 also */
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P1")
@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0007) AM_RAM
 	AM_RANGE(0x0008, 0x000f) AM_READWRITE(graph_processor_r, graph_processor_w)
 	AM_RANGE(0x0010, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(cloak_irq_reset_1_w)
 	AM_RANGE(0x1200, 0x1200) AM_WRITE(cloak_clearbmp_w)
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(cloak_custom_w)

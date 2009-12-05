@@ -405,8 +405,8 @@ static ADDRESS_MAP_START( hangon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0xa00000, 0xa00fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0xc00000, 0xc3ffff) AM_ROM AM_REGION("sub", 0)
-	AM_RANGE(0xc68000, 0xc68fff) AM_RAM AM_SHARE(1) AM_BASE(&segaic16_roadram_0)
-	AM_RANGE(0xc7c000, 0xc7ffff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xc68000, 0xc68fff) AM_RAM AM_SHARE("share1") AM_BASE(&segaic16_roadram_0)
+	AM_RANGE(0xc7c000, 0xc7ffff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xe00000, 0xffffff) AM_READWRITE(hangon_io_r, hangon_io_w)
 ADDRESS_MAP_END
 
@@ -417,10 +417,10 @@ static ADDRESS_MAP_START( sharrier_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE(&segaic16_tileram_0)
 	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(segaic16_textram_0_w) AM_BASE(&segaic16_textram_0)
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
-	AM_RANGE(0x124000, 0x127fff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x124000, 0x127fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
 	AM_RANGE(0x140000, 0x14ffff) AM_READWRITE(sharrier_io_r, sharrier_io_w)
-	AM_RANGE(0xc68000, 0xc68fff) AM_RAM AM_SHARE(1) AM_BASE(&segaic16_roadram_0)
+	AM_RANGE(0xc68000, 0xc68fff) AM_RAM AM_SHARE("share1") AM_BASE(&segaic16_roadram_0)
 ADDRESS_MAP_END
 
 
@@ -436,8 +436,8 @@ static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x068000, 0x068fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x07c000, 0x07ffff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x068000, 0x068fff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x07c000, 0x07ffff) AM_RAM AM_SHARE("share2")
 ADDRESS_MAP_END
 
 

@@ -1301,8 +1301,8 @@ static WRITE64_HANDLER( eeprom_93c46a_w )
 
 static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	/* Area 0 */
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE(3) AM_REGION("maincpu", 0) // BIOS
-	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_SHARE(3)  // non cachable access to  0x00000000 - 0x001fffff
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share3") AM_REGION("maincpu", 0) // BIOS
+	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_SHARE("share3")  // non cachable access to  0x00000000 - 0x001fffff
 
 	AM_RANGE(0x00200000, 0x00207fff) AM_RAM                                             // bios uses it (battery backed ram ?)
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
@@ -1330,10 +1330,10 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x08000000, 0x0bffffff) AM_NOP // 'Unassigned'
 
 	/* Area 3 */
-	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM AM_BASE(&naomi_ram64) AM_SHARE(4)
-	AM_RANGE(0x0e000000, 0x0fffffff) AM_RAM AM_SHARE(4)// mirror
+	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM AM_BASE(&naomi_ram64) AM_SHARE("share4")
+	AM_RANGE(0x0e000000, 0x0fffffff) AM_RAM AM_SHARE("share4")// mirror
 
-	AM_RANGE(0x8c000000, 0x8dffffff) AM_RAM AM_SHARE(4) // RAM access through cache
+	AM_RANGE(0x8c000000, 0x8dffffff) AM_RAM AM_SHARE("share4") // RAM access through cache
 
 	/* Area 4 */
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
@@ -1477,13 +1477,13 @@ static ADDRESS_MAP_START( aw_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x08000000, 0x0bffffff) AM_NOP // 'Unassigned'
 
 	/* Area 3 */
-	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_BASE(&naomi_ram64) AM_SHARE(4)
-	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE(4)// extra ram on Naomi (mirror on DC)
-	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE(4)// mirror
-	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE(4)// mirror
+	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_BASE(&naomi_ram64) AM_SHARE("share4")
+	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE("share4")// extra ram on Naomi (mirror on DC)
+	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE("share4")// mirror
+	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE("share4")// mirror
 
-	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE(4) // RAM access through cache
-	AM_RANGE(0x8d000000, 0x8dffffff) AM_RAM AM_SHARE(4) // RAM access through cache
+	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE("share4") // RAM access through cache
+	AM_RANGE(0x8d000000, 0x8dffffff) AM_RAM AM_SHARE("share4") // RAM access through cache
 
 	/* Area 4 - half the texture memory, like dreamcast, not naomi */
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )

@@ -69,7 +69,7 @@ static WRITE8_HANDLER( metlclsh_ack_nmi )
 
 static ADDRESS_MAP_START( metlclsh_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
@@ -116,7 +116,7 @@ static WRITE8_HANDLER( metlclsh_flipscreen_w )
 
 static ADDRESS_MAP_START( metlclsh_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0") AM_WRITE(metlclsh_gfxbank_w)	// bg tiles bank
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")

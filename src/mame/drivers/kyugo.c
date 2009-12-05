@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(kyugo_scroll_x_lo_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(kyugo_gfxctrl_w)
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(kyugo_scroll_y_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE(1) AM_BASE(&shared_ram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("share1") AM_BASE(&shared_ram)
 ADDRESS_MAP_END
 
 
@@ -104,7 +104,7 @@ Main_PortMap( srdmissn, 0x08 )
 #define Sub_MemMap( name, rom_end, shared, in0, in1, in2 )					\
 static ADDRESS_MAP_START( name##_sub_map, ADDRESS_SPACE_PROGRAM, 8 )		\
 	AM_RANGE(0x0000, rom_end) AM_ROM										\
-	AM_RANGE(shared, shared+0x7ff) AM_RAM AM_SHARE(1)						\
+	AM_RANGE(shared, shared+0x7ff) AM_RAM AM_SHARE("share1")						\
 	AM_RANGE(in0, in0) AM_READ_PORT("SYSTEM")								\
 	AM_RANGE(in1, in1) AM_READ_PORT("P1")									\
 	AM_RANGE(in2, in2) AM_READ_PORT("P2")									\

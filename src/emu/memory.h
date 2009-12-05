@@ -232,7 +232,7 @@ struct _address_map_entry
 	offs_t					addrmask;			/* mask bits */
 	map_handler_data		read;				/* data for read handler */
 	map_handler_data		write;				/* data for write handler */
-	UINT32					share;				/* index of a shared memory block */
+	const char *			share;				/* tag of a shared memory block */
 	void **					baseptr;			/* receives pointer to memory (optional) */
 	size_t *				sizeptr;			/* receives size of area in bytes (optional) */
 	UINT32					baseptroffs_plus1;	/* offset of base pointer within driver_data, plus 1 */
@@ -832,14 +832,14 @@ union _addrmap64_token
 #define AM_ROM \
 	TOKEN_UINT32_PACK4(ADDRMAP_TOKEN_READ, 8, AMH_ROM, 8, 0, 8, 0, 8),
 
+#define AM_RAM \
+	TOKEN_UINT32_PACK4(ADDRMAP_TOKEN_READWRITE, 8, AMH_RAM, 8, 0, 8, 0, 8),
+
 #define AM_READONLY \
 	TOKEN_UINT32_PACK4(ADDRMAP_TOKEN_READ, 8, AMH_RAM, 8, 0, 8, 0, 8),
 
 #define AM_WRITEONLY \
 	TOKEN_UINT32_PACK4(ADDRMAP_TOKEN_WRITE, 8, AMH_RAM, 8, 0, 8, 0, 8),
-
-#define AM_RAM \
-	TOKEN_UINT32_PACK4(ADDRMAP_TOKEN_READWRITE, 8, AMH_RAM, 8, 0, 8, 0, 8),
 
 #define AM_UNMAP \
 	TOKEN_UINT32_PACK4(ADDRMAP_TOKEN_READWRITE, 8, AMH_UNMAP, 8, 0, 8, 0, 8),
@@ -863,6 +863,10 @@ union _addrmap64_token
 	TOKEN_UINT32_PACK4(ADDRMAP_TOKEN_WRITE, 8, AMH_PORT, 8, 0, 8, 0, 8), \
 	TOKEN_STRING(_tag),
 
+#define AM_READWRITE_PORT(_tag) \
+	TOKEN_UINT32_PACK4(ADDRMAP_TOKEN_READWRITE, 8, AMH_PORT, 8, 0, 8, 0, 8), \
+	TOKEN_STRING(_tag),
+
 
 /* bank accesses */
 #define AM_READ_BANK(_tag) \
@@ -873,14 +877,19 @@ union _addrmap64_token
 	TOKEN_UINT32_PACK4(ADDRMAP_TOKEN_WRITE, 8, AMH_BANK, 8, 0, 8, 0, 8), \
 	TOKEN_STRING(_tag),
 
+#define AM_READWRITE_BANK(_tag) \
+	TOKEN_UINT32_PACK4(ADDRMAP_TOKEN_READWRITE, 8, AMH_BANK, 8, 0, 8, 0, 8), \
+	TOKEN_STRING(_tag),
+
 
 /* attributes for accesses */
 #define AM_REGION(_tag, _offs) \
 	TOKEN_UINT64_PACK2(ADDRMAP_TOKEN_REGION, 8, _offs, 32), \
 	TOKEN_STRING(_tag),
 
-#define AM_SHARE(_index) \
-	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_SHARE, 8, _index, 24),
+#define AM_SHARE(_tag) \
+	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_SHARE, 8), \
+	TOKEN_STRING(_tag),
 
 #define AM_BASE(_base) \
 	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_BASEPTR, 8), \
@@ -905,7 +914,7 @@ union _addrmap64_token
 
 /* common shortcuts */
 #define AM_ROMBANK(_bank)					AM_READ_BANK(_bank)
-#define AM_RAMBANK(_bank)					AM_READ_BANK(_bank) AM_WRITE_BANK(_bank)
+#define AM_RAMBANK(_bank)					AM_READWRITE_BANK(_bank)
 #define AM_RAM_READ(_read)					AM_READ(_read) AM_WRITEONLY
 #define AM_RAM_WRITE(_write)				AM_READONLY AM_WRITE(_write)
 #define AM_RAM_DEVREAD(_tag, _read)			AM_DEVREAD(_tag, _read) AM_WRITEONLY
@@ -942,7 +951,7 @@ const address_space *memory_find_address_space(const device_config *device, int 
 /* ----- address maps ----- */
 
 /* build and allocate an address map for a device's address space */
-address_map *address_map_alloc(const device_config *device, const game_driver *driver, int spacenum);
+address_map *address_map_alloc(const device_config *device, const game_driver *driver, int spacenum, void *memdata);
 
 /* release allocated memory for an address map */
 void address_map_free(address_map *map);

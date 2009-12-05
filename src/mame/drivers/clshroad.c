@@ -62,7 +62,7 @@ static READ8_HANDLER( clshroad_input_r )
 static ADDRESS_MAP_START( clshroad_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x95ff) AM_RAM
-	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x9800, 0x9dff) AM_RAM
 	AM_RANGE(0x9e00, 0x9fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	// ? Interrupt related
@@ -76,7 +76,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( clshroad_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(wiping_sound_w) AM_BASE(&wiping_soundregs)
-	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa003, 0xa003) AM_WRITENOP	// ? Interrupt related
 ADDRESS_MAP_END
 

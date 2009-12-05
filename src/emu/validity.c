@@ -320,7 +320,7 @@ static int validate_driver(int drivnum, const machine_config *config, tagmap *na
 	enum { NAME_LEN_PARENT = 8, NAME_LEN_CLONE = 16 };
 
 	/* check for duplicate names */
-	if (tagmap_add(names, driver->name, (void *)driver) == TMERR_DUPLICATE)
+	if (tagmap_add(names, driver->name, (void *)driver, FALSE) == TMERR_DUPLICATE)
 	{
 		const game_driver *match = tagmap_find(names, driver->name);
 		mame_printf_error("%s: %s is a duplicate name (%s, %s)\n", driver->source_file, driver->name, match->source_file, match->name);
@@ -328,7 +328,7 @@ static int validate_driver(int drivnum, const machine_config *config, tagmap *na
 	}
 
 	/* check for duplicate descriptions */
-	if (tagmap_add(descriptions, driver->description, (void *)driver) == TMERR_DUPLICATE)
+	if (tagmap_add(descriptions, driver->description, (void *)driver, FALSE) == TMERR_DUPLICATE)
 	{
 		const game_driver *match = tagmap_find(descriptions, driver->description);
 		mame_printf_error("%s: %s is a duplicate description (%s, %s)\n", driver->source_file, driver->description, match->source_file, match->description);
@@ -414,7 +414,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 	{
 		char romaddr[20];
 		sprintf(romaddr, "%p", driver->rom);
-		if (tagmap_add(roms, romaddr, (void *)driver) == TMERR_DUPLICATE)
+		if (tagmap_add(roms, romaddr, (void *)driver, FALSE) == TMERR_DUPLICATE)
 		{
 			const game_driver *match = tagmap_find(roms, romaddr);
 			mame_printf_error("%s: %s uses the same ROM set as (%s, %s)\n", driver->source_file, driver->description, match->source_file, match->name);
@@ -1283,7 +1283,7 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 			address_map *map;
 
 			/* construct the maps */
-			map = address_map_alloc(device, driver, spacenum);
+			map = address_map_alloc(device, driver, spacenum, NULL);
 
 			/* if this is an empty map, just skip it */
 			if (map->entrylist == NULL)
@@ -1377,11 +1377,13 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 					error = TRUE;
 				}
 
-				/* validate bank tags */
+				/* validate bank and share tags */
 				if (entry->read.type == AMH_BANK)
 					error |= validate_tag(driver, "bank", entry->read.tag);
 				if (entry->write.type == AMH_BANK)
 					error |= validate_tag(driver, "bank", entry->write.tag);
+				if (entry->share != NULL)
+					error |= validate_tag(driver, "share", entry->share);
 			}
 
 			/* release the address map */
@@ -1465,7 +1467,7 @@ int mame_validitychecks(const game_driver *curdriver)
 	{
 		const char *string = input_port_string_from_index(strnum);
 		if (string != NULL)
-			tagmap_add(defstr, string, (void *)(FPTR)strnum);
+			tagmap_add(defstr, string, (void *)(FPTR)strnum, FALSE);
 	}
 	prep += get_profile_ticks();
 

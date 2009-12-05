@@ -938,7 +938,7 @@ static WRITE8_HANDLER( sound_nmi_clear_w )
 
 static ADDRESS_MAP_START( mazerbla_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd800, 0xd800) AM_READ(cfb_zpu_int_req_clr)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM
@@ -968,7 +968,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazerbla_cpu3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")					/* GFX roms */
 	AM_RANGE(0x4000, 0x4003) AM_WRITE(VCU_video_reg_w)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(&cfb_ram)		/* Color Frame Buffer PCB, a.k.a. RAM for VCU commands and parameters */
