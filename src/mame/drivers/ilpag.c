@@ -91,10 +91,6 @@ static VIDEO_UPDATE(ilpag)
 	int x,y;
 	int count;
 
-	UINT8 *blit_rom = memory_region(screen->machine, "blit_data");
-
-	blit_rom = blit_buffer;
-
 	count = 0;
 
 	for(y=0;y<512;y++)
@@ -102,7 +98,7 @@ static VIDEO_UPDATE(ilpag)
 		for(x=0;x<512;x++)
 		{
 			UINT32 color;
-			color = (blit_rom[count] & 0xff);
+			color = (blit_buffer[count] & 0xff);
 
 			if(x<video_screen_get_visible_area(screen)->max_x && y<video_screen_get_visible_area(screen)->max_y)
 				*BITMAP_ADDR32(bitmap, y, x) = screen->machine->pens[color];
