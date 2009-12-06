@@ -71,7 +71,7 @@ struct _cheat_region_map
 {
 	UINT64		offset;
 	UINT64		endoffset;
-	UINT8		share;
+	const char *share;
 	UINT8		disabled;
 };
 
@@ -1789,7 +1789,7 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 			cheat_region[region_count].disabled = (entry->write.type == AMH_RAM) ? FALSE : TRUE;
 
 			/* disable double share regions */
-			if (entry->share != 0)
+			if (entry->share != NULL)
 				for (i = 0; i < region_count; i++)
 					if (cheat_region[i].share == entry->share)
 						cheat_region[region_count].disabled = TRUE;
