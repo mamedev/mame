@@ -272,7 +272,7 @@ static WRITE32_HANDLER( sysh1_char_w )
 		gfx[offset*4+2] = (h1_charram[offset] & 0x0000ff00) >> 8;
 		gfx[offset*4+3] = (h1_charram[offset] & 0x000000ff) >> 0;
 
-		gfx_element_mark_dirty(space->machine->gfx[2], offset/16);
+		gfx_element_mark_dirty(space->machine->gfx[2], offset/64); //*4/256
 	}
 }
 
@@ -342,7 +342,7 @@ static const gfx_layout tiles8x8_layout =
 	16,16,
 	RGN_FRAC(1,1),
 	8,
-	{ 0, 1, 2, 3,4,5,6,7 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120 },
 	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
 	16*128
