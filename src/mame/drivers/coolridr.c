@@ -127,7 +127,8 @@ static WRITE32_HANDLER(sysh1_unk_w)
 /* According to Guru, this is actually the same I/O chip of Sega Model 2 HW */
 static READ32_HANDLER(sysh1_ioga_r)
 {
-	return mame_rand(space->machine);//h1_ioga[offset];
+	//return mame_rand(space->machine);//h1_ioga[offset];
+	return h1_ioga[offset];
 }
 
 static WRITE32_HANDLER(sysh1_ioga_w)
@@ -155,7 +156,7 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 			/*  "THIS MACHINE IS STAND-ALONE." / disclaimer written with this CMD */
 			if((cmd & 0xff) == 0xf4)
 			{
-				/* FIXME: color offset */
+				/* FIXME: color offset and proper offset calculation */
 				memory_write_dword(space,(dst_addr + param),data);
 				dst_addr+=4;
 
@@ -243,6 +244,7 @@ static WRITE32_HANDLER( sysh1_dma_w )
 		sysh1_dma_transfer(space, 1);
 	}
 
+	if(0)
 	{
 		UINT8 *gfx = memory_region(space->machine, "ram_gfx");
 
@@ -256,9 +258,8 @@ static WRITE32_HANDLER( sysh1_dma_w )
 }
 
 static ADDRESS_MAP_START( system_h1_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_SHARE("share1") AM_WRITENOP
-	AM_RANGE(0x01000000, 0x010fffff) AM_ROM AM_REGION("maincpu_data",0x0000000) //correct?
-	AM_RANGE(0x01200000, 0x021fffff) AM_ROM AM_REGION("gfx_data",0x0000000) //correct?
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share1") AM_WRITENOP
+	AM_RANGE(0x01000000, 0x01ffffff) AM_ROM AM_REGION("gfx_data",0x0000000) //correct?
 
 	/*WARNING: boundaries of these two are WRONG!*/
 	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_BASE(&framebuffer_vram)
@@ -267,7 +268,7 @@ static ADDRESS_MAP_START( system_h1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM_WRITE(coolridr_pal_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x04000000, 0x0400003f) AM_RAM_WRITE(sysh1_txt_blit_w) AM_BASE(&sysh1_txt_blit)
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE(&sysh1_workram_h)
-	AM_RANGE(0x20000000, 0x200fffff) AM_ROM AM_SHARE("share1")
+	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_SHARE("share1")
 
 	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
 ADDRESS_MAP_END
@@ -340,7 +341,7 @@ static const gfx_layout test =
 #endif
 
 static GFXDECODE_START( coolridr )
-	GFXDECODE_ENTRY( "maincpu_data", 0, tiles8x8_layout, 0, 16 )
+//	GFXDECODE_ENTRY( "maincpu_data", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx_data", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx5", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "ram_gfx", 0, tiles8x8_layout, 0, 16 )
@@ -412,21 +413,19 @@ ROM_START( coolridr )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* SH2 code */
 	ROM_LOAD32_WORD_SWAP( "ep17659.30", 0x0000000, 0x080000, CRC(473027b0) SHA1(acaa212869dd79550235171b9f054e82750f74c3) )
 	ROM_LOAD32_WORD_SWAP( "ep17658.29", 0x0000002, 0x080000, CRC(7ecfdfcc) SHA1(97cb3e6cf9764c8db06de12e4e958148818ef737) )
-
-	ROM_REGION32_BE( 0x100000, "maincpu_data", 0 )
-	ROM_LOAD32_WORD_SWAP( "ep17661.32", 0x0000000, 0x0080000, CRC(81a7d90b) SHA1(99f8c3e75b94dd1b60455c26dc38ce08db82fe32) )
-	ROM_LOAD32_WORD_SWAP( "ep17660.31", 0x0000002, 0x0080000, CRC(27b7a507) SHA1(4c28b1d18d75630a73194b5d4fd166f3b647c595) )
+	ROM_LOAD32_WORD_SWAP( "ep17661.32", 0x0100000, 0x080000, CRC(81a7d90b) SHA1(99f8c3e75b94dd1b60455c26dc38ce08db82fe32) )
+	ROM_LOAD32_WORD_SWAP( "ep17660.31", 0x0100002, 0x080000, CRC(27b7a507) SHA1(4c28b1d18d75630a73194b5d4fd166f3b647c595) )
 
 	/* Page 12 of the service manual states that these 4 regions are tested, so I believe that they are read by the SH-2 */
 	ROM_REGION32_BE( 0x1000000, "gfx_data", 0 ) /* SH2 code */
-	ROM_LOAD32_WORD_SWAP( "mp17650.11", 0x0000000, 0x0200000, CRC(0ccc84a1) SHA1(65951685b0c8073f6bd1cf9959e1b4d0fc6031d8) )
-	ROM_LOAD32_WORD_SWAP( "mp17651.12", 0x0000002, 0x0200000, CRC(25fd7dde) SHA1(a1c3f3d947ce20fbf61ea7ab235259be9b7d35a8) )
-	ROM_LOAD32_WORD_SWAP( "mp17652.13", 0x0400000, 0x0200000, CRC(be9b4d05) SHA1(0252ba647434f69d6eacb4efc6f55e6af534c7c5) )
-	ROM_LOAD32_WORD_SWAP( "mp17653.14", 0x0400002, 0x0200000, CRC(64d1406d) SHA1(779dbbf42a14a6be1de9afbae5bbb18f8f36ceb3) )
-	ROM_LOAD32_WORD_SWAP( "mp17654.15", 0x0800000, 0x0200000, CRC(5dee5cba) SHA1(6e6ec8574bdd35cc27903fc45f0d4a36ce9df103) )
-	ROM_LOAD32_WORD_SWAP( "mp17655.16", 0x0800002, 0x0200000, CRC(02903cf2) SHA1(16d555fda144e0f1b62b428e9158a0e8ebf7084e) )
-	ROM_LOAD32_WORD_SWAP( "mp17656.17", 0x0c00000, 0x0200000, CRC(945c89e3) SHA1(8776d74f73898d948aae3c446d7c710ad0407603) )
-	ROM_LOAD32_WORD_SWAP( "mp17657.18", 0x0c00002, 0x0200000, CRC(74676b1f) SHA1(b4a9003a052bde93bebfa4bef9e8dff65003c3b2) )
+	ROM_LOAD32_WORD_SWAP( "mp17650.11", 0x0000002, 0x0200000, CRC(0ccc84a1) SHA1(65951685b0c8073f6bd1cf9959e1b4d0fc6031d8) )
+	ROM_LOAD32_WORD_SWAP( "mp17651.12", 0x0000000, 0x0200000, CRC(25fd7dde) SHA1(a1c3f3d947ce20fbf61ea7ab235259be9b7d35a8) )
+	ROM_LOAD32_WORD_SWAP( "mp17652.13", 0x0400002, 0x0200000, CRC(be9b4d05) SHA1(0252ba647434f69d6eacb4efc6f55e6af534c7c5) )
+	ROM_LOAD32_WORD_SWAP( "mp17653.14", 0x0400000, 0x0200000, CRC(64d1406d) SHA1(779dbbf42a14a6be1de9afbae5bbb18f8f36ceb3) )
+	ROM_LOAD32_WORD_SWAP( "mp17654.15", 0x0800002, 0x0200000, CRC(5dee5cba) SHA1(6e6ec8574bdd35cc27903fc45f0d4a36ce9df103) )
+	ROM_LOAD32_WORD_SWAP( "mp17655.16", 0x0800000, 0x0200000, CRC(02903cf2) SHA1(16d555fda144e0f1b62b428e9158a0e8ebf7084e) )
+	ROM_LOAD32_WORD_SWAP( "mp17656.17", 0x0c00002, 0x0200000, CRC(945c89e3) SHA1(8776d74f73898d948aae3c446d7c710ad0407603) )
+	ROM_LOAD32_WORD_SWAP( "mp17657.18", 0x0c00000, 0x0200000, CRC(74676b1f) SHA1(b4a9003a052bde93bebfa4bef9e8dff65003c3b2) )
 
 	ROM_REGION32_BE( 0x100000, "ram_gfx", ROMREGION_ERASE00 ) /* SH2 code */
 
