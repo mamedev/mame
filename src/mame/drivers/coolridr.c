@@ -56,7 +56,7 @@ SEGA CUSTOM IC :
 #include "deprecat.h"
 #include "sound/scsp.h"
 
-static UINT32* sysh1_workram_h,*framebuffer_vram, *h1_unk;
+static UINT32* sysh1_workram_h,*framebuffer_vram, *h1_unk, *h1_charram;
 static UINT32* sysh1_txt_blit;
 
 /* video */
@@ -74,7 +74,17 @@ static VIDEO_UPDATE(coolridr)
 	const gfx_element *gfx = screen->machine->gfx[2];
 	int count = 0x09c00/4;
 	int y,x;
+	static int color;
 
+
+	if(input_code_pressed(screen->machine,KEYCODE_Z))
+		count = 0x0bc00/4;
+
+	if(input_code_pressed_once(screen->machine,KEYCODE_A))
+		color++;
+
+	if(input_code_pressed_once(screen->machine,KEYCODE_S))
+		color--;
 
 	for (y=0;y<64;y++)
 	{
@@ -84,10 +94,10 @@ static VIDEO_UPDATE(coolridr)
 
 			tile = (framebuffer_vram[count] & 0x0fff0000) >> 16;
 			//int colour = tile>>12;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,(x+0)*16,y*16);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x+0)*16,y*16);
 
 			tile = (framebuffer_vram[count] & 0x00000fff) >> 0;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,(x+1)*16,y*16);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x+1)*16,y*16);
 
 			count++;
 		}
@@ -206,11 +216,11 @@ static void sysh1_dma_transfer( const address_space *space, UINT16 dma_index )
 		printf("%08x %08x %08x %08x\n",src,dst,size,type);
 
 		if(type == 0xd)
-			dst |= 0x3e00000;
+			dst |= 0x3d00000; //to charram, FIXME: unknown offset
 
 		if(type == 0xe)
 		{
-			dst |= 0x3c00000; //FIXME: unknown offset
+			dst |= 0x3c00000; //to paletteram FIXME: unknown offset
 			//printf("%08x %08x %08x %08x\n",src,dst,size,type);
 			if((src & 0xff00000) == 0x3e00000)
 				return; //FIXME: kludge to avoid palette corruption
@@ -243,27 +253,24 @@ static WRITE32_HANDLER( sysh1_dma_w )
 {
 	COMBINE_DATA(&framebuffer_vram[offset]);
 
-
-
-	if(offset*4 >= 0x6c0 && offset*4 <= 0x6df)
-	{
-		//if(!(offset*4 == 0x6c0 && data == 0))
-		//	printf("%08x -> [%04x]\n",framebuffer_vram[offset],(offset*4));
-	}
-
 	if(offset*4 == 0x000)
 	{
 		if((framebuffer_vram[offset] & 0xff00000) == 0xfe00000)
 			sysh1_dma_transfer(space, framebuffer_vram[offset] & 0xffff);
 	}
+}
+
+static WRITE32_HANDLER( sysh1_char_w )
+{
+	COMBINE_DATA(&h1_charram[offset]);
 
 	{
 		UINT8 *gfx = memory_region(space->machine, "ram_gfx");
 
-		gfx[offset*4+0] = (framebuffer_vram[offset] & 0xff000000) >> 24;
-		gfx[offset*4+1] = (framebuffer_vram[offset] & 0x00ff0000) >> 16;
-		gfx[offset*4+2] = (framebuffer_vram[offset] & 0x0000ff00) >> 8;
-		gfx[offset*4+3] = (framebuffer_vram[offset] & 0x000000ff) >> 0;
+		gfx[offset*4+0] = (h1_charram[offset] & 0xff000000) >> 24;
+		gfx[offset*4+1] = (h1_charram[offset] & 0x00ff0000) >> 16;
+		gfx[offset*4+2] = (h1_charram[offset] & 0x0000ff00) >> 8;
+		gfx[offset*4+3] = (h1_charram[offset] & 0x000000ff) >> 0;
 
 		gfx_element_mark_dirty(space->machine->gfx[2], offset/16);
 	}
@@ -271,10 +278,11 @@ static WRITE32_HANDLER( sysh1_dma_w )
 
 static ADDRESS_MAP_START( system_h1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share1") AM_WRITENOP
-	AM_RANGE(0x01000000, 0x01ffffff) AM_ROM AM_REGION("gfx_data",0x0000000) //correct?
+	AM_RANGE(0x01000000, 0x01ffffff) AM_ROM AM_REGION("gfx_data",0x0000000)
 
 	AM_RANGE(0x03c00000, 0x03c0ffff) AM_RAM_WRITE(sysh1_pal_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_BASE(&framebuffer_vram)
+	AM_RANGE(0x03d00000, 0x03dfffff) AM_RAM_WRITE(sysh1_char_w) AM_BASE(&h1_charram) //FIXME: half size
+	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_BASE(&framebuffer_vram) //FIXME: not all of it
 
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM //text tilemap + "lineram"
