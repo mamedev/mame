@@ -70,12 +70,11 @@ static VIDEO_UPDATE(coolridr)
 	0x3e0bc00-0x3e0dbff looks like tilemap planes.
 	0x3e00000 onward seems to contain video registers, I've seen MAP registers that clearly points to the aforementioned planes.
 	*/
-	const gfx_element *gfx = screen->machine->gfx[0];
+	const gfx_element *gfx = screen->machine->gfx[2];
 	int count = 0x0bc00/4;
 	int y,x;
 
 
-	/* The following is just a hack to draw the FBI logo */
 	for (y=0;y<64;y++)
 	{
 		for (x=0;x<128;x+=2)
@@ -162,8 +161,8 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 
 				printf("PARAM = %04x | %c%c%c%c\n",param,(data >> 24) & 0xff,(data >> 16) & 0xff,(data >> 8) & 0xff,(data >> 0) & 0xff);
 			}
-			else
-				printf("CMD = %04x PARAM = %04x DATA = %08x\n",cmd,param,data);
+			//else
+			//	printf("CMD = %04x PARAM = %04x DATA = %08x\n",cmd,param,data);
 			break;
 	}
 }
@@ -244,7 +243,6 @@ static WRITE32_HANDLER( sysh1_dma_w )
 		sysh1_dma_transfer(space, 1);
 	}
 
-	if(0)
 	{
 		UINT8 *gfx = memory_region(space->machine, "ram_gfx");
 
@@ -253,7 +251,7 @@ static WRITE32_HANDLER( sysh1_dma_w )
 		gfx[offset*4+2] = (framebuffer_vram[offset] & 0x0000ff00) >> 8;
 		gfx[offset*4+3] = (framebuffer_vram[offset] & 0x000000ff) >> 0;
 
-		gfx_element_mark_dirty(space->machine->gfx[3], offset/16);
+		gfx_element_mark_dirty(space->machine->gfx[2], offset/16);
 	}
 }
 
@@ -319,10 +317,7 @@ static const gfx_layout tiles8x8_layout =
 	RGN_FRAC(1,1),
 	8,
 	{ 0, 1, 2, 3,4,5,6,7 },
-	{ 16, 24, 0, 8,
-	  48,56,32,40,
-	  80,88,64,72,
-	  112,120,96,104 },
+	{ 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120 },
 	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
 	16*128
 };
@@ -428,7 +423,6 @@ ROM_START( coolridr )
 	ROM_LOAD32_WORD_SWAP( "mp17657.18", 0x0c00000, 0x0200000, CRC(74676b1f) SHA1(b4a9003a052bde93bebfa4bef9e8dff65003c3b2) )
 
 	ROM_REGION32_BE( 0x100000, "ram_gfx", ROMREGION_ERASE00 ) /* SH2 code */
-
 
 	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )	/* 68000 */
 	/* uploaded by the main CPU */
