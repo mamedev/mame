@@ -1791,7 +1791,7 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 			/* disable double share regions */
 			if (entry->share != NULL)
 				for (i = 0; i < region_count; i++)
-					if (cheat_region[i].share == entry->share)
+					if (strcmp(cheat_region[i].share,entry->share)==0)
 						cheat_region[region_count].disabled = TRUE;
 
 			region_count++;
