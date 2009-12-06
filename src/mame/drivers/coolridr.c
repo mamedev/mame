@@ -55,7 +55,7 @@ SEGA CUSTOM IC :
 #include "deprecat.h"
 #include "sound/scsp.h"
 
-static UINT32* sysh1_workram_h,*h1_ioga,*framebuffer_vram;
+static UINT32* sysh1_workram_h,*h1_ioga,*framebuffer_vram, *h1_unk;
 static UINT32* sysh1_txt_blit;
 
 /* video */
@@ -98,8 +98,8 @@ static VIDEO_UPDATE(coolridr)
 
 /* end video */
 
-/* same as ST-V? */
-static READ32_HANDLER(sysh1_ioga_r)
+/* unknown purpose */
+static READ32_HANDLER(sysh1_unk_r)
 {
 	switch(offset)
 	{
@@ -119,6 +119,17 @@ static READ32_HANDLER(sysh1_ioga_r)
 	return 0xffffffff;//h1_ioga[offset];
 }
 
+static WRITE32_HANDLER(sysh1_unk_w)
+{
+	COMBINE_DATA(&h1_unk[offset]);
+}
+
+/* According to Guru, this is actually the same I/O chip of Sega Model 2 HW */
+static READ32_HANDLER(sysh1_ioga_r)
+{
+	return mame_rand(space->machine);//h1_ioga[offset];
+}
+
 static WRITE32_HANDLER(sysh1_ioga_w)
 {
 	COMBINE_DATA(&h1_ioga[offset]);
@@ -129,6 +140,7 @@ static WRITE32_HANDLER(sysh1_ioga_w)
 static WRITE32_HANDLER( sysh1_txt_blit_w )
 {
 	static UINT16 cmd,param;
+	static UINT32 dst_addr;
 
 	COMBINE_DATA(&sysh1_txt_blit[offset]);
 
@@ -137,11 +149,18 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 		case 0x10/4: //cmd + param?
 			cmd = (sysh1_txt_blit[offset] & 0xffff0000) >> 16;
 			param = (sysh1_txt_blit[offset] & 0x0000ffff) >> 0;
+			dst_addr = 0x3f40000;
 			break;
 		case 0x14/4: //data
 			/*  "THIS MACHINE IS STAND-ALONE." / disclaimer written with this CMD */
 			if((cmd & 0xff) == 0xf4)
+			{
+				/* FIXME: color offset */
+				memory_write_dword(space,(dst_addr + param),data);
+				dst_addr+=4;
+
 				printf("PARAM = %04x | %c%c%c%c\n",param,(data >> 24) & 0xff,(data >> 16) & 0xff,(data >> 8) & 0xff,(data >> 0) & 0xff);
+			}
 			else
 				printf("CMD = %04x PARAM = %04x DATA = %08x\n",cmd,param,data);
 			break;
@@ -265,7 +284,7 @@ static ADDRESS_MAP_START( coolridr_submap, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03208900, 0x03208903) AM_RAM /*???*/
 	AM_RANGE(0x03300400, 0x03300403) AM_RAM /*irq enable?*/
 
-	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE(sysh1_ioga_r,sysh1_ioga_w) AM_BASE(&h1_ioga) /*input area?*/
+	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE(sysh1_unk_r,sysh1_unk_w) AM_BASE(&h1_unk)
 	AM_RANGE(0x04200000, 0x0420003f) AM_RAM /*???*/
 
 	AM_RANGE(0x05000000, 0x05000fff) AM_RAM
@@ -273,7 +292,7 @@ static ADDRESS_MAP_START( coolridr_submap, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x05300000, 0x0530ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x05ff0000, 0x05ffffff) AM_RAM /*???*/
 	AM_RANGE(0x06000000, 0x06000fff) AM_RAM
-	AM_RANGE(0x06100000, 0x06100fff) AM_RAM
+	AM_RANGE(0x06100000, 0x0610003f) AM_READWRITE(sysh1_ioga_r,sysh1_ioga_w) AM_BASE(&h1_ioga)
 	AM_RANGE(0x06200000, 0x06200fff) AM_RAM
 	AM_RANGE(0x07fff000, 0x07ffffff) AM_RAM
 	AM_RANGE(0x20000000, 0x2001ffff) AM_ROM AM_SHARE("share2")
@@ -362,14 +381,14 @@ static MACHINE_RESET ( coolridr )
 }
 
 static MACHINE_DRIVER_START( coolridr )
-	MDRV_CPU_ADD("maincpu", SH2, 28000000)	// ?? mhz
+	MDRV_CPU_ADD("maincpu", SH2, 28000000)	// 28 mhz
 	MDRV_CPU_PROGRAM_MAP(system_h1_map)
 	MDRV_CPU_VBLANK_INT("screen",system_h1)
 
-	MDRV_CPU_ADD("soundcpu", M68000, 12000000)	// ?? mhz
+	MDRV_CPU_ADD("soundcpu", M68000, 16000000)	// 16 mhz
 	MDRV_CPU_PROGRAM_MAP(system_h1_sound_map)
 
-	MDRV_CPU_ADD("sub", SH1, 8000000)	// SH7032 HD6417032F20!! ?? mhz
+	MDRV_CPU_ADD("sub", SH1, 16000000)	// SH7032 HD6417032F20!! 16 mhz
 	MDRV_CPU_PROGRAM_MAP(coolridr_submap)
 	MDRV_CPU_VBLANK_INT_HACK(system_h1_sub, 3)
 
