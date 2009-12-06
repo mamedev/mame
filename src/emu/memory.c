@@ -1549,9 +1549,9 @@ void _memory_unmap(const address_space *space, offs_t addrstart, offs_t addrend,
 	address_space *spacerw = (address_space *)space;
 
 	if (unmap_read)
-		space_map_range(spacerw, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(quiet ? STATIC_NOP : STATIC_UNMAP), spacerw, "unmapped");
+		space_map_range(spacerw, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)(quiet ? STATIC_NOP : STATIC_UNMAP), spacerw, "unmapped");
 	if (unmap_write)
-		space_map_range(spacerw, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(quiet ? STATIC_NOP : STATIC_UNMAP), spacerw, "unmapped");
+		space_map_range(spacerw, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)(quiet ? STATIC_NOP : STATIC_UNMAP), spacerw, "unmapped");
 }
 
 
