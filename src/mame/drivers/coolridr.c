@@ -161,7 +161,7 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 				memory_write_dword(space,(dst_addr + param),data);
 				dst_addr+=4;
 
-				printf("PARAM = %04x | %c%c%c%c\n",param,(data >> 24) & 0xff,(data >> 16) & 0xff,(data >> 8) & 0xff,(data >> 0) & 0xff);
+				//printf("PARAM = %04x | %c%c%c%c\n",param,(data >> 24) & 0xff,(data >> 16) & 0xff,(data >> 8) & 0xff,(data >> 0) & 0xff);
 			}
 			//else
 			//	printf("CMD = %04x PARAM = %04x DATA = %08x\n",cmd,param,data);
@@ -189,45 +189,61 @@ static WRITE32_HANDLER( sysh1_pal_w )
 
 
 /* FIXME: this seems to do a hell lot of stuff, it's not ST-V SCU but still somewhat complex :/ */
-static void sysh1_dma_transfer( const address_space *space, UINT8 ch )
+static void sysh1_dma_transfer( const address_space *space, UINT16 dma_index )
 {
 	static UINT32 src,dst,size,type,s_i;
+	static UINT8 end_dma_mark;
 
-	src = (framebuffer_vram[(0x6c0+ch*0xc)/4] & 0x0fffffff);
-	dst = (framebuffer_vram[(0x6c4+ch*0xc)/4] & 0xfffff);
-	size = framebuffer_vram[(0x6c8+ch*0xc)/4]*2;
-	type = (framebuffer_vram[(0x6c0+ch*0xc)/4] & 0xf0000000) >> 28;
+	end_dma_mark = 0;
 
-	if(type == 0xd)
-		dst |= 0x3e00000;
+	do{
+		src = (framebuffer_vram[(0+dma_index)/4] & 0x0fffffff);
+		dst = (framebuffer_vram[(4+dma_index)/4] & 0xfffff);
+		size = framebuffer_vram[(8+dma_index)/4]*2;
+		type = (framebuffer_vram[(0+dma_index)/4] & 0xf0000000) >> 28;
 
-	if(type == 0xe)
-	{
-		dst |= 0x3c00000; //FIXME: unknown offset
+		if(type & 8)
 		printf("%08x %08x %08x %08x\n",src,dst,size,type);
-		if((src & 0xff00000) == 0x3e00000)
-			return; //FIXME: kludge to avoid palette corruption
-		//debugger_break(space->machine);
-	}
 
-	if(type == 0xd || type == 0xe)
-	{
-		for(s_i=0;s_i<size;s_i+=4)
+		if(type == 0xd)
+			dst |= 0x3e00000;
+
+		if(type == 0xe)
 		{
-			memory_write_dword(space,dst,memory_read_dword(space,src));
-			dst+=4;
-			src+=4;
+			dst |= 0x3c00000; //FIXME: unknown offset
+			//printf("%08x %08x %08x %08x\n",src,dst,size,type);
+			if((src & 0xff00000) == 0x3e00000)
+				return; //FIXME: kludge to avoid palette corruption
+			//debugger_break(space->machine);
 		}
-	}
-	else
-	{
-		//printf("%08x %08x %08x %08x\n",src,dst,size,type);
-	}
+
+		if(type == 0xd || type == 0xe)
+		{
+			for(s_i=0;s_i<size;s_i+=4)
+			{
+				memory_write_dword(space,dst,memory_read_dword(space,src));
+				dst+=4;
+				src+=4;
+			}
+		}
+		else
+		{
+			//printf("%08x %08x %08x %08x\n",src,dst,size,type);
+		}
+
+		if(type == 0x0)
+			end_dma_mark = 1; //end of DMA list
+
+		dma_index+=0xc;
+
+	}while(!end_dma_mark );
 }
 
 static WRITE32_HANDLER( sysh1_dma_w )
 {
 	COMBINE_DATA(&framebuffer_vram[offset]);
+
+
 
 	if(offset*4 >= 0x6c0 && offset*4 <= 0x6df)
 	{
@@ -235,10 +251,10 @@ static WRITE32_HANDLER( sysh1_dma_w )
 		//	printf("%08x -> [%04x]\n",framebuffer_vram[offset],(offset*4));
 	}
 
-	if(offset*4 == 0x6d8)
+	if(offset*4 == 0x000)
 	{
-		sysh1_dma_transfer(space, 0);
-		sysh1_dma_transfer(space, 1);
+		if((framebuffer_vram[offset] & 0xff00000) == 0xfe00000)
+			sysh1_dma_transfer(space, framebuffer_vram[offset] & 0xffff);
 	}
 
 	{
