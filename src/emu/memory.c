@@ -330,6 +330,8 @@ struct _subtable_data
 
 struct _memory_private
 {
+	UINT8					initialized;					/* have we completed initialization? */
+
 	const address_space *	spacelist;						/* list of address spaces */
 
 	UINT8 *					bank_ptr[STATIC_COUNT];			/* array of bank pointers */
@@ -399,13 +401,12 @@ static void memory_exit(running_machine *machine);
 static void map_detokenize(memory_private *memdata, address_map *map, const game_driver *driver, const char *devtag, const addrmap_token *tokens);
 
 /* memory mapping helpers */
-static void space_map_range_private(address_space *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
 static void space_map_range(address_space *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
-static void *space_find_backing_memory(const address_space *space, offs_t byteaddress);
+static void *space_find_backing_memory(const address_space *space, offs_t addrstart, offs_t addrend);
 static int space_needs_backing_store(const address_space *space, const address_map_entry *entry);
 
 /* banking helpers */
-static void *bank_find_or_allocate(const address_space *space, const char *tag, offs_t bytestart, offs_t byteend, read_or_write readorwrite);
+static void *bank_find_or_allocate(const address_space *space, const char *tag, offs_t addrstart, offs_t addrend, read_or_write readorwrite);
 static STATE_POSTLOAD( bank_reattach );
 
 /* table management */
@@ -820,6 +821,9 @@ void memory_init(running_machine *machine)
 
 	/* dump the final memory configuration */
 	mem_dump(machine);
+	
+	/* we are now initialized */
+	memdata->initialized = TRUE;
 }
 
 
@@ -1234,17 +1238,19 @@ void memory_set_bankptr(running_machine *machine, const char *tag, void *base)
     if present
 -------------------------------------------------*/
 
-void *_memory_install_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name)
+void *_memory_install_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler)
 {
 	address_space *spacerw = (address_space *)space;
-	if (rhandler >= STATIC_COUNT || whandler >= STATIC_COUNT)
-		fatalerror("fatal: can only use static banks with memory_install_handler()");
+	if (rhandler >= STATIC_COUNT)
+		fatalerror("Attempted to install non-static read handler via memory_install_handler() in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+	if (whandler >= STATIC_COUNT)
+		fatalerror("Attempted to install non-static write handler via memory_install_handler() in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
 	if (rhandler != 0)
-		space_map_range(spacerw, ROW_READ, spacerw->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)rhandler, spacerw, rhandler_name);
+		space_map_range(spacerw, ROW_READ, spacerw->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)rhandler, spacerw, NULL);
 	if (whandler != 0)
-		space_map_range(spacerw, ROW_WRITE, spacerw->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)whandler, spacerw, whandler_name);
+		space_map_range(spacerw, ROW_WRITE, spacerw->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)whandler, spacerw, NULL);
 	mem_dump(space->machine);
-	return space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
+	return space_find_backing_memory(spacerw, addrstart, addrend);
 }
 
 
@@ -1253,15 +1259,19 @@ void *_memory_install_handler(const address_space *space, offs_t addrstart, offs
     explicitly for 8-bit handlers
 -------------------------------------------------*/
 
-UINT8 *_memory_install_handler8(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_space_func rhandler, write8_space_func whandler, const char *rhandler_name, const char *whandler_name)
+UINT8 *_memory_install_handler8(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_space_func rhandler, const char *rhandler_name, write8_space_func whandler, const char *whandler_name, int handlerunitmask)
 {
 	address_space *spacerw = (address_space *)space;
+	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
+		fatalerror("Attempted to install invalid read handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+	if (whandler != NULL && (FPTR)whandler < STATIC_COUNT)
+		fatalerror("Attempted to install invalid write handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
 	if (rhandler != NULL)
-		space_map_range(spacerw, ROW_READ, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
+		space_map_range(spacerw, ROW_READ, 8, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
 	if (whandler != NULL)
-		space_map_range(spacerw, ROW_WRITE, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
+		space_map_range(spacerw, ROW_WRITE, 8, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
 	mem_dump(space->machine);
-	return (UINT8 *)space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
+	return (UINT8 *)space_find_backing_memory(spacerw, addrstart, addrend);
 }
 
 
@@ -1270,15 +1280,19 @@ UINT8 *_memory_install_handler8(const address_space *space, offs_t addrstart, of
     explicitly for 16-bit handlers
 -------------------------------------------------*/
 
-UINT16 *_memory_install_handler16(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_space_func rhandler, write16_space_func whandler, const char *rhandler_name, const char *whandler_name)
+UINT16 *_memory_install_handler16(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_space_func rhandler, const char *rhandler_name, write16_space_func whandler, const char *whandler_name, int handlerunitmask)
 {
 	address_space *spacerw = (address_space *)space;
+	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
+		fatalerror("Attempted to install invalid read handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+	if (whandler != NULL && (FPTR)whandler < STATIC_COUNT)
+		fatalerror("Attempted to install invalid write handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
 	if (rhandler != NULL)
-		space_map_range(spacerw, ROW_READ, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
+		space_map_range(spacerw, ROW_READ, 16, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
 	if (whandler != NULL)
-		space_map_range(spacerw, ROW_WRITE, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
+		space_map_range(spacerw, ROW_WRITE, 16, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
 	mem_dump(space->machine);
-	return (UINT16 *)space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
+	return (UINT16 *)space_find_backing_memory(spacerw, addrstart, addrend);
 }
 
 
@@ -1287,15 +1301,19 @@ UINT16 *_memory_install_handler16(const address_space *space, offs_t addrstart, 
     explicitly for 32-bit handlers
 -------------------------------------------------*/
 
-UINT32 *_memory_install_handler32(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_space_func rhandler, write32_space_func whandler, const char *rhandler_name, const char *whandler_name)
+UINT32 *_memory_install_handler32(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_space_func rhandler, const char *rhandler_name, write32_space_func whandler, const char *whandler_name, int handlerunitmask)
 {
 	address_space *spacerw = (address_space *)space;
+	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
+		fatalerror("Attempted to install invalid read handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+	if (whandler != NULL && (FPTR)whandler < STATIC_COUNT)
+		fatalerror("Attempted to install invalid write handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
 	if (rhandler != NULL)
-		space_map_range(spacerw, ROW_READ, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
+		space_map_range(spacerw, ROW_READ, 32, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
 	if (whandler != NULL)
-		space_map_range(spacerw, ROW_WRITE, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
+		space_map_range(spacerw, ROW_WRITE, 32, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
 	mem_dump(space->machine);
-	return (UINT32 *)space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
+	return (UINT32 *)space_find_backing_memory(spacerw, addrstart, addrend);
 }
 
 
@@ -1304,36 +1322,19 @@ UINT32 *_memory_install_handler32(const address_space *space, offs_t addrstart, 
     explicitly for 64-bit handlers
 -------------------------------------------------*/
 
-UINT64 *_memory_install_handler64(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_space_func rhandler, write64_space_func whandler, const char *rhandler_name, const char *whandler_name)
+UINT64 *_memory_install_handler64(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_space_func rhandler, const char *rhandler_name, write64_space_func whandler, const char *whandler_name, int handlerunitmask)
 {
 	address_space *spacerw = (address_space *)space;
+	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
+		fatalerror("Attempted to install invalid read handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+	if (whandler != NULL && (FPTR)whandler < STATIC_COUNT)
+		fatalerror("Attempted to install invalid write handler in space %s of device '%s'\n", space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
 	if (rhandler != NULL)
-		space_map_range(spacerw, ROW_READ, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
+		space_map_range(spacerw, ROW_READ, 64, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
 	if (whandler != NULL)
-		space_map_range(spacerw, ROW_WRITE, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
+		space_map_range(spacerw, ROW_WRITE, 64, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
 	mem_dump(space->machine);
-	return (UINT64 *)space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
-}
-
-
-/*-------------------------------------------------
-    _memory_install_device_handler - install a new
-    device memory handler into the given address
-    space, returning a pointer to the memory
-    backing it, if present
--------------------------------------------------*/
-
-void *_memory_install_device_handler(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name)
-{
-	address_space *spacerw = (address_space *)space;
-	if (rhandler >= STATIC_COUNT || whandler >= STATIC_COUNT)
-		fatalerror("fatal: can only use static banks with memory_install_device_handler()");
-	if (rhandler != 0)
-		space_map_range(spacerw, ROW_READ, spacerw->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)rhandler, (void *)device, rhandler_name);
-	if (whandler != 0)
-		space_map_range(spacerw, ROW_WRITE, spacerw->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)whandler, (void *)device, whandler_name);
-	mem_dump(space->machine);
-	return space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
+	return (UINT64 *)space_find_backing_memory(spacerw, addrstart, addrend);
 }
 
 
@@ -1342,15 +1343,19 @@ void *_memory_install_device_handler(const address_space *space, const device_co
     but explicitly for 8-bit handlers
 -------------------------------------------------*/
 
-UINT8 *_memory_install_device_handler8(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, write8_device_func whandler, const char *rhandler_name, const char *whandler_name)
+UINT8 *_memory_install_device_handler8(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, const char *rhandler_name, write8_device_func whandler, const char *whandler_name, int handlerunitmask)
 {
 	address_space *spacerw = (address_space *)space;
+	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
+		fatalerror("Attempted to install invalid read handler for device '%s' in space %s of device '%s'\n", device->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+	if (whandler != NULL && (FPTR)whandler < STATIC_COUNT)
+		fatalerror("Attempted to install invalid write handler for device '%s' in space %s of device '%s'\n", device->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
 	if (rhandler != NULL)
-		space_map_range(spacerw, ROW_READ, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
+		space_map_range(spacerw, ROW_READ, 8, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
 	if (whandler != NULL)
-		space_map_range(spacerw, ROW_WRITE, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
+		space_map_range(spacerw, ROW_WRITE, 8, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
 	mem_dump(space->machine);
-	return (UINT8 *)space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
+	return (UINT8 *)space_find_backing_memory(spacerw, addrstart, addrend);
 }
 
 
@@ -1359,15 +1364,19 @@ UINT8 *_memory_install_device_handler8(const address_space *space, const device_
     above but explicitly for 16-bit handlers
 -------------------------------------------------*/
 
-UINT16 *_memory_install_device_handler16(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, write16_device_func whandler, const char *rhandler_name, const char *whandler_name)
+UINT16 *_memory_install_device_handler16(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, const char *rhandler_name, write16_device_func whandler, const char *whandler_name, int handlerunitmask)
 {
 	address_space *spacerw = (address_space *)space;
+	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
+		fatalerror("Attempted to install invalid read handler for device '%s' in space %s of device '%s'\n", device->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+	if (whandler != NULL && (FPTR)whandler < STATIC_COUNT)
+		fatalerror("Attempted to install invalid write handler for device '%s' in space %s of device '%s'\n", device->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
 	if (rhandler != NULL)
-		space_map_range(spacerw, ROW_READ, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
+		space_map_range(spacerw, ROW_READ, 16, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
 	if (whandler != NULL)
-		space_map_range(spacerw, ROW_WRITE, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
+		space_map_range(spacerw, ROW_WRITE, 16, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
 	mem_dump(space->machine);
-	return (UINT16 *)space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
+	return (UINT16 *)space_find_backing_memory(spacerw, addrstart, addrend);
 }
 
 
@@ -1376,15 +1385,19 @@ UINT16 *_memory_install_device_handler16(const address_space *space, const devic
     above but explicitly for 32-bit handlers
 -------------------------------------------------*/
 
-UINT32 *_memory_install_device_handler32(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, write32_device_func whandler, const char *rhandler_name, const char *whandler_name)
+UINT32 *_memory_install_device_handler32(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, const char *rhandler_name, write32_device_func whandler, const char *whandler_name, int handlerunitmask)
 {
 	address_space *spacerw = (address_space *)space;
+	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
+		fatalerror("Attempted to install invalid read handler for device '%s' in space %s of device '%s'\n", device->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+	if (whandler != NULL && (FPTR)whandler < STATIC_COUNT)
+		fatalerror("Attempted to install invalid write handler for device '%s' in space %s of device '%s'\n", device->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
 	if (rhandler != NULL)
-		space_map_range(spacerw, ROW_READ, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
+		space_map_range(spacerw, ROW_READ, 32, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
 	if (whandler != NULL)
-		space_map_range(spacerw, ROW_WRITE, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
+		space_map_range(spacerw, ROW_WRITE, 32, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
 	mem_dump(space->machine);
-	return (UINT32 *)space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
+	return (UINT32 *)space_find_backing_memory(spacerw, addrstart, addrend);
 }
 
 
@@ -1393,15 +1406,19 @@ UINT32 *_memory_install_device_handler32(const address_space *space, const devic
     above but explicitly for 64-bit handlers
 -------------------------------------------------*/
 
-UINT64 *_memory_install_device_handler64(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, write64_device_func whandler, const char *rhandler_name, const char *whandler_name)
+UINT64 *_memory_install_device_handler64(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, const char *rhandler_name, write64_device_func whandler, const char *whandler_name, int handlerunitmask)
 {
 	address_space *spacerw = (address_space *)space;
+	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
+		fatalerror("Attempted to install invalid read handler for device '%s' in space %s of device '%s'\n", device->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+	if (whandler != NULL && (FPTR)whandler < STATIC_COUNT)
+		fatalerror("Attempted to install invalid write handler for device '%s' in space %s of device '%s'\n", device->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
 	if (rhandler != NULL)
-		space_map_range(spacerw, ROW_READ, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
+		space_map_range(spacerw, ROW_READ, 64, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
 	if (whandler != NULL)
-		space_map_range(spacerw, ROW_WRITE, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
+		space_map_range(spacerw, ROW_WRITE, 64, handlerunitmask, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
 	mem_dump(space->machine);
-	return (UINT64 *)space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
+	return (UINT64 *)space_find_backing_memory(spacerw, addrstart, addrend);
 }
 
 
@@ -1416,32 +1433,34 @@ void _memory_install_port(const address_space *space, offs_t addrstart, offs_t a
 	genf *rhandler = NULL;
 	genf *whandler = NULL;
 
+	/* pick the appropriate read/write handlers */
 	switch (space->dbits)
 	{
 		case 8:		rhandler = (genf *)input_port_read8;	whandler = (genf *)input_port_write8; 	break;
-		case 16:	rhandler = (genf *)input_port_read16; 	whandler = (genf *)input_port_write16; break;
-		case 32:	rhandler = (genf *)input_port_read32; 	whandler = (genf *)input_port_write32; break;
-		case 64:	rhandler = (genf *)input_port_read64; 	whandler = (genf *)input_port_write64; break;
+		case 16:	rhandler = (genf *)input_port_read16; 	whandler = (genf *)input_port_write16;	break;
+		case 32:	rhandler = (genf *)input_port_read32; 	whandler = (genf *)input_port_write32;	break;
+		case 64:	rhandler = (genf *)input_port_read64; 	whandler = (genf *)input_port_write64;	break;
 	}
 
+	/* assign the read handler */
 	if (rtag != NULL)
 	{
 		const input_port_config *port = input_port_by_tag(&space->machine->portlist, rtag);
 		if (port == NULL)
-			fatalerror("Non-existent port referenced: '%s'\n", rtag);
-
+			fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
 		space_map_range(spacerw, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, rhandler, (void *)port, rtag);
 	}
 
+	/* assign the write handler */
 	if (wtag != NULL)
 	{
 		const input_port_config *port = input_port_by_tag(&space->machine->portlist, wtag);
 		if (port == NULL)
-			fatalerror("Non-existent port referenced: '%s'\n", wtag);
-
+			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
 		space_map_range(spacerw, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, whandler, (void *)port, wtag);
 	}
 
+	/* update the memory dump */
 	mem_dump(space->machine);
 }
 
@@ -1455,21 +1474,70 @@ void _memory_install_bank(const address_space *space, offs_t addrstart, offs_t a
 {
 	address_space *spacerw = (address_space *)space;
 
+	/* map the read bank */
 	if (rtag != NULL)
 	{
 		void *handler = bank_find_or_allocate(space, rtag, addrstart, addrend, ROW_READ);
 		space_map_range(spacerw, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, spacerw, rtag);
 	}
 
+	/* map the write bank */
 	if (wtag != NULL)
 	{
 		void *handler = bank_find_or_allocate(space, wtag, addrstart, addrend, ROW_WRITE);
 		space_map_range(spacerw, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, spacerw, wtag);
 	}
 
+	/* update the memory dump */
 	mem_dump(space->machine);
 }
 
+
+/*-------------------------------------------------
+    _memory_install_ram - install a simple fixed
+    RAM region into the given address space
+-------------------------------------------------*/
+
+void _memory_install_ram(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT8 install_read, UINT8 install_write)
+{
+	memory_private *memdata = space->machine->memory_data;
+	address_space *spacerw = (address_space *)space;
+	FPTR bankindex;
+	void *handler;
+	
+	/* map for read */
+	if (install_read)
+	{
+		handler = bank_find_or_allocate(space, NULL, addrstart, addrend, ROW_READ);
+		space_map_range(spacerw, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, spacerw, "ram");
+
+		/* if we don't have a bank pointer yet, try to find one */ 
+		bankindex = (FPTR)handler;
+		if (memdata->bank_ptr[bankindex] == NULL)
+			memdata->bank_ptr[bankindex] = (UINT8 *)space_find_backing_memory(space, addrstart, addrend);
+		
+		/* if we still don't have a pointer, and we're past the initialization phase, allocate a new block */
+		if (memdata->bank_ptr[bankindex] == NULL && memdata->initialized)
+			memdata->bank_ptr[bankindex] = block_allocate(space, memory_address_to_byte(space, addrstart), memory_address_to_byte_end(space, addrend), NULL);
+	}
+
+	/* map for write */
+	if (install_write)
+	{
+		handler = bank_find_or_allocate(space, NULL, addrstart, addrend, ROW_WRITE);
+		space_map_range(spacerw, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, spacerw, "ram");
+
+		/* if we don't have a bank pointer yet, try to find one */ 
+		bankindex = (FPTR)handler;
+		if (memdata->bank_ptr[bankindex] == NULL)
+			memdata->bank_ptr[bankindex] = (UINT8 *)space_find_backing_memory(space, addrstart, addrend);
+		
+		/* if we still don't have a pointer, and we're past the initialization phase, allocate a new block */
+		if (memdata->bank_ptr[bankindex] == NULL && memdata->initialized)
+			memdata->bank_ptr[bankindex] = block_allocate(space, memory_address_to_byte(space, addrstart), memory_address_to_byte_end(space, addrend), NULL);
+	}
+}
+	
 
 /*-------------------------------------------------
     _memory_unmap - unmap a section of address 
@@ -1848,10 +1916,7 @@ static void memory_init_populate(running_machine *machine)
 static void memory_init_map_entry(address_space *space, const address_map_entry *entry, read_or_write readorwrite)
 {
 	const map_handler_data *handler = (readorwrite == ROW_READ) ? &entry->read : &entry->write;
-	int bits = (handler->bits != 0) ? handler->bits : space->dbits;
-	genf *funcptr = handler->handler.generic;
-	const char *name = handler->name;
-	void *object = space;
+	const device_config *device;
 
 	/* based on the handler type, alter the bits, name, funcptr, and object */
 	switch (handler->type)
@@ -1859,62 +1924,107 @@ static void memory_init_map_entry(address_space *space, const address_map_entry 
 		case AMH_NONE:
 			return;
 			
+		case AMH_ROM:
+			if (readorwrite == ROW_WRITE)
+				return;
+			/* fall through to the RAM case otherwise */
+			
 		case AMH_RAM:
-			bits = space->dbits;
-			name = "RAM";
-			funcptr = (genf *)STATIC_RAM;
+			_memory_install_ram(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
+								readorwrite == ROW_READ, readorwrite == ROW_WRITE);
 			break;
 	
-		case AMH_ROM:
-			bits = space->dbits;
-			name = "ROM";
-			funcptr = (genf *)STATIC_ROM;
-			break;
-		
 		case AMH_NOP:
-			bits = space->dbits;
-			name = "nop";
-			funcptr = (genf *)STATIC_NOP;
+			_memory_unmap(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+							readorwrite == ROW_READ, readorwrite == ROW_WRITE, TRUE);
 			break;
 	
 		case AMH_UNMAP:
-			bits = space->dbits;
-			name = "unmapped";
-			funcptr = (genf *)STATIC_NOP;
+			_memory_unmap(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+							readorwrite == ROW_READ, readorwrite == ROW_WRITE, FALSE);
 			break;
 
-		case AMH_DEVICE_HANDLER:
-			object = (void *)device_list_find_by_tag(&space->machine->config->devicelist, handler->tag);
-			if (object == NULL)
-				fatalerror("Non-existent device '%s' referenced in memory map\n", handler->tag);
-			break;
-		
 		case AMH_HANDLER:
+			switch ((handler->bits != 0) ? handler->bits : space->dbits)
+			{
+				case 8:		
+					_memory_install_handler8(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
+												(readorwrite == ROW_READ) ? handler->handler.read.shandler8 : NULL, handler->name, 
+												(readorwrite == ROW_WRITE) ? handler->handler.write.shandler8 : NULL, handler->name, 
+												handler->mask); 
+					break;
+
+				case 16:	
+					_memory_install_handler16(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
+												(readorwrite == ROW_READ) ? handler->handler.read.shandler16 : NULL, handler->name, 
+												(readorwrite == ROW_WRITE) ? handler->handler.write.shandler16 : NULL, handler->name, 
+												handler->mask); 
+					break;
+
+				case 32:	
+					_memory_install_handler32(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
+												(readorwrite == ROW_READ) ? handler->handler.read.shandler32 : NULL, handler->name, 
+												(readorwrite == ROW_WRITE) ? handler->handler.write.shandler32 : NULL, handler->name, 
+												handler->mask); 
+					break;
+					
+				case 64:
+					_memory_install_handler64(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
+												(readorwrite == ROW_READ) ? handler->handler.read.shandler64 : NULL, handler->name, 
+												(readorwrite == ROW_WRITE) ? handler->handler.write.shandler64 : NULL, handler->name, 
+												handler->mask); 
+					break;
+			}
 			break;
 	
-		case AMH_PORT:
-			name = handler->tag;
-			switch (bits)
+		case AMH_DEVICE_HANDLER:
+			device = devtag_get_device(space->machine, handler->tag);
+			if (device == NULL)
+				fatalerror("Attempted to map a non-existent device '%s' in space %s of device '%s'\n", handler->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
+			switch ((handler->bits != 0) ? handler->bits : space->dbits)
 			{
-				case 8:		funcptr = (readorwrite == ROW_READ) ? (genf *)input_port_read8  : (genf *)input_port_write8;	break;
-				case 16:	funcptr = (readorwrite == ROW_READ) ? (genf *)input_port_read16 : (genf *)input_port_write16;	break;
-				case 32:	funcptr = (readorwrite == ROW_READ) ? (genf *)input_port_read32 : (genf *)input_port_write32;	break;
-				case 64:	funcptr = (readorwrite == ROW_READ) ? (genf *)input_port_read64 : (genf *)input_port_write64;	break;
+				case 8:		
+					_memory_install_device_handler8(space, device, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
+													(readorwrite == ROW_READ) ? handler->handler.read.dhandler8 : NULL, handler->name, 
+													(readorwrite == ROW_WRITE) ? handler->handler.write.dhandler8 : NULL, handler->name, 
+													handler->mask); 
+					break;
+
+				case 16:	
+					_memory_install_device_handler16(space, device, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
+													(readorwrite == ROW_READ) ? handler->handler.read.dhandler16 : NULL, handler->name, 
+													(readorwrite == ROW_WRITE) ? handler->handler.write.dhandler16 : NULL, handler->name, 
+													handler->mask); 
+					break;
+
+				case 32:	
+					_memory_install_device_handler32(space, device, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
+													(readorwrite == ROW_READ) ? handler->handler.read.dhandler32 : NULL, handler->name, 
+													(readorwrite == ROW_WRITE) ? handler->handler.write.dhandler32 : NULL, handler->name, 
+													handler->mask); 
+					break;
+					
+				case 64:
+					_memory_install_device_handler64(space, device, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
+													(readorwrite == ROW_READ) ? handler->handler.read.dhandler64 : NULL, handler->name, 
+													(readorwrite == ROW_WRITE) ? handler->handler.write.dhandler64 : NULL, handler->name, 
+													handler->mask); 
+					break;
 			}
-			object = (void *)input_port_by_tag(&space->machine->portlist, handler->tag);
-			if (object == NULL)
-				fatalerror("Non-existent port '%s' referenced in memory map\n", handler->tag);
+			break;
+		
+		case AMH_PORT:
+			_memory_install_port(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
+									(readorwrite == ROW_READ) ? handler->tag : NULL, 
+									(readorwrite == ROW_WRITE) ? handler->tag : NULL);
 			break;
 		
 		case AMH_BANK:
-			bits = space->dbits;
-			name = handler->tag;
-			funcptr = (genf *)bank_find_or_allocate(space, handler->tag, entry->addrstart, entry->addrend, readorwrite);
+			_memory_install_bank(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
+									(readorwrite == ROW_READ) ? handler->tag : NULL, 
+									(readorwrite == ROW_WRITE) ? handler->tag : NULL);
 			break;		
 	}
-	
-	/* do the actual mapping */
-	space_map_range_private(space, readorwrite, bits, handler->mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, funcptr, object, name);
 }
 
 
@@ -2370,42 +2480,6 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 ***************************************************************************/
 
 /*-------------------------------------------------
-    space_map_range_private - wrapper for
-    space_map_range which is used at
-    initialization time and converts RAM/ROM
-    banks to dynamically assigned banks
--------------------------------------------------*/
-
-static void space_map_range_private(address_space *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name)
-{
-	/* translate ROM to RAM/UNMAP here */
-	if (HANDLER_IS_ROM(handler))
-		handler = (readorwrite == ROW_WRITE) ? (genf *)STATIC_UNMAP : (genf *)STATIC_RAM;
-
-	/* assign banks for RAM/ROM areas */
-	if (HANDLER_IS_RAM(handler))
-	{
-		memory_private *memdata = space->machine->memory_data;
-		offs_t bytestart = addrstart;
-		offs_t byteend = addrend;
-		offs_t bytemask = addrmask;
-		offs_t bytemirror = addrmirror;
-
-		/* adjust the incoming addresses (temporarily) */
-		adjust_addresses(space, &bytestart, &byteend, &bytemask, &bytemirror);
-
-		/* assign a bank to the adjusted addresses */
-		handler = bank_find_or_allocate(space, NULL, bytestart, byteend, readorwrite);
-		if (memdata->bank_ptr[HANDLER_TO_BANK(handler)] == NULL)
-			memdata->bank_ptr[HANDLER_TO_BANK(handler)] = (UINT8 *)space_find_backing_memory(space, bytestart);
-	}
-
-	/* then do a normal installation */
-	space_map_range(space, readorwrite, handlerbits, handlerunitmask, addrstart, addrend, addrmask, addrmirror, handler, object, handler_name);
-}
-
-
-/*-------------------------------------------------
     space_map_range - maps a range of addresses
     to the specified handler within an address
     space
@@ -2470,31 +2544,34 @@ static void space_map_range(address_space *space, read_or_write readorwrite, int
     device and offset
 -------------------------------------------------*/
 
-static void *space_find_backing_memory(const address_space *space, offs_t byteaddress)
+static void *space_find_backing_memory(const address_space *space, offs_t addrstart, offs_t addrend)
 {
+	offs_t bytestart = memory_address_to_byte(space, addrstart);
+	offs_t byteend = memory_address_to_byte_end(space, addrend);
 	memory_private *memdata = space->machine->memory_data;
 	address_map_entry *entry;
 	memory_block *block;
 
-	VPRINTF(("space_find_backing_memory('%s',%s,%08X) -> ", space->cpu->tag, space->name, byteaddress));
+	VPRINTF(("space_find_backing_memory('%s',%s,%08X-%08X) -> ", space->cpu->tag, space->name, bytestart, byteend));
 
 	/* look in the address map first */
 	for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
 	{
-		offs_t maskoffs = byteaddress & entry->bytemask;
-		if (maskoffs >= entry->bytestart && maskoffs <= entry->byteend)
+		offs_t maskstart = bytestart & entry->bytemask;
+		offs_t maskend = byteend & entry->bytemask;
+		if (maskstart >= entry->bytestart && maskend <= entry->byteend)
 		{
-			VPRINTF(("found in entry %08X-%08X [%p]\n", entry->addrstart, entry->addrend, (UINT8 *)entry->memory + (maskoffs - entry->bytestart)));
-			return (UINT8 *)entry->memory + (maskoffs - entry->bytestart);
+			VPRINTF(("found in entry %08X-%08X [%p]\n", entry->addrstart, entry->addrend, (UINT8 *)entry->memory + (maskstart - entry->bytestart)));
+			return (UINT8 *)entry->memory + (maskstart - entry->bytestart);
 		}
 	}
 
 	/* if not found there, look in the allocated blocks */
 	for (block = memdata->memory_block_list; block != NULL; block = block->next)
-		if (block->space == space && block->bytestart <= byteaddress && block->byteend > byteaddress)
+		if (block->space == space && block->bytestart <= bytestart && block->byteend >= byteend)
 		{
-			VPRINTF(("found in allocated memory block %08X-%08X [%p]\n", block->bytestart, block->byteend, block->data + (byteaddress - block->bytestart)));
-			return block->data + byteaddress - block->bytestart;
+			VPRINTF(("found in allocated memory block %08X-%08X [%p]\n", block->bytestart, block->byteend, block->data + (bytestart - block->bytestart)));
+			return block->data + bytestart - block->bytestart;
 		}
 
 	VPRINTF(("did not find\n"));
@@ -2539,8 +2616,10 @@ static int space_needs_backing_store(const address_space *space, const address_m
     read/write handler
 -------------------------------------------------*/
 
-void *bank_find_or_allocate(const address_space *space, const char *tag, offs_t bytestart, offs_t byteend, read_or_write readorwrite)
+static void *bank_find_or_allocate(const address_space *space, const char *tag, offs_t addrstart, offs_t addrend, read_or_write readorwrite)
 {
+	offs_t bytestart = memory_address_to_byte(space, addrstart);
+	offs_t byteend = memory_address_to_byte_end(space, addrend);
 	memory_private *memdata = space->machine->memory_data;
 	bank_info *bank = NULL;
 	char temptag[10];
@@ -3031,7 +3110,6 @@ static UINT8 subtable_alloc(address_table *tabledata)
 		if (!subtable_merge(tabledata))
 			fatalerror("Ran out of subtables!");
 	}
-
 }
 
 

@@ -1682,12 +1682,12 @@ static void remap_dynamic_addresses(running_machine *machine)
 		if (dynamic[addr].mread == NOP_HANDLER)
 			memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0);
 		else if (dynamic[addr].mread != NULL)
-			_memory_install_handler32(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].mread, NULL, dynamic[addr].rdname, NULL);
+			_memory_install_handler32(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].mread, dynamic[addr].rdname, NULL, NULL, 0);
 		if (dynamic[addr].mwrite != NULL)
-			_memory_install_handler32(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, NULL, dynamic[addr].mwrite, NULL, dynamic[addr].wrname);
+			_memory_install_handler32(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, NULL, NULL, dynamic[addr].mwrite, dynamic[addr].wrname, 0);
 
 		if (dynamic[addr].dread != NULL || dynamic[addr].dwrite != NULL)
-			_memory_install_device_handler32(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].device, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].dread, dynamic[addr].dwrite, dynamic[addr].rdname, dynamic[addr].wrname);
+			_memory_install_device_handler32(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].device, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].dread, dynamic[addr].rdname, dynamic[addr].dwrite, dynamic[addr].wrname, 0);
 	}
 
 	if (LOG_DYNAMIC)

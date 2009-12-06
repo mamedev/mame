@@ -1791,8 +1791,9 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 			/* disable double share regions */
 			if (entry->share != NULL)
 				for (i = 0; i < region_count; i++)
-					if (strcmp(cheat_region[i].share,entry->share)==0)
-						cheat_region[region_count].disabled = TRUE;
+					if (cheat_region[i].share != NULL)
+						if (strcmp(cheat_region[i].share, entry->share)==0)
+							cheat_region[region_count].disabled = TRUE;
 
 			region_count++;
 		}
@@ -1808,7 +1809,7 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 		/* force region to the specified range */
 		cheat_region[region_count].offset = memory_address_to_byte(space, offset) & space->bytemask;;
 		cheat_region[region_count].endoffset = memory_address_to_byte(space, offset + length - 1) & space->bytemask;;
-		cheat_region[region_count].share = 0;
+		cheat_region[region_count].share = NULL;
 		cheat_region[region_count].disabled = FALSE;
 		region_count++;
 	}
