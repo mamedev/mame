@@ -1373,20 +1373,20 @@ ROM_START( trvwzh )
 	ROM_LOAD( "trivia.u6",    0x2000, 0x2000, CRC(af6886c0) SHA1(48005b921d7ce33ffc0ba160be82053a26382a9d) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "trivia.u39",   0x0000, 0x2000, CRC(f8a5f5fb) SHA1(a511e1a2b5e887ef00dc919e9e664ccec2d36cfa) )
-	ROM_LOAD( "trivia.u38",   0x2000, 0x2000, CRC(27621e52) SHA1(a7e88d329e2e774fef9bd8c5cefb4d8f1cfcba4c) )
-	ROM_LOAD( "trivia.u37",   0x4000, 0x2000, CRC(f739b5dc) SHA1(fbf469b7f4cab50e06ec2def9344e3b9801a275e) )
+	ROM_LOAD( "triv_1_u39.u39", 0x0000, 0x2000, CRC(f8a5f5fb) SHA1(a511e1a2b5e887ef00dc919e9e664ccec2d36cfa) )
+	ROM_LOAD( "triv_1_u38.u38", 0x2000, 0x2000, CRC(27621e52) SHA1(a7e88d329e2e774fef9bd8c5cefb4d8f1cfcba4c) )
+	ROM_LOAD( "triv_1_u37.u37", 0x4000, 0x2000, CRC(f739b5dc) SHA1(fbf469b7f4cab50e06ec2def9344e3b9801a275e) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "trivia.u40",   0x0000, 0x2000, CRC(cea7319f) SHA1(663cd18a4699dfd5ad1d3357094eff247e9b4a47) )
+	ROM_LOAD( "triv_1_u40.u40",   0x0000, 0x2000, CRC(cea7319f) SHA1(663cd18a4699dfd5ad1d3357094eff247e9b4a47) )
 
 	ROM_REGION( 0xa0000, "user1", ROMREGION_ERASEFF ) /* questions */
-	ROM_LOAD( "trivia.ent",   0x08000, 0x8000, CRC(ff45d92b) SHA1(10356bc6a04b2c53ecaf76cb0cba3ec70b4ba612) )
-	ROM_LOAD( "trivia1.ent",  0x18000, 0x8000, CRC(902e26f7) SHA1(f13b816bfc507fb429fb3f44531de346a82c780d) )
-	ROM_LOAD( "trivia.gen",   0x28000, 0x8000, CRC(1d8d353f) SHA1(6bd0cc5c67da81a48737f32bc49cbf235648c4c6) )
-	ROM_LOAD( "trivia.02a",   0x3c000, 0x4000, CRC(2000e3c3) SHA1(21737fde3d1a1b22da4590476e4e52ee1bab026f) )
-	ROM_LOAD( "trivia.sex",   0x48000, 0x8000, CRC(0be4ef9a) SHA1(c80080f1c853e1043bf7e47bea322540a8ac9195) )
-	ROM_LOAD( "trivia.sx2",   0x58000, 0x8000, CRC(32519098) SHA1(d070e02bb10e04964893903599a69a8943f9ac8a) )
+	ROM_LOAD( "ent-001_01a",  0x08000, 0x8000, CRC(ff45d92b) SHA1(10356bc6a04b2c53ecaf76cb0cba3ec70b4ba612) )
+	ROM_LOAD( "ent-001_02a",  0x18000, 0x8000, CRC(902e26f7) SHA1(f13b816bfc507fb429fb3f44531de346a82c780d) )
+	ROM_LOAD( "gen-001_01a",  0x28000, 0x8000, CRC(1d8d353f) SHA1(6bd0cc5c67da81a48737f32bc49cbf235648c4c6) )
+	ROM_LOAD( "gen-001_02a",  0x3c000, 0x4000, CRC(2000e3c3) SHA1(21737fde3d1a1b22da4590476e4e52ee1bab026f) ) /* 27128 eprom, others are 27256 */
+	ROM_LOAD( "sex-001_01a",  0x48000, 0x8000, CRC(32519098) SHA1(d070e02bb10e04964893903599a69a8943f9ac8a) )
+	ROM_LOAD( "sex-001_02a",  0x58000, 0x8000, CRC(0be4ef9a) SHA1(c80080f1c853e1043bf7e47bea322540a8ac9195) )
 ROM_END
 
 ROM_START( trvwzha )
@@ -1395,17 +1395,17 @@ ROM_START( trvwzha )
 	ROM_LOAD( "trivia.u6",    0x2000, 0x2000, CRC(af6886c0) SHA1(48005b921d7ce33ffc0ba160be82053a26382a9d) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "trivia.u39",   0x0000, 0x2000, CRC(f8a5f5fb) SHA1(a511e1a2b5e887ef00dc919e9e664ccec2d36cfa) )
-	ROM_LOAD( "trivia.u38",   0x2000, 0x2000, CRC(27621e52) SHA1(a7e88d329e2e774fef9bd8c5cefb4d8f1cfcba4c) )
-	ROM_LOAD( "trivia.u37",   0x4000, 0x2000, CRC(f739b5dc) SHA1(fbf469b7f4cab50e06ec2def9344e3b9801a275e) )
+	ROM_LOAD( "triv_1_u39.u39", 0x0000, 0x2000, CRC(f8a5f5fb) SHA1(a511e1a2b5e887ef00dc919e9e664ccec2d36cfa) )
+	ROM_LOAD( "triv_1_u38.u38", 0x2000, 0x2000, CRC(27621e52) SHA1(a7e88d329e2e774fef9bd8c5cefb4d8f1cfcba4c) )
+	ROM_LOAD( "triv_1_u37.u37", 0x4000, 0x2000, CRC(f739b5dc) SHA1(fbf469b7f4cab50e06ec2def9344e3b9801a275e) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "trivia.u40",   0x0000, 0x2000, CRC(cea7319f) SHA1(663cd18a4699dfd5ad1d3357094eff247e9b4a47) )
+	ROM_LOAD( "triv_1_u40.u40",   0x0000, 0x2000, CRC(cea7319f) SHA1(663cd18a4699dfd5ad1d3357094eff247e9b4a47) )
 
 	ROM_REGION( 0xa0000, "user1", ROMREGION_ERASEFF ) /* questions */
-	ROM_LOAD( "trivia.spo",   0x08000, 0x8000, CRC(64181d34) SHA1(f84e28fc589b86ca6a596815871ed26602bcc095) )
-	ROM_LOAD( "trivia1.spo",  0x18000, 0x8000, CRC(ae111429) SHA1(ff551d7ac7ad367338e908805aeb78c59a747919) )
-	ROM_LOAD( "trivia2.spo",  0x28000, 0x8000, CRC(ee9263b3) SHA1(1644ab01f17e3af1e193e509d64dcbb243d3eb80) )
+	ROM_LOAD( "spo-001_01a",  0x08000, 0x8000, CRC(ae111429) SHA1(ff551d7ac7ad367338e908805aeb78c59a747919) )
+	ROM_LOAD( "spo-001_02a",  0x18000, 0x8000, CRC(ee9263b3) SHA1(1644ab01f17e3af1e193e509d64dcbb243d3eb80) )
+	ROM_LOAD( "spo-001_03a",  0x28000, 0x8000, CRC(64181d34) SHA1(f84e28fc589b86ca6a596815871ed26602bcc095) )
 ROM_END
 
 /* question board only - this contained a variety of roms from the 'trvwzh' and 'trvwzha' sets
@@ -1416,12 +1416,12 @@ ROM_START( trvwzhb )
 	ROM_LOAD( "trivia.u6",    0x2000, 0x2000, CRC(af6886c0) SHA1(48005b921d7ce33ffc0ba160be82053a26382a9d) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "trivia.u39",   0x0000, 0x2000, CRC(f8a5f5fb) SHA1(a511e1a2b5e887ef00dc919e9e664ccec2d36cfa) )
-	ROM_LOAD( "trivia.u38",   0x2000, 0x2000, CRC(27621e52) SHA1(a7e88d329e2e774fef9bd8c5cefb4d8f1cfcba4c) )
-	ROM_LOAD( "trivia.u37",   0x4000, 0x2000, CRC(f739b5dc) SHA1(fbf469b7f4cab50e06ec2def9344e3b9801a275e) )
+	ROM_LOAD( "triv_1_u39.u39", 0x0000, 0x2000, CRC(f8a5f5fb) SHA1(a511e1a2b5e887ef00dc919e9e664ccec2d36cfa) )
+	ROM_LOAD( "triv_1_u38.u38", 0x2000, 0x2000, CRC(27621e52) SHA1(a7e88d329e2e774fef9bd8c5cefb4d8f1cfcba4c) )
+	ROM_LOAD( "triv_1_u37.u37", 0x4000, 0x2000, CRC(f739b5dc) SHA1(fbf469b7f4cab50e06ec2def9344e3b9801a275e) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "trivia.u40",   0x0000, 0x2000, CRC(cea7319f) SHA1(663cd18a4699dfd5ad1d3357094eff247e9b4a47) )
+	ROM_LOAD( "triv_1_u40.u40",   0x0000, 0x2000, CRC(cea7319f) SHA1(663cd18a4699dfd5ad1d3357094eff247e9b4a47) )
 
 	ROM_REGION( 0xa0000, "user1", ROMREGION_ERASEFF ) /* questions */
 	ROM_LOAD( "merit2_6.1",   0x08000, 0x8000, CRC(8a4bcde3) SHA1(528ae9d3ff0b98201f89fd6b93a712cd7f0e9ab4) ) // 0xxxxxxxxxxxxxx = 0x00
@@ -1445,9 +1445,9 @@ ROM_START( trvwzv )
 	ROM_LOAD( "ent_001_01.bin", 0x08000, 0x8000, CRC(c68ce954) SHA1(bf70fe64f095d5cfcf5347d83651b78c6c8bf05f) )
 	ROM_LOAD( "ent_001_02.bin", 0x18000, 0x8000, CRC(aac4ff63) SHA1(d68c4408b4dad976e317a33f2a4eaee39d90dbed) )
 	ROM_LOAD( "gen_001_01.bin", 0x28000, 0x8000, CRC(5deb1900) SHA1(b7e9407c37481ef8953e8283d45949d951302e92) )
-	ROM_LOAD( "gen_001_02.bin", 0x3c000, 0x4000, CRC(d2b53b6a) SHA1(f75334e47885086e277682daf018818a02ce1026) )
-	ROM_LOAD( "sex_001_01.bin", 0x48000, 0x8000, CRC(32519098) SHA1(d070e02bb10e04964893903599a69a8943f9ac8a) )
-	ROM_LOAD( "sex_001_02.bin", 0x58000, 0x8000, CRC(0be4ef9a) SHA1(c80080f1c853e1043bf7e47bea322540a8ac9195) )
+	ROM_LOAD( "gen_001_02.bin", 0x3c000, 0x4000, CRC(d2b53b6a) SHA1(f75334e47885086e277682daf018818a02ce1026) ) /* 27128 eprom, others are 27256 */
+	ROM_LOAD( "sex_001_01a",    0x48000, 0x8000, CRC(32519098) SHA1(d070e02bb10e04964893903599a69a8943f9ac8a) )
+	ROM_LOAD( "sex_001_02a",    0x58000, 0x8000, CRC(0be4ef9a) SHA1(c80080f1c853e1043bf7e47bea322540a8ac9195) )
 ROM_END
 
 ROM_START( trvwzva )
@@ -1521,9 +1521,9 @@ ROM_START( trvwz3h )
 	ROM_LOAD( "u6",           0x2000, 0x2000, CRC(21a44014) SHA1(331f8b4fa3f837de070b68b959c818122aedc68a) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "u39",          0x0000, 0x2000, CRC(f8a5f5fb) SHA1(a511e1a2b5e887ef00dc919e9e664ccec2d36cfa) )
-	ROM_LOAD( "u38",          0x2000, 0x2000, CRC(27621e52) SHA1(a7e88d329e2e774fef9bd8c5cefb4d8f1cfcba4c) )
-	ROM_LOAD( "u37",          0x4000, 0x2000, CRC(f739b5dc) SHA1(fbf469b7f4cab50e06ec2def9344e3b9801a275e) )
+	ROM_LOAD( "triv_1_u39.u39", 0x0000, 0x2000, CRC(f8a5f5fb) SHA1(a511e1a2b5e887ef00dc919e9e664ccec2d36cfa) )
+	ROM_LOAD( "triv_1_u38.u38", 0x2000, 0x2000, CRC(27621e52) SHA1(a7e88d329e2e774fef9bd8c5cefb4d8f1cfcba4c) )
+	ROM_LOAD( "triv_1_u37.u37", 0x4000, 0x2000, CRC(f739b5dc) SHA1(fbf469b7f4cab50e06ec2def9344e3b9801a275e) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "u40",          0x0000, 0x2000, CRC(e829473f) SHA1(ba754d9377d955b409970494e1a14dbe1d359ee5) )
@@ -1537,7 +1537,7 @@ ROM_START( trvwz3h )
 	ROM_LOAD( "12",           0x58000, 0x8000, CRC(057f6676) SHA1(a93a7a76fc8b8263568a50b00a57f3abe76c9aa3) )
 	ROM_LOAD( "13",           0x68000, 0x8000, CRC(1fa46b86) SHA1(16d54d0932fe342399faf303eafa3c0b7ba2e202) )
 	ROM_LOAD( "14",           0x78000, 0x8000, CRC(b395cd97) SHA1(a42c7c1687eaba64a725888cd6413568cc90b010) )
-	ROM_LOAD( "15",           0x88000, 0x8000, CRC(b064876b) SHA1(588300fb6603f334de41a9685b1fcf8c642b5c16) )
+	ROM_LOAD( "sex-001_02",   0x88000, 0x8000, CRC(b064876b) SHA1(588300fb6603f334de41a9685b1fcf8c642b5c16) )
 ROM_END
 
 ROM_START( trvwz3v )
@@ -1568,13 +1568,13 @@ ROM_END
 
 ROM_START( trvwz3ha )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "merit6.u5",           0x0000, 0x2000, CRC(e0a07f06) SHA1(02cde0fc4a62d108ecd3e2f7704b9166c31707f2) )
-	ROM_LOAD( "merit6.u6",           0x2000, 0x2000, CRC(223482d6) SHA1(4d9dbce7505b98ccd8e2b55f6f86a59b213d72a1) )
+	ROM_LOAD( "6221-04.u5-0c",           0x0000, 0x2000, CRC(e0a07f06) SHA1(02cde0fc4a62d108ecd3e2f7704b9166c31707f2) )
+	ROM_LOAD( "6221-04_u6-0c",           0x2000, 0x2000, CRC(223482d6) SHA1(4d9dbce7505b98ccd8e2b55f6f86a59b213d72a1) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "merit6.u39",          0x0000, 0x2000, CRC(f8a5f5fb) SHA1(a511e1a2b5e887ef00dc919e9e664ccec2d36cfa) )
-	ROM_LOAD( "merit6.u38",          0x2000, 0x2000, CRC(27621e52) SHA1(a7e88d329e2e774fef9bd8c5cefb4d8f1cfcba4c) )
-	ROM_LOAD( "merit6.u37",          0x4000, 0x2000, CRC(f739b5dc) SHA1(fbf469b7f4cab50e06ec2def9344e3b9801a275e) )
+	ROM_LOAD( "triv_1_u39.u39", 0x0000, 0x2000, CRC(f8a5f5fb) SHA1(a511e1a2b5e887ef00dc919e9e664ccec2d36cfa) )
+	ROM_LOAD( "triv_1_u38.u38", 0x2000, 0x2000, CRC(27621e52) SHA1(a7e88d329e2e774fef9bd8c5cefb4d8f1cfcba4c) )
+	ROM_LOAD( "triv_1_u37.u37", 0x4000, 0x2000, CRC(f739b5dc) SHA1(fbf469b7f4cab50e06ec2def9344e3b9801a275e) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "merit6.u40",          0x0000, 0x2000, CRC(e829473f) SHA1(ba754d9377d955b409970494e1a14dbe1d359ee5) )
@@ -1587,11 +1587,11 @@ ROM_START( trvwz3ha )
 	ROM_LOAD( "merit6.7",           0x48000, 0x8000, CRC(057f6676) SHA1(a93a7a76fc8b8263568a50b00a57f3abe76c9aa3) )
 	ROM_LOAD( "merit6.0",           0x58000, 0x8000, CRC(1fa46b86) SHA1(16d54d0932fe342399faf303eafa3c0b7ba2e202) )
 	ROM_LOAD( "merit6.3",           0x68000, 0x8000, CRC(b395cd97) SHA1(a42c7c1687eaba64a725888cd6413568cc90b010) )
-	ROM_LOAD( "merit6.2",           0x78000, 0x8000, CRC(b064876b) SHA1(588300fb6603f334de41a9685b1fcf8c642b5c16) )
+	ROM_LOAD( "sex-001_02",         0x78000, 0x8000, CRC(b064876b) SHA1(588300fb6603f334de41a9685b1fcf8c642b5c16) )
 
 	ROM_REGION( 0x8000, "misc", 0 )
 	ROM_LOAD( "merit6.u13",         0x00000, 0x1f3, CRC(686d2ad0) SHA1(7aad0a1ed09942528eceaf4d7a5e1fd7601aeac7) )
-	ROM_LOAD( "merit6.1",           0x00000, 0x8000, CRC(77a2a734) SHA1(7ba662d275b7914c9dcc9532116086e091e6cf88) ) // should be a question rom, but doesn't work, bad, or from a different game?
+	ROM_LOAD( "sex-001_01",         0x00000, 0x8000, CRC(77a2a734) SHA1(7ba662d275b7914c9dcc9532116086e091e6cf88) ) // should be a question rom, but doesn't work, bad, or from a different game?
 ROM_END
 
 ROM_START( trvwz4 )
