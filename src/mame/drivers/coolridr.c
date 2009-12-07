@@ -1,53 +1,215 @@
-/*
+/******************************************************************************************************
 
-Sega System H1
-preliminary
+	System H1 (c) 1994 Sega
 
-22 Aug 2004 - Basic skeleton driver, loads some roms doesn't run the right code yet
-2 Dec 2008 - Added an hack for the SH-2,fixed some irqs and some memory maps/ram sharing.
-             Got to the point that area 0x03e00000 on the SH-2 loads some DMA-style tables.
+	preliminary driver by David Haywood, Angelo Salese and Tomasz Slanina
+	special thanks to Guru for references and HW advices
 
-Known Games on this Platform
+	TODO:
+	- DMA is still a bit of a mystery;
+	- video emulation is pratically non-existant;
+	- SCSP;
+	- Many SH-1 ports needs investigations;
+	- IRQ generation
+	- Understand & remove the hacks at the bottom;
+	- IC1/IC10 are currently unused, might contain sprite data / music data for the SCSP / chars for the
+	  text tilemap/blitter;
+
+=======================================================================================================
+
 Cool Riders
+Sega 1994
 
--- readme --
+This game runs on SYSTEM-H1 hardware. Only one known game exists on this
+PCB and this is it. The hardware seems overly complex for a 2D bike
+racing game? This might have been an experimental design transitioning
+between Model 1 and Model 2 or a step up from ST-V's 2D to pseudo 3D/2.5D?
+The design of the PCB is very similar to vanilla Model 2
+(i.e. Daytona etc). However instead of fully custom-badged chips,
+many of the custom chips are off-the-shelf Hitachi gate-arrays.
 
-Cool Riders by SEGA 1995
-SYSTEM H1 CPU Board
--------------------
-Processors :
-Hitachi SH2 HD6417095
-Toshiba TMP68HC000N-16
-Hitachi SH7032 HD6417032F20
 
-Eprom :
-Ep17662.12
+PCB Layouts
+-----------
 
-SEGA CUSTOM IC :
-315-5687 (x2)
-315-5757
-315-5758
-315-5849
-315-5800 GAL16V8B
-315-5801 GAL16V8B
-315-5802 GAL16V8B
+SYSTEM-H1 ROM BD
+171-6516C
+837-9623
+834-11482 (sticker)
+|--------------------------------------------------------------|
+|  IC17            IC18              IC5               IC10    |
+|                                                              |
+|  IC15            IC16              IC4               IC9     |
+|                                                              |
+|  IC13            IC14              IC3               IC8     |
+|                                                              |
+|  IC11            IC12              IC2               IC7     |
+|                                                              |
+|  IC31            IC32              IC1               IC6     |
+|                                                              |
+|  IC29            IC30                                        |
+|JP1-JP8                                                       |
+|  LED    32.500MHz   CN1         JP9-JP12    CN2              |
+|--------------------------------------------------------------|
+Notes:
+      CN1/2   - Connectors joining to CPU board
+      JP1-8   - Jumpers to set ROM sizes
+                JP1-4 set to 1-2
+                JP5-8 set to 2-3
+      JP9-12  - Jumpers to set ROM sizes
+                JP9 set to 1-2
+                JP10-12 open (no jumpers) but JP12 pin 2 tied to JP10 pin 1
+      IC*     - IC29-IC32 are 27C4002 EPROM
+                All other ROMs are 42 pin DIP 16M mask ROM
 
-SYSTEM H1 VIDEO BOARD
----------------------
-SEGA CUSTOM IC :
-315-5648 (x4)
-315-5691
-315-5692
-315-5693 (x2)
-315-5694
-315-5695 (x2)
-315-5696 (x2)
-315-5697
-315-5698
-315-5803 GAL16V8B
-315-5864 GAL16V8B
 
-*/
+SYSTEM-H1 COMMUNICATION-BD
+171-6849B
+837-10942
+|----------------------------------|
+|                 CN2              |
+|       74F74   74F245  MB84256    |
+|       74F373  74F245  MB84256    |
+|MB89273A         CN1              |
+|                                  |
+|       74F138 74F04   74F125      |
+|                                  |
+|       74F157 74F161  74F02       |
+|                                  |
+|       74F04  74F74   74F86     TX|
+|MB89374                           |
+|       74F02  74F160            RX|
+|                         SN75179  |
+|                     JP1 JP2 JP3  |
+|       LED               CN3      |
+|----------------------------------|
+Notes: (All IC's shown)
+      CN1/2 - Connectors joining to CPU board
+      CN3   - Connector joining to Filter board
+      RX/TX - Optical cable connections for network (not used)
+      JP*   - 3x 2-pin jumpers. JP1 shorted, other jumpers open
+
+
+SYSTEM-H1 CPU BD
+171-6651A
+837-10389
+837-11481 (sticker)
+|--------------------------------------------------------------|
+|                                                EPR-17662.IC12|
+|                                                              |
+|   |--------|    |--------|                                   |
+|   |SEGA    |    |SEGA    |           FM1208S      SEC_CONN   |
+|   |315-5758|    |315-5757|       CN2         CN1             |
+|   |        |    |        |           |------|            CN10|
+|   |--------|    |--------|           |SH7032|                |
+|CN8                                   |      |                |
+|                                      |------|                |
+|                                                              |
+|                   PAL1  JP1 JP4 JP6 JP2                      |
+|                   PAL2   JP3 JP5     MB3771                  |
+|     28MHz   32MHz              PC910                 A1603C  |
+|                                               DSW1   DAN803  |
+|HM5241605                       |--------| |--------| DAP803  |
+|HM5241605      PAL3             |SEGA    | |SEGA    |         |
+|                                |315-5687| |315-5687| 315-5649|
+|                                |        | |        |         |
+|   |-----|        TMP68HC000N-16|--------| |--------|         |
+|   |SH2  |                       514270      514270           |
+|   |     |                         CN12               A1603C  |
+|CN7|-----|         MB84256            TDA1386   TL062     CN11|
+|                           22.579MHz   CN14                   |
+|                   MB84256                                    |
+|                                                              |
+|                                      TDA1386   TL062         |
+|--------------------------------------------------------------|
+Notes:
+      22.579MHz   - This OSC is tied to pin 1 of a 74AC04 logic chip. The output from that (pin 2) is tied
+                    directly to both 315-5687 chips on pin 14. Therefore the clock input of the YMF292's is 22.579MHz
+      514270      - Hitachi HM514270AJ-7 256k x16 DRAM (SOJ40)
+      68000       - Clock 16.00MHz [32/2]
+      A1603C      - NEC uPA1603C Monolithic N-Channel Power MOS FET Array (DIP16)
+      CN7/8       - Connectors joining to ROM board (above)
+      CN10/11     - Connectors joining to Filter board
+      CN12/14     - Connectors for (possible) extra sound board (not used)
+      DAN803      - Diotec Semiconductor DAN803 Small Signal Diode Array with common anodes (SIL9)
+      DAP803      - Diotec Semiconductor DAP803 Small Signal Diode Array with common cathodes (SIL9)
+      DSW1        - 4-position DIP switch. All OFF
+      EPR-17662   - Toshiba TC57H1025 1M EPROM (DIP40)
+      FM1208S     - RAMTRON FM1208S 4k (512 bytes x8) Nonvolatile Ferroelectric RAM (SOIC24)
+      HM5241605   - Hitachi HM5241605 4M (256k x 16 x 2 banks) SDRAM (SSOP50)
+      JP1-6       - Jumpers. JP2 open. JP5 1-2. All others 2-3
+      MB3771      - Fujitsu MB3771 Master Reset IC (SOIC8)
+      MB84256     - Fujitsu MB84256 32k x8 SRAM (SOP28)
+      PAL1        - GAL16V8B also marked '315-5800' (DIP20)
+      PAL2        - GAL16V8B also marked '315-5802' (DIP20)
+      PAL3        - GAL16V8B also marked '315-5801' (DIP20)
+      PC910       - Sharp PC910 opto-isolator (DIP8)
+      SEC_CONN    - Sega security-board connector (not used)
+      SH7032      - Hitachi HD6417032F20 ROMless SH1 CPU (QFP112). Clock input 16.00MHz on pin 71
+      SH2         - Hitachi HD6417095 SH2 CPU (QFP144). Clock input 28.00MHz on pin 118
+      TDA1386     - Philips TDA1386T Noise Shaping Filter DAC (SOP24)
+      TL062       - Texas Instruments TL062 Low Power JFET Input Operational Amplifier (SOIC8)
+      Sega Custom - 315-5757 (QFP160)
+                    315-5758 (QFP168) also marked 'HG62G035R26F'
+                    315-5649 (QFP100) custom I/O chip (also used on Model 2A/2B/2C, but NOT vanilla Model 2)
+                    315-5687 (QFP128 x2) also marked 'YMF292-F' (also used on Model 2A/2B/2C and ST-V)
+      Syncs       - Horizontal 24.24506kHz
+                    Vertical 57.0426Hz
+
+
+SYSTEM-H1 VIDEO BD
+171-6514F
+837-9621
+|--------------------------------------------------------------|
+|         CN2                                                  |
+|                                                           JP4|
+|                                   |--------|  TC55328 D431008|
+|      |--------|          HM514270 |SEGA    |  TC55328 D431008|
+|      |SEGA    |          HM514270 |315-5697|              JP3|
+|CN1   |315-5691|  TC55328 HM514270 |        |  D431008 D431008|
+|      |        |  TC55328 HM514270 |--------|  D431008 D431008|
+|      |--------|                                           JP2|
+|                                                           JP1|
+|                                     315-5698   315-5648      |
+|        |------------|                                        |
+|        |  SEGA      |      50MHz                             |
+|        |  315-5692  |               315-5696   315-5648      |
+|        |            |                                     CN9|
+|LED     |------------|                                        |
+|40MHz     |--------|                 315-5696   315-5648      |
+|          |SEGA    |                                          |
+|   PAL1   |315-5693|                                          |
+|CN4       |        |       315-5695  315-5695   315-5648      |
+||--------||--------|                                          |
+||SEGA    |                                                    |
+||315-5694||--------| M5M411860 M5M411860 M5M411860 M5M411860  |
+||        ||SEGA    | M5M411860 M5M411860 M5M411860 M5M411860  |
+||--------||315-5693| M5M411860 M5M411860 M5M411860 M5M411860  |
+|   PAL2   |        | M5M411860 M5M411860 M5M411860 M5M411860  |
+|          |--------|                                          |
+|--------------------------------------------------------------|
+Notes:
+      CN9         - Connector joining to Filter board
+      CN1/2/4     - Connectors joining to CPU board
+      JP1/2/3/4   - 4x 3-pin jumpers. All set to 1-2
+      D431008     - NEC D431008 128k x8 SRAM (SOJ32)
+      HM514270    - Hitachi HM514270AJ7 256k x16 DRAM (SOJ40)
+      M5M411860   - Mitsubishi M5M411860TP435SF00-7 DRAM with fast page mode, 64k-words x 18 bits per word (maybe?) (TSOP42)
+      TC55328     - Toshiba TC55328AJ-15 32k x8 SRAM (SOJ24)
+      PAL1        - GAL16V8B also marked '315-5803' (DIP20)
+      PAL2        - GAL16V8B also marked '315-5804' (DIP20)
+      Sega Custom - 315-5648 (QFP64, x4)
+                    315-5691 also marked 'HG62S0791R17F' (QFP208)
+                    315-5692 also marked 'HG51B152FD' (QFP256)
+                    315-5693 also marked 'HG62G019R16F' (QFP168, x3)
+                    315-5694 (QFP208)
+                    315-5695 (QFP100, x2)
+                    315-5696 (QFP120, x2)
+                    315-5697 (QFP208)
+                    315-5698 (QFP144)
+
+
+******************************************************************************************************/
 
 #include "driver.h"
 #include "debugger.h"
@@ -329,9 +491,9 @@ ADDRESS_MAP_END
 // the SCSP is believed to be hardcoded to decode the first 4 MB like this for a master/slave config
 // (see also Model 3):
 static ADDRESS_MAP_START( system_h1_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 //  AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp1", scsp_r, scsp_w)
-	AM_RANGE(0x200000, 0x27ffff) AM_RAM
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM
 //  AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE("scsp2", scsp_r, scsp_w)
 ADDRESS_MAP_END
 
@@ -687,10 +849,8 @@ static INTERRUPT_GEN( system_h1_sub )
 
 static MACHINE_RESET ( coolridr )
 {
-
 //  cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
-
 }
 
 static MACHINE_DRIVER_START( coolridr )
@@ -742,14 +902,26 @@ ROM_START( coolridr )
 	ROM_REGION32_BE( 0x100000, "ram_gfx", ROMREGION_ERASE00 ) /* SH2 code */
 
 	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )	/* 68000 */
-	/* uploaded by the main CPU */
+	ROM_COPY( "maincpu", 0x100000, 0x000000, 0x080000 ) //hardcoded from SH-2 roms? no, It doesn't seem so...
 
 	ROM_REGION( 0x100000, "sub", 0 ) /* SH1 */
 	ROM_LOAD16_WORD_SWAP( "ep17662.12", 0x000000, 0x020000,  CRC(50d66b1f) SHA1(f7b7f2f5b403a13b162f941c338a3e1207762a0b) )
 
 	/* these 10 interleave somehow?? */
 	ROM_REGION( 0x1600000, "gfx5", ROMREGION_ERASEFF ) /* Other Roms */
-	ROMX_LOAD( "mp17640.1", 0x0000000, 0x0200000, CRC(5ecd98c7) SHA1(22027c1e9e6195d27f29a5779695d8597f68809e), ROM_SKIP(9) )
+	/* logical interleaving according to the readme? */
+	ROM_LOAD32_WORD_SWAP( "mp17640.1", 0x0000002, 0x0200000, CRC(5ecd98c7) SHA1(22027c1e9e6195d27f29a5779695d8597f68809e) )
+	ROM_LOAD32_WORD_SWAP( "mp17645.6", 0x0000000, 0x0200000, CRC(00954173) SHA1(863f32565296448ef10992dc3c0480411eb2b193) )
+	ROM_LOAD32_WORD_SWAP( "mp17641.2", 0x0400002, 0x0200000, CRC(a59b0605) SHA1(c93f84fd58f1942b40b7a55058e02a18a3dec3af) )
+	ROM_LOAD32_WORD_SWAP( "mp17646.7", 0x0400000, 0x0200000, CRC(7ae4d92e) SHA1(8a0eaa5dce112289ac5d16ad5dc7f5895e71e87b) )
+	ROM_LOAD32_WORD_SWAP( "mp17642.3", 0x0800002, 0x0200000, CRC(5f8a1827) SHA1(23179d751777436f2a4f652132001d5e425d8cd5) )
+	ROM_LOAD32_WORD_SWAP( "mp17647.8", 0x0800000, 0x0200000, CRC(082faee8) SHA1(c047b8475517f96f481c09471a77aa0d103631d6) )
+	ROM_LOAD32_WORD_SWAP( "mp17643.4", 0x0c00002, 0x0200000, CRC(44a05dd0) SHA1(32aa86f8761ec6ffceb63979c44828603c244e7d) )
+	ROM_LOAD32_WORD_SWAP( "mp17648.9", 0x0c00000, 0x0200000, CRC(0791802f) SHA1(acad55bbd22c7e955a729c8abed9509fc6f10927) )
+	ROM_LOAD32_WORD_SWAP( "mp17644.5", 0x1000002, 0x0200000, CRC(be2763c5) SHA1(1044b0a73e334337b0b9ac958df59480aedfb942) )
+	ROM_LOAD32_WORD_SWAP( "mp17649.10",0x1000000, 0x0200000, CRC(567fbc0a) SHA1(3999c99b26f13d97ac1c58de00a44049ee7775fd) )
+
+/*	ROMX_LOAD( "mp17640.1", 0x0000000, 0x0200000, CRC(5ecd98c7) SHA1(22027c1e9e6195d27f29a5779695d8597f68809e), ROM_SKIP(9) )
 	ROMX_LOAD( "mp17641.2", 0x0000001, 0x0200000, CRC(a59b0605) SHA1(c93f84fd58f1942b40b7a55058e02a18a3dec3af), ROM_SKIP(9) )
 	ROMX_LOAD( "mp17642.3", 0x0000002, 0x0200000, CRC(5f8a1827) SHA1(23179d751777436f2a4f652132001d5e425d8cd5), ROM_SKIP(9) )
 	ROMX_LOAD( "mp17643.4", 0x0000003, 0x0200000, CRC(44a05dd0) SHA1(32aa86f8761ec6ffceb63979c44828603c244e7d), ROM_SKIP(9) )
@@ -758,7 +930,7 @@ ROM_START( coolridr )
 	ROMX_LOAD( "mp17646.7", 0x0000006, 0x0200000, CRC(7ae4d92e) SHA1(8a0eaa5dce112289ac5d16ad5dc7f5895e71e87b), ROM_SKIP(9) )
 	ROMX_LOAD( "mp17647.8", 0x0000007, 0x0200000, CRC(082faee8) SHA1(c047b8475517f96f481c09471a77aa0d103631d6), ROM_SKIP(9) )
 	ROMX_LOAD( "mp17648.9", 0x0000008, 0x0200000, CRC(0791802f) SHA1(acad55bbd22c7e955a729c8abed9509fc6f10927), ROM_SKIP(9) )
-	ROMX_LOAD( "mp17649.10",0x0000009, 0x0200000, CRC(567fbc0a) SHA1(3999c99b26f13d97ac1c58de00a44049ee7775fd), ROM_SKIP(9) )
+	ROMX_LOAD( "mp17649.10",0x0000009, 0x0200000, CRC(567fbc0a) SHA1(3999c99b26f13d97ac1c58de00a44049ee7775fd), ROM_SKIP(9) )*/
 ROM_END
 
 /*TODO: there must be an irq line with custom vector located somewhere that writes to here...*/
