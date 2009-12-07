@@ -361,20 +361,18 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 }
 
 
-//UINT16* sysh1_soundram;
-
 static WRITE32_HANDLER( sysh1_pal_w )
 {
 	int r,g,b;
 	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
-	b = ((space->machine->generic.paletteram.u32[offset] & 0x00007c00) >> 10);
+	r = ((space->machine->generic.paletteram.u32[offset] & 0x00007c00) >> 10);
 	g = ((space->machine->generic.paletteram.u32[offset] & 0x000003e0) >> 5);
-	r = ((space->machine->generic.paletteram.u32[offset] & 0x0000001f) >> 0);
+	b = ((space->machine->generic.paletteram.u32[offset] & 0x0000001f) >> 0);
 	palette_set_color_rgb(space->machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
-	b = ((space->machine->generic.paletteram.u32[offset] & 0x7c000000) >> 26);
+	r = ((space->machine->generic.paletteram.u32[offset] & 0x7c000000) >> 26);
 	g = ((space->machine->generic.paletteram.u32[offset] & 0x03e00000) >> 21);
-	r = ((space->machine->generic.paletteram.u32[offset] & 0x001f0000) >> 16);
+	b = ((space->machine->generic.paletteram.u32[offset] & 0x001f0000) >> 16);
 	palette_set_color_rgb(space->machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
@@ -1033,6 +1031,9 @@ ROM_END
 #if 0
 static READ32_HANDLER( coolridr_hack1_r )
 {
+	if(cpu_get_pc(space->cpu) == 0x6012374 || cpu_get_pc(space->cpu) == 0x6012392)
+		return 0;
+
 	return sysh1_workram_h[0xd88a4/4];
 }
 #endif
