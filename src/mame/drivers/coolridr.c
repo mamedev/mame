@@ -234,7 +234,7 @@ static VIDEO_UPDATE(coolridr)
 	UINT32 count;
 	int y,x;
 	static int color;
-	static UINT32 test_offs = 0x8000;
+	static UINT32 test_offs = 0x2000;
 
 
 	if(input_code_pressed(screen->machine,KEYCODE_Z))
@@ -261,6 +261,9 @@ static VIDEO_UPDATE(coolridr)
 	if(input_code_pressed_once(screen->machine,KEYCODE_S))
 		color--;
 
+	if(test_offs > 0x100000*4)
+		test_offs = 0;
+
 	count = test_offs/4;
 
 	popmessage("%08x %04x",test_offs,color);
@@ -272,7 +275,6 @@ static VIDEO_UPDATE(coolridr)
 			int tile;
 
 			tile = (h1_vram[count] & 0x0fff0000) >> 16;
-			//int colour = tile>>12;
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x+0)*16,y*16);
 
 			tile = (h1_vram[count] & 0x00000fff) >> 0;
@@ -387,23 +389,43 @@ static void sysh1_dma_transfer( const address_space *space, UINT16 dma_index )
 
 	do{
 		src = (framebuffer_vram[(0+dma_index)/4] & 0x0fffffff);
-		dst = (framebuffer_vram[(4+dma_index)/4] & 0xfffff);
-		size = framebuffer_vram[(8+dma_index)/4]*2;
+		dst = (framebuffer_vram[(4+dma_index)/4]);
+		size = framebuffer_vram[(8+dma_index)/4];
 		type = (framebuffer_vram[(0+dma_index)/4] & 0xf0000000) >> 28;
 
-		if(type & 8)
-		printf("%08x %08x %08x %08x\n",src,dst,size,type);
+		if(type == 0xc || type == 0xd || type == 0xe)
+			printf("* %08x %08x %08x %08x\n",src,dst,size,type);
+		else if(type != 0 && type != 0x4)
+			printf("%08x %08x %08x %08x\n",src,dst,size,type);
+
+		if(type == 0x3 || type == 0x4)
+		{
+			//type 3 sets a DMA param, type 4 sets some kind of table? Skip it for now
+			dma_index+=4;
+			continue;
+		}
 
 		if(type == 0xc)
-			dst |= 0x3000000; //to videoram, FIXME: unknown offset
+		{
+			dst &= 0xfffff;
 
+			dst |= 0x3000000; //to videoram, FIXME: unknown offset
+			size*=2;
+		}
 		if(type == 0xd)
+		{
+			dst &= 0xfffff;
+
 			dst |= 0x3d00000; //to charram, FIXME: unknown offset
+			size*=2;
+		}
 
 		if(type == 0xe)
 		{
+			dst &= 0xfffff;
+
 			dst |= 0x3c00000; //to paletteram FIXME: unknown offset
-			//printf("%08x %08x %08x %08x\n",src,dst,size,type);
+			//size/=2;
 			if((src & 0xff00000) == 0x3e00000)
 				return; //FIXME: kludge to avoid palette corruption
 			//debugger_break(space->machine);
@@ -423,7 +445,7 @@ static void sysh1_dma_transfer( const address_space *space, UINT16 dma_index )
 			//printf("%08x %08x %08x %08x\n",src,dst,size,type);
 		}
 
-		if(type == 0x0)
+		if(type == 0x00)
 			end_dma_mark = 1; //end of DMA list
 
 		dma_index+=0xc;
