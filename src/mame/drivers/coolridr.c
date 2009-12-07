@@ -218,7 +218,7 @@ Notes:
 #include "deprecat.h"
 #include "sound/scsp.h"
 
-static UINT32* sysh1_workram_h,*framebuffer_vram, *h1_unk, *h1_charram;
+static UINT32* sysh1_workram_h,*framebuffer_vram, *h1_unk, *h1_charram, *h1_vram;
 static UINT32* sysh1_txt_blit;
 
 /* video */
@@ -229,18 +229,31 @@ static VIDEO_START(coolridr)
 
 static VIDEO_UPDATE(coolridr)
 {
-	/*
-	0x3e09c00-0x3e0bbff and 0x3e0bc00-0x3e0dbff looks like tilemap planes.
-	0x3e00000 onward seems to contain video registers, I've seen MAP registers that clearly points to the aforementioned planes.
-	*/
+	/* planes seems to basically be at 0x8000 and 0x28000... */
 	const gfx_element *gfx = screen->machine->gfx[2];
-	int count = 0x09c00/4;
+	UINT32 count;
 	int y,x;
 	static int color;
+	static UINT32 test_offs = 0x8000;
 
 
 	if(input_code_pressed(screen->machine,KEYCODE_Z))
-		count = 0x0bc00/4;
+		test_offs+=4;
+
+	if(input_code_pressed(screen->machine,KEYCODE_X))
+		test_offs-=4;
+
+	if(input_code_pressed(screen->machine,KEYCODE_C))
+		test_offs+=0x40;
+
+	if(input_code_pressed(screen->machine,KEYCODE_V))
+		test_offs-=0x40;
+
+	if(input_code_pressed(screen->machine,KEYCODE_B))
+		test_offs+=0x400;
+
+	if(input_code_pressed(screen->machine,KEYCODE_N))
+		test_offs-=0x400;
 
 	if(input_code_pressed_once(screen->machine,KEYCODE_A))
 		color++;
@@ -248,17 +261,21 @@ static VIDEO_UPDATE(coolridr)
 	if(input_code_pressed_once(screen->machine,KEYCODE_S))
 		color--;
 
+	count = test_offs/4;
+
+	popmessage("%08x %04x",test_offs,color);
+
 	for (y=0;y<64;y++)
 	{
 		for (x=0;x<128;x+=2)
 		{
 			int tile;
 
-			tile = (framebuffer_vram[count] & 0x0fff0000) >> 16;
+			tile = (h1_vram[count] & 0x0fff0000) >> 16;
 			//int colour = tile>>12;
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x+0)*16,y*16);
 
-			tile = (framebuffer_vram[count] & 0x00000fff) >> 0;
+			tile = (h1_vram[count] & 0x00000fff) >> 0;
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x+1)*16,y*16);
 
 			count++;
@@ -445,7 +462,7 @@ static ADDRESS_MAP_START( system_h1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share1") AM_WRITENOP
 	AM_RANGE(0x01000000, 0x01ffffff) AM_ROM AM_REGION("gfx_data",0x0000000)
 
-	AM_RANGE(0x03000000, 0x030fffff) AM_RAM //bg vram
+	AM_RANGE(0x03000000, 0x030fffff) AM_RAM AM_BASE(&h1_vram)//bg vram
 	AM_RANGE(0x03c00000, 0x03c0ffff) AM_RAM_WRITE(sysh1_pal_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x03d00000, 0x03dfffff) AM_RAM_WRITE(sysh1_char_w) AM_BASE(&h1_charram) //FIXME: half size
 	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_BASE(&framebuffer_vram) //FIXME: not all of it
