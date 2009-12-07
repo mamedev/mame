@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
 	FILE *file;
 	int bytes;
 	int col = 0;
+	int escape = 0;
 
 	/* print usage info */
 	if (argc != 2)
@@ -112,16 +113,18 @@ int main(int argc, char *argv[])
 		/* C-specific handling */
 		if (is_c_file)
 		{
-			/* check for string literals */
-			if (ch == '"' && !in_c_comment && !in_cpp_comment )
+			/* check for string/char literals */
+			if ((ch == '"' || ch == '\'') && !in_c_comment && !in_cpp_comment )
 			{
-				UINT8 lastch = (src > 1) ? original[src-2] : '\0';
-
-				if (in_c_string && lastch != '\\')
-					in_c_string = FALSE;
-				else if (!in_c_string && lastch != '\'')
-					in_c_string = TRUE;
+				if (ch == in_c_string && !escape)
+					in_c_string = 0;
+				else if (!in_c_string)
+					in_c_string = ch;
 			}
+
+			/* Update escape state */
+			if (in_c_string)
+				escape = (ch == '\\') ? !escape : 0;
 
 			if (!in_c_string && !in_cpp_comment)
 			{

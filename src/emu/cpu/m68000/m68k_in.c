@@ -281,7 +281,7 @@ M68KMAKE_OPCODE_HANDLER_FOOTER
 
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 M68KMAKE_TABLE_BODY
-
+/*
 The following table is arranged as follows:
 
 name:        Opcode mnemonic
@@ -349,7 +349,7 @@ mode:        CPU operating mode for each cpu type.  U = user or supervisor,
 cpu cycles:  Base number of cycles required to execute this opcode on the
              specified CPU type.
              Use "." if CPU does not have this opcode.
-
+*/
 
 
               spec  spec                    allowed ea  mode       cpu cycles
