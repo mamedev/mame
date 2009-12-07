@@ -221,11 +221,16 @@ Notes:
 static UINT32* sysh1_workram_h,*framebuffer_vram, *h1_unk, *h1_charram, *h1_vram;
 static UINT32* sysh1_txt_blit;
 static UINT32* txt_vram;
+static bitmap_t* temp_bitmap_sprites;
 
 /* video */
 
 static VIDEO_START(coolridr)
 {
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+
+	temp_bitmap_sprites  = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_RGB32);
 }
 
 static VIDEO_UPDATE(coolridr)
@@ -284,6 +289,10 @@ static VIDEO_UPDATE(coolridr)
 			count++;
 		}
 	}
+
+	copybitmap_trans(bitmap, temp_bitmap_sprites, 0, 0, 0, 0, cliprect, 0);
+	bitmap_fill(temp_bitmap_sprites, cliprect, 0);
+
 
 	return 0;
 }
@@ -396,6 +405,21 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 					y = (attr_buff[9] & 0x01f00000) >> 20;
 					x = (attr_buff[9] & 0x1f0) >> 4;
 					dst_addr = 0x3f40000 | y*0x40 | x;
+
+					{
+						int x2,y2;
+						const gfx_element *gfx = space->machine->gfx[1];
+						rectangle clip;
+
+						y2 = (attr_buff[9] & 0x01ff0000) >> 16;
+						x2 = (attr_buff[9] & 0x000001ff);
+						clip.min_x = 0;
+						clip.max_x =  temp_bitmap_sprites->width;
+						clip.min_y = 0;
+						clip.max_y = temp_bitmap_sprites->height;
+
+						drawgfx_opaque(temp_bitmap_sprites,&clip,gfx,1,1,0,0,x2,y2);
+					}
 				}
 				if(attr_index == 0xc)
 				{
@@ -415,8 +439,8 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 				for(clear_vram=0x3f40000;clear_vram < 0x3f4ffff;clear_vram+=4)
 					memory_write_dword(space,(clear_vram),0x00000000);
 			}
-			else
-				printf("CMD = %04x PARAM = %04x DATA = %08x\n",cmd,param,data);
+			//else
+			//	printf("CMD = %04x PARAM = %04x DATA = %08x\n",cmd,param,data);
 			break;
 	}
 }
