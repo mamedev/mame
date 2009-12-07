@@ -220,6 +220,7 @@ Notes:
 
 static UINT32* sysh1_workram_h,*framebuffer_vram, *h1_unk, *h1_charram, *h1_vram;
 static UINT32* sysh1_txt_blit;
+static UINT32* txt_vram;
 
 /* video */
 
@@ -328,12 +329,42 @@ static WRITE32_HANDLER(sysh1_ioga_w)
 	COMBINE_DATA(&h1_ioga[offset]);
 }
 #endif
+/*
+CMD = 03f4 PARAM = 0230 | ¦
+CMD = ac90 PARAM = 0001 DATA = 00000000
+CMD = ac90 PARAM = 0001 DATA = 00000059
+CMD = ac90 PARAM = 0001 DATA = 00000000
+CMD = ac90 PARAM = 0001 DATA = 00000000
+CMD = ac90 PARAM = 0001 DATA = 07000000
+CMD = ac90 PARAM = 0001 DATA = 00010000
+CMD = ac90 PARAM = 0001 DATA = 00010001
+CMD = ac90 PARAM = 0001 DATA = 00000000
+CMD = ac90 PARAM = 0001 DATA = 00400040
+CMD = ac90 PARAM = 0001 DATA = 01200050
+CMD = ac90 PARAM = 0001 DATA = 00000000
+CMD = ac90 PARAM = 0001 DATA = 03f40230
 
-/* this looks like an exotic I/O-based tilemap blitter, very unusual from Sega... */
+CMD = 03f4 PARAM = 0170 | ¦
+CMD = ac90 PARAM = 0001 DATA = 00000000
+CMD = ac90 PARAM = 0001 DATA = 00000059
+CMD = ac90 PARAM = 0001 DATA = 00000000
+CMD = ac90 PARAM = 0001 DATA = 00000000
+CMD = ac90 PARAM = 0001 DATA = 07000000
+CMD = ac90 PARAM = 0001 DATA = 00010000
+CMD = ac90 PARAM = 0001 DATA = 00010001
+CMD = ac90 PARAM = 0001 DATA = 00000000
+CMD = ac90 PARAM = 0001 DATA = 00400040
+CMD = ac90 PARAM = 0001 DATA = 00800050
+CMD = ac90 PARAM = 0001 DATA = 00000000
+CMD = ac90 PARAM = 0001 DATA = 03f40170
+*/
+/* this looks like an exotic I/O-based tilemap / sprite blitter, very unusual from Sega... */
 static WRITE32_HANDLER( sysh1_txt_blit_w )
 {
 	static UINT16 cmd,param;
 	static UINT32 dst_addr;
+	static UINT32 txt_buff[0x10],attr_buff[0x10];
+	static UINT8 txt_index,attr_index;
 
 	COMBINE_DATA(&sysh1_txt_blit[offset]);
 
@@ -343,19 +374,49 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 			cmd = (sysh1_txt_blit[offset] & 0xffff0000) >> 16;
 			param = (sysh1_txt_blit[offset] & 0x0000ffff) >> 0;
 			dst_addr = 0x3f40000;
+			txt_index = 0;
+			attr_index = 0;
 			break;
 		case 0x14/4: //data
 			/*  "THIS MACHINE IS STAND-ALONE." / disclaimer written with this CMD */
 			if((cmd & 0xff) == 0xf4)
 			{
-				/* FIXME: color offset and proper offset calculation */
-				memory_write_dword(space,(dst_addr + param),data);
-				dst_addr+=4;
+				txt_buff[txt_index++] = data;
 
-				//printf("PARAM = %04x | %c%c%c%c\n",param,(data >> 24) & 0xff,(data >> 16) & 0xff,(data >> 8) & 0xff,(data >> 0) & 0xff);
+				//printf("CMD = %04x PARAM = %04x | %c%c%c%c\n",cmd,param,(data >> 24) & 0xff,(data >> 16) & 0xff,(data >> 8) & 0xff,(data >> 0) & 0xff);
 			}
-			//else
-			//	printf("CMD = %04x PARAM = %04x DATA = %08x\n",cmd,param,data);
+			else if((cmd & 0xff) == 0x90 || (cmd & 0xff) == 0x30)
+			{
+				attr_buff[attr_index++] = data;
+
+				if(attr_index == 0xa)
+				{
+					static UINT16 x,y;
+
+					y = (attr_buff[9] & 0x01f00000) >> 20;
+					x = (attr_buff[9] & 0x1f0) >> 4;
+					dst_addr = 0x3f40000 | y*0x40 | x;
+				}
+				if(attr_index == 0xc)
+				{
+					static UINT8 size;
+
+					size = (attr_buff[6] / 4)+1;
+					for(txt_index = 0;txt_index < size; txt_index++)
+					{
+						memory_write_dword(space,(dst_addr),txt_buff[txt_index]);
+						dst_addr+=4;
+					}
+				}
+			}
+			else if((cmd & 0xff) == 0x10)
+			{
+				static UINT32 clear_vram;
+				for(clear_vram=0x3f40000;clear_vram < 0x3f4ffff;clear_vram+=4)
+					memory_write_dword(space,(clear_vram),0x00000000);
+			}
+			else
+				printf("CMD = %04x PARAM = %04x DATA = %08x\n",cmd,param,data);
 			break;
 	}
 }
@@ -391,10 +452,12 @@ static void sysh1_dma_transfer( const address_space *space, UINT16 dma_index )
 		size = framebuffer_vram[(8+dma_index)/4];
 		type = (framebuffer_vram[(0+dma_index)/4] & 0xf0000000) >> 28;
 
+		#if 0
 		if(type == 0xc || type == 0xd || type == 0xe)
 			printf("* %08x %08x %08x %08x\n",src,dst,size,type);
 		else if(type != 0 && type != 0x4)
 			printf("%08x %08x %08x %08x\n",src,dst,size,type);
+		#endif
 
 		if(type == 0x3 || type == 0x4)
 		{
@@ -488,7 +551,7 @@ static ADDRESS_MAP_START( system_h1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_BASE(&framebuffer_vram) //FIXME: not all of it
 
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
-	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM //text tilemap + "lineram"
+	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM AM_BASE(&txt_vram)//text tilemap + "lineram"
 	AM_RANGE(0x04000000, 0x0400003f) AM_RAM_WRITE(sysh1_txt_blit_w) AM_BASE(&sysh1_txt_blit)
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE(&sysh1_workram_h)
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_SHARE("share1")
