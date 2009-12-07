@@ -440,7 +440,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dcs_2k_data_map, ADDRESS_SPACE_DATA, 16 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
-	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("bank20")
+	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
 	AM_RANGE(0x3000, 0x33ff) AM_WRITE(dcs_data_bank_select_w)
 	AM_RANGE(0x3400, 0x37ff) AM_READWRITE(input_latch_r, output_latch_w)
 	AM_RANGE(0x3800, 0x39ff) AM_RAM
@@ -451,7 +451,7 @@ ADDRESS_MAP_END
 /* DCS 2k with UART memory map */
 static ADDRESS_MAP_START( dcs_2k_uart_data_map, ADDRESS_SPACE_DATA, 16 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
-	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("bank20")
+	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
 	AM_RANGE(0x3000, 0x33ff) AM_WRITE(dcs_data_bank_select_w)
 	AM_RANGE(0x3400, 0x3402) AM_NOP								/* UART (ignored) */
 	AM_RANGE(0x3403, 0x3403) AM_READWRITE(input_latch_r, output_latch_w)
@@ -470,7 +470,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dcs_8k_data_map, ADDRESS_SPACE_DATA, 16 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
-	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("bank20")
+	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
 	AM_RANGE(0x3000, 0x33ff) AM_WRITE(dcs_data_bank_select_w)
 	AM_RANGE(0x3400, 0x37ff) AM_READWRITE(input_latch_r, output_latch_w)
 	AM_RANGE(0x3800, 0x39ff) AM_RAM
@@ -536,7 +536,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsio_data_map, ADDRESS_SPACE_DATA, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank20")
+	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("databank")
 	AM_RANGE(0x0400, 0x3fdf) AM_RAM
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
@@ -568,7 +568,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( denver_data_map, ADDRESS_SPACE_DATA, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("bank20")
+	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("databank")
 	AM_RANGE(0x0800, 0x3fdf) AM_RAM
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
@@ -809,7 +809,7 @@ static TIMER_CALLBACK( dcs_reset )
 		/* rev 1: just reset the bank to 0 */
 		case 1:
 			dcs.sounddata_bank = 0;
-			memory_set_bank(machine, "bank20", 0);
+			memory_set_bank(machine, "databank", 0);
 			break;
 
 		/* rev 2: reset the SDRC ASIC */
@@ -945,7 +945,7 @@ void dcs_init(running_machine *machine)
 	dcs.sounddata = dcs.bootrom;
 	dcs.sounddata_words = dcs.bootrom_words;
 	dcs.sounddata_banks = dcs.sounddata_words / 0x1000;
-	memory_configure_bank(machine, "bank20", 0, dcs.sounddata_banks, dcs.sounddata, 0x1000*2);
+	memory_configure_bank(machine, "databank", 0, dcs.sounddata_banks, dcs.sounddata, 0x1000*2);
 
 	/* create the timers */
 	dcs.internal_timer = timer_alloc(machine, internal_timer_callback, NULL);
@@ -1007,7 +1007,7 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	}
 	dcs.sounddata_banks = dcs.sounddata_words / soundbank_words;
 	if (dcs.rev != 2)
-		memory_configure_bank(machine, "bank20", 0, dcs.sounddata_banks, dcs.sounddata, soundbank_words*2);
+		memory_configure_bank(machine, "databank", 0, dcs.sounddata_banks, dcs.sounddata, soundbank_words*2);
 
 	/* allocate memory for the SRAM */
 	dcs_sram = auto_alloc_array(machine, UINT16, 0x8000*4/2);
@@ -1068,7 +1068,7 @@ static WRITE16_HANDLER( dcs_dataram_w )
 static WRITE16_HANDLER( dcs_data_bank_select_w )
 {
 	dcs.sounddata_bank = data & 0x7ff;
-	memory_set_bank(space->machine, "bank20", dcs.sounddata_bank % dcs.sounddata_banks);
+	memory_set_bank(space->machine, "databank", dcs.sounddata_bank % dcs.sounddata_banks);
 
 	/* bit 11 = sound board led */
 #if 0
@@ -1095,15 +1095,15 @@ INLINE void sdrc_update_bank_pointers(running_machine *machine)
 		{
 			/* ROM-based; use the memory page to select from ROM */
 			if (SDRC_ROM_MS == 1 && SDRC_ROM_ST != 3)
-				memory_set_bankptr(machine, "bank25", &dcs.sounddata[(SDRC_EPM_PG * pagesize) % dcs.sounddata_words]);
+				memory_set_bankptr(machine, "rompage", &dcs.sounddata[(SDRC_EPM_PG * pagesize) % dcs.sounddata_words]);
 		}
 		else
 		{
 			/* RAM-based; use the ROM page to select from ROM, and the memory page to select from RAM */
 			if (SDRC_ROM_MS == 1 && SDRC_ROM_ST != 3)
-				memory_set_bankptr(machine, "bank25", &dcs.bootrom[(SDRC_ROM_PG * 4096 /*pagesize*/) % dcs.bootrom_words]);
+				memory_set_bankptr(machine, "rompage", &dcs.bootrom[(SDRC_ROM_PG * 4096 /*pagesize*/) % dcs.bootrom_words]);
 			if (SDRC_DM_ST != 0)
-				memory_set_bankptr(machine, "bank26", &dcs.sounddata[(SDRC_DM_PG * 1024) % dcs.sounddata_words]);
+				memory_set_bankptr(machine, "drampage", &dcs.sounddata[(SDRC_DM_PG * 1024) % dcs.sounddata_words]);
 		}
 	}
 }
@@ -1122,29 +1122,23 @@ static void sdrc_remap_memory(running_machine *machine)
 	else
 	{
 		/* first start with a clean program map */
-		memory_install_readwrite_bank(dcs.program, 0x0800, 0x3fff, 0, 0, "bank21");
-		memory_set_bankptr(machine, "bank21", dcs_sram + 0x4800);
+		memory_install_ram(dcs.program, 0x0800, 0x3fff, 0, 0, dcs_sram + 0x4800);
 
 		/* set up the data map based on the SRAM banking */
 		/* map 0: ram from 0800-37ff */
 		if (SDRC_SM_BK == 0)
 		{
-			memory_install_readwrite_bank(dcs.data, 0x0800, 0x17ff, 0, 0, "bank22");
-			memory_install_readwrite_bank(dcs.data, 0x1800, 0x27ff, 0, 0, "bank23");
-			memory_install_readwrite_bank(dcs.data, 0x2800, 0x37ff, 0, 0, "bank24");
-			memory_set_bankptr(machine, "bank22", dcs_sram + 0x0000);
-			memory_set_bankptr(machine, "bank23", dcs_sram + 0x1000);
-			memory_set_bankptr(machine, "bank24", dcs_sram + 0x2000);
+			memory_install_ram(dcs.data, 0x0800, 0x17ff, 0, 0, dcs_sram + 0x0000);
+			memory_install_ram(dcs.data, 0x1800, 0x27ff, 0, 0, dcs_sram + 0x1000);
+			memory_install_ram(dcs.data, 0x2800, 0x37ff, 0, 0, dcs_sram + 0x2000);
 		}
 
 		/* map 1: nothing from 0800-17ff, alternate RAM at 1800-27ff, same RAM at 2800-37ff */
 		else
 		{
 			memory_unmap_readwrite(dcs.data, 0x0800, 0x17ff, 0, 0);
-			memory_install_readwrite_bank(dcs.data, 0x1800, 0x27ff, 0, 0, "bank23");
-			memory_install_readwrite_bank(dcs.data, 0x2800, 0x37ff, 0, 0, "bank24");
-			memory_set_bankptr(machine, "bank23", dcs_sram + 0x3000);
-			memory_set_bankptr(machine, "bank24", dcs_sram + 0x2000);
+			memory_install_ram(dcs.data, 0x1800, 0x27ff, 0, 0, dcs_sram + 0x3000);
+			memory_install_ram(dcs.data, 0x2800, 0x37ff, 0, 0, dcs_sram + 0x2000);
 		}
 	}
 
@@ -1153,14 +1147,14 @@ static void sdrc_remap_memory(running_machine *machine)
 	{
 		int baseaddr = (SDRC_ROM_ST == 0) ? 0x0000 : (SDRC_ROM_ST == 1) ? 0x3000 : 0x3400;
 		int pagesize = (SDRC_ROM_SZ == 0 && SDRC_ROM_ST != 0) ? 4096 : 1024;
-		memory_install_read_bank(dcs.data, baseaddr, baseaddr + pagesize - 1, 0, 0, "bank25");
+		memory_install_read_bank(dcs.data, baseaddr, baseaddr + pagesize - 1, 0, 0, "rompage");
 	}
 
 	/* map the DRAM page as bank 26 */
 	if (SDRC_DM_ST != 0)
 	{
 		int baseaddr = (SDRC_DM_ST == 1) ? 0x0000 : (SDRC_DM_ST == 2) ? 0x3000 : 0x3400;
-		memory_install_readwrite_bank(dcs.data, baseaddr, baseaddr + 0x3ff, 0, 0, "bank26");
+		memory_install_readwrite_bank(dcs.data, baseaddr, baseaddr + 0x3ff, 0, 0, "drampage");
 	}
 
 	/* update the bank pointers */
@@ -1352,7 +1346,7 @@ static WRITE16_HANDLER( dsio_w )
 		/* offset 2 controls RAM pages */
 		case 2:
 			dsio.reg[2] = data;
-			memory_set_bank(space->machine, "bank20", DSIO_DM_PG % dcs.sounddata_banks);
+			memory_set_bank(space->machine, "databank", DSIO_DM_PG % dcs.sounddata_banks);
 			break;
 	}
 }
@@ -1418,7 +1412,7 @@ static WRITE16_HANDLER( denver_w )
 		/* offset 2 controls RAM pages */
 		case 2:
 			dsio.reg[2] = data;
-			memory_set_bank(space->machine, "bank20", DENV_DM_PG % dcs.sounddata_bank);
+			memory_set_bank(space->machine, "databank", DENV_DM_PG % dcs.sounddata_bank);
 			break;
 
 		/* offset 3 controls FIFO reset */

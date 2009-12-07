@@ -777,8 +777,7 @@ static DRIVER_INIT( asylum )
 	leland_rotate_memory(machine, "slave");
 
 	/* asylum appears to have some extra RAM for the slave CPU */
-	memory_install_readwrite_bank(cputag_get_address_space(machine, "slave", ADDRESS_SPACE_PROGRAM), 0xf000, 0xfffb, 0, 0, "bank4");
-	memory_set_bankptr(machine, "bank4", auto_alloc_array(machine, UINT8, 0x1000));
+	memory_install_ram(cputag_get_address_space(machine, "slave", ADDRESS_SPACE_PROGRAM), 0xf000, 0xfffb, 0, 0, NULL);
 
 	/* set up additional input ports */
 	memory_install_read_port(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x0d, 0x0d, 0, 0, "P2");

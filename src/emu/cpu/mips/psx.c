@@ -1316,8 +1316,7 @@ static void mips_update_scratchpad( const address_space *space )
 	}
 	else
 	{
-		memory_install_readwrite_bank( space, 0x1f800000, 0x1f8003ff, 0, 0, "bank32" );
-		memory_set_bankptr(space->machine,  "bank32", psxcpu->dcache );
+		memory_install_ram( space, 0x1f800000, 0x1f8003ff, 0, 0, psxcpu->dcache );
 	}
 }
 

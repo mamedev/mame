@@ -24,7 +24,6 @@
 #define NEOGEO_BANK_CARTRIDGE				"cartridge"
 #define NEOGEO_BANK_BIOS					"bios"
 #define NEOGEO_BANK_VECTORS					"vectors"
-#define NEOGEO_BANK_EXTRA_RAM				"extra_ram"
 #define NEOGEO_BANK_AUDIO_CPU_MAIN_BANK		"audio_main"
 
 

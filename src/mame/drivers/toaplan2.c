@@ -406,8 +406,7 @@ static DRIVER_INIT( fixeight )
 
 	if (fixeight_sec_cpu_mem)
 	{
-		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x28f002, 0x28fbff, 0, 0, "bank2" );
-		memory_set_bankptr(machine, "bank2", fixeight_sec_cpu_mem);
+		memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x28f002, 0x28fbff, 0, 0, fixeight_sec_cpu_mem );
 	}
 
 	toaplan2_sub_cpu = CPU_2_V25;
@@ -936,8 +935,7 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 			/* game keeping service mode. It writes/reads the settings to/from */
 			/* these shared RAM locations. The secondary CPU reads/writes them */
 			/* from/to nvram to store the settings (a 93C45 EEPROM) */
-			//memory_install_readwrite_bank(space, 0x28f002, 0x28fbff, 0, 0, "bank2");
-			//memory_set_bankptr(space->machine, "bank2", fixeight_sec_cpu_mem);
+			//memory_install_ram(space, 0x28f002, 0x28fbff, 0, 0, fixeight_sec_cpu_mem);
 			memory_install_read_port(space, 0x28f004, 0x28f005, 0, 0, "DSWA");	/* Dip Switch A - Wrong !!! */
 			memory_install_read_port(space, 0x28f006, 0x28f007, 0, 0, "DSWB");	/* Dip Switch B - Wrong !!! */
 			memory_install_read_port(space, 0x28f008, 0x28f009, 0, 0, "JMPR");	/* Territory Jumper block - Wrong !!! */

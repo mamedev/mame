@@ -254,7 +254,6 @@ static UINT8 zigzag_ay8910_latch;
 static UINT8 kingball_speech_dip;
 static UINT8 kingball_sound;
 static UINT8 mshuttle_ay8910_cs;
-static UINT8 *frogg_ram;
 
 static UINT16 protection_state;
 static UINT8 protection_result;
@@ -2522,11 +2521,7 @@ static DRIVER_INIT( frogg )
 	common_init(machine, galaxian_draw_bullet, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
 
 	/* ...but needs a full 2k of RAM */
-	memory_install_readwrite_bank(space, 0x4000, 0x47ff, 0, 0, "bank1");
-	frogg_ram = auto_alloc_array(machine, UINT8, 0x800);
-	memory_set_bankptr(machine, "bank1", frogg_ram);
-
-	state_save_register_global_pointer(machine, frogg_ram, 0x800);
+	memory_install_ram(space, 0x4000, 0x47ff, 0, 0, NULL);
 }
 
 
@@ -2810,12 +2805,10 @@ static DRIVER_INIT( skybase )
 	memory_install_write8_handler(space, 0xa002, 0xa002, 0, 0x7f8, galaxian_gfxbank_w);
 
 	/* needs a full 2k of RAM */
-	memory_install_readwrite_bank(space, 0x8000, 0x87ff, 0, 0, "bank1");
-	memory_set_bankptr(machine, "bank1", auto_alloc_array(machine, UINT8, 0x800));
+	memory_install_ram(space, 0x8000, 0x87ff, 0, 0, NULL);
 
 	/* extend ROM */
-	memory_install_read_bank(space, 0x0000, 0x5fff, 0, 0, "bank2");
-	memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu"));
+	memory_install_rom(space, 0x0000, 0x5fff, 0, 0, memory_region(machine, "maincpu"));
 }
 
 
@@ -2874,12 +2867,10 @@ static DRIVER_INIT( scorpnmc )
 	memory_install_write8_handler(space, 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
 
 	/* extra ROM */
-	memory_install_read_bank(space, 0x5000, 0x67ff, 0, 0, "bank1");
-	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x5000);
+	memory_install_rom(space, 0x5000, 0x67ff, 0, 0, memory_region(machine, "maincpu") + 0x5000);
 
 	/* install RAM at $4000-$4800 */
-	memory_install_readwrite_bank(space, 0x4000, 0x47ff, 0, 0, "bank2");
-	memory_set_bankptr(machine, "bank2", auto_alloc_array(machine, UINT8, 0x800));
+	memory_install_ram(space, 0x4000, 0x47ff, 0, 0, NULL);
 
 	/* doesn't appear to use original RAM */
 	memory_unmap_readwrite(space, 0x8000, 0x87ff, 0, 0);
@@ -2998,11 +2989,7 @@ static DRIVER_INIT( froggrmc )
 	memory_install_write8_handler(space, 0xb001, 0xb001, 0, 0x7f8, froggrmc_sound_control_w);
 
 	/* actually needs 2k of RAM */
-	memory_install_readwrite_bank(space, 0x8000, 0x87ff, 0, 0, "bank1");
-	frogg_ram = auto_alloc_array(machine, UINT8, 0x800);
-	memory_set_bankptr(machine, "bank1", frogg_ram);
-
-	state_save_register_global_pointer(machine, frogg_ram, 0x800);
+	memory_install_ram(space, 0x8000, 0x87ff, 0, 0, NULL);
 
 	/* decrypt */
 	decode_frogger_sound(machine);

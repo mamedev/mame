@@ -1669,11 +1669,7 @@ void megatech_set_genz80_as_sms_standard_map(running_machine *machine, const cha
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
 
 	/* main ram area */
-	sms_mainram = auto_alloc_array(machine, UINT8, 0x2000); // 8kb of main ram
-	memory_install_readwrite_bank(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0, "bank6");
-	memory_set_bankptr(machine,  "bank6", sms_mainram );
-	memory_install_readwrite_bank(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, "bank7");
-	memory_set_bankptr(machine,  "bank7", sms_mainram );
+	sms_mainram = memory_install_ram(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0x2000, NULL);
 	memset(sms_mainram,0x00,0x2000);
 
 	megatech_set_genz80_as_sms_standard_ports(machine,  tag);

@@ -406,7 +406,7 @@ static void *space_find_backing_memory(const address_space *space, offs_t addrst
 static int space_needs_backing_store(const address_space *space, const address_map_entry *entry);
 
 /* banking helpers */
-static void *bank_find_or_allocate(const address_space *space, const char *tag, offs_t addrstart, offs_t addrend, read_or_write readorwrite);
+static void *bank_find_or_allocate(const address_space *space, const char *tag, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite);
 static STATE_POSTLOAD( bank_reattach );
 
 /* table management */
@@ -477,7 +477,7 @@ INLINE void force_opbase_update(const address_space *space)
     given address space in a standard fashion
 -------------------------------------------------*/
 
-INLINE void adjust_addresses(address_space *space, offs_t *start, offs_t *end, offs_t *mask, offs_t *mirror)
+INLINE void adjust_addresses(const address_space *space, offs_t *start, offs_t *end, offs_t *mask, offs_t *mirror)
 {
 	/* adjust start/end/mask values */
 	if (*mask == 0)
@@ -1477,14 +1477,14 @@ void _memory_install_bank(const address_space *space, offs_t addrstart, offs_t a
 	/* map the read bank */
 	if (rtag != NULL)
 	{
-		void *handler = bank_find_or_allocate(space, rtag, addrstart, addrend, ROW_READ);
+		void *handler = bank_find_or_allocate(space, rtag, addrstart, addrend, addrmask, addrmirror, ROW_READ);
 		space_map_range(spacerw, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, spacerw, rtag);
 	}
 
 	/* map the write bank */
 	if (wtag != NULL)
 	{
-		void *handler = bank_find_or_allocate(space, wtag, addrstart, addrend, ROW_WRITE);
+		void *handler = bank_find_or_allocate(space, wtag, addrstart, addrend, addrmask, addrmirror, ROW_WRITE);
 		space_map_range(spacerw, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, spacerw, wtag);
 	}
 
@@ -1498,7 +1498,7 @@ void _memory_install_bank(const address_space *space, offs_t addrstart, offs_t a
     RAM region into the given address space
 -------------------------------------------------*/
 
-void _memory_install_ram(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT8 install_read, UINT8 install_write)
+void *_memory_install_ram(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT8 install_read, UINT8 install_write, void *baseptr)
 {
 	memory_private *memdata = space->machine->memory_data;
 	address_space *spacerw = (address_space *)space;
@@ -1508,34 +1508,52 @@ void _memory_install_ram(const address_space *space, offs_t addrstart, offs_t ad
 	/* map for read */
 	if (install_read)
 	{
-		handler = bank_find_or_allocate(space, NULL, addrstart, addrend, ROW_READ);
+		handler = bank_find_or_allocate(space, NULL, addrstart, addrend, addrmask, addrmirror, ROW_READ);
 		space_map_range(spacerw, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, spacerw, "ram");
+		
+		/* if we are provided a pointer, set it */
+		bankindex = (FPTR)handler;
+		if (baseptr != NULL)
+			memdata->bank_ptr[bankindex] = baseptr;
 
 		/* if we don't have a bank pointer yet, try to find one */ 
-		bankindex = (FPTR)handler;
 		if (memdata->bank_ptr[bankindex] == NULL)
 			memdata->bank_ptr[bankindex] = (UINT8 *)space_find_backing_memory(space, addrstart, addrend);
 		
 		/* if we still don't have a pointer, and we're past the initialization phase, allocate a new block */
 		if (memdata->bank_ptr[bankindex] == NULL && memdata->initialized)
+		{
+			if (mame_get_phase(space->machine) >= MAME_PHASE_RESET)
+				fatalerror("Attempted to call memory_install_ram() after initialization time without a baseptr!");
 			memdata->bank_ptr[bankindex] = block_allocate(space, memory_address_to_byte(space, addrstart), memory_address_to_byte_end(space, addrend), NULL);
+		}
 	}
 
 	/* map for write */
 	if (install_write)
 	{
-		handler = bank_find_or_allocate(space, NULL, addrstart, addrend, ROW_WRITE);
+		handler = bank_find_or_allocate(space, NULL, addrstart, addrend, addrmask, addrmirror, ROW_WRITE);
 		space_map_range(spacerw, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, spacerw, "ram");
 
-		/* if we don't have a bank pointer yet, try to find one */ 
+		/* if we are provided a pointer, set it */
 		bankindex = (FPTR)handler;
+		if (baseptr != NULL)
+			memdata->bank_ptr[bankindex] = baseptr;
+
+		/* if we don't have a bank pointer yet, try to find one */ 
 		if (memdata->bank_ptr[bankindex] == NULL)
 			memdata->bank_ptr[bankindex] = (UINT8 *)space_find_backing_memory(space, addrstart, addrend);
 		
 		/* if we still don't have a pointer, and we're past the initialization phase, allocate a new block */
 		if (memdata->bank_ptr[bankindex] == NULL && memdata->initialized)
+		{
+			if (mame_get_phase(space->machine) >= MAME_PHASE_RESET)
+				fatalerror("Attempted to call memory_install_ram() after initialization time without a baseptr!");
 			memdata->bank_ptr[bankindex] = block_allocate(space, memory_address_to_byte(space, addrstart), memory_address_to_byte_end(space, addrend), NULL);
+		}
 	}
+
+	return (void *)space_find_backing_memory(spacerw, addrstart, addrend);
 }
 	
 
@@ -1931,7 +1949,7 @@ static void memory_init_map_entry(address_space *space, const address_map_entry 
 			
 		case AMH_RAM:
 			_memory_install_ram(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
-								readorwrite == ROW_READ, readorwrite == ROW_WRITE);
+								readorwrite == ROW_READ, readorwrite == ROW_WRITE, NULL);
 			break;
 	
 		case AMH_NOP:
@@ -2559,7 +2577,7 @@ static void *space_find_backing_memory(const address_space *space, offs_t addrst
 	{
 		offs_t maskstart = bytestart & entry->bytemask;
 		offs_t maskend = byteend & entry->bytemask;
-		if (maskstart >= entry->bytestart && maskend <= entry->byteend)
+		if (entry->memory != NULL && maskstart >= entry->bytestart && maskend <= entry->byteend)
 		{
 			VPRINTF(("found in entry %08X-%08X [%p]\n", entry->addrstart, entry->addrend, (UINT8 *)entry->memory + (maskstart - entry->bytestart)));
 			return (UINT8 *)entry->memory + (maskstart - entry->bytestart);
@@ -2616,14 +2634,19 @@ static int space_needs_backing_store(const address_space *space, const address_m
     read/write handler
 -------------------------------------------------*/
 
-static void *bank_find_or_allocate(const address_space *space, const char *tag, offs_t addrstart, offs_t addrend, read_or_write readorwrite)
+static void *bank_find_or_allocate(const address_space *space, const char *tag, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite)
 {
-	offs_t bytestart = memory_address_to_byte(space, addrstart);
-	offs_t byteend = memory_address_to_byte_end(space, addrend);
 	memory_private *memdata = space->machine->memory_data;
+	offs_t bytemirror = addrmirror;
+	offs_t bytestart = addrstart;
+	offs_t bytemask = addrmask;
+	offs_t byteend = addrend;
 	bank_info *bank = NULL;
 	char temptag[10];
 	char name[30];
+	
+	/* adjust the addresses, handling mirrors and such */
+	adjust_addresses(space, &bytestart, &byteend, &bytemask, &bytemirror);
 	
 	/* if this bank is named, look it up */
 	if (tag != NULL)

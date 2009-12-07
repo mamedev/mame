@@ -61,6 +61,8 @@ puzznici note
 #include "includes/taito_l.h"
 
 
+static const char * const bankname[] = { "bank2", "bank3", "bank4", "bank5" };
+
 static const struct
 {
 	void (*notifier)(running_machine *, int);
@@ -152,7 +154,7 @@ static void machine_init(running_machine *machine)
 		cur_rambank[i] = 0x80;
 		current_base[i] = palette_ram;
 		current_notifier[i] = palette_notifier;
-		memory_set_bankptr(machine, "bank2"+i, current_base[i]);
+		memory_set_bankptr(machine, bankname[i], current_base[i]);
 	}
 	cur_rombank = cur_rombank2 = 0;
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x10000);
@@ -392,7 +394,7 @@ logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, cpu_get_pc(spa
 			current_notifier[offset] = 0;
 			current_base[offset] = empty_ram;
 		}
-		memory_set_bankptr(space->machine, "bank2"+offset, current_base[offset]);
+		memory_set_bankptr(space->machine, bankname[offset], current_base[offset]);
 	}
 }
 

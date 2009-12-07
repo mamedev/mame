@@ -312,8 +312,7 @@ MACHINE_START( vsnes )
 	}
 	else
 	{
-		memory_install_readwrite_bank(ppu1_space, 0x0000, 0x1fff, 0, 0, "bank2");
-		memory_set_bankptr(machine, "bank2", vram);
+		memory_install_ram(ppu1_space, 0x0000, 0x1fff, 0, 0, vram);
 	}
 }
 
@@ -495,8 +494,7 @@ DRIVER_INIT( suprmrio )
 	DRIVER_INIT_CALL(vsnormal);
 
 	/* extra ram at $6000 is enabled with bit 1 of $4016 */
-	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
-	memory_set_bankptr(machine, "bank1", auto_alloc_array(machine, UINT8, 0x2000));
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, NULL );
 
 	/* now override the vidaccess callback */
 	/* we need to remap color tables */
@@ -1148,8 +1146,7 @@ DRIVER_INIT( MMC3 )
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, mapper4_w );
 
 	/* extra ram at $6000-$7fff */
-	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
-	memory_set_bankptr(machine, "bank1", auto_alloc_array(machine, UINT8, 0x2000));
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, NULL );
 
 	/* common init */
 	init_vsnes(machine);
@@ -1372,8 +1369,7 @@ DRIVER_INIT( bnglngby )
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0231, 0x0231, 0, 0, set_bnglngby_irq_r, set_bnglngby_irq_w );
 
 	/* extra ram */
-	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
-	memory_set_bankptr(machine, "bank1", auto_alloc_array(machine, UINT8, 0x2000));
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, NULL );
 
 	ret = 0;
 
@@ -1460,10 +1456,8 @@ DRIVER_INIT( vstennis )
 	memory_install_write8_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, vstennis_vrom_banking );
 
 	/* shared ram at $6000 */
-	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
-	memory_install_readwrite_bank(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
-
-	memory_set_bankptr(machine, "bank1", &prg[0x6000]);
+	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, &prg[0x6000] );
+	memory_install_ram(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, &prg[0x6000] );
 }
 
 /**********************************************************************/
@@ -1527,8 +1521,7 @@ DRIVER_INIT( btlecity )
 DRIVER_INIT( vstetris )
 {
 	/* extra ram at $6000 is enabled with bit 1 of $4016 */
-	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank1" );
-	memory_set_bankptr(machine, "bank1", auto_alloc_array(machine, UINT8, 0x2000));
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, NULL );
 
 	init_vsnes(machine);
 	DRIVER_INIT_CALL(vsnormal);

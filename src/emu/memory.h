@@ -490,6 +490,8 @@ union _addrmap64_token
 	_memory_install_port(space, start, end, mask, mirror, rtag, NULL)
 #define memory_install_read_bank(space, start, end, mask, mirror, rtag) \
 	_memory_install_bank(space, start, end, mask, mirror, rtag, NULL)
+#define memory_install_rom(space, start, end, mask, mirror, baseptr) \
+	_memory_install_ram(space, start, end, mask, mirror, TRUE, FALSE, baseptr)
 #define memory_unmap_read(space, start, end, mask, mirror) \
 	_memory_unmap(space, start, end, mask, mirror, TRUE, FALSE, FALSE)
 #define memory_nop_read(space, start, end, mask, mirror) \
@@ -518,6 +520,8 @@ union _addrmap64_token
 	_memory_install_port(space, start, end, mask, mirror, NULL, wtag)
 #define memory_install_write_bank(space, start, end, mask, mirror, wtag) \
 	_memory_install_bank(space, start, end, mask, mirror, NULL, wtag)
+#define memory_install_writeonly(space, start, end, mask, mirror, baseptr) \
+	_memory_install_ram(space, start, end, mask, mirror, FALSE, TRUE, baseptr)
 #define memory_unmap_write(space, start, end, mask, mirror) \
 	_memory_unmap(space, start, end, mask, mirror, FALSE, TRUE, FALSE)
 #define memory_nop_write(space, start, end, mask, mirror) \
@@ -546,6 +550,8 @@ union _addrmap64_token
 	_memory_install_port(space, start, end, mask, mirror, rtag, wtag)
 #define memory_install_readwrite_bank(space, start, end, mask, mirror, tag) \
 	_memory_install_bank(space, start, end, mask, mirror, tag, tag)
+#define memory_install_ram(space, start, end, mask, mirror, baseptr) \
+	_memory_install_ram(space, start, end, mask, mirror, TRUE, TRUE, baseptr)
 #define memory_unmap_readwrite(space, start, end, mask, mirror) \
 	_memory_unmap(space, start, end, mask, mirror, TRUE, TRUE, FALSE)
 #define memory_nop_readwrite(space, start, end, mask, mirror) \
@@ -1017,7 +1023,7 @@ void _memory_install_port(const address_space *space, offs_t addrstart, offs_t a
 void _memory_install_bank(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag) ATTR_NONNULL(1);
 
 /* install a simple fixed RAM region into the given address space */
-void _memory_install_ram(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT8 install_read, UINT8 install_write) ATTR_NONNULL(1);
+void *_memory_install_ram(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT8 install_read, UINT8 install_write, void *baseptr) ATTR_NONNULL(1);
 
 /* unmap a section of address space */
 void _memory_unmap(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, UINT8 unmap_read, UINT8 unmap_write, UINT8 quiet) ATTR_NONNULL(1);
