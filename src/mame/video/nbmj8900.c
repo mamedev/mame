@@ -67,6 +67,7 @@ READ8_HANDLER( nbmj8900_palette_type2_r )
 	return nbmj8900_palette[offset];
 }
 
+#ifdef UNUSED_FUNCTION
 WRITE8_HANDLER( nbmj8900_palette_type2_w )
 {
 	int r, g, b;
@@ -105,6 +106,7 @@ WRITE8_HANDLER( nbmj8900_palette_type3_w )
 
 	palette_set_color_rgb(space->machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
+#endif
 
 WRITE8_HANDLER( nbmj8900_clutsel_w )
 {

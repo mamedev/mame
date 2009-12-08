@@ -53,8 +53,6 @@ WRITE8_HANDLER( mmonkey_protection_w );
 PALETTE_INIT( btime );
 PALETTE_INIT( lnc );
 
-MACHINE_RESET( lnc );
-
 VIDEO_START( btime );
 VIDEO_START( bnj );
 

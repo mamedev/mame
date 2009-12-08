@@ -16,7 +16,6 @@
 #include "rendutil.h"
 #include "ui.h"
 #include "aviio.h"
-#include "deprecat.h"
 
 #include "snap.lh"
 

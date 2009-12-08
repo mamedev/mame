@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "esrip.h"
 
 CPU_DISASSEMBLE( esrip );

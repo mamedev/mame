@@ -20,6 +20,8 @@ struct _zerozone_state
 	const device_config *audiocpu;
 };
 
+/*----------- defined in video/zerozone.c -----------*/
+
 WRITE16_HANDLER( zerozone_tilemap_w );
 WRITE16_HANDLER( zerozone_tilebank_w );
 

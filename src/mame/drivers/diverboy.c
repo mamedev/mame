@@ -66,7 +66,7 @@ struct _diverboy_state
 };
 
 
-VIDEO_START(diverboy)
+static VIDEO_START(diverboy)
 {
 }
 
@@ -106,7 +106,7 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 	}
 }
 
-VIDEO_UPDATE(diverboy)
+static VIDEO_UPDATE(diverboy)
 {
 //  bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	draw_sprites(screen->machine, bitmap, cliprect);

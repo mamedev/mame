@@ -121,7 +121,6 @@ unknown cycle: CME, SSE, SSS
 
 #include "debugger.h"
 #include "tms0980.h"
-#include "deprecat.h"
 
 #define LOG					0
 

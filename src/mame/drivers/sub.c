@@ -114,11 +114,11 @@ static UINT8* sub_vid;
 static UINT8* sub_attr;
 static UINT8* sub_scrolly;
 
-VIDEO_START(sub)
+static VIDEO_START(sub)
 {
 }
 
-VIDEO_UPDATE(sub)
+static VIDEO_UPDATE(sub)
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int y,x;
@@ -361,7 +361,7 @@ static GFXDECODE_START( sub )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x32_layout, 0, 0x80 )
 GFXDECODE_END
 
-PALETTE_INIT( sub )
+static PALETTE_INIT( sub )
 {
 	int i;
 	UINT8* lookup = memory_region(machine,"proms2");

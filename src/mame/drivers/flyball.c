@@ -66,14 +66,14 @@ static TILE_GET_INFO( flyball_get_tile_info )
 }
 
 
-VIDEO_START( flyball )
+static VIDEO_START( flyball )
 {
 	flyball_state *state = (flyball_state *)machine->driver_data;
 	state->tmap = tilemap_create(machine, flyball_get_tile_info, flyball_get_memory_offset, 8, 16, 32, 16);
 }
 
 
-VIDEO_UPDATE( flyball )
+static VIDEO_UPDATE( flyball )
 {
 	flyball_state *state = (flyball_state *)screen->machine->driver_data;
 	int pitcherx = state->pitcher_horz;

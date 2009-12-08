@@ -23,7 +23,7 @@ struct _bombjack_state
 };
 
 
-/* defined in video/bombjack.c */
+/*----------- defined in video/bombjack.c -----------*/
 
 WRITE8_HANDLER( bombjack_videoram_w );
 WRITE8_HANDLER( bombjack_colorram_w );

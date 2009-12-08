@@ -25,7 +25,7 @@ struct _bogeyman_state
 };
 
 
-/* defined in video/bogeyman.c */
+/*----------- defined in video/bogeyman.c -----------*/
 
 WRITE8_HANDLER( bogeyman_videoram_w );
 WRITE8_HANDLER( bogeyman_colorram_w );

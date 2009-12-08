@@ -56,16 +56,16 @@ static UINT16 *fg_buffer;	// i.e. text
  *
  *************************************/
 
-UINT32 *skimaxx_bg_buffer_front;
-UINT32 *skimaxx_bg_buffer_back;
+static UINT32 *skimaxx_bg_buffer_front;
+static UINT32 *skimaxx_bg_buffer_back;
 
-UINT32 *skimaxx_blitter_regs;
-UINT16 *skimaxx_blitter_gfx;
+static UINT32 *skimaxx_blitter_regs;
+static UINT16 *skimaxx_blitter_gfx;
 
-UINT32 skimaxx_blitter_gfx_len;
+static UINT32 skimaxx_blitter_gfx_len;
 
-UINT32 skimaxx_blitter_src_x, skimaxx_blitter_src_dx;
-UINT32 skimaxx_blitter_src_y, skimaxx_blitter_src_dy;
+static UINT32 skimaxx_blitter_src_x, skimaxx_blitter_src_dx;
+static UINT32 skimaxx_blitter_src_y, skimaxx_blitter_src_dy;
 
 // Set up blit parameters
 static WRITE32_HANDLER( skimaxx_blitter_w )
@@ -236,7 +236,7 @@ static READ32_HANDLER( m68k_tms_r )
   bit 0: bit banging data
 */
 
-UINT32 *skimaxx_fpga_ctrl;
+static UINT32 *skimaxx_fpga_ctrl;
 static WRITE32_HANDLER( skimaxx_fpga_ctrl_w )
 {
 	UINT32 newdata = COMBINE_DATA( skimaxx_fpga_ctrl );

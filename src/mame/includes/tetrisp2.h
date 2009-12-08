@@ -43,3 +43,4 @@ VIDEO_START( rocknms );
 VIDEO_UPDATE( rocknms );
 
 VIDEO_START( nndmseal );
+void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t *bitmap_pri, const rectangle *cliprect, UINT8* priram, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int reverseorder, int flip, int allowzoom);

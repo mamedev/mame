@@ -42,7 +42,7 @@ struct _dotrikun_state
  *
  *************************************/
 
-WRITE8_HANDLER( dotrikun_color_w )
+static WRITE8_HANDLER( dotrikun_color_w )
 {
 	dotrikun_state *state = (dotrikun_state *)space->machine->driver_data;
 	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
@@ -50,7 +50,7 @@ WRITE8_HANDLER( dotrikun_color_w )
 }
 
 
-VIDEO_UPDATE( dotrikun )
+static VIDEO_UPDATE( dotrikun )
 {
 	dotrikun_state *state = (dotrikun_state *)screen->machine->driver_data;
 	int offs;

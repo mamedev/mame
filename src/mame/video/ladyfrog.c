@@ -132,7 +132,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 }
 
-VIDEO_START( ladyfrog_common )
+static VIDEO_START( ladyfrog_common )
 {
   ladyfrog_spriteram = auto_alloc_array(machine, UINT8, 160);
   bg_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );

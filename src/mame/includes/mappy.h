@@ -13,9 +13,6 @@ struct _mappy_state
 
 /*----------- defined in video/mappy.c -----------*/
 
-extern UINT8 *mappy_videoram;
-extern UINT8 *mappy_spriteram;
-
 VIDEO_START( phozon );
 PALETTE_INIT( phozon );
 VIDEO_UPDATE( phozon );

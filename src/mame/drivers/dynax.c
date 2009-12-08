@@ -608,7 +608,7 @@ static WRITE8_HANDLER( hjingi_hopper_w )
 	hjingi_hopper = data & 0x01;
 }
 
-UINT8 hjingi_hopper_bit(running_machine *machine)
+static UINT8 hjingi_hopper_bit(running_machine *machine)
 {
 	return (hjingi_hopper && !(video_screen_get_frame_number(machine->primary_screen)%10)) ? 0 : (1<<6);
 }

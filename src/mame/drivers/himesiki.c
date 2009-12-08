@@ -83,7 +83,6 @@ A                                                   12.000MHz
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "includes/himesiki.h"

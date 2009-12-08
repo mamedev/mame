@@ -1670,7 +1670,7 @@ static DRIVER_INIT( hng64_reorder_gfx )
 
 
 #ifdef HACK_REGION
-void hng64_patch_bios_region(running_machine* machine, int region)
+static void hng64_patch_bios_region(running_machine* machine, int region)
 {
 	UINT8 *rom = memory_region(machine, "user1");
 

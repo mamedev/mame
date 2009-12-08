@@ -1807,8 +1807,8 @@ static TILE_GET_INFO( get_gx_psac_tile_info )
 }
 
 UINT32* konamigx_type3_psac2_bank;
-int konamigx_type3_psac2_actual_bank;
-int konamigx_type3_psac2_actual_last_bank = 0;
+static int konamigx_type3_psac2_actual_bank;
+//int konamigx_type3_psac2_actual_last_bank = 0;
 
 WRITE32_HANDLER( konamigx_type3_psac2_bank_w )
 {

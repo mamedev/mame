@@ -2196,7 +2196,7 @@ static READ16_HANDLER( setaroul_d4_10_r )
 
 
 // ?? looks like sprite ram access is 8-bit not 16?
-WRITE16_HANDLER( setaroul_spr_w )
+static WRITE16_HANDLER( setaroul_spr_w )
 {
 	int realoffs = offset;
 	realoffs >>=1;

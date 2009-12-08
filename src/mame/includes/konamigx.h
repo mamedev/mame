@@ -1,3 +1,4 @@
+/*----------- defined in video/konamigx.c -----------*/
 
 // 2nd-Tier GX/MW Hardware Functions
 void K053247GP_set_SpriteOffset(int offsx, int offsy);
@@ -77,6 +78,35 @@ void konamigx_mixer_primode(int mode);
 
 
 void konamigx_objdma(void);
+extern UINT16 *K053247_ram;
+
+VIDEO_START(konamigx_5bpp);
+VIDEO_START(konamigx_6bpp);
+VIDEO_START(konamigx_6bpp_2);
+VIDEO_START(konamigx_type3);
+VIDEO_START(konamigx_type4);
+VIDEO_START(konamigx_type4_sd2);
+VIDEO_START(le2);
+VIDEO_START(dragoonj);
+VIDEO_START(winspike);
+VIDEO_START(opengolf);
+VIDEO_START(racinfrc);
+VIDEO_UPDATE(konamigx);
+
+WRITE32_HANDLER( konamigx_palette_w );
+WRITE32_HANDLER( konamigx_palette2_w );
+WRITE32_HANDLER( konamigx_555_palette_w );
+WRITE32_HANDLER( konamigx_555_palette2_w );
+WRITE32_HANDLER( konamigx_tilebank_w );
+WRITE32_HANDLER( konamigx_t1_psacmap_w );
+WRITE32_HANDLER( konamigx_t4_psacmap_w );
+
+extern int konamigx_current_frame;
+extern WRITE32_HANDLER( konamigx_type3_psac2_bank_w );
+extern UINT32* konamigx_type3_psac2_bank;
+
+
+/*----------- defined in machine/konamigx.c -----------*/
 
 // K055550/K053990/ESC protection devices handlers
 READ16_HANDLER ( K055550_word_r );
@@ -87,5 +117,5 @@ void konamigx_esc_alert(UINT32 *srcbase, int srcoffs, int count, int mode);
 void fantjour_dma_install(running_machine *machine);
 WRITE32_HANDLER(fantjour_dma_w);
 
-extern UINT16 *K053247_ram;
+
 

@@ -85,7 +85,6 @@
 #include "uimenu.h"
 #include "uiinput.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "debug/debugcon.h"
 
 #include <stdarg.h>

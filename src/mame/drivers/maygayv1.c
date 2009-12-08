@@ -133,7 +133,6 @@ Find lamps/reels after UPD changes.
 #include "sound/2413intf.h"
 #include "sound/upd7759.h"
 
-//#include "deprecat.h"
 
 /*************************************
  *

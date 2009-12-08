@@ -28,7 +28,8 @@ struct _pandoras_state
 };
 
 
-/* defined in video/pandoras.c */
+/*----------- defined in video/pandoras.c -----------*/
+
 PALETTE_INIT( pandoras );
 
 WRITE8_HANDLER( pandoras_vram_w );

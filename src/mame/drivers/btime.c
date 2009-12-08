@@ -1448,7 +1448,7 @@ static MACHINE_START( mmonkey )
 	state_save_register_global(machine, state->protection_ret);
 }
 
-MACHINE_RESET( btime )
+static MACHINE_RESET( btime )
 {
 	btime_state *state = (btime_state *)machine->driver_data;
 
@@ -1465,7 +1465,7 @@ MACHINE_RESET( btime )
 	state->audio_nmi_state = 0;
 }
 
-MACHINE_RESET( lnc )
+static MACHINE_RESET( lnc )
 {
 	btime_state *state = (btime_state *)machine->driver_data;
 	*state->lnc_charbank = 1;
@@ -1473,7 +1473,7 @@ MACHINE_RESET( lnc )
 	MACHINE_RESET_CALL(btime);
 }
 
-MACHINE_RESET( mmonkey )
+static MACHINE_RESET( mmonkey )
 {
 	btime_state *state = (btime_state *)machine->driver_data;
 

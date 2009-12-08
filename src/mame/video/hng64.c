@@ -12,25 +12,25 @@
 
 // !!! I'm sure this isn't right !!!
 UINT32 hng64_dls[2][0x81] ;
-UINT8 additive_tilemap_debug;
+static UINT8 additive_tilemap_debug;
 
 static int frameCount = 0 ;
 
 UINT32* hng64_videoram;
-tilemap *hng64_tilemap0_8x8;
-tilemap *hng64_tilemap1_8x8;
-tilemap *hng64_tilemap2_8x8;
-tilemap *hng64_tilemap3_8x8;
+static tilemap *hng64_tilemap0_8x8;
+static tilemap *hng64_tilemap1_8x8;
+static tilemap *hng64_tilemap2_8x8;
+static tilemap *hng64_tilemap3_8x8;
 
-tilemap *hng64_tilemap0_16x16;
-tilemap *hng64_tilemap1_16x16;
-tilemap *hng64_tilemap2_16x16;
-tilemap *hng64_tilemap3_16x16;
+static tilemap *hng64_tilemap0_16x16;
+static tilemap *hng64_tilemap1_16x16;
+static tilemap *hng64_tilemap2_16x16;
+static tilemap *hng64_tilemap3_16x16;
 
-tilemap *hng64_tilemap0_16x16_alt;
-tilemap *hng64_tilemap1_16x16_alt;
-tilemap *hng64_tilemap2_16x16_alt;
-tilemap *hng64_tilemap3_16x16_alt;
+static tilemap *hng64_tilemap0_16x16_alt;
+static tilemap *hng64_tilemap1_16x16_alt;
+static tilemap *hng64_tilemap2_16x16_alt;
+static tilemap *hng64_tilemap3_16x16_alt;
 
 
 UINT32 *hng64_spriteram;
@@ -43,7 +43,7 @@ UINT32 *hng64_tcram ;
 
 UINT8 hng64_screen_dis;
 
-void hng64_mark_all_tiles_dirty( int tilemap )
+static void hng64_mark_all_tiles_dirty( int tilemap )
 {
 	if (tilemap == 0)
 	{
@@ -71,7 +71,7 @@ void hng64_mark_all_tiles_dirty( int tilemap )
 	}
 }
 
-void hng64_mark_tile_dirty( int tilemap, int tile_index )
+static void hng64_mark_tile_dirty( int tilemap, int tile_index )
 {
 	if (tilemap == 0)
 	{
@@ -148,7 +148,7 @@ do																					\
 while (0)																			\
 
 
-void pdrawgfx_transpen_additive(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+static void pdrawgfx_transpen_additive(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_t *priority, UINT32 pmask, UINT32 transpen)
 {
@@ -181,7 +181,7 @@ void pdrawgfx_transpen_additive(bitmap_t *dest, const rectangle *cliprect, const
 }
 
 
-void pdrawgfxzoom_transpen_additive(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+static void pdrawgfxzoom_transpen_additive(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask,
 		UINT32 transpen)
@@ -1659,7 +1659,7 @@ static void hng64_tilemap_draw_roz_core(running_machine* machine, tilemap *tmap,
 
 
 
-void hng64_tilemap_draw_roz_primask(running_machine* machine, bitmap_t *dest, const rectangle *cliprect, tilemap *tmap,
+static void hng64_tilemap_draw_roz_primask(running_machine* machine, bitmap_t *dest, const rectangle *cliprect, tilemap *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask, hng64trans_t drawformat)
 {

@@ -32,7 +32,7 @@ struct _ashnojoe_state
 };
 
 
-/* defined in video/ashnojoe.c */
+/*----------- defined in video/ashnojoe.c -----------*/
 
 WRITE16_HANDLER( ashnojoe_tileram_w );
 WRITE16_HANDLER( ashnojoe_tileram2_w );

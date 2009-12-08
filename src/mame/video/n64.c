@@ -52,7 +52,7 @@ typedef struct
     int dzpix;
 } SPAN;
 
-UINT8 cvg_mem[8*1048576];
+//UINT8 cvg_mem[8*1048576];
 
 static SPAN span[4096];
 
@@ -254,7 +254,7 @@ static INT32 NormPointRom[64];
 static INT32 NormSlopeRom[64];
 
 #define zmode other_modes.z_mode
-struct
+static struct
 {
 	UINT32 shift;
 	UINT32 add;
@@ -2820,6 +2820,7 @@ INLINE void tcdiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst)
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 void col_decode16(UINT16* addr, COLOR* col)
 {
 	col->r = (((*addr >> 11) & 0x1f) << 3) | (((*addr >> 11) & 0x1f) >> 2);
@@ -2827,6 +2828,7 @@ void col_decode16(UINT16* addr, COLOR* col)
 	col->b = (((*addr >> 1) & 0x1f) << 3) | (((*addr >> 6) & 0x1f) >> 2);
 	col->a = (*addr & 1) ? 0xff : 0;
 }
+#endif
 
 static void texture_rectangle_16bit(running_machine *machine, TEX_RECTANGLE *rect)
 {

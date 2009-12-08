@@ -13,11 +13,12 @@ priority should be given to
 
 
 #include "driver.h"
+#include "includes/tetrisp2.h"
 #include "includes/ms32.h"
 
-bitmap_t* temp_bitmap_tilemaps;
-bitmap_t* temp_bitmap_sprites;
-bitmap_t* temp_bitmap_sprites_pri;
+static bitmap_t* temp_bitmap_tilemaps;
+static bitmap_t* temp_bitmap_sprites;
+static bitmap_t* temp_bitmap_sprites_pri;
 
 
 //UINT32 *ms32_fce00000;
@@ -231,7 +232,6 @@ WRITE32_HANDLER( ms32_gfxctrl_w )
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
 /* now using function in tetrisp2.c */
-void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t *bitmap_pri, const rectangle *cliprect, UINT8* priram, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int reverseorder, int flip, int allowzoom);
 
 
 

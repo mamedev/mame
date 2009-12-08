@@ -451,11 +451,11 @@ WRITE16_DEVICE_HANDLER( rf5c400_w )
 
 			default:
 			{
-				//mame_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", cpuexec_describe_context(Machine), data, offset, mem_mask);
+				//mame_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", cpuexec_describe_context(device->machine), data, offset, mem_mask);
 				break;
 			}
 		}
-		//mame_printf_debug("%s:rf5c400_w: %08X, %08X, %08X at %08X\n", cpuexec_describe_context(Machine), data, offset, mem_mask);
+		//mame_printf_debug("%s:rf5c400_w: %08X, %08X, %08X at %08X\n", cpuexec_describe_context(device->machine), data, offset, mem_mask);
 	}
 	else
 	{

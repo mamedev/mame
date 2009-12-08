@@ -36,7 +36,6 @@ Limit for help/undo (matta):
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
@@ -96,7 +95,7 @@ static PALETTE_INIT( othello )
     palette_set_color(machine,0x0f,MAKE_RGB(0xff,0xff,0xff));
 }
 
-VIDEO_UPDATE( othello )
+static VIDEO_UPDATE( othello )
 {
 	const device_config *mc6845 = devtag_get_device(screen->machine, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);

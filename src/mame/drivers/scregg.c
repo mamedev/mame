@@ -213,7 +213,7 @@ static MACHINE_START( scregg )
 	state_save_register_global_array(machine, state->btime_tilemap);
 }
 
-MACHINE_RESET( scregg )
+static MACHINE_RESET( scregg )
 {
 	btime_state *state = (btime_state *)machine->driver_data;
 

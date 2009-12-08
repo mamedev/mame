@@ -244,16 +244,6 @@ static WRITE32_HANDLER( reset_sub_w )
 /********** MEMORY MAP **********/
 
 
-extern tilemap *ms32_tx_tilemap, *ms32_roz_tilemap, *ms32_bg_tilemap, *ms32_bg_tilemap_alt;
-extern UINT8* ms32_priram_8;
-extern UINT16* ms32_palram_16;
-extern UINT16* ms32_rozram_16;
-extern UINT16* ms32_lineram_16;
-extern UINT16* ms32_sprram_16;
-extern UINT16* ms32_txram_16;
-extern UINT16* ms32_bgram_16;
-extern UINT32 ms32_tilemaplayoutcontrol;
-
 static READ8_HANDLER(   ms32_nvram_r8 )    { return ms32_nvram_8[offset]; }
 static WRITE8_HANDLER(  ms32_nvram_w8 )    { ms32_nvram_8[offset] = data; }
 static READ8_HANDLER(   ms32_priram_r8 )   { return ms32_priram_8[offset]; }
@@ -323,9 +313,6 @@ ADDRESS_MAP_END
 
 /* F1 Super Battle has an extra linemap for the road, and am unknown maths chip (mcu?) handling perspective calculations for the road / corners etc. */
 /* it should use it's own memory map */
-
-extern UINT16* f1superb_extraram_16;
-extern tilemap* ms32_extra_tilemap;
 
 static WRITE16_HANDLER( ms32_extra_w16 )  { COMBINE_DATA(&f1superb_extraram_16[offset]); tilemap_mark_tile_dirty(ms32_extra_tilemap,offset/2); }
 static READ16_HANDLER(  ms32_extra_r16 )  { return f1superb_extraram_16[offset]; }

@@ -59,7 +59,6 @@ Windows showed a 5.94 gig partion empty and a 12.74 unallocated partition
 
 #include "driver.h"
 #include "cpu/mips/r3000.h"
-#include "deprecat.h"
 
 
 #define R3041_CLOCK		25000000

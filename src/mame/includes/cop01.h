@@ -27,7 +27,7 @@ struct _cop01_state
 
 
 
-/*----------- defined in video/circusc.c -----------*/
+/*----------- defined in video/cop01.c -----------*/
 
 
 PALETTE_INIT( cop01 );

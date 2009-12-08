@@ -154,7 +154,7 @@ static void draw_boxer( running_machine *machine, bitmap_t* bitmap, const rectan
 }
 
 
-VIDEO_UPDATE( boxer )
+static VIDEO_UPDATE( boxer )
 {
 	boxer_state *state = (boxer_state *)screen->machine->driver_data;
 	int i, j;

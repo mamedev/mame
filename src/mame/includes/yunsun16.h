@@ -26,7 +26,7 @@ struct _yunsun16_state
 };
 
 
-/* defined in video/yunsun16.c */
+/*----------- defined in video/yunsun16.c -----------*/
 
 WRITE16_HANDLER( yunsun16_vram_0_w );
 WRITE16_HANDLER( yunsun16_vram_1_w );

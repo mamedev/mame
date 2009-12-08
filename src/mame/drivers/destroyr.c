@@ -33,7 +33,7 @@ struct _destroyr_state
 };
 
 
-VIDEO_UPDATE( destroyr )
+static VIDEO_UPDATE( destroyr )
 {
 	destroyr_state *state = (destroyr_state *)screen->machine->driver_data;
 	int i, j;
