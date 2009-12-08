@@ -162,7 +162,7 @@ static INPUT_PORTS_START( magictg )
 	PORT_START("IPT_TEST")
 INPUT_PORTS_END
 
-/* the SMT rom are almost certainly dumped too small */
+
 
 ROM_START( magictg )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* MIPs code? */
