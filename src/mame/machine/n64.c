@@ -1580,8 +1580,8 @@ static int pif_channel_handle_command(running_machine *machine, int channel, int
 		{
 			UINT16 buttons = 0;
 			INT8 x = 0, y = 0;
-			/* add here tags for P2, P3 and P4 when implemented */
-			static const char *const portnames[] = { "P1", "P1_ANALOG_X", "P1_ANALOG_Y" };
+			/* add here tags for P3 and P4 when implemented */
+			static const char *const portnames[] = { "P1", "P1_ANALOG_X", "P1_ANALOG_Y", "P2", "P2_ANALOG_X", "P2_ANALOG_Y" };
 
 			if (slength != 1 || rlength != 4)
 			{
@@ -1590,7 +1590,8 @@ static int pif_channel_handle_command(running_machine *machine, int channel, int
 
 			switch (channel)
 			{
-				case 0:
+				case 0: //p1 inputs
+				case 1: //p2 inputs
 				{
                     buttons = input_port_read(machine, portnames[(channel*3) + 0]);
                     x = input_port_read(machine, portnames[(channel*3) + 1]) - 128;
@@ -1602,7 +1603,6 @@ static int pif_channel_handle_command(running_machine *machine, int channel, int
 					rdata[3] = (UINT8)(y);
 					return 0;
 				}
-				case 1:
 				case 2:
 				case 3:
 				{
