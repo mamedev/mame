@@ -9668,7 +9668,7 @@ Other Sun games
 	/* Hi-Soft */
 	DRIVER( himesiki )	/* (c) 1989 Hi-Soft */
 
-	/* Draw Poker Hi-Lo based (z80) */
+	/* Draw Poker HI-LO based (z80) */
 	DRIVER( norautp )	/* (c) 1988 Noraut Ltd. */
 	DRIVER( norautdx )	/* (c) 198? Noraut Ltd. */
 	DRIVER( norautpn )	/* (c) 199? unknown */
@@ -9690,7 +9690,7 @@ Other Sun games
 	DRIVER( pma )		/* 1983, PMA */
 	DRIVER( bjpoker )	/* (c) M. Kramer Inc. */
 
-	/* Draw Poker Hi-Lo based (i8080) */
+	/* Draw Poker HI-LO based (8080) */
 	DRIVER( dphl )		/* (c) 1983 M. Kramer Inc. */
 	DRIVER( dphla )		/* unknown */
 	DRIVER( dphljp )	/* unknown */
@@ -9699,6 +9699,10 @@ Other Sun games
 	DRIVER( smshilo )	/* (c) 1983 SMS Manufacturing Corp. */
 	DRIVER( drhl )		/* (c) Drew, Inc. */
 	DRIVER( tpoker2 )	/* (c) 1993 Micro Manufacturing, Inc. */
+	DRIVER( fastdrwp )	/* Stern? */
+	DRIVER( dphlunka )	/* SMS Manufacturing Corp? */
+	DRIVER( dphlunkb )	/* SMS Manufacturing Corp? */
+
 
 	/* Sanki Denshi Kogyo */
 	DRIVER( pachifev )	/* (c) 1983? */

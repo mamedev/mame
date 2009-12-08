@@ -31,7 +31,7 @@
    * PMA Poker,                           198?,  PMA.
    * Poker / Black Jack (Model 7521),     198?,  M. Kramer Manufacturing.
 
-  -- 8080A based --
+  -- 8080 based --
 
    * Draw Poker HI-LO,                    1983,  M. Kramer Manufacturing.
    * Draw Poker HI-LO (alt),              1983,  Unknown.
@@ -41,13 +41,16 @@
    * HI-LO Double Up Joker Poker,         1983,  SMS Manufacturing Corp.
    * DRHL Poker (v.2.89),                 1986,  Drews Inc.
    * Turbo Poker 2,                       1993,  Micro Manufacturing, Inc.
+   * Fast Draw (poker conversion kit)?,   198?,  Stern/Seeburg?.
+   * Draw Poker HI-LO (unknown, rev 1),   198?,  SMS Manufacturing Corp?.
+   * Draw Poker HI-LO (unknown, rev 2),   198?,  SMS Manufacturing Corp?.
 
 
   This hardware emulation opened a big can of worms. :)
 
   Seems that the original hardware/game was created by M.Kramer Manufacturing,
   and then reprogrammed, copied, bootlegged, used & abused by other companies
-  like Noraut Ltd, Kimble Gaming, GTI, DellFern, Merit Industries, Red Card,
+  like Noraut Ltd, Kimble Ireland, GTI, DellFern, Merit Industries, Red Card,
   Blue Games, CGI, Micro Manufacturing, SMS Manufacturing, Drews Distributing,
   Drew Industries, Lynch Enterprises Inc, Hillside Gaming Corp, Electro Sport,
   Mainline London, Southern Systems, Americade Amusement Inc, Prologic Ireland,
@@ -498,11 +501,19 @@
   - Fixed the default lamps state.
 
 
+  [2009-12-08]
+
+  - Added Fast Draw (poker conversion kit)?. Seems based on 8080 CPU hardware.
+  - Added Draw Poker HI-LO (unknown, rev 1). Seems based on 8080 CPU hardware.
+  - Added Draw Poker HI-LO (unknown, rev 2). Seems based on 8080 CPU hardware.
+  - Added some technical notes.
+
+
   TODO:
 
   - Analize and hook the 3rd PPI device at 0xc0-0xc3.
     /OBF handshake line (PC7) doesn't seems to work properly.
-  - Interrupts in i8080 based games.
+  - Interrupts in 8080 based games.
   - Find if wide chars are hardcoded or tied to a bit.
   - Save support.
   - Parent/clone relationship.
@@ -754,21 +765,27 @@ static READ8_HANDLER( test2_r )
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | bjpoker  |   Z80   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | dphl     |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  | dphl     |  8080   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | dphla    |  8080A  |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
+  | dphla    |  8080   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | dphljp   |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  | dphljp   |  8080   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | kimbldhl |  8080A  |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
+  | kimbldhl |  8080   |  0x60-0x63   |  0x90  |  0xA0-0xA3   |  0x92  |  0xC0-0xC3   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | gtipoker |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  | gtipoker |  8080   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | smshilo  |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  | smshilo  |  8080   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | tpoker2  |  8080A  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  | tpoker2  |  8080   |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
-  | drhl     |  8080A? |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  | drhl     |  8080?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | fastdrwp |  8080?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | dphlunka |  8080?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | dphlunkb |  8080?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
 
 */
@@ -1311,7 +1328,7 @@ static MACHINE_DRIVER_START( kimble )
 MACHINE_DRIVER_END
 
 
-/**** 8080A based ****/
+/********** 8080 based **********/
 
 
 static MACHINE_DRIVER_START( dphl )
@@ -2377,9 +2394,9 @@ ROM_START( bjpoker )
 ROM_END
 
 
-/************************************** i8080 sets **************************************/
+/*************************************** 8080 sets **************************************/
 /*                                                                                      */
-/*  The following ones are 'Draw Poker HI-LO' type, running in a i8080a based hardware  */
+/*   The following ones are 'Draw Poker HI-LO' type, running in a 8080 based hardware   */
 /*                                                                                      */
 /****************************************************************************************/
 
@@ -3104,6 +3121,78 @@ ROM_START( tpoker2 )
 ROM_END
 
 
+/************************** Unknown Sets ****************************/
+
+/*
+
+  Fast Draw (Stern)?
+
+  Text font is different to other similar games.
+
+  The set was found as 'fastdraw'. No other info.
+  Maybe is the poker conversion kit released by Stern as 'Fast Draw':
+
+  http://www.arcadeflyers.com/?page=thumbs&db=videodb&id=4602
+
+*/
+
+ROM_START( fastdrwp )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* PC=0x068b for error screen */
+	ROM_LOAD( "u12.bin", 0x0000, 0x1000, CRC(d020d7d3) SHA1(4808ef14adf230e3971161c9375f2b354cd9d519) )
+	ROM_LOAD( "u18.bin", 0x1000, 0x1000, CRC(03de6413) SHA1(c61131244e8095b998c5e31724a21496cacad247) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(            0x0000, 0x0800, 0xff )
+	ROM_LOAD( "u31.bin", 0x0800, 0x0800, CRC(6dd3a5b5) SHA1(e7978267ef8af31e65e6f278aebe82347bd5ffdd) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "u51_bpr.bin",  0x0000, 0x0100, CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
+ROM_END
+
+/*
+
+  Unknown DPHL rev 1.
+
+  No extra info inside the zip. Just ROM dumps... 
+  Maybe from SMS Manufacturing, since there are GFX tiles with the SMS logo. 
+
+*/
+
+ROM_START( dphlunka )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* no stack, call's RET go to PC=0 */
+	ROM_LOAD( "u-12_ss.u12", 0x0000, 0x1000, CRC(10ddbc16) SHA1(ab683d836c9223bc67701e092c2cb95afc0f0fa2) )
+	ROM_LOAD( "u-18_ss.u18", 0x1000, 0x1000, CRC(ffbac2bf) SHA1(219247624e0eb0c0c805f5f9a96c4b6b60c9c5ac) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "u-31_ss.u31", 0x0000, 0x1000, CRC(7afa583e) SHA1(e897c6dbcc5452fdb99894203131886a529eed37) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "n82s129n_1",  0x0000, 0x0100, CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
+ROM_END
+
+/*
+
+  Unknown DPHL rev 2.
+
+  No extra info inside the zip. Just ROM dumps... 
+  Maybe from SMS Manufacturing, since there are GFX tiles with the SMS logo. 
+
+*/
+
+ROM_START( dphlunkb )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* PC=0x068b for error screen */
+	ROM_LOAD( "u-12_rev-2.u12", 0x0000, 0x1000, CRC(1b1d8ca4) SHA1(405bf8a56dfc669a0890b0af9417c1ed6a3bf374) )
+	ROM_LOAD( "u-18_rev-2.u18", 0x1000, 0x1000, CRC(22dbe0c7) SHA1(ca223074b0f4b86e60a1b91c22568680845ae17e) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "u-31_ss.u31", 0x0000, 0x1000, CRC(7afa583e) SHA1(e897c6dbcc5452fdb99894203131886a529eed37) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "n82s129n_2",  0x0000, 0x0100, CRC(ee452994) SHA1(315913ce4a92fe0ea7b76e862507c933d6104616) )
+ROM_END
+
+
+
 /**************************
 *       Driver Init       *
 **************************/
@@ -3250,19 +3339,30 @@ GAME(  1983, pma,      0,       nortest1, norautp,  0,   ROT0, "PMA",           
 GAMEL( 198?, bjpoker,  0,       norautxp, norautrh, 0,   ROT0, "M.Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",     GAME_NOT_WORKING, layout_noraut12 )
 
 
-/************************************* i8080 sets *************************************/
-/* The following ones are 'Draw Poker HI-LO' type, running in a i8080a based hardware */
+/************************************* 8080 sets **************************************/
+/*  The following ones are 'Draw Poker HI-LO' type, running in a 8080 based hardware  */
 /**************************************************************************************/
 
-/*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT ROT    COMPANY                      FULLNAME                              FLAGS             LAYOUT */
+/*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT ROT    COMPANY                     FULLNAME                              FLAGS             LAYOUT */
 
 GAME(  1983, dphl,     0,       dphl,     norautp,  0,   ROT0, "M.Kramer Manufacturing.",  "Draw Poker HI-LO (M.Kramer)",         GAME_NOT_WORKING )
 GAME(  1983, dphla,    0,       dphla,    norautp,  0,   ROT0, "<unknown>",                "Draw Poker HI-LO (Alt)",              GAME_NOT_WORKING )
 GAME(  1983, dphljp,   0,       dphl,     norautp,  0,   ROT0, "<unknown>",                "Draw Poker HI-LO (Japanese)",         GAME_NOT_WORKING )
 GAME(  198?, kimbldhl, 0,       kimbldhl, norautp,  0,   ROT0, "Kimble Ireland",           "Kimble Double HI-LO",                 GAME_NOT_WORKING )
 GAME(  1983, gtipoker, 0,       dphl,     norautp,  0,   ROT0, "GTI Inc",                  "GTI Poker",                           GAME_NOT_WORKING )
-GAME(  1983, smshilo,  0,       dphla,    norautp,  0,   ROT0, "SMS Manufacturing Corp.",  "HI-LO Double Up Joker Poker ",        GAME_NOT_WORKING )
+GAME(  1983, smshilo,  0,       dphla,    norautp,  0,   ROT0, "SMS Manufacturing Corp.",  "HI-LO Double Up Joker Poker",         GAME_NOT_WORKING )
 GAME(  1986, drhl,     0,       drhl,     norautp,  0,   ROT0, "Drews Inc.",               "DRHL Poker (v.2.89)",                 GAME_NOT_WORKING )
 
 /* The following one also has a custom 68705 MCU */
 GAME(  1993, tpoker2,  0,       dphltest, norautp,  0,   ROT0, "Micro Manufacturing Inc.", "Turbo Poker 2",                       GAME_NOT_WORKING )
+
+
+/************************************ unknown sets ************************************/
+/* The following ones are still unknown. No info about name, CPU, manufacturer, or HW */
+/**************************************************************************************/
+
+/*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT ROT    COMPANY                     FULLNAME                              FLAGS             LAYOUT */
+
+GAME(  198?, fastdrwp, 0,       dphl,     norautp,  0,   ROT0, "Stern/Seeburg?",           "Fast Draw (poker conversion kit)?",   GAME_NOT_WORKING )
+GAME(  198?, dphlunka, 0,       dphl,     norautp,  0,   ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 1)",   GAME_NOT_WORKING )
+GAME(  198?, dphlunkb, 0,       dphl,     norautp,  0,   ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 2)",   GAME_NOT_WORKING )
