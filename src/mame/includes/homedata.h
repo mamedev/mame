@@ -1,9 +1,42 @@
-/*----------- defined in video/homedata.c -----------*/
 
-extern UINT8 *homedata_vreg;
-extern int homedata_visible_page;
-extern int homedata_priority;
-extern UINT8 reikaids_which;
+typedef struct _homedata_state homedata_state;
+struct _homedata_state
+{
+	/* memory pointers */
+	UINT8 *  vreg;
+	UINT8 *  videoram;
+
+	/* video-related */
+	tilemap *bg_tilemap[2][4];
+	int      visible_page;
+	int      priority;
+	UINT8    reikaids_which;
+	int      flipscreen;
+	UINT8	   gfx_bank[2];	// pteacher only uses the first one
+	UINT8	   blitter_bank;
+	int      blitter_param_count;
+	UINT8	   blitter_param[4];		/* buffers last 4 writes to 0x8006 */
+
+
+	/* misc */
+	int      vblank;
+	int      sndbank;
+	int      keyb;
+	int      snd_command;
+	int      upd7807_porta, upd7807_portc;
+	int      to_cpu, from_cpu;
+
+	/* device */
+	const device_config *maincpu;
+	const device_config *audiocpu;
+	const device_config *dac;
+	const device_config *ym;
+	const device_config *sn;
+};
+
+
+
+/*----------- defined in video/homedata.c -----------*/
 
 WRITE8_HANDLER( mrokumei_videoram_w );
 WRITE8_HANDLER( reikaids_videoram_w );

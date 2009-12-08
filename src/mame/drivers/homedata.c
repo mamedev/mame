@@ -224,21 +224,16 @@ Custom: GX61A01
 #include "sound/2203intf.h"
 #include "sound/sn76496.h"
 
-
-/********************************************************************************/
-
-
-static int vblank;
-
 static INTERRUPT_GEN( homedata_irq )
 {
-	vblank = 1;
-	cpu_set_input_line(device,M6809_FIRQ_LINE,HOLD_LINE);
+	homedata_state *state = (homedata_state *)device->machine->driver_data;
+	state->vblank = 1;
+	cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( upd7807_irq )
 {
-	cpu_set_input_line(device,UPD7810_INTF1,HOLD_LINE);
+	cpu_set_input_line(device, UPD7810_INTF1, HOLD_LINE);
 }
 
 
@@ -250,19 +245,18 @@ static INTERRUPT_GEN( upd7807_irq )
 
  ********************************************************************************/
 
-static int keyb;
-
 static READ8_HANDLER( mrokumei_keyboard_r )
 {
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
 	int res = 0x3f,i;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 
 	/* offset 0 is player 1, offset 1 player 2 (not supported) */
 	if (offset == 0)
 	{
-		for (i = 0;i < 5;i++)
+		for (i = 0; i < 5; i++)
 		{
-			if (keyb & (1 << i))
+			if (state->keyb & (1 << i))
 			{
 				res = input_port_read(space->machine, keynames[i]) & 0x3f;
 				break;
@@ -276,11 +270,12 @@ static READ8_HANDLER( mrokumei_keyboard_r )
          * bit 6: vblank
          * other bits are inputs
          */
-		res |= homedata_visible_page << 7;
+		res |= state->visible_page << 7;
 
-		if (vblank) res |= 0x40;
+		if (state->vblank) 
+			res |= 0x40;
 
-		vblank = 0;
+		state->vblank = 0;
 	}
 
 	return res;
@@ -288,46 +283,48 @@ static READ8_HANDLER( mrokumei_keyboard_r )
 
 static WRITE8_HANDLER( mrokumei_keyboard_select_w )
 {
-	keyb = data;
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+	state->keyb = data;
 }
 
 
-
-static int sndbank;
-
 static READ8_HANDLER( mrokumei_sound_io_r )
 {
-	if (sndbank & 4)
-		return(soundlatch_r(space,0));
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+	if (state->sndbank & 4)
+		return(soundlatch_r(space, 0));
 	else
-		return memory_region(space->machine, "audiocpu")[0x10000 + offset + (sndbank & 1) * 0x10000];
+		return memory_region(space->machine, "audiocpu")[0x10000 + offset + (state->sndbank & 1) * 0x10000];
 }
 
 static WRITE8_HANDLER( mrokumei_sound_bank_w )
 {
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
 	/* bit 0 = ROM bank
        bit 2 = ROM or soundlatch
      */
-	sndbank = data;
+	state->sndbank = data;
 }
 
 static WRITE8_HANDLER( mrokumei_sound_io_w )
 {
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
 	switch (offset & 0xff)
 	{
 		case 0x40:
-			dac_signed_data_w(devtag_get_device(space->machine, "dac"),data);
+			dac_signed_data_w(state->dac, data);
 			break;
 		default:
-			logerror("%04x: I/O write to port %04x\n",cpu_get_pc(space->cpu),offset);
+			logerror("%04x: I/O write to port %04x\n", cpu_get_pc(space->cpu), offset);
 			break;
 	}
 }
 
 static WRITE8_HANDLER( mrokumei_sound_cmd_w )
 {
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 
@@ -339,20 +336,22 @@ static WRITE8_HANDLER( mrokumei_sound_cmd_w )
 
  ********************************************************************************/
 
-static int upd7807_porta,upd7807_portc;
-
 static READ8_HANDLER( reikaids_upd7807_porta_r )
 {
-	return upd7807_porta;
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+	return state->upd7807_porta;
 }
 
 static WRITE8_HANDLER( reikaids_upd7807_porta_w )
 {
-	upd7807_porta = data;
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+	state->upd7807_porta = data;
 }
 
 static WRITE8_HANDLER( reikaids_upd7807_portc_w )
 {
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+
 	/* port C layout:
        7 coin counter
        6 to main CPU (data)
@@ -363,66 +362,53 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
        1 \ ROM bank
        0 /
       */
-//  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n",cpu_get_pc(space->cpu),data,BIT(data,2),BIT(data,6));
+//  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n", cpu_get_pc(space->cpu), data, BIT(data, 2), BIT(data, 6));
 
 
-	memory_set_bankptr(space->machine, "bank2",memory_region(space->machine, "audiocpu") + 0x10000 * (data & 0x03));
+	memory_set_bankptr(space->machine, "bank2", memory_region(space->machine, "audiocpu") + 0x10000 * (data & 0x03));
 
-	coin_counter_w(space->machine, 0,~data & 0x80);
+	coin_counter_w(space->machine, 0, ~data & 0x80);
 
-	if (BIT(upd7807_portc,5) && !BIT(data,5))	/* write clock 1->0 */
-	{
-		const device_config *device = devtag_get_device(space->machine, "ymsnd");
-		ym2203_w(device, BIT(data,3), upd7807_porta);
-	}
+	if (BIT(state->upd7807_portc, 5) && !BIT(data, 5))	/* write clock 1->0 */
+		ym2203_w(state->ym, BIT(data, 3), state->upd7807_porta);
 
-	if (BIT(upd7807_portc,4) && !BIT(data,4))	/* read clock 1->0 */
-	{
-		const device_config *device = devtag_get_device(space->machine, "ymsnd");
-		upd7807_porta = ym2203_r(device, BIT(data,3));
-	}
+	if (BIT(state->upd7807_portc, 4) && !BIT(data, 4))	/* read clock 1->0 */
+		state->upd7807_porta = ym2203_r(state->ym, BIT(data, 3));
 
-	upd7807_portc = data;
-}
-
-static MACHINE_RESET( reikaids_upd7807 )
-{
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	/* on reset, ports are set as input (high impedance), therefore 0xff output */
-	reikaids_which=homedata_priority;
-	reikaids_upd7807_portc_w(space,0,0xff);
+	state->upd7807_portc = data;
 }
 
 static READ8_HANDLER( reikaids_io_r )
 {
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
 	int res = input_port_read(space->machine, "IN2");	// bit 4 = coin, bit 5 = service
 
-	res |= BIT(upd7807_portc,2) * 0x01;		// bit 0 = upd7807 status
-	res |= BIT(upd7807_portc,6) * 0x02;		// bit 1 = upd7807 data
-	if (vblank) res |= 0x04;				// bit 2 = vblank
-	res |= homedata_visible_page * 0x08;	// bit 3 = visible page
+	res |= BIT(state->upd7807_portc, 2) * 0x01;		// bit 0 = upd7807 status
+	res |= BIT(state->upd7807_portc, 6) * 0x02;		// bit 1 = upd7807 data
+	if (state->vblank) 
+		res |= 0x04;				// bit 2 = vblank
+	res |= state->visible_page * 0x08;	// bit 3 = visible page
 
-	vblank = 0;
+	state->vblank = 0;
 
-//logerror("%04x: io_r %02x\n",cpu_get_pc(space->cpu),res);
+	//logerror("%04x: io_r %02x\n", cpu_get_pc(space->cpu), res);
 
 	return res;
 }
 
-static int snd_command;
-
 static READ8_HANDLER( reikaids_snd_command_r )
 {
-//logerror("%04x: sndmcd_r (%02x)\n",cpu_get_pc(space->cpu),snd_command);
-	return snd_command;
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+	//logerror("%04x: sndmcd_r (%02x)\n", cpu_get_pc(space->cpu), state->snd_command);
+	return state->snd_command;
 }
 
 static WRITE8_HANDLER( reikaids_snd_command_w )
 {
-	snd_command = data;
-//logerror("%04x: coprocessor_command_w %02x\n",cpu_get_pc(space->cpu),data);
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+	state->snd_command = data;
+	//logerror("%04x: coprocessor_command_w %02x\n", cpu_get_pc(space->cpu), data);
 }
-
 
 
 /********************************************************************************
@@ -433,54 +419,57 @@ static WRITE8_HANDLER( reikaids_snd_command_w )
 
  ********************************************************************************/
 
-static int to_cpu,from_cpu;
-
 static WRITE8_HANDLER( pteacher_snd_command_w )
 {
-//logerror("%04x: snd_command_w %02x\n",cpu_get_pc(space->cpu),data);
-	from_cpu = data;
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+	//logerror("%04x: snd_command_w %02x\n", cpu_get_pc(space->cpu), data);
+	state->from_cpu = data;
 }
 
 static READ8_HANDLER( pteacher_snd_r )
 {
-//logerror("%04x: pteacher_snd_r %02x\n",cpu_get_pc(space->cpu),to_cpu);
-	return to_cpu;
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+	//logerror("%04x: pteacher_snd_r %02x\n",cpu_get_pc(space->cpu),to_cpu);
+	return state->to_cpu;
 }
 
 static READ8_HANDLER( pteacher_io_r )
 {
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
 	/* bit 6: !vblank
      * bit 7: visible page
      * other bits seem unused
      */
 
-	int res = (homedata_visible_page ^ 1) << 7;
+	int res = (state->visible_page ^ 1) << 7;
 
-	if (!vblank) res |= 0x40;
+	if (!state->vblank) 
+		res |= 0x40;
 
-	vblank = 0;
+	state->vblank = 0;
 
 	return res;
 }
 
 static READ8_HANDLER( pteacher_keyboard_r )
 {
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 	int dips = input_port_read(space->machine, "DSW");
 
-//  logerror("%04x: keyboard_r with port A = %02x\n",cpu_get_pc(space->cpu),upd7807_porta);
+	//  logerror("%04x: keyboard_r with port A = %02x\n",cpu_get_pc(space->cpu),upd7807_porta);
 
-	if (upd7807_porta & 0x80)
+	if (state->upd7807_porta & 0x80)
 	{
 		/* player 1 + dip switches */
-		int row = (upd7807_porta & 0x07);
+		int row = (state->upd7807_porta & 0x07);
 		return input_port_read(space->machine, keynames[row]) | (((dips >> row) & 1) << 5);	// 0-5
 	}
-	if (upd7807_porta & 0x08)
+	if (state->upd7807_porta & 0x08)
 	{
 		/* player 2 (not supported) + dip switches */
-		int row = ((upd7807_porta >> 4) & 0x07);
-		return 0xdf | (((dips >> (row+5)) & 1) << 5);	// 6-11
+		int row = ((state->upd7807_porta >> 4) & 0x07);
+		return 0xdf | (((dips >> (row + 5)) & 1) << 5);	// 6-11
 	}
 
 	return 0xff;
@@ -488,27 +477,31 @@ static READ8_HANDLER( pteacher_keyboard_r )
 
 static READ8_HANDLER( pteacher_upd7807_porta_r )
 {
-	if (!BIT(upd7807_portc,6))
-		upd7807_porta = from_cpu;
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+	if (!BIT(state->upd7807_portc, 6))
+		state->upd7807_porta = state->from_cpu;
 	else
-logerror("%04x: read PA with PC *not* clear\n",cpu_get_pc(space->cpu));
+		logerror("%04x: read PA with PC *not* clear\n", cpu_get_pc(space->cpu));
 
-	return upd7807_porta;
+	return state->upd7807_porta;
 }
 
 static WRITE8_HANDLER( pteacher_snd_answer_w )
 {
-	to_cpu = data;
-//logerror("%04x: to_cpu = %02x\n",cpu_get_pc(space->cpu),to_cpu);
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+	state->to_cpu = data;
+	//logerror("%04x: to_cpu = %02x\n", cpu_get_pc(space->cpu), state->to_cpu);
 }
 
 static WRITE8_HANDLER( pteacher_upd7807_porta_w )
 {
-	upd7807_porta = data;
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+	state->upd7807_porta = data;
 }
 
 static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 {
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
 	/* port C layout:
        7 coin counter
        6 enable message from main CPU on port A
@@ -520,25 +513,17 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
        0 input (coin)
       */
 
-//  logerror("%04x: port C wr %02x\n",cpu_get_pc(space->cpu),data);
+	//  logerror("%04x: port C wr %02x\n", cpu_get_pc(space->cpu), data);
 
-	memory_set_bankptr(space->machine, "bank2",memory_region(space->machine, "audiocpu") + 0x10000 * ((data & 0x0c) >> 2));
+	memory_set_bankptr(space->machine, "bank2", memory_region(space->machine, "audiocpu") + 0x10000 * ((data & 0x0c) >> 2));
 
-	coin_counter_w(space->machine, 0,~data & 0x80);
+	coin_counter_w(space->machine, 0, ~data & 0x80);
 
-	if (BIT(upd7807_portc,5) && !BIT(data,5))	/* clock 1->0 */
-		sn76496_w(devtag_get_device(space->machine, "snsnd"),0,upd7807_porta);
+	if (BIT(state->upd7807_portc, 5) && !BIT(data, 5))	/* clock 1->0 */
+		sn76496_w(state->sn, 0, state->upd7807_porta);
 
-	upd7807_portc = data;
+	state->upd7807_portc = data;
 }
-
-static MACHINE_RESET( pteacher_upd7807 )
-{
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	/* on reset, ports are set as input (high impedance), therefore 0xff output */
-	pteacher_upd7807_portc_w(space,0,0xff);
-}
-
 
 /********************************************************************************/
 
@@ -546,8 +531,8 @@ static MACHINE_RESET( pteacher_upd7807 )
 static WRITE8_HANDLER( bankswitch_w )
 {
 	UINT8 *rom = memory_region(space->machine, "maincpu");
-	int len = memory_region_length(space->machine, "maincpu") - 0x10000+0x4000;
-	int offs = (data * 0x4000) & (len-1);
+	int len = memory_region_length(space->machine, "maincpu") - 0x10000 + 0x4000;
+	int offs = (data * 0x4000) & (len - 1);
 
 	/* last bank is fixed */
 	if (offs < len - 0x4000)
@@ -565,7 +550,7 @@ static WRITE8_HANDLER( bankswitch_w )
 
 
 static ADDRESS_MAP_START( mrokumei_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_BASE_MEMBER(homedata_state, videoram)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
 	AM_RANGE(0x7000, 0x77ff) AM_RAM /* hourouki expects this to act as RAM */
@@ -574,7 +559,7 @@ static ADDRESS_MAP_START( mrokumei_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7803, 0x7803) AM_READ_PORT("IN0")			// coin, service
 	AM_RANGE(0x7804, 0x7804) AM_READ_PORT("DSW1")			// DSW1
 	AM_RANGE(0x7805, 0x7805) AM_READ_PORT("DSW2")			// DSW2
-	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_BASE(&homedata_vreg)
+	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_BASE_MEMBER(homedata_state, vreg)
 	AM_RANGE(0x7ffe, 0x7ffe) AM_READNOP	// ??? read every vblank, value discarded
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(mrokumei_blitter_start_w)	// in some games also ROM bank switch to access service ROM
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(mrokumei_keyboard_select_w)
@@ -599,14 +584,14 @@ ADDRESS_MAP_END
 /********************************************************************************/
 
 static ADDRESS_MAP_START( reikaids_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(reikaids_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(reikaids_videoram_w) AM_BASE_MEMBER(homedata_state, videoram)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM	/* work RAM */
 	AM_RANGE(0x7800, 0x7800) AM_RAM	/* behaves as normal RAM */
 	AM_RANGE(0x7801, 0x7801) AM_READ_PORT("IN0")
 	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("IN1")
 	AM_RANGE(0x7803, 0x7803) AM_READ(reikaids_io_r)	// coin, blitter, upd7807
-	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_BASE(&homedata_vreg)
+	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_BASE_MEMBER(homedata_state, vreg)
 	AM_RANGE(0x7ffe, 0x7ffe) AM_WRITE(reikaids_blitter_bank_w)
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(reikaids_blitter_start_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(bankswitch_w)
@@ -633,14 +618,14 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( pteacher_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(pteacher_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(pteacher_videoram_w) AM_BASE_MEMBER(homedata_state, videoram)
 	AM_RANGE(0x4000, 0x5eff) AM_RAM
 	AM_RANGE(0x5f00, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
 	AM_RANGE(0x7800, 0x7800) AM_RAM /* behaves as normal RAM */
 	AM_RANGE(0x7801, 0x7801) AM_READ(pteacher_io_r)	// vblank, visible page
 	AM_RANGE(0x7ff2, 0x7ff2) AM_READ(pteacher_snd_r)
-	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_BASE(&homedata_vreg)
+	AM_RANGE(0x7ff0, 0x7ffd) AM_WRITEONLY AM_BASE_MEMBER(homedata_state, vreg)
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(pteacher_blitter_start_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(pteacher_snd_command_w)
@@ -773,7 +758,7 @@ static INPUT_PORTS_START( mjhokite )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( reikaids )
-	PORT_START("IN0")	// IN0  - 0x7801
+	PORT_START("IN0")	// 0x7801
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
@@ -783,7 +768,7 @@ static INPUT_PORTS_START( reikaids )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) /* jump */
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START("IN1")	// IN1 - 0x7802
+	PORT_START("IN1")	// 0x7802
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
@@ -793,7 +778,7 @@ static INPUT_PORTS_START( reikaids )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* jump */
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN2")	// IN2 - 0x7803
+	PORT_START("IN2")	// 0x7803
 	PORT_BIT(  0x01, IP_ACTIVE_HIGH,IPT_SPECIAL ) /* coprocessor status */
 	PORT_BIT(  0x02, IP_ACTIVE_HIGH,IPT_SPECIAL ) /* coprocessor data */
 	PORT_BIT(  0x04, IP_ACTIVE_HIGH,IPT_SPECIAL ) /* vblank */
@@ -803,7 +788,7 @@ static INPUT_PORTS_START( reikaids )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW,	IPT_UNKNOWN  )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW,	IPT_UNKNOWN  )
 
-	PORT_START("DSW1")	// DSW1
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -827,7 +812,7 @@ static INPUT_PORTS_START( reikaids )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")	// DSW2
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
@@ -1167,7 +1152,109 @@ GFXDECODE_END
 
 
 
+static MACHINE_START( homedata )
+{
+	homedata_state *state = (homedata_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->ym = devtag_get_device(machine, "ymsnd");
+	state->sn = devtag_get_device(machine, "snsnd");
+	state->dac = devtag_get_device(machine, "dac");
+
+	state_save_register_global(machine, state->visible_page);
+	state_save_register_global(machine, state->flipscreen);
+	state_save_register_global(machine, state->blitter_bank);
+	state_save_register_global(machine, state->blitter_param_count);
+	state_save_register_global_array(machine, state->blitter_param);
+	state_save_register_global(machine, state->vblank);
+	state_save_register_global(machine, state->sndbank);
+	state_save_register_global(machine, state->keyb);
+	state_save_register_global(machine, state->snd_command);
+}
+
+static MACHINE_START( reikaids )
+{
+	homedata_state *state = (homedata_state *)machine->driver_data;
+
+	MACHINE_START_CALL(homedata);
+
+	state_save_register_global(machine, state->upd7807_porta);
+	state_save_register_global(machine, state->upd7807_portc);
+
+	state_save_register_global(machine, state->reikaids_which);
+	state_save_register_global_array(machine, state->gfx_bank);
+}
+
+static MACHINE_START( pteacher )
+{
+	homedata_state *state = (homedata_state *)machine->driver_data;
+
+	MACHINE_START_CALL(homedata);
+
+	state_save_register_global(machine, state->upd7807_porta);
+	state_save_register_global(machine, state->upd7807_portc);
+
+	state_save_register_global_array(machine, state->gfx_bank);
+	state_save_register_global(machine, state->to_cpu);
+	state_save_register_global(machine, state->from_cpu);
+}
+
+static MACHINE_RESET( homedata )
+{
+	homedata_state *state = (homedata_state *)machine->driver_data;
+
+	state->visible_page = 0;
+	state->flipscreen = 0;
+	state->blitter_bank = 0;
+	state->blitter_param_count = 0;
+	state->blitter_param[0] = 0;
+	state->blitter_param[1] = 0;
+	state->blitter_param[2] = 0;
+	state->blitter_param[3] = 0;
+	state->vblank = 0;
+	state->sndbank = 0;
+	state->keyb = 0;
+	state->snd_command = 0;
+}
+
+static MACHINE_RESET( pteacher )
+{
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	/* on reset, ports are set as input (high impedance), therefore 0xff output */
+	pteacher_upd7807_portc_w(space, 0, 0xff);
+
+	MACHINE_RESET_CALL(homedata);
+
+	state->upd7807_porta = 0;
+	state->gfx_bank[0] = 0;
+	state->gfx_bank[1] = 0;
+	state->to_cpu = 0;
+	state->from_cpu = 0;
+}
+
+static MACHINE_RESET( reikaids )
+{
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	/* on reset, ports are set as input (high impedance), therefore 0xff output */
+	reikaids_upd7807_portc_w(space, 0, 0xff);
+
+	MACHINE_RESET_CALL(homedata);
+
+	state->reikaids_which = state->priority;	// state->priority is set in DRIVER_INIT
+	state->upd7807_porta = 0;
+	state->gfx_bank[0] = 0;
+	state->gfx_bank[1] = 0;	// this is not used by reikaids
+}
+
 static MACHINE_DRIVER_START( mrokumei )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(homedata_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
@@ -1177,6 +1264,9 @@ static MACHINE_DRIVER_START( mrokumei )
 	MDRV_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mrokumei_sound_map)
 	MDRV_CPU_IO_MAP(mrokumei_sound_io_map)
+
+	MDRV_MACHINE_START(homedata)
+	MDRV_MACHINE_RESET(homedata)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1232,6 +1322,9 @@ static const UPD7810_CONFIG upd_config =
 
 static MACHINE_DRIVER_START( reikaids )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(homedata_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(reikaids_map)
@@ -1245,7 +1338,8 @@ static MACHINE_DRIVER_START( reikaids )
 
 	MDRV_QUANTUM_TIME(HZ(30000))	// very high interleave required to sync for startup tests
 
-	MDRV_MACHINE_RESET(reikaids_upd7807)
+	MDRV_MACHINE_START(reikaids)
+	MDRV_MACHINE_RESET(reikaids)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1282,6 +1376,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pteacher )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(homedata_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(pteacher_map)
@@ -1295,7 +1392,8 @@ static MACHINE_DRIVER_START( pteacher )
 
 	MDRV_QUANTUM_TIME(HZ(6000))	// should be enough
 
-	MDRV_MACHINE_RESET(pteacher_upd7807)
+	MDRV_MACHINE_START(pteacher)
+	MDRV_MACHINE_RESET(pteacher)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1785,29 +1883,31 @@ static DRIVER_INIT( mjikaga )
 
 static DRIVER_INIT( reikaids )
 {
-	homedata_priority=0;
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	state->priority = 0;
 }
 
 static DRIVER_INIT( battlcry )
 {
-	homedata_priority=1; /* priority and initial value for bank write */
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	state->priority = 1; /* priority and initial value for bank write */
 }
 
-GAME( 1987, hourouki, 0, mrokumei, mjhokite, 0,          ROT0, "Home Data", "Mahjong Hourouki Part 1 - Seisyun Hen (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, mhgaiden, 0, mrokumei, mjhokite, 0,          ROT0, "Home Data", "Mahjong Hourouki Gaiden (Japan)", 0 )
-GAME( 1988, mjhokite, 0, mrokumei, mjhokite, 0,          ROT0, "Home Data", "Mahjong Hourouki Okite (Japan)", 0 )
-GAME( 1988, mjclinic, 0, mrokumei, mjhokite, 0,          ROT0, "Home Data", "Mahjong Clinic (Japan)", 0 )
-GAME( 1988, mrokumei, 0, mrokumei, mjhokite, 0,          ROT0, "Home Data", "Mahjong Rokumeikan (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1987, hourouki, 0, mrokumei, mjhokite, 0,          ROT0, "Home Data", "Mahjong Hourouki Part 1 - Seisyun Hen (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1987, mhgaiden, 0, mrokumei, mjhokite, 0,          ROT0, "Home Data", "Mahjong Hourouki Gaiden (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, mjhokite, 0, mrokumei, mjhokite, 0,          ROT0, "Home Data", "Mahjong Hourouki Okite (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, mjclinic, 0, mrokumei, mjhokite, 0,          ROT0, "Home Data", "Mahjong Clinic (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, mrokumei, 0, mrokumei, mjhokite, 0,          ROT0, "Home Data", "Mahjong Rokumeikan (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
-GAME( 1988, reikaids, 0, reikaids, reikaids, reikaids,   ROT0, "Home Data", "Reikai Doushi (Japan)", 0 )
-GAME( 1991, battlcry, 0, reikaids, battlcry, battlcry,   ROT0, "Home Data", "Battlecry", GAME_IMPERFECT_GRAPHICS  )
-GAME( 1989, mjkojink, 0, pteacher, pteacher, 0,          ROT0, "Home Data", "Mahjong Kojinkyouju (Private Teacher) (Japan)", 0 )
-GAME( 1989, vitaminc, 0, pteacher, pteacher, 0,          ROT0, "Home Data", "Mahjong Vitamin C (Japan)", 0 )
-GAME( 1989, mjyougo,  0, pteacher, pteacher, 0,          ROT0, "Home Data", "Mahjong-yougo no Kisotairyoku (Japan)", 0 )
-GAME( 1991, mjkinjas, 0, mjkinjas, pteacher, 0,          ROT0, "Home Data", "Mahjong Kinjirareta Asobi (Japan)", 0 )
-GAME( 1992?,jogakuen, 0, pteacher, jogakuen, jogakuen,   ROT0, "Windom",    "Mahjong Jogakuen (Japan)", 0 )
+GAME( 1988, reikaids, 0, reikaids, reikaids, reikaids,   ROT0, "Home Data", "Reikai Doushi (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, battlcry, 0, reikaids, battlcry, battlcry,   ROT0, "Home Data", "Battlecry", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1989, mjkojink, 0, pteacher, pteacher, 0,          ROT0, "Home Data", "Mahjong Kojinkyouju (Private Teacher) (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, vitaminc, 0, pteacher, pteacher, 0,          ROT0, "Home Data", "Mahjong Vitamin C (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mjyougo,  0, pteacher, pteacher, 0,          ROT0, "Home Data", "Mahjong-yougo no Kisotairyoku (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, mjkinjas, 0, mjkinjas, pteacher, 0,          ROT0, "Home Data", "Mahjong Kinjirareta Asobi (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992?,jogakuen, 0, pteacher, jogakuen, jogakuen,   ROT0, "Windom",    "Mahjong Jogakuen (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, lemnangl, 0, lemnangl, pteacher, 0,          ROT0, "Home Data", "Mahjong Lemon Angel (Japan)", 0 )
-GAME( 1991, mjprivat, 0, lemnangl, pteacher, 0,          ROT0, "Matoba",    "Mahjong Private (Japan)", 0 )
+GAME( 1990, lemnangl, 0, lemnangl, pteacher, 0,          ROT0, "Home Data", "Mahjong Lemon Angel (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, mjprivat, 0, lemnangl, pteacher, 0,          ROT0, "Matoba",    "Mahjong Private (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991?,mjikaga,  0, lemnangl, mjikaga,  mjikaga,    ROT0, "Mitchell",  "Mahjong Ikaga Desu ka (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1991?,mjikaga,  0, lemnangl, mjikaga,  mjikaga,    ROT0, "Mitchell",  "Mahjong Ikaga Desu ka (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

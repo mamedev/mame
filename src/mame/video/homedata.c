@@ -2,22 +2,6 @@
 #include "cpu/m6809/m6809.h"
 #include "homedata.h"
 
-
-UINT8 *homedata_vreg;	/* pointer to RAM associated with 0x7ffx */
-UINT8 reikaids_which;
-int homedata_visible_page;
-int homedata_priority;
-static int homedata_flipscreen;
-
-static UINT8	reikaids_gfx_bank[2];
-static UINT8	pteacher_gfx_bank;
-static UINT8	blitter_bank;
-static int		blitter_param_count;
-static UINT8	blitter_param[4];		/* buffers last 4 writes to 0x8006 */
-
-static tilemap *bg_tilemap[2][4];
-
-
 /*
     video control registers:
     0 xxxxxxxx  unknown
@@ -50,39 +34,38 @@ static tilemap *bg_tilemap[2][4];
 
 static void mrokumei_handleblit( const address_space *space, int rom_base )
 {
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
 	int i;
-	int DestParam;
-	int SourceAddr;
-	int DestAddr;
-	int BaseAddr;
-	int opcode,data,NumTiles;
+	int dest_param;
+	int source_addr;
+	int dest_addr;
+	int base_addr;
+	int opcode, data, num_tiles;
 	UINT8 *pBlitData = memory_region(space->machine, "user1") + rom_base;
 
-	DestParam =
-		blitter_param[(blitter_param_count-4)&3]*256+
-		blitter_param[(blitter_param_count-3)&3];
+	dest_param = state->blitter_param[(state->blitter_param_count - 4) & 3] * 256 +
+		state->blitter_param[(state->blitter_param_count - 3) & 3];
 
-	SourceAddr =
-		blitter_param[(blitter_param_count-2)&3]*256+
-		blitter_param[(blitter_param_count-1)&3];
+	source_addr = state->blitter_param[(state->blitter_param_count - 2) & 3] * 256 +
+		state->blitter_param[(state->blitter_param_count - 1) & 3];
 
 	/*  xxx-.----.----.---- not used?
      *  ---x.----.----.---- layer
      *  ----.xxxx.xxxx.xxxx addr
      */
-	BaseAddr= (DestParam&0x1000);
-	DestAddr= (DestParam&0x0fff);
+	base_addr= (dest_param & 0x1000);
+	dest_addr= (dest_param & 0x0fff);
 
-//  logerror( "[blit bank %02x src %04x dst %04x]\n",blitter_bank,SourceAddr,DestParam);
+//  logerror( "[blit bank %02x src %04x dst %04x]\n", blitter_bank, source_addr, dest_param);
 
-	if( homedata_visible_page == 0 )
+	if( state->visible_page == 0 )
 	{
-		BaseAddr += 0x2000;
+		base_addr += 0x2000;
 	}
 
 	for(;;)
 	{
-		opcode = pBlitData[SourceAddr++];
+		opcode = pBlitData[source_addr++];
 		/* 00xxxxxx RLE incrementing
          * 01xxxxxx Raw Run
          * 1xxxxxxx RLE constant data
@@ -92,21 +75,21 @@ static void mrokumei_handleblit( const address_space *space, int rom_base )
  			/* end-of-graphic */
  			goto finish;
 		}
-		data  = pBlitData[SourceAddr++];
+		data  = pBlitData[source_addr++];
 
-		if (opcode&0x80)
-			NumTiles = 0x80-(opcode&0x7f);
+		if (opcode & 0x80)
+			num_tiles = 0x80 - (opcode & 0x7f);
 		else
-			NumTiles = 0x40-(opcode&0x3f);
+			num_tiles = 0x40 - (opcode & 0x3f);
 
-		for( i=0; i<NumTiles; i++ )
+		for (i = 0; i < num_tiles; i++)
 		{
-			if( i!=0 )
+			if (i != 0)
 			{
-				switch( opcode&0xc0 )
+				switch (opcode & 0xc0)
 				{
 				case 0x40: // Raw Run
-					data  = pBlitData[SourceAddr++];
+					data  = pBlitData[source_addr++];
 					break;
 
 				case 0x00: // RLE incrementing
@@ -116,87 +99,85 @@ static void mrokumei_handleblit( const address_space *space, int rom_base )
 			} /* i!=0 */
 
 			if (data)	/* 00 is a nop */
-				mrokumei_videoram_w( space, BaseAddr + DestAddr, data );
+				mrokumei_videoram_w(space, base_addr + dest_addr, data);
 
-			if (homedata_vreg[1] & 0x80)	/* flip screen */
+			if (state->vreg[1] & 0x80)	/* flip screen */
 			{
-				DestAddr-=2;
-				if (DestAddr < 0) goto finish;
+				dest_addr -= 2;
+				if (dest_addr < 0) 
+					goto finish;
 			}
 			else
 			{
-				DestAddr+=2;
-				if (DestAddr >= 0x1000) goto finish;
+				dest_addr+=2;
+				if (dest_addr >= 0x1000) goto finish;
 			}
-		} /* for( i=0; i<NumTiles; i++ ) */
+		} /* for( i=0; i<num_tiles; i++ ) */
 	} /* for(;;) */
 
 finish:
-	cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static void reikaids_handleblit( const address_space *space, int rom_base )
 {
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
 	int i;
-	UINT16 DestParam;
+	UINT16 dest_param;
 	int flipx;
-	int SourceAddr, BaseAddr;
-	int DestAddr;
+	int source_addr, base_addr;
+	int dest_addr;
 	UINT8 *pBlitData = memory_region(space->machine, "user1") + rom_base;
 
-	int opcode,data,NumTiles;
+	int opcode, data, num_tiles;
 
-	DestParam =
-		blitter_param[(blitter_param_count-4)&3]*256+
-		blitter_param[(blitter_param_count-3)&3];
+	dest_param = state->blitter_param[(state->blitter_param_count - 4) & 3] * 256 +
+		state->blitter_param[(state->blitter_param_count - 3) & 3];
 
-	SourceAddr =
-		blitter_param[(blitter_param_count-2)&3]*256+
-		blitter_param[(blitter_param_count-1)&3];
+	source_addr = state->blitter_param[(state->blitter_param_count - 2) & 3] * 256 +
+		state->blitter_param[(state->blitter_param_count - 1) & 3];
 
 	/*  x---.----.----.---- flipx
      *  -x--.----.----.---- select: attr/tile
      *  --*x.xxxx.*xxx.xxxx addr
      */
-	BaseAddr= (DestParam&0x4000);
-	DestAddr= (DestParam&0x3fff);
-	flipx	= (DestParam&0x8000);
+	base_addr = (dest_param & 0x4000);
+	dest_addr = (dest_param & 0x3fff);
+	flipx	= (dest_param & 0x8000);
 
-//  logerror( "[blit %02x %04x %04x]\n",blitter_bank,SourceAddr,DestParam);
+//  logerror( "[blit %02x %04x %04x]\n",blitter_bank,source_addr,dest_param);
 
-	if( homedata_visible_page == 0 )
-	{
-		BaseAddr += 0x2000<<2;
-	}
+	if (state->visible_page == 0)
+		base_addr += 0x2000 << 2;
 
 	for(;;)
 	{
-		opcode = pBlitData[SourceAddr++];
+		opcode = pBlitData[source_addr++];
 		/* 00xxxxxx Raw Run
          * 01xxxxxx RLE incrementing
          * 1xxxxxxx RLE constant data
          */
-		if( opcode == 0x00 )
+		if (opcode == 0x00)
 		{
 			/* end-of-graphic */
 			goto finish;
 		}
 
-		data  = pBlitData[SourceAddr++];
+		data  = pBlitData[source_addr++];
 
-		if( (opcode&0xc0)==0x80 )
-			NumTiles = 0x80 - (opcode&0x7f);
+		if ((opcode & 0xc0) == 0x80)
+			num_tiles = 0x80 - (opcode & 0x7f);
 		else
-			NumTiles = 0x40 - (opcode&0x3f);
+			num_tiles = 0x40 - (opcode & 0x3f);
 
-		for( i=0; i<NumTiles; i++ )
+		for (i = 0; i < num_tiles; i++)
 		{
-			if( i!=0 )
+			if (i != 0)
 			{
-				switch( opcode&0xc0 )
+				switch (opcode & 0xc0)
 				{
 				case 0x00: // Raw Run
-					data  = pBlitData[SourceAddr++];
+					data  = pBlitData[source_addr++];
 					break;
 
 				case 0x40: // RLE incrementing
@@ -207,92 +188,92 @@ static void reikaids_handleblit( const address_space *space, int rom_base )
 
 			if (data)	/* 00 is a nop */
 			{
-				int addr = BaseAddr + (DestAddr & 0x3fff);
+				int addr = base_addr + (dest_addr & 0x3fff);
 				int dat = data;
 
 				if ((addr & 0x2080) == 0)
 				{
 					addr = ((addr & 0xc000) >> 2) | ((addr & 0x1f00) >> 1) | (addr & 0x7f);
 
-					if( flipx )
+					if (flipx)
 					{
-						if ((BaseAddr & 0x4000) == 0) dat |= 0x80;
+						if ((base_addr & 0x4000) == 0) 
+							dat |= 0x80;
 						addr ^= 0x007c;
 					}
 
-					reikaids_videoram_w( space, addr, dat );
+					reikaids_videoram_w(space, addr, dat);
 				}
 			}
 
-			if (homedata_vreg[1] & 0x80)	/* flip screen */
-				DestAddr-=4;
+			if (state->vreg[1] & 0x80)	/* flip screen */
+				dest_addr-=4;
 			else
-				DestAddr+=4;
-		} /* for( i=0; i<NumTiles; i++ ) */
+				dest_addr+=4;
+		} /* for( i=0; i<num_tiles; i++ ) */
 	}
 
 finish:
-	cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static void pteacher_handleblit( const address_space *space, int rom_base )
 {
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
 	int i;
-	int DestParam;
-	int SourceAddr;
-	int DestAddr, BaseAddr;
-	int opcode,data,NumTiles;
+	int dest_param;
+	int source_addr;
+	int dest_addr, base_addr;
+	int opcode, data, num_tiles;
 	UINT8 *pBlitData = memory_region(space->machine, "user1") + rom_base;
 
-	DestParam =
-		blitter_param[(blitter_param_count-4)&3]*256+
-		blitter_param[(blitter_param_count-3)&3];
+	dest_param = state->blitter_param[(state->blitter_param_count - 4) & 3] * 256 +
+		state->blitter_param[(state->blitter_param_count - 3) & 3];
 
-	SourceAddr =
-		blitter_param[(blitter_param_count-2)&3]*256+
-		blitter_param[(blitter_param_count-1)&3];
+	source_addr = state->blitter_param[(state->blitter_param_count - 2) & 3] * 256 +
+		state->blitter_param[(state->blitter_param_count - 1) & 3];
 
 	/*  x---.----.----.---- not used?
      *  -x--.----.----.---- layer   (0..1)
      *  --*x.xxxx.*xxx.xxxx addr
      */
-	BaseAddr= (DestParam&0x4000);
-	DestAddr= (DestParam&0x3fff);
+	base_addr = (dest_param & 0x4000);
+	dest_addr = (dest_param & 0x3fff);
 
-//  logerror( "[blit %02x %04x %04x]->%d\n",blitter_bank,SourceAddr,DestParam,homedata_visible_page);
+//  logerror( "[blit %02x %04x %04x]->%d\n",blitter_bank,source_addr,dest_param,homedata_visible_page);
 
-	if( homedata_visible_page == 0 )
+	if (state->visible_page == 0)
 	{
-		BaseAddr += 0x2000<<2;
+		base_addr += 0x2000 << 2;
 	}
 
 	for(;;)
 	{
-		opcode = pBlitData[SourceAddr++];
+		opcode = pBlitData[source_addr++];
 		/* 00xxxxxx Raw Run
          * 01xxxxxx RLE incrementing
          * 1xxxxxxx RLE constant data
          */
-		if( opcode == 0x00 )
+		if (opcode == 0x00)
 		{
  			/* end-of-graphic */
  			goto finish;
 		}
-		data  = pBlitData[SourceAddr++];
+		data  = pBlitData[source_addr++];
 
 		if (opcode & 0x80)
-			NumTiles = 0x80-(opcode&0x7f);
+			num_tiles = 0x80 - (opcode & 0x7f);
 		else
-			NumTiles = 0x40-(opcode&0x3f);
+			num_tiles = 0x40 - (opcode & 0x3f);
 
-		for( i=0; i<NumTiles; i++ )
+		for (i = 0; i < num_tiles; i++)
 		{
-			if( i!=0 )
+			if (i != 0)
 			{
-				switch( opcode&0xc0 )
+				switch (opcode & 0xc0)
 				{
 				case 0x00: // Raw Run
-					data  = pBlitData[SourceAddr++];
+					data  = pBlitData[source_addr++];
 					break;
 
 				case 0x40: // RLE incrementing
@@ -303,24 +284,24 @@ static void pteacher_handleblit( const address_space *space, int rom_base )
 
 			if (data)	/* 00 is a nop */
 			{
-				int addr = BaseAddr + (DestAddr & 0x3fff);
+				int addr = base_addr + (dest_addr & 0x3fff);
 
 				if ((addr & 0x2080) == 0)
 				{
 					addr = ((addr & 0xc000) >> 2) | ((addr & 0x1f00) >> 1) | (addr & 0x7f);
-					pteacher_videoram_w( space, addr, data );
+					pteacher_videoram_w(space, addr, data);
 				}
 			}
 
-			if (homedata_vreg[1] & 0x80)	/* flip screen */
-				DestAddr-=2;
+			if (state->vreg[1] & 0x80)	/* flip screen */
+				dest_addr -= 2;
 			else
-				DestAddr+=2;
-		} /* for( i=0; i<NumTiles; i++ ) */
+				dest_addr += 2;
+		} /* for( i=0; i<num_tiles; i++ ) */
 	} /* for(;;) */
 
 finish:
-	cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 
@@ -350,7 +331,7 @@ PALETTE_INIT( mrokumei )
 		g = ((color >>  7) & 0x1e) | ((color >> 2) & 1);
 		b = ((color >>  3) & 0x1e) | ((color >> 1) & 1);
 
-		palette_set_color_rgb(machine,i,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(machine, i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -372,7 +353,7 @@ PALETTE_INIT( reikaids )
 		r = ((color >>  7) & 0x1e) | ((color >> 2) & 1);
 		b = ((color >>  3) & 0x1e) | ((color >> 1) & 1);
 
-		palette_set_color_rgb(machine,i,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(machine, i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -394,7 +375,7 @@ PALETTE_INIT( pteacher )
 		r = ((color >>  6) & 0x1f);
 		b = ((color >>  1) & 0x1f);
 
-		palette_set_color_rgb(machine,i,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(machine, i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 }
 
@@ -408,36 +389,58 @@ PALETTE_INIT( pteacher )
 
 INLINE void mrokumei_info0( running_machine *machine, tile_data *tileinfo, int tile_index, int page, int gfxbank )
 {
+	homedata_state *state = (homedata_state *)machine->driver_data;
 	int addr  = tile_index * 2 + 0x2000 * page;
-	int attr  = machine->generic.videoram.u8[addr];
-	int code  = machine->generic.videoram.u8[addr + 1] + ((attr & 0x03) << 8) + (gfxbank << 10);
+	int attr  = state->videoram[addr];
+	int code  = state->videoram[addr + 1] + ((attr & 0x03) << 8) + (gfxbank << 10);
 	int color = (attr >> 2) + (gfxbank << 6);
 
-	SET_TILE_INFO( 0, code, color, homedata_flipscreen );
+	SET_TILE_INFO( 0, code, color, state->flipscreen );
 }
 INLINE void mrokumei_info1( running_machine *machine, tile_data *tileinfo, int tile_index, int page, int gfxbank )
 {
+	homedata_state *state = (homedata_state *)machine->driver_data;
 	int addr  = tile_index * 2 + 0x1000 + 0x2000 * page;
-	int attr  = machine->generic.videoram.u8[addr];
-	int code  = machine->generic.videoram.u8[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
+	int attr  = state->videoram[addr];
+	int code  = state->videoram[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
 	int color = (attr >> 3) + ((gfxbank & 3) << 6);
 
-	SET_TILE_INFO( 1, code, color, homedata_flipscreen );
+	SET_TILE_INFO( 1, code, color, state->flipscreen );
 }
 
-static TILE_GET_INFO( mrokumei_get_info0_0 ) { mrokumei_info0( machine, tileinfo, tile_index, 0,  blitter_bank & 0x03 ); }
-static TILE_GET_INFO( mrokumei_get_info1_0 ) { mrokumei_info0( machine, tileinfo, tile_index, 1,  blitter_bank & 0x03 ); }
-static TILE_GET_INFO( mrokumei_get_info0_1 ) { mrokumei_info1( machine, tileinfo, tile_index, 0, (blitter_bank & 0x38) >> 3 ); }
-static TILE_GET_INFO( mrokumei_get_info1_1 ) { mrokumei_info1( machine, tileinfo, tile_index, 1, (blitter_bank & 0x38) >> 3 ); }
+static TILE_GET_INFO( mrokumei_get_info0_0 ) 
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	mrokumei_info0( machine, tileinfo, tile_index, 0,  state->blitter_bank & 0x03 ); 
+}
+
+static TILE_GET_INFO( mrokumei_get_info1_0 ) 
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	mrokumei_info0( machine, tileinfo, tile_index, 1,  state->blitter_bank & 0x03 ); 
+}
+
+static TILE_GET_INFO( mrokumei_get_info0_1 ) 
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	mrokumei_info1( machine, tileinfo, tile_index, 0, (state->blitter_bank & 0x38) >> 3 ); 
+}
+
+static TILE_GET_INFO( mrokumei_get_info1_1 ) 
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	mrokumei_info1( machine, tileinfo, tile_index, 1, (state->blitter_bank & 0x38) >> 3 ); 
+}
 
 
 INLINE void reikaids_info( running_machine *machine, tile_data *tileinfo, int tile_index, int page, int layer, int gfxbank )
 {
+	homedata_state *state = (homedata_state *)machine->driver_data;
 	int addr  = tile_index * 4 + layer + 0x2000 * page;
-	int attr  = machine->generic.videoram.u8[addr];
-	int code  = machine->generic.videoram.u8[addr + 0x1000] + ((attr & 0x03) << 8) + (gfxbank << 10);
+	int attr  = state->videoram[addr];
+	int code  = state->videoram[addr + 0x1000] + ((attr & 0x03) << 8) + (gfxbank << 10);
 	int color = (attr & 0x7c) >> 2;
-	int flags = homedata_flipscreen;
+	int flags = state->flipscreen;
 
 	if (attr & 0x80) flags ^= TILE_FLIPX;
 
@@ -452,46 +455,126 @@ INLINE void reikaids_info( running_machine *machine, tile_data *tileinfo, int ti
      *      xxxx.x---   layer#0
      *      ----.-xxx   layer#2
      */
-static TILE_GET_INFO( reikaids_get_info0_0 ) { reikaids_info( machine, tileinfo, tile_index, 0, 0,  (reikaids_gfx_bank[1]>>3)); }
-static TILE_GET_INFO( reikaids_get_info1_0 ) { reikaids_info( machine, tileinfo, tile_index, 1, 0,  (reikaids_gfx_bank[1]>>3)); }
-static TILE_GET_INFO( reikaids_get_info0_1 ) { reikaids_info( machine, tileinfo, tile_index, 0, 1, ((reikaids_gfx_bank[0]&0x78)>>3)); }
-static TILE_GET_INFO( reikaids_get_info1_1 ) { reikaids_info( machine, tileinfo, tile_index, 1, 1, ((reikaids_gfx_bank[0]&0x78)>>3)); }
-static TILE_GET_INFO( reikaids_get_info0_2 ) { reikaids_info( machine, tileinfo, tile_index, 0, 2,  (reikaids_gfx_bank[1]&0x7)); }
-static TILE_GET_INFO( reikaids_get_info1_2 ) { reikaids_info( machine, tileinfo, tile_index, 1, 2,  (reikaids_gfx_bank[1]&0x7)); }
-static TILE_GET_INFO( reikaids_get_info0_3 ) { reikaids_info( machine, tileinfo, tile_index, 0, 3,  (reikaids_gfx_bank[0]&0x7)); }
-static TILE_GET_INFO( reikaids_get_info1_3 ) { reikaids_info( machine, tileinfo, tile_index, 1, 3,  (reikaids_gfx_bank[0]&0x7)); }
+static TILE_GET_INFO( reikaids_get_info0_0 ) 
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	reikaids_info(machine, tileinfo, tile_index, 0, 0,  (state->gfx_bank[1] >> 3)); 
+}
+
+static TILE_GET_INFO( reikaids_get_info1_0 ) 
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	reikaids_info(machine, tileinfo, tile_index, 1, 0,  (state->gfx_bank[1] >> 3)); 
+}
+
+static TILE_GET_INFO( reikaids_get_info0_1 )
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	reikaids_info(machine, tileinfo, tile_index, 0, 1, ((state->gfx_bank[0] & 0x78) >> 3)); 
+}
+
+static TILE_GET_INFO( reikaids_get_info1_1 )
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	reikaids_info(machine, tileinfo, tile_index, 1, 1, ((state->gfx_bank[0] & 0x78) >> 3)); 
+}
+
+static TILE_GET_INFO( reikaids_get_info0_2 )
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	reikaids_info(machine, tileinfo, tile_index, 0, 2,  (state->gfx_bank[1] & 0x7)); 
+}
+
+static TILE_GET_INFO( reikaids_get_info1_2 )
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	reikaids_info(machine, tileinfo, tile_index, 1, 2,  (state->gfx_bank[1] & 0x7)); 
+}
+
+static TILE_GET_INFO( reikaids_get_info0_3 )
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	reikaids_info(machine, tileinfo, tile_index, 0, 3,  (state->gfx_bank[0] & 0x7)); 
+}
+
+static TILE_GET_INFO( reikaids_get_info1_3 )
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	reikaids_info(machine, tileinfo, tile_index, 1, 3,  (state->gfx_bank[0] & 0x7)); 
+}
 
 
 INLINE void pteacher_info( running_machine *machine, tile_data *tileinfo, int tile_index, int page, int layer, int gfxbank )
 {
+	homedata_state *state = (homedata_state *)machine->driver_data;
 	int addr  = tile_index * 2 + 0x1000 * layer + 0x2000 * page;
-	int attr  = machine->generic.videoram.u8[addr];
-	int code  = machine->generic.videoram.u8[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
+	int attr  = state->videoram[addr];
+	int code  = state->videoram[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
 	int color = (attr >> 3) + ((gfxbank & 1) << 5);
 
-	SET_TILE_INFO( layer, code, color, homedata_flipscreen );
+	SET_TILE_INFO(layer, code, color, state->flipscreen);
 }
 
-static TILE_GET_INFO( pteacher_get_info0_0 ) { pteacher_info( machine, tileinfo, tile_index, 0, 0, pteacher_gfx_bank & 0x0f ); }
-static TILE_GET_INFO( pteacher_get_info1_0 ) { pteacher_info( machine, tileinfo, tile_index, 1, 0, pteacher_gfx_bank & 0x0f ); }
-static TILE_GET_INFO( pteacher_get_info0_1 ) { pteacher_info( machine, tileinfo, tile_index, 0, 1, pteacher_gfx_bank >> 4 ); }
-static TILE_GET_INFO( pteacher_get_info1_1 ) { pteacher_info( machine, tileinfo, tile_index, 1, 1, pteacher_gfx_bank >> 4 ); }
+static TILE_GET_INFO( pteacher_get_info0_0 )
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	pteacher_info(machine, tileinfo, tile_index, 0, 0, state->gfx_bank[0] & 0x0f); 
+}
+
+static TILE_GET_INFO( pteacher_get_info1_0 )
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	pteacher_info(machine, tileinfo, tile_index, 1, 0, state->gfx_bank[0] & 0x0f); 
+}
+
+static TILE_GET_INFO( pteacher_get_info0_1 )
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	pteacher_info(machine, tileinfo, tile_index, 0, 1, state->gfx_bank[0] >> 4); 
+}
+
+static TILE_GET_INFO( pteacher_get_info1_1 )
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	pteacher_info(machine, tileinfo, tile_index, 1, 1, state->gfx_bank[0] >> 4); 
+}
 
 
 INLINE void lemnangl_info( running_machine *machine, tile_data *tileinfo, int tile_index, int page, int layer, int gfxset, int gfxbank )
 {
+	homedata_state *state = (homedata_state *)machine->driver_data;
 	int addr  = tile_index * 2 + 0x1000 * layer + 0x2000 * page;
-	int attr  = machine->generic.videoram.u8[addr];
-	int code  = machine->generic.videoram.u8[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
+	int attr  = state->videoram[addr];
+	int code  = state->videoram[addr + 1] + ((attr & 0x07) << 8) + (gfxbank << 11);
 	int color = 16 * (attr >> 3) + gfxbank;
 
-	SET_TILE_INFO( 2*layer + gfxset, code, color, homedata_flipscreen );
+	SET_TILE_INFO(2 * layer + gfxset, code, color, state->flipscreen);
 }
 
-static TILE_GET_INFO( lemnangl_get_info0_0 ) { lemnangl_info( machine, tileinfo, tile_index, 0, 0,  blitter_bank & 1,       pteacher_gfx_bank & 0x0f ); }
-static TILE_GET_INFO( lemnangl_get_info1_0 ) { lemnangl_info( machine, tileinfo, tile_index, 1, 0,  blitter_bank & 1,       pteacher_gfx_bank & 0x0f ); }
-static TILE_GET_INFO( lemnangl_get_info0_1 ) { lemnangl_info( machine, tileinfo, tile_index, 0, 1, (blitter_bank & 2) >> 1, pteacher_gfx_bank >> 4 ); }
-static TILE_GET_INFO( lemnangl_get_info1_1 ) { lemnangl_info( machine, tileinfo, tile_index, 1, 1, (blitter_bank & 2) >> 1, pteacher_gfx_bank >> 4 ); }
+static TILE_GET_INFO( lemnangl_get_info0_0 )
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	lemnangl_info( machine, tileinfo, tile_index, 0, 0,  state->blitter_bank & 1, state->gfx_bank[0] & 0x0f ); 
+}
+
+static TILE_GET_INFO( lemnangl_get_info1_0 )
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	lemnangl_info( machine, tileinfo, tile_index, 1, 0,  state->blitter_bank & 1, state->gfx_bank[0] & 0x0f ); 
+}
+
+
+static TILE_GET_INFO( lemnangl_get_info0_1 )
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	lemnangl_info( machine, tileinfo, tile_index, 0, 1, (state->blitter_bank & 2) >> 1, state->gfx_bank[0] >> 4 ); 
+}
+
+static TILE_GET_INFO( lemnangl_get_info1_1 )
+{ 
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	lemnangl_info( machine, tileinfo, tile_index, 1, 1, (state->blitter_bank & 2) >> 1, state->gfx_bank[0] >> 4 ); 
+}
 
 
 /***************************************************************************
@@ -502,56 +585,60 @@ static TILE_GET_INFO( lemnangl_get_info1_1 ) { lemnangl_info( machine, tileinfo,
 
 VIDEO_START( mrokumei )
 {
-	bg_tilemap[0][0] = tilemap_create( machine, mrokumei_get_info0_0, tilemap_scan_rows,       8, 8, 64,32 );
-	bg_tilemap[0][1] = tilemap_create( machine, mrokumei_get_info0_1, tilemap_scan_rows,  8, 8, 64,32 );
-	bg_tilemap[1][0] = tilemap_create( machine, mrokumei_get_info1_0, tilemap_scan_rows,       8, 8, 64,32 );
-	bg_tilemap[1][1] = tilemap_create( machine, mrokumei_get_info1_1, tilemap_scan_rows,  8, 8, 64,32 );
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	state->bg_tilemap[0][0] = tilemap_create( machine, mrokumei_get_info0_0, tilemap_scan_rows, 8, 8, 64, 32 );
+	state->bg_tilemap[0][1] = tilemap_create( machine, mrokumei_get_info0_1, tilemap_scan_rows, 8, 8, 64, 32 );
+	state->bg_tilemap[1][0] = tilemap_create( machine, mrokumei_get_info1_0, tilemap_scan_rows, 8, 8, 64, 32 );
+	state->bg_tilemap[1][1] = tilemap_create( machine, mrokumei_get_info1_1, tilemap_scan_rows, 8, 8, 64, 32 );
 
-	tilemap_set_transparent_pen(bg_tilemap[0][1],0);
-	tilemap_set_transparent_pen(bg_tilemap[1][1],0);
+	tilemap_set_transparent_pen(state->bg_tilemap[0][1], 0);
+	tilemap_set_transparent_pen(state->bg_tilemap[1][1], 0);
 }
 
 VIDEO_START( reikaids )
 {
-	bg_tilemap[0][0] = tilemap_create( machine, reikaids_get_info0_0, tilemap_scan_rows,  8, 8, 32, 32 );
-	bg_tilemap[0][1] = tilemap_create( machine, reikaids_get_info0_1, tilemap_scan_rows,  8, 8, 32, 32 );
-	bg_tilemap[0][2] = tilemap_create( machine, reikaids_get_info0_2, tilemap_scan_rows,  8, 8, 32, 32 );
-	bg_tilemap[0][3] = tilemap_create( machine, reikaids_get_info0_3, tilemap_scan_rows,  8, 8, 32, 32 );
-	bg_tilemap[1][0] = tilemap_create( machine, reikaids_get_info1_0, tilemap_scan_rows,  8, 8, 32, 32 );
-	bg_tilemap[1][1] = tilemap_create( machine, reikaids_get_info1_1, tilemap_scan_rows,  8, 8, 32, 32 );
-	bg_tilemap[1][2] = tilemap_create( machine, reikaids_get_info1_2, tilemap_scan_rows,  8, 8, 32, 32 );
-	bg_tilemap[1][3] = tilemap_create( machine, reikaids_get_info1_3, tilemap_scan_rows,  8, 8, 32, 32 );
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	state->bg_tilemap[0][0] = tilemap_create(machine, reikaids_get_info0_0, tilemap_scan_rows,  8, 8, 32, 32);
+	state->bg_tilemap[0][1] = tilemap_create(machine, reikaids_get_info0_1, tilemap_scan_rows,  8, 8, 32, 32);
+	state->bg_tilemap[0][2] = tilemap_create(machine, reikaids_get_info0_2, tilemap_scan_rows,  8, 8, 32, 32);
+	state->bg_tilemap[0][3] = tilemap_create(machine, reikaids_get_info0_3, tilemap_scan_rows,  8, 8, 32, 32);
+	state->bg_tilemap[1][0] = tilemap_create(machine, reikaids_get_info1_0, tilemap_scan_rows,  8, 8, 32, 32);
+	state->bg_tilemap[1][1] = tilemap_create(machine, reikaids_get_info1_1, tilemap_scan_rows,  8, 8, 32, 32);
+	state->bg_tilemap[1][2] = tilemap_create(machine, reikaids_get_info1_2, tilemap_scan_rows,  8, 8, 32, 32);
+	state->bg_tilemap[1][3] = tilemap_create(machine, reikaids_get_info1_3, tilemap_scan_rows,  8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(bg_tilemap[0][0],0xff);
-	tilemap_set_transparent_pen(bg_tilemap[0][1],0xff);
-	tilemap_set_transparent_pen(bg_tilemap[0][2],0xff);
-	tilemap_set_transparent_pen(bg_tilemap[0][3],0xff);
-	tilemap_set_transparent_pen(bg_tilemap[1][0],0xff);
-	tilemap_set_transparent_pen(bg_tilemap[1][1],0xff);
-	tilemap_set_transparent_pen(bg_tilemap[1][2],0xff);
-	tilemap_set_transparent_pen(bg_tilemap[1][3],0xff);
+	tilemap_set_transparent_pen(state->bg_tilemap[0][0], 0xff);
+	tilemap_set_transparent_pen(state->bg_tilemap[0][1], 0xff);
+	tilemap_set_transparent_pen(state->bg_tilemap[0][2], 0xff);
+	tilemap_set_transparent_pen(state->bg_tilemap[0][3], 0xff);
+	tilemap_set_transparent_pen(state->bg_tilemap[1][0], 0xff);
+	tilemap_set_transparent_pen(state->bg_tilemap[1][1], 0xff);
+	tilemap_set_transparent_pen(state->bg_tilemap[1][2], 0xff);
+	tilemap_set_transparent_pen(state->bg_tilemap[1][3], 0xff);
 }
 
 VIDEO_START( pteacher )
 {
-	bg_tilemap[0][0] = tilemap_create( machine, pteacher_get_info0_0, tilemap_scan_rows,       8, 8, 64,32 );
-	bg_tilemap[0][1] = tilemap_create( machine, pteacher_get_info0_1, tilemap_scan_rows,  8, 8, 64,32 );
-	bg_tilemap[1][0] = tilemap_create( machine, pteacher_get_info1_0, tilemap_scan_rows,       8, 8, 64,32 );
-	bg_tilemap[1][1] = tilemap_create( machine, pteacher_get_info1_1, tilemap_scan_rows,  8, 8, 64,32 );
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	state->bg_tilemap[0][0] = tilemap_create(machine, pteacher_get_info0_0, tilemap_scan_rows, 8, 8, 64, 32);
+	state->bg_tilemap[0][1] = tilemap_create(machine, pteacher_get_info0_1, tilemap_scan_rows, 8, 8, 64, 32);
+	state->bg_tilemap[1][0] = tilemap_create(machine, pteacher_get_info1_0, tilemap_scan_rows, 8, 8, 64, 32);
+	state->bg_tilemap[1][1] = tilemap_create(machine, pteacher_get_info1_1, tilemap_scan_rows, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(bg_tilemap[0][1],0xff);
-	tilemap_set_transparent_pen(bg_tilemap[1][1],0xff);
+	tilemap_set_transparent_pen(state->bg_tilemap[0][1], 0xff);
+	tilemap_set_transparent_pen(state->bg_tilemap[1][1], 0xff);
 }
 
 VIDEO_START( lemnangl )
 {
-	bg_tilemap[0][0] = tilemap_create( machine, lemnangl_get_info0_0, tilemap_scan_rows,       8, 8, 64,32 );
-	bg_tilemap[0][1] = tilemap_create( machine, lemnangl_get_info0_1, tilemap_scan_rows,  8, 8, 64,32 );
-	bg_tilemap[1][0] = tilemap_create( machine, lemnangl_get_info1_0, tilemap_scan_rows,       8, 8, 64,32 );
-	bg_tilemap[1][1] = tilemap_create( machine, lemnangl_get_info1_1, tilemap_scan_rows,  8, 8, 64,32 );
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	state->bg_tilemap[0][0] = tilemap_create(machine, lemnangl_get_info0_0, tilemap_scan_rows, 8, 8, 64, 32);
+	state->bg_tilemap[0][1] = tilemap_create(machine, lemnangl_get_info0_1, tilemap_scan_rows, 8, 8, 64, 32);
+	state->bg_tilemap[1][0] = tilemap_create(machine, lemnangl_get_info1_0, tilemap_scan_rows, 8, 8, 64, 32);
+	state->bg_tilemap[1][1] = tilemap_create(machine, lemnangl_get_info1_1, tilemap_scan_rows, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(bg_tilemap[0][1],0x0f);
-	tilemap_set_transparent_pen(bg_tilemap[1][1],0x0f);
+	tilemap_set_transparent_pen(state->bg_tilemap[0][1], 0x0f);
+	tilemap_set_transparent_pen(state->bg_tilemap[1][1], 0x0f);
 }
 
 
@@ -564,93 +651,103 @@ VIDEO_START( lemnangl )
 
 WRITE8_HANDLER( mrokumei_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty( bg_tilemap[(offset & 0x2000) >> 13][(offset & 0x1000) >> 12], (offset & 0xffe) >> 1 );
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap[(offset & 0x2000) >> 13][(offset & 0x1000) >> 12], (offset & 0xffe) >> 1);
 }
 
 WRITE8_HANDLER( reikaids_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty( bg_tilemap[(offset & 0x2000) >> 13][offset & 3], (offset & 0xffc) >> 2 );
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap[(offset & 0x2000) >> 13][offset & 3], (offset & 0xffc) >> 2);
 }
 
 WRITE8_HANDLER( pteacher_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty( bg_tilemap[(offset & 0x2000) >> 13][(offset & 0x1000) >> 12], (offset & 0xffe) >> 1 );
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap[(offset & 0x2000) >> 13][(offset & 0x1000) >> 12], (offset & 0xffe) >> 1);
 }
 
 WRITE8_HANDLER( reikaids_gfx_bank_w )
 {
-
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
 //logerror( "%04x: [setbank %02x]\n",cpu_get_pc(space->cpu),data);
 
-	if (reikaids_gfx_bank[reikaids_which] != data)
+	if (state->gfx_bank[state->reikaids_which] != data)
 	{
-		reikaids_gfx_bank[reikaids_which] = data;
-		tilemap_mark_all_tiles_dirty_all( space->machine );
+		state->gfx_bank[state->reikaids_which] = data;
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
-	reikaids_which ^= 1;
+	state->reikaids_which ^= 1;
 }
 
 WRITE8_HANDLER( pteacher_gfx_bank_w )
 {
-//  logerror( "%04x: gfxbank:=%02x\n", cpu_get_pc(space->cpu), data );
-	if (pteacher_gfx_bank != data)
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+//  logerror("%04x: gfxbank:=%02x\n", cpu_get_pc(space->cpu), data);
+	if (state->gfx_bank[0] != data)
 	{
-		pteacher_gfx_bank = data;
-		tilemap_mark_all_tiles_dirty_all( space->machine );
+		state->gfx_bank[0] = data;
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 
 WRITE8_HANDLER( homedata_blitter_param_w )
 {
-//logerror("%04x: blitter_param_w %02x\n",cpu_get_pc(space->cpu),data);
-	blitter_param[blitter_param_count] = data;
-	blitter_param_count++;
-	blitter_param_count&=3;
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+//logerror("%04x: blitter_param_w %02x\n", cpu_get_pc(space->cpu), data);
+	state->blitter_param[state->blitter_param_count] = data;
+	state->blitter_param_count++;
+	state->blitter_param_count &= 3;
 }
 
 WRITE8_HANDLER( mrokumei_blitter_bank_w )
 {
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
 	/* --xxx--- layer 1 gfx bank
        -----x-- blitter ROM bank
        ------xx layer 0 gfx bank
      */
 
-	if ((blitter_bank ^ data) & 0x3b)
-		tilemap_mark_all_tiles_dirty_all( space->machine);
+	if ((state->blitter_bank ^ data) & 0x3b)
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 
-	blitter_bank = data;
+	state->blitter_bank = data;
 }
 
 WRITE8_HANDLER( reikaids_blitter_bank_w )
 {
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
 	/* xxx----- priority control
        ----x--- target page? what's this for?
        ------xx blitter ROM bank
      */
-	blitter_bank = data;
+	state->blitter_bank = data;
 }
 
 WRITE8_HANDLER( pteacher_blitter_bank_w )
 {
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
 	/* xxx----- blitter ROM bank
        -----x-- pixel clock (normal/slow)
        ------x- layer #1 gfx charset (lemnangl only)
        -------x layer #0 gfx charset (lemnangl only)
      */
 
-	if ((blitter_bank ^ data) & 0x03)
-		tilemap_mark_all_tiles_dirty_all( space->machine);
+	if ((state->blitter_bank ^ data) & 0x03)
+		tilemap_mark_all_tiles_dirty_all(space->machine);
 
-	blitter_bank = data;
+	state->blitter_bank = data;
 }
 
 WRITE8_HANDLER( mrokumei_blitter_start_w )
 {
-	if (data & 0x80) mrokumei_handleblit(space, ((blitter_bank & 0x04) >> 2) * 0x10000);
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+	if (data & 0x80) 
+		mrokumei_handleblit(space, ((state->blitter_bank & 0x04) >> 2) * 0x10000);
 
 	/* bit 0 = bank switch; used by hourouki to access the
        optional service mode ROM (not available in current dump) */
@@ -658,12 +755,14 @@ WRITE8_HANDLER( mrokumei_blitter_start_w )
 
 WRITE8_HANDLER( reikaids_blitter_start_w )
 {
-	reikaids_handleblit(space, (blitter_bank & 3) * 0x10000);
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+	reikaids_handleblit(space, (state->blitter_bank & 3) * 0x10000);
 }
 
 WRITE8_HANDLER( pteacher_blitter_start_w )
 {
-	pteacher_handleblit(space, (blitter_bank >> 5) * 0x10000 & (memory_region_length(space->machine, "user1") - 1));
+	homedata_state *state = (homedata_state *)space->machine->driver_data;
+	pteacher_handleblit(space, (state->blitter_bank >> 5) * 0x10000 & (memory_region_length(space->machine, "user1") - 1));
 }
 
 
@@ -676,84 +775,87 @@ WRITE8_HANDLER( pteacher_blitter_start_w )
 
 VIDEO_UPDATE( mrokumei )
 {
+	homedata_state *state = (homedata_state *)screen->machine->driver_data;
 	int flags,width;
 
 	/* blank screen */
-	if (homedata_vreg[0x3] == 0xc1 && homedata_vreg[0x4] == 0xc0 && homedata_vreg[0x5] == 0xff)
+	if (state->vreg[0x3] == 0xc1 && state->vreg[0x4] == 0xc0 && state->vreg[0x5] == 0xff)
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 		return 0;
 	}
 
-	flags = (homedata_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
-	if (flags != homedata_flipscreen)
+	flags = (state->vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
+	if (flags != state->flipscreen)
 	{
-		homedata_flipscreen = flags;
-		tilemap_mark_all_tiles_dirty_all( screen->machine );
+		state->flipscreen = flags;
+		tilemap_mark_all_tiles_dirty_all(screen->machine);
 	}
 
-	switch (homedata_vreg[0x3])
+	switch (state->vreg[0x3])
 	{
 		case 0xb7: width = 54; break;	// mjclinic
 		case 0xae: width = 52; break;	// mrokumei
 		case 0x9f: width = 49; break;	// hourouki, mhgaiden, mjhokite
 		case 0x96: width = 49; break;	// mjclinic
 		default:
-			if (homedata_vreg[0x3])
+			if (state->vreg[0x3])
 				popmessage("unknown video control %02x %02x %02x %02x",
-					homedata_vreg[0x3],
-					homedata_vreg[0x4],
-					homedata_vreg[0x5],
-					homedata_vreg[0x6]);
+					state->vreg[0x3],
+					state->vreg[0x4],
+					state->vreg[0x5],
+					state->vreg[0x6]);
 			width = 54;
 			break;
 	}
 	video_screen_set_visarea(screen, 0*8, width*8-1, 2*8, 30*8-1);
 
-	tilemap_set_scrollx(bg_tilemap[homedata_visible_page][0],0,homedata_vreg[0xc] << 1);
+	tilemap_set_scrollx(state->bg_tilemap[state->visible_page][0], 0, state->vreg[0xc] << 1);
 
-	tilemap_draw(bitmap, cliprect, bg_tilemap[homedata_visible_page][0], 0, 0);
-	tilemap_draw(bitmap, cliprect, bg_tilemap[homedata_visible_page][1], 0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap[state->visible_page][0], 0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap[state->visible_page][1], 0, 0);
 	return 0;
 }
 
 #ifdef UNUSED_FUNCTION
 VIDEO_UPDATE( reikaids )
 {
-    int flags;
-    static const int pritable[8][4] =
-    {
-        { 3,1,0,2 },
-        { 1,3,0,2 },
-        { 0,3,1,2 },
-        { 0,1,3,2 },
-        { 3,0,1,2 },
-        { 1,0,3,2 },
-        { 2,3,1,0 },    // (bg color should be taken from 1)
-        { 3,1,2,0 },    // (bg color should be taken from 1)
-    };
-    int pri,i;
+	homedata_state *state = (homedata_state *)screen->machine->driver_data;
+	int flags;
+	static const int pritable[8][4] =
+	{
+		{ 3,1,0,2 },
+		{ 1,3,0,2 },
+		{ 0,3,1,2 },
+		{ 0,1,3,2 },
+		{ 3,0,1,2 },
+		{ 1,0,3,2 },
+		{ 2,3,1,0 },    // (bg color should be taken from 1)
+		{ 3,1,2,0 },    // (bg color should be taken from 1)
+	};
+	int pri, i;
 
 
-    flags = (homedata_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
-    if (flags != homedata_flipscreen)
-    {
-        homedata_flipscreen = flags;
-        tilemap_mark_all_tiles_dirty_all( screen->machine );
-    }
+	flags = (state->vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
+	if (flags != state->flipscreen)
+	{
+		state->flipscreen = flags;
+		tilemap_mark_all_tiles_dirty_all(screen->machine);
+	}
 
 
-    bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
-    pri = (blitter_bank & 0x70) >> 4;
-    for (i = 0;i < 4;i++)
-        tilemap_draw(bitmap, cliprect, bg_tilemap[homedata_visible_page][pritable[pri][3-i]], 0, 0);
-    return 0;
+	pri = (state->bank & 0x70) >> 4;
+	for (i = 0; i < 4; i++)
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap[state->visible_page][pritable[pri][3 - i]], 0, 0);
+	return 0;
 }
 #endif
 
 VIDEO_UPDATE( reikaids )
 {
+	homedata_state *state = (homedata_state *)screen->machine->driver_data;
 	int flags;
 	static const int pritable[2][8][4] =	/* table of priorities derived from the PROM */
 	{
@@ -779,42 +881,43 @@ VIDEO_UPDATE( reikaids )
 	},
 	};
 
-	int pri,i;
+	int pri, i;
 
-	flags = (homedata_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
-	if (flags != homedata_flipscreen)
+	flags = (state->vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
+	if (flags != state->flipscreen)
 	{
-		homedata_flipscreen = flags;
-		tilemap_mark_all_tiles_dirty_all( screen->machine );
+		state->flipscreen = flags;
+		tilemap_mark_all_tiles_dirty_all(screen->machine);
 	}
 
 
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
-	pri = (blitter_bank & 0x70) >> 4;
-	for (i = 0;i < 4;i++)
-		tilemap_draw(bitmap, cliprect, bg_tilemap[homedata_visible_page][pritable[homedata_priority][pri][3-i]], 0, 0);
+	pri = (state->blitter_bank & 0x70) >> 4;
+	for (i = 0; i < 4; i++)
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap[state->visible_page][pritable[state->priority][pri][3 - i]], 0, 0);
 	return 0;
 }
 
 
 VIDEO_UPDATE( pteacher )
 {
-	int flags,scroll_low,scroll_high;
+	homedata_state *state = (homedata_state *)screen->machine->driver_data;
+	int flags, scroll_low, scroll_high;
 
 
 	/* blank screen */
-	if (homedata_vreg[0x3] == 0xc1 && homedata_vreg[0x4] == 0xc0 && homedata_vreg[0x5] == 0xff)
+	if (state->vreg[0x3] == 0xc1 && state->vreg[0x4] == 0xc0 && state->vreg[0x5] == 0xff)
 	{
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 		return 0;
 	}
 
-	flags = (homedata_vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
-	if (flags != homedata_flipscreen)
+	flags = (state->vreg[1] & 0x80) ? (TILE_FLIPX | TILE_FLIPY) : 0;
+	if (flags != state->flipscreen)
 	{
-		homedata_flipscreen = flags;
-		tilemap_mark_all_tiles_dirty_all( screen->machine );
+		state->flipscreen = flags;
+		tilemap_mark_all_tiles_dirty_all(screen->machine);
 	}
 
 	/* bit 2 of blitter_bank stretches characters horizontally by 3/2,
@@ -841,9 +944,9 @@ VIDEO_UPDATE( pteacher )
        blanked = c1 c0 ff --
       */
 
-	if (blitter_bank & 0x04)
+	if (state->blitter_bank & 0x04)
 	{
-		if (homedata_vreg[0x4] == 0xae || homedata_vreg[0x4] == 0xb8)
+		if (state->vreg[0x4] == 0xae || state->vreg[0x4] == 0xb8)
 		{
 			/* kludge for mjkinjas */
 			video_screen_set_visarea(screen, 0*8, 42*8-1, 2*8, 30*8-1);
@@ -851,33 +954,34 @@ VIDEO_UPDATE( pteacher )
 		}
 		else
 		{
-			if (homedata_vreg[0x3] == 0xa6)
+			if (state->vreg[0x3] == 0xa6)
 				video_screen_set_visarea(screen, 0*8, 33*8-1, 2*8, 30*8-1);
 			else
 				video_screen_set_visarea(screen, 0*8, 35*8-1, 2*8, 30*8-1);
-			scroll_low = (11 - (homedata_vreg[0x4] & 0x0f)) * 8 / 12;
+			scroll_low = (11 - (state->vreg[0x4] & 0x0f)) * 8 / 12;
 		}
 	}
 	else
 	{
-		if (homedata_vreg[0x3] == 0xa6)
+		if (state->vreg[0x3] == 0xa6)
 			video_screen_set_visarea(screen, 0*8, 51*8-1, 2*8, 30*8-1);
 		else
 			video_screen_set_visarea(screen, 0*8, 54*8-1, 2*8, 30*8-1);
-		scroll_low = 7 - (homedata_vreg[0x4] & 0x0f);
+		scroll_low = 7 - (state->vreg[0x4] & 0x0f);
 	}
-	scroll_high = homedata_vreg[0xb] >> 2;
+	scroll_high = state->vreg[0xb] >> 2;
 
-	tilemap_set_scrollx(bg_tilemap[homedata_visible_page][0],0,scroll_high*8 + scroll_low);
-	tilemap_set_scrollx(bg_tilemap[homedata_visible_page][1],0,scroll_high*8 + scroll_low);
+	tilemap_set_scrollx(state->bg_tilemap[state->visible_page][0], 0, scroll_high * 8 + scroll_low);
+	tilemap_set_scrollx(state->bg_tilemap[state->visible_page][1], 0, scroll_high * 8 + scroll_low);
 
-	tilemap_draw(bitmap, cliprect, bg_tilemap[homedata_visible_page][0], 0, 0);
-	tilemap_draw(bitmap, cliprect, bg_tilemap[homedata_visible_page][1], 0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap[state->visible_page][0], 0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap[state->visible_page][1], 0, 0);
 	return 0;
 }
 
 
 VIDEO_EOF( homedata )
 {
-	homedata_visible_page ^= 1;
+	homedata_state *state = (homedata_state *)machine->driver_data;
+	state->visible_page ^= 1;
 }

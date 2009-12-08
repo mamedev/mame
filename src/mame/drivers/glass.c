@@ -11,36 +11,22 @@ The DS5002FP has up to 128KB undumped gameplay code making the game unplayable :
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-
-extern UINT16 *glass_vregs;
-extern UINT16 *glass_videoram;
-extern UINT16 *glass_spriteram;
-extern int glass_current_bit;
-
-/* from video/glass.c */
-WRITE16_HANDLER( glass_vram_w );
-WRITE16_HANDLER( glass_blitter_w );
-VIDEO_START( glass );
-VIDEO_UPDATE( glass );
-
-static int cause_interrupt;
-
-static MACHINE_RESET( glass )
-{
-	cause_interrupt = 1;
-	glass_current_bit = 0;
-}
+#include "includes/glass.h"
 
 static WRITE16_HANDLER( clr_int_w )
 {
-	cause_interrupt = 1;
+	glass_state *state = (glass_state *)space->machine->driver_data;
+	state->cause_interrupt = 1;
 }
 
 static INTERRUPT_GEN( glass_interrupt )
 {
-	if (cause_interrupt){
+	glass_state *state = (glass_state *)device->machine->driver_data;
+
+	if (state->cause_interrupt)
+	{
 		cpu_set_input_line(device, 6, HOLD_LINE);
-		cause_interrupt = 0;
+		state->cause_interrupt = 0;
 	}
 }
 
@@ -71,14 +57,14 @@ static WRITE16_HANDLER( OKIM6295_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "oki");
 
-	if (ACCESSING_BITS_0_7){
-		memcpy(&RAM[0x30000], &RAM[0x40000 + (data & 0x0f)*0x10000], 0x10000);
-	}
+	if (ACCESSING_BITS_0_7)
+		memcpy(&RAM[0x30000], &RAM[0x40000 + (data & 0x0f) * 0x10000], 0x10000);
 }
 
 static WRITE16_HANDLER( glass_coin_w )
 {
-	switch (offset >> 3){
+	switch (offset >> 3)
+	{
 		case 0x00:	/* Coin Lockouts */
 		case 0x01:
 			coin_lockout_w(space->machine, (offset >> 3) & 0x01, ~data & 0x01);
@@ -94,12 +80,12 @@ static WRITE16_HANDLER( glass_coin_w )
 
 static ADDRESS_MAP_START( glass_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(glass_vram_w) AM_BASE(&glass_videoram)						/* Video RAM */
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(glass_vram_w) AM_BASE_MEMBER(glass_state, videoram)						/* Video RAM */
 	AM_RANGE(0x102000, 0x102fff) AM_RAM																		/* Extra Video RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE(&glass_vregs)									/* Video Registers */
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE_MEMBER(glass_state, vregs)									/* Video Registers */
 	AM_RANGE(0x108008, 0x108009) AM_WRITE(clr_int_w)														/* CLR INT Video */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&glass_spriteram)											/* Sprite RAM */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(glass_state, spriteram)											/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
@@ -114,50 +100,50 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( glass )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07,    0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:6,7,8")
-	PORT_DIPSETTING(       0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(       0x00, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(       0x01, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(       0x06, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(       0x05, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(       0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(       0x03, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(       0x02, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x38,    0x38, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:3,4,5")
-	PORT_DIPSETTING(       0x10, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(       0x18, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(       0x20, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(       0x28, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(       0x30, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(       0x08, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(       0x00, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(       0x38, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x40,    0x40, "Credit configuration" ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(       0x40, "Start 1C" )
-	PORT_DIPSETTING(       0x00, "Start 2C" )
-	PORT_DIPNAME( 0x80,    0x80, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(       0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(       0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:6,7,8")
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:3,4,5")
+	PORT_DIPSETTING(    0x10, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x40, 0x40, "Credit configuration" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, "Start 1C" )
+	PORT_DIPSETTING(    0x00, "Start 2C" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03,    0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
-	PORT_DIPSETTING(       0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(       0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(       0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(       0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c,    0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:5,6")
-	PORT_DIPSETTING(       0x0c, "3" )
-	PORT_DIPSETTING(       0x08, "1" )
-	PORT_DIPSETTING(       0x04, "2" )
-	PORT_DIPSETTING(       0x00, "4" )
-	PORT_DIPNAME( 0x10,    0x10, DEF_STR( Version ) ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(       0x10, DEF_STR( Normal ) )
-	PORT_DIPSETTING(       0x00, "Light" )
-	PORT_DIPNAME( 0x20,    0x20, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(       0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(       0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x0c, "3" )
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Version ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Light" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:2" ) /* Listed as "Unused" */
-	PORT_SERVICE_DIPLOC(   0x80, IP_ACTIVE_LOW, "SW2:1" )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:1" )
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -185,13 +171,40 @@ INPUT_PORTS_END
 
 
 
+static MACHINE_START( glass )
+{
+	glass_state *state = (glass_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->cause_interrupt);
+	state_save_register_global(machine, state->current_bit);
+	state_save_register_global(machine, state->current_command);
+	state_save_register_global_array(machine, state->blitter_serial_buffer);
+}
+
+static MACHINE_RESET( glass )
+{
+	glass_state *state = (glass_state *)machine->driver_data;
+	int i;
+
+	state->cause_interrupt = 1;
+	state->current_bit = 0;
+	state->current_command = 0;
+
+	for (i = 0; i < 5; i++)
+		state->blitter_serial_buffer[i] = 0;
+}
+
 static MACHINE_DRIVER_START( glass )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(glass_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)		/* 12 MHz (M680000 P12) */
 	MDRV_CPU_PROGRAM_MAP(glass_map)
 	MDRV_CPU_VBLANK_INT("screen", glass_interrupt)
 
+	MDRV_MACHINE_START(glass)
 	MDRV_MACHINE_RESET(glass)
 
 	/* video hardware */
@@ -285,7 +298,7 @@ ROM_END
 
 ***************************************************************************/
 
-static void glass_ROM16_split_gfx(running_machine *machine, const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2)
+static void glass_ROM16_split_gfx( running_machine *machine, const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2 )
 {
 	int i;
 
@@ -296,9 +309,10 @@ static void glass_ROM16_split_gfx(running_machine *machine, const char *src_reg,
 	UINT8 *dst = (UINT8 *)memory_region(machine, dst_reg);
 
 	/* fill destination areas with the proper data */
-	for (i = 0; i < length/2; i++){
-		dst[dest1 + i] = src[start + i*2 + 0];
-		dst[dest2 + i] = src[start + i*2 + 1];
+	for (i = 0; i < length / 2; i++)
+	{
+		dst[dest1 + i] = src[start + i * 2 + 0];
+		dst[dest2 + i] = src[start + i * 2 + 1];
 	}
 }
 
@@ -323,6 +337,6 @@ static DRIVER_INIT( glass )
 	glass_ROM16_split_gfx(machine, "gfx2", "gfx1", 0x0200000, 0x0200000, 0x0200000, 0x0300000);
 }
 
-GAME( 1993, glass,    0,     glass, glass, glass, ROT0, "Gaelco", "Glass (Ver 1.1)",                GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1993, glass10,  glass, glass, glass, glass, ROT0, "Gaelco", "Glass (Ver 1.0)",                GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1993, glassbrk, glass, glass, glass, glass, ROT0, "Gaelco", "Glass (Ver 1.0, Break Edition)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, glass,    0,     glass, glass, glass, ROT0, "Gaelco", "Glass (Ver 1.1)",                GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, glass10,  glass, glass, glass, glass, ROT0, "Gaelco", "Glass (Ver 1.0)",                GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, glassbrk, glass, glass, glass, glass, ROT0, "Gaelco", "Glass (Ver 1.0, Break Edition)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
