@@ -12,23 +12,14 @@
 
 /*************************************
  *
- *  Globals we own
- *
- *************************************/
-
-UINT16 *blstroid_priorityram;
-
-
-
-/*************************************
- *
  *  Tilemap callbacks
  *
  *************************************/
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	UINT16 data = atarigen_playfield[tile_index];
+	blstroid_state *state = (blstroid_state *)machine->driver_data;
+	UINT16 data = state->atarigen.playfield[tile_index];
 	int code = data & 0x1fff;
 	int color = (data >> 13) & 0x07;
 	SET_TILE_INFO(0, code, color, 0);
@@ -80,9 +71,10 @@ VIDEO_START( blstroid )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
+	blstroid_state *state = (blstroid_state *)machine->driver_data;
 
 	/* initialize the playfield */
-	atarigen_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  16,8, 64,64);
+	state->atarigen.playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  16,8, 64,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
@@ -115,11 +107,12 @@ static TIMER_CALLBACK( irq_on )
 
 void blstroid_scanline_update(const device_config *screen, int scanline)
 {
+	blstroid_state *state = (blstroid_state *)screen->machine->driver_data;
 	int offset = (scanline / 8) * 64 + 40;
 
 	/* check for interrupts */
 	if (offset < 0x1000)
-		if (atarigen_playfield[offset] & 0x8000)
+		if (state->atarigen.playfield[offset] & 0x8000)
 		{
 			int width, vpos;
 			attotime period_on;
@@ -152,12 +145,13 @@ void blstroid_scanline_update(const device_config *screen, int scanline)
 
 VIDEO_UPDATE( blstroid )
 {
+	blstroid_state *state = (blstroid_state *)screen->machine->driver_data;
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -174,7 +168,7 @@ VIDEO_UPDATE( blstroid )
                         priority address = HPPPMMMM
                     */
 					int priaddr = ((pf[x] & 8) << 4) | (pf[x] & 0x70) | ((mo[x] & 0xf0) >> 4);
-					if (blstroid_priorityram[priaddr] & 1)
+					if (state->priorityram[priaddr] & 1)
 						pf[x] = mo[x];
 
 					/* erase behind ourselves */

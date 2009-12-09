@@ -33,9 +33,10 @@
 
 static void update_interrupts(running_machine *machine)
 {
-	cputag_set_input_line(machine, "maincpu", 1, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 2, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 4, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	blstroid_state *state = (blstroid_state *)machine->driver_data;
+	cputag_set_input_line(machine, "maincpu", 1, state->atarigen.scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, state->atarigen.video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, state->atarigen.sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -47,8 +48,10 @@ static WRITE16_HANDLER( blstroid_halt_until_hblank_0_w )
 
 static MACHINE_RESET( blstroid )
 {
-	atarigen_eeprom_reset();
-	atarigen_interrupt_reset(update_interrupts);
+	blstroid_state *state = (blstroid_state *)machine->driver_data;
+
+	atarigen_eeprom_reset(&state->atarigen);
+	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
 	atarigen_scanline_timer_reset(machine->primary_screen, blstroid_scanline_update, 8);
 	atarijsa_reset();
 }
@@ -64,9 +67,10 @@ static MACHINE_RESET( blstroid )
 static READ16_HANDLER( inputs_r )
 {
 	static const char *const iptnames[] = { "IN0", "IN1" };
+	blstroid_state *state = (blstroid_state *)space->machine->driver_data;
 	int temp = input_port_read(space->machine, iptnames[offset & 1]);
 
-	if (atarigen_cpu_to_sound_ready) temp ^= 0x0040;
+	if (state->atarigen.cpu_to_sound_ready) temp ^= 0x0040;
 	if (atarigen_get_hblank(space->machine->primary_screen)) temp ^= 0x0010;
 	return temp;
 }
@@ -87,7 +91,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8200, 0xff8201) AM_MIRROR(0x7f81fe) AM_WRITE(atarigen_scanline_int_ack_w)
 	AM_RANGE(0xff8400, 0xff8401) AM_MIRROR(0x7f81fe) AM_WRITE(atarigen_video_int_ack_w)
 	AM_RANGE(0xff8600, 0xff8601) AM_MIRROR(0x7f81fe) AM_WRITE(atarigen_eeprom_enable_w)
-	AM_RANGE(0xff8800, 0xff89ff) AM_MIRROR(0x7f8000) AM_WRITEONLY AM_BASE(&blstroid_priorityram)
+	AM_RANGE(0xff8800, 0xff89ff) AM_MIRROR(0x7f8000) AM_WRITEONLY AM_BASE_MEMBER(blstroid_state, priorityram)
 	AM_RANGE(0xff8a00, 0xff8a01) AM_MIRROR(0x7f81fe) AM_WRITE(atarigen_sound_w)
 	AM_RANGE(0xff8c00, 0xff8c01) AM_MIRROR(0x7f81fe) AM_WRITE(atarigen_sound_reset_w)
 	AM_RANGE(0xff8e00, 0xff8e01) AM_MIRROR(0x7f81fe) AM_WRITE(blstroid_halt_until_hblank_0_w)
@@ -96,8 +100,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff9804, 0xff9805) AM_MIRROR(0x7f83f8) AM_READ_PORT("DIAL1")
 	AM_RANGE(0xff9c00, 0xff9c03) AM_MIRROR(0x7f83fc) AM_READ(inputs_r)
 	AM_RANGE(0xffa000, 0xffa3ff) AM_MIRROR(0x7f8c00) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xffb000, 0xffb3ff) AM_MIRROR(0x7f8c00) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
-	AM_RANGE(0xffc000, 0xffcfff) AM_MIRROR(0x7f8000) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE(&atarigen_playfield)
+	AM_RANGE(0xffb000, 0xffb3ff) AM_MIRROR(0x7f8c00) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(blstroid_state, atarigen.eeprom, atarigen.eeprom_size)
+	AM_RANGE(0xffc000, 0xffcfff) AM_MIRROR(0x7f8000) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(blstroid_state, atarigen.playfield)
 	AM_RANGE(0xffd000, 0xffdfff) AM_MIRROR(0x7f8000) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0xffe000, 0xffffff) AM_MIRROR(0x7f8000) AM_RAM
 ADDRESS_MAP_END
@@ -191,6 +195,7 @@ GFXDECODE_END
  *************************************/
 
 static MACHINE_DRIVER_START( blstroid )
+	MDRV_DRIVER_DATA(blstroid_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -420,7 +425,6 @@ ROM_END
 
 static DRIVER_INIT( blstroid )
 {
-	atarigen_eeprom_default = NULL;
 	atarijsa_init(machine, "IN0", 0x80);
 }
 

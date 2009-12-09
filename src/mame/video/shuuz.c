@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "machine/atarigen.h"
 #include "shuuz.h"
 
 
@@ -18,8 +17,9 @@
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	UINT16 data1 = atarigen_playfield[tile_index];
-	UINT16 data2 = atarigen_playfield_upper[tile_index] >> 8;
+	shuuz_state *state = (shuuz_state *)machine->driver_data;
+	UINT16 data1 = state->atarigen.playfield[tile_index];
+	UINT16 data2 = state->atarigen.playfield_upper[tile_index] >> 8;
 	int code = data1 & 0x3fff;
 	int color = data2 & 0x0f;
 	SET_TILE_INFO(0, code, color, (data1 >> 15) & 1);
@@ -71,9 +71,10 @@ VIDEO_START( shuuz )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
+	shuuz_state *state = (shuuz_state *)machine->driver_data;
 
 	/* initialize the playfield */
-	atarigen_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
+	state->atarigen.playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
@@ -89,12 +90,13 @@ VIDEO_START( shuuz )
 
 VIDEO_UPDATE( shuuz )
 {
+	shuuz_state *state = (shuuz_state *)screen->machine->driver_data;
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);

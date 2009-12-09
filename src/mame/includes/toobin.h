@@ -4,6 +4,20 @@
 
 *************************************************************************/
 
+#include "machine/atarigen.h"
+
+typedef struct _toobin_state toobin_state;
+struct _toobin_state
+{
+	atarigen_state	atarigen;
+
+	UINT16 *		interrupt_scan;
+
+	double 			brightness;
+	bitmap_t *		pfbitmap;
+};
+
+
 /*----------- defined in video/toobin.c -----------*/
 
 WRITE16_HANDLER( toobin_paletteram_w );

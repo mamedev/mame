@@ -68,7 +68,6 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/atarigen.h"
 #include "arcadecl.h"
 #include "sound/okim6295.h"
 
@@ -84,7 +83,8 @@
 
 static void update_interrupts(running_machine *machine)
 {
-	cputag_set_input_line(machine, "maincpu", 4, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	rampart_state *state = (rampart_state *)machine->driver_data;
+	cputag_set_input_line(machine, "maincpu", 4, state->atarigen.scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -105,8 +105,10 @@ static void scanline_update(const device_config *screen, int scanline)
 
 static MACHINE_RESET( arcadecl )
 {
-	atarigen_eeprom_reset();
-	atarigen_interrupt_reset(update_interrupts);
+	rampart_state *state = (rampart_state *)machine->driver_data;
+
+	atarigen_eeprom_reset(&state->atarigen);
+	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
 	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 32);
 }
 
@@ -144,7 +146,7 @@ static WRITE16_HANDLER( latch_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&rampart_bitmap)
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(rampart_state, bitmap)
 	AM_RANGE(0x3c0000, 0x3c07ff) AM_RAM_WRITE(atarigen_expanded_666_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0x3e0800, 0x3effbf) AM_RAM
@@ -159,7 +161,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x640026, 0x640027) AM_READ_PORT("TRACKY1")
 	AM_RANGE(0x640040, 0x64004f) AM_WRITE(latch_w)
 	AM_RANGE(0x640060, 0x64006f) AM_WRITE(atarigen_eeprom_enable_w)
-	AM_RANGE(0x641000, 0x641fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
+	AM_RANGE(0x641000, 0x641fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(rampart_state, atarigen.eeprom, atarigen.eeprom_size)
 	AM_RANGE(0x642000, 0x642001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0xff00)
 	AM_RANGE(0x646000, 0x646fff) AM_WRITE(atarigen_scanline_int_ack_w)
 	AM_RANGE(0x647000, 0x647fff) AM_WRITE(watchdog_reset16_w)
@@ -315,6 +317,7 @@ GFXDECODE_END
  *************************************/
 
 static MACHINE_DRIVER_START( arcadecl )
+	MDRV_DRIVER_DATA(rampart_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
@@ -387,15 +390,8 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( arcadecl )
-{
-	atarigen_eeprom_default = NULL;
-}
-
-
 static DRIVER_INIT( sparkz )
 {
-	atarigen_eeprom_default = NULL;
 	memset(memory_region(machine, "gfx1"), 0, memory_region_length(machine, "gfx1"));
 }
 
@@ -407,5 +403,5 @@ static DRIVER_INIT( sparkz )
  *
  *************************************/
 
-GAME( 1992, arcadecl, 0, arcadecl, arcadecl, arcadecl, ROT0, "Atari Games", "Arcade Classics (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 1992, sparkz,   0, arcadecl, sparkz,   sparkz,   ROT0, "Atari Games", "Sparkz (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1992, arcadecl, 0, arcadecl, arcadecl, 0,      ROT0, "Atari Games", "Arcade Classics (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1992, sparkz,   0, arcadecl, sparkz,   sparkz, ROT0, "Atari Games", "Sparkz (prototype)", GAME_SUPPORTS_SAVE )

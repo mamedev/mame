@@ -5,21 +5,8 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "machine/atarigen.h"
 #include "vindictr.h"
 #include "thunderj.h"
-
-
-
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-static UINT8 playfield_tile_bank;
-static UINT16 playfield_xscroll;
-static UINT16 playfield_yscroll;
 
 
 
@@ -31,7 +18,8 @@ static UINT16 playfield_yscroll;
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	UINT16 data = atarigen_alpha[tile_index];
+	vindictr_state *state = (vindictr_state *)machine->driver_data;
+	UINT16 data = state->atarigen.alpha[tile_index];
 	int code = data & 0x3ff;
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
 	int opaque = data & 0x8000;
@@ -41,8 +29,9 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	UINT16 data = atarigen_playfield[tile_index];
-	int code = (playfield_tile_bank * 0x1000) + (data & 0xfff);
+	vindictr_state *state = (vindictr_state *)machine->driver_data;
+	UINT16 data = state->atarigen.playfield[tile_index];
+	int code = (state->playfield_tile_bank * 0x1000) + (data & 0xfff);
 	int color = 0x10 + 2 * ((data >> 12) & 7);
 	SET_TILE_INFO(0, code, color, (data >> 15) & 1);
 }
@@ -93,16 +82,17 @@ VIDEO_START( vindictr )
 		0,					/* resulting value to indicate "special" */
 		NULL				/* callback routine for special entries */
 	};
+	vindictr_state *state = (vindictr_state *)machine->driver_data;
 
 	/* initialize the playfield */
-	atarigen_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
+	state->atarigen.playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	atarigen_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
-	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
+	state->atarigen.alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
+	tilemap_set_transparent_pen(state->atarigen.alpha_tilemap, 0);
 }
 
 
@@ -145,13 +135,14 @@ WRITE16_HANDLER( vindictr_paletteram_w )
 
 void vindictr_scanline_update(const device_config *screen, int scanline)
 {
-	UINT16 *base = &atarigen_alpha[((scanline - 8) / 8) * 64 + 42];
+	vindictr_state *state = (vindictr_state *)screen->machine->driver_data;
+	UINT16 *base = &state->atarigen.alpha[((scanline - 8) / 8) * 64 + 42];
 	int x;
 
 	/* keep in range */
-	if (base < atarigen_alpha)
+	if (base < state->atarigen.alpha)
 		base += 0x7c0;
-	else if (base >= &atarigen_alpha[0x7c0])
+	else if (base >= &state->atarigen.alpha[0x7c0])
 		return;
 
 	/* update the current parameters */
@@ -162,20 +153,20 @@ void vindictr_scanline_update(const device_config *screen, int scanline)
 		switch ((data >> 9) & 7)
 		{
 			case 2:		/* /PFB */
-				if (playfield_tile_bank != (data & 7))
+				if (state->playfield_tile_bank != (data & 7))
 				{
 					video_screen_update_partial(screen, scanline - 1);
-					playfield_tile_bank = data & 7;
-					tilemap_mark_all_tiles_dirty(atarigen_playfield_tilemap);
+					state->playfield_tile_bank = data & 7;
+					tilemap_mark_all_tiles_dirty(state->atarigen.playfield_tilemap);
 				}
 				break;
 
 			case 3:		/* /PFHSLD */
-				if (playfield_xscroll != (data & 0x1ff))
+				if (state->playfield_xscroll != (data & 0x1ff))
 				{
 					video_screen_update_partial(screen, scanline - 1);
-					tilemap_set_scrollx(atarigen_playfield_tilemap, 0, data);
-					playfield_xscroll = data & 0x1ff;
+					tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, data);
+					state->playfield_xscroll = data & 0x1ff;
 				}
 				break;
 
@@ -202,10 +193,10 @@ void vindictr_scanline_update(const device_config *screen, int scanline)
 				if (offset > visible_area->max_y)
 					offset -= visible_area->max_y + 1;
 
-				if (playfield_yscroll != ((data - offset) & 0x1ff))
+				if (state->playfield_yscroll != ((data - offset) & 0x1ff))
 				{
 					video_screen_update_partial(screen, scanline - 1);
-					tilemap_set_scrolly(atarigen_playfield_tilemap, 0, data - offset);
+					tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, data - offset);
 					atarimo_set_yscroll(0, (data - offset) & 0x1ff);
 				}
 				break;
@@ -224,12 +215,13 @@ void vindictr_scanline_update(const device_config *screen, int scanline)
 
 VIDEO_UPDATE( vindictr )
 {
+	vindictr_state *state = (vindictr_state *)screen->machine->driver_data;
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -270,7 +262,7 @@ VIDEO_UPDATE( vindictr )
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, atarigen_alpha_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->atarigen.alpha_tilemap, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
 	rectlist.rect -= rectlist.numrects;

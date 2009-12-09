@@ -19,7 +19,6 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/atarigen.h"
 #include "shuuz.h"
 #include "sound/okim6295.h"
 
@@ -33,7 +32,8 @@
 
 static void update_interrupts(running_machine *machine)
 {
-	cputag_set_input_line(machine, "maincpu", 4, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	shuuz_state *state = (shuuz_state *)machine->driver_data;
+	cputag_set_input_line(machine, "maincpu", 4, state->atarigen.scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -65,9 +65,11 @@ static WRITE16_HANDLER( shuuz_atarivc_w )
 
 static MACHINE_RESET( shuuz )
 {
-	atarigen_eeprom_reset();
-	atarigen_interrupt_reset(update_interrupts);
-	atarivc_reset(machine->primary_screen, atarivc_eof_data, 1);
+	shuuz_state *state = (shuuz_state *)machine->driver_data;
+
+	atarigen_eeprom_reset(&state->atarigen);
+	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
+	atarivc_reset(machine->primary_screen, state->atarigen.atarivc_eof_data, 1);
 }
 
 
@@ -131,7 +133,7 @@ static READ16_HANDLER( special_port0_r )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
+	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(shuuz_state, atarigen.eeprom, atarigen.eeprom_size)
 	AM_RANGE(0x101000, 0x101fff) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x102000, 0x102001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x103000, 0x103003) AM_READ(leta_r)
@@ -140,11 +142,11 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x106000, 0x106001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x107000, 0x107007) AM_NOP
 	AM_RANGE(0x3e0000, 0x3e087f) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(shuuz_atarivc_r, shuuz_atarivc_w) AM_BASE(&atarivc_data)
-	AM_RANGE(0x3f4000, 0x3f5eff) AM_RAM_WRITE(atarigen_playfield_latched_msb_w) AM_BASE(&atarigen_playfield)
-	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_BASE(&atarivc_eof_data)
+	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(shuuz_atarivc_r, shuuz_atarivc_w) AM_BASE_MEMBER(shuuz_state, atarigen.atarivc_data)
+	AM_RANGE(0x3f4000, 0x3f5eff) AM_RAM_WRITE(atarigen_playfield_latched_msb_w) AM_BASE_MEMBER(shuuz_state, atarigen.playfield)
+	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_BASE_MEMBER(shuuz_state, atarigen.atarivc_eof_data)
 	AM_RANGE(0x3f5f80, 0x3f5fff) AM_RAM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
-	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM_WRITE(atarigen_playfield_upper_w) AM_BASE(&atarigen_playfield_upper)
+	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM_WRITE(atarigen_playfield_upper_w) AM_BASE_MEMBER(shuuz_state, atarigen.playfield_upper)
 	AM_RANGE(0x3f8000, 0x3fcfff) AM_RAM
 	AM_RANGE(0x3fd000, 0x3fd3ff) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0x3fd400, 0x3fffff) AM_RAM
@@ -251,6 +253,7 @@ GFXDECODE_END
  *************************************/
 
 static MACHINE_DRIVER_START( shuuz )
+	MDRV_DRIVER_DATA(shuuz_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -346,22 +349,9 @@ ROM_END
 
 /*************************************
  *
- *  Driver init
- *
- *************************************/
-
-static DRIVER_INIT( shuuz )
-{
-	atarigen_eeprom_default = NULL;
-}
-
-
-
-/*************************************
- *
  *  Game driver(s)
  *
  *************************************/
 
-GAME( 1990, shuuz,  0,     shuuz, shuuz,  shuuz, ROT0, "Atari Games", "Shuuz (version 8.0)", 0 )
-GAME( 1990, shuuz2, shuuz, shuuz, shuuz2, shuuz, ROT0, "Atari Games", "Shuuz (version 7.1)", 0 )
+GAME( 1990, shuuz,  0,     shuuz, shuuz,  0, ROT0, "Atari Games", "Shuuz (version 8.0)", 0 )
+GAME( 1990, shuuz2, shuuz, shuuz, shuuz2, 0, ROT0, "Atari Games", "Shuuz (version 7.1)", 0 )

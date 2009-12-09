@@ -12,16 +12,6 @@
 
 /*************************************
  *
- *  Globals we own
- *
- *************************************/
-
-UINT16 *rampart_bitmap;
-
-
-
-/*************************************
- *
  *  Video system start
  *
  *************************************/
@@ -119,12 +109,13 @@ VIDEO_UPDATE( rampart )
 
 void rampart_bitmap_render(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	rampart_state *state = (rampart_state *)machine->driver_data;
 	int x, y;
 
 	/* update any dirty scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		const UINT16 *src = &rampart_bitmap[256 * y];
+		const UINT16 *src = &state->bitmap[256 * y];
 		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
 
 		/* regenerate the line */

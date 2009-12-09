@@ -11,17 +11,6 @@
 
 /*************************************
  *
- *  Globals we own
- *
- *************************************/
-
-UINT32 *	beathead_vram_bulk_latch;
-UINT32 *	beathead_palette_select;
-
-
-
-/*************************************
- *
  *  Statics
  *
  *************************************/
@@ -67,6 +56,8 @@ WRITE32_HANDLER( beathead_vram_transparent_w )
 
 WRITE32_HANDLER( beathead_vram_bulk_w )
 {
+	beathead_state *state = (beathead_state *)space->machine->driver_data;
+
 	/* it appears that writes to this area pass in a mask for 4 words in VRAM */
 	/* allowing them to be filled from a preset latch */
 	offset &= ~3;
@@ -77,7 +68,7 @@ WRITE32_HANDLER( beathead_vram_bulk_w )
 		space->machine->generic.videoram.u32[offset+0] =
 		space->machine->generic.videoram.u32[offset+1] =
 		space->machine->generic.videoram.u32[offset+2] =
-		space->machine->generic.videoram.u32[offset+3] = *beathead_vram_bulk_latch;
+		space->machine->generic.videoram.u32[offset+3] = *state->vram_bulk_latch;
 	else
 		logerror("Detected bulk VRAM write with mask %08x\n", data);
 }
@@ -181,13 +172,14 @@ WRITE32_HANDLER( beathead_hsync_ram_w )
 
 VIDEO_UPDATE( beathead )
 {
+	beathead_state *state = (beathead_state *)screen->machine->driver_data;
 	UINT8 *videoram = screen->machine->generic.videoram.u8;
 	int x, y;
 
 	/* generate the final screen */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		pen_t pen_base = (*beathead_palette_select & 0x7f) * 256;
+		pen_t pen_base = (*state->palette_select & 0x7f) * 256;
 		UINT16 scanline[336];
 
 		/* blanking */

@@ -18,7 +18,8 @@
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	UINT16 data = atarigen_alpha[tile_index];
+	xybots_state *state = (xybots_state *)machine->driver_data;
+	UINT16 data = state->atarigen.alpha[tile_index];
 	int code = data & 0x3ff;
 	int color = (data >> 12) & 7;
 	int opaque = data & 0x8000;
@@ -28,7 +29,8 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	UINT16 data = atarigen_playfield[tile_index];
+	xybots_state *state = (xybots_state *)machine->driver_data;
+	UINT16 data = state->atarigen.playfield[tile_index];
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
 	SET_TILE_INFO(0, code, color, (data >> 15) & 1);
@@ -80,16 +82,17 @@ VIDEO_START( xybots )
 		0,					/* resulting value to indicate "special" */
 		NULL				/* callback routine for special entries */
 	};
+	xybots_state *state = (xybots_state *)machine->driver_data;
 
 	/* initialize the playfield */
-	atarigen_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 64,32);
+	state->atarigen.playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 64,32);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	atarigen_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
-	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
+	state->atarigen.alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
+	tilemap_set_transparent_pen(state->atarigen.alpha_tilemap, 0);
 }
 
 
@@ -102,12 +105,13 @@ VIDEO_START( xybots )
 
 VIDEO_UPDATE( xybots )
 {
+	xybots_state *state = (xybots_state *)screen->machine->driver_data;
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -161,6 +165,6 @@ VIDEO_UPDATE( xybots )
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, atarigen_alpha_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->atarigen.alpha_tilemap, 0, 0);
 	return 0;
 }

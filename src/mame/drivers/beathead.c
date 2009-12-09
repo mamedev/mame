@@ -162,9 +162,11 @@ static TIMER_CALLBACK( scanline_callback )
 
 static MACHINE_RESET( beathead )
 {
+	beathead_state *state = (beathead_state *)machine->driver_data;
+
 	/* reset the common subsystems */
-	atarigen_eeprom_reset();
-	atarigen_interrupt_reset(update_interrupts);
+	atarigen_eeprom_reset(&state->atarigen);
+	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
 	atarijsa_reset();
 
 	/* the code is temporarily mapped at 0 at startup */
@@ -269,9 +271,10 @@ static WRITE32_HANDLER( eeprom_enable_w )
 
 static READ32_HANDLER( input_2_r )
 {
+	beathead_state *state = (beathead_state *)space->machine->driver_data;
 	int result = input_port_read(space->machine, "IN2");
-	if (atarigen_sound_to_cpu_ready) result ^= 0x10;
-	if (atarigen_cpu_to_sound_ready) result ^= 0x20;
+	if (state->atarigen.sound_to_cpu_ready) result ^= 0x10;
+	if (state->atarigen.cpu_to_sound_ready) result ^= 0x20;
 	return result;
 }
 
@@ -336,7 +339,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x41000220, 0x41000227) AM_WRITE(coin_count_w)
 	AM_RANGE(0x41000300, 0x41000303) AM_READ(input_2_r)
 	AM_RANGE(0x41000304, 0x41000307) AM_READ_PORT("IN3")
-	AM_RANGE(0x41000400, 0x41000403) AM_WRITEONLY AM_BASE(&beathead_palette_select)
+	AM_RANGE(0x41000400, 0x41000403) AM_WRITEONLY AM_BASE_MEMBER(beathead_state, palette_select)
 	AM_RANGE(0x41000500, 0x41000503) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0x41000600, 0x41000603) AM_WRITE(beathead_finescroll_w)
 	AM_RANGE(0x41000700, 0x41000703) AM_WRITE(watchdog_reset32_w)
@@ -347,7 +350,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x8f900000, 0x8f97ffff) AM_WRITE(beathead_vram_transparent_w)
 	AM_RANGE(0x8f980000, 0x8f9fffff) AM_RAM AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x8fb80000, 0x8fbfffff) AM_WRITE(beathead_vram_bulk_w)
-	AM_RANGE(0x8fff8000, 0x8fff8003) AM_WRITEONLY AM_BASE(&beathead_vram_bulk_latch)
+	AM_RANGE(0x8fff8000, 0x8fff8003) AM_WRITEONLY AM_BASE_MEMBER(beathead_state, vram_bulk_latch)
 	AM_RANGE(0x9e280000, 0x9e2fffff) AM_WRITE(beathead_vram_copy_w)
 ADDRESS_MAP_END
 
@@ -407,6 +410,7 @@ INPUT_PORTS_END
  *************************************/
 
 static MACHINE_DRIVER_START( beathead )
+	MDRV_DRIVER_DATA(beathead_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ASAP, ATARI_CLOCK_14MHz)
@@ -510,7 +514,6 @@ static READ32_HANDLER( movie_speedup_r )
 static DRIVER_INIT( beathead )
 {
 	/* initialize the common systems */
-	atarigen_eeprom_default = NULL;
 	atarijsa_init(machine, "IN2", 0x0040);
 
 	/* prepare the speedups */

@@ -29,32 +29,25 @@
 
 /*************************************
  *
- *  Statics
- *
- *************************************/
-
-static UINT16 *interrupt_scan;
-
-
-
-/*************************************
- *
  *  Initialization & interrupts
  *
  *************************************/
 
 static void update_interrupts(running_machine *machine)
 {
-	cputag_set_input_line(machine, "maincpu", 1, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 2, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 3, atarigen_scanline_int_state && atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	toobin_state *state = (toobin_state *)machine->driver_data;
+	cputag_set_input_line(machine, "maincpu", 1, state->atarigen.scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, state->atarigen.sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 3, state->atarigen.scanline_int_state && state->atarigen.sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static MACHINE_RESET( toobin )
 {
-	atarigen_eeprom_reset();
-	atarigen_interrupt_reset(update_interrupts);
+	toobin_state *state = (toobin_state *)machine->driver_data;
+
+	atarigen_eeprom_reset(&state->atarigen);
+	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
 	atarijsa_reset();
 }
 
@@ -68,14 +61,15 @@ static MACHINE_RESET( toobin )
 
 static WRITE16_HANDLER( interrupt_scan_w )
 {
-	int oldword = interrupt_scan[offset];
+	toobin_state *state = (toobin_state *)space->machine->driver_data;
+	int oldword = state->interrupt_scan[offset];
 	int newword = oldword;
 	COMBINE_DATA(&newword);
 
 	/* if something changed, update the word in memory */
 	if (oldword != newword)
 	{
-		interrupt_scan[offset] = newword;
+		state->interrupt_scan[offset] = newword;
 		atarigen_scanline_int_set(space->machine->primary_screen, newword & 0x1ff);
 	}
 }
@@ -90,9 +84,10 @@ static WRITE16_HANDLER( interrupt_scan_w )
 
 static READ16_HANDLER( special_port1_r )
 {
+	toobin_state *state = (toobin_state *)space->machine->driver_data;
 	int result = input_port_read(space->machine, "FF9000");
 	if (atarigen_get_hblank(space->machine->primary_screen)) result ^= 0x8000;
-	if (atarigen_cpu_to_sound_ready) result ^= 0x2000;
+	if (state->atarigen.cpu_to_sound_ready) result ^= 0x2000;
 	return result;
 }
 
@@ -108,25 +103,25 @@ static READ16_HANDLER( special_port1_r )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xc7ffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0xc00000, 0xc07fff) AM_RAM_WRITE(atarigen_playfield_large_w) AM_BASE(&atarigen_playfield)
-	AM_RANGE(0xc08000, 0xc097ff) AM_MIRROR(0x046000) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE(&atarigen_alpha)
+	AM_RANGE(0xc00000, 0xc07fff) AM_RAM_WRITE(atarigen_playfield_large_w) AM_BASE_MEMBER(toobin_state, atarigen.playfield)
+	AM_RANGE(0xc08000, 0xc097ff) AM_MIRROR(0x046000) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(toobin_state, atarigen.alpha)
 	AM_RANGE(0xc09800, 0xc09fff) AM_MIRROR(0x046000) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0xc10000, 0xc107ff) AM_MIRROR(0x047800) AM_RAM_WRITE(toobin_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff6000, 0xff6001) AM_READNOP		/* who knows? read at controls time */
 	AM_RANGE(0xff8000, 0xff8001) AM_MIRROR(0x4500fe) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xff8100, 0xff8101) AM_MIRROR(0x4500fe) AM_WRITE(atarigen_sound_w)
 	AM_RANGE(0xff8300, 0xff8301) AM_MIRROR(0x45003e) AM_WRITE(toobin_intensity_w)
-	AM_RANGE(0xff8340, 0xff8341) AM_MIRROR(0x45003e) AM_WRITE(interrupt_scan_w) AM_BASE(&interrupt_scan)
+	AM_RANGE(0xff8340, 0xff8341) AM_MIRROR(0x45003e) AM_WRITE(interrupt_scan_w) AM_BASE_MEMBER(toobin_state, interrupt_scan)
 	AM_RANGE(0xff8380, 0xff8381) AM_MIRROR(0x45003e) AM_WRITE(toobin_slip_w) AM_BASE(&atarimo_0_slipram)
 	AM_RANGE(0xff83c0, 0xff83c1) AM_MIRROR(0x45003e) AM_WRITE(atarigen_scanline_int_ack_w)
 	AM_RANGE(0xff8400, 0xff8401) AM_MIRROR(0x4500fe) AM_WRITE(atarigen_sound_reset_w)
 	AM_RANGE(0xff8500, 0xff8501) AM_MIRROR(0x4500fe) AM_WRITE(atarigen_eeprom_enable_w)
-	AM_RANGE(0xff8600, 0xff8601) AM_MIRROR(0x4500fe) AM_WRITE(toobin_xscroll_w) AM_BASE(&atarigen_xscroll)
-	AM_RANGE(0xff8700, 0xff8701) AM_MIRROR(0x4500fe) AM_WRITE(toobin_yscroll_w) AM_BASE(&atarigen_yscroll)
+	AM_RANGE(0xff8600, 0xff8601) AM_MIRROR(0x4500fe) AM_WRITE(toobin_xscroll_w) AM_BASE_MEMBER(toobin_state, atarigen.xscroll)
+	AM_RANGE(0xff8700, 0xff8701) AM_MIRROR(0x4500fe) AM_WRITE(toobin_yscroll_w) AM_BASE_MEMBER(toobin_state, atarigen.yscroll)
 	AM_RANGE(0xff8800, 0xff8801) AM_MIRROR(0x4507fe) AM_READ_PORT("FF8800")
 	AM_RANGE(0xff9000, 0xff9001) AM_MIRROR(0x4507fe) AM_READ(special_port1_r)
 	AM_RANGE(0xff9800, 0xff9801) AM_MIRROR(0x4507fe) AM_READ(atarigen_sound_r)
-	AM_RANGE(0xffa000, 0xffafff) AM_MIRROR(0x451000) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
+	AM_RANGE(0xffa000, 0xffafff) AM_MIRROR(0x451000) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(toobin_state, atarigen.eeprom, atarigen.eeprom_size)
 	AM_RANGE(0xffc000, 0xffffff) AM_MIRROR(0x450000) AM_RAM
 ADDRESS_MAP_END
 
@@ -223,6 +218,7 @@ GFXDECODE_END
  *************************************/
 
 static MACHINE_DRIVER_START( toobin )
+	MDRV_DRIVER_DATA(toobin_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68010, MASTER_CLOCK/4)
@@ -602,7 +598,6 @@ ROM_END
 
 static DRIVER_INIT( toobin )
 {
-	atarigen_eeprom_default = NULL;
 	atarijsa_init(machine, "FF9000", 0x1000);
 }
 

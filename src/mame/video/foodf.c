@@ -5,14 +5,8 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "machine/atarigen.h"
 #include "foodf.h"
 #include "video/resnet.h"
-
-
-static double rweights[3], gweights[3], bweights[2];
-static UINT8 playfield_flip;
-
 
 
 /*************************************
@@ -23,10 +17,11 @@ static UINT8 playfield_flip;
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	UINT16 data = atarigen_playfield[tile_index];
+	foodf_state *state = (foodf_state *)machine->driver_data;
+	UINT16 data = state->atarigen.playfield[tile_index];
 	int code = (data & 0xff) | ((data >> 7) & 0x100);
 	int color = (data >> 8) & 0x3f;
-	SET_TILE_INFO(0, code, color, playfield_flip ? (TILE_FLIPX | TILE_FLIPY) : 0);
+	SET_TILE_INFO(0, code, color, state->playfield_flip ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
 
@@ -40,21 +35,21 @@ static TILE_GET_INFO( get_playfield_tile_info )
 VIDEO_START( foodf )
 {
 	static const int resistances[3] = { 1000, 470, 220 };
+	foodf_state *state = (foodf_state *)machine->driver_data;
 
 	/* initialize the playfield */
-	atarigen_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 32,32);
-	tilemap_set_transparent_pen(atarigen_playfield_tilemap, 0);
+	state->atarigen.playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 32,32);
+	tilemap_set_transparent_pen(state->atarigen.playfield_tilemap, 0);
 
 	/* adjust the playfield for the 8 pixel offset */
-	tilemap_set_scrollx(atarigen_playfield_tilemap, 0, -8);
-	playfield_flip = 0;
-	state_save_register_global(machine, playfield_flip);
+	tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, -8);
+	state_save_register_global(machine, state->playfield_flip);
 
 	/* compute the color output resistor weights */
 	compute_resistor_weights(0,	255, -1.0,
-			3,	&resistances[0], rweights, 0, 0,
-			3,	&resistances[0], gweights, 0, 0,
-			2,	&resistances[1], bweights, 0, 0);
+			3,	&resistances[0], state->rweights, 0, 0,
+			3,	&resistances[0], state->gweights, 0, 0,
+			2,	&resistances[1], state->bweights, 0, 0);
 }
 
 
@@ -65,12 +60,12 @@ VIDEO_START( foodf )
  *
  *************************************/
 
-void foodf_set_flip(int flip)
+void foodf_set_flip(foodf_state *state, int flip)
 {
-	if (flip != playfield_flip)
+	if (flip != state->playfield_flip)
 	{
-		playfield_flip = flip;
-		tilemap_mark_all_tiles_dirty(atarigen_playfield_tilemap);
+		state->playfield_flip = flip;
+		tilemap_mark_all_tiles_dirty(state->atarigen.playfield_tilemap);
 	}
 }
 
@@ -84,6 +79,7 @@ void foodf_set_flip(int flip)
 
 WRITE16_HANDLER( foodf_paletteram_w )
 {
+	foodf_state *state = (foodf_state *)space->machine->driver_data;
 	int newword, r, g, b, bit0, bit1, bit2;
 
 	COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
@@ -94,18 +90,18 @@ WRITE16_HANDLER( foodf_paletteram_w )
 	bit0 = (newword >> 0) & 0x01;
 	bit1 = (newword >> 1) & 0x01;
 	bit2 = (newword >> 2) & 0x01;
-	r = combine_3_weights(rweights, bit0, bit1, bit2);
+	r = combine_3_weights(state->rweights, bit0, bit1, bit2);
 
 	/* green component */
 	bit0 = (newword >> 3) & 0x01;
 	bit1 = (newword >> 4) & 0x01;
 	bit2 = (newword >> 5) & 0x01;
-	g = combine_3_weights(gweights, bit0, bit1, bit2);
+	g = combine_3_weights(state->gweights, bit0, bit1, bit2);
 
 	/* blue component */
 	bit0 = (newword >> 6) & 0x01;
 	bit1 = (newword >> 7) & 0x01;
-	b = combine_2_weights(bweights, bit0, bit1);
+	b = combine_2_weights(state->bweights, bit0, bit1);
 
 	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
 }
@@ -120,17 +116,18 @@ WRITE16_HANDLER( foodf_paletteram_w )
 
 VIDEO_UPDATE( foodf )
 {
+	foodf_state *state = (foodf_state *)screen->machine->driver_data;
 	int offs;
 	const gfx_element *gfx = screen->machine->gfx[1];
 	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
 	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
 
 	/* first draw the playfield opaquely */
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* then draw the non-transparent parts with a priority of 1 */
 	bitmap_fill(priority_bitmap, 0, 0);
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 1);
+	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 0, 1);
 
 	/* draw the motion objects front-to-back */
 	for (offs = 0x80-2; offs >= 0x20; offs -= 2)

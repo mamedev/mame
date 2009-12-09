@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "machine/atarigen.h"
 #include "klax.h"
 
 
@@ -18,8 +17,9 @@
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	UINT16 data1 = atarigen_playfield[tile_index];
-	UINT16 data2 = atarigen_playfield_upper[tile_index] >> 8;
+	klax_state *state = (klax_state *)machine->driver_data;
+	UINT16 data1 = state->atarigen.playfield[tile_index];
+	UINT16 data2 = state->atarigen.playfield_upper[tile_index] >> 8;
 	int code = data1 & 0x1fff;
 	int color = data2 & 0x0f;
 	SET_TILE_INFO(0, code, color, (data1 >> 15) & 1);
@@ -71,9 +71,10 @@ VIDEO_START( klax )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
+	klax_state *state = (klax_state *)machine->driver_data;
 
 	/* initialize the playfield */
-	atarigen_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,32);
+	state->atarigen.playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,32);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
@@ -101,12 +102,13 @@ WRITE16_HANDLER( klax_latch_w )
 
 VIDEO_UPDATE( klax )
 {
+	klax_state *state = (klax_state *)screen->machine->driver_data;
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);

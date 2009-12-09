@@ -19,7 +19,6 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/atarigen.h"
 #include "klax.h"
 #include "sound/okim6295.h"
 
@@ -33,7 +32,8 @@
 
 static void update_interrupts(running_machine *machine)
 {
-	cputag_set_input_line(machine, "maincpu", 4, atarigen_video_int_state || atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	klax_state *state = (klax_state *)machine->driver_data;
+	cputag_set_input_line(machine, "maincpu", 4, state->atarigen.video_int_state || state->atarigen.scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -61,8 +61,10 @@ static WRITE16_HANDLER( interrupt_ack_w )
 
 static MACHINE_RESET( klax )
 {
-	atarigen_eeprom_reset();
-	atarigen_interrupt_reset(update_interrupts);
+	klax_state *state = (klax_state *)machine->driver_data;
+
+	atarigen_eeprom_reset(&state->atarigen);
+	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
 	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 32);
 }
 
@@ -76,7 +78,7 @@ static MACHINE_RESET( klax )
 
 static ADDRESS_MAP_START( klax_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r,atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
+	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r,atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(klax_state, atarigen.eeprom, atarigen.eeprom_size)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("P1") AM_WRITE(klax_latch_w)
 	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("P2")
@@ -84,9 +86,9 @@ static ADDRESS_MAP_START( klax_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(interrupt_ack_w)
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_RAM_WRITE(atarigen_expanded_666_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3f0000, 0x3f0f7f) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE(&atarigen_playfield)
+	AM_RANGE(0x3f0000, 0x3f0f7f) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(klax_state, atarigen.playfield)
 	AM_RANGE(0x3f0f80, 0x3f0fff) AM_RAM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
-	AM_RANGE(0x3f1000, 0x3f1fff) AM_RAM_WRITE(atarigen_playfield_upper_w) AM_BASE(&atarigen_playfield_upper)
+	AM_RANGE(0x3f1000, 0x3f1fff) AM_RAM_WRITE(atarigen_playfield_upper_w) AM_BASE_MEMBER(klax_state, atarigen.playfield_upper)
 	AM_RANGE(0x3f2000, 0x3f27ff) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0x3f2800, 0x3f3fff) AM_RAM
 ADDRESS_MAP_END
@@ -156,6 +158,7 @@ GFXDECODE_END
  *************************************/
 
 static MACHINE_DRIVER_START( klax )
+	MDRV_DRIVER_DATA(klax_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -348,25 +351,12 @@ ROM_END
 
 /*************************************
  *
- *  Driver initialization
- *
- *************************************/
-
-static DRIVER_INIT( klax )
-{
-	atarigen_eeprom_default = NULL;
-}
-
-
-
-/*************************************
- *
  *  Game driver(s)
  *
  *************************************/
 
-GAME( 1989, klax,  0,    klax, klax, klax, ROT0, "Atari Games", "Klax (set 1)", 0 )
-GAME( 1989, klax2, klax, klax, klax, klax, ROT0, "Atari Games", "Klax (set 2)", 0 )
-GAME( 1989, klax3, klax, klax, klax, klax, ROT0, "Atari Games", "Klax (set 3)", 0 )
-GAME( 1989, klaxj, klax, klax, klax, klax, ROT0, "Atari Games", "Klax (Japan)", 0 )
-GAME( 1989, klaxd, klax, klax, klax, klax, ROT0, "Atari Games", "Klax (Germany)", 0 )
+GAME( 1989, klax,  0,    klax, klax, 0, ROT0, "Atari Games", "Klax (set 1)", 0 )
+GAME( 1989, klax2, klax, klax, klax, 0, ROT0, "Atari Games", "Klax (set 2)", 0 )
+GAME( 1989, klax3, klax, klax, klax, 0, ROT0, "Atari Games", "Klax (set 3)", 0 )
+GAME( 1989, klaxj, klax, klax, klax, 0, ROT0, "Atari Games", "Klax (Japan)", 0 )
+GAME( 1989, klaxd, klax, klax, klax, 0, ROT0, "Atari Games", "Klax (Germany)", 0 )

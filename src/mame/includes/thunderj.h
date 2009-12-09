@@ -4,9 +4,17 @@
 
 *************************************************************************/
 
-/*----------- defined in video/thunderj.c -----------*/
+#include "machine/atarigen.h"
 
-extern UINT8 thunderj_alpha_tile_bank;
+typedef struct _thunderj_state thunderj_state;
+struct _thunderj_state
+{
+	atarigen_state	atarigen;
+	UINT8			alpha_tile_bank;
+};
+
+
+/*----------- defined in video/thunderj.c -----------*/
 
 VIDEO_START( thunderj );
 VIDEO_UPDATE( thunderj );

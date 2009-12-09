@@ -4,9 +4,20 @@
 
 *************************************************************************/
 
-/*----------- defined in video/batman.c -----------*/
+#include "machine/atarigen.h"
 
-extern UINT8 batman_alpha_tile_bank;
+typedef struct _batman_state batman_state;
+struct _batman_state
+{
+	atarigen_state	atarigen;
+
+	UINT16 			latch_data;
+
+	UINT8 			alpha_tile_bank;
+};
+
+
+/*----------- defined in video/batman.c -----------*/
 
 VIDEO_START( batman );
 VIDEO_UPDATE( batman );

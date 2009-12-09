@@ -49,41 +49,79 @@ struct atarivc_state_desc
 };
 
 
+typedef struct _atarigen_state atarigen_state;
+struct _atarigen_state
+{
+	UINT8 				scanline_int_state;
+	UINT8 				sound_int_state;
+	UINT8 				video_int_state;
 
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
+	const UINT16 *		eeprom_default;
+	UINT16 *			eeprom;
+	size_t 				eeprom_size;
 
-extern UINT8			atarigen_scanline_int_state;
-extern UINT8			atarigen_sound_int_state;
-extern UINT8			atarigen_video_int_state;
+	UINT8 				cpu_to_sound_ready;
+	UINT8 				sound_to_cpu_ready;
 
-extern const UINT16 *	atarigen_eeprom_default;
-extern UINT16 *		atarigen_eeprom;
-extern size_t 			atarigen_eeprom_size;
+	UINT16 *			playfield;
+	UINT16 *			playfield2;
+	UINT16 *			playfield_upper;
+	UINT16 *			alpha;
+	UINT16 *			alpha2;
+	UINT16 *			xscroll;
+	UINT16 *			yscroll;
 
-extern UINT8			atarigen_cpu_to_sound_ready;
-extern UINT8			atarigen_sound_to_cpu_ready;
+	UINT32 *			playfield32;
+	UINT32 *			alpha32;
 
-extern UINT16 *		atarigen_playfield;
-extern UINT16 *		atarigen_playfield2;
-extern UINT16 *		atarigen_playfield_upper;
-extern UINT16 *		atarigen_alpha;
-extern UINT16 *		atarigen_alpha2;
-extern UINT16 *		atarigen_xscroll;
-extern UINT16 *		atarigen_yscroll;
+	tilemap *			playfield_tilemap;
+	tilemap *			playfield2_tilemap;
+	tilemap *			alpha_tilemap;
+	tilemap *			alpha2_tilemap;
 
-extern UINT32 *		atarigen_playfield32;
-extern UINT32 *		atarigen_alpha32;
+	UINT16 *			atarivc_data;
+	UINT16 *			atarivc_eof_data;
+	struct atarivc_state_desc atarivc_state;
 
-extern tilemap *		atarigen_playfield_tilemap;
-extern tilemap *		atarigen_playfield2_tilemap;
-extern tilemap *		atarigen_alpha_tilemap;
-extern tilemap *		atarigen_alpha2_tilemap;
+	/* internal state */
+	atarigen_int_func 		update_int_callback;
 
-extern UINT16 *		atarivc_data;
-extern UINT16 *		atarivc_eof_data;
-extern struct atarivc_state_desc atarivc_state;
+	UINT8 					eeprom_unlocked;
+
+	UINT8					slapstic_num;
+	UINT16 *				slapstic;
+	UINT8					slapstic_bank;
+	void *					slapstic_bank0;
+	offs_t					slapstic_last_pc;
+	offs_t					slapstic_last_address;
+	offs_t					slapstic_base;
+	offs_t					slapstic_mirror;
+
+	const device_config *	sound_cpu;
+	UINT8 					cpu_to_sound;
+	UINT8 					sound_to_cpu;
+	UINT8 					timed_int;
+	UINT8 					ym2151_int;
+
+	atarigen_scanline_func 	scanline_callback;
+	UINT32 					scanlines_per_callback;
+
+	UINT32 					actual_vc_latch0;
+	UINT32 					actual_vc_latch1;
+	UINT8					atarivc_playfields;
+
+	UINT32					playfield_latch;
+	UINT32					playfield2_latch;
+
+	const device_config *	scanline_interrupt_timer_screens[ATARIMO_MAX];
+	emu_timer *				scanline_interrupt_timers[ATARIMO_MAX];
+
+	const device_config *	scanline_timer_screens[ATARIMO_MAX];
+	emu_timer *				scanline_timers[ATARIMO_MAX];
+
+	const device_config *	atarivc_eof_update_timer_screens[ATARIMO_MAX];
+	emu_timer *				atarivc_eof_update_timers[ATARIMO_MAX];
+};
 
 
 
@@ -95,7 +133,7 @@ extern struct atarivc_state_desc atarivc_state;
     INTERRUPT HANDLING
 ---------------------------------------------------------------*/
 
-void atarigen_interrupt_reset(atarigen_int_func update_int);
+void atarigen_interrupt_reset(atarigen_state *state, atarigen_int_func update_int);
 void atarigen_update_interrupts(running_machine *machine);
 
 void atarigen_scanline_int_set(const device_config *screen, int scanline);
@@ -116,7 +154,7 @@ WRITE32_HANDLER( atarigen_video_int_ack32_w );
     EEPROM HANDLING
 ---------------------------------------------------------------*/
 
-void atarigen_eeprom_reset(void);
+void atarigen_eeprom_reset(atarigen_state *state);
 
 WRITE16_HANDLER( atarigen_eeprom_enable_w );
 WRITE16_HANDLER( atarigen_eeprom_w );
@@ -135,7 +173,7 @@ NVRAM_HANDLER( atarigen );
 ---------------------------------------------------------------*/
 
 void atarigen_slapstic_init(const device_config *device, offs_t base, offs_t mirror, int chipnum);
-void atarigen_slapstic_reset(void);
+void atarigen_slapstic_reset(atarigen_state *state);
 
 WRITE16_HANDLER( atarigen_slapstic_w );
 READ16_HANDLER( atarigen_slapstic_r );
@@ -187,10 +225,10 @@ void atarivc_reset(const device_config *screen, UINT16 *eof_data, int playfields
 void atarivc_w(const device_config *screen, offs_t offset, UINT16 data, UINT16 mem_mask);
 UINT16 atarivc_r(const device_config *screen, offs_t offset);
 
-INLINE void atarivc_update_pf_xscrolls(void)
+INLINE void atarivc_update_pf_xscrolls(atarigen_state *state)
 {
-	atarivc_state.pf0_xscroll = atarivc_state.pf0_xscroll_raw + ((atarivc_state.pf1_xscroll_raw) & 7);
-	atarivc_state.pf1_xscroll = atarivc_state.pf1_xscroll_raw + 4;
+	state->atarivc_state.pf0_xscroll = state->atarivc_state.pf0_xscroll_raw + ((state->atarivc_state.pf1_xscroll_raw) & 7);
+	state->atarivc_state.pf1_xscroll = state->atarivc_state.pf1_xscroll_raw + 4;
 }
 
 
@@ -201,8 +239,8 @@ INLINE void atarivc_update_pf_xscrolls(void)
 WRITE16_HANDLER( atarigen_alpha_w );
 WRITE32_HANDLER( atarigen_alpha32_w );
 WRITE16_HANDLER( atarigen_alpha2_w );
-void atarigen_set_playfield_latch(int data);
-void atarigen_set_playfield2_latch(int data);
+void atarigen_set_playfield_latch(atarigen_state *state, int data);
+void atarigen_set_playfield2_latch(atarigen_state *state, int data);
 WRITE16_HANDLER( atarigen_playfield_w );
 WRITE32_HANDLER( atarigen_playfield32_w );
 WRITE16_HANDLER( atarigen_playfield_large_w );

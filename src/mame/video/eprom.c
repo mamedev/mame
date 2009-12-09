@@ -5,13 +5,8 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "machine/atarigen.h"
 #include "eprom.h"
 #include "thunderj.h"
-
-
-int eprom_screen_intensity;
-int eprom_video_disable;
 
 
 /*************************************
@@ -22,6 +17,7 @@ int eprom_video_disable;
 
 static void update_palette(running_machine *machine)
 {
+	eprom_state *state = (eprom_state *)machine->driver_data;
 	int color;
 
 	for (color = 0; color < 0x800; ++color)
@@ -35,7 +31,7 @@ static void update_palette(running_machine *machine)
          * This is, however, good enough to match the video and description
          * of MAMETesters bug #02677.
          */
-		i = (((data >> 12) & 15) + 1) * (4 - eprom_screen_intensity);
+		i = (((data >> 12) & 15) + 1) * (4 - state->screen_intensity);
 		if (i < 0)
 			i = 0;
 
@@ -57,7 +53,8 @@ static void update_palette(running_machine *machine)
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	UINT16 data = atarigen_alpha[tile_index];
+	eprom_state *state = (eprom_state *)machine->driver_data;
+	UINT16 data = state->atarigen.alpha[tile_index];
 	int code = data & 0x3ff;
 	int color = ((data >> 10) & 0x0f) | ((data >> 9) & 0x20);
 	int opaque = data & 0x8000;
@@ -67,8 +64,9 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	UINT16 data1 = atarigen_playfield[tile_index];
-	UINT16 data2 = atarigen_playfield_upper[tile_index] >> 8;
+	eprom_state *state = (eprom_state *)machine->driver_data;
+	UINT16 data1 = state->atarigen.playfield[tile_index];
+	UINT16 data2 = state->atarigen.playfield_upper[tile_index] >> 8;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
 	SET_TILE_INFO(0, code, color, (data1 >> 15) & 1);
@@ -77,8 +75,9 @@ static TILE_GET_INFO( get_playfield_tile_info )
 
 static TILE_GET_INFO( guts_get_playfield_tile_info )
 {
-	UINT16 data1 = atarigen_playfield[tile_index];
-	UINT16 data2 = atarigen_playfield_upper[tile_index] >> 8;
+	eprom_state *state = (eprom_state *)machine->driver_data;
+	UINT16 data1 = state->atarigen.playfield[tile_index];
+	UINT16 data2 = state->atarigen.playfield_upper[tile_index] >> 8;
 	int code = data1 & 0x7fff;
 	int color = 0x10 + (data2 & 0x0f);
 	SET_TILE_INFO(2, code, color, (data1 >> 15) & 1);
@@ -130,22 +129,17 @@ VIDEO_START( eprom )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
+	eprom_state *state = (eprom_state *)machine->driver_data;
 
 	/* initialize the playfield */
-	atarigen_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
+	state->atarigen.playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	atarigen_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
-	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
-
-	/* global brightess (not used by klax and guts) */
-	eprom_screen_intensity = 0;
-
-	/* video disabled (not used?) */
-	eprom_video_disable = 0;
+	state->atarigen.alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
+	tilemap_set_transparent_pen(state->atarigen.alpha_tilemap, 0);
 }
 
 
@@ -187,22 +181,17 @@ VIDEO_START( guts )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
+	eprom_state *state = (eprom_state *)machine->driver_data;
 
 	/* initialize the playfield */
-	atarigen_playfield_tilemap = tilemap_create(machine, guts_get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
+	state->atarigen.playfield_tilemap = tilemap_create(machine, guts_get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	atarigen_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
-	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
-
-	/* global brightess (not used by guts) */
-	eprom_screen_intensity = 0;
-
-	/* video disable (not used by guts) */
-	eprom_video_disable = 0;
+	state->atarigen.alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
+	tilemap_set_transparent_pen(state->atarigen.alpha_tilemap, 0);
 }
 
 
@@ -215,13 +204,15 @@ VIDEO_START( guts )
 
 void eprom_scanline_update(const device_config *screen, int scanline)
 {
+	eprom_state *state = (eprom_state *)screen->machine->driver_data;
+
 	/* update the playfield */
 	if (scanline == 0)
 	{
-		int xscroll = (atarigen_alpha[0x780] >> 7) & 0x1ff;
-		int yscroll = (atarigen_alpha[0x781] >> 7) & 0x1ff;
-		tilemap_set_scrollx(atarigen_playfield_tilemap, 0, xscroll);
-		tilemap_set_scrolly(atarigen_playfield_tilemap, 0, yscroll);
+		int xscroll = (state->atarigen.alpha[0x780] >> 7) & 0x1ff;
+		int yscroll = (state->atarigen.alpha[0x781] >> 7) & 0x1ff;
+		tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, xscroll);
+		tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, yscroll);
 		atarimo_set_xscroll(0, xscroll);
 		atarimo_set_yscroll(0, yscroll);
 	}
@@ -237,11 +228,12 @@ void eprom_scanline_update(const device_config *screen, int scanline)
 
 VIDEO_UPDATE( eprom )
 {
+	eprom_state *state = (eprom_state *)screen->machine->driver_data;
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
 
-	if (eprom_video_disable)
+	if (state->video_disable)
 	{
 		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 		return 0;
@@ -250,7 +242,7 @@ VIDEO_UPDATE( eprom )
 	update_palette(screen->machine);
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -359,7 +351,7 @@ VIDEO_UPDATE( eprom )
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, atarigen_alpha_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->atarigen.alpha_tilemap, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
 	rectlist.rect -= rectlist.numrects;
@@ -391,11 +383,12 @@ VIDEO_UPDATE( eprom )
 
 VIDEO_UPDATE( guts )
 {
+	eprom_state *state = (eprom_state *)screen->machine->driver_data;
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
 
-	if (eprom_video_disable)
+	if (state->video_disable)
 	{
 		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 		return 0;
@@ -404,7 +397,7 @@ VIDEO_UPDATE( guts )
 	update_palette(screen->machine);
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -432,7 +425,7 @@ VIDEO_UPDATE( guts )
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, atarigen_alpha_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->atarigen.alpha_tilemap, 0, 0);
 
 	/* now go back and process the upper bit of MO priority */
 	rectlist.rect -= rectlist.numrects;

@@ -4,6 +4,15 @@
 
 *************************************************************************/
 
+#include "machine/atarigen.h"
+
+typedef struct _skullxbo_state skullxbo_state;
+struct _skullxbo_state
+{
+	atarigen_state	atarigen;
+};
+
+
 /*----------- defined in video/skullxbo.c -----------*/
 
 WRITE16_HANDLER( skullxbo_playfieldlatch_w );

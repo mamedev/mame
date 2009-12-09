@@ -5,32 +5,8 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "machine/atarigen.h"
 #include "slapstic.h"
 #include "atarisy2.h"
-
-
-
-/*************************************
- *
- *  Globals we own
- *
- *************************************/
-
-UINT16 *atarisy2_slapstic;
-
-
-
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-static emu_timer *yscroll_reset_timer;
-static UINT32 playfield_tile_bank[2];
-static UINT32 videobank;
-static UINT16 *vram;
 
 
 
@@ -52,7 +28,8 @@ static TIMER_CALLBACK( reset_yscroll_callback );
 
 static TILE_GET_INFO( get_alpha_tile_info )
 {
-	UINT16 data = atarigen_alpha[tile_index];
+	atarisy2_state *state = (atarisy2_state *)machine->driver_data;
+	UINT16 data = state->atarigen.alpha[tile_index];
 	int code = data & 0x3ff;
 	int color = (data >> 13) & 0x07;
 	SET_TILE_INFO(2, code, color, 0);
@@ -61,8 +38,9 @@ static TILE_GET_INFO( get_alpha_tile_info )
 
 static TILE_GET_INFO( get_playfield_tile_info )
 {
-	UINT16 data = atarigen_playfield[tile_index];
-	int code = playfield_tile_bank[(data >> 10) & 1] + (data & 0x3ff);
+	atarisy2_state *state = (atarisy2_state *)machine->driver_data;
+	UINT16 data = state->atarigen.playfield[tile_index];
+	int code = state->playfield_tile_bank[(data >> 10) & 1] + (data & 0x3ff);
 	int color = (data >> 11) & 7;
 	SET_TILE_INFO(0, code, color, 0);
 	tileinfo->category = (~data >> 14) & 3;
@@ -114,32 +92,31 @@ VIDEO_START( atarisy2 )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
+	atarisy2_state *state = (atarisy2_state *)machine->driver_data;
 
-	/* allocate banked memory */
-	vram = auto_alloc_array(machine, UINT16, 0x8000/2);
-	memset(vram, 0, 0x8000);
-	atarigen_alpha = &vram[0x0000];
-	atarimo_0_spriteram = &vram[0x0c00];
-	atarigen_playfield = &vram[0x2000];
+	/* initialize banked memory */
+	state->atarigen.alpha = &state->vram[0x0000];
+	atarimo_0_spriteram = &state->vram[0x0c00];
+	state->atarigen.playfield = &state->vram[0x2000];
 
 	/* initialize the playfield */
-	atarigen_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 128,64);
+	state->atarigen.playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_rows,  8,8, 128,64);
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* initialize the alphanumerics */
-	atarigen_alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,48);
-	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
+	state->atarigen.alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,48);
+	tilemap_set_transparent_pen(state->atarigen.alpha_tilemap, 0);
 
 	/* reset the statics */
-	yscroll_reset_timer = timer_alloc(machine, reset_yscroll_callback, NULL);
-	videobank = 0;
+	state->yscroll_reset_timer = timer_alloc(machine, reset_yscroll_callback, NULL);
+	state->videobank = 0;
 
 	/* save states */
-	state_save_register_global_array(machine, playfield_tile_bank);
-	state_save_register_global(machine, videobank);
-	state_save_register_global_pointer(machine, vram, 0x8000/2);
+	state_save_register_global_array(machine, state->playfield_tile_bank);
+	state_save_register_global(machine, state->videobank);
+	state_save_register_global_array(machine, state->vram);
 }
 
 
@@ -152,7 +129,8 @@ VIDEO_START( atarisy2 )
 
 WRITE16_HANDLER( atarisy2_xscroll_w )
 {
-	UINT16 oldscroll = *atarigen_xscroll;
+	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	UINT16 oldscroll = *state->atarigen.xscroll;
 	UINT16 newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
@@ -161,29 +139,31 @@ WRITE16_HANDLER( atarisy2_xscroll_w )
 		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 
 	/* update the playfield scrolling - hscroll is clocked on the following scanline */
-	tilemap_set_scrollx(atarigen_playfield_tilemap, 0, newscroll >> 6);
+	tilemap_set_scrollx(state->atarigen.playfield_tilemap, 0, newscroll >> 6);
 
 	/* update the playfield banking */
-	if (playfield_tile_bank[0] != (newscroll & 0x0f) * 0x400)
+	if (state->playfield_tile_bank[0] != (newscroll & 0x0f) * 0x400)
 	{
-		playfield_tile_bank[0] = (newscroll & 0x0f) * 0x400;
-		tilemap_mark_all_tiles_dirty(atarigen_playfield_tilemap);
+		state->playfield_tile_bank[0] = (newscroll & 0x0f) * 0x400;
+		tilemap_mark_all_tiles_dirty(state->atarigen.playfield_tilemap);
 	}
 
 	/* update the data */
-	*atarigen_xscroll = newscroll;
+	*state->atarigen.xscroll = newscroll;
 }
 
 
 static TIMER_CALLBACK( reset_yscroll_callback )
 {
-	tilemap_set_scrolly(atarigen_playfield_tilemap, 0, param);
+	atarisy2_state *state = (atarisy2_state *)machine->driver_data;
+	tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, param);
 }
 
 
 WRITE16_HANDLER( atarisy2_yscroll_w )
 {
-	UINT16 oldscroll = *atarigen_yscroll;
+	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	UINT16 oldscroll = *state->atarigen.yscroll;
 	UINT16 newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
@@ -193,19 +173,19 @@ WRITE16_HANDLER( atarisy2_yscroll_w )
 
 	/* if bit 4 is zero, the scroll value is clocked in right away */
 	if (!(newscroll & 0x10))
-		tilemap_set_scrolly(atarigen_playfield_tilemap, 0, (newscroll >> 6) - video_screen_get_vpos(space->machine->primary_screen));
+		tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, (newscroll >> 6) - video_screen_get_vpos(space->machine->primary_screen));
 	else
-		timer_adjust_oneshot(yscroll_reset_timer, video_screen_get_time_until_pos(space->machine->primary_screen, 0, 0), newscroll >> 6);
+		timer_adjust_oneshot(state->yscroll_reset_timer, video_screen_get_time_until_pos(space->machine->primary_screen, 0, 0), newscroll >> 6);
 
 	/* update the playfield banking */
-	if (playfield_tile_bank[1] != (newscroll & 0x0f) * 0x400)
+	if (state->playfield_tile_bank[1] != (newscroll & 0x0f) * 0x400)
 	{
-		playfield_tile_bank[1] = (newscroll & 0x0f) * 0x400;
-		tilemap_mark_all_tiles_dirty(atarigen_playfield_tilemap);
+		state->playfield_tile_bank[1] = (newscroll & 0x0f) * 0x400;
+		tilemap_mark_all_tiles_dirty(state->atarigen.playfield_tilemap);
 	}
 
 	/* update the data */
-	*atarigen_yscroll = newscroll;
+	*state->atarigen.yscroll = newscroll;
 }
 
 
@@ -253,21 +233,24 @@ WRITE16_HANDLER( atarisy2_paletteram_w )
 
 READ16_HANDLER( atarisy2_slapstic_r )
 {
-	int result = atarisy2_slapstic[offset];
+	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	int result = state->slapstic_base[offset];
 	slapstic_tweak(space, offset);
 
 	/* an extra tweak for the next opcode fetch */
-	videobank = slapstic_tweak(space, 0x1234) * 0x1000;
+	state->videobank = slapstic_tweak(space, 0x1234) * 0x1000;
 	return result;
 }
 
 
 WRITE16_HANDLER( atarisy2_slapstic_w )
 {
+	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+
 	slapstic_tweak(space, offset);
 
 	/* an extra tweak for the next opcode fetch */
-	videobank = slapstic_tweak(space, 0x1234) * 0x1000;
+	state->videobank = slapstic_tweak(space, 0x1234) * 0x1000;
 }
 
 
@@ -280,19 +263,21 @@ WRITE16_HANDLER( atarisy2_slapstic_w )
 
 READ16_HANDLER( atarisy2_videoram_r )
 {
-	return vram[offset | videobank];
+	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	return state->vram[offset | state->videobank];
 }
 
 
 WRITE16_HANDLER( atarisy2_videoram_w )
 {
-	int offs = offset | videobank;
+	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
+	int offs = offset | state->videobank;
 
 	/* alpharam? */
 	if (offs < 0x0c00)
 	{
-		COMBINE_DATA(&atarigen_alpha[offs]);
-		tilemap_mark_tile_dirty(atarigen_alpha_tilemap, offs);
+		COMBINE_DATA(&state->atarigen.alpha[offs]);
+		tilemap_mark_tile_dirty(state->atarigen.alpha_tilemap, offs);
 	}
 
 	/* spriteram? */
@@ -308,14 +293,14 @@ WRITE16_HANDLER( atarisy2_videoram_w )
 	else if (offs >= 0x2000)
 	{
 		offs -= 0x2000;
-		COMBINE_DATA(&atarigen_playfield[offs]);
-		tilemap_mark_tile_dirty(atarigen_playfield_tilemap, offs);
+		COMBINE_DATA(&state->atarigen.playfield[offs]);
+		tilemap_mark_tile_dirty(state->atarigen.playfield_tilemap, offs);
 	}
 
 	/* generic case */
 	else
 	{
-		COMBINE_DATA(&vram[offs]);
+		COMBINE_DATA(&state->vram[offs]);
 	}
 }
 
@@ -329,6 +314,7 @@ WRITE16_HANDLER( atarisy2_videoram_w )
 
 VIDEO_UPDATE( atarisy2 )
 {
+	atarisy2_state *state = (atarisy2_state *)screen->machine->driver_data;
 	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
@@ -336,10 +322,10 @@ VIDEO_UPDATE( atarisy2 )
 
 	/* draw the playfield */
 	bitmap_fill(priority_bitmap, cliprect, 0);
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 1, 1);
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 2, 2);
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 3, 3);
+	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 1, 1);
+	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 2, 2);
+	tilemap_draw(bitmap, cliprect, state->atarigen.playfield_tilemap, 3, 3);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -372,6 +358,6 @@ VIDEO_UPDATE( atarisy2 )
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, atarigen_alpha_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->atarigen.alpha_tilemap, 0, 0);
 	return 0;
 }

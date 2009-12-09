@@ -4,10 +4,19 @@
 
 *************************************************************************/
 
-/*----------- defined in video/beathead.c -----------*/
+#include "machine/atarigen.h"
 
-extern UINT32 *	beathead_vram_bulk_latch;
-extern UINT32 *	beathead_palette_select;
+typedef struct _beathead_state beathead_state;
+struct _beathead_state
+{
+	atarigen_state	atarigen;
+
+	UINT32 *		vram_bulk_latch;
+	UINT32 *		palette_select;
+};
+
+
+/*----------- defined in video/beathead.c -----------*/
 
 VIDEO_START( beathead );
 VIDEO_UPDATE( beathead );

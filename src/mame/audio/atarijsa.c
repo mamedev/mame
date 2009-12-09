@@ -200,6 +200,7 @@ void atarijsa_reset(void)
 
 static READ8_HANDLER( jsa1_io_r )
 {
+	atarigen_state *atarigen = (atarigen_state *)space->machine->driver_data;
 	int result = 0xff;
 
 	switch (offset & 0x206)
@@ -225,8 +226,8 @@ static READ8_HANDLER( jsa1_io_r )
             */
 			result = input_port_read(space->machine, "JSAI");
 			if (!(input_port_read(space->machine, test_port) & test_mask)) result ^= 0x80;
-			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
-			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
+			if (atarigen->cpu_to_sound_ready) result ^= 0x40;
+			if (atarigen->sound_to_cpu_ready) result ^= 0x20;
 			if (tms5220 == NULL || !tms5220_readyq_r(tms5220)) result ^= 0x10;
 			break;
 
@@ -324,6 +325,7 @@ static WRITE8_HANDLER( jsa1_io_w )
 
 static READ8_HANDLER( jsa2_io_r )
 {
+	atarigen_state *atarigen = (atarigen_state *)space->machine->driver_data;
 	int result = 0xff;
 
 	switch (offset & 0x206)
@@ -352,8 +354,8 @@ static READ8_HANDLER( jsa2_io_r )
             */
 			result = input_port_read(space->machine, "JSAII");
 			if (!(input_port_read(space->machine, test_port) & test_mask)) result ^= 0x80;
-			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
-			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
+			if (atarigen->cpu_to_sound_ready) result ^= 0x40;
+			if (atarigen->sound_to_cpu_ready) result ^= 0x20;
 			break;
 
 		case 0x006:		/* /IRQACK */
@@ -446,6 +448,7 @@ static WRITE8_HANDLER( jsa2_io_w )
 
 static READ8_HANDLER( jsa3_io_r )
 {
+	atarigen_state *atarigen = (atarigen_state *)space->machine->driver_data;
 	int result = 0xff;
 
 	switch (offset & 0x206)
@@ -472,8 +475,8 @@ static READ8_HANDLER( jsa3_io_r )
             */
 			result = input_port_read(space->machine, "JSAIII");
 			if (!(input_port_read(space->machine, test_port) & test_mask)) result ^= 0x90;
-			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
-			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
+			if (atarigen->cpu_to_sound_ready) result ^= 0x40;
+			if (atarigen->sound_to_cpu_ready) result ^= 0x20;
 			break;
 
 		case 0x006:		/* /IRQACK */
@@ -577,6 +580,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 
 static READ8_HANDLER( jsa3s_io_r )
 {
+	atarigen_state *atarigen = (atarigen_state *)space->machine->driver_data;
 	int result = 0xff;
 
 	switch (offset & 0x206)
@@ -603,8 +607,8 @@ static READ8_HANDLER( jsa3s_io_r )
             */
 			result = input_port_read(space->machine, "JSAIII");
 			if (!(input_port_read(space->machine, test_port) & test_mask)) result ^= 0x90;
-			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
-			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
+			if (atarigen->cpu_to_sound_ready) result ^= 0x40;
+			if (atarigen->sound_to_cpu_ready) result ^= 0x20;
 			break;
 
 		case 0x006:		/* /IRQACK */

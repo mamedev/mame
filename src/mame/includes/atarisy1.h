@@ -4,9 +4,45 @@
 
 *************************************************************************/
 
-/*----------- defined in video/atarisy1.c -----------*/
+#include "machine/atarigen.h"
 
-extern UINT16 *atarisy1_bankselect;
+typedef struct _atarisy1_state atarisy1_state;
+struct _atarisy1_state
+{
+	atarigen_state	atarigen;
+
+	UINT16 *		bankselect;
+
+	UINT8 			joystick_type;
+	UINT8 			trackball_type;
+
+	emu_timer *		joystick_timer;
+	UINT8 			joystick_int;
+	UINT8 			joystick_int_enable;
+	UINT8 			joystick_value;
+
+	UINT8	 		tms5220_out_data;
+	UINT8	 		tms5220_in_data;
+	UINT8	 		tms5220_ctl;
+
+	/* playfield parameters */
+	UINT16 			playfield_lookup[256];
+	UINT8 			playfield_tile_bank;
+	UINT16 			playfield_priority_pens;
+	emu_timer *		yscroll_reset_timer;
+
+	/* INT3 tracking */
+	int 			next_timer_scanline;
+	emu_timer *		scanline_timer;
+	emu_timer *		int3off_timer;
+
+	/* graphics bank tracking */
+	UINT8 			bank_gfx[3][8];
+	UINT8 			bank_color_shift[MAX_GFX_ELEMENTS];
+};
+
+
+/*----------- defined in video/atarisy1.c -----------*/
 
 READ16_HANDLER( atarisy1_int3state_r );
 

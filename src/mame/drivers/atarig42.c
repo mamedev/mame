@@ -20,28 +20,10 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/atarigen.h"
 #include "machine/asic65.h"
 #include "audio/atarijsa.h"
 #include "video/atarirle.h"
 #include "atarig42.h"
-
-
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-static UINT8 analog_data;
-static UINT16 *mo_command;
-
-static int sloop_bank;
-static int sloop_next_bank;
-static int sloop_offset;
-static int sloop_state;
-static UINT16 *sloop_base;
-
 
 
 /*************************************
@@ -52,15 +34,18 @@ static UINT16 *sloop_base;
 
 static void update_interrupts(running_machine *machine)
 {
-	cputag_set_input_line(machine, "maincpu", 4, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", 5, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	atarig42_state *state = (atarig42_state *)machine->driver_data;
+	cputag_set_input_line(machine, "maincpu", 4, state->atarigen.video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 5, state->atarigen.sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static MACHINE_RESET( atarig42 )
 {
-	atarigen_eeprom_reset();
-	atarigen_interrupt_reset(update_interrupts);
+	atarig42_state *state = (atarig42_state *)machine->driver_data;
+
+	atarigen_eeprom_reset(&state->atarigen);
+	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
 	atarigen_scanline_timer_reset(machine->primary_screen, atarig42_scanline_update, 8);
 	atarijsa_reset();
 }
@@ -75,9 +60,10 @@ static MACHINE_RESET( atarig42 )
 
 static READ16_HANDLER( special_port2_r )
 {
+	atarig42_state *state = (atarig42_state *)space->machine->driver_data;
 	int temp = input_port_read(space->machine, "IN2");
-	if (atarigen_cpu_to_sound_ready) temp ^= 0x0020;
-	if (atarigen_sound_to_cpu_ready) temp ^= 0x0010;
+	if (state->atarigen.cpu_to_sound_ready) temp ^= 0x0020;
+	if (state->atarigen.sound_to_cpu_ready) temp ^= 0x0010;
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
 	return temp;
 }
@@ -86,14 +72,16 @@ static READ16_HANDLER( special_port2_r )
 static WRITE16_HANDLER( a2d_select_w )
 {
 	static const char *const portnames[] = { "A2D0", "A2D1" };
+	atarig42_state *state = (atarig42_state *)space->machine->driver_data;
 
-	analog_data = input_port_read(space->machine, portnames[offset != 0]);
+	state->analog_data = input_port_read(space->machine, portnames[offset != 0]);
 }
 
 
 static READ16_HANDLER( a2d_data_r )
 {
-	return analog_data << 8;
+	atarig42_state *state = (atarig42_state *)space->machine->driver_data;
+	return state->analog_data << 8;
 }
 
 
@@ -125,7 +113,8 @@ static WRITE16_HANDLER( io_latch_w )
 
 static WRITE16_HANDLER( mo_command_w )
 {
-	COMBINE_DATA(mo_command);
+	atarig42_state *state = (atarig42_state *)space->machine->driver_data;
+	COMBINE_DATA(state->mo_command);
 	atarirle_command_w(0, (data == 0) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
@@ -139,16 +128,17 @@ static WRITE16_HANDLER( mo_command_w )
 
 static DIRECT_UPDATE_HANDLER( sloop_direct_handler )
 {
+	atarig42_state *state = (atarig42_state *)space->machine->driver_data;
 	if (address < 0x80000)
 	{
-		direct->raw = direct->decrypted = (UINT8 *)sloop_base;
+		direct->raw = direct->decrypted = (UINT8 *)state->sloop_base;
 		return (offs_t)-1;
 	}
 	return address;
 }
 
 
-static void roadriot_sloop_tweak(int offset)
+static void roadriot_sloop_tweak(atarig42_state *state, int offset)
 {
 /*
     sequence 1:
@@ -171,38 +161,38 @@ static void roadriot_sloop_tweak(int offset)
 	{
 		/* standard 68000 -> 68eee -> (bank) addressing */
 		case 0x68000/2:
-			sloop_state = 1;
+			state->sloop_state = 1;
 			break;
 		case 0x68eee/2:
-			if (sloop_state == 1)
-				sloop_state = 2;
+			if (state->sloop_state == 1)
+				state->sloop_state = 2;
 			break;
 		case 0x00124/2:
-			if (sloop_state == 2)
+			if (state->sloop_state == 2)
 			{
-				sloop_next_bank = 0;
-				sloop_state = 3;
+				state->sloop_next_bank = 0;
+				state->sloop_state = 3;
 			}
 			break;
 		case 0x00678/2:
-			if (sloop_state == 2)
+			if (state->sloop_state == 2)
 			{
-				sloop_next_bank = 1;
-				sloop_state = 3;
+				state->sloop_next_bank = 1;
+				state->sloop_state = 3;
 			}
 			break;
 		case 0x00abc/2:
-			if (sloop_state == 2)
+			if (state->sloop_state == 2)
 			{
-				sloop_next_bank = 2;
-				sloop_state = 3;
+				state->sloop_next_bank = 2;
+				state->sloop_state = 3;
 			}
 			break;
 		case 0x01024/2:
-			if (sloop_state == 2)
+			if (state->sloop_state == 2)
 			{
-				sloop_next_bank = 3;
-				sloop_state = 3;
+				state->sloop_next_bank = 3;
+				state->sloop_state = 3;
 			}
 			break;
 
@@ -215,36 +205,36 @@ static void roadriot_sloop_tweak(int offset)
 			/* written if $ff8007 == 2 */
 		case 0x71166/2:
 			/* written if $ff8007 == 3 */
-			if (sloop_state == 3)
-				sloop_bank = sloop_next_bank;
-			sloop_state = 0;
+			if (state->sloop_state == 3)
+				state->sloop_bank = state->sloop_next_bank;
+			state->sloop_state = 0;
 			break;
 
 		/* bank offsets */
 		case 0x5edb4/2:
-			if (sloop_state == 0)
+			if (state->sloop_state == 0)
 			{
-				sloop_state = 10;
-				sloop_offset = 0;
+				state->sloop_state = 10;
+				state->sloop_offset = 0;
 			}
-			sloop_offset += 2;
+			state->sloop_offset += 2;
 			break;
 		case 0x5db0a/2:
-			if (sloop_state == 0)
+			if (state->sloop_state == 0)
 			{
-				sloop_state = 10;
-				sloop_offset = 0;
+				state->sloop_state = 10;
+				state->sloop_offset = 0;
 			}
-			sloop_offset += 1;
+			state->sloop_offset += 1;
 			break;
 
 		/* apply the offset */
 		case 0x5f042/2:
-			if (sloop_state == 10)
+			if (state->sloop_state == 10)
 			{
-				sloop_bank = (sloop_bank + sloop_offset) & 3;
-				sloop_offset = 0;
-				sloop_state = 0;
+				state->sloop_bank = (state->sloop_bank + state->sloop_offset) & 3;
+				state->sloop_offset = 0;
+				state->sloop_state = 0;
 			}
 			break;
 
@@ -262,17 +252,19 @@ static void roadriot_sloop_tweak(int offset)
 
 static READ16_HANDLER( roadriot_sloop_data_r )
 {
-	roadriot_sloop_tweak(offset);
+	atarig42_state *state = (atarig42_state *)space->machine->driver_data;
+	roadriot_sloop_tweak(state, offset);
 	if (offset < 0x78000/2)
-		return sloop_base[offset];
+		return state->sloop_base[offset];
 	else
-		return sloop_base[0x78000/2 + sloop_bank * 0x1000 + (offset & 0xfff)];
+		return state->sloop_base[0x78000/2 + state->sloop_bank * 0x1000 + (offset & 0xfff)];
 }
 
 
 static WRITE16_HANDLER( roadriot_sloop_data_w )
 {
-	roadriot_sloop_tweak(offset);
+	atarig42_state *state = (atarig42_state *)space->machine->driver_data;
+	roadriot_sloop_tweak(state, offset);
 }
 
 
@@ -283,7 +275,7 @@ static WRITE16_HANDLER( roadriot_sloop_data_w )
  *
  *************************************/
 
-static void guardians_sloop_tweak(int offset)
+static void guardians_sloop_tweak(atarig42_state *state, int offset)
 {
 	static UINT32 last_accesses[8];
 
@@ -300,36 +292,38 @@ static void guardians_sloop_tweak(int offset)
 
 		if (last_accesses[0] == 0x7f7c0/2 && last_accesses[1] == 0x7f7ce/2 && last_accesses[2] == 0x7f7c2/2 && last_accesses[3] == 0x7f7cc/2 &&
 			last_accesses[4] == 0x7f7c4/2 && last_accesses[5] == 0x7f7ca/2 && last_accesses[6] == 0x7f7c6/2 && last_accesses[7] == 0x7f7c8/2)
-			sloop_bank = 0;
+			state->sloop_bank = 0;
 
 		if (last_accesses[0] == 0x7f7d0/2 && last_accesses[1] == 0x7f7de/2 && last_accesses[2] == 0x7f7d2/2 && last_accesses[3] == 0x7f7dc/2 &&
 			last_accesses[4] == 0x7f7d4/2 && last_accesses[5] == 0x7f7da/2 && last_accesses[6] == 0x7f7d6/2 && last_accesses[7] == 0x7f7d8/2)
-			sloop_bank = 1;
+			state->sloop_bank = 1;
 
 		if (last_accesses[0] == 0x7f7e0/2 && last_accesses[1] == 0x7f7ee/2 && last_accesses[2] == 0x7f7e2/2 && last_accesses[3] == 0x7f7ec/2 &&
 			last_accesses[4] == 0x7f7e4/2 && last_accesses[5] == 0x7f7ea/2 && last_accesses[6] == 0x7f7e6/2 && last_accesses[7] == 0x7f7e8/2)
-			sloop_bank = 2;
+			state->sloop_bank = 2;
 
 		if (last_accesses[0] == 0x7f7f0/2 && last_accesses[1] == 0x7f7fe/2 && last_accesses[2] == 0x7f7f2/2 && last_accesses[3] == 0x7f7fc/2 &&
 			last_accesses[4] == 0x7f7f4/2 && last_accesses[5] == 0x7f7fa/2 && last_accesses[6] == 0x7f7f6/2 && last_accesses[7] == 0x7f7f8/2)
-			sloop_bank = 3;
+			state->sloop_bank = 3;
 	}
 }
 
 
 static READ16_HANDLER( guardians_sloop_data_r )
 {
-	guardians_sloop_tweak(offset);
+	atarig42_state *state = (atarig42_state *)space->machine->driver_data;
+	guardians_sloop_tweak(state, offset);
 	if (offset < 0x78000/2)
-		return sloop_base[offset];
+		return state->sloop_base[offset];
 	else
-		return sloop_base[0x78000/2 + sloop_bank * 0x1000 + (offset & 0xfff)];
+		return state->sloop_base[0x78000/2 + state->sloop_bank * 0x1000 + (offset & 0xfff)];
 }
 
 
 static WRITE16_HANDLER( guardians_sloop_data_w )
 {
-	guardians_sloop_tweak(offset);
+	atarig42_state *state = (atarig42_state *)space->machine->driver_data;
+	guardians_sloop_tweak(state, offset);
 }
 
 
@@ -357,12 +351,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf40000, 0xf40001) AM_READ(asic65_io_r)
 	AM_RANGE(0xf60000, 0xf60001) AM_READ(asic65_r)
 	AM_RANGE(0xf80000, 0xf80003) AM_WRITE(asic65_data_w)
-	AM_RANGE(0xfa0000, 0xfa0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
+	AM_RANGE(0xfa0000, 0xfa0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(atarig42_state, atarigen.eeprom, atarigen.eeprom_size)
 	AM_RANGE(0xfc0000, 0xfc0fff) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff0000, 0xff0fff) AM_WRITE(atarirle_0_spriteram_w) AM_BASE(&atarirle_0_spriteram)
-	AM_RANGE(0xff2000, 0xff5fff) AM_WRITE(atarigen_playfield_w) AM_BASE(&atarigen_playfield)
-	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(atarigen_alpha_w) AM_BASE(&atarigen_alpha)
-	AM_RANGE(0xff7000, 0xff7001) AM_WRITE(mo_command_w) AM_BASE(&mo_command)
+	AM_RANGE(0xff2000, 0xff5fff) AM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(atarig42_state, atarigen.playfield)
+	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(atarig42_state, atarigen.alpha)
+	AM_RANGE(0xff7000, 0xff7001) AM_WRITE(mo_command_w) AM_BASE_MEMBER(atarig42_state, mo_command)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -507,6 +501,7 @@ GFXDECODE_END
  *************************************/
 
 static MACHINE_DRIVER_START( atarig42 )
+	MDRV_DRIVER_DATA(atarig42_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
@@ -680,14 +675,15 @@ static DRIVER_INIT( roadriot )
 		0x01B0,0x0146,0x012E,0x1A00,0x01C8,0x01D0,0x0118,0x0D00,
 		0x0118,0x0100,0x01C8,0x01D0,0x0000
 	};
-	atarigen_eeprom_default = default_eeprom;
+	atarig42_state *state = (atarig42_state *)machine->driver_data;
+	state->atarigen.eeprom_default = default_eeprom;
 	atarijsa_init(machine, "IN2", 0x0040);
 
-	atarig42_playfield_base = 0x400;
-	atarig42_motion_object_base = 0x200;
-	atarig42_motion_object_mask = 0x1ff;
+	state->playfield_base = 0x400;
+	state->motion_object_base = 0x200;
+	state->motion_object_mask = 0x1ff;
 
-	sloop_base = memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, roadriot_sloop_data_r, roadriot_sloop_data_w);
+	state->sloop_base = memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, roadriot_sloop_data_r, roadriot_sloop_data_w);
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), sloop_direct_handler);
 
 	asic65_config(machine, ASIC65_ROMBASED);
@@ -729,18 +725,19 @@ static DRIVER_INIT( guardian )
 		0x01BE,0x016D,0x0142,0x0100,0x0120,0x0109,0x0110,0x0141,
 		0x0109,0x0100,0x0108,0x0134,0x0105,0x0148,0x1400,0x0000
 	};
-	atarigen_eeprom_default = default_eeprom;
+	atarig42_state *state = (atarig42_state *)machine->driver_data;
+	state->atarigen.eeprom_default = default_eeprom;
 	atarijsa_init(machine, "IN2", 0x0040);
 
-	atarig42_playfield_base = 0x000;
-	atarig42_motion_object_base = 0x400;
-	atarig42_motion_object_mask = 0x3ff;
+	state->playfield_base = 0x000;
+	state->motion_object_base = 0x400;
+	state->motion_object_mask = 0x3ff;
 
 	/* it looks like they jsr to $80000 as some kind of protection */
 	/* put an RTS there so we don't die */
 	*(UINT16 *)&memory_region(machine, "maincpu")[0x80000] = 0x4E75;
 
-	sloop_base = memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, guardians_sloop_data_r, guardians_sloop_data_w);
+	state->sloop_base = memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, guardians_sloop_data_r, guardians_sloop_data_w);
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), sloop_direct_handler);
 
 	asic65_config(machine, ASIC65_GUARDIANS);

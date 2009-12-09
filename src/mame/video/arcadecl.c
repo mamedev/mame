@@ -9,18 +9,7 @@
 
 
 #include "driver.h"
-#include "machine/atarigen.h"
 #include "arcadecl.h"
-
-
-
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-static UINT8 has_mo;
 
 
 
@@ -68,6 +57,7 @@ VIDEO_START( arcadecl )
 		0,					/* resulting value to indicate "special" */
 		0,					/* callback routine for special entries */
 	};
+	rampart_state *state = (rampart_state *)machine->driver_data;
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
@@ -75,7 +65,7 @@ VIDEO_START( arcadecl )
 	/* set the intial scroll offset */
 	atarimo_set_xscroll(0, -4);
 	atarimo_set_yscroll(0, 0x110);
-	has_mo = (machine->gfx[0]->total_elements > 10);
+	state->has_mo = (machine->gfx[0]->total_elements > 10);
 }
 
 
@@ -88,11 +78,13 @@ VIDEO_START( arcadecl )
 
 VIDEO_UPDATE( arcadecl )
 {
+	rampart_state *state = (rampart_state *)screen->machine->driver_data;
+
 	/* draw the playfield */
 	rampart_bitmap_render(screen->machine, bitmap, cliprect);
 
 	/* draw and merge the MO */
-	if (has_mo)
+	if (state->has_mo)
 	{
 		atarimo_rect_list rectlist;
 		bitmap_t *mobitmap;
