@@ -156,7 +156,7 @@ void clear_rcp_interrupt(running_machine *machine, int interrupt)
 	}
 }
 
-static UINT8 is64_buffer[0x10000];
+UINT8 is64_buffer[0x10000];
 
 READ32_HANDLER( n64_is64_r )
 {
@@ -816,17 +816,22 @@ static void n64_vi_recalculate_resolution(running_machine *machine)
     if (width == 0 || height == 0)
     {
         n64_vi_blank = 1;
+        /*
+        FIXME: MAME doesn't handle well a h/w res of zero (otherwise it hardlocks the emu, seen especially in Aleck 64 games
+        that sets the res after a longer delay than n64), guess that this just disables drawing?
+        */
+        return;
     }
     else
     {
         n64_vi_blank = 0;
     }
 
-    if (width == 0)
-        width = 1;
+//  if (width == 0)
+//      width = 1;
 
-    if (height == 0)
-        height = 1;
+//  if (height == 0)
+//      height = 1;
 
     if (width > 640)
         width = 640;
@@ -1384,14 +1389,14 @@ WRITE32_HANDLER( n64_pi_reg_w )
 }
 
 // RDRAM Interface
-static UINT32 ri_mode = 0;
-static UINT32 ri_config = 0;
-static UINT32 ri_current_load = 0;
-static UINT32 ri_select = 0;
-static UINT32 ri_count = 0;
-static UINT32 ri_latency = 0;
-static UINT32 ri_rerror = 0;
-static UINT32 ri_werror = 0;
+UINT32 ri_mode = 0;
+UINT32 ri_config = 0;
+UINT32 ri_current_load = 0;
+UINT32 ri_select = 0;
+UINT32 ri_count = 0;
+UINT32 ri_latency = 0;
+UINT32 ri_rerror = 0;
+UINT32 ri_werror = 0;
 
 READ32_HANDLER( n64_ri_reg_r )
 {
@@ -1542,13 +1547,13 @@ static int pif_channel_handle_command(running_machine *machine, int channel, int
 			switch (channel)
 			{
 				case 0:
+				case 1:
 				{
 					rdata[0] = 0x05;
 					rdata[1] = 0x00;
 					rdata[2] = 0x02;
 					return 0;
 				}
-				case 1:
 				case 2:
 				case 3:
 				{
