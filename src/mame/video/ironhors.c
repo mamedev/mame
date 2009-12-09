@@ -8,17 +8,14 @@
 
 #include "driver.h"
 #include "video/resnet.h"
-
-UINT8 *ironhors_scroll;
-static int palettebank, charbank, spriterambank;
-
-static tilemap *bg_tilemap;
+#include "includes/ironhors.h"
 
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
 
 ***************************************************************************/
+
 PALETTE_INIT( ironhors )
 {
 	static const int resistances[4] = { 2000, 1000, 470, 220 };
@@ -83,34 +80,38 @@ PALETTE_INIT( ironhors )
 
 WRITE8_HANDLER( ironhors_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	ironhors_state *state = (ironhors_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( ironhors_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	ironhors_state *state = (ironhors_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( ironhors_charbank_w )
 {
-	if (charbank != (data & 0x03))
+	ironhors_state *state = (ironhors_state *)space->machine->driver_data;
+	if (state->charbank != (data & 0x03))
 	{
-		charbank = data & 0x03;
+		state->charbank = data & 0x03;
 		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
-	spriterambank = data & 0x08;
+	state->spriterambank = data & 0x08;
 
 	/* other bits unknown */
 }
 
 WRITE8_HANDLER( ironhors_palettebank_w )
 {
-	if (palettebank != (data & 0x07))
+	ironhors_state *state = (ironhors_state *)space->machine->driver_data;
+	if (state->palettebank != (data & 0x07))
 	{
-		palettebank = data & 0x07;
+		state->palettebank = data & 0x07;
 		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 
@@ -119,7 +120,8 @@ WRITE8_HANDLER( ironhors_palettebank_w )
 
 	/* bit 6 unknown - set after game over */
 
-	if (data & 0x88) popmessage("ironhors_palettebank_w %02x",data);
+	if (data & 0x88) 
+		popmessage("ironhors_palettebank_w %02x",data);
 }
 
 WRITE8_HANDLER( ironhors_flipscreen_w )
@@ -135,41 +137,43 @@ WRITE8_HANDLER( ironhors_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x40) << 2) +
-		((machine->generic.colorram.u8[tile_index] & 0x20) << 4) + (charbank << 10);
-	int color = (machine->generic.colorram.u8[tile_index] & 0x0f) + 16 * palettebank;
-	int flags = ((machine->generic.colorram.u8[tile_index] & 0x10) ? TILE_FLIPX : 0) |
-		((machine->generic.colorram.u8[tile_index] & 0x20) ? TILE_FLIPY : 0);
+	ironhors_state *state = (ironhors_state *)machine->driver_data;
+	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x40) << 2) +
+		((state->colorram[tile_index] & 0x20) << 4) + (state->charbank << 10);
+	int color = (state->colorram[tile_index] & 0x0f) + 16 * state->palettebank;
+	int flags = ((state->colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |
+		((state->colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(0, code, color, flags);
 }
 
 VIDEO_START( ironhors )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
+	ironhors_state *state = (ironhors_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_scroll_rows(bg_tilemap, 32);
+	tilemap_set_scroll_rows(state->bg_tilemap, 32);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	ironhors_state *state = (ironhors_state *)machine->driver_data;
 	int offs;
 	UINT8 *sr;
 
-	if (spriterambank != 0)
-		sr = machine->generic.spriteram.u8;
+	if (state->spriterambank != 0)
+		sr = state->spriteram;
 	else
-		sr = machine->generic.spriteram2.u8;
+		sr = state->spriteram2;
 
-	for (offs = 0;offs < machine->generic.spriteram_size;offs += 5)
+	for (offs = 0; offs < state->spriteram_size; offs += 5)
 	{
-		int sx = sr[offs+3];
-		int sy = sr[offs+2];
-		int flipx = sr[offs+4] & 0x20;
-		int flipy = sr[offs+4] & 0x40;
-		int code = (sr[offs] << 2) + ((sr[offs+1] & 0x03) << 10) + ((sr[offs+1] & 0x0c) >> 2);
-		int color = ((sr[offs+1] & 0xf0)>>4) + 16 * palettebank;
+		int sx = sr[offs + 3];
+		int sy = sr[offs + 2];
+		int flipx = sr[offs + 4] & 0x20;
+		int flipy = sr[offs + 4] & 0x40;
+		int code = (sr[offs] << 2) + ((sr[offs + 1] & 0x03) << 10) + ((sr[offs + 1] & 0x0c) >> 2);
+		int color = ((sr[offs + 1] & 0xf0) >> 4) + 16 * state->palettebank;
 	//  int mod = flip_screen_get(machine) ? -8 : 8;
 
 		if (flip_screen_get(machine))
@@ -180,7 +184,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		switch (sr[offs+4] & 0x0c)
+		switch (sr[offs + 4] & 0x0c)
 		{
 			case 0x00:	/* 16x16 */
 				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
@@ -237,55 +241,51 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( ironhors )
 {
+	ironhors_state *state = (ironhors_state *)screen->machine->driver_data;
 	int row;
 
 	for (row = 0; row < 32; row++)
-		tilemap_set_scrollx(bg_tilemap, row, ironhors_scroll[row]);
+		tilemap_set_scrollx(state->bg_tilemap, row, state->scroll[row]);
 
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
 static TILE_GET_INFO( farwest_get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x40) << 2) +
-		((machine->generic.colorram.u8[tile_index] & 0x20) << 4) + (charbank << 10);
-	int color = (machine->generic.colorram.u8[tile_index] & 0x0f) + 16 * palettebank;
-	int flags = 0;//((machine->generic.colorram.u8[tile_index] & 0x10) ? TILE_FLIPX : 0) |  ((machine->generic.colorram.u8[tile_index] & 0x20) ? TILE_FLIPY : 0);
+	ironhors_state *state = (ironhors_state *)machine->driver_data;
+	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x40) << 2) +
+		((state->colorram[tile_index] & 0x20) << 4) + (state->charbank << 10);
+	int color = (state->colorram[tile_index] & 0x0f) + 16 * state->palettebank;
+	int flags = 0;//((state->colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |  ((state->colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(0, code, color, flags);
 }
 
 VIDEO_START( farwest )
 {
-	bg_tilemap = tilemap_create(machine, farwest_get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
+	ironhors_state *state = (ironhors_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, farwest_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	tilemap_set_scroll_rows(bg_tilemap, 32);
+	tilemap_set_scroll_rows(state->bg_tilemap, 32);
 }
 
-static void farwest_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void farwest_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	ironhors_state *state = (ironhors_state *)machine->driver_data;
 	int offs;
-	UINT8 *sr=machine->generic.spriteram2.u8;
-	UINT8 *sr2=machine->generic.spriteram.u8;
+	UINT8 *sr = state->spriteram2;
+	UINT8 *sr2 = state->spriteram;
 
-//  if (spriterambank != 0)
-	//  sr = spriteram;
-	//else
-		//sr = ;
-
-	for (offs = 0;offs < machine->generic.spriteram_size;offs += 4)
+	for (offs = 0; offs < state->spriteram_size; offs += 4)
 	{
-		int sx = sr[offs+2];
-		int sy = sr[offs+1];
-		int flipx = sr[offs+3] & 0x20;
-		int flipy = sr[offs+3] & 0x40;
+		int sx = sr[offs + 2];
+		int sy = sr[offs + 1];
+		int flipx = sr[offs + 3] & 0x20;
+		int flipy = sr[offs + 3] & 0x40;
 		int code = (sr[offs] << 2) + ((sr2[offs] & 0x03) << 10) + ((sr2[offs] & 0x0c) >> 2);
-		int color = ((sr2[offs] & 0xf0)>>4) + 16 * palettebank;
-
-
+		int color = ((sr2[offs] & 0xf0) >> 4) + 16 * state->palettebank;
 
 	//  int mod = flip_screen_get() ? -8 : 8;
 
@@ -297,7 +297,7 @@ static void farwest_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 		//  flipy = !flipy;
 		}
 
-		switch (sr[offs+3] & 0x0c)
+		switch (sr[offs + 3] & 0x0c)
 		{
 			case 0x00:	/* 16x16 */
 				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
@@ -354,12 +354,13 @@ static void farwest_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 VIDEO_UPDATE( farwest)
 {
+	ironhors_state *state = (ironhors_state *)screen->machine->driver_data;
 	int row;
 
 	for (row = 0; row < 32; row++)
-		tilemap_set_scrollx(bg_tilemap, row, ironhors_scroll[row]);
+		tilemap_set_scrollx(state->bg_tilemap, row, state->scroll[row]);
 
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	farwest_draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

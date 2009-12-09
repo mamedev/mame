@@ -1,8 +1,8 @@
 /***************************************************************************
 
-IronHorse
+    IronHorse
 
-driver by Mirko Buffoni
+    driver by Mirko Buffoni
 
 ***************************************************************************/
 
@@ -12,41 +12,36 @@ driver by Mirko Buffoni
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 #include "sound/discrete.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
+#include "includes/ironhors.h"
 
-extern UINT8 *ironhors_scroll;
-static UINT8 *ironhors_interrupt_enable;
-
-extern WRITE8_HANDLER( ironhors_videoram_w );
-extern WRITE8_HANDLER( ironhors_colorram_w );
-extern WRITE8_HANDLER( ironhors_palettebank_w );
-extern WRITE8_HANDLER( ironhors_charbank_w );
-extern WRITE8_HANDLER( ironhors_flipscreen_w );
-
-extern PALETTE_INIT( ironhors );
-extern VIDEO_START( ironhors );
-extern VIDEO_UPDATE( ironhors );
-extern VIDEO_START( farwest );
-extern VIDEO_UPDATE( farwest );
-
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 static INTERRUPT_GEN( ironhors_interrupt )
 {
+	ironhors_state *state = (ironhors_state *)device->machine->driver_data;
+
 	if (cpu_getiloops(device) == 0)
 	{
-		if (*ironhors_interrupt_enable & 4)
+		if (*state->interrupt_enable & 4)
 			cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
-		if (*ironhors_interrupt_enable & 1)
+		if (*state->interrupt_enable & 1)
 			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static WRITE8_HANDLER( ironhors_sh_irqtrigger_w )
 {
-	cputag_set_input_line_and_vector(space->machine, "soundcpu", 0, HOLD_LINE, 0xff);
+	ironhors_state *state = (ironhors_state *)space->machine->driver_data;
+
+	cpu_set_input_line_and_vector(state->soundcpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( ironhors_filter_w )
@@ -56,12 +51,18 @@ static WRITE8_DEVICE_HANDLER( ironhors_filter_w )
 	discrete_sound_w(device, NODE_13, (data & 0x01) >> 0);
 }
 
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
+
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0002) AM_RAM
 	AM_RANGE(0x0003, 0x0003) AM_RAM_WRITE(ironhors_charbank_w)
-	AM_RANGE(0x0004, 0x0004) AM_RAM AM_BASE(&ironhors_interrupt_enable)
+	AM_RANGE(0x0004, 0x0004) AM_RAM AM_BASE_MEMBER(ironhors_state, interrupt_enable)
 	AM_RANGE(0x0005, 0x001f) AM_RAM
-	AM_RANGE(0x0020, 0x003f) AM_RAM AM_BASE(&ironhors_scroll)
+	AM_RANGE(0x0020, 0x003f) AM_RAM AM_BASE_MEMBER(ironhors_state, scroll)
 	AM_RANGE(0x0040, 0x005f) AM_RAM
 	AM_RANGE(0x0060, 0x00df) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(soundlatch_w)
@@ -74,12 +75,12 @@ static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1800) AM_WRITENOP // ???
 	AM_RANGE(0x1a00, 0x1a01) AM_WRITENOP // ???
 	AM_RANGE(0x1c00, 0x1dff) AM_WRITENOP // ???
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ironhors_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ironhors_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ironhors_colorram_w) AM_BASE_MEMBER(ironhors_state, colorram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ironhors_videoram_w) AM_BASE_MEMBER(ironhors_state, videoram)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_BASE_GENERIC(spriteram2)
+	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_BASE_MEMBER(ironhors_state, spriteram2)
 	AM_RANGE(0x3100, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_BASE_SIZE_MEMBER(ironhors_state, spriteram, spriteram_size)
 	AM_RANGE(0x3900, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -100,7 +101,7 @@ static ADDRESS_MAP_START( farwest_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	//20=31db
 
 	AM_RANGE(0x0005, 0x001f) AM_RAM
-	AM_RANGE(0x31db, 0x31fa) AM_RAM AM_BASE(&ironhors_scroll)
+	AM_RANGE(0x31db, 0x31fa) AM_RAM AM_BASE_MEMBER(ironhors_state, scroll)
 	AM_RANGE(0x0040, 0x005f) AM_RAM
 	AM_RANGE(0x0060, 0x00ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(soundlatch_w)
@@ -114,17 +115,17 @@ static ADDRESS_MAP_START( farwest_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(ironhors_sh_irqtrigger_w)
-	AM_RANGE(0x1a00, 0x1a00) AM_RAM AM_BASE(&ironhors_interrupt_enable)
+	AM_RANGE(0x1a00, 0x1a00) AM_RAM AM_BASE_MEMBER(ironhors_state, interrupt_enable)
 	AM_RANGE(0x1a01, 0x1a01) AM_RAM_WRITE(ironhors_charbank_w)
 	AM_RANGE(0x1a02, 0x1a02) AM_WRITE(ironhors_palettebank_w)
 	AM_RANGE(0x0000, 0x1bff) AM_ROM
 //  AM_RANGE(0x1c00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ironhors_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ironhors_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ironhors_colorram_w) AM_BASE_MEMBER(ironhors_state, colorram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ironhors_videoram_w) AM_BASE_MEMBER(ironhors_state, videoram)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM
-	AM_RANGE(0x1c00, 0x1dff) AM_RAM AM_BASE_GENERIC(spriteram2)
+	AM_RANGE(0x1c00, 0x1dff) AM_RAM AM_BASE_MEMBER(ironhors_state, spriteram2)
 	AM_RANGE(0x3000, 0x38ff) AM_RAM
-	AM_RANGE(0x1e00, 0x1eff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x1e00, 0x1eff) AM_RAM AM_BASE_SIZE_MEMBER(ironhors_state, spriteram, spriteram_size)
 	AM_RANGE(0x3900, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -136,6 +137,11 @@ static ADDRESS_MAP_START( farwest_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( dairesya )
 	PORT_START("SYSTEM")
@@ -199,6 +205,12 @@ static INPUT_PORTS_START( ironhors )
 INPUT_PORTS_END
 
 
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 static const gfx_layout ironhors_charlayout =
 {
@@ -272,6 +284,13 @@ static GFXDECODE_START( farwest )
 	GFXDECODE_ENTRY( "gfx2", 0, farwest_spritelayout2,16*8*16, 16*8 )  /* to handle 8x8 sprites */
 GFXDECODE_END
 
+
+/*************************************
+ *
+ *  Discrete sound
+ *
+ *************************************/
+
 static const discrete_mixer_desc ironhors_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
 		{RES_K(2.2), RES_K(2.2), RES_K(2.2)},
@@ -317,6 +336,12 @@ static DISCRETE_SOUND_START( ironhors )
 
 DISCRETE_SOUND_END
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
 static const ym2203_interface ym2203_config =
 {
 	{
@@ -331,7 +356,30 @@ static const ym2203_interface ym2203_config =
 };
 
 
+static MACHINE_START( ironhors )
+{
+	ironhors_state *state = (ironhors_state *)machine->driver_data;
+
+	state->soundcpu = devtag_get_device(machine, "soundcpu");
+
+	state_save_register_global(machine, state->palettebank);
+	state_save_register_global(machine, state->charbank);
+	state_save_register_global(machine, state->spriterambank);
+}
+
+static MACHINE_RESET( ironhors )
+{
+	ironhors_state *state = (ironhors_state *)machine->driver_data;
+
+	state->palettebank = 0;
+	state->charbank = 0;
+	state->spriterambank = 0;
+}
+
 static MACHINE_DRIVER_START( ironhors )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ironhors_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
@@ -341,6 +389,9 @@ static MACHINE_DRIVER_START( ironhors )
 	MDRV_CPU_ADD("soundcpu",Z80,18432000/6)		 /* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(slave_map)
 	MDRV_CPU_IO_MAP(slave_io_map)
+
+	MDRV_MACHINE_START(ironhors)
+	MDRV_MACHINE_RESET(ironhors)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -376,21 +427,25 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( farwest_interrupt )
 {
+	ironhors_state *state = (ironhors_state *)device->machine->driver_data;
+
 	if (cpu_getiloops(device) &1)
 	{
-		if (*ironhors_interrupt_enable & 4)
+		if (*state->interrupt_enable & 4)
 			cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 	}
 	else //if (cpu_getiloops() % 2)
 	{
-		if (*ironhors_interrupt_enable & 1)
+		if (*state->interrupt_enable & 1)
 			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static READ8_DEVICE_HANDLER( farwest_soundlatch_r )
 {
-	return soundlatch_r(cputag_get_address_space(device->machine, "soundcpu", ADDRESS_SPACE_PROGRAM),0);
+	ironhors_state *state = (ironhors_state *)device->machine->driver_data;
+
+	return soundlatch_r(cpu_get_address_space(state->soundcpu, ADDRESS_SPACE_PROGRAM), 0);
 }
 
 static const ym2203_interface farwest_ym2203_config =
@@ -429,11 +484,11 @@ MACHINE_DRIVER_END
 
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( ironhors )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -507,6 +562,11 @@ ROM_START( farwest )
 ROM_END
 
 
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
 
 GAME( 1986, ironhors, 0,        ironhors, ironhors, 0, ROT0, "Konami", "Iron Horse", 0 )
 GAME( 1986, dairesya, ironhors, ironhors, dairesya, 0, ROT0, "[Konami] (Kawakusu license)", "Dai Ressya Goutou (Japan)", 0 )
