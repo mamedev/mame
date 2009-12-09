@@ -812,6 +812,26 @@ ROM_START( fitter )
 	ROM_LOAD( "roundup.clr",  0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) )
 ROM_END
 
+ROM_START( fitterbl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bl-ic38.bin",  0x0000, 0x1000, CRC(805c6974) SHA1(b1a41df746a347df6f47578fc59a7393e5195ada) )
+	ROM_LOAD( "bl-ic39.bin",  0x1000, 0x1000, CRC(37bf554b) SHA1(773279fb21c56221d5f29fd31c2149e68dcf3909) )
+	ROM_LOAD( "bl-ic40.bin",  0x2000, 0x1000, CRC(c5f7156e) SHA1(3702a0eb4c395217a8f761133dba7871a96b7f38) )
+	ROM_LOAD( "bl-ic41.bin",  0x3000, 0x1000, CRC(a67d5bda) SHA1(86d1628d4f0bcd3c3099f99ab92b3ac758ffec71) )
+	ROM_LOAD( "bl-ic33.bin",  0x4000, 0x1000, CRC(1f3c78ee) SHA1(961b6ba8d08ddcbeda52b98a2f181f37beed5fb1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "ic30.bin",  0x0000, 0x0800, CRC(1b18faee) SHA1(b4002e2fdaa6bb966da4faa46ac56751a3841f5f) )
+	ROM_LOAD( "ic31.bin",  0x0800, 0x0800, CRC(76cf4394) SHA1(5dc13bd5fc92ce4ce12bab60576292a6028891c3) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 ) /* chars and sprites */
+	ROM_LOAD( "ic9.bin",   0x0000, 0x0800, CRC(394676a2) SHA1(5bd26d717e25b7c192af8173db9ae18371dbcfbe) )
+	ROM_LOAD( "ic10.bin",  0x1000, 0x0800, CRC(a38d708d) SHA1(6632392cece34332a2a4427ec14d95f201319c67) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "roundup.clr",  0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) )
+ROM_END
+
 ROM_START( intrepid )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic19.1",       0x0000, 0x1000, CRC(7d927b23) SHA1(5a8f5a3bd5df423f0e61f96ebdf4adbea534f9ba) )
@@ -1052,6 +1072,7 @@ static DRIVER_INIT( rtriv )
 
 GAME( 1981, roundup,  0,        thepit,   roundup,  0,     ROT90, "Amenip/Centuri", "Round-Up", 0 )
 GAME( 1981, fitter,   roundup,  thepit,   fitter,   0,     ROT90, "Taito Corporation", "Fitter", 0 )
+GAME( 1981, fitterbl, roundup,  thepit,   fitter,   0,     ROT90, "bootleg", "Fitter (bootleg)", 0 )
 GAME( 1982, thepit,   0,        thepit,   thepit,   0,     ROT90, "Taito", "The Pit", 0 )
 GAME( 1982, thepitc,  thepit,   thepit,   thepit,   0,     ROT90, "Centuri", "The Pit (Centuri)", 0 )
 GAME( 1982, thepitb,  thepit,   thepit,   thepit,   0,     ROT90, "bootleg", "The Pit (bootleg)", 0 ) /* based off the Centuri version */

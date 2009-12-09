@@ -1147,6 +1147,7 @@ ROM_START( skywolf )
 	ROM_LOAD( "m1.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? not used */
 ROM_END
 
+
 ROM_START( skywolf2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "z80_2.bin",   0x0000, 0x8000, CRC(34db7bda) SHA1(1a98d5cf97063453a0351f7dbe339c32d59a3d20) )
@@ -1178,6 +1179,78 @@ ROM_START( skywolf2 )
 	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM */
 	ROM_LOAD( "m1.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? not used */
 ROM_END
+
+/*
+Sky Wolf bootleg
+ - this has all the data in 0x8000 sized roms.
+
+on main PCB (CR208):
+1x TMS27256JL (1)
+3x M27256 (2,3,4)
+3x PAL16L8NC (read protected)
+
+on roms PCB (CR207):
+7x M27256 (5,6,7,8,9,10,11)
+3x PROM N82S129N
+2x PROM DM74S288N (one is blank!) 
+
+the only real difference seems to be that you get less lives.
+
+*/
+
+ROM_START( skywolf3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",   0x0000, 0x4000, CRC(74a86ec8) SHA1(f9e5622c855053f7aac81c4775654ee8bc802180) )
+	ROM_CONTINUE(0x0000,0x4000) // 1.BIN        [2/2]      z80_2.bin    [1/2]      99.981689%
+	ROM_LOAD( "2.bin",   0x4000, 0x4000, CRC(f02143de) SHA1(7695432c87bb4850f09b9d00c17f4b9216fb2b90) )
+	ROM_CONTINUE(0x4000,0x4000)
+
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "3.bin",  0x0000, 0x4000, CRC(787cdd0a) SHA1(6f53008ee96b690ef467b3436d4bebba82c71d6b) )
+	ROM_CONTINUE(0x0000,0x4000)
+	ROM_LOAD( "4.bin",  0x4000, 0x4000, CRC(07a2c814) SHA1(242bbce2b1b6e1668235d327e8c3a61906175af5) )
+	ROM_CONTINUE(0x4000,0x4000)
+
+	ROM_REGION( 0x01000, "gfx1", 0 )
+	ROM_LOAD( "8.bin",  0x00000, 0x1000, CRC(b86d3dac) SHA1(d92e494d46f641fbfb107da218f5aab5bdf1e68c) ) /* chars */
+	ROM_CONTINUE(0x0000,0x1000)
+	ROM_CONTINUE(0x0000,0x1000)
+	ROM_CONTINUE(0x0000,0x1000)
+	ROM_CONTINUE(0x0000,0x1000)
+	ROM_CONTINUE(0x0000,0x1000)
+	ROM_CONTINUE(0x0000,0x1000)
+	ROM_CONTINUE(0x0000,0x1000)
+
+	ROM_REGION( 0x06000, "gfx2", 0 )
+	ROM_LOAD( "11.bin",  0x00000, 0x2000, CRC(fc7bbf7a) SHA1(a10245d32efa9998a63008e3989b1a4958c85b0a) ) /* tiles - plane 1 */
+	ROM_CONTINUE(0x0000,0x2000)
+	ROM_CONTINUE(0x0000,0x2000)
+	ROM_CONTINUE(0x0000,0x2000)
+	ROM_LOAD( "10.bin",  0x02000, 0x2000, CRC(1a3710ab) SHA1(6e61e94bb7f22beeb43af35c3299569c40c38ed9) ) /* tiles - plane 0 */
+	ROM_CONTINUE(0x2000,0x2000)
+	ROM_CONTINUE(0x2000,0x2000)
+	ROM_CONTINUE(0x2000,0x2000)
+	ROM_LOAD( "9.bin",  0x04000, 0x2000, CRC(a184349a) SHA1(e67f3727e6b57dc5ab503f2aa00ec860ba722633) ) /* tiles - plane 2 */
+	ROM_CONTINUE(0x4000,0x2000)
+	ROM_CONTINUE(0x4000,0x2000)
+	ROM_CONTINUE(0x4000,0x2000)
+
+	ROM_REGION( 0x18000, "gfx3", 0 )
+	ROM_LOAD( "7.bin",  0x00000, 0x8000, CRC(086612e8) SHA1(c59296d720a65a69d8c558fda73702ec345c5a2d) ) /* sprites - plane 0 */
+	ROM_LOAD( "6.bin",  0x08000, 0x8000, CRC(3a9beabd) SHA1(a20ee42af04ef2e77dcc2040d9ebd6084005e009) ) /* sprites - plane 1 */
+	ROM_LOAD( "5.bin",  0x10000, 0x8000, CRC(bd83658e) SHA1(4b2a98c24c20e4deb819613e5fbcd63ae8c81700) ) /* sprites - plane 2 */
+
+	ROM_REGION( 0x0340, "proms", 0 )
+	ROM_LOAD( "82s129-1.bin",     0x0000, 0x0100, CRC(6a94b2a3) SHA1(b1f9bd97aa26c9fb6377ef32d5dd125583361f48) ) /* red */
+	//ROM_LOAD( "82s129-2.bin",     0x0100, 0x0100, CRC(ff7a7446) SHA1(ceeb375dc90142142a284969c104e581deb76f16) ) /* green (bad?) - causes green outline on title */
+	//ROM_LOAD( "82s129-3.bin",     0x0200, 0x0100, CRC(6b0980bf) SHA1(6314f9e593f2d2a2f014f6eb82295cb3aa70cbd1)) ) /* blue (bad) - high bit of colour fixed to 0 */
+	ROM_LOAD( "82s129-2.bin",     0x0100, 0x0100, CRC(ec0923d3) SHA1(26f9eda4260a8b767893b8dea42819f192ef0b20) ) /* green */
+	ROM_LOAD( "82s129-3.bin",     0x0200, 0x0100, CRC(ade97052) SHA1(cc1b4cd57d7bc55ce44de6b89a322ff08eabb1a0) ) /* blue */
+	ROM_LOAD( "74s288-2.bin",     0x0300, 0x0020, CRC(190a55ad) SHA1(de8a847bff8c343d69b853a215e6ee775ef2ef96) ) /* blank lookup prom */ 
+	ROM_LOAD( "74s288-1.bin",     0x0320, 0x0020, CRC(5ddb2d15) SHA1(422663566ebc7ea8cbc3089d806b0868e006fe0c) ) /* timing? not used */
+ROM_END
+
 
 ROM_START( legend )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1269,3 +1342,4 @@ GAME( 1987, airwolf,   0,        srdmissn, airwolf,  srdmissn, ROT0,  "Kyugo", "
 GAME( 1987, airwolfa,  airwolf,  srdmissn, airwolf,  srdmissn, ROT0,  "Kyugo (UA Theatre license)", "Airwolf (US)", GAME_SUPPORTS_SAVE )
 GAME( 1987, skywolf,   airwolf,  srdmissn, skywolf,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1987, skywolf2,  airwolf,  srdmissn, airwolf,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, skywolf3,  airwolf,  srdmissn, airwolf,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 3)", GAME_SUPPORTS_SAVE )

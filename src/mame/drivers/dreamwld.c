@@ -1,5 +1,8 @@
 /*
 
+Note: this hardware is a copy of Psikyo's 68020 based hardware,
+      the Strikers 1945 bootleg has the same unknown rom!
+
 Dream World
 SemiCom, 2000
 

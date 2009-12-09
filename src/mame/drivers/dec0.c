@@ -2168,6 +2168,53 @@ ROM_START( ffantasya )
 	ROM_LOAD( "ew03",         0x0000, 0x10000, CRC(b606924d) SHA1(b759fcec10b333465cf5cd1b30987bf2d62186b2) )
 ROM_END
 
+/* this is probably a bootleg of an undumped original revision */
+ROM_START( ffantasybl )
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 4*64k for 68000 code */
+	ROM_LOAD16_BYTE( "14.bin",  0x00000, 0x10000, CRC(bd42bc66) SHA1(d81a3d16ca282817f85372d1426470900a553b24) ) // 61.926270% ff-02-2.bin
+	ROM_LOAD16_BYTE( "11.bin",  0x00001, 0x10000, CRC(4df38e4b) SHA1(e176afb7b63e2e1ac482662d152da2866884594e) ) // 55.798340% ff-01-2.bin
+	ROM_LOAD16_BYTE( "13.bin",  0x20000, 0x10000, CRC(eecb6bed) SHA1(f5761bfc01ae207d3a321aa4ad510f6af8ad6094) ) // 86.532593% ew05
+	ROM_LOAD16_BYTE( "10.bin",  0x20001, 0x10000, CRC(7cdcf418) SHA1(9653b6620dce70bd510fb63ba5c324dda581a412) ) // 85.887146% ew00                                   
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 6502 sound */
+	ROM_LOAD( "15.bin",         0x8000, 0x8000, CRC(9871b98d) SHA1(2b6c46bc2b10a28946d6ad8251e1a156a0b99947) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 )	/* 68705 MCU */ // (labeled on PCB as Z80, but it isn't!)
+	ROM_LOAD( "68705u3.bin",              0x00000, 0x1000, NO_DUMP ) // nor dumped, maybe it's the same as the midresb one?
+
+	ROM_REGION( 0x20000, "gfx1", 0 ) /* chars */
+	ROM_LOAD( "22.bin",         0x00000, 0x10000, CRC(686f72c1) SHA1(41d4fc1208d779f3428990a96586f6a555c28562) )
+	ROM_LOAD( "23.bin",         0x10000, 0x10000, CRC(28e69371) SHA1(32d57aabf948388825757ab0cfe87b6550a07a9d) ) // 94.793701% ev13
+                                   
+	ROM_REGION( 0x20000, "gfx2", 0 ) /* tiles */
+	ROM_LOAD( "25.bin",         0x00000, 0x08000, CRC(6b80d7a3) SHA1(323162e7e0ce16f6244d8d98fdb2396ffef87e82) )
+	ROM_LOAD( "27.bin",         0x08000, 0x08000, CRC(78d3d764) SHA1(e8f77a23bd4f4d268bec7c0153fb957acd07cdee) )
+	ROM_LOAD( "24.bin",         0x10000, 0x08000, CRC(ce9f5de3) SHA1(b8af33f52ca3579a45b41395751697a58931f9d6) )
+	ROM_LOAD( "26.bin",         0x18000, 0x08000, CRC(487a7ba2) SHA1(7d52cc1517def8426355e8281440ec5e617d1121) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 ) /* tiles */
+	ROM_LOAD( "29.bin",         0x00000, 0x08000, CRC(4e1bc2a4) SHA1(d7d4c42fd932722436f1847929088e46d03184bd) )
+	ROM_LOAD( "21.bin",         0x08000, 0x08000, CRC(28b37d27) SHA1(c70718f8ce23f75a728dc0a7556fd7d259048b88) )
+	ROM_IGNORE(0x8000) // same content, double size as original, ignore 2nd half
+	ROM_LOAD( "28.bin",         0x10000, 0x08000, CRC(9ecf479e) SHA1(a8d4c1490f12e1b15d53a2a97147920dcb638378) )
+	ROM_LOAD( "20.bin",         0x18000, 0x08000, CRC(b5ca8ed9) SHA1(3f44ebf7fec76154a843ee4398d4ac8690e70342) )
+	ROM_IGNORE(0x8000) // same content, double size as original, ignore 2nd half
+
+	ROM_REGION( 0x80000, "gfx4", 0 ) /* sprites */
+	ROM_LOAD( "6.bin",         0x00000, 0x10000, CRC(95423914) SHA1(e9e7a6bdf5aa717dc04a751709632f31762886fb) )
+	ROM_LOAD( "3.bin",         0x10000, 0x10000, CRC(96233177) SHA1(929a1b7fb65ab33277719b84517ff57da563f875) )
+	ROM_LOAD( "8.bin",         0x20000, 0x10000, CRC(4c25dfe8) SHA1(e4334de96698cd0112a8926dea131e748b6a84fc) )
+	ROM_LOAD( "4.bin",         0x30000, 0x10000, CRC(f2e007fc) SHA1(da30ad3725b9bc4a07dbb1afa05f145c3574c84c) )
+	ROM_LOAD( "5.bin",         0x40000, 0x10000, CRC(bc6028c4) SHA1(6ca5bb328912df23ad3d61b596b4a35f2815ef31) ) // 99.996948% ew06 (bad dump?)
+	ROM_LOAD( "1.bin",         0x50000, 0x10000, CRC(470b6989) SHA1(16b292d8a3a54048bf29f0b4f41bb6ca049b347c) )
+	ROM_LOAD( "7.bin",         0x60000, 0x10000, CRC(8c97c757) SHA1(36fd807da9e144dfb29c8252e9450cc37ca2604f) )
+	ROM_LOAD( "2.bin",         0x70000, 0x10000, CRC(a2d244bc) SHA1(ff2391efc480f36a302650691f8a7a620b86d99a) )
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_LOAD( "30.bin",         0x0000, 0x10000, CRC(b606924d) SHA1(b759fcec10b333465cf5cd1b30987bf2d62186b2) )
+ROM_END
+                   
+
 ROM_START( slyspy )
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "fa14-3.17l",   0x00000, 0x10000, CRC(54353a84) SHA1(899559f17705a8222fd56e9304e9b802eac8f6db) )
@@ -2699,6 +2746,7 @@ GAME( 1987, hbarrel,  0,        hbarrel,  hbarrel,  hbarrel,  ROT270, "Data East
 GAME( 1987, hbarrelw, hbarrel,  hbarrel,  hbarrel,  hbarrelw, ROT270, "Data East Corporation", "Heavy Barrel (World)", 0 )
 GAME( 1988, baddudes, 0,        baddudes, baddudes, baddudes, ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US)", 0 )
 GAME( 1988, drgninja, baddudes, baddudes, baddudes, baddudes, ROT0,   "Data East Corporation", "Dragonninja (Japan)", 0 )
+/* A Bad Dudes bootleg with 68705 like the midres and ffantasy ones exists, but is not dumped */
 GAME( 1988, birdtry,  0,        birdtry,  birdtry,  birdtry,  ROT270, "Data East Corporation", "Birdie Try (Japan)", GAME_UNEMULATED_PROTECTION )
 GAME( 1988, robocop,  0,        robocop,  robocop,  robocop,  ROT0,   "Data East Corporation", "Robocop (World revision 4)", 0 )
 GAME( 1988, robocopw, robocop,  robocop,  robocop,  robocop,  ROT0,   "Data East Corporation", "Robocop (World revision 3)", 0 )
@@ -2710,6 +2758,7 @@ GAME( 1988, automat,  robocop,  automat,  robocop,  robocop,  ROT0,   "bootleg",
 GAME( 1989, hippodrm, 0,        hippodrm, hippodrm, hippodrm, ROT0,   "Data East USA",         "Hippodrome (US)", 0 )
 GAME( 1989, ffantasy, hippodrm, hippodrm, hippodrm, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 2)", 0 )
 GAME( 1989, ffantasya,hippodrm, hippodrm, hippodrm, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan)", 0 )
+GAME( 1989, ffantasybl,hippodrm,midres,   midres,   0,        ROT0,   "bootleg",               "Fighting Fantasy (bootleg with 68705)", GAME_NOT_WORKING ) // 68705 not dumped, might be the same as midresb
 GAME( 1989, slyspy,   0,        slyspy,   slyspy,   slyspy,   ROT0,   "Data East USA",         "Sly Spy (US revision 3)", 0 )
 GAME( 1989, slyspy2,  slyspy,   slyspy,   slyspy,   slyspy,   ROT0,   "Data East USA",         "Sly Spy (US revision 2)", 0 )
 GAME( 1989, secretag, slyspy,   slyspy,   slyspy,   slyspy,   ROT0,   "Data East Corporation", "Secret Agent (World)", 0 )

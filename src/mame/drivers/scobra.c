@@ -1325,6 +1325,25 @@ ROM_START( hustlerb )
 	ROM_LOAD( "hustler.clr",  0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
 ROM_END
 
+ROM_START( hustlerb2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b1.1",   0x0000, 0x1000, CRC(2ce5e7b9) SHA1(e47e89bd085b40d7dd38be51fd69f69b143daf1b) )
+	ROM_LOAD( "b1.2",   0x1000, 0x1000, CRC(dc6752ec) SHA1(b103021079646286156e4141fe34dd92ccfd34bd) )
+	ROM_LOAD( "b3.3",   0x2000, 0x1000, CRC(23092f67) SHA1(3c04544c636eab8998752e1f521e34b1345e39ff) )
+	/* 3000-3fff space for diagnostics ROM */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "b6.bin",    0x0000, 0x0800, CRC(7a946544) SHA1(7ee2ad3fdf996f08534fb87fc02b619c168f420c) )
+	ROM_LOAD( "b7.bin",    0x0800, 0x0800, CRC(3db57351) SHA1(e5075a7130a80d2bf24f0556c2589dff0625ee60) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "b4.r2",   0x0000, 0x0800, CRC(0bdfad0e) SHA1(8e6f1737604f3801c03fa2e9a5e6a2778b54bae8) )
+	ROM_LOAD( "b5",   0x0800, 0x0800, CRC(8e062177) SHA1(7e52a1669804b6c2f694cfc64b04abc8246bb0c2) ) // broken rom, assumed to be the same
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "27s19.bin",  0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
+ROM_END
+
 ROM_START( mimonkey )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mm1.2e",		  0x0000, 0x1000, CRC(9019f1b1) SHA1(0c45f64e39b9a182f6162ab520ced6ef0686466c) )
@@ -1385,8 +1404,9 @@ GAME( 1982, rescue,   0,        rescue,   rescue,   rescue,       ROT90,  "Stern
 GAME( 1982, aponow,   rescue,   rescue,   rescue,   rescue,       ROT90,  "bootleg", "Apocaljpse Now", GAME_SUPPORTS_SAVE )
 GAME( 1983, minefld,  0,        minefld,  minefld,  minefld,      ROT90,  "Stern", "Minefield", GAME_SUPPORTS_SAVE )
 GAME( 1981, hustler,  0,        hustler,  hustler,  hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
-GAME( 1981, billiard, hustler,  hustler,  hustler,  billiard,     ROT90,  "bootleg", "The Billiards", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerb, hustler,  hustlerb, hustler,  scramble_ppi, ROT90,  "bootleg", "Video Hustler (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, billiard, hustler,  hustler,  hustler,  billiard,     ROT90,  "bootleg", "The Billiards (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, hustlerb, hustler,  hustlerb, hustler,  scramble_ppi, ROT90,  "bootleg", "Video Hustler (bootleg)", GAME_NOT_WORKING ) // broken?
+GAME( 1981, hustlerb2,hustler,  hustler,  hustler,  scramble_ppi, ROT90,  "bootleg", "Fatsy Gambler (Video Hustler bootleg)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, mimonkey, 0,	mimonkey, mimonkey, mimonkey,	  ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
 GAME( 1982, mimonsco, mimonkey, mimonkey, mimonsco, mimonsco,     ROT90,  "bootleg", "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
 

@@ -243,6 +243,7 @@ const game_driver * const drivers[] =
 	DRIVER( ckongg )	/* 1981 bootleg */
 	DRIVER( kkgalax )	/* 1981 bootleg */
 	DRIVER( porter )	/* 1982 bootleg (Arcade TV Game List - P.98, Left, 15 from bottom) */
+	DRIVER( vstars )	/* 19?? Competitive Video? */
 	DRIVER( tdpgal )	/* 1983 Design Labs / Thomas Automatics */
 
 	/* Has some similarities with Moon Cresta but Board is very different */
@@ -316,6 +317,7 @@ const game_driver * const drivers[] =
 	DRIVER( hustler )	/* GX343 (c) 1981 Konami */
 	DRIVER( billiard )	/* bootleg */
 	DRIVER( hustlerb )	/* bootleg */
+	DRIVER( hustlerb2 )	/* bootleg */
 	DRIVER( frogger )	/* GX392 (c) 1981 Konami */
 	DRIVER( froggers1 )	/* (c) 1981 Sega */
 	DRIVER( froggers2 )	/* 834-0068 (c) 1981 Sega */
@@ -1144,6 +1146,8 @@ const game_driver * const drivers[] =
 	DRIVER( rbibba )	/* (c) 1987 Namco */
 	DRIVER( suprmrio )	/* (c) 1986 Nintendo */
 	DRIVER( suprmrioa )	/* (c) 1986 Nintendo */
+	DRIVER( suprmriobl ) /* bootleg */
+	DRIVER( suprmriobl2 )/* bootleg */
 	DRIVER( skatekds )	/* (c) 1988 (hack) */
 	DRIVER( vsskykid )	/* (c) 1986 Namco */
 	DRIVER( tkoboxng )	/* (c) 1987 Data East */
@@ -2400,6 +2404,7 @@ V-V                           TP-027
 	DRIVER( airwolfa )	/* (c) 1987 Kyugo */
 	DRIVER( skywolf )	/* bootleg */
 	DRIVER( skywolf2 )	/* bootleg */
+	DRIVER( skywolf3 )	/* bootleg */
 
 	/* Williams games */
 	DRIVER( defender )	/* (c) 1980 */
@@ -4963,6 +4968,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( hippodrm )	/* (c) 1989 Data East USA (US) */
 	DRIVER( ffantasy )	/* (c) 1989 Data East Corporation (Japan) */
 	DRIVER( ffantasya )	/* (c) 1989 Data East Corporation (Japan) */
+	DRIVER( ffantasybl )/* bootleg */
 	DRIVER( slyspy )	/* (c) 1989 Data East USA (US) */
 	DRIVER( slyspy2 )	/* (c) 1989 Data East USA (US) */
 	DRIVER( secretag )	/* (c) 1989 Data East Corporation (World) */
@@ -5660,8 +5666,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( targc )		/* (c) 1980 */
 	DRIVER( spectar )	/* (c) 1980 */
 	DRIVER( spectar1 )	/* (c) 1980 */
-	DRIVER( rallys )	/* (c) 1980 Novar (bootleg?) */
-	DRIVER( phantoma )	/* (c) 1980 Jeutel (bootleg?) */
+	DRIVER( rallys )	/* (c) 1980 Novar (bootleg) */
+	DRIVER( panzer )	/* (c) 1980 Proel (bootleg) */
+	DRIVER( phantoma )	/* (c) 1980 Jeutel (bootleg) */
+	DRIVER( phantom )	/* (c) 1980 Proel (bootleg) */
 	DRIVER( venture )	/* (c) 1981 */
 	DRIVER( venture2 )	/* (c) 1981 */
 	DRIVER( venture4 )	/* (c) 1981 */
@@ -7014,6 +7022,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* "The Pit hardware" games */
 	DRIVER( roundup )	/* (c) 1981 Amenip/Centuri */
 	DRIVER( fitter )	/* (c) 1981 Taito */
+	DRIVER( fitterbl )	/* bootleg */
 	DRIVER( thepit )	/* (c) 1982 Taito */
 	DRIVER( thepitc )	/* (c) 1982 Centuri */
 	DRIVER( thepitb )	/* bootleg */

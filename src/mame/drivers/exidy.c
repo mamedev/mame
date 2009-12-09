@@ -1017,6 +1017,25 @@ ROM_START( rallys )
 	ROM_LOAD( "targ82s.123", 0x0000, 0x0020, CRC(9eb9125c) SHA1(660ad9b2c7c28c3fda4b10c1401c03165d131c61) )	/* unknown */
 ROM_END
 
+ROM_START( panzer )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "p1.1a",   0x1000, 0x0400, CRC(a192b22b) SHA1(aaae0b1822f934df30b354f787ffa8848c71b52f) )
+	ROM_LOAD( "p2.2a",   0x1400, 0x0400, CRC(19e730aa) SHA1(4f4e87d26c14a9ff2be5b4173c4e5804db551e33) )
+	ROM_LOAD( "p3.3a",   0x1800, 0x0400, CRC(2a3e7b69) SHA1(d31a3e6acca87881741e88e70d46a4a0ee59fcf8) )
+	ROM_LOAD( "p4.4a",   0x1c00, 0x0400, CRC(6d224696) SHA1(586bc8efdc8ac0a73e4a4300459efaf89021f6f5) )
+	ROM_LOAD( "p5.5a",   0x2000, 0x0400, CRC(af943b5e) SHA1(819fa8a6ee78a39cdade49789cd42b4a215f82f0) )
+	ROM_LOAD( "p6.6a",   0x2400, 0x0400, CRC(9b3d9e61) SHA1(b183e0844706713eb0a241a6e45c09c53e4077a3) )
+	ROM_LOAD( "p7.7a",   0x2800, 0x0400, CRC(8ef8bc67) SHA1(c8d80cc8e89a9bc5d957d648d704e4c66b17932d) )
+	ROM_LOAD( "p8.8a",   0x2c00, 0x0400, CRC(243c54f2) SHA1(813b3ecbd5642034b5de0bae96698ed2b036fc7b) )
+	ROM_LOAD( "p10.15b", 0x3400, 0x0400, CRC(46f473d2) SHA1(e6a180fdcf2ac13ffab624554ef8aab128e80321) )
+	ROM_LOAD( "p9.13b",  0x3c00, 0x0400, CRC(f01e474e) SHA1(454d9f32f95b87819d490aefe26cc3db6de29700) ) // only rom different to rallys
+
+	ROM_REGION( 0x0400, "gfx1", 0 )
+	ROM_LOAD( "sc.4d",    0x0000, 0x0400, CRC(9f03513e) SHA1(aa4763e49df65e5686a96431543580b8d8285893) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "targ82s.123", 0x0000, 0x0020, CRC(9eb9125c) SHA1(660ad9b2c7c28c3fda4b10c1401c03165d131c61) )	/* unknown */
+ROM_END
 
 ROM_START( phantoma )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1032,6 +1051,22 @@ ROM_START( phantoma )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "156_pal",  0x0000, 0x0020, CRC(9fb1daee) SHA1(2ec1189a57c95d7ad820eb12343fcf2c3fb08431) )
 ROM_END
+
+ROM_START( phantom )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "156_a2",   0x1000, 0x0800, CRC(c5af9d34) SHA1(4c9f9a06cc7f6caf13a79fa8491db17b01b24774) )
+	ROM_LOAD( "156_a3",   0x1800, 0x0800, CRC(30121e69) SHA1(1588cfb61eb9aa9598b3ff600cc02b0f1ac622bf) )
+	ROM_LOAD( "156_a4",   0x2000, 0x0800, CRC(02d7fb94) SHA1(634e952a6a0d4c1a42692100e1913ecd5ab9faed) )
+	ROM_LOAD( "156_a5",   0x2800, 0x0800, CRC(0127bc8d) SHA1(c555507f2662d1b45caf0b696147f70749292930) )
+	ROM_LOAD( "1a.bin",   0xf800, 0x0800, CRC(a4e40b67) SHA1(809d89393f80c1094fc4b1fc95e480aaa253c556) )
+
+	ROM_REGION( 0x800, "gfx1", 0 )
+	ROM_LOAD( "156_d1",   0x0000, 0x0800, CRC(d18e5f14) SHA1(5cd327500e74eca378ad5d0924949f96dd955cf8) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "156_pal",  0x0000, 0x0020, CRC(9fb1daee) SHA1(2ec1189a57c95d7ad820eb12343fcf2c3fb08431) )
+ROM_END
+
 
 
 ROM_START( mtrap )
@@ -1444,8 +1479,10 @@ GAME( 1980, targ,     0,       targ,     targ,     targ,     ROT0, "Exidy", "Tar
 GAME( 1980, targc,    targ,    targ,     targ,     targ,     ROT0, "Exidy", "Targ (cocktail?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, spectar,  0,       spectar,  spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, spectar1, spectar, spectar,  spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 1?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, rallys,   spectar, rallys,   rallys,   rallys,   ROT0, "Novar", "Rallys (bootleg?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, phantoma, spectar, rallys,   phantoma, phantoma, ROT0, "Jeutel","Phantomas", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, rallys,   spectar, rallys,   rallys,   rallys,   ROT0, "Novar", "Rallys (bootleg of Spectar)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, panzer,   spectar, rallys,   rallys,   rallys,   ROT0, "Proel", "Panzer (bootleg of Spectar)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, phantoma, spectar, rallys,   phantoma, phantoma, ROT0, "Jeutel","Phantomas (bootleg of Spectar)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, phantom,  spectar, rallys,   phantoma, phantoma, ROT0, "Proel","Phantom (bootleg of Spectar)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 GAME( 1981, mtrap,    0,       mtrap,    mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 5)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mtrap3,   mtrap,   mtrap,    mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 3)", GAME_SUPPORTS_SAVE )

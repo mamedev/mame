@@ -1883,6 +1883,52 @@ ROM_START( suprmrioa )
 	ROM_LOAD( "mds-sm4.2a",  0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
 ROM_END
 
+/* I don't know what the Z80 is for on these (located top-left of the PCB with rom 1) */
+/* PCB is also marked for a plain 6502, I can't see from the image what is there tho */
+ROM_START( suprmriobl2 )
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
+	ROM_LOAD( "4-27256.bin",  0x8000, 0x8000, CRC(663b1753) SHA1(b0d2057c4545f2d6534cafb16086826c8ba49f5a) )
+
+	ROM_REGION( 0x10000,"subcpu", 0 ) /* Z80 memory */
+	ROM_LOAD( "1-2764.bin",  0x0000, 0x2000, CRC(95856e07) SHA1(c681cfdb656e687bc59080df56c9c38e13be4bb8) )
+
+	ROM_REGION( 0x10000,"unk", 0 ) /* first half is some sort of table */
+	ROM_LOAD( "3-27256.bin",  0x0000, 0x8000, CRC(67a467f9) SHA1(61cd1db7cd52faa31153b89f6b98c9b78bf4ca4f) )
+
+	ROM_REGION( 0x4000,"gfx1", 0  ) /* PPU memory */
+	ROM_LOAD( "2-2764.bin",  0x0000, 0x2000, CRC(42418d40) SHA1(22ab61589742cfa4cc6856f7205d7b4b8310bc4d) )
+	ROM_LOAD( "5-2764.bin",  0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
+ROM_END
+
+ROM_START( suprmriobl )
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
+	ROM_LOAD( "4.bin",  0x8000, 0x8000, CRC(6f857416) SHA1(05e2df8ac01a03bf09b73e34c30aaf5bf4715809) )
+
+	ROM_REGION( 0x10000,"subcpu", 0 ) /* Z80 memory */
+	ROM_LOAD( "1.bin",  0x0000, 0x2000, CRC(9e3557f2) SHA1(11a0de2c0154f7ac120d9774cb5d1051e0156822) )
+
+	ROM_REGION( 0x10000,"unk", 0 ) /* first half is some sort of table */
+	ROM_LOAD( "3.bin",  0x0000, 0x8000, CRC(67a467f9) SHA1(61cd1db7cd52faa31153b89f6b98c9b78bf4ca4f) )
+
+	ROM_REGION( 0x4000,"gfx1", 0  ) /* PPU memory */
+	ROM_LOAD( "2.bin",  0x0000, 0x2000, CRC(42418d40) SHA1(22ab61589742cfa4cc6856f7205d7b4b8310bc4d) )
+	ROM_LOAD( "5.bin",  0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
+	
+	/* this set has some extra files compared to the above one, they probably exist on that pcb too tho */
+	ROM_REGION( 0x200,"proms", 0  )
+	ROM_LOAD( "prom6301.1",  0x000, 0x100, CRC(a31dc330) SHA1(b652003f7e252bac3bdb19412839c2f03af7f8b8) )
+	ROM_LOAD( "prom6301.2",  0x100, 0x100, CRC(019c6141) SHA1(fdeda4dea6506807a3324fa941f0684208aa3b4b) )
+
+	ROM_REGION( 0x4000,"pals", 0  )
+	ROM_LOAD( "pal16l8.1",  0x000, 0x104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
+	ROM_LOAD( "pal16r6a.2.bad.dump",  0x000, 0x104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "pal16r8.3",  0x000, 0x104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
+	ROM_LOAD( "pal16l8.4",  0x000, 0x104, CRC(6f6de82d) SHA1(3d59b222d25457b2f89b559409721db37d6a81d8) )
+	ROM_LOAD( "pal16r6.5",  0x000, 0x104, CRC(ceff7c7c) SHA1(52fd344c591478469369cd0862d1facfe23e12fb) )
+	ROM_LOAD( "pal16r8.6",  0x000, 0x104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
+	ROM_LOAD( "pal16r8a.7", 0x000, 0x104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
+ROM_END
+
 ROM_START( skatekds )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-sm4.1d",  0x8000, 0x2000,CRC(be4d5436) SHA1(08162a7c987f1939d09bebdb676f596c86abf465) )
@@ -2531,6 +2577,8 @@ GAME( 1986, rbibb,    0,        vsnes,   rbibb,    rbibb,    ROT0, "Namco",     
 GAME( 1986, rbibba,   rbibb,    vsnes,   rbibb,    rbibb,    ROT0, "Namco",     "Vs. Atari R.B.I. Baseball (set 2)", 0 )
 GAME( 1986, suprmrio, 0,        vsnes,   suprmrio, suprmrio, ROT0, "Nintendo",  "Vs. Super Mario Bros.", 0 )
 GAME( 1986, suprmrioa,suprmrio, vsnes,   suprmrio, suprmrio, ROT0, "Nintendo",  "Vs. Super Mario Bros. (alt)", 0 )
+GAME( 1986, suprmriobl,suprmrio,vsnes,   suprmrio, suprmrio, ROT0, "bootleg",   "Vs. Super Mario Bros. (bootleg with Z80, set 1)", GAME_NOT_WORKING )
+GAME( 1986, suprmriobl2,suprmrio,vsnes,  suprmrio, suprmrio, ROT0, "bootleg",   "Vs. Super Mario Bros. (bootleg with Z80, set 2)", GAME_NOT_WORKING )
 GAME( 1988, skatekds, suprmrio, vsnes,   suprmrio, suprmrio, ROT0, "hack",      "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)", 0 )
 GAME( 1985, vsskykid, 0,        vsnes,   vsskykid, MMC3,     ROT0, "Namco",     "Vs. Super SkyKid" , 0 )
 GAME( 1987, tkoboxng, 0,        vsnes,   tkoboxng, tkoboxng, ROT0, "Namco LTD.","Vs. TKO Boxing", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
