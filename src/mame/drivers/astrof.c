@@ -197,12 +197,34 @@ static void astrof_get_pens( running_machine *machine, pen_t *pens )
 {
 	astrof_state *state = (astrof_state *)machine->driver_data;
 	offs_t i;
+	UINT8 bank = (state->astrof_palette_bank ? 0x10 : 0x00);
+	UINT8 config = input_port_read_safe(machine, "FAKE", 0x00);
 	UINT8 *prom = memory_region(machine, "proms");
+
+	/* a common wire hack to the pcb causes the prom halves to be inverted */
+	/* this results in e.g. astrof background being black */
+	switch (config)
+	{
+	case 0:
+		/* normal PROM access */
+		break;
+	case 1:
+		/* invert PROM acess */
+		bank ^= 0x10;
+		break;
+	case 2:
+		/* force low */
+		bank = 0x00;
+		break;
+	default:
+		/* force high */
+		bank = 0x10;
+		break;
+	}
 
 	for (i = 0; i < ASTROF_NUM_PENS; i++)
 	{
-		UINT8 data = prom[(state->astrof_palette_bank ? 0x10 : 0x00) | i];
-
+		UINT8 data = prom[bank | i];
 		pens[i] = make_pen(machine, data);
 	}
 }
@@ -591,7 +613,20 @@ ADDRESS_MAP_END
  *
  *************************************/
 
+static INPUT_PORTS_START( astrof_common )
+	PORT_START("FAKE") // appears in DRIVER CONFIGURATION menu
+	/* There are PCB wire-mods which limit / change PROM access */
+	PORT_CONFNAME( 0x03, 0x00, "Color PROM Wiremod" )
+	PORT_CONFSETTING(    0x00, "Normal (no mod)" )
+	PORT_CONFSETTING(    0x01, "Invert Access" )
+	PORT_CONFSETTING(    0x02, "Force Low" )
+	PORT_CONFSETTING(    0x03, "Force High" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( astrof )
+	PORT_INCLUDE( astrof_common )
+
 	PORT_START("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
@@ -645,6 +680,8 @@ INPUT_PORTS_END
 
 /* same as 'astrof', but inputs are ACTIVE_HIGH instead of ACTIVE_LOW */
 static INPUT_PORTS_START( abattle )
+	PORT_INCLUDE( astrof_common )
+
 	PORT_START("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -698,6 +735,8 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( spfghmk2 )
+	PORT_INCLUDE( astrof_common )
+
 	PORT_START("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
@@ -747,6 +786,8 @@ static INPUT_PORTS_START( spfghmk2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spfgmk22 )
+	PORT_INCLUDE( astrof_common )
+
 	PORT_START("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
