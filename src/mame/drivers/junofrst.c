@@ -78,17 +78,16 @@ Blitter source graphics
 
 
 #include "driver.h"
-#include "tutankhm.h"
-#include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/flt_rc.h"
-#include "konamipt.h"
+#include "machine/konami1.h"
+#include "includes/timeplt.h"
+#include "includes/konamipt.h"
 
-static int i8039_status;
 
 static WRITE8_HANDLER( junofrst_bankselect_w )
 {
@@ -98,67 +97,70 @@ static WRITE8_HANDLER( junofrst_bankselect_w )
 
 static READ8_DEVICE_HANDLER( junofrst_portA_r )
 {
+	timeplt_state *state = (timeplt_state *)device->machine->driver_data;
 	int timer;
-
 
 	/* main xtal 14.318MHz, divided by 8 to get the CPU clock, further */
 	/* divided by 1024 to get this timer */
 	/* (divide by (1024/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
-	timer = (cputag_get_total_cycles(device->machine, "audiocpu") / (1024/2)) & 0x0f;
+	timer = (cpu_get_total_cycles(state->soundcpu) / (1024 / 2)) & 0x0f;
 
 	/* low three bits come from the 8039 */
 
-	return (timer << 4) | i8039_status;
+	return (timer << 4) | state->i8039_status;
 }
 
 
 static WRITE8_DEVICE_HANDLER( junofrst_portB_w )
 {
-	static const char *const fltname[] = { "filter.0.0", "filter.0.1", "filter.0.2" };
+	timeplt_state *state = (timeplt_state *)device->machine->driver_data;
+	const device_config *filter[3] = { state->filter_0_0, state->filter_0_1, state->filter_0_2 };
 	int i;
 
-
-	for (i = 0;i < 3;i++)
+	for (i = 0; i < 3; i++)
 	{
-		int C;
+		int C = 0;
 
+		if (data & 1) 
+			C += 47000;	/* 47000pF = 0.047uF */
+		if (data & 2) 
+			C += 220000;	/* 220000pF = 0.22uF */
 
-		C = 0;
-		if (data & 1) C += 47000;	/* 47000pF = 0.047uF */
-		if (data & 2) C += 220000;	/* 220000pF = 0.22uF */
 		data >>= 2;
-		filter_rc_set_RC(devtag_get_device(device->machine, fltname[i]),FLT_RC_LOWPASS,1000,2200,200,CAP_P(C));
+		filter_rc_set_RC(filter[i], FLT_RC_LOWPASS, 1000, 2200, 200, CAP_P(C));
 	}
 }
 
 
 static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 {
-	static int last;
+	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
 
-
-	if (last == 0 && data == 1)
+	if (state->last_irq == 0 && data == 1)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
+		cpu_set_input_line_and_vector(state->soundcpu, 0, HOLD_LINE, 0xff);
 	}
 
-	last = data;
+	state->last_irq = data;
 }
 
 
 static WRITE8_HANDLER( junofrst_i8039_irq_w )
 {
-	cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
+	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	cpu_set_input_line(state->i8039, 0, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
 {
+	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+
 	if ((data & 0x80) == 0)
-		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
-	i8039_status = (data & 0x70) >> 4;
+		cpu_set_input_line(state->i8039, 0, CLEAR_LINE);
+	state->i8039_status = (data & 0x70) >> 4;
 }
 
 
@@ -171,14 +173,14 @@ static WRITE8_HANDLER( flip_screen_w )
 
 static WRITE8_HANDLER( junofrst_coin_counter_w )
 {
-	coin_counter_w(space->machine, offset,data);
+	coin_counter_w(space->machine, offset, data);
 }
 
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
-	AM_RANGE(0x8000, 0x800f) AM_RAM AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_SIZE_MEMBER(timeplt_state, videoram, videoram_size)
+	AM_RANGE(0x8000, 0x800f) AM_RAM AM_BASE_MEMBER(timeplt_state, paletteram)
 	AM_RANGE(0x8010, 0x8010) AM_READ_PORT("DSW2")
 	AM_RANGE(0x801c, 0x801c) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8020, 0x8020) AM_READ_PORT("SYSTEM")
@@ -187,7 +189,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x802c, 0x802c) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8030, 0x8030) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x8031, 0x8032) AM_WRITE(junofrst_coin_counter_w)
-	AM_RANGE(0x8033, 0x8033) AM_WRITEONLY AM_BASE(&tutankhm_scroll)  /* not used in Juno */
+	AM_RANGE(0x8033, 0x8033) AM_WRITEONLY AM_BASE_MEMBER(timeplt_state, scroll)  /* not used in Juno */
 	AM_RANGE(0x8034, 0x8035) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x8040, 0x8040) AM_WRITE(junofrst_sh_irqtrigger_w)
 	AM_RANGE(0x8050, 0x8050) AM_WRITE(soundlatch_w)
@@ -276,7 +278,42 @@ static const ay8910_interface ay8910_config =
 };
 
 
+static MACHINE_START( junofrst )
+{
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->i8039 = devtag_get_device(machine, "mcu");
+	state->soundcpu = devtag_get_device(machine, "audiocpu");
+	state->filter_0_0 = devtag_get_device(machine, "filter.0.0");
+	state->filter_0_1 = devtag_get_device(machine, "filter.0.1");
+	state->filter_0_2 = devtag_get_device(machine, "filter.0.2");
+
+	state_save_register_global(machine, state->i8039_status);
+	state_save_register_global(machine, state->last_irq);
+	state_save_register_global(machine, state->flip_x);
+	state_save_register_global(machine, state->flip_y);
+	state_save_register_global_array(machine, state->blitterdata);
+}
+
+static MACHINE_RESET( junofrst )
+{
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+
+	state->i8039_status = 0;
+	state->last_irq = 0;
+	state->flip_x = 0;
+	state->flip_y = 0;
+	state->blitterdata[0] = 0;
+	state->blitterdata[1] = 0;
+	state->blitterdata[2] = 0;
+	state->blitterdata[3] = 0;
+}
+
 static MACHINE_DRIVER_START( junofrst )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(timeplt_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1500000)			/* 1.5 MHz ??? */
@@ -290,6 +327,9 @@ static MACHINE_DRIVER_START( junofrst )
 	MDRV_CPU_PROGRAM_MAP(mcu_map)
 	MDRV_CPU_IO_MAP(mcu_io_map)
 
+	MDRV_MACHINE_START(junofrst)
+	MDRV_MACHINE_RESET(junofrst)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(30)
@@ -298,7 +338,6 @@ static MACHINE_DRIVER_START( junofrst )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)	/* not sure about the visible area */
 
-	MDRV_VIDEO_START(tutankhm)
 	MDRV_VIDEO_UPDATE(tutankhm)
 
 	/* sound hardware */

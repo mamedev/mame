@@ -10,15 +10,10 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "pooyan.h"
-#include "audio/timeplt.h"
+#include "includes/timeplt.h"
 
 
 #define MASTER_CLOCK		XTAL_18_432MHz
-
-
-
-static UINT8 irq_enable;
 
 
 /*************************************
@@ -27,26 +22,23 @@ static UINT8 irq_enable;
  *
  *************************************/
 
-static MACHINE_START( pooyan )
-{
-	state_save_register_global(machine, irq_enable);
-}
-
-
 static INTERRUPT_GEN( pooyan_interrupt )
 {
-	if (irq_enable)
+	timeplt_state *state = (timeplt_state *)device->machine->driver_data;
+
+	if (state->irq_enable)
 		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( irq_enable_w )
 {
-	irq_enable = data & 1;
-	if (!irq_enable)
-		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
-}
+	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
 
+	state->irq_enable = data & 1;
+	if (!state->irq_enable)
+		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+}
 
 
 /*************************************
@@ -57,11 +49,11 @@ static WRITE8_HANDLER( irq_enable_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pooyan_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pooyan_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pooyan_colorram_w) AM_BASE_MEMBER(timeplt_state, colorram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pooyan_videoram_w) AM_BASE_MEMBER(timeplt_state, videoram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0x9400, 0x94ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE_GENERIC(spriteram2)
+	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE_MEMBER(timeplt_state, spriteram)
+	AM_RANGE(0x9400, 0x94ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE_MEMBER(timeplt_state, spriteram2)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x5e7f) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa080, 0xa080) AM_MIRROR(0x5e1f) AM_READ_PORT("IN0")
 	AM_RANGE(0xa0a0, 0xa0a0) AM_MIRROR(0x5e1f) AM_READ_PORT("IN1")
@@ -213,7 +205,27 @@ GFXDECODE_END
  *
  *************************************/
 
+static MACHINE_START( pooyan )
+{
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+
+	state_save_register_global(machine, state->irq_enable);
+}
+
+
+static MACHINE_RESET( pooyan )
+{
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	state->irq_enable = 0;
+}
+
+
 static MACHINE_DRIVER_START( pooyan )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(timeplt_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
@@ -221,6 +233,7 @@ static MACHINE_DRIVER_START( pooyan )
 	MDRV_CPU_VBLANK_INT("screen", pooyan_interrupt)
 
 	MDRV_MACHINE_START(pooyan)
+	MDRV_MACHINE_RESET(pooyan)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -239,7 +252,6 @@ static MACHINE_DRIVER_START( pooyan )
 	/* sound hardware */
 	MDRV_IMPORT_FROM(timeplt_sound)
 MACHINE_DRIVER_END
-
 
 
 /*************************************

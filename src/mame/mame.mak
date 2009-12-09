@@ -790,7 +790,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/hornet.o $(MACHINE)/konppc.o \
 	$(DRIVERS)/hyperspt.o $(VIDEO)/hyperspt.o \
 	$(DRIVERS)/ironhors.o $(VIDEO)/ironhors.o \
-	$(DRIVERS)/jackal.o $(MACHINE)/jackal.o $(VIDEO)/jackal.o \
+	$(DRIVERS)/jackal.o $(VIDEO)/jackal.o \
 	$(DRIVERS)/jailbrek.o $(VIDEO)/jailbrek.o \
 	$(DRIVERS)/junofrst.o \
 	$(DRIVERS)/konamigq.o \

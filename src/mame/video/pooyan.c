@@ -6,12 +6,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
-#include "pooyan.h"
-
-
-static tilemap *bg_tilemap;
-
-
+#include "includes/timeplt.h"
 
 /***************************************************************************
 
@@ -40,7 +35,7 @@ PALETTE_INIT( pooyan )
 	int i;
 
 	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, rweights, 1000, 0,
 			3, resistances_rg, gweights, 1000, 0,
 			2, resistances_b,  bweights, 1000, 0);
@@ -102,8 +97,9 @@ PALETTE_INIT( pooyan )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = machine->generic.colorram.u8[tile_index];
-	int code = machine->generic.videoram.u8[tile_index];
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	int attr = state->colorram[tile_index];
+	int code = state->videoram[tile_index];
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX(attr >> 6);
 
@@ -120,7 +116,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( pooyan )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  8,8, 32,32);
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
@@ -133,15 +130,17 @@ VIDEO_START( pooyan )
 
 WRITE8_HANDLER( pooyan_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
 WRITE8_HANDLER( pooyan_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
@@ -158,13 +157,14 @@ WRITE8_HANDLER( pooyan_flipscreen_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
-	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram_2 = state->spriteram2;
 	int offs;
 
-	for (offs = 0x10;offs < 0x40;offs += 2)
+	for (offs = 0x10; offs < 0x40; offs += 2)
 	{
 		int sx = spriteram[offs];
 		int sy = 240 - spriteram_2[offs + 1];
@@ -194,7 +194,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( pooyan )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	timeplt_state *state = (timeplt_state *)screen->machine->driver_data;
+
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

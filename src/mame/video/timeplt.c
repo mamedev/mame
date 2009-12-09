@@ -7,10 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "timeplt.h"
-
-static tilemap *bg_tilemap;
-
+#include "includes/timeplt.h"
 
 /***************************************************************************
 
@@ -45,30 +42,30 @@ PALETTE_INIT( timeplt )
 	rgb_t palette[32];
 	int i;
 
-	for (i = 0;i < 32;i++)
+	for (i = 0; i < 32; i++)
 	{
-		int bit0,bit1,bit2,bit3,bit4,r,g,b;
+		int bit0, bit1, bit2, bit3, bit4, r, g, b;
 
-		bit0 = (color_prom[i + 1*32] >> 1) & 0x01;
-		bit1 = (color_prom[i + 1*32] >> 2) & 0x01;
-		bit2 = (color_prom[i + 1*32] >> 3) & 0x01;
-		bit3 = (color_prom[i + 1*32] >> 4) & 0x01;
-		bit4 = (color_prom[i + 1*32] >> 5) & 0x01;
+		bit0 = (color_prom[i + 1 * 32] >> 1) & 0x01;
+		bit1 = (color_prom[i + 1 * 32] >> 2) & 0x01;
+		bit2 = (color_prom[i + 1 * 32] >> 3) & 0x01;
+		bit3 = (color_prom[i + 1 * 32] >> 4) & 0x01;
+		bit4 = (color_prom[i + 1 * 32] >> 5) & 0x01;
 		r = 0x19 * bit0 + 0x24 * bit1 + 0x35 * bit2 + 0x40 * bit3 + 0x4d * bit4;
-		bit0 = (color_prom[i + 1*32] >> 6) & 0x01;
-		bit1 = (color_prom[i + 1*32] >> 7) & 0x01;
-		bit2 = (color_prom[i + 0*32] >> 0) & 0x01;
-		bit3 = (color_prom[i + 0*32] >> 1) & 0x01;
-		bit4 = (color_prom[i + 0*32] >> 2) & 0x01;
+		bit0 = (color_prom[i + 1 * 32] >> 6) & 0x01;
+		bit1 = (color_prom[i + 1 * 32] >> 7) & 0x01;
+		bit2 = (color_prom[i + 0 * 32] >> 0) & 0x01;
+		bit3 = (color_prom[i + 0 * 32] >> 1) & 0x01;
+		bit4 = (color_prom[i + 0 * 32] >> 2) & 0x01;
 		g = 0x19 * bit0 + 0x24 * bit1 + 0x35 * bit2 + 0x40 * bit3 + 0x4d * bit4;
-		bit0 = (color_prom[i + 0*32] >> 3) & 0x01;
-		bit1 = (color_prom[i + 0*32] >> 4) & 0x01;
-		bit2 = (color_prom[i + 0*32] >> 5) & 0x01;
-		bit3 = (color_prom[i + 0*32] >> 6) & 0x01;
-		bit4 = (color_prom[i + 0*32] >> 7) & 0x01;
+		bit0 = (color_prom[i + 0 * 32] >> 3) & 0x01;
+		bit1 = (color_prom[i + 0 * 32] >> 4) & 0x01;
+		bit2 = (color_prom[i + 0 * 32] >> 5) & 0x01;
+		bit3 = (color_prom[i + 0 * 32] >> 6) & 0x01;
+		bit4 = (color_prom[i + 0 * 32] >> 7) & 0x01;
 		b = 0x19 * bit0 + 0x24 * bit1 + 0x35 * bit2 + 0x40 * bit3 + 0x4d * bit4;
 
-		palette[i] = MAKE_RGB(r,g,b);
+		palette[i] = MAKE_RGB(r, g, b);
 	}
 
 	color_prom += 2*32;
@@ -76,11 +73,11 @@ PALETTE_INIT( timeplt )
 
 
 	/* sprites */
-	for (i = 0;i < 64*4;i++)
-		palette_set_color(machine, 32*4 + i, palette[*color_prom++ & 0x0f]);
+	for (i = 0; i < 64 * 4; i++)
+		palette_set_color(machine, 32 * 4 + i, palette[*color_prom++ & 0x0f]);
 
 	/* characters */
-	for (i = 0;i < 32*4;i++)
+	for (i = 0; i < 32 * 4; i++)
 		palette_set_color(machine, i, palette[(*color_prom++ & 0x0f) + 0x10]);
 }
 
@@ -94,8 +91,9 @@ PALETTE_INIT( timeplt )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	int attr = machine->generic.colorram.u8[tile_index];
-	int code = machine->generic.videoram.u8[tile_index] + 8 * (attr & 0x20);
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	int attr = state->colorram[tile_index];
+	int code = state->videoram[tile_index] + 8 * (attr & 0x20);
 	int color = attr & 0x1f;
 	int flags = TILE_FLIPYX(attr >> 6);
 
@@ -113,7 +111,8 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( timeplt )
 {
-	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
@@ -126,15 +125,17 @@ VIDEO_START( timeplt )
 
 WRITE8_HANDLER( timeplt_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset);
+	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
 WRITE8_HANDLER( timeplt_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset);
+	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
@@ -157,10 +158,11 @@ READ8_HANDLER( timeplt_scanline_r )
  *
  *************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
-	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram_2 = state->spriteram2;
 	int offs;
 
 	for (offs = 0x3e;offs >= 0x10;offs -= 2)
@@ -191,8 +193,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( timeplt )
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);
+	timeplt_state *state = (timeplt_state *)screen->machine->driver_data;
+
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	draw_sprites(screen->machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 1, 0);
 	return 0;
 }

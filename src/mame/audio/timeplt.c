@@ -4,7 +4,7 @@
 
     timeplt.c
     pooyan.c
-    locomotn.c
+    rallyx.c (for locomotn)
     tutankhm.c
     rocnrope.c
 
@@ -14,13 +14,10 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/flt_rc.h"
-#include "timeplt.h"
+#include "includes/timeplt.h"
 
 
-#define MASTER_CLOCK		XTAL_14_31818MHz
-
-
-static UINT8 timeplt_last_irq_state;
+#define MASTER_CLOCK         XTAL_14_31818MHz
 
 
 /*************************************
@@ -31,8 +28,18 @@ static UINT8 timeplt_last_irq_state;
 
 static SOUND_START( timeplt )
 {
-	timeplt_last_irq_state = 0;
-	state_save_register_global(machine, timeplt_last_irq_state);
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+
+	state->soundcpu = devtag_get_device(machine, "tpsound");
+	state->filter_0_0 = devtag_get_device(machine, "filter.0.0");
+	state->filter_0_1 = devtag_get_device(machine, "filter.0.1");
+	state->filter_0_2 = devtag_get_device(machine, "filter.0.2");
+	state->filter_1_0 = devtag_get_device(machine, "filter.1.0");
+	state->filter_1_1 = devtag_get_device(machine, "filter.1.1");
+	state->filter_1_2 = devtag_get_device(machine, "filter.1.2");
+
+	state->last_irq_state = 0;
+	state_save_register_global(machine, state->last_irq_state);
 }
 
 
@@ -62,11 +69,14 @@ static SOUND_START( timeplt )
 
 static READ8_DEVICE_HANDLER( timeplt_portB_r )
 {
+	timeplt_state *state = (timeplt_state *)device->machine->driver_data;
+
 	static const int timeplt_timer[10] =
 	{
 		0x00, 0x10, 0x20, 0x30, 0x40, 0x90, 0xa0, 0xb0, 0xa0, 0xd0
 	};
-	return timeplt_timer[(cputag_get_total_cycles(device->machine, "tpsound") / 512) % 10];
+
+	return timeplt_timer[(cpu_get_total_cycles(state->soundcpu) / 512) % 10];
 }
 
 
@@ -77,24 +87,28 @@ static READ8_DEVICE_HANDLER( timeplt_portB_r )
  *
  *************************************/
 
-static void filter_w(const device_config *device, int data)
+static void filter_w( const device_config *device, int data )
 {
 	int C = 0;
 
-	if (data & 1) C += 220000;	/* 220000pF = 0.220uF */
-	if (data & 2) C +=  47000;	/*  47000pF = 0.047uF */
-	filter_rc_set_RC(device,FLT_RC_LOWPASS, 1000,5100,0,CAP_P(C));
+	if (data & 1) 
+		C += 220000;	/* 220000pF = 0.220uF */
+	if (data & 2) 
+		C +=  47000;	/*  47000pF = 0.047uF */
+
+	filter_rc_set_RC(device, FLT_RC_LOWPASS, 1000, 5100, 0, CAP_P(C));
 }
 
 
 static WRITE8_HANDLER( timeplt_filter_w )
 {
-	filter_w(devtag_get_device(space->machine, "filter.0.0"), (offset >>  6) & 3);
-	filter_w(devtag_get_device(space->machine, "filter.0.1"), (offset >>  8) & 3);
-	filter_w(devtag_get_device(space->machine, "filter.0.2"), (offset >> 10) & 3);
-	filter_w(devtag_get_device(space->machine, "filter.1.0"), (offset >>  0) & 3);
-	filter_w(devtag_get_device(space->machine, "filter.1.1"), (offset >>  2) & 3);
-	filter_w(devtag_get_device(space->machine, "filter.1.2"), (offset >>  4) & 3);
+	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	filter_w(state->filter_1_0, (offset >>  0) & 3);
+	filter_w(state->filter_1_1, (offset >>  2) & 3);
+	filter_w(state->filter_1_2, (offset >>  4) & 3);
+	filter_w(state->filter_0_0, (offset >>  6) & 3);
+	filter_w(state->filter_0_1, (offset >>  8) & 3);
+	filter_w(state->filter_0_2, (offset >> 10) & 3);
 }
 
 
@@ -107,13 +121,15 @@ static WRITE8_HANDLER( timeplt_filter_w )
 
 WRITE8_HANDLER( timeplt_sh_irqtrigger_w )
 {
-	if (timeplt_last_irq_state == 0 && data)
+	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+
+	if (state->last_irq_state == 0 && data)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		cputag_set_input_line_and_vector(space->machine, "tpsound", 0, HOLD_LINE, 0xff);
+		cpu_set_input_line_and_vector(state->soundcpu, 0, HOLD_LINE, 0xff);
 	}
 
-	timeplt_last_irq_state = data;
+	state->last_irq_state = data;
 }
 
 

@@ -46,14 +46,10 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "timeplt.h"
-#include "audio/timeplt.h"
-#include "konamipt.h"
+#include "includes/timeplt.h"
+#include "includes/konamipt.h"
 
-#define MASTER_CLOCK		XTAL_18_432MHz
-
-static UINT8 nmi_enable;
-
+#define MASTER_CLOCK         XTAL_18_432MHz
 
 /*************************************
  *
@@ -61,24 +57,22 @@ static UINT8 nmi_enable;
  *
  *************************************/
 
-static MACHINE_START( timeplt )
-{
-	state_save_register_global(machine, nmi_enable);
-}
-
-
 static INTERRUPT_GEN( timeplt_interrupt )
 {
-	if (nmi_enable)
+	timeplt_state *state = (timeplt_state *)device->machine->driver_data;
+
+	if (state->nmi_enable)
 		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( timeplt_nmi_enable_w )
 {
-	nmi_enable = data & 1;
-	if (!nmi_enable)
-		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+
+	state->nmi_enable = data & 1;
+	if (!state->nmi_enable)
+		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -121,11 +115,11 @@ static READ8_HANDLER( psurge_protection_r )
 static ADDRESS_MAP_START( timeplt_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(timeplt_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE(timeplt_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(timeplt_colorram_w) AM_BASE_MEMBER(timeplt_state, colorram)
+	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE(timeplt_videoram_w) AM_BASE_MEMBER(timeplt_state, videoram)
 	AM_RANGE(0xa800, 0xafff) AM_RAM
-	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE_GENERIC(spriteram2)
+	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE_MEMBER(timeplt_state, spriteram)
+	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE_MEMBER(timeplt_state, spriteram2)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_nmi_enable_w)
@@ -145,11 +139,11 @@ static ADDRESS_MAP_START( psurge_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6004, 0x6004) AM_READ(psurge_protection_r)
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(timeplt_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE(timeplt_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(timeplt_colorram_w) AM_BASE_MEMBER(timeplt_state, colorram)
+	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE(timeplt_videoram_w) AM_BASE_MEMBER(timeplt_state, videoram)
 	AM_RANGE(0xa800, 0xafff) AM_RAM
-	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE_GENERIC(spriteram2)
+	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE_MEMBER(timeplt_state, spriteram)
+	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE_MEMBER(timeplt_state, spriteram2)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xc302, 0xc302) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_flipscreen_w)
@@ -307,7 +301,33 @@ GFXDECODE_END
  *
  *************************************/
 
+static MACHINE_START( common )
+{
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+}
+
+static MACHINE_START( timeplt )
+{
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+
+	MACHINE_START_CALL(common);
+
+	state_save_register_global(machine, state->nmi_enable);
+}
+
+static MACHINE_RESET( timeplt )
+{
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+
+	state->nmi_enable = 0;
+}
+
 static MACHINE_DRIVER_START( timeplt )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(timeplt_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)	/* not confirmed, but common for Konami games of the era */
@@ -315,6 +335,7 @@ static MACHINE_DRIVER_START( timeplt )
 	MDRV_CPU_VBLANK_INT("screen", timeplt_interrupt)
 
 	MDRV_MACHINE_START(timeplt)
+	MDRV_MACHINE_RESET(timeplt)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
@@ -345,7 +366,8 @@ static MACHINE_DRIVER_START( psurge )
 	MDRV_CPU_PROGRAM_MAP(psurge_main_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_MACHINE_START(0)
+	MDRV_MACHINE_START(common)
+	MDRV_MACHINE_RESET(0)
 MACHINE_DRIVER_END
 
 

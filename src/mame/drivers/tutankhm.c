@@ -21,13 +21,9 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "tutankhm.h"
 #include "cpu/m6809/m6809.h"
-#include "audio/timeplt.h"
-#include "konamipt.h"
-
-static UINT8 irq_toggle;
-static UINT8 irq_enable;
+#include "includes/timeplt.h"
+#include "includes/konamipt.h"
 
 
 /*************************************
@@ -38,20 +34,23 @@ static UINT8 irq_enable;
 
 static INTERRUPT_GEN( tutankhm_interrupt )
 {
+	timeplt_state *state = (timeplt_state *)device->machine->driver_data;
+
 	/* flip flops cause the interrupt to be signalled every other frame */
-	irq_toggle ^= 1;
-	if (irq_toggle && irq_enable)
+	state->irq_toggle ^= 1;
+	if (state->irq_toggle && state->irq_enable)
 		cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( irq_enable_w )
 {
-	irq_enable = data & 1;
-	if (!irq_enable)
-		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
-}
+	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
 
+	state->irq_enable = data & 1;
+	if (!state->irq_enable)
+		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+}
 
 
 /*************************************
@@ -60,19 +59,10 @@ static WRITE8_HANDLER( irq_enable_w )
  *
  *************************************/
 
-static MACHINE_START( tutankhm )
-{
-	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x1000);
-	state_save_register_global(machine, irq_toggle);
-	state_save_register_global(machine, irq_enable);
-}
-
-
 static WRITE8_HANDLER( tutankhm_bankselect_w )
 {
 	memory_set_bank(space->machine, "bank1", data & 0x0f);
 }
-
 
 
 /*************************************
@@ -93,7 +83,6 @@ static WRITE8_HANDLER( tutankhm_coin_counter_w )
 }
 
 
-
 /*************************************
  *
  *  Main CPU memory handlers
@@ -101,9 +90,9 @@ static WRITE8_HANDLER( tutankhm_coin_counter_w )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
-	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x8100, 0x8100) AM_MIRROR(0x000f) AM_RAM AM_BASE(&tutankhm_scroll)
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_SIZE_MEMBER(timeplt_state, videoram, videoram_size)
+	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM AM_BASE_MEMBER(timeplt_state, paletteram)
+	AM_RANGE(0x8100, 0x8100) AM_MIRROR(0x000f) AM_RAM AM_BASE_MEMBER(timeplt_state, scroll)
 	AM_RANGE(0x8120, 0x8120) AM_MIRROR(0x000f) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8160, 0x8160) AM_MIRROR(0x000f) AM_READ_PORT("DSW2")	/* DSW2 (inverted bits) */
 	AM_RANGE(0x8180, 0x8180) AM_MIRROR(0x000f) AM_READ_PORT("IN0")	/* IN0 I/O: Coin slots, service, 1P/2P buttons */
@@ -122,7 +111,6 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
-
 
 
 /*************************************
@@ -171,14 +159,40 @@ static INPUT_PORTS_START( tutankhm )
 INPUT_PORTS_END
 
 
-
 /*************************************
  *
  *  Machine drivers
  *
  *************************************/
 
+static MACHINE_START( tutankhm )
+{
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+
+	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x1000);
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+
+	state_save_register_global(machine, state->irq_toggle);
+	state_save_register_global(machine, state->irq_enable);
+	state_save_register_global(machine, state->flip_x);
+	state_save_register_global(machine, state->flip_y);
+}
+
+static MACHINE_RESET( tutankhm )
+{
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
+
+	state->irq_toggle = 0;
+	state->irq_enable = 0;
+	state->flip_x = 0;
+	state->flip_y = 0;
+}
+
 static MACHINE_DRIVER_START( tutankhm )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(timeplt_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1500000)			/* 1.5 MHz ??? */
@@ -186,6 +200,7 @@ static MACHINE_DRIVER_START( tutankhm )
 	MDRV_CPU_VBLANK_INT("screen", tutankhm_interrupt)
 
 	MDRV_MACHINE_START(tutankhm)
+	MDRV_MACHINE_RESET(tutankhm)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -195,13 +210,11 @@ static MACHINE_DRIVER_START( tutankhm )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)	/* not sure about the visible area */
 
-	MDRV_VIDEO_START(tutankhm)
 	MDRV_VIDEO_UPDATE(tutankhm)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(timeplt_sound)
 MACHINE_DRIVER_END
-
 
 
 /*************************************

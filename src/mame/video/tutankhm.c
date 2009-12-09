@@ -6,20 +6,11 @@
 
 ***************************************************************************/
 
-
 #include "driver.h"
-#include "tutankhm.h"
+#include "includes/timeplt.h"
 
 
 #define NUM_PENS	(0x10)
-
-
-UINT8 *tutankhm_scroll;
-
-static UINT8 junofrst_blitterdata[4];
-static UINT8 tutankhm_flip_screen_x;
-static UINT8 tutankhm_flip_screen_y;
-
 
 
 /*************************************
@@ -30,15 +21,16 @@ static UINT8 tutankhm_flip_screen_y;
 
 WRITE8_HANDLER( tutankhm_flip_screen_x_w )
 {
-	tutankhm_flip_screen_x = data & 0x01;
+	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	state->flip_x = data & 0x01;
 }
 
 
 WRITE8_HANDLER( tutankhm_flip_screen_y_w )
 {
-	tutankhm_flip_screen_y = data & 0x01;
+	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	state->flip_y = data & 0x01;
 }
-
 
 
 /*************************************
@@ -47,33 +39,18 @@ WRITE8_HANDLER( tutankhm_flip_screen_y_w )
  *
  *************************************/
 
-static void get_pens(running_machine *machine, pen_t *pens)
+static void get_pens( running_machine *machine, pen_t *pens )
 {
+	timeplt_state *state = (timeplt_state *)machine->driver_data;
 	offs_t i;
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
-		UINT8 data = machine->generic.paletteram.u8[i];
+		UINT8 data = state->paletteram[i];
 
 		pens[i] = MAKE_RGB(pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 }
-
-
-
-/*************************************
- *
- *  Video startup
- *
- *************************************/
-
-VIDEO_START( tutankhm )
-{
-	state_save_register_global_array(machine, junofrst_blitterdata);
-	state_save_register_global(machine, tutankhm_flip_screen_x);
-	state_save_register_global(machine, tutankhm_flip_screen_y);
-}
-
 
 
 /*************************************
@@ -84,8 +61,9 @@ VIDEO_START( tutankhm )
 
 VIDEO_UPDATE( tutankhm )
 {
-	int xorx = tutankhm_flip_screen_x ? 255 : 0;
-	int xory = tutankhm_flip_screen_y ? 255 : 0;
+	timeplt_state *state = (timeplt_state *)screen->machine->driver_data;
+	int xorx = state->flip_x ? 255 : 0;
+	int xory = state->flip_y ? 255 : 0;
 	pen_t pens[NUM_PENS];
 	int x, y;
 
@@ -98,9 +76,9 @@ VIDEO_UPDATE( tutankhm )
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
 			UINT8 effx = x ^ xorx;
-			UINT8 yscroll = (effx < 192) ? *tutankhm_scroll : 0;
+			UINT8 yscroll = (effx < 192) ? *state->scroll : 0;
 			UINT8 effy = (y ^ xory) + yscroll;
-			UINT8 vrambyte = screen->machine->generic.videoram.u8[effy * 128 + effx / 2];
+			UINT8 vrambyte = state->videoram[effy * 128 + effx / 2];
 			UINT8 shifted = vrambyte >> (4 * (effx % 2));
 			dst[x] = pens[shifted & 0x0f];
 		}
@@ -131,7 +109,8 @@ VIDEO_UPDATE( tutankhm )
 
 WRITE8_HANDLER( junofrst_blitter_w )
 {
-	junofrst_blitterdata[offset] = data;
+	timeplt_state *state = (timeplt_state *)space->machine->driver_data;
+	state->blitterdata[offset] = data;
 
 	/* blitter is triggered by $8073 */
 	if (offset == 3)
@@ -139,10 +118,10 @@ WRITE8_HANDLER( junofrst_blitter_w )
 		int i;
 		UINT8 *gfx_rom = memory_region(space->machine, "gfx1");
 
-		offs_t src = ((junofrst_blitterdata[2] << 8) | junofrst_blitterdata[3]) & 0xfffc;
-		offs_t dest = (junofrst_blitterdata[0] << 8) | junofrst_blitterdata[1];
+		offs_t src = ((state->blitterdata[2] << 8) | state->blitterdata[3]) & 0xfffc;
+		offs_t dest = (state->blitterdata[0] << 8) | state->blitterdata[1];
 
-		int copy = junofrst_blitterdata[3] & 0x01;
+		int copy = state->blitterdata[3] & 0x01;
 
 		/* 16x16 graphics */
 		for (i = 0; i < 16; i++)
@@ -158,25 +137,25 @@ WRITE8_HANDLER( junofrst_blitter_w )
 				else
 					data = gfx_rom[src >> 1] >> 4;
 
-				src = src + 1;
+				src += 1;
 
 				/* if there is a source pixel either copy the pixel or clear the pixel depending on the copy flag */
 
 				if (data)
 				{
-					if (copy==0)
+					if (copy == 0)
 						data = 0;
 
 					if (dest & 1)
-						space->machine->generic.videoram.u8[dest >> 1] = (space->machine->generic.videoram.u8[dest >> 1] & 0x0f) | (data << 4);
+						state->videoram[dest >> 1] = (state->videoram[dest >> 1] & 0x0f) | (data << 4);
 					else
-						space->machine->generic.videoram.u8[dest >> 1] = (space->machine->generic.videoram.u8[dest >> 1] & 0xf0) | data;
+						state->videoram[dest >> 1] = (state->videoram[dest >> 1] & 0xf0) | data;
 				}
 
-				dest = dest + 1;
+				dest += 1;
 			}
 
-			dest = dest + 240;
+			dest += 240;
 		}
 	}
 }
