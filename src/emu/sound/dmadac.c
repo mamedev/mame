@@ -83,14 +83,17 @@ static STREAM_UPDATE( dmadac_update )
 
 	/* feed as much as we can */
 	while (curout != curin && samples-- > 0)
-		*output++ = (source[curout++ % BUFFER_SIZE] * volume) >> 8;
+	{
+		*output++ = (source[curout] * volume) >> 8;
+		curout = (curout + 1) % BUFFER_SIZE;
+	}
 
 	/* fill the rest with silence */
 	while (samples-- > 0)
 		*output++ = 0;
 
 	/* save the new output pointer */
-	ch->bufout = curout % BUFFER_SIZE;
+	ch->bufout = curout;
 }
 
 
@@ -155,7 +158,8 @@ void dmadac_transfer(const device_config **devlist, UINT8 num_channels, offs_t c
 			/* copy the data */
 			for (j = 0; j < total_frames && curin != maxin; j++)
 			{
-				ch->buffer[curin++ % BUFFER_SIZE] = *src;
+				ch->buffer[curin] = *src;
+				curin = (curin + 1) % BUFFER_SIZE;
 				src += frame_spacing;
 			}
 			ch->bufin = curin;
