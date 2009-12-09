@@ -140,7 +140,9 @@ static const via6522_interface via_1_interface =
 static WRITE8_DEVICE_HANDLER( audio_reset_w )
 {
 	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
-	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+
 	if (data == 0)
 	{
 		device_reset(state->riot);
@@ -182,7 +184,9 @@ static const via6522_interface via_2_interface =
 
 static WRITE_LINE_DEVICE_HANDLER( r6532_irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, state);
+	gameplan_state *gameplan = (gameplan_state *)device->machine->driver_data;
+
+	cpu_set_input_line(gameplan->audiocpu, 0, state);
 	if (state == ASSERT_LINE)
 		cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(10));
 }
@@ -203,37 +207,6 @@ static const riot6532_interface r6532_interface =
 	DEVCB_HANDLER(r6532_soundlatch_w),	/* port B write handler */
 	DEVCB_LINE(r6532_irq)				/* IRQ callback */
 };
-
-
-
-/*************************************
- *
- *  Start
- *
- *************************************/
-
-static MACHINE_START( gameplan )
-{
-	gameplan_state *state = (gameplan_state *)machine->driver_data;
-
-	state->riot = devtag_get_device(machine, "riot");
-
-	/* register for save states */
-	state_save_register_global(machine, state->current_port);
-}
-
-
-
-/*************************************
- *
- *  Reset
- *
- *************************************/
-
-static MACHINE_RESET( gameplan )
-{
-}
-
 
 
 /*************************************
@@ -1006,6 +979,35 @@ static const ay8910_interface ay8910_config =
 };
 
 
+
+static MACHINE_START( gameplan )
+{
+	gameplan_state *state = (gameplan_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->riot = devtag_get_device(machine, "riot");
+	state->via_0 = devtag_get_device(machine, "via6522_0");
+
+	/* register for save states */
+	state_save_register_global(machine, state->current_port);
+	state_save_register_global(machine, state->video_x);
+	state_save_register_global(machine, state->video_y);
+	state_save_register_global(machine, state->video_command);
+	state_save_register_global(machine, state->video_data);
+}
+
+
+static MACHINE_RESET( gameplan )
+{
+	gameplan_state *state = (gameplan_state *)machine->driver_data;
+	state->current_port = 0;
+	state->video_x = 0;
+	state->video_y = 0;
+	state->video_command = 0;
+	state->video_data = 0;
+}
+
 static MACHINE_DRIVER_START( gameplan )
 
 	MDRV_DRIVER_DATA(gameplan_state)
@@ -1197,8 +1199,8 @@ ROM_END
 GAME( 1980, killcom,  0,        gameplan, killcom,  0, ROT0,   "GamePlan (Centuri license)", "Killer Comet", GAME_SUPPORTS_SAVE )
 GAME( 1980, megatack, 0,        gameplan, megatack, 0, ROT0,   "GamePlan (Centuri license)", "Megatack", GAME_SUPPORTS_SAVE )
 GAME( 1981, challeng, 0,        gameplan, challeng, 0, ROT0,   "GamePlan (Centuri license)", "Challenger", GAME_SUPPORTS_SAVE )
-GAME( 1981, kaos,     0,        gameplan, kaos,     0, ROT270, "GamePlan", "Kaos", GAME_SUPPORTS_SAVE )
-GAME( 1982, leprechn, 0,        leprechn, leprechn, 0, ROT0,   "Tong Electronic", "Leprechaun", GAME_SUPPORTS_SAVE )
-GAME( 1982, potogold, leprechn, leprechn, potogold, 0, ROT0,   "GamePlan", "Pot of Gold", GAME_SUPPORTS_SAVE )
-GAME( 1982, leprechp, leprechn, leprechn, potogold, 0, ROT0,   "Tong Electronic", "Leprechaun (Pacific Polytechnical license)", GAME_SUPPORTS_SAVE )
-GAME( 1982, piratetr, 0,        leprechn, piratetr, 0, ROT0,   "Tong Electronic", "Pirate Treasure", GAME_SUPPORTS_SAVE )
+GAME( 1981, kaos,     0,        gameplan, kaos,     0, ROT270, "GamePlan",                   "Kaos", GAME_SUPPORTS_SAVE )
+GAME( 1982, leprechn, 0,        leprechn, leprechn, 0, ROT0,   "Tong Electronic",            "Leprechaun", GAME_SUPPORTS_SAVE )
+GAME( 1982, potogold, leprechn, leprechn, potogold, 0, ROT0,   "GamePlan",                   "Pot of Gold", GAME_SUPPORTS_SAVE )
+GAME( 1982, leprechp, leprechn, leprechn, potogold, 0, ROT0,   "Tong Electronic",            "Leprechaun (Pacific Polytechnical license)", GAME_SUPPORTS_SAVE )
+GAME( 1982, piratetr, 0,        leprechn, piratetr, 0, ROT0,   "Tong Electronic",            "Pirate Treasure", GAME_SUPPORTS_SAVE )

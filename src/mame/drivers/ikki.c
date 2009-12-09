@@ -12,18 +12,14 @@ Ikki (c) 1985 Sun Electronics
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/sn76496.h"
+#include "includes/ikki.h"
 
 
-extern UINT8 *ikki_scroll;
-
-PALETTE_INIT( ikki );
-VIDEO_START( ikki );
-VIDEO_UPDATE( ikki );
-
-
-/****************************************************************************/
-
-WRITE8_HANDLER( ikki_scrn_ctrl_w );
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 static READ8_HANDLER( ikki_e000_r )
 {
@@ -36,17 +32,21 @@ static READ8_HANDLER( ikki_e000_r )
 
 static WRITE8_HANDLER( ikki_coin_counters )
 {
-	coin_counter_w( space->machine, 0, data & 0x01 );
-	coin_counter_w( space->machine, 1, data & 0x02 );
+	coin_counter_w(space->machine, 0, data & 0x01);
+	coin_counter_w(space->machine, 1, data & 0x02);
 }
 
-/****************************************************************************/
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( ikki_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(ikki_state, videoram, videoram_size)
 	AM_RANGE(0xe000, 0xe000) AM_READ(ikki_e000_r)
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("DSW2")
@@ -55,19 +55,23 @@ static ADDRESS_MAP_START( ikki_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe005, 0xe005) AM_READ_PORT("P2")
 	AM_RANGE(0xe008, 0xe008) AM_WRITE(ikki_scrn_ctrl_w)
 	AM_RANGE(0xe009, 0xe009) AM_WRITE(ikki_coin_counters)
-	AM_RANGE(0xe00a, 0xe00b) AM_WRITEONLY AM_BASE(&ikki_scroll)
+	AM_RANGE(0xe00a, 0xe00b) AM_WRITEONLY AM_BASE_MEMBER(ikki_state, scroll)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ikki_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_SIZE_MEMBER(ikki_state, spriteram, spriteram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd801, 0xd801) AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE("sn2", sn76496_w)
 ADDRESS_MAP_END
 
 
-/****************************************************************************/
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( ikki )
 	PORT_START("DSW1")
@@ -157,7 +161,12 @@ static INPUT_PORTS_START( ikki )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
-/****************************************************************************/
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 static const gfx_layout charlayout =
 {
@@ -191,7 +200,31 @@ static GFXDECODE_START( ikki )
 GFXDECODE_END
 
 
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( ikki )
+{
+	ikki_state *state = (ikki_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->flipscreen);
+	state_save_register_global(machine, state->punch_through_pen);
+}
+
+static MACHINE_RESET( ikki )
+{
+	ikki_state *state = (ikki_state *)machine->driver_data;
+
+	state->flipscreen = 0;
+}
+
 static MACHINE_DRIVER_START( ikki )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ikki_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
@@ -203,6 +236,9 @@ static MACHINE_DRIVER_START( ikki )
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	MDRV_QUANTUM_TIME(HZ(600))
+
+	MDRV_MACHINE_START(ikki)
+	MDRV_MACHINE_RESET(ikki)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -229,7 +265,12 @@ static MACHINE_DRIVER_START( ikki )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 
-/****************************************************************************/
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( ikki )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main CPU */
@@ -297,5 +338,11 @@ ROM_START( farmer )
 	ROM_LOAD( "prom17_2", 0x0100,  0x0100, CRC(f3c55174) SHA1(936c5432c4fccfcb2601c1e08b98d5509202fe5b) ) /* unknown */
 ROM_END
 
-GAME( 1985, ikki,   0,    ikki, ikki, 0, ROT0, "Sun Electronics", "Ikki (Japan)", 0 )
-GAME( 1985, farmer, ikki, ikki, ikki, 0, ROT0, "Sun Electronics", "Farmers Rebellion", 0 )
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1985, ikki,   0,    ikki, ikki, 0, ROT0, "Sun Electronics", "Ikki (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1985, farmer, ikki, ikki, ikki, 0, ROT0, "Sun Electronics", "Farmers Rebellion", GAME_SUPPORTS_SAVE )

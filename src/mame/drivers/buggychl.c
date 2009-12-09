@@ -92,7 +92,7 @@ Dip locations and factory settings verified from dip listing
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bankptr(space->machine, "bank1",&memory_region(space->machine, "maincpu")[0x10000 + (data & 7) * 0x2000]);
+	memory_set_bank(space->machine, "bank1", data & 0x07);	// shall we check if data&7 < # banks?
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -377,6 +377,9 @@ static const msm5232_interface msm5232_config =
 static MACHINE_START( buggychl )
 {
 	buggychl_state *state = (buggychl_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x2000);
 
 	state->audiocpu = devtag_get_device(machine, "audiocpu");
 	state->mcu = devtag_get_device(machine, "mcu");

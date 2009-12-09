@@ -364,8 +364,7 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
       */
 //  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n", cpu_get_pc(space->cpu), data, BIT(data, 2), BIT(data, 6));
 
-
-	memory_set_bankptr(space->machine, "bank2", memory_region(space->machine, "audiocpu") + 0x10000 * (data & 0x03));
+	memory_set_bank(space->machine, "bank2", data & 0x03);
 
 	coin_counter_w(space->machine, 0, ~data & 0x80);
 
@@ -515,7 +514,7 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 
 	//  logerror("%04x: port C wr %02x\n", cpu_get_pc(space->cpu), data);
 
-	memory_set_bankptr(space->machine, "bank2", memory_region(space->machine, "audiocpu") + 0x10000 * ((data & 0x0c) >> 2));
+	memory_set_bank(space->machine, "bank2", (data & 0x0c) >> 2);
 
 	coin_counter_w(space->machine, 0, ~data & 0x80);
 
@@ -530,19 +529,13 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	UINT8 *rom = memory_region(space->machine, "maincpu");
-	int len = memory_region_length(space->machine, "maincpu") - 0x10000 + 0x4000;
-	int offs = (data * 0x4000) & (len - 1);
+	int last_bank = (memory_region_length(space->machine, "maincpu") - 0x10000) / 0x4000;
 
-	/* last bank is fixed */
-	if (offs < len - 0x4000)
-	{
-		memory_set_bankptr(space->machine, "bank1", &rom[offs + 0x10000]);
-	}
+	/* last bank is fixed and is #0 for us, other banks start from #1 (hence data+1 below)*/
+	if (data < last_bank)
+		memory_set_bank(space->machine, "bank1", data + 1);
 	else
-	{
-		memory_set_bankptr(space->machine, "bank1", &rom[0xc000]);
-	}
+		memory_set_bank(space->machine, "bank1", 0);
 }
 
 
@@ -1176,6 +1169,10 @@ static MACHINE_START( homedata )
 static MACHINE_START( reikaids )
 {
 	homedata_state *state = (homedata_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0xc000], 0x4000);
+	memory_configure_bank(machine, "bank2", 0, 4, memory_region(machine, "audiocpu"), 0x10000);
 
 	MACHINE_START_CALL(homedata);
 
@@ -1189,6 +1186,10 @@ static MACHINE_START( reikaids )
 static MACHINE_START( pteacher )
 {
 	homedata_state *state = (homedata_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0xc000], 0x4000);
+	memory_configure_bank(machine, "bank2", 0, 4, memory_region(machine, "audiocpu"), 0x10000);
 
 	MACHINE_START_CALL(homedata);
 

@@ -41,40 +41,10 @@ Memo:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "fromance.h"
 #include "sound/ay8910.h"
 #include "sound/2413intf.h"
 #include "sound/msm5205.h"
-
-
-/* Local variables */
-static UINT8 fromance_directionflag;
-static UINT8 fromance_commanddata;
-static UINT8 fromance_portselect;
-
-static UINT8 fromance_adpcm_reset;
-static UINT8 fromance_adpcm_data;
-static UINT8 fromance_vclk_left;
-
-
-
-/*************************************
- *
- *  Machine init
- *
- *************************************/
-
-static MACHINE_RESET( fromance )
-{
-	fromance_directionflag = 0;
-	fromance_commanddata = 0;
-	fromance_portselect = 0;
-
-	fromance_adpcm_reset = 0;
-	fromance_adpcm_data = 0;
-	fromance_vclk_left = 0;
-}
-
+#include "includes/fromance.h"
 
 
 /*************************************
@@ -85,14 +55,16 @@ static MACHINE_RESET( fromance )
 
 static READ8_HANDLER( fromance_commanddata_r )
 {
-	return fromance_commanddata;
+	fromance_state *state = (fromance_state *)space->machine->driver_data;
+	return state->commanddata;
 }
 
 
 static TIMER_CALLBACK( deferred_commanddata_w )
 {
-	fromance_commanddata = param;
-	fromance_directionflag = 1;
+	fromance_state *state = (fromance_state *)machine->driver_data;
+	state->commanddata = param;
+	state->directionflag = 1;
 }
 
 
@@ -105,24 +77,33 @@ static WRITE8_HANDLER( fromance_commanddata_w )
 
 static READ8_HANDLER( fromance_busycheck_main_r )
 {
+	fromance_state *state = (fromance_state *)space->machine->driver_data;
+
 	/* set a timer to force synchronization after the read */
 	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 
-	if (!fromance_directionflag) return 0x00;		// standby
-	else return 0xff;								// busy
+	if (!state->directionflag) 
+		return 0x00;		// standby
+	else 
+		return 0xff;		// busy
 }
 
 
 static READ8_HANDLER( fromance_busycheck_sub_r )
 {
-	if (fromance_directionflag) return 0xff;		// standby
-	else return 0x00;								// busy
+	fromance_state *state = (fromance_state *)space->machine->driver_data;
+
+	if (state->directionflag) 
+		return 0xff;		// standby
+	else 
+		return 0x00;		// busy
 }
 
 
 static WRITE8_HANDLER( fromance_busycheck_sub_w )
 {
-	fromance_directionflag = 0;
+	fromance_state *state = (fromance_state *)space->machine->driver_data;
+	state->directionflag = 0;
 }
 
 
@@ -135,9 +116,7 @@ static WRITE8_HANDLER( fromance_busycheck_sub_w )
 
 static WRITE8_HANDLER( fromance_rombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "sub");
-
-	memory_set_bankptr(space->machine, "bank1", &ROM[0x010000 + (0x4000 * data)]);
+	memory_set_bank(space->machine, "bank1", data);
 }
 
 
@@ -150,8 +129,9 @@ static WRITE8_HANDLER( fromance_rombank_w )
 
 static WRITE8_DEVICE_HANDLER( fromance_adpcm_reset_w )
 {
-	fromance_adpcm_reset = (data & 0x01);
-	fromance_vclk_left = 0;
+	fromance_state *state = (fromance_state *)device->machine->driver_data;
+	state->adpcm_reset = (data & 0x01);
+	state->vclk_left = 0;
 
 	msm5205_reset_w(device, !(data & 0x01));
 }
@@ -159,28 +139,31 @@ static WRITE8_DEVICE_HANDLER( fromance_adpcm_reset_w )
 
 static WRITE8_HANDLER( fromance_adpcm_w )
 {
-	fromance_adpcm_data = data;
-	fromance_vclk_left = 2;
+	fromance_state *state = (fromance_state *)space->machine->driver_data;
+	state->adpcm_data = data;
+	state->vclk_left = 2;
 }
 
 
-static void fromance_adpcm_int(const device_config *device)
+static void fromance_adpcm_int( const device_config *device )
 {
+	fromance_state *state = (fromance_state *)device->machine->driver_data;
+
 	/* skip if we're reset */
-	if (!fromance_adpcm_reset)
+	if (!state->adpcm_reset)
 		return;
 
 	/* clock the data through */
-	if (fromance_vclk_left)
+	if (state->vclk_left)
 	{
-		msm5205_data_w(device, (fromance_adpcm_data >> 4));
-		fromance_adpcm_data <<= 4;
-		fromance_vclk_left--;
+		msm5205_data_w(device, (state->adpcm_data >> 4));
+		state->adpcm_data <<= 4;
+		state->vclk_left--;
 	}
 
 	/* generate an NMI if we're out of data */
-	if (!fromance_vclk_left)
-		cputag_set_input_line(device->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
+	if (!state->vclk_left)
+		cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -193,23 +176,25 @@ static void fromance_adpcm_int(const device_config *device)
 
 static WRITE8_HANDLER( fromance_portselect_w )
 {
-	fromance_portselect = data;
+	fromance_state *state = (fromance_state *)space->machine->driver_data;
+	state->portselect = data;
 }
 
 
 static READ8_HANDLER( fromance_keymatrix_r )
 {
+	fromance_state *state = (fromance_state *)space->machine->driver_data;
 	int ret = 0xff;
 
-	if (fromance_portselect & 0x01)
+	if (state->portselect & 0x01)
 		ret &= input_port_read(space->machine, "KEY1");
-	if (fromance_portselect & 0x02)
+	if (state->portselect & 0x02)
 		ret &= input_port_read(space->machine, "KEY2");
-	if (fromance_portselect & 0x04)
+	if (state->portselect & 0x04)
 		ret &= input_port_read(space->machine, "KEY3");
-	if (fromance_portselect & 0x08)
+	if (state->portselect & 0x08)
 		ret &= input_port_read(space->machine, "KEY4");
-	if (fromance_portselect & 0x10)
+	if (state->portselect & 0x10)
 		ret &= input_port_read(space->machine, "KEY5");
 
 	return ret;
@@ -973,7 +958,60 @@ static const msm5205_interface msm5205_config =
  *
  *************************************/
 
+static MACHINE_START( fromance )
+{
+	fromance_state *state = (fromance_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "sub");
+
+	memory_configure_bank(machine, "bank1", 0, 0x100, &ROM[0x10000], 0x4000);
+
+	state->subcpu = devtag_get_device(machine, "sub");
+
+	state_save_register_global(machine, state->directionflag);
+	state_save_register_global(machine, state->commanddata);
+	state_save_register_global(machine, state->portselect);
+
+	state_save_register_global(machine, state->adpcm_reset);
+	state_save_register_global(machine, state->adpcm_data);
+	state_save_register_global(machine, state->vclk_left);
+
+	/* video-related elements are saved in VIDEO_START */
+}
+
+static MACHINE_RESET( fromance )
+{
+	fromance_state *state = (fromance_state *)machine->driver_data;
+	int i;
+
+	state->directionflag = 0;
+	state->commanddata = 0;
+	state->portselect = 0;
+
+	state->adpcm_reset = 0;
+	state->adpcm_data = 0;
+	state->vclk_left = 0;
+
+	state->flipscreen_old = -1;
+	state->scrollx_ofs = 0x159;
+	state->scrolly_ofs = 0x10;
+
+	state->selected_videoram = state->selected_paletteram = 0;
+	state->scrollx[0] = 0;
+	state->scrollx[1] = 0;
+	state->scrolly[0] = 0;
+	state->scrolly[1] = 0;
+	state->gfxreg = 0;
+	state->flipscreen = 0;
+	state->crtc_register = 0;
+
+	for (i = 0; i < 0x10; i++)
+		state->crtc_data[i] = 0;
+}
+
 static MACHINE_DRIVER_START( nekkyoku )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(fromance_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
@@ -984,6 +1022,7 @@ static MACHINE_DRIVER_START( nekkyoku )
 	MDRV_CPU_PROGRAM_MAP(nekkyoku_sub_map)
 	MDRV_CPU_IO_MAP(nekkyoku_sub_io_map)
 
+	MDRV_MACHINE_START(fromance)
 	MDRV_MACHINE_RESET(fromance)
 
 	/* video hardware */
@@ -1013,6 +1052,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( idolmj )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(fromance_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_main_map)
@@ -1022,6 +1064,7 @@ static MACHINE_DRIVER_START( idolmj )
 	MDRV_CPU_PROGRAM_MAP(fromance_sub_map)
 	MDRV_CPU_IO_MAP(idolmj_sub_io_map)
 
+	MDRV_MACHINE_START(fromance)
 	MDRV_MACHINE_RESET(fromance)
 
 	/* video hardware */
@@ -1051,6 +1094,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fromance )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(fromance_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_main_map)
@@ -1060,6 +1106,7 @@ static MACHINE_DRIVER_START( fromance )
 	MDRV_CPU_PROGRAM_MAP(fromance_sub_map)
 	MDRV_CPU_IO_MAP(fromance_sub_io_map)
 
+	MDRV_MACHINE_START(fromance)
 	MDRV_MACHINE_RESET(fromance)
 
 	/* video hardware */
@@ -1099,7 +1146,7 @@ ROM_START( nekkyoku )
 	ROM_LOAD( "1-ic1a.bin",  0x000000, 0x008000, CRC(bb52d959) SHA1(1dfeb108879978dbcc1398e64b26c36505bee6d0) )
 	ROM_LOAD( "2-ic2a.bin",  0x008000, 0x008000, CRC(61848d8b) SHA1(72048c53e4364544ca8a79e213db9d02b7b4778f) )
 
-	ROM_REGION( 0x210000, "sub", 0 )
+	ROM_REGION( 0x410000, "sub", 0 )
 	ROM_LOAD( "3-ic3a.bin",  0x000000, 0x008000, CRC(a13da011) SHA1(601180f65ba42b7b1b6b058c0eccf88af1b430ca) )
 	ROM_LOAD( "ic4a.bin",    0x010000, 0x080000, CRC(1cc4d31b) SHA1(6ea8ec3d6b3bbffbbab3460e9c5dae74195eafc6) )
 	ROM_LOAD( "ic5a.bin",    0x090000, 0x080000, CRC(8b0945a1) SHA1(c52f77d817c687afa0cd93e7725cdf2021158a11) )
@@ -1299,11 +1346,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, nekkyoku,        0, nekkyoku, nekkyoku, 0, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, idolmj,          0, idolmj,   idolmj,   0, ROT0, "System Service", "Idol-Mahjong Housoukyoku (Japan)", 0 )
-GAME( 1989, mjnatsu,         0, fromance, mjnatsu,  0, ROT0, "Video System Co.", "Mahjong Natsu Monogatari (Japan)", 0 )
-GAME( 1989, natsuiro,  mjnatsu, fromance, mjnatsu,  0, ROT0, "Video System Co.", "Natsuiro Mahjong (Japan)", 0 )
-GAME( 1989, mfunclub,        0, fromance, mfunclub, 0, ROT0, "Video System Co.", "Mahjong Fun Club - Idol Saizensen (Japan)", 0 )
-GAME( 1990, daiyogen,        0, fromance, daiyogen, 0, ROT0, "Video System Co.", "Mahjong Daiyogen (Japan)", 0 )
-GAME( 1991, nmsengen,        0, fromance, nmsengen, 0, ROT0, "Video System Co.", "Nekketsu Mahjong Sengen! AFTER 5 (Japan)", 0 )
-GAME( 1991, fromance,        0, fromance, fromance, 0, ROT0, "Video System Co.", "Idol-Mahjong Final Romance (Japan)", 0 )
+GAME( 1988, nekkyoku,  0,       nekkyoku, nekkyoku, 0, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1988, idolmj,    0,       idolmj,   idolmj,   0, ROT0, "System Service", "Idol-Mahjong Housoukyoku (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mjnatsu,   0,       fromance, mjnatsu,  0, ROT0, "Video System Co.", "Mahjong Natsu Monogatari (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, natsuiro,  mjnatsu, fromance, mjnatsu,  0, ROT0, "Video System Co.", "Natsuiro Mahjong (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mfunclub,  0,       fromance, mfunclub, 0, ROT0, "Video System Co.", "Mahjong Fun Club - Idol Saizensen (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, daiyogen,  0,       fromance, daiyogen, 0, ROT0, "Video System Co.", "Mahjong Daiyogen (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, nmsengen,  0,       fromance, nmsengen, 0, ROT0, "Video System Co.", "Nekketsu Mahjong Sengen! AFTER 5 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, fromance,  0,       fromance, fromance, 0, ROT0, "Video System Co.", "Idol-Mahjong Final Romance (Japan)", GAME_SUPPORTS_SAVE )

@@ -18,15 +18,15 @@ driver by Chris Moore
  *
  *************************************/
 
-#define HTOTAL				(0x160)
-#define HBEND				(0x000)
-#define HBSTART				(0x100)
-#define VTOTAL				(0x118)
-#define VBEND				(0x000)
-#define VBSTART				(0x100)
+#define HTOTAL              (0x160)
+#define HBEND               (0x000)
+#define HBSTART             (0x100)
+#define VTOTAL              (0x118)
+#define VBEND               (0x000)
+#define VBSTART             (0x100)
 
-#define GAMEPLAN_NUM_PENS	(0x08)
-#define LEPRECHN_NUM_PENS	(0x10)
+#define GAMEPLAN_NUM_PENS   (0x08)
+#define LEPRECHN_NUM_PENS   (0x10)
 
 
 
@@ -36,7 +36,7 @@ driver by Chris Moore
  *
  *************************************/
 
-static void gameplan_get_pens(pen_t *pens)
+static void gameplan_get_pens( pen_t *pens )
 {
 	offs_t i;
 
@@ -46,7 +46,7 @@ static void gameplan_get_pens(pen_t *pens)
 
 
 /* RGBI palette. Is it correct, or does it use the standard RGB? */
-static void leprechn_get_pens(pen_t *pens)
+static void leprechn_get_pens( pen_t *pens )
 {
 	offs_t i;
 
@@ -142,10 +142,10 @@ static WRITE8_DEVICE_HANDLER( leprechn_video_command_w )
 
 static TIMER_CALLBACK( clear_screen_done_callback )
 {
-	const device_config *via = devtag_get_device(machine, "via6522_0");
+	gameplan_state *state = (gameplan_state *)machine->driver_data;
 
 	/* indicate that the we are done clearing the screen */
-	via_ca1_w(via, 0, 0);
+	via_ca1_w(state->via_0, 0, 0);
 }
 
 
@@ -195,8 +195,7 @@ static WRITE8_DEVICE_HANDLER( video_command_trigger_w )
 		case 3:
 			/* indicate that the we are busy */
 			{
-				const device_config *via = devtag_get_device(device->machine, "via6522_0");
-				via_ca1_w(via, 0, 1);
+				via_ca1_w(state->via_0, 0, 1);
 			}
 
 			memset(state->videoram, state->video_data & 0x0f, state->videoram_size);
@@ -214,7 +213,8 @@ static WRITE8_DEVICE_HANDLER( video_command_trigger_w )
 
 static TIMER_CALLBACK( via_irq_delayed )
 {
-	cputag_set_input_line(machine, "maincpu", 0, param);
+	gameplan_state *state = (gameplan_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 0, param);
 }
 
 
@@ -267,29 +267,15 @@ const via6522_interface trvquest_via_0_interface =
 static TIMER_CALLBACK( via_0_ca1_timer_callback )
 {
 	gameplan_state *state = (gameplan_state *)machine->driver_data;
-	const device_config *via = devtag_get_device(machine, "via6522_0");
 
 	/* !VBLANK is connected to CA1 */
-	via_ca1_w(via, 0, (UINT8)param);
+	via_ca1_w(state->via_0, 0, (UINT8)param);
 
 	if (param)
 		timer_adjust_oneshot(state->via_0_ca1_timer, video_screen_get_time_until_pos(machine->primary_screen, VBSTART, 0), 0);
 	else
 		timer_adjust_oneshot(state->via_0_ca1_timer, video_screen_get_time_until_pos(machine->primary_screen, VBEND, 0), 1);
 }
-
-
-static void create_via_0_timer(running_machine *machine, gameplan_state *state)
-{
-	state->via_0_ca1_timer = timer_alloc(machine, via_0_ca1_timer_callback, NULL);
-}
-
-
-static void start_via_0_timer(running_machine *machine, gameplan_state *state)
-{
-	timer_adjust_oneshot(state->via_0_ca1_timer, video_screen_get_time_until_pos(machine->primary_screen, VBSTART, 0), 0);
-}
-
 
 
 /*************************************
@@ -305,14 +291,10 @@ static VIDEO_START( common )
 	state->videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
 	state->videoram = auto_alloc_array(machine, UINT8, state->videoram_size);
 
-	create_via_0_timer(machine, state);
+	state->via_0_ca1_timer = timer_alloc(machine, via_0_ca1_timer_callback, NULL);
 
 	/* register for save states */
 	state_save_register_global_pointer(machine, state->videoram, state->videoram_size);
-	state_save_register_global(machine, state->video_x);
-	state_save_register_global(machine, state->video_y);
-	state_save_register_global(machine, state->video_command);
-	state_save_register_global(machine, state->video_data);
 }
 
 
@@ -343,7 +325,8 @@ static VIDEO_START( trvquest )
 
 static VIDEO_RESET( gameplan )
 {
-	start_via_0_timer(machine, (gameplan_state *)machine->driver_data);
+	gameplan_state *state = (gameplan_state *)machine->driver_data;
+	timer_adjust_oneshot(state->via_0_ca1_timer, video_screen_get_time_until_pos(machine->primary_screen, VBSTART, 0), 0);
 }
 
 

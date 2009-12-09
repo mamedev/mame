@@ -162,37 +162,16 @@ Added Multiple Coin Feature:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "fromance.h"
 #include "sound/2608intf.h"
 #include "sound/2610intf.h"
-
-
-static UINT8 pending_command;
-static UINT8 sound_command;
-
+#include "includes/fromance.h"
 
 
 /*************************************
  *
- *  Initialization & bankswitching
+ *  Bankswitching
  *
  *************************************/
-
-static MACHINE_RESET( pipedrm )
-{
-	/* initialize main Z80 bank */
-	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x2000);
-	memory_set_bank(machine, "bank1", 0);
-
-	/* initialize sound bank */
-	memory_configure_bank(machine, "bank2", 0, 2, memory_region(machine, "sub") + 0x10000, 0x8000);
-	memory_set_bank(machine, "bank2", 0);
-	/* state save */
-	state_save_register_global(machine, pending_command);
-	state_save_register_global(machine, sound_command);
-
-}
-
 
 static WRITE8_HANDLER( pipedrm_bankswitch_w )
 {
@@ -231,14 +210,15 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static TIMER_CALLBACK( delayed_command_w	)
 {
-	sound_command = param & 0xff;
-	pending_command = 1;
+	fromance_state *state = (fromance_state *)machine->driver_data;
+	state->sound_command = param & 0xff;
+	state->pending_command = 1;
 
 	/* Hatris polls commands *and* listens to the NMI; this causes it to miss */
 	/* sound commands. It's possible the NMI isn't really hooked up on the YM2608 */
 	/* sound board. */
 	if (param & 0x100)
-		cputag_set_input_line(machine, "sub", INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -256,20 +236,23 @@ static WRITE8_HANDLER( sound_command_nonmi_w )
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	pending_command = 0;
-	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, CLEAR_LINE);
+	fromance_state *state = (fromance_state *)space->machine->driver_data;
+	state->pending_command = 0;
+	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
 static READ8_HANDLER( pending_command_r )
 {
-	return pending_command;
+	fromance_state *state = (fromance_state *)space->machine->driver_data;
+	return state->pending_command;
 }
 
 
 static READ8_HANDLER( sound_command_r )
 {
-	return sound_command;
+	fromance_state *state = (fromance_state *)space->machine->driver_data;
+	return state->sound_command;
 }
 
 
@@ -285,7 +268,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w) AM_BASE_SIZE_MEMBER(fromance_state, videoram, videoram_size)
 ADDRESS_MAP_END
 
 
@@ -573,9 +556,10 @@ GFXDECODE_END
  *
  *************************************/
 
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "sub", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	fromance_state *state = (fromance_state *)device->machine->driver_data;
+	cpu_set_input_line(state->subcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -603,7 +587,56 @@ static const ym2610_interface ym2610_config =
  *
  *************************************/
 
+static MACHINE_START( pipedrm )
+{
+	fromance_state *state = (fromance_state *)machine->driver_data;
+
+	state->subcpu = devtag_get_device(machine, "sub");
+
+	/* initialize main Z80 bank */
+	memory_configure_bank(machine, "bank1", 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+	memory_set_bank(machine, "bank1", 0);
+
+	/* initialize sound bank */
+	memory_configure_bank(machine, "bank2", 0, 2, memory_region(machine, "sub") + 0x10000, 0x8000);
+	memory_set_bank(machine, "bank2", 0);
+
+	/* state save */
+	state_save_register_global(machine, state->pending_command);
+	state_save_register_global(machine, state->sound_command);
+
+	/* video-related elements are saved in VIDEO_START */
+}
+
+static MACHINE_RESET( pipedrm )
+{
+	fromance_state *state = (fromance_state *)machine->driver_data;
+	int i;
+
+	state->pending_command = 0;
+	state->sound_command = 0;
+
+	state->flipscreen_old = -1;
+	state->scrollx_ofs = 0x159;
+	state->scrolly_ofs = 0x10;
+
+	state->selected_videoram = state->selected_paletteram = 0;
+	state->scrollx[0] = 0;
+	state->scrollx[1] = 0;
+	state->scrolly[0] = 0;
+	state->scrolly[1] = 0;
+	state->gfxreg = 0;
+	state->flipscreen = 0;
+	state->crtc_register = 0;
+
+	for (i = 0; i < 0x10; i++)
+		state->crtc_data[i] = 0;
+}
+
 static MACHINE_DRIVER_START( pipedrm )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(fromance_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)
@@ -615,6 +648,7 @@ static MACHINE_DRIVER_START( pipedrm )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(sound_portmap)
 
+	MDRV_MACHINE_START(pipedrm)
 	MDRV_MACHINE_RESET(pipedrm)
 
 	/* video hardware */
@@ -644,6 +678,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( hatris )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(fromance_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -654,6 +691,7 @@ static MACHINE_DRIVER_START( hatris )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(hatris_sound_portmap)
 
+	MDRV_MACHINE_START(pipedrm)
 	MDRV_MACHINE_RESET(pipedrm)
 
 	/* video hardware */
@@ -845,10 +883,12 @@ ROM_END
 
 static DRIVER_INIT( pipedrm )
 {
+	fromance_state *state = (fromance_state *)machine->driver_data;
+
 	/* sprite RAM lives at the end of palette RAM */
-	machine->generic.spriteram.u8 = &machine->generic.paletteram.u8[0xc00];
-	machine->generic.spriteram_size = 0x400;
-	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xcc00, 0xcfff, 0, 0, machine->generic.spriteram.u8);
+	state->spriteram = &machine->generic.paletteram.u8[0xc00];
+	state->spriteram_size = 0x400;
+	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xcc00, 0xcfff, 0, 0, state->spriteram);
 }
 
 

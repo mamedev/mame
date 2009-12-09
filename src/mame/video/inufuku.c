@@ -15,16 +15,6 @@
 #include "includes/inufuku.h"
 
 
-static int inufuku_bg_scrollx, inufuku_bg_scrolly;
-static int inufuku_text_scrollx, inufuku_text_scrolly;
-static int inufuku_bg_raster;
-static int inufuku_bg_palettebank;
-static int inufuku_text_palettebank;
-
-static tilemap *inufuku_bg_tilemap;
-static tilemap *inufuku_text_tilemap;
-
-
 /******************************************************************************
 
     Memory handlers
@@ -33,24 +23,28 @@ static tilemap *inufuku_text_tilemap;
 
 WRITE16_HANDLER( inufuku_palettereg_w )
 {
-	switch (offset) {
-		case 0x02:	inufuku_bg_palettebank = (data & 0xf000) >> 12;
-					tilemap_mark_all_tiles_dirty(inufuku_bg_tilemap);
-					break;
-		case 0x03:	inufuku_text_palettebank = (data & 0xf000) >> 12;
-					tilemap_mark_all_tiles_dirty(inufuku_text_tilemap);
-					break;
+	inufuku_state *state = (inufuku_state *)space->machine->driver_data;
+	switch (offset) 
+	{
+		case 0x02:	state->bg_palettebank = (data & 0xf000) >> 12;
+				tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+				break;
+		case 0x03:	state->tx_palettebank = (data & 0xf000) >> 12;
+				tilemap_mark_all_tiles_dirty(state->tx_tilemap);
+				break;
 	}
 }
 
 WRITE16_HANDLER( inufuku_scrollreg_w )
 {
-	switch (offset) {
-		case 0x00:	inufuku_bg_scrollx = data + 1; break;
-		case 0x01:	inufuku_bg_scrolly = data + 0; break;
-		case 0x02:	inufuku_text_scrollx = data - 3; break;
-		case 0x03:	inufuku_text_scrolly = data + 1; break;
-		case 0x04:	inufuku_bg_raster = (data & 0x0200) ? 0 : 1; break;
+	inufuku_state *state = (inufuku_state *)space->machine->driver_data;
+	switch (offset) 
+	{
+		case 0x00:	state->bg_scrollx = data + 1; break;
+		case 0x01:	state->bg_scrolly = data + 0; break;
+		case 0x02:	state->tx_scrollx = data - 3; break;
+		case 0x03:	state->tx_scrolly = data + 1; break;
+		case 0x04:	state->bg_raster = (data & 0x0200) ? 0 : 1; break;
 	}
 }
 
@@ -61,20 +55,21 @@ WRITE16_HANDLER( inufuku_scrollreg_w )
 
 ******************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	inufuku_state *state = (inufuku_state *)machine->driver_data;
 	int offs;
 
-	for (offs = (inufuku_spriteram1_size / 16) - 1; offs >= 0; offs--) {
-
-		if ((inufuku_spriteram1[offs] & 0x8000) == 0x0000) {
-
+	for (offs = (state->spriteram1_size / 16) - 1; offs >= 0; offs--) 
+	{
+		if ((state->spriteram1[offs] & 0x8000) == 0x0000) 
+		{
 			int attr_start;
 			int map_start;
 			int ox, oy, x, y, xsize, ysize, zoomx, zoomy, flipx, flipy, color;
 			int priority, priority_mask;
 
-			attr_start = 4 * (inufuku_spriteram1[offs] & 0x03ff);
+			attr_start = 4 * (state->spriteram1[offs] & 0x03ff);
 
 			/*
                 attr_start + 0x0000
@@ -99,21 +94,22 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
                 x--- ---- ---- ---- unused?
             */
 
-			ox = (inufuku_spriteram1[attr_start + 1] & 0x01ff) + 0;
-			xsize = (inufuku_spriteram1[attr_start + 1] & 0x0e00) >> 9;
-			zoomx = (inufuku_spriteram1[attr_start + 1] & 0xf000) >> 12;
-			oy = (inufuku_spriteram1[attr_start + 0] & 0x01ff) + 1;
-			ysize = (inufuku_spriteram1[attr_start + 0] & 0x0e00) >> 9;
-			zoomy = (inufuku_spriteram1[attr_start + 0] & 0xf000) >> 12;
-			flipx = inufuku_spriteram1[attr_start + 2] & 0x4000;
-			flipy = inufuku_spriteram1[attr_start + 2] & 0x8000;
-			color = (inufuku_spriteram1[attr_start + 2] & 0x3f00) >> 8;
-			priority = (inufuku_spriteram1[attr_start + 2] & 0x3000) >> 12;
-			map_start = (inufuku_spriteram1[attr_start + 3] & 0x7fff) << 1;
+			ox = (state->spriteram1[attr_start + 1] & 0x01ff) + 0;
+			xsize = (state->spriteram1[attr_start + 1] & 0x0e00) >> 9;
+			zoomx = (state->spriteram1[attr_start + 1] & 0xf000) >> 12;
+			oy = (state->spriteram1[attr_start + 0] & 0x01ff) + 1;
+			ysize = (state->spriteram1[attr_start + 0] & 0x0e00) >> 9;
+			zoomy = (state->spriteram1[attr_start + 0] & 0xf000) >> 12;
+			flipx = state->spriteram1[attr_start + 2] & 0x4000;
+			flipy = state->spriteram1[attr_start + 2] & 0x8000;
+			color = (state->spriteram1[attr_start + 2] & 0x3f00) >> 8;
+			priority = (state->spriteram1[attr_start + 2] & 0x3000) >> 12;
+			map_start = (state->spriteram1[attr_start + 3] & 0x7fff) << 1;
 
-			switch (priority) {
+			switch (priority) 
+			{
 				default:
-				case 0: priority_mask = 0x00; break;
+				case 0:	priority_mask = 0x00; break;
 				case 3:	priority_mask = 0xfe; break;
 				case 2:	priority_mask = 0xfc; break;
 				case 1:	priority_mask = 0xf0; break;
@@ -125,7 +121,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			zoomx = 32 - zoomx;
 			zoomy = 32 - zoomy;
 
-			for (y = 0; y <= ysize; y++) {
+			for (y = 0; y <= ysize; y++) 
+			{
 				int sx, sy;
 
 				if (flipy)
@@ -133,7 +130,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				else
 					sy = (oy + zoomy * y / 2 + 16) & 0x1ff;
 
-				for (x = 0; x <= xsize; x++) {
+				for (x = 0; x <= xsize; x++) 
+				{
 					int code;
 
 					if (flipx)
@@ -141,7 +139,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					else
 						sx = (ox + zoomx * x / 2 + 16) & 0x1ff;
 
-					code  = ((inufuku_spriteram2[map_start] & 0x0007) << 16) + inufuku_spriteram2[map_start + 1];
+					code  = ((state->spriteram2[map_start] & 0x0007) << 16) + state->spriteram2[map_start + 1];
 
 					pdrawgfxzoom_transpen(bitmap, cliprect, machine->gfx[2],
 							code,
@@ -167,42 +165,48 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static TILE_GET_INFO( get_inufuku_bg_tile_info )
 {
+	inufuku_state *state = (inufuku_state *)machine->driver_data;
 	SET_TILE_INFO(
 			0,
-			inufuku_bg_videoram[tile_index],
-			inufuku_bg_palettebank,
+			state->bg_videoram[tile_index],
+			state->bg_palettebank,
 			0);
 }
 
-static TILE_GET_INFO( get_inufuku_text_tile_info )
+static TILE_GET_INFO( get_inufuku_tx_tile_info )
 {
+	inufuku_state *state = (inufuku_state *)machine->driver_data;
 	SET_TILE_INFO(
 			1,
-			inufuku_text_videoram[tile_index],
-			inufuku_text_palettebank,
+			state->tx_videoram[tile_index],
+			state->tx_palettebank,
 			0);
 }
 
 READ16_HANDLER( inufuku_bg_videoram_r )
 {
-	return inufuku_bg_videoram[offset];
+	inufuku_state *state = (inufuku_state *)space->machine->driver_data;
+	return state->bg_videoram[offset];
 }
 
 WRITE16_HANDLER( inufuku_bg_videoram_w )
 {
-	COMBINE_DATA(&inufuku_bg_videoram[offset]);
-	tilemap_mark_tile_dirty(inufuku_bg_tilemap, offset);
+	inufuku_state *state = (inufuku_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->bg_videoram[offset]);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
-READ16_HANDLER( inufuku_text_videoram_r )
+READ16_HANDLER( inufuku_tx_videoram_r )
 {
-	return inufuku_text_videoram[offset];
+	inufuku_state *state = (inufuku_state *)space->machine->driver_data;
+	return state->tx_videoram[offset];
 }
 
-WRITE16_HANDLER( inufuku_text_videoram_w )
+WRITE16_HANDLER( inufuku_tx_videoram_w )
 {
-	COMBINE_DATA(&inufuku_text_videoram[offset]);
-	tilemap_mark_tile_dirty(inufuku_text_tilemap, offset);
+	inufuku_state *state = (inufuku_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->tx_videoram[offset]);
+	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
 }
 
 
@@ -214,11 +218,13 @@ WRITE16_HANDLER( inufuku_text_videoram_w )
 
 VIDEO_START( inufuku )
 {
-	inufuku_bg_tilemap = tilemap_create(machine, get_inufuku_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 64);
-	inufuku_text_tilemap = tilemap_create(machine, get_inufuku_text_tile_info, tilemap_scan_rows,  8, 8, 64, 64);
+	inufuku_state *state = (inufuku_state *)machine->driver_data;
 
-	tilemap_set_transparent_pen(inufuku_bg_tilemap, 255);
-	tilemap_set_transparent_pen(inufuku_text_tilemap, 255);
+	state->bg_tilemap = tilemap_create(machine, get_inufuku_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
+	state->tx_tilemap = tilemap_create(machine, get_inufuku_tx_tile_info, tilemap_scan_rows, 8, 8, 64, 64);
+
+	tilemap_set_transparent_pen(state->bg_tilemap, 255);
+	tilemap_set_transparent_pen(state->tx_tilemap, 255);
 }
 
 
@@ -230,25 +236,29 @@ VIDEO_START( inufuku )
 
 VIDEO_UPDATE( inufuku )
 {
+	inufuku_state *state = (inufuku_state *)screen->machine->driver_data;
 	int i;
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 
-	if (inufuku_bg_raster) {
-		tilemap_set_scroll_rows(inufuku_bg_tilemap, 512);
-		for (i = 0; i < 256; i++) tilemap_set_scrollx(inufuku_bg_tilemap, (inufuku_bg_scrolly + i) & 0x1ff, inufuku_bg_rasterram[i]);
+	if (state->bg_raster) 
+	{
+		tilemap_set_scroll_rows(state->bg_tilemap, 512);
+		for (i = 0; i < 256; i++) 
+			tilemap_set_scrollx(state->bg_tilemap, (state->bg_scrolly + i) & 0x1ff, state->bg_rasterram[i]);
 	}
-	else {
-		tilemap_set_scroll_rows(inufuku_bg_tilemap, 1);
-		tilemap_set_scrollx(inufuku_bg_tilemap, 0, inufuku_bg_scrollx);
+	else 
+	{
+		tilemap_set_scroll_rows(state->bg_tilemap, 1);
+		tilemap_set_scrollx(state->bg_tilemap, 0, state->bg_scrollx);
 	}
-	tilemap_set_scrolly(inufuku_bg_tilemap, 0, inufuku_bg_scrolly);
-	tilemap_draw(bitmap, cliprect, inufuku_bg_tilemap, 0, 0);
+	tilemap_set_scrolly(state->bg_tilemap, 0, state->bg_scrolly);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
-	tilemap_set_scrollx(inufuku_text_tilemap, 0, inufuku_text_scrollx);
-	tilemap_set_scrolly(inufuku_text_tilemap, 0, inufuku_text_scrolly);
-	tilemap_draw(bitmap, cliprect, inufuku_text_tilemap, 0, 4);
+	tilemap_set_scrollx(state->tx_tilemap, 0, state->tx_scrollx);
+	tilemap_set_scrolly(state->tx_tilemap, 0, state->tx_scrolly);
+	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 4);
 
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;

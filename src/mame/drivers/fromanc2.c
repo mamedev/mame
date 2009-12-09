@@ -15,72 +15,21 @@
     Special thanks to Uki.
 
 ******************************************************************************/
-/******************************************************************************
-
-Memo:
-
-******************************************************************************/
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/2610intf.h"
 #include "rendlay.h"
 #include "includes/fromanc2.h"
 
 
-static int fromanc2_portselect;
-static UINT16 fromanc2_datalatch1;
-static UINT8 fromanc2_datalatch_2h, fromanc2_datalatch_2l;
-static UINT8 fromanc2_subcpu_int_flag;
-static UINT8 fromanc2_subcpu_nmi_flag;
-static UINT8 fromanc2_sndcpu_nmi_flag;
-
-
-// ----------------------------------------------------------------------------
-//  MACHINE INITIALYZE
-// ----------------------------------------------------------------------------
-
-static MACHINE_RESET( fromanc2 )
-{
-	//
-}
-
-static MACHINE_RESET( fromancr )
-{
-	//
-}
-
-static MACHINE_RESET( fromanc4 )
-{
-	//
-}
-
-
-static DRIVER_INIT( fromanc2 )
-{
-	fromanc2_subcpu_nmi_flag = 1;
-	fromanc2_subcpu_int_flag = 1;
-	fromanc2_sndcpu_nmi_flag = 1;
-}
-
-static DRIVER_INIT( fromancr )
-{
-	fromanc2_subcpu_nmi_flag = 1;
-	fromanc2_subcpu_int_flag = 1;
-	fromanc2_sndcpu_nmi_flag = 1;
-}
-
-static DRIVER_INIT( fromanc4 )
-{
-	fromanc2_sndcpu_nmi_flag = 1;
-}
-
-
-// ----------------------------------------------------------------------------
-//  MAIN CPU Interrupt (fromanc2, fromancr, fromanc4)   TEST ROUTINE
-// ----------------------------------------------------------------------------
+/*************************************
+ *
+ *  Interrupts and memory handlers
+ *
+ *************************************/
 
 static INTERRUPT_GEN( fromanc2_interrupt )
 {
@@ -88,40 +37,37 @@ static INTERRUPT_GEN( fromanc2_interrupt )
 }
 
 
-// ----------------------------------------------------------------------------
-//  Sound Command Interface (fromanc2, fromancr, fromanc4)
-// ----------------------------------------------------------------------------
-
 static WRITE16_HANDLER( fromanc2_sndcmd_w )
 {
+	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+
 	soundlatch_w(space, offset, (data >> 8) & 0xff);	// 1P (LEFT)
 	soundlatch2_w(space, offset, data & 0xff);			// 2P (RIGHT)
 
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-	fromanc2_sndcpu_nmi_flag = 0;
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	state->sndcpu_nmi_flag = 0;
 }
-
-// ----------------------------------------------------------------------------
-//  Input Port Interface (COIN, TEST, KEY MATRIX, EEPROM)
-// ----------------------------------------------------------------------------
 
 static WRITE16_HANDLER( fromanc2_portselect_w )
 {
-	fromanc2_portselect = data;
+	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	state->portselect = data;
 }
 
 static READ16_HANDLER( fromanc2_keymatrix_r )
 {
+	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
 	UINT16 ret;
 
-	switch (fromanc2_portselect) {
-		case 0x01:	ret = input_port_read(space->machine, "KEY0"); break;
-		case 0x02:	ret = input_port_read(space->machine, "KEY1"); break;
-		case 0x04:	ret = input_port_read(space->machine, "KEY2"); break;
-		case 0x08:	ret = input_port_read(space->machine, "KEY3"); break;
-		default:	ret = 0xffff;
-					logerror("PC:%08X unknown %02X\n", cpu_get_pc(space->cpu), fromanc2_portselect);
-					break;
+	switch (state->portselect) 
+	{
+	case 0x01:	ret = input_port_read(space->machine, "KEY0"); break;
+	case 0x02:	ret = input_port_read(space->machine, "KEY1"); break;
+	case 0x04:	ret = input_port_read(space->machine, "KEY2"); break;
+	case 0x08:	ret = input_port_read(space->machine, "KEY3"); break;
+	default:	ret = 0xffff;
+			logerror("PC:%08X unknown %02X\n", cpu_get_pc(space->cpu), state->portselect);
+			break;
 	}
 
 	return ret;
@@ -129,135 +75,116 @@ static READ16_HANDLER( fromanc2_keymatrix_r )
 
 static CUSTOM_INPUT( subcpu_int_r )
 {
-	return fromanc2_subcpu_int_flag & 0x01;
+	fromanc2_state *state = (fromanc2_state *)field->port->machine->driver_data;
+	return state->subcpu_int_flag & 0x01;
 }
 
 static CUSTOM_INPUT( sndcpu_nmi_r )
 {
-	return fromanc2_sndcpu_nmi_flag & 0x01;
+	fromanc2_state *state = (fromanc2_state *)field->port->machine->driver_data;
+	return state->sndcpu_nmi_flag & 0x01;
 }
 
 static CUSTOM_INPUT( subcpu_nmi_r )
 {
-	return fromanc2_subcpu_nmi_flag & 0x01;
+	fromanc2_state *state = (fromanc2_state *)field->port->machine->driver_data;
+	return state->subcpu_nmi_flag & 0x01;
 }
 
 static WRITE16_HANDLER( fromanc2_eeprom_w )
 {
-	if (ACCESSING_BITS_8_15) {
-		// latch the bit
-		eeprom_write_bit(data & 0x0100);
-
-		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x0400) ? CLEAR_LINE : ASSERT_LINE);
-
-		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
-	}
+	if (ACCESSING_BITS_8_15)
+		input_port_write(space->machine, "EEPROMOUT", data, 0xffff);
 }
 
 static WRITE16_HANDLER( fromancr_eeprom_w )
 {
-	if (ACCESSING_BITS_0_7) {
-		fromancr_gfxbank_w(data & 0xfff8);
-
-		// latch the bit
-		eeprom_write_bit(data & 0x0001);
-
-		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x0004) ? CLEAR_LINE : ASSERT_LINE);
-
-		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x0002) ? ASSERT_LINE : CLEAR_LINE);
+	if (ACCESSING_BITS_0_7) 
+	{
+		fromancr_gfxbank_w(space->machine, data & 0xfff8);
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 	}
 }
 
 static WRITE16_HANDLER( fromanc4_eeprom_w )
 {
-	if (ACCESSING_BITS_0_7) {
-		// latch the bit
-		eeprom_write_bit(data & 0x0004);
-
-		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x0001) ? CLEAR_LINE : ASSERT_LINE);
-
-		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x0002) ? ASSERT_LINE : CLEAR_LINE);
-	}
+	if (ACCESSING_BITS_0_7)
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 }
-
-// ----------------------------------------------------------------------------
-//  MAIN CPU, SUB CPU Communication Interface (fromanc2, fromancr)
-// ----------------------------------------------------------------------------
 
 static WRITE16_HANDLER( fromanc2_subcpu_w )
 {
-	fromanc2_datalatch1 = data;
+	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	state->datalatch1 = data;
 
-	cputag_set_input_line(space->machine, "sub", 0, HOLD_LINE);
-	fromanc2_subcpu_int_flag = 0;
+	cpu_set_input_line(state->subcpu, 0, HOLD_LINE);
+	state->subcpu_int_flag = 0;
 }
 
 static READ16_HANDLER( fromanc2_subcpu_r )
 {
-	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
-	fromanc2_subcpu_nmi_flag = 0;
+	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
+	state->subcpu_nmi_flag = 0;
 
-	return (fromanc2_datalatch_2h << 8) | fromanc2_datalatch_2l;
+	return (state->datalatch_2h << 8) | state->datalatch_2l;
 }
 
 static READ8_HANDLER( fromanc2_maincpu_r_l )
 {
-	return fromanc2_datalatch1 & 0x00ff;
+	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	return state->datalatch1 & 0x00ff;
 }
 
 static READ8_HANDLER( fromanc2_maincpu_r_h )
 {
-	fromanc2_subcpu_int_flag = 1;
+	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	state->subcpu_int_flag = 1;
 
-	return (fromanc2_datalatch1 & 0xff00) >> 8;
+	return (state->datalatch1 & 0xff00) >> 8;
 }
 
 static WRITE8_HANDLER( fromanc2_maincpu_w_l )
 {
-	fromanc2_datalatch_2l = data;
+	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	state->datalatch_2l = data;
 }
 
 static WRITE8_HANDLER( fromanc2_maincpu_w_h )
 {
-	fromanc2_datalatch_2h = data;
+	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	state->datalatch_2h = data;
 }
 
 static WRITE8_HANDLER( fromanc2_subcpu_nmi_clr )
 {
-	fromanc2_subcpu_nmi_flag = 1;
+	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	state->subcpu_nmi_flag = 1;
 }
 
 static READ8_HANDLER( fromanc2_sndcpu_nmi_clr )
 {
-	fromanc2_sndcpu_nmi_flag = 1;
+	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
+	state->sndcpu_nmi_flag = 1;
 
 	return 0xff;
 }
 
 static WRITE8_HANDLER( fromanc2_subcpu_rombank_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "sub");
-	int rombank = data & 0x03;
-	int rambank = (data & 0x0c) >> 2;
-
 	// Change ROM BANK
-	memory_set_bankptr(space->machine, "bank1", &RAM[rombank * 0x4000]);
+	memory_set_bank(space->machine, "bank1", data & 0x03);
 
 	// Change RAM BANK
-	if (rambank != 0) memory_set_bankptr(space->machine, "bank2", &RAM[0x10000 + (rambank * 0x4000)]);
-	else memory_set_bankptr(space->machine, "bank2", &RAM[0x8000]);
+	memory_set_bank(space->machine, "bank2", (data & 0x0c) >> 2);
 }
 
 
-// ----------------------------------------------------------------------------
-//  MAIN Program (fromanc2, fromancr, fromanc4)
-// ----------------------------------------------------------------------------
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( fromanc2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM									// MAIN ROM
@@ -356,10 +283,6 @@ static ADDRESS_MAP_START( fromanc4_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-// ----------------------------------------------------------------------------
-//  Z80 SUB Program (fromanc2, fromancr)
-// ----------------------------------------------------------------------------
-
 static ADDRESS_MAP_START( fromanc2_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM								// ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank1")						// ROM(BANK) (is this comment correct?  It was in the split address maps in a RAM configuration...
@@ -376,10 +299,6 @@ static ADDRESS_MAP_START( fromanc2_sub_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-// ----------------------------------------------------------------------------
-//  Z80 Sound Program (fromanc2, fromancr, fromanc4)
-// ----------------------------------------------------------------------------
-
 static ADDRESS_MAP_START( fromanc2_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
@@ -393,9 +312,12 @@ static ADDRESS_MAP_START( fromanc2_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0c, 0x0c) AM_READ(fromanc2_sndcpu_nmi_clr)
 ADDRESS_MAP_END
 
-/* ----------------------------------------------------------------------------
-        Input Ports
- ---------------------------------------------------------------------------- */
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( fromanc2 )
 	PORT_START("SYSTEM")
@@ -406,7 +328,7 @@ static INPUT_PORTS_START( fromanc2 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(subcpu_int_r, NULL)		// SUBCPU INT FLAG
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sndcpu_nmi_r, NULL)		// SNDCPU NMI FLAG
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(subcpu_nmi_r, NULL)		// SUBCPU NMI FLAG
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)		// EEPROM READ
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Service Mode (1P)" ) PORT_CODE(KEYCODE_F2)	// TEST (1P)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Service Mode (2P)" ) PORT_CODE(KEYCODE_F2)	// TEST (2P)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -487,6 +409,20 @@ static INPUT_PORTS_START( fromanc2 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( fromancr )
+	PORT_INCLUDE( fromanc2 )
+
+	PORT_MODIFY("EEPROMOUT")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fromanc4 )
@@ -500,15 +436,22 @@ static INPUT_PORTS_START( fromanc4 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sndcpu_nmi_r, NULL)		// SNDCPU NMI FLAG
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)		// EEPROM READ
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("EEPROMOUT")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
 INPUT_PORTS_END
 
 
-// ----------------------------------------------------------------------------
-//
-// ----------------------------------------------------------------------------
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 static const gfx_layout fromanc2_tilelayout =
 {
@@ -546,13 +489,16 @@ static GFXDECODE_START( fromancr )
 GFXDECODE_END
 
 
-// ----------------------------------------------------------------------------
-//
-// ----------------------------------------------------------------------------
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
 
 static void irqhandler(const device_config *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	fromanc2_state *state = (fromanc2_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -561,11 +507,59 @@ static const ym2610_interface ym2610_config =
 };
 
 
-// ----------------------------------------------------------------------------
-//
-// ----------------------------------------------------------------------------
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( fromanc4 )
+{
+	fromanc2_state *state = (fromanc2_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->subcpu = devtag_get_device(machine, "sub");
+	state->eeprom = devtag_get_device(machine, "eeprom");
+	state->left_screen = devtag_get_device(machine, "lscreen");
+	state->right_screen = devtag_get_device(machine, "rscreen");
+
+	state_save_register_global(machine, state->portselect);
+	state_save_register_global(machine, state->sndcpu_nmi_flag);
+	state_save_register_global(machine, state->datalatch1);
+	state_save_register_global(machine, state->datalatch_2h);
+	state_save_register_global(machine, state->datalatch_2l);
+
+	/* video-related elements are saved in VIDEO_START */
+}
+
+static MACHINE_START( fromanc2 )
+{
+	fromanc2_state *state = (fromanc2_state *)machine->driver_data;
+
+	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "sub"), 0x4000);
+	memory_configure_bank(machine, "bank2", 0, 1, memory_region(machine, "sub") + 0x08000, 0x4000);
+	memory_configure_bank(machine, "bank2", 1, 3, memory_region(machine, "sub") + 0x14000, 0x4000);
+
+	MACHINE_START_CALL(fromanc4);
+
+	state_save_register_global(machine, state->subcpu_int_flag);
+	state_save_register_global(machine, state->subcpu_nmi_flag);
+}
+
+static MACHINE_RESET( fromanc2 )
+{
+	fromanc2_state *state = (fromanc2_state *)machine->driver_data;
+
+	state->portselect = 0;
+	state->datalatch1 = 0;
+	state->datalatch_2h = 0;
+	state->datalatch_2l = 0;
+}
 
 static MACHINE_DRIVER_START( fromanc2 )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(fromanc2_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,32000000/2)		/* 16.00 MHz */
@@ -580,9 +574,10 @@ static MACHINE_DRIVER_START( fromanc2 )
 	MDRV_CPU_PROGRAM_MAP(fromanc2_sub_map)
 	MDRV_CPU_IO_MAP(fromanc2_sub_io_map)
 
-
+	MDRV_MACHINE_START(fromanc2)
 	MDRV_MACHINE_RESET(fromanc2)
-	MDRV_NVRAM_HANDLER(93C46)
+
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_GFXDECODE(fromanc2)
@@ -603,7 +598,6 @@ static MACHINE_DRIVER_START( fromanc2 )
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 
-
 	MDRV_VIDEO_START(fromanc2)
 	MDRV_VIDEO_UPDATE(fromanc2)
 
@@ -619,6 +613,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fromancr )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(fromanc2_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,32000000/2)		/* 16.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromancr_main_map)
@@ -632,8 +629,10 @@ static MACHINE_DRIVER_START( fromancr )
 	MDRV_CPU_PROGRAM_MAP(fromanc2_sub_map)
 	MDRV_CPU_IO_MAP(fromanc2_sub_io_map)
 
-	MDRV_MACHINE_RESET(fromancr)
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_MACHINE_START(fromanc2)
+	MDRV_MACHINE_RESET(fromanc2)
+
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_GFXDECODE(fromancr)
@@ -654,7 +653,6 @@ static MACHINE_DRIVER_START( fromancr )
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 
-
 	MDRV_VIDEO_START(fromancr)
 	MDRV_VIDEO_UPDATE(fromanc2)
 
@@ -670,6 +668,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fromanc4 )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(fromanc2_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,32000000/2)		/* 16.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc4_main_map)
@@ -679,8 +680,10 @@ static MACHINE_DRIVER_START( fromanc4 )
 	MDRV_CPU_PROGRAM_MAP(fromanc2_sound_map)
 	MDRV_CPU_IO_MAP(fromanc2_sound_io_map)
 
-	MDRV_MACHINE_RESET(fromanc4)
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_MACHINE_START(fromanc4)
+	MDRV_MACHINE_RESET(fromanc2)
+
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_GFXDECODE(fromancr)
@@ -702,7 +705,6 @@ static MACHINE_DRIVER_START( fromanc4 )
 	MDRV_SCREEN_SIZE(512, 512)
 	MDRV_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
 
-
 	MDRV_VIDEO_START(fromanc4)
 	MDRV_VIDEO_UPDATE(fromanc2)
 
@@ -717,9 +719,11 @@ static MACHINE_DRIVER_START( fromanc4 )
 MACHINE_DRIVER_END
 
 
-// ----------------------------------------------------------------------------
-//
-// ----------------------------------------------------------------------------
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( fromanc2 )
 	ROM_REGION( 0x0080000, "maincpu", 0 )	// MAIN CPU
@@ -822,6 +826,33 @@ ROM_START( fromanc4 )
 ROM_END
 
 
-GAME( 1995, fromanc2, 0, fromanc2, fromanc2, fromanc2, ROT0, "Video System Co.", "Taisen Idol-Mahjong Final Romance 2 (Japan)", 0 )
-GAME( 1995, fromancr, 0, fromancr, fromanc2, fromancr, ROT0, "Video System Co.", "Taisen Mahjong FinalRomance R (Japan)", 0 )
-GAME( 1998, fromanc4, 0, fromanc4, fromanc4, fromanc4, ROT0, "Video System Co.", "Taisen Mahjong FinalRomance 4 (Japan)", 0 )
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
+
+static DRIVER_INIT( fromanc2 )
+{
+	fromanc2_state *state = (fromanc2_state *)machine->driver_data;
+	state->subcpu_nmi_flag = 1;
+	state->subcpu_int_flag = 1;
+	state->sndcpu_nmi_flag = 1;
+}
+
+static DRIVER_INIT( fromanc4 )
+{
+	fromanc2_state *state = (fromanc2_state *)machine->driver_data;
+	state->sndcpu_nmi_flag = 1;
+}
+
+
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1995, fromanc2, 0, fromanc2, fromanc2, fromanc2, ROT0, "Video System Co.", "Taisen Idol-Mahjong Final Romance 2 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1995, fromancr, 0, fromancr, fromanc2, fromanc2, ROT0, "Video System Co.", "Taisen Mahjong FinalRomance R (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1998, fromanc4, 0, fromanc4, fromanc4, fromanc4, ROT0, "Video System Co.", "Taisen Mahjong FinalRomance 4 (Japan)", GAME_SUPPORTS_SAVE )

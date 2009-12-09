@@ -70,18 +70,9 @@ TODO:
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/2610intf.h"
 #include "includes/inufuku.h"
-
-
-UINT16 *inufuku_bg_videoram;
-UINT16 *inufuku_bg_rasterram;
-UINT16 *inufuku_text_videoram;
-UINT16 *inufuku_spriteram1;
-UINT16 *inufuku_spriteram2;
-size_t inufuku_spriteram1_size;
-static UINT16 pending_command;
 
 
 /******************************************************************************
@@ -92,48 +83,29 @@ static UINT16 pending_command;
 
 static WRITE16_HANDLER( inufuku_soundcommand_w )
 {
-	if (ACCESSING_BITS_0_7) {
-
+	inufuku_state *state = (inufuku_state *)space->machine->driver_data;
+	if (ACCESSING_BITS_0_7) 
+	{
 		/* hack... sound doesn't work otherwise */
-		if (data == 0x08) return;
+		if (data == 0x08) 
+			return;
 
-		pending_command = 1;
+		state->pending_command = 1;
 		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	pending_command = 0;
+	inufuku_state *state = (inufuku_state *)space->machine->driver_data;
+	state->pending_command = 0;
 }
 
 static WRITE8_HANDLER( inufuku_soundrombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "audiocpu") + 0x10000;
-
-	memory_set_bankptr(space->machine, "bank1", ROM + (data & 0x03) * 0x8000);
+	memory_set_bank(space->machine, "bank1", data & 0x03);
 }
-
-
-/******************************************************************************
-
-    Machine initialization / Driver initialization
-
-******************************************************************************/
-
-static MACHINE_RESET( inufuku )
-{
-	;
-}
-
-static DRIVER_INIT( inufuku )
-{
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	pending_command = 1;
-	inufuku_soundrombank_w(space, 0, 0);
-}
-
 
 /******************************************************************************
 
@@ -143,23 +115,11 @@ static DRIVER_INIT( inufuku )
 
 static CUSTOM_INPUT( soundflag_r )
 {
-	UINT16 soundflag = pending_command ? 0 : 1;
+	inufuku_state *state = (inufuku_state *)field->port->machine->driver_data;
+	UINT16 soundflag = state->pending_command ? 0 : 1;
 
 	return soundflag;
 }
-
-static WRITE16_HANDLER( inufuku_eeprom_w )
-{
-	// latch the bit
-	eeprom_write_bit(data & 0x0800);
-
-	// reset line asserted: reset.
-	eeprom_set_cs_line((data & 0x2000) ? CLEAR_LINE : ASSERT_LINE);
-
-	// clock line asserted: write latch or select next bit to read
-	eeprom_set_clock_line((data & 0x1000) ? ASSERT_LINE : CLEAR_LINE);
-}
-
 
 /******************************************************************************
 
@@ -179,15 +139,15 @@ static ADDRESS_MAP_START( inufuku_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("EXTRA")
 	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("P3")
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE(inufuku_eeprom_w)			// eeprom
+	AM_RANGE(0x200000, 0x200001) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x280000, 0x280001) AM_WRITE(inufuku_soundcommand_w)	// sound command
 
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)						// palette ram
-	AM_RANGE(0x380000, 0x3801ff) AM_WRITEONLY AM_BASE(&inufuku_bg_rasterram)												// bg raster ram
-	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(inufuku_bg_videoram_r, inufuku_bg_videoram_w) AM_BASE(&inufuku_bg_videoram)		// bg ram
-	AM_RANGE(0x402000, 0x403fff) AM_READWRITE(inufuku_text_videoram_r, inufuku_text_videoram_w) AM_BASE(&inufuku_text_videoram)	// text ram
-	AM_RANGE(0x580000, 0x580fff) AM_RAM AM_BASE(&inufuku_spriteram1) AM_SIZE(&inufuku_spriteram1_size)							// sprite table + sprite attribute
-	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_BASE(&inufuku_spriteram2)															// cell table
+	AM_RANGE(0x380000, 0x3801ff) AM_WRITEONLY AM_BASE_MEMBER(inufuku_state, bg_rasterram)									// bg raster ram
+	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(inufuku_bg_videoram_r, inufuku_bg_videoram_w) AM_BASE_MEMBER(inufuku_state, bg_videoram)		// bg ram
+	AM_RANGE(0x402000, 0x403fff) AM_READWRITE(inufuku_tx_videoram_r, inufuku_tx_videoram_w) AM_BASE_MEMBER(inufuku_state, tx_videoram)		// text ram
+	AM_RANGE(0x580000, 0x580fff) AM_RAM AM_BASE_SIZE_MEMBER(inufuku_state, spriteram1, spriteram1_size)							// sprite table + sprite attribute
+	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_BASE_MEMBER(inufuku_state, spriteram2)											// cell table
 
 	AM_RANGE(0x780000, 0x780013) AM_WRITE(inufuku_palettereg_w)	// bg & text palettebank register
 	AM_RANGE(0x7a0000, 0x7a0023) AM_WRITE(inufuku_scrollreg_w)	// bg & text scroll register
@@ -273,8 +233,13 @@ static INPUT_PORTS_START( inufuku )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundflag_r, NULL)	// pending sound command
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 
 	PORT_START("P3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
@@ -331,9 +296,10 @@ GFXDECODE_END
 
 ******************************************************************************/
 
-static void irqhandler(const device_config *device, int irq)
+static void irqhandler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	inufuku_state *state = (inufuku_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -348,7 +314,44 @@ static const ym2610_interface ym2610_config =
 
 ******************************************************************************/
 
+static MACHINE_START( inufuku )
+{
+	inufuku_state *state = (inufuku_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "audiocpu");
+
+	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x8000);
+	memory_set_bank(machine, "bank1", 0);
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->pending_command);
+	state_save_register_global(machine, state->bg_scrollx);
+	state_save_register_global(machine, state->bg_scrolly);
+	state_save_register_global(machine, state->tx_scrollx);
+	state_save_register_global(machine, state->tx_scrolly);
+	state_save_register_global(machine, state->bg_raster);
+	state_save_register_global(machine, state->bg_palettebank);
+	state_save_register_global(machine, state->tx_palettebank);
+}
+
+static MACHINE_RESET( inufuku )
+{
+	inufuku_state *state = (inufuku_state *)machine->driver_data;
+
+	state->pending_command = 1;
+	state->bg_scrollx = 0;
+	state->bg_scrolly = 0;
+	state->tx_scrollx = 0;
+	state->tx_scrolly = 0;
+	state->bg_raster = 0;
+	state->bg_palettebank = 0;
+	state->tx_palettebank = 0;
+}
+
 static MACHINE_DRIVER_START( inufuku )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(inufuku_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)	/* 16.00 MHz */
@@ -360,8 +363,10 @@ static MACHINE_DRIVER_START( inufuku )
 	MDRV_CPU_IO_MAP(inufuku_sound_io_map)
 								/* IRQs are triggered by the YM2610 */
 
+	MDRV_MACHINE_START(inufuku)
 	MDRV_MACHINE_RESET(inufuku)
-	MDRV_NVRAM_HANDLER(93C46)
+
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -426,5 +431,4 @@ ROM_END
 
 ******************************************************************************/
 
-GAME( 1998, inufuku, 0, inufuku, inufuku, inufuku, ROT0, "Video System Co.", "Quiz & Variety Sukusuku Inufuku (Japan)", GAME_NO_COCKTAIL )
-
+GAME( 1998, inufuku, 0, inufuku, inufuku, 0, ROT0, "Video System Co.", "Quiz & Variety Sukusuku Inufuku (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
