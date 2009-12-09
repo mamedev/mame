@@ -614,7 +614,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( astrof_common )
-	PORT_START("FAKE") // appears in DRIVER CONFIGURATION menu
+	PORT_START("FAKE")
 	/* There are PCB wire-mods which limit / change PROM access */
 	PORT_CONFNAME( 0x03, 0x00, "Color PROM Wiremod" )
 	PORT_CONFSETTING(    0x00, "Normal (no mod)" )
