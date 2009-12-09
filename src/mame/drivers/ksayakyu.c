@@ -67,16 +67,10 @@ SRAM:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "includes/ksayakyu.h"
 
 #define MAIN_CLOCK XTAL_18_432MHz
 
-WRITE8_HANDLER( ksayakyu_videoram_w );
-WRITE8_HANDLER( ksayakyu_videoctrl_w );
-PALETTE_INIT( ksayakyu );
-VIDEO_START( ksayakyu );
-VIDEO_UPDATE( ksayakyu );
-
-static int sound_status;
 
 static WRITE8_HANDLER( bank_select_w )
 {
@@ -87,24 +81,27 @@ static WRITE8_HANDLER( bank_select_w )
         xxxxxxx  - unused ?
 
     */
-	memory_set_bankptr(space->machine,  "bank1", memory_region(space->machine, "maincpu") + ((data&1) * 0x4000) + 0x10000 );
+	memory_set_bank(space->machine, "bank1", data & 0x01);
 }
 
 static WRITE8_HANDLER( latch_w )
 {
-	sound_status&=~0x80;
-	soundlatch_w(space,0,data|0x80);
+	ksayakyu_state *state = (ksayakyu_state *)space->machine->driver_data;
+	state->sound_status &= ~0x80;
+	soundlatch_w(space, 0, data | 0x80);
 }
 
 static READ8_HANDLER (sound_status_r)
 {
-	return sound_status|4;
+	ksayakyu_state *state = (ksayakyu_state *)space->machine->driver_data;
+	return state->sound_status | 4;
 }
 
 static WRITE8_HANDLER(tomaincpu_w)
 {
-	sound_status|=0x80;
-	soundlatch_w(space,0,data);
+	ksayakyu_state *state = (ksayakyu_state *)space->machine->driver_data;
+	state->sound_status |= 0x80;
+	soundlatch_w(space, 0, data);
 }
 
 static ADDRESS_MAP_START( maincpu_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -121,8 +118,8 @@ static ADDRESS_MAP_START( maincpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa806, 0xa806) AM_READ(sound_status_r)
 	AM_RANGE(0xa807, 0xa807) AM_READNOP /* watchdog ? */
 	AM_RANGE(0xa808, 0xa808) AM_WRITE(bank_select_w)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(ksayakyu_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(ksayakyu_videoram_w) AM_BASE_MEMBER(ksayakyu_state, videoram)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE_SIZE_MEMBER(ksayakyu_state, spriteram, spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundcpu_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -176,17 +173,17 @@ INPUT_PORTS_END
 
 static WRITE8_DEVICE_HANDLER(dummy1_w)
 {
-//	printf("%02x 1\n",data);
+//	printf("%02x 1\n", data);
 }
 
 static WRITE8_DEVICE_HANDLER(dummy2_w)
 {
-//	printf("%02x 2\n",data);
+//	printf("%02x 2\n", data);
 }
 
 static WRITE8_DEVICE_HANDLER(dummy3_w)
 {
-//	printf("%02x 3\n",data);
+//	printf("%02x 3\n", data);
 }
 
 
@@ -252,7 +249,34 @@ static GFXDECODE_START( ksayakyu )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 16 )
 GFXDECODE_END
 
+
+static MACHINE_START( ksayakyu )
+{
+	ksayakyu_state *state = (ksayakyu_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
+
+	state_save_register_global(machine, state->sound_status);
+	state_save_register_global(machine, state->video_ctrl);
+	state_save_register_global(machine, state->flipscreen);
+}
+
+static MACHINE_RESET( ksayakyu )
+{
+	ksayakyu_state *state = (ksayakyu_state *)machine->driver_data;
+
+	state->sound_status = 0xff;
+	state->video_ctrl = 0;
+	state->flipscreen = 0;
+}
+
 static MACHINE_DRIVER_START( ksayakyu )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ksayakyu_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,MAIN_CLOCK/8) //divider is guessed
 	MDRV_CPU_PROGRAM_MAP(maincpu_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -262,6 +286,9 @@ static MACHINE_DRIVER_START( ksayakyu )
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,60) //guess, controls music tempo
 
 	MDRV_QUANTUM_TIME(HZ(60000))
+
+	MDRV_MACHINE_START(ksayakyu)
+	MDRV_MACHINE_RESET(ksayakyu)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -329,9 +356,4 @@ ROM_START( ksayakyu )
 	ROM_LOAD( "9f.bin", 0x0000, 0x0100, CRC(ff71b27f) SHA1(6aad2bd2be997595a05ddb81d24df8fe1435910b) )
 ROM_END
 
-static DRIVER_INIT( ksayakyu )
-{
-	sound_status = 0xff;
-}
-
-GAME( 1985, ksayakyu, 0, ksayakyu, ksayakyu, ksayakyu, ORIENTATION_FLIP_Y, "Taito Corporation", "Kusayakyuu",0 )
+GAME( 1985, ksayakyu, 0, ksayakyu, ksayakyu, 0, ORIENTATION_FLIP_Y, "Taito Corporation", "Kusayakyuu", GAME_SUPPORTS_SAVE )

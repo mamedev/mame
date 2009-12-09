@@ -61,26 +61,14 @@ Same as VS version but with a DAC instead of a MSM5205. Also some minor
 IO ports and memory map changes. Dip switches differ too.
 
 ***************************************************************************/
+
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/msm5205.h"
+#include "includes/kchamp.h"
 
-
-/* from video */
-extern WRITE8_HANDLER( kchamp_videoram_w );
-extern WRITE8_HANDLER( kchamp_colorram_w );
-extern WRITE8_HANDLER( kchamp_flipscreen_w );
-
-extern PALETTE_INIT( kchamp );
-extern VIDEO_START( kchamp );
-extern VIDEO_UPDATE( kchamp );
-extern VIDEO_UPDATE( kchampvs );
-
-
-static int nmi_enable = 0;
-static int sound_nmi_enable = 0;
 
 /********************
 * VS Version        *
@@ -88,42 +76,44 @@ static int sound_nmi_enable = 0;
 
 static WRITE8_HANDLER( control_w )
 {
-	nmi_enable = data & 1;
+	kchamp_state *state = (kchamp_state *)space->machine->driver_data;
+	state->nmi_enable = data & 1;
 }
 
 static WRITE8_HANDLER( sound_reset_w )
 {
-	if ( !( data & 1 ) )
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
+	kchamp_state *state = (kchamp_state *)space->machine->driver_data;
+	if (!(data & 1))
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
-	msm5205_reset_w( device, !( data & 1 ) );
-	sound_nmi_enable = ( ( data >> 1 ) & 1 );
+	kchamp_state *state = (kchamp_state *)device->machine->driver_data;
+	msm5205_reset_w(device, !(data & 1));
+	state->sound_nmi_enable = ((data >> 1) & 1);
 }
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w( space, 0, data );
-	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff );
+	kchamp_state *state = (kchamp_state *)space->machine->driver_data;
+	soundlatch_w(space, 0, data);
+	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
-
-static int msm_data = 0;
-static int msm_play_lo_nibble;
 
 static WRITE8_HANDLER( sound_msm_w )
 {
-	msm_data = data;
-	msm_play_lo_nibble = 1;
+	kchamp_state *state = (kchamp_state *)space->machine->driver_data;
+	state->msm_data = data;
+	state->msm_play_lo_nibble = 1;
 }
 
 static ADDRESS_MAP_START( kchampvs_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(kchamp_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(kchamp_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(kchamp_videoram_w) AM_BASE_MEMBER(kchamp_state, videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(kchamp_colorram_w) AM_BASE_MEMBER(kchamp_state, colorram)
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE_MEMBER(kchamp_state, spriteram, spriteram_size)
 	AM_RANGE(0xd900, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -158,24 +148,27 @@ ADDRESS_MAP_END
 ********************/
 static READ8_HANDLER( sound_reset_r )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
+	kchamp_state *state = (kchamp_state *)space->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 
 static WRITE8_HANDLER( kc_sound_control_w )
 {
-	if ( offset == 0 )
-		sound_nmi_enable = ( ( data >> 7 ) & 1 );
+	kchamp_state *state = (kchamp_state *)space->machine->driver_data;
+
+	if (offset == 0)
+		state->sound_nmi_enable = ((data >> 7) & 1);
 //  else
-//      DAC_set_volume(0,( data == 1 ) ? 255 : 0,0);
+//      DAC_set_volume(0, (data == 1) ? 255 : 0, 0);
 }
 
 static ADDRESS_MAP_START( kchamp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(kchamp_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(kchamp_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0xea00, 0xeaff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(kchamp_videoram_w) AM_BASE_MEMBER(kchamp_state, videoram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(kchamp_colorram_w) AM_BASE_MEMBER(kchamp_state, colorram)
+	AM_RANGE(0xea00, 0xeaff) AM_RAM AM_BASE_SIZE_MEMBER(kchamp_state, spriteram, spriteram_size)
 	AM_RANGE(0xeb00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -355,29 +348,26 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( kc_interrupt )
 {
-
-	if ( nmi_enable )
+	kchamp_state *state = (kchamp_state *)device->machine->driver_data;
+	if (state->nmi_enable)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void msmint(const device_config *device)
+static void msmint( const device_config *device )
 {
+	kchamp_state *state = (kchamp_state *)device->machine->driver_data;
 
-	static int counter = 0;
-
-	if ( msm_play_lo_nibble )
-		msm5205_data_w( device, msm_data & 0x0f );
+	if (state->msm_play_lo_nibble)
+		msm5205_data_w(device, state->msm_data & 0x0f);
 	else
-		msm5205_data_w( device, ( msm_data >> 4 ) & 0x0f );
+		msm5205_data_w(device, (state->msm_data >> 4) & 0x0f);
 
-	msm_play_lo_nibble ^= 1;
+	state->msm_play_lo_nibble ^= 1;
 
-	if ( !( counter ^= 1 ) )
+	if (!(state->counter ^= 1))
 	{
-		if ( sound_nmi_enable )
-		{
-			cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
-		}
+		if (state->sound_nmi_enable)
+			cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -393,27 +383,63 @@ static const msm5205_interface msm_interface =
 
 static INTERRUPT_GEN( sound_int )
 {
-	if ( sound_nmi_enable )
+	kchamp_state *state = (kchamp_state *)device->machine->driver_data;
+	if (state->sound_nmi_enable)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
+static MACHINE_START( kchamp )
+{
+	kchamp_state *state = (kchamp_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->nmi_enable);
+	state_save_register_global(machine, state->sound_nmi_enable);
+}
+
+static MACHINE_START( kchampvs )
+{
+	kchamp_state *state = (kchamp_state *)machine->driver_data;
+
+	MACHINE_START_CALL(kchamp);
+
+	state_save_register_global(machine, state->msm_data);
+	state_save_register_global(machine, state->msm_play_lo_nibble);
+	state_save_register_global(machine, state->counter);
+}
+
+static MACHINE_RESET( kchamp )
+{
+	kchamp_state *state = (kchamp_state *)machine->driver_data;
+
+	state->nmi_enable = 0;
+	state->sound_nmi_enable = 0;
+}
+
 static MACHINE_DRIVER_START( kchampvs )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(kchamp_state)
+
 	/* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)    /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)    /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(kchampvs_map)
 	MDRV_CPU_IO_MAP(kchampvs_io_map)
 	MDRV_CPU_VBLANK_INT("screen", kc_interrupt)
 
-    MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4)    /* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4)    /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(kchampvs_sound_map)
 	MDRV_CPU_IO_MAP(kchampvs_sound_io_map)		/* irq's triggered from main cpu */
 										/* nmi's from msm5205 */
 
+	MDRV_MACHINE_START(kchampvs)
+	MDRV_MACHINE_RESET(kchamp)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(59.10) /* verified on pcb */
+	MDRV_SCREEN_REFRESH_RATE(59.10) /* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
@@ -429,13 +455,13 @@ static MACHINE_DRIVER_START( kchampvs )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-    MDRV_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)    /* verified on pcb */
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)    /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-    MDRV_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)    /* verified on pcb */
+	MDRV_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)    /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-    MDRV_SOUND_ADD("msm", MSM5205, 375000)  /* verified on pcb, discrete circuit clock */
+	MDRV_SOUND_ADD("msm", MSM5205, 375000)  /* verified on pcb, discrete circuit clock */
 	MDRV_SOUND_CONFIG(msm_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -445,6 +471,9 @@ MACHINE_DRIVER_END
 ********************/
 
 static MACHINE_DRIVER_START( kchamp )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(kchamp_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
@@ -458,6 +487,9 @@ static MACHINE_DRIVER_START( kchamp )
 	MDRV_CPU_PERIODIC_INT(sound_int, 125)	/* Hz */
 											/* irq's triggered from main cpu */
 											/* nmi's from 125 Hz clock */
+
+	MDRV_MACHINE_START(kchamp)
+	MDRV_MACHINE_RESET(kchamp)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -711,7 +743,7 @@ static UINT8 *decrypt_code(running_machine *machine)
 
 	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypted);
 
-	for (A = 0;A < 0x10000;A++)
+	for (A = 0; A < 0x10000; A++)
 		decrypted[A] = (rom[A] & 0x55) | ((rom[A] & 0x88) >> 2) | ((rom[A] & 0x22) << 2);
 
 	return decrypted;
@@ -720,6 +752,7 @@ static UINT8 *decrypt_code(running_machine *machine)
 
 static DRIVER_INIT( kchampvs )
 {
+	kchamp_state *state = (kchamp_state *)machine->driver_data;
 	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *decrypted = decrypt_code(machine);
 	int A;
@@ -742,28 +775,27 @@ static DRIVER_INIT( kchampvs )
 	A += 2;
 	decrypted[A] = rom[A];	/* fix fourth opcode (ld ($xxxx),a */
 	/* and from here on, opcodes are encrypted */
+
+	state->counter = 0;
+	state->msm_data = 0;
+	state->msm_play_lo_nibble = 0;
 }
 
-
-static DRIVER_INIT( kchamp )
-{
-	nmi_enable = 0;
-	sound_nmi_enable = 0;
-}
 
 static DRIVER_INIT( kchampvs2 )
 {
-	DRIVER_INIT_CALL( kchamp );
+	kchamp_state *state = (kchamp_state *)machine->driver_data;
+
 	decrypt_code(machine);
-	msm_data = 0;
-	msm_play_lo_nibble = 1;
+	state->counter = 0;
+	state->msm_data = 0;
+	state->msm_play_lo_nibble = 1;
 }
 
 
 
-GAME( 1984, kchamp,    0,      kchamp,   kchamp,   kchamp,    ROT90, "Data East USA", "Karate Champ (US)", 0 )
-GAME( 1984, karatedo,  kchamp, kchamp,   kchamp,   kchamp,    ROT90, "Data East Corporation", "Karate Dou (Japan)", 0 )
-GAME( 1984, kchampvs,  kchamp, kchampvs, kchampvs, kchampvs,  ROT90, "Data East USA", "Karate Champ (US, VS version set 1)", 0 )
-GAME( 1984, kchampvs2, kchamp, kchampvs, kchampvs, kchampvs2, ROT90, "Data East USA", "Karate Champ (US, VS version set 2)", 0 )
-GAME( 1984, karatevs,  kchamp, kchampvs, kchampvs, kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", 0 )
-
+GAME( 1984, kchamp,    0,      kchamp,   kchamp,   0,         ROT90, "Data East USA",         "Karate Champ (US)", GAME_SUPPORTS_SAVE )
+GAME( 1984, karatedo,  kchamp, kchamp,   kchamp,   0,         ROT90, "Data East Corporation", "Karate Dou (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1984, kchampvs,  kchamp, kchampvs, kchampvs, kchampvs,  ROT90, "Data East USA",         "Karate Champ (US, VS version set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, kchampvs2, kchamp, kchampvs, kchampvs, kchampvs2, ROT90, "Data East USA",         "Karate Champ (US, VS version set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, karatevs,  kchamp, kchampvs, kchampvs, kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", GAME_SUPPORTS_SAVE )

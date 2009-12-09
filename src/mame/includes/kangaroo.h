@@ -6,9 +6,23 @@
 
 ***************************************************************************/
 
-/*----------- defined in video/kangaroo.c -----------*/
+typedef struct _kangaroo_state kangaroo_state;
+struct _kangaroo_state
+{
+	/* memory pointers */
+	UINT8 *      video_control;
 
-extern UINT8 *kangaroo_video_control;
+	/* video-related */
+	UINT32       *videoram;
+
+	/* misc */
+	UINT8        clock;
+};
+
+
+
+
+/*----------- defined in video/kangaroo.c -----------*/
 
 VIDEO_START( kangaroo );
 VIDEO_UPDATE( kangaroo );

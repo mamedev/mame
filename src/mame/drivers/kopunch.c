@@ -1,29 +1,17 @@
 /********************************************************
 
-KO Punch (c) 1981 Sega
+    KO Punch (c) 1981 Sega
 
 ********************************************************/
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
-
-extern UINT8 *kopunch_videoram2;
-
-extern WRITE8_HANDLER( kopunch_videoram_w );
-extern WRITE8_HANDLER( kopunch_videoram2_w );
-extern WRITE8_HANDLER( kopunch_scroll_x_w );
-extern WRITE8_HANDLER( kopunch_scroll_y_w );
-extern WRITE8_HANDLER( kopunch_gfxbank_w );
-
-extern PALETTE_INIT( kopunch );
-extern VIDEO_START( kopunch );
-extern VIDEO_UPDATE( kopunch );
-
+#include "includes/kopunch.h"
 
 static INTERRUPT_GEN( kopunch_interrupt )
 {
-	cpu_set_input_line(device,I8085_RST75_LINE,ASSERT_LINE);
-	cpu_set_input_line(device,I8085_RST75_LINE,CLEAR_LINE);
+	cpu_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
+	cpu_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
 }
 
 static READ8_HANDLER( kopunch_in_r )
@@ -37,7 +25,7 @@ static READ8_HANDLER( kopunch_in_r )
 
 static WRITE8_HANDLER( kopunch_lamp_w )
 {
-	set_led_status(space->machine, 0,~data & 0x80);
+	set_led_status(space->machine, 0, ~data & 0x80);
 
 //  if ((data & 0x7f) != 0x7f)
 //      popmessage("port 38 = %02x",data);
@@ -45,8 +33,8 @@ static WRITE8_HANDLER( kopunch_lamp_w )
 
 static WRITE8_HANDLER( kopunch_coin_w )
 {
-	coin_counter_w(space->machine, 0,~data & 0x80);
-	coin_counter_w(space->machine, 1,~data & 0x40);
+	coin_counter_w(space->machine, 0, ~data & 0x80);
+	coin_counter_w(space->machine, 1, ~data & 0x40);
 
 //  if ((data & 0x3f) != 0x3f)
 //      popmessage("port 34 = %02x",data);
@@ -57,8 +45,8 @@ static WRITE8_HANDLER( kopunch_coin_w )
 static ADDRESS_MAP_START( kopunch_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(kopunch_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x7000, 0x70ff) AM_RAM_WRITE(kopunch_videoram2_w) AM_BASE(&kopunch_videoram2)
+	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(kopunch_videoram_w) AM_BASE_MEMBER(kopunch_state, videoram)
+	AM_RANGE(0x7000, 0x70ff) AM_RAM_WRITE(kopunch_videoram2_w) AM_BASE_MEMBER(kopunch_state, videoram2)
 	AM_RANGE(0x7100, 0x7aff) AM_RAM	// ???
 ADDRESS_MAP_END
 
@@ -82,16 +70,20 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( left_coin_inserted )
 {
+	kopunch_state *state = (kopunch_state *)field->port->machine->driver_data;
+
 	/* left coin insertion causes a rst6.5 (vector 0x34) */
-	if(newval)
-		cputag_set_input_line(field->port->machine, "maincpu", I8085_RST65_LINE, HOLD_LINE);
+	if (newval)
+		cpu_set_input_line(state->maincpu, I8085_RST65_LINE, HOLD_LINE);
 }
 
 static INPUT_CHANGED( right_coin_inserted )
 {
+	kopunch_state *state = (kopunch_state *)field->port->machine->driver_data;
+
 	/* right coin insertion causes a rst5.5 (vector 0x2c) */
-	if(newval)
-		cputag_set_input_line(field->port->machine, "maincpu", I8085_RST55_LINE, HOLD_LINE);
+	if (newval)
+		cpu_set_input_line(state->maincpu, I8085_RST55_LINE, HOLD_LINE);
 }
 
 static INPUT_PORTS_START( kopunch )
@@ -108,9 +100,9 @@ static INPUT_PORTS_START( kopunch )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* punch strength (high 3 bits) */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(right_coin_inserted, 0)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(left_coin_inserted, 0)
 
 	PORT_START("DSW")
@@ -179,13 +171,35 @@ static GFXDECODE_START( kopunch )
 GFXDECODE_END
 
 
+static MACHINE_START( kopunch )
+{
+	kopunch_state *state = (kopunch_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+
+	state_save_register_global(machine, state->gfxbank);
+}
+
+static MACHINE_RESET( kopunch )
+{
+	kopunch_state *state = (kopunch_state *)machine->driver_data;
+
+	state->gfxbank = 0;
+}
+
 static MACHINE_DRIVER_START( kopunch )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(kopunch_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8085A, 4000000)	/* 4 MHz ???? Uses SIM, must be 8085 */
 	MDRV_CPU_PROGRAM_MAP(kopunch_map)
 	MDRV_CPU_IO_MAP(kopunch_io_map)
 	MDRV_CPU_VBLANK_INT("screen",kopunch_interrupt)
+
+	MDRV_MACHINE_START(kopunch)
+	MDRV_MACHINE_RESET(kopunch)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -236,4 +250,4 @@ ROM_START( kopunch )
 	ROM_LOAD( "epr1100",      0x0040, 0x0020, CRC(bedb66b1) SHA1(8e78bb205d900075b761e1baa5f5813174ff28ba) )	/* unknown */
 ROM_END
 
-GAME( 1981, kopunch, 0, kopunch, kopunch, 0, ROT270, "Sega", "KO Punch", GAME_NO_SOUND | GAME_NOT_WORKING)
+GAME( 1981, kopunch, 0, kopunch, kopunch, 0, ROT270, "Sega", "KO Punch", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

@@ -24,32 +24,20 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
-#include "kyugo.h"
 #include "sound/ay8910.h"
-
-
-static UINT8 *shared_ram;
-static WRITE8_HANDLER( kyugo_sub_cpu_control_w );
+#include "includes/kyugo.h"
 
 
 /*************************************
  *
- *  Machine initialization
+ *  Memory handlers
  *
  *************************************/
 
-static MACHINE_RESET( kyugo )
-{
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	// must start with interrupts and sub CPU disabled
-	cpu_interrupt_enable(cputag_get_cpu(machine, "maincpu"), 0);
-	kyugo_sub_cpu_control_w(space, 0, 0);
-}
-
-
 static WRITE8_HANDLER( kyugo_sub_cpu_control_w )
 {
-	cputag_set_input_line(space->machine, "sub", INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
+	kyugo_state *state = (kyugo_state *)space->machine->driver_data;
+	cpu_set_input_line(state->subcpu, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -61,15 +49,15 @@ static WRITE8_HANDLER( kyugo_sub_cpu_control_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(kyugo_bgvideoram_w) AM_BASE(&kyugo_bgvideoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(kyugo_bgattribram_w) AM_BASE(&kyugo_bgattribram)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(kyugo_fgvideoram_w) AM_BASE(&kyugo_fgvideoram)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM_READ(kyugo_spriteram_2_r) AM_BASE(&kyugo_spriteram_2)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE(&kyugo_spriteram_1)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(kyugo_bgvideoram_w) AM_BASE_MEMBER(kyugo_state, bgvideoram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(kyugo_bgattribram_w) AM_BASE_MEMBER(kyugo_state, bgattribram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(kyugo_fgvideoram_w) AM_BASE_MEMBER(kyugo_state, fgvideoram)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM_READ(kyugo_spriteram_2_r) AM_BASE_MEMBER(kyugo_state, spriteram_2)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(kyugo_state, spriteram_1)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(kyugo_scroll_x_lo_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(kyugo_gfxctrl_w)
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(kyugo_scroll_y_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("share1") AM_BASE(&shared_ram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(kyugo_state, shared_ram)
 ADDRESS_MAP_END
 
 
@@ -459,7 +447,42 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
+static MACHINE_START( kyugo )
+{
+	kyugo_state *state = (kyugo_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->subcpu = devtag_get_device(machine, "sub");
+
+	state_save_register_global(machine, state->scroll_x_lo);
+	state_save_register_global(machine, state->scroll_x_hi);
+	state_save_register_global(machine, state->scroll_y);
+	state_save_register_global(machine, state->bgpalbank);
+	state_save_register_global(machine, state->fgcolor);
+	state_save_register_global(machine, state->flipscreen);
+}
+
+static MACHINE_RESET( kyugo )
+{
+	kyugo_state *state = (kyugo_state *)machine->driver_data;
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	// must start with interrupts and sub CPU disabled
+	cpu_interrupt_enable(cputag_get_cpu(machine, "maincpu"), 0);
+	kyugo_sub_cpu_control_w(space, 0, 0);
+
+	state->scroll_x_lo = 0;
+	state->scroll_x_hi = 0;
+	state->scroll_y = 0;
+	state->bgpalbank = 0;
+	state->fgcolor = 0;
+	state->flipscreen = 0;
+}
+
+
 static MACHINE_DRIVER_START( gyrodine )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(kyugo_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
@@ -474,6 +497,7 @@ static MACHINE_DRIVER_START( gyrodine )
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
+	MDRV_MACHINE_START(kyugo)
 	MDRV_MACHINE_RESET(kyugo)
 
 	/* video hardware */
@@ -1211,8 +1235,10 @@ static DRIVER_INIT( gyrodine )
 
 static DRIVER_INIT( srdmissn )
 {
+	kyugo_state *state = (kyugo_state *)machine->driver_data;
+
 	/* shared RAM is mapped at 0xe000 as well  */
-	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xe7ff, 0, 0, shared_ram);
+	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe000, 0xe7ff, 0, 0, state->shared_ram);
 
 	/* extra RAM on sub CPU  */
 	memory_install_ram(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x8800, 0x8fff, 0, 0, NULL);
@@ -1226,20 +1252,20 @@ static DRIVER_INIT( srdmissn )
  *
  *************************************/
 
-GAME( 1984, gyrodine, 0,        gyrodine, gyrodine, gyrodine, ROT90, "Crux (Taito Corporation license)", "Gyrodine (Taito Corporation license)", 0 )
-GAME( 1984, gyrodinec,gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Gyrodine", 0 )
-GAME( 1984, buzzard,  gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Buzzard", 0 )
-GAME( 1985, sonofphx, 0,        sonofphx, sonofphx, 0,        ROT90, "Associated Overseas MFR, Inc", "Son of Phoenix", 0 )
-GAME( 1985, repulse,  sonofphx, sonofphx, sonofphx, 0,        ROT90, "Sega", "Repulse", 0 )
-GAME( 1985, 99lstwar, sonofphx, sonofphx, sonofphx, 0,        ROT90, "Proma", "'99: The Last War", 0 )
-GAME( 1985, 99lstwara,sonofphx, sonofphx, sonofphx, 0,        ROT90, "Proma", "'99: The Last War (alternate)", 0 )
-GAME( 1985, 99lstwark,sonofphx, sonofphx, sonofphx, 0,        ROT90, "Kyugo", "'99: The Last War (Kyugo)", 0 )
-GAME( 1985, flashgal, 0,        flashgal, flashgal, 0,        ROT0,  "Sega", "Flashgal (set 1)", 0 )
-GAME( 1985, flashgala,flashgal, flashgla, flashgal, 0,        ROT0,  "Sega", "Flashgal (set 2)", 0 )
-GAME( 1986, srdmissn, 0,        srdmissn, srdmissn, srdmissn, ROT90, "Taito Corporation", "S.R.D. Mission", 0 )
-GAME( 1986, fx,       srdmissn, srdmissn, srdmissn, srdmissn, ROT90, "bootleg", "F-X", 0 )
-GAME( 1986, legend,   0,        legend,   legend,   srdmissn, ROT0,  "Sega / Coreland", "Legend", 0 )
-GAME( 1987, airwolf,  0,        srdmissn, airwolf,  srdmissn, ROT0,  "Kyugo", "Airwolf", 0 )
-GAME( 1987, airwolfa, airwolf,  srdmissn, airwolf,  srdmissn, ROT0,  "Kyugo (UA Theatre license)", "Airwolf (US)", 0 )
-GAME( 1987, skywolf,  airwolf,  srdmissn, skywolf,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 1)", 0 )
-GAME( 1987, skywolf2, airwolf,  srdmissn, airwolf,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 2)", 0 )
+GAME( 1984, gyrodine,  0,        gyrodine, gyrodine, gyrodine, ROT90, "Crux (Taito Corporation license)", "Gyrodine (Taito Corporation license)", GAME_SUPPORTS_SAVE )
+GAME( 1984, gyrodinec, gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Gyrodine", GAME_SUPPORTS_SAVE )
+GAME( 1984, buzzard,   gyrodine, gyrodine, gyrodine, gyrodine, ROT90, "Crux", "Buzzard", GAME_SUPPORTS_SAVE )
+GAME( 1985, sonofphx,  0,        sonofphx, sonofphx, 0,        ROT90, "Associated Overseas MFR, Inc", "Son of Phoenix", GAME_SUPPORTS_SAVE )
+GAME( 1985, repulse,   sonofphx, sonofphx, sonofphx, 0,        ROT90, "Sega", "Repulse", GAME_SUPPORTS_SAVE )
+GAME( 1985, 99lstwar,  sonofphx, sonofphx, sonofphx, 0,        ROT90, "Proma", "'99: The Last War", GAME_SUPPORTS_SAVE )
+GAME( 1985, 99lstwara, sonofphx, sonofphx, sonofphx, 0,        ROT90, "Proma", "'99: The Last War (alternate)", GAME_SUPPORTS_SAVE )
+GAME( 1985, 99lstwark, sonofphx, sonofphx, sonofphx, 0,        ROT90, "Kyugo", "'99: The Last War (Kyugo)", GAME_SUPPORTS_SAVE )
+GAME( 1985, flashgal,  0,        flashgal, flashgal, 0,        ROT0,  "Sega", "Flashgal (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, flashgala, flashgal, flashgla, flashgal, 0,        ROT0,  "Sega", "Flashgal (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1986, srdmissn,  0,        srdmissn, srdmissn, srdmissn, ROT90, "Taito Corporation", "S.R.D. Mission", GAME_SUPPORTS_SAVE )
+GAME( 1986, fx,        srdmissn, srdmissn, srdmissn, srdmissn, ROT90, "bootleg", "F-X", GAME_SUPPORTS_SAVE )
+GAME( 1986, legend,    0,        legend,   legend,   srdmissn, ROT0,  "Sega / Coreland", "Legend", GAME_SUPPORTS_SAVE )
+GAME( 1987, airwolf,   0,        srdmissn, airwolf,  srdmissn, ROT0,  "Kyugo", "Airwolf", GAME_SUPPORTS_SAVE )
+GAME( 1987, airwolfa,  airwolf,  srdmissn, airwolf,  srdmissn, ROT0,  "Kyugo (UA Theatre license)", "Airwolf (US)", GAME_SUPPORTS_SAVE )
+GAME( 1987, skywolf,   airwolf,  srdmissn, skywolf,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, skywolf2,  airwolf,  srdmissn, airwolf,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 2)", GAME_SUPPORTS_SAVE )

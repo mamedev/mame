@@ -155,21 +155,16 @@
 
 #include "driver.h"
 #include "cpu/mb88xx/mb88xx.h"
-#include "kangaroo.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "includes/kangaroo.h"
 
 
 #define MASTER_CLOCK		XTAL_10MHz
 
 
-
 static READ8_HANDLER(mcu_sim_r);
 static WRITE8_HANDLER(mcu_sim_w);
-
-static UINT8 kangaroo_clock;
-
-
 
 /*************************************
  *
@@ -180,20 +175,23 @@ static UINT8 kangaroo_clock;
 static MACHINE_START( kangaroo )
 {
 	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "gfx1"), 0x2000);
-	state_save_register_global(machine, kangaroo_clock);
 }
 
 
 static MACHINE_START( kangaroo_mcu )
 {
+	kangaroo_state *state = (kangaroo_state *)machine->driver_data;
+
 	MACHINE_START_CALL(kangaroo);
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xef00, 0xefff, 0, 0, mcu_sim_r, mcu_sim_w);
-	kangaroo_clock = 0;
+	state_save_register_global(machine, state->clock);
 }
 
 
 static MACHINE_RESET( kangaroo )
 {
+	kangaroo_state *state = (kangaroo_state *)machine->driver_data;
+
 	/* I think there is a bug in the startup checks of the game. At the very */
 	/* beginning, during the RAM check, it goes one byte too far, and ends up */
 	/* trying to write, and re-read, location dfff. To the best of my knowledge, */
@@ -206,6 +204,8 @@ static MACHINE_RESET( kangaroo )
 	/* Anyway, what I do here is just immediately generate the NMI, so the game */
 	/* properly starts. */
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+
+	state->clock = 0;
 }
 
 
@@ -222,7 +222,8 @@ static MACHINE_RESET( kangaroo )
 
 static READ8_HANDLER( mcu_sim_r )
 {
-	return ++kangaroo_clock & 0x0f;
+	kangaroo_state *state = (kangaroo_state *)space->machine->driver_data;
+	return ++state->clock & 0x0f;
 }
 
 static WRITE8_HANDLER( mcu_sim_w )
@@ -257,7 +258,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM
 	AM_RANGE(0xe400, 0xe400) AM_MIRROR(0x03ff) AM_READ_PORT("DSW0")
-	AM_RANGE(0xe800, 0xe80a) AM_MIRROR(0x03f0) AM_WRITE(kangaroo_video_control_w) AM_BASE(&kangaroo_video_control)
+	AM_RANGE(0xe800, 0xe80a) AM_MIRROR(0x03f0) AM_WRITE(kangaroo_video_control_w) AM_BASE_MEMBER(kangaroo_state, video_control)
 	AM_RANGE(0xec00, 0xec00) AM_MIRROR(0x00ff) AM_READ_PORT("IN0") AM_WRITE(soundlatch_w)
 	AM_RANGE(0xed00, 0xed00) AM_MIRROR(0x00ff) AM_READ_PORT("IN1") AM_WRITE(kangaroo_coin_counter_w)
 	AM_RANGE(0xee00, 0xee00) AM_MIRROR(0x00ff) AM_READ_PORT("IN2")
@@ -428,6 +429,9 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( nomcu )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(kangaroo_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -572,7 +576,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, fnkyfish, 0,        nomcu, fnkyfish, 0, ROT90, "Sun Electronics", "Funky Fish", 0 )
-GAME( 1982, kangaroo, 0,        mcu,   kangaroo, 0, ROT90, "Sun Electronics", "Kangaroo", 0 )
-GAME( 1982, kangarooa,kangaroo, mcu,   kangaroo, 0, ROT90, "[Sun Electronics] (Atari license)", "Kangaroo (Atari)", 0 )
-GAME( 1982, kangaroob,kangaroo, nomcu, kangaroo, 0, ROT90, "bootleg", "Kangaroo (bootleg)", 0 )
+GAME( 1981, fnkyfish,  0,        nomcu, fnkyfish, 0, ROT90, "Sun Electronics",                   "Funky Fish", GAME_SUPPORTS_SAVE )
+GAME( 1982, kangaroo,  0,        mcu,   kangaroo, 0, ROT90, "Sun Electronics",                   "Kangaroo", GAME_SUPPORTS_SAVE )
+GAME( 1982, kangarooa, kangaroo, mcu,   kangaroo, 0, ROT90, "[Sun Electronics] (Atari license)", "Kangaroo (Atari)", GAME_SUPPORTS_SAVE )
+GAME( 1982, kangaroob, kangaroo, nomcu, kangaroo, 0, ROT90, "bootleg",                           "Kangaroo (bootleg)", GAME_SUPPORTS_SAVE )
