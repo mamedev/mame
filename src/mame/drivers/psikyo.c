@@ -65,12 +65,14 @@ This was pointed out by Bart Puype
 #include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
 #include "sound/ymf278b.h"
+#include "sound/okim6295.h"
 
 
 /* Variables defined in video */
 
 extern UINT32 *psikyo_vram_0, *psikyo_vram_1, *psikyo_vregs;
 extern int psikyo_ka302c_banking;
+extern UINT32* psikyo_bootleg_spritebuffer;
 
 /* Functions defined in video */
 
@@ -81,6 +83,7 @@ VIDEO_START( psikyo );
 VIDEO_EOF( psikyo );
 VIDEO_UPDATE( psikyo );
 VIDEO_START( sngkace );
+VIDEO_UPDATE( psikyo_bootleg );
 
 extern void psikyo_switch_banks( int tmap, int bank );
 
@@ -356,6 +359,58 @@ static ADDRESS_MAP_START( psikyo_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM														// RAM
 ADDRESS_MAP_END
 
+READ32_DEVICE_HANDLER( s1945bl_oki_r )
+{
+	UINT8 dat = okim6295_r(device,0);
+	return dat << 24;
+}
+
+static WRITE32_DEVICE_HANDLER( s1945bl_oki_w )
+{
+	if (ACCESSING_BITS_24_31)
+	{
+		okim6295_w(device,0,data>>24);
+	}
+	if (ACCESSING_BITS_16_23)
+	{
+		// not at all sure about this, it seems to write 0 too often
+		UINT8 bank = (data & 0x00ff0000)>>16;
+		if (bank<4)
+			memory_set_bankptr(device->machine, "okibank", memory_region(device->machine,"oki")+0x30000+0x10000*bank);
+	}
+	if (ACCESSING_BITS_8_15)
+	{
+		printf("ACCESSING_BITS_8_15 ?? %08x %08x\n",data&0x00ff0000,mem_mask);
+	}
+	if (ACCESSING_BITS_0_7)
+	{
+		printf("ACCESSING_BITS_0_7 ?? %08x %08x\n",data&0x00ff0000,mem_mask);
+	}
+}
+
+static ADDRESS_MAP_START( s1945bl_oki_map, 0, 8 )
+	AM_RANGE(0x00000, 0x2ffff) AM_ROM
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( psikyo_bootleg_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM														// ROM (not all used)
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE(&psikyo_bootleg_spritebuffer)				// RAM (it copies the spritelist here, the HW probably doesn't have automatic buffering like the originals?
+
+	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)		// Sprites, buffered by two frames (list buffered + fb buffered)
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(psikyo_vram_0_w) AM_BASE(&psikyo_vram_0)		// Layer 0
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(psikyo_vram_1_w) AM_BASE(&psikyo_vram_1)		// Layer 1
+	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_BASE(&psikyo_vregs)								// RAM + Vregs
+//  AM_RANGE(0xc00000, 0xc0000b) AM_READ(psikyo_input_r)                                    // Depends on board, see DRIVER_INIT
+//  AM_RANGE(0xc00004, 0xc0000b) AM_WRITE(s1945_mcu_w)                                      // MCU on sh404, see DRIVER_INIT
+//  AM_RANGE(0xc00010, 0xc00013) AM_WRITE(psikyo_soundlatch_w)                              // Depends on board, see DRIVER_INIT
+
+	AM_RANGE(0xC00018, 0xC0001b) AM_DEVREADWRITE("oki", s1945bl_oki_r, s1945bl_oki_w)
+	
+	AM_RANGE(0xfe0000, 0xffffff) AM_RAM														// RAM
+
+ADDRESS_MAP_END
 
 /***************************************************************************
 
@@ -1011,6 +1066,18 @@ static INPUT_PORTS_START( s1945j )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( s1945bl )
+	PORT_INCLUDE( s1945 )
+
+	PORT_MODIFY("P1_P2")
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	// I need to invert the Vblank on this to avoid excessive slowdown
+	PORT_MODIFY("DSW")		/* c00004 -> c00007 */
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_VBLANK  )	// vblank
+INPUT_PORTS_END
+
 
 /***************************************************************************
                                 Tengai
@@ -1271,6 +1338,38 @@ static MACHINE_DRIVER_START( gunbird )
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( s1945bl ) /* Bootleg hardware based on the unprotected Japanese Strikers 1945 set */
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
+	MDRV_CPU_PROGRAM_MAP(psikyo_bootleg_map)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+
+	MDRV_MACHINE_RESET(psikyo)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(59.3)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(320, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
+
+	MDRV_GFXDECODE(psikyo)
+	MDRV_PALETTE_LENGTH(0x1000)
+
+	MDRV_VIDEO_START(psikyo)
+	MDRV_VIDEO_UPDATE(psikyo_bootleg)
+	MDRV_VIDEO_EOF(psikyo)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/16) // ?? clock
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7low) // ?? pin 7
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_DEVICE_ADDRESS_MAP(0, s1945bl_oki_map)
+MACHINE_DRIVER_END
 
 
 
@@ -1379,7 +1478,7 @@ ROM_START( samuraia )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* Samples */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
 
-	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
+	ROM_REGION( 0x040000, "spritelut", 0 )	/* Sprites LUT */
 	ROM_LOAD( "u11.bin",  0x000000, 0x040000, CRC(11a04d91) SHA1(5d146a9a39a70f2ee212ceab9a5469598432449e) ) // x1xxxxxxxxxxxxxxxx = 0xFF
 
 ROM_END
@@ -1404,7 +1503,7 @@ ROM_START( sngkace )
 	ROM_REGION( 0x100000, "ymsnd", 0 )	/* Samples */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
 
-	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
+	ROM_REGION( 0x040000, "spritelut", 0 )	/* Sprites LUT */
 	ROM_LOAD( "u11.bin",  0x000000, 0x040000, CRC(11a04d91) SHA1(5d146a9a39a70f2ee212ceab9a5469598432449e) ) // x1xxxxxxxxxxxxxxxx = 0xFF
 
 ROM_END
@@ -1490,7 +1589,7 @@ ROM_START( gunbird )
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
-	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
+	ROM_REGION( 0x040000, "spritelut", 0 )	/* Sprites LUT */
 	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(0905aeb2) SHA1(8cca09f7dfe3f804e77515f7b1b1bdbeb7bb3d80) )
 
 ROM_END
@@ -1520,7 +1619,7 @@ ROM_START( gunbirdk )
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
-	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
+	ROM_REGION( 0x040000, "spritelut", 0 )	/* Sprites LUT */
 	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(0905aeb2) SHA1(8cca09f7dfe3f804e77515f7b1b1bdbeb7bb3d80) )
 
 ROM_END
@@ -1550,7 +1649,7 @@ ROM_START( gunbirdj )
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
-	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
+	ROM_REGION( 0x040000, "spritelut", 0 )	/* Sprites LUT */
 	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(0905aeb2) SHA1(8cca09f7dfe3f804e77515f7b1b1bdbeb7bb3d80) )
 
 ROM_END
@@ -1581,7 +1680,7 @@ ROM_START( btlkroad )
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(0f33049f) SHA1(ca4fd5f3906685ace1af40b75f5678231d7324e8) )
 
-	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
+	ROM_REGION( 0x040000, "spritelut", 0 )	/* Sprites LUT */
 	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(30d541ed) SHA1(6f7fb5f5ecbce7c086185392de164ebb6887e780) )
 
 	ROM_REGION( 0x0400, "plds", 0 )
@@ -1621,7 +1720,6 @@ Chips:  PS2001B
 ***************************************************************************/
 
 ROM_START( s1945jn )
-
 	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "1-u46.bin", 0x000000, 0x080000, CRC(45fa8086) SHA1(f1753b9420596f4b828c77e877a044ba5fb01b28) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2-u39.bin", 0x000002, 0x080000, CRC(0152ab8c) SHA1(2aef4cb88341b35f20bb551716f1e5ac2731e9ba) ) // 3&2
@@ -1645,9 +1743,35 @@ ROM_START( s1945jn )
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(a44a4a9b) SHA1(5378256752d709daed0b5f4199deebbcffe84e10) )
 
-	ROM_REGION( 0x040000, "user1", 0 )	/* */
+	ROM_REGION( 0x040000, "spritelut", 0 )	/* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
+ROM_END
 
+/* closely based on s1945jn set, unsurprising because it's unprotected */
+ROM_START( s1945bl )
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
+	ROM_LOAD32_BYTE( "27c010-1", 0x000000, 0x020000, CRC(d3361536) SHA1(430df1c98645603c17333222834d344efd4fb584) ) // 1-u46.bin    [odd 1/2]  99.797821%
+	ROM_LOAD32_BYTE( "27c010-2", 0x000001, 0x020000, CRC(1d1916b1) SHA1(4e200454c16d0bd45c4146ee41902a811a55c008) ) // 1-u46.bin    [even 1/2] 99.793243%
+	ROM_LOAD32_BYTE( "27c010-3", 0x000002, 0x020000, CRC(391e0387) SHA1(5c5c737629a450e8d07b088ad50280dae57aeded) ) // 2-u39.bin    [odd 1/2]  99.749756%
+	ROM_LOAD32_BYTE( "27c010-4", 0x000003, 0x020000, CRC(2aebcf6b) SHA1(2aea1c5edc006f70c21d84b581a48082ec111f6a) ) // 2-u39.bin    [even 1/2] 99.743652%
+
+	ROM_REGION( 0x800000, "gfx1", 0 )	/* Sprites */
+	// same content as original sets, alt rom layout
+	ROM_LOAD16_WORD_SWAP( "rv27c3200.m4",  0x000000, 0x400000, CRC(70c8f72e) SHA1(90d25f4ecd6bfe72b51713099625f643b12aa674) )
+	ROM_LOAD16_WORD_SWAP( "rv27c3200.m3",  0x400000, 0x400000, CRC(0dec2a8d) SHA1(b2f3143f2be50c825b61d5218cec26ba8ed1f07e) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 0 + 1 */
+	ROM_LOAD( "rv27c1600.m1",  0x000000, 0x200000, CRC(aaf83e23) SHA1(1c75d09ff42c0c215f8c66c699ca75688c95a05e) )
+
+	ROM_REGION( 0x100000, "oki", 0 )	/* OKI Samples */
+	ROM_LOAD( "rv27c040.m6",  0x000000, 0x080000, CRC(c22e5b65) SHA1(d807bd7c136d6b51f54258b44ebf3eecbd5b35fa) )
+
+	ROM_REGION( 0x040000, "spritelut", 0 )	/* */
+	ROM_LOAD16_BYTE( "27c010-b",  0x000000, 0x020000, CRC(e38d5ab7) SHA1(73a708ebc305cb6297efd3296da23c87898e805e) ) // u1.bin       [even]     IDENTICAL
+	ROM_LOAD16_BYTE( "27c010-a",  0x000001, 0x020000, CRC(cb8c65ec) SHA1(a55c5c5067b50a1243e7ba60fa1f9569bfed5de8) ) // u1.bin       [odd]      99.999237%              	
+
+	ROM_REGION( 0x080000, "unknown", 0 )	/* unknown - matches Semicom's Dream World */
+	ROM_LOAD( "27c512",  0x000000, 0x010000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
 
 static DRIVER_INIT( s1945jn )
@@ -1762,7 +1886,7 @@ ROM_START( s1945 )
 	ROM_REGION( 0x200000, "ymf", 0 )	/* Samples */
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a839cf47) SHA1(e179eb505c80d5bb3ccd9e228f2cf428c62b72ee) )	// 8 bit signed pcm (16KHz)
 
-	ROM_REGION( 0x040000, "user1", 0 )	/* */
+	ROM_REGION( 0x040000, "spritelut", 0 )	/* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
 
 ROM_END
@@ -1792,7 +1916,7 @@ ROM_START( s1945a )
 	ROM_REGION( 0x200000, "ymf", 0 )	/* Samples */
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a839cf47) SHA1(e179eb505c80d5bb3ccd9e228f2cf428c62b72ee) )	// 8 bit signed pcm (16KHz)
 
-	ROM_REGION( 0x040000, "user1", 0 )	/* */
+	ROM_REGION( 0x040000, "spritelut", 0 )	/* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
 
 ROM_END
@@ -1822,7 +1946,7 @@ ROM_START( s1945j )
 	ROM_REGION( 0x200000, "ymf", 0 )	/* Samples */
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a839cf47) SHA1(e179eb505c80d5bb3ccd9e228f2cf428c62b72ee) )	// 8 bit signed pcm (16KHz)
 
-	ROM_REGION( 0x040000, "user1", 0 )	/* */
+	ROM_REGION( 0x040000, "spritelut", 0 )	/* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
 
 ROM_END
@@ -1852,7 +1976,7 @@ ROM_START( s1945k ) /* Same MCU as the current parent set, region dip has no eff
 	ROM_REGION( 0x200000, "ymf", 0 )	/* Samples */
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a839cf47) SHA1(e179eb505c80d5bb3ccd9e228f2cf428c62b72ee) )	// 8 bit signed pcm (16KHz)
 
-	ROM_REGION( 0x040000, "user1", 0 )	/* */
+	ROM_REGION( 0x040000, "spritelut", 0 )	/* */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(dee22654) SHA1(5df05b0029ff7b1f7f04b41da7823d2aa8034bd2) )
 
 ROM_END
@@ -1949,7 +2073,7 @@ ROM_START( tengai )
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a63633c5) SHA1(89e75a40518926ebcc7d88dea86c01ba0bb496e5) )	// 8 bit signed pcm (16KHz)
 	ROM_LOAD( "u62.bin",  0x200000, 0x200000, CRC(3ad0c357) SHA1(35f78cfa2eafa93ab96b24e336f569ee84af06b6) )
 
-	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
+	ROM_REGION( 0x040000, "spritelut", 0 )	/* Sprites LUT */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(681d7d55) SHA1(b0b28471440d747adbc4d22d1918f89f6ede1615) )
 
 ROM_END
@@ -1979,7 +2103,7 @@ ROM_START( tengaij )
 	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a63633c5) SHA1(89e75a40518926ebcc7d88dea86c01ba0bb496e5) )	// 8 bit signed pcm (16KHz)
 	ROM_LOAD( "u62.bin",  0x200000, 0x200000, CRC(3ad0c357) SHA1(35f78cfa2eafa93ab96b24e336f569ee84af06b6) )
 
-	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
+	ROM_REGION( 0x040000, "spritelut", 0 )	/* Sprites LUT */
 	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(681d7d55) SHA1(b0b28471440d747adbc4d22d1918f89f6ede1615) )
 
 ROM_END
@@ -1997,6 +2121,13 @@ static DRIVER_INIT( tengai )
 	s1945_mcu_init(0);
 
 	psikyo_ka302c_banking = 0; // Banking is controlled by mcu
+}
+
+static DRIVER_INIT( s1945bl )
+{
+	DRIVER_INIT_CALL( s1945jn );
+
+	memory_set_bankptr(machine, "okibank", memory_region(machine,"oki")+0x30000);
 }
 
 
@@ -2020,5 +2151,6 @@ GAME( 1995, s1945a,   s1945,    s1945,    s1945a,   s1945a,   ROT270, "Psikyo", 
 GAME( 1995, s1945j,   s1945,    s1945,    s1945j,   s1945j,   ROT270, "Psikyo", "Strikers 1945 (Japan)", 0 )
 GAME( 1995, s1945jn,  s1945,    gunbird,  s1945j,   s1945jn,  ROT270, "Psikyo", "Strikers 1945 (Japan, unprotected)", 0 )
 GAME( 1995, s1945k,   s1945,    s1945,    s1945j,   s1945,    ROT270, "Psikyo", "Strikers 1945 (Korea)", 0 )
+GAME( 1995, s1945bl,  s1945,    s1945bl,  s1945bl,  s1945bl,  ROT270, "Psikyo", "Strikers 1945 (Hong Kong, bootleg)", 0 )
 GAME( 1996, tengai,   0,        s1945,    tengai,   tengai,   ROT0,   "Psikyo", "Tengai (World)", 0 )
 GAME( 1996, tengaij,  tengai,   s1945,    tengaij,  tengai,   ROT0,   "Psikyo", "Sengoku Blade: Sengoku Ace Episode II / Tengai", 0 ) // Region dip - 0x0f=Japan, anything else=World

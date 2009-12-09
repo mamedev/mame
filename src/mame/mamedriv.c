@@ -7387,6 +7387,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( s1945a )	/* (c) 1995 */
 	DRIVER( s1945j )	/* (c) 1995 */
 	DRIVER( s1945jn )	/* (c) 1995 */
+	DRIVER( s1945bl )	/* (c) 1995 (Hong Kong bootleg) */
 	DRIVER( s1945k )	/* (c) 1995 */
 	DRIVER( tengai )	/* (c) 1996 */
 	DRIVER( tengaij )	/* (c) 1996 */
