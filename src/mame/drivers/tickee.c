@@ -1,6 +1,7 @@
 /***************************************************************************
 
     Raster Elite Tickee Tickats hardware
+	 + variations
 
     driver by Aaron Giles
 
@@ -8,6 +9,7 @@
         * Tickee Tickats
         * Ghost Hunter
         * Tuts Tomb
+        * Rapid Fire
 
     Known bugs:
         * (Tickee) gun sometimes misfires
@@ -19,11 +21,11 @@
 #include "machine/ticket.h"
 #include "video/tlc34076.h"
 #include "sound/ay8910.h"
-
+#include "sound/okim6295.h"
 
 #define CPU_CLOCK			XTAL_40MHz
 #define VIDEO_CLOCK			XTAL_14_31818MHz
-
+#define OKI_CLOCK			XTAL_1MHz
 
 
 /* local variables */
@@ -31,7 +33,10 @@ static UINT16 *tickee_control;
 static UINT16 *tickee_vram;
 static emu_timer *setup_gun_timer;
 
-
+static int beamxadd;
+static int beamyadd;
+static int palette_bank;
+static UINT8 gunx[2];
 
 /*************************************
  *
@@ -57,9 +62,18 @@ INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *
 
 static TIMER_CALLBACK( trigger_gun_interrupt )
 {
+	int which = param & 1;
+	int beamx = (video_screen_get_hpos(machine->primary_screen)/2)-58;
+	
+	/* once we're ready to fire, set the X coordinate and assert the line */
+	gunx[which] = beamx;
+
 	/* fire the IRQ at the correct moment */
 	cputag_set_input_line(machine, "maincpu", param, ASSERT_LINE);
 }
+
+
+
 
 
 static TIMER_CALLBACK( clear_gun_interrupt )
@@ -77,19 +91,21 @@ static TIMER_CALLBACK( setup_gun_interrupts )
 	timer_adjust_oneshot(setup_gun_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 	/* only do work if the palette is flashed */
-	if (!tickee_control[2])
-		return;
+	if (tickee_control)
+		if (!tickee_control[2])
+			return;
 
 	/* generate interrupts for player 1's gun */
 	get_crosshair_xy(machine, 0, &beamx, &beamy);
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, beamy,     beamx + 50), NULL, 0, trigger_gun_interrupt);
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, beamy + 1, beamx + 50), NULL, 0, clear_gun_interrupt);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, beamy + beamyadd,     beamx + beamxadd), NULL, 0, trigger_gun_interrupt);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, beamy + beamyadd + 1, beamx + beamxadd), NULL, 0, clear_gun_interrupt);
 
 	/* generate interrupts for player 2's gun */
 	get_crosshair_xy(machine, 1, &beamx, &beamy);
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, beamy,     beamx + 50), NULL, 1, trigger_gun_interrupt);
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, beamy + 1, beamx + 50), NULL, 1, clear_gun_interrupt);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, beamy + beamyadd,     beamx + beamxadd), NULL, 1, trigger_gun_interrupt);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, beamy + beamyadd + 1, beamx + beamxadd), NULL, 1, clear_gun_interrupt);
 }
+
 
 
 
@@ -105,7 +121,6 @@ static VIDEO_START( tickee )
 	setup_gun_timer = timer_alloc(machine, setup_gun_interrupts, NULL);
 	timer_adjust_oneshot(setup_gun_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
-
 
 
 /*************************************
@@ -139,6 +154,38 @@ static void scanline_update(const device_config *screen, bitmap_t *bitmap, int s
 }
 
 
+static void rapidfir_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+{
+	UINT16 *src = &tickee_vram[(params->rowaddr << 8) & 0x3ff00];
+	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
+	const rgb_t *pens = tlc34076_get_pens();
+	int coladdr = params->coladdr << 1;
+	int x;
+
+	if (palette_bank)
+	{
+		/* blank palette: fill with pen 255 */
+		for (x = params->heblnk; x < params->hsblnk; x += 2)
+		{
+			dest[x + 0] = pens[0xff];
+			dest[x + 1] = pens[0xff];
+		}
+	}
+	else
+	{
+
+		/* copy the non-blanked portions of this scanline */
+		for (x = params->heblnk; x < params->hsblnk; x += 2)
+		{
+			UINT16 pixels = src[coladdr++ & 0xff];
+			dest[x + 0] = pens[pixels & 0xff];
+			dest[x + 1] = pens[pixels >> 8];
+		}
+
+	}
+}
+
+
 /*************************************
  *
  *  Machine init
@@ -147,11 +194,51 @@ static void scanline_update(const device_config *screen, bitmap_t *bitmap, int s
 
 static MACHINE_RESET( tickee )
 {
+	beamxadd = 50;
+	beamyadd = 0;
 	ticket_dispenser_init(machine, 100, 0, 1);
 	tlc34076_reset(6);
 }
 
+static MACHINE_RESET( rapidfir )
+{
+	beamxadd = 0;
+	beamyadd = -5;
+	tlc34076_reset(6);
+}
 
+
+/*************************************
+ *
+ *  Video related
+ *
+ *************************************/
+
+static WRITE16_HANDLER( rapidfir_transparent_w )
+{
+	if (!(data & 0xff00)) mem_mask &= 0x00ff;
+	if (!(data & 0x00ff)) mem_mask &= 0xff00;
+	COMBINE_DATA(&tickee_vram[offset]);
+}
+
+
+static READ16_HANDLER( rapidfir_transparent_r )
+{
+	return tickee_vram[offset];
+}
+
+void rapidfir_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
+{
+	if (address < 0x800000)
+		memcpy(shiftreg, &tickee_vram[TOWORD(address)], TOBYTE(0x2000));
+}
+
+
+void rapidfir_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
+{
+	if (address < 0x800000)
+		memcpy(&tickee_vram[TOWORD(address)], shiftreg, TOBYTE(0x2000));
+}
 
 /*************************************
  *
@@ -204,6 +291,74 @@ static WRITE16_HANDLER( tickee_control_w )
 
 
 
+
+/*************************************
+ *
+ *	Unknowns
+ *
+ *************************************/
+
+static READ16_HANDLER( ffff_r )
+{
+	return 0xffff;
+}
+
+static READ16_HANDLER( rapidfir_gun1_r )
+{
+	return gunx[0];
+}
+
+
+static READ16_HANDLER( rapidfir_gun2_r )
+{
+	return gunx[1];
+}
+
+
+static READ16_HANDLER( ff7f_r )
+{
+	return 0xff7f;
+}
+
+static WRITE16_HANDLER( rapidfir_control_w )
+{
+	/* other bits like control on tickee? */
+	if (ACCESSING_BITS_0_7)
+		palette_bank = data & 1;
+}
+
+/*************************************
+ *
+ *	Sound
+ *
+ *************************************/
+
+static WRITE16_DEVICE_HANDLER( sound_bank_w )
+{
+	switch (data & 0xff)
+	{
+		case 0x2c:
+			okim6295_set_bank_base(device, 0x00000);
+			break;
+		
+		case 0x2d:
+			okim6295_set_bank_base(device, 0x50000);
+			break;
+		
+		case 0x1c:
+			okim6295_set_bank_base(device, 0x80000);
+			break;
+		
+		case 0x1d:
+			okim6295_set_bank_base(device, 0xc0000);
+			break;
+		
+		default:
+			logerror("sound_bank_w %04X %04X\n", data, mem_mask);
+			break;
+	}
+}
+
 /*************************************
  *
  *  Memory maps
@@ -243,6 +398,29 @@ static ADDRESS_MAP_START( ghoshunt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
+/* newer hardware */
+static ADDRESS_MAP_START( rapidfir_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(&tickee_vram)
+	AM_RANGE(0x02000000, 0x027fffff) AM_READWRITE(rapidfir_transparent_r, rapidfir_transparent_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xfc000000, 0xfc00000f) AM_READ(rapidfir_gun1_r)
+	AM_RANGE(0xfc000100, 0xfc00010f) AM_READ(rapidfir_gun2_r)
+	AM_RANGE(0xfc000400, 0xfc00040f) AM_READ(ffff_r)
+	AM_RANGE(0xfc000500, 0xfc00050f) AM_NOP
+	AM_RANGE(0xfc000600, 0xfc00060f) AM_WRITE(rapidfir_control_w)
+	AM_RANGE(0xfc000700, 0xfc00070f) AM_DEVWRITE("oki", sound_bank_w)
+	AM_RANGE(0xfc000800, 0xfc00080f) AM_READ_PORT("IN0")
+	AM_RANGE(0xfc000900, 0xfc00090f) AM_READ_PORT("IN1")
+	AM_RANGE(0xfc000a00, 0xfc000a0f) AM_READ_PORT("IN2")
+	AM_RANGE(0xfc000b00, 0xfc000b0f) AM_READ_PORT("DSW0")
+	AM_RANGE(0xfc000c00, 0xfc000c1f) AM_READ_PORT("DSW1")
+	AM_RANGE(0xfc000e00, 0xfc000e1f) AM_READ(watchdog_reset16_r)
+	AM_RANGE(0xfc100000, 0xfc1000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
+	AM_RANGE(0xfc200000, 0xfc207fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xfc300000, 0xfc30000f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0xfc400010, 0xfc40001f) AM_READ(ff7f_r)
+	AM_RANGE(0xfe000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -368,6 +546,65 @@ static INPUT_PORTS_START( ghoshunt )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( rapidfir )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW )
+	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ))	
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0001, DEF_STR( On ))
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ))	
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0002, DEF_STR( On ))
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ))	
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0004, DEF_STR( On ))
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ))	
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ))
+	PORT_BIT( 0x0070, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ))	
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0080, DEF_STR( On ))
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1")
+	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0040, 0x0000, "Reset NVRAM" )	
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ))
+	PORT_DIPSETTING(      0x0040, DEF_STR( Yes ))
+	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("GUNX1")			/* fake analog X */
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
+
+	PORT_START("GUNY1")			/* fake analog Y */
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
+
+	PORT_START("GUNX2")			/* fake analog X */
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	PORT_START("GUNY2")			/* fake analog Y */
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
+INPUT_PORTS_END
+
 
 
 /*************************************
@@ -417,6 +654,18 @@ static const tms34010_config tms_config =
 };
 
 
+static const tms34010_config rapidfir_tms_config =
+{
+	FALSE,							/* halt on reset */
+	"screen",						/* the screen operated on */
+	VIDEO_CLOCK/2,					/* pixel clock */
+	1,								/* pixels per clock */
+	rapidfir_scanline_update,		/* scanline callback */
+	NULL,							/* generate interrupt */
+	rapidfir_to_shiftreg,			/* write to shiftreg function */
+	rapidfir_from_shiftreg			/* read from shiftreg function */
+};
+
 
 /*************************************
  *
@@ -454,7 +703,6 @@ static MACHINE_DRIVER_START( tickee )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
-
 static MACHINE_DRIVER_START( ghoshunt )
 	MDRV_IMPORT_FROM(tickee)
 
@@ -463,7 +711,31 @@ static MACHINE_DRIVER_START( ghoshunt )
 	MDRV_CPU_PROGRAM_MAP(ghoshunt_map)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( rapidfir )
 
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", TMS34010, XTAL_50MHz)
+	MDRV_CPU_CONFIG(rapidfir_tms_config)
+	MDRV_CPU_PROGRAM_MAP(rapidfir_map)
+	
+	MDRV_MACHINE_RESET(rapidfir)
+	MDRV_NVRAM_HANDLER(generic_1fill)
+
+	/* video hardware */
+	MDRV_VIDEO_START(tickee)
+	MDRV_VIDEO_UPDATE(tms340x0)
+
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)
+	
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("oki", OKIM6295, OKI_CLOCK)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+MACHINE_DRIVER_END
 
 /*************************************
  *
@@ -579,6 +851,73 @@ ROM_START( tutstomb )
 	ROM_LOAD16_BYTE( "tutstomb.7k",  0x100000, 0x80000, CRC(bc362df8) SHA1(7b15c646e99c916d850629e4e758b1dbb329639a) )
 ROM_END
 
+/*
+
+Rapid Fire (v1.1)
+Hanaho Games, 1998
+
+PCB No: BE 1V-0 VER3: 7/30/98 (Sticker says PVG/SEMCO)
+CPU   : TMS34010FNL-50
+SND   : BS901 + CA5102 (YM2151 + YM3012), AD-65 (OKI M6295) 
+OSC   : 50.000MHz, 3.5795MHz, 8.000MHz, 18.000MHz
+RAM   : Toshiba TC528267J-70 (x 4, surface mounted)
+DIPs  : 8 position (x2)
+OTHER : MACH110 (x1, CPLD)
+        MACH210 (x2, CPLD)
+        DS1232 (Dallas Semi, MicroMonitor Chip / Watchdog timer)
+        ADV476KN50 (28 Pin DIP, Analog Devices CMOS Monolithic 256x18 color palette RAM-DAC @ 50MHz)
+        DALLAS DS1220Y-200 (NONVOLATILE SRAM)
+
+On the back of the PCB is a 25 pin female D-Type connector (looks like Parallel connector)
+
+ROMs  : RF11.U2     27C040      \
+        RF11.U3       "         |
+        RF10.U4       "         |
+        RF10.U5       "         |
+        RF10.U6       "         |   GROUPED TOGETHER, PRG/GFX
+        RF10.U7       "         |
+        RF11.U8       "         |
+        RF11.U9       "         |
+        DS1220Y.U504  *1        /   
+
+        RF11.U507    27C040     \
+        RF11.U510      "        /   GROUPED TOGETHER, SND/OKI SAMPLES
+
+*1: Contents of Dallas DS1220 NVRAM (2K)
+*/
+
+ROM_START( rapidfir ) /* Version 1.1, test menu shows "Build 239" */
+	ROM_REGION16_LE( 0x400000, "user1", 0 )	/* 34010 code */
+	ROM_LOAD16_BYTE( "rf11.u8",  0x000000, 0x80000, CRC(f7d8df33) SHA1(0abd54bbccfa90d830cbbdbcf2058197af980981) )
+	ROM_LOAD16_BYTE( "rf11.u9",  0x000001, 0x80000, CRC(a72af935) SHA1(ed0deb6f51681f70e07ad7c05a92f6a0f2063f7a) )
+	ROM_LOAD16_BYTE( "rf10.u6",  0x100000, 0x80000, CRC(e8d2e5d2) SHA1(db93014598f7b76785e0fd5c0ac8808a3be06435) )
+	ROM_LOAD16_BYTE( "rf10.u7",  0x100001, 0x80000, CRC(0e33f2ed) SHA1(9b2533e001b94ccc97b95e31762186f59d5a3b9c) )
+	ROM_LOAD16_BYTE( "rf10.u4",  0x200000, 0x80000, CRC(8a088468) SHA1(f94dc78158e5656657d3b26c5b0ca88f39eb5ff4) )
+	ROM_LOAD16_BYTE( "rf10.u5",  0x200001, 0x80000, CRC(593b3df2) SHA1(301fa06031eff54fb2d9e08f80fc3c26e5c51da9) )
+	ROM_LOAD16_BYTE( "rf11.u2",  0x300000, 0x80000, CRC(ffa0c695) SHA1(bccdefe7cee15999c416fdcb16a65b1bc6e12d13) )
+	ROM_LOAD16_BYTE( "rf11.u3",  0x300001, 0x80000, CRC(ac63b863) SHA1(c9160aec6179d1f550279b80fd4c2a14ce94fdab) )
+	
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "rf11.507", 0x000000, 0x80000, CRC(899d1e15) SHA1(ca22b4ad714a5212bc9347eb3a5b660c02bad7e5) )
+	ROM_LOAD( "rf11.510", 0x080000, 0x80000, CRC(6209c8fe) SHA1(bfbd63445b4ac2d4253c4b5354e1058070290084) )
+ROM_END
+
+
+ROM_START( rapidfire ) /* Version 1.0, test menu shows "Build 236" */
+	ROM_REGION16_LE( 0x400000, "user1", 0 )	/* 34010 code */
+	ROM_LOAD16_BYTE( "rf10.u8",  0x000000, 0x80000, CRC(71d42125) SHA1(e34bdb08aa1b85ba4dd219b7f6de6f99a1ed8758) )
+	ROM_LOAD16_BYTE( "rf10.u9",  0x000001, 0x80000, CRC(d70e67c2) SHA1(e0876027f58584dae949a4f3c9391bd013912ee8) )
+	ROM_LOAD16_BYTE( "rf10.u6",  0x100000, 0x80000, CRC(e8d2e5d2) SHA1(db93014598f7b76785e0fd5c0ac8808a3be06435) )
+	ROM_LOAD16_BYTE( "rf10.u7",  0x100001, 0x80000, CRC(0e33f2ed) SHA1(9b2533e001b94ccc97b95e31762186f59d5a3b9c) )
+	ROM_LOAD16_BYTE( "rf10.u4",  0x200000, 0x80000, CRC(8a088468) SHA1(f94dc78158e5656657d3b26c5b0ca88f39eb5ff4) )
+	ROM_LOAD16_BYTE( "rf10.u5",  0x200001, 0x80000, CRC(593b3df2) SHA1(301fa06031eff54fb2d9e08f80fc3c26e5c51da9) )
+	ROM_LOAD16_BYTE( "rf10.u2",  0x300000, 0x80000, CRC(5ef404dd) SHA1(cf060567822c4c02baf4b1948d6e50b480bfb7da) )
+	ROM_LOAD16_BYTE( "rf10.u3",  0x300001, 0x80000, CRC(d8d664db) SHA1(cd63fdc6fe4beb68ced57a2547f8302c1d2544dc) )
+	
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "rf10.507", 0x000000, 0x80000, CRC(7eab2af4) SHA1(bbb4b2b9f96add56c26f334a7242cdc81a64ce2d) )
+	ROM_LOAD( "rf10.510", 0x080000, 0x80000, CRC(ecd70be6) SHA1(5a26703e822776fecb3f6d729bf91e76db7a7141) )
+ROM_END
 
 
 /*************************************
@@ -587,6 +926,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, tickee,   0, tickee,   tickee,   0, ROT0, "Raster Elite",  "Tickee Tickats", 0 )
-GAME( 1996, ghoshunt, 0, ghoshunt, ghoshunt, 0, ROT0, "Hanaho Games",  "Ghost Hunter", 0 )
-GAME( 1996, tutstomb, 0, ghoshunt, ghoshunt, 0, ROT0, "Island Design", "Tut's Tomb", 0 )
+GAME( 1994, tickee,    0,        tickee,   tickee,   0, ROT0, "Raster Elite",  "Tickee Tickats", 0 )
+GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, 0, ROT0, "Hanaho Games",  "Ghost Hunter", 0 )
+GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, 0, ROT0, "Island Design", "Tut's Tomb", 0 )
+GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.1", 0 )
+GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.0", 0 )
