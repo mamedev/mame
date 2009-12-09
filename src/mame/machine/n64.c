@@ -156,7 +156,7 @@ void clear_rcp_interrupt(running_machine *machine, int interrupt)
 	}
 }
 
-UINT8 is64_buffer[0x10000];
+static UINT8 is64_buffer[0x10000];
 
 READ32_HANDLER( n64_is64_r )
 {
@@ -1389,14 +1389,14 @@ WRITE32_HANDLER( n64_pi_reg_w )
 }
 
 // RDRAM Interface
-UINT32 ri_mode = 0;
-UINT32 ri_config = 0;
-UINT32 ri_current_load = 0;
-UINT32 ri_select = 0;
-UINT32 ri_count = 0;
-UINT32 ri_latency = 0;
-UINT32 ri_rerror = 0;
-UINT32 ri_werror = 0;
+static UINT32 ri_mode = 0;
+static UINT32 ri_config = 0;
+static UINT32 ri_current_load = 0;
+static UINT32 ri_select = 0;
+static UINT32 ri_count = 0;
+static UINT32 ri_latency = 0;
+static UINT32 ri_rerror = 0;
+static UINT32 ri_werror = 0;
 
 READ32_HANDLER( n64_ri_reg_r )
 {
