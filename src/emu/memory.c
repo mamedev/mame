@@ -2293,6 +2293,7 @@ static void memory_exit(running_machine *machine)
 
 static void map_detokenize(memory_private *memdata, address_map *map, const game_driver *driver, const char *devtag, const addrmap_token *tokens)
 {
+	address_map_entry **firstentryptr;
 	address_map_entry **entryptr;
 	address_map_entry *entry;
 	address_map tmap = {0};
@@ -2315,6 +2316,7 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 
 	/* find the end of the list */
 	for (entryptr = &map->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next) ;
+	firstentryptr = entryptr;
 	entry = NULL;
 
 	/* loop over tokens until we hit the end */
@@ -2367,6 +2369,11 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 				check_entry_field(addrmirror);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->addrmirror, 32);
+				if (entry->addrmirror != 0)
+				{
+					entry->addrstart &= ~entry->addrmirror;
+					entry->addrend &= ~entry->addrmirror;
+				}
 				break;
 
 			case ADDRMAP_TOKEN_READ:
@@ -2489,6 +2496,15 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 				break;
 		}
 	}
+	
+	/* post-process to apply the global mask */
+	if (map->globalmask != 0)
+		for (entry = map->entrylist; entry != NULL; entry = entry->next)
+		{
+			entry->addrstart &= map->globalmask;
+			entry->addrend &= map->globalmask;
+			entry->addrmask &= map->globalmask;
+		}
 }
 
 

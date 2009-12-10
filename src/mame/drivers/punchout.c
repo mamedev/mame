@@ -340,10 +340,10 @@ static ADDRESS_MAP_START( punchout_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xdff0, 0xdff7) AM_RAM AM_BASE(&punchout_spr1_ctrlram)
-	AM_RANGE(0xdff8, 0xdffc) AM_RAM AM_BASE(&punchout_spr2_ctrlram)
-	AM_RANGE(0xdffd, 0xdffd) AM_RAM AM_BASE(&punchout_palettebank)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_BASE(&punchout_bg_top_videoram)
+	AM_RANGE(0xdff0, 0xdff7) AM_BASE(&punchout_spr1_ctrlram)
+	AM_RANGE(0xdff8, 0xdffc) AM_BASE(&punchout_spr2_ctrlram)
+	AM_RANGE(0xdffd, 0xdffd) AM_BASE(&punchout_palettebank)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_spr1_videoram_w) AM_BASE(&punchout_spr1_videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_spr2_videoram_w) AM_BASE(&punchout_spr2_videoram)
 	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(punchout_bg_bot_videoram_w) AM_BASE(&punchout_bg_bot_videoram)	// also contains scroll RAM
@@ -354,10 +354,10 @@ static ADDRESS_MAP_START( armwrest_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xdff0, 0xdff7) AM_RAM AM_BASE(&punchout_spr1_ctrlram)
-	AM_RANGE(0xdff8, 0xdffc) AM_RAM AM_BASE(&punchout_spr2_ctrlram)
-	AM_RANGE(0xdffd, 0xdffd) AM_RAM AM_BASE(&punchout_palettebank)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(armwrest_fg_videoram_w) AM_BASE(&armwrest_fg_videoram)
+	AM_RANGE(0xdff0, 0xdff7) AM_BASE(&punchout_spr1_ctrlram)
+	AM_RANGE(0xdff8, 0xdffc) AM_BASE(&punchout_spr2_ctrlram)
+	AM_RANGE(0xdffd, 0xdffd) AM_BASE(&punchout_palettebank)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_spr1_videoram_w) AM_BASE(&punchout_spr1_videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_spr2_videoram_w) AM_BASE(&punchout_spr2_videoram)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(punchout_bg_bot_videoram_w) AM_BASE(&punchout_bg_bot_videoram)

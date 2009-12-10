@@ -23,7 +23,8 @@
     DEBUGGING
 ***************************************************************************/
 
-#define REPORT_TIMES		(0)
+#define REPORT_TIMES				(0)
+#define DETECT_OVERLAPPING_MEMORY 	(0)
 
 
 
@@ -1253,6 +1254,7 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 	for (device = device_list_first(&config->devicelist, DEVICE_TYPE_WILDCARD); device != NULL; device = device_list_next(device, DEVICE_TYPE_WILDCARD))
 	{
 		device_validity_check_func validity_check = (device_validity_check_func) device_get_info_fct(device, DEVINFO_FCT_VALIDITY_CHECK);
+		int detected_overlap = DETECT_OVERLAPPING_MEMORY ? FALSE : TRUE;
 		const device_config *scandevice;
 		int spacenum;
 
@@ -1309,6 +1311,21 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 			{
 				UINT32 bytestart = SPACE_SHIFT(entry->addrstart);
 				UINT32 byteend = SPACE_SHIFT_END(entry->addrend);
+				
+				/* look for overlapping entries */
+				if (!detected_overlap)
+				{
+					address_map_entry *scan;
+					for (scan = map->entrylist; scan != entry; scan = scan->next)
+						if (entry->addrstart <= scan->addrend && entry->addrend >= scan->addrstart &&
+							((entry->read.type != AMH_NONE && scan->read.type != AMH_NONE) ||
+							 (entry->write.type != AMH_NONE && scan->write.type != AMH_NONE)))
+						{
+							mame_printf_warning("%s: %s '%s' %s space has overlapping memory (%X-%X,%d,%d) vs (%X-%X,%d,%d)\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->addrstart, entry->addrend, entry->read.type, entry->write.type, scan->addrstart, scan->addrend, scan->read.type, scan->write.type);
+							detected_overlap = TRUE;
+							break;
+						}
+				}
 
 				/* look for inverted start/end pairs */
 				if (byteend < bytestart)
