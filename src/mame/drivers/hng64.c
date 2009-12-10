@@ -446,7 +446,7 @@ And the Korean board only plays Samurai Shodown games (wont play Buriki One
 or Fatal Fury for example).
 */
 
-#define MASTER_CLOCK	50000000
+#define MASTER_CLOCK 50000000
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/nec/nec.h"
@@ -467,17 +467,17 @@ static UINT32 *hng64_sysregs;
 
 // Stuff from over in video...
 extern WRITE32_HANDLER( hng64_videoram_w );
-extern UINT32 *hng64_spriteram, *hng64_videoregs, *hng64_spriteregs ;
-extern UINT32 *hng64_videoram ;
-extern UINT32 *hng64_tcram ;
+extern UINT32 *hng64_spriteram, *hng64_videoregs, *hng64_spriteregs;
+extern UINT32 *hng64_videoram;
+extern UINT32 *hng64_tcram;
 extern UINT32 *hng64_3dregs;
 
-extern UINT32 hng64_dls[2][0x81] ;
+extern UINT32 hng64_dls[2][0x81];
 
 extern UINT8 hng64_screen_dis;
 
-VIDEO_START( hng64 ) ;
-VIDEO_UPDATE( hng64 ) ;
+VIDEO_START( hng64 );
+VIDEO_UPDATE( hng64 );
 
 static UINT32 activeBuffer;
 
@@ -492,7 +492,7 @@ static UINT32 *hng64_dl;
 //static UINT32 *hng64_q2;
 
 /* Communications stuff */
-static UINT32 *hng64_com_ram ;
+static UINT32 *hng64_com_ram;
 
 static UINT8 *hng64_com_virtual_mem;
 static UINT8 *hng64_com_op_base;
@@ -519,7 +519,7 @@ static READ32_HANDLER( hng64_random_read )
 static READ32_HANDLER( hng64_com_r )
 {
 	logerror("com read  (PC=%08x): %08x %08x = %08x\n", cpu_get_pc(space->cpu), (offset*4)+0xc0000000, mem_mask, hng64_com_ram[offset]);
-	return hng64_com_ram[offset] ;
+	return hng64_com_ram[offset];
 }
 
 
@@ -567,10 +567,10 @@ static WRITE32_HANDLER( hng64_pal_w )
 	a = ((space->machine->generic.paletteram.u32[offset] & 0xff000000) >>24);
 
 	// a sure ain't alpha.
-	// mame_printf_debug("Alpha : %d %d %d %d\n", a, b, g, r) ;
+	// mame_printf_debug("Alpha : %d %d %d %d\n", a, b, g, r);
 
 	//if (a != 0)
-	//  popmessage("Alpha is not zero!") ;
+	//  popmessage("Alpha is not zero!");
 
 	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
@@ -846,7 +846,7 @@ static WRITE32_HANDLER( hng64_dualport_w )
 //   <ElSemi> 30140000-3015ffff is ZBuffer A
 static READ32_HANDLER( hng64_3d_1_r )
 {
-	return hng64_3d_1[offset] ;
+	return hng64_3d_1[offset];
 }
 
 #ifdef UNUSED_FUNCTION
@@ -858,13 +858,13 @@ WRITE32_HANDLER( hng64_3d_1_w )
 
 static READ32_HANDLER( hng64_3d_2_r )
 {
-	return hng64_3d_2[offset] ;
+	return hng64_3d_2[offset];
 }
 
 static WRITE32_HANDLER( hng64_3d_2_w )
 {
-	COMBINE_DATA (&hng64_3d_1[offset]) ;
-	COMBINE_DATA (&hng64_3d_2[offset]) ;
+	COMBINE_DATA (&hng64_3d_1[offset]);
+	COMBINE_DATA (&hng64_3d_2[offset]);
 }
 
 
@@ -874,7 +874,7 @@ static WRITE32_HANDLER( hng64_3d_2_w )
 // sams64 / sams64_2 access it in a very different way to fatal fury...
 static WRITE32_HANDLER( dl_w )
 {
-	COMBINE_DATA (&hng64_dl[offset]) ;
+	COMBINE_DATA (&hng64_dl[offset]);
 }
 
 #if 0
@@ -882,9 +882,9 @@ static READ32_HANDLER( dl_r )
 {
 
 
-//  mame_printf_debug("dl R (%08x) : %x %x\n", cpu_get_pc(space->cpu), offset, hng64_dl[offset]) ;
-//  usrintf_showmessage("dl R (%08x) : %x %x", cpu_get_pc(space->cpu), offset, hng64_dl[offset]) ;
-	return hng64_dl[offset] ;
+//  mame_printf_debug("dl R (%08x) : %x %x\n", cpu_get_pc(space->cpu), offset, hng64_dl[offset]);
+//  usrintf_showmessage("dl R (%08x) : %x %x", cpu_get_pc(space->cpu), offset, hng64_dl[offset]);
+	return hng64_dl[offset];
 }
 #endif
 
@@ -907,15 +907,15 @@ static WRITE32_HANDLER( dl_control_w )
 #ifdef UNUSED_FUNCTION
 WRITE32_HANDLER( activate_3d_buffer )
 {
-    COMBINE_DATA (&active_3d_buffer[offset]) ;
-    mame_printf_debug("COMBINED %d\n", active_3d_buffer[offset]) ;
+    COMBINE_DATA (&active_3d_buffer[offset]);
+    mame_printf_debug("COMBINED %d\n", active_3d_buffer[offset]);
 }
 #endif
 
 // Transition Control memory.
 static WRITE32_HANDLER( tcram_w )
 {
-	COMBINE_DATA (&hng64_tcram[offset]) ;
+	COMBINE_DATA (&hng64_tcram[offset]);
 
 	if(offset == 0x02)
 	{
@@ -945,12 +945,12 @@ static WRITE32_HANDLER( tcram_w )
 
 static READ32_HANDLER( tcram_r )
 {
-//      printf("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]) ;
+//      printf("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]);
 
 	if(offset == 0x12)
 		return input_port_read(space->machine, "VBLANK");
 
-	return hng64_tcram[offset] ;
+	return hng64_tcram[offset];
 }
 
 /* Some games (namely sams64 after the title screen) tests bit 15 of this to be high, unknown purpose (vblank? related to the display list?). */
@@ -981,7 +981,7 @@ static WRITE32_HANDLER( hng64_soundram_w )
 	UINT32 mem_mask32 = mem_mask;
 	UINT32 data32 = data;
 
-	/* swap data around.. keep the v30 happy ;-) */
+	/* swap data around.. keep the v30 happy;-) */
 	data = data32 >> 16;
 	data = FLIPENDIAN_INT16(data);
 	mem_mask = mem_mask32 >> 16;
@@ -1066,32 +1066,32 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0) AM_BASE(&rombase)
 
 	// Video
-	AM_RANGE(0x20000000, 0x2000bfff) AM_RAM AM_BASE(&hng64_spriteram)							// Sprites
+	AM_RANGE(0x20000000, 0x2000bfff) AM_RAM AM_BASE(&hng64_spriteram)
 	AM_RANGE(0x2000d800, 0x2000e3ff) AM_WRITE(hng64_sprite_clear_even_w)
 	AM_RANGE(0x2000e400, 0x2000efff) AM_WRITE(hng64_sprite_clear_odd_w)
-	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_BASE(&hng64_spriteregs)							// Sprites Registers
-	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_BASE(&hng64_videoram)	// Tilemap
-	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_BASE(&hng64_videoregs)							// Video Registers
-	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_BASE_GENERIC(paletteram)		// Palette
-	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(&hng64_tcram)		// Transition Control
-	AM_RANGE(0x20300000, 0x203001ff) AM_RAM_WRITE(dl_w) AM_BASE(&hng64_dl)						// 3d Display List
+	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_BASE(&hng64_spriteregs)
+	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_BASE(&hng64_videoram)// Tilemap
+	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_BASE(&hng64_videoregs)
+	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(&hng64_tcram)	// Transition Control
+	AM_RANGE(0x20300000, 0x203001ff) AM_RAM_WRITE(dl_w) AM_BASE(&hng64_dl)		// 3d Display List
 	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)
 	AM_RANGE(0x20300218, 0x2030021b) AM_READ(unk_vreg_r)
 
 	// 3d?
   	AM_RANGE(0x30000000, 0x3000002f) AM_RAM AM_BASE(&hng64_3dregs)
-	AM_RANGE(0x30100000, 0x3015ffff) AM_READWRITE(hng64_3d_1_r,hng64_3d_2_w) AM_BASE(&hng64_3d_1)		// 3D Display Buffer A
-	AM_RANGE(0x30200000, 0x3025ffff) AM_READWRITE(hng64_3d_2_r,hng64_3d_2_w) AM_BASE(&hng64_3d_2)		// 3D Display Buffer B
+	AM_RANGE(0x30100000, 0x3015ffff) AM_READWRITE(hng64_3d_1_r,hng64_3d_2_w) AM_BASE(&hng64_3d_1)	// 3D Display Buffer A
+	AM_RANGE(0x30200000, 0x3025ffff) AM_READWRITE(hng64_3d_2_r,hng64_3d_2_w) AM_BASE(&hng64_3d_2)	// 3D Display Buffer B
 
 	// Sound
-	AM_RANGE(0x60000000, 0x601fffff) AM_RAM																// Sound ??
-	AM_RANGE(0x60200000, 0x603fffff) AM_READWRITE(hng64_soundram_r, hng64_soundram_w)					// uploads the v53 sound program here, elsewhere on ss64-2 */
+	AM_RANGE(0x60000000, 0x601fffff) AM_RAM												// Sound ??
+	AM_RANGE(0x60200000, 0x603fffff) AM_READWRITE(hng64_soundram_r, hng64_soundram_w)	// uploads the v53 sound program here, elsewhere on ss64-2
 
 	// These are sound ports of some sort
-//  AM_RANGE(0x68000000, 0x68000003) AM_WRITENOP                                                // ??
-//  AM_RANGE(0x68000004, 0x68000007) AM_READNOP                                                 // ??
-//  AM_RANGE(0x68000008, 0x6800000b) AM_WRITENOP                                                // ??
-//  AM_RANGE(0x6f000000, 0x6f000003) AM_WRITENOP                                                // halt / reset line for the sound CPU
+//  AM_RANGE(0x68000000, 0x68000003) AM_WRITENOP	// ??
+//  AM_RANGE(0x68000004, 0x68000007) AM_READNOP		// ??
+//  AM_RANGE(0x68000008, 0x6800000b) AM_WRITENOP	// ??
+//  AM_RANGE(0x6f000000, 0x6f000003) AM_WRITENOP	// halt / reset line for the sound CPU
 
 	// Communications
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_READWRITE(hng64_com_r, hng64_com_w) AM_BASE(&hng64_com_ram)
@@ -1223,8 +1223,8 @@ static DIRECT_UPDATE_HANDLER( KL5C80_direct_handler )
 
 static UINT32 KL5C80_translate_address(UINT16 vAddr)
 {
-	int i ;
-	UINT8 bNum = 4 ;
+	int i;
+	UINT8 bNum = 4;
 
 	/* Determine what B the vAddr is in */
 	for (i = 1; i < 5; i++)
@@ -1292,8 +1292,8 @@ static void KL5C80_init(void)
 
 static READ8_HANDLER( hng64_comm_memory_r )
 {
-	UINT32 physical_address = KL5C80_translate_address(offset) ;
-	logerror("READING 0x%02x from 0x%04x (0x%05x)\n", hng64_com_virtual_mem[physical_address], offset, physical_address) ;
+	UINT32 physical_address = KL5C80_translate_address(offset);
+	logerror("READING 0x%02x from 0x%04x (0x%05x)\n", hng64_com_virtual_mem[physical_address], offset, physical_address);
 
 	/* Custom "virtual" memory map */
 	if (physical_address >= 0x26000 && physical_address <= 0x28000)
@@ -1302,13 +1302,13 @@ static READ8_HANDLER( hng64_comm_memory_r )
 	}
 
 
-	return hng64_com_virtual_mem[physical_address] ;
+	return hng64_com_virtual_mem[physical_address];
 }
 
 static WRITE8_HANDLER( hng64_comm_memory_w )
 {
-//  UINT32 physical_address = KL5C80_translate_address(offset) ;
-//  logerror("WRITING 0x%02x to 0x%04x (0x%05x)\n", hng64_com_virtual_mem[physical_address], offset, physical_address) ;
+//  UINT32 physical_address = KL5C80_translate_address(offset);
+//  logerror("WRITING 0x%02x to 0x%04x (0x%05x)\n", hng64_com_virtual_mem[physical_address], offset, physical_address);
 
 	// Write to both virtual and physical memory
 }
@@ -1323,9 +1323,9 @@ static WRITE8_HANDLER( hng64_comm_io_mmu )
 	if (hng64_com_mmu_mem[7] != 0xf0 || ((hng64_com_mmu_mem[6] & 0xc0) != 0x00))
 		logerror("KL5C MMU error !!! Code is trying to change A4!\n");
 
-	logerror("COMM CPU MMU WRITE : ") ;
+	logerror("COMM CPU MMU WRITE : ");
 	logerror("B : %02x %02x %02x %02x  A : %03x %03x %03x %03x\n", KL5C_MMU_B(1), KL5C_MMU_B(2), KL5C_MMU_B(3), KL5C_MMU_B(4),
-																   KL5C_MMU_A(1), KL5C_MMU_A(2), KL5C_MMU_A(3), KL5C_MMU_A(4)) ;
+																   KL5C_MMU_A(1), KL5C_MMU_A(2), KL5C_MMU_A(3), KL5C_MMU_A(4));
 	KL5C80_virtual_mem_sync();
 }
 
@@ -1789,7 +1789,7 @@ static MACHINE_START(hyperneo)
 
 static MACHINE_RESET(hyperneo)
 {
-	int i ;
+	int i;
 	const UINT8 *rom = memory_region(machine, "user2");
 
 	/* Sound CPU */
@@ -1809,7 +1809,7 @@ static MACHINE_RESET(hyperneo)
 
 	/* Fill up virtual memory with ROM */
 	for (i = 0x0; i < 0x100000; i++)
-		hng64_com_virtual_mem[i] = rom[i] ;
+		hng64_com_virtual_mem[i] = rom[i];
 
 	KL5C80_virtual_mem_sync();
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "comm", ADDRESS_SPACE_PROGRAM), KL5C80_direct_handler);
@@ -1818,7 +1818,7 @@ static MACHINE_RESET(hyperneo)
 //  cputag_set_input_line(machine, "comm", INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
 
 	// "Display List" init - ugly
-	activeBuffer = 0 ;
+	activeBuffer = 0;
 
 	/* For simulate MCU stepping */
 	fake_mcu_time = 0;
