@@ -88,6 +88,7 @@ struct _tilemap
 
 	/* callback to interpret video RAM for the tilemap */
 	tile_get_info_func			tile_get_info;		/* callback to get information about a tile */
+	void *						tile_get_info_object;/* object passed as the first parameter to the get_info functon */
 	tile_data					tileinfo;			/* structure to hold the data for a tile */
 	void *						user_data;			/* user data value passed to the callback */
 
@@ -135,6 +136,7 @@ struct _tilemap_private
 ***************************************************************************/
 
 /* system management helpers */
+static tilemap *tilemap_create_common(running_machine *machine, void *get_info_object, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
 static void tilemap_exit(running_machine *machine);
 static STATE_POSTLOAD( tilemap_postload );
 static void tilemap_dispose(tilemap *tmap);
@@ -310,10 +312,32 @@ void tilemap_init(running_machine *machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    tilemap_create - allocate a new tilemap
+    tilemap_create - create a new tilemap
 -------------------------------------------------*/
 
 tilemap *tilemap_create(running_machine *machine, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
+{
+	return tilemap_create_common(machine, (void *)machine, tile_get_info, mapper, tilewidth, tileheight, cols, rows);
+}
+
+
+/*-------------------------------------------------
+    tilemap_create - create a new tilemap that
+    is owned by a device
+-------------------------------------------------*/
+
+tilemap *tilemap_create_device(const device_config *device, tile_get_info_device_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
+{
+	return tilemap_create_common(device->machine, (void *)device, (tile_get_info_func)tile_get_info, mapper, tilewidth, tileheight, cols, rows);
+}
+
+
+/*-------------------------------------------------
+    tilemap_create_common - shared creation
+    function
+-------------------------------------------------*/
+
+static tilemap *tilemap_create_common(running_machine *machine, void *get_info_object, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
 {
 	tilemap *tmap;
 	int tilemap_instance = machine->tilemap_data->instance;
@@ -337,6 +361,7 @@ tilemap *tilemap_create(running_machine *machine, tile_get_info_func tile_get_in
 
 	/* set up the tile map callbacks */
 	tmap->tile_get_info = tile_get_info;
+	tmap->tile_get_info_object = get_info_object;
 
 	/* set up the default pen mask */
 	tmap->tileinfo.pen_mask = 0xff;
@@ -1287,7 +1312,7 @@ profiler_mark_start(PROFILER_TILEMAP_UPDATE);
 
 	/* call the get info callback for the associated memory index */
 	memindex = tmap->logical_to_memory[logindex];
-	(*tmap->tile_get_info)(tmap->machine, &tmap->tileinfo, memindex, tmap->user_data);
+	(*tmap->tile_get_info)(tmap->tile_get_info_object, &tmap->tileinfo, memindex, tmap->user_data);
 
 	/* apply the global tilemap flip to the returned flip flags */
 	flags = tmap->tileinfo.flags ^ (tmap->attributes & 0x03);

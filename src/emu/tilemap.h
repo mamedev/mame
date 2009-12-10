@@ -397,6 +397,7 @@ struct _tile_data
 
 /* callback function to get info about a tile */
 typedef void (*tile_get_info_func)(running_machine *machine, tile_data *tileinfo, tilemap_memory_index tile_index, void *param);
+typedef void (*tile_get_info_device_func)(const device_config *device, tile_data *tileinfo, tilemap_memory_index tile_index, void *param);
 
 /* callback function to map a column,row pair to a memory index */
 typedef tilemap_memory_index (*tilemap_mapper_func)(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows);
@@ -419,6 +420,9 @@ void tilemap_init(running_machine *machine);
 
 /* create a new tilemap; note that tilemaps are tracked by the core so there is no dispose */
 tilemap *tilemap_create(running_machine *machine, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
+
+/* create a new tilemap that is owned by a device */
+tilemap *tilemap_create_device(const device_config *device, tile_get_info_device_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
 
 /* specify a parameter to be passed into the tile_get_info callback */
 void tilemap_set_user_data(tilemap *tmap, void *user_data);
