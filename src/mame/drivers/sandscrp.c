@@ -122,9 +122,10 @@ static INTERRUPT_GEN( sandscrp_interrupt )
 
 static VIDEO_EOF( sandscrp )
 {
+	const device_config *pandora = devtag_get_device(machine, "pandora");
 	sprite_irq = 1;
 	update_irq_state(machine);
-	pandora_eof(machine);
+	pandora_eof(pandora);
 }
 
 /* Reads the cause of the interrupt */
@@ -213,7 +214,7 @@ static ADDRESS_MAP_START( sandscrp, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x401000, 0x401fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0)	//
 	AM_RANGE(0x402000, 0x402fff) AM_RAM AM_BASE(&kaneko16_vscroll_1)									//
 	AM_RANGE(0x403000, 0x403fff) AM_RAM AM_BASE(&kaneko16_vscroll_0)									//
-	AM_RANGE(0x500000, 0x501fff) AM_READWRITE(pandora_spriteram_LSB_r, pandora_spriteram_LSB_w ) // sprites
+	AM_RANGE(0x500000, 0x501fff) AM_DEVREADWRITE("pandora", pandora_spriteram_LSB_r, pandora_spriteram_LSB_w ) // sprites
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(sandscrp_coin_counter_w)	// Coin Counters (Lockout unused)
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
@@ -431,6 +432,13 @@ static const ym2203_interface ym2203_intf_sandscrp =
 };
 
 
+static const kaneko_pandora_interface sandscrp_pandora_config =
+{
+	"screen",	/* screen tag */
+	0, 	/* gfx_region */
+	0, 0	/* x_offs, y_offs */
+};
+
 static MACHINE_DRIVER_START( sandscrp )
 
 	/* basic machine hardware */
@@ -456,6 +464,8 @@ static MACHINE_DRIVER_START( sandscrp )
 
 	MDRV_GFXDECODE(sandscrp)
 	MDRV_PALETTE_LENGTH(2048)
+
+	MDRV_KANEKO_PANDORA_ADD("pandora", sandscrp_pandora_config)
 
 	MDRV_VIDEO_START(sandscrp_1xVIEW2)
 	MDRV_VIDEO_EOF(sandscrp)

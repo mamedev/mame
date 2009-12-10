@@ -119,9 +119,8 @@ VIDEO_START( airbustr )
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
 	sprites_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-    state_save_register_global_bitmap(machine, sprites_bitmap);
+	state_save_register_global_bitmap(machine, sprites_bitmap);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-	pandora_start(machine,1,0,0);
 
 	tilemap_set_scrolldx(bg_tilemap, 0x094, 0x06a);
 	tilemap_set_scrolldy(bg_tilemap, 0x100, 0x1ff);
@@ -132,18 +131,20 @@ VIDEO_START( airbustr )
 
 VIDEO_UPDATE( airbustr )
 {
+	const device_config *pandora = devtag_get_device(screen->machine, "pandora");
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
 	// copy the sprite bitmap to the screen
-	pandora_update(screen->machine, bitmap, cliprect);
+	pandora_update(pandora, bitmap, cliprect);
 
 	return 0;
 }
 
 VIDEO_EOF( airbustr )
 {
+	const device_config *pandora = devtag_get_device(machine, "pandora");
 	// update the sprite bitmap
-	pandora_eof(machine);
+	pandora_eof(pandora);
 }
 

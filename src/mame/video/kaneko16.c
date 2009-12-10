@@ -235,7 +235,6 @@ VIDEO_START( kaneko16_2xVIEW2 )
 VIDEO_START( sandscrp_1xVIEW2 )
 {
 	VIDEO_START_CALL(kaneko16_1xVIEW2);
-	pandora_start(machine,0,0,0);
 
 	tilemap_set_scrolldy( kaneko16_tmap_0, 0, 256 - 1 );
 	tilemap_set_scrolldy( kaneko16_tmap_1, 0, 256 - 1 );
@@ -1122,6 +1121,7 @@ VIDEO_UPDATE( galsnew )
 
 VIDEO_UPDATE( sandscrp )
 {
+	const device_config *pandora = devtag_get_device(screen->machine, "pandora");
 	kaneko16_fill_bitmap(screen->machine,bitmap,cliprect);
 
 	// if the display is disabled, do nothing?
@@ -1130,7 +1130,7 @@ VIDEO_UPDATE( sandscrp )
 	VIDEO_UPDATE_CALL(common);
 
 	// copy sprite bitmap to screen
-	pandora_update(screen->machine,bitmap,cliprect);
+	pandora_update(pandora, bitmap, cliprect);
 	return 0;
 }
 

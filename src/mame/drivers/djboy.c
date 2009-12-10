@@ -743,7 +743,7 @@ static WRITE8_HANDLER( cpu2_bankswitch_w )
 static ADDRESS_MAP_START( cpu0_am, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xafff) AM_ROMBANK("bank4")
-	AM_RANGE(0xb000, 0xbfff) AM_READWRITE( pandora_spriteram_r, pandora_spriteram_w )
+	AM_RANGE(0xb000, 0xbfff) AM_DEVREADWRITE("pandora", pandora_spriteram_r, pandora_spriteram_w)
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
@@ -907,6 +907,13 @@ static INTERRUPT_GEN( djboy_interrupt )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, addr);
 }
 
+static const kaneko_pandora_interface djboy_pandora_config =
+{
+	"screen",	/* screen tag */
+	0, 	/* gfx_region */
+	0, 0	/* x_offs, y_offs */
+};
+
 static MACHINE_DRIVER_START( djboy )
 	MDRV_CPU_ADD("maincpu", Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu0_am)
@@ -934,6 +941,8 @@ static MACHINE_DRIVER_START( djboy )
 
 	MDRV_GFXDECODE(djboy)
 	MDRV_PALETTE_LENGTH(0x200)
+
+	MDRV_KANEKO_PANDORA_ADD("pandora", djboy_pandora_config)
 
 	MDRV_VIDEO_START(djboy)
 	MDRV_VIDEO_UPDATE(djboy)

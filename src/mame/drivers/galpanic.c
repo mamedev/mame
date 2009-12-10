@@ -137,7 +137,8 @@ VIDEO_UPDATE( comad );
 
 static VIDEO_EOF( galpanic )
 {
-	pandora_eof(machine);
+	const device_config *pandora = devtag_get_device(machine, "pandora");
+	pandora_eof(pandora);
 }
 
 static INTERRUPT_GEN( galpanic_interrupt )
@@ -162,6 +163,8 @@ static INTERRUPT_GEN( galhustl_interrupt )
 
 static WRITE16_HANDLER( galpanic_6295_bankswitch_w )
 {
+	const device_config *pandora = devtag_get_device(space->machine, "pandora");
+
 	if (ACCESSING_BITS_8_15)
 	{
 		UINT8 *rom = memory_region(space->machine, "oki");
@@ -169,7 +172,7 @@ static WRITE16_HANDLER( galpanic_6295_bankswitch_w )
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 
 		// used before title screen
-		pandora_set_clear_bitmap((data & 0x8000)>>15);
+		pandora_set_clear_bitmap(pandora, (data & 0x8000)>>15);
 	}
 }
 
@@ -186,9 +189,11 @@ static WRITE16_HANDLER( galpania_6295_bankswitch_w )
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( galpania_misc_w )
 {
+	const device_config *pandora = devtag_get_device(machine, "pandora");
+
 	if (ACCESSING_BITS_0_7)
 	{
-		pandora_set_clear_bitmap( data & 0x0004 );
+		pandora_set_clear_bitmap(pandora, data & 0x0004);
 	}
 
 	// other bits unknown !
@@ -223,7 +228,7 @@ static ADDRESS_MAP_START( galpanic_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(&galpanic_fgvideoram) AM_SIZE(&galpanic_fgvideoram_size)
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_BASE(&galpanic_bgvideoram)	/* + work RAM */
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(galpanic_paletteram_w) AM_BASE_GENERIC(paletteram)	/* 1024 colors, but only 512 seem to be used */
-	AM_RANGE(0x700000, 0x701fff) AM_READWRITE(pandora_spriteram_LSB_r, pandora_spriteram_LSB_w)
+	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", pandora_spriteram_LSB_r, pandora_spriteram_LSB_w)
 	AM_RANGE(0x702000, 0x704fff) AM_RAM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1_P1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2_P2")
@@ -868,6 +873,13 @@ static GFXDECODE_START( galpanic )
 GFXDECODE_END
 
 
+static const kaneko_pandora_interface galpanic_pandora_config =
+{
+	"screen",	/* screen tag */
+	0, 	/* gfx_region */
+	0, -16	/* x_offs, y_offs */
+};
+
 
 static MACHINE_DRIVER_START( galpanic )
 
@@ -886,6 +898,8 @@ static MACHINE_DRIVER_START( galpanic )
 
 	MDRV_GFXDECODE(galpanic)
 	MDRV_PALETTE_LENGTH(1024 + 32768)
+
+	MDRV_KANEKO_PANDORA_ADD("pandora", galpanic_pandora_config)
 
 	MDRV_PALETTE_INIT(galpanic)
 	MDRV_VIDEO_START(galpanic)
@@ -916,6 +930,8 @@ static MACHINE_DRIVER_START( comad )
 	MDRV_IMPORT_FROM(galpanic)
 	MDRV_CPU_REPLACE("maincpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(comad_map)
+
+	MDRV_DEVICE_REMOVE("pandora")
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(comad)

@@ -45,7 +45,6 @@ WRITE8_HANDLER( djboy_videoram_w )
 VIDEO_START( djboy )
 {
 	background = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,16,16,64,32);
-	pandora_start(machine,0,0,0);
 }
 
 WRITE8_HANDLER( djboy_paletteram_w )
@@ -67,17 +66,19 @@ VIDEO_UPDATE( djboy )
      * ---x---- flipscreen?
      * ----xxxx ROM bank
      */
+	const device_config *pandora = devtag_get_device(screen->machine, "pandora");
 	int scroll;
 	scroll = djboy_scrollx | ((djboy_videoreg&0xc0)<<2);
 	tilemap_set_scrollx( background, 0, scroll-0x391 );
 	scroll = djboy_scrolly | ((djboy_videoreg&0x20)<<3);
 	tilemap_set_scrolly( background, 0, scroll );
 	tilemap_draw( bitmap, cliprect,background,0,0 );
-	pandora_update(screen->machine,bitmap,cliprect);
+	pandora_update(pandora, bitmap, cliprect);
 	return 0;
 }
 
 VIDEO_EOF( djboy )
 {
-	pandora_eof(machine);
+	const device_config *pandora = devtag_get_device(machine, "pandora");
+	pandora_eof(pandora);
 }

@@ -299,12 +299,13 @@ static WRITE8_HANDLER( master_bankswitch_w )
 
 static WRITE8_HANDLER( slave_bankswitch_w )
 {
+	const device_config *pandora = devtag_get_device(space->machine, "pandora");
 	airbustr_bankswitch(space->machine, "slave", "bank2", data);
 
 	flip_screen_set(space->machine, data & 0x10);
 
 	// used at the end of levels, after defeating the boss, to leave trails
-	pandora_set_clear_bitmap(data&0x20);
+	pandora_set_clear_bitmap(pandora, data&0x20);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -370,7 +371,7 @@ static WRITE8_HANDLER( airbustr_coin_counter_w )
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(pandora_spriteram_r, pandora_spriteram_w)
+	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", pandora_spriteram_r, pandora_spriteram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE(&devram) // shared with protection device
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")
@@ -609,6 +610,13 @@ static MACHINE_RESET( airbustr )
 
 /* Machine Driver */
 
+static const kaneko_pandora_interface airbustr_pandora_config =
+{
+	"screen",	/* screen tag */
+	1, 	/* gfx_region */
+	0, 0	/* x_offs, y_offs */
+};
+
 static MACHINE_DRIVER_START( airbustr )
 	// basic machine hardware
 	MDRV_CPU_ADD("master", Z80, 6000000)	// ???
@@ -628,12 +636,11 @@ static MACHINE_DRIVER_START( airbustr )
 
 	MDRV_QUANTUM_TIME(HZ(6000))	// Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches
-    MDRV_MACHINE_START(airbustr)
+	MDRV_MACHINE_START(airbustr)
 	MDRV_MACHINE_RESET(airbustr)
 	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
 	// video hardware
-
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -642,6 +649,8 @@ static MACHINE_DRIVER_START( airbustr )
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(airbustr)
 	MDRV_PALETTE_LENGTH(768)
+
+	MDRV_KANEKO_PANDORA_ADD("pandora", airbustr_pandora_config)
 
 	MDRV_VIDEO_START(airbustr)
 	MDRV_VIDEO_UPDATE(airbustr)

@@ -286,7 +286,6 @@ static TILE_GET_INFO( get_bg_tile_info )
 static VIDEO_START(hvyunit)
 {
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
-	pandora_start(machine,0,0,0);
 }
 
 #define SX_POS 	152
@@ -294,7 +293,7 @@ static VIDEO_START(hvyunit)
 
 static VIDEO_UPDATE(hvyunit)
 {
-
+	const device_config *pandora = devtag_get_device(screen->machine, "pandora");
 	tilemap_set_scrollx( bg_tilemap,0, ((port0_data&0x40)<<2)+ hu_scrollx + SX_POS); //TODO
 	tilemap_set_scrolly( bg_tilemap,0, ((port0_data&0x80)<<1)+ hu_scrolly + SY_POS); // TODO
 
@@ -302,13 +301,14 @@ static VIDEO_UPDATE(hvyunit)
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	pandora_update(screen->machine,bitmap,cliprect);
+	pandora_update(pandora, bitmap, cliprect);
 	return 0;
 }
 
 static VIDEO_EOF(hvyunit)
 {
-	pandora_eof(machine);
+	const device_config *pandora = devtag_get_device(machine, "pandora");
+	pandora_eof(pandora);
 }
 
 static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
@@ -349,7 +349,7 @@ static WRITE8_HANDLER( hu_colorram_w )
 static ADDRESS_MAP_START( master_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE( pandora_spriteram_r, pandora_spriteram_w )
+	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", pandora_spriteram_r, pandora_spriteram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
@@ -630,6 +630,13 @@ static INTERRUPT_GEN( hvyunit_interrupt )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, addr);
 }
 
+static const kaneko_pandora_interface hvyunit_pandora_config =
+{
+	"screen",	/* screen tag */
+	0, 	/* gfx_region */
+	0, 0	/* x_offs, y_offs */
+};
+
 
 static MACHINE_DRIVER_START( hvyunit )
 
@@ -660,6 +667,8 @@ static MACHINE_DRIVER_START( hvyunit )
 
 	MDRV_GFXDECODE(hvyunit)
 	MDRV_PALETTE_LENGTH(0x800)
+
+	MDRV_KANEKO_PANDORA_ADD("pandora", hvyunit_pandora_config)
 
 	MDRV_VIDEO_START(hvyunit)
 	MDRV_VIDEO_UPDATE(hvyunit)

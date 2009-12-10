@@ -82,21 +82,19 @@ static WRITE16_HANDLER( snowbros_flipscreen_w )
 
 static VIDEO_UPDATE( snowbros )
 {
+	const device_config *pandora = devtag_get_device(screen->machine, "pandora");
+
 	/* This clears & redraws the entire screen each pass */
 	bitmap_fill(bitmap,cliprect,0xf0);
-	pandora_update(screen->machine,bitmap,cliprect);
+	pandora_update(pandora, bitmap, cliprect);
 	return 0;
 }
 
 
-static VIDEO_START( snowbros )
-{
-	pandora_start(machine,0,0,0);
-}
-
 static VIDEO_EOF( snowbros )
 {
-	pandora_eof(machine);
+	const device_config *pandora = devtag_get_device(machine, "pandora");
+	pandora_eof(pandora);
 }
 
 
@@ -185,7 +183,7 @@ static ADDRESS_MAP_START( snowbros_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x600000, 0x6001ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x700000, 0x701fff) AM_READWRITE(pandora_spriteram_LSB_r,pandora_spriteram_LSB_w)
+	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", pandora_spriteram_LSB_r, pandora_spriteram_LSB_w)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)	/* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)	/* IRQ 3 acknowledge */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)	/* IRQ 2 acknowledge */
@@ -366,7 +364,7 @@ static ADDRESS_MAP_START( hyperpac_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0x600000, 0x6001ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x700000, 0x701fff) AM_READWRITE(pandora_spriteram_LSB_r,pandora_spriteram_LSB_w)
+	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", pandora_spriteram_LSB_r,pandora_spriteram_LSB_w)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)	/* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)	/* IRQ 3 acknowledge */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)	/* IRQ 2 acknowledge */
@@ -517,7 +515,7 @@ static ADDRESS_MAP_START( finalttr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0x600000, 0x6001ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x700000, 0x701fff) AM_READWRITE(pandora_spriteram_LSB_r,pandora_spriteram_LSB_w)
+	AM_RANGE(0x700000, 0x701fff) AM_DEVREADWRITE("pandora", pandora_spriteram_LSB_r, pandora_spriteram_LSB_w)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(snowbros_irq4_ack_w)	/* IRQ 4 acknowledge */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(snowbros_irq3_ack_w)	/* IRQ 3 acknowledge */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)	/* IRQ 2 acknowledge */
@@ -1514,6 +1512,13 @@ static MACHINE_RESET (finalttr)
 	hyperpac_ram[0x2000/2 + i] = PROTDATA[i];
 }
 
+static const kaneko_pandora_interface snowbros_pandora_config =
+{
+	"screen",	/* screen tag */
+	0, 	/* gfx_region */
+	0, 0	/* x_offs, y_offs */
+};
+
 static MACHINE_DRIVER_START( snowbros )
 
 	/* basic machine hardware */
@@ -1536,9 +1541,10 @@ static MACHINE_DRIVER_START( snowbros )
 	MDRV_GFXDECODE(snowbros)
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(snowbros)
 	MDRV_VIDEO_UPDATE(snowbros)
 	MDRV_VIDEO_EOF(snowbros)
+
+	MDRV_KANEKO_PANDORA_ADD("pandora", snowbros_pandora_config)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1554,6 +1560,8 @@ static MACHINE_DRIVER_START( wintbob )
 	MDRV_IMPORT_FROM(snowbros)
 	MDRV_CPU_REPLACE("maincpu", M68000, 10000000) /* 10mhz - Confirmed */
 	MDRV_CPU_PROGRAM_MAP(wintbob_map)
+
+	MDRV_DEVICE_REMOVE("pandora")
 
 	/* video hardware */
 	MDRV_GFXDECODE(wb)
