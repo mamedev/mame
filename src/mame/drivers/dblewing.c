@@ -169,53 +169,6 @@ static VIDEO_UPDATE(dblewing)
 }
 
 
-/*
-
-cheats.. to make testing a bit easier
-
-; [ Double Wings ]
-:dblewing:00000000:FF3C1F:00000009:FFFFFFFF:Infinite Credits
-:dblewing:00000000:FF381C:000000F8:FFFFFFFF:1P Rapid Fire
-:dblewing:00000000:FF3821:00000002:FFFFFFFF:1P Invincibility
-:dblewing:00000000:FF389D:00000008:FFFFFFFF:1P Infinite Lives
-:dblewing:00000000:FF389F:00000006:FFFFFFFF:1P Infinite Bombs
-:dblewing:00000000:FF38A5:0000001C:0000001C:1P Always Maximum Shot Power
-:dblewing:62000000:FF38A5:00000000:00000000:1P Select Weapon
-:dblewing:00010000:FF38A5:00000000:00000060:Vulcan
-:dblewing:00010000:FF38A5:00000020:00000060:Laser
-:dblewing:00010000:FF38A5:00000040:00000060:Break Vulcan
-:dblewing:00000000:FF38A7:0000000C:0000000C:1P Always Max Sub Wepon Power
-:dblewing:62000000:FF38A7:00000000:00000000:1P Select Sub Weapon
-:dblewing:00010000:FF38A7:00000000:000000F0:None
-:dblewing:00010000:FF38A7:00000060:000000F0:Missile
-:dblewing:00010000:FF38A7:00000070:000000F0:Homing
-:dblewing:00000000:FF38B5:00000001:FFFFFFFF:1P Always Have Restart Item
-:dblewing:62000000:FF38A1:00000000:FFFFFFFF:1P Select Character
-:dblewing:00010000:FF38A1:00000000:FFFFFFFF:Nick (Red)
-:dblewing:00010000:FF38A1:00000001:FFFFFFFF:Sophie (Blue)
-:dblewing:00010000:FF38A1:00000002:FFFFFFFF:Elan (Yellow)
-:dblewing:00000000:FF38DC:000000F8:FFFFFFFF:2P Rapid Fire
-:dblewing:00000000:FF38E1:00000002:FFFFFFFF:2P Invincibility
-:dblewing:00000000:FF395D:00000008:FFFFFFFF:2P Infinite Lives
-:dblewing:00000000:FF395F:00000006:FFFFFFFF:2P Infinite Bombs
-:dblewing:00000000:FF3965:0000001C:0000001C:2P Always Maximum Shot Power
-:dblewing:62000000:FF3965:00000000:00000000:2P Select Weapon
-:dblewing:00010000:FF3965:00000000:00000060:Vulcan
-:dblewing:00010000:FF3965:00000020:00000060:Laser
-:dblewing:00010000:FF3965:00000040:00000060:Break Vulcan
-:dblewing:00000000:FF3967:0000000C:0000000C:2P Always Max Sub Wepon Power
-:dblewing:62000000:FF3967:00000000:00000000:2P Select Sub Weapon
-:dblewing:00010000:FF3967:00000000:000000F0:None
-:dblewing:00010000:FF3967:00000060:000000F0:Missile
-:dblewing:00010000:FF3967:00000070:000000F0:Homing
-:dblewing:00000000:FF3975:00000001:FFFFFFFF:2P Always Have Restart Item
-:dblewing:62000000:FF3961:00000000:FFFFFFFF:2P Select Character
-:dblewing:00010000:FF3961:00000000:FFFFFFFF:Nick (Red)
-:dblewing:00010000:FF3961:00000001:FFFFFFFF:Sophie (Blue)
-:dblewing:00010000:FF3961:00000002:FFFFFFFF:Elan (Yellow)
-
-*/
-
 /* protection.. involves more addresses than this .. */
 /* this is going to be typical deco '104' protection...
  writes one place, reads back data shifted in another
