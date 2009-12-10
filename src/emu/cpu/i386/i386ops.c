@@ -2212,6 +2212,11 @@ static void I386OP(into)(i386_state *cpustate)				// Opcode 0xce
 static void I386OP(escape)(i386_state *cpustate)			// Opcodes 0xd8 - 0xdf
 {
 	UINT8 modrm = FETCH(cpustate);
+	if(modrm < 0xc0)
+	{
+		UINT32 ea;
+		ea = GetEA(cpustate,modrm);
+	}
 	CYCLES(cpustate,3);	// TODO: confirm this
 	(void) LOAD_RM8(modrm);
 }
