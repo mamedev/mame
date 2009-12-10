@@ -6430,7 +6430,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ninjamas )	/* 0217 (c) 1996 ADK / SNK */
 	DRIVER( ragnagrd )	/* 0218 (c) 1996 Saurus */
 	DRIVER( pgoal )		/* 0219 (c) 1996 Saurus */
-	DRIVER( ironclad )	/* 0220 (c) 1996 Saurus - Choutetsu Brikin'ger - iron clad (bootleg or actual MVS dump?) */
+						/* 0220 (c) 1996 Saurus - Choutetsu Brikin'ger - Iron clad (undumped protoype) */
 	DRIVER( magdrop2 )	/* 0221 (c) 1996 Data East Corporation */
 	DRIVER( samsho4 )	/* 0222 (c) 1996 SNK */
 	DRIVER( samsho4k )	/* Censored Korean release of samsho4 */
