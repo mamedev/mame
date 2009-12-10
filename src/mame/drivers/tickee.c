@@ -856,6 +856,26 @@ ROM_END
 Rapid Fire (v1.1)
 Hanaho Games, 1998
 
+BE 1V-0 VER3
++-----------------------------------------------+
+|         U510 U507    M6295    MACH210         |
+|   VOL DS1232                          RAM RAM |
+|                               MACH210         |
+|GUN1     YM3012 18MHz                  RAM RAM |
+|GUN2                                           |
++-+         YM2151 8MHz  TMS34010               |
+  |                3.5795MHz                    |
++-+                      MACH110                |
+|                                    ADV476     |
+|J            DSW2               50MHz          |
+|A            DSW1                              |
+|M                                  U3 U5 U7 U9 |
+|M                                              |
+|A     +------------+        DS1220 U2 U4 U6 U8 |
+|      | CN110 DB25 |                           |
++------+------------+---------------------------+
+
+
 PCB No: BE 1V-0 VER3: 7/30/98 (Sticker says PVG/SEMCO)
 CPU   : TMS34010FNL-50
 SND   : BS901 + CA5102 (YM2151 + YM3012), AD-65 (OKI M6295) 
@@ -868,22 +888,23 @@ OTHER : MACH110 (x1, CPLD)
         ADV476KN50 (28 Pin DIP, Analog Devices CMOS Monolithic 256x18 color palette RAM-DAC @ 50MHz)
         DALLAS DS1220Y-200 (NONVOLATILE SRAM)
 
-On the back of the PCB is a 25 pin female D-Type connector (looks like Parallel connector)
+There is also a standard DB25 female connector (looks like a Parallel connector)
 
 ROMs  : RF11.U2     27C040      \
         RF11.U3       "         |
         RF10.U4       "         |
         RF10.U5       "         |
-        RF10.U6       "         |   GROUPED TOGETHER, PRG/GFX
+        RF10.U6       "         |   Grouped together, PRG/GFX
         RF10.U7       "         |
         RF11.U8       "         |
         RF11.U9       "         |
         DS1220Y.U504  *1        /   
 
         RF11.U507    27C040     \
-        RF11.U510      "        /   GROUPED TOGETHER, SND/OKI SAMPLES
+        RF11.U510      "        /   Grouped together, SND/OKI SAMPLES
 
 *1: Contents of Dallas DS1220 NVRAM (2K)
+
 */
 
 ROM_START( rapidfir ) /* Version 1.1, test menu shows "Build 239" */
