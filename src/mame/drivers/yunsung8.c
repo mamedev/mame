@@ -33,36 +33,7 @@ To Do:
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
-
-/* Variables defined in video: */
-
-extern UINT8 *yunsung8_videoram_0, *yunsung8_videoram_1;
-extern int yunsung8_layers_ctrl;
-
-/* Functions defined in video: */
-
-WRITE8_HANDLER( yunsung8_videobank_w );
-
-READ8_HANDLER ( yunsung8_videoram_r );
-WRITE8_HANDLER( yunsung8_videoram_w );
-
-WRITE8_HANDLER( yunsung8_flipscreen_w );
-
-VIDEO_START( yunsung8 );
-VIDEO_UPDATE( yunsung8 );
-
-
-
-static MACHINE_RESET( yunsung8 )
-{
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8* yunsung8_videoram = auto_alloc_array(machine, UINT8, 0x4000);
-
-	yunsung8_videoram_0 = yunsung8_videoram + 0x0000;	// Ram is banked
-	yunsung8_videoram_1 = yunsung8_videoram + 0x2000;
-	yunsung8_videobank_w(space, 0, 0);
-}
-
+#include "includes/yunsung8.h"
 
 /***************************************************************************
 
@@ -75,17 +46,14 @@ static MACHINE_RESET( yunsung8 )
 
 static WRITE8_HANDLER( yunsung8_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	yunsung8_state *state = (yunsung8_state *)space->machine->driver_data;
 
-	int bank				=	data & 7;		// ROM bank
-	yunsung8_layers_ctrl	=	data & 0x30;	// Layers enable
+	state->layers_ctrl = data & 0x30;	// Layers enable
 
-	if (data & ~0x37)	logerror("CPU #0 - PC %04X: Bank %02X\n",cpu_get_pc(space->cpu),data);
+	memory_set_bank(space->machine, "bank1", data & 0x07);
 
-	if (bank < 3)	RAM = &RAM[0x4000 * bank];
-	else			RAM = &RAM[0x4000 * (bank-3) + 0x10000];
-
-	memory_set_bankptr(space->machine, "bank1", RAM);
+	if (data & ~0x37)	
+		logerror("CPU #0 - PC %04X: Bank %02X\n", cpu_get_pc(space->cpu), data);
 }
 
 /*
@@ -98,10 +66,10 @@ static WRITE8_HANDLER( yunsung8_bankswitch_w )
 */
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(yunsung8_bankswitch_w	)	// ROM Bank (again?)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1"				)	// Banked ROM
+	AM_RANGE(0x0001, 0x0001) AM_WRITE(yunsung8_bankswitch_w)	// ROM Bank (again?)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	// Banked ROM
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(yunsung8_videoram_r, yunsung8_videoram_w	)	// Video RAM (Banked)
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(yunsung8_videoram_r, yunsung8_videoram_w)	// Video RAM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -109,11 +77,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE(yunsung8_videobank_w)	// video RAM bank
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(yunsung8_bankswitch_w	)	// ROM Bank + Layers Enable
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2") AM_WRITE(soundlatch_w			)	// To Sound CPU
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(yunsung8_bankswitch_w)	// ROM Bank + Layers Enable
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2") AM_WRITE(soundlatch_w)	// To Sound CPU
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x06, 0x06) AM_WRITE(yunsung8_flipscreen_w						)	// Flip Screen
+	AM_RANGE(0x06, 0x06) AM_WRITE(yunsung8_flipscreen_w)	// Flip Screen
 	AM_RANGE(0x07, 0x07) AM_WRITENOP	// ? (end of IRQ, random value)
 ADDRESS_MAP_END
 
@@ -127,28 +95,22 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-
-static int adpcm;
-
 static WRITE8_DEVICE_HANDLER( yunsung8_sound_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(device->machine, "audiocpu");
-	int bank = data & 7;
+	msm5205_reset_w(device, data & 0x20);
 
-	if ( bank != (data&(~0x20)) ) 	logerror("%s: Bank %02X\n",cpuexec_describe_context(device->machine),data);
+	memory_set_bank(device->machine, "bank2", data & 0x07);
 
-	if (bank < 3)	RAM = &RAM[0x4000 * bank];
-	else			RAM = &RAM[0x4000 * (bank-3) + 0x10000];
-
-	memory_set_bankptr(device->machine, "bank2", RAM);
-
-	msm5205_reset_w(device,data & 0x20);
+	if (data != (data & (~0x27))) 
+		logerror("%s: Bank %02X\n", cpuexec_describe_context(device->machine), data);
 }
 
 static WRITE8_HANDLER( yunsung8_adpcm_w )
 {
+	yunsung8_state *state = (yunsung8_state *)space->machine->driver_data;
+
 	/* Swap the nibbles */
-	adpcm = ((data&0xf)<<4) | ((data >>4)&0xf);
+	state->adpcm = ((data & 0xf) << 4) | ((data >> 4) & 0xf);
 }
 
 
@@ -157,10 +119,10 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")	// Banked ROM
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", yunsung8_sound_bankswitch_w	)	// ROM Bank
-	AM_RANGE(0xe400, 0xe400) AM_WRITE(yunsung8_adpcm_w				)
-	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_w		)
+	AM_RANGE(0xe400, 0xe400) AM_WRITE(yunsung8_adpcm_w)
+	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r					)	// From Main CPU
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)	// From Main CPU
 ADDRESS_MAP_END
 
 
@@ -180,18 +142,18 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( magix )
 	PORT_START("SYSTEM")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_START2   )
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_START1   )
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_COIN1    )
+	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("P1")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	// same as button1 !?
 	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
@@ -200,8 +162,8 @@ static INPUT_PORTS_START( magix )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("P2")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	// same as button1 !?
 	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
@@ -266,17 +228,17 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( cannball )
 	PORT_START("SYSTEM")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_START2   )
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_START1   )
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_COIN1    )
+	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("P1")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -286,7 +248,7 @@ static INPUT_PORTS_START( cannball )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("P2")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -356,18 +318,18 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( rocktris )
 	PORT_START("SYSTEM")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_START2   )
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_START1   )
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(1)
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_COIN1    ) PORT_IMPULSE(1)
+	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 
 	PORT_START("P1")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	// same as button1 !?
 	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
@@ -376,8 +338,8 @@ static INPUT_PORTS_START( rocktris )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("P2")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	// same as button1 !?
 	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
@@ -484,16 +446,16 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-static void yunsung8_adpcm_int(const device_config *device)
+static void yunsung8_adpcm_int( const device_config *device )
 {
-	static int toggle = 0;
+	yunsung8_state *state = (yunsung8_state *)device->machine->driver_data;
 
-	msm5205_data_w(device, adpcm >> 4);
-	adpcm <<= 4;
+	msm5205_data_w(device, state->adpcm >> 4);
+	state->adpcm <<= 4;
 
-	toggle ^= 1;
-	if (toggle)
-		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	state->toggle ^= 1;
+	if (state->toggle)
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface yunsung8_msm5205_interface =
@@ -503,7 +465,45 @@ static const msm5205_interface yunsung8_msm5205_interface =
 };
 
 
+static MACHINE_START( yunsung8 )
+{
+	yunsung8_state *state = (yunsung8_state *)machine->driver_data;
+	UINT8 *MAIN = memory_region(machine, "maincpu");
+	UINT8 *AUDIO = memory_region(machine, "audiocpu");
+
+	state->videoram = auto_alloc_array(machine, UINT8, 0x4000);
+	state->videoram_0 = state->videoram + 0x0000;	// Ram is banked
+	state->videoram_1 = state->videoram + 0x2000;
+
+	memory_configure_bank(machine, "bank1", 0, 3, &MAIN[0x00000], 0x4000);
+	memory_configure_bank(machine, "bank1", 3, 5, &MAIN[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank2", 0, 3, &AUDIO[0x00000], 0x4000);
+	memory_configure_bank(machine, "bank2", 3, 5, &AUDIO[0x10000], 0x4000);
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global_pointer(machine, state->videoram, 0x4000);
+	state_save_register_global(machine, state->layers_ctrl);
+	state_save_register_global(machine, state->videobank);
+	state_save_register_global(machine, state->adpcm);
+	state_save_register_global(machine, state->toggle);
+}
+
+static MACHINE_RESET( yunsung8 )
+{
+	yunsung8_state *state = (yunsung8_state *)machine->driver_data;
+
+	state->videobank = 0;
+	state->layers_ctrl = 0;
+	state->adpcm = 0;
+	state->toggle = 0;
+}
+
+
 static MACHINE_DRIVER_START( yunsung8 )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(yunsung8_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)			/* Z80B */
@@ -515,6 +515,7 @@ static MACHINE_DRIVER_START( yunsung8 )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* NMI caused by the MSM5205? */
 
+	MDRV_MACHINE_START(yunsung8)
 	MDRV_MACHINE_RESET(yunsung8)
 
 	/* video hardware */
@@ -702,7 +703,7 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1995,  cannball, 0,        yunsung8, cannball, 0, ROT0,   "Yun Sung / Soft Vision", "Cannon Ball (Yun Sung) (horizontal)",  GAME_IMPERFECT_SOUND )
-GAME( 1995,  cannballv,cannball, yunsung8, cannbalv, 0, ROT270, "Yun Sung / T&K",         "Cannon Ball (Yun Sung) (vertical)",  GAME_IMPERFECT_SOUND )
-GAME( 1995,  magix,    0,        yunsung8, magix,    0, ROT0,   "Yun Sung",               "Magix / Rock", GAME_IMPERFECT_SOUND ) // Title: DSW
-GAME( 1994?, rocktris, 0,        yunsung8, rocktris, 0, ROT0,   "Yun Sung",               "Rock Tris",    GAME_IMPERFECT_SOUND )
+GAME( 1995,  cannball,  0,        yunsung8, cannball, 0, ROT0,   "Yun Sung / Soft Vision", "Cannon Ball (Yun Sung) (horizontal)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1995,  cannballv, cannball, yunsung8, cannbalv, 0, ROT270, "Yun Sung / T&K",         "Cannon Ball (Yun Sung) (vertical)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1995,  magix,     0,        yunsung8, magix,    0, ROT0,   "Yun Sung",               "Magix / Rock", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1994?, rocktris,  0,        yunsung8, rocktris, 0, ROT0,   "Yun Sung",               "Rock Tris",    GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

@@ -7,13 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "lwings.h"
-
-UINT8 *lwings_fgvideoram;
-UINT8 *lwings_bg1videoram;
-
-static int bAvengersHardware, bg2_image;
-static tilemap *fg_tilemap, *bg1_tilemap, *bg2_tilemap;
+#include "includes/lwings.h"
 
 /***************************************************************************
 
@@ -28,10 +22,9 @@ static TILEMAP_MAPPER( get_bg2_memory_offset )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code, color;
-
-	code = lwings_fgvideoram[tile_index];
-	color = lwings_fgvideoram[tile_index + 0x400];
+	lwings_state *state = (lwings_state *)machine->driver_data;
+	int code = state->fgvideoram[tile_index];
+	int color = state->fgvideoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			0,
 			code + ((color & 0xc0) << 2),
@@ -41,10 +34,9 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( lwings_get_bg1_tile_info )
 {
-	int code, color;
-
-	code = lwings_bg1videoram[tile_index];
-	color = lwings_bg1videoram[tile_index + 0x400];
+	lwings_state *state = (lwings_state *)machine->driver_data;
+	int code = state->bg1videoram[tile_index];
+	int color = state->bg1videoram[tile_index + 0x400];
 	SET_TILE_INFO(
 			1,
 			code + ((color & 0xe0) << 3),
@@ -54,26 +46,27 @@ static TILE_GET_INFO( lwings_get_bg1_tile_info )
 
 static TILE_GET_INFO( trojan_get_bg1_tile_info )
 {
-	int code, color;
-
-	code = lwings_bg1videoram[tile_index];
-	color = lwings_bg1videoram[tile_index + 0x400];
+	lwings_state *state = (lwings_state *)machine->driver_data;
+	int code = state->bg1videoram[tile_index];
+	int color = state->bg1videoram[tile_index + 0x400];
 	code += (color & 0xe0)<<3;
 	SET_TILE_INFO(
 			1,
 			code,
-			bAvengersHardware ? ((color & 7) ^ 6) : (color & 7),
+			state->bg2_avenger_hw ? ((color & 7) ^ 6) : (color & 7),
 			((color & 0x10) ? TILE_FLIPX : 0));
+
 	tileinfo->group = (color & 0x08) >> 3;
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
+	lwings_state *state = (lwings_state *)machine->driver_data;
 	int code, color;
 	UINT8 *rom = memory_region(machine, "gfx5");
 	int mask = memory_region_length(machine, "gfx5") - 1;
 
-	tile_index = (tile_index + bg2_image * 0x20) & mask;
+	tile_index = (tile_index + state->bg2_image * 0x20) & mask;
 	code = rom[tile_index];
 	color = rom[tile_index + 1];
 	SET_TILE_INFO(
@@ -91,29 +84,35 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 VIDEO_START( lwings )
 {
-	fg_tilemap  = tilemap_create(machine, get_fg_tile_info,        tilemap_scan_rows, 8, 8,32,32);
-	bg1_tilemap = tilemap_create(machine, lwings_get_bg1_tile_info,tilemap_scan_cols,     16,16,32,32);
+	lwings_state *state = (lwings_state *)machine->driver_data;
 
-	tilemap_set_transparent_pen(fg_tilemap,3);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->bg1_tilemap = tilemap_create(machine, lwings_get_bg1_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
+
+	tilemap_set_transparent_pen(state->fg_tilemap, 3);
 }
 
 VIDEO_START( trojan )
 {
-	fg_tilemap  = tilemap_create(machine, get_fg_tile_info,        tilemap_scan_rows,    8, 8,32,32);
-	bg1_tilemap = tilemap_create(machine, trojan_get_bg1_tile_info,tilemap_scan_cols,         16,16,32,32);
-	bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,       get_bg2_memory_offset,    16,16,32,16);
+	lwings_state *state = (lwings_state *)machine->driver_data;
 
-		tilemap_set_transparent_pen(fg_tilemap,3);
-		tilemap_set_transmask(bg1_tilemap,0,0xffff,0x0001); /* split type 0 is totally transparent in front half */
-		tilemap_set_transmask(bg1_tilemap,1,0xf07f,0x0f81); /* split type 1 has pens 7-11 opaque in front half */
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->bg1_tilemap = tilemap_create(machine, trojan_get_bg1_tile_info,tilemap_scan_cols, 16, 16, 32, 32);
+	state->bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, get_bg2_memory_offset, 16, 16, 32, 16);
 
-		bAvengersHardware = 0;
+	tilemap_set_transparent_pen(state->fg_tilemap, 3);
+	tilemap_set_transmask(state->bg1_tilemap, 0, 0xffff, 0x0001); /* split type 0 is totally transparent in front half */
+	tilemap_set_transmask(state->bg1_tilemap, 1, 0xf07f, 0x0f81); /* split type 1 has pens 7-11 opaque in front half */
+
+	state->bg2_avenger_hw = 0;
 }
 
 VIDEO_START( avengers )
 {
+	lwings_state *state = (lwings_state *)machine->driver_data;
+
 	VIDEO_START_CALL(trojan);
-	bAvengersHardware = 1;
+	state->bg2_avenger_hw = 1;
 }
 
 /***************************************************************************
@@ -124,44 +123,47 @@ VIDEO_START( avengers )
 
 WRITE8_HANDLER( lwings_fgvideoram_w )
 {
-	lwings_fgvideoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap,offset & 0x3ff);
+	lwings_state *state = (lwings_state *)space->machine->driver_data;
+	state->fgvideoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( lwings_bg1videoram_w )
 {
-	lwings_bg1videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg1_tilemap,offset & 0x3ff);
+	lwings_state *state = (lwings_state *)space->machine->driver_data;
+	state->bg1videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg1_tilemap, offset & 0x3ff);
 }
 
 
 WRITE8_HANDLER( lwings_bg1_scrollx_w )
 {
-	static UINT8 scroll[2];
-
-	scroll[offset] = data;
-	tilemap_set_scrollx(bg1_tilemap,0,scroll[0] | (scroll[1] << 8));
+	lwings_state *state = (lwings_state *)space->machine->driver_data;
+	state->scroll_x[offset] = data;
+	tilemap_set_scrollx(state->bg1_tilemap, 0, state->scroll_x[0] | (state->scroll_x[1] << 8));
 }
 
 WRITE8_HANDLER( lwings_bg1_scrolly_w )
 {
-	static UINT8 scroll[2];
-
-	scroll[offset] = data;
-	tilemap_set_scrolly(bg1_tilemap,0,scroll[0] | (scroll[1] << 8));
+	lwings_state *state = (lwings_state *)space->machine->driver_data;
+	state->scroll_y[offset] = data;
+	tilemap_set_scrolly(state->bg1_tilemap, 0, state->scroll_y[0] | (state->scroll_y[1] << 8));
 }
 
 WRITE8_HANDLER( trojan_bg2_scrollx_w )
 {
-	tilemap_set_scrollx(bg2_tilemap,0,data);
+	lwings_state *state = (lwings_state *)space->machine->driver_data;
+	tilemap_set_scrollx(state->bg2_tilemap, 0, data);
 }
 
 WRITE8_HANDLER( trojan_bg2_image_w )
 {
-	if (bg2_image != data)
+	lwings_state *state = (lwings_state *)space->machine->driver_data;
+
+	if (state->bg2_image != data)
 	{
-		bg2_image = data;
-		tilemap_mark_all_tiles_dirty(bg2_tilemap);
+		state->bg2_image = data;
+		tilemap_mark_all_tiles_dirty(state->bg2_tilemap);
 	}
 }
 
@@ -172,10 +174,9 @@ WRITE8_HANDLER( trojan_bg2_image_w )
 
 ***************************************************************************/
 
-INLINE int is_sprite_on(UINT8 *buffered_spriteram, int offs)
+INLINE int is_sprite_on( UINT8 *buffered_spriteram, int offs )
 {
-	int sx,sy;
-
+	int sx, sy;
 
 	sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
 	sy = buffered_spriteram[offs + 2];
@@ -183,22 +184,21 @@ INLINE int is_sprite_on(UINT8 *buffered_spriteram, int offs)
 	return sx || sy;
 }
 
-static void lwings_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void lwings_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
 	int offs;
 
-
-	for (offs = machine->generic.spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		if (is_sprite_on(buffered_spriteram, offs))
 		{
-			int code,color,sx,sy,flipx,flipy;
-
+			int code, color, sx, sy, flipx, flipy;
 
 			sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
 			sy = buffered_spriteram[offs + 2];
-			if (sy > 0xf8) sy-=0x100;
+			if (sy > 0xf8) 
+				sy -= 0x100;
 			code = buffered_spriteram[offs] | (buffered_spriteram[offs + 1] & 0xc0) << 2;
 			color = (buffered_spriteram[offs + 1] & 0x38) >> 3;
 			flipx = buffered_spriteram[offs + 1] & 0x02;
@@ -220,29 +220,29 @@ static void lwings_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 	}
 }
 
-static void trojan_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void trojan_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	lwings_state *state = (lwings_state *)machine->driver_data;
 	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
 	int offs;
 
-
-	for (offs = machine->generic.spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		if (is_sprite_on(buffered_spriteram, offs))
 		{
-			int code,color,sx,sy,flipx,flipy;
-
+			int code, color, sx, sy, flipx, flipy;
 
 			sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
 			sy = buffered_spriteram[offs + 2];
-			if (sy > 0xf8) sy-=0x100;
+			if (sy > 0xf8) 
+				sy -= 0x100;
 			code = buffered_spriteram[offs] |
 				   ((buffered_spriteram[offs + 1] & 0x20) << 4) |
 				   ((buffered_spriteram[offs + 1] & 0x40) << 2) |
 				   ((buffered_spriteram[offs + 1] & 0x80) << 3);
 			color = (buffered_spriteram[offs + 1] & 0x0e) >> 1;
 
-			if( bAvengersHardware )
+			if (state->bg2_avenger_hw)
 			{
 				flipx = 0;										/* Avengers */
 				flipy = ~buffered_spriteram[offs + 1] & 0x10;
@@ -271,19 +271,23 @@ static void trojan_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 
 VIDEO_UPDATE( lwings )
 {
-	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
-	lwings_draw_sprites(screen->machine,bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+	lwings_state *state = (lwings_state *)screen->machine->driver_data;
+
+	tilemap_draw(bitmap, cliprect, state->bg1_tilemap, 0, 0);
+	lwings_draw_sprites(screen->machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;
 }
 
 VIDEO_UPDATE( trojan )
 {
-	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,bg1_tilemap,TILEMAP_DRAW_LAYER1,0);
-	trojan_draw_sprites(screen->machine,bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,bg1_tilemap,TILEMAP_DRAW_LAYER0,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+	lwings_state *state = (lwings_state *)screen->machine->driver_data;
+
+	tilemap_draw(bitmap, cliprect, state->bg2_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg1_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	trojan_draw_sprites(screen->machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, state->bg1_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;
 }
 

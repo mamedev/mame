@@ -51,50 +51,37 @@ Notes:
 #include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
+#include "includes/ladyfrog.h"
 
-VIDEO_START( ladyfrog );
-VIDEO_START( toucheme );
-VIDEO_UPDATE( ladyfrog );
-
-extern UINT8 *ladyfrog_scrlram;
-static int sound_nmi_enable=0,pending_nmi=0;
-static int snd_flag;
-static UINT8 snd_data;
-
-WRITE8_HANDLER( ladyfrog_videoram_w );
-WRITE8_HANDLER( ladyfrog_spriteram_w );
-WRITE8_HANDLER( ladyfrog_palette_w );
-WRITE8_HANDLER( ladyfrog_gfxctrl_w );
-WRITE8_HANDLER( ladyfrog_gfxctrl2_w );
-WRITE8_HANDLER( ladyfrog_scrlram_w );
-
-READ8_HANDLER( ladyfrog_spriteram_r );
-READ8_HANDLER( ladyfrog_palette_r );
-READ8_HANDLER( ladyfrog_scrlram_r );
-READ8_HANDLER( ladyfrog_videoram_r );
 
 static READ8_HANDLER( from_snd_r )
 {
-	snd_flag=0;
-	return snd_data;
+	ladyfrog_state *state = (ladyfrog_state *)space->machine->driver_data;
+	state->snd_flag = 0;
+	return state->snd_data;
 }
 
 static WRITE8_HANDLER( to_main_w )
 {
-	snd_data = data;
-	snd_flag = 2;
-
+	ladyfrog_state *state = (ladyfrog_state *)space->machine->driver_data;
+	state->snd_data = data;
+	state->snd_flag = 2;
 }
 
 static WRITE8_HANDLER( sound_cpu_reset_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
+	ladyfrog_state *state = (ladyfrog_state *)space->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	if (sound_nmi_enable) cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-	else pending_nmi = 1;
+	ladyfrog_state *state = (ladyfrog_state *)machine->driver_data;
+
+	if (state->sound_nmi_enable) 
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	else 
+		state->pending_nmi = 1;
 }
 
 static WRITE8_HANDLER( sound_command_w )
@@ -105,16 +92,19 @@ static WRITE8_HANDLER( sound_command_w )
 
 static WRITE8_HANDLER( nmi_disable_w )
 {
-	sound_nmi_enable = 0;
+	ladyfrog_state *state = (ladyfrog_state *)space->machine->driver_data;
+	state->sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	sound_nmi_enable = 1;
-	if (pending_nmi)
+	ladyfrog_state *state = (ladyfrog_state *)space->machine->driver_data;
+
+	state->sound_nmi_enable = 1;
+	if (state->pending_nmi)
 	{
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-		pending_nmi = 0;
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		state->pending_nmi = 0;
 	}
 }
 
@@ -140,25 +130,26 @@ static const msm5232_interface msm5232_config =
 
 static READ8_HANDLER( snd_flag_r )
 {
-	return snd_flag | 0xfd;
+	ladyfrog_state *state = (ladyfrog_state *)space->machine->driver_data;
+	return state->snd_flag | 0xfd;
 }
 
 static ADDRESS_MAP_START( ladyfrog_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc07f) AM_RAM
-	AM_RANGE(0xc080, 0xc87f) AM_READ(ladyfrog_videoram_r) AM_WRITE(ladyfrog_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xc080, 0xc87f) AM_READWRITE(ladyfrog_videoram_r, ladyfrog_videoram_w) AM_BASE_SIZE_MEMBER(ladyfrog_state, videoram, videoram_size)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(ladyfrog_gfxctrl2_w)
-	AM_RANGE(0xd400, 0xd400) AM_READ(from_snd_r) AM_WRITE(sound_command_w)
+	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
 	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
 	AM_RANGE(0xd403, 0xd403) AM_WRITE(sound_cpu_reset_w)
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW2")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xdc00, 0xdc9f) AM_READ(ladyfrog_spriteram_r) AM_WRITE(ladyfrog_spriteram_w)
-	AM_RANGE(0xdca0, 0xdcbf) AM_READ(ladyfrog_scrlram_r)  AM_WRITE(ladyfrog_scrlram_w) AM_BASE(&ladyfrog_scrlram)
+	AM_RANGE(0xdc00, 0xdc9f) AM_READWRITE(ladyfrog_spriteram_r,ladyfrog_spriteram_w)
+	AM_RANGE(0xdca0, 0xdcbf) AM_READWRITE(ladyfrog_scrlram_r, ladyfrog_scrlram_w) AM_BASE_MEMBER(ladyfrog_state, scrlram)
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM
-	AM_RANGE(0xdd00, 0xdeff) AM_READ(ladyfrog_palette_r)  AM_WRITE(ladyfrog_palette_w)
+	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(ladyfrog_palette_r, ladyfrog_palette_w)
 	AM_RANGE(0xd0d0, 0xd0d0) AM_READNOP /* code jumps to ASCII text "Alfa tecnology"  @ $b7 */
 	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(ladyfrog_gfxctrl_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
@@ -173,7 +164,7 @@ static ADDRESS_MAP_START( ladyfrog_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xca00, 0xca00) AM_WRITENOP
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITENOP
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITENOP
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r) AM_WRITE(to_main_w)
+	AM_RANGE(0xd000, 0xd000) AM_READWRITE(soundlatch_r,to_main_w)
 	AM_RANGE(0xd200, 0xd200) AM_READNOP AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0xd600, 0xd600) AM_WRITENOP
@@ -291,7 +282,39 @@ static GFXDECODE_START( ladyfrog )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )
 GFXDECODE_END
 
+
+static MACHINE_START( ladyfrog )
+{
+	ladyfrog_state *state = (ladyfrog_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->tilebank);
+	state_save_register_global(machine, state->palette_bank);
+	state_save_register_global(machine, state->sound_nmi_enable);
+	state_save_register_global(machine, state->pending_nmi);
+	state_save_register_global(machine, state->snd_flag);
+	state_save_register_global(machine, state->snd_data);
+}
+
+static MACHINE_RESET( ladyfrog )
+{
+	ladyfrog_state *state = (ladyfrog_state *)machine->driver_data;
+
+	state->tilebank = 0;
+	state->palette_bank = 0;
+	state->sound_nmi_enable = 0;
+	state->pending_nmi = 0;
+	state->snd_flag = 0;
+	state->snd_data = 0;
+}
+
 static MACHINE_DRIVER_START( ladyfrog )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ladyfrog_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(ladyfrog_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -300,17 +323,18 @@ static MACHINE_DRIVER_START( ladyfrog )
 	MDRV_CPU_PROGRAM_MAP(ladyfrog_sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
-	/* video hardware */
+	MDRV_MACHINE_START(ladyfrog)
+	MDRV_MACHINE_RESET(ladyfrog)
+
 	MDRV_QUANTUM_TIME(HZ(6000))
 
-
+	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 29*8-1) // black borders in ladyfrog gameplay are correct
-
 
 	MDRV_GFXDECODE(ladyfrog)
 	MDRV_PALETTE_LENGTH(512)
@@ -378,5 +402,7 @@ ROM_START( toucheme )
 	ROM_LOAD( "8.ic10",   0x20000, 0x10000, CRC(fc6808bf) SHA1(f1f1b75a79dfdb500012f9b52c6364f0a13dce2d) )
 ROM_END
 
-GAME( 1990, ladyfrog, 0, ladyfrog, ladyfrog, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", 0)
-GAME( 19??, toucheme, 0, toucheme, toucheme, 0, ORIENTATION_SWAP_XY, "Unknown", "Touche Me", 0) // art style is similar, so it's probably the same manufacturer
+GAME( 1990, ladyfrog, 0, ladyfrog, ladyfrog, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", GAME_SUPPORTS_SAVE )
+
+// toucheme art style is similar to ladyfrog, so it's probably the same manufacturer
+GAME( 19??, toucheme, 0, toucheme, toucheme, 0, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me", GAME_SUPPORTS_SAVE ) 

@@ -28,16 +28,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 #include "driver.h"
-
-/* Variables that driver has access to: */
-
-UINT8 *yunsung8_videoram_0, *yunsung8_videoram_1;
-int yunsung8_layers_ctrl;
-
-/* Variables only used here: */
-
-static tilemap *tilemap_0, *tilemap_1;
-static int yunsung8_videobank;
+#include "includes/yunsung8.h"
 
 
 /***************************************************************************
@@ -48,61 +39,79 @@ static int yunsung8_videobank;
 
 WRITE8_HANDLER( yunsung8_videobank_w )
 {
-	yunsung8_videobank = data;
+	yunsung8_state *state = (yunsung8_state *)space->machine->driver_data;
+	state->videobank = data;
 }
 
 
 READ8_HANDLER( yunsung8_videoram_r )
 {
+	yunsung8_state *state = (yunsung8_state *)space->machine->driver_data;
 	int bank;
 
 	/*  Bit 1 of the bankswitching register contols the c000-c7ff
         area (Palette). Bit 0 controls the c800-dfff area (Tiles) */
 
-	if (offset < 0x0800)	bank = yunsung8_videobank & 2;
-	else					bank = yunsung8_videobank & 1;
+	if (offset < 0x0800)	
+		bank = state->videobank & 2;
+	else					
+		bank = state->videobank & 1;
 
-	if (bank)	return yunsung8_videoram_0[offset];
-	else		return yunsung8_videoram_1[offset];
+	if (bank)	
+		return state->videoram_0[offset];
+	else		
+		return state->videoram_1[offset];
 }
 
 
 WRITE8_HANDLER( yunsung8_videoram_w )
 {
+	yunsung8_state *state = (yunsung8_state *)space->machine->driver_data;
+
 	if (offset < 0x0800)		// c000-c7ff    Banked Palette RAM
 	{
-		int bank = yunsung8_videobank & 2;
+		int bank = state->videobank & 2;
 		UINT8 *RAM;
 		int color;
 
-		if (bank)	RAM = yunsung8_videoram_0;
-		else		RAM = yunsung8_videoram_1;
+		if (bank)	
+			RAM = state->videoram_0;
+		else		
+			RAM = state->videoram_1;
 
 		RAM[offset] = data;
 		color = RAM[offset & ~1] | (RAM[offset | 1] << 8);
 
 		/* BBBBBGGGGGRRRRRx */
-		palette_set_color_rgb(space->machine, offset/2 + (bank ? 0x400:0), pal5bit(color >> 0), pal5bit(color >> 5), pal5bit(color >> 10));
+		palette_set_color_rgb(space->machine, offset / 2 + (bank ? 0x400 : 0), pal5bit(color >> 0), pal5bit(color >> 5), pal5bit(color >> 10));
 	}
 	else
 	{
 		int tile;
-		int bank = yunsung8_videobank & 1;
+		int bank = state->videobank & 1;
 
-		if (offset < 0x1000)	tile = (offset-0x0800);		// c800-cfff: Banked Color RAM
-		else				 	tile = (offset-0x1000)/2;	// d000-dfff: Banked Tiles RAM
+		if (offset < 0x1000)	
+			tile = (offset - 0x0800);		// c800-cfff: Banked Color RAM
+		else				 	
+			tile = (offset - 0x1000) / 2;	// d000-dfff: Banked Tiles RAM
 
-		if (bank)	{	yunsung8_videoram_0[offset] = data;
-						tilemap_mark_tile_dirty(tilemap_0, tile);	}
-		else		{	yunsung8_videoram_1[offset] = data;
-						tilemap_mark_tile_dirty(tilemap_1, tile);	}
+		if (bank)	
+		{
+			state->videoram_0[offset] = data;
+			tilemap_mark_tile_dirty(state->tilemap_0, tile);
+		}
+		else		
+		{
+			state->videoram_1[offset] = data;
+			tilemap_mark_tile_dirty(state->tilemap_1, tile);
+		}
 	}
 }
 
 
 WRITE8_HANDLER( yunsung8_flipscreen_w )
 {
-	tilemap_set_flip_all(space->machine, (data & 1) ? (TILEMAP_FLIPX|TILEMAP_FLIPY) : 0);
+	tilemap_set_flip_all(space->machine, (data & 1) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
 
 
@@ -127,8 +136,9 @@ WRITE8_HANDLER( yunsung8_flipscreen_w )
 
 static TILE_GET_INFO( get_tile_info_0 )
 {
-	int code  =  yunsung8_videoram_0[0x1000+tile_index * 2 + 0] + yunsung8_videoram_0[0x1000+tile_index * 2 + 1] * 256;
-	int color =  yunsung8_videoram_0[0x0800+ tile_index] & 0x07;
+	yunsung8_state *state = (yunsung8_state *)machine->driver_data;
+	int code  =  state->videoram_0[0x1000 + tile_index * 2 + 0] + state->videoram_0[0x1000 + tile_index * 2 + 1] * 256;
+	int color =  state->videoram_0[0x0800 + tile_index] & 0x07;
 	SET_TILE_INFO(
 			0,
 			code,
@@ -143,8 +153,9 @@ static TILE_GET_INFO( get_tile_info_0 )
 
 static TILE_GET_INFO( get_tile_info_1 )
 {
-	int code  =  yunsung8_videoram_1[0x1000+ tile_index * 2 + 0] + yunsung8_videoram_1[0x1000+tile_index * 2 + 1] * 256;
-	int color =  yunsung8_videoram_1[0x0800+ tile_index] & 0x3f;
+	yunsung8_state *state = (yunsung8_state *)machine->driver_data;
+	int code  =  state->videoram_1[0x1000 + tile_index * 2 + 0] + state->videoram_1[0x1000 + tile_index * 2 + 1] * 256;
+	int color =  state->videoram_1[0x0800 + tile_index] & 0x3f;
 	SET_TILE_INFO(
 			1,
 			code,
@@ -165,13 +176,12 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 VIDEO_START( yunsung8 )
 {
-	tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
-								 8,8, DIM_NX_0, DIM_NY_0 );
+	yunsung8_state *state = (yunsung8_state *)machine->driver_data;
 
-	tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
-								 8,8, DIM_NX_1, DIM_NY_1 );
+	state->tilemap_0 = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 8, 8, DIM_NX_0, DIM_NY_0 );
+	state->tilemap_1 = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 8, 8, DIM_NX_1, DIM_NY_1 );
 
-		tilemap_set_transparent_pen(tilemap_1,0);
+	tilemap_set_transparent_pen(state->tilemap_1, 0);
 }
 
 
@@ -186,7 +196,8 @@ VIDEO_START( yunsung8 )
 
 VIDEO_UPDATE( yunsung8 )
 {
-	int layers_ctrl = (~yunsung8_layers_ctrl) >> 4;
+	yunsung8_state *state = (yunsung8_state *)screen->machine->driver_data;
+	int layers_ctrl = (~state->layers_ctrl) >> 4;
 
 #ifdef MAME_DEBUG
 if (input_code_pressed(screen->machine, KEYCODE_Z))
@@ -198,9 +209,13 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 }
 #endif
 
-	if (layers_ctrl&1)	tilemap_draw(bitmap,cliprect, tilemap_0, 0,0);
-	else				bitmap_fill(bitmap,cliprect,0);
+	if (layers_ctrl & 1)	
+		tilemap_draw(bitmap, cliprect, state->tilemap_0, 0, 0);
+	else			
+		bitmap_fill(bitmap, cliprect, 0);
 
-	if (layers_ctrl&2)	tilemap_draw(bitmap,cliprect, tilemap_1, 0,0);
+	if (layers_ctrl & 2)
+		tilemap_draw(bitmap, cliprect, state->tilemap_1, 0, 0);
+
 	return 0;
 }

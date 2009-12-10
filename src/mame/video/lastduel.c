@@ -7,13 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-
-UINT16 *lastduel_vram,*lastduel_scroll2,*lastduel_scroll1;
-
-static tilemap *bg_tilemap,*fg_tilemap,*tx_tilemap;
-
-static int sprite_flipy_mask,sprite_pri_mask,tilemap_priority;
-
+#include "includes/lastduel.h"
 
 
 /***************************************************************************
@@ -24,8 +18,9 @@ static int sprite_flipy_mask,sprite_pri_mask,tilemap_priority;
 
 static TILE_GET_INFO( ld_get_bg_tile_info )
 {
-	int tile = lastduel_scroll2[2*tile_index] & 0x1fff;
-	int color = lastduel_scroll2[2*tile_index+1];
+	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	int tile = state->scroll2[2 * tile_index] & 0x1fff;
+	int color = state->scroll2[2 * tile_index + 1];
 	SET_TILE_INFO(
 			2,
 			tile,color & 0xf,
@@ -34,8 +29,9 @@ static TILE_GET_INFO( ld_get_bg_tile_info )
 
 static TILE_GET_INFO( ld_get_fg_tile_info )
 {
-	int tile = lastduel_scroll1[2*tile_index] & 0x1fff;
-	int color = lastduel_scroll1[2*tile_index+1];
+	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	int tile = state->scroll1[2 * tile_index] & 0x1fff;
+	int color = state->scroll1[2 * tile_index + 1];
 	SET_TILE_INFO(
 			3,
 			tile,
@@ -46,8 +42,9 @@ static TILE_GET_INFO( ld_get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int tile = lastduel_scroll2[tile_index] & 0x1fff;
-	int color = lastduel_scroll2[tile_index+0x0800];
+	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	int tile = state->scroll2[tile_index] & 0x1fff;
+	int color = state->scroll2[tile_index + 0x0800];
 	SET_TILE_INFO(
 			2,
 			tile,
@@ -57,8 +54,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int tile = lastduel_scroll1[tile_index] & 0x1fff;
-	int color = lastduel_scroll1[tile_index+0x0800];
+	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	int tile = state->scroll1[tile_index] & 0x1fff;
+	int color = state->scroll1[tile_index + 0x0800];
 	SET_TILE_INFO(
 			3,
 			tile,
@@ -69,7 +67,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_fix_info )
 {
-	int tile = lastduel_vram[tile_index];
+	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	int tile = state->vram[tile_index];
 	SET_TILE_INFO(
 			1,
 			tile & 0x7ff,
@@ -87,33 +86,34 @@ static TILE_GET_INFO( get_fix_info )
 
 VIDEO_START( lastduel )
 {
-	bg_tilemap = tilemap_create(machine, ld_get_bg_tile_info,tilemap_scan_rows,16,16,64,64);
-	fg_tilemap = tilemap_create(machine, ld_get_fg_tile_info,tilemap_scan_rows,16,16,64,64);
-	tx_tilemap = tilemap_create(machine, get_fix_info,tilemap_scan_rows,8,8,64,32);
+	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, ld_get_bg_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
+	state->fg_tilemap = tilemap_create(machine, ld_get_fg_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
+	state->tx_tilemap = tilemap_create(machine, get_fix_info, tilemap_scan_rows, 8, 8, 64, 32);
 
-	tilemap_set_transmask(fg_tilemap,0,0xffff,0x0001);
-	tilemap_set_transmask(fg_tilemap,1,0xf07f,0x0f81);
-	tilemap_set_transparent_pen(tx_tilemap,3);
+	tilemap_set_transmask(state->fg_tilemap, 0, 0xffff, 0x0001);
+	tilemap_set_transmask(state->fg_tilemap, 1, 0xf07f, 0x0f81);
+	tilemap_set_transparent_pen(state->tx_tilemap, 3);
 
-	sprite_flipy_mask = 0x40;
-	sprite_pri_mask = 0x00;
-	tilemap_priority = 0;
+	state->sprite_flipy_mask = 0x40;
+	state->sprite_pri_mask = 0x00;
+	state->tilemap_priority = 0;
 }
 
 VIDEO_START( madgear )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,64,32);
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,16,16,64,32);
-	tx_tilemap = tilemap_create(machine, get_fix_info,tilemap_scan_rows,8,8,64,32);
+	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,64,32);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,16,16,64,32);
+	state->tx_tilemap = tilemap_create(machine, get_fix_info,tilemap_scan_rows,8,8,64,32);
 
-	tilemap_set_transmask(fg_tilemap,0,0xffff,0x8000);
-	tilemap_set_transmask(fg_tilemap,1,0x80ff,0xff00);
-	tilemap_set_transparent_pen(tx_tilemap,3);
-	tilemap_set_transparent_pen(bg_tilemap,15);
+	tilemap_set_transmask(state->fg_tilemap, 0, 0xffff, 0x8000);
+	tilemap_set_transmask(state->fg_tilemap, 1, 0x80ff, 0xff00);
+	tilemap_set_transparent_pen(state->tx_tilemap, 3);
+	tilemap_set_transparent_pen(state->bg_tilemap, 15);
 
-	sprite_flipy_mask = 0x80;
-	sprite_pri_mask = 0x10;
-	tilemap_priority = 0;
+	state->sprite_flipy_mask = 0x80;
+	state->sprite_pri_mask = 0x10;
 }
 
 
@@ -130,25 +130,25 @@ WRITE16_HANDLER( lastduel_flip_w )
 	{
 		flip_screen_set(space->machine, data & 0x01);
 
-		coin_lockout_w(space->machine, 0,~data & 0x10);
-		coin_lockout_w(space->machine, 1,~data & 0x20);
-		coin_counter_w(space->machine, 0,data & 0x40);
-		coin_counter_w(space->machine, 1,data & 0x80);
+		coin_lockout_w(space->machine, 0, ~data & 0x10);
+		coin_lockout_w(space->machine, 1, ~data & 0x20);
+		coin_counter_w(space->machine, 0, data & 0x40);
+		coin_counter_w(space->machine, 1, data & 0x80);
 	}
 }
 
 WRITE16_HANDLER( lastduel_scroll_w )
 {
-	static UINT16 scroll[8];
+	lastduel_state *state = (lastduel_state *)space->machine->driver_data;
 
-	data = COMBINE_DATA(&scroll[offset]);
+	data = COMBINE_DATA(&state->scroll[offset]);
 	switch (offset)
 	{
-		case 0: tilemap_set_scrolly(fg_tilemap,0,data); break;
-		case 1: tilemap_set_scrollx(fg_tilemap,0,data); break;
-		case 2: tilemap_set_scrolly(bg_tilemap,0,data); break;
-		case 3: tilemap_set_scrollx(bg_tilemap,0,data); break;
-		case 7: tilemap_priority=data; break;
+		case 0: tilemap_set_scrolly(state->fg_tilemap, 0, data); break;
+		case 1: tilemap_set_scrollx(state->fg_tilemap, 0, data); break;
+		case 2: tilemap_set_scrolly(state->bg_tilemap, 0, data); break;
+		case 3: tilemap_set_scrollx(state->bg_tilemap, 0, data); break;
+		case 7: state->tilemap_priority = data; break;
 		default:
 			logerror("Unmapped video write %d %04x\n", offset, data);
 			break;
@@ -157,45 +157,57 @@ WRITE16_HANDLER( lastduel_scroll_w )
 
 WRITE16_HANDLER( lastduel_scroll1_w )
 {
-	COMBINE_DATA(&lastduel_scroll1[offset]);
-	tilemap_mark_tile_dirty(fg_tilemap,offset/2);
+	lastduel_state *state = (lastduel_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->scroll1[offset]);
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset / 2);
 }
 
 WRITE16_HANDLER( lastduel_scroll2_w )
 {
-	COMBINE_DATA(&lastduel_scroll2[offset]);
-	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
+	lastduel_state *state = (lastduel_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->scroll2[offset]);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 WRITE16_HANDLER( lastduel_vram_w )
 {
-	COMBINE_DATA(&lastduel_vram[offset]);
-	tilemap_mark_tile_dirty(tx_tilemap,offset);
+	lastduel_state *state = (lastduel_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->vram[offset]);
+	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
 }
 
 WRITE16_HANDLER( madgear_scroll1_w )
 {
-	COMBINE_DATA(&lastduel_scroll1[offset]);
-	tilemap_mark_tile_dirty(fg_tilemap,offset & 0x7ff);
+	lastduel_state *state = (lastduel_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->scroll1[offset]);
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset & 0x7ff);
 }
 
 WRITE16_HANDLER( madgear_scroll2_w )
 {
-	COMBINE_DATA(&lastduel_scroll2[offset]);
-	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
+	lastduel_state *state = (lastduel_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->scroll2[offset]);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset & 0x7ff);
 }
 
 WRITE16_HANDLER( lastduel_palette_word_w )
 {
+	lastduel_state *state = (lastduel_state *)space->machine->driver_data;
+
 	int red, green, blue, bright;
-	data = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	data = COMBINE_DATA(&state->paletteram[offset]);
 
 	// Brightness parameter interpreted same way as CPS1
-	bright = 0x10 + (data&0x0f);
+	bright = 0x10 + (data & 0x0f);
 
-	red   = ((data>>12)&0x0f) * bright * 0x11 / 0x1f;
-	green = ((data>>8 )&0x0f) * bright * 0x11 / 0x1f;
-	blue  = ((data>>4 )&0x0f) * bright * 0x11 / 0x1f;
+	red   = ((data >> 12) & 0x0f) * bright * 0x11 / 0x1f;
+	green = ((data >> 8)  & 0x0f) * bright * 0x11 / 0x1f;
+	blue  = ((data >> 4)  & 0x0f) * bright * 0x11 / 0x1f;
 
 	palette_set_color (space->machine, offset, MAKE_RGB(red, green, blue));
 }
@@ -206,33 +218,38 @@ WRITE16_HANDLER( lastduel_palette_word_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
+static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
+	lastduel_state *state = (lastduel_state *)machine->driver_data;
+
 	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	int offs;
 
-	if (!sprite_pri_mask)
-		if (pri == 1) return;	/* only low priority sprites in lastduel */
+	if (!state->sprite_pri_mask)
+		if (pri == 1) 
+			return;	/* only low priority sprites in lastduel */
 
-	for(offs=0x400-4;offs>=0;offs-=4)
+	for (offs = 0x400 - 4; offs >= 0; offs -= 4)
 	{
-		int attr,sy,sx,flipx,flipy,code,color;
+		int attr, sy, sx, flipx, flipy, code, color;
 
-		attr = buffered_spriteram16[offs+1];
-		if (sprite_pri_mask)	/* only madgear seems to have this */
+		attr = buffered_spriteram16[offs + 1];
+		if (state->sprite_pri_mask)	/* only madgear seems to have this */
 		{
-			if (pri==1 && (attr & sprite_pri_mask)) continue;
-			if (pri==0 && !(attr & sprite_pri_mask)) continue;
+			if (pri == 1 && (attr & state->sprite_pri_mask)) 
+				continue;
+			if (pri == 0 && !(attr & state->sprite_pri_mask)) 
+				continue;
 		}
 
 		code = buffered_spriteram16[offs];
-		sx = buffered_spriteram16[offs+3] & 0x1ff;
-		sy = buffered_spriteram16[offs+2] & 0x1ff;
+		sx = buffered_spriteram16[offs + 3] & 0x1ff;
+		sy = buffered_spriteram16[offs + 2] & 0x1ff;
 		if (sy > 0x100)
 			sy -= 0x200;
 
 		flipx = attr & 0x20;
-		flipy = attr & sprite_flipy_mask;	/* 0x40 for lastduel, 0x80 for madgear */
+		flipy = attr & state->sprite_flipy_mask;	/* 0x40 for lastduel, 0x80 for madgear */
 		color = attr & 0x0f;
 
 		if (flip_screen_get(machine))
@@ -254,34 +271,38 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( lastduel )
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER1,0);
-	draw_sprites(screen->machine,bitmap,cliprect,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER0,0);
-	draw_sprites(screen->machine,bitmap,cliprect,1);
-	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
+	lastduel_state *state = (lastduel_state *)screen->machine->driver_data;
+
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 1);
+	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 	return 0;
 }
 
 VIDEO_UPDATE( madgear )
 {
-	if (tilemap_priority)
+	lastduel_state *state = (lastduel_state *)screen->machine->driver_data;
+
+	if (state->tilemap_priority)
 	{
-		tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER1 | TILEMAP_DRAW_OPAQUE,0);
-		draw_sprites(screen->machine,bitmap,cliprect,0);
-		tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER0,0);
-		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-		draw_sprites(screen->machine,bitmap,cliprect,1);
+		tilemap_draw(bitmap, cliprect, state->fg_tilemap, TILEMAP_DRAW_LAYER1 | TILEMAP_DRAW_OPAQUE, 0);
+		draw_sprites(screen->machine, bitmap, cliprect, 0);
+		tilemap_draw(bitmap, cliprect, state->fg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+		draw_sprites(screen->machine, bitmap, cliprect, 1);
 	}
 	else
 	{
-		tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
-		tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER1,0);
-		draw_sprites(screen->machine,bitmap,cliprect,0);
-		tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER0,0);
-		draw_sprites(screen->machine,bitmap,cliprect,1);
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+		tilemap_draw(bitmap, cliprect, state->fg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+		draw_sprites(screen->machine, bitmap, cliprect, 0);
+		tilemap_draw(bitmap, cliprect, state->fg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+		draw_sprites(screen->machine, bitmap, cliprect, 1);
 	}
-	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
+	tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 	return 0;
 }
 
@@ -292,5 +313,5 @@ VIDEO_EOF( lastduel )
 	/* Spriteram is always 1 frame ahead, suggesting buffering.  I can't find
         a register to control this so I assume it happens automatically
         every frame at the end of vblank */
-	buffer_spriteram16_w(space,0,0,0xffff);
+	buffer_spriteram16_w(space, 0, 0, 0xffff);
 }

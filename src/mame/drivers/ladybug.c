@@ -61,36 +61,78 @@ TODO:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
+#include "includes/ladybug.h"
 
 
-extern UINT8 *sraider_grid_data;
+/* Sound comm between CPU's */
+static READ8_HANDLER( sraider_sound_low_r )
+{
+	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	return state->sound_low;
+}
 
-WRITE8_HANDLER( ladybug_videoram_w );
-WRITE8_HANDLER( ladybug_colorram_w );
-WRITE8_HANDLER( ladybug_flipscreen_w );
+static READ8_HANDLER( sraider_sound_high_r )
+{
+	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	return state->sound_high;
+}
 
-PALETTE_INIT( ladybug );
-VIDEO_START( ladybug );
-VIDEO_UPDATE( ladybug );
+static WRITE8_HANDLER( sraider_sound_low_w )
+{
+	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	state->sound_low = data;
+}
 
-PALETTE_INIT( sraider );
-VIDEO_START( sraider );
-VIDEO_UPDATE( sraider );
-VIDEO_EOF( sraider );
+static WRITE8_HANDLER( sraider_sound_high_w )
+{
+	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	state->sound_high = data;
+}
 
-READ8_HANDLER( sraider_8005_r );
-WRITE8_HANDLER( sraider_sound_low_w );
-WRITE8_HANDLER( sraider_sound_high_w );
-READ8_HANDLER( sraider_sound_low_r );
-READ8_HANDLER( sraider_sound_high_r );
-WRITE8_HANDLER( sraider_io_w );
-WRITE8_HANDLER( sraider_misc_w );
+/* Protection? */
+static READ8_HANDLER( sraider_8005_r )
+{
+	/* This must return X011111X or cpu #1 will hang */
+	/* see code at rst $10 */
+	return 0x3e;
+}
 
+/* Unknown IO */
+static WRITE8_HANDLER( sraider_misc_w )
+{
+	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+
+	switch(offset)
+	{
+		/* These 8 bits are stored in the latch at A7 */
+		case 0x00:
+		case 0x01:
+		case 0x02:
+		case 0x03:
+		case 0x04:
+		case 0x05:
+		case 0x06:
+		case 0x07:
+			state->weird_value[offset & 7] = data & 1;
+			break;
+		/* These 6 bits are stored in the latch at N7 */
+		case 0x08:
+			state->sraider_0x30 = data&0x3f;
+			break;
+		/* These 6 bits are stored in the latch at N8 */
+		case 0x10:
+			state->sraider_0x38 = data&0x3f;
+			break;
+		default:
+			mame_printf_debug("(%04X) write to %02X\n", cpu_get_pc(space->cpu), offset);
+			break;
+	}
+}
 
 static ADDRESS_MAP_START( ladybug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(ladybug_state, spriteram, spriteram_size)
 	AM_RANGE(0x8000, 0x8fff) AM_READNOP
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN0")
 	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("IN1")
@@ -99,8 +141,8 @@ static ADDRESS_MAP_START( ladybug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(ladybug_flipscreen_w)
 	AM_RANGE(0xb000, 0xbfff) AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(ladybug_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(ladybug_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(ladybug_videoram_w) AM_BASE_MEMBER(ladybug_state, videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(ladybug_colorram_w) AM_BASE_MEMBER(ladybug_state, colorram)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
@@ -108,7 +150,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sraider_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(ladybug_state, spriteram, spriteram_size)
 	AM_RANGE(0x8005, 0x8005) AM_READ(sraider_8005_r)  // protection check?
 	AM_RANGE(0x8006, 0x8006) AM_WRITE(sraider_sound_low_w)
 	AM_RANGE(0x8007, 0x8007) AM_WRITE(sraider_sound_high_w)
@@ -116,8 +158,8 @@ static ADDRESS_MAP_START( sraider_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("IN1")
 	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW0")
 	AM_RANGE(0x9003, 0x9003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(ladybug_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_WRITE(ladybug_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(ladybug_videoram_w) AM_BASE_MEMBER(ladybug_state, videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_WRITE(ladybug_colorram_w) AM_BASE_MEMBER(ladybug_state, colorram)
 	AM_RANGE(0xe000, 0xe000) AM_WRITENOP  //unknown 0x10 when in attract, 0x20 when coined/playing
 ADDRESS_MAP_END
 
@@ -128,7 +170,7 @@ static ADDRESS_MAP_START( sraider_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_READ(sraider_sound_low_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(sraider_sound_high_r)
 	AM_RANGE(0xc000, 0xc000) AM_READNOP //some kind of sync
-	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_BASE(&sraider_grid_data)
+	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_BASE_MEMBER(ladybug_state, grid_data)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(sraider_io_w)
 ADDRESS_MAP_END
 
@@ -147,15 +189,19 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( coin1_inserted )
 {
+	ladybug_state *state = (ladybug_state *)field->port->machine->driver_data;
+
 	/* left coin insertion causes an NMI */
-	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_CHANGED( coin2_inserted )
 {
+	ladybug_state *state = (ladybug_state *)field->port->machine->driver_data;
+
 	/* right coin insertion causes an IRQ */
 	if (newval)
-		cputag_set_input_line(field->port->machine, "maincpu", 0, HOLD_LINE);
+		cpu_set_input_line(state->maincpu, 0, HOLD_LINE);
 }
 
 
@@ -676,11 +722,67 @@ static GFXDECODE_START( sraider )
 GFXDECODE_END
 
 
+static MACHINE_START( ladybug )
+{
+	ladybug_state *state = (ladybug_state *)machine->driver_data;
+	state->maincpu = devtag_get_device(machine, "maincpu");
+}
+
+static MACHINE_START( sraider )
+{
+	ladybug_state *state = (ladybug_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+
+	state_save_register_global(machine, state->grid_color);
+	state_save_register_global(machine, state->sound_low);
+	state_save_register_global(machine, state->sound_high);
+	state_save_register_global(machine, state->sraider_0x30);
+	state_save_register_global(machine, state->sraider_0x38);
+	state_save_register_global_array(machine, state->weird_value);
+
+	/* for stars */
+	state_save_register_global(machine, state->star_speed);
+	state_save_register_global(machine, state->stars_enable);
+	state_save_register_global(machine, state->stars_speed);
+	state_save_register_global(machine, state->stars_state);
+	state_save_register_global(machine, state->stars_offset);
+	state_save_register_global(machine, state->stars_count);
+}
+
+static MACHINE_RESET( sraider )
+{
+	ladybug_state *state = (ladybug_state *)machine->driver_data;
+	int i;
+
+	state->grid_color = 0;
+	state->sound_low = 0;
+	state->sound_high = 0;
+	state->sraider_0x30 = 0;
+	state->sraider_0x38 = 0;
+
+	/* for stars */
+	state->star_speed = 0;
+	state->stars_enable = 0;
+	state->stars_speed = 0;
+	state->stars_state = 0;
+	state->stars_offset = 0;
+	state->stars_count = 0;
+
+	for (i = 0; i < 8; i++)
+		state->weird_value[i] = 0;
+}
+
 static MACHINE_DRIVER_START( ladybug )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ladybug_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(ladybug_map)
+
+	MDRV_MACHINE_START(ladybug)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -710,6 +812,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sraider )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(ladybug_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sraider_cpu1_map)
@@ -719,6 +824,9 @@ static MACHINE_DRIVER_START( sraider )
 	MDRV_CPU_PROGRAM_MAP(sraider_cpu2_map)
 	MDRV_CPU_IO_MAP(sraider_cpu2_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_MACHINE_START(sraider)
+	MDRV_MACHINE_RESET(sraider)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -972,11 +1080,11 @@ static DRIVER_INIT( dorodon )
 }
 
 
-GAME( 1981, cavenger, 0,       ladybug, cavenger, 0,       ROT0,   "Universal", "Cosmic Avenger", 0 )
-GAME( 1981, ladybug,  0,       ladybug, ladybug,  0,       ROT270, "Universal", "Lady Bug", 0 )
-GAME( 1981, ladybugb, ladybug, ladybug, ladybug,  0,       ROT270, "bootleg",   "Lady Bug (bootleg set 1)", 0 )
-GAME( 1981, ladybgb2, ladybug, ladybug, ladybug,  0,       ROT270, "bootleg",   "Lady Bug (bootleg set 2)", 0 )
-GAME( 1982, dorodon,  0,       ladybug, dorodon,  dorodon, ROT270, "Falcon",    "Dorodon (set 1)", 0 )
-GAME( 1982, dorodon2, dorodon, ladybug, dorodon,  dorodon, ROT270, "Falcon",    "Dorodon (set 2)", 0 )
-GAME( 1982, snapjack, 0,       ladybug, snapjack, 0,       ROT0,   "Universal", "Snap Jack", 0 )
-GAME( 1982, sraider,  0,       sraider, sraider,  0,       ROT270, "Universal", "Space Raider", 0 )
+GAME( 1981, cavenger, 0,       ladybug, cavenger, 0,       ROT0,   "Universal", "Cosmic Avenger", GAME_SUPPORTS_SAVE )
+GAME( 1981, ladybug,  0,       ladybug, ladybug,  0,       ROT270, "Universal", "Lady Bug", GAME_SUPPORTS_SAVE )
+GAME( 1981, ladybugb, ladybug, ladybug, ladybug,  0,       ROT270, "bootleg",   "Lady Bug (bootleg set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, ladybgb2, ladybug, ladybug, ladybug,  0,       ROT270, "bootleg",   "Lady Bug (bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, dorodon,  0,       ladybug, dorodon,  dorodon, ROT270, "Falcon",    "Dorodon (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, dorodon2, dorodon, ladybug, dorodon,  dorodon, ROT270, "Falcon",    "Dorodon (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, snapjack, 0,       ladybug, snapjack, 0,       ROT0,   "Universal", "Snap Jack", GAME_SUPPORTS_SAVE )
+GAME( 1982, sraider,  0,       sraider, sraider,  0,       ROT270, "Universal", "Space Raider", GAME_SUPPORTS_SAVE )

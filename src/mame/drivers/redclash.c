@@ -22,35 +22,20 @@ TODO:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-
-
-extern WRITE8_HANDLER( redclash_videoram_w );
-extern WRITE8_HANDLER( redclash_gfxbank_w );
-extern WRITE8_HANDLER( redclash_flipscreen_w );
-
-extern WRITE8_HANDLER( redclash_star0_w );
-extern WRITE8_HANDLER( redclash_star1_w );
-extern WRITE8_HANDLER( redclash_star2_w );
-extern WRITE8_HANDLER( redclash_star_reset_w );
-
-extern PALETTE_INIT( redclash );
-extern VIDEO_START( redclash );
-extern VIDEO_UPDATE( redclash );
-extern VIDEO_EOF( redclash );
-
+#include "includes/ladybug.h"
 
 
 static WRITE8_HANDLER( irqack_w )
 {
-	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
+	ladybug_state *state = (ladybug_state *)space->machine->driver_data;
+	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
-
 
 static ADDRESS_MAP_START( zerohour_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(redclash_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_BASE_SIZE_MEMBER(ladybug_state, spriteram, spriteram_size)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(redclash_videoram_w) AM_BASE_MEMBER(ladybug_state, videoram)
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")	/* IN0 */
 	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")	/* IN1 */
 	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")	/* DSW0 */
@@ -69,7 +54,7 @@ static ADDRESS_MAP_START( redclash_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 //  AM_RANGE(0x3000, 0x3000) AM_WRITENOP
 //  AM_RANGE(0x3800, 0x3800) AM_WRITENOP
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(redclash_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(redclash_videoram_w) AM_BASE_MEMBER(ladybug_state, videoram)
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")	/* IN0 */
 	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")	/* IN1 */
 	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")	/* DSW0 */
@@ -81,7 +66,7 @@ static ADDRESS_MAP_START( redclash_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5806, 0x5806) AM_WRITE(redclash_star2_w)
 	AM_RANGE(0x5807, 0x5807) AM_WRITE(redclash_flipscreen_w)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE_SIZE_MEMBER(ladybug_state, spriteram, spriteram_size)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(redclash_star_reset_w)
 	AM_RANGE(0x7800, 0x7800) AM_WRITE(irqack_w)
 ADDRESS_MAP_END
@@ -93,18 +78,22 @@ ADDRESS_MAP_END
 */
 static INPUT_CHANGED( left_coin_inserted )
 {
+	ladybug_state *state = (ladybug_state *)field->port->machine->driver_data;
+
 	if(newval)
-		cputag_set_input_line(field->port->machine, "maincpu", 0, ASSERT_LINE);
+		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
 }
 
 static INPUT_CHANGED( right_coin_inserted )
 {
+	ladybug_state *state = (ladybug_state *)field->port->machine->driver_data;
+
 	if(newval)
-		cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INPUT_PORTS_START( redclash )
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -114,7 +103,7 @@ static INPUT_PORTS_START( redclash )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -126,7 +115,7 @@ static INPUT_PORTS_START( redclash )
 	/* them this way is enough to get the game running. */
 	PORT_BIT( 0xc0, 0x40, IPT_VBLANK )
 
-	PORT_START("DSW1")	/* DSW0 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )
 	PORT_DIPSETTING(    0x03, "Easy?" )
 	PORT_DIPSETTING(    0x02, "Medium?" )
@@ -150,7 +139,7 @@ static INPUT_PORTS_START( redclash )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "7" )
 
-	PORT_START("DSW2")	/* DSW1 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 5C_1C ) )
@@ -186,7 +175,7 @@ static INPUT_PORTS_START( redclash )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_8C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_9C ) )
 
-	PORT_START("FAKE")	/* FAKE */
+	PORT_START("FAKE")
 	/* The coin slots are not memory mapped. Coin Left causes a NMI, */
 	/* Coin Right an IRQ. This fake input port is used by the interrupt */
 	/* handler to be notified of coin insertions. We use IMPULSE to */
@@ -197,7 +186,7 @@ static INPUT_PORTS_START( redclash )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( zerohour )
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -207,7 +196,7 @@ static INPUT_PORTS_START( zerohour )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -219,7 +208,7 @@ static INPUT_PORTS_START( zerohour )
 	/* them this way is enough to get the game running. */
 	PORT_BIT( 0xc0, 0x40, IPT_VBLANK )
 
-	PORT_START("DSW1")	/* DSW0 */
+	PORT_START("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" ) 	/* Switches 6-8 are not used */
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:6" )
@@ -237,7 +226,7 @@ static INPUT_PORTS_START( zerohour )
 	PORT_DIPSETTING(    0x80, "4" )
 	PORT_DIPSETTING(    0x40, "5" )
 
-	PORT_START("DSW2")	/* DSW1 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:4,3,2,1")
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
@@ -261,7 +250,7 @@ static INPUT_PORTS_START( zerohour )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 
-	PORT_START("FAKE")	/* FAKE */
+	PORT_START("FAKE")
 	/* The coin slots are not memory mapped. Coin Left causes a NMI, */
 	/* Coin Right an IRQ. This fake input port is used by the interrupt */
 	/* handler to be notified of coin insertions. We use IMPULSE to */
@@ -337,11 +326,45 @@ GFXDECODE_END
 
 
 
+static MACHINE_START( redclash )
+{
+	ladybug_state *state = (ladybug_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+
+	state_save_register_global(machine, state->star_speed);
+	state_save_register_global(machine, state->gfxbank);
+	state_save_register_global(machine, state->stars_enable);
+	state_save_register_global(machine, state->stars_speed);
+	state_save_register_global(machine, state->stars_state);
+	state_save_register_global(machine, state->stars_offset);
+	state_save_register_global(machine, state->stars_count);
+}
+
+static MACHINE_RESET( redclash )
+{
+	ladybug_state *state = (ladybug_state *)machine->driver_data;
+
+	state->star_speed = 0;
+	state->gfxbank = 0;
+	state->stars_enable = 0;
+	state->stars_speed = 0;
+	state->stars_state = 0;
+	state->stars_offset = 0;
+	state->stars_count = 0;
+}
+
 static MACHINE_DRIVER_START( zerohour )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(ladybug_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(zerohour_map)
+
+	MDRV_MACHINE_START(redclash)
+	MDRV_MACHINE_RESET(redclash)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -365,9 +388,15 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( redclash )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(ladybug_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(redclash_map)
+
+	MDRV_MACHINE_START(redclash)
+	MDRV_MACHINE_RESET(redclash)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -510,8 +539,7 @@ static DRIVER_INIT( redclash )
 }
 
 
-
-GAME( 1980, zerohour,  0,        zerohour, zerohour, redclash, ROT270, "Universal", "Zero Hour",          GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME( 1981, redclash,  0,        redclash, redclash, redclash, ROT270, "Tehkan",    "Red Clash (set 1)",  GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME( 1981, redclasha, redclash, redclash, redclash, redclash, ROT270, "Tehkan",    "Red Clash (set 2)",  GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME( 1981, redclashk, redclash, redclash, redclash, redclash, ROT270, "Kaneko",    "Red Clash (Kaneko)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME( 1980, zerohour,  0,        zerohour, zerohour, redclash, ROT270, "Universal", "Zero Hour",          GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1981, redclash,  0,        redclash, redclash, redclash, ROT270, "Tehkan",    "Red Clash (set 1)",  GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1981, redclasha, redclash, redclash, redclash, redclash, ROT270, "Tehkan",    "Red Clash (set 2)",  GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1981, redclashk, redclash, redclash, redclash, redclash, ROT270, "Kaneko",    "Red Clash (Kaneko)", GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

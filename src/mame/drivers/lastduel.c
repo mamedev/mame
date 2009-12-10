@@ -120,29 +120,15 @@ Notes:
 #include "deprecat.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "includes/lastduel.h"
 
-WRITE16_HANDLER( lastduel_vram_w );
-WRITE16_HANDLER( lastduel_flip_w );
-WRITE16_HANDLER( lastduel_scroll1_w );
-WRITE16_HANDLER( lastduel_scroll2_w );
-WRITE16_HANDLER( madgear_scroll1_w );
-WRITE16_HANDLER( madgear_scroll2_w );
-WRITE16_HANDLER( lastduel_scroll_w );
-WRITE16_HANDLER( lastduel_palette_word_w );
-VIDEO_START( lastduel );
-VIDEO_START( madgear );
-VIDEO_UPDATE( lastduel );
-VIDEO_UPDATE( madgear );
-VIDEO_EOF( lastduel );
-
-extern UINT16 *lastduel_vram,*lastduel_scroll2,*lastduel_scroll1;
 
 /******************************************************************************/
 
 static WRITE16_HANDLER( lastduel_sound_w )
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_w(space,0,data & 0xff);
+		soundlatch_w(space, 0, data & 0xff);
 }
 
 /******************************************************************************/
@@ -156,10 +142,10 @@ static ADDRESS_MAP_START( lastduel_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc4004, 0xfc4005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfc4006, 0xfc4007) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfc8000, 0xfc800f) AM_WRITE(lastduel_scroll_w)
-	AM_RANGE(0xfcc000, 0xfcdfff) AM_RAM_WRITE(lastduel_vram_w) AM_BASE(&lastduel_vram)
-	AM_RANGE(0xfd0000, 0xfd3fff) AM_RAM_WRITE(lastduel_scroll1_w) AM_BASE(&lastduel_scroll1)
-	AM_RANGE(0xfd4000, 0xfd7fff) AM_RAM_WRITE(lastduel_scroll2_w) AM_BASE(&lastduel_scroll2)
-	AM_RANGE(0xfd8000, 0xfd87ff) AM_RAM_WRITE(lastduel_palette_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xfcc000, 0xfcdfff) AM_RAM_WRITE(lastduel_vram_w) AM_BASE_MEMBER(lastduel_state, vram)
+	AM_RANGE(0xfd0000, 0xfd3fff) AM_RAM_WRITE(lastduel_scroll1_w) AM_BASE_MEMBER(lastduel_state, scroll1)
+	AM_RANGE(0xfd4000, 0xfd7fff) AM_RAM_WRITE(lastduel_scroll2_w) AM_BASE_MEMBER(lastduel_state, scroll2)
+	AM_RANGE(0xfd8000, 0xfd87ff) AM_RAM_WRITE(lastduel_palette_word_w) AM_BASE_MEMBER(lastduel_state, paletteram)
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -170,11 +156,11 @@ static ADDRESS_MAP_START( madgear_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc4002, 0xfc4003) AM_READ_PORT("DSW2") AM_WRITE(lastduel_sound_w)
 	AM_RANGE(0xfc4004, 0xfc4005) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xfc4006, 0xfc4007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xfc8000, 0xfc9fff) AM_RAM_WRITE(lastduel_vram_w) AM_BASE(&lastduel_vram)
-	AM_RANGE(0xfcc000, 0xfcc7ff) AM_RAM_WRITE(lastduel_palette_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xfc8000, 0xfc9fff) AM_RAM_WRITE(lastduel_vram_w) AM_BASE_MEMBER(lastduel_state, vram)
+	AM_RANGE(0xfcc000, 0xfcc7ff) AM_RAM_WRITE(lastduel_palette_word_w) AM_BASE_MEMBER(lastduel_state, paletteram)
 	AM_RANGE(0xfd0000, 0xfd000f) AM_WRITE(lastduel_scroll_w)
-	AM_RANGE(0xfd4000, 0xfd7fff) AM_RAM_WRITE(madgear_scroll1_w) AM_BASE(&lastduel_scroll1)
-	AM_RANGE(0xfd8000, 0xfdffff) AM_RAM_WRITE(madgear_scroll2_w) AM_BASE(&lastduel_scroll2)
+	AM_RANGE(0xfd4000, 0xfd7fff) AM_RAM_WRITE(madgear_scroll1_w) AM_BASE_MEMBER(lastduel_state, scroll1)
+	AM_RANGE(0xfd8000, 0xfdffff) AM_RAM_WRITE(madgear_scroll2_w) AM_BASE_MEMBER(lastduel_state, scroll2)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -190,11 +176,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mg_bankswitch_w )
 {
-	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "audiocpu");
-
-	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
+	memory_set_bank(space->machine, "bank1", data & 0x01);
 }
 
 static ADDRESS_MAP_START( madgear_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -207,187 +189,6 @@ static ADDRESS_MAP_START( madgear_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf006, 0xf006) AM_READ(soundlatch_r)
 	AM_RANGE(0xf00a, 0xf00a) AM_WRITE(mg_bankswitch_w)
 ADDRESS_MAP_END
-
-/******************************************************************************/
-
-static const gfx_layout sprite_layout =
-{
-	16,16,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8
-};
-
-static const gfx_layout text_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	2,
-	{ 4, 0 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8
-};
-
-static const gfx_layout madgear_tile =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 3*4, 2*4, 1*4, 0*4 },
-	{ 0, 1, 2, 3, 16+0, 16+1, 16+2, 16+3,
-			32*16+0, 32*16+1, 32*16+2, 32*16+3, 32*16+16+0, 32*16+16+1, 32*16+16+2, 32*16+16+3 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	64*16
-};
-
-static const gfx_layout madgear_tile2 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 1*4, 3*4, 0*4, 2*4 },
-	{ 0, 1, 2, 3, 16+0, 16+1, 16+2, 16+3,
-			32*16+0, 32*16+1, 32*16+2, 32*16+3, 32*16+16+0, 32*16+16+1, 32*16+16+2, 32*16+16+3 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	64*16
-};
-
-static GFXDECODE_START( lastduel )
-	GFXDECODE_ENTRY( "gfx1", 0,sprite_layout, 0x200, 16 )	/* colors 0x200-0x2ff */
-	GFXDECODE_ENTRY( "gfx2", 0,text_layout,   0x300, 16 )	/* colors 0x300-0x33f */
-	GFXDECODE_ENTRY( "gfx3", 0,madgear_tile,  0x000, 16 )	/* colors 0x000-0x0ff */
-	GFXDECODE_ENTRY( "gfx4", 0,madgear_tile,  0x100, 16 )	/* colors 0x100-0x1ff */
-GFXDECODE_END
-
-static GFXDECODE_START( madgear )
-	GFXDECODE_ENTRY( "gfx1", 0,sprite_layout, 0x200, 16 )	/* colors 0x200-0x2ff */
-	GFXDECODE_ENTRY( "gfx2", 0,text_layout,   0x300, 16 )	/* colors 0x300-0x33f */
-	GFXDECODE_ENTRY( "gfx3", 0,madgear_tile,  0x000, 16 )	/* colors 0x000-0x0ff */
-	GFXDECODE_ENTRY( "gfx4", 0,madgear_tile2, 0x100, 16 )	/* colors 0x100-0x1ff */
-GFXDECODE_END
-
-/******************************************************************************/
-
-/* handler called by the 2203 emulator when the internal timers cause an IRQ */
-static void irqhandler(const device_config *device, int irq)
-{
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
-}
-
-static const ym2203_interface ym2203_config =
-{
-	{
-			AY8910_LEGACY_OUTPUT,
-			AY8910_DEFAULT_LOADS,
-			DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	},
-	irqhandler
-};
-
-static INTERRUPT_GEN( lastduel_interrupt )
-{
-	if (cpu_getiloops(device) == 0)
-		cpu_set_input_line(device, 2, HOLD_LINE); /* VBL */
-	else
-		cpu_set_input_line(device, 4, HOLD_LINE); /* Controls */
-}
-
-static INTERRUPT_GEN( madgear_interrupt )
-{
-	if (cpu_getiloops(device) == 0)
-		cpu_set_input_line(device, 5, HOLD_LINE); /* VBL */
-	else
-		cpu_set_input_line(device, 6, HOLD_LINE); /* Controls */
-}
-
-static MACHINE_DRIVER_START( lastduel )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* Could be 8 MHz */
-	MDRV_CPU_PROGRAM_MAP(lastduel_map)
-	MDRV_CPU_VBLANK_INT_HACK(lastduel_interrupt,3)	/* 1 for vbl, 2 for control reads?? */
-
-	MDRV_CPU_ADD("audiocpu", Z80, 3579545) /* Accurate */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_BUFFERS_SPRITERAM)
-
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-
-	MDRV_GFXDECODE(lastduel)
-	MDRV_PALETTE_LENGTH(1024)
-
-	MDRV_VIDEO_START(lastduel)
-	MDRV_VIDEO_EOF(lastduel)
-	MDRV_VIDEO_UPDATE(lastduel)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("ym1", YM2203, 3579545)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-
-	MDRV_SOUND_ADD("ym2", YM2203, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( madgear )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* Accurate */
-	MDRV_CPU_PROGRAM_MAP(madgear_map)
-	MDRV_CPU_VBLANK_INT_HACK(madgear_interrupt,3)	/* 1 for vbl, 2 for control reads?? */
-
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(madgear_sound_map)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_BUFFERS_SPRITERAM)
-
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-
-	MDRV_GFXDECODE(madgear)
-	MDRV_PALETTE_LENGTH(1024)
-
-	MDRV_VIDEO_START(madgear)
-	MDRV_VIDEO_EOF(lastduel)
-	MDRV_VIDEO_UPDATE(madgear)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-
-	MDRV_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_10MHz/10)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.98)
-MACHINE_DRIVER_END
 
 /******************************************************************************/
 
@@ -569,6 +370,230 @@ static INPUT_PORTS_START( madgear )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
+
+/******************************************************************************/
+
+static const gfx_layout sprite_layout =
+{
+	16,16,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
+			16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	32*8
+};
+
+static const gfx_layout text_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	2,
+	{ 4, 0 },
+	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	16*8
+};
+
+static const gfx_layout madgear_tile =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 3*4, 2*4, 1*4, 0*4 },
+	{ 0, 1, 2, 3, 16+0, 16+1, 16+2, 16+3,
+			32*16+0, 32*16+1, 32*16+2, 32*16+3, 32*16+16+0, 32*16+16+1, 32*16+16+2, 32*16+16+3 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	64*16
+};
+
+static const gfx_layout madgear_tile2 =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 1*4, 3*4, 0*4, 2*4 },
+	{ 0, 1, 2, 3, 16+0, 16+1, 16+2, 16+3,
+			32*16+0, 32*16+1, 32*16+2, 32*16+3, 32*16+16+0, 32*16+16+1, 32*16+16+2, 32*16+16+3 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	64*16
+};
+
+static GFXDECODE_START( lastduel )
+	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout, 0x200, 16 )	/* colors 0x200-0x2ff */
+	GFXDECODE_ENTRY( "gfx2", 0, text_layout,   0x300, 16 )	/* colors 0x300-0x33f */
+	GFXDECODE_ENTRY( "gfx3", 0, madgear_tile,  0x000, 16 )	/* colors 0x000-0x0ff */
+	GFXDECODE_ENTRY( "gfx4", 0, madgear_tile,  0x100, 16 )	/* colors 0x100-0x1ff */
+GFXDECODE_END
+
+static GFXDECODE_START( madgear )
+	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout, 0x200, 16 )	/* colors 0x200-0x2ff */
+	GFXDECODE_ENTRY( "gfx2", 0, text_layout,   0x300, 16 )	/* colors 0x300-0x33f */
+	GFXDECODE_ENTRY( "gfx3", 0, madgear_tile,  0x000, 16 )	/* colors 0x000-0x0ff */
+	GFXDECODE_ENTRY( "gfx4", 0, madgear_tile2, 0x100, 16 )	/* colors 0x100-0x1ff */
+GFXDECODE_END
+
+/******************************************************************************/
+
+/* handler called by the 2203 emulator when the internal timers cause an IRQ */
+static void irqhandler( const device_config *device, int irq )
+{
+	lastduel_state *state = (lastduel_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static const ym2203_interface ym2203_config =
+{
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	},
+	irqhandler
+};
+
+static INTERRUPT_GEN( lastduel_interrupt )
+{
+	if (cpu_getiloops(device) == 0)
+		cpu_set_input_line(device, 2, HOLD_LINE); /* VBL */
+	else
+		cpu_set_input_line(device, 4, HOLD_LINE); /* Controls */
+}
+
+static INTERRUPT_GEN( madgear_interrupt )
+{
+	if (cpu_getiloops(device) == 0)
+		cpu_set_input_line(device, 5, HOLD_LINE); /* VBL */
+	else
+		cpu_set_input_line(device, 6, HOLD_LINE); /* Controls */
+}
+
+static MACHINE_START( lastduel )
+{
+	lastduel_state *state = (lastduel_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->tilemap_priority);
+	state_save_register_global_array(machine, state->scroll);
+}
+
+static MACHINE_START( madgear )
+{
+	UINT8 *ROM = memory_region(machine, "audiocpu");
+
+	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
+
+	MACHINE_START_CALL(lastduel);
+}
+
+static MACHINE_RESET( lastduel )
+{
+	lastduel_state *state = (lastduel_state *)machine->driver_data;
+	int i;
+
+	state->tilemap_priority = 0;
+
+	for (i = 0; i < 8; i++)
+		state->scroll[i] = 0;
+}
+
+static MACHINE_DRIVER_START( lastduel )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(lastduel_state)
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* Could be 8 MHz */
+	MDRV_CPU_PROGRAM_MAP(lastduel_map)
+	MDRV_CPU_VBLANK_INT_HACK(lastduel_interrupt,3)	/* 1 for vbl, 2 for control reads?? */
+
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545) /* Accurate */
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+
+	MDRV_MACHINE_START(lastduel)
+	MDRV_MACHINE_RESET(lastduel)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_BUFFERS_SPRITERAM)
+
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
+
+	MDRV_GFXDECODE(lastduel)
+	MDRV_PALETTE_LENGTH(1024)
+
+	MDRV_VIDEO_START(lastduel)
+	MDRV_VIDEO_EOF(lastduel)
+	MDRV_VIDEO_UPDATE(lastduel)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ym1", YM2203, 3579545)
+	MDRV_SOUND_CONFIG(ym2203_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MDRV_SOUND_ADD("ym2", YM2203, 3579545)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( madgear )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(lastduel_state)
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* Accurate */
+	MDRV_CPU_PROGRAM_MAP(madgear_map)
+	MDRV_CPU_VBLANK_INT_HACK(madgear_interrupt,3)	/* 1 for vbl, 2 for control reads?? */
+
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_PROGRAM_MAP(madgear_sound_map)
+
+	MDRV_MACHINE_START(madgear)
+	MDRV_MACHINE_RESET(lastduel)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_BUFFERS_SPRITERAM)
+
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
+
+	MDRV_GFXDECODE(madgear)
+	MDRV_PALETTE_LENGTH(1024)
+
+	MDRV_VIDEO_START(madgear)
+	MDRV_VIDEO_EOF(lastduel)
+	MDRV_VIDEO_UPDATE(madgear)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_CONFIG(ym2203_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MDRV_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_10MHz/10)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.98)
+MACHINE_DRIVER_END
 
 /******************************************************************************/
 
@@ -855,11 +880,11 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1988, lastduel,  0,        lastduel, lastduel, 0, ROT270, "Capcom", "Last Duel (US New Ver.)", 0 )
-GAME( 1988, lastduelo, lastduel, lastduel, lastduel, 0, ROT270, "Capcom", "Last Duel (US Old Ver.)", 0 )
-GAME( 1988, lastduelj, lastduel, lastduel, lastduel, 0, ROT270, "Capcom", "Last Duel (Japan)", 0 )
-GAME( 1988, lastduelb, lastduel, lastduel, lastduel, 0, ROT270, "bootleg", "Last Duel (bootleg)", 0 )
-GAME( 1989, madgear,   0,        madgear,  madgear,  0, ROT270, "Capcom", "Mad Gear (US)", 0 )
-GAME( 1989, madgearj,  madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Mad Gear (Japan)", 0 )
-GAME( 1988, ledstorm,  madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Led Storm (US)", 0 )
-GAME( 1988, ledstorm2, madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Led Storm Rally 2011 (US)", GAME_IMPERFECT_GRAPHICS ) /* game still has wrong sprite issues */
+GAME( 1988, lastduel,  0,        lastduel, lastduel, 0, ROT270, "Capcom",  "Last Duel (US New Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1988, lastduelo, lastduel, lastduel, lastduel, 0, ROT270, "Capcom",  "Last Duel (US Old Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1988, lastduelj, lastduel, lastduel, lastduel, 0, ROT270, "Capcom",  "Last Duel (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, lastduelb, lastduel, lastduel, lastduel, 0, ROT270, "bootleg", "Last Duel (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1989, madgear,   0,        madgear,  madgear,  0, ROT270, "Capcom",  "Mad Gear (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, madgearj,  madgear,  madgear,  madgear,  0, ROT270, "Capcom",  "Mad Gear (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, ledstorm,  madgear,  madgear,  madgear,  0, ROT270, "Capcom",  "Led Storm (US)", GAME_SUPPORTS_SAVE )
+GAME( 1988, ledstorm2, madgear,  madgear,  madgear,  0, ROT270, "Capcom",  "Led Storm Rally 2011 (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) /* game still has wrong sprite issues */
