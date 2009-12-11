@@ -42,6 +42,8 @@ struct _gameplan_state
 	const device_config *audiocpu;
 	const device_config *riot;
 	const device_config *via_0;
+	const device_config *via_1;
+	const device_config *via_2;
 };
 
 

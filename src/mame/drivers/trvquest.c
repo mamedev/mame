@@ -49,7 +49,7 @@ static READ8_HANDLER( trvquest_question_r )
 
 static WRITE8_DEVICE_HANDLER( trvquest_coin_w )
 {
-	coin_counter_w(device->machine, 0,~data & 1);
+	coin_counter_w(device->machine, 0, ~data & 1);
 }
 
 static WRITE8_DEVICE_HANDLER( trvquest_misc_w )
@@ -148,10 +148,11 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( via_irq_delayed )
 {
-	cputag_set_input_line(machine, "maincpu", 0, param);
+	gameplan_state *state = (gameplan_state *)machine->driver_data;
+	cpu_set_input_line(state->maincpu, 0, param);
 }
 
-static void via_irq(const device_config *device, int state)
+static void via_irq( const device_config *device, int state )
 {
 	// from gameplan.c
 
@@ -162,20 +163,9 @@ static void via_irq(const device_config *device, int state)
 }
 
 
-static input_port_value input_port_read_indexed(running_machine *machine, int portnum)
-{
-	const input_port_config *port = input_port_by_index(&machine->portlist, portnum);
-	return input_port_read_direct(port);
-}
-
-static READ8_DEVICE_HANDLER( via_input_port_0_r ) { return input_port_read_indexed(device->machine, 0); }
-static READ8_DEVICE_HANDLER( via_input_port_1_r ) { return input_port_read_indexed(device->machine, 1); }
-static READ8_DEVICE_HANDLER( via_input_port_2_r ) { return input_port_read_indexed(device->machine, 2); }
-static READ8_DEVICE_HANDLER( via_input_port_3_r ) { return input_port_read_indexed(device->machine, 3); }
-
 static const via6522_interface via_1_interface =
 {
-	/*inputs : A/B         */ DEVCB_HANDLER(via_input_port_0_r), DEVCB_HANDLER(via_input_port_1_r),
+	/*inputs : A/B         */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"),
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B         */ DEVCB_NULL, DEVCB_NULL,
 	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(trvquest_coin_w), DEVCB_NULL,
@@ -184,7 +174,7 @@ static const via6522_interface via_1_interface =
 
 static const via6522_interface via_2_interface =
 {
-	/*inputs : A/B         */ DEVCB_HANDLER(via_input_port_2_r), DEVCB_HANDLER(via_input_port_3_r),
+	/*inputs : A/B         */ DEVCB_INPUT_PORT("UNK"), DEVCB_INPUT_PORT("DSW"),
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B         */ DEVCB_NULL, DEVCB_NULL,
 	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(trvquest_misc_w), DEVCB_NULL,
@@ -194,17 +184,35 @@ static const via6522_interface via_2_interface =
 
 static MACHINE_START( trvquest )
 {
+	gameplan_state *state = (gameplan_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->via_0 = devtag_get_device(machine, "via6522_0");
+	state->via_1 = devtag_get_device(machine, "via6522_1");
+	state->via_2 = devtag_get_device(machine, "via6522_2");
+
+	/* register for save states */
+	state_save_register_global(machine, state->video_x);
+	state_save_register_global(machine, state->video_y);
+	state_save_register_global(machine, state->video_command);
+	state_save_register_global(machine, state->video_data);
 }
 
 static MACHINE_RESET( trvquest )
 {
+	gameplan_state *state = (gameplan_state *)machine->driver_data;
+
+	state->video_x = 0;
+	state->video_y = 0;
+	state->video_command = 0;
+	state->video_data = 0;
 }
 
 static INTERRUPT_GEN( trvquest_interrupt )
 {
-	const device_config *via_2 = devtag_get_device(device->machine, "via6522_2");
-	via_ca1_w(via_2, 0, 1);
-	via_ca1_w(via_2, 0, 0);
+	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
+	via_ca1_w(state->via_2, 0, 1);
+	via_ca1_w(state->via_2, 0, 0);
 }
 
 static MACHINE_DRIVER_START( trvquest )

@@ -988,6 +988,8 @@ static MACHINE_START( gameplan )
 	state->audiocpu = devtag_get_device(machine, "audiocpu");
 	state->riot = devtag_get_device(machine, "riot");
 	state->via_0 = devtag_get_device(machine, "via6522_0");
+	state->via_1 = devtag_get_device(machine, "via6522_1");
+	state->via_2 = devtag_get_device(machine, "via6522_2");
 
 	/* register for save states */
 	state_save_register_global(machine, state->current_port);
