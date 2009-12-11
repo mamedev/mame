@@ -1,5 +1,5 @@
 /*
-DJ Boy (c)1989 Kanako
+DJ Boy (c)1989 Kaneko
 
 Hardware has many similarities to Airbusters.
 
@@ -159,76 +159,28 @@ Notes:
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h"
+#include "includes/djboy.h"
 
-/* public functions from video/djboy.h */
-extern void djboy_set_videoreg( UINT8 data );
-extern WRITE8_HANDLER( djboy_scrollx_w );
-extern WRITE8_HANDLER( djboy_scrolly_w );
-extern WRITE8_HANDLER( djboy_videoram_w );
-extern WRITE8_HANDLER( djboy_paletteram_w );
-extern VIDEO_START( djboy );
-extern VIDEO_UPDATE( djboy );
-extern VIDEO_EOF( djboy );
-
-/******************************************************************************/
 
 /* KANEKO BEAST state */
 
-#define PROT_OUTPUT_BUFFER_SIZE 8
-
-static int prot_busy_count;
-static UINT8 prot_output_buffer[PROT_OUTPUT_BUFFER_SIZE];
-static int prot_available_data_count;
-static int prot_offs; /* internal state */
-static UINT8 prot_ram[0x80]; /* internal RAM */
-static UINT8 prot_param[8];
-
-static int coin;
-static int complete;
-static int lives[2];
-static int addr;
-static int bankxor;
-
-static enum
+static void ProtectionOut( running_machine *machine, int i, UINT8 data )
 {
-	eDJBOY_ATTRACT_HIGHSCORE,
-	eDJBOY_ATTRACT_TITLE,
-	eDJBOY_ATTRACT_GAMEPLAY,
-	eDJBOY_PRESS_P1_START,
-	eDJBOY_PRESS_P1_OR_P2_START,
-	eDJBOY_ACTIVE_GAMEPLAY
-} mDjBoyState;
+	djboy_state *state = (djboy_state *)machine->driver_data;
 
-static enum
-{
-	ePROT_NORMAL,
-	ePROT_WRITE_BYTES,
-	ePROT_WRITE_BYTE,
-	ePROT_READ_BYTES,
-	ePROT_WAIT_DSW1_WRITEBACK,
-	ePROT_WAIT_DSW2_WRITEBACK,
-	ePROT_STORE_PARAM
-} prot_mode;
-
-static void
-ProtectionOut( int i, UINT8 data )
-{
-	if( prot_available_data_count == i )
-	{
-		prot_output_buffer[prot_available_data_count++] = data;
-	}
+	if (state->prot_available_data_count == i)
+		state->prot_output_buffer[state->prot_available_data_count++] = data;
 	else
 	{
-		logerror( "prot_output_buffer overflow!\n" );
+		logerror("prot_output_buffer overflow!\n");
 		exit(1);
 	}
 } /* ProtectionOut */
 
-static int
-GetLives( running_machine *machine )
+static int GetLives( running_machine *machine )
 {
 	int dsw = input_port_read(machine, "DSW2");
-	switch( dsw&0x30 )
+	switch (dsw & 0x30)
 	{
 	case 0x10: return 3;
 	case 0x00: return 5;
@@ -238,370 +190,370 @@ GetLives( running_machine *machine )
 	return 0;
 } /* GetLives */
 
+
 static WRITE8_HANDLER( coinplus_w )
 {
+	djboy_state *state = (djboy_state *)space->machine->driver_data;
+
 	int dsw = input_port_read(space->machine, "DSW1");
-	coin_counter_w( space->machine, 0, data&1 );
-	coin_counter_w( space->machine, 1, data&2 );
-	if( data&1 )
+	coin_counter_w(space->machine, 0, data & 1);
+	coin_counter_w(space->machine, 1, data & 2);
+
+	if (data & 1)
 	{ /* TODO: coinage adjustments */
-		logerror( "COIN A+\n" );
-		switch( (dsw&0x30)>>4 )
+		logerror("COIN A+\n");
+		switch ((dsw & 0x30) >> 4)
 		{
-		case 0: coin += 4; break; /* 1 coin, 1 credit */
-		case 1: coin += 8; break; /* 1 coin, 2 credits */
-		case 2: coin += 2; break; /* 2 coins, 1 credit */
-		case 3: coin += 6; break; /* 2 coins, 3 credits */
+		case 0: state->coin += 4; break; /* 1 coin, 1 credit */
+		case 1: state->coin += 8; break; /* 1 coin, 2 credits */
+		case 2: state->coin += 2; break; /* 2 coins, 1 credit */
+		case 3: state->coin += 6; break; /* 2 coins, 3 credits */
 		}
 	}
-	if( data&2 )
+	if (data & 2)
 	{
-		logerror( "COIN B+\n" );
-		switch( (dsw&0xc0)>>6 )
+		logerror("COIN B+\n");
+		switch ((dsw & 0xc0) >> 6)
 		{
-		case 0: coin += 4; break; /* 1 coin, 1 credit */
-		case 1: coin += 8; break; /* 1 coin, 2 credits */
-		case 2: coin += 2; break; /* 2 coins, 1 credit */
-		case 3: coin += 6; break; /* 2 coins, 3 credits */
+		case 0: state->coin += 4; break; /* 1 coin, 1 credit */
+		case 1: state->coin += 8; break; /* 1 coin, 2 credits */
+		case 2: state->coin += 2; break; /* 2 coins, 1 credit */
+		case 3: state->coin += 6; break; /* 2 coins, 3 credits */
 		}
 	}
 } /* coinplus_w */
 
-static void
-OutputProtectionState( running_machine *machine, int i, int type )
+static void OutputProtectionState( running_machine *machine, int i, int type )
 {
+	djboy_state *state = (djboy_state *)machine->driver_data;
 	int io = ~input_port_read(machine, "IN0");
 	int dat = 0x00;
 
-	switch( mDjBoyState )
+	switch (state->mDjBoyState)
 	{
 	case eDJBOY_ATTRACT_HIGHSCORE:
-		if( coin>=4 )
+		if (state->coin >= 4)
 		{
 			dat = 0x01;
-			mDjBoyState = eDJBOY_PRESS_P1_START;
-			logerror( "COIN UP\n" );
+			state->mDjBoyState = eDJBOY_PRESS_P1_START;
+			logerror("COIN UP\n");
 		}
-		else if( complete )
+		else if (state->complete)
 		{
 			dat = 0x06;
-			mDjBoyState = eDJBOY_ATTRACT_TITLE;
+			state->mDjBoyState = eDJBOY_ATTRACT_TITLE;
 		}
 		break;
 
 	case eDJBOY_ATTRACT_TITLE:
-		if( coin>=4 )
+		if (state->coin >= 4)
 		{
 			dat = 0x01;
-			mDjBoyState = eDJBOY_PRESS_P1_START;
-			logerror( "COIN UP\n" );
+			state->mDjBoyState = eDJBOY_PRESS_P1_START;
+			logerror("COIN UP\n");
 		}
-		else if( complete )
+		else if (state->complete)
 		{
 			dat = 0x15;
-			mDjBoyState = eDJBOY_ATTRACT_GAMEPLAY;
+			state->mDjBoyState = eDJBOY_ATTRACT_GAMEPLAY;
 		}
 		break;
 
 	case eDJBOY_ATTRACT_GAMEPLAY:
-		if( coin>=4 )
+		if (state->coin>=4)
 		{
 			dat = 0x01;
-			mDjBoyState = eDJBOY_PRESS_P1_START;
-			logerror( "COIN UP\n" );
+			state->mDjBoyState = eDJBOY_PRESS_P1_START;
+			logerror("COIN UP\n");
 		}
-		else if( complete )
+		else if (state->complete)
 		{
 			dat = 0x0b;
-			mDjBoyState = eDJBOY_ATTRACT_HIGHSCORE;
+			state->mDjBoyState = eDJBOY_ATTRACT_HIGHSCORE;
 		}
 		break;
 
 	case eDJBOY_PRESS_P1_START:
-		if( io&1 )
-		{ /* p1 start */
+		if (io & 1) /* p1 start */
+		{
 			dat = 0x16;
-			mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
-			logerror( "P1 START\n" );
+			state->mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
+			logerror("P1 START\n");
 		}
-		else if( coin>=8 )
+		else if (state->coin >= 8)
 		{
 			dat = 0x05;
-			mDjBoyState = eDJBOY_PRESS_P1_OR_P2_START;
-			logerror( "COIN2 UP\n" );
+			state->mDjBoyState = eDJBOY_PRESS_P1_OR_P2_START;
+			logerror("COIN2 UP\n");
 		}
 		break;
 
 	case eDJBOY_PRESS_P1_OR_P2_START:
-		if( io&1 )
-		{ /* p1 start */
+		if (io & 1) /* p1 start */
+		{
 			dat = 0x16;
-			mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
-			lives[0] = GetLives(machine);
-			logerror( "P1 START!\n" );
-			coin-=4;
+			state->mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
+			state->lives[0] = GetLives(machine);
+			logerror("P1 START!\n");
+			state->coin -= 4;
 		}
-		else if( io&2 )
-		{ /* p2 start */
+		else if (io & 2) /* p2 start */
+		{
 			dat = 0x0a;
-			mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
-			lives[0] = GetLives(machine);
-			lives[1] = GetLives(machine);
-			logerror( "P2 START!\n" );
-			coin-=8;
+			state->mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
+			state->lives[0] = GetLives(machine);
+			state->lives[1] = GetLives(machine);
+			logerror("P2 START!\n");
+			state->coin -= 8;
 		}
 		break;
 
 	case eDJBOY_ACTIVE_GAMEPLAY:
-		if( lives[0]==0 && lives[1]==0 && complete )
-		{ /* continue countdown complete */
-			dat = 0x0f;
-			logerror( "countdown complete!\n" );
-			mDjBoyState = eDJBOY_ATTRACT_HIGHSCORE;
-		}
-		else if( coin>=4 )
+		if (state->lives[0] == 0 && state->lives[1] == 0 && state->complete) /* continue countdown complete */
 		{
-			if( (io&1) && lives[0]==0 )
+			dat = 0x0f;
+			logerror("countdown complete!\n");
+			state->mDjBoyState = eDJBOY_ATTRACT_HIGHSCORE;
+		}
+		else if (state->coin >= 4)
+		{
+			if ((io & 1) && state->lives[0] == 0)
 			{
 				dat = 0x12; /* continue (P1) */
-				lives[0] = GetLives(machine);
-				mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
-				coin-=4;
-				logerror( "P1 CONTINUE!\n" );
+				state->lives[0] = GetLives(machine);
+				state->mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
+				state->coin -= 4;
+				logerror("P1 CONTINUE!\n");
 			}
-			else if( (io&2) && lives[1]==0 )
+			else if ((io & 2) && state->lives[1] == 0)
 			{
 				dat = 0x08; /* continue (P2) */
-				lives[1] = GetLives(machine);
-				mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
-				coin-=4;
-				logerror( "P2 CONTINUE!\n" );
+				state->lives[1] = GetLives(machine);
+				state->mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
+				state->coin -= 4;
+				logerror("P2 CONTINUE!\n");
 			}
 		}
 		break;
 	}
-	complete = 0;
-	ProtectionOut( i, dat );
+	state->complete = 0;
+	ProtectionOut(machine, i, dat);
 } /* OutputProtectionState */
 
-static void
-CommonProt( running_machine *machine, int i, int type )
+static void CommonProt( running_machine *machine, int i, int type )
 {
-	int displayedCredits = coin/4;
-	if( displayedCredits>9 )
-	{
+	djboy_state *state = (djboy_state *)machine->driver_data;
+	int displayedCredits = state->coin / 4;
+	if (displayedCredits > 9)
 		displayedCredits = 9;
-	}
-	ProtectionOut( i++, displayedCredits );
-	ProtectionOut( i++, input_port_read(machine, "IN0") ); /* COIN/START */
-	OutputProtectionState( machine, i, type );
+
+	ProtectionOut(machine, i++, displayedCredits);
+	ProtectionOut(machine, i++, input_port_read(machine, "IN0")); /* COIN/START */
+	OutputProtectionState(machine, i, type);
 } /* CommonProt */
 
 static WRITE8_HANDLER( beast_data_w )
 {
-	prot_busy_count = 1;
+	djboy_state *state = (djboy_state *)space->machine->driver_data;
 
-	logerror( "0x%04x: prot_w(0x%02x)\n", cpu_get_pc(space->cpu), data );
+	state->prot_busy_count = 1;
 
-	watchdog_reset_w(space,0,0);
+	logerror("0x%04x: prot_w(0x%02x)\n", cpu_get_pc(space->cpu), data);
 
-	if( prot_mode == ePROT_WAIT_DSW1_WRITEBACK )
+	watchdog_reset_w(space, 0, 0);
+
+	if (state->prot_mode == ePROT_WAIT_DSW1_WRITEBACK)
 	{
-		logerror( "[DSW1_WRITEBACK]\n" );
-		ProtectionOut( 0, input_port_read(space->machine, "DSW2") ); /* DSW2 */
-		prot_mode = ePROT_WAIT_DSW2_WRITEBACK;
+		logerror("[DSW1_WRITEBACK]\n");
+		ProtectionOut(space->machine, 0, input_port_read(space->machine, "DSW2")); /* DSW2 */
+		state->prot_mode = ePROT_WAIT_DSW2_WRITEBACK;
 	}
-	else if( prot_mode == ePROT_WAIT_DSW2_WRITEBACK )
+	else if (state->prot_mode == ePROT_WAIT_DSW2_WRITEBACK)
 	{
-		logerror( "[DSW2_WRITEBACK]\n" );
-		prot_mode = ePROT_STORE_PARAM;
-		prot_offs = 0;
+		logerror("[DSW2_WRITEBACK]\n");
+		state->prot_mode = ePROT_STORE_PARAM;
+		state->prot_offs = 0;
 	}
-	else if( prot_mode == ePROT_STORE_PARAM )
+	else if (state->prot_mode == ePROT_STORE_PARAM)
 	{
-		logerror( "prot param[%d]: 0x%02x\n", prot_offs, data );
-		if( prot_offs<8 )
-		{
-			prot_param[prot_offs++] = data;
-		}
-		if( prot_offs == 8 )
-		{
-			prot_mode = ePROT_NORMAL;
-		}
+		logerror("prot param[%d]: 0x%02x\n", state->prot_offs, data);
+		if (state->prot_offs < 8)
+			state->prot_param[state->prot_offs++] = data;
+
+		if(state->prot_offs == 8)
+			state->prot_mode = ePROT_NORMAL;
 	}
-	else if( prot_mode == ePROT_WRITE_BYTE )
+	else if (state->prot_mode == ePROT_WRITE_BYTE)
 	{ /* pc == 0x79cd */
-		prot_ram[(prot_offs++)&0x7f] = data;
-		prot_mode = ePROT_WRITE_BYTES;
+		state->prot_ram[(state->prot_offs++) & 0x7f] = data;
+		state->prot_mode = ePROT_WRITE_BYTES;
 	}
 	else
 	{
-		switch( data )
+		switch (data)
 		{
 		case 0x00:
-			if( prot_mode == ePROT_WRITE_BYTES )
+			if (state->prot_mode == ePROT_WRITE_BYTES)
 			{ /* next byte is data to write to internal prot RAM */
-				prot_mode = ePROT_WRITE_BYTE;
+				state->prot_mode = ePROT_WRITE_BYTE;
 			}
-			else if( prot_mode == ePROT_READ_BYTES )
+			else if (state->prot_mode == ePROT_READ_BYTES)
 			{ /* request next byte of internal prot RAM */
-				ProtectionOut( 0, prot_ram[(prot_offs++)&0x7f] );
+				ProtectionOut(space->machine, 0, state->prot_ram[(state->prot_offs++) & 0x7f]);
 			}
 			else
-			{
-				logerror( "UNEXPECTED PREFIX!\n" );
-			}
+				logerror("UNEXPECTED PREFIX!\n");
 			break;
 
 		case 0x01: // pc=7389
-			OutputProtectionState( space->machine, 0, 0x01 );
+			OutputProtectionState(space->machine, 0, 0x01);
 			break;
 
 		case 0x02:
-			CommonProt( space->machine,0,0x02 );
+			CommonProt(space->machine, 0, 0x02);
 			break;
 
 		case 0x03: /* prepare for memory write to protection device ram (pc == 0x7987) */ // -> 0x02
-			logerror( "[WRITE BYTES]\n" );
-			prot_mode = ePROT_WRITE_BYTES;
-			prot_offs = 0;
+			logerror("[WRITE BYTES]\n");
+			state->prot_mode = ePROT_WRITE_BYTES;
+			state->prot_offs = 0;
 			break;
 
 		case 0x04:
-			ProtectionOut( 0,0 ); // ?
-			ProtectionOut( 1,0 ); // ?
-			ProtectionOut( 2,0 ); // ?
-			ProtectionOut( 3,0 ); // ?
-			CommonProt(    space->machine, 4,0x04 );
+			ProtectionOut(space->machine, 0, 0); // ?
+			ProtectionOut(space->machine, 1, 0); // ?
+			ProtectionOut(space->machine, 2, 0); // ?
+			ProtectionOut(space->machine, 3, 0); // ?
+			CommonProt(space->machine, 4, 0x04);
 			break;
 
 		case 0x05: /* 0x71f4 */
-			ProtectionOut( 0,input_port_read(space->machine, "IN1") ); // to $42
-			ProtectionOut( 1,0 ); // ?
-			ProtectionOut( 2,input_port_read(space->machine, "IN2") ); // to $43
-			ProtectionOut( 3,0 ); // ?
-			ProtectionOut( 4,0 ); // ?
-			CommonProt(    space->machine, 5,0x05 );
+			ProtectionOut(space->machine, 0, input_port_read(space->machine, "IN1")); // to $42
+			ProtectionOut(space->machine, 1, 0); // ?
+			ProtectionOut(space->machine, 2, input_port_read(space->machine, "IN2")); // to $43
+			ProtectionOut(space->machine, 3, 0); // ?
+			ProtectionOut(space->machine, 4, 0); // ?
+			CommonProt(space->machine, 5, 0x05);
 			break;
 
 		case 0x07:
-			CommonProt( space->machine, 0,0x07 );
+			CommonProt(space->machine, 0, 0x07);
 			break;
 
 		case 0x08: /* pc == 0x727a */
-			ProtectionOut( 0,input_port_read(space->machine, "IN0") ); /* COIN/START */
-			ProtectionOut( 1,input_port_read(space->machine, "IN1") ); /* JOY1 */
-			ProtectionOut( 2,input_port_read(space->machine, "IN2") ); /* JOY2 */
-			ProtectionOut( 3,input_port_read(space->machine, "DSW1") ); /* DSW1 */
-			ProtectionOut( 4,input_port_read(space->machine, "DSW2") ); /* DSW2 */
-			CommonProt(    space->machine, 5, 0x08 );
+			ProtectionOut(space->machine, 0, input_port_read(space->machine, "IN0")); /* COIN/START */
+			ProtectionOut(space->machine, 1, input_port_read(space->machine, "IN1")); /* JOY1 */
+			ProtectionOut(space->machine, 2, input_port_read(space->machine, "IN2")); /* JOY2 */
+			ProtectionOut(space->machine, 3, input_port_read(space->machine, "DSW1")); /* DSW1 */
+			ProtectionOut(space->machine, 4, input_port_read(space->machine, "DSW2")); /* DSW2 */
+			CommonProt(space->machine, 5, 0x08);
 			break;
 
 		case 0x09:
-			ProtectionOut( 0,0 ); // ?
-			ProtectionOut( 1,0 ); // ?
-			ProtectionOut( 2,0 ); // ?
-			CommonProt(    space->machine, 3, 0x09 );
+			ProtectionOut(space->machine, 0, 0); // ?
+			ProtectionOut(space->machine, 1, 0); // ?
+			ProtectionOut(space->machine, 2, 0); // ?
+			CommonProt(space->machine, 3, 0x09);
 			break;
 
 		case 0x0a:
-			CommonProt( space->machine,0,0x0a );
+			CommonProt(space->machine, 0, 0x0a);
 			break;
 
 		case 0x0c:
-			CommonProt( space->machine,1,0x0c );
+			CommonProt(space->machine, 1, 0x0c);
 			break;
 
 		case 0x0d:
-			CommonProt( space->machine,2,0x0d );
+			CommonProt(space->machine, 2, 0x0d);
 			break;
 
 		case 0xfe: /* prepare for memory read from protection device ram (pc == 0x79ee, 0x7a3f) */
-			if( prot_mode == ePROT_WRITE_BYTES )
+			if (state->prot_mode == ePROT_WRITE_BYTES)
 			{
-				prot_mode = ePROT_READ_BYTES;
-				logerror( "[READ BYTES]\n" );
+				state->prot_mode = ePROT_READ_BYTES;
+				logerror("[READ BYTES]\n");
 			}
 			else
 			{
-				prot_mode = ePROT_WRITE_BYTES;
-				logerror( "[WRITE BYTES*]\n" );
+				state->prot_mode = ePROT_WRITE_BYTES;
+				logerror("[WRITE BYTES*]\n");
 			}
-			prot_offs = 0;
+			state->prot_offs = 0;
 			break;
 
 		case 0xff: /* read DSW (pc == 0x714d) */
-			ProtectionOut( 0,input_port_read(space->machine, "DSW1") ); /* DSW1 */
-			prot_mode = ePROT_WAIT_DSW1_WRITEBACK;
+			ProtectionOut(space->machine, 0, input_port_read(space->machine, "DSW1")); /* DSW1 */
+			state->prot_mode = ePROT_WAIT_DSW1_WRITEBACK;
 			break;
 
 		case 0xa9: /* 1-player game: P1 dies
                          2-player game: P2 dies */
-			if( lives[0]>0 && lives[1]>0 )
+			if (state->lives[0] > 0 && state->lives[1] > 0 )
 			{
-				lives[1]--;
-				logerror( "%02x P2 DIE(%d)\n", data, lives[1] );
+				state->lives[1]--;
+				logerror("%02x P2 DIE(%d)\n", data, state->lives[1]);
 			}
-			else if( lives[0]>0 )
+			else if (state->lives[0] > 0)
 			{
-				lives[0]--;
-				logerror( "%02x P1 DIE(%d)\n", data, lives[0] );
+				state->lives[0]--;
+				logerror("%02x P1 DIE(%d)\n", data, state->lives[0]);
 			}
 			else
 			{
-				logerror( "%02x COMPLETE.\n", data );
-				complete = 0xa9;
+				logerror("%02x COMPLETE.\n", data);
+				state->complete = 0xa9;
 			}
 			break;
 
 		case 0x92: /* p2 lost life; in 2-p game, P1 died */
-			if( lives[0]>0 && lives[1]>0 )
+			if (state->lives[0] > 0 && state->lives[1] > 0 )
 			{
-				lives[0]--;
-				logerror( "%02x P1 DIE(%d)\n", data, lives[0] );
+				state->lives[0]--;
+				logerror("%02x P1 DIE(%d)\n", data, state->lives[0]);
 			}
-			else if( lives[1]>0 )
+			else if (state->lives[1] > 0)
 			{
-				lives[1]--;
-				logerror( "%02x P2 DIE (%d)\n", data, lives[1] );
+				state->lives[1]--;
+				logerror("%02x P2 DIE (%d)\n", data, state->lives[1]);
 			}
 			else
 			{
-				logerror( "%02x COMPLETE.\n", data );
-				complete = 0x92;
+				logerror("%02x COMPLETE.\n", data);
+				state->complete = 0x92;
 			}
 			break;
 
 		case 0xa3: /* p2 bonus life */
-			lives[1]++;
-			logerror( "%02x P2 BONUS(%d)\n", data, lives[1] );
+			state->lives[1]++;
+			logerror("%02x P2 BONUS(%d)\n", data, state->lives[1]);
 			break;
 
 		case 0xa5: /* p1 bonus life */
-			lives[0]++;
-			logerror( "%02x P1 BONUS(%d)\n", data, lives[0] );
+			state->lives[0]++;
+			logerror("%02x P1 BONUS(%d)\n", data, state->lives[0]);
 			break;
 
 		case 0xad: /* 1p game start ack */
-			logerror( "%02x 1P GAME START\n", data );
+			logerror("%02x 1P GAME START\n", data);
 			break;
 
 		case 0xb0: /* 1p+2p game start ack */
-			logerror( "%02x 1P+2P GAME START\n", data );
+			logerror("%02x 1P+2P GAME START\n", data);
 			break;
 
 		case 0xb3: /* 1p continue ack */
-			logerror( "%02x 1P CONTINUE\n", data );
+			logerror("%02x 1P CONTINUE\n", data);
 			break;
 
 		case 0xb7: /* 2p continue ack */
-			logerror( "%02x 2P CONTINUE\n", data );
+			logerror("%02x 2P CONTINUE\n", data);
 			break;
 
 		default:
 		case 0x97:
 		case 0x9a:
-			logerror( "!!0x%04x: prot_w(0x%02x)\n", cpu_get_pc(space->cpu), data );
+			logerror("!!0x%04x: prot_w(0x%02x)\n", cpu_get_pc(space->cpu), data);
 			break;
 		}
 	}
@@ -609,75 +561,56 @@ static WRITE8_HANDLER( beast_data_w )
 
 static READ8_HANDLER( beast_data_r )
 { /* port#4 */
+	djboy_state *state = (djboy_state *)space->machine->driver_data;
 	UINT8 data = 0x00;
-	if( prot_available_data_count )
+	if (state->prot_available_data_count)
 	{
 		int i;
-		data = prot_output_buffer[0];
-		prot_available_data_count--;
-		for( i=0; i<prot_available_data_count; i++ )
-		{
-			prot_output_buffer[i] = prot_output_buffer[i+1];
-		}
+		data = state->prot_output_buffer[0];
+		state->prot_available_data_count--;
+		for (i = 0; i < state->prot_available_data_count; i++)
+			state->prot_output_buffer[i] = state->prot_output_buffer[i + 1];
 	}
 	else
 	{
-		logerror( "prot_r: data expected!\n" );
+		logerror("prot_r: data expected!\n");
 	}
-	logerror( "0x%04x: prot_r() == 0x%02x\n", cpu_get_pc(space->cpu), data );
+	logerror("0x%04x: prot_r() == 0x%02x\n", cpu_get_pc(space->cpu), data);
 	return data;
 } /* beast_data_r */
 
 static READ8_HANDLER( beast_status_r )
 { /* port 0xc */
+	djboy_state *state = (djboy_state *)space->machine->driver_data;
 	UINT8 result = 0;
-	if( prot_busy_count )
+
+	if (state->prot_busy_count)
 	{
-		prot_busy_count--;
-		result |= 1<<3;
+		state->prot_busy_count--;
+		result |= 1 << 3;
 	}
-	if( !prot_available_data_count )
+	if (!state->prot_available_data_count)
 	{
-		result |= 1<<2;
+		result |= 1 << 2;
 	}
 	return result;
 } /* beast_status_r */
 
 /******************************************************************************/
-static DRIVER_INIT( djboy )
-{
-	coin = 0;
-	complete = 0;
-	memset(lives, 0, sizeof(lives));
-	addr = 0xff;
-	bankxor = 0x00;
-}
-
-static DRIVER_INIT( djboyj )
-{
-	DRIVER_INIT_CALL( djboy );
-	bankxor = 0x1f;
-}
 
 static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
 {
-	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+	djboy_state *state = (djboy_state *)space->machine->driver_data;
+	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( cpu0_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(space->machine, "maincpu");
-	data ^= bankxor;
-	memory_set_bankptr(space->machine, "bank4",&RAM[0x10000]); /* unsure if/how this area is banked */
-	if( data < 4 )
-	{
-		RAM = &RAM[0x2000 * data];
-	}
-	else
-	{
-		RAM = &RAM[0x10000 + 0x2000 * (data-4)];
-	}
-	memory_set_bankptr(space->machine, "bank1",RAM);
+	djboy_state *state = (djboy_state *)space->machine->driver_data;
+
+	data ^= state->bankxor;
+	memory_set_bank(space->machine, "bank1", data);
+	memory_set_bank(space->machine, "bank4", 0); /* unsure if/how this area is banked */
 }
 
 /******************************************************************************/
@@ -690,25 +623,30 @@ static WRITE8_HANDLER( cpu0_bankswitch_w )
  */
 static WRITE8_HANDLER( cpu1_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "cpu1");
-	djboy_set_videoreg( data );
-	switch( data&0xf )
+	djboy_state *state = (djboy_state *)space->machine->driver_data;
+	state->videoreg = data;
+
+	switch (data & 0xf)
 	{
 	/* bs65.5y */
-	case 0x00: memory_set_bankptr(space->machine, "bank2",&RAM[0x00000]); break;
-	case 0x01: memory_set_bankptr(space->machine, "bank2",&RAM[0x04000]); break;
-	case 0x02: memory_set_bankptr(space->machine, "bank2",&RAM[0x10000]); break;
-	case 0x03: memory_set_bankptr(space->machine, "bank2",&RAM[0x14000]); break;
+	case 0x00: 
+	case 0x01: 
+	case 0x02: 
+	case 0x03: 
+		memory_set_bank(space->machine, "bank2", (data & 0xf));
+		break;
 
 	/* bs101.6w */
-	case 0x08: memory_set_bankptr(space->machine, "bank2",&RAM[0x18000]); break;
-	case 0x09: memory_set_bankptr(space->machine, "bank2",&RAM[0x1c000]); break;
-	case 0x0a: memory_set_bankptr(space->machine, "bank2",&RAM[0x20000]); break;
-	case 0x0b: memory_set_bankptr(space->machine, "bank2",&RAM[0x24000]); break;
-	case 0x0c: memory_set_bankptr(space->machine, "bank2",&RAM[0x28000]); break;
-	case 0x0d: memory_set_bankptr(space->machine, "bank2",&RAM[0x2c000]); break;
-	case 0x0e: memory_set_bankptr(space->machine, "bank2",&RAM[0x30000]); break;
-	case 0x0f: memory_set_bankptr(space->machine, "bank2",&RAM[0x34000]); break;
+	case 0x08: 
+	case 0x09: 
+	case 0x0a: 
+	case 0x0b: 
+	case 0x0c: 
+	case 0x0d: 
+	case 0x0e: 
+	case 0x0f: 
+		memory_set_bank(space->machine, "bank2", (data & 0xf) - 4);
+		break;
 
 	default:
 		break;
@@ -719,23 +657,14 @@ static WRITE8_HANDLER( cpu1_bankswitch_w )
 
 static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 {
+	djboy_state *state = (djboy_state *)space->machine->driver_data;
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "cpu2", INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(state->cpu2, INPUT_LINE_NMI, PULSE_LINE);
 } /* trigger_nmi_on_sound_cpu2 */
 
 static WRITE8_HANDLER( cpu2_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "cpu2");
-
-	if( data < 3 )
-	{
-		RAM = &RAM[0x04000 * data];
-	}
-	else
-	{
-		RAM = &RAM[0x10000 + 0x4000 * (data - 3)];
-	}
-	memory_set_bankptr(space->machine, "bank3", RAM);
+	memory_set_bank(space->machine, "bank3", data);	// shall we check data<0x07?
 }
 
 /******************************************************************************/
@@ -760,8 +689,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu1_am, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(djboy_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(djboy_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(djboy_videoram_w) AM_BASE_MEMBER(djboy_state, videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(djboy_paletteram_w) AM_BASE_MEMBER(djboy_state, paletteram)
 	AM_RANGE(0xd400, 0xd8ff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
@@ -903,8 +832,9 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( djboy_interrupt )
 { /* CPU1 uses interrupt mode 2. For now, just alternate the two interrupts. */
-	addr ^= 0x02;
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, addr);
+	djboy_state *state = (djboy_state *)device->machine->driver_data;
+	state->addr ^= 0x02;
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, state->addr);
 }
 
 static const kaneko_pandora_interface djboy_pandora_config =
@@ -914,7 +844,77 @@ static const kaneko_pandora_interface djboy_pandora_config =
 	0, 0	/* x_offs, y_offs */
 };
 
+
+static MACHINE_START( djboy )
+{
+	djboy_state *state = (djboy_state *)machine->driver_data;
+	UINT8 *MAIN = memory_region(machine, "maincpu");
+	UINT8 *CPU1 = memory_region(machine, "cpu1");
+	UINT8 *CPU2 = memory_region(machine, "cpu2");
+
+	memory_configure_bank(machine, "bank1", 0, 4,  &MAIN[0x00000], 0x2000);
+	memory_configure_bank(machine, "bank1", 4, 28, &MAIN[0x10000], 0x2000);
+	memory_configure_bank(machine, "bank2", 0, 2,  &CPU1[0x00000], 0x4000);
+	memory_configure_bank(machine, "bank2", 2, 10, &CPU1[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank3", 0, 3,  &CPU2[0x00000], 0x4000);
+	memory_configure_bank(machine, "bank3", 3, 5,  &CPU2[0x10000], 0x4000);
+	memory_configure_bank(machine, "bank4", 0, 1,  &MAIN[0x10000], 0x3000); /* unsure if/how this area is banked */
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->cpu1 = devtag_get_device(machine, "cpu1");
+	state->cpu2 = devtag_get_device(machine, "cpu2");
+	state->pandora = devtag_get_device(machine, "pandora");
+
+	state_save_register_global(machine, state->videoreg);
+	state_save_register_global(machine, state->scrollx);
+	state_save_register_global(machine, state->scrolly);
+
+	/* Kaneko BEAST */
+	state_save_register_global(machine, state->coin);
+	state_save_register_global(machine, state->complete);
+	state_save_register_global(machine, state->addr);
+	state_save_register_global_array(machine, state->lives);
+
+	state_save_register_global(machine, state->mDjBoyState );
+	state_save_register_global(machine, state->prot_mode);
+	state_save_register_global(machine, state->prot_busy_count);
+	state_save_register_global(machine, state->prot_available_data_count);
+	state_save_register_global(machine, state->prot_offs);
+	state_save_register_global_array(machine, state->prot_output_buffer);
+	state_save_register_global_array(machine, state->prot_ram);
+	state_save_register_global_array(machine, state->prot_param);
+}
+
+static MACHINE_RESET( djboy )
+{
+	djboy_state *state = (djboy_state *)machine->driver_data;
+
+	state->videoreg = 0;
+	state->scrollx = 0;
+	state->scrolly = 0;
+
+	/* Kaneko BEAST */
+	state->coin = 0;
+	state->complete = 0;
+	state->addr = 0xff;
+	state->lives[0] = 0;
+	state->lives[1] = 0;
+
+	state->prot_busy_count = 0;
+	state->prot_available_data_count = 0;
+	state->prot_offs = 0;
+
+	memset(state->prot_output_buffer, 0, PROT_OUTPUT_BUFFER_SIZE);
+	memset(state->prot_ram, 0, 0x80);
+	memset(state->prot_param, 0, 8);
+
+	state->mDjBoyState = eDJBOY_ATTRACT_HIGHSCORE;
+	state->prot_mode = ePROT_NORMAL;
+}
+
 static MACHINE_DRIVER_START( djboy )
+	MDRV_DRIVER_DATA(djboy_state)
+
 	MDRV_CPU_ADD("maincpu", Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu0_am)
 	MDRV_CPU_IO_MAP(cpu0_port_am)
@@ -931,6 +931,9 @@ static MACHINE_DRIVER_START( djboy )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
+
+	MDRV_MACHINE_START(djboy)
+	MDRV_MACHINE_RESET(djboy)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -1072,8 +1075,19 @@ ROM_START( djboyj )
 ROM_END
 
 
+static DRIVER_INIT( djboy )
+{
+	djboy_state *state = (djboy_state *)machine->driver_data;
+	state->bankxor = 0x00;
+}
+
+static DRIVER_INIT( djboyj )
+{
+	djboy_state *state = (djboy_state *)machine->driver_data;
+	state->bankxor = 0x1f;
+}
 
 /*     YEAR, NAME,  PARENT, MACHINE, INPUT, INIT, MNTR,  COMPANY, FULLNAME, FLAGS */
-GAME( 1989, djboy,  0,      djboy,   djboy, djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 1)", 0) // Sammy & Williams logos in FG ROM
-GAME( 1989, djboya, djboy,  djboy,   djboy, djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 2)", 0) // Sammy & Williams logos in FG ROM
-GAME( 1989, djboyj, djboy,  djboy,   djboy, djboyj,   ROT0, "Kaneko (Sega license)", "DJ Boy (Japan)", 0 ) // Sega logo in FG ROM
+GAME( 1989, djboy,  0,      djboy,   djboy, djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 1)", GAME_SUPPORTS_SAVE) // Sammy & Williams logos in FG ROM
+GAME( 1989, djboya, djboy,  djboy,   djboy, djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 2)", GAME_SUPPORTS_SAVE) // Sammy & Williams logos in FG ROM
+GAME( 1989, djboyj, djboy,  djboy,   djboy, djboyj,   ROT0, "Kaneko (Sega license)", "DJ Boy (Japan)", GAME_SUPPORTS_SAVE ) // Sega logo in FG ROM
