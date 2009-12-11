@@ -63,7 +63,9 @@ struct polygon
 static float* depthBuffer3d;
 static UINT32* colorBuffer3d;
 static struct polygon *polys;
-static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw3d(running_machine *machine);
+
+static UINT32 numPolys = 0;	// lame
 
 
 
@@ -390,8 +392,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 //      if (((source[2] & 0xffff0000) >> 16) == 0x0001)
 //      {
-//          usrintf_showmessage("T %.8x %.8x %.8x %.8x %.8x", source[0], source[1], source[2], source[3], source[4]);
-//          // usrintf_showmessage("T %.8x %.8x %.8x %.8x %.8x", source[0], source[1], source[2], source[3], source[4]);
+//          popmessage("T %.8x %.8x %.8x %.8x %.8x", source[0], source[1], source[2], source[3], source[4]);
+//          // popmessage("T %.8x %.8x %.8x %.8x %.8x", source[0], source[1], source[2], source[3], source[4]);
 //      }
 
 		for(ydrw=0;ydrw<=chainy;ydrw++)
@@ -1521,7 +1523,7 @@ VIDEO_UPDATE( hng64 )
 	if (hng64_mcu_type != RACING_MCU) // disable on racing games until it stops crashing MAME!
 	{
 		int x, y;
-		draw3d(screen->machine, bitmap, cliprect);
+		draw3d(screen->machine);
 
 		// Blit the color buffer into the primary bitmap
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
@@ -1622,6 +1624,9 @@ VIDEO_UPDATE( hng64 )
 		popmessage("blend changed %02x", additive_tilemap_debug);
 	}
 
+	// Reset part of the global 3d state (lame)
+	numPolys = 0;
+
 	return 0;
 }
 
@@ -1679,7 +1684,11 @@ VIDEO_START( hng64 )
 ///////////////
 UINT32 hng64_dls[2][0x81];
 
-static float uToF(UINT16 input);
+// 3d State
+static int paletteState3d = 0x00;
+static float projectionMatrix[16];
+static float modelViewMatrix[16];
+static float cameraMatrix[16];
 
 static void setIdentity(float *matrix);
 static void matmul4(float *product, const float *a, const float *b);
@@ -1688,12 +1697,549 @@ static void vecmatmul4(float *product, const float *a, const float *b);
 //static void normalize(float* x);
 
 static void performFrustumClip(struct polygon *p);
-static void drawShaded(running_machine *machine, struct polygon *p, bitmap_t *bitmap);
+static void drawShaded(running_machine *machine, struct polygon *p);
 //static void plot(INT32 x, INT32 y, INT32 color, bitmap_t *bitmap);
 //static void drawline2d(INT32 x0, INT32 y0, INT32 x1, INT32 y1, INT32 color, bitmap_t *bitmap);
 //static void DrawWireframe(struct polygon *p, bitmap_t *bitmap);
 
+static float uToF(UINT16 input);
 #define WORD_AT(BUFFER,OFFSET) ( (BUFFER[OFFSET] << 8) | BUFFER[OFFSET+1] )
+
+// Operation 0001
+static void setCameraTransformation(const UINT16* packet)
+{
+	// CAMERA TRANSFORMATION MATRIX
+	cameraMatrix[0]  = uToF(packet[1]);
+	cameraMatrix[4]  = uToF(packet[2]);
+	cameraMatrix[8]  = uToF(packet[3]);
+	cameraMatrix[3]  = 0.0f;
+
+	cameraMatrix[1]  = uToF(packet[4]);
+	cameraMatrix[5]  = uToF(packet[5]);
+	cameraMatrix[9]  = uToF(packet[6]);
+	cameraMatrix[7]  = 0.0f;
+
+	cameraMatrix[2]  = uToF(packet[7]);
+	cameraMatrix[6]  = uToF(packet[8]);
+	cameraMatrix[10] = uToF(packet[9]);
+	cameraMatrix[11] = 0.0f;
+
+	cameraMatrix[12] = uToF(packet[10]);
+	cameraMatrix[13] = uToF(packet[11]);
+	cameraMatrix[14] = uToF(packet[12]);
+	cameraMatrix[15] = 1.0f;
+} 
+
+// Operation 0011
+static void set3dFlags(const UINT16* packet)
+{
+	// All flags?
+	// 00110000 00000000 00000100 01000100 0400-0000 00007fff 00000000 00000020
+	// ----                                pal  ---- -------- -------- -------- not used (known)
+	paletteState3d  = (packet[8] & 0xff00) >> 8;
+	paletteState3d += ((hng64_3dregs[0x00/4] & 0x2000) >> 9); //framebuffer base color reg? Used by Buriki One
+	/* FIXME: Buriki One door colors in attract mode still aren't quite right, investigate... */
+}
+
+// Operation 0012
+static void setCameraProjectionMatrix(const UINT16* packet)
+{
+	// Seems an awful lot parameters for a projection matrix, but it's good so far.
+
+	// It changes when fatfurwa 'How to play' is on the screen.  
+	// Not too much, but if this is right, the aspect ratio is different...
+
+	// Heisted from GLFrustum - 6 parameters...
+	float left, right, top, bottom, near_, far_;
+
+	left    = uToF(packet[11]);
+	right   = uToF(packet[10]);
+	top     = uToF(packet[12]);
+	bottom  = uToF(packet[13]);
+	near_   = uToF(packet[6]);
+	far_    = uToF(packet[7]);
+
+	projectionMatrix[0]  = (2.0f*near_)/(right-left);
+	projectionMatrix[1]  = 0.0f;
+	projectionMatrix[2]  = 0.0f;
+	projectionMatrix[3]  = 0.0f;
+
+	projectionMatrix[4]  = 0.0f;
+	projectionMatrix[5]  = (2.0f*near_)/(top-bottom);
+	projectionMatrix[6]  = 0.0f;
+	projectionMatrix[7]  = 0.0f;
+
+	projectionMatrix[8]  = (right+left)/(right-left);
+	projectionMatrix[9]  = (top+bottom)/(top-bottom);
+	projectionMatrix[10] = -((far_+near_)/(far_-near_));
+	projectionMatrix[11] = -1.0f;
+
+	projectionMatrix[12] = 0.0f;
+	projectionMatrix[13] = 0.0f;
+	projectionMatrix[14] = -((2.0f*far_*near_)/(far_-near_));
+	projectionMatrix[15] = 0.0f;
+
+	/*
+	int xxx;
+	for (xxx = 0; xxx < 16; xxx++)
+		mame_printf_debug("%f ", projectionMatrix[xxx]);
+	mame_printf_debug("\n");
+
+	mame_printf_debug("Vars   : %f %f %f %f %f %f\n", left, right, top, bottom, near, far);
+	mame_printf_debug("Camera : %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
+					 uToF((workingList[i+0] & 0xffff0000) >> 16)*128, uToF( workingList[i+0] & 0x0000ffff)*128,
+					 uToF((workingList[i+1] & 0xffff0000) >> 16)*128, uToF( workingList[i+1] & 0x0000ffff)*128,
+
+					 uToF((workingList[i+2] & 0xffff0000) >> 16)*128, uToF( workingList[i+2] & 0x0000ffff)*128,
+					 uToF((workingList[i+3] & 0xffff0000) >> 16)*128, uToF( workingList[i+3] & 0x0000ffff)*128,
+
+					 uToF((workingList[i+4] & 0xffff0000) >> 16)*128, uToF( workingList[i+4] & 0x0000ffff)*128,
+					 uToF((workingList[i+5] & 0xffff0000) >> 16)*128, uToF( workingList[i+5] & 0x0000ffff)*128,
+
+					 uToF((workingList[i+6] & 0xffff0000) >> 16)*128, uToF( workingList[i+6] & 0x0000ffff)*128,
+					 uToF((workingList[i+7] & 0xffff0000) >> 16)*128, uToF( workingList[i+7] & 0x0000ffff)*128);
+	*/
+}
+
+// Operation 0100
+void recoverPolygonBlock(running_machine* machine, const UINT16* packet)
+{
+	int k, l, m;
+
+	UINT8 *threeDRoms;
+	UINT8 *threeDPointer;
+	UINT32 dword1;
+	UINT32 threeDOffset;
+	UINT32 size[4];
+	UINT32 address[4];
+	UINT32 megaOffset;
+	float eyeCoords[4];			// objectCoords transformed by the modelViewMatrix
+	// float clipCoords[4];		// eyeCoords transformed by the projectionMatrix
+	float ndCoords[4];			// normalized device coordinates/clipCoordinates (x/w, y/w, z/w)
+	float windowCoords[4];		// mapped ndCoordinates to screen space
+	float cullRay[4];
+
+	float objectMatrix[16];
+	struct polygon lastPoly = { 0 };
+
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+
+	// GEOMETRY
+	setIdentity(objectMatrix);
+
+	threeDRoms = memory_region(machine, "verts");
+
+	/////////////////////////
+	// GET THE HEADER INFO //
+	/////////////////////////
+
+	// 3d ROM Offset
+	// FIXME: This might be more than just 20 bits...
+	dword1 = (((UINT32)packet[2]) << 16) | ((UINT32)packet[3]);
+	threeDOffset = dword1 & 0x000fffff;
+	threeDOffset = (threeDOffset << 1) * 3;
+
+	threeDPointer = &threeDRoms[threeDOffset];
+
+	// I think this packet entry has something to do with lighting.
+	// It's 0 for the 66-byte lit globe in the character select and 0 for something in terry's hand.
+	// if (packet[1] & 0x0010)
+
+	//////////////////////////////////////////
+	// GET THE OBJECT TRANSFORMATION MATRIX //
+	//////////////////////////////////////////
+
+	objectMatrix[8 ] = uToF(packet[7]);
+	objectMatrix[4 ] = uToF(packet[8]);
+	objectMatrix[0 ] = uToF(packet[9]);
+	objectMatrix[3]  = 0.0f;
+
+	objectMatrix[9 ] = uToF(packet[10]);
+	objectMatrix[5 ] = uToF(packet[11]);
+	objectMatrix[1 ] = uToF(packet[12]);
+	objectMatrix[7]  = 0.0f;
+
+	objectMatrix[10] = uToF(packet[13]);
+	objectMatrix[6 ] = uToF(packet[14]);
+	objectMatrix[2 ] = uToF(packet[15]);
+	objectMatrix[11] = 0.0f;
+
+	objectMatrix[12] = uToF(packet[4]);
+	objectMatrix[13] = uToF(packet[5]);
+	objectMatrix[14] = uToF(packet[6]);
+	objectMatrix[15] = 1.0f;
+
+
+	//////////////////////////////////////////////////////////
+	// EXTRACT DATA FROM THE ADDRESS POINTED TO IN THE FILE //
+	//////////////////////////////////////////////////////////
+
+	// Okay, there are 4 hunks per address.  They all seem good too...
+
+	// First tell me how many 'chunks' are at each address...
+	size[0] = WORD_AT(threeDPointer, ( 6<<1));
+	size[1] = WORD_AT(threeDPointer, ( 7<<1));
+	size[2] = WORD_AT(threeDPointer, ( 9<<1));
+	size[3] = WORD_AT(threeDPointer, (10<<1));
+
+	megaOffset = ( WORD_AT(threeDRoms, (threeDOffset + 4)) ) << 16;
+	address[0] = megaOffset | WORD_AT(threeDPointer, (0<<1));
+	address[1] = megaOffset | WORD_AT(threeDPointer, (1<<1));
+	address[2] = megaOffset | WORD_AT(threeDPointer, (3<<1));
+	address[3] = megaOffset | WORD_AT(threeDPointer, (4<<1));
+
+	// DEBUG
+	// mame_printf_debug("%.5x %.3x %.5x %.3x %.5x %.3x %.5x %.3x\n", address[0], size[0], address[1], size[1], address[2], size[2], address[3], size[3]);
+	// !! END DEBUG !!
+
+	for (k = 0; k < 4; k++)										// For all 4 chunks
+	{
+		threeDPointer = &threeDRoms[(address[k]<<1) * 3];
+
+		for (l = 0; l < size[k]; l++)
+		{
+			////////////////////////////////////////////
+			// GATHER A SINGLE TRIANGLE'S INFORMATION //
+			////////////////////////////////////////////
+			UINT8 triangleType = threeDPointer[1];
+
+			UINT8 numVertices = 3;
+			UINT8 chunkLength = 0;
+
+			// Some chunks only have 1 vertex (they act as a vertex fan)
+			if (triangleType == 0x97 ||
+				triangleType == 0x87 ||
+				triangleType == 0xd7 ||
+				triangleType == 0x96)
+				numVertices = 1;
+
+			// Get which texture this polygon refers to...
+			// In fatfur it's 0xc for the smooth-shaded earth       - maybe this is for all things with alpha - check the hair at some point...
+			//                0x9 for the untextured buildings
+			//                0xd for the 'explosion' of the HNG64
+			//            and 0x8 everywhere else...
+			//        they're 0x8 in the buriki intro too (those are 66-byte chunks!)
+			polys[numPolys].texType = ((threeDPointer[2] & 0xf0) >> 4);
+
+			if (polys[numPolys].texType == 0x8 || polys[numPolys].texType == 0xc)		//  || polys[numPolys].texType == 0x9
+				polys[numPolys].texIndex = threeDPointer[3] & 0x0f;
+			else
+				polys[numPolys].texIndex = -1;
+
+			// Set the polygon's palette
+			polys[numPolys].palIndex = paletteState3d;
+
+			for (m = 0; m < numVertices; m++)								// For all vertices of the chunk
+			{
+				switch(triangleType)
+				{
+				// 42 byte chunk
+				case 0x04:
+				case 0x0e:
+					polys[numPolys].vert[m].worldCoords[0] = uToF(WORD_AT(threeDPointer, ((3<<1) + (6<<1)*m)) );
+					polys[numPolys].vert[m].worldCoords[1] = uToF(WORD_AT(threeDPointer, ((4<<1) + (6<<1)*m)) );
+					polys[numPolys].vert[m].worldCoords[2] = uToF(WORD_AT(threeDPointer, ((5<<1) + (6<<1)*m)) );
+					polys[numPolys].vert[m].worldCoords[3] = 1.0f;
+					polys[numPolys].n = 3;
+
+					// !! What is the first coordinate here (6) - maybe denotes size of chunk? !!
+					polys[numPolys].vert[m].texCoords[0] = uToF(WORD_AT(threeDPointer, ((7<<1) + (6<<1)*m)) );
+					polys[numPolys].vert[m].texCoords[1] = uToF(WORD_AT(threeDPointer, ((8<<1) + (6<<1)*m)) );
+					polys[numPolys].vert[m].texCoords[2] = 0.0f;
+					polys[numPolys].vert[m].texCoords[3] = 1.0f;
+
+					polys[numPolys].vert[m].normal[0] = uToF(WORD_AT(threeDPointer, (21<<1) ));
+					polys[numPolys].vert[m].normal[1] = uToF(WORD_AT(threeDPointer, (22<<1) ));
+					polys[numPolys].vert[m].normal[2] = uToF(WORD_AT(threeDPointer, (23<<1) ));
+					polys[numPolys].vert[m].normal[3] = 0.0f;
+
+					// !!! DUMB !!!
+					polys[numPolys].vert[m].light[0] = polys[numPolys].vert[m].texCoords[0] * 255.0f;
+					polys[numPolys].vert[m].light[1] = polys[numPolys].vert[m].texCoords[1] * 255.0f;
+					polys[numPolys].vert[m].light[2] = polys[numPolys].vert[m].texCoords[2] * 255.0f;
+
+					// Redundantly called, but it works...
+					polys[numPolys].faceNormal[0] = polys[numPolys].vert[m].normal[0];
+					polys[numPolys].faceNormal[1] = polys[numPolys].vert[m].normal[1];
+					polys[numPolys].faceNormal[2] = polys[numPolys].vert[m].normal[2];
+					polys[numPolys].faceNormal[3] = 0.0f;
+
+					chunkLength = (24<<1);
+					break;
+
+				// 66 byte chunk
+				case 0x05:
+				case 0x0f:
+					polys[numPolys].vert[m].worldCoords[0] = uToF(WORD_AT(threeDPointer, ((3<<1) + (9<<1)*m)) );
+					polys[numPolys].vert[m].worldCoords[1] = uToF(WORD_AT(threeDPointer, ((4<<1) + (9<<1)*m)) );
+					polys[numPolys].vert[m].worldCoords[2] = uToF(WORD_AT(threeDPointer, ((5<<1) + (9<<1)*m)) );
+					polys[numPolys].vert[m].worldCoords[3] = 1.0f;
+					polys[numPolys].n = 3;
+
+					// !! See above - (6) - why? !!
+					polys[numPolys].vert[m].texCoords[0] = uToF(WORD_AT(threeDPointer, ((7<<1) + (9<<1)*m)) );
+					polys[numPolys].vert[m].texCoords[1] = uToF(WORD_AT(threeDPointer, ((8<<1) + (9<<1)*m)) );
+					polys[numPolys].vert[m].texCoords[2] = 0.0f;
+					polys[numPolys].vert[m].texCoords[3] = 1.0f;
+
+					polys[numPolys].vert[m].normal[0] = uToF(WORD_AT(threeDPointer, ((9<<1) + (9<<1)*m)) );
+					polys[numPolys].vert[m].normal[1] = uToF(WORD_AT(threeDPointer, ((10<<1) + (9<<1)*m)) );
+					polys[numPolys].vert[m].normal[2] = uToF(WORD_AT(threeDPointer, ((11<<1) + (9<<1)*m)) );
+					polys[numPolys].vert[m].normal[3] = 0.0f;
+
+					// !!! DUMB !!!
+					polys[numPolys].vert[m].light[0] = polys[numPolys].vert[m].texCoords[0] * 255.0f;
+					polys[numPolys].vert[m].light[1] = polys[numPolys].vert[m].texCoords[1] * 255.0f;
+					polys[numPolys].vert[m].light[2] = polys[numPolys].vert[m].texCoords[2] * 255.0f;
+
+					// Redundantly called, but it works...
+					polys[numPolys].faceNormal[0] = uToF(WORD_AT(threeDPointer, (30<<1) ));
+					polys[numPolys].faceNormal[1] = uToF(WORD_AT(threeDPointer, (31<<1) ));
+					polys[numPolys].faceNormal[2] = uToF(WORD_AT(threeDPointer, (32<<1) ));
+					polys[numPolys].faceNormal[3] = 0.0f;
+
+					chunkLength = (33<<1);
+					break;
+
+				// 30 byte chunk
+				case 0x97:
+				case 0x87:
+				case 0xd7:
+
+					// Copy over the proper vertices from the previous triangle...
+					memcpy(&polys[numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
+					memcpy(&polys[numPolys].vert[2], &lastPoly.vert[2], sizeof(struct polyVert));
+
+					// Fill in the appropriate data...
+					polys[numPolys].vert[0].worldCoords[0] = uToF(WORD_AT(threeDPointer, (3<<1) ));
+					polys[numPolys].vert[0].worldCoords[1] = uToF(WORD_AT(threeDPointer, (4<<1) ));
+					polys[numPolys].vert[0].worldCoords[2] = uToF(WORD_AT(threeDPointer, (5<<1) ));
+					polys[numPolys].vert[0].worldCoords[3] = 1.0f;
+					polys[numPolys].n = 3;
+
+					// !! See above - (6) - why? !!
+					polys[numPolys].vert[0].texCoords[0] = uToF(WORD_AT(threeDPointer, (7<<1) ));
+					polys[numPolys].vert[0].texCoords[1] = uToF(WORD_AT(threeDPointer, (8<<1) ));
+					polys[numPolys].vert[0].texCoords[2] = 0.0f;
+					polys[numPolys].vert[0].texCoords[3] = 1.0f;
+
+					polys[numPolys].vert[0].normal[0] = uToF(WORD_AT(threeDPointer, (9<<1) ));
+					polys[numPolys].vert[0].normal[1] = uToF(WORD_AT(threeDPointer, (10<<1) ));
+					polys[numPolys].vert[0].normal[2] = uToF(WORD_AT(threeDPointer, (11<<1) ));
+					polys[numPolys].vert[0].normal[3] = 0.0f;
+
+					polys[numPolys].vert[0].light[0] = polys[numPolys].vert[0].texCoords[0] * 255.0f;
+					polys[numPolys].vert[0].light[1] = polys[numPolys].vert[0].texCoords[1] * 255.0f;
+					polys[numPolys].vert[0].light[2] = polys[numPolys].vert[0].texCoords[2] * 255.0f;
+
+					polys[numPolys].faceNormal[0] = uToF(WORD_AT(threeDPointer, (12<<1) ));
+					polys[numPolys].faceNormal[1] = uToF(WORD_AT(threeDPointer, (13<<1) ));
+					polys[numPolys].faceNormal[2] = uToF(WORD_AT(threeDPointer, (14<<1) ));
+					polys[numPolys].faceNormal[3] = 0.0f;
+
+					chunkLength = (15<<1);
+					break;
+
+				// 18 byte chunk
+				case 0x96:
+
+					// Copy over the proper vertices from the previous triangle...
+					memcpy(&polys[numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
+					memcpy(&polys[numPolys].vert[2], &lastPoly.vert[2], sizeof(struct polyVert));
+
+					// !!! Too lazy to have finished this yet !!!
+
+					polys[numPolys].vert[0].worldCoords[0] = uToF(WORD_AT(threeDPointer, (3<<1)));
+					polys[numPolys].vert[0].worldCoords[1] = uToF(WORD_AT(threeDPointer, (4<<1)));
+					polys[numPolys].vert[0].worldCoords[2] = uToF(WORD_AT(threeDPointer, (5<<1)));
+					polys[numPolys].vert[0].worldCoords[3] = 1.0f;
+					polys[numPolys].n = 3;
+
+					// !! See above - (6) - why? !!
+					polys[numPolys].vert[0].texCoords[0] = uToF(WORD_AT(threeDPointer, (7<<1)));
+					polys[numPolys].vert[0].texCoords[1] = uToF(WORD_AT(threeDPointer, (8<<1)));
+					polys[numPolys].vert[0].texCoords[2] = 0.0f;
+					polys[numPolys].vert[0].texCoords[3] = 1.0f;
+
+					// !!! DUMB !!!
+					polys[numPolys].vert[0].light[0] = polys[numPolys].vert[0].texCoords[0] * 255.0f;
+					polys[numPolys].vert[0].light[1] = polys[numPolys].vert[0].texCoords[1] * 255.0f;
+					polys[numPolys].vert[0].light[2] = polys[numPolys].vert[0].texCoords[2] * 255.0f;
+
+					// This normal could be right, but I'm not entirely sure - there is no normal in the 18 bytes!
+					polys[numPolys].vert[0].normal[0] = lastPoly.faceNormal[0];
+					polys[numPolys].vert[0].normal[1] = lastPoly.faceNormal[1];
+					polys[numPolys].vert[0].normal[2] = lastPoly.faceNormal[2];
+					polys[numPolys].vert[0].normal[3] = lastPoly.faceNormal[3];
+
+					polys[numPolys].faceNormal[0] = lastPoly.faceNormal[0];
+					polys[numPolys].faceNormal[1] = lastPoly.faceNormal[1];
+					polys[numPolys].faceNormal[2] = lastPoly.faceNormal[2];
+					polys[numPolys].faceNormal[3] = lastPoly.faceNormal[3];
+
+					chunkLength = (9<<1);
+					break;
+
+				default:
+					mame_printf_debug("UNKNOWN geometry CHUNK TYPE : %x\n", triangleType);
+					break;
+				}
+			}
+
+			polys[numPolys].visible = 1;
+
+			memcpy(&lastPoly, &polys[numPolys], sizeof(struct polygon));
+
+
+			/* FIXME: Okay, it's utterly horrible that i'm clipping the polys before storing them */
+
+			////////////////////////////////////
+			// A FEW 'GLOBAL' TRANSFORMATIONS //
+			////////////////////////////////////
+			// Now perform the world transformations...
+			// !! Can eliminate this step with a matrix stack (maybe necessary?) !!
+			setIdentity(modelViewMatrix);
+			matmul4(modelViewMatrix, modelViewMatrix, cameraMatrix);
+			matmul4(modelViewMatrix, modelViewMatrix, objectMatrix);
+
+
+			///////////////////
+			// BACKFACE CULL //
+			///////////////////
+			// EMPIRICAL EVIDENCE SEEMS TO SHOW THE HNG64 HARDWARE DOES NOT BACKFACE CULL //
+			/*
+			float cullRay[4];
+			float cullNorm[4];
+
+			// Cast a ray out of the camera towards the polygon's point in eyespace.
+			vecmatmul4(cullRay, modelViewMatrix, polys[numPolys].vert[0].worldCoords);
+			normalize(cullRay);
+			// Dot product that with the normal to see if you're negative...
+			vecmatmul4(cullNorm, modelViewMatrix, polys[numPolys].faceNormal);
+
+			float result = vecDotProduct(cullRay, cullNorm);
+
+			if (result < 0.0f)
+				polys[numPolys].visible = 1;
+			else
+				polys[numPolys].visible = 0;
+			*/
+
+			////////////////////////////
+			// BEHIND-THE-CAMERA CULL //
+			////////////////////////////
+			vecmatmul4(cullRay, modelViewMatrix, polys[numPolys].vert[0].worldCoords);
+
+			if (cullRay[2] > 0.0f)				// Camera is pointing down -Z
+			{
+				polys[numPolys].visible = 0;
+			}
+
+
+			//////////////////////////////////////////////////////////
+			// TRANSFORM THE TRIANGLE INTO HOMOGENEOUS SCREEN SPACE //
+			//////////////////////////////////////////////////////////
+			if (polys[numPolys].visible)
+			{
+				for (m = 0; m < polys[numPolys].n; m++)
+				{
+					// Transform and project the vertex into pre-divided homogeneous coordinates...
+					vecmatmul4(eyeCoords, modelViewMatrix, polys[numPolys].vert[m].worldCoords);
+					vecmatmul4(polys[numPolys].vert[m].clipCoords, projectionMatrix, eyeCoords);
+				}
+
+				if (polys[numPolys].visible)
+				{
+					// Clip the triangles to the view frustum...
+					performFrustumClip(&polys[numPolys]);
+
+					for (m = 0; m < polys[numPolys].n; m++)
+					{
+						// Convert into normalized device coordinates...
+						ndCoords[0] = polys[numPolys].vert[m].clipCoords[0] / polys[numPolys].vert[m].clipCoords[3];
+						ndCoords[1] = polys[numPolys].vert[m].clipCoords[1] / polys[numPolys].vert[m].clipCoords[3];
+						ndCoords[2] = polys[numPolys].vert[m].clipCoords[2] / polys[numPolys].vert[m].clipCoords[3];
+						ndCoords[3] = polys[numPolys].vert[m].clipCoords[3];
+
+						// Final pixel values are garnered here :
+						windowCoords[0] = (ndCoords[0]+1.0f) * ((float)(visarea->max_x) / 2.0f) + 0.0f;
+						windowCoords[1] = (ndCoords[1]+1.0f) * ((float)(visarea->max_y) / 2.0f) + 0.0f;
+						windowCoords[2] = (ndCoords[2]+1.0f) * 0.5f;
+
+						windowCoords[1] = (float)visarea->max_y - windowCoords[1];		// Flip Y
+
+						// Store the points in a list for later use...
+						polys[numPolys].vert[m].clipCoords[0] = windowCoords[0];
+						polys[numPolys].vert[m].clipCoords[1] = windowCoords[1];
+						polys[numPolys].vert[m].clipCoords[2] = windowCoords[2];
+						polys[numPolys].vert[m].clipCoords[3] = ndCoords[3];
+					}
+				}
+			}
+
+
+			/*
+			// DEBUG
+			if (chunkLength == (9 << 1))
+			{
+				mame_printf_debug("Chunk : ");
+				for (int ajg = 0; ajg < chunkLength; ajg+=2)
+					mame_printf_debug("%.2x%.2x ", threeDPointer[ajg], threeDPointer[ajg+1]);
+				mame_printf_debug("\n");
+			}
+			// END DEBUG
+			*/
+
+			// Advance to the next polygon chunk...
+			threeDPointer += chunkLength;
+
+			numPolys++;				// Add one more to the display list...
+		}
+	}
+}
+
+
+/*
+static void command3d(running_machine* machine, const UINT16* packet)
+{
+	switch (packet[0])
+	{
+	case 0x0000:	// Appears to be a NOP.
+		break;
+
+	case 0x0001:	// Camera transformation.
+		break;
+
+	case 0x0010:	// Unknown (called twice for fatfurwa 'howto' frame)
+		break;
+
+	case 0x0011:	// Palette / Model flags?
+		break;
+
+	case 0x0012:	// Projection Matrix
+		break;
+
+	case 0x0100:	// Geometry
+		break;
+
+	case 0x0101:	// Unknown: Geometry?
+		break;
+
+	case 0x0102:	// Unknown: Geometry?
+		break;
+
+	case 0x1000:	// Unknown: Some sort of global flags?
+		break;
+
+	case 0x1001:	// Unknown: Some sort of global flags?
+		break;
+
+	default:
+		logerror("HNG64: Unknown 3d command %04x.\n", packet[0]);
+		break;
+	}
+}
+*/
 
 /* 3D/framebuffer video registers
  * ------------------------------
@@ -1708,27 +2254,18 @@ static void drawShaded(running_machine *machine, struct polygon *p, bitmap_t *bi
  *   4-11 | ---- ???? ---- ???? ---- ???? ---- ???? | Table filled with 0x0? data
  *
  */
-static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw3d(running_machine *machine)
 {
-	int i,j,k,l,m;
+	int i,j,n;
 
-	float projectionMatrix[16];
-	float modelViewMatrix[16];
-	float cameraMatrix[16];
-	float objectMatrix[16];
+	UINT16 packet3d[16];
 
-	int paletteState = 0x00;
-
-	UINT32 numPolys = 0;
-
-	struct polygon lastPoly = { 0 };
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	// Set some matrices to the identity...
 	setIdentity(projectionMatrix);
 	setIdentity(modelViewMatrix);
 	setIdentity(cameraMatrix);
-	setIdentity(objectMatrix);
 
 	// Display list 2 comes after display list 1.  Go figure.
 	for (j = 1; j >= 0; j--)
@@ -1737,119 +2274,29 @@ static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *
 
 		for (i = 0; i < 0x80; i += 0x08)
 		{
-			float left, right, top, bottom, near_, far_;
-			UINT8 *threeDRoms;
-			UINT8 *threeDPointer;
-			UINT32 threeDOffset;
-			UINT32 size[4];
-			UINT32 address[4];
-			UINT32 megaOffset;
-			float eyeCoords[4];			// objectCoords transformed by the modelViewMatrix
-			// float clipCoords[4];     // eyeCoords transformed by the projectionMatrix
-			float ndCoords[4];			// normalized device coordinates/clipCoordinates (x/w, y/w, z/w)
-			float windowCoords[4];		// mapped ndCoordinates to screen space
-			float cullRay[4];
-
 			// Debug...
 //          mame_printf_debug("Element %.2d (%d) : %.8x %.8x %.8x %.8x %.8x %.8x %.8x %.8x\n", i/0x08, j,
-//                             (UINT32)hng64_dls[j][i+0], (UINT32)hng64_dls[j][i+1],
-//                             (UINT32)hng64_dls[j][i+2], (UINT32)hng64_dls[j][i+3],
-//                             (UINT32)hng64_dls[j][i+4], (UINT32)hng64_dls[j][i+5],
-//                             (UINT32)hng64_dls[j][i+6], (UINT32)hng64_dls[j][i+7]);
+//                             (UINT32)hng64_dls[j][i+0], (UINT32)hng64_dls[j][i+1], 
+// 							   (UINT32)hng64_dls[j][i+2], (UINT32)hng64_dls[j][i+3],
+//                             (UINT32)hng64_dls[j][i+4], (UINT32)hng64_dls[j][i+5], 
+// 							   (UINT32)hng64_dls[j][i+6], (UINT32)hng64_dls[j][i+7]);
+
+			// Transition code.
+			for (n = 0; n < 0x08; n++)
+			{
+				packet3d[n*2+0] = (workingList[i+n] & 0xffff0000) >> 16;
+				packet3d[n*2+1] = (workingList[i+n] & 0x0000ffff);
+			}
 
 			// Depending on what the initial flags are, do sumthin'...
 			switch((workingList[i+0] & 0xffff0000) >> 16)
 			{
 			case 0x0012:
-				// UNKNOWN - seems an awful lot parameters for a projection matrix though...
-
-				;
-
-				// It changes when 'How to play' is on the screen...  not too much, but if this is right, the aspect
-				// ratio is different...
-
-				// Heisted from GLFrustum - 6 parameters...
-				left   = uToF( workingList[i+5] & 0x0000ffff);
-				right  = uToF((workingList[i+5] & 0xffff0000) >> 16);
-				top    = uToF((workingList[i+6] & 0xffff0000) >> 16);
-				bottom = uToF( workingList[i+6] & 0x0000ffff);
-				near_   = uToF((workingList[i+3] & 0xffff0000) >> 16);
-				far_    = uToF( workingList[i+3] & 0x0000ffff);
-
-				// It's almost .always. these values in fatfurwa...
-				// 0.070313    0.000000 [0]     (scaled by 128)
-				// 0.000000   10.000000 [1]
-				// 0.000000    0.500000 [2]
-				// 2.000000   11.062500 [3]
-				// 10.000000  11.000000 [4]
-				// 1.000000   -1.000000 [5]
-				// 0.875000   -0.875000 [6]
-				// 0.000000    0.000000 [7]
-
-				projectionMatrix[0]  = (2.0f*near_)/(right-left);
-				projectionMatrix[1]  = 0.0f;
-				projectionMatrix[2]  = 0.0f;
-				projectionMatrix[3]  = 0.0f;
-
-				projectionMatrix[4]  = 0.0f;
-				projectionMatrix[5]  = (2.0f*near_)/(top-bottom);
-				projectionMatrix[6]  = 0.0f;
-				projectionMatrix[7]  = 0.0f;
-
-				projectionMatrix[8]  = (right+left)/(right-left);
-				projectionMatrix[9]  = (top+bottom)/(top-bottom);
-				projectionMatrix[10] = -((far_+near_)/(far_-near_));
-				projectionMatrix[11] = -1.0f;
-
-				projectionMatrix[12] = 0.0f;
-				projectionMatrix[13] = 0.0f;
-				projectionMatrix[14] = -((2.0f*far_*near_)/(far_-near_));
-				projectionMatrix[15] = 0.0f;
-
-				/*
-                int xxx;
-                for (xxx = 0; xxx < 16; xxx++)
-                    mame_printf_debug("%f ", projectionMatrix[xxx]);
-                mame_printf_debug("\n");
-
-                mame_printf_debug("Vars   : %f %f %f %f %f %f\n", left, right, top, bottom, near, far);
-                mame_printf_debug("Camera : %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
-                                 uToF((workingList[i+0] & 0xffff0000) >> 16)*128, uToF( workingList[i+0] & 0x0000ffff)*128,
-                                 uToF((workingList[i+1] & 0xffff0000) >> 16)*128, uToF( workingList[i+1] & 0x0000ffff)*128,
-
-                                 uToF((workingList[i+2] & 0xffff0000) >> 16)*128, uToF( workingList[i+2] & 0x0000ffff)*128,
-                                 uToF((workingList[i+3] & 0xffff0000) >> 16)*128, uToF( workingList[i+3] & 0x0000ffff)*128,
-
-                                 uToF((workingList[i+4] & 0xffff0000) >> 16)*128, uToF( workingList[i+4] & 0x0000ffff)*128,
-                                 uToF((workingList[i+5] & 0xffff0000) >> 16)*128, uToF( workingList[i+5] & 0x0000ffff)*128,
-
-                                 uToF((workingList[i+6] & 0xffff0000) >> 16)*128, uToF( workingList[i+6] & 0x0000ffff)*128,
-                                 uToF((workingList[i+7] & 0xffff0000) >> 16)*128, uToF( workingList[i+7] & 0x0000ffff)*128);
-                */
-
+				setCameraProjectionMatrix(packet3d);
 				break;
 
 			case 0x0001:
-				// CAMERA TRANSFORMATION MATRIX
-				cameraMatrix[0]  = uToF( workingList[i+0] & 0x0000ffff);
-				cameraMatrix[4]  = uToF((workingList[i+1] & 0xffff0000) >> 16);
-				cameraMatrix[8]  = uToF( workingList[i+1] & 0x0000ffff);
-				cameraMatrix[3]  = 0.0f;
-
-				cameraMatrix[1]  = uToF((workingList[i+2] & 0xffff0000) >> 16);
-				cameraMatrix[5]  = uToF( workingList[i+2] & 0x0000ffff);
-				cameraMatrix[9]  = uToF((workingList[i+3] & 0xffff0000) >> 16);
-				cameraMatrix[7]  = 0.0f;
-
-				cameraMatrix[2]  = uToF( workingList[i+3] & 0x0000ffff);
-				cameraMatrix[6]  = uToF((workingList[i+4] & 0xffff0000) >> 16);
-				cameraMatrix[10] = uToF( workingList[i+4] & 0x0000ffff);
-				cameraMatrix[11] = 0.0f;
-
-				cameraMatrix[12] = uToF((workingList[i+5] & 0xffff0000) >> 16);
-				cameraMatrix[13] = uToF( workingList[i+5] & 0x0000ffff);
-				cameraMatrix[14] = uToF((workingList[i+6] & 0xffff0000) >> 16);
-				cameraMatrix[15] = 1.0f;
+				setCameraTransformation(packet3d);
 				break;
 
 			case 0x0010:
@@ -1857,396 +2304,11 @@ static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *
 				break;
 
 			case 0x0011:
-				// Model Flags?
-				// 00110000 00000000 00000100 01000100 0400-0000 00007fff 00000000 00000020
-				// ----                                pal  ---- -------- -------- -------- not used (known)
-				paletteState = (workingList[i+4] & 0xff000000) >> 24;
-				paletteState+=((hng64_3dregs[0x00/4] & 0x2000) >> 9); //framebuffer base color reg? Used by Buriki One
-				/* FIXME: Buriki One door colors in attract mode still aren't quite right, investigate... */
+				set3dFlags(packet3d);
 				break;
 
 			case 0x0100:
-				// GEOMETRY
-				;
-
-				threeDRoms = memory_region(machine, "verts");
-
-				/////////////////////////
-				// GET THE HEADER INFO //
-				/////////////////////////
-
-				// 3d ROM Offset
-				// !!! This might be more than just 20 bits...
-				threeDOffset = workingList[i+1] & 0x000fffff;
-				threeDOffset = (threeDOffset<<1) * 3;
-
-				threeDPointer = &threeDRoms[threeDOffset];
-
-
-				// 66 byte versus 48 byte chunk flag
-				//    WRONG !  I think it's something to do with lighting...
-				//    it's 0 for the 66-byte lit globe in the character select and 0 for something in terry's hand...
-				// if (workingList[i+0] & 0x00000010)
-
-
-				//////////////////////////////////////////
-				// GET THE OBJECT TRANSFORMATION MATRIX //
-				//////////////////////////////////////////
-
-				objectMatrix[8 ] = uToF( workingList[i+3] & 0x0000ffff);
-				objectMatrix[4 ] = uToF((workingList[i+4] & 0xffff0000) >> 16);
-				objectMatrix[0 ] = uToF( workingList[i+4] & 0x0000ffff);
-				objectMatrix[3]  = 0.0f;
-
-				objectMatrix[9 ] = uToF((workingList[i+5] & 0xffff0000) >> 16);
-				objectMatrix[5 ] = uToF( workingList[i+5] & 0x0000ffff);
-				objectMatrix[1 ] = uToF((workingList[i+6] & 0xffff0000) >> 16);
-				objectMatrix[7]  = 0.0f;
-
-				objectMatrix[10] = uToF( workingList[i+6] & 0x0000ffff);
-				objectMatrix[6 ] = uToF((workingList[i+7] & 0xffff0000) >> 16);
-				objectMatrix[2 ] = uToF( workingList[i+7] & 0x0000ffff);
-				objectMatrix[11] = 0.0f;
-
-				objectMatrix[12] = uToF((workingList[i+2] & 0xffff0000) >> 16);
-				objectMatrix[13] = uToF( workingList[i+2] & 0x0000ffff);
-				objectMatrix[14] = uToF((workingList[i+3] & 0xffff0000) >> 16);
-				objectMatrix[15] = 1.0f;
-
-
-
-				//////////////////////////////////////////////////////////
-				// EXTRACT DATA FROM THE ADDRESS POINTED TO IN THE FILE //
-				//////////////////////////////////////////////////////////
-
-				// Okay, there are 4 hunks per address.  They all seem good too...
-
-				// First tell me how many 'chunks' are at each address...
-				size[0] = WORD_AT( threeDPointer, ( 6<<1) );
-				size[1] = WORD_AT( threeDPointer, ( 7<<1) );
-				size[2] = WORD_AT( threeDPointer, ( 9<<1) );
-				size[3] = WORD_AT( threeDPointer, (10<<1) );
-
-				megaOffset = ( WORD_AT(threeDRoms, (threeDOffset + 4)) ) << 16;
-				address[0] = megaOffset | WORD_AT(threeDPointer, (0<<1));
-				address[1] = megaOffset | WORD_AT(threeDPointer, (1<<1));
-				address[2] = megaOffset | WORD_AT(threeDPointer, (3<<1));
-				address[3] = megaOffset | WORD_AT(threeDPointer, (4<<1));
-
-				// DEBUG
-				// mame_printf_debug("%.5x %.3x %.5x %.3x %.5x %.3x %.5x %.3x\n", address[0], size[0], address[1], size[1], address[2], size[2], address[3], size[3]);
-				// !! END DEBUG !!
-
-
-
-				////////////////////////////////////
-				// A FEW 'GLOBAL' TRANSFORMATIONS //
-				////////////////////////////////////
-
-				// Now perform the world transformations...
-				// !! Can eliminate this step with a matrix stack (maybe necessary?) !!
-				setIdentity(modelViewMatrix);
-				matmul4(modelViewMatrix, modelViewMatrix, cameraMatrix);
-				matmul4(modelViewMatrix, modelViewMatrix, objectMatrix);
-
-				for (k = 0; k < 4; k++)										// For all 4 chunks
-				{
-					threeDPointer = &threeDRoms[(address[k]<<1) * 3];
-
-					for (l = 0; l < size[k]; l++)
-					{
-						////////////////////////////////////////////
-						// GATHER A SINGLE TRIANGLE'S INFORMATION //
-						////////////////////////////////////////////
-
-						UINT8 triangleType = threeDPointer[1];
-
-						UINT8 numVertices = 3;
-						UINT8 chunkLength = 0;
-
-						// Some chunks only have 1 vertex (they act as a vertex fan)
-						if (triangleType == 0x97 ||
-							triangleType == 0x87 ||
-							triangleType == 0xd7 ||
-							triangleType == 0x96)
-							numVertices = 1;
-
-						// Get which texture this polygon refers to...
-						// In fatfur it's 0xc for the smooth-shaded earth       - maybe this is for all things with alpha - check the hair at some point...
-						//                0x9 for the untextured buildings
-						//                0xd for the 'explosion' of the HNG64
-						//            and 0x8 everywhere else...
-						//        they're 0x8 in the buriki intro too (those are 66-byte chunks!)
-						polys[numPolys].texType = ((threeDPointer[2] & 0xf0) >> 4);
-
-						if (polys[numPolys].texType == 0x8 || polys[numPolys].texType == 0xc)		//  || polys[numPolys].texType == 0x9
-							polys[numPolys].texIndex = threeDPointer[3] & 0x0f;
-						else
-							polys[numPolys].texIndex = -1;
-
-						// Set the polygon's palette
-						polys[numPolys].palIndex = paletteState;
-
-						for (m = 0; m < numVertices; m++)								// For all vertices of the chunk
-						{
-							switch(triangleType)
-							{
-							// 42 byte chunk
-							case 0x04:
-							case 0x0e:
-								polys[numPolys].vert[m].worldCoords[0] = uToF(WORD_AT(threeDPointer, ((3<<1) + (6<<1)*m)) );
-								polys[numPolys].vert[m].worldCoords[1] = uToF(WORD_AT(threeDPointer, ((4<<1) + (6<<1)*m)) );
-								polys[numPolys].vert[m].worldCoords[2] = uToF(WORD_AT(threeDPointer, ((5<<1) + (6<<1)*m)) );
-								polys[numPolys].vert[m].worldCoords[3] = 1.0f;
-								polys[numPolys].n = 3;
-
-								// !! What is the first coordinate here (6) - maybe denotes size of chunk? !!
-								polys[numPolys].vert[m].texCoords[0] = uToF(WORD_AT(threeDPointer, ((7<<1) + (6<<1)*m)) );
-								polys[numPolys].vert[m].texCoords[1] = uToF(WORD_AT(threeDPointer, ((8<<1) + (6<<1)*m)) );
-								polys[numPolys].vert[m].texCoords[2] = 0.0f;
-								polys[numPolys].vert[m].texCoords[3] = 1.0f;
-
-								polys[numPolys].vert[m].normal[0] = uToF(WORD_AT(threeDPointer, (21<<1) ));
-								polys[numPolys].vert[m].normal[1] = uToF(WORD_AT(threeDPointer, (22<<1) ));
-								polys[numPolys].vert[m].normal[2] = uToF(WORD_AT(threeDPointer, (23<<1) ));
-								polys[numPolys].vert[m].normal[3] = 0.0f;
-
-								// !!! DUMB !!!
-								polys[numPolys].vert[m].light[0] = polys[numPolys].vert[m].texCoords[0] * 255.0f;
-								polys[numPolys].vert[m].light[1] = polys[numPolys].vert[m].texCoords[1] * 255.0f;
-								polys[numPolys].vert[m].light[2] = polys[numPolys].vert[m].texCoords[2] * 255.0f;
-
-								// Redundantly called, but it works...
-								polys[numPolys].faceNormal[0] = polys[numPolys].vert[m].normal[0];
-								polys[numPolys].faceNormal[1] = polys[numPolys].vert[m].normal[1];
-								polys[numPolys].faceNormal[2] = polys[numPolys].vert[m].normal[2];
-								polys[numPolys].faceNormal[3] = 0.0f;
-
-								chunkLength = (24<<1);
-								break;
-
-							// 66 byte chunk
-							case 0x05:
-							case 0x0f:
-								polys[numPolys].vert[m].worldCoords[0] = uToF(WORD_AT(threeDPointer, ((3<<1) + (9<<1)*m)) );
-								polys[numPolys].vert[m].worldCoords[1] = uToF(WORD_AT(threeDPointer, ((4<<1) + (9<<1)*m)) );
-								polys[numPolys].vert[m].worldCoords[2] = uToF(WORD_AT(threeDPointer, ((5<<1) + (9<<1)*m)) );
-								polys[numPolys].vert[m].worldCoords[3] = 1.0f;
-								polys[numPolys].n = 3;
-
-								// !! See above - (6) - why? !!
-								polys[numPolys].vert[m].texCoords[0] = uToF(WORD_AT(threeDPointer, ((7<<1) + (9<<1)*m)) );
-								polys[numPolys].vert[m].texCoords[1] = uToF(WORD_AT(threeDPointer, ((8<<1) + (9<<1)*m)) );
-								polys[numPolys].vert[m].texCoords[2] = 0.0f;
-								polys[numPolys].vert[m].texCoords[3] = 1.0f;
-
-								polys[numPolys].vert[m].normal[0] = uToF(WORD_AT(threeDPointer, ((9<<1) + (9<<1)*m)) );
-								polys[numPolys].vert[m].normal[1] = uToF(WORD_AT(threeDPointer, ((10<<1) + (9<<1)*m)) );
-								polys[numPolys].vert[m].normal[2] = uToF(WORD_AT(threeDPointer, ((11<<1) + (9<<1)*m)) );
-								polys[numPolys].vert[m].normal[3] = 0.0f;
-
-								// !!! DUMB !!!
-								polys[numPolys].vert[m].light[0] = polys[numPolys].vert[m].texCoords[0] * 255.0f;
-								polys[numPolys].vert[m].light[1] = polys[numPolys].vert[m].texCoords[1] * 255.0f;
-								polys[numPolys].vert[m].light[2] = polys[numPolys].vert[m].texCoords[2] * 255.0f;
-
-								// Redundantly called, but it works...
-								polys[numPolys].faceNormal[0] = uToF(WORD_AT(threeDPointer, (30<<1) ));
-								polys[numPolys].faceNormal[1] = uToF(WORD_AT(threeDPointer, (31<<1) ));
-								polys[numPolys].faceNormal[2] = uToF(WORD_AT(threeDPointer, (32<<1) ));
-								polys[numPolys].faceNormal[3] = 0.0f;
-
-								chunkLength = (33<<1);
-								break;
-
-							// 30 byte chunk
-							case 0x97:
-							case 0x87:
-							case 0xd7:
-
-								// Copy over the proper vertices from the previous triangle...
-								memcpy(&polys[numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
-								memcpy(&polys[numPolys].vert[2], &lastPoly.vert[2], sizeof(struct polyVert));
-
-								// Fill in the appropriate data...
-								polys[numPolys].vert[0].worldCoords[0] = uToF(WORD_AT(threeDPointer, (3<<1) ));
-								polys[numPolys].vert[0].worldCoords[1] = uToF(WORD_AT(threeDPointer, (4<<1) ));
-								polys[numPolys].vert[0].worldCoords[2] = uToF(WORD_AT(threeDPointer, (5<<1) ));
-								polys[numPolys].vert[0].worldCoords[3] = 1.0f;
-								polys[numPolys].n = 3;
-
-								// !! See above - (6) - why? !!
-								polys[numPolys].vert[0].texCoords[0] = uToF(WORD_AT(threeDPointer, (7<<1) ));
-								polys[numPolys].vert[0].texCoords[1] = uToF(WORD_AT(threeDPointer, (8<<1) ));
-								polys[numPolys].vert[0].texCoords[2] = 0.0f;
-								polys[numPolys].vert[0].texCoords[3] = 1.0f;
-
-								polys[numPolys].vert[0].normal[0] = uToF(WORD_AT(threeDPointer, (9<<1) ));
-								polys[numPolys].vert[0].normal[1] = uToF(WORD_AT(threeDPointer, (10<<1) ));
-								polys[numPolys].vert[0].normal[2] = uToF(WORD_AT(threeDPointer, (11<<1) ));
-								polys[numPolys].vert[0].normal[3] = 0.0f;
-
-								polys[numPolys].vert[0].light[0] = polys[numPolys].vert[0].texCoords[0] * 255.0f;
-								polys[numPolys].vert[0].light[1] = polys[numPolys].vert[0].texCoords[1] * 255.0f;
-								polys[numPolys].vert[0].light[2] = polys[numPolys].vert[0].texCoords[2] * 255.0f;
-
-								polys[numPolys].faceNormal[0] = uToF(WORD_AT(threeDPointer, (12<<1) ));
-								polys[numPolys].faceNormal[1] = uToF(WORD_AT(threeDPointer, (13<<1) ));
-								polys[numPolys].faceNormal[2] = uToF(WORD_AT(threeDPointer, (14<<1) ));
-								polys[numPolys].faceNormal[3] = 0.0f;
-
-								chunkLength = (15<<1);
-								break;
-
-							// 18 byte chunk
-							case 0x96:
-
-								// Copy over the proper vertices from the previous triangle...
-								memcpy(&polys[numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
-								memcpy(&polys[numPolys].vert[2], &lastPoly.vert[2], sizeof(struct polyVert));
-
-								// !!! Too lazy to have finished this yet !!!
-
-								polys[numPolys].vert[0].worldCoords[0] = uToF(WORD_AT(threeDPointer, (3<<1)));
-								polys[numPolys].vert[0].worldCoords[1] = uToF(WORD_AT(threeDPointer, (4<<1)));
-								polys[numPolys].vert[0].worldCoords[2] = uToF(WORD_AT(threeDPointer, (5<<1)));
-								polys[numPolys].vert[0].worldCoords[3] = 1.0f;
-								polys[numPolys].n = 3;
-
-								// !! See above - (6) - why? !!
-								polys[numPolys].vert[0].texCoords[0] = uToF(WORD_AT(threeDPointer, (7<<1)));
-								polys[numPolys].vert[0].texCoords[1] = uToF(WORD_AT(threeDPointer, (8<<1)));
-								polys[numPolys].vert[0].texCoords[2] = 0.0f;
-								polys[numPolys].vert[0].texCoords[3] = 1.0f;
-
-								// !!! DUMB !!!
-								polys[numPolys].vert[0].light[0] = polys[numPolys].vert[0].texCoords[0] * 255.0f;
-								polys[numPolys].vert[0].light[1] = polys[numPolys].vert[0].texCoords[1] * 255.0f;
-								polys[numPolys].vert[0].light[2] = polys[numPolys].vert[0].texCoords[2] * 255.0f;
-
-								// This normal could be right, but I'm not entirely sure - there is no normal in the 18 bytes!
-								polys[numPolys].vert[0].normal[0] = lastPoly.faceNormal[0];
-								polys[numPolys].vert[0].normal[1] = lastPoly.faceNormal[1];
-								polys[numPolys].vert[0].normal[2] = lastPoly.faceNormal[2];
-								polys[numPolys].vert[0].normal[3] = lastPoly.faceNormal[3];
-
-								polys[numPolys].faceNormal[0] = lastPoly.faceNormal[0];
-								polys[numPolys].faceNormal[1] = lastPoly.faceNormal[1];
-								polys[numPolys].faceNormal[2] = lastPoly.faceNormal[2];
-								polys[numPolys].faceNormal[3] = lastPoly.faceNormal[3];
-
-								chunkLength = (9<<1);
-								break;
-
-							default:
-								mame_printf_debug("UNKNOWN geometry CHUNK TYPE : %x\n", triangleType);
-								break;
-							}
-						}
-
-						polys[numPolys].visible = 1;
-
-						memcpy(&lastPoly, &polys[numPolys], sizeof(struct polygon));
-
-
-
-
-						// THE HNG64 HARDWARE DOES NOT SEEM TO BACKFACE CULL //
-
-						///////////////////
-						// BACKFACE CULL //
-						///////////////////
-/*
-                        float cullRay[4];
-                        float cullNorm[4];
-
-                        // Cast a ray out of the camera towards the polygon's point in eyespace.
-                        vecmatmul4(cullRay, modelViewMatrix, polys[numPolys].vert[0].worldCoords);
-                        normalize(cullRay);
-                        // Dot product that with the normal to see if you're negative...
-                        vecmatmul4(cullNorm, modelViewMatrix, polys[numPolys].faceNormal);
-
-                        float result = vecDotProduct(cullRay, cullNorm);
-
-                        if (result < 0.0f)
-                            polys[numPolys].visible = 1;
-                        else
-                            polys[numPolys].visible = 0;
-*/
-
-						////////////////////////////
-						// BEHIND-THE-CAMERA CULL //
-						////////////////////////////
-						vecmatmul4(cullRay, modelViewMatrix, polys[numPolys].vert[0].worldCoords);
-
-						if (cullRay[2] > 0.0f)				// Camera is pointing down -Z
-						{
-							polys[numPolys].visible = 0;
-						}
-
-
-						//////////////////////////////////////////////////////////
-						// TRANSFORM THE TRIANGLE INTO HOMOGENEOUS SCREEN SPACE //
-						//////////////////////////////////////////////////////////
-
-						if (polys[numPolys].visible)
-						{
-							for (m = 0; m < polys[numPolys].n; m++)
-							{
-								// Transform and project the vertex into pre-divided homogeneous coordinates...
-								vecmatmul4(eyeCoords, modelViewMatrix, polys[numPolys].vert[m].worldCoords);
-								vecmatmul4(polys[numPolys].vert[m].clipCoords, projectionMatrix, eyeCoords);
-							}
-
-							if (polys[numPolys].visible)
-							{
-								// Clip the triangles to the view frustum...
-								performFrustumClip(&polys[numPolys]);
-
-								for (m = 0; m < polys[numPolys].n; m++)
-								{
-									// Convert into normalized device coordinates...
-									ndCoords[0] = polys[numPolys].vert[m].clipCoords[0] / polys[numPolys].vert[m].clipCoords[3];
-									ndCoords[1] = polys[numPolys].vert[m].clipCoords[1] / polys[numPolys].vert[m].clipCoords[3];
-									ndCoords[2] = polys[numPolys].vert[m].clipCoords[2] / polys[numPolys].vert[m].clipCoords[3];
-									ndCoords[3] = polys[numPolys].vert[m].clipCoords[3];
-
-									// Final pixel values are garnered here :
-									windowCoords[0] = (ndCoords[0]+1.0f) * ((float)(visarea->max_x) / 2.0f) + 0.0f;
-									windowCoords[1] = (ndCoords[1]+1.0f) * ((float)(visarea->max_y) / 2.0f) + 0.0f;
-									windowCoords[2] = (ndCoords[2]+1.0f) * 0.5f;
-
-									windowCoords[1] = (float)visarea->max_y - windowCoords[1];		// Flip Y
-
-									// Store the points in a list for later use...
-									polys[numPolys].vert[m].clipCoords[0] = windowCoords[0];
-									polys[numPolys].vert[m].clipCoords[1] = windowCoords[1];
-									polys[numPolys].vert[m].clipCoords[2] = windowCoords[2];
-									polys[numPolys].vert[m].clipCoords[3] = ndCoords[3];
-								}
-							}
-						}
-
-
-/*
-                        // DEBUG
-                        if (chunkLength == (9 << 1))
-                        {
-                            mame_printf_debug("Chunk : ");
-                            for (int ajg = 0; ajg < chunkLength; ajg+=2)
-                                mame_printf_debug("%.2x%.2x ", threeDPointer[ajg], threeDPointer[ajg+1]);
-                            mame_printf_debug("\n");
-                        }
-                        // END DEBUG
-*/
-
-						// Advance to the next polygon chunk...
-						threeDPointer += chunkLength;
-
-						numPolys++;				// Add one more to the display list...
-					}
-				}
-
+				recoverPolygonBlock(machine, packet3d);
 				break;
 
 			default:
@@ -2256,7 +2318,6 @@ static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *
 
 		// Don't forget about this !!!
 		//mame_printf_debug("                 %.8x\n\n", (UINT32)hng64_dls[j][0x80]);
-
 	}
 
 
@@ -2276,11 +2337,11 @@ static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *
 		if (polys[i].visible)
 		{
 			//DrawWireframe(&polys[i], bitmap);
-			drawShaded(machine, &polys[i], bitmap);
+			drawShaded(machine, &polys[i]);
 		}
 	}
 
-	// usrintf_showmessage("%d", numPolys);
+	//popmessage("%d", numPolys);
 
 	// Clear each of the display list buffers after drawing...
 	for (i = 0; i < 0x81; i++)
@@ -2375,7 +2436,7 @@ static void normalize(float* x)
 ///////////////////////////////////////////////////////////////////////////////////
 // The remainder of the code in this file is heavily                             //
 //   influenced by, and sometimes copied verbatim from Andrew Zaferakis' SoftGL  //
-//   rasterizing system.  http://www.cs.unc.edu/~andrewz/comp236/                //
+//   rasterizing system.                                                         //
 //                                                                               //
 //   Andrew granted permission for its use in MAME in October of 2004.           //
 ///////////////////////////////////////////////////////////////////////////////////
@@ -2634,7 +2695,7 @@ static void DrawWireframe(struct polygon *p, bitmap_t *bitmap)
 /**                                                                 **/
 /**     Output: none                                                **/
 /*********************************************************************/
-INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine, bitmap_t *Color,
+INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 										  int Wrapping, int Filtering, int Function,
 										  int x_start, int x_end, int y, float z_start, float z_delta,
 										  float w_start, float w_delta, float r_start, float r_delta,
@@ -2730,7 +2791,7 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine, bitmap_t *Co
 //   nearest and bilinear filtering: Filtering={0,1}
 //   replace and modulate application modes: Function={0,1}
 //---------------------------------------------------------------------------
-static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine, bitmap_t *Color,
+static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 											float A[4], float B[4], float C[4],
 											float Ca[3], float Cb[3], float Cc[3], // PER-VERTEX RGB COLORS
 											float Ta[2], float Tb[2], float Tc[2], // PER-VERTEX (S,T) TEX-COORDS
@@ -2925,7 +2986,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine, bitmap_t *
 
 		// Pass the horizontal line to the filler, this could be put in the routine
 		// then interpolate for the next values of x and z
-		FillSmoothTexPCHorizontalLine(machine, Color, Wrapping, Filtering, Function,
+		FillSmoothTexPCHorizontalLine(machine, Wrapping, Filtering, Function,
 			x_start, x_end, y_min, z_interp_x, z_delta_x, w_interp_x, w_delta_x,
 			r_interp_x, r_delta_x, g_interp_x, g_delta_x, b_interp_x, b_delta_x,
 			s_interp_x, s_delta_x, t_interp_x, t_delta_x);
@@ -3005,7 +3066,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine, bitmap_t *
 
 		// Pass the horizontal line to the filler, this could be put in the routine
 		// then interpolate for the next values of x and z
-		FillSmoothTexPCHorizontalLine(machine, Color, Wrapping, Filtering, Function,
+		FillSmoothTexPCHorizontalLine(machine, Wrapping, Filtering, Function,
 			x_start, x_end, y_mid, z_interp_x, z_delta_x, w_interp_x, w_delta_x,
 			r_interp_x, r_delta_x, g_interp_x, g_delta_x, b_interp_x, b_delta_x,
 			s_interp_x, s_delta_x, t_interp_x, t_delta_x);
@@ -3020,7 +3081,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine, bitmap_t *
 	}
 }
 
-static void drawShaded(running_machine *machine, struct polygon *p, bitmap_t *bitmap)
+static void drawShaded(running_machine *machine, struct polygon *p)
 {
 	// The perspective-correct texture divide...
 	// !!! There is a very good chance the HNG64 hardware does not do perspective-correct texture-mapping !!!
@@ -3037,7 +3098,7 @@ static void drawShaded(running_machine *machine, struct polygon *p, bitmap_t *bi
 
 	for (j = 1; j < p->n-1; j++)
 	{
-		RasterizeTriangle_SMOOTH_TEX_PC(machine, bitmap,
+		RasterizeTriangle_SMOOTH_TEX_PC(machine,
 										p->vert[0].clipCoords, p->vert[j].clipCoords, p->vert[j+1].clipCoords,
 										p->vert[0].light,      p->vert[j].light,      p->vert[j+1].light,
 										p->vert[0].texCoords,  p->vert[j].texCoords,  p->vert[j+1].texCoords,
