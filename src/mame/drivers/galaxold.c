@@ -3014,13 +3014,13 @@ The CPU has 'VIDEO STARS - V.S PRO - TEL: 03045 61541' on a sticky label on it.
 
 the cpu daughterboard is etched 'competitive video'.
 
-The rom daughtercard may not have come from this precise pcb, 
-i think it was on a fullsize pcb according to the spacing of the riser pins. 
+The rom daughtercard may not have come from this precise pcb,
+i think it was on a fullsize pcb according to the spacing of the riser pins.
 This daughterboard is also etched competitive video, and uses 4 2716's and 3 2732's.
 
 there are 8 rom sockets on this daughterboard, 7 are roms, and the final socket is actually a 6116 ram.
 
-there is a small prom in the midle of the pcb inbetween the risers, 
+there is a small prom in the midle of the pcb inbetween the risers,
 with a circular red labelled saying 'k'. This might be a decryption prom or somethign? i dunno.
 
 there is a TBP18s03 PROM installed at 6L which i guess is the colour prom :)

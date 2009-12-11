@@ -221,7 +221,7 @@ static void gcp_adpcm_int( const device_config *device )
 		state->adpcm_data = ((state->adpcm_trigger ? (ROM[state->adpcm_start] & 0x0f) : (ROM[state->adpcm_start] & 0xf0) >> 4));
 		msm5205_data_w(device, state->adpcm_data & 0xf);
 		state->adpcm_trigger ^= 1;
-		if (state->adpcm_trigger == 0) 
+		if (state->adpcm_trigger == 0)
 			state->adpcm_start++;
 	}
 }

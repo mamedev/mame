@@ -12,8 +12,8 @@ struct _goal92_state
 	UINT16 *    fg_data;
 	UINT16 *    tx_data;
 	UINT16 *    scrollram;
-//	UINT16 *    paletteram;	// this currently use generic palette handling
-//	UINT16 *    spriteram;	// this currently use generic buffered spriteram
+//  UINT16 *    paletteram; // this currently use generic palette handling
+//  UINT16 *    spriteram;  // this currently use generic buffered spriteram
 
 	/* video-related */
 	tilemap     *bg_layer, *fg_layer, *tx_layer;

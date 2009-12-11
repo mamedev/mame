@@ -133,7 +133,7 @@ struct _gstream_state
 	UINT32 *  vram;
 	UINT32 *  workram;
 	UINT32 *  paletteram;
-//	UINT32 *  nvram;	// currently this uses generic nvram handling
+//  UINT32 *  nvram;    // currently this uses generic nvram handling
 
 	/* video-related */
 	tilemap   *tilemap1, *tilemap2, *tilemap3;
@@ -216,40 +216,40 @@ static WRITE32_HANDLER( gstream_vram_w )
 	}
 }
 
-static WRITE32_HANDLER( gstream_tilemap1_scrollx_w ) 
-{ 
-	gstream_state *state = (gstream_state *)space->machine->driver_data;
-	state->tmap1_scrollx = data; 
-}
-
-static WRITE32_HANDLER( gstream_tilemap1_scrolly_w ) 
-{ 
-	gstream_state *state = (gstream_state *)space->machine->driver_data;
-	state->tmap1_scrolly = data; 
-}
-
-static WRITE32_HANDLER( gstream_tilemap2_scrollx_w ) 
+static WRITE32_HANDLER( gstream_tilemap1_scrollx_w )
 {
 	gstream_state *state = (gstream_state *)space->machine->driver_data;
-	state->tmap2_scrollx = data; 
+	state->tmap1_scrollx = data;
 }
 
-static WRITE32_HANDLER( gstream_tilemap2_scrolly_w ) 
-{ 
+static WRITE32_HANDLER( gstream_tilemap1_scrolly_w )
+{
 	gstream_state *state = (gstream_state *)space->machine->driver_data;
-	state->tmap2_scrolly = data; 
+	state->tmap1_scrolly = data;
 }
 
-static WRITE32_HANDLER( gstream_tilemap3_scrollx_w ) 
-{ 
+static WRITE32_HANDLER( gstream_tilemap2_scrollx_w )
+{
 	gstream_state *state = (gstream_state *)space->machine->driver_data;
-	state->tmap3_scrollx = data; 
+	state->tmap2_scrollx = data;
 }
 
-static WRITE32_HANDLER( gstream_tilemap3_scrolly_w ) 
-{ 
+static WRITE32_HANDLER( gstream_tilemap2_scrolly_w )
+{
 	gstream_state *state = (gstream_state *)space->machine->driver_data;
-	state->tmap3_scrolly = data; 
+	state->tmap2_scrolly = data;
+}
+
+static WRITE32_HANDLER( gstream_tilemap3_scrollx_w )
+{
+	gstream_state *state = (gstream_state *)space->machine->driver_data;
+	state->tmap3_scrollx = data;
+}
+
+static WRITE32_HANDLER( gstream_tilemap3_scrolly_w )
+{
+	gstream_state *state = (gstream_state *)space->machine->driver_data;
+	state->tmap3_scrolly = data;
 }
 
 static ADDRESS_MAP_START( gstream_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -482,11 +482,11 @@ static VIDEO_UPDATE(gstream)
 	//popmessage("(1) %08x %08x (2) %08x %08x (3) %08x %08x", state->tmap1_scrollx, state->tmap1_scrolly, state->tmap2_scrollx, state->tmap2_scrolly, state->tmap3_scrollx, state->tmap3_scrolly );
 
 	tilemap_set_scrollx(state->tilemap3, 0, state->tmap3_scrollx >> 16);
-	tilemap_set_scrolly(state->tilemap3, 0, state->tmap3_scrolly >> 16); 
+	tilemap_set_scrolly(state->tilemap3, 0, state->tmap3_scrolly >> 16);
 
 	tilemap_set_scrollx(state->tilemap1, 0, state->tmap1_scrollx >> 16);
 	tilemap_set_scrolly(state->tilemap1, 0, state->tmap1_scrolly >> 16);
- 
+
 	tilemap_set_scrollx(state->tilemap2, 0, state->tmap2_scrollx >> 16);
 	tilemap_set_scrolly(state->tilemap2, 0, state->tmap2_scrolly >> 16);
 

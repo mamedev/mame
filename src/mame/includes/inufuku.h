@@ -8,7 +8,7 @@ struct _inufuku_state
 	UINT16 *  tx_videoram;
 	UINT16 *  spriteram1;
 	UINT16 *  spriteram2;
-//  	UINT16 *  paletteram;    // currently this uses generic palette handling
+//      UINT16 *  paletteram;    // currently this uses generic palette handling
 	size_t    spriteram1_size;
 
 	/* video-related */

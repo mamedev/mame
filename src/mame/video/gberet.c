@@ -185,7 +185,7 @@ WRITE8_HANDLER( gberetb_scroll_w )
 	gberet_state *state = (gberet_state *)space->machine->driver_data;
 	int scroll = data;
 
-	if (offset) 
+	if (offset)
 		scroll |= 0x100;
 
 	for (offset = 6; offset < 29; offset++)

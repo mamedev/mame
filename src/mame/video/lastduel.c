@@ -226,7 +226,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	int offs;
 
 	if (!state->sprite_pri_mask)
-		if (pri == 1) 
+		if (pri == 1)
 			return;	/* only low priority sprites in lastduel */
 
 	for (offs = 0x400 - 4; offs >= 0; offs -= 4)
@@ -236,9 +236,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		attr = buffered_spriteram16[offs + 1];
 		if (state->sprite_pri_mask)	/* only madgear seems to have this */
 		{
-			if (pri == 1 && (attr & state->sprite_pri_mask)) 
+			if (pri == 1 && (attr & state->sprite_pri_mask))
 				continue;
-			if (pri == 0 && !(attr & state->sprite_pri_mask)) 
+			if (pri == 0 && !(attr & state->sprite_pri_mask))
 				continue;
 		}
 

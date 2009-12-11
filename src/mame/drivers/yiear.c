@@ -57,9 +57,9 @@ The 6809 NMI is used for sound timing.
 
 static READ8_DEVICE_HANDLER( yiear_speech_r )
 {
-	if (vlm5030_bsy(device)) 
+	if (vlm5030_bsy(device))
 		return 1;
-	else 
+	else
 		return 0;
 }
 
@@ -75,7 +75,7 @@ static INTERRUPT_GEN( yiear_nmi_interrupt )
 	trackfld_state *state = (trackfld_state *)device->machine->driver_data;
 
 	/* can't use nmi_line_pulse() because interrupt_enable_w() effects it */
-	if (state->yiear_nmi_enable) 
+	if (state->yiear_nmi_enable)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 

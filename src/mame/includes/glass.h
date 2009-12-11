@@ -11,7 +11,7 @@ struct _glass_state
 	UINT16 *    videoram;
 	UINT16 *    vregs;
 	UINT16 *    spriteram;
-//  	UINT16 *    paletteram;    // currently this uses generic palette handling
+//      UINT16 *    paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap     *pant[2];

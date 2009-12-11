@@ -189,7 +189,7 @@ WRITE16_HANDLER( fromanc2_videoram_3_w ) { fromanc2_dispvram_w(space->machine, o
 WRITE16_HANDLER( fromanc2_gfxreg_0_w )
 {
 	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
-	switch (offset) 
+	switch (offset)
 	{
 		case 0x00:	state->scrollx[0][0] = -(data - 0x000); break;
 		case 0x01:	state->scrolly[0][0] = -(data - 0x000); break;
@@ -203,7 +203,7 @@ WRITE16_HANDLER( fromanc2_gfxreg_0_w )
 WRITE16_HANDLER( fromanc2_gfxreg_1_w )
 {
 	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
-	switch (offset) 
+	switch (offset)
 	{
 		case 0x00:	state->scrollx[1][0] = -(data - 0x1be); break;
 		case 0x01:	state->scrolly[1][0] = -(data - 0x1ef); break;
@@ -217,7 +217,7 @@ WRITE16_HANDLER( fromanc2_gfxreg_1_w )
 WRITE16_HANDLER( fromanc2_gfxreg_2_w )
 {
 	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
-	switch (offset) 
+	switch (offset)
 	{
 		case 0x00:	state->scrollx[0][2] = -(data - 0x1c0); break;
 		case 0x01:	state->scrolly[0][2] = -(data - 0x1ef); break;
@@ -231,7 +231,7 @@ WRITE16_HANDLER( fromanc2_gfxreg_2_w )
 WRITE16_HANDLER( fromanc2_gfxreg_3_w )
 {
 	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
-	switch (offset) 
+	switch (offset)
 	{
 		case 0x00:	state->scrollx[1][2] = -(data - 0x1bf); break;
 		case 0x01:	state->scrolly[1][2] = -(data - 0x1ef); break;
@@ -285,7 +285,7 @@ WRITE16_HANDLER( fromancr_videoram_2_w ) { fromancr_vram_w(space->machine, offse
 WRITE16_HANDLER( fromancr_gfxreg_0_w )
 {
 	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
-	switch (offset) 
+	switch (offset)
 	{
 		case 0x00:	state->scrollx[0][0] = -(data - 0x1bf); break;
 		case 0x01:	state->scrolly[0][0] = -(data - 0x1ef); break;
@@ -299,7 +299,7 @@ WRITE16_HANDLER( fromancr_gfxreg_0_w )
 WRITE16_HANDLER( fromancr_gfxreg_1_w )
 {
 	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
-	switch (offset) 
+	switch (offset)
 	{
 		case 0x00:	state->scrollx[0][1] = -(data - 0x000); break;
 		case 0x01:	state->scrolly[0][1] = -(data - 0x000); break;
@@ -341,7 +341,7 @@ WRITE16_HANDLER( fromanc4_videoram_2_w ) { fromanc4_vram_w(space->machine, offse
 WRITE16_HANDLER( fromanc4_gfxreg_0_w )
 {
 	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
-	switch (offset) 
+	switch (offset)
 	{
 		case 0x00:	state->scrollx[0][2] = -(data - 0xfbb); break;
 		case 0x01:	state->scrolly[0][2] = -(data - 0x1e4); break;
@@ -360,7 +360,7 @@ WRITE16_HANDLER( fromanc4_gfxreg_0_w )
 WRITE16_HANDLER( fromanc4_gfxreg_1_w )
 {
 	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
-	switch (offset) 
+	switch (offset)
 	{
 		case 0x00:	state->scrollx[0][1] = -(data - 0xfba); break;
 		case 0x01:	state->scrolly[0][1] = -(data - 0x1e4); break;
@@ -379,7 +379,7 @@ WRITE16_HANDLER( fromanc4_gfxreg_1_w )
 WRITE16_HANDLER( fromanc4_gfxreg_2_w )
 {
 	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
-	switch (offset) 
+	switch (offset)
 	{
 		case 0x00:	state->scrollx[0][0] = -(data - 0xfbb); break;
 		case 0x01:	state->scrolly[0][0] = -(data - 0x1e4); break;

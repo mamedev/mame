@@ -91,9 +91,9 @@ static void filter_w( const device_config *device, int data )
 {
 	int C = 0;
 
-	if (data & 1) 
+	if (data & 1)
 		C += 220000;	/* 220000pF = 0.220uF */
-	if (data & 2) 
+	if (data & 2)
 		C +=  47000;	/*  47000pF = 0.047uF */
 
 	filter_rc_set_RC(device, FLT_RC_LOWPASS, 1000, 5100, 0, CAP_P(C));

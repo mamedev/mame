@@ -11,7 +11,7 @@ struct _karnov_state
 	UINT16 *    videoram;
 	UINT16 *    ram;
 	UINT16 *    pf_data;
-//	UINT16 *    spriteram;	// currently this uses generic buffered spriteram
+//  UINT16 *    spriteram;  // currently this uses generic buffered spriteram
 
 	/* video-related */
 	bitmap_t    *bitmap_f;
@@ -30,13 +30,13 @@ struct _karnov_state
 	const device_config *audiocpu;
 };
 
-enum { 
-	KARNOV = 0, 
-	KARNOVJ, 
-	CHELNOV, 
-	CHELNOVJ, 
-	CHELNOVW, 
-	WNDRPLNT 
+enum {
+	KARNOV = 0,
+	KARNOVJ,
+	CHELNOV,
+	CHELNOVJ,
+	CHELNOVW,
+	WNDRPLNT
 };
 
 

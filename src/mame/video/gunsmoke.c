@@ -157,7 +157,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int sx = spriteram[offs + 3] - ((attr & 0x20) << 3);
 		int sy = spriteram[offs + 2];
 
-		if (bank == 3) 
+		if (bank == 3)
 			bank += state->sprite3bank;
 
 		code += 256 * bank;
@@ -185,10 +185,10 @@ VIDEO_UPDATE( gunsmoke )
 	else
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
-	if (state->objon) 
+	if (state->objon)
 		draw_sprites(screen->machine, bitmap, cliprect);
 
-	if (state->chon)  
+	if (state->chon)
 		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 
 	return 0;

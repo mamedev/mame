@@ -118,12 +118,12 @@ static INTERRUPT_GEN( jb_interrupt_nmi )
 }
 
 
-static READ8_DEVICE_HANDLER( jailbrek_speech_r ) 
+static READ8_DEVICE_HANDLER( jailbrek_speech_r )
 {
 	return (vlm5030_bsy(device) ? 1 : 0);
 }
 
-static WRITE8_DEVICE_HANDLER( jailbrek_speech_w ) 
+static WRITE8_DEVICE_HANDLER( jailbrek_speech_w )
 {
 	/* bit 0 could be latch direction like in yiear */
 	vlm5030_st(device, (data >> 1) & 1);

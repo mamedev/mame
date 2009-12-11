@@ -341,9 +341,9 @@ static void draw_sprites( const device_config *screen, bitmap_t *bitmap, const r
 			yzoom = 16 - zoomtable[yzoom] / 8;
 
 			/* wrap around */
-			if (x > visarea->max_x) 
+			if (x > visarea->max_x)
 				x -= 0x200;
-			if (y > visarea->max_y) 
+			if (y > visarea->max_y)
 				y -= 0x200;
 
 			/* flip ? */

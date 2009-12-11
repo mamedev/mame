@@ -241,7 +241,7 @@ static INTERRUPT_GEN( lazercmd_timer )
 {
 	lazercmd_state *state = (lazercmd_state *)device->machine->driver_data;
 
-	if (++state->timer_count >= 64 * 128) 
+	if (++state->timer_count >= 64 * 128)
 	{
 		state->timer_count = 0;
 		state->sense_state ^= 1;
@@ -379,7 +379,7 @@ static READ8_HANDLER( lazercmd_hardware_r )
 			data = input_port_read(space->machine, "IN2");
 			break;
 		case 4: 			   /* vertical scan counter */
-			data = ((state->timer_count & 0x10) >> 1) | ((state->timer_count & 0x20) >> 3) 
+			data = ((state->timer_count & 0x10) >> 1) | ((state->timer_count & 0x20) >> 3)
 						| ((state->timer_count & 0x40) >> 5) | ((state->timer_count & 0x80) >> 7);
 			break;
 		case 5: 			   /* vertical scan counter */
@@ -631,10 +631,10 @@ static MACHINE_DRIVER_START( lazercmd )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 672 kHz? */
-/*	Main Clock is 8MHz divided by 12
-	but memory and IO access is only possible
-	within the line and frame blanking period
-	thus requiring an extra loading of approx 3-5 */
+/*  Main Clock is 8MHz divided by 12
+    but memory and IO access is only possible
+    within the line and frame blanking period
+    thus requiring an extra loading of approx 3-5 */
 	MDRV_CPU_PROGRAM_MAP(lazercmd_map)
 	MDRV_CPU_IO_MAP(lazercmd_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(lazercmd_timer, 128) 	/* 7680 Hz */
@@ -672,10 +672,10 @@ static MACHINE_DRIVER_START( medlanes )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 666 kHz */
-/*	Main Clock is 8MHz divided by 12
-	but memory and IO access is only possible
-	within the line and frame blanking period
-	thus requiring an extra loading of approx 3-5 */
+/*  Main Clock is 8MHz divided by 12
+    but memory and IO access is only possible
+    within the line and frame blanking period
+    thus requiring an extra loading of approx 3-5 */
 	MDRV_CPU_PROGRAM_MAP(medlanes_map)
 	MDRV_CPU_IO_MAP(lazercmd_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(lazercmd_timer, 128) 	/* 7680 Hz */
@@ -713,10 +713,10 @@ static MACHINE_DRIVER_START( bbonk )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 666 kHz */
-/*	Main Clock is 8MHz divided by 12
-	but memory and IO access is only possible
-	within the line and frame blanking period
-	thus requiring an extra loading of approx 3-5 */
+/*  Main Clock is 8MHz divided by 12
+    but memory and IO access is only possible
+    within the line and frame blanking period
+    thus requiring an extra loading of approx 3-5 */
 	MDRV_CPU_PROGRAM_MAP(bbonk_map)
 	MDRV_CPU_IO_MAP(lazercmd_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(bbonk_timer, 128) 	/* 7680 Hz */

@@ -1241,7 +1241,7 @@ static WRITE32_HANDLER( tmek_pf_w )
 static DRIVER_INIT( tmek )
 {
 	atarigt_state *state = (atarigt_state *)machine->driver_data;
-	
+
 	state->atarigen.eeprom_default = NULL;
 	state->is_primrage = 0;
 

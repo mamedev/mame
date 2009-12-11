@@ -11,7 +11,7 @@ struct _aerofgt_state
 	UINT16 *  spriteram2;
 	UINT16 *  spriteram3;
 	UINT16 *  tx_tilemap_ram;
-//	UINT16 *  paletteram;	// currently this uses generic palette handling
+//  UINT16 *  paletteram;   // currently this uses generic palette handling
 	size_t    spriteram1_size;
 	size_t    spriteram2_size;
 	size_t    spriteram3_size;

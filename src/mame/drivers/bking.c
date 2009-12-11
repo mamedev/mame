@@ -41,11 +41,11 @@ static WRITE8_HANDLER( bking_soundlatch_w )
 	int i, code = 0;
 
 	for (i = 0;i < 8;i++)
-		if (data & (1 << i)) 
+		if (data & (1 << i))
 			code |= 0x80 >> i;
 
 	soundlatch_w(space, offset, code);
-	if (state->sound_nmi_enable) 
+	if (state->sound_nmi_enable)
 		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -395,7 +395,7 @@ GFXDECODE_END
 static WRITE8_DEVICE_HANDLER( port_b_w )
 {
 	/* don't know what this is... could be a filter */
-	if (data != 0x00) 
+	if (data != 0x00)
 		logerror("port_b = %02x\n", data);
 }
 

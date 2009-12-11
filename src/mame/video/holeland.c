@@ -102,9 +102,9 @@ WRITE8_HANDLER( holeland_scroll_w )
 
 WRITE8_HANDLER( holeland_flipscreen_w )
 {
-	if (offset) 
+	if (offset)
 		flip_screen_y_set(space->machine, data);
-	else        
+	else
 		flip_screen_x_set(space->machine, data);
 }
 

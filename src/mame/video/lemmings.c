@@ -30,7 +30,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 		y = spritedata[offs];
 		flash = y & 0x1000;
-		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1))
 			continue;
 
 		x = spritedata[offs + 2];
@@ -180,9 +180,9 @@ VIDEO_UPDATE( lemmings )
 	draw_sprites(screen->machine, bitmap, cliprect, state->sprite_triple_buffer_1, 1, 0x0000);
 
 	/* Pixel layer can be windowed in hardware (two player mode) */
-	if ((state->control_data[6] & 2) == 0) 
+	if ((state->control_data[6] & 2) == 0)
 		copyscrollbitmap_trans(bitmap, state->bitmap0, 1, &x1, 1, &y, cliprect, 0x100);
-	else 
+	else
 	{
 		rect.max_x = 159;
 		rect.min_x = 0;

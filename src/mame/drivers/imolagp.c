@@ -150,7 +150,7 @@ static READ8_HANDLER( receive_data_r )
 #endif
 
 static void initialize_colors( running_machine *machine )
-{ 
+{
 	/* optional runtime remapping of colors */
 	static const UINT8 color[0x10][3] =
 	{ /* wrong! need color-accurate screenshots to fix */

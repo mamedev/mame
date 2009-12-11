@@ -2766,7 +2766,7 @@ PCB Layout
 Notes:
       Z80 - clock 6.802725MHz [27.2109/4]
    YM2203 - clocks 3.4013625 [27/2109/8] & 1.1337875 [27.2109/24]
-    VSync - 55.8268Hz  \ possibly sync/PCB fault, had to adjust 
+    VSync - 55.8268Hz  \ possibly sync/PCB fault, had to adjust
     HSync - 14.7739kHz / h/v syncs on monitor to get a stable picture
 
 */

@@ -10,9 +10,9 @@ struct _gng_state
 	/* memory pointers */
 	UINT8 *    bgvideoram;
 	UINT8 *    fgvideoram;
-//	UINT8 *    paletteram;	// currently this uses generic palette handling
-//	UINT8 *    paletteram2;	// currently this uses generic palette handling
-//	UINT8 *    spriteram;	// currently this uses generic buffered spriteram
+//  UINT8 *    paletteram;  // currently this uses generic palette handling
+//  UINT8 *    paletteram2; // currently this uses generic palette handling
+//  UINT8 *    spriteram;   // currently this uses generic buffered spriteram
 
 	/* video-related */
 	tilemap    *bg_tilemap, *fg_tilemap;

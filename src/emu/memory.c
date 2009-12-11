@@ -79,69 +79,69 @@
         value of 0x14000 would map the bucket at 0x00000, 0x04000, 0x10000,
         and 0x14000.
 
-   	AM_ROM
-   		Specifies that this bucket contains ROM data by attaching an 
-   		internal read handler. If this address space describes the first
-   		address space for a device, and if there is a region whose name
-   		matches the device's name, and if the bucket start/end range is
-   		within the bounds of that region, then this bucket will automatically
-   		map to the memory contained in that region.
-    
+    AM_ROM
+        Specifies that this bucket contains ROM data by attaching an
+        internal read handler. If this address space describes the first
+        address space for a device, and if there is a region whose name
+        matches the device's name, and if the bucket start/end range is
+        within the bounds of that region, then this bucket will automatically
+        map to the memory contained in that region.
+
     AM_RAM
     AM_READONLY
     AM_WRITEONLY
-    	Specifies that this bucket contains RAM data by attaching internal
-    	read and/or write handlers. Memory is automatically allocated to back
-    	this area. AM_RAM maps both reads and writes, while AM_READONLY only
-    	maps reads and AM_WRITEONLY only maps writes.
+        Specifies that this bucket contains RAM data by attaching internal
+        read and/or write handlers. Memory is automatically allocated to back
+        this area. AM_RAM maps both reads and writes, while AM_READONLY only
+        maps reads and AM_WRITEONLY only maps writes.
 
-	AM_NOP
-	AM_READNOP
-	AM_WRITENOP
-		Specifies that reads and/or writes in this bucket are unmapped, but 
-		that accesses to them should not be logged. AM_NOP unmaps both reads
-		and writes, while AM_READNOP only unmaps reads, and AM_WRITENOP only
-		unmaps writes.
-	
-	AM_UNMAP
-		Specifies that both reads and writes in thus bucket are unmapeed,
-		and that accesses to them should be logged. There is rarely a need
-		for this, as the entire address space is initialized to behave this
-		way by default.
-    
+    AM_NOP
+    AM_READNOP
+    AM_WRITENOP
+        Specifies that reads and/or writes in this bucket are unmapped, but
+        that accesses to them should not be logged. AM_NOP unmaps both reads
+        and writes, while AM_READNOP only unmaps reads, and AM_WRITENOP only
+        unmaps writes.
+
+    AM_UNMAP
+        Specifies that both reads and writes in thus bucket are unmapeed,
+        and that accesses to them should be logged. There is rarely a need
+        for this, as the entire address space is initialized to behave this
+        way by default.
+
     AM_READ_BANK(tag)
     AM_WRITE_BANK(tag)
     AM_READWRITE_BANK(tag)
-    	Specifies that reads and/or writes in this bucket map to a memory 
-    	bank with the provided 'tag'. The actual memory this bank points to 
-    	can be later controlled via the same tag.
+        Specifies that reads and/or writes in this bucket map to a memory
+        bank with the provided 'tag'. The actual memory this bank points to
+        can be later controlled via the same tag.
 
     AM_READ(read)
     AM_WRITE(write)
     AM_READWRITE(read, write)
-        Specifies read and/or write handler callbacks for this bucket. All 
+        Specifies read and/or write handler callbacks for this bucket. All
         reads and writes in this bucket will trigger a call to the provided
         functions.
-   	
-   	AM_DEVREAD(tag, read)
-   	AM_DEVWRITE(tag, read)
-   	AM_DEVREADWRITE(tag, read)
-   		Specifies a device-specific read and/or write handler for this 
-   		bucket, automatically bound to the device specified by the provided 
-   		'tag'.
-   	
-   	AM_READ_PORT(tag)
-   	AM_WRITE_PORT(tag)
-   	AM_READWRITE_PORT(tag)
-   		Specifies that read and/or write accesses in this bucket will map 
-   		to the I/O port with the provided 'tag'. An internal read/write 
-   		handler is set up to handle this mapping.
-   	
+
+    AM_DEVREAD(tag, read)
+    AM_DEVWRITE(tag, read)
+    AM_DEVREADWRITE(tag, read)
+        Specifies a device-specific read and/or write handler for this
+        bucket, automatically bound to the device specified by the provided
+        'tag'.
+
+    AM_READ_PORT(tag)
+    AM_WRITE_PORT(tag)
+    AM_READWRITE_PORT(tag)
+        Specifies that read and/or write accesses in this bucket will map
+        to the I/O port with the provided 'tag'. An internal read/write
+        handler is set up to handle this mapping.
+
     AM_REGION(class, tag, offs)
         Only useful if used in conjunction with AM_ROM, AM_RAM, or
-        AM_READ/WRITE_BANK. By default, memory is allocated to back each 
-        bucket. By specifying AM_REGION, you can tell the memory system to 
-        point the base of the memory backing this bucket to a given memory 
+        AM_READ/WRITE_BANK. By default, memory is allocated to back each
+        bucket. By specifying AM_REGION, you can tell the memory system to
+        point the base of the memory backing this bucket to a given memory
         'region' at the specified 'offs' instead of allocating it.
 
     AM_SHARE(tag)
@@ -159,16 +159,16 @@
         with the size, in bytes, of the current bucket.
 
     AM_BASE_MEMBER(struct, basefield)
-	AM_SIZE_MEMBER(struct, sizefield)
-		Specifies a field within a given struct as where to store the base
-		or size of the current bucket. The struct is assumed to be hanging
-		off of the machine->driver_data pointer.
-	
-	AM_BASE_GENERIC(basefield)
-	AM_SIZE_GENERIC(sizefield)
-		Specifies a field within the global generic_pointers struct as
-		where to store the base or size of the current bucket. The global
-		generic_pointer struct lives in machine->generic.
+    AM_SIZE_MEMBER(struct, sizefield)
+        Specifies a field within a given struct as where to store the base
+        or size of the current bucket. The struct is assumed to be hanging
+        off of the machine->driver_data pointer.
+
+    AM_BASE_GENERIC(basefield)
+    AM_SIZE_GENERIC(sizefield)
+        Specifies a field within the global generic_pointers struct as
+        where to store the base or size of the current bucket. The global
+        generic_pointer struct lives in machine->generic.
 
 ***************************************************************************/
 
@@ -342,7 +342,7 @@ struct _memory_private
 	tagmap *				bankmap;						/* map for fast bank lookups */
 	bank_info * 			banklist;						/* data gathered for each bank */
 	UINT8					banknext;						/* next bank to allocate */
-	
+
 	tagmap *				sharemap;						/* map for share lookups */
 
 	UINT8 *					wptable;						/* watchpoint-fill table */
@@ -821,7 +821,7 @@ void memory_init(running_machine *machine)
 
 	/* dump the final memory configuration */
 	mem_dump(machine);
-	
+
 	/* we are now initialized */
 	memdata->initialized = TRUE;
 }
@@ -1104,7 +1104,7 @@ void memory_configure_bank(running_machine *machine, const char *tag, int starte
 	memory_private *memdata = machine->memory_data;
 	bank_info *bank = tagmap_find_hash_only(memdata->bankmap, tag);
 	int entrynum;
-	
+
 	/* validation checks */
 	if (bank == NULL)
 		fatalerror("memory_configure_bank called for unknown bank '%s'", tag);
@@ -1504,22 +1504,22 @@ void *_memory_install_ram(const address_space *space, offs_t addrstart, offs_t a
 	address_space *spacerw = (address_space *)space;
 	FPTR bankindex;
 	void *handler;
-	
+
 	/* map for read */
 	if (install_read)
 	{
 		handler = bank_find_or_allocate(space, NULL, addrstart, addrend, addrmask, addrmirror, ROW_READ);
 		space_map_range(spacerw, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, spacerw, "ram");
-		
+
 		/* if we are provided a pointer, set it */
 		bankindex = (FPTR)handler;
 		if (baseptr != NULL)
 			memdata->bank_ptr[bankindex] = baseptr;
 
-		/* if we don't have a bank pointer yet, try to find one */ 
+		/* if we don't have a bank pointer yet, try to find one */
 		if (memdata->bank_ptr[bankindex] == NULL)
 			memdata->bank_ptr[bankindex] = (UINT8 *)space_find_backing_memory(space, addrstart, addrend);
-		
+
 		/* if we still don't have a pointer, and we're past the initialization phase, allocate a new block */
 		if (memdata->bank_ptr[bankindex] == NULL && memdata->initialized)
 		{
@@ -1540,10 +1540,10 @@ void *_memory_install_ram(const address_space *space, offs_t addrstart, offs_t a
 		if (baseptr != NULL)
 			memdata->bank_ptr[bankindex] = baseptr;
 
-		/* if we don't have a bank pointer yet, try to find one */ 
+		/* if we don't have a bank pointer yet, try to find one */
 		if (memdata->bank_ptr[bankindex] == NULL)
 			memdata->bank_ptr[bankindex] = (UINT8 *)space_find_backing_memory(space, addrstart, addrend);
-		
+
 		/* if we still don't have a pointer, and we're past the initialization phase, allocate a new block */
 		if (memdata->bank_ptr[bankindex] == NULL && memdata->initialized)
 		{
@@ -1555,10 +1555,10 @@ void *_memory_install_ram(const address_space *space, offs_t addrstart, offs_t a
 
 	return (void *)space_find_backing_memory(spacerw, addrstart, addrend);
 }
-	
+
 
 /*-------------------------------------------------
-    _memory_unmap - unmap a section of address 
+    _memory_unmap - unmap a section of address
     space
 -------------------------------------------------*/
 
@@ -1820,7 +1820,7 @@ static void memory_init_preflight(running_machine *machine)
 {
 	memory_private *memdata = machine->memory_data;
 	address_space *space;
-	
+
 	/* reset the banking state */
 	memdata->banknext = STATIC_BANK1;
 
@@ -1916,7 +1916,7 @@ static void memory_init_populate(running_machine *machine)
 				/* find the entry before the last one we processed */
 				for (entry = space->map->entrylist; entry->next != last_entry; entry = entry->next) ;
 				last_entry = entry;
-				
+
 				/* map both read and write halves */
 				memory_init_map_entry(space, entry, ROW_READ);
 				memory_init_map_entry(space, entry, ROW_WRITE);
@@ -1941,22 +1941,22 @@ static void memory_init_map_entry(address_space *space, const address_map_entry 
 	{
 		case AMH_NONE:
 			return;
-			
+
 		case AMH_ROM:
 			if (readorwrite == ROW_WRITE)
 				return;
 			/* fall through to the RAM case otherwise */
-			
+
 		case AMH_RAM:
-			_memory_install_ram(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
+			_memory_install_ram(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
 								readorwrite == ROW_READ, readorwrite == ROW_WRITE, NULL);
 			break;
-	
+
 		case AMH_NOP:
 			_memory_unmap(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
 							readorwrite == ROW_READ, readorwrite == ROW_WRITE, TRUE);
 			break;
-	
+
 		case AMH_UNMAP:
 			_memory_unmap(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
 							readorwrite == ROW_READ, readorwrite == ROW_WRITE, FALSE);
@@ -1965,83 +1965,83 @@ static void memory_init_map_entry(address_space *space, const address_map_entry 
 		case AMH_HANDLER:
 			switch ((handler->bits != 0) ? handler->bits : space->dbits)
 			{
-				case 8:		
-					_memory_install_handler8(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
-												(readorwrite == ROW_READ) ? handler->handler.read.shandler8 : NULL, handler->name, 
-												(readorwrite == ROW_WRITE) ? handler->handler.write.shandler8 : NULL, handler->name, 
-												handler->mask); 
+				case 8:
+					_memory_install_handler8(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+												(readorwrite == ROW_READ) ? handler->handler.read.shandler8 : NULL, handler->name,
+												(readorwrite == ROW_WRITE) ? handler->handler.write.shandler8 : NULL, handler->name,
+												handler->mask);
 					break;
 
-				case 16:	
-					_memory_install_handler16(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
-												(readorwrite == ROW_READ) ? handler->handler.read.shandler16 : NULL, handler->name, 
-												(readorwrite == ROW_WRITE) ? handler->handler.write.shandler16 : NULL, handler->name, 
-												handler->mask); 
+				case 16:
+					_memory_install_handler16(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+												(readorwrite == ROW_READ) ? handler->handler.read.shandler16 : NULL, handler->name,
+												(readorwrite == ROW_WRITE) ? handler->handler.write.shandler16 : NULL, handler->name,
+												handler->mask);
 					break;
 
-				case 32:	
-					_memory_install_handler32(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
-												(readorwrite == ROW_READ) ? handler->handler.read.shandler32 : NULL, handler->name, 
-												(readorwrite == ROW_WRITE) ? handler->handler.write.shandler32 : NULL, handler->name, 
-												handler->mask); 
+				case 32:
+					_memory_install_handler32(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+												(readorwrite == ROW_READ) ? handler->handler.read.shandler32 : NULL, handler->name,
+												(readorwrite == ROW_WRITE) ? handler->handler.write.shandler32 : NULL, handler->name,
+												handler->mask);
 					break;
-					
+
 				case 64:
-					_memory_install_handler64(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
-												(readorwrite == ROW_READ) ? handler->handler.read.shandler64 : NULL, handler->name, 
-												(readorwrite == ROW_WRITE) ? handler->handler.write.shandler64 : NULL, handler->name, 
-												handler->mask); 
+					_memory_install_handler64(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+												(readorwrite == ROW_READ) ? handler->handler.read.shandler64 : NULL, handler->name,
+												(readorwrite == ROW_WRITE) ? handler->handler.write.shandler64 : NULL, handler->name,
+												handler->mask);
 					break;
 			}
 			break;
-	
+
 		case AMH_DEVICE_HANDLER:
 			device = devtag_get_device(space->machine, handler->tag);
 			if (device == NULL)
 				fatalerror("Attempted to map a non-existent device '%s' in space %s of device '%s'\n", handler->tag, space->name, (space->cpu != NULL) ? space->cpu->tag : "??");
 			switch ((handler->bits != 0) ? handler->bits : space->dbits)
 			{
-				case 8:		
-					_memory_install_device_handler8(space, device, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
-													(readorwrite == ROW_READ) ? handler->handler.read.dhandler8 : NULL, handler->name, 
-													(readorwrite == ROW_WRITE) ? handler->handler.write.dhandler8 : NULL, handler->name, 
-													handler->mask); 
+				case 8:
+					_memory_install_device_handler8(space, device, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+													(readorwrite == ROW_READ) ? handler->handler.read.dhandler8 : NULL, handler->name,
+													(readorwrite == ROW_WRITE) ? handler->handler.write.dhandler8 : NULL, handler->name,
+													handler->mask);
 					break;
 
-				case 16:	
-					_memory_install_device_handler16(space, device, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
-													(readorwrite == ROW_READ) ? handler->handler.read.dhandler16 : NULL, handler->name, 
-													(readorwrite == ROW_WRITE) ? handler->handler.write.dhandler16 : NULL, handler->name, 
-													handler->mask); 
+				case 16:
+					_memory_install_device_handler16(space, device, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+													(readorwrite == ROW_READ) ? handler->handler.read.dhandler16 : NULL, handler->name,
+													(readorwrite == ROW_WRITE) ? handler->handler.write.dhandler16 : NULL, handler->name,
+													handler->mask);
 					break;
 
-				case 32:	
-					_memory_install_device_handler32(space, device, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
-													(readorwrite == ROW_READ) ? handler->handler.read.dhandler32 : NULL, handler->name, 
-													(readorwrite == ROW_WRITE) ? handler->handler.write.dhandler32 : NULL, handler->name, 
-													handler->mask); 
+				case 32:
+					_memory_install_device_handler32(space, device, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+													(readorwrite == ROW_READ) ? handler->handler.read.dhandler32 : NULL, handler->name,
+													(readorwrite == ROW_WRITE) ? handler->handler.write.dhandler32 : NULL, handler->name,
+													handler->mask);
 					break;
-					
+
 				case 64:
-					_memory_install_device_handler64(space, device, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
-													(readorwrite == ROW_READ) ? handler->handler.read.dhandler64 : NULL, handler->name, 
-													(readorwrite == ROW_WRITE) ? handler->handler.write.dhandler64 : NULL, handler->name, 
-													handler->mask); 
+					_memory_install_device_handler64(space, device, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+													(readorwrite == ROW_READ) ? handler->handler.read.dhandler64 : NULL, handler->name,
+													(readorwrite == ROW_WRITE) ? handler->handler.write.dhandler64 : NULL, handler->name,
+													handler->mask);
 					break;
 			}
 			break;
-		
+
 		case AMH_PORT:
-			_memory_install_port(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
-									(readorwrite == ROW_READ) ? handler->tag : NULL, 
+			_memory_install_port(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+									(readorwrite == ROW_READ) ? handler->tag : NULL,
 									(readorwrite == ROW_WRITE) ? handler->tag : NULL);
 			break;
-		
+
 		case AMH_BANK:
-			_memory_install_bank(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, 
-									(readorwrite == ROW_READ) ? handler->tag : NULL, 
+			_memory_install_bank(space, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror,
+									(readorwrite == ROW_READ) ? handler->tag : NULL,
 									(readorwrite == ROW_WRITE) ? handler->tag : NULL);
-			break;		
+			break;
 	}
 }
 
@@ -2205,12 +2205,12 @@ static void memory_exit(running_machine *machine)
 		memdata->memory_block_list = block->next;
 		free(block);
 	}
-	
+
 	/* free banks */
 	while (memdata->banklist != NULL)
 	{
 		bank_info *bank = memdata->banklist;
-		
+
 		/* free references within each bank */
 		while (bank->reflist != NULL)
 		{
@@ -2218,7 +2218,7 @@ static void memory_exit(running_machine *machine)
 			bank->reflist = ref->next;
 			free(ref);
 		}
-		
+
 		memdata->banklist = bank->next;
 		free(bank);
 	}
@@ -2496,7 +2496,7 @@ static void map_detokenize(memory_private *memdata, address_map *map, const game
 				break;
 		}
 	}
-	
+
 	/* post-process to apply the global mask */
 	if (map->globalmask != 0)
 		for (entry = map->entrylist; entry != NULL; entry = entry->next)
@@ -2628,12 +2628,12 @@ static int space_needs_backing_store(const address_space *space, const address_m
 	/* if we're writing to any sort of bank or RAM, then yes, we do need backing */
 	if (entry->write.type == AMH_BANK || entry->write.type == AMH_RAM)
 		return TRUE;
-	
+
 	/* if we're reading from RAM or from ROM outside of address space 0 or its region, then yes, we do need backing */
-	if (entry->read.type == AMH_RAM || 
+	if (entry->read.type == AMH_RAM ||
 		(entry->read.type == AMH_ROM && (space->spacenum != ADDRESS_SPACE_0 || entry->addrstart >= memory_region_length(space->machine, space->cpu->tag))))
 		return TRUE;
-	
+
 	/* all other cases don't need backing */
 	return FALSE;
 }
@@ -2645,8 +2645,8 @@ static int space_needs_backing_store(const address_space *space, const address_m
 ***************************************************************************/
 
 /*-------------------------------------------------
-    bank_find_or_allocate - allocate a new 
-    bank, or find an existing one, and return the 
+    bank_find_or_allocate - allocate a new
+    bank, or find an existing one, and return the
     read/write handler
 -------------------------------------------------*/
 
@@ -2660,14 +2660,14 @@ static void *bank_find_or_allocate(const address_space *space, const char *tag, 
 	bank_info *bank = NULL;
 	char temptag[10];
 	char name[30];
-	
+
 	/* adjust the addresses, handling mirrors and such */
 	adjust_addresses(space, &bytestart, &byteend, &bytemask, &bytemirror);
-	
+
 	/* if this bank is named, look it up */
 	if (tag != NULL)
 		bank = tagmap_find_hash_only(memdata->bankmap, tag);
-	
+
 	/* else try to find an exact match */
 	else
 	{
@@ -2675,12 +2675,12 @@ static void *bank_find_or_allocate(const address_space *space, const char *tag, 
 			if (bank->tag[0] == '~' && bank->bytestart == bytestart && bank->byteend == byteend && bank->reflist != NULL && bank->reflist->space == space)
 				break;
 	}
-	
+
 	/* if we don't have a bank yet, find a free one */
 	if (bank == NULL)
 	{
 		int banknum = memdata->banknext++;
-		
+
 		/* handle failure */
 		if (banknum > STATIC_BANKMAX)
 		{
@@ -2689,7 +2689,7 @@ static void *bank_find_or_allocate(const address_space *space, const char *tag, 
 			else
 				fatalerror("Unable to allocate bank for RAM/ROM area %X-%X\n", bytestart, byteend);
 		}
-		
+
 		/* generate an internal tag if we don't have one */
 		if (tag == NULL)
 		{
@@ -2699,10 +2699,10 @@ static void *bank_find_or_allocate(const address_space *space, const char *tag, 
 		}
 		else
 			sprintf(name, "Bank '%s'", tag);
-		
+
 		/* allocate the bank */
 		bank = (bank_info *)alloc_array_clear_or_die(UINT8, sizeof(bank_info) + strlen(tag) + 1 + strlen(name));
-			
+
 		/* populate it */
 		bank->index = banknum;
 		bank->handler = (void *)(FPTR)(STATIC_BANK1 + banknum - 1);
@@ -2712,11 +2712,11 @@ static void *bank_find_or_allocate(const address_space *space, const char *tag, 
 		strcpy(bank->tag, tag);
 		bank->name = bank->tag + strlen(tag) + 1;
 		strcpy(bank->name, name);
-		
+
 		/* add us to the list */
 		bank->next = memdata->banklist;
 		memdata->banklist = bank;
-		
+
 		/* for named banks, add to the map and register for save states */
 		if (tag[0] != '~')
 		{
@@ -2725,7 +2725,7 @@ static void *bank_find_or_allocate(const address_space *space, const char *tag, 
 				state_save_register_item(space->machine, "memory", bank->tag, 0, bank->curentry);
 		}
 	}
-		
+
 	/* update the read/write state for this bank */
 	if (readorwrite == ROW_READ)
 		bank->read = TRUE;
@@ -3761,7 +3761,7 @@ static const char *handler_to_string(const address_space *space, const address_t
 		"bank 120",		"bank 121",		"bank 122",		"ram",
 		"rom",			"nop",			"unmapped",     "watchpoint"
 	};
-	
+
 	/* banks have names */
 	if (entry >= STATIC_BANK1 && entry <= STATIC_BANKMAX)
 	{
@@ -3770,7 +3770,7 @@ static const char *handler_to_string(const address_space *space, const address_t
 			if (info->index == entry)
 				return info->name;
 	}
-		
+
 	/* constant strings for lower entries */
 	if (entry < STATIC_COUNT)
 		return strings[entry];

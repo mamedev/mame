@@ -295,7 +295,7 @@ static void calculate_star_field( running_machine *machine )
 			bit1 = (~generator >> 17) & 1;
 			bit2 = (generator >> 5) & 1;
 
-			if (bit1 ^ bit2) 
+			if (bit1 ^ bit2)
 				generator |= 1;
 
 			if (((~generator >> 16) & 1) && (generator & 0xfe) == 0xfe)
@@ -492,7 +492,7 @@ static void rallyx_draw_sprites( running_machine *machine, bitmap_t *bitmap, con
 		int color = spriteram_2[offs + 1] & 0x3f;
 		int flipx = spriteram[offs] & 1;
 		int flipy = spriteram[offs] & 2;
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 			sx -= 2 * displacement;
 
 		pdrawgfx_transmask(bitmap,cliprect,machine->gfx[1],
@@ -540,7 +540,7 @@ static void rallyx_draw_bullets( running_machine *machine, bitmap_t *bitmap, con
 
 		x = state->radarx[offs] + ((~state->radarattr[offs & 0x0f] & 0x01) << 8);
 		y = 253 - state->radary[offs];
-		if (flip_screen_get(machine)) 
+		if (flip_screen_get(machine))
 			x -= 3;
 
 		if (transpen)

@@ -204,19 +204,19 @@ static int avengers_fetch_paldata( running_machine *machine )
 	int digit1 = pal_data[page * 256 * 2 + (30 - row * 2) * 16 + col];
 	int result;
 
-	if (digit0 >= 'A') 
-		digit0 += 10 - 'A'; 
-	else 
+	if (digit0 >= 'A')
+		digit0 += 10 - 'A';
+	else
 		digit0 -= '0';
 
-	if (digit1 >= 'A') 
-		digit1 += 10 - 'A'; 
-	else 
+	if (digit1 >= 'A')
+		digit1 += 10 - 'A';
+	else
 		digit1 -= '0';
 
 	result = digit0 * 16 + digit1;
 
-	if ((state->palette_pen & 0x3f) != 0x3f) 
+	if ((state->palette_pen & 0x3f) != 0x3f)
 		state->palette_pen++;
 
 	return result;

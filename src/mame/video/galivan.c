@@ -297,11 +297,11 @@ WRITE8_HANDLER( ninjemak_gfxbank_w )
 WRITE8_HANDLER( galivan_scrollx_w )
 {
 	galivan_state *state = (galivan_state *)space->machine->driver_data;
-	if (offset == 1) 
+	if (offset == 1)
 	{
 		if (data & 0x80)
 			state->write_layers = 1;
-		else if (state->write_layers) 
+		else if (state->write_layers)
 		{
 			state->layers = data & 0x60;
 			state->write_layers = 0;
@@ -388,13 +388,13 @@ VIDEO_UPDATE( galivan )
 	else
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
-	if (state->layers & 0x20) 
+	if (state->layers & 0x20)
 	{
 		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 1, 0);
 		draw_sprites(screen->machine, bitmap, cliprect);
-	} 
-	else 
+	}
+	else
 	{
 		draw_sprites(screen->machine, bitmap, cliprect);
 		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);

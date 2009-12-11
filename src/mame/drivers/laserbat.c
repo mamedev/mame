@@ -584,16 +584,16 @@ static const sn76477_interface laserbat_sn76477_interface =
 
 /* Cat'N Mouse sound ***********************************/
 
-static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0a ) 
-{ 
+static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0a )
+{
 	laserbat_state *laserbat = (laserbat_state *)device->machine->driver_data;
-	cpu_set_input_line(laserbat->audiocpu, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); 
+	cpu_set_input_line(laserbat->audiocpu, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b ) 
-{ 
+static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b )
+{
 	laserbat_state *laserbat = (laserbat_state *)device->machine->driver_data;
-	cpu_set_input_line(laserbat->audiocpu, 0, state ? ASSERT_LINE : CLEAR_LINE); 
+	cpu_set_input_line(laserbat->audiocpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER( zaccaria_port0a_r )

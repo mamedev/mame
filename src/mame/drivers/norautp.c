@@ -635,7 +635,7 @@ static WRITE8_DEVICE_HANDLER( mainlamps_w )
 	output_set_lamp_value(6, (data >> 6) & 1);	/* HOLD 5 lamp */
 	output_set_lamp_value(7, (data >> 7) & 1);	/* CANCEL lamp */
 
-//	popmessage("lamps: %02x", data);
+//  popmessage("lamps: %02x", data);
 }
 
 static WRITE8_DEVICE_HANDLER( soundlamps_w )
@@ -1581,17 +1581,17 @@ ROM_END
 
 
   - CPU:      1x Z084004PSC (Frequency measured 2.3025MHz.)
-  - RAM:      4x 2114 
+  - RAM:      4x 2114
   - I/O:      3x 8255 Peripeheral Interface Adapter.
   - Prg ROM:  2x 2732, U11,U16
-  - Gfx ROM:  1x 2716 U27 Eprom 
+  - Gfx ROM:  1x 2716 U27 Eprom
   - Sound:    Discrete.
   - Crystal:  1x 18.432 MHz
 
 
   NOTE: PIN NO 5 LIFTED FROM CPU SOCKET (A15)
   PCB DOES NOT BOOT IF PIN IS PUT BACK IN SOCKET.
-    
+
   PCB silksceened:
   PROLOGIC MADE IN (IRL) - 131191
 
@@ -1968,12 +1968,12 @@ ROM_END
   ||                    |   | 6116 | |
   ||     Z084004PS      |   |      | |
   *|                    |   |      | |
-  *|____________________|   |      | |               
+  *|____________________|   |      | |
   * J2                      |______| |
   |__________________________________|
 
 
-  Discrete audio circuitry: SAME AS KIMBLE DIAGRAM 
+  Discrete audio circuitry: SAME AS KIMBLE DIAGRAM
   EXCEPT FOR :R1 = 120 K ; Tolerance +/- 5%
 
 */
@@ -2132,7 +2132,7 @@ ROM_END
 
   2) Press HOLD1 to reset meters, HOLD2 for readout,
      or follow the next steps to adjust percentage.
-	 Press DEAL to exit.
+     Press DEAL to exit.
 
   2) Keep pressed HI & LO buttons.
   3) Press HOLD5 (readout) button.
@@ -2157,33 +2157,33 @@ ROM_END
   -------------------------
 
   Hardware Layout:
- 
-  - CPU:             1x Z8400AB1: ON CPU ADDON BOARD 
+
+  - CPU:             1x Z8400AB1: ON CPU ADDON BOARD
   - RAM:             2x 2114 VIDEO
   - RAM:             1x 6264 PROG: ON EXPANSION BOARD
   - I/O:             3x 8255 Peripeheral Interface Adapter.
   - Prg ROM:         1x 27C256: ON EXPANSION BOARD
-  - Prg ROM:         1x 27C128: ON EXPANSION BOARD 
-  - Gfx ROM:         1x 2716 U27 Eprom 
+  - Prg ROM:         1x 27C128: ON EXPANSION BOARD
+  - Gfx ROM:         1x 2716 U27 Eprom
   - Sound:           Discrete.
-  - Crystal:         1x 18.432 MHz.ON CPU ADDON BOARD 
+  - Crystal:         1x 18.432 MHz.ON CPU ADDON BOARD
                      1X PAL16R8 ON EXPANSION BOARD
-                      
+
   PCB silksceened:
   SCT 18-88
   KIMBLE DOUBLE HI-LO
   CARD GAME
-   
+
   PCB MARKED:SZY044
-   
+
   CHAR EPROM LABELED: "QUIZ CHAR II"
   PROG EPROM (256) LABELED: "M.B POKER ALT 1 2P/10P I"
   PROG EPROM (128) LABELED: "M.B POKER ALT 1 2P/10P II"
- 
- 
+
+
   Frequency measured 2.3025MHz.
-  
-    
+
+
   PCB Layout (Kimble Double HI-LO Z80):                                        Edge Connector 36x2
    ______________________________________________________________________________________________
   |                         _________    _________    _____        .........     _________       |
@@ -2233,9 +2233,9 @@ ROM_END
   | |____________________|        U5              U4           U3           U2           U1      |
   |  1        U6                                                                                 |
   |______________________________________________________________________________________________|
-  
 
-  PCB Layout EXPANSION BOARD (Kimble Double HI-LO 8080): 
+
+  PCB Layout EXPANSION BOARD (Kimble Double HI-LO 8080):
 
   EXPANSION BOARD  Silksceened:SCT 34-88
    __________________________________________________________________
@@ -2318,8 +2318,8 @@ ROM_END
 
   C1 = 10nK 63v
   C2 = 223J
-  C3 = 47nK 63v 
-  
+  C3 = 47nK 63v
+
   C4 = 10nK 63v
   C5 = 10nK 63v
   C6 = 100nK 100v
@@ -2725,31 +2725,31 @@ ROM_END
 
 
   Hardware Layout (Kimble Double HI-LO 8080):
- 
-   - CPU:             1x INTEL P8080A 
+
+   - CPU:             1x INTEL P8080A
    - RAM:             2x 2114 VIDEO
    - RAM:             1x 6264 PROG: ON EXPANSION BOARD
    - I/O:             3x 8255 Peripeheral Interface Adapter.
    - Prg ROM:         1x 27C256: ON EXPANSION BOARD
-   - Gfx ROM:         1x 2716 U27 Eprom 
+   - Gfx ROM:         1x 2716 U27 Eprom
    - Sound:           Discrete.
    - Crystal:         1x 18.432 MHz.
                       1X PAL16R8 ON EXPANSION BOARD
-                      
+
   PCB silksceened:
   "SCT 41-88"
   "KIMBLE DOUBLE HI-LO"
   "CARD GAME"
-   
+
   PCB MARKED:"VZY07"
-   
+
   CHAR EPROM LABELED: "QUIZ CHAR II"
   PROG EPROM LABELED: "JPCS25611"
- 
- 
+
+
   Frequency measured = 2.040 MHz.
-  
-    
+
+
   PCB Layout (Kimble Double HI-LO 8080):                                       Edge Connector 36x2
    ______________________________________________________________________________________________
   |                         _________    _________    _____        .........     _________       |
@@ -2799,7 +2799,7 @@ ROM_END
   | |____________________|        U5              U4           U3           U2           U1      |
   |           U6                                                                                 |
   |______________________________________________________________________________________________|
-  
+
 
   PCB Layout EXPANSION BOARD (Kimble Double HI-LO 8080):
 
@@ -3223,8 +3223,8 @@ ROM_END
 
   Unknown DPHL rev 1.
 
-  No extra info inside the zip. Just ROM dumps... 
-  Maybe from SMS Manufacturing, since there are GFX tiles with the SMS logo. 
+  No extra info inside the zip. Just ROM dumps...
+  Maybe from SMS Manufacturing, since there are GFX tiles with the SMS logo.
 
 */
 
@@ -3245,8 +3245,8 @@ ROM_END
 
   Unknown DPHL rev 2.
 
-  No extra info inside the zip. Just ROM dumps... 
-  Maybe from SMS Manufacturing, since there are GFX tiles with the SMS logo. 
+  No extra info inside the zip. Just ROM dumps...
+  Maybe from SMS Manufacturing, since there are GFX tiles with the SMS logo.
 
 */
 

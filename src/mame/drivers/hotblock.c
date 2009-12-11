@@ -154,7 +154,7 @@ static VIDEO_UPDATE(hotblock)
 	{
 		for(x = 0; x < xxx; x++)
 		{
-			if (state->port0 & 0x40) 
+			if (state->port0 & 0x40)
 				*BITMAP_ADDR16(bitmap, y, x) = state->vram[count];
 			count++;
 		}

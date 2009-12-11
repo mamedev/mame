@@ -424,7 +424,7 @@ static void draw_sprites_bootleg(running_machine *machine, bitmap_t *bitmap, con
 
 	int offs;
 
-//	UINT16 *spritelist	=	(UINT16 *)(machine->generic.spriteram.u32 + 0x1800/4);
+//  UINT16 *spritelist  =   (UINT16 *)(machine->generic.spriteram.u32 + 0x1800/4);
 	UINT16 *spritelist	=	(UINT16 *)(spritebuf2 + 0x1800/4);
 
 	UINT8 *TILES	=	memory_region(machine, "spritelut");	// Sprites LUT
@@ -458,7 +458,7 @@ static void draw_sprites_bootleg(running_machine *machine, bitmap_t *bitmap, con
 		sprite	=	spritelist[ BYTE_XOR_BE(offs) ];
 
 		sprite	%=	0x300;
-//		source	=	&psikyo_bootleg_spritebuffer[ sprite*8/4 ];
+//      source  =   &psikyo_bootleg_spritebuffer[ sprite*8/4 ];
 		source	=	&spritebuf2[ sprite*8/4 ];
 
 		/* Draw this sprite */

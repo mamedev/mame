@@ -42,9 +42,9 @@ static UINT8 amspdwy_wheel_r( running_machine *machine, int index )
 	if (wheel != state->wheel_old[index])
 	{
 		wheel = (wheel & 0x7fff) - (wheel & 0x8000);
-		if (wheel > state->wheel_old[index])  
+		if (wheel > state->wheel_old[index])
 		state->wheel_return[index] = ((+wheel) & 0xf) | 0x00;
-		else						   
+		else
 		state->wheel_return[index] = ((-wheel) & 0xf) | 0x10;
 
 	state->wheel_old[index] = wheel;

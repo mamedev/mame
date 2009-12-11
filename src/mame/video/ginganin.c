@@ -229,9 +229,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const recta
 
 		if (state->flipscreen)
 		{
-			x = 240 - x;	
+			x = 240 - x;
 			y = 240 - y;
-			flipx = !flipx; 	
+			flipx = !flipx;
 			flipy = !flipy;
 		}
 
@@ -280,14 +280,14 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 
 	if (layers_ctrl1 & 1)
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	else	
+	else
 		bitmap_fill(bitmap, cliprect, 0);
 
-	if (layers_ctrl1 & 2)	
+	if (layers_ctrl1 & 2)
 		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
-	if (layers_ctrl1 & 8)	
+	if (layers_ctrl1 & 8)
 		draw_sprites(screen->machine, bitmap, cliprect);
-	if (layers_ctrl1 & 4)	
+	if (layers_ctrl1 & 4)
 		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
 
 	return 0;

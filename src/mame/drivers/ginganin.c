@@ -308,7 +308,7 @@ static MACHINE_START( ginganin )
 
 	state->audiocpu = devtag_get_device(machine, "audiocpu");
 
-	state_save_register_global(machine, state->layers_ctrl); 
+	state_save_register_global(machine, state->layers_ctrl);
 	state_save_register_global(machine, state->flipscreen);
 	state_save_register_global(machine, state->MC6840_index0);
 	state_save_register_global(machine, state->MC6840_register0);
@@ -324,7 +324,7 @@ static MACHINE_RESET( ginganin )
 {
 	ginganin_state *state = (ginganin_state *)machine->driver_data;
 
-	state->layers_ctrl = 0; 
+	state->layers_ctrl = 0;
 	state->flipscreen = 0;
 	state->MC6840_index0 = 0;
 	state->MC6840_register0 = 0;

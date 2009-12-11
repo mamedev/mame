@@ -1073,7 +1073,7 @@ ROM_END
 static void init_g1_common(running_machine *machine, offs_t slapstic_base, int slapstic, int is_pitfight)
 {
 	atarig1_state *state = (atarig1_state *)machine->driver_data;
-	
+
 	state->atarigen.eeprom_default = NULL;
 	if (slapstic == -1)
 	{

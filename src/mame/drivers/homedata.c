@@ -272,7 +272,7 @@ static READ8_HANDLER( mrokumei_keyboard_r )
          */
 		res |= state->visible_page << 7;
 
-		if (state->vblank) 
+		if (state->vblank)
 			res |= 0x40;
 
 		state->vblank = 0;
@@ -384,7 +384,7 @@ static READ8_HANDLER( reikaids_io_r )
 
 	res |= BIT(state->upd7807_portc, 2) * 0x01;		// bit 0 = upd7807 status
 	res |= BIT(state->upd7807_portc, 6) * 0x02;		// bit 1 = upd7807 data
-	if (state->vblank) 
+	if (state->vblank)
 		res |= 0x04;				// bit 2 = vblank
 	res |= state->visible_page * 0x08;	// bit 3 = visible page
 
@@ -442,7 +442,7 @@ static READ8_HANDLER( pteacher_io_r )
 
 	int res = (state->visible_page ^ 1) << 7;
 
-	if (!state->vblank) 
+	if (!state->vblank)
 		res |= 0x40;
 
 	state->vblank = 0;

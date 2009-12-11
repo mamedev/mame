@@ -10,7 +10,7 @@ struct _himesiki_state
 	/* memory pointers */
 	UINT8 *    bg_ram;
 	UINT8 *    spriteram;
-//	UINT8 *    paletteram;	// currently this uses generic palette handling
+//  UINT8 *    paletteram;  // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap    *bg_tilemap;

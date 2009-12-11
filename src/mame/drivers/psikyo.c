@@ -407,7 +407,7 @@ static ADDRESS_MAP_START( psikyo_bootleg_map, ADDRESS_SPACE_PROGRAM, 32 )
 //  AM_RANGE(0xc00010, 0xc00013) AM_WRITE(psikyo_soundlatch_w)                              // Depends on board, see DRIVER_INIT
 
 	AM_RANGE(0xC00018, 0xC0001b) AM_DEVREADWRITE("oki", s1945bl_oki_r, s1945bl_oki_w)
-	
+
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM														// RAM
 
 ADDRESS_MAP_END
@@ -1768,7 +1768,7 @@ ROM_START( s1945bl )
 
 	ROM_REGION( 0x040000, "spritelut", 0 )	/* */
 	ROM_LOAD16_BYTE( "27c010-b",  0x000000, 0x020000, CRC(e38d5ab7) SHA1(73a708ebc305cb6297efd3296da23c87898e805e) ) // u1.bin       [even]     IDENTICAL
-	ROM_LOAD16_BYTE( "27c010-a",  0x000001, 0x020000, CRC(cb8c65ec) SHA1(a55c5c5067b50a1243e7ba60fa1f9569bfed5de8) ) // u1.bin       [odd]      99.999237%              	
+	ROM_LOAD16_BYTE( "27c010-a",  0x000001, 0x020000, CRC(cb8c65ec) SHA1(a55c5c5067b50a1243e7ba60fa1f9569bfed5de8) ) // u1.bin       [odd]      99.999237%
 
 	ROM_REGION( 0x080000, "unknown", 0 )	/* unknown - matches Semicom's Dream World */
 	ROM_LOAD( "27c512",  0x000000, 0x010000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )

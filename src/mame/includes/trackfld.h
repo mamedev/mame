@@ -18,7 +18,7 @@ struct _trackfld_state
 	UINT8 *  scroll2;		// trackfld
 	UINT8 *  spriteram;
 	UINT8 *  spriteram2;
-//	UINT8 *  nvram;		// currently this uses generic nvram handling (trackfld & hyperspt)
+//  UINT8 *  nvram;     // currently this uses generic nvram handling (trackfld & hyperspt)
 	size_t   spriteram_size;
 	UINT8 *  palettebank;		// sbasketb
 	UINT8 *  spriteram_select;	// sbasketb

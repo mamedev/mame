@@ -1,7 +1,7 @@
 /***************************************************************************
 
     Raster Elite Tickee Tickats hardware
-	 + variations
+     + variations
 
     driver by Aaron Giles
 
@@ -64,7 +64,7 @@ static TIMER_CALLBACK( trigger_gun_interrupt )
 {
 	int which = param & 1;
 	int beamx = (video_screen_get_hpos(machine->primary_screen)/2)-58;
-	
+
 	/* once we're ready to fire, set the X coordinate and assert the line */
 	gunx[which] = beamx;
 
@@ -294,7 +294,7 @@ static WRITE16_HANDLER( tickee_control_w )
 
 /*************************************
  *
- *	Unknowns
+ *  Unknowns
  *
  *************************************/
 
@@ -329,7 +329,7 @@ static WRITE16_HANDLER( rapidfir_control_w )
 
 /*************************************
  *
- *	Sound
+ *  Sound
  *
  *************************************/
 
@@ -340,19 +340,19 @@ static WRITE16_DEVICE_HANDLER( sound_bank_w )
 		case 0x2c:
 			okim6295_set_bank_base(device, 0x00000);
 			break;
-		
+
 		case 0x2d:
 			okim6295_set_bank_base(device, 0x50000);
 			break;
-		
+
 		case 0x1c:
 			okim6295_set_bank_base(device, 0x80000);
 			break;
-		
+
 		case 0x1d:
 			okim6295_set_bank_base(device, 0xc0000);
 			break;
-		
+
 		default:
 			logerror("sound_bank_w %04X %04X\n", data, mem_mask);
 			break;
@@ -567,27 +567,27 @@ static INPUT_PORTS_START( rapidfir )
 	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ))	
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0001, DEF_STR( On ))
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ))	
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0002, DEF_STR( On ))
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ))	
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0004, DEF_STR( On ))
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ))	
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ))
 	PORT_BIT( 0x0070, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ))	
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0080, DEF_STR( On ))
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0040, 0x0000, "Reset NVRAM" )	
+	PORT_DIPNAME( 0x0040, 0x0000, "Reset NVRAM" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ))
 	PORT_DIPSETTING(      0x0040, DEF_STR( Yes ))
 	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -717,7 +717,7 @@ static MACHINE_DRIVER_START( rapidfir )
 	MDRV_CPU_ADD("maincpu", TMS34010, XTAL_50MHz)
 	MDRV_CPU_CONFIG(rapidfir_tms_config)
 	MDRV_CPU_PROGRAM_MAP(rapidfir_map)
-	
+
 	MDRV_MACHINE_RESET(rapidfir)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
@@ -728,7 +728,7 @@ static MACHINE_DRIVER_START( rapidfir )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)
-	
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -878,7 +878,7 @@ BE 1V-0 VER3
 
 PCB No: BE 1V-0 VER3: 7/30/98 (Sticker says PVG/SEMCO)
 CPU   : TMS34010FNL-50
-SND   : BS901 + CA5102 (YM2151 + YM3012), AD-65 (OKI M6295) 
+SND   : BS901 + CA5102 (YM2151 + YM3012), AD-65 (OKI M6295)
 OSC   : 50.000MHz, 3.5795MHz, 8.000MHz, 18.000MHz
 RAM   : Toshiba TC528267J-70 (x 4, surface mounted)
 DIPs  : 8 position (x2)
@@ -898,7 +898,7 @@ ROMs  : RF11.U2     27C040      \
         RF10.U7       "         |
         RF11.U8       "         |
         RF11.U9       "         |
-        DS1220Y.U504  *1        /   
+        DS1220Y.U504  *1        /
 
         RF11.U507    27C040     \
         RF11.U510      "        /   Grouped together, SND/OKI SAMPLES
@@ -917,7 +917,7 @@ ROM_START( rapidfir ) /* Version 1.1, test menu shows "Build 239" */
 	ROM_LOAD16_BYTE( "rf10.u5",  0x200001, 0x80000, CRC(593b3df2) SHA1(301fa06031eff54fb2d9e08f80fc3c26e5c51da9) )
 	ROM_LOAD16_BYTE( "rf11.u2",  0x300000, 0x80000, CRC(ffa0c695) SHA1(bccdefe7cee15999c416fdcb16a65b1bc6e12d13) )
 	ROM_LOAD16_BYTE( "rf11.u3",  0x300001, 0x80000, CRC(ac63b863) SHA1(c9160aec6179d1f550279b80fd4c2a14ce94fdab) )
-	
+
 	ROM_REGION( 0x100000, "oki", 0 )
 	ROM_LOAD( "rf11.507", 0x000000, 0x80000, CRC(899d1e15) SHA1(ca22b4ad714a5212bc9347eb3a5b660c02bad7e5) )
 	ROM_LOAD( "rf11.510", 0x080000, 0x80000, CRC(6209c8fe) SHA1(bfbd63445b4ac2d4253c4b5354e1058070290084) )
@@ -934,7 +934,7 @@ ROM_START( rapidfire ) /* Version 1.0, test menu shows "Build 236" */
 	ROM_LOAD16_BYTE( "rf10.u5",  0x200001, 0x80000, CRC(593b3df2) SHA1(301fa06031eff54fb2d9e08f80fc3c26e5c51da9) )
 	ROM_LOAD16_BYTE( "rf10.u2",  0x300000, 0x80000, CRC(5ef404dd) SHA1(cf060567822c4c02baf4b1948d6e50b480bfb7da) )
 	ROM_LOAD16_BYTE( "rf10.u3",  0x300001, 0x80000, CRC(d8d664db) SHA1(cd63fdc6fe4beb68ced57a2547f8302c1d2544dc) )
-	
+
 	ROM_REGION( 0x100000, "oki", 0 )
 	ROM_LOAD( "rf10.507", 0x000000, 0x80000, CRC(7eab2af4) SHA1(bbb4b2b9f96add56c26f334a7242cdc81a64ce2d) )
 	ROM_LOAD( "rf10.510", 0x080000, 0x80000, CRC(ecd70be6) SHA1(5a26703e822776fecb3f6d729bf91e76db7a7141) )

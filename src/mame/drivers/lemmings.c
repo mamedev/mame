@@ -27,14 +27,14 @@ static WRITE16_HANDLER( lemmings_control_w )
 	lemmings_state *state = (lemmings_state *)space->machine->driver_data;
 
 	/* Offset==0 Pixel layer X scroll */
-	if (offset == 4) 
+	if (offset == 4)
 		return; /* Watchdog or IRQ ack */
 	COMBINE_DATA(&state->control_data[offset]);
 }
 
 static READ16_HANDLER( lemmings_trackball_r )
 {
-	switch (offset) 
+	switch (offset)
 	{
 	case 0: return input_port_read(space->machine, "AN0");
 	case 1: return input_port_read(space->machine, "AN1");
@@ -47,7 +47,7 @@ static READ16_HANDLER( lemmings_trackball_r )
 /* Same as Robocop 2 protection chip */
 static READ16_HANDLER( lemmings_prot_r )
 {
- 	switch (offset << 1) 
+ 	switch (offset << 1)
 	{
 		case 0x41a:
 			return input_port_read(space->machine, "BUTTONS");
@@ -68,7 +68,7 @@ static WRITE16_HANDLER( lemmings_palette_24bit_w )
 	int r, g, b;
 
 	COMBINE_DATA(&state->paletteram[offset]);
-	if (offset & 1) 
+	if (offset & 1)
 		offset--;
 
 	b = (state->paletteram[offset] >> 0) & 0xff;

@@ -6,9 +6,9 @@ struct _lwings_state
 	UINT8 *  fgvideoram;
 	UINT8 *  bg1videoram;
 	UINT8 *  soundlatch2;
-//  	UINT8 *  spriteram;	// currently this uses generic buffered spriteram
-//  	UINT8 *  paletteram;	// currently this uses generic palette handling
-//  	UINT8 *  paletteram2;	// currently this uses generic palette handling
+//      UINT8 *  spriteram; // currently this uses generic buffered spriteram
+//      UINT8 *  paletteram;    // currently this uses generic palette handling
+//      UINT8 *  paletteram2;   // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap  *fg_tilemap, *bg1_tilemap, *bg2_tilemap;

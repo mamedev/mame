@@ -10,7 +10,7 @@ typedef struct _cyberbal_state cyberbal_state;
 struct _cyberbal_state
 {
 	atarigen_state	atarigen;
-	
+
 	UINT16 *		paletteram_0;
 	UINT16 *		paletteram_1;
 	UINT16 			current_slip[2];

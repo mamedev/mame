@@ -78,9 +78,9 @@ static TIMER_CALLBACK( nmi_callback )
 {
 	ladyfrog_state *state = (ladyfrog_state *)machine->driver_data;
 
-	if (state->sound_nmi_enable) 
+	if (state->sound_nmi_enable)
 		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-	else 
+	else
 		state->pending_nmi = 1;
 }
 
@@ -405,4 +405,4 @@ ROM_END
 GAME( 1990, ladyfrog, 0, ladyfrog, ladyfrog, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", GAME_SUPPORTS_SAVE )
 
 // toucheme art style is similar to ladyfrog, so it's probably the same manufacturer
-GAME( 19??, toucheme, 0, toucheme, toucheme, 0, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me", GAME_SUPPORTS_SAVE ) 
+GAME( 19??, toucheme, 0, toucheme, toucheme, 0, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me", GAME_SUPPORTS_SAVE )

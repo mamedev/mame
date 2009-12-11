@@ -122,9 +122,9 @@ static WRITE8_DEVICE_HANDLER( junofrst_portB_w )
 	{
 		int C = 0;
 
-		if (data & 1) 
+		if (data & 1)
 			C += 47000;	/* 47000pF = 0.047uF */
-		if (data & 2) 
+		if (data & 2)
 			C += 220000;	/* 220000pF = 0.22uF */
 
 		data >>= 2;

@@ -42,7 +42,7 @@ struct _good_state
 	UINT16 *  bg_tilemapram;
 	UINT16 *  fg_tilemapram;
 	UINT16 *  sprites;
-//	UINT16 *  paletteram;	// currently this uses generic palette handling
+//  UINT16 *  paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap  *bg_tilemap,*fg_tilemap;

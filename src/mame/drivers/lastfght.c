@@ -71,7 +71,7 @@ struct _lastfght_state
 {
 	/* memory pointers */
 	UINT8 *  colorram;
-//	UINT8 *  nvram;	// currently this uses generic nvram handling
+//  UINT8 *  nvram; // currently this uses generic nvram handling
 
 	/* video-related */
 	bitmap_t *bitmap[2];
@@ -179,7 +179,7 @@ static WRITE16_HANDLER( lastfght_hi_w )
 {
 	lastfght_state *state = (lastfght_state *)space->machine->driver_data;
 
-	if (ACCESSING_BITS_8_15)	
+	if (ACCESSING_BITS_8_15)
 		logerror("%06x: 600000.b = %02x\n", cpu_get_pc(space->cpu), data >> 8);
 	if (ACCESSING_BITS_0_7)
 	{
@@ -229,7 +229,7 @@ static WRITE16_HANDLER( lastfght_h_w )
 		state->h = state->hi | (data >> 8);
 		//logerror("%06x: lastfght_h   = %02x\n", cpu_get_pc(space->cpu), data >> 8);
 	}
-	if (ACCESSING_BITS_0_7)	
+	if (ACCESSING_BITS_0_7)
 		logerror("%06x: 80000d.b = %02x\n", cpu_get_pc(space->cpu), data);
 }
 
@@ -336,7 +336,7 @@ static WRITE16_HANDLER( lastfght_blit_w )
 			}
 		}
 	}
-	if (ACCESSING_BITS_0_7)	
+	if (ACCESSING_BITS_0_7)
 		logerror("%06x: 600007.b = %02x\n", cpu_get_pc(space->cpu), data);
 }
 
@@ -345,7 +345,7 @@ static WRITE16_HANDLER( lastfght_dest_w )
 {
 	lastfght_state *state = (lastfght_state *)space->machine->driver_data;
 
-	if (ACCESSING_BITS_0_7)	
+	if (ACCESSING_BITS_0_7)
 		state->dest ^= 1;
 }
 
@@ -394,7 +394,7 @@ static READ16_HANDLER( lastfght_sound_r )
 
 static WRITE16_HANDLER( lastfght_sound_w )
 {
-	if (ACCESSING_BITS_8_15)	
+	if (ACCESSING_BITS_8_15)
 		logerror("%06x: sound_w msb = %02x\n", cpu_get_pc(space->cpu), data >> 8);
 	if (ACCESSING_BITS_0_7)
 		logerror("%06x: sound_w lsb = %02x\n", cpu_get_pc(space->cpu), data);

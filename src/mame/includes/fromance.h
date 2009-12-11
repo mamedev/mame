@@ -13,7 +13,7 @@ struct _fromance_state
 	/* memory pointers (used by pipedrm) */
 	UINT8 *  videoram;
 	UINT8 *  spriteram;
-//	UINT8 *  paletteram;    // currently this uses generic palette handling
+//  UINT8 *  paletteram;    // currently this uses generic palette handling
 	size_t   videoram_size;
 	size_t   spriteram_size;
 

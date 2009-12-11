@@ -139,10 +139,10 @@ static READ8_DEVICE_HANDLER( input_r )
 
 		if (key)
 		{
-			while (!(key & 1))	
-			{	
-				key >>= 1;	
-				keyval++;	
+			while (!(key & 1))
+			{
+				key >>= 1;
+				keyval++;
 			}
 		}
 

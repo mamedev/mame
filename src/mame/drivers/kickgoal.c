@@ -207,7 +207,7 @@ static WRITE16_DEVICE_HANDLER( actionhw_snd_w )
 	kickgoal_state *state = (kickgoal_state *)device->machine->driver_data;
 	logerror("%s: Writing %04x to Sound CPU - mask %04x\n",cpuexec_describe_context(device->machine),data,mem_mask);
 
-	if (!ACCESSING_BITS_0_7) 
+	if (!ACCESSING_BITS_0_7)
 		data >>= 8;
 
 	switch (data)
@@ -216,11 +216,11 @@ static WRITE16_DEVICE_HANDLER( actionhw_snd_w )
 		case 0xfd:	okim6295_set_bank_base(device, (2 * 0x40000)); break;
 		case 0xfe:	okim6295_set_bank_base(device, (1 * 0x40000)); break;
 		case 0xff:	okim6295_set_bank_base(device, (3 * 0x40000)); break;
-		case 0x78:	
+		case 0x78:
 				okim6295_w(device, 0, data);
 				state->snd_sam[0] = 00; state->snd_sam[1]= 00; state->snd_sam[2] = 00; state->snd_sam[3] = 00;
 				break;
-		default:	
+		default:
 				if (state->snd_new) /* Play new sample */
 				{
 					if ((data & 0x80) && (state->snd_sam[3] != state->snd_new))
@@ -333,14 +333,14 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		{
 			state->m6295_bank += 0x01;
 			state->m6295_bank &= 0x03;
-			if (state->m6295_bank == 0x03) 
+			if (state->m6295_bank == 0x03)
 				state->m6295_bank = 0x00;
 			popmessage("Changing Bank to %02x", state->m6295_bank);
 			okim6295_set_bank_base(state->adpcm, ((state->m6295_bank) * 0x40000));
 
-			if (state->m6295_key_delay == 0xffff) 
+			if (state->m6295_key_delay == 0xffff)
 				state->m6295_key_delay = 0x00;
-			else 
+			else
 				state->m6295_key_delay = (0x30 * oki_time_base);
 		}
 		else
@@ -352,14 +352,14 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		{
 			state->m6295_bank -= 0x01;
 			state->m6295_bank &= 0x03;
-			if (state->m6295_bank == 0x03) 
+			if (state->m6295_bank == 0x03)
 				state->m6295_bank = 0x02;
 			popmessage("Changing Bank to %02x", state->m6295_bank);
 			okim6295_set_bank_base(state->adpcm, ((state->m6295_bank) * 0x40000));
 
-			if (state->m6295_key_delay == 0xffff) 
+			if (state->m6295_key_delay == 0xffff)
 				state->m6295_key_delay = 0x00;
-			else 
+			else
 				state->m6295_key_delay = (0x30 * oki_time_base);
 		}
 		else
@@ -378,9 +378,9 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 			if (state->m6295_comm == 0x70) { okim6295_set_bank_base(state->adpcm, (1 * 0x40000)); state->m6295_bank = 1; }
 			popmessage("Sound test command %02x on Bank %02x", state->m6295_comm, state->m6295_bank);
 
-			if (state->m6295_key_delay == 0xffff) 
+			if (state->m6295_key_delay == 0xffff)
 				state->m6295_key_delay = 0x00;
-			else 
+			else
 				state->m6295_key_delay = (0x5d * oki_time_base);
 		}
 		else
@@ -399,9 +399,9 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 			if (state->m6295_comm == 0x76) { okim6295_set_bank_base(state->adpcm, (1 * 0x40000)); state->m6295_bank = 1; }
 			popmessage("Sound test command %02x on Bank %02x", state->m6295_comm, state->m6295_bank);
 
-			if (state->m6295_key_delay == 0xffff) 
+			if (state->m6295_key_delay == 0xffff)
 				state->m6295_key_delay = 0x00;
-			else 
+			else
 				state->m6295_key_delay = (0x5d * oki_time_base);
 		}
 		else
@@ -417,16 +417,16 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 
 			popmessage("Playing sound %02x on Bank %02x", state->m6295_comm, state->m6295_bank);
 
-			if (state->m6295_key_delay == 0xffff) 
+			if (state->m6295_key_delay == 0xffff)
 				state->m6295_key_delay = 0x00;
-			else 
+			else
 				state->m6295_key_delay = (0x60 * oki_time_base);
 		}
 		else
 			state->m6295_key_delay += (0x01 * oki_time_base);
 //      logerror("Sending %02x to the sound CPU\n", state->m6295_comm);
 	}
-	else 
+	else
 		state->m6295_key_delay = 0xffff;
 }
 

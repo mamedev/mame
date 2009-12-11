@@ -28,10 +28,10 @@
 
     It's funny to see that this game, as 'arkanoid', does NOT allow you
     to enter "SEX" as initials (which will be replaced by "H !") ;)
-	
+
 PCB Layout:
-	
-	
+
+
 |--------------------------------------|
 |UPC1241       U114            2016    |
 |DSW(8) VOL    U113                    |

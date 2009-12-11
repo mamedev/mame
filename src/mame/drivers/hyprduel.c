@@ -72,8 +72,8 @@ static INTERRUPT_GEN( hyprduel_interrupt )
 		cpu_set_input_line(device, 2, HOLD_LINE);
 		/* the duration is a guess */
 		timer_set(device->machine, ATTOTIME_IN_USEC(2500), NULL, 0x20, vblank_end_callback);
-	} 
-	else 
+	}
+	else
 		state->requested_int |= 0x12;		/* hsync */
 
 	update_irq_state(device->machine);
@@ -215,9 +215,9 @@ static READ16_HANDLER( hyprduel_bankedrom_r )
 
 	offset = offset * 2 + 0x10000 * (*state->rombank);
 
-	if (offset < len)	
+	if (offset < len)
 		return ((ROM[offset + 0] << 8) + ROM[offset + 1]);
-	else				
+	else
 		return 0xffff;
 }
 

@@ -242,7 +242,7 @@ VIDEO_UPDATE( bigkarnk )
 	tilemap_draw(bitmap, cliprect, state->tilemap[0], TILEMAP_DRAW_LAYER0 | 2, 2);
 
 	tilemap_draw(bitmap, cliprect, state->tilemap[1], TILEMAP_DRAW_LAYER1 | 1, 2);
-	tilemap_draw(bitmap, cliprect, state->tilemap[0], TILEMAP_DRAW_LAYER1 | 1, 2); 
+	tilemap_draw(bitmap, cliprect, state->tilemap[0], TILEMAP_DRAW_LAYER1 | 1, 2);
 
 	tilemap_draw(bitmap, cliprect, state->tilemap[1], TILEMAP_DRAW_LAYER0 | 1, 4);
 	tilemap_draw(bitmap, cliprect, state->tilemap[0], TILEMAP_DRAW_LAYER0 | 1, 4);

@@ -8,8 +8,8 @@ struct _lemmings_state
 	UINT16 *  vram_data;
 	UINT16 *  control_data;
 	UINT16 *  paletteram;
-//	UINT16 *  spriteram;	// this currently uses generic buffered spriteram
-//	UINT16 *  spriteram2;	// this currently uses generic buffered spriteram
+//  UINT16 *  spriteram;    // this currently uses generic buffered spriteram
+//  UINT16 *  spriteram2;   // this currently uses generic buffered spriteram
 
 	/* video-related */
 	bitmap_t *bitmap0;

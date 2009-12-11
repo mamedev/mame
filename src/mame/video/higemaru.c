@@ -76,7 +76,7 @@ PALETTE_INIT( higemaru )
 WRITE8_HANDLER( higemaru_c800_w )
 {
 	higemaru_state *state = (higemaru_state *)space->machine->driver_data;
-	if (data & 0x7c) 
+	if (data & 0x7c)
 		logerror("c800 = %02x\n",data);
 
 	/* bits 0 and 1 are coin counters */

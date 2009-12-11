@@ -507,7 +507,7 @@ static void transition_control(bitmap_t *bitmap, const rectangle *cliprect)
 		brigR = (INT32)( hng64_tcram[0x0000000a]        & 0xff);
 		brigG = (INT32)((hng64_tcram[0x0000000a] >> 8)  & 0xff);
 		brigB = (INT32)((hng64_tcram[0x0000000a] >> 16) & 0xff);
-								 
+
 		for (i = cliprect->min_x; i < cliprect->max_x; i++)
 		{
 			for (j = cliprect->min_y; j < cliprect->max_y; j++)
@@ -778,7 +778,7 @@ static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap *tmap
 	/* set the priority code and alpha */
 	//blit->tilemap_priority_code = priority | (priority_mask << 8) | (tmap->palette_offset << 16); // fixit
 	blit->alpha = (flags & TILEMAP_DRAW_ALPHA_FLAG) ? (flags >> 24) : 0xff;
-	
+
 	blit->drawformat = drawformat;
 
 	/* tile priority; unless otherwise specified, draw anything in layer 0 */
@@ -815,8 +815,8 @@ INLINE UINT32 alpha_additive_r32(UINT32 d, UINT32 s, UINT8 level)
 	if (add & 0x01000000) d = (d & 0xff00ffff) | (0x00ff0000);
 	else d = (d & 0xff00ffff) | (add & 0x00ff0000);
 	add = (s & 0x000000ff) + (d & 0x000000ff);
-	if (add & 0x00000100) d = (d & 0xffffff00) | (0x000000ff); 
-	else d = (d & 0xffffff00) | (add & 0x000000ff); 
+	if (add & 0x00000100) d = (d & 0xffffff00) | (0x000000ff);
+	else d = (d & 0xffffff00) | (add & 0x000000ff);
 	add = (s & 0x0000ff00) + (d & 0x0000ff00);
 	if (add & 0x00010000) d = (d & 0xffff00ff) | (0x0000ff00);
 	else d = (d & 0xffff00ff) | (add & 0x0000ff00);
@@ -1031,7 +1031,7 @@ static void hng64_tilemap_draw_roz_primask(running_machine* machine, bitmap_t *d
 
 	/* skip if disabled */
 	//if (!tmap->enable)
-	//	return;
+	//  return;
 
 profiler_mark_start(PROFILER_TILEMAP_DRAW_ROZ);
 	/* configure the blit parameters */
@@ -1528,10 +1528,10 @@ VIDEO_UPDATE( hng64 )
 		{
 			UINT32 *src = &colorBuffer3d[y * (cliprect->max_x-cliprect->min_x)];
 			UINT32 *dst = BITMAP_ADDR32(bitmap, y, cliprect->min_x);
-	
+
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-            {    
-				if(*src & 0xff000000) 
+            {
+				if(*src & 0xff000000)
 					*dst = *src;
 
 				dst++;
@@ -1745,17 +1745,17 @@ static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *
 			UINT32 address[4];
 			UINT32 megaOffset;
 			float eyeCoords[4];			// objectCoords transformed by the modelViewMatrix
-			// float clipCoords[4];		// eyeCoords transformed by the projectionMatrix
+			// float clipCoords[4];     // eyeCoords transformed by the projectionMatrix
 			float ndCoords[4];			// normalized device coordinates/clipCoordinates (x/w, y/w, z/w)
 			float windowCoords[4];		// mapped ndCoordinates to screen space
 			float cullRay[4];
 
 			// Debug...
 //          mame_printf_debug("Element %.2d (%d) : %.8x %.8x %.8x %.8x %.8x %.8x %.8x %.8x\n", i/0x08, j,
-//                             (UINT32)hng64_dls[j][i+0], (UINT32)hng64_dls[j][i+1], 
-// 							   (UINT32)hng64_dls[j][i+2], (UINT32)hng64_dls[j][i+3],
-//                             (UINT32)hng64_dls[j][i+4], (UINT32)hng64_dls[j][i+5], 
-// 							   (UINT32)hng64_dls[j][i+6], (UINT32)hng64_dls[j][i+7]);
+//                             (UINT32)hng64_dls[j][i+0], (UINT32)hng64_dls[j][i+1],
+//                             (UINT32)hng64_dls[j][i+2], (UINT32)hng64_dls[j][i+3],
+//                             (UINT32)hng64_dls[j][i+4], (UINT32)hng64_dls[j][i+5],
+//                             (UINT32)hng64_dls[j][i+6], (UINT32)hng64_dls[j][i+7]);
 
 			// Depending on what the initial flags are, do sumthin'...
 			switch((workingList[i+0] & 0xffff0000) >> 16)
@@ -2348,10 +2348,10 @@ static float uToF(UINT16 input)
 	retVal = (float)((INT16)input) / 32768.0f;
 	return retVal;
 
-/*	if ((INT16)input < 0)
-		retVal = (float)((INT16)input) / 32768.0f;
-	else
-		retVal = (float)((INT16)input) / 32767.0f; */
+/*  if ((INT16)input < 0)
+        retVal = (float)((INT16)input) / 32768.0f;
+    else
+        retVal = (float)((INT16)input) / 32767.0f; */
 }
 
 #ifdef UNUSED_FUNCTION
@@ -2649,7 +2649,7 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine, bitmap_t *Co
 	UINT8 paletteEntry;
 	float t_coord, s_coord;
 
-	if (Function >= 0) 
+	if (Function >= 0)
 		textureOffset = &gfx[Function * 1024 * 1024];
 	else
 		textureOffset = 0x00;

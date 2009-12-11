@@ -120,7 +120,7 @@ WRITE8_HANDLER( ironhors_palettebank_w )
 
 	/* bit 6 unknown - set after game over */
 
-	if (data & 0x88) 
+	if (data & 0x88)
 		popmessage("ironhors_palettebank_w %02x",data);
 }
 

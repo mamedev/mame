@@ -24,7 +24,7 @@
 WRITE16_HANDLER( inufuku_palettereg_w )
 {
 	inufuku_state *state = (inufuku_state *)space->machine->driver_data;
-	switch (offset) 
+	switch (offset)
 	{
 		case 0x02:	state->bg_palettebank = (data & 0xf000) >> 12;
 				tilemap_mark_all_tiles_dirty(state->bg_tilemap);
@@ -38,7 +38,7 @@ WRITE16_HANDLER( inufuku_palettereg_w )
 WRITE16_HANDLER( inufuku_scrollreg_w )
 {
 	inufuku_state *state = (inufuku_state *)space->machine->driver_data;
-	switch (offset) 
+	switch (offset)
 	{
 		case 0x00:	state->bg_scrollx = data + 1; break;
 		case 0x01:	state->bg_scrolly = data + 0; break;
@@ -60,9 +60,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	inufuku_state *state = (inufuku_state *)machine->driver_data;
 	int offs;
 
-	for (offs = (state->spriteram1_size / 16) - 1; offs >= 0; offs--) 
+	for (offs = (state->spriteram1_size / 16) - 1; offs >= 0; offs--)
 	{
-		if ((state->spriteram1[offs] & 0x8000) == 0x0000) 
+		if ((state->spriteram1[offs] & 0x8000) == 0x0000)
 		{
 			int attr_start;
 			int map_start;
@@ -106,7 +106,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			priority = (state->spriteram1[attr_start + 2] & 0x3000) >> 12;
 			map_start = (state->spriteram1[attr_start + 3] & 0x7fff) << 1;
 
-			switch (priority) 
+			switch (priority)
 			{
 				default:
 				case 0:	priority_mask = 0x00; break;
@@ -121,7 +121,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			zoomx = 32 - zoomx;
 			zoomy = 32 - zoomy;
 
-			for (y = 0; y <= ysize; y++) 
+			for (y = 0; y <= ysize; y++)
 			{
 				int sx, sy;
 
@@ -130,7 +130,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 				else
 					sy = (oy + zoomy * y / 2 + 16) & 0x1ff;
 
-				for (x = 0; x <= xsize; x++) 
+				for (x = 0; x <= xsize; x++)
 				{
 					int code;
 
@@ -242,13 +242,13 @@ VIDEO_UPDATE( inufuku )
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 
-	if (state->bg_raster) 
+	if (state->bg_raster)
 	{
 		tilemap_set_scroll_rows(state->bg_tilemap, 512);
-		for (i = 0; i < 256; i++) 
+		for (i = 0; i < 256; i++)
 			tilemap_set_scrollx(state->bg_tilemap, (state->bg_scrolly + i) & 0x1ff, state->bg_rasterram[i]);
 	}
-	else 
+	else
 	{
 		tilemap_set_scroll_rows(state->bg_tilemap, 1);
 		tilemap_set_scrollx(state->bg_tilemap, 0, state->bg_scrollx);

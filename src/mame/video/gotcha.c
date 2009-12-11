@@ -21,16 +21,16 @@ INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int ti
 	SET_TILE_INFO(0, code, (data >> 12) + color_offs, 0);
 }
 
-static TILE_GET_INFO( fg_get_tile_info ) 
-{ 
+static TILE_GET_INFO( fg_get_tile_info )
+{
 	gotcha_state *state = (gotcha_state *)machine->driver_data;
-	get_tile_info(machine, tileinfo, tile_index, state->fgvideoram, 0); 
+	get_tile_info(machine, tileinfo, tile_index, state->fgvideoram, 0);
 }
 
-static TILE_GET_INFO( bg_get_tile_info ) 
-{ 
+static TILE_GET_INFO( bg_get_tile_info )
+{
 	gotcha_state *state = (gotcha_state *)machine->driver_data;
-	get_tile_info(machine, tileinfo, tile_index, state->bgvideoram, 16); 
+	get_tile_info(machine, tileinfo, tile_index, state->bgvideoram, 16);
 }
 
 

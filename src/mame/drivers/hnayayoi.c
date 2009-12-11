@@ -48,7 +48,7 @@ static READ8_HANDLER( keyboard_0_r )
 
 	for (i = 0; i < 5; i++)
 	{
-		if (~state->keyb & (1 << i)) 
+		if (~state->keyb & (1 << i))
 			res &= input_port_read(space->machine, keynames[i]);
 	}
 

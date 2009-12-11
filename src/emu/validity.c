@@ -1311,7 +1311,7 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 			{
 				UINT32 bytestart = SPACE_SHIFT(entry->addrstart);
 				UINT32 byteend = SPACE_SHIFT_END(entry->addrend);
-				
+
 				/* look for overlapping entries */
 				if (!detected_overlap)
 				{
@@ -1401,7 +1401,7 @@ static int validate_devices(int drivnum, const machine_config *config, const inp
 					error |= validate_tag(driver, "bank", entry->write.tag);
 				if (entry->share != NULL)
 					error |= validate_tag(driver, "share", entry->share);
-				
+
 				/* if there are base or size members, check that they are within bounds */
 				if (entry->baseptroffs_plus1 != 0 && (entry->baseptroffs_plus1 - 1) >= config->driver_data_size)
 				{

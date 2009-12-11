@@ -23,7 +23,7 @@ struct _s2636_interface
 {
 	const char *screen;
 	int        work_ram_size;
-	int        y_offset; 
+	int        y_offset;
 	int        x_offset;
 };
 

@@ -211,7 +211,7 @@ static void scanline_update(const device_config *screen, int scanline)
 static DIRECT_UPDATE_HANDLER( atarisy2_direct_handler )
 {
 	atarisy2_state *state = (atarisy2_state *)space->machine->driver_data;
-	
+
 	/* make sure slapstic area looks like ROM */
 	if (address >= 0x8000 && address < 0x8200)
 	{

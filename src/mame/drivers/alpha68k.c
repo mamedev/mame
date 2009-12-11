@@ -346,14 +346,14 @@ static READ16_HANDLER( kyros_alpha_trigger_r )
 	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
 	int source = state->shared_ram[offset];
 
-	switch (offset) 
+	switch (offset)
 	{
 	case 0x22: /* Coin value */
 		state->shared_ram[0x22] = (source & 0xff00) | (state->credits & 0x00ff);
 		return 0;
 	case 0x29: /* Query microcontroller for coin insert */
 		state->trigstate++;
-		if ((input_port_read(space->machine, "IN2") & 0x3) == 3) 
+		if ((input_port_read(space->machine, "IN2") & 0x3) == 3)
 			state->latch = 0;
 		if ((input_port_read(space->machine, "IN2") & 0x1) == 0 && !state->latch)
 		{
@@ -439,7 +439,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
 			return 0;
 
 		case 0x29: /* Query microcontroller for coin insert */
-			if ((input_port_read(space->machine, "IN2") & 0x3) == 3) 
+			if ((input_port_read(space->machine, "IN2") & 0x3) == 3)
 				state->latch = 0;
 			if ((input_port_read(space->machine, "IN2") & 0x1) == 0 && !state->latch)
 			{
@@ -532,7 +532,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 			state->shared_ram[0x22] = (source & 0xff00) | (state->credits & 0x00ff);
 			return 0;
 		case 0x29: /* Query microcontroller for coin insert */
-			if ((input_port_read(space->machine, "IN2") & 0x3) == 3) 
+			if ((input_port_read(space->machine, "IN2") & 0x3) == 3)
 				state->latch = 0;
 			if ((input_port_read(space->machine, "IN2") & 0x1) == 0 && !state->latch)
 			{
@@ -590,7 +590,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 			state->shared_ram[0x1f00] = (source & 0xff00) | input_port_read(space->machine, "IN4");
 			return 0;
 		case 0x1f29: /* Query microcontroller for coin insert */
-			if ((input_port_read(space->machine, "IN2") & 0x3) == 3) 
+			if ((input_port_read(space->machine, "IN2") & 0x3) == 3)
 				state->latch = 0;
 			if ((input_port_read(space->machine, "IN2") & 0x1) == 0 && !state->latch)
 			{
@@ -3131,7 +3131,7 @@ static READ16_HANDLER( timesold_cycle_r )
 	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
 	int ret = state->shared_ram[0x4];
 
-	if (cpu_get_pc(space->cpu) == 0x9ea2 && (ret & 0xff00) == 0) 
+	if (cpu_get_pc(space->cpu) == 0x9ea2 && (ret & 0xff00) == 0)
 	{
 		cpu_spinuntil_int(space->cpu);
 		return 0x100 | (ret & 0xff);
@@ -3145,7 +3145,7 @@ static READ16_HANDLER( timesol1_cycle_r )
 	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
 	int ret = state->shared_ram[0x4];
 
-	if (cpu_get_pc(space->cpu) == 0x9e20 && (ret & 0xff00) == 0) 
+	if (cpu_get_pc(space->cpu) == 0x9e20 && (ret & 0xff00) == 0)
 	{
 		cpu_spinuntil_int(space->cpu);
 		return 0x100 | (ret & 0xff);
@@ -3159,7 +3159,7 @@ static READ16_HANDLER( btlfield_cycle_r )
 	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
 	int ret = state->shared_ram[0x4];
 
-	if (cpu_get_pc(space->cpu) == 0x9e1c && (ret & 0xff00) == 0) 
+	if (cpu_get_pc(space->cpu) == 0x9e1c && (ret & 0xff00) == 0)
 	{
 		cpu_spinuntil_int(space->cpu);
 		return 0x100 | (ret & 0xff);
@@ -3173,7 +3173,7 @@ static READ16_HANDLER( skysoldr_cycle_r )
 	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
 	int ret = state->shared_ram[0x4];
 
-	if (cpu_get_pc(space->cpu) == 0x1f4e && (ret & 0xff00) == 0) 
+	if (cpu_get_pc(space->cpu) == 0x1f4e && (ret & 0xff00) == 0)
 	{
 		cpu_spinuntil_int(space->cpu);
 		return 0x100 | (ret & 0xff);
@@ -3187,7 +3187,7 @@ static READ16_HANDLER( skyadvnt_cycle_r )
 	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
 	int ret = state->shared_ram[0x4];
 
-	if (cpu_get_pc(space->cpu) == 0x1f78 && (ret & 0xff00) == 0) 
+	if (cpu_get_pc(space->cpu) == 0x1f78 && (ret & 0xff00) == 0)
 	{
 		cpu_spinuntil_int(space->cpu);
 		return 0x100 | (ret & 0xff);
@@ -3201,7 +3201,7 @@ static READ16_HANDLER( gangwars_cycle_r )
 	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
 	int ret = state->shared_ram[0x103];
 
-	if (cpu_get_pc(space->cpu) == 0xbbb6) 
+	if (cpu_get_pc(space->cpu) == 0xbbb6)
 	{
 		cpu_spinuntil_int(space->cpu);
 		return (ret + 2) & 0xff;
@@ -3215,7 +3215,7 @@ static READ16_HANDLER( gangwarb_cycle_r )
 	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
 	int ret = state->shared_ram[0x103];
 
-	if (cpu_get_pc(space->cpu) == 0xbbca) 
+	if (cpu_get_pc(space->cpu) == 0xbbca)
 	{
 		cpu_spinuntil_int(space->cpu);
 		return (ret + 2) & 0xff;

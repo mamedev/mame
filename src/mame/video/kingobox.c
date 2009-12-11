@@ -220,7 +220,7 @@ static void kingofb_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 		/* the offset into spriteram seems scrambled */
 		roffs = BITSWAP16(offs,15,14,13,12,11,10,4,7,6,5,9,8,3,2,1,0) ^ 0x3c;
-		if (roffs & 0x200) 
+		if (roffs & 0x200)
 			roffs ^= 0x1c0;
 
 		bank = (spriteram[roffs + 3] & 0x04) >> 2;

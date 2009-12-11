@@ -129,7 +129,7 @@ VIDEO_START( atarig42 )
 WRITE16_HANDLER( atarig42_mo_control_w )
 {
 	atarig42_state *state = (atarig42_state *)space->machine->driver_data;
-	
+
 	logerror("MOCONT = %d (scan = %d)\n", data, video_screen_get_vpos(space->machine->primary_screen));
 
 	/* set the control value */

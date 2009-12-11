@@ -18,7 +18,7 @@ static void update_sound_68k_interrupts(running_machine *machine);
 void cyberbal_sound_reset(running_machine *machine)
 {
 	cyberbal_state *state = (cyberbal_state *)machine->driver_data;
-	
+
 	/* reset the sound system */
 	state->bank_base = &memory_region(machine, "audiocpu")[0x10000];
 	memory_set_bankptr(machine, "soundbank", &state->bank_base[0x0000]);

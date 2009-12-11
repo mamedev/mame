@@ -32,7 +32,7 @@ struct _timeplt_state
 	UINT8 *  radarattr;	// jungler
 	UINT8 *  radarx;	// jungler
 	UINT8 *  radary;	// jungler
-//	UINT8 *  namco_soundregs;	// rallyx - these are dealt with in emu/sound/namco.c
+//  UINT8 *  namco_soundregs;   // rallyx - these are dealt with in emu/sound/namco.c
 	size_t   videoram_size;	// tutankham, junofrst
 	size_t   spriteram_size;	// rocnrope
 

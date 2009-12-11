@@ -122,9 +122,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 		if (flip_screen_get(machine))
 		{
-			x = max_x - x - 8;	
+			x = max_x - x - 8;
 			y = max_y - y - 8;
-			flipx = !flipx;	
+			flipx = !flipx;
 			flipy = !flipy;
 		}
 

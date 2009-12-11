@@ -161,9 +161,9 @@ static UINT8 jangou_gfx_nibble( running_machine *machine, UINT16 niboffset )
 static void plot_jangou_gfx_pixel( running_machine *machine, UINT8 pix, int x, int y )
 {
 	jangou_state *state = (jangou_state *)machine->driver_data;
-	if (y < 0 || y >= 512) 
+	if (y < 0 || y >= 512)
 		return;
-	if (x < 0 || x >= 512) 
+	if (x < 0 || x >= 512)
 		return;
 
 	if (x & 1)
@@ -184,7 +184,7 @@ static WRITE8_HANDLER( blitter_process_w )
 		int xcount, ycount;
 
 		/* printf("%02x %02x %02x %02x %02x %02x\n", state->blit_data[0], state->blit_data[1], state->blit_data[2],
-					state->blit_data[3], state->blit_data[4], state->blit_data[5]); */
+                    state->blit_data[3], state->blit_data[4], state->blit_data[5]); */
 		w = (state->blit_data[4] & 0xff) + 1;
 		h = (state->blit_data[5] & 0xff) + 1;
 		src = ((state->blit_data[1] << 8)|(state->blit_data[0] << 0));
@@ -194,9 +194,9 @@ static WRITE8_HANDLER( blitter_process_w )
 		// lowest bit of src controls flipping / draw direction?
 		flipx = (state->blit_data[0] & 1);
 
-		if (!flipx) 
+		if (!flipx)
 			src += (w * h) - 1;
-		else 
+		else
 			src -= (w * h) - 1;
 
 		for (ycount = 0; ycount < h; ycount++)
@@ -214,9 +214,9 @@ static WRITE8_HANDLER( blitter_process_w )
 				if ((dat & 0xff) != 0)
 					plot_jangou_gfx_pixel(space->machine, dat, drawx, drawy);
 
-				if (!flipx)	
+				if (!flipx)
 					count--;
-				else 
+				else
 					count++;
 			}
 		}

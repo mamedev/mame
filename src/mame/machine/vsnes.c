@@ -282,7 +282,7 @@ MACHINE_RESET( vsdual )
 MACHINE_START( vsnes )
 {
 	const address_space *ppu1_space = cpu_get_address_space(cputag_get_cpu(machine, "ppu1"), ADDRESS_SPACE_PROGRAM);
-	
+
 	/* establish nametable ram */
 	nt_ram[0] = auto_alloc_array(machine, UINT8, 0x1000);
 	/* set mirroring */

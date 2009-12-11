@@ -1192,7 +1192,7 @@ on main PCB (CR208):
 on roms PCB (CR207):
 7x M27256 (5,6,7,8,9,10,11)
 3x PROM N82S129N
-2x PROM DM74S288N (one is blank!) 
+2x PROM DM74S288N (one is blank!)
 
 the only real difference seems to be that you get less lives.
 
@@ -1247,7 +1247,7 @@ ROM_START( skywolf3 )
 	//ROM_LOAD( "82s129-3.bin",     0x0200, 0x0100, CRC(6b0980bf) SHA1(6314f9e593f2d2a2f014f6eb82295cb3aa70cbd1)) ) /* blue (bad) - high bit of colour fixed to 0 */
 	ROM_LOAD( "82s129-2.bin",     0x0100, 0x0100, CRC(ec0923d3) SHA1(26f9eda4260a8b767893b8dea42819f192ef0b20) ) /* green */
 	ROM_LOAD( "82s129-3.bin",     0x0200, 0x0100, CRC(ade97052) SHA1(cc1b4cd57d7bc55ce44de6b89a322ff08eabb1a0) ) /* blue */
-	ROM_LOAD( "74s288-2.bin",     0x0300, 0x0020, CRC(190a55ad) SHA1(de8a847bff8c343d69b853a215e6ee775ef2ef96) ) /* blank lookup prom */ 
+	ROM_LOAD( "74s288-2.bin",     0x0300, 0x0020, CRC(190a55ad) SHA1(de8a847bff8c343d69b853a215e6ee775ef2ef96) ) /* blank lookup prom */
 	ROM_LOAD( "74s288-1.bin",     0x0320, 0x0020, CRC(5ddb2d15) SHA1(422663566ebc7ea8cbc3089d806b0868e006fe0c) ) /* timing? not used */
 ROM_END
 

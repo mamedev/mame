@@ -82,9 +82,9 @@ static READ8_HANDLER( fromance_busycheck_main_r )
 	/* set a timer to force synchronization after the read */
 	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 
-	if (!state->directionflag) 
+	if (!state->directionflag)
 		return 0x00;		// standby
-	else 
+	else
 		return 0xff;		// busy
 }
 
@@ -93,9 +93,9 @@ static READ8_HANDLER( fromance_busycheck_sub_r )
 {
 	fromance_state *state = (fromance_state *)space->machine->driver_data;
 
-	if (state->directionflag) 
+	if (state->directionflag)
 		return 0xff;		// standby
-	else 
+	else
 		return 0x00;		// busy
 }
 

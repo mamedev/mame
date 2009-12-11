@@ -173,17 +173,17 @@ INPUT_PORTS_END
 
 static WRITE8_DEVICE_HANDLER(dummy1_w)
 {
-//	printf("%02x 1\n", data);
+//  printf("%02x 1\n", data);
 }
 
 static WRITE8_DEVICE_HANDLER(dummy2_w)
 {
-//	printf("%02x 2\n", data);
+//  printf("%02x 2\n", data);
 }
 
 static WRITE8_DEVICE_HANDLER(dummy3_w)
 {
-//	printf("%02x 3\n", data);
+//  printf("%02x 3\n", data);
 }
 
 

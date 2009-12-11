@@ -1913,7 +1913,7 @@ ROM_START( suprmriobl )
 	ROM_REGION( 0x4000,"gfx1", 0  ) /* PPU memory */
 	ROM_LOAD( "2.bin",  0x0000, 0x2000, CRC(42418d40) SHA1(22ab61589742cfa4cc6856f7205d7b4b8310bc4d) )
 	ROM_LOAD( "5.bin",  0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
-	
+
 	/* this set has some extra files compared to the above one, they probably exist on that pcb too tho */
 	ROM_REGION( 0x200,"proms", 0  )
 	ROM_LOAD( "prom6301.1",  0x000, 0x100, CRC(a31dc330) SHA1(b652003f7e252bac3bdb19412839c2f03af7f8b8) )

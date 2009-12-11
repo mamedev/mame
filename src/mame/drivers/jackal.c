@@ -121,7 +121,7 @@ WRITE8_HANDLER( jackal_rambank_w )
 	jackal_state *state = (jackal_state *)space->machine->driver_data;
 	UINT8 *rgn = memory_region(space->machine, "master");
 
-	if (data & 0x04) 
+	if (data & 0x04)
 		popmessage("jackal_rambank_w %02x", data);
 
 	coin_counter_w(space->machine, 0, data & 0x01);

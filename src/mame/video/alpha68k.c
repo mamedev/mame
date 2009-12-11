@@ -87,16 +87,16 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		mx = spriteram[offs + 2 + (j << 1)] << 1 | my >> 15;
 		my = -my & 0x1ff;
 		mx = ((mx + 0x100) & 0x1ff) - 0x100;
-		if (j == 0 && s == 0x7c0) 
+		if (j == 0 && s == 0x7c0)
 			my++;
 //ZT
-		if (state->flipscreen) 
+		if (state->flipscreen)
 		{
 			mx = 240 - mx;
 			my = 240 - my;
 		}
 
-		for (i = 0; i < 0x40; i += 2) 
+		for (i = 0; i < 0x40; i += 2)
 		{
 			tile = spriteram[offs + 1 + i + (0x800 * j) + 0x800];
 			color = spriteram[offs + i + (0x800 * j) + 0x800] & 0x7f;
@@ -105,7 +105,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			fx = tile & 0x4000;
 			tile &= 0x3fff;
 
-			if (state->flipscreen) 
+			if (state->flipscreen)
 			{
 				if (fx) fx = 0; else fx = 1;
 				if (fy) fy = 0; else fy = 1;
@@ -172,7 +172,7 @@ VIDEO_UPDATE( alpha68k_II )
 WRITE16_HANDLER( alpha68k_II_video_bank_w )
 {
 	alpha68k_state *state = (alpha68k_state *)space->machine->driver_data;
-	switch (offset) 
+	switch (offset)
 	{
 		case 0x10: /* Reset */
 			state->bank_base = state->buffer_28 = state->buffer_60 = state->buffer_68 = 0;
@@ -211,7 +211,7 @@ WRITE16_HANDLER( alpha68k_II_video_bank_w )
 
 WRITE16_HANDLER( alpha68k_V_video_control_w )
 {
-	switch (offset) 
+	switch (offset)
 	{
 		case 0x08: /* Graphics flags?  Not related to fix chars anyway */
 		case 0x0c:
@@ -234,16 +234,16 @@ static void draw_sprites_V( running_machine *machine, bitmap_t *bitmap, const re
 		mx = spriteram[offs + 2 + (j << 1)] << 1 | my >> 15;
 		my = -my & 0x1ff;
 		mx = ((mx + 0x100) & 0x1ff) - 0x100;
-		if (j == 0 && s == 0x7c0) 
+		if (j == 0 && s == 0x7c0)
 			my++;
 //ZT
-		if (state->flipscreen) 
+		if (state->flipscreen)
 		{
 			mx = 240 - mx;
 			my = 240 - my;
 		}
 
-		for (i = 0; i < 0x40; i += 2) 
+		for (i = 0; i < 0x40; i += 2)
 		{
 			tile = spriteram[offs + 1 + i + (0x800 * j) + 0x800];
 			color = spriteram[offs + i + (0x800 * j) + 0x800] & 0xff;
@@ -251,10 +251,10 @@ static void draw_sprites_V( running_machine *machine, bitmap_t *bitmap, const re
 			fx = tile & fx_mask;
 			fy = tile & fy_mask;
 			tile = tile & sprite_mask;
-			if (tile > 0x4fff) 
+			if (tile > 0x4fff)
 				continue;
 
-			if (state->flipscreen) 
+			if (state->flipscreen)
 			{
 				if (fx) fx = 0; else fx = 1;
 				if (fy) fy = 0; else fy = 1;
@@ -294,11 +294,11 @@ VIDEO_UPDATE( alpha68k_V )
 		draw_sprites_V(screen->machine, bitmap, cliprect, 0, 0x07c0, 0x0800, 0, 0x8000, 0x7fff);
 		draw_sprites_V(screen->machine, bitmap, cliprect, 1, 0x0000, 0x0800, 0, 0x8000, 0x7fff);
 		//AT: *KLUDGE* fixes priest priority in level 1(could be a game bug)
-		if (spriteram[0x1bde] == 0x24 && (spriteram[0x1bdf] >> 8) == 0x3b) 
+		if (spriteram[0x1bde] == 0x24 && (spriteram[0x1bdf] >> 8) == 0x3b)
 		{
 			draw_sprites_V(screen->machine, bitmap, cliprect, 2, 0x03c0, 0x0800, 0, 0x8000, 0x7fff);
 			draw_sprites_V(screen->machine, bitmap, cliprect, 2, 0x0000, 0x03c0, 0, 0x8000, 0x7fff);
-		} 
+		}
 		else
 			draw_sprites_V(screen->machine, bitmap, cliprect, 2, 0x0000, 0x0800, 0, 0x8000, 0x7fff);
 
@@ -463,7 +463,7 @@ static void kyros_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 		my = -(mx >> 8) & 0xff;
 		mx &= 0xff;
 
-		if (state->flipscreen) 
+		if (state->flipscreen)
 			my = 249 - my;
 
 		for (i = 0; i < 0x20; i++)
@@ -527,10 +527,10 @@ static void sstingry_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		mx = spriteram[offs + c];
 		my = -(mx >> 8) & 0xff;
 		mx &= 0xff;
-		if (mx > 0xf8) 
+		if (mx > 0xf8)
 			mx -= 0x100;
 
-		if (state->flipscreen) 
+		if (state->flipscreen)
 			my = 249 - my;
 
 		for (i = 0; i < 0x20; i++)

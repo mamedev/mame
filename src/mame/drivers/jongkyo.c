@@ -416,7 +416,7 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Palette initialization and 
+ *  Palette initialization and
  *    graphics definitions
  *
  *************************************/

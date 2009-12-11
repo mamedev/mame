@@ -197,7 +197,7 @@ static void lwings_draw_sprites( running_machine *machine, bitmap_t *bitmap, con
 
 			sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
 			sy = buffered_spriteram[offs + 2];
-			if (sy > 0xf8) 
+			if (sy > 0xf8)
 				sy -= 0x100;
 			code = buffered_spriteram[offs] | (buffered_spriteram[offs + 1] & 0xc0) << 2;
 			color = (buffered_spriteram[offs + 1] & 0x38) >> 3;
@@ -234,7 +234,7 @@ static void trojan_draw_sprites( running_machine *machine, bitmap_t *bitmap, con
 
 			sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
 			sy = buffered_spriteram[offs + 2];
-			if (sy > 0xf8) 
+			if (sy > 0xf8)
 				sy -= 0x100;
 			code = buffered_spriteram[offs] |
 				   ((buffered_spriteram[offs + 1] & 0x20) << 4) |

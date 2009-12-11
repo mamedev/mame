@@ -11,7 +11,7 @@ struct _lastduel_state
 	UINT16 *    vram;
 	UINT16 *    scroll1;
 	UINT16 *    scroll2;
-//	UINT16 *    spriteram;	// this currently uses generic buffered spriteram
+//  UINT16 *    spriteram;  // this currently uses generic buffered spriteram
 	UINT16 *    paletteram;
 
 	/* video-related */

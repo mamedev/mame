@@ -214,9 +214,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			int flipy = !(attr & 0x80);
 			int color = attr & 0x0f;
 
-			if (attr & 0x10) 
+			if (attr & 0x10)
 				code += 512;
-			if (attr & 0x20) 
+			if (attr & 0x20)
 				code += 256;
 
 			if (state->flipscreen)
@@ -227,7 +227,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 				sy = 240 - sy;
 			}
 
-			if (sx >= 256-8) 
+			if (sx >= 256-8)
 				sx -= 256;
 
 			drawgfx_transpen(bitmap,&clip,gfx,

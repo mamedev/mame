@@ -10,7 +10,7 @@ struct _gumbo_state
 	/* memory pointers */
 	UINT16 *    bg_videoram;
 	UINT16 *    fg_videoram;
-//	UINT16 *    paletteram;	// currently this uses generic palette handling
+//  UINT16 *    paletteram; // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap    *bg_tilemap;

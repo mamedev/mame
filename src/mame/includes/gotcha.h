@@ -11,7 +11,7 @@ struct _gotcha_state
 	UINT16 *    fgvideoram;
 	UINT16 *    bgvideoram;
 	UINT16 *    spriteram;
-//	UINT16 *    paletteram;	// currently this uses generic palette handling
+//  UINT16 *    paletteram; // currently this uses generic palette handling
 	size_t      spriteram_size;
 
 	/* video-related */

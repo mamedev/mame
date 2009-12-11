@@ -107,7 +107,7 @@ static void kickgoal_draw_sprites( running_machine *machine, bitmap_t *bitmap,co
 		int flipx = spriteram[offs + 1] & 0x0020;
 		int color = spriteram[offs + 1] & 0x000f;
 
-		if (spriteram[offs + 0] & 0x0100) 
+		if (spriteram[offs + 0] & 0x0100)
 			break;
 
 		ypos *= 2;

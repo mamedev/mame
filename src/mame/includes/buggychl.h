@@ -1,5 +1,5 @@
 /*
-    buggychl mcu emulation is also used by 
+    buggychl mcu emulation is also used by
     40love.c, bking.c and msisaac.c
 */
 
@@ -17,7 +17,7 @@ struct _buggychl_state
 	UINT8 *     scrollh;	// buggychl
 	UINT8 *     charram;	// buggychl
 	UINT8 *     video_ctrl;	// 40love
-//  	UINT8 *     paletteram; // currently this uses generic palette handling (buggychl & msisaac)
+//      UINT8 *     paletteram; // currently this uses generic palette handling (buggychl & msisaac)
 	UINT8 *     mcu_ram;	// 40love (undokai)
 	UINT8 *     playfield_ram;	// bking
 	size_t      videoram_size;

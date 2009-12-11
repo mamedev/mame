@@ -51,7 +51,7 @@
 #include "video/kan_pand.h"
 
 typedef struct _kaneko_pandora_state  kaneko_pandora_state;
-struct _kaneko_pandora_state 
+struct _kaneko_pandora_state
 {
 	const device_config *screen;
 	UINT8 *      spriteram;
@@ -140,9 +140,9 @@ static void pandora_draw( const device_config *device, bitmap_t *bitmap, const r
 		int flipy =  (attr & 0x40) << 1;
 		int tile  = ((attr & 0x3f) << 8) + (pandora->spriteram[offs + 6] & 0xff);
 
-		if (tilecolour & 1) 
+		if (tilecolour & 1)
 			dx |= 0x100;
-		if (tilecolour & 2) 
+		if (tilecolour & 2)
 			dy |= 0x100;
 
 		if (tilecolour & 4)
@@ -176,9 +176,9 @@ static void pandora_draw( const device_config *device, bitmap_t *bitmap, const r
 		sx &= 0x1ff;
 		sy &= 0x1ff;
 
-		if (sx & 0x100) 
+		if (sx & 0x100)
 			sx -= 0x200;
-		if (sy & 0x100) 
+		if (sy & 0x100)
 			sy -= 0x200;
 
 		drawgfx_transpen(bitmap,cliprect,device->machine->gfx[pandora->region],
@@ -195,7 +195,7 @@ void pandora_eof( const device_config *device )
 	assert(pandora->spriteram != NULL);
 
 	// the games can disable the clearing of the sprite bitmap, to leave sprite trails
-	if (pandora->clear_bitmap) 
+	if (pandora->clear_bitmap)
 		bitmap_fill(pandora->sprites_bitmap, video_screen_get_visible_area(pandora->screen), 0);
 
 	pandora_draw(device, pandora->sprites_bitmap, video_screen_get_visible_area(pandora->screen));

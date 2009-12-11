@@ -103,9 +103,9 @@ static void draw_bg( running_machine *machine, bitmap_t *bitmap, const rectangle
 		int sx = offs % 32;
 		int sy = offs / 32;
 
-		if (flip_screen_x_get(machine)) 
+		if (flip_screen_x_get(machine))
 			sx = 31 - sx;
-		if (flip_screen_y_get(machine)) 
+		if (flip_screen_y_get(machine))
 			sy = 31 - sy;
 
 		drawgfx_opaque(state->tmp_bitmap1, NULL, machine->gfx[0],
@@ -145,9 +145,9 @@ static void draw_fg( running_machine *machine, bitmap_t *bitmap, const rectangle
 
 		int code = state->videoram[offs];
 
-		if (flipx) 
+		if (flipx)
 			sx = 31 - sx;
-		if (flipy) 
+		if (flipy)
 			sy = 31 - sy;
 
 		drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
@@ -195,7 +195,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 				charline = zoomy_rom[y] & 0x07;
 				base_pos = zoomy_rom[y] & 0x38;
-				if (flipy) 
+				if (flipy)
 					base_pos ^= 0x38;
 
 				px = 0;

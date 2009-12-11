@@ -69,9 +69,9 @@ static void karnov_i8751_w( running_machine *machine, int data )
 		state->i8751_return = 0x56a;
 
 	if (data == 0x100 && state->microcontroller_id == KARNOV)	/* USA version */
-		state->i8751_return = 0x56b; 
+		state->i8751_return = 0x56b;
 
-	if ((data & 0xf00) == 0x300) 
+	if ((data & 0xf00) == 0x300)
 		state->i8751_return = (data & 0xff) * 0x12; /* Player sprite mapping */
 
 	/* I'm not sure the ones marked ^ appear in the right order */
@@ -182,7 +182,7 @@ static void chelnov_i8751_w( running_machine *machine, int data )
 	if (data == 0x100 && state->microcontroller_id == CHELNOVW)	/* World version */
 		state->i8751_return = 0x71c;
 
-	if (data >= 0x6000 && data < 0x8000) 
+	if (data >= 0x6000 && data < 0x8000)
 		state->i8751_return = 1;  /* patched */
 
 	if ((data & 0xf000) == 0x1000) state->i8751_level = 1;	/* Level 1 */
@@ -205,7 +205,7 @@ static void chelnov_i8751_w( running_machine *machine, int data )
 					else state->i8751_return = 5;
 				}
 				else	/* Japan, World */
-				{ 
+				{
 					if (b < 3) state->i8751_return = 0;
 					else if (b < 8) state->i8751_return = 1;
 					else if (b < 0xc) state->i8751_return = 2;
@@ -332,11 +332,11 @@ static WRITE16_HANDLER( karnov_control_w )
 			break;
 
 		case 6: /* SECREQ (Interrupt & Data to i8751) */
-			if (state->microcontroller_id == KARNOV || state->microcontroller_id == KARNOVJ) 
+			if (state->microcontroller_id == KARNOV || state->microcontroller_id == KARNOVJ)
 				karnov_i8751_w(space->machine, data);
-			if (state->microcontroller_id == CHELNOV || state->microcontroller_id == CHELNOVJ || state->microcontroller_id == CHELNOVW) 
+			if (state->microcontroller_id == CHELNOV || state->microcontroller_id == CHELNOVJ || state->microcontroller_id == CHELNOVW)
 				chelnov_i8751_w(space->machine, data);
-			if (state->microcontroller_id == WNDRPLNT) 
+			if (state->microcontroller_id == WNDRPLNT)
 				wndrplnt_i8751_w(space->machine, data);
 			break;
 
@@ -720,7 +720,7 @@ static INTERRUPT_GEN( karnov_interrupt )
 	karnov_state *state = (karnov_state *)device->machine->driver_data;
 
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
-	if (input_port_read(device->machine, "FAKE") == state->coin_mask) 
+	if (input_port_read(device->machine, "FAKE") == state->coin_mask)
 		state->latch = 1;
 
 	if (input_port_read(device->machine, "FAKE") != state->coin_mask && state->latch)
@@ -790,7 +790,7 @@ static MACHINE_RESET( karnov )
 	state->i8751_coin_pending = 0;
 	state->i8751_command_queue = 0;
 	state->i8751_level = 0;
-//	state->latch = 0;
+//  state->latch = 0;
 
 	state->flipscreen = 0;
 	state->scroll[0] = 0;

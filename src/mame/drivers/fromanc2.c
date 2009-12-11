@@ -59,7 +59,7 @@ static READ16_HANDLER( fromanc2_keymatrix_r )
 	fromanc2_state *state = (fromanc2_state *)space->machine->driver_data;
 	UINT16 ret;
 
-	switch (state->portselect) 
+	switch (state->portselect)
 	{
 	case 0x01:	ret = input_port_read(space->machine, "KEY0"); break;
 	case 0x02:	ret = input_port_read(space->machine, "KEY1"); break;
@@ -99,7 +99,7 @@ static WRITE16_HANDLER( fromanc2_eeprom_w )
 
 static WRITE16_HANDLER( fromancr_eeprom_w )
 {
-	if (ACCESSING_BITS_0_7) 
+	if (ACCESSING_BITS_0_7)
 	{
 		fromancr_gfxbank_w(space->machine, data & 0xfff8);
 		input_port_write(space->machine, "EEPROMOUT", data, 0xff);

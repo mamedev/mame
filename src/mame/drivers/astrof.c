@@ -248,9 +248,9 @@ static void tomahawk_get_pens( running_machine *machine, pen_t *pens )
 
 	for (i = 0; i < TOMAHAWK_NUM_PENS; i++)
 	{
-		UINT8 data; 
+		UINT8 data;
 		UINT8 pen;
- 
+
 		/* a common wire hack to the pcb causes the prom halves to be inverted */
 		/* this results in e.g. astrof background being black */
 		switch (config)
@@ -1269,7 +1269,7 @@ ROM_START( tomahawk )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "t777.clr",     0x0000, 0x0020, CRC(d6a528fd) SHA1(5fc08252a2d7c5405f601efbfb7d84bec328d733) )
-	
+
 	// versions of this have also been seen using the standard Astro Fighter PROM, giving a blue submarine
 	// in blue water, with pink / yellow borders.  I think these are just unofficial conversions of Astro
 	// Fighter without the PROM properly replaced tho.

@@ -84,10 +84,10 @@ TODO:
 static WRITE16_HANDLER( inufuku_soundcommand_w )
 {
 	inufuku_state *state = (inufuku_state *)space->machine->driver_data;
-	if (ACCESSING_BITS_0_7) 
+	if (ACCESSING_BITS_0_7)
 	{
 		/* hack... sound doesn't work otherwise */
-		if (data == 0x08) 
+		if (data == 0x08)
 			return;
 
 		state->pending_command = 1;

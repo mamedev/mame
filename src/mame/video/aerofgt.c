@@ -371,18 +371,18 @@ static void aerofgt_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 			{
 				int sx, sy;
 
-				if (flipy) 
+				if (flipy)
 					sy = ((oy + zoomy * (ysize - y)/2 + 16) & 0x1ff) - 16;
-				else 
+				else
 					sy = ((oy + zoomy * y / 2 + 16) & 0x1ff) - 16;
 
 				for (x = 0; x <= xsize; x++)
 				{
 					int code;
 
-					if (flipx) 
+					if (flipx)
 						sx = ((ox + zoomx * (xsize - x) / 2 + 16) & 0x1ff) - 16;
-					else 
+					else
 						sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
 
 					if (map_start < 0x2000)
@@ -418,15 +418,15 @@ static void turbofrc_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 // some other drivers still use this wrong table, they have to be upgraded
 //      int zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 
-		if (!(state->spriteram3[attr_start + 2] & 0x0080)) 
+		if (!(state->spriteram3[attr_start + 2] & 0x0080))
 			continue;
 
 		pri = state->spriteram3[attr_start + 2] & 0x0010;
 
-		if ( chip_disabled_pri & !pri) 
+		if ( chip_disabled_pri & !pri)
 			continue;
 
-		if ((!chip_disabled_pri) & (pri >> 4)) 
+		if ((!chip_disabled_pri) & (pri >> 4))
 			continue;
 
 		ox = state->spriteram3[attr_start + 1] & 0x01ff;
@@ -452,18 +452,18 @@ static void turbofrc_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		{
 			int sx, sy;
 
-			if (flipy) 
+			if (flipy)
 				sy = ((oy + zoomy * (ysize - y)/2 + 16) & 0x1ff) - 16;
-			else 
+			else
 				sy = ((oy + zoomy * y / 2 + 16) & 0x1ff) - 16;
 
 			for (x = 0; x <= xsize; x++)
 			{
 				int code;
 
-				if (flipx) 
+				if (flipx)
 					sx = ((ox + zoomx * (xsize - x) / 2 + 16) & 0x1ff) - 16;
-				else 
+				else
 					sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
 
 				if (chip == 0)
@@ -503,14 +503,14 @@ static void spinlbrk_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 // some other drivers still use this wrong table, they have to be upgraded
 //      int zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 
-		if (!(state->spriteram3[attr_start + 2] & 0x0080)) 
+		if (!(state->spriteram3[attr_start + 2] & 0x0080))
 			continue;
 
 		pri = state->spriteram3[attr_start + 2] & 0x0010;
 
-		if ( chip_disabled_pri & !pri) 
+		if ( chip_disabled_pri & !pri)
 			continue;
-		if ((!chip_disabled_pri) & (pri >> 4)) 
+		if ((!chip_disabled_pri) & (pri >> 4))
 			continue;
 
 		ox = state->spriteram3[attr_start + 1] & 0x01ff;
@@ -536,18 +536,18 @@ static void spinlbrk_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		{
 			int sx, sy;
 
-			if (flipy) 
+			if (flipy)
 				sy = ((oy + zoomy * (ysize - y)/2 + 16) & 0x1ff) - 16;
-			else 
+			else
 				sy = ((oy + zoomy * y / 2 + 16) & 0x1ff) - 16;
 
 			for (x = 0; x <= xsize; x++)
 			{
 				int code;
 
-				if (flipx) 
+				if (flipx)
 					sx = ((ox + zoomx * (xsize - x) / 2 + 16) & 0x1ff) - 16;
-				else 
+				else
 					sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
 
 				if (chip == 0)
@@ -589,14 +589,14 @@ static void aerfboo2_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 // some other drivers still use this wrong table, they have to be upgraded
 //      int zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 
-		if (!(state->spriteram3[attr_start + 2] & 0x0080)) 
+		if (!(state->spriteram3[attr_start + 2] & 0x0080))
 			continue;
 
 		pri = state->spriteram3[attr_start + 2] & 0x0010;
 
-		if ( chip_disabled_pri & !pri) 
+		if ( chip_disabled_pri & !pri)
 			continue;
-		if ((!chip_disabled_pri) & (pri >> 4)) 
+		if ((!chip_disabled_pri) & (pri >> 4))
 			continue;
 		ox = state->spriteram3[attr_start + 1] & 0x01ff;
 		xsize = (state->spriteram3[attr_start + 2] & 0x0700) >> 8;
@@ -621,18 +621,18 @@ static void aerfboo2_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		{
 			int sx, sy;
 
-			if (flipy) 
+			if (flipy)
 				sy = ((oy + zoomy * (ysize - y)/2 + 16) & 0x1ff) - 16;
-			else 
+			else
 				sy = ((oy + zoomy * y / 2 + 16) & 0x1ff) - 16;
 
 			for (x = 0; x <= xsize; x++)
 			{
 				int code;
 
-				if (flipx) 
+				if (flipx)
 					sx = ((ox + zoomx * (xsize - x) / 2 + 16) & 0x1ff) - 16;
-				else 
+				else
 					sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
 
 				if (chip == 0)
@@ -667,7 +667,7 @@ static void pspikesb_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	{
 		int xpos, ypos, color, flipx, flipy, code;
 
-		if (state->spriteram3[i + 3 - 4] & 0x8000) 
+		if (state->spriteram3[i + 3 - 4] & 0x8000)
 			break;
 
 		xpos = (state->spriteram3[i + 2] & 0x1ff) - 34;
@@ -707,7 +707,7 @@ static void spikes91_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 		code = state->spriteram3[i + 0] & 0x1fff;
 
-		if (!code) 
+		if (!code)
 			continue;
 
 		xpos = (state->spriteram3[i + 2] & 0x01ff) - 16;
@@ -758,7 +758,7 @@ static void aerfboot_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		pri = state->spriteram3[attr_start + 2] & 0x0010;
 		code = state->spriteram3[attr_start + 3] & 0x1fff;
 
-		if (!(state->spriteram3[attr_start + 2] & 0x0040)) 
+		if (!(state->spriteram3[attr_start + 2] & 0x0040))
 			code |= 0x2000;
 
 		zoomx = 32 + zoomx;
@@ -796,7 +796,7 @@ static void aerfboot_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		pri = state->spriteram3[attr_start + 2] & 0x0010;
 		code = state->spriteram3[attr_start + 3] & 0x1fff;
 
-		if (!(state->spriteram3[attr_start + 2] & 0x0040)) 
+		if (!(state->spriteram3[attr_start + 2] & 0x0040))
 			code |= 0x2000;
 
 		zoomx = 32 + zoomx;

@@ -8,8 +8,8 @@
 
     TODO:
 
-	- remove CDP1802 dependency
-	- sound base frequencies are TPA/TPB
+    - remove CDP1802 dependency
+    - sound base frequencies are TPA/TPB
     - white noise
     - scanline based update
     - CMSEL output

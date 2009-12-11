@@ -100,8 +100,8 @@ WRITE16_HANDLER( glass_blitter_w )
 						*BITMAP_ADDR16(state->screen_bitmap, j, i) = color & 0xff;
 					}
 				}
-			} 
-			else 
+			}
+			else
 				bitmap_fill(state->screen_bitmap, 0, 0);
 		}
 	}

@@ -246,9 +246,9 @@ INLINE void hyprduel_vram_w( running_machine *machine, offs_t offset, UINT16 dat
 		/* Account for the window */
 		int col = (offset % BIG_NX) - ((state->window[layer * 2 + 1] / 8) % BIG_NX);
 		int row = (offset / BIG_NX) - ((state->window[layer * 2 + 0] / 8) % BIG_NY);
-		if (col < -(BIG_NX-WIN_NX))	
+		if (col < -(BIG_NX-WIN_NX))
 			col += (BIG_NX-WIN_NX) + WIN_NX;
-		if (row < -(BIG_NY-WIN_NY))	
+		if (row < -(BIG_NY-WIN_NY))
 			row += (BIG_NY-WIN_NY) + WIN_NY;
 		if ((col >= 0) && (col < WIN_NX) && (row >= 0) && (row < WIN_NY))
 			tilemap_mark_tile_dirty(state->bg_tilemap[layer], row * WIN_NX + col);
@@ -257,40 +257,40 @@ INLINE void hyprduel_vram_w( running_machine *machine, offs_t offset, UINT16 dat
 
 
 
-static TILE_GET_INFO( get_tile_info_0_8bit ) 
-{ 
+static TILE_GET_INFO( get_tile_info_0_8bit )
+{
 	hyprduel_state *state = (hyprduel_state *)machine->driver_data;
-	get_tile_info_8bit(machine, tileinfo, tile_index, 0, state->vram_0); 
+	get_tile_info_8bit(machine, tileinfo, tile_index, 0, state->vram_0);
 }
 
-static TILE_GET_INFO( get_tile_info_1_8bit ) 
-{ 
+static TILE_GET_INFO( get_tile_info_1_8bit )
+{
 	hyprduel_state *state = (hyprduel_state *)machine->driver_data;
-	get_tile_info_8bit(machine, tileinfo, tile_index, 1, state->vram_1); 
+	get_tile_info_8bit(machine, tileinfo, tile_index, 1, state->vram_1);
 }
 
-static TILE_GET_INFO( get_tile_info_2_8bit ) 
-{ 
+static TILE_GET_INFO( get_tile_info_2_8bit )
+{
 	hyprduel_state *state = (hyprduel_state *)machine->driver_data;
-	get_tile_info_8bit(machine, tileinfo, tile_index, 2, state->vram_2); 
+	get_tile_info_8bit(machine, tileinfo, tile_index, 2, state->vram_2);
 }
 
-WRITE16_HANDLER( hyprduel_vram_0_w ) 
-{ 
+WRITE16_HANDLER( hyprduel_vram_0_w )
+{
 	hyprduel_state *state = (hyprduel_state *)space->machine->driver_data;
-	hyprduel_vram_w(space->machine, offset, data, mem_mask, 0, state->vram_0); 
+	hyprduel_vram_w(space->machine, offset, data, mem_mask, 0, state->vram_0);
 }
 
-WRITE16_HANDLER( hyprduel_vram_1_w ) 
-{ 
+WRITE16_HANDLER( hyprduel_vram_1_w )
+{
 	hyprduel_state *state = (hyprduel_state *)space->machine->driver_data;
-	hyprduel_vram_w(space->machine, offset, data, mem_mask, 1, state->vram_1); 
+	hyprduel_vram_w(space->machine, offset, data, mem_mask, 1, state->vram_1);
 }
 
-WRITE16_HANDLER( hyprduel_vram_2_w ) 
-{ 
+WRITE16_HANDLER( hyprduel_vram_2_w )
+{
 	hyprduel_state *state = (hyprduel_state *)space->machine->driver_data;
-	hyprduel_vram_w(space->machine, offset, data, mem_mask, 2, state->vram_2); 
+	hyprduel_vram_w(space->machine, offset, data, mem_mask, 2, state->vram_2);
 }
 
 
@@ -718,7 +718,7 @@ VIDEO_UPDATE( hyprduel )
         ---- ---- ---4 32--
         ---- ---- ---- --1-     ? Blank Screen
         ---- ---- ---- ---0     Flip  Screen    */
-	if (screenctrl & 2)	
+	if (screenctrl & 2)
 		return 0;
 	flip_screen_set(screen->machine, screenctrl & 1);
 
@@ -730,9 +730,9 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 	if (input_code_pressed(screen->machine, KEYCODE_E))	msk |= 0x04;
 	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 0x08;
 	if (msk != 0)
-	{	
+	{
 		bitmap_fill(bitmap, cliprect,0);
-		layers_ctrl &= msk;	
+		layers_ctrl &= msk;
 	}
 
 	popmessage("%x-%x-%x:%04x %04x %04x",

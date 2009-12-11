@@ -40,7 +40,7 @@ struct _go2000_state
 	/* memory pointers */
 	UINT16 *  videoram;
 	UINT16 *  videoram2;
-//	UINT16 *  paletteram;	// currently this uses generic palette handling
+//  UINT16 *  paletteram;   // currently this uses generic palette handling
 
 	/* devices */
 	const device_config *soundcpu;
@@ -230,29 +230,29 @@ static VIDEO_UPDATE(go2000)
 			case 0xc:	dimx = 4;	dimy = 32;	y0 = 0x120; break;
 		}
 
-		if (dimx == 4)	
-		{ 
-			flipx = srcx & 2; 	
-			srcx &= ~2; 
+		if (dimx == 4)
+		{
+			flipx = srcx & 2;
+			srcx &= ~2;
 		}
-		else			
+		else
 			flipx = 0;
 
 		x = (x & 0xff) - (x & 0x100);
 		y = (y0 - (y & 0xff) - dimy * 8) & 0xff;
 
-		if (flipx)	
-		{ 
-			tile_xstart = dimx - 1; 
-			tile_xinc = -1; 
+		if (flipx)
+		{
+			tile_xstart = dimx - 1;
+			tile_xinc = -1;
 		}
 		else
-		{ 
-			tile_xstart = 0;		
-			tile_xinc = +1; 
+		{
+			tile_xstart = 0;
+			tile_xinc = +1;
 		}
 
-		tile_y = 0; 	
+		tile_y = 0;
 		tile_yinc = +1;
 
 		for (dy = 0; dy < dimy * 8; dy += 8)
@@ -271,7 +271,7 @@ static VIDEO_UPDATE(go2000)
 				int tile_flipx = tile & 0x4000;
 				int tile_flipy = tile & 0x8000;
 
-				if (flipx)	
+				if (flipx)
 					tile_flipx = !tile_flipx;
 
 				if (flip_screen_get(screen->machine))

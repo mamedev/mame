@@ -11,8 +11,8 @@ struct _ladyfrog_state
 	UINT8 *    videoram;
 	UINT8 *    spriteram;
 	UINT8 *    scrlram;
-//  	UINT8 *    paletteram;    // currently this uses generic palette handling
-//  	UINT8 *    paletteram2;   // currently this uses generic palette handling
+//      UINT8 *    paletteram;    // currently this uses generic palette handling
+//      UINT8 *    paletteram2;   // currently this uses generic palette handling
 	size_t     videoram_size;
 
 	/* video-related */

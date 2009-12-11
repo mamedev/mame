@@ -78,20 +78,20 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 	int scrollx = state->scroll[0];
 	int scrolly = state->scroll[1];
 
-	if (state->flipscreen) 
-		fx = fy = 1; 
-	else 
+	if (state->flipscreen)
+		fx = fy = 1;
+	else
 		fx = fy = 0;
 
-	mx = -1; 
+	mx = -1;
 	my = 0;
 
-	for (offs = 0; offs < 0x400; offs ++) 
+	for (offs = 0; offs < 0x400; offs ++)
 	{
 		mx++;
-		if (mx == 32) 
+		if (mx == 32)
 		{
-			mx=0; 
+			mx=0;
 			my++;
 		}
 
@@ -106,12 +106,12 @@ static void draw_background( running_machine *machine, bitmap_t *bitmap, const r
 				color, fx, fy, 16*mx,16*my);
 	}
 
-	if (!state->flipscreen) 
+	if (!state->flipscreen)
 	{
 		scrolly = -scrolly;
 		scrollx = -scrollx;
-	} 
-	else 
+	}
+	else
 	{
 		scrolly = scrolly + 256;
 		scrollx = scrollx + 256;
@@ -126,12 +126,12 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
 	int offs;
 
-	for (offs = 0; offs <0x800; offs += 4) 
+	for (offs = 0; offs <0x800; offs += 4)
 	{
 		int x, y, sprite, sprite2, colour, fx, fy, extra;
 
 		y = buffered_spriteram16[offs];
-		if (!(y & 0x8000)) 
+		if (!(y & 0x8000))
 			continue;
 
 		y = y & 0x1ff;
@@ -145,7 +145,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		fy = fx & 0x2;
 		fx = fx & 0x4;
 
-		if (extra) 
+		if (extra)
 			y = y + 16;
 
 		/* Convert the co-ords..*/
@@ -153,7 +153,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		y = (y + 16) % 0x200;
 		x = 256 - x;
 		y = 256 - y;
-		if (state->flipscreen) 
+		if (state->flipscreen)
 		{
 			y = 240 - y;
 			x = 240 - x;
@@ -163,12 +163,12 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		}
 
 		/* Y Flip determines order of multi-sprite */
-		if (extra && fy) 
+		if (extra && fy)
 		{
 			sprite2 = sprite;
 			sprite++;
 		}
-		else 	
+		else
 			sprite2 = sprite + 1;
 
 		drawgfx_transpen(bitmap,cliprect,machine->gfx[2],

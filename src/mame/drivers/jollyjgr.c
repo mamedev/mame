@@ -396,7 +396,7 @@ static VIDEO_UPDATE( jollyjgr )
 		else
 			sy = 240 - sy;
 
-		if (offs < 3 * 4)  
+		if (offs < 3 * 4)
 			sy++;
 
 		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],

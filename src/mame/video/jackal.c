@@ -132,9 +132,9 @@ static void draw_sprites_region( running_machine *machine, bitmap_t *bitmap, con
 		int flipy = attr & 0x40;
 		int color = ((sn2 & 0xf0) >> 4);
 
-		if (attr & 0x01) 
+		if (attr & 0x01)
 			sx = sx - 256;
-		if (sy > 0xf0)   
+		if (sy > 0xf0)
 			sy = sy - 256;
 
 		if (flip_screen_get(machine))

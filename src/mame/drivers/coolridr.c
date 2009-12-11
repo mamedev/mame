@@ -1,19 +1,19 @@
 /******************************************************************************************************
 
-	System H1 (c) 1994 Sega
+    System H1 (c) 1994 Sega
 
-	preliminary driver by David Haywood, Angelo Salese and Tomasz Slanina
-	special thanks to Guru for references and HW advices
+    preliminary driver by David Haywood, Angelo Salese and Tomasz Slanina
+    special thanks to Guru for references and HW advices
 
-	TODO:
-	- DMA is still a bit of a mystery;
-	- video emulation is pratically non-existant;
-	- SCSP;
-	- Many SH-1 ports needs investigations;
-	- IRQ generation
-	- Understand & remove the hacks at the bottom;
-	- IC1/IC10 are currently unused, might contain sprite data / music data for the SCSP / chars for the
-	  text tilemap/blitter;
+    TODO:
+    - DMA is still a bit of a mystery;
+    - video emulation is pratically non-existant;
+    - SCSP;
+    - Many SH-1 ports needs investigations;
+    - IRQ generation
+    - Understand & remove the hacks at the bottom;
+    - IC1/IC10 are currently unused, might contain sprite data / music data for the SCSP / chars for the
+      text tilemap/blitter;
 
 =======================================================================================================
 
@@ -339,7 +339,7 @@ static WRITE32_HANDLER(sysh1_ioga_w)
 }
 #endif
 /*
-CMD = 03f4 PARAM = 0230 | ¦
+CMD = 03f4 PARAM = 0230 | ?
 CMD = ac90 PARAM = 0001 DATA = 00000000
 CMD = ac90 PARAM = 0001 DATA = 00000059
 CMD = ac90 PARAM = 0001 DATA = 00000000
@@ -353,7 +353,7 @@ CMD = ac90 PARAM = 0001 DATA = 01200050
 CMD = ac90 PARAM = 0001 DATA = 00000000
 CMD = ac90 PARAM = 0001 DATA = 03f40230
 
-CMD = 03f4 PARAM = 0170 | ¦
+CMD = 03f4 PARAM = 0170 | ?
 CMD = ac90 PARAM = 0001 DATA = 00000000
 CMD = ac90 PARAM = 0001 DATA = 00000059
 CMD = ac90 PARAM = 0001 DATA = 00000000
@@ -440,7 +440,7 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 					memory_write_dword(space,(clear_vram),0x00000000);
 			}
 			//else
-			//	printf("CMD = %04x PARAM = %04x DATA = %08x\n",cmd,param,data);
+			//  printf("CMD = %04x PARAM = %04x DATA = %08x\n",cmd,param,data);
 			break;
 	}
 }
@@ -654,7 +654,7 @@ static const gfx_layout test =
 #endif
 
 static GFXDECODE_START( coolridr )
-//	GFXDECODE_ENTRY( "maincpu_data", 0, tiles8x8_layout, 0, 16 )
+//  GFXDECODE_ENTRY( "maincpu_data", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx_data", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx5", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "ram_gfx", 0, tiles8x8_layout, 0, 16 )
@@ -1009,12 +1009,12 @@ INPUT_PORTS_END
 static INTERRUPT_GEN( system_h1 )
 {
 	cpu_set_input_line(device, 4, HOLD_LINE);
-/*	switch(cpu_getiloops(device))
-	{
-      	case 0: break;
+/*  switch(cpu_getiloops(device))
+    {
+        case 0: break;
         case 1:cpu_set_input_line(device, 6, HOLD_LINE); break;
 //      case 2:cpu_set_input_line(device, 8, HOLD_LINE); break;
-	}*/
+    }*/
 }
 
 //IRQs 10,12 and 14 are valid on SH-1 instead
@@ -1102,16 +1102,16 @@ ROM_START( coolridr )
 	ROM_LOAD32_WORD_SWAP( "mp17644.5", 0x1000002, 0x0200000, CRC(be2763c5) SHA1(1044b0a73e334337b0b9ac958df59480aedfb942) )
 	ROM_LOAD32_WORD_SWAP( "mp17649.10",0x1000000, 0x0200000, CRC(567fbc0a) SHA1(3999c99b26f13d97ac1c58de00a44049ee7775fd) )
 
-/*	ROMX_LOAD( "mp17640.1", 0x0000000, 0x0200000, CRC(5ecd98c7) SHA1(22027c1e9e6195d27f29a5779695d8597f68809e), ROM_SKIP(9) )
-	ROMX_LOAD( "mp17641.2", 0x0000001, 0x0200000, CRC(a59b0605) SHA1(c93f84fd58f1942b40b7a55058e02a18a3dec3af), ROM_SKIP(9) )
-	ROMX_LOAD( "mp17642.3", 0x0000002, 0x0200000, CRC(5f8a1827) SHA1(23179d751777436f2a4f652132001d5e425d8cd5), ROM_SKIP(9) )
-	ROMX_LOAD( "mp17643.4", 0x0000003, 0x0200000, CRC(44a05dd0) SHA1(32aa86f8761ec6ffceb63979c44828603c244e7d), ROM_SKIP(9) )
-	ROMX_LOAD( "mp17644.5", 0x0000004, 0x0200000, CRC(be2763c5) SHA1(1044b0a73e334337b0b9ac958df59480aedfb942), ROM_SKIP(9) )
-	ROMX_LOAD( "mp17645.6", 0x0000005, 0x0200000, CRC(00954173) SHA1(863f32565296448ef10992dc3c0480411eb2b193), ROM_SKIP(9) )
-	ROMX_LOAD( "mp17646.7", 0x0000006, 0x0200000, CRC(7ae4d92e) SHA1(8a0eaa5dce112289ac5d16ad5dc7f5895e71e87b), ROM_SKIP(9) )
-	ROMX_LOAD( "mp17647.8", 0x0000007, 0x0200000, CRC(082faee8) SHA1(c047b8475517f96f481c09471a77aa0d103631d6), ROM_SKIP(9) )
-	ROMX_LOAD( "mp17648.9", 0x0000008, 0x0200000, CRC(0791802f) SHA1(acad55bbd22c7e955a729c8abed9509fc6f10927), ROM_SKIP(9) )
-	ROMX_LOAD( "mp17649.10",0x0000009, 0x0200000, CRC(567fbc0a) SHA1(3999c99b26f13d97ac1c58de00a44049ee7775fd), ROM_SKIP(9) )*/
+/*  ROMX_LOAD( "mp17640.1", 0x0000000, 0x0200000, CRC(5ecd98c7) SHA1(22027c1e9e6195d27f29a5779695d8597f68809e), ROM_SKIP(9) )
+    ROMX_LOAD( "mp17641.2", 0x0000001, 0x0200000, CRC(a59b0605) SHA1(c93f84fd58f1942b40b7a55058e02a18a3dec3af), ROM_SKIP(9) )
+    ROMX_LOAD( "mp17642.3", 0x0000002, 0x0200000, CRC(5f8a1827) SHA1(23179d751777436f2a4f652132001d5e425d8cd5), ROM_SKIP(9) )
+    ROMX_LOAD( "mp17643.4", 0x0000003, 0x0200000, CRC(44a05dd0) SHA1(32aa86f8761ec6ffceb63979c44828603c244e7d), ROM_SKIP(9) )
+    ROMX_LOAD( "mp17644.5", 0x0000004, 0x0200000, CRC(be2763c5) SHA1(1044b0a73e334337b0b9ac958df59480aedfb942), ROM_SKIP(9) )
+    ROMX_LOAD( "mp17645.6", 0x0000005, 0x0200000, CRC(00954173) SHA1(863f32565296448ef10992dc3c0480411eb2b193), ROM_SKIP(9) )
+    ROMX_LOAD( "mp17646.7", 0x0000006, 0x0200000, CRC(7ae4d92e) SHA1(8a0eaa5dce112289ac5d16ad5dc7f5895e71e87b), ROM_SKIP(9) )
+    ROMX_LOAD( "mp17647.8", 0x0000007, 0x0200000, CRC(082faee8) SHA1(c047b8475517f96f481c09471a77aa0d103631d6), ROM_SKIP(9) )
+    ROMX_LOAD( "mp17648.9", 0x0000008, 0x0200000, CRC(0791802f) SHA1(acad55bbd22c7e955a729c8abed9509fc6f10927), ROM_SKIP(9) )
+    ROMX_LOAD( "mp17649.10",0x0000009, 0x0200000, CRC(567fbc0a) SHA1(3999c99b26f13d97ac1c58de00a44049ee7775fd), ROM_SKIP(9) )*/
 ROM_END
 
 /*TODO: there must be an irq line with custom vector located somewhere that writes to here...*/
@@ -1135,7 +1135,7 @@ static READ32_HANDLER( coolridr_hack2_r )
 
 static DRIVER_INIT( coolridr )
 {
-//	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60d88a4, 0x060d88a7, 0, 0, coolridr_hack1_r );
+//  memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60d88a4, 0x060d88a7, 0, 0, coolridr_hack1_r );
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60d8894, 0x060d8897, 0, 0, coolridr_hack2_r );
 }
 

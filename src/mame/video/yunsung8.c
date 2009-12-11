@@ -52,14 +52,14 @@ READ8_HANDLER( yunsung8_videoram_r )
 	/*  Bit 1 of the bankswitching register contols the c000-c7ff
         area (Palette). Bit 0 controls the c800-dfff area (Tiles) */
 
-	if (offset < 0x0800)	
+	if (offset < 0x0800)
 		bank = state->videobank & 2;
-	else					
+	else
 		bank = state->videobank & 1;
 
-	if (bank)	
+	if (bank)
 		return state->videoram_0[offset];
-	else		
+	else
 		return state->videoram_1[offset];
 }
 
@@ -74,9 +74,9 @@ WRITE8_HANDLER( yunsung8_videoram_w )
 		UINT8 *RAM;
 		int color;
 
-		if (bank)	
+		if (bank)
 			RAM = state->videoram_0;
-		else		
+		else
 			RAM = state->videoram_1;
 
 		RAM[offset] = data;
@@ -90,17 +90,17 @@ WRITE8_HANDLER( yunsung8_videoram_w )
 		int tile;
 		int bank = state->videobank & 1;
 
-		if (offset < 0x1000)	
+		if (offset < 0x1000)
 			tile = (offset - 0x0800);		// c800-cfff: Banked Color RAM
-		else				 	
+		else
 			tile = (offset - 0x1000) / 2;	// d000-dfff: Banked Tiles RAM
 
-		if (bank)	
+		if (bank)
 		{
 			state->videoram_0[offset] = data;
 			tilemap_mark_tile_dirty(state->tilemap_0, tile);
 		}
-		else		
+		else
 		{
 			state->videoram_1[offset] = data;
 			tilemap_mark_tile_dirty(state->tilemap_1, tile);
@@ -209,9 +209,9 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 }
 #endif
 
-	if (layers_ctrl & 1)	
+	if (layers_ctrl & 1)
 		tilemap_draw(bitmap, cliprect, state->tilemap_0, 0, 0);
-	else			
+	else
 		bitmap_fill(bitmap, cliprect, 0);
 
 	if (layers_ctrl & 2)
