@@ -62,19 +62,6 @@ static WRITE8_DEVICE_HANDLER( joust2_snd_cmd_w );
 static WRITE8_DEVICE_HANDLER( joust2_pia_3_cb1_w );
 
 
-
-/*************************************
- *
- *  Trampoline functions
- *
- *************************************/
-
-static READ8_DEVICE_HANDLER( input_port_0_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 0)); }
-static READ8_DEVICE_HANDLER( input_port_1_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 1)); }
-static READ8_DEVICE_HANDLER( input_port_2_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 2)); }
-static READ8_DEVICE_HANDLER( input_port_3_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 3)); }
-static READ8_DEVICE_HANDLER( input_port_4_device_r ) { return input_port_read_direct(input_port_by_index(&device->machine->portlist, 4)); }
-
 /*************************************
  *
  *  Generic old-Williams PIA interfaces
@@ -84,7 +71,7 @@ static READ8_DEVICE_HANDLER( input_port_4_device_r ) { return input_port_read_di
 /* Generic PIA 0, maps to input ports 0 and 1 */
 const pia6821_interface williams_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_0_device_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
@@ -94,7 +81,7 @@ const pia6821_interface williams_pia_0_intf =
 /* muxing done in williams_mux_r */
 const pia6821_interface williams_muxed_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_0_device_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(williams_port_select_w),
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
@@ -102,7 +89,7 @@ const pia6821_interface williams_muxed_pia_0_intf =
 /* Generic 49-way joystick PIA 0 for Sinistar/Blaster */
 const pia6821_interface williams_49way_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(williams_49way_port_0_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(williams_49way_port_0_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
@@ -110,7 +97,7 @@ const pia6821_interface williams_49way_pia_0_intf =
 /* Muxing 49-way joystick PIA 0 for Blaster kit */
 const pia6821_interface williams_49way_muxed_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(williams_input_port_49way_0_5_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(williams_input_port_49way_0_5_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(williams_port_select_w),
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
@@ -118,7 +105,7 @@ const pia6821_interface williams_49way_muxed_pia_0_intf =
 /* Generic PIA 1, maps to input port 2, sound command out, and IRQs */
 const pia6821_interface williams_pia_1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_2_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
 };
@@ -142,7 +129,7 @@ const pia6821_interface williams_snd_pia_intf =
 /* Special PIA 0 for Lotto Fun, to handle the controls and ticket dispenser */
 const pia6821_interface lottofun_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(lottofun_input_port_0_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(lottofun_input_port_0_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, ticket_dispenser_w), DEVCB_HANDLER(lottofun_coin_lock_w), DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
@@ -158,7 +145,7 @@ const pia6821_interface sinistar_snd_pia_intf =
 /* Special PIA 1 for PlayBall, doesn't set the high bits on sound commands */
 const pia6821_interface playball_pia_1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_2_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(playball_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
 };
@@ -166,7 +153,7 @@ const pia6821_interface playball_pia_1_intf =
 /* extra PIA 3 for Speed Ball */
 const pia6821_interface spdball_pia_3_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_3_device_r), DEVCB_HANDLER(input_port_4_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN3"), DEVCB_INPUT_PORT("IN4"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
@@ -182,7 +169,7 @@ const pia6821_interface spdball_pia_3_intf =
 /* Generic muxing PIA 0, maps to input ports 0/3 and 1; port select is CA2 */
 const pia6821_interface williams2_muxed_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_0_device_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(williams_port_select_w), DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
@@ -190,7 +177,7 @@ const pia6821_interface williams2_muxed_pia_0_intf =
 /* Generic PIA 1, maps to input port 2, sound command out, and IRQs */
 const pia6821_interface williams2_pia_1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_2_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("pia_2", pia6821_ca1_w),
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
 };
@@ -214,7 +201,7 @@ const pia6821_interface williams2_snd_pia_intf =
 /* Mystic Marathon PIA 0 */
 const pia6821_interface mysticm_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_0_device_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_firq), DEVCB_LINE(mysticm_main_irq)
 };
@@ -222,7 +209,7 @@ const pia6821_interface mysticm_pia_0_intf =
 /* Mystic Marathon PIA 1 */
 const pia6821_interface mysticm_pia_1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_2_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("pia_2", pia6821_ca1_w),
 	/*irqs   : A/B             */ DEVCB_LINE(mysticm_main_irq), DEVCB_LINE(mysticm_main_irq)
 };
@@ -230,7 +217,7 @@ const pia6821_interface mysticm_pia_1_intf =
 /* Turkey Shoot PIA 0 */
 const pia6821_interface tshoot_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(tshoot_input_port_0_3_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(tshoot_input_port_0_3_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(tshoot_lamp_w), DEVCB_HANDLER(williams_port_select_w), DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(tshoot_main_irq), DEVCB_LINE(tshoot_main_irq)
 };
@@ -238,7 +225,7 @@ const pia6821_interface tshoot_pia_0_intf =
 /* Turkey Shoot PIA 1 */
 const pia6821_interface tshoot_pia_1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_2_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("pia_2", pia6821_ca1_w),
 	/*irqs   : A/B             */ DEVCB_LINE(tshoot_main_irq), DEVCB_LINE(tshoot_main_irq)
 };
@@ -254,7 +241,7 @@ const pia6821_interface tshoot_snd_pia_intf =
 /* Joust 2 PIA 1 */
 const pia6821_interface joust2_pia_1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_2_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(joust2_snd_cmd_w), DEVCB_HANDLER(joust2_pia_3_cb1_w), DEVCB_DEVICE_HANDLER("pia_2", pia6821_ca1_w),
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
 };
