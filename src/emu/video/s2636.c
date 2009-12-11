@@ -317,7 +317,7 @@ WRITE8_DEVICE_HANDLER( s2636_work_ram_w )
 {
 	s2636_state *s2636 = get_safe_token(device);
 
-	assert(offset < 8);
+	assert(offset < s2636->work_ram_size);
 
 	s2636->work_ram[offset] = data;
 }
