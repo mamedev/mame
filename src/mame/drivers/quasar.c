@@ -317,21 +317,21 @@ static INTERRUPT_GEN( quasar_interrupt )
 static const s2636_interface s2636_0_config =
 {
 	"screen",
-	0xff,
+	0x100,
 	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET
 };
 
 static const s2636_interface s2636_1_config =
 {
 	"screen",
-	0xff,
+	0x100,
 	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET
 };
 
 static const s2636_interface s2636_2_config =
 {
 	"screen",
-	0xff,
+	0x100,
 	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET
 };
 

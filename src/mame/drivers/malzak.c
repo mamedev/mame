@@ -366,14 +366,14 @@ static const sn76477_interface sn76477_intf =
 static const s2636_interface s2636_0_config =
 {
 	"screen",
-	0xff,
+	0x100,
 	0, -16	/* -8, -16 */
 };
 
 static const s2636_interface s2636_1_config =
 {
 	"screen",
-	0xff,
+	0x100,
 	0, -16	/* -9, -16 */
 };
 

@@ -684,21 +684,21 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 static const s2636_interface s2636_1_config =
 {
 	"screen",
-	0xff,
+	0x100,
 	0, -19
 };
 
 static const s2636_interface s2636_2_config =
 {
 	"screen",
-	0xff,
+	0x100,
 	0, -19
 };
 
 static const s2636_interface s2636_3_config =
 {
 	"screen",
-	0xff,
+	0x100,
 	0, -19
 };
 
