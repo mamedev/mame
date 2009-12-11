@@ -1,11 +1,11 @@
 /***************************************************************************
 
-  Street Fighter
+    Street Fighter
 
-  driver by Olivier Galibert
+    driver by Olivier Galibert
 
-TODO:
-- is there a third coin input?
+    TODO:
+    - is there a third coin input?
 
 ***************************************************************************/
 
@@ -14,17 +14,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"
-
-
-extern UINT16 *sf_objectram,*sf_videoram;
-
-WRITE16_HANDLER( sf_bg_scroll_w );
-WRITE16_HANDLER( sf_fg_scroll_w );
-WRITE16_HANDLER( sf_videoram_w );
-WRITE16_HANDLER( sf_gfxctrl_w );
-VIDEO_START( sf );
-VIDEO_UPDATE( sf );
-
+#include "includes/sf.h"
 
 static READ16_HANDLER( dummy_r )
 {
@@ -36,21 +26,23 @@ static WRITE16_HANDLER( sf_coin_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine, 0,data & 0x01);
-		coin_counter_w(space->machine, 1,data & 0x02);
-		coin_lockout_w(space->machine, 0,~data & 0x10);
-		coin_lockout_w(space->machine, 1,~data & 0x20);
-		coin_lockout_w(space->machine, 2,~data & 0x40);	/* is there a third coin input? */
+		coin_counter_w(space->machine, 0, data & 0x01);
+		coin_counter_w(space->machine, 1,  data & 0x02);
+		coin_lockout_w(space->machine, 0, ~data & 0x10);
+		coin_lockout_w(space->machine, 1, ~data & 0x20);
+		coin_lockout_w(space->machine, 2, ~data & 0x40);	/* is there a third coin input? */
 	}
 }
 
 
 static WRITE16_HANDLER( soundcmd_w )
 {
+	sf_state *state = (sf_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, offset, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -58,10 +50,10 @@ static WRITE16_HANDLER( soundcmd_w )
 /* The protection of the japanese version */
 /* I'd love to see someone dump the 68705 rom */
 
-static void write_dword(const address_space *space,offs_t offset,UINT32 data)
+static void write_dword( const address_space *space, offs_t offset, UINT32 data )
 {
-	memory_write_word(space, offset,data >> 16);
-	memory_write_word(space, offset+2,data);
+	memory_write_word(space, offset, data >> 16);
+	memory_write_word(space, offset + 2, data);
 }
 
 static WRITE16_HANDLER( protection_w )
@@ -76,30 +68,31 @@ static WRITE16_HANDLER( protection_w )
 
 	map = maplist
 		[memory_read_byte(space, 0xffc006)]
-		[(memory_read_byte(space, 0xffc003)<<1) + (memory_read_word(space, 0xffc004)>>8)];
+		[(memory_read_byte(space, 0xffc003) << 1) + (memory_read_word(space, 0xffc004) >> 8)];
 
-	switch(memory_read_byte(space, 0xffc684)) {
+	switch (memory_read_byte(space, 0xffc684)) 
+	{
 	case 1:
 		{
 			int base;
 
-			base = 0x1b6e8+0x300e*map;
+			base = 0x1b6e8 + 0x300e * map;
 
-			write_dword(space, 0xffc01c, 0x16bfc+0x270*map);
-			write_dword(space, 0xffc020, base+0x80);
+			write_dword(space, 0xffc01c, 0x16bfc + 0x270 * map);
+			write_dword(space, 0xffc020, base + 0x80);
 			write_dword(space, 0xffc024, base);
-			write_dword(space, 0xffc028, base+0x86);
-			write_dword(space, 0xffc02c, base+0x8e);
-			write_dword(space, 0xffc030, base+0x20e);
-			write_dword(space, 0xffc034, base+0x30e);
-			write_dword(space, 0xffc038, base+0x38e);
-			write_dword(space, 0xffc03c, base+0x40e);
-			write_dword(space, 0xffc040, base+0x80e);
-			write_dword(space, 0xffc044, base+0xc0e);
-			write_dword(space, 0xffc048, base+0x180e);
-			write_dword(space, 0xffc04c, base+0x240e);
-			write_dword(space, 0xffc050, 0x19548+0x60*map);
-			write_dword(space, 0xffc054, 0x19578+0x60*map);
+			write_dword(space, 0xffc028, base + 0x86);
+			write_dword(space, 0xffc02c, base + 0x8e);
+			write_dword(space, 0xffc030, base + 0x20e);
+			write_dword(space, 0xffc034, base + 0x30e);
+			write_dword(space, 0xffc038, base + 0x38e);
+			write_dword(space, 0xffc03c, base + 0x40e);
+			write_dword(space, 0xffc040, base + 0x80e);
+			write_dword(space, 0xffc044, base + 0xc0e);
+			write_dword(space, 0xffc048, base + 0x180e);
+			write_dword(space, 0xffc04c, base + 0x240e);
+			write_dword(space, 0xffc050, 0x19548 + 0x60 * map);
+			write_dword(space, 0xffc054, 0x19578 + 0x60 * map);
 			break;
 		}
 	case 2:
@@ -126,15 +119,19 @@ static WRITE16_HANDLER( protection_w )
 	case 4:
 		{
 			int pos = memory_read_byte(space, 0xffc010);
-			pos = (pos+1) & 3;
+			pos = (pos + 1) & 3;
 			memory_write_byte(space, 0xffc010, pos);
-			if(!pos) {
+			if(!pos) 
+			{
 				int d1 = memory_read_word(space, 0xffc682);
 				int off = memory_read_word(space, 0xffc00e);
-				if(off!=512) {
+				if (off!=512) 
+				{
 					off++;
 					d1++;
-				} else {
+				} 
+				else 
+				{
 					off = 0;
 					d1 -= 512;
 				}
@@ -146,7 +143,7 @@ static WRITE16_HANDLER( protection_w )
 		}
 	default:
 		{
-			logerror("Write protection at %06x (%04x)\n", cpu_get_pc(space->cpu), data&0xffff);
+			logerror("Write protection at %06x (%04x)\n", cpu_get_pc(space->cpu), data & 0xffff);
 			logerror("*** Unknown protection %d\n", memory_read_byte(space, 0xffc684));
 			break;
 		}
@@ -162,35 +159,35 @@ static const int scale[8] = { 0x00, 0x40, 0xe0, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe };
 
 static READ16_HANDLER( button1_r )
 {
-	return (scale[input_port_read(space->machine, "IN3")]<<8) | scale[input_port_read(space->machine, "IN1")];
+	return (scale[input_port_read(space->machine, "IN3")] << 8) | scale[input_port_read(space->machine, "IN1")];
 }
 
 static READ16_HANDLER( button2_r )
 {
-	return (scale[input_port_read(space->machine, "IN4")]<<8) | scale[input_port_read(space->machine, "IN2")];
+	return (scale[input_port_read(space->machine, "IN4")] << 8) | scale[input_port_read(space->machine, "IN2")];
 }
 
 
 static WRITE8_HANDLER( sound2_bank_w )
 {
-	memory_set_bankptr(space->machine, "bank1",memory_region(space->machine, "audio2")+0x8000*(data+1));
+	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "audio2") + 0x8000 * (data + 1));
 }
 
 
 static WRITE8_DEVICE_HANDLER( msm5205_w )
 {
-	msm5205_reset_w(device,(data>>7)&1);
+	msm5205_reset_w(device, (data >> 7) & 1);
 	/* ?? bit 6?? */
-	msm5205_data_w(device,data);
-	msm5205_vclk_w(device,1);
-	msm5205_vclk_w(device,0);
+	msm5205_data_w(device, data);
+	msm5205_vclk_w(device, 1);
+	msm5205_vclk_w(device, 0);
 }
 
 
 
 static ADDRESS_MAP_START( sf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE(&sf_videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE_MEMBER(sf_state, videoram, videoram_size)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("COINS")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN0")
@@ -207,12 +204,12 @@ static ADDRESS_MAP_START( sf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
 	AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
-	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE(&sf_objectram)
+	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE_MEMBER(sf_state, objectram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sfus_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE(&sf_videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE_MEMBER(sf_state, videoram, videoram_size)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
@@ -229,12 +226,12 @@ static ADDRESS_MAP_START( sfus_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
 	AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
-	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE(&sf_objectram)
+	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE_MEMBER(sf_state, objectram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sfjp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE(&sf_videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE_SIZE_MEMBER(sf_state, videoram, videoram_size)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("COINS")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1")
@@ -251,7 +248,7 @@ static ADDRESS_MAP_START( sfjp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
 	AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
-	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE(&sf_objectram)
+	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE_MEMBER(sf_state, objectram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -786,9 +783,10 @@ GFXDECODE_END
 
 
 
-static void irq_handler(const device_config *device, int irq)
+static void irq_handler( const device_config *device, int irq )
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	sf_state *state = (sf_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -802,7 +800,32 @@ static const msm5205_interface msm5205_config =
 	MSM5205_SEX_4B	/* 8KHz playback ?    */
 };
 
+static MACHINE_START( sf )
+{
+	sf_state *state = (sf_state *)machine->driver_data;
+
+	/* devices */
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+
+	state_save_register_global(machine, state->sf_active);
+	state_save_register_global(machine, state->bgscroll);
+	state_save_register_global(machine, state->fgscroll);
+}
+
+static MACHINE_RESET( sf )
+{
+	sf_state *state = (sf_state *)machine->driver_data;
+
+	state->sf_active = 0;
+	state->bgscroll = 0;
+	state->fgscroll = 0;
+}
+
 static MACHINE_DRIVER_START( sf )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(sf_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ? (xtal is 16MHz) */
@@ -812,6 +835,9 @@ static MACHINE_DRIVER_START( sf )
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* ? xtal is 3.579545MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 								/* NMIs are caused by the main CPU */
+
+	MDRV_MACHINE_START(sf)
+	MDRV_MACHINE_RESET(sf)
 
 	MDRV_CPU_ADD("audio2", Z80, 3579545)	/* ? xtal is 3.579545MHz */
 	MDRV_CPU_PROGRAM_MAP(sound2_map)
@@ -1133,7 +1159,7 @@ ROM_END
 
 
 
-GAME( 1987, sf,   0,  sf,   sf,   0, ROT0, "Capcom", "Street Fighter (World)", 0 )
-GAME( 1987, sfus, sf, sfus, sfus, 0, ROT0, "Capcom", "Street Fighter (US)", 0 )
-GAME( 1987, sfj, sf, sfjp, sfjp, 0, ROT0, "Capcom", "Street Fighter (Japan)", 0 )
-GAME( 1987, sfp,  sf, sfp,  sf,   0, ROT0, "Capcom", "Street Fighter (prototype)", 0 )
+GAME( 1987, sf,   0,  sf,   sf,   0, ROT0, "Capcom", "Street Fighter (World)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sfus, sf, sfus, sfus, 0, ROT0, "Capcom", "Street Fighter (US)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sfj,  sf, sfjp, sfjp, 0, ROT0, "Capcom", "Street Fighter (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sfp,  sf, sfp,  sf,   0, ROT0, "Capcom", "Street Fighter (prototype)", GAME_SUPPORTS_SAVE )

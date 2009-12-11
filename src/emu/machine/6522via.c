@@ -263,6 +263,36 @@ static DEVICE_START( via6522 )
 	/* Default clock is from CPU1 */
 	if (device->clock == 0)
 		device_set_clock(device, device->machine->firstcpu->clock);
+
+	/* save state register */
+	state_save_register_device_item(device, 0, v->in_a);
+	state_save_register_device_item(device, 0, v->in_ca1);
+	state_save_register_device_item(device, 0, v->in_ca2);
+	state_save_register_device_item(device, 0, v->out_a);
+	state_save_register_device_item(device, 0, v->out_ca2);
+	state_save_register_device_item(device, 0, v->ddr_a);
+	state_save_register_device_item(device, 0, v->in_b);
+	state_save_register_device_item(device, 0, v->in_cb1);
+	state_save_register_device_item(device, 0, v->in_cb2);
+	state_save_register_device_item(device, 0, v->out_b);
+	state_save_register_device_item(device, 0, v->out_cb2);
+	state_save_register_device_item(device, 0, v->ddr_b);
+	state_save_register_device_item(device, 0, v->t1cl);
+	state_save_register_device_item(device, 0, v->t1ch);
+	state_save_register_device_item(device, 0, v->t1ll);
+	state_save_register_device_item(device, 0, v->t1lh);
+	state_save_register_device_item(device, 0, v->t2cl);
+	state_save_register_device_item(device, 0, v->t2ch);
+	state_save_register_device_item(device, 0, v->t2ll);
+	state_save_register_device_item(device, 0, v->t2lh);
+	state_save_register_device_item(device, 0, v->sr);
+	state_save_register_device_item(device, 0, v->pcr);
+	state_save_register_device_item(device, 0, v->acr);
+	state_save_register_device_item(device, 0, v->ier);
+	state_save_register_device_item(device, 0, v->ifr);
+	state_save_register_device_item(device, 0, v->t1_active);
+	state_save_register_device_item(device, 0, v->t2_active);
+	state_save_register_device_item(device, 0, v->shift_counter);
 }
 
 
