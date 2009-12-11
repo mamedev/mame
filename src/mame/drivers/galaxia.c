@@ -30,22 +30,6 @@ TS 2008.08.12:
 static UINT8 *galaxia_video;
 static UINT8 *galaxia_color;
 
-static s2636_t *s2636_0, *s2636_1, *s2636_2;
-static UINT8 *galaxia_s2636_0_ram;
-static UINT8 *galaxia_s2636_1_ram;
-static UINT8 *galaxia_s2636_2_ram;
-
-static VIDEO_START( galaxia )
-{
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
-
-	/* configure the S2636 chips */
-	s2636_0 = s2636_config(machine, galaxia_s2636_0_ram, height, width,  3, -27);
-	s2636_1 = s2636_config(machine, galaxia_s2636_1_ram, height, width,  3, -27);
-	s2636_2 = s2636_config(machine, galaxia_s2636_2_ram, height, width,  3, -27);
-}
-
 static VIDEO_UPDATE( galaxia )
 {
 	int x,y, count;
@@ -53,6 +37,10 @@ static VIDEO_UPDATE( galaxia )
 	bitmap_t *s2636_0_bitmap;
 	bitmap_t *s2636_1_bitmap;
 	bitmap_t *s2636_2_bitmap;
+	
+	const device_config *s2636_0 = devtag_get_device(screen->machine, "s2636_0");
+	const device_config *s2636_1 = devtag_get_device(screen->machine, "s2636_1");
+	const device_config *s2636_2 = devtag_get_device(screen->machine, "s2636_2");
 
 	count = 0;
 
@@ -118,9 +106,9 @@ static READ8_HANDLER(galaxia_video_r)
 static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&galaxia_s2636_0_ram)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&galaxia_s2636_1_ram)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&galaxia_s2636_2_ram)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
+	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
+	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_2", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(galaxia_video_r, galaxia_video_w)  AM_BASE(&galaxia_video)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
@@ -141,9 +129,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( astrowar_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&galaxia_s2636_0_ram)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&galaxia_s2636_1_ram)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&galaxia_s2636_2_ram)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
+	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
+	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_2", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(galaxia_video_r, galaxia_video_w)  AM_BASE(&galaxia_video)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
@@ -242,6 +230,28 @@ static INTERRUPT_GEN( galaxia_interrupt )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
 }
 
+
+static const s2636_interface s2636_0_config =
+{
+	"screen",
+	0xff,
+	3, -27
+};
+
+static const s2636_interface s2636_1_config =
+{
+	"screen",
+	0xff,
+	3, -27
+};
+
+static const s2636_interface s2636_2_config =
+{
+	"screen",
+	0xff,
+	3, -27
+};
+
 static MACHINE_DRIVER_START( galaxia )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650,2000000)		 /* ? MHz */
@@ -260,7 +270,10 @@ static MACHINE_DRIVER_START( galaxia )
 	MDRV_GFXDECODE(galaxia)
 	MDRV_PALETTE_LENGTH(0x100)
 
-	MDRV_VIDEO_START(galaxia)
+	MDRV_S2636_ADD("s2636_0", s2636_0_config)
+	MDRV_S2636_ADD("s2636_1", s2636_1_config)
+	MDRV_S2636_ADD("s2636_2", s2636_2_config)
+
 	MDRV_VIDEO_UPDATE(galaxia)
 MACHINE_DRIVER_END
 

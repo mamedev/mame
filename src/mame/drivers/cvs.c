@@ -118,9 +118,6 @@ UINT8 *cvs_video_ram;
 UINT8 *cvs_bullet_ram;
 UINT8 *cvs_palette_ram;
 static UINT8 *cvs_character_ram;
-UINT8 *cvs_s2636_0_ram;
-UINT8 *cvs_s2636_1_ram;
-UINT8 *cvs_s2636_2_ram;
 UINT8 *cvs_fo_state;
 
 static emu_timer *cvs_393hz_timer;
@@ -185,14 +182,18 @@ WRITE8_HANDLER( cvs_bullet_ram_or_palette_w )
 
 READ8_HANDLER( cvs_s2636_0_or_character_ram_r )
 {
+	const device_config *s2636_0 = devtag_get_device(space->machine, "s2636_0");
+
 	if (*cvs_fo_state)
 		return cvs_character_ram[(0 * 0x800) | 0x400 | character_ram_page_start | offset];
 	else
-		return cvs_s2636_0_ram[offset];
+		return s2636_work_ram_r(s2636_0, offset);
 }
 
 WRITE8_HANDLER( cvs_s2636_0_or_character_ram_w )
 {
+	const device_config *s2636_0 = devtag_get_device(space->machine, "s2636_0");
+
 	if (*cvs_fo_state)
 	{
 		offset |= (0 * 0x800) | 0x400 | character_ram_page_start;
@@ -200,20 +201,24 @@ WRITE8_HANDLER( cvs_s2636_0_or_character_ram_w )
 		gfx_element_mark_dirty(space->machine->gfx[1], (offset/8) % 256);
 	}
 	else
-		cvs_s2636_0_ram[offset] = data;
+		s2636_work_ram_w(s2636_0, offset, data);
 }
 
 
 READ8_HANDLER( cvs_s2636_1_or_character_ram_r )
 {
+	const device_config *s2636_1 = devtag_get_device(space->machine, "s2636_1");
+
 	if (*cvs_fo_state)
 		return cvs_character_ram[(1 * 0x800) | 0x400 | character_ram_page_start | offset];
 	else
-		return cvs_s2636_1_ram[offset];
+		return s2636_work_ram_r(s2636_1, offset);
 }
 
 WRITE8_HANDLER( cvs_s2636_1_or_character_ram_w )
 {
+	const device_config *s2636_1 = devtag_get_device(space->machine, "s2636_1");
+
 	if (*cvs_fo_state)
 	{
 		offset |= (1 * 0x800) | 0x400 | character_ram_page_start;
@@ -221,20 +226,24 @@ WRITE8_HANDLER( cvs_s2636_1_or_character_ram_w )
 		gfx_element_mark_dirty(space->machine->gfx[1], (offset/8) % 256);
 	}
 	else
-		cvs_s2636_1_ram[offset] = data;
+		s2636_work_ram_w(s2636_1, offset, data);
 }
 
 
 READ8_HANDLER( cvs_s2636_2_or_character_ram_r )
 {
+	const device_config *s2636_2 = devtag_get_device(space->machine, "s2636_2");
+
 	if (*cvs_fo_state)
 		return cvs_character_ram[(2 * 0x800) | 0x400 | character_ram_page_start | offset];
 	else
-		return cvs_s2636_2_ram[offset];
+		return s2636_work_ram_r(s2636_2, offset);
 }
 
 WRITE8_HANDLER( cvs_s2636_2_or_character_ram_w )
 {
+	const device_config *s2636_2 = devtag_get_device(space->machine, "s2636_2");
+
 	if (*cvs_fo_state)
 	{
 		offset |= (2 * 0x800) | 0x400 | character_ram_page_start;
@@ -242,7 +251,7 @@ WRITE8_HANDLER( cvs_s2636_2_or_character_ram_w )
 		gfx_element_mark_dirty(space->machine->gfx[1], (offset/8) % 256);
 	}
 	else
-		cvs_s2636_2_ram[offset] = data;
+		s2636_work_ram_w(s2636_2, offset, data);
 }
 
 
@@ -525,9 +534,9 @@ static ADDRESS_MAP_START( cvs_main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_bullet_ram_or_palette_r, cvs_bullet_ram_or_palette_w) AM_BASE(&cvs_bullet_ram)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_2_or_character_ram_r, cvs_s2636_2_or_character_ram_w) AM_BASE(&cvs_s2636_2_ram)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_1_or_character_ram_r, cvs_s2636_1_or_character_ram_w) AM_BASE(&cvs_s2636_1_ram)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_0_or_character_ram_r, cvs_s2636_0_or_character_ram_w) AM_BASE(&cvs_s2636_0_ram)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_2_or_character_ram_r, cvs_s2636_2_or_character_ram_w)
+	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_1_or_character_ram_r, cvs_s2636_1_or_character_ram_w)
+	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_0_or_character_ram_r, cvs_s2636_0_or_character_ram_w)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(cvs_video_or_color_ram_r, cvs_video_or_color_ram_w) AM_BASE(&cvs_video_ram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
@@ -1014,6 +1023,28 @@ GFXDECODE_END
  *
  *************************************/
 
+static const s2636_interface s2636_0_config =
+{
+	"screen",
+	0xff,
+	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET
+};
+
+static const s2636_interface s2636_1_config =
+{
+	"screen",
+	0xff,
+	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET
+};
+
+static const s2636_interface s2636_2_config =
+{
+	"screen",
+	0xff,
+	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET
+};
+
+
 static MACHINE_DRIVER_START( cvs )
 
 	/* basic machine hardware */
@@ -1047,6 +1078,10 @@ static MACHINE_DRIVER_START( cvs )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 1*8, 32*8-1)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1000))
+
+	MDRV_S2636_ADD("s2636_0", s2636_0_config)
+	MDRV_S2636_ADD("s2636_1", s2636_1_config)
+	MDRV_S2636_ADD("s2636_2", s2636_2_config)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

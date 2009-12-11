@@ -76,9 +76,7 @@
 *************************************************************/
 
 #include "driver.h"
-#include "s2636.h"
-
-
+#include "video/s2636.h"
 
 /*************************************
  *
@@ -91,49 +89,45 @@
 
 static const int sprite_offsets[4] = { 0x00, 0x10, 0x20, 0x40 };
 
-
-
 /*************************************
  *
  *  Internal S2636 data structure
  *
  *************************************/
 
-struct _s2636_t
+typedef struct _s2636_state  s2636_state;
+struct _s2636_state 
 {
-	UINT8 *work_ram;
-	int y_offset;
-	int x_offset;
+	UINT8     *work_ram;
+	int       work_ram_size;
+	int       y_offset;
+	int       x_offset;
 
 	bitmap_t *bitmap;
 	bitmap_t *collision_bitmap;
 };
 
-
-
 /*************************************
  *
- *  Configuration
+ *  Inline functions
  *
  *************************************/
 
-s2636_t *s2636_config(running_machine *machine, UINT8 *work_ram, int screen_height, int screen_width, int y_offset, int x_offset)
+INLINE s2636_state *get_safe_token( const device_config *device )
 {
-	s2636_t *s2636;
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == S2636);
 
-	/* allocate the object that holds the state */
-	s2636 = auto_alloc(machine, s2636_t);
-
-	s2636->work_ram = work_ram;
-	s2636->y_offset = y_offset;
-	s2636->x_offset = x_offset;
-
-	s2636->bitmap = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED16);
-	s2636->collision_bitmap = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED16);
-
-	return s2636;
+	return (s2636_state *)device->token;
 }
 
+INLINE const s2636_interface *get_interface( const device_config *device )
+{
+	assert(device != NULL);
+	assert((device->type == S2636));
+	return (const s2636_interface *) device->static_config;
+}
 
 
 /*************************************
@@ -142,8 +136,7 @@ s2636_t *s2636_config(running_machine *machine, UINT8 *work_ram, int screen_heig
  *
  *************************************/
 
-static void draw_sprite(UINT8 *gfx, int color, int y, int x, int expand,
-						int or_mode, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprite( UINT8 *gfx, int color, int y, int x, int expand, int or_mode, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int sy;
 
@@ -197,8 +190,9 @@ static void draw_sprite(UINT8 *gfx, int color, int y, int x, int expand,
  *
  *************************************/
 
-static int check_collision(s2636_t *s2636, int spriteno1, int spriteno2, const rectangle *cliprect)
+static int check_collision( const device_config *device, int spriteno1, int spriteno2, const rectangle *cliprect )
 {
+	s2636_state *s2636 = get_safe_token(device);
 	int checksum = 0;
 
 	UINT8* attr1 = &s2636->work_ram[sprite_offsets[spriteno1]];
@@ -227,10 +221,8 @@ static int check_collision(s2636_t *s2636, int spriteno1, int spriteno2, const r
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
 			{
-				if ((x < cliprect->min_x) ||
-					(x > cliprect->max_x) ||
-					(y < cliprect->min_y) ||
-					(y > cliprect->max_y))
+				if ((x < cliprect->min_x) || (x > cliprect->max_x) ||
+					(y < cliprect->min_y) || (y > cliprect->max_y))
 					continue;
 
 				checksum = checksum + *BITMAP_ADDR16(s2636->collision_bitmap, y, x);
@@ -243,10 +235,8 @@ static int check_collision(s2636_t *s2636, int spriteno1, int spriteno2, const r
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
 			{
-				if ((x < cliprect->min_x) ||
-					(x > cliprect->max_x) ||
-					(y < cliprect->min_y) ||
-					(y > cliprect->max_y))
+				if ((x < cliprect->min_x) || (x > cliprect->max_x) ||
+					(y < cliprect->min_y) || (y > cliprect->max_y))
 					continue;
 
 				checksum = checksum - *BITMAP_ADDR16(s2636->collision_bitmap, y, x);
@@ -264,8 +254,9 @@ static int check_collision(s2636_t *s2636, int spriteno1, int spriteno2, const r
  *
  *************************************/
 
-bitmap_t *s2636_update(s2636_t *s2636, const rectangle *cliprect)
+bitmap_t *s2636_update( const device_config *device, const rectangle *cliprect )
 {
+	s2636_state *s2636 = get_safe_token(device);
 	UINT8 collision = 0;
 	int spriteno;
 
@@ -274,7 +265,6 @@ bitmap_t *s2636_update(s2636_t *s2636, const rectangle *cliprect)
 	for (spriteno = 0; spriteno < 4; spriteno++)
 	{
 		int color, expand, x, y;
-
 		UINT8* attr = &s2636->work_ram[sprite_offsets[spriteno]];
 
 		/* get out if sprite is turned off */
@@ -304,14 +294,79 @@ bitmap_t *s2636_update(s2636_t *s2636, const rectangle *cliprect)
 	}
 
 	/* collision detection */
-	if (check_collision(s2636, 0, 1, cliprect))  collision |= 0x20;
-	if (check_collision(s2636, 0, 2, cliprect))  collision |= 0x10;
-	if (check_collision(s2636, 0, 3, cliprect))  collision |= 0x08;
-	if (check_collision(s2636, 1, 2, cliprect))  collision |= 0x04;
-	if (check_collision(s2636, 1, 3, cliprect))  collision |= 0x02;
-	if (check_collision(s2636, 2, 3, cliprect))  collision |= 0x01;
+	if (check_collision(device, 0, 1, cliprect))  collision |= 0x20;
+	if (check_collision(device, 0, 2, cliprect))  collision |= 0x10;
+	if (check_collision(device, 0, 3, cliprect))  collision |= 0x08;
+	if (check_collision(device, 1, 2, cliprect))  collision |= 0x04;
+	if (check_collision(device, 1, 3, cliprect))  collision |= 0x02;
+	if (check_collision(device, 2, 3, cliprect))  collision |= 0x01;
 
 	s2636->work_ram[0xcb] = collision;
 
 	return s2636->bitmap;
 }
+
+
+/*************************************
+ *
+ *  Work RAM access handlers
+ *
+ *************************************/
+
+WRITE8_DEVICE_HANDLER( s2636_work_ram_w )
+{
+	s2636_state *s2636 = get_safe_token(device);
+
+	assert(offset < 8);
+
+	s2636->work_ram[offset] = data;
+}
+
+
+READ8_DEVICE_HANDLER( s2636_work_ram_r )
+{
+	s2636_state *s2636 = get_safe_token(device);
+
+	assert(offset < s2636->work_ram_size);
+
+	return s2636->work_ram[offset];
+}
+
+/*************************************
+ *
+ *  Device interface
+ *
+ *************************************/
+
+static DEVICE_START( s2636 )
+{
+	s2636_state *s2636 = get_safe_token(device);
+	const s2636_interface *intf = get_interface(device);
+	const device_config *screen = devtag_get_device(device->machine, intf->screen);
+	int width = video_screen_get_width(screen);
+	int height = video_screen_get_height(screen);
+
+	s2636->work_ram_size = intf->work_ram_size;
+	s2636->x_offset = intf->x_offset;
+	s2636->y_offset = intf->y_offset;
+
+	s2636->work_ram = auto_alloc_array(device->machine, UINT8, intf->work_ram_size);
+	s2636->bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
+	s2636->collision_bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
+
+	state_save_register_device_item(device, 0, s2636->x_offset);
+	state_save_register_device_item(device, 0, s2636->y_offset);
+	state_save_register_device_item_pointer(device, 0, s2636->work_ram, s2636->work_ram_size);
+	state_save_register_device_item_bitmap(device, 0, s2636->bitmap);
+	state_save_register_device_item_bitmap(device, 0, s2636->collision_bitmap);
+}
+
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+
+#define DEVTEMPLATE_ID( p, s )	p##s2636##s
+#define DEVTEMPLATE_FEATURES		DT_HAS_START
+#define DEVTEMPLATE_NAME		"Signetics 2636"
+#define DEVTEMPLATE_FAMILY		"Signetics Video Chips"
+#define DEVTEMPLATE_CLASS		DEVICE_CLASS_VIDEO
+#include "devtempl.h"
+

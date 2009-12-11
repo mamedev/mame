@@ -10,7 +10,6 @@
 
 #include "driver.h"
 #include "cpu/s2650/s2650.h"
-#include "video/s2636.h"
 
 #include "tinv2650.lh"
 

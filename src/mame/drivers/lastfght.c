@@ -66,231 +66,287 @@ Notes:
 #include "deprecat.h"
 #include "cpu/h83002/h8.h"
 
+typedef struct _lastfght_state lastfght_state;
+struct _lastfght_state
+{
+	/* memory pointers */
+	UINT8 *  colorram;
+//	UINT8 *  nvram;	// currently this uses generic nvram handling
+
+	/* video-related */
+	bitmap_t *bitmap[2];
+	int clr_offset;
+	int dest;
+	int hi, sx, sx1, dsx, sy, sy1, dsy, sp, sr;
+	int x, y, w, h;
+
+	/* misc */
+	UINT16 c00006;
+
+	/* devices */
+	const device_config *maincpu;
+};
+
+
 /***************************************************************************
                                 Video Hardware
 ***************************************************************************/
 
-static bitmap_t *lastfght_bitmap[2];
-static int clr_offset;
-static int lastfght_dest;
-
 static VIDEO_START( lastfght )
 {
+	lastfght_state *state = (lastfght_state *)machine->driver_data;
 	int i;
 	for (i = 0; i < 2; i++)
-		lastfght_bitmap[i] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+		state->bitmap[i] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	machine->generic.colorram.u8 = auto_alloc_array(machine, UINT8, 256*3);
+	state->colorram = auto_alloc_array(machine, UINT8, 256 * 3);
+
+	state_save_register_global_bitmap(machine, state->bitmap[0]);
+	state_save_register_global_bitmap(machine, state->bitmap[1]);
+	state_save_register_global_pointer(machine, state->colorram, 256 * 3);
 }
 
 
 static VIDEO_UPDATE( lastfght )
 {
+	lastfght_state *state = (lastfght_state *)screen->machine->driver_data;
+
 #ifdef MAME_DEBUG
 #if 1
 	// gfx roms viewer (toggle with enter, use pgup/down to browse)
 	int x, y, count = 0;
 	static unsigned base = 0;
 	static int view_roms = 0;
-	UINT8 *gfxdata = memory_region( screen->machine, "gfx1" );
+	UINT8 *gfxdata = memory_region(screen->machine, "gfx1");
 	UINT8 data;
 
-	if ( input_code_pressed_once(screen->machine, KEYCODE_ENTER) )	view_roms ^= 1;
-	if ( view_roms )
+	if (input_code_pressed_once(screen->machine, KEYCODE_ENTER))	view_roms ^= 1;
+	if (view_roms)
 	{
-		if ( input_code_pressed_once(screen->machine, KEYCODE_PGDN) )	base += 512 * 256;
-		if ( input_code_pressed_once(screen->machine, KEYCODE_PGUP) )	base -= 512 * 256;
-		base %= memory_region_length( screen->machine, "gfx1" );
+		if (input_code_pressed_once(screen->machine, KEYCODE_PGDN))	base += 512 * 256;
+		if (input_code_pressed_once(screen->machine, KEYCODE_PGUP))	base -= 512 * 256;
+		base %= memory_region_length(screen->machine, "gfx1");
 
 		count = base;
 
-		bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
-		for ( y = 0 ; y < 256; y++ )
+		bitmap_fill(bitmap, cliprect , get_black_pen(screen->machine));
+		for (y = 0 ; y < 256; y++)
 		{
-			for ( x = 0; x < 512; x++ )
+			for (x = 0; x < 512; x++)
 			{
-				data = ( ((count&0xf)==0)&&((count&0x1e00)==0) )? get_white_pen(screen->machine) : gfxdata[count];	// white grid or data
+				data = (((count & 0xf) == 0) && ((count & 0x1e00) == 0)) ? get_white_pen(screen->machine) : gfxdata[count];	// white grid or data
 				*BITMAP_ADDR16(bitmap, y, x) = data;
 				count++;
 			}
 		}
-		popmessage("%x",base);
+		popmessage("%x", base);
 		return 0;
 	}
 #endif
 #endif
 
-	copybitmap(bitmap,lastfght_bitmap[lastfght_dest^1],0,0,0,0,cliprect);
+	copybitmap(bitmap, state->bitmap[state->dest ^ 1], 0, 0, 0, 0, cliprect);
 
 	return 0;
 }
 
 // Palette: HMC HM86171 VGA 256 colour RAMDAC
 
-static WRITE16_HANDLER(colordac_w)
+static WRITE16_HANDLER( colordac_w )
 {
+	lastfght_state *state = (lastfght_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_0_7)
 	{
-		space->machine->generic.colorram.u8[clr_offset] = data;
-		palette_set_color_rgb(space->machine, clr_offset/3,
-			pal6bit(space->machine->generic.colorram.u8[(clr_offset/3)*3+0]),
-			pal6bit(space->machine->generic.colorram.u8[(clr_offset/3)*3+1]),
-			pal6bit(space->machine->generic.colorram.u8[(clr_offset/3)*3+2])
+		state->colorram[state->clr_offset] = data;
+		palette_set_color_rgb(space->machine, state->clr_offset / 3,
+			pal6bit(state->colorram[(state->clr_offset / 3) * 3 + 0]),
+			pal6bit(state->colorram[(state->clr_offset / 3) * 3 + 1]),
+			pal6bit(state->colorram[(state->clr_offset / 3) * 3 + 2])
 		);
-		clr_offset = (clr_offset+1) % (256*3);
+		state->clr_offset = (state->clr_offset + 1) % (256 * 3);
 	}
-
 	if (ACCESSING_BITS_8_15)
 	{
-		clr_offset = (data>>8) * 3;
+		state->clr_offset = (data >> 8) * 3;
 	}
 }
 
 //  Blitter (supports zooming)
 
-static int lastfght_hi, lastfght_sx, lastfght_sx1, lastfght_dsx, lastfght_sy, lastfght_sy1, lastfght_dsy, lastfght_sp, lastfght_sr;
-static int lastfght_x, lastfght_y, lastfght_w, lastfght_h;
-
 // high byte of a 16 bit register
 static WRITE16_HANDLER( lastfght_hi_w )
 {
-	if (ACCESSING_BITS_8_15)	logerror("%06x: 600000.b = %02x\n", cpu_get_pc(space->cpu),data>>8);
+	lastfght_state *state = (lastfght_state *)space->machine->driver_data;
+
+	if (ACCESSING_BITS_8_15)	
+		logerror("%06x: 600000.b = %02x\n", cpu_get_pc(space->cpu), data >> 8);
 	if (ACCESSING_BITS_0_7)
 	{
-		lastfght_hi	=	data << 8;
-		//logerror("%06x: lastfght_hi  = %02x\n", cpu_get_pc(space->cpu),data);
+		state->hi = data << 8;
+		//logerror("%06x: lastfght_hi  = %02x\n", cpu_get_pc(space->cpu), data);
 	}
 }
+
 // screen x
 static WRITE16_HANDLER( lastfght_x_w )
 {
-	if (ACCESSING_BITS_8_15)	logerror("%06x: 800008.b = %02x\n", cpu_get_pc(space->cpu),data>>8);
+	lastfght_state *state = (lastfght_state *)space->machine->driver_data;
+
+	if (ACCESSING_BITS_8_15)
+		logerror("%06x: 800008.b = %02x\n", cpu_get_pc(space->cpu), data >> 8);
 	if (ACCESSING_BITS_0_7)
 	{
-		lastfght_x	=	lastfght_hi | data;
+		state->x = state->hi | data;
 		//logerror("%06x: lastfght_x   = %02x\n", cpu_get_pc(space->cpu),data);
 	}
 }
+
 // screen y, screen width - 1
 static WRITE16_HANDLER( lastfght_yw_w )
 {
+	lastfght_state *state = (lastfght_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_8_15)
 	{
-		lastfght_y	=	lastfght_hi | (data >> 8);
-		//logerror("%06x: lastfght_y   = %02x\n", cpu_get_pc(space->cpu),data>>8);
+		state->y = state->hi | (data >> 8);
+		//logerror("%06x: lastfght_y   = %02x\n", cpu_get_pc(space->cpu), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		lastfght_w	=	lastfght_hi | data;
-		//logerror("%06x: lastfght_w   = %02x\n", cpu_get_pc(space->cpu),data);
+		state->w = state->hi | data;
+		//logerror("%06x: lastfght_w   = %02x\n", cpu_get_pc(space->cpu), data);
 	}
 }
+
 // screen height - 1
 static WRITE16_HANDLER( lastfght_h_w )
 {
+	lastfght_state *state = (lastfght_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_8_15)
 	{
-		lastfght_h	=	lastfght_hi | (data >> 8);
-		//logerror("%06x: lastfght_h   = %02x\n", cpu_get_pc(space->cpu),data>>8);
+		state->h = state->hi | (data >> 8);
+		//logerror("%06x: lastfght_h   = %02x\n", cpu_get_pc(space->cpu), data >> 8);
 	}
-	if (ACCESSING_BITS_0_7)	logerror("%06x: 80000d.b = %02x\n", cpu_get_pc(space->cpu),data);
+	if (ACCESSING_BITS_0_7)	
+		logerror("%06x: 80000d.b = %02x\n", cpu_get_pc(space->cpu), data);
 }
+
 // source delta x << 6, source x << 6
 static WRITE16_HANDLER( lastfght_sx_w )
 {
+	lastfght_state *state = (lastfght_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_8_15)
 	{
-		lastfght_dsx	=	lastfght_hi | (data >> 8);
-		//logerror("%06x: lastfght_dsx = %02x\n", cpu_get_pc(space->cpu),data>>8);
+		state->dsx = state->hi | (data >> 8);
+		//logerror("%06x: lastfght_dsx = %02x\n", cpu_get_pc(space->cpu), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		lastfght_sx	=	lastfght_hi | data;
-		//logerror("%06x: lastfght_sx  = %02x\n", cpu_get_pc(space->cpu),data);
+		state->sx = state->hi | data;
+		//logerror("%06x: lastfght_sx  = %02x\n", cpu_get_pc(space->cpu), data);
 	}
 }
+
 // source y << 6, source y1 << 6
 static WRITE16_HANDLER( lastfght_sy_w )
 {
+	lastfght_state *state = (lastfght_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_8_15)
 	{
-		lastfght_sy	=	lastfght_hi | (data >> 8);
-		//logerror("%06x: lastfght_sy  = %02x\n", cpu_get_pc(space->cpu),data>>8);
+		state->sy = state->hi | (data >> 8);
+		//logerror("%06x: lastfght_sy  = %02x\n", cpu_get_pc(space->cpu), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		lastfght_sy1	=	lastfght_hi | data;
-		//logerror("%06x: lastfght_sy1 = %02x\n", cpu_get_pc(space->cpu),data);
+		state->sy1 = state->hi | data;
+		//logerror("%06x: lastfght_sy1 = %02x\n", cpu_get_pc(space->cpu), data);
 	}
 }
+
 // source rom (0x200000 bytes), source page (512x256 bytes)
 static WRITE16_HANDLER( lastfght_sr_w )
 {
+	lastfght_state *state = (lastfght_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_8_15)
 	{
-		lastfght_sp	=	(lastfght_hi>>8) >> 4;
-		//logerror("%06x: lastfght_sp  = %02x\n", cpu_get_pc(space->cpu),data>>8);
+		state->sp = (state->hi >> 8) >> 4;
+		//logerror("%06x: lastfght_sp  = %02x\n", cpu_get_pc(space->cpu), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		lastfght_sr	=	data;
-		//logerror("%06x: lastfght_sr  = %02x\n", cpu_get_pc(space->cpu),data);
+		state->sr = data;
+		//logerror("%06x: lastfght_sr  = %02x\n", cpu_get_pc(space->cpu), data);
 	}
 }
+
 // source x1 << 6, source delta y << 6
 static WRITE16_HANDLER( lastfght_sd_w )
 {
+	lastfght_state *state = (lastfght_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_8_15)
 	{
-		lastfght_sx1	=	lastfght_hi | (data >> 8);
-		//logerror("%06x: lastfght_sx1 = %02x\n", cpu_get_pc(space->cpu),data>>8);
+		state->sx1 = state->hi | (data >> 8);
+		//logerror("%06x: lastfght_sx1 = %02x\n", cpu_get_pc(space->cpu), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		lastfght_dsy	=	lastfght_hi | data;
-		//logerror("%06x: lastfght_dsy = %02x\n", cpu_get_pc(space->cpu),data);
+		state->dsy = state->hi | data;
+		//logerror("%06x: lastfght_dsy = %02x\n", cpu_get_pc(space->cpu), data);
 	}
 }
+
 // start blit
 static WRITE16_HANDLER( lastfght_blit_w )
 {
+	lastfght_state *state = (lastfght_state *)space->machine->driver_data;
+
 	if (ACCESSING_BITS_8_15)
 	{
-		int x,y, addr;
+		int x, y, addr;
 		UINT8 *gfxdata = memory_region( space->machine, "gfx1" );
-		bitmap_t *dest = lastfght_bitmap[lastfght_dest];
+		bitmap_t *dest = state->bitmap[state->dest];
 
 #if 0
 		logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, sx %03x.%02x, sx1 %03x.%02x, dsx %03x.%02x, sy %03x.%02x, sy1 %03x.%02x, dsy %03x.%02x, sp %02x, sr %02x, data %02x\n", cpu_get_pc(space->cpu),
-				lastfght_x,lastfght_y,lastfght_w+1,lastfght_h+1,
-				lastfght_sx>>6,lastfght_sx&0x3f,	lastfght_sx1>>6,lastfght_dsx&0x3f,	lastfght_sx1>>6,lastfght_sx1&0x3f,
-				lastfght_sy>>6,lastfght_sy&0x3f,	lastfght_sy1>>6,lastfght_dsy&0x3f,	lastfght_sy1>>6,lastfght_sy1&0x3f,
-				lastfght_sp,lastfght_sr,
-				data>>8	);
+				state->x, state->y, state->w + 1, state->h + 1,
+				state->sx >> 6, state->sx & 0x3f, state->sx1 >> 6, state->dsx & 0x3f, state->sx1 >> 6, state->sx1 & 0x3f,
+				state->sy >> 6, state->sy & 0x3f, state->sy1 >> 6, state->dsy & 0x3f, state->sy1 >> 6, state->sy1 & 0x3f,
+				state->sp, state->sr,
+				data >> 8);
 #endif
 
-		for (y = 0; y <= lastfght_h; y++)
+		for (y = 0; y <= state->h; y++)
 		{
-			for (x = 0; x <= lastfght_w; x++)
+			for (x = 0; x <= state->w; x++)
 			{
-				addr	=	(( (lastfght_sx + lastfght_sx1 + lastfght_dsx * x) >> 6 ) & 0x1ff) +
-							(( (lastfght_sy + lastfght_sy1 + lastfght_dsy * y) >> 6 ) & 0xff ) * 0x200 +
-							lastfght_sp * 0x200 * 0x100 +
-							lastfght_sr * 0x200000;
+				addr = (((state->sx + state->sx1 + state->dsx * x) >> 6) & 0x1ff) +
+							(((state->sy + state->sy1 + state->dsy * y) >> 6) & 0xff) * 0x200 +
+							state->sp * 0x200 * 0x100 + state->sr * 0x200000;
 
-				data	=	gfxdata[addr];
+				data = gfxdata[addr];
 
-				if (data && (lastfght_x + x >= 0) && (lastfght_x + x < 512) && (lastfght_y + y >= 0) && (lastfght_y + y < 256))
-					*BITMAP_ADDR16(dest, lastfght_y + y, lastfght_x + x) = data;
+				if (data && (state->x + x >= 0) && (state->x + x < 512) && (state->y + y >= 0) && (state->y + y < 256))
+					*BITMAP_ADDR16(dest, state->y + y, state->x + x) = data;
 			}
 		}
 	}
-	if (ACCESSING_BITS_0_7)	logerror("%06x: 600007.b = %02x\n", cpu_get_pc(space->cpu),data);
+	if (ACCESSING_BITS_0_7)	
+		logerror("%06x: 600007.b = %02x\n", cpu_get_pc(space->cpu), data);
 }
+
 // toggle framebuffer
 static WRITE16_HANDLER( lastfght_dest_w )
 {
-	if (ACCESSING_BITS_0_7)	lastfght_dest ^= 1;
+	lastfght_state *state = (lastfght_state *)space->machine->driver_data;
+
+	if (ACCESSING_BITS_0_7)	
+		state->dest ^= 1;
 }
 
 static READ16_HANDLER( lastfght_c00000_r )
@@ -324,9 +380,9 @@ static READ16_HANDLER( lastfght_c00006_r )
 
 static WRITE16_HANDLER( lastfght_c00006_w )
 {
-	static UINT16 val = 0;
-	COMBINE_DATA(&val);
-//  popmessage("%04x",val);
+	lastfght_state *state = (lastfght_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->c00006);
+	//  popmessage("%04x", state->c00006);
 }
 
 static READ16_HANDLER( lastfght_sound_r )
@@ -338,8 +394,10 @@ static READ16_HANDLER( lastfght_sound_r )
 
 static WRITE16_HANDLER( lastfght_sound_w )
 {
-	if (ACCESSING_BITS_8_15)	logerror("%06x: sound_w msb = %02x\n", cpu_get_pc(space->cpu),data>>8);
-	if (ACCESSING_BITS_0_7)	logerror("%06x: sound_w lsb = %02x\n", cpu_get_pc(space->cpu),data);
+	if (ACCESSING_BITS_8_15)	
+		logerror("%06x: sound_w msb = %02x\n", cpu_get_pc(space->cpu), data >> 8);
+	if (ACCESSING_BITS_0_7)
+		logerror("%06x: sound_w lsb = %02x\n", cpu_get_pc(space->cpu), data);
 }
 
 /***************************************************************************
@@ -449,23 +507,78 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( unknown_interrupt )
 {
+	lastfght_state *state = (lastfght_state *)device->machine->driver_data;
 	switch (cpu_getiloops(device))
 	{
 		case 0:
 			generic_pulse_irq_line(device, 0);
 			break;
 		default:
-			cputag_set_input_line(device->machine, "maincpu", H8_METRO_TIMER_HACK, HOLD_LINE);
+			cpu_set_input_line(state->maincpu, H8_METRO_TIMER_HACK, HOLD_LINE);
 			break;
 	}
 }
 
+static MACHINE_START( lastfght )
+{
+	lastfght_state *state = (lastfght_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+
+	state_save_register_global(machine, state->clr_offset);
+	state_save_register_global(machine, state->dest);
+	state_save_register_global(machine, state->hi);
+	state_save_register_global(machine, state->sx);
+	state_save_register_global(machine, state->sx1);
+	state_save_register_global(machine, state->dsx);
+	state_save_register_global(machine, state->sy);
+	state_save_register_global(machine, state->sy1);
+	state_save_register_global(machine, state->dsy);
+	state_save_register_global(machine, state->sp);
+	state_save_register_global(machine, state->sr);
+	state_save_register_global(machine, state->x);
+	state_save_register_global(machine, state->y);
+	state_save_register_global(machine, state->w);
+	state_save_register_global(machine, state->h);
+	state_save_register_global(machine, state->c00006);
+}
+
+static MACHINE_RESET( lastfght )
+{
+	lastfght_state *state = (lastfght_state *)machine->driver_data;
+
+	state->clr_offset = 0;
+	state->dest = 0;
+	state->hi = 0;
+	state->sx = 0;
+	state->sx1 = 0;
+	state->dsx = 0;
+	state->sy = 0;
+	state->sy1 = 0;
+	state->dsy = 0;
+	state->sp = 0;
+	state->sr = 0;
+	state->x = 0;
+	state->y = 0;
+	state->w = 0;
+	state->h = 0;
+	state->c00006 = 0;
+}
+
 static MACHINE_DRIVER_START( lastfght )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(lastfght_state)
+
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H83044, 32000000/2)
 	MDRV_CPU_PROGRAM_MAP( lastfght_map)
 	MDRV_CPU_VBLANK_INT_HACK(unknown_interrupt,2)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	MDRV_MACHINE_START(lastfght)
+	MDRV_MACHINE_RESET(lastfght)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH( 256 )
@@ -504,10 +617,10 @@ static DRIVER_INIT(lastfght)
 	UINT16 *rom = (UINT16*)memory_region(machine, "maincpu");
 
 	// pass initial check (protection ? hw?)
-	rom[0x00354/2] = 0x403e;
+	rom[0x00354 / 2] = 0x403e;
 
 	// rts -> rte
-	rom[0x01b86/2] = 0x5670;
+	rom[0x01b86 / 2] = 0x5670;
 }
 
-GAME(2000, lastfght, 0, lastfght, lastfght, lastfght, ROT0, "Subsino", "Last Fighting", GAME_NO_SOUND)
+GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght, ROT0, "Subsino", "Last Fighting", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

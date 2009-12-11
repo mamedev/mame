@@ -30,34 +30,34 @@ DIP locations verified for:
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
-#include "lasso.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/ay8910.h"
+#include "includes/lasso.h"
 
 
 static INPUT_CHANGED( coin_inserted )
 {
+	lasso_state *state = (lasso_state *)field->port->machine->driver_data;
+
 	/* coin insertion causes an NMI */
-	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 /* Write to the sound latch and generate an IRQ on the sound CPU */
-
-static UINT8 *lasso_chip_data;
-
-
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(space,offset,data);
-	generic_pulse_irq_line(cputag_get_cpu(space->machine, "audiocpu"), 0);
+	lasso_state *state = (lasso_state *)space->machine->driver_data;
+	soundlatch_w(space, offset, data);
+	generic_pulse_irq_line(state->audiocpu, 0);
 }
 
 static WRITE8_HANDLER( pinbo_sound_command_w )
 {
-	soundlatch_w(space,offset,data);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	lasso_state *state = (lasso_state *)space->machine->driver_data;
+	soundlatch_w(space, offset, data);
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( sound_status_r )
@@ -68,24 +68,25 @@ static READ8_HANDLER( sound_status_r )
 
 static WRITE8_HANDLER( sound_select_w )
 {
-	UINT8 to_write = BITSWAP8(*lasso_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
+	lasso_state *state = (lasso_state *)space->machine->driver_data;
+	UINT8 to_write = BITSWAP8(*state->chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	if (~data & 0x01)	/* chip #0 */
-		sn76496_w(devtag_get_device(space->machine, "sn76489.1"), 0, to_write);
+		sn76496_w(state->sn_1, 0, to_write);
 
 	if (~data & 0x02)	/* chip #1 */
-		sn76496_w(devtag_get_device(space->machine, "sn76489.2"), 0, to_write);
+		sn76496_w(state->sn_2, 0, to_write);
 }
 
 
 static ADDRESS_MAP_START( lasso_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(lasso_videoram_w) AM_BASE(&lasso_videoram)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_BASE(&lasso_colorram)
-	AM_RANGE(0x0c00, 0x0c7f) AM_RAM AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(lasso_videoram_w) AM_BASE_MEMBER(lasso_state, videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_BASE_MEMBER(lasso_state, colorram)
+	AM_RANGE(0x0c00, 0x0c7f) AM_RAM AM_BASE_SIZE_MEMBER(lasso_state, spriteram, spriteram_size)
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
-	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_BASE(&lasso_back_color)
+	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_BASE_MEMBER(lasso_state, back_color)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(lasso_video_control_w)
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
 	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("1805")
@@ -98,7 +99,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( lasso_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x5000, 0x7fff) AM_ROM
-	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_BASE(&lasso_chip_data)
+	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_BASE_MEMBER(lasso_state, chip_data)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
 	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_r)
@@ -108,20 +109,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lasso_coprocessor_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&lasso_bitmap_ram)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(lasso_state, bitmap_ram)
 	AM_RANGE(0x8000, 0x8fff) AM_MIRROR(0x7000) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( chameleo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(lasso_videoram_w) AM_BASE(&lasso_videoram)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_BASE(&lasso_colorram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(lasso_videoram_w) AM_BASE_MEMBER(lasso_state, videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_BASE_MEMBER(lasso_state, colorram)
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x107f) AM_RAM AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
+	AM_RANGE(0x1000, 0x107f) AM_RAM AM_BASE_SIZE_MEMBER(lasso_state, spriteram, spriteram_size)
 	AM_RANGE(0x1080, 0x10ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
-	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_BASE(&lasso_back_color)
+	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_BASE_MEMBER(lasso_state, back_color)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(lasso_video_control_w)
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
 	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("1805")
@@ -136,7 +137,7 @@ static ADDRESS_MAP_START( chameleo_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
-	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_BASE(&lasso_chip_data)
+	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_BASE_MEMBER(lasso_state, chip_data)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
 	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_r)
@@ -146,18 +147,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wwjgtin_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_videoram_w) AM_BASE(&lasso_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(lasso_colorram_w) AM_BASE(&lasso_colorram)
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_videoram_w) AM_BASE_MEMBER(lasso_state, videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(lasso_colorram_w) AM_BASE_MEMBER(lasso_state, colorram)
+	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_SIZE_MEMBER(lasso_state, spriteram, spriteram_size)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
-	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_BASE(&lasso_back_color)
-	AM_RANGE(0x1802, 0x1802) AM_WRITE(wwjgtin_video_control_w	)
+	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_BASE_MEMBER(lasso_state, back_color)
+	AM_RANGE(0x1802, 0x1802) AM_WRITE(wwjgtin_video_control_w)
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
 	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("1805")
 	AM_RANGE(0x1806, 0x1806) AM_READ_PORT("1806")
 	AM_RANGE(0x1807, 0x1807) AM_READ_PORT("1807")
-	AM_RANGE(0x1c00, 0x1c03) AM_WRITEONLY AM_BASE(&wwjgtin_last_colors)
-	AM_RANGE(0x1c04, 0x1c07) AM_WRITEONLY AM_BASE(&wwjgtin_track_scroll)
+	AM_RANGE(0x1c00, 0x1c03) AM_WRITEONLY AM_BASE_MEMBER(lasso_state, last_colors)
+	AM_RANGE(0x1c04, 0x1c07) AM_WRITEONLY AM_BASE_MEMBER(lasso_state, track_scroll)
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
@@ -166,7 +167,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( wwjgtin_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
-	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_BASE(&lasso_chip_data)
+	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_BASE_MEMBER(lasso_state, chip_data)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
 	AM_RANGE(0xb003, 0xb003) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
@@ -176,9 +177,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pinbo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(lasso_videoram_w) AM_BASE(&lasso_videoram)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_BASE(&lasso_colorram)
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(lasso_videoram_w) AM_BASE_MEMBER(lasso_state, videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_BASE_MEMBER(lasso_state, colorram)
+	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_SIZE_MEMBER(lasso_state, spriteram, spriteram_size)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(pinbo_sound_command_w)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(pinbo_video_control_w)
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
@@ -217,8 +218,8 @@ static INPUT_PORTS_START( lasso )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) /* lasso */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) /* shoot */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED  )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("1805")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
@@ -226,9 +227,9 @@ static INPUT_PORTS_START( lasso )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2	 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED  )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("1806")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:!1")
@@ -266,8 +267,8 @@ static INPUT_PORTS_START( lasso )
 	PORT_DIPNAME( 0x08, 0x00, "Invulnerability (Cheat)") PORT_DIPLOCATION("SW1:!6") /* Listed as "Test" */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2    ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1    ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2  )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1  )
 INPUT_PORTS_END
@@ -324,10 +325,10 @@ static INPUT_PORTS_START( wwjgtin )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:!5" )		/* probably unused */
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:!6" )		/* probably unused */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1   ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1  )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pinbo )
@@ -461,7 +462,47 @@ GFXDECODE_END
 
 
 
+static MACHINE_START( lasso )
+{
+	lasso_state *state = (lasso_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->sn_1 = devtag_get_device(machine, "sn76489.1");
+	state->sn_2 = devtag_get_device(machine, "sn76489.2");
+
+	state_save_register_global(machine, state->gfxbank);
+}
+
+static MACHINE_START( wwjgtin )
+{
+	lasso_state *state = (lasso_state *)machine->driver_data;
+
+	MACHINE_START_CALL(lasso);
+
+	state_save_register_global(machine, state->track_enable);
+}
+
+static MACHINE_RESET( lasso )
+{
+	lasso_state *state = (lasso_state *)machine->driver_data;
+
+	state->gfxbank = 0;
+}
+
+static MACHINE_RESET( wwjgtin )
+{
+	lasso_state *state = (lasso_state *)machine->driver_data;
+
+	MACHINE_RESET_CALL(lasso);
+
+	state->track_enable = 0;
+}
+
 static MACHINE_DRIVER_START( base )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(lasso_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 11289000/16)	/* guess */
@@ -472,6 +513,9 @@ static MACHINE_DRIVER_START( base )
 	MDRV_CPU_PROGRAM_MAP(lasso_audio_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
+
+	MDRV_MACHINE_START(lasso)
+	MDRV_MACHINE_RESET(lasso)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -530,6 +574,9 @@ static MACHINE_DRIVER_START( wwjgtin )
 
 	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_PROGRAM_MAP(wwjgtin_audio_map)
+
+	MDRV_MACHINE_START(wwjgtin)
+	MDRV_MACHINE_RESET(wwjgtin)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")

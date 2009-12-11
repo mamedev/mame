@@ -17,8 +17,24 @@
 #define MARKER_HORZ_ADJ -1
 #define MARKER_VERT_ADJ -10
 
-/*----------- defined in video/lazercmd.c -----------*/
+typedef struct _lazercmd_state lazercmd_state;
+struct _lazercmd_state
+{
+	/* memory pointers */
+	UINT8 *  videoram;
+	size_t   videoram_size;
 
-extern int marker_x, marker_y;
+	/* video-related */
+	int      marker_x, marker_y;
+
+	/* misc */
+	int      timer_count, sense_state, dac_data;
+
+	/* device */
+	const device_config *dac;
+};
+
+
+/*----------- defined in video/lazercmd.c -----------*/
 
 VIDEO_UPDATE( lazercmd );

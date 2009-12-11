@@ -75,8 +75,6 @@ extern int malzak_x;
 extern int malzak_y;
 
 extern UINT8 *saa5050_vidram;  /* Video RAM for SAA 5050 */
-extern UINT8 *malzak_s2636_0_ram;
-extern UINT8 *malzak_s2636_1_ram;
 
 // in video/malzak.c
 VIDEO_START( malzak );
@@ -86,7 +84,9 @@ WRITE8_HANDLER( malzak_playfield_w );
 
 static READ8_HANDLER( fake_VRLE_r )
 {
-	return (malzak_s2636_0_ram[0xcb] & 0x3f) + (video_screen_get_vblank(space->machine->primary_screen)*0x40);
+	const device_config *s2636_0 = devtag_get_device(space->machine, "s2636_0");
+
+	return (s2636_work_ram_r(s2636_0, 0xcb) & 0x3f) + (video_screen_get_vblank(space->machine->primary_screen)*0x40);
 }
 
 static READ8_HANDLER( bank_r )
@@ -125,8 +125,8 @@ static ADDRESS_MAP_START( malzak_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1200, 0x12ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1300, 0x13ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x14cb, 0x14cb) AM_MIRROR(0x6000) AM_READ(fake_VRLE_r)
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&malzak_s2636_0_ram)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&malzak_s2636_1_ram)
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM_WRITE(malzak_playfield_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&saa5050_vidram)
@@ -146,8 +146,8 @@ static ADDRESS_MAP_START( malzak2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1300, 0x13ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x14cb, 0x14cb) AM_MIRROR(0x6000) AM_READ(fake_VRLE_r)
 	AM_RANGE(0x14cc, 0x14cc) AM_MIRROR(0x6000) AM_READ(s2636_portA_r)
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&malzak_s2636_0_ram)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&malzak_s2636_1_ram)
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM_WRITE(malzak_playfield_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&saa5050_vidram)
@@ -205,11 +205,11 @@ static ADDRESS_MAP_START( malzak_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(collision_r) // returns where a collision can occur.
 	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w)  // possibly sound codes for dual SN76477s
 	AM_RANGE(0x60, 0x60) AM_WRITE(port60_w)  // possibly playfield scroll X offset
-    AM_RANGE(0x80, 0x80) AM_READ_PORT("IN0")  //controls
+	AM_RANGE(0x80, 0x80) AM_READ_PORT("IN0")  //controls
 	AM_RANGE(0xa0, 0xa0) AM_WRITENOP  // echoes I/O port read from port 0x80
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(portc0_w)  // possibly playfield row selection for writing and/or collisions
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(s2650_data_r)  // read upon death
-    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 
@@ -228,8 +228,8 @@ static INPUT_PORTS_START( malzak )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    )
 
-    PORT_START("POT")
-    /* No POT switch on Malzak as far as I know */
+	PORT_START("POT")
+	/* No POT switch on Malzak as far as I know */
 
 	PORT_START("SENSE")		/* SENSE */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
@@ -251,7 +251,7 @@ static INPUT_PORTS_START( malzak2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    )
 
-    PORT_START("POT")		/* Fake DIP switch to handle the POT switch */
+	PORT_START("POT")		/* Fake DIP switch to handle the POT switch */
 	PORT_DIPNAME( 0x03, 0x00, "POT switch position" )
 	PORT_DIPSETTING( 0x00, "1" )  // Normal play
 	PORT_DIPSETTING( 0x01, "2" )
@@ -363,6 +363,20 @@ static const sn76477_interface sn76477_intf =
 };
 
 
+static const s2636_interface s2636_0_config =
+{
+	"screen",
+	0xff,
+	0, -16	/* -8, -16 */
+};
+
+static const s2636_interface s2636_1_config =
+{
+	"screen",
+	0xff,
+	0, -16	/* -9, -16 */
+};
+
 static MACHINE_DRIVER_START( malzak )
 
 	/* basic machine hardware */
@@ -384,7 +398,9 @@ static MACHINE_DRIVER_START( malzak )
 
 //  MDRV_MACHINE_RESET(malzak)
 
-	MDRV_VIDEO_START(malzak)
+	MDRV_S2636_ADD("s2636_0", s2636_0_config)
+	MDRV_S2636_ADD("s2636_1", s2636_1_config)
+
 	MDRV_VIDEO_UPDATE(malzak)
 
 	/* sound hardware */

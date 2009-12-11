@@ -20,71 +20,95 @@
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 
-static UINT8 *vram1,*vram2;
-static int vrambank=0;
+typedef struct _laserbas_state laserbas_state;
+struct _laserbas_state
+{
+	/* video-related */
+	UINT8    *vram1;
+	UINT8    *vram2;
+	int      vrambank;
+
+	/* misc */
+	int      count;
+};
+
 
 static VIDEO_START(laserbas)
 {
-	vram1=auto_alloc_array(machine, UINT8, 0x8000);
-	vram2=auto_alloc_array(machine, UINT8, 0x8000);
+	laserbas_state *state = (laserbas_state *)machine->driver_data;
+
+	state->vram1 = auto_alloc_array(machine, UINT8, 0x8000);
+	state->vram2 = auto_alloc_array(machine, UINT8, 0x8000);
+
+	state_save_register_global_pointer(machine, state->vram1, 0x8000);
+	state_save_register_global_pointer(machine, state->vram2, 0x8000);
 }
 
 static VIDEO_UPDATE(laserbas)
 {
-	int x,y;
- 	for(y=0;y<256;y++)
-		for(x=0;x<128;x++)
-		{
-			if (vram2[y*128+x]&0xf)
-				*BITMAP_ADDR16(bitmap, y, x*2) = (vram2[y*128+x]&0xf)+16;
-			else
-				*BITMAP_ADDR16(bitmap, y, x*2) = (vram1[y*128+x]&0xf)+16;
+	laserbas_state *state = (laserbas_state *)screen->machine->driver_data;
+	int x, y;
 
-			if (vram2[y*128+x]>>4)
-				*BITMAP_ADDR16(bitmap, y, x*2+1) = (vram2[y*128+x]>>4)+16;
+ 	for (y = 0; y < 256; y++)
+		for(x = 0; x < 128; x++)
+		{
+			if (state->vram2[y * 128 + x] & 0xf)
+				*BITMAP_ADDR16(bitmap, y, x * 2) = (state->vram2[y * 128 + x] & 0xf) + 16;
 			else
-				*BITMAP_ADDR16(bitmap, y, x*2+1) = (vram1[y*128+x]>>4)+16;
+				*BITMAP_ADDR16(bitmap, y, x * 2) = (state->vram1[y * 128 + x] & 0xf) + 16;
+
+			if (state->vram2[y * 128 + x] >> 4)
+				*BITMAP_ADDR16(bitmap, y, x * 2 + 1) = (state->vram2[y * 128 + x] >> 4) + 16;
+			else
+				*BITMAP_ADDR16(bitmap, y, x * 2 + 1) = (state->vram1[y * 128 + x] >> 4) + 16;
 		}
 	return 0;
 }
 
 static READ8_HANDLER(vram_r)
 {
-	if(!vrambank)
-		return vram1[offset];
+	laserbas_state *state = (laserbas_state *)space->machine->driver_data;
+
+	if(!state->vrambank)
+		return state->vram1[offset];
 	else
-		return vram2[offset];
+		return state->vram2[offset];
 }
 
 static WRITE8_HANDLER(vram_w)
 {
-	if(!vrambank)
-		vram1[offset]=data;
+	laserbas_state *state = (laserbas_state *)space->machine->driver_data;
+
+	if(!state->vrambank)
+		state->vram1[offset] = data;
 	else
-		vram2[offset]=data;
+		state->vram2[offset] = data;
 }
 
 static READ8_HANDLER( read_unk )
 {
-	static int count=0;
-	count ^= 0x80;
-	return count|0x7f;
+	laserbas_state *state = (laserbas_state *)space->machine->driver_data;
+
+	state->count ^= 0x80;
+	return state->count | 0x7f;
 }
 
 static WRITE8_HANDLER(palette_w)
 {
-	palette_set_color_rgb(space->machine,offset,pal3bit(data>>5),pal3bit(data>>2),pal2bit(data));
+	palette_set_color_rgb(space->machine, offset, pal3bit(data >> 5), pal3bit(data >> 2), pal2bit(data));
 }
 
 static WRITE8_HANDLER(vrambank_w)
 {
-	if((offset&0xf1)==0x10)
-		vrambank=data&0x40;
+	laserbas_state *state = (laserbas_state *)space->machine->driver_data;
+
+	if ((offset & 0xf1) == 0x10)
+		state->vrambank = data & 0x40;
 }
 
 static ADDRESS_MAP_START( laserbas_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0xbfff) AM_READ(vram_r) AM_WRITE(vram_w)
+	AM_RANGE(0x4000, 0xbfff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0xc000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xfbff) AM_RAM /* protection device */
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
@@ -123,17 +147,37 @@ INPUT_PORTS_END
 static INTERRUPT_GEN( laserbas_interrupt )
 {
 	if(video_screen_get_vblank(device->machine->primary_screen))
-		 cpu_set_input_line(device, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	else
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
+static MACHINE_START( laserbas )
+{
+	laserbas_state *state = (laserbas_state *)machine->driver_data;
+
+	state_save_register_global(machine, state->vrambank);
+	state_save_register_global(machine, state->count);
+}
+
+static MACHINE_RESET( laserbas )
+{
+	laserbas_state *state = (laserbas_state *)machine->driver_data;
+
+	state->vrambank = 0;
+	state->count = 0;
+}
+
 static MACHINE_DRIVER_START( laserbas )
+	MDRV_DRIVER_DATA(laserbas_state)
+
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(laserbas_memory)
 	MDRV_CPU_IO_MAP(laserbas_io)
 	MDRV_CPU_VBLANK_INT_HACK(laserbas_interrupt,2)
 
+	MDRV_MACHINE_START(laserbas)
+	MDRV_MACHINE_RESET(laserbas)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -145,7 +189,6 @@ static MACHINE_DRIVER_START( laserbas )
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_VIDEO_START(laserbas)
 	MDRV_VIDEO_UPDATE(laserbas)
-
 MACHINE_DRIVER_END
 
 /*
@@ -236,6 +279,6 @@ ROM_START( futflash )
 	ROM_LOAD( "ff.8",         0xf000, 0x0800, CRC(623f558f) SHA1(be6c6565df658555f21c43a8c2459cf399794a84) )
 ROM_END
 
-GAME( 1981, laserbas, 0,        laserbas, laserbas, 0, ROT270, "Amstar/HOEI", "Laser Base (set 1)", GAME_NO_SOUND | GAME_NOT_WORKING)
-GAME( 1981, laserbasa,laserbas, laserbas, laserbas, 0, ROT270, "Amstar/HOEI", "Laser Base (set 2)", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 1981, futflash, laserbas, laserbas, laserbas, 0, ROT270, "HOEI",        "Future Flash",       GAME_NO_SOUND | GAME_NOT_WORKING)
+GAME( 1981, laserbas, 0,        laserbas, laserbas, 0, ROT270, "Amstar/HOEI", "Laser Base (set 1)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1981, laserbasa,laserbas, laserbas, laserbas, 0, ROT270, "Amstar/HOEI", "Laser Base (set 2)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1981, futflash, laserbas, laserbas, laserbas, 0, ROT270, "HOEI",        "Future Flash",       GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

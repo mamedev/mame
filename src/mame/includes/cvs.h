@@ -15,9 +15,6 @@ extern UINT8 *cvs_color_ram;
 extern UINT8 *cvs_video_ram;
 extern UINT8 *cvs_bullet_ram;
 extern UINT8 *cvs_palette_ram;
-extern UINT8 *cvs_s2636_0_ram;
-extern UINT8 *cvs_s2636_1_ram;
-extern UINT8 *cvs_s2636_2_ram;
 extern UINT8 *cvs_fo_state;
 
 MACHINE_START( cvs );

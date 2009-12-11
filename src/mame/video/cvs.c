@@ -19,7 +19,6 @@
 #define STARS_COLOR_BASE 	16
 
 
-static s2636_t *s2636_0, *s2636_1, *s2636_2;
 static bitmap_t *background_bitmap;
 bitmap_t *cvs_collision_background;
 static bitmap_t *scrolled_collision_background;
@@ -145,7 +144,7 @@ WRITE8_HANDLER( cvs_scroll_w )
 VIDEO_START( cvs )
 {
 	int generator = 0;
-	int y, width, height;
+	int y;
 
 	/* precalculate the star background */
 
@@ -182,14 +181,6 @@ VIDEO_START( cvs )
 		}
 	}
 
-	/* configure the S2636 chips */
-	width = video_screen_get_width(machine->primary_screen);
-	height = video_screen_get_height(machine->primary_screen);
-
-	s2636_0 = s2636_config(machine, cvs_s2636_0_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
-	s2636_1 = s2636_config(machine, cvs_s2636_1_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
-	s2636_2 = s2636_config(machine, cvs_s2636_2_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
-
 	/* create helper bitmaps */
 	background_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	cvs_collision_background = video_screen_auto_bitmap_alloc(machine->primary_screen);
@@ -214,6 +205,9 @@ VIDEO_UPDATE( cvs )
 	bitmap_t *s2636_0_bitmap;
 	bitmap_t *s2636_1_bitmap;
 	bitmap_t *s2636_2_bitmap;
+	const device_config *s2636_0 = devtag_get_device(screen->machine, "s2636_0");
+	const device_config *s2636_1 = devtag_get_device(screen->machine, "s2636_1");
+	const device_config *s2636_2 = devtag_get_device(screen->machine, "s2636_2");
 
 	set_pens(screen->machine->colortable);
 

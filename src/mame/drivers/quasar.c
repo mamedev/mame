@@ -153,9 +153,9 @@ static READ8_HANDLER( audio_t1_r )
 static ADDRESS_MAP_START( quasar, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_bullet_ram_or_palette_r, quasar_bullet_w) AM_BASE(&cvs_bullet_ram)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_0_or_character_ram_r, cvs_s2636_0_or_character_ram_w) AM_BASE(&cvs_s2636_0_ram)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_1_or_character_ram_r, cvs_s2636_1_or_character_ram_w) AM_BASE(&cvs_s2636_1_ram)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_2_or_character_ram_r, cvs_s2636_2_or_character_ram_w) AM_BASE(&cvs_s2636_2_ram)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_0_or_character_ram_r, cvs_s2636_0_or_character_ram_w)
+	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_1_or_character_ram_r, cvs_s2636_1_or_character_ram_w)
+	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_2_or_character_ram_r, cvs_s2636_2_or_character_ram_w)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(cvs_video_or_color_ram_r, quasar_video_w) AM_BASE(&cvs_video_ram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
@@ -314,6 +314,26 @@ static INTERRUPT_GEN( quasar_interrupt )
 	generic_pulse_irq_line_and_vector(device,0,0x03);
 }
 
+static const s2636_interface s2636_0_config =
+{
+	"screen",
+	0xff,
+	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET
+};
+
+static const s2636_interface s2636_1_config =
+{
+	"screen",
+	0xff,
+	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET
+};
+
+static const s2636_interface s2636_2_config =
+{
+	"screen",
+	0xff,
+	CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET
+};
 
 // ****************************************
 // Quasar S2650 Main CPU, I8035 sound board
@@ -344,6 +364,10 @@ static MACHINE_DRIVER_START( quasar )
 
 	MDRV_GFXDECODE(quasar)
 	MDRV_PALETTE_LENGTH((64+1)*8+(4*256))
+
+	MDRV_S2636_ADD("s2636_0", s2636_0_config)
+	MDRV_S2636_ADD("s2636_1", s2636_1_config)
+	MDRV_S2636_ADD("s2636_2", s2636_2_config)
 
 	MDRV_PALETTE_INIT(quasar)
 	MDRV_VIDEO_START(quasar)

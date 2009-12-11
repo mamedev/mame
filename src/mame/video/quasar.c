@@ -23,8 +23,6 @@
 UINT8 *quasar_effectram;
 UINT8 quasar_effectcontrol;
 
-static s2636_t *s2636_0, *s2636_1, *s2636_2;
-
 PALETTE_INIT( quasar )
 {
 	int i;
@@ -98,15 +96,7 @@ PALETTE_INIT( quasar )
 
 VIDEO_START( quasar )
 {
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
-
 	quasar_effectram = auto_alloc_array(machine, UINT8, 0x400);
-
-	/* configure the S2636 chips */
-	s2636_0 = s2636_config(machine, cvs_s2636_0_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
-	s2636_1 = s2636_config(machine, cvs_s2636_1_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
-	s2636_2 = s2636_config(machine, cvs_s2636_2_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
 
 	/* create helper bitmaps */
 	cvs_collision_background = video_screen_auto_bitmap_alloc(machine->primary_screen);
@@ -118,6 +108,9 @@ VIDEO_UPDATE( quasar )
 	bitmap_t *s2636_0_bitmap;
 	bitmap_t *s2636_1_bitmap;
 	bitmap_t *s2636_2_bitmap;
+	const device_config *s2636_0 = devtag_get_device(screen->machine, "s2636_0");
+	const device_config *s2636_1 = devtag_get_device(screen->machine, "s2636_1");
+	const device_config *s2636_2 = devtag_get_device(screen->machine, "s2636_2");
 
 	/* for every character in the video RAM */
 	for (offs = 0; offs < 0x0400; offs++)

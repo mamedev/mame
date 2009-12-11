@@ -5,8 +5,6 @@
 /*************************************************************/
 
 #include "driver.h"
-#include "video/s2636.h"
-
 
 UINT8 *zac2650_s2636_0_ram;
 static bitmap_t *spritebitmap;
