@@ -63,18 +63,16 @@
 */
 
 #include "driver.h"
-#include "video/s2636.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/sn76477.h"
-
-#define SAA5050_VBLANK 2500
+#include "video/s2636.h"
+#include "video/saa5050.h"
 
 static int malzak_bank1;
 
 extern int malzak_x;
 extern int malzak_y;
 
-extern UINT8 *saa5050_vidram;  /* Video RAM for SAA 5050 */
 
 // in video/malzak.c
 VIDEO_START( malzak );
@@ -129,7 +127,7 @@ static ADDRESS_MAP_START( malzak_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM_WRITE(malzak_playfield_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&saa5050_vidram)
+	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_DEVREADWRITE("saa5050", saa5050_videoram_r, saa5050_videoram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
@@ -150,7 +148,7 @@ static ADDRESS_MAP_START( malzak2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM_WRITE(malzak_playfield_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&saa5050_vidram)
+	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_DEVREADWRITE("saa5050", saa5050_videoram_r, saa5050_videoram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
@@ -363,19 +361,28 @@ static const sn76477_interface sn76477_intf =
 };
 
 
-static const s2636_interface s2636_0_config =
+static const s2636_interface malzac_s2636_0_config =
 {
 	"screen",
 	0x100,
 	0, -16	/* -8, -16 */
 };
 
-static const s2636_interface s2636_1_config =
+static const s2636_interface malzac_s2636_1_config =
 {
 	"screen",
 	0x100,
 	0, -16	/* -9, -16 */
 };
+
+static const saa5050_interface malzac_saa5050_intf =
+{
+	"screen",
+	1,	/* starting gfxnum */
+	42, 24, 64,  /* x, y, size */
+      1  	/* rev y order */
+};
+
 
 static MACHINE_DRIVER_START( malzak )
 
@@ -398,9 +405,10 @@ static MACHINE_DRIVER_START( malzak )
 
 //  MDRV_MACHINE_RESET(malzak)
 
-	MDRV_S2636_ADD("s2636_0", s2636_0_config)
-	MDRV_S2636_ADD("s2636_1", s2636_1_config)
+	MDRV_S2636_ADD("s2636_0", malzac_s2636_0_config)
+	MDRV_S2636_ADD("s2636_1", malzac_s2636_1_config)
 
+	MDRV_SAA5050_ADD("saa5050", malzac_saa5050_intf)
 	MDRV_VIDEO_UPDATE(malzak)
 
 	/* sound hardware */
