@@ -166,6 +166,7 @@ struct _debug_view_disasm
 typedef struct _debug_view_memory debug_view_memory;
 struct _debug_view_memory
 {
+	const memory_subview_item *subviewlist;		/* linked list of memory subviews */
 	const memory_subview_item *desc;			/* description of our current subview */
 	debug_view_expression expression;			/* expression describing the start address */
 	UINT32				chunks_per_row;			/* number of chunks displayed per line */
@@ -207,7 +208,6 @@ struct _debugvw_private
 	debug_view *		viewlist;				/* list of views */
 	const registers_subview_item *registers_subviews;/* linked list of registers subviews */
 	const disasm_subview_item *disasm_subviews;	/* linked list of disassembly subviews */
-	const memory_subview_item *memory_subviews;	/* linked list of memory subviews */
 };
 
 
@@ -350,7 +350,6 @@ void debug_view_init(running_machine *machine)
 	/* build a list of disassembly and memory subviews */
 	global->registers_subviews = registers_view_enumerate_subviews(machine);
 	global->disasm_subviews = disasm_view_enumerate_subviews(machine);
-	global->memory_subviews = memory_view_enumerate_subviews(machine);
 }
 
 
@@ -2412,7 +2411,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 					astring_printf(tempstring, "CPU '%s' (%s) %s memory", device->tag, device_get_name(device), space->name);
 				else
 					astring_printf(tempstring, "%s '%s' space #%d memory", device_get_name(device), device->tag, spacenum);
-				subview = (memory_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + astring_len(tempstring));
+				subview = (memory_subview_item *)alloc_array_clear_or_die(UINT8, sizeof(*subview) + astring_len(tempstring));
 
 				/* populate the subview */
 				subview->next = NULL;
@@ -2441,7 +2440,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 
 			/* determine the string and allocate a subview large enough */
 			astring_printf(tempstring, "Region '%s'", rgntag);
-			subview = (memory_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + astring_len(tempstring));
+			subview = (memory_subview_item *)alloc_array_clear_or_die(UINT8, sizeof(*subview) + astring_len(tempstring));
 
 			/* populate the subview */
 			subview->next = NULL;
@@ -2472,13 +2471,13 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 			break;
 
 		/* if this is a single-entry global, add it */
-		if (valcount > 1 && strstr(name, "/globals/"))
+		if (valcount > 1 && strstr(name, "globals/"))
 		{
 			memory_subview_item *subview;
 
 			/* determine the string and allocate a subview large enough */
 			astring_printf(tempstring, "%s", strrchr(name, '/') + 1);
-			subview = (memory_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + astring_len(tempstring));
+			subview = (memory_subview_item *)alloc_array_clear_or_die(UINT8, sizeof(*subview) + astring_len(tempstring));
 
 			/* populate the subview */
 			subview->next = NULL;
@@ -2509,18 +2508,17 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 
 static int memory_view_alloc(debug_view *view)
 {
+	const memory_subview_item *subviews = memory_view_enumerate_subviews(view->machine);
 	debug_view_memory *memdata;
 
-	/* fail if no available subviews */
-	if (view->machine->debugvw_data->memory_subviews == NULL)
+	/* if no subviews, fail */
+	if (subviews == NULL)
 		return FALSE;
 
 	/* allocate memory */
-	memdata = (debug_view_memory *)malloc(sizeof(*memdata));
-	if (memdata == NULL)
-		return FALSE;
-	memset(memdata, 0, sizeof(*memdata));
-
+	memdata = alloc_clear_or_die(debug_view_memory);
+	memdata->subviewlist = subviews;
+	
 	/* allocate the expression data */
 	debug_view_expression_alloc(&memdata->expression);
 
@@ -2531,7 +2529,7 @@ static int memory_view_alloc(debug_view *view)
 	view->supports_cursor = TRUE;
 
 	/* default to the first subview */
-	memdata->desc = view->machine->debugvw_data->memory_subviews;
+	memdata->desc = memdata->subviewlist;
 
 	/* start out with 16 bytes in a single column and ASCII displayed */
 	memdata->bytes_per_chunk = memdata->desc->prefsize;
@@ -2555,6 +2553,12 @@ static void memory_view_free(debug_view *view)
 	/* free any memory we allocated */
 	if (memdata != NULL)
 	{
+		while (memdata->subviewlist != NULL)
+		{
+			memory_subview_item *item = (memory_subview_item *)memdata->subviewlist;
+			memdata->subviewlist = item->next;
+			free(item);
+		}
 		debug_view_expression_free(&memdata->expression);
 		free(memdata);
 	}
@@ -3099,8 +3103,9 @@ static void memory_view_write(debug_view_memory *memdata, UINT8 size, offs_t off
 
 const memory_subview_item *memory_view_get_subview_list(debug_view *view)
 {
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 	assert(view->type == DVT_MEMORY);
-	return view->machine->debugvw_data->memory_subviews;
+	return memdata->subviewlist;
 }
 
 
@@ -3220,11 +3225,14 @@ UINT8 memory_view_get_physical(debug_view *view)
 
 void memory_view_set_subview(debug_view *view, int index)
 {
-	const memory_subview_item *subview = memory_view_get_subview_by_index(view->machine->debugvw_data->memory_subviews, index);
 	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
+	const memory_subview_item *subview;
 
 	assert(view->type == DVT_MEMORY);
 	assert(subview != NULL);
+
+	/* pick the requested view */
+	subview = memory_view_get_subview_by_index(memdata->subviewlist, index);
 	if (subview == NULL)
 		return;
 
