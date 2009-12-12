@@ -20,19 +20,12 @@
 #include "driver.h"
 #include "neogeo.h"
 
-
-
-static UINT32 fatfury2_prot_data;
-static UINT16 neogeo_rng;
-
-static UINT16 *pvc_cartridge_ram;
-
-
 /************************ Fatal Fury 2 *************************/
 
 static READ16_HANDLER( fatfury2_protection_16_r )
 {
-	UINT16 res = fatfury2_prot_data >> 24;
+	neogeo_state *state = (neogeo_state *)space->machine->driver_data;
+	UINT16 res = state->fatfury2_prot_data >> 24;
 
 	switch (offset)
 	{
@@ -49,7 +42,7 @@ static READ16_HANDLER( fatfury2_protection_16_r )
 			return ((res & 0xf0) >> 4) | ((res & 0x0f) << 4);
 
 		default:
-logerror("unknown protection read at pc %06x, offset %08x\n",cpu_get_pc(space->cpu),offset<<1);
+			logerror("unknown protection read at pc %06x, offset %08x\n", cpu_get_pc(space->cpu), offset << 1);
 			return 0;
 	}
 }
@@ -57,30 +50,32 @@ logerror("unknown protection read at pc %06x, offset %08x\n",cpu_get_pc(space->c
 
 static WRITE16_HANDLER( fatfury2_protection_16_w )
 {
+	neogeo_state *state = (neogeo_state *)space->machine->driver_data;
+
 	switch (offset)
 	{
 		case 0x11112/2: /* data == 0x1111; expects 0xff000000 back */
-			fatfury2_prot_data = 0xff000000;
+			state->fatfury2_prot_data = 0xff000000;
 			break;
 
 		case 0x33332/2: /* data == 0x3333; expects 0x0000ffff back */
-			fatfury2_prot_data = 0x0000ffff;
+			state->fatfury2_prot_data = 0x0000ffff;
 			break;
 
 		case 0x44442/2: /* data == 0x4444; expects 0x00ff0000 back */
-			fatfury2_prot_data = 0x00ff0000;
+			state->fatfury2_prot_data = 0x00ff0000;
 			break;
 
 		case 0x55552/2: /* data == 0x5555; read back from 55550, ffff0, 00000, ff000 */
-			fatfury2_prot_data = 0xff00ff00;
+			state->fatfury2_prot_data = 0xff00ff00;
 			break;
 
 		case 0x56782/2: /* data == 0x1234; read back from 36000 *or* 36004 */
-			fatfury2_prot_data = 0xf05a3601;
+			state->fatfury2_prot_data = 0xf05a3601;
 			break;
 
 		case 0x42812/2: /* data == 0x1824; read back from 36008 *or* 3600c */
-			fatfury2_prot_data = 0x81422418;
+			state->fatfury2_prot_data = 0x81422418;
 			break;
 
 		case 0x55550/2:
@@ -90,23 +85,27 @@ static WRITE16_HANDLER( fatfury2_protection_16_w )
 		case 0x36004/2:
 		case 0x36008/2:
 		case 0x3600c/2:
-			fatfury2_prot_data <<= 8;
+			state->fatfury2_prot_data <<= 8;
 			break;
 
 		default:
-			logerror("unknown protection write at pc %06x, offset %08x, data %02x\n",cpu_get_pc(space->cpu),offset,data);
+			logerror("unknown protection write at pc %06x, offset %08x, data %02x\n", cpu_get_pc(space->cpu), offset, data);
 			break;
 	}
 }
 
 
-void fatfury2_install_protection(running_machine *machine)
+void fatfury2_install_protection( running_machine *machine )
 {
+	neogeo_state *state = (neogeo_state *)machine->driver_data;
+
 	/* the protection involves reading and writing addresses in the */
 	/* 0x2xxxxx range. There are several checks all around the code. */
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x2fffff, 0, 0, fatfury2_protection_16_r, fatfury2_protection_16_w);
 
-	state_save_register_global(machine, fatfury2_prot_data);
+	state->fatfury2_prot_data = 0;
+
+	state_save_register_global(machine, state->fatfury2_prot_data);
 }
 
 
@@ -124,27 +123,28 @@ static WRITE16_HANDLER ( kof98_prot_w )
 
 	switch (data)
 	{
-		case 0x0090:
-		logerror ("%06x kof98 - protection 0x0090 old %04x %04x\n",cpu_get_pc(space->cpu), mem16[0x100/2], mem16[0x102/2]);
-		mem16[0x100/2] = 0x00c2; mem16[0x102/2] = 0x00fd;
+	case 0x0090:
+		logerror ("%06x kof98 - protection 0x0090 old %04x %04x\n", cpu_get_pc(space->cpu), mem16[0x100/2], mem16[0x102/2]);
+		mem16[0x100/2] = 0x00c2; 
+		mem16[0x102/2] = 0x00fd;
 		break;
 
-		case 0x00f0:
-		logerror ("%06x kof98 - protection 0x00f0 old %04x %04x\n",cpu_get_pc(space->cpu), mem16[0x100/2], mem16[0x102/2]);
-		mem16[0x100/2] = 0x4e45; mem16[0x102/2] = 0x4f2d;
+	case 0x00f0:
+		logerror ("%06x kof98 - protection 0x00f0 old %04x %04x\n", cpu_get_pc(space->cpu), mem16[0x100/2], mem16[0x102/2]);
+		mem16[0x100/2] = 0x4e45; 
+		mem16[0x102/2] = 0x4f2d;
 		break;
 
-		default: // 00aa is written, but not needed?
-		logerror ("%06x kof98 - unknown protection write %04x\n",cpu_get_pc(space->cpu), data);
+	default: // 00aa is written, but not needed?
+		logerror ("%06x kof98 - unknown protection write %04x\n", cpu_get_pc(space->cpu), data);
 		break;
 	}
 }
 
 
-void install_kof98_protection(running_machine *machine)
+void install_kof98_protection( running_machine *machine )
 {
-	/* when 0x20aaaa contains 0x0090 (word) then 0x100 (normally the neogeo header) should return 0x00c200fd
-   worked out using real hw */
+	/* when 0x20aaaa contains 0x0090 (word) then 0x100 (normally the neogeo header) should return 0x00c200fd worked out using real hw */
 
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x20aaaa, 0x20aaab, 0, 0, kof98_prot_w);
 }
@@ -157,19 +157,19 @@ void install_kof98_protection(running_machine *machine)
   Also found on this special board is a QFP144 labeled with 0103
 ***************************************************************/
 
-void mslugx_install_protection(running_machine *machine)
+void mslugx_install_protection( running_machine *machine )
 {
 	int i;
 	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
 
 	for (i = 0;i < (0x100000/2) - 4;i++)
 	{
-		if (mem16[i+0] == 0x0243 &&
-			mem16[i+1] == 0x0001 && 	/* andi.w  #$1, D3 */
-			mem16[i+2] == 0x6600)		/* bne xxxx */
+		if (mem16[i + 0] == 0x0243 &&
+			mem16[i + 1] == 0x0001 && 	/* andi.w  #$1, D3 */
+			mem16[i + 2] == 0x6600)		/* bne xxxx */
 		{
-			mem16[i+2] = 0x4e71;
-			mem16[i+3] = 0x4e71;
+			mem16[i + 2] = 0x4e71;
+			mem16[i + 3] = 0x4e71;
 		}
 	}
 	mem16[0x3bdc/2] = 0x4e71;
@@ -375,39 +375,42 @@ static READ16_HANDLER( prot_9a37_r )
 
 static READ16_HANDLER( sma_random_r )
 {
-	UINT16 old = neogeo_rng;
+	neogeo_state *state = (neogeo_state *)space->machine->driver_data;
+	UINT16 old = state->neogeo_rng;
 
-	UINT16 newbit = ((neogeo_rng >> 2) ^
-					 (neogeo_rng >> 3) ^
-					 (neogeo_rng >> 5) ^
-					 (neogeo_rng >> 6) ^
-					 (neogeo_rng >> 7) ^
-					 (neogeo_rng >>11) ^
-					 (neogeo_rng >>12) ^
-					 (neogeo_rng >>15)) & 1;
+	UINT16 newbit = ((state->neogeo_rng >> 2) ^
+					 (state->neogeo_rng >> 3) ^
+					 (state->neogeo_rng >> 5) ^
+					 (state->neogeo_rng >> 6) ^
+					 (state->neogeo_rng >> 7) ^
+					 (state->neogeo_rng >>11) ^
+					 (state->neogeo_rng >>12) ^
+					 (state->neogeo_rng >>15)) & 1;
 
-	neogeo_rng = (neogeo_rng << 1) | newbit;
+	state->neogeo_rng = (state->neogeo_rng << 1) | newbit;
 
 	return old;
 }
 
 
-void neogeo_reset_rng(void)
+void neogeo_reset_rng( running_machine *machine )
 {
-	neogeo_rng = 0x2345;
+	neogeo_state *state = (neogeo_state *)machine->driver_data;
+	state->neogeo_rng = 0x2345;
 }
 
 
-static void sma_install_random_read_handler(running_machine *machine, int addr1, int addr2)
+static void sma_install_random_read_handler( running_machine *machine, int addr1, int addr2 )
 {
-	state_save_register_global(machine, neogeo_rng);
+	neogeo_state *state = (neogeo_state *)machine->driver_data;
+	state_save_register_global(machine, state->neogeo_rng);
 
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), addr1, addr1 + 1, 0, 0, sma_random_r);
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), addr2, addr2 + 1, 0, 0, sma_random_r);
 }
 
 
-void kof99_install_protection(running_machine *machine)
+void kof99_install_protection( running_machine *machine )
 {
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2ffff0, 0x2ffff1, 0, 0, kof99_bankswitch_w);
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
@@ -416,7 +419,7 @@ void kof99_install_protection(running_machine *machine)
 }
 
 
-void garou_install_protection(running_machine *machine)
+void garou_install_protection( running_machine *machine )
 {
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2fffc0, 0x2fffc1, 0, 0, garou_bankswitch_w);
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
@@ -425,7 +428,7 @@ void garou_install_protection(running_machine *machine)
 }
 
 
-void garouo_install_protection(running_machine *machine)
+void garouo_install_protection( running_machine *machine )
 {
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2fffc0, 0x2fffc1, 0, 0, garouo_bankswitch_w);
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
@@ -434,7 +437,7 @@ void garouo_install_protection(running_machine *machine)
 }
 
 
-void mslug3_install_protection(running_machine *machine)
+void mslug3_install_protection( running_machine *machine )
 {
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2fffe4, 0x2fffe5, 0, 0, mslug3_bankswitch_w);
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
@@ -443,7 +446,7 @@ void mslug3_install_protection(running_machine *machine)
 }
 
 
-void kof2000_install_protection(running_machine *machine)
+void kof2000_install_protection( running_machine *machine )
 {
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2fffec, 0x2fffed, 0, 0, kof2000_bankswitch_w);
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
@@ -457,72 +460,85 @@ void kof2000_install_protection(running_machine *machine)
   mslug5, svcchaos, kof2003
 ***************************************************************/
 
-static void pvc_w8(offs_t offset, UINT8 data)
+static void pvc_w8( running_machine *machine, offs_t offset, UINT8 data )
 {
-	*(((UINT8*)pvc_cartridge_ram)+BYTE_XOR_LE(offset))=data;
+	neogeo_state *state = (neogeo_state *)machine->driver_data;
+	*(((UINT8*)state->pvc_cartridge_ram) + BYTE_XOR_LE(offset)) = data;
 }
 
 
-static UINT8 pvc_r8(offs_t offset)
+static UINT8 pvc_r8( running_machine *machine, offs_t offset )
 {
-	return *(((UINT8*)pvc_cartridge_ram)+BYTE_XOR_LE(offset));
+	neogeo_state *state = (neogeo_state *)machine->driver_data;
+	return *(((UINT8*)state->pvc_cartridge_ram) + BYTE_XOR_LE(offset));
 }
 
 
-static void pvc_prot1( void )
+static void pvc_prot1( running_machine *machine )
 {
 	UINT8 b1, b2;
-	b1 = pvc_r8(0x1fe1);
-	b2 = pvc_r8(0x1fe0);
-	pvc_w8(0x1fe2,(((b2>>0)&0xf)<<1)|((b1>>4)&1));
-	pvc_w8(0x1fe3,(((b2>>4)&0xf)<<1)|((b1>>5)&1));
-	pvc_w8(0x1fe4,(((b1>>0)&0xf)<<1)|((b1>>6)&1));
-	pvc_w8(0x1fe5, (b1>>7));
+
+	b1 = pvc_r8(machine, 0x1fe1);
+	b2 = pvc_r8(machine, 0x1fe0);
+	pvc_w8(machine, 0x1fe2, (((b2 >> 0) & 0xf) << 1) | ((b1 >> 4) & 1));
+	pvc_w8(machine, 0x1fe3, (((b2 >> 4) & 0xf) << 1) | ((b1 >> 5) & 1));
+	pvc_w8(machine, 0x1fe4, (((b1 >> 0) & 0xf) << 1) | ((b1 >> 6) & 1));
+	pvc_w8(machine, 0x1fe5, (b1 >> 7));
 }
 
 
-static void pvc_prot2( void ) // on writes to e8/e9/ea/eb
+static void pvc_prot2( running_machine *machine ) // on writes to e8/e9/ea/eb
 {
 	UINT8 b1, b2, b3, b4;
-	b1 = pvc_r8(0x1fe9);
-	b2 = pvc_r8(0x1fe8);
-	b3 = pvc_r8(0x1feb);
-	b4 = pvc_r8(0x1fea);
-	pvc_w8(0x1fec,(b2>>1)|((b1>>1)<<4));
-	pvc_w8(0x1fed,(b4>>1)|((b2&1)<<4)|((b1&1)<<5)|((b4&1)<<6)|((b3&1)<<7));
+
+	b1 = pvc_r8(machine, 0x1fe9);
+	b2 = pvc_r8(machine, 0x1fe8);
+	b3 = pvc_r8(machine, 0x1feb);
+	b4 = pvc_r8(machine, 0x1fea);
+	pvc_w8(machine, 0x1fec, (b2 >> 1) | ((b1 >> 1) << 4));
+	pvc_w8(machine, 0x1fed, (b4 >> 1) | ((b2 & 1) << 4) | ((b1 & 1) << 5) | ((b4 & 1) << 6) | ((b3 & 1) << 7));
 }
 
 
 static void pvc_write_bankswitch( const address_space *space )
 {
+	neogeo_state *state = (neogeo_state *)space->machine->driver_data;
 	UINT32 bankaddress;
-	bankaddress = ((pvc_cartridge_ram[0xff8]>>8)|(pvc_cartridge_ram[0xff9]<<8));
-	*(((UINT8 *)pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff0)) = 0xa0;
-	*(((UINT8 *)pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff1)) &= 0xfe;
-	*(((UINT8 *)pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff3)) &= 0x7f;
-	neogeo_set_main_cpu_bank_address(space, bankaddress+0x100000);
+
+	bankaddress = ((state->pvc_cartridge_ram[0xff8] >> 8)|(state->pvc_cartridge_ram[0xff9] << 8));
+	*(((UINT8 *)state->pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff0)) = 0xa0;
+	*(((UINT8 *)state->pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff1)) &= 0xfe;
+	*(((UINT8 *)state->pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff3)) &= 0x7f;
+	neogeo_set_main_cpu_bank_address(space, bankaddress + 0x100000);
 }
 
 
 static READ16_HANDLER( pvc_prot_r )
 {
-	return pvc_cartridge_ram[ offset ];
+	neogeo_state *state = (neogeo_state *)space->machine->driver_data;
+	return state->pvc_cartridge_ram[offset];
 }
 
 
 static WRITE16_HANDLER( pvc_prot_w )
 {
-	COMBINE_DATA( &pvc_cartridge_ram[ offset ] );
-	if (offset == 0xff0)pvc_prot1();
-	else if(offset >= 0xff4 && offset <= 0xff5)pvc_prot2();
-	else if(offset >= 0xff8)pvc_write_bankswitch(space);
+	neogeo_state *state = (neogeo_state *)space->machine->driver_data;
+
+	COMBINE_DATA(&state->pvc_cartridge_ram[offset] );
+	if (offset == 0xff0)
+		pvc_prot1(space->machine);
+	else if(offset >= 0xff4 && offset <= 0xff5)
+		pvc_prot2(space->machine);
+	else if(offset >= 0xff8)
+		pvc_write_bankswitch(space);
 }
 
 
 void install_pvc_protection( running_machine *machine )
 {
-	pvc_cartridge_ram = auto_alloc_array(machine, UINT16, 0x2000/2);
-	state_save_register_global_pointer(machine, pvc_cartridge_ram, 0x2000 / 2);
+	neogeo_state *state = (neogeo_state *)machine->driver_data;
+	state->pvc_cartridge_ram = auto_alloc_array(machine, UINT16, 0x2000 / 2);
+	state_save_register_global_pointer(machine, state->pvc_cartridge_ram, 0x2000 / 2);
 
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2fe000, 0x2fffff, 0, 0, pvc_prot_r, pvc_prot_w);
 }
