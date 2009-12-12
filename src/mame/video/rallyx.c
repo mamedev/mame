@@ -302,7 +302,7 @@ static void calculate_star_field( running_machine *machine )
 			{
 				int color = (~(generator >> 8)) & 0x3f;
 
-				if (color && state->total_stars < MAX_STARS)
+				if (color && state->total_stars < JUNGLER_MAX_STARS)
 				{
 					state->stars[state->total_stars].x = x;
 					state->stars[state->total_stars].y = y;

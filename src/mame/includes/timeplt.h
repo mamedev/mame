@@ -17,7 +17,7 @@ struct jungler_star
 	int x, y, color;
 };
 
-#define MAX_STARS 1000
+#define JUNGLER_MAX_STARS 1000
 
 typedef struct _timeplt_state timeplt_state;
 struct _timeplt_state
@@ -52,7 +52,7 @@ struct _timeplt_state
 	int      last_bang;	// jungler
 	int      spriteram_base, stars_enable, total_stars;	// jungler
 	UINT8    drawmode_table[4];	// jungler
-	struct jungler_star stars[MAX_STARS];	// jungler
+	struct jungler_star stars[JUNGLER_MAX_STARS];	// jungler
 
 	/* devices */
 	const device_config *maincpu;

@@ -1,33 +1,32 @@
-/***************************************************************************
+/*************************************************************************************
 
-"Mitchell hardware". Actually used mostly by Capcom.
+    "Mitchell hardware". Actually used mostly by Capcom.
 
-All games run on the same hardware except mgakuen, which runs on an
-earlier version, without RAM banking, not encrypted (standard Z80)
-and without EEPROM.
+    All games run on the same hardware except mgakuen, which runs on an
+    earlier version, without RAM banking, not encrypted (standard Z80)
+    and without EEPROM.
 
-Other games that might run on this hardware:
-"Chi-toitsu"(YUGA 1988)-Another version of"Mahjong Gakuen"
+    Other games that might run on this hardware:
+    "Chi-toitsu"(YUGA 1988)-Another version of"Mahjong Gakuen"
 
-Notes:
-- Super Pang has a protection which involves copying code stored in the
-  EEPROM to RAM and execute it from there. The first time the game is run,
-  you have to keep the player 1 start button pressed until the title screen
-  appears. This forces the game to initialize the EEPROM, otherwise it will
-  not work.
-  This is simulated with a kluge in input_r.
-  This doesn't work with spangj! The data written to EEPROM is wrong. This is
-  currently fixed by patching the ROM data so the EEPROM is right. It would be
-  better to just preload the correct EEPROM, without needing the input_r kludge.
+    Notes:
+    - Super Pang has a protection which involves copying code stored in the
+      EEPROM to RAM and execute it from there. The first time the game is run,
+      you have to keep the player 1 start button pressed until the title screen
+      appears. This forces the game to initialize the EEPROM, otherwise it will
+      not work.
+      This is simulated with a kluge in input_r.
+      This doesn't work with spangj! The data written to EEPROM is wrong. This is
+      currently fixed by patching the ROM data so the EEPROM is right. It would be
+      better to just preload the correct EEPROM, without needing the input_r kludge.
 
-TODO:
-- understand what bits 0 and 3 of input port 0x05 are
-- ball speed is erratic in Block Block. It was not like this at one point.
-  This is probably related to interrupts and maybe to the above bits.
+    TODO:
+    - understand what bits 0 and 3 of input port 0x05 are
+    - ball speed is erratic in Block Block. It was not like this at one point.
+      This is probably related to interrupts and maybe to the above bits.
 
-***************************************************************************/
 
-/*****************************************************************************
+******************************************************************************
  Monsters World (c)1994 TCH
 
  Monsters World is basically a bootleg of Mitchell's Super Pang
@@ -73,7 +72,7 @@ mw-7.rom = ST M27C1001   /
 mw-8.rom = ST M27C1001 \
 mw-9.rom = ST M27C1001 / GFX
 
-******************************************************************************/
+*************************************************************************************/
 
 
 #include "driver.h"
@@ -81,51 +80,18 @@ mw-9.rom = ST M27C1001 / GFX
 #include "deprecat.h"
 #include "machine/eeprom.h"
 #include "includes/cps1.h"	// needed for decoding functions only
+#include "includes/mitchell.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 #include "sound/2413intf.h"
 #include "sound/msm5205.h"
 
 
-VIDEO_START( pang );
-VIDEO_UPDATE( pang );
-
-WRITE8_HANDLER( mgakuen_paletteram_w );
-READ8_HANDLER( mgakuen_paletteram_r );
-WRITE8_HANDLER( mgakuen_videoram_w );
-READ8_HANDLER( mgakuen_videoram_r );
-WRITE8_HANDLER( mgakuen_objram_w );
-READ8_HANDLER( mgakuen_objram_r );
-
-WRITE8_HANDLER( pang_video_bank_w );
-WRITE8_HANDLER( pang_videoram_w );
-READ8_HANDLER( pang_videoram_r );
-WRITE8_HANDLER( pang_colorram_w );
-READ8_HANDLER( pang_colorram_r );
-WRITE8_HANDLER( pang_gfxctrl_w );
-WRITE8_HANDLER( pang_paletteram_w );
-READ8_HANDLER( pang_paletteram_r );
-
-extern UINT8 *pang_videoram;
-extern UINT8 *pang_colorram;
-
-extern size_t pang_videoram_size;
-static UINT8 pang_port5_kludge = 0;
-
-
-
-static WRITE8_HANDLER( pang_bankswitch_w )
-{
-	memory_set_bank(space->machine, "bank1", data & 0x0f);
-}
-
-
-
-/***************************************************************************
-
-  EEPROM
-
-***************************************************************************/
+/*************************************
+ *
+ *  EEPROM
+ *
+ *************************************/
 
 static const eeprom_interface eeprom_intf =
 {
@@ -166,6 +132,7 @@ static NVRAM_HANDLER( mitchell )
 
 static READ8_HANDLER( pang_port5_r )
 {
+	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
 	int bit;
 
 	bit = eeprom_read_bit() << 7;
@@ -175,11 +142,13 @@ static READ8_HANDLER( pang_port5_r )
 	/* bit 3 is checked before updating the palette so it really seems to be vblank. */
 	/* Many games require two interrupts per frame and for these bits to toggle, */
 	/* otherwise music doesn't work. */
-	if (cpu_getiloops(space->cpu) & 1) bit |= 0x01;
-	else bit |= 0x08;
+	if (cpu_getiloops(space->cpu) & 1) 
+		bit |= 0x01;
+	else 
+		bit |= 0x08;
 
-		if (pang_port5_kludge)	/* hack... music doesn't work otherwise */
-			bit ^= 0x08;
+	if (state->port5_kludge)	/* hack... music doesn't work otherwise */
+		bit ^= 0x08;
 
 	return (input_port_read(space->machine, "DSW0") & 0x76) | bit;
 }
@@ -200,54 +169,63 @@ static WRITE8_HANDLER( eeprom_serial_w )
 }
 
 
+/*************************************
+ *
+ *  Bankswitch handling
+ *
+ *************************************/
 
-/***************************************************************************
+static WRITE8_HANDLER( pang_bankswitch_w )
+{
+	memory_set_bank(space->machine, "bank1", data & 0x0f);
+}
 
-  Input handling
-
-***************************************************************************/
-
-static int dial[2],dial_selected;
+/*************************************
+ *
+ *  Input handling
+ *
+ *************************************/
 
 static READ8_HANDLER( block_input_r )
 {
-	static int dir[2];
+	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
 	static const char *const dialnames[] = { "DIAL1", "DIAL2" };
 	static const char *const portnames[] = { "IN1", "IN2" };
 
-	if (dial_selected)
+	if (state->dial_selected)
 	{
-		int delta;
+		int delta = (input_port_read(space->machine, dialnames[offset]) - state->dial[offset]) & 0xff;
 
-		delta = (input_port_read(space->machine, dialnames[offset]) - dial[offset]) & 0xff;
 		if (delta & 0x80)
 		{
 			delta = (-delta) & 0xff;
-			if (dir[offset])
+			if (state->dir[offset])
 			{
 			/* don't report movement on a direction change, otherwise it will stutter */
-				dir[offset] = 0;
+				state->dir[offset] = 0;
 				delta = 0;
 			}
 		}
 		else if (delta > 0)
 		{
-			if (dir[offset] == 0)
+			if (!state->dir[offset])
 			{
 			/* don't report movement on a direction change, otherwise it will stutter */
-				dir[offset] = 1;
+				state->dir[offset] = 1;
 				delta = 0;
 			}
 		}
-		if (delta > 0x3f) delta = 0x3f;
+		if (delta > 0x3f) 
+			delta = 0x3f;
+
 		return delta << 2;
 	}
 	else
 	{
-		int res;
+		int res = input_port_read(space->machine, portnames[offset]) & 0xf7;
 
-		res = input_port_read(space->machine, portnames[offset]) & 0xf7;
-		if (dir[offset]) res |= 0x08;
+		if (state->dir[offset]) 
+			res |= 0x08;
 
 		return res;
 	}
@@ -255,23 +233,24 @@ static READ8_HANDLER( block_input_r )
 
 static WRITE8_HANDLER( block_dial_control_w )
 {
+	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
+
 	if (data == 0x08)
 	{
 		/* reset the dial counters */
-		dial[0] = input_port_read(space->machine, "DIAL1");
-		dial[1] = input_port_read(space->machine, "DIAL2");
+		state->dial[0] = input_port_read(space->machine, "DIAL1");
+		state->dial[1] = input_port_read(space->machine, "DIAL2");
 	}
 	else if (data == 0x80)
-		dial_selected = 0;
+		state->dial_selected = 0;
 	else
-		dial_selected = 1;
+		state->dial_selected = 1;
 }
 
 
-static int keymatrix;
-
 static READ8_HANDLER( mahjong_input_r )
 {
+	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
 	int i;
 	static const char *const keynames[2][5] =
 			{
@@ -280,38 +259,46 @@ static READ8_HANDLER( mahjong_input_r )
 			};
 
 	for (i = 0; i < 5; i++)
-		if (keymatrix & (0x80 >> i)) return input_port_read(space->machine, keynames[offset][i]);
+	{
+		if (state->keymatrix & (0x80 >> i)) 
+			return input_port_read(space->machine, keynames[offset][i]);
+	}
 
 	return 0xff;
 }
 
 static WRITE8_HANDLER( mahjong_input_select_w )
 {
-	keymatrix = data;
+	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
+	state->keymatrix = data;
 }
 
 
-static int input_type;
-
 static READ8_HANDLER( input_r )
 {
+	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
-	switch (input_type)
+	switch (state->input_type)
 	{
 		case 0:
 		default:
 			return input_port_read(space->machine, portnames[offset]);
 		case 1:		/* Mahjong games */
-			if (offset) return mahjong_input_r(space, offset-1);
-			else return input_port_read(space->machine, "IN0");
+			if (offset) 
+				return mahjong_input_r(space, offset - 1);
+			else 
+				return input_port_read(space->machine, "IN0");
 			break;
 		case 2:		/* Block Block - dial control */
-			if (offset) return block_input_r(space, offset-1);
-			else return input_port_read(space->machine, "IN0");
+			if (offset) 
+				return block_input_r(space, offset - 1);
+			else 
+				return input_port_read(space->machine, "IN0");
 			break;
 		case 3:		/* Super Pang - simulate START 1 press to initialize EEPROM */
-			if (offset || init_eeprom_count == 0) return input_port_read(space->machine, portnames[offset]);
+			if (offset || init_eeprom_count == 0) 
+				return input_port_read(space->machine, portnames[offset]);
 			else
 			{
 				init_eeprom_count--;
@@ -324,45 +311,46 @@ static READ8_HANDLER( input_r )
 
 static WRITE8_HANDLER( input_w )
 {
-	switch (input_type)
+	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
+
+	switch (state->input_type)
 	{
 		case 0:
 		default:
-logerror("PC %04x: write %02x to port 01\n",cpu_get_pc(space->cpu),data);
+			logerror("PC %04x: write %02x to port 01\n", cpu_get_pc(space->cpu), data);
 			break;
 		case 1:
-			mahjong_input_select_w(space,offset,data);
+			mahjong_input_select_w(space, offset, data);
 			break;
 		case 2:
-			block_dial_control_w(space,offset,data);
+			block_dial_control_w(space, offset, data);
 			break;
 	}
 }
 
 
-
-/***************************************************************************
-
-  Memory handlers
-
-***************************************************************************/
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( mgakuen_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(mgakuen_paletteram_r,mgakuen_paletteram_w)	/* palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r,pang_colorram_w) AM_BASE(&pang_colorram) /* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(mgakuen_videoram_r,mgakuen_videoram_w) AM_BASE(&pang_videoram) AM_SIZE(&pang_videoram_size) /* char RAM */
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(mgakuen_paletteram_r, mgakuen_paletteram_w)	/* palette RAM */
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w) AM_BASE_MEMBER(mitchell_state, colorram) /* Attribute RAM */
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(mgakuen_videoram_r, mgakuen_videoram_w) AM_BASE_SIZE_MEMBER(mitchell_state, videoram, videoram_size) /* char RAM */
 	AM_RANGE(0xe000, 0xefff) AM_RAM	/* Work RAM */
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(mgakuen_objram_r,mgakuen_objram_w)	/* OBJ RAM */
+	AM_RANGE(0xf000, 0xffff) AM_READWRITE(mgakuen_objram_r, mgakuen_objram_w)	/* OBJ RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mitchell_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r,pang_paletteram_w) /* Banked palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r,pang_colorram_w) AM_BASE(&pang_colorram) /* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r,pang_videoram_w) AM_BASE(&pang_videoram) AM_SIZE(&pang_videoram_size)/* Banked char / OBJ RAM */
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r,pang_colorram_w) AM_BASE_MEMBER(mitchell_state, colorram) /* Attribute RAM */
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r,pang_videoram_w) AM_BASE_SIZE_MEMBER(mitchell_state, videoram, videoram_size)/* Banked char / OBJ RAM */
 	AM_RANGE(0xe000, 0xffff) AM_RAM	/* Work RAM */
 ADDRESS_MAP_END
 
@@ -384,13 +372,12 @@ static ADDRESS_MAP_START( mitchell_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 /* spangbl */
-
 static ADDRESS_MAP_START( spangbl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r, pang_paletteram_w)	/* Banked palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w)	AM_BASE(&pang_colorram)/* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r, pang_videoram_w)	AM_BASE(&pang_videoram) AM_SIZE(&pang_videoram_size) /* Banked char / OBJ RAM */
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w)	AM_BASE_MEMBER(mitchell_state, colorram)/* Attribute RAM */
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r, pang_videoram_w)	AM_BASE_SIZE_MEMBER(mitchell_state, videoram, videoram_size) /* Banked char / OBJ RAM */
 	AM_RANGE(0xe000, 0xffff) AM_RAM		/* Work RAM */
 ADDRESS_MAP_END
 
@@ -410,13 +397,11 @@ static ADDRESS_MAP_START( spangbl_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static int sample_buffer = 0;
-static int sample_select = 0;
-
 #ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( spangbl_msm5205_data_w )
 {
-    sample_buffer = data;
+	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
+	state->sample_buffer = data;
 }
 #endif
 
@@ -430,8 +415,8 @@ static ADDRESS_MAP_START( spangbl_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
-/**** Monsters World ****/
 
+/**** Monsters World ****/
 static WRITE8_DEVICE_HANDLER( oki_banking_w )
 {
 	okim6295_set_bank_base(device, 0x40000 * (data & 3));
@@ -447,12 +432,10 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(mstworld_sound_w)
 {
+	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
-
-extern WRITE8_HANDLER( mstworld_gfxctrl_w );
-extern WRITE8_HANDLER( mstworld_video_bank_w );
 
 static ADDRESS_MAP_START( mstworld_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -467,11 +450,15 @@ static ADDRESS_MAP_START( mstworld_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x07, 0x07) AM_WRITE(mstworld_video_bank_w)	/* Video RAM bank register */
 ADDRESS_MAP_END
 
-/**** End Monsters World ****/
 
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( mj_common )
-	PORT_START("DSW0")	/* DSW */
+	PORT_START("DSW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
@@ -479,7 +466,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
 
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -489,7 +476,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("KEY0")	/* IN1 */
+	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -499,7 +486,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 
-	PORT_START("KEY1")	/* IN1 */
+	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -509,7 +496,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 
-	PORT_START("KEY2")	/* IN1 */
+	PORT_START("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -519,7 +506,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 
-	PORT_START("KEY3")	/* IN1 */
+	PORT_START("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -529,7 +516,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 
-	PORT_START("KEY4")	/* IN1 */
+	PORT_START("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -539,7 +526,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY5")	/* IN2 */
+	PORT_START("KEY5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -549,7 +536,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
 
-	PORT_START("KEY6")	/* IN2 */
+	PORT_START("KEY6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -559,7 +546,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
 
-	PORT_START("KEY7")	/* IN2 */
+	PORT_START("KEY7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -569,7 +556,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
 
-	PORT_START("KEY8")	/* IN2 */
+	PORT_START("KEY8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -579,7 +566,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
 
-	PORT_START("KEY9")	/* IN2 */
+	PORT_START("KEY9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -593,7 +580,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mgakuen )
 	PORT_INCLUDE( mj_common )
 
-	PORT_START("DSW1")	/* DSW1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
@@ -617,7 +604,7 @@ static INPUT_PORTS_START( mgakuen )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("DSW2")		/* DSW2 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Player 1 Skill" )
 	PORT_DIPSETTING(    0x03, "Weak" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
@@ -653,10 +640,10 @@ static INPUT_PORTS_START( pkladies )
 	/* same unknown ports as the mahjong games, so we include the following */
 	PORT_INCLUDE( marukin )
 
-	PORT_MODIFY("IN0")		/* IN0 */
+	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )	/* same as the service mode farther down */
 
-	PORT_MODIFY("KEY0")		/* IN1 */
+	PORT_MODIFY("KEY0")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -664,30 +651,30 @@ static INPUT_PORTS_START( pkladies )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 E") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 A") PORT_CODE(KEYCODE_A)
 
-	PORT_MODIFY("KEY1")		/* IN1 */
+	PORT_MODIFY("KEY1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Cancel") PORT_CODE(KEYCODE_LALT)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 B") PORT_CODE(KEYCODE_B)
 
-	PORT_MODIFY("KEY2")		/* IN1 */
+	PORT_MODIFY("KEY2")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Flip") PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 C") PORT_CODE(KEYCODE_C)
 
-	PORT_MODIFY("KEY3")		/* IN1 */
+	PORT_MODIFY("KEY3")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 D") PORT_CODE(KEYCODE_D)
 
-	PORT_MODIFY("KEY4")		/* IN1 */
+	PORT_MODIFY("KEY4")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_MODIFY("KEY5")		/* IN2 */
+	PORT_MODIFY("KEY5")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -695,32 +682,32 @@ static INPUT_PORTS_START( pkladies )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 E") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 A") PORT_CODE(KEYCODE_A)
 
-	PORT_MODIFY("KEY6")		/* IN2 */
+	PORT_MODIFY("KEY6")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Cancel") PORT_CODE(KEYCODE_LALT)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 B") PORT_CODE(KEYCODE_B)
 
-	PORT_MODIFY("KEY7")		/* IN2 */
+	PORT_MODIFY("KEY7")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Flip") PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 C") PORT_CODE(KEYCODE_C)
 
-	PORT_MODIFY("KEY8")		/* IN2 */
+	PORT_MODIFY("KEY8")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 D") PORT_CODE(KEYCODE_D)
 
-	PORT_MODIFY("KEY9")		/* IN2 */
+	PORT_MODIFY("KEY9")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pang )
-	PORT_START("DSW0")		/* DSW */
+	PORT_START("DSW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
@@ -728,7 +715,7 @@ static INPUT_PORTS_START( pang )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
 
-	PORT_START("IN0")		/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
@@ -738,7 +725,7 @@ static INPUT_PORTS_START( pang )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("IN1")		/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -748,7 +735,7 @@ static INPUT_PORTS_START( pang )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 
-	PORT_START("IN2")		/* IN2 */
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -768,7 +755,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mstworld )
 	/* this port may not have the same role */
-	PORT_START("DSW0")		/* DSW */
+	PORT_START("DSW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
@@ -776,7 +763,7 @@ static INPUT_PORTS_START( mstworld )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM (spang) */
 
-	PORT_START("IN0")		/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
@@ -786,7 +773,7 @@ static INPUT_PORTS_START( mstworld )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("IN1")		/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // don't think this one matters..
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -796,7 +783,7 @@ static INPUT_PORTS_START( mstworld )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 
-	PORT_START("IN2")		/* IN2 */
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // if not active high gfx aren't copied for game screen?! .. is this instead of a bit in port 5?
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -884,7 +871,7 @@ static INPUT_PORTS_START( mstworld )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( qtono1 )
-	PORT_START("DSW0")		/* DSW */
+	PORT_START("DSW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
@@ -892,7 +879,7 @@ static INPUT_PORTS_START( qtono1 )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
 
-	PORT_START("IN0")		/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )	/* same as the service mode farther down */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -902,7 +889,7 @@ static INPUT_PORTS_START( qtono1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("IN1")		/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -912,7 +899,7 @@ static INPUT_PORTS_START( qtono1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START("IN2")		/* IN2 */
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
@@ -924,7 +911,7 @@ static INPUT_PORTS_START( qtono1 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( block )
-	PORT_START("DSW0")		/* DSW */
+	PORT_START("DSW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
@@ -932,7 +919,7 @@ static INPUT_PORTS_START( block )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
 
-	PORT_START("IN0")		/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
@@ -942,7 +929,7 @@ static INPUT_PORTS_START( block )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("IN1")		/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -950,7 +937,7 @@ static INPUT_PORTS_START( block )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START("IN2")      /* IN2 */
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -958,15 +945,15 @@ static INPUT_PORTS_START( block )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
-	PORT_START("DIAL1")		/* DIAL1 */
+	PORT_START("DIAL1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(20)
 
-	PORT_START("DIAL2")		/* DIAL2 */
+	PORT_START("DIAL2")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(20) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( blockjoy )
-	PORT_START("DSW0")		/* DSW */
+	PORT_START("DSW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
@@ -974,7 +961,7 @@ static INPUT_PORTS_START( blockjoy )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
 
-	PORT_START("IN0")		/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
@@ -984,7 +971,7 @@ static INPUT_PORTS_START( blockjoy )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("IN1")		/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -994,7 +981,7 @@ static INPUT_PORTS_START( blockjoy )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START("IN2")		/* IN2 */
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1006,6 +993,12 @@ static INPUT_PORTS_START( blockjoy )
 INPUT_PORTS_END
 
 
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 static const gfx_layout charlayout =
 {
@@ -1088,13 +1081,56 @@ static GFXDECODE_START( mstworld )
 	GFXDECODE_ENTRY( "gfx2", 0, mstworld_spritelayout, 0x000, 0x40 )
 GFXDECODE_END
 
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_START( mitchell )
+{
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->oki = devtag_get_device(machine, "oki");
+
+	state_save_register_global(machine, state->sample_buffer);
+	state_save_register_global(machine, state->sample_select);
+	state_save_register_global(machine, state->dial_selected);
+	state_save_register_global(machine, state->keymatrix);
+	state_save_register_global_array(machine, state->dir);
+	state_save_register_global_array(machine, state->dial); 
+//	state_save_register_global(machine, init_eeprom_count); 
+}
+
+static MACHINE_RESET( mitchell )
+{
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+
+	state->sample_buffer = 0;
+	state->sample_select = 0;
+	state->dial_selected = 0;
+	state->dial[0] = 0;
+	state->dial[1] = 0;
+	state->dir[0] = 0;
+	state->dir[1] = 0;
+	state->keymatrix = 0;
+}
+
 static MACHINE_DRIVER_START( mgakuen )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(mitchell_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(mgakuen_map)
 	MDRV_CPU_IO_MAP(mitchell_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
+
+	MDRV_MACHINE_START(mitchell)
+	MDRV_MACHINE_RESET(mitchell)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1124,11 +1160,17 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pang )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(mitchell_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_16MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mitchell_map)
 	MDRV_CPU_IO_MAP(mitchell_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
+
+	MDRV_MACHINE_START(mitchell)
+	MDRV_MACHINE_RESET(mitchell)
 
 	MDRV_NVRAM_HANDLER(mitchell)
 
@@ -1176,13 +1218,14 @@ GFXDECODE_END
 
 
 
-static void spangbl_adpcm_int(const device_config *device)
+static void spangbl_adpcm_int( const device_config *device )
 {
-	msm5205_data_w(device, sample_buffer & 0x0F);
-	sample_buffer >>= 4;
-	sample_select ^= 1;
-	if(sample_select == 0)
-		cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+	mitchell_state *state = (mitchell_state *)device->machine->driver_data;
+	msm5205_data_w(device, state->sample_buffer & 0x0f);
+	state->sample_buffer >>= 4;
+	state->sample_select ^= 1;
+	if(state->sample_select == 0)
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -1201,7 +1244,7 @@ static MACHINE_DRIVER_START( spangbl )
 	MDRV_CPU_IO_MAP(spangbl_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("soundcpu",Z80, 8000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(spangbl_sound_map)
 	MDRV_CPU_IO_MAP(spangbl_sound_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -1209,13 +1252,15 @@ static MACHINE_DRIVER_START( spangbl )
 
 	MDRV_GFXDECODE(spangbl)
 
-
 	MDRV_SOUND_REPLACE("oki", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mstworld )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(mitchell_state)
 
 	/* basic machine hardware */
 	/* it doesn't glitch with the clock speed set to 4x normal, however this is incorrect..
@@ -1228,6 +1273,9 @@ static MACHINE_DRIVER_START( mstworld )
 
 	MDRV_CPU_ADD("audiocpu", Z80,6000000)		 /* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(mstworld_sound_map)
+
+	MDRV_MACHINE_START(mitchell)
+	MDRV_MACHINE_RESET(mitchell)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1253,6 +1301,9 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( marukin )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(mitchell_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* Super Pang says 8MHZ ORIGINAL BOARD */
@@ -1288,6 +1339,11 @@ static MACHINE_DRIVER_START( marukin )
 MACHINE_DRIVER_END
 
 
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( mgakuen )
 	ROM_REGION( 0x50000, "maincpu", 0 )
@@ -1522,7 +1578,7 @@ ROM_START( pangba )
 	ROM_CONTINUE(        0x74000, 0x04000 )
 	ROM_CONTINUE(        0x24000, 0x04000 )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 ) /* Sound Z80 + M5205(?) samples */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Sound Z80 + M5205(?) samples */
 	ROM_LOAD( "pang.4",   0x00000, 0x10000, CRC(88a7b1f8) SHA1(b34fa26dbc613bf3b525d19df90fa3ba4efb6e5d) ) // this is the same as the microhard game 'rebus' ...
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT | ROMREGION_ERASEFF )
@@ -1735,7 +1791,7 @@ ROM_START( spangbl )
 	ROM_CONTINUE(0x44000,0x4000)
 	ROM_CONTINUE(0x4c000,0x4000)
 
-	ROM_REGION( 0x20000, "soundcpu", 0 ) /* Sound Z80 + M5205 samples */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Sound Z80 + M5205 samples */
 	ROM_LOAD( "ic28.4",   0x00000, 0x10000, CRC(02b07d0a) SHA1(77cb9bf1b0d93ebad1bd8cdbedb7fdbad23697be) )
 	ROM_LOAD( "ic45.5",   0x10000, 0x10000, CRC(95c32824) SHA1(02de90a7bfbe89feb7708fda8dfac4ed32bc0773) )
 
@@ -1967,7 +2023,13 @@ ROM_START( blockbl )
 ROM_END
 
 
-static void bootleg_decode(running_machine *machine)
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
+
+static void bootleg_decode( running_machine *machine )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x50000);
@@ -1975,51 +2037,59 @@ static void bootleg_decode(running_machine *machine)
 }
 
 
-static void configure_banks(running_machine *machine)
+static void configure_banks( running_machine *machine )
 {
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+
 	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
-	pang_port5_kludge = 0;
+	state->port5_kludge = 0;
 }
 
 
 static DRIVER_INIT( dokaben )
 {
-	input_type = 0;
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 0;
 	nvram_size = 0;
 	mgakuen2_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( pang )
 {
-	input_type = 0;
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 0;
 	nvram_size = 0;
 	pang_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( pangb )
 {
-	input_type = 0;
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 0;
 	nvram_size = 0;
 	bootleg_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( cworld )
 {
-	input_type = 0;
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 0;
 	nvram_size = 0;
 	cworld_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( hatena )
 {
-	input_type = 0;
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 0;
 	nvram_size = 0;
 	hatena_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( spang )
 {
-	input_type = 3;
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 3;
 	nvram_size = 0x80;
 	nvram = &memory_region(machine, "maincpu")[0xe000];	/* NVRAM */
 	spang_decode(machine);
@@ -2028,7 +2098,8 @@ static DRIVER_INIT( spang )
 
 static DRIVER_INIT( spangbl )
 {
-	input_type = 3;
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 3;
 	nvram_size = 0x80;
 	nvram = &memory_region(machine, "maincpu")[0xe000];	/* NVRAM */
 	bootleg_decode(machine);
@@ -2037,7 +2108,8 @@ static DRIVER_INIT( spangbl )
 
 static DRIVER_INIT( spangj )
 {
-	input_type = 3;
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 3;
 	nvram_size = 0x80;
 	nvram = &memory_region(machine, "maincpu")[0xe000];	/* NVRAM */
 	spangj_decode(machine);
@@ -2053,7 +2125,8 @@ static DRIVER_INIT( spangj )
 }
 static DRIVER_INIT( sbbros )
 {
-	input_type = 3;
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 3;
 	nvram_size = 0x80;
 	nvram = &memory_region(machine, "maincpu")[0xe000];	/* NVRAM */
 	sbbros_decode(machine);
@@ -2061,50 +2134,57 @@ static DRIVER_INIT( sbbros )
 }
 static DRIVER_INIT( qtono1 )
 {
-	input_type = 0;
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 0;
 	nvram_size = 0;
 	qtono1_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( qsangoku )
 {
-	input_type = 0;
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 0;
 	nvram_size = 0;
 	qsangoku_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( mgakuen )
 {
-	input_type = 1;
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 1;
 	configure_banks(machine);
 	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, "DSW1");
 	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, "DSW2");
 }
 static DRIVER_INIT( mgakuen2 )
 {
-	input_type = 1;
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 1;
 	nvram_size = 0;
 	mgakuen2_decode(machine);
 	configure_banks(machine);
-	pang_port5_kludge = 1;
+	state->port5_kludge = 1;
 }
 static DRIVER_INIT( pkladies )
 {
-	input_type = 1;
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 1;
 	nvram_size = 0;
 	mgakuen2_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( marukin )
 {
-	input_type = 1;
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 1;
 	nvram_size = 0;
 	marukin_decode(machine);
 	configure_banks(machine);
 }
 static DRIVER_INIT( block )
 {
-	input_type = 2;
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 2;
 	nvram_size = 0x80;
 	nvram = &memory_region(machine, "maincpu")[0xff80];	/* NVRAM */
 	block_decode(machine);
@@ -2112,7 +2192,8 @@ static DRIVER_INIT( block )
 }
 static DRIVER_INIT( blockbl )
 {
-	input_type = 2;
+	mitchell_state *state = (mitchell_state *)machine->driver_data;
+	state->input_type = 2;
 	nvram_size = 0x80;
 	nvram = &memory_region(machine, "maincpu")[0xff80];	/* NVRAM */
 	bootleg_decode(machine);
@@ -2124,7 +2205,7 @@ static DRIVER_INIT( mstworld )
 	/* descramble the program rom .. */
 	int len = memory_region_length(machine, "maincpu");
 	UINT8* source = alloc_array_or_die(UINT8, len);
-	UINT8* dst    = memory_region(machine, "maincpu") ;
+	UINT8* dst = memory_region(machine, "maincpu") ;
 	int x;
 
 	static const int tablebank[]=
@@ -2152,12 +2233,12 @@ static DRIVER_INIT( mstworld )
 	};
 
 	memcpy(source, dst, len);
-	for (x=0;x<40;x+=2)
+	for (x = 0; x < 40; x += 2)
 	{
-		if (tablebank[x]!=-1)
+		if (tablebank[x] != -1)
 		{
-			memcpy(&dst[(x/2)*0x4000],&source[tablebank[x]*0x4000],0x4000);
-			memcpy(&dst[((x/2)*0x4000)+0x50000],&source[tablebank[x+1]*0x4000],0x4000);
+			memcpy(&dst[(x / 2) * 0x4000], &source[tablebank[x] * 0x4000], 0x4000);
+			memcpy(&dst[((x / 2) * 0x4000) + 0x50000],&source[tablebank[x + 1] * 0x4000], 0x4000);
 		}
 	}
 	free(source);
@@ -2167,31 +2248,36 @@ static DRIVER_INIT( mstworld )
 }
 
 
-GAME( 1988, mgakuen,   0,        mgakuen, mgakuen,  mgakuen,  ROT0,   "Yuga", "Mahjong Gakuen", 0 )
-GAME( 1988, 7toitsu,   mgakuen,  mgakuen, mgakuen,  mgakuen,  ROT0,   "Yuga", "Chi-Toitsu", 0 )
-GAME( 1989, mgakuen2,  0,        marukin, marukin,  mgakuen2, ROT0,   "Face", "Mahjong Gakuen 2 Gakuen-chou no Fukushuu", 0 )
-GAME( 1989, pkladies,  0,        marukin, pkladies, pkladies, ROT0,   "Mitchell", "Poker Ladies", 0 )
-GAME( 1989, pkladiesl, pkladies, marukin, pkladies, pkladies, ROT0,   "Leprechaun", "Poker Ladies (Leprechaun ver. 510)", 0 )
-GAME( 1989, pkladiesla,pkladies, marukin, pkladies, pkladies, ROT0,   "Leprechaun", "Poker Ladies (Leprechaun ver. 401)", 0 )
-GAME( 1989, dokaben,   0,        pang,    pang,     dokaben,  ROT0,   "Capcom", "Dokaben (Japan)", 0 )
-GAME( 1989, pang,      0,        pang,    pang,     pang,     ROT0,   "Mitchell", "Pang (World)", 0 )
-GAME( 1989, pangb,     pang,     pang,    pang,     pangb,    ROT0,   "[Mitchell] (bootleg)", "Pang (bootleg, set 1)", 0 )
-GAME( 1989, pangbold,  pang,     pang,    pang,     pangb,    ROT0,   "[Mitchell] (bootleg)", "Pang (bootleg, set 2)", 0 )
-GAME( 1989, pangba,    pang,     spangbl, pang,     pangb,    ROT0,   "[Mitchell] (bootleg)", "Pang (bootleg, set 3)", GAME_NO_SOUND )
-GAME( 1989, bbros,     pang,     pang,    pang,     pang,     ROT0,   "Capcom", "Buster Bros. (US)", 0 )
-GAME( 1989, pompingw,  pang,     pang,    pang,     pang,     ROT0,   "Mitchell", "Pomping World (Japan)", 0 )
-GAME( 1989, cworld,    0,        pang,    qtono1,   cworld,   ROT0,   "Capcom", "Capcom World (Japan)", 0 )
-GAME( 1990, hatena,    0,        pang,    qtono1,   hatena,   ROT0,   "Capcom", "Adventure Quiz 2 Hatena Hatena no Dai-Bouken (Japan 900228)", 0 )
-GAME( 1990, spang,     0,        pang,    pang,     spang,    ROT0,   "Mitchell", "Super Pang (World 900914)", 0 )
-GAME( 1990, spangj,    spang,    pang,    pang,     spangj,   ROT0,   "Mitchell", "Super Pang (Japan 901023)", 0 )
-GAME( 1990, spangbl,   spang,    spangbl, spangbl,  spangbl,  ROT0,   "[Mitchell] (bootleg)", "Super Pang (World 900914, bootleg)", GAME_NO_SOUND ) // different sound hardware
-GAME( 1994, mstworld,  0,        mstworld,mstworld, mstworld, ROT0,   "TCH", "Monsters World",GAME_IMPERFECT_GRAPHICS ) // bootleg of Spang
-GAME( 1990, sbbros,    spang,    pang,    pang,     sbbros,   ROT0,   "Mitchell + Capcom", "Super Buster Bros. (US 901001)", 0 )
-GAME( 1990, marukin,   0,        marukin, marukin,  marukin,  ROT0,   "Yuga", "Super Marukin-Ban (Japan 901017)", 0 )
-GAME( 1991, qtono1,    0,        pang,    qtono1,   qtono1,   ROT0,   "Capcom", "Quiz Tonosama no Yabou (Japan)", 0 )
-GAME( 1991, qsangoku,  0,        pang,    qtono1,   qsangoku, ROT0,   "Capcom", "Quiz Sangokushi (Japan)", 0 )
-GAME( 1991, block,     0,        pang,    block,    block,    ROT270, "Capcom", "Block Block (World 910910)", 0 )
-GAME( 1991, blockj,    block,    pang,    block,    block,    ROT270, "Capcom", "Block Block (Japan 910910)", 0 )
-GAME( 1991, blockjoy,  block,    pang,    blockjoy, block,    ROT270, "Capcom", "Block Block (World 911106 Joystick)", 0 )
-GAME( 1991, blockbl,   block,    pang,    block,    blockbl,  ROT270, "bootleg", "Block Block (bootleg)", 0 )
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
 
+GAME( 1988, mgakuen,   0,        mgakuen, mgakuen,  mgakuen,  ROT0,   "Yuga", "Mahjong Gakuen", GAME_SUPPORTS_SAVE )
+GAME( 1988, 7toitsu,   mgakuen,  mgakuen, mgakuen,  mgakuen,  ROT0,   "Yuga", "Chi-Toitsu", GAME_SUPPORTS_SAVE )
+GAME( 1989, mgakuen2,  0,        marukin, marukin,  mgakuen2, ROT0,   "Face", "Mahjong Gakuen 2 Gakuen-chou no Fukushuu", GAME_SUPPORTS_SAVE )
+GAME( 1989, pkladies,  0,        marukin, pkladies, pkladies, ROT0,   "Mitchell", "Poker Ladies", GAME_SUPPORTS_SAVE )
+GAME( 1989, pkladiesl, pkladies, marukin, pkladies, pkladies, ROT0,   "Leprechaun", "Poker Ladies (Leprechaun ver. 510)", GAME_SUPPORTS_SAVE )
+GAME( 1989, pkladiesla,pkladies, marukin, pkladies, pkladies, ROT0,   "Leprechaun", "Poker Ladies (Leprechaun ver. 401)", GAME_SUPPORTS_SAVE )
+GAME( 1989, dokaben,   0,        pang,    pang,     dokaben,  ROT0,   "Capcom", "Dokaben (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, pang,      0,        pang,    pang,     pang,     ROT0,   "Mitchell", "Pang (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, pangb,     pang,     pang,    pang,     pangb,    ROT0,   "[Mitchell] (bootleg)", "Pang (bootleg, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, pangbold,  pang,     pang,    pang,     pangb,    ROT0,   "[Mitchell] (bootleg)", "Pang (bootleg, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, pangba,    pang,     spangbl, pang,     pangb,    ROT0,   "[Mitchell] (bootleg)", "Pang (bootleg, set 3)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1989, bbros,     pang,     pang,    pang,     pang,     ROT0,   "Capcom", "Buster Bros. (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, pompingw,  pang,     pang,    pang,     pang,     ROT0,   "Mitchell", "Pomping World (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, cworld,    0,        pang,    qtono1,   cworld,   ROT0,   "Capcom", "Capcom World (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, hatena,    0,        pang,    qtono1,   hatena,   ROT0,   "Capcom", "Adventure Quiz 2 Hatena Hatena no Dai-Bouken (Japan 900228)", GAME_SUPPORTS_SAVE )
+GAME( 1990, spang,     0,        pang,    pang,     spang,    ROT0,   "Mitchell", "Super Pang (World 900914)", GAME_SUPPORTS_SAVE )
+GAME( 1990, spangj,    spang,    pang,    pang,     spangj,   ROT0,   "Mitchell", "Super Pang (Japan 901023)", GAME_SUPPORTS_SAVE )
+GAME( 1990, spangbl,   spang,    spangbl, spangbl,  spangbl,  ROT0,   "[Mitchell] (bootleg)", "Super Pang (World 900914, bootleg)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // different sound hardware
+GAME( 1994, mstworld,  0,        mstworld,mstworld, mstworld, ROT0,   "TCH", "Monsters World", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // bootleg of Spang
+GAME( 1990, sbbros,    spang,    pang,    pang,     sbbros,   ROT0,   "Mitchell + Capcom", "Super Buster Bros. (US 901001)", GAME_SUPPORTS_SAVE )
+GAME( 1990, marukin,   0,        marukin, marukin,  marukin,  ROT0,   "Yuga", "Super Marukin-Ban (Japan 901017)", GAME_SUPPORTS_SAVE )
+GAME( 1991, qtono1,    0,        pang,    qtono1,   qtono1,   ROT0,   "Capcom", "Quiz Tonosama no Yabou (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, qsangoku,  0,        pang,    qtono1,   qsangoku, ROT0,   "Capcom", "Quiz Sangokushi (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, block,     0,        pang,    block,    block,    ROT270, "Capcom", "Block Block (World 910910)", GAME_SUPPORTS_SAVE )
+GAME( 1991, blockj,    block,    pang,    block,    block,    ROT270, "Capcom", "Block Block (Japan 910910)", GAME_SUPPORTS_SAVE )
+GAME( 1991, blockjoy,  block,    pang,    blockjoy, block,    ROT270, "Capcom", "Block Block (World 911106 Joystick)", GAME_SUPPORTS_SAVE )
+GAME( 1991, blockbl,   block,    pang,    block,    blockbl,  ROT270, "bootleg", "Block Block (bootleg)", GAME_SUPPORTS_SAVE )

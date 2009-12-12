@@ -284,11 +284,7 @@ static WRITE16_HANDLER( forgottn_dial_1_reset_w )
 
 static WRITE8_HANDLER( cps1_snd_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "audiocpu");
-	int bankaddr;
-
-	bankaddr = ((data & 1) * 0x4000);
-	memory_set_bankptr(space->machine, "bank1",&RAM[0x10000 + bankaddr]);
+	memory_set_bank(space->machine, "bank1", data & 0x01);
 }
 
 static WRITE8_DEVICE_HANDLER( cps1_oki_pin7_w )
@@ -396,18 +392,15 @@ static WRITE16_HANDLER( qsound_sharedram2_w )
 
 static WRITE8_HANDLER( qsound_banksw_w )
 {
-	/*
-    Z80 bank register for music note data. It's odd that it isn't encrypted
-    though.
-    */
-	UINT8 *RAM = memory_region(space->machine, "audiocpu");
-	int bankaddress=0x10000+((data&0x0f)*0x4000);
-	if (bankaddress >= memory_region_length(space->machine, "audiocpu"))
+	/* Z80 bank register for music note data. It's odd that it isn't encrypted though. */
+	int bank = data & 0x0f;
+	if ((0x10000 + (bank * 0x4000)) >= memory_region_length(space->machine, "audiocpu"))
 	{
 		logerror("WARNING: Q sound bank overflow (%02x)\n", data);
-		bankaddress=0x10000;
+		bank = 0;
 	}
-	memory_set_bankptr(space->machine, "bank1", &RAM[bankaddress]);
+
+	memory_set_bank(space->machine, "bank1", bank);
 }
 
 
@@ -2766,12 +2759,30 @@ static const ym2151_interface ym2151_config =
 *
 ********************************************************************/
 
-static MACHINE_START( cps1 )
+static MACHINE_START( common )
 {
 	cps_state *state = (cps_state *)machine->driver_data;
 
 	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->audiocpu = devtag_get_device(machine, "audiocpu");
+}
+
+static MACHINE_START( cps1 )
+{
+	MACHINE_START_CALL(common);
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+}
+
+static MACHINE_START( qsound )
+{
+	MACHINE_START_CALL(common);
+	memory_configure_bank(machine, "bank1", 0, 6, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
+}
+
+static MACHINE_START( cpspicb )
+{
+	MACHINE_START_CALL(common);
+	memory_configure_bank(machine, "bank1", 0, 6, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
 }
 
 
@@ -2849,6 +2860,8 @@ static MACHINE_DRIVER_START( qsound )
 	MDRV_CPU_PROGRAM_MAP(qsound_sub_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 250)	/* ?? */
 
+	MDRV_MACHINE_START(qsound)
+
 	MDRV_EEPROM_NODEFAULT_ADD("eeprom", qsound_eeprom_interface)
 
 	/* sound hardware */
@@ -2878,7 +2891,7 @@ static MACHINE_DRIVER_START( cpspicb )
 	MDRV_CPU_ADD("audiocpu", PIC16C57, 12000000)
 	MDRV_CPU_FLAGS(CPU_DISABLE) /* no valid dumps .. */
 
-	MDRV_MACHINE_START(cps1)
+	MDRV_MACHINE_START(cpspicb)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2958,7 +2971,7 @@ static MACHINE_DRIVER_START( sf2mdt )
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(sf2mdt_z80map)
 
-	MDRV_MACHINE_START(cps1)
+	MDRV_MACHINE_START(common)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -3046,7 +3059,7 @@ static MACHINE_DRIVER_START( knightsb )
 	MDRV_CPU_ADD("audiocpu", Z80, 29821000 / 8)
 	MDRV_CPU_PROGRAM_MAP(sf2mdt_z80map)
 
-	MDRV_MACHINE_START(cps1)
+	MDRV_MACHINE_START(common)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

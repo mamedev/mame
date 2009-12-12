@@ -47,27 +47,51 @@ MM63.10N
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 
-static UINT8* chinsan_video;
-static UINT8 chinsan_port_select;
+typedef struct _chinsan_state chinsan_state;
+struct _chinsan_state
+{
+	/* memory pointers */
+	UINT8 *  video;
 
-static UINT32 adpcm_pos;
-static UINT8 adpcm_idle,adpcm_data;
+	/* misc */
+	UINT8    port_select;
+	UINT32   adpcm_pos;
+	UINT8    adpcm_idle, adpcm_data;
+	UINT8    trigger;
+};
 
-static VIDEO_START(chinsan)
+
+/*************************************
+ *
+ *  Video emulation
+ *
+ *************************************/
+
+static PALETTE_INIT( chinsan )
+{
+	UINT8 *src = memory_region( machine, "color_proms" );
+	int i;
+
+	for (i = 0; i < 0x100; i++)
+		palette_set_color_rgb(machine, i, pal4bit(src[i + 0x200]), pal4bit(src[i + 0x100]), pal4bit(src[i + 0x000]));
+}
+
+static VIDEO_START( chinsan )
 {
 }
 
-static VIDEO_UPDATE(chinsan)
+static VIDEO_UPDATE( chinsan )
 {
-	int y,x, count;
+	chinsan_state *state = (chinsan_state *)screen->machine->driver_data;
+	int y, x, count;
 	count = 0;
-	for(y=0;y<32;y++)
+	for (y = 0; y < 32; y++)
 	{
-		for (x=0;x<64;x++)
+		for (x = 0; x < 64; x++)
 		{
-			int tileno,colour;
-			tileno = chinsan_video[count] | (chinsan_video[count+0x800]<<8);
-			colour = chinsan_video[count+0x1000]>>3;
+			int tileno, colour;
+			tileno = state->video[count] | (state->video[count + 0x800] << 8);
+			colour = state->video[count + 0x1000] >> 3;
 			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tileno,colour,0,0,x*8,y*8);
 			count++;
 		}
@@ -78,28 +102,26 @@ static VIDEO_UPDATE(chinsan)
 
 
 
-static MACHINE_RESET( chinsan )
-{
-	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
-	adpcm_idle = 1;
-}
-
-
-static WRITE8_HANDLER(ctrl_w)
+static WRITE8_HANDLER( ctrl_w )
 {
 	memory_set_bank(space->machine, "bank1", data >> 6);
 }
 
 static WRITE8_DEVICE_HANDLER( ym_port_w1 )
 {
-	logerror("ym_write port 1 %02x\n",data);
+	logerror("ym_write port 1 %02x\n", data);
 }
 
 
 static WRITE8_DEVICE_HANDLER( ym_port_w2 )
 {
-	logerror("ym_write port 2 %02x\n",data);
+	logerror("ym_write port 2 %02x\n", data);
 }
 
 
@@ -117,27 +139,29 @@ static const ym2203_interface ym2203_config =
 
 static WRITE8_HANDLER( chinsan_port00_w )
 {
+	chinsan_state *state = (chinsan_state *)space->machine->driver_data;
 
-	chinsan_port_select = data;
+	state->port_select = data;
 
 	if (
-	   (data!=0x40) &&
-	   (data!=0x4f) &&
-	   (data!=0x53) &&
-	   (data!=0x57) &&
-	   (data!=0x5b) &&
-	   (data!=0x5d) &&
-	   (data!=0x5e))
-		logerror("write port 00 %02x\n",data);
+	   (data != 0x40) &&
+	   (data != 0x4f) &&
+	   (data != 0x53) &&
+	   (data != 0x57) &&
+	   (data != 0x5b) &&
+	   (data != 0x5d) &&
+	   (data != 0x5e))
+		logerror("write port 00 %02x\n", data);
 
 }
 
 static READ8_HANDLER( chinsan_input_port_0_r )
 {
+	chinsan_state *state = (chinsan_state *)space->machine->driver_data;
 
 	//return 0xff; // the inputs don't seem to work, so just return ff for now
 
-	switch (chinsan_port_select)
+	switch (state->port_select)
 	{
 		/* i doubt these are both really the same.. */
 		case 0x40:
@@ -160,13 +184,15 @@ static READ8_HANDLER( chinsan_input_port_0_r )
 			return input_port_read(space->machine, "MAHJONG_P2_6");
 	}
 
-	printf("chinsan_input_port_0_r unk_r %02x\n", chinsan_port_select);
+	printf("chinsan_input_port_0_r unk_r %02x\n", state->port_select);
 	return mame_rand(space->machine);
 }
 
 static READ8_HANDLER( chinsan_input_port_1_r )
 {
-	switch (chinsan_port_select)
+	chinsan_state *state = (chinsan_state *)space->machine->driver_data;
+
+	switch (state->port_select)
 	{
 		/* i doubt these are both really the same.. */
 		case 0x40:
@@ -189,22 +215,29 @@ static READ8_HANDLER( chinsan_input_port_1_r )
 			return input_port_read(space->machine, "MAHJONG_P1_6");
 	}
 
-	printf("chinsan_input_port_1_r unk_r %02x\n", chinsan_port_select);
+	printf("chinsan_input_port_1_r unk_r %02x\n", state->port_select);
 	return mame_rand(space->machine);
 }
 
 static WRITE8_DEVICE_HANDLER( chin_adpcm_w )
 {
-	adpcm_pos = (data & 0xff) * 0x100;
-	adpcm_idle = 0;
-	msm5205_reset_w(device,0);
+	chinsan_state *state = (chinsan_state *)device->machine->driver_data;
+	state->adpcm_pos = (data & 0xff) * 0x100;
+	state->adpcm_idle = 0;
+	msm5205_reset_w(device, 0);
 }
+
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( chinsan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_BASE(&chinsan_video)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_BASE_MEMBER(chinsan_state, video)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinsan_io, ADDRESS_SPACE_IO, 8 )
@@ -217,6 +250,12 @@ static ADDRESS_MAP_START( chinsan_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)	// ROM bank + unknown stuff (input mutliplex?)
 ADDRESS_MAP_END
 
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( chinsan )
 	PORT_START("DSW1")
@@ -457,6 +496,12 @@ INPUT_PORTS_END
 
 
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
 static const gfx_layout tiles8x8_layout =
 {
 	8,8,
@@ -472,28 +517,34 @@ static GFXDECODE_START( chinsan )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 32 )
 GFXDECODE_END
 
-static void chin_adpcm_int(const device_config *device)
-{
-	static UINT8 trigger;
+/*************************************
+ *
+ *  Sound interface
+ *
+ *************************************/
 
-	if (adpcm_pos >= 0x10000 || adpcm_idle)
+static void chin_adpcm_int( const device_config *device )
+{
+	chinsan_state *state = (chinsan_state *)device->machine->driver_data;
+
+	if (state->adpcm_pos >= 0x10000 || state->adpcm_idle)
 	{
-		//adpcm_idle = 1;
-		msm5205_reset_w(device,1);
-		trigger = 0;
+		//state->adpcm_idle = 1;
+		msm5205_reset_w(device, 1);
+		state->trigger = 0;
 	}
 	else
 	{
 		UINT8 *ROM = memory_region(device->machine, "adpcm");
 
-		adpcm_data = ((trigger ? (ROM[adpcm_pos] & 0x0f) : (ROM[adpcm_pos] & 0xf0)>>4) );
-		msm5205_data_w(device,adpcm_data & 0xf);
-		trigger^=1;
-		if(trigger == 0)
+		state->adpcm_data = ((state->trigger ? (ROM[state->adpcm_pos] & 0x0f) : (ROM[state->adpcm_pos] & 0xf0) >> 4));
+		msm5205_data_w(device, state->adpcm_data & 0xf);
+		state->trigger ^= 1;
+		if(state->trigger == 0)
 		{
-			adpcm_pos++;
-			if((ROM[adpcm_pos] & 0xff) == 0x70)
-				adpcm_idle = 1;
+			state->adpcm_pos++;
+			if ((ROM[state->adpcm_pos] & 0xff) == 0x70)
+				state->adpcm_idle = 1;
 		}
 	}
 }
@@ -504,24 +555,49 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S64_4B	/* 8kHz */
 };
 
-static PALETTE_INIT( chinsan )
-{
-	UINT8 *src = memory_region( machine, "color_proms" );
-	int i;
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
 
-	for (i=0;i<0x100;i++)
-	{
-		palette_set_color_rgb(machine,i,pal4bit(src[i+0x200]),pal4bit(src[i+0x100]),pal4bit(src[i+0x000]));
-	}
+static MACHINE_START( chinsan )
+{
+	chinsan_state *state = (chinsan_state *)machine->driver_data;
+
+	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x4000);
+
+	state_save_register_global(machine, state->adpcm_idle);
+	state_save_register_global(machine, state->port_select);
+	state_save_register_global(machine, state->adpcm_pos);
+	state_save_register_global(machine, state->adpcm_data);
+	state_save_register_global(machine, state->trigger);
 }
 
+static MACHINE_RESET( chinsan )
+{
+	chinsan_state *state = (chinsan_state *)machine->driver_data;
+
+	state->adpcm_idle = 1;
+	state->port_select = 0;
+	state->adpcm_pos = 0;
+	state->adpcm_data = 0;
+	state->trigger = 0;
+}
+
+
 static MACHINE_DRIVER_START( chinsan )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(chinsan_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,10000000/2)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(chinsan_map)
 	MDRV_CPU_IO_MAP(chinsan_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+	MDRV_MACHINE_START( chinsan )
 	MDRV_MACHINE_RESET( chinsan )
 
 	/* video hardware */
@@ -539,7 +615,7 @@ static MACHINE_DRIVER_START( chinsan )
 	MDRV_VIDEO_START(chinsan)
 	MDRV_VIDEO_UPDATE(chinsan)
 
-	// sound hardware
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000) /* ? Mhz */
@@ -555,6 +631,12 @@ static MACHINE_DRIVER_START( chinsan )
 MACHINE_DRIVER_END
 
 
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( chinsan )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* encrypted code / data */
@@ -583,10 +665,22 @@ ROM_START( chinsan )
 ROM_END
 
 
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
+
 static DRIVER_INIT( chinsan )
 {
 	mc8123_decrypt_rom(machine, "maincpu", "user1", "bank1", 4);
 }
 
 
-GAME( 1987, chinsan,  0,    chinsan, chinsan, chinsan, ROT0, "Sanritsu", "Ganbare Chinsan Ooshoubu (MC-8123A, 317-5012)", 0 )
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1987, chinsan,  0,    chinsan, chinsan, chinsan, ROT0, "Sanritsu", "Ganbare Chinsan Ooshoubu (MC-8123A, 317-5012)", GAME_SUPPORTS_SAVE )

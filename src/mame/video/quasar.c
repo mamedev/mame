@@ -15,13 +15,9 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "cvs.h"
 #include "video/s2636.h"
 #include "cpu/s2650/s2650.h"
-
-
-UINT8 *quasar_effectram;
-UINT8 quasar_effectcontrol;
+#include "includes/cvs.h"
 
 PALETTE_INIT( quasar )
 {
@@ -96,54 +92,52 @@ PALETTE_INIT( quasar )
 
 VIDEO_START( quasar )
 {
-	quasar_effectram = auto_alloc_array(machine, UINT8, 0x400);
+	cvs_state *state = (cvs_state *)machine->driver_data;
+	state->effectram = auto_alloc_array(machine, UINT8, 0x400);
 
-	/* create helper bitmaps */
-	cvs_collision_background = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	/* create helper bitmap */
+	state->collision_background = video_screen_auto_bitmap_alloc(machine->primary_screen);
+
+	/* register save */
+	state_save_register_global_bitmap(machine, state->collision_background);
+	state_save_register_global_pointer(machine, state->effectram, 0x400);
 }
 
 VIDEO_UPDATE( quasar )
 {
+	cvs_state *state = (cvs_state *)screen->machine->driver_data;
 	int offs;
-	bitmap_t *s2636_0_bitmap;
-	bitmap_t *s2636_1_bitmap;
-	bitmap_t *s2636_2_bitmap;
-	const device_config *s2636_0 = devtag_get_device(screen->machine, "s2636_0");
-	const device_config *s2636_1 = devtag_get_device(screen->machine, "s2636_1");
-	const device_config *s2636_2 = devtag_get_device(screen->machine, "s2636_2");
+	bitmap_t *s2636_0_bitmap, *s2636_1_bitmap, *s2636_2_bitmap;
 
 	/* for every character in the video RAM */
 	for (offs = 0; offs < 0x0400; offs++)
 	{
 		int ox, oy;
-        UINT8 code = cvs_video_ram[offs];
-
+		UINT8 code = state->video_ram[offs];
 		UINT8 x = (offs & 0x1f) << 3;
 		UINT8 y = (offs >> 5) << 3;
 
 		// While we have the current character code, draw the effects layer
 		// intensity / on and off controlled by latch
 
-		int forecolor = 0x208 + quasar_effectram[offs] + (256 * (((quasar_effectcontrol >> 4) ^ 3) & 3));
+		int forecolor = 0x208 + state->effectram[offs] + (256 * (((state->effectcontrol >> 4) ^ 3) & 3));
 
-		for(ox=0;ox<8;ox++)
-			for(oy=0;oy<8;oy++)
-				*BITMAP_ADDR16(bitmap, y+oy, x+ox) = forecolor;
+		for (ox = 0; ox < 8; ox++)
+			for (oy = 0; oy < 8; oy++)
+				*BITMAP_ADDR16(bitmap, y + oy, x + ox) = forecolor;
 
 		/* Main Screen */
-
 		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
 				code,
-				cvs_color_ram[offs] & 0x3f,
+				state->color_ram[offs] & 0x3f,
 				0,0,
 				x,y,0);
 
 
 		/* background for Collision Detection (it can only hit certain items) */
-
-		if((cvs_color_ram[offs] & 7) == 0)
+		if((state->color_ram[offs] & 7) == 0)
 		{
-			drawgfx_opaque(cvs_collision_background,cliprect,screen->machine->gfx[0],
+			drawgfx_opaque(state->collision_background,cliprect,screen->machine->gfx[0],
 					code,
 					64,
 					0,0,
@@ -152,23 +146,23 @@ VIDEO_UPDATE( quasar )
 	}
 
     /* update the S2636 chips */
-	s2636_0_bitmap = s2636_update(s2636_0, cliprect);
-	s2636_1_bitmap = s2636_update(s2636_1, cliprect);
-	s2636_2_bitmap = s2636_update(s2636_2, cliprect);
+	s2636_0_bitmap = s2636_update(state->s2636_0, cliprect);
+	s2636_1_bitmap = s2636_update(state->s2636_1, cliprect);
+	s2636_2_bitmap = s2636_update(state->s2636_2, cliprect);
 
     /* Bullet Hardware */
     for (offs = 8; offs < 256; offs++ )
     {
-        if(cvs_bullet_ram[offs] != 0)
+        if(state->bullet_ram[offs] != 0)
         {
         	int ct;
-            for(ct=0;ct<1;ct++)
+            for (ct = 0; ct < 1; ct++)
             {
-            	int bx=255-9-cvs_bullet_ram[offs]-ct;
+            	int bx = 255 - 9 - state->bullet_ram[offs] - ct;
 
             	/* bullet/object Collision */
-				if (*BITMAP_ADDR16(s2636_0_bitmap, offs, bx) != 0) cvs_collision_register |= 0x04;
-				if (*BITMAP_ADDR16(s2636_2_bitmap, offs, bx) != 0) cvs_collision_register |= 0x08;
+				if (*BITMAP_ADDR16(s2636_0_bitmap, offs, bx) != 0) state->collision_register |= 0x04;
+				if (*BITMAP_ADDR16(s2636_2_bitmap, offs, bx) != 0) state->collision_register |= 0x08;
 
 				*BITMAP_ADDR16(bitmap, offs, bx) = 7;
             }
@@ -197,10 +191,10 @@ VIDEO_UPDATE( quasar )
 					*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel);
 
 					/* S2636 vs. background collision detection */
-					if (colortable_entry_get_value(screen->machine->colortable, *BITMAP_ADDR16(cvs_collision_background, y, x)))
+					if (colortable_entry_get_value(screen->machine->colortable, *BITMAP_ADDR16(state->collision_background, y, x)))
 					{
-						if (S2636_IS_PIXEL_DRAWN(pixel0)) cvs_collision_register |= 0x01;
-						if (S2636_IS_PIXEL_DRAWN(pixel2)) cvs_collision_register |= 0x02;
+						if (S2636_IS_PIXEL_DRAWN(pixel0)) state->collision_register |= 0x01;
+						if (S2636_IS_PIXEL_DRAWN(pixel2)) state->collision_register |= 0x02;
 					}
 				}
 			}
