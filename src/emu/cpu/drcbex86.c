@@ -3856,8 +3856,8 @@ static x86code *op_restore(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 
 static x86code *op_load(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, basep, indp, sizep;
-	int dstreg;
+	drcuml_parameter dstp, basep, indp, scalesizep;
+	int dstreg, scale, size;
 
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
@@ -3865,7 +3865,9 @@ static x86code *op_load(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	assert_no_flags(inst);
 
 	/* normalize parameters */
-	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &basep, PTYPE_M, &indp, PTYPE_MRI, &sizep, PTYPE_I);
+	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &basep, PTYPE_M, &indp, PTYPE_MRI, &scalesizep, PTYPE_I);
+	scale = 1 << (scalesizep.value / 16);
+	size = scalesizep.value % 16;
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
@@ -3873,16 +3875,16 @@ static x86code *op_load(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	/* immediate index */
 	if (indp.type == DRCUML_PTYPE_IMMEDIATE)
 	{
-		if (sizep.value == DRCUML_SIZE_BYTE)
-			emit_movzx_r32_m8(&dst, dstreg, MABS(basep.value + 1*indp.value));			// movzx dstreg,[basep + 1*indp]
-		else if (sizep.value == DRCUML_SIZE_WORD)
-			emit_movzx_r32_m16(&dst, dstreg, MABS(basep.value + 2*indp.value));			// movzx dstreg,[basep + 2*indp]
-		else if (sizep.value == DRCUML_SIZE_DWORD)
-			emit_mov_r32_m32(&dst, dstreg, MABS(basep.value + 4*indp.value));			// mov   dstreg,[basep + 4*indp]
-		else if (sizep.value == DRCUML_SIZE_QWORD)
+		if (size == DRCUML_SIZE_BYTE)
+			emit_movzx_r32_m8(&dst, dstreg, MABS(basep.value + scale*indp.value));		// movzx dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_WORD)
+			emit_movzx_r32_m16(&dst, dstreg, MABS(basep.value + scale*indp.value));		// movzx dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_DWORD)
+			emit_mov_r32_m32(&dst, dstreg, MABS(basep.value + scale*indp.value));		// mov   dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_QWORD)
 		{
-			emit_mov_r32_m32(&dst, REG_EDX, MABS(basep.value + 8*indp.value + 4));		// mov   edx,[basep + 8*indp + 4]
-			emit_mov_r32_m32(&dst, dstreg, MABS(basep.value + 8*indp.value));			// mov   dstreg,[basep + 8*indp]
+			emit_mov_r32_m32(&dst, REG_EDX, MABS(basep.value + scale*indp.value + 4));	// mov   edx,[basep + scale*indp + 4]
+			emit_mov_r32_m32(&dst, dstreg, MABS(basep.value + scale*indp.value));		// mov   dstreg,[basep + scale*indp]
 		}
 	}
 
@@ -3891,16 +3893,16 @@ static x86code *op_load(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	{
 		int indreg = param_select_register(REG_ECX, &indp, NULL);
 		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);
-		if (sizep.value == DRCUML_SIZE_BYTE)
-			emit_movzx_r32_m8(&dst, dstreg, MISD(indreg, 1, basep.value));				// movzx dstreg,[basep + 1*indp]
-		else if (sizep.value == DRCUML_SIZE_WORD)
-			emit_movzx_r32_m16(&dst, dstreg, MISD(indreg, 2, basep.value));				// movzx dstreg,[basep + 2*indp]
-		else if (sizep.value == DRCUML_SIZE_DWORD)
-			emit_mov_r32_m32(&dst, dstreg, MISD(indreg, 4, basep.value));				// mov   dstreg,[basep + 4*indp]
-		else if (sizep.value == DRCUML_SIZE_QWORD)
+		if (size == DRCUML_SIZE_BYTE)
+			emit_movzx_r32_m8(&dst, dstreg, MISD(indreg, scale, basep.value));			// movzx dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_WORD)
+			emit_movzx_r32_m16(&dst, dstreg, MISD(indreg, scale, basep.value));			// movzx dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_DWORD)
+			emit_mov_r32_m32(&dst, dstreg, MISD(indreg, scale, basep.value));			// mov   dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_QWORD)
 		{
-			emit_mov_r32_m32(&dst, REG_EDX, MISD(indreg, 8, basep.value + 4));			// mov   edx,[basep + 8*indp + 4]
-			emit_mov_r32_m32(&dst, dstreg, MISD(indreg, 8, basep.value));				// mov   dstreg,[basep + 8*indp]
+			emit_mov_r32_m32(&dst, REG_EDX, MISD(indreg, scale, basep.value + 4));		// mov   edx,[basep + scale*indp + 4]
+			emit_mov_r32_m32(&dst, dstreg, MISD(indreg, scale, basep.value));			// mov   dstreg,[basep + scale*indp]
 		}
 	}
 
@@ -3911,7 +3913,7 @@ static x86code *op_load(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	if (inst->size == 8)
 	{
 		/* 1, 2, or 4-byte case */
-		if (sizep.value != DRCUML_SIZE_QWORD)
+		if (size != DRCUML_SIZE_QWORD)
 		{
 			if (dstp.type == DRCUML_PTYPE_MEMORY)
 				emit_mov_m32_imm(&dst, MABS(dstp.value + 4), 0);						// mov   [dstp+4],0
@@ -3938,8 +3940,8 @@ static x86code *op_load(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 
 static x86code *op_loads(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, basep, indp, sizep;
-	int dstreg;
+	drcuml_parameter dstp, basep, indp, scalesizep;
+	int dstreg, scale, size;
 
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
@@ -3947,7 +3949,9 @@ static x86code *op_loads(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	assert_no_flags(inst);
 
 	/* normalize parameters */
-	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &basep, PTYPE_M, &indp, PTYPE_MRI, &sizep, PTYPE_I);
+	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &basep, PTYPE_M, &indp, PTYPE_MRI, &scalesizep, PTYPE_I);
+	scale = 1 << (scalesizep.value / 16);
+	size = scalesizep.value % 16;
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
@@ -3955,16 +3959,16 @@ static x86code *op_loads(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	/* immediate index */
 	if (indp.type == DRCUML_PTYPE_IMMEDIATE)
 	{
-		if (sizep.value == DRCUML_SIZE_BYTE)
-			emit_movsx_r32_m8(&dst, dstreg, MABS(basep.value + 1*indp.value));			// movsx dstreg,[basep + 1*indp]
-		else if (sizep.value == DRCUML_SIZE_WORD)
-			emit_movsx_r32_m16(&dst, dstreg, MABS(basep.value + 2*indp.value));			// movsx dstreg,[basep + 2*indp]
-		else if (sizep.value == DRCUML_SIZE_DWORD)
-			emit_mov_r32_m32(&dst, dstreg, MABS(basep.value + 4*indp.value));			// mov   dstreg,[basep + 4*indp]
-		else if (sizep.value == DRCUML_SIZE_QWORD)
+		if (size == DRCUML_SIZE_BYTE)
+			emit_movsx_r32_m8(&dst, dstreg, MABS(basep.value + scale*indp.value));		// movsx dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_WORD)
+			emit_movsx_r32_m16(&dst, dstreg, MABS(basep.value + scale*indp.value));		// movsx dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_DWORD)
+			emit_mov_r32_m32(&dst, dstreg, MABS(basep.value + scale*indp.value));		// mov   dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_QWORD)
 		{
-			emit_mov_r32_m32(&dst, REG_EDX, MABS(basep.value + 8*indp.value + 4));		// mov   edx,[basep + 8*indp + 4]
-			emit_mov_r32_m32(&dst, dstreg, MABS(basep.value + 8*indp.value));			// mov   dstreg,[basep + 8*indp]
+			emit_mov_r32_m32(&dst, REG_EDX, MABS(basep.value + scale*indp.value + 4));	// mov   edx,[basep + scale*indp + 4]
+			emit_mov_r32_m32(&dst, dstreg, MABS(basep.value + scale*indp.value));		// mov   dstreg,[basep + scale*indp]
 		}
 	}
 
@@ -3973,16 +3977,16 @@ static x86code *op_loads(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	{
 		int indreg = param_select_register(REG_ECX, &indp, NULL);
 		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);
-		if (sizep.value == DRCUML_SIZE_BYTE)
-			emit_movsx_r32_m8(&dst, dstreg, MISD(indreg, 1, basep.value));				// movsx dstreg,[basep + 1*indp]
-		else if (sizep.value == DRCUML_SIZE_WORD)
-			emit_movsx_r32_m16(&dst, dstreg, MISD(indreg, 2, basep.value));				// movsx dstreg,[basep + 2*indp]
-		else if (sizep.value == DRCUML_SIZE_DWORD)
-			emit_mov_r32_m32(&dst, dstreg, MISD(indreg, 4, basep.value));				// mov   dstreg,[basep + 4*indp]
-		else if (sizep.value == DRCUML_SIZE_QWORD)
+		if (size == DRCUML_SIZE_BYTE)
+			emit_movsx_r32_m8(&dst, dstreg, MISD(indreg, scale, basep.value));			// movsx dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_WORD)
+			emit_movsx_r32_m16(&dst, dstreg, MISD(indreg, scale, basep.value));			// movsx dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_DWORD)
+			emit_mov_r32_m32(&dst, dstreg, MISD(indreg, scale, basep.value));			// mov   dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_QWORD)
 		{
-			emit_mov_r32_m32(&dst, REG_EDX, MISD(indreg, 8, basep.value + 4));			// mov   edx,[basep + 8*indp + 4]
-			emit_mov_r32_m32(&dst, dstreg, MISD(indreg, 8, basep.value));				// mov   dstreg,[basep + 8*indp]
+			emit_mov_r32_m32(&dst, REG_EDX, MISD(indreg, scale, basep.value + 4));		// mov   edx,[basep + scale*indp + 4]
+			emit_mov_r32_m32(&dst, dstreg, MISD(indreg, scale, basep.value));			// mov   dstreg,[basep + scale*indp]
 		}
 	}
 
@@ -4008,8 +4012,8 @@ static x86code *op_loads(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 
 static x86code *op_store(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter srcp, basep, indp, sizep;
-	int srcreg;
+	drcuml_parameter srcp, basep, indp, scalesizep;
+	int srcreg, scale, size;
 
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
@@ -4017,11 +4021,13 @@ static x86code *op_store(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	assert_no_flags(inst);
 
 	/* normalize parameters */
-	param_normalize_4(drcbe, inst, &basep, PTYPE_M, &indp, PTYPE_MRI, &srcp, PTYPE_MRI, &sizep, PTYPE_I);
+	param_normalize_4(drcbe, inst, &basep, PTYPE_M, &indp, PTYPE_MRI, &srcp, PTYPE_MRI, &scalesizep, PTYPE_I);
+	scale = 1 << (scalesizep.value / 16);
+	size = scalesizep.value % 16;
 
 	/* pick a source register for the general case */
 	srcreg = param_select_register(REG_EAX, &srcp, NULL);
-	if (sizep.value == DRCUML_SIZE_BYTE && (srcreg & 4))
+	if (size == DRCUML_SIZE_BYTE && (srcreg & 4))
 		srcreg = REG_EAX;
 
 	/* degenerate case: constant index */
@@ -4030,37 +4036,37 @@ static x86code *op_store(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 		/* immediate source */
 		if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
 		{
-			if (sizep.value == DRCUML_SIZE_BYTE)
-				emit_mov_m8_imm(&dst, MABS(basep.value + 1*indp.value), srcp.value);	// mov   [basep + 1*indp],srcp
-			else if (sizep.value == DRCUML_SIZE_WORD)
-				emit_mov_m16_imm(&dst, MABS(basep.value + 2*indp.value), srcp.value);	// mov   [basep + 2*indp],srcp
-			else if (sizep.value == DRCUML_SIZE_DWORD)
-				emit_mov_m32_imm(&dst, MABS(basep.value + 4*indp.value), srcp.value);	// mov   [basep + 4*indp],srcp
-			else if (sizep.value == DRCUML_SIZE_QWORD)
+			if (size == DRCUML_SIZE_BYTE)
+				emit_mov_m8_imm(&dst, MABS(basep.value + scale*indp.value), srcp.value);	// mov   [basep + scale*indp],srcp
+			else if (size == DRCUML_SIZE_WORD)
+				emit_mov_m16_imm(&dst, MABS(basep.value + scale*indp.value), srcp.value);	// mov   [basep + scale*indp],srcp
+			else if (size == DRCUML_SIZE_DWORD)
+				emit_mov_m32_imm(&dst, MABS(basep.value + scale*indp.value), srcp.value);	// mov   [basep + scale*indp],srcp
+			else if (size == DRCUML_SIZE_QWORD)
 			{
-				emit_mov_m32_imm(&dst, MABS(basep.value + 8*indp.value), srcp.value);	// mov   [basep + 8*indp],srcp
-				emit_mov_m32_imm(&dst, MABS(basep.value + 8*indp.value + 4), srcp.value >> 32);
-																						// mov   [basep + 8*indp + 4],srcp >> 32
+				emit_mov_m32_imm(&dst, MABS(basep.value + scale*indp.value), srcp.value);	// mov   [basep + scale*indp],srcp
+				emit_mov_m32_imm(&dst, MABS(basep.value + scale*indp.value + 4), srcp.value >> 32);
+																						// mov   [basep + scale*indp + 4],srcp >> 32
 			}
 		}
 
 		/* variable source */
 		else
 		{
-			if (sizep.value != DRCUML_SIZE_QWORD)
+			if (size != DRCUML_SIZE_QWORD)
 				emit_mov_r32_p32(drcbe, &dst, srcreg, &srcp);							// mov   srcreg,srcp
 			else
 				emit_mov_r64_p64(drcbe, &dst, srcreg, REG_EDX, &srcp);					// mov   edx:srcreg,srcp
-			if (sizep.value == DRCUML_SIZE_BYTE)
-				emit_mov_m8_r8(&dst, MABS(basep.value + 1*indp.value), srcreg);			// mov   [basep + 1*indp],srcreg
-			else if (sizep.value == DRCUML_SIZE_WORD)
-				emit_mov_m16_r16(&dst, MABS(basep.value + 2*indp.value), srcreg);		// mov   [basep + 2*indp],srcreg
-			else if (sizep.value == DRCUML_SIZE_DWORD)
-				emit_mov_m32_r32(&dst, MABS(basep.value + 4*indp.value), srcreg);		// mov   [basep + 4*indp],srcreg
-			else if (sizep.value == DRCUML_SIZE_QWORD)
+			if (size == DRCUML_SIZE_BYTE)
+				emit_mov_m8_r8(&dst, MABS(basep.value + scale*indp.value), srcreg);		// mov   [basep + scale*indp],srcreg
+			else if (size == DRCUML_SIZE_WORD)
+				emit_mov_m16_r16(&dst, MABS(basep.value + scale*indp.value), srcreg);	// mov   [basep + scale*indp],srcreg
+			else if (size == DRCUML_SIZE_DWORD)
+				emit_mov_m32_r32(&dst, MABS(basep.value + scale*indp.value), srcreg);	// mov   [basep + scale*indp],srcreg
+			else if (size == DRCUML_SIZE_QWORD)
 			{
-				emit_mov_m32_r32(&dst, MABS(basep.value + 8*indp.value), srcreg);		// mov   [basep + 8*indp],srcreg
-				emit_mov_m32_r32(&dst, MABS(basep.value + 8*indp.value + 4), REG_EDX);	// mov   [basep + 8*indp + 4],edx
+				emit_mov_m32_r32(&dst, MABS(basep.value + scale*indp.value), srcreg);	// mov   [basep + scale*indp],srcreg
+				emit_mov_m32_r32(&dst, MABS(basep.value + scale*indp.value + 4), REG_EDX);	// mov   [basep + scale*indp + 4],edx
 			}
 		}
 	}
@@ -4074,16 +4080,16 @@ static x86code *op_store(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 		/* immediate source */
 		if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
 		{
-			if (sizep.value == DRCUML_SIZE_BYTE)
-				emit_mov_m8_imm(&dst, MISD(indreg, 1, basep.value), srcp.value);		// mov   [basep + 1*ecx],srcp
-			else if (sizep.value == DRCUML_SIZE_WORD)
-				emit_mov_m16_imm(&dst, MISD(indreg, 2, basep.value), srcp.value);		// mov   [basep + 2*ecx],srcp
-			else if (sizep.value == DRCUML_SIZE_DWORD)
-				emit_mov_m32_imm(&dst, MISD(indreg, 4, basep.value), srcp.value);		// mov   [basep + 4*ecx],srcp
-			else if (sizep.value == DRCUML_SIZE_QWORD)
+			if (size == DRCUML_SIZE_BYTE)
+				emit_mov_m8_imm(&dst, MISD(indreg, scale, basep.value), srcp.value);	// mov   [basep + 1*ecx],srcp
+			else if (size == DRCUML_SIZE_WORD)
+				emit_mov_m16_imm(&dst, MISD(indreg, scale, basep.value), srcp.value);	// mov   [basep + 2*ecx],srcp
+			else if (size == DRCUML_SIZE_DWORD)
+				emit_mov_m32_imm(&dst, MISD(indreg, scale, basep.value), srcp.value);	// mov   [basep + 4*ecx],srcp
+			else if (size == DRCUML_SIZE_QWORD)
 			{
-				emit_mov_m32_imm(&dst, MISD(indreg, 8, basep.value), srcp.value);		// mov   [basep + 8*ecx],srcp
-				emit_mov_m32_imm(&dst, MISD(indreg, 8, basep.value + 4), srcp.value >> 32);
+				emit_mov_m32_imm(&dst, MISD(indreg, scale, basep.value), srcp.value);	// mov   [basep + 8*ecx],srcp
+				emit_mov_m32_imm(&dst, MISD(indreg, scale, basep.value + 4), srcp.value >> 32);
 																						// mov   [basep + 8*ecx + 4],srcp >> 32
 			}
 		}
@@ -4091,20 +4097,20 @@ static x86code *op_store(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 		/* variable source */
 		else
 		{
-			if (sizep.value != DRCUML_SIZE_QWORD)
+			if (size != DRCUML_SIZE_QWORD)
 				emit_mov_r32_p32(drcbe, &dst, srcreg, &srcp);							// mov   srcreg,srcp
 			else
 				emit_mov_r64_p64(drcbe, &dst, srcreg, REG_EDX, &srcp);					// mov   edx:srcreg,srcp
-			if (sizep.value == DRCUML_SIZE_BYTE)
-				emit_mov_m8_r8(&dst, MISD(indreg, 1, basep.value), srcreg);				// mov   [basep + 1*ecx],srcreg
-			else if (sizep.value == DRCUML_SIZE_WORD)
-				emit_mov_m16_r16(&dst, MISD(indreg, 2, basep.value), srcreg);			// mov   [basep + 2*ecx],srcreg
-			else if (sizep.value == DRCUML_SIZE_DWORD)
-				emit_mov_m32_r32(&dst, MISD(indreg, 4, basep.value), srcreg);			// mov   [basep + 4*ecx],srcreg
-			else if (sizep.value == DRCUML_SIZE_QWORD)
+			if (size == DRCUML_SIZE_BYTE)
+				emit_mov_m8_r8(&dst, MISD(indreg, scale, basep.value), srcreg);			// mov   [basep + 1*ecx],srcreg
+			else if (size == DRCUML_SIZE_WORD)
+				emit_mov_m16_r16(&dst, MISD(indreg, scale, basep.value), srcreg);		// mov   [basep + 2*ecx],srcreg
+			else if (size == DRCUML_SIZE_DWORD)
+				emit_mov_m32_r32(&dst, MISD(indreg, scale, basep.value), srcreg);		// mov   [basep + 4*ecx],srcreg
+			else if (size == DRCUML_SIZE_QWORD)
 			{
-				emit_mov_m32_r32(&dst, MISD(indreg, 8, basep.value), srcreg);			// mov   [basep + 8*ecx],srcreg
-				emit_mov_m32_r32(&dst, MISD(indreg, 8, basep.value + 4), REG_EDX);		// mov   [basep + 8*ecx],edx
+				emit_mov_m32_r32(&dst, MISD(indreg, scale, basep.value), srcreg);		// mov   [basep + 8*ecx],srcreg
+				emit_mov_m32_r32(&dst, MISD(indreg, scale, basep.value + 4), REG_EDX);	// mov   [basep + 8*ecx],edx
 			}
 		}
 	}

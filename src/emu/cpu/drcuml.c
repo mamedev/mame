@@ -100,10 +100,11 @@
 #define PTYPES_CFUNC	(PTYPES_MEM | 0x4000)
 #define PTYPES_HAND		(PTYPES_MEM | 0x5000)
 #define PTYPES_SIZE		(PTYPES_IMM | 0x8000)
-#define PTYPES_SPACE	(PTYPES_IMM | 0x9000)
-#define PTYPES_SPSZ		(PTYPES_IMM | 0xa000)
-#define PTYPES_FMOD		(PTYPES_IMM | 0xb000)
-#define PTYPES_LAB		(PTYPES_IMM | 0xc000)
+#define PTYPES_SCSZ		(PTYPES_IMM | 0x9000)
+#define PTYPES_SPACE	(PTYPES_IMM | 0xa000)
+#define PTYPES_SPSZ		(PTYPES_IMM | 0xb000)
+#define PTYPES_FMOD		(PTYPES_IMM | 0xc000)
+#define PTYPES_LAB		(PTYPES_IMM | 0xd000)
 
 /* combinations of types */
 #define PTYPES_IRM		(PTYPES_IREG | PTYPES_MEM)
@@ -227,9 +228,9 @@ static const drcuml_opcode_info opcode_info_source[] =
 	OPINFO1(RESTORE, "restore",  4,   FALSE, NONE, ALL,  ALL,  PINFO(IN, OP, STATE))
 
 	/* Integer Operations */
-	OPINFO4(LOAD,    "!load",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SIZE))
-	OPINFO4(LOADS,   "!loads",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SIZE))
-	OPINFO4(STORE,   "!store",   4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SIZE))
+	OPINFO4(LOAD,    "!load",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SCSZ))
+	OPINFO4(LOADS,   "!loads",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, SCSZ))
+	OPINFO4(STORE,   "!store",   4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, OP, PTR), PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SCSZ))
 	OPINFO3(READ,    "!read",    4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, 4, IANY), PINFO(IN, OP, SPSZ))
 	OPINFO4(READM,   "!readm",   4|8, FALSE, NONE, NONE, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSZ))
 	OPINFO3(WRITE,   "!write",   4|8, FALSE, NONE, NONE, ALL,  PINFO(IN, 4, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, SPSZ))
@@ -1192,6 +1193,17 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drcuml_state *d
 				/* size + address space immediate */
 				else if (typemask == PTYPES_SPSZ)
 					dest += sprintf(dest, "%s_%s", address_space_names[param->value / 16], sizes[param->value % 16]);
+
+				/* size + scale immediate */
+				else if (typemask == PTYPES_SCSZ)
+				{
+					int scale = param->value / 16;
+					int size  = param->value % 16;
+					if (scale == size)
+						dest += sprintf(dest, "%s", sizes[size]);
+					else
+						dest += sprintf(dest, "%s_x%d", sizes[size], 1 << scale);
+				}
 
 				/* fmod immediate */
 				else if (typemask == PTYPES_FMOD)

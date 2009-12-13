@@ -3808,8 +3808,8 @@ static x86code *op_restore(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 
 static x86code *op_load(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, basep, indp, sizep;
-	int basereg, dstreg;
+	drcuml_parameter dstp, basep, indp, scalesizep;
+	int basereg, dstreg, scale, size;
 	INT32 baseoffs;
 
 	/* validate instruction */
@@ -3818,7 +3818,9 @@ static x86code *op_load(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	assert_no_flags(inst);
 
 	/* normalize parameters */
-	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &basep, PTYPE_M, &indp, PTYPE_MRI, &sizep, PTYPE_I);
+	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &basep, PTYPE_M, &indp, PTYPE_MRI, &scalesizep, PTYPE_I);
+	scale = 1 << (scalesizep.value / 16);
+	size = scalesizep.value % 16;
 
 	/* determine the pointer base */
 	basereg = get_base_register_and_offset(drcbe, &dst, basep.value, REG_RDX, &baseoffs);
@@ -3829,14 +3831,14 @@ static x86code *op_load(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	/* immediate index */
 	if (indp.type == DRCUML_PTYPE_IMMEDIATE)
 	{
-		if (sizep.value == DRCUML_SIZE_BYTE)
-			emit_movzx_r32_m8(&dst, dstreg, MBD(basereg, baseoffs + 1*indp.value));		// movzx dstreg,[basep + 1*indp]
-		else if (sizep.value == DRCUML_SIZE_WORD)
-			emit_movzx_r32_m16(&dst, dstreg, MBD(basereg, baseoffs + 2*indp.value));	// movzx dstreg,[basep + 2*indp]
-		else if (sizep.value == DRCUML_SIZE_DWORD)
-			emit_mov_r32_m32(&dst, dstreg, MBD(basereg, baseoffs + 4*indp.value));		// mov   dstreg,[basep + 4*indp]
-		else if (sizep.value == DRCUML_SIZE_QWORD)
-			emit_mov_r64_m64(&dst, dstreg, MBD(basereg, baseoffs + 8*indp.value));		// mov   dstreg,[basep + 8*indp]
+		if (size == DRCUML_SIZE_BYTE)
+			emit_movzx_r32_m8(&dst, dstreg, MBD(basereg, baseoffs + scale*indp.value));	// movzx dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_WORD)
+			emit_movzx_r32_m16(&dst, dstreg, MBD(basereg, baseoffs + scale*indp.value));// movzx dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_DWORD)
+			emit_mov_r32_m32(&dst, dstreg, MBD(basereg, baseoffs + scale*indp.value));	// mov   dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_QWORD)
+			emit_mov_r64_m64(&dst, dstreg, MBD(basereg, baseoffs + scale*indp.value));	// mov   dstreg,[basep + scale*indp]
 	}
 
 	/* other index */
@@ -3844,14 +3846,14 @@ static x86code *op_load(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	{
 		int indreg = param_select_register(REG_ECX, &indp, NULL);
 		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);
-		if (sizep.value == DRCUML_SIZE_BYTE)
-			emit_movzx_r32_m8(&dst, dstreg, MBISD(basereg, indreg, 1, baseoffs));		// movzx dstreg,[basep + 1*indp]
-		else if (sizep.value == DRCUML_SIZE_WORD)
-			emit_movzx_r32_m16(&dst, dstreg, MBISD(basereg, indreg, 2, baseoffs));		// movzx dstreg,[basep + 2*indp]
-		else if (sizep.value == DRCUML_SIZE_DWORD)
-			emit_mov_r32_m32(&dst, dstreg, MBISD(basereg, indreg, 4, baseoffs));		// mov   dstreg,[basep + 4*indp]
-		else if (sizep.value == DRCUML_SIZE_QWORD)
-			emit_mov_r64_m64(&dst, dstreg, MBISD(basereg, indreg, 8, baseoffs));		// mov   dstreg,[basep + 8*indp]
+		if (size == DRCUML_SIZE_BYTE)
+			emit_movzx_r32_m8(&dst, dstreg, MBISD(basereg, indreg, scale, baseoffs));	// movzx dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_WORD)
+			emit_movzx_r32_m16(&dst, dstreg, MBISD(basereg, indreg, scale, baseoffs));	// movzx dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_DWORD)
+			emit_mov_r32_m32(&dst, dstreg, MBISD(basereg, indreg, scale, baseoffs));	// mov   dstreg,[basep + scale*indp]
+		else if (size == DRCUML_SIZE_QWORD)
+			emit_mov_r64_m64(&dst, dstreg, MBISD(basereg, indreg, scale, baseoffs));	// mov   dstreg,[basep + scale*indp]
 	}
 
 	/* store result */
@@ -3870,8 +3872,8 @@ static x86code *op_load(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 
 static x86code *op_loads(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, basep, indp, sizep;
-	int basereg, dstreg;
+	drcuml_parameter dstp, basep, indp, scalesizep;
+	int basereg, dstreg, scale, size;
 	INT32 baseoffs;
 
 	/* validate instruction */
@@ -3880,7 +3882,9 @@ static x86code *op_loads(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	assert_no_flags(inst);
 
 	/* normalize parameters */
-	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &basep, PTYPE_M, &indp, PTYPE_MRI, &sizep, PTYPE_I);
+	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &basep, PTYPE_M, &indp, PTYPE_MRI, &scalesizep, PTYPE_I);
+	scale = 1 << (scalesizep.value / 16);
+	size = scalesizep.value % 16;
 
 	/* determine the pointer base */
 	basereg = get_base_register_and_offset(drcbe, &dst, basep.value, REG_RDX, &baseoffs);
@@ -3893,23 +3897,23 @@ static x86code *op_loads(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	{
 		if (inst->size == 4)
 		{
-			if (sizep.value == DRCUML_SIZE_BYTE)
-				emit_movsx_r32_m8(&dst, dstreg, MBD(basereg, baseoffs + 1*indp.value));	// movsx dstreg,[basep + 1*indp]
-			else if (sizep.value == DRCUML_SIZE_WORD)
-				emit_movsx_r32_m16(&dst, dstreg, MBD(basereg, baseoffs + 2*indp.value));// movsx dstreg,[basep + 2*indp]
-			else if (sizep.value == DRCUML_SIZE_DWORD)
-				emit_mov_r32_m32(&dst, dstreg, MBD(basereg, baseoffs + 4*indp.value));	// mov   dstreg,[basep + 4*indp]
+			if (size == DRCUML_SIZE_BYTE)
+				emit_movsx_r32_m8(&dst, dstreg, MBD(basereg, baseoffs + scale*indp.value));	// movsx dstreg,[basep + scale*indp]
+			else if (size == DRCUML_SIZE_WORD)
+				emit_movsx_r32_m16(&dst, dstreg, MBD(basereg, baseoffs + scale*indp.value));// movsx dstreg,[basep + scale*indp]
+			else if (size == DRCUML_SIZE_DWORD)
+				emit_mov_r32_m32(&dst, dstreg, MBD(basereg, baseoffs + scale*indp.value));	// mov   dstreg,[basep + scale*indp]
 		}
 		else if (inst->size == 8)
 		{
-			if (sizep.value == DRCUML_SIZE_BYTE)
-				emit_movsx_r64_m8(&dst, dstreg, MBD(basereg, baseoffs + 1*indp.value));	// movzx dstreg,[basep + 1*indp]
-			else if (sizep.value == DRCUML_SIZE_WORD)
-				emit_movsx_r64_m16(&dst, dstreg, MBD(basereg, baseoffs + 2*indp.value));// movzx dstreg,[basep + 2*indp]
-			else if (sizep.value == DRCUML_SIZE_DWORD)
-				emit_movsxd_r64_m32(&dst, dstreg, MBD(basereg, baseoffs + 4*indp.value));// movsxd dstreg,[basep + 4*indp]
-			else if (sizep.value == DRCUML_SIZE_QWORD)
-				emit_mov_r64_m64(&dst, dstreg, MBD(basereg, baseoffs + 8*indp.value));	// mov   dstreg,[basep + 8*indp]
+			if (size == DRCUML_SIZE_BYTE)
+				emit_movsx_r64_m8(&dst, dstreg, MBD(basereg, baseoffs + scale*indp.value));	// movzx dstreg,[basep + scale*indp]
+			else if (size == DRCUML_SIZE_WORD)
+				emit_movsx_r64_m16(&dst, dstreg, MBD(basereg, baseoffs + scale*indp.value));// movzx dstreg,[basep + scale*indp]
+			else if (size == DRCUML_SIZE_DWORD)
+				emit_movsxd_r64_m32(&dst, dstreg, MBD(basereg, baseoffs + scale*indp.value));// movsxd dstreg,[basep + scale*indp]
+			else if (size == DRCUML_SIZE_QWORD)
+				emit_mov_r64_m64(&dst, dstreg, MBD(basereg, baseoffs + scale*indp.value));	// mov   dstreg,[basep + scale*indp]
 		}
 	}
 
@@ -3920,23 +3924,23 @@ static x86code *op_loads(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);
 		if (inst->size == 4)
 		{
-			if (sizep.value == DRCUML_SIZE_BYTE)
-				emit_movsx_r32_m8(&dst, dstreg, MBISD(basereg, indreg, 1, baseoffs));	// movsx dstreg,[basep + 1*indp]
-			else if (sizep.value == DRCUML_SIZE_WORD)
-				emit_movsx_r32_m16(&dst, dstreg, MBISD(basereg, indreg, 2, baseoffs));	// movsx dstreg,[basep + 2*indp]
-			else if (sizep.value == DRCUML_SIZE_DWORD)
-				emit_mov_r32_m32(&dst, dstreg, MBISD(basereg, indreg, 4, baseoffs));	// mov   dstreg,[basep + 4*indp]
+			if (size == DRCUML_SIZE_BYTE)
+				emit_movsx_r32_m8(&dst, dstreg, MBISD(basereg, indreg, scale, baseoffs));	// movsx dstreg,[basep + scale*indp]
+			else if (size == DRCUML_SIZE_WORD)
+				emit_movsx_r32_m16(&dst, dstreg, MBISD(basereg, indreg, scale, baseoffs));	// movsx dstreg,[basep + scale*indp]
+			else if (size == DRCUML_SIZE_DWORD)
+				emit_mov_r32_m32(&dst, dstreg, MBISD(basereg, indreg, scale, baseoffs));	// mov   dstreg,[basep + scale*indp]
 		}
 		else if (inst->size == 8)
 		{
-			if (sizep.value == DRCUML_SIZE_BYTE)
-				emit_movsx_r64_m8(&dst, dstreg, MBISD(basereg, indreg, 1, baseoffs));	// movsx dstreg,[basep + 1*indp]
-			else if (sizep.value == DRCUML_SIZE_WORD)
-				emit_movsx_r64_m16(&dst, dstreg, MBISD(basereg, indreg, 2, baseoffs));	// movsx dstreg,[basep + 2*indp]
-			else if (sizep.value == DRCUML_SIZE_DWORD)
-				emit_movsxd_r64_m32(&dst, dstreg, MBISD(basereg, indreg, 4, baseoffs));	// movsxd dstreg,[basep + 4*indp]
-			else if (sizep.value == DRCUML_SIZE_QWORD)
-				emit_mov_r64_m64(&dst, dstreg, MBISD(basereg, indreg, 8, baseoffs));	// mov   dstreg,[basep + 8*indp]
+			if (size == DRCUML_SIZE_BYTE)
+				emit_movsx_r64_m8(&dst, dstreg, MBISD(basereg, indreg, scale, baseoffs));	// movsx dstreg,[basep + scale*indp]
+			else if (size == DRCUML_SIZE_WORD)
+				emit_movsx_r64_m16(&dst, dstreg, MBISD(basereg, indreg, scale, baseoffs));	// movsx dstreg,[basep + scale*indp]
+			else if (size == DRCUML_SIZE_DWORD)
+				emit_movsxd_r64_m32(&dst, dstreg, MBISD(basereg, indreg, scale, baseoffs));	// movsxd dstreg,[basep + scale*indp]
+			else if (size == DRCUML_SIZE_QWORD)
+				emit_mov_r64_m64(&dst, dstreg, MBISD(basereg, indreg, scale, baseoffs));	// mov   dstreg,[basep + scale*indp]
 		}
 	}
 
@@ -3956,8 +3960,8 @@ static x86code *op_loads(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 
 static x86code *op_store(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter srcp, basep, indp, sizep;
-	int srcreg, basereg;
+	drcuml_parameter srcp, basep, indp, scalesizep;
+	int srcreg, basereg, scale, size;
 	INT32 baseoffs;
 
 	/* validate instruction */
@@ -3966,7 +3970,9 @@ static x86code *op_store(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	assert_no_flags(inst);
 
 	/* normalize parameters */
-	param_normalize_4(drcbe, inst, &basep, PTYPE_M, &indp, PTYPE_MRI, &srcp, PTYPE_MRI, &sizep, PTYPE_I);
+	param_normalize_4(drcbe, inst, &basep, PTYPE_M, &indp, PTYPE_MRI, &srcp, PTYPE_MRI, &scalesizep, PTYPE_I);
+	scale = 1 << (scalesizep.value / 16);
+	size = scalesizep.value % 16;
 
 	/* determine the pointer base */
 	basereg = get_base_register_and_offset(drcbe, &dst, basep.value, REG_RDX, &baseoffs);
@@ -3980,21 +3986,21 @@ static x86code *op_store(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 		/* immediate source */
 		if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
 		{
-			if (sizep.value == DRCUML_SIZE_BYTE)
-				emit_mov_m8_imm(&dst, MBD(basereg, baseoffs + 1*indp.value), srcp.value);	// mov   [basep + 1*indp],srcp
-			else if (sizep.value == DRCUML_SIZE_WORD)
-				emit_mov_m16_imm(&dst, MBD(basereg, baseoffs + 2*indp.value), srcp.value);	// mov   [basep + 2*indp],srcp
-			else if (sizep.value == DRCUML_SIZE_DWORD)
-				emit_mov_m32_imm(&dst, MBD(basereg, baseoffs + 4*indp.value), srcp.value);	// mov   [basep + 4*indp],srcp
-			else if (sizep.value == DRCUML_SIZE_QWORD)
+			if (size == DRCUML_SIZE_BYTE)
+				emit_mov_m8_imm(&dst, MBD(basereg, baseoffs + scale*indp.value), srcp.value);	// mov   [basep + scale*indp],srcp
+			else if (size == DRCUML_SIZE_WORD)
+				emit_mov_m16_imm(&dst, MBD(basereg, baseoffs + scale*indp.value), srcp.value);	// mov   [basep + scale*indp],srcp
+			else if (size == DRCUML_SIZE_DWORD)
+				emit_mov_m32_imm(&dst, MBD(basereg, baseoffs + scale*indp.value), srcp.value);	// mov   [basep + scale*indp],srcp
+			else if (size == DRCUML_SIZE_QWORD)
 			{
 				if (short_immediate(srcp.value))
-					emit_mov_m64_imm(&dst, MBD(basereg, baseoffs + 8*indp.value), srcp.value);// mov   [basep + 8*indp],srcp
+					emit_mov_m64_imm(&dst, MBD(basereg, baseoffs + scale*indp.value), srcp.value);// mov   [basep + scale*indp],srcp
 				else
 				{
-					emit_mov_m32_imm(&dst, MBD(basereg, baseoffs + 8*indp.value), srcp.value);// mov   [basep + 8*indp],srcp
-					emit_mov_m32_imm(&dst, MBD(basereg, baseoffs + 8*indp.value + 4), srcp.value >> 32);
-																						// mov   [basep + 8*indp + 4],srcp >> 32
+					emit_mov_m32_imm(&dst, MBD(basereg, baseoffs + scale*indp.value), srcp.value);// mov   [basep + scale*indp],srcp
+					emit_mov_m32_imm(&dst, MBD(basereg, baseoffs + scale*indp.value + 4), srcp.value >> 32);
+																						// mov   [basep + scale*indp + 4],srcp >> 32
 				}
 			}
 		}
@@ -4002,18 +4008,18 @@ static x86code *op_store(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 		/* variable source */
 		else
 		{
-			if (sizep.value != DRCUML_SIZE_QWORD)
+			if (size != DRCUML_SIZE_QWORD)
 				emit_mov_r32_p32(drcbe, &dst, srcreg, &srcp);							// mov   srcreg,srcp
 			else
 				emit_mov_r64_p64(drcbe, &dst, srcreg, &srcp);							// mov   srcreg,srcp
-			if (sizep.value == DRCUML_SIZE_BYTE)
-				emit_mov_m8_r8(&dst, MBD(basereg, baseoffs + 1*indp.value), srcreg);	// mov   [basep + 1*indp],srcreg
-			else if (sizep.value == DRCUML_SIZE_WORD)
-				emit_mov_m16_r16(&dst, MBD(basereg, baseoffs + 2*indp.value), srcreg);	// mov   [basep + 2*indp],srcreg
-			else if (sizep.value == DRCUML_SIZE_DWORD)
-				emit_mov_m32_r32(&dst, MBD(basereg, baseoffs + 4*indp.value), srcreg);	// mov   [basep + 4*indp],srcreg
-			else if (sizep.value == DRCUML_SIZE_QWORD)
-				emit_mov_m64_r64(&dst, MBD(basereg, baseoffs + 8*indp.value), srcreg);	// mov   [basep + 8*indp],srcreg
+			if (size == DRCUML_SIZE_BYTE)
+				emit_mov_m8_r8(&dst, MBD(basereg, baseoffs + scale*indp.value), srcreg);	// mov   [basep + scale*indp],srcreg
+			else if (size == DRCUML_SIZE_WORD)
+				emit_mov_m16_r16(&dst, MBD(basereg, baseoffs + scale*indp.value), srcreg);	// mov   [basep + scale*indp],srcreg
+			else if (size == DRCUML_SIZE_DWORD)
+				emit_mov_m32_r32(&dst, MBD(basereg, baseoffs + scale*indp.value), srcreg);	// mov   [basep + scale*indp],srcreg
+			else if (size == DRCUML_SIZE_QWORD)
+				emit_mov_m64_r64(&dst, MBD(basereg, baseoffs + scale*indp.value), srcreg);	// mov   [basep + scale*indp],srcreg
 		}
 	}
 
@@ -4026,21 +4032,21 @@ static x86code *op_store(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 		/* immediate source */
 		if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
 		{
-			if (sizep.value == DRCUML_SIZE_BYTE)
-				emit_mov_m8_imm(&dst, MBISD(basereg, indreg, 1, baseoffs), srcp.value);	// mov   [basep + 1*ecx],srcp
-			else if (sizep.value == DRCUML_SIZE_WORD)
-				emit_mov_m16_imm(&dst, MBISD(basereg, indreg, 2, baseoffs), srcp.value);// mov   [basep + 2*ecx],srcp
-			else if (sizep.value == DRCUML_SIZE_DWORD)
-				emit_mov_m32_imm(&dst, MBISD(basereg, indreg, 4, baseoffs), srcp.value);// mov   [basep + 4*ecx],srcp
-			else if (sizep.value == DRCUML_SIZE_QWORD)
+			if (size == DRCUML_SIZE_BYTE)
+				emit_mov_m8_imm(&dst, MBISD(basereg, indreg, scale, baseoffs), srcp.value);	// mov   [basep + scale*ecx],srcp
+			else if (size == DRCUML_SIZE_WORD)
+				emit_mov_m16_imm(&dst, MBISD(basereg, indreg, scale, baseoffs), srcp.value);// mov   [basep + scale*ecx],srcp
+			else if (size == DRCUML_SIZE_DWORD)
+				emit_mov_m32_imm(&dst, MBISD(basereg, indreg, scale, baseoffs), srcp.value);// mov   [basep + scale*ecx],srcp
+			else if (size == DRCUML_SIZE_QWORD)
 			{
 				if (short_immediate(srcp.value))
-					emit_mov_m64_imm(&dst, MBISD(basereg, indreg, 8, baseoffs), srcp.value);// mov   [basep + 8*indp],srcp
+					emit_mov_m64_imm(&dst, MBISD(basereg, indreg, scale, baseoffs), srcp.value);// mov   [basep + scale*indp],srcp
 				else
 				{
-					emit_mov_m32_imm(&dst, MBISD(basereg, indreg, 8, baseoffs), srcp.value);// mov   [basep + 8*ecx],srcp
-					emit_mov_m32_imm(&dst, MBISD(basereg, indreg, 8, baseoffs + 4), srcp.value >> 32);
-																						// mov   [basep + 8*ecx + 4],srcp >> 32
+					emit_mov_m32_imm(&dst, MBISD(basereg, indreg, scale, baseoffs), srcp.value);// mov   [basep + scale*ecx],srcp
+					emit_mov_m32_imm(&dst, MBISD(basereg, indreg, scale, baseoffs + 4), srcp.value >> 32);
+																						// mov   [basep + scale*ecx + 4],srcp >> 32
 				}
 			}
 		}
@@ -4048,18 +4054,18 @@ static x86code *op_store(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 		/* variable source */
 		else
 		{
-			if (sizep.value != DRCUML_SIZE_QWORD)
+			if (size != DRCUML_SIZE_QWORD)
 				emit_mov_r32_p32(drcbe, &dst, srcreg, &srcp);							// mov   srcreg,srcp
 			else
 				emit_mov_r64_p64(drcbe, &dst, srcreg, &srcp);							// mov   edx:srcreg,srcp
-			if (sizep.value == DRCUML_SIZE_BYTE)
-				emit_mov_m8_r8(&dst, MBISD(basereg, indreg, 1, baseoffs), srcreg);		// mov   [basep + 1*ecx],srcreg
-			else if (sizep.value == DRCUML_SIZE_WORD)
-				emit_mov_m16_r16(&dst, MBISD(basereg, indreg, 2, baseoffs), srcreg);	// mov   [basep + 2*ecx],srcreg
-			else if (sizep.value == DRCUML_SIZE_DWORD)
-				emit_mov_m32_r32(&dst, MBISD(basereg, indreg, 4, baseoffs), srcreg);	// mov   [basep + 4*ecx],srcreg
-			else if (sizep.value == DRCUML_SIZE_QWORD)
-				emit_mov_m64_r64(&dst, MBISD(basereg, indreg, 8, baseoffs), srcreg);	// mov   [basep + 8*ecx],srcreg
+			if (size == DRCUML_SIZE_BYTE)
+				emit_mov_m8_r8(&dst, MBISD(basereg, indreg, scale, baseoffs), srcreg);	// mov   [basep + scale*ecx],srcreg
+			else if (size == DRCUML_SIZE_WORD)
+				emit_mov_m16_r16(&dst, MBISD(basereg, indreg, scale, baseoffs), srcreg);// mov   [basep + scale*ecx],srcreg
+			else if (size == DRCUML_SIZE_DWORD)
+				emit_mov_m32_r32(&dst, MBISD(basereg, indreg, scale, baseoffs), srcreg);// mov   [basep + scale*ecx],srcreg
+			else if (size == DRCUML_SIZE_QWORD)
+				emit_mov_m64_r64(&dst, MBISD(basereg, indreg, scale, baseoffs), srcreg);// mov   [basep + scale*ecx],srcreg
 		}
 	}
 	return dst;
