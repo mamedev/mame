@@ -6,8 +6,6 @@
 
 #include "driver.h"
 #include "mw8080bw.h"
-#include "machine/mb14241.h"
-
 
 /*************************************
  *
@@ -108,7 +106,6 @@ static void mw8080bw_start_interrupt_timer(running_machine *machine)
 MACHINE_START( mw8080bw )
 {
 	mw8080bw_create_interrupt_timer(machine);
-	mb14241_init(machine,0);
 }
 
 

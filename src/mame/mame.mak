@@ -326,7 +326,6 @@ DRVLIBS = \
 #-------------------------------------------------
 
 $(MAMEOBJ)/shared.a: \
-	$(MACHINE)/mb14241.o \
 	$(MACHINE)/nmk112.o \
 	$(MACHINE)/pckeybrd.o \
 	$(MACHINE)/pcshare.o \

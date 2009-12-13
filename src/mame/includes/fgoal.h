@@ -14,11 +14,11 @@ struct _fgoal_state
 	/* misc */
 	int        fgoal_player;
 	UINT8      row, col;
-	unsigned   shift_data, shift_bits;
 	int        prev_coin;
 
 	/* devices */
 	const device_config *maincpu;
+	const device_config *mb14241;
 };
 
 

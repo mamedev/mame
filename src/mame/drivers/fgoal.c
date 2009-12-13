@@ -18,6 +18,7 @@ Differences between these sets include
 
 #include "driver.h"
 #include "cpu/m6800/m6800.h"
+#include "machine/mb14241.h"
 #include "includes/fgoal.h"
 
 
@@ -138,24 +139,18 @@ static READ8_HANDLER( fgoal_row_r )
 static WRITE8_HANDLER( fgoal_row_w )
 {
 	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+
 	state->row = data;
-	state->shift_data = state->shift_data >> 8;
+	mb14241_shift_data_w(state->mb14241, 0, 0);
 }
 
 static WRITE8_HANDLER( fgoal_col_w )
 {
 	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
+
 	state->col = data;
-	state->shift_bits = data & 7;
+	mb14241_shift_count_w(state->mb14241, 0, data);
 }
-
-
-static WRITE8_HANDLER( fgoal_shifter_w )
-{
-	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
-	state->shift_data = (state->shift_data >> 8) | (data << 8); /* MB14241 custom chip */
-}
-
 
 static READ8_HANDLER( fgoal_address_hi_r )
 {
@@ -167,11 +162,10 @@ static READ8_HANDLER( fgoal_address_lo_r )
 	return video_ram_address(space->machine) & 0xff;
 }
 
-
 static READ8_HANDLER( fgoal_shifter_r )
 {
 	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
-	UINT8 v = state->shift_data >> (8 - state->shift_bits);
+	UINT8 v = mb14241_shift_result_r(state->mb14241, 0);
 
 	return BITSWAP8(v, 7, 6, 5, 4, 3, 2, 1, 0);
 }
@@ -179,7 +173,7 @@ static READ8_HANDLER( fgoal_shifter_r )
 static READ8_HANDLER( fgoal_shifter_reverse_r )
 {
 	fgoal_state *state = (fgoal_state *)space->machine->driver_data;
-	UINT8 v = state->shift_data >> (8 - state->shift_bits);
+	UINT8 v = mb14241_shift_result_r(state->mb14241, 0);
 
 	return BITSWAP8(v, 0, 1, 2, 3, 4, 5, 6, 7);
 }
@@ -230,7 +224,7 @@ static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00f1, 0x00f1) AM_WRITE(fgoal_col_w)
 	AM_RANGE(0x00f2, 0x00f2) AM_WRITE(fgoal_row_w)
 	AM_RANGE(0x00f3, 0x00f3) AM_WRITE(fgoal_col_w)
-	AM_RANGE(0x00f4, 0x00f7) AM_WRITE(fgoal_shifter_w)
+	AM_RANGE(0x00f4, 0x00f7) AM_DEVWRITE("mb14241", mb14241_shift_data_w)
 	AM_RANGE(0x00f8, 0x00fb) AM_WRITE(fgoal_sound1_w)
 	AM_RANGE(0x00fc, 0x00ff) AM_WRITE(fgoal_sound2_w)
 
@@ -347,6 +341,7 @@ static MACHINE_START( fgoal )
 	fgoal_state *state = (fgoal_state *)machine->driver_data;
 
 	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->mb14241 = devtag_get_device(machine, "mb14241");
 
 	state_save_register_global(machine, state->xpos);
 	state_save_register_global(machine, state->ypos);
@@ -354,8 +349,6 @@ static MACHINE_START( fgoal )
 	state_save_register_global(machine, state->fgoal_player);
 	state_save_register_global(machine, state->row);
 	state_save_register_global(machine, state->col);
-	state_save_register_global(machine, state->shift_data);
-	state_save_register_global(machine, state->shift_bits);
 	state_save_register_global(machine, state->prev_coin);
 }
 
@@ -371,8 +364,6 @@ static MACHINE_RESET( fgoal )
 	state->fgoal_player = 0;
 	state->row = 0;
 	state->col = 0;
-	state->shift_data = 0;
-	state->shift_bits = 0;
 	state->prev_coin = 0;
 }
 
@@ -387,6 +378,9 @@ static MACHINE_DRIVER_START( fgoal )
 
 	MDRV_MACHINE_START(fgoal)
 	MDRV_MACHINE_RESET(fgoal)
+
+	/* add shifter */
+	MDRV_MB14241_ADD("mb14241")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
