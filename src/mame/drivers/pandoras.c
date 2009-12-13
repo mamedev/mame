@@ -32,6 +32,7 @@ Boards:
 
 
 #define MASTER_CLOCK		XTAL_18_432MHz
+#define SOUND_CLOCK			XTAL_14_31818MHz
 
 
 static INTERRUPT_GEN( pandoras_master_interrupt )
@@ -362,10 +363,10 @@ static MACHINE_DRIVER_START( pandoras )
 	MDRV_CPU_PROGRAM_MAP(pandoras_slave_map)
 	MDRV_CPU_VBLANK_INT("screen", pandoras_slave_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/8)
+	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(pandoras_sound_map)
 
-	MDRV_CPU_ADD("mcu", I8039, MASTER_CLOCK/2)
+	MDRV_CPU_ADD("mcu", I8039, SOUND_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(pandoras_i8039_map)
 	MDRV_CPU_IO_MAP(pandoras_i8039_io_map)
 
@@ -392,7 +393,7 @@ static MACHINE_DRIVER_START( pandoras )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
+	MDRV_SOUND_ADD("aysnd", AY8910, SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
