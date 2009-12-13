@@ -354,6 +354,7 @@
 
 /* function definition for a get info callback */
 #define TILE_GET_INFO(_name)			void _name(running_machine *machine, tile_data *tileinfo, tilemap_memory_index tile_index, void *param)
+#define TILE_GET_INFO_DEVICE(_name)		void _name(const device_config *device, tile_data *tileinfo, tilemap_memory_index tile_index, void *param)
 
 /* function definition for a logical-to-memory mapper */
 #define TILEMAP_MAPPER(_name)			tilemap_memory_index _name(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
