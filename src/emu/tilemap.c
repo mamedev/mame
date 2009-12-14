@@ -291,15 +291,12 @@ void tilemap_init(running_machine *machine)
 
 	if (machine->primary_screen == NULL)
 		return;
-
+	
 	screen_width  = video_screen_get_width(machine->primary_screen);
 	screen_height = video_screen_get_height(machine->primary_screen);
 
 	if (screen_width != 0 && screen_height != 0)
 	{
-		machine->tilemap_data = auto_alloc_clear(machine, tilemap_private);
-		machine->tilemap_data->tailptr = &machine->tilemap_data->list;
-
 		machine->priority_bitmap = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
 		add_exit_callback(machine, tilemap_exit);
 	}
@@ -340,8 +337,16 @@ tilemap *tilemap_create_device(const device_config *device, tile_get_info_device
 static tilemap *tilemap_create_common(running_machine *machine, void *get_info_object, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
 {
 	tilemap *tmap;
-	int tilemap_instance = machine->tilemap_data->instance;
+	int tilemap_instance;
 	int group;
+
+	/* if no tilemap private data yet, allocate it */
+	if (machine->tilemap_data == NULL)
+	{
+		machine->tilemap_data = auto_alloc_clear(machine, tilemap_private);
+		machine->tilemap_data->tailptr = &machine->tilemap_data->list;
+	}
+	tilemap_instance = machine->tilemap_data->instance;
 
 	/* allocate the tilemap itself */
 	tmap = alloc_clear_or_die(tilemap);
