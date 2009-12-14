@@ -5,22 +5,10 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "mw8080bw.h"
 #include "sound/samples.h"
 #include "sound/sn76477.h"
 #include "sound/discrete.h"
-
-
-
-/*************************************
- *
- *  Globals
- *
- *************************************/
-
-static UINT8 port_1_last;
-static UINT8 port_2_last;
-
+#include "includes/mw8080bw.h"
 
 
 /*************************************
@@ -31,11 +19,12 @@ static UINT8 port_2_last;
 
 static SOUND_START( samples )
 {
-	/* setup for save states */
-	state_save_register_global(machine, port_1_last);
-	state_save_register_global(machine, port_2_last);
-}
+	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
 
+	/* setup for save states */
+	state_save_register_global(machine, state->port_1_last);
+	state_save_register_global(machine, state->port_2_last);
+}
 
 
 /*************************************
@@ -45,12 +34,12 @@ static SOUND_START( samples )
  *
  *************************************/
 
-#define MIDWAY_TONE_EN				NODE_100
-#define MIDWAY_TONE_DATA_L			NODE_101
-#define MIDWAY_TONE_DATA_H			NODE_102
-#define MIDWAY_TONE_SND				NODE_103
-#define MIDWAY_TONE_TRASFORM_OUT	NODE_104
-#define MIDWAY_TONE_BEFORE_AMP_SND	NODE_105
+#define MIDWAY_TONE_EN              NODE_100
+#define MIDWAY_TONE_DATA_L          NODE_101
+#define MIDWAY_TONE_DATA_H          NODE_102
+#define MIDWAY_TONE_SND             NODE_103
+#define MIDWAY_TONE_TRASFORM_OUT    NODE_104
+#define MIDWAY_TONE_BEFORE_AMP_SND  NODE_105
 
 
 #define MIDWAY_TONE_GENERATOR(discrete_op_amp_tvca_info) \
@@ -176,29 +165,29 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( seawolf_audio_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
-	UINT8 rising_bits = data & ~port_1_last;
+	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	UINT8 rising_bits = data & ~state->port_1_last;
 
 	/* if (data & 0x01)  enable SHIP HIT sound */
-	if (rising_bits & 0x01) sample_start(samples, 0, 0, 0);
+	if (rising_bits & 0x01) sample_start(state->samples, 0, 0, 0);
 
 	/* if (data & 0x02)  enable TORPEDO sound */
-	if (rising_bits & 0x02) sample_start(samples, 1, 1, 0);
+	if (rising_bits & 0x02) sample_start(state->samples, 1, 1, 0);
 
 	/* if (data & 0x04)  enable DIVE sound */
-	if (rising_bits & 0x04) sample_start(samples, 2, 2, 0);
+	if (rising_bits & 0x04) sample_start(state->samples, 2, 2, 0);
 
 	/* if (data & 0x08)  enable SONAR sound */
-	if (rising_bits & 0x08) sample_start(samples, 3, 3, 0);
+	if (rising_bits & 0x08) sample_start(state->samples, 3, 3, 0);
 
 	/* if (data & 0x10)  enable MINE HIT sound */
-	if (rising_bits & 0x10) sample_start(samples, 4, 4, 0);
+	if (rising_bits & 0x10) sample_start(state->samples, 4, 4, 0);
 
 	coin_counter_w(space->machine, 0, (data >> 5) & 0x01);
 
 	/* D6 and D7 are not connected */
 
-	port_1_last = data;
+	state->port_1_last = data;
 }
 
 
@@ -242,8 +231,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( gunfight_audio_w )
 {
-	const device_config *samples0 = devtag_get_device(space->machine, "samples1");
-	const device_config *samples1 = devtag_get_device(space->machine, "samples2");
+	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
 
 	/* D0 and D1 are just tied to 1k resistors */
 
@@ -257,26 +245,26 @@ WRITE8_HANDLER( gunfight_audio_w )
 
 	case 0x01:
 		/* enable LEFT SHOOT sound (left speaker) */
-		sample_start(samples0, 0, 0, 0);
+		sample_start(state->samples1, 0, 0, 0);
 		break;
 
 	case 0x02:
 		/* enable RIGHT SHOOT sound (right speaker) */
-		sample_start(samples1, 0, 0, 0);
+		sample_start(state->samples2, 0, 0, 0);
 		break;
 
 	case 0x03:
 		/* enable LEFT HIT sound (left speaker) */
-		sample_start(samples0, 0, 1, 0);
+		sample_start(state->samples1, 0, 1, 0);
 		break;
 
 	case 0x04:
 		/* enable RIGHT HIT sound (right speaker) */
-		sample_start(samples1, 0, 1, 0);
+		sample_start(state->samples2, 0, 1, 0);
 		break;
 
 	default:
-		logerror("%04x:  Unknown sh port write %02x\n",cpu_get_pc(space->cpu),data);
+		logerror("%04x:  Unknown sh port write %02x\n", cpu_get_pc(space->cpu), data);
 		break;
 	}
 }
@@ -289,19 +277,19 @@ WRITE8_HANDLER( gunfight_audio_w )
  *
  *************************************/
 
-#define TORNBASE_SQUAREW_240		NODE_01
-#define TORNBASE_SQUAREW_960		NODE_02
-#define TORNBASE_SQUAREW_120		NODE_03
+#define TORNBASE_SQUAREW_240        NODE_01
+#define TORNBASE_SQUAREW_960        NODE_02
+#define TORNBASE_SQUAREW_120        NODE_03
 
-#define TORNBASE_TONE_240_EN		NODE_04
-#define TORNBASE_TONE_960_EN		NODE_05
-#define TORNBASE_TONE_120_EN		NODE_06
+#define TORNBASE_TONE_240_EN        NODE_04
+#define TORNBASE_TONE_960_EN        NODE_05
+#define TORNBASE_TONE_120_EN        NODE_06
 
-#define TORNBASE_TONE_240_SND		NODE_07
-#define TORNBASE_TONE_960_SND		NODE_08
-#define TORNBASE_TONE_120_SND		NODE_09
-#define TORNBASE_TONE_SND			NODE_10
-#define TORNBASE_TONE_SND_FILT		NODE_11
+#define TORNBASE_TONE_240_SND       NODE_07
+#define TORNBASE_TONE_960_SND       NODE_08
+#define TORNBASE_TONE_120_SND       NODE_09
+#define TORNBASE_TONE_SND           NODE_10
+#define TORNBASE_TONE_SND_FILT      NODE_11
 
 
 static DISCRETE_SOUND_START(tornbase)
@@ -425,22 +413,22 @@ WRITE8_HANDLER( zzzap_audio_2_w )
  *************************************/
 
 /* nodes - inputs */
-#define MAZE_P1_DATA			NODE_01
-#define MAZE_P2_DATA			NODE_02
-#define MAZE_TONE_TIMING		NODE_03
-#define MAZE_COIN				NODE_04
+#define MAZE_P1_DATA             NODE_01
+#define MAZE_P2_DATA             NODE_02
+#define MAZE_TONE_TIMING         NODE_03
+#define MAZE_COIN                NODE_04
 
 /* nodes - other */
-#define MAZE_JOYSTICK_IN_USE	NODE_11
-#define MAZE_AUDIO_ENABLE		NODE_12
-#define MAZE_TONE_ENABLE		NODE_13
-#define MAZE_GAME_OVER			NODE_14
-#define MAZE_R305_306_308		NODE_15
-#define MAZE_R303_309			NODE_16
-#define MAZE_PLAYER_SEL			NODE_17
+#define MAZE_JOYSTICK_IN_USE     NODE_11
+#define MAZE_AUDIO_ENABLE        NODE_12
+#define MAZE_TONE_ENABLE         NODE_13
+#define MAZE_GAME_OVER           NODE_14
+#define MAZE_R305_306_308        NODE_15
+#define MAZE_R303_309            NODE_16
+#define MAZE_PLAYER_SEL          NODE_17
 
 /* nodes - sounds */
-#define MAZE_SND				NODE_18
+#define MAZE_SND                 NODE_18
 
 
 static const discrete_555_desc maze_555_F2 =
@@ -618,21 +606,21 @@ void maze_write_discrete(const device_config *device, UINT8 maze_tone_timing_sta
  *************************************/
 
 /* nodes - inputs */
-#define BOOTHILL_GAME_ON_EN			NODE_01
-#define BOOTHILL_LEFT_SHOT_EN		NODE_02
-#define BOOTHILL_RIGHT_SHOT_EN		NODE_03
-#define BOOTHILL_LEFT_HIT_EN		NODE_04
-#define BOOTHILL_RIGHT_HIT_EN		NODE_05
+#define BOOTHILL_GAME_ON_EN         NODE_01
+#define BOOTHILL_LEFT_SHOT_EN       NODE_02
+#define BOOTHILL_RIGHT_SHOT_EN      NODE_03
+#define BOOTHILL_LEFT_HIT_EN        NODE_04
+#define BOOTHILL_RIGHT_HIT_EN       NODE_05
 
 /* nodes - sounds */
-#define BOOTHILL_NOISE				NODE_06
-#define BOOTHILL_L_SHOT_SND			NODE_07
-#define BOOTHILL_R_SHOT_SND			NODE_08
-#define BOOTHILL_L_HIT_SND			NODE_09
-#define BOOTHILL_R_HIT_SND			NODE_10
+#define BOOTHILL_NOISE              NODE_06
+#define BOOTHILL_L_SHOT_SND         NODE_07
+#define BOOTHILL_R_SHOT_SND         NODE_08
+#define BOOTHILL_L_HIT_SND          NODE_09
+#define BOOTHILL_R_HIT_SND          NODE_10
 
 /* nodes - adjusters */
-#define BOOTHILL_MUSIC_ADJ			NODE_11
+#define BOOTHILL_MUSIC_ADJ          NODE_11
 
 
 static const discrete_op_amp_tvca_info boothill_tone_tvca_info =
@@ -862,23 +850,23 @@ WRITE8_DEVICE_HANDLER( boothill_audio_w )
  *************************************/
 
 /* nodes - inputs */
-#define CHECKMAT_BOOM_EN			NODE_01
-#define CHECKMAT_TONE_EN			NODE_02
-#define CHECKMAT_TONE_DATA_45		NODE_03
-#define CHECKMAT_TONE_DATA_67		NODE_04
+#define CHECKMAT_BOOM_EN            NODE_01
+#define CHECKMAT_TONE_EN            NODE_02
+#define CHECKMAT_TONE_DATA_45       NODE_03
+#define CHECKMAT_TONE_DATA_67       NODE_04
 
 /* nodes - other */
-#define CHECKMAT_R401_402_400		NODE_06
-#define CHECKMAT_R407_406_410		NODE_07
+#define CHECKMAT_R401_402_400       NODE_06
+#define CHECKMAT_R407_406_410       NODE_07
 
 /* nodes - sounds */
-#define CHECKMAT_BOOM_SND			NODE_10
-#define CHECKMAT_TONE_SND			NODE_11
-#define CHECKMAT_FINAL_SND			NODE_12
+#define CHECKMAT_BOOM_SND           NODE_10
+#define CHECKMAT_TONE_SND           NODE_11
+#define CHECKMAT_FINAL_SND          NODE_12
 
 /* nodes - adjusters */
-#define CHECKMAT_R309				NODE_15
-#define CHECKMAT_R411				NODE_16
+#define CHECKMAT_R309               NODE_15
+#define CHECKMAT_R411               NODE_16
 
 
 static const discrete_comp_adder_table checkmat_r401_402_400 =
@@ -1090,25 +1078,25 @@ WRITE8_DEVICE_HANDLER( checkmat_audio_w )
  *************************************/
 
 /* nodes - inputs */
-#define DESERTGU_GAME_ON_EN					NODE_01
-#define DESERTGU_RIFLE_SHOT_EN				NODE_02
-#define DESERTGU_BOTTLE_HIT_EN				NODE_03
-#define DESERTGU_ROAD_RUNNER_HIT_EN			NODE_04
-#define DESERTGU_CREATURE_HIT_EN			NODE_05
-#define DESERTGU_ROADRUNNER_BEEP_BEEP_EN	NODE_06
-#define DESERTGU_TRIGGER_CLICK_EN			NODE_07
+#define DESERTGU_GAME_ON_EN                   NODE_01
+#define DESERTGU_RIFLE_SHOT_EN                NODE_02
+#define DESERTGU_BOTTLE_HIT_EN                NODE_03
+#define DESERTGU_ROAD_RUNNER_HIT_EN           NODE_04
+#define DESERTGU_CREATURE_HIT_EN              NODE_05
+#define DESERTGU_ROADRUNNER_BEEP_BEEP_EN      NODE_06
+#define DESERTGU_TRIGGER_CLICK_EN             NODE_07
 
 /* nodes - sounds */
-#define DESERTGU_NOISE						NODE_08
-#define DESERTGU_RIFLE_SHOT_SND				NODE_09
-#define DESERTGU_BOTTLE_HIT_SND				NODE_10
-#define DESERTGU_ROAD_RUNNER_HIT_SND		NODE_11
-#define DESERTGU_CREATURE_HIT_SND			NODE_12
-#define DESERTGU_ROADRUNNER_BEEP_BEEP_SND	NODE_13
-#define DESERTGU_TRIGGER_CLICK_SND			DESERTGU_TRIGGER_CLICK_EN
+#define DESERTGU_NOISE                        NODE_08
+#define DESERTGU_RIFLE_SHOT_SND               NODE_09
+#define DESERTGU_BOTTLE_HIT_SND               NODE_10
+#define DESERTGU_ROAD_RUNNER_HIT_SND          NODE_11
+#define DESERTGU_CREATURE_HIT_SND             NODE_12
+#define DESERTGU_ROADRUNNER_BEEP_BEEP_SND     NODE_13
+#define DESERTGU_TRIGGER_CLICK_SND            DESERTGU_TRIGGER_CLICK_EN
 
 /* nodes - adjusters */
-#define DESERTGU_MUSIC_ADJ					NODE_15
+#define DESERTGU_MUSIC_ADJ                    NODE_15
 
 
 static const discrete_op_amp_tvca_info desertgu_rifle_shot_tvca_info =
@@ -1296,13 +1284,15 @@ WRITE8_DEVICE_HANDLER( desertgu_audio_1_w )
 
 WRITE8_DEVICE_HANDLER( desertgu_audio_2_w )
 {
+	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
+
 	discrete_sound_w(device, DESERTGU_ROADRUNNER_BEEP_BEEP_EN, (data >> 0) & 0x01);
 
 	discrete_sound_w(device, DESERTGU_TRIGGER_CLICK_EN, (data >> 1) & 0x01);
 
 	output_set_value("KICKER", (data >> 2) & 0x01);
 
-	desertgun_set_controller_select((data >> 3) & 0x01);
+	state->desertgun_controller_select = (data >> 3) & 0x01;
 
 	/* D4-D7 are not connected */
 }
@@ -1318,21 +1308,21 @@ WRITE8_DEVICE_HANDLER( desertgu_audio_2_w )
  *************************************/
 
 /* nodes - inputs */
-#define DPLAY_GAME_ON_EN	NODE_01
-#define DPLAY_TONE_ON_EN	NODE_02
-#define DPLAY_SIREN_EN		NODE_03
-#define DPLAY_WHISTLE_EN	NODE_04
-#define DPLAY_CHEER_EN		NODE_05
+#define DPLAY_GAME_ON_EN      NODE_01
+#define DPLAY_TONE_ON_EN      NODE_02
+#define DPLAY_SIREN_EN        NODE_03
+#define DPLAY_WHISTLE_EN      NODE_04
+#define DPLAY_CHEER_EN        NODE_05
 
 /* nodes - sounds */
-#define DPLAY_NOISE			NODE_06
-#define DPLAY_TONE_SND		NODE_07
-#define DPLAY_SIREN_SND		NODE_08
-#define DPLAY_WHISTLE_SND	NODE_09
-#define DPLAY_CHEER_SND		NODE_10
+#define DPLAY_NOISE           NODE_06
+#define DPLAY_TONE_SND        NODE_07
+#define DPLAY_SIREN_SND       NODE_08
+#define DPLAY_WHISTLE_SND     NODE_09
+#define DPLAY_CHEER_SND       NODE_10
 
 /* nodes - adjusters */
-#define DPLAY_MUSIC_ADJ		NODE_11
+#define DPLAY_MUSIC_ADJ       NODE_11
 
 
 static const discrete_lfsr_desc dplay_lfsr =
@@ -1603,9 +1593,8 @@ WRITE8_HANDLER( gmissile_audio_1_w )
        reversed (D5=R, D7=L), but the software confirms that
        ours is right */
 
-	const device_config *samples0 = devtag_get_device(space->machine, "samples1");
-	const device_config *samples1 = devtag_get_device(space->machine, "samples2");
-	UINT8 rising_bits = data & ~port_1_last;
+	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	UINT8 rising_bits = data & ~state->port_1_last;
 
 	/* D0 and D1 are not connected */
 
@@ -1614,20 +1603,20 @@ WRITE8_HANDLER( gmissile_audio_1_w )
 	sound_global_enable(space->machine, (data >> 3) & 0x01);
 
 	/* if (data & 0x10)  enable RIGHT MISSILE sound (goes to right speaker) */
-	if (rising_bits & 0x10) sample_start(samples1, 0, 0, 0);
+	if (rising_bits & 0x10) sample_start(state->samples2, 0, 0, 0);
 
 	/* if (data & 0x20)  enable LEFT EXPLOSION sound (goes to left speaker) */
 	output_set_value("L_EXP_LIGHT", (data >> 5) & 0x01);
-	if (rising_bits & 0x20) sample_start(samples0, 0, 1, 0);
+	if (rising_bits & 0x20) sample_start(state->samples1, 0, 1, 0);
 
 	/* if (data & 0x40)  enable LEFT MISSILE sound (goes to left speaker) */
-	if (rising_bits & 0x40) sample_start(samples0, 0, 0, 0);
+	if (rising_bits & 0x40) sample_start(state->samples1, 0, 0, 0);
 
 	/* if (data & 0x80)  enable RIGHT EXPLOSION sound (goes to right speaker) */
 	output_set_value("R_EXP_LIGHT", (data >> 7) & 0x01);
-	if (rising_bits & 0x80) sample_start(samples1, 0, 1, 0);
+	if (rising_bits & 0x80) sample_start(state->samples2, 0, 1, 0);
 
-	port_1_last = data;
+	state->port_1_last = data;
 }
 
 
@@ -1699,9 +1688,8 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( m4_audio_1_w )
 {
-	const device_config *samples0 = devtag_get_device(space->machine, "samples1");
-	const device_config *samples1 = devtag_get_device(space->machine, "samples2");
-	UINT8 rising_bits = data & ~port_1_last;
+	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	UINT8 rising_bits = data & ~state->port_1_last;
 
 	/* D0 and D1 are not connected */
 
@@ -1710,32 +1698,31 @@ WRITE8_HANDLER( m4_audio_1_w )
 	sound_global_enable(space->machine, (data >> 3) & 0x01);
 
 	/* if (data & 0x10)  enable LEFT PLAYER SHOT sound (goes to left speaker) */
-	if (rising_bits & 0x10) sample_start(samples0, 0, 0, 0);
+	if (rising_bits & 0x10) sample_start(state->samples1, 0, 0, 0);
 
 	/* if (data & 0x20)  enable RIGHT PLAYER SHOT sound (goes to right speaker) */
-	if (rising_bits & 0x20) sample_start(samples1, 0, 0, 0);
+	if (rising_bits & 0x20) sample_start(state->samples2, 0, 0, 0);
 
 	/* if (data & 0x40)  enable LEFT PLAYER EXPLOSION sound via 300K res (goes to left speaker) */
-	if (rising_bits & 0x40) sample_start(samples0, 1, 1, 0);
+	if (rising_bits & 0x40) sample_start(state->samples1, 1, 1, 0);
 
 	/* if (data & 0x80)  enable RIGHT PLAYER EXPLOSION sound via 300K res (goes to right speaker) */
-	if (rising_bits & 0x80) sample_start(samples1, 1, 1, 0);
+	if (rising_bits & 0x80) sample_start(state->samples2, 1, 1, 0);
 
-	port_1_last = data;
+	state->port_1_last = data;
 }
 
 
 WRITE8_HANDLER( m4_audio_2_w )
 {
-	const device_config *samples0 = devtag_get_device(space->machine, "samples1");
-	const device_config *samples1 = devtag_get_device(space->machine, "samples2");
-	UINT8 rising_bits = data & ~port_2_last;
+	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	UINT8 rising_bits = data & ~state->port_2_last;
 
 	/* if (data & 0x01)  enable LEFT PLAYER EXPLOSION sound via 510K res (goes to left speaker) */
-	if (rising_bits & 0x01) sample_start(samples0, 1, 1, 0);
+	if (rising_bits & 0x01) sample_start(state->samples1, 1, 1, 0);
 
 	/* if (data & 0x02)  enable RIGHT PLAYER EXPLOSION sound via 510K res (goes to right speaker) */
-	if (rising_bits & 0x02) sample_start(samples1, 1, 1, 0);
+	if (rising_bits & 0x02) sample_start(state->samples2, 1, 1, 0);
 
 	/* if (data & 0x04)  enable LEFT TANK MOTOR sound (goes to left speaker) */
 
@@ -1749,7 +1736,7 @@ WRITE8_HANDLER( m4_audio_2_w )
 
 	/* D6 and D7 are not connected */
 
-	port_2_last = data;
+	state->port_2_last = data;
 }
 
 
@@ -1763,20 +1750,20 @@ WRITE8_HANDLER( m4_audio_2_w )
  *************************************/
 
 /* nodes - inputs */
-#define CLOWNS_POP_BOTTOM_EN		NODE_01
-#define CLOWNS_POP_MIDDLE_EN		NODE_02
-#define CLOWNS_POP_TOP_EN			NODE_03
-#define CLOWNS_SPRINGBOARD_HIT_EN	NODE_04
-#define CLOWNS_SPRINGBOARD_MISS_EN	NODE_05
+#define CLOWNS_POP_BOTTOM_EN        NODE_01
+#define CLOWNS_POP_MIDDLE_EN        NODE_02
+#define CLOWNS_POP_TOP_EN           NODE_03
+#define CLOWNS_SPRINGBOARD_HIT_EN   NODE_04
+#define CLOWNS_SPRINGBOARD_MISS_EN  NODE_05
 
 /* nodes - sounds */
-#define CLOWNS_NOISE				NODE_06
-#define CLOWNS_POP_SND				NODE_07
-#define CLOWNS_SB_HIT_SND			NODE_08
-#define CLOWNS_SB_MISS_SND			NODE_09
+#define CLOWNS_NOISE                NODE_06
+#define CLOWNS_POP_SND              NODE_07
+#define CLOWNS_SB_HIT_SND           NODE_08
+#define CLOWNS_SB_MISS_SND          NODE_09
 
 /* nodes - adjusters */
-#define CLOWNS_R507_POT				NODE_11
+#define CLOWNS_R507_POT             NODE_11
 
 
 static const discrete_op_amp_tvca_info clowns_pop_tvca_info =
@@ -1963,9 +1950,10 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( clowns_audio_1_w )
 {
+	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
 	coin_counter_w(space->machine, 0, (data >> 0) & 0x01);
 
-	clowns_set_controller_select((data >> 1) & 0x01);
+	state->clowns_controller_select = (data >> 1) & 0x01;
 
 	/* D2-D7 are not connected */
 }
@@ -1973,8 +1961,8 @@ WRITE8_HANDLER( clowns_audio_1_w )
 
 WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
 {
-	const device_config *samples = devtag_get_device(device->machine, "samples");
-	UINT8 rising_bits = data & ~port_2_last;
+	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
+	UINT8 rising_bits = data & ~state->port_2_last;
 
 	discrete_sound_w(device, CLOWNS_POP_BOTTOM_EN, (data >> 0) & 0x01);
 
@@ -1986,11 +1974,11 @@ WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
 
 	discrete_sound_w(device, CLOWNS_SPRINGBOARD_HIT_EN, (data >> 4) & 0x01);
 
-	if (rising_bits & 0x20) sample_start(samples, 0, 0, 0);  /* springboard miss */
+	if (rising_bits & 0x20) sample_start(state->samples, 0, 0, 0);  /* springboard miss */
 
 	/* D6 and D7 are not connected */
 
-	port_2_last = data;
+	state->port_2_last = data;
 }
 
 
@@ -2004,24 +1992,24 @@ WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
  *************************************/
 
  /* Discrete Sound Input Nodes */
-#define SPACWALK_TARGET_HIT_BOTTOM_EN		NODE_01
-#define SPACWALK_TARGET_HIT_MIDDLE_EN		NODE_02
-#define SPACWALK_TARGET_HIT_TOP_EN			NODE_03
-#define SPACWALK_SPRINGBOARD_HIT1_EN		NODE_04
-#define SPACWALK_SPRINGBOARD_HIT2_EN		NODE_05
-#define SPACWALK_SPRINGBOARD_MISS_EN		NODE_06
-#define SPACWALK_SPACE_SHIP_EN				NODE_07
+#define SPACWALK_TARGET_HIT_BOTTOM_EN         NODE_01
+#define SPACWALK_TARGET_HIT_MIDDLE_EN         NODE_02
+#define SPACWALK_TARGET_HIT_TOP_EN            NODE_03
+#define SPACWALK_SPRINGBOARD_HIT1_EN          NODE_04
+#define SPACWALK_SPRINGBOARD_HIT2_EN          NODE_05
+#define SPACWALK_SPRINGBOARD_MISS_EN          NODE_06
+#define SPACWALK_SPACE_SHIP_EN                NODE_07
 
 /* Discrete Sound Output Nodes */
-#define SPACWALK_NOISE						NODE_10
-#define SPACWALK_TARGET_HIT_SND				NODE_11
-#define SPACWALK_SPRINGBOARD_HIT1_SND		NODE_12
-#define SPACWALK_SPRINGBOARD_HIT2_SND		NODE_13
-#define SPACWALK_SPRINGBOARD_MISS_SND		NODE_14
-#define SPACWALK_SPACE_SHIP_SND				NODE_15
+#define SPACWALK_NOISE                        NODE_10
+#define SPACWALK_TARGET_HIT_SND               NODE_11
+#define SPACWALK_SPRINGBOARD_HIT1_SND         NODE_12
+#define SPACWALK_SPRINGBOARD_HIT2_SND         NODE_13
+#define SPACWALK_SPRINGBOARD_MISS_SND         NODE_14
+#define SPACWALK_SPACE_SHIP_SND               NODE_15
 
 /* Adjusters */
-#define SPACWALK_R507_POT			NODE_19
+#define SPACWALK_R507_POT                     NODE_19
 
 /* Parts List - Resistors */
 #define SPACWALK_R200		RES_K(820)
@@ -2329,9 +2317,11 @@ MACHINE_DRIVER_END
 
 WRITE8_DEVICE_HANDLER( spacwalk_audio_1_w )
 {
+	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
+
 	coin_counter_w(device->machine, 0, (data >> 0) & 0x01);
 
-	clowns_set_controller_select((data >> 1) & 0x01);
+	state->clowns_controller_select = (data >> 1) & 0x01;
 
 	sound_global_enable(device->machine, (data >> 2) & 0x01);
 
@@ -2364,19 +2354,19 @@ WRITE8_DEVICE_HANDLER( spacwalk_audio_2_w )
  *************************************/
 
  /* Discrete Sound Input Nodes */
-#define SHUFFLE_ROLLING_1_EN		NODE_01
-#define SHUFFLE_ROLLING_2_EN		NODE_02
-#define SHUFFLE_ROLLING_3_EN		NODE_03
-#define SHUFFLE_FOUL_EN				NODE_04
-#define SHUFFLE_ROLLOVER_EN			NODE_05
-#define SHUFFLE_CLICK_EN			NODE_06
+#define SHUFFLE_ROLLING_1_EN        NODE_01
+#define SHUFFLE_ROLLING_2_EN        NODE_02
+#define SHUFFLE_ROLLING_3_EN        NODE_03
+#define SHUFFLE_FOUL_EN             NODE_04
+#define SHUFFLE_ROLLOVER_EN         NODE_05
+#define SHUFFLE_CLICK_EN            NODE_06
 
 /* Discrete Sound Output Nodes */
-#define SHUFFLE_NOISE				NODE_10
-#define SHUFFLE_ROLLING_SND			NODE_11
-#define SHUFFLE_FOUL_SND			NODE_12
-#define SHUFFLE_ROLLOVER_SND		NODE_13
-#define SHUFFLE_CLICK_SND			NODE_14
+#define SHUFFLE_NOISE               NODE_10
+#define SHUFFLE_ROLLING_SND         NODE_11
+#define SHUFFLE_FOUL_SND            NODE_12
+#define SHUFFLE_ROLLOVER_SND        NODE_13
+#define SHUFFLE_CLICK_SND           NODE_14
 
 /* Parts List - Resistors */
 #define SHUFFLE_R300	RES_K(33)
@@ -2677,23 +2667,23 @@ static const sn76477_interface spcenctr_sn76477_interface =
 
 
 /* nodes - inputs */
-#define SPCENCTR_ENEMY_SHIP_SHOT_EN		NODE_01
-#define SPCENCTR_PLAYER_SHOT_EN			NODE_02
-#define SPCENCTR_SCREECH_EN				NODE_03
-#define SPCENCTR_CRASH_EN				NODE_04
-#define SPCENCTR_EXPLOSION_EN			NODE_05
-#define SPCENCTR_BONUS_EN				NODE_06
-#define SPCENCTR_WIND_DATA				NODE_07
+#define SPCENCTR_ENEMY_SHIP_SHOT_EN       NODE_01
+#define SPCENCTR_PLAYER_SHOT_EN           NODE_02
+#define SPCENCTR_SCREECH_EN               NODE_03
+#define SPCENCTR_CRASH_EN                 NODE_04
+#define SPCENCTR_EXPLOSION_EN             NODE_05
+#define SPCENCTR_BONUS_EN                 NODE_06
+#define SPCENCTR_WIND_DATA                NODE_07
 
 /* nodes - sounds */
-#define SPCENCTR_NOISE					NODE_10
-#define SPCENCTR_ENEMY_SHIP_SHOT_SND	NODE_11
-#define SPCENCTR_PLAYER_SHOT_SND		NODE_12
-#define SPCENCTR_SCREECH_SND			NODE_13
-#define SPCENCTR_CRASH_SND				NODE_14
-#define SPCENCTR_EXPLOSION_SND			NODE_15
-#define SPCENCTR_BONUS_SND				NODE_16
-#define SPCENCTR_WIND_SND				NODE_17
+#define SPCENCTR_NOISE                    NODE_10
+#define SPCENCTR_ENEMY_SHIP_SHOT_SND      NODE_11
+#define SPCENCTR_PLAYER_SHOT_SND          NODE_12
+#define SPCENCTR_SCREECH_SND              NODE_13
+#define SPCENCTR_CRASH_SND                NODE_14
+#define SPCENCTR_EXPLOSION_SND            NODE_15
+#define SPCENCTR_BONUS_SND                NODE_16
+#define SPCENCTR_WIND_SND                 NODE_17
 
 
 static const discrete_op_amp_info spcenctr_enemy_ship_shot_op_amp_E1 =
@@ -3175,6 +3165,8 @@ WRITE8_DEVICE_HANDLER( spcenctr_audio_1_w )
 
 WRITE8_DEVICE_HANDLER( spcenctr_audio_2_w )
 {
+	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
+
 	/* set WIND SOUND FREQ(data & 0x0f)  0, if no wind */
 
 	discrete_sound_w(device, SPCENCTR_EXPLOSION_EN, (data >> 4) & 0x01);
@@ -3183,25 +3175,25 @@ WRITE8_DEVICE_HANDLER( spcenctr_audio_2_w )
 
 	/* D6 and D7 are not connected */
 
-	port_2_last = data;
+	state->port_2_last = data;
 }
 
 
 WRITE8_DEVICE_HANDLER( spcenctr_audio_3_w )
 {
-	const device_config *sn = devtag_get_device(device->machine, "snsnd");
+	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
 
 	/* if (data & 0x01)  enable SCREECH (hit the sides) sound */
 
 	discrete_sound_w(device, SPCENCTR_ENEMY_SHIP_SHOT_EN, (data >> 1) & 0x01);
 
-	spcenctr_set_strobe_state((data >> 2) & 0x01);
+	state->spcenctr_strobe_state = (data >> 2) & 0x01;
 
 	output_set_value("LAMP", (data >> 3) & 0x01);
 
 	discrete_sound_w(device, SPCENCTR_BONUS_EN, (data >> 4) & 0x01);
 
-	sn76477_enable_w(sn, (data >> 5) & 0x01);	/* saucer sound */
+	sn76477_enable_w(state->sn, (data >> 5) & 0x01);	/* saucer sound */
 
 	/* D6 and D7 are not connected */
 }
@@ -3242,11 +3234,11 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( phantom2_audio_1_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
-	UINT8 rising_bits = data & ~port_1_last;
+	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	UINT8 rising_bits = data & ~state->port_1_last;
 
 	/* if (data & 0x01)  enable PLAYER SHOT sound */
-	if (rising_bits & 0x01) sample_start(samples, 0, 0, 0);
+	if (rising_bits & 0x01) sample_start(state->samples, 0, 0, 0);
 
 	/* if (data & 0x02)  enable ENEMY SHOT sound */
 
@@ -3258,25 +3250,25 @@ WRITE8_HANDLER( phantom2_audio_1_w )
 
 	/* D5-D7 are not connected */
 
-	port_1_last = data;
+	state->port_1_last = data;
 }
 
 
 WRITE8_HANDLER( phantom2_audio_2_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, "samples");
-	UINT8 rising_bits = data & ~port_2_last;
+	mw8080bw_state *state = (mw8080bw_state *)space->machine->driver_data;
+	UINT8 rising_bits = data & ~state->port_2_last;
 
 	/* D0-D2 are not connected */
 
 	/* if (data & 0x08)  enable EXPLOSION sound */
-	if (rising_bits & 0x08) sample_start(samples, 1, 1, 0);
+	if (rising_bits & 0x08) sample_start(state->samples, 1, 1, 0);
 
 	output_set_value("EXPLAMP", (data >> 4) & 0x01);
 
 	/* set JET SOUND FREQ((data >> 5) & 0x07)  0, if no jet sound */
 
-	port_2_last = data;
+	state->port_2_last = data;
 }
 
 
@@ -3291,10 +3283,10 @@ WRITE8_HANDLER( phantom2_audio_2_w )
  *************************************/
 
 /* nodes - inputs */
-#define BOWLER_FOWL_EN			NODE_01
+#define BOWLER_FOWL_EN            NODE_01
 
 /* nodes - sounds */
-#define BOWLER_FOWL_SND			NODE_10
+#define BOWLER_FOWL_SND           NODE_10
 
 
 static const discrete_op_amp_tvca_info bowler_fowl_tvca =
@@ -3527,21 +3519,21 @@ MACHINE_DRIVER_END
 
 
 /* nodes - inputs */
-#define INVADERS_SAUCER_HIT_EN				01
-#define INVADERS_FLEET_DATA					02
-#define INVADERS_BONUS_MISSLE_BASE_EN		03
-#define INVADERS_INVADER_HIT_EN				04
-#define INVADERS_EXPLOSION_EN				05
-#define INVADERS_MISSILE_EN					06
+#define INVADERS_SAUCER_HIT_EN                01
+#define INVADERS_FLEET_DATA                   02
+#define INVADERS_BONUS_MISSLE_BASE_EN         03
+#define INVADERS_INVADER_HIT_EN               04
+#define INVADERS_EXPLOSION_EN                 05
+#define INVADERS_MISSILE_EN                   06
 
 /* nodes - sounds */
-#define INVADERS_NOISE						NODE_10
-#define INVADERS_SAUCER_HIT_SND				11
-#define INVADERS_FLEET_SND					12
-#define INVADERS_BONUS_MISSLE_BASE_SND		13
-#define INVADERS_INVADER_HIT_SND			14
-#define INVADERS_EXPLOSION_SND				15
-#define INVADERS_MISSILE_SND				16
+#define INVADERS_NOISE                        NODE_10
+#define INVADERS_SAUCER_HIT_SND               11
+#define INVADERS_FLEET_SND                    12
+#define INVADERS_BONUS_MISSLE_BASE_SND        13
+#define INVADERS_INVADER_HIT_SND              14
+#define INVADERS_EXPLOSION_SND                15
+#define INVADERS_MISSILE_SND                  16
 
 
 static const discrete_op_amp_info invaders_saucer_hit_op_amp_B3_9 =
@@ -4095,9 +4087,9 @@ MACHINE_DRIVER_END
 
 WRITE8_DEVICE_HANDLER( invaders_audio_1_w )
 {
-	const device_config *sn = devtag_get_device(device->machine, "snsnd");
+	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
 
-	sn76477_enable_w(sn, (~data >> 0) & 0x01);	/* saucer sound */
+	sn76477_enable_w(state->sn, (~data >> 0) & 0x01);	/* saucer sound */
 
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
@@ -4112,13 +4104,15 @@ WRITE8_DEVICE_HANDLER( invaders_audio_1_w )
 
 WRITE8_DEVICE_HANDLER( invaders_audio_2_w )
 {
+	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
+
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_FLEET_DATA, 1), data & 0x0f);
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 1), data & 0x10);
 
 	/* the flip screen line is only connected on the cocktail PCB */
 	if (invaders_is_cabinet_cocktail(device->machine))
 	{
-		invaders_set_flip_screen((data >> 5) & 0x01);
+		state->invaders_flip_screen = (data >> 5) & 0x01;
 	}
 
 	/* D6 and D7 are not connected */
@@ -4137,19 +4131,19 @@ WRITE8_DEVICE_HANDLER( invaders_audio_2_w )
  *************************************/
 
 /* nodes - inputs */
-#define BLUESHRK_OCTOPUS_EN		NODE_01
-#define BLUESHRK_HIT_EN			NODE_02
-#define BLUESHRK_SHARK_EN		NODE_03
-#define BLUESHRK_SHOT_EN		NODE_04
-#define BLUESHRK_GAME_ON_EN		NODE_05
+#define BLUESHRK_OCTOPUS_EN         NODE_01
+#define BLUESHRK_HIT_EN             NODE_02
+#define BLUESHRK_SHARK_EN           NODE_03
+#define BLUESHRK_SHOT_EN            NODE_04
+#define BLUESHRK_GAME_ON_EN         NODE_05
 
 /* nodes - sounds */
-#define BLUESHRK_NOISE_1		NODE_11
-#define BLUESHRK_NOISE_2		NODE_12
-#define BLUESHRK_OCTOPUS_SND	NODE_13
-#define BLUESHRK_HIT_SND		NODE_14
-#define BLUESHRK_SHARK_SND		NODE_15
-#define BLUESHRK_SHOT_SND		NODE_16
+#define BLUESHRK_NOISE_1            NODE_11
+#define BLUESHRK_NOISE_2            NODE_12
+#define BLUESHRK_OCTOPUS_SND        NODE_13
+#define BLUESHRK_HIT_SND            NODE_14
+#define BLUESHRK_SHARK_SND          NODE_15
+#define BLUESHRK_SHOT_SND           NODE_16
 
 /* Parts List - Resistors */
 #define BLUESHRK_R300	RES_M(1)
@@ -4726,9 +4720,9 @@ MACHINE_DRIVER_END
 
 WRITE8_DEVICE_HANDLER( invad2ct_audio_1_w )
 {
-	const device_config *sn = devtag_get_device(device->machine, "sn1");
+	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
 
-	sn76477_enable_w(sn, (~data >> 0) & 0x01);	/* saucer sound */
+	sn76477_enable_w(state->sn1, (~data >> 0) & 0x01);	/* saucer sound */
 
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
@@ -4752,9 +4746,9 @@ WRITE8_DEVICE_HANDLER( invad2ct_audio_2_w )
 
 WRITE8_DEVICE_HANDLER( invad2ct_audio_3_w )
 {
-	const device_config *sn = devtag_get_device(device->machine, "sn2");
+	mw8080bw_state *state = (mw8080bw_state *)device->machine->driver_data;
 
-	sn76477_enable_w(sn, (~data >> 0) & 0x01);	/* saucer sound */
+	sn76477_enable_w(state->sn2, (~data >> 0) & 0x01);	/* saucer sound */
 
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_MISSILE_EN, 2), data & 0x02);
 	discrete_sound_w(device, INVADERS_NODE(INVADERS_EXPLOSION_EN, 2), data & 0x04);

@@ -7,61 +7,28 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "8080bw.h"
-#include "mw8080bw.h"
+#include "includes/mw8080bw.h"
 
 
 #define NUM_PENS	(8)
 
 
-UINT8 *c8080bw_colorram;
-
-static UINT8 c8080bw_flip_screen;
-static UINT8 color_map;
-static UINT8 screen_red;
-static UINT8 schaser_background_disable;
-static UINT8 schaser_background_select;
-
 MACHINE_START( extra_8080bw_vh )
 {
-    state_save_register_global(machine, c8080bw_flip_screen);
-    state_save_register_global(machine, color_map);
-    state_save_register_global(machine, screen_red);
+ 	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
 
-    // These two only belong to schaser, but for simplicity's sake let's waste
-    // two bytes in other drivers' .sta files.
-    state_save_register_global(machine, schaser_background_disable);
-    state_save_register_global(machine, schaser_background_select);
-}
+	state_save_register_global(machine, state->c8080bw_flip_screen);
+	state_save_register_global(machine, state->color_map);
+	state_save_register_global(machine, state->screen_red);
 
-void c8080bw_flip_screen_w(const address_space *space, int data)
-{
-	color_map = data;
-	c8080bw_flip_screen = data && (input_port_read(space->machine, CABINET_PORT_TAG) & 0x01);
+	// These two only belong to schaser, but for simplicity's sake let's waste
+	// two bytes in other drivers' .sta files.
+	state_save_register_global(machine, state->schaser_background_disable);
+	state_save_register_global(machine, state->schaser_background_select);
 }
 
 
-void lupin3_flip_screen_w(const address_space *space, int data)
-{
-	color_map = data & 0x40;
-	c8080bw_flip_screen = (data & 0x20) && (input_port_read(space->machine, "IN2") & 0x04);
-}
-
-
-void c8080bw_screen_red_w(int data)
-{
-	screen_red = data;
-}
-
-
-void schaser_background_control_w(int data)
-{
-	schaser_background_disable = (data >> 3) & 0x01;
-	schaser_background_select = (data >> 4) & 0x01;
-}
-
-
-static void invadpt2_get_pens(pen_t *pens)
+static void invadpt2_get_pens( pen_t *pens )
 {
 	offs_t i;
 
@@ -72,7 +39,7 @@ static void invadpt2_get_pens(pen_t *pens)
 }
 
 
-static void sflush_get_pens(pen_t *pens)
+static void sflush_get_pens( pen_t *pens )
 {
 	offs_t i;
 
@@ -85,7 +52,7 @@ static void sflush_get_pens(pen_t *pens)
 }
 
 
-static void cosmo_get_pens(pen_t *pens)
+static void cosmo_get_pens( pen_t *pens )
 {
 	offs_t i;
 
@@ -96,11 +63,13 @@ static void cosmo_get_pens(pen_t *pens)
 }
 
 
-INLINE void set_pixel(bitmap_t *bitmap, UINT8 y, UINT8 x, pen_t *pens, UINT8 color)
+INLINE void set_pixel( running_machine *machine, bitmap_t *bitmap, UINT8 y, UINT8 x, pen_t *pens, UINT8 color )
 {
+ 	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
+
 	if (y >= MW8080BW_VCOUNTER_START_NO_VBLANK)
 	{
-		if (c8080bw_flip_screen)
+		if (state->c8080bw_flip_screen)
 			*BITMAP_ADDR32(bitmap, MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = pens[color];
 		else
 			*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pens[color];
@@ -108,14 +77,13 @@ INLINE void set_pixel(bitmap_t *bitmap, UINT8 y, UINT8 x, pen_t *pens, UINT8 col
 }
 
 
-INLINE void set_8_pixels(bitmap_t *bitmap, UINT8 y, UINT8 x, UINT8 data,
-						  pen_t *pens, UINT8 fore_color, UINT8 back_color)
+INLINE void set_8_pixels( running_machine *machine, bitmap_t *bitmap, UINT8 y, UINT8 x, UINT8 data, pen_t *pens, UINT8 fore_color, UINT8 back_color )
 {
 	int i;
 
 	for (i = 0; i < 8; i++)
 	{
-		set_pixel(bitmap, y, x, pens, (data & 0x01) ? fore_color : back_color);
+		set_pixel(machine, bitmap, y, x, pens, (data & 0x01) ? fore_color : back_color);
 
 		x = x + 1;
 		data = data >> 1;
@@ -124,8 +92,9 @@ INLINE void set_8_pixels(bitmap_t *bitmap, UINT8 y, UINT8 x, UINT8 data,
 
 
 /* this is needed as this driver doesn't emulate the shift register like mw8080bw does */
-static void clear_extra_columns(bitmap_t *bitmap, pen_t *pens, UINT8 color)
+static void clear_extra_columns( running_machine *machine, bitmap_t *bitmap, pen_t *pens, UINT8 color )
 {
+ 	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
 	UINT8 x;
 
 	for (x = 0; x < 4; x++)
@@ -134,7 +103,7 @@ static void clear_extra_columns(bitmap_t *bitmap, pen_t *pens, UINT8 color)
 
 		for (y = MW8080BW_VCOUNTER_START_NO_VBLANK; y != 0; y++)
 		{
-			if (c8080bw_flip_screen)
+			if (state->c8080bw_flip_screen)
 				*BITMAP_ADDR32(bitmap, MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + x)) = pens[color];
 			else
 				*BITMAP_ADDR32(bitmap, y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + x) = pens[color];
@@ -145,6 +114,7 @@ static void clear_extra_columns(bitmap_t *bitmap, pen_t *pens, UINT8 color)
 
 VIDEO_UPDATE( invadpt2 )
 {
+ 	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *prom;
@@ -153,22 +123,22 @@ VIDEO_UPDATE( invadpt2 )
 	invadpt2_get_pens(pens);
 
 	prom = memory_region(screen->machine, "proms");
-	color_map_base = color_map ? &prom[0x0400] : &prom[0x0000];
+	color_map_base = state->color_map ? &prom[0x0400] : &prom[0x0000];
 
-	for (offs = 0; offs < mw8080bw_ram_size; offs++)
+	for (offs = 0; offs < state->main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
 		offs_t color_address = (offs >> 8 << 5) | (offs & 0x1f);
 
-		UINT8 data = mw8080bw_ram[offs];
-		UINT8 fore_color = screen_red ? 1 : color_map_base[color_address] & 0x07;
+		UINT8 data = state->main_ram[offs];
+		UINT8 fore_color = state->screen_red ? 1 : color_map_base[color_address] & 0x07;
 
-		set_8_pixels(bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(screen->machine, bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(bitmap, pens, 0);
+	clear_extra_columns(screen->machine, bitmap, pens, 0);
 
 	return 0;
 }
@@ -176,6 +146,7 @@ VIDEO_UPDATE( invadpt2 )
 
 VIDEO_UPDATE( ballbomb )
 {
+ 	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *color_map_base;
@@ -184,23 +155,23 @@ VIDEO_UPDATE( ballbomb )
 	invadpt2_get_pens(pens);
 
 	prom = memory_region(screen->machine, "proms");
-	color_map_base = color_map ? &prom[0x0400] : &prom[0x0000];
+	color_map_base = state->color_map ? &prom[0x0400] : &prom[0x0000];
 
-	for (offs = 0; offs < mw8080bw_ram_size; offs++)
+	for (offs = 0; offs < state->main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
 		offs_t color_address = (offs >> 8 << 5) | (offs & 0x1f);
 
-		UINT8 data = mw8080bw_ram[offs];
-		UINT8 fore_color = screen_red ? 1 : color_map_base[color_address] & 0x07;
+		UINT8 data = state->main_ram[offs];
+		UINT8 fore_color = state->screen_red ? 1 : color_map_base[color_address] & 0x07;
 
 		/* blue background */
-		set_8_pixels(bitmap, y, x, data, pens, fore_color, 2);
+		set_8_pixels(screen->machine, bitmap, y, x, data, pens, fore_color, 2);
 	}
 
-	clear_extra_columns(bitmap, pens, 2);
+	clear_extra_columns(screen->machine, bitmap, pens, 2);
 
 	return 0;
 }
@@ -208,6 +179,7 @@ VIDEO_UPDATE( ballbomb )
 
 VIDEO_UPDATE( schaser )
 {
+ 	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *background_map_base;
@@ -216,17 +188,17 @@ VIDEO_UPDATE( schaser )
 
 	background_map_base = memory_region(screen->machine, "proms");
 
-	for (offs = 0; offs < mw8080bw_ram_size; offs++)
+	for (offs = 0; offs < state->main_ram_size; offs++)
 	{
 		UINT8 back_color = 0;
 
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data = mw8080bw_ram[offs];
-		UINT8 fore_color = c8080bw_colorram[offs & 0x1f9f] & 0x07;
+		UINT8 data = state->main_ram[offs];
+		UINT8 fore_color = state->colorram[offs & 0x1f9f] & 0x07;
 
-		if (!schaser_background_disable)
+		if (!state->schaser_background_disable)
 		{
 			offs_t back_address = (offs >> 8 << 5) | (offs & 0x1f);
 
@@ -234,13 +206,13 @@ VIDEO_UPDATE( schaser )
 
 			/* the equations derived from the schematics don't appear to produce
                the right colors, but this one does, at least for this PROM */
-			back_color = (((back_data & 0x0c) == 0x0c) && schaser_background_select) ? 4 : 2;
+			back_color = (((back_data & 0x0c) == 0x0c) && state->schaser_background_select) ? 4 : 2;
 		}
 
-		set_8_pixels(bitmap, y, x, data, pens, fore_color, back_color);
+		set_8_pixels(screen->machine, bitmap, y, x, data, pens, fore_color, back_color);
 	}
 
-	clear_extra_columns(bitmap, pens, schaser_background_disable ? 0 : 2);
+	clear_extra_columns(screen->machine, bitmap, pens, state->schaser_background_disable ? 0 : 2);
 
 	return 0;
 }
@@ -248,24 +220,25 @@ VIDEO_UPDATE( schaser )
 
 VIDEO_UPDATE( schasrcv )
 {
+ 	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
 	invadpt2_get_pens(pens);
 
-	for (offs = 0; offs < mw8080bw_ram_size; offs++)
+	for (offs = 0; offs < state->main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data = mw8080bw_ram[offs];
-		UINT8 fore_color = c8080bw_colorram[offs & 0x1f9f] & 0x07;
+		UINT8 data = state->main_ram[offs];
+		UINT8 fore_color = state->colorram[offs & 0x1f9f] & 0x07;
 
 		/* blue background */
-		set_8_pixels(bitmap, y, x, data, pens, fore_color, 2);
+		set_8_pixels(screen->machine, bitmap, y, x, data, pens, fore_color, 2);
 	}
 
-	clear_extra_columns(bitmap, pens, 2);
+	clear_extra_columns(screen->machine, bitmap, pens, 2);
 
 	return 0;
 }
@@ -273,23 +246,24 @@ VIDEO_UPDATE( schasrcv )
 
 VIDEO_UPDATE( rollingc )
 {
+ 	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
 	invadpt2_get_pens(pens);
 
-	for (offs = 0; offs < mw8080bw_ram_size; offs++)
+	for (offs = 0; offs < state->main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data = mw8080bw_ram[offs];
-		UINT8 fore_color = c8080bw_colorram[offs & 0x1f1f] & 0x07;
+		UINT8 data = state->main_ram[offs];
+		UINT8 fore_color = state->colorram[offs & 0x1f1f] & 0x07;
 
-		set_8_pixels(bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(screen->machine, bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(bitmap, pens, 0);
+	clear_extra_columns(screen->machine, bitmap, pens, 0);
 
 	return 0;
 }
@@ -297,6 +271,7 @@ VIDEO_UPDATE( rollingc )
 
 VIDEO_UPDATE( polaris )
 {
+ 	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *color_map_base;
@@ -307,12 +282,12 @@ VIDEO_UPDATE( polaris )
 	color_map_base = memory_region(screen->machine, "proms");
 	cloud_gfx = memory_region(screen->machine, "user1");
 
-	for (offs = 0; offs < mw8080bw_ram_size; offs++)
+	for (offs = 0; offs < state->main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data = mw8080bw_ram[offs];
+		UINT8 data = state->main_ram[offs];
 
 		offs_t color_address = (offs >> 8 << 5) | (offs & 0x1f);
 
@@ -323,13 +298,13 @@ VIDEO_UPDATE( polaris )
            bits 1 and 2 are marked 'not use' (sic) */
 
 		UINT8 back_color = (color_map_base[color_address] & 0x01) ? 6 : 2;
-		UINT8 fore_color = ~c8080bw_colorram[offs & 0x1f9f] & 0x07;
+		UINT8 fore_color = ~state->colorram[offs & 0x1f9f] & 0x07;
 
-		UINT8 cloud_y = y - polaris_get_cloud_pos();
+		UINT8 cloud_y = y - state->polaris_cloud_pos;
 
 		if ((color_map_base[color_address] & 0x08) || (cloud_y >= 64))
 		{
-			set_8_pixels(bitmap, y, x, data, pens, fore_color, back_color);
+			set_8_pixels(screen->machine, bitmap, y, x, data, pens, fore_color, back_color);
 		}
 		else
 		{
@@ -352,7 +327,7 @@ VIDEO_UPDATE( polaris )
 					color = (cloud_gfx[cloud_gfx_offs] & bit) ? 7 : back_color;
 				}
 
-				set_pixel(bitmap, y, x, pens, color);
+				set_pixel(screen->machine, bitmap, y, x, pens, color);
 
 				x = x + 1;
 				data = data >> 1;
@@ -360,7 +335,7 @@ VIDEO_UPDATE( polaris )
 		}
 	}
 
-	clear_extra_columns(bitmap, pens, 6);
+	clear_extra_columns(screen->machine, bitmap, pens, 6);
 
 	return 0;
 }
@@ -368,23 +343,24 @@ VIDEO_UPDATE( polaris )
 
 VIDEO_UPDATE( lupin3 )
 {
+ 	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
 	invadpt2_get_pens(pens);
 
-	for (offs = 0; offs < mw8080bw_ram_size; offs++)
+	for (offs = 0; offs < state->main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data = mw8080bw_ram[offs];
-		UINT8 fore_color = ~c8080bw_colorram[offs & 0x1f9f] & 0x07;
+		UINT8 data = state->main_ram[offs];
+		UINT8 fore_color = ~state->colorram[offs & 0x1f9f] & 0x07;
 
-		set_8_pixels(bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(screen->machine, bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(bitmap, pens, 0);
+	clear_extra_columns(screen->machine, bitmap, pens, 0);
 
 	return 0;
 }
@@ -392,25 +368,26 @@ VIDEO_UPDATE( lupin3 )
 
 VIDEO_UPDATE( cosmo )
 {
+ 	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
 	cosmo_get_pens(pens);
 
-	for (offs = 0; offs < mw8080bw_ram_size; offs++)
+	for (offs = 0; offs < state->main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
 		offs_t color_address = (offs >> 8 << 5) | (offs & 0x1f);
 
-		UINT8 data = mw8080bw_ram[offs];
-		UINT8 fore_color = c8080bw_colorram[color_address] & 0x07;
+		UINT8 data = state->main_ram[offs];
+		UINT8 fore_color = state->colorram[color_address] & 0x07;
 
-		set_8_pixels(bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(screen->machine, bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(bitmap, pens, 0);
+	clear_extra_columns(screen->machine, bitmap, pens, 0);
 
 	return 0;
 }
@@ -418,6 +395,7 @@ VIDEO_UPDATE( cosmo )
 
 VIDEO_UPDATE( indianbt )
 {
+ 	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 	UINT8 *color_map_base;
@@ -426,22 +404,22 @@ VIDEO_UPDATE( indianbt )
 	cosmo_get_pens(pens);
 
 	prom = memory_region(screen->machine, "proms");
-	color_map_base = color_map ? &prom[0x0400] : &prom[0x0000];
+	color_map_base = state->color_map ? &prom[0x0400] : &prom[0x0000];
 
-	for (offs = 0; offs < mw8080bw_ram_size; offs++)
+	for (offs = 0; offs < state->main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
 		offs_t color_address = (offs >> 8 << 5) | (offs & 0x1f);
 
-		UINT8 data = mw8080bw_ram[offs];
+		UINT8 data = state->main_ram[offs];
 		UINT8 fore_color = color_map_base[color_address] & 0x07;
 
-		set_8_pixels(bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(screen->machine, bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(bitmap, pens, 0);
+	clear_extra_columns(screen->machine, bitmap, pens, 0);
 
 	return 0;
 }
@@ -449,17 +427,18 @@ VIDEO_UPDATE( indianbt )
 
 VIDEO_UPDATE( shuttlei )
 {
+ 	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
 	pen_t pens[2] = { RGB_BLACK, RGB_WHITE };
 	offs_t offs;
 
-	for (offs = 0; offs < mw8080bw_ram_size; offs++)
+	for (offs = 0; offs < state->main_ram_size; offs++)
 	{
 		int i;
 
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data = mw8080bw_ram[offs];
+		UINT8 data = state->main_ram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -471,7 +450,7 @@ VIDEO_UPDATE( shuttlei )
 		}
 	}
 
-	clear_extra_columns(bitmap, pens, 0);
+	clear_extra_columns(screen->machine, bitmap, pens, 0);
 
 	return 0;
 }
@@ -479,23 +458,24 @@ VIDEO_UPDATE( shuttlei )
 
 VIDEO_UPDATE( sflush )
 {
+ 	mw8080bw_state *state = (mw8080bw_state *)screen->machine->driver_data;
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
 	sflush_get_pens(pens);
 
-	for (offs = 0; offs < mw8080bw_ram_size; offs++)
+	for (offs = 0; offs < state->main_ram_size; offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data = mw8080bw_ram[offs];
-		UINT8 fore_color = c8080bw_colorram[offs & 0x1f9f] & 0x07;
+		UINT8 data = state->main_ram[offs];
+		UINT8 fore_color = state->colorram[offs & 0x1f9f] & 0x07;
 
-		set_8_pixels(bitmap, y, x, data, pens, fore_color, 0);
+		set_8_pixels(screen->machine, bitmap, y, x, data, pens, fore_color, 0);
 	}
 
-	clear_extra_columns(bitmap, pens, 0);
+	clear_extra_columns(screen->machine, bitmap, pens, 0);
 
 	return 0;
 }

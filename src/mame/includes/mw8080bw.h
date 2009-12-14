@@ -4,32 +4,94 @@
 
 ****************************************************************************/
 
+#include "sound/discrete.h"
+#include "sound/sn76477.h"
+#include "sound/samples.h"
 
-#define MW8080BW_MASTER_CLOCK				(19968000)
-#define MW8080BW_CPU_CLOCK					(MW8080BW_MASTER_CLOCK / 10)
-#define MW8080BW_PIXEL_CLOCK				(MW8080BW_MASTER_CLOCK / 4)
-#define MW8080BW_HTOTAL						(0x140)
-#define MW8080BW_HBEND						(0x000)
-#define MW8080BW_HBSTART					(0x100)
-#define MW8080BW_VTOTAL						(0x106)
-#define MW8080BW_VBEND						(0x000)
-#define MW8080BW_VBSTART					(0x0e0)
-#define MW8080BW_VCOUNTER_START_NO_VBLANK	(0x020)
-#define MW8080BW_VCOUNTER_START_VBLANK		(0x0da)
-#define MW8080BW_INT_TRIGGER_COUNT_1		(0x080)
-#define MW8080BW_INT_TRIGGER_VBLANK_1		(0)
-#define MW8080BW_INT_TRIGGER_COUNT_2		MW8080BW_VCOUNTER_START_VBLANK
-#define MW8080BW_INT_TRIGGER_VBLANK_2		(1)
+
+#define MW8080BW_MASTER_CLOCK             (19968000)
+#define MW8080BW_CPU_CLOCK                (MW8080BW_MASTER_CLOCK / 10)
+#define MW8080BW_PIXEL_CLOCK              (MW8080BW_MASTER_CLOCK / 4)
+#define MW8080BW_HTOTAL                   (0x140)
+#define MW8080BW_HBEND                    (0x000)
+#define MW8080BW_HBSTART                  (0x100)
+#define MW8080BW_VTOTAL                   (0x106)
+#define MW8080BW_VBEND                    (0x000)
+#define MW8080BW_VBSTART                  (0x0e0)
+#define MW8080BW_VCOUNTER_START_NO_VBLANK (0x020)
+#define MW8080BW_VCOUNTER_START_VBLANK    (0x0da)
+#define MW8080BW_INT_TRIGGER_COUNT_1      (0x080)
+#define MW8080BW_INT_TRIGGER_VBLANK_1     (0)
+#define MW8080BW_INT_TRIGGER_COUNT_2      MW8080BW_VCOUNTER_START_VBLANK
+#define MW8080BW_INT_TRIGGER_VBLANK_2     (1)
 
 /* +4 is added to HBSTART because the hardware displays that many pixels after
    setting HBLANK */
-#define MW8080BW_HPIXCOUNT		(MW8080BW_HBSTART + 4)
+#define MW8080BW_HPIXCOUNT                (MW8080BW_HBSTART + 4)
+
+
+typedef struct _mw8080bw_state mw8080bw_state;
+struct _mw8080bw_state
+{
+	/* memory pointers */
+	UINT8 *     main_ram;
+	UINT8 *     colorram;
+	size_t      main_ram_size;
+
+	/* sound-related */
+	UINT8       port_1_last;
+	UINT8       port_2_last;
+	UINT8       port_1_last_extra;
+	UINT8       port_2_last_extra;
+	UINT8       port_3_last_extra;
+
+	/* misc game specific */
+	emu_timer   *schaser_effect_555_timer;
+	attotime    schaser_effect_555_time_remain;
+	INT32       schaser_effect_555_time_remain_savable;
+	int         schaser_effect_555_is_low;
+	int         schaser_explosion;
+	int         schaser_last_effect;
+	UINT8       sfl_int;
+	UINT8       polaris_cloud_speed;
+	UINT8       polaris_cloud_pos;
+	UINT8       schaser_background_disable;
+	UINT8       schaser_background_select;
+	UINT8       c8080bw_flip_screen;
+	UINT8       color_map;
+	UINT8       screen_red;
+
+
+	UINT16      phantom2_cloud_counter;
+	UINT8       invaders_flip_screen;
+	UINT8       rev_shift_res;
+	UINT8       maze_tone_timing_state;	/* output of IC C1, pin 5 */
+	UINT8       desertgun_controller_select;
+	UINT8       clowns_controller_select;
+
+	UINT8       spcenctr_strobe_state;
+	UINT8       spcenctr_trench_width;
+	UINT8       spcenctr_trench_center;
+	UINT8       spcenctr_trench_slope[16];  /* 16x4 bit RAM */
+
+	/* timer */
+	emu_timer   *interrupt_timer;
+
+	/* devices */
+	const device_config *maincpu;
+	const device_config *mb14241;
+	const device_config *samples;
+	const device_config *samples1;
+	const device_config *samples2;
+	const device_config *speaker;
+	const device_config *sn1;
+	const device_config *sn2;
+	const device_config *sn;
+	const device_config *discrete;
+};
 
 
 /*----------- defined in drivers/mw8080bw.c -----------*/
-
-extern UINT8 *mw8080bw_ram;
-extern size_t mw8080bw_ram_size;
 
 MACHINE_DRIVER_EXTERN( mw8080bw_root );
 MACHINE_DRIVER_EXTERN( invaders );
@@ -44,26 +106,18 @@ UINT8 tornbase_get_cabinet_type(running_machine *machine);
 
 #define DESERTGU_GUN_X_PORT_TAG			("GUNX")
 #define DESERTGU_GUN_Y_PORT_TAG			("GUNY")
-void desertgun_set_controller_select(UINT8 data);
-
-void clowns_set_controller_select(UINT8 data);
-
-void spcenctr_set_strobe_state(UINT8 data);
-UINT8 spcenctr_get_trench_width(void);
-UINT8 spcenctr_get_trench_center(void);
-UINT8 spcenctr_get_trench_slope(UINT8 addr);
-
-UINT16 phantom2_get_cloud_counter(void);
-void phantom2_set_cloud_counter(UINT16 data);
 
 #define INVADERS_CAB_TYPE_PORT_TAG		("CAB")
 #define INVADERS_P1_CONTROL_PORT_TAG	("CONTP1")
 #define INVADERS_P2_CONTROL_PORT_TAG	("CONTP2")
 
+/* for games in 8080bw.c */
+#define CABINET_PORT_TAG                  "CAB"
+
+
 CUSTOM_INPUT( invaders_in1_control_r );
 CUSTOM_INPUT( invaders_in2_control_r );
-UINT8 invaders_is_flip_screen(void);
-void invaders_set_flip_screen(UINT8 data);
+
 int invaders_is_cabinet_cocktail(running_machine *machine);
 
 #define BLUESHRK_SPEAR_PORT_TAG			("IN0")
@@ -184,6 +238,56 @@ WRITE8_DEVICE_HANDLER( invad2ct_audio_2_w );
 WRITE8_DEVICE_HANDLER( invad2ct_audio_3_w );
 WRITE8_DEVICE_HANDLER( invad2ct_audio_4_w );
 
+/*----------- defined in audio/8080bw.c -----------*/
+
+MACHINE_START( extra_8080bw_sh );
+
+WRITE8_HANDLER( invadpt2_sh_port_1_w );
+WRITE8_HANDLER( invadpt2_sh_port_2_w );
+
+WRITE8_HANDLER( spcewars_sh_port_w );
+
+WRITE8_HANDLER( lrescue_sh_port_1_w );
+WRITE8_HANDLER( lrescue_sh_port_2_w );
+extern const samples_interface lrescue_samples_interface;
+
+WRITE8_HANDLER( cosmo_sh_port_2_w );
+
+WRITE8_HANDLER( ballbomb_sh_port_1_w );
+WRITE8_HANDLER( ballbomb_sh_port_2_w );
+
+WRITE8_HANDLER( indianbt_sh_port_1_w );
+WRITE8_HANDLER( indianbt_sh_port_2_w );
+WRITE8_DEVICE_HANDLER( indianbt_sh_port_3_w );
+DISCRETE_SOUND_EXTERN( indianbt );
+
+WRITE8_DEVICE_HANDLER( polaris_sh_port_1_w );
+WRITE8_DEVICE_HANDLER( polaris_sh_port_2_w );
+WRITE8_DEVICE_HANDLER( polaris_sh_port_3_w );
+DISCRETE_SOUND_EXTERN( polaris );
+
+MACHINE_RESET( schaser_sh );
+MACHINE_START( schaser_sh );
+WRITE8_HANDLER( schaser_sh_port_1_w );
+WRITE8_HANDLER( schaser_sh_port_2_w );
+extern const sn76477_interface schaser_sn76477_interface;
+DISCRETE_SOUND_EXTERN( schaser );
+
+WRITE8_HANDLER( rollingc_sh_port_w );
+
+WRITE8_HANDLER( invrvnge_sh_port_w );
+
+WRITE8_HANDLER( lupin3_sh_port_1_w );
+WRITE8_HANDLER( lupin3_sh_port_2_w );
+
+WRITE8_HANDLER( schasrcv_sh_port_1_w );
+WRITE8_HANDLER( schasrcv_sh_port_2_w );
+
+WRITE8_HANDLER( yosakdon_sh_port_1_w );
+WRITE8_HANDLER( yosakdon_sh_port_2_w );
+
+WRITE8_HANDLER( shuttlei_sh_port_1_w );
+WRITE8_HANDLER( shuttlei_sh_port_2_w );
 
 
 /*----------- defined in video/mw8080bw.c -----------*/
@@ -196,3 +300,21 @@ VIDEO_UPDATE( phantom2 );
 VIDEO_EOF( phantom2 );
 
 VIDEO_UPDATE( invaders );
+
+
+/*----------- defined in video/8080bw.c -----------*/
+
+MACHINE_START( extra_8080bw_vh );
+
+VIDEO_UPDATE( invadpt2 );
+VIDEO_UPDATE( ballbomb );
+VIDEO_UPDATE( schaser );
+VIDEO_UPDATE( schasrcv );
+VIDEO_UPDATE( rollingc );
+VIDEO_UPDATE( polaris );
+VIDEO_UPDATE( lupin3 );
+VIDEO_UPDATE( cosmo );
+VIDEO_UPDATE( indianbt );
+VIDEO_UPDATE( shuttlei );
+VIDEO_UPDATE( sflush );
+
