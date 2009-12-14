@@ -1198,7 +1198,7 @@ static MACHINE_START( desertgu )
 	mw8080bw_state *state = (mw8080bw_state *)machine->driver_data;
 
 	/* setup for save states */
-	state_save_register_global(machine, state->desertgu_controller_select);
+	state_save_register_global(machine, state->desertgun_controller_select);
 
 	MACHINE_START_CALL(mw8080bw);
 }
@@ -1209,7 +1209,7 @@ static CUSTOM_INPUT( desertgu_gun_input_r )
 	mw8080bw_state *state = (mw8080bw_state *)field->port->machine->driver_data;
 	UINT32 ret;
 
-	if (state->desertgu_controller_select)
+	if (state->desertgun_controller_select)
 		ret = input_port_read(field->port->machine, DESERTGU_GUN_X_PORT_TAG);
 	else
 		ret = input_port_read(field->port->machine, DESERTGU_GUN_Y_PORT_TAG);
@@ -1223,7 +1223,7 @@ static CUSTOM_INPUT( desertgu_dip_sw_0_1_r )
 	mw8080bw_state *state = (mw8080bw_state *)field->port->machine->driver_data;
 	UINT32 ret;
 
-	if (state->desertgu_controller_select)
+	if (state->desertgun_controller_select)
 		ret = input_port_read(field->port->machine, DESERTGU_DIP_SW_0_1_SET_2_TAG);
 	else
 		ret = input_port_read(field->port->machine, DESERTGU_DIP_SW_0_1_SET_1_TAG);
