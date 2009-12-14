@@ -13,18 +13,23 @@ Preliminary driver by: Manuel Abadia <manu@teleline.es>
 #include "driver.h"
 #include "cpu/hd6309/hd6309.h"
 #include "cpu/z80/z80.h"
-#include "video/konamiic.h"
 #include "sound/3812intf.h"
-#include "konamipt.h"
+#include "video/konicdev.h"
+#include "includes/konamipt.h"
 
 /* from video */
 WRITE8_HANDLER( battlnts_spritebank_w );
 VIDEO_START( battlnts );
 VIDEO_UPDATE( battlnts );
 
+extern void battlnts_tile_callback(int layer, int bank, int *code, int *color, int *flags);
+extern void battlnts_sprite_callback(int *code, int *color);
+
+
 static INTERRUPT_GEN( battlnts_interrupt )
 {
-	if (K007342_is_INT_enabled())
+	const device_config *k007342 = devtag_get_device(device->machine, "k007342");
+	if (k007342_is_int_enabled(k007342))
 		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
@@ -50,11 +55,11 @@ static WRITE8_HANDLER( battlnts_bankswitch_w )
 }
 
 static ADDRESS_MAP_START( battlnts_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(K007342_r, K007342_w)	/* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_READWRITE(K007420_r, K007420_w)	/* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_READWRITE(K007342_scroll_r, K007342_scroll_w)		/* Scroll RAM */
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_r, k007342_w)	/* Color RAM + Video RAM */
+	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_r, k007420_w)	/* Sprite RAM */
+	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_scroll_r, k007342_scroll_w)		/* Scroll RAM */
 	AM_RANGE(0x2400, 0x24ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE_GENERIC(paletteram)/* palette */
-	AM_RANGE(0x2600, 0x2607) AM_WRITE(K007342_vreg_w) 			/* Video Registers */
+	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE("k007342", k007342_vreg_w) 			/* Video Registers */
 	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P2")
 	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P1")
@@ -192,6 +197,17 @@ GFXDECODE_END
 
 ***************************************************************************/
 
+static const k007342_interface bladestl_k007342_intf =
+{
+	0,	battlnts_tile_callback	/* gfx_num (for tile creation), callback */
+};
+
+static const k007420_interface bladestl_k007420_intf =
+{
+	0x3ff, 	battlnts_sprite_callback	/* banklimit, callback */
+};
+
+
 static MACHINE_DRIVER_START( battlnts )
 
 	/* basic machine hardware */
@@ -214,6 +230,9 @@ static MACHINE_DRIVER_START( battlnts )
 
 	MDRV_VIDEO_START(battlnts)
 	MDRV_VIDEO_UPDATE(battlnts)
+
+	MDRV_K007342_ADD("k007342", bladestl_k007342_intf)
+	MDRV_K007420_ADD("k007420", bladestl_k007420_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

@@ -50,9 +50,9 @@ Notes:
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/hd6309/hd6309.h"
-#include "video/konamiic.h"
 #include "sound/2151intf.h"
 #include "sound/vlm5030.h"
+#include "video/konicdev.h"
 
 /* from video */
 VIDEO_START( rockrage );
@@ -60,10 +60,15 @@ VIDEO_UPDATE( rockrage );
 WRITE8_HANDLER( rockrage_vreg_w );
 PALETTE_INIT( rockrage );
 
+extern void rockrage_tile_callback(int layer, int bank, int *code, int *color, int *flags);
+extern void rockrage_sprite_callback(int *code, int *color);
+
+
 static INTERRUPT_GEN( rockrage_interrupt )
 {
-	if (K007342_is_INT_enabled())
-        cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
+	const device_config *k007342 = devtag_get_device(device->machine, "k007342");
+	if (k007342_is_int_enabled(k007342))
+		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( rockrage_bankswitch_w )
@@ -101,11 +106,11 @@ static WRITE8_DEVICE_HANDLER( rockrage_speech_w )
 }
 
 static ADDRESS_MAP_START( rockrage_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(K007342_r,K007342_w)					/* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_READWRITE(K007420_r,K007420_w)					/* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_READWRITE(K007342_scroll_r,K007342_scroll_w)	/* Scroll RAM */
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_r, k007342_w)					/* Color RAM + Video RAM */
+	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_r, k007420_w)					/* Sprite RAM */
+	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_scroll_r, k007342_scroll_w)	/* Scroll RAM */
 	AM_RANGE(0x2400, 0x247f) AM_RAM AM_BASE_GENERIC(paletteram)						/* Palette */
-	AM_RANGE(0x2600, 0x2607) AM_WRITE(K007342_vreg_w)							/* Video Registers */
+	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE("k007342", k007342_vreg_w)							/* Video Registers */
 	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P1")
 	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P2")
@@ -266,6 +271,17 @@ GFXDECODE_END
 
 ***************************************************************************/
 
+static const k007342_interface rockrage_k007342_intf =
+{
+	0,	rockrage_tile_callback
+};
+
+static const k007420_interface rockrage_k007420_intf =
+{
+	0x3ff, rockrage_sprite_callback
+};
+
+
 static MACHINE_DRIVER_START( rockrage )
 
 	/* basic machine hardware */
@@ -283,6 +299,9 @@ static MACHINE_DRIVER_START( rockrage )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
+	MDRV_K007342_ADD("k007342", rockrage_k007342_intf)
+	MDRV_K007420_ADD("k007420", rockrage_k007420_intf)
 
 	MDRV_GFXDECODE(rockrage)
 	MDRV_PALETTE_LENGTH(64 + 2*16*16)

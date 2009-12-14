@@ -169,12 +169,11 @@ Check gticlub.c for details on the bottom board.
 #include "cpu/sharc/sharc.h"
 #include "sound/k054539.h"
 #include "machine/konppc.h"
-#include "machine/konamiic.h"
 #include "machine/adc083x.h"
 #include "machine/eepromdev.h"
 #include "video/konamiic.h"
 #include "video/gticlub.h"
-
+#include "sound/k056800.h"
 
 static UINT8 led_reg0, led_reg1;
 
@@ -422,8 +421,8 @@ static ADDRESS_MAP_START( zr107_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)				/* LANC registers */
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_READWRITE(lanc_ram_r, lanc_ram_w) AM_BASE(&lanc_ram)		/* LANC Buffer RAM (27E) */
-	AM_RANGE(0x7e00c000, 0x7e00c007) AM_WRITE(K056800_host_w)
-	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_READ(K056800_host_r)
+	AM_RANGE(0x7e00c000, 0x7e00c007) AM_DEVWRITE("k056800", k056800_host_w)
+	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_DEVREAD("k056800", k056800_host_r)
 	AM_RANGE(0x7f800000, 0x7f9fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")	/* Program ROM */
 ADDRESS_MAP_END
@@ -450,8 +449,8 @@ static ADDRESS_MAP_START( jetwave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_MIRROR(0x80000000) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)				/* LANC registers */
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_MIRROR(0x80000000) AM_READWRITE(lanc_ram_r, lanc_ram_w)	 AM_BASE(&lanc_ram)	/* LANC Buffer RAM (27E) */
-	AM_RANGE(0x7e00c000, 0x7e00c007) AM_MIRROR(0x80000000) AM_WRITE(K056800_host_w)
-	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_MIRROR(0x80000000) AM_READ(K056800_host_r)
+	AM_RANGE(0x7e00c000, 0x7e00c007) AM_MIRROR(0x80000000) AM_DEVWRITE("k056800", k056800_host_w)
+	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_MIRROR(0x80000000) AM_DEVREAD("k056800", k056800_host_r)
 	AM_RANGE(0x7f000000, 0x7f3fffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0x7f800000, 0x7f9fffff) AM_MIRROR(0x80000000) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x7fe00000, 0x7fffffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")	/* Program ROM */
@@ -485,8 +484,8 @@ static ADDRESS_MAP_START( sound_memmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM		/* Work RAM */
 	AM_RANGE(0x200000, 0x2004ff) AM_READWRITE(dual539_r, dual539_w)
-	AM_RANGE(0x400000, 0x40000f) AM_WRITE(K056800_sound_w)
-	AM_RANGE(0x400010, 0x40001f) AM_READ(K056800_sound_r)
+	AM_RANGE(0x400000, 0x40000f) AM_DEVWRITE("k056800", k056800_sound_w)
+	AM_RANGE(0x400010, 0x40001f) AM_DEVREAD("k056800", k056800_sound_r)
 	AM_RANGE(0x580000, 0x580001) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -682,6 +681,25 @@ static const adc083x_interface zr107_adc_interface = {
 };
 
 
+static TIMER_CALLBACK( irq_off )
+{
+	cputag_set_input_line(machine, "audiocpu", param, CLEAR_LINE);
+}
+
+static void sound_irq_callback( running_machine *machine, int irq )
+{
+	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
+
+	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
+	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
+}
+
+static const k056800_interface zr107_k056800_interface = 
+{
+	sound_irq_callback
+};
+
+
 /* PowerPC interrupts
 
     IRQ0:  Vblank
@@ -693,6 +711,7 @@ static INTERRUPT_GEN( zr107_vblank )
 {
 	cpu_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
+
 static MACHINE_RESET( zr107 )
 {
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
@@ -729,6 +748,8 @@ static MACHINE_DRIVER_START( zr107 )
 
 	MDRV_VIDEO_START(zr107)
 	MDRV_VIDEO_UPDATE(zr107)
+
+	MDRV_K056800_ADD("k056800", zr107_k056800_interface)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -777,6 +798,8 @@ static MACHINE_DRIVER_START( jetwave )
 	MDRV_VIDEO_START(jetwave)
 	MDRV_VIDEO_UPDATE(jetwave)
 
+	MDRV_K056800_ADD("k056800", zr107_k056800_interface)
+
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("konami1", K054539, 48000)
@@ -794,18 +817,6 @@ MACHINE_DRIVER_END
 
 /*****************************************************************************/
 
-static TIMER_CALLBACK( irq_off )
-{
-	cputag_set_input_line(machine, "audiocpu", param, CLEAR_LINE);
-}
-
-static void sound_irq_callback(running_machine *machine, int irq)
-{
-	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
-	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
-	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
-}
-
 static void init_zr107(running_machine *machine)
 {
 	sharc_dataram = auto_alloc_array(machine, UINT32, 0x100000/4);
@@ -813,8 +824,6 @@ static void init_zr107(running_machine *machine)
 	ccu_vcth = ccu_vctl = 0;
 
 	K001005_preprocess_texture_data(memory_region(machine, "gfx1"), memory_region_length(machine, "gfx1"), 0);
-
-	K056800_init(machine, sound_irq_callback);
 }
 
 static DRIVER_INIT(zr107)

@@ -20,7 +20,6 @@ typedef void (*k051960_callback)(int *code, int *color, int *priority, int *shad
 typedef void (*k05324x_callback)(int *code, int *color, int *priority);
 typedef void (*k051316_callback)(int *code, int *color, int *flags);
 typedef void (*k056832_callback)(int layer, int *code, int *color, int *flags);
-typedef void (*k056800_irq_cb)(running_machine *, int);
 
 
 typedef struct _k007342_interface k007342_interface;
@@ -33,7 +32,7 @@ struct _k007342_interface
 typedef struct _k007420_interface k007420_interface;
 struct _k007420_interface
 {
-	int                gfxnum;
+	int                banklimit;
 	k007420_callback   callback;
 };
 
@@ -58,6 +57,8 @@ struct _k05324x_interface
 {
 	const char         *gfx_memory_region;
 	int                plane_order;
+	int                dx, dy;
+	int                deinterleave;
 	k05324x_callback   callback;
 };
 
@@ -68,6 +69,7 @@ struct _k053247_interface
 	const char         *gfx_memory_region;
 	int                plane_order;
 	int                dx, dy;
+	int                deinterleave;
 	k05324x_callback   callback;
 };
 
@@ -90,19 +92,20 @@ typedef struct _k056832_interface k056832_interface;
 struct _k056832_interface
 {
 	const char *gfx_memory_region;
-	int bpp; 
-	int big;
-//	int (*scrolld)[4][2];	// 2009-12 FP: what were these for? they are never used as of 0.135
-	int djmain_hack;
+	int                bpp; 
+	int                big;
+	int                djmain_hack;
+	int                deinterleave;
 	k056832_callback   callback;
 
-	const char         *k055555;
+	const char         *k055555;	// tbyahhoo uses the k056832 together with a k055555
 };
 
 typedef struct _k054338_interface k054338_interface;
 struct _k054338_interface
 {
 	const char         *screen;
+	int                alpha_inv;
 	const char         *k055555;
 };
 
@@ -111,12 +114,6 @@ struct _k053250_interface
 {
 	const char         *screen;
 	const char         *region;
-};
-
-typedef struct _k056800_interface k056800_interface;
-struct _k056800_interface
-{
-	k056800_irq_cb       irq_cb;
 };
 
 
@@ -142,7 +139,6 @@ DEVICE_GET_INFO( k055555 );
 DEVICE_GET_INFO( k054338 );
 DEVICE_GET_INFO( k053250 );
 DEVICE_GET_INFO( k053252 );
-DEVICE_GET_INFO( k056800 );
 
 
 /***************************************************************************
@@ -261,16 +257,18 @@ DEVICE_GET_INFO( k056800 );
 #define MDRV_K053252_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, K053252, 0)
 
-#define K056800 DEVICE_GET_INFO_NAME( k056800 )
-
-#define MDRV_K056800_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K056800, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
-
 
 /***************************************************************************
     HELPERS FOR DRIVERS
 ***************************************************************************/
+
+enum 
+{ 
+	KONAMI_ROM_DEINTERLEAVE_NONE = 0,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	KONAMI_ROM_DEINTERLEAVE_2_HALF,
+	KONAMI_ROM_DEINTERLEAVE_4
+};
 
 /* helper function to join two 16-bit ROMs and form a 32-bit data stream */
 void konamid_rom_deinterleave_2(running_machine *machine, const char *mem_region);
@@ -303,17 +301,15 @@ WRITE8_DEVICE_HANDLER( k007342_vreg_w );
 void k007342_tilemap_update(const device_config *device);
 void k007342_tilemap_set_enable(const device_config *device, int layer, int enable);
 void k007342_tilemap_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int num, int flags, UINT32 priority);
-int k007342_is_INT_enabled(const device_config *device);
+int k007342_is_int_enabled(const device_config *device);
 
 
 /**  Konami 007420  **/
-#define k007420_SPRITERAM_SIZE 0x200
+#define K007420_SPRITERAM_SIZE 0x200
 
 READ8_DEVICE_HANDLER( k007420_r );
 WRITE8_DEVICE_HANDLER( k007420_w );
-
-void k007420_sprites_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
-void k007420_set_banklimit(const device_config *device, int limit);
+void k007420_sprites_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, gfx_element *gfx);
 
 
 /**  Konami 052109  **/
@@ -359,9 +355,7 @@ void k052109_tilemap_update(const device_config *device);
 int k052109_is_IRQ_enabled(const device_config *device);
 void k052109_set_layer_offsets(const device_config *device, int layer, int dx, int dy);
 
-void k052109_get_tmap(const device_config *device, tilemap *tilemap, int index);
-void k052109_get_tmaps_all(const device_config *device, tilemap *tilemap0, tilemap *tilemap1, tilemap *tilemap2);
-
+void k052109_tilemap_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int tmap_num, UINT32 flags, UINT8 priority);
 void k052109_postload_tileflip_reset( const device_config *device );	// this has to be added to POSTLOAD functions in each driver
 
 
@@ -455,7 +449,9 @@ void k053247_set_sprite_offs(const device_config *device, int offsx, int offsy);
 void k053247_wraparound_enable(const device_config *device, int status);
 void k05324x_set_z_rejection(const device_config *device, int zcode); // common to k053244/5
 void k053247_set_z_rejection(const device_config *device, int zcode); // common to k053246/7
-//void k053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(int *, int *, int *), int *dx, int *dy);
+void k053247_get_ram(const device_config *device, UINT16 **ram);
+int k053247_get_dx(const device_config *device);
+int k053247_get_dy(const device_config *device);
 
 READ8_DEVICE_HANDLER( k053246_r );
 WRITE8_DEVICE_HANDLER( k053246_w );
@@ -464,8 +460,8 @@ WRITE16_DEVICE_HANDLER( k053246_word_w );
 READ32_DEVICE_HANDLER( k053246_long_r );
 WRITE32_DEVICE_HANDLER( k053246_long_w );
 
-void k053246_set_OBJCHA_line(const device_config *device, int state);
-int k053246_is_IRQ_enabled(const device_config *device);
+void k053246_set_objcha_line(const device_config *device, int state);
+int k053246_is_irq_enabled(const device_config *device);
 int k053246_read_register(const device_config *device, int regnum);
 
 /**  Konami 051316  **/
@@ -509,12 +505,19 @@ void k053936_set_offset(const device_config *device, int xoffs, int yoffs);
 WRITE8_DEVICE_HANDLER( k053251_w );
 WRITE16_DEVICE_HANDLER( k053251_lsb_w );
 WRITE16_DEVICE_HANDLER( k053251_msb_w );
-//enum { K053251_CI0=0,K053251_CI1,K053251_CI2,K053251_CI3,K053251_CI4 };
 int k053251_get_priority(const device_config *device, int ci);
 int k053251_get_palette_index(const device_config *device, int ci);
 void k053251_set_tilemaps(const device_config *device, tilemap *ci0,tilemap *ci1,tilemap *ci2,tilemap *ci3,tilemap *ci4);
 void k053251_postload_reset_indexes(const device_config *device);
 
+enum 
+{ 
+	K053251_CI0 = 0,
+	K053251_CI1,
+	K053251_CI2,
+	K053251_CI3,
+	K053251_CI4 
+};
 
 /**  Konami 054000 **/
 WRITE8_DEVICE_HANDLER( k054000_w );
@@ -558,17 +561,16 @@ WRITE8_DEVICE_HANDLER( k056832_ram_attr_hi_w );
 WRITE8_DEVICE_HANDLER( k056832_w );
 WRITE8_DEVICE_HANDLER( k056832_b_w );
 void k056832_mark_plane_dirty(const device_config *device, int num);
-void k056832_MarkAllTilemapsDirty(const device_config *device);
+void k056832_mark_all_tmaps_dirty(const device_config *device);
 void k056832_tilemap_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int num, UINT32 flags, UINT32 priority);
 void k056832_tilemap_draw_dj(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int layer, UINT32 flags, UINT32 priority);
-void k056832_set_LayerAssociation(const device_config *device, int status);
-int  k056832_get_LayerAssociation(const device_config *device);
-void k056832_set_LayerOffset(const device_config *device, int layer, int offsx, int offsy);
-void k056832_set_LSRAMPage(const device_config *device, int logical_page, int physical_page, int physical_offset);
-void k056832_set_UpdateMode(const device_config *device, int mode);
+void k056832_set_layer_association(const device_config *device, int status);
+int  k056832_get_layer_association(const device_config *device);
+void k056832_set_layer_offs(const device_config *device, int layer, int offsx, int offsy);
+void k056832_set_lsram_page(const device_config *device, int logical_page, int physical_page, int physical_offset);
 void k056832_linemap_enable(const device_config *device, int enable);
-int  k056832_is_IRQ_enabled(const device_config *device, int irqline);
-void k056832_read_AVAC(const device_config *device, int *mode, int *data);
+int  k056832_is_irq_enabled(const device_config *device, int irqline);
+void k056832_read_avac(const device_config *device, int *mode, int *data);
 int  k056832_read_register(const device_config *device, int regnum);
 int k056832_get_current_rambank(const device_config *device);
 int k056832_get_lookup(const device_config *device, int bits);	/* Asterix */
@@ -667,10 +669,10 @@ int k055555_get_palette_index(const device_config *device, int idx);
 
 WRITE16_DEVICE_HANDLER( k054338_word_w ); // "CLCT" registers
 WRITE32_DEVICE_HANDLER( k054338_long_w );
-int k054338_read_register(const device_config *device, int reg);
+int k054338_register_r(const device_config *device, int reg);
 void k054338_update_all_shadows(const device_config *device, int rushingheroes_hack);			// called at the beginning of VIDEO_UPDATE()
 void k054338_fill_solid_bg(const device_config *device, bitmap_t *bitmap);				// solid backcolor fill
-void k054338_fill_backcolor(const device_config *device, bitmap_t *bitmap, int mode);	// unified fill, 0=solid, 1=gradient
+void k054338_fill_backcolor(const device_config *device, bitmap_t *bitmap, int mode);	// unified fill, 0=solid, 1=gradient (by using a k055555)
 int  k054338_set_alpha_level(const device_config *device, int pblend);							// blend style 0-2
 void k054338_invert_alpha(const device_config *device, int invert);								// 0=0x00(invis)-0x1f(solid), 1=0x1f(invis)-0x00(solod)
 //void K054338_export_config(const device_config *device, int **shdRGB);
@@ -734,11 +736,3 @@ READ32_DEVICE_HANDLER( k053247_reg_long_r );    // OBJSET2
 READ32_DEVICE_HANDLER( k055555_long_r );        // PCU2
 
 READ16_DEVICE_HANDLER( k053244_reg_word_r );    // OBJSET0
-
-
-/**  Konami 056800  **/
-READ32_DEVICE_HANDLER( K056800_host_r );
-WRITE32_DEVICE_HANDLER( K056800_host_w );
-READ16_DEVICE_HANDLER( K056800_sound_r );
-WRITE16_DEVICE_HANDLER( K056800_sound_w );
-

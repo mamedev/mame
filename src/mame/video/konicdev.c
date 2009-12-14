@@ -1667,7 +1667,7 @@ void k007342_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 	tilemap_draw(bitmap, cliprect, k007342->tilemap[num], flags, priority);
 }
 
-int k007342_is_INT_enabled( const device_config *device )
+int k007342_is_int_enabled( const device_config *device )
 {
 	k007342_state *k007342 = k007342_get_safe_token(device);
 	return k007342->int_enabled;
@@ -1795,7 +1795,6 @@ struct _k007420_state
 {
 	UINT8        *ram;
 
-	gfx_element  *gfx;
 	int          banklimit;
 	int          flipscreen;	// current code uses the 7342 flipscreen!! 
 	UINT8        regs[8];	// current code uses the 7342 regs!! (only [2])
@@ -1839,14 +1838,6 @@ WRITE8_DEVICE_HANDLER( k007420_w )
 	k007420->ram[offset] = data;
 }
 
-
-void k007420_set_banklimit( const device_config *device, int limit )
-{
-	k007420_state *k007420 = k007420_get_safe_token(device);
-	k007420->banklimit = limit;
-}
-
-
 /*
  * Sprite Format
  * ------------------
@@ -1867,14 +1858,14 @@ void k007420_set_banklimit( const device_config *device, int limit )
  *   7  | xxxxxxxx | unused
  */
 
-void k007420_sprites_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect )
+void k007420_sprites_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, gfx_element *gfx )
 {
 	k007420_state *k007420 = k007420_get_safe_token(device);
 	int offs;
 	int codemask = k007420->banklimit;
 	int bankmask = ~k007420->banklimit;
 
-	for (offs = k007420_SPRITERAM_SIZE - 8; offs >= 0; offs -= 8)
+	for (offs = K007420_SPRITERAM_SIZE - 8; offs >= 0; offs -= 8)
 	{
 		int ox, oy, code, color, flipx, flipy, zoom, w, h, x, y, bank;
 		static const int xoffset[4] = { 0, 1, 4, 5 };
@@ -1945,14 +1936,14 @@ void k007420_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 					else 
 						c += bank;
 
-					drawgfx_transpen(bitmap,cliprect,k007420->gfx,
+					drawgfx_transpen(bitmap,cliprect,gfx,
 						c,
 						color,
 						flipx,flipy,
 						sx,sy,0);
 
 					if (k007420->regs[2] & 0x80)
-						drawgfx_transpen(bitmap,cliprect,k007420->gfx,
+						drawgfx_transpen(bitmap,cliprect,gfx,
 							c,
 							color,
 							flipx,flipy,
@@ -1989,7 +1980,7 @@ void k007420_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 					else 
 						c += bank;
 
-					drawgfxzoom_transpen(bitmap,cliprect,k007420->gfx,
+					drawgfxzoom_transpen(bitmap,cliprect,gfx,
 						c,
 						color,
 						flipx,flipy,
@@ -1997,7 +1988,7 @@ void k007420_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 						(zw << 16) / 8,(zh << 16) / 8,0);
 
 					if (k007420->regs[2] & 0x80)
-						drawgfxzoom_transpen(bitmap,cliprect,k007420->gfx,
+						drawgfxzoom_transpen(bitmap,cliprect,gfx,
 							c,
 							color,
 							flipx,flipy,
@@ -2011,8 +2002,8 @@ void k007420_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 	{
 		static int current_sprite = 0;
 
-		if (input_code_pressed_once(machine, KEYCODE_Z)) current_sprite = (current_sprite+1) & ((k007420_SPRITERAM_SIZE/8)-1);
-		if (input_code_pressed_once(machine, KEYCODE_X)) current_sprite = (current_sprite-1) & ((k007420_SPRITERAM_SIZE/8)-1);
+		if (input_code_pressed_once(machine, KEYCODE_Z)) current_sprite = (current_sprite+1) & ((K007420_SPRITERAM_SIZE/8)-1);
+		if (input_code_pressed_once(machine, KEYCODE_X)) current_sprite = (current_sprite-1) & ((K007420_SPRITERAM_SIZE/8)-1);
 
 		popmessage("%02x:%02x %02x %02x %02x %02x %02x %02x %02x", current_sprite,
 			k007420->ram[(current_sprite*8)+0], k007420->ram[(current_sprite*8)+1],
@@ -2032,13 +2023,12 @@ static DEVICE_START( k007420 )
 	k007420_state *k007420 = k007420_get_safe_token(device);
 	const k007420_interface *intf = k007420_get_interface(device);
 
-	k007420->gfx = device->machine->gfx[intf->gfxnum];
 	k007420->callback = intf->callback;
+	k007420->banklimit = intf->banklimit;
 
 	k007420->ram = auto_alloc_array_clear(device->machine, UINT8, 0x200);
 
 	state_save_register_device_item_pointer(device, 0, k007420->ram, 0x0200);
-	state_save_register_device_item(device, 0, k007420->banklimit);
 	state_save_register_device_item(device, 0, k007420->flipscreen);	// current one uses 7342 one
 	state_save_register_device_item_array(device, 0, k007420->regs);	// current one uses 7342 ones
 }
@@ -2048,8 +2038,7 @@ static DEVICE_RESET( k007420 )
 	k007420_state *k007420 = k007420_get_safe_token(device);
 	int i;
 
-	k007420->banklimit = -1;
-	k007420->flipscreen = -1;
+	k007420->flipscreen = 0;
 	for (i = 0; i < 8; i++)
 		k007420->regs[i] = 0;
 }
@@ -2328,23 +2317,6 @@ int k052109_get_RMRD_line(const device_config *device )
 	return k052109->RMRD_line;
 }
 
-void k052109_get_tmap( const device_config *device, tilemap *tilemap, int index )
-{
-	k052109_state *k052109 = k052109_get_safe_token(device);
-
-	assert(index < 3);
-
-	tilemap = k052109->tilemap[index];
-}
-
-void k052109_get_tmaps_all(const device_config *device, tilemap *tilemap0, tilemap *tilemap1, tilemap *tilemap2)
-{
-	k052109_get_tmap(device, tilemap0, 0);
-	k052109_get_tmap(device, tilemap1, 1);
-	k052109_get_tmap(device, tilemap2, 2);
-}
-
-
 void k052109_tilemap_update( const device_config *device )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
@@ -2496,6 +2468,12 @@ if (input_code_pressed(machine, KEYCODE_F))
 	}
 }
 #endif
+}
+
+void k052109_tilemap_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int tmap_num, UINT32 flags, UINT8 priority )
+{
+	k052109_state *k052109 = k052109_get_safe_token(device);
+	tilemap_draw(bitmap, cliprect, k052109->tilemap[tmap_num], flags, priority);
 }
 
 int k052109_is_IRQ_enabled( const device_config *device )
@@ -4012,11 +3990,29 @@ static DEVICE_START( k05324x )
 		128*8
 	};
 
+	/* deinterleave the graphics, if needed */
+	switch (intf->deinterleave)
+	{
+	case KONAMI_ROM_DEINTERLEAVE_NONE:
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_2:
+		konamid_rom_deinterleave_2(machine, intf->gfx_memory_region);
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_2_HALF:
+		konamid_rom_deinterleave_2_half(machine, intf->gfx_memory_region);
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_4:
+		konamid_rom_deinterleave_4(machine, intf->gfx_memory_region);
+		break;
+	}
+
+
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 		if (machine->gfx[gfx_index] == 0)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
+
 
 	/* decode the graphics */
 	switch (intf->plane_order)
@@ -4037,6 +4033,8 @@ static DEVICE_START( k05324x )
 
 	k05324x->memory_region = intf->gfx_memory_region;
 	k05324x->gfx = machine->gfx[gfx_index];
+	k05324x->dx = intf->dx;
+	k05324x->dy = intf->dy;
 	k05324x->callback = intf->callback;
 	k05324x->ram = auto_alloc_array_clear(machine, UINT16, k05324x->ramsize / 2);
 
@@ -4045,8 +4043,6 @@ static DEVICE_START( k05324x )
 	state_save_register_device_item_pointer(device, 0, k05324x->ram, k05324x->ramsize / 2);
 	state_save_register_device_item_pointer(device, 0, k05324x->buffer, k05324x->ramsize / 2);
 	state_save_register_device_item(device, 0, k05324x->rombank);
-	state_save_register_device_item(device, 0, k05324x->dx);
-	state_save_register_device_item(device, 0, k05324x->dy);
 	state_save_register_device_item(device, 0, k05324x->z_rejection);
 	state_save_register_device_item_array(device, 0, k05324x->regs);
 }
@@ -4058,7 +4054,6 @@ static DEVICE_RESET( k05324x )
 
 	k05324x->z_rejection = -1;
 	k05324x->rombank = 0;
-	k05324x->dx = k05324x->dy = 0;
 
 	for (i = 0; i < 0x10; i++)
 		k05324x->regs[i] = 0;
@@ -4080,7 +4075,7 @@ struct _k053247_state
 	UINT8    Kx46_regs[8];
 	UINT16   Kx47_regs[16];
 	int      dx, dy, wraparound;
-	UINT8    OBJCHA_line;
+	UINT8    objcha_line;
 	int      z_rejection;
 
 	k05324x_callback callback;
@@ -4116,20 +4111,37 @@ INLINE const k053247_interface *k053247_get_interface( const device_config *devi
 *****************************************************************************/
 
 #if 0
-void k053247_export_config(UINT16 **ram, gfx_element **gfx, void (**callback)(int *, int *, int *), int *dx, int *dy)
+void k053247_get_gfx( const device_config *device, gfx_element **gfx )
 {
-	if(ram)
-		*ram = k053247_ram;
-	if(gfx)
-		*gfx = k053247_gfx;
-	if(callback)
-		*callback = k053247_callback;
-	if(dx)
-		*dx = k053247_dx;
-	if(dy)
-		*dy = k053247_dy;
+	k053247_state *k053247 = k053247_get_safe_token(device);
+	*gfx = k053247->gfx;
 }
+
+void k053247_get_cb( const device_config *device, void (**callback)(int *, int *, int *) )
+{
+	k053247_state *k053247 = k053247_get_safe_token(device);
+	*callback = k053247->callback;
+}
+
 #endif
+
+void k053247_get_ram( const device_config *device, UINT16 **ram )
+{
+	k053247_state *k053247 = k053247_get_safe_token(device);
+	*ram = k053247->ram;
+}
+
+int k053247_get_dx( const device_config *device )
+{
+	k053247_state *k053247 = k053247_get_safe_token(device);
+	return k053247->dx;
+}
+
+int k053247_get_dy( const device_config *device )
+{
+	k053247_state *k053247 = k053247_get_safe_token(device);
+	return k053247->dy;
+}
 
 int k053246_read_register( const device_config *device, int regnum ) 
 { 
@@ -4222,9 +4234,9 @@ WRITE8_DEVICE_HANDLER( k053247_w )
 		k053247->ram[offs] = (k053247->ram[offs] & 0x00ff) | (data << 8);
 }
 
-// Mystic Warriors hardware games support a non-OBJCHA based ROM readback
+// Mystic Warriors hardware games support a non-objcha based ROM readback
 // write the address to the 246 as usual, but there's a completely separate ROM
-// window that works without needing an OBJCHA line.
+// window that works without needing an objcha line.
 // in this window, +0 = 32 bits from one set of ROMs, and +8 = 32 bits from another set
 READ16_DEVICE_HANDLER( k055673_rom_word_r )	// 5bpp
 {
@@ -4303,7 +4315,7 @@ READ16_DEVICE_HANDLER( k055673_GX6bpp_rom_word_r )
 READ8_DEVICE_HANDLER( k053246_r )
 {
 	k053247_state *k053246 = k053247_get_safe_token(device);
-	if (k053246->OBJCHA_line == ASSERT_LINE)
+	if (k053246->objcha_line == ASSERT_LINE)
 	{
 		int addr;
 
@@ -4353,13 +4365,13 @@ WRITE32_DEVICE_HANDLER( k053246_long_w )
 	k053246_word_w(device, offset + 1, data, mem_mask);
 }
 
-void k053246_set_OBJCHA_line( const device_config *device, int state )
+void k053246_set_objcha_line( const device_config *device, int state )
 {
 	k053247_state *k053246 = k053247_get_safe_token(device);
-	k053246->OBJCHA_line = state;
+	k053246->objcha_line = state;
 }
 
-int k053246_is_IRQ_enabled( const device_config *device )
+int k053246_is_irq_enabled( const device_config *device )
 {
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	// This bit enables obj DMA rather than obj IRQ even though the two functions usually coincide.
@@ -4821,11 +4833,30 @@ static DEVICE_START( k053247 )
 
 	k053247->screen = devtag_get_device(device->machine, intf->screen);
 
+
+	/* deinterleave the graphics, if needed */
+	switch (intf->deinterleave)
+	{
+	case KONAMI_ROM_DEINTERLEAVE_NONE:
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_2:
+		konamid_rom_deinterleave_2(machine, intf->gfx_memory_region);
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_2_HALF:
+		konamid_rom_deinterleave_2_half(machine, intf->gfx_memory_region);
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_4:
+		konamid_rom_deinterleave_4(machine, intf->gfx_memory_region);
+		break;
+	}
+
+
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 		if (machine->gfx[gfx_index] == 0)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
+
 
 	/* decode the graphics */
 	switch (intf->plane_order)
@@ -4864,7 +4895,7 @@ static DEVICE_START( k053247 )
 	state_save_register_device_item_pointer(device, 0, k053247->ram, 0x800);
 	state_save_register_device_item_array(device, 0, k053247->Kx46_regs);
 	state_save_register_device_item_array(device, 0, k053247->Kx47_regs);
-	state_save_register_device_item(device, 0, k053247->OBJCHA_line);
+	state_save_register_device_item(device, 0, k053247->objcha_line);
 	state_save_register_device_item(device, 0, k053247->wraparound);
 	state_save_register_device_item(device, 0, k053247->z_rejection);
 }
@@ -4993,7 +5024,7 @@ static DEVICE_START( k055673 )
 	state_save_register_device_item_pointer(device, 0, k053247->ram, 0x800);
 	state_save_register_device_item_array(device, 0, k053247->Kx46_regs);
 	state_save_register_device_item_array(device, 0, k053247->Kx47_regs);
-	state_save_register_device_item(device, 0, k053247->OBJCHA_line);
+	state_save_register_device_item(device, 0, k053247->objcha_line);
 	state_save_register_device_item(device, 0, k053247->wraparound);
 	state_save_register_device_item(device, 0, k053247->z_rejection);
 }
@@ -5004,7 +5035,7 @@ static DEVICE_RESET( k053247 )
 
 	k053247->wraparound = 1;
 	k053247->z_rejection = -1;
-	k053247->OBJCHA_line = CLEAR_LINE;
+	k053247->objcha_line = CLEAR_LINE;
 
 	memset(k053247->ram,  0, 0x1000);
 	memset(k053247->Kx46_regs, 0, 8);
@@ -5730,7 +5761,7 @@ static DEVICE_RESET( k053251 )
 typedef struct _k054000_state k054000_state;
 struct _k054000_state
 {
-	UINT8    ram[0x20];
+	UINT8    regs[0x20];
 };
 
 /*****************************************************************************
@@ -5755,7 +5786,7 @@ WRITE8_DEVICE_HANDLER( k054000_w )
 	k054000_state *k054000 = k054000_get_safe_token(device);
 
 	//logerror("%04x: write %02x to 054000 address %02x\n",cpu_get_pc(space->cpu),data,offset);
-	k054000->ram[offset] = data;
+	k054000->regs[offset] = data;
 }
 
 READ8_DEVICE_HANDLER( k054000_r )
@@ -5769,22 +5800,22 @@ READ8_DEVICE_HANDLER( k054000_r )
 	if (offset != 0x18) 
 		return 0;
 
-	Acx = (k054000->ram[0x01] << 16) | (k054000->ram[0x02] << 8) | k054000->ram[0x03];
-	Acy = (k054000->ram[0x09] << 16) | (k054000->ram[0x0a] << 8) | k054000->ram[0x0b];
+	Acx = (k054000->regs[0x01] << 16) | (k054000->regs[0x02] << 8) | k054000->regs[0x03];
+	Acy = (k054000->regs[0x09] << 16) | (k054000->regs[0x0a] << 8) | k054000->regs[0x0b];
 
 	/* TODO: this is a hack to make thndrx2 pass the startup check. It is certainly wrong. */
-	if (k054000->ram[0x04] == 0xff) 
+	if (k054000->regs[0x04] == 0xff) 
 		Acx+=3;
-	if (k054000->ram[0x0c] == 0xff) 
+	if (k054000->regs[0x0c] == 0xff) 
 		Acy+=3;
 
-	Aax = k054000->ram[0x06] + 1;
-	Aay = k054000->ram[0x07] + 1;
+	Aax = k054000->regs[0x06] + 1;
+	Aay = k054000->regs[0x07] + 1;
 
-	Bcx = (k054000->ram[0x15] << 16) | (k054000->ram[0x16] << 8) | k054000->ram[0x17];
-	Bcy = (k054000->ram[0x11] << 16) | (k054000->ram[0x12] << 8) | k054000->ram[0x13];
-	Bax = k054000->ram[0x0e] + 1;
-	Bay = k054000->ram[0x0f] + 1;
+	Bcx = (k054000->regs[0x15] << 16) | (k054000->regs[0x16] << 8) | k054000->regs[0x17];
+	Bcy = (k054000->regs[0x11] << 16) | (k054000->regs[0x12] << 8) | k054000->regs[0x13];
+	Bax = k054000->regs[0x0e] + 1;
+	Bay = k054000->regs[0x0f] + 1;
 
 	if (Acx + Aax < Bcx - Bax)
 		return 1;
@@ -5820,7 +5851,7 @@ static DEVICE_START( k054000 )
 {
 	k054000_state *k054000 = k054000_get_safe_token(device);
 
-	state_save_register_device_item_array(device, 0, k054000->ram);
+	state_save_register_device_item_array(device, 0, k054000->regs);
 }
 
 static DEVICE_RESET( k054000 )
@@ -5829,7 +5860,7 @@ static DEVICE_RESET( k054000 )
 	int i;
 
 	for (i = 0; i < 0x20; i++)
-		k054000->ram[i] = 0;
+		k054000->regs[i] = 0;
 }
 
 
@@ -6007,8 +6038,8 @@ struct _k056832_state
 
 	UINT8 *   rombase;	// pointer to tile gfx data
 	UINT16 *  videoram;
-	int       NumGfxBanks;		// depends on size of graphics ROMs
-	int       CurGfxBank;		// cached info for K056832_regs[0x1a]
+	int       num_gfx_banks;	// depends on size of graphics ROMs
+	int       cur_gfx_banks;		// cached info for K056832_regs[0x1a]
 	int       gfxnum;			// graphics element index for unpacked tiles
 	const char *memory_region;	// memory region for tile gfx data
 
@@ -6039,7 +6070,6 @@ struct _k056832_state
 	int       active_layer;
 	int       selected_page;
 	int       selected_page_x4096;
-	int       update_mode;
 	int       linemap_enabled;
 	int       use_ext_linescroll;
 	int       uses_tile_banks, cur_tile_bank;
@@ -6105,7 +6135,7 @@ void k056832_mark_plane_dirty( const device_config *device, int layer )
 	}
 }
 
-void k056832_MarkAllTilemapsDirty( const device_config *device )
+void k056832_mark_all_tmaps_dirty( const device_config *device )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	int i;
@@ -6120,7 +6150,7 @@ void k056832_MarkAllTilemapsDirty( const device_config *device )
 	}
 }
 
-static void k056832_UpdatePageLayout( const device_config *device )
+static void k056832_update_page_layout( const device_config *device )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	int layer, rowstart, rowspan, colstart, colspan, r, c, pageIndex, setlayer;
@@ -6171,7 +6201,7 @@ static void k056832_UpdatePageLayout( const device_config *device )
 	}
 
 	// refresh associated tilemaps
-	k056832_MarkAllTilemapsDirty(device);
+	k056832_mark_all_tmaps_dirty(device);
 }
 
 int k056832_get_lookup( const device_config *device, int bits )
@@ -6269,7 +6299,7 @@ static void k056832_change_rambank( const device_config *device )
 	k056832->selected_page_x4096 = k056832->selected_page << 12;
 
 	// refresh associated tilemaps
-	k056832_MarkAllTilemapsDirty(device);
+	k056832_mark_all_tmaps_dirty(device);
 }
 
 int k056832_get_current_rambank( const device_config *device )
@@ -6294,7 +6324,7 @@ static void k056832_change_rombank( const device_config *device )
 		bank = k056832->regs[0x1a] | (k056832->regs[0x1b] << 16);
 	}
 
-	k056832->CurGfxBank = bank % k056832->NumGfxBanks;
+	k056832->cur_gfx_banks = bank % k056832->num_gfx_banks;
 }
 
 void k056832_set_tile_bank( const device_config *device, int bank )
@@ -6337,7 +6367,7 @@ static int k056832_rom_read_b( const device_config *device, int offset, int blks
 	}
 
 	// add in the bank offset
-	offset += (k056832->CurGfxBank * 0x2000);
+	offset += (k056832->cur_gfx_banks * 0x2000);
 
 	// figure out the base of the ROM block
 	base = (offset / blksize) * blksize2;
@@ -6415,8 +6445,8 @@ READ16_DEVICE_HANDLER( k056832_rom_word_r )
 	ofs16 = (offset / 8)*5;
 	ofs8 = (offset / 4)*5;
 
-	ofs16 += (k056832->CurGfxBank* 5 * 1024);
-	ofs8 += (k056832->CurGfxBank* 10 * 1024);
+	ofs16 += (k056832->cur_gfx_banks * 5 * 1024);
+	ofs8 += (k056832->cur_gfx_banks * 10 * 1024);
 
 	if (!k056832->rombase)
 	{
@@ -6442,7 +6472,7 @@ READ16_DEVICE_HANDLER( k056832_rom_word_r )
 READ16_DEVICE_HANDLER( k056832_mw_rom_word_r )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
-	int bank = 10240 * k056832->CurGfxBank;
+	int bank = 10240 * k056832->cur_gfx_banks;
 	int addr;
 
 	if (!k056832->rombase)
@@ -6506,7 +6536,7 @@ READ16_DEVICE_HANDLER( k056832_mw_rom_word_r )
 READ16_DEVICE_HANDLER( k056832_bishi_rom_word_r )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
-	int addr = 0x4000 * k056832->CurGfxBank + offset;
+	int addr = 0x4000 * k056832->cur_gfx_banks + offset;
 
 	if (!k056832->rombase)
 		k056832->rombase = memory_region(device->machine, k056832->memory_region);
@@ -6517,7 +6547,7 @@ READ16_DEVICE_HANDLER( k056832_bishi_rom_word_r )
 READ16_DEVICE_HANDLER( k056832_rom_word_8000_r )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
-	int addr = 0x8000 * k056832->CurGfxBank + 2 * offset;
+	int addr = 0x8000 * k056832->cur_gfx_banks + 2 * offset;
 
 	if (!k056832->rombase)
 		k056832->rombase = memory_region(device->machine, k056832->memory_region);
@@ -6528,7 +6558,7 @@ READ16_DEVICE_HANDLER( k056832_rom_word_8000_r )
 READ16_DEVICE_HANDLER( k056832_old_rom_word_r )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
-	int addr = 0x2000 * k056832->CurGfxBank + 2 * offset;
+	int addr = 0x2000 * k056832->cur_gfx_banks + 2 * offset;
 
 	if (!k056832->rombase)
 		k056832->rombase = memory_region(device->machine, k056832->memory_region);
@@ -6831,7 +6861,7 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 					k056832->y[layer] = (new_data & 0x18) >> 3;
 					k056832->h[layer] = (new_data & 0x3);
 					k056832->active_layer = layer;
-					k056832_UpdatePageLayout(device);
+					k056832_update_page_layout(device);
 				} else
 
 				if (offset >= 0x18/2 && offset <= 0x1e/2)
@@ -6839,7 +6869,7 @@ WRITE16_DEVICE_HANDLER( k056832_word_w )
 					k056832->x[layer] = (new_data & 0x18) >> 3;
 					k056832->w[layer] = (new_data & 0x03);
 					k056832->active_layer = layer;
-					k056832_UpdatePageLayout(device);
+					k056832_update_page_layout(device);
 				} else
 
 				if (offset >= 0x20/2 && offset <= 0x26/2)
@@ -7045,17 +7075,17 @@ void k056832_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 	int dminy, dmaxy, dminx, dmaxx;
 	rectangle drawrect;
 	tilemap *tmap;
-	UINT16 *pScrollData;
+	UINT16 *p_scroll_data;
 	UINT16 ram16[2];
 
 	int rowstart = k056832->y[layer];
 	int colstart = k056832->x[layer];
-	int rowspan  = k056832->h[layer]+1;
-	int colspan  = k056832->w[layer]+1;
+	int rowspan  = k056832->h[layer] + 1;
+	int colspan  = k056832->w[layer] + 1;
 	int dy = k056832->dy[layer];
 	int dx = k056832->dx[layer];
-	int scrollbank = ((k056832->regs[0x18]>>1) & 0xc) | (k056832->regs[0x18] & 3);
-	int scrollmode = k056832->regs[0x05]>>(k056832->lsram_page[layer][0]<<1) & 3;
+	int scrollbank = ((k056832->regs[0x18] >> 1) & 0xc) | (k056832->regs[0x18] & 3);
+	int scrollmode = k056832->regs[0x05] >> (k056832->lsram_page[layer][0] << 1) & 3;
 
 	if (k056832->use_ext_linescroll)
 	{
@@ -7105,20 +7135,20 @@ void k056832_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 	switch( scrollmode )
 	{
 		case 0: // linescroll
-			pScrollData = &k056832->videoram[scrollbank<<12] + (k056832->lsram_page[layer][1]>>1);
+			p_scroll_data = &k056832->videoram[scrollbank<<12] + (k056832->lsram_page[layer][1]>>1);
 			line_height = 1;
 			sdat_wrapmask = 0x3ff;
 			sdat_adv = 2;
 		break;
 		case 2: // rowscroll
 
-			pScrollData = &k056832->videoram[scrollbank<<12] + (k056832->lsram_page[layer][1]>>1);
+			p_scroll_data = &k056832->videoram[scrollbank << 12] + (k056832->lsram_page[layer][1] >> 1);
 			line_height = 8;
 			sdat_wrapmask = 0x3ff;
 			sdat_adv = 16;
 		break;
 		default: // xyscroll
-			pScrollData = ram16;
+			p_scroll_data = ram16;
 			line_height = K056832_PAGE_HEIGHT;
 			sdat_wrapmask = 0;
 			sdat_adv = 0;
@@ -7129,7 +7159,7 @@ void k056832_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 		sdat_adv = -sdat_adv;
 
 	last_active = k056832->active_layer;
-	new_colorbase = (k056832->update_mode) ? k055555_get_palette_index(device, layer) : 0;
+	new_colorbase = (k056832->k055555 != NULL) ? k055555_get_palette_index(k056832->k055555, layer) : 0;
 
 	for (r = 0; r < rowspan; r++)
 	{
@@ -7234,7 +7264,7 @@ void k056832_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 				k056832->active_layer = layer;
 			}
 
-			if (k056832->update_mode)
+			if (k056832->k055555 != NULL)		// are we using k055555 palette?
 			{
 				if (k056832->last_colorbase[pageIndex] != new_colorbase)
 				{
@@ -7257,7 +7287,7 @@ void k056832_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 			last_dx = 0x100000;
 			last_visible = 0;
 
-			for (sdat_walk=sdat_start, line_y=line_starty; line_y<line_endy; sdat_walk+=sdat_adv, line_y+=line_height)
+			for (sdat_walk = sdat_start, line_y = line_starty; line_y < line_endy; sdat_walk += sdat_adv, line_y += line_height)
 			{
 				dminy = line_y;
 				dmaxy = line_y + line_height - 1;
@@ -7271,7 +7301,7 @@ void k056832_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 				drawrect.min_y = (dminy < cminy ) ? cminy : dminy;
 				drawrect.max_y = (dmaxy > cmaxy ) ? cmaxy : dmaxy;
 
-				dx = ((int)pScrollData[sdat_offs]<<16 | (int)pScrollData[sdat_offs+1]) + corr;
+				dx = ((int)p_scroll_data[sdat_offs]<<16 | (int)p_scroll_data[sdat_offs + 1]) + corr;
 
 				if (last_dx == dx) { if (last_visible) goto LINE_SHORTCIRCUIT; continue; }
 				last_dx = dx;
@@ -7352,7 +7382,7 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 	int dminy, dmaxy, dminx, dmaxx;
 	rectangle drawrect;
 	tilemap *tmap;
-	UINT16 *pScrollData;
+	UINT16 *p_scroll_data;
 	UINT16 ram16[2];
 
 	int rowstart = k056832->y[layer];
@@ -7407,19 +7437,19 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 	switch( scrollmode )
 	{
 		case 0: // linescroll
-			pScrollData = &k056832->videoram[scrollbank << 12] + (k056832->lsram_page[layer][1] >> 1);
+			p_scroll_data = &k056832->videoram[scrollbank << 12] + (k056832->lsram_page[layer][1] >> 1);
 			line_height = 1;
 			sdat_wrapmask = 0x3ff;
 			sdat_adv = 2;
 		break;
 		case 2: // rowscroll
-			pScrollData = &k056832->videoram[scrollbank << 12] + (k056832->lsram_page[layer][1] >> 1);
+			p_scroll_data = &k056832->videoram[scrollbank << 12] + (k056832->lsram_page[layer][1] >> 1);
 			line_height = 8;
 			sdat_wrapmask = 0x3ff;
 			sdat_adv = 16;
 		break;
 		default: // xyscroll
-			pScrollData = ram16;
+			p_scroll_data = ram16;
 			line_height = K056832_PAGE_HEIGHT;
 			sdat_wrapmask = 0;
 			sdat_adv = 0;
@@ -7430,7 +7460,7 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 		sdat_adv = -sdat_adv;
 
 	last_active = k056832->active_layer;
-	new_colorbase = (k056832->update_mode) ? k055555_get_palette_index(k056832->k055555, layer) : 0;
+	new_colorbase = (k056832->k055555 != NULL) ? k055555_get_palette_index(k056832->k055555, layer) : 0;
 
 	for (r = 0; r <= rowspan; r++)
 	{
@@ -7511,7 +7541,7 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 				k056832->active_layer = layer;
 			}		
 
-			if (k056832->update_mode)
+			if (k056832->k055555 != NULL)		// are we using k055555 palette?
 			{
 				if (k056832->last_colorbase[pageIndex] != new_colorbase)
 				{
@@ -7548,7 +7578,7 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 				drawrect.min_y = (dminy < cminy ) ? cminy : dminy;
 				drawrect.max_y = (dmaxy > cmaxy ) ? cmaxy : dmaxy;
 
-				dx = ((int)pScrollData[sdat_offs] << 16 | (int)pScrollData[sdat_offs + 1]) + corr;	
+				dx = ((int)p_scroll_data[sdat_offs] << 16 | (int)p_scroll_data[sdat_offs + 1]) + corr;	
 
 				if (last_dx == dx) { if (last_visible) goto LINE_SHORTCIRCUIT; continue; }
 				last_dx = dx;
@@ -7633,17 +7663,11 @@ void k056832_set_layer_offs( const device_config *device, int layer, int offsx, 
 	k056832->layer_offs[layer][1] = offsy;
 }
 
-void k056832_set_LSRAMPage( const device_config *device, int logical_page, int physical_page, int physical_offset )
+void k056832_set_lsram_page( const device_config *device, int logical_page, int physical_page, int physical_offset )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	k056832->lsram_page[logical_page][0] = physical_page;
 	k056832->lsram_page[logical_page][1] = physical_offset;
-}
-
-void k056832_set_UpdateMode( const device_config *device, int mode )
-{
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	k056832->update_mode = mode;
 }
 
 void k056832_linemap_enable( const device_config *device, int enable )
@@ -7652,13 +7676,13 @@ void k056832_linemap_enable( const device_config *device, int enable )
 	k056832->linemap_enabled = enable;
 }
 
-int k056832_is_IRQ_enabled( const device_config *device, int irqline )
+int k056832_is_irq_enabled( const device_config *device, int irqline )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	return(k056832->regs[0x06/2] & (1 << irqline & 7));
 }
 
-void k056832_read_AVAC( const device_config *device, int *mode, int *data )
+void k056832_read_avac( const device_config *device, int *mode, int *data )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	*mode = k056832->regs[0x04/2] & 7;
@@ -7674,7 +7698,7 @@ int k056832_read_register( const device_config *device, int regnum )
 //static STATE_POSTLOAD( k056832_postload )
 void k056832_postload( const device_config *device )
 {
-	k056832_UpdatePageLayout(device);
+	k056832_update_page_layout(device);
 	k056832_change_rambank(device);
 	k056832_change_rombank(device);
 }
@@ -7754,6 +7778,24 @@ static DEVICE_START( k056832 )
 		8*8*4
 	};
 
+
+	/* deinterleave the graphics, if needed */
+	switch (intf->deinterleave)
+	{
+	case KONAMI_ROM_DEINTERLEAVE_NONE:
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_2:
+		konamid_rom_deinterleave_2(machine, intf->gfx_memory_region);
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_2_HALF:
+		konamid_rom_deinterleave_2_half(machine, intf->gfx_memory_region);
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_4:
+		konamid_rom_deinterleave_4(machine, intf->gfx_memory_region);
+		break;
+	}
+
+
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 	{
@@ -7761,8 +7803,10 @@ static DEVICE_START( k056832 )
 	}
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
+
 	/* handle the various graphics formats */
 	i = (intf->big) ? 8 : 16;
+
 
 	/* decode the graphics */
 	switch (intf->bpp)
@@ -7808,7 +7852,7 @@ static DEVICE_START( k056832 )
 	k056832->callback = intf->callback;
 
 	k056832->rombase = memory_region(machine, intf->gfx_memory_region);
-	k056832->NumGfxBanks = memory_region_length(machine, intf->gfx_memory_region) / 0x2000;
+	k056832->num_gfx_banks = memory_region_length(machine, intf->gfx_memory_region) / 0x2000;
 	k056832->djmain_hack = intf->djmain_hack;
 
 	k056832->k055555 = devtag_get_device(device->machine, intf->k055555);
@@ -7841,7 +7885,7 @@ static DEVICE_START( k056832 )
 		tilemap_set_transparent_pen(tmap, 0);
 	}
 
-	k056832_UpdatePageLayout(device);
+	k056832_update_page_layout(device);
 
 	k056832_change_rambank(device);
 	k056832_change_rombank(device);
@@ -7859,7 +7903,6 @@ static DEVICE_START( k056832 )
 
 	state_save_register_device_item(device, 0, k056832->default_layer_association);
 	state_save_register_device_item(device, 0, k056832->active_layer);
-	state_save_register_device_item(device, 0, k056832->update_mode);
 	state_save_register_device_item(device, 0, k056832->linemap_enabled);
 	state_save_register_device_item(device, 0, k056832->use_ext_linescroll);
 	state_save_register_device_item(device, 0, k056832->uses_tile_banks);
@@ -7878,7 +7921,7 @@ static DEVICE_RESET( k056832 )
 	k056832_state *k056832 = k056832_get_safe_token(device);
 	int i;
 
-	k056832->CurGfxBank = 0;
+	k056832->cur_gfx_banks = 0;
 	k056832->use_ext_linescroll = 0;
 	k056832->uses_tile_banks = 0;
 
@@ -7899,7 +7942,6 @@ static DEVICE_RESET( k056832 )
 
 	k056832->default_layer_association = 1;
 	k056832->active_layer = 0;
-	k056832->update_mode = 0;
 	k056832->linemap_enabled = 0;
 
 	memset(k056832->line_dirty, 0, sizeof(UINT32) * K056832_PAGE_COUNT * 8);
@@ -8174,7 +8216,7 @@ void k054338_fill_backcolor( const device_config *device, bitmap_t *bitmap, int 
 	BGC_SET = 0;
 	pal_ptr = device->machine->generic.paletteram.u32;
 
-	if (!mode)
+	if (!mode || k054338->k055555 == NULL)
 	{
 		// single color output from CLTC
 		bgcolor = (int)(k054338->regs[K338_REG_BGC_R] & 0xff) << 16 | (int)k054338->regs[K338_REG_BGC_GB];
@@ -8328,9 +8370,10 @@ static DEVICE_START( k054338 )
 	k054338->screen = devtag_get_device(device->machine, intf->screen);
 	k054338->k055555 = devtag_get_device(device->machine, intf->k055555);
 
+	k054338->alphainverted = intf->alpha_inv;
+
 	state_save_register_device_item_array(device, 0, k054338->regs);
 	state_save_register_device_item_array(device, 0, k054338->shd_rgb);
-	state_save_register_device_item(device, 0, k054338->alphainverted);
 }
 
 static DEVICE_RESET( k054338 )
@@ -8339,7 +8382,6 @@ static DEVICE_RESET( k054338 )
 
 	memset(k054338->regs, 0, sizeof(UINT16)*32);
 	memset(k054338->shd_rgb, 0, sizeof(int)*9);
-	k054338->alphainverted = 1;
 }
 
 
@@ -9439,192 +9481,6 @@ DEVICE_GET_INFO( k053252 )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:					strcpy(info->s, "Konami 053252");				break;
 		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Konami Video IC");					break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;
-	}
-}
-
-/*************************************************************************
-
-   To be split and added to emu/sound as a separate device
-
-*************************************************************************/
-
-/* Konami K056800 (MIRAC) */
-
-typedef struct _k056800_state k056800_state;
-struct _k056800_state
-{
-	UINT8                host_reg[8];
-	UINT8                sound_reg[8];
-
-	emu_timer            *sound_cpu_timer;
-	UINT8                sound_cpu_irq1_enable;
-	k056800_irq_cb       irq_cb;
-};
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE k056800_state *k056800_get_safe_token( const device_config *device )
-{
-	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K056800);
-
-	return (k056800_state *)device->token;
-}
-
-INLINE const k056800_interface *k056800_get_interface( const device_config *device )
-{
-	assert(device != NULL);
-	assert((device->type == K056800));
-	return (const k056800_interface *) device->static_config;
-}
-
-/*****************************************************************************
-    DEVICE HANDLERS
-*****************************************************************************/
-
-
-static UINT8 k056800_host_reg_r( const device_config *device, int reg )
-{
-	k056800_state *k056800 = k056800_get_safe_token(device);
-	UINT8 value = k056800->host_reg[reg];
-	if (reg == 2) 
-		value &= ~3; // suppress VOLWR busy flags
-
-	return value;
-}
-
-static void k056800_host_reg_w( const device_config *device, int reg, UINT8 data )
-{
-	k056800_state *k056800 = k056800_get_safe_token(device);
-
-	k056800->sound_reg[reg] = data;
-
-	if (reg == 7)
-		k056800->irq_cb(device->machine, 1);
-}
-
-static UINT8 k056800_sound_reg_r( const device_config *device, int reg )
-{
-	k056800_state *k056800 = k056800_get_safe_token(device);
-	return k056800->sound_reg[reg];
-}
-
-static void k056800_sound_reg_w( const device_config *device, int reg, UINT8 data )
-{
-	k056800_state *k056800 = k056800_get_safe_token(device);
-
-	if (reg == 4)
-		k056800->sound_cpu_irq1_enable = data & 0x01;
-
-	k056800->host_reg[reg] = data;
-}
-
-static TIMER_CALLBACK( k056800_sound_cpu_timer_tick )
-{
-	k056800_state *k056800 = (k056800_state *)ptr;
-
-	if (k056800->sound_cpu_irq1_enable)
-		k056800->irq_cb(machine, 0);
-}
-
-READ32_DEVICE_HANDLER( k056800_host_r )
-{
-	UINT32 r = 0;
-
-	if (ACCESSING_BITS_24_31)
-		r |= k056800_host_reg_r(device, (offset * 4) + 0) << 24;
-
-	if (ACCESSING_BITS_16_23)
-		r |= k056800_host_reg_r(device, (offset * 4) + 1) << 16;
-
-	if (ACCESSING_BITS_8_15)
-		r |= k056800_host_reg_r(device, (offset * 4) + 2) << 8;
-
-	if (ACCESSING_BITS_0_7)
-		r |= k056800_host_reg_r(device, (offset * 4) + 3) << 0;
-
-
-	return r;
-}
-
-WRITE32_DEVICE_HANDLER( k056800_host_w )
-{
-	if (ACCESSING_BITS_24_31)
-		k056800_host_reg_w(device, (offset * 4) + 0, (data >> 24) & 0xff);
-
-	if (ACCESSING_BITS_16_23)
-		k056800_host_reg_w(device, (offset * 4) + 1, (data >> 16) & 0xff);
-
-	if (ACCESSING_BITS_8_15)
-		k056800_host_reg_w(device, (offset * 4) + 2, (data >> 8) & 0xff);
-
-	if (ACCESSING_BITS_0_7)
-		k056800_host_reg_w(device, (offset * 4) + 3, (data >> 0) & 0xff);
-
-}
-
-READ16_DEVICE_HANDLER( k056800_sound_r )
-{
-	return k056800_sound_reg_r(device, offset);
-}
-
-WRITE16_DEVICE_HANDLER( k056800_sound_w )
-{
-	k056800_sound_reg_w(device, offset, data);
-}
-
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-static DEVICE_START( k056800 )
-{
-	k056800_state *k056800 = k056800_get_safe_token(device);
-	const k056800_interface *intf = k056800_get_interface(device);
-	attotime timer_period = attotime_mul(ATTOTIME_IN_HZ(44100), 128);	// roughly 2.9us
-
-	k056800->irq_cb = intf->irq_cb;
-
-	k056800->sound_cpu_timer = timer_alloc(device->machine, k056800_sound_cpu_timer_tick, k056800);
-	timer_adjust_periodic(k056800->sound_cpu_timer, timer_period, 0, timer_period);
-
-	state_save_register_device_item_array(device, 0, k056800->host_reg);
-	state_save_register_device_item_array(device, 0, k056800->sound_reg);
-	state_save_register_device_item(device, 0, k056800->sound_cpu_irq1_enable);
-}
-
-static DEVICE_RESET( k056800 )
-{
-	k056800_state *k056800 = k056800_get_safe_token(device);
-
-	memset(k056800->host_reg, 0, sizeof(k056800->host_reg));
-	memset(k056800->sound_reg, 0, sizeof(k056800->sound_reg));
-
-	k056800->sound_cpu_irq1_enable = 0;
-}
-
-DEVICE_GET_INFO( k056800 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(k056800_state);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k056800);		break;
-		case DEVINFO_FCT_STOP:					/* Nothing */									break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(k056800);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Konami 056800 MIRAC");				break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Konami custom");					break;
 		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
 		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME Team");			break;

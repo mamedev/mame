@@ -217,11 +217,11 @@ Thrill Drive 713A13  -       713A14  -
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
-#include "machine/konamiic.h"
 #include "machine/adc1213x.h"
 #include "sound/rf5c400.h"
 #include "video/voodoo.h"
 #include "machine/timekpr.h"
+#include "sound/k056800.h"
 
 static UINT8 led_reg0, led_reg1;
 
@@ -894,9 +894,9 @@ static ADDRESS_MAP_START( nwktr_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ(sysreg_r)
 	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE(sysreg_w)
 	AM_RANGE(0x7d020000, 0x7d021fff) AM_DEVREADWRITE8("m48t58", timekeeper_r, timekeeper_w, 0xffffffff)	/* M48T58Y RTC/NVRAM */
-	AM_RANGE(0x7d030000, 0x7d030007) AM_READ(K056800_host_r)
-	AM_RANGE(0x7d030000, 0x7d030007) AM_WRITE(K056800_host_w)
-	AM_RANGE(0x7d030008, 0x7d03000f) AM_WRITE(K056800_host_w)
+	AM_RANGE(0x7d030000, 0x7d030007) AM_DEVREAD("k056800", k056800_host_r)
+	AM_RANGE(0x7d030000, 0x7d030007) AM_DEVWRITE("k056800", k056800_host_w)
+	AM_RANGE(0x7d030008, 0x7d03000f) AM_DEVWRITE("k056800", k056800_host_w)
 	AM_RANGE(0x7d040000, 0x7d04ffff) AM_READWRITE(lanc1_r, lanc1_w)
 	AM_RANGE(0x7d050000, 0x7d05ffff) AM_READWRITE(lanc2_r, lanc2_w)
 	AM_RANGE(0x7e000000, 0x7e7fffff) AM_ROM AM_REGION("user2", 0)	/* Data ROM */
@@ -910,7 +910,7 @@ static ADDRESS_MAP_START( sound_memmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		/* Work RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("rfsnd", rf5c400_r, rf5c400_w)		/* Ricoh RF5C400 */
-	AM_RANGE(0x300000, 0x30000f) AM_READWRITE(K056800_sound_r, K056800_sound_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("k056800", k056800_sound_r, k056800_sound_w)
 	AM_RANGE(0x600000, 0x600001) AM_NOP
 ADDRESS_MAP_END
 
@@ -1029,6 +1029,18 @@ static const adc12138_interface nwktr_adc_interface = {
 	adc12138_input_callback
 };
 
+static void sound_irq_callback(running_machine *machine, int irq)
+{
+	if (irq == 0)
+		generic_pulse_irq_line(cputag_get_cpu(machine, "audiocpu"), INPUT_LINE_IRQ1);
+	else
+		generic_pulse_irq_line(cputag_get_cpu(machine, "audiocpu"), INPUT_LINE_IRQ2);
+}
+
+static const k056800_interface nwktr_k056800_interface = 
+{
+	sound_irq_callback
+};
 
 static MACHINE_RESET( nwktr )
 {
@@ -1071,6 +1083,8 @@ static MACHINE_DRIVER_START( nwktr )
 	MDRV_VIDEO_START(nwktr)
 	MDRV_VIDEO_UPDATE(nwktr)
 
+	MDRV_K056800_ADD("k056800", nwktr_k056800_interface)
+
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("rfsnd", RF5C400, 16934400)	// as per Guru readme above
@@ -1084,14 +1098,6 @@ MACHINE_DRIVER_END
 
 /*****************************************************************************/
 
-static void sound_irq_callback(running_machine *machine, int irq)
-{
-	if (irq == 0)
-		generic_pulse_irq_line(cputag_get_cpu(machine, "audiocpu"), INPUT_LINE_IRQ1);
-	else
-		generic_pulse_irq_line(cputag_get_cpu(machine, "audiocpu"), INPUT_LINE_IRQ2);
-}
-
 static DRIVER_INIT(nwktr)
 {
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_NWKTR);
@@ -1100,7 +1106,6 @@ static DRIVER_INIT(nwktr)
 	sharc_dataram = auto_alloc_array(machine, UINT32, 0x100000/4);
 	led_reg0 = led_reg1 = 0x7f;
 
-	K056800_init(machine, sound_irq_callback);
 	K033906_init(machine);
 
 	lanc2_init(machine);

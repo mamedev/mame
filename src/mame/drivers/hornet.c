@@ -313,12 +313,12 @@
 #include "cpu/sharc/sharc.h"
 #include "machine/eeprom.h"
 #include "machine/konppc.h"
-#include "machine/konamiic.h"
 #include "video/voodoo.h"
 #include "machine/timekpr.h"
 #include "sound/rf5c400.h"
 #include "rendlay.h"
 #include "machine/adc1213x.h"
+#include "sound/k056800.h"
 
 static UINT8 led_reg0, led_reg1;
 static UINT32 *workram;
@@ -807,7 +807,7 @@ static ADDRESS_MAP_START( hornet_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ8(sysreg_r, 0xffffffff)
 	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE8(sysreg_w, 0xffffffff)
 	AM_RANGE(0x7d020000, 0x7d021fff) AM_DEVREADWRITE8("m48t58", timekeeper_r, timekeeper_w, 0xffffffff)	/* M48T58Y RTC/NVRAM */
-	AM_RANGE(0x7d030000, 0x7d030007) AM_READWRITE(K056800_host_r, K056800_host_w)
+	AM_RANGE(0x7d030000, 0x7d030007) AM_DEVREADWRITE("k056800", k056800_host_r, k056800_host_w)
 	AM_RANGE(0x7d042000, 0x7d043fff) AM_RAM				/* COMM BOARD 0 */
 	AM_RANGE(0x7d044000, 0x7d044007) AM_READ(comm0_unk_r)
 	AM_RANGE(0x7d048000, 0x7d048003) AM_WRITE(comm1_w)
@@ -824,7 +824,7 @@ static ADDRESS_MAP_START( sound_memmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		/* Work RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("rfsnd", rf5c400_r, rf5c400_w)		/* Ricoh RF5C400 */
-	AM_RANGE(0x300000, 0x30000f) AM_READWRITE(K056800_sound_r, K056800_sound_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("k056800", k056800_sound_r, k056800_sound_w)
 	AM_RANGE(0x480000, 0x480001) AM_WRITENOP
 	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP
@@ -1078,6 +1078,24 @@ static const adc12138_interface hornet_adc_interface = {
 	adc12138_input_callback
 };
 
+static TIMER_CALLBACK( irq_off )
+{
+	cputag_set_input_line(machine, "audiocpu", param, CLEAR_LINE);
+}
+
+static void sound_irq_callback( running_machine *machine, int irq )
+{
+	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
+
+	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
+	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
+}
+
+static const k056800_interface hornet_k056800_interface = 
+{
+	sound_irq_callback
+};
+
 static MACHINE_DRIVER_START( hornet )
 
 	/* basic machine hardware */
@@ -1115,6 +1133,8 @@ static MACHINE_DRIVER_START( hornet )
 	MDRV_VIDEO_START(hornet)
 	MDRV_VIDEO_UPDATE(hornet)
 
+	MDRV_K056800_ADD("k056800", hornet_k056800_interface)
+
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("rfsnd", RF5C400, 16934400)	// value from Guru readme, gives 44100 Hz sample rate
@@ -1125,6 +1145,7 @@ static MACHINE_DRIVER_START( hornet )
 
 	MDRV_ADC12138_ADD( "adc12138", hornet_adc_interface )
 MACHINE_DRIVER_END
+
 
 static MACHINE_RESET( hornet_2board )
 {
@@ -1352,24 +1373,11 @@ static void jamma_jvs_cmd_exec(running_machine *machine)
 /*****************************************************************************/
 
 
-static TIMER_CALLBACK( irq_off )
-{
-	cputag_set_input_line(machine, "audiocpu", param, CLEAR_LINE);
-}
-
-static void sound_irq_callback(running_machine *machine, int irq)
-{
-	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
-	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
-	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
-}
-
 static DRIVER_INIT(hornet)
 {
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_HORNET);
 	set_cgboard_texture_bank(machine, 0, "bank5", memory_region(machine, "user5"));
 
-	K056800_init(machine, sound_irq_callback);
 	K033906_init(machine);
 
 	led_reg0 = led_reg1 = 0x7f;
@@ -1383,7 +1391,6 @@ static DRIVER_INIT(hornet_2board)
 	set_cgboard_texture_bank(machine, 0, "bank5", memory_region(machine, "user5"));
 	set_cgboard_texture_bank(machine, 1, "bank6", memory_region(machine, "user5"));
 
-	K056800_init(machine, sound_irq_callback);
 	K033906_init(machine);
 
 	led_reg0 = led_reg1 = 0x7f;
@@ -1595,11 +1602,11 @@ ROM_END
 
 /*************************************************************************/
 
-GAME(  1998, gradius4, 0,      hornet,           hornet, hornet,        ROT0, "Konami", "Gradius 4: Fukkatsu", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME(  1998, nbapbp,   0,      hornet,           hornet, hornet,        ROT0, "Konami", "NBA Play By Play", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAMEL( 1998, terabrst, 0,      terabrst,    	 hornet, hornet_2board, ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 1998, terabrsta,terabrst,terabrst,   	 hornet, hornet_2board, ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 2000, sscope,   0,      hornet_2board,    sscope, hornet_2board, ROT0, "Konami", "Silent Scope (ver JZD)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 2000, sscopea,  sscope, hornet_2board,    sscope, hornet_2board, ROT0, "Konami", "Silent Scope (ver UAB)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 2000, sscopeb,  sscope, hornet_2board,    sscope, hornet_2board, ROT0, "Konami", "Silent Scope (ver UAA)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 2000, sscope2,  0,      hornet_2board_v2, sscope, hornet_2board, ROT0, "Konami", "Silent Scope 2", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAME(  1998, gradius4,  0,        hornet,           hornet, hornet,        ROT0, "Konami", "Gradius 4: Fukkatsu", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME(  1998, nbapbp,    0,        hornet,           hornet, hornet,        ROT0, "Konami", "NBA Play By Play", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAMEL( 1998, terabrst,  0,        terabrst,         hornet, hornet_2board, ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 1998, terabrsta, terabrst, terabrst,         hornet, hornet_2board, ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope,    0,        hornet_2board,    sscope, hornet_2board, ROT0, "Konami", "Silent Scope (ver JZD)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscopea,   sscope,   hornet_2board,    sscope, hornet_2board, ROT0, "Konami", "Silent Scope (ver UAB)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscopeb,   sscope,   hornet_2board,    sscope, hornet_2board, ROT0, "Konami", "Silent Scope (ver UAA)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope2,   0,        hornet_2board_v2, sscope, hornet_2board, ROT0, "Konami", "Silent Scope 2", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )

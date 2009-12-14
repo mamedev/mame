@@ -298,6 +298,7 @@ SOUNDDEFS += -DHAS_K007232=$(if $(filter K007232,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_K051649=$(if $(filter K051649,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_K053260=$(if $(filter K053260,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_K054539=$(if $(filter K054539,$(SOUNDS)),1,0)
+SOUNDDEFS += -DHAS_K056800=$(if $(filter K056800,$(SOUNDS)),1,0)
 
 ifneq ($(filter K005289,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/k005289.o
@@ -319,6 +320,9 @@ ifneq ($(filter K054539,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/k054539.o
 endif
 
+ifneq ($(filter K056800,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/k056800.o
+endif
 
 
 #-------------------------------------------------

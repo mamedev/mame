@@ -12,9 +12,10 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "sound/k054539.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "machine/konppc.h"
-#include "machine/konamiic.h"
+#include "sound/k056800.h"
+
 
 static UINT32 *vram;
 static UINT32 *workram;
@@ -65,11 +66,7 @@ static READ32_HANDLER( eeprom_r )
 static WRITE32_HANDLER( eeprom_w )
 {
 	if (ACCESSING_BITS_24_31)
-	{
-		eeprom_write_bit((data & 0x01000000) ? 1 : 0);
-		eeprom_set_clock_line((data & 0x02000000) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_cs_line((data & 0x04000000) ? CLEAR_LINE : ASSERT_LINE);
-	}
+		input_port_write(space->machine, "EEPROMOUT", data, 0xffffffff);
 }
 
 static CUSTOM_INPUT( analog_ctrl_r )
@@ -100,8 +97,8 @@ static ADDRESS_MAP_START( ultrsprt_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x70000000, 0x70000003) AM_READWRITE(eeprom_r, eeprom_w)
 	AM_RANGE(0x70000020, 0x70000023) AM_READ_PORT("P1")
 	AM_RANGE(0x70000040, 0x70000043) AM_READ_PORT("P2")
-	AM_RANGE(0x70000080, 0x70000087) AM_WRITE(K056800_host_w)
-	AM_RANGE(0x70000088, 0x7000008f) AM_READ(K056800_host_r)
+	AM_RANGE(0x70000080, 0x70000087) AM_DEVWRITE("k056800", k056800_host_w)
+	AM_RANGE(0x70000088, 0x7000008f) AM_DEVREAD("k056800", k056800_host_r)
 	AM_RANGE(0x700000e0, 0x700000e3) AM_WRITE(int_ack_w)
 	AM_RANGE(0x7f000000, 0x7f01ffff) AM_RAM AM_BASE(&workram)
 	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_WRITE(palette_w) AM_BASE_GENERIC(paletteram)
@@ -114,24 +111,27 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( K056800_68k_r )
 {
+	const device_config *k056800 = devtag_get_device(space->machine, "k056800");
 	UINT16 r = 0;
 
 	if (ACCESSING_BITS_8_15)
-		r |= K056800_sound_r(space, (offset*2)+0, 0xffff) << 8;
+		r |= k056800_sound_r(k056800, (offset*2)+0, 0xffff) << 8;
 
 	if (ACCESSING_BITS_0_7)
-		r |= K056800_sound_r(space, (offset*2)+1, 0xffff) << 0;
+		r |= k056800_sound_r(k056800, (offset*2)+1, 0xffff) << 0;
 
 	return r;
 }
 
 static WRITE16_HANDLER( K056800_68k_w )
 {
+	const device_config *k056800 = devtag_get_device(space->machine, "k056800");
+
 	if (ACCESSING_BITS_8_15)
-		K056800_sound_w(space, (offset*2)+0, (data >> 8) & 0xff, 0x00ff);
+		k056800_sound_w(k056800, (offset*2)+0, (data >> 8) & 0xff, 0x00ff);
 
 	if (ACCESSING_BITS_0_7)
-		K056800_sound_w(space, (offset*2)+1, (data >> 0) & 0xff, 0x00ff);
+		k056800_sound_w(k056800, (offset*2)+1, (data >> 0) & 0xff, 0x00ff);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -160,8 +160,13 @@ static INPUT_PORTS_START( ultrsprt )
 	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_START2 )
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_SERVICE_NO_TOGGLE( 0x08000000, IP_ACTIVE_LOW )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 
 	PORT_START("STICKX1")
 	PORT_BIT( 0xfff, 0x800, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -176,26 +181,24 @@ static INPUT_PORTS_START( ultrsprt )
 	PORT_BIT( 0xfff, 0x800, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static NVRAM_HANDLER(ultrsprt)
-{
-	if (read_or_write)
-	{
-		eeprom_save(file);
-	}
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C46);
-		if (file)
-		{
-			eeprom_load(file);
-		}
-	}
-}
 
 static INTERRUPT_GEN( ultrsprt_vblank )
 {
 	cpu_set_input_line(device, INPUT_LINE_IRQ1, ASSERT_LINE);
 }
+
+static void sound_irq_callback(running_machine *machine, int irq)
+{
+	if (irq == 0)
+		/*generic_pulse_irq_line(cputag_get_cpu(machine, "audiocpu"), INPUT_LINE_IRQ5)*/;
+	else
+		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_IRQ6, HOLD_LINE);
+}
+
+static const k056800_interface ultrsprt_k056800_interface = 
+{
+	sound_irq_callback
+};
 
 
 static MACHINE_DRIVER_START( ultrsprt )
@@ -210,7 +213,7 @@ static MACHINE_DRIVER_START( ultrsprt )
 
 	MDRV_QUANTUM_TIME(HZ(12000))
 
-	MDRV_NVRAM_HANDLER(ultrsprt)
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 	MDRV_MACHINE_START(ultrsprt)
 
  	/* video hardware */
@@ -226,6 +229,8 @@ static MACHINE_DRIVER_START( ultrsprt )
 	MDRV_VIDEO_UPDATE(ultrsprt)
 
 	/* sound hardware */
+	MDRV_K056800_ADD("k056800", ultrsprt_k056800_interface)
+
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("konami", K054539, 48000)
@@ -233,18 +238,6 @@ static MACHINE_DRIVER_START( ultrsprt )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
-static void sound_irq_callback(running_machine *machine, int irq)
-{
-	if (irq == 0)
-		/*generic_pulse_irq_line(cputag_get_cpu(machine, "audiocpu"), INPUT_LINE_IRQ5)*/;
-	else
-		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_IRQ6, HOLD_LINE);
-}
-
-static DRIVER_INIT( ultrsprt )
-{
-	K056800_init(machine, sound_irq_callback);
-}
 
 /*****************************************************************************/
 
@@ -263,4 +256,4 @@ ROM_START( fiveside )
 	ROM_LOAD("479_a07.bin", 0x080000, 0x80000, CRC(75835df8) SHA1(105b95c16f2ce6902c2e4c9c2fd9f2f7a848c546))
 ROM_END
 
-GAME(1995, fiveside, 0, ultrsprt, ultrsprt, ultrsprt, ROT90, "Konami", "Five a Side Soccer (ver UAA)", GAME_IMPERFECT_SOUND)
+GAME(1995, fiveside, 0, ultrsprt, ultrsprt, 0, ROT90, "Konami", "Five a Side Soccer (ver UAA)", GAME_IMPERFECT_SOUND)

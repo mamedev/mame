@@ -224,11 +224,11 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
-#include "machine/konamiic.h"
 #include "sound/rf5c400.h"
 #include "video/voodoo.h"
 #include "video/gticlub.h"
 #include "rendlay.h"
+#include "sound/k056800.h"
 
 static UINT32 *work_ram;
 
@@ -614,9 +614,9 @@ static ADDRESS_MAP_START( gticlub_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_READWRITE(lanc_ram_r, lanc_ram_w) AM_BASE(&lanc_ram)
-	AM_RANGE(0x7e00c000, 0x7e00c007) AM_WRITE(K056800_host_w)
-	AM_RANGE(0x7e00c000, 0x7e00c007) AM_READ(K056800_host_r)		// Hang Pilot
-	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_READ(K056800_host_r)
+	AM_RANGE(0x7e00c000, 0x7e00c007) AM_DEVWRITE("k056800", k056800_host_w)
+	AM_RANGE(0x7e00c000, 0x7e00c007) AM_DEVREAD("k056800", k056800_host_r)		// Hang Pilot
+	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_DEVREAD("k056800", k056800_host_r)
 	AM_RANGE(0x7f000000, 0x7f3fffff) AM_ROM AM_REGION("user2", 0)	/* Data ROM */
 	AM_RANGE(0x7f800000, 0x7f9fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")	/* Program ROM */
@@ -627,7 +627,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_memmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_READWRITE(K056800_sound_r, K056800_sound_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("k056800", k056800_sound_r, k056800_sound_w)
 	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rfsnd", rf5c400_r, rf5c400_w)		/* Ricoh RF5C400 */
 	AM_RANGE(0x580000, 0x580001) AM_WRITENOP
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP
@@ -693,7 +693,6 @@ static NVRAM_HANDLER(gticlub)
 {
 	eeprom_handler(machine, file, read_or_write);
 }
-
 
 static INPUT_PORTS_START( gticlub )
 	PORT_START("IN0")
@@ -898,6 +897,25 @@ static const sharc_config sharc_cfg =
 	BOOT_MODE_EPROM
 };
 
+
+static TIMER_CALLBACK( irq_off )
+{
+	cputag_set_input_line(machine, "audiocpu", param, CLEAR_LINE);
+}
+
+static void sound_irq_callback( running_machine *machine, int irq )
+{
+	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
+
+	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
+	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
+}
+
+static const k056800_interface gticlub_k056800_interface = 
+{
+	sound_irq_callback
+};
+
 static MACHINE_RESET( gticlub )
 {
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
@@ -934,6 +952,8 @@ static MACHINE_DRIVER_START( gticlub )
 
 	MDRV_VIDEO_START(gticlub)
 	MDRV_VIDEO_UPDATE(gticlub)
+
+	MDRV_K056800_ADD("k056800", gticlub_k056800_interface)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1000,6 +1020,8 @@ static MACHINE_DRIVER_START( hangplt )
 
 	MDRV_VIDEO_START(hangplt)
 	MDRV_VIDEO_UPDATE(hangplt)
+
+	MDRV_K056800_ADD("k056800", gticlub_k056800_interface)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1201,18 +1223,6 @@ ROM_START( hangplt ) /* Japan version JAB */
 	ROM_LOAD32_WORD( "685a14.12w", 0x000000, 0x400000, CRC(87437739) SHA1(0d45637af40938a54d5efd29c125b0fafd55f9a4) )
 ROM_END
 
-static TIMER_CALLBACK( irq_off )
-{
-	cputag_set_input_line(machine, "audiocpu", param, CLEAR_LINE);
-}
-
-static void sound_irq_callback(running_machine *machine, int irq)
-{
-	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
-	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
-	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
-}
-
 static DRIVER_INIT(gticlub)
 {
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_GTICLUB);
@@ -1221,8 +1231,6 @@ static DRIVER_INIT(gticlub)
 	gticlub_led_reg0 = gticlub_led_reg1 = 0x7f;
 
 	K001005_preprocess_texture_data(memory_region(machine, "gfx1"), memory_region_length(machine, "gfx1"), 1);
-
-	K056800_init(machine, sound_irq_callback);
 
 	adc1038_init(machine);
 }
@@ -1237,7 +1245,6 @@ static DRIVER_INIT(hangplt)
 	sharc_dataram_1 = auto_alloc_array(machine, UINT32, 0x100000/4);
 	gticlub_led_reg0 = gticlub_led_reg1 = 0x7f;
 
-	K056800_init(machine, sound_irq_callback);
 	K033906_init(machine);
 
 	adc1038_init(machine);

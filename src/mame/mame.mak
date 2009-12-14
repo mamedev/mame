@@ -181,6 +181,7 @@ SOUNDS += K007232
 SOUNDS += K051649
 SOUNDS += K053260
 SOUNDS += K054539
+SOUNDS += K056800
 SOUNDS += SEGAPCM
 SOUNDS += MULTIPCM
 SOUNDS += SCSP
@@ -844,7 +845,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/xmen.o $(VIDEO)/xmen.o \
 	$(DRIVERS)/yiear.o $(VIDEO)/yiear.o \
 	$(DRIVERS)/zr107.o \
-	$(MACHINE)/konamiic.o $(VIDEO)/konamiic.o $(VIDEO)/konicdev.o \
+	$(VIDEO)/konamiic.o $(VIDEO)/konicdev.o \
 
 $(MAMEOBJ)/maygay.a: \
 	$(DRIVERS)/maygay1b.o \

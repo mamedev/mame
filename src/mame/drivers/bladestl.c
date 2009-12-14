@@ -29,10 +29,10 @@ Notes:
 #include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/hd6309/hd6309.h"
-#include "video/konamiic.h"
 #include "sound/2203intf.h"
 #include "sound/upd7759.h"
-#include "konamipt.h"
+#include "video/konicdev.h"
+#include "includes/konamipt.h"
 
 /* from video */
 int bladestl_spritebank;
@@ -40,13 +40,21 @@ PALETTE_INIT( bladestl );
 VIDEO_START( bladestl );
 VIDEO_UPDATE( bladestl );
 
+extern void bladestl_tile_callback(int layer, int bank, int *code, int *color, int *flags);
+extern void bladestl_sprite_callback(int *code, int *color);
+
+
 static INTERRUPT_GEN( bladestl_interrupt )
 {
-	if (cpu_getiloops(device) == 0){
-		if (K007342_is_INT_enabled())
+	const device_config *k007342 = devtag_get_device(device->machine, "k007342");
+
+	if (cpu_getiloops(device) == 0)
+	{
+		if (k007342_is_int_enabled(k007342))
 			cpu_set_input_line(device, HD6309_FIRQ_LINE, HOLD_LINE);
 	}
-	else if (cpu_getiloops(device) % 2){
+	else if (cpu_getiloops(device) % 2)
+	{
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -109,11 +117,11 @@ static WRITE8_DEVICE_HANDLER( bladestl_speech_ctrl_w ){
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(K007342_r, K007342_w)	/* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_READWRITE(K007420_r, K007420_w)	/* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_READWRITE(K007342_scroll_r, K007342_scroll_w)	/* Scroll RAM */
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_r, k007342_w)	/* Color RAM + Video RAM */
+	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_r, k007420_w)	/* Sprite RAM */
+	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_scroll_r, k007342_scroll_w)	/* Scroll RAM */
 	AM_RANGE(0x2400, 0x245f) AM_RAM AM_BASE_GENERIC(paletteram)		/* palette */
-	AM_RANGE(0x2600, 0x2607) AM_WRITE(K007342_vreg_w)			/* Video Registers */
+	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE("k007342", k007342_vreg_w)			/* Video Registers */
 	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("COINSW")				/* DIPSW #3, coinsw, startsw */
 	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P1")					/* 1P controls */
 	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P2")					/* 2P controls */
@@ -123,7 +131,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2ec0, 0x2ec0) AM_WRITE(watchdog_reset_w)			/* watchdog reset */
 	AM_RANGE(0x2f00, 0x2f03) AM_READ(trackball_r)				/* Trackballs */
 	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(bladestl_bankswitch_w)	/* bankswitch control */
-	AM_RANGE(0x2f80, 0x2f9f) AM_READWRITE(K051733_r, K051733_w)	/* Protection: 051733 */
+	AM_RANGE(0x2f80, 0x2f9f) AM_DEVREADWRITE("k051733", k051733_r, k051733_w)	/* Protection: 051733 */
 	AM_RANGE(0x2fc0, 0x2fc0) AM_WRITENOP						/* ??? */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM								/* Work RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")						/* banked ROM */
@@ -269,6 +277,17 @@ static const ym2203_interface ym2203_config =
 	NULL
 };
 
+static const k007342_interface bladestl_k007342_intf =
+{
+	0,	bladestl_tile_callback	/* gfx_num (for tile creation), callback */
+};
+
+static const k007420_interface bladestl_k007420_intf =
+{
+	0x3ff, 	bladestl_sprite_callback	/* banklimit, callback */
+};
+
+
 static MACHINE_DRIVER_START( bladestl )
 
 	/* basic machine hardware */
@@ -295,6 +314,10 @@ static MACHINE_DRIVER_START( bladestl )
 
 	MDRV_VIDEO_START(bladestl)
 	MDRV_VIDEO_UPDATE(bladestl)
+
+	MDRV_K007342_ADD("k007342", bladestl_k007342_intf)
+	MDRV_K007420_ADD("k007420", bladestl_k007420_intf)
+	MDRV_K051733_ADD("k051733")
 
 	/* sound hardware */
 	/* the initialization order is important, the port callbacks being

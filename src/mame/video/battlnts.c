@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 static int spritebank;
 
@@ -11,7 +11,7 @@ static int layer_colorbase[2];
 
 ***************************************************************************/
 
-static void tile_callback(int layer, int bank, int *code, int *color, int *flags)
+void battlnts_tile_callback(int layer, int bank, int *code, int *color, int *flags)
 {
 	*code |= ((*color & 0x0f) << 9) | ((*color & 0x40) << 2);
 	*color = layer_colorbase[layer];
@@ -23,7 +23,7 @@ static void tile_callback(int layer, int bank, int *code, int *color, int *flags
 
 ***************************************************************************/
 
-static void sprite_callback(int *code,int *color)
+void battlnts_sprite_callback(int *code,int *color)
 {
 	*code |= ((*color & 0xc0) << 2) | spritebank;
 	*code = (*code << 2) | ((*color & 0x30) >> 4);
@@ -45,9 +45,6 @@ VIDEO_START( battlnts )
 {
 	layer_colorbase[0] = 0;
 	layer_colorbase[1] = 0;
-
-	K007342_vh_start(machine,0,tile_callback);
-	K007420_vh_start(machine,1,sprite_callback);
 }
 
 /***************************************************************************
@@ -56,12 +53,15 @@ VIDEO_START( battlnts )
 
 ***************************************************************************/
 
-VIDEO_UPDATE( battlnts ){
+VIDEO_UPDATE( battlnts )
+{
+	const device_config *k007342 = devtag_get_device(screen->machine, "k007342");
+	const device_config *k007420 = devtag_get_device(screen->machine, "k007420");
 
-	K007342_tilemap_update();
+	k007342_tilemap_update(k007342);
 
-	K007342_tilemap_draw( bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE ,0);
-	K007420_sprites_draw( bitmap, cliprect );
-	K007342_tilemap_draw( bitmap, cliprect, 0, 1 | TILEMAP_DRAW_OPAQUE ,0);
+	k007342_tilemap_draw(k007342, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE ,0);
+	k007420_sprites_draw(k007420, bitmap, cliprect, screen->machine->gfx[1]);
+	k007342_tilemap_draw(k007342, bitmap, cliprect, 0, 1 | TILEMAP_DRAW_OPAQUE ,0);
 	return 0;
 }

@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 
 int k88games_priority;
@@ -14,7 +14,7 @@ static int layer_colorbase[3],sprite_colorbase,zoom_colorbase;
 
 ***************************************************************************/
 
-static void tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
+void _88games_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	*code |= ((*color & 0x0f) << 8) | (bank << 12);
 	*color = layer_colorbase[layer] + ((*color & 0xf0) >> 4);
@@ -27,7 +27,7 @@ static void tile_callback(int layer,int bank,int *code,int *color,int *flags,int
 
 ***************************************************************************/
 
-static void sprite_callback(int *code,int *color,int *priority,int *shadow)
+void _88games_sprite_callback(int *code,int *color,int *priority,int *shadow)
 {
 	*priority = (*color & 0x20) >> 5;	/* ??? */
 	*color = sprite_colorbase + (*color & 0x0f);
@@ -40,13 +40,12 @@ static void sprite_callback(int *code,int *color,int *priority,int *shadow)
 
 ***************************************************************************/
 
-static void zoom_callback(int *code,int *color,int *flags)
+void _88games_zoom_callback(int *code,int *color,int *flags)
 {
 	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x07) << 8);
 	*color = zoom_colorbase + ((*color & 0x38) >> 3) + ((*color & 0x80) >> 4);
 }
-
 
 /***************************************************************************
 
@@ -61,14 +60,11 @@ VIDEO_START( 88games )
 	layer_colorbase[2] = 16;
 	sprite_colorbase = 32;
 	zoom_colorbase = 48;
-	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tile_callback);
-	K051960_vh_start(machine,"gfx2",NORMAL_PLANE_ORDER,sprite_callback);
-	K051316_vh_start_0(machine,"gfx3",4,FALSE,0,zoom_callback);
 
-    state_save_register_global_array(machine, layer_colorbase);
-    state_save_register_global(machine, k88games_priority);
-    state_save_register_global(machine, sprite_colorbase);
-    state_save_register_global(machine, zoom_colorbase);
+	state_save_register_global_array(machine, layer_colorbase);
+	state_save_register_global(machine, k88games_priority);
+	state_save_register_global(machine, sprite_colorbase);
+	state_save_register_global(machine, zoom_colorbase);
 }
 
 
@@ -81,25 +77,29 @@ VIDEO_START( 88games )
 
 VIDEO_UPDATE( 88games )
 {
-	K052109_tilemap_update();
+	const device_config *k052109 = devtag_get_device(screen->machine, "k052109");
+	const device_config *k051960 = devtag_get_device(screen->machine, "k051960");
+	const device_config *k051316 = devtag_get_device(screen->machine, "k051316");
+
+	k052109_tilemap_update(k052109);
 
 	if (k88games_priority)
 	{
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[0],TILEMAP_DRAW_OPAQUE,0);
-		K051960_sprites_draw(screen->machine,bitmap,cliprect,1,1);
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,0);
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[1],0,0);
-		K051960_sprites_draw(screen->machine,bitmap,cliprect,0,0);
-		K051316_zoom_draw_0(bitmap,cliprect,0,0);
+		k052109_tilemap_draw(k052109, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);	// tile 0
+		k051960_sprites_draw(k051960, bitmap,cliprect, 1, 1);
+		k052109_tilemap_draw(k052109, bitmap, cliprect, 2, 0, 0);	// tile 2
+		k052109_tilemap_draw(k052109, bitmap, cliprect, 1, 0, 0);	// tile 1
+		k051960_sprites_draw(k051960, bitmap, cliprect, 0, 0);
+		k051316_zoom_draw(k051316, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[2],TILEMAP_DRAW_OPAQUE,0);
-		K051316_zoom_draw_0(bitmap,cliprect,0,0);
-		K051960_sprites_draw(screen->machine,bitmap,cliprect,0,0);
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[1],0,0);
-		K051960_sprites_draw(screen->machine,bitmap,cliprect,1,1);
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[0],0,0);
+		k052109_tilemap_draw(k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE, 0);	// tile 2
+		k051316_zoom_draw(k051316, bitmap, cliprect, 0, 0);
+		k051960_sprites_draw(k051960, bitmap, cliprect, 0, 0);
+		k052109_tilemap_draw(k052109, bitmap, cliprect, 1, 0, 0);	// tile 1
+		k051960_sprites_draw(k051960, bitmap, cliprect, 1, 1);
+		k052109_tilemap_draw(k052109, bitmap, cliprect, 0, 0, 0);	// tile 0
 	}
 	return 0;
 }

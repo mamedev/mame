@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 static int layer_colorbase[2];
 extern int bladestl_spritebank;
@@ -47,7 +47,7 @@ static void set_pens(running_machine *machine)
 
 ***************************************************************************/
 
-static void tile_callback(int layer, int bank, int *code, int *color, int *flags)
+void bladestl_tile_callback(int layer, int bank, int *code, int *color, int *flags)
 {
 	*code |= ((*color & 0x0f) << 8) | ((*color & 0x40) << 6);
 	*color = layer_colorbase[layer];
@@ -59,7 +59,7 @@ static void tile_callback(int layer, int bank, int *code, int *color, int *flags
 
 ***************************************************************************/
 
-static void sprite_callback(int *code,int *color)
+void bladestl_sprite_callback(int *code,int *color)
 {
 	*code |= ((*color & 0xc0) << 2) + bladestl_spritebank;
 	*code = (*code << 2) | ((*color & 0x30) >> 4);
@@ -77,9 +77,6 @@ VIDEO_START( bladestl )
 {
 	layer_colorbase[0] = 0;
 	layer_colorbase[1] = 1;
-
-	K007342_vh_start(machine,0,tile_callback);
-	K007420_vh_start(machine,1,sprite_callback);
 }
 
 /***************************************************************************
@@ -90,14 +87,16 @@ VIDEO_START( bladestl )
 
 VIDEO_UPDATE( bladestl )
 {
+	const device_config *k007342 = devtag_get_device(screen->machine, "k007342");
+	const device_config *k007420 = devtag_get_device(screen->machine, "k007420");
 	set_pens(screen->machine);
 
-	K007342_tilemap_update();
+	k007342_tilemap_update(k007342);
 
-	K007342_tilemap_draw( bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE ,0);
-	K007420_sprites_draw( bitmap, cliprect );
-	K007342_tilemap_draw( bitmap, cliprect, 1, 1 | TILEMAP_DRAW_OPAQUE ,0);
-	K007342_tilemap_draw( bitmap, cliprect, 0, 0 ,0);
-	K007342_tilemap_draw( bitmap, cliprect, 0, 1 ,0);
+	k007342_tilemap_draw(k007342, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE ,0);
+	k007420_sprites_draw(k007420, bitmap, cliprect, screen->machine->gfx[1]);
+	k007342_tilemap_draw(k007342, bitmap, cliprect, 1, 1 | TILEMAP_DRAW_OPAQUE ,0);
+	k007342_tilemap_draw(k007342, bitmap, cliprect, 0, 0 ,0);
+	k007342_tilemap_draw(k007342, bitmap, cliprect, 0, 1 ,0);
 	return 0;
 }
