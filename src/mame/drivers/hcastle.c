@@ -12,7 +12,8 @@
 #include "sound/3812intf.h"
 #include "sound/k007232.h"
 #include "sound/k051649.h"
-#include "konamipt.h"
+#include "video/konicdev.h"
+#include "includes/konamipt.h"
 
 PALETTE_INIT( hcastle );
 VIDEO_UPDATE( hcastle );
@@ -214,6 +215,9 @@ static MACHINE_DRIVER_START( hcastle )
 	MDRV_PALETTE_INIT(hcastle)
 	MDRV_VIDEO_START(hcastle)
 	MDRV_VIDEO_UPDATE(hcastle)
+
+	MDRV_K007121_ADD("k007121_1")
+	MDRV_K007121_ADD("k007121_2")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

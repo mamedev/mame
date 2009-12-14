@@ -126,6 +126,7 @@ Dip location and recommended settings verified with the US manual
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/upd7759.h"
+#include "video/konicdev.h"
 
 /* from video/combasc.c */
 PALETTE_INIT( combasc );
@@ -572,6 +573,9 @@ static MACHINE_DRIVER_START( combasc )
 	MDRV_PALETTE_INIT(combasc)
 	MDRV_VIDEO_START(combasc)
 	MDRV_VIDEO_UPDATE(combasc)
+
+	MDRV_K007121_ADD("k007121_1")
+	MDRV_K007121_ADD("k007121_2")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

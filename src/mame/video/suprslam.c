@@ -1,7 +1,7 @@
 /* Super Slams - video, see notes in driver file */
 
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 
 UINT16 *suprslam_screen_videoram, *suprslam_bg_videoram,*suprslam_sp_videoram, *suprslam_spriteram;
@@ -142,16 +142,15 @@ VIDEO_START( suprslam )
 	suprslam_bg_tilemap = tilemap_create(machine, get_suprslam_bg_tile_info,tilemap_scan_rows, 16, 16,64,64);
 	suprslam_screen_tilemap = tilemap_create(machine, get_suprslam_tile_info,tilemap_scan_rows, 8, 8,64,32);
 
-	K053936_wraparound_enable(0, 1);
-	K053936_set_offset(0, -45, -21);
-
 	tilemap_set_transparent_pen(suprslam_screen_tilemap,15);
 }
 
 VIDEO_UPDATE( suprslam )
 {
+	const device_config *k053936 = devtag_get_device(screen->machine, "k053936");
+
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
-	K053936_0_zoom_draw(bitmap,cliprect,suprslam_bg_tilemap,0,0,1);
+	k053936_zoom_draw(k053936, bitmap,cliprect,suprslam_bg_tilemap,0,0,1);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,suprslam_screen_tilemap,0,0);
 	return 0;

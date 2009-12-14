@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 static tilemap *bg_tilemap[2];
 static tilemap *textlayer;
@@ -127,6 +127,8 @@ static void set_pens(running_machine *machine)
 
 static TILE_GET_INFO( get_tile_info0 )
 {
+	const device_config *k007121 = devtag_get_device(machine, "k007121_1");
+	UINT8 ctrl_6 = k007121_ctrlram_r(k007121, 6);
 	UINT8 attributes = combasc_page[0][tile_index];
 	int bank = 4*((combasc_vreg & 0x0f) - 1);
 	int number,color;
@@ -138,7 +140,7 @@ static TILE_GET_INFO( get_tile_info0 )
 	if (attributes & 0x10) bank += 2;
 	if (attributes & 0x20) bank += 4;
 
-	color = ((K007121_ctrlram[0][6]&0x10)*2+16) + (attributes & 0x0f);
+	color = ((ctrl_6 & 0x10) * 2 + 16) + (attributes & 0x0f);
 
 	number = combasc_page[0][tile_index + 0x400] + 256*bank;
 
@@ -152,6 +154,8 @@ static TILE_GET_INFO( get_tile_info0 )
 
 static TILE_GET_INFO( get_tile_info1 )
 {
+	const device_config *k007121 = devtag_get_device(machine, "k007121_2");
+	UINT8 ctrl_6 = k007121_ctrlram_r(k007121, 6);
 	UINT8 attributes = combasc_page[1][tile_index];
 	int bank = 4*((combasc_vreg >> 4) - 1);
 	int number, color;
@@ -163,7 +167,7 @@ static TILE_GET_INFO( get_tile_info1 )
 	if (attributes & 0x10) bank += 2;
 	if (attributes & 0x20) bank += 4;
 
-	color = ((K007121_ctrlram[1][6]&0x10)*2+16+4*16) + (attributes & 0x0f);
+	color = ((ctrl_6 & 0x10) * 2 + 16 + 4 * 16) + (attributes & 0x0f);
 
 	number = combasc_page[1][tile_index + 0x400] + 256*bank;
 
@@ -444,7 +448,9 @@ MACHINE_RESET( combasc )
 
 WRITE8_HANDLER( combasc_pf_control_w )
 {
-	K007121_ctrl_w(space->machine,combasc_video_circuit,offset,data);
+	const char *chiptag = combasc_video_circuit ? "k007121_2" : "k007121_1";
+	const device_config *k007121 = devtag_get_device(space->machine, chiptag);
+	k007121_ctrl_w(k007121, offset, data);
 
 	if (offset == 7)
 		tilemap_set_flip(bg_tilemap[combasc_video_circuit],(data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -478,19 +484,23 @@ WRITE8_HANDLER( combasc_scrollram_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *source,int circuit,UINT32 pri_mask)
 {
-	int base_color = (circuit*4)*16+(K007121_ctrlram[circuit][6]&0x10)*2;
+	const char *chiptag = circuit ? "k007121_2" : "k007121_1";
+	const device_config *k007121 = devtag_get_device(machine, chiptag);
+	int base_color = (circuit * 4) * 16 + (k007121_ctrlram_r(k007121, 6) & 0x10) * 2;
 
-	K007121_sprites_draw(circuit,bitmap,cliprect,machine->gfx,machine->colortable,source,base_color,0,0,pri_mask);
+	k007121_sprites_draw(k007121, bitmap, cliprect, machine->gfx[circuit], machine->colortable, source, base_color, 0, 0, pri_mask);
 }
 
 
 VIDEO_UPDATE( combasc )
 {
+	const device_config *k007121_1 = devtag_get_device(screen->machine, "k007121_1");
+	const device_config *k007121_2 = devtag_get_device(screen->machine, "k007121_2");
 	int i;
 
 	set_pens(screen->machine);
 
-	if (K007121_ctrlram[0][0x01] & 0x02)
+	if (k007121_ctrlram_r(k007121_1, 1) & 0x02)
 	{
 		tilemap_set_scroll_rows(bg_tilemap[0],32);
 		for (i = 0;i < 32;i++)
@@ -499,10 +509,10 @@ VIDEO_UPDATE( combasc )
 	else
 	{
 		tilemap_set_scroll_rows(bg_tilemap[0],1);
-		tilemap_set_scrollx(bg_tilemap[0],0,K007121_ctrlram[0][0x00] | ((K007121_ctrlram[0][0x01] & 0x01) << 8));
+		tilemap_set_scrollx(bg_tilemap[0],0,k007121_ctrlram_r(k007121_1, 0) | ((k007121_ctrlram_r(k007121_1, 1) & 0x01) << 8));
 	}
 
-	if (K007121_ctrlram[1][0x01] & 0x02)
+	if (k007121_ctrlram_r(k007121_2, 1) & 0x02)
 	{
 		tilemap_set_scroll_rows(bg_tilemap[1],32);
 		for (i = 0;i < 32;i++)
@@ -511,11 +521,11 @@ VIDEO_UPDATE( combasc )
 	else
 	{
 		tilemap_set_scroll_rows(bg_tilemap[1],1);
-		tilemap_set_scrollx(bg_tilemap[1],0,K007121_ctrlram[1][0x00] | ((K007121_ctrlram[1][0x01] & 0x01) << 8));
+		tilemap_set_scrollx(bg_tilemap[1],0,k007121_ctrlram_r(k007121_2, 0) | ((k007121_ctrlram_r(k007121_2, 1) & 0x01) << 8));
 	}
 
-	tilemap_set_scrolly(bg_tilemap[0],0,K007121_ctrlram[0][0x02]);
-	tilemap_set_scrolly(bg_tilemap[1],0,K007121_ctrlram[1][0x02]);
+	tilemap_set_scrolly(bg_tilemap[0],0,k007121_ctrlram_r(k007121_1, 2));
+	tilemap_set_scrolly(bg_tilemap[1],0,k007121_ctrlram_r(k007121_2, 2));
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
@@ -542,7 +552,7 @@ VIDEO_UPDATE( combasc )
 		draw_sprites(screen->machine,bitmap,cliprect,private_spriteram[0],0,0x4444);
 	}
 
-	if (K007121_ctrlram[0][0x01] & 0x08)
+	if (k007121_ctrlram_r(k007121_1, 1) & 0x08)
 	{
 		for (i = 0;i < 32;i++)
 		{
@@ -552,7 +562,7 @@ VIDEO_UPDATE( combasc )
 	}
 
 	/* chop the extreme columns if necessary */
-	if (K007121_ctrlram[0][0x03] & 0x40)
+	if (k007121_ctrlram_r(k007121_1, 3) & 0x40)
 	{
 		rectangle clip;
 

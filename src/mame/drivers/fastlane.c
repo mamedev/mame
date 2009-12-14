@@ -13,9 +13,9 @@ TODO:
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/hd6309/hd6309.h"
-#include "video/konamiic.h"
 #include "sound/k007232.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
+#include "video/konicdev.h"
 
 /* from video/fastlane.c */
 extern UINT8 *fastlane_k007121_regs,*fastlane_videoram1,*fastlane_videoram2;
@@ -27,22 +27,25 @@ VIDEO_UPDATE( fastlane );
 
 static INTERRUPT_GEN( fastlane_interrupt )
 {
+	const device_config *k007121 = devtag_get_device(device->machine, "k007121");
 	if (cpu_getiloops(device) == 0)
 	{
-		if (K007121_ctrlram[0][0x07] & 0x02)
+		if (k007121_ctrlram_r(k007121, 7) & 0x02)
 			cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
-		if (K007121_ctrlram[0][0x07] & 0x01)
+		if (k007121_ctrlram_r(k007121, 7) & 0x01)
 			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static WRITE8_HANDLER( k007121_registers_w )
 {
+	const device_config *k007121 = devtag_get_device(space->machine, "k007121");
+
 	if (offset < 8)
-		K007121_ctrl_0_w(space,offset,data);
+		k007121_ctrl_w(k007121, offset, data);
 	else	/* scroll registers */
 		fastlane_k007121_regs[offset] = data;
 }
@@ -92,7 +95,7 @@ static ADDRESS_MAP_START( fastlane_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(fastlane_bankswitch_w)									/* bankswitch control */
 	AM_RANGE(0x0d00, 0x0d0d) AM_DEVREADWRITE("konami1", fastlane_k007232_r, fastlane_k007232_w)	/* 007232 registers (chip 1) */
 	AM_RANGE(0x0e00, 0x0e0d) AM_DEVREADWRITE("konami2", fastlane_k007232_r, fastlane_k007232_w)	/* 007232 registers (chip 2) */
-	AM_RANGE(0x0f00, 0x0f1f) AM_READWRITE(K051733_r, K051733_w)									/* 051733 (protection) */
+	AM_RANGE(0x0f00, 0x0f1f) AM_DEVREADWRITE("k051733", k051733_r, k051733_w)									/* 051733 (protection) */
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_BASE_GENERIC(paletteram)										/* Palette RAM */
 	AM_RANGE(0x1800, 0x1fff) AM_RAM																/* Work RAM */
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(fastlane_vram1_w) AM_BASE(&fastlane_videoram1) 		/* Video RAM (chip 1) */
@@ -224,6 +227,9 @@ static MACHINE_DRIVER_START( fastlane )
 	MDRV_PALETTE_INIT(fastlane)
 	MDRV_VIDEO_START(fastlane)
 	MDRV_VIDEO_UPDATE(fastlane)
+
+	MDRV_K007121_ADD("k007121")
+	MDRV_K051733_ADD("k051733")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

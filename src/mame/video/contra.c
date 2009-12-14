@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 //static int spriteram_offset;
 static UINT8 *private_spriteram_2,*private_spriteram;
@@ -84,68 +84,83 @@ static void set_pens(running_machine *machine)
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
+	const device_config *k007121 = devtag_get_device(machine, "k007121_1");
+	UINT8 ctrl_3 = k007121_ctrlram_r(k007121, 3);
+	UINT8 ctrl_4 = k007121_ctrlram_r(k007121, 4);
+	UINT8 ctrl_5 = k007121_ctrlram_r(k007121, 5);
+	UINT8 ctrl_6 = k007121_ctrlram_r(k007121, 6);
 	int attr = contra_fg_cram[tile_index];
-	int bit0 = (K007121_ctrlram[0][0x05] >> 0) & 0x03;
-	int bit1 = (K007121_ctrlram[0][0x05] >> 2) & 0x03;
-	int bit2 = (K007121_ctrlram[0][0x05] >> 4) & 0x03;
-	int bit3 = (K007121_ctrlram[0][0x05] >> 6) & 0x03;
+	int bit0 = (ctrl_5 >> 0) & 0x03;
+	int bit1 = (ctrl_5 >> 2) & 0x03;
+	int bit2 = (ctrl_5 >> 4) & 0x03;
+	int bit3 = (ctrl_5 >> 6) & 0x03;
 	int bank = ((attr & 0x80) >> 7) |
-			((attr >> (bit0+2)) & 0x02) |
-			((attr >> (bit1+1)) & 0x04) |
-			((attr >> (bit2  )) & 0x08) |
-			((attr >> (bit3-1)) & 0x10) |
-			((K007121_ctrlram[0][0x03] & 0x01) << 5);
-	int mask = (K007121_ctrlram[0][0x04] & 0xf0) >> 4;
+			((attr >> (bit0 + 2)) & 0x02) |
+			((attr >> (bit1 + 1)) & 0x04) |
+			((attr >> (bit2    )) & 0x08) |
+			((attr >> (bit3 - 1)) & 0x10) |
+			((ctrl_3 & 0x01) << 5);
+	int mask = (ctrl_4 & 0xf0) >> 4;
 
-	bank = (bank & ~(mask << 1)) | ((K007121_ctrlram[0][0x04] & mask) << 1);
+	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
 	SET_TILE_INFO(
 			0,
-			contra_fg_vram[tile_index]+bank*256,
-			((K007121_ctrlram[0][6]&0x30)*2+16)+(attr&7),
+			contra_fg_vram[tile_index] + bank * 256,
+			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
 			0);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
+	const device_config *k007121 = devtag_get_device(machine, "k007121_2");
+	UINT8 ctrl_3 = k007121_ctrlram_r(k007121, 3);
+	UINT8 ctrl_4 = k007121_ctrlram_r(k007121, 4);
+	UINT8 ctrl_5 = k007121_ctrlram_r(k007121, 5);
+	UINT8 ctrl_6 = k007121_ctrlram_r(k007121, 6);
 	int attr = contra_bg_cram[tile_index];
-	int bit0 = (K007121_ctrlram[1][0x05] >> 0) & 0x03;
-	int bit1 = (K007121_ctrlram[1][0x05] >> 2) & 0x03;
-	int bit2 = (K007121_ctrlram[1][0x05] >> 4) & 0x03;
-	int bit3 = (K007121_ctrlram[1][0x05] >> 6) & 0x03;
+	int bit0 = (ctrl_5 >> 0) & 0x03;
+	int bit1 = (ctrl_5 >> 2) & 0x03;
+	int bit2 = (ctrl_5 >> 4) & 0x03;
+	int bit3 = (ctrl_5 >> 6) & 0x03;
 	int bank = ((attr & 0x80) >> 7) |
-			((attr >> (bit0+2)) & 0x02) |
-			((attr >> (bit1+1)) & 0x04) |
-			((attr >> (bit2  )) & 0x08) |
-			((attr >> (bit3-1)) & 0x10) |
-			((K007121_ctrlram[1][0x03] & 0x01) << 5);
-	int mask = (K007121_ctrlram[1][0x04] & 0xf0) >> 4;
+			((attr >> (bit0 + 2)) & 0x02) |
+			((attr >> (bit1 + 1)) & 0x04) |
+			((attr >> (bit2    )) & 0x08) |
+			((attr >> (bit3 - 1)) & 0x10) |
+			((ctrl_3 & 0x01) << 5);
+	int mask = (ctrl_4 & 0xf0) >> 4;
 
-	bank = (bank & ~(mask << 1)) | ((K007121_ctrlram[0][0x04] & mask) << 1);
+	// 2009-12 FP: TO BE VERIFIED - old code used ctrl4 from chip 0?!?
+	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
 	SET_TILE_INFO(
 			1,
-			contra_bg_vram[tile_index]+bank*256,
-			((K007121_ctrlram[1][6]&0x30)*2+16)+(attr&7),
+			contra_bg_vram[tile_index] + bank * 256,
+			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
 			0);
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
+	const device_config *k007121 = devtag_get_device(machine, "k007121_1");
+	UINT8 ctrl_5 = k007121_ctrlram_r(k007121, 5);
+	UINT8 ctrl_6 = k007121_ctrlram_r(k007121, 6);
 	int attr = contra_text_cram[tile_index];
-	int bit0 = (K007121_ctrlram[0][0x05] >> 0) & 0x03;
-	int bit1 = (K007121_ctrlram[0][0x05] >> 2) & 0x03;
-	int bit2 = (K007121_ctrlram[0][0x05] >> 4) & 0x03;
-	int bit3 = (K007121_ctrlram[0][0x05] >> 6) & 0x03;
+	int bit0 = (ctrl_5 >> 0) & 0x03;
+	int bit1 = (ctrl_5 >> 2) & 0x03;
+	int bit2 = (ctrl_5 >> 4) & 0x03;
+	int bit3 = (ctrl_5 >> 6) & 0x03;
 	int bank = ((attr & 0x80) >> 7) |
-			((attr >> (bit0+2)) & 0x02) |
-			((attr >> (bit1+1)) & 0x04) |
-			((attr >> (bit2  )) & 0x08) |
-			((attr >> (bit3-1)) & 0x10);
+			((attr >> (bit0 + 2)) & 0x02) |
+			((attr >> (bit1 + 1)) & 0x04) |
+			((attr >> (bit2    )) & 0x08) |
+			((attr >> (bit3 - 1)) & 0x10);
+
 	SET_TILE_INFO(
 			0,
-			contra_text_vram[tile_index]+bank*256,
-			((K007121_ctrlram[0][6]&0x30)*2+16)+(attr&7),
+			contra_text_vram[tile_index] + bank * 256,
+			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
 			0);
 }
 
@@ -221,42 +236,48 @@ WRITE8_HANDLER( contra_text_cram_w )
 
 WRITE8_HANDLER( contra_K007121_ctrl_0_w )
 {
+	const device_config *k007121 = devtag_get_device(space->machine, "k007121_1");
+	UINT8 ctrl_6 = k007121_ctrlram_r(k007121, 6);
+
 	if (offset == 3)
 	{
-		if ((data&0x8)==0)
+		if ((data & 0x8) == 0)
 			memcpy(private_spriteram,space->machine->generic.spriteram.u8+0x800,0x800);
 		else
 			memcpy(private_spriteram,space->machine->generic.spriteram.u8,0x800);
 	}
 	if (offset == 6)
 	{
-		if (K007121_ctrlram[0][6] != data)
-			tilemap_mark_all_tiles_dirty( fg_tilemap );
+		if (ctrl_6 != data)
+			tilemap_mark_all_tiles_dirty(fg_tilemap);
 	}
 	if (offset == 7)
 		tilemap_set_flip(fg_tilemap,(data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	K007121_ctrl_0_w(space,offset,data);
+	k007121_ctrl_w(k007121, offset, data);
 }
 
 WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 {
+	const device_config *k007121 = devtag_get_device(space->machine, "k007121_2");
+	UINT8 ctrl_6 = k007121_ctrlram_r(k007121, 6);
+
 	if (offset == 3)
 	{
-		if ((data&0x8)==0)
+		if ((data & 0x8) == 0)
 			memcpy(private_spriteram_2,space->machine->generic.spriteram.u8+0x2800,0x800);
 		else
 			memcpy(private_spriteram_2,space->machine->generic.spriteram.u8+0x2000,0x800);
 	}
 	if (offset == 6)
 	{
-		if (K007121_ctrlram[1][6] != data )
-			tilemap_mark_all_tiles_dirty( bg_tilemap );
+		if (ctrl_6 != data )
+			tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}
 	if (offset == 7)
 		tilemap_set_flip(bg_tilemap,(data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	K007121_ctrl_1_w(space,offset,data);
+	k007121_ctrl_w(k007121, offset, data);
 }
 
 
@@ -269,17 +290,25 @@ WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank )
 {
+	const char *chiptag = bank ? "k007121_2" : "k007121_1";
+	const device_config *k007121 = devtag_get_device(machine, chiptag);
+	int base_color = (k007121_ctrlram_r(k007121, 6) & 0x30) * 2;
 	const UINT8 *source;
-	int base_color = (K007121_ctrlram[bank][6]&0x30)*2;
 
 	if (bank==0) source=private_spriteram;
 	else source=private_spriteram_2;
 
-	K007121_sprites_draw(bank,bitmap,cliprect,machine->gfx,machine->colortable,source,base_color,40,0,-1);
+	k007121_sprites_draw(k007121,bitmap,cliprect,machine->gfx[bank],machine->colortable,source,base_color,40,0,-1);
 }
 
 VIDEO_UPDATE( contra )
 {
+	const device_config *k007121_1 = devtag_get_device(screen->machine, "k007121_1");
+	const device_config *k007121_2 = devtag_get_device(screen->machine, "k007121_2");
+	UINT8 ctrl_1_0 = k007121_ctrlram_r(k007121_1, 0);
+	UINT8 ctrl_1_2 = k007121_ctrlram_r(k007121_1, 2);
+	UINT8 ctrl_2_0 = k007121_ctrlram_r(k007121_2, 0);
+	UINT8 ctrl_2_2 = k007121_ctrlram_r(k007121_2, 2);
 	rectangle bg_finalclip = bg_clip;
 	rectangle fg_finalclip = fg_clip;
 	rectangle tx_finalclip = tx_clip;
@@ -290,10 +319,10 @@ VIDEO_UPDATE( contra )
 
 	set_pens(screen->machine);
 
-	tilemap_set_scrollx( fg_tilemap,0, K007121_ctrlram[0][0x00] - 40 );
-	tilemap_set_scrolly( fg_tilemap,0, K007121_ctrlram[0][0x02] );
-	tilemap_set_scrollx( bg_tilemap,0, K007121_ctrlram[1][0x00] - 40 );
-	tilemap_set_scrolly( bg_tilemap,0, K007121_ctrlram[1][0x02] );
+	tilemap_set_scrollx( fg_tilemap, 0, ctrl_1_0 - 40 );
+	tilemap_set_scrolly( fg_tilemap, 0, ctrl_1_2 );
+	tilemap_set_scrollx( bg_tilemap, 0, ctrl_2_0 - 40 );
+	tilemap_set_scrolly( bg_tilemap, 0, ctrl_2_2 );
 
 	tilemap_draw( bitmap,&bg_finalclip, bg_tilemap, 0 ,0);
 	tilemap_draw( bitmap,&fg_finalclip, fg_tilemap, 0 ,0);

@@ -1,6 +1,6 @@
 #include "driver.h"
-#include "video/konamiic.h"
-#include "crshrace.h"
+#include "video/konicdev.h"
+#include "includes/crshrace.h"
 
 
 UINT16 *crshrace_videoram1,*crshrace_videoram2;
@@ -43,9 +43,6 @@ VIDEO_START( crshrace )
 {
 	tilemap1 = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,16,16,64,64);
 	tilemap2 = tilemap_create(machine, get_tile_info2,tilemap_scan_rows, 8, 8,64,64);
-
-	K053936_wraparound_enable(0, 1);
-	K053936_set_offset(0, -48, -21);
 
 	tilemap_set_transparent_pen(tilemap1,0x0f);
 	tilemap_set_transparent_pen(tilemap2,0xff);
@@ -177,9 +174,10 @@ static void draw_bg(bitmap_t *bitmap,const rectangle *cliprect)
 }
 
 
-static void draw_fg(bitmap_t *bitmap,const rectangle *cliprect)
+static void draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	K053936_0_zoom_draw(bitmap,cliprect,tilemap1,0,0,1);
+	const device_config *k053936 = devtag_get_device(machine, "k053936");
+	k053936_zoom_draw(k053936, bitmap,cliprect,tilemap1,0,0,1);
 }
 
 
@@ -198,12 +196,12 @@ VIDEO_UPDATE( crshrace )
 		case 0x00:	/* high score screen */
 			draw_sprites(screen->machine,bitmap,cliprect);
 			draw_bg(bitmap,cliprect);
-			draw_fg(bitmap,cliprect);
+			draw_fg(screen->machine,bitmap,cliprect);
 			break;
 		case 0x01:
 		case 0x02:
 			draw_bg(bitmap,cliprect);
-			draw_fg(bitmap,cliprect);
+			draw_fg(screen->machine,bitmap,cliprect);
 			draw_sprites(screen->machine,bitmap,cliprect);
 			break;
 		default:

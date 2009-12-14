@@ -22,10 +22,10 @@ f1gp2:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "video/konamiic.h"
-#include "f1gp.h"
+#include "video/konicdev.h"
 #include "sound/2610intf.h"
 #include "sound/okim6295.h"
+#include "includes/f1gp.h"
 
 
 static UINT16 *sharedram;
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( f1gp_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfff008, 0xfff009) AM_READ(command_pending_r)
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
-	AM_RANGE(0xfff040, 0xfff05f) AM_WRITEONLY AM_BASE(&K053936_0_ctrl)
+	AM_RANGE(0xfff040, 0xfff05f) AM_DEVWRITE("k053936", k053936_ctrl_w)
 	AM_RANGE(0xfff050, 0xfff051) AM_READ_PORT("DSW3")
 ADDRESS_MAP_END
 
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( f1gp2_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfff008, 0xfff009) AM_READWRITE(command_pending_r, sound_command_w)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW3")
-	AM_RANGE(0xfff020, 0xfff02f) AM_WRITEONLY AM_BASE(&K053936_0_ctrl)
+	AM_RANGE(0xfff020, 0xfff03f) AM_DEVWRITE("k053936", k053936_ctrl_w)
 	AM_RANGE(0xfff044, 0xfff047) AM_WRITE(f1gp_fgscroll_w)
 ADDRESS_MAP_END
 
@@ -420,6 +420,17 @@ static const ym2610_interface ym2610_config =
 	irqhandler
 };
 
+static const k053936_interface f1gp_k053936_intf =
+{
+	1, -58, -2,	/* wrap, xoff, yoff */
+	0		/* linectrl_size */
+};
+
+static const k053936_interface f1gp2_k053936_intf =
+{
+	1, -48, -21,	/* wrap, xoff, yoff */
+	0			/* linectrl_size */
+};
 
 
 static MACHINE_DRIVER_START( f1gp )
@@ -451,6 +462,8 @@ static MACHINE_DRIVER_START( f1gp )
 
 	MDRV_VIDEO_START(f1gp)
 	MDRV_VIDEO_UPDATE(f1gp)
+
+	MDRV_K053936_ADD("k053936", f1gp_k053936_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -512,6 +525,9 @@ static MACHINE_DRIVER_START( f1gp2 )
 	MDRV_GFXDECODE(f1gp2)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+
+	MDRV_DEVICE_REMOVE("k053936")
+	MDRV_K053936_ADD("k053936", f1gp2_k053936_intf)
 
 	MDRV_VIDEO_START(f1gp2)
 	MDRV_VIDEO_UPDATE(f1gp2)

@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 UINT8 *labyrunr_videoram1,*labyrunr_videoram2,*labyrunr_scrollram;
 static tilemap *layer0, *layer1;
@@ -68,51 +68,61 @@ static void set_pens(running_machine *machine)
 
 static TILE_GET_INFO( get_tile_info0 )
 {
+	const device_config *k007121 = devtag_get_device(machine, "k007121");
+	UINT8 ctrl_3 = k007121_ctrlram_r(k007121, 3);
+	UINT8 ctrl_4 = k007121_ctrlram_r(k007121, 4);
+	UINT8 ctrl_5 = k007121_ctrlram_r(k007121, 5);
+	UINT8 ctrl_6 = k007121_ctrlram_r(k007121, 6);
 	int attr = labyrunr_videoram1[tile_index];
 	int code = labyrunr_videoram1[tile_index + 0x400];
-	int bit0 = (K007121_ctrlram[0][0x05] >> 0) & 0x03;
-	int bit1 = (K007121_ctrlram[0][0x05] >> 2) & 0x03;
-	int bit2 = (K007121_ctrlram[0][0x05] >> 4) & 0x03;
-	int bit3 = (K007121_ctrlram[0][0x05] >> 6) & 0x03;
+	int bit0 = (ctrl_5 >> 0) & 0x03;
+	int bit1 = (ctrl_5 >> 2) & 0x03;
+	int bit2 = (ctrl_5 >> 4) & 0x03;
+	int bit3 = (ctrl_5 >> 6) & 0x03;
 	int bank = ((attr & 0x80) >> 7) |
 			((attr >> (bit0+2)) & 0x02) |
 			((attr >> (bit1+1)) & 0x04) |
 			((attr >> (bit2  )) & 0x08) |
 			((attr >> (bit3-1)) & 0x10) |
-			((K007121_ctrlram[0][0x03] & 0x01) << 5);
-	int mask = (K007121_ctrlram[0][0x04] & 0xf0) >> 4;
+			((ctrl_3 & 0x01) << 5);
+	int mask = (ctrl_4 & 0xf0) >> 4;
 
-	bank = (bank & ~(mask << 1)) | ((K007121_ctrlram[0][0x04] & mask) << 1);
+	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
 	SET_TILE_INFO(
 			0,
 			code+bank*256,
-			((K007121_ctrlram[0][6]&0x30)*2+16)+(attr&7),
+			((ctrl_6 & 0x30) * 2 + 16)+(attr & 7),
 			0);
 }
 
 static TILE_GET_INFO( get_tile_info1 )
 {
+	const device_config *k007121 = devtag_get_device(machine, "k007121");
+	UINT8 ctrl_3 = k007121_ctrlram_r(k007121, 3);
+	UINT8 ctrl_4 = k007121_ctrlram_r(k007121, 4);
+	UINT8 ctrl_5 = k007121_ctrlram_r(k007121, 5);
+	UINT8 ctrl_6 = k007121_ctrlram_r(k007121, 6);
 	int attr = labyrunr_videoram2[tile_index];
 	int code = labyrunr_videoram2[tile_index + 0x400];
-	int bit0 = (K007121_ctrlram[0][0x05] >> 0) & 0x03;
-	int bit1 = (K007121_ctrlram[0][0x05] >> 2) & 0x03;
-	int bit2 = (K007121_ctrlram[0][0x05] >> 4) & 0x03;
-	int bit3 = (K007121_ctrlram[0][0x05] >> 6) & 0x03;
+	int bit0 = (ctrl_5 >> 0) & 0x03;
+	int bit1 = (ctrl_5 >> 2) & 0x03;
+	int bit2 = (ctrl_5 >> 4) & 0x03;
+	int bit3 = (ctrl_5 >> 6) & 0x03;
 	int bank = ((attr & 0x80) >> 7) |
 			((attr >> (bit0+2)) & 0x02) |
 			((attr >> (bit1+1)) & 0x04) |
 			((attr >> (bit2  )) & 0x08) |
 			((attr >> (bit3-1)) & 0x10) |
-			((K007121_ctrlram[0][0x03] & 0x01) << 5);
-	int mask = (K007121_ctrlram[0][0x04] & 0xf0) >> 4;
+			((ctrl_3 & 0x01) << 5);
+	int mask = (ctrl_4 & 0xf0) >> 4;
 
-	bank = (bank & ~(mask << 1)) | ((K007121_ctrlram[0][0x04] & mask) << 1);
+	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
 
 	SET_TILE_INFO(
 			0,
 			code+bank*256,
-			((K007121_ctrlram[0][6]&0x30)*2+16)+(attr&7),
+			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
 			0);
 }
 
@@ -171,6 +181,8 @@ WRITE8_HANDLER( labyrunr_vram2_w )
 
 VIDEO_UPDATE( labyrunr )
 {
+	const device_config *k007121 = devtag_get_device(screen->machine, "k007121");
+	UINT8 ctrl_0 = k007121_ctrlram_r(k007121, 0);
 	rectangle finalclip0, finalclip1;
 
 	set_pens(screen->machine);
@@ -178,7 +190,7 @@ VIDEO_UPDATE( labyrunr )
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
-	if(~K007121_ctrlram[0][3] & 0x20)
+	if(~k007121_ctrlram_r(k007121, 3) & 0x20)
 	{
 		int i;
 
@@ -188,20 +200,20 @@ VIDEO_UPDATE( labyrunr )
 		sect_rect(&finalclip0, cliprect);
 		sect_rect(&finalclip1, cliprect);
 
-		tilemap_set_scrollx(layer0,0,K007121_ctrlram[0][0x00] - 40);
+		tilemap_set_scrollx(layer0,0,ctrl_0 - 40);
 		tilemap_set_scrollx(layer1,0,0);
 
 		for(i = 0; i < 32; i++)
 		{
 			/* enable colscroll */
-			if((K007121_ctrlram[0][1] & 6) == 6) // it's probably just one bit, but it's only used once in the game so I don't know which it's
-				tilemap_set_scrolly(layer0,(i+2) & 0x1f,K007121_ctrlram[0][0x02] + labyrunr_scrollram[i]);
+			if((k007121_ctrlram_r(k007121, 1) & 6) == 6) // it's probably just one bit, but it's only used once in the game so I don't know which it's
+				tilemap_set_scrolly(layer0,(i+2) & 0x1f,k007121_ctrlram_r(k007121, 2) + labyrunr_scrollram[i]);
 			else
-				tilemap_set_scrolly(layer0,(i+2) & 0x1f,K007121_ctrlram[0][0x02]);
+				tilemap_set_scrolly(layer0,(i+2) & 0x1f,k007121_ctrlram_r(k007121, 2));
 		}
 
 		tilemap_draw(bitmap,&finalclip0,layer0,TILEMAP_DRAW_OPAQUE,0);
-		K007121_sprites_draw(0,bitmap,cliprect,screen->machine->gfx,screen->machine->colortable,screen->machine->generic.spriteram.u8,(K007121_ctrlram[0][6]&0x30)*2,40,0,(K007121_ctrlram[0][3] & 0x40) >> 5);
+		k007121_sprites_draw(k007121,bitmap,cliprect,screen->machine->gfx[0],screen->machine->colortable,screen->machine->generic.spriteram.u8,(k007121_ctrlram_r(k007121, 6) & 0x30) * 2, 40,0,(k007121_ctrlram_r(k007121, 3) & 0x40) >> 5);
 		/* we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites */
 		tilemap_draw(bitmap,&finalclip1,layer1,TILEMAP_DRAW_OPAQUE,0);
 	}
@@ -214,12 +226,12 @@ VIDEO_UPDATE( labyrunr )
 		finalclip0.min_y = finalclip1.min_y = cliprect->min_y;
 		finalclip0.max_y = finalclip1.max_y = cliprect->max_y;
 
-		if(K007121_ctrlram[0][1] & 1)
+		if(k007121_ctrlram_r(k007121, 1) & 1)
 		{
-			finalclip0.min_x = cliprect->max_x - K007121_ctrlram[0][0x00] + 8;
+			finalclip0.min_x = cliprect->max_x - ctrl_0 + 8;
 			finalclip0.max_x = cliprect->max_x;
 
-			if(K007121_ctrlram[0][0x00] >= 40)
+			if(ctrl_0 >= 40)
 			{
 				finalclip1.min_x = cliprect->min_x;
 			}
@@ -227,15 +239,15 @@ VIDEO_UPDATE( labyrunr )
 			{
 				use_clip3[0] = 1;
 
-				finalclip1.min_x = 40 - K007121_ctrlram[0][0x00];
+				finalclip1.min_x = 40 - ctrl_0;
 			}
 
-			finalclip1.max_x = cliprect->max_x - K007121_ctrlram[0][0x00] + 8;
+			finalclip1.max_x = cliprect->max_x - ctrl_0 + 8;
 
 		}
 		else
 		{
-			if(K007121_ctrlram[0][0x00] >= 40)
+			if(ctrl_0 >= 40)
 			{
 				finalclip0.min_x = cliprect->min_x;
 			}
@@ -243,12 +255,12 @@ VIDEO_UPDATE( labyrunr )
 			{
 				use_clip3[1] = 1;
 
-				finalclip0.min_x = 40 - K007121_ctrlram[0][0x00];
+				finalclip0.min_x = 40 - ctrl_0;
 			}
 
-			finalclip0.max_x = cliprect->max_x - K007121_ctrlram[0][0x00] + 8;
+			finalclip0.max_x = cliprect->max_x - ctrl_0 + 8;
 
-			finalclip1.min_x = cliprect->max_x - K007121_ctrlram[0][0x00] + 8;
+			finalclip1.min_x = cliprect->max_x - ctrl_0 + 8;
 			finalclip1.max_x = cliprect->max_x;
 		}
 
@@ -257,11 +269,11 @@ VIDEO_UPDATE( labyrunr )
 			finalclip3.min_y = cliprect->min_y;
 			finalclip3.max_y = cliprect->max_y;
 			finalclip3.min_x = cliprect->min_x;
-			finalclip3.max_x = 40 - K007121_ctrlram[0][0x00] - 8;
+			finalclip3.max_x = 40 - ctrl_0 - 8;
 		}
 
-		tilemap_set_scrollx(layer0,0,K007121_ctrlram[0][0x00] - 40);
-		tilemap_set_scrollx(layer1,0,K007121_ctrlram[0][0x00] - 40);
+		tilemap_set_scrollx(layer0,0,ctrl_0 - 40);
+		tilemap_set_scrollx(layer1,0,ctrl_0 - 40);
 
 		tilemap_draw(bitmap,&finalclip0,layer0,0,1);
 		if(use_clip3[0]) tilemap_draw(bitmap,&finalclip3,layer0,0,1);
@@ -269,7 +281,7 @@ VIDEO_UPDATE( labyrunr )
 		tilemap_draw(bitmap,&finalclip1,layer1,0,1);
 		if(use_clip3[1]) tilemap_draw(bitmap,&finalclip3,layer1,0,1);
 
-		K007121_sprites_draw(0,bitmap,cliprect,screen->machine->gfx,screen->machine->colortable,screen->machine->generic.spriteram.u8,(K007121_ctrlram[0][6]&0x30)*2,40,0,(K007121_ctrlram[0][3] & 0x40) >> 5);
+		k007121_sprites_draw(k007121,bitmap,cliprect,screen->machine->gfx[0],screen->machine->colortable,screen->machine->generic.spriteram.u8,(k007121_ctrlram_r(k007121, 6) & 0x30) * 2,40,0,(k007121_ctrlram_r(k007121, 3) & 0x40) >> 5);
 	}
 	return 0;
 }

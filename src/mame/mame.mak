@@ -844,7 +844,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/xmen.o $(VIDEO)/xmen.o \
 	$(DRIVERS)/yiear.o $(VIDEO)/yiear.o \
 	$(DRIVERS)/zr107.o \
-	$(MACHINE)/konamiic.o $(VIDEO)/konamiic.o \
+	$(MACHINE)/konamiic.o $(VIDEO)/konamiic.o $(VIDEO)/konicdev.o \
 
 $(MAMEOBJ)/maygay.a: \
 	$(DRIVERS)/maygay1b.o \

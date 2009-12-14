@@ -83,7 +83,7 @@ EB26IC73.BIN    27C240      /  Main Program
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "sound/2610intf.h"
 
 
@@ -143,10 +143,10 @@ static ADDRESS_MAP_START( suprslam_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfe0000, 0xfe0fff) AM_RAM_WRITE(suprslam_screen_videoram_w) AM_BASE(&suprslam_screen_videoram)
 	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(suprslam_bg_videoram_w) AM_BASE(&suprslam_bg_videoram)
 //  AM_RANGE(0xff2000, 0xff203f) AM_RAM /* ?? */
-	AM_RANGE(0xff8000, 0xff8fff) AM_RAM AM_BASE(&K053936_0_linectrl)
+	AM_RANGE(0xff8000, 0xff8fff) AM_DEVREADWRITE("k053936", k053936_linectrl_r, k053936_linectrl_w)
 	AM_RANGE(0xff9000, 0xff9001) AM_WRITE(sound_command_w)
 	AM_RANGE(0xffa000, 0xffafff) AM_RAM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xffd000, 0xffd01f) AM_WRITEONLY AM_BASE(&K053936_0_ctrl)
+	AM_RANGE(0xffd000, 0xffd01f) AM_DEVWRITE("k053936", k053936_ctrl_w)
 	AM_RANGE(0xffe000, 0xffe001) AM_WRITE(suprslam_bank_w)
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
@@ -297,6 +297,12 @@ static const ym2610_interface ym2610_config =
 
 /*** MACHINE DRIVER **********************************************************/
 
+static const k053936_interface suprslam_k053936_intf =
+{
+	1, -45, -21,	/* wrap, xoff, yoff */
+	0x1000		/* linectrl_size */
+};
+
 static MACHINE_DRIVER_START( suprslam )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(suprslam_map)
@@ -321,6 +327,8 @@ static MACHINE_DRIVER_START( suprslam )
 
 	MDRV_VIDEO_START(suprslam)
 	MDRV_VIDEO_UPDATE(suprslam)
+
+	MDRV_K053936_ADD("k053936", suprslam_k053936_intf)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

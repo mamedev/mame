@@ -129,9 +129,9 @@ Dip locations verified with Service Mode.
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "video/konamiic.h"
 #include "sound/2610intf.h"
-#include "crshrace.h"
+#include "video/konicdev.h"
+#include "includes/crshrace.h"
 
 
 #define CRSHRACE_3P_HACK	0
@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( crshrace_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("P3")
-	AM_RANGE(0xfff020, 0xfff03f) AM_WRITEONLY AM_BASE(&K053936_0_ctrl)
+	AM_RANGE(0xfff020, 0xfff03f) AM_DEVWRITE("k053936", k053936_ctrl_w)
 	AM_RANGE(0xfff044, 0xfff047) AM_WRITEONLY	// ??? moves during race
 ADDRESS_MAP_END
 
@@ -436,6 +436,11 @@ static const ym2610_interface ym2610_config =
 	irqhandler
 };
 
+static const k053936_interface crshrace_k053936_intf =
+{
+	1, -48, -21,	/* wrap, xoff, yoff */
+	0			/* linectrl_size */
+};
 
 
 static MACHINE_DRIVER_START( crshrace )
@@ -460,6 +465,8 @@ static MACHINE_DRIVER_START( crshrace )
 
 	MDRV_GFXDECODE(crshrace)
 	MDRV_PALETTE_LENGTH(2048)
+
+	MDRV_K053936_ADD("k053936", crshrace_k053936_intf)
 
 	MDRV_VIDEO_START(crshrace)
 	MDRV_VIDEO_EOF(crshrace)

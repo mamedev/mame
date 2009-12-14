@@ -11,9 +11,9 @@ Driver by Nicola Salmoria
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/hd6309/hd6309.h"
-#include "video/konamiic.h"
 #include "sound/2203intf.h"
-#include "konamipt.h"
+#include "video/konicdev.h"
+#include "includes/konamipt.h"
 
 /* from video/labyrunr.c */
 extern UINT8 *labyrunr_videoram1,*labyrunr_videoram2,*labyrunr_scrollram;
@@ -25,14 +25,16 @@ VIDEO_UPDATE( labyrunr );
 
 static INTERRUPT_GEN( labyrunr_interrupt )
 {
+	const device_config *k007121 = devtag_get_device(device->machine, "k007121");
+
 	if (cpu_getiloops(device) == 0)
 	{
-		if (K007121_ctrlram[0][0x07] & 0x02)
+		if (k007121_ctrlram_r(k007121, 7) & 0x02)
 			cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
-		if (K007121_ctrlram[0][0x07] & 0x01)
+		if (k007121_ctrlram_r(k007121, 7) & 0x01)
 			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -54,7 +56,7 @@ if (data & 0xe0) popmessage("bankswitch %02x",data);
 }
 
 static ADDRESS_MAP_START( labyrunr_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0007) AM_WRITE(K007121_ctrl_0_w)
+	AM_RANGE(0x0000, 0x0007) AM_DEVWRITE("k007121", k007121_ctrl_w)
 	AM_RANGE(0x0020, 0x005f) AM_RAM AM_BASE(&labyrunr_scrollram)
 	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("ym1", ym2203_read_port_r, ym2203_write_port_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("ym1", ym2203_status_port_r, ym2203_control_port_w)
@@ -64,7 +66,7 @@ static ADDRESS_MAP_START( labyrunr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0a01, 0x0a01) AM_READ_PORT("P1")
 	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(labyrunr_bankswitch_w)
-	AM_RANGE(0x0d00, 0x0d1f) AM_READWRITE(K051733_r, K051733_w)
+	AM_RANGE(0x0d00, 0x0d1f) AM_DEVREADWRITE("k051733", k051733_r, k051733_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
@@ -212,6 +214,9 @@ static MACHINE_DRIVER_START( labyrunr )
 	MDRV_PALETTE_INIT(labyrunr)
 	MDRV_VIDEO_START(labyrunr)
 	MDRV_VIDEO_UPDATE(labyrunr)
+
+	MDRV_K007121_ADD("k007121")
+	MDRV_K051733_ADD("k051733")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

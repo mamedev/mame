@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 UINT8 *hcastle_pf1_videoram,*hcastle_pf2_videoram;
 static int gfx_bank;
@@ -76,10 +76,13 @@ static TILEMAP_MAPPER( tilemap_scan )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int bit0 = (K007121_ctrlram[0][0x05] >> 0) & 0x03;
-	int bit1 = (K007121_ctrlram[0][0x05] >> 2) & 0x03;
-	int bit2 = (K007121_ctrlram[0][0x05] >> 4) & 0x03;
-	int bit3 = (K007121_ctrlram[0][0x05] >> 6) & 0x03;
+	const device_config *k007121 = devtag_get_device(machine, "k007121_1");
+	UINT8 ctrl_5 = k007121_ctrlram_r(k007121, 5);
+	UINT8 ctrl_6 = k007121_ctrlram_r(k007121, 6);
+	int bit0 = (ctrl_5 >> 0) & 0x03;
+	int bit1 = (ctrl_5 >> 2) & 0x03;
+	int bit2 = (ctrl_5 >> 4) & 0x03;
+	int bit3 = (ctrl_5 >> 6) & 0x03;
 	int attr = hcastle_pf1_videoram[tile_index];
 	int tile = hcastle_pf1_videoram[tile_index + 0x400];
 	int color = attr & 0x7;
@@ -92,16 +95,19 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(
 			0,
 			tile + bank*0x100 + pf1_bankbase,
-			((K007121_ctrlram[0][6]&0x30)*2+16) + color,
+			((ctrl_6 & 0x30) * 2 + 16) + color,
 			0);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int bit0 = (K007121_ctrlram[1][0x05] >> 0) & 0x03;
-	int bit1 = (K007121_ctrlram[1][0x05] >> 2) & 0x03;
-	int bit2 = (K007121_ctrlram[1][0x05] >> 4) & 0x03;
-	int bit3 = (K007121_ctrlram[1][0x05] >> 6) & 0x03;
+	const device_config *k007121 = devtag_get_device(machine, "k007121_2");
+	UINT8 ctrl_5 = k007121_ctrlram_r(k007121, 5);
+	UINT8 ctrl_6 = k007121_ctrlram_r(k007121, 6);
+	int bit0 = (ctrl_5 >> 0) & 0x03;
+	int bit1 = (ctrl_5 >> 2) & 0x03;
+	int bit2 = (ctrl_5 >> 4) & 0x03;
+	int bit3 = (ctrl_5 >> 6) & 0x03;
 	int attr = hcastle_pf2_videoram[tile_index];
 	int tile = hcastle_pf2_videoram[tile_index + 0x400];
 	int color = attr & 0x7;
@@ -114,7 +120,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(
 			1,
 			tile + bank*0x100 + pf2_bankbase,
-			((K007121_ctrlram[1][6]&0x30)*2+16) + color,
+			((ctrl_6 & 0x30) * 2 + 16) + color,
 			0);
 }
 
@@ -128,8 +134,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( hcastle )
 {
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan,8,8,64,32);
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan,     8,8,64,32);
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan, 8, 8, 64, 32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan, 8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }
@@ -166,6 +172,7 @@ READ8_HANDLER( hcastle_gfxbank_r )
 
 WRITE8_HANDLER( hcastle_pf1_control_w )
 {
+	const device_config *k007121 = devtag_get_device(space->machine, "k007121_1");
 	if (offset==3)
 	{
 		if ((data&0x8)==0)
@@ -177,11 +184,12 @@ WRITE8_HANDLER( hcastle_pf1_control_w )
 	{
 		tilemap_set_flip(fg_tilemap, (data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
-	K007121_ctrl_0_w(space,offset,data);
+	k007121_ctrl_w(k007121, offset, data);
 }
 
 WRITE8_HANDLER( hcastle_pf2_control_w )
 {
+	const device_config *k007121 = devtag_get_device(space->machine, "k007121_2");
 	if (offset==3)
 	{
 		if ((data&0x8)==0)
@@ -193,21 +201,35 @@ WRITE8_HANDLER( hcastle_pf2_control_w )
 	{
 		tilemap_set_flip(bg_tilemap, (data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
-	K007121_ctrl_1_w(space,offset,data);
+	k007121_ctrl_w(k007121, offset, data);
 }
 
 /*****************************************************************************/
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *sbank, int bank )
 {
+	const char *chiptag = bank ? "k007121_2" : "k007121_1";
+	const device_config *k007121 = devtag_get_device(machine, chiptag);
+	int base_color = (k007121_ctrlram_r(k007121, 6) & 0x30) * 2;
 	int bank_base = (bank == 0) ? 0x4000 * (gfx_bank & 1) : 0;
-	K007121_sprites_draw(bank,bitmap,cliprect,machine->gfx,machine->colortable,sbank,(K007121_ctrlram[bank][6]&0x30)*2,0,bank_base,-1);
+
+	k007121_sprites_draw(k007121, bitmap, cliprect,machine->gfx[bank], machine->colortable, sbank, base_color, 0, bank_base, -1);
 }
 
 /*****************************************************************************/
 
 VIDEO_UPDATE( hcastle )
 {
+	const device_config *k007121_1 = devtag_get_device(screen->machine, "k007121_1");
+	const device_config *k007121_2 = devtag_get_device(screen->machine, "k007121_2");
+	UINT8 ctrl_1_0 = k007121_ctrlram_r(k007121_1, 0);
+	UINT8 ctrl_1_1 = k007121_ctrlram_r(k007121_1, 1);
+	UINT8 ctrl_1_2 = k007121_ctrlram_r(k007121_1, 2);
+	UINT8 ctrl_1_3 = k007121_ctrlram_r(k007121_1, 3);
+	UINT8 ctrl_2_0 = k007121_ctrlram_r(k007121_2, 0);
+	UINT8 ctrl_2_1 = k007121_ctrlram_r(k007121_2, 1);
+	UINT8 ctrl_2_2 = k007121_ctrlram_r(k007121_2, 2);
+	UINT8 ctrl_2_3 = k007121_ctrlram_r(k007121_2, 3);
 	static int old_pf1,old_pf2;
 
 	set_pens(screen->machine);
@@ -215,8 +237,8 @@ VIDEO_UPDATE( hcastle )
 	pf1_bankbase = 0x0000;
 	pf2_bankbase = 0x4000 * ((gfx_bank & 2) >> 1);
 
-	if (K007121_ctrlram[0][3] & 0x01) pf1_bankbase += 0x2000;
-	if (K007121_ctrlram[1][3] & 0x01) pf2_bankbase += 0x2000;
+	if (ctrl_1_3 & 0x01) pf1_bankbase += 0x2000;
+	if (ctrl_2_3 & 0x01) pf2_bankbase += 0x2000;
 
 	if (pf1_bankbase != old_pf1)
 		tilemap_mark_all_tiles_dirty(fg_tilemap);
@@ -227,13 +249,13 @@ VIDEO_UPDATE( hcastle )
 	old_pf1 = pf1_bankbase;
 	old_pf2 = pf2_bankbase;
 
-	tilemap_set_scrolly(bg_tilemap,0,K007121_ctrlram[1][2]);
-	tilemap_set_scrollx(bg_tilemap,0,((K007121_ctrlram[1][1]<<8)+K007121_ctrlram[1][0]));
-	tilemap_set_scrolly(fg_tilemap,0,K007121_ctrlram[0][2]);
-	tilemap_set_scrollx(fg_tilemap,0,((K007121_ctrlram[0][1]<<8)+K007121_ctrlram[0][0]));
+	tilemap_set_scrolly(bg_tilemap,0,ctrl_2_2);
+	tilemap_set_scrollx(bg_tilemap,0,((ctrl_2_1<<8)+ctrl_2_0));
+	tilemap_set_scrolly(fg_tilemap,0,ctrl_1_2);
+	tilemap_set_scrollx(fg_tilemap,0,((ctrl_1_1<<8)+ctrl_1_0));
 
 //  /* Sprite priority */
-//  if (K007121_ctrlram[0][3]&0x20)
+//  if (ctrl_1_3 & 0x20)
 	if ((gfx_bank & 0x04) == 0)
 	{
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);

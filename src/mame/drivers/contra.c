@@ -19,7 +19,8 @@ Dip locations and factory settings verified with manual
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
+#include "video/konicdev.h"
 
 extern UINT8 *contra_fg_vram,*contra_fg_cram;
 extern UINT8 *contra_bg_vram,*contra_bg_cram;
@@ -213,6 +214,9 @@ static MACHINE_DRIVER_START( contra )
 	MDRV_VIDEO_START(contra)
 	MDRV_VIDEO_UPDATE(contra)
 
+	MDRV_K007121_ADD("k007121_1")
+	MDRV_K007121_ADD("k007121_2")
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -246,7 +250,7 @@ ROM_START( contra )
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
 
 	ROM_REGION( 0x0001, "pals", 0 )
-    ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
+	ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 ROM_START( contra1 )
@@ -273,7 +277,7 @@ ROM_START( contra1 )
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
 
 	ROM_REGION( 0x0001, "pals", 0 )
-    ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
+	ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 ROM_START( contrab )
@@ -339,7 +343,7 @@ ROM_START( contraj )
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
 
 	ROM_REGION( 0x0001, "pals", 0 )
-    ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
+	ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 ROM_START( contrajb )
@@ -405,7 +409,7 @@ ROM_START( gryzor )
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
 
 	ROM_REGION( 0x0001, "pals", 0 )
-    ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
+	ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 ROM_START( gryzora )
@@ -432,7 +436,7 @@ ROM_START( gryzora )
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )	/* 007121 #1 char lookup table */
 
 	ROM_REGION( 0x0001, "pals", 0 )
-    ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
+	ROM_LOAD( "007766.20d.bin", 0x0000, 0x0001, NO_DUMP ) /* PAL16L8A-2CN */
 ROM_END
 
 

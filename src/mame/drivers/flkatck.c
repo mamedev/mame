@@ -15,7 +15,8 @@ TO DO:
 #include "cpu/hd6309/hd6309.h"
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
-#include "konamipt.h"
+#include "video/konicdev.h"
+#include "includes/konamipt.h"
 
 /* from video/flkatck.c */
 VIDEO_START( flkatck );
@@ -233,6 +234,8 @@ static MACHINE_DRIVER_START( flkatck )
 
 	MDRV_VIDEO_START(flkatck)
 	MDRV_VIDEO_UPDATE(flkatck)
+
+	MDRV_K007121_ADD("k007121")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
