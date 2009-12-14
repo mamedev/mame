@@ -360,7 +360,8 @@
 #define TILEMAP_MAPPER(_name)			tilemap_memory_index _name(UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows)
 
 /* useful macro inside of a TILE_GET_INFO callback to set tile information  */
-#define SET_TILE_INFO(GFX,CODE,COLOR,FLAGS) tileinfo_set(machine, tileinfo, GFX, CODE, COLOR, FLAGS)
+#define SET_TILE_INFO(GFX,CODE,COLOR,FLAGS)         tileinfo_set(machine, tileinfo, GFX, CODE, COLOR, FLAGS)
+#define SET_TILE_INFO_DEVICE(GFX,CODE,COLOR,FLAGS)  tileinfo_set(device->machine, tileinfo, GFX, CODE, COLOR, FLAGS)
 
 /* Macros for setting tile attributes in the TILE_GET_INFO callback: */
 /*   TILE_FLIP_YX assumes that flipy is in bit 1 and flipx is in bit 0 */
