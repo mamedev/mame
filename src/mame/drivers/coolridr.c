@@ -22,11 +22,9 @@ Sega 1994
 
 This game runs on SYSTEM-H1 hardware. Only one known game exists on this
 PCB and this is it. The hardware seems overly complex for a 2D bike
-racing game? This might have been an experimental design transitioning
-between Model 1 and Model 2 or a step up from ST-V's 2D to pseudo 3D/2.5D?
-The design of the PCB is very similar to vanilla Model 2
+racing game? The design of the PCB is very similar to vanilla Model 2
 (i.e. Daytona etc). However instead of fully custom-badged chips,
-many of the custom chips are off-the-shelf Hitachi gate-arrays.
+many of the custom chips are off-the-shelf Hitachi/Toshiba gate-arrays.
 
 
 PCB Layouts
@@ -60,7 +58,8 @@ Notes:
                 JP9 set to 1-2
                 JP10-12 open (no jumpers) but JP12 pin 2 tied to JP10 pin 1
       IC*     - IC29-IC32 are 27C4002 EPROM
-                All other ROMs are 42 pin DIP 16M mask ROM
+                IC1-IC10 are DIP42 32M mask ROM
+                IC11-IC18 are DIP42 16M mask ROM
 
 
 SYSTEM-H1 COMMUNICATION-BD
@@ -70,7 +69,7 @@ SYSTEM-H1 COMMUNICATION-BD
 |                 CN2              |
 |       74F74   74F245  MB84256    |
 |       74F373  74F245  MB84256    |
-|MB89273A         CN1              |
+|MB89237A         CN1              |
 |                                  |
 |       74F138 74F04   74F125      |
 |                                  |
@@ -84,10 +83,14 @@ SYSTEM-H1 COMMUNICATION-BD
 |       LED               CN3      |
 |----------------------------------|
 Notes: (All IC's shown)
-      CN1/2 - Connectors joining to CPU board
-      CN3   - Connector joining to Filter board
-      RX/TX - Optical cable connections for network (not used)
-      JP*   - 3x 2-pin jumpers. JP1 shorted, other jumpers open
+      CN1/2   - Connectors joining to CPU board
+      CN3     - Connector joining to Filter board
+      RX/TX   - Optical cable connections for network (not used)
+      JP*     - 3x 2-pin jumpers. JP1 shorted, other jumpers open
+      MB84256 - Fujitsu MB84256 32k x8 SRAM (NDIP28)
+      MB89374 - Fujitsu MB89374 Data Link Controller (SDIP42)
+      MB89237A- Fujitsu MB89237A 8-Bit Proprietary Microcontroller (?) (DIP40)
+      SN75179 - Texas Instruments SN75179 Differential Driver and Receiver Pair (DIP8)
 
 
 SYSTEM-H1 CPU BD
@@ -197,7 +200,7 @@ Notes:
       M5M411860   - Mitsubishi M5M411860TP435SF00-7 DRAM with fast page mode, 64k-words x 18 bits per word (maybe?) (TSOP42)
       TC55328     - Toshiba TC55328AJ-15 32k x8 SRAM (SOJ24)
       PAL1        - GAL16V8B also marked '315-5803' (DIP20)
-      PAL2        - GAL16V8B also marked '315-5804' (DIP20)
+      PAL2        - GAL16V8B also marked '315-5864' (DIP20)
       Sega Custom - 315-5648 (QFP64, x4)
                     315-5691 also marked 'HG62S0791R17F' (QFP208)
                     315-5692 also marked 'HG51B152FD' (QFP256)
@@ -212,7 +215,21 @@ Notes:
 
 Note: This hardware appears to have been designed as a test-bed for a new RLE based compression system 
       used by the zooming sprites.  It is possible that Sega planned on using this for ST-V, but 
-      decided against it. However, it pre-dates ST-V & Saturn and fits between System 32 and ST-V.
+      decided against it. Video/CPU part numbers give an interesting insight, since video hardware # 
+      sits between Model 1 & Model 2.
+
+                 Year on
+      System      PCB     PCB #      PALs
+      ---------------------------------------------------------
+      System32    1990    837-7428   315-5441 315-5442
+      SysMulti32  1992    837-8676   315-5596
+      Model 1     1992    837-8886   315-5546 315-5483 315-5484
+      Model 2     1994    837-10071  315-5737 315-5741
+      Model 2A    1994    837-10848  315-5737 315-5815
+      STV         1994    837-10934  315-5833
+
+      H1 (CPU)    1994    837-10389  315-5800 315-5801 315-5802
+      H1 (Video)  1994    837-9621   315-5803 315-5864
 
 ******************************************************************************************************/
 
