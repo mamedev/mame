@@ -83,6 +83,7 @@ struct _cia_state
 	UINT8			icr;
 	UINT8			ics;
 	UINT8			irq;
+	int				flag;
 
 	/* Serial */
 	UINT8			loaded;
@@ -192,6 +193,7 @@ static DEVICE_START( cia )
 	state_save_register_device_item(device, 0, cia->icr);
 	state_save_register_device_item(device, 0, cia->ics);
 	state_save_register_device_item(device, 0, cia->irq);
+	state_save_register_device_item(device, 0, cia->flag);
 	state_save_register_device_item(device, 0, cia->loaded);
 	state_save_register_device_item(device, 0, cia->sdr);
 	state_save_register_device_item(device, 0, cia->sp);
@@ -640,6 +642,31 @@ void cia_set_input_cnt(const device_config *device, int data)
 	cia->cnt = data ? 1 : 0;
 }
 
+WRITE_LINE_DEVICE_HANDLER( mos6526_tod_w )
+{
+	if (state) cia_clock_tod(device);
+}
+
+WRITE_LINE_DEVICE_HANDLER( mos6526_cnt_w )
+{
+	cia_set_input_cnt(device, state);
+}
+
+WRITE_LINE_DEVICE_HANDLER( mos6526_sp_w )
+{
+	cia_set_input_sp(device, state);
+}
+
+WRITE_LINE_DEVICE_HANDLER( mos6526_flag_w )
+{
+	cia_state *cia = get_token(device);
+
+	if (cia->flag && !state)
+	{
+		cia->flag = state;
+		cia_issue_index(device);
+	}
+}
 
 /*-------------------------------------------------
     cia_r

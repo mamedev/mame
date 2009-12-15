@@ -70,6 +70,11 @@ void cia_issue_index(const device_config *device);
 void cia_set_input_cnt(const device_config *device, int data);
 void cia_set_input_sp(const device_config *device, int data);
 
+WRITE_LINE_DEVICE_HANDLER( mos6526_tod_w );
+WRITE_LINE_DEVICE_HANDLER( mos6526_cnt_w );
+WRITE_LINE_DEVICE_HANDLER( mos6526_sp_w );
+WRITE_LINE_DEVICE_HANDLER( mos6526_flag_w );
+
 /* accessors */
 UINT8 cia_get_output_a(const device_config *device);
 UINT8 cia_get_output_b(const device_config *device);
