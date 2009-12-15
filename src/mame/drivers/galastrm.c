@@ -283,13 +283,6 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static MACHINE_RESET( galastrm )
-{
-	taito_f3_soundsystem_reset(machine);
-	f3_68681_reset(machine);
-}
-
-
 static const UINT8 default_eeprom[128]={
 	0x45,0x58,0x00,0x00,0xff,0xff,0x00,0x00,0x00,0x28,0x00,0x01,0x00,0x00,0x00,0xfa,
 	0x00,0xec,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
@@ -333,9 +326,6 @@ static MACHINE_DRIVER_START( galastrm )
 	MDRV_CPU_PROGRAM_MAP(galastrm_map)
 	MDRV_CPU_VBLANK_INT("screen", galastrm_interrupt) /* VBL */
 
-	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
-
-	MDRV_MACHINE_RESET(galastrm)
 	MDRV_NVRAM_HANDLER(galastrm)
 
 	/* video hardware */
@@ -353,7 +343,7 @@ static MACHINE_DRIVER_START( galastrm )
 	MDRV_VIDEO_UPDATE(galastrm)
 
 	/* sound hardware */
-	TAITO_F3_SOUND_SYSTEM_ES5505(30476100/2)
+	MDRV_IMPORT_FROM(taito_f3_sound)
 MACHINE_DRIVER_END
 
 /***************************************************************************/

@@ -353,12 +353,6 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static MACHINE_RESET( groundfx )
-{
-	taito_f3_soundsystem_reset(machine);
-	f3_68681_reset(machine);
-}
-
 static INTERRUPT_GEN( groundfx_interrupt )
 {
 	frame_counter^=1;
@@ -372,9 +366,6 @@ static MACHINE_DRIVER_START( groundfx )
 	MDRV_CPU_PROGRAM_MAP(groundfx_map)
 	MDRV_CPU_VBLANK_INT("screen", groundfx_interrupt)
 
-	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
-
-	MDRV_MACHINE_RESET(groundfx)
 //  MDRV_NVRAM_HANDLER(groundfx)
 	MDRV_EEPROM_ADD("eeprom", groundfx_eeprom_interface, 128, default_eeprom)
 
@@ -393,7 +384,7 @@ static MACHINE_DRIVER_START( groundfx )
 	MDRV_VIDEO_UPDATE(groundfx)
 
 	/* sound hardware */
-	TAITO_F3_SOUND_SYSTEM_ES5505(30476100/2)
+	MDRV_IMPORT_FROM(taito_f3_sound)
 MACHINE_DRIVER_END
 
 /***************************************************************************

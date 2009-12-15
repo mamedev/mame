@@ -295,9 +295,9 @@ static void init_savestate(running_machine *machine, int index, atarimo_data *mo
 	state_save_register_item(machine, "atarimo", NULL, index, mo->dirtyheight);
 #endif
 
-	state_save_register_bitmap(machine, "atarimo", NULL, index, "bitmap", mo->bitmap);
+	state_save_register_bitmap(machine, "atarimo", NULL, index, "bitmap", mo->bitmap, __FILE__, __LINE__);
 
-	state_save_register_memory(machine, "atarimo", NULL, index, "spriteram", mo->spriteram, sizeof(atarimo_entry), mo->spriteramsize);
+	state_save_register_memory(machine, "atarimo", NULL, index, "spriteram", mo->spriteram, sizeof(atarimo_entry), mo->spriteramsize, __FILE__, __LINE__);
 
 	state_save_register_item_pointer(machine, "atarimo", NULL, index, mo->codelookup, round_to_powerof2(mo->codemask.mask));
 

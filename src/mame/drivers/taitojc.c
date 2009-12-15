@@ -1298,10 +1298,6 @@ static MACHINE_RESET( taitojc )
 	memset(projection_data, 0, sizeof(projection_data));
 	memset(intersection_data, 0, sizeof(intersection_data));
 
-	taito_f3_soundsystem_reset(machine);
-
-	f3_68681_reset(machine);
-
 	// hold the TMS in reset until we have code
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 }
@@ -1328,8 +1324,6 @@ static MACHINE_DRIVER_START( taitojc )
 	MDRV_CPU_PROGRAM_MAP(taitojc_map)
 	MDRV_CPU_VBLANK_INT("screen", taitojc_vblank)
 	MDRV_CPU_PERIODIC_INT(taitojc_int6, 1000)
-
-	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
 	MDRV_CPU_ADD("sub", MC68HC11, 4000000) //MC68HC11M0
 	MDRV_CPU_PROGRAM_MAP(hc11_pgm_map)
@@ -1358,7 +1352,7 @@ static MACHINE_DRIVER_START( taitojc )
 	MDRV_VIDEO_UPDATE(taitojc)
 
 	/* sound hardware */
-	TAITO_F3_SOUND_SYSTEM_ES5505(30476100/2)
+	MDRV_IMPORT_FROM(taito_f3_sound)
 MACHINE_DRIVER_END
 
 static DRIVER_INIT( taitojc )

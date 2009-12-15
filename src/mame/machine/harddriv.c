@@ -38,7 +38,6 @@
 
 
 static void hd68k_update_interrupts(running_machine *machine);
-static TIMER_CALLBACK( duart_callback );
 
 
 
@@ -61,6 +60,9 @@ MACHINE_START( harddriv )
 	state->sim_memory = (UINT16 *)memory_region(machine, "user1");
 	state->sim_memory_size = memory_region_length(machine, "user1") / 2;
 	state->adsp_pgm_memory_word = (UINT16 *)((UINT8 *)state->adsp_pgm_memory + 1);
+
+	/* allocate timers */
+	state->duart_timer = devtag_get_device(machine, "duart_timer");
 }
 
 
@@ -93,7 +95,6 @@ MACHINE_RESET( harddriv )
 	memset(state->duart_read_data, 0, sizeof(state->duart_read_data));
 	memset(state->duart_write_data, 0, sizeof(state->duart_write_data));
 	state->duart_output_port = 0;
-	state->duart_timer = timer_alloc(machine, duart_callback, NULL);
 
 	/* reset the ADSP/DSIII/DSIV boards */
 	state->adsp_halt = 1;
@@ -523,18 +524,18 @@ INLINE attotime duart_clock_period(harddriv_state *state)
 }
 
 
-static TIMER_CALLBACK( duart_callback )
+TIMER_DEVICE_CALLBACK( hd68k_duart_callback )
 {
-	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	harddriv_state *state = (harddriv_state *)timer->machine->driver_data;
 	logerror("DUART timer fired\n");
 	if (state->duart_write_data[0x05] & 0x08)
 	{
 		logerror("DUART interrupt generated\n");
 		state->duart_read_data[0x05] |= 0x08;
 		state->duart_irq_state = (state->duart_read_data[0x05] & state->duart_write_data[0x05]) != 0;
-		atarigen_update_interrupts(machine);
+		atarigen_update_interrupts(timer->machine);
 	}
-	timer_adjust_oneshot(state->duart_timer, attotime_mul(duart_clock_period(state), 65536), 0);
+	timer_device_adjust_oneshot(timer, attotime_mul(duart_clock_period(state), 65536), 0);
 }
 
 
@@ -562,14 +563,14 @@ READ16_HANDLER( hd68k_duart_r )
 		case 0x0e:		/* Start-Counter Command 3 */
 		{
 			int reps = (state->duart_write_data[0x06] << 8) | state->duart_write_data[0x07];
-			timer_adjust_oneshot(state->duart_timer, attotime_mul(duart_clock_period(state), reps), 0);
+			timer_device_adjust_oneshot(state->duart_timer, attotime_mul(duart_clock_period(state), reps), 0);
 			logerror("DUART timer started (period=%f)\n", attotime_to_double(attotime_mul(duart_clock_period(state), reps)));
 			return 0x00ff;
 		}
 		case 0x0f:		/* Stop-Counter Command 3 */
 			{
-				int reps = attotime_to_double(attotime_mul(timer_timeleft(state->duart_timer), duart_clock(state)));
-				timer_adjust_oneshot(state->duart_timer, attotime_never, 0);
+				int reps = attotime_to_double(attotime_mul(timer_device_timeleft(state->duart_timer), duart_clock(state)));
+				timer_device_adjust_oneshot(state->duart_timer, attotime_never, 0);
 				state->duart_read_data[0x06] = reps >> 8;
 				state->duart_read_data[0x07] = reps & 0xff;
 				logerror("DUART timer stopped (final count=%04X)\n", reps);

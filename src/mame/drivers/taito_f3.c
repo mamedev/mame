@@ -369,10 +369,7 @@ static INTERRUPT_GEN( f3_interrupt2 )
 
 static MACHINE_RESET( f3 )
 {
-	taito_f3_soundsystem_reset(machine);
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
-
-	f3_68681_reset(machine);
 }
 
 
@@ -399,8 +396,6 @@ static MACHINE_DRIVER_START( f3 )
 	MDRV_CPU_PROGRAM_MAP(f3_map)
 	MDRV_CPU_VBLANK_INT("screen", f3_interrupt2)
 
-	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
-
 	MDRV_MACHINE_START(f3)
 	MDRV_MACHINE_RESET(f3)
 
@@ -422,7 +417,7 @@ static MACHINE_DRIVER_START( f3 )
 	MDRV_VIDEO_UPDATE(f3)
 
 	/* sound hardware */
-	TAITO_F3_SOUND_SYSTEM_ES5505(30476100/2)
+	MDRV_IMPORT_FROM(taito_f3_sound)
 MACHINE_DRIVER_END
 
 /* These games reprogram the video output registers to display different scanlines,

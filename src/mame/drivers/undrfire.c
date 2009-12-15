@@ -717,14 +717,6 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static MACHINE_RESET( undrfire )
-{
-	taito_f3_soundsystem_reset(machine);
-
-	f3_68681_reset(machine);
-}
-
-
 static INTERRUPT_GEN( undrfire_interrupt )
 {
 	frame_counter^=1;
@@ -738,9 +730,6 @@ static MACHINE_DRIVER_START( undrfire )
 	MDRV_CPU_PROGRAM_MAP(undrfire_map)
 	MDRV_CPU_VBLANK_INT("screen", undrfire_interrupt)
 
-	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
-
-	MDRV_MACHINE_RESET(undrfire)
 	MDRV_NVRAM_HANDLER(undrfire)
 
 	/* video hardware */
@@ -758,7 +747,7 @@ static MACHINE_DRIVER_START( undrfire )
 	MDRV_VIDEO_UPDATE(undrfire)
 
 	/* sound hardware */
-	TAITO_F3_SOUND_SYSTEM_ES5505(30476100/2)
+	MDRV_IMPORT_FROM(taito_f3_sound)
 MACHINE_DRIVER_END
 
 
@@ -769,15 +758,12 @@ static MACHINE_DRIVER_START( cbombers )
 	MDRV_CPU_PROGRAM_MAP(cbombers_cpua_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
-
 	MDRV_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(cbombers_cpub_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
 
-	MDRV_MACHINE_RESET(undrfire)
 	MDRV_NVRAM_HANDLER(undrfire)
 
 	/* video hardware */
@@ -796,7 +782,7 @@ static MACHINE_DRIVER_START( cbombers )
 	MDRV_VIDEO_UPDATE(cbombers)
 
 	/* sound hardware */
-	TAITO_F3_SOUND_SYSTEM_ES5505(30476100/2)
+	MDRV_IMPORT_FROM(taito_f3_sound)
 MACHINE_DRIVER_END
 
 

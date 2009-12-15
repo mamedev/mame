@@ -1191,6 +1191,8 @@ static MACHINE_START( cps2 )
 	state->audiocpu = devtag_get_device(machine, "audiocpu");
 
 	state_save_register_global(machine, state->scancount);
+
+	memory_configure_bank(machine, "bank1", 0, (QSOUND_SIZE - 0x10000) / 0x4000, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
 }
 
 

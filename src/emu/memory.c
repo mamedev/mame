@@ -3443,7 +3443,7 @@ static void *block_allocate(const address_space *space, offs_t bytestart, offs_t
 		char name[256];
 
 		sprintf(name, "%08x-%08x", bytestart, byteend);
-		state_save_register_memory(space->machine, "memory", space->cpu->tag, space->spacenum, name, memory, bytes_per_element, (UINT32)(byteend - bytestart + 1) / bytes_per_element);
+		state_save_register_memory(space->machine, "memory", space->cpu->tag, space->spacenum, name, memory, bytes_per_element, (UINT32)(byteend - bytestart + 1) / bytes_per_element, __FILE__, __LINE__);
 	}
 
 	/* fill in the tracking block */

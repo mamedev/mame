@@ -77,7 +77,7 @@ struct _harddriv_state
 	UINT8 					duart_read_data[16];
 	UINT8 					duart_write_data[16];
 	UINT8 					duart_output_port;
-	emu_timer *				duart_timer;
+	const device_config *	duart_timer;
 
 	UINT8 					last_gsp_shiftreg;
 
@@ -193,6 +193,7 @@ WRITE16_HANDLER( hdc68k_wheel_edge_reset_w );
 READ16_HANDLER( hd68k_zram_r );
 WRITE16_HANDLER( hd68k_zram_w );
 
+TIMER_DEVICE_CALLBACK( hd68k_duart_callback );
 READ16_HANDLER( hd68k_duart_r );
 WRITE16_HANDLER( hd68k_duart_w );
 

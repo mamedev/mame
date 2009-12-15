@@ -1021,6 +1021,8 @@ static MACHINE_DRIVER_START( driver_nomsp )
 	MDRV_MACHINE_START(harddriv)
 	MDRV_MACHINE_RESET(harddriv)
 	MDRV_NVRAM_HANDLER(atarigen)
+	
+	MDRV_TIMER_ADD("duart_timer", hd68k_duart_callback)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

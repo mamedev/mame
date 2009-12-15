@@ -255,7 +255,7 @@ VIDEO_START( generic_bitmapped )
 	machine->generic.tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	/* ensure the contents of the bitmap are saved */
-	state_save_register_bitmap(machine, "video", NULL, 0, "tmpbitmap", machine->generic.tmpbitmap);
+	state_save_register_global_bitmap(machine, machine->generic.tmpbitmap);
 }
 
 

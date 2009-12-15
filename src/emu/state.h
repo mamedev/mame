@@ -67,7 +67,7 @@ typedef enum _state_save_error state_save_error;
 #define state_save_register_generic(_mach, _mod, _tag, _index, _name, _val, _valsize, _count) 		\
 do {																								\
 	assert_always(IS_VALID_SAVE_TYPE(_valsize), "Invalid data type supplied for state saving.");	\
-	state_save_register_memory(_mach, _mod, _tag, _index, _name, _val, sizeof(_valsize), _count);	\
+	state_save_register_memory(_mach, _mod, _tag, _index, _name, _val, sizeof(_valsize), _count, __FILE__, __LINE__);	\
 } while (0)
 
 
@@ -85,7 +85,7 @@ do {																								\
 	state_save_register_item_pointer(_mach, _mod, _tag, _index, _val[0], sizeof(_val)/sizeof(_val[0][0]))
 
 #define state_save_register_item_bitmap(_mach, _mod, _tag, _index, _val)	\
-	state_save_register_bitmap(_mach, _mod, _tag, _index, #_val, _val)
+	state_save_register_bitmap(_mach, _mod, _tag, _index, #_val, _val, __FILE__, __LINE__)
 
 
 
@@ -103,7 +103,7 @@ do {																								\
 	state_save_register_item_pointer((_dev)->machine, device_get_name(_dev), (_dev)->tag, _index, _val[0], sizeof(_val)/sizeof(_val[0][0]))
 
 #define state_save_register_device_item_bitmap(_dev, _index, _val)	\
-	state_save_register_bitmap((_dev)->machine, device_get_name(_dev), (_dev)->tag, _index, #_val, _val)
+	state_save_register_bitmap((_dev)->machine, device_get_name(_dev), (_dev)->tag, _index, #_val, _val, __FILE__, __LINE__)
 
 
 
@@ -121,7 +121,7 @@ do {																								\
 	state_save_register_item_2d_array(_mach, "globals", NULL, 0, _val)
 
 #define state_save_register_global_bitmap(_mach, _val) \
-	state_save_register_bitmap(_mach, "globals", NULL, 0, #_val, _val)
+	state_save_register_bitmap(_mach, "globals", NULL, 0, #_val, _val, __FILE__, __LINE__)
 
 
 
@@ -149,10 +149,10 @@ void state_save_allow_registration(running_machine *machine, int allowed);
 int state_save_registration_allowed(running_machine *machine);
 
 /* register an array of data in memory */
-void state_save_register_memory(running_machine *machine, const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount);
+void state_save_register_memory(running_machine *machine, const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount, const char *file, int line);
 
 /* register a bitmap to be saved */
-void state_save_register_bitmap(running_machine *machine, const char *module, const char *tag, UINT32 index, const char *name, bitmap_t *val);
+void state_save_register_bitmap(running_machine *machine, const char *module, const char *tag, UINT32 index, const char *name, bitmap_t *val, const char *file, int line);
 
 
 

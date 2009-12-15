@@ -7,7 +7,6 @@ static int counter,vector_reg,imr_status;
 static UINT16 es5510_dsp_ram[0x200];
 static UINT32	es5510_gpr[0xc0];
 static UINT32	es5510_gpr_latch;
-static emu_timer *timer_68681=NULL;
 static int timer_mode,m68681_imr;
 
 //static int es_tmp=1;
@@ -16,6 +15,8 @@ static int timer_mode,m68681_imr;
 #define M68681_CLOCK	2000000 /* Actually X1, not the main clock */
 
 enum { TIMER_SINGLESHOT, TIMER_PULSE };
+
+
 
 static READ16_HANDLER(f3_68000_share_r)
 {
@@ -68,20 +69,15 @@ static WRITE16_HANDLER( f3_volume_w )
 	/* Channels 0, 1, 2, 3 - Unused */
 }
 
-static TIMER_CALLBACK( taito_en_timer_callback )
+static TIMER_DEVICE_CALLBACK( taito_en_timer_callback )
 {
 	/* Only cause IRQ if the mask is set to allow it */
 	if (m68681_imr & 0x08)
 	{
-		cpu_set_input_line_vector(cputag_get_cpu(machine, "audiocpu"), 6, vector_reg);
-		cputag_set_input_line(machine, "audiocpu", 6, ASSERT_LINE);
+		cpu_set_input_line_vector(cputag_get_cpu(timer->machine, "audiocpu"), 6, vector_reg);
+		cputag_set_input_line(timer->machine, "audiocpu", 6, ASSERT_LINE);
 		imr_status |= 0x08;
 	}
-}
-
-void f3_68681_reset(running_machine *machine)
-{
-	timer_68681 = timer_alloc(machine, taito_en_timer_callback, NULL);
 }
 
 static READ16_HANDLER(f3_68681_r)
@@ -123,7 +119,7 @@ static WRITE16_HANDLER(f3_68681_w)
 				case 3:
 					logerror("Counter:  X1/Clk - divided by 16, counter is %04x, so interrupt every %d cycles\n",counter,(M68000_CLOCK/M68681_CLOCK)*counter*16);
 					timer_mode=TIMER_SINGLESHOT;
-					timer_adjust_oneshot(timer_68681, cpu_clocks_to_attotime(space->cpu, (M68000_CLOCK/M68681_CLOCK)*counter*16), 0);
+					timer_device_adjust_oneshot(devtag_get_device(space->machine, "timer_68681"), cpu_clocks_to_attotime(space->cpu, (M68000_CLOCK/M68681_CLOCK)*counter*16), 0);
 					break;
 				case 4:
 					logerror("Timer:  Unimplemented external IP2\n");
@@ -134,7 +130,7 @@ static WRITE16_HANDLER(f3_68681_w)
 				case 6:
 					logerror("Timer:  X1/Clk, counter is %04x, so interrupt every %d cycles\n",counter,(M68000_CLOCK/M68681_CLOCK)*counter);
 					timer_mode=TIMER_PULSE;
-					timer_adjust_periodic(timer_68681, cpu_clocks_to_attotime(space->cpu, (M68000_CLOCK/M68681_CLOCK)*counter), 0, cpu_clocks_to_attotime(space->cpu, (M68000_CLOCK/M68681_CLOCK)*counter));
+					timer_device_adjust_periodic(devtag_get_device(space->machine, "timer_68681"), cpu_clocks_to_attotime(space->cpu, (M68000_CLOCK/M68681_CLOCK)*counter), 0, cpu_clocks_to_attotime(space->cpu, (M68000_CLOCK/M68681_CLOCK)*counter));
 					break;
 				case 7:
 					logerror("Timer:  Unimplemented X1/Clk - divided by 16\n");
@@ -247,7 +243,7 @@ ADDRESS_MAP_START( f3_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("share1")	// mirror
 ADDRESS_MAP_END
 
-void taito_f3_soundsystem_reset(running_machine *machine)
+static SOUND_RESET( taito_f3_soundsystem_reset )
 {
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
 	UINT16 *ROM = (UINT16 *)memory_region(machine, "audiocpu");
@@ -265,9 +261,24 @@ void taito_f3_soundsystem_reset(running_machine *machine)
 	//cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-const es5505_interface es5505_taito_f3_config =
+static const es5505_interface es5505_taito_f3_config =
 {
 	"ensoniq.0",	/* Bank 0: Unused by F3 games? */
 	"ensoniq.0",	/* Bank 1: All games seem to use this */
 	NULL /* irq */
 };
+
+MACHINE_DRIVER_START( taito_f3_sound )
+	MDRV_TIMER_ADD("timer_68681", taito_en_timer_callback)
+	
+	MDRV_SOUND_RESET( taito_f3_soundsystem_reset )
+
+	MDRV_CPU_ADD("audiocpu",  M68000, 16000000)
+	MDRV_CPU_PROGRAM_MAP(f3_sound_map)
+
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MDRV_SOUND_ADD("ensoniq", ES5505, 30476100/2)
+	MDRV_SOUND_CONFIG(es5505_taito_f3_config)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_DRIVER_END

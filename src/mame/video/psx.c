@@ -739,7 +739,7 @@ static void psx_gpu_init( running_machine *machine )
 	}
 
 	// icky!!!
-	state_save_register_memory( machine, "globals", NULL, 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ) );
+	state_save_register_memory( machine, "globals", NULL, 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ), __FILE__, __LINE__ );
 
 	state_save_register_global_pointer(machine,  m_p_vram, m_n_vram_size );
 	state_save_register_global(machine,  m_n_gpu_buffer_offset );

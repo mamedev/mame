@@ -151,7 +151,7 @@ void intelflash_init(running_machine *machine, int chip, int type, void *data)
 	state_save_register_item( machine, "intelfsh", NULL, chip, c->status );
 	state_save_register_item( machine, "intelfsh", NULL, chip, c->flash_mode );
 	state_save_register_item( machine, "intelfsh", NULL, chip, c->flash_master_lock );
-	state_save_register_memory( machine, "intelfsh", NULL, chip, "flash_memory", c->flash_memory, c->bits/8, c->size / (c->bits/8) );
+	state_save_register_memory( machine, "intelfsh", NULL, chip, "flash_memory", c->flash_memory, c->bits/8, c->size / (c->bits/8), __FILE__, __LINE__ );
 }
 
 UINT32 intelflash_read(int chip, UINT32 address)

@@ -302,14 +302,6 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-static MACHINE_RESET( gunbustr )
-{
-	taito_f3_soundsystem_reset(machine);
-
-	f3_68681_reset(machine);
-}
-
-
 static const UINT8 default_eeprom[128]={
 	0x00,0x01,0x00,0x85,0x00,0xfd,0x00,0xff,0x00,0x67,0x00,0x02,0x00,0x00,0x00,0x7b,
 	0x00,0xff,0x00,0xff,0x00,0x78,0x00,0x03,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
@@ -352,9 +344,6 @@ static MACHINE_DRIVER_START( gunbustr )
 	MDRV_CPU_PROGRAM_MAP(gunbustr_map)
 	MDRV_CPU_VBLANK_INT("screen", gunbustr_interrupt) /* VBL */
 
-	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
-
-	MDRV_MACHINE_RESET(gunbustr)
 	MDRV_NVRAM_HANDLER(gunbustr)
 
 	/* video hardware */
@@ -372,7 +361,7 @@ static MACHINE_DRIVER_START( gunbustr )
 	MDRV_VIDEO_UPDATE(gunbustr)
 
 	/* sound hardware */
-	TAITO_F3_SOUND_SYSTEM_ES5505(30476100/2)
+	MDRV_IMPORT_FROM(taito_f3_sound)
 MACHINE_DRIVER_END
 
 /***************************************************************************/

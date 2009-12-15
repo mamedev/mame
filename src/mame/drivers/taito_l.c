@@ -136,13 +136,16 @@ logerror("%s:Large palette ? %03x\n", cpuexec_describe_context(machine), addr);
 	}
 }
 
-static void machine_init(running_machine *machine)
+static MACHINE_START( taito_l )
 {
-	int i;
-
 	taitol_rambanks = auto_alloc_array(machine, UINT8, 0x1000*12);
 	palette_ram = auto_alloc_array(machine, UINT8, 0x1000);
 	empty_ram = auto_alloc_array(machine, UINT8, 0x1000);
+}
+
+static void machine_reset(running_machine *machine)
+{
+	int i;
 
 	for(i=0;i<3;i++)
 		irq_adr_table[i] = 0;
@@ -178,7 +181,7 @@ static void machine_init(running_machine *machine)
 
 static MACHINE_RESET( fhawk )
 {
-	machine_init(machine);
+	machine_reset(machine);
 	porte0_tag = NULL;
 	porte1_tag = NULL;
 	portf0_tag = NULL;
@@ -187,7 +190,7 @@ static MACHINE_RESET( fhawk )
 
 static MACHINE_RESET( raimais )
 {
-	machine_init(machine);
+	machine_reset(machine);
 	porte0_tag = NULL;
 	porte1_tag = NULL;
 	portf0_tag = NULL;
@@ -196,7 +199,7 @@ static MACHINE_RESET( raimais )
 
 static MACHINE_RESET( champwr )
 {
-	machine_init(machine);
+	machine_reset(machine);
 	porte0_tag = NULL;
 	porte1_tag = NULL;
 	portf0_tag = NULL;
@@ -206,7 +209,7 @@ static MACHINE_RESET( champwr )
 
 static MACHINE_RESET( kurikint )
 {
-	machine_init(machine);
+	machine_reset(machine);
 	porte0_tag = NULL;
 	porte1_tag = NULL;
 	portf0_tag = NULL;
@@ -215,7 +218,7 @@ static MACHINE_RESET( kurikint )
 
 static MACHINE_RESET( evilston )
 {
-	machine_init(machine);
+	machine_reset(machine);
 	porte0_tag = NULL;
 	porte1_tag = NULL;
 	portf0_tag = NULL;
@@ -224,7 +227,7 @@ static MACHINE_RESET( evilston )
 
 static MACHINE_RESET( puzznic )
 {
-	machine_init(machine);
+	machine_reset(machine);
 	porte0_tag = "DSWA";
 	porte1_tag = "DSWB";
 	portf0_tag = "IN0";
@@ -233,7 +236,7 @@ static MACHINE_RESET( puzznic )
 
 static MACHINE_RESET( plotting )
 {
-	machine_init(machine);
+	machine_reset(machine);
 	porte0_tag = "DSWA";
 	porte1_tag = "DSWB";
 	portf0_tag = "IN0";
@@ -242,7 +245,7 @@ static MACHINE_RESET( plotting )
 
 static MACHINE_RESET( palamed )
 {
-	machine_init(machine);
+	machine_reset(machine);
 	porte0_tag = "DSWA";
 	porte1_tag = NULL;
 	portf0_tag = "DSWB";
@@ -251,7 +254,7 @@ static MACHINE_RESET( palamed )
 
 static MACHINE_RESET( cachat )
 {
-	machine_init(machine);
+	machine_reset(machine);
 	porte0_tag = "DSWA";
 	porte1_tag = NULL;
 	portf0_tag = "DSWB";
@@ -260,7 +263,7 @@ static MACHINE_RESET( cachat )
 
 static MACHINE_RESET( horshoes )
 {
-	machine_init(machine);
+	machine_reset(machine);
 	porte0_tag = "DSWA";
 	porte1_tag = "DSWB";
 	portf0_tag = "IN0";
@@ -1965,6 +1968,7 @@ static MACHINE_DRIVER_START( fhawk )
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
+	MDRV_MACHINE_START(taito_l)
 	MDRV_MACHINE_RESET(fhawk)
 
 	/* video hardware */
@@ -2061,6 +2065,7 @@ static MACHINE_DRIVER_START( kurikint )
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
+	MDRV_MACHINE_START(taito_l)
 	MDRV_MACHINE_RESET(kurikint)
 
 	/* video hardware */
@@ -2106,6 +2111,7 @@ static MACHINE_DRIVER_START( plotting )
 	MDRV_CPU_PROGRAM_MAP(plotting_map)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
+	MDRV_MACHINE_START(taito_l)
 	MDRV_MACHINE_RESET(plotting)
 
 	/* video hardware */
@@ -2201,6 +2207,7 @@ static MACHINE_DRIVER_START( evilston )
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
+	MDRV_MACHINE_START(taito_l)
 	MDRV_MACHINE_RESET(evilston)
 
 	/* video hardware */

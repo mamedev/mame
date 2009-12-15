@@ -223,7 +223,7 @@ int state_save_registration_allowed(running_machine *machine)
     array of data in memory
 -------------------------------------------------*/
 
-void state_save_register_memory(running_machine *machine, const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount)
+void state_save_register_memory(running_machine *machine, const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount, const char *file, int line)
 {
 	state_private *global = machine->state_data;
 	state_entry **entryptr, *next;
@@ -272,7 +272,7 @@ void state_save_register_memory(running_machine *machine, const char *module, co
 	(*entryptr)->name      = totalname;
 	(*entryptr)->typesize  = valsize;
 	(*entryptr)->typecount = valcount;
-	restrack_register_object(OBJTYPE_STATEREG, *entryptr, 0, __FILE__, __LINE__);
+	restrack_register_object(OBJTYPE_STATEREG, *entryptr, 0, file, line);
 }
 
 
@@ -281,9 +281,9 @@ void state_save_register_memory(running_machine *machine, const char *module, co
     bitmap to be saved
 -------------------------------------------------*/
 
-void state_save_register_bitmap(running_machine *machine, const char *module, const char *tag, UINT32 index, const char *name, bitmap_t *val)
+void state_save_register_bitmap(running_machine *machine, const char *module, const char *tag, UINT32 index, const char *name, bitmap_t *val, const char *file, int line)
 {
-	state_save_register_memory(machine, module, tag, index, name, val->base, val->bpp / 8, val->rowpixels * val->height);
+	state_save_register_memory(machine, module, tag, index, name, val->base, val->bpp / 8, val->rowpixels * val->height, file, line);
 }
 
 
