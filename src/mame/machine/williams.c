@@ -49,7 +49,6 @@ static void mysticm_main_irq(const device_config *device, int state);
 static void tshoot_main_irq(const device_config *device, int state);
 
 /* Lotto Fun-specific code */
-static READ8_DEVICE_HANDLER( lottofun_input_port_0_r );
 static WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w );
 
 /* Turkey Shoot-specific code */
@@ -129,8 +128,8 @@ const pia6821_interface williams_snd_pia_intf =
 /* Special PIA 0 for Lotto Fun, to handle the controls and ticket dispenser */
 const pia6821_interface lottofun_pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(lottofun_input_port_0_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, ticket_dispenser_w), DEVCB_HANDLER(lottofun_coin_lock_w), DEVCB_NULL,
+	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DEVICE_HANDLER("ticket", ticket_dispenser_w), DEVCB_HANDLER(lottofun_coin_lock_w), DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
 
@@ -358,9 +357,6 @@ static void tshoot_main_irq(const device_config *device, int state)
 
 static MACHINE_RESET( williams_common )
 {
-	/* reset the ticket dispenser (Lotto Fun) */
-	ticket_dispenser_init(machine, 70, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH);
-
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
 	scanline_timer = timer_alloc(machine, williams_va11_callback, NULL);
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
@@ -871,18 +867,12 @@ WRITE8_HANDLER( blaster_bank_select_w )
  *
  *************************************/
 
-static READ8_DEVICE_HANDLER( lottofun_input_port_0_r )
-{
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-
-	/* merge in the ticket dispenser status */
-	return input_port_read(device->machine, "IN0") | ticket_dispenser_r(space, offset);
-}
-
 static WRITE8_DEVICE_HANDLER( lottofun_coin_lock_w )
 {
 	coin_lockout_global_w(device->machine, data & 1); /* bit 5 of PIC control port A */
 }
+
+
 
 /*************************************
  *

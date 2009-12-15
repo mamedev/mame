@@ -329,10 +329,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, ticket_dispenser_r),
+		DEVCB_DEVICE_HANDLER("ticket", ticket_dispenser_r),
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, ticket_dispenser_w),  /* Also a status LED. See memory map above */
+		DEVCB_DEVICE_HANDLER("ticket", ticket_dispenser_w),  /* Also a status LED. See memory map above */
 	},
 	firqhandler
 };
@@ -385,6 +385,8 @@ static MACHINE_DRIVER_START( capbowl )
 	MDRV_MACHINE_START(capbowl)
 	MDRV_MACHINE_RESET(capbowl)
 	MDRV_NVRAM_HANDLER(capbowl)
+	
+	MDRV_TICKET_DISPENSER_ADD("ticket", 100, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
 	MDRV_VIDEO_START(capbowl)
@@ -511,21 +513,12 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( bowlrama )
-{
-	/* Initialize the ticket dispenser to 100 milliseconds */
-	/* (I'm not sure what the correct value really is) */
-	ticket_dispenser_init(machine, 100, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
-}
-
 static DRIVER_INIT( capbowl )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	/* configure ROM banks in 0x0000-0x3fff */
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);
-
-	DRIVER_INIT_CALL(bowlrama);
 }
 
 
@@ -540,4 +533,4 @@ GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl,  ROT270, "Incredible 
 GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl,  ROT270, "Incredible Technologies", "Capcom Bowling (set 3)", 0 )
 GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl,  ROT270, "Incredible Technologies", "Capcom Bowling (set 4)", 0 )
 GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl,  ROT270, "Incredible Technologies", "Coors Light Bowling", 0 )
-GAME( 1991, bowlrama, 0,       bowlrama, capbowl, bowlrama, ROT270, "P&P Marketing", "Bowl-O-Rama", 0 )
+GAME( 1991, bowlrama, 0,       bowlrama, capbowl, 0,        ROT270, "P&P Marketing", "Bowl-O-Rama", 0 )

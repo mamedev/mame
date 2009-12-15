@@ -140,7 +140,7 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 	set_led_status(device->machine, 9,data & 0x08);
 
 	/* bit 5 - ticket out in trivia games */
-	ticket_dispenser_w(space, 0, (data & 0x20)<< 2);
+	ticket_dispenser_w(devtag_get_device(device->machine, "ticket"), 0, (data & 0x20)<< 2);
 
 	/* bit 6 enables NMI */
 	interrupt_enable_w(space, 0, data & 0x40);
@@ -501,7 +501,7 @@ static INPUT_PORTS_START(trivia_standard)
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ticket_dispenser_0_port_r, 0)		/* ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)		/* ticket status */
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -609,7 +609,7 @@ static INPUT_PORTS_START( getrivia )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_IMPULSE(2) PORT_CONDITION("DSWA", 0x40, PORTCOND_EQUALS, 0x00) PORT_NAME ("Start in no coins mode")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_CONDITION("DSWA", 0x40, PORTCOND_EQUALS, 0x40)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSWA", 0x40, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ticket_dispenser_0_port_r, 0)		/* ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)		/* ticket status */
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -786,7 +786,7 @@ static INPUT_PORTS_START( gt103a )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_IMPULSE(2) PORT_CONDITION("DSWA", 0x40, PORTCOND_EQUALS, 0x00) PORT_NAME ("Start in no coins mode")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_CONDITION("DSWA", 0x40, PORTCOND_EQUALS, 0x40)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSWA", 0x40, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ticket_dispenser_0_port_r, 0)		/* ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)		/* ticket status */
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -892,7 +892,7 @@ static INPUT_PORTS_START(sprtauth)
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ticket_dispenser_0_port_r, 0)		/* ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)		/* ticket status */
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -992,15 +992,6 @@ static const ppi8255_interface findout_ppi8255_intf[2] =
 	}
 };
 
-static MACHINE_RESET( getrivia )
-{
-	ticket_dispenser_init(machine, 100, 1, 1);
-}
-
-static MACHINE_RESET( gselect )
-{
-}
-
 static MACHINE_DRIVER_START( getrivia )
 	MDRV_CPU_ADD("maincpu",Z80,4000000) /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(getrivia_map)
@@ -1017,7 +1008,6 @@ static MACHINE_DRIVER_START( getrivia )
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_PALETTE_INIT(gei)
 
-	MDRV_MACHINE_RESET(getrivia)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_VIDEO_START(generic_bitmapped)
@@ -1025,6 +1015,7 @@ static MACHINE_DRIVER_START( getrivia )
 
 	MDRV_PPI8255_ADD( "ppi8255_0", getrivia_ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", getrivia_ppi8255_intf[1] )
+	MDRV_TICKET_DISPENSER_ADD("ticket", 100, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1047,11 +1038,11 @@ static MACHINE_DRIVER_START( gselect )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(getrivia)
+	
+	MDRV_DEVICE_REMOVE("ticket")
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gselect_map)
-
-	MDRV_MACHINE_RESET(gselect)
 
 	MDRV_PPI8255_RECONFIG( "ppi8255_0", gselect_ppi8255_intf[0] )
 	MDRV_PPI8255_RECONFIG( "ppi8255_1", gselect_ppi8255_intf[1] )
@@ -1062,10 +1053,11 @@ static MACHINE_DRIVER_START( jokpokera )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(getrivia)
 
+	MDRV_DEVICE_REMOVE("ticket")
+
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gselect_map)
 
-	MDRV_MACHINE_RESET(gselect)
 	MDRV_PPI8255_RECONFIG( "ppi8255_0", gselect_ppi8255_intf[0] )
 MACHINE_DRIVER_END
 

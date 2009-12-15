@@ -34,7 +34,6 @@ static UINT8 bitvals[32];
 static MACHINE_RESET( xtheball )
 {
 	tlc34076_reset(6);
-	ticket_dispenser_init(machine, 100, 1, 1);
 }
 
 
@@ -134,7 +133,7 @@ static WRITE16_HANDLER( bit_controls_w )
 			switch (offset)
 			{
 				case 7:
-					ticket_dispenser_w(space, 0, data << 7);
+					ticket_dispenser_w(devtag_get_device(space->machine, "ticket"), 0, data << 7);
 					break;
 
 				case 8:
@@ -191,14 +190,6 @@ static WRITE16_HANDLER( bit_controls_w )
  *
  *************************************/
 
-static READ16_HANDLER( port0_r )
-{
-	int result = input_port_read(space->machine, "DSW");
-	result ^= ticket_dispenser_r(space,0) >> 3;
-	return result;
-}
-
-
 static READ16_HANDLER( analogx_r )
 {
 	return (input_port_read(space->machine, "ANALOGX") << 8) | 0x00ff;
@@ -226,7 +217,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x02000000, 0x020fffff) AM_RAM AM_BASE(&vram_fg)
 	AM_RANGE(0x03000000, 0x030000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
 	AM_RANGE(0x03040000, 0x030401ff) AM_WRITE(bit_controls_w)
-	AM_RANGE(0x03040080, 0x0304008f) AM_READ(port0_r)
+	AM_RANGE(0x03040080, 0x0304008f) AM_READ_PORT("DSW")
 	AM_RANGE(0x03040100, 0x0304010f) AM_READ(analogx_r)
 	AM_RANGE(0x03040110, 0x0304011f) AM_READ_PORT("COIN1")
 	AM_RANGE(0x03040130, 0x0304013f) AM_READ_PORT("SERVICE2")
@@ -251,7 +242,9 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( xtheball )
 	PORT_START("DSW")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
+	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0700, 0x0000, "Target Tickets")
 	PORT_DIPSETTING(      0x0000, "3" )
 	PORT_DIPSETTING(      0x0100, "4" )
@@ -349,6 +342,8 @@ static MACHINE_DRIVER_START( xtheball )
 
 	MDRV_MACHINE_RESET(xtheball)
 	MDRV_NVRAM_HANDLER(generic_1fill)
+	
+	MDRV_TICKET_DISPENSER_ADD("ticket", 100, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(tms340x0)

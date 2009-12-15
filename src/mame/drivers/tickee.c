@@ -38,6 +38,8 @@ static int beamyadd;
 static int palette_bank;
 static UINT8 gunx[2];
 
+
+
 /*************************************
  *
  *  Compute X/Y coordinates
@@ -73,9 +75,6 @@ static TIMER_CALLBACK( trigger_gun_interrupt )
 }
 
 
-
-
-
 static TIMER_CALLBACK( clear_gun_interrupt )
 {
 	/* clear the IRQ on the next scanline? */
@@ -108,7 +107,6 @@ static TIMER_CALLBACK( setup_gun_interrupts )
 
 
 
-
 /*************************************
  *
  *  Video startup
@@ -121,6 +119,7 @@ static VIDEO_START( tickee )
 	setup_gun_timer = timer_alloc(machine, setup_gun_interrupts, NULL);
 	timer_adjust_oneshot(setup_gun_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
+
 
 
 /*************************************
@@ -173,7 +172,6 @@ static void rapidfir_scanline_update(const device_config *screen, bitmap_t *bitm
 	}
 	else
 	{
-
 		/* copy the non-blanked portions of this scanline */
 		for (x = params->heblnk; x < params->hsblnk; x += 2)
 		{
@@ -181,7 +179,6 @@ static void rapidfir_scanline_update(const device_config *screen, bitmap_t *bitm
 			dest[x + 0] = pens[pixels & 0xff];
 			dest[x + 1] = pens[pixels >> 8];
 		}
-
 	}
 }
 
@@ -196,7 +193,6 @@ static MACHINE_RESET( tickee )
 {
 	beamxadd = 50;
 	beamyadd = 0;
-	ticket_dispenser_init(machine, 100, 0, 1);
 	tlc34076_reset(6);
 }
 
@@ -227,6 +223,7 @@ static READ16_HANDLER( rapidfir_transparent_r )
 	return tickee_vram[offset];
 }
 
+
 void rapidfir_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	if (address < 0x800000)
@@ -238,24 +235,6 @@ void rapidfir_from_shiftreg(const address_space *space, UINT32 address, UINT16 *
 {
 	if (address < 0x800000)
 		memcpy(&tickee_vram[TOWORD(address)], shiftreg, TOBYTE(0x2000));
-}
-
-/*************************************
- *
- *  Miscellaneous control bits
- *
- *************************************/
-
-static READ8_DEVICE_HANDLER( port1_r )
-{
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	return input_port_read(device->machine, "IN0") | (ticket_dispenser_0_r(space, 0) >> 5) | (ticket_dispenser_1_r(space, 0) >> 6);
-}
-
-static READ8_DEVICE_HANDLER( port2_r )
-{
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	return input_port_read(device->machine, "IN2") | (ticket_dispenser_0_r(space, 0) >> 5) | (ticket_dispenser_1_r(space, 0) >> 6);
 }
 
 
@@ -281,14 +260,13 @@ static WRITE16_HANDLER( tickee_control_w )
 
 	if (offset == 3)
 	{
-		ticket_dispenser_0_w(space, 0, (data & 8) << 4);
-		ticket_dispenser_1_w(space, 0, (data & 4) << 5);
+		ticket_dispenser_w(devtag_get_device(space->machine, "ticket1"), 0, (data & 8) << 4);
+		ticket_dispenser_w(devtag_get_device(space->machine, "ticket2"), 0, (data & 4) << 5);
 	}
 
 	if (olddata != tickee_control[offset])
 		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", cpu_get_pc(space->cpu), offset, tickee_control[offset], olddata);
 }
-
 
 
 
@@ -302,6 +280,7 @@ static READ16_HANDLER( ffff_r )
 {
 	return 0xffff;
 }
+
 
 static READ16_HANDLER( rapidfir_gun1_r )
 {
@@ -320,12 +299,15 @@ static READ16_HANDLER( ff7f_r )
 	return 0xff7f;
 }
 
+
 static WRITE16_HANDLER( rapidfir_control_w )
 {
 	/* other bits like control on tickee? */
 	if (ACCESSING_BITS_0_7)
 		palette_bank = data & 1;
 }
+
+
 
 /*************************************
  *
@@ -342,7 +324,7 @@ static WRITE16_DEVICE_HANDLER( sound_bank_w )
 			break;
 
 		case 0x2d:
-			okim6295_set_bank_base(device, 0x50000);
+			okim6295_set_bank_base(device, 0x40000);
 			break;
 
 		case 0x1c:
@@ -358,6 +340,8 @@ static WRITE16_DEVICE_HANDLER( sound_bank_w )
 			break;
 	}
 }
+
+
 
 /*************************************
  *
@@ -398,6 +382,7 @@ static ADDRESS_MAP_START( ghoshunt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
+
 /* newer hardware */
 static ADDRESS_MAP_START( rapidfir_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(&tickee_vram)
@@ -421,6 +406,7 @@ static ADDRESS_MAP_START( rapidfir_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc400010, 0xfc40001f) AM_READ(ff7f_r)
 	AM_RANGE(0xfe000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
+
 
 
 /*************************************
@@ -455,8 +441,8 @@ static INPUT_PORTS_START( tickee )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* right ticket status */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* left ticket status */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket2", ticket_dispenser_line_r) /* right ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket1", ticket_dispenser_line_r)	/* left ticket status */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -485,6 +471,7 @@ static INPUT_PORTS_START( tickee )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( ghoshunt )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Messages in Play")
@@ -512,8 +499,8 @@ static INPUT_PORTS_START( ghoshunt )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* right ticket status */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* left ticket status */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket2", ticket_dispenser_line_r)	/* right ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket1", ticket_dispenser_line_r)	/* left ticket status */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xd8, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -528,8 +515,8 @@ static INPUT_PORTS_START( ghoshunt )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* right ticket status */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* left ticket status */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket2", ticket_dispenser_line_r)	/* right ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket1", ticket_dispenser_line_r)	/* left ticket status */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xd8, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -545,6 +532,7 @@ static INPUT_PORTS_START( ghoshunt )
 	PORT_START("GUNY2")			/* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( rapidfir )
 	PORT_START("IN0")
@@ -627,8 +615,8 @@ static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(port1_r),
-	DEVCB_HANDLER(port2_r),
+	DEVCB_INPUT_PORT("IN0"),
+	DEVCB_INPUT_PORT("IN2"),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -667,6 +655,7 @@ static const tms34010_config rapidfir_tms_config =
 };
 
 
+
 /*************************************
  *
  *  Machine drivers
@@ -682,6 +671,9 @@ static MACHINE_DRIVER_START( tickee )
 
 	MDRV_MACHINE_RESET(tickee)
 	MDRV_NVRAM_HANDLER(generic_1fill)
+	
+	MDRV_TICKET_DISPENSER_ADD("ticket1", 100, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
+	MDRV_TICKET_DISPENSER_ADD("ticket2", 100, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
 	MDRV_VIDEO_START(tickee)
@@ -703,6 +695,7 @@ static MACHINE_DRIVER_START( tickee )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
+
 static MACHINE_DRIVER_START( ghoshunt )
 	MDRV_IMPORT_FROM(tickee)
 
@@ -710,6 +703,7 @@ static MACHINE_DRIVER_START( ghoshunt )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ghoshunt_map)
 MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( rapidfir )
 
@@ -736,6 +730,8 @@ static MACHINE_DRIVER_START( rapidfir )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
+
+
 
 /*************************************
  *
@@ -939,6 +935,7 @@ ROM_START( rapidfire ) /* Version 1.0, test menu shows "Build 236" */
 	ROM_LOAD( "rf10.507", 0x000000, 0x80000, CRC(7eab2af4) SHA1(bbb4b2b9f96add56c26f334a7242cdc81a64ce2d) )
 	ROM_LOAD( "rf10.510", 0x080000, 0x80000, CRC(ecd70be6) SHA1(5a26703e822776fecb3f6d729bf91e76db7a7141) )
 ROM_END
+
 
 
 /*************************************

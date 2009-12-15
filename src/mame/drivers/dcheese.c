@@ -131,7 +131,7 @@ static WRITE16_HANDLER( eeprom_control_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
-		ticket_dispenser_w(space, 0, (data & 1) << 7);
+		ticket_dispenser_w(devtag_get_device(space->machine, "ticket"), 0, (data & 1) << 7);
 	}
 }
 
@@ -270,7 +270,7 @@ static INPUT_PORTS_START( dcheese )
 
 	PORT_START("240000")
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* low 5 bits read as a unit */
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ticket_dispenser_0_port_r, NULL)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* sound->main buffer status (0=empty) */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(sound_latch_state_r, NULL)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -319,7 +319,7 @@ static INPUT_PORTS_START( lottof2 )
 
 	PORT_START("240000")
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* low 5 bits read as a unit */
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ticket_dispenser_0_port_r, NULL)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* sound->main buffer status (0=empty) */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(sound_latch_state_r, NULL)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -366,7 +366,7 @@ static INPUT_PORTS_START( fredmem )
 
 	PORT_START("240000")
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* low 5 bits read as a unit */
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ticket_dispenser_0_port_r, NULL)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* sound->main buffer status (0=empty) */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(sound_latch_state_r, NULL)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -422,6 +422,7 @@ static MACHINE_DRIVER_START( dcheese )
 	MDRV_MACHINE_START(dcheese)
 
 	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -801,29 +802,16 @@ ROM_END
 
 /*************************************
  *
- *  Driver configuration
- *
- *************************************/
-
-static DRIVER_INIT( dcheese )
-{
-	ticket_dispenser_init(machine, 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
-}
-
-
-
-/*************************************
- *
  *  Game driver(s)
  *
  *************************************/
 
-GAME( 1993, dcheese,  0,       dcheese, dcheese, dcheese, ROT90, "HAR", "Double Cheese", GAME_SUPPORTS_SAVE )
-GAME( 1993, lottof2,  0,       dcheese, lottof2, dcheese, ROT0,  "HAR", "Lotto Fun 2", GAME_SUPPORTS_SAVE )
-GAME( 1993, cecmatch, 0,       fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "ChuckECheese's Match Game", GAME_SUPPORTS_SAVE )
-GAME( 1994, fredmem,  0,       fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (World?, Ticket version, 3/17/95)", GAME_SUPPORTS_SAVE )
-GAME( 1994, fredmemus,fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (US, High Score version, 3/10/95)", GAME_SUPPORTS_SAVE )
-GAME( 1994, fredmemuk,fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (UK, 3/17/95)", GAME_SUPPORTS_SAVE )
-GAME( 1994, fredmemj, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Japan, High Score version, 3/20/95)", GAME_SUPPORTS_SAVE )
-GAME( 1994, fredmemc, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Mandarin Chinese, 3/17/95)", GAME_SUPPORTS_SAVE )
-GAME( 1994, fredmesp, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Spanish, 3/17/95)", GAME_SUPPORTS_SAVE )
+GAME( 1993, dcheese,   0,       dcheese, dcheese, 0, ROT90, "HAR", "Double Cheese", GAME_SUPPORTS_SAVE )
+GAME( 1993, lottof2,   0,       dcheese, lottof2, 0, ROT0,  "HAR", "Lotto Fun 2", GAME_SUPPORTS_SAVE )
+GAME( 1993, cecmatch,  0,       fredmem, fredmem, 0, ROT0,  "Coastal Amusements", "ChuckECheese's Match Game", GAME_SUPPORTS_SAVE )
+GAME( 1994, fredmem,   0,       fredmem, fredmem, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (World?, Ticket version, 3/17/95)", GAME_SUPPORTS_SAVE )
+GAME( 1994, fredmemus, fredmem, fredmem, fredmem, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (US, High Score version, 3/10/95)", GAME_SUPPORTS_SAVE )
+GAME( 1994, fredmemuk, fredmem, fredmem, fredmem, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (UK, 3/17/95)", GAME_SUPPORTS_SAVE )
+GAME( 1994, fredmemj,  fredmem, fredmem, fredmem, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Japan, High Score version, 3/20/95)", GAME_SUPPORTS_SAVE )
+GAME( 1994, fredmemc,  fredmem, fredmem, fredmem, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Mandarin Chinese, 3/17/95)", GAME_SUPPORTS_SAVE )
+GAME( 1994, fredmesp,  fredmem, fredmem, fredmem, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Spanish, 3/17/95)", GAME_SUPPORTS_SAVE )

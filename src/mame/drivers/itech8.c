@@ -552,7 +552,7 @@ static WRITE8_HANDLER( pia_portb_out );
 static const pia6821_interface pia_interface =
 {
 	DEVCB_NULL,		/* port A in */
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, ticket_dispenser_r),	/* port B in */
+	DEVCB_DEVICE_LINE("ticket", ticket_dispenser_line_r),			/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
@@ -680,9 +680,6 @@ static MACHINE_RESET( itech8 )
 		device_reset(cputag_get_cpu(machine, "maincpu"));
 	}
 
-	/* reset the ticket dispenser */
-	ticket_dispenser_init(machine, 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
-
 	/* reset the palette chip */
 	tlc34076_reset(6);
 
@@ -779,7 +776,7 @@ static WRITE8_HANDLER( pia_portb_out )
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	pia_portb_data = data;
-	ticket_dispenser_w(space, 0, (data & 0x10) << 3);
+	ticket_dispenser_w(devtag_get_device(space->machine, "ticket"), 0, (data & 0x10) << 3);
 	coin_counter_w(space->machine, 0, (data & 0x20) >> 5);
 }
 
@@ -793,7 +790,7 @@ static WRITE8_DEVICE_HANDLER( ym2203_portb_out )
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
 	pia_portb_data = data;
-	ticket_dispenser_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, data & 0x80);
+	ticket_dispenser_w(devtag_get_device(device->machine, "ticket"), 0, data & 0x80);
 	coin_counter_w(device->machine, 0, (data & 0x20) >> 5);
 }
 
@@ -1729,6 +1726,8 @@ static MACHINE_DRIVER_START( itech8_core_lo )
 
 	MDRV_MACHINE_RESET(itech8)
 	MDRV_NVRAM_HANDLER(itech8)
+	
+	MDRV_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

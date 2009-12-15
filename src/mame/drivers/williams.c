@@ -497,12 +497,15 @@
 #include "sound/dac.h"
 #include "sound/hc55516.h"
 #include "machine/6821pia.h"
+#include "machine/ticket.h"
 #include "audio/williams.h"
 #include "williams.h"
 
 
 #define MASTER_CLOCK		(12000000)
 #define SOUND_CLOCK			(3579000)
+
+
 
 /*************************************
  *
@@ -1237,7 +1240,7 @@ static INPUT_PORTS_START( lottofun )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* Used by ticket dispenser */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r) 
 
 	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1520,6 +1523,7 @@ static MACHINE_DRIVER_START( lottofun )
 
 	/* pia */
 	MDRV_PIA6821_MODIFY("pia_0", lottofun_pia_0_intf)
+	MDRV_TICKET_DISPENSER_ADD("ticket", 70, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_DRIVER_END
 
 

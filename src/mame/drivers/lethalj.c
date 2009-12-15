@@ -159,13 +159,6 @@ Pin #11(+) | | R               |
  *
  *************************************/
 
-static CUSTOM_INPUT( ticket_status )
-{
-	const address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	return ticket_dispenser_0_r(space, 0) >> 7;
-}
-
-
 static CUSTOM_INPUT( cclownz_paddle )
 {
 	int value = input_port_read(field->port->machine, "PADDLE");
@@ -183,14 +176,14 @@ static CUSTOM_INPUT( cclownz_paddle )
 static WRITE16_HANDLER( ripribit_control_w )
 {
 	coin_counter_w(space->machine, 0, data & 1);
-	ticket_dispenser_0_w(space, 0, ((data >> 1) & 1) << 7);
+	ticket_dispenser_w(devtag_get_device(space->machine, "ticket"), 0, ((data >> 1) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 }
 
 
 static WRITE16_HANDLER( cfarm_control_w )
 {
-	ticket_dispenser_0_w(space, 0, ((data >> 0) & 1) << 7);
+	ticket_dispenser_w(devtag_get_device(space->machine, "ticket"), 0, ((data >> 0) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 	output_set_lamp_value(1, (data >> 3) & 1);
 	output_set_lamp_value(2, (data >> 4) & 1);
@@ -200,7 +193,7 @@ static WRITE16_HANDLER( cfarm_control_w )
 
 static WRITE16_HANDLER( cclownz_control_w )
 {
-	ticket_dispenser_0_w(space, 0, ((data >> 0) & 1) << 7);
+	ticket_dispenser_w(devtag_get_device(space->machine, "ticket"), 0, ((data >> 0) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 	output_set_lamp_value(1, (data >> 4) & 1);
 	output_set_lamp_value(2, (data >> 5) & 1);
@@ -411,7 +404,7 @@ static INPUT_PORTS_START( ripribit )
 	PORT_START("IN0")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(ticket_status, NULL)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -498,7 +491,7 @@ static INPUT_PORTS_START( cfarm )
 	PORT_DIPSETTING(      0x0000, "10" )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(ticket_status, NULL)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
 	PORT_BIT( 0x0006, IP_ACTIVE_LOW, IPT_UNUSED )
  	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
  	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -549,7 +542,7 @@ static INPUT_PORTS_START( cclownz )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cclownz_paddle, NULL)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(ticket_status, NULL)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
 	PORT_BIT( 0x0060, IP_ACTIVE_LOW, IPT_UNUSED )
  	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -604,6 +597,8 @@ static MACHINE_DRIVER_START( gameroom )
 	MDRV_CPU_ADD("maincpu", TMS34010, MASTER_CLOCK)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(lethalj_map)
+	
+	MDRV_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -906,21 +901,18 @@ ROM_END
 
 static DRIVER_INIT( ripribit )
 {
-	ticket_dispenser_init(machine, 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x04100010, 0x0410001f, 0, 0, ripribit_control_w);
 }
 
 
 static DRIVER_INIT( cfarm )
 {
-	ticket_dispenser_init(machine, 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x04100010, 0x0410001f, 0, 0, cfarm_control_w);
 }
 
 
 static DRIVER_INIT( cclownz )
 {
-	ticket_dispenser_init(machine, 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x04100010, 0x0410001f, 0, 0, cclownz_control_w);
 }
 
