@@ -82,9 +82,6 @@ static const gfx_layout objlayout_6bpp =
 static void update_timers(running_machine *machine, int scanline);
 static void decode_gfx(running_machine *machine, UINT16 *pflookup, UINT16 *molookup);
 static int get_bank(running_machine *machine, UINT8 prom1, UINT8 prom2, int bpp);
-static TIMER_CALLBACK( int3_callback );
-static TIMER_CALLBACK( int3off_callback );
-static TIMER_CALLBACK( reset_yscroll_callback );
 
 
 
@@ -199,9 +196,14 @@ VIDEO_START( atarisy1 )
 	/* reset the statics */
 	atarimo_set_yscroll(0, 256);
 	state->next_timer_scanline = -1;
-	state->scanline_timer = timer_alloc(machine, int3_callback, NULL);
-	state->int3off_timer = timer_alloc(machine, int3off_callback, NULL);
-	state->yscroll_reset_timer = timer_alloc(machine, reset_yscroll_callback, NULL);
+	state->scanline_timer = devtag_get_device(machine, "scan_timer");
+	state->int3off_timer = devtag_get_device(machine, "int3off_timer");
+	state->yscroll_reset_timer = devtag_get_device(machine, "yreset_timer");
+
+	/* save state */
+	state_save_register_global(machine, state->playfield_tile_bank);
+	state_save_register_global(machine, state->playfield_priority_pens);
+	state_save_register_global(machine, state->next_timer_scanline);
 }
 
 
@@ -304,9 +306,9 @@ WRITE16_HANDLER( atarisy1_xscroll_w )
  *
  *************************************/
 
-static TIMER_CALLBACK( reset_yscroll_callback )
+TIMER_DEVICE_CALLBACK( atarisy1_reset_yscroll_callback )
 {
-	atarisy1_state *state = (atarisy1_state *)machine->driver_data;
+	atarisy1_state *state = (atarisy1_state *)timer->machine->driver_data;
 	tilemap_set_scrolly(state->atarigen.playfield_tilemap, 0, param);
 }
 
@@ -332,7 +334,7 @@ WRITE16_HANDLER( atarisy1_yscroll_w )
 
 	/* but since we've adjusted it, we must reset it to the normal value
        once we hit scanline 0 again */
-	timer_adjust_oneshot(state->yscroll_reset_timer, video_screen_get_time_until_pos(space->machine->primary_screen, 0, 0), newscroll);
+	timer_device_adjust_oneshot(state->yscroll_reset_timer, video_screen_get_time_until_pos(space->machine->primary_screen, 0, 0), newscroll);
 
 	/* update the data */
 	*state->atarigen.yscroll = newscroll;
@@ -385,29 +387,29 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
  *
  *************************************/
 
-static TIMER_CALLBACK( int3off_callback )
+TIMER_DEVICE_CALLBACK( atarisy1_int3off_callback )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(timer->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* clear the state */
 	atarigen_scanline_int_ack_w(space, 0, 0, 0xffff);
 }
 
 
-static TIMER_CALLBACK( int3_callback )
+TIMER_DEVICE_CALLBACK( atarisy1_int3_callback )
 {
-	atarisy1_state *state = (atarisy1_state *)machine->driver_data;
+	atarisy1_state *state = (atarisy1_state *)timer->machine->driver_data;
 	int scanline = param;
 
 	/* update the state */
-	atarigen_scanline_int_gen(cputag_get_cpu(machine, "maincpu"));
+	atarigen_scanline_int_gen(cputag_get_cpu(timer->machine, "maincpu"));
 
 	/* set a timer to turn it off */
-	timer_adjust_oneshot(state->int3off_timer, video_screen_get_scan_period(machine->primary_screen), 0);
+	timer_device_adjust_oneshot(state->int3off_timer, video_screen_get_scan_period(timer->machine->primary_screen), 0);
 
 	/* determine the time of the next one */
 	state->next_timer_scanline = -1;
-	update_timers(machine, scanline);
+	update_timers(timer->machine, scanline);
 }
 
 
@@ -484,9 +486,9 @@ static void update_timers(running_machine *machine, int scanline)
 
 		/* set a new one */
 		if (best != -1)
-			timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, best, 0), best);
+			timer_device_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, best, 0), best);
 		else
-			timer_adjust_oneshot(state->scanline_timer, attotime_never, 0);
+			timer_device_adjust_oneshot(state->scanline_timer, attotime_never, 0);
 	}
 }
 

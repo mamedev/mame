@@ -38,6 +38,16 @@ static void update_interrupts(running_machine *machine)
 }
 
 
+static MACHINE_START( batman )
+{
+	batman_state *state = (batman_state *)machine->driver_data;
+	atarigen_init(machine);
+
+	state_save_register_global(machine, state->latch_data);
+	state_save_register_global(machine, state->alpha_tile_bank);
+}
+
+
 static MACHINE_RESET( batman )
 {
 	batman_state *state = (batman_state *)machine->driver_data;
@@ -47,8 +57,6 @@ static MACHINE_RESET( batman )
 	atarivc_reset(machine->primary_screen, state->atarigen.atarivc_eof_data, 2);
 	atarigen_scanline_timer_reset(machine->primary_screen, batman_scanline_update, 8);
 	atarijsa_reset();
-	atarigen_init_save_state(machine);
-	state_save_register_global(machine, state->latch_data);
 }
 
 
@@ -231,6 +239,7 @@ static MACHINE_DRIVER_START( batman )
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
+	MDRV_MACHINE_START(batman)
 	MDRV_MACHINE_RESET(batman)
 	MDRV_NVRAM_HANDLER(atarigen)
 

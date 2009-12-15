@@ -32,6 +32,8 @@
     STATIC FUNCTION DECLARATIONS
 ***************************************************************************/
 
+static STATE_POSTLOAD( slapstic_postload );
+
 static TIMER_CALLBACK( scanline_interrupt_callback );
 
 static void decompress_eeprom_word(UINT16 *dest, const UINT16 *data);
@@ -55,6 +57,92 @@ static TIMER_CALLBACK( atarivc_eof_update );
 
 
 /***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE const atarigen_screen_timer *get_screen_timer(const device_config *screen)
+{
+	atarigen_state *state = (atarigen_state *)screen->machine->driver_data;
+	int i;
+
+	/* find the index of the timer that matches the screen */
+	for (i = 0; i < ARRAY_LENGTH(state->screen_timer); i++)
+		if (state->screen_timer[i].screen == screen)
+			return &state->screen_timer[i];
+	
+	fatalerror("Unexpected: no atarivc_eof_update_timer for screen '%s'\n", screen->tag);
+	return NULL;
+}
+
+
+
+/***************************************************************************
+    OVERALL INIT
+***************************************************************************/
+
+void atarigen_init(running_machine *machine)
+{
+	atarigen_state *state = (atarigen_state *)machine->driver_data;
+	const device_config *screen;
+	int i;
+	
+	/* allocate timers for all screens */
+	assert(video_screen_count(machine->config) <= ARRAY_LENGTH(state->screen_timer));
+	for (i = 0, screen = video_screen_first(machine->config); screen != NULL; i++, screen = video_screen_next(screen))
+	{
+		state->screen_timer[i].screen = screen;
+		state->screen_timer[i].scanline_interrupt_timer = timer_alloc(machine, scanline_interrupt_callback, (void *)screen);
+		state->screen_timer[i].scanline_timer = timer_alloc(machine, scanline_timer_callback, (void *)screen);
+		state->screen_timer[i].atarivc_eof_update_timer = timer_alloc(machine, atarivc_eof_update, (void *)screen);
+	}
+
+	state_save_register_global(machine, state->scanline_int_state);
+	state_save_register_global(machine, state->sound_int_state);
+	state_save_register_global(machine, state->video_int_state);
+
+	state_save_register_global(machine, state->cpu_to_sound_ready);
+	state_save_register_global(machine, state->sound_to_cpu_ready);
+
+	state_save_register_global(machine, state->atarivc_state.latch1);				/* latch #1 value (-1 means disabled) */
+	state_save_register_global(machine, state->atarivc_state.latch2);				/* latch #2 value (-1 means disabled) */
+	state_save_register_global(machine, state->atarivc_state.rowscroll_enable);		/* true if row-scrolling is enabled */
+	state_save_register_global(machine, state->atarivc_state.palette_bank);			/* which palette bank is enabled */
+	state_save_register_global(machine, state->atarivc_state.pf0_xscroll);			/* playfield 1 xscroll */
+	state_save_register_global(machine, state->atarivc_state.pf0_xscroll_raw);		/* playfield 1 xscroll raw value */
+	state_save_register_global(machine, state->atarivc_state.pf0_yscroll);			/* playfield 1 yscroll */
+	state_save_register_global(machine, state->atarivc_state.pf1_xscroll);			/* playfield 2 xscroll */
+	state_save_register_global(machine, state->atarivc_state.pf1_xscroll_raw);		/* playfield 2 xscroll raw value */
+	state_save_register_global(machine, state->atarivc_state.pf1_yscroll);			/* playfield 2 yscroll */
+	state_save_register_global(machine, state->atarivc_state.mo_xscroll);			/* sprite xscroll */
+	state_save_register_global(machine, state->atarivc_state.mo_yscroll);			/* sprite xscroll */
+
+	state_save_register_global(machine, state->eeprom_unlocked);
+
+	state_save_register_global(machine, state->slapstic_num);
+	state_save_register_global(machine, state->slapstic_bank);
+	state_save_register_global(machine, state->slapstic_last_pc);
+	state_save_register_global(machine, state->slapstic_last_address);
+
+	state_save_register_global(machine, state->cpu_to_sound);
+	state_save_register_global(machine, state->sound_to_cpu);
+	state_save_register_global(machine, state->timed_int);
+	state_save_register_global(machine, state->ym2151_int);
+
+	state_save_register_global(machine, state->scanlines_per_callback);
+
+	state_save_register_global(machine, state->actual_vc_latch0);
+	state_save_register_global(machine, state->actual_vc_latch1);
+
+	state_save_register_global(machine, state->playfield_latch);
+	state_save_register_global(machine, state->playfield2_latch);
+
+	/* need a postload to reset the state */
+	state_save_register_postload(machine, slapstic_postload, NULL);
+}
+
+
+
+/***************************************************************************
     INTERRUPT HANDLING
 ***************************************************************************/
 
@@ -65,22 +153,11 @@ static TIMER_CALLBACK( atarivc_eof_update );
 
 void atarigen_interrupt_reset(atarigen_state *state, atarigen_int_func update_int)
 {
-	int i;
-
 	/* set the callback */
 	state->update_int_callback = update_int;
 
 	/* reset the interrupt states */
 	state->video_int_state = state->sound_int_state = state->scanline_int_state = 0;
-
-	/* clear the timers */
-	for (i = 0; i < ATARIMO_MAX; i++)
-	{
-		state->scanline_interrupt_timer_screens[i] = NULL;
-		state->scanline_interrupt_timers[i] = NULL;
-		state->scanline_timer_screens[i] = NULL;
-		state->scanline_timers[i] = NULL;
-	}
 }
 
 
@@ -98,50 +175,13 @@ void atarigen_update_interrupts(running_machine *machine)
 
 
 /*---------------------------------------------------------------
-    get_scanline_interrupt_timer_for_screen: Retrieves or
-    creates a scanline interrupt timer.
----------------------------------------------------------------*/
-
-static emu_timer *get_scanline_interrupt_timer_for_screen(const device_config *screen)
-{
-	atarigen_state *state = (atarigen_state *)screen->machine->driver_data;
-	int i;
-
-	/* find the index of the timer that matches the screen */
-	for (i = 0; i < ATARIMO_MAX; i++)
-	{
-		/* matching */
-		if (state->scanline_interrupt_timer_screens[i] == screen)
-			break;
-
-		/* no more */
-		if (state->scanline_interrupt_timer_screens[i] == NULL)
-			break;
-	}
-
-	/* check that we still have room */
-	assert(i != ATARIMO_MAX);
-
-	/* need to create? */
-	if (state->scanline_interrupt_timer_screens[i] == NULL)
-	{
-		state->scanline_interrupt_timer_screens[i] = screen;
-		state->scanline_interrupt_timers[i] = timer_alloc(screen->machine, scanline_interrupt_callback, (void *)screen);
-	}
-
-	/* found it */
-	return state->scanline_interrupt_timers[i];
-}
-
-
-/*---------------------------------------------------------------
     atarigen_scanline_int_set: Sets the scanline when the next
     scanline interrupt should be generated.
 ---------------------------------------------------------------*/
 
 void atarigen_scanline_int_set(const device_config *screen, int scanline)
 {
-	emu_timer *timer = get_scanline_interrupt_timer_for_screen(screen);
+	emu_timer *timer = get_screen_timer(screen)->scanline_interrupt_timer;
 	timer_adjust_oneshot(timer, video_screen_get_time_until_pos(screen, scanline, 0), 0);
 }
 
@@ -252,7 +292,7 @@ WRITE32_HANDLER( atarigen_video_int_ack32_w )
 static TIMER_CALLBACK( scanline_interrupt_callback )
 {
 	const device_config *screen = (const device_config *)ptr;
-	emu_timer *timer = get_scanline_interrupt_timer_for_screen(screen);
+	emu_timer *timer = get_screen_timer(screen)->scanline_interrupt_timer;
 
 	/* generate the interrupt */
 	atarigen_scanline_int_gen(cputag_get_cpu(machine, "maincpu"));
@@ -880,43 +920,6 @@ void atarigen_set_oki6295_vol(running_machine *machine, int volume)
 ***************************************************************************/
 
 /*---------------------------------------------------------------
-    get_scanline_timer_for_screen: Retrieves or
-    creates the the scanline timer.
----------------------------------------------------------------*/
-
-static emu_timer *get_scanline_timer_for_screen(const device_config *screen)
-{
-	atarigen_state *state = (atarigen_state *)screen->machine->driver_data;
-	int i;
-
-	/* find the index of the timer that matches the screen */
-	for (i = 0; i < ATARIMO_MAX; i++)
-	{
-		/* matching */
-		if (state->scanline_timer_screens[i] == screen)
-			break;
-
-		/* no more */
-		if (state->scanline_timer_screens[i] == NULL)
-			break;
-	}
-
-	/* check that we still have room */
-	assert(i != ATARIMO_MAX);
-
-	/* need to create? */
-	if (state->scanline_timer_screens[i] == NULL)
-	{
-		state->scanline_timer_screens[i] = screen;
-		state->scanline_timers[i] = timer_alloc(screen->machine, scanline_timer_callback, (void *)screen);
-	}
-
-	/* found it */
-	return state->scanline_timers[i];
-}
-
-
-/*---------------------------------------------------------------
     atarigen_scanline_timer_reset: Sets up the scanline timer.
 ---------------------------------------------------------------*/
 
@@ -931,13 +934,9 @@ void atarigen_scanline_timer_reset(const device_config *screen, atarigen_scanlin
 	/* set a timer to go off at scanline 0 */
 	if (state->scanline_callback != NULL)
 	{
-		emu_timer *timer = get_scanline_timer_for_screen(screen);
+		emu_timer *timer = get_screen_timer(screen)->scanline_timer;
 		timer_adjust_oneshot(timer, video_screen_get_time_until_pos(screen, 0, 0), 0);
 	}
-
-	/* implicitly allocate a scanline interrupt timer */
-	get_scanline_interrupt_timer_for_screen(screen);
-
 }
 
 
@@ -961,7 +960,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 		scanline += state->scanlines_per_callback;
 		if (scanline >= video_screen_get_height(screen))
 			scanline = 0;
-		timer_adjust_oneshot(get_scanline_timer_for_screen(screen), video_screen_get_time_until_pos(screen, scanline, 0), scanline);
+		timer_adjust_oneshot(get_screen_timer(screen)->scanline_timer, video_screen_get_time_until_pos(screen, scanline, 0), scanline);
 	}
 }
 
@@ -972,43 +971,6 @@ static TIMER_CALLBACK( scanline_timer_callback )
 ***************************************************************************/
 
 /*---------------------------------------------------------------
-    get_scanline_timer_for_screen: Retrieves or
-    creates the the scanline timer.
----------------------------------------------------------------*/
-
-static emu_timer *get_atarivc_eof_update_timer_for_screen(const device_config *screen)
-{
-	atarigen_state *state = (atarigen_state *)screen->machine->driver_data;
-	int i;
-
-	/* find the index of the timer that matches the screen */
-	for (i = 0; i < ATARIMO_MAX; i++)
-	{
-		/* matching */
-		if (state->atarivc_eof_update_timer_screens[i] == screen)
-			break;
-
-		/* no more */
-		if (state->atarivc_eof_update_timer_screens[i] == NULL)
-			break;
-	}
-
-	/* check that we still have room */
-	assert(i != ATARIMO_MAX);
-
-	/* need to create? */
-	if (state->atarivc_eof_update_timer_screens[i] == NULL)
-	{
-		state->atarivc_eof_update_timer_screens[i] = screen;
-		state->atarivc_eof_update_timers[i] = timer_alloc(screen->machine, atarivc_eof_update, (void *)screen);
-	}
-
-	/* found it */
-	return state->atarivc_eof_update_timers[i];
-}
-
-
-/*---------------------------------------------------------------
     atarivc_eof_update: Callback that slurps up data and feeds
     it into the video controller registers every refresh.
 ---------------------------------------------------------------*/
@@ -1017,7 +979,7 @@ static TIMER_CALLBACK( atarivc_eof_update )
 {
 	atarigen_state *state = (atarigen_state *)machine->driver_data;
 	const device_config *screen = (const device_config *)ptr;
-	emu_timer *timer = get_atarivc_eof_update_timer_for_screen(screen);
+	emu_timer *timer = get_screen_timer(screen)->atarivc_eof_update_timer;
 	int i;
 
 	/* echo all the commands to the video controller */
@@ -1063,7 +1025,6 @@ static TIMER_CALLBACK( atarivc_eof_update )
 void atarivc_reset(const device_config *screen, UINT16 *eof_data, int playfields)
 {
 	atarigen_state *state = (atarigen_state *)screen->machine->driver_data;
-	int i;
 
 	/* this allows us to manually reset eof_data to NULL if it's not used */
 	state->atarivc_eof_data = eof_data;
@@ -1077,17 +1038,10 @@ void atarivc_reset(const device_config *screen, UINT16 *eof_data, int playfields
 	state->atarivc_state.latch1 = state->atarivc_state.latch2 = -1;
 	state->actual_vc_latch0 = state->actual_vc_latch1 = -1;
 
-	/* clear the timers */
-	for (i = 0; i < ATARIMO_MAX; i++)
-	{
-		state->atarivc_eof_update_timer_screens[i] = NULL;
-		state->atarivc_eof_update_timers[i] = NULL;
-	}
-
 	/* start a timer to go off a little before scanline 0 */
 	if (state->atarivc_eof_data)
 	{
-		emu_timer *timer = get_atarivc_eof_update_timer_for_screen(screen);
+		emu_timer *timer = get_screen_timer(screen)->atarivc_eof_update_timer;
 		timer_adjust_oneshot(timer, video_screen_get_time_until_pos(screen, 0, 0), 0);
 	}
 }
@@ -1636,57 +1590,4 @@ void atarigen_blend_gfx(running_machine *machine, int gfx0, int gfx1, int mask0,
 
 	/* make the assembled data our new source data */
 	gfx_element_set_source(gx0, srcdata);
-}
-
-
-/***************************************************************************
-    SAVE STATE
-***************************************************************************/
-
-void atarigen_init_save_state(running_machine *machine)
-{
-	atarigen_state *state = (atarigen_state *)machine->driver_data;
-
-	state_save_register_global(machine, state->scanline_int_state);
-	state_save_register_global(machine, state->sound_int_state);
-	state_save_register_global(machine, state->video_int_state);
-
-	state_save_register_global(machine, state->cpu_to_sound_ready);
-	state_save_register_global(machine, state->sound_to_cpu_ready);
-
-	state_save_register_global(machine, state->atarivc_state.latch1);				/* latch #1 value (-1 means disabled) */
-	state_save_register_global(machine, state->atarivc_state.latch2);				/* latch #2 value (-1 means disabled) */
-	state_save_register_global(machine, state->atarivc_state.rowscroll_enable);		/* true if row-scrolling is enabled */
-	state_save_register_global(machine, state->atarivc_state.palette_bank);			/* which palette bank is enabled */
-	state_save_register_global(machine, state->atarivc_state.pf0_xscroll);			/* playfield 1 xscroll */
-	state_save_register_global(machine, state->atarivc_state.pf0_xscroll_raw);		/* playfield 1 xscroll raw value */
-	state_save_register_global(machine, state->atarivc_state.pf0_yscroll);			/* playfield 1 yscroll */
-	state_save_register_global(machine, state->atarivc_state.pf1_xscroll);			/* playfield 2 xscroll */
-	state_save_register_global(machine, state->atarivc_state.pf1_xscroll_raw);		/* playfield 2 xscroll raw value */
-	state_save_register_global(machine, state->atarivc_state.pf1_yscroll);			/* playfield 2 yscroll */
-	state_save_register_global(machine, state->atarivc_state.mo_xscroll);			/* sprite xscroll */
-	state_save_register_global(machine, state->atarivc_state.mo_yscroll);			/* sprite xscroll */
-
-	state_save_register_global(machine, state->eeprom_unlocked);
-
-	state_save_register_global(machine, state->slapstic_num);
-	state_save_register_global(machine, state->slapstic_bank);
-	state_save_register_global(machine, state->slapstic_last_pc);
-	state_save_register_global(machine, state->slapstic_last_address);
-
-	state_save_register_global(machine, state->cpu_to_sound);
-	state_save_register_global(machine, state->sound_to_cpu);
-	state_save_register_global(machine, state->timed_int);
-	state_save_register_global(machine, state->ym2151_int);
-
-	state_save_register_global(machine, state->scanlines_per_callback);
-
-	state_save_register_global(machine, state->actual_vc_latch0);
-	state_save_register_global(machine, state->actual_vc_latch1);
-
-	state_save_register_global(machine, state->playfield_latch);
-	state_save_register_global(machine, state->playfield2_latch);
-
-	/* need a postload to reset the state */
-	state_save_register_postload(machine, slapstic_postload, NULL);
 }

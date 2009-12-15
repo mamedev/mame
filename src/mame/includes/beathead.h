@@ -13,6 +13,13 @@ struct _beathead_state
 
 	UINT32 *		vram_bulk_latch;
 	UINT32 *		palette_select;
+
+	UINT32			finescroll;
+	offs_t			vram_latch_offset;
+
+	offs_t			hsyncram_offset;
+	offs_t			hsyncram_start;
+	UINT8			hsyncram[0x800];
 };
 
 

@@ -56,6 +56,12 @@ static void update_interrupts(running_machine *machine)
 }
 
 
+static MACHINE_START( atarigt )
+{
+	atarigen_init(machine);
+}
+
+
 static MACHINE_RESET( atarigt )
 {
 	atarigt_state *state = (atarigt_state *)machine->driver_data;
@@ -793,6 +799,7 @@ static MACHINE_DRIVER_START( atarigt )
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 	MDRV_CPU_PERIODIC_INT(atarigen_scanline_int_gen, 250)
 
+	MDRV_MACHINE_START(atarigt)
 	MDRV_MACHINE_RESET(atarigt)
 	MDRV_NVRAM_HANDLER(atarigen)
 

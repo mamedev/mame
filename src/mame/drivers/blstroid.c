@@ -46,6 +46,12 @@ static WRITE16_HANDLER( blstroid_halt_until_hblank_0_w )
 }
 
 
+static MACHINE_START( blstroid )
+{
+	atarigen_init(machine);
+}
+
+
 static MACHINE_RESET( blstroid )
 {
 	blstroid_state *state = (blstroid_state *)machine->driver_data;
@@ -202,6 +208,7 @@ static MACHINE_DRIVER_START( blstroid )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
+	MDRV_MACHINE_START(blstroid)
 	MDRV_MACHINE_RESET(blstroid)
 	MDRV_NVRAM_HANDLER(atarigen)
 

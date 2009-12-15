@@ -196,6 +196,12 @@ static void scanline_update(const device_config *screen, int scanline)
 }
 
 
+static MACHINE_START( badlands )
+{
+	atarigen_init(machine);
+}
+
+
 static MACHINE_RESET( badlands )
 {
 	badlands_state *state = (badlands_state *)machine->driver_data;
@@ -208,6 +214,8 @@ static MACHINE_RESET( badlands )
 
 	atarigen_sound_io_reset(cputag_get_cpu(machine, "audiocpu"));
 	memcpy(state->bank_base, &state->bank_source_data[0x0000], 0x1000);
+	
+	state_save_register_global_array(machine, state->pedal_value);
 }
 
 
@@ -504,6 +512,7 @@ static MACHINE_DRIVER_START( badlands )
 	MDRV_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MDRV_CPU_PROGRAM_MAP(audio_map)
 
+	MDRV_MACHINE_START(badlands)
 	MDRV_MACHINE_RESET(badlands)
 	MDRV_NVRAM_HANDLER(atarigen)
 
@@ -713,6 +722,7 @@ static MACHINE_DRIVER_START( badlandb )
 //  MDRV_CPU_ADD("audiocpu", Z80, 2800000/8)
 //  MDRV_CPU_PROGRAM_MAP(bootleg_soundmap)
 
+	MDRV_MACHINE_START(badlands)
 	MDRV_MACHINE_RESET(badlandb)
 	MDRV_NVRAM_HANDLER(atarigen)
 

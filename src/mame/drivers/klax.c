@@ -59,6 +59,12 @@ static WRITE16_HANDLER( interrupt_ack_w )
  *
  *************************************/
 
+static MACHINE_START( klax )
+{
+	atarigen_init(machine);
+}
+
+
 static MACHINE_RESET( klax )
 {
 	klax_state *state = (klax_state *)machine->driver_data;
@@ -92,6 +98,7 @@ static ADDRESS_MAP_START( klax_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x3f2000, 0x3f27ff) AM_RAM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0x3f2800, 0x3f3fff) AM_RAM
 ADDRESS_MAP_END
+
 
 
 /*************************************
@@ -165,6 +172,7 @@ static MACHINE_DRIVER_START( klax )
 	MDRV_CPU_PROGRAM_MAP(klax_map)
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
+	MDRV_MACHINE_START(klax)
 	MDRV_MACHINE_RESET(klax)
 	MDRV_NVRAM_HANDLER(atarigen)
 

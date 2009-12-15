@@ -38,6 +38,12 @@ static void update_interrupts(running_machine *machine)
 }
 
 
+static MACHINE_START( vindictr )
+{
+	atarigen_init(machine);
+}
+
+
 static MACHINE_RESET( vindictr )
 {
 	vindictr_state *state = (vindictr_state *)machine->driver_data;
@@ -194,6 +200,7 @@ static MACHINE_DRIVER_START( vindictr )
 	MDRV_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
+	MDRV_MACHINE_START(vindictr)
 	MDRV_MACHINE_RESET(vindictr)
 	MDRV_NVRAM_HANDLER(atarigen)
 

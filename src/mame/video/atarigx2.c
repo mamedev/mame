@@ -108,6 +108,13 @@ VIDEO_START( atarigx2 )
 	/* initialize the alphanumerics */
 	state->atarigen.alpha_tilemap = tilemap_create(machine, get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
 	tilemap_set_transparent_pen(state->atarigen.alpha_tilemap, 0);
+	
+	/* save states */
+	state_save_register_global(machine, state->current_control);
+	state_save_register_global(machine, state->playfield_tile_bank);
+	state_save_register_global(machine, state->playfield_color_bank);
+	state_save_register_global(machine, state->playfield_xscroll);
+	state_save_register_global(machine, state->playfield_yscroll);
 }
 
 

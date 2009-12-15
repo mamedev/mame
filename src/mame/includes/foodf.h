@@ -16,7 +16,6 @@ struct _foodf_state
 	double			bweights[2];
 	UINT8 			playfield_flip;
 
-	emu_timer *		scanline_timer;
 	UINT8 			whichport;
 };
 

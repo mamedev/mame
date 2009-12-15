@@ -130,15 +130,6 @@
 
 /*************************************
  *
- *  Statics
- *
- *************************************/
-
-
-
-
-/*************************************
- *
  *  Initialization & interrupts
  *
  *************************************/
@@ -160,6 +151,15 @@ static void scanline_update(const device_config *screen, int scanline)
 		atarigen_6502_irq_gen(cputag_get_cpu(screen->machine, "audiocpu"));
 	else
 		atarigen_6502_irq_ack_r(space, 0);
+}
+
+
+static MACHINE_START( gauntlet )
+{
+	gauntlet_state *state = (gauntlet_state *)machine->driver_data;
+	atarigen_init(machine);
+	
+	state_save_register_global(machine, state->sound_reset_val);
 }
 
 
@@ -514,6 +514,7 @@ static MACHINE_DRIVER_START( gauntlet )
 	MDRV_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
+	MDRV_MACHINE_START(gauntlet)
 	MDRV_MACHINE_RESET(gauntlet)
 	MDRV_NVRAM_HANDLER(atarigen)
 

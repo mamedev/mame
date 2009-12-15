@@ -55,6 +55,8 @@ static void hd68k_update_interrupts(running_machine *machine);
 MACHINE_START( harddriv )
 {
 	harddriv_state *state = (harddriv_state *)machine->driver_data;
+	
+	atarigen_init(machine);
 
 	/* predetermine memory regions */
 	state->sim_memory = (UINT16 *)memory_region(machine, "user1");

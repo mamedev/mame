@@ -41,6 +41,12 @@ static void update_interrupts(running_machine *machine)
 }
 
 
+static MACHINE_START( atarigx2 )
+{
+	atarigen_init(machine);
+}
+
+
 static MACHINE_RESET( atarigx2 )
 {
 	atarigx2_state *state = (atarigx2_state *)machine->driver_data;
@@ -1392,6 +1398,7 @@ static MACHINE_DRIVER_START( atarigx2 )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
+	MDRV_MACHINE_START(atarigx2)
 	MDRV_MACHINE_RESET(atarigx2)
 	MDRV_NVRAM_HANDLER(atarigen)
 

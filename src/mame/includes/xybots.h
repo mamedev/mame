@@ -11,7 +11,7 @@ struct _xybots_state
 {
 	atarigen_state	atarigen;
 
-	int 			h256;
+	UINT16 			h256;
 };
 
 

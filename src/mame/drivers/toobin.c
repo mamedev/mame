@@ -42,6 +42,12 @@ static void update_interrupts(running_machine *machine)
 }
 
 
+static MACHINE_START( toobin )
+{
+	atarigen_init(machine);
+}
+
+
 static MACHINE_RESET( toobin )
 {
 	toobin_state *state = (toobin_state *)machine->driver_data;
@@ -224,6 +230,7 @@ static MACHINE_DRIVER_START( toobin )
 	MDRV_CPU_ADD("maincpu", M68010, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
+	MDRV_MACHINE_START(toobin)
 	MDRV_MACHINE_RESET(toobin)
 	MDRV_NVRAM_HANDLER(atarigen)
 	MDRV_WATCHDOG_VBLANK_INIT(8)

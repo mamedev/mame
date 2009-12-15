@@ -32,7 +32,8 @@ typedef void (*atarigen_int_func)(running_machine *machine);
 
 typedef void (*atarigen_scanline_func)(const device_config *screen, int scanline);
 
-struct atarivc_state_desc
+typedef struct _atarivc_state_desc atarivc_state_desc;
+struct _atarivc_state_desc
 {
 	UINT32 latch1;								/* latch #1 value (-1 means disabled) */
 	UINT32 latch2;								/* latch #2 value (-1 means disabled) */
@@ -46,6 +47,16 @@ struct atarivc_state_desc
 	UINT32 pf1_yscroll;						/* playfield 2 yscroll */
 	UINT32 mo_xscroll;							/* sprite xscroll */
 	UINT32 mo_yscroll;							/* sprite xscroll */
+};
+
+
+typedef struct _atarigen_screen_timer atarigen_screen_timer;
+struct _atarigen_screen_timer
+{
+	const device_config *screen;
+	emu_timer *			scanline_interrupt_timer;
+	emu_timer *			scanline_timer;
+	emu_timer *			atarivc_eof_update_timer;
 };
 
 
@@ -81,7 +92,7 @@ struct _atarigen_state
 
 	UINT16 *			atarivc_data;
 	UINT16 *			atarivc_eof_data;
-	struct atarivc_state_desc atarivc_state;
+	atarivc_state_desc 	atarivc_state;
 
 	/* internal state */
 	atarigen_int_func 		update_int_callback;
@@ -113,14 +124,7 @@ struct _atarigen_state
 	UINT32					playfield_latch;
 	UINT32					playfield2_latch;
 
-	const device_config *	scanline_interrupt_timer_screens[ATARIMO_MAX];
-	emu_timer *				scanline_interrupt_timers[ATARIMO_MAX];
-
-	const device_config *	scanline_timer_screens[ATARIMO_MAX];
-	emu_timer *				scanline_timers[ATARIMO_MAX];
-
-	const device_config *	atarivc_eof_update_timer_screens[ATARIMO_MAX];
-	emu_timer *				atarivc_eof_update_timers[ATARIMO_MAX];
+	atarigen_screen_timer	screen_timer[2];
 };
 
 
@@ -128,6 +132,13 @@ struct _atarigen_state
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
+
+/*---------------------------------------------------------------
+    OVERALL INIT
+---------------------------------------------------------------*/
+
+void atarigen_init(running_machine *machine);
+
 
 /*---------------------------------------------------------------
     INTERRUPT HANDLING
@@ -272,11 +283,6 @@ void atarigen_swap_mem(void *ptr1, void *ptr2, int bytes);
 void atarigen_blend_gfx(running_machine *machine, int gfx0, int gfx1, int mask0, int mask1);
 
 
-/*---------------------------------------------------------------
-    STATE SAVE
----------------------------------------------------------------*/
-
-void atarigen_init_save_state(running_machine *machine);
 
 /***************************************************************************
     GENERAL ATARI NOTES

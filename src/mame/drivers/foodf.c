@@ -111,9 +111,8 @@ static void update_interrupts(running_machine *machine)
 }
 
 
-static TIMER_CALLBACK( scanline_update )
+static TIMER_DEVICE_CALLBACK( scanline_update )
 {
-	foodf_state *state = (foodf_state *)machine->driver_data;
 	int scanline = param;
 
 	/* WARNING: the timing of this is not perfectly accurate; it should fire on
@@ -122,7 +121,7 @@ static TIMER_CALLBACK( scanline_update )
        mystery yet */
 
 	/* INT 1 is on 32V */
-	atarigen_scanline_int_gen(cputag_get_cpu(machine, "maincpu"));
+	atarigen_scanline_int_gen(cputag_get_cpu(timer->machine, "maincpu"));
 
 	/* advance to the next interrupt */
 	scanline += 64;
@@ -130,15 +129,15 @@ static TIMER_CALLBACK( scanline_update )
 		scanline = 0;
 
 	/* set a timer for it */
-	timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_device_adjust_oneshot(timer, video_screen_get_time_until_pos(timer->machine->primary_screen, scanline, 0), scanline);
 }
 
 
 static MACHINE_START( foodf )
 {
 	foodf_state *state = (foodf_state *)machine->driver_data;
+	atarigen_init(machine);
 	state_save_register_global(machine, state->whichport);
-	state->scanline_timer = timer_alloc(machine, scanline_update, NULL);
 }
 
 
@@ -146,7 +145,7 @@ static MACHINE_RESET( foodf )
 {
 	foodf_state *state = (foodf_state *)machine->driver_data;
 	atarigen_interrupt_reset(&state->atarigen, update_interrupts);
-	timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_device_adjust_oneshot(devtag_get_device(machine, "scan_timer"), video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 
@@ -365,6 +364,8 @@ static MACHINE_DRIVER_START( foodf )
 	MDRV_MACHINE_RESET(foodf)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 	MDRV_WATCHDOG_VBLANK_INIT(8)
+	
+	MDRV_TIMER_ADD("scan_timer", scanline_update)
 
 	/* video hardware */
 	MDRV_GFXDECODE(foodf)

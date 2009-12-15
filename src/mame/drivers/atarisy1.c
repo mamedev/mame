@@ -180,10 +180,6 @@
 
 
 
-static TIMER_CALLBACK( delayed_joystick_int );
-
-
-
 /*************************************
  *
  *  Initialization & interrupts
@@ -200,6 +196,20 @@ static void update_interrupts(running_machine *machine)
 }
 
 
+static MACHINE_START( atarisy1 )
+{
+	atarisy1_state *state = (atarisy1_state *)machine->driver_data;
+	atarigen_init(machine);
+	
+	state_save_register_global(machine, state->joystick_int);
+	state_save_register_global(machine, state->joystick_int_enable);
+	state_save_register_global(machine, state->joystick_value);
+	state_save_register_global(machine, state->tms5220_out_data);
+	state_save_register_global(machine, state->tms5220_in_data);
+	state_save_register_global(machine, state->tms5220_ctl);
+}
+
+
 static MACHINE_RESET( atarisy1 )
 {
 	atarisy1_state *state = (atarisy1_state *)machine->driver_data;
@@ -212,7 +222,7 @@ static MACHINE_RESET( atarisy1 )
 
 	/* reset the joystick parameters */
 	state->joystick_value = 0;
-	state->joystick_timer = timer_alloc(machine, delayed_joystick_int, NULL);
+	state->joystick_timer = devtag_get_device(machine, "joystick_timer");
 	state->joystick_int = 0;
 	state->joystick_int_enable = 0;
 }
@@ -225,12 +235,12 @@ static MACHINE_RESET( atarisy1 )
  *
  *************************************/
 
-static TIMER_CALLBACK( delayed_joystick_int )
+static TIMER_DEVICE_CALLBACK( delayed_joystick_int )
 {
-	atarisy1_state *state = (atarisy1_state *)machine->driver_data;
+	atarisy1_state *state = (atarisy1_state *)timer->machine->driver_data;
 	state->joystick_value = param;
 	state->joystick_int = 1;
-	atarigen_update_interrupts(machine);
+	atarigen_update_interrupts(timer->machine);
 }
 
 
@@ -257,7 +267,7 @@ static READ16_HANDLER( joystick_r )
 
 	/* clear any existing interrupt and set a timer for a new one */
 	state->joystick_int = 0;
-	timer_adjust_oneshot(state->joystick_timer, ATTOTIME_IN_USEC(50), newval);
+	timer_device_adjust_oneshot(state->joystick_timer, ATTOTIME_IN_USEC(50), newval);
 	atarigen_update_interrupts(space->machine);
 
 	return state->joystick_value;
@@ -753,8 +763,14 @@ static MACHINE_DRIVER_START( atarisy1 )
 	MDRV_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
+	MDRV_MACHINE_START(atarisy1)
 	MDRV_MACHINE_RESET(atarisy1)
 	MDRV_NVRAM_HANDLER(atarigen)
+	
+	MDRV_TIMER_ADD("joystick_timer", delayed_joystick_int)
+	MDRV_TIMER_ADD("scan_timer", atarisy1_int3_callback)
+	MDRV_TIMER_ADD("int3off_timer", atarisy1_int3off_callback)
+	MDRV_TIMER_ADD("yreset_timer", atarisy1_reset_yscroll_callback)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

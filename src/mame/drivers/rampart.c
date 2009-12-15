@@ -60,6 +60,12 @@ static void scanline_update(const device_config *screen, int scanline)
  *
  *************************************/
 
+static MACHINE_START( rampart )
+{
+	atarigen_init(machine);
+}
+
+
 static MACHINE_RESET( rampart )
 {
 	rampart_state *state = (rampart_state *)machine->driver_data;
@@ -343,6 +349,7 @@ static MACHINE_DRIVER_START( rampart )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
+	MDRV_MACHINE_START(rampart)
 	MDRV_MACHINE_RESET(rampart)
 	MDRV_NVRAM_HANDLER(atarigen)
 	MDRV_WATCHDOG_VBLANK_INIT(8)

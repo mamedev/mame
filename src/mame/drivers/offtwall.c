@@ -45,6 +45,12 @@ static void update_interrupts(running_machine *machine)
  *
  *************************************/
 
+static MACHINE_START( offtwall )
+{
+	atarigen_init(machine);
+}
+
+
 static MACHINE_RESET( offtwall )
 {
 	offtwall_state *state = (offtwall_state *)machine->driver_data;
@@ -404,6 +410,7 @@ static MACHINE_DRIVER_START( offtwall )
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
+	MDRV_MACHINE_START(offtwall)
 	MDRV_MACHINE_RESET(offtwall)
 	MDRV_NVRAM_HANDLER(atarigen)
 

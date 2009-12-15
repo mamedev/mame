@@ -17,7 +17,6 @@
 
 ***************************************************************************/
 
-
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/asic65.h"
@@ -37,6 +36,19 @@ static void update_interrupts(running_machine *machine)
 	atarig42_state *state = (atarig42_state *)machine->driver_data;
 	cputag_set_input_line(machine, "maincpu", 4, state->atarigen.video_int_state ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, "maincpu", 5, state->atarigen.sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+static MACHINE_START( atarig42 )
+{
+	atarig42_state *state = (atarig42_state *)machine->driver_data;
+	atarigen_init(machine);
+
+	state_save_register_global(machine, state->analog_data);
+	state_save_register_global(machine, state->sloop_bank);
+	state_save_register_global(machine, state->sloop_next_bank);
+	state_save_register_global(machine, state->sloop_offset);
+	state_save_register_global(machine, state->sloop_state);
 }
 
 
@@ -511,6 +523,7 @@ static MACHINE_DRIVER_START( atarig42 )
 	/* ASIC65 */
 	MDRV_IMPORT_FROM(asic65)
 
+	MDRV_MACHINE_START(atarig42)
 	MDRV_MACHINE_RESET(atarig42)
 	MDRV_NVRAM_HANDLER(atarigen)
 

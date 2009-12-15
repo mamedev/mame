@@ -40,6 +40,15 @@ static void update_interrupts(running_machine *machine)
 }
 
 
+static MACHINE_START( thunderj )
+{
+	thunderj_state *state = (thunderj_state *)machine->driver_data;
+	atarigen_init(machine);
+	
+	state_save_register_global(machine, state->alpha_tile_bank);
+}
+
+
 static MACHINE_RESET( thunderj )
 {
 	thunderj_state *state = (thunderj_state *)machine->driver_data;
@@ -284,6 +293,7 @@ static MACHINE_DRIVER_START( thunderj )
 	MDRV_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(extra_map)
 
+	MDRV_MACHINE_START(thunderj)
 	MDRV_MACHINE_RESET(thunderj)
 	MDRV_NVRAM_HANDLER(atarigen)
 

@@ -43,6 +43,7 @@ static void update_interrupts(running_machine *machine)
 static MACHINE_START( atarig1 )
 {
 	atarig1_state *state = (atarig1_state *)machine->driver_data;
+	atarigen_init(machine);
 	state_save_register_global(machine, state->which_input);
 }
 

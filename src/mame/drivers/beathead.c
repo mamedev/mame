@@ -135,16 +135,16 @@ static UINT8		eeprom_enabled;
 
 static void update_interrupts(running_machine *machine);
 
-static TIMER_CALLBACK( scanline_callback )
+static TIMER_DEVICE_CALLBACK( scanline_callback )
 {
 	int scanline = param;
 
 	/* update the video */
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(timer->machine->primary_screen);
 
 	/* on scanline zero, clear any halt condition */
 	if (scanline == 0)
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+		cputag_set_input_line(timer->machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
 
 	/* wrap around at 262 */
 	scanline++;
@@ -153,10 +153,16 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* set the scanline IRQ */
 	irq_state[2] = 1;
-	update_interrupts(machine);
+	update_interrupts(timer->machine);
 
 	/* set the timer for the next one */
-	timer_set(machine, double_to_attotime(attotime_to_double(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0)) - hblank_offset), NULL, scanline, scanline_callback);
+	timer_device_adjust_oneshot(timer, double_to_attotime(attotime_to_double(video_screen_get_time_until_pos(timer->machine->primary_screen, scanline, 0)) - hblank_offset), scanline);
+}
+
+
+static MACHINE_START( beathead )
+{
+	atarigen_init(machine);
 }
 
 
@@ -175,7 +181,7 @@ static MACHINE_RESET( beathead )
 
 	/* compute the timing of the HBLANK interrupt and set the first timer */
 	hblank_offset = attotime_to_double(video_screen_get_scan_period(machine->primary_screen)) * ((455. - 336. - 25.) / 455.);
-	timer_set(machine, double_to_attotime(attotime_to_double(video_screen_get_time_until_pos(machine->primary_screen, 0, 0)) - hblank_offset), NULL, 0, scanline_callback);
+	timer_device_adjust_oneshot(devtag_get_device(machine, "scan_timer"), double_to_attotime(attotime_to_double(video_screen_get_time_until_pos(machine->primary_screen, 0, 0)) - hblank_offset), 0);
 
 	/* reset IRQs */
 	irq_line_state = CLEAR_LINE;
@@ -416,8 +422,11 @@ static MACHINE_DRIVER_START( beathead )
 	MDRV_CPU_ADD("maincpu", ASAP, ATARI_CLOCK_14MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
+	MDRV_MACHINE_START(beathead)
 	MDRV_MACHINE_RESET(beathead)
 	MDRV_NVRAM_HANDLER(generic_1fill)
+	
+	MDRV_TIMER_ADD("scan_timer", scanline_callback)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

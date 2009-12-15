@@ -70,6 +70,12 @@ static WRITE16_HANDLER( skullxbo_halt_until_hblank_0_w )
 }
 
 
+static MACHINE_START( skullxbo )
+{
+	atarigen_init(machine);
+}
+
+
 static MACHINE_RESET( skullxbo )
 {
 	skullxbo_state *state = (skullxbo_state *)machine->driver_data;
@@ -255,6 +261,7 @@ static MACHINE_DRIVER_START( skullxbo )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
+	MDRV_MACHINE_START(skullxbo)
 	MDRV_MACHINE_RESET(skullxbo)
 	MDRV_NVRAM_HANDLER(atarigen)
 

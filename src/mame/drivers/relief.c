@@ -64,6 +64,12 @@ static WRITE16_HANDLER( relief_atarivc_w )
  *
  *************************************/
 
+static MACHINE_START( relief )
+{
+	atarigen_init(machine);
+}
+
+
 static MACHINE_RESET( relief )
 {
 	relief_state *state = (relief_state *)machine->driver_data;
@@ -293,6 +299,7 @@ static MACHINE_DRIVER_START( relief )
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
+	MDRV_MACHINE_START(relief)
 	MDRV_MACHINE_RESET(relief)
 	MDRV_NVRAM_HANDLER(atarigen)
 
