@@ -1698,6 +1698,10 @@ static DRIVER_INIT( hng64 )
 //  hng64_patch_bios_region(machine, 4); // 'Others'
 #endif
 
+	/* 1 meg of virtual address space for the com cpu */
+	hng64_com_virtual_mem = auto_alloc_array(machine, UINT8, 0x100000);
+	hng64_com_op_base     = auto_alloc_array(machine, UINT8, 0x10000);
+
 	hng64_soundram=auto_alloc_array(machine, UINT16, 0x200000/2);
 	DRIVER_INIT_CALL(hng64_reorder_gfx);
 }
@@ -1802,10 +1806,6 @@ static MACHINE_RESET(hyperneo)
 
 	/* Comm CPU */
 	KL5C80_init();
-
-	/* 1 meg of virtual address space for the com cpu */
-	hng64_com_virtual_mem = auto_alloc_array(machine, UINT8, 0x100000);
-	hng64_com_op_base     = auto_alloc_array(machine, UINT8, 0x10000);
 
 	/* Fill up virtual memory with ROM */
 	for (i = 0x0; i < 0x100000; i++)
