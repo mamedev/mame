@@ -1972,6 +1972,25 @@ WRITE8_HANDLER( snes_w_bank7 )
 
 *************************************/
 
+static void snes_init_timers(running_machine *machine)
+{
+	/* init timers and stop them */
+	snes_scanline_timer = timer_alloc(machine, snes_scanline_tick, NULL);
+	timer_adjust_oneshot(snes_scanline_timer, attotime_never, 0);
+	snes_hblank_timer = timer_alloc(machine, snes_hblank_tick, NULL);
+	timer_adjust_oneshot(snes_hblank_timer, attotime_never, 0);
+	snes_nmi_timer = timer_alloc(machine, snes_nmi_tick, NULL);
+	timer_adjust_oneshot(snes_nmi_timer, attotime_never, 0);
+	snes_hirq_timer = timer_alloc(machine, snes_hirq_tick_callback, NULL);
+	timer_adjust_oneshot(snes_hirq_timer, attotime_never, 0);
+
+	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
+	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.
+	hblank_offset = 268;
+	timer_adjust_oneshot(snes_hblank_timer, video_screen_get_time_until_pos(machine->primary_screen, ((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC-1 : SNES_VTOTAL_PAL-1, hblank_offset), 0);
+
+}
+
 static void snes_init_ram(running_machine *machine)
 {
 	const address_space *cpu0space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -2019,21 +2038,6 @@ static void snes_init_ram(running_machine *machine)
 	// set up some known register power-up defaults
 	snes_ram[WRIO] = 0xff;
 	snes_ram[VMAIN] = 0x80;
-
-	/* init timers and stop them */
-	snes_scanline_timer = timer_alloc(machine, snes_scanline_tick, NULL);
-	timer_adjust_oneshot(snes_scanline_timer, attotime_never, 0);
-	snes_hblank_timer = timer_alloc(machine, snes_hblank_tick, NULL);
-	timer_adjust_oneshot(snes_hblank_timer, attotime_never, 0);
-	snes_nmi_timer = timer_alloc(machine, snes_nmi_tick, NULL);
-	timer_adjust_oneshot(snes_nmi_timer, attotime_never, 0);
-	snes_hirq_timer = timer_alloc(machine, snes_hirq_tick_callback, NULL);
-	timer_adjust_oneshot(snes_hirq_timer, attotime_never, 0);
-
-	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
-	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.
-	hblank_offset = 268;
-	timer_adjust_oneshot(snes_hblank_timer, video_screen_get_time_until_pos(machine->primary_screen, ((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC-1 : SNES_VTOTAL_PAL-1, hblank_offset), 0);
 
 	switch (snes_has_addon_chip)
 	{
@@ -2143,6 +2147,8 @@ MACHINE_START( snes )
 			st010_init(machine);
 			break;
 	}
+
+	snes_init_timers(machine);
 }
 
 MACHINE_RESET( snes )
