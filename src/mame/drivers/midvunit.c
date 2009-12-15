@@ -41,7 +41,7 @@ static UINT8 adc_shift;
 static UINT16 last_port0;
 static UINT8 shifter_state;
 
-static emu_timer *timer[2];
+static const device_config *timer[2];
 static double timer_rate;
 
 static UINT32 *tms32031_control;
@@ -76,8 +76,8 @@ static MACHINE_RESET( midvunit )
 	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 
-	timer[0] = timer_alloc(machine, NULL, NULL);
-	timer[1] = timer_alloc(machine, NULL, NULL);
+	timer[0] = devtag_get_device(machine, "timer0");
+	timer[1] = devtag_get_device(machine, "timer1");
 }
 
 
@@ -89,8 +89,8 @@ static MACHINE_RESET( midvplus )
 	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 
-	timer[0] = timer_alloc(machine, NULL, NULL);
-	timer[1] = timer_alloc(machine, NULL, NULL);
+	timer[0] = devtag_get_device(machine, "timer0");
+	timer[1] = devtag_get_device(machine, "timer1");
 
 	devtag_reset(machine, "ide");
 }
@@ -261,7 +261,7 @@ static READ32_HANDLER( tms32031_control_r )
 	{
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
-		INT32 result = attotime_to_double(attotime_mul(timer_timeelapsed(timer[which]), timer_rate));
+		INT32 result = attotime_to_double(attotime_mul(timer_device_timeelapsed(timer[which]), timer_rate));
 //      logerror("%06X:tms32031_control_r(%02X) = %08X\n", cpu_get_pc(space->cpu), offset, result);
 		return result;
 	}
@@ -288,7 +288,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 		int which = (offset >> 4) & 1;
 //  logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(space->cpu), offset, data);
 		if (data & 0x40)
-			timer_adjust_oneshot(timer[which], attotime_never, 0);
+			timer_device_adjust_oneshot(timer[which], attotime_never, 0);
 
 		/* bit 0x200 selects internal clocking, which is 1/2 the main CPU clock rate */
 		if (data & 0x200)
@@ -1027,6 +1027,9 @@ static MACHINE_DRIVER_START( midvcommon )
 	MDRV_MACHINE_START(midvunit)
 	MDRV_MACHINE_RESET(midvunit)
 	MDRV_NVRAM_HANDLER(generic_1fill)
+	
+	MDRV_TIMER_ADD("timer0", NULL)
+	MDRV_TIMER_ADD("timer1", NULL)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32768)

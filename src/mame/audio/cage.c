@@ -45,10 +45,10 @@ static attotime serial_period_per_word;
 
 static UINT8 dma_enabled;
 static UINT8 dma_timer_enabled;
-static emu_timer *dma_timer;
+static const device_config *dma_timer;
 
 static UINT8 cage_timer_enabled[2];
-static emu_timer *timer[2];
+static const device_config *timer[2];
 
 static UINT32 *tms32031_io_regs;
 
@@ -140,8 +140,8 @@ static const char *const register_names[] =
  *
  *************************************/
 
-static TIMER_CALLBACK( dma_timer_callback );
-static TIMER_CALLBACK( cage_timer_callback );
+static TIMER_DEVICE_CALLBACK( dma_timer_callback );
+static TIMER_DEVICE_CALLBACK( cage_timer_callback );
 static void update_timer(int which);
 static WRITE32_HANDLER( speedup_w );
 
@@ -167,9 +167,9 @@ void cage_init(running_machine *machine, offs_t speedup)
 	cage_cpu_clock_period = ATTOTIME_IN_HZ(cpu_get_clock(cage_cpu));
 	cage_cpu_h1_clock_period = attotime_mul(cage_cpu_clock_period, 2);
 
-	dma_timer = timer_alloc(machine, dma_timer_callback, NULL);
-	timer[0] = timer_alloc(machine, cage_timer_callback, NULL);
-	timer[1] = timer_alloc(machine, cage_timer_callback, NULL);
+	dma_timer = devtag_get_device(machine, "cage_dma_timer");
+	timer[0] = devtag_get_device(machine, "cage_timer0");
+	timer[1] = devtag_get_device(machine, "cage_timer1");
 
 	if (speedup)
 		speedup_ram = memory_install_write32_handler(cpu_get_address_space(cage_cpu, ADDRESS_SPACE_PROGRAM), speedup, speedup, 0, 0, speedup_w);
@@ -214,14 +214,14 @@ void cage_reset_w(int state)
  *
  *************************************/
 
-static TIMER_CALLBACK( dma_timer_callback )
+static TIMER_DEVICE_CALLBACK( dma_timer_callback )
 {
 	/* if we weren't enabled, don't do anything, just shut ourself off */
 	if (!dma_enabled)
 	{
 		if (dma_timer_enabled)
 		{
-			timer_adjust_oneshot(dma_timer, attotime_never, 0);
+			timer_device_adjust_oneshot(timer, attotime_never, 0);
 			dma_timer_enabled = 0;
 		}
 		return;
@@ -272,7 +272,7 @@ static void update_dma_state(const address_space *space)
 		if (!dma_timer_enabled)
 		{
 			attotime period = attotime_mul(serial_period_per_word, tms32031_io_regs[DMA_TRANSFER_COUNT]);
-			timer_adjust_periodic(dma_timer, period, addr, period);
+			timer_device_adjust_periodic(dma_timer, period, addr, period);
 			dma_timer_enabled = 1;
 		}
 	}
@@ -280,7 +280,7 @@ static void update_dma_state(const address_space *space)
 	/* see if we turned off */
 	else if (!enabled && dma_enabled)
 	{
-		timer_adjust_oneshot(dma_timer, attotime_never, 0);
+		timer_device_adjust_oneshot(dma_timer, attotime_never, 0);
 		dma_timer_enabled = 0;
 	}
 
@@ -296,7 +296,7 @@ static void update_dma_state(const address_space *space)
  *
  *************************************/
 
-static TIMER_CALLBACK( cage_timer_callback )
+static TIMER_DEVICE_CALLBACK( cage_timer_callback )
 {
 	int which = param;
 
@@ -322,13 +322,13 @@ static void update_timer(int which)
 		if (tms32031_io_regs[base + TIMER0_GLOBAL_CTL] != 0x2c1)
 			logerror("CAGE TIMER%d: unexpected timer config %08X!\n", which, tms32031_io_regs[base + TIMER0_GLOBAL_CTL]);
 
-		timer_adjust_oneshot(timer[which], period, which);
+		timer_device_adjust_oneshot(timer[which], period, which);
 	}
 
 	/* see if we turned off */
 	else if (!enabled && cage_timer_enabled[which])
 	{
-		timer_adjust_oneshot(timer[which], attotime_never, which);
+		timer_device_adjust_oneshot(timer[which], attotime_never, which);
 	}
 
 	/* set the new state */
@@ -569,12 +569,12 @@ void cage_control_w(running_machine *machine, UINT16 data)
 
 		dma_enabled = 0;
 		dma_timer_enabled = 0;
-		timer_adjust_oneshot(dma_timer, attotime_never, 0);
+		timer_device_adjust_oneshot(dma_timer, attotime_never, 0);
 
 		cage_timer_enabled[0] = 0;
 		cage_timer_enabled[1] = 0;
-		timer_adjust_oneshot(timer[0], attotime_never, 0);
-		timer_adjust_oneshot(timer[1], attotime_never, 0);
+		timer_device_adjust_oneshot(timer[0], attotime_never, 0);
+		timer_device_adjust_oneshot(timer[1], attotime_never, 0);
 
 		memset(tms32031_io_regs, 0, 0x60 * 4);
 
@@ -653,6 +653,10 @@ MACHINE_DRIVER_START( cage )
 	MDRV_CPU_ADD("cage", TMS32031, 33868800)
 	MDRV_CPU_CONFIG(cage_config)
 	MDRV_CPU_PROGRAM_MAP(cage_map)
+
+	MDRV_TIMER_ADD("cage_dma_timer", dma_timer_callback)
+	MDRV_TIMER_ADD("cage_timer0", cage_timer_callback)
+	MDRV_TIMER_ADD("cage_timer1", cage_timer_callback)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
