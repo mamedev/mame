@@ -90,7 +90,7 @@
 /*
     Globals
 */
-static UINT8 bank[4];
+static UINT8 bank_data[4];
 static UINT8 *work_ram;
 static UINT8 *video_ram;
 static UINT8 h_scroll;
@@ -121,7 +121,7 @@ static UINT32 mux_outputlatch;
 /*
     Function prototypes
 */
-INLINE void z80_bank(running_machine *machine, const char *bank, int data);
+INLINE void z80_bank(running_machine *machine, int num, int data);
 
 
 static void update_irqs(running_machine *machine)
@@ -389,9 +389,9 @@ INLINE UINT8* blitter_get_addr(running_machine *machine, UINT32 addr)
 	else if(addr < 0x20000)
 	{
 		addr &= 0xffff;
-		addr += (bank[0] & 1) ? 0x10000 : 0;
+		addr += (bank_data[0] & 1) ? 0x10000 : 0;
 
-		return (UINT8*)(memory_region(machine, "user1") + addr + ((bank[0] >> 1) * 0x20000));
+		return (UINT8*)(memory_region(machine, "user1") + addr + ((bank_data[0] >> 1) * 0x20000));
 	}
 	else if (addr >= 0x20000 && addr < 0x40000)
 	{
@@ -830,7 +830,7 @@ static READ8_HANDLER( chipset_r )
 		case 2:
 		case 3:
 		{
-			val = bank[offset];
+			val = bank_data[offset];
 			break;
 		}
 		case 6:
@@ -882,13 +882,12 @@ static WRITE8_HANDLER( chipset_w )
 		case 0x02:
 		case 0x03:
 		{
-			static const char * const bankname[] = { "bank1", "bank2", "bank3" };
 			if (data > 0x3f)
 				popmessage("%x: Unusual bank access (%x)\n", cpu_get_previouspc(space->cpu), data);
 
 			data &= 0x3f;
-			bank[offset] = data;
-			z80_bank(space->machine, bankname[offset - 1], data);
+			bank_data[offset] = data;
+			z80_bank(space->machine, offset, data);
 			break;
 		}
 
@@ -963,37 +962,32 @@ static WRITE8_HANDLER( chipset_w )
 	}
 }
 
-INLINE void z80_bank(running_machine *machine, const char *bank, int data)
+INLINE void z80_bank(running_machine *machine, int num, int data)
 {
+	static const char * const bank_names[] = { "bank1", "bank2", "bank3" };
+
 	if (data < 0x08)
 	{
-		/* TODO: Don't need this table! */
-		static const UINT32 offs_table[2][8] =
-		{
-			{ 0x10000, 0x14000, 0x18000, 0x1c000, 0x00000, 0x04000, 0x08000, 0x0c000 },
-			{ 0x00000, 0x04000, 0x08000, 0x0c000, 0x10000, 0x14000, 0x18000, 0x1c000 }
-		};
+		UINT32 offset = ((bank_data[0] >> 1) * 0x20000) + ((0x4000 * data) ^ ((bank_data[0] & 1) ? 0 : 0x10000));
 
-		UINT32 offset = ((bank[0] >> 1) * 0x20000) + offs_table[bank[0] & 0x1][data];
-
-		memory_set_bankptr(machine, bank, memory_region(machine, "user1") + offset);
+		memory_set_bankptr(machine, bank_names[num - 1], memory_region(machine, "user1") + offset);
 	}
 	else if (data < 0x10)
 	{
-		memory_set_bankptr(machine, bank, &video_ram[(data - 0x08) * 0x4000]);
+		memory_set_bankptr(machine, bank_names[num - 1], &video_ram[(data - 0x08) * 0x4000]);
 	}
 	else
 	{
-		memory_set_bankptr(machine, bank, &work_ram[(data - 0x10) * 0x4000]);
+		memory_set_bankptr(machine, bank_names[num - 1], &work_ram[(data - 0x10) * 0x4000]);
 	}
 }
 
 static WRITE8_HANDLER( rombank_w )
 {
-	bank[0] = data;
-	z80_bank(space->machine, "bank1", bank[1]);
-	z80_bank(space->machine, "bank2", bank[2]);
-	z80_bank(space->machine, "bank3", bank[3]);
+	bank_data[0] = data;
+	z80_bank(space->machine, 1, bank_data[1]);
+	z80_bank(space->machine, 2, bank_data[2]);
+	z80_bank(space->machine, 3, bank_data[3]);
 }
 
 
@@ -1293,7 +1287,7 @@ static MACHINE_RESET( bfcobra )
 		palette_set_color_rgb(machine, pal, pal3bit((pal>>5)&7), pal3bit((pal>>2)&7), pal2bit(pal&3));
 	}
 
-	bank[0] = 1;
+	bank_data[0] = 1;
 	memset(&ramdac, 0, sizeof(ramdac));
 	reset_fdc();
 
@@ -1695,10 +1689,10 @@ static DRIVER_INIT( bfcobra )
 
 	init_ram(machine);
 
-	bank[0] = 1;
-	bank[1] = 0;
-	bank[2] = 0;
-	bank[3] = 0;
+	bank_data[0] = 1;
+	bank_data[1] = 0;
+	bank_data[2] = 0;
+	bank_data[3] = 0;
 
 	/* Fixed 16kB ROM region */
 	memory_set_bankptr(machine, "bank4", memory_region(machine, "user1"));
@@ -1717,7 +1711,7 @@ static DRIVER_INIT( bfcobra )
 	state_save_register_global(machine, flip_22);
 	state_save_register_global(machine, z80_int);
 	state_save_register_global(machine, z80_inten);
-	state_save_register_global_array(machine, bank);
+	state_save_register_global_array(machine, bank_data);
 	state_save_register_global_pointer(machine, work_ram, 0xc0000);
 	state_save_register_global_pointer(machine, video_ram, 0x20000);
 }
