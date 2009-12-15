@@ -1108,13 +1108,13 @@ static void tilemap_exit(running_machine *machine)
 	tilemap_private *tilemap_data = machine->tilemap_data;
 
 	/* free all the tilemaps in the list */
-	while (tilemap_data->list != NULL)
-	{
-		tilemap *next = tilemap_data->list->next;
-		tilemap_dispose(tilemap_data->list);
-		tilemap_data->list = next;
-	}
-	tilemap_data->tailptr = &tilemap_data->list;
+	if (tilemap_data != NULL)
+		while (tilemap_data->list != NULL)
+		{
+			tilemap *next = tilemap_data->list->next;
+			tilemap_dispose(tilemap_data->list);
+			tilemap_data->list = next;
+		}
 }
 
 
