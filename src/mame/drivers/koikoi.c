@@ -8,8 +8,8 @@ driver by
 
 TODO:
 - map missing inputs (temp mapped to z-x-left shift)
-- is there (still..) some kind of protection ? timers looks weird (2nd player timer is frozen)
-- colors (afaik color(?) prom outputs are connected to one of pals), might help to have a screenshot of the original thing.
+- is there (still..) some kind of protection ? timers looks weird (2nd player timer is frozen) (this seems fixed now -AS)
+- colors (afaik color(?) prom outputs are connected to one of pals), Missing color prom apparently.
 
 
 Basic hw is...
@@ -78,27 +78,48 @@ static TILE_GET_INFO( get_tile_info )
 	SET_TILE_INFO( 0, code, color, flip);
 }
 
-static PALETTE_INIT( koikoi ) //wrong
+static PALETTE_INIT( koikoi )
 {
+	#if 0
 	int i;
 
-	for (i = 0; i < 0x100; i++)
+	for (i = 0;i < 0x100;i++)
 	{
-		int bit0, bit1, bit2, bit3, r, g, b;
+		int prom_val,r,g,b;
+		int t[3];
 
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 2) & 0x01;
-		bit2 = (color_prom[i] >> 1) & 0x01;
-		bit3 = (color_prom[i] >> 0) & 0x01;
+		prom_val = (color_prom[i] >> 0) & 0x0f;
 
-		r = bit0 * 0xaa + bit3 * 0x55;
-		g = bit1 * 0xaa + bit3 * 0x55;
-		b = bit2 * 0xaa + bit3 * 0x55;
+		t[0] = mame_rand(machine) & 0xff;
+		t[1] = mame_rand(machine) & 0xff;
+		t[2] = mame_rand(machine) & 0xff;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		/* this looks like to be a clut...color prom is very likely to be undumped */
+		switch(prom_val)
+		{
+			case 0x00: r = 0x00; g = 0x55; b = 0x00; break; //UNK
+			case 0x01: r = 0xff; g = 0xff; b = 0xff; break;
+			case 0x02: r = 0xff; g = 0xff; b = 0x00; break;
+			case 0x03: r = 0xff; g = 0x55; b = 0x00; break; //UNK
+			case 0x04: r = 0xff; g = 0xff; b = 0xff; break;
+			case 0x05: r = 0x00; g = 0xff; b = 0x00; break;
+			case 0x06: r = 0x00; g = 0xff; b = 0x55; break; //UNK
+			case 0x07: r = 0x00; g = 0x00; b = 0xff; break;
+			case 0x08: r = 0x00; g = 0x55; b = 0xff; break;
+			case 0x09: r = 0xff; g = 0x00; b = 0x55; break;
+			case 0x0a: r = 0xff; g = 0x00; b = 0x00; break;
+//			case 0x0b: r = ????; g = ????; b = ????; break;
+			case 0x0c: r = 0x55; g = 0x00; b = 0x00; break; //UNK
+			case 0x0d: r = 0x55; g = 0x55; b = 0x55; break;
+			case 0x0e: r = 0x00; g = 0x00; b = 0x00; break;
+			case 0x0f: r = t[0]; g = t[1]; b = t[2]; break;
+			default: r = 0x00; g = 0x00; b = 0x00; break;
+		}
+
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
+	#endif
 }
-
 static VIDEO_START(koikoi)
 {
 	koikoi_state *state = (koikoi_state *)machine->driver_data;
@@ -165,7 +186,7 @@ static READ8_DEVICE_HANDLER( input_r )
 
 static WRITE8_DEVICE_HANDLER( unknown_w )
 {
-	//unknown... could be input select (player 1 or 2 = fd/fe or ef/df(??) )
+	//xor'ed mux select, player 1 = 1,2,4,8, player 2 = 0x10, 0x20, 0x40, 0x80
 }
 
 static READ8_HANDLER( io_r )
@@ -202,7 +223,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( koikoi_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_WRITENOP //unknown , many writes
+	AM_RANGE(0x02, 0x02) AM_WRITENOP //watchdog
 	AM_RANGE(0x03, 0x03) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
@@ -263,7 +284,7 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Graphics definitions
+ *  Graphic definitions
  *
  *************************************/
 
@@ -272,8 +293,7 @@ static const gfx_layout tilelayout =
 	8, 8,
 	RGN_FRAC(1,3),
 	3,
-	{ RGN_FRAC(0,3), RGN_FRAC(2,3), RGN_FRAC(1,3) },
-	//{ RGN_FRAC(2,3), RGN_FRAC(0,3), RGN_FRAC(1,3) },
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -386,6 +406,9 @@ ROM_START( koikoi )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "prom.ic23", 0x000, 0x100,  CRC(f1d169a6) SHA1(5ee4b1dfe61e8b97a90cc113ba234298189f1a73) )
+
+	ROM_REGION( 0x0020, "color_prom", 0 )
+	ROM_LOAD( "prom.x", 0x000, 0x020,  NO_DUMP )
 
 	ROM_REGION( 0x0a00, "plds", 0 )
 	ROM_LOAD( "pal16r8-10_pink.ic9",   0x0000, 0x0104, CRC(9f8fdb95) SHA1(cdcdb1a6baef18961cf6c75fba0c3aba47f3edbb) )
