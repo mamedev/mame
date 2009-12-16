@@ -144,6 +144,7 @@ static DEVICE_START( cia )
 	cia->device = device;
 	devcb_resolve_write_line(&cia->irq_func, &intf->irq_func, device);
 	devcb_resolve_write_line(&cia->pc_func, &intf->pc_func, device);
+	cia->flag = 1;
 
 	/* setup ports */
 	for (p = 0; p < (sizeof(cia->port) / sizeof(cia->port[0])); p++)
@@ -663,9 +664,10 @@ WRITE_LINE_DEVICE_HANDLER( mos6526_flag_w )
 
 	if (cia->flag && !state)
 	{
-		cia->flag = state;
 		cia_issue_index(device);
 	}
+
+	cia->flag = state;
 }
 
 /*-------------------------------------------------
