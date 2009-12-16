@@ -943,7 +943,8 @@ static const struct game_keys keys_table[] =
 	{ "sfz3a",    { 0x990b9301,0xa4e42c7e }, 0x100000 },	// 0C80 1C62 F5A8  cmpi.l  #$1C62F5A8,D0
 	{ "sfz3ar1",  { 0x990b9301,0xa4e42c7e }, 0x100000 },	// 0C80 1C62 F5A8  cmpi.l  #$1C62F5A8,D0
 	{ "jyangoku", { 0x6ca42ae6,0x92f63f59 },  /*?*/   },	// 0C80 3652 1573  cmpi.l  #$36521573,D0
-	{ "hsf2",     { 0xb8ed3630,0xaae30a3d }, 0x100000 },	// 0838 0007 2000  btst    #7,$2000
+	{ "hsf2",     { 0x5a369ddd,0xfea3189c }, 0x100000 },	// 0838 0007 2000  btst    #7,$2000	
+	{ "hsf2a",    { 0xb8ed3630,0xaae30a3d }, 0x100000 },	// 0838 0007 2000  btst    #7,$2000
 	{ "hsf2j",    { 0x65d82fe0,0xdbb83e47 }, 0x100000 },	// 0838 0007 2000  btst    #7,$2000
 	{ "gigawing", { 0xe52de290,0x1b60d780 }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
 	{ "gigawingj",{ 0x1126196a,0xbef50895 }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
