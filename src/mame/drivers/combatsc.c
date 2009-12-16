@@ -136,7 +136,7 @@ Dip location and recommended settings verified with the US manual
  *
  *************************************/
 
-WRITE8_HANDLER( combatsc_vreg_w )
+static WRITE8_HANDLER( combatsc_vreg_w )
 {
 	combatsc_state *state = (combatsc_state *)space->machine->driver_data;
 	if (data != state->vreg)
@@ -170,7 +170,7 @@ static WRITE8_HANDLER( combatscb_priority_w )
 	state->priority = data & 0x20;
 }
 
-WRITE8_HANDLER( combatsc_bankselect_w )
+static WRITE8_HANDLER( combatsc_bankselect_w )
 {
 	combatsc_state *state = (combatsc_state *)space->machine->driver_data;
 
@@ -195,7 +195,20 @@ WRITE8_HANDLER( combatsc_bankselect_w )
 		memory_set_bank(space->machine, "bank1", 8 + (data & 1));
 }
 
-WRITE8_HANDLER( combatscb_bankselect_w )
+static WRITE8_HANDLER( combatscb_io_w )
+{
+	combatsc_state *state = (combatsc_state *)space->machine->driver_data;
+
+	switch (offset)
+	{
+		case 0x400: combatscb_priority_w(space, 0, data); break;
+		case 0x800: combatscb_sh_irqtrigger_w(space, 0, data); break;
+		case 0xc00:	combatsc_vreg_w(space, 0, data); break;
+		default: state->io_ram[offset] = data; break;
+	}
+}
+
+static WRITE8_HANDLER( combatscb_bankselect_w )
 {
 	combatsc_state *state = (combatsc_state *)space->machine->driver_data;
 
@@ -224,10 +237,8 @@ WRITE8_HANDLER( combatscb_bankselect_w )
 		if (data == 0x1f)
 		{
 			memory_set_bank(space->machine, "bank1", 8 + (data & 1));
+			memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, combatscb_io_w);
 			memory_install_read8_handler(space, 0x4400, 0x4403, 0, 0, combatscb_io_r);/* IO RAM & Video Registers */
-			memory_install_write8_handler(space, 0x4400, 0x4400, 0, 0, combatscb_priority_w);
-			memory_install_write8_handler(space, 0x4800, 0x4800, 0, 0, combatscb_sh_irqtrigger_w);
-			memory_install_write8_handler(space, 0x4c00, 0x4c00, 0, 0, combatsc_vreg_w);
 		}
 		else
 		{
