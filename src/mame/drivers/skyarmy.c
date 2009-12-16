@@ -31,31 +31,22 @@ static tilemap* skyarmy_tilemap;
 
 static TILE_GET_INFO( get_skyarmy_tile_info )
 {
-        int code = skyarmy_videoram[tile_index];
-        int attr = skyarmy_colorram[tile_index];
-
-	/* bit 0 <-> bit 2 ????? */
-	switch(attr)
-	{
-		case 1: attr=4; break;
-		case 3: attr=6; break;
-		case 4: attr=1; break;
-		case 6: attr=3; break;
-	}
+	int code = skyarmy_videoram[tile_index];
+	int attr = BITSWAP8(skyarmy_colorram[tile_index], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
 
 	SET_TILE_INFO( 0, code, attr, 0);
 }
 
 static WRITE8_HANDLER( skyarmy_videoram_w )
 {
-        skyarmy_videoram[offset] = data;
-        tilemap_mark_tile_dirty(skyarmy_tilemap,offset);
+	skyarmy_videoram[offset] = data;
+	tilemap_mark_tile_dirty(skyarmy_tilemap,offset);
 }
 
 static WRITE8_HANDLER( skyarmy_colorram_w )
 {
-        skyarmy_colorram[offset] = data;
-        tilemap_mark_tile_dirty(skyarmy_tilemap,offset);
+	skyarmy_colorram[offset] = data;
+	tilemap_mark_tile_dirty(skyarmy_tilemap,offset);
 }
 
 static PALETTE_INIT( skyarmy )
@@ -88,43 +79,38 @@ static PALETTE_INIT( skyarmy )
 
 static VIDEO_START( skyarmy )
 {
-        skyarmy_tilemap = tilemap_create(machine, get_skyarmy_tile_info,tilemap_scan_rows,8,8,32,32);
-        tilemap_set_scroll_cols(skyarmy_tilemap,32);
+	skyarmy_tilemap = tilemap_create(machine, get_skyarmy_tile_info,tilemap_scan_rows,8,8,32,32);
+	tilemap_set_scroll_cols(skyarmy_tilemap,32);
 }
 
 
 static VIDEO_UPDATE( skyarmy )
 {
 	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
-        int sx, sy, flipx, flipy, offs,pal;
-        int i;
-	for(i=0;i<0x20;i++)tilemap_set_scrolly( skyarmy_tilemap,i,skyarmy_scrollram[i]);
+	int sx, sy, flipx, flipy, offs,pal;
+	int i;
 
-        tilemap_draw(bitmap,cliprect,skyarmy_tilemap,0,0);
+	for(i=0;i<0x20;i++)
+		tilemap_set_scrolly( skyarmy_tilemap,i,skyarmy_scrollram[i]);
+
+	tilemap_draw(bitmap,cliprect,skyarmy_tilemap,0,0);
 
 	for (offs = 0 ; offs < 0x40; offs+=4)
 	{
+		pal = BITSWAP8(spriteram[offs+2], 7, 6, 5, 4, 3, 0, 1, 2) & 7;
 
-		pal=spriteram[offs+2]&0x7;
-
-		switch(pal)
-		{
-		 case 1: pal=4; break;
-		 case 2: pal=2; break;
-	 	 case 3: pal=6; break;
-	  	 case 4: pal=1; break;
-	  	 case 6: pal=3; break;
-		}
 		sx = spriteram[offs+3];
 		sy = 242-spriteram[offs];
 		flipy = (spriteram[offs+1]&0x80)>>7;
 		flipx = (spriteram[offs+1]&0x40)>>6;
+
 		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
-		spriteram[offs+1]&0x3f,
-		pal,
-		flipx,flipy,
-		sx,sy,0);
+			spriteram[offs+1]&0x3f,
+			pal,
+			flipx,flipy,
+			sx,sy,0);
 	}
+
 	return 0;
 }
 
@@ -132,13 +118,13 @@ static int skyarmy_nmi=0;
 
 static INTERRUPT_GEN( skyarmy_nmi_source )
 {
-	 if(skyarmy_nmi) cpu_set_input_line(device,INPUT_LINE_NMI, PULSE_LINE)	;
+	if(skyarmy_nmi) cpu_set_input_line(device,INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-        skyarmy_nmi=data&1;
+	skyarmy_nmi=data&1;
 }
 
 
@@ -209,30 +195,30 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,
-        256,
-        2,
-        { 0, 256*8*8 },
-        { 0, 1, 2, 3, 4, 5, 6, 7 },
-        { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-        8*8
+	256,
+	2,
+	{ 0, 256*8*8 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
 };
 
 static const gfx_layout spritelayout =
 {
-        16,16,
-        32*2,
-        2,
-        { 0, 256*8*8 },
-        { 0, 1, 2, 3, 4, 5, 6, 7,
-          8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
-        { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-         16*8,17*8,18*8,19*8,20*8,21*8,22*8,23*8 },
-        32*8
+	16,16,
+	32*2,
+	2,
+	{ 0, 256*8*8 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
+	  8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+	 16*8,17*8,18*8,19*8,20*8,21*8,22*8,23*8 },
+	32*8
 };
 
 static GFXDECODE_START( skyarmy )
-        GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
-        GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 8 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( skyarmy )
@@ -283,5 +269,5 @@ ROM_START( skyarmy )
 	ROM_LOAD( "a6.bin",  0x0000, 0x0020, CRC(c721220b) SHA1(61b3320fb616c0600d56840cb6438616c7e0c6eb) )
 ROM_END
 
-GAME( 1982, skyarmy, 0, skyarmy, skyarmy, 0, ROT90, "Shoei", "Sky Army", GAME_WRONG_COLORS )
+GAME( 1982, skyarmy, 0, skyarmy, skyarmy, 0, ROT90, "Shoei", "Sky Army", 0 )
 
