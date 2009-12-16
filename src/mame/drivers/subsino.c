@@ -80,11 +80,28 @@ static PALETTE_INIT( subsino_2proms )
 
 static PALETTE_INIT( subsino_3proms )
 {
-	int i;
+	int i,r,g,b,val;
+	int bit0,bit1,bit2;
+
 	for (i = 0; i < 256; i++)
-		palette_set_color_rgb(machine,i,	pal2bit(color_prom[i+0x200]),
-											pal3bit(color_prom[i+0x100]),
-											pal3bit(color_prom[i+0x000])	);
+	{
+		val = (color_prom[i+0x000]) | (color_prom[i+0x100]<<3) | (color_prom[i+0x200]<<6);
+
+		bit0 = 0;
+		bit1 = (val >> 6) & 0x01;
+		bit2 = (val >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = 0;//(val >> 2) & 0x01;
+		bit1 = (val >> 3) & 0x01;
+		bit2 = (val >> 4) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = 0;//(val >> 0) & 0x01;
+		bit1 = (val >> 0) & 0x01;
+		bit2 = (val >> 1) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
 }
 
 /***************************************************************************
@@ -246,7 +263,12 @@ static const gfx_layout layout_8x8x4 =
 	8, 8,
 	RGN_FRAC(1, 4),
 	4,
-	{ RGN_FRAC(0,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4) },
+//	{ RGN_FRAC(3,4),RGN_FRAC(2,4),RGN_FRAC(0,4),RGN_FRAC(1,4) },
+	{ RGN_FRAC(2,4),RGN_FRAC(3,4),RGN_FRAC(0,4),RGN_FRAC(1,4) },
+//	{ RGN_FRAC(1,4),RGN_FRAC(3,4),RGN_FRAC(0,4),RGN_FRAC(2,4) },
+//	{ RGN_FRAC(3,4),RGN_FRAC(1,4),RGN_FRAC(0,4),RGN_FRAC(2,4) },
+//	{ RGN_FRAC(2,4),RGN_FRAC(1,4),RGN_FRAC(0,4),RGN_FRAC(3,4) },
+//	{ RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(0,4),RGN_FRAC(3,4) },
 	{ STEP8(0,1) },
 	{ STEP8(0,8) },
 	8*8
