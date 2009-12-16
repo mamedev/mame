@@ -1,12 +1,12 @@
 /***************************************************************************
 
-Konami Battlantis Hardware
+    Konami Battlantis Hardware
 
-Supports:
- GX765 - Rack 'em Up/The Hustler (c) 1987 Konami
- GX777 - Battlantis (c) 1987 Konami
+    Supports:
+     GX765 - Rack 'em Up/The Hustler (c) 1987 Konami
+     GX777 - Battlantis (c) 1987 Konami
 
-Preliminary driver by: Manuel Abadia <manu@teleline.es>
+    Preliminary driver by: Manuel Abadia <manu@teleline.es>
 
 ***************************************************************************/
 
@@ -16,43 +16,46 @@ Preliminary driver by: Manuel Abadia <manu@teleline.es>
 #include "sound/3812intf.h"
 #include "video/konicdev.h"
 #include "includes/konamipt.h"
+#include "includes/battlnts.h"
 
-/* from video */
-WRITE8_HANDLER( battlnts_spritebank_w );
-VIDEO_START( battlnts );
-VIDEO_UPDATE( battlnts );
 
-extern void battlnts_tile_callback(int layer, int bank, int *code, int *color, int *flags);
-extern void battlnts_sprite_callback(int *code, int *color);
-
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 static INTERRUPT_GEN( battlnts_interrupt )
 {
-	const device_config *k007342 = devtag_get_device(device->machine, "k007342");
-	if (k007342_is_int_enabled(k007342))
+	battlnts_state *state = (battlnts_state *)device->machine->driver_data;
+	if (k007342_is_int_enabled(state->k007342))
 		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( battlnts_sh_irqtrigger_w )
 {
-	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
+	battlnts_state *state = (battlnts_state *)space->machine->driver_data;
+	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( battlnts_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
-	UINT32 bankaddress;
-
 	/* bits 6 & 7 = bank number */
-	bankaddress = 0x10000 + ((data & 0xc0) >> 6) * 0x4000;
-	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
+	memory_set_bank(space->machine, "bank1", (data & 0xc0) >> 6);
 
 	/* bits 4 & 5 = coin counters */
-	coin_counter_w(space->machine, 0,data & 0x10);
-	coin_counter_w(space->machine, 1,data & 0x20);
+	coin_counter_w(space->machine, 0, data & 0x10);
+	coin_counter_w(space->machine, 1, data & 0x20);
 
 	/* other bits unknown */
 }
+
+
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( battlnts_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_r, k007342_w)	/* Color RAM + Video RAM */
@@ -82,11 +85,11 @@ static ADDRESS_MAP_START( battlnts_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)			/* soundlatch_r */
 ADDRESS_MAP_END
 
-/***************************************************************************
-
-    Input Ports
-
-***************************************************************************/
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( battlnts )
 	PORT_START("DSW1")
@@ -163,6 +166,12 @@ static INPUT_PORTS_START( thehustj )
 INPUT_PORTS_END
 
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
 static const gfx_layout charlayout =
 {
 	8,8,			/* 8 x 8 characters */
@@ -191,11 +200,12 @@ static GFXDECODE_START( battlnts )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 4*16, 1 ) /* colors 64-79 */
 GFXDECODE_END
 
-/***************************************************************************
 
-    Machine Driver
-
-***************************************************************************/
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
 
 static const k007342_interface bladestl_k007342_intf =
 {
@@ -208,7 +218,34 @@ static const k007420_interface bladestl_k007420_intf =
 };
 
 
+static MACHINE_START( battlnts )
+{
+	battlnts_state *state = (battlnts_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->k007342 = devtag_get_device(machine, "k007342");
+	state->k007420 = devtag_get_device(machine, "k007420");
+
+	state_save_register_global(machine, state->spritebank);
+	state_save_register_global_array(machine, state->layer_colorbase);
+}
+
+static MACHINE_RESET( battlnts )
+{
+	battlnts_state *state = (battlnts_state *)machine->driver_data;
+
+	state->layer_colorbase[0] = 0;
+	state->layer_colorbase[1] = 0;
+	state->spritebank = 0;
+}
+
 static MACHINE_DRIVER_START( battlnts )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(battlnts_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, XTAL_24MHz / 2 /* 3000000*4? */)
@@ -217,6 +254,9 @@ static MACHINE_DRIVER_START( battlnts )
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_24MHz / 6 /* 3579545? */)
 	MDRV_CPU_PROGRAM_MAP(battlnts_sound_map)
+
+	MDRV_MACHINE_START(battlnts)
+	MDRV_MACHINE_RESET(battlnts)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -228,7 +268,6 @@ static MACHINE_DRIVER_START( battlnts )
 	MDRV_GFXDECODE(battlnts)
 	MDRV_PALETTE_LENGTH(128)
 
-	MDRV_VIDEO_START(battlnts)
 	MDRV_VIDEO_UPDATE(battlnts)
 
 	MDRV_K007342_ADD("k007342", bladestl_k007342_intf)
@@ -245,11 +284,11 @@ static MACHINE_DRIVER_START( battlnts )
 MACHINE_DRIVER_END
 
 
-/***************************************************************************
-
-  Game ROMs
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( battlnts )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
@@ -327,44 +366,58 @@ ROM_START( thehustlj )
 ROM_END
 
 
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
+
 /*
     This recursive function doesn't use additional memory
     (it could be easily converted into an iterative one).
     It's called shuffle because it mimics the shuffling of a deck of cards.
 */
-static void shuffle(UINT8 *buf,int len)
+static void shuffle( UINT8 *buf, int len )
 {
 	int i;
 	UINT8 t;
 
-	if (len == 2) return;
+	if (len == 2) 
+		return;
 
-	if (len % 4) fatalerror("shuffle() - not modulo 4");	/* must not happen */
+	if (len % 4) 
+		fatalerror("shuffle() - not modulo 4");	/* must not happen */
 
 	len /= 2;
 
-	for (i = 0;i < len/2;i++)
+	for (i = 0; i < len / 2; i++)
 	{
-		t = buf[len/2 + i];
-		buf[len/2 + i] = buf[len + i];
+		t = buf[len / 2 + i];
+		buf[len / 2 + i] = buf[len + i];
 		buf[len + i] = t;
 	}
 
-	shuffle(buf,len);
-	shuffle(buf + len,len);
+	shuffle(buf, len);
+	shuffle(buf + len, len);
 }
 
 
 static DRIVER_INIT( rackemup )
 {
 	/* rearrange char ROM */
-	shuffle(memory_region(machine, "gfx1"),memory_region_length(machine, "gfx1"));
+	shuffle(memory_region(machine, "gfx1"), memory_region_length(machine, "gfx1"));
 }
 
 
 
-GAME( 1987, battlnts, 0,        battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis", 0 )
-GAME( 1987, battlntsj,battlnts, battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis (Japan)", 0 )
-GAME( 1987, rackemup, 0,        battlnts, thehustj, rackemup, ROT90, "Konami", "Rack 'em Up", GAME_NO_COCKTAIL )
-GAME( 1987, thehustl, rackemup, battlnts, thehustj, 0,        ROT90, "Konami", "The Hustler (Japan version M)", GAME_NO_COCKTAIL )
-GAME( 1987, thehustlj,rackemup, battlnts, thehustj, 0,        ROT90, "Konami", "The Hustler (Japan version J)", GAME_NO_COCKTAIL )
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1987, battlnts,  0,        battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis", GAME_SUPPORTS_SAVE )
+GAME( 1987, battlntsj, battlnts, battlnts, battlnts, 0,        ROT90, "Konami", "Battlantis (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rackemup,  0,        battlnts, thehustj, rackemup, ROT90, "Konami", "Rack 'em Up", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, thehustl,  rackemup, battlnts, thehustj, 0,        ROT90, "Konami", "The Hustler (Japan version M)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, thehustlj, rackemup, battlnts, thehustj, 0,        ROT90, "Konami", "The Hustler (Japan version J)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

@@ -13,13 +13,13 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*k007342_callback)(int tmap, int bank, int *code, int *color, int *flags);
-typedef void (*k007420_callback)(int *code, int *color);
-typedef void (*k052109_callback)(int layer, int bank, int *code, int *color, int *flags, int *priority);
-typedef void (*k051960_callback)(int *code, int *color, int *priority, int *shadow);
-typedef void (*k05324x_callback)(int *code, int *color, int *priority);
-typedef void (*k051316_callback)(int *code, int *color, int *flags);
-typedef void (*k056832_callback)(int layer, int *code, int *color, int *flags);
+typedef void (*k007342_callback)(running_machine *machine, int tmap, int bank, int *code, int *color, int *flags);
+typedef void (*k007420_callback)(running_machine *machine, int *code, int *color);
+typedef void (*k052109_callback)(running_machine *machine, int layer, int bank, int *code, int *color, int *flags, int *priority);
+typedef void (*k051960_callback)(running_machine *machine, int *code, int *color, int *priority, int *shadow);
+typedef void (*k05324x_callback)(running_machine *machine, int *code, int *color, int *priority);
+typedef void (*k051316_callback)(running_machine *machine, int *code, int *color, int *flags);
+typedef void (*k056832_callback)(running_machine *machine, int layer, int *code, int *color, int *flags);
 
 
 typedef struct _k007342_interface k007342_interface;
@@ -349,10 +349,10 @@ WRITE16_DEVICE_HANDLER( k052109_word_w );
 READ16_DEVICE_HANDLER( k052109_lsb_r );
 WRITE16_DEVICE_HANDLER( k052109_lsb_w );
 
-void k052109_set_RMRD_line(const device_config *device, int state);
-int k052109_get_RMRD_line(const device_config *device);
+void k052109_set_rmrd_line(const device_config *device, int state);
+int k052109_get_rmrd_line(const device_config *device);
 void k052109_tilemap_update(const device_config *device);
-int k052109_is_IRQ_enabled(const device_config *device);
+int k052109_is_irq_enabled(const device_config *device);
 void k052109_set_layer_offsets(const device_config *device, int layer, int dx, int dy);
 
 void k052109_tilemap_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int tmap_num, UINT32 flags, UINT8 priority);

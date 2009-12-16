@@ -6,16 +6,8 @@
 
 #include "driver.h"
 #include "video/konicdev.h"
+#include "includes/contra.h"
 
-//static int spriteram_offset;
-static UINT8 *private_spriteram_2,*private_spriteram;
-
-UINT8 *contra_fg_vram,*contra_fg_cram;
-UINT8 *contra_text_vram,*contra_text_cram;
-UINT8 *contra_bg_vram,*contra_bg_cram;
-
-static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
-static rectangle bg_clip, fg_clip, tx_clip;
 
 /***************************************************************************
 **
@@ -60,13 +52,14 @@ PALETTE_INIT( contra )
 }
 
 
-static void set_pens(running_machine *machine)
+static void set_pens( running_machine *machine )
 {
+	contra_state *state = (contra_state *)machine->driver_data;
 	int i;
 
 	for (i = 0x00; i < 0x100; i += 2)
 	{
-		UINT16 data = machine->generic.paletteram.u8[i] | (machine->generic.paletteram.u8[i | 1] << 8);
+		UINT16 data = state->paletteram[i] | (state->paletteram[i | 1] << 8);
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
@@ -84,12 +77,12 @@ static void set_pens(running_machine *machine)
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	const device_config *k007121 = devtag_get_device(machine, "k007121_1");
-	UINT8 ctrl_3 = k007121_ctrlram_r(k007121, 3);
-	UINT8 ctrl_4 = k007121_ctrlram_r(k007121, 4);
-	UINT8 ctrl_5 = k007121_ctrlram_r(k007121, 5);
-	UINT8 ctrl_6 = k007121_ctrlram_r(k007121, 6);
-	int attr = contra_fg_cram[tile_index];
+	contra_state *state = (contra_state *)machine->driver_data;
+	UINT8 ctrl_3 = k007121_ctrlram_r(state->k007121_1, 3);
+	UINT8 ctrl_4 = k007121_ctrlram_r(state->k007121_1, 4);
+	UINT8 ctrl_5 = k007121_ctrlram_r(state->k007121_1, 5);
+	UINT8 ctrl_6 = k007121_ctrlram_r(state->k007121_1, 6);
+	int attr = state->fg_cram[tile_index];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
 	int bit2 = (ctrl_5 >> 4) & 0x03;
@@ -106,19 +99,19 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 	SET_TILE_INFO(
 			0,
-			contra_fg_vram[tile_index] + bank * 256,
+			state->fg_vram[tile_index] + bank * 256,
 			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
 			0);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	const device_config *k007121 = devtag_get_device(machine, "k007121_2");
-	UINT8 ctrl_3 = k007121_ctrlram_r(k007121, 3);
-	UINT8 ctrl_4 = k007121_ctrlram_r(k007121, 4);
-	UINT8 ctrl_5 = k007121_ctrlram_r(k007121, 5);
-	UINT8 ctrl_6 = k007121_ctrlram_r(k007121, 6);
-	int attr = contra_bg_cram[tile_index];
+	contra_state *state = (contra_state *)machine->driver_data;
+	UINT8 ctrl_3 = k007121_ctrlram_r(state->k007121_2, 3);
+	UINT8 ctrl_4 = k007121_ctrlram_r(state->k007121_2, 4);
+	UINT8 ctrl_5 = k007121_ctrlram_r(state->k007121_2, 5);
+	UINT8 ctrl_6 = k007121_ctrlram_r(state->k007121_2, 6);
+	int attr = state->bg_cram[tile_index];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
 	int bit2 = (ctrl_5 >> 4) & 0x03;
@@ -136,17 +129,17 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	SET_TILE_INFO(
 			1,
-			contra_bg_vram[tile_index] + bank * 256,
+			state->bg_vram[tile_index] + bank * 256,
 			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
 			0);
 }
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	const device_config *k007121 = devtag_get_device(machine, "k007121_1");
-	UINT8 ctrl_5 = k007121_ctrlram_r(k007121, 5);
-	UINT8 ctrl_6 = k007121_ctrlram_r(k007121, 6);
-	int attr = contra_text_cram[tile_index];
+	contra_state *state = (contra_state *)machine->driver_data;
+	UINT8 ctrl_5 = k007121_ctrlram_r(state->k007121_1, 5);
+	UINT8 ctrl_6 = k007121_ctrlram_r(state->k007121_1, 6);
+	int attr = state->tx_cram[tile_index];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
 	int bit2 = (ctrl_5 >> 4) & 0x03;
@@ -159,7 +152,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 	SET_TILE_INFO(
 			0,
-			contra_text_vram[tile_index] + bank * 256,
+			state->tx_vram[tile_index] + bank * 256,
 			((ctrl_6 & 0x30) * 2 + 16) + (attr & 7),
 			0);
 }
@@ -173,23 +166,28 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( contra )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,     8,8,32,32);
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
-	tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows,     8,8,32,32);
+	contra_state *state = (contra_state *)machine->driver_data;
 
-	private_spriteram = auto_alloc_array(machine, UINT8, 0x800);
-	private_spriteram_2 = auto_alloc_array(machine, UINT8, 0x800);
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	bg_clip = *video_screen_get_visible_area(machine->primary_screen);
-	bg_clip.min_x += 40;
+	state->spriteram = auto_alloc_array(machine, UINT8, 0x800);
+	state->spriteram_2 = auto_alloc_array(machine, UINT8, 0x800);
 
-	fg_clip = bg_clip;
+	state->bg_clip = *video_screen_get_visible_area(machine->primary_screen);
+	state->bg_clip.min_x += 40;
 
-	tx_clip = *video_screen_get_visible_area(machine->primary_screen);
-	tx_clip.max_x = 39;
-	tx_clip.min_x = 0;
+	state->fg_clip = state->bg_clip;
 
-	tilemap_set_transparent_pen(fg_tilemap,0);
+	state->tx_clip = *video_screen_get_visible_area(machine->primary_screen);
+	state->tx_clip.max_x = 39;
+	state->tx_clip.min_x = 0;
+
+	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+
+	state_save_register_global_pointer(machine, state->spriteram, 0x800);
+	state_save_register_global_pointer(machine, state->spriteram_2, 0x800);
 }
 
 
@@ -201,83 +199,98 @@ VIDEO_START( contra )
 
 WRITE8_HANDLER( contra_fg_vram_w )
 {
-	contra_fg_vram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap,offset);
+	contra_state *state = (contra_state *)space->machine->driver_data;
+
+	state->fg_vram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
-WRITE8_HANDLER( contra_fg_cram_w ){
-	contra_fg_cram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap,offset);
+WRITE8_HANDLER( contra_fg_cram_w )
+{
+	contra_state *state = (contra_state *)space->machine->driver_data;
+
+	state->fg_cram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( contra_bg_vram_w )
 {
-	contra_bg_vram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset);
+	contra_state *state = (contra_state *)space->machine->driver_data;
+
+	state->bg_vram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( contra_bg_cram_w )
 {
-	contra_bg_cram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset);
+	contra_state *state = (contra_state *)space->machine->driver_data;
+
+	state->bg_cram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( contra_text_vram_w )
 {
-	contra_text_vram[offset] = data;
-	tilemap_mark_tile_dirty(tx_tilemap,offset);
+	contra_state *state = (contra_state *)space->machine->driver_data;
+
+	state->tx_vram[offset] = data;
+	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
 }
 
 WRITE8_HANDLER( contra_text_cram_w )
 {
-	contra_text_cram[offset] = data;
-	tilemap_mark_tile_dirty(tx_tilemap,offset);
+	contra_state *state = (contra_state *)space->machine->driver_data;
+
+	state->tx_cram[offset] = data;
+	tilemap_mark_tile_dirty(state->tx_tilemap, offset);
 }
 
 WRITE8_HANDLER( contra_K007121_ctrl_0_w )
 {
-	const device_config *k007121 = devtag_get_device(space->machine, "k007121_1");
-	UINT8 ctrl_6 = k007121_ctrlram_r(k007121, 6);
+	contra_state *state = (contra_state *)space->machine->driver_data;
+	UINT8 ctrl_6 = k007121_ctrlram_r(state->k007121_1, 6);
 
 	if (offset == 3)
 	{
 		if ((data & 0x8) == 0)
-			memcpy(private_spriteram,space->machine->generic.spriteram.u8+0x800,0x800);
+			memcpy(state->spriteram, space->machine->generic.spriteram.u8 + 0x800, 0x800);
 		else
-			memcpy(private_spriteram,space->machine->generic.spriteram.u8,0x800);
+			memcpy(state->spriteram, space->machine->generic.spriteram.u8, 0x800);
 	}
+
 	if (offset == 6)
 	{
 		if (ctrl_6 != data)
-			tilemap_mark_all_tiles_dirty(fg_tilemap);
+			tilemap_mark_all_tiles_dirty(state->fg_tilemap);
 	}
-	if (offset == 7)
-		tilemap_set_flip(fg_tilemap,(data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	k007121_ctrl_w(k007121, offset, data);
+	if (offset == 7)
+		tilemap_set_flip(state->fg_tilemap, (data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+
+	k007121_ctrl_w(state->k007121_1, offset, data);
 }
 
 WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 {
-	const device_config *k007121 = devtag_get_device(space->machine, "k007121_2");
-	UINT8 ctrl_6 = k007121_ctrlram_r(k007121, 6);
+	contra_state *state = (contra_state *)space->machine->driver_data;
+	UINT8 ctrl_6 = k007121_ctrlram_r(state->k007121_2, 6);
 
 	if (offset == 3)
 	{
 		if ((data & 0x8) == 0)
-			memcpy(private_spriteram_2,space->machine->generic.spriteram.u8+0x2800,0x800);
+			memcpy(state->spriteram_2, space->machine->generic.spriteram.u8 + 0x2800, 0x800);
 		else
-			memcpy(private_spriteram_2,space->machine->generic.spriteram.u8+0x2000,0x800);
+			memcpy(state->spriteram_2, space->machine->generic.spriteram.u8 + 0x2000, 0x800);
 	}
 	if (offset == 6)
 	{
 		if (ctrl_6 != data )
-			tilemap_mark_all_tiles_dirty(bg_tilemap);
+			tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 	}
 	if (offset == 7)
-		tilemap_set_flip(bg_tilemap,(data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		tilemap_set_flip(state->bg_tilemap, (data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	k007121_ctrl_w(k007121, offset, data);
+	k007121_ctrl_w(state->k007121_2, offset, data);
 }
 
 
@@ -290,28 +303,29 @@ WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank )
 {
-	const char *chiptag = bank ? "k007121_2" : "k007121_1";
-	const device_config *k007121 = devtag_get_device(machine, chiptag);
+	contra_state *state = (contra_state *)machine->driver_data;
+	const device_config *k007121 = bank ? state->k007121_2 : state->k007121_1;
 	int base_color = (k007121_ctrlram_r(k007121, 6) & 0x30) * 2;
 	const UINT8 *source;
 
-	if (bank==0) source=private_spriteram;
-	else source=private_spriteram_2;
+	if (bank == 0) 
+		source = state->spriteram;
+	else 
+		source = state->spriteram_2;
 
-	k007121_sprites_draw(k007121,bitmap,cliprect,machine->gfx[bank],machine->colortable,source,base_color,40,0,-1);
+	k007121_sprites_draw(k007121, bitmap, cliprect, machine->gfx[bank], machine->colortable, source, base_color, 40, 0, -1);
 }
 
 VIDEO_UPDATE( contra )
 {
-	const device_config *k007121_1 = devtag_get_device(screen->machine, "k007121_1");
-	const device_config *k007121_2 = devtag_get_device(screen->machine, "k007121_2");
-	UINT8 ctrl_1_0 = k007121_ctrlram_r(k007121_1, 0);
-	UINT8 ctrl_1_2 = k007121_ctrlram_r(k007121_1, 2);
-	UINT8 ctrl_2_0 = k007121_ctrlram_r(k007121_2, 0);
-	UINT8 ctrl_2_2 = k007121_ctrlram_r(k007121_2, 2);
-	rectangle bg_finalclip = bg_clip;
-	rectangle fg_finalclip = fg_clip;
-	rectangle tx_finalclip = tx_clip;
+	contra_state *state = (contra_state *)screen->machine->driver_data;
+	UINT8 ctrl_1_0 = k007121_ctrlram_r(state->k007121_1, 0);
+	UINT8 ctrl_1_2 = k007121_ctrlram_r(state->k007121_1, 2);
+	UINT8 ctrl_2_0 = k007121_ctrlram_r(state->k007121_2, 0);
+	UINT8 ctrl_2_2 = k007121_ctrlram_r(state->k007121_2, 2);
+	rectangle bg_finalclip = state->bg_clip;
+	rectangle fg_finalclip = state->fg_clip;
+	rectangle tx_finalclip = state->tx_clip;
 
 	sect_rect(&bg_finalclip, cliprect);
 	sect_rect(&fg_finalclip, cliprect);
@@ -319,15 +333,15 @@ VIDEO_UPDATE( contra )
 
 	set_pens(screen->machine);
 
-	tilemap_set_scrollx( fg_tilemap, 0, ctrl_1_0 - 40 );
-	tilemap_set_scrolly( fg_tilemap, 0, ctrl_1_2 );
-	tilemap_set_scrollx( bg_tilemap, 0, ctrl_2_0 - 40 );
-	tilemap_set_scrolly( bg_tilemap, 0, ctrl_2_2 );
+	tilemap_set_scrollx(state->fg_tilemap, 0, ctrl_1_0 - 40);
+	tilemap_set_scrolly(state->fg_tilemap, 0, ctrl_1_2);
+	tilemap_set_scrollx(state->bg_tilemap, 0, ctrl_2_0 - 40);
+	tilemap_set_scrolly(state->bg_tilemap, 0, ctrl_2_2);
 
-	tilemap_draw( bitmap,&bg_finalclip, bg_tilemap, 0 ,0);
-	tilemap_draw( bitmap,&fg_finalclip, fg_tilemap, 0 ,0);
-	draw_sprites( screen->machine,bitmap,cliprect, 0 );
-	draw_sprites( screen->machine,bitmap,cliprect, 1 );
-	tilemap_draw( bitmap,&tx_finalclip, tx_tilemap, 0 ,0);
+	tilemap_draw(bitmap, &bg_finalclip, state->bg_tilemap, 0 ,0);
+	tilemap_draw(bitmap, &fg_finalclip, state->fg_tilemap, 0 ,0);
+	draw_sprites(screen->machine,bitmap,cliprect, 0);
+	draw_sprites(screen->machine,bitmap,cliprect, 1);
+	tilemap_draw(bitmap, &tx_finalclip, state->tx_tilemap, 0 ,0);
 	return 0;
 }

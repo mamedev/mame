@@ -1707,7 +1707,7 @@ INLINE void k007342_get_tile_info( const device_config *device, tile_data *tilei
 
 	tileinfo->category = (color & 0x80) >> 7;
 
-	k007342->callback(layer, k007342->regs[1], &code, &color, &flags);
+	k007342->callback(device->machine, layer, k007342->regs[1], &code, &color, &flags);
 
 	SET_TILE_INFO_DEVICE(
 			k007342->gfxnum,
@@ -1878,7 +1878,7 @@ void k007420_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 		flipx = k007420->ram[offs + 4] & 0x04;
 		flipy = k007420->ram[offs + 4] & 0x08;
 
-		k007420->callback(&code,&color);
+		k007420->callback(device->machine, &code, &color);
 
 		bank = code & bankmask;
 		code &= codemask;
@@ -2026,9 +2026,9 @@ static DEVICE_START( k007420 )
 	k007420->callback = intf->callback;
 	k007420->banklimit = intf->banklimit;
 
-	k007420->ram = auto_alloc_array_clear(device->machine, UINT8, 0x200);
+	k007420->ram = auto_alloc_array(device->machine, UINT8, 0x200);
 
-	state_save_register_device_item_pointer(device, 0, k007420->ram, 0x0200);
+	state_save_register_device_item_pointer(device, 0, k007420->ram, 0x200);
 	state_save_register_device_item(device, 0, k007420->flipscreen);	// current one uses 7342 one
 	state_save_register_device_item_array(device, 0, k007420->regs);	// current one uses 7342 ones
 }
@@ -2037,6 +2037,8 @@ static DEVICE_RESET( k007420 )
 {
 	k007420_state *k007420 = k007420_get_safe_token(device);
 	int i;
+
+	memset(k007420->ram, 0, 0x200);
 
 	k007420->flipscreen = 0;
 	for (i = 0; i < 8; i++)
@@ -2142,7 +2144,7 @@ READ8_DEVICE_HANDLER( k052109_r )
 	if (k052109->has_extra_video_ram) 
 		code |= color << 8;	/* kludge for X-Men */
 	else
-		k052109->callback(0, bank, &code, &color, &flags, &priority);
+		k052109->callback(device->machine, 0, bank, &code, &color, &flags, &priority);
 
 		addr = (code << 5) + (offset & 0x1f);
 		addr &= memory_region_length(device->machine, k052109->memory_region) - 1;
@@ -2305,13 +2307,13 @@ WRITE16_DEVICE_HANDLER( k052109_lsb_w )
 		k052109_w(device, offset, data & 0xff);
 }
 
-void k052109_set_RMRD_line( const device_config *device, int state )
+void k052109_set_rmrd_line( const device_config *device, int state )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
 	k052109->RMRD_line = state;
 }
 
-int k052109_get_RMRD_line(const device_config *device )
+int k052109_get_rmrd_line(const device_config *device )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
 	return k052109->RMRD_line;
@@ -2476,7 +2478,7 @@ void k052109_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 	tilemap_draw(bitmap, cliprect, k052109->tilemap[tmap_num], flags, priority);
 }
 
-int k052109_is_IRQ_enabled( const device_config *device )
+int k052109_is_irq_enabled( const device_config *device )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
 
@@ -2526,7 +2528,7 @@ INLINE void k052109_get_tile_info( const device_config *device, tile_data *tilei
 
 	flipy = color & 0x02;
 
-	k052109->callback(layer, bank, &code, &color, &flags, &priority);
+	k052109->callback(device->machine, layer, bank, &code, &color, &flags, &priority);
 
 	/* if the callback set flip X but it is not enabled, turn it off */
 	if (!(k052109->tileflip_enable & 1)) 
@@ -2744,7 +2746,7 @@ static int k051960_fetchromdata( const device_config *device, int byte )
 	color = ((k051960->spriterombank[1] & 0xfc) >> 2) + ((k051960->spriterombank[2] & 0x03) << 6);
 	pri = 0;
 	shadow = color & 0x80;
-	k051960->callback(&code, &color, &pri, &shadow);
+	k051960->callback(device->machine, &code, &color, &pri, &shadow);
 
 	addr = (code << 7) | (off1 << 2) | byte;
 	addr &= memory_region_length(device->machine, k051960->memory_region) - 1;
@@ -2966,7 +2968,7 @@ void k051960_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 		color = k051960->ram[offs + 3] & 0xff;
 		pri = 0;
 		shadow = color & 0x80;
-		k051960->callback(&code, &color, &pri, &shadow);
+		k051960->callback(device->machine, &code, &color, &pri, &shadow);
 
 		if (max_priority != -1)
 			if (pri < min_priority || pri > max_priority) 
@@ -3541,7 +3543,7 @@ void k053245_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 		color = k053245->buffer[offs + 6] & 0x00ff;
 		pri = 0;
 
-		k053245->callback(&code, &color, &pri);
+		k053245->callback(device->machine, &code, &color, &pri);
 
 		size = (k053245->buffer[offs] & 0x0f00) >> 8;
 
@@ -3795,7 +3797,7 @@ void k053245_sprites_draw_lethal( const device_config *device, bitmap_t *bitmap,
 		color = k053245->buffer[offs + 6] & 0x00ff;
 		pri = 0;
 
-		k053245->callback(&code, &color, &pri);
+		k053245->callback(device->machine, &code, &color, &pri);
 
 		size = (k053245->buffer[offs] & 0x0f00) >> 8;
 
@@ -3990,29 +3992,12 @@ static DEVICE_START( k05324x )
 		128*8
 	};
 
-	/* deinterleave the graphics, if needed */
-	switch (intf->deinterleave)
-	{
-	case KONAMI_ROM_DEINTERLEAVE_NONE:
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_2:
-		konamid_rom_deinterleave_2(machine, intf->gfx_memory_region);
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_2_HALF:
-		konamid_rom_deinterleave_2_half(machine, intf->gfx_memory_region);
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_4:
-		konamid_rom_deinterleave_4(machine, intf->gfx_memory_region);
-		break;
-	}
-
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 		if (machine->gfx[gfx_index] == 0)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
-
 
 	/* decode the graphics */
 	switch (intf->plane_order)
@@ -4029,6 +4014,22 @@ static DEVICE_START( k05324x )
 	if (VERBOSE && !(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
+	/* deinterleave the graphics, if needed */
+	switch (intf->deinterleave)
+	{
+	case KONAMI_ROM_DEINTERLEAVE_NONE:
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_2:
+		konamid_rom_deinterleave_2(machine, intf->gfx_memory_region);
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_2_HALF:
+		konamid_rom_deinterleave_2_half(machine, intf->gfx_memory_region);
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_4:
+		konamid_rom_deinterleave_4(machine, intf->gfx_memory_region);
+		break;
+	}
+
 	k05324x->ramsize = 0x800;
 
 	k05324x->memory_region = intf->gfx_memory_region;
@@ -4036,9 +4037,9 @@ static DEVICE_START( k05324x )
 	k05324x->dx = intf->dx;
 	k05324x->dy = intf->dy;
 	k05324x->callback = intf->callback;
-	k05324x->ram = auto_alloc_array_clear(machine, UINT16, k05324x->ramsize / 2);
+	k05324x->ram = auto_alloc_array(machine, UINT16, k05324x->ramsize / 2);
 
-	k05324x->buffer = auto_alloc_array_clear(machine, UINT16, k05324x->ramsize / 2);
+	k05324x->buffer = auto_alloc_array(machine, UINT16, k05324x->ramsize / 2);
 
 	state_save_register_device_item_pointer(device, 0, k05324x->ram, k05324x->ramsize / 2);
 	state_save_register_device_item_pointer(device, 0, k05324x->buffer, k05324x->ramsize / 2);
@@ -4051,6 +4052,9 @@ static DEVICE_RESET( k05324x )
 {
 	k05324x_state *k05324x = k05324x_get_safe_token(device);
 	int i;
+
+	memset(k05324x->ram,  0, k05324x->ramsize / 2);
+	memset(k05324x->buffer,  0, k05324x->ramsize / 2);
 
 	k05324x->z_rejection = -1;
 	k05324x->rombank = 0;
@@ -4556,7 +4560,7 @@ void k053247_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 		shadow = color = k053246->ram[offs + 6];
 		primask = 0;
 
-		k053246->callback(&code, &color, &primask);
+		k053246->callback(device->machine, &code, &color, &primask);
 
 		temp = k053246->ram[offs];
 
@@ -4833,24 +4837,6 @@ static DEVICE_START( k053247 )
 
 	k053247->screen = devtag_get_device(device->machine, intf->screen);
 
-
-	/* deinterleave the graphics, if needed */
-	switch (intf->deinterleave)
-	{
-	case KONAMI_ROM_DEINTERLEAVE_NONE:
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_2:
-		konamid_rom_deinterleave_2(machine, intf->gfx_memory_region);
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_2_HALF:
-		konamid_rom_deinterleave_2_half(machine, intf->gfx_memory_region);
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_4:
-		konamid_rom_deinterleave_4(machine, intf->gfx_memory_region);
-		break;
-	}
-
-
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 		if (machine->gfx[gfx_index] == 0)
@@ -4882,6 +4868,22 @@ static DEVICE_START( k053247 )
 			if (!(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
 				popmessage("driver should use VIDEO_HAS_SHADOWS");
 		}
+	}
+
+	/* deinterleave the graphics, if needed */
+	switch (intf->deinterleave)
+	{
+	case KONAMI_ROM_DEINTERLEAVE_NONE:
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_2:
+		konamid_rom_deinterleave_2(machine, intf->gfx_memory_region);
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_2_HALF:
+		konamid_rom_deinterleave_2_half(machine, intf->gfx_memory_region);
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_4:
+		konamid_rom_deinterleave_4(machine, intf->gfx_memory_region);
+		break;
 	}
 
 	k053247->dx = intf->dx;
@@ -5190,7 +5192,7 @@ INLINE void k051316_get_tile_info( const device_config *device, tile_data *tilei
 	int color = k051316->ram[tile_index + 0x400];
 	int flags = 0;
 
-	k051316->callback(&code, &color, &flags);
+	k051316->callback(device->machine, &code, &color, &flags);
 
 	SET_TILE_INFO_DEVICE(
 			k051316->gfxnum,
@@ -6254,7 +6256,7 @@ INLINE void k056832_get_tile_info( const device_config *device, tile_data *tilei
 	color = (attr & smptr->palm1) | (attr >> smptr->pals2 & smptr->palm2);
 	flags = TILE_FLIPYX(flip);
 
-	k056832->callback(layer, &code, &color, &flags);
+	k056832->callback(device->machine, layer, &code, &color, &flags);
 
 	SET_TILE_INFO_DEVICE(
 			k056832->gfxnum,
@@ -7707,6 +7709,8 @@ void k056832_postload( const device_config *device )
     DEVICE INTERFACE
 *****************************************************************************/
 
+/* TODO: understand which elements MUST be init here (to keep correct layer 
+   associations) and which ones can can be init at RESET, if any */
 static DEVICE_START( k056832 )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
@@ -7779,28 +7783,12 @@ static DEVICE_START( k056832 )
 	};
 
 
-	/* deinterleave the graphics, if needed */
-	switch (intf->deinterleave)
-	{
-	case KONAMI_ROM_DEINTERLEAVE_NONE:
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_2:
-		konamid_rom_deinterleave_2(machine, intf->gfx_memory_region);
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_2_HALF:
-		konamid_rom_deinterleave_2_half(machine, intf->gfx_memory_region);
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_4:
-		konamid_rom_deinterleave_4(machine, intf->gfx_memory_region);
-		break;
-	}
-
-
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 	{
 		if (machine->gfx[gfx_index] == 0) break;
 	}
+
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 
@@ -7847,6 +7835,22 @@ static DEVICE_START( k056832 )
 
 	machine->gfx[gfx_index]->color_granularity = 16; /* override */
 
+	/* deinterleave the graphics, if needed */
+	switch (intf->deinterleave)
+	{
+	case KONAMI_ROM_DEINTERLEAVE_NONE:
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_2:
+		konamid_rom_deinterleave_2(machine, intf->gfx_memory_region);
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_2_HALF:
+		konamid_rom_deinterleave_2_half(machine, intf->gfx_memory_region);
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_4:
+		konamid_rom_deinterleave_4(machine, intf->gfx_memory_region);
+		break;
+	}
+
 	k056832->memory_region = intf->gfx_memory_region;
 	k056832->gfxnum = gfx_index;
 	k056832->callback = intf->callback;
@@ -7855,9 +7859,40 @@ static DEVICE_START( k056832 )
 	k056832->num_gfx_banks = memory_region_length(machine, intf->gfx_memory_region) / 0x2000;
 	k056832->djmain_hack = intf->djmain_hack;
 
+	k056832->cur_gfx_banks = 0;
+	k056832->use_ext_linescroll = 0;
+	k056832->uses_tile_banks = 0;
+
+	for (i = 0; i < 4; i++)
+	{
+		k056832->layer_offs[i][0] = 0;
+		k056832->layer_offs[i][1] = 0;
+		k056832->lsram_page[i][0] = i;
+		k056832->lsram_page[i][1] = i << 11;
+		k056832->x[i] = 0;
+		k056832->y[i] = 0;
+		k056832->w[i] = 0;
+		k056832->h[i] = 0;
+		k056832->dx[i] = 0;
+		k056832->dy[i] = 0;
+		k056832->layer_tile_mode[i] = 1;
+	}
+
+	k056832->default_layer_association = 1;
+	k056832->active_layer = 0;
+	k056832->linemap_enabled = 0;
+
 	k056832->k055555 = devtag_get_device(device->machine, intf->k055555);
 
-	k056832->videoram = auto_alloc_array(machine, UINT16, 0x2000 * (K056832_PAGE_COUNT+1) / 2);
+	memset(k056832->line_dirty, 0, sizeof(UINT32) * K056832_PAGE_COUNT * 8);
+
+	for (i = 0; i < K056832_PAGE_COUNT; i++)
+	{
+		k056832->all_lines_dirty[i] = 0;
+		k056832->page_tile_mode[i] = 1;
+	}
+
+	k056832->videoram = auto_alloc_array(machine, UINT16, 0x2000 * (K056832_PAGE_COUNT + 1) / 2);
 
 	k056832->tilemap[0x0] = tilemap_create_device(device, k056832_get_tile_info0, tilemap_scan_rows,  8, 8, 64, 32);
 	k056832->tilemap[0x1] = tilemap_create_device(device, k056832_get_tile_info1, tilemap_scan_rows,  8, 8, 64, 32);
@@ -7884,6 +7919,10 @@ static DEVICE_START( k056832 )
 
 		tilemap_set_transparent_pen(tmap, 0);
 	}
+
+	memset(k056832->videoram, 0x00, 0x20000);
+	memset(k056832->regs,     0x00, sizeof(k056832->regs) );
+	memset(k056832->regsb,    0x00, sizeof(k056832->regsb) );
 
 	k056832_update_page_layout(device);
 
@@ -7914,48 +7953,6 @@ static DEVICE_START( k056832 )
 	/* FIXME: a couple of elements are still not registered */
 
 //	state_save_register_postload(device->machine, k056832_postload, NULL);
-}
-
-static DEVICE_RESET( k056832 )
-{
-	k056832_state *k056832 = k056832_get_safe_token(device);
-	int i;
-
-	k056832->cur_gfx_banks = 0;
-	k056832->use_ext_linescroll = 0;
-	k056832->uses_tile_banks = 0;
-
-	for (i = 0; i < 4; i++)
-	{
-		k056832->layer_offs[i][0] = 0;
-		k056832->layer_offs[i][1] = 0;
-		k056832->lsram_page[i][0] = i;
-		k056832->lsram_page[i][1] = i << 11;
-		k056832->x[i] = 0;
-		k056832->y[i] = 0;
-		k056832->w[i] = 0;
-		k056832->h[i] = 0;
-		k056832->dx[i] = 0;
-		k056832->dy[i] = 0;
-		k056832->layer_tile_mode[i] = 1;
-	}
-
-	k056832->default_layer_association = 1;
-	k056832->active_layer = 0;
-	k056832->linemap_enabled = 0;
-
-	memset(k056832->line_dirty, 0, sizeof(UINT32) * K056832_PAGE_COUNT * 8);
-
-	for (i = 0; i < K056832_PAGE_COUNT; i++)
-	{
-		k056832->all_lines_dirty[i] = 0;
-		k056832->page_tile_mode[i] = 1;
-	}
-
-	memset(k056832->videoram, 0x00, 0x20000);
-	memset(k056832->regs,     0x00, sizeof(k056832->regs) );
-	memset(k056832->regsb,    0x00, sizeof(k056832->regsb) );
-
 }
 
 /***************************************************************************/
@@ -9387,8 +9384,8 @@ DEVICE_GET_INFO( k056832 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k056832);		break;
-		case DEVINFO_FCT_STOP:					/* Nothing */									break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(k056832);		break;
+		case DEVINFO_FCT_STOP:					/* Nothing */						break;
+		case DEVINFO_FCT_RESET:					/* Nothing */						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:					strcpy(info->s, "Konami 056832");				break;

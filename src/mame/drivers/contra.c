@@ -19,53 +19,35 @@ Dip locations and factory settings verified with manual
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
-#include "includes/konamipt.h"
 #include "video/konicdev.h"
-
-extern UINT8 *contra_fg_vram,*contra_fg_cram;
-extern UINT8 *contra_bg_vram,*contra_bg_cram;
-extern UINT8 *contra_text_vram,*contra_text_cram;
-
-PALETTE_INIT( contra );
-
-WRITE8_HANDLER( contra_fg_vram_w );
-WRITE8_HANDLER( contra_fg_cram_w );
-WRITE8_HANDLER( contra_bg_vram_w );
-WRITE8_HANDLER( contra_bg_cram_w );
-WRITE8_HANDLER( contra_text_vram_w );
-WRITE8_HANDLER( contra_text_cram_w );
-
-WRITE8_HANDLER( contra_K007121_ctrl_0_w );
-WRITE8_HANDLER( contra_K007121_ctrl_1_w );
-VIDEO_UPDATE( contra );
-VIDEO_START( contra );
+#include "includes/konamipt.h"
+#include "includes/contra.h"
 
 
 static WRITE8_HANDLER( contra_bankswitch_w )
 {
-	UINT32 bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
-
-
-	bankaddress = 0x10000 + (data & 0x0f) * 0x2000;
-	if (bankaddress < 0x28000)	/* for safety */
-		memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
+	if ((data & 0x0f) < 12)	/* for safety */
+		memory_set_bank(space->machine, "bank1", data & 0x0f);
 }
 
 static WRITE8_HANDLER( contra_sh_irqtrigger_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
+	contra_state *state = (contra_state *)space->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( contra_coin_counter_w )
 {
-	if (data & 0x01) coin_counter_w(space->machine, 0,data & 0x01);
-	if (data & 0x02) coin_counter_w(space->machine, 1,(data & 0x02) >> 1);
+	if (data & 0x01) 
+		coin_counter_w(space->machine, 0, data & 0x01);
+
+	if (data & 0x02) 
+		coin_counter_w(space->machine, 1, (data & 0x02) >> 1);
 }
 
 static WRITE8_HANDLER( cpu_sound_command_w )
 {
-	soundlatch_w(space,offset,data);
+	soundlatch_w(space, offset, data);
 }
 
 
@@ -86,19 +68,19 @@ static ADDRESS_MAP_START( contra_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x001e, 0x001e) AM_WRITENOP	/* ? */
 	AM_RANGE(0x0060, 0x0067) AM_WRITE(contra_K007121_ctrl_1_w)
 
-	AM_RANGE(0x0c00, 0x0cff) AM_RAM AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0c00, 0x0cff) AM_RAM AM_BASE_MEMBER(contra_state, paletteram)
 
 	AM_RANGE(0x1000, 0x1fff) AM_RAM
 
 	AM_RANGE(0x2000, 0x5fff) AM_READONLY
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(contra_fg_cram_w) AM_BASE(&contra_fg_cram)
-	AM_RANGE(0x2400, 0x27ff) AM_WRITE(contra_fg_vram_w) AM_BASE(&contra_fg_vram)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(contra_text_cram_w) AM_BASE(&contra_text_cram)
-	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(contra_text_vram_w) AM_BASE(&contra_text_vram)
+	AM_RANGE(0x2000, 0x23ff) AM_WRITE(contra_fg_cram_w) AM_BASE_MEMBER(contra_state, fg_cram)
+	AM_RANGE(0x2400, 0x27ff) AM_WRITE(contra_fg_vram_w) AM_BASE_MEMBER(contra_state, fg_vram)
+	AM_RANGE(0x2800, 0x2bff) AM_WRITE(contra_text_cram_w) AM_BASE_MEMBER(contra_state, tx_cram)
+	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(contra_text_vram_w) AM_BASE_MEMBER(contra_state, tx_vram)
 	AM_RANGE(0x3000, 0x37ff) AM_WRITEONLY AM_BASE_GENERIC(spriteram)/* 2nd bank is at 0x5000 */
 	AM_RANGE(0x3800, 0x3fff) AM_WRITEONLY // second sprite buffer
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(contra_bg_cram_w) AM_BASE(&contra_bg_cram)
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(contra_bg_vram_w) AM_BASE(&contra_bg_vram)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(contra_bg_cram_w) AM_BASE_MEMBER(contra_state, bg_cram)
+	AM_RANGE(0x4400, 0x47ff) AM_WRITE(contra_bg_vram_w) AM_BASE_MEMBER(contra_state, bg_vram)
 	AM_RANGE(0x4800, 0x5fff) AM_WRITEONLY
 
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
@@ -187,7 +169,22 @@ GFXDECODE_END
 
 
 
+static MACHINE_START( contra )
+{
+	contra_state *state = (contra_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x2000);
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->k007121_1 = devtag_get_device(machine, "k007121_1");
+	state->k007121_2 = devtag_get_device(machine, "k007121_2");
+}
+
 static MACHINE_DRIVER_START( contra )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(contra_state)
 
 	/* basic machine hardware */
  	MDRV_CPU_ADD("maincpu", M6809, XTAL_24MHz/16) /* 1500000? */
@@ -198,6 +195,8 @@ static MACHINE_DRIVER_START( contra )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+
+	MDRV_MACHINE_START(contra)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -441,10 +440,10 @@ ROM_END
 
 
 
-GAME( 1987, contra,   0,      contra, contra, 0, ROT90, "Konami", "Contra (US, Set 1)", 0 )
-GAME( 1987, contra1,  contra, contra, contra, 0, ROT90, "Konami", "Contra (US, Set 2)", 0 )
-GAME( 1987, contrab,  contra, contra, contra, 0, ROT90, "bootleg", "Contra (bootleg)", 0 )
-GAME( 1987, contraj,  contra, contra, contra, 0, ROT90, "Konami", "Contra (Japan)", 0 )
-GAME( 1987, contrajb, contra, contra, contra, 0, ROT90, "bootleg", "Contra (Japan bootleg)", 0 )
-GAME( 1987, gryzor,   contra, contra, contra, 0, ROT90, "Konami", "Gryzor (Set 1)", 0 )
-GAME( 1987, gryzora,  contra, contra, contra, 0, ROT90, "Konami", "Gryzor (Set 2)", 0 )
+GAME( 1987, contra,   0,      contra, contra, 0, ROT90, "Konami", "Contra (US, Set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, contra1,  contra, contra, contra, 0, ROT90, "Konami", "Contra (US, Set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, contrab,  contra, contra, contra, 0, ROT90, "bootleg", "Contra (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1987, contraj,  contra, contra, contra, 0, ROT90, "Konami", "Contra (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, contrajb, contra, contra, contra, 0, ROT90, "bootleg", "Contra (Japan bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1987, gryzor,   contra, contra, contra, 0, ROT90, "Konami", "Gryzor (Set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, gryzora,  contra, contra, contra, 0, ROT90, "Konami", "Gryzor (Set 2)", GAME_SUPPORTS_SAVE )

@@ -5288,11 +5288,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( contrajb )	/* bootleg */
 	DRIVER( gryzor )	/* GX633 (c) 1987 */
 	DRIVER( gryzora )	/* GX633 (c) 1987 */
-	DRIVER( combasc )	/* GX611 (c) 1988 */
-	DRIVER( combasct )	/* GX611 (c) 1987 */
-	DRIVER( combascj )	/* GX611 (c) 1987 (Japan) */
+	DRIVER( combatsc )	/* GX611 (c) 1988 */
+	DRIVER( combatsct )	/* GX611 (c) 1987 */
+	DRIVER( combatscj )	/* GX611 (c) 1987 (Japan) */
 	DRIVER( bootcamp )	/* GX611 (c) 1987 */
-	DRIVER( combascb )	/* bootleg */
+	DRIVER( combatscb )	/* bootleg */
 	DRIVER( rockrage )	/* GX620 (c) 1986 (World?) */
 	DRIVER( rockragea )	/* GX620 (c) 1986 (Prototype?) */
 	DRIVER( rockragej )	/* GX620 (c) 1986 (Japan) */

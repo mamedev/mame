@@ -1,8 +1,6 @@
 #include "driver.h"
 #include "video/konicdev.h"
-
-static int layer_colorbase[2];
-extern int bladestl_spritebank;
+#include "includes/bladestl.h"
 
 
 PALETTE_INIT( bladestl )
@@ -25,13 +23,14 @@ PALETTE_INIT( bladestl )
 }
 
 
-static void set_pens(running_machine *machine)
+static void set_pens( running_machine *machine )
 {
+	bladestl_state *state = (bladestl_state *)machine->driver_data;
 	int i;
 
 	for (i = 0x00; i < 0x60; i += 2)
 	{
-		UINT16 data = machine->generic.paletteram.u8[i | 1] | (machine->generic.paletteram.u8[i] << 8);
+		UINT16 data = state->paletteram[i | 1] | (state->paletteram[i] << 8);
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
@@ -47,10 +46,12 @@ static void set_pens(running_machine *machine)
 
 ***************************************************************************/
 
-void bladestl_tile_callback(int layer, int bank, int *code, int *color, int *flags)
+void bladestl_tile_callback( running_machine *machine, int layer, int bank, int *code, int *color, int *flags )
 {
+	bladestl_state *state = (bladestl_state *)machine->driver_data;
+
 	*code |= ((*color & 0x0f) << 8) | ((*color & 0x40) << 6);
-	*color = layer_colorbase[layer];
+	*color = state->layer_colorbase[layer];
 }
 
 /***************************************************************************
@@ -59,25 +60,15 @@ void bladestl_tile_callback(int layer, int bank, int *code, int *color, int *fla
 
 ***************************************************************************/
 
-void bladestl_sprite_callback(int *code,int *color)
+void bladestl_sprite_callback( running_machine *machine, int *code,int *color )
 {
-	*code |= ((*color & 0xc0) << 2) + bladestl_spritebank;
+	bladestl_state *state = (bladestl_state *)machine->driver_data;
+
+	*code |= ((*color & 0xc0) << 2) + state->spritebank;
 	*code = (*code << 2) | ((*color & 0x30) >> 4);
 	*color = 0 + (*color & 0x0f);
 }
 
-
-/***************************************************************************
-
-    Start the video hardware emulation.
-
-***************************************************************************/
-
-VIDEO_START( bladestl )
-{
-	layer_colorbase[0] = 0;
-	layer_colorbase[1] = 1;
-}
 
 /***************************************************************************
 
@@ -87,16 +78,15 @@ VIDEO_START( bladestl )
 
 VIDEO_UPDATE( bladestl )
 {
-	const device_config *k007342 = devtag_get_device(screen->machine, "k007342");
-	const device_config *k007420 = devtag_get_device(screen->machine, "k007420");
+	bladestl_state *state = (bladestl_state *)screen->machine->driver_data;
 	set_pens(screen->machine);
 
-	k007342_tilemap_update(k007342);
+	k007342_tilemap_update(state->k007342);
 
-	k007342_tilemap_draw(k007342, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE ,0);
-	k007420_sprites_draw(k007420, bitmap, cliprect, screen->machine->gfx[1]);
-	k007342_tilemap_draw(k007342, bitmap, cliprect, 1, 1 | TILEMAP_DRAW_OPAQUE ,0);
-	k007342_tilemap_draw(k007342, bitmap, cliprect, 0, 0 ,0);
-	k007342_tilemap_draw(k007342, bitmap, cliprect, 0, 1 ,0);
+	k007342_tilemap_draw(state->k007342, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE ,0);
+	k007420_sprites_draw(state->k007420, bitmap, cliprect, screen->machine->gfx[1]);
+	k007342_tilemap_draw(state->k007342, bitmap, cliprect, 1, 1 | TILEMAP_DRAW_OPAQUE ,0);
+	k007342_tilemap_draw(state->k007342, bitmap, cliprect, 0, 0 ,0);
+	k007342_tilemap_draw(state->k007342, bitmap, cliprect, 0, 1 ,0);
 	return 0;
 }
