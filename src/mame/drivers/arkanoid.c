@@ -1306,6 +1306,8 @@ static DRIVER_INIT( block2 )
 
 	memcpy(srcgfx, buffer, 0x18000);
 
+	free(buffer);
+
 	state->bootleg_id = BLOCK2;
 	arkanoid_bootleg_init(machine);
 }
