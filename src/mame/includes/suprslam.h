@@ -1,0 +1,37 @@
+/*************************************************************************
+
+    Super Slams
+
+*************************************************************************/
+
+typedef struct _suprslam_state suprslam_state;
+struct _suprslam_state
+{
+	/* memory pointers */
+	UINT16 *    screen_videoram;
+	UINT16 *    bg_videoram;
+	UINT16 *    sp_videoram;
+	UINT16 *    spriteram;
+//	UINT16 *    paletteram;	// this currently uses generic palette handling
+
+	/* video-related */
+	tilemap     *screen_tilemap, *bg_tilemap;
+	UINT16      screen_bank, bg_bank;
+
+	/* misc */
+	int         pending_command;
+
+	/* devices */
+	const device_config *audiocpu;
+	const device_config *k053936;
+};
+
+
+/*----------- defined in video/suprslam.c -----------*/
+
+WRITE16_HANDLER( suprslam_screen_videoram_w );
+WRITE16_HANDLER( suprslam_bg_videoram_w );
+WRITE16_HANDLER( suprslam_bank_w );
+
+VIDEO_START( suprslam );
+VIDEO_UPDATE( suprslam );

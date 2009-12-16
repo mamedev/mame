@@ -85,43 +85,34 @@ EB26IC73.BIN    27C240      /  Main Program
 #include "cpu/m68000/m68000.h"
 #include "video/konicdev.h"
 #include "sound/2610intf.h"
-
-
-extern UINT16 *suprslam_screen_videoram, *suprslam_bg_videoram,*suprslam_sp_videoram, *suprslam_spriteram;
-
-/* in video */
-
-WRITE16_HANDLER( suprslam_screen_videoram_w );
-WRITE16_HANDLER( suprslam_bg_videoram_w );
-VIDEO_START( suprslam );
-VIDEO_UPDATE( suprslam );
-WRITE16_HANDLER (suprslam_bank_w);
+#include "includes/suprslam.h"
 
 
 /*** SOUND *******************************************************************/
 
-static int pending_command;
-
 static WRITE16_HANDLER( sound_command_w )
 {
+	suprslam_state *state = (suprslam_state *)space->machine->driver_data;
 	if (ACCESSING_BITS_0_7)
 	{
-		pending_command = 1;
+		state->pending_command = 1;
 		soundlatch_w(space, offset, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 #if 0
 static READ16_HANDLER( pending_command_r )
 {
+	suprslam_state *state = (suprslam_state *)space->machine->driver_data;
 	return pending_command;
 }
 #endif
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	pending_command = 0;
+	suprslam_state *state = (suprslam_state *)space->machine->driver_data;
+	state->pending_command = 0;
 }
 
 static WRITE8_HANDLER( suprslam_sh_bankswitch_w )
@@ -137,11 +128,11 @@ static WRITE8_HANDLER( suprslam_sh_bankswitch_w )
 
 static ADDRESS_MAP_START( suprslam_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0xfb0000, 0xfb1fff) AM_RAM AM_BASE(&suprslam_spriteram)
-	AM_RANGE(0xfc0000, 0xfcffff) AM_RAM AM_BASE(&suprslam_sp_videoram)
+	AM_RANGE(0xfb0000, 0xfb1fff) AM_RAM AM_BASE_MEMBER(suprslam_state, spriteram)
+	AM_RANGE(0xfc0000, 0xfcffff) AM_RAM AM_BASE_MEMBER(suprslam_state, sp_videoram)
 	AM_RANGE(0xfd0000, 0xfdffff) AM_RAM
-	AM_RANGE(0xfe0000, 0xfe0fff) AM_RAM_WRITE(suprslam_screen_videoram_w) AM_BASE(&suprslam_screen_videoram)
-	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(suprslam_bg_videoram_w) AM_BASE(&suprslam_bg_videoram)
+	AM_RANGE(0xfe0000, 0xfe0fff) AM_RAM_WRITE(suprslam_screen_videoram_w) AM_BASE_MEMBER(suprslam_state, screen_videoram)
+	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(suprslam_bg_videoram_w) AM_BASE_MEMBER(suprslam_state, bg_videoram)
 //  AM_RANGE(0xff2000, 0xff203f) AM_RAM /* ?? */
 	AM_RANGE(0xff8000, 0xff8fff) AM_DEVREADWRITE("k053936", k053936_linectrl_r, k053936_linectrl_w)
 	AM_RANGE(0xff9000, 0xff9001) AM_WRITE(sound_command_w)
@@ -287,7 +278,8 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int irq)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	suprslam_state *state = (suprslam_state *)device->machine->driver_data;
+	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -303,7 +295,30 @@ static const k053936_interface suprslam_k053936_intf =
 	0x1000		/* linectrl_size */
 };
 
+static MACHINE_START( suprslam )
+{
+	suprslam_state *state = (suprslam_state *)machine->driver_data;
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->k053936 = devtag_get_device(machine, "k053936");
+
+	state_save_register_global(machine, state->screen_bank);
+	state_save_register_global(machine, state->bg_bank);
+	state_save_register_global(machine, state->pending_command);
+}
+
+static MACHINE_RESET( suprslam )
+{
+	suprslam_state *state = (suprslam_state *)machine->driver_data;
+
+	state->screen_bank = 0;
+	state->bg_bank = 0;
+	state->pending_command = 0;
+}
+
 static MACHINE_DRIVER_START( suprslam )
+	MDRV_DRIVER_DATA(suprslam_state)
+
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(suprslam_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -311,6 +326,9 @@ static MACHINE_DRIVER_START( suprslam )
 	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(sound_io_map)
+
+	MDRV_MACHINE_START(suprslam)
+	MDRV_MACHINE_RESET(suprslam)
 
 	MDRV_GFXDECODE(suprslam)
 
@@ -373,4 +391,4 @@ ROM_END
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1995, suprslam, 0, suprslam, suprslam, 0, ROT0, "Banpresto / Toei Animation", "Super Slams", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, suprslam, 0, suprslam, suprslam, 0, ROT0, "Banpresto / Toei Animation", "Super Slams", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

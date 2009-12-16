@@ -1,12 +1,12 @@
 /***************************************************************************
 
-Flak Attack/MX5000 (Konami GX669)
+    Flak Attack / MX5000 (Konami GX669)
 
-Driver by:
-    Manuel Abadia <manu@teleline.es>
+    Driver by:
+        Manuel Abadia <manu@teleline.es>
 
-TO DO:
-    -What does 0x900X do? (Z80)
+    TO DO:
+        -What does 0x900X do? (Z80)
 
 ***************************************************************************/
 
@@ -17,51 +17,34 @@ TO DO:
 #include "sound/k007232.h"
 #include "video/konicdev.h"
 #include "includes/konamipt.h"
+#include "includes/flkatck.h"
 
-/* from video/flkatck.c */
-VIDEO_START( flkatck );
-VIDEO_UPDATE( flkatck );
-WRITE8_HANDLER( flkatck_k007121_w );
-WRITE8_HANDLER( flkatck_k007121_regs_w );
-
-extern UINT8 *k007121_ram;
-extern int flkatck_irq_enabled;
-
-static int multiply_reg[2];
-
-/***************************************************************************/
-
-static MACHINE_RESET( flkatck )
-{
-	k007232_set_bank( devtag_get_device(machine, "konami"), 0, 1 );
-}
 
 static INTERRUPT_GEN( flkatck_interrupt )
 {
-	if (flkatck_irq_enabled)
+	flkatck_state *state = (flkatck_state *)device->machine->driver_data;
+
+	if (state->irq_enabled)
 		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( flkatck_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
-	int bankaddress = 0;
-
 	/* bits 3-4: coin counters */
-	coin_counter_w(space->machine, 0,data & 0x08);
-	coin_counter_w(space->machine, 1,data & 0x10);
+	coin_counter_w(space->machine, 0, data & 0x08);
+	coin_counter_w(space->machine, 1, data & 0x10);
 
 	/* bits 0-1: bank # */
-	bankaddress += 0x10000 + (data & 0x03)*0x2000;
 	if ((data & 0x03) != 0x03)	/* for safety */
-		memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
+		memory_set_bank(space->machine, "bank1", data & 0x03);
 }
 
 static READ8_HANDLER( flkatck_ls138_r )
 {
 	int data = 0;
 
-	switch ((offset & 0x1c) >> 2){
+	switch ((offset & 0x1c) >> 2)
+	{
 		case 0x00:
 			if (offset & 0x02)
 				data = input_port_read(space->machine, (offset & 0x01) ? "COIN" : "DSW3");
@@ -79,7 +62,10 @@ static READ8_HANDLER( flkatck_ls138_r )
 
 static WRITE8_HANDLER( flkatck_ls138_w )
 {
-	switch ((offset & 0x1c) >> 2){
+	flkatck_state *state = (flkatck_state *)space->machine->driver_data;
+
+	switch ((offset & 0x1c) >> 2)
+	{
 		case 0x04:	/* bankswitch */
 			flkatck_bankswitch_w(space, 0, data);
 			break;
@@ -87,7 +73,7 @@ static WRITE8_HANDLER( flkatck_ls138_w )
 			soundlatch_w(space, 0, data);
 			break;
 		case 0x06:	/* Cause interrupt on audio CPU */
-			cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+			cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
 			break;
 		case 0x07:	/* watchdog reset */
 			watchdog_reset_w(space, 0, data);
@@ -98,12 +84,14 @@ static WRITE8_HANDLER( flkatck_ls138_w )
 /* Protection - an external multiplyer connected to the sound CPU */
 static READ8_HANDLER( multiply_r )
 {
-	return (multiply_reg[0] * multiply_reg[1]) & 0xFF;
+	flkatck_state *state = (flkatck_state *)space->machine->driver_data;
+	return (state->multiply_reg[0] * state->multiply_reg[1]) & 0xff;
 }
 
 static WRITE8_HANDLER( multiply_w )
 {
-	multiply_reg[offset] = data;
+	flkatck_state *state = (flkatck_state *)space->machine->driver_data;
+	state->multiply_reg[offset] = data;
 }
 
 
@@ -113,7 +101,7 @@ static ADDRESS_MAP_START( flkatck_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0400, 0x041f) AM_READWRITE(flkatck_ls138_r, flkatck_ls138_w)							/* inputs, DIPS, bankswitch, counters, sound command */
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE_GENERIC(paletteram)	/* palette */
 	AM_RANGE(0x1000, 0x1fff) AM_RAM																	/* RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(flkatck_k007121_w) AM_BASE(&k007121_ram)					/* Video RAM (007121) */
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(flkatck_k007121_w) AM_BASE_MEMBER(flkatck_state, k007121_ram)					/* Video RAM (007121) */
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")															/* banked ROM */
 	AM_RANGE(0x6000, 0xffff) AM_ROM																	/* ROM */
 ADDRESS_MAP_END
@@ -197,8 +185,8 @@ GFXDECODE_END
 
 static void volume_callback0(const device_config *device, int v)
 {
-	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
-	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(device, 0, (v >> 4) * 0x11, 0);
+	k007232_set_volume(device, 1, 0, (v & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_config =
@@ -207,7 +195,37 @@ static const k007232_interface k007232_config =
 };
 
 
+static MACHINE_START( flkatck )
+{
+	flkatck_state *state = (flkatck_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x10000], 0x2000);
+
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->k007121 = devtag_get_device(machine, "k007121");
+
+	state_save_register_global(machine, state->irq_enabled);
+	state_save_register_global_array(machine, state->multiply_reg);
+	state_save_register_global(machine, state->flipscreen);
+}
+
+static MACHINE_RESET( flkatck )
+{
+	flkatck_state *state = (flkatck_state *)machine->driver_data;
+
+	k007232_set_bank(devtag_get_device(machine, "konami"), 0, 1);
+
+	state->irq_enabled = 0;
+	state->multiply_reg[0] = 0;
+	state->multiply_reg[1] = 0;
+	state->flipscreen = 0;
+}
+
 static MACHINE_DRIVER_START( flkatck )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(flkatck_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
@@ -219,6 +237,7 @@ static MACHINE_DRIVER_START( flkatck )
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
+	MDRV_MACHINE_START(flkatck)
 	MDRV_MACHINE_RESET(flkatck)
 
 	/* video hardware */
@@ -286,5 +305,5 @@ ROM_END
 
 
 
-GAME( 1987, mx5000,  0, 	 flkatck, flkatck, 0, ROT90, "Konami", "MX5000", 0 )
-GAME( 1987, flkatck, mx5000, flkatck, flkatck, 0, ROT90, "Konami", "Flak Attack (Japan)", 0 )
+GAME( 1987, mx5000,  0, 	 flkatck, flkatck, 0, ROT90, "Konami", "MX5000", GAME_SUPPORTS_SAVE )
+GAME( 1987, flkatck, mx5000, flkatck, flkatck, 0, ROT90, "Konami", "Flak Attack (Japan)", GAME_SUPPORTS_SAVE )

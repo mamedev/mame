@@ -1,12 +1,12 @@
 /***************************************************************************
 
-Fast Lane(GX752) (c) 1987 Konami
+    Fast Lane (GX752) (c) 1987 Konami
 
-Driver by Manuel Abadia <manu@teleline.es>
+    Driver by Manuel Abadia <manu@teleline.es>
 
-TODO:
-- colors don't seem 100% accurate.
-- verify that sound is correct (volume and bank switching)
+    TODO:
+        - colors don't seem 100% accurate.
+        - verify that sound is correct (volume and bank switching)
 
 ***************************************************************************/
 
@@ -14,57 +14,49 @@ TODO:
 #include "deprecat.h"
 #include "cpu/hd6309/hd6309.h"
 #include "sound/k007232.h"
-#include "includes/konamipt.h"
 #include "video/konicdev.h"
-
-/* from video/fastlane.c */
-extern UINT8 *fastlane_k007121_regs,*fastlane_videoram1,*fastlane_videoram2;
-WRITE8_HANDLER( fastlane_vram1_w );
-WRITE8_HANDLER( fastlane_vram2_w );
-PALETTE_INIT( fastlane );
-VIDEO_START( fastlane );
-VIDEO_UPDATE( fastlane );
+#include "includes/konamipt.h"
+#include "includes/fastlane.h"
 
 static INTERRUPT_GEN( fastlane_interrupt )
 {
-	const device_config *k007121 = devtag_get_device(device->machine, "k007121");
+	fastlane_state *state = (fastlane_state *)device->machine->driver_data;
+
 	if (cpu_getiloops(device) == 0)
 	{
-		if (k007121_ctrlram_r(k007121, 7) & 0x02)
+		if (k007121_ctrlram_r(state->k007121, 7) & 0x02)
 			cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
-		if (k007121_ctrlram_r(k007121, 7) & 0x01)
+		if (k007121_ctrlram_r(state->k007121, 7) & 0x01)
 			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static WRITE8_HANDLER( k007121_registers_w )
 {
-	const device_config *k007121 = devtag_get_device(space->machine, "k007121");
+	fastlane_state *state = (fastlane_state *)space->machine->driver_data;
 
 	if (offset < 8)
-		k007121_ctrl_w(k007121, offset, data);
+		k007121_ctrl_w(state->k007121, offset, data);
 	else	/* scroll registers */
-		fastlane_k007121_regs[offset] = data;
+		state->k007121_regs[offset] = data;
 }
 
 static WRITE8_HANDLER( fastlane_bankswitch_w )
 {
-	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	fastlane_state *state = (fastlane_state *)space->machine->driver_data;
 
 	/* bits 0 & 1 coin counters */
 	coin_counter_w(space->machine, 0,data & 0x01);
 	coin_counter_w(space->machine, 1,data & 0x02);
 
 	/* bits 2 & 3 = bank number */
-	bankaddress = 0x10000 + ((data & 0x0c) >> 2) * 0x4000;
-	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
+	memory_set_bank(space->machine, "bank1", (data & 0x0c) >> 2);
 
 	/* bit 4: bank # for the 007232 (chip 2) */
-	k007232_set_bank(devtag_get_device(space->machine, "konami2"),0 + ((data & 0x10) >> 4),2 + ((data & 0x10) >> 4));
+	k007232_set_bank(state->konami2, 0 + ((data & 0x10) >> 4), 2 + ((data & 0x10) >> 4));
 
 	/* other bits seems to be unused */
 }
@@ -76,15 +68,15 @@ static READ8_DEVICE_HANDLER( fastlane_k007232_r )
 {
 	return k007232_r(device, offset ^ 1);
 }
+
 static WRITE8_DEVICE_HANDLER( fastlane_k007232_w )
 {
 	k007232_w(device, offset ^ 1, data);
 }
 
 
-
 static ADDRESS_MAP_START( fastlane_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x005f) AM_RAM_WRITE(k007121_registers_w) AM_BASE(&fastlane_k007121_regs)	/* 007121 registers */
+	AM_RANGE(0x0000, 0x005f) AM_RAM_WRITE(k007121_registers_w) AM_BASE_MEMBER(fastlane_state, k007121_regs)	/* 007121 registers */
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("P2")
 	AM_RANGE(0x0802, 0x0802) AM_READ_PORT("P1")
@@ -96,11 +88,11 @@ static ADDRESS_MAP_START( fastlane_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0d00, 0x0d0d) AM_DEVREADWRITE("konami1", fastlane_k007232_r, fastlane_k007232_w)	/* 007232 registers (chip 1) */
 	AM_RANGE(0x0e00, 0x0e0d) AM_DEVREADWRITE("konami2", fastlane_k007232_r, fastlane_k007232_w)	/* 007232 registers (chip 2) */
 	AM_RANGE(0x0f00, 0x0f1f) AM_DEVREADWRITE("k051733", k051733_r, k051733_w)									/* 051733 (protection) */
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_BASE_GENERIC(paletteram)										/* Palette RAM */
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_BASE_MEMBER(fastlane_state, paletteram)										/* Palette RAM */
 	AM_RANGE(0x1800, 0x1fff) AM_RAM																/* Work RAM */
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(fastlane_vram1_w) AM_BASE(&fastlane_videoram1) 		/* Video RAM (chip 1) */
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(fastlane_vram2_w) AM_BASE(&fastlane_videoram2) 		/* Video RAM (chip 2) */
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE_GENERIC(spriteram)											/* Sprite RAM */
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(fastlane_vram1_w) AM_BASE_MEMBER(fastlane_state, videoram1) 		/* Video RAM (chip 1) */
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(fastlane_vram2_w) AM_BASE_MEMBER(fastlane_state, videoram2) 		/* Video RAM (chip 2) */
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE_MEMBER(fastlane_state, spriteram)											/* Sprite RAM */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")														/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM																/* ROM */
 ADDRESS_MAP_END
@@ -186,14 +178,14 @@ GFXDECODE_END
 
 static void volume_callback0(const device_config *device, int v)
 {
-	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
-	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(device, 0, (v >> 4) * 0x11, 0);
+	k007232_set_volume(device, 1, 0, (v & 0x0f) * 0x11);
 }
 
 static void volume_callback1(const device_config *device, int v)
 {
-	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
-	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(device, 0, (v >> 4) * 0x11, 0);
+	k007232_set_volume(device, 1, 0, (v & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_interface_1 =
@@ -206,12 +198,28 @@ static const k007232_interface k007232_interface_2 =
 	volume_callback1
 };
 
+static MACHINE_START( fastlane )
+{
+	fastlane_state *state = (fastlane_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
+
+	state->konami2 = devtag_get_device(machine, "konami2");
+	state->k007121 = devtag_get_device(machine, "k007121");
+}
+
 static MACHINE_DRIVER_START( fastlane )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(fastlane_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)		/* 24MHz/8? */
 	MDRV_CPU_PROGRAM_MAP(fastlane_map)
 	MDRV_CPU_VBLANK_INT_HACK(fastlane_interrupt,16)	/* 1 IRQ + ??? NMI (generated by the 007121) */
+
+	MDRV_MACHINE_START(fastlane)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -271,4 +279,4 @@ ROM_START( fastlane )
 ROM_END
 
 
-GAME( 1987, fastlane, 0, fastlane, fastlane, 0, ROT90, "Konami", "Fast Lane", GAME_IMPERFECT_COLORS )
+GAME( 1987, fastlane, 0, fastlane, fastlane, 0, ROT90, "Konami", "Fast Lane", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )

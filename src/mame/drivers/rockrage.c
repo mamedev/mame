@@ -65,12 +65,8 @@ static INTERRUPT_GEN( rockrage_interrupt )
 
 static WRITE8_HANDLER( rockrage_bankswitch_w )
 {
-	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
-
 	/* bits 4-6 = bank number */
-	bankaddress = 0x10000 + ((data & 0x70) >> 4) * 0x2000;
-	memory_set_bankptr(space->machine, "bank1",&RAM[bankaddress]);
+	memory_set_bank(space->machine, "bank1", (data & 0x70) >> 4);
 
 	/* bits 0 & 1 = coin counters */
 	coin_counter_w(space->machine, 0,data & 0x01);
@@ -278,6 +274,9 @@ static const k007420_interface rockrage_k007420_intf =
 static MACHINE_START( rockrage )
 {
 	rockrage_state *state = (rockrage_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x2000);
 
 	state->audiocpu = devtag_get_device(machine, "audiocpu");
 	state->k007342 = devtag_get_device(machine, "k007342");
@@ -432,6 +431,6 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1986, rockrage, 0,        rockrage, rockrage, 0, ROT0, "Konami", "Rock'n Rage (World)", 0 )
-GAME( 1986, rockragea,rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Rock'n Rage (Prototype?)", 0 )
-GAME( 1986, rockragej,rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Koi no Hotrock (Japan)", 0 )
+GAME( 1986, rockrage, 0,        rockrage, rockrage, 0, ROT0, "Konami", "Rock'n Rage (World)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rockragea,rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Rock'n Rage (Prototype?)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rockragej,rockrage, rockrage, rockrage, 0, ROT0, "Konami", "Koi no Hotrock (Japan)", GAME_SUPPORTS_SAVE )

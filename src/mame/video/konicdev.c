@@ -5396,6 +5396,7 @@ struct _k053936_state
 
 	int      wraparound;
 	int      offset[2];
+	int      size;
 };
 
 /*****************************************************************************
@@ -5449,7 +5450,7 @@ READ16_DEVICE_HANDLER( k053936_linectrl_r )
 
 // there is another implementation of this in  video/konamigx.c (!)
 //  why? shall they be merged?
-void k053936_zoom_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, tilemap *tmap, int flags, UINT32 priority, int glfgreat_hack)
+void k053936_zoom_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, tilemap *tmap, int flags, UINT32 priority, int glfgreat_hack )
 {
 	k053936_state *k053936= k053936_get_safe_token(device);
 	if (!tmap)
@@ -5497,10 +5498,10 @@ void k053936_zoom_draw( const device_config *device, bitmap_t *bitmap, const rec
 
 		while (y <= maxy)
 		{
-			UINT16 *lineaddr = k053936->linectrl + 4 * ((y - k053936->offset[1]) & 0x1ff);
+			UINT16 *lineaddr = 4 * ((y - k053936->offset[1]) & 0x1ff) + (k053936->linectrl) ?  k053936->linectrl : 0;
 			my_clip.min_y = my_clip.max_y = y;
 
-			startx = 256 * (INT16)(lineaddr[0] + k053936->ctrl[0x00]);
+//			startx = 256 * (INT16)(lineaddr[0] + k053936->ctrl[0x00]);
 			starty = 256 * (INT16)(lineaddr[1] + k053936->ctrl[0x01]);
 			incxx  =       (INT16)(lineaddr[2]);
 			incxy  =       (INT16)(lineaddr[3]);
@@ -5590,14 +5591,35 @@ static DEVICE_START( k053936 )
 	const k053936_interface *intf = k053936_get_interface(device);
 
 	k053936->ctrl = auto_alloc_array(device->machine, UINT16, 0x20);
-	k053936->linectrl = auto_alloc_array(device->machine, UINT16, intf->linectrl_size);	// FIXME: should this only be 0x1000?
+
+	if (intf->linectrl_size)
+		k053936->linectrl = auto_alloc_array(device->machine, UINT16, intf->linectrl_size);	// FIXME: should this only be 0x1000?
+	else	
+	{
+		/* f1gp.c & crshrace.c seem to have no linectrl ram: is it unmapped or really not present? */
+		/* in the meanwhile, we alloc a fake entry to avoid debug to complain for 0-size alloc */
+		k053936->linectrl = NULL;
+	}
 
 	k053936->wraparound = intf->wrap;
 	k053936->offset[0] = intf->xoff;
 	k053936->offset[1] = intf->yoff;
 
+	k053936->size = intf->linectrl_size;
+
 	state_save_register_device_item_pointer(device, 0, k053936->ctrl, 0x20);
-	state_save_register_device_item_pointer(device, 0, k053936->linectrl, intf->linectrl_size);
+
+	if (intf->linectrl_size)
+		state_save_register_device_item_pointer(device, 0, k053936->linectrl, intf->linectrl_size);
+}
+
+static DEVICE_RESET( k053936 )
+{
+	k053936_state *k053936 = k053936_get_safe_token(device);
+	memset(k053936->ctrl, 0, 0x20);
+
+	if (k053936->linectrl != NULL)
+		memset(k053936->linectrl, 0, k053936->size);
 }
 
 /***************************************************************************/
@@ -9297,7 +9319,7 @@ DEVICE_GET_INFO( k053936 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(k053936);		break;
 		case DEVINFO_FCT_STOP:					/* Nothing */									break;
-		case DEVINFO_FCT_RESET:					/* Nothing */									break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(k053936);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:					strcpy(info->s, "Konami 053936");				break;
