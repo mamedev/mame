@@ -80,46 +80,49 @@ static TILE_GET_INFO( get_tile_info )
 
 static PALETTE_INIT( koikoi )
 {
-	#if 0
 	int i;
 
-	for (i = 0;i < 0x100;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x10);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x10; i++)
 	{
-		int prom_val,r,g,b;
-		int t[3];
+		int bit0, bit1, bit2;
+		int r, g, b;
 
-		prom_val = (color_prom[i] >> 0) & 0x0f;
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		t[0] = mame_rand(machine) & 0xff;
-		t[1] = mame_rand(machine) & 0xff;
-		t[2] = mame_rand(machine) & 0xff;
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* this looks like to be a clut...color prom is very likely to be undumped */
-		switch(prom_val)
-		{
-			case 0x00: r = 0x00; g = 0x55; b = 0x00; break; //UNK
-			case 0x01: r = 0xff; g = 0xff; b = 0xff; break;
-			case 0x02: r = 0xff; g = 0xff; b = 0x00; break;
-			case 0x03: r = 0xff; g = 0x55; b = 0x00; break; //UNK
-			case 0x04: r = 0xff; g = 0xff; b = 0xff; break;
-			case 0x05: r = 0x00; g = 0xff; b = 0x00; break;
-			case 0x06: r = 0x00; g = 0xff; b = 0x55; break; //UNK
-			case 0x07: r = 0x00; g = 0x00; b = 0xff; break;
-			case 0x08: r = 0x00; g = 0x55; b = 0xff; break;
-			case 0x09: r = 0xff; g = 0x00; b = 0x55; break;
-			case 0x0a: r = 0xff; g = 0x00; b = 0x00; break;
-//			case 0x0b: r = ????; g = ????; b = ????; break;
-			case 0x0c: r = 0x55; g = 0x00; b = 0x00; break; //UNK
-			case 0x0d: r = 0x55; g = 0x55; b = 0x55; break;
-			case 0x0e: r = 0x00; g = 0x00; b = 0x00; break;
-			case 0x0f: r = t[0]; g = t[1]; b = t[2]; break;
-			default: r = 0x00; g = 0x00; b = 0x00; break;
-		}
+		/* blue component */
+		bit0 = 0;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
-	#endif
+
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x20;
+
+	/* characters/sprites */
+	for (i = 0; i < 0x100; i++)
+	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
+
 static VIDEO_START(koikoi)
 {
 	koikoi_state *state = (koikoi_state *)machine->driver_data;
@@ -404,11 +407,9 @@ ROM_START( koikoi )
 	ROM_LOAD( "ic26", 0x1000, 0x1000, CRC(79cb1e93) SHA1(4d08b3d88727b437673f7a51d47396f19bbc3caa) )
 	ROM_LOAD( "ic18", 0x2000, 0x1000, CRC(c209362d) SHA1(0620c19fe72e8407db0f487b6413c5d45ac8046c) )
 
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "prom.ic23", 0x000, 0x100,  CRC(f1d169a6) SHA1(5ee4b1dfe61e8b97a90cc113ba234298189f1a73) )
-
-	ROM_REGION( 0x0020, "color_prom", 0 )
-	ROM_LOAD( "prom.x", 0x000, 0x020,  NO_DUMP )
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "prom.x",    0x000, 0x020,  NO_DUMP )
+	ROM_LOAD( "prom.ic23", 0x020, 0x100,  CRC(f1d169a6) SHA1(5ee4b1dfe61e8b97a90cc113ba234298189f1a73) )
 
 	ROM_REGION( 0x0a00, "plds", 0 )
 	ROM_LOAD( "pal16r8-10_pink.ic9",   0x0000, 0x0104, CRC(9f8fdb95) SHA1(cdcdb1a6baef18961cf6c75fba0c3aba47f3edbb) )
