@@ -805,23 +805,23 @@ DASMOBJS += $(CPUOBJ)/mips/psxdasm.o
 endif
 
 $(CPUOBJ)/mips/r3000.o:	$(CPUSRC)/mips/r3000.c \
-						$(CPUSRC)/mips/r3000.h
+			$(CPUSRC)/mips/r3000.h
 
 $(CPUOBJ)/mips/mips3com.o:	$(CPUSRC)/mips/mips3.h \
-								$(CPUSRC)/mips/mips3com.h
+				$(CPUSRC)/mips/mips3com.h
 
 $(CPUOBJ)/mips/mips3fe.o:	$(CPUSRC)/mips/mips3.h \
-								$(CPUSRC)/mips/mips3com.h \
-								$(CPUSRC)/mips/mips3fe.h
+				$(CPUSRC)/mips/mips3com.h \
+				$(CPUSRC)/mips/mips3fe.h
 
-$(CPUOBJ)/mips/mips3drc.o:		$(CPUSRC)/mips/mips3drc.c \
-								$(CPUSRC)/mips/mips3.h \
-								$(CPUSRC)/mips/mips3com.h \
-								$(CPUSRC)/mips/mips3fe.h \
-								$(DRCDEPS)
+$(CPUOBJ)/mips/mips3drc.o:	$(CPUSRC)/mips/mips3drc.c \
+				$(CPUSRC)/mips/mips3.h \
+				$(CPUSRC)/mips/mips3com.h \
+				$(CPUSRC)/mips/mips3fe.h \
+				$(DRCDEPS)
 
 $(CPUOBJ)/mips/psx.o:	$(CPUSRC)/mips/psx.c \
-						$(CPUSRC)/mips/psx.h
+			$(CPUSRC)/mips/psx.h
 
 
 
@@ -1191,13 +1191,17 @@ $(CPUOBJ)/minx/minx.o:		$(CPUSRC)/minx/minx.c \
 
 ifneq ($(filter RSP,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/rsp
-CPUOBJS += $(CPUOBJ)/rsp/rsp.o
+CPUOBJS += $(CPUOBJ)/rsp/rspdrc.o	$(CPUOBJ)/rsp/rspfe.o	$(DRCOBJ)
 DASMOBJS += $(CPUOBJ)/rsp/rsp_dasm.o
 endif
 
-$(CPUOBJ)/rsp/rsp.o:	$(CPUSRC)/rsp/rsp.c \
-						$(CPUSRC)/rsp/rsp.h
+$(CPUOBJ)/rsp/rspdrc.o:	$(CPUSRC)/rsp/rspdrc.c \
+			$(CPUSRC)/rsp/rsp.h \
+			$(CPUSRC)/rsp/rspfe.h \
+			$(DRCDEPS)
 
+$(CPUOBJ)/rsp/rspfe.o:	$(CPUSRC)/rsp/rspfe.c \
+			$(CPUSRC)/rsp/rspfe.h
 
 
 #-------------------------------------------------

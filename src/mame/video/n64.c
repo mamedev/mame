@@ -346,7 +346,7 @@ INLINE void MASK(INT32* S, INT32* T, INT32 cycle)
 	}
 }
 
-INLINE void SHIFT(INT32* S, INT32* T, INT32* maxs, INT32* maxt, UINT32 num)
+INLINE void texshift(INT32* S, INT32* T, INT32* maxs, INT32* maxt, UINT32 num)
 {
 	*S = SIGN16(*S);
 	*T = SIGN16(*T);
@@ -1824,7 +1824,7 @@ INLINE void TEXTURE_PIPELINE(COLOR* TEX, INT32 SSS, INT32 SST, UINT32 NOBILINEAR
 		sss1 = SSS;
 		sst1 = SST;
 
-		SHIFT(&sss1, &sst1, &maxs, &maxt, tilenum);
+		texshift(&sss1, &sst1, &maxs, &maxt, tilenum);
 
 		sss2 = sss1 + 32; sst2 = sst1 + 32;
 		maxs2 = ((sss2 >> 3) >= tile[tilenum].sh);
@@ -1912,7 +1912,7 @@ INLINE void TEXTURE_PIPELINE(COLOR* TEX, INT32 SSS, INT32 SST, UINT32 NOBILINEAR
 		sss1 = SSS;
 		sst1 = SST;
 
-		SHIFT(&sss1, &sst1, &maxs, &maxt, tilenum);
+		texshift(&sss1, &sst1, &maxs, &maxt, tilenum);
 		sss1 = RELATIVE(sss1, tile[tilenum].sl);
 		sst1 = RELATIVE(sst1, tile[tilenum].tl);
 
@@ -2646,13 +2646,19 @@ INLINE void video_max(UINT32* Pixels, UINT8* max, UINT32* enb)
 	*enb = 0;
 	for(i = 0; i < 7; i++)
 	{
-	    if (Pixels[i] >= Pixels[pos])
-			pos = i;
-	}
-	for(i = 0; i < 7; i++)
-	{
-	    if (Pixels[i] != Pixels[pos])
+		if (Pixels[i] > Pixels[pos])
+		{
 		    *enb += (1 << i);
+			pos = i;
+		}
+		else if (Pixels[i] < Pixels[pos])
+		{
+		    *enb += (1 << i);
+		}
+		else
+		{
+			pos = i;
+		}
 	}
 	*max = Pixels[pos];
 }

@@ -698,11 +698,11 @@ WRITE32_HANDLER( n64_sp_reg_w )
                 //printf( "Setting PC to: %08x\n", 0x04001000 | (data & 0xfff ) );
                 if( cpu_get_reg(cputag_get_cpu(space->machine, "rsp"), RSP_NEXTPC) != 0xffffffff )
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_NEXTPC, 0x04001000 | (data & 0xfff));
+                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_NEXTPC, 0x1000 | (data & 0xfff));
                 }
                 else
                 {
-                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_PC, 0x04001000 | (data & 0xfff));
+                    cpu_set_reg(cputag_get_cpu(space->machine, "rsp"), RSP_PC, 0x1000 | (data & 0xfff));
                 }
                 break;
 
@@ -1994,8 +1994,13 @@ MACHINE_START( n64 )
 {
 	mips3drc_set_options(cputag_get_cpu(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
-		/* configure fast RAM regions for DRC */
+	/* configure fast RAM regions for DRC */
 	mips3drc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x007fffff, FALSE, rdram);
+
+	rspdrc_set_options(cputag_get_cpu(machine, "rsp"), 0);
+	rspdrc_add_imem(cputag_get_cpu(machine, "rsp"), rsp_imem);
+	rspdrc_add_dmem(cputag_get_cpu(machine, "rsp"), rsp_dmem);
+	rspdrc_flush_drc_cache(cputag_get_cpu(machine, "rsp"));
 }
 
 MACHINE_RESET( n64 )
