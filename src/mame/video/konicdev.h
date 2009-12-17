@@ -385,8 +385,8 @@ READ16_DEVICE_HANDLER( k051937_word_r );
 WRITE16_DEVICE_HANDLER( k051937_word_w );
 
 void k051960_sprites_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int min_priority, int max_priority);
-int k051960_is_IRQ_enabled(const device_config *device);
-int k051960_is_NMI_enabled(const device_config *device);
+int k051960_is_irq_enabled(const device_config *device);
+int k051960_is_nmi_enabled(const device_config *device);
 void k051960_set_sprite_offsets(const device_config *device, int dx, int dy);
 
 #if 0 // to be moved in the specific drivers!

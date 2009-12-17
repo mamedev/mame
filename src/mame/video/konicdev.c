@@ -2850,13 +2850,13 @@ WRITE8_DEVICE_HANDLER( k051937_w )
 	}
 }
 
-int k051960_is_IRQ_enabled( const device_config *device )
+int k051960_is_irq_enabled( const device_config *device )
 {
 	k051960_state *k051960 = k051960_get_safe_token(device);
 	return k051960->irq_enabled;
 }
 
-int k051960_is_NMI_enabled( const device_config *device )
+int k051960_is_nmi_enabled( const device_config *device )
 {
 	k051960_state *k051960 = k051960_get_safe_token(device);
 	return k051960->nmi_enabled;

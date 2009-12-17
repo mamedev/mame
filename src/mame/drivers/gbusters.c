@@ -10,15 +10,17 @@ Preliminary driver by:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 /* prototypes */
 static MACHINE_RESET( gbusters );
 static KONAMI_SETLINES_CALLBACK( gbusters_banking );
 
+extern void gbusters_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags, int *priority);
+extern void gbusters_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
 
 extern int gbusters_priority;
 
@@ -30,7 +32,9 @@ static UINT8 *ram;
 
 static INTERRUPT_GEN( gbusters_interrupt )
 {
-	if (K052109_is_IRQ_enabled())
+	const device_config *k052109 = devtag_get_device(device->machine, "k052109");
+
+	if (k052109_is_irq_enabled(k052109))
 		cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
@@ -52,9 +56,10 @@ static WRITE8_HANDLER( bankedram_w )
 
 static WRITE8_HANDLER( gbusters_1f98_w )
 {
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
 
 	/* bit 0 = enable char ROM reading through the video RAM */
-	K052109_set_RMRD_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(k052109, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 7 used (during gfx rom tests), but unknown */
 
@@ -122,6 +127,39 @@ static WRITE8_DEVICE_HANDLER( gbusters_snd_bankswitch_w )
 #endif
 }
 
+/* special handlers to combine 052109 & 051960 */
+static READ8_HANDLER( k052109_051960_r )
+{
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	const device_config *k051960 = devtag_get_device(space->machine, "k051960");
+
+	if (k052109_get_rmrd_line(k052109) == CLEAR_LINE)
+	{
+		if (offset >= 0x3800 && offset < 0x3808)
+			return k051937_r(k051960, offset - 0x3800);
+		else if (offset < 0x3c00)
+			return k052109_r(k052109, offset);
+		else
+			return k051960_r(k051960, offset - 0x3c00);
+	}
+	else 
+		return k052109_r(k052109, offset);
+}
+
+static WRITE8_HANDLER( k052109_051960_w )
+{
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	const device_config *k051960 = devtag_get_device(space->machine, "k051960");
+
+	if (offset >= 0x3800 && offset < 0x3808)
+		k051937_w(k051960, offset - 0x3800, data);
+	else if (offset < 0x3c00)
+		k052109_w(k052109, offset, data);
+	else
+		k051960_w(k051960, offset - 0x3c00, data);
+}
+
+
 static ADDRESS_MAP_START( gbusters_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(gbusters_coin_counter_w)						/* coin counters */
 	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)									/* sound code # */
@@ -135,7 +173,7 @@ static ADDRESS_MAP_START( gbusters_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1f98, 0x1f98) AM_WRITE(gbusters_1f98_w)								/* enable gfx ROM read through VRAM */
 	AM_RANGE(0x1f9c, 0x1f9c) AM_WRITE(gbusters_unknown_w)							/* ??? */
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)		/* tiles + sprites (RAM H21, G21 & H6) */
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)		/* tiles + sprites (RAM H21, G21 & H6) */
 	AM_RANGE(0x4000, 0x57ff) AM_RAM													/* RAM I12 */
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(&ram)	/* palette + work RAM (RAM D16 & C16) */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")											/* banked ROM */
@@ -223,6 +261,20 @@ static const k007232_interface k007232_config =
 	volume_callback	/* external port callback */
 };
 
+static const k052109_interface gbusters_k052109_intf =
+{
+	"gfx1",
+	NORMAL_PLANE_ORDER,
+	gbusters_tile_callback
+};
+
+static const k051960_interface gbusters_k051960_intf =
+{
+	"gfx2",
+	NORMAL_PLANE_ORDER,
+	gbusters_sprite_callback
+};
+
 static MACHINE_DRIVER_START( gbusters )
 
 	/* basic machine hardware */
@@ -249,6 +301,9 @@ static MACHINE_DRIVER_START( gbusters )
 
 	MDRV_VIDEO_START(gbusters)
 	MDRV_VIDEO_UPDATE(gbusters)
+
+	MDRV_K052109_ADD("k052109", gbusters_k052109_intf)
+	MDRV_K051960_ADD("k051960", gbusters_k051960_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -375,8 +430,8 @@ static MACHINE_RESET( gbusters )
 
 static DRIVER_INIT( gbusters )
 {
-	konami_rom_deinterleave_2(machine, "gfx1");
-	konami_rom_deinterleave_2(machine, "gfx2");
+	konamid_rom_deinterleave_2(machine, "gfx1");
+	konamid_rom_deinterleave_2(machine, "gfx2");
 }
 
 
