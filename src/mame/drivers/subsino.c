@@ -198,9 +198,21 @@ static ADDRESS_MAP_START( sharkpy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x13fff ) AM_ROM //overlap unmapped regions
 ADDRESS_MAP_END
 
+/*
+Protection: this calculates the combinations of the screen.
+0x00 = you lose
+0x01 = royal flush
+0x02 = 5 of a kind
+ ...
+0x0a = jacks of better
+
+0xd9 is asked at the POST, game refuses to run otherwise.
+
+Protection also calculates the prize count in-game (don't know about it yet).
+*/
 static READ8_HANDLER( flash_r )
 {
-	return 0xd9; /* weakest way to protect a game? It even says the exact value on screen? */
+	return 0xd9;
 }
 
 static ADDRESS_MAP_START( victor5_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -210,14 +222,15 @@ static ADDRESS_MAP_START( victor5_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x09001, 0x09001 ) AM_READ_PORT( "DSW2" )
 	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "DSW3" )
 
-	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "DSW4" )
-	AM_RANGE( 0x09005, 0x09005 ) AM_READ_PORT( "INA" )
-	AM_RANGE( 0x09006, 0x09006 ) AM_READ_PORT( "INB" )
+	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "INA" )
+	AM_RANGE( 0x09005, 0x09005 ) AM_READ_PORT( "INB" )
+	AM_RANGE( 0x09006, 0x09006 ) AM_READ_PORT( "INC" )
 
 //	AM_RANGE( 0x09009, 0x09009 ) AM_WRITE( subsino_out_b_w )
 //	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE( subsino_out_a_w )
 
 	AM_RANGE( 0x0900a, 0x0900a ) AM_READ( flash_r ) AM_WRITENOP
+//	AM_RANGE( 0x0900b, 0x0900b ) //"flash" status, bit 0
 //	AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
 
 	AM_RANGE( 0x0900e, 0x0900f ) AM_DEVWRITE( "ymsnd", ym2413_w )
@@ -318,6 +331,146 @@ static INPUT_PORTS_START( smoto )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( victor5 )
+
+	PORT_START( "DSW1" )
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START( "DSW2" )
+	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START( "DSW3" )
+	PORT_DIPNAME( 0x01, 0x01, "DSW3" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START( "INA" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_BET )
+	PORT_DIPNAME( 0x80, 0x80, "INA" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START( "INB" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )	// coin
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )	// coin
+	PORT_DIPNAME( 0x04, 0x04, "INB" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START( "INC" )
+	PORT_DIPNAME( 0x01, 0x01, "INC" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 /***************************************************************************
                                 Graphics Layout
@@ -375,7 +528,7 @@ static MACHINE_DRIVER_START( victor5 )
 	MDRV_GFXDECODE(subsino_depth3)
 
 	MDRV_PALETTE_LENGTH(0x100)
-//  MDRV_PALETTE_INIT(subsino_3proms)   // no proms?
+	MDRV_PALETTE_INIT(subsino_2proms)
 
 	MDRV_VIDEO_START(subsino)
 	MDRV_VIDEO_UPDATE(subsino)
@@ -395,7 +548,8 @@ static MACHINE_DRIVER_START( victor21 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( victor5 )
-	MDRV_PALETTE_INIT(subsino_2proms)
+
+	//...
 MACHINE_DRIVER_END
 
 
@@ -519,12 +673,16 @@ ROM_START( victor5 )
 	ROM_CONTINUE(0x0000,0xc000)
 
 	ROM_REGION( 0x18000, "tilemap", 0 )
-	ROM_LOAD( "2.u24", 0x00000, 0x8000, CRC(1229e951) SHA1(1e548625bb60e2d6f52a376a0dea9e5709f94135) )
+	ROM_LOAD( "2.u24", 0x10000, 0x8000, CRC(1229e951) SHA1(1e548625bb60e2d6f52a376a0dea9e5709f94135) )
 	ROM_LOAD( "3.u23", 0x08000, 0x8000, CRC(2d89bbf1) SHA1(d7fda0174a835e88b330dfd09bdb604bfe4c2e44) )
-	ROM_LOAD( "4.u22", 0x10000, 0x8000, CRC(ecf840a1) SHA1(9ecf522afb23e3557d37effc3c8568e8a14dad1a) )
+	ROM_LOAD( "4.u22", 0x00000, 0x8000, CRC(ecf840a1) SHA1(9ecf522afb23e3557d37effc3c8568e8a14dad1a) )
 
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE )
 	// rom socket is empty
+
+	ROM_REGION( 0x200, "proms", 0 ) //missing proms in this set, we'll use the same as Victor 21 for now.
+	ROM_LOAD( "74s287.u35", 0x000, 0x100, BAD_DUMP CRC(40094bed) SHA1(b25d96126b3f7bd06bf76dc9958f8669f83abdb7) )
+	ROM_LOAD( "74s287.u36", 0x100, 0x100, BAD_DUMP CRC(9ca021c5) SHA1(6a1d8d4f958d36e4a676dc4f4aee83d637933bc3) )
 ROM_END
 
 /***************************************************************************
@@ -1060,7 +1218,7 @@ static DRIVER_INIT( sharkpy )
 }
 
 
-GAME( 1990, victor5,  0,        victor5,  smoto,    victor5,  ROT0, "Subsino", "Victor 5",                  GAME_NOT_WORKING )
+GAME( 1990, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino", "Victor 5",                  GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1990, victor21, 0,        victor21, smoto,    victor21, ROT0, "Subsino", "Victor 21",                 GAME_NOT_WORKING )
 GAME( 1991, crsbingo, 0,        crsbingo, smoto,    crsbingo, ROT0, "Subsino", "Cross Bingo",               GAME_NOT_WORKING )
 GAME( 1993, sharkpy,  0,        sharkpy,  smoto,    sharkpy,  ROT0, "Subsino", "Shark Party (Italy, v1.3)", 0 ) // missing POST messages?
