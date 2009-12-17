@@ -5501,7 +5501,7 @@ void k053936_zoom_draw( const device_config *device, bitmap_t *bitmap, const rec
 			UINT16 *lineaddr = 4 * ((y - k053936->offset[1]) & 0x1ff) + (k053936->linectrl) ?  k053936->linectrl : 0;
 			my_clip.min_y = my_clip.max_y = y;
 
-//			startx = 256 * (INT16)(lineaddr[0] + k053936->ctrl[0x00]);
+			startx = 256 * (INT16)(lineaddr[0] + k053936->ctrl[0x00]);
 			starty = 256 * (INT16)(lineaddr[1] + k053936->ctrl[0x01]);
 			incxx  =       (INT16)(lineaddr[2]);
 			incxy  =       (INT16)(lineaddr[3]);
