@@ -148,6 +148,7 @@ static ADDRESS_MAP_START( srider_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sharkpy_map, ADDRESS_SPACE_PROGRAM, 8 )
+
 	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM
 
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
@@ -585,7 +586,7 @@ ROM_START( sharkpy )
 	ROM_CONTINUE(              0x30000, 0x08000 )
 	ROM_CONTINUE(              0x28000, 0x08000 )
 	ROM_CONTINUE(              0x38000, 0x08000 )
-	
+
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "shark(ii)-italy_4_ver1.0.u54", 0x00000, 0x20000, CRC(9f384c59) SHA1(d2b087b8370b40b6f0944de661ea6aebaebea06f) )
 
@@ -898,7 +899,7 @@ static DRIVER_INIT( sharkpy )
 GAME( 1990, victor5,  0,        victor5,  victor5,  0,        ROT0, "Subsino", "Victor 5",                  GAME_NOT_WORKING )
 GAME( 1990, victor21, 0,        victor21, victor5,  0,        ROT0, "Subsino", "Victor 21",                 GAME_NOT_WORKING )
 GAME( 1991, crsbingo, 0,        crsbingo, crsbingo, 0,        ROT0, "Subsino", "Cross Bingo",               GAME_NOT_WORKING )
-GAME( 1993, sharkpy,  0,        sharkpy,  smoto,    sharkpy,  ROT0, "Subsino", "Shark Party",               GAME_NOT_WORKING ) // inputs?
-GAME( 1993, sharkpya, sharkpy,  sharkpy,  smoto,    sharkpy,  ROT0, "Subsino", "Shark Party (alt)",         GAME_NOT_WORKING ) // inputs?
+GAME( 1993, sharkpy,  0,        sharkpy,  smoto,    sharkpy,  ROT0, "Subsino", "Shark Party (Italy, v1.3)", 0 ) // missing POST messages?
+GAME( 1993, sharkpya, sharkpy,  sharkpy,  smoto,    sharkpy,  ROT0, "Subsino", "Shark Party (Italy, v1.6)", 0 ) // missing POST messages?
 GAME( 1996, smoto20,  0,        srider,   smoto,    smoto20,  ROT0, "Subsino", "Super Rider (Italy, v2.0)", 0 )
 GAME( 1996, smoto16,  smoto20,  srider,   smoto,    smoto16,  ROT0, "Subsino", "Super Moto (Italy, v1.6)",  0 )
