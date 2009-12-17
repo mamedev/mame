@@ -37,7 +37,6 @@ UINT8 hng64_screen_dis;
 // (Temporarily global - someday they will live with the proper bit-depth in the memory map)
 static float* depthBuffer3d;
 static UINT32* colorBuffer3d;
-static void draw3d(running_machine *machine);	// TODO: Kill
 static void clear3d(running_machine *machine);	// TODO: Inline
 
 
@@ -1495,7 +1494,6 @@ VIDEO_UPDATE( hng64 )
 	if (hng64_mcu_type != RACING_MCU) // disable on racing games until it stops crashing MAME!
 	{
 		int x, y;
-		draw3d(screen->machine);
 
 		// Blit the color buffer into the primary bitmap
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
@@ -1512,7 +1510,7 @@ VIDEO_UPDATE( hng64 )
 				src++;
 			}
 		}
-
+		//printf("\n");   /* DEBUG */
 		clear3d(screen->machine);	/* TODO: Inline */
 	}
 
@@ -1707,6 +1705,25 @@ static float uToF(UINT16 input);
 // Camera transformation.
 static void setCameraTransformation(const UINT16* packet)
 {
+	/*//////////////
+	// PACKET FORMAT
+	// [0]  - 0001 ... ID
+	// [1]  - xxxx ... Extrinsic camera matrix
+	// [2]  - xxxx ... Extrinsic camera matrix
+	// [3]  - xxxx ... Extrinsic camera matrix
+	// [4]  - xxxx ... Extrinsic camera matrix
+	// [5]  - xxxx ... Extrinsic camera matrix
+	// [6]  - xxxx ... Extrinsic camera matrix
+	// [7]  - xxxx ... Extrinsic camera matrix
+	// [8]  - xxxx ... Extrinsic camera matrix
+	// [9]  - xxxx ... Extrinsic camera matrix
+	// [10] - xxxx ... Extrinsic camera matrix
+	// [11] - xxxx ... Extrinsic camera matrix
+	// [12] - xxxx ... Extrinsic camera matrix
+	// [13] - ???? ... ? Flips per-frame during fatfurwa 'HNG64'
+	// [14] - ???? ... ? Could be some floating-point values during buriki 'door run'
+	// [15] - ???? ... ? Same as 13 & 14
+	////////////*/
 	// CAMERA TRANSFORMATION MATRIX
 	cameraMatrix[0]  = uToF(packet[1]);
 	cameraMatrix[4]  = uToF(packet[2]);
@@ -1733,11 +1750,27 @@ static void setCameraTransformation(const UINT16* packet)
 // Palette / Model flags?
 static void set3dFlags(const UINT16* packet)
 {
-	// All flags?
-	// 00110000 00000000 00000100 01000100 0400-0000 00007fff 00000000 00000020
-	// ----                                pal  ---- -------- -------- -------- not used (known)
+	/*//////////////
+	// PACKET FORMAT
+	// [0]  - 0011 ... ID
+	// [1]  - ???? ... 
+	// [2]  - ???? ... 
+	// [3]  - ???? ... 
+	// [4]  - ???? ... 
+	// [5]  - ???? ... 
+	// [6]  - ???? ... ? Flip & flop around like mad during fatfurwa intro
+	// [7]  - ???? ... ? Flip & flop around like mad during fatfurwa intro
+	// [8]  - xx?? ... Palette offset & ??
+	// [9]  - ???? ... ? Very much used - seem to bounce around when characters are on screen
+	// [10] - ???? ... ? ''  ''
+	// [11] - ???? ... ? ''  ''
+	// [12] - ???? ... ? ''  ''
+	// [13] - ???? ... ? ''  ''
+	// [14] - ???? ... ? ''  ''
+	// [15] - ???? ... ? ''  ''
+	////////////*/
 	paletteState3d  = (packet[8] & 0xff00) >> 8;
-	paletteState3d += ((hng64_3dregs[0x00/4] & 0x2000) >> 9); //framebuffer base color reg? Used by Buriki One
+	paletteState3d += ((hng64_3dregs[0x00/4] & 0x2000) >> 9); /* Palette is + 0x0800 in buriki. */
 	/* FIXME: Buriki One door colors in attract mode still aren't quite right, investigate... */
 }
 
@@ -1745,9 +1778,27 @@ static void set3dFlags(const UINT16* packet)
 // Projection Matrix.
 static void setCameraProjectionMatrix(const UINT16* packet)
 {
-	// Seems an awful lot parameters for a projection matrix, but it's good so far.
+	/*//////////////
+	// PACKET FORMAT
+	// [0]  - 0012 ... ID
+	// [1]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
+	// [2]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
+	// [3]  - ???? ... ? Contains a value
+	// [4]  - ???? ... ? Contains a value in buriki
+	// [5]  - ???? ... ? Contains a value
+	// [6]  - xxxx ... camera projection near
+	// [7]  - xxxx ... camera projection far
+	// [8]  - ???? ... ? Contains a value
+	// [9]  - ???? ... ? Contains a value
+	// [10] - xxxx ... camera projection right
+	// [11] - xxxx ... camera projection left
+	// [12] - xxxx ... camera projection top
+	// [13] - xxxx ... camera projection bottom
+	// [14] - ???? ... ? Gets data during buriki door-run
+	// [15] - ???? ... ? Gets data during buriki door-run
+	////////////*/
 
-	// It changes when fatfurwa 'How to play' is on the screen.  
+	// This packet changes when fatfurwa 'How to play' is on the screen.
 	// Not too much, but if this is right, the aspect ratio is different...
 
 	// Heisted from GLFrustum - 6 parameters...
@@ -1779,33 +1830,37 @@ static void setCameraProjectionMatrix(const UINT16* packet)
 	projectionMatrix[13] = 0.0f;
 	projectionMatrix[14] = -((2.0f*far_*near_)/(far_-near_));
 	projectionMatrix[15] = 0.0f;
-
-	/*
-	int xxx;
-	for (xxx = 0; xxx < 16; xxx++)
-		mame_printf_debug("%f ", projectionMatrix[xxx]);
-	mame_printf_debug("\n");
-
-	mame_printf_debug("Vars   : %f %f %f %f %f %f\n", left, right, top, bottom, near, far);
-	mame_printf_debug("Camera : %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
-					 uToF((workingList[i+0] & 0xffff0000) >> 16)*128, uToF( workingList[i+0] & 0x0000ffff)*128,
-					 uToF((workingList[i+1] & 0xffff0000) >> 16)*128, uToF( workingList[i+1] & 0x0000ffff)*128,
-
-					 uToF((workingList[i+2] & 0xffff0000) >> 16)*128, uToF( workingList[i+2] & 0x0000ffff)*128,
-					 uToF((workingList[i+3] & 0xffff0000) >> 16)*128, uToF( workingList[i+3] & 0x0000ffff)*128,
-
-					 uToF((workingList[i+4] & 0xffff0000) >> 16)*128, uToF( workingList[i+4] & 0x0000ffff)*128,
-					 uToF((workingList[i+5] & 0xffff0000) >> 16)*128, uToF( workingList[i+5] & 0x0000ffff)*128,
-
-					 uToF((workingList[i+6] & 0xffff0000) >> 16)*128, uToF( workingList[i+6] & 0x0000ffff)*128,
-					 uToF((workingList[i+7] & 0xffff0000) >> 16)*128, uToF( workingList[i+7] & 0x0000ffff)*128);
-	*/
 }
 
 // Operation 0100
 // Polygon rasterization.
 void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct polygon* polys, int* numPolys)
 {
+	/*//////////////
+	// PACKET FORMAT
+	// [0]  - 0100 ... ID
+	// [1]  - xxxx ... Flags for sure (0118 for buriki characters, 
+	//                                 0010 for buriki door, 
+	//                                 0110 for fatfurwa hng64, 
+	//                                 0118|0108 for fatfurwa building intro,
+	//                                 0118|0108 for fatfurwa fighters infight,
+	//                                 0108->0118 for fatfurwa globe (transitions when players are selected,
+	//                                 00d8 for segfaulting geo in xrally & roadedge)
+	// [2]  - xxxx ... offset into ROM
+	// [3]  - xxxx ... offset into ROM
+	// [4]  - xxxx ... Transformation matrix
+	// [5]  - xxxx ... Transformation matrix
+	// [6]  - xxxx ... Transformation matrix
+	// [7]  - xxxx ... Transformation matrix
+	// [8]  - xxxx ... Transformation matrix
+	// [9]  - xxxx ... Transformation matrix
+	// [10] - xxxx ... Transformation matrix
+	// [11] - xxxx ... Transformation matrix
+	// [12] - xxxx ... Transformation matrix
+	// [13] - ???? ... Transformation matrix
+	// [14] - ???? ... Transformation matrix
+	// [15] - ???? ... Transformation matrix
+	////////////*/
 	int k, l, m;
 
 	UINT8 *threeDRoms;
@@ -1815,10 +1870,10 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	UINT32 size[4];
 	UINT32 address[4];
 	UINT32 megaOffset;
-	float eyeCoords[4];			// objectCoords transformed by the modelViewMatrix
-	// float clipCoords[4];		// eyeCoords transformed by the projectionMatrix
-	float ndCoords[4];			// normalized device coordinates/clipCoordinates (x/w, y/w, z/w)
-	float windowCoords[4];		// mapped ndCoordinates to screen space
+	float eyeCoords[4];			// ObjectCoords transformed by the modelViewMatrix
+	// float clipCoords[4];		// EyeCoords transformed by the projectionMatrix
+	float ndCoords[4];			// Normalized device coordinates/clipCoordinates (x/w, y/w, z/w)
+	float windowCoords[4];		// Mapped ndCoordinates to screen space
 	float cullRay[4];
 
 	float objectMatrix[16];
@@ -1836,7 +1891,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	/////////////////////////
 
 	// 3d ROM Offset
-	// FIXME: This might be more than just 20 bits...
+	// FIXME: This decoding works for buriki and fatfurwa, but not for xrally.
 	dword1 = (((UINT32)packet[2]) << 16) | ((UINT32)packet[3]);
 	threeDOffset = dword1 & 0x000fffff;
 	threeDOffset = (threeDOffset << 1) * 3;
@@ -1850,7 +1905,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	//////////////////////////////////////////
 	// GET THE OBJECT TRANSFORMATION MATRIX //
 	//////////////////////////////////////////
-
 	objectMatrix[8 ] = uToF(packet[7]);
 	objectMatrix[4 ] = uToF(packet[8]);
 	objectMatrix[0 ] = uToF(packet[9]);
@@ -2191,28 +2245,79 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	}
 }
 
-
-/*
-static void command3d(running_machine* machine, const UINT16* packet)
+#ifdef UNUSED_FUNCTION
+void printPacket(const UINT16* packet, int hex)
 {
+	if (hex)
+	{
+		printf("Packet : %04x %04x  2:%04x %04x  4:%04x %04x  6:%04x %04x  8:%04x %04x  10:%04x %04x  12:%04x %04x  14:%04x %04x\n",
+				packet[0],  packet[1],
+				packet[2],  packet[3],
+				packet[4],  packet[5],
+				packet[6],  packet[7],
+				packet[8],  packet[9],
+				packet[10], packet[11],
+				packet[12], packet[13],
+				packet[14], packet[15]);
+	}
+	else
+	{
+		printf("Packet : %04x %3.4f  2:%3.4f %3.4f  4:%3.4f %3.4f  6:%3.4f %3.4f  8:%3.4f %3.4f  10:%3.4f %3.4f  12:%3.4f %3.4f  14:%3.4f %3.4f\n",
+				packet[0],            uToF(packet[1] )*128,
+				uToF(packet[2] )*128, uToF(packet[3] )*128,
+				uToF(packet[4] )*128, uToF(packet[5] )*128,
+				uToF(packet[6] )*128, uToF(packet[7] )*128,
+				uToF(packet[8] )*128, uToF(packet[9] )*128,
+				uToF(packet[10])*128, uToF(packet[11])*128,
+				uToF(packet[12])*128, uToF(packet[13])*128,
+				uToF(packet[14])*128, uToF(packet[15])*128);
+	}
+}
+#endif
+
+void hng64_command3d(running_machine* machine, const UINT16* packet)
+{
+	int i;
+
+	// A temporary place to put some polygons.
+	int numPolys = 0;
+	struct polygon* polys = malloc(sizeof(struct polygon) * (1024*5));	/* This will optimize globally if the compiler's any good */
+
 	switch (packet[0])
 	{
 	case 0x0000:	// Appears to be a NOP.
 		break;
 
 	case 0x0001:	// Camera transformation.
+		setCameraTransformation(packet);
 		break;
 
 	case 0x0010:	// Unknown (called twice for fatfurwa 'howto' frame)
 		break;
 
 	case 0x0011:	// Palette / Model flags?
+		set3dFlags(packet);
 		break;
 
 	case 0x0012:	// Projection Matrix
+		setCameraProjectionMatrix(packet);
 		break;
 
 	case 0x0100:	// Geometry
+		//printPacket(packet, 1);
+		recoverPolygonBlock(machine, packet, polys, &numPolys);
+
+		/* Immeditately rasterize the chunk's polygons into the display buffer */
+		for (i = 0; i < numPolys; i++)
+		{
+			if (polys[i].visible)
+			{
+				//DrawWireframe(&polys[i], bitmap);
+				drawShaded(machine, &polys[i]);
+			}
+		}
+
+		numPolys = 0;
 		break;
 
 	case 0x0101:	// Unknown: Geometry?
@@ -2222,17 +2327,20 @@ static void command3d(running_machine* machine, const UINT16* packet)
 		break;
 
 	case 0x1000:	// Unknown: Some sort of global flags?
+		//printPacket(packet, 1);
 		break;
 
 	case 0x1001:	// Unknown: Some sort of global flags?
+		//printPacket(packet, 1);
 		break;
 
 	default:
 		logerror("HNG64: Unknown 3d command %04x.\n", packet[0]);
 		break;
 	}
+
+	free(polys);
 }
-*/
 
 static void clear3d(running_machine *machine)
 {
@@ -2260,7 +2368,7 @@ static void clear3d(running_machine *machine)
 	setIdentity(cameraMatrix);
 }
 
-/* 3D/framebuffer video registers
+/* 3D/framebuffer video registers 
  * ------------------------------
  *
  * UINT32 | Bits                                    | Use
@@ -2273,84 +2381,10 @@ static void clear3d(running_machine *machine)
  *   4-11 | ---- ???? ---- ???? ---- ???? ---- ???? | Table filled with 0x0? data
  *
  */
-static void draw3d(running_machine *machine)
-{
-	int i,j,k,n;
 
-	UINT16 packet3d[16];
-
-	// The general display list of polygons in the scene...
-	int numPolys = 0;
-	struct polygon* polys = malloc(sizeof(struct polygon) * (1024*5));	/* This will optimize globally if the compiler's any good */
-
-	// Display list 2 comes after display list 1.  Go figure.
-	for (j = 1; j >= 0; j--)
-	{
-		UINT32 *workingList = hng64_dls[j];
-
-		for (i = 0; i < 0x80; i += 0x08)
-		{
-			// Debug...
-//          mame_printf_debug("Element %.2d (%d) : %.8x %.8x %.8x %.8x %.8x %.8x %.8x %.8x\n", i/0x08, j,
-//                             (UINT32)hng64_dls[j][i+0], (UINT32)hng64_dls[j][i+1], 
-// 							   (UINT32)hng64_dls[j][i+2], (UINT32)hng64_dls[j][i+3],
-//                             (UINT32)hng64_dls[j][i+4], (UINT32)hng64_dls[j][i+5], 
-// 							   (UINT32)hng64_dls[j][i+6], (UINT32)hng64_dls[j][i+7]);
-
-			// Transition code.
-			for (n = 0; n < 0x08; n++)
-			{
-				packet3d[n*2+0] = (workingList[i+n] & 0xffff0000) >> 16;
-				packet3d[n*2+1] = (workingList[i+n] & 0x0000ffff);
-			}
-
-			// Depending on what the initial flags are, do sumthin'...
-			switch((workingList[i+0] & 0xffff0000) >> 16)
-			{
-			case 0x0012:
-				setCameraProjectionMatrix(packet3d);
-				break;
-
-			case 0x0001:
-				setCameraTransformation(packet3d);
-				break;
-
-			case 0x0010:
-				// UNKNOWN - light maybe
-				break;
-
-			case 0x0011:
-				set3dFlags(packet3d);
-				break;
-
-			case 0x0100:
-				recoverPolygonBlock(machine, packet3d, polys, &numPolys);
-
-				/* Immeditately rasterize the chunk's polygons into the display buffer */
-				for (k = 0; k < numPolys; k++)
-				{
-					if (polys[k].visible)
-					{
-						//DrawWireframe(&polys[k], bitmap);
-						drawShaded(machine, &polys[k]);
-					}
-				}
-				/* TODO: do a full polycount */
-				numPolys = 0;
-				break;
-
-			default:
-				break;
-			}
-		}
-
-		// Don't forget about this !!!
-		//mame_printf_debug("                 %.8x\n\n", (UINT32)hng64_dls[j][0x80]);
-	}
-
-	free(polys);
-}
-
+/////////////////////
+// 3D UTILITY CODE //
+/////////////////////
 
 /* 4x4 matrix multiplication */
 static void matmul4( float *product, const float *a, const float *b )
@@ -2358,15 +2392,15 @@ static void matmul4( float *product, const float *a, const float *b )
    int i;
    for (i = 0; i < 4; i++)
    {
-      const float ai0 = a[0  + i];
-	  const float ai1 = a[4  + i];
-	  const float ai2 = a[8  + i];
-	  const float ai3 = a[12 + i];
+		const float ai0 = a[0  + i];
+		const float ai1 = a[4  + i];
+		const float ai2 = a[8  + i];
+		const float ai3 = a[12 + i];
 
-	  product[0  + i] = ai0 * b[0 ] + ai1 * b[1 ] + ai2 * b[2 ] + ai3 * b[3 ];
-	  product[4  + i] = ai0 * b[4 ] + ai1 * b[5 ] + ai2 * b[6 ] + ai3 * b[7 ];
-	  product[8  + i] = ai0 * b[8 ] + ai1 * b[9 ] + ai2 * b[10] + ai3 * b[11];
-	  product[12 + i] = ai0 * b[12] + ai1 * b[13] + ai2 * b[14] + ai3 * b[15];
+		product[0  + i] = ai0 * b[0 ] + ai1 * b[1 ] + ai2 * b[2 ] + ai3 * b[3 ];
+		product[4  + i] = ai0 * b[4 ] + ai1 * b[5 ] + ai2 * b[6 ] + ai3 * b[7 ];
+		product[8  + i] = ai0 * b[8 ] + ai1 * b[9 ] + ai2 * b[10] + ai3 * b[11];
+		product[12 + i] = ai0 * b[12] + ai1 * b[13] + ai2 * b[14] + ai3 * b[15];
    }
 }
 
@@ -2409,10 +2443,12 @@ static float uToF(UINT16 input)
 	retVal = (float)((INT16)input) / 32768.0f;
 	return retVal;
 
-/*  if ((INT16)input < 0)
-        retVal = (float)((INT16)input) / 32768.0f;
-    else
-        retVal = (float)((INT16)input) / 32767.0f; */
+/*
+	if ((INT16)input < 0)
+		retVal = (float)((INT16)input) / 32768.0f;
+	else
+		retVal = (float)((INT16)input) / 32767.0f;
+*/
 }
 
 #ifdef UNUSED_FUNCTION
@@ -2466,10 +2502,8 @@ static int Inside(struct polyVert *v, int plane)
 
 	case HNG64_NEAR:
 		return (v->clipCoords[2] <=  v->clipCoords[3]) ? 1 : 0;
-
 	case HNG64_FAR:
 		return (v->clipCoords[2] >= -v->clipCoords[3]) ? 1 : 0;
-
 	}
 
 	return 0;
@@ -2530,9 +2564,7 @@ static void Intersect(struct polyVert *input0, struct polyVert *input1, struct p
 
 static void performFrustumClip(struct polygon *p)
 {
-	int i, j;
-	int k;
-
+	int i, j, k;
 	//////////////////////////////////////////////////////////////////////////
 	// Clip against the volumes defined by the homogeneous clip coordinates //
 	//////////////////////////////////////////////////////////////////////////
@@ -2737,14 +2769,14 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 					// Greyscale texture - for Buriki...
 					// *BITMAP_ADDR32(Color, y, x_start) = MAKE_ARGB(255, (UINT8)paletteEntry, (UINT8)paletteEntry, (UINT8)paletteEntry);
 
-					//*BITMAP_ADDR32(Color, y, x_start) = machine->pens[(128*(Filtering))+paletteEntry];
+					// *BITMAP_ADDR32(Color, y, x_start) = machine->pens[(128*(Filtering))+paletteEntry];
 					*cb = machine->pens[(128*(Filtering))+paletteEntry];
 					*db = z_start;
 				}
 			}
 			else
 			{
-				//*BITMAP_ADDR32(Color, y, x_start) = MAKE_ARGB(255, (UINT8)(r_start/w_start), (UINT8)(g_start/w_start), (UINT8)(b_start/w_start));
+				// *BITMAP_ADDR32(Color, y, x_start) = MAKE_ARGB(255, (UINT8)(r_start/w_start), (UINT8)(g_start/w_start), (UINT8)(b_start/w_start));
 				*cb = MAKE_ARGB(255, (UINT8)(r_start/w_start), (UINT8)(g_start/w_start), (UINT8)(b_start/w_start));
 				*db = z_start;
 			}
