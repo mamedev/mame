@@ -54,14 +54,11 @@ static WRITE16_HANDLER( fcrash_soundlatch_w )
 static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 {
 	cps_state *state = (cps_state *)space->machine->driver_data;
-	UINT8 *RAM = memory_region(space->machine, "soundcpu");
-	int bankaddr;
 
 	sound_set_output_gain(state->msm_1, 0, (data & 0x08) ? 0.0 : 1.0);
 	sound_set_output_gain(state->msm_2, 0, (data & 0x10) ? 0.0 : 1.0);
 
-	bankaddr = ((data & 7) * 0x4000);
-	memory_set_bankptr(space->machine, "bank1",&RAM[0x10000 + bankaddr]);
+	memory_set_bank(space->machine, "bank1", data & 0x07);
 }
 
 static void m5205_int1( const device_config *device )
@@ -695,6 +692,9 @@ static const msm5205_interface msm5205_interface2 =
 static MACHINE_START( fcrash )
 {
 	cps_state *state = (cps_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 
 	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->audiocpu = devtag_get_device(machine, "soundcpu");

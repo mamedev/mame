@@ -2779,13 +2779,6 @@ static MACHINE_START( qsound )
 	memory_configure_bank(machine, "bank1", 0, 6, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
 }
 
-static MACHINE_START( cpspicb )
-{
-	MACHINE_START_CALL(common);
-	memory_configure_bank(machine, "bank1", 0, 6, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
-}
-
-
 static MACHINE_DRIVER_START( cps1_10MHz )
 
 	/* driver data */
@@ -2891,7 +2884,7 @@ static MACHINE_DRIVER_START( cpspicb )
 	MDRV_CPU_ADD("audiocpu", PIC16C57, 12000000)
 	MDRV_CPU_FLAGS(CPU_DISABLE) /* no valid dumps .. */
 
-	MDRV_MACHINE_START(cpspicb)
+	MDRV_MACHINE_START(common)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
