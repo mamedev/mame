@@ -148,9 +148,6 @@ static ADDRESS_MAP_START( srider_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sharkpy_map, ADDRESS_SPACE_PROGRAM, 8 )
-
-	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM
-
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
 	AM_RANGE( 0x09000, 0x09000 ) AM_READ_PORT( "DSW1" )
@@ -175,6 +172,8 @@ static ADDRESS_MAP_START( sharkpy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
 	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE( subsino_colorram_w ) AM_BASE_GENERIC( colorram )
 	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE_GENERIC( videoram )
+
+	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM //overlap unmapped regions
 ADDRESS_MAP_END
 
 
