@@ -147,6 +147,36 @@ static ADDRESS_MAP_START( srider_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE_GENERIC( videoram )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sharkpy_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM
+
+	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
+
+	AM_RANGE( 0x09000, 0x09000 ) AM_READ_PORT( "DSW1" )
+	AM_RANGE( 0x09001, 0x09001 ) AM_READ_PORT( "DSW2" )
+	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "DSW3" )
+
+	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "DSW4" )
+	AM_RANGE( 0x09005, 0x09005 ) AM_READ_PORT( "INA" )
+	AM_RANGE( 0x09006, 0x09006 ) AM_READ_PORT( "INB" )
+
+	AM_RANGE( 0x09009, 0x09009 ) AM_WRITE( subsino_out_b_w )
+	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE( subsino_out_a_w )
+
+	AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
+
+	AM_RANGE( 0x09016, 0x09017 ) AM_DEVWRITE( "ymsnd", ym3812_w )
+
+	AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE( "oki", okim6295_w )
+
+	AM_RANGE( 0x0901b, 0x0901b ) AM_WRITE( subsino_tiles_offset_w )
+
+	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
+	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE( subsino_colorram_w ) AM_BASE_GENERIC( colorram )
+	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE_GENERIC( videoram )
+ADDRESS_MAP_END
+
+
 
 static ADDRESS_MAP_START( victor5_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM
@@ -356,6 +386,13 @@ static MACHINE_DRIVER_START( srider )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( sharkpy )
+	MDRV_IMPORT_FROM(srider)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(sharkpy_map)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( crsbingo )
 	/* basic machine hardware */
@@ -535,18 +572,20 @@ Info by f205v (25/03/2008)
 
 ROM_START( sharkpy )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "shark_n.1.u18", 0x00000, 0x10000, CRC(25aeac2f) SHA1(d94e3e5cfffd150ac48e1463493a8323f42e7a89) )
+	ROM_LOAD( "shark_n.1.u18", 0x0a000, 0x6000, CRC(25aeac2f) SHA1(d94e3e5cfffd150ac48e1463493a8323f42e7a89) ) // is this mapped correctly? - used during gameplay?
+	ROM_CONTINUE(0x0000, 0xa000)
+
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
-	ROM_LOAD( "shark_n.2.u17", 0x00000, 0x08000, CRC(c27f3d0a) SHA1(77c8eb0322c5b9c89777cb080d26ecf9abe01ae7) )
+	ROM_LOAD( "shark_n.3.u16", 0x00000, 0x08000, CRC(a7a715ce) SHA1(38b93e05377d9cb816688f5070e847480f195c6b) )
 	ROM_CONTINUE(              0x10000, 0x08000 )
 	ROM_CONTINUE(              0x08000, 0x08000 )
 	ROM_CONTINUE(              0x18000, 0x08000 )
-	ROM_LOAD( "shark_n.3.u16", 0x20000, 0x08000, CRC(a7a715ce) SHA1(38b93e05377d9cb816688f5070e847480f195c6b) )
+	ROM_LOAD( "shark_n.2.u17", 0x20000, 0x08000, CRC(c27f3d0a) SHA1(77c8eb0322c5b9c89777cb080d26ecf9abe01ae7) )
 	ROM_CONTINUE(              0x30000, 0x08000 )
 	ROM_CONTINUE(              0x28000, 0x08000 )
 	ROM_CONTINUE(              0x38000, 0x08000 )
-
+	
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "shark(ii)-italy_4_ver1.0.u54", 0x00000, 0x20000, CRC(9f384c59) SHA1(d2b087b8370b40b6f0944de661ea6aebaebea06f) )
 
@@ -555,7 +594,6 @@ ROM_START( sharkpy )
 	ROM_LOAD( "n82s129an.u12", 0x100, 0x100, CRC(5a7a25ed) SHA1(eebd679195e6ea50f64f3c46cd06ee21a1550491) )
 	ROM_LOAD( "n82s129an.u13", 0x200, 0x100, CRC(0ef5f218) SHA1(a02cf266661385aa078563bd83240d36549c1cf0) )
 ROM_END
-
 /***************************************************************************
 
 Shark Party (alt)
@@ -596,16 +634,18 @@ Info by f205v (25/03/2008)
 
 ***************************************************************************/
 
+
 ROM_START( sharkpya )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "shark1.6.u18", 0x00000, 0x10000, CRC(365312a0) SHA1(de8370b1f35e8d071185d2e5f2fbd2fdf74c55ac) )
+	ROM_LOAD( "shark1.6.u18", 0x0a000, 0x6000, CRC(365312a0) SHA1(de8370b1f35e8d071185d2e5f2fbd2fdf74c55ac) )
+	ROM_CONTINUE(0x0000, 0xa000)
 
 	ROM_REGION( 0x40000, "tilemap", 0 )
-	ROM_LOAD( "shark_n.2.u17", 0x00000, 0x08000, CRC(c27f3d0a) SHA1(77c8eb0322c5b9c89777cb080d26ecf9abe01ae7) )
+	ROM_LOAD( "shark_n.3.u16", 0x00000, 0x08000, CRC(a7a715ce) SHA1(38b93e05377d9cb816688f5070e847480f195c6b) )
 	ROM_CONTINUE(              0x10000, 0x08000 )
 	ROM_CONTINUE(              0x08000, 0x08000 )
 	ROM_CONTINUE(              0x18000, 0x08000 )
-	ROM_LOAD( "shark_n.3.u16", 0x20000, 0x08000, CRC(a7a715ce) SHA1(38b93e05377d9cb816688f5070e847480f195c6b) )
+	ROM_LOAD( "shark_n.2.u17", 0x20000, 0x08000, CRC(c27f3d0a) SHA1(77c8eb0322c5b9c89777cb080d26ecf9abe01ae7) )
 	ROM_CONTINUE(              0x30000, 0x08000 )
 	ROM_CONTINUE(              0x28000, 0x08000 )
 	ROM_CONTINUE(              0x38000, 0x08000 )
@@ -811,11 +851,54 @@ ROM_START( crsbingo )
 	ROM_LOAD( "18cv8.u29", 0x155, 0x155, BAD_DUMP CRC(996e8f59) SHA1(630d9b91f6e8eda781061e2a8ff6fb0fecaf034c) )
 ROM_END
 
+static DRIVER_INIT( sharkpy )
+{
+//	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	unsigned char xors[8] = { 0x33, 0x55, 0x99, 0x55, 0x11, 0xCC, 0x00, 0x00 };
+	int i;
+	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
+	UINT8* region = memory_region(machine,"maincpu");
+	for (i=0;i<0x10000;i++)
+	{
+		if (i<0xa000)
+		{
+			decrypt[i] = region[i]^xors[i&7]^0xff;
+			if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,0,7,6,5,4);
+			if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
+			if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,4,3,6,5,0);
+			if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i],3,6,1,0,7,2,5,4);
+			if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
+			if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i],3,2,5,4,7,6,1,0);
+			if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i],7,6,1,4,3,2,5,0);
+			if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],3,6,1,4,7,2,5,0);
+		}
+		else
+		{
+			decrypt[i] = region[i];
+		}
+	}
+/*
+    {
+        FILE *fp;
+        char filename[256];
+        sprintf(filename,"dat_%s", machine->gamedrv->name);
+        fp=fopen(filename, "w+b");
+        if (fp)
+        {
+            fwrite(decrypt, 0x10000, 1, fp);
+            fclose(fp);
+        }
+    }
+*/
+	memcpy(region, decrypt, 0x10000);
+//	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypt);
+}
+
 
 GAME( 1990, victor5,  0,        victor5,  victor5,  0,        ROT0, "Subsino", "Victor 5",                  GAME_NOT_WORKING )
 GAME( 1990, victor21, 0,        victor21, victor5,  0,        ROT0, "Subsino", "Victor 21",                 GAME_NOT_WORKING )
 GAME( 1991, crsbingo, 0,        crsbingo, crsbingo, 0,        ROT0, "Subsino", "Cross Bingo",               GAME_NOT_WORKING )
-GAME( 1993, sharkpy,  0,        srider,   smoto,    0,        ROT0, "Subsino", "Shark Party",               GAME_NOT_WORKING )
-GAME( 1993, sharkpya, sharkpy,  srider,   smoto,    0,        ROT0, "Subsino", "Shark Party (alt)",         GAME_NOT_WORKING )
+GAME( 1993, sharkpy,  0,        sharkpy,  smoto,    sharkpy,  ROT0, "Subsino", "Shark Party",               GAME_NOT_WORKING ) // inputs?
+GAME( 1993, sharkpya, sharkpy,  sharkpy,  smoto,    sharkpy,  ROT0, "Subsino", "Shark Party (alt)",         GAME_NOT_WORKING ) // inputs?
 GAME( 1996, smoto20,  0,        srider,   smoto,    smoto20,  ROT0, "Subsino", "Super Rider (Italy, v2.0)", 0 )
 GAME( 1996, smoto16,  smoto20,  srider,   smoto,    smoto16,  ROT0, "Subsino", "Super Moto (Italy, v1.6)",  0 )
