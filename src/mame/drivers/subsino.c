@@ -75,7 +75,28 @@ static VIDEO_UPDATE( subsino )
 
 static PALETTE_INIT( subsino_2proms )
 {
-	// To be done (only 2 roms?)
+	int i,r,g,b,val;
+	int bit0,bit1,bit2;
+
+	for (i = 0; i < 256; i++)
+	{
+		val = (color_prom[i+0x100]) | (color_prom[i+0x000]<<4);
+
+		bit0 = 0;
+		bit1 = (val >> 6) & 0x01;
+		bit2 = (val >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (val >> 3) & 0x01;
+		bit1 = (val >> 4) & 0x01;
+		bit2 = (val >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (val >> 0) & 0x01;
+		bit1 = (val >> 1) & 0x01;
+		bit2 = (val >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
 }
 
 static PALETTE_INIT( subsino_3proms )
@@ -173,7 +194,7 @@ static ADDRESS_MAP_START( sharkpy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE( subsino_colorram_w ) AM_BASE_GENERIC( colorram )
 	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE_GENERIC( videoram )
 
-	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM //overlap unmapped regions
+	AM_RANGE( 0x00000, 0x0ffff ) AM_ROM //overlap unmapped regions
 ADDRESS_MAP_END
 
 
@@ -267,11 +288,6 @@ static INPUT_PORTS_START( smoto )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( victor5 )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( crsbingo )
-INPUT_PORTS_END
 
 /***************************************************************************
                                 Graphics Layout
@@ -397,7 +413,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( crsbingo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 3)	// Unknown CPU and clock
-	MDRV_CPU_PROGRAM_MAP(victor5_map)
+	MDRV_CPU_PROGRAM_MAP(sharkpy_map)
 	MDRV_CPU_IO_MAP(subsino_iomap)
 
 	/* video hardware */
@@ -422,7 +438,10 @@ static MACHINE_DRIVER_START( crsbingo )
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)	// unknown clock
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	// no OKI
+	// is there really no oki, or just no rom?
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_4_433619MHz / 4)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -466,7 +485,8 @@ Info by f205v (26/03/2008)
 
 ROM_START( victor5 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.u1", 0x00000, 0x10000, CRC(e3ada2fc) SHA1(eddb460dcb80a29fbbe3ed6c4733c75b892baf52) )
+	ROM_LOAD( "1.u1", 0xc000, 0x4000, CRC(e3ada2fc) SHA1(eddb460dcb80a29fbbe3ed6c4733c75b892baf52) )
+	ROM_CONTINUE(0x0000,0xc000)
 
 	ROM_REGION( 0x18000, "tilemap", 0 )
 	ROM_LOAD( "2.u24", 0x00000, 0x8000, CRC(1229e951) SHA1(1e548625bb60e2d6f52a376a0dea9e5709f94135) )
@@ -515,7 +535,8 @@ Info by f205v, Corrado Tomaselli (20/04/2008)
 
 ROM_START( victor21 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.u1", 0x00000, 0x10000, CRC(43999b2d) SHA1(7ce26fd332ffe35fd826a1a6166b228d4bc370b8) )
+	ROM_LOAD( "1.u1", 0x0c000, 0x4000, CRC(43999b2d) SHA1(7ce26fd332ffe35fd826a1a6166b228d4bc370b8) )
+	ROM_CONTINUE(0x0000,0xc000)
 
 	ROM_REGION( 0x18000, "tilemap", 0 )
 	ROM_LOAD( "2.u24", 0x00000, 0x8000, CRC(f1181b93) SHA1(53cd4d2ce13973495b51d911a4745a69a9784983) )
@@ -836,7 +857,8 @@ Info by f205v (14/12/2008)
 
 ROM_START( crsbingo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.u36", 0x00000, 0x10000, CRC(c5aff4eb) SHA1(74f06d7735975657fca9be5fff9e7d53f38fcd02) )
+	ROM_LOAD( "1.u36", 0x0c000, 0x4000, CRC(c5aff4eb) SHA1(74f06d7735975657fca9be5fff9e7d53f38fcd02) )
+	ROM_CONTINUE(0x0000,0xc000)
 
 	ROM_REGION( 0x20000, "tilemap", 0 )
 	ROM_LOAD( "2.u4",  0x00000, 0x10000, CRC(ce527722) SHA1(f3759cefab902259eb25f8d4be2fcafc1afd90b9) )
@@ -846,14 +868,139 @@ ROM_START( crsbingo )
 	ROM_LOAD( "82s129.u13", 0x000, 0x100, CRC(89c06859) SHA1(b98d5335f36ea3842086677aca47b605030d442f) )
 	ROM_LOAD( "82s129.u14", 0x100, 0x100, CRC(eaddb54f) SHA1(51fbf31e910a93315204a892d10bcf982a6ed099) )
 
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x155 * 2, "plds", 0 )
 	ROM_LOAD( "18cv8.u22", 0x000, 0x155, BAD_DUMP CRC(996e8f59) SHA1(630d9b91f6e8eda781061e2a8ff6fb0fecaf034c) )
 	ROM_LOAD( "18cv8.u29", 0x155, 0x155, BAD_DUMP CRC(996e8f59) SHA1(630d9b91f6e8eda781061e2a8ff6fb0fecaf034c) )
 ROM_END
 
+/****************************
+ Decryption
+****************************/
+
+void dump_decrypted(running_machine* machine, UINT8* decrypt)
+{
+    FILE *fp;
+    char filename[256];
+    sprintf(filename,"dat_%s", machine->gamedrv->name);
+    fp=fopen(filename, "w+b");
+    if (fp)
+    {
+        fwrite(decrypt, 0x10000, 1, fp);
+        fclose(fp);
+    }
+}
+
+static DRIVER_INIT( victor5 )
+{
+	unsigned char xors[8] = { 0x99, 0x99, 0x33, 0x44, 0xBB, 0x88, 0x88, 0xBB };
+
+	int i;
+	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
+	UINT8* region = memory_region(machine,"maincpu");
+	for (i=0;i<0x10000;i++)
+	{
+		if (i<0xc000)
+		{
+			decrypt[i] = region[i]^xors[i&7];
+
+			if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
+			if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
+			if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,0,3,6,1,4);
+			if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i],7,6,1,0,3,2,5,4);
+			if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,0,7,6,5,4);
+			if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
+			if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i],3,6,1,0,7,2,5,4);
+			if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,0,7,6,5,4);
+
+
+		}
+		else
+		{
+			decrypt[i] = region[i];
+		}
+	}
+
+	dump_decrypted(machine, decrypt);
+
+	memcpy(region, decrypt, 0x10000);
+}
+
+
+static DRIVER_INIT( victor21 )
+{
+	unsigned char xors[8] = { 0x44, 0xBB, 0x66, 0x44, 0xAA, 0x55, 0x88, 0x22 };
+
+
+
+	int i;
+	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
+	UINT8* region = memory_region(machine,"maincpu");
+	for (i=0;i<0x10000;i++)
+	{
+		if (i<0xc000)
+		{
+			decrypt[i] = region[i]^xors[i&7];
+
+			if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
+			if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
+			if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
+			if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
+			if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
+			if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
+			if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
+			if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
+
+		}
+		else
+		{
+			decrypt[i] = region[i];
+		}
+	}
+
+	dump_decrypted(machine, decrypt);
+
+	memcpy(region, decrypt, 0x10000);
+}
+
+static DRIVER_INIT( crsbingo )
+{
+	unsigned char xors[8] = { 0x44, 0x33, 0x33, 0x22, 0x55, 0xEE, 0xBB, 0x11 };
+
+	int i;
+	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
+	UINT8* region = memory_region(machine,"maincpu");
+	for (i=0;i<0x10000;i++)
+	{
+		if (i<0xc000)
+		{
+			decrypt[i] = region[i]^xors[i&7]^0xff;
+
+			if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
+			if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
+			if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i],3,2,5,0,7,6,1,4);
+			if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,0,3,6,1,4);
+			if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,0,3,2,1,4);
+			if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i],7,6,1,4,3,2,5,0);
+			if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
+			if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,0,7,6,5,4);
+		}
+		else
+		{
+			decrypt[i] = region[i];
+		}
+	}
+
+	dump_decrypted(machine, decrypt);
+
+	memcpy(region, decrypt, 0x10000);
+}
+
+
+
 static DRIVER_INIT( sharkpy )
 {
-//	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	unsigned char xors[8] = { 0x33, 0x55, 0x99, 0x55, 0x11, 0xCC, 0x00, 0x00 };
 	int i;
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
@@ -877,27 +1024,15 @@ static DRIVER_INIT( sharkpy )
 			decrypt[i] = region[i];
 		}
 	}
-/*
-    {
-        FILE *fp;
-        char filename[256];
-        sprintf(filename,"dat_%s", machine->gamedrv->name);
-        fp=fopen(filename, "w+b");
-        if (fp)
-        {
-            fwrite(decrypt, 0x10000, 1, fp);
-            fclose(fp);
-        }
-    }
-*/
+
+	dump_decrypted(machine, decrypt);
+
 	memcpy(region, decrypt, 0x10000);
-//	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypt);
 }
 
-
-GAME( 1990, victor5,  0,        victor5,  victor5,  0,        ROT0, "Subsino", "Victor 5",                  GAME_NOT_WORKING )
-GAME( 1990, victor21, 0,        victor21, victor5,  0,        ROT0, "Subsino", "Victor 21",                 GAME_NOT_WORKING )
-GAME( 1991, crsbingo, 0,        crsbingo, crsbingo, 0,        ROT0, "Subsino", "Cross Bingo",               GAME_NOT_WORKING )
+GAME( 1990, victor5,  0,        victor5,  smoto,    victor5,  ROT0, "Subsino", "Victor 5",                  GAME_NOT_WORKING )
+GAME( 1990, victor21, 0,        victor21, smoto,    victor21, ROT0, "Subsino", "Victor 21",                 GAME_NOT_WORKING )
+GAME( 1991, crsbingo, 0,        crsbingo, smoto,    crsbingo, ROT0, "Subsino", "Cross Bingo",               GAME_NOT_WORKING )
 GAME( 1993, sharkpy,  0,        sharkpy,  smoto,    sharkpy,  ROT0, "Subsino", "Shark Party (Italy, v1.3)", 0 ) // missing POST messages?
 GAME( 1993, sharkpya, sharkpy,  sharkpy,  smoto,    sharkpy,  ROT0, "Subsino", "Shark Party (Italy, v1.6)", 0 ) // missing POST messages?
 GAME( 1996, smoto20,  0,        srider,   smoto,    smoto20,  ROT0, "Subsino", "Super Rider (Italy, v2.0)", 0 )
