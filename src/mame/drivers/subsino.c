@@ -168,6 +168,7 @@ static ADDRESS_MAP_START( srider_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE_GENERIC( videoram )
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START( sharkpy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
@@ -194,16 +195,45 @@ static ADDRESS_MAP_START( sharkpy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE( subsino_colorram_w ) AM_BASE_GENERIC( colorram )
 	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE_GENERIC( videoram )
 
-	AM_RANGE( 0x00000, 0x0ffff ) AM_ROM //overlap unmapped regions
+	AM_RANGE( 0x00000, 0x13fff ) AM_ROM //overlap unmapped regions
 ADDRESS_MAP_END
 
-
+static READ8_HANDLER( flash_r )
+{
+	return 0xd9; /* weakest way to protect a game? It even says the exact value on screen? */
+}
 
 static ADDRESS_MAP_START( victor5_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM
-	AM_RANGE( 0x0c000, 0x0cfff ) AM_RAM
-	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE( subsino_colorram_w ) AM_BASE_GENERIC( colorram )
-	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE_GENERIC( videoram )
+	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
+
+	AM_RANGE( 0x09000, 0x09000 ) AM_READ_PORT( "DSW1" )
+	AM_RANGE( 0x09001, 0x09001 ) AM_READ_PORT( "DSW2" )
+	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "DSW3" )
+
+	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "DSW4" )
+	AM_RANGE( 0x09005, 0x09005 ) AM_READ_PORT( "INA" )
+	AM_RANGE( 0x09006, 0x09006 ) AM_READ_PORT( "INB" )
+
+//	AM_RANGE( 0x09009, 0x09009 ) AM_WRITE( subsino_out_b_w )
+//	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE( subsino_out_a_w )
+
+	AM_RANGE( 0x0900a, 0x0900a ) AM_READ( flash_r ) AM_WRITENOP
+//	AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
+
+	AM_RANGE( 0x0900e, 0x0900f ) AM_DEVWRITE( "ymsnd", ym2413_w )
+
+//	AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE( "oki", okim6295_w )
+
+	AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE( subsino_tiles_offset_w )
+
+	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
+	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE_GENERIC( videoram )
+	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE( subsino_colorram_w ) AM_BASE_GENERIC( colorram )
+
+	AM_RANGE( 0x00000, 0x8fff ) AM_ROM //overlap unmapped regions
+
+	AM_RANGE( 0x10000, 0x13fff ) AM_ROM //overlap unmapped regions
+
 ADDRESS_MAP_END
 
 
@@ -484,8 +514,8 @@ Info by f205v (26/03/2008)
 ***************************************************************************/
 
 ROM_START( victor5 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.u1", 0xc000, 0x4000, CRC(e3ada2fc) SHA1(eddb460dcb80a29fbbe3ed6c4733c75b892baf52) )
+	ROM_REGION( 0x14000, "maincpu", 0 )
+	ROM_LOAD( "1.u1", 0x10000, 0x4000, CRC(e3ada2fc) SHA1(eddb460dcb80a29fbbe3ed6c4733c75b892baf52) )
 	ROM_CONTINUE(0x0000,0xc000)
 
 	ROM_REGION( 0x18000, "tilemap", 0 )
@@ -534,14 +564,14 @@ Info by f205v, Corrado Tomaselli (20/04/2008)
 ***************************************************************************/
 
 ROM_START( victor21 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "1.u1", 0x0c000, 0x4000, CRC(43999b2d) SHA1(7ce26fd332ffe35fd826a1a6166b228d4bc370b8) )
 	ROM_CONTINUE(0x0000,0xc000)
 
 	ROM_REGION( 0x18000, "tilemap", 0 )
-	ROM_LOAD( "2.u24", 0x00000, 0x8000, CRC(f1181b93) SHA1(53cd4d2ce13973495b51d911a4745a69a9784983) )
+	ROM_LOAD( "2.u24", 0x10000, 0x8000, CRC(f1181b93) SHA1(53cd4d2ce13973495b51d911a4745a69a9784983) )
 	ROM_LOAD( "3.u25", 0x08000, 0x8000, CRC(437abb27) SHA1(bd3790807d60a41d58e07f60fb990553076d6e96) )
-	ROM_LOAD( "4.u26", 0x10000, 0x8000, CRC(e2f66eee) SHA1(ece924fe626f21fd7d31faabf19225d80e2bcfd3) )
+	ROM_LOAD( "4.u26", 0x00000, 0x8000, CRC(e2f66eee) SHA1(ece924fe626f21fd7d31faabf19225d80e2bcfd3) )
 
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE )
 	// rom socket is empty
@@ -592,7 +622,7 @@ Info by f205v (25/03/2008)
 ***************************************************************************/
 
 ROM_START( sharkpy )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "shark_n.1.u18", 0x0a000, 0x6000, CRC(25aeac2f) SHA1(d94e3e5cfffd150ac48e1463493a8323f42e7a89) ) // is this mapped correctly? - used during gameplay?
 	ROM_CONTINUE(0x0000, 0xa000)
 
@@ -657,7 +687,7 @@ Info by f205v (25/03/2008)
 
 
 ROM_START( sharkpya )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "shark1.6.u18", 0x0a000, 0x6000, CRC(365312a0) SHA1(de8370b1f35e8d071185d2e5f2fbd2fdf74c55ac) )
 	ROM_CONTINUE(0x0000, 0xa000)
 
@@ -856,8 +886,8 @@ Info by f205v (14/12/2008)
 ***************************************************************************/
 
 ROM_START( crsbingo )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.u36", 0x0c000, 0x4000, CRC(c5aff4eb) SHA1(74f06d7735975657fca9be5fff9e7d53f38fcd02) )
+	ROM_REGION( 0x14000, "maincpu", 0 )
+	ROM_LOAD( "1.u36", 0x10000, 0x4000, CRC(c5aff4eb) SHA1(74f06d7735975657fca9be5fff9e7d53f38fcd02) )
 	ROM_CONTINUE(0x0000,0xc000)
 
 	ROM_REGION( 0x20000, "tilemap", 0 )
@@ -906,13 +936,13 @@ static DRIVER_INIT( victor5 )
 			decrypt[i] = region[i]^xors[i&7];
 
 			if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
-			if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
-			if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,0,3,6,1,4);
-			if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i],7,6,1,0,3,2,5,4);
+			if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,0,3,2,1,4);
+			if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
+			if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
 			if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,0,7,6,5,4);
-			if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
+			if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,0,3,2,1,4);
 			if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i],3,6,1,0,7,2,5,4);
-			if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,0,7,6,5,4);
+			if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,4,3,6,5,0);
 
 
 		}
@@ -943,14 +973,14 @@ static DRIVER_INIT( victor21 )
 		{
 			decrypt[i] = region[i]^xors[i&7];
 
-			if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
-			if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
-			if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
-			if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
-			if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
-			if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
+			if ((i&7) == 0) decrypt[i] = BITSWAP8(decrypt[i],7,2,1,0,3,6,5,4);
+			if ((i&7) == 1) decrypt[i] = BITSWAP8(decrypt[i],3,6,1,4,7,2,5,0);
+			if ((i&7) == 2) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,4,7,6,5,0);
+			if ((i&7) == 3) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
+			if ((i&7) == 4) decrypt[i] = BITSWAP8(decrypt[i],7,2,5,4,3,6,1,0);
+			if ((i&7) == 5) decrypt[i] = BITSWAP8(decrypt[i],3,6,5,0,7,2,1,4);
 			if ((i&7) == 6) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
-			if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],7,6,5,4,3,2,1,0);
+			if ((i&7) == 7) decrypt[i] = BITSWAP8(decrypt[i],3,2,1,4,7,6,5,0);
 
 		}
 		else
@@ -998,7 +1028,6 @@ static DRIVER_INIT( crsbingo )
 }
 
 
-
 static DRIVER_INIT( sharkpy )
 {
 	unsigned char xors[8] = { 0x33, 0x55, 0x99, 0x55, 0x11, 0xCC, 0x00, 0x00 };
@@ -1029,6 +1058,7 @@ static DRIVER_INIT( sharkpy )
 
 	memcpy(region, decrypt, 0x10000);
 }
+
 
 GAME( 1990, victor5,  0,        victor5,  smoto,    victor5,  ROT0, "Subsino", "Victor 5",                  GAME_NOT_WORKING )
 GAME( 1990, victor21, 0,        victor21, smoto,    victor21, ROT0, "Subsino", "Victor 21",                 GAME_NOT_WORKING )
