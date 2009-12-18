@@ -198,24 +198,7 @@ static ADDRESS_MAP_START( sharkpy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x13fff ) AM_ROM //overlap unmapped regions
 ADDRESS_MAP_END
 
-/*
-Protection: this calculates the combinations of the screen.
-0x00 = you lose
-0x01 = royal flush
-0x02 = 5 of a kind
- ...
-0x0a = jacks of better
-
-0xd9 is asked at the POST, game refuses to run otherwise.
-
-Protection also calculates the prize count in-game? Not sure about this...
-*/
-static READ8_HANDLER( flash_r )
-{
-	return 0xd9;
-}
-
-static ADDRESS_MAP_START( victor5_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( victor21_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
 	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "INC" )
@@ -229,7 +212,6 @@ static ADDRESS_MAP_START( victor5_map, ADDRESS_SPACE_PROGRAM, 8 )
 //	AM_RANGE( 0x09009, 0x09009 ) AM_WRITE( subsino_out_b_w )
 //	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE( subsino_out_a_w )
 
-	AM_RANGE( 0x0900a, 0x0900a ) AM_READ( flash_r ) AM_WRITENOP
 //	AM_RANGE( 0x0900b, 0x0900b ) //"flash" status, bit 0
 //	AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
 
@@ -247,6 +229,62 @@ static ADDRESS_MAP_START( victor5_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x10000, 0x13fff ) AM_ROM //overlap unmapped regions
 
+ADDRESS_MAP_END
+
+
+/*
+Victor 5 has a protection device that calculates the combinations of the screen.
+0x00 = you lose
+0x01 = royal flush
+0x02 = 5 of a kind
+ ...
+0x0a = jacks of better
+
+0xd9 is asked at the POST, game refuses to run otherwise.
+
+The fun thing is that the main CPU actually calculates the combinations then it routes to this port
+thru packet writes, 0xd* starts the packet, 0xe* ends the packet.
+I'm fairly sure that this thing can do a lot more, the POST check makes me think that 0xd9 is actually a result of a RNG.
+For now we'll emulate the bare minimum to let this game to work, obviously we need tests/tracing on the real board to understand
+what it is exactly and what it can possibly do.
+*/
+
+static UINT8 flash_val,flash_packet,flash_packet_start;
+
+static READ8_HANDLER( flash_r )
+{
+//	printf("R %02x\n",flash_val);
+
+	if(flash_val == 0xff)
+		return 0xd9;
+	else if(flash_val <= 0xa)
+		return flash_val;
+	else
+		return 0xd9;
+}
+
+static WRITE8_HANDLER( flash_w )
+{
+	switch(flash_packet_start)
+	{
+		case 0:
+			flash_packet = data;
+			if(flash_packet == 0xd0 || flash_packet == 0xd2)
+				flash_packet_start = 1; //start of packet
+			break;
+		case 1:
+			flash_packet = data;
+			if(flash_packet == 0xe0 || flash_packet == 0xe2)
+				flash_packet_start = 0; //end of packet
+			else
+				flash_val = data;
+			break;
+	}
+}
+
+static ADDRESS_MAP_START( victor5_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_IMPORT_FROM( victor21_map )
+	AM_RANGE( 0x0900a, 0x0900a ) AM_READWRITE( flash_r, flash_w )
 ADDRESS_MAP_END
 
 
@@ -414,9 +452,9 @@ static INPUT_PORTS_START( victor5 )
 	PORT_START( "INA" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3 / Half Take")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / Small")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Big")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_BET )
 	PORT_DIPNAME( 0x80, 0x80, "INA" )
@@ -650,10 +688,10 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( victor5 )
+static MACHINE_DRIVER_START( victor21 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 3)	// 4 MHz?
-	MDRV_CPU_PROGRAM_MAP(victor5_map)
+	MDRV_CPU_PROGRAM_MAP(victor21_map)
 	MDRV_CPU_IO_MAP(subsino_iomap)
 
 	/* video hardware */
@@ -683,12 +721,13 @@ static MACHINE_DRIVER_START( victor5 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( victor21 )
+/* same but with an additional protection. */
+static MACHINE_DRIVER_START( victor5 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( victor5 )
-
-	//...
+	MDRV_IMPORT_FROM( victor21 )
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(victor5_map)
 MACHINE_DRIVER_END
 
 
@@ -1357,10 +1396,10 @@ static DRIVER_INIT( sharkpy )
 }
 
 
-GAME( 1990, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino", "Victor 5",                  GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1990, victor21, 0,        victor21, victor21, victor21, ROT0, "Subsino", "Victor 21",                 0 )
-GAME( 1991, crsbingo, 0,        crsbingo, smoto,    crsbingo, ROT0, "Subsino", "Cross Bingo",               GAME_NOT_WORKING )
-GAME( 1993, sharkpy,  0,        sharkpy,  smoto,    sharkpy,  ROT0, "Subsino", "Shark Party (Italy, v1.3)", 0 ) // missing POST messages?
-GAME( 1993, sharkpya, sharkpy,  sharkpy,  smoto,    sharkpy,  ROT0, "Subsino", "Shark Party (Italy, v1.6)", 0 ) // missing POST messages?
-GAME( 1996, smoto20,  0,        srider,   smoto,    smoto20,  ROT0, "Subsino", "Super Rider (Italy, v2.0)", 0 )
-GAME( 1996, smoto16,  smoto20,  srider,   smoto,    smoto16,  ROT0, "Subsino", "Super Moto (Italy, v1.6)",  0 )
+GAME( 1990, victor21, 0,        victor21, victor21, victor21, ROT0, "Subsino / Buffy", "Victor 21",                 0 )
+GAME( 1991, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino",         "Victor 5",                  0 )
+GAME( 1991, crsbingo, 0,        victor5,  victor5,  crsbingo, ROT0, "Subsino",         "Cross Bingo",               GAME_NOT_WORKING )
+GAME( 1996, sharkpy,  0,        sharkpy,  smoto,    sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)", 0 ) // missing POST messages?
+GAME( 1996, sharkpya, sharkpy,  sharkpy,  smoto,    sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)", 0 ) // missing POST messages?
+GAME( 1996, smoto20,  0,        srider,   smoto,    smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)", 0 )
+GAME( 1996, smoto16,  smoto20,  srider,   smoto,    smoto16,  ROT0, "Subsino",         "Super Moto (Italy, v1.6)",  0 )
