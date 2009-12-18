@@ -77,26 +77,26 @@ static INPUT_PORTS_START( hexa )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x00, "Naughty Pics" )
+	PORT_DIPNAME( 0x04, 0x00, "Naughty Pics" )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, "Difficulty?" )
+	PORT_DIPNAME( 0x30, 0x30, "Difficulty?" )  PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x30, "Easy?" )
 	PORT_DIPSETTING(    0x20, "Medium?" )
 	PORT_DIPSETTING(    0x10, "Hard?" )
 	PORT_DIPSETTING(    0x00, "Hardest?" )
-	PORT_DIPNAME( 0x40, 0x40, "Pobys" )
+	PORT_DIPNAME( 0x40, 0x40, "Pobys" )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -154,7 +154,7 @@ static MACHINE_DRIVER_START( hexa )
 	MDRV_DRIVER_DATA(hexa_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000)		/* 4 MHz ??????? */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* Imported from arkanoid - correct? */
 	MDRV_CPU_PROGRAM_MAP(hexa_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -178,7 +178,7 @@ static MACHINE_DRIVER_START( hexa )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
+	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_12MHz/4/2)	/* Imported from arkanoid - correct? */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
