@@ -2001,6 +2001,8 @@ MACHINE_START( n64 )
 	rspdrc_add_imem(cputag_get_cpu(machine, "rsp"), rsp_imem);
 	rspdrc_add_dmem(cputag_get_cpu(machine, "rsp"), rsp_dmem);
 	rspdrc_flush_drc_cache(cputag_get_cpu(machine, "rsp"));
+
+	audio_timer = timer_alloc(machine, audio_timer_callback, NULL);
 }
 
 MACHINE_RESET( n64 )
@@ -2060,7 +2062,6 @@ MACHINE_RESET( n64 )
 
 	cic_status = 0;
 
-	audio_timer = timer_alloc(machine, audio_timer_callback, NULL);
 	timer_adjust_oneshot(audio_timer, attotime_never, 0);
 
 	cputag_set_input_line(machine, "rsp", INPUT_LINE_HALT, ASSERT_LINE);

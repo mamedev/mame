@@ -31,7 +31,7 @@ static UINT8 portA_in,portA_out,ddrA;
 static UINT8 portB_in,portB_out,ddrB;
 static UINT8 portC_in,portC_out,ddrC;
 static UINT8 tdr,tcr;
-static emu_timer *mcu_timer;
+static const device_config *mcu_timer;
 
 /* Port A:
     0   (in)  DSW
@@ -147,14 +147,14 @@ static WRITE8_HANDLER( mcu_portC_ddr_w )
 	ddrC = data;
 }
 
-static TIMER_CALLBACK( mcu_timer_proc )
+static TIMER_DEVICE_CALLBACK( mcu_timer_proc )
 {
 	if ( --tdr == 0x00 )
 	{
 		if ( (tcr & 0x40) == 0 )
 		{
 			//timer interrupt!
-			generic_pulse_irq_line(cputag_get_cpu(machine, "mcu"), M68705_INT_TIMER);
+			generic_pulse_irq_line(cputag_get_cpu(timer->machine, "mcu"), M68705_INT_TIMER);
 		}
 	}
 }
@@ -202,7 +202,7 @@ static WRITE8_HANDLER( mcu_tcr_w )
 		}
 
 		period = attotime_mul(ATTOTIME_IN_HZ(3579545), divider);
-		timer_adjust_periodic( mcu_timer, period, 0, period);
+		timer_device_adjust_periodic( mcu_timer, period, 0, period);
 	}
 }
 
@@ -212,7 +212,7 @@ static MACHINE_RESET(supervisor_board)
 	portB_in = portB_out = ddrB	= 0;
 	portC_in = portC_out = ddrC	= 0;
 	tdr = tcr = 0;
-	mcu_timer = timer_alloc(machine,  mcu_timer_proc , NULL);
+	mcu_timer = devtag_get_device(machine, "mcu_timer");
 
 	output_set_lamp_value(0, 0);
 	output_set_lamp_value(1, 0);
@@ -437,6 +437,7 @@ static MACHINE_DRIVER_START( a600xl )
 	MDRV_CPU_PROGRAM_MAP(mcu_mem)
 
 	MDRV_PIA6821_ADD("pia", atarixl_pia_interface)
+	MDRV_TIMER_ADD("mcu_timer", mcu_timer_proc)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

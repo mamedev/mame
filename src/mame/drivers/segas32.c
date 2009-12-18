@@ -376,7 +376,7 @@ static UINT8 *z80_shared_ram;
 
 /* V60 interrupt controller */
 static UINT8 v60_irq_control[0x10];
-static emu_timer *v60_irq_timer[2];
+static const device_config *v60_irq_timer[2];
 
 /* sound interrupt controller */
 static UINT8 sound_irq_control[4];
@@ -403,7 +403,6 @@ static void (*system32_prot_vblank)(const device_config *device);
  *************************************/
 
 static void signal_v60_irq(running_machine *machine, int data);
-static TIMER_CALLBACK( signal_v60_irq_callback );
 static void signal_sound_irq(running_machine *machine, int which);
 
 
@@ -420,8 +419,8 @@ static MACHINE_RESET( system32 )
 	memset(v60_irq_control, 0xff, sizeof(v60_irq_control));
 
 	/* allocate timers */
-	v60_irq_timer[0] = timer_alloc(machine, signal_v60_irq_callback, NULL);
-	v60_irq_timer[1] = timer_alloc(machine, signal_v60_irq_callback, NULL);
+	v60_irq_timer[0] = devtag_get_device(machine, "v60_irq0");
+	v60_irq_timer[1] = devtag_get_device(machine, "v60_irq1");
 
 	/* clear IRQ lines */
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
@@ -467,9 +466,9 @@ static void signal_v60_irq(running_machine *machine, int which)
 }
 
 
-static TIMER_CALLBACK( signal_v60_irq_callback )
+static TIMER_DEVICE_CALLBACK( signal_v60_irq_callback )
 {
-	signal_v60_irq(machine, param);
+	signal_v60_irq(timer->machine, param);
 }
 
 
@@ -509,7 +508,7 @@ static void int_control_w(const address_space *space, int offset, UINT8 data)
 			if (duration)
 			{
 				attotime period = attotime_make(0, attotime_to_attoseconds(ATTOTIME_IN_HZ(TIMER_0_CLOCK)) * duration);
-				timer_adjust_oneshot(v60_irq_timer[0], period, MAIN_IRQ_TIMER0);
+				timer_device_adjust_oneshot(v60_irq_timer[0], period, MAIN_IRQ_TIMER0);
 			}
 			break;
 
@@ -520,7 +519,7 @@ static void int_control_w(const address_space *space, int offset, UINT8 data)
 			if (duration)
 			{
 				attotime period = attotime_make(0, attotime_to_attoseconds(ATTOTIME_IN_HZ(TIMER_1_CLOCK)) * duration);
-				timer_adjust_oneshot(v60_irq_timer[1], period, MAIN_IRQ_TIMER1);
+				timer_device_adjust_oneshot(v60_irq_timer[1], period, MAIN_IRQ_TIMER1);
 			}
 			break;
 
@@ -2189,6 +2188,9 @@ static MACHINE_DRIVER_START( system32 )
 
 	MDRV_MACHINE_RESET(system32)
 	MDRV_NVRAM_HANDLER(system32)
+
+	MDRV_TIMER_ADD("v60_irq0", signal_v60_irq_callback)
+	MDRV_TIMER_ADD("v60_irq1", signal_v60_irq_callback)
 
 	/* video hardware */
 	MDRV_GFXDECODE(segas32)

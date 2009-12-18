@@ -790,24 +790,24 @@ static UINT16 irq_timera;
 static UINT8  irq_timerb;
 static UINT8  irq_allow0, irq_allow1;
 static int    irq_timer_pend0, irq_timer_pend1, irq_yms, irq_vblank, irq_sprite;
-static emu_timer *irq_timer, *irq_timer_clear;
+static const device_config *irq_timer, *irq_timer_clear;
 
-static TIMER_CALLBACK( irq_timer_cb )
+static TIMER_DEVICE_CALLBACK( irq_timer_cb )
 {
 	irq_timer_pend0 = irq_timer_pend1 = 1;
 	if(irq_allow0 & (1 << IRQ_TIMER))
-		cputag_set_input_line(machine, "maincpu", IRQ_TIMER+1, ASSERT_LINE);
+		cputag_set_input_line(timer->machine, "maincpu", IRQ_TIMER+1, ASSERT_LINE);
 	if(irq_allow1 & (1 << IRQ_TIMER))
-		cputag_set_input_line(machine, "sub", IRQ_TIMER+1, ASSERT_LINE);
+		cputag_set_input_line(timer->machine, "sub", IRQ_TIMER+1, ASSERT_LINE);
 }
 
-static TIMER_CALLBACK( irq_timer_clear_cb )
+static TIMER_DEVICE_CALLBACK( irq_timer_clear_cb )
 {
 	irq_sprite = irq_vblank = 0;
-	cputag_set_input_line(machine, "maincpu", IRQ_VBLANK+1, CLEAR_LINE);
-	cputag_set_input_line(machine, "maincpu", IRQ_SPRITE+1, CLEAR_LINE);
-	cputag_set_input_line(machine, "sub", IRQ_VBLANK+1, CLEAR_LINE);
-	cputag_set_input_line(machine, "sub", IRQ_SPRITE+1, CLEAR_LINE);
+	cputag_set_input_line(timer->machine, "maincpu", IRQ_VBLANK+1, CLEAR_LINE);
+	cputag_set_input_line(timer->machine, "maincpu", IRQ_SPRITE+1, CLEAR_LINE);
+	cputag_set_input_line(timer->machine, "sub", IRQ_VBLANK+1, CLEAR_LINE);
+	cputag_set_input_line(timer->machine, "sub", IRQ_SPRITE+1, CLEAR_LINE);
 }
 
 static void irq_init(running_machine *machine)
@@ -820,8 +820,8 @@ static void irq_init(running_machine *machine)
 	irq_timer_pend1 = 0;
 	irq_vblank = 0;
 	irq_sprite = 0;
-	irq_timer = timer_alloc(machine, irq_timer_cb, NULL);
-	irq_timer_clear = timer_alloc(machine, irq_timer_clear_cb, NULL);
+	irq_timer = devtag_get_device(machine, "irq_timer");
+	irq_timer_clear = devtag_get_device(machine, "irq_timer_clear");
 }
 
 static void irq_timer_reset(void)
@@ -829,7 +829,7 @@ static void irq_timer_reset(void)
 	int freq = (irq_timerb << 12) | irq_timera;
 	freq &= 0x1fff;
 
-	timer_adjust_periodic(irq_timer, ATTOTIME_IN_HZ(freq), 0, ATTOTIME_IN_HZ(freq));
+	timer_device_adjust_periodic(irq_timer, ATTOTIME_IN_HZ(freq), 0, ATTOTIME_IN_HZ(freq));
 	logerror("New timer frequency: %0d [%02x %04x]\n", freq, irq_timerb, irq_timera);
 }
 
@@ -916,7 +916,7 @@ static INTERRUPT_GEN(irq_vbl)
 		irq_vblank = 1;
 	}
 
-	timer_adjust_oneshot(irq_timer_clear, ATTOTIME_IN_HZ(VIDEO_CLOCK/2/656.0), 0);
+	timer_device_adjust_oneshot(irq_timer_clear, ATTOTIME_IN_HZ(VIDEO_CLOCK/2/656.0), 0);
 
 	mask = 1 << irq;
 
@@ -1786,6 +1786,9 @@ static MACHINE_DRIVER_START( system24 )
 
 	MDRV_MACHINE_START(system24)
 	MDRV_MACHINE_RESET(system24)
+
+	MDRV_TIMER_ADD("irq_timer", irq_timer_cb)
+	MDRV_TIMER_ADD("irq_timer_clear", irq_timer_clear_cb)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 

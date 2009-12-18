@@ -55,7 +55,7 @@ static UINT8 timer_irq_state;
 
 static UINT16 *backupram;
 
-static emu_timer *interrupt_timer;
+static const device_config *interrupt_timer;
 
 
 
@@ -133,7 +133,7 @@ static void update_main_irqs(running_machine *machine)
 
 static int irq2_scanline = 170;
 
-static TIMER_CALLBACK( scanline_callback )
+static TIMER_DEVICE_CALLBACK( scanline_callback )
 {
 	int scanline = param;
 
@@ -166,10 +166,10 @@ static TIMER_CALLBACK( scanline_callback )
 	}
 
 	/* update IRQs on the main CPU */
-	update_main_irqs(machine);
+	update_main_irqs(timer->machine);
 
 	/* come back at the next appropriate scanline */
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_device_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(timer->machine->primary_screen, scanline, 0), scanline);
 
 #if TWEAK_IRQ2_SCANLINE
 	if (scanline == 223)
@@ -177,10 +177,10 @@ static TIMER_CALLBACK( scanline_callback )
 		int old = irq2_scanline;
 
 		/* Q = -10 scanlines, W = -1 scanline, E = +1 scanline, R = +10 scanlines */
-		if (input_code_pressed(machine, KEYCODE_Q)) { while (input_code_pressed(machine, KEYCODE_Q)) ; irq2_scanline -= 10; }
-		if (input_code_pressed(machine, KEYCODE_W)) { while (input_code_pressed(machine, KEYCODE_W)) ; irq2_scanline -= 1; }
-		if (input_code_pressed(machine, KEYCODE_E)) { while (input_code_pressed(machine, KEYCODE_E)) ; irq2_scanline += 1; }
-		if (input_code_pressed(machine, KEYCODE_R)) { while (input_code_pressed(machine, KEYCODE_R)) ; irq2_scanline += 10; }
+		if (input_code_pressed(timer->machine, KEYCODE_Q)) { while (input_code_pressed(timer->machine, KEYCODE_Q)) ; irq2_scanline -= 10; }
+		if (input_code_pressed(timer->machine, KEYCODE_W)) { while (input_code_pressed(timer->machine, KEYCODE_W)) ; irq2_scanline -= 1; }
+		if (input_code_pressed(timer->machine, KEYCODE_E)) { while (input_code_pressed(timer->machine, KEYCODE_E)) ; irq2_scanline += 1; }
+		if (input_code_pressed(timer->machine, KEYCODE_R)) { while (input_code_pressed(timer->machine, KEYCODE_R)) ; irq2_scanline += 10; }
 		if (old != irq2_scanline)
 			popmessage("scanline = %d", irq2_scanline);
 	}
@@ -188,15 +188,19 @@ static TIMER_CALLBACK( scanline_callback )
 }
 
 
-static MACHINE_RESET( yboard )
+static MACHINE_START( yboard )
 {
-    interrupt_timer = timer_alloc(machine, scanline_callback, NULL);
-    timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 223, 0), 223);
-
 	state_save_register_global_array(machine, misc_io_data);
 	state_save_register_global_array(machine, analog_data);
 	state_save_register_global(machine, vblank_irq_state);
 	state_save_register_global(machine, timer_irq_state);
+}
+
+
+static MACHINE_RESET( yboard )
+{
+    interrupt_timer = devtag_get_device(machine, "int_timer");
+    timer_device_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 223, 0), 223);
 }
 
 
@@ -980,9 +984,12 @@ static MACHINE_DRIVER_START( yboard )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(sound_portmap)
 
+	MDRV_MACHINE_START(yboard)
 	MDRV_MACHINE_RESET(yboard)
 	MDRV_NVRAM_HANDLER(yboard)
 	MDRV_QUANTUM_TIME(HZ(6000))
+
+    MDRV_TIMER_ADD("int_timer", scanline_callback)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

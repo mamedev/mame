@@ -96,6 +96,22 @@ WRITE8_HANDLER( cinemat_sound_control_w )
  *
  *************************************/
 
+static MACHINE_START( generic )
+{
+    /* register for save states */
+    state_save_register_global(machine, sound_control);
+    state_save_register_global(machine, current_shift);
+    state_save_register_global(machine, last_shift);
+    state_save_register_global(machine, last_shift2);
+    state_save_register_global(machine, current_pitch);
+    state_save_register_global(machine, last_frame);
+    state_save_register_global_array(machine, sound_fifo);
+    state_save_register_global(machine, sound_fifo_in);
+    state_save_register_global(machine, sound_fifo_out);
+    state_save_register_global(machine, last_portb_write);
+}
+
+
 static void generic_init(running_machine *machine, void (*callback)(running_machine *,UINT8, UINT8))
 {
 	/* call the standard init */
@@ -117,18 +133,6 @@ static void generic_init(running_machine *machine, void (*callback)(running_mach
 
 	/* reset Star Castle pitch */
     current_pitch = 0x10000;
-
-    /* register for save states */
-    state_save_register_global(machine, sound_control);
-    state_save_register_global(machine, current_shift);
-    state_save_register_global(machine, last_shift);
-    state_save_register_global(machine, last_shift2);
-    state_save_register_global(machine, current_pitch);
-    state_save_register_global(machine, last_frame);
-    state_save_register_global_array(machine, sound_fifo);
-    state_save_register_global(machine, sound_fifo_in);
-    state_save_register_global(machine, sound_fifo_out);
-    state_save_register_global(machine, last_portb_write);
 }
 
 
@@ -206,6 +210,7 @@ static MACHINE_RESET( spacewar )
 }
 
 MACHINE_DRIVER_START( spacewar_sound )
+	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(spacewar)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -261,6 +266,7 @@ static MACHINE_RESET( barrier )
 }
 
 MACHINE_DRIVER_START( barrier_sound )
+	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(barrier)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -321,6 +327,7 @@ static MACHINE_RESET( speedfrk )
 }
 
 MACHINE_DRIVER_START( speedfrk_sound )
+	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(speedfrk)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -397,6 +404,7 @@ static MACHINE_RESET( starhawk )
 }
 
 MACHINE_DRIVER_START( starhawk_sound )
+	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(starhawk)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -467,6 +475,7 @@ static MACHINE_RESET( sundance )
 }
 
 MACHINE_DRIVER_START( sundance_sound )
+	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(sundance)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -556,6 +565,7 @@ static MACHINE_RESET( tailg )
 }
 
 MACHINE_DRIVER_START( tailg_sound )
+	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(tailg)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -625,6 +635,7 @@ static MACHINE_RESET( warrior )
 }
 
 MACHINE_DRIVER_START( warrior_sound )
+	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(warrior)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -720,6 +731,7 @@ static MACHINE_RESET( armora )
 }
 
 MACHINE_DRIVER_START( armora_sound )
+	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(armora)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -812,6 +824,7 @@ static MACHINE_RESET( ripoff )
 }
 
 MACHINE_DRIVER_START( ripoff_sound )
+	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(ripoff)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -925,6 +938,7 @@ static MACHINE_RESET( starcas )
 }
 
 MACHINE_DRIVER_START( starcas_sound )
+	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(starcas)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1061,6 +1075,7 @@ static MACHINE_RESET( solarq )
 }
 
 MACHINE_DRIVER_START( solarq_sound )
+	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(solarq)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1196,6 +1211,7 @@ static MACHINE_RESET( boxingb )
 }
 
 MACHINE_DRIVER_START( boxingb_sound )
+	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(boxingb)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1309,6 +1325,7 @@ static MACHINE_RESET( wotw )
 }
 
 MACHINE_DRIVER_START( wotw_sound )
+	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(wotw)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1422,6 +1439,7 @@ static MACHINE_RESET( wotwc )
 }
 
 MACHINE_DRIVER_START( wotwc_sound )
+	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(wotwc)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1577,6 +1595,7 @@ MACHINE_DRIVER_START( demon_sound )
 
 	MDRV_Z80CTC_ADD("ctc", 3579545 /* same as "audiocpu" */, demon_z80ctc_interface)
 
+	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(demon_sound)
 
 	/* sound hardware */

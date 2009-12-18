@@ -163,10 +163,10 @@ static int megadrive_region_pal;
 static int megadrive_max_hposition;
 
 
-static emu_timer* frame_timer;
-static emu_timer* scanline_timer;
-static emu_timer* irq6_on_timer;
-static emu_timer* irq4_on_timer;
+static const device_config* frame_timer;
+static const device_config* scanline_timer;
+static const device_config* irq6_on_timer;
+static const device_config* irq4_on_timer;
 static bitmap_t* render_bitmap;
 //emu_timer* vblankirq_off_timer;
 
@@ -3838,7 +3838,7 @@ VIDEO_UPDATE(megadriv)
 //  int xxx;
 	/* reference */
 
-//  time_elapsed_since_crap = timer_timeelapsed(frame_timer);
+//  time_elapsed_since_crap = timer_device_timeelapsed(frame_timer);
 //  xxx = cputag_attotime_to_clocks(screen->machine, "maincpu", time_elapsed_since_crap);
 //  mame_printf_debug("update cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.attoseconds>>32),(UINT32)(time_elapsed_since_crap.attoseconds&0xffffffff));
 
@@ -3847,7 +3847,7 @@ VIDEO_UPDATE(megadriv)
 
 
 
-static TIMER_CALLBACK( frame_timer_callback )
+static TIMER_DEVICE_CALLBACK( frame_timer_callback )
 {
 	/* callback */
 }
@@ -5383,7 +5383,7 @@ INLINE UINT16 get_hposition(void)
 	attotime time_elapsed_since_scanline_timer;
 	UINT16 value4;
 
-	time_elapsed_since_scanline_timer = timer_timeelapsed(scanline_timer);
+	time_elapsed_since_scanline_timer = timer_device_timeelapsed(scanline_timer);
 
 	if (time_elapsed_since_scanline_timer.attoseconds<(ATTOSECONDS_PER_SECOND/megadriv_framerate /megadrive_total_scanlines))
 	{
@@ -5671,24 +5671,24 @@ INLINE UINT16 get_hposition(void)
 
 static int irq4counter;
 
-static emu_timer* render_timer;
+static const device_config* render_timer;
 
-static TIMER_CALLBACK( render_timer_callback )
+static TIMER_DEVICE_CALLBACK( render_timer_callback )
 {
 	if (genesis_scanline_counter>=0 && genesis_scanline_counter<megadrive_visible_scanlines)
 	{
-		genesis_render_scanline(machine, genesis_scanline_counter);
+		genesis_render_scanline(timer->machine, genesis_scanline_counter);
 	}
 }
 
 
-static TIMER_CALLBACK( scanline_timer_callback )
+static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 {
 	/* This function is called at the very start of every scanline starting at the very
        top-left of the screen.  The first scanline is scanline 0 (we set scanline to -1 in
        VIDEO_EOF) */
 
-	timer_call_after_resynch(machine, NULL, 0, 0);
+	timer_call_after_resynch(timer->machine, NULL, 0, 0);
 	/* Compensate for some rounding errors
 
        When the counter reaches 261 we should have reached the end of the frame, however due
@@ -5700,13 +5700,13 @@ static TIMER_CALLBACK( scanline_timer_callback )
 	{
 		genesis_scanline_counter++;
 //      mame_printf_debug("scanline %d\n",genesis_scanline_counter);
-		timer_adjust_oneshot(scanline_timer, attotime_div(ATTOTIME_IN_HZ(megadriv_framerate), megadrive_total_scanlines), 0);
-		timer_adjust_oneshot(render_timer, ATTOTIME_IN_USEC(1), 0);
+		timer_device_adjust_oneshot(scanline_timer, attotime_div(ATTOTIME_IN_HZ(megadriv_framerate), megadrive_total_scanlines), 0);
+		timer_device_adjust_oneshot(render_timer, ATTOTIME_IN_USEC(1), 0);
 
 		if (genesis_scanline_counter==megadrive_irq6_scanline )
 		{
 		//  mame_printf_debug("x %d",genesis_scanline_counter);
-			timer_adjust_oneshot(irq6_on_timer,  ATTOTIME_IN_USEC(6), 0);
+			timer_device_adjust_oneshot(irq6_on_timer,  ATTOTIME_IN_USEC(6), 0);
 			megadrive_irq6_pending = 1;
 			megadrive_vblank_flag = 1;
 
@@ -5743,7 +5743,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 
 				if (MEGADRIVE_REG0_IRQ4_ENABLE)
 				{
-					timer_adjust_oneshot(irq4_on_timer,  ATTOTIME_IN_USEC(1), 0);
+					timer_device_adjust_oneshot(irq4_on_timer,  ATTOTIME_IN_USEC(1), 0);
 					//mame_printf_debug("irq4 on scanline %d reload %d\n",genesis_scanline_counter,MEGADRIVE_REG0A_HINT_VALUE);
 				}
 			}
@@ -5754,21 +5754,21 @@ static TIMER_CALLBACK( scanline_timer_callback )
 			else irq4counter=MEGADRIVE_REG0A_HINT_VALUE;
 		}
 
-		//if (genesis_scanline_counter==0) timer_adjust_oneshot(irq4_on_timer,  ATTOTIME_IN_USEC(2), 0);
+		//if (genesis_scanline_counter==0) timer_device_adjust_oneshot(irq4_on_timer,  ATTOTIME_IN_USEC(2), 0);
 
 
 
 
-		if (cputag_get_cpu(machine, "genesis_snd_z80") != NULL)
+		if (cputag_get_cpu(timer->machine, "genesis_snd_z80") != NULL)
 		{
 			if (genesis_scanline_counter == megadrive_z80irq_scanline)
 			{
 				if ((genz80.z80_has_bus == 1) && (genz80.z80_is_reset == 0))
-					cputag_set_input_line(machine, "genesis_snd_z80", 0, HOLD_LINE);
+					cputag_set_input_line(timer->machine, "genesis_snd_z80", 0, HOLD_LINE);
 			}
 			if (genesis_scanline_counter == megadrive_z80irq_scanline + 1)
 			{
-				cputag_set_input_line(machine, "genesis_snd_z80", 0, CLEAR_LINE);
+				cputag_set_input_line(timer->machine, "genesis_snd_z80", 0, CLEAR_LINE);
 			}
 		}
 
@@ -5780,21 +5780,21 @@ static TIMER_CALLBACK( scanline_timer_callback )
 
 }
 
-static TIMER_CALLBACK( irq6_on_callback )
+static TIMER_DEVICE_CALLBACK( irq6_on_callback )
 {
 	//mame_printf_debug("irq6 active on %d\n",genesis_scanline_counter);
 
 	{
 //      megadrive_irq6_pending = 1;
 		if (MEGADRIVE_REG01_IRQ6_ENABLE || genesis_always_irq6)
-			cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE);
+			cputag_set_input_line(timer->machine, "maincpu", 6, HOLD_LINE);
 	}
 }
 
-static TIMER_CALLBACK( irq4_on_callback )
+static TIMER_DEVICE_CALLBACK( irq4_on_callback )
 {
 	//mame_printf_debug("irq4 active on %d\n",genesis_scanline_counter);
-	cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
+	cputag_set_input_line(timer->machine, "maincpu", 4, HOLD_LINE);
 }
 
 /*****************************************************************************************/
@@ -5855,15 +5855,15 @@ MACHINE_RESET( megadriv )
 
 	megadrive_init_io(machine);
 
-	frame_timer = timer_alloc(machine, frame_timer_callback, NULL);
-	scanline_timer = timer_alloc(machine, scanline_timer_callback, NULL);
-	render_timer = timer_alloc(machine, render_timer_callback, NULL);
+	frame_timer = devtag_get_device(machine, "frame_timer");
+	scanline_timer = devtag_get_device(machine, "scanline_timer");
+	render_timer = devtag_get_device(machine, "render_timer");
 
-	irq6_on_timer = timer_alloc(machine, irq6_on_callback, NULL);
-	irq4_on_timer = timer_alloc(machine, irq4_on_callback, NULL);
+	irq6_on_timer = devtag_get_device(machine, "irq6_timer");
+	irq4_on_timer = devtag_get_device(machine, "irq4_timer");
 
-	timer_adjust_oneshot(frame_timer, attotime_zero, 0);
-	timer_adjust_oneshot(scanline_timer, attotime_zero, 0);
+	timer_device_adjust_oneshot(frame_timer, attotime_zero, 0);
+	timer_device_adjust_oneshot(scanline_timer, attotime_zero, 0);
 
 	if (genesis_other_hacks)
 	{
@@ -5902,7 +5902,7 @@ MACHINE_RESET( megadriv )
 
 void megadriv_stop_scanline_timer(void)
 {
-	timer_adjust_oneshot(scanline_timer,  attotime_never, 0);
+	timer_device_adjust_oneshot(scanline_timer,  attotime_never, 0);
 }
 
 /*
@@ -6014,14 +6014,14 @@ int megadrive_z80irq_hpos = 320;
 	//  /* reference */
 		frametime = ATTOSECONDS_PER_SECOND/megadriv_framerate;
 
-		//time_elapsed_since_crap = timer_timeelapsed(frame_timer);
+		//time_elapsed_since_crap = timer_device_timeelapsed(frame_timer);
 		//xxx = cputag_attotime_to_clocks(machine, "maincpu",time_elapsed_since_crap);
 		//mame_printf_debug("---------- cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.attoseconds>>32),(UINT32)(time_elapsed_since_crap.attoseconds&0xffffffff));
 		//mame_printf_debug("---------- framet %d, %08x %08x\n",xxx, (UINT32)(frametime>>32),(UINT32)(frametime&0xffffffff));
-		timer_adjust_oneshot(frame_timer,  attotime_zero, 0);
+		timer_device_adjust_oneshot(frame_timer,  attotime_zero, 0);
 	}
 
-	timer_adjust_oneshot(scanline_timer,  attotime_zero, 0);
+	timer_device_adjust_oneshot(scanline_timer,  attotime_zero, 0);
 
 }
 
@@ -6066,6 +6066,12 @@ MACHINE_DRIVER_START( megadriv )
 
 	MDRV_MACHINE_RESET(megadriv)
 
+	MDRV_TIMER_ADD("frame_timer", frame_timer_callback)
+	MDRV_TIMER_ADD("scanline_timer", scanline_timer_callback)
+	MDRV_TIMER_ADD("render_timer", render_timer_callback)
+	MDRV_TIMER_ADD("irq6_timer", irq6_on_callback)
+	MDRV_TIMER_ADD("irq4_timer", irq4_on_callback)
+
 	MDRV_SCREEN_ADD("megadriv", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -6109,6 +6115,12 @@ MACHINE_DRIVER_START( megadpal )
 	/* IRQ handled via the timers */
 
 	MDRV_MACHINE_RESET(megadriv)
+
+	MDRV_TIMER_ADD("frame_timer", frame_timer_callback)
+	MDRV_TIMER_ADD("scanline_timer", scanline_timer_callback)
+	MDRV_TIMER_ADD("render_timer", render_timer_callback)
+	MDRV_TIMER_ADD("irq6_timer", irq6_on_callback)
+	MDRV_TIMER_ADD("irq4_timer", irq4_on_callback)
 
 	MDRV_SCREEN_ADD("megadriv", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)

@@ -276,7 +276,6 @@ static UINT8 color_ram[0x0400];
 static UINT16 p1, p2;
 static UINT8 t0_latch;
 static UINT16 n_offs;
-static emu_timer *t1_timer;
 
 static UINT8 vp_sound_p2;
 static UINT8 p24_data;
@@ -856,7 +855,7 @@ static WRITE8_DEVICE_HANDLER(baby_sound_p3_w)
 }
 
 
-static TIMER_CALLBACK(sound_t1_callback)
+static TIMER_DEVICE_CALLBACK(sound_t1_callback)
 {
 	if (te_40103 == 1)
 	{
@@ -864,7 +863,7 @@ static TIMER_CALLBACK(sound_t1_callback)
 
 		if (dc_40103 == 0)
 		{
-			cputag_set_input_line(machine, "soundcpu", 0, ASSERT_LINE);
+			cputag_set_input_line(timer->machine, "soundcpu", 0, ASSERT_LINE);
 		}
 	}
 }
@@ -1136,8 +1135,6 @@ static MACHINE_START(videopkr)
 	p1 = 0xff;
 	ant_cio = 0;
 	count0 = 0;
-	t1_timer = timer_alloc(machine, sound_t1_callback, NULL);
-	timer_adjust_periodic(t1_timer, attotime_zero, 0, ATTOTIME_IN_HZ(50));	/* 50Hz. */
 }
 
 static const ay8910_interface ay8910_config =
@@ -1169,6 +1166,8 @@ static MACHINE_DRIVER_START( videopkr )
 	MDRV_CPU_IO_MAP(i8039_sound_port)
 	MDRV_MACHINE_START(videopkr)
 	MDRV_NVRAM_HANDLER(videopkr)
+
+	MDRV_TIMER_ADD_PERIODIC("t1_timer", sound_t1_callback, HZ(50))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

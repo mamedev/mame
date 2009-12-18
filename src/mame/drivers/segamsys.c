@@ -1601,7 +1601,7 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 			}
 			else
 			{
-				memory_install_read_bank(space, 0x0000, 0xbfff, 0, 0, "bank5");
+				memory_install_rom(space, 0x0000, 0xbfff, 0, 0, sms_rom);
 				memory_unmap_write(space, 0x0000, 0xbfff, 0, 0);
 			}
 
@@ -1674,15 +1674,13 @@ void megatech_set_genz80_as_sms_standard_map(running_machine *machine, const cha
 
 	megatech_set_genz80_as_sms_standard_ports(machine,  tag);
 
+	/* fixed rom bank area */
+	sms_rom = memory_install_rom(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, NULL);
+
+	memcpy(sms_rom, memory_region(machine, "maincpu"), 0xc000);
+
 	if (mapper == MAPPER_STANDARD )
 	{
-		/* fixed rom bank area */
-		sms_rom = auto_alloc_array(machine, UINT8, 0x400000);
-		memory_install_read_bank(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, "bank5");
-		memory_unmap_write(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0);
-		memory_set_bankptr(machine,  "bank5", sms_rom );
-
-		memcpy(sms_rom, memory_region(machine, "maincpu"), 0x400000);
 
 
 		memory_install_write8_handler(cputag_get_address_space(machine, tag, ADDRESS_SPACE_PROGRAM), 0xfffc, 0xffff, 0, 0, mt_sms_standard_rom_bank_w);
@@ -1690,14 +1688,6 @@ void megatech_set_genz80_as_sms_standard_map(running_machine *machine, const cha
 	}
 	else if (mapper == MAPPER_CODEMASTERS )
 	{
-		/* fixed rom bank area */
-		sms_rom = auto_alloc_array(machine, UINT8, 0xc000);
-		memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, "bank5");
-		memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0);
-		memory_set_bankptr(machine,  "bank5", sms_rom );
-
-		memcpy(sms_rom, memory_region(machine, "maincpu"), 0xc000);
-
 		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x0000, 0, 0, codemasters_rom_bank_0000_w);
 		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x4000, 0, 0, codemasters_rom_bank_4000_w);
 		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x8000, 0, 0, codemasters_rom_bank_8000_w);

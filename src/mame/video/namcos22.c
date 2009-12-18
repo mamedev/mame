@@ -837,16 +837,7 @@ MallocSceneNode( running_machine *machine )
    }
    else
    {
-#define SCENE_NODE_POOL_SIZE 64
-		struct SceneNode *pSceneNodePool = auto_alloc_array(machine, struct SceneNode, SCENE_NODE_POOL_SIZE);
-		{
-			int i;
-			for( i=0; i<SCENE_NODE_POOL_SIZE; i++ )
-			{
-				FreeSceneNode( &pSceneNodePool[i] );
-			}
-			return MallocSceneNode(machine);
-		}
+   	  node = alloc_or_die(struct SceneNode);
    }
    memset( node, 0, sizeof(*node) );
    return node;
@@ -2208,6 +2199,13 @@ static void namcos22_reset(running_machine *machine)
 
 static void namcos22_exit(running_machine *machine)
 {
+	while (mpFreeSceneNode != NULL)
+	{
+		struct SceneNode *node = mpFreeSceneNode;
+		mpFreeSceneNode = node->nextInBucket;
+		free(node);
+	}
+
 	poly_free(poly);
 }
 
