@@ -86,7 +86,7 @@ INLINE scmp_state *get_safe_token(const device_config *device)
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == CPU);
-	assert(cpu_get_type(device) == CPU_SCMP);
+	assert(cpu_get_type(device) == CPU_SCMP || cpu_get_type(device) == CPU_INS8060);
 	return (scmp_state *)device->token;
 }
 
