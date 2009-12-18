@@ -723,7 +723,7 @@ Info by f205v, Corrado Tomaselli (20/04/2008)
 
 ROM_START( victor21 )
 	ROM_REGION( 0x14000, "maincpu", 0 )
-	ROM_LOAD( "1.u1", 0x0c000, 0x4000, CRC(43999b2d) SHA1(7ce26fd332ffe35fd826a1a6166b228d4bc370b8) )
+	ROM_LOAD( "1.u1", 0x10000, 0x4000, CRC(43999b2d) SHA1(7ce26fd332ffe35fd826a1a6166b228d4bc370b8) )
 	ROM_CONTINUE(0x0000,0xc000)
 
 	ROM_REGION( 0x18000, "tilemap", 0 )
