@@ -452,7 +452,7 @@ static INTERRUPT_GEN( vendetta_irq )
 
 static const k052109_interface vendetta_k052109_intf =
 {
-	"gfx1",
+	"gfx1", 0,
 	NORMAL_PLANE_ORDER,
 	KONAMI_ROM_DEINTERLEAVE_2,
 	vendetta_tile_callback
@@ -460,7 +460,7 @@ static const k052109_interface vendetta_k052109_intf =
 
 static const k052109_interface esckids_k052109_intf =
 {
-	"gfx1",
+	"gfx1", 0,
 	NORMAL_PLANE_ORDER,
 	KONAMI_ROM_DEINTERLEAVE_2,
 	esckids_tile_callback
@@ -469,7 +469,7 @@ static const k052109_interface esckids_k052109_intf =
 static const k053247_interface vendetta_k053246_intf =
 {
 	"screen",
-	"gfx2",
+	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	53, 6,
 	KONAMI_ROM_DEINTERLEAVE_4,
@@ -479,7 +479,7 @@ static const k053247_interface vendetta_k053246_intf =
 static const k053247_interface esckids_k053246_intf =
 {
 	"screen",
-	"gfx2",
+	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	101, 6,
 	KONAMI_ROM_DEINTERLEAVE_4,

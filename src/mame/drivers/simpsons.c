@@ -264,7 +264,7 @@ static INTERRUPT_GEN( simpsons_irq )
 
 static const k052109_interface simpsons_k052109_intf =
 {
-	"gfx1",
+	"gfx1", 0,
 	NORMAL_PLANE_ORDER,
 	KONAMI_ROM_DEINTERLEAVE_2,
 	simpsons_tile_callback
@@ -273,7 +273,7 @@ static const k052109_interface simpsons_k052109_intf =
 static const k053247_interface simpsons_k053246_intf =
 {
 	"screen",
-	"gfx2",
+	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	53, 23,
 	KONAMI_ROM_DEINTERLEAVE_4,

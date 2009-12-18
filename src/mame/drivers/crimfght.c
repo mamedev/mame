@@ -247,7 +247,7 @@ static const k007232_interface k007232_config =
 
 static const k052109_interface crimfght_k052109_intf =
 {
-	"gfx1",
+	"gfx1", 0,
 	NORMAL_PLANE_ORDER,
 	KONAMI_ROM_DEINTERLEAVE_2,
 	crimfght_tile_callback
@@ -255,7 +255,7 @@ static const k052109_interface crimfght_k052109_intf =
 
 static const k051960_interface crimfght_k051960_intf =
 {
-	"gfx2",
+	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	KONAMI_ROM_DEINTERLEAVE_2,
 	crimfght_sprite_callback

@@ -40,6 +40,7 @@ typedef struct _k052109_interface k052109_interface;
 struct _k052109_interface
 {
 	const char         *gfx_memory_region;
+	int                gfx_num;
 	int                plane_order;
 	int                deinterleave;
 	k052109_callback   callback;
@@ -49,6 +50,7 @@ typedef struct _k051960_interface k051960_interface;
 struct _k051960_interface
 {
 	const char         *gfx_memory_region;
+	int                gfx_num;
 	int                plane_order;
 	int                deinterleave;
 	k051960_callback   callback;
@@ -58,6 +60,7 @@ typedef struct _k05324x_interface k05324x_interface;
 struct _k05324x_interface
 {
 	const char         *gfx_memory_region;
+	int                gfx_num;
 	int                plane_order;
 	int                dx, dy;
 	int                deinterleave;
@@ -69,6 +72,7 @@ struct _k053247_interface
 {
 	const char         *screen;
 	const char         *gfx_memory_region;
+	int                gfx_num;
 	int                plane_order;
 	int                dx, dy;
 	int                deinterleave;
@@ -79,6 +83,7 @@ typedef struct _k051316_interface k051316_interface;
 struct _k051316_interface
 {
 	const char         *gfx_memory_region;
+	int                gfx_num;
 	int                bpp, pen_is_mask, transparent_pen;
 	int                wrap, xoffs, yoffs;
 	k051316_callback   callback;
@@ -94,7 +99,8 @@ struct _k053936_interface
 typedef struct _k056832_interface k056832_interface;
 struct _k056832_interface
 {
-	const char *gfx_memory_region;
+	const char         *gfx_memory_region;
+	int                gfx_num;
 	int                bpp; 
 	int                big;
 	int                djmain_hack;
@@ -116,7 +122,7 @@ typedef struct _k053250_interface k053250_interface;
 struct _k053250_interface
 {
 	const char         *screen;
-	const char         *region;
+	const char         *gfx_memory_region;
 	int                xoff, yoff;
 };
 

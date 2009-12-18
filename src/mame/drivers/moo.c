@@ -488,7 +488,7 @@ static MACHINE_RESET( moo )
 
 static const k056832_interface moo_k056832_intf =
 {
-	"gfx1",
+	"gfx1", 0,
 	K056832_BPP_4,
 	1, 0,
 	KONAMI_ROM_DEINTERLEAVE_2,
@@ -498,7 +498,7 @@ static const k056832_interface moo_k056832_intf =
 static const k053247_interface moo_k053247_intf =
 {
 	"screen", 
-	"gfx2", 
+	"gfx2", 1,
 	NORMAL_PLANE_ORDER, 
 	-48+1, 23, 
 	KONAMI_ROM_DEINTERLEAVE_4,
@@ -508,7 +508,7 @@ static const k053247_interface moo_k053247_intf =
 static const k053247_interface bucky_k053247_intf =
 {
 	"screen", 
-	"gfx2", 
+	"gfx2", 1,
 	NORMAL_PLANE_ORDER, 
 	-48, 23,
 	KONAMI_ROM_DEINTERLEAVE_4,

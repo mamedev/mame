@@ -21,7 +21,7 @@ Notes:
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "machine/eeprom.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
@@ -31,51 +31,9 @@ Notes:
 VIDEO_START( overdriv );
 VIDEO_UPDATE( overdriv );
 
-
-static READ16_HANDLER( K051316_0_msb_r )
-{
-	return K051316_0_r(space,offset) << 8;
-}
-
-static READ16_HANDLER( K051316_1_msb_r )
-{
-	return K051316_1_r(space,offset) << 8;
-}
-
-static READ16_HANDLER( K051316_rom_0_msb_r )
-{
-	return K051316_rom_0_r(space,offset) << 8;
-}
-
-static READ16_HANDLER( K051316_rom_1_msb_r )
-{
-	return K051316_rom_1_r(space,offset) << 8;
-}
-
-static WRITE16_HANDLER( K051316_0_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		K051316_0_w(space,offset,data >> 8);
-}
-
-static WRITE16_HANDLER( K051316_1_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		K051316_1_w(space,offset,data >> 8);
-}
-
-static WRITE16_HANDLER( K051316_ctrl_0_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		K051316_ctrl_0_w(space,offset,data >> 8);
-}
-
-static WRITE16_HANDLER( K051316_ctrl_1_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		K051316_ctrl_1_w(space,offset,data >> 8);
-}
-
+extern void overdriv_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
+extern void overdriv_zoom_callback_0(running_machine *machine, int *code,int *color,int *flags);
+extern void overdriv_zoom_callback_1(running_machine *machine, int *code,int *color,int *flags);
 
 /***************************************************************************
 
@@ -137,18 +95,20 @@ static WRITE16_HANDLER( eeprom_w )
 }
 
 
-
-
-
 static INTERRUPT_GEN( cpuA_interrupt )
 {
-	if (cpu_getiloops(device)) cpu_set_input_line(device, 5, HOLD_LINE);
-	else cpu_set_input_line(device, 4, HOLD_LINE);
+	if (cpu_getiloops(device)) 
+		cpu_set_input_line(device, 5, HOLD_LINE);
+	else 
+		cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( cpuB_interrupt )
 {
-	if (K053246_is_IRQ_enabled()) cpu_set_input_line(device, 4, HOLD_LINE);
+	const device_config *k053246 = devtag_get_device(device->machine, "k053246");
+
+	if (k053246_is_irq_enabled(k053246)) 
+		cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 
@@ -185,12 +145,13 @@ static READ16_HANDLER( cpuB_ctrl_r )
 
 static WRITE16_HANDLER( cpuB_ctrl_w )
 {
+	const device_config *k053246 = devtag_get_device(space->machine, "k053246");
 	COMBINE_DATA(&cpuB_ctrl);
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = enable sprite ROM reading */
-		K053246_set_OBJCHA_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+		k053246_set_objcha_line(k053246, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 1 used but unknown (irq enable?) */
 
@@ -232,19 +193,19 @@ static ADDRESS_MAP_START( overdriv_master_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10001f) AM_WRITENOP			/* 053252? (LSB) */
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("PADDLE")
-	AM_RANGE(0x1c0000, 0x1c001f) AM_WRITE(K051316_ctrl_0_msb_w)
-	AM_RANGE(0x1c8000, 0x1c801f) AM_WRITE(K051316_ctrl_1_msb_w)
-	AM_RANGE(0x1d0000, 0x1d001f) AM_WRITE(K053251_msb_w)
+	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVWRITE8("k051316_1", k051316_ctrl_w, 0xff00)
+	AM_RANGE(0x1c8000, 0x1c801f) AM_DEVWRITE8("k051316_2", k051316_ctrl_w, 0xff00)
+	AM_RANGE(0x1d0000, 0x1d001f) AM_DEVWRITE("k053251", k053251_msb_w)
 	AM_RANGE(0x1d8000, 0x1d8003) AM_DEVREADWRITE8("konami1", overdriv_sound_r, k053260_w, 0x00ff)	/* K053260 */
 	AM_RANGE(0x1e0000, 0x1e0003) AM_DEVREADWRITE8("konami2", overdriv_sound_r, k053260_w, 0x00ff)	/* K053260 */
 	AM_RANGE(0x1e8000, 0x1e8001) AM_WRITE(overdriv_soundirq_w)
 	AM_RANGE(0x1f0000, 0x1f0001) AM_WRITE(cpuA_ctrl_w)	/* halt cpu B, coin counter, start lamp, other? */
 	AM_RANGE(0x1f8000, 0x1f8001) AM_WRITE(eeprom_w)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x210000, 0x210fff) AM_READWRITE(K051316_0_msb_r,K051316_0_msb_w)
-	AM_RANGE(0x218000, 0x218fff) AM_READWRITE(K051316_1_msb_r,K051316_1_msb_w)
-	AM_RANGE(0x220000, 0x220fff) AM_READ(K051316_rom_0_msb_r)
-	AM_RANGE(0x228000, 0x228fff) AM_READ(K051316_rom_1_msb_r)
+	AM_RANGE(0x210000, 0x210fff) AM_DEVREADWRITE8("k051316_1", k051316_r, k051316_w, 0xff00)
+	AM_RANGE(0x218000, 0x218fff) AM_DEVREADWRITE8("k051316_2", k051316_r, k051316_w, 0xff00)
+	AM_RANGE(0x220000, 0x220fff) AM_DEVREAD8("k051316_1", k051316_rom_r, 0xff00)
+	AM_RANGE(0x228000, 0x228fff) AM_DEVREAD8("k051316_2", k051316_rom_r, 0xff00)
 	AM_RANGE(0x230000, 0x230001) AM_WRITE(overdriv_cpuB_irq6_w)
 	AM_RANGE(0x238000, 0x238001) AM_WRITE(overdriv_cpuB_irq5_w)
 ADDRESS_MAP_END
@@ -255,10 +216,10 @@ static ADDRESS_MAP_START( overdriv_slave_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM
 	AM_RANGE(0x100000, 0x10000f) AM_NOP	// K053250 #0
 	AM_RANGE(0x108000, 0x10800f) AM_NOP	// K053250 #1
-	AM_RANGE(0x118000, 0x118fff) AM_READWRITE(K053247_word_r,K053247_word_w)
-	AM_RANGE(0x120000, 0x120001) AM_READ(K053246_word_r)
+	AM_RANGE(0x118000, 0x118fff) AM_DEVREADWRITE("k053246", k053247_word_r, k053247_word_w)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREAD("k053246", k053246_word_r)
 	AM_RANGE(0x128000, 0x128001) AM_READWRITE(cpuB_ctrl_r,cpuB_ctrl_w) 	/* enable K053247 ROM reading, plus something else */
-	AM_RANGE(0x130000, 0x130007) AM_WRITE(K053246_word_w)
+	AM_RANGE(0x130000, 0x130007) AM_DEVWRITE("k053246", k053246_word_w)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x208000, 0x20bfff) AM_RAM
 	AM_RANGE(0x218000, 0x219fff) AM_READNOP	// K053250 #0 gfx ROM read (LSB)
@@ -304,7 +265,7 @@ static INPUT_PORTS_START( overdriv )
 INPUT_PORTS_END
 
 
-
+#if 0
 static const gfx_layout charlayout =
 {
 	8,8,
@@ -320,7 +281,7 @@ static GFXDECODE_START( overdriv )
 	GFXDECODE_ENTRY( "gfx4", 0, charlayout, 0, 0x80 )
 	GFXDECODE_ENTRY( "gfx5", 0, charlayout, 0, 0x80 )
 GFXDECODE_END
-
+#endif
 
 
 static const k053260_interface k053260_config =
@@ -328,6 +289,31 @@ static const k053260_interface k053260_config =
 	"shared"
 };
 
+static const k053247_interface overdriv_k053246_intf =
+{
+	"screen",
+	"gfx1", 0,
+	NORMAL_PLANE_ORDER,
+	77, 22,
+	KONAMI_ROM_DEINTERLEAVE_4,
+	overdriv_sprite_callback
+};
+
+static const k051316_interface overdriv_k051316_intf_1 =
+{
+	"gfx2", 1,
+	4, TRUE, 0,
+	1, 14, -1,
+	overdriv_zoom_callback_0
+};
+
+static const k051316_interface overdriv_k051316_intf_2 =
+{
+	"gfx3", 2,
+	4, FALSE, 0,
+	0, 15, 1,
+	overdriv_zoom_callback_1
+};
 
 
 static MACHINE_DRIVER_START( overdriv )
@@ -362,11 +348,16 @@ static MACHINE_DRIVER_START( overdriv )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 0*8, 32*8-1 )
 
-	MDRV_GFXDECODE(overdriv)
+//	MDRV_GFXDECODE(overdriv)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(overdriv)
 	MDRV_VIDEO_UPDATE(overdriv)
+
+	MDRV_K053246_ADD("k053246", overdriv_k053246_intf)
+	MDRV_K051316_ADD("k051316_1", overdriv_k051316_intf_1)
+	MDRV_K051316_ADD("k051316_2", overdriv_k051316_intf_2)
+	MDRV_K053251_ADD("k053251")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -433,10 +424,4 @@ ROM_START( overdriv )
 ROM_END
 
 
-static DRIVER_INIT( overdriv )
-{
-	konami_rom_deinterleave_4(machine, "gfx1");
-}
-
-
-GAMEL( 1990, overdriv, 0, overdriv, overdriv, overdriv, ROT90, "Konami", "Over Drive", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING, layout_overdriv )
+GAMEL( 1990, overdriv, 0, overdriv, overdriv, 0, ROT90, "Konami", "Over Drive", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING, layout_overdriv )

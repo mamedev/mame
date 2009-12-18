@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "cpu/konami/konami.h"
 #include "machine/eeprom.h"
 #include "sound/k053260.h"
@@ -85,15 +85,18 @@ WRITE8_HANDLER( simpsons_eeprom_w )
 
 WRITE8_HANDLER( simpsons_coin_counter_w )
 {
+	const device_config *k053246 = devtag_get_device(space->machine, "k053246");
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+
 	/* bit 0,1 coin counters */
 	coin_counter_w(space->machine, 0,data & 0x01);
 	coin_counter_w(space->machine, 1,data & 0x02);
 	/* bit 2 selects mono or stereo sound */
 	/* bit 3 = enable char ROM reading through the video RAM */
-	K052109_set_RMRD_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	/* bit 4 = INIT (unknown) */
 	/* bit 5 = enable sprite ROM reading */
-	K053246_set_OBJCHA_line((~data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	k053246_set_objcha_line(k053246, (~data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_HANDLER( simpsons_sound_interrupt_r )

@@ -235,7 +235,7 @@ INPUT_PORTS_END
 
 static const k056832_interface asterix_k056832_intf =
 {
-	"gfx1",
+	"gfx1", 0,
 	K056832_BPP_4,
 	1, 1,
 	KONAMI_ROM_DEINTERLEAVE_2,
@@ -244,7 +244,7 @@ static const k056832_interface asterix_k056832_intf =
 
 static const k05324x_interface asterix_k05324x_intf =
 {
-	"gfx2",
+	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	-3, -1,
 	KONAMI_ROM_DEINTERLEAVE_2,

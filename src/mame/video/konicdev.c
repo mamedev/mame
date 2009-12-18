@@ -2640,7 +2640,6 @@ static DEVICE_START( k052109 )
 	k052109_state *k052109 = k052109_get_safe_token(device);
 	const k052109_interface *intf = k052109_get_interface(device);
 	running_machine *machine = device->machine;
-	int gfx_index;
 	UINT32 total;
 	static const gfx_layout charlayout =
 	{
@@ -2664,23 +2663,17 @@ static DEVICE_START( k052109 )
 	};
 
 
-	/* find first empty slot to decode gfx */
-	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine->gfx[gfx_index] == 0)
-			break;
-	assert(gfx_index != MAX_GFX_ELEMENTS);
-
 	/* decode the graphics */
 	switch (intf->plane_order)
 	{
 	case NORMAL_PLANE_ORDER:
 		total = memory_region_length(machine, intf->gfx_memory_region) / 32;
-		decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &charlayout, 4);
+		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout, 4);
 		break;
 
 	case GRADIUS3_PLANE_ORDER:
 		total = 0x1000;
-		decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &charlayout_gradius3, 4);
+		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout_gradius3, 4);
 		break;
 
 	default:
@@ -2691,7 +2684,7 @@ static DEVICE_START( k052109 )
 	deinterleave_gfx(machine, intf->gfx_memory_region, intf->deinterleave);
 
 	k052109->memory_region = intf->gfx_memory_region;
-	k052109->gfxnum = gfx_index;
+	k052109->gfxnum = intf->gfx_num;
 	k052109->callback = intf->callback;
 
 	k052109->tilemap[0] = tilemap_create_device(device, k052109_get_tile_info0, tilemap_scan_rows, 8, 8, 64, 32);
@@ -3179,7 +3172,6 @@ static DEVICE_START( k051960 )
 	k051960_state *k051960 = k051960_get_safe_token(device);
 	const k051960_interface *intf = k051960_get_interface(device);
 	running_machine *machine = device->machine;
-	int gfx_index;
 	UINT32 total;
 	static const gfx_layout spritelayout =
 	{
@@ -3218,29 +3210,22 @@ static DEVICE_START( k051960 )
 		128*8
 	};
 
-	/* find first empty slot to decode gfx */
-	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine->gfx[gfx_index] == 0)
-			break;
-
-	assert(gfx_index != MAX_GFX_ELEMENTS);
-
 	/* decode the graphics */
 	switch (intf->plane_order)
 	{
 	case NORMAL_PLANE_ORDER:
 		total = memory_region_length(machine, intf->gfx_memory_region) / 128;
-		decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &spritelayout, 4);
+		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &spritelayout, 4);
 		break;
 
 	case REVERSE_PLANE_ORDER:
 		total = memory_region_length(machine, intf->gfx_memory_region) / 128;
-		decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &spritelayout_reverse, 4);
+		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &spritelayout_reverse, 4);
 		break;
 
 	case GRADIUS3_PLANE_ORDER:
 		total = 0x4000;
-		decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &spritelayout_gradius3, 4);
+		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &spritelayout_gradius3, 4);
 		break;
 
 	default:
@@ -3254,7 +3239,7 @@ static DEVICE_START( k051960 )
 	deinterleave_gfx(machine, intf->gfx_memory_region, intf->deinterleave);
 
 	k051960->memory_region = intf->gfx_memory_region;
-	k051960->gfx = machine->gfx[gfx_index];
+	k051960->gfx = machine->gfx[intf->gfx_num];
 	k051960->callback = intf->callback;
 	k051960->ram = auto_alloc_array_clear(machine, UINT8, 0x400);
 
@@ -4041,7 +4026,6 @@ static DEVICE_START( k05324x )
 	k05324x_state *k05324x = k05324x_get_safe_token(device);
 	const k05324x_interface *intf = k05324x_get_interface(device);
 	running_machine *machine = device->machine;
-	int gfx_index;
 	UINT32 total;
 	static const gfx_layout spritelayout =
 	{
@@ -4056,19 +4040,12 @@ static DEVICE_START( k05324x )
 		128*8
 	};
 
-
-	/* find first empty slot to decode gfx */
-	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine->gfx[gfx_index] == 0)
-			break;
-	assert(gfx_index != MAX_GFX_ELEMENTS);
-
 	/* decode the graphics */
 	switch (intf->plane_order)
 	{
 	case NORMAL_PLANE_ORDER:
 		total = memory_region_length(machine, intf->gfx_memory_region) / 128;
-		decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &spritelayout, 4);
+		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &spritelayout, 4);
 		break;
 
 	default:
@@ -4084,7 +4061,7 @@ static DEVICE_START( k05324x )
 	k05324x->ramsize = 0x800;
 
 	k05324x->memory_region = intf->gfx_memory_region;
-	k05324x->gfx = machine->gfx[gfx_index];
+	k05324x->gfx = machine->gfx[intf->gfx_num];
 	k05324x->dx = intf->dx;
 	k05324x->dy = intf->dy;
 	k05324x->callback = intf->callback;
@@ -4870,8 +4847,6 @@ static DEVICE_START( k053247 )
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	const k053247_interface *intf = k053247_get_interface(device);
 	running_machine *machine = device->machine;
-
-	int gfx_index;
 	UINT32 total;
 	static const gfx_layout spritelayout =
 	{
@@ -4888,19 +4863,12 @@ static DEVICE_START( k053247 )
 
 	k053247->screen = devtag_get_device(device->machine, intf->screen);
 
-	/* find first empty slot to decode gfx */
-	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine->gfx[gfx_index] == 0)
-			break;
-	assert(gfx_index != MAX_GFX_ELEMENTS);
-
-
 	/* decode the graphics */
 	switch (intf->plane_order)
 	{
 	case NORMAL_PLANE_ORDER:
 		total = memory_region_length(machine, intf->gfx_memory_region) / 128;
-		decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &spritelayout, 4);
+		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &spritelayout, 4);
 		break;
 
 	default:
@@ -4927,7 +4895,7 @@ static DEVICE_START( k053247 )
 	k053247->dx = intf->dx;
 	k053247->dy = intf->dy;
 	k053247->memory_region = intf->gfx_memory_region;
-	k053247->gfx = machine->gfx[gfx_index];
+	k053247->gfx = machine->gfx[intf->gfx_num];
 	k053247->callback = intf->callback;
 
 	k053247->ram = auto_alloc_array(machine, UINT16, 0x1000/2);
@@ -4946,8 +4914,6 @@ static DEVICE_START( k055673 )
 	k053247_state *k053247 = k053247_get_safe_token(device);
 	const k053247_interface *intf = k053247_get_interface(device);
 	running_machine *machine = device->machine;
-
-	int gfx_index;
 	UINT32 total;
 	UINT8 *s1, *s2, *d;
 	long i;
@@ -4998,12 +4964,6 @@ static DEVICE_START( k055673 )
 		16*16*6
 	};
 
-	/* find first empty slot to decode gfx */
-	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine->gfx[gfx_index] == 0)
-			break;
-	assert(gfx_index != MAX_GFX_ELEMENTS);
-
 	K055673_rom = (UINT16 *)memory_region(machine, intf->gfx_memory_region);
 
 	/* decode the graphics */
@@ -5028,22 +4988,22 @@ static DEVICE_START( k055673 )
 		}
 
 		total = size4 / 128;
-		decode_gfx(machine, gfx_index, (UINT8 *)K055673_rom, total, &spritelayout, 4);
+		decode_gfx(machine, intf->gfx_num, (UINT8 *)K055673_rom, total, &spritelayout, 4);
 		break;
 
 	case K055673_LAYOUT_RNG:
 		total = memory_region_length(machine, intf->gfx_memory_region) / (16 * 16 / 2);
-		decode_gfx(machine, gfx_index, (UINT8 *)K055673_rom, total, &spritelayout2, 4);
+		decode_gfx(machine, intf->gfx_num, (UINT8 *)K055673_rom, total, &spritelayout2, 4);
 		break;
 
 	case K055673_LAYOUT_LE2:
 		total = memory_region_length(machine, intf->gfx_memory_region) / (16 * 16);
-		decode_gfx(machine, gfx_index, (UINT8 *)K055673_rom, total, &spritelayout3, 4);
+		decode_gfx(machine, intf->gfx_num, (UINT8 *)K055673_rom, total, &spritelayout3, 4);
 		break;
 
 	case K055673_LAYOUT_GX6:
 		total = memory_region_length(machine, intf->gfx_memory_region) / (16 * 16 * 6 / 8);
-		decode_gfx(machine, gfx_index, (UINT8 *)K055673_rom, total, &spritelayout4, 4);
+		decode_gfx(machine, intf->gfx_num, (UINT8 *)K055673_rom, total, &spritelayout4, 4);
 		break;
 
 	default:
@@ -5056,7 +5016,7 @@ static DEVICE_START( k055673 )
 	k053247->dx = intf->dx;
 	k053247->dy = intf->dy;
 	k053247->memory_region = intf->gfx_memory_region;
-	k053247->gfx = machine->gfx[gfx_index];
+	k053247->gfx = machine->gfx[intf->gfx_num];
 	k053247->callback = intf->callback;
 
 	k053247->ram = auto_alloc_array(machine, UINT16, 0x1000 / 2);
@@ -5285,7 +5245,7 @@ static DEVICE_START( k051316 )
 	const k051316_interface *intf = k051316_get_interface(device);
 	running_machine *machine = device->machine;
 
-	int gfx_index, is_tail2nos = 0;
+	int is_tail2nos = 0;
 	UINT32 total;
 
 	static const gfx_layout charlayout4 =
@@ -5340,34 +5300,28 @@ static DEVICE_START( k051316 )
 		128*8
 	};
 
-	/* find first empty slot to decode gfx */
-	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine->gfx[gfx_index] == 0)
-			break;
-	assert(gfx_index != MAX_GFX_ELEMENTS);
-
 	/* decode the graphics */
 	switch (intf->bpp)
 	{
 	case -4:
 		total = 0x400;
 		is_tail2nos = 1;
-		decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &charlayout_tail2nos, 4);
+		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout_tail2nos, 4);
 		break;
 
 	case 4:
 		total = memory_region_length(machine, intf->gfx_memory_region) / 128;
-		decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &charlayout4, 4);
+		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout4, 4);
 		break;
 
 	case 7:
 		total = memory_region_length(machine, intf->gfx_memory_region) / 256;
-		decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &charlayout7, 7);
+		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout7, 7);
 		break;
 	
 	case 8:
 		total = memory_region_length(machine, intf->gfx_memory_region) / 256;
-		decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &charlayout8, 8);
+		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout8, 8);
 		break;
 
 	default:
@@ -5375,7 +5329,7 @@ static DEVICE_START( k051316 )
 	}
 
 	k051316->memory_region = intf->gfx_memory_region;
-	k051316->gfxnum = gfx_index;
+	k051316->gfxnum = intf->gfx_num;
 	k051316->bpp = is_tail2nos ? 4 : intf->bpp;	// tail2nos is passed with bpp = -4 to setup the custom charlayout!
 	k051316->callback = intf->callback;
 
@@ -7784,7 +7738,6 @@ static DEVICE_START( k056832 )
 	const k056832_interface *intf = k056832_get_interface(device);
 	running_machine *machine = device->machine;
 	tilemap *tmap;
-	int gfx_index;
 	int i;
 	UINT32 total;
 	static const gfx_layout charlayout8 =
@@ -7850,15 +7803,6 @@ static DEVICE_START( k056832 )
 	};
 
 
-	/* find first empty slot to decode gfx */
-	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-	{
-		if (machine->gfx[gfx_index] == 0) break;
-	}
-
-	assert(gfx_index != MAX_GFX_ELEMENTS);
-
-
 	/* handle the various graphics formats */
 	i = (intf->big) ? 8 : 16;
 
@@ -7868,45 +7812,45 @@ static DEVICE_START( k056832 )
 	{
 		case K056832_BPP_4:
 			total = memory_region_length(machine, intf->gfx_memory_region) / (i * 4);
-			decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &charlayout4, 4);
+			decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout4, 4);
 			break;
 
 		case K056832_BPP_5:
 			total = memory_region_length(machine, intf->gfx_memory_region) / (i * 5);
-			decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &charlayout5, 4);
+			decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout5, 4);
 			break;
 
 		case K056832_BPP_6:
 			total = memory_region_length(machine, intf->gfx_memory_region) / (i * 6);
-			decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &charlayout6, 4);
+			decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout6, 4);
 			break;
 
 		case K056832_BPP_8:
 			total = memory_region_length(machine, intf->gfx_memory_region) / (i * 8);
-			decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &charlayout8, 4);
+			decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout8, 4);
 			break;
 
 		case K056832_BPP_8LE:
 			total = memory_region_length(machine, intf->gfx_memory_region) / (i * 8);
-			decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &charlayout8le, 4);
+			decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout8le, 4);
 			break;
 
 		case K056832_BPP_4dj:
 			total = memory_region_length(machine, intf->gfx_memory_region) / (i * 4);
-			decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &charlayout4dj, 4);
+			decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout4dj, 4);
 			break;
 
 		default:
 			fatalerror("Unsupported bpp");
 	}
 
-	machine->gfx[gfx_index]->color_granularity = 16; /* override */
+	machine->gfx[intf->gfx_num]->color_granularity = 16; /* override */
 
 	/* deinterleave the graphics, if needed */
 	deinterleave_gfx(machine, intf->gfx_memory_region, intf->deinterleave);
 
 	k056832->memory_region = intf->gfx_memory_region;
-	k056832->gfxnum = gfx_index;
+	k056832->gfxnum = intf->gfx_num;
 	k056832->callback = intf->callback;
 
 	k056832->rombase = memory_region(machine, intf->gfx_memory_region);
@@ -8951,8 +8895,8 @@ static DEVICE_START( k053250 )
 	k053250_state *k053250 = k053250_get_safe_token(device);
 	const k053250_interface *intf = k053250_get_interface(device);
 
-	k053250->base = memory_region(device->machine, intf->region);
-	k053250->rommask = memory_region_length(device->machine, intf->region);
+	k053250->base = memory_region(device->machine, intf->gfx_memory_region);
+	k053250->rommask = memory_region_length(device->machine, intf->gfx_memory_region);
 
 	k053250->screen = devtag_get_device(device->machine, intf->screen);
 
@@ -8966,7 +8910,7 @@ static DEVICE_START( k053250 )
 	k053250->offsy = intf->yoff;
 
 	/* unpack graphics */
-	k053250_unpack_pixels(device->machine, intf->region);
+	k053250_unpack_pixels(device->machine, intf->gfx_memory_region);
 
 	state_save_register_device_item_pointer(device, 0, k053250->ram, 0x6000 / 2);
 	state_save_register_device_item_array(device, 0, k053250->regs);

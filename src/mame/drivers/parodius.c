@@ -237,7 +237,7 @@ INPUT_PORTS_END
 
 static const k052109_interface parodius_k052109_intf =
 {
-	"gfx1",
+	"gfx1", 0,
 	NORMAL_PLANE_ORDER,
 	KONAMI_ROM_DEINTERLEAVE_2,
 	parodius_tile_callback
@@ -245,7 +245,7 @@ static const k052109_interface parodius_k052109_intf =
 
 static const k05324x_interface parodius_k05324x_intf =
 {
-	"gfx2",
+	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	0, 0,
 	KONAMI_ROM_DEINTERLEAVE_2,

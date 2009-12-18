@@ -353,7 +353,7 @@ static MACHINE_RESET( 88games )
 
 static const k052109_interface _88games_k052109_intf =
 {
-	"gfx1",
+	"gfx1", 0,
 	NORMAL_PLANE_ORDER,
 	KONAMI_ROM_DEINTERLEAVE_2,
 	_88games_tile_callback
@@ -361,7 +361,7 @@ static const k052109_interface _88games_k052109_intf =
 
 static const k051960_interface _88games_k051960_intf =
 {
-	"gfx2",
+	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	KONAMI_ROM_DEINTERLEAVE_2,
 	_88games_sprite_callback
@@ -369,7 +369,7 @@ static const k051960_interface _88games_k051960_intf =
 
 static const k051316_interface _88games_k051316_intf =
 {
-	"gfx3",
+	"gfx3", 2,
 	4, FALSE, 0,
 	0, 0, 0,
 	_88games_zoom_callback

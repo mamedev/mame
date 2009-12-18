@@ -226,7 +226,7 @@ static const ym2151_interface ym2151_config =
 
 static const k052109_interface aliens_k052109_intf =
 {
-	"gfx1",
+	"gfx1", 0,
 	NORMAL_PLANE_ORDER,
 	KONAMI_ROM_DEINTERLEAVE_2,
 	aliens_tile_callback
@@ -234,7 +234,7 @@ static const k052109_interface aliens_k052109_intf =
 
 static const k051960_interface aliens_k051960_intf =
 {
-	"gfx2",
+	"gfx2", 1,
 	NORMAL_PLANE_ORDER,
 	KONAMI_ROM_DEINTERLEAVE_2,
 	aliens_sprite_callback
