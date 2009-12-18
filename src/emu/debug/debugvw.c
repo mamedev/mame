@@ -3229,7 +3229,6 @@ void memory_view_set_subview(debug_view *view, int index)
 	const memory_subview_item *subview;
 
 	assert(view->type == DVT_MEMORY);
-	assert(subview != NULL);
 
 	/* pick the requested view */
 	subview = memory_view_get_subview_by_index(memdata->subviewlist, index);
