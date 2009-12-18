@@ -249,6 +249,7 @@ static const k052109_interface crimfght_k052109_intf =
 {
 	"gfx1",
 	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
 	crimfght_tile_callback
 };
 
@@ -256,6 +257,7 @@ static const k051960_interface crimfght_k051960_intf =
 {
 	"gfx2",
 	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
 	crimfght_sprite_callback
 };
 
@@ -419,14 +421,6 @@ static MACHINE_RESET( crimfght )
 	memory_set_bankptr(machine,  "bank2", &RAM[0x10000] );
 }
 
-static DRIVER_INIT( crimfght )
-{
-	konamid_rom_deinterleave_2(machine, "gfx1");
-	konamid_rom_deinterleave_2(machine, "gfx2");
-}
-
-
-
-GAME( 1989, crimfght, 0,        crimfght, crimfght, crimfght, ROT0, "Konami", "Crime Fighters (US 4 players)", 0 )
-GAME( 1989, crimfght2,crimfght, crimfght, crimfgtj, crimfght, ROT0, "Konami", "Crime Fighters (World 2 Players)", 0 )
-GAME( 1989, crimfghtj,crimfght, crimfght, crimfgtj, crimfght, ROT0, "Konami", "Crime Fighters (Japan 2 Players)", 0 )
+GAME( 1989, crimfght, 0,        crimfght, crimfght, 0, ROT0, "Konami", "Crime Fighters (US 4 players)", 0 )
+GAME( 1989, crimfght2,crimfght, crimfght, crimfgtj, 0, ROT0, "Konami", "Crime Fighters (World 2 Players)", 0 )
+GAME( 1989, crimfghtj,crimfght, crimfght, crimfgtj, 0, ROT0, "Konami", "Crime Fighters (Japan 2 Players)", 0 )

@@ -11,10 +11,10 @@ K052591 emulation by Eddie Edwards
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 static MACHINE_RESET( scontra );
 static MACHINE_RESET( thunderx );
@@ -26,11 +26,17 @@ VIDEO_UPDATE( scontra );
 
 static UINT8 thunderx_1f98_data = 0;
 
+extern void thunderx_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void thunderx_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow);
+
+
 /***************************************************************************/
 
 static INTERRUPT_GEN( scontra_interrupt )
 {
-	if (K052109_is_IRQ_enabled())
+	const device_config *k052109 = devtag_get_device(device->machine, "k052109");
+
+	if (k052109_is_irq_enabled(k052109))
 		cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
@@ -296,10 +302,12 @@ static READ8_HANDLER( thunderx_1f98_r )
 
 static WRITE8_HANDLER( thunderx_1f98_w )
 {
-// logerror("%04x: 1f98_w %02x\n",cpu_get_pc(space->cpu),data);
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+
+	// logerror("%04x: 1f98_w %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bit 0 = enable char ROM reading through the video RAM */
-	K052109_set_RMRD_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(k052109, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 1 = PMC-BK */
 	pmcbank = (data & 0x02) >> 1;
@@ -369,6 +377,37 @@ static WRITE8_DEVICE_HANDLER( scontra_snd_bankswitch_w )
 	k007232_set_bank( device, bank_A, bank_B );
 }
 
+static READ8_HANDLER( k052109_051960_r )
+{
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	const device_config *k051960 = devtag_get_device(space->machine, "k051960");
+
+	if (k052109_get_rmrd_line(k052109) == CLEAR_LINE)
+	{
+		if (offset >= 0x3800 && offset < 0x3808)
+			return k051937_r(k051960, offset - 0x3800);
+		else if (offset < 0x3c00)
+			return k052109_r(k052109, offset);
+		else
+			return k051960_r(k051960, offset - 0x3c00);
+	}
+	else 
+		return k052109_r(k052109, offset);
+}
+
+static WRITE8_HANDLER( k052109_051960_w )
+{
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	const device_config *k051960 = devtag_get_device(space->machine, "k051960");
+
+	if (offset >= 0x3800 && offset < 0x3808)
+		k051937_w(k051960, offset - 0x3800, data);
+	else if (offset < 0x3c00)
+		k052109_w(k052109, offset, data);
+	else
+		k051960_w(k051960, offset - 0x3c00, data);
+}
+
 /***************************************************************************/
 
 static ADDRESS_MAP_START( scontra_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -383,7 +422,7 @@ static ADDRESS_MAP_START( scontra_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1f98, 0x1f98) AM_WRITE(thunderx_1f98_w)
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)		/* video RAM + sprite RAM */
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)		/* video RAM + sprite RAM */
 
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(scontra_bankedram_r, scontra_bankedram_w) AM_BASE(&ram)			/* palette + work RAM */
@@ -403,7 +442,7 @@ static ADDRESS_MAP_START( thunderx_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1f98, 0x1f98) AM_READWRITE(thunderx_1f98_r, thunderx_1f98_w) /* registers */
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
 	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(thunderx_bankedram_r, thunderx_bankedram_w) AM_BASE(&ram)			/* palette + work RAM + unknown RAM */
@@ -574,6 +613,22 @@ static const k007232_interface k007232_config =
 
 
 
+static const k052109_interface thunderx_k052109_intf =
+{
+	"gfx1",
+	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	thunderx_tile_callback
+};
+
+static const k051960_interface thunderx_k051960_intf =
+{
+	"gfx2",
+	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	thunderx_sprite_callback
+};
+
 static MACHINE_DRIVER_START( scontra )
 
 	/* basic machine hardware */
@@ -600,6 +655,9 @@ static MACHINE_DRIVER_START( scontra )
 
 	MDRV_VIDEO_START(scontra)
 	MDRV_VIDEO_UPDATE(scontra)
+
+	MDRV_K052109_ADD("k052109", thunderx_k052109_intf)
+	MDRV_K051960_ADD("k051960", thunderx_k051960_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -641,6 +699,9 @@ static MACHINE_DRIVER_START( thunderx )
 
 	MDRV_VIDEO_START(scontra)
 	MDRV_VIDEO_UPDATE(scontra)
+
+	MDRV_K052109_ADD("k052109", thunderx_k052109_intf)
+	MDRV_K051960_ADD("k051960", thunderx_k051960_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -931,18 +992,10 @@ static MACHINE_RESET( thunderx )
 	pmcram = &RAM[0x28800];
 }
 
-static DRIVER_INIT( scontra )
-{
-	konami_rom_deinterleave_2(machine, "gfx1");
-	konami_rom_deinterleave_2(machine, "gfx2");
-}
-
-
-
-GAME( 1988, scontra,  0,        scontra,  scontra,  scontra, ROT90, "Konami", "Super Contra", 0 )
-GAME( 1988, scontraj, scontra,  scontra,  scontra,  scontra, ROT90, "Konami", "Super Contra (Japan)", 0 )
-GAME( 1988, thunderx, 0,        thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross (set 1)", 0 )
-GAME( 1988, thunderxa,thunderx, thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross (set 2)", 0 )
-GAME( 1988, thunderxb,thunderx, thunderx, thunderx, scontra, ROT0,  "Konami", "Thunder Cross (set 3)", 0 )
-GAME( 1988, thunderxj,thunderx, thunderx, thnderxj, scontra, ROT0,  "Konami", "Thunder Cross (Japan)", 0 )
-//GAME( 1988, thndrxja, thunderx, thunderx, thndrxja, scontra, ROT0,  "Konami", "Thunder Cross (Japan, newer revision)", 0 )
+GAME( 1988, scontra,  0,        scontra,  scontra,  0, ROT90, "Konami", "Super Contra", 0 )
+GAME( 1988, scontraj, scontra,  scontra,  scontra,  0, ROT90, "Konami", "Super Contra (Japan)", 0 )
+GAME( 1988, thunderx, 0,        thunderx, thunderx, 0, ROT0,  "Konami", "Thunder Cross (set 1)", 0 )
+GAME( 1988, thunderxa,thunderx, thunderx, thunderx, 0, ROT0,  "Konami", "Thunder Cross (set 2)", 0 )
+GAME( 1988, thunderxb,thunderx, thunderx, thunderx, 0, ROT0,  "Konami", "Thunder Cross (set 3)", 0 )
+GAME( 1988, thunderxj,thunderx, thunderx, thnderxj, 0, ROT0,  "Konami", "Thunder Cross (Japan)", 0 )
+//GAME( 1988, thndrxja, thunderx, thunderx, thndrxja, 0, ROT0,  "Konami", "Thunder Cross (Japan, newer revision)", 0 )

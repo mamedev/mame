@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 static int sprite_colorbase;
 static int layer_colorbase[4], layerpri[4];
@@ -10,7 +10,7 @@ void xexex_set_alpha(int on)
 	cur_alpha = on;
 }
 
-static void xexex_sprite_callback(int *code, int *color, int *priority_mask)
+void xexex_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask)
 {
 	int pri, c = *color;
 
@@ -27,35 +27,24 @@ static void xexex_sprite_callback(int *code, int *color, int *priority_mask)
 	*color = sprite_colorbase | (c & 0x001f);
 }
 
-static void xexex_tile_callback(int layer, int *code, int *color, int *flags)
+void xexex_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags)
 {
 	*color = layer_colorbase[layer] | (*color>>2 & 0x0f);
 }
 
 VIDEO_START( xexex )
 {
-	const char * region = "gfx3";
+	const device_config *k056832 = devtag_get_device(machine, "k056832");
 
 	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_RGB32);
 
 	cur_alpha = 0;
 
-	K053251_vh_start(machine);
-	K054338_vh_start(machine);
-	K053250_vh_start(machine, 1, &region);
-
-	K056832_vh_start(machine, "gfx1", K056832_BPP_4, 1, NULL, xexex_tile_callback, 0);
-	K053247_vh_start(machine, "gfx2", -48, 32, NORMAL_PLANE_ORDER, xexex_sprite_callback);
-
 	// Xexex has relative plane offsets of -2,2,4,6 vs. -2,0,2,3 in MW and GX.
-	K056832_set_LayerOffset(0, -2, 16);
-	K056832_set_LayerOffset(1,  2, 16);
-	K056832_set_LayerOffset(2,  4, 16);
-	K056832_set_LayerOffset(3,  6, 16);
-
-	K053250_set_LayerOffset(0, -5,-16);
-
-	K054338_invert_alpha(0);
+	k056832_set_layer_offs(k056832, 0, -2, 16);
+	k056832_set_layer_offs(k056832, 1,  2, 16);
+	k056832_set_layer_offs(k056832, 2,  4, 16);
+	k056832_set_layer_offs(k056832, 3,  6, 16);
 }
 
 /* useful function to sort the four tile layers by priority order */
@@ -81,36 +70,41 @@ static void sortlayers(int *layer, int *pri)
 VIDEO_UPDATE( xexex )
 {
 	static const int K053251_CI[4] = { K053251_CI1, K053251_CI2, K053251_CI3, K053251_CI4 };
+	const device_config *k056832 = devtag_get_device(screen->machine, "k056832");
+	const device_config *k053246 = devtag_get_device(screen->machine, "k053246");
+	const device_config *k053251 = devtag_get_device(screen->machine, "k053251");
+	const device_config *k053250 = devtag_get_device(screen->machine, "k053250");
+	const device_config *k054338 = devtag_get_device(screen->machine, "k054338");
 	int layer[4];
 	int bg_colorbase, new_colorbase, plane, alpha;
 
-	sprite_colorbase   = K053251_get_palette_index(K053251_CI0);
-	bg_colorbase       = K053251_get_palette_index(K053251_CI1);
+	sprite_colorbase   = k053251_get_palette_index(k053251, K053251_CI0);
+	bg_colorbase       = k053251_get_palette_index(k053251, K053251_CI1);
 	layer_colorbase[0] = 0x70;
 
-	for (plane=1; plane<4; plane++)
+	for (plane = 1; plane < 4; plane++)
 	{
-		new_colorbase = K053251_get_palette_index(K053251_CI[plane]);
+		new_colorbase = k053251_get_palette_index(k053251, K053251_CI[plane]);
 		if (layer_colorbase[plane] != new_colorbase)
 		{
 			layer_colorbase[plane] = new_colorbase;
-			K056832_mark_plane_dirty(plane);
+			k056832_mark_plane_dirty(k056832, plane);
 		}
 	}
 
 	layer[0] = 1;
-	layerpri[0] = K053251_get_priority(K053251_CI2);
+	layerpri[0] = k053251_get_priority(k053251, K053251_CI2);
 	layer[1] = 2;
-	layerpri[1] = K053251_get_priority(K053251_CI3);
+	layerpri[1] = k053251_get_priority(k053251, K053251_CI3);
 	layer[2] = 3;
-	layerpri[2] = K053251_get_priority(K053251_CI4);
+	layerpri[2] = k053251_get_priority(k053251, K053251_CI4);
 	layer[3] = -1;
-	layerpri[3] = K053251_get_priority(K053251_CI1);
+	layerpri[3] = k053251_get_priority(k053251, K053251_CI1);
 
 	sortlayers(layer, layerpri);
 
-	K054338_update_all_shadows(screen->machine, 0);
-	K054338_fill_backcolor(screen->machine, bitmap, 0);
+	k054338_update_all_shadows(k054338, 0);
+	k054338_fill_backcolor(k054338, bitmap, 0);
 
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
@@ -118,26 +112,26 @@ VIDEO_UPDATE( xexex )
 	{
 		if (layer[plane] < 0)
 		{
-			K053250_draw(screen->machine, bitmap, cliprect, 0, bg_colorbase, 0, 1<<plane);
+			k053250_draw(k053250, bitmap, cliprect, bg_colorbase, 0, 1 << plane);
 		}
 		else if (!cur_alpha || layer[plane] != 1)
 		{
-			K056832_tilemap_draw(screen->machine, bitmap, cliprect, layer[plane], 0, 1<<plane);
+			k056832_tilemap_draw(k056832, bitmap, cliprect, layer[plane], 0, 1 << plane);
 		}
 	}
 
-	K053247_sprites_draw(screen->machine, bitmap, cliprect);
+	k053247_sprites_draw(k053246, bitmap, cliprect);
 
 	if (cur_alpha)
 	{
-		alpha = K054338_set_alpha_level(1);
+		alpha = k054338_set_alpha_level(k054338, 1);
 
 		if (alpha > 0)
 		{
-			K056832_tilemap_draw(screen->machine, bitmap, cliprect, 1, TILEMAP_DRAW_ALPHA(alpha), 0);
+			k056832_tilemap_draw(k056832, bitmap, cliprect, 1, TILEMAP_DRAW_ALPHA(alpha), 0);
 		}
 	}
 
-	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 0, 0, 0);
+	k056832_tilemap_draw(k056832, bitmap, cliprect, 0, 0, 0);
 	return 0;
 }

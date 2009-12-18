@@ -355,6 +355,7 @@ static const k052109_interface _88games_k052109_intf =
 {
 	"gfx1",
 	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
 	_88games_tile_callback
 };
 
@@ -362,6 +363,7 @@ static const k051960_interface _88games_k051960_intf =
 {
 	"gfx2",
 	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
 	_88games_sprite_callback
 };
 
@@ -369,6 +371,7 @@ static const k051316_interface _88games_k051316_intf =
 {
 	"gfx3",
 	4, FALSE, 0,
+	0, 0, 0,
 	_88games_zoom_callback
 };
 
@@ -594,23 +597,10 @@ ROM_END
 
 /*************************************
  *
- *  Driver initialization
- *
- *************************************/
-
-static DRIVER_INIT( 88games )
-{
-	konamid_rom_deinterleave_2(machine, "gfx1");
-	konamid_rom_deinterleave_2(machine, "gfx2");
-}
-
-
-/*************************************
- *
  *  Game driver(s)
  *
  *************************************/
 
-GAME( 1988, 88games,  0,       88games, 88games, 88games, ROT0, "Konami", "'88 Games", GAME_SUPPORTS_SAVE )
-GAME( 1988, konami88, 88games, 88games, 88games, 88games, ROT0, "Konami", "Konami '88", GAME_SUPPORTS_SAVE )
-GAME( 1988, hypsptsp, 88games, 88games, 88games, 88games, ROT0, "Konami", "Hyper Sports Special (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, 88games,  0,       88games, 88games, 0, ROT0, "Konami", "'88 Games", GAME_SUPPORTS_SAVE )
+GAME( 1988, konami88, 88games, 88games, 88games, 0, ROT0, "Konami", "Konami '88", GAME_SUPPORTS_SAVE )
+GAME( 1988, hypsptsp, 88games, 88games, 88games, 0, ROT0, "Konami", "Hyper Sports Special (Japan)", GAME_SUPPORTS_SAVE )

@@ -265,6 +265,7 @@ static const k052109_interface gbusters_k052109_intf =
 {
 	"gfx1",
 	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
 	gbusters_tile_callback
 };
 
@@ -272,6 +273,7 @@ static const k051960_interface gbusters_k051960_intf =
 {
 	"gfx2",
 	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
 	gbusters_sprite_callback
 };
 
@@ -428,14 +430,6 @@ static MACHINE_RESET( gbusters )
 }
 
 
-static DRIVER_INIT( gbusters )
-{
-	konamid_rom_deinterleave_2(machine, "gfx1");
-	konamid_rom_deinterleave_2(machine, "gfx2");
-}
-
-
-
-GAME( 1988, gbusters, 0,        gbusters, gbusters, gbusters, ROT90, "Konami", "Gang Busters (set 1)", 0 ) /* N02 & J03 program roms */
-GAME( 1988, gbustersa,gbusters, gbusters, gbusters, gbusters, ROT90, "Konami", "Gang Busters (set 2)", 0 ) /* unknown region program roms */
-GAME( 1988, crazycop, gbusters, gbusters, gbusters, gbusters, ROT90, "Konami", "Crazy Cop (Japan)", 0 )    /* M02 & J03 program roms */
+GAME( 1988, gbusters, 0,        gbusters, gbusters, 0, ROT90, "Konami", "Gang Busters (set 1)", 0 ) /* N02 & J03 program roms */
+GAME( 1988, gbustersa,gbusters, gbusters, gbusters, 0, ROT90, "Konami", "Gang Busters (set 2)", 0 ) /* unknown region program roms */
+GAME( 1988, crazycop, gbusters, gbusters, gbusters, 0, ROT90, "Konami", "Crazy Cop (Japan)", 0 )    /* M02 & J03 program roms */

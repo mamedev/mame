@@ -228,6 +228,7 @@ static const k052109_interface aliens_k052109_intf =
 {
 	"gfx1",
 	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
 	aliens_tile_callback
 };
 
@@ -235,6 +236,7 @@ static const k051960_interface aliens_k051960_intf =
 {
 	"gfx2",
 	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
 	aliens_sprite_callback
 };
 
@@ -548,9 +550,6 @@ static MACHINE_RESET( aliens )
 
 static DRIVER_INIT( aliens )
 {
-	konamid_rom_deinterleave_2(machine, "gfx1");
-	konamid_rom_deinterleave_2(machine, "gfx2");
-
 	state_save_register_global(machine, palette_selected);
 }
 

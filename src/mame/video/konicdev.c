@@ -1163,7 +1163,7 @@ Registers (word-wise):
     (it could be easily converted into an iterative one).
     It's called shuffle because it mimics the shuffling of a deck of cards.
 */
-static void shuffle(UINT16 *buf,int len)
+static void konami_shuffle_16(UINT16 *buf,int len)
 {
 	int i;
 	UINT16 t;
@@ -1181,16 +1181,37 @@ static void shuffle(UINT16 *buf,int len)
 		buf[len + i] = t;
 	}
 
-	shuffle(buf,len);
-	shuffle(buf + len,len);
+	konami_shuffle_16(buf,len);
+	konami_shuffle_16(buf + len,len);
 }
 
-// to be renamed back to the original when video/konamiic.c is fully replaced
+static void konami_shuffle_8(UINT8 *buf,int len)
+{
+	int i;
+	UINT8 t;
+
+	if (len == 2) return;
+
+	if (len % 4) fatalerror("shuffle() - not modulo 4");	/* must not happen */
+
+	len /= 2;
+
+	for (i = 0;i < len/2;i++)
+	{
+		t = buf[len/2 + i];
+		buf[len/2 + i] = buf[len + i];
+		buf[len + i] = t;
+	}
+
+	konami_shuffle_8(buf,len);
+	konami_shuffle_8(buf + len,len);
+}
+
 
 /* helper function to join two 16-bit ROMs and form a 32-bit data stream */
 void konamid_rom_deinterleave_2(running_machine *machine, const char *mem_region)
 {
-	shuffle((UINT16 *)memory_region(machine, mem_region),memory_region_length(machine, mem_region)/2);
+	konami_shuffle_16((UINT16 *)memory_region(machine, mem_region),memory_region_length(machine, mem_region)/2);
 }
 
 /* hacked version of rom_deinterleave_2_half for Lethal Enforcers */
@@ -1198,8 +1219,8 @@ void konamid_rom_deinterleave_2_half(running_machine *machine, const char *mem_r
 {
 	UINT8 *rgn = memory_region(machine, mem_region);
 
-	shuffle((UINT16 *)rgn,memory_region_length(machine, mem_region)/4);
-	shuffle((UINT16 *)(rgn+memory_region_length(machine, mem_region)/2),memory_region_length(machine, mem_region)/4);
+	konami_shuffle_16((UINT16 *)rgn,memory_region_length(machine, mem_region)/4);
+	konami_shuffle_16((UINT16 *)(rgn+memory_region_length(machine, mem_region)/2),memory_region_length(machine, mem_region)/4);
 }
 
 /* helper function to join four 16-bit ROMs and form a 64-bit data stream */
@@ -1219,6 +1240,27 @@ static void decode_gfx(running_machine *machine, int gfx_index, UINT8 *data, UIN
 	machine->gfx[gfx_index] = gfx_element_alloc(machine, &gl, data, machine->config->total_colors >> bpp, 0);
 }
 
+
+static void deinterleave_gfx(running_machine *machine, const char *gfx_memory_region, int deinterleave)
+{
+	switch (deinterleave)
+	{
+	case KONAMI_ROM_DEINTERLEAVE_NONE:
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_2:
+		konamid_rom_deinterleave_2(machine, gfx_memory_region);
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_2_HALF:
+		konamid_rom_deinterleave_2_half(machine, gfx_memory_region);
+		break;
+	case KONAMI_ROM_DEINTERLEAVE_4:
+		konamid_rom_deinterleave_4(machine, gfx_memory_region);
+		break;
+	case KONAMI_ROM_SHUFFLE8:
+		konami_shuffle_8(memory_region(machine, gfx_memory_region), memory_region_length(machine, gfx_memory_region));
+		break;
+	}
+}
 
 /***************************************************************************/
 /*                                                                         */
@@ -2319,6 +2361,22 @@ int k052109_get_rmrd_line(const device_config *device )
 	return k052109->RMRD_line;
 }
 
+/* WIP to handle glfgreat & prmrsocr... */
+tilemap *k052109_get_tilemap(const device_config *device, int tmap_num)
+{
+	k052109_state *k052109 = k052109_get_safe_token(device);
+
+	assert(tmap_num < 3);
+	return k052109->tilemap[tmap_num];
+}
+
+void k052109_get_tmap( const device_config *device, tilemap **tilemap, int tmap_num )
+{
+	k052109_state *k052109 = k052109_get_safe_token(device);
+	*tilemap = k052109->tilemap[tmap_num];
+}
+
+
 void k052109_tilemap_update( const device_config *device )
 {
 	k052109_state *k052109 = k052109_get_safe_token(device);
@@ -2628,6 +2686,9 @@ static DEVICE_START( k052109 )
 	default:
 		fatalerror("Unsupported plane_order");
 	}
+
+	/* deinterleave the graphics, if needed */
+	deinterleave_gfx(machine, intf->gfx_memory_region, intf->deinterleave);
 
 	k052109->memory_region = intf->gfx_memory_region;
 	k052109->gfxnum = gfx_index;
@@ -3188,6 +3249,9 @@ static DEVICE_START( k051960 )
 
 	if (VERBOSE && !(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
+
+	/* deinterleave the graphics, if needed */
+	deinterleave_gfx(machine, intf->gfx_memory_region, intf->deinterleave);
 
 	k051960->memory_region = intf->gfx_memory_region;
 	k051960->gfx = machine->gfx[gfx_index];
@@ -4015,20 +4079,7 @@ static DEVICE_START( k05324x )
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	/* deinterleave the graphics, if needed */
-	switch (intf->deinterleave)
-	{
-	case KONAMI_ROM_DEINTERLEAVE_NONE:
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_2:
-		konamid_rom_deinterleave_2(machine, intf->gfx_memory_region);
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_2_HALF:
-		konamid_rom_deinterleave_2_half(machine, intf->gfx_memory_region);
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_4:
-		konamid_rom_deinterleave_4(machine, intf->gfx_memory_region);
-		break;
-	}
+	deinterleave_gfx(machine, intf->gfx_memory_region, intf->deinterleave);
 
 	k05324x->ramsize = 0x800;
 
@@ -4871,20 +4922,7 @@ static DEVICE_START( k053247 )
 	}
 
 	/* deinterleave the graphics, if needed */
-	switch (intf->deinterleave)
-	{
-	case KONAMI_ROM_DEINTERLEAVE_NONE:
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_2:
-		konamid_rom_deinterleave_2(machine, intf->gfx_memory_region);
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_2_HALF:
-		konamid_rom_deinterleave_2_half(machine, intf->gfx_memory_region);
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_4:
-		konamid_rom_deinterleave_4(machine, intf->gfx_memory_region);
-		break;
-	}
+	deinterleave_gfx(machine, intf->gfx_memory_region, intf->deinterleave);
 
 	k053247->dx = intf->dx;
 	k053247->dy = intf->dy;
@@ -5164,20 +5202,6 @@ WRITE8_DEVICE_HANDLER( k051316_ctrl_w )
 	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", cpuexec_describe_context(device->machine), data, offset);
 }
 
-void k051316_wraparound_enable( const device_config *device, int status )
-{
-	k051316_state *k051316= k051316_get_safe_token(device);
-	k051316->wraparound = status;
-}
-
-void k051316_set_offset( const device_config *device, int xoffs, int yoffs )
-{
-	k051316_state *k051316= k051316_get_safe_token(device);
-
-	k051316->offset[0] = xoffs;
-	k051316->offset[1] = yoffs;
-}
-
 
 /***************************************************************************
 
@@ -5340,7 +5364,7 @@ static DEVICE_START( k051316 )
 		total = memory_region_length(machine, intf->gfx_memory_region) / 256;
 		decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &charlayout7, 7);
 		break;
-
+	
 	case 8:
 		total = memory_region_length(machine, intf->gfx_memory_region) / 256;
 		decode_gfx(machine, gfx_index, memory_region(machine, intf->gfx_memory_region), total, &charlayout8, 8);
@@ -5367,18 +5391,20 @@ static DEVICE_START( k051316 )
 		tilemap_map_pens_to_layer(k051316->tmap, 0, intf->transparent_pen, intf->transparent_pen, TILEMAP_PIXEL_LAYER0);
 	}
 
+	k051316->wraparound = intf->wrap;
+	k051316->offset[0] = intf->xoffs;
+	k051316->offset[1] = intf->yoffs;
+
 	state_save_register_device_item_pointer(device, 0, k051316->ram, 0x800);
 	state_save_register_device_item_array(device, 0, k051316->ctrlram);
-	state_save_register_device_item_array(device, 0, k051316->offset);
-	state_save_register_device_item(device, 0, k051316->wraparound);
 }
 
 static DEVICE_RESET( k051316 )
 {
 	k051316_state *k051316 = k051316_get_safe_token(device);
 
-	k051316->wraparound = 0;	/* default = no wraparound */
-	k051316->offset[0] = k051316->offset[1] = 0;
+	memset(k051316->ram,  0, 0x800);
+	memset(k051316->ctrlram,  0, 0x10);
 }
 
 
@@ -5631,7 +5657,10 @@ static DEVICE_RESET( k053936 )
 typedef struct _k053251_state k053251_state;
 struct _k053251_state
 {
+	/* glfgreat wants to pass k052109 tilemaps to k053251... still in progress... */
 	tilemap  *tmaps[5];
+	int      dirty_tmap[5];
+
 	UINT8    ram[16];
 	int      tilemaps_set;
 	int      palette_index[5];
@@ -5697,10 +5726,9 @@ WRITE8_DEVICE_HANDLER( k053251_w )
 				if (k053251->palette_index[i] != newind)
 				{
 					k053251->palette_index[i] = newind;
+//					k053251->dirty_tmap[i] = 1;
 					if (k053251->tmaps[i])
-						tilemap_mark_all_tiles_dirty(k053251->tmaps[i]);
-
-				}
+						tilemap_mark_all_tiles_dirty(k053251->tmaps[i]);				}
 			}
 
 			if (!k053251->tilemaps_set)
@@ -5715,9 +5743,9 @@ WRITE8_DEVICE_HANDLER( k053251_w )
 				if (k053251->palette_index[3 + i] != newind)
 				{
 					k053251->palette_index[3 + i] = newind;
+//					k053251->dirty_tmap[3 + i] = 1;
 					if (k053251->tmaps[3 + i])
-						tilemap_mark_all_tiles_dirty(k053251->tmaps[3 + i]);
-				}
+						tilemap_mark_all_tiles_dirty(k053251->tmaps[3 + i]);				}
 			}
 
 			if (!k053251->tilemaps_set)
@@ -5750,6 +5778,20 @@ int k053251_get_palette_index( const device_config *device, int ci )
 	return k053251->palette_index[ci];
 }
 
+int k053251_get_tmap_dirty( const device_config *device, int tmap_num )
+{
+	k053251_state *k053251 = k053251_get_safe_token(device);
+	assert(tmap_num < 5);
+	return k053251->dirty_tmap[tmap_num];
+}
+
+void k053251_set_tmap_dirty( const device_config *device, int tmap_num, int data )
+{
+	k053251_state *k053251 = k053251_get_safe_token(device);
+	assert(tmap_num < 5);
+	k053251->dirty_tmap[tmap_num] = data ? 1 : 0;
+}
+
 
 /*****************************************************************************
     DEVICE INTERFACE
@@ -5761,7 +5803,7 @@ static DEVICE_START( k053251 )
 
 	state_save_register_device_item_array(device, 0, k053251->ram);
 	state_save_register_device_item(device, 0, k053251->tilemaps_set);
-
+	state_save_register_device_item_array(device, 0, k053251->dirty_tmap);
 }
 
 static DEVICE_RESET( k053251 )
@@ -5773,6 +5815,9 @@ static DEVICE_RESET( k053251 )
 		k053251->ram[i] = 0;
 
 	k053251_set_tilemaps(device, NULL, NULL, NULL, NULL, NULL);
+
+	for (i = 0; i < 5; i++)
+		k053251->dirty_tmap[i] = 0;
 }
 
 
@@ -7858,20 +7903,7 @@ static DEVICE_START( k056832 )
 	machine->gfx[gfx_index]->color_granularity = 16; /* override */
 
 	/* deinterleave the graphics, if needed */
-	switch (intf->deinterleave)
-	{
-	case KONAMI_ROM_DEINTERLEAVE_NONE:
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_2:
-		konamid_rom_deinterleave_2(machine, intf->gfx_memory_region);
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_2_HALF:
-		konamid_rom_deinterleave_2_half(machine, intf->gfx_memory_region);
-		break;
-	case KONAMI_ROM_DEINTERLEAVE_4:
-		konamid_rom_deinterleave_4(machine, intf->gfx_memory_region);
-		break;
-	}
+	deinterleave_gfx(machine, intf->gfx_memory_region, intf->deinterleave);
 
 	k056832->memory_region = intf->gfx_memory_region;
 	k056832->gfxnum = gfx_index;
@@ -8449,14 +8481,6 @@ INLINE const k053250_interface *k053250_get_interface( const device_config *devi
     DEVICE HANDLERS
 *****************************************************************************/
 
-void k053250_set_layer_offs( const device_config *device, int offsx, int offsy )
-{
-	k053250_state *k053250 = k053250_get_safe_token(device);
-
-	k053250->offsx = offsx;
-	k053250->offsy = offsy;
-}
-
 // The DMA process should be instantaneous but since rendering in MAME is performed at VIDEO_UPDATE()
 // the k053250 memory must be buffered to maintain visual integrity.
 void k053250_dma( const device_config *device, int limiter )
@@ -8518,7 +8542,7 @@ READ16_DEVICE_HANDLER( k053250_rom_r )
 
 
 // Pixel data of the k053250 is nibble packed. It's preferable to be unpacked into byte format.
-void k053250_unpack_pixels(running_machine *machine, const char *region)
+static void k053250_unpack_pixels(running_machine *machine, const char *region)
 {
 	UINT8 *src_ptr, *dst_ptr;
 	int hi_nibble, lo_nibble, offset;
@@ -8938,6 +8962,12 @@ static DEVICE_START( k053250 )
 	k053250->buffer[0] = k053250->ram + 0x2000;
 	k053250->buffer[1] = k053250->ram + 0x2800;
 
+	k053250->offsx = intf->xoff;
+	k053250->offsy = intf->yoff;
+
+	/* unpack graphics */
+	k053250_unpack_pixels(device->machine, intf->region);
+
 	state_save_register_device_item_pointer(device, 0, k053250->ram, 0x6000 / 2);
 	state_save_register_device_item_array(device, 0, k053250->regs);
 	state_save_register_device_item(device, 0, k053250->page);
@@ -8951,10 +8981,9 @@ static DEVICE_RESET( k053250 )
 	k053250_state *k053250 = k053250_get_safe_token(device);
 	int i;
 
-	memset(k053250->ram + 0x2000, 0, 0x6000 / 2);
+	memset(k053250->ram, 0, 0x6000 / 2);
 
 	k053250->page = 0;
-	k053250->offsy = k053250->offsx = 0;
 	k053250->frame = -1;
 
 	for (i = 0; i < 8; i++)

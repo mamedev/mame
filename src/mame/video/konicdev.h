@@ -41,6 +41,7 @@ struct _k052109_interface
 {
 	const char         *gfx_memory_region;
 	int                plane_order;
+	int                deinterleave;
 	k052109_callback   callback;
 };
 
@@ -49,6 +50,7 @@ struct _k051960_interface
 {
 	const char         *gfx_memory_region;
 	int                plane_order;
+	int                deinterleave;
 	k051960_callback   callback;
 };
 
@@ -78,6 +80,7 @@ struct _k051316_interface
 {
 	const char         *gfx_memory_region;
 	int                bpp, pen_is_mask, transparent_pen;
+	int                wrap, xoffs, yoffs;
 	k051316_callback   callback;
 };
 
@@ -114,6 +117,7 @@ struct _k053250_interface
 {
 	const char         *screen;
 	const char         *region;
+	int                xoff, yoff;
 };
 
 
@@ -267,7 +271,8 @@ enum
 	KONAMI_ROM_DEINTERLEAVE_NONE = 0,
 	KONAMI_ROM_DEINTERLEAVE_2,
 	KONAMI_ROM_DEINTERLEAVE_2_HALF,
-	KONAMI_ROM_DEINTERLEAVE_4
+	KONAMI_ROM_DEINTERLEAVE_4,
+	KONAMI_ROM_SHUFFLE8
 };
 
 /* helper function to join two 16-bit ROMs and form a 32-bit data stream */
@@ -354,6 +359,10 @@ int k052109_get_rmrd_line(const device_config *device);
 void k052109_tilemap_update(const device_config *device);
 int k052109_is_irq_enabled(const device_config *device);
 void k052109_set_layer_offsets(const device_config *device, int layer, int dx, int dy);
+
+// WIP code while trying to convert/cleanup glfgreat
+void k052109_get_tmap(const device_config *device, tilemap **tilemap, int tmap_num);
+tilemap *k052109_get_tilemap(const device_config *device, int tmap_num);
 
 void k052109_tilemap_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int tmap_num, UINT32 flags, UINT8 priority);
 void k052109_postload_tileflip_reset( const device_config *device );	// this has to be added to POSTLOAD functions in each driver
@@ -482,8 +491,6 @@ WRITE8_DEVICE_HANDLER( k051316_w );
 READ8_DEVICE_HANDLER( k051316_rom_r );
 WRITE8_DEVICE_HANDLER( k051316_ctrl_w );
 void k051316_zoom_draw(const device_config *device, bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT32 priority);
-void k051316_wraparound_enable(const device_config *device, int status);
-void k051316_set_offset(const device_config *device, int xoffs, int yoffs);
 
 
 /**  Konami 053936  **/
@@ -492,8 +499,8 @@ READ16_DEVICE_HANDLER( k053936_ctrl_r );	// FIXME: this is probably unused... to
 WRITE16_DEVICE_HANDLER( k053936_linectrl_w );
 READ16_DEVICE_HANDLER( k053936_linectrl_r );
 void k053936_zoom_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, tilemap *tmap, int flags, UINT32 priority, int glfgreat_hack);
-void k053936_wraparound_enable(const device_config *device, int status);
-void k053936_set_offset(const device_config *device, int xoffs, int yoffs);
+void k053936_wraparound_enable(const device_config *device, int status);	// shall we merge this into the configuration intf?
+void k053936_set_offset(const device_config *device, int xoffs, int yoffs);	// shall we merge this into the configuration intf?
 
 
 /**  Konami 053251 **/
@@ -507,7 +514,10 @@ WRITE16_DEVICE_HANDLER( k053251_lsb_w );
 WRITE16_DEVICE_HANDLER( k053251_msb_w );
 int k053251_get_priority(const device_config *device, int ci);
 int k053251_get_palette_index(const device_config *device, int ci);
-void k053251_set_tilemaps(const device_config *device, tilemap *ci0,tilemap *ci1,tilemap *ci2,tilemap *ci3,tilemap *ci4);
+
+void k053251_set_tilemaps(const device_config *device, tilemap *ci0, tilemap *ci1, tilemap *ci2, tilemap *ci3, tilemap *ci4);
+int k053251_get_tmap_dirty(const device_config *device, int tmap_num);
+void k053251_set_tmap_dirty(const device_config *device, int tmap_num, int data);
 void k053251_postload_reset_indexes(const device_config *device);
 
 enum 
@@ -693,24 +703,17 @@ void k054338_invert_alpha(const device_config *device, int invert);								// 0=
 
 
 /**  Konami 053250  **/
-WRITE16_DEVICE_HANDLER( k053250_0_w );
-READ16_DEVICE_HANDLER( k053250_0_r );
-WRITE16_DEVICE_HANDLER( k053250_0_ram_w );
-READ16_DEVICE_HANDLER( k053250_0_ram_r );
-READ16_DEVICE_HANDLER( k053250_0_rom_r );
-WRITE16_DEVICE_HANDLER( k053250_1_w );
-READ16_DEVICE_HANDLER( k053250_1_r );
-WRITE16_DEVICE_HANDLER( k053250_1_ram_w );
-READ16_DEVICE_HANDLER( k053250_1_ram_r );
-READ16_DEVICE_HANDLER( k053250_1_rom_r );
+WRITE16_DEVICE_HANDLER( k053250_w );
+READ16_DEVICE_HANDLER( k053250_r );
+WRITE16_DEVICE_HANDLER( k053250_ram_w );
+READ16_DEVICE_HANDLER( k053250_ram_r );
+READ16_DEVICE_HANDLER( k053250_rom_r );
 
 // K053250_draw() control flags
 #define K053250_WRAP500		0x01
 #define K053250_OVERDRIVE	0x02
 
 void k053250_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int colorbase, int flags, int pri);
-void k053250_set_LayerOffset(const device_config *device, int offsx, int offsy);
-void k053250_unpack_pixels(running_machine *machine, const char *region);
 void k053250_dma(const device_config *device, int limiter);
 
 

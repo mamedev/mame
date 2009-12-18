@@ -15,5 +15,7 @@ NVRAM_HANDLER( simpsons );
 extern UINT8 *simpsons_xtraram;
 
 void simpsons_video_banking( running_machine *machine, int select );
-VIDEO_START( simpsons );
 VIDEO_UPDATE( simpsons );
+
+extern void simpsons_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void simpsons_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);

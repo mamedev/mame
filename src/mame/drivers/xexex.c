@@ -64,17 +64,20 @@ Unresolved Issues:
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
 #include "sound/k054539.h"
 #include "sound/2151intf.h"
 #include "sound/flt_vol.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 VIDEO_START( xexex );
 VIDEO_UPDATE( xexex );
 void xexex_set_alpha(int on);
+
+extern void xexex_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
+extern void xexex_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
 
 static MACHINE_START( xexex );
 static MACHINE_RESET( xexex );
@@ -125,23 +128,27 @@ static NVRAM_HANDLER( xexex )
 /* A1, A5 and A6 don't go to the 053247. */
 static READ16_HANDLER( K053247_scattered_word_r )
 {
+	const device_config *k053246 = devtag_get_device(space->machine, "k053246");
+
 	if (offset & 0x0031)
 		return space->machine->generic.spriteram.u16[offset];
 	else
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x3fc0) >> 3);
-		return K053247_word_r(offset,mem_mask);
+		return k053247_word_r(k053246, offset, mem_mask);
 	}
 }
 
 static WRITE16_HANDLER( K053247_scattered_word_w )
 {
+	const device_config *k053246 = devtag_get_device(space->machine, "k053246");
+
 	if (offset & 0x0031)
 		COMBINE_DATA(space->machine->generic.spriteram.u16+offset);
 	else
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x3fc0) >> 3);
-		K053247_word_w(offset,data,mem_mask);
+		k053247_word_w(k053246, offset, data, mem_mask);
 	}
 }
 
@@ -150,14 +157,17 @@ static WRITE16_HANDLER( K053247_scattered_word_w )
 
 static void xexex_objdma(running_machine *machine, int limiter)
 {
+	const device_config *k053246 = devtag_get_device(machine, "k053246");
 	int counter, num_inactive;
 	UINT16 *src, *dst;
 
 	counter = frame;
 	frame = video_screen_get_frame_number(machine->primary_screen);
-	if (limiter && counter == frame) return; // make sure we only do DMA transfer once per frame
+	if (limiter && counter == frame) 
+		return; // make sure we only do DMA transfer once per frame
 
-	K053247_export_config(&dst, 0, 0, 0, &counter);
+	k053247_get_ram(k053246, &dst);
+	counter = k053247_get_dy(k053246);
 	src = machine->generic.spriteram.u16;
 	num_inactive = counter = 256;
 
@@ -219,8 +229,10 @@ static READ16_HANDLER( control1_r )
 	return res;
 }
 
-static void parse_control2(void)
+static void parse_control2( running_machine *machine )
 {
+	const device_config *k053246 = devtag_get_device(machine, "k053246");
+
 	/* bit 0  is data */
 	/* bit 1  is cs (active low) */
 	/* bit 2  is clock (active high) */
@@ -233,7 +245,7 @@ static void parse_control2(void)
 	eeprom_set_clock_line((cur_control2 & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 8 = enable sprite ROM reading */
-	K053246_set_OBJCHA_line((cur_control2 & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
+	k053246_set_objcha_line(k053246, (cur_control2 & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 9 = disable alpha channel on K054157 plane 0 (under investigation) */
 	xexex_set_alpha(!(cur_control2 & 0x200));
@@ -247,7 +259,7 @@ static READ16_HANDLER( control2_r )
 static WRITE16_HANDLER( control2_w )
 {
 	COMBINE_DATA(&cur_control2);
-	parse_control2();
+	parse_control2(space->machine);
 }
 
 
@@ -305,7 +317,11 @@ static TIMER_CALLBACK( dmaend_callback )
 	if (cur_control2 & 0x0040)
 	{
 		// foul-proof (CPU0 could be deactivated while we wait)
-		if (suspension_active) { suspension_active = 0; cpuexec_trigger(machine, resume_trigger); }
+		if (suspension_active) 
+		{ 
+			suspension_active = 0; 
+			cpuexec_trigger(machine, resume_trigger); 
+		}
 
 		// IRQ 5 is the "object DMA end interrupt" and shouldn't be triggered
 		// if object data isn't ready for DMA within the frame.
@@ -315,7 +331,13 @@ static TIMER_CALLBACK( dmaend_callback )
 
 static INTERRUPT_GEN( xexex_interrupt )
 {
-	if (suspension_active) { suspension_active = 0; cpuexec_trigger(device->machine, resume_trigger); }
+	const device_config *k053246 = devtag_get_device(device->machine, "k053246");
+
+	if (suspension_active) 
+	{ 
+		suspension_active = 0; 
+		cpuexec_trigger(device->machine, resume_trigger); 
+	}
 
 	switch (cpu_getiloops(device))
 	{
@@ -326,7 +348,7 @@ static INTERRUPT_GEN( xexex_interrupt )
 		break;
 
 		case 1:
-			if (K053246_is_IRQ_enabled())
+			if (k053246_is_irq_enabled(k053246))
 			{
 				// OBJDMA starts at the beginning of V-blank
 				xexex_objdma(device->machine, 0);
@@ -354,39 +376,39 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_BASE_GENERIC(spriteram)			// K053247 sprite RAM
 	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(spriteram16_mirror_r, spriteram16_mirror_w)	// K053247 sprite RAM mirror read
-	AM_RANGE(0x0c0000, 0x0c003f) AM_WRITE(K056832_word_w)				// VACSET (K054157)
-	AM_RANGE(0x0c2000, 0x0c2007) AM_WRITE(K053246_word_w)				// OBJSET1
-	AM_RANGE(0x0c4000, 0x0c4001) AM_READ(K053246_word_r)				// Passthrough to sprite roms
-	AM_RANGE(0x0c6000, 0x0c7fff) AM_READWRITE(K053250_0_ram_r, K053250_0_ram_w)	// K053250 "road" RAM
-	AM_RANGE(0x0c8000, 0x0c800f) AM_READWRITE(K053250_0_r, K053250_0_w)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_WRITE(K054338_word_w)				// CLTC
-	AM_RANGE(0x0cc000, 0x0cc01f) AM_WRITE(K053251_lsb_w)				// priority encoder
-	AM_RANGE(0x0d0000, 0x0d001f) AM_WRITE(K053252_word_w)				// CCU
+	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE("k056832", k056832_word_w)				// VACSET (K054157)
+	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE("k053246", k053246_word_w)				// OBJSET1
+	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD("k053246", k053246_word_r)				// Passthrough to sprite roms
+	AM_RANGE(0x0c6000, 0x0c7fff) AM_DEVREADWRITE("k053250", k053250_ram_r, k053250_ram_w)	// K053250 "road" RAM
+	AM_RANGE(0x0c8000, 0x0c800f) AM_DEVREADWRITE("k053250", k053250_r, k053250_w)
+	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE("k054338", k054338_word_w)				// CLTC
+	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE("k053251", k053251_lsb_w)				// priority encoder
+	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVWRITE("k053252", k053252_word_w)				// CCU
 	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE(sound_cmd2_w)
 	AM_RANGE(0x0d6014, 0x0d6015) AM_READ(sound_status_r)
 	AM_RANGE(0x0d6000, 0x0d601f) AM_RAM									// sound regs fall through
-	AM_RANGE(0x0d8000, 0x0d8007) AM_WRITE(K056832_b_word_w)				// VSCCS regs
+	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE("k056832", k056832_b_word_w)				// VSCCS regs
 	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1")
 	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2")
 	AM_RANGE(0x0dc000, 0x0dc001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0dc002, 0x0dc003) AM_READ(control1_r)
 	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
-	AM_RANGE(0x180000, 0x181fff) AM_READWRITE(K056832_ram_word_r, K056832_ram_word_w)
-	AM_RANGE(0x182000, 0x183fff) AM_READWRITE(K056832_ram_word_r, K056832_ram_word_w)
-	AM_RANGE(0x190000, 0x191fff) AM_READ(K056832_rom_word_r)		// Passthrough to tile roms
-	AM_RANGE(0x1a0000, 0x1a1fff) AM_READ(K053250_0_rom_r)
+	AM_RANGE(0x180000, 0x181fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)
+	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)
+	AM_RANGE(0x190000, 0x191fff) AM_DEVREAD("k056832", k056832_rom_word_r)		// Passthrough to tile roms
+	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREAD("k053250", k053250_rom_r)
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)
 
 #if XE_DEBUG
-	AM_RANGE(0x0c0000, 0x0c003f) AM_READ(K056832_word_r)
-	AM_RANGE(0x0c2000, 0x0c2007) AM_READ(K053246_reg_word_r)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_READ(K054338_word_r)
-	AM_RANGE(0x0cc000, 0x0cc01f) AM_READ(K053251_lsb_r)
-	AM_RANGE(0x0d0000, 0x0d001f) AM_READ(K053252_word_r)
-	AM_RANGE(0x0d8000, 0x0d8007) AM_READ(K056832_b_word_r)
+	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVREAD("k056832", k056832_word_r)
+	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVREAD("k053246", k053246_reg_word_r)
+	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVREAD("k054338", k054338_word_r)
+	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVREAD("k053251", k053251_lsb_r)
+	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREAD("k053252", k053252_word_r)
+	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVREAD("k056832", k056832_b_word_r)
 #endif
 
 ADDRESS_MAP_END
@@ -439,6 +461,40 @@ static const k054539_interface k054539_config =
 	ym_set_mixing
 };
 
+static const k054338_interface xexex_k054338_intf =
+{
+	"screen",
+	0,
+	"none"
+};
+
+
+static const k053250_interface xexex_k053250_intf =
+{
+	"screen",
+	"gfx3",
+	-5, -16
+};
+
+static const k056832_interface xexex_k056832_intf =
+{
+	"gfx1",
+	K056832_BPP_4,
+	1, 0,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	xexex_tile_callback, "none"
+};
+
+static const k053247_interface xexex_k053246_intf =
+{
+	"screen",
+	"gfx2",
+	NORMAL_PLANE_ORDER,
+	-48, 32,
+	KONAMI_ROM_DEINTERLEAVE_4,
+	xexex_sprite_callback
+};
+
 static MACHINE_DRIVER_START( xexex )
 
 	/* basic machine hardware */
@@ -472,6 +528,13 @@ static MACHINE_DRIVER_START( xexex )
 
 	MDRV_VIDEO_START(xexex)
 	MDRV_VIDEO_UPDATE(xexex)
+
+	MDRV_K056832_ADD("k056832", xexex_k056832_intf)
+	MDRV_K053246_ADD("k053246", xexex_k053246_intf)
+	MDRV_K053250_ADD("k053250", xexex_k053250_intf)
+	MDRV_K053251_ADD("k053251")
+	MDRV_K053252_ADD("k053252")
+	MDRV_K054338_ADD("k054338", xexex_k054338_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -599,7 +662,7 @@ static MACHINE_RESET( xexex )
 
 static STATE_POSTLOAD( xexex_postload )
 {
-	parse_control2();
+	parse_control2(machine);
 	reset_sound_region(machine);
 }
 
@@ -625,10 +688,6 @@ static DRIVER_INIT( xexex )
 //      *(UINT16 *)(memory_region(machine, "maincpu") + 0x00008) = 0x5500;
 		xexex_strip0x1a = 1;
 	}
-
-	konami_rom_deinterleave_2(machine, "gfx1");
-	konami_rom_deinterleave_4(machine, "gfx2");
-	K053250_unpack_pixels(machine, "gfx3");
 }
 
 GAME( 1991, xexex,  0,     xexex, xexex, xexex, ROT0, "Konami", "Xexex (ver EAA)", 0 )

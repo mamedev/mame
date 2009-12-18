@@ -186,6 +186,7 @@ static const k052109_interface blockhl_k052109_intf =
 {
 	"gfx1",
 	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
 	blockhl_tile_callback
 };
 
@@ -193,6 +194,7 @@ static const k051960_interface blockhl_k051960_intf =
 {
 	"gfx2",
 	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
 	blockhl_sprite_callback
 };
 
@@ -334,12 +336,5 @@ static MACHINE_RESET( blockhl )
 }
 
 
-static DRIVER_INIT( blockhl )
-{
-	konamid_rom_deinterleave_2(machine, "gfx1");
-	konamid_rom_deinterleave_2(machine, "gfx2");
-}
-
-
-GAME( 1989, blockhl, 0,       blockhl, blockhl, blockhl, ROT0, "Konami", "Block Hole", 0 )
-GAME( 1989, quarth,  blockhl, blockhl, blockhl, blockhl, ROT0, "Konami", "Quarth (Japan)", 0 )
+GAME( 1989, blockhl, 0,       blockhl, blockhl, 0, ROT0, "Konami", "Block Hole", 0 )
+GAME( 1989, quarth,  blockhl, blockhl, blockhl, 0, ROT0, "Konami", "Quarth (Japan)", 0 )
