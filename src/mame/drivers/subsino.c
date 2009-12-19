@@ -276,8 +276,6 @@ static WRITE8_HANDLER( flash_w )
 				flash_packet_start = 0; //end of packet
 			else
 				flash_val = data;
-
-			printf("%02x %02x\n",flash_packet,flash_val);
 			break;
 	}
 }
