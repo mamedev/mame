@@ -476,6 +476,10 @@ void tilemap_set_flip(tilemap *tmap, UINT32 attributes)
 void tilemap_set_flip_all(running_machine *machine, UINT32 attributes)
 {
 	tilemap *tmap;
+
+	if (machine->tilemap_data == NULL)
+		return;
+
 	for (tmap = machine->tilemap_data->list; tmap != NULL; tmap = tmap->next)
 		tilemap_set_flip(tmap, attributes);
 }
