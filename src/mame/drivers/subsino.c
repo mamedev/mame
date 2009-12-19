@@ -3,15 +3,13 @@
                         -= Subsino's Gambling Games =-
 
                      driver by   Luca Elia (l.elia@tin.it)
+            additional work by   David Haywood and Angelo Salese
 
 CPU:    Z180 (in a black box)
 GFX:    1 Tilemap (8x8 tiles, no scrolling)
 CUSTOM: 2 x SUBSINO SS9100, SUBSINO SS9101
 SOUND:  M6295, YM2413 or YM3812
 OTHER:  Battery
-
-Preliminary driver, only "Super Rider" works since it has valid z180 code.
-Note that e.g. "Shark Party" has snippets of valid code (6f - ff).
 
 To enter test mode in smoto, keep F2 pressed during boot.
 
@@ -286,6 +284,11 @@ static ADDRESS_MAP_START( victor5_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+static READ8_HANDLER( hwcheck_r )
+{
+	/* Wants this at POST otherwise an "Hardware Error" occurs. */
+	return 0x55;
+}
 
 static ADDRESS_MAP_START( crsbingo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
@@ -294,20 +297,20 @@ static ADDRESS_MAP_START( crsbingo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x09001, 0x09001 ) AM_READ_PORT( "SW2" )
 	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "INA" )
 	AM_RANGE( 0x09003, 0x09003 ) AM_READ_PORT( "INB" )
-//	AM_RANGE( 0x09004, 0x09004 ) // INC?
+	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "INC" )
 
-	AM_RANGE( 0x09008, 0x09008 ) AM_READ_PORT( "SW4" ) 
+	AM_RANGE( 0x09008, 0x09008 ) AM_READ_PORT( "SW4" )
 	AM_RANGE( 0x09009, 0x09009 ) AM_READ_PORT( "SW3" ) AM_WRITE( subsino_out_b_w )
-//	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE( subsino_out_a_w )
+	AM_RANGE( 0x0900a, 0x0900a ) AM_READ( hwcheck_r )
 
-//	AM_RANGE( 0x0900b, 0x0900b ) //"flash" status, bit 0
+	AM_RANGE( 0x09010, 0x09010 ) AM_READWRITE( flash_r, flash_w )
+//	AM_RANGE( 0x09011, 0x09011 ) //"flash" status, bit 0
 //	AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
-
-	AM_RANGE( 0x0900e, 0x0900f ) AM_DEVWRITE( "ymsnd", ym2413_w )
+	AM_RANGE( 0x0900c, 0x0900d ) AM_DEVWRITE( "ymsnd", ym2413_w )
 
 //	AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE( "oki", okim6295_w )
 
-	AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE( subsino_tiles_offset_w )
+//	AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE( subsino_tiles_offset_w )
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
 	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE_GENERIC( videoram )
@@ -756,7 +759,7 @@ static INPUT_PORTS_START( crsbingo )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START( "SW4" )
 	PORT_DIPNAME( 0x01, 0x01, "SW4" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -784,47 +787,27 @@ static INPUT_PORTS_START( crsbingo )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START( "INA" )
-	PORT_DIPNAME( 0x01, 0x01, "INA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3 / Half Take")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / Small")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Big")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_BET )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START( "INB" )
-	PORT_DIPNAME( 0x01, 0x01, "INB" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )	// coin
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )	// coin
+	PORT_DIPNAME( 0x04, 0x04, "INB" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )	// test
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -859,7 +842,7 @@ static INPUT_PORTS_START( crsbingo )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1454,6 +1437,7 @@ ROM_END
  Decryption
 ****************************/
 
+#if 0
 void dump_decrypted(running_machine* machine, UINT8* decrypt)
 {
     FILE *fp;
@@ -1466,6 +1450,7 @@ void dump_decrypted(running_machine* machine, UINT8* decrypt)
         fclose(fp);
     }
 }
+#endif
 
 static DRIVER_INIT( victor5 )
 {
@@ -1497,7 +1482,7 @@ static DRIVER_INIT( victor5 )
 		}
 	}
 
-	dump_decrypted(machine, decrypt);
+//	dump_decrypted(machine, decrypt);
 
 	memcpy(region, decrypt, 0x10000);
 }
@@ -1534,7 +1519,7 @@ static DRIVER_INIT( victor21 )
 		}
 	}
 
-	dump_decrypted(machine, decrypt);
+//	dump_decrypted(machine, decrypt);
 
 	memcpy(region, decrypt, 0x10000);
 }
@@ -1567,7 +1552,7 @@ static DRIVER_INIT( crsbingo )
 		}
 	}
 
-	dump_decrypted(machine, decrypt);
+//	dump_decrypted(machine, decrypt);
 
 	memcpy(region, decrypt, 0x10000);
 }
@@ -1599,15 +1584,15 @@ static DRIVER_INIT( sharkpy )
 		}
 	}
 
-	dump_decrypted(machine, decrypt);
+//	dump_decrypted(machine, decrypt);
 
 	memcpy(region, decrypt, 0x10000);
 }
 
 
 GAME( 1990, victor21, 0,        victor21, victor21, victor21, ROT0, "Subsino / Buffy", "Victor 21",                 0 )
-GAME( 1991, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino",         "Victor 5",                  0 )
-GAME( 1991, crsbingo, 0,        crsbingo, crsbingo,    crsbingo, ROT0, "Subsino",         "Cross Bingo",               GAME_NOT_WORKING )
+GAME( 1991, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino",         "Victor 5",                  0 ) // board sticker says Victor 5, in-game says G.E.A with no manufacturer info?
+GAME( 1991, crsbingo, 0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",            GAME_IMPERFECT_GRAPHICS ) //alt version of Cross Bingo?
 GAME( 1996, sharkpy,  0,        sharkpy,  smoto,    sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)", 0 ) // missing POST messages?
 GAME( 1996, sharkpya, sharkpy,  sharkpy,  smoto,    sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)", 0 ) // missing POST messages?
 GAME( 1996, smoto20,  0,        srider,   smoto,    smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)", 0 )
