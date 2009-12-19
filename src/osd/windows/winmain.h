@@ -53,6 +53,7 @@
 // performance options
 #define WINOPTION_PRIORITY				"priority"
 #define WINOPTION_MULTITHREADING		"multithreading"
+#define WINOPTION_NUMPROCESSORS			"numprocessors"
 
 // video options
 #define WINOPTION_VIDEO					"video"
@@ -131,6 +132,8 @@
 
 extern const options_entry mame_win_options[];
 
+// defined in winwork.c
+extern int osd_num_processors;
 
 
 //============================================================

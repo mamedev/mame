@@ -174,7 +174,11 @@ struct _osd_work_item
 	volatile INT32		done;			// is the item done?
 };
 
+//============================================================
+//  GLOBAL VARIABLES
+//============================================================
 
+int osd_num_processors = 0;
 
 //============================================================
 //  FUNCTION PROTOTYPES
@@ -677,20 +681,28 @@ void osd_work_item_release(osd_work_item *item)
 
 static int effective_num_processors(void)
 {
-	TCHAR *procsoverride;
 	SYSTEM_INFO info;
-	int numprocs = 0;
-
-	// if the OSDPROCESSORS environment variable is set, use that value if valid
-	procsoverride = _tgetenv(_T("OSDPROCESSORS"));
-	if (procsoverride != NULL && _stscanf(procsoverride, _T("%d"), &numprocs) == 1 && numprocs > 0)
-		return numprocs;
-
-	// otherwise, fetch the info from the system
+	// fetch the info from the system
 	GetSystemInfo(&info);
 
-	// max out at 4 for now since scaling above that seems to do poorly
-	return MIN(info.dwNumberOfProcessors, 4);
+	if (osd_num_processors > 0)
+	{
+		return MIN(info.dwNumberOfProcessors * 4, osd_num_processors);
+	}
+	else
+	{
+		TCHAR *procsoverride;
+		int numprocs = 0;
+
+		// if the OSDPROCESSORS environment variable is set, use that value if valid
+		procsoverride = _tgetenv(_T("OSDPROCESSORS"));
+		if (procsoverride != NULL && _stscanf(procsoverride, _T("%d"), &numprocs) == 1 && numprocs > 0)
+			// Be well behaved ...
+			return MIN(info.dwNumberOfProcessors * 4, numprocs);
+
+		// max out at 4 for now since scaling above that seems to do poorly
+		return MIN(info.dwNumberOfProcessors, 4);
+	}
 }
 
 

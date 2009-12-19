@@ -165,6 +165,7 @@ const options_entry mame_win_options[] =
 	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS PERFORMANCE OPTIONS" },
 	{ "priority(-15-1)",          "0",        0,                 "thread priority for the main game thread; range from -15 to 1" },
 	{ "multithreading;mt",        "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
+	{ "numprocessors;np",         "auto",     0,				 "number of processors; this overrides the number the system reports" },
 
 	// video options
 	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS VIDEO OPTIONS" },
@@ -309,6 +310,7 @@ static void output_oslog(running_machine *machine, const char *buffer)
 void osd_init(running_machine *machine)
 {
 	int watchdog = options_get_int(mame_options(), WINOPTION_WATCHDOG);
+	const char *stemp;
 
 	// thread priority
 	if (!options_get_bool(mame_options(), OPTION_DEBUG))
@@ -316,6 +318,21 @@ void osd_init(running_machine *machine)
 
 	// ensure we get called on the way out
 	add_exit_callback(machine, osd_exit);
+
+	// get number of processors
+	stemp = options_get_string(mame_options(), WINOPTION_NUMPROCESSORS);
+
+	osd_num_processors = 0;
+
+	if (strcmp(stemp, "auto") != 0)
+	{
+		osd_num_processors = atoi(stemp);
+		if (osd_num_processors < 1)
+		{
+			mame_printf_warning("Warning: numprocessors < 1 doesn't make much sense. Assuming auto ...\n");
+			osd_num_processors = 0;
+		}
+	}
 
 	// initialize the subsystems
 	winvideo_init(machine);

@@ -43,7 +43,13 @@ Windows performance options
 	window and all DirectDraw/Direct3D code to execute on a second thread,
 	which can improve performance on hyperthreaded and multicore systems.
 	The default is OFF (-nomultithreading).
-
+	
+-numprocessors <auto|value>
+	Specify the number of processors to use for work queues. Specifying
+	"auto" will use the value reported by the system or environment 
+	variable OSDPROCESSORS. To avoid abuse, this value is internally limited
+	to 4 times the number of processors reported by the system. 
+	The default is "auto".
 
 
 Windows video options
