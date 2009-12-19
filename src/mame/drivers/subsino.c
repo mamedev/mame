@@ -255,6 +255,8 @@ static READ8_HANDLER( flash_r )
 		return 0xd9;
 	else if(flash_val <= 0xa)
 		return flash_val;
+	else if(flash_val == 0x92)
+		return 0xeb; //protected GFXs in Cross Bingo
 	else
 		return 0xd9;
 }
@@ -265,15 +267,17 @@ static WRITE8_HANDLER( flash_w )
 	{
 		case 0:
 			flash_packet = data;
-			if(flash_packet == 0xd0 || flash_packet == 0xd2)
+			if((flash_packet & 0xf8) == 0xd0)
 				flash_packet_start = 1; //start of packet
 			break;
 		case 1:
 			flash_packet = data;
-			if(flash_packet == 0xe0 || flash_packet == 0xe2)
+			if((flash_packet & 0xf8) == 0xe0)
 				flash_packet_start = 0; //end of packet
 			else
 				flash_val = data;
+
+			printf("%02x %02x\n",flash_packet,flash_val);
 			break;
 	}
 }
@@ -1592,7 +1596,7 @@ static DRIVER_INIT( sharkpy )
 
 GAME( 1990, victor21, 0,        victor21, victor21, victor21, ROT0, "Subsino / Buffy", "Victor 21",                 0 )
 GAME( 1991, victor5,  0,        victor5,  victor5,  victor5,  ROT0, "Subsino",         "Victor 5",                  0 ) // board sticker says Victor 5, in-game says G.E.A with no manufacturer info?
-GAME( 1991, crsbingo, 0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",            GAME_IMPERFECT_GRAPHICS ) //alt version of Cross Bingo?
+GAME( 1991, crsbingo, 0,        crsbingo, crsbingo, crsbingo, ROT0, "Subsino",         "Poker Carnival",            0 ) // alt version of Cross Bingo?
 GAME( 1996, sharkpy,  0,        sharkpy,  smoto,    sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)", 0 ) // missing POST messages?
 GAME( 1996, sharkpya, sharkpy,  sharkpy,  smoto,    sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)", 0 ) // missing POST messages?
 GAME( 1996, smoto20,  0,        srider,   smoto,    smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)", 0 )
