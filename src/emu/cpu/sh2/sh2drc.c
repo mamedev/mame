@@ -19,6 +19,7 @@
 #include "sh2.h"
 #include "sh2comn.h"
 #include "eminline.h"
+#include "profiler.h"
 
 CPU_DISASSEMBLE( sh2 );
 
@@ -930,6 +931,8 @@ static void code_compile_block(SH2 *sh2, UINT8 mode, offs_t pc)
 	drcuml_block *block;
 	jmp_buf errorbuf;
 
+	profiler_mark_start(PROFILER_DRC_COMPILE);
+
 	/* get a description of this sequence */
 	desclist = drcfe_describe_code(sh2->drcfe, pc);
 	if (LOG_UML || LOG_NATIVE)
@@ -1019,6 +1022,7 @@ static void code_compile_block(SH2 *sh2, UINT8 mode, offs_t pc)
 
 	/* end the sequence */
 	drcuml_block_end(block);
+	profiler_mark_end();
 }
 
 /*-------------------------------------------------

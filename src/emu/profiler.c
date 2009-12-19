@@ -115,6 +115,7 @@ astring *_profiler_get_text(running_machine *machine, astring *string)
 {
 	static const profile_string names[] =
 	{
+		{ PROFILER_DRC_COMPILE,      "DRC Compilation" },
 		{ PROFILER_MEMREAD,          "Memory Read" },
 		{ PROFILER_MEMWRITE,         "Memory Write" },
 		{ PROFILER_VIDEO,            "Video Update" },

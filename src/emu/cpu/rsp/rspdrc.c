@@ -20,6 +20,7 @@
 
 #include "cpuintrf.h"
 #include "debugger.h"
+#include "profiler.h"
 #include "rsp.h"
 #include "rspfe.h"
 #include "cpu/drcfe.h"
@@ -171,6 +172,8 @@ static int generate_special(rsp_state *rsp, drcuml_block *block, compiler_state 
 static int generate_regimm(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 static int generate_cop0(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 static int generate_cop2(rsp_state *rsp, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+
+static void log_add_disasm_comment(rsp_state *rsp, drcuml_block *block, UINT32 pc, UINT32 op);
 
 /***************************************************************************
     HELPFUL DEFINES
@@ -3617,6 +3620,8 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 	int override = FALSE;
 	drcuml_block *block;
 	jmp_buf errorbuf;
+	
+	profiler_mark_start(PROFILER_DRC_COMPILE);
 
 	/* get a description of this sequence */
 	desclist = drcfe_describe_code(rsp->impstate->drcfe, pc);
@@ -3697,6 +3702,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 
 	/* end the sequence */
 	drcuml_block_end(block);
+	profiler_mark_end();
 }
 
 /***************************************************************************
@@ -4069,6 +4075,10 @@ static void generate_sequence_instruction(rsp_state *rsp, drcuml_block *block, c
 {
 	offs_t expc;
 
+	/* add an entry for the log */
+	if (LOG_UML && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
+		log_add_disasm_comment(rsp, block, desc->pc, desc->opptr.l[0]);
+
 	/* set the PC map variable */
 	expc = (desc->flags & OPFLAG_IN_DELAY_SLOT) ? desc->pc - 3 : desc->pc;
 	UML_MAPVAR(block, MAPVAR_PC, expc);												// mapvar  PC,expc
@@ -4244,8 +4254,7 @@ static int generate_opcode(rsp_state *rsp, drcuml_block *block, compiler_state *
 		case 0x09:	/* ADDIU - MIPS I */
 			if (RTREG != 0)
 			{
-				UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));					// add     i0,<rsreg>,SIMMVAL,V
-				UML_SEXT(block, R32(RTREG), IREG(0), DWORD);						// dsext   <rtreg>,i0,dword
+				UML_ADD(block, R32(RTREG), R32(RSREG), IMM(SIMMVAL));			// add     i0,<rsreg>,SIMMVAL,V
 			}
 			return TRUE;
 
@@ -4404,48 +4413,42 @@ static int generate_special(rsp_state *rsp, drcuml_block *block, compiler_state 
 		case 0x00:	/* SLL - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SHL(block, IREG(0), R32(RTREG), IMM(SHIFT));					// shl     i0,<rtreg>,<shift>
-				UML_SEXT(block, R32(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
+				UML_SHL(block, R32(RDREG), R32(RTREG), IMM(SHIFT));					// shl     i0,<rtreg>,<shift>
 			}
 			return TRUE;
 
 		case 0x02:	/* SRL - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SHR(block, IREG(0), R32(RTREG), IMM(SHIFT));					// shr     i0,<rtreg>,<shift>
-				UML_SEXT(block, R32(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
+				UML_SHR(block, R32(RDREG), R32(RTREG), IMM(SHIFT));					// shr     i0,<rtreg>,<shift>
 			}
 			return TRUE;
 
 		case 0x03:	/* SRA - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SAR(block, IREG(0), R32(RTREG), IMM(SHIFT));					// sar     i0,<rtreg>,<shift>
-				UML_SEXT(block, R32(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
+				UML_SAR(block, R32(RDREG), R32(RTREG), IMM(SHIFT));					// sar     i0,<rtreg>,<shift>
 			}
 			return TRUE;
 
 		case 0x04:	/* SLLV - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SHL(block, IREG(0), R32(RTREG), R32(RSREG));					// shl     i0,<rtreg>,<rsreg>
-				UML_SEXT(block, R32(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
+				UML_SHL(block, R32(RDREG), R32(RTREG), R32(RSREG));					// shl     i0,<rtreg>,<rsreg>
 			}
 			return TRUE;
 
 		case 0x06:	/* SRLV - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SHR(block, IREG(0), R32(RTREG), R32(RSREG));					// shr     i0,<rtreg>,<rsreg>
-				UML_SEXT(block, R32(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
+				UML_SHR(block, R32(RDREG), R32(RTREG), R32(RSREG));					// shr     i0,<rtreg>,<rsreg>
 			}
 			return TRUE;
 
 		case 0x07:	/* SRAV - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SAR(block, IREG(0), R32(RTREG), R32(RSREG));					// sar     i0,<rtreg>,<rsreg>
-				UML_SEXT(block, R32(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
+				UML_SAR(block, R32(RDREG), R32(RTREG), R32(RSREG));					// sar     i0,<rtreg>,<rsreg>
 			}
 			return TRUE;
 
@@ -4454,32 +4457,28 @@ static int generate_special(rsp_state *rsp, drcuml_block *block, compiler_state 
 		case 0x20:	/* ADD - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_ADD(block, IREG(0), R32(RSREG), R32(RTREG));					// add     i0,<rsreg>,<rtreg>
-				UML_SEXT(block, R32(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
+				UML_ADD(block, R32(RDREG), R32(RSREG), R32(RTREG));					// add     i0,<rsreg>,<rtreg>
 			}
 			return TRUE;
 
 		case 0x21:	/* ADDU - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_ADD(block, IREG(0), R32(RSREG), R32(RTREG));					// add     i0,<rsreg>,<rtreg>
-				UML_SEXT(block, R32(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
+				UML_ADD(block, R32(RDREG), R32(RSREG), R32(RTREG));					// add     i0,<rsreg>,<rtreg>
 			}
 			return TRUE;
 
 		case 0x22:	/* SUB - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SUB(block, IREG(0), R32(RSREG), R32(RTREG));					// sub     i0,<rsreg>,<rtreg>
-				UML_SEXT(block, R32(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
+				UML_SUB(block, R32(RDREG), R32(RSREG), R32(RTREG));					// sub     i0,<rsreg>,<rtreg>
 			}
 			return TRUE;
 
 		case 0x23:	/* SUBU - MIPS I */
 			if (RDREG != 0)
 			{
-				UML_SUB(block, IREG(0), R32(RSREG), R32(RTREG));					// sub     i0,<rsreg>,<rtreg>
-				UML_SEXT(block, R32(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
+				UML_SUB(block, R32(RDREG), R32(RSREG), R32(RTREG));					// sub     i0,<rsreg>,<rtreg>
 			}
 			return TRUE;
 
@@ -4658,15 +4657,15 @@ static int generate_cop0(rsp_state *rsp, drcuml_block *block, compiler_state *co
 		case 0x00:	/* MFCz */
 			if (RTREG != 0)
 			{
-				UML_SEXT(block, MEM(&rsp->impstate->arg0), IMM(RDREG), DWORD);		// mov     [arg0],<rtreg>,dword
-				UML_SEXT(block, MEM(&rsp->impstate->arg1), IMM(RTREG), DWORD);		// mov     [arg1],<rdval>,dword
+				UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(RDREG));				// mov     [arg0],<rtreg>,dword
+				UML_MOV(block, MEM(&rsp->impstate->arg1), IMM(RTREG));				// mov     [arg1],<rdval>,dword
 				UML_CALLC(block, cfunc_get_cop0_reg, rsp);							// callc   cfunc_get_cop0_reg
 			}
 			return TRUE;
 
 		case 0x04:	/* MTCz */
-			UML_SEXT(block, MEM(&rsp->impstate->arg0), IMM(RDREG), DWORD);			// mov     [arg0],<rtreg>,dword
-			UML_SEXT(block, MEM(&rsp->impstate->arg1), R32(RTREG), DWORD);			// mov     [arg1],<rdval>,dword
+			UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(RDREG));					// mov     [arg0],<rtreg>,dword
+			UML_MOV(block, MEM(&rsp->impstate->arg1), R32(RTREG));					// mov     [arg1],<rdval>,dword
 			UML_CALLC(block, cfunc_set_cop0_reg, rsp);								// callc   cfunc_set_cop0_reg
 			return TRUE;
 	}
@@ -4718,6 +4717,25 @@ static void cfunc_ctc2(void *param)
 	UINT32 op = rsp->impstate->arg0;
 	rsp->flag[RDREG] = RTVAL & 0xffff;
 }
+
+/***************************************************************************
+    CODE LOGGING HELPERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    log_add_disasm_comment - add a comment
+    including disassembly of a RSP instruction
+-------------------------------------------------*/
+
+static void log_add_disasm_comment(rsp_state *rsp, drcuml_block *block, UINT32 pc, UINT32 op)
+{
+#if (LOG_UML)
+	char buffer[100];
+	rsp_dasm_one(buffer, pc, op);
+	UML_COMMENT(block, "%08X: %s", pc, buffer);										// comment
+#endif
+}
+
 
 static CPU_SET_INFO( rsp )
 {

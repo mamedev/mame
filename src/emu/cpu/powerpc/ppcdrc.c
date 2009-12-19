@@ -19,6 +19,7 @@
 #include <stddef.h>
 #include "cpuintrf.h"
 #include "debugger.h"
+#include "profiler.h"
 #include "ppccom.h"
 #include "ppcfe.h"
 #include "cpu/drcfe.h"
@@ -953,6 +954,8 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 	drcuml_block *block;
 	jmp_buf errorbuf;
 
+	profiler_mark_start(PROFILER_DRC_COMPILE);
+
 	/* get a description of this sequence */
 	desclist = drcfe_describe_code(ppc->impstate->drcfe, pc);
 	if (LOG_UML || LOG_NATIVE)
@@ -1034,6 +1037,7 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 
 	/* end the sequence */
 	drcuml_block_end(block);
+	profiler_mark_end();
 }
 
 
