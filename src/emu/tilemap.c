@@ -980,6 +980,9 @@ int tilemap_count(running_machine *machine)
 	tilemap *tmap;
 	int count = 0;
 
+	if (machine->tilemap_data == NULL)
+		return 0;
+
 	/* find by the tilemap index */
 	for (tmap = machine->tilemap_data->list; tmap != NULL; tmap = tmap->next)
 		count++;
