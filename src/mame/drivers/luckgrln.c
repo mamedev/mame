@@ -75,6 +75,7 @@
 
 #include "driver.h"
 #include "cpu/z180/z180.h"
+#include "video/mc6845.h"
 
 
 static ADDRESS_MAP_START( mainmap, ADDRESS_SPACE_PROGRAM, 8 )
@@ -87,7 +88,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff) // i think
-	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
+	AM_RANGE(0x0000, 0x003f) AM_RAM // Z180 internal regs
+	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x00b1, 0x00b1) AM_DEVWRITE("crtc", mc6845_register_w)
 ADDRESS_MAP_END
 
 
@@ -120,11 +123,28 @@ static VIDEO_UPDATE(luckgrln)
 	return 0;
 }
 
+static const mc6845_interface mc6845_intf =
+{
+	"screen",	/* screen we are acting on */
+	8,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	DEVCB_NULL,	/* callback for display state changes */
+	DEVCB_NULL,	/* callback for cursor state changes */
+	DEVCB_NULL,	/* HSYNC callback */
+	DEVCB_NULL,	/* VSYNC callback */
+	NULL		/* update address callback */
+};
+
 static MACHINE_DRIVER_START( luckgrln )
 	MDRV_CPU_ADD("maincpu", Z180,8000000)
 	MDRV_CPU_PROGRAM_MAP(mainmap)
 	MDRV_CPU_IO_MAP(portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_MC6845_ADD("crtc", H46505, 6000000/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
