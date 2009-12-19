@@ -20,12 +20,12 @@ Added dsw locations and verified factory setting based on Guru's notes
 
 #include "driver.h"
 #include "deprecat.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 extern UINT16 *gradius3_gfxram;
 extern int gradius3_priority;
@@ -34,44 +34,53 @@ READ16_HANDLER( gradius3_gfxrom_r );
 WRITE16_HANDLER( gradius3_gfxram_w );
 VIDEO_UPDATE( gradius3 );
 
+extern void gradius3_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow);
+extern void gradius3_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
 
 
 static READ16_HANDLER( K052109_halfword_r )
 {
-	return K052109_r(space,offset);
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	return k052109_r(k052109, offset);
 }
 
 static WRITE16_HANDLER( K052109_halfword_w )
 {
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
 	if (ACCESSING_BITS_0_7)
-		K052109_w(space,offset,data & 0xff);
+		k052109_w(k052109, offset, data & 0xff);
 
 	/* is this a bug in the game or something else? */
 	if (!ACCESSING_BITS_0_7)
-		K052109_w(space,offset,(data >> 8) & 0xff);
+		k052109_w(k052109, offset, (data >> 8) & 0xff);
 //      logerror("%06x half %04x = %04x\n",cpu_get_pc(space->cpu),offset,data);
 }
 
 static READ16_HANDLER( K051937_halfword_r )
 {
-	return K051937_r(space,offset);
+	const device_config *k051960 = devtag_get_device(space->machine, "k051960");
+	return k051937_r(k051960, offset);
 }
 
 static WRITE16_HANDLER( K051937_halfword_w )
 {
+	const device_config *k051960 = devtag_get_device(space->machine, "k051960");
+
 	if (ACCESSING_BITS_0_7)
-		K051937_w(space,offset,data & 0xff);
+		k051937_w(k051960, offset, data & 0xff);
 }
 
 static READ16_HANDLER( K051960_halfword_r )
 {
-	return K051960_r(space,offset);
+	const device_config *k051960 = devtag_get_device(space->machine, "k051960");
+	return k051960_r(k051960, offset);
 }
 
 static WRITE16_HANDLER( K051960_halfword_w )
 {
+	const device_config *k051960 = devtag_get_device(space->machine, "k051960");
 	if (ACCESSING_BITS_0_7)
-		K051960_w(space,offset,data & 0xff);
+		k051960_w(k051960, offset, data & 0xff);
 }
 
 
@@ -287,6 +296,22 @@ static const k007232_interface k007232_config =
 
 
 
+static const k052109_interface gradius3_k052109_intf =
+{
+	"gfx1", 0,
+	GRADIUS3_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_NONE,
+	gradius3_tile_callback
+};
+
+static const k051960_interface gradius3_k051960_intf =
+{
+	"gfx2", 1,
+	GRADIUS3_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	gradius3_sprite_callback
+};
+
 static MACHINE_DRIVER_START( gradius3 )
 
 	/* basic machine hardware */
@@ -320,6 +345,9 @@ static MACHINE_DRIVER_START( gradius3 )
 
 	MDRV_VIDEO_START(gradius3)
 	MDRV_VIDEO_UPDATE(gradius3)
+
+	MDRV_K052109_ADD("k052109", gradius3_k052109_intf)
+	MDRV_K051960_ADD("k051960", gradius3_k051960_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -471,13 +499,7 @@ ROM_START( gradius3e )
 ROM_END
 
 
-static DRIVER_INIT( gradius3 )
-{
-	konami_rom_deinterleave_2(machine, "gfx2");
-}
 
-
-
-GAME( 1989, gradius3, 0,        gradius3, gradius3, gradius3, ROT0, "Konami", "Gradius III (Japan)", 0 )
-GAME( 1989, gradius3a, gradius3, gradius3, gradius3, gradius3, ROT0, "Konami", "Gradius III (Asia)", 0 )
-GAME( 1989, gradius3e, gradius3, gradius3, gradius3, gradius3, ROT0, "Konami", "Gradius III (World ?)", 0 )
+GAME( 1989, gradius3, 0,        gradius3, gradius3, 0, ROT0, "Konami", "Gradius III (Japan)", 0 )
+GAME( 1989, gradius3a, gradius3, gradius3, gradius3, 0, ROT0, "Konami", "Gradius III (Asia)", 0 )
+GAME( 1989, gradius3e, gradius3, gradius3, gradius3, 0, ROT0, "Konami", "Gradius III (World ?)", 0 )

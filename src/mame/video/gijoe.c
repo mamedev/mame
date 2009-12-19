@@ -1,12 +1,12 @@
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 
 static int AVAC_bits[4], AVAC_occupancy[4];
 static int layer_colorbase[4], layer_pri[4];
 static int AVAC_vrc, sprite_colorbase;
 
-static void gijoe_sprite_callback(int *code, int *color, int *priority_mask)
+void gijoe_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask)
 {
 	int pri, c = *color;
 
@@ -21,7 +21,7 @@ static void gijoe_sprite_callback(int *code, int *color, int *priority_mask)
 	*color = sprite_colorbase | (c & 0x001f);
 }
 
-static void gijoe_tile_callback(int layer, int *code, int *color, int *flags)
+void gijoe_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags)
 {
 	int tile = *code;
 
@@ -39,16 +39,14 @@ static void gijoe_tile_callback(int layer, int *code, int *color, int *flags)
 
 VIDEO_START( gijoe )
 {
+	const device_config *k056832 = devtag_get_device(machine, "k056832");
 	int i;
 
-	K053251_vh_start(machine);
-	K056832_vh_start(machine, "gfx1", K056832_BPP_4, 1, NULL, gijoe_tile_callback, 0);
+	k056832_linemap_enable(k056832, 1);
 
-	K056832_linemap_enable(1);
+	for (i = 0; i < 4; i++) 
+		AVAC_occupancy[i] = 0;
 
-	K053247_vh_start(machine, "gfx2", -37, 20, NORMAL_PLANE_ORDER, gijoe_sprite_callback);
-
-	for (i=0; i<4; i++) AVAC_occupancy[i] = 0;
 	AVAC_vrc = 0xffff;
 }
 
@@ -73,17 +71,22 @@ static void sortlayers(int *layer, int *pri)
 
 VIDEO_UPDATE( gijoe )
 {
+	const device_config *k056832 = devtag_get_device(screen->machine, "k056832");
+	const device_config *k053251 = devtag_get_device(screen->machine, "k053251");
+	const device_config *k053246 = devtag_get_device(screen->machine, "k053246");
 	static const int K053251_CI[4] = { K053251_CI1, K053251_CI2, K053251_CI3, K053251_CI4 };
 	int layer[4];
 	int vrc_mode, vrc_new, colorbase_new, primode, dirty, i;
 	int mask = 0;
 
 	// update tile offsets
-	K056832_read_AVAC(&vrc_mode, &vrc_new);
+	k056832_read_avac(k056832, &vrc_mode, &vrc_new);
 
 	if (vrc_mode)
 	{
-		for (dirty=0xf000; dirty; dirty>>=4) if ((AVAC_vrc & dirty) != (vrc_new & dirty)) mask |= dirty;
+		for (dirty = 0xf000; dirty; dirty >>= 4) 
+			if ((AVAC_vrc & dirty) != (vrc_new & dirty)) 
+				mask |= dirty;
 
 		AVAC_vrc = vrc_new;
 		AVAC_bits[0] = vrc_new<<4  & 0xf000;
@@ -95,17 +98,26 @@ VIDEO_UPDATE( gijoe )
 		AVAC_bits[3] = AVAC_bits[2] = AVAC_bits[1] = AVAC_bits[0] = 0xf000;
 
 	// update color info and refresh tilemaps
-	sprite_colorbase = K053251_get_palette_index(K053251_CI0);
+	sprite_colorbase = k053251_get_palette_index(k053251, K053251_CI0);
 
-	for (i=0; i<4; i++)
+	for (i = 0; i < 4; i++)
 	{
 		dirty = 0;
 
-		colorbase_new = K053251_get_palette_index(K053251_CI[i]);
-		if (layer_colorbase[i] != colorbase_new) { layer_colorbase[i] = colorbase_new; dirty = 1; }
-		if (AVAC_occupancy[i] & mask) dirty = 1;
+		colorbase_new = k053251_get_palette_index(k053251, K053251_CI[i]);
+		if (layer_colorbase[i] != colorbase_new) 
+		{ 
+			layer_colorbase[i] = colorbase_new; 
+			dirty = 1; 
+		}
+		if (AVAC_occupancy[i] & mask) 
+			dirty = 1;
 
-		if (dirty) { AVAC_occupancy[i] = 0; K056832_mark_plane_dirty(i); }
+		if (dirty) 
+		{ 	
+			AVAC_occupancy[i] = 0; 
+			k056832_mark_plane_dirty(k056832, i); 
+		}
 	}
 
 	/*
@@ -114,43 +126,43 @@ VIDEO_UPDATE( gijoe )
         written to the layer's X-scroll register otherwise the chip expects totally
         different alignment values.
     */
-	if (K056832_read_register(0x14) == 2)
+	if (k056832_read_register(k056832, 0x14) == 2)
 	{
-		K056832_set_LayerOffset(0,  2, 0);
-		K056832_set_LayerOffset(1,  4, 0);
-		K056832_set_LayerOffset(2,  6, 0); // 7?
-		K056832_set_LayerOffset(3,  8, 0);
+		k056832_set_layer_offs(k056832, 0,  2, 0);
+		k056832_set_layer_offs(k056832, 1,  4, 0);
+		k056832_set_layer_offs(k056832, 2,  6, 0); // 7?
+		k056832_set_layer_offs(k056832, 3,  8, 0);
 	}
 	else
 	{
-		K056832_set_LayerOffset(0,  0, 0);
-		K056832_set_LayerOffset(1,  8, 0);
-		K056832_set_LayerOffset(2, 14, 0);
-		K056832_set_LayerOffset(3, 16, 0); // smaller?
+		k056832_set_layer_offs(k056832, 0,  0, 0);
+		k056832_set_layer_offs(k056832, 1,  8, 0);
+		k056832_set_layer_offs(k056832, 2, 14, 0);
+		k056832_set_layer_offs(k056832, 3, 16, 0); // smaller?
 	}
 
 	// seems to switch the K053251 between different priority modes, detail unknown
-	primode = K053251_get_priority(K053251_CI1);
+	primode = k053251_get_priority(k053251, K053251_CI1);
 
 	layer[0] = 0;
 	layer_pri[0] = 0; // not sure
 	layer[1] = 1;
-	layer_pri[1] = K053251_get_priority(K053251_CI2);
+	layer_pri[1] = k053251_get_priority(k053251, K053251_CI2);
 	layer[2] = 2;
-	layer_pri[2] = K053251_get_priority(K053251_CI3);
+	layer_pri[2] = k053251_get_priority(k053251, K053251_CI3);
 	layer[3] = 3;
-	layer_pri[3] = K053251_get_priority(K053251_CI4);
+	layer_pri[3] = k053251_get_priority(k053251, K053251_CI4);
 
 	sortlayers(layer, layer_pri);
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
-	K056832_tilemap_draw(screen->machine, bitmap,cliprect, layer[0], 0, 1);
-	K056832_tilemap_draw(screen->machine, bitmap,cliprect, layer[1], 0, 2);
-	K056832_tilemap_draw(screen->machine, bitmap,cliprect, layer[2], 0, 4);
-	K056832_tilemap_draw(screen->machine, bitmap,cliprect, layer[3], 0, 8);
+	k056832_tilemap_draw(k056832, bitmap,cliprect, layer[0], 0, 1);
+	k056832_tilemap_draw(k056832, bitmap,cliprect, layer[1], 0, 2);
+	k056832_tilemap_draw(k056832, bitmap,cliprect, layer[2], 0, 4);
+	k056832_tilemap_draw(k056832, bitmap,cliprect, layer[3], 0, 8);
 
-	K053247_sprites_draw(screen->machine, bitmap, cliprect);
+	k053247_sprites_draw(k053246, bitmap, cliprect);
 	return 0;
 }

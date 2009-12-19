@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 
 #define TOTAL_CHARS 0x1000
@@ -17,7 +17,7 @@ static int layer_colorbase[3],sprite_colorbase;
 
 ***************************************************************************/
 
-static void gradius3_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
+void gradius3_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x1c) << 7);
@@ -32,7 +32,7 @@ static void gradius3_tile_callback(int layer,int bank,int *code,int *color,int *
 
 ***************************************************************************/
 
-static void gradius3_sprite_callback(int *code,int *color,int *priority_mask,int *shadow)
+void gradius3_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow)
 {
 	#define L0 0xaa
 	#define L1 0xcc
@@ -60,21 +60,21 @@ static void gradius3_sprite_callback(int *code,int *color,int *priority_mask,int
 
 VIDEO_START( gradius3 )
 {
+	const device_config *k052109 = devtag_get_device(machine, "k052109");
+	const device_config *k051960 = devtag_get_device(machine, "k051960");
 	int i;
 
 	layer_colorbase[0] = 0;
 	layer_colorbase[1] = 32;
 	layer_colorbase[2] = 48;
 	sprite_colorbase = 16;
-	K052109_vh_start(machine,"gfx1",GRADIUS3_PLANE_ORDER,gradius3_tile_callback);
-	K051960_vh_start(machine,"gfx2",GRADIUS3_PLANE_ORDER,gradius3_sprite_callback);
 
-	K052109_set_layer_offsets(2, -2, 0);
-	K051960_set_sprite_offsets(2, 0);
+	k052109_set_layer_offsets(k052109, 2, -2, 0);
+	k051960_set_sprite_offsets(k051960, 2, 0);
 
 	/* re-decode the sprites because the ROMs are connected to the custom IC differently
        from how they are connected to the CPU. */
-	for (i = 0;i < TOTAL_SPRITES;i++)
+	for (i = 0; i < TOTAL_SPRITES; i++)
 		gfx_element_mark_dirty(machine->gfx[1],i);
 
 	gfx_element_set_source(machine->gfx[0], (UINT8 *)gradius3_gfxram);
@@ -113,28 +113,29 @@ WRITE16_HANDLER( gradius3_gfxram_w )
 
 VIDEO_UPDATE( gradius3 )
 {
-	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const device_config *k052109 = devtag_get_device(screen->machine, "k052109");
+	const device_config *k051960 = devtag_get_device(screen->machine, "k051960");
 
 	/* TODO: this kludge enforces the char banks. For some reason, they don't work otherwise. */
-	K052109_w(space,0x1d80,0x10);
-	K052109_w(space,0x1f00,0x32);
+	k052109_w(k052109, 0x1d80, 0x10);
+	k052109_w(k052109, 0x1f00, 0x32);
 
-	K052109_tilemap_update();
+	k052109_tilemap_update(k052109);
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	if (gradius3_priority == 0)
 	{
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_DRAW_OPAQUE,2);
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,4);
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[0],0,1);
+		k052109_tilemap_draw(k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 2);
+		k052109_tilemap_draw(k052109, bitmap, cliprect, 2, 0, 4);
+		k052109_tilemap_draw(k052109, bitmap, cliprect, 0, 0, 1);
 	}
 	else
 	{
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[0],TILEMAP_DRAW_OPAQUE,1);
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[1],0,2);
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,4);
+		k052109_tilemap_draw(k052109, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 1);
+		k052109_tilemap_draw(k052109, bitmap, cliprect, 1, 0, 2);
+		k052109_tilemap_draw(k052109, bitmap, cliprect, 2, 0, 4);
 	}
 
-	K051960_sprites_draw(screen->machine,bitmap,cliprect,-1,-1);
+	k051960_sprites_draw(k051960, bitmap, cliprect, -1, -1);
 	return 0;
 }

@@ -369,6 +369,7 @@ void k052109_set_layer_offsets(const device_config *device, int layer, int dx, i
 // WIP code while trying to convert/cleanup glfgreat
 void k052109_get_tmap(const device_config *device, tilemap **tilemap, int tmap_num);
 tilemap *k052109_get_tilemap(const device_config *device, int tmap_num);
+void k052109_tilemap_mark_dirty(const device_config *device, int tmap_num);
 
 void k052109_tilemap_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int tmap_num, UINT32 flags, UINT8 priority);
 void k052109_postload_tileflip_reset( const device_config *device );	// this has to be added to POSTLOAD functions in each driver

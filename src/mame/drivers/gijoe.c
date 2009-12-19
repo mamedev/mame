@@ -38,14 +38,17 @@ Known Issues
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
 #include "sound/k054539.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 VIDEO_START( gijoe );
 VIDEO_UPDATE( gijoe );
+
+extern void gijoe_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
+extern void gijoe_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
 
 static UINT16 *gijoe_workram;
 static UINT16 cur_control2;
@@ -106,7 +109,9 @@ static READ16_HANDLER( control2_r )
 
 static WRITE16_HANDLER( control2_w )
 {
-	if(ACCESSING_BITS_0_7) {
+	const device_config *k053246 = devtag_get_device(space->machine, "k053246");
+	if(ACCESSING_BITS_0_7) 
+	{
 		/* bit 0  is data */
 		/* bit 1  is cs (active low) */
 		/* bit 2  is clock (active high) */
@@ -120,17 +125,18 @@ static WRITE16_HANDLER( control2_w )
 		cur_control2 = data;
 
 		/* bit 6 = enable sprite ROM reading */
-		K053246_set_OBJCHA_line((data & 0x0040) ? ASSERT_LINE : CLEAR_LINE);
+		k053246_set_objcha_line(k053246, (data & 0x0040) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
 static void gijoe_objdma(running_machine *machine)
 {
+	const device_config *k053246 = devtag_get_device(machine, "k053246");
 	UINT16 *src_head, *src_tail, *dst_head, *dst_tail;
 
 	src_head = machine->generic.spriteram.u16;
 	src_tail = machine->generic.spriteram.u16 + 255*8;
-	K053247_export_config(&dst_head, 0, 0, 0, 0);
+	k053247_get_ram(k053246, &dst_head);
 	dst_tail = dst_head + 255*8;
 
 	for (; src_head<=src_tail; src_head+=8)
@@ -156,10 +162,14 @@ static TIMER_CALLBACK( dmaend_callback )
 
 static INTERRUPT_GEN( gijoe_interrupt )
 {
-	// global interrupt masking (*this game only)
-	if (!K056832_is_IRQ_enabled(0)) return;
+	const device_config *k053246 = devtag_get_device(device->machine, "k053246");
+	const device_config *k056832 = devtag_get_device(device->machine, "k056832");
 
-	if (K053246_is_IRQ_enabled())
+	// global interrupt masking (*this game only)
+	if (!k056832_is_irq_enabled(k056832, 0)) 
+		return;
+
+	if (k053246_is_irq_enabled(k053246))
 	{
 		gijoe_objdma(device->machine);
 
@@ -174,7 +184,8 @@ static INTERRUPT_GEN( gijoe_interrupt )
 
 static WRITE16_HANDLER( sound_cmd_w )
 {
-	if(ACCESSING_BITS_0_7) {
+	if(ACCESSING_BITS_0_7) 
+	{
 		data &= 0xff;
 		soundlatch_w(space, 0, data);
 	}
@@ -206,16 +217,16 @@ static MACHINE_START( gijoe )
 static ADDRESS_MAP_START( gijoe_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE_GENERIC(spriteram)								// Sprites
-	AM_RANGE(0x110000, 0x110007) AM_WRITE(K053246_word_w)
-	AM_RANGE(0x120000, 0x121fff) AM_READWRITE(K056832_ram_word_r, K056832_ram_word_w)		// Graphic planes
-	AM_RANGE(0x122000, 0x123fff) AM_READWRITE(K056832_ram_word_r, K056832_ram_word_w)		// Graphic planes mirror read
-	AM_RANGE(0x130000, 0x131fff) AM_READ(K056832_rom_word_r) 								// Passthrough to tile roms
-	AM_RANGE(0x160000, 0x160007) AM_WRITE(K056832_b_word_w)									// VSCCS (board dependent)
+	AM_RANGE(0x110000, 0x110007) AM_DEVWRITE("k053246", k053246_word_w)
+	AM_RANGE(0x120000, 0x121fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)		// Graphic planes
+	AM_RANGE(0x122000, 0x123fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)		// Graphic planes mirror read
+	AM_RANGE(0x130000, 0x131fff) AM_DEVREAD("k056832", k056832_rom_word_r) 								// Passthrough to tile roms
+	AM_RANGE(0x160000, 0x160007) AM_DEVWRITE("k056832", k056832_b_word_w)									// VSCCS (board dependent)
 	AM_RANGE(0x170000, 0x170001) AM_WRITENOP												// Watchdog
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(&gijoe_workram)					// Main RAM.  Spec. 180000-1803ff, 180400-187fff
 	AM_RANGE(0x190000, 0x190fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_WRITE(K053251_lsb_w)
-	AM_RANGE(0x1b0000, 0x1b003f) AM_WRITE(K056832_word_w)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVWRITE("k053251", k053251_lsb_w)
+	AM_RANGE(0x1b0000, 0x1b003f) AM_DEVWRITE("k056832", k056832_word_w)
 	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x1c0014, 0x1c0015) AM_READ(sound_status_r)
 	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM
@@ -225,12 +236,12 @@ static ADDRESS_MAP_START( gijoe_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1e4000, 0x1e4001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1e4002, 0x1e4003) AM_READ(control1_r)
 	AM_RANGE(0x1e8000, 0x1e8001) AM_READWRITE(control2_r, control2_w)
-	AM_RANGE(0x1f0000, 0x1f0001) AM_READ(K053246_word_r)
+	AM_RANGE(0x1f0000, 0x1f0001) AM_DEVREAD("k053246", k053246_word_r)
 #if JOE_DEBUG
-	AM_RANGE(0x110000, 0x110007) AM_READ(K053246_reg_word_r)
-	AM_RANGE(0x160000, 0x160007) AM_READ(K056832_b_word_r)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_READ(K053251_lsb_r)
-	AM_RANGE(0x1b0000, 0x1b003f) AM_READ(K056832_word_r)
+	AM_RANGE(0x110000, 0x110007) AM_DEVREAD("k053246", k053246_reg_word_r)
+	AM_RANGE(0x160000, 0x160007) AM_DEVREAD("k056832", k056832_b_word_r)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREAD("k053251", k053251_lsb_r)
+	AM_RANGE(0x1b0000, 0x1b003f) AM_DEVREAD("k056832", k056832_word_r)
 #endif
 ADDRESS_MAP_END
 
@@ -288,6 +299,25 @@ static const k054539_interface k054539_config =
 	sound_nmi
 };
 
+static const k056832_interface gijoe_k056832_intf =
+{
+	"gfx1", 0,
+	K056832_BPP_4,
+	1, 0,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	gijoe_tile_callback, "none"
+};
+
+static const k053247_interface gijoe_k053247_intf =
+{
+	"screen",
+	"gfx2", 1,
+	NORMAL_PLANE_ORDER,
+	-37, 20,
+	KONAMI_ROM_DEINTERLEAVE_4,
+	gijoe_sprite_callback
+};
+
 static MACHINE_DRIVER_START( gijoe )
 
 	/* basic machine hardware */
@@ -315,6 +345,10 @@ static MACHINE_DRIVER_START( gijoe )
 
 	MDRV_VIDEO_START(gijoe)
 	MDRV_VIDEO_UPDATE(gijoe)
+
+	MDRV_K056832_ADD("k056832", gijoe_k056832_intf)
+	MDRV_K053246_ADD("k053246", gijoe_k053247_intf)
+	MDRV_K053251_ADD("k053251")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -398,12 +432,7 @@ ROM_START( gijoej )
 	ROM_LOAD( "069a04", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 ROM_END
 
-static DRIVER_INIT( gijoe )
-{
-	konami_rom_deinterleave_2(machine, "gfx1");
-	konami_rom_deinterleave_4(machine, "gfx2");
-}
 
-GAME( 1992, gijoe,  0,     gijoe, gijoe, gijoe, ROT0, "Konami", "GI Joe (World)", 0)
-GAME( 1992, gijoeu, gijoe, gijoe, gijoe, gijoe, ROT0, "Konami", "GI Joe (US)", 0)
-GAME( 1992, gijoej, gijoe, gijoe, gijoe, gijoe, ROT0, "Konami", "GI Joe (Japan)", 0)
+GAME( 1992, gijoe,  0,     gijoe, gijoe, 0, ROT0, "Konami", "GI Joe (World)", 0)
+GAME( 1992, gijoeu, gijoe, gijoe, gijoe, 0, ROT0, "Konami", "GI Joe (US)", 0)
+GAME( 1992, gijoej, gijoe, gijoe, gijoe, 0, ROT0, "Konami", "GI Joe (Japan)", 0)

@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 
 static int layer_colorbase[3],sprite_colorbase;
@@ -20,7 +20,7 @@ static int layer_colorbase[3],sprite_colorbase;
 
 ***************************************************************************/
 
-static void mainevt_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
+void mainevt_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	*flags = (*color & 0x02) ? TILE_FLIPX : 0;
 
@@ -30,7 +30,7 @@ static void mainevt_tile_callback(int layer,int bank,int *code,int *color,int *f
 	*color = layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
 
-static void dv_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
+void dv_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x3c) << 7);
@@ -44,7 +44,7 @@ static void dv_tile_callback(int layer,int bank,int *code,int *color,int *flags,
 
 ***************************************************************************/
 
-static void mainevt_sprite_callback(int *code,int *color,int *priority_mask,int *shadow)
+void mainevt_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow)
 {
 	/* bit 5 = priority over layer B (has precedence) */
 	/* bit 6 = HALF priority over layer B (used for crowd when you get out of the ring) */
@@ -56,7 +56,7 @@ static void mainevt_sprite_callback(int *code,int *color,int *priority_mask,int 
 	*color = sprite_colorbase + (*color & 0x03);
 }
 
-static void dv_sprite_callback(int *code,int *color,int *priority,int *shadow)
+void dv_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow)
 {
 	/* TODO: the priority/shadow handling (bits 5-7) seems to be quite complex (see PROM) */
 	*color = sprite_colorbase + (*color & 0x07);
@@ -71,9 +71,6 @@ VIDEO_START( mainevt )
 	layer_colorbase[1] = 8;
 	layer_colorbase[2] = 4;
 	sprite_colorbase = 12;
-
-	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,mainevt_tile_callback);
-	K051960_vh_start(machine,"gfx2",NORMAL_PLANE_ORDER,mainevt_sprite_callback);
 }
 
 VIDEO_START( dv )
@@ -82,34 +79,37 @@ VIDEO_START( dv )
 	layer_colorbase[1] = 0;
 	layer_colorbase[2] = 4;
 	sprite_colorbase = 8;
-
-	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,dv_tile_callback);
-	K051960_vh_start(machine,"gfx2",NORMAL_PLANE_ORDER,dv_sprite_callback);
 }
 
 /*****************************************************************************/
 
 VIDEO_UPDATE( mainevt )
 {
-	K052109_tilemap_update();
+	const device_config *k052109 = devtag_get_device(screen->machine, "k052109");
+	const device_config *k051960 = devtag_get_device(screen->machine, "k051960");
+
+	k052109_tilemap_update(k052109);
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_DRAW_OPAQUE,1);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],1,2);	/* low priority part of layer */
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,4);	/* high priority part of layer */
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[0],0,8);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 1);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, 2, 1, 2);	/* low priority part of layer */
+	k052109_tilemap_draw(k052109, bitmap, cliprect, 2, 0, 4);	/* high priority part of layer */
+	k052109_tilemap_draw(k052109, bitmap, cliprect, 0, 0, 8);
 
-	K051960_sprites_draw(screen->machine,bitmap,cliprect,-1,-1);
+	k051960_sprites_draw(k051960, bitmap, cliprect, -1, -1);
 	return 0;
 }
 
 VIDEO_UPDATE( dv )
 {
-	K052109_tilemap_update();
+	const device_config *k052109 = devtag_get_device(screen->machine, "k052109");
+	const device_config *k051960 = devtag_get_device(screen->machine, "k051960");
 
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_DRAW_OPAQUE,0);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,0);
-	K051960_sprites_draw(screen->machine,bitmap,cliprect,0,0);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[0],0,0);
+	k052109_tilemap_update(k052109);
+
+	k052109_tilemap_draw(k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, 2, 0, 0);
+	k051960_sprites_draw(k051960, bitmap, cliprect, 0, 0);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, 0, 0, 0);
 	return 0;
 }

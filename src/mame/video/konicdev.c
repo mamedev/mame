@@ -2376,6 +2376,12 @@ void k052109_get_tmap( const device_config *device, tilemap **tilemap, int tmap_
 	*tilemap = k052109->tilemap[tmap_num];
 }
 
+void k052109_tilemap_mark_dirty( const device_config *device, int tmap_num )
+{
+	k052109_state *k052109 = k052109_get_safe_token(device);
+	tilemap_mark_all_tiles_dirty(k052109->tilemap[tmap_num]);
+}
+
 
 void k052109_tilemap_update( const device_config *device )
 {
@@ -4964,6 +4970,8 @@ static DEVICE_START( k055673 )
 		16*16*6
 	};
 
+	k053247->screen = devtag_get_device(device->machine, intf->screen);
+
 	K055673_rom = (UINT16 *)memory_region(machine, intf->gfx_memory_region);
 
 	/* decode the graphics */
@@ -5680,9 +5688,10 @@ WRITE8_DEVICE_HANDLER( k053251_w )
 				if (k053251->palette_index[i] != newind)
 				{
 					k053251->palette_index[i] = newind;
-//					k053251->dirty_tmap[i] = 1;
-					if (k053251->tmaps[i])
-						tilemap_mark_all_tiles_dirty(k053251->tmaps[i]);				}
+					k053251->dirty_tmap[i] = 1;
+//					if (k053251->tmaps[i])
+//						tilemap_mark_all_tiles_dirty(k053251->tmaps[i]);				
+				}
 			}
 
 			if (!k053251->tilemaps_set)
@@ -5697,9 +5706,10 @@ WRITE8_DEVICE_HANDLER( k053251_w )
 				if (k053251->palette_index[3 + i] != newind)
 				{
 					k053251->palette_index[3 + i] = newind;
-//					k053251->dirty_tmap[3 + i] = 1;
-					if (k053251->tmaps[3 + i])
-						tilemap_mark_all_tiles_dirty(k053251->tmaps[3 + i]);				}
+					k053251->dirty_tmap[3 + i] = 1;
+//					if (k053251->tmaps[3 + i])
+//						tilemap_mark_all_tiles_dirty(k053251->tmaps[3 + i]);				
+				}
 			}
 
 			if (!k053251->tilemaps_set)
