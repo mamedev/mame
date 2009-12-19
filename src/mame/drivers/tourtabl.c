@@ -13,7 +13,7 @@
 #include "video/tia.h"
 
 
-#define MASTER_CLOCK	3579575
+#define MASTER_CLOCK	XTAL_3_579545MHz
 
 
 static WRITE8_DEVICE_HANDLER( tourtabl_led_w )
