@@ -569,6 +569,13 @@ static READ8_HANDLER( rranger_soundstatus_r )
 	return 0x02;
 }
 
+static WRITE8_HANDLER( sranger_prot_w )
+{
+	/* check code at 0x2ce2 (in sranger), protection is so dire that I can't even exactly
+	   estabilish if what I'm doing can be considered or not a kludge... -AS */
+	memory_write_byte(space,0xcd99,0xff);
+}
+
 static ADDRESS_MAP_START( rranger_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")						// Banked ROM
@@ -577,7 +584,7 @@ static ADDRESS_MAP_START( rranger_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P1")					// P1 (Inputs)
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0xc004, 0xc004) AM_READ(rranger_soundstatus_r	)	// Latch Status?
-	AM_RANGE(0xc200, 0xc200) AM_NOP								// Protection?
+	AM_RANGE(0xc200, 0xc200) AM_READNOP AM_WRITE(sranger_prot_w)// Protection?
 	AM_RANGE(0xc280, 0xc280) AM_WRITENOP	// ? NMI Ack
 	AM_RANGE(0xc280, 0xc280) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0xc2c0, 0xc2c0) AM_READ_PORT("DSW2")				// DSW 2
@@ -2272,15 +2279,15 @@ static DRIVER_INIT( suna8 )
 
 /* Working Games */
 GAME( 1988, rranger,  0,        rranger,  rranger,  suna8,    ROT0,  "SunA (Sharp Image license)", "Rough Ranger (v2.0)", 0)
+GAME( 1988, sranger,  rranger,  rranger,  rranger,  suna8,    ROT0,  "SunA", "Super Ranger (v2.0)", 0 )
+GAME( 1988, srangerb, rranger,  rranger,  rranger,  suna8,    ROT0,  "bootleg", "Super Ranger (bootleg)", 0 )
+GAME( 1988, srangerw, rranger,  rranger,  rranger,  suna8,    ROT0,  "SunA (WDK license)", "Super Ranger (WDK)", 0 )
 GAME( 1988, hardhead, 0,        hardhead, hardhead, hardhead, ROT0,  "SunA", "Hard Head" , 0)
 GAME( 1988, hardheadb,hardhead, hardhead, hardhead, hardhedb, ROT0,  "bootleg", "Hard Head (bootleg)" , 0)
 GAME( 1988, pop_hh,   hardhead, hardhead, hardhead, hardhedb, ROT0,  "bootleg", "Popper (Hard Head bootleg)" , 0)
 GAME( 1991, hardhea2, 0,        hardhea2, hardhea2, hardhea2, ROT0,  "SunA", "Hard Head 2 (v2.0)" , 0 )
 
 /* Non Working Games */
-GAME( 1988, sranger,  rranger,  rranger,  rranger,  suna8,    ROT0,  "SunA", "Super Ranger (v2.0)", GAME_NOT_WORKING )
-GAME( 1988, srangerb, rranger,  rranger,  rranger,  suna8,    ROT0,  "bootleg", "Super Ranger (bootleg)", GAME_NOT_WORKING )
-GAME( 1988, srangerw, rranger,  rranger,  rranger,  suna8,    ROT0,  "SunA (WDK license)", "Super Ranger (WDK)", GAME_NOT_WORKING )
 GAME( 1989, sparkman, 0,        sparkman, sparkman, sparkman, ROT0,  "SunA", "Spark Man (v 2.0)", GAME_NOT_WORKING )
 GAME( 1990, starfigh, 0,        starfigh, hardhea2, starfigh, ROT90, "SunA", "Star Fighter (v1)", GAME_NOT_WORKING )
 GAME( 1992, brickzn,  0,        brickzn,  brickzn,  brickzn,  ROT90, "SunA", "Brick Zone (v5.0)", GAME_NOT_WORKING )
