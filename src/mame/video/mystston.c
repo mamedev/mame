@@ -25,7 +25,7 @@
  *************************************/
 
 #define PIXEL_CLOCK		(MYSTSTON_MASTER_CLOCK / 2)
-#define HTOTAL			(0x140)
+#define HTOTAL			(0x180)
 #define HBEND			(0x000)
 #define HBSTART			(0x100)
 #define VTOTAL			(0x110)	 /* counts from 0x08-0xff, then from 0xe8-0xff */
