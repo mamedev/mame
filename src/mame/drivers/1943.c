@@ -14,6 +14,13 @@
 
 /*
 
+    SERVICE TEST INFORMATION:
+
+    - To access the unreachable tests (#4-7) in the Service Test, when starting
+    up the machine after it has been set into Test Mode, hold down the left
+    coin switch.
+
+
     TODO:
 
     - use priority PROM for drawing sprites
