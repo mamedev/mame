@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 
 int spy_video_enable;
@@ -13,7 +13,7 @@ static int layer_colorbase[3],sprite_colorbase;
 
 ***************************************************************************/
 
-static void tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
+void spy_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	*flags = (*color & 0x20) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9)
@@ -28,7 +28,7 @@ static void tile_callback(int layer,int bank,int *code,int *color,int *flags,int
 
 ***************************************************************************/
 
-static void sprite_callback(int *code,int *color,int *priority_mask,int *shadow)
+void spy_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow)
 {
 	/* bit 4 = priority over layer A (0 = have priority) */
 	/* bit 5 = priority over layer B (1 = have priority) */
@@ -52,8 +52,6 @@ VIDEO_START( spy )
 	layer_colorbase[1] = 0;
 	layer_colorbase[2] = 16;
 	sprite_colorbase = 32;
-	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tile_callback);
-	K051960_vh_start(machine,"gfx2",NORMAL_PLANE_ORDER,sprite_callback);
 }
 
 
@@ -66,7 +64,10 @@ VIDEO_START( spy )
 
 VIDEO_UPDATE( spy )
 {
-	K052109_tilemap_update();
+	const device_config *k052109 = devtag_get_device(screen->machine, "k052109");
+	const device_config *k051960 = devtag_get_device(screen->machine, "k051960");
+
+	k052109_tilemap_update(k052109);
 
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
@@ -74,10 +75,10 @@ VIDEO_UPDATE( spy )
 		bitmap_fill(bitmap,cliprect,16 * layer_colorbase[0]);
 	else
 	{
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_DRAW_OPAQUE,1);
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,2);
-		K051960_sprites_draw(screen->machine,bitmap,cliprect,-1,-1);
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[0],0,0);
+		k052109_tilemap_draw(k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 1);
+		k052109_tilemap_draw(k052109, bitmap, cliprect, 2, 0, 2);
+		k051960_sprites_draw(k051960, bitmap, cliprect, -1, -1);
+		k052109_tilemap_draw(k052109, bitmap, cliprect, 0, 0, 0);
 	}
 
 	return 0;

@@ -7,12 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/konamiic.h"
-#include "cpu/z80/z80.h"
-
-#define SPRITEROM_MEM_REGION "gfx1"
-#define ZOOMROM0_MEM_REGION "gfx2"
-#define ZOOMROM1_MEM_REGION "gfx3"
+#include "video/konicdev.h"
 
 static int sprite_colorbase,zoom_colorbase[2];
 
@@ -22,7 +17,7 @@ static int sprite_colorbase,zoom_colorbase[2];
 
 ***************************************************************************/
 
-static void sprite_callback(int *code,int *color,int *priority,int *shadow)
+void chqflag_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow)
 {
 	*priority = (*color & 0x10) >> 4;
 	*color = sprite_colorbase + (*color & 0x0f);
@@ -35,13 +30,12 @@ static void sprite_callback(int *code,int *color,int *priority,int *shadow)
 
 ***************************************************************************/
 
-static void zoom_callback_0(int *code,int *color,int *flags)
-{
-	*code |= ((*color & 0x03) << 8);
+void chqflag_zoom_callback_0(running_machine *machine, int *code,int *color,int *flags)
+{	*code |= ((*color & 0x03) << 8);
 	*color = zoom_colorbase[0] + ((*color & 0x3c) >> 2);
 }
 
-static void zoom_callback_1(int *code,int *color,int *flags)
+void chqflag_zoom_callback_1(running_machine *machine, int *code,int *color,int *flags)
 {
 	*flags = TILE_FLIPYX((*color & 0xc0) >> 6);
 	*code |= ((*color & 0x0f) << 8);
@@ -59,13 +53,6 @@ VIDEO_START( chqflag )
 	sprite_colorbase = 0;
 	zoom_colorbase[0] = 0x10;
 	zoom_colorbase[1] = 0x02;
-
-	K051960_vh_start(machine,SPRITEROM_MEM_REGION,NORMAL_PLANE_ORDER,sprite_callback);
-	K051316_vh_start_0(machine,ZOOMROM0_MEM_REGION,4,FALSE,0,zoom_callback_0);
-	K051316_vh_start_1(machine,ZOOMROM1_MEM_REGION,8,TRUE,0xc0,zoom_callback_1);
-
-	K051316_set_offset(0,7,0);
-	K051316_wraparound_enable(1,1);
 }
 
 /***************************************************************************
@@ -76,12 +63,16 @@ VIDEO_START( chqflag )
 
 VIDEO_UPDATE( chqflag )
 {
-	bitmap_fill(bitmap,cliprect,0);
+	const device_config *k051960 = devtag_get_device(screen->machine, "k051960");
+	const device_config *k051316_1 = devtag_get_device(screen->machine, "k051316_1");
+	const device_config *k051316_2 = devtag_get_device(screen->machine, "k051316_2");
 
-	K051316_zoom_draw_1(bitmap,cliprect,TILEMAP_DRAW_LAYER1,0);
-	K051960_sprites_draw(screen->machine,bitmap,cliprect,0,0);
-	K051316_zoom_draw_1(bitmap,cliprect,TILEMAP_DRAW_LAYER0,0);
-	K051960_sprites_draw(screen->machine,bitmap,cliprect,1,1);
-	K051316_zoom_draw_0(bitmap,cliprect,0,0);
+	bitmap_fill(bitmap, cliprect, 0);
+
+	k051316_zoom_draw(k051316_2, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	k051960_sprites_draw(k051960, bitmap, cliprect, 0, 0);
+	k051316_zoom_draw(k051316_2, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	k051960_sprites_draw(k051960, bitmap, cliprect, 1, 1);
+	k051316_zoom_draw(k051316_1, bitmap, cliprect, 0, 0);
 	return 0;
 }

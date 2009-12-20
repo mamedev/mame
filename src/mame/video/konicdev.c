@@ -5170,6 +5170,12 @@ WRITE8_DEVICE_HANDLER( k051316_ctrl_w )
 	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", cpuexec_describe_context(device->machine), data, offset);
 }
 
+// a few games (ajax, rollerg, etc.) can enable and disable wraparound after start
+void k051316_wraparound_enable( const device_config *device, int status )
+{
+	k051316_state *k051316= k051316_get_safe_token(device);
+	k051316->wraparound = status;
+}
 
 /***************************************************************************
 

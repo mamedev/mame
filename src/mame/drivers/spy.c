@@ -20,7 +20,7 @@ Revisions:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "sound/3812intf.h"
 #include "sound/k007232.h"
 #include "konamipt.h"
@@ -30,10 +30,14 @@ VIDEO_UPDATE( spy );
 
 static UINT8 *pmcram;
 
+extern void spy_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void spy_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow);
+
 
 static INTERRUPT_GEN( spy_interrupt )
 {
-	if (K052109_is_IRQ_enabled())
+	const device_config *k052109 = devtag_get_device(device->machine, "k052109");
+	if (k052109_is_irq_enabled(k052109))
 		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
@@ -248,6 +252,7 @@ static void spy_collision(void)
 
 static WRITE8_HANDLER( spy_3f90_w )
 {
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
 	extern int spy_video_enable;
 	static int old;
 
@@ -290,11 +295,11 @@ static WRITE8_HANDLER( spy_3f90_w )
     ********************************************************************/
 
 	/* bits 0/1 = coin counters */
-	coin_counter_w(space->machine, 0,data & 0x01);
-	coin_counter_w(space->machine, 1,data & 0x02);
+	coin_counter_w(space->machine, 0, data & 0x01);
+	coin_counter_w(space->machine, 1, data & 0x02);
 
 	/* bit 2 = enable char ROM reading through the video RAM */
-	K052109_set_RMRD_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(k052109, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 3 = disable video */
 	spy_video_enable = ~(data & 0x08);
@@ -351,6 +356,37 @@ static WRITE8_HANDLER( sound_bank_w )
 
 
 
+static READ8_HANDLER( k052109_051960_r )
+{
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	const device_config *k051960 = devtag_get_device(space->machine, "k051960");
+
+	if (k052109_get_rmrd_line(k052109) == CLEAR_LINE)
+	{
+		if (offset >= 0x3800 && offset < 0x3808)
+			return k051937_r(k051960, offset - 0x3800);
+		else if (offset < 0x3c00)
+			return k052109_r(k052109, offset);
+		else
+			return k051960_r(k051960, offset - 0x3c00);
+	}
+	else 
+		return k052109_r(k052109, offset);
+}
+
+static WRITE8_HANDLER( k052109_051960_w )
+{
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	const device_config *k051960 = devtag_get_device(space->machine, "k051960");
+
+	if (offset >= 0x3800 && offset < 0x3808)
+		k051937_w(k051960, offset - 0x3800, data);
+	else if (offset < 0x3c00)
+		k052109_w(k052109, offset, data);
+	else
+		k051960_w(k051960, offset - 0x3c00, data);
+}
+
 static ADDRESS_MAP_START( spy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(spy_bankedram1_r,spy_bankedram1_w) AM_BASE(&ram)
 	AM_RANGE(0x0800, 0x1aff) AM_RAM
@@ -364,7 +400,7 @@ static ADDRESS_MAP_START( spy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3fd2, 0x3fd2) AM_READ_PORT("P2")
 	AM_RANGE(0x3fd3, 0x3fd3) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3fe0, 0x3fe0) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(K052109_051960_r,K052109_051960_w)
+	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -373,8 +409,8 @@ static ADDRESS_MAP_START( spy_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)
-	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("konami1", k007232_r,k007232_w)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami2", k007232_r,k007232_w)
+	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("konami1", k007232_r, k007232_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami2", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym3812_r,ym3812_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -468,6 +504,22 @@ static const ym3812_interface ym3812_config =
 
 
 
+static const k052109_interface spy_k052109_intf =
+{
+	"gfx1", 0,
+	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	spy_tile_callback
+};
+
+static const k051960_interface spy_k051960_intf =
+{
+	"gfx2", 1,
+	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	spy_sprite_callback
+};
+
 static MACHINE_DRIVER_START( spy )
 
 	/* basic machine hardware */
@@ -493,6 +545,9 @@ static MACHINE_DRIVER_START( spy )
 
 	MDRV_VIDEO_START(spy)
 	MDRV_VIDEO_UPDATE(spy)
+
+	MDRV_K052109_ADD("k052109", spy_k052109_intf)
+	MDRV_K051960_ADD("k051960", spy_k051960_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -574,18 +629,10 @@ ROM_START( spyu )
 ROM_END
 
 
-
-static void gfx_untangle(running_machine *machine)
-{
-	konami_rom_deinterleave_2(machine, "gfx1");
-	konami_rom_deinterleave_2(machine, "gfx2");
-}
-
 static DRIVER_INIT( spy )
 {
 	machine->generic.paletteram.u8 = &memory_region(machine, "maincpu")[0x28000];
-	pmcram =     &memory_region(machine, "maincpu")[0x28800];
-	gfx_untangle(machine);
+	pmcram = &memory_region(machine, "maincpu")[0x28800];
 }
 
 

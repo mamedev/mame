@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 
 
@@ -14,7 +14,7 @@ static int layer_colorbase[3],sprite_colorbase,zoom_colorbase;
 
 ***************************************************************************/
 
-static void tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
+void bottom9_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	*code |= (*color & 0x3f) << 8;
 	*color = layer_colorbase[layer] + ((*color & 0xc0) >> 6);
@@ -27,7 +27,7 @@ static void tile_callback(int layer,int bank,int *code,int *color,int *flags,int
 
 ***************************************************************************/
 
-static void sprite_callback(int *code,int *color,int *priority,int *shadow)
+void bottom9_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow)
 {
 	/* bit 4 = priority over zoom (0 = have priority) */
 	/* bit 5 = priority over B (1 = have priority) */
@@ -42,7 +42,7 @@ static void sprite_callback(int *code,int *color,int *priority,int *shadow)
 
 ***************************************************************************/
 
-static void zoom_callback(int *code,int *color,int *flags)
+void bottom9_zoom_callback(running_machine *machine, int *code,int *color,int *flags)
 {
 	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8);
@@ -63,9 +63,6 @@ VIDEO_START( bottom9 )
 	layer_colorbase[2] = 16;
 	sprite_colorbase = 32;
 	zoom_colorbase = 48;
-	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tile_callback);
-	K051960_vh_start(machine,"gfx2",NORMAL_PLANE_ORDER,sprite_callback);
-	K051316_vh_start_0(machine,"gfx3",4,FALSE,0,zoom_callback);
 }
 
 
@@ -78,20 +75,24 @@ VIDEO_START( bottom9 )
 
 VIDEO_UPDATE( bottom9 )
 {
-	K052109_tilemap_update();
+	const device_config *k052109 = devtag_get_device(screen->machine, "k052109");
+	const device_config *k051960 = devtag_get_device(screen->machine, "k051960");
+	const device_config *k051316 = devtag_get_device(screen->machine, "k051316");
+
+	k052109_tilemap_update(k052109);
 
 	/* note: FIX layer is not used */
 	bitmap_fill(bitmap,cliprect,layer_colorbase[1]);
 //  if (bottom9_video_enable)
 	{
-		K051960_sprites_draw(screen->machine,bitmap,cliprect,1,1);
-		K051316_zoom_draw_0(bitmap,cliprect,0,0);
-		K051960_sprites_draw(screen->machine,bitmap,cliprect,0,0);
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,0);
+		k051960_sprites_draw(k051960, bitmap, cliprect, 1, 1);
+		k051316_zoom_draw(k051316, bitmap, cliprect, 0, 0);
+		k051960_sprites_draw(k051960, bitmap, cliprect, 0, 0);
+		k052109_tilemap_draw(k052109, bitmap, cliprect, 2, 0, 0);
 		/* note that priority 3 is opposite to the basic layer priority! */
 		/* (it IS used, but hopefully has no effect) */
-		K051960_sprites_draw(screen->machine,bitmap,cliprect,2,3);
-		tilemap_draw(bitmap,cliprect,K052109_tilemap[1],0,0);
+		k051960_sprites_draw(k051960, bitmap, cliprect, 2, 3);
+		k052109_tilemap_draw(k052109, bitmap, cliprect, 1, 0, 0);
 	}
 	return 0;
 }

@@ -11,7 +11,7 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "cpu/konami/konami.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "includes/ajax.h"
 
 static int firq_enable;
@@ -180,14 +180,16 @@ WRITE8_HANDLER( ajax_ls138_f10_w )
 
 WRITE8_HANDLER( ajax_bankswitch_2_w )
 {
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	const device_config *k051316 = devtag_get_device(space->machine, "k051316");
 	UINT8 *RAM = memory_region(space->machine, "sub");
 	int bankaddress;
 
 	/* enable char ROM reading through the video RAM */
-	K052109_set_RMRD_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 5 enables 051316 wraparound */
-	K051316_wraparound_enable(0, data & 0x20);
+	k051316_wraparound_enable(k051316, data & 0x20);
 
 	/* FIRQ control */
 	firq_enable = data & 0x10;
@@ -211,6 +213,7 @@ MACHINE_RESET( ajax )
 
 INTERRUPT_GEN( ajax_interrupt )
 {
-	if (K051960_is_IRQ_enabled())
+	const device_config *k051960 = devtag_get_device(device->machine, "k051960");
+	if (k051960_is_irq_enabled(k051960))
 		cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }

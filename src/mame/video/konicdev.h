@@ -498,6 +498,7 @@ WRITE8_DEVICE_HANDLER( k051316_w );
 READ8_DEVICE_HANDLER( k051316_rom_r );
 WRITE8_DEVICE_HANDLER( k051316_ctrl_w );
 void k051316_zoom_draw(const device_config *device, bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT32 priority);
+void k051316_wraparound_enable(const device_config *device, int status);
 
 
 /**  Konami 053936  **/

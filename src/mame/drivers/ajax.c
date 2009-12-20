@@ -14,21 +14,26 @@ TO DO:
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/konami/konami.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
 #include "includes/ajax.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 static WRITE8_DEVICE_HANDLER( k007232_extvol_w );
 static WRITE8_HANDLER( sound_bank_w );
+
+extern void ajax_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void ajax_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
+extern void ajax_zoom_callback(running_machine *machine, int *code,int *color,int *flags);
+
 
 /****************************************************************************/
 
 static ADDRESS_MAP_START( ajax_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01c0) AM_READWRITE(ajax_ls138_f10_r, ajax_ls138_f10_w)	/* bankswitch + sound command + FIRQ command */
-	AM_RANGE(0x0800, 0x0807) AM_READWRITE(K051937_r, K051937_w)					/* sprite control registers */
-	AM_RANGE(0x0c00, 0x0fff) AM_READWRITE(K051960_r, K051960_w)					/* sprite RAM 2128SL at J7 */
+	AM_RANGE(0x0800, 0x0807) AM_DEVREADWRITE("k051960", k051937_r, k051937_w)					/* sprite control registers */
+	AM_RANGE(0x0c00, 0x0fff) AM_DEVREADWRITE("k051960", k051960_r, k051960_w)					/* sprite RAM 2128SL at J7 */
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE_GENERIC(paletteram)/* palette */
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("share1")									/* shared RAM with the 6809 */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM												/* RAM 6264L at K10 */
@@ -37,12 +42,12 @@ static ADDRESS_MAP_START( ajax_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ajax_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(K051316_0_r, K051316_0_w)	/* 051316 zoom/rotation layer */
-	AM_RANGE(0x0800, 0x080f) AM_WRITE(K051316_ctrl_0_w)				/* 051316 control registers */
-	AM_RANGE(0x1000, 0x17ff) AM_READ(K051316_rom_0_r)				/* 051316 (ROM test) */
+	AM_RANGE(0x0000, 0x07ff) AM_DEVREADWRITE("k051316", k051316_r, k051316_w)	/* 051316 zoom/rotation layer */
+	AM_RANGE(0x0800, 0x080f) AM_DEVWRITE("k051316", k051316_ctrl_w)				/* 051316 control registers */
+	AM_RANGE(0x1000, 0x17ff) AM_DEVREAD("k051316", k051316_rom_r)				/* 051316 (ROM test) */
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(ajax_bankswitch_2_w)			/* bankswitch control */
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("share1")						/* shared RAM with the 052001 */
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(K052109_r, K052109_w)		/* video RAM + color RAM + video registers */
+	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("k052109", k052109_r, k052109_w)		/* video RAM + color RAM + video registers */
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")							/* banked ROM */
 	AM_RANGE(0xa000, 0xffff) AM_ROM									/* ROM I16 */
 ADDRESS_MAP_END
@@ -180,6 +185,30 @@ static const k007232_interface k007232_interface_2 =
 
 
 
+static const k052109_interface ajax_k052109_intf =
+{
+	"gfx1", 0,
+	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	ajax_tile_callback
+};
+
+static const k051960_interface ajax_k051960_intf =
+{
+	"gfx2", 1,
+	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	ajax_sprite_callback
+};
+
+static const k051316_interface ajax_k051316_intf =
+{
+	"gfx3", 2,
+	7, FALSE, 0, 
+	0, 0, 0,
+	ajax_zoom_callback
+};
+
 static MACHINE_DRIVER_START( ajax )
 
 	/* basic machine hardware */
@@ -196,7 +225,7 @@ static MACHINE_DRIVER_START( ajax )
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(ajax)
-    MDRV_MACHINE_START(ajax)
+	MDRV_MACHINE_START(ajax)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -211,6 +240,10 @@ static MACHINE_DRIVER_START( ajax )
 
 	MDRV_VIDEO_START(ajax)
 	MDRV_VIDEO_UPDATE(ajax)
+
+	MDRV_K052109_ADD("k052109", ajax_k052109_intf)
+	MDRV_K051960_ADD("k051960", ajax_k051960_intf)
+	MDRV_K051316_ADD("k051316", ajax_k051316_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -383,13 +416,6 @@ ROM_START( ajaxj )
 ROM_END
 
 
-static DRIVER_INIT( ajax )
-{
-	konami_rom_deinterleave_2(machine, "gfx1");
-	konami_rom_deinterleave_2(machine, "gfx2");
-}
-
-
-GAME( 1987, ajax,    0,    ajax, ajax, ajax, ROT90, "Konami", "Ajax", GAME_SUPPORTS_SAVE )
-GAME( 1987, typhoon, ajax, ajax, ajax, ajax, ROT90, "Konami", "Typhoon", GAME_SUPPORTS_SAVE )
-GAME( 1987, ajaxj,   ajax, ajax, ajax, ajax, ROT90, "Konami", "Ajax (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ajax,    0,    ajax, ajax, 0, ROT90, "Konami", "Ajax", GAME_SUPPORTS_SAVE )
+GAME( 1987, typhoon, ajax, ajax, ajax, 0, ROT90, "Konami", "Typhoon", GAME_SUPPORTS_SAVE )
+GAME( 1987, ajaxj,   ajax, ajax, ajax, 0, ROT90, "Konami", "Ajax (Japan)", GAME_SUPPORTS_SAVE )
