@@ -371,12 +371,6 @@ static MACHINE_RESET( cojag )
 	/* halt the CPUs */
 	jaguargpu_ctrl_w(cputag_get_cpu(machine, "gpu"), G_CTRL, 0, 0xffffffff);
 	jaguardsp_ctrl_w(cputag_get_cpu(machine, "audiocpu"), D_CTRL, 0, 0xffffffff);
-
-	/* init the sound system */
-	cojag_sound_reset(machine);
-
-	/* reset the IDE controller */
-	devtag_reset(machine, "ide");
 }
 
 
@@ -1122,6 +1116,8 @@ static MACHINE_DRIVER_START( cojagr3k )
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	MDRV_IDE_CONTROLLER_ADD("ide", jaguar_external_int)
+	
+	MDRV_TIMER_ADD("serial_timer", jaguar_serial_callback)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

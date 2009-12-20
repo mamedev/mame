@@ -198,7 +198,11 @@ static void scanline_update(const device_config *screen, int scanline)
 
 static MACHINE_START( badlands )
 {
+	badlands_state *state = (badlands_state *)machine->driver_data;
+
 	atarigen_init(machine);
+	
+	state_save_register_global_array(machine, state->pedal_value);
 }
 
 
@@ -214,8 +218,6 @@ static MACHINE_RESET( badlands )
 
 	atarigen_sound_io_reset(cputag_get_cpu(machine, "audiocpu"));
 	memcpy(state->bank_base, &state->bank_source_data[0x0000], 0x1000);
-	
-	state_save_register_global_array(machine, state->pedal_value);
 }
 
 

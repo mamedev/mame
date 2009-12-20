@@ -37,22 +37,30 @@
 #define TTL74153_H
 
 
-/* The interface structure */
-struct TTL74153_interface
+typedef struct _ttl74153_config ttl74153_config;
+struct _ttl74153_config
 {
-	void (*output_cb)(running_machine *machine);
+	void (*output_cb)(const device_config *device);
 };
 
 
-void TTL74153_config(running_machine *machine, int which, const struct TTL74153_interface *intf);
+#define MDRV_74153_ADD(_tag, _output_cb) \
+	MDRV_DEVICE_ADD(_tag, TTL74153, 0) \
+	MDRV_DEVICE_CONFIG_DATAPTR(ttl74153_config, output_cb, _output_cb)
+
+
 
 /* must call TTL74153_update() after setting the inputs */
-void TTL74153_update(int which);
+void ttl74153_update(const device_config *device);
 
-void TTL74153_a_w(int which, int data);
-void TTL74153_b_w(int which, int data);
-void TTL74153_input_line_w(int which, int section, int input_line, int data);
-void TTL74153_enable_w(int which, int section, int data);
-int TTL74153_output_r(int which, int section);
+void ttl74153_a_w(const device_config *device, int data);
+void ttl74153_b_w(const device_config *device, int data);
+void ttl74153_input_line_w(const device_config *device, int section, int input_line, int data);
+void ttl74153_enable_w(const device_config *device, int section, int data);
+int ttl74153_output_r(const device_config *device, int section);
+
+/* device get info callback */
+#define TTL74153 DEVICE_GET_INFO_NAME(ttl74153)
+DEVICE_GET_INFO( ttl74153 );
 
 #endif

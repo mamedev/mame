@@ -6,6 +6,8 @@
 
 /*----------- defined in machine/vertigo.c -----------*/
 
+void vertigo_update_irq(const device_config *device);
+
 extern const struct pit8253_config vertigo_pit8254_config;
 
 READ16_HANDLER( vertigo_io_convert );

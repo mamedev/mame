@@ -166,19 +166,11 @@ enum
 static UINT16 dsp_regs[DSP_REGS];
 
 static UINT16 serial_frequency;
-static emu_timer *serial_timer;
 
 static UINT8 gpu_irq_state;
 
 #if ENABLE_SPEEDUP_HACKS
-
-static TIMER_CALLBACK( serial_chunky_callback );
 static WRITE32_HANDLER( dsp_flags_w );
-
-#else
-
-static TIMER_CALLBACK( serial_callback );
-
 #endif
 
 
@@ -271,23 +263,6 @@ void cojag_sound_init(running_machine *machine)
 
 #if ENABLE_SPEEDUP_HACKS
 	memory_install_write32_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0xf1a100, 0xf1a103, 0, 0, dsp_flags_w);
-#endif
-}
-
-
-
-/*************************************
- *
- *  Sound reset
- *
- *************************************/
-
-void cojag_sound_reset(running_machine *machine)
-{
-#if ENABLE_SPEEDUP_HACKS
-	serial_timer = timer_alloc(machine, serial_chunky_callback, NULL);
-#else
-	serial_timer = timer_alloc(machine, serial_callback, NULL);
 #endif
 }
 
@@ -390,11 +365,11 @@ static WRITE32_HANDLER( dsp_flags_w )
 
 #if ENABLE_SPEEDUP_HACKS
 
-static TIMER_CALLBACK( serial_chunky_callback )
+TIMER_DEVICE_CALLBACK( jaguar_serial_callback )
 {
 	/* assert the A2S IRQ on CPU #2 (DSP) */
-	cputag_set_input_line(machine, "audiocpu", 1, ASSERT_LINE);
-	jaguar_dsp_resume(machine);
+	cputag_set_input_line(timer->machine, "audiocpu", 1, ASSERT_LINE);
+	jaguar_dsp_resume(timer->machine);
 
 	/* fix flaky code in interrupt handler which thwarts our speedup */
 	if ((jaguar_dsp_ram[0x3e/4] & 0xffff) == 0xbfbc &&
@@ -409,11 +384,11 @@ static TIMER_CALLBACK( serial_chunky_callback )
 
 #else
 
-static TIMER_CALLBACK( serial_callback )
+TIMER_DEVICE_CALLBACK( jaguar_serial_callback )
 {
 	/* assert the A2S IRQ on CPU #2 (DSP) */
-	cputag_set_input_line(machine, "audiocpu", 1, ASSERT_LINE);
-	jaguar_dsp_resume(machine);
+	cputag_set_input_line(timer->machine, "audiocpu", 1, ASSERT_LINE);
+	jaguar_dsp_resume(timer->machine);
 }
 
 #endif
@@ -459,7 +434,7 @@ WRITE32_HANDLER( jaguar_serial_w )
 			if ((data & 0x3f) == 0x15)
 			{
 				attotime rate = attotime_mul(ATTOTIME_IN_HZ(26000000), 32 * 2 * (serial_frequency + 1));
-				timer_adjust_periodic(serial_timer, rate, 0, rate);
+				timer_device_adjust_periodic(devtag_get_device(space->machine, "serial_timer"), rate, 0, rate);
 			}
 			break;
 

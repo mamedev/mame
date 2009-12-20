@@ -42,12 +42,11 @@
 #include "machine/74148.h"
 
 
-#define MAX_TTL74148 4
-
-struct TTL74148
+typedef struct _ttl74148_state ttl74148_state;
+struct _ttl74148_state
 {
 	/* callback */
-	void (*output_cb)(running_machine *machine);
+	void (*output_cb)(const device_config *device);
 
 	/* inputs */
 	int input_lines[8];	/* pins 1-4,10-13 */
@@ -64,139 +63,163 @@ struct TTL74148
 	int last_enable_output;
 };
 
-static struct TTL74148 chips[MAX_TTL74148];
 
-
-void TTL74148_update(running_machine *machine, int which)
+INLINE ttl74148_state *get_safe_token(const device_config *device)
 {
-	if (chips[which].enable_input)
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == ttl74148);
+
+	return (ttl74148_state *)device->token;
+}
+
+void ttl74148_update(const device_config *device)
+{
+	ttl74148_state *state = get_safe_token(device);
+
+	if (state->enable_input)
 	{
 		// row 1 in truth table
-		chips[which].output = 0x07;
-		chips[which].output_valid = 1;
-		chips[which].enable_output = 1;
+		state->output = 0x07;
+		state->output_valid = 1;
+		state->enable_output = 1;
 	}
 	else
 	{
 		int bit0, bit1, bit2;
 
 		/* this comes straight off the data sheet schematics */
-		bit0 = !(((!chips[which].input_lines[1]) &
-		           chips[which].input_lines[2] &
-		           chips[which].input_lines[4] &
-		           chips[which].input_lines[6])  |
-		         ((!chips[which].input_lines[3]) &
-		           chips[which].input_lines[4] &
-		           chips[which].input_lines[6])  |
-		         ((!chips[which].input_lines[5]) &
-		           chips[which].input_lines[6])  |
-		         (!chips[which].input_lines[7]));
+		bit0 = !(((!state->input_lines[1]) &
+		           state->input_lines[2] &
+		           state->input_lines[4] &
+		           state->input_lines[6])  |
+		         ((!state->input_lines[3]) &
+		           state->input_lines[4] &
+		           state->input_lines[6])  |
+		         ((!state->input_lines[5]) &
+		           state->input_lines[6])  |
+		         (!state->input_lines[7]));
 
-		bit1 = !(((!chips[which].input_lines[2]) &
-		           chips[which].input_lines[4] &
-		           chips[which].input_lines[5])  |
-		         ((!chips[which].input_lines[3]) &
-		           chips[which].input_lines[4] &
-		           chips[which].input_lines[5])  |
-		         (!chips[which].input_lines[6])  |
-		         (!chips[which].input_lines[7]));
+		bit1 = !(((!state->input_lines[2]) &
+		           state->input_lines[4] &
+		           state->input_lines[5])  |
+		         ((!state->input_lines[3]) &
+		           state->input_lines[4] &
+		           state->input_lines[5])  |
+		         (!state->input_lines[6])  |
+		         (!state->input_lines[7]));
 
-		bit2 = !((!chips[which].input_lines[4])  |
-		         (!chips[which].input_lines[5])  |
-		         (!chips[which].input_lines[6])  |
-		         (!chips[which].input_lines[7]));
+		bit2 = !((!state->input_lines[4])  |
+		         (!state->input_lines[5])  |
+		         (!state->input_lines[6])  |
+		         (!state->input_lines[7]));
 
-		chips[which].output = (bit2 << 2) | (bit1 << 1) | bit0;
+		state->output = (bit2 << 2) | (bit1 << 1) | bit0;
 
-		chips[which].output_valid = (chips[which].input_lines[0] &
-									 chips[which].input_lines[1] &
-									 chips[which].input_lines[2] &
-									 chips[which].input_lines[3] &
-									 chips[which].input_lines[4] &
-									 chips[which].input_lines[5] &
-									 chips[which].input_lines[6] &
-									 chips[which].input_lines[7]);
+		state->output_valid = (state->input_lines[0] &
+									 state->input_lines[1] &
+									 state->input_lines[2] &
+									 state->input_lines[3] &
+									 state->input_lines[4] &
+									 state->input_lines[5] &
+									 state->input_lines[6] &
+									 state->input_lines[7]);
 
-		chips[which].enable_output = !chips[which].output_valid;
+		state->enable_output = !state->output_valid;
 	}
 
 
 	/* call callback if any of the outputs changed */
-	if (  chips[which].output_cb &&
-		((chips[which].output        != chips[which].last_output) ||
-	     (chips[which].output_valid  != chips[which].last_output_valid) ||
-	     (chips[which].enable_output != chips[which].last_enable_output)))
+	if (  state->output_cb &&
+		((state->output        != state->last_output) ||
+	     (state->output_valid  != state->last_output_valid) ||
+	     (state->enable_output != state->last_enable_output)))
 	{
-		chips[which].last_output = chips[which].output;
-		chips[which].last_output_valid = chips[which].output_valid;
-		chips[which].last_enable_output = chips[which].enable_output;
+		state->last_output = state->output;
+		state->last_output_valid = state->output_valid;
+		state->last_enable_output = state->enable_output;
 
-		chips[which].output_cb(machine);
+		state->output_cb(device);
 	}
 }
 
 
-void TTL74148_input_line_w(int which, int input_line, int data)
+void ttl74148_input_line_w(const device_config *device, int input_line, int data)
 {
-	chips[which].input_lines[input_line] = data ? 1 : 0;
+	ttl74148_state *state = get_safe_token(device);
+	state->input_lines[input_line] = data ? 1 : 0;
 }
 
 
-void TTL74148_enable_input_w(int which, int data)
+void ttl74148_enable_input_w(const device_config *device, int data)
 {
-	chips[which].enable_input = data ? 1 : 0;
+	ttl74148_state *state = get_safe_token(device);
+	state->enable_input = data ? 1 : 0;
 }
 
 
-int TTL74148_output_r(int which)
+int ttl74148_output_r(const device_config *device)
 {
-	return chips[which].output;
+	ttl74148_state *state = get_safe_token(device);
+	return state->output;
 }
 
 
-int TTL74148_output_valid_r(int which)
+int ttl74148_output_valid_r(const device_config *device)
 {
-	return chips[which].output_valid;
+	ttl74148_state *state = get_safe_token(device);
+	return state->output_valid;
 }
 
 
-int TTL74148_enable_output_r(int which)
+int ttl74148_enable_output_r(const device_config *device)
 {
-	return chips[which].enable_output;
+	ttl74148_state *state = get_safe_token(device);
+	return state->enable_output;
 }
 
 
-
-void TTL74148_config(running_machine *machine, int which, const struct TTL74148_interface *intf)
+static DEVICE_START( ttl74148 )
 {
-	if (which >= MAX_TTL74148)
-	{
-		logerror("Only %d 74148's are supported at this time.\n", MAX_TTL74148);
-		return;
-	}
+	ttl74148_config *config = (ttl74148_config *)device->inline_config;
+	ttl74148_state *state = get_safe_token(device);
+    state->output_cb = config->output_cb;
 
-
-    chips[which].output_cb = (intf ? intf->output_cb : 0);
-    chips[which].enable_input = 1;
-    chips[which].input_lines[0] = 1;
-    chips[which].input_lines[1] = 1;
-    chips[which].input_lines[2] = 1;
-    chips[which].input_lines[3] = 1;
-    chips[which].input_lines[4] = 1;
-    chips[which].input_lines[5] = 1;
-    chips[which].input_lines[6] = 1;
-    chips[which].input_lines[7] = 1;
-
-    chips[which].last_output = -1;
-    chips[which].last_output_valid = -1;
-    chips[which].last_enable_output = -1;
-
-    state_save_register_item_array(machine, "ttl74148", NULL, which, chips[which].input_lines);
-    state_save_register_item(machine, "ttl74148", NULL, which, chips[which].enable_input);
-    state_save_register_item(machine, "ttl74148", NULL, which, chips[which].output);
-    state_save_register_item(machine, "ttl74148", NULL, which, chips[which].output_valid);
-    state_save_register_item(machine, "ttl74148", NULL, which, chips[which].enable_output);
-    state_save_register_item(machine, "ttl74148", NULL, which, chips[which].last_output);
-    state_save_register_item(machine, "ttl74148", NULL, which, chips[which].last_output_valid);
-    state_save_register_item(machine, "ttl74148", NULL, which, chips[which].last_enable_output);
+    state_save_register_device_item_array(device, 0, state->input_lines);
+    state_save_register_device_item(device, 0, state->enable_input);
+    state_save_register_device_item(device, 0, state->output);
+    state_save_register_device_item(device, 0, state->output_valid);
+    state_save_register_device_item(device, 0, state->enable_output);
+    state_save_register_device_item(device, 0, state->last_output);
+    state_save_register_device_item(device, 0, state->last_output_valid);
+    state_save_register_device_item(device, 0, state->last_enable_output);
 }
+
+
+static DEVICE_RESET( ttl74148 )
+{
+	ttl74148_state *state = get_safe_token(device);
+
+    state->enable_input = 1;
+    state->input_lines[0] = 1;
+    state->input_lines[1] = 1;
+    state->input_lines[2] = 1;
+    state->input_lines[3] = 1;
+    state->input_lines[4] = 1;
+    state->input_lines[5] = 1;
+    state->input_lines[6] = 1;
+    state->input_lines[7] = 1;
+
+    state->last_output = -1;
+    state->last_output_valid = -1;
+    state->last_enable_output = -1;
+}
+
+
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+
+#define DEVTEMPLATE_ID(p,s)		p##ttl74148##s
+#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET | DT_HAS_INLINE_CONFIG
+#define DEVTEMPLATE_NAME		"74148"
+#define DEVTEMPLATE_FAMILY		"TTL"
+#include "devtempl.h"

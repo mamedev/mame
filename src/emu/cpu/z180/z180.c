@@ -2019,6 +2019,9 @@ static CPU_INIT( z180 )
 		cpustate->daisy = z80daisy_init(device, (const z80_daisy_chain *)device->static_config);
 	cpustate->irq_callback = irqcallback;
 
+	SZHVC_add = auto_alloc_array(device->machine, UINT8, 2*256*256);
+	SZHVC_sub = auto_alloc_array(device->machine, UINT8, 2*256*256);
+
 	/* set up the state table */
 	cpustate->state = state_table_template;
 	cpustate->state.baseptr = cpustate;
@@ -2064,8 +2067,6 @@ static CPU_RESET( z180 )
 	int oldval, newval, val;
 	UINT8 *padd, *padc, *psub, *psbc;
 	/* allocate big flag arrays once */
-	SZHVC_add = auto_alloc_array(device->machine, UINT8, 2*256*256);
-	SZHVC_sub = auto_alloc_array(device->machine, UINT8, 2*256*256);
 	padd = &SZHVC_add[	0*256];
 	padc = &SZHVC_add[256*256];
 	psub = &SZHVC_sub[	0*256];

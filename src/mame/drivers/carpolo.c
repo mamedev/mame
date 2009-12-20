@@ -18,6 +18,9 @@
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/7474.h"
+#include "machine/74148.h"
+#include "machine/74153.h"
 #include "machine/6821pia.h"
 #include "carpolo.h"
 
@@ -240,6 +243,22 @@ static MACHINE_DRIVER_START( carpolo )
 
 	MDRV_PIA6821_ADD("pia0", carpolo_pia0_intf)
 	MDRV_PIA6821_ADD("pia1", carpolo_pia1_intf)
+
+	MDRV_7474_ADD("7474_2s_1", carpolo_7474_2s_1_cb)
+	MDRV_7474_ADD("7474_2s_2", carpolo_7474_2s_2_cb)
+	MDRV_7474_ADD("7474_2u_1", carpolo_7474_2u_1_cb)
+	MDRV_7474_ADD("7474_2u_2", carpolo_7474_2u_2_cb)
+	MDRV_7474_ADD("7474_1f_1", NULL)
+	MDRV_7474_ADD("7474_1f_2", NULL)
+	MDRV_7474_ADD("7474_1d_1", NULL)
+	MDRV_7474_ADD("7474_1d_2", NULL)
+	MDRV_7474_ADD("7474_1c_1", NULL)
+	MDRV_7474_ADD("7474_1c_2", NULL)
+	MDRV_7474_ADD("7474_1a_1", NULL)
+	MDRV_7474_ADD("7474_1a_2", NULL)
+	
+	MDRV_74148_ADD("74148_3s", carpolo_74148_3s_cb)
+	MDRV_74153_ADD("74153_1k", NULL)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

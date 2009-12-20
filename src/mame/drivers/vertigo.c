@@ -15,6 +15,7 @@
 #include "video/vector.h"
 #include "vertigo.h"
 #include "exidy440.h"
+#include "machine/74148.h"
 #include "machine/pit8253.h"
 
 
@@ -113,6 +114,8 @@ static MACHINE_DRIVER_START( vertigo )
 	MDRV_IMPORT_FROM(exidy440_audio)
 
 	MDRV_PIT8254_ADD( "pit8254", vertigo_pit8254_config )
+	
+	MDRV_74148_ADD( "74148", vertigo_update_irq )
 
 	/* motor controller */
 	/*

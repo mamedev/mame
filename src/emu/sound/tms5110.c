@@ -175,6 +175,7 @@ struct _tms5110_state
 	INT32 speech_rom_bitnum;
 
 	emu_timer *romclk_timer;
+	UINT8 romclk_timer_started;
 	UINT8 romclk_state;
 };
 
@@ -206,6 +207,7 @@ static void tms5110_PDC_set(tms5110_state *tms, int data);
 static void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size);
 static void parse_frame(tms5110_state *tms);
 static STREAM_UPDATE( tms5110_update );
+static TIMER_CALLBACK( romclk_timer_cb );
 
 
 #define DEBUG_5110	0
@@ -964,6 +966,7 @@ static DEVICE_START( tms5110 )
 	}
 
 	tms->state = CTL_STATE_INPUT; /* most probably not defined */
+   	tms->romclk_timer = timer_alloc(device->machine, romclk_timer_cb, (void *) device);
 
 	register_for_save_states(tms);
 }
@@ -1139,11 +1142,11 @@ READ8_DEVICE_HANDLER( tms5110_romclk_r )
     stream_update(tms->stream);
 
     /* create and start timer if necessary */
-    if (tms->romclk_timer == NULL)
+    if (!tms->romclk_timer_started)
     {
-    	tms->romclk_timer = timer_alloc(device->machine, romclk_timer_cb, (void *) device);
-    	timer_adjust_periodic(tms->romclk_timer, ATTOTIME_IN_HZ(device->clock / 40), 0, ATTOTIME_IN_HZ(device->clock / 40));
-    }
+    	tms->romclk_timer_started = TRUE;
+	   	timer_adjust_periodic(tms->romclk_timer, ATTOTIME_IN_HZ(device->clock / 40), 0, ATTOTIME_IN_HZ(device->clock / 40));
+	}
     return tms->romclk_state;
 }
 

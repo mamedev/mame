@@ -218,7 +218,6 @@ if (resource_tracking_tag == 2) mame_printf_warning("auto_malloc(%ld) called wit
 void *auto_realloc_file_line(running_machine *machine, void *ptr, size_t size, const char *file, int line)
 {
 	object_pool *pool = current_pool();
-if (resource_tracking_tag == 2) mame_printf_warning("auto_realloc(%p, %ld) called within reset scope by %s, line %d\n", ptr, (long) size, file, line);
 	if (ptr != NULL)
 	{
 		int tag = resource_tracking_tag;
@@ -230,6 +229,7 @@ if (resource_tracking_tag == 2) mame_printf_warning("auto_realloc(%p, %ld) calle
 		}
 		assert_always(tag > 0, "Failed to find alloc in pool");
 	}
+else if (resource_tracking_tag == 2) mame_printf_warning("auto_realloc(%p, %ld) called within reset scope by %s, line %d\n", ptr, (long) size, file, line);
 
 	return pool_realloc_file_line(pool, ptr, size, file, line);
 }

@@ -79,9 +79,11 @@ READ8_DEVICE_HANDLER( frogger_portB_r )
 
 WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 {
+	const device_config *target = devtag_get_device(device->machine, "konami_7474");
+
 	/* the complement of bit 3 is connected to the flip-flop's clock */
-	TTL7474_clock_w(2, ~data & 0x08);
-	TTL7474_update(device->machine, 2);
+	ttl7474_clock_w(target, ~data & 0x08);
+	ttl7474_update(target);
 
 	/* bit 4 is sound disable */
 	sound_global_enable(device->machine, ~data & 0x10);
@@ -89,39 +91,34 @@ WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 
 WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
 {
-	/* the complement of bit 3 is connected to the flip-flop's clock */
-	TTL7474_clock_w(2, ~data & 0x08);
-	TTL7474_update(device->machine, 2);
-}
+	const device_config *target = devtag_get_device(device->machine, "konami_7474");
 
-#ifdef UNUSED_FUNCTION
-WRITE8_HANDLER( froggrmc_sh_irqtrigger_w )
-{
-	/* the complement of bit 0 is connected to the flip-flop's clock */
-	TTL7474_clock_w(2, ~data & 0x01);
-	TTL7474_update(space->machine, 2);
+	/* the complement of bit 3 is connected to the flip-flop's clock */
+	ttl7474_clock_w(target, ~data & 0x08);
+	ttl7474_update(target);
 }
-#endif
 
 static IRQ_CALLBACK(scramble_sh_irq_callback)
 {
+	const device_config *target = devtag_get_device(device->machine, "konami_7474");
+
 	/* interrupt acknowledge clears the flip-flop --
        we need to pulse the CLR line because MAME's core never clears this
        line, only asserts it */
-	TTL7474_clear_w(2, 0);
-	TTL7474_update(device->machine, 2);
+	ttl7474_clear_w(target, 0);
+	ttl7474_update(target);
 
-	TTL7474_clear_w(2, 1);
-	TTL7474_update(device->machine, 2);
+	ttl7474_clear_w(target, 1);
+	ttl7474_update(target);
 
 	return 0xff;
 }
 
-static void scramble_sh_7474_callback(running_machine *machine)
+void scramble_sh_7474_callback(const device_config *device)
 {
 	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
 	/* we need to complement Q bar */
-	cputag_set_input_line(machine, "audiocpu", 0, !TTL7474_output_comp_r(2) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, !ttl7474_output_comp_r(device) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_HANDLER( hotshock_sh_irqtrigger_w )
@@ -166,19 +163,12 @@ WRITE8_HANDLER( frogger_filter_w )
 	filter_w(devtag_get_device(space->machine, "filter.0.2"), (offset >> 10) & 3);
 }
 
-static const struct TTL7474_interface scramble_sh_7474_intf =
-{
-	scramble_sh_7474_callback
-};
-
 void scramble_sh_init(running_machine *machine)
 {
 	cpu_set_irq_callback(cputag_get_cpu(machine, "audiocpu"), scramble_sh_irq_callback);
 
-	TTL7474_config(machine, 2, &scramble_sh_7474_intf);
-
 	/* PR is always 0, D is always 1 */
-	TTL7474_d_w(2, 1);
+	ttl7474_d_w(devtag_get_device(machine, "konami_7474"), 1);
 }
 
 

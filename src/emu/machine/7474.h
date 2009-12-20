@@ -25,7 +25,7 @@
     H   L   X   X | L   H
     L   L   X   X | H   H  (Note 1)
     H   H  _-   X | D  /D
-    H   H   L   X | Q0 /Q0
+    H   H   L   X | Q0 /Q01
     --------------+-------
     L   = lo (0)
     H   = hi (1)
@@ -41,23 +41,31 @@
 #define TTL7474_H
 
 
-/* The interface structure */
-struct TTL7474_interface
+typedef struct _ttl7474_config ttl7474_config;
+struct _ttl7474_config
 {
-	void (*output_cb)(running_machine *machine);
+	void (*output_cb)(const device_config *device);
 };
 
 
-void TTL7474_config(running_machine *machine, int which, const struct TTL7474_interface *intf);
+#define MDRV_7474_ADD(_tag, _output_cb) \
+	MDRV_DEVICE_ADD(_tag, TTL7474, 0) \
+	MDRV_DEVICE_CONFIG_DATAPTR(ttl7474_config, output_cb, _output_cb)
+
+
 
 /* must call TTL7474_update() after setting the inputs */
-void TTL7474_update(running_machine *machine, int which);
+void ttl7474_update(const device_config *device);
 
-void TTL7474_clear_w(int which, int data);
-void TTL7474_preset_w(int which, int data);
-void TTL7474_clock_w(int which, int data);
-void TTL7474_d_w(int which, int data);
-int  TTL7474_output_r(int which);
-int  TTL7474_output_comp_r(int which);	/* NOT strictly the same as !TTL7474_output_r() */
+void ttl7474_clear_w(const device_config *device, int data);
+void ttl7474_preset_w(const device_config *device, int data);
+void ttl7474_clock_w(const device_config *device, int data);
+void ttl7474_d_w(const device_config *device, int data);
+int  ttl7474_output_r(const device_config *device);
+int  ttl7474_output_comp_r(const device_config *device);	/* NOT strictly the same as !ttl7474_output_r() */
+
+/* device get info callback */
+#define TTL7474 DEVICE_GET_INFO_NAME(ttl7474)
+DEVICE_GET_INFO( ttl7474 );
 
 #endif

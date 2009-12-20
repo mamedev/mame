@@ -94,7 +94,6 @@ static MACHINE_RESET( artmagic )
 	tms_irq = hack_irq = 0;
 	update_irq_state(machine);
 	tlc34076_reset(6);
-	tlc34076_state_save(machine);
 }
 
 

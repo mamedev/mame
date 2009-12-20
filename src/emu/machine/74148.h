@@ -42,22 +42,29 @@
 #define TTL74148_H
 
 
-/* The interface structure */
-struct TTL74148_interface
+typedef struct _ttl74148_config ttl74148_config;
+struct _ttl74148_config
 {
-	void (*output_cb)(running_machine *machine);
+	void (*output_cb)(const device_config *device);
 };
 
 
-void TTL74148_config(running_machine *machine, int which, const struct TTL74148_interface *intf);
+#define MDRV_74148_ADD(_tag, _output_cb) \
+	MDRV_DEVICE_ADD(_tag, TTL74148, 0) \
+	MDRV_DEVICE_CONFIG_DATAPTR(ttl74148_config, output_cb, _output_cb)
 
-/* must call TTL74148_update() after setting the inputs */
-void TTL74148_update(running_machine *machine, int which);
 
-void TTL74148_input_line_w(int which, int input_line, int data);
-void TTL74148_enable_input_w(int which, int data);
-int  TTL74148_output_r(int which);
-int  TTL74148_output_valid_r(int which);
-int  TTL74148_enable_output_r(int which);
+/* must call ttl74148_update() after setting the inputs */
+void ttl74148_update(const device_config *device);
+
+void ttl74148_input_line_w(const device_config *device, int input_line, int data);
+void ttl74148_enable_input_w(const device_config *device, int data);
+int  ttl74148_output_r(const device_config *device);
+int  ttl74148_output_valid_r(const device_config *device);
+int  ttl74148_enable_output_r(const device_config *device);
+
+/* device get info callback */
+#define TTL74148 DEVICE_GET_INFO_NAME(ttl74148)
+DEVICE_GET_INFO( ttl74148 );
 
 #endif

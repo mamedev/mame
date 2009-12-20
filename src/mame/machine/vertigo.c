@@ -11,6 +11,9 @@
 #include "machine/pit8253.h"
 
 
+static const device_config *ttl74148;
+
+
 
 /*************************************
  *
@@ -20,7 +23,6 @@
 
 static PIT8253_OUTPUT_CHANGED( v_irq4_w );
 static PIT8253_OUTPUT_CHANGED( v_irq3_w );
-static void update_irq(running_machine *machine);
 
 
 
@@ -59,12 +61,6 @@ const struct pit8253_config vertigo_pit8254_config =
 };
 
 
-static const struct TTL74148_interface irq_encoder =
-{
-	update_irq
-};
-
-
 
 /*************************************
  *
@@ -74,22 +70,22 @@ static const struct TTL74148_interface irq_encoder =
  *
  *************************************/
 
-static void update_irq(running_machine *machine)
+void vertigo_update_irq(const device_config *device)
 {
 	if (irq_state < 7)
-		cputag_set_input_line(machine, "maincpu", irq_state ^ 7, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "maincpu", irq_state ^ 7, CLEAR_LINE);
 
-	irq_state = TTL74148_output_r(0);
+	irq_state = ttl74148_output_r(device);
 
 	if (irq_state < 7)
-		cputag_set_input_line(machine, "maincpu", irq_state ^ 7, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "maincpu", irq_state ^ 7, ASSERT_LINE);
 }
 
 
 static void update_irq_encoder(running_machine *machine, int line, int state)
 {
-	TTL74148_input_line_w(0, line, !state);
-	TTL74148_update(machine, 0);
+	ttl74148_input_line_w(ttl74148, line, !state);
+	ttl74148_update(ttl74148);
 }
 
 
@@ -211,13 +207,13 @@ MACHINE_RESET( vertigo )
 {
 	int i;
 
-	TTL74148_config(machine, 0, &irq_encoder);
-	TTL74148_enable_input_w(0, 0);
+	ttl74148 = devtag_get_device(machine, "74148");
+	ttl74148_enable_input_w(ttl74148, 0);
 
 	for (i = 0; i < 8; i++)
-		TTL74148_input_line_w(0, i, 1);
+		ttl74148_input_line_w(ttl74148, i, 1);
 
-	TTL74148_update(machine, 0);
+	ttl74148_update(ttl74148);
 	vertigo_vproc_init(machine);
 
 	irq4_time = timer_get_time(machine);

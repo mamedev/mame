@@ -691,6 +691,13 @@ static DEVICE_START(duart68681)
 	assert(device != NULL);
 	assert(device->tag != NULL);
 
+	duart68681->duart_config = (const duart68681_config *)device->static_config;
+	duart68681->device = device;
+
+	duart68681->channel[0].tx_timer = timer_alloc(device->machine, tx_timer_callback, (void*)device);
+	duart68681->channel[1].tx_timer = timer_alloc(device->machine, tx_timer_callback, (void*)device);
+	duart68681->duart_timer = timer_alloc(device->machine, duart_timer_callback, (void*)device);
+
 	state_save_register_device_item(device, 0, duart68681->ACR);
 	state_save_register_device_item(device, 0, duart68681->IMR);
 	state_save_register_device_item(device, 0, duart68681->ISR);
@@ -739,29 +746,29 @@ static DEVICE_START(duart68681)
 static DEVICE_RESET(duart68681)
 {
 	duart68681_state *duart68681 = get_safe_token(device);
+	emu_timer *save0, *save1;
 
-	memset(duart68681, 0, sizeof(duart68681_state));
-	duart68681->duart_config = (const duart68681_config *)device->static_config;
-	duart68681->device = device;
+	duart68681->ACR = 0;  /* Interrupt Vector Register */
 	duart68681->IVR = 0x0f;  /* Interrupt Vector Register */
-	// "reset clears internal registers (SRA, SRB, IMR, ISR, OPR, OPCR) puts OP0-7 in the high state, stops the counter/timer, and puts channels a/b in the inactive state"
-	duart68681->channel[0].SR = 0;
-	duart68681->channel[1].SR = 0;
 	duart68681->IMR = 0;  /* Interrupt Mask Register */
 	duart68681->ISR = 0;  /* Interrupt Status Register */
 	duart68681->OPCR = 0; /* Output Port Conf. Register */
 	duart68681->OPR = 0;  /* Output Port Register */
+	duart68681->CTR.d = 0;  /* Counter/Timer Preset Value */
+	duart68681->IP_last_state = 0;  /* last state of IP bits */
+	// "reset clears internal registers (SRA, SRB, IMR, ISR, OPR, OPCR) puts OP0-7 in the high state, stops the counter/timer, and puts channels a/b in the inactive state"
+	save0 = duart68681->channel[0].tx_timer;
+	save1 = duart68681->channel[1].tx_timer;
+	memset(duart68681->channel, 0, sizeof(duart68681->channel));
+	duart68681->channel[0].tx_timer = save0;
+	duart68681->channel[1].tx_timer = save1;
+
 	if (duart68681->duart_config->output_port_write)
-	duart68681->duart_config->output_port_write(duart68681->device, duart68681->OPR ^ 0xff);
+		duart68681->duart_config->output_port_write(duart68681->device, duart68681->OPR ^ 0xff);
 
-	// allocate timers
-	duart68681->channel[0].tx_timer = timer_alloc(device->machine, tx_timer_callback, (void*)device);
+	// reset timers
 	timer_adjust_oneshot(duart68681->channel[0].tx_timer, attotime_never, 0);
-
-	duart68681->channel[1].tx_timer = timer_alloc(device->machine, tx_timer_callback, (void*)device);
 	timer_adjust_oneshot(duart68681->channel[1].tx_timer, attotime_never, 1);
-
-	duart68681->duart_timer = timer_alloc(device->machine, duart_timer_callback, (void*)device);
 }
 
 /*-------------------------------------------------

@@ -16,67 +16,60 @@ static emu_timer *int_timer;
 
 static UINT8 _4in1_bank;
 
-static void galaxold_7474_9M_2_callback(running_machine *machine)
+void galaxold_7474_9m_2_callback(const device_config *device)
 {
 	/* Q bar clocks the other flip-flop,
        Q is VBLANK (not visible to the CPU) */
-	TTL7474_clock_w(1, TTL7474_output_comp_r(0));
-	TTL7474_update(machine, 1);
+    const device_config *target = devtag_get_device(device->machine, "7474_9m_1");
+	ttl7474_clock_w(target, ttl7474_output_comp_r(device));
+	ttl7474_update(target);
 }
 
-static void galaxold_7474_9M_1_callback(running_machine *machine)
+void galaxold_7474_9m_1_callback(const device_config *device)
 {
 	/* Q goes to the NMI line */
-	cputag_set_input_line(machine, "maincpu", irq_line, TTL7474_output_r(1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine, "maincpu", irq_line, ttl7474_output_r(device) ? CLEAR_LINE : ASSERT_LINE);
 }
-
-static const struct TTL7474_interface galaxold_7474_9M_2_intf =
-{
-	galaxold_7474_9M_2_callback
-};
-
-static const struct TTL7474_interface galaxold_7474_9M_1_intf =
-{
-	galaxold_7474_9M_1_callback
-};
-
 
 WRITE8_HANDLER( galaxold_nmi_enable_w )
 {
-	TTL7474_preset_w(1, data);
-	TTL7474_update(space->machine, 1);
+    const device_config *target = devtag_get_device(space->machine, "7474_9m_1");
+	ttl7474_preset_w(target, data);
+	ttl7474_update(target);
 }
 
 
 static TIMER_CALLBACK( interrupt_timer )
 {
+    const device_config *target = devtag_get_device(machine, "7474_9m_2");
+
 	/* 128V, 64V and 32V go to D */
-	TTL7474_d_w(0, (param & 0xe0) != 0xe0);
+	ttl7474_d_w(target, (param & 0xe0) != 0xe0);
 
 	/* 16V clocks the flip-flop */
-	TTL7474_clock_w(0, param & 0x10);
+	ttl7474_clock_w(target, param & 0x10);
 
 	param = (param + 0x10) & 0xff;
 
 	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(machine->primary_screen, param, 0), param);
 
-	TTL7474_update(machine, 0);
+	ttl7474_update(target);
 }
 
 
 static void machine_reset_common(running_machine *machine, int line)
 {
+    const device_config *ttl7474_9m_1 = devtag_get_device(machine, "7474_9m_1");
+    const device_config *ttl7474_9m_2 = devtag_get_device(machine, "7474_9m_2");
 	irq_line = line;
 
 	/* initalize main CPU interrupt generator flip-flops */
-	TTL7474_config(machine, 0, &galaxold_7474_9M_2_intf);
-	TTL7474_preset_w(0, 1);
-	TTL7474_clear_w (0, 1);
+	ttl7474_preset_w(ttl7474_9m_2, 1);
+	ttl7474_clear_w (ttl7474_9m_2, 1);
 
-	TTL7474_config(machine, 1, &galaxold_7474_9M_1_intf);
-	TTL7474_clear_w (1, 1);
-	TTL7474_d_w     (1, 0);
-	TTL7474_preset_w(1, 0);
+	ttl7474_clear_w (ttl7474_9m_1, 1);
+	ttl7474_d_w     (ttl7474_9m_1, 0);
+	ttl7474_preset_w(ttl7474_9m_1, 0);
 
 	/* start a timer to generate interrupts */
 	int_timer = timer_alloc(machine, interrupt_timer, NULL);

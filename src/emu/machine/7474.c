@@ -41,12 +41,11 @@
 #include "7474.h"
 
 
-#define MAX_TTL7474  12
-
-struct TTL7474
+typedef struct _ttl7474_state ttl7474_state;
+struct _ttl7474_state
 {
 	/* callback */
-	void (*output_cb)(running_machine *);
+	void (*output_cb)(const device_config *);
 
 	/* inputs */
 	UINT8 clear;			/* pin 1/13 */
@@ -64,108 +63,133 @@ struct TTL7474
 	UINT8 last_output_comp;
 };
 
-static struct TTL7474 chips[MAX_TTL7474];
-
-
-void TTL7474_update(running_machine *machine, int which)
+INLINE ttl7474_state *get_safe_token(const device_config *device)
 {
-	if (!chips[which].preset && chips[which].clear)			  /* line 1 in truth table */
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == TTL7474);
+
+	return (ttl7474_state *)device->token;
+}
+
+
+void ttl7474_update(const device_config *device)
+{
+	ttl7474_state *state = get_safe_token(device);
+
+	if (!state->preset && state->clear)			  /* line 1 in truth table */
 	{
-		chips[which].output 	 = 1;
-		chips[which].output_comp = 0;
+		state->output 	 = 1;
+		state->output_comp = 0;
 	}
-	else if (chips[which].preset && !chips[which].clear)	  /* line 2 in truth table */
+	else if (state->preset && !state->clear)	  /* line 2 in truth table */
 	{
-		chips[which].output 	 = 0;
-		chips[which].output_comp = 1;
+		state->output 	 = 0;
+		state->output_comp = 1;
 	}
-	else if (!chips[which].preset && !chips[which].clear)	  /* line 3 in truth table */
+	else if (!state->preset && !state->clear)	  /* line 3 in truth table */
 	{
-		chips[which].output 	 = 1;
-		chips[which].output_comp = 1;
+		state->output 	 = 1;
+		state->output_comp = 1;
 	}
-	else if (!chips[which].last_clock && chips[which].clock)  /* line 4 in truth table */
+	else if (!state->last_clock && state->clock)  /* line 4 in truth table */
 	{
-		chips[which].output 	 =  chips[which].d;
-		chips[which].output_comp = !chips[which].d;
+		state->output 	 =  state->d;
+		state->output_comp = !state->d;
 	}
 
-	chips[which].last_clock = chips[which].clock;
+	state->last_clock = state->clock;
 
 
 	/* call callback if any of the outputs changed */
-	if (  chips[which].output_cb &&
-	    ((chips[which].output      != chips[which].last_output) ||
-	     (chips[which].output_comp != chips[which].last_output_comp)))
+	if (  state->output_cb &&
+	    ((state->output      != state->last_output) ||
+	     (state->output_comp != state->last_output_comp)))
 	{
-		chips[which].last_output = chips[which].output;
-		chips[which].last_output_comp = chips[which].output_comp;
+		state->last_output = state->output;
+		state->last_output_comp = state->output_comp;
 
-		chips[which].output_cb(machine);
+		state->output_cb(device);
 	}
 }
 
 
-void TTL7474_clear_w(int which, int data)
+void ttl7474_clear_w(const device_config *device, int data)
 {
-	chips[which].clear = data ? 1 : 0;
+	ttl7474_state *state = get_safe_token(device);
+	state->clear = data ? 1 : 0;
 }
 
-void TTL7474_preset_w(int which, int data)
+void ttl7474_preset_w(const device_config *device, int data)
 {
-	chips[which].preset = data ? 1 : 0;
+	ttl7474_state *state = get_safe_token(device);
+	state->preset = data ? 1 : 0;
 }
 
-void TTL7474_clock_w(int which, int data)
+void ttl7474_clock_w(const device_config *device, int data)
 {
-	chips[which].clock = data ? 1 : 0;
+	ttl7474_state *state = get_safe_token(device);
+	state->clock = data ? 1 : 0;
 }
 
-void TTL7474_d_w(int which, int data)
+void ttl7474_d_w(const device_config *device, int data)
 {
-	chips[which].d = data ? 1 : 0;
-}
-
-
-int TTL7474_output_r(int which)
-{
-	return chips[which].output;
-}
-
-int TTL7474_output_comp_r(int which)
-{
-	return chips[which].output_comp;
+	ttl7474_state *state = get_safe_token(device);
+	state->d = data ? 1 : 0;
 }
 
 
-void TTL7474_config(running_machine *machine, int which, const struct TTL7474_interface *intf)
+int ttl7474_output_r(const device_config *device)
 {
-	if (which >= MAX_TTL7474)
-	{
-		logerror("Only %d 7474's are supported at this time.\n", MAX_TTL7474);
-		return;
-	}
+	ttl7474_state *state = get_safe_token(device);
+	return state->output;
+}
+
+int ttl7474_output_comp_r(const device_config *device)
+{
+	ttl7474_state *state = get_safe_token(device);
+	return state->output_comp;
+}
 
 
-    chips[which].output_cb = (intf ? intf->output_cb : 0);
+static DEVICE_START( ttl7474 )
+{
+	ttl7474_config *config = (ttl7474_config *)device->inline_config;
+	ttl7474_state *state = get_safe_token(device);
+    state->output_cb = config->output_cb;
+
+    state_save_register_device_item(device, 0, state->clear);
+    state_save_register_device_item(device, 0, state->preset);
+    state_save_register_device_item(device, 0, state->clock);
+    state_save_register_device_item(device, 0, state->d);
+    state_save_register_device_item(device, 0, state->output);
+    state_save_register_device_item(device, 0, state->output_comp);
+    state_save_register_device_item(device, 0, state->last_clock);
+    state_save_register_device_item(device, 0, state->last_output);
+    state_save_register_device_item(device, 0, state->last_output_comp);
+}
+
+
+static DEVICE_RESET( ttl7474 )
+{
+	ttl7474_state *state = get_safe_token(device);
 
 	/* all inputs are open first */
-    chips[which].clear = 1;
-    chips[which].preset = 1;
-    chips[which].clock = 1;
-    chips[which].d = 1;
+    state->clear = 1;
+    state->preset = 1;
+    state->clock = 1;
+    state->d = 1;
 
-    chips[which].last_clock = 1;
-    chips[which].last_output = -1;
-    chips[which].last_output_comp = -1;
-
-    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].clear);
-    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].preset);
-    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].clock);
-    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].d);
-    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].output);
-    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].output_comp);
-    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].last_clock);
-    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].last_output);
-    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].last_output_comp);
+    state->last_clock = 1;
+    state->last_output = -1;
+    state->last_output_comp = -1;
 }
+
+
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+
+#define DEVTEMPLATE_ID(p,s)		p##ttl7474##s
+#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET | DT_HAS_INLINE_CONFIG
+#define DEVTEMPLATE_NAME		"7474"
+#define DEVTEMPLATE_FAMILY		"TTL"
+#include "devtempl.h"

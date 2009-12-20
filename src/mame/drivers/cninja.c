@@ -53,7 +53,7 @@ Note about version levels using Mutant Fighter as the example:
 #include "sound/okim6295.h"
 
 static int cninja_scanline, cninja_irq_mask;
-static emu_timer *raster_irq_timer;
+static const device_config *raster_irq_timer;
 static UINT16 *cninja_ram;
 
 /**********************************************************************************/
@@ -70,7 +70,7 @@ static WRITE16_HANDLER( stoneage_sound_w )
 	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static TIMER_CALLBACK( interrupt_gen )
+static TIMER_DEVICE_CALLBACK( interrupt_gen )
 {
 	int scanline = param;
 
@@ -85,8 +85,8 @@ static TIMER_CALLBACK( interrupt_gen )
 	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf34_control[3] & 0xffff;
 	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf34_control[4] & 0xffff;
 
-	cputag_set_input_line(machine, "maincpu", (cninja_irq_mask&0x10) ? 3 : 4, ASSERT_LINE);
-	timer_adjust_oneshot(raster_irq_timer, attotime_never, 0);
+	cputag_set_input_line(timer->machine, "maincpu", (cninja_irq_mask&0x10) ? 3 : 4, ASSERT_LINE);
+	timer_device_adjust_oneshot(raster_irq_timer, attotime_never, 0);
 }
 
 static READ16_HANDLER( cninja_irq_r )
@@ -122,9 +122,9 @@ static WRITE16_HANDLER( cninja_irq_w )
 	case 1: /* Raster IRQ scanline position, only valid for values between 1 & 239 (0 and 240-256 do NOT generate IRQ's) */
 		cninja_scanline=data&0xff;
 		if ((cninja_irq_mask&0x2)==0 && cninja_scanline>0 && cninja_scanline<240)
-			timer_adjust_oneshot(raster_irq_timer, video_screen_get_time_until_pos(space->machine->primary_screen, cninja_scanline, 0), cninja_scanline);
+			timer_device_adjust_oneshot(raster_irq_timer, video_screen_get_time_until_pos(space->machine->primary_screen, cninja_scanline, 0), cninja_scanline);
 		else
-			timer_adjust_oneshot(raster_irq_timer,attotime_never,0);
+			timer_device_adjust_oneshot(raster_irq_timer,attotime_never,0);
 		return;
 
 	case 2: /* VBL irq ack */
@@ -654,7 +654,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( cninja )
 {
-	raster_irq_timer = timer_alloc(machine, interrupt_gen, NULL);
+	raster_irq_timer = devtag_get_device(machine, "raster_timer");
 	cninja_scanline=0;
 	cninja_irq_mask=0;
 }
@@ -699,6 +699,8 @@ static MACHINE_DRIVER_START( cninja )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(cninja)
+	
+	MDRV_TIMER_ADD("raster_timer", interrupt_gen)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -748,6 +750,8 @@ static MACHINE_DRIVER_START( stoneage )
 
 	MDRV_MACHINE_RESET(cninja)
 
+	MDRV_TIMER_ADD("raster_timer", interrupt_gen)
+
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
@@ -792,6 +796,8 @@ static MACHINE_DRIVER_START( edrandy )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(cninja)
+
+	MDRV_TIMER_ADD("raster_timer", interrupt_gen)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -840,6 +846,8 @@ static MACHINE_DRIVER_START( robocop2 )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(cninja)
+
+	MDRV_TIMER_ADD("raster_timer", interrupt_gen)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

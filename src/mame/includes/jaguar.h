@@ -29,6 +29,8 @@ extern UINT32 *jaguar_wave_rom;
 
 /*----------- defined in audio/jaguar.c -----------*/
 
+TIMER_DEVICE_CALLBACK( jaguar_serial_callback );
+
 void jaguar_dsp_suspend(running_machine *machine);
 void jaguar_dsp_resume(running_machine *machine);
 

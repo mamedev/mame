@@ -54,18 +54,6 @@ static const UINT16 nvram_unlock_seq[] =
 #define NVRAM_UNLOCK_SEQ_LEN (ARRAY_LENGTH(nvram_unlock_seq))
 static UINT16 nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN];
 static UINT8 nvram_write_enable;
-static emu_timer *nvram_write_timer;
-
-
-
-/*************************************
- *
- *  Prototypes
- *
- *************************************/
-
-static TIMER_CALLBACK( nvram_write_timeout );
-
 
 
 
@@ -148,7 +136,6 @@ static void coolpool_from_shiftreg(const address_space *space, UINT32 address, U
 static MACHINE_RESET( amerdart )
 {
 	nvram_write_enable = 0;
-	nvram_write_timer = timer_alloc(machine, nvram_write_timeout, NULL);
 }
 
 
@@ -156,7 +143,6 @@ static MACHINE_RESET( coolpool )
 {
 	tlc34076_reset(6);
 	nvram_write_enable = 0;
-	nvram_write_timer = timer_alloc(machine, nvram_write_timeout, NULL);
 }
 
 
@@ -167,7 +153,7 @@ static MACHINE_RESET( coolpool )
  *
  *************************************/
 
-static TIMER_CALLBACK( nvram_write_timeout )
+static TIMER_DEVICE_CALLBACK( nvram_write_timeout )
 {
 	nvram_write_enable = 0;
 }
@@ -183,7 +169,7 @@ static WRITE16_HANDLER( nvram_thrash_w )
 	if (!memcmp(nvram_unlock_seq, nvram_write_seq, sizeof(nvram_unlock_seq)))
 	{
 		nvram_write_enable = 1;
-		timer_adjust_oneshot(nvram_write_timer, ATTOTIME_IN_MSEC(1000), 0);
+		timer_device_adjust_oneshot(devtag_get_device(space->machine, "nvram_timer"), ATTOTIME_IN_MSEC(1000), 0);
 	}
 }
 
@@ -695,6 +681,8 @@ static MACHINE_DRIVER_START( amerdart )
 	MDRV_MACHINE_RESET(amerdart)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
+	MDRV_TIMER_ADD("nvram_timer", nvram_write_timeout)
+
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(tms340x0)
 
@@ -723,6 +711,8 @@ static MACHINE_DRIVER_START( coolpool )
 
 	MDRV_MACHINE_RESET(coolpool)
 	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	MDRV_TIMER_ADD("nvram_timer", nvram_write_timeout)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(tms340x0)

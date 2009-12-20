@@ -35,6 +35,7 @@ Notes/Tidbits:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
+#include "machine/7474.h"
 #include "galaxold.h"
 #include "sound/ay8910.h"
 
@@ -859,6 +860,8 @@ static MACHINE_DRIVER_START( type1 )
 	MDRV_CPU_PROGRAM_MAP(scobra_sound_map)
 	MDRV_CPU_IO_MAP(scobra_sound_io_map)
 
+	MDRV_7474_ADD("konami_7474", scramble_sh_7474_callback)
+
 	MDRV_MACHINE_RESET(scramble)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", scramble_ppi_0_intf )
@@ -982,6 +985,8 @@ static MACHINE_DRIVER_START( hustler )
 	MDRV_CPU_ADD("audiocpu",Z80,14318000/8)	/* 1.78975 MHz */
 	MDRV_CPU_PROGRAM_MAP(hustler_sound_map)
 	MDRV_CPU_IO_MAP(hustler_sound_io_map)
+
+	MDRV_7474_ADD("konami_7474", scramble_sh_7474_callback)
 
 	MDRV_MACHINE_RESET(scramble)
 
