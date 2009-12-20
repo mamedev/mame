@@ -1,6 +1,6 @@
-INLINE UINT8 alpha_cvg_get_cta_ca(UINT8 comb_alpha)
+INLINE void alpha_cvg_get_cta_ca(UINT8 *comb_alpha)
 {
-	UINT32 temp = comb_alpha;
+	UINT32 temp = *comb_alpha;
 	UINT32 temp2 = curpixel_cvg;
 	UINT32 temp3 = 0;
 
@@ -11,30 +11,34 @@ INLINE UINT8 alpha_cvg_get_cta_ca(UINT8 comb_alpha)
 
 	if (temp > 0xff)
 	{
-		temp = 0xff;
+		*comb_alpha = 0xff;
 	}
-
-	return (UINT8)temp;
+	else
+	{
+		*comb_alpha = (UINT8)temp;
+	}
 }
 
-INLINE UINT8 alpha_cvg_get_ncta_ca(UINT8 comb_alpha)
+INLINE void alpha_cvg_get_ncta_ca(UINT8 *comb_alpha)
 {
-	UINT32 temp = comb_alpha;
+	UINT32 temp = *comb_alpha;
 	UINT32 temp2 = curpixel_cvg;
 
 	temp = temp2 << 5;
 
 	if (temp > 0xff)
 	{
-		temp = 0xff;
+		*comb_alpha = 0xff;
 	}
-
-	return (UINT8)temp;
+	else
+	{
+		*comb_alpha = (UINT8)temp;
+	}
 }
 
-INLINE UINT8 alpha_cvg_get_cta_nca(UINT8 comb_alpha)
+INLINE void alpha_cvg_get_cta_nca(UINT8 *comb_alpha)
 {
-	UINT32 temp = comb_alpha;
+	UINT32 temp = *comb_alpha;
 	UINT32 temp2 = curpixel_cvg;
 	UINT32 temp3 = 0;
 
@@ -43,20 +47,24 @@ INLINE UINT8 alpha_cvg_get_cta_nca(UINT8 comb_alpha)
 
 	if (temp > 0xff)
 	{
-		temp = 0xff;
+		*comb_alpha = 0xff;
 	}
-
-	return (UINT8)temp;
+	else
+	{
+		*comb_alpha = (UINT8)temp;
+	}
 }
 
-INLINE UINT8 alpha_cvg_get_ncta_nca(UINT8 comb_alpha)
+INLINE void alpha_cvg_get_ncta_nca(UINT8 *comb_alpha)
 {
-	UINT32 temp = comb_alpha;
+	UINT32 temp = *comb_alpha;
 
 	if (temp > 0xff)
 	{
-		temp = 0xff;
+		*comb_alpha = 0xff;
 	}
-
-	return (UINT8)temp;
+	else
+	{
+		*comb_alpha = (UINT8)temp;
+	}
 }

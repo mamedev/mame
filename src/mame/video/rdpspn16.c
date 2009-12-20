@@ -1,56 +1,339 @@
-static void render_spans_16_c1(running_machine *machine, int start, int end, TILE* tex_tile, int shade, int texture, int zbuffer, int flip)
+#if defined(SHADE)
+	#if defined(TEXTURE)
+		#if defined(ZBUF)
+			#if defined(FLIP)
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_s_t_z_f_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_s_t_z_f_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_s_t_z_f_zc(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_s_t_z_f_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#else
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_s_t_z_nf_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_s_t_z_nf_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_s_t_z_nf_zc(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_s_t_z_nf_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#endif
+		#else
+			#if defined(FLIP)
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_s_t_nz_f_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_s_t_nz_f_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_s_t_nz_f_zc(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_s_t_nz_f_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#else
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_s_t_nz_nf_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_s_t_nz_nf_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_s_t_nz_nf_zc(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_s_t_nz_nf_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#endif
+		#endif
+	#else
+		#if defined(ZBUF)
+			#if defined(FLIP)
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_s_nt_z_f_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_s_nt_z_f_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_s_nt_z_f_zc(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_s_nt_z_f_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#else
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_s_nt_z_nf_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_s_nt_z_nf_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_s_nt_z_nf_zc(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_s_nt_z_nf_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#endif
+		#else
+			#if defined(FLIP)
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_s_nt_nz_f_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_s_nt_nz_f_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_s_nt_nz_f_zc(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_s_nt_nz_f_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#else
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_s_nt_nz_nf_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_s_nt_nz_nf_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_s_nt_nz_nf_zc(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_s_nt_nz_nf_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#endif
+		#endif
+	#endif
+#else
+	#if defined(TEXTURE)
+		#if defined(ZBUF)
+			#if defined(FLIP)
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_ns_t_z_f_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_ns_t_z_f_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_ns_t_z_f_zc(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_ns_t_z_f_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#else
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_ns_t_z_nf_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_ns_t_z_nf_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_ns_t_z_nf_zc(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_ns_t_z_nf_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#endif
+		#else
+			#if defined(FLIP)
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_ns_t_nz_f_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_ns_t_nz_f_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_ns_t_nz_f_zc(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_ns_t_nz_f_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#else
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_ns_t_nz_nf_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_ns_t_nz_nf_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_ns_t_nz_nf_zc(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_ns_t_nz_nf_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#endif
+		#endif
+	#else
+		#if defined(ZBUF)
+			#if defined(FLIP)
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_ns_nt_z_f_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_ns_nt_z_f_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_ns_nt_z_f_zc(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_ns_nt_z_f_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#else
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_ns_nt_z_nf_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_ns_nt_z_nf_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_ns_nt_z_nf_zc(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_ns_nt_z_nf_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#endif
+		#else
+			#if defined(FLIP)
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_ns_nt_nz_f_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_ns_nt_nz_f_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_ns_nt_nz_f_zc(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_ns_nt_nz_f_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#else
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_ns_nt_nz_nf_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_ns_nt_nz_nf_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+						static void render_spans_16_c1_ns_nt_nz_nf_zc(int start, int end, TILE* tex_tile)
+					#else
+						static void render_spans_16_c1_ns_nt_nz_nf_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#endif
+		#endif
+	#endif
+#endif
 {
 	UINT16 *fb = (UINT16*)&rdram[fb_address / 4];
-	UINT16 *zb = (UINT16*)&rdram[zb_address / 4];
 	UINT8 *hb = &hidden_bits[fb_address >> 1];
+#if defined(ZUPDATE) || defined(ZCOMPARE)
+	UINT16 *zb = (UINT16*)&rdram[zb_address / 4];
 	UINT8 *zhb = &hidden_bits[zb_address >> 1];
+#endif
 
 	int i, j;
 
 	int clipx1, clipx2, clipy1, clipy2;
 
-	UINT32 prim_tile = tex_tile->num;
-	UINT32 disable_lod = 0;
-	int tilenum;
-
+#if defined(SHADE)
 	SPAN_PARAM dr = span[0].dr;
 	SPAN_PARAM dg = span[0].dg;
 	SPAN_PARAM db = span[0].db;
 	SPAN_PARAM da = span[0].da;
-	SPAN_PARAM dz = span[0].dz;
+#if defined(FLIP)
+	int drinc = dr.w;
+	int dginc = dg.w;
+	int dbinc = db.w;
+	int dainc = da.w;
+#else
+	int drinc = -dr.w;
+	int dginc = -dg.w;
+	int dbinc = -db.w;
+	int dainc = -da.w;
+#endif
+#endif
+
+#if defined(TEXTURE)
+	UINT32 prim_tile = tex_tile->num;
+	UINT32 disable_lod = 0;
+	int tilenum;
+
 	SPAN_PARAM ds = span[0].ds;
 	SPAN_PARAM dt = span[0].dt;
 	SPAN_PARAM dw = span[0].dw;
-	int dzpix = span[0].dzpix;
-	int drinc, dginc, dbinc, dainc, dzinc, dsinc, dtinc, dwinc;
-	int xinc = flip ? 1 : -1;
+#if defined(FLIP)
+	int dsinc = ds.w;
+	int dtinc = dt.w;
+	int dwinc = dw.w;
+#else
+	int dsinc = -ds.w;
+	int dtinc = -dt.w;
+	int dwinc = -dw.w;
+#endif
+#endif
 
-	calculate_clamp_diffs(tex_tile->num);
+#if defined(ZBUF)
+	SPAN_PARAM dz = span[0].dz;
+	int dzpix = span[0].dzpix;
+#if defined(FLIP)
+	int dzinc = dz.w;
+#else
+	int dzinc = -dz.w;
+#endif
+#else
+	int sz = 0, dzpix = 0;
+
+	if (other_modes.z_source_sel)
+	{
+		sz = (((UINT32)primitive_z) << 3) & 0x3ffff;
+		dzpix = primitive_delta_z;
+	}
+#endif
 
 	clipx1 = clip.xh / 4;
 	clipx2 = clip.xl / 4;
 	clipy1 = clip.yh / 4;
 	clipy2 = clip.yl / 4;
 
-	if (texture && !other_modes.tex_lod_en)
+#if defined(TEXTURE)
+	if (!other_modes.tex_lod_en)
 	{
 		tilenum = prim_tile;
 		tex_tile = &tile[tilenum];
 	}
-
-	if (other_modes.tex_lod_en) // Used by World Driver Championship
+	else
 	{
-		disable_lod = 1;
+		disable_lod = 1; // Used by World Driver Championship
 	}
-
-	drinc = flip ? (dr.w) : -dr.w;
-	dginc = flip ? (dg.w) : -dg.w;
-	dbinc = flip ? (db.w) : -db.w;
-	dainc = flip ? (da.w) : -da.w;
-	dzinc = flip ? (dz.w) : -dz.w;
-	dsinc = flip ? (ds.w) : -ds.w;
-	dtinc = flip ? (dt.w) : -dt.w;
-	dwinc = flip ? (dw.w) : -dw.w;
+#endif
 
 	if (start < clipy1)
 	{
@@ -69,82 +352,91 @@ static void render_spans_16_c1(running_machine *machine, int start, int end, TIL
 		end = clipy2 - 1;
 	}
 
-	set_shade_for_tris(shade); // Needed by backgrounds in Top Gear Rally 1
+#if !defined(SHADE)
+	shade_color.c = prim_color.c;
+#endif
 
 	for (i = start; i <= end; i++)
 	{
 		int xstart = span[i].lx;
 		int xend = span[i].rx;
-		SPAN_PARAM r;
-		SPAN_PARAM g;
-		SPAN_PARAM b;
-		SPAN_PARAM a;
-		SPAN_PARAM z = span[i].z;
-		SPAN_PARAM s = span[i].s;
-		SPAN_PARAM t = span[i].t;
-		SPAN_PARAM w = span[i].w;
 
 		int x;
 
 		int fb_index = fb_width * i;
 		int length;
 
-		if (shade)
-		{
-			r = span[i].r;
-			g = span[i].g;
-			b = span[i].b;
-			a = span[i].a;
-		}
+#if defined(SHADE)
+		SPAN_PARAM r = span[i].r;
+		SPAN_PARAM g = span[i].g;
+		SPAN_PARAM b = span[i].b;
+		SPAN_PARAM a = span[i].a;
+#endif
+#if defined(TEXTURE)
+		SPAN_PARAM s = span[i].s;
+		SPAN_PARAM t = span[i].t;
+		SPAN_PARAM w = span[i].w;
+#endif
+#if defined(ZBUF)
+		SPAN_PARAM z = span[i].z;
+#endif
 
 		x = xend;
 
-		length = flip ? (xstart - xend) : (xend - xstart); //Moogly
+#if defined(FLIP)
+		length = (xstart - xend);
+#else
+		length = (xend - xstart);
+#endif
 
 		for (j = 0; j <= length; j++)
 		{
-			int sr = 0, sg = 0, sb = 0, sa = 0;
+#if defined(SHADE)
+			int sr = r.h.h;
+			int sg = g.h.h;
+			int sb = b.h.h;
+			int sa = a.h.h;
+#endif
+#if defined(TEXTURE)
 			int ss = s.h.h;
 			int st = t.h.h;
 			int sw = w.h.h;
-			int sz = z.w >> 13;
 			int sss = 0, sst = 0;
+#endif
+#if defined(ZBUF)
+			int sz = z.w >> 13;
+#endif
 			COLOR c1, c2;
-			if (shade)
-			{
-				sr = r.h.h;
-				sg = g.h.h;
-				sb = b.h.h;
-				sa = a.h.h;
-			}
 			c1.c = 0;
 			c2.c = 0;
+
+#if defined(ZBUF)
 			if (other_modes.z_source_sel)
 			{
 				sz = (((UINT32)primitive_z) << 3) & 0x3ffff;
 				dzpix = primitive_delta_z;
 			}
-
+#endif
 
 			if (x >= clipx1 && x < clipx2)
 			{
+#if defined(ZCOMPARE)
 				int z_compare_result = 1;
+#endif
 
 				curpixel_cvg=span[i].cvg[x];
-
-				if (curpixel_cvg > 8)
-				{
-					stricterror("render_spans_16: cvg of current pixel is %d", curpixel_cvg);
-				}
 
 				if (curpixel_cvg)
 				{
 					int curpixel = fb_index + x;
 					UINT16* fbcur = &fb[curpixel ^ WORD_ADDR_XOR];
-					UINT16* zbcur = &zb[curpixel ^ WORD_ADDR_XOR];
 					UINT8* hbcur = &hb[curpixel ^ BYTE_ADDR_XOR];
+#if defined(ZUPDATE) || defined(ZCOMPARE)
+					UINT16* zbcur = &zb[curpixel ^ WORD_ADDR_XOR];
 					UINT8* zhbcur = &zhb[curpixel ^ BYTE_ADDR_XOR];
+#endif
 
+#if defined(TEXTURE)
 					if (other_modes.persp_tex_en)
 					{
 						tcdiv(ss, st, sw, &sss, &sst);
@@ -154,36 +446,39 @@ static void render_spans_16_c1(running_machine *machine, int start, int end, TIL
 						sss = ss;
 						sst = st;
 					}
+#endif
 
-					if (shade)
-					{
-						if (sr > 0xff) sr = 0xff;
-						if (sg > 0xff) sg = 0xff;
-						if (sb > 0xff) sb = 0xff;
-						if (sa > 0xff) sa = 0xff;
-						if (sr < 0) sr = 0;
-						if (sg < 0) sg = 0;
-						if (sb < 0) sb = 0;
-						if (sa < 0) sa = 0;
-						shade_color.i.r = sr;
-						shade_color.i.g = sg;
-						shade_color.i.b = sb;
-						shade_color.i.a = sa;
-					}
+#if defined(SHADE)
+					if (sr > 0xff) sr = 0xff;
+					if (sg > 0xff) sg = 0xff;
+					if (sb > 0xff) sb = 0xff;
+					if (sa > 0xff) sa = 0xff;
+					if (sr < 0) sr = 0;
+					if (sg < 0) sg = 0;
+					if (sb < 0) sb = 0;
+					if (sa < 0) sa = 0;
+					shade_color.i.r = sr;
+					shade_color.i.g = sg;
+					shade_color.i.b = sb;
+					shade_color.i.a = sa;
+#endif
 
-					if (texture)
-					{
-						TEXTURE_PIPELINE(&texel0_color, sss, sst, tex_tile);
-					}
+#if defined(TEXTURE)
+					TEXTURE_PIPELINE(&texel0_color, sss, sst, tex_tile);
+#endif
 
-					c1 = COLOR_COMBINER1(machine);
+					COLOR_COMBINER1(&c1);
 
-					if ((zbuffer || other_modes.z_source_sel) && other_modes.z_compare_en)
+#if defined(ZCOMPARE)
+#if !defined(ZBUF)
+					if (other_modes.z_source_sel)
+#endif
 					{
 						z_compare_result = z_compare(fbcur, hbcur, zbcur, zhbcur, sz, dzpix);
 					}
 
 					if(z_compare_result)
+#endif
 					{
 						int rendered = 0;
 						int dith = 0;
@@ -196,44 +491,326 @@ static void render_spans_16_c1(running_machine *machine, int start, int end, TIL
 							dith = bayer_matrix[(((i) & 3) << 2) + ((x ^ WORD_ADDR_XOR) & 3)];
 						}
 
-						rendered = BLENDER1_16(machine, fbcur, hbcur, c1, dith);
+						rendered = BLENDER1_16(fbcur, hbcur, c1, dith);
 
-						if (other_modes.z_update_en && rendered)
+#if defined(ZUPDATE)
+						if (rendered)
 						{
 							z_store(zbcur, zhbcur, sz, dzpix);
 						}
+#endif
 					}
 				}
 			}
 
-			if (shade)
-			{
-				r.w += drinc;
-				g.w += dginc;
-				b.w += dbinc;
-				a.w += dainc;
-			}
-			z.w += dzinc;
+#if defined(SHADE)
+			r.w += drinc;
+			g.w += dginc;
+			b.w += dbinc;
+			a.w += dainc;
+#endif
+#if defined(TEXTURE)
 			s.w += dsinc;
 			t.w += dtinc;
 			w.w += dwinc;
+#endif
+#if defined(ZBUF)
+			z.w += dzinc;
+#endif
 
-			x += xinc;
+#if defined(FLIP)
+			x++;
+#else
+			x--;
+#endif
 		}
 	}
 }
 
-static void render_spans_16_c2(running_machine *machine, int start, int end, TILE* tex_tile, int shade, int texture, int zbuffer, int flip)
+#if defined(SHADE)
+	#if defined(TEXTURE)
+		#if defined(ZBUF)
+			#if defined(FLIP)
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_s_t_z_f_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_s_t_z_f_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_s_t_z_f_zc(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_s_t_z_f_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#else
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_s_t_z_nf_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_s_t_z_nf_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_s_t_z_nf_zc(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_s_t_z_nf_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#endif
+		#else
+			#if defined(FLIP)
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_s_t_nz_f_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_s_t_nz_f_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_s_t_nz_f_zc(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_s_t_nz_f_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#else
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_s_t_nz_nf_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_s_t_nz_nf_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_s_t_nz_nf_zc(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_s_t_nz_nf_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#endif
+		#endif
+	#else
+		#if defined(ZBUF)
+			#if defined(FLIP)
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_s_nt_z_f_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_s_nt_z_f_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_s_nt_z_f_zc(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_s_nt_z_f_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#else
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_s_nt_z_nf_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_s_nt_z_nf_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_s_nt_z_nf_zc(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_s_nt_z_nf_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#endif
+		#else
+			#if defined(FLIP)
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_s_nt_nz_f_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_s_nt_nz_f_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_s_nt_nz_f_zc(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_s_nt_nz_f_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#else
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_s_nt_nz_nf_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_s_nt_nz_nf_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_s_nt_nz_nf_zc(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_s_nt_nz_nf_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#endif
+		#endif
+	#endif
+#else
+	#if defined(TEXTURE)
+		#if defined(ZBUF)
+			#if defined(FLIP)
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_ns_t_z_f_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_ns_t_z_f_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_ns_t_z_f_zc(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_ns_t_z_f_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#else
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_ns_t_z_nf_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_ns_t_z_nf_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_ns_t_z_nf_zc(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_ns_t_z_nf_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#endif
+		#else
+			#if defined(FLIP)
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_ns_t_nz_f_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_ns_t_nz_f_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_ns_t_nz_f_zc(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_ns_t_nz_f_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#else
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_ns_t_nz_nf_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_ns_t_nz_nf_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_ns_t_nz_nf_zc(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_ns_t_nz_nf_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#endif
+		#endif
+	#else
+		#if defined(ZBUF)
+			#if defined(FLIP)
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_ns_nt_z_f_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_ns_nt_z_f_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_ns_nt_z_f_zc(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_ns_nt_z_f_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#else
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_ns_nt_z_nf_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_ns_nt_z_nf_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_ns_nt_z_nf_zc(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_ns_nt_z_nf_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#endif
+		#else
+			#if defined(FLIP)
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_ns_nt_nz_f_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_ns_nt_nz_f_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_ns_nt_nz_f_zc(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_ns_nt_nz_f_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#else
+				#if defined(ZUPDATE)
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_ns_nt_nz_nf_zc_zu(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_ns_nt_nz_nf_nzc_zu(int start, int end, TILE* tex_tile)
+					#endif
+				#else
+					#if defined(ZCOMPARE)
+					static void render_spans_16_c2_ns_nt_nz_nf_zc(int start, int end, TILE* tex_tile)
+					#else
+					static void render_spans_16_c2_ns_nt_nz_nf_nzc(int start, int end, TILE* tex_tile)
+					#endif
+				#endif
+			#endif
+		#endif
+	#endif
+#endif
 {
 	UINT16 *fb = (UINT16*)&rdram[fb_address / 4];
-	UINT16 *zb = (UINT16*)&rdram[zb_address / 4];
 	UINT8 *hb = &hidden_bits[fb_address >> 1];
+#if defined(ZUPDATE) || defined(ZCOMPARE)
+	UINT16 *zb = (UINT16*)&rdram[zb_address / 4];
 	UINT8 *zhb = &hidden_bits[zb_address >> 1];
+#endif
 
 	int i, j;
 
 	int clipx1, clipx2, clipy1, clipy2;
 
+#if defined(SHADE)
+	SPAN_PARAM dr = span[0].dr;
+	SPAN_PARAM dg = span[0].dg;
+	SPAN_PARAM db = span[0].db;
+	SPAN_PARAM da = span[0].da;
+#if defined(FLIP)
+	int drinc = dr.w;
+	int dginc = dg.w;
+	int dbinc = db.w;
+	int dainc = da.w;
+#else
+	int drinc = -dr.w;
+	int dginc = -dg.w;
+	int dbinc = -db.w;
+	int dainc = -da.w;
+#endif
+#endif
+
+#if defined(TEXTURE)
 	UINT32 prim_tile = tex_tile->num;
 	UINT32 tilenum2 = 0;
 	TILE *tex_tile2 = NULL;
@@ -245,44 +822,57 @@ static void render_spans_16_c2(running_machine *machine, int start, int end, TIL
 	UINT32 magnify = 0;
 	UINT32 distant = 0;
 
-	SPAN_PARAM dr = span[0].dr;
-	SPAN_PARAM dg = span[0].dg;
-	SPAN_PARAM db = span[0].db;
-	SPAN_PARAM da = span[0].da;
-	SPAN_PARAM dz = span[0].dz;
-	SPAN_PARAM ds = span[0].ds;
-	SPAN_PARAM dt = span[0].dt;
-	SPAN_PARAM dw = span[0].dw;
-	int dzpix = span[0].dzpix;
-	int drinc, dginc, dbinc, dainc, dzinc, dsinc, dtinc, dwinc;
-	int xinc = flip ? 1 : -1;
-
 	int nexts, nextt, nextsw;
 	int lodclamp = 0;
 
+	SPAN_PARAM ds = span[0].ds;
+	SPAN_PARAM dt = span[0].dt;
+	SPAN_PARAM dw = span[0].dw;
+#if defined(FLIP)
+	int dsinc = ds.w;
+	int dtinc = dt.w;
+	int dwinc = dw.w;
+#else
+	int dsinc = -ds.w;
+	int dtinc = -dt.w;
+	int dwinc = -dw.w;
+#endif
+#endif
+
+#if defined(ZBUF)
+	SPAN_PARAM dz = span[0].dz;
+	int dzpix = span[0].dzpix;
+#if defined(FLIP)
+	int dzinc = dz.w;
+#else
+	int dzinc = -dz.w;
+#endif
+#else
+	int sz = 0, dzpix = 0;
+
+	if (other_modes.z_source_sel)
+	{
+		sz = (((UINT32)primitive_z) << 3) & 0x3ffff;
+		dzpix = primitive_delta_z;
+	}
+#endif
+
+#if defined(TEXTURE)
 	calculate_clamp_diffs(tex_tile->num);
 
-	clipx1 = clip.xh / 4;
-	clipx2 = clip.xl / 4;
-	clipy1 = clip.yh / 4;
-	clipy2 = clip.yl / 4;
-
-	if (texture && !other_modes.tex_lod_en)
+	if (!other_modes.tex_lod_en)
 	{
 		tilenum = prim_tile;
 		tex_tile = &tile[tilenum];
 		tilenum2 = (prim_tile + 1) & 7;
 		tex_tile2 = &tile[tilenum2];
 	}
+#endif
 
-	drinc = flip ? (dr.w) : -dr.w;
-	dginc = flip ? (dg.w) : -dg.w;
-	dbinc = flip ? (db.w) : -db.w;
-	dainc = flip ? (da.w) : -da.w;
-	dzinc = flip ? (dz.w) : -dz.w;
-	dsinc = flip ? (ds.w) : -ds.w;
-	dtinc = flip ? (dt.w) : -dt.w;
-	dwinc = flip ? (dw.w) : -dw.w;
+	clipx1 = clip.xh / 4;
+	clipx2 = clip.xl / 4;
+	clipy1 = clip.yh / 4;
+	clipy2 = clip.yl / 4;
 
 	if (start < clipy1)
 	{
@@ -301,82 +891,105 @@ static void render_spans_16_c2(running_machine *machine, int start, int end, TIL
 		end = clipy2 - 1;
 	}
 
-	set_shade_for_tris(shade); // Needed by backgrounds in Top Gear Rally 1
+#if !defined(SHADE)
+	shade_color.c = prim_color.c;
+#endif
 
 	for (i = start; i <= end; i++)
 	{
 		int xstart = span[i].lx;
 		int xend = span[i].rx;
-		SPAN_PARAM r;
-		SPAN_PARAM g;
-		SPAN_PARAM b;
-		SPAN_PARAM a;
-		SPAN_PARAM z = span[i].z;
+#if defined(SHADE)
+		SPAN_PARAM r = span[i].r;
+		SPAN_PARAM g = span[i].g;
+		SPAN_PARAM b = span[i].b;
+		SPAN_PARAM a = span[i].a;
+#endif
+#if defined(TEXTURE)
 		SPAN_PARAM s = span[i].s;
 		SPAN_PARAM t = span[i].t;
 		SPAN_PARAM w = span[i].w;
+#endif
+#if defined(ZBUF)
+		SPAN_PARAM z = span[i].z;
+#endif
 
 		int x;
 
 		int fb_index = fb_width * i;
 		int length;
 
-		if (shade)
-		{
-			r = span[i].r;
-			g = span[i].g;
-			b = span[i].b;
-			a = span[i].a;
-		}
-
 		x = xend;
 
-		length = flip ? (xstart - xend) : (xend - xstart); //Moogly
+#if defined(FLIP)
+		length = (xstart - xend);
+#else
+		length = (xend - xstart);
+#endif
 
 		for (j = 0; j <= length; j++)
 		{
-			int sr = 0, sg = 0, sb = 0, sa = 0;
+#if defined(SHADE)
+			int sr = r.h.h;
+			int sg = g.h.h;
+			int sb = b.h.h;
+			int sa = a.h.h;
+#endif
+#if defined(TEXTURE)
 			int ss = s.h.h;
 			int st = t.h.h;
 			int sw = w.h.h;
-			int sz = z.w >> 13;
 			int sss = 0, sst = 0;
+#endif
+#if defined(ZBUF)
+			int sz = z.w >> 13;
+#endif
 			COLOR c1, c2;
-			if (shade)
-			{
-				sr = r.h.h;
-				sg = g.h.h;
-				sb = b.h.h;
-				sa = a.h.h;
-			}
-			c1.c = 0;
-			c2.c = 0;
+			//c1.c = 0;
+			//c2.c = 0;
+
+#if defined(ZBUF)
 			if (other_modes.z_source_sel)
 			{
 				sz = (((UINT32)primitive_z) << 3) & 0x3ffff;
 				dzpix = primitive_delta_z;
 			}
-
+#endif
 
 			if (x >= clipx1 && x < clipx2)
 			{
+#if defined(ZCOMPARE)
 				int z_compare_result = 1;
+#endif
 
 				curpixel_cvg=span[i].cvg[x];
-
-				if (curpixel_cvg > 8)
-				{
-					stricterror("render_spans_16: cvg of current pixel is %d", curpixel_cvg);
-				}
 
 				if (curpixel_cvg)
 				{
 					int curpixel = fb_index + x;
 					UINT16* fbcur = &fb[curpixel ^ WORD_ADDR_XOR];
-					UINT16* zbcur = &zb[curpixel ^ WORD_ADDR_XOR];
 					UINT8* hbcur = &hb[curpixel ^ BYTE_ADDR_XOR];
+#if defined(ZUPDATE) || defined(ZCOMPARE)
+					UINT16* zbcur = &zb[curpixel ^ WORD_ADDR_XOR];
 					UINT8* zhbcur = &zhb[curpixel ^ BYTE_ADDR_XOR];
+#endif
 
+#if defined(SHADE)
+					if (sr > 0xff) sr = 0xff;
+					if (sg > 0xff) sg = 0xff;
+					if (sb > 0xff) sb = 0xff;
+					if (sa > 0xff) sa = 0xff;
+					if (sr < 0) sr = 0;
+					if (sg < 0) sg = 0;
+					if (sb < 0) sb = 0;
+					if (sa < 0) sa = 0;
+					shade_color.i.r = sr;
+					shade_color.i.g = sg;
+					shade_color.i.b = sb;
+					shade_color.i.a = sa;
+#endif
+
+#if defined(TEXTURE)
 					if (other_modes.persp_tex_en)
 					{
 						tcdiv(ss, st, sw, &sss, &sst);
@@ -493,37 +1106,23 @@ static void render_spans_16_c2(running_machine *machine, int start, int end, TIL
 						}
 					}
 
-					if (shade)
-					{
-						if (sr > 0xff) sr = 0xff;
-						if (sg > 0xff) sg = 0xff;
-						if (sb > 0xff) sb = 0xff;
-						if (sa > 0xff) sa = 0xff;
-						if (sr < 0) sr = 0;
-						if (sg < 0) sg = 0;
-						if (sb < 0) sb = 0;
-						if (sa < 0) sa = 0;
-						shade_color.i.r = sr;
-						shade_color.i.g = sg;
-						shade_color.i.b = sb;
-						shade_color.i.a = sa;
-					}
+					TEXTURE_PIPELINE(&texel0_color, sss, sst, tex_tile);
+					TEXTURE_PIPELINE(&texel1_color, sss, sst, tex_tile2);
+#endif
 
-					if (texture)
-					{
-						TEXTURE_PIPELINE(&texel0_color, sss, sst, tex_tile);
-						TEXTURE_PIPELINE(&texel1_color, sss, sst, tex_tile2);
-					}
+					COLOR_COMBINER2_C0(&c1);
+					COLOR_COMBINER2_C1(&c2);
 
-					c1 = COLOR_COMBINER2_C0(machine);
-					c2 = COLOR_COMBINER2_C1(machine);
-
-					if ((zbuffer || other_modes.z_source_sel) && other_modes.z_compare_en)
+#if defined(ZCOMPARE)
+#if !defined(ZBUF)
+					if (other_modes.z_source_sel)
+#endif
 					{
 						z_compare_result = z_compare(fbcur, hbcur, zbcur, zhbcur, sz, dzpix);
 					}
 
 					if(z_compare_result)
+#endif
 					{
 						int rendered = 0;
 						int dith = 0;
@@ -536,29 +1135,38 @@ static void render_spans_16_c2(running_machine *machine, int start, int end, TIL
 							dith = bayer_matrix[(((i) & 3) << 2) + ((x ^ WORD_ADDR_XOR) & 3)];
 						}
 
-						rendered = BLENDER2_16(machine, fbcur, hbcur, c1, c2, dith);
+						rendered = BLENDER2_16(fbcur, hbcur, c1, c2, dith);
 
-						if (other_modes.z_update_en && rendered)
+#if defined(ZUPDATE)
+						if (rendered)
 						{
 							z_store(zbcur, zhbcur, sz, dzpix);
 						}
+#endif
 					}
 				}
 			}
 
-			if (shade)
-			{
-				r.w += drinc;
-				g.w += dginc;
-				b.w += dbinc;
-				a.w += dainc;
-			}
-			z.w += dzinc;
+#if defined(SHADE)
+			r.w += drinc;
+			g.w += dginc;
+			b.w += dbinc;
+			a.w += dainc;
+#endif
+#if defined(TEXTURE)
 			s.w += dsinc;
 			t.w += dtinc;
 			w.w += dwinc;
+#endif
+#if defined(ZBUF)
+			z.w += dzinc;
+#endif
 
-			x += xinc;
+#if defined(FLIP)
+			x++;
+#else
+			x--;
+#endif
 		}
 	}
 }

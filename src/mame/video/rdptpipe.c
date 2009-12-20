@@ -45,30 +45,12 @@ INLINE void TEXTURE_PIPELINE_BILINEAR_NMID(COLOR* TEX, INT32 SSS, INT32 SST, TIL
 		INVTF = 0x20 - TFRAC;
 	}
 
+	FETCH_TEXEL(&t1, sss2, sst1, tex_tile);
+	FETCH_TEXEL(&t2, sss1, sst2, tex_tile);
+
 	if (!upper)
 	{
 		FETCH_TEXEL(&t0, sss1, sst1, tex_tile);
-	}
-	FETCH_TEXEL(&t1, sss2, sst1, tex_tile);
-	FETCH_TEXEL(&t2, sss1, sst2, tex_tile);
-	if (upper)
-	{
-		FETCH_TEXEL(&t3, sss2, sst2, tex_tile);
-	}
-
-	if (upper)
-	{
-		R32 = t3.i.r + ((INVSF*(t2.i.r - t3.i.r))>>5) + ((INVTF*(t1.i.r - t3.i.r))>>5);
-		TEX->i.r = (R32 < 0) ? 0 : R32;
-		G32 = t3.i.g + ((INVSF*(t2.i.g - t3.i.g))>>5) + ((INVTF*(t1.i.g - t3.i.g))>>5);
-		TEX->i.g = (G32 < 0) ? 0 : G32;
-		B32 = t3.i.b + ((INVSF*(t2.i.b - t3.i.b))>>5) + ((INVTF*(t1.i.b - t3.i.b))>>5);
-		TEX->i.b = (B32 < 0) ? 0 : B32;
-		A32 = t3.i.a + ((INVSF*(t2.i.a - t3.i.a))>>5) + ((INVTF*(t1.i.a - t3.i.a))>>5);
-		TEX->i.a = (A32 < 0) ? 0 : A32;
-	}
-	else
-	{
 		R32 = t0.i.r + ((SFRAC*(t1.i.r - t0.i.r))>>5) + ((TFRAC*(t2.i.r - t0.i.r))>>5);
 		TEX->i.r = (R32 < 0) ? 0 : R32;
 		G32 = t0.i.g + ((SFRAC*(t1.i.g - t0.i.g))>>5) + ((TFRAC*(t2.i.g - t0.i.g))>>5);
@@ -76,6 +58,18 @@ INLINE void TEXTURE_PIPELINE_BILINEAR_NMID(COLOR* TEX, INT32 SSS, INT32 SST, TIL
 		B32 = t0.i.b + ((SFRAC*(t1.i.b - t0.i.b))>>5) + ((TFRAC*(t2.i.b - t0.i.b))>>5);
 		TEX->i.b = (B32 < 0) ? 0 : B32;
 		A32 = t0.i.a + ((SFRAC*(t1.i.a - t0.i.a))>>5) + ((TFRAC*(t2.i.a - t0.i.a))>>5);
+		TEX->i.a = (A32 < 0) ? 0 : A32;
+	}
+	else
+	{
+		FETCH_TEXEL(&t3, sss2, sst2, tex_tile);
+		R32 = t3.i.r + ((INVSF*(t2.i.r - t3.i.r))>>5) + ((INVTF*(t1.i.r - t3.i.r))>>5);
+		TEX->i.r = (R32 < 0) ? 0 : R32;
+		G32 = t3.i.g + ((INVSF*(t2.i.g - t3.i.g))>>5) + ((INVTF*(t1.i.g - t3.i.g))>>5);
+		TEX->i.g = (G32 < 0) ? 0 : G32;
+		B32 = t3.i.b + ((INVSF*(t2.i.b - t3.i.b))>>5) + ((INVTF*(t1.i.b - t3.i.b))>>5);
+		TEX->i.b = (B32 < 0) ? 0 : B32;
+		A32 = t3.i.a + ((INVSF*(t2.i.a - t3.i.a))>>5) + ((INVTF*(t1.i.a - t3.i.a))>>5);
 		TEX->i.a = (A32 < 0) ? 0 : A32;
 	}
 }
