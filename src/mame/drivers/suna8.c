@@ -2278,8 +2278,8 @@ static DRIVER_INIT( suna8 )
 }
 
 /* Working Games */
-GAME( 1988, rranger,  0,        rranger,  rranger,  suna8,    ROT0,  "SunA (Sharp Image license)", "Rough Ranger (v2.0)", 0)
-GAME( 1988, sranger,  rranger,  rranger,  rranger,  suna8,    ROT0,  "SunA", "Super Ranger (v2.0)", 0 )
+GAME( 1988, sranger,  0,        rranger,  rranger,  suna8,    ROT0,  "SunA", "Super Ranger (v2.0)", 0 )
+GAME( 1988, rranger,  rranger,  rranger,  rranger,  suna8,    ROT0,  "SunA (Sharp Image license)", "Rough Ranger (v2.0, unprotected, bootleg?)", 0) //protection is patched out in this.
 GAME( 1988, srangerb, rranger,  rranger,  rranger,  suna8,    ROT0,  "bootleg", "Super Ranger (bootleg)", 0 )
 GAME( 1988, srangerw, rranger,  rranger,  rranger,  suna8,    ROT0,  "SunA (WDK license)", "Super Ranger (WDK)", 0 )
 GAME( 1988, hardhead, 0,        hardhead, hardhead, hardhead, ROT0,  "SunA", "Hard Head" , 0)
