@@ -26,9 +26,9 @@
 #include "outrun.lh"
 
 
-#define MASTER_CLOCK   		(50000000)
-#define SOUND_CLOCK    		(16000000)
-#define MASTER_CLOCK_25MHz	(25174800)	/* super hang-on only */
+#define MASTER_CLOCK   		(XTAL_40MHz)
+#define SOUND_CLOCK    		(XTAL_16MHz)
+#define MASTER_CLOCK_25MHz	(XTAL_25_1748MHz)	/* super hang-on only */
 
 
 
