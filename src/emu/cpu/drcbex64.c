@@ -18,8 +18,6 @@
 
     * Identify common pairs and optimize output
 
-    * Convert AND 0xff/0xffff to movzx
-
     * Convert SUB a,0,b to NEG
 
     * Optimize, e.g., and [r5],i0,$FF to use rbx as temporary register
@@ -5446,6 +5444,26 @@ static x86code *op_and(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 		if (src1p.type == dstp.type && src1p.value == dstp.value && dstp.type == DRCUML_PTYPE_MEMORY)
 			emit_and_m32_p32(drcbe, &dst, MABS(drcbe, dstp.value), &src2p, inst);		// and   [dstp],src2p
 
+		/* AND with immediate 0xff */
+		else if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value == 0xff && inst->flags == 0)
+		{
+			if (src1p.type == DRCUML_PTYPE_INT_REGISTER)
+				emit_movzx_r32_r8(&dst, dstreg, src1p.value);							// movzx dstreg,src1p
+			else if (src1p.type == DRCUML_PTYPE_MEMORY)
+				emit_movzx_r32_m8(&dst, dstreg, MABS(drcbe, src1p.value));				// movzx dstreg,[src1p]
+			emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);								// mov   dstp,dstreg
+		}
+
+		/* AND with immediate 0xffff */
+		else if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value == 0xffff && inst->flags == 0)
+		{
+			if (src1p.type == DRCUML_PTYPE_INT_REGISTER)
+				emit_movzx_r32_r16(&dst, dstreg, src1p.value);							// movzx dstreg,src1p
+			else if (src1p.type == DRCUML_PTYPE_MEMORY)
+				emit_movzx_r32_m16(&dst, dstreg, MABS(drcbe, src1p.value));				// movzx dstreg,[src1p]
+			emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);								// mov   dstp,dstreg
+		}
+
 		/* general case */
 		else
 		{
@@ -5461,6 +5479,38 @@ static x86code *op_and(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 		/* dstp == src1p in memory */
 		if (src1p.type == dstp.type && src1p.value == dstp.value && dstp.type == DRCUML_PTYPE_MEMORY)
 			emit_and_m64_p64(drcbe, &dst, MABS(drcbe, dstp.value), &src2p, inst);		// and   [dstp],src2p
+
+		/* AND with immediate 0xff */
+		else if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value == 0xff && inst->flags == 0)
+		{
+			if (src1p.type == DRCUML_PTYPE_INT_REGISTER)
+				emit_movzx_r32_r8(&dst, dstreg, src1p.value);							// movzx dstreg,src1p
+			else if (src1p.type == DRCUML_PTYPE_MEMORY)
+				emit_movzx_r32_m8(&dst, dstreg, MABS(drcbe, src1p.value));				// movzx dstreg,[src1p]
+			emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);								// mov   dstp,dstreg
+		}
+
+		/* AND with immediate 0xffff */
+		else if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value == 0xffff && inst->flags == 0)
+		{
+			if (src1p.type == DRCUML_PTYPE_INT_REGISTER)
+				emit_movzx_r32_r16(&dst, dstreg, src1p.value);							// movzx dstreg,src1p
+			else if (src1p.type == DRCUML_PTYPE_MEMORY)
+				emit_movzx_r32_m16(&dst, dstreg, MABS(drcbe, src1p.value));				// movzx dstreg,[src1p]
+			emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);								// mov   dstp,dstreg
+		}
+
+		/* AND with immediate 0xffffffff */
+		else if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value == 0xffffffff && inst->flags == 0)
+		{
+			if (src1p.type == dstp.type && src1p.value == dstp.value && dstp.type == DRCUML_PTYPE_INT_REGISTER)
+				emit_mov_r32_r32(&dst, dstreg, dstreg);									// mov   dstreg,dstreg
+			else
+			{
+				emit_mov_r32_p32(drcbe, &dst, dstreg, &src1p);							// mov   dstreg,src1p
+				emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);							// mov   dstp,dstreg
+			}
+		}
 
 		/* general case */
 		else

@@ -1305,20 +1305,17 @@ static void static_generate_memory_accessor(mips3_state *mips3, int mode, int si
 					}
 					else if (size == 2)
 					{
-						UML_SHR(block, IREG(0), IREG(0), IMM(1));						// shr     i0,i0,1
-						UML_XOR(block, IREG(0), IREG(0), IMM(mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0)));
-																						// xor     i0,i0,bytexor
-						UML_LOAD(block, IREG(0), fastbase, IREG(0), WORD);				// load    i0,fastbase,i0,word
+						UML_XOR(block, IREG(0), IREG(0), IMM(mips3->bigendian ? WORD_XOR_BE(0) : WORD_XOR_LE(0)));
+																						// xor     i0,i0,wordxor
+						UML_LOAD(block, IREG(0), fastbase, IREG(0), WORD_x1);			// load    i0,fastbase,i0,word_x1
 					}
 					else if (size == 4)
 					{
-						UML_SHR(block, IREG(0), IREG(0), IMM(2));						// shr     i0,i0,2
-						UML_LOAD(block, IREG(0), fastbase, IREG(0), DWORD);				// load    i0,fastbase,i0,dword
+						UML_LOAD(block, IREG(0), fastbase, IREG(0), DWORD_x1);			// load    i0,fastbase,i0,dword_x1
 					}
 					else if (size == 8)
 					{
-						UML_SHR(block, IREG(0), IREG(0), IMM(3));						// shr     i0,i0,3
-						UML_DLOAD(block, IREG(0), fastbase, IREG(0), QWORD);			// dload   i0,fastbase,i0,qword
+						UML_DLOAD(block, IREG(0), fastbase, IREG(0), QWORD_x1);			// dload   i0,fastbase,i0,qword_x1
 						UML_DROR(block, IREG(0), IREG(0), IMM(32 * (mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0))));
 																						// dror    i0,i0,32*bytexor
 					}
@@ -1334,38 +1331,35 @@ static void static_generate_memory_accessor(mips3_state *mips3, int mode, int si
 					}
 					else if (size == 2)
 					{
-						UML_SHR(block, IREG(0), IREG(0), IMM(1));						// shr     i0,i0,1
-						UML_XOR(block, IREG(0), IREG(0), IMM(mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0)));
-																						// xor     i0,i0,bytexor
-						UML_STORE(block, fastbase, IREG(0), IREG(1), WORD);				// store   fastbase,i0,i1,word
+						UML_XOR(block, IREG(0), IREG(0), IMM(mips3->bigendian ? WORD_XOR_BE(0) : WORD_XOR_LE(0)));
+																						// xor     i0,i0,wordxor
+						UML_STORE(block, fastbase, IREG(0), IREG(1), WORD_x1);			// store   fastbase,i0,i1,word_x1
 					}
 					else if (size == 4)
 					{
-						UML_SHR(block, IREG(0), IREG(0), IMM(2));						// shr     i0,i0,2
 						if (ismasked)
 						{
-							UML_LOAD(block, IREG(3), fastbase, IREG(0), DWORD);			// load    i3,fastbase,i0,dword
+							UML_LOAD(block, IREG(3), fastbase, IREG(0), DWORD_x1);		// load    i3,fastbase,i0,dword_x1
 							UML_ROLINS(block, IREG(3), IREG(1), IMM(0), IREG(2));		// rolins  i3,i1,0,i2
-							UML_STORE(block, fastbase, IREG(0), IREG(3), DWORD);		// store   fastbase,i0,i3,dword
+							UML_STORE(block, fastbase, IREG(0), IREG(3), DWORD_x1);		// store   fastbase,i0,i3,dword_x1
 						}
 						else
-							UML_STORE(block, fastbase, IREG(0), IREG(1), DWORD);		// store   fastbase,i0,i1,dword
+							UML_STORE(block, fastbase, IREG(0), IREG(1), DWORD_x1);		// store   fastbase,i0,i1,dword_x1
 					}
 					else if (size == 8)
 					{
-						UML_SHR(block, IREG(0), IREG(0), IMM(3));						// shr     i0,i0,3
 						UML_DROR(block, IREG(1), IREG(1), IMM(32 * (mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0))));
 																						// dror    i1,i1,32*bytexor
 						if (ismasked)
 						{
 							UML_DROR(block, IREG(2), IREG(2), IMM(32 * (mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0))));
 																						// dror    i2,i2,32*bytexor
-							UML_DLOAD(block, IREG(3), fastbase, IREG(0), QWORD);		// dload   i3,fastbase,i0,qword
+							UML_DLOAD(block, IREG(3), fastbase, IREG(0), QWORD_x1);		// dload   i3,fastbase,i0,qword_x1
 							UML_DROLINS(block, IREG(3), IREG(1), IMM(0), IREG(2));		// drolins i3,i1,0,i2
-							UML_DSTORE(block, fastbase, IREG(0), IREG(3), QWORD);		// dstore  fastbase,i0,i3,qword
+							UML_DSTORE(block, fastbase, IREG(0), IREG(3), QWORD_x1);	// dstore  fastbase,i0,i3,qword_x1
 						}
 						else
-							UML_DSTORE(block, fastbase, IREG(0), IREG(1), QWORD);		// dstore  fastbase,i0,i1,qword
+							UML_DSTORE(block, fastbase, IREG(0), IREG(1), QWORD_x1);	// dstore  fastbase,i0,i1,qword_x1
 					}
 					UML_RET(block);														// ret
 				}
