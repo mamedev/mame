@@ -17,6 +17,7 @@ struct _suprslam_state
 	/* video-related */
 	tilemap     *screen_tilemap, *bg_tilemap;
 	UINT16      screen_bank, bg_bank;
+	UINT16      *spr_ctrl;
 
 	/* misc */
 	int         pending_command;

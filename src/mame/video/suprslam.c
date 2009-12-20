@@ -68,9 +68,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 			if (ypos > 0xff) ypos -=0x200;
 
-			for (ycnt = 0; ycnt < high+1; ycnt ++) 
+			for (ycnt = 0; ycnt < high+1; ycnt ++)
 			{
-				if (!flipx) 
+				if (!flipx)
 			{
 					for (xcnt = 0; xcnt < wide+1; xcnt ++)
 					{
@@ -79,8 +79,8 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 						drawgfxzoom_transpen(bitmap, cliprect, gfx, tileno, col, 0, 0,-0x200+xpos + xcnt * xzoom/2, ypos + ycnt * yzoom/2,xzoom << 11, yzoom << 11, 15);
 						loopno ++;
 					}
-				} 
-				else 
+				}
+				else
 				{
 					for (xcnt = wide; xcnt >= 0; xcnt --)
 					{
@@ -158,8 +158,11 @@ VIDEO_UPDATE( suprslam )
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	k053936_zoom_draw(state->k053936, bitmap, cliprect, state->bg_tilemap, 0, 0, 1);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	if(!(state->spr_ctrl[0] & 8))
+		draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, state->screen_tilemap, 0, 0);
+	if(state->spr_ctrl[0] & 8)
+		draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -173,8 +176,8 @@ WRITE16_HANDLER (suprslam_bank_w)
 	state->screen_bank = data & 0xf000;
 	state->bg_bank = (data & 0x0f00) << 4;
 
-	if (state->screen_bank != old_screen_bank) 
+	if (state->screen_bank != old_screen_bank)
 		tilemap_mark_all_tiles_dirty(state->screen_tilemap);
-	if (state->bg_bank != old_bg_bank) 
+	if (state->bg_bank != old_bg_bank)
 		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 }
