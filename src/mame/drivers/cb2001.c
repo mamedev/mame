@@ -48,36 +48,36 @@ In test mode (c) is 2000
 static const UINT8 cb2001_decryption_table[256] = {
 	0xe8,xxxx,xxxx,xxxx,xxxx,0x61,xxxx,xxxx, 0x3c,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 00 */
 //    pppp                     ????            pppp
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,xxxx,0x3a,xxxx,xxxx,xxxx, /* 10 */
-//                                             pppp     ????       pppp           ????
+	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,xxxx,0x3a,xxxx,0x89,xxxx, /* 10 */
+//                                             pppp     ????       pppp      pppp ????
 	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xbc,xxxx, xxxx,xxxx,xxxx,0x75,xxxx,xxxx,xxxx,xxxx, /* 20 */
 //         !!!!      ????      ???? ????                      pppp
 	0x9d,xxxx,xxxx,xxxx,xxxx,xxxx,0xbe,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,0xbf,0x74, /* 30 */
 //    ????                          ????                 ????           ???? ???? pppp
 	xxxx,0xea,xxxx,xxxx,xxxx,0xb0,xxxx,xxxx, xxxx,0xa2,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 40 */
 //         !!!!                gggg                 pppp
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x42,xxxx, xxxx,xxxx,xxxx,xxxx,0xeb,xxxx,xxxx,xxxx, /* 50 */
-//                                  ????                           pppp
-	xxxx,xxxx,xxxx,xxxx,0x22,xxxx,xxxx,xxxx, xxxx,0xa5,xxxx,xxxx,xxxx,xxxx,0xba,xxxx, /* 60 */
-//                        pppp                      ????                     gggg
-	0xc3,xxxx,0x02,xxxx,xxxx,xxxx,xxxx,xxxx, 0x72,xxxx,0xf2,xxxx,xxxx,xxxx,xxxx,xxxx, /* 70 */
-//    pppp      pppp                           ????      ????
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x34, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 80 */
-//                                       ????
+	xxxx,xxxx,0x2a,xxxx,xxxx,xxxx,0x42,xxxx, xxxx,xxxx,xxxx,xxxx,0xeb,xxxx,xxxx,xxxx, /* 50 */
+//              pppp                ????                           pppp
+	xxxx,xxxx,xxxx,xxxx,0x22,xxxx,xxxx,xxxx, xxxx,0xa5,xxxx,xxxx,xxxx,0xbb,0xba,xxxx, /* 60 */
+//                        pppp                      ????                pppp gggg
+	0xc3,xxxx,0x02,xxxx,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf2,xxxx,xxxx,xxxx,xxxx,xxxx, /* 70 */
+//    pppp      pppp                pppp       pppp      ????
+	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x34, xxxx,xxxx,xxxx,xxxx,0x73,xxxx,xxxx,xxxx, /* 80 */
+//                                       ????                      pppp
 	xxxx,xxxx,0xe9,xxxx,xxxx,0xbe,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0xb9,xxxx,xxxx,xxxx, /* 90 */
 //              ????           pppp                                pppp
 	xxxx,xxxx,xxxx,0x06,0xaa,0x9c,xxxx,0xb8, xxxx,xxxx,0xfc,xxxx,xxxx,xxxx,xxxx,xxxx, /* A0 */
 //                   ???? ???? ????      !!!!            ????
-	0x75,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x07,0xcf, /* B0 */
-//    ????                                                         ????      ???? ????
+	0x75,xxxx,0xb4,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,0x03,xxxx,xxxx,xxxx,0x07,0xcf, /* B0 */
+//    ????      pppp                                     pppp      ????      ???? ????
 	xxxx,xxxx,0xee,xxxx,xxxx,0xe2,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xa4,xxxx, /* C0 */
 //              ????           pppp                                          ????
-	xxxx,xxxx,0x46,xxxx,0x60,xxxx,xxxx,xxxx, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,xxxx, /* D0 */
-//              pppp      ????                 pppp                     ???? !!!!
+	xxxx,xxxx,0x46,xxxx,0x60,xxxx,xxxx,xxxx, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,0x8b, /* D0 */
+//              pppp      ????                 pppp                     ???? !!!! pppp
 	0x8a,xxxx,xxxx,0xc6,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
-//    ????           !!!!
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* F0 */
-//
+//    pppp           !!!!
+	xxxx,xxxx,0xfe,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* F0 */
+//              pppp
 };
 
 /* robiza's notes:
@@ -123,8 +123,39 @@ cmv4                          cb2001                     (en -> de)
   4aa4 jr $4abe                 e66e7 br 0e6703h         (5c -> eb)
 
   4aa6 add a,a                  e66e9 add al,al          (72 -> 02)
+  4aa7 ld e,a                   .
+  4aa8 ld d,$00                 e66eb mov ah,00h         (b2 -> b4)
+  4aaa ld hl,$4b62              e66ed mov bw,67cbh       (6d -> bb)
+  4aad add lh,de                e66f0 add bw,aw          (ba -> 03)
+  4aae ld e,(hl)                CE                                  ????????
+  4aaf inc hl                   .
+  4abo ld d,(hl)                .
+  4ab1 ex de,hl                 e66f3 mov bw,w ptr[bw]   (df -> 8b)
+  4ab2 xor a                    .
+  4ab3 ld ($d618),a             e66f5 mov b ptr[72dh],ah (d8 -> 88)
+  4ab6 ld ($d619),a             e66f9 mov b ptr[72eh],ah
+  4ab9 ld ($d61a),hl            e66fd mov w ptr[72fh],bw (1e -> 89)
+  4abc jr $4ac9                 e6701 br 0e6712h
 
+  4abe ld a,($d619)             e6703 mov al,[72eh]
+  4ac1 and a                    e6706 and al,al
+  4ac2 jr z,$4ac9               e6708 be 0e6712h
+  4ac4 dec a                    e670a dec al             (f2 -> fe)
+  4ac5 ld ($d619),a             e670c mov [72eh],al
+  .                             e670f be 0e6712h
+  4ac8 ret nz                   e6711 ret                (70 -> c3)
 
+  4ace cp $f0                   e671f cmp al,0f0h
+  4ad0 jr nc,$4b14              e6721 bnc ???            (8c -> 73)
+
+  4add sub $50                  e672f sub al,50h         (52 -> 2a)
+  4adf cp $50                   e6731 cmp al,50h
+  4ae1 jr c,$4ae7               e6733 bc 0e6739          (78 -> 72)
+  4ae3 ld b,$04                 e6735 26 04
+  4ae5 sub $50                  e6737 sub al,50h
+  4ae7 ld c,a                   e6739 mov cl,al          (e0 -> 8a)
+  4ae8 and $0f                  e673b and al,0fh         (76 -> 24)
+  4aea add a,a                  e673d add al,al
 
 
 -------------------------------------------------
