@@ -1711,7 +1711,7 @@ ROM_START( phrcraze )
 
 	// probably over-dumped, 1st and 2nd half identical
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "phrz_u27.u37", 0x00000, 0x8000, CRC(237e221a) SHA1(7aa69375c2b9a9e73e0e4ed207bf595368b2deb2) )
+	ROM_LOAD( "phrz_u37.u37", 0x00000, 0x8000, CRC(237e221a) SHA1(7aa69375c2b9a9e73e0e4ed207bf595368b2deb2) )
 	ROM_LOAD( "phrz_u38.u38", 0x08000, 0x8000, CRC(bfa78b67) SHA1(1b51c0e00240f798fe717624e706cb15700bc2f9) )
 	ROM_LOAD( "phrz_u39.u39", 0x10000, 0x8000, CRC(9ce22cb3) SHA1(b653afb8f13decd993e434aaad69a6e09ab65f83) )
 
