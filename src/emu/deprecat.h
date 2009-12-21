@@ -66,9 +66,6 @@ int cpu_getiloops(const device_config *device);
  *
  *************************************/
 
-/* decode a series of tiles from a particular gfx_element */
-void decodegfx(gfx_element *gfx, UINT32 first, UINT32 count);
-
 void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src);
 
 

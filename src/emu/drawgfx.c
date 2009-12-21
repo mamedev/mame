@@ -362,40 +362,6 @@ void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src)
 }
 
 
-/*-------------------------------------------------
-    decodegfx - decode a series of tiles from
-    a particular gfx_element
--------------------------------------------------*/
-
-void decodegfx(gfx_element *gfx, UINT32 first, UINT32 count)
-{
-	int last = first + count - 1;
-	int c;
-
-	assert(gfx != NULL);
-	assert(gfx->srcdata != NULL);
-	assert(first < gfx->total_elements);
-	assert(last < gfx->total_elements);
-
-	/* if this is raw graphics data, just set the pointer and compute pen usage */
-	if (gfx->flags & GFX_ELEMENT_DONT_FREE)
-	{
-		/* if we got a pointer, set it */
-		gfx->gfxdata = (UINT8 *)gfx->srcdata;
-
-		/* compute pen usage for everything */
-		for (c = first; c <= last; c++)
-			calc_penusage(gfx, c);
-	}
-
-	/* otherwise, we get to manually decode */
-	else
-		for (c = first; c <= last; c++)
-			decodechar(gfx, c, gfx->srcdata);
-}
-
-
-
 /***************************************************************************
     DRAWGFX IMPLEMENTATIONS
 ***************************************************************************/
