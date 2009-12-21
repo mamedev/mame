@@ -2112,6 +2112,8 @@ static MACHINE_DRIVER_START( galaxold_base )
 	MDRV_7474_ADD("7474_9m_1", galaxold_7474_9m_1_callback)
 	MDRV_7474_ADD("7474_9m_2", galaxold_7474_9m_2_callback)
 
+	MDRV_TIMER_ADD("int_timer", galaxold_interrupt_timer)
+
 	/* video hardware */
 	MDRV_GFXDECODE(galaxian)
 	MDRV_PALETTE_LENGTH(32+2+64)		/* 32 for the characters, 2 for the bullets, 64 for the stars */

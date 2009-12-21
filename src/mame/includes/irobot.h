@@ -14,6 +14,9 @@ extern UINT8 *irobot_combase;
 DRIVER_INIT( irobot );
 MACHINE_RESET( irobot );
 
+TIMER_DEVICE_CALLBACK( irobot_irvg_done_callback );
+TIMER_DEVICE_CALLBACK( irobot_irmb_done_callback );
+
 READ8_HANDLER( irobot_status_r );
 WRITE8_HANDLER( irobot_statwr_w );
 WRITE8_HANDLER( irobot_out0_w );

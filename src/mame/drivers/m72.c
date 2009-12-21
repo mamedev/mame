@@ -110,6 +110,9 @@ static TIMER_CALLBACK( m72_scanline_interrupt );
 static MACHINE_START( m72 )
 {
 	scanline_timer = timer_alloc(machine, m72_scanline_interrupt, NULL);
+
+	state_save_register_global(machine, mcu_sample_addr);
+	state_save_register_global(machine, mcu_snd_cmd_latch);
 }
 
 static TIMER_CALLBACK( synch_callback )
@@ -124,11 +127,6 @@ static MACHINE_RESET( m72 )
 	mcu_sample_addr = 0;
 	mcu_snd_cmd_latch = 0;
 
-	MACHINE_RESET_CALL(m72_sound);
-
-	state_save_register_global(machine, mcu_sample_addr);
-	state_save_register_global(machine, mcu_snd_cmd_latch);
-
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 	timer_call_after_resynch(machine,  NULL, 0, synch_callback);
 }
@@ -136,14 +134,12 @@ static MACHINE_RESET( m72 )
 static MACHINE_RESET( xmultipl )
 {
 	m72_irq_base = 0x08;
-	MACHINE_RESET_CALL(m72_sound);
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 static MACHINE_RESET( kengo )
 {
 	m72_irq_base = 0x18;
-	MACHINE_RESET_CALL(m72_sound);
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
@@ -1795,6 +1791,9 @@ static MACHINE_DRIVER_START( rtype )
 
 	MDRV_MACHINE_START(m72)
 	MDRV_MACHINE_RESET(m72)
+	
+	MDRV_SOUND_START(m72)
+	MDRV_SOUND_RESET(m72)
 
 	/* video hardware */
 	MDRV_GFXDECODE(m72)
@@ -1829,6 +1828,9 @@ static MACHINE_DRIVER_START( m72_base )
 
 	MDRV_MACHINE_START(m72)
 	MDRV_MACHINE_RESET(m72)
+
+	MDRV_SOUND_START(m72)
+	MDRV_SOUND_RESET(m72)
 
 	/* video hardware */
 	MDRV_GFXDECODE(m72)
@@ -1890,6 +1892,9 @@ static MACHINE_DRIVER_START( dkgenm72 )
 	MDRV_MACHINE_START(m72)
 	MDRV_MACHINE_RESET(xmultipl)
 
+	MDRV_SOUND_START(m72)
+	MDRV_SOUND_RESET(m72)
+
 	/* video hardware */
 	MDRV_GFXDECODE(m72)
 	MDRV_PALETTE_LENGTH(512)
@@ -1930,6 +1935,9 @@ static MACHINE_DRIVER_START( xmultipl )
 
 	MDRV_MACHINE_START(m72)
 	MDRV_MACHINE_RESET(xmultipl)
+
+	MDRV_SOUND_START(m72)
+	MDRV_SOUND_RESET(m72)
 
 	/* video hardware */
 	MDRV_GFXDECODE(m72)
@@ -1972,6 +1980,9 @@ static MACHINE_DRIVER_START( dbreed )
 	MDRV_MACHINE_START(m72)
 	MDRV_MACHINE_RESET(xmultipl)
 
+	MDRV_SOUND_START(m72)
+	MDRV_SOUND_RESET(m72)
+
 	/* video hardware */
 	MDRV_GFXDECODE(rtype2)
 	MDRV_PALETTE_LENGTH(512)
@@ -2011,6 +2022,9 @@ static MACHINE_DRIVER_START( dbreed72 )
 
 	MDRV_MACHINE_START(m72)
 	MDRV_MACHINE_RESET(xmultipl)
+
+	MDRV_SOUND_START(m72)
+	MDRV_SOUND_RESET(m72)
 
 	/* video hardware */
 	MDRV_GFXDECODE(m72)
@@ -2053,6 +2067,9 @@ static MACHINE_DRIVER_START( rtype2 )
 	MDRV_MACHINE_START(m72)
 	MDRV_MACHINE_RESET(m72)
 
+	MDRV_SOUND_START(m72)
+	MDRV_SOUND_RESET(m72)
+
 	/* video hardware */
 	MDRV_GFXDECODE(rtype2)
 	MDRV_PALETTE_LENGTH(512)
@@ -2093,6 +2110,9 @@ static MACHINE_DRIVER_START( majtitle )
 	MDRV_MACHINE_START(m72)
 	MDRV_MACHINE_RESET(m72)
 
+	MDRV_SOUND_START(m72)
+	MDRV_SOUND_RESET(m72)
+
 	/* video hardware */
 	MDRV_GFXDECODE(majtitle)
 	MDRV_PALETTE_LENGTH(512)
@@ -2132,6 +2152,9 @@ static MACHINE_DRIVER_START( hharry )
 
 	MDRV_MACHINE_START(m72)
 	MDRV_MACHINE_RESET(xmultipl)
+
+	MDRV_SOUND_START(m72)
+	MDRV_SOUND_RESET(m72)
 
 	/* video hardware */
 	MDRV_GFXDECODE(rtype2)
@@ -2174,6 +2197,9 @@ static MACHINE_DRIVER_START( hharryu )
 	MDRV_MACHINE_START(m72)
 	MDRV_MACHINE_RESET(xmultipl)
 
+	MDRV_SOUND_START(m72)
+	MDRV_SOUND_RESET(m72)
+
 	/* video hardware */
 	MDRV_GFXDECODE(rtype2)
 	MDRV_PALETTE_LENGTH(512)
@@ -2215,6 +2241,9 @@ static MACHINE_DRIVER_START( poundfor )
 	MDRV_MACHINE_START(m72)
 	MDRV_MACHINE_RESET(m72)
 
+	MDRV_SOUND_START(m72)
+	MDRV_SOUND_RESET(m72)
+
 	/* video hardware */
 	MDRV_GFXDECODE(rtype2)
 	MDRV_PALETTE_LENGTH(512)
@@ -2254,6 +2283,9 @@ static MACHINE_DRIVER_START( cosmccop )
 
 	MDRV_MACHINE_START(m72)
 	MDRV_MACHINE_RESET(kengo)
+
+	MDRV_SOUND_START(m72)
+	MDRV_SOUND_RESET(m72)
 
 	/* video hardware */
 	MDRV_GFXDECODE(rtype2)

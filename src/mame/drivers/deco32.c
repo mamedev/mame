@@ -239,21 +239,21 @@ Notes:
 
 static UINT32 *deco32_ram;
 static int raster_enable;
-static emu_timer *raster_irq_timer;
+static const device_config *raster_irq_timer;
 static UINT8 nslasher_sound_irq;
 
 /**********************************************************************************/
 
-static TIMER_CALLBACK( interrupt_gen )
+static TIMER_DEVICE_CALLBACK( interrupt_gen )
 {
 	/* Save state of scroll registers before the IRQ */
-	deco32_raster_display_list[deco32_raster_display_position++]=video_screen_get_vpos(machine->primary_screen);
+	deco32_raster_display_list[deco32_raster_display_position++]=video_screen_get_vpos(timer->machine->primary_screen);
 	deco32_raster_display_list[deco32_raster_display_position++]=deco32_pf12_control[1]&0xffff;
 	deco32_raster_display_list[deco32_raster_display_position++]=deco32_pf12_control[2]&0xffff;
 	deco32_raster_display_list[deco32_raster_display_position++]=deco32_pf12_control[3]&0xffff;
 	deco32_raster_display_list[deco32_raster_display_position++]=deco32_pf12_control[4]&0xffff;
 
-	cputag_set_input_line(machine, "maincpu", ARM_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(timer->machine, "maincpu", ARM_IRQ_LINE, HOLD_LINE);
 }
 
 static READ32_HANDLER( deco32_irq_controller_r )
@@ -305,9 +305,9 @@ static WRITE32_HANDLER( deco32_irq_controller_w )
 	case 1: /* Raster IRQ scanline position, only valid for values between 1 & 239 (0 and 240-256 do NOT generate IRQ's) */
 		scanline=(data&0xff);
 		if (raster_enable && scanline>0 && scanline<240)
-			timer_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(space->machine->primary_screen, scanline-1, 320),0);
+			timer_device_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(space->machine->primary_screen, scanline-1, 320),0);
 		else
-			timer_adjust_oneshot(raster_irq_timer,attotime_never,0);
+			timer_device_adjust_oneshot(raster_irq_timer,attotime_never,0);
 		break;
 	case 2: /* VBL irq ack */
 		break;
@@ -1657,7 +1657,7 @@ static NVRAM_HANDLER(tattass)
 
 static MACHINE_RESET( deco32 )
 {
-	raster_irq_timer = timer_alloc(machine, interrupt_gen, NULL);
+	raster_irq_timer = devtag_get_device(machine, "int_timer");
 }
 
 static INTERRUPT_GEN( deco32_vbl_interrupt )
@@ -1681,6 +1681,8 @@ static MACHINE_DRIVER_START( captaven )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(deco32)
+	
+	MDRV_TIMER_ADD("int_timer", interrupt_gen)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -1822,6 +1824,8 @@ static MACHINE_DRIVER_START( dragngun )
 	MDRV_MACHINE_RESET(deco32)
 	MDRV_NVRAM_HANDLER(93C46)
 
+	MDRV_TIMER_ADD("int_timer", interrupt_gen)
+
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
 
@@ -1874,6 +1878,8 @@ static MACHINE_DRIVER_START( lockload )
 
 	MDRV_MACHINE_RESET(deco32)
 	MDRV_NVRAM_HANDLER(93C46)
+
+	MDRV_TIMER_ADD("int_timer", interrupt_gen)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )

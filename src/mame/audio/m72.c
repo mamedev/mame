@@ -104,12 +104,15 @@ static TIMER_CALLBACK( setvector_callback )
 		cputag_set_input_line_and_vector(machine, "soundcpu",0,ASSERT_LINE, irqvector);
 }
 
-MACHINE_RESET( m72_sound )
+SOUND_START( m72 )
 {
-	setvector_callback(machine, NULL, VECTOR_INIT);
-
 	state_save_register_global(machine, irqvector);
 	state_save_register_global(machine, sample_addr);
+}
+
+SOUND_RESET( m72 )
+{
+	setvector_callback(machine, NULL, VECTOR_INIT);
 }
 
 void m72_ym2151_irq_handler(const device_config *device, int irq)

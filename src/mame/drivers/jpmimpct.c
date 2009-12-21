@@ -94,11 +94,9 @@ static UINT8 tms_irq;
 static UINT8 duart_1_irq;
 static UINT8 touch_cnt;
 static UINT8 touch_data[3];
-static emu_timer *duart_1_timer;
 
 static int lamp_strobe;
 static UINT8 Lamps[256];
-static TIMER_CALLBACK( duart_1_timer_event );
 
 
 /*************************************
@@ -166,17 +164,8 @@ static void update_irqs(running_machine *machine)
  *
  *************************************/
 
-static MACHINE_RESET( jpmimpct )
+static MACHINE_START( jpmimpct )
 {
-	memset(&duart_1, 0, sizeof(duart_1));
-
-	duart_1_timer = timer_alloc(machine, duart_1_timer_event, NULL);
-
-	/* Reset states */
-	duart_1_irq = tms_irq = 0;
-	touch_cnt = 0;
-
-//  duart_1.IVR=0x0f;
 	state_save_register_global(machine, tms_irq);
 	state_save_register_global(machine, duart_1_irq);
 	state_save_register_global(machine, touch_cnt);
@@ -186,6 +175,18 @@ static MACHINE_RESET( jpmimpct )
 	state_save_register_global(machine, duart_1.ISR);
 	state_save_register_global(machine, duart_1.IMR);
 	state_save_register_global(machine, duart_1.CT);
+}
+
+
+static MACHINE_RESET( jpmimpct )
+{
+	memset(&duart_1, 0, sizeof(duart_1));
+
+	/* Reset states */
+	duart_1_irq = tms_irq = 0;
+	touch_cnt = 0;
+
+//  duart_1.IVR=0x0f;
 }
 
 
@@ -234,13 +235,13 @@ static READ16_HANDLER( m68k_tms_r )
  *  TxDB/TxDB: Data retrieval unit
  */
 
-static TIMER_CALLBACK( duart_1_timer_event )
+static TIMER_DEVICE_CALLBACK( duart_1_timer_event )
 {
 	duart_1.tc = 0;
 	duart_1.ISR |= 0x08;
 
 	duart_1_irq = 1;
-	update_irqs(machine);
+	update_irqs(timer->machine);
 }
 
 static READ16_HANDLER( duart_1_r )
@@ -291,7 +292,7 @@ static READ16_HANDLER( duart_1_r )
 		case 0xe:
 		{
 			attotime rate = attotime_mul(ATTOTIME_IN_HZ(MC68681_1_CLOCK), 16 * duart_1.CT);
-			timer_adjust_periodic(duart_1_timer, rate, 0, rate);
+			timer_device_adjust_periodic(devtag_get_device(space->machine, "duart_1_timer"), rate, 0, rate);
 			break;
 		}
 		case 0xf:
@@ -852,8 +853,11 @@ static MACHINE_DRIVER_START( jpmimpct )
 	MDRV_CPU_PROGRAM_MAP(tms_program_map)
 
 	MDRV_QUANTUM_TIME(HZ(30000))
+	MDRV_MACHINE_START(jpmimpct)
 	MDRV_MACHINE_RESET(jpmimpct)
 	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	MDRV_TIMER_ADD( "duart_1_timer", duart_1_timer_event)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -1128,15 +1132,8 @@ static const ppi8255_interface ppi8255_intf[1] =
 	}
 };
 
-static MACHINE_RESET( impctawp )
+static MACHINE_START( impctawp )
 {
-	memset(&duart_1, 0, sizeof(duart_1));
-
-	duart_1_timer = timer_alloc(machine, duart_1_timer_event, NULL);
-
-	/* Reset states */
-	duart_1_irq = 0;
-
 	state_save_register_global(machine, duart_1_irq);
 	state_save_register_global(machine, touch_cnt);
 	state_save_register_global_array(machine, touch_data);
@@ -1146,8 +1143,6 @@ static MACHINE_RESET( impctawp )
 	state_save_register_global(machine, duart_1.IMR);
 	state_save_register_global(machine, duart_1.CT);
 
-	ROC10937_init(0, MSC1937,0);
-	ROC10937_reset(0);	/* reset display1 */
 	stepper_config(machine, 0, &starpoint_interface_48step);
 	stepper_config(machine, 1, &starpoint_interface_48step);
 	stepper_config(machine, 2, &starpoint_interface_48step);
@@ -1155,6 +1150,17 @@ static MACHINE_RESET( impctawp )
 	stepper_config(machine, 4, &starpoint_interface_48step);
 	stepper_config(machine, 5, &starpoint_interface_48step);
 	stepper_config(machine, 6, &starpoint_interface_48step);
+}
+
+static MACHINE_RESET( impctawp )
+{
+	memset(&duart_1, 0, sizeof(duart_1));
+
+	/* Reset states */
+	duart_1_irq = 0;
+
+	ROC10937_init(0, MSC1937,0);
+	ROC10937_reset(0);	/* reset display1 */
 }
 /*************************************
  *
@@ -1320,10 +1326,13 @@ static MACHINE_DRIVER_START( impctawp )
 
 	MDRV_QUANTUM_TIME(HZ(30000))
 
+	MDRV_MACHINE_START(impctawp)
 	MDRV_MACHINE_RESET(impctawp)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	
+	MDRV_TIMER_ADD( "duart_1_timer", duart_1_timer_event)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)

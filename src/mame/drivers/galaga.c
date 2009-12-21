@@ -893,23 +893,7 @@ static void bosco_latch_reset(running_machine *machine)
 		bosco_latch_w(space,i,0);
 }
 
-static MACHINE_RESET( bosco )
-{
-	/* Reset all latches */
-	bosco_latch_reset(machine);
-
-	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
-}
-
 static MACHINE_RESET( galaga )
-{
-	/* Reset all latches */
-	bosco_latch_reset(machine);
-
-	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
-}
-
-static MACHINE_RESET( xevious )
 {
 	/* Reset all latches */
 	bosco_latch_reset(machine);
@@ -919,22 +903,9 @@ static MACHINE_RESET( xevious )
 
 static MACHINE_RESET( battles )
 {
-	/* Reset all latches */
-	bosco_latch_reset(machine);
-
+	MACHINE_RESET_CALL(galaga);
 	battles_customio_init(machine);
-
-	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
-
-static MACHINE_RESET( digdug )
-{
-	/* Reset all latches */
-	bosco_latch_reset(machine);
-
-	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
-}
-
 
 
 /* the same memory map is used by all three CPUs; all RAM areas are shared */
@@ -1635,7 +1606,7 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_START(galaga)
-	MDRV_MACHINE_RESET(bosco)
+	MDRV_MACHINE_RESET(galaga)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1758,7 +1729,7 @@ static MACHINE_DRIVER_START( xevious )
 	MDRV_QUANTUM_TIME(HZ(60000))	/* 1000 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_START(galaga)
-	MDRV_MACHINE_RESET(xevious)
+	MDRV_MACHINE_RESET(galaga)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1800,6 +1771,8 @@ static MACHINE_DRIVER_START( battles )
 	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(battles_mem4)
 	MDRV_CPU_VBLANK_INT("screen", battles_interrupt_4)
+	
+	MDRV_TIMER_ADD("battles_nmi", battles_nmi_generate)
 
 	MDRV_MACHINE_RESET(battles)
 
@@ -1837,7 +1810,7 @@ static MACHINE_DRIVER_START( digdug )
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_START(galaga)
-	MDRV_MACHINE_RESET(digdug)
+	MDRV_MACHINE_RESET(galaga)
 
 	MDRV_ATARIVGEAROM_ADD("earom")
 

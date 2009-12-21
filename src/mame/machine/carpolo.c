@@ -262,6 +262,7 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 		
 		switch (player)
 		{
+			default:
 			case 0:	movement_flip_flop = ttl7474_1f_1;	dir_flip_flop = ttl7474_1f_2;	break;
 			case 1:	movement_flip_flop = ttl7474_1d_1;	dir_flip_flop = ttl7474_1d_2;	break;
 			case 2:	movement_flip_flop = ttl7474_1c_1;	dir_flip_flop = ttl7474_1c_2;	break;

@@ -78,34 +78,10 @@
 static UINT8 aimpos[2];
 static UINT8 trackball_old[2];
 
-static emu_timer *sound_nmi_timer;
 static UINT8 master_sound_latch;
 static UINT8 slave_sound_latch;
 static UINT8 sound_control;
 static UINT8 dac_value[2];
-
-
-
-/*************************************
- *
- *  Prototypes
- *
- *************************************/
-
-static TIMER_CALLBACK( master_sound_nmi_callback );
-
-
-
-/*************************************
- *
- *  System init
- *
- *************************************/
-
-static MACHINE_RESET( exterm )
-{
-	sound_nmi_timer = timer_alloc(machine, master_sound_nmi_callback, NULL);
-}
 
 
 
@@ -232,11 +208,11 @@ static WRITE16_HANDLER( sound_latch_w )
  *
  *************************************/
 
-static TIMER_CALLBACK( master_sound_nmi_callback )
+static TIMER_DEVICE_CALLBACK( master_sound_nmi_callback )
 {
 	/* bit 0 of the sound control determines if the NMI is actually delivered */
 	if (sound_control & 0x01)
-		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(timer->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -253,7 +229,7 @@ static WRITE8_HANDLER( sound_nmi_rate_w )
 	/* this value is latched into up-counters, which are clocked at the */
 	/* input clock / 256 */
 	attotime nmi_rate = attotime_mul(ATTOTIME_IN_HZ(4000000), 4096 * (256 - data));
-	timer_adjust_periodic(sound_nmi_timer, nmi_rate, 0, nmi_rate);
+	timer_device_adjust_periodic(devtag_get_device(space->machine, "snd_nmi_timer"), nmi_rate, 0, nmi_rate);
 }
 
 
@@ -488,8 +464,9 @@ static MACHINE_DRIVER_START( exterm )
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_RESET(exterm)
 	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	MDRV_TIMER_ADD("snd_nmi_timer", master_sound_nmi_callback)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(2048+32768)

@@ -109,7 +109,7 @@ VIDEO_EOF( mlc );
 
 extern UINT32 *mlc_vram, *mlc_clip_ram;
 static UINT32 *mlc_ram, *irq_ram;
-static emu_timer *raster_irq_timer;
+static const device_config *raster_irq_timer;
 static int mainCpuIsArm;
 static int mlc_raster_table[9][256];
 static UINT32 vbl_i;
@@ -174,10 +174,10 @@ static READ32_HANDLER( mlc_scanline_r )
 	return video_screen_get_vpos(space->machine->primary_screen);
 }
 
-static TIMER_CALLBACK( interrupt_gen )
+static TIMER_DEVICE_CALLBACK( interrupt_gen )
 {
 //  logerror("hit scanline IRQ %d (%08x)\n", video_screen_get_vpos(machine->primary_screen), info.i);
-	cputag_set_input_line(machine, "maincpu", mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
+	cputag_set_input_line(timer->machine, "maincpu", mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
 }
 
 static WRITE32_HANDLER( mlc_irq_w )
@@ -192,7 +192,7 @@ static WRITE32_HANDLER( mlc_irq_w )
 		cputag_set_input_line(space->machine, "maincpu", mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
 		return;
 	case 0x14: /* Prepare scanline interrupt */
-		timer_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(space->machine->primary_screen, irq_ram[0x14/4], 0),0);
+		timer_device_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(space->machine->primary_screen, irq_ram[0x14/4], 0),0);
 		//logerror("prepare scanline to fire at %d (currently on %d)\n", irq_ram[0x14/4], video_screen_get_vpos(space->machine->primary_screen));
 		return;
 	case 0x18:
@@ -379,7 +379,7 @@ GFXDECODE_END
 static MACHINE_RESET( mlc )
 {
 	vbl_i = 0xffffffff;
-	raster_irq_timer = timer_alloc(machine, interrupt_gen, NULL);
+	raster_irq_timer = devtag_get_device(machine, "int_timer");
 }
 
 static NVRAM_HANDLER( mlc )
@@ -409,6 +409,8 @@ static MACHINE_DRIVER_START( avengrgs )
 
 	MDRV_MACHINE_RESET(mlc)
 	MDRV_NVRAM_HANDLER(mlc) /* Actually 93c45 */
+	
+	MDRV_TIMER_ADD("int_timer", interrupt_gen)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -440,6 +442,8 @@ static MACHINE_DRIVER_START( mlc )
 
 	MDRV_MACHINE_RESET(mlc)
 	MDRV_NVRAM_HANDLER(mlc) /* Actually 93c45 */
+
+	MDRV_TIMER_ADD("int_timer", interrupt_gen)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

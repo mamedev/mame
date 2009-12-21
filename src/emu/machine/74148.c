@@ -68,7 +68,7 @@ INLINE ttl74148_state *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-	assert(device->type == ttl74148);
+	assert(device->type == TTL74148);
 
 	return (ttl74148_state *)device->token;
 }

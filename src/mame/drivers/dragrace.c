@@ -11,15 +11,15 @@ Atari Drag Race Driver
 #include "sound/discrete.h"
 
 
-static TIMER_CALLBACK( dragrace_frame_callback )
+static TIMER_DEVICE_CALLBACK( dragrace_frame_callback )
 {
-	dragrace_state *state = (dragrace_state *)machine->driver_data;
+	dragrace_state *state = (dragrace_state *)timer->machine->driver_data;
 	int i;
 	static const char *const portnames[] = { "P1", "P2" };
 
 	for (i = 0; i < 2; i++)
 	{
-		switch (input_port_read(machine, portnames[i]))
+		switch (input_port_read(timer->machine, portnames[i]))
 		{
 		case 0x01: state->gear[i] = 1; break;
 		case 0x02: state->gear[i] = 2; break;
@@ -30,7 +30,7 @@ static TIMER_CALLBACK( dragrace_frame_callback )
 	}
 
 	/* watchdog is disabled during service mode */
-	watchdog_enable(machine, input_port_read(machine, "IN0") & 0x20);
+	watchdog_enable(timer->machine, input_port_read(timer->machine, "IN0") & 0x20);
 }
 
 
@@ -328,8 +328,6 @@ static MACHINE_RESET( dragrace )
 {
 	dragrace_state *state = (dragrace_state *)machine->driver_data;
 
-	timer_pulse(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, dragrace_frame_callback);
-
 	state->misc_flags = 0;
 	state->gear[0] = 0;
 	state->gear[1] = 0;
@@ -348,6 +346,8 @@ static MACHINE_DRIVER_START( dragrace )
 
 	MDRV_MACHINE_START(dragrace)
 	MDRV_MACHINE_RESET(dragrace)
+	
+	MDRV_TIMER_ADD_PERIODIC("frame_timer", dragrace_frame_callback, HZ(60))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

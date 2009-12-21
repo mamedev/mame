@@ -164,7 +164,7 @@ static offs_t tms_offset_xor;
 static UINT8 analog_ports[4];
 static UINT8 framenum;
 
-static emu_timer *adsp_autobuffer_timer;
+static const device_config *adsp_autobuffer_timer;
 static UINT16 *adsp_control_regs;
 static UINT16 *adsp_fastram_base;
 static UINT8 adsp_ireg;
@@ -172,7 +172,6 @@ static offs_t adsp_ireg_base, adsp_incs, adsp_size;
 static const device_config *dmadac[SOUND_CHANNELS];
 
 static void adsp_tx_callback(const device_config *device, int port, INT32 data);
-static TIMER_CALLBACK( adsp_autobuffer_irq );
 
 
 /*************************************
@@ -180,6 +179,20 @@ static TIMER_CALLBACK( adsp_autobuffer_irq );
  *  Machine init
  *
  *************************************/
+
+static MACHINE_START( gaelco3d )
+{
+	/* Save state support */
+	state_save_register_global(machine, sound_data);
+	state_save_register_global(machine, sound_status);
+	state_save_register_global_array(machine, analog_ports);
+	state_save_register_global(machine, framenum);
+	state_save_register_global(machine, adsp_ireg);
+	state_save_register_global(machine, adsp_ireg_base);
+	state_save_register_global(machine, adsp_incs);
+	state_save_register_global(machine, adsp_size);
+}
+
 
 static MACHINE_RESET( common )
 {
@@ -197,7 +210,7 @@ static MACHINE_RESET( common )
 	}
 
 	/* allocate a timer for feeding the autobuffer */
-	adsp_autobuffer_timer = timer_alloc(machine, adsp_autobuffer_irq, NULL);
+	adsp_autobuffer_timer = devtag_get_device(machine, "adsp_timer");
 
 	memory_configure_bank(machine, "bank1", 0, 256, memory_region(machine, "user1"), 0x4000);
 	memory_set_bank(machine, "bank1", 0);
@@ -211,16 +224,6 @@ static MACHINE_RESET( common )
 		sprintf(buffer, "dac%d", i + 1);
 		dmadac[i] = devtag_get_device(machine, buffer);
 	}
-
-	/* Save state support */
-	state_save_register_global(machine, sound_data);
-	state_save_register_global(machine, sound_status);
-	state_save_register_global_array(machine, analog_ports);
-	state_save_register_global(machine, framenum);
-	state_save_register_global(machine, adsp_ireg);
-	state_save_register_global(machine, adsp_ireg_base);
-	state_save_register_global(machine, adsp_incs);
-	state_save_register_global(machine, adsp_size);
 }
 
 
@@ -228,7 +231,6 @@ static MACHINE_RESET( gaelco3d )
 {
 	MACHINE_RESET_CALL( common );
 	tms_offset_xor = 0;
-	state_save_register_global(machine, tms_offset_xor);
 }
 
 
@@ -236,7 +238,6 @@ static MACHINE_RESET( gaelco3d2 )
 {
 	MACHINE_RESET_CALL( common );
 	tms_offset_xor = BYTE_XOR_BE(0);
-	state_save_register_global(machine, tms_offset_xor);
 }
 
 
@@ -530,7 +531,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if ((data & 0x0800) == 0)
 			{
 				dmadac_enable(&dmadac[0], SOUND_CHANNELS, 0);
-				timer_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);
+				timer_device_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);
 			}
 			break;
 
@@ -539,7 +540,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if ((data & 0x0002) == 0)
 			{
 				dmadac_enable(&dmadac[0], SOUND_CHANNELS, 0);
-				timer_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);
+				timer_device_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);
 			}
 			break;
 
@@ -568,10 +569,10 @@ static WRITE16_HANDLER( adsp_rombank_w )
  *
  *************************************/
 
-static TIMER_CALLBACK( adsp_autobuffer_irq )
+static TIMER_DEVICE_CALLBACK( adsp_autobuffer_irq )
 {
 	/* get the index register */
-	int reg = cpu_get_reg(cputag_get_cpu(machine, "adsp"), ADSP2100_I0 + adsp_ireg);
+	int reg = cpu_get_reg(cputag_get_cpu(timer->machine, "adsp"), ADSP2100_I0 + adsp_ireg);
 
 	/* copy the current data into the buffer */
 // logerror("ADSP buffer: I%d=%04X incs=%04X size=%04X\n", adsp_ireg, reg, adsp_incs, adsp_size);
@@ -588,11 +589,11 @@ static TIMER_CALLBACK( adsp_autobuffer_irq )
 		reg = adsp_ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		generic_pulse_irq_line(cputag_get_cpu(machine, "adsp"), ADSP2105_IRQ1);
+		generic_pulse_irq_line(cputag_get_cpu(timer->machine, "adsp"), ADSP2105_IRQ1);
 	}
 
 	/* store it */
-	cpu_set_reg(cputag_get_cpu(machine, "adsp"), ADSP2100_I0 + adsp_ireg, reg);
+	cpu_set_reg(cputag_get_cpu(timer->machine, "adsp"), ADSP2100_I0 + adsp_ireg, reg);
 }
 
 
@@ -647,7 +648,7 @@ static void adsp_tx_callback(const device_config *device, int port, INT32 data)
 			/* fire off a timer wich will hit every half-buffer */
 			sample_period = attotime_div(attotime_mul(sample_period, adsp_size), SOUND_CHANNELS * adsp_incs);
 
-			timer_adjust_periodic(adsp_autobuffer_timer, sample_period, 0, sample_period);
+			timer_device_adjust_periodic(adsp_autobuffer_timer, sample_period, 0, sample_period);
 
 			return;
 		}
@@ -659,7 +660,7 @@ static void adsp_tx_callback(const device_config *device, int port, INT32 data)
 	dmadac_enable(&dmadac[0], SOUND_CHANNELS, 0);
 
 	/* remove timer */
-	timer_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);
+	timer_device_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);
 }
 
 
@@ -966,10 +967,13 @@ static MACHINE_DRIVER_START( gaelco3d )
 	MDRV_CPU_PROGRAM_MAP(adsp_program_map)
 	MDRV_CPU_DATA_MAP(adsp_data_map)
 
+	MDRV_MACHINE_START(gaelco3d)
 	MDRV_MACHINE_RESET(gaelco3d)
 	MDRV_NVRAM_HANDLER(93C66B)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
+
+	MDRV_TIMER_ADD("adsp_timer", adsp_autobuffer_irq)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

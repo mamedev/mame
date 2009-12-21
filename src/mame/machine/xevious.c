@@ -17,16 +17,12 @@
 
 ***************************************************************************/
 
-static emu_timer *nmi_timer;
-
 static UINT8 customio[16];
 static char battles_customio_command;
 static char battles_customio_prev_command;
 static char battles_customio_command_count;
 static char battles_customio_data;
 static char battles_sound_played;
-
-static TIMER_CALLBACK( battles_nmi_generate );
 
 
 void battles_customio_init(running_machine *machine)
@@ -36,11 +32,10 @@ void battles_customio_init(running_machine *machine)
 	battles_customio_command_count = 0;
 	battles_customio_data = 0;
 	battles_sound_played = 0;
-	nmi_timer = timer_alloc(machine, battles_nmi_generate, NULL);
 }
 
 
-static TIMER_CALLBACK( battles_nmi_generate )
+TIMER_DEVICE_CALLBACK( battles_nmi_generate )
 {
 
 	battles_customio_prev_command = battles_customio_command;
@@ -49,18 +44,18 @@ static TIMER_CALLBACK( battles_nmi_generate )
 	{
 		if( battles_customio_command_count == 0 )
 		{
-			cputag_set_input_line(machine, "sub3", INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(timer->machine, "sub3", INPUT_LINE_NMI, PULSE_LINE);
 		}
 		else
 		{
-			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-			cputag_set_input_line(machine, "sub3", INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(timer->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(timer->machine, "sub3", INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 	else
 	{
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
-		cputag_set_input_line(machine, "sub3", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(timer->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(timer->machine, "sub3", INPUT_LINE_NMI, PULSE_LINE);
 	}
 	battles_customio_command_count++;
 }
@@ -94,6 +89,8 @@ READ8_HANDLER( battles_customio3_r )
 
 WRITE8_HANDLER( battles_customio0_w )
 {
+	const device_config *timer = devtag_get_device(space->machine, "battles_nmi");
+
 	logerror("CPU0 %04x: custom I/O Write = %02x\n",cpu_get_pc(space->cpu),data);
 
 	battles_customio_command = data;
@@ -102,10 +99,10 @@ WRITE8_HANDLER( battles_customio0_w )
 	switch (data)
 	{
 		case 0x10:
-			timer_adjust_oneshot(nmi_timer, attotime_never, 0);
+			timer_device_adjust_oneshot(timer, attotime_never, 0);
 			return; /* nop */
 	}
-	timer_adjust_periodic(nmi_timer, ATTOTIME_IN_USEC(166), 0, ATTOTIME_IN_USEC(166));
+	timer_device_adjust_periodic(timer, ATTOTIME_IN_USEC(166), 0, ATTOTIME_IN_USEC(166));
 
 }
 

@@ -317,19 +317,22 @@ static DRIVER_INIT( konamigv )
 	psx_dma_install_write_handler(5, scsi_dma_write);
 }
 
-static MACHINE_RESET( konamigv )
+static MACHINE_START( konamigv )
 {
-	psx_machine_init(machine);
-
-	/* also hook up CDDA audio to the CD-ROM drive */
-	cdda_set_cdrom(devtag_get_device(machine, "cdda"), am53cf96_get_device(SCSI_ID_4));
-
 	state_save_register_global_array(machine, sector_buffer);
 	state_save_register_global(machine, flash_address);
 	state_save_register_global_array(machine, trackball_prev);
 	state_save_register_global_array(machine, trackball_data);
 	state_save_register_global_array(machine, btc_trackball_prev);
 	state_save_register_global_array(machine, btc_trackball_data);
+}
+
+static MACHINE_RESET( konamigv )
+{
+	psx_machine_init(machine);
+
+	/* also hook up CDDA audio to the CD-ROM drive */
+	cdda_set_cdrom(devtag_get_device(machine, "cdda"), am53cf96_get_device(SCSI_ID_4));
 }
 
 static void spu_irq(const device_config *device, UINT32 data)
@@ -351,6 +354,7 @@ static MACHINE_DRIVER_START( konamigv )
 	MDRV_CPU_PROGRAM_MAP( konamigv_map)
 	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
 
+	MDRV_MACHINE_START( konamigv )
 	MDRV_MACHINE_RESET( konamigv )
 	MDRV_NVRAM_HANDLER(konamigv_93C46)
 

@@ -16,6 +16,7 @@ Dip locations verified with manual
 #include "cpu/z80/z80.h"
 #include "includes/galaxian.h"
 #include "includes/galaxold.h"
+#include "machine/7474.h"
 
 static int noise_data = 0;
 
@@ -186,6 +187,11 @@ static MACHINE_DRIVER_START( dambustr )
 	MDRV_CPU_PROGRAM_MAP(dambustr_map)
 
 	MDRV_MACHINE_RESET(galaxold)
+
+	MDRV_7474_ADD("7474_9m_1", galaxold_7474_9m_1_callback)
+	MDRV_7474_ADD("7474_9m_2", galaxold_7474_9m_2_callback)
+	
+	MDRV_TIMER_ADD("int_timer", galaxold_interrupt_timer)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

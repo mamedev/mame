@@ -1247,6 +1247,8 @@ static MACHINE_DRIVER_START( scramble )
 	MDRV_7474_ADD("7474_9m_2", galaxold_7474_9m_2_callback)
 	MDRV_7474_ADD("konami_7474", scramble_sh_7474_callback)
 
+	MDRV_TIMER_ADD("int_timer", galaxold_interrupt_timer)
+
 	MDRV_MACHINE_RESET(scramble)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", scramble_ppi_0_intf )
@@ -1479,6 +1481,8 @@ static MACHINE_DRIVER_START( ad2083 )
 	MDRV_7474_ADD("7474_9m_1", galaxold_7474_9m_1_callback)
 	MDRV_7474_ADD("7474_9m_2", galaxold_7474_9m_2_callback)
 	MDRV_7474_ADD("konami_7474", scramble_sh_7474_callback)
+
+	MDRV_TIMER_ADD("int_timer", galaxold_interrupt_timer)
 
 	MDRV_MACHINE_RESET(galaxold)
 

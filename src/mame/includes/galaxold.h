@@ -98,6 +98,8 @@ WRITE8_HANDLER( galaxold_flip_screen_y_w );
 
 /*----------- defined in machine/galaxold.c -----------*/
 
+TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer );
+
 void galaxold_7474_9m_2_callback(const device_config *device);
 void galaxold_7474_9m_1_callback(const device_config *device);
 

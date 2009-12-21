@@ -12,7 +12,7 @@
 #include "includes/galaxold.h"
 
 static int irq_line;
-static emu_timer *int_timer;
+static const device_config *int_timer;
 
 static UINT8 _4in1_bank;
 
@@ -39,9 +39,9 @@ WRITE8_HANDLER( galaxold_nmi_enable_w )
 }
 
 
-static TIMER_CALLBACK( interrupt_timer )
+TIMER_DEVICE_CALLBACK( galaxold_interrupt_timer )
 {
-    const device_config *target = devtag_get_device(machine, "7474_9m_2");
+    const device_config *target = devtag_get_device(timer->machine, "7474_9m_2");
 
 	/* 128V, 64V and 32V go to D */
 	ttl7474_d_w(target, (param & 0xe0) != 0xe0);
@@ -51,7 +51,7 @@ static TIMER_CALLBACK( interrupt_timer )
 
 	param = (param + 0x10) & 0xff;
 
-	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(machine->primary_screen, param, 0), param);
+	timer_device_adjust_oneshot(int_timer, video_screen_get_time_until_pos(timer->machine->primary_screen, param, 0), param);
 
 	ttl7474_update(target);
 }
@@ -72,8 +72,8 @@ static void machine_reset_common(running_machine *machine, int line)
 	ttl7474_preset_w(ttl7474_9m_1, 0);
 
 	/* start a timer to generate interrupts */
-	int_timer = timer_alloc(machine, interrupt_timer, NULL);
-	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	int_timer = devtag_get_device(machine, "int_timer");
+	timer_device_adjust_oneshot(int_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 MACHINE_RESET( galaxold )
