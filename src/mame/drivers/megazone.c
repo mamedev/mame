@@ -19,8 +19,11 @@ To enter service mode, keep 1&2 pressed on reset
 extern UINT8 *megazone_scrollx;
 extern UINT8 *megazone_scrolly;
 
+extern UINT8 *megazone_videoram;
 extern UINT8 *megazone_videoram2;
+extern UINT8 *megazone_colorram;
 extern UINT8 *megazone_colorram2;
+extern size_t megazone_videoram_size;
 extern size_t megazone_videoram2_size;
 
 static int i8039_status;
@@ -98,9 +101,9 @@ static ADDRESS_MAP_START( megazone_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITEONLY AM_BASE(&megazone_scrolly)
 	AM_RANGE(0x1800, 0x1800) AM_WRITEONLY AM_BASE(&megazone_scrollx)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(&megazone_videoram) AM_SIZE(&megazone_videoram_size)
 	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE(&megazone_videoram2) AM_SIZE(&megazone_videoram2_size)
-	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE_GENERIC(colorram)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE(&megazone_colorram)
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE(&megazone_colorram2)
 	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("share1")

@@ -17,6 +17,8 @@
 
 
 
+UINT8 *matmania_videoram,*matmania_colorram;
+size_t matmania_videoram_size;
 UINT8 *matmania_videoram2,*matmania_colorram2;
 size_t matmania_videoram2_size;
 UINT8 *matmania_videoram3,*matmania_colorram3;
@@ -144,7 +146,7 @@ VIDEO_UPDATE( matmania )
 
 
 	/* Update the tiles in the left tile ram bank */
-	for (offs = screen->machine->generic.videoram_size - 1;offs >= 0;offs--)
+	for (offs = matmania_videoram_size - 1;offs >= 0;offs--)
 	{
 		int sx,sy;
 
@@ -153,8 +155,8 @@ VIDEO_UPDATE( matmania )
 		sy = offs % 32;
 
 		drawgfx_opaque(tmpbitmap,0,screen->machine->gfx[1],
-				screen->machine->generic.videoram.u8[offs] + ((screen->machine->generic.colorram.u8[offs] & 0x08) << 5),
-				(screen->machine->generic.colorram.u8[offs] & 0x30) >> 4,
+				matmania_videoram3[offs] + ((matmania_colorram[offs] & 0x08) << 5),
+				(matmania_colorram[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
 				16*sx,16*sy);
 	}
@@ -228,7 +230,7 @@ VIDEO_UPDATE( maniach )
 
 
 	/* Update the tiles in the left tile ram bank */
-	for (offs = screen->machine->generic.videoram_size - 1;offs >= 0;offs--)
+	for (offs = matmania_videoram_size - 1;offs >= 0;offs--)
 	{
 		int sx,sy;
 
@@ -237,8 +239,8 @@ VIDEO_UPDATE( maniach )
 		sy = offs % 32;
 
 		drawgfx_opaque(tmpbitmap,0,screen->machine->gfx[1],
-				screen->machine->generic.videoram.u8[offs] + ((screen->machine->generic.colorram.u8[offs] & 0x03) << 8),
-				(screen->machine->generic.colorram.u8[offs] & 0x30) >> 4,
+				matmania_videoram[offs] + ((matmania_colorram[offs] & 0x03) << 8),
+				(matmania_colorram[offs] & 0x30) >> 4,
 				0,sy >= 16,	/* flip horizontally tiles on the right half of the bitmap */
 				16*sx,16*sy);
 	}

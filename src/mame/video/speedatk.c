@@ -5,6 +5,8 @@
 *****************************************************************************************/
 #include "driver.h"
 
+UINT8 *speedatk_videoram;
+UINT8 *speedatk_colorram;
 static tilemap *bg_tilemap;
 
 /*
@@ -75,13 +77,13 @@ PALETTE_INIT( speedatk )
 
 WRITE8_HANDLER( speedatk_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	speedatk_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( speedatk_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	speedatk_colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -89,9 +91,9 @@ static TILE_GET_INFO( get_tile_info )
 {
 	int code, color, region;
 
-	code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0xe0) << 3);
-	color = machine->generic.colorram.u8[tile_index] & 0x1f;
-	region = (machine->generic.colorram.u8[tile_index] & 0x10) >> 4;
+	code = speedatk_videoram[tile_index] + ((speedatk_colorram[tile_index] & 0xe0) << 3);
+	color = speedatk_colorram[tile_index] & 0x1f;
+	region = (speedatk_colorram[tile_index] & 0x10) >> 4;
 
 	SET_TILE_INFO(region, code, color, 0);
 }

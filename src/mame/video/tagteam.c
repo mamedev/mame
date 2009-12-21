@@ -10,6 +10,8 @@
 
 static int palettebank;
 
+UINT8 *tagteam_videoram;
+UINT8 *tagteam_colorram;
 static tilemap *bg_tilemap;
 
 PALETTE_INIT( tagteam )
@@ -44,13 +46,13 @@ PALETTE_INIT( tagteam )
 
 WRITE8_HANDLER( tagteam_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	tagteam_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( tagteam_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	tagteam_colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -63,7 +65,7 @@ READ8_HANDLER( tagteam_mirrorvideoram_r )
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	return space->machine->generic.videoram.u8[offset];
+	return tagteam_videoram[offset];
 }
 
 READ8_HANDLER( tagteam_mirrorcolorram_r )
@@ -75,7 +77,7 @@ READ8_HANDLER( tagteam_mirrorcolorram_r )
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	return space->machine->generic.colorram.u8[offset];
+	return tagteam_colorram[offset];
 }
 
 WRITE8_HANDLER( tagteam_mirrorvideoram_w )
@@ -121,7 +123,7 @@ WRITE8_HANDLER( tagteam_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index] + 256 * machine->generic.colorram.u8[tile_index];
+	int code = tagteam_videoram[tile_index] + 256 * tagteam_colorram[tile_index];
 	int color = palettebank * 2; // GUESS
 
 	SET_TILE_INFO(0, code, color, 0);
@@ -139,15 +141,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 	for (offs = 0; offs < 0x20; offs += 4)
 	{
-		int spritebank = (machine->generic.videoram.u8[offs] & 0x30) << 4;
-		int code = machine->generic.videoram.u8[offs + 1] + 256 * spritebank;
+		int spritebank = (tagteam_videoram[offs] & 0x30) << 4;
+		int code = tagteam_videoram[offs + 1] + 256 * spritebank;
 		int color = 1 + 2 * palettebank; // GUESS
-		int flipx = machine->generic.videoram.u8[offs] & 0x04;
-		int flipy = machine->generic.videoram.u8[offs] & 0x02;
-		int sx = 240 - machine->generic.videoram.u8[offs + 3];
-		int sy = 240 - machine->generic.videoram.u8[offs + 2];
+		int flipx = tagteam_videoram[offs] & 0x04;
+		int flipy = tagteam_videoram[offs] & 0x02;
+		int sx = 240 - tagteam_videoram[offs + 3];
+		int sy = 240 - tagteam_videoram[offs + 2];
 
-		if (!(machine->generic.videoram.u8[offs] & 0x01)) continue;
+		if (!(tagteam_videoram[offs] & 0x01)) continue;
 
 		if (flip_screen_get(machine))
 		{
@@ -165,7 +167,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		/* Wrap around */
 
-		code = machine->generic.videoram.u8[offs + 0x20] + 256 * spritebank;
+		code = tagteam_videoram[offs + 0x20] + 256 * spritebank;
 		color = palettebank;
 		sy += (flip_screen_get(machine) ? -256 : 256);
 

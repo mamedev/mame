@@ -2,6 +2,8 @@
 
 static tilemap *bg_tilemap, *fg_tilemap;
 
+UINT8* mermaid_videoram;
+UINT8* mermaid_colorram;
 UINT8* mermaid_videoram2;
 UINT8* mermaid_bg_scrollram;
 UINT8* mermaid_fg_scrollram;
@@ -62,13 +64,13 @@ WRITE8_HANDLER( mermaid_videoram2_w )
 
 WRITE8_HANDLER( mermaid_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	mermaid_videoram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( mermaid_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	mermaid_colorram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -143,8 +145,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int attr = machine->generic.colorram.u8[tile_index];
-	int code = machine->generic.videoram.u8[tile_index] + ((attr & 0x30) << 4);
+	int attr = mermaid_colorram[tile_index];
+	int code = mermaid_videoram[tile_index] + ((attr & 0x30) << 4);
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0xc0) >> 6);
 

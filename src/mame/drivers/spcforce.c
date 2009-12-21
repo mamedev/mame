@@ -37,6 +37,8 @@ a000-a3ff   R/W X/Y scroll position of each character (can be scrolled up
 #include "sound/sn76496.h"
 
 
+extern UINT8 *spcforce_videoram;
+extern UINT8 *spcforce_colorram;
 extern UINT8 *spcforce_scrollram;
 
 WRITE8_HANDLER( spcforce_flip_screen_w );
@@ -91,8 +93,8 @@ static ADDRESS_MAP_START( spcforce_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x700b, 0x700b) AM_WRITE(spcforce_flip_screen_w)
 	AM_RANGE(0x700e, 0x700e) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x700f, 0x700f) AM_WRITENOP
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE_GENERIC(colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(&spcforce_videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE(&spcforce_colorram)
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_BASE(&spcforce_scrollram)
 ADDRESS_MAP_END
 

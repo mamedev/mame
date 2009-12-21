@@ -1,5 +1,7 @@
 #include "driver.h"
 
+UINT8 *solomon_videoram;
+UINT8 *solomon_colorram;
 UINT8 *solomon_videoram2;
 UINT8 *solomon_colorram2;
 
@@ -7,13 +9,13 @@ static tilemap *bg_tilemap, *fg_tilemap;
 
 WRITE8_HANDLER( solomon_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	solomon_colorram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( solomon_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	solomon_colorram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -50,8 +52,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int attr = machine->generic.colorram.u8[tile_index];
-	int code = machine->generic.videoram.u8[tile_index] + 256 * (attr & 0x07);
+	int attr = solomon_colorram[tile_index];
+	int code = solomon_colorram[tile_index] + 256 * (attr & 0x07);
 	int color = (attr & 0x70) >> 4;
 
 	SET_TILE_INFO(0, code, color, 0);

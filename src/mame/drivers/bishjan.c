@@ -42,6 +42,7 @@ To do:
                               Tilemaps Access
 ***************************************************************************/
 
+static UINT8	*bishjan_colorram;
 static UINT8	*bishjan_videoram_1_lo,	*bishjan_videoram_1_hi;
 static UINT8	*bishjan_videoram_2_lo,	*bishjan_videoram_2_hi;
 
@@ -227,7 +228,7 @@ static VIDEO_START(bishjan)
 
 	bishjan_videoram_2_hi = auto_alloc_array(machine, UINT8, 0x80 * 0x40);
 
-	machine->generic.colorram.u8 = auto_alloc_array(machine, UINT8, 256*3);
+	bishjan_colorram = auto_alloc_array(machine, UINT8, 256*3);
 }
 
 static VIDEO_UPDATE( bishjan )
@@ -282,11 +283,11 @@ static WRITE8_HANDLER(colordac_w)
 			break;
 
 		case 1:
-			space->machine->generic.colorram.u8[colordac_offs] = data;
+			bishjan_colorram[colordac_offs] = data;
 			palette_set_color_rgb(space->machine, colordac_offs/3,
-				pal6bit(space->machine->generic.colorram.u8[(colordac_offs/3)*3+0]),
-				pal6bit(space->machine->generic.colorram.u8[(colordac_offs/3)*3+1]),
-				pal6bit(space->machine->generic.colorram.u8[(colordac_offs/3)*3+2])
+				pal6bit(bishjan_colorram[(colordac_offs/3)*3+0]),
+				pal6bit(bishjan_colorram[(colordac_offs/3)*3+1]),
+				pal6bit(bishjan_colorram[(colordac_offs/3)*3+2])
 			);
 			colordac_offs = (colordac_offs+1) % (256*3);
 			break;

@@ -12,23 +12,25 @@
 #include "sound/2203intf.h"
 
 static tilemap *tmap;
+static UINT8 *colorram;
+static UINT8 *videoram;
 
 static WRITE8_HANDLER( cowrace_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(tmap, offset);
 }
 
 static WRITE8_HANDLER( cowrace_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	colorram[offset] = data;
 	tilemap_mark_tile_dirty(tmap, offset);
 }
 
 static TILE_GET_INFO( get_tile_info )
 {
-	UINT16 code = machine->generic.videoram.u8[ tile_index ] + (machine->generic.colorram.u8[ tile_index ] << 8) ;
-	UINT8 color = 0;//(machine->generic.colorram.u8[ tile_index ] & 0x3e)>>1;
+	UINT16 code = videoram[ tile_index ] + (colorram[ tile_index ] << 8) ;
+	UINT8 color = 0;//(colorram[ tile_index ] & 0x3e)>>1;
 
 	SET_TILE_INFO(1, code & 0x1ff, color, TILE_FLIPYX( 0 ));;
 }
@@ -90,8 +92,8 @@ static ADDRESS_MAP_START( mem_map_cowrace, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(cowrace_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(cowrace_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(cowrace_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(cowrace_colorram_w) AM_BASE(&colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map_cowrace, ADDRESS_SPACE_IO, 8 )

@@ -100,19 +100,21 @@
 *     Video Hardware     *
 *************************/
 
+static UINT8 *videoram;
+static UINT8 *colorram;
 static tilemap *bg_tilemap;
 
 
 static WRITE8_HANDLER( jokrwild_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 
 static WRITE8_HANDLER( jokrwild_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -124,8 +126,8 @@ static TILE_GET_INFO( get_bg_tile_info )
     xx-- ----   bank select.
     ---- xxxx   color code.
 */
-  	int attr = machine->generic.colorram.u8[tile_index];
-	int code = machine->generic.videoram.u8[tile_index] | ((attr & 0xc0) << 2);
+  	int attr = colorram[tile_index];
+	int code = videoram[tile_index] | ((attr & 0xc0) << 2);
 	int color = (attr & 0x0f);
 
 	SET_TILE_INFO( 0, code , color , 0);
@@ -176,9 +178,9 @@ static READ8_HANDLER( rng_r )
 *************************/
 
 static ADDRESS_MAP_START( jokrwild_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(jokrwild_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(jokrwild_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM //FIXME: backup RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(jokrwild_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(jokrwild_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x2400, 0x27ff) AM_RAM //stack RAM
  	AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w) //optical sensor is here

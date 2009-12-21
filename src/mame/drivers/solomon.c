@@ -10,6 +10,8 @@ driver by Mirko Buffoni
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
+extern UINT8 *solomon_videoram;
+extern UINT8 *solomon_colorram;
 extern UINT8 *solomon_videoram2;
 extern UINT8 *solomon_colorram2;
 
@@ -53,8 +55,8 @@ static READ8_HANDLER( solomon_0xe603_r )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(solomon_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(solomon_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(solomon_colorram_w) AM_BASE(&solomon_colorram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(solomon_videoram_w) AM_BASE(&solomon_videoram)
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(solomon_colorram2_w) AM_BASE(&solomon_colorram2)
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(solomon_videoram2_w) AM_BASE(&solomon_videoram2)
 	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)

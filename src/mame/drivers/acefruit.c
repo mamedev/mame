@@ -13,6 +13,9 @@ Inputs and Dip Switches by Stephh
 
 #include "sidewndr.lh"
 
+static UINT8 *colorram;
+static UINT8 *videoram;
+
 static void acefruit_update_irq(running_machine *machine, int vpos )
 {
 	int col;
@@ -21,7 +24,7 @@ static void acefruit_update_irq(running_machine *machine, int vpos )
 	for( col = 0; col < 32; col++ )
 	{
 		int tile_index = ( col * 32 ) + row;
-		int color = machine->generic.colorram.u8[ tile_index ];
+		int color = colorram[ tile_index ];
 
 		switch( color )
 		{
@@ -73,8 +76,8 @@ static VIDEO_UPDATE( acefruit )
 		for( col = 0; col < 32; col++ )
 		{
 			int tile_index = ( col * 32 ) + row;
-			int code = screen->machine->generic.videoram.u8[ tile_index ];
-			int color = screen->machine->generic.colorram.u8[ tile_index ];
+			int code = videoram[ tile_index ];
+			int color = colorram[ tile_index ];
 
 			if( color < 0x4 )
 			{
@@ -197,7 +200,7 @@ static CUSTOM_INPUT( starspnr_payout_r )
 
 static WRITE8_HANDLER( acefruit_colorram_w )
 {
-	space->machine->generic.colorram.u8[ offset ] = data & 0xf;
+	colorram[ offset ] = data & 0xf;
 }
 
 static WRITE8_HANDLER( acefruit_coin_w )
@@ -256,8 +259,8 @@ static PALETTE_INIT( acefruit )
 static ADDRESS_MAP_START( acefruit_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(acefruit_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(acefruit_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN2")

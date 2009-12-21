@@ -1,6 +1,8 @@
 #include "driver.h"
 
 
+UINT8 *sidepckt_videoram;
+UINT8 *sidepckt_colorram;
 static tilemap *bg_tilemap;
 static int flipscreen;
 
@@ -46,10 +48,10 @@ PALETTE_INIT( sidepckt )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	UINT8 attr = machine->generic.colorram.u8[tile_index];
+	UINT8 attr = sidepckt_colorram[tile_index];
 	SET_TILE_INFO(
 			0,
-			machine->generic.videoram.u8[tile_index] + ((attr & 0x07) << 8),
+			sidepckt_videoram[tile_index] + ((attr & 0x07) << 8),
 			((attr & 0x10) >> 3) | ((attr & 0x20) >> 5),
 			TILE_FLIPX);
 	tileinfo->group = (attr & 0x80) >> 7;
@@ -83,13 +85,13 @@ VIDEO_START( sidepckt )
 
 WRITE8_HANDLER( sidepckt_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	sidepckt_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( sidepckt_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	sidepckt_colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 

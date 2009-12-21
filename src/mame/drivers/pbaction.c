@@ -70,6 +70,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "machine/segacrpt.h"
 
 
+extern UINT8 *pbaction_videoram,*pbaction_colorram;
 extern UINT8 *pbaction_videoram2,*pbaction_colorram2;
 
 extern WRITE8_HANDLER( pbaction_videoram_w );
@@ -99,8 +100,8 @@ static ADDRESS_MAP_START( pbaction_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&work_ram)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(pbaction_videoram2_w) AM_BASE(&pbaction_videoram2)
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(pbaction_colorram2_w) AM_BASE(&pbaction_colorram2)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(pbaction_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(pbaction_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(pbaction_videoram_w) AM_BASE(&pbaction_videoram)
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(pbaction_colorram_w) AM_BASE(&pbaction_colorram)
 	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe400, 0xe5ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1") AM_WRITE(interrupt_enable_w)

@@ -165,8 +165,6 @@ struct _generic_pointers
 	UINT32					nvram_size;
 	generic_ptr				videoram;			/* videoram */
 	UINT32					videoram_size;
-	generic_ptr				colorram;			/* color ram */
-	UINT32					colorram_size;
 	generic_ptr				spriteram;			/* spriteram */
 	UINT32					spriteram_size;
 	generic_ptr				spriteram2;			/* secondary spriteram */

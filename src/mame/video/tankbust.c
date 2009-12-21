@@ -8,7 +8,10 @@
 *   variables
 */
 
+UINT8 * tankbust_videoram;
+UINT8 * tankbust_colorram;
 static tilemap *bg_tilemap;
+
 static tilemap *txt_tilemap;
 UINT8 * tankbust_txtram;
 
@@ -34,8 +37,8 @@ note:
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index];
-	int attr = machine->generic.colorram.u8[tile_index];
+	int code = tankbust_videoram[tile_index];
+	int attr = tankbust_colorram[tile_index];
 
 	int color = ((attr>>4) & 0x07);
 
@@ -101,22 +104,22 @@ VIDEO_START( tankbust )
 
 WRITE8_HANDLER( tankbust_background_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	tankbust_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 READ8_HANDLER( tankbust_background_videoram_r )
 {
-	return space->machine->generic.videoram.u8[offset];
+	return tankbust_videoram[offset];
 }
 
 WRITE8_HANDLER( tankbust_background_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	tankbust_colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 READ8_HANDLER( tankbust_background_colorram_r )
 {
-	return space->machine->generic.colorram.u8[offset];
+	return tankbust_colorram[offset];
 }
 
 WRITE8_HANDLER( tankbust_txtram_w )
@@ -235,7 +238,7 @@ VIDEO_UPDATE( tankbust )
 
 	for (i=0; i<0x800; i++)
 	{
-		int tile_attrib = screen->machine->generic.colorram.u8[i];
+		int tile_attrib = tankbust_colorram[i];
 
 		if ( (tile_attrib&8) || (tile_attrib&0x80) )
 		{

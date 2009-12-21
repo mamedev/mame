@@ -12,6 +12,8 @@ extern int sidearms_gameid;
 
 UINT8 *sidearms_bg_scrollx;
 UINT8 *sidearms_bg_scrolly;
+UINT8 *sidearms_videoram;
+UINT8 *sidearms_colorram;
 
 static UINT8 *tilerom;
 static int bgon, objon, staron, charon, flipon;
@@ -21,13 +23,13 @@ static tilemap *bg_tilemap, *fg_tilemap;
 
 WRITE8_HANDLER( sidearms_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	sidearms_videoram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( sidearms_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	sidearms_colorram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -128,8 +130,8 @@ static TILE_GET_INFO( get_philko_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int attr = machine->generic.colorram.u8[tile_index];
-	int code = machine->generic.videoram.u8[tile_index] + (attr<<2 & 0x300);
+	int attr = sidearms_colorram[tile_index];
+	int code = sidearms_videoram[tile_index] + (attr<<2 & 0x300);
 	int color = attr & 0x3f;
 
 	SET_TILE_INFO(0, code, color, 0);

@@ -42,6 +42,8 @@ Tomasz Slanina 20050225
 /* video */
 
 static UINT8 *vroulet_ball;
+static UINT8 *videoram;
+static UINT8 *colorram;
 static tilemap *bg_tilemap;
 
 static WRITE8_HANDLER(vroulet_paletteram_w)
@@ -66,20 +68,20 @@ static WRITE8_HANDLER(vroulet_paletteram_w)
 
 static WRITE8_HANDLER( vroulet_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( vroulet_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = machine->generic.colorram.u8[tile_index];
-	int code = machine->generic.videoram.u8[tile_index] + ((attr & 0xc0) << 2);
+	int attr = colorram[tile_index];
+	int code = videoram[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x1f;
 
 	SET_TILE_INFO(0, code, color, 0);
@@ -105,8 +107,8 @@ static ADDRESS_MAP_START( vroulet_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x8000, 0x8000) AM_NOP
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(vroulet_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(vroulet_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(vroulet_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(vroulet_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xa000, 0xa001) AM_RAM AM_BASE(&vroulet_ball)
 	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(vroulet_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc000, 0xc000) AM_NOP

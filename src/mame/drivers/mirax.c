@@ -75,6 +75,8 @@ The End
 
 static UINT8 nAyCtrl, nAyData;
 static UINT8 nmi_mask;
+static UINT8 *videoram;
+static UINT8 *colorram;
 
 static VIDEO_START(mirax)
 {
@@ -117,8 +119,8 @@ static VIDEO_UPDATE(mirax)
 	{
 		for (x=0;x<32;x++)
 		{
-			int tile = screen->machine->generic.videoram.u8[count];
-			int color = (screen->machine->generic.colorram.u8[x*2]<<8) | (screen->machine->generic.colorram.u8[(x*2)+1]);
+			int tile = videoram[count];
+			int color = (colorram[x*2]<<8) | (colorram[(x*2)+1]);
 			int x_scroll = (color & 0xff00)>>8;
 			tile |= ((color & 0xe0)<<3);
 
@@ -139,8 +141,8 @@ static VIDEO_UPDATE(mirax)
 	{
 		for (x=0;x<32;x++)
 		{
-			int tile = screen->machine->generic.videoram.u8[count];
-			int color = (screen->machine->generic.colorram.u8[x*2]<<8) | (screen->machine->generic.colorram.u8[(x*2)+1]);
+			int tile = videoram[count];
+			int color = (colorram[x*2]<<8) | (colorram[(x*2)+1]);
 			int x_scroll = (color & 0xff00)>>8;
 			tile |= ((color & 0xe0)<<3);
 
@@ -204,9 +206,9 @@ static WRITE8_HANDLER( mirax_sound_cmd_w )
 static ADDRESS_MAP_START( mirax_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc800, 0xd7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0xea00, 0xea3f) AM_RAM AM_BASE_GENERIC(colorram) //per-column color + bank bits for the videoram
+	AM_RANGE(0xea00, 0xea3f) AM_RAM AM_BASE(&colorram) //per-column color + bank bits for the videoram
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P1")
 	AM_RANGE(0xf100, 0xf100) AM_READ_PORT("P2")
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW1")

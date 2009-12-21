@@ -8,6 +8,8 @@
 
 #include "driver.h"
 
+UINT8 *popeye_videoram;
+UINT8 *popeye_colorram;
 UINT8 *popeye_background_pos;
 UINT8 *popeye_palettebank;
 static UINT8 *popeye_bitmapram;
@@ -173,13 +175,13 @@ static void set_background_palette(running_machine *machine,int bank)
 
 WRITE8_HANDLER( popeye_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	popeye_videoram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( popeye_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	popeye_colorram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -236,8 +238,8 @@ WRITE8_HANDLER( skyskipr_bitmap_w )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index];
-	int color = machine->generic.colorram.u8[tile_index] & 0x0f;
+	int code = popeye_videoram[tile_index];
+	int color = popeye_colorram[tile_index] & 0x0f;
 
 	SET_TILE_INFO(0, code, color, 0);
 }

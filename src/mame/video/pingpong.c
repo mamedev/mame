@@ -9,6 +9,8 @@
 #include "driver.h"
 
 static tilemap *bg_tilemap;
+UINT8 *pingpong_videoram;
+UINT8 *pingpong_colorram;
 
 
 /* This is strange; it's unlikely that the sprites actually have a hardware */
@@ -95,20 +97,20 @@ PALETTE_INIT( pingpong )
 
 WRITE8_HANDLER( pingpong_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	pingpong_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( pingpong_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	pingpong_colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = machine->generic.colorram.u8[tile_index];
-	int code = machine->generic.videoram.u8[tile_index] + ((attr & 0x20) << 3);
+	int attr = pingpong_colorram[tile_index];
+	int code = pingpong_videoram[tile_index] + ((attr & 0x20) << 3);
 	int color = attr & 0x1f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 

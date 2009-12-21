@@ -9,6 +9,8 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 
 #include "driver.h"
 
+UINT8 *ssozumo_videoram;
+UINT8 *ssozumo_colorram;
 UINT8 *ssozumo_videoram2;
 UINT8 *ssozumo_colorram2;
 
@@ -46,13 +48,13 @@ PALETTE_INIT( ssozumo )
 
 WRITE8_HANDLER( ssozumo_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	ssozumo_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( ssozumo_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	ssozumo_colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -113,8 +115,8 @@ WRITE8_HANDLER( ssozumo_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x08) << 5);
-	int color = (machine->generic.colorram.u8[tile_index] & 0x30) >> 4;
+	int code = ssozumo_videoram[tile_index] + ((ssozumo_colorram[tile_index] & 0x08) << 5);
+	int color = (ssozumo_colorram[tile_index] & 0x30) >> 4;
 	int flags = ((tile_index % 32) >= 16) ? TILE_FLIPY : 0;
 
 	SET_TILE_INFO(1, code, color, flags);

@@ -239,7 +239,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd840, 0xd85f) AM_BASE_GENERIC(spriteram2) AM_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xd000, 0xd85f) AM_RAM
 	AM_RANGE(0xe000, 0xe3ff) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)	/* Fallthrough */
-	AM_RANGE(0xe400, 0xe7ff) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe83f) AM_BASE(&wiz_attributesram)
 	AM_RANGE(0xe840, 0xe85f) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xe000, 0xe85f) AM_RAM

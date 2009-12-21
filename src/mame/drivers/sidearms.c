@@ -40,6 +40,8 @@ Notes:
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 
+extern UINT8 *sidearms_videoram;
+extern UINT8 *sidearms_colorram;
 extern UINT8 *sidearms_bg_scrollx;
 extern UINT8 *sidearms_bg_scrolly;
 
@@ -99,8 +101,8 @@ static ADDRESS_MAP_START( sidearms_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc808, 0xc809) AM_WRITEONLY AM_BASE(&sidearms_bg_scrollx)
 	AM_RANGE(0xc80a, 0xc80b) AM_WRITEONLY AM_BASE(&sidearms_bg_scrolly)
 	AM_RANGE(0xc80c, 0xc80c) AM_WRITE(sidearms_gfxctrl_w)	/* background and sprite enable */
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sidearms_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sidearms_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sidearms_videoram_w) AM_BASE(&sidearms_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sidearms_colorram_w) AM_BASE(&sidearms_colorram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
@@ -122,8 +124,8 @@ static ADDRESS_MAP_START( turtship_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe808, 0xe809) AM_WRITEONLY AM_BASE(&sidearms_bg_scrollx)
 	AM_RANGE(0xe80a, 0xe80b) AM_WRITEONLY AM_BASE(&sidearms_bg_scrolly)
 	AM_RANGE(0xe80c, 0xe80c) AM_WRITE(sidearms_gfxctrl_w)	/* background and sprite enable */
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(sidearms_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(sidearms_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(sidearms_videoram_w) AM_BASE(&sidearms_videoram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(sidearms_colorram_w) AM_BASE(&sidearms_colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sidearms_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -172,8 +174,8 @@ static ADDRESS_MAP_START( whizz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe805, 0xe805) AM_WRITE(sidearms_star_scrollx_w)
 	AM_RANGE(0xe806, 0xe806) AM_WRITE(sidearms_star_scrolly_w)
 	AM_RANGE(0xc80c, 0xc80c) AM_WRITE(sidearms_gfxctrl_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sidearms_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sidearms_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sidearms_videoram_w) AM_BASE(&sidearms_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sidearms_colorram_w) AM_BASE(&sidearms_colorram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END

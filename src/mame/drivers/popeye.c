@@ -21,6 +21,8 @@ Notes:
 #include "sound/ay8910.h"
 
 
+extern UINT8 *popeye_videoram;
+extern UINT8 *popeye_colorram;
 extern UINT8 *popeye_background_pos;
 extern UINT8 *popeye_palettebank;
 
@@ -86,8 +88,8 @@ static ADDRESS_MAP_START( skyskipr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE(&popeye_palettebank)
 	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x8e80, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_BASE(&popeye_videoram)
+	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_BASE(&popeye_colorram)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(skyskipr_bitmap_w)
 	AM_RANGE(0xe000, 0xe001) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
@@ -100,8 +102,8 @@ static ADDRESS_MAP_START( popeye_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE(&popeye_palettebank)
 	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x8e80, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_BASE(&popeye_videoram)
+	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_BASE(&popeye_colorram)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(popeye_bitmap_w)
 	AM_RANGE(0xe000, 0xe001) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
@@ -113,8 +115,8 @@ static ADDRESS_MAP_START( popeyebl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE(&popeye_palettebank)
 	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x8e80, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_BASE(&popeye_videoram)
+	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_BASE(&popeye_colorram)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(skyskipr_bitmap_w)
 	AM_RANGE(0xe000, 0xe01f) AM_ROM
 ADDRESS_MAP_END

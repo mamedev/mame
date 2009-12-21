@@ -8,6 +8,8 @@
 
 #include "driver.h"
 
+UINT8 *lvcards_videoram;
+UINT8 *lvcards_colorram;
 static tilemap *bg_tilemap;
 
 PALETTE_INIT( ponttehk )
@@ -82,20 +84,20 @@ PALETTE_INIT( lvcards ) //Ever so slightly different, but different enough.
 
 WRITE8_HANDLER( lvcards_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	lvcards_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( lvcards_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	lvcards_colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = machine->generic.colorram.u8[tile_index];
-	int code = machine->generic.videoram.u8[tile_index] + ((attr & 0x30) << 4) + ((attr & 0x80) << 3);
+	int attr = lvcards_colorram[tile_index];
+	int code = lvcards_videoram[tile_index] + ((attr & 0x30) << 4) + ((attr & 0x80) << 3);
 	int color = attr & 0x0f;
 	int flags = (attr & 0x40) ? TILE_FLIPX : 0;
 

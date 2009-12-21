@@ -9,6 +9,9 @@ Ping Pong (c) 1985 Konami
 #include "deprecat.h"
 #include "sound/sn76496.h"
 
+extern UINT8 *pingpong_videoram;
+extern UINT8 *pingpong_colorram;
+
 extern WRITE8_HANDLER( pingpong_videoram_w );
 extern WRITE8_HANDLER( pingpong_colorram_w );
 
@@ -94,8 +97,8 @@ static INTERRUPT_GEN( pingpong_interrupt )
 
 static ADDRESS_MAP_START( pingpong_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE(&pingpong_colorram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE(&pingpong_videoram)
 	AM_RANGE(0x9000, 0x9002) AM_RAM
 	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x9053, 0x97ff) AM_RAM
@@ -115,8 +118,8 @@ static ADDRESS_MAP_START( merlinmm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5400, 0x57ff) AM_RAM
 	AM_RANGE(0x6000, 0x6007) AM_WRITENOP /* solenoid writes */
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN4")
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE(&pingpong_colorram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE(&pingpong_videoram)
 	AM_RANGE(0x9000, 0x9002) AM_RAM
 	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x9053, 0x97ff) AM_RAM

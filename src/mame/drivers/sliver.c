@@ -90,6 +90,7 @@ static int jpeg_y=0;
 static int tmp_counter;
 static int clr_offset=0;
 
+static UINT8 *colorram;
 static bitmap_t *sliver_bitmap_fg;
 static bitmap_t *sliver_bitmap_bg;
 
@@ -183,7 +184,7 @@ static WRITE16_HANDLER( sliver_RAMDAC_offset_w )
 
 static WRITE16_HANDLER( sliver_RAMDAC_color_w )
 {
-	space->machine->generic.colorram.u8[clr_offset]=data;
+	colorram[clr_offset]=data;
 	clr_offset=(clr_offset+1)%768;
 }
 
@@ -214,9 +215,9 @@ static void plot_pixel_pal(running_machine *machine, int x, int y, int addr)
 	if(y<0 ||x<0 || x>383 || y> 255) return;
 	addr*=3;
 
-	b=machine->generic.colorram.u8[addr]<<2;
-	g=machine->generic.colorram.u8[addr+1]<<2;
-	r=machine->generic.colorram.u8[addr+2]<<2;
+	b=colorram[addr]<<2;
+	g=colorram[addr+1]<<2;
+	r=colorram[addr+2]<<2;
 
 	if (sliver_bitmap_fg->bpp == 32)
 	{
@@ -590,7 +591,7 @@ ROM_END
 static DRIVER_INIT(sliver)
 {
 	jpeg_addr = -1;
-	machine->generic.colorram.u8=auto_alloc_array(machine, UINT8, 256*3);
+	colorram=auto_alloc_array(machine, UINT8, 256*3);
 }
 
 GAME( 1996, sliver, 0,        sliver, sliver, sliver, ROT0,  "Hollow Corp", "Sliver", GAME_IMPERFECT_GRAPHICS )

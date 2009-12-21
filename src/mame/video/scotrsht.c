@@ -2,6 +2,8 @@
 
 UINT8 *scotrsht_scroll;
 
+UINT8 *scotrsht_videoram;
+UINT8 *scotrsht_colorram;
 static tilemap *bg_tilemap;
 static int scotrsht_charbank = 0;
 static int scotrsht_palette_bank = 0;
@@ -42,13 +44,13 @@ PALETTE_INIT( scotrsht )
 
 WRITE8_HANDLER( scotrsht_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	scotrsht_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( scotrsht_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	scotrsht_colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -80,8 +82,8 @@ WRITE8_HANDLER( scotrsht_palettebank_w )
 
 static TILE_GET_INFO( scotrsht_get_bg_tile_info )
 {
-	int attr = machine->generic.colorram.u8[tile_index];
-	int code = machine->generic.videoram.u8[tile_index] + (scotrsht_charbank << 9) + ((attr & 0x40) << 2);
+	int attr = scotrsht_colorram[tile_index];
+	int code = scotrsht_videoram[tile_index] + (scotrsht_charbank << 9) + ((attr & 0x40) << 2);
 	int color = (attr & 0x0f) + scotrsht_palette_bank * 16;
 	int flag = 0;
 

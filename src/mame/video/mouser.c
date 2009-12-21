@@ -15,6 +15,9 @@
 
 #include "driver.h"
 
+UINT8 *mouser_videoram;
+UINT8 *mouser_colorram;
+
 PALETTE_INIT( mouser )
 {
 	int i;
@@ -61,7 +64,7 @@ VIDEO_UPDATE( mouser )
 	int flipx,flipy;
 
 	/* for every character in the Video RAM  */
-	for (offs = screen->machine->generic.videoram_size - 1;offs >= 0;offs--)
+	for (offs = 0x3ff; offs >= 0; offs--)
 	{
 		int scrolled_y_position;
 		int color_offs;
@@ -89,8 +92,8 @@ VIDEO_UPDATE( mouser )
 		color_offs = offs%32 + ((256 + 8*(offs/32) - spriteram[offs%32])%256)/8*32;
 
 		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
-				screen->machine->generic.videoram.u8[offs] | (screen->machine->generic.colorram.u8[color_offs]>>5)*256 | ((screen->machine->generic.colorram.u8[color_offs]>>4)&1)*512,
-				screen->machine->generic.colorram.u8[color_offs]%16,
+				mouser_videoram[offs] | (mouser_colorram[color_offs]>>5)*256 | ((mouser_colorram[color_offs]>>4)&1)*512,
+				mouser_colorram[color_offs]%16,
 				flip_screen_x_get(screen->machine),flip_screen_y_get(screen->machine),
 				8*sx,scrolled_y_position);
 	}

@@ -23,10 +23,12 @@
 #include "cardline.lh"
 
 static int cardline_video;
+static UINT8 *videoram;
+static UINT8 *colorram;
 
 #define DRAW_TILE(machine, offset, transparency) drawgfx_transpen(bitmap, cliprect, machine->gfx[0],\
-					(machine->generic.videoram.u8[index+offset] | (machine->generic.colorram.u8[index+offset]<<8))&0x3fff,\
-					(machine->generic.colorram.u8[index+offset]&0x80)>>7,\
+					(videoram[index+offset] | (colorram[index+offset]<<8))&0x3fff,\
+					(colorram[index+offset]&0x80)>>7,\
 					0,0,\
 					x<<3, y<<3,\
 					transparency?transparency:-1);
@@ -59,13 +61,13 @@ static VIDEO_UPDATE( cardline )
 static WRITE8_HANDLER(vram_w)
 {
 	offset+=0x1000*((cardline_video&2)>>1);
-	space->machine->generic.videoram.u8[offset]=data;
+	videoram[offset]=data;
 }
 
 static WRITE8_HANDLER(attr_w)
 {
 	offset+=0x1000*((cardline_video&2)>>1);
-	space->machine->generic.colorram.u8[offset]=data;
+	colorram[offset]=data;
 }
 
 static WRITE8_HANDLER(video_w)
@@ -111,8 +113,8 @@ static ADDRESS_MAP_START( mem_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2840, 0x2840) AM_NOP
 	AM_RANGE(0x2880, 0x2880) AM_NOP
 	AM_RANGE(0x3003, 0x3003) AM_NOP
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(vram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(attr_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(vram_w) AM_BASE(&videoram)
+	AM_RANGE(0xe000, 0xffff) AM_WRITE(attr_w) AM_BASE(&colorram)
 	/* Ports */
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(unk_r, video_w)
 ADDRESS_MAP_END

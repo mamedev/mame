@@ -13,6 +13,8 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
+extern UINT8 *ssozumo_videoram;
+extern UINT8 *ssozumo_colorram;
 extern UINT8 *ssozumo_videoram2;
 extern UINT8 *ssozumo_colorram2;
 
@@ -40,8 +42,8 @@ static ADDRESS_MAP_START( ssozumo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0780, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ssozumo_videoram2_w) AM_BASE(&ssozumo_videoram2)
 	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ssozumo_colorram2_w) AM_BASE(&ssozumo_colorram2)
-	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE(ssozumo_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x3200, 0x33ff) AM_RAM_WRITE(ssozumo_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE(ssozumo_videoram_w) AM_BASE(&ssozumo_videoram)
+	AM_RANGE(0x3200, 0x33ff) AM_RAM_WRITE(ssozumo_colorram_w) AM_BASE(&ssozumo_colorram)
 	AM_RANGE(0x3400, 0x35ff) AM_RAM
 	AM_RANGE(0x3600, 0x37ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITE(ssozumo_flipscreen_w)

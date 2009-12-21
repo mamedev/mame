@@ -9,6 +9,8 @@
 ** variables
 */
 UINT8 *tsamurai_videoram;
+UINT8 *tsamurai_colorram;
+UINT8 *tsamurai_bg_videoram;
 static int bgcolor;
 static int textbank1, textbank2;
 
@@ -23,8 +25,8 @@ static tilemap *background, *foreground;
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 attributes = tsamurai_videoram[2*tile_index+1];
-	int tile_number = tsamurai_videoram[2*tile_index];
+	UINT8 attributes = tsamurai_bg_videoram[2*tile_index+1];
+	int tile_number = tsamurai_bg_videoram[2*tile_index];
 	tile_number += (( attributes & 0xc0 ) >> 6 ) * 256;	 /* legacy */
 	tile_number += (( attributes & 0x20 ) >> 5 ) * 1024; /* Mission 660 add-on*/
 	SET_TILE_INFO(
@@ -36,13 +38,13 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int tile_number = machine->generic.videoram.u8[tile_index];
+	int tile_number = tsamurai_videoram[tile_index];
 	if (textbank1 & 0x01) tile_number += 256; /* legacy */
 	if (textbank2 & 0x01) tile_number += 512; /* Mission 660 add-on */
 	SET_TILE_INFO(
 			1,
 			tile_number,
-			machine->generic.colorram.u8[((tile_index&0x1f)*2)+1] & 0x1f,
+			tsamurai_colorram[((tile_index&0x1f)*2)+1] & 0x1f,
 			0);
 }
 
@@ -104,20 +106,20 @@ WRITE8_HANDLER( tsamurai_textbank2_w )
 
 WRITE8_HANDLER( tsamurai_bg_videoram_w )
 {
-	tsamurai_videoram[offset]=data;
+	tsamurai_bg_videoram[offset]=data;
 	offset = offset/2;
 	tilemap_mark_tile_dirty(background,offset);
 }
 WRITE8_HANDLER( tsamurai_fg_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset]=data;
+	tsamurai_videoram[offset]=data;
 	tilemap_mark_tile_dirty(foreground,offset);
 }
 WRITE8_HANDLER( tsamurai_fg_colorram_w )
 {
-	if( space->machine->generic.colorram.u8[offset]!=data )
+	if( tsamurai_colorram[offset]!=data )
 	{
-		space->machine->generic.colorram.u8[offset]=data;
+		tsamurai_colorram[offset]=data;
 		if (offset & 1)
 		{
 			int col = offset/2;
@@ -203,7 +205,7 @@ VIDEO_UPDATE( tsamurai )
 	tilemap_set_scroll_cols(foreground, 32);
 	for (i = 0 ; i < 32 ; i++)
 	{
-		tilemap_set_scrolly(foreground, i, screen->machine->generic.colorram.u8[i*2]);
+		tilemap_set_scrolly(foreground, i, tsamurai_colorram[i*2]);
 	}
 /* end of column scroll code */
 
@@ -242,7 +244,7 @@ WRITE8_HANDLER( vsgongf_color_w )
 
 static TILE_GET_INFO( get_vsgongf_tile_info )
 {
-	int tile_number = machine->generic.videoram.u8[tile_index];
+	int tile_number = tsamurai_videoram[tile_index];
 	int color = vsgongf_color&0x1f;
 	if( textbank1 ) tile_number += 0x100;
 	SET_TILE_INFO(

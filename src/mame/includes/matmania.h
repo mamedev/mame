@@ -16,6 +16,8 @@ READ8_HANDLER( maniach_mcu_status_r );
 
 /*----------- defined in video/matmania.c -----------*/
 
+extern UINT8 *matmania_videoram,*matmania_colorram;
+extern size_t matmania_videoram_size;
 extern UINT8 *matmania_videoram2,*matmania_colorram2;
 extern size_t matmania_videoram2_size;
 extern UINT8 *matmania_videoram3,*matmania_colorram3;

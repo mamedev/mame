@@ -11,6 +11,8 @@
 
 static int palettebank;
 
+UINT8 *mikie_videoram;
+UINT8 *mikie_colorram;
 static tilemap *bg_tilemap;
 
 /***************************************************************************
@@ -92,13 +94,13 @@ PALETTE_INIT( mikie )
 
 WRITE8_HANDLER( mikie_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	mikie_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( mikie_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	mikie_colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -122,9 +124,9 @@ WRITE8_HANDLER( mikie_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x20) << 3);
-	int color = (machine->generic.colorram.u8[tile_index] & 0x0f) + 16 * palettebank;
-	int flags = ((machine->generic.colorram.u8[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((machine->generic.colorram.u8[tile_index] & 0x80) ? TILE_FLIPY : 0);
+	int code = mikie_videoram[tile_index] + ((mikie_colorram[tile_index] & 0x20) << 3);
+	int color = (mikie_colorram[tile_index] & 0x0f) + 16 * palettebank;
+	int flags = ((mikie_colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((mikie_colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(0, code, color, flags);
 }

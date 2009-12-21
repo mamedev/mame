@@ -8,6 +8,8 @@
 
 #include "driver.h"
 
+UINT8 *mrjong_videoram;
+UINT8 *mrjong_colorram;
 static tilemap *bg_tilemap;
 
 /***************************************************************************
@@ -68,13 +70,13 @@ PALETTE_INIT( mrjong )
 ***************************************************************************/
 WRITE8_HANDLER( mrjong_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	mrjong_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( mrjong_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	mrjong_colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -89,9 +91,9 @@ WRITE8_HANDLER( mrjong_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index] | ((machine->generic.colorram.u8[tile_index] & 0x20) << 3);
-	int color = machine->generic.colorram.u8[tile_index] & 0x1f;
-	int flags = ((machine->generic.colorram.u8[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((machine->generic.colorram.u8[tile_index] & 0x80) ? TILE_FLIPY : 0);
+	int code = mrjong_videoram[tile_index] | ((mrjong_colorram[tile_index] & 0x20) << 3);
+	int color = mrjong_colorram[tile_index] & 0x1f;
+	int flags = ((mrjong_colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((mrjong_colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(0, code, color, flags);
 }
@@ -115,13 +117,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int sx, sy;
 		int flipx, flipy;
 
-		sprt = (((machine->generic.videoram.u8[offs + 1] >> 2) & 0x3f) | ((machine->generic.videoram.u8[offs + 3] & 0x20) << 1));
-		flipx = (machine->generic.videoram.u8[offs + 1] & 0x01) >> 0;
-		flipy = (machine->generic.videoram.u8[offs + 1] & 0x02) >> 1;
-		color = (machine->generic.videoram.u8[offs + 3] & 0x1f);
+		sprt = (((mrjong_videoram[offs + 1] >> 2) & 0x3f) | ((mrjong_videoram[offs + 3] & 0x20) << 1));
+		flipx = (mrjong_videoram[offs + 1] & 0x01) >> 0;
+		flipy = (mrjong_videoram[offs + 1] & 0x02) >> 1;
+		color = (mrjong_videoram[offs + 3] & 0x1f);
 
-		sx = 224 - machine->generic.videoram.u8[offs + 2];
-		sy = machine->generic.videoram.u8[offs + 0];
+		sx = 224 - mrjong_videoram[offs + 2];
+		sy = mrjong_videoram[offs + 0];
 		if (flip_screen_get(machine))
 		{
 			sx = 208 - sx;

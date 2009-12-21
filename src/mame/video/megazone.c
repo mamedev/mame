@@ -13,8 +13,11 @@ UINT8 *megazone_scrollx;
 UINT8 *megazone_scrolly;
 static int flipscreen;
 
+UINT8 *megazone_videoram;
+UINT8 *megazone_colorram;
 UINT8 *megazone_videoram2;
 UINT8 *megazone_colorram2;
+size_t megazone_videoram_size;
 size_t megazone_videoram2_size;
 
 /***************************************************************************
@@ -119,14 +122,14 @@ VIDEO_UPDATE( megazone )
 	int x,y;
 
 	/* for every character in the Video RAM */
-	for (offs = screen->machine->generic.videoram_size - 1;offs >= 0;offs--)
+	for (offs = megazone_videoram_size - 1;offs >= 0;offs--)
 	{
 		int sx,sy,flipx,flipy;
 
 		sx = offs % 32;
 		sy = offs / 32;
-		flipx = screen->machine->generic.colorram.u8[offs] & (1<<6);
-		flipy = screen->machine->generic.colorram.u8[offs] & (1<<5);
+		flipx = megazone_colorram[offs] & (1<<6);
+		flipy = megazone_colorram[offs] & (1<<5);
 		if (flipscreen)
 		{
 			sx = 31 - sx;
@@ -136,8 +139,8 @@ VIDEO_UPDATE( megazone )
 		}
 
 		drawgfx_opaque(screen->machine->generic.tmpbitmap,0,screen->machine->gfx[1],
-				((int)screen->machine->generic.videoram.u8[offs]) + ((screen->machine->generic.colorram.u8[offs] & (1<<7) ? 256 : 0) ),
-				(screen->machine->generic.colorram.u8[offs] & 0x0f) + 0x10,
+				((int)megazone_videoram[offs]) + ((megazone_colorram[offs] & (1<<7) ? 256 : 0) ),
+				(megazone_colorram[offs] & 0x0f) + 0x10,
 				flipx,flipy,
 				8*sx,8*sy);
 	}

@@ -49,14 +49,17 @@ Some debug tricks (let's test this CPU as more as possible):
 
 static UINT8 *hitpoker_sys_regs;
 static UINT8 hitpoker_pic_data;
+static UINT8 *videoram;
+static UINT8 *paletteram;
+static UINT8 *colorram;
 
 #define CRTC_CLOCK XTAL_3_579545MHz
 
 static VIDEO_START(hitpoker)
 {
-	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 0x35ff);
-	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x1000);
-	machine->generic.colorram.u8 = auto_alloc_array(machine, UINT8, 0x2000);
+	videoram = auto_alloc_array(machine, UINT8, 0x35ff);
+	paletteram = auto_alloc_array(machine, UINT8, 0x1000);
+	colorram = auto_alloc_array(machine, UINT8, 0x2000);
 }
 
 static VIDEO_UPDATE(hitpoker)
@@ -72,9 +75,9 @@ static VIDEO_UPDATE(hitpoker)
 		{
 			int tile,color,gfx_bpp;
 
-			tile = (((screen->machine->generic.videoram.u8[count]<<8)|(screen->machine->generic.videoram.u8[count+1])) & 0x3fff);
-			gfx_bpp = (screen->machine->generic.colorram.u8[count] & 0x80)>>7; //flag between 4 and 8 bpp
-			color = gfx_bpp ? ((screen->machine->generic.colorram.u8[count] & 0x70)>>4) : (screen->machine->generic.colorram.u8[count] & 0xf);
+			tile = (((videoram[count]<<8)|(videoram[count+1])) & 0x3fff);
+			gfx_bpp = (colorram[count] & 0x80)>>7; //flag between 4 and 8 bpp
+			color = gfx_bpp ? ((colorram[count] & 0x70)>>4) : (colorram[count] & 0xf);
 
 			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[gfx_bpp],tile,color,0,0,x*8,y*8);
 
@@ -90,7 +93,7 @@ static READ8_HANDLER( hitpoker_vram_r )
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
 	if(hitpoker_pic_data & 0x10)
-		return space->machine->generic.videoram.u8[offset];
+		return videoram[offset];
 	else
 		return ROM[offset+0x8000];
 }
@@ -100,7 +103,7 @@ static WRITE8_HANDLER( hitpoker_vram_w )
 //  UINT8 *ROM = memory_region(space->machine, "maincpu");
 
 //  if(hitpoker_sys_regs[0x00] & 0x10)
-	space->machine->generic.videoram.u8[offset] = data;
+	videoram[offset] = data;
 }
 
 static READ8_HANDLER( hitpoker_cram_r )
@@ -108,14 +111,14 @@ static READ8_HANDLER( hitpoker_cram_r )
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
 	if(hitpoker_pic_data & 0x10)
-		return space->machine->generic.colorram.u8[offset];
+		return colorram[offset];
 	else
 		return ROM[offset+0xc000];
 }
 
 static WRITE8_HANDLER( hitpoker_cram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	colorram[offset] = data;
 }
 
 static READ8_HANDLER( hitpoker_paletteram_r )
@@ -123,7 +126,7 @@ static READ8_HANDLER( hitpoker_paletteram_r )
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
 	if(hitpoker_pic_data & 0x10)
-		return space->machine->generic.paletteram.u8[offset];
+		return paletteram[offset];
 	else
 		return ROM[offset+0xe000];
 }
@@ -131,9 +134,9 @@ static READ8_HANDLER( hitpoker_paletteram_r )
 static WRITE8_HANDLER( hitpoker_paletteram_w )
 {
 	int r,g,b,datax;
-	space->machine->generic.paletteram.u8[offset] = data;
+	paletteram[offset] = data;
 	offset>>=1;
-	datax=256*space->machine->generic.paletteram.u8[offset*2]+space->machine->generic.paletteram.u8[offset*2+1];
+	datax=256*paletteram[offset*2]+paletteram[offset*2+1];
 
 	/* RGB565 */
 	b = ((datax)&0xf800)>>11;

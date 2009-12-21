@@ -18,6 +18,9 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 
+extern UINT8 *liberate_videoram;
+extern UINT8 *liberate_colorram;
+
 PALETTE_INIT( liberate );
 VIDEO_UPDATE( prosoccr );
 VIDEO_UPDATE( prosport );
@@ -56,8 +59,8 @@ static READ8_HANDLER( deco16_bank_r )
 		return ROM[offset];
 
 	/* Else the handler falls through to read the usual address */
-	if (offset<0x400) return space->machine->generic.colorram.u8[offset];
-	if (offset<0x800) return space->machine->generic.videoram.u8[offset-0x400];
+	if (offset<0x400) return liberate_colorram[offset];
+	if (offset<0x800) return liberate_videoram[offset-0x400];
 	if (offset<0x1000) return space->machine->generic.spriteram.u8[offset-0x800];
 	if (offset<0x2200) { logerror("%04x: Unmapped bank read %04x\n",cpu_get_pc(space->cpu),offset); return 0; }
 	if (offset<0x2800) return scratchram[offset-0x2200];
@@ -99,9 +102,9 @@ static READ8_HANDLER( prosoccr_bank_r )
 		return ROM[offset];
 
 	/* Else the handler falls through to read the usual address */
-	if (offset<0x400) return space->machine->generic.colorram.u8[offset];
-	if (offset<0x800) return space->machine->generic.videoram.u8[offset-0x400];
-	if (offset<0xc00) return space->machine->generic.colorram.u8[offset-0x800];
+	if (offset<0x400) return liberate_colorram[offset];
+	if (offset<0x800) return liberate_videoram[offset-0x400];
+	if (offset<0xc00) return liberate_colorram[offset-0x800];
 	if (offset<0x1000) return space->machine->generic.spriteram.u8[offset-0xc00];
 	if (offset<0x2200) { logerror("%04x: Unmapped bank read %04x\n",cpu_get_pc(space->cpu),offset); return 0; }
 	if (offset<0x2800) return scratchram[offset-0x2200];
@@ -246,8 +249,8 @@ static ADDRESS_MAP_START( prosport_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(prosport_bg_vram_w) AM_BASE(&prosport_bg_vram)
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(prosport_charram_r,prosport_charram_w) //0x1e00-0x1fff isn't charram!
  	AM_RANGE(0x2400, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(liberate_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(liberate_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(liberate_colorram_w) AM_BASE(&liberate_colorram)
+	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(liberate_videoram_w) AM_BASE(&liberate_videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x8000, 0x800f) AM_WRITE(prosport_io_w)
 	AM_RANGE(0x8000, 0x800f) AM_ROMBANK("bank1")
@@ -258,8 +261,8 @@ static ADDRESS_MAP_START( liberate_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(liberate_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(liberate_colorram_w) AM_BASE(&liberate_colorram)
+	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE(&liberate_videoram)
 	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x6200, 0x67ff) AM_RAM AM_BASE(&scratchram)
 	AM_RANGE(0x8000, 0x800f) AM_WRITE(deco16_io_w)
@@ -271,8 +274,8 @@ static ADDRESS_MAP_START( prosoccr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(prosoccr_bank_r)
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x800) AM_WRITE(liberate_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x800) AM_WRITE(liberate_colorram_w) AM_BASE(&liberate_colorram)
+	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE(&liberate_videoram)
 	AM_RANGE(0x4c00, 0x4fff) AM_WRITEONLY AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x6200, 0x67ff) AM_RAM AM_BASE(&scratchram)
 	AM_RANGE(0x8000, 0x97ff) AM_READWRITE(prosoccr_charram_r,prosoccr_charram_w)
@@ -295,8 +298,8 @@ static ADDRESS_MAP_START( liberatb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(liberate_colorram_w) AM_BASE_GENERIC(colorram)
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(liberate_colorram_w) AM_BASE(&liberate_colorram)
+	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE(&liberate_videoram)
 	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x6200, 0x67ff) AM_WRITEONLY AM_BASE(&scratchram)
 	AM_RANGE(0xf000, 0xf00f) AM_WRITE(deco16_io_w)

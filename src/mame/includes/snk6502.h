@@ -41,6 +41,8 @@ DISCRETE_SOUND_EXTERN( fantasy );
 
 /*----------- defined in video/snk6502.c -----------*/
 
+extern UINT8 *snk6502_videoram;
+extern UINT8 *snk6502_colorram;
 extern UINT8 *snk6502_videoram2;
 extern UINT8 *snk6502_charram;
 

@@ -38,6 +38,8 @@ Stephh's notes (based on the game M6502 code and some tests) :
 #include "sound/2203intf.h"
 #include "includes/konamipt.h"
 
+extern UINT8 *scotrsht_videoram;
+extern UINT8 *scotrsht_colorram;
 extern UINT8 *scotrsht_scroll;
 
 extern WRITE8_HANDLER( scotrsht_videoram_w );
@@ -70,8 +72,8 @@ static WRITE8_HANDLER( scotrsht_soundlatch_w )
 }
 
 static ADDRESS_MAP_START( scotrsht_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(scotrsht_colorram_w) AM_BASE_GENERIC(colorram)
-    AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(scotrsht_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(scotrsht_colorram_w) AM_BASE(&scotrsht_colorram)
+    AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(scotrsht_videoram_w) AM_BASE(&scotrsht_videoram)
     AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* sprites */
 	AM_RANGE(0x10c0, 0x1fff) AM_RAM /* work ram */
     AM_RANGE(0x2000, 0x201f) AM_RAM AM_BASE(&scotrsht_scroll) /* scroll registers */

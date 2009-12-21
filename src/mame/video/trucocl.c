@@ -34,6 +34,8 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 
 #include "driver.h"
 
+UINT8 *trucocl_videoram;
+UINT8 *trucocl_colorram;
 static tilemap *bg_tilemap;
 
 PALETTE_INIT( trucocl )
@@ -46,22 +48,22 @@ PALETTE_INIT( trucocl )
 
 WRITE8_HANDLER( trucocl_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	trucocl_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( trucocl_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	trucocl_colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int gfxsel = machine->generic.colorram.u8[tile_index] & 1;
-	int bank = ( ( machine->generic.colorram.u8[tile_index] >> 2 ) & 0x07 );
-	int code = machine->generic.videoram.u8[tile_index];
-	int colour = (machine->generic.colorram.u8[tile_index] & 2) >> 1;
+	int gfxsel = trucocl_colorram[tile_index] & 1;
+	int bank = ( ( trucocl_colorram[tile_index] >> 2 ) & 0x07 );
+	int code = trucocl_videoram[tile_index];
+	int colour = (trucocl_colorram[tile_index] & 2) >> 1;
 
 	code |= ( bank & 1 ) << 10;
 	code |= ( bank & 2 ) << 8;

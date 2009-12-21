@@ -8,6 +8,7 @@
 
 #include "driver.h"
 
+UINT8 *pbaction_videoram, *pbaction_colorram;
 UINT8 *pbaction_videoram2, *pbaction_colorram2;
 
 static int scroll;
@@ -16,13 +17,13 @@ static tilemap *bg_tilemap, *fg_tilemap;
 
 WRITE8_HANDLER( pbaction_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	pbaction_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( pbaction_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	pbaction_colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -53,8 +54,8 @@ WRITE8_HANDLER( pbaction_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = machine->generic.colorram.u8[tile_index];
-	int code = machine->generic.videoram.u8[tile_index] + 0x10 * (attr & 0x70);
+	int attr = pbaction_colorram[tile_index];
+	int code = pbaction_videoram[tile_index] + 0x10 * (attr & 0x70);
 	int color = attr & 0x07;
 	int flags = (attr & 0x80) ? TILE_FLIPY : 0;
 

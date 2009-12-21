@@ -20,6 +20,8 @@
 #include "includes/pacman.h"
 #include "video/resnet.h"
 
+UINT8 *pacman_videoram;
+UINT8 *pacman_colorram;
 static tilemap *bg_tilemap;
 static UINT8 charbank;
 static UINT8 spritebank;
@@ -152,8 +154,8 @@ static TILEMAP_MAPPER( pacman_scan_rows )
 
 static TILE_GET_INFO( pacman_get_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index] | (charbank << 8);
-	int attr = (machine->generic.colorram.u8[tile_index] & 0x1f) | (colortablebank << 5) | (palettebank << 6 );
+	int code = pacman_videoram[tile_index] | (charbank << 8);
+	int attr = (pacman_colorram[tile_index] & 0x1f) | (colortablebank << 5) | (palettebank << 6 );
 
 	SET_TILE_INFO(0,code,attr,0);
 }
@@ -198,13 +200,13 @@ VIDEO_START( pacman )
 
 WRITE8_HANDLER( pacman_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	pacman_videoram[offset] = data;
 	tilemap_mark_tile_dirty( bg_tilemap, offset );
 }
 
 WRITE8_HANDLER( pacman_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	pacman_colorram[offset] = data;
 	tilemap_mark_tile_dirty( bg_tilemap, offset );
 }
 
@@ -367,8 +369,8 @@ static TILE_GET_INFO( s2650_get_tile_info )
 
 	colbank = s2650games_tileram[tile_index & 0x1f] & 0x3;
 
-	code = machine->generic.videoram.u8[tile_index] + (colbank << 8);
-	attr = machine->generic.colorram.u8[tile_index & 0x1f];
+	code = pacman_videoram[tile_index] + (colbank << 8);
+	attr = pacman_colorram[tile_index & 0x1f];
 
 	SET_TILE_INFO(0,code,attr & 0x1f,0);
 }
@@ -442,14 +444,14 @@ VIDEO_UPDATE( s2650games )
 
 WRITE8_HANDLER( s2650games_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	pacman_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( s2650games_colorram_w )
 {
 	int i;
-	space->machine->generic.colorram.u8[offset & 0x1f] = data;
+	pacman_colorram[offset & 0x1f] = data;
 	for (i = offset; i < 0x0400; i += 32)
 		tilemap_mark_tile_dirty(bg_tilemap, i);
 }
@@ -512,8 +514,8 @@ static TILE_GET_INFO( jrpacman_get_tile_info )
 		color_index = tile_index + 0x80;
 	}
 
-	code = machine->generic.videoram.u8[tile_index] | (charbank << 8);
-	attr = (machine->generic.videoram.u8[color_index] & 0x1f) | (colortablebank << 5) | (palettebank << 6 );
+	code = pacman_videoram[tile_index] | (charbank << 8);
+	attr = (pacman_videoram[color_index] & 0x1f) | (colortablebank << 5) | (palettebank << 6 );
 
 	SET_TILE_INFO(0,code,attr,0);
 }
@@ -567,7 +569,7 @@ VIDEO_START( jrpacman )
 
 WRITE8_HANDLER( jrpacman_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	pacman_videoram[offset] = data;
 	jrpacman_mark_tile_dirty(offset);
 }
 

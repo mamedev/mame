@@ -10,6 +10,8 @@
 
 UINT8 *seicross_row_scroll;
 
+UINT8 *seicross_videoram;
+UINT8 *seicross_colorram;
 static tilemap *bg_tilemap;
 
 /***************************************************************************
@@ -58,7 +60,7 @@ PALETTE_INIT( seicross )
 
 WRITE8_HANDLER( seicross_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	seicross_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -69,8 +71,8 @@ WRITE8_HANDLER( seicross_colorram_w )
 	/* region. */
 	offset &= 0xffdf;
 
-	space->machine->generic.colorram.u8[offset] = data;
-	space->machine->generic.colorram.u8[offset + 0x20] = data;
+	seicross_colorram[offset] = data;
+	seicross_colorram[offset + 0x20] = data;
 
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 	tilemap_mark_tile_dirty(bg_tilemap, offset + 0x20);
@@ -78,9 +80,9 @@ WRITE8_HANDLER( seicross_colorram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index] + ((machine->generic.colorram.u8[tile_index] & 0x10) << 4);
-	int color = machine->generic.colorram.u8[tile_index] & 0x0f;
-	int flags = ((machine->generic.colorram.u8[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((machine->generic.colorram.u8[tile_index] & 0x80) ? TILE_FLIPY : 0);
+	int code = seicross_videoram[tile_index] + ((seicross_colorram[tile_index] & 0x10) << 4);
+	int color = seicross_colorram[tile_index] & 0x0f;
+	int flags = ((seicross_colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((seicross_colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(0, code, color, flags);
 }

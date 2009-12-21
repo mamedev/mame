@@ -13,18 +13,20 @@
 
 UINT8 *bagman_video_enable;
 
+UINT8 *bagman_videoram;
+UINT8 *bagman_colorram;
 static tilemap *bg_tilemap;
 
 
 WRITE8_HANDLER( bagman_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	bagman_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( bagman_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	bagman_colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -95,9 +97,9 @@ WRITE8_HANDLER( bagman_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int gfxbank = (machine->gfx[2] && (machine->generic.colorram.u8[tile_index] & 0x10)) ? 2 : 0;
-	int code = machine->generic.videoram.u8[tile_index] + 8 * (machine->generic.colorram.u8[tile_index] & 0x20);
-	int color = machine->generic.colorram.u8[tile_index] & 0x0f;
+	int gfxbank = (machine->gfx[2] && (bagman_colorram[tile_index] & 0x10)) ? 2 : 0;
+	int code = bagman_videoram[tile_index] + 8 * (bagman_colorram[tile_index] & 0x20);
+	int color = bagman_colorram[tile_index] & 0x0f;
 
 	SET_TILE_INFO(gfxbank, code, color, 0);
 }

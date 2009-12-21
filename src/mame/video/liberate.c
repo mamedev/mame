@@ -12,6 +12,8 @@
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 
+UINT8 *liberate_videoram;
+UINT8 *liberate_colorram;
 static int background_color, background_disable;
 static tilemap *background_tilemap, *fix_tilemap;
 static UINT8 deco16_io_ram[16];
@@ -70,8 +72,8 @@ static TILE_GET_INFO( get_back_tile_info )
 
 static TILE_GET_INFO( get_fix_tile_info )
 {
-	UINT8 *videoram = machine->generic.videoram.u8;
-	UINT8 *colorram = machine->generic.colorram.u8;
+	UINT8 *videoram = liberate_videoram;
+	UINT8 *colorram = liberate_colorram;
 	int tile, color;
 
 	tile = videoram[tile_index] + (colorram[tile_index] << 8);
@@ -183,13 +185,13 @@ WRITE8_HANDLER( prosport_io_w )
 
 WRITE8_HANDLER( liberate_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	liberate_videoram[offset] = data;
 	tilemap_mark_tile_dirty(fix_tilemap, offset);
 }
 
 WRITE8_HANDLER( liberate_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	liberate_colorram[offset] = data;
 	tilemap_mark_tile_dirty(fix_tilemap, offset);
 }
 
@@ -527,7 +529,7 @@ VIDEO_UPDATE( prosport )
 
 	for (offs = 0;offs < 0x400;offs++)
 	{
-		tile=screen->machine->generic.videoram.u8[offs]+((screen->machine->generic.colorram.u8[offs]&0x3)<<8);
+		tile=liberate_videoram[offs]+((liberate_colorram[offs]&0x3)<<8);
 
 		if(deco16_io_ram[0]&0x40) //dynamic ram-based gfxs for Pro Golf
 			gfx_region = 3;

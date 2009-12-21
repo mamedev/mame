@@ -72,7 +72,8 @@ INTERRUPT_GEN( getstar_interrupt );
 
 extern UINT8 *slapfight_videoram;
 extern UINT8 *slapfight_colorram;
-extern size_t slapfight_videoram_size;
+extern UINT8 *slapfight_fixvideoram;
+extern UINT8 *slapfight_fixcolorram;
 extern UINT8 *slapfight_scrollx_lo,*slapfight_scrollx_hi,*slapfight_scrolly;
 
 VIDEO_UPDATE( slapfight );

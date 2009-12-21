@@ -47,6 +47,10 @@ TODO:
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
+extern UINT8 *tsamurai_videoram;
+extern UINT8 *tsamurai_colorram;
+extern UINT8 *tsamurai_bg_videoram;
+
 WRITE8_HANDLER( vsgongf_color_w );
 
 WRITE8_HANDLER( tsamurai_bgcolor_w );
@@ -60,7 +64,6 @@ WRITE8_HANDLER( tsamurai_bg_videoram_w );
 WRITE8_HANDLER( tsamurai_fg_videoram_w );
 WRITE8_HANDLER( tsamurai_fg_colorram_w );
 extern VIDEO_START( tsamurai );
-extern UINT8 *tsamurai_videoram;
 
 extern VIDEO_START( vsgongf );
 extern VIDEO_UPDATE( vsgongf );
@@ -142,10 +145,10 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd900, 0xd900) AM_READ(unknown_d900_r)
 	AM_RANGE(0xd938, 0xd938) AM_READ(unknown_d938_r)
 
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xe400, 0xe43f) AM_RAM_WRITE(tsamurai_fg_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE(&tsamurai_videoram)
+	AM_RANGE(0xe400, 0xe43f) AM_RAM_WRITE(tsamurai_fg_colorram_w) AM_BASE(&tsamurai_colorram)
 	AM_RANGE(0xe440, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(tsamurai_bg_videoram_w) AM_BASE(&tsamurai_videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(tsamurai_bg_videoram_w) AM_BASE(&tsamurai_bg_videoram)
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_BASE_GENERIC(spriteram)
 
 	AM_RANGE(0xf400, 0xf400) AM_WRITENOP
@@ -175,10 +178,10 @@ static ADDRESS_MAP_START( m660_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd900, 0xd900) AM_READ(unknown_d900_r)
 	AM_RANGE(0xd938, 0xd938) AM_READ(unknown_d938_r)
 
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xe400, 0xe43f) AM_RAM_WRITE(tsamurai_fg_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE(&tsamurai_videoram)
+	AM_RANGE(0xe400, 0xe43f) AM_RAM_WRITE(tsamurai_fg_colorram_w) AM_BASE(&tsamurai_colorram)
 	AM_RANGE(0xe440, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(tsamurai_bg_videoram_w) AM_BASE(&tsamurai_videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(tsamurai_bg_videoram_w) AM_BASE(&tsamurai_bg_videoram)
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_BASE_GENERIC(spriteram)
 
 	AM_RANGE(0xf400, 0xf400) AM_WRITENOP/* This is always written with F401, F402 & F403 data */
@@ -335,7 +338,7 @@ static ADDRESS_MAP_START( vsgongf_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa006, 0xa006) AM_READ(vsgongf_a006_r) /* protection */
 	AM_RANGE(0xa100, 0xa100) AM_READ(vsgongf_a100_r) /* protection */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM					 /* work ram */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(tsamurai_fg_videoram_w) AM_BASE(&tsamurai_videoram)
 	AM_RANGE(0xe400, 0xe43f) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xe440, 0xe47b) AM_RAM
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(vsgongf_sound_command_w)

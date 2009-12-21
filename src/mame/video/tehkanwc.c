@@ -13,6 +13,8 @@ robbiex@rocketmail.com
 
 #include "driver.h"
 
+UINT8 *tehkanwc_videoram;
+UINT8 *tehkanwc_colorram;
 UINT8 *tehkanwc_videoram2;
 static UINT8 scroll_x[2];
 static UINT8 led0,led1;
@@ -21,13 +23,13 @@ static tilemap *bg_tilemap, *fg_tilemap;
 
 WRITE8_HANDLER( tehkanwc_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	tehkanwc_videoram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( tehkanwc_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	tehkanwc_colorram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -79,8 +81,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int attr = machine->generic.colorram.u8[tile_index];
-	int code = machine->generic.videoram.u8[tile_index] + ((attr & 0x10) << 4);
+	int attr = tehkanwc_colorram[tile_index];
+	int code = tehkanwc_videoram[tile_index] + ((attr & 0x10) << 4);
 	int color = attr & 0x0f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 

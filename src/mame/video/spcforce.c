@@ -10,6 +10,8 @@
 
 
 UINT8 *spcforce_scrollram;
+UINT8 *spcforce_videoram;
+UINT8 *spcforce_colorram;
 
 
 WRITE8_HANDLER( spcforce_flip_screen_w )
@@ -28,7 +30,7 @@ VIDEO_UPDATE( spcforce )
 	bitmap_fill(bitmap,cliprect,0);
 
 
-	for (offs = 0; offs < screen->machine->generic.videoram_size; offs++)
+	for (offs = 0; offs < 0x400; offs++)
 	{
 		int code,sx,sy,col;
 
@@ -36,8 +38,8 @@ VIDEO_UPDATE( spcforce )
 		sy = 8 * (offs / 32) -  (spcforce_scrollram[offs]       & 0x0f);
 		sx = 8 * (offs % 32) + ((spcforce_scrollram[offs] >> 4) & 0x0f);
 
-		code = screen->machine->generic.videoram.u8[offs] + ((screen->machine->generic.colorram.u8[offs] & 0x01) << 8);
-		col  = (~screen->machine->generic.colorram.u8[offs] >> 4) & 0x07;
+		code = spcforce_videoram[offs] + ((spcforce_colorram[offs] & 0x01) << 8);
+		col  = (~spcforce_colorram[offs] >> 4) & 0x07;
 
 		if (flip_screen_get(screen->machine))
 		{

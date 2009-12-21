@@ -47,6 +47,9 @@ ROMs 6A, 7A, 8A, 9A: 2764
 #include "sound/sn76496.h"
 
 
+extern UINT8 *mrjong_videoram;
+extern UINT8 *mrjong_colorram;
+
 extern WRITE8_HANDLER( mrjong_videoram_w );
 extern WRITE8_HANDLER( mrjong_colorram_w );
 extern WRITE8_HANDLER( mrjong_flipscreen_w );
@@ -60,8 +63,8 @@ static ADDRESS_MAP_START( mrjong_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(mrjong_videoram_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(mrjong_colorram_w) AM_BASE_GENERIC(colorram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(mrjong_videoram_w) AM_BASE(&mrjong_videoram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(mrjong_colorram_w) AM_BASE(&mrjong_colorram)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( io_0x00_w )

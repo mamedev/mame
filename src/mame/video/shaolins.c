@@ -12,6 +12,8 @@
 extern UINT8 shaolins_nmi_enable;
 
 static int palettebank;
+UINT8 *shaolins_videoram;
+UINT8 *shaolins_colorram;
 static tilemap *bg_tilemap;
 
 /***************************************************************************
@@ -93,13 +95,13 @@ PALETTE_INIT( shaolins )
 
 WRITE8_HANDLER( shaolins_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	shaolins_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( shaolins_colorram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	shaolins_colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -133,8 +135,8 @@ WRITE8_HANDLER( shaolins_nmi_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = machine->generic.colorram.u8[tile_index];
-	int code = machine->generic.videoram.u8[tile_index] + ((attr & 0x40) << 2);
+	int attr = shaolins_colorram[tile_index];
+	int code = shaolins_videoram[tile_index] + ((attr & 0x40) << 2);
 	int color = (attr & 0x0f) + 16 * palettebank;
 	int flags = (attr & 0x20) ? TILE_FLIPY : 0;
 

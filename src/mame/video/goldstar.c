@@ -9,6 +9,8 @@
 #include "driver.h"
 
 UINT8 *goldstar_reel1_scroll, *goldstar_reel2_scroll, *goldstar_reel3_scroll;
+UINT8 *goldstar_fg_atrram;
+UINT8 *goldstar_fg_vidram;
 
 static int bgcolor;
 
@@ -55,20 +57,20 @@ WRITE8_HANDLER( cm_outport0_w )
 
 WRITE8_HANDLER( goldstar_fg_vidram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	goldstar_fg_vidram[offset] = data;
 	tilemap_mark_tile_dirty(goldstar_fg_tilemap,offset);
 }
 
 WRITE8_HANDLER( goldstar_fg_atrram_w )
 {
-	space->machine->generic.colorram.u8[offset] = data;
+	goldstar_fg_atrram[offset] = data;
 	tilemap_mark_tile_dirty(goldstar_fg_tilemap,offset);
 }
 
 static TILE_GET_INFO( get_goldstar_fg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index];
-	int attr = machine->generic.colorram.u8[tile_index];
+	int code = goldstar_fg_vidram[tile_index];
+	int attr = goldstar_fg_atrram[tile_index];
 
 	SET_TILE_INFO(
 			0,
@@ -80,8 +82,8 @@ static TILE_GET_INFO( get_goldstar_fg_tile_info )
 // colour / high tile bits are swapped around
 static TILE_GET_INFO( get_cherrym_fg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index];
-	int attr = machine->generic.colorram.u8[tile_index];
+	int code = goldstar_fg_vidram[tile_index];
+	int attr = goldstar_fg_atrram[tile_index];
 
 	SET_TILE_INFO(
 			0,
