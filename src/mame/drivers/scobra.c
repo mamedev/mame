@@ -867,6 +867,11 @@ static MACHINE_DRIVER_START( type1 )
 	MDRV_PPI8255_ADD( "ppi8255_0", scramble_ppi_0_intf )
 	MDRV_PPI8255_ADD( "ppi8255_1", scramble_ppi_1_intf )
 
+	MDRV_7474_ADD("7474_9m_1", galaxold_7474_9m_1_callback)
+	MDRV_7474_ADD("7474_9m_2", galaxold_7474_9m_2_callback)
+
+	MDRV_TIMER_ADD("int_timer", galaxold_interrupt_timer)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(16000.0/132/2)
@@ -989,6 +994,11 @@ static MACHINE_DRIVER_START( hustler )
 	MDRV_7474_ADD("konami_7474", scramble_sh_7474_callback)
 
 	MDRV_MACHINE_RESET(scramble)
+
+	MDRV_7474_ADD("7474_9m_1", galaxold_7474_9m_1_callback)
+	MDRV_7474_ADD("7474_9m_2", galaxold_7474_9m_2_callback)
+
+	MDRV_TIMER_ADD("int_timer", galaxold_interrupt_timer)
 
 	/* device config overrides */
 	MDRV_PPI8255_ADD( "ppi8255_0", scramble_ppi_0_intf )

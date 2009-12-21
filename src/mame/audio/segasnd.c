@@ -302,7 +302,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static TIMER_CALLBACK( increment_t1_clock )
+static TIMER_DEVICE_CALLBACK( increment_t1_clock )
 {
 	/* only increment if it is not being forced clear */
 	if (!(usb.last_p2_value & 0x80))
@@ -316,7 +316,6 @@ void sega_usb_reset(running_machine *machine, UINT8 t1_clock_mask)
 	cpu_set_input_line(usb.cpu, INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* start the clock timer */
-	timer_pulse(machine, attotime_mul(ATTOTIME_IN_HZ(USB_2MHZ_CLOCK), 256), NULL, 0, increment_t1_clock);
 	usb.t1_clock_mask = t1_clock_mask;
 }
 
@@ -922,6 +921,8 @@ MACHINE_DRIVER_START( sega_universal_sound_board )
 	MDRV_CPU_ADD("usbcpu", I8035, USB_MASTER_CLOCK)		/* divide by 15 in CPU */
 	MDRV_CPU_PROGRAM_MAP(usb_map)
 	MDRV_CPU_IO_MAP(usb_portmap)
+
+	MDRV_TIMER_ADD_PERIODIC("usb_timer", increment_t1_clock, HZ(USB_2MHZ_CLOCK / 256))
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("usbsnd", USB, 0)

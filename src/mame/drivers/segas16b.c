@@ -909,7 +909,8 @@ CPU  - 317-0092  |--------------------------------------------------------------
 static UINT16 *workram;
 
 static UINT8 rom_board;
-static int atomicp_sound_rate;
+static UINT8 atomicp_sound_divisor;
+static UINT8 atomicp_sound_count;
 
 static UINT8 has_sound_cpu;
 
@@ -1112,16 +1113,13 @@ static MACHINE_RESET( system16b )
 }
 
 
-static TIMER_CALLBACK( atomicp_sound_irq )
+static TIMER_DEVICE_CALLBACK( atomicp_sound_irq )
 {
-	cputag_set_input_line(machine, "maincpu", 2, HOLD_LINE);
-}
-
-
-static MACHINE_RESET( atomicp )
-{
-	MACHINE_RESET_CALL(system16b);
-	timer_pulse(machine, ATTOTIME_IN_HZ(atomicp_sound_rate), NULL, 0, atomicp_sound_irq);
+	if (++atomicp_sound_count >= atomicp_sound_divisor)
+	{
+		cputag_set_input_line(timer->machine, "maincpu", 2, HOLD_LINE);
+		atomicp_sound_count = 0;
+	}
 }
 
 
@@ -1555,6 +1553,12 @@ static void wrestwar_i8751_sim(running_machine *machine)
  *  Atomic Point custom sound
  *
  *************************************/
+
+static MACHINE_START( atomicp )
+{
+	state_save_register_global(machine, atomicp_sound_count);
+}
+
 
 static WRITE16_HANDLER( atomicp_sound_w )
 {
@@ -3296,7 +3300,9 @@ static MACHINE_DRIVER_START( atomicp ) /* 10MHz CPU Clock verified */
 
 	/* basic machine hardware */
 	MDRV_DEVICE_REMOVE("soundcpu")
-	MDRV_MACHINE_RESET(atomicp)
+
+	MDRV_MACHINE_START(atomicp)
+	MDRV_TIMER_ADD_PERIODIC("atomicp_timer", atomicp_sound_irq, HZ(10000))
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("ymsnd", YM2413, XTAL_20MHz/4) /* 20MHz OSC divided by 4 (verified) */
@@ -6356,7 +6362,7 @@ static DRIVER_INIT( atomicp )
 	system16b_generic_init(machine, ROM_BOARD_ATOMICP);
 	disable_screen_blanking = 1;
 	segaic16_display_enable = 1;
-	atomicp_sound_rate = 10000;
+	atomicp_sound_divisor = 1;
 }
 
 
@@ -6365,7 +6371,7 @@ static DRIVER_INIT( snapper )
 	system16b_generic_init(machine, ROM_BOARD_ATOMICP);
 	disable_screen_blanking = 1;
 	segaic16_display_enable = 1;
-	atomicp_sound_rate = 2500;
+	atomicp_sound_divisor = 4;
 }
 
 

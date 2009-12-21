@@ -2,6 +2,7 @@
 #define TMP68301_H
 
 // Machine init
+MACHINE_START( tmp68301 );
 MACHINE_RESET( tmp68301 );
 
 // Hardware Registers

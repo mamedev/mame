@@ -184,7 +184,7 @@ READ8_HANDLER( acitya_decrypt_rom )
 }
 
 
-MACHINE_RESET( acitya )
+MACHINE_START( acitya )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
 
@@ -196,10 +196,15 @@ MACHINE_RESET( acitya )
 	acitya_decrypt_rom_A(machine);
 	acitya_decrypt_rom_B(machine);
 
-	/* The initial state of the counter is 0x0B */
-	counter = 0x0B;
 	memory_configure_bank(machine, "bank1", 0, 4, &RAM[0x10000], 0x4000);
-	memory_set_bank(machine, "bank1", 3);
 
 	state_save_register_global(machine, counter);
+}
+
+
+MACHINE_RESET( acitya )
+{
+	/* The initial state of the counter is 0x0B */
+	counter = 0x0B;
+	memory_set_bank(machine, "bank1", 3);
 }

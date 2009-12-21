@@ -25,7 +25,7 @@ static UINT16* pkscramble_mdtilemap_ram;
 static UINT16* pkscramble_bgtilemap_ram;
 
 static tilemap *fg_tilemap, *md_tilemap, *bg_tilemap;
-static emu_timer *scanline_timer;
+static const device_config *scanline_timer;
 
 static WRITE16_HANDLER( pkscramble_fgtilemap_w )
 {
@@ -191,20 +191,20 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(0,tile,color,0);
 }
 
-static TIMER_CALLBACK( scanline_callback )
+static TIMER_DEVICE_CALLBACK( scanline_callback )
 {
 	if (param == interrupt_scanline)
 	{
     	if (out & 0x2000)
-    		cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE);
-		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, param + 1, 0), param+1);
+    		cputag_set_input_line(timer->machine, "maincpu", 1, ASSERT_LINE);
+		timer_device_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(timer->machine->primary_screen, param + 1, 0), param+1);
 		interrupt_line_active = 1;
 	}
 	else
 	{
 		if (interrupt_line_active)
-	    	cputag_set_input_line(machine, "maincpu", 1, CLEAR_LINE);
-		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, interrupt_scanline, 0), interrupt_scanline);
+	    	cputag_set_input_line(timer->machine, "maincpu", 1, CLEAR_LINE);
+		timer_device_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(timer->machine->primary_screen, interrupt_scanline, 0), interrupt_scanline);
 		interrupt_line_active = 0;
 	}
 }
@@ -259,15 +259,18 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
+static MACHINE_START( pkscramble)
+{
+	state_save_register_global(machine, out);
+	state_save_register_global(machine, interrupt_line_active);
+}
+
 static MACHINE_RESET( pkscramble)
 {
 	out = 0;
 	interrupt_line_active=0;
-	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, interrupt_scanline, 0), interrupt_scanline);
-
-	state_save_register_global(machine, out);
-	state_save_register_global(machine, interrupt_line_active);
+	scanline_timer = devtag_get_device(machine, "scan_timer");
+	timer_device_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, interrupt_scanline, 0), interrupt_scanline);
 }
 
 static MACHINE_DRIVER_START( pkscramble )
@@ -278,7 +281,10 @@ static MACHINE_DRIVER_START( pkscramble )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
+	MDRV_MACHINE_START(pkscramble)
 	MDRV_MACHINE_RESET(pkscramble)
+	
+	MDRV_TIMER_ADD("scan_timer", scanline_callback)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

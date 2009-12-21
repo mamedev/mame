@@ -234,9 +234,9 @@ void state_save_register_memory(running_machine *machine, const char *module, co
 	/* check for invalid timing */
 	if (!global->reg_allowed)
 	{
-		logerror("Attempt to register save state entry after state registration is closed! module %s tag %s name %s\n",module, tag, name);
+		logerror("Attempt to register save state entry after state registration is closed!\nFile: %s, line %d, module %s tag %s name %s\n", file, line, module, tag, name);
 		if (machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
-			fatalerror("Attempt to register save state entry after state registration is closed! module %s tag %s name %s\n", module, tag, name);
+			fatalerror("Attempt to register save state entry after state registration is closed!\nFile: %s, line %d, module %s tag %s name %s\n", file, line, module, tag, name);
 		global->illegal_regs++;
 		return;
 	}

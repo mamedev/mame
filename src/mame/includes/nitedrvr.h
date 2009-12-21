@@ -24,6 +24,8 @@ WRITE8_HANDLER( nitedrvr_steering_reset_w );
 WRITE8_HANDLER( nitedrvr_out0_w );
 WRITE8_HANDLER( nitedrvr_out1_w );
 
+TIMER_DEVICE_CALLBACK( nitedrvr_crash_toggle_callback );
+
 MACHINE_RESET( nitedrvr );
 MACHINE_START( nitedrvr );
 

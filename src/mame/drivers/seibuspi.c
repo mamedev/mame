@@ -888,35 +888,6 @@ static READ32_HANDLER( spi_unknown_r )
 	return 0xffffffff;
 }
 
-static WRITE32_HANDLER( ds2404_reset_w )
-{
-	if( ACCESSING_BITS_0_7 ) {
-		DS2404_1W_reset_w(space, offset, data);
-	}
-}
-
-static READ32_HANDLER( ds2404_data_r )
-{
-	if( ACCESSING_BITS_0_7 ) {
-		return DS2404_data_r(space, offset);
-	}
-	return 0;
-}
-
-static WRITE32_HANDLER( ds2404_data_w )
-{
-	if( ACCESSING_BITS_0_7 ) {
-		DS2404_data_w(space, offset, data);
-	}
-}
-
-static WRITE32_HANDLER( ds2404_clk_w )
-{
-	if( ACCESSING_BITS_0_7 ) {
-		DS2404_clk_w(space, offset, data);
-	}
-}
-
 static WRITE32_HANDLER( eeprom_w )
 {
 	const device_config *oki2 = devtag_get_device(space->machine, "oki2");
@@ -1090,10 +1061,10 @@ static ADDRESS_MAP_START( spi_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000680, 0x00000683) AM_WRITE(sound_fifo_w)
 	AM_RANGE(0x00000684, 0x00000687) AM_READ(sound_fifo_status_r)
 	AM_RANGE(0x00000684, 0x00000687) AM_WRITENOP				/* Unknown */
-	AM_RANGE(0x000006d0, 0x000006d3) AM_WRITE(ds2404_reset_w)
-	AM_RANGE(0x000006d4, 0x000006d7) AM_WRITE(ds2404_data_w)
-	AM_RANGE(0x000006d8, 0x000006db) AM_WRITE(ds2404_clk_w)
-	AM_RANGE(0x000006dc, 0x000006df) AM_READ(ds2404_data_r)
+	AM_RANGE(0x000006d0, 0x000006d3) AM_DEVWRITE8("ds2404", ds2404_1w_reset_w, 0x000000ff)
+	AM_RANGE(0x000006d4, 0x000006d7) AM_DEVWRITE8("ds2404", ds2404_data_w, 0x000000ff)
+	AM_RANGE(0x000006d8, 0x000006db) AM_DEVWRITE8("ds2404", ds2404_clk_w, 0x000000ff)
+	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_data_r, 0x000000ff)
 	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE(&spimainram)
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x00a00000, 0x013fffff) AM_READ(soundrom_r)
@@ -1822,16 +1793,6 @@ GFXDECODE_END
 
 static NVRAM_HANDLER( spi )
 {
-	if( read_or_write ) {
-		DS2404_save(file);
-	} else {
-		DS2404_init(machine, 1995, 1, 1);
-
-		if(file) {
-			DS2404_load(file);
-		}
-	}
-
 	nvram_handler_intelflash(machine, 0, file, read_or_write);
 	nvram_handler_intelflash(machine, 1, file, read_or_write);
 }
@@ -1874,6 +1835,11 @@ static IRQ_CALLBACK(spi_irq_callback)
 
 /* SPI */
 
+static MACHINE_START( spi )
+{
+	z80_rom = auto_alloc_array(machine, UINT8, 0x40000);
+}
+
 static MACHINE_RESET( spi )
 {
 	int i;
@@ -1889,7 +1855,6 @@ static MACHINE_RESET( spi )
 	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000688, 0x0000068b, 0, 0, z80_prg_fifo_w);
 	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000068c, 0x0000068f, 0, 0, z80_enable_w);
 
-	z80_rom = auto_alloc_array(machine, UINT8, 0x40000);
 	memory_set_bankptr(machine, "bank4", z80_rom);
 	memory_set_bankptr(machine, "bank5", z80_rom);
 
@@ -1923,8 +1888,11 @@ static MACHINE_DRIVER_START( spi )
 
 	MDRV_QUANTUM_TIME(HZ(12000))
 
+	MDRV_MACHINE_START(spi)
 	MDRV_MACHINE_RESET(spi)
 	MDRV_NVRAM_HANDLER(spi)
+
+	MDRV_DS2404_ADD("ds2404", 1995, 1, 1)
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2238,7 +2206,7 @@ static MACHINE_DRIVER_START( seibu386 )
 
 	MDRV_NVRAM_HANDLER(sxx2f)
 	MDRV_MACHINE_RESET(seibu386)
-
+	
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(54)

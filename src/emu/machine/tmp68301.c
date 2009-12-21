@@ -106,11 +106,16 @@ static void tmp68301_update_timer( running_machine *machine, int i )
 	}
 }
 
-MACHINE_RESET( tmp68301 )
+MACHINE_START( tmp68301 )
 {
 	int i;
 	for (i = 0; i < 3; i++)
 		tmp68301_timer[i] = timer_alloc(machine, tmp68301_timer_callback, NULL);
+}
+
+MACHINE_RESET( tmp68301 )
+{
+	int i;
 
 	for (i = 0; i < 3; i++)
 		tmp68301_IE[i] = 0;

@@ -3277,6 +3277,7 @@ static MACHINE_DRIVER_START( theglobp )
 	MDRV_CPU_PROGRAM_MAP(epos_map)
 	MDRV_CPU_IO_MAP(theglobp_portmap)
 
+	MDRV_MACHINE_START(theglobp)
 	MDRV_MACHINE_RESET(theglobp)
 MACHINE_DRIVER_END
 
@@ -3290,6 +3291,7 @@ static MACHINE_DRIVER_START( acitya )
 	MDRV_CPU_PROGRAM_MAP(epos_map)
 	MDRV_CPU_IO_MAP(acitya_portmap)
 
+	MDRV_MACHINE_START(acitya)
 	MDRV_MACHINE_RESET(acitya)
 MACHINE_DRIVER_END
 

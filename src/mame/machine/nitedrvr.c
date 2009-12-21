@@ -250,11 +250,11 @@ WRITE8_HANDLER( nitedrvr_out1_w )
 }
 
 
-static TIMER_CALLBACK( nitedrvr_crash_toggle_callback )
+TIMER_DEVICE_CALLBACK( nitedrvr_crash_toggle_callback )
 {
 	if (nitedrvr_crash_en && nitedrvr_crash_data_en)
 	{
-		const device_config *discrete = devtag_get_device(machine, "discrete");
+		const device_config *discrete = devtag_get_device(timer->machine, "discrete");
 
 		nitedrvr_crash_data--;
 		discrete_sound_w(discrete, NITEDRVR_BANG_DATA, nitedrvr_crash_data);	// Crash Volume
@@ -262,14 +262,14 @@ static TIMER_CALLBACK( nitedrvr_crash_toggle_callback )
 		if (nitedrvr_crash_data & 0x01)
 		{
 			/* Invert video */
-			palette_set_color(machine,1,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-			palette_set_color(machine,0,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
+			palette_set_color(timer->machine,1,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+			palette_set_color(timer->machine,0,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 		}
 		else
 		{
 			/* Normal video */
-			palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-			palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
+			palette_set_color(timer->machine,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+			palette_set_color(timer->machine,1,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 		}
 	}
 }
@@ -298,6 +298,4 @@ MACHINE_RESET( nitedrvr )
 	nitedrvr_crash_data_en = 0;
 	ac_line = 0;
 	last_steering_val = 0;
-
-	timer_pulse(machine, PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)), NULL, 0, nitedrvr_crash_toggle_callback);
 }
