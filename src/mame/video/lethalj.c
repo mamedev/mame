@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "cpu/tms34010/tms34010.h"
-#include "lethalj.h"
+#include "includes/lethalj.h"
 
 
 #define BLITTER_SOURCE_WIDTH		1024

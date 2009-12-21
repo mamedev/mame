@@ -45,7 +45,7 @@ Note:   if MAME_DEBUG is defined, pressing:
 **************************************************************************/
 
 #include "driver.h"
-#include "cave.h"
+#include "includes/cave.h"
 
 /* Variables that driver has access to: */
 

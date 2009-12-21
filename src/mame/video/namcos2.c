@@ -2,8 +2,8 @@
 
 #include "driver.h"
 
-#include "namcos2.h"
-#include "namcoic.h"
+#include "includes/namcos2.h"
+#include "includes/namcoic.h"
 
 UINT16 *namcos2_sprite_ram;
 UINT16 *namcos2_68k_palette_ram;

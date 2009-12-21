@@ -54,7 +54,7 @@ To enter service mode, keep 1&2 pressed on reset
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/discrete.h"
-#include "circusc.h"
+#include "includes/circusc.h"
 
 
 static MACHINE_START( circusc )

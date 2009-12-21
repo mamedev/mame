@@ -77,7 +77,7 @@ Coin B is not used
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
-#include "ashnojoe.h"
+#include "includes/ashnojoe.h"
 
 static READ16_HANDLER(fake_4a00a_r)
 {

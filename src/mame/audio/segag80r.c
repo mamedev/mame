@@ -10,7 +10,7 @@
 #include "driver.h"
 #include "streams.h"
 #include "cpu/mcs48/mcs48.h"
-#include "segag80r.h"
+#include "includes/segag80r.h"
 #include "machine/8255ppi.h"
 #include "machine/i8243.h"
 #include "sound/samples.h"

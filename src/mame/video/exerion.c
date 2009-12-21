@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
-#include "exerion.h"
+#include "includes/exerion.h"
 
 
 #define BACKGROUND_X_START		32

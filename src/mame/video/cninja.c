@@ -5,8 +5,8 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deco16ic.h"
-#include "cninja.h"
+#include "includes/deco16ic.h"
+#include "includes/cninja.h"
 
 /******************************************************************************/
 

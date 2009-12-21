@@ -7,7 +7,7 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 
 #include "driver.h"
 #include "cpu/m6800/m6800.h"
-#include "firetrk.h"
+#include "includes/firetrk.h"
 #include "sound/discrete.h"
 
 #define MASTER_CLOCK (XTAL_12_096MHz)

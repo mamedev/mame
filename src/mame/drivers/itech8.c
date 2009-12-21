@@ -504,7 +504,7 @@
 #include "machine/ticket.h"
 #include "video/tms34061.h"
 #include "video/tlc34076.h"
-#include "itech8.h"
+#include "includes/itech8.h"
 #include "sound/2203intf.h"
 #include "sound/2608intf.h"
 #include "sound/3812intf.h"

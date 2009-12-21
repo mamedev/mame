@@ -103,7 +103,7 @@
 #include "cpu/tms57002/tms57002.h"
 #include "machine/eeprom.h"
 #include "sound/k054539.h"
-#include "konamigx.h"
+#include "includes/konamigx.h"
 #include "machine/adc083x.h"
 #include "rendlay.h"
 

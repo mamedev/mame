@@ -40,7 +40,7 @@
 #include "machine/eepromdev.h"
 #include "sound/namco.h"
 #include "sound/dac.h"
-#include "20pacgal.h"
+#include "includes/20pacgal.h"
 
 
 /*************************************

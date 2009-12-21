@@ -38,7 +38,7 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromdev.h"
-#include "taito_f3.h"
+#include "includes/taito_f3.h"
 #include "sound/es5506.h"
 #include "audio/taito_en.h"
 #include "sound/okim6295.h"

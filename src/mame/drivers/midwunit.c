@@ -88,7 +88,7 @@ Notes:
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "audio/dcs.h"
-#include "midwunit.h"
+#include "includes/midwunit.h"
 
 
 #define PIXEL_CLOCK		(8000000)

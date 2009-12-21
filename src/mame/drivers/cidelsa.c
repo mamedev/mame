@@ -4,7 +4,7 @@
 #include "sound/cdp1869.h"
 #include "sound/ay8910.h"
 #include "machine/cdp1852.h"
-#include "cidelsa.h"
+#include "includes/cidelsa.h"
 
 /* CDP1802 Interface */
 

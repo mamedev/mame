@@ -152,7 +152,7 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ymf278b.h"
-#include "fuukifg3.h"
+#include "includes/fuukifg3.h"
 
 
 static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )

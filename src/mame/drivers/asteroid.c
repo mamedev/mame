@@ -189,7 +189,7 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "machine/atari_vg.h"
-#include "asteroid.h"
+#include "includes/asteroid.h"
 #include "sound/discrete.h"
 #include "sound/pokey.h"
 

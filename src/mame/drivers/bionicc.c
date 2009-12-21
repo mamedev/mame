@@ -59,7 +59,7 @@
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/2151intf.h"
-#include "bionicc.h"
+#include "includes/bionicc.h"
 
 #define MASTER_CLOCK       XTAL_24MHz
 #define EXO3_F0_CLK        XTAL_14_31818MHz

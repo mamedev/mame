@@ -79,7 +79,7 @@ TODO:
 #include "machine/6532riot.h"
 #include "machine/6522via.h"
 #include "sound/ay8910.h"
-#include "gameplan.h"
+#include "includes/gameplan.h"
 
 
 

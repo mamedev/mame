@@ -4,7 +4,7 @@
 
 *************************************************************************/
 #include "driver.h"
-#include "subs.h"
+#include "includes/subs.h"
 #include "sound/discrete.h"
 
 

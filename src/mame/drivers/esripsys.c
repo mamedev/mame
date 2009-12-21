@@ -31,7 +31,7 @@
 #include "machine/6840ptm.h"
 #include "sound/dac.h"
 #include "sound/tms5220.h"
-#include "esripsys.h"
+#include "includes/esripsys.h"
 
 
 /*************************************

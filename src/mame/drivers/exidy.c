@@ -128,8 +128,8 @@
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "deprecat.h"
-#include "exidy.h"
-#include "targ.h"
+#include "includes/exidy.h"
+#include "includes/targ.h"
 #include "machine/6821pia.h"
 
 

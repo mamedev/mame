@@ -1,7 +1,7 @@
 /* Free Kick Video Hardware */
 
 #include "driver.h"
-#include "freekick.h"
+#include "includes/freekick.h"
 
 
 static TILE_GET_INFO( get_freek_tile_info )

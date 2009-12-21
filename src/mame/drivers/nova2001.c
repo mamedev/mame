@@ -121,7 +121,7 @@ e000 - e7ff        R/W      Work RAM
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
-#include "nova2001.h"
+#include "includes/nova2001.h"
 
 #define MAIN_CLOCK XTAL_12MHz
 

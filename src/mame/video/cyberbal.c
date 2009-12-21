@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "machine/atarigen.h"
-#include "cyberbal.h"
+#include "includes/cyberbal.h"
 
 
 #define SCREEN_WIDTH		(42*16)

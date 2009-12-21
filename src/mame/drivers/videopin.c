@@ -12,7 +12,7 @@
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-#include "videopin.h"
+#include "includes/videopin.h"
 #include "videopin.lh"
 #include "sound/discrete.h"
 

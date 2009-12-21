@@ -7,7 +7,7 @@ enable / disable tilemap bits might be wrong
 */
 
 #include "driver.h"
-#include "angelkds.h"
+#include "includes/angelkds.h"
 
 
 /*** Text Layer Tilemap

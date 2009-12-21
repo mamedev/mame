@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "nova2001.h"
+#include "includes/nova2001.h"
 
 UINT8 *nova2001_fg_videoram, *nova2001_bg_videoram;
 

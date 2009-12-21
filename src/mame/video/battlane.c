@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "battlane.h"
+#include "includes/battlane.h"
 
 /*
     Video control register

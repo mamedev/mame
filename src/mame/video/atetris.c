@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "atetris.h"
+#include "includes/atetris.h"
 
 
 static tilemap *bg_tilemap;

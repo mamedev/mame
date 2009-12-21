@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "cloud9.h"
+#include "includes/cloud9.h"
 #include "video/resnet.h"
 
 

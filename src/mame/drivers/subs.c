@@ -20,7 +20,7 @@
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "deprecat.h"
-#include "subs.h"
+#include "includes/subs.h"
 #include "sound/discrete.h"
 #include "rendlay.h"
 

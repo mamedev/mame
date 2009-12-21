@@ -17,7 +17,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "video/vector.h"
-#include "aztarac.h"
+#include "includes/aztarac.h"
 #include "sound/ay8910.h"
 
 

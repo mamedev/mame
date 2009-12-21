@@ -10,7 +10,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/ticket.h"
-#include "williams.h"
+#include "includes/williams.h"
 #include "sound/dac.h"
 #include "sound/hc55516.h"
 

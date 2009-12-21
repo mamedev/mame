@@ -115,7 +115,7 @@ Notes (couriersud)
 #include "machine/rescap.h"
 #include "sound/samples.h"
 #include "machine/74123.h"
-#include "m10.h"
+#include "includes/m10.h"
 
 
 /*************************************

@@ -4,7 +4,7 @@
  */
 
 #include "driver.h"
-#include "namcoic.h"
+#include "includes/namcoic.h"
 
 #define TX_TILE_OFFSET_CENTER	(32 * 2)
 #define TX_TILE_OFFSET_RIGHT	(32 * 0 + 2)

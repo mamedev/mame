@@ -871,7 +871,7 @@ CPU  - 317-0092  |--------------------------------------------------------------
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
-#include "system16.h"
+#include "includes/system16.h"
 #include "machine/segaic16.h"
 #include "machine/fd1089.h"
 #include "machine/fd1094.h"

@@ -77,7 +77,7 @@ Dip locations verified with manual for ddragon & ddragon2
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"
-#include "ddragon.h"
+#include "includes/ddragon.h"
 
 
 #define MAIN_CLOCK		XTAL_12MHz

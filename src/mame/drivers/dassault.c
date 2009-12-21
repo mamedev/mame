@@ -124,7 +124,7 @@ Dip locations verified with US conversion kit manual.
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
-#include "deco16ic.h"
+#include "includes/deco16ic.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"

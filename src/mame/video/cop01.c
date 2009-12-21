@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "cop01.h"
+#include "includes/cop01.h"
 
 
 PALETTE_INIT( cop01 )

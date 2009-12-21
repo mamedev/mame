@@ -118,7 +118,7 @@
 
 #include "driver.h"
 #include "cpu/s2650/s2650.h"
-#include "meadows.h"
+#include "includes/meadows.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
 

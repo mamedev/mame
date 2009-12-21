@@ -15,7 +15,7 @@
 #include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
-#include "bogeyman.h"
+#include "includes/bogeyman.h"
 
 
 /* Read/Write Handlers */

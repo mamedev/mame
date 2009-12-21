@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "exedexes.h"
+#include "includes/exedexes.h"
 
 
 #define TileMap(offs) (memory_region(machine, "gfx5")[offs])

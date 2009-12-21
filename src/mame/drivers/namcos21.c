@@ -292,13 +292,13 @@ CPU68 PCB:
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
 #include "deprecat.h"
-#include "namcos2.h"
+#include "includes/namcos2.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/tms32025/tms32025.h"
-#include "namcoic.h"
+#include "includes/namcoic.h"
 #include "sound/2151intf.h"
 #include "sound/c140.h"
-#include "namcos21.h"
+#include "includes/namcos21.h"
 
 #define PTRAM_SIZE 0x20000
 

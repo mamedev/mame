@@ -10,7 +10,7 @@ Functions to emulate the video hardware of the machine.
 
 #include "driver.h"
 #include "sound/dac.h"
-#include "cheekyms.h"
+#include "includes/cheekyms.h"
 
 /* bit 3 and 7 of the char color PROMs are used for something -- not currently emulated -
    thus GAME_IMPERFECT_GRAPHICS */

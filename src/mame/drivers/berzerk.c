@@ -10,7 +10,7 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "exidy.h"
+#include "includes/exidy.h"
 #include "machine/74181.h"
 #include "sound/s14001a.h"
 #include "video/resnet.h"

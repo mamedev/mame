@@ -5,7 +5,7 @@
 *************************************************************************/
 
 #include "driver.h"
-#include "segag80v.h"
+#include "includes/segag80v.h"
 #include "sound/samples.h"
 
 /* History:

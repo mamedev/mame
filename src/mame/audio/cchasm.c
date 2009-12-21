@@ -8,7 +8,7 @@
 #include "streams.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
-#include "cchasm.h"
+#include "includes/cchasm.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 

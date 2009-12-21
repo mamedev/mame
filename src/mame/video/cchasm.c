@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "video/vector.h"
-#include "cchasm.h"
+#include "includes/cchasm.h"
 
 #define HALT   0
 #define JUMP   1

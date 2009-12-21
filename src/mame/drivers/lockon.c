@@ -14,7 +14,7 @@
 #include "cpu/nec/nec.h"
 #include "sound/2203intf.h"
 #include "sound/flt_vol.h"
-#include "lockon.h"
+#include "includes/lockon.h"
 
 #define V30_GND_ADDR	((lockon_ctrl_reg & 0x3) << 16)
 #define V30_OBJ_ADDR	((lockon_ctrl_reg & 0x18) << 13)

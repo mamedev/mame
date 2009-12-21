@@ -219,7 +219,7 @@ Custom: GX61A01
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/upd7810/upd7810.h"
-#include "homedata.h"
+#include "includes/homedata.h"
 #include "sound/dac.h"
 #include "sound/2203intf.h"
 #include "sound/sn76496.h"

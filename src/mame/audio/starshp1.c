@@ -4,7 +4,7 @@
  ************************************************************************/
 
 #include "driver.h"
-#include "starshp1.h"
+#include "includes/starshp1.h"
 #include "sound/discrete.h"
 
 

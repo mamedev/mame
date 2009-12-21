@@ -36,7 +36,7 @@ Notes/Tidbits:
 #include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "machine/7474.h"
-#include "galaxold.h"
+#include "includes/galaxold.h"
 #include "sound/ay8910.h"
 
 static const gfx_layout scobra_charlayout =

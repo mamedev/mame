@@ -319,7 +319,7 @@ MIB.42
 #include "cpu/v60/v60.h"
 #include "cpu/nec/nec.h"
 #include "rendlay.h"
-#include "segas32.h"
+#include "includes/segas32.h"
 #include "machine/eeprom.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"

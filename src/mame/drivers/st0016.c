@@ -14,7 +14,7 @@ Dips verified for Neratte Chu (nratechu) from manual
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/st0016.h"
-#include "st0016.h"
+#include "includes/st0016.h"
 
 
 

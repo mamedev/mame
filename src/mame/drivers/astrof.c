@@ -58,7 +58,7 @@
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-#include "astrof.h"
+#include "includes/astrof.h"
 
 
 #define MASTER_CLOCK  		(XTAL_10_595MHz)

@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "machine/atarigen.h"
-#include "atarig1.h"
+#include "includes/atarig1.h"
 
 
 

@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "atarifb.h"
+#include "includes/atarifb.h"
 #include "sound/discrete.h"
 
 

@@ -10,7 +10,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
-#include "madalien.h"
+#include "includes/madalien.h"
 
 
 #define SOUND_CLOCK XTAL_4MHz

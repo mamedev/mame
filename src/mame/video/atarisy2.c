@@ -5,8 +5,8 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "slapstic.h"
-#include "atarisy2.h"
+#include "includes/slapstic.h"
+#include "includes/atarisy2.h"
 
 
 

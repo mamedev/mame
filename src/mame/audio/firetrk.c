@@ -5,7 +5,7 @@
 *************************************************************************/
 
 #include "driver.h"
-#include "firetrk.h"
+#include "includes/firetrk.h"
 #include "sound/discrete.h"
 
 

@@ -11,7 +11,7 @@ Dip locations added from dip listing at crazykong.com
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/2203intf.h"
-#include "citycon.h"
+#include "includes/citycon.h"
 
 
 static READ8_HANDLER( citycon_in_r )

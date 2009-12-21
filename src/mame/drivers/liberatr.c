@@ -138,7 +138,7 @@
 #include "deprecat.h"
 #include "machine/atari_vg.h"
 #include "sound/pokey.h"
-#include "liberatr.h"
+#include "includes/liberatr.h"
 
 #define MASTER_CLOCK 20000000 /* 20Mhz Main Clock Xtal */
 

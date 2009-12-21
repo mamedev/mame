@@ -105,7 +105,7 @@
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "deprecat.h"
-#include "atarifb.h"
+#include "includes/atarifb.h"
 #include "sound/discrete.h"
 
 #include "atarifb.lh"

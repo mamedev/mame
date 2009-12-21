@@ -9,7 +9,7 @@
 
 #include "driver.h"
 #include "cpu/mcs51/mcs51.h"
-#include "gaelcrpt.h"
+#include "includes/gaelcrpt.h"
 #include "includes/wrally.h"
 
 /***************************************************************************

@@ -98,7 +98,7 @@ Dip Locations and factory settings verified with manual
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "bombjack.h"
+#include "includes/bombjack.h"
 
 
 static TIMER_CALLBACK( soundlatch_callback )

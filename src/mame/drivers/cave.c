@@ -73,7 +73,7 @@ Versions known to exist but not dumped:
 #include "machine/eeprom.h"
 #include "machine/nmk112.h"
 #include "cpu/z80/z80.h"
-#include "cave.h"
+#include "includes/cave.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"

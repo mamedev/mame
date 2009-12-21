@@ -50,7 +50,7 @@ So this is the correct behavior of real hardware, not an emulation bug.
 #include "sound/k007232.h"
 #include "sound/k051649.h"
 #include "includes/nemesis.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 int nemesis_irq_on = 0;
 int nemesis_irq2_on = 0;

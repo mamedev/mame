@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "fcombat.h"
+#include "includes/fcombat.h"
 
 
 static TILE_GET_INFO( get_bg_tile_info )

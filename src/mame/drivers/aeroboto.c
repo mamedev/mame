@@ -25,7 +25,7 @@ Revisions:
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
-#include "aeroboto.h"
+#include "includes/aeroboto.h"
 
 
 static READ8_HANDLER( aeroboto_201_r )

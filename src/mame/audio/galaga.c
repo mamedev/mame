@@ -6,7 +6,7 @@
 #include "driver.h"
 #include "namco52.h"
 #include "namco54.h"
-#include "galaga.h"
+#include "includes/galaga.h"
 
 
 /*************************************

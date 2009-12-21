@@ -37,7 +37,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 #include "driver.h"
-#include "unico.h"
+#include "includes/unico.h"
 
 /* Variables needed by drivers: */
 

@@ -26,7 +26,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 #include "driver.h"
-#include "paradise.h"
+#include "includes/paradise.h"
 
 /* Variables that driver has access to: */
 

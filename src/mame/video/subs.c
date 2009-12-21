@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "subs.h"
+#include "includes/subs.h"
 #include "sound/discrete.h"
 
 WRITE8_HANDLER( subs_invert1_w )

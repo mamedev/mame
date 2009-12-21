@@ -39,7 +39,7 @@ This is not a bug (real machine behaves the same).
 #include "cpu/z80/z80.h"
 #include "cpu/mips/r3000.h"
 #include "sound/st0016.h"
-#include "st0016.h"
+#include "includes/st0016.h"
 
 #define DEBUG_CHAR
 static UINT32 databank;

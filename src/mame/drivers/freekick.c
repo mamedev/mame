@@ -33,7 +33,7 @@ TODO:
 #include "machine/8255ppi.h"
 #include "machine/mc8123.h"
 #include "sound/sn76496.h"
-#include "freekick.h"
+#include "includes/freekick.h"
 
 
 /*************************************

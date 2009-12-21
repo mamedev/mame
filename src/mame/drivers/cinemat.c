@@ -32,7 +32,7 @@
 #include "driver.h"
 #include "video/vector.h"
 #include "cpu/ccpu/ccpu.h"
-#include "cinemat.h"
+#include "includes/cinemat.h"
 #include "rendlay.h"
 
 #include "armora.lh"

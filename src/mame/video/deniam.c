@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "deniam.h"
+#include "includes/deniam.h"
 
 
 static void deniam_common_init( running_machine *machine )

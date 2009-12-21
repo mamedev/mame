@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "suprridr.h"
+#include "includes/suprridr.h"
 
 
 UINT8 *suprridr_bgram;

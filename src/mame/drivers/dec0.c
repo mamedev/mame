@@ -47,7 +47,7 @@ ToDo:
 #include "cpu/m6502/m6502.h"
 #include "cpu/h6280/h6280.h"
 #include "cpu/z80/z80.h"
-#include "dec0.h"
+#include "includes/dec0.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"

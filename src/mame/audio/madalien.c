@@ -4,7 +4,7 @@
  ************************************************************************/
 
 #include "driver.h"
-#include "madalien.h"
+#include "includes/madalien.h"
 #include "sound/discrete.h"
 
 

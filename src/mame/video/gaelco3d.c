@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "eminline.h"
-#include "gaelco3d.h"
+#include "includes/gaelco3d.h"
 #include "cpu/tms32031/tms32031.h"
 #include "video/rgbutil.h"
 #include "video/poly.h"

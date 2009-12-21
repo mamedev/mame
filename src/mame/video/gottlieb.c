@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "gottlieb.h"
+#include "includes/gottlieb.h"
 #include "machine/laserdsc.h"
 #include "video/resnet.h"
 

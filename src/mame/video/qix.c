@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "video/mc6845.h"
-#include "qix.h"
+#include "includes/qix.h"
 #include "cpu/m6809/m6809.h"
 
 

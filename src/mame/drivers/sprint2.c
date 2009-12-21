@@ -19,7 +19,7 @@
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-#include "sprint2.h"
+#include "includes/sprint2.h"
 #include "sound/discrete.h"
 
 #define GAME_IS_SPRINT1   (game == 1)

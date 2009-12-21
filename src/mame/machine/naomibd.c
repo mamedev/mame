@@ -177,7 +177,7 @@ Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/
 #include "machine/x76f100.h"
 #include "cdrom.h"
 #include "includes/naomi.h"
-#include "naomibd.h"
+#include "includes/naomibd.h"
 
 #define NAOMIBD_FLAG_AUTO_ADVANCE	(8)	// address auto-advances on read
 #define NAOMIBD_FLAG_SPECIAL_MODE	(4)	// used to access protection registers

@@ -31,7 +31,7 @@ inputs + notes by stephh
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "fcombat.h"
+#include "includes/fcombat.h"
 
 
 static INPUT_CHANGED( coin_inserted )

@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "cpu/mips/r3000.h"
-#include "policetr.h"
+#include "includes/policetr.h"
 
 
 /* constants */

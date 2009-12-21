@@ -194,7 +194,7 @@
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/74123.h"
-#include "spiders.h"
+#include "includes/spiders.h"
 
 
 #define MAIN_CPU_MASTER_CLOCK	(11200000)

@@ -12,7 +12,7 @@ To Do:
 
 #include "driver.h"
 #include "cpu/m6800/m6800.h"
-#include "triplhnt.h"
+#include "includes/triplhnt.h"
 
 static UINT8 triplhnt_cmos[16];
 static UINT8 triplhnt_da_latch;

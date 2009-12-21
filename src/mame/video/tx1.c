@@ -8,7 +8,7 @@
 #include "render.h"
 #include "video/resnet.h"
 #include "cpu/i86/i86.h"
-#include "tx1.h"
+#include "includes/tx1.h"
 
 
 /*************************************

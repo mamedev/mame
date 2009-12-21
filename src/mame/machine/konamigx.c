@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "video/konamiic.h"
-#include "konamigx.h"
+#include "includes/konamigx.h"
 
 /***************************************************************************/
 /*                                                                         */

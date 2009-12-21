@@ -23,7 +23,7 @@ Revisions:
 #include "video/konicdev.h"
 #include "sound/3812intf.h"
 #include "sound/k007232.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 VIDEO_START( spy );
 VIDEO_UPDATE( spy );

@@ -21,7 +21,7 @@
 
 #include "driver.h"
 #include "machine/atarigen.h"
-#include "atarig42.h"
+#include "includes/atarig42.h"
 
 
 

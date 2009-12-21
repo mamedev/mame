@@ -3,7 +3,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 static UINT8 *mogura_tileram;
 static UINT8* mogura_gfxram;

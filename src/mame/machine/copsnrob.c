@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "copsnrob.h"
+#include "includes/copsnrob.h"
 
 static const int gun_mask[] = {0x7e, 0x7d, 0x7b, 0x77, 0x6f, 0x5f, 0x3f};
 

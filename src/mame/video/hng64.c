@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "hng64.h"
+#include "includes/hng64.h"
 
 #include <math.h>
 #include "drawgfxm.h"

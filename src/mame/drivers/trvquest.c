@@ -38,7 +38,7 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "machine/6522via.h"
 #include "sound/ay8910.h"
-#include "gameplan.h"
+#include "includes/gameplan.h"
 
 static READ8_HANDLER( trvquest_question_r )
 {

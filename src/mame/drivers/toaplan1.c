@@ -65,7 +65,7 @@ To Do:
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
-#include "toaplan1.h"
+#include "includes/toaplan1.h"
 #include "sound/3812intf.h"
 
 

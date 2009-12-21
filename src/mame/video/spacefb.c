@@ -5,7 +5,7 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "spacefb.h"
+#include "includes/spacefb.h"
 #include "video/resnet.h"
 
 

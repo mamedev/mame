@@ -14,13 +14,13 @@
 
 #define DE156CPU ARM
 #include "driver.h"
-#include "decocrpt.h"
-#include "deco32.h"
+#include "includes/decocrpt.h"
+#include "includes/deco32.h"
 #include "machine/eepromdev.h"
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 #include "cpu/arm/arm.h"
-#include "deco16ic.h"
+#include "includes/deco16ic.h"
 
 static int simpl156_bank_callback(const int bank)
 {

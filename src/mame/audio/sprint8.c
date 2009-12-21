@@ -4,7 +4,7 @@
  ************************************************************************/
 
 #include "driver.h"
-#include "sprint8.h"
+#include "includes/sprint8.h"
 
 
 /* Discrete Sound Input Nodes */

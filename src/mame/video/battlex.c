@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "battlex.h"
+#include "includes/battlex.h"
 
 PALETTE_INIT( battlex )
 {

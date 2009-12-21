@@ -47,7 +47,7 @@ Head Panic
 #include "machine/eepromdev.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
-#include "esd16.h"
+#include "includes/esd16.h"
 
 
 /***************************************************************************

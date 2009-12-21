@@ -268,7 +268,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
 #include "video/mc6845.h"
 #include "sound/sn76477.h"
 #include "sound/samples.h"
-#include "snk6502.h"
+#include "includes/snk6502.h"
 
 
 #define MASTER_CLOCK	XTAL_11_289MHz

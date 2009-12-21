@@ -15,7 +15,7 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "exerion.h"
+#include "includes/exerion.h"
 #include "sound/ay8910.h"
 
 

@@ -7,7 +7,7 @@ Data East machine functions - Bryan McPhail, mish@tendril.co.uk
 *******************************************************************************/
 
 #include "driver.h"
-#include "dec0.h"
+#include "includes/dec0.h"
 #include "cpu/h6280/h6280.h"
 
 static int GAME,i8751_return,slyspy_state;

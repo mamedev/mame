@@ -72,7 +72,7 @@
 
 #include "driver.h"
 #include "machine/eeprom.h"
-#include "decoprot.h"
+#include "includes/decoprot.h"
 
 #define DECO_PORT(p) (prot_ram[p/2])
 

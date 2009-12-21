@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deco16ic.h"
+#include "includes/deco16ic.h"
 
 static UINT16 vaportra_priority[2];
 

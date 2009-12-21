@@ -22,7 +22,7 @@
 #include "cpu/m68000/m68000.h"
 #include "audio/atarijsa.h"
 #include "video/atarirle.h"
-#include "atarig1.h"
+#include "includes/atarig1.h"
 
 
 

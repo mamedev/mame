@@ -67,7 +67,7 @@ correctly.
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
-#include "1942.h"
+#include "includes/1942.h"
 
 
 static WRITE8_HANDLER( c1942_bankswitch_w )

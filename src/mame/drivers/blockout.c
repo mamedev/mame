@@ -70,7 +70,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "blockout.h"
+#include "includes/blockout.h"
 
 
 static INTERRUPT_GEN( blockout_interrupt )

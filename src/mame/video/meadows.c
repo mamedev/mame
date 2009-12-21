@@ -5,7 +5,7 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "meadows.h"
+#include "includes/meadows.h"
 
 /* some constants to make life easier */
 #define SPR_ADJUST_X    -18

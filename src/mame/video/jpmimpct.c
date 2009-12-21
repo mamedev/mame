@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "cpu/tms34010/tms34010.h"
-#include "jpmimpct.h"
+#include "includes/jpmimpct.h"
 
 
 UINT16 *tms_vram;

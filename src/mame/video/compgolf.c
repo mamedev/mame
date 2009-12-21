@@ -6,7 +6,7 @@
 ****************************************************************************************/
 
 #include "driver.h"
-#include "compgolf.h"
+#include "includes/compgolf.h"
 
 
 PALETTE_INIT( compgolf )

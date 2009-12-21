@@ -365,7 +365,6 @@ endif
 # add core include paths
 CCOMFLAGS += \
 	-I$(SRC)/$(TARGET) \
-	-I$(SRC)/$(TARGET)/includes \
 	-I$(OBJ)/$(TARGET)/layout \
 	-I$(SRC)/emu \
 	-I$(OBJ)/emu \

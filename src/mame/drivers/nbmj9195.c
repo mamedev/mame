@@ -22,7 +22,7 @@ Notes:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
-#include "nb1413m3.h"		// needed for mahjong input controller
+#include "includes/nb1413m3.h"		// needed for mahjong input controller
 #include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "cpu/z80/z80daisy.h"

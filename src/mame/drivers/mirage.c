@@ -34,12 +34,10 @@ MR_01-.3A    [a0b758aa]
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "decocrpt.h"
-#include "decoprot.h"
-#include "deco16ic.h"
+#include "includes/decocrpt.h"
+#include "includes/decoprot.h"
+#include "includes/deco16ic.h"
 #include "sound/okim6295.h"
-
-#include "deco16ic.h"
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, int pri)
 {

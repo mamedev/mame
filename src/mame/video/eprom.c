@@ -5,8 +5,8 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "eprom.h"
-#include "thunderj.h"
+#include "includes/eprom.h"
+#include "includes/thunderj.h"
 
 
 /*************************************

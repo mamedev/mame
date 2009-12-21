@@ -1,9 +1,9 @@
 /* video/namcofl.c */
 
 #include "driver.h"
-#include "namconb1.h"
-#include "namcoic.h"
-#include "namcos2.h"
+#include "includes/namconb1.h"
+#include "includes/namcoic.h"
+#include "includes/namcos2.h"
 
 //UINT32 *namcofl_spritebank32;
 //UINT32 *namcofl_tilebank32;

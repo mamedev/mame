@@ -172,7 +172,7 @@ there are 9 PALS on the pcb (not dumped)
 #include "deprecat.h"
 #include "sound/ymz280b.h"
 #include "includes/suprnova.h"
-#include "kaneko16.h"
+#include "includes/kaneko16.h"
 
 static bitmap_t *sprite_bitmap_1;
 static bitmap_t *sprite_bitmap_2;

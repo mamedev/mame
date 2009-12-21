@@ -9,7 +9,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
-#include "cheekyms.h"
+#include "includes/cheekyms.h"
 
 
 static INPUT_CHANGED( coin_inserted )

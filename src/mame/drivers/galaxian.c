@@ -229,7 +229,7 @@ TO DO :
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/s2650/s2650.h"
-#include "galaxian.h"
+#include "includes/galaxian.h"
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"

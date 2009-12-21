@@ -124,7 +124,7 @@
 #include "sound/tms5220.h"
 #include "sound/2151intf.h"
 #include "sound/pokey.h"
-#include "gauntlet.h"
+#include "includes/gauntlet.h"
 
 
 

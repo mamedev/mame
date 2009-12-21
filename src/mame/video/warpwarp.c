@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
-#include "warpwarp.h"
+#include "includes/warpwarp.h"
 
 
 UINT8 *geebee_videoram,*warpwarp_videoram;

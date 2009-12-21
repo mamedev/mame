@@ -5,7 +5,7 @@
 *************************************************************************/
 
 #include "driver.h"
-#include "centiped.h"
+#include "includes/centiped.h"
 
 
 static tilemap *bg_tilemap;

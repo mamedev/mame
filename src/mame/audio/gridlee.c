@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "gridlee.h"
+#include "includes/gridlee.h"
 #include "sound/samples.h"
 
 

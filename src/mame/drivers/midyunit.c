@@ -116,7 +116,7 @@ Notes:
 #include "cpu/tms34010/tms34010.h"
 #include "audio/williams.h"
 #include "sound/okim6295.h"
-#include "midyunit.h"
+#include "includes/midyunit.h"
 
 
 /* master clocks vary based on game */

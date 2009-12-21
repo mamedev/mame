@@ -9,9 +9,9 @@
 #include "cpu/h6280/h6280.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "decocrpt.h"
-#include "decoprot.h"
-#include "deco16ic.h"
+#include "includes/decocrpt.h"
+#include "includes/decoprot.h"
+#include "includes/deco16ic.h"
 
 VIDEO_UPDATE( dietgo );
 VIDEO_START( dietgo );

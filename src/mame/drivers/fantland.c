@@ -51,7 +51,7 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 #include "sound/3526intf.h"
 #include "sound/dac.h"
 #include "sound/msm5205.h"
-#include "fantland.h"
+#include "includes/fantland.h"
 
 /***************************************************************************
 

@@ -60,7 +60,7 @@ To do:
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "sound/st0016.h"
-#include "st0016.h"
+#include "includes/st0016.h"
 #include "cpu/z80/z80.h"
 
 #define DARKHORS_DEBUG	0

@@ -11,7 +11,7 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m68000/m68000.h"
-#include "namcoic.h"
+#include "includes/namcoic.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
 #include "sound/namco.h"

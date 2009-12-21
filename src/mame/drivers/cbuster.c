@@ -22,7 +22,7 @@
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "deco16ic.h"
+#include "includes/deco16ic.h"
 
 VIDEO_START( twocrude );
 VIDEO_UPDATE( twocrude );

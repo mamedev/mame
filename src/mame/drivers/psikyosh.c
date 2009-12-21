@@ -275,7 +275,7 @@ Notes:
 #include "machine/eeprom.h"
 #include "sound/ymf278b.h"
 
-#include "psikyosh.h"
+#include "includes/psikyosh.h"
 
 #define ROMTEST 1 /* Does necessary stuff to perform rom test, uses RAM as it doesn't dispose of GFX after decoding */
 

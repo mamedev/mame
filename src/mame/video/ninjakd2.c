@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "ninjakd2.h"
+#include "includes/ninjakd2.h"
 
 UINT8* ninjakd2_bg_videoram;
 UINT8* ninjakd2_fg_videoram;

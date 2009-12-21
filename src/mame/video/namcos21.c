@@ -7,9 +7,9 @@ Namco System 21 Video Hardware
 */
 
 #include "driver.h"
-#include "namcos2.h"
-#include "namcoic.h"
-#include "namcos21.h"
+#include "includes/namcos2.h"
+#include "includes/namcoic.h"
+#include "includes/namcos21.h"
 
 #define FRAMEBUFFER_SIZE_IN_BYTES (sizeof(UINT16)*NAMCOS21_POLY_FRAME_WIDTH*NAMCOS21_POLY_FRAME_HEIGHT)
 

@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "aztarac.h"
+#include "includes/aztarac.h"
 
 static int sound_status;
 

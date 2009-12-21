@@ -23,7 +23,7 @@
 #include "video/atarirle.h"
 #include "cpu/m68000/m68000.h"
 #include "audio/cage.h"
-#include "atarigt.h"
+#include "includes/atarigt.h"
 
 
 #define LOG_PROTECTION		(0)

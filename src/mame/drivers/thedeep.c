@@ -28,7 +28,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
 #include "deprecat.h"
-#include "thedeep.h"
+#include "includes/thedeep.h"
 #include "sound/2203intf.h"
 
 /***************************************************************************

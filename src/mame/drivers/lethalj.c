@@ -140,7 +140,7 @@ Pin #11(+) | | R               |
 
 #include "driver.h"
 #include "cpu/tms34010/tms34010.h"
-#include "lethalj.h"
+#include "includes/lethalj.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
 

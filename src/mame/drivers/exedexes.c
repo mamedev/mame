@@ -14,7 +14,7 @@
 #include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
-#include "exedexes.h"
+#include "includes/exedexes.h"
 
 
 static INTERRUPT_GEN( exedexes_interrupt )

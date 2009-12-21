@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
-#include "popper.h"
+#include "includes/popper.h"
 
 
 /***************************************************************************

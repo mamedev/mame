@@ -83,7 +83,7 @@ Notes:
 #include "deprecat.h"
 #include "sound/okim6295.h"
 #include "sound/k051649.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 VIDEO_START( hexion );
 VIDEO_UPDATE( hexion );

@@ -5,8 +5,8 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "batman.h"
-#include "thunderj.h"
+#include "includes/batman.h"
+#include "includes/thunderj.h"
 
 
 

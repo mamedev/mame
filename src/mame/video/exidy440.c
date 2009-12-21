@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "exidy440.h"
+#include "includes/exidy440.h"
 
 
 #define PIXEL_CLOCK			(EXIDY440_MASTER_CLOCK / 2)

@@ -4,7 +4,7 @@
 
 *************************************************************************/
 #include "driver.h"
-#include "canyon.h"
+#include "includes/canyon.h"
 #include "sound/discrete.h"
 
 

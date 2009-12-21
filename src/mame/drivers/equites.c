@@ -372,7 +372,7 @@ D                                                                               
 #include "sound/msm5232.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
-#include "equites.h"
+#include "includes/equites.h"
 
 #define HVOLTAGE_DEBUG	0
 #define EASY_TEST_MODE	0

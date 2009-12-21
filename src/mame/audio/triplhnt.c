@@ -4,7 +4,7 @@
 
 *************************************************************************/
 #include "driver.h"
-#include "triplhnt.h"
+#include "includes/triplhnt.h"
 #include "sound/discrete.h"
 
 

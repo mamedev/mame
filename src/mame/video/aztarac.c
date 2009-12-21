@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "video/vector.h"
-#include "aztarac.h"
+#include "includes/aztarac.h"
 
 #define AVECTOR(m, x, y, color, intensity) \
 vector_add_point (m, xcenter + ((x) << 16), ycenter - ((y) << 16), color, intensity)

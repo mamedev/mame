@@ -5,8 +5,8 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "vindictr.h"
-#include "thunderj.h"
+#include "includes/vindictr.h"
+#include "includes/thunderj.h"
 
 
 

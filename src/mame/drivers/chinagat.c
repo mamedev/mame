@@ -78,7 +78,7 @@ Dip locations and factory settings verified with China Gate US manual.
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"
-#include "ddragon.h"
+#include "includes/ddragon.h"
 
 #define MAIN_CLOCK		XTAL_12MHz
 #define PIXEL_CLOCK		MAIN_CLOCK / 2

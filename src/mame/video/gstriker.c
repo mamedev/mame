@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "gstriker.h"
+#include "includes/gstriker.h"
 
 //UINT16 *gs_videoram3;
 //UINT16 *gs_mixer_regs;

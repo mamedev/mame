@@ -5,7 +5,7 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "neogeo.h"
+#include "includes/neogeo.h"
 #include "video/resnet.h"
 
 #define NUM_PENS	(0x1000)

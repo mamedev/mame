@@ -85,7 +85,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
-#include "popper.h"
+#include "includes/popper.h"
 
 
 /*************************************

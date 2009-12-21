@@ -77,7 +77,7 @@
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/pokey.h"
-#include "irobot.h"
+#include "includes/irobot.h"
 
 
 

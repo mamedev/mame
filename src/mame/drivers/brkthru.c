@@ -53,7 +53,7 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
-#include "brkthru.h"
+#include "includes/brkthru.h"
 
 
 #define MASTER_CLOCK		XTAL_12MHz

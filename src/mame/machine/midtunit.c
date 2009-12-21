@@ -9,7 +9,7 @@
 #include "cpu/m6809/m6809.h"
 #include "audio/williams.h"
 #include "audio/dcs.h"
-#include "midtunit.h"
+#include "includes/midtunit.h"
 
 
 /* compile-time constants */

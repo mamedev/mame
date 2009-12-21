@@ -5,8 +5,8 @@
 *************************************************************************/
 
 #include "driver.h"
-#include "vertigo.h"
-#include "exidy440.h"
+#include "includes/vertigo.h"
+#include "includes/exidy440.h"
 #include "machine/74148.h"
 #include "machine/pit8253.h"
 

@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "crgolf.h"
+#include "includes/crgolf.h"
 
 
 #define NUM_PENS		(0x20)

@@ -24,7 +24,7 @@
 #include "audio/dcs.h"
 #include "machine/idectrl.h"
 #include "machine/midwayic.h"
-#include "midvunit.h"
+#include "includes/midvunit.h"
 
 
 #define CPU_CLOCK		50000000

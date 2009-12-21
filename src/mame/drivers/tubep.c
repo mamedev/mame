@@ -105,7 +105,7 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 
-#include "tubep.h"
+#include "includes/tubep.h"
 
 /* Global variables */
 static UINT8 sound_latch;

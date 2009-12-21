@@ -5,7 +5,7 @@
 *************************************************************************/
 
 #include "driver.h"
-#include "vicdual.h"
+#include "includes/vicdual.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
 

@@ -7,7 +7,7 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "nb1413m3.h"
+#include "includes/nb1413m3.h"
 
 
 static int nbmj8900_scrolly;

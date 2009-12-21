@@ -533,7 +533,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255a.h"
-#include "norautp.h"
+#include "includes/norautp.h"
 
 #include "noraut11.lh"
 #include "noraut12.lh"

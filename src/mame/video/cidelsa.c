@@ -1,7 +1,7 @@
 #include "driver.h"
 #include "sound/cdp1869.h"
 #include "sound/ay8910.h"
-#include "cidelsa.h"
+#include "includes/cidelsa.h"
 
 /* Page RAM Access */
 

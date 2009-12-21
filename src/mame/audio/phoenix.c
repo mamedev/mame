@@ -11,7 +11,7 @@
 #include "driver.h"
 #include "streams.h"
 #include "sound/tms36xx.h"
-#include "phoenix.h"
+#include "includes/phoenix.h"
 
 /****************************************************************************
  * 4006

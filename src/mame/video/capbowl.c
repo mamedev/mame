@@ -7,7 +7,7 @@
 #include "driver.h"
 #include "video/tms34061.h"
 #include "cpu/m6809/m6809.h"
-#include "capbowl.h"
+#include "includes/capbowl.h"
 
 
 /*************************************

@@ -89,7 +89,7 @@
 #include "driver.h"
 #include "cpu/m6800/m6800.h"
 #include "deprecat.h"
-#include "skydiver.h"
+#include "includes/skydiver.h"
 #include "sound/discrete.h"
 
 #define MASTER_CLOCK (XTAL_12_096MHz)

@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "tatsumi.h"
+#include "includes/tatsumi.h"
 
 static tilemap *tx_layer;
 static tilemap *layer0, *layer1, *layer2, *layer3;

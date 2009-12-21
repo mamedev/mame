@@ -34,7 +34,7 @@ Pleiads:
 #include "sound/tms36xx.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
-#include "phoenix.h"
+#include "includes/phoenix.h"
 
 
 static ADDRESS_MAP_START( phoenix_memory_map, ADDRESS_SPACE_PROGRAM, 8 )

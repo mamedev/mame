@@ -79,8 +79,8 @@
 
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
-#include "gridlee.h"
-#include "balsente.h"
+#include "includes/gridlee.h"
+#include "includes/balsente.h"
 #include "sound/samples.h"
 
 

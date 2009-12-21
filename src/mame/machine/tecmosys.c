@@ -29,7 +29,7 @@
 */
 
 #include "driver.h"
-#include "tecmosys.h"
+#include "includes/tecmosys.h"
 
 enum DEV_STATUS
 {

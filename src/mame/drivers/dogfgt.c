@@ -10,7 +10,7 @@ driver by Nicola Salmoria
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "deprecat.h"
-#include "dogfgt.h"
+#include "includes/dogfgt.h"
 #include "sound/ay8910.h"
 
 

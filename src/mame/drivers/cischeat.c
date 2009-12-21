@@ -172,7 +172,7 @@ Cisco Heat.
 #include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "megasys1.h"
+#include "includes/megasys1.h"
 #include "includes/cischeat.h"
 
 static UINT16 *rom_1, *rom_2, *rom_3;

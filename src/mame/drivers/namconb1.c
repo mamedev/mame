@@ -271,9 +271,9 @@ GFX:                Custom 145     ( 80 pin PQFP)
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
-#include "namconb1.h"
-#include "namcos2.h"
-#include "namcoic.h"
+#include "includes/namconb1.h"
+#include "includes/namcos2.h"
+#include "includes/namcoic.h"
 #include "sound/c352.h"
 #include "cpu/m37710/m37710.h"
 

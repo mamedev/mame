@@ -130,7 +130,7 @@ Dumped by Chackn
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt.h"
 #include "sound/2203intf.h"
-#include "angelkds.h"
+#include "includes/angelkds.h"
 
 static READ8_HANDLER( angelkds_main_sound_r );
 static WRITE8_HANDLER( angelkds_main_sound_w );

@@ -207,7 +207,7 @@
 #include "machine/mathbox.h"
 #include "machine/atari_vg.h"
 #include "rendlay.h"
-#include "bzone.h"
+#include "includes/bzone.h"
 
 #include "sound/pokey.h"
 

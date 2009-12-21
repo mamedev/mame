@@ -25,12 +25,12 @@
 #include "deprecat.h"
 
 #include "video/konamiic.h"
-#include "konamigx.h"
+#include "includes/konamigx.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
 #include "sound/k054539.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 VIDEO_START(gaiapols);
 VIDEO_START(dadandrn);

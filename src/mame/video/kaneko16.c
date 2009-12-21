@@ -32,7 +32,7 @@
 **************************************************************************/
 
 #include "driver.h"
-#include "kaneko16.h"
+#include "includes/kaneko16.h"
 #include "kan_pand.h"
 
 static UINT16 kaneko16_disp_enable;

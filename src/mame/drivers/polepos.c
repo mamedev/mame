@@ -228,7 +228,7 @@ Todo:
 #include "sound/samples.h"
 #include "audio/namco52.h"
 #include "audio/namco54.h"
-#include "polepos.h"
+#include "includes/polepos.h"
 #include "sound/tms5220.h"
 
 #include "polepos.lh"

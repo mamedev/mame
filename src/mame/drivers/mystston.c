@@ -16,7 +16,7 @@
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
-#include "mystston.h"
+#include "includes/mystston.h"
 
 
 

@@ -5,7 +5,7 @@
 
 #include "driver.h"
 #include "video/konamiic.h"
-#include "konamigx.h"
+#include "includes/konamigx.h"
 
 
 #define GX_DEBUG 0

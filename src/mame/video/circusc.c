@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
-#include "circusc.h"
+#include "includes/circusc.h"
 
 
 /***************************************************************************

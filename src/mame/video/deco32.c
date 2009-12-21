@@ -1,6 +1,6 @@
 #include "driver.h"
-#include "deco16ic.h"
-#include "deco32.h"
+#include "includes/deco16ic.h"
+#include "includes/deco32.h"
 
 UINT32 *deco32_pf1_data,*deco32_pf2_data,*deco32_pf3_data,*deco32_pf4_data;
 UINT32 *deco32_pf12_control,*deco32_pf34_control;

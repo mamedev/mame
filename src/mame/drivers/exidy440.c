@@ -216,7 +216,7 @@
 
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
-#include "exidy440.h"
+#include "includes/exidy440.h"
 
 
 /* constants */

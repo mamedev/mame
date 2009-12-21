@@ -110,7 +110,7 @@
 #include "machine/8255ppi.h"
 #include "machine/segacrpt.h"
 #include "audio/segasnd.h"
-#include "segag80r.h"
+#include "includes/segag80r.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/samples.h"

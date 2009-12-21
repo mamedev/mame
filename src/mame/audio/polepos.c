@@ -8,7 +8,7 @@
 #include "machine/rescap.h"
 #include "namco52.h"
 #include "namco54.h"
-#include "polepos.h"
+#include "includes/polepos.h"
 
 static int sample_msb = 0;
 static int sample_lsb = 0;

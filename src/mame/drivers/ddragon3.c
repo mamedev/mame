@@ -143,7 +143,7 @@ ROMs (All ROMs are 27C010 EPROM. - means not populated)
 #include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "ddragon3.h"
+#include "includes/ddragon3.h"
 
 #define PIXEL_CLOCK		(XTAL_28MHz / 4)
 

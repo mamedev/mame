@@ -33,7 +33,7 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
-#include "crospang.h"
+#include "includes/crospang.h"
 
 
 static WRITE16_HANDLER ( crospang_soundlatch_w )

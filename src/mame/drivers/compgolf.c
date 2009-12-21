@@ -13,7 +13,7 @@
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
-#include "compgolf.h"
+#include "includes/compgolf.h"
 
 
 /*************************************

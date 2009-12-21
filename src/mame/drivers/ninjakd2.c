@@ -133,7 +133,7 @@ TODO:
 #include "sound/2203intf.h"
 #include "sound/samples.h"
 #include "machine/mc8123.h"
-#include "ninjakd2.h"
+#include "includes/ninjakd2.h"
 
 #define MAIN_CLOCK_12 XTAL_12MHz
 #define MAIN_CLOCK_5  XTAL_5MHz

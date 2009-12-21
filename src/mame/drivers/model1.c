@@ -628,7 +628,7 @@ Notes:
 #include "cpu/v60/v60.h"
 #include "deprecat.h"
 #include "machine/eeprom.h"
-#include "system16.h"
+#include "includes/system16.h"
 #include "video/segaic24.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mb86233/mb86233.h"

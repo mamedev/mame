@@ -12,7 +12,7 @@
 
 #include "driver.h"
 #include "sound/samples.h"
-#include "circus.h"
+#include "includes/circus.h"
 
 
 WRITE8_HANDLER( circus_videoram_w )

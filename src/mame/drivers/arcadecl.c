@@ -68,7 +68,7 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "arcadecl.h"
+#include "includes/arcadecl.h"
 #include "sound/okim6295.h"
 
 

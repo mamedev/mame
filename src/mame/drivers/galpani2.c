@@ -23,7 +23,7 @@ To Do:
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "machine/eeprom.h"
-#include "kaneko16.h"
+#include "includes/kaneko16.h"
 #include "sound/okim6295.h"
 
 /***************************************************************************

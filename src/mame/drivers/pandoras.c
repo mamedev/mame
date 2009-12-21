@@ -27,8 +27,8 @@ Boards:
 #include "cpu/mcs48/mcs48.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "konamipt.h"
-#include "pandoras.h"
+#include "includes/konamipt.h"
+#include "includes/pandoras.h"
 
 
 #define MASTER_CLOCK		XTAL_18_432MHz

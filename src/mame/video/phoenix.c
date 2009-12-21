@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
-#include "phoenix.h"
+#include "includes/phoenix.h"
 
 static UINT8 *videoram_pg[2];
 static UINT8 videoram_pg_index;

@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "arkanoid.h"
+#include "includes/arkanoid.h"
 
 
 /* To log specific reads and writes of the bootlegs */

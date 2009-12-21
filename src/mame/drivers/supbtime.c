@@ -25,7 +25,7 @@ down hardware (it doesn't write any good sound data btw, mostly zeros).
 #include "cpu/h6280/h6280.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "deco16ic.h"
+#include "includes/deco16ic.h"
 
 VIDEO_START( supbtime );
 VIDEO_UPDATE( supbtime );

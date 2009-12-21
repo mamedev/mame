@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
-#include "cloak.h"
+#include "includes/cloak.h"
 
 
 #define NUM_PENS	(0x40)

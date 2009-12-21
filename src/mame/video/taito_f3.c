@@ -205,7 +205,7 @@ Playfield tile info:
 ***************************************************************************/
 
 #include "driver.h"
-#include "taito_f3.h"
+#include "includes/taito_f3.h"
 #include "ui.h"
 
 #define VERBOSE 0

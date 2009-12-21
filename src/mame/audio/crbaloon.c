@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "crbaloon.h"
+#include "includes/crbaloon.h"
 #include "sound/sn76477.h"
 #include "sound/discrete.h"
 

@@ -202,7 +202,7 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 #include "sound/samples.h"
 #include "sound/sp0250.h"
 #include "streams.h"
-#include "gottlieb.h"
+#include "includes/gottlieb.h"
 
 
 #define LOG_AUDIO_DECODE	(0)

@@ -270,7 +270,7 @@ Notes:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "system16.h"
+#include "includes/system16.h"
 #include "machine/fd1089.h"
 #include "machine/segaic16.h"
 #include "machine/8255ppi.h"

@@ -14,7 +14,7 @@
 
 #include "driver.h"
 #include "video/mc6845.h"
-#include "twincobr.h"
+#include "includes/twincobr.h"
 
 
 static STATE_POSTLOAD( twincobr_restore_screen );

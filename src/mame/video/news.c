@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "news.h"
+#include "includes/news.h"
 
 
 UINT8 *news_fgram;

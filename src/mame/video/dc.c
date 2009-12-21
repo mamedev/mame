@@ -4,7 +4,7 @@
 */
 
 #include "driver.h"
-#include "dc.h"
+#include "includes/dc.h"
 #include "cpu/sh4/sh4.h"
 #include "render.h"
 #include "rendutil.h"

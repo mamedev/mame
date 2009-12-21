@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "hexa.h"
+#include "includes/hexa.h"
 
 WRITE8_HANDLER( hexa_videoram_w )
 {

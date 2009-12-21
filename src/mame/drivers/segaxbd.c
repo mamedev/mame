@@ -233,7 +233,7 @@ Notes:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "system16.h"
+#include "includes/system16.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/segaic16.h"
 #include "sound/2151intf.h"

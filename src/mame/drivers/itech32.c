@@ -352,7 +352,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
 #include "machine/ticket.h"
-#include "itech32.h"
+#include "includes/itech32.h"
 #include "sound/es5506.h"
 #include "machine/timekpr.h"
 #include "devconv.h"

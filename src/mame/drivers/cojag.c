@@ -294,7 +294,7 @@ Notes:
 #include "cpu/jaguar/jaguar.h"
 #include "machine/idectrl.h"
 #include "sound/dac.h"
-#include "jaguar.h"
+#include "includes/jaguar.h"
 
 
 #define JAGUAR_CLOCK		XTAL_52MHz

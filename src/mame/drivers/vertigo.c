@@ -13,8 +13,8 @@
 #include "cpu/m6805/m6805.h"
 #include "cpu/m68000/m68000.h"
 #include "video/vector.h"
-#include "vertigo.h"
-#include "exidy440.h"
+#include "includes/vertigo.h"
+#include "includes/exidy440.h"
 #include "machine/74148.h"
 #include "machine/pit8253.h"
 

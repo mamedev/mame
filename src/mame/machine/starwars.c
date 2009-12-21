@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "starwars.h"
+#include "includes/starwars.h"
 #include "video/avgdvg.h"
 
 

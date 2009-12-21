@@ -88,8 +88,8 @@ other supported games as well.
 #include "audio/m72.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
-#include "iremipt.h"
-#include "m72.h"
+#include "includes/iremipt.h"
+#include "includes/m72.h"
 #include "cpu/mcs51/mcs51.h"
 
 #define MASTER_CLOCK		XTAL_32MHz

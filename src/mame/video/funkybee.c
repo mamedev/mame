@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "funkybee.h"
+#include "includes/funkybee.h"
 
 PALETTE_INIT( funkybee )
 {

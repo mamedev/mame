@@ -10,7 +10,7 @@
 
 #include "driver.h"
 #include "sound/ay8910.h"
-#include "dday.h"
+#include "includes/dday.h"
 
 
 /* Note: There seems to be no way to reset this timer via hardware.

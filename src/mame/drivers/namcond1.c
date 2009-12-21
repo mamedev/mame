@@ -69,7 +69,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "video/ygv608.h"
 #include "cpu/h83002/h8.h"
-#include "namcond1.h"
+#include "includes/namcond1.h"
 #include "sound/c352.h"
 #include "machine/at28c16.h"
 

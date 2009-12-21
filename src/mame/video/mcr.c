@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "mcr.h"
+#include "includes/mcr.h"
 
 
 INT8 mcr12_sprite_xoffs;

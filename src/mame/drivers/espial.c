@@ -9,7 +9,7 @@ Espial: The Orca logo is displayed, but looks to be "blacked out" via the
 
 #include "driver.h"
 #include "deprecat.h"
-#include "espial.h"
+#include "includes/espial.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 

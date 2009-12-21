@@ -44,7 +44,7 @@
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 #include "rendlay.h"
-#include "tx1.h"
+#include "includes/tx1.h"
 
 #include "tx1.lh"
 #include "buggyboy.lh"

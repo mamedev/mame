@@ -350,7 +350,7 @@ TO DO :
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/s2650/s2650.h"
-#include "galaxold.h"
+#include "includes/galaxold.h"
 #include "machine/7474.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"

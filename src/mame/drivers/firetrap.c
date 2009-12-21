@@ -62,7 +62,7 @@ write:
 #include "cpu/m6502/m6502.h"
 #include "sound/3526intf.h"
 #include "sound/msm5205.h"
-#include "firetrap.h"
+#include "includes/firetrap.h"
 
 
 static WRITE8_HANDLER( firetrap_nmi_disable_w )

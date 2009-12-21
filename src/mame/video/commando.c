@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "commando.h"
+#include "includes/commando.h"
 
 
 WRITE8_HANDLER( commando_videoram_w )

@@ -7,7 +7,7 @@ TODO:
 */
 
 #include "driver.h"
-#include "namcona1.h"
+#include "includes/namcona1.h"
 
 #define NAMCONA1_NUM_TILEMAPS 4
 

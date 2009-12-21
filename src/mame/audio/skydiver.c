@@ -4,7 +4,7 @@
 
 *************************************************************************/
 #include "driver.h"
-#include "skydiver.h"
+#include "includes/skydiver.h"
 #include "sound/discrete.h"
 
 

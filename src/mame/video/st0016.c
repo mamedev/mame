@@ -4,7 +4,7 @@
 ************************************/
 
 #include "driver.h"
-#include "st0016.h"
+#include "includes/st0016.h"
 
 UINT8 *st0016_charram;
 static UINT8 *st0016_spriteram,*st0016_paletteram;

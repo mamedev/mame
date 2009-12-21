@@ -50,7 +50,7 @@ Known Issues:
 #include "sound/k007232.h"
 #include "sound/upd7759.h"
 #include "includes/twin16.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 UINT16 twin16_custom_video;
 UINT16 *twin16_gfx_rom;

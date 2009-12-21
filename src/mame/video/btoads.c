@@ -9,7 +9,7 @@
 #include "driver.h"
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"
-#include "btoads.h"
+#include "includes/btoads.h"
 
 
 #define BT_DEBUG 0

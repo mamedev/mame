@@ -90,7 +90,7 @@
 #include "driver.h"
 #include "machine/ticket.h"
 #include "cpu/m6809/m6809.h"
-#include "capbowl.h"
+#include "includes/capbowl.h"
 #include "sound/2203intf.h"
 #include "sound/dac.h"
 

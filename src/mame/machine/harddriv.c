@@ -13,7 +13,7 @@
 #include "machine/asic65.h"
 #include "audio/atarijsa.h"
 #include "includes/slapstic.h"
-#include "harddriv.h"
+#include "includes/harddriv.h"
 
 
 /*************************************

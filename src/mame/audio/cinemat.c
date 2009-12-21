@@ -21,7 +21,7 @@
 #include "cpu/ccpu/ccpu.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
-#include "cinemat.h"
+#include "includes/cinemat.h"
 #include "sound/samples.h"
 #include "sound/ay8910.h"
 

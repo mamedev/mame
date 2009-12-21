@@ -17,7 +17,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
 #include "deprecat.h"
-#include "system16.h"
+#include "includes/system16.h"
 #include "machine/segaic16.h"
 #include "machine/fd1089.h"
 #include "machine/8255ppi.h"

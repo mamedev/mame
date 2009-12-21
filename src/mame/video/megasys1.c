@@ -192,7 +192,7 @@ actual code sent to the hardware.
 ***************************************************************************/
 
 #include "driver.h"
-#include "megasys1.h"
+#include "includes/megasys1.h"
 
 /* Variables defined here, that have to be shared: */
 tilemap *megasys1_tmap[3];

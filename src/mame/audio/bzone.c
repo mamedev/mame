@@ -20,7 +20,7 @@ D0  explosion enable        gates a noise generator
 #include <math.h>
 #include "driver.h"
 #include "streams.h"
-#include "bzone.h"
+#include "includes/bzone.h"
 
 #include "sound/discrete.h"
 #include "sound/pokey.h"

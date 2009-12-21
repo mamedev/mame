@@ -24,7 +24,7 @@
 #include "cpu/adsp2100/adsp2100.h"
 #include "audio/williams.h"
 #include "audio/dcs.h"
-#include "midtunit.h"
+#include "includes/midtunit.h"
 
 
 #define CPU_CLOCK		(50000000)

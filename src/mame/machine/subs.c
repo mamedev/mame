@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "subs.h"
+#include "includes/subs.h"
 
 static int subs_steering_buf1;
 static int subs_steering_buf2;

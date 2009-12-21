@@ -7,7 +7,7 @@
 #include "driver.h"
 #include "profiler.h"
 #include "cpu/tms34010/tms34010.h"
-#include "midyunit.h"
+#include "includes/midyunit.h"
 
 
 /* compile-time options */

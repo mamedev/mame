@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "arabian.h"
+#include "includes/arabian.h"
 
 /* Constants */
 #define BITMAP_WIDTH		256

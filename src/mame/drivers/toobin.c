@@ -21,7 +21,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
-#include "toobin.h"
+#include "includes/toobin.h"
 
 #define MASTER_CLOCK		XTAL_32MHz
 

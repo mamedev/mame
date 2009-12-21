@@ -26,7 +26,7 @@
 #include "sound/dac.h"
 #include "rendlay.h"
 #include "audio/atarijsa.h"
-#include "cyberbal.h"
+#include "includes/cyberbal.h"
 
 
 /*************************************

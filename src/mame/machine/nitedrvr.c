@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "nitedrvr.h"
+#include "includes/nitedrvr.h"
 #include "sound/discrete.h"
 
 static UINT8 nitedrvr_gear;

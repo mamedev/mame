@@ -14,7 +14,7 @@
 #include "streams.h"
 #include "sound/sn76477.h"
 #include "sound/samples.h"
-#include "snk6502.h"
+#include "includes/snk6502.h"
 #include "sound/discrete.h"
 
 

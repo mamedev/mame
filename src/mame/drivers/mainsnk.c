@@ -109,7 +109,7 @@ cc_p14.j2 8192 0xedc6a1eb M5L2764k
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "snk.h"
+#include "includes/snk.h"
 #include "sound/ay8910.h"
 
 extern UINT8 *mainsnk_fgram;

@@ -6,7 +6,7 @@
 *********************************************************************/
 
 #include "driver.h"
-#include "ashnojoe.h"
+#include "includes/ashnojoe.h"
 
 
 static TILE_GET_INFO( get_joe_tile_info )

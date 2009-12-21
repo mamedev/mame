@@ -14,7 +14,7 @@
 #include "deprecat.h"
 #include "machine/eepromdev.h"
 #include "sound/okim6295.h"
-#include "eolithsp.h"
+#include "includes/eolithsp.h"
 
 static UINT16 *vram;
 static int vbuffer = 0;

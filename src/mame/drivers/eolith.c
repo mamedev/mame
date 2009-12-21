@@ -65,7 +65,7 @@ extern int eolith_buffer;
 
 static int coin_counter_bit = 0;
 
-#include "eolithsp.h"
+#include "includes/eolithsp.h"
 
 // It's configured for 512 bytes
 static const eeprom_interface eeprom_interface_93C66 =

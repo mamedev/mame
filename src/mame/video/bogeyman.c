@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "bogeyman.h"
+#include "includes/bogeyman.h"
 
 
 PALETTE_INIT( bogeyman )

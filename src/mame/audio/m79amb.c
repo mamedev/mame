@@ -4,7 +4,7 @@
  ************************************************************************/
 
 #include "driver.h"
-#include "m79amb.h"
+#include "includes/m79amb.h"
 #include "sound/discrete.h"
 
 #define	TIME_OF_9602(r, c)				(0.34 * (r) * (c) * (1.0 + 1.0 / (r)))

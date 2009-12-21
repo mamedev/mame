@@ -10,7 +10,7 @@
 #include "driver.h"
 #include "sound/sn76496.h"
 
-#include "genesis.h"
+#include "includes/genesis.h"
 
 
 static const device_config *genesis_screen;

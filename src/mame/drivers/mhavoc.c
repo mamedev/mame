@@ -190,7 +190,7 @@
 #include "video/vector.h"
 #include "sound/tms5220.h"
 #include "sound/pokey.h"
-#include "mhavoc.h"
+#include "includes/mhavoc.h"
 
 /*************************************
  *

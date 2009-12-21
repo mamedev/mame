@@ -123,7 +123,7 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
-#include "megasys1.h"
+#include "includes/megasys1.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"

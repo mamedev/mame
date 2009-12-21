@@ -122,7 +122,7 @@
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/pokey.h"
-#include "ccastles.h"
+#include "includes/ccastles.h"
 
 
 #define MASTER_CLOCK	(10000000)

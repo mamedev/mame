@@ -46,7 +46,7 @@ Note : there is an ingame typo bug that doesn't display the bonus life values
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/2203intf.h"
-#include "commando.h"
+#include "includes/commando.h"
 
 
 /* Memory Maps */

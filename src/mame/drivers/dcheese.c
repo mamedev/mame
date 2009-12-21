@@ -34,7 +34,7 @@
 #include "machine/eepromdev.h"
 #include "machine/ticket.h"
 #include "sound/bsmt2000.h"
-#include "dcheese.h"
+#include "includes/dcheese.h"
 
 
 #define MAIN_OSC	14318180

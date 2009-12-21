@@ -1049,12 +1049,12 @@ Notes:
 #include "video/generic.h"
 #include "machine/eeprom.h"
 #include "machine/intelfsh.h"
-#include "naomibd.h"
-#include "naomi.h"
+#include "includes/naomibd.h"
+#include "includes/naomi.h"
 #include "cpu/sh4/sh4.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/aica.h"
-#include "dc.h"
+#include "includes/dc.h"
 
 #define CPU_CLOCK (200000000)
 static UINT32 *dc_sound_ram;

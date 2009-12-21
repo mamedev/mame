@@ -4,7 +4,7 @@
 
 *************************************************************************/
 #include "driver.h"
-#include "nitedrvr.h"
+#include "includes/nitedrvr.h"
 #include "sound/discrete.h"
 
 

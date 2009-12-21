@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "copsnrob.h"
+#include "includes/copsnrob.h"
 
 
 VIDEO_UPDATE( copsnrob )

@@ -12,13 +12,13 @@
 
 #define DE156CPU ARM
 #include "driver.h"
-#include "decocrpt.h"
-#include "deco32.h"
+#include "includes/decocrpt.h"
+#include "includes/deco32.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 #include "cpu/arm/arm.h"
-#include "deco16ic.h"
+#include "includes/deco16ic.h"
 #include "rendlay.h"
 
 static UINT32 *backfire_spriteram32_1;

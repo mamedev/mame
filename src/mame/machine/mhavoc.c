@@ -8,7 +8,7 @@
 #include "video/avgdvg.h"
 #include "sound/tms5220.h"
 #include "cpu/m6502/m6502.h"
-#include "mhavoc.h"
+#include "includes/mhavoc.h"
 
 UINT8 *mhavoc_zram0, *mhavoc_zram1;
 

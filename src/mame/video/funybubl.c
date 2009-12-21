@@ -6,7 +6,7 @@ todo - convert to tilemap
 
 
 #include "driver.h"
-#include "funybubl.h"
+#include "includes/funybubl.h"
 
 
 WRITE8_HANDLER ( funybubl_paldatawrite )

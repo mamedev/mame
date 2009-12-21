@@ -9,7 +9,7 @@
 #include "cpu/adsp2100/adsp2100.h"
 #include "audio/williams.h"
 #include "video/poly.h"
-#include "midvunit.h"
+#include "includes/midvunit.h"
 
 
 #define WATCH_RENDER		(0)

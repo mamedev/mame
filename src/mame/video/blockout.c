@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "blockout.h"
+#include "includes/blockout.h"
 
 
 static void setcolor( running_machine *machine, int color, int rgb )

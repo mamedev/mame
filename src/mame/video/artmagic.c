@@ -8,7 +8,7 @@
 #include "profiler.h"
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"
-#include "artmagic.h"
+#include "includes/artmagic.h"
 
 
 #define INSTANT_BLIT		1

@@ -212,7 +212,7 @@ A046491
 #include "machine/atarigen.h"
 #include "machine/asic65.h"
 #include "audio/atarijsa.h"
-#include "harddriv.h"
+#include "includes/harddriv.h"
 #include "sound/dac.h"
 
 /* from slapstic.c */

@@ -5,7 +5,7 @@
 *******************************************************************************/
 
 #include "driver.h"
-#include "actfancr.h"
+#include "includes/actfancr.h"
 
 
 static TILEMAP_MAPPER( actfancr_scan )

@@ -69,7 +69,7 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "itech8.h"
+#include "includes/itech8.h"
 
 
 #define YBUFFER_COUNT	15

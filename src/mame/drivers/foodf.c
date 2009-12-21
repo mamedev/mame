@@ -77,7 +77,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "sound/pokey.h"
-#include "foodf.h"
+#include "includes/foodf.h"
 
 
 #define MASTER_CLOCK		12096000

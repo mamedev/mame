@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "iqblock.h"
+#include "includes/iqblock.h"
 
 
 UINT8 *iqblock_bgvideoram;

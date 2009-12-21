@@ -17,7 +17,7 @@
 #include <math.h>
 #include "driver.h"
 #include "streams.h"
-#include "bzone.h"
+#include "includes/bzone.h"
 #include "sound/pokey.h"
 
 #define OUTPUT_RATE		(48000)

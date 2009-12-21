@@ -26,7 +26,7 @@ Check game speed, it depends on a bit we toggle..
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "blmbycar.h"
+#include "includes/blmbycar.h"
 
 
 /***************************************************************************

@@ -36,7 +36,7 @@ SPOT TABLE test
 #include "driver.h"
 #include "eminline.h"
 #include "video/rgbutil.h"
-#include "namcos22.h"
+#include "includes/namcos22.h"
 #include "video/poly.h"
 
 // uncomment this line to render everything as quads

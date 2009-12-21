@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "video/mc6845.h"
-#include "madalien.h"
+#include "includes/madalien.h"
 
 
 #define PIXEL_CLOCK (MADALIEN_MAIN_CLOCK / 2)

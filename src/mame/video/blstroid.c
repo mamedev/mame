@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "machine/atarigen.h"
-#include "blstroid.h"
+#include "includes/blstroid.h"
 
 
 

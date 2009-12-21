@@ -93,7 +93,7 @@
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-#include "redalert.h"
+#include "includes/redalert.h"
 
 
 #define MAIN_PCB_CLOCK		(XTAL_12_5MHz)

@@ -81,7 +81,7 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "suprridr.h"
+#include "includes/suprridr.h"
 #include "sound/ay8910.h"
 
 static UINT8 nmi_enable;

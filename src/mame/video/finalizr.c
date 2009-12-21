@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "finalizr.h"
+#include "includes/finalizr.h"
 
 
 PALETTE_INIT( finalizr )

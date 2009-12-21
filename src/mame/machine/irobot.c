@@ -7,7 +7,7 @@
 #include "driver.h"
 #include "profiler.h"
 #include "cpu/m6809/m6809.h"
-#include "irobot.h"
+#include "includes/irobot.h"
 
 /* Note:
  * There's probably something wrong with the way the Mathbox gets started.

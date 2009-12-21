@@ -30,7 +30,7 @@
  */
 
 #include "driver.h"
-#include "namcond1.h"   // only while debugging
+#include "includes/namcond1.h"   // only while debugging
 #include "video/ygv608.h"
 
 #define _ENABLE_SPRITES

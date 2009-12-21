@@ -139,7 +139,7 @@
 #include "audio/segasnd.h"
 #include "video/vector.h"
 #include "includes/segag80r.h"
-#include "segag80v.h"
+#include "includes/segag80v.h"
 
 
 /*************************************

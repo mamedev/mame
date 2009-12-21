@@ -33,8 +33,8 @@
 #include "cpu/mcs51/mcs51.h"
 #include "deprecat.h"
 #include "machine/segaic16.h"
-#include "system16.h"
-#include "genesis.h"
+#include "includes/system16.h"
+#include "includes/genesis.h"
 #include "sound/2612intf.h"
 #include "sound/rf5c68.h"
 

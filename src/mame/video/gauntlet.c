@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "machine/atarigen.h"
-#include "gauntlet.h"
+#include "includes/gauntlet.h"
 
 
 

@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
-#include "fastfred.h"
+#include "includes/fastfred.h"
 #include "includes/galaxold.h"
 
 UINT8 *fastfred_videoram;

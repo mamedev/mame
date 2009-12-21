@@ -4,7 +4,7 @@
 
 *************************************************************************/
 #include "driver.h"
-#include "videopin.h"
+#include "includes/videopin.h"
 #include "sound/discrete.h"
 
 

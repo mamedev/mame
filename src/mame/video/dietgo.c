@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "deco16ic.h"
+#include "includes/deco16ic.h"
 
 static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectangle *cliprect)
 {

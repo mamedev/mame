@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "video/vector.h"
-#include "cchasm.h"
+#include "includes/cchasm.h"
 
 WRITE16_HANDLER( cchasm_led_w )
 {

@@ -5,7 +5,7 @@ Atari Tank 8 video emulation
 ***************************************************************************/
 
 #include "driver.h"
-#include "tank8.h"
+#include "includes/tank8.h"
 
 
 UINT8 *tank8_video_ram;

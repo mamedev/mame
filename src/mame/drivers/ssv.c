@@ -185,7 +185,7 @@ Notes:
 #include "deprecat.h"
 #include "machine/eeprom.h"
 #include "sound/es5506.h"
-#include "seta.h"
+#include "includes/seta.h"
 
 /***************************************************************************
 

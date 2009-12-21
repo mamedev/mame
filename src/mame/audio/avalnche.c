@@ -4,7 +4,7 @@
 
 *************************************************************************/
 #include "driver.h"
-#include "avalnche.h"
+#include "includes/avalnche.h"
 #include "sound/discrete.h"
 
 

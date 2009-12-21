@@ -49,7 +49,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
-#include "konamigx.h"
+#include "includes/konamigx.h"
 #include "machine/eepromdev.h"
 #include "machine/am53cf96.h"
 #include "harddisk.h"

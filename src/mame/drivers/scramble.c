@@ -33,7 +33,7 @@ Notes:
 #include "sound/flt_rc.h"
 #include "machine/7474.h"
 #include "machine/8255ppi.h"
-#include "galaxold.h"
+#include "includes/galaxold.h"
 
 
 

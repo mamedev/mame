@@ -5,7 +5,7 @@ Atari Fire Truck + Super Bug + Monte Carlo video emulation
 ***************************************************************************/
 
 #include "driver.h"
-#include "firetrk.h"
+#include "includes/firetrk.h"
 
 
 UINT8 *firetrk_alpha_num_ram;

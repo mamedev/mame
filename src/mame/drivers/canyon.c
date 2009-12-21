@@ -38,7 +38,7 @@
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-#include "canyon.h"
+#include "includes/canyon.h"
 #include "sound/discrete.h"
 
 

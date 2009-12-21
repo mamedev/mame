@@ -49,7 +49,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "hexa.h"
+#include "includes/hexa.h"
 
 
 static ADDRESS_MAP_START( hexa_map, ADDRESS_SPACE_PROGRAM, 8 )

@@ -452,7 +452,7 @@ or Fatal Fury for example).
 #include "cpu/nec/nec.h"
 #include "deprecat.h"
 #include "cpu/mips/mips3.h"
-#include "hng64.h"
+#include "includes/hng64.h"
 
 int hng64_mcu_type = 0;
 static UINT32 fake_mcu_time;

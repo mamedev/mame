@@ -4,7 +4,7 @@
  ************************************************************************/
 
 #include "driver.h"
-#include "skyraid.h"
+#include "includes/skyraid.h"
 
 
 /* Discrete Sound Input Nodes */

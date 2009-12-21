@@ -22,7 +22,7 @@
 #include "machine/asic65.h"
 #include "audio/atarijsa.h"
 #include "video/atarirle.h"
-#include "atarig42.h"
+#include "includes/atarig42.h"
 
 
 /*************************************

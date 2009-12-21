@@ -65,7 +65,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
-#include "exterm.h"
+#include "includes/exterm.h"
 
 
 

@@ -28,7 +28,7 @@
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "actfancr.h"
+#include "includes/actfancr.h"
 
 
 /******************************************************************************/

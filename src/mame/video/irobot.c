@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "irobot.h"
+#include "includes/irobot.h"
 
 #define BITMAP_WIDTH	256
 static UINT8 *polybitmap1,*polybitmap2;

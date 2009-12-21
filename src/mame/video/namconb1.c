@@ -1,9 +1,9 @@
 /* video/namconb1.c */
 
 #include "driver.h"
-#include "namconb1.h"
-#include "namcoic.h"
-#include "namcos2.h"
+#include "includes/namconb1.h"
+#include "includes/namcoic.h"
+#include "includes/namcos2.h"
 #include "audio/namcoc7x.h"
 
 static UINT32 tilemap_tile_bank[4];

@@ -49,8 +49,8 @@
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-#include "slapstic.h"
-#include "atetris.h"
+#include "includes/slapstic.h"
+#include "includes/atetris.h"
 #include "sound/sn76496.h"
 #include "sound/pokey.h"
 #include "state.h"

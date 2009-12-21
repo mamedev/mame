@@ -224,7 +224,7 @@ Interrupts:
 #include "driver.h"
 #include "cpu/m6805/m6805.h"
 #include "rendlay.h"
-#include "qix.h"
+#include "includes/qix.h"
 #include "cpu/m6809/m6809.h"
 
 #include "elecyoyo.lh"

@@ -54,7 +54,7 @@ Grndtour:
 #include "cpu/z180/z180.h"
 #include "deprecat.h"
 #include "machine/8255ppi.h"
-#include "iqblock.h"
+#include "includes/iqblock.h"
 #include "sound/2413intf.h"
 
 static UINT8 *rambase;

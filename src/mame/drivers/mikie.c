@@ -20,7 +20,7 @@ MAIN BOARD:
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 extern WRITE8_HANDLER( mikie_videoram_w );
 extern WRITE8_HANDLER( mikie_colorram_w );

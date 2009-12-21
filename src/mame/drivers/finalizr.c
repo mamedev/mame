@@ -17,8 +17,8 @@
 #include "cpu/mcs48/mcs48.h"
 #include "sound/sn76496.h"
 #include "sound/dac.h"
-#include "konamipt.h"
-#include "finalizr.h"
+#include "includes/konamipt.h"
+#include "includes/finalizr.h"
 
 
 static INTERRUPT_GEN( finalizr_interrupt )

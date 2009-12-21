@@ -101,7 +101,7 @@
 #include "cpu/asap/asap.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
-#include "beathead.h"
+#include "includes/beathead.h"
 
 
 

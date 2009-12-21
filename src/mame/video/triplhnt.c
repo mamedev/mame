@@ -5,7 +5,7 @@ Atari Triple Hunt video emulation
 ***************************************************************************/
 
 #include "driver.h"
-#include "triplhnt.h"
+#include "includes/triplhnt.h"
 
 
 UINT8* triplhnt_playfield_ram;

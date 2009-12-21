@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "starfire.h"
+#include "includes/starfire.h"
 
 
 #define	NUM_PENS	(0x40)

@@ -42,11 +42,11 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
-#include "decocrpt.h"
+#include "includes/decocrpt.h"
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "deco16ic.h"
+#include "includes/deco16ic.h"
 
 #define TUMBLEP_HACK	0
 

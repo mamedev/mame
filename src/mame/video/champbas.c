@@ -1,6 +1,6 @@
 #include "driver.h"
 #include "video/resnet.h"
-#include "champbas.h"
+#include "includes/champbas.h"
 
 
 /***************************************************************************

@@ -30,7 +30,7 @@ Notes:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "nb1413m3.h"
+#include "includes/nb1413m3.h"
 #include "sound/ay8910.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"

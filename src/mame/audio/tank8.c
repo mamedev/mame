@@ -4,7 +4,7 @@
 
 *************************************************************************/
 #include "driver.h"
-#include "tank8.h"
+#include "includes/tank8.h"
 #include "sound/discrete.h"
 
 

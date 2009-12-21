@@ -28,7 +28,7 @@ Dumped by Chackn
 */
 
 #include "driver.h"
-#include "news.h"
+#include "includes/news.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 

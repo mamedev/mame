@@ -20,7 +20,7 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
-#include "relief.h"
+#include "includes/relief.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
 

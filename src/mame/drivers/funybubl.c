@@ -51,7 +51,7 @@ Note: SW2, SW3 & SW4 not populated
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
-#include "funybubl.h"
+#include "includes/funybubl.h"
 
 
 static WRITE8_HANDLER ( funybubl_vidram_bank_w )

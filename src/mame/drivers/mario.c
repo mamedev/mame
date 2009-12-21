@@ -93,7 +93,7 @@ write:
 #include "cpu/z80/z80.h"
 #include "machine/z80dma.h"
 
-#include "mario.h"
+#include "includes/mario.h"
 
 /*************************************
  *

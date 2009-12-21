@@ -68,7 +68,7 @@ Dumped by Uki
 #include "deprecat.h"
 #include "sound/ymz280b.h"
 #include "includes/suprnova.h"
-#include "kaneko16.h"
+#include "includes/kaneko16.h"
 
 /***************************************************************************
 

@@ -446,9 +446,9 @@ $a00000 checks have been seen on the Final Lap boards.
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
 #include "deprecat.h"
-#include "namcos2.h"
+#include "includes/namcos2.h"
 #include "cpu/m6809/m6809.h"
-#include "namcoic.h"
+#include "includes/namcoic.h"
 #include "sound/2151intf.h"
 #include "sound/c140.h"
 

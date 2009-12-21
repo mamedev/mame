@@ -28,8 +28,8 @@
 #include "video/avgdvg.h"
 #include "sound/tms5220.h"
 #include "sound/pokey.h"
-#include "starwars.h"
-#include "slapstic.h"
+#include "includes/starwars.h"
+#include "includes/slapstic.h"
 
 #define MASTER_CLOCK (12096000)
 #define CLOCK_3KHZ  (MASTER_CLOCK / 4096)

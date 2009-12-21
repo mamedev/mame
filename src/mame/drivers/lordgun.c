@@ -33,7 +33,7 @@ To do:
 #include "machine/eeprom.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "lordgun.h"
+#include "includes/lordgun.h"
 
 
 static UINT16 *lordgun_priority_ram, lordgun_priority;

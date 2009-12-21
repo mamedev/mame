@@ -42,7 +42,7 @@ forcing all sprites on a row to have an added blue component.
 #include "cpu/z80/z80.h"
 #include "sound/samples.h"
 #include "sound/dac.h"
-#include "cosmic.h"
+#include "includes/cosmic.h"
 
 
 /* Schematics show 12 triggers for discrete sound circuits */

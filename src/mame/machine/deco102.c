@@ -9,7 +9,7 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "decocrpt.h"
+#include "includes/decocrpt.h"
 
 static UINT16 decrypt(UINT16 data, int address, int select_xor)
 {

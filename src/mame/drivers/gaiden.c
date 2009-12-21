@@ -129,7 +129,7 @@ Notes:
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-#include "gaiden.h"
+#include "includes/gaiden.h"
 
 static WRITE16_HANDLER( gaiden_sound_command_w )
 {

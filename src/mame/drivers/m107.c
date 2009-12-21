@@ -25,8 +25,8 @@ confirmed for m107 games as well.
 
 #include "driver.h"
 #include "cpu/nec/nec.h"
-#include "m107.h"
-#include "iremipt.h"
+#include "includes/m107.h"
+#include "includes/iremipt.h"
 #include "machine/irem_cpu.h"
 #include "sound/2151intf.h"
 #include "sound/iremga20.h"

@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deco16ic.h"
+#include "includes/deco16ic.h"
 
 static int twocrude_pri;
 

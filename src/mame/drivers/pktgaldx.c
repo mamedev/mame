@@ -54,9 +54,9 @@ bootleg todo:
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "decocrpt.h"
-#include "decoprot.h"
-#include "deco16ic.h"
+#include "includes/decocrpt.h"
+#include "includes/decoprot.h"
+#include "includes/deco16ic.h"
 #include "sound/okim6295.h"
 
 VIDEO_START(pktgaldx);

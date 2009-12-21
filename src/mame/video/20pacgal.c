@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "20pacgal.h"
+#include "includes/20pacgal.h"
 
 
 #define SCREEN_HEIGHT	(224)

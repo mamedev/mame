@@ -4,7 +4,7 @@
  ************************************************************************/
 
 #include "driver.h"
-#include "norautp.h"
+#include "includes/norautp.h"
 
 
 /* Discrete Sound Input Nodes */

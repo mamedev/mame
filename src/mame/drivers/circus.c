@@ -37,7 +37,7 @@ D000      Paddle Position and Interrupt Reset
 #include "cpu/m6502/m6502.h"
 #include "deprecat.h"
 #include "sound/samples.h"
-#include "circus.h"
+#include "includes/circus.h"
 
 #include "circus.lh"
 #include "crash.lh"

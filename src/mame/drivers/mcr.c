@@ -290,7 +290,7 @@
 #include "machine/z80sio.h"
 #include "audio/mcr.h"
 #include "sound/samples.h"
-#include "mcr.h"
+#include "includes/mcr.h"
 
 
 static UINT8 input_mux;

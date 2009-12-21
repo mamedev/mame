@@ -46,7 +46,7 @@
 #include "driver.h"
 #include "profiler.h"
 #include "video/vector.h"
-#include "vertigo.h"
+#include "includes/vertigo.h"
 
 
 /*************************************

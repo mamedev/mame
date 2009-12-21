@@ -10,7 +10,7 @@
 #include "driver.h"
 #include "machine/atari_vg.h"
 #include "video/avgdvg.h"
-#include "asteroid.h"
+#include "includes/asteroid.h"
 
 UINT8 *asteroid_ram1, *asteroid_ram2;
 

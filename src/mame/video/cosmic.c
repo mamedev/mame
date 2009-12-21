@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "cosmic.h"
+#include "includes/cosmic.h"
 
 
 WRITE8_HANDLER( cosmic_color_register_w )

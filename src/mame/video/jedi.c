@@ -15,7 +15,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "jedi.h"
+#include "includes/jedi.h"
 
 
 #define NUM_PENS	(0x1000)

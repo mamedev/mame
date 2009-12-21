@@ -6,11 +6,11 @@
 
 #include "driver.h"
 #include "debugger.h"
-#include "dc.h"
+#include "includes/dc.h"
 #include "cpu/sh4/sh4.h"
 #include "sound/aica.h"
-#include "naomibd.h"
-#include "naomi.h"
+#include "includes/naomibd.h"
+#include "includes/naomi.h"
 
 #define DEBUG_REGISTERS	(1)
 

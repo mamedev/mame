@@ -1,6 +1,6 @@
 #include "driver.h"
-#include "namcos2.h" /* for game-specific hacks */
-#include "namcoic.h"
+#include "includes/namcos2.h" /* for game-specific hacks */
+#include "includes/namcoic.h"
 
 /**************************************************************************************/
 static int mPalXOR;		/* XOR'd with palette select register; needed for System21 */

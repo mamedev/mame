@@ -52,7 +52,7 @@ puzznici note
 
 #include "driver.h"
 #include "deprecat.h"
-#include "taitoipt.h"
+#include "includes/taitoipt.h"
 #include "cpu/z80/z80.h"
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"

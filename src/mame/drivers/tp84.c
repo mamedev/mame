@@ -69,7 +69,7 @@ C004      76489 #4 trigger
 #include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"
 #include "sound/flt_rc.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 extern UINT8 *tp84_bg_videoram;
 extern UINT8 *tp84_bg_colorram;

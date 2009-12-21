@@ -20,7 +20,7 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "audio/atarijsa.h"
-#include "vindictr.h"
+#include "includes/vindictr.h"
 
 
 

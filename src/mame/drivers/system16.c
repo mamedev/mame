@@ -88,7 +88,7 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "system16.h"
+#include "includes/system16.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/msm5205.h"
 #include "sound/2151intf.h"

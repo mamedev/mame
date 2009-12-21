@@ -32,7 +32,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
-#include "epos.h"
+#include "includes/epos.h"
 
 static WRITE8_HANDLER( dealer_decrypt_rom )
 {

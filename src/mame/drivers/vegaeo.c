@@ -16,7 +16,7 @@
 #include "cpu/e132xs/e132xs.h"
 #include "deprecat.h"
 #include "machine/at28c16.h"
-#include "eolithsp.h"
+#include "includes/eolithsp.h"
 
 static UINT32 *vega_vram;
 static UINT8 vega_vbuffer = 0;

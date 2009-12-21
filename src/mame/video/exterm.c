@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "cpu/tms34010/tms34010.h"
-#include "exterm.h"
+#include "includes/exterm.h"
 
 
 UINT16 *exterm_master_videoram, *exterm_slave_videoram;

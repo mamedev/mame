@@ -31,7 +31,7 @@
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-#include "1943.h"
+#include "includes/1943.h"
 
 
 /* Read/Write Handlers */

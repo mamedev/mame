@@ -13,7 +13,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "neogeo.h"
+#include "includes/neogeo.h"
 
 
 /* General Bootleg Functions - used by more than 1 game */

@@ -21,7 +21,7 @@
 #include "video/vector.h"
 #include "machine/6840ptm.h"
 #include "machine/z80ctc.h"
-#include "cchasm.h"
+#include "includes/cchasm.h"
 
 #define CCHASM_68K_CLOCK (XTAL_8MHz)
 

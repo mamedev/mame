@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "victory.h"
+#include "includes/victory.h"
 
 
 /* globally-accessible storage */

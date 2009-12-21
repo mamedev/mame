@@ -1,6 +1,6 @@
 #include "driver.h"
 #include "sound/samples.h"
-#include "circus.h"
+#include "includes/circus.h"
 
 static const char *const circus_sample_names[] =
 {

@@ -14,7 +14,7 @@
 #include "sound/tms5220.h"
 #include "sound/okim6295.h"
 #include "sound/pokey.h"
-#include "slapstic.h"
+#include "includes/slapstic.h"
 #include "atarigen.h"
 
 

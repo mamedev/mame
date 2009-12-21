@@ -53,7 +53,7 @@ Mighty Guy board layout:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/3526intf.h"
-#include "cop01.h"
+#include "includes/cop01.h"
 
 
 #define MIGHTGUY_HACK	 0

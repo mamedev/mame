@@ -20,9 +20,8 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "realbrk.h"
+#include "includes/realbrk.h"
 
-//UINT16 *realbrk_vram_0, *realbrk_vram_1, *realbrk_vram_2, *realbrk_vregs;
 UINT16 *realbrk_vram_0, *realbrk_vram_1, *realbrk_vram_2, *realbrk_vregs, *realbrk_vram_0ras, *realbrk_vram_1ras;
 static bitmap_t *tmpbitmap0 = NULL;
 static bitmap_t *tmpbitmap1 = NULL;

@@ -29,7 +29,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "thedeep.h"
+#include "includes/thedeep.h"
 
 /* Variables only used here: */
 

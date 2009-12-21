@@ -8,7 +8,7 @@ driver by Chris Moore
 
 #include "driver.h"
 #include "machine/6522via.h"
-#include "gameplan.h"
+#include "includes/gameplan.h"
 
 
 
