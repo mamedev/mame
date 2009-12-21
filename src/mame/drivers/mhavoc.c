@@ -480,8 +480,11 @@ static MACHINE_DRIVER_START( mhavoc )
 	MDRV_CPU_ADD("gamma", M6502, MHAVOC_CLOCK_1_25M)	/* 1.25 MHz */
 	MDRV_CPU_PROGRAM_MAP(gamma_map)
 
+	MDRV_MACHINE_START(mhavoc)
 	MDRV_MACHINE_RESET(mhavoc)
 	MDRV_NVRAM_HANDLER(generic_1fill)
+
+	MDRV_TIMER_ADD_PERIODIC("5k_timer", mhavoc_cpu_irq_clock, HZ(MHAVOC_CLOCK_5K))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", VECTOR)

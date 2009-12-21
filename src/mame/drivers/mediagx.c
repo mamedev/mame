@@ -113,7 +113,6 @@ static INT16 *dacr;
 static int dacl_ptr = 0;
 static int dacr_ptr = 0;
 
-static emu_timer *sound_timer;
 static UINT8 ad1847_regs[16];
 static UINT32 ad1847_sample_counter = 0;
 static UINT32 ad1847_sample_rate;
@@ -635,10 +634,10 @@ static void cx5510_pci_w(const device_config *busdevice, const device_config *de
 
 /* Analog Devices AD1847 Stereo DAC */
 
-static TIMER_CALLBACK( sound_timer_callback )
+static TIMER_DEVICE_CALLBACK( sound_timer_callback )
 {
 	ad1847_sample_counter = 0;
-	timer_adjust_oneshot(sound_timer, ATTOTIME_IN_MSEC(10), 0);
+	timer_device_adjust_oneshot(timer, ATTOTIME_IN_MSEC(10), 0);
 
 	dmadac_transfer(&dmadac[0], 1, 0, 1, dacl_ptr, dacl);
 	dmadac_transfer(&dmadac[1], 1, 0, 1, dacr_ptr, dacr);
@@ -965,6 +964,9 @@ static MACHINE_START(mediagx)
 	mediagx_devices.pic8259_2 = devtag_get_device( machine, "pic8259_slave" );
 	mediagx_devices.dma8237_1 = devtag_get_device( machine, "dma8237_1" );
 	mediagx_devices.dma8237_2 = devtag_get_device( machine, "dma8237_2" );
+
+	dacl = auto_alloc_array(machine, INT16, 65536);
+	dacr = auto_alloc_array(machine, INT16, 65536);
 }
 
 static MACHINE_RESET(mediagx)
@@ -976,11 +978,7 @@ static MACHINE_RESET(mediagx)
 	memcpy(bios_ram, rom, 0x40000);
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 
-	dacl = auto_alloc_array(machine, INT16, 65536);
-	dacr = auto_alloc_array(machine, INT16, 65536);
-
-	sound_timer = timer_alloc(machine, sound_timer_callback, NULL);
-	timer_adjust_oneshot(sound_timer, ATTOTIME_IN_MSEC(10), 0);
+	timer_device_adjust_oneshot(devtag_get_device(machine, "sound_timer"), ATTOTIME_IN_MSEC(10), 0);
 
 	dmadac[0] = devtag_get_device(machine, "dac1");
 	dmadac[1] = devtag_get_device(machine, "dac2");
@@ -1069,6 +1067,8 @@ static MACHINE_DRIVER_START(mediagx)
 	MDRV_PIC8259_ADD( "pic8259_slave", mediagx_pic8259_2_config )
 
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
+
+	MDRV_TIMER_ADD("sound_timer", sound_timer_callback)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 

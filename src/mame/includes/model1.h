@@ -19,6 +19,8 @@ WRITE16_HANDLER( model1_vr_tgp_ram_w );
 
 ADDRESS_MAP_EXTERN( model1_vr_tgp_map, 32 );
 
+MACHINE_START( model1 );
+
 void model1_vr_tgp_reset( running_machine *machine );
 void model1_tgp_reset(running_machine *machine, int swa);
 

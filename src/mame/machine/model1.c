@@ -1920,27 +1920,9 @@ WRITE16_HANDLER( model1_tgp_copro_ram_w )
 	}
 }
 
-void model1_tgp_reset(running_machine *machine, int swa)
+MACHINE_START( model1 )
 {
-	ram_adr = 0;
 	ram_data = auto_alloc_array(machine, UINT32, 0x10000);
-	memset(ram_data, 0, 0x10000*4);
-
-	fifoout_rpos = 0;
-	fifoout_wpos = 0;
-	fifoin_rpos = 0;
-	fifoin_wpos = 0;
-
-	acc = 0;
-	mat_stack_pos = 0;
-	memset(cmat, 0, sizeof(cmat));
-	cmat[0] = 1.0;
-	cmat[4] = 1.0;
-	cmat[8] = 1.0;
-
-	model1_dump = 0;
-	model1_swa = swa;
-	next_fn();
 
 	state_save_register_global_pointer(machine, ram_data, 0x10000);
 	state_save_register_global(machine, ram_adr);
@@ -1960,6 +1942,28 @@ void model1_tgp_reset(running_machine *machine, int swa)
 	state_save_register_global(machine, list_length);
 }
 
+void model1_tgp_reset(running_machine *machine, int swa)
+{
+	ram_adr = 0;
+	memset(ram_data, 0, 0x10000*4);
+
+	fifoout_rpos = 0;
+	fifoout_wpos = 0;
+	fifoin_rpos = 0;
+	fifoin_wpos = 0;
+
+	acc = 0;
+	mat_stack_pos = 0;
+	memset(cmat, 0, sizeof(cmat));
+	cmat[0] = 1.0;
+	cmat[4] = 1.0;
+	cmat[8] = 1.0;
+
+	model1_dump = 0;
+	model1_swa = swa;
+	next_fn();
+}
+
 /*********************************** Virtua Racing ***********************************/
 
 static int copro_fifoout_rpos, copro_fifoout_wpos;
@@ -1972,7 +1976,6 @@ static int copro_fifoin_num;
 void model1_vr_tgp_reset( running_machine *machine )
 {
 	ram_adr = 0;
-	ram_data = auto_alloc_array(machine, UINT32, 0x8000);
 	memset(ram_data, 0, 0x8000*4);
 
 	copro_fifoout_rpos = 0;

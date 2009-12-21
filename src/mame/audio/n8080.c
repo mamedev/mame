@@ -435,10 +435,10 @@ static WRITE8_HANDLER( helifire_sound_ctrl_w )
 }
 
 
-static TIMER_CALLBACK( spacefev_vco_voltage_timer )
+static TIMER_DEVICE_CALLBACK( spacefev_vco_voltage_timer )
 {
-	const device_config *sn = devtag_get_device(machine, "snsnd");
-	n8080_state *state = (n8080_state *)machine->driver_data;
+	const device_config *sn = devtag_get_device(timer->machine, "snsnd");
+	n8080_state *state = (n8080_state *)timer->machine->driver_data;
 	double voltage = 0;
 
 	if (state->mono_flop[2])
@@ -450,10 +450,10 @@ static TIMER_CALLBACK( spacefev_vco_voltage_timer )
 }
 
 
-static TIMER_CALLBACK( helifire_dac_volume_timer )
+static TIMER_DEVICE_CALLBACK( helifire_dac_volume_timer )
 {
-	n8080_state *state = (n8080_state *)machine->driver_data;
-	double t = state->helifire_dac_timing - attotime_to_double(timer_get_time(machine));
+	n8080_state *state = (n8080_state *)timer->machine->driver_data;
+	double t = state->helifire_dac_timing - attotime_to_double(timer_get_time(timer->machine));
 
 	if (state->helifire_dac_phase)
 	{
@@ -485,8 +485,6 @@ MACHINE_RESET( spacefev_sound )
 {
 	n8080_state *state = (n8080_state *)machine->driver_data;
 	state->n8080_hardware = 1;
-
-	timer_pulse(machine, ATTOTIME_IN_HZ(1000), NULL, 0, spacefev_vco_voltage_timer);
 
 	state->mono_flop[0] = 0;
 	state->mono_flop[1] = 0;
@@ -548,8 +546,6 @@ MACHINE_RESET( helifire_sound )
 	n8080_state *state = (n8080_state *)machine->driver_data;
 	state->n8080_hardware = 3;
 
-	timer_pulse(machine, ATTOTIME_IN_HZ(1000), NULL, 0, helifire_dac_volume_timer);
-
 	state->helifire_dac_volume = 1;
 	state->helifire_dac_timing = 0;
 	state->helifire_dac_phase = 0;
@@ -596,6 +592,8 @@ MACHINE_DRIVER_START( spacefev_sound )
 	MDRV_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
 	MDRV_CPU_IO_MAP(n8080_sound_io_map)
 
+	MDRV_TIMER_ADD_PERIODIC("vco_timer", spacefev_vco_voltage_timer, HZ(1000))
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -633,6 +631,8 @@ MACHINE_DRIVER_START( helifire_sound )
 	MDRV_CPU_ADD("audiocpu", I8035, 6000000)
 	MDRV_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
 	MDRV_CPU_IO_MAP(helifire_sound_io_map)
+
+	MDRV_TIMER_ADD_PERIODIC("helifire_dac", helifire_dac_volume_timer, HZ(1000) )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

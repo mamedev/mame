@@ -641,6 +641,8 @@ static DEVICE_START( i8237 ) {
 		devcb_resolve_write8(&i8237->chan[i].out_iow_func, &intf->out_iow_func[i], device);
 		devcb_resolve_write_line(&i8237->chan[i].out_dack_func, &intf->out_dack_func[i], device);
 	}
+
+	i8237->timer = timer_alloc(device->machine, dma8237_timerproc, (void *)device);
 }
 
 
@@ -648,7 +650,6 @@ static DEVICE_RESET( i8237 ) {
 	i8237_t	*i8237 = get_safe_token(device);
 
 	i8237->status = 0x0F;
-	i8237->timer = timer_alloc(device->machine, dma8237_timerproc, (void *)device);
 	i8237->eop = 1;
 	i8237->state = DMA8237_SI;
 	i8237->last_service_channel = 3;

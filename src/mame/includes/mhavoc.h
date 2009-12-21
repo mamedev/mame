@@ -17,9 +17,12 @@
 
 /*----------- defined in machine/mhavoc.c -----------*/
 
+TIMER_DEVICE_CALLBACK( mhavoc_cpu_irq_clock );
+
 WRITE8_HANDLER( mhavoc_alpha_irq_ack_w );
 WRITE8_HANDLER( mhavoc_gamma_irq_ack_w );
 
+MACHINE_START( mhavoc );
 MACHINE_RESET( mhavoc );
 DRIVER_INIT( mhavocrv );
 

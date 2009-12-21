@@ -72,7 +72,7 @@ static UINT16 *model2_soundram = NULL;
 
 static UINT32 model2_timervals[4], model2_timerorig[4];
 static int      model2_timerrun[4];
-static emu_timer *model2_timers[4];
+static const device_config *model2_timers[4];
 static int model2_ctrlmode;
 static int analog_channel;
 
@@ -271,7 +271,7 @@ static READ32_HANDLER( timers_r )
 	if (model2_timerrun[offset])
 	{
 		// get elapsed time, convert to units of 25 MHz
-		UINT32 cur = attotime_to_double(attotime_mul(timer_timeelapsed(model2_timers[offset]), 25000000));
+		UINT32 cur = attotime_to_double(attotime_mul(timer_device_timeelapsed(model2_timers[offset]), 25000000));
 
 		// subtract units from starting value
 		model2_timervals[offset] = model2_timerorig[offset] - cur;
@@ -289,21 +289,21 @@ static WRITE32_HANDLER( timers_w )
 
 	model2_timerorig[offset] = model2_timervals[offset];
 	period = attotime_mul(ATTOTIME_IN_HZ(25000000), model2_timerorig[offset]);
-	timer_adjust_oneshot(model2_timers[offset], period, 0);
+	timer_device_adjust_oneshot(model2_timers[offset], period, 0);
 	model2_timerrun[offset] = 1;
 }
 
-static TIMER_CALLBACK( model2_timer_cb )
+static TIMER_DEVICE_CALLBACK( model2_timer_cb )
 {
 	int tnum = (int)(FPTR)ptr;
 	int bit = tnum + 2;
 
-	timer_adjust_oneshot(model2_timers[tnum], attotime_never, 0);
+	timer_device_adjust_oneshot(model2_timers[tnum], attotime_never, 0);
 
 	model2_intreq |= (1<<bit);
 	if (model2_intena & (1<<bit))
 	{
-		cputag_set_input_line(machine, "maincpu", I960_IRQ2, ASSERT_LINE);
+		cputag_set_input_line(timer->machine, "maincpu", I960_IRQ2, ASSERT_LINE);
 	}
 
 	model2_timervals[tnum] = 0;
@@ -330,11 +330,12 @@ static MACHINE_RESET(model2_common)
 
 	model2_timerrun[0] = model2_timerrun[1] = model2_timerrun[2] = model2_timerrun[3] = 0;
 
+	model2_timers[0] = devtag_get_device(machine, "timer0");
+	model2_timers[1] = devtag_get_device(machine, "timer1");
+	model2_timers[2] = devtag_get_device(machine, "timer2");
+	model2_timers[3] = devtag_get_device(machine, "timer3");
 	for (i=0; i<4; i++)
-	{
-		model2_timers[i] = timer_alloc(machine, model2_timer_cb, (void*)(FPTR)i);
-		timer_adjust_oneshot(model2_timers[i], attotime_never, 0);
-	}
+		timer_device_adjust_oneshot(model2_timers[i], attotime_never, 0);
 }
 
 static MACHINE_RESET(model2o)
@@ -1842,6 +1843,15 @@ static MACHINE_DRIVER_START( model2o )
 
 	MDRV_MACHINE_RESET(model2o)
 	MDRV_NVRAM_HANDLER( model2 )
+	
+	MDRV_TIMER_ADD("timer0", model2_timer_cb)
+	MDRV_TIMER_PTR((FPTR)0)
+	MDRV_TIMER_ADD("timer1", model2_timer_cb)
+	MDRV_TIMER_PTR((FPTR)1)
+	MDRV_TIMER_ADD("timer2", model2_timer_cb)
+	MDRV_TIMER_PTR((FPTR)2)
+	MDRV_TIMER_ADD("timer3", model2_timer_cb)
+	MDRV_TIMER_PTR((FPTR)3)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 
@@ -1887,6 +1897,15 @@ static MACHINE_DRIVER_START( model2a )
 
 	MDRV_MACHINE_RESET(model2)
 	MDRV_NVRAM_HANDLER( model2 )
+
+	MDRV_TIMER_ADD("timer0", model2_timer_cb)
+	MDRV_TIMER_PTR((FPTR)0)
+	MDRV_TIMER_ADD("timer1", model2_timer_cb)
+	MDRV_TIMER_PTR((FPTR)1)
+	MDRV_TIMER_ADD("timer2", model2_timer_cb)
+	MDRV_TIMER_PTR((FPTR)2)
+	MDRV_TIMER_ADD("timer3", model2_timer_cb)
+	MDRV_TIMER_PTR((FPTR)3)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 
@@ -1938,6 +1957,15 @@ static MACHINE_DRIVER_START( model2b )
 	MDRV_MACHINE_RESET(model2b)
 	MDRV_NVRAM_HANDLER( model2 )
 
+	MDRV_TIMER_ADD("timer0", model2_timer_cb)
+	MDRV_TIMER_PTR((FPTR)0)
+	MDRV_TIMER_ADD("timer1", model2_timer_cb)
+	MDRV_TIMER_PTR((FPTR)1)
+	MDRV_TIMER_ADD("timer2", model2_timer_cb)
+	MDRV_TIMER_PTR((FPTR)2)
+	MDRV_TIMER_ADD("timer3", model2_timer_cb)
+	MDRV_TIMER_PTR((FPTR)3)
+
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1971,6 +1999,15 @@ static MACHINE_DRIVER_START( model2c )
 
 	MDRV_MACHINE_RESET(model2c)
 	MDRV_NVRAM_HANDLER( model2 )
+
+	MDRV_TIMER_ADD("timer0", model2_timer_cb)
+	MDRV_TIMER_PTR((FPTR)0)
+	MDRV_TIMER_ADD("timer1", model2_timer_cb)
+	MDRV_TIMER_PTR((FPTR)1)
+	MDRV_TIMER_ADD("timer2", model2_timer_cb)
+	MDRV_TIMER_PTR((FPTR)2)
+	MDRV_TIMER_ADD("timer3", model2_timer_cb)
+	MDRV_TIMER_PTR((FPTR)3)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 

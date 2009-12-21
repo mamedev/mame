@@ -36,7 +36,7 @@ static UINT8 speech_write_buffer;
  *
  *************************************/
 
-static TIMER_CALLBACK( cpu_irq_clock )
+TIMER_DEVICE_CALLBACK( mhavoc_cpu_irq_clock )
 {
 	/* clock the LS161 driving the alpha CPU IRQ */
 	if (alpha_irq_clock_enable)
@@ -44,7 +44,7 @@ static TIMER_CALLBACK( cpu_irq_clock )
 		alpha_irq_clock++;
 		if ((alpha_irq_clock & 0x0c) == 0x0c)
 		{
-			cputag_set_input_line(machine, "alpha", 0, ASSERT_LINE);
+			cputag_set_input_line(timer->machine, "alpha", 0, ASSERT_LINE);
 			alpha_irq_clock_enable = 0;
 		}
 	}
@@ -53,7 +53,7 @@ static TIMER_CALLBACK( cpu_irq_clock )
 	if (has_gamma_cpu)
 	{
 		gamma_irq_clock++;
-		cputag_set_input_line(machine, "gamma", 0, (gamma_irq_clock & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(timer->machine, "gamma", 0, (gamma_irq_clock & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -81,6 +81,23 @@ WRITE8_HANDLER( mhavoc_gamma_irq_ack_w )
  *  Machine init
  *
  *************************************/
+
+MACHINE_START( mhavoc )
+{
+	state_save_register_item(machine, "misc", NULL, 0, alpha_data);
+	state_save_register_item(machine, "misc", NULL, 0, alpha_rcvd);
+	state_save_register_item(machine, "misc", NULL, 0, alpha_xmtd);
+	state_save_register_item(machine, "misc", NULL, 0, gamma_data);
+	state_save_register_item(machine, "misc", NULL, 0, gamma_rcvd);
+	state_save_register_item(machine, "misc", NULL, 0, gamma_xmtd);
+	state_save_register_item(machine, "misc", NULL, 0, player_1);
+	state_save_register_item(machine, "misc", NULL, 0, alpha_irq_clock);
+	state_save_register_item(machine, "misc", NULL, 0, alpha_irq_clock_enable);
+	state_save_register_item(machine, "misc", NULL, 0, gamma_irq_clock);
+
+	state_save_register_item(machine, "misc", NULL, 0, speech_write_buffer);
+}
+
 
 MACHINE_RESET( mhavoc )
 {
@@ -112,22 +129,6 @@ MACHINE_RESET( mhavoc )
 	alpha_irq_clock = 0;
 	alpha_irq_clock_enable = 1;
 	gamma_irq_clock = 0;
-
-	/* set a timer going for the CPU interrupt generators */
-	timer_pulse(machine, ATTOTIME_IN_HZ(MHAVOC_CLOCK_5K), NULL, 0, cpu_irq_clock);
-
-	state_save_register_item(machine, "misc", NULL, 0, alpha_data);
-	state_save_register_item(machine, "misc", NULL, 0, alpha_rcvd);
-	state_save_register_item(machine, "misc", NULL, 0, alpha_xmtd);
-	state_save_register_item(machine, "misc", NULL, 0, gamma_data);
-	state_save_register_item(machine, "misc", NULL, 0, gamma_rcvd);
-	state_save_register_item(machine, "misc", NULL, 0, gamma_xmtd);
-	state_save_register_item(machine, "misc", NULL, 0, player_1);
-	state_save_register_item(machine, "misc", NULL, 0, alpha_irq_clock);
-	state_save_register_item(machine, "misc", NULL, 0, alpha_irq_clock_enable);
-	state_save_register_item(machine, "misc", NULL, 0, gamma_irq_clock);
-
-	state_save_register_item(machine, "misc", NULL, 0, speech_write_buffer);
 }
 
 
