@@ -1,7 +1,5 @@
 /***************************************************************************
-
     Sega Out Run hardware
-
 ****************************************************************************
 
     Known bugs:
@@ -11,7 +9,264 @@
         * verify analog input min/max
         * verify protection
 
+--
+
+Guru's Outrun & Super Hang On Board Notes:
+
+Outrun & Super Hang On
+Sega, 1986, 1987
+
+PCB Layouts
+-----------
+
+CPU Board: The CPU board used on Outrun and Super Hang On is identical. Only the ROMs are changed,
+all other chips including PALs/PLDs and custom chips are the same.
+The non-encrypted versions are documented below as they are easy to repair and that version is used to
+resurrect dead FD1089/1094 versions :-)
+
+171-5376-01
+837-6063-01 SEGA 1986
+Sticker: 837-6278-02 (for Super Hang On)
+Sticker: 834-6277-02 SUPER HANG ON
+Sticker: 834-6065-02 OUT RUN
+Sticker: 834-6065-04 OUT RUN (REV B)
+|-----------------------------------------------------------------------------------|
+|                        IC71   TMM2115                      J     5.5V_0.1F        |
+|                               TMM2115       16MHz                                 |
+|                        IC70     |--------|          MF6CN-50                    N |
+|                                 |315-5218|          MF6CN-50   4066  LM324        |
+|                        IC69     |        |                                        |
+|                                 |--------|          MP7633JN                    P |
+|                        IC68                                                       |
+|                                          Z80A              TL084               LED|
+|                        IC67              IC88    315-5224           |-----------| |
+|                                       TMM2115              YM3012   |SEGA       | |
+|                        IC66                      YM2151             |315-5195   | |
+| 315-5222 315-5155 315-5155            40MHz      MB3771             |           | |
+| IC11          IC47                                                  |           | |
+|                                                                     |-----------| |
+|                           315-5225 315-5226                                       |
+|                           |---------------------|         |---------------------| |
+|          315-5223A        |        68000        |         |        68000        | |
+|                           |---------------------|         |---------------------| |
+|                                                                                   |
+|                                                                                   |
+|                                                                                   |
+|                                                                                   |
+|                               IC58        IC76                IC118       IC133   |
+|                                                                                   |
+|                               IC57        IC75                IC117       IC132   |
+|           TMM2115   TMM2115                                                       |
+|                               IC56        IC74                IC116       IC131   |
+|           TMM2115   TMM2115                                                       |
+|                               TMM2063     TMM2063             TMM2063     TMM2063 |
+|                                                                                   |
+|                               TMM2063     TMM2063             TMM2062     TMM2063 |
+|                                                                                   |
+|                                                                                   |
+|         A                         B                                 C             |
+|-----------------------------------------------------------------------------------|
+Notes:
+      68000     - Clock Input 10.000MHz [40/4]
+      Z80A      - Clock Input 4.000MHz [16/4]
+      YM2151    - Yamaha YM2151 FM Operator Type M (OPM) Sound Generator IC. Clock Input 4.000MHz [16/4]
+      YM3012    - Yamaha YM3012 2-Channel Serial Input Floating Point Digital to Analog Convertor (DIP16)
+      TMM2063   - Toshiba TMM2063 8kx8 SRAM (NDIP28)
+      TMM2115   - Toshiba TMM2115 2kx8 SRAM (NDIP24)
+      TL084     - Texas Instruments TL084 Quad JFET-Input General-Purpose Operational Amplifier (DIP14)
+      LM324     - National Semiconductor LM324 Low Power Quad Operational Amplifier (DIP14)
+      MP7633JN  - Exar Corporation MP7633JN 15V CMOS 10-Bit Multiplying Digital-to-Analog Converter (DIP16)
+                  Also equivalent to National Semiconductor DAC1022LCN and AD7520JN / AD7530JN
+      MF6CN-50  - National Semiconductor MF6CN-50 6th Order Switched Capacitor Butterworth Lowpass Filter (DIP14)
+      5.5V_0.1F - 0.1 Farad Super Cap for Capacitor Backed RAM
+      4066      - NEC D74HC4066 Quad Bilateral Switch (DIP14)
+      MB3771    - Fujitsu MB3771 Master Reset IC (DIP8)
+      J         - 10 Pin Connector for 5V Input and GND
+      N         - 6 Pin Connector for Unamplified Stereo Sound Output
+      P         - 4 Pin Connector (not used)
+      A/B/C     - 50 Pin Connectors (x3) for joining CPU Board to Video Board
+      315-5155  - Sega custom PAL (Road Bit Extraction) (DIP20)
+      315-5195  - Sega Memory Mapper IC (in PGA package)
+      315-5218  - Sega PCM Sound Controller IC (QFP100).
+                  Clock input 16.000MHz on pin 80
+                  Clock outputs: pin 2 - 4.000MHz, pin 80 - 500.000kHz, pin 89 - 62.500KHz
+      315-5222  - Signetics PLS153N (Road Mixing) (DIP20)
+      315-5223A - Signetics CK2605 (DIP20)
+      315-5224  - Signetics CK2605 (DIP20)
+      315-5225  - MMI PAL16R4 (DIP20)
+      315-5226  - MMI PAL16R4 (DIP20)
+
+      Measurements
+      ------------
+      OSC1 - 39.99967MHz
+      OSC2 - 16.00019MHz
+
+
+      ROMs (EPR/MPR)
+      ----
+                     IC88  IC66  IC67  IC68  IC69  IC70  IC71  IC47  IC11  IC58  IC57  IC56  IC76  IC75  IC74  IC118  IC117  IC116  IC133  IC132  IC131
+      -------------------------------------------------------------------------------------------------------------------------------------------------
+      Out Run        10187 10193 10192 10191 10190 10189 10188 10186 10185 10329 10330 -     10327 10328 -     10382  10383  -      10380  10381  -
+      Super Hang On  10649 10643 10644 10645 10646 -     -     10642 -     10790 10791 -     10792 10793 -     10884  10885  -      10886  10887  -
+      -------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Video Board: (Used only on Super Hang On)
+
+171-5480
+837-6279 SEGA 1987
+Sticker: 837-6279-03
+|-----------------------------------------------------------------------------------|
+|10675.8 10676.7 10677.6 10678.5 10679.4 10680.3 10681.2 IC1  LED  CN6       CN5    |
+|                                                                                   |
+|                                                                               DSWB|
+|                                                                                   |
+|10682.16 10683.15 10684.14 10685.13 10686.12 10687.11 10688.10 IC9                 |
+|JP3 JP1                                                                        DSWA|
+|JP4 JP2                                                                            |
+|                                                                TLP521-4           |
+|315-5251           315-5213          TMM2018  TMM2018           TLP521-4           |
+|      |-----------|                                             TLP521-4           |
+|      | SEGA      |                                             TLP521-4           |
+|      | 315-5196  |                                                                |
+|      |           |                                                   ULN2003      |
+|      |           |                                                     D4051      |
+|      |-----------|                                                             CN4|
+|                                                                                   |
+|                                                                                   |
+|                                                                                   |
+|                                                                                   |
+|                                                                                   |
+|  TMM2018  TMM2018  TMM2018  TMM2018                                               |
+|JP5                                                                                |
+|JP6  10650.56 10651.55 10652.54                                                    |
+|                                  D42832   TMM2115                           DAP601|
+|                                                                             DAP601|
+|25.1748MHz                                                                 ADC0804 |
+|      |-----------|                                                                |
+|   JP7| SEGA      |               D42832   TMM2115                                 |
+|      | 315-5197  |                                                                |
+|JP8   |           |                                               |----------|     |
+|      |           |                                               | SEGA     |     |
+|      |-----------|               TMM2115  TMM2115                | 315-5242 |     |
+|                                                                  |----------|     |
+|         A                         B                                 C             |
+|-----------------------------------------------------------------------------------|
+Notes:
+      D42832   - NEC D42832 32kx8 SRAM (DIP28)
+      TMM2018  - Toshiba TMM2018 2kx8 SRAM (NDIP24)
+      TMM2115  - Toshiba TMM2115 2kx8 SRAM (NDIP24)
+      TLP521-4 - Toshiba TLP521-4 Photocoupler Gallium Arsenide Infrared Diode & Photo−Transistor (DIP16)
+      ADC0804  - National Semiconductor ADC0804 8-Bit Microprocessor Compatible A/D Converter (DIP20)
+      ULN2003  - NEC uPA2003 7 High-Voltage, High-Current Darlington Transistor Arrays (DIP16)
+      D4051    - NEC D4051 Single 8-Channel, Dual 4-Channel, Triple 2-Channel Analog Multiplexer/Demultiplexer with Logic Level Conversion (DIP16)
+      DAP601   - Diotec Semiconductor DAP601 Small Signal Diode Array IC (SIP7)
+      CN4      - 50 Pin Connector for Controls/Inputs/Outputs
+      CN5      - 6 Pin Connector for Video Output (RGB/Sync/GND)
+      CN6      - 10 Pin Connector for 5V Input and GND
+      A/B/C    - 50 Pin Connectors (x3) for joining Video Board to CPU Board
+      315-5196 - Sega Custom Sprite Generator (PGA package)
+      315-5197 - Sega Custom Tilemap Generator (PGA package)
+      315-5213 - MMI PAL16R6 (sprite-related) (DIP20)
+      315-5242 - Sega Custom Color Encoder (wide custom DIP32 ceramic package with surface mount caps/resistors/transistors and a QFP44 IC)
+      315-5251 - Signetics CK2605 (DIP20)
+      JPx      - 0-Ohm Resistors for ROM Configuration
+                 JP1: 512 populated
+                 JP2: 1M  populated from lower hole to JP4 upper hole (i.e. diagonally across both JP2 and JP4)
+                 JP3: 1M  not populated
+                 JP4: 512, see JP2
+                 JP5: 256 populated
+                 JP6: 512 not populated
+                 JP7: 512 not populated
+                 JP8: 256 populated
+      106xx.xx   ROMs, 1065x = 27C256, all other 106xx.xx are 27C512
+      IC1/9    - DIP28 sockets not populated
+
+      Measurements
+      ------------
+      VSync - 60.0543Hz
+      HSync - 15.6740kHz
+      OSC1  - 25.1747MHz
+
+
+Video Board: (Used only on Out Run)
+
+171-5377-01
+837-6064 SEGA 1986
+|-----------------------------------------------------------------------------------|
+|HM65256 HM65256 HM65256 HM65256                              LED   K         H     |
+|                HM65256 HM65256 HM65256 HM65256  TMM2063                           |
+|                                                 TMM2063                       DSWB|
+|                                                                                   |
+|HM65256 HM65256 HM65256 HM65256                                                    |
+|                HM65256 HM65256 HM65256 HM65256                                DSWA|
+|                                                                                   |
+|                                                                                   |
+|                   25.1748MHz  TMM2018               TMM2015             2401      |
+| |-----------|                 TMM2018               HM65256             2401      |
+| | SEGA      |                                       TMM2015             2401      |
+| | 315-5211  |                                       HM65256             2401      |
+| |           |                                                                     |
+| |           |                                                                     |
+| |-----------|                                                                    G|
+|               315-5227A                                                           |
+|   R1    R2     R3                                                                 |
+|                                                                                   |
+|IC12 IC16 IC20 IC24 IC28 IC32 IC36 IC40 IC44                                       |
+|                                                |-----------|       315-5228       |
+|                                                | SEGA      |                      |
+|                                                | 315-5197  |                      |
+|IC11 IC15 IC19 IC23 IC27 IC31 IC35 IC39 IC43    |           |             UPD2003  |
+|                                                |           |             UPD2003 F|
+|                                                |-----------|             UPD2003  |
+|                                                     R11 R12 R13                   |
+|IC10 IC14 IC18 IC22 IC26 IC30 IC34 IC38 IC42  IC102 IC103 IC104                    |
+|                                                                                   |
+|                                                                      8255         |
+|                                                                                   |
+|IC9  IC13 IC17 IC21 IC25 IC29 IC33 IC37 IC41  IC99  IC100 IC101            DAP601  |
+|                                                                           DAP601 D|
+|                                                                           ADC0804 |
+|         A                         B                                 C     4051    |
+|-----------------------------------------------------------------------------------|
+Notes:
+      HM65256  - Hitachi HM65256 or uPD42832 32kx8 SRAM (DIP28)
+      TMM2063  - Toshiba TMM2063 8kx8 SRAM (NDIP28)
+      TMM2018  - Toshiba TMM2018 2kx8 SRAM (NDIP24)
+      TMM2015  - Toshiba TMM2015 2kx8 SRAM (NDIP24)
+      ADC0804  - National Semiconductor ADC0804 8-Bit Microprocessor Compatible A/D Converter (DIP20)
+      ULN2003  - NEC uPA2003 7 High-Voltage, High-Current Darlington Transistor Arrays (DIP16)
+      D4051    - NEC D4051 Single 8-Channel, Dual 4-Channel, Triple 2-Channel Analog Multiplexer/Demultiplexer with Logic Level Conversion (DIP16)
+      DAP601   - Diotec Semiconductor DAP601 Small Signal Diode Array IC (SIP7)
+      8255     - NEC D8255AC-2 Programmable Peripheral Interface Adapter (DIP40)
+      2401     - NEC 2401 (or Sharp PC817) 4-Channel Type Photocoupler (DIP16)
+      G        - 50 Pin Connector for Controls/Inputs/Outputs
+      H        - 6 Pin Connector for Video Output (RGB/Sync/GND)
+      K        - 10 Pin Connector for 5V Input and GND
+      A/B/C    - 50 Pin Connectors (x3) for joining Video Board to CPU Board
+      F        - 26 Pin Connector
+      D        - 20 Pin Connector
+      315-5197 - Sega Custom Tilemap Generator (PGA package)
+      315-5211 - Sega Custom Sprite Generator (PGA package)
+      315-5227A- Signetics CK2678 (DIP20)
+      315-5228 - Signetics CK2605 (DIP20)
+      R1/2/3   - 0-Ohm Resistors for ROM Configuration (for IC9 - IC44)
+                 For 831000 mask ROMs: R1 populated, R2 & R3 not populated
+                 For 27C256 EPROMs: R1 not populated, R2 & R3 populated
+                 Other possible configurations unknown
+      R11/12/13- 0-Ohm Resistors for ROM Configuration (for IC99 - IC104)
+                 For 27C256 EPROMs: R11 & R13 populated, R12 not populated
+                 Other possible configurations unknown
+      ICxx     - DIP28 sockets
+
+      Measurements
+      ------------
+      VSync - 60.0543Hz
+      HSync - 15.6740kHz
+      OSC1  - 25.1747MHz
+
 ***************************************************************************/
+
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
