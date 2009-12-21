@@ -686,7 +686,7 @@ static int get_code_base_size(UINT32 *base, UINT32 *size)
 			}
 
 	fclose(map);
-	return 0;
+	return result;
 }
 
 
