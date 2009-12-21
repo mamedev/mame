@@ -60,8 +60,8 @@ static const UINT8 cb2001_decryption_table[256] = {
 //              pppp                ????                           pppp
 	xxxx,xxxx,xxxx,xxxx,0x22,xxxx,xxxx,xxxx, xxxx,0xa5,xxxx,xxxx,xxxx,0xbb,0xba,xxxx, /* 60 */
 //                        pppp                      ????                pppp gggg
-	0xc3,xxxx,0x02,xxxx,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf2,xxxx,xxxx,xxxx,xxxx,xxxx, /* 70 */
-//    pppp      pppp                pppp       pppp      ????
+	0xc3,xxxx,0x02,xxxx,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf2,xxxx,xxxx,0x43,xxxx,xxxx, /* 70 */
+//    pppp      pppp                pppp       pppp      ????           pppp
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x34, xxxx,xxxx,xxxx,xxxx,0x73,xxxx,xxxx,xxxx, /* 80 */
 //                                       ????                      pppp
 	xxxx,xxxx,0xe9,xxxx,xxxx,0xbe,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0xb9,xxxx,xxxx,xxxx, /* 90 */
@@ -127,7 +127,7 @@ cmv4                          cb2001                     (en -> de)
   4aa8 ld d,$00                 e66eb mov ah,00h         (b2 -> b4)
   4aaa ld hl,$4b62              e66ed mov bw,67cbh       (6d -> bb)
   4aad add lh,de                e66f0 add bw,aw          (ba -> 03)
-  4aae ld e,(hl)                CE                                  ????????
+  4aae ld e,(hl)                CE                                  prefix
   4aaf inc hl                   .
   4abo ld d,(hl)                .
   4ab1 ex de,hl                 e66f3 mov bw,w ptr[bw]   (df -> 8b)
@@ -145,8 +145,11 @@ cmv4                          cb2001                     (en -> de)
   .                             e670f be 0e6712h
   4ac8 ret nz                   e6711 ret                (70 -> c3)
 
+  4ac9 ld hl,($d61a)            e671c mov al,b ptr[bw]
+  4acc ld a,(hl)                .
+  4acd inc hl                   e671e inc bw             (7d -> 43)
   4ace cp $f0                   e671f cmp al,0f0h
-  4ad0 jr nc,$4b14              e6721 bnc ???            (8c -> 73)
+  4ad0 jr nc,$4b14              e6721 bnc 0e676fh        (8c -> 73)
 
   4add sub $50                  e672f sub al,50h         (52 -> 2a)
   4adf cp $50                   e6731 cmp al,50h
