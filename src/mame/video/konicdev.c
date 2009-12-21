@@ -5390,7 +5390,6 @@ struct _k053936_state
 
 	int      wraparound;
 	int      offset[2];
-	int      size;
 };
 
 /*****************************************************************************
@@ -5492,7 +5491,8 @@ void k053936_zoom_draw( const device_config *device, bitmap_t *bitmap, const rec
 
 		while (y <= maxy)
 		{
-			UINT16 *lineaddr = 4 * ((y - k053936->offset[1]) & 0x1ff) + (k053936->linectrl) ?  k053936->linectrl : 0;
+			UINT16 *lineaddr = k053936->linectrl + 4 * ((y - k053936->offset[1]) & 0x1ff);
+
 			my_clip.min_y = my_clip.max_y = y;
 
 			startx = 256 * (INT16)(lineaddr[0] + k053936->ctrl[0x00]);
@@ -5585,35 +5585,22 @@ static DEVICE_START( k053936 )
 	const k053936_interface *intf = k053936_get_interface(device);
 
 	k053936->ctrl = auto_alloc_array(device->machine, UINT16, 0x20);
-
-	if (intf->linectrl_size)
-		k053936->linectrl = auto_alloc_array(device->machine, UINT16, intf->linectrl_size);	// FIXME: should this only be 0x1000?
-	else	
-	{
-		/* f1gp.c & crshrace.c seem to have no linectrl ram: is it unmapped or really not present? */
-		/* in the meanwhile, we alloc a fake entry to avoid debug to complain for 0-size alloc */
-		k053936->linectrl = NULL;
-	}
+	k053936->linectrl = auto_alloc_array(device->machine, UINT16, 0x1000);
 
 	k053936->wraparound = intf->wrap;
 	k053936->offset[0] = intf->xoff;
 	k053936->offset[1] = intf->yoff;
 
-	k053936->size = intf->linectrl_size;
-
 	state_save_register_device_item_pointer(device, 0, k053936->ctrl, 0x20);
-
-	if (intf->linectrl_size)
-		state_save_register_device_item_pointer(device, 0, k053936->linectrl, intf->linectrl_size);
+	state_save_register_device_item_pointer(device, 0, k053936->linectrl, 0x1000);
 }
 
 static DEVICE_RESET( k053936 )
 {
 	k053936_state *k053936 = k053936_get_safe_token(device);
-	memset(k053936->ctrl, 0, 0x20);
 
-	if (k053936->linectrl != NULL)
-		memset(k053936->linectrl, 0, k053936->size);
+	memset(k053936->ctrl, 0, 0x20);
+	memset(k053936->linectrl, 0, 0x1000);
 }
 
 /***************************************************************************/

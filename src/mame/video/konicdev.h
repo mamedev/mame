@@ -93,7 +93,6 @@ typedef struct _k053936_interface k053936_interface;
 struct _k053936_interface
 {
 	int                wrap, xoff, yoff;
-	int                linectrl_size;
 };
 
 typedef struct _k056832_interface k056832_interface;

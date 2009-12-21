@@ -441,8 +441,7 @@ static const ym2610_interface ym2610_config =
 
 static const k053936_interface crshrace_k053936_intf =
 {
-	1, -48, -21,	/* wrap, xoff, yoff */
-	0			/* linectrl_size */
+	1, -48, -21	/* wrap, xoff, yoff */
 };
 
 
