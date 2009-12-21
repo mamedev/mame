@@ -55,13 +55,13 @@ static const UINT8 cb2001_decryption_table[256] = {
 	0x9d,xxxx,xxxx,xxxx,xxxx,xxxx,0xbe,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,0xbf,0x74, /* 30 */
 //    ????                          ????                 ????           ???? ???? pppp
 	xxxx,0xea,xxxx,xxxx,xxxx,0xb0,xxxx,xxxx, xxxx,0xa2,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 40 */
-//         !!!!                gggg                 ????
+//         !!!!                gggg                 pppp
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x42,xxxx, xxxx,xxxx,xxxx,xxxx,0xeb,xxxx,xxxx,xxxx, /* 50 */
-//                                  ????                           ????
+//                                  ????                           pppp
 	xxxx,xxxx,xxxx,xxxx,0x22,xxxx,xxxx,xxxx, xxxx,0xa5,xxxx,xxxx,xxxx,xxxx,0xba,xxxx, /* 60 */
 //                        pppp                      ????                     gggg
-	0xc3,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0x72,xxxx,0xf2,xxxx,xxxx,xxxx,xxxx,xxxx, /* 70 */
-//    pppp                                     ????      ????
+	0xc3,xxxx,0x02,xxxx,xxxx,xxxx,xxxx,xxxx, 0x72,xxxx,0xf2,xxxx,xxxx,xxxx,xxxx,xxxx, /* 70 */
+//    pppp      pppp                           ????      ????
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x34, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 80 */
 //                                       ????
 	xxxx,xxxx,0xe9,xxxx,xxxx,0xbe,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0xb9,xxxx,xxxx,xxxx, /* 90 */
@@ -107,11 +107,25 @@ cmv4                          cb2001                     (en -> de)
 02aa ld a,$01                 e0243 mov al,1h
 02ac ld ($d618),a             e0245 mov [72dh],al
 02af call $4a8e               e0248 call 0e66cbh
-  4a8e ld a,($d618)             e66cb mov al,[72dh]
+  4a8e ld a,($d618)             e66cb mov al,[72dh]      (1a -> a0)
   4a91 and a                    e66ce and al,al          (64 -> 22)
   4a92 jr z,$4abe               e66d0 be e6703           (3f -> 74)
   4a94 cp $02                   e66d2 cmp al,2h          (08 -> 3c)
   4a96 jr nz,$4aa6              e66d4 bne e66e9          (2b -> 75)
+  4a98 ld a,$0d                 e66d6 mov al,0dh         (45 -> b0)
+  .                             e66d8 mov dw,23h         (6e -> ba)
+  4a9a out ($03),a              e66db out dw,al          (c2 -> ee)
+  4a9c ld a,$00                 e66dc mov al,00h
+  .                             e66de mov dw,22h
+  4a9e out ($02),a              e66e1 out dw,al
+  4aa0 xor a                    e66e2 xor al,al          (18 -> 32)
+  4aa1 ld ($d618),al            e66e4 mov [72dh],al      (49 -> a2)
+  4aa4 jr $4abe                 e66e7 br 0e6703h         (5c -> eb)
+
+  4aa6 add a,a                  e66e9 add al,al          (72 -> 02)
+
+
+
 
 -------------------------------------------------
 
