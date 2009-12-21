@@ -46,20 +46,20 @@ In test mode (c) is 2000
 #define xxxx 0x90 /* Unknown */
 
 static const UINT8 cb2001_decryption_table[256] = {
-	0xe8,xxxx,xxxx,xxxx,xxxx,0x61,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 00 */
-//    pppp                     ????
+	0xe8,xxxx,xxxx,xxxx,xxxx,0x61,xxxx,xxxx, 0x3c,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 00 */
+//    pppp                     ????            pppp
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,xxxx,0x3a,xxxx,xxxx,xxxx, /* 10 */
 //                                             pppp     ????       pppp           ????
 	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xbc,xxxx, xxxx,xxxx,xxxx,0x75,xxxx,xxxx,xxxx,xxxx, /* 20 */
 //         !!!!      ????      ???? ????                      pppp
-	0x9d,xxxx,xxxx,xxxx,xxxx,xxxx,0xbe,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,0xbf,xxxx, /* 30 */
-//    ????                          ????                 ????           ???? ????
+	0x9d,xxxx,xxxx,xxxx,xxxx,xxxx,0xbe,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,0xbf,0x74, /* 30 */
+//    ????                          ????                 ????           ???? ???? pppp
 	xxxx,0xea,xxxx,xxxx,xxxx,0xb0,xxxx,xxxx, xxxx,0xa2,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 40 */
 //         !!!!                gggg                 ????
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x42,xxxx, xxxx,xxxx,xxxx,xxxx,0xeb,xxxx,xxxx,xxxx, /* 50 */
 //                                  ????                           ????
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,0xa5,xxxx,xxxx,xxxx,xxxx,0xba,xxxx, /* 60 */
-//                                                  ????                     gggg
+	xxxx,xxxx,xxxx,xxxx,0x22,xxxx,xxxx,xxxx, xxxx,0xa5,xxxx,xxxx,xxxx,xxxx,0xba,xxxx, /* 60 */
+//                        pppp                      ????                     gggg
 	0xc3,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0x72,xxxx,0xf2,xxxx,xxxx,xxxx,xxxx,xxxx, /* 70 */
 //    pppp                                     ????      ????
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x34, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 80 */
@@ -82,7 +82,7 @@ static const UINT8 cb2001_decryption_table[256] = {
 
 /* robiza's notes:
 
-cmast91 seems similar to this cb2001:
+cmast91 and cmv4 seems similar to this cb2001:
 
 cmast91:                      cb2001:
 0067 ld a,$07                 e0130 mov al,7h
@@ -97,6 +97,23 @@ cmast91:                      cb2001:
 0071 out ($13),a              e0126 mov dw,13h
                               e0129 out dw,al
 
+-------------------------------------------------
+
+cmv4                          cb2001                     (en -> de)
+029f ld b,$fc                 
+02a1 call $0c38               e0239 call 0e30b8h
+02a4 ld hl,$d023              e023d mov ix,90h
+02a7 call $2b2d               e0240 call 0e32a6h
+02aa ld a,$01                 e0243 mov al,1h
+02ac ld ($d618),a             e0245 mov [72dh],al
+02af call $4a8e               e0248 call 0e66cbh
+  4a8e ld a,($d618)             e66cb mov al,[72dh]
+  4a91 and a                    e66ce and al,al          (64 -> 22)
+  4a92 jr z,$4abe               e66d0 be e6703           (3f -> 74)
+  4a94 cp $02                   e66d2 cmp al,2h          (08 -> 3c)
+  4a96 jr nz,$4aa6              e66d4 bne e66e9          (2b -> 75)
+
+-------------------------------------------------
 
 56 -> ????
 
