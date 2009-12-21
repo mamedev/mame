@@ -8,14 +8,14 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 
 static int sprite_colorbase;
 static int layer_colorbase[4];
 //static int layerpri[4] ={ 1,2,4,0 };
 
-static void lethalen_sprite_callback(int *code, int *color, int *priority_mask)
+void lethalen_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask)
 {
 	int pri = (*color & 0xfff0);
 	*color = *color & 0x000f;
@@ -38,38 +38,32 @@ static void lethalen_sprite_callback(int *code, int *color, int *priority_mask)
 	*code = (*code & 0x3fff); // | spritebanks[(*code >> 12) & 3];
 }
 
-static void lethalen_tile_callback(int layer, int *code, int *color, int *flags)
+void lethalen_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags)
 {
 	*color = layer_colorbase[layer] + ((*color & 0x3c)<<2);
 }
 
 VIDEO_START(lethalen)
 {
-	K053251_vh_start(machine);
-
-	K056832_vh_start(machine, "gfx1", K056832_BPP_8LE, 1, NULL, lethalen_tile_callback, 0);
-
-	K053245_vh_start(machine, 0, "gfx3",NORMAL_PLANE_ORDER, lethalen_sprite_callback);
+	const device_config *k056832 = devtag_get_device(machine, "k056832");
 
 	// this game uses external linescroll RAM
-	K056832_SetExtLinescroll();
+	k056832_SetExtLinescroll(k056832);
 
 	// the US and Japanese cabinets apparently use different mirror setups
 	if (!strcmp(machine->gamedrv->name, "lethalenj"))
 	{
-		K056832_set_LayerOffset(0, -196, 0);
-		K056832_set_LayerOffset(1, -194, 0);
-		K056832_set_LayerOffset(2, -192, 0);
-		K056832_set_LayerOffset(3, -190, 0);
-		K053245_set_SpriteOffset(0, -105, 0);
+		k056832_set_layer_offs(k056832, 0, -196, 0);
+		k056832_set_layer_offs(k056832, 1, -194, 0);
+		k056832_set_layer_offs(k056832, 2, -192, 0);
+		k056832_set_layer_offs(k056832, 3, -190, 0);
 	}
 	else
 	{ /* fixme */
- 		K056832_set_LayerOffset(0, 188, 0);
-		K056832_set_LayerOffset(1, 190, 0);
-		K056832_set_LayerOffset(2, 192, 0);
-		K056832_set_LayerOffset(3, 194, 0);
-		K053245_set_SpriteOffset(0, 95, 0);
+ 		k056832_set_layer_offs(k056832, 0, 188, 0);
+		k056832_set_layer_offs(k056832, 1, 190, 0);
+		k056832_set_layer_offs(k056832, 2, 192, 0);
+		k056832_set_layer_offs(k056832, 3, 194, 0);
 	}
 
 	layer_colorbase[0] = 0x00;
@@ -80,20 +74,22 @@ VIDEO_START(lethalen)
 
 WRITE8_HANDLER(lethalen_palette_control)
 {
+	const device_config *k056832 = devtag_get_device(space->machine, "k056832");
+
 	switch (offset)
 	{
 		case 0:	// 40c8 - PCU1 from schematics
 			layer_colorbase[0] = ((data & 0x7)-1) * 0x40;
 			layer_colorbase[1] = (((data>>4) & 0x7)-1) * 0x40;
-			K056832_mark_plane_dirty(0);
-			K056832_mark_plane_dirty(1);
+			k056832_mark_plane_dirty(k056832, 0);
+			k056832_mark_plane_dirty(k056832, 1);
 			break;
 
 		case 4: // 40cc - PCU2 from schematics
 			layer_colorbase[2] = ((data & 0x7)-1) * 0x40;
 			layer_colorbase[3] = (((data>>4) & 0x7)-1) * 0x40;
-			K056832_mark_plane_dirty(2);
-			K056832_mark_plane_dirty(3);
+			k056832_mark_plane_dirty(k056832, 2);
+			k056832_mark_plane_dirty(k056832, 3);
 			break;
 
 		case 8:	// 40d0 - PCU3 from schematics
@@ -104,31 +100,20 @@ WRITE8_HANDLER(lethalen_palette_control)
 
 VIDEO_UPDATE(lethalen)
 {
+	const device_config *k056832 = devtag_get_device(screen->machine, "k056832");
+	const device_config *k053244 = devtag_get_device(screen->machine, "k053244");
+
 	bitmap_fill(bitmap, cliprect, 7168);
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
-	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 3, 0, 1);
-	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 2, 0, 2);
-	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 1, 0, 4);
+	k056832_tilemap_draw(k056832, bitmap, cliprect, 3, 0, 1);
+	k056832_tilemap_draw(k056832, bitmap, cliprect, 2, 0, 2);
+	k056832_tilemap_draw(k056832, bitmap, cliprect, 1, 0, 4);
 
-	K053245_sprites_draw_lethal(screen->machine,0, bitmap, cliprect);
+	k053245_sprites_draw_lethal(k053244, bitmap, cliprect);
 
 	// force "A" layer over top of everything
-	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 0, 0, 0);
+	k056832_tilemap_draw(k056832, bitmap, cliprect, 0, 0, 0);
 
-
-#if 0
-	{
-		extern UINT16 *K056832_videoram;
-		FILE *fp;
-
-		fp=fopen("K056832_videoram", "w+b");
-		if (fp)
-		{
-			fwrite(K056832_videoram, 0x10000, 2, fp);
-			fclose(fp);
-		}
-	}
-#endif
 	return 0;
 }

@@ -9,7 +9,9 @@ extern UINT16 *xmen6p_tilemapright;
 
 /*----------- defined in video/xmen.c -----------*/
 
-VIDEO_START( xmen );
+void xmen_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+void xmen_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
+
 VIDEO_START( xmen6p );
 VIDEO_UPDATE( xmen );
 VIDEO_UPDATE( xmen6p );

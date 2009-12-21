@@ -8,7 +8,7 @@
 */
 
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 static int ttl_gfx_index;
 static tilemap *ttl_tilemap, *rng_936_tilemap;
@@ -32,7 +32,7 @@ static TILE_GET_INFO( ttl_get_tile_info )
 	SET_TILE_INFO(ttl_gfx_index, code, attr, 0);
 }
 
-static void rng_sprite_callback(int *code, int *color, int *priority_mask)
+void rng_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask)
 {
 	*color = sprite_colorbase | (*color & 0x001f);
 }
@@ -81,10 +81,10 @@ VIDEO_START(rng)
 		8*8*4
 	};
 
-	K055673_vh_start(machine, "gfx2", 1, -8, 15, rng_sprite_callback);
+//	K055673_vh_start(machine, "gfx2", 1, -8, 15, rng_sprite_callback);
 
-	K053936_wraparound_enable(0, 0);
-	K053936_set_offset(0, 34, 9);
+//	K053936_wraparound_enable(0, 0);
+//	K053936_set_offset(0, 34, 9);
 
 	rng_936_tilemap = tilemap_create(machine, get_rng_936_tile_info, tilemap_scan_rows,  16, 16, 128, 128);
 	tilemap_set_transparent_pen(rng_936_tilemap, 0);
@@ -111,12 +111,15 @@ VIDEO_START(rng)
 
 VIDEO_UPDATE(rng)
 {
+	const device_config *k055673 = devtag_get_device(screen->machine, "k055673");
+	const device_config *k053936 = devtag_get_device(screen->machine, "k053936");
+
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
-	K053936_0_zoom_draw(bitmap, cliprect, rng_936_tilemap, 0, 0, 1);
+	k053936_zoom_draw(k053936, bitmap, cliprect, rng_936_tilemap, 0, 0, 1);
 
-	K053247_sprites_draw(screen->machine, bitmap, cliprect);
+	k053247_sprites_draw(k055673, bitmap, cliprect);
 
 	tilemap_mark_all_tiles_dirty(ttl_tilemap);
 	tilemap_draw(bitmap, cliprect, ttl_tilemap, 0, 0);

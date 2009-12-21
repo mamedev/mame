@@ -1,6 +1,6 @@
 #include "driver.h"
 #include "machine/eeprom.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "includes/tmnt.h"
 
 
@@ -47,7 +47,7 @@ static TILE_GET_INFO( prmrsocr_get_roz_tile_info )
 
 /* Missing in Action */
 
-static void mia_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
+void mia_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	*flags = (*color & 0x04) ? TILE_FLIPX : 0;
 	if (layer == 0)
@@ -62,9 +62,11 @@ static void mia_tile_callback(int layer,int bank,int *code,int *color,int *flags
 	}
 }
 
-static void cuebrick_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
+void cuebrick_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
-	if ((K052109_get_RMRD_line() == CLEAR_LINE) && (layer == 0))
+	const device_config *k052109 = devtag_get_device(machine, "k052109");
+
+	if ((k052109_get_rmrd_line(k052109) == CLEAR_LINE) && (layer == 0))
 	{
 		*code |= ((*color & 0x01) << 8);
 		*color = layer_colorbase[layer]  + ((*color & 0x80) >> 5) + ((*color & 0x10) >> 1);
@@ -76,14 +78,14 @@ static void cuebrick_tile_callback(int layer,int bank,int *code,int *color,int *
 	}
 }
 
-static void tmnt_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
+void tmnt_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9)
 			| (bank << 13);
 	*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
-static void ssbl_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
+void ssbl_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	if (layer == 0)
 	{
@@ -102,7 +104,7 @@ static void ssbl_tile_callback(int layer,int bank,int *code,int *color,int *flag
 
 static int blswhstl_rombank;
 
-static void blswhstl_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
+void blswhstl_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x10) << 5) | ((*color & 0x0c) << 8)
@@ -118,18 +120,18 @@ static void blswhstl_tile_callback(int layer,int bank,int *code,int *color,int *
 
 ***************************************************************************/
 
-static void mia_sprite_callback(int *code,int *color,int *priority,int *shadow)
+void mia_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow)
 {
 	*color = sprite_colorbase + (*color & 0x0f);
 }
 
-static void tmnt_sprite_callback(int *code,int *color,int *priority,int *shadow)
+void tmnt_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow)
 {
 	*code |= (*color & 0x10) << 9;
 	*color = sprite_colorbase + (*color & 0x0f);
 }
 
-static void punkshot_sprite_callback(int *code,int *color,int *priority_mask,int *shadow)
+void punkshot_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow)
 {
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= layerpri[2])								*priority_mask = 0;
@@ -141,7 +143,7 @@ static void punkshot_sprite_callback(int *code,int *color,int *priority_mask,int
 	*color = sprite_colorbase + (*color & 0x0f);
 }
 
-static void thndrx2_sprite_callback(int *code,int *color,int *priority_mask,int *shadow)
+void thndrx2_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow)
 {
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= layerpri[2])								*priority_mask = 0;
@@ -159,7 +161,7 @@ static void thndrx2_sprite_callback(int *code,int *color,int *priority_mask,int 
 
 ***************************************************************************/
 
-static void lgtnfght_sprite_callback(int *code,int *color,int *priority_mask)
+void lgtnfght_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask)
 {
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= layerpri[2])								*priority_mask = 0;
@@ -170,7 +172,7 @@ static void lgtnfght_sprite_callback(int *code,int *color,int *priority_mask)
 	*color = sprite_colorbase + (*color & 0x1f);
 }
 
-static void blswhstl_sprite_callback(int *code,int *color,int *priority_mask)
+void blswhstl_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask)
 {
 #if 0
 if (input_code_pressed(machine, KEYCODE_Q) && (*color & 0x20)) *color = rand();
@@ -186,7 +188,7 @@ if (input_code_pressed(machine, KEYCODE_E) && (*color & 0x80)) *color = rand();
 	*color = sprite_colorbase + (*color & 0x1f);
 }
 
-static void prmrsocr_sprite_callback(int *code,int *color,int *priority_mask)
+void prmrsocr_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask)
 {
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= layerpri[2])								*priority_mask = 0;
@@ -207,24 +209,24 @@ static void prmrsocr_sprite_callback(int *code,int *color,int *priority_mask)
 
 ***************************************************************************/
 
-VIDEO_START( mia )
-{
-	layer_colorbase[0] = 0;
-	layer_colorbase[1] = 32;
-	layer_colorbase[2] = 40;
-	sprite_colorbase = 16;
-	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,mia_tile_callback);
-	K051960_vh_start(machine,"gfx2",REVERSE_PLANE_ORDER,mia_sprite_callback);
-}
-
 VIDEO_START( cuebrick )
 {
 	layer_colorbase[0] = 0;
 	layer_colorbase[1] = 32;
 	layer_colorbase[2] = 40;
 	sprite_colorbase = 16;
-	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,cuebrick_tile_callback);
-	K051960_vh_start(machine,"gfx2",REVERSE_PLANE_ORDER,mia_sprite_callback);
+//	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,cuebrick_tile_callback);
+//	K051960_vh_start(machine,"gfx2",REVERSE_PLANE_ORDER,mia_sprite_callback);
+}
+
+VIDEO_START( mia )
+{
+	layer_colorbase[0] = 0;
+	layer_colorbase[1] = 32;
+	layer_colorbase[2] = 40;
+	sprite_colorbase = 16;
+//	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,mia_tile_callback);
+//	K051960_vh_start(machine,"gfx2",REVERSE_PLANE_ORDER,mia_sprite_callback);
 }
 
 VIDEO_START( tmnt )
@@ -233,24 +235,26 @@ VIDEO_START( tmnt )
 	layer_colorbase[1] = 32;
 	layer_colorbase[2] = 40;
 	sprite_colorbase = 16;
-	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K051960_vh_start(machine,"gfx2",REVERSE_PLANE_ORDER,tmnt_sprite_callback);
+//	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
+//	K051960_vh_start(machine,"gfx2",REVERSE_PLANE_ORDER,tmnt_sprite_callback);
 }
 
 VIDEO_START( punkshot )
 {
-	K053251_vh_start(machine);
-	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K051960_vh_start(machine,"gfx2",NORMAL_PLANE_ORDER,punkshot_sprite_callback);
+//	K053251_vh_start(machine);
+//	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
+//	K051960_vh_start(machine,"gfx2",NORMAL_PLANE_ORDER,punkshot_sprite_callback);
 }
 
 VIDEO_START( lgtnfght )	/* also tmnt2, ssriders */
 {
-	K053251_vh_start(machine);
-	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K053245_vh_start(machine,0, "gfx2",NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
+	const device_config *k053245 = devtag_get_device(machine, "k053245");
 
-	K05324x_set_z_rejection(0);
+//	K053251_vh_start(machine);
+//	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
+//	K053245_vh_start(machine,0, "gfx2",NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
+
+	k05324x_set_z_rejection(k053245, 0);
 
 	dim_c = dim_v = lastdim = lasten = 0;
 
@@ -262,53 +266,52 @@ VIDEO_START( lgtnfght )	/* also tmnt2, ssriders */
 
 VIDEO_START( sunsetbl )
 {
-	K053251_vh_start(machine);
-	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,ssbl_tile_callback);
-	K053245_vh_start(machine,0, "gfx2",NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
+//	K053251_vh_start(machine);
+//	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,ssbl_tile_callback);
+//	K053245_vh_start(machine,0, "gfx2",NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
 }
 
 VIDEO_START( blswhstl )
 {
-	K053251_vh_start(machine);
-	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,blswhstl_tile_callback);
-	K053245_vh_start(machine,0, "gfx2",NORMAL_PLANE_ORDER,blswhstl_sprite_callback);
+//	K053251_vh_start(machine);
+//	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,blswhstl_tile_callback);
+//	K053245_vh_start(machine,0, "gfx2",NORMAL_PLANE_ORDER,blswhstl_sprite_callback);
 }
 
 VIDEO_START( glfgreat )
 {
-	K053251_vh_start(machine);
-	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K053245_vh_start(machine,0, "gfx2",NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
+//	K053251_vh_start(machine);
+//	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
+//	K053245_vh_start(machine,0, "gfx2",NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
 
 	roz_tilemap = tilemap_create(machine, glfgreat_get_roz_tile_info,tilemap_scan_rows,16,16,512,512);
 
 	tilemap_set_transparent_pen(roz_tilemap,0);
 
-	K053936_wraparound_enable(0, 1);
-	K053936_set_offset(0, 85, 0);
+//	k053936_wraparound_enable(k053936, 1);
+//	k053936_set_offset(k053936, 85, 0);
 }
 
 VIDEO_START( thndrx2 )
 {
-	K053251_vh_start(machine);
-	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K051960_vh_start(machine,"gfx2",NORMAL_PLANE_ORDER,thndrx2_sprite_callback);
+//	K053251_vh_start(machine);
+//	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
+//	K051960_vh_start(machine,"gfx2",NORMAL_PLANE_ORDER,thndrx2_sprite_callback);
 }
 
 VIDEO_START( prmrsocr )
 {
-	K053251_vh_start(machine);
-	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
-	K053245_vh_start(machine,0, "gfx2",NORMAL_PLANE_ORDER,prmrsocr_sprite_callback);
+//	K053251_vh_start(machine);
+//	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tmnt_tile_callback);
+//	K053245_vh_start(machine,0, "gfx2",NORMAL_PLANE_ORDER,prmrsocr_sprite_callback);
 
 	roz_tilemap = tilemap_create(machine, prmrsocr_get_roz_tile_info,tilemap_scan_rows,16,16,512,256);
 
 	tilemap_set_transparent_pen(roz_tilemap,0);
 
-	K053936_wraparound_enable(0, 0);
-	K053936_set_offset(0, 85, 1);
+//	k053936_wraparound_enable(k053936, 0, 0);
+//	k053936_set_offset(k053936, 0, 85, 1);
 }
-
 
 
 /***************************************************************************
@@ -330,6 +333,8 @@ WRITE16_HANDLER( tmnt_paletteram_word_w )
 
 WRITE16_HANDLER( tmnt_0a0000_w )
 {
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+
 	if (ACCESSING_BITS_0_7)
 	{
 		static int last;
@@ -348,7 +353,7 @@ WRITE16_HANDLER( tmnt_0a0000_w )
 		interrupt_enable_w(space, 0, data & 0x20);
 
 		/* bit 7 = enable char ROM reading through the video RAM */
-		K052109_set_RMRD_line((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(k052109, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* other bits unused */
 	}
@@ -356,6 +361,8 @@ WRITE16_HANDLER( tmnt_0a0000_w )
 
 WRITE16_HANDLER( punkshot_0a0020_w )
 {
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+
 	if (ACCESSING_BITS_0_7)
 	{
 		static int last;
@@ -371,16 +378,17 @@ WRITE16_HANDLER( punkshot_0a0020_w )
 		last = data & 0x04;
 
 		/* bit 3 = enable char ROM reading through the video RAM */
-		K052109_set_RMRD_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
 WRITE16_HANDLER( lgtnfght_0a0018_w )
 {
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+
 	if (ACCESSING_BITS_0_7)
 	{
 		static int last;
-
 
 		/* bit 0,1 = coin counter */
 		coin_counter_w(space->machine, 0, data & 0x01);
@@ -393,12 +401,14 @@ WRITE16_HANDLER( lgtnfght_0a0018_w )
 		last = data & 0x04;
 
 		/* bit 3 = enable char ROM reading through the video RAM */
-		K052109_set_RMRD_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
 WRITE16_HANDLER( blswhstl_700300_w )
 {
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
@@ -406,7 +416,7 @@ WRITE16_HANDLER( blswhstl_700300_w )
 		coin_counter_w(space->machine, 1,data & 0x02);
 
 		/* bit 3 = enable char ROM reading through the video RAM */
-		K052109_set_RMRD_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 7 = select char ROM bank */
 		if (blswhstl_rombank != ((data & 0x80) >> 7))
@@ -436,6 +446,8 @@ READ16_HANDLER( glfgreat_rom_r )
 
 WRITE16_HANDLER( glfgreat_122000_w )
 {
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
@@ -443,7 +455,7 @@ WRITE16_HANDLER( glfgreat_122000_w )
 		coin_counter_w(space->machine, 1,data & 0x02);
 
 		/* bit 4 = enable char ROM reading through the video RAM */
-		K052109_set_RMRD_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(k052109, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 5 = 53596 tile rom bank selection */
 		if (glfgreat_roz_rom_bank != (data & 0x20) >> 5)
@@ -467,6 +479,8 @@ WRITE16_HANDLER( glfgreat_122000_w )
 
 WRITE16_HANDLER( ssriders_eeprom_w )
 {
+	const device_config *k053245 = devtag_get_device(space->machine, "k053245");
+
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
@@ -482,12 +496,14 @@ WRITE16_HANDLER( ssriders_eeprom_w )
 		dim_c = data & 0x18;
 
 		/* bit 5 selects sprite ROM for testing in TMNT2 (bits 5-7, actually, according to the schematics) */
-		K053244_bankselect(0, ((data & 0x20) >> 5) << 2);
+		k053244_bankselect(k053245, ((data & 0x20) >> 5) << 2);
 	}
 }
 
 WRITE16_HANDLER( ssriders_1c0300_w )
 {
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
@@ -495,7 +511,7 @@ WRITE16_HANDLER( ssriders_1c0300_w )
 		coin_counter_w(space->machine, 1,data & 0x02);
 
 		/* bit 3 = enable char ROM reading through the video RAM */
-		K052109_set_RMRD_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bits 4-6 control palette dimming (DIM0-DIM2) */
 		dim_v = (data & 0x70) >> 4;
@@ -504,6 +520,9 @@ WRITE16_HANDLER( ssriders_1c0300_w )
 
 WRITE16_HANDLER( prmrsocr_122000_w )
 {
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	const device_config *k053245 = devtag_get_device(space->machine, "k053245");
+
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
@@ -511,11 +530,11 @@ WRITE16_HANDLER( prmrsocr_122000_w )
 		coin_counter_w(space->machine, 1,data & 0x02);
 
 		/* bit 4 = enable char ROM reading through the video RAM */
-		K052109_set_RMRD_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(k052109, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 6 = sprite ROM bank */
 		prmrsocr_sprite_bank = (data & 0x40) >> 6;
-		K053244_bankselect(0, prmrsocr_sprite_bank << 2);
+		k053244_bankselect(k053245, prmrsocr_sprite_bank << 2);
 
 		/* bit 7 = 53596 region selector for ROM test */
 		glfgreat_roz_char_bank = (data & 0x80) >> 7;
@@ -587,84 +606,100 @@ static void sortlayers(int *layer,int *pri)
 
 VIDEO_UPDATE( mia )
 {
-	K052109_tilemap_update();
+	const device_config *k052109 = devtag_get_device(screen->machine, "k052109");
+	const device_config *k051960 = devtag_get_device(screen->machine, "k051960");
 
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],TILEMAP_DRAW_OPAQUE,0);
-	if ((priorityflag & 1) == 1) K051960_sprites_draw(screen->machine,bitmap,cliprect,0,0);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[1],0,0);
-	if ((priorityflag & 1) == 0) K051960_sprites_draw(screen->machine,bitmap,cliprect,0,0);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[0],0,0);
+	k052109_tilemap_update(k052109);
+
+	k052109_tilemap_draw(k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
+	if ((priorityflag & 1) == 1) k051960_sprites_draw(k051960,bitmap,cliprect,0,0);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, 1, 0, 0);
+	if ((priorityflag & 1) == 0) k051960_sprites_draw(k051960,bitmap,cliprect,0,0);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, 0, 0, 0);
+
 	return 0;
 }
 
 VIDEO_UPDATE( tmnt )
 {
-	K052109_tilemap_update();
+	const device_config *k052109 = devtag_get_device(screen->machine, "k052109");
+	const device_config *k051960 = devtag_get_device(screen->machine, "k051960");
 
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],TILEMAP_DRAW_OPAQUE,0);
-	if ((priorityflag & 1) == 1) K051960_sprites_draw(screen->machine,bitmap,cliprect,0,0);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[1],0,0);
-	if ((priorityflag & 1) == 0) K051960_sprites_draw(screen->machine,bitmap,cliprect,0,0);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[0],0,0);
+	k052109_tilemap_update(k052109);
+
+	k052109_tilemap_draw(k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
+	if ((priorityflag & 1) == 1) k051960_sprites_draw(k051960,bitmap,cliprect,0,0);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, 1, 0, 0);
+	if ((priorityflag & 1) == 0) k051960_sprites_draw(k051960,bitmap,cliprect,0,0);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, 0, 0, 0);
+
 	return 0;
 }
 
 
 VIDEO_UPDATE( punkshot )
 {
-	bg_colorbase       = K053251_get_palette_index(K053251_CI0);
-	sprite_colorbase   = K053251_get_palette_index(K053251_CI1);
-	layer_colorbase[0] = K053251_get_palette_index(K053251_CI2);
-	layer_colorbase[1] = K053251_get_palette_index(K053251_CI4);
-	layer_colorbase[2] = K053251_get_palette_index(K053251_CI3);
+	const device_config *k052109 = devtag_get_device(screen->machine, "k052109");
+	const device_config *k053251 = devtag_get_device(screen->machine, "k053251");
+	const device_config *k051960 = devtag_get_device(screen->machine, "k051960");
 
-	K052109_tilemap_update();
+	bg_colorbase       = k053251_get_palette_index(k053251, K053251_CI0);
+	sprite_colorbase   = k053251_get_palette_index(k053251, K053251_CI1);
+	layer_colorbase[0] = k053251_get_palette_index(k053251, K053251_CI2);
+	layer_colorbase[1] = k053251_get_palette_index(k053251, K053251_CI4);
+	layer_colorbase[2] = k053251_get_palette_index(k053251, K053251_CI3);
+
+	k052109_tilemap_update(k052109);
 
 	sorted_layer[0] = 0;
-	layerpri[0] = K053251_get_priority(K053251_CI2);
+	layerpri[0] = k053251_get_priority(k053251, K053251_CI2);
 	sorted_layer[1] = 1;
-	layerpri[1] = K053251_get_priority(K053251_CI4);
+	layerpri[1] = k053251_get_priority(k053251, K053251_CI4);
 	sorted_layer[2] = 2;
-	layerpri[2] = K053251_get_priority(K053251_CI3);
+	layerpri[2] = k053251_get_priority(k053251, K053251_CI3);
 
 	sortlayers(sorted_layer,layerpri);
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[0]],TILEMAP_DRAW_OPAQUE,1);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[1]],0,2);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[2]],0,4);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, sorted_layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, sorted_layer[1], 0, 2);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, sorted_layer[2], 0, 4);
 
-	K051960_sprites_draw(screen->machine,bitmap,cliprect,-1,-1);
+	k051960_sprites_draw(k051960, bitmap, cliprect, -1, -1);
 	return 0;
 }
 
 
 VIDEO_UPDATE( lgtnfght )
 {
-	bg_colorbase       = K053251_get_palette_index(K053251_CI0);
-	sprite_colorbase   = K053251_get_palette_index(K053251_CI1);
-	layer_colorbase[0] = K053251_get_palette_index(K053251_CI2);
-	layer_colorbase[1] = K053251_get_palette_index(K053251_CI4);
-	layer_colorbase[2] = K053251_get_palette_index(K053251_CI3);
+	const device_config *k052109 = devtag_get_device(screen->machine, "k052109");
+	const device_config *k053251 = devtag_get_device(screen->machine, "k053251");
+	const device_config *k053245 = devtag_get_device(screen->machine, "k053245");
 
-	K052109_tilemap_update();
+	bg_colorbase       = k053251_get_palette_index(k053251, K053251_CI0);
+	sprite_colorbase   = k053251_get_palette_index(k053251, K053251_CI1);
+	layer_colorbase[0] = k053251_get_palette_index(k053251, K053251_CI2);
+	layer_colorbase[1] = k053251_get_palette_index(k053251, K053251_CI4);
+	layer_colorbase[2] = k053251_get_palette_index(k053251, K053251_CI3);
+
+	k052109_tilemap_update(k052109);
 
 	sorted_layer[0] = 0;
-	layerpri[0] = K053251_get_priority(K053251_CI2);
+	layerpri[0] = k053251_get_priority(k053251, K053251_CI2);
 	sorted_layer[1] = 1;
-	layerpri[1] = K053251_get_priority(K053251_CI4);
+	layerpri[1] = k053251_get_priority(k053251, K053251_CI4);
 	sorted_layer[2] = 2;
-	layerpri[2] = K053251_get_priority(K053251_CI3);
+	layerpri[2] = k053251_get_priority(k053251, K053251_CI3);
 
 	sortlayers(sorted_layer,layerpri);
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,16 * bg_colorbase);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[0]],0,1);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[1]],0,2);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[2]],0,4);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, sorted_layer[0], 0, 1);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, sorted_layer[1], 0, 2);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, sorted_layer[2], 0, 4);
 
-	K053245_sprites_draw(screen->machine, 0, bitmap,cliprect);
+	k053245_sprites_draw(k053245, bitmap, cliprect);
 	return 0;
 }
 
@@ -680,24 +715,45 @@ popmessage("%04x",glfgreat_pixel);
 	else return glfgreat_pixel & 0xff;
 }
 
+static void glfgreat_update_dirtytile(running_machine *machine)
+{
+//	const device_config *k052109 = devtag_get_device(machine, "k052109");
+//	const device_config *k053251 = devtag_get_device(machine, "k053251");
+//	int i;
+//
+//	for (i = 0; i < 3; i++)
+//	{
+//		if (k053251_get_tmap_dirty(k053251, 2 + i))
+//		{
+//			k053251_set_tmap_dirty(k053251, 2 + i, 0);
+//			tilemap_mark_all_tiles_dirty(k052109_get_tilemap(k052109, i));
+//		}
+//	}
+}
+
 VIDEO_UPDATE( glfgreat )
 {
-	K053251_set_tilemaps(NULL,NULL,K052109_tilemap[0],K052109_tilemap[1],K052109_tilemap[2]);
+	const device_config *k052109 = devtag_get_device(screen->machine, "k052109");
+	const device_config *k053251 = devtag_get_device(screen->machine, "k053251");
+	const device_config *k053245 = devtag_get_device(screen->machine, "k053245");
+	const device_config *k053936 = devtag_get_device(screen->machine, "k053936");
 
-	bg_colorbase       = K053251_get_palette_index(K053251_CI0);
-	sprite_colorbase   = K053251_get_palette_index(K053251_CI1);
-	layer_colorbase[0] = K053251_get_palette_index(K053251_CI2);
-	layer_colorbase[1] = K053251_get_palette_index(K053251_CI3) + 8;	/* weird... */
-	layer_colorbase[2] = K053251_get_palette_index(K053251_CI4);
+	glfgreat_update_dirtytile(screen->machine);
 
-	K052109_tilemap_update();
+	bg_colorbase       = k053251_get_palette_index(k053251, K053251_CI0);
+	sprite_colorbase   = k053251_get_palette_index(k053251, K053251_CI1);
+	layer_colorbase[0] = k053251_get_palette_index(k053251, K053251_CI2);
+	layer_colorbase[1] = k053251_get_palette_index(k053251, K053251_CI3) + 8;	/* weird... */
+	layer_colorbase[2] = k053251_get_palette_index(k053251, K053251_CI4);
+
+	k052109_tilemap_update(k052109);
 
 	sorted_layer[0] = 0;
-	layerpri[0] = K053251_get_priority(K053251_CI2);
+	layerpri[0] = k053251_get_priority(k053251, K053251_CI2);
 	sorted_layer[1] = 1;
-	layerpri[1] = K053251_get_priority(K053251_CI3);
+	layerpri[1] = k053251_get_priority(k053251, K053251_CI3);
 	sorted_layer[2] = 2;
-	layerpri[2] = K053251_get_priority(K053251_CI4);
+	layerpri[2] = k053251_get_priority(k053251, K053251_CI4);
 
 	sortlayers(sorted_layer,layerpri);
 
@@ -705,36 +761,42 @@ VIDEO_UPDATE( glfgreat )
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,16 * bg_colorbase);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[0]],0,1);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, sorted_layer[0], 0, 1);
+
 	if (layerpri[0] >= 0x30 && layerpri[1] < 0x30)
 	{
-		K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,1,1);
-		glfgreat_pixel = *BITMAP_ADDR16(bitmap,0x80,0x105);
-	}
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[1]],0,2);
-	if (layerpri[1] >= 0x30 && layerpri[2] < 0x30)
-	{
-		K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,1,1);
-		glfgreat_pixel = *BITMAP_ADDR16(bitmap,0x80,0x105);
-	}
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[2]],0,4);
-	if (layerpri[2] >= 0x30)
-	{
-		K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,1,1);
+		k053936_zoom_draw(k053936, bitmap, cliprect, roz_tilemap, 0, 1, 1);
 		glfgreat_pixel = *BITMAP_ADDR16(bitmap,0x80,0x105);
 	}
 
-	K053245_sprites_draw(screen->machine, 0, bitmap,cliprect);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, sorted_layer[1], 0, 2);
+
+	if (layerpri[1] >= 0x30 && layerpri[2] < 0x30)
+	{
+		k053936_zoom_draw(k053936, bitmap, cliprect, roz_tilemap, 0, 1, 1);
+		glfgreat_pixel = *BITMAP_ADDR16(bitmap,0x80,0x105);
+	}
+
+	k052109_tilemap_draw(k052109, bitmap, cliprect, sorted_layer[2], 0, 4);
+
+	if (layerpri[2] >= 0x30)
+	{
+		k053936_zoom_draw(k053936, bitmap, cliprect, roz_tilemap, 0, 1, 1);
+		glfgreat_pixel = *BITMAP_ADDR16(bitmap,0x80,0x105);
+	}
+
+	k053245_sprites_draw(k053245, bitmap, cliprect);
 	return 0;
 }
 
 VIDEO_UPDATE( tmnt2 )
 {
+	const device_config *k053251 = devtag_get_device(screen->machine, "k053251");
 	double brt;
 	int i, newdim, newen, cb, ce;
 
 	newdim = dim_v | ((~dim_c & 0x10) >> 1);
-	newen  = (K053251_get_priority(5) && K053251_get_priority(5) != 0x3e);
+	newen  = (k053251_get_priority(k053251, 5) && k053251_get_priority(k053251, 5) != 0x3e);
 
 	if (newdim != lastdim || newen != lasten)
 	{
@@ -756,16 +818,16 @@ VIDEO_UPDATE( tmnt2 )
 		ce = cb + 128;
 
 		// dim all colors before it
-		for (i=0; i<cb; i++)
-			palette_set_pen_contrast(screen->machine,i,brt);
+		for (i = 0; i < cb; i++)
+			palette_set_pen_contrast(screen->machine, i, brt);
 
 		// reset all colors in range
-		for (i=cb; i<ce; i++)
-			palette_set_pen_contrast(screen->machine,i,1.0);
+		for (i = cb; i < ce; i++)
+			palette_set_pen_contrast(screen->machine, i, 1.0);
 
 		// dim all colors after it
-		for (i=ce; i<2048; i++)
-			palette_set_pen_contrast(screen->machine,i,brt);
+		for (i = ce; i < 2048; i++)
+			palette_set_pen_contrast(screen->machine, i, brt);
 
 		// toggle shadow/highlight
 		if (~dim_c & 0x10)
@@ -781,30 +843,34 @@ VIDEO_UPDATE( tmnt2 )
 
 VIDEO_UPDATE( thndrx2 )
 {
-	bg_colorbase       = K053251_get_palette_index(K053251_CI0);
-	sprite_colorbase   = K053251_get_palette_index(K053251_CI1);
-	layer_colorbase[0] = K053251_get_palette_index(K053251_CI2);
-	layer_colorbase[1] = K053251_get_palette_index(K053251_CI4);
-	layer_colorbase[2] = K053251_get_palette_index(K053251_CI3);
+	const device_config *k052109 = devtag_get_device(screen->machine, "k052109");
+	const device_config *k053251 = devtag_get_device(screen->machine, "k053251");
+	const device_config *k051960 = devtag_get_device(screen->machine, "k051960");
 
-	K052109_tilemap_update();
+	bg_colorbase       = k053251_get_palette_index(k053251, K053251_CI0);
+	sprite_colorbase   = k053251_get_palette_index(k053251, K053251_CI1);
+	layer_colorbase[0] = k053251_get_palette_index(k053251, K053251_CI2);
+	layer_colorbase[1] = k053251_get_palette_index(k053251, K053251_CI4);
+	layer_colorbase[2] = k053251_get_palette_index(k053251, K053251_CI3);
+
+	k052109_tilemap_update(k052109);
 
 	sorted_layer[0] = 0;
-	layerpri[0] = K053251_get_priority(K053251_CI2);
+	layerpri[0] = k053251_get_priority(k053251, K053251_CI2);
 	sorted_layer[1] = 1;
-	layerpri[1] = K053251_get_priority(K053251_CI4);
+	layerpri[1] = k053251_get_priority(k053251, K053251_CI4);
 	sorted_layer[2] = 2;
-	layerpri[2] = K053251_get_priority(K053251_CI3);
+	layerpri[2] = k053251_get_priority(k053251, K053251_CI3);
 
 	sortlayers(sorted_layer,layerpri);
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,16 * bg_colorbase);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[0]],0,1);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[1]],0,2);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[sorted_layer[2]],0,4);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, sorted_layer[0], 0, 1);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, sorted_layer[1], 0, 2);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, sorted_layer[2], 0, 4);
 
-	K051960_sprites_draw(screen->machine,bitmap,cliprect,-1,-1);
+	k051960_sprites_draw(k051960, bitmap, cliprect, -1, -1);
 	return 0;
 }
 
@@ -818,5 +884,6 @@ VIDEO_UPDATE( thndrx2 )
 
 VIDEO_EOF( blswhstl )
 {
-	K053245_clear_buffer(0);
+	const device_config *k053245 = devtag_get_device(machine, "k053245");
+	k053245_clear_buffer(k053245);
 }

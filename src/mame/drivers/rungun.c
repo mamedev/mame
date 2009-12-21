@@ -37,12 +37,12 @@
 
 #include "driver.h"
 
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
 #include "sound/k054539.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
 
 VIDEO_START( rng );
 VIDEO_UPDATE( rng );
@@ -52,6 +52,7 @@ WRITE16_HANDLER( rng_ttl_ram_w );
 WRITE16_HANDLER( rng_936_videoram_w );
 
 extern UINT16 *rng_936_videoram;
+extern void rng_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
 
 static UINT16 *rng_sysreg;
 static int init_eeprom_count;
@@ -95,20 +96,20 @@ static READ16_HANDLER( rng_sysregs_r )
 	{
 		case 0x00/2:
 			if (input_port_read(space->machine, "DSW") & 0x20)
-				return(input_port_read(space->machine, "P1") | input_port_read(space->machine, "P3")<<8);
+				return(input_port_read(space->machine, "P1") | input_port_read(space->machine, "P3") << 8);
 			else
 			{
 				data = input_port_read(space->machine, "P1") & input_port_read(space->machine, "P3");
-				return(data<<8 | data);
+				return(data << 8 | data);
 			}
 
 		case 0x02/2:
 			if (input_port_read(space->machine, "DSW") & 0x20)
-				return(input_port_read(space->machine, "P2") | input_port_read(space->machine, "P4")<<8);
+				return(input_port_read(space->machine, "P2") | input_port_read(space->machine, "P4") << 8);
 			else
 			{
 				data = input_port_read(space->machine, "P2") & input_port_read(space->machine, "P4");
-				return(data<<8 | data);
+				return(data << 8 | data);
 			}
 
 		case 0x04/2:
@@ -138,6 +139,7 @@ static READ16_HANDLER( rng_sysregs_r )
 
 static WRITE16_HANDLER( rng_sysregs_w )
 {
+	const device_config *k055673 = devtag_get_device(space->machine, "k055673");
 	COMBINE_DATA(rng_sysreg + offset);
 
 	switch (offset)
@@ -169,7 +171,7 @@ static WRITE16_HANDLER( rng_sysregs_w )
                 bit 2 : OBJCHA
                 bit 3 : enable IRQ 5
             */
-			K053246_set_OBJCHA_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+			k053246_set_objcha_line(k055673, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	}
 }
@@ -212,25 +214,25 @@ static ADDRESS_MAP_START( rungun_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x380000, 0x39ffff) AM_RAM											// work RAM
 	AM_RANGE(0x400000, 0x43ffff) AM_READNOP	// AM_READ( K053936_0_rom_r )       // '936 ROM readback window
 	AM_RANGE(0x480000, 0x48001f) AM_READWRITE(rng_sysregs_r,rng_sysregs_w) AM_BASE(&rng_sysreg)
-	AM_RANGE(0x4c0000, 0x4c001f) AM_READ(K053252_word_r)						// CCU (for scanline and vblank polling)
+	AM_RANGE(0x4c0000, 0x4c001f) AM_DEVREAD("k053252", k053252_word_r)						// CCU (for scanline and vblank polling)
 	AM_RANGE(0x540000, 0x540001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x58000c, 0x58000d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x58000e, 0x58000f) AM_WRITE(sound_cmd2_w)
 	AM_RANGE(0x580014, 0x580015) AM_READ(sound_status_msb_r)
 	AM_RANGE(0x580000, 0x58001f) AM_RAM											// sound regs read/write fall-through
-	AM_RANGE(0x5c0000, 0x5c000d) AM_READ(K053246_word_r)						// 246A ROM readback window
-	AM_RANGE(0x5c0010, 0x5c001f) AM_WRITE(K053247_reg_word_w)
-	AM_RANGE(0x600000, 0x600fff) AM_READWRITE(K053247_word_r,K053247_word_w)	// OBJ RAM
+	AM_RANGE(0x5c0000, 0x5c000d) AM_DEVREAD("k055673", k053246_word_r)						// 246A ROM readback window
+	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVWRITE("k055673", k053247_reg_word_w)
+	AM_RANGE(0x600000, 0x600fff) AM_DEVREADWRITE("k055673", k053247_word_r, k053247_word_w)	// OBJ RAM
 	AM_RANGE(0x601000, 0x601fff) AM_RAM											// communication? second monitor buffer?
-	AM_RANGE(0x640000, 0x640007) AM_WRITE(K053246_word_w)						// '246A registers
-	AM_RANGE(0x680000, 0x68001f) AM_WRITEONLY AM_BASE(&K053936_0_ctrl)			// '936 registers
+	AM_RANGE(0x640000, 0x640007) AM_DEVWRITE("k055673", k053246_word_w)						// '246A registers
+	AM_RANGE(0x680000, 0x68001f) AM_DEVWRITE("k053936", k053936_ctrl_w)			// '936 registers
 	AM_RANGE(0x6c0000, 0x6cffff) AM_RAM_WRITE(rng_936_videoram_w) AM_BASE(&rng_936_videoram)	// PSAC2 ('936) RAM (34v + 35v)
-	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_BASE(&K053936_0_linectrl)			// PSAC "Line RAM"
+	AM_RANGE(0x700000, 0x7007ff) AM_DEVREADWRITE("k053936", k053936_linectrl_r, k053936_linectrl_w)			// PSAC "Line RAM"
 	AM_RANGE(0x740000, 0x741fff) AM_READWRITE(rng_ttl_ram_r,rng_ttl_ram_w)		// text plane RAM
 	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITENOP									// watchdog
 #if RNG_DEBUG
-	AM_RANGE(0x5c0010, 0x5c001f) AM_READ(K053247_reg_word_r)
-	AM_RANGE(0x640000, 0x640007) AM_READ(K053246_reg_word_r)
+	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVREAD("k055673", k053247_reg_word_r)
+	AM_RANGE(0x640000, 0x640007) AM_DEVREAD("k055673", k053246_reg_word_r)
 #endif
 ADDRESS_MAP_END
 
@@ -276,77 +278,6 @@ static ADDRESS_MAP_START( rungun_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfff0, 0xfff3) AM_WRITENOP
 ADDRESS_MAP_END
 
-
-static const k054539_interface k054539_config =
-{
-	"shared"
-};
-
-/**********************************************************************************/
-
-static const gfx_layout bglayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4,
-	  9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8
-};
-
-static GFXDECODE_START( rungun )
-	GFXDECODE_ENTRY( "gfx1", 0, bglayout, 0x0000, 64 )
-GFXDECODE_END
-
-static MACHINE_DRIVER_START( rng )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(rungun_map)
-	MDRV_CPU_VBLANK_INT("screen", rng_interrupt)
-
-	MDRV_CPU_ADD("soundcpu", Z80, 10000000) // 8Mhz (10Mhz is much safer in self-test due to heavy sync)
-	MDRV_CPU_PROGRAM_MAP(rungun_sound_map)
-	MDRV_CPU_PERIODIC_INT(audio_interrupt, 480)
-
-	MDRV_QUANTUM_TIME(HZ(6000)) // higher if sound stutters
-
-	MDRV_GFXDECODE(rungun)
-
-	MDRV_MACHINE_RESET(rng)
-	MDRV_NVRAM_HANDLER(rungun)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_BEFORE_VBLANK)
-
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(88, 88+384-1, 24, 24+224-1)
-
-	MDRV_PALETTE_LENGTH(1024)
-
-	MDRV_VIDEO_START(rng)
-	MDRV_VIDEO_UPDATE(rng)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MDRV_SOUND_ADD("konami1", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	MDRV_SOUND_ADD("konami2", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
 
 static INPUT_PORTS_START( rng )
 	PORT_START("SYSTEM")
@@ -397,6 +328,102 @@ static INPUT_PORTS_START( rng )
 	PORT_START("P4")
 	KONAMI8_B123_START(4)
 INPUT_PORTS_END
+
+
+
+/**********************************************************************************/
+
+static const gfx_layout bglayout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 0, 1, 2, 3 },
+	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4,
+	  9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
+	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
+			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	128*8
+};
+
+static GFXDECODE_START( rungun )
+	GFXDECODE_ENTRY( "gfx1", 0, bglayout, 0x0000, 64 )
+GFXDECODE_END
+
+
+
+static const k054539_interface k054539_config =
+{
+	"shared"
+};
+
+
+static const k053936_interface rng_k053936_intf =
+{
+	0, 34, 9
+};
+
+static const k053247_interface rng_k055673_intf =
+{
+	"screen",
+	"gfx2", 1,
+	K055673_LAYOUT_RNG,
+	-8, 15,
+	KONAMI_ROM_DEINTERLEAVE_NONE,	// there is some interleave in VIDEO_START...
+	rng_sprite_callback
+};
+
+
+static MACHINE_DRIVER_START( rng )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
+	MDRV_CPU_PROGRAM_MAP(rungun_map)
+	MDRV_CPU_VBLANK_INT("screen", rng_interrupt)
+
+	MDRV_CPU_ADD("soundcpu", Z80, 10000000) // 8Mhz (10Mhz is much safer in self-test due to heavy sync)
+	MDRV_CPU_PROGRAM_MAP(rungun_sound_map)
+	MDRV_CPU_PERIODIC_INT(audio_interrupt, 480)
+
+	MDRV_QUANTUM_TIME(HZ(6000)) // higher if sound stutters
+
+	MDRV_GFXDECODE(rungun)
+
+	MDRV_MACHINE_RESET(rng)
+	MDRV_NVRAM_HANDLER(rungun)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_BEFORE_VBLANK)
+
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(88, 88+384-1, 24, 24+224-1)
+
+	MDRV_PALETTE_LENGTH(1024)
+
+	MDRV_VIDEO_START(rng)
+	MDRV_VIDEO_UPDATE(rng)
+
+	MDRV_K053936_ADD("k053936", rng_k053936_intf)
+	MDRV_K055673_ADD("k055673", rng_k055673_intf)
+	MDRV_K053252_ADD("k053252")
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MDRV_SOUND_ADD("konami1", K054539, 48000)
+	MDRV_SOUND_CONFIG(k054539_config)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MDRV_SOUND_ADD("konami2", K054539, 48000)
+	MDRV_SOUND_CONFIG(k054539_config)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_DRIVER_END
 
 
 ROM_START( rungun )

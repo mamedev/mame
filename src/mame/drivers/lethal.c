@@ -165,7 +165,7 @@ maybe some priority issues / sprite placement issues..
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/hd6309/hd6309.h"
 #include "cpu/z80/z80.h"
@@ -185,6 +185,9 @@ static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIG
 VIDEO_START(lethalen);
 VIDEO_UPDATE(lethalen);
 WRITE8_HANDLER(lethalen_palette_control);
+
+extern void lethalen_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
+extern void lethalen_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
 
 static int init_eeprom_count;
 static UINT8 cur_control2;
@@ -249,7 +252,10 @@ static WRITE8_HANDLER( control2_w )
 
 static INTERRUPT_GEN(lethalen_interrupt)
 {
-	if (K056832_is_IRQ_enabled(0)) cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
+	const device_config *k056832 = devtag_get_device(device->machine, "k056832");
+
+	if (k056832_is_irq_enabled(k056832, 0)) 
+		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( sound_cmd_w )
@@ -281,6 +287,10 @@ static WRITE8_HANDLER( le_bankswitch_w )
 
 static READ8_HANDLER( le_4800_r )
 {
+	const device_config *k056832 = devtag_get_device(space->machine, "k056832");
+	const device_config *k053244 = devtag_get_device(space->machine, "k053244");
+	const device_config *k054000 = devtag_get_device(space->machine, "k054000");
+
 	if (cur_control2 & 0x10)	// RAM enable
 	{
 		return space->machine->generic.paletteram.u8[offset];
@@ -298,7 +308,7 @@ static READ8_HANDLER( le_4800_r )
 				case 0x44:
 				case 0x45:
 				case 0x46:
-					return K053244_r(space,offset-0x40);
+					return k053244_r(k053244, offset - 0x40);
 
 				case 0x80:
 				case 0x81:
@@ -332,22 +342,22 @@ static READ8_HANDLER( le_4800_r )
 				case 0x9d:
 				case 0x9e:
 				case 0x9f:
-					return K054000_r(space,offset-0x80);
+					return k054000_r(k054000, offset - 0x80);
 
 				case 0xca:
-					return sound_status_r(space,0);
+					return sound_status_r(space, 0);
 			}
 		}
 		else if (offset < 0x1800)
-			return K053245_r(space,(offset - 0x0800) & 0x07ff);
+			return k053245_r(k053244, (offset - 0x0800) & 0x07ff);
 		else if (offset < 0x2000)
-			return K056832_ram_code_lo_r(space,offset - 0x1800);
+			return k056832_ram_code_lo_r(k056832, offset - 0x1800);
 		else if (offset < 0x2800)
-			return K056832_ram_code_hi_r(space,offset - 0x2000);
+			return k056832_ram_code_hi_r(k056832, offset - 0x2000);
 		else if (offset < 0x3000)
-			return K056832_ram_attr_lo_r(space,offset - 0x2800);
+			return k056832_ram_attr_lo_r(k056832, offset - 0x2800);
 		else // (offset < 0x3800)
-			return K056832_ram_attr_hi_r(space,offset - 0x3000);
+			return k056832_ram_attr_hi_r(k056832, offset - 0x3000);
 	}
 
 	return 0;
@@ -355,6 +365,10 @@ static READ8_HANDLER( le_4800_r )
 
 static WRITE8_HANDLER( le_4800_w )
 {
+	const device_config *k056832 = devtag_get_device(space->machine, "k056832");
+	const device_config *k053244 = devtag_get_device(space->machine, "k053244");
+	const device_config *k054000 = devtag_get_device(space->machine, "k054000");
+
 	if (cur_control2 & 0x10)	// RAM enable
 	{
 		paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
@@ -380,7 +394,7 @@ static WRITE8_HANDLER( le_4800_w )
 				case 0x44:
 				case 0x45:
 				case 0x46:
-					K053244_w(space, offset-0x40, data);
+					k053244_w(k053244, offset - 0x40, data);
 					break;
 
 				case 0x80:
@@ -415,7 +429,7 @@ static WRITE8_HANDLER( le_4800_w )
 				case 0x9d:
 				case 0x9e:
 				case 0x9f:
-					K054000_w(space, offset-0x80, data);
+					k054000_w(k054000, offset - 0x80, data);
 					break;
 
 				default:
@@ -424,18 +438,15 @@ static WRITE8_HANDLER( le_4800_w )
 			}
 		}
 		else if (offset < 0x1800)
-		{
-			K053245_w(space, (offset - 0x0800) & 0x07ff, data);
-
-		}
+			k053245_w(k053244, (offset - 0x0800) & 0x07ff, data);
 		else if (offset < 0x2000)
-			K056832_ram_code_lo_w(space, offset - 0x1800, data);
+			k056832_ram_code_lo_w(k056832, offset - 0x1800, data);
 		else if (offset < 0x2800)
-			K056832_ram_code_hi_w(space, offset - 0x2000, data);
+			k056832_ram_code_hi_w(k056832, offset - 0x2000, data);
 		else if (offset < 0x3000)
-			K056832_ram_attr_lo_w(space, offset - 0x2800, data);
+			k056832_ram_attr_lo_w(k056832, offset - 0x2800, data);
 		else // (offset < 0x3800)
-			K056832_ram_attr_hi_w(space, offset - 0x3000, data);
+			k056832_ram_attr_hi_w(k056832, offset - 0x3000, data);
 	}
 }
 
@@ -450,20 +461,20 @@ static READ8_HANDLER(guns_r)
 	switch (offset)
 	{
 		case 0:
-			return GUNX(1)>>1;
+			return GUNX(1) >> 1;
 		case 1:
-			if ((240-GUNY(1)) == 7)
+			if ((240 - GUNY(1)) == 7)
 				return 0;
 			else
-				return (240-GUNY(1));
+				return (240 - GUNY(1));
 			break;
 		case 2:
-			return GUNX(2)>>1;
+			return GUNX(2) >> 1;
 		case 3:
-			if ((240-GUNY(2)) == 7)
+			if ((240 - GUNY(2)) == 7)
 				return 0;
 			else
-				return (240-GUNY(2));
+				return (240 - GUNY(2));
 			break;
 	}
 
@@ -483,8 +494,8 @@ static READ8_HANDLER(gunsaux_r)
 static ADDRESS_MAP_START( le_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM				// work RAM
-	AM_RANGE(0x4000, 0x403f) AM_WRITE(K056832_w)
-	AM_RANGE(0x4040, 0x404f) AM_WRITE(K056832_b_w)
+	AM_RANGE(0x4000, 0x403f) AM_DEVWRITE("k056832", k056832_w)
+	AM_RANGE(0x4040, 0x404f) AM_DEVWRITE("k056832", k056832_b_w)
 	AM_RANGE(0x4080, 0x4080) AM_READNOP		// watchdog
 	AM_RANGE(0x4090, 0x4090) AM_READNOP
 	AM_RANGE(0x40a0, 0x40a0) AM_READNOP
@@ -508,8 +519,6 @@ static ADDRESS_MAP_START( le_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc02, 0xfc02) AM_READ(soundlatch_r)
 	AM_RANGE(0xfc03, 0xfc03) AM_READNOP
 ADDRESS_MAP_END
-
-/* sound */
 
 static INPUT_PORTS_START( lethalen )
 	PORT_START("INPUTS")
@@ -569,6 +578,28 @@ static INPUT_PORTS_START( lethalej )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_REVERSE
 INPUT_PORTS_END
 
+
+static const gfx_layout lethal_6bpp =
+{
+	16,16,
+	RGN_FRAC(1,2),
+	6,
+	{ RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+0, 8, 0, 24, 16 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
+	8*32+0, 8*32+1, 8*32+2, 8*32+3, 8*32+4, 8*32+5, 8*32+6, 8*32+7 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+		16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
+	128*8
+};
+
+/* we use this decode instead of the one done by the sprite video start due to it being 6bpp */
+static GFXDECODE_START( lethal )
+	GFXDECODE_ENTRY( "gfx2", 0, lethal_6bpp,   0x000/*0x400*/, 256  ) /* sprites tiles */
+GFXDECODE_END
+
+
+/* sound */
+
 static const k054539_interface k054539_config =
 {
 	NULL,
@@ -591,23 +622,32 @@ static MACHINE_RESET( lethalen )
 	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
 
-static const gfx_layout lethal_6bpp =
+static const k056832_interface lethalen_k056832_intf =
 {
-	16,16,
-	RGN_FRAC(1,2),
-	6,
-	{ RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+0, 8, 0, 24, 16 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-	8*32+0, 8*32+1, 8*32+2, 8*32+3, 8*32+4, 8*32+5, 8*32+6, 8*32+7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
-	128*8
+	"gfx1", 1,
+	K056832_BPP_8LE,
+	1, 0,
+	KONAMI_ROM_DEINTERLEAVE_NONE,
+	lethalen_tile_callback, "none"
 };
 
-/* we use this decode instead of the one done by the sprite video start due to it being 6bpp */
-static GFXDECODE_START( lethal )
-	GFXDECODE_ENTRY( "gfx2", 0, lethal_6bpp,   0x000/*0x400*/, 256  ) /* sprites tiles */
-GFXDECODE_END
+static const k05324x_interface lethalen_k05324x_intf =
+{
+	"gfx3", 2,
+	NORMAL_PLANE_ORDER,
+	95, 0,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	lethalen_sprite_callback
+};
+
+static const k05324x_interface lethalej_k05324x_intf =
+{
+	"gfx3", 2,
+	NORMAL_PLANE_ORDER,
+	-105, 0,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	lethalen_sprite_callback
+};
 
 static MACHINE_DRIVER_START( lethalen )
 	/* basic machine hardware */
@@ -640,6 +680,10 @@ static MACHINE_DRIVER_START( lethalen )
 	MDRV_VIDEO_START(lethalen)
 	MDRV_VIDEO_UPDATE(lethalen)
 
+	MDRV_K056832_ADD("k056832", lethalen_k056832_intf)
+	MDRV_K053244_ADD("k053244", lethalen_k05324x_intf)
+	MDRV_K054000_ADD("k054000")
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -654,6 +698,9 @@ static MACHINE_DRIVER_START( lethalej )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(224, 512-1, 16, 240-1)
+
+	MDRV_DEVICE_REMOVE("k053244")
+	MDRV_K053244_ADD("k053244", lethalej_k05324x_intf)
 MACHINE_DRIVER_END
 
 ROM_START( lethalen )	// US version UAE
@@ -864,9 +911,8 @@ ROM_END
 
 static DRIVER_INIT( lethalen )
 {
-	konami_rom_deinterleave_2_half(machine, "gfx2");
-	konami_rom_deinterleave_2(machine, "gfx3");
-	konami_rom_deinterleave_2(machine, "gfx4");
+	konamid_rom_deinterleave_2_half(machine, "gfx2");
+	konamid_rom_deinterleave_2(machine, "gfx4");
 }
 
 GAME( 1992, lethalen,   0,        lethalen, lethalen, lethalen, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver UAE, 11/19/92 15:04)", GAME_IMPERFECT_GRAPHICS) // writes UE to eeprom

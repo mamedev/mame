@@ -11,12 +11,13 @@ press F1+F3 to see ROM/RAM tests and the final animation
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "cpu/z80/z80.h"
 #include "sound/2608intf.h"
 
 
 extern UINT16 *tail2nos_bgvideoram;
+extern void tail2nos_zoom_callback(running_machine *machine, int *code,int *color,int *flags);
 
 WRITE16_HANDLER( tail2nos_bgvideoram_w );
 READ16_HANDLER( tail2nos_zoomdata_r );
@@ -46,6 +47,7 @@ static WRITE16_HANDLER( sound_command_w )
 	}
 }
 
+#if 0
 static READ16_HANDLER( tail2nos_K051316_0_r )
 {
 	return K051316_0_r(space,offset);
@@ -62,6 +64,7 @@ static WRITE16_HANDLER( tail2nos_K051316_ctrl_0_w )
 	if (ACCESSING_BITS_0_7)
 		K051316_ctrl_0_w(space,offset,data & 0xff);
 }
+#endif
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
@@ -73,8 +76,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK("bank1")	/* extra ROM */
 	AM_RANGE(0x2c0000, 0x2dffff) AM_ROMBANK("bank2")
 	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE(tail2nos_zoomdata_r, tail2nos_zoomdata_w)
-	AM_RANGE(0x500000, 0x500fff) AM_READWRITE(tail2nos_K051316_0_r, tail2nos_K051316_0_w)
-	AM_RANGE(0x510000, 0x51001f) AM_WRITE(tail2nos_K051316_ctrl_0_w)
+	AM_RANGE(0x500000, 0x500fff) AM_DEVREADWRITE8("k051316", k051316_r, k051316_w, 0x00ff)
+	AM_RANGE(0x510000, 0x51001f) AM_DEVWRITE8("k051316", k051316_ctrl_w, 0x00ff)
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM								/* work RAM */
 	AM_RANGE(0xffc000, 0xffc2ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xffc300, 0xffcfff) AM_RAM
@@ -232,6 +235,13 @@ static const ym2608_interface ym2608_config =
 };
 
 
+static const k051316_interface tail2nos_k051316_intf =
+{
+	"gfx3", 2,
+	-4, TRUE, 0, 
+	1, -89, -14,
+	tail2nos_zoom_callback
+};
 
 static MACHINE_DRIVER_START( tail2nos )
 
@@ -259,6 +269,8 @@ static MACHINE_DRIVER_START( tail2nos )
 
 	MDRV_VIDEO_START(tail2nos)
 	MDRV_VIDEO_UPDATE(tail2nos)
+
+	MDRV_K051316_ADD("k051316", tail2nos_k051316_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

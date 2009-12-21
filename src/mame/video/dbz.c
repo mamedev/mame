@@ -9,18 +9,18 @@
 
 
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 static tilemap *dbz_bg1_tilemap, *dbz_bg2_tilemap;
 UINT16 *dbz_bg1_videoram, *dbz_bg2_videoram;
 static int sprite_colorbase, layer_colorbase[6], layer[5], layerpri[5];
 
-static void dbz_tile_callback(int layer, int *code, int *color, int *flags)
+void dbz_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags)
 {
 	*color = (layer_colorbase[layer] << 1) + ((*color & 0x3c) >> 2);
 }
 
-static void dbz_sprite_callback(int *code, int *color, int *priority_mask)
+void dbz_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask)
 {
 	int pri = (*color & 0x3c0) >> 5;
 
@@ -93,48 +93,46 @@ static void sortlayers(int *layer, int *pri)
 
 VIDEO_START( dbz )
 {
-	K053251_vh_start(machine);
-	K056832_vh_start(machine, "gfx1", K056832_BPP_4, 1, NULL, dbz_tile_callback, 1);
-	K053247_vh_start(machine, "gfx2", -52, 16, NORMAL_PLANE_ORDER, dbz_sprite_callback);
+	const device_config *k056832 = devtag_get_device(machine, "k056832");
+	const device_config *k053246 = devtag_get_device(machine, "k053246");
 
-	dbz_bg1_tilemap = tilemap_create(machine, get_dbz_bg1_tile_info,tilemap_scan_rows, 16, 16,64,32);
-	dbz_bg2_tilemap = tilemap_create(machine, get_dbz_bg2_tile_info,tilemap_scan_rows, 16, 16,64,32);
+	dbz_bg1_tilemap = tilemap_create(machine, get_dbz_bg1_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
+	dbz_bg2_tilemap = tilemap_create(machine, get_dbz_bg2_tile_info, tilemap_scan_rows, 16, 16, 64, 32);
 
-	tilemap_set_transparent_pen(dbz_bg1_tilemap,0);
-	tilemap_set_transparent_pen(dbz_bg2_tilemap,0);
-
-	K053936_wraparound_enable(0, 1);
-	K053936_set_offset(0, -46, -16);
-
-	K053936_wraparound_enable(1, 1);
-	K053936_set_offset(1, -46, -16);
+	tilemap_set_transparent_pen(dbz_bg1_tilemap, 0);
+	tilemap_set_transparent_pen(dbz_bg2_tilemap, 0);
 
 	if (!strcmp(machine->gamedrv->name, "dbz"))
-		K056832_set_LayerOffset(0, -34, -16);
+		k056832_set_layer_offs(k056832, 0, -34, -16);
 	else
-		K056832_set_LayerOffset(0, -35, -16);
+		k056832_set_layer_offs(k056832, 0, -35, -16);
 
-	K056832_set_LayerOffset(1, -31, -16);
-	K056832_set_LayerOffset(3, -31, -16); //?
+	k056832_set_layer_offs(k056832, 1, -31, -16);
+	k056832_set_layer_offs(k056832, 3, -31, -16); //?
 
-	K053247_set_SpriteOffset(-87,32);
+	k053247_set_sprite_offs(k053246, -87, 32);
 }
 
 VIDEO_UPDATE( dbz )
 {
 	static const int K053251_CI[6] = { K053251_CI3, K053251_CI4, K053251_CI4, K053251_CI4, K053251_CI2, K053251_CI1 };
+	const device_config *k056832 = devtag_get_device(screen->machine, "k056832");
+	const device_config *k053246 = devtag_get_device(screen->machine, "k053246");
+	const device_config *k053251 = devtag_get_device(screen->machine, "k053251");
+	const device_config *k053936_1 = devtag_get_device(screen->machine, "k053936_1");
+	const device_config *k053936_2 = devtag_get_device(screen->machine, "k053936_2");
 	int plane, new_colorbase;
 
-	sprite_colorbase = K053251_get_palette_index(K053251_CI0);
+	sprite_colorbase = k053251_get_palette_index(k053251, K053251_CI0);
 
-	for (plane=0; plane<6; plane++)
+	for (plane = 0; plane < 6; plane++)
 	{
-		new_colorbase = K053251_get_palette_index(K053251_CI[plane]);
+		new_colorbase = k053251_get_palette_index(k053251, K053251_CI[plane]);
 		if (layer_colorbase[plane] != new_colorbase)
 		{
 			layer_colorbase[plane] = new_colorbase;
-			if(plane <= 3)
-				K056832_mark_plane_dirty(plane);
+			if (plane <= 3)
+				k056832_mark_plane_dirty(k056832, plane);
 			else if(plane == 4)
 				tilemap_mark_all_tiles_dirty(dbz_bg1_tilemap);
 			else if(plane == 5)
@@ -145,25 +143,25 @@ VIDEO_UPDATE( dbz )
 	//layers priority
 
 	layer[0] = 0;
-	layerpri[0] = K053251_get_priority(K053251_CI3);
+	layerpri[0] = k053251_get_priority(k053251, K053251_CI3);
 	layer[1] = 1;
-	layerpri[1] = K053251_get_priority(K053251_CI4);
+	layerpri[1] = k053251_get_priority(k053251, K053251_CI4);
 	layer[2] = 3;
-	layerpri[2] = K053251_get_priority(K053251_CI0);
+	layerpri[2] = k053251_get_priority(k053251, K053251_CI0);
 	layer[3] = 4;
-	layerpri[3] = K053251_get_priority(K053251_CI2);
+	layerpri[3] = k053251_get_priority(k053251, K053251_CI2);
 	layer[4] = 5;
-	layerpri[4] = K053251_get_priority(K053251_CI1);
+	layerpri[4] = k053251_get_priority(k053251, K053251_CI1);
 
 	sortlayers(layer, layerpri);
 
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
-	for(plane = 0; plane < 5; plane++)
+	for (plane = 0; plane < 5; plane++)
 	{
 		int flag, pri;
 
-		if(plane == 0)
+		if (plane == 0)
 		{
 			flag = TILEMAP_DRAW_OPAQUE;
 			pri = 0;
@@ -175,14 +173,14 @@ VIDEO_UPDATE( dbz )
 		}
 
 		if(layer[plane] == 4)
-			K053936_1_zoom_draw(bitmap,cliprect,dbz_bg1_tilemap,flag,pri,1);
+			k053936_zoom_draw(k053936_2, bitmap, cliprect, dbz_bg1_tilemap, flag, pri, 1);
 		else if(layer[plane] == 5)
-			K053936_0_zoom_draw(bitmap,cliprect,dbz_bg2_tilemap,flag,pri,1);
+			k053936_zoom_draw(k053936_1, bitmap, cliprect, dbz_bg2_tilemap, flag, pri, 1);
 		else
-			K056832_tilemap_draw(screen->machine, bitmap,cliprect,layer[plane],flag,pri);
+			k056832_tilemap_draw(k056832, bitmap, cliprect, layer[plane], flag, pri);
 	}
 
-	K053247_sprites_draw(screen->machine, bitmap, cliprect);
+	k053247_sprites_draw(k053246, bitmap, cliprect);
 	return 0;
 }
 

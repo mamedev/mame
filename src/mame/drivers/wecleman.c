@@ -273,7 +273,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
@@ -305,6 +305,8 @@ VIDEO_START( wecleman );
 VIDEO_UPDATE( hotchase );
 VIDEO_START( hotchase );
 
+extern void hotchase_zoom_callback_0(running_machine *machine, int *code,int *color,int *flags);
+extern void hotchase_zoom_callback_1(running_machine *machine, int *code,int *color,int *flags);
 
 /***************************************************************************
                             Common Routines
@@ -564,46 +566,16 @@ ADDRESS_MAP_END
                         Hot Chase Main CPU Handlers
 ***************************************************************************/
 
-static READ16_HANDLER( hotchase_K051316_0_r )
-{
-	return K051316_0_r(space, offset) & 0xff;
-}
-
-static READ16_HANDLER( hotchase_K051316_1_r )
-{
-	return K051316_1_r(space, offset) & 0xff;
-}
-
-static WRITE16_HANDLER( hotchase_K051316_0_w )
-{
-	if (ACCESSING_BITS_0_7)      K051316_0_w(space, offset, data & 0xff);
-}
-
-static WRITE16_HANDLER( hotchase_K051316_1_w )
-{
-	if (ACCESSING_BITS_0_7)      K051316_1_w(space, offset, data & 0xff);
-}
-
-static WRITE16_HANDLER( hotchase_K051316_ctrl_0_w )
-{
-	if (ACCESSING_BITS_0_7)      K051316_ctrl_0_w(space, offset, data & 0xff);
-}
-
-static WRITE16_HANDLER( hotchase_K051316_ctrl_1_w )
-{
-	if (ACCESSING_BITS_0_7)      K051316_ctrl_1_w(space, offset, data & 0xff);
-}
-
 static WRITE16_HANDLER( hotchase_soundlatch_w );
 
 static ADDRESS_MAP_START( hotchase_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x063fff) AM_RAM										// RAM (weird size!?)
 	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_BASE(&blitter_regs)	// Blitter
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(hotchase_K051316_0_r, hotchase_K051316_0_w)	// Background
-	AM_RANGE(0x101000, 0x10101f) AM_WRITE(hotchase_K051316_ctrl_0_w)	// Background Ctrl
-	AM_RANGE(0x102000, 0x102fff) AM_READWRITE(hotchase_K051316_1_r, hotchase_K051316_1_w)	// Foreground
-	AM_RANGE(0x103000, 0x10301f) AM_WRITE(hotchase_K051316_ctrl_1_w)	// Foreground Ctrl
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE8("k051316_1", k051316_r, k051316_w, 0x00ff)	// Background
+	AM_RANGE(0x101000, 0x10101f) AM_DEVWRITE8("k051316_1", k051316_ctrl_w, 0x00ff)	// Background Ctrl
+	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE8("k051316_2", k051316_r, k051316_w, 0x00ff)	// Foreground
+	AM_RANGE(0x103000, 0x10301f) AM_DEVWRITE8("k051316_2", k051316_ctrl_w, 0x00ff)	// Foreground Ctrl
 	AM_RANGE(0x110000, 0x111fff) AM_RAM_WRITE(hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("share1")					// Shared with sub CPU
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE_GENERIC(spriteram)	// Sprites
@@ -1135,6 +1107,22 @@ static INTERRUPT_GEN( hotchase_sound_timer )
 	generic_pulse_irq_line(device, M6809_FIRQ_LINE);
 }
 
+static const k051316_interface hotchase_k051316_intf_0 =
+{
+	"gfx2", 1,
+	4, FALSE, 0, 
+	1, -0xb0 / 2, -16,
+	hotchase_zoom_callback_0
+};
+
+static const k051316_interface hotchase_k051316_intf_1 =
+{
+	"gfx3", 2,
+	4, FALSE, 0, 
+	0, -0xb0 / 2, -16,
+	hotchase_zoom_callback_1
+};
+
 static MACHINE_DRIVER_START( hotchase )
 
 	/* basic machine hardware */
@@ -1166,6 +1154,9 @@ static MACHINE_DRIVER_START( hotchase )
 
 	MDRV_VIDEO_START(hotchase)
 	MDRV_VIDEO_UPDATE(hotchase)
+
+	MDRV_K051316_ADD("k051316_1", hotchase_k051316_intf_0)
+	MDRV_K051316_ADD("k051316_2", hotchase_k051316_intf_1)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

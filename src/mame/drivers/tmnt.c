@@ -66,7 +66,7 @@ Updates:
 
 #include "driver.h"
 #include "deprecat.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "machine/eeprom.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -78,37 +78,58 @@ Updates:
 #include "sound/k007232.h"
 #include "sound/upd7759.h"
 #include "includes/tmnt.h"
-#include "konamipt.h"
+#include "includes/konamipt.h"
+
+
+extern void mia_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void cuebrick_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void tmnt_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void ssbl_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void blswhstl_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
+extern void mia_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
+extern void tmnt_sprite_callback(running_machine *machine, int *code,int *color,int *priority,int *shadow);
+extern void punkshot_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow);
+extern void thndrx2_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask,int *shadow);
+extern void lgtnfght_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
+extern void blswhstl_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
+extern void prmrsocr_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
 
 static int tmnt_soundlatch;
 static int cuebrick_snd_irqlatch, cuebrick_nvram_bank;
 static UINT16 cuebrick_nvram[0x400*0x20];	// 32k paged in a 1k window
 static INT16 *sampledata;
 
+
 static READ16_HANDLER( K052109_word_noA12_r )
 {
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	return K052109_word_r(space,offset,mem_mask);
+	return k052109_word_r(k052109, offset, mem_mask);
 }
 
 static WRITE16_HANDLER( K052109_word_noA12_w )
 {
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	K052109_word_w(space,offset,data,mem_mask);
+	k052109_word_w(k052109, offset, data, mem_mask);
 }
 
 static WRITE16_HANDLER( punkshot_K052109_word_w )
 {
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+
 	/* it seems that a word write is supposed to affect only the MSB. The */
 	/* "ROUND 1" text in punkshtj goes lost otherwise. */
 	if (ACCESSING_BITS_8_15)
-		K052109_w(space,offset,(data >> 8) & 0xff);
+		k052109_w(k052109, offset, (data >> 8) & 0xff);
 	else if (ACCESSING_BITS_0_7)
-		K052109_w(space,offset + 0x2000,data & 0xff);
+		k052109_w(k052109, offset + 0x2000, data & 0xff);
 }
 
 static WRITE16_HANDLER( punkshot_K052109_word_noA12_w )
@@ -116,7 +137,7 @@ static WRITE16_HANDLER( punkshot_K052109_word_noA12_w )
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	punkshot_K052109_word_w(space,offset,data,mem_mask);
+	punkshot_K052109_word_w(space, offset, data, mem_mask);
 }
 
 
@@ -125,41 +146,49 @@ static WRITE16_HANDLER( punkshot_K052109_word_noA12_w )
 /* A1, A5 and A6 don't go to the 053245. */
 static READ16_HANDLER( K053245_scattered_word_r )
 {
+	const device_config *k053245 = devtag_get_device(space->machine, "k053245");
+
 	if (offset & 0x0031)
 		return space->machine->generic.spriteram.u16[offset];
 	else
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x1fc0) >> 3);
-		return K053245_word_r(space,offset,mem_mask);
+		return k053245_word_r(k053245, offset, mem_mask);
 	}
 }
 
 static WRITE16_HANDLER( K053245_scattered_word_w )
 {
+	const device_config *k053245 = devtag_get_device(space->machine, "k053245");
+
 	COMBINE_DATA(space->machine->generic.spriteram.u16 + offset);
 
 	if (!(offset & 0x0031))
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x1fc0) >> 3);
-		K053245_word_w(space,offset,data,mem_mask);
+		k053245_word_w(k053245, offset, data, mem_mask);
 	}
 }
 
 static READ16_HANDLER( K053244_word_noA1_r )
 {
+	const device_config *k053245 = devtag_get_device(space->machine, "k053245");
+
 	offset &= ~1;	/* handle mirror address */
 
-	return K053244_r(space,offset + 1) | (K053244_r(space,offset) << 8);
+	return k053244_r(k053245, offset + 1) | (k053244_r(k053245, offset) << 8);
 }
 
 static WRITE16_HANDLER( K053244_word_noA1_w )
 {
+	const device_config *k053245 = devtag_get_device(space->machine, "k053245");
+
 	offset &= ~1;	/* handle mirror address */
 
 	if (ACCESSING_BITS_8_15)
-		K053244_w(space,offset,(data >> 8) & 0xff);
+		k053244_w(k053245, offset, (data >> 8) & 0xff);
 	if (ACCESSING_BITS_0_7)
-		K053244_w(space,offset + 1,data & 0xff);
+		k053244_w(k053245, offset + 1, data & 0xff);
 }
 
 static INTERRUPT_GEN(cuebrick_interrupt)
@@ -180,14 +209,18 @@ static INTERRUPT_GEN(cuebrick_interrupt)
 
 static INTERRUPT_GEN( punkshot_interrupt )
 {
-	if (K052109_is_IRQ_enabled()) irq4_line_hold(device);
+	const device_config *k052109 = devtag_get_device(device->machine, "k052109");
 
+	if (k052109_is_irq_enabled(k052109)) 
+		irq4_line_hold(device);
 }
 
 static INTERRUPT_GEN( lgtnfght_interrupt )
 {
-	if (K052109_is_IRQ_enabled()) irq5_line_hold(device);
+	const device_config *k052109 = devtag_get_device(device->machine, "k052109");
 
+	if (k052109_is_irq_enabled(k052109)) 
+		irq5_line_hold(device);
 }
 
 
@@ -344,8 +377,9 @@ static READ16_HANDLER( punkshot_kludge_r )
 /* protection simulation derived from a bootleg */
 static READ16_HANDLER( ssriders_protection_r )
 {
-    int data = memory_read_word(space, 0x105a0a);
-    int cmd = memory_read_word(space, 0x1058fc);
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	int data = memory_read_word(space, 0x105a0a);
+	int cmd = memory_read_word(space, 0x1058fc);
 
 	switch (cmd)
 	{
@@ -375,7 +409,7 @@ static READ16_HANDLER( ssriders_protection_r )
 			data = -memory_read_word(space, 0x105818);
 			data = ((data / 8 - 4) & 0x1f) * 0x40;
 			data += ((memory_read_word(space, 0x105cb0) +
-						256*K052109_r(space,0x1a01) + K052109_r(space,0x1a00) - 6) / 8 + 12) & 0x3f;
+						256 * k052109_r(k052109, 0x1a01) + k052109_r(k052109, 0x1a00) - 6) / 8 + 12) & 0x3f;
 			return data;
 
 		default:
@@ -387,6 +421,8 @@ static READ16_HANDLER( ssriders_protection_r )
 
 static WRITE16_HANDLER( ssriders_protection_w )
 {
+	const device_config *k053245 = devtag_get_device(space->machine, "k053245");
+
 	if (offset == 1)
 	{
 		int logical_pri,hardware_pri;
@@ -401,7 +437,7 @@ static WRITE16_HANDLER( ssriders_protection_w )
 			{
 				if ((memory_read_word(space, 0x180006 + 128*i) >> 8) == logical_pri)
 				{
-					K053245_word_w(space,8*i,hardware_pri,0x00ff);
+					k053245_word_w(k053245, 8 * i, hardware_pri, 0x00ff);
 					hardware_pri++;
 				}
 			}
@@ -578,6 +614,7 @@ static READ16_HANDLER( thndrx2_eeprom_r )
 
 static WRITE16_HANDLER( thndrx2_eeprom_w )
 {
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
 	static int last;
 
 	if (ACCESSING_BITS_0_7)
@@ -595,7 +632,7 @@ static WRITE16_HANDLER( thndrx2_eeprom_w )
 		last = data & 0x20;
 
 		/* bit 6 = enable char ROM reading through the video RAM */
-		K052109_set_RMRD_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -663,8 +700,8 @@ static ADDRESS_MAP_START( cuebrick_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b0400, 0x0b0401) AM_WRITE(cuebrick_nvbank_w)
 	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0xff00)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(K052109_word_noA12_r, K052109_word_noA12_w)
-	AM_RANGE(0x140000, 0x140007) AM_READWRITE(K051937_word_r, K051937_word_w)
-	AM_RANGE(0x140400, 0x1407ff) AM_READWRITE(K051960_word_r, K051960_word_w)
+	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE("k051960", k051937_word_r, k051937_word_w)
+	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE("k051960", k051960_word_r, k051960_word_w)
 ADDRESS_MAP_END
 
 
@@ -685,8 +722,8 @@ static ADDRESS_MAP_START( mia_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 #endif
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(K052109_word_noA12_r, K052109_word_noA12_w)
 //  AM_RANGE(0x10e800, 0x10e801) AM_WRITENOP ???
-	AM_RANGE(0x140000, 0x140007) AM_READWRITE(K051937_word_r, K051937_word_w)
-	AM_RANGE(0x140400, 0x1407ff) AM_READWRITE(K051960_word_r, K051960_word_w)
+	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE("k051960", k051937_word_r, k051937_word_w)
+	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE("k051960", k051960_word_r, k051960_word_w)
 ADDRESS_MAP_END
 
 
@@ -706,8 +743,8 @@ static ADDRESS_MAP_START( tmnt_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(tmnt_priority_w)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(K052109_word_noA12_r, K052109_word_noA12_w)
 //  AM_RANGE(0x10e800, 0x10e801) AM_WRITENOP ???
-	AM_RANGE(0x140000, 0x140007) AM_READWRITE(K051937_word_r, K051937_word_w)
-	AM_RANGE(0x140400, 0x1407ff) AM_READWRITE(K051960_word_r, K051960_word_w)
+	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE("k051960", k051937_word_r, k051937_word_w)
+	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE("k051960", k051960_word_r, k051960_word_w)
 ADDRESS_MAP_END
 
 
@@ -722,11 +759,11 @@ static ADDRESS_MAP_START( punkshot_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0020, 0x0a0021) AM_WRITE(punkshot_0a0020_w)
 	AM_RANGE(0x0a0040, 0x0a0043) AM_DEVREAD8("konami", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x0a0040, 0x0a0041) AM_DEVWRITE8("konami", k053260_w, 0x00ff)
-	AM_RANGE(0x0a0060, 0x0a007f) AM_WRITE(K053251_lsb_w)
+	AM_RANGE(0x0a0060, 0x0a007f) AM_DEVWRITE("k053251", k053251_lsb_w)
 	AM_RANGE(0x0a0080, 0x0a0081) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(K052109_word_noA12_r, punkshot_K052109_word_noA12_w)
-	AM_RANGE(0x110000, 0x110007) AM_READWRITE(K051937_word_r, K051937_word_w)
-	AM_RANGE(0x110400, 0x1107ff) AM_READWRITE(K051960_word_r, K051960_word_w)
+	AM_RANGE(0x110000, 0x110007) AM_DEVREADWRITE("k051960", k051937_word_r, k051937_word_w)
+	AM_RANGE(0x110400, 0x1107ff) AM_DEVREADWRITE("k051960", k051960_word_r, k051960_word_w)
 	AM_RANGE(0xfffffc, 0xffffff) AM_READ(punkshot_kludge_r)
 ADDRESS_MAP_END
 
@@ -747,7 +784,7 @@ static ADDRESS_MAP_START( lgtnfght_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0028, 0x0a0029) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_READWRITE(K053245_scattered_word_r, K053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0c0000, 0x0c001f) AM_READWRITE(K053244_word_noA1_r, K053244_word_noA1_w)
-	AM_RANGE(0x0e0000, 0x0e001f) AM_WRITE(K053251_lsb_w)
+	AM_RANGE(0x0e0000, 0x0e001f) AM_DEVWRITE("k053251", k053251_lsb_w)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(K052109_word_noA12_r, K052109_word_noA12_w)
 ADDRESS_MAP_END
 
@@ -760,11 +797,11 @@ static WRITE16_HANDLER( ssriders_soundkludge_w )
 
 static ADDRESS_MAP_START( blswhstl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(K052109_word_r, K052109_word_w)
+	AM_RANGE(0x180000, 0x183fff) AM_DEVREADWRITE("k052109", k052109_word_r, k052109_word_w)
 	AM_RANGE(0x204000, 0x207fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x300000, 0x303fff) AM_READWRITE(K053245_scattered_word_r, K053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x500000, 0x50003f) AM_READWRITE(K054000_lsb_r, K054000_lsb_w)
+	AM_RANGE(0x500000, 0x50003f) AM_DEVREADWRITE("k054000", k054000_lsb_r, k054000_lsb_w)
 	AM_RANGE(0x680000, 0x68001f) AM_READWRITE(K053244_word_noA1_r, K053244_word_noA1_w)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")
@@ -772,24 +809,48 @@ static ADDRESS_MAP_START( blswhstl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x700200, 0x700201) AM_WRITE(blswhstl_eeprom_w)
 	AM_RANGE(0x700300, 0x700301) AM_WRITE(blswhstl_700300_w)
-	AM_RANGE(0x700400, 0x700401) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x700400, 0x700401) AM_WRITE(watchdog_reset16_w)	
 	AM_RANGE(0x780600, 0x780603) AM_DEVREAD8("konami", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x780600, 0x780601) AM_DEVWRITE8("konami", k053260_w, 0x00ff)
 	AM_RANGE(0x780604, 0x780605) AM_WRITE(ssriders_soundkludge_w)
-	AM_RANGE(0x780700, 0x78071f) AM_WRITE(K053251_lsb_w)
+	AM_RANGE(0x780700, 0x78071f) AM_DEVWRITE("k053251", k053251_lsb_w)
 ADDRESS_MAP_END
 
+
+static WRITE16_HANDLER( K053251_glfgreat_w )
+{
+	const device_config *k053251 = devtag_get_device(space->machine, "k053251");
+	const device_config *k052109 = devtag_get_device(space->machine, "k052109");
+	int i;
+
+	if (ACCESSING_BITS_8_15)
+	{
+		k053251_w(k053251, offset, (data >> 8) & 0xff);
+
+		/* FIXME: in the old code k052109 tilemaps were tilemaps 2,3,4 for k053251 
+		and got marked as dirty in the write above... how was the original hardware working?!? */
+		for (i = 0; i < 3; i++)
+		{
+			if (k053251_get_tmap_dirty(k053251, 2 + i))
+			{
+				k052109_tilemap_mark_dirty(k052109, i);
+				k053251_set_tmap_dirty(k053251, 2 + i, 0);
+			}
+		}
+	}
+}
 
 static ADDRESS_MAP_START( glfgreat_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(K053245_scattered_word_r, K053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x10c000, 0x10cfff) AM_RAM	 AM_BASE(&K053936_0_linectrl)	/* 053936? */
+	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE("k053936", k053936_linectrl_r, k053936_linectrl_w)	/* 053936? */
 	AM_RANGE(0x110000, 0x11001f) AM_WRITE(K053244_word_noA1_w)				/* duplicate! */
-	AM_RANGE(0x114000, 0x11401f) AM_READWRITE(K053244_lsb_r, K053244_lsb_w)	/* duplicate! */
-	AM_RANGE(0x118000, 0x11801f) AM_WRITEONLY AM_BASE(&K053936_0_ctrl)
-	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(K053251_msb_w)
+	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE("k053245", k053244_lsb_r, k053244_lsb_w)	/* duplicate! */
+	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE("k053936", k053936_ctrl_w)
+//	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE("k053251", k053251_msb_w)
+	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(K053251_glfgreat_w)
 	AM_RANGE(0x120000, 0x120001) AM_READ_PORT("P1/P2")
 	AM_RANGE(0x120002, 0x120003) AM_READ_PORT("P3/P4")
 	AM_RANGE(0x120004, 0x120005) AM_READ_PORT("COINS/DSW3")
@@ -808,11 +869,12 @@ static ADDRESS_MAP_START( prmrsocr_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(K053245_scattered_word_r, K053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x10c000, 0x10cfff) AM_RAM AM_BASE(&K053936_0_linectrl)
+	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE("k053936", k053936_linectrl_r, k053936_linectrl_w)	
 	AM_RANGE(0x110000, 0x11001f) AM_WRITE(K053244_word_noA1_w)				/* duplicate! */
-	AM_RANGE(0x114000, 0x11401f) AM_READWRITE(K053244_lsb_r, K053244_lsb_w)	/* duplicate! */
-	AM_RANGE(0x118000, 0x11801f) AM_WRITEONLY AM_BASE(&K053936_0_ctrl)
-	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(K053251_msb_w)
+	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE("k053245", k053244_lsb_r, k053244_lsb_w)	/* duplicate! */
+	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE("k053936", k053936_ctrl_w)
+//	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE("k053251", k053251_msb_w)
+	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(K053251_glfgreat_w)
 	AM_RANGE(0x120000, 0x120001) AM_READ(prmrsocr_IN0_r)
 	AM_RANGE(0x120002, 0x120003) AM_READ_PORT("P2/EEPROM")
 	AM_RANGE(0x12100c, 0x12100f) AM_WRITE(prmrsocr_sound_cmd_w)
@@ -839,6 +901,8 @@ INLINE UINT32 tmnt2_get_word(running_machine *machine, UINT32 addr)
 
 static void tmnt2_put_word(const address_space *space, UINT32 addr, UINT16 data)
 {
+	const device_config *k053245 = devtag_get_device(space->machine, "k053245");
+
 	UINT32 offs;
 	if (addr >= 0x180000/2 && addr <= 0x183fff/2)
 	{
@@ -847,7 +911,7 @@ static void tmnt2_put_word(const address_space *space, UINT32 addr, UINT16 data)
 		if (!(offs & 0x0031))
 		{
 			offs = ((offs & 0x000e) >> 1) | ((offs & 0x1fc0) >> 3);
-			K053245_word_w(space, offs, data, 0xffff);
+			k053245_word_w(k053245, offs, data, 0xffff);
 		}
 	}
 	else if (addr >= 0x104000/2 && addr <= 0x107fff/2) sunset_104000[addr-0x104000/2] = data;
@@ -971,8 +1035,8 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 #else // for reference; do not remove
 static WRITE16_HANDLER( tmnt2_1c0800_w )
 {
-    COMBINE_DATA( tmnt2_1c0800 + offset);
-    if ( offset == 0x0008 && ( tmnt2_1c0800[0x8] & 0xff00 ) == 0x8200 )
+	COMBINE_DATA( tmnt2_1c0800 + offset);
+	if ( offset == 0x0008 && ( tmnt2_1c0800[0x8] & 0xff00 ) == 0x8200 )
 	{
 		UINT32 CellSrc;
 		UINT32 CellVar;
@@ -984,14 +1048,14 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 		dst = tmnt2_1c0800[0x02] | (tmnt2_1c0800[0x03] << 16 );
 		CellSrc = tmnt2_1c0800[0x00] | (tmnt2_1c0800[0x01] << 16 );
 //        if ( CellDest >= 0x180000 && CellDest < 0x183fe0 ) {
-        CellVar -= 0x104000;
+		CellVar -= 0x104000;
 		src = (UINT16 *)(memory_region(space->machine, "maincpu") + CellSrc);
 
 		CellVar >>= 1;
 
 		memory_write_word(space,dst+0x00, 0x8000 | ((src[1] & 0xfc00) >> 2));	/* size, flip xy */
-        memory_write_word(space,dst+0x04, src[0]);	/* code */
-        memory_write_word(space,dst+0x18, (src[1] & 0x3ff) ^		/* color, mirror, priority */
+		memory_write_word(space,dst+0x04, src[0]);	/* code */
+		memory_write_word(space,dst+0x18, (src[1] & 0x3ff) ^		/* color, mirror, priority */
 				(sunset_104000[CellVar + 0x00] & 0x0060));
 
 		/* base color modifier */
@@ -1077,8 +1141,8 @@ static ADDRESS_MAP_START( tmnt2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x5c0600, 0x5c0603) AM_DEVREAD8("konami", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x5c0600, 0x5c0601) AM_DEVWRITE8("konami", k053260_w, 0x00ff)
 	AM_RANGE(0x5c0604, 0x5c0605) AM_WRITE(ssriders_soundkludge_w)
-	AM_RANGE(0x5c0700, 0x5c071f) AM_WRITE(K053251_lsb_w)
-	AM_RANGE(0x600000, 0x603fff) AM_READWRITE(K052109_word_r, K052109_word_w)
+	AM_RANGE(0x5c0700, 0x5c071f) AM_DEVWRITE("k053251", k053251_lsb_w)
+	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_word_r, k052109_word_w)
 ADDRESS_MAP_END
 
 
@@ -1103,8 +1167,8 @@ static ADDRESS_MAP_START( ssriders_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x5c0600, 0x5c0603) AM_DEVREAD8("konami", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x5c0600, 0x5c0601) AM_DEVWRITE8("konami", k053260_w, 0x00ff)
 	AM_RANGE(0x5c0604, 0x5c0605) AM_WRITE(ssriders_soundkludge_w)
-	AM_RANGE(0x5c0700, 0x5c071f) AM_WRITE(K053251_lsb_w)
-	AM_RANGE(0x600000, 0x603fff) AM_READWRITE(K052109_word_r, K052109_word_w)
+	AM_RANGE(0x5c0700, 0x5c071f) AM_DEVWRITE("k053251", k053251_lsb_w)
+	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_word_r, k052109_word_w)
 ADDRESS_MAP_END
 
 
@@ -1112,13 +1176,13 @@ static ADDRESS_MAP_START( sunsetbl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x14c000, 0x14cfff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x14e700, 0x14e71f) AM_WRITE(K053251_lsb_w)
+	AM_RANGE(0x14e700, 0x14e71f) AM_DEVWRITE("k053251", k053251_lsb_w)
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(K053245_scattered_word_r, K053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x184000, 0x18ffff) AM_RAM
 	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE(ssriders_1c0300_w)
 	AM_RANGE(0x1c0400, 0x1c0401) AM_WRITENOP
 	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(K053244_word_noA1_r, K053244_word_noA1_w)
-	AM_RANGE(0x600000, 0x603fff) AM_READWRITE(K052109_word_r, K052109_word_w)
+	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("k052109", k052109_word_r, k052109_word_w)
 	AM_RANGE(0x604020, 0x60402f) AM_WRITENOP	/* written every frame */
 	AM_RANGE(0x604200, 0x604201) AM_WRITENOP	/* watchdog */
 	AM_RANGE(0x6119e2, 0x6119e3) AM_WRITENOP	/* written a lot in some test menus (PC=18204) */
@@ -1138,17 +1202,17 @@ static ADDRESS_MAP_START( thndrx2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x300000, 0x30001f) AM_WRITE(K053251_lsb_w)
+	AM_RANGE(0x300000, 0x30001f) AM_DEVWRITE("k053251", k053251_lsb_w)
 	AM_RANGE(0x400000, 0x400003) AM_DEVREAD8("konami", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("konami", k053260_w, 0x00ff)
-	AM_RANGE(0x500000, 0x50003f) AM_READWRITE(K054000_lsb_r, K054000_lsb_w)
+	AM_RANGE(0x500000, 0x50003f) AM_DEVREADWRITE("k054000", k054000_lsb_r, k054000_lsb_w)
 	AM_RANGE(0x500100, 0x500101) AM_WRITE(thndrx2_eeprom_w)
 	AM_RANGE(0x500200, 0x500201) AM_READ(thndrx2_in0_r)
 	AM_RANGE(0x500202, 0x500203) AM_READ(thndrx2_eeprom_r)
 	AM_RANGE(0x500300, 0x500301) AM_WRITENOP	/* watchdog reset? irq enable? */
 	AM_RANGE(0x600000, 0x607fff) AM_READWRITE(K052109_word_noA12_r, K052109_word_noA12_w)
-	AM_RANGE(0x700000, 0x700007) AM_READWRITE(K051937_word_r, K051937_word_w)
-	AM_RANGE(0x700400, 0x7007ff) AM_READWRITE(K051960_word_r, K051960_word_w)
+	AM_RANGE(0x700000, 0x700007) AM_DEVREADWRITE("k051960", k051937_word_r, k051937_word_w)
+	AM_RANGE(0x700400, 0x7007ff) AM_DEVREADWRITE("k051960", k051960_word_r, k051960_word_w)
 ADDRESS_MAP_END
 
 
@@ -2072,6 +2136,147 @@ static const samples_interface tmnt_samples_interface =
 	tmnt_decode_sample
 };
 
+
+/* 052109 interfaces */
+static const k052109_interface cuebrick_k052109_intf =
+{
+	"gfx1", 0,
+	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_SHUFFLE8,
+	cuebrick_tile_callback
+};
+
+static const k052109_interface mia_k052109_intf =
+{
+	"gfx1", 0,
+	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	mia_tile_callback
+};
+
+static const k052109_interface tmnt_k052109_intf =
+{
+	"gfx1", 0,
+	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	tmnt_tile_callback
+};
+
+static const k052109_interface glfgreat_k052109_intf =
+{
+	"gfx1", 1,
+	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_SHUFFLE8,
+	tmnt_tile_callback
+};
+
+static const k052109_interface sunsetbl_k052109_intf =
+{
+	"gfx1", 0,
+	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	ssbl_tile_callback
+};
+
+static const k052109_interface blswhstl_k052109_intf =
+{
+	"gfx1", 0,
+	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	blswhstl_tile_callback
+};
+
+/* 053245 interfaces */
+static const k05324x_interface lgtnfght_k05324x_intf =
+{
+	"gfx2", 1,
+	NORMAL_PLANE_ORDER,
+	0, 0,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	lgtnfght_sprite_callback
+};
+
+static const k05324x_interface prmrsocr_k05324x_intf =
+{
+	"gfx2", 2,
+	NORMAL_PLANE_ORDER,
+	0, 0,
+	KONAMI_ROM_SHUFFLE8,
+	prmrsocr_sprite_callback
+};
+
+static const k05324x_interface blswhstl_k05324x_intf =
+{
+	"gfx2", 1,
+	NORMAL_PLANE_ORDER,
+	0, 0,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	blswhstl_sprite_callback
+};
+
+static const k05324x_interface glfgreat_k05324x_intf =
+{
+	"gfx2", 2,
+	NORMAL_PLANE_ORDER,
+	0, 0,
+	KONAMI_ROM_SHUFFLE8,
+	lgtnfght_sprite_callback
+};
+
+/* 051960 interfaces */
+static const k051960_interface cuebrick_k051960_intf =
+{
+	"gfx2", 1,
+	REVERSE_PLANE_ORDER,
+	KONAMI_ROM_SHUFFLE8,
+	mia_sprite_callback
+};
+
+static const k051960_interface mia_k051960_intf =
+{
+	"gfx2", 1,
+	REVERSE_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	mia_sprite_callback
+};
+
+static const k051960_interface tmnt_k051960_intf =
+{
+	"gfx2", 1,
+	REVERSE_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	tmnt_sprite_callback
+};
+
+static const k051960_interface punkshot_k051960_intf =
+{
+	"gfx2", 1,
+	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	punkshot_sprite_callback
+};
+
+static const k051960_interface thndrx2_k051960_intf =
+{
+	"gfx2", 1,
+	NORMAL_PLANE_ORDER,
+	KONAMI_ROM_DEINTERLEAVE_2,
+	thndrx2_sprite_callback
+};
+
+
+/* 053936 interfaces */
+static const k053936_interface glfgreat_k053936_interface =
+{
+	1, 85, 0		/* wrap, xoff, yoff */
+};
+
+static const k053936_interface prmrsocr_k053936_interface =
+{
+	0, 85, 1		/* wrap, xoff, yoff */
+};
+
+
 static MACHINE_DRIVER_START( cuebrick )
 
 	/* basic machine hardware */
@@ -2094,6 +2299,9 @@ static MACHINE_DRIVER_START( cuebrick )
 
 	MDRV_VIDEO_START(cuebrick)
 	MDRV_VIDEO_UPDATE(mia)
+
+	MDRV_K052109_ADD("k052109", cuebrick_k052109_intf)
+	MDRV_K051960_ADD("k051960", cuebrick_k051960_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2129,6 +2337,9 @@ static MACHINE_DRIVER_START( mia )
 
 	MDRV_VIDEO_START(mia)
 	MDRV_VIDEO_UPDATE(mia)
+
+	MDRV_K052109_ADD("k052109", mia_k052109_intf)
+	MDRV_K051960_ADD("k051960", mia_k051960_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2179,6 +2390,9 @@ static MACHINE_DRIVER_START( tmnt )
 	MDRV_VIDEO_START(tmnt)
 	MDRV_VIDEO_UPDATE(tmnt)
 
+	MDRV_K052109_ADD("k052109", tmnt_k052109_intf)
+	MDRV_K051960_ADD("k051960", tmnt_k051960_intf)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -2226,6 +2440,10 @@ static MACHINE_DRIVER_START( punkshot )
 	MDRV_VIDEO_START(punkshot)
 	MDRV_VIDEO_UPDATE(punkshot)
 
+	MDRV_K052109_ADD("k052109", tmnt_k052109_intf)
+	MDRV_K051960_ADD("k051960", punkshot_k051960_intf)
+	MDRV_K053251_ADD("k053251")
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -2262,6 +2480,10 @@ static MACHINE_DRIVER_START( lgtnfght )
 
 	MDRV_VIDEO_START(lgtnfght)
 	MDRV_VIDEO_UPDATE(lgtnfght)
+
+	MDRV_K052109_ADD("k052109", tmnt_k052109_intf)
+	MDRV_K053245_ADD("k053245", lgtnfght_k05324x_intf)
+	MDRV_K053251_ADD("k053251")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2304,6 +2526,11 @@ static MACHINE_DRIVER_START( blswhstl )
 	MDRV_VIDEO_START(blswhstl)
 	MDRV_VIDEO_UPDATE(lgtnfght)
 	MDRV_VIDEO_EOF( blswhstl )
+
+	MDRV_K052109_ADD("k052109", blswhstl_k052109_intf)
+	MDRV_K053245_ADD("k053245", blswhstl_k05324x_intf)
+	MDRV_K053251_ADD("k053251")
+	MDRV_K054000_ADD("k054000")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2362,6 +2589,11 @@ static MACHINE_DRIVER_START( glfgreat )
 	MDRV_VIDEO_START(glfgreat)
 	MDRV_VIDEO_UPDATE(glfgreat)
 
+	MDRV_K052109_ADD("k052109", glfgreat_k052109_intf)
+	MDRV_K053245_ADD("k053245", glfgreat_k05324x_intf)
+	MDRV_K053936_ADD("k053936", glfgreat_k053936_interface)
+	MDRV_K053251_ADD("k053251")
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2412,6 +2644,11 @@ static MACHINE_DRIVER_START( prmrsocr )
 	MDRV_VIDEO_START(prmrsocr)
 	MDRV_VIDEO_UPDATE(glfgreat)
 
+	MDRV_K052109_ADD("k052109", glfgreat_k052109_intf)
+	MDRV_K053245_ADD("k053245", prmrsocr_k05324x_intf)
+	MDRV_K053936_ADD("k053936", prmrsocr_k053936_interface)
+	MDRV_K053251_ADD("k053251")
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2454,6 +2691,10 @@ static MACHINE_DRIVER_START( tmnt2 )
 	MDRV_VIDEO_START(lgtnfght)
 	MDRV_VIDEO_UPDATE(tmnt2)
 
+	MDRV_K052109_ADD("k052109", tmnt_k052109_intf)
+	MDRV_K053245_ADD("k053245", lgtnfght_k05324x_intf)
+	MDRV_K053251_ADD("k053251")
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2495,6 +2736,10 @@ static MACHINE_DRIVER_START( ssriders )
 	MDRV_VIDEO_START(lgtnfght)
 	MDRV_VIDEO_UPDATE(tmnt2)
 
+	MDRV_K052109_ADD("k052109", tmnt_k052109_intf)
+	MDRV_K053245_ADD("k053245", lgtnfght_k05324x_intf)
+	MDRV_K053251_ADD("k053251")
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -2528,6 +2773,10 @@ static MACHINE_DRIVER_START( sunsetbl )
 	MDRV_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 
 	MDRV_PALETTE_LENGTH(2048)
+
+	MDRV_K052109_ADD("k052109", sunsetbl_k052109_intf)
+	MDRV_K053245_ADD("k053245", lgtnfght_k05324x_intf)
+	MDRV_K053251_ADD("k053251")
 
 	MDRV_VIDEO_START(sunsetbl)
 	MDRV_VIDEO_UPDATE(tmnt2)
@@ -2568,6 +2817,11 @@ static MACHINE_DRIVER_START( thndrx2 )
 
 	MDRV_VIDEO_START(thndrx2)
 	MDRV_VIDEO_UPDATE(thndrx2)
+
+	MDRV_K052109_ADD("k052109", tmnt_k052109_intf)
+	MDRV_K051960_ADD("k051960", thndrx2_k051960_intf)
+	MDRV_K053251_ADD("k053251")
+	MDRV_K054000_ADD("k054000")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3690,11 +3944,6 @@ ROM_START( prmrsocrj )
 	ROM_LOAD( "101a06.1d",    0x0000, 0x200000, CRC(4f48e043) SHA1(f50e8642d9d3a028c243777640e7cd13da1abf86) )
 ROM_END
 
-static DRIVER_INIT( gfx )
-{
-	konami_rom_deinterleave_2(machine, "gfx1");
-	konami_rom_deinterleave_2(machine, "gfx2");
-}
 
 static DRIVER_INIT( mia )
 {
@@ -3703,9 +3952,6 @@ static DRIVER_INIT( mia )
 	int i,j,k,A,B;
 	int bits[32];
 	UINT8 *temp;
-
-
-	DRIVER_INIT_CALL(gfx);
 
 	/*
         along with the normal byte reordering, TMNT also needs the bits to
@@ -3799,9 +4045,6 @@ static DRIVER_INIT( tmnt )
 	int i,j,k,A,B,entry;
 	int bits[32];
 	UINT8 *temp;
-
-
-	DRIVER_INIT_CALL(gfx);
 
 	/*
         along with the normal byte reordering, TMNT also needs the bits to
@@ -3900,43 +4143,10 @@ static DRIVER_INIT( tmnt )
 	free(temp);
 }
 
-static void shuffle(UINT8 *buf,int len)
-{
-	int i;
-	UINT8 t;
-
-	if (len == 2) return;
-
-	if (len % 4) fatalerror("shuffle() - not modulo 4");	/* must not happen */
-
-	len /= 2;
-
-	for (i = 0;i < len/2;i++)
-	{
-		t = buf[len/2 + i];
-		buf[len/2 + i] = buf[len + i];
-		buf[len + i] = t;
-	}
-
-	shuffle(buf,len);
-	shuffle(buf + len,len);
-}
-
-static DRIVER_INIT( glfgreat )
-{
-	/* ROMs are interleaved at byte level */
-	shuffle(memory_region(machine, "gfx1"),memory_region_length(machine, "gfx1"));
-	shuffle(memory_region(machine, "gfx2"),memory_region_length(machine, "gfx2"));
-}
-
 static DRIVER_INIT( cuebrick )
 {
 	machine->generic.nvram.u8 = (UINT8 *)cuebrick_nvram;
 	machine->generic.nvram_size = 0x400*0x20;
-
-	/* ROMs are interleaved at byte level */
-	shuffle(memory_region(machine, "gfx1"),memory_region_length(machine, "gfx1"));
-	shuffle(memory_region(machine, "gfx2"),memory_region_length(machine, "gfx2"));
 }
 
 GAME( 1989, cuebrick, 0,        cuebrick, cuebrick, cuebrick, ROT0,  "Konami", "Cue Brick (World version D)", 0 )
@@ -3954,43 +4164,43 @@ GAME( 1989, tmht2pa,  tmnt,     tmnt,     tmnt2p,   tmnt,     ROT0,  "Konami", "
 GAME( 1990, tmnt2pj,  tmnt,     tmnt,     tmnt2p,   tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (Japan 2 Players)", 0 )
 GAME( 1989, tmnt2po,  tmnt,     tmnt,     tmnt2p,   tmnt,     ROT0,  "Konami", "Teenage Mutant Ninja Turtles (Oceania 2 Players)", 0 )
 
-GAME( 1990, punkshot, 0,        punkshot, punkshot, gfx,      ROT0,  "Konami", "Punk Shot (US 4 Players)", 0 )
-GAME( 1990, punkshot2,punkshot, punkshot, punksht2, gfx,      ROT0,  "Konami", "Punk Shot (US 2 Players)", 0 )
-GAME( 1990, punkshotj,punkshot, punkshot, punksht2, gfx,      ROT0,  "Konami", "Punk Shot (Japan 2 Players)", 0 )
+GAME( 1990, punkshot, 0,        punkshot, punkshot, 0,      ROT0,  "Konami", "Punk Shot (US 4 Players)", 0 )
+GAME( 1990, punkshot2,punkshot, punkshot, punksht2, 0,      ROT0,  "Konami", "Punk Shot (US 2 Players)", 0 )
+GAME( 1990, punkshotj,punkshot, punkshot, punksht2, 0,      ROT0,  "Konami", "Punk Shot (Japan 2 Players)", 0 )
 
-GAME( 1990, lgtnfght, 0,        lgtnfght, lgtnfght, gfx,      ROT90, "Konami", "Lightning Fighters (World)", 0 )
-GAME( 1990, lgtnfghta,lgtnfght, lgtnfght, lgtnfght, gfx,      ROT90, "Konami", "Lightning Fighters (Asia)", 0 )
-GAME( 1990, lgtnfghtu,lgtnfght, lgtnfght, lgtnfght, gfx,      ROT90, "Konami", "Lightning Fighters (US)", 0 )
-GAME( 1990, trigon,   lgtnfght, lgtnfght, lgtnfght, gfx,      ROT90, "Konami", "Trigon (Japan)", 0 )
+GAME( 1990, lgtnfght, 0,        lgtnfght, lgtnfght, 0,      ROT90, "Konami", "Lightning Fighters (World)", 0 )
+GAME( 1990, lgtnfghta,lgtnfght, lgtnfght, lgtnfght, 0,      ROT90, "Konami", "Lightning Fighters (Asia)", 0 )
+GAME( 1990, lgtnfghtu,lgtnfght, lgtnfght, lgtnfght, 0,      ROT90, "Konami", "Lightning Fighters (US)", 0 )
+GAME( 1990, trigon,   lgtnfght, lgtnfght, lgtnfght, 0,      ROT90, "Konami", "Trigon (Japan)", 0 )
 
-GAME( 1991, blswhstl, 0,        blswhstl, blswhstl, gfx,      ROT90, "Konami", "Bells & Whistles (Version L)", 0 )
-GAME( 1991, detatwin, blswhstl, blswhstl, blswhstl, gfx,      ROT90, "Konami", "Detana!! Twin Bee (Japan ver. J)", 0 )
+GAME( 1991, blswhstl, 0,        blswhstl, blswhstl, 0,      ROT90, "Konami", "Bells & Whistles (Version L)", 0 )
+GAME( 1991, detatwin, blswhstl, blswhstl, blswhstl, 0,      ROT90, "Konami", "Detana!! Twin Bee (Japan ver. J)", 0 )
 
-GAME( 1991, glfgreat, 0,        glfgreat, glfgreat, glfgreat, ROT0,  "Konami", "Golfing Greats", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1991, glfgreatj,glfgreat, glfgreat, glfgreat, glfgreat, ROT0,  "Konami", "Golfing Greats (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1991, glfgreat, 0,        glfgreat, glfgreat, 0, ROT0,  "Konami", "Golfing Greats", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1991, glfgreatj,glfgreat, glfgreat, glfgreat, 0, ROT0,  "Konami", "Golfing Greats (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
-GAME( 1991, tmnt2,    0,        tmnt2,    ssridr4p, gfx,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", 0 ) // ver. UAA
-GAME( 1991, tmnt2a,   tmnt2,    tmnt2,    ssrid4ps, gfx,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", 0 ) // ver. ADA
-GAME( 1991, tmht22pe, tmnt2,    tmnt2,    ssriders, gfx,      ROT0,  "Konami", "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  0 ) // ver. EBA
-GAME( 1991, tmnt22pu, tmnt2,    tmnt2,    ssriders, gfx,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", 0 ) // ver. UDA
+GAME( 1991, tmnt2,    0,        tmnt2,    ssridr4p, 0,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", 0 ) // ver. UAA
+GAME( 1991, tmnt2a,   tmnt2,    tmnt2,    ssrid4ps, 0,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", 0 ) // ver. ADA
+GAME( 1991, tmht22pe, tmnt2,    tmnt2,    ssriders, 0,      ROT0,  "Konami", "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  0 ) // ver. EBA
+GAME( 1991, tmnt22pu, tmnt2,    tmnt2,    ssriders, 0,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", 0 ) // ver. UDA
 
-GAME( 1993, qgakumon, 0,        tmnt2,    qgakumon, gfx,      ROT0,  "Konami", "Quiz Gakumon no Susume (Japan ver. JA2 Type L)", 0 )
+GAME( 1993, qgakumon, 0,        tmnt2,    qgakumon, 0,      ROT0,  "Konami", "Quiz Gakumon no Susume (Japan ver. JA2 Type L)", 0 )
 
-GAME( 1991, ssriders,    0,        ssriders, ssridr4p, gfx,      ROT0,  "Konami", "Sunset Riders (4 Players ver EAC)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersebd, ssriders, ssriders, ssriders, gfx,      ROT0,  "Konami", "Sunset Riders (2 Players ver EBD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersebc, ssriders, ssriders, ssriders, gfx,      ROT0,  "Konami", "Sunset Riders (2 Players ver EBC)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersuda, ssriders, ssriders, ssrid4ps, gfx,      ROT0,  "Konami", "Sunset Riders (4 Players ver UDA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssriderseaa, ssriders, ssriders, ssrid4ps, gfx,      ROT0,  "Konami", "Sunset Riders (4 Players ver EAA)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersuac, ssriders, ssriders, ssridr4p, gfx,      ROT0,  "Konami", "Sunset Riders (4 Players ver UAC)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersubc, ssriders, ssriders, ssriders, gfx,      ROT0,  "Konami", "Sunset Riders (2 Players ver UBC)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersabd, ssriders, ssriders, ssriders, gfx,      ROT0,  "Konami", "Sunset Riders (2 Players ver ABD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersadd, ssriders, ssriders, ssrid4ps, gfx,      ROT0,  "Konami", "Sunset Riders (4 Players ver ADD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersjbd, ssriders, ssriders, ssriders, gfx,      ROT0,  "Konami", "Sunset Riders (2 Players ver JBD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl, gfx,      ROT0,  "Konami", "Sunset Riders (bootleg 4 Players ver ADD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, ssriders,    0,        ssriders, ssridr4p, 0,      ROT0,  "Konami", "Sunset Riders (4 Players ver EAC)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, ssridersebd, ssriders, ssriders, ssriders, 0,      ROT0,  "Konami", "Sunset Riders (2 Players ver EBD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, ssridersebc, ssriders, ssriders, ssriders, 0,      ROT0,  "Konami", "Sunset Riders (2 Players ver EBC)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, ssridersuda, ssriders, ssriders, ssrid4ps, 0,      ROT0,  "Konami", "Sunset Riders (4 Players ver UDA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, ssriderseaa, ssriders, ssriders, ssrid4ps, 0,      ROT0,  "Konami", "Sunset Riders (4 Players ver EAA)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, ssridersuac, ssriders, ssriders, ssridr4p, 0,      ROT0,  "Konami", "Sunset Riders (4 Players ver UAC)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, ssridersubc, ssriders, ssriders, ssriders, 0,      ROT0,  "Konami", "Sunset Riders (2 Players ver UBC)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, ssridersabd, ssriders, ssriders, ssriders, 0,      ROT0,  "Konami", "Sunset Riders (2 Players ver ABD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, ssridersadd, ssriders, ssriders, ssrid4ps, 0,      ROT0,  "Konami", "Sunset Riders (4 Players ver ADD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, ssridersjbd, ssriders, ssriders, ssriders, 0,      ROT0,  "Konami", "Sunset Riders (2 Players ver JBD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl, 0,      ROT0,  "Konami", "Sunset Riders (bootleg 4 Players ver ADD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1991, thndrx2,  0,        thndrx2,  thndrx2,  gfx,      ROT0,  "Konami", "Thunder Cross II (World)", 0 )
-GAME( 1991, thndrx2a, thndrx2,  thndrx2,  thndrx2,  gfx,      ROT0,  "Konami", "Thunder Cross II (Asia)", 0 )
-GAME( 1991, thndrx2j, thndrx2,  thndrx2,  thndrx2,  gfx,      ROT0,  "Konami", "Thunder Cross II (Japan)", 0 )
+GAME( 1991, thndrx2,  0,        thndrx2,  thndrx2,  0,      ROT0,  "Konami", "Thunder Cross II (World)", 0 )
+GAME( 1991, thndrx2a, thndrx2,  thndrx2,  thndrx2,  0,      ROT0,  "Konami", "Thunder Cross II (Asia)", 0 )
+GAME( 1991, thndrx2j, thndrx2,  thndrx2,  thndrx2,  0,      ROT0,  "Konami", "Thunder Cross II (Japan)", 0 )
 
-GAME( 1993, prmrsocr, 0,        prmrsocr, prmrsocr, glfgreat, ROT0,  "Konami", "Premier Soccer (ver EAB)", 0 )
-GAME( 1993, prmrsocrj,prmrsocr, prmrsocr, prmrsocr, glfgreat, ROT0,  "Konami", "Premier Soccer (ver JAB)", 0 )
+GAME( 1993, prmrsocr, 0,        prmrsocr, prmrsocr, 0, ROT0,  "Konami", "Premier Soccer (ver EAB)", 0 )
+GAME( 1993, prmrsocrj,prmrsocr, prmrsocr, prmrsocr, 0, ROT0,  "Konami", "Premier Soccer (ver JAB)", 0 )

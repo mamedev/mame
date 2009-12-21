@@ -5170,7 +5170,7 @@ WRITE8_DEVICE_HANDLER( k051316_ctrl_w )
 	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", cpuexec_describe_context(device->machine), data, offset);
 }
 
-// a few games (ajax, rollerg, etc.) can enable and disable wraparound after start
+// a few games (ajax, rollerg, ultraman, etc.) can enable and disable wraparound after start
 void k051316_wraparound_enable( const device_config *device, int status )
 {
 	k051316_state *k051316= k051316_get_safe_token(device);
@@ -5585,14 +5585,14 @@ static DEVICE_START( k053936 )
 	const k053936_interface *intf = k053936_get_interface(device);
 
 	k053936->ctrl = auto_alloc_array(device->machine, UINT16, 0x20);
-	k053936->linectrl = auto_alloc_array(device->machine, UINT16, 0x1000);
+	k053936->linectrl = auto_alloc_array(device->machine, UINT16, 0x4000);
 
 	k053936->wraparound = intf->wrap;
 	k053936->offset[0] = intf->xoff;
 	k053936->offset[1] = intf->yoff;
 
 	state_save_register_device_item_pointer(device, 0, k053936->ctrl, 0x20);
-	state_save_register_device_item_pointer(device, 0, k053936->linectrl, 0x1000);
+	state_save_register_device_item_pointer(device, 0, k053936->linectrl, 0x4000);
 }
 
 static DEVICE_RESET( k053936 )
@@ -5600,7 +5600,7 @@ static DEVICE_RESET( k053936 )
 	k053936_state *k053936 = k053936_get_safe_token(device);
 
 	memset(k053936->ctrl, 0, 0x20);
-	memset(k053936->linectrl, 0, 0x1000);
+	memset(k053936->linectrl, 0, 0x4000);
 }
 
 /***************************************************************************/

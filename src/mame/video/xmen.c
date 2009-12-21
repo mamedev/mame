@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "includes/xmen.h"
 
 
@@ -13,7 +13,7 @@ static int layerpri[3];
 
 ***************************************************************************/
 
-static void xmen_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
+void xmen_tile_callback(running_machine *machine, int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	if (layer == 0)
@@ -28,7 +28,7 @@ static void xmen_tile_callback(int layer,int bank,int *code,int *color,int *flag
 
 ***************************************************************************/
 
-static void xmen_sprite_callback(int *code,int *color,int *priority_mask)
+void xmen_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask)
 {
 	int pri = (*color & 0x00e0) >> 4;	/* ??????? */
 	if (pri <= layerpri[2])								*priority_mask = 0;
@@ -47,25 +47,15 @@ static void xmen_sprite_callback(int *code,int *color,int *priority_mask)
 
 ***************************************************************************/
 
-VIDEO_START( xmen )
-{
-	K053251_vh_start(machine);
-
-	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,xmen_tile_callback);
-	K053247_vh_start(machine,"gfx2",53,-2,NORMAL_PLANE_ORDER,xmen_sprite_callback);
-}
-
 static bitmap_t * screen_right;
 static bitmap_t * screen_left;
 static UINT16 *K053247_ram;
 
 VIDEO_START( xmen6p )
 {
-	K053251_vh_start(machine);
+	const device_config *k053246 = devtag_get_device(machine, "k053246");
 
-	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,xmen_tile_callback);
-	K053247_vh_start(machine,"gfx2",53,-2,NORMAL_PLANE_ORDER,xmen_sprite_callback);
-	K053247_export_config(&K053247_ram, NULL, NULL, NULL, NULL);
+	k053247_get_ram(k053246, &K053247_ram);
 
 	screen_left = auto_bitmap_alloc(machine, 64*8, 32*8, BITMAP_FORMAT_INDEXED16);
 	screen_right = auto_bitmap_alloc(machine, 64*8, 32*8, BITMAP_FORMAT_INDEXED16);
@@ -97,63 +87,64 @@ static void sortlayers(int *layer,int *pri)
 
 VIDEO_UPDATE( xmen )
 {
+	const device_config *k052109 = devtag_get_device(screen->machine, "k052109");
+	const device_config *k053246 = devtag_get_device(screen->machine, "k053246");
+	const device_config *k053251 = devtag_get_device(screen->machine, "k053251");
 	int layer[3];
 
+	bg_colorbase       = k053251_get_palette_index(k053251, K053251_CI4);
+	sprite_colorbase   = k053251_get_palette_index(k053251, K053251_CI1);
+	layer_colorbase[0] = k053251_get_palette_index(k053251, K053251_CI3);
+	layer_colorbase[1] = k053251_get_palette_index(k053251, K053251_CI0);
+	layer_colorbase[2] = k053251_get_palette_index(k053251, K053251_CI2);
 
-	bg_colorbase       = K053251_get_palette_index(K053251_CI4);
-	sprite_colorbase   = K053251_get_palette_index(K053251_CI1);
-	layer_colorbase[0] = K053251_get_palette_index(K053251_CI3);
-	layer_colorbase[1] = K053251_get_palette_index(K053251_CI0);
-	layer_colorbase[2] = K053251_get_palette_index(K053251_CI2);
-
-	K052109_tilemap_update();
+	k052109_tilemap_update(k052109);
 
 	layer[0] = 0;
-	layerpri[0] = K053251_get_priority(K053251_CI3);
+	layerpri[0] = k053251_get_priority(k053251, K053251_CI3);
 	layer[1] = 1;
-	layerpri[1] = K053251_get_priority(K053251_CI0);
+	layerpri[1] = k053251_get_priority(k053251, K053251_CI0);
 	layer[2] = 2;
-	layerpri[2] = K053251_get_priority(K053251_CI2);
+	layerpri[2] = k053251_get_priority(k053251, K053251_CI2);
 
 	sortlayers(layer,layerpri);
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	/* note the '+1' in the background color!!! */
 	bitmap_fill(bitmap,cliprect,16 * bg_colorbase+1);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[0]],0,1);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[1]],0,2);
-	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[2]],0,4);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, layer[0], 0, 1);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, layer[1], 0, 2);
+	k052109_tilemap_draw(k052109, bitmap, cliprect, layer[2], 0, 4);
 
 /* this isn't supported anymore and it is unsure if still needed; keeping here for reference
     pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
-	K053247_sprites_draw(screen->machine, bitmap,cliprect);
+	k053247_sprites_draw(k053246, bitmap, cliprect);
 	return 0;
 }
 
 
 VIDEO_UPDATE( xmen6p )
 {
-	int x,y;
-
  	const device_config *left_screen   = devtag_get_device(screen->machine, "lscreen");
 	const device_config *right_screen  = devtag_get_device(screen->machine, "rscreen");
+	int x,y;
 
 	if (screen == left_screen)
-		for(y=0;y<32*8;y++)
+		for(y = 0; y < 32 * 8; y++)
 		{
 			UINT16* line_dest = BITMAP_ADDR16(bitmap, y, 0);
 			UINT16* line_src = BITMAP_ADDR16(screen_left, y, 0);
 
-			for (x=12*8;x<52*8;x++)
+			for (x = 12 * 8; x < 52 * 8; x++)
 				line_dest[x] = line_src[x];
 		}
 	else if (screen == right_screen)
-		for(y=0;y<32*8;y++)
+		for(y = 0; y < 32 * 8; y++)
 		{
 			UINT16* line_dest = BITMAP_ADDR16(bitmap, y, 0);
 			UINT16* line_src = BITMAP_ADDR16(screen_right, y, 0);
 
-			for (x=12*8;x<52*8;x++)
+			for (x = 12 * 8; x < 52 * 8; x++)
 				line_dest[x] = line_src[x];
 		}
 
@@ -163,7 +154,9 @@ VIDEO_UPDATE( xmen6p )
 /* my lefts and rights are mixed up in several places.. */
 VIDEO_EOF( xmen6p )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const device_config *k052109 = devtag_get_device(machine, "k052109");
+	const device_config *k053246 = devtag_get_device(machine, "k053246");
+	const device_config *k053251 = devtag_get_device(machine, "k053251");
 	int layer[3];
 	bitmap_t * renderbitmap;
 	rectangle cliprect;
@@ -186,17 +179,17 @@ VIDEO_EOF( xmen6p )
 	if (xmen_current_frame & 0x01)
 	{
 
-			/* copy the desired spritelist to the chip */
+		/* copy the desired spritelist to the chip */
 		memcpy(K053247_ram, xmen6p_spriteramright, 0x1000);
+
 		/* we write the entire content of the tileram to the chip to ensure
            everything gets marked as dirty and the desired tilemap is rendered
-
            this is not very efficient!
            */
 		for (offset = 0; offset < (0xc000 / 2); offset++)
 		{
 //          K052109_lsb_w
-			K052109_w(space, offset, xmen6p_tilemapright[offset] & 0x00ff);
+			k052109_w(k052109, offset, xmen6p_tilemapright[offset] & 0x00ff);
 		}
 
 
@@ -215,7 +208,7 @@ VIDEO_EOF( xmen6p )
 		for (offset = 0; offset < (0xc000 / 2); offset++)
 		{
 //          K052109_lsb_w
-			K052109_w(space, offset, xmen6p_tilemapleft[offset] & 0x00ff);
+			k052109_w(k052109, offset, xmen6p_tilemapleft[offset] & 0x00ff);
 		}
 
 
@@ -223,31 +216,31 @@ VIDEO_EOF( xmen6p )
 	}
 
 
-	bg_colorbase       = K053251_get_palette_index(K053251_CI4);
-	sprite_colorbase   = K053251_get_palette_index(K053251_CI1);
-	layer_colorbase[0] = K053251_get_palette_index(K053251_CI3);
-	layer_colorbase[1] = K053251_get_palette_index(K053251_CI0);
-	layer_colorbase[2] = K053251_get_palette_index(K053251_CI2);
+	bg_colorbase       = k053251_get_palette_index(k053251, K053251_CI4);
+	sprite_colorbase   = k053251_get_palette_index(k053251, K053251_CI1);
+	layer_colorbase[0] = k053251_get_palette_index(k053251, K053251_CI3);
+	layer_colorbase[1] = k053251_get_palette_index(k053251, K053251_CI0);
+	layer_colorbase[2] = k053251_get_palette_index(k053251, K053251_CI2);
 
-	K052109_tilemap_update();
+	k052109_tilemap_update(k052109);
 
 	layer[0] = 0;
-	layerpri[0] = K053251_get_priority(K053251_CI3);
+	layerpri[0] = k053251_get_priority(k053251, K053251_CI3);
 	layer[1] = 1;
-	layerpri[1] = K053251_get_priority(K053251_CI0);
+	layerpri[1] = k053251_get_priority(k053251, K053251_CI0);
 	layer[2] = 2;
-	layerpri[2] = K053251_get_priority(K053251_CI2);
+	layerpri[2] = k053251_get_priority(k053251, K053251_CI2);
 
 	sortlayers(layer,layerpri);
 
 	bitmap_fill(machine->priority_bitmap, &cliprect, 0);
 	/* note the '+1' in the background color!!! */
 	bitmap_fill(renderbitmap, &cliprect, 16 * bg_colorbase + 1);
-	tilemap_draw(renderbitmap, &cliprect, K052109_tilemap[layer[0]], 0, 1);
-	tilemap_draw(renderbitmap, &cliprect, K052109_tilemap[layer[1]], 0, 2);
-	tilemap_draw(renderbitmap, &cliprect, K052109_tilemap[layer[2]], 0, 4);
+	k052109_tilemap_draw(k052109, renderbitmap, &cliprect, layer[0], 0, 1);
+	k052109_tilemap_draw(k052109, renderbitmap, &cliprect, layer[1], 0, 2);
+	k052109_tilemap_draw(k052109, renderbitmap, &cliprect, layer[2], 0, 4);
 
 /* this isn't supported anymore and it is unsure if still needed; keeping here for reference
     pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
-	K053247_sprites_draw(machine, renderbitmap, &cliprect);
+	k053247_sprites_draw(k053246, renderbitmap, &cliprect);
 }

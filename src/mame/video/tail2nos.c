@@ -1,5 +1,5 @@
 #include "driver.h"
-#include "konamiic.h"
+#include "video/konicdev.h"
 
 
 UINT16 *tail2nos_bgvideoram;
@@ -36,7 +36,7 @@ static TILE_GET_INFO( get_tile_info )
 
 ***************************************************************************/
 
-static void zoom_callback(int *code,int *color,int *flags)
+void tail2nos_zoom_callback(running_machine *machine, int *code,int *color,int *flags)
 {
 	*code |= ((*color & 0x03) << 8);
 	*color = 32 + ((*color & 0x38) >> 3);
@@ -52,12 +52,8 @@ VIDEO_START( tail2nos )
 {
 	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,64,32);
 
-	K051316_vh_start_0(machine,"gfx3",-4,TRUE,0,zoom_callback);
-
 	tilemap_set_transparent_pen(bg_tilemap,15);
 
-	K051316_wraparound_enable(0,1);
-	K051316_set_offset(0,-89,-14);
 	zoomdata = (UINT16 *)memory_region(machine, "gfx3");
 }
 
@@ -157,13 +153,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( tail2nos )
 {
+	const device_config *k051316 = devtag_get_device(screen->machine, "k051316");
+
 	if (video_enable)
 	{
-		K051316_zoom_draw_0(bitmap,cliprect,0,0);
-		draw_sprites(screen->machine, bitmap,cliprect);
-		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+		k051316_zoom_draw(k051316, bitmap,cliprect, 0, 0);
+		draw_sprites(screen->machine, bitmap, cliprect);
+		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	}
 	else
-		bitmap_fill(bitmap,cliprect,0);
+		bitmap_fill(bitmap, cliprect, 0);
+
 	return 0;
 }
