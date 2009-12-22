@@ -566,6 +566,33 @@ ROM_START( bloodbroa )
 	ROM_LOAD( "bb_08.bin",    0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
 ROM_END
 
+ROM_START( bloodbrob )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "bloodbros02.bin",    0x00001, 0x20000, CRC(204dca6e) SHA1(f04cb2116d699ac2deec2d55597beb5d7b3dc793) )
+	ROM_LOAD16_BYTE( "bloodbros01.bin",    0x00000, 0x20000, CRC(ac6719e7) SHA1(bcefd61ed5d2f5eeb4424243f03037c7d123b9f6) )
+	ROM_LOAD16_BYTE( "bb_04.bin",    0x40001, 0x20000, CRC(fd951c2c) SHA1(f4031bf303c67c82f2f78f7456f78382d8c1ac85) )
+	ROM_LOAD16_BYTE( "bb_03.bin",    0x40000, 0x20000, CRC(18d3c460) SHA1(93b86af1199f0fedeaf1fe64d27ffede4b819e42) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "bb_07.bin",    0x000000, 0x08000, CRC(411b94e8) SHA1(6968441f64212c0935afeca68f07deaadf86d614) )
+	ROM_CONTINUE(             0x010000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "bb_05.bin",    0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) )	/* characters */
+	ROM_LOAD( "bb_06.bin",    0x10000, 0x10000, CRC(7092e35b) SHA1(659d30b2e2fd9ffa34a47e98193c8f0a87ac1315) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "bloodb.bk",   0x00000, 0x100000, CRC(1aa87ee6) SHA1(e7843c1e8a0f3a685f0b5d6e3a2eb3176c410847) )	/* Background+Foreground */
+
+	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_LOAD( "bloodb.obj",   0x00000, 0x100000, CRC(d27c3952) SHA1(de7306432b682f238b911507ad7aa2fa8acbee80) )	/* sprites */
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
+	ROM_LOAD( "bb_08.bin",    0x00000, 0x20000, CRC(deb1b975) SHA1(08f2e9a0a23171201b71d381d091edcd3787c287) )
+ROM_END
+
+
 ROM_START( weststry )
 	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
 	ROM_LOAD16_BYTE( "ws13.bin",    0x00001, 0x20000, CRC(158e302a) SHA1(52cc1bf526424ff025a6b79f3fc7bba4b9bbfcbb) )
@@ -655,5 +682,6 @@ static DRIVER_INIT( weststry )
 
 GAME( 1990, bloodbro, 0,        bloodbro, bloodbro, 0,        ROT0,   "Tad", "Blood Bros. (set 1)", GAME_NO_COCKTAIL )
 GAME( 1990, bloodbroa,bloodbro, bloodbro, bloodbro, 0,        ROT0,   "Tad", "Blood Bros. (set 2)", GAME_NO_COCKTAIL )
+GAME( 1990, bloodbrob,bloodbro, bloodbro, bloodbro, 0,        ROT0,   "Tad", "Blood Bros. (set 3)", GAME_NO_COCKTAIL )
 GAME( 1990, weststry, bloodbro, weststry, weststry, weststry, ROT0,   "bootleg", "West Story", GAME_NO_COCKTAIL | GAME_NO_SOUND )
 GAME( 1990, skysmash, 0,        skysmash, skysmash, 0,        ROT270, "Nihon System", "Sky Smasher", 0 )

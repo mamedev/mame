@@ -7194,6 +7194,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( jujub )		/* (c) 1989 Tad (Japan) */
 	DRIVER( bloodbro )	/* (c) 1990 Tad */
 	DRIVER( bloodbroa )	/* (c) 1990 Tad */
+	DRIVER( bloodbrob )	/* (c) 1990 Tad */
 	DRIVER( weststry )	/* bootleg */
 	DRIVER( skysmash )	/* (c) 1990 Nihon System Inc. */
 	DRIVER( legionna )	/* (c) 1992 Tad (World) */
