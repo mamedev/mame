@@ -291,111 +291,137 @@ Notes:
 #include "cpu/arm7/arm7core.h"
 #include "includes/pgm.h"
 
-
-UINT16 *pgm_mainram, *pgm_bg_videoram, *pgm_tx_videoram, *pgm_videoregs, *pgm_rowscrollram;
-static UINT16 *pgm_videoram;
-static UINT8 *z80_mainram;
-static UINT32 *arm7_shareram;
-static UINT32 *svg_shareram[2];	//for 5585G MACHINE
-static UINT32 kov2_latchdata_68k_w;
-static UINT32 kov2_latchdata_arm_w;
-
+UINT16 *pgm_mainram;
 
 static WRITE16_HANDLER( pgm_videoram_w )
 {
-	if (offset<0x4000/2)
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+
+	if (offset < 0x4000 / 2)
 		pgm_bg_videoram_w(space, offset, data, mem_mask);
-	else if (offset<0x7000/2)
-		pgm_tx_videoram_w(space, offset-0x4000/2, data, mem_mask);
-	else COMBINE_DATA(&pgm_videoram[offset/2]);
+	else if (offset < 0x7000 / 2)
+		pgm_tx_videoram_w(space, offset - 0x4000 / 2, data, mem_mask);
+	else 
+		COMBINE_DATA(&state->videoram[offset / 2]);
 }
 
 static READ16_HANDLER ( z80_ram_r )
 {
-	return (z80_mainram[offset*2] << 8)|z80_mainram[offset*2+1];
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	return (state->z80_mainram[offset * 2] << 8) | state->z80_mainram[offset * 2 + 1];
 }
 
 static READ32_HANDLER( arm7_latch_arm_r )
 {
-	if (PGMARM7LOGERROR) logerror("ARM7: Latch read: %08x (%08x) (%06x)\n", kov2_latchdata_68k_w, mem_mask, cpu_get_pc(space->cpu) );
-	return kov2_latchdata_68k_w;
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+
+	if (PGMARM7LOGERROR) 
+		logerror("ARM7: Latch read: %08x (%08x) (%06x)\n", state->kov2_latchdata_68k_w, mem_mask, cpu_get_pc(space->cpu));
+	return state->kov2_latchdata_68k_w;
 }
 
 static WRITE32_HANDLER( arm7_latch_arm_w )
 {
-	if (PGMARM7LOGERROR) logerror("ARM7: Latch write: %08x (%08x) (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu) );
-	COMBINE_DATA(&kov2_latchdata_arm_w);
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+
+	if (PGMARM7LOGERROR) 
+		logerror("ARM7: Latch write: %08x (%08x) (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu));
+
+	COMBINE_DATA(&state->kov2_latchdata_arm_w);
 }
 
 static READ32_HANDLER( arm7_shareram_r )
 {
-	if (PGMARM7LOGERROR) logerror("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) (%06x)\n", offset << 2, arm7_shareram[offset], mem_mask, cpu_get_pc(space->cpu) );
-	return arm7_shareram[offset];
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+
+	if (PGMARM7LOGERROR) 
+		logerror("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) (%06x)\n", offset << 2, state->arm7_shareram[offset], mem_mask, cpu_get_pc(space->cpu));
+	return state->arm7_shareram[offset];
 }
 
 static WRITE32_HANDLER( arm7_shareram_w )
 {
-	if (PGMARM7LOGERROR) logerror("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) (%06x)\n", offset << 2, data, mem_mask, cpu_get_pc(space->cpu) );
-	COMBINE_DATA(&arm7_shareram[offset]);
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+
+	if (PGMARM7LOGERROR) 
+		logerror("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) (%06x)\n", offset << 2, data, mem_mask, cpu_get_pc(space->cpu));
+	COMBINE_DATA(&state->arm7_shareram[offset]);
 }
 
 static READ16_HANDLER( arm7_latch_68k_r )
 {
-	if (PGMARM7LOGERROR) logerror("M68K: Latch read: %04x (%04x) (%06x)\n", kov2_latchdata_arm_w & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu) );
-	return kov2_latchdata_arm_w;
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+
+	if (PGMARM7LOGERROR) 
+		logerror("M68K: Latch read: %04x (%04x) (%06x)\n", state->kov2_latchdata_arm_w & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu));
+	return state->kov2_latchdata_arm_w;
 }
 
 static WRITE16_HANDLER( arm7_latch_68k_w )
 {
-	if (PGMARM7LOGERROR) logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu) );
-	COMBINE_DATA(&kov2_latchdata_68k_w);
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
 
-	generic_pulse_irq_line(cputag_get_cpu(space->machine, "prot"), ARM7_FIRQ_LINE);
+	if (PGMARM7LOGERROR) 
+		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu));
+	COMBINE_DATA(&state->kov2_latchdata_68k_w);
+
+	generic_pulse_irq_line(state->prot, ARM7_FIRQ_LINE);
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(200));
-	cpu_spinuntil_time(space->cpu, cputag_clocks_to_attotime(space->machine, "prot", 200)); // give the arm time to respond (just boosting the interleave doesn't help)
+	cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(state->prot, 200)); // give the arm time to respond (just boosting the interleave doesn't help)
 }
 
 static READ16_HANDLER( arm7_ram_r )
 {
-	UINT16 *share16 = (UINT16 *)arm7_shareram;
-	if (PGMARM7LOGERROR) logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, cpu_get_pc(space->cpu) );
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	UINT16 *share16 = (UINT16 *)state->arm7_shareram;
+
+	if (PGMARM7LOGERROR) 
+		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, cpu_get_pc(space->cpu));
 	return share16[BYTE_XOR_LE(offset)];
 }
 
 static WRITE16_HANDLER( arm7_ram_w )
 {
-	UINT16 *share16 = (UINT16 *)arm7_shareram;
-	if (PGMARM7LOGERROR) logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, cpu_get_pc(space->cpu) );
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	UINT16 *share16 = (UINT16 *)state->arm7_shareram;
 
+	if (PGMARM7LOGERROR) 
+		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, cpu_get_pc(space->cpu));
 	COMBINE_DATA(&share16[BYTE_XOR_LE(offset)]);
 }
 
 static WRITE16_HANDLER ( z80_ram_w )
 {
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
 	int pc = cpu_get_pc(space->cpu);
-	if(ACCESSING_BITS_8_15)
-		z80_mainram[offset*2] = data >> 8;
-	if(ACCESSING_BITS_0_7)
-		z80_mainram[offset*2+1] = data;
 
-	if(pc != 0xf12 && pc != 0xde2 && pc != 0x100c50 && pc != 0x100b20)
-		if (PGMLOGERROR) logerror("Z80: write %04x, %04x @ %04x (%06x)\n", offset*2, data, mem_mask, cpu_get_pc(space->cpu));
+	if (ACCESSING_BITS_8_15)
+		state->z80_mainram[offset * 2] = data >> 8;
+	if (ACCESSING_BITS_0_7)
+		state->z80_mainram[offset * 2 + 1] = data;
+
+	if (pc != 0xf12 && pc != 0xde2 && pc != 0x100c50 && pc != 0x100b20)
+		if (PGMLOGERROR) 
+			logerror("Z80: write %04x, %04x @ %04x (%06x)\n", offset * 2, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
 static WRITE16_HANDLER ( z80_reset_w )
 {
-	if (PGMLOGERROR) logerror("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu));
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
 
-	if(data == 0x5050)
+	if (PGMLOGERROR) 
+		logerror("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu));
+
+	if (data == 0x5050)
 	{
-		devtag_reset(space->machine, "ics");
-		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, CLEAR_LINE);
-		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, PULSE_LINE);
+		device_reset(state->ics);
+		cpu_set_input_line(state->soundcpu, INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(state->soundcpu, INPUT_LINE_RESET, PULSE_LINE);
 		if(0)
 		{
 			FILE *out;
 			out = fopen("z80ram.bin", "wb");
-			fwrite(z80_mainram, 1, 65536, out);
+			fwrite(state->z80_mainram, 1, 65536, out);
 			fclose(out);
 		}
 	}
@@ -403,115 +429,120 @@ static WRITE16_HANDLER ( z80_reset_w )
 	{
 		/* this might not be 100% correct, but several of the games (ddp2, puzzli2 etc. expect the z80 to be turned
            off during data uploads, they write here before the upload */
-		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(state->soundcpu, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
 static WRITE16_HANDLER ( z80_ctrl_w )
 {
-	if (PGMLOGERROR) logerror("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu));
+	if (PGMLOGERROR) 
+		logerror("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu));
 }
 
 static WRITE16_HANDLER ( m68k_l1_w )
 {
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+
 	if(ACCESSING_BITS_0_7)
 	{
-		if (PGMLOGERROR) logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, cpu_get_pc(space->cpu));
+		if (PGMLOGERROR) 
+			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, cpu_get_pc(space->cpu));
 		soundlatch_w(space, 0, data);
-		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE );
+		cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE );
 	}
 }
 
 static WRITE8_HANDLER( z80_l3_w )
 {
-	if (PGMLOGERROR) logerror("SL 3 z80.w %02x (%04x)\n", data, cpu_get_pc(space->cpu));
+	if (PGMLOGERROR) 
+		logerror("SL 3 z80.w %02x (%04x)\n", data, cpu_get_pc(space->cpu));
 	soundlatch3_w(space, 0, data);
 }
 
-static void sound_irq(const device_config *device, int level)
+static void sound_irq( const device_config *device, int level )
 {
-	cputag_set_input_line(device->machine, "soundcpu", 0, level);
+	pgm_state *state = (pgm_state *)device->machine->driver_data;
+	cpu_set_input_line(state->soundcpu, 0, level);
 }
 
-static const ics2115_interface pgm_ics2115_interface = {
+static const ics2115_interface pgm_ics2115_interface = 
+{
 	sound_irq
 };
 
+
 /* Calendar Emulation */
 
-static UINT8 CalVal, CalMask, CalCom=0, CalCnt=0;
-
-static UINT8 bcd(UINT8 data)
+static UINT8 bcd( UINT8 data )
 {
 	return ((data / 10) << 4) | (data % 10);
 }
 
 static READ16_HANDLER( pgm_calendar_r )
 {
-	UINT8 calr;
-	calr = (CalVal & CalMask) ? 1 : 0;
-	CalMask <<= 1;
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	UINT8 calr = (state->cal_val & state->cal_mask) ? 1 : 0;
+
+	state->cal_mask <<= 1;
 	return calr;
 }
 
 static WRITE16_HANDLER( pgm_calendar_w )
 {
-	static mame_system_time systime;
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
 
-	mame_get_base_datetime(space->machine, &systime);
+	mame_get_base_datetime(space->machine, &state->systime);
 
-	// initialize the time, otherwise it crashes
-	if( !systime.time )
-		mame_get_base_datetime(space->machine, &systime);
+	state->cal_com <<= 1;
+	state->cal_com |= data & 1;
+	++state->cal_cnt;
 
-	CalCom <<= 1;
-	CalCom |= data & 1;
-	++CalCnt;
-	if(CalCnt==4)
+	if (state->cal_cnt == 4)
 	{
-		CalMask = 1;
-		CalVal = 1;
-		CalCnt = 0;
-		switch(CalCom & 0xf)
+		state->cal_mask = 1;
+		state->cal_val = 1;
+		state->cal_cnt = 0;
+
+		switch (state->cal_com & 0xf)
 		{
 			case 1: case 3: case 5: case 7: case 9: case 0xb: case 0xd:
-				CalVal++;
+				state->cal_val++;
 				break;
 
 			case 0:
-				CalVal=bcd(systime.local_time.weekday); //??
+				state->cal_val = bcd(state->systime.local_time.weekday); //??
 				break;
 
 			case 2:  //Hours
-				CalVal=bcd(systime.local_time.hour);
+				state->cal_val = bcd(state->systime.local_time.hour);
 				break;
 
 			case 4:  //Seconds
-				CalVal=bcd(systime.local_time.second);
+				state->cal_val = bcd(state->systime.local_time.second);
 				break;
 
 			case 6:  //Month
-				CalVal=bcd(systime.local_time.month + 1); //?? not bcd in MVS
+				state->cal_val = bcd(state->systime.local_time.month + 1); //?? not bcd in MVS
 				break;
 
 			case 8:
-				CalVal=0; //Controls blinking speed, maybe milliseconds
+				state->cal_val = 0; //Controls blinking speed, maybe milliseconds
 				break;
 
 			case 0xa: //Day
-				CalVal=bcd(systime.local_time.mday);
+				state->cal_val = bcd(state->systime.local_time.mday);
 				break;
 
 			case 0xc: //Minute
-				CalVal=bcd(systime.local_time.minute);
+				state->cal_val = bcd(state->systime.local_time.minute);
 				break;
 
 			case 0xe:  //Year
-				CalVal=bcd(systime.local_time.year % 100);
+				state->cal_val = bcd(state->systime.local_time.year % 100);
 				break;
 
 			case 0xf:  //Load Date
-				mame_get_base_datetime(space->machine, &systime);
+				mame_get_base_datetime(space->machine, &state->systime);
 				break;
 		}
 	}
@@ -542,12 +573,12 @@ static ADDRESS_MAP_START( pgm_mem, ADDRESS_SPACE_PROGRAM, 16)
 
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) /* Main Ram */
 
-//  AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(pgm_bg_videoram_w) AM_BASE(&pgm_bg_videoram) /* Backgrounds */
-//  AM_RANGE(0x904000, 0x905fff) AM_RAM_WRITE(pgm_tx_videoram_w) AM_BASE(&pgm_tx_videoram) /* Text Layer */
-//  AM_RANGE(0x907000, 0x9077ff) AM_RAM AM_BASE(&pgm_rowscrollram)
-	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_RAM_WRITE(pgm_videoram_w) AM_BASE(&pgm_videoram) /* IGS023 VIDEO CHIP */
+//  AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(pgm_bg_videoram_w) AM_BASE_MEMBER(pgm_state, bg_videoram) /* Backgrounds */
+//  AM_RANGE(0x904000, 0x905fff) AM_RAM_WRITE(pgm_tx_videoram_w) AM_BASE_MEMBER(pgm_state, tx_videoram) /* Text Layer */
+//  AM_RANGE(0x907000, 0x9077ff) AM_RAM AM_BASE_MEMBER(pgm_state, rowscrollram)
+	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_RAM_WRITE(pgm_videoram_w) AM_BASE_MEMBER(pgm_state, videoram) /* IGS023 VIDEO CHIP */
 	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE(&pgm_videoregs) /* Video Regs inc. Zoom Table */
+	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE_MEMBER(pgm_state, videoregs) /* Video Regs inc. Zoom Table */
 
 	AM_RANGE(0xc00002, 0xc00003) AM_READWRITE(soundlatch_word_r, m68k_l1_w)
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(soundlatch2_word_r, soundlatch2_word_w)
@@ -563,24 +594,22 @@ static ADDRESS_MAP_START( pgm_mem, ADDRESS_SPACE_PROGRAM, 16)
 
 	AM_RANGE(0xc10000, 0xc1ffff) AM_READWRITE(z80_ram_r, z80_ram_w) /* Z80 Program */
 ADDRESS_MAP_END
-
-static UINT16 *killbld_sharedprotram;
 
 static ADDRESS_MAP_START( killbld_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM   /* BIOS ROM */
 	AM_RANGE(0x100000, 0x2fffff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE(&killbld_sharedprotram) // Shared with protection device
+	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_MEMBER(pgm_state, sharedprotram) // Shared with protection device
 
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) /* Main Ram */
 
-//  AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(pgm_bg_videoram_w) AM_BASE(&pgm_bg_videoram) /* Backgrounds */
-//  AM_RANGE(0x904000, 0x905fff) AM_RAM_WRITE(pgm_tx_videoram_w) AM_BASE(&pgm_tx_videoram) /* Text Layer */
-//  AM_RANGE(0x907000, 0x9077ff) AM_RAM AM_BASE(&pgm_rowscrollram)
-	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_RAM_WRITE(pgm_videoram_w) AM_BASE(&pgm_videoram) /* IGS023 VIDEO CHIP */
+//  AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(pgm_bg_videoram_w) AM_BASE_MEMBER(pgm_state, bg_videoram) /* Backgrounds */
+//  AM_RANGE(0x904000, 0x905fff) AM_RAM_WRITE(pgm_tx_videoram_w) AM_BASE_MEMBER(pgm_state, tx_videoram) /* Text Layer */
+//  AM_RANGE(0x907000, 0x9077ff) AM_RAM AM_BASE_MEMBER(pgm_state, rowscrollram)
+	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_RAM_WRITE(pgm_videoram_w) AM_BASE_MEMBER(pgm_state, videoram) /* IGS023 VIDEO CHIP */
 	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE(&pgm_videoregs) /* Video Regs inc. Zoom Table */
+	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE_MEMBER(pgm_state, videoregs) /* Video Regs inc. Zoom Table */
 
 	AM_RANGE(0xc00002, 0xc00003) AM_READWRITE(soundlatch_word_r, m68k_l1_w)
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(soundlatch2_word_r, soundlatch2_word_w)
@@ -597,23 +626,21 @@ static ADDRESS_MAP_START( killbld_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xc10000, 0xc1ffff) AM_READWRITE(z80_ram_r, z80_ram_w) /* Z80 Program */
 ADDRESS_MAP_END
 
-static UINT16 *olds_sharedprotram;
-
 static ADDRESS_MAP_START( olds_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM   /* BIOS ROM */
 	AM_RANGE(0x100000, 0x3fffff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE(&olds_sharedprotram) // Shared with protection device
+	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE_MEMBER(pgm_state, sharedprotram) // Shared with protection device
 
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) /* Main Ram */
 
-//  AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(pgm_bg_videoram_w) AM_BASE(&pgm_bg_videoram) /* Backgrounds */
-//  AM_RANGE(0x904000, 0x905fff) AM_RAM_WRITE(pgm_tx_videoram_w) AM_BASE(&pgm_tx_videoram) /* Text Layer */
-//  AM_RANGE(0x907000, 0x9077ff) AM_RAM AM_BASE(&pgm_rowscrollram)
-	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_RAM_WRITE(pgm_videoram_w) AM_BASE(&pgm_videoram) /* IGS023 VIDEO CHIP */
+//  AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(pgm_bg_videoram_w) AM_BASE_MEMBER(pgm_state, bg_videoram) /* Backgrounds */
+//  AM_RANGE(0x904000, 0x905fff) AM_RAM_WRITE(pgm_tx_videoram_w) AM_BASE_MEMBER(pgm_state, tx_videoram) /* Text Layer */
+//  AM_RANGE(0x907000, 0x9077ff) AM_RAM AM_BASE_MEMBER(pgm_state, rowscrollram)
+	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_RAM_WRITE(pgm_videoram_w) AM_BASE_MEMBER(pgm_state, videoram) /* IGS023 VIDEO CHIP */
 	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE(&pgm_videoregs) /* Video Regs inc. Zoom Table */
+	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE_MEMBER(pgm_state, videoregs) /* Video Regs inc. Zoom Table */
 
 	AM_RANGE(0xc00002, 0xc00003) AM_READWRITE(soundlatch_word_r, m68k_l1_w)
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(soundlatch2_word_r, soundlatch2_word_w)
@@ -638,12 +665,12 @@ static ADDRESS_MAP_START( kov2_mem, ADDRESS_SPACE_PROGRAM, 16)
 
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) /* Main Ram */
 
-//  AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(pgm_bg_videoram_w) AM_BASE(&pgm_bg_videoram) /* Backgrounds */
-//  AM_RANGE(0x904000, 0x905fff) AM_RAM_WRITE(pgm_tx_videoram_w) AM_BASE(&pgm_tx_videoram) /* Text Layer */
-//  AM_RANGE(0x907000, 0x9077ff) AM_RAM AM_BASE(&pgm_rowscrollram)
-	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_RAM_WRITE(pgm_videoram_w) AM_BASE(&pgm_videoram) /* IGS023 VIDEO CHIP */
+//  AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(pgm_bg_videoram_w) AM_BASE_MEMBER(pgm_state, bg_videoram) /* Backgrounds */
+//  AM_RANGE(0x904000, 0x905fff) AM_RAM_WRITE(pgm_tx_videoram_w) AM_BASE_MEMBER(pgm_state, tx_videoram) /* Text Layer */
+//  AM_RANGE(0x907000, 0x9077ff) AM_RAM AM_BASE_MEMBER(pgm_state, rowscrollram)
+	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_RAM_WRITE(pgm_videoram_w) AM_BASE_MEMBER(pgm_state, videoram) /* IGS023 VIDEO CHIP */
 	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE(&pgm_videoregs) /* Video Regs inc. Zoom Table */
+	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE_MEMBER(pgm_state, videoregs) /* Video Regs inc. Zoom Table */
 
 	AM_RANGE(0xc00002, 0xc00003) AM_READWRITE(soundlatch_word_r, m68k_l1_w)
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(soundlatch2_word_r, soundlatch2_word_w)
@@ -666,18 +693,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cavepgm_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM   /* larger BIOS ROM */
 	AM_RANGE(0xfffffe, 0xffffff) AM_ROMBANK("bank1") /* Game ROM (unmapped for now, might not even have it) */
-	AM_RANGE(0x400000, 0x4fffff) AM_RAM AM_BASE(&olds_sharedprotram) // Shared with protection device
+	AM_RANGE(0x400000, 0x4fffff) AM_RAM AM_BASE_MEMBER(pgm_state, sharedprotram) // Shared with protection device
 
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) /* Main Ram */
 
-//  AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(pgm_bg_videoram_w) AM_BASE(&pgm_bg_videoram) /* Backgrounds */
-//  AM_RANGE(0x904000, 0x905fff) AM_RAM_WRITE(pgm_tx_videoram_w) AM_BASE(&pgm_tx_videoram) /* Text Layer */
-//  AM_RANGE(0x907000, 0x9077ff) AM_RAM AM_BASE(&pgm_rowscrollram)
-	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_RAM_WRITE(pgm_videoram_w) AM_BASE(&pgm_videoram) /* IGS023 VIDEO CHIP */
+//  AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(pgm_bg_videoram_w) AM_BASE_MEMBER(pgm_state, bg_videoram) /* Backgrounds */
+//  AM_RANGE(0x904000, 0x905fff) AM_RAM_WRITE(pgm_tx_videoram_w) AM_BASE_MEMBER(pgm_state, tx_videoram) /* Text Layer */
+//  AM_RANGE(0x907000, 0x9077ff) AM_RAM AM_BASE_MEMBER(pgm_state, rowscrollram)
+	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_RAM_WRITE(pgm_videoram_w) AM_BASE_MEMBER(pgm_state, videoram) /* IGS023 VIDEO CHIP */
 	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE(&pgm_videoregs) /* Video Regs inc. Zoom Table */
+	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE_MEMBER(pgm_state, videoregs) /* Video Regs inc. Zoom Table */
 
 	AM_RANGE(0xc00002, 0xc00003) AM_READWRITE(soundlatch_word_r, m68k_l1_w)
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(soundlatch2_word_r, soundlatch2_word_w)
@@ -696,7 +723,7 @@ ADDRESS_MAP_END
 #endif
 
 static ADDRESS_MAP_START( z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE(&z80_mainram)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(pgm_state, z80_mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8 )
@@ -712,83 +739,89 @@ static ADDRESS_MAP_START( arm7_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM
 	AM_RANGE(0x18000000, 0x1800ffff) AM_RAM
 	AM_RANGE(0x38000000, 0x38000003) AM_READWRITE(arm7_latch_arm_r, arm7_latch_arm_w) /* 68k Latch */
-	AM_RANGE(0x48000000, 0x4800ffff) AM_READWRITE(arm7_shareram_r, arm7_shareram_w) AM_BASE(&arm7_shareram)
+	AM_RANGE(0x48000000, 0x4800ffff) AM_READWRITE(arm7_shareram_r, arm7_shareram_w) AM_BASE_MEMBER(pgm_state, arm7_shareram)
 	AM_RANGE(0x50000000, 0x500003ff) AM_RAM
 ADDRESS_MAP_END
 
 /* Kov Superheroes */
 
-static UINT16 kovsh_highlatch_arm_w, kovsh_lowlatch_arm_w;
-static UINT16 kovsh_highlatch_68k_w, kovsh_lowlatch_68k_w;
-
 static READ32_HANDLER( kovsh_arm7_protlatch_r )
 {
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+
 	timer_call_after_resynch(space->machine, NULL, 0, 0); // force resync
 
-	return (kovsh_highlatch_68k_w << 16) | (kovsh_lowlatch_68k_w);
+	return (state->kovsh_highlatch_68k_w << 16) | (state->kovsh_lowlatch_68k_w);
 }
 
 static WRITE32_HANDLER( kovsh_arm7_protlatch_w )
 {
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+
 	timer_call_after_resynch(space->machine, NULL, 0, 0); // force resync
 
 	if (ACCESSING_BITS_16_31)
 	{
-		kovsh_highlatch_arm_w = data>>16;
-		kovsh_highlatch_68k_w = 0;
+		state->kovsh_highlatch_arm_w = data >> 16;
+		state->kovsh_highlatch_68k_w = 0;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		kovsh_lowlatch_arm_w = data;
-		kovsh_lowlatch_68k_w = 0;
+		state->kovsh_lowlatch_arm_w = data;
+		state->kovsh_lowlatch_68k_w = 0;
 	}
 }
 
 static READ16_HANDLER( kovsh_68k_protlatch_r )
 {
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+
 	timer_call_after_resynch(space->machine, NULL, 0, 0); // force resync
 
 	switch (offset)
 	{
-		case 1: return kovsh_highlatch_arm_w;
-		case 0: return kovsh_lowlatch_arm_w;
+		case 1: return state->kovsh_highlatch_arm_w;
+		case 0: return state->kovsh_lowlatch_arm_w;
 	}
 	return -1;
 }
 
 static WRITE16_HANDLER( kovsh_68k_protlatch_w )
 {
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+
 	timer_call_after_resynch(space->machine, NULL, 0, 0); // force resync
 
 	switch (offset)
 	{
 		case 1:
-			{
-				kovsh_highlatch_68k_w = data;
-			}
+			state->kovsh_highlatch_68k_w = data;
 			break;
 
 		case 0:
-			{
-				kovsh_lowlatch_68k_w = data;
-			}
+			state->kovsh_lowlatch_68k_w = data;
 			break;
 	}
 }
 
 static READ16_HANDLER( kovsh_arm7_ram_r )
 {
-	UINT16 *share16 = (UINT16 *)arm7_shareram;
-	if (PGMARM7LOGERROR) logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, cpu_get_pc(space->cpu) );
-	return share16[BYTE_XOR_LE(offset<<1)];
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	UINT16 *share16 = (UINT16 *)state->arm7_shareram;
+
+	if (PGMARM7LOGERROR) 
+		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, cpu_get_pc(space->cpu));
+	return share16[BYTE_XOR_LE(offset << 1)];
 }
 
 static WRITE16_HANDLER( kovsh_arm7_ram_w )
 {
-	UINT16 *share16 = (UINT16 *)arm7_shareram;
-	if (PGMARM7LOGERROR) logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, cpu_get_pc(space->cpu) );
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	UINT16 *share16 = (UINT16 *)state->arm7_shareram;
 
-	COMBINE_DATA(&share16[BYTE_XOR_LE(offset<<1)]);
+	if (PGMARM7LOGERROR) 
+		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, cpu_get_pc(space->cpu));
+	COMBINE_DATA(&share16[BYTE_XOR_LE(offset << 1)]);
 }
 
 static ADDRESS_MAP_START( kovsh_mem, ADDRESS_SPACE_PROGRAM, 16)
@@ -799,12 +832,12 @@ static ADDRESS_MAP_START( kovsh_mem, ADDRESS_SPACE_PROGRAM, 16)
 
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) /* Main Ram */
 
-//  AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(pgm_bg_videoram_w) AM_BASE(&pgm_bg_videoram) /* Backgrounds */
-//  AM_RANGE(0x904000, 0x905fff) AM_RAM_WRITE(pgm_tx_videoram_w) AM_BASE(&pgm_tx_videoram) /* Text Layer */
-//  AM_RANGE(0x907000, 0x9077ff) AM_RAM AM_BASE(&pgm_rowscrollram)
-	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_RAM_WRITE(pgm_videoram_w) AM_BASE(&pgm_videoram) /* IGS023 VIDEO CHIP */
+//  AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(pgm_bg_videoram_w) AM_BASE_MEMBER(pgm_state, bg_videoram) /* Backgrounds */
+//  AM_RANGE(0x904000, 0x905fff) AM_RAM_WRITE(pgm_tx_videoram_w) AM_BASE_MEMBER(pgm_state, tx_videoram) /* Text Layer */
+//  AM_RANGE(0x907000, 0x9077ff) AM_RAM AM_BASE_MEMBER(pgm_state, rowscrollram)
+	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_RAM_WRITE(pgm_videoram_w) AM_BASE_MEMBER(pgm_state, videoram) /* IGS023 VIDEO CHIP */
 	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE(&pgm_videoregs) /* Video Regs inc. Zoom Table */
+	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE_MEMBER(pgm_state, videoregs) /* Video Regs inc. Zoom Table */
 
 	AM_RANGE(0xc00002, 0xc00003) AM_READWRITE(soundlatch_word_r, m68k_l1_w)
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(soundlatch2_word_r, soundlatch2_word_w)
@@ -823,11 +856,11 @@ static ADDRESS_MAP_START( kovsh_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x500000, 0x500005) AM_READWRITE(kovsh_68k_protlatch_r, kovsh_68k_protlatch_w) /* ARM7 Latch */
 ADDRESS_MAP_END
 
-static UINT32 kovsh_counter;
 
 static READ32_HANDLER( kovsh_arm7_unk_r )
 {
-	return kovsh_counter++;
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	return state->kovsh_counter++;
 }
 
 static READ32_HANDLER( kovsh_exrom_r )
@@ -839,46 +872,49 @@ static ADDRESS_MAP_START( kovsh_arm7_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 	AM_RANGE(0x08100000, 0x083fffff) AM_READ(kovsh_exrom_r) // unpopulated, returns 0 to keep checksum happy
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM // internal ram for asic
-	AM_RANGE(0x40000000, 0x40000003) AM_READ(kovsh_arm7_protlatch_r) AM_WRITE(kovsh_arm7_protlatch_w)
+	AM_RANGE(0x40000000, 0x40000003) AM_READWRITE(kovsh_arm7_protlatch_r, kovsh_arm7_protlatch_w)
 	AM_RANGE(0x40000008, 0x4000000b) AM_WRITENOP // ?
 	AM_RANGE(0x4000000c, 0x4000000f) AM_READ(kovsh_arm7_unk_r)
-	AM_RANGE(0x50800000, 0x5080003f) AM_READWRITE(arm7_shareram_r, arm7_shareram_w) AM_BASE(&arm7_shareram)
+	AM_RANGE(0x50800000, 0x5080003f) AM_READWRITE(arm7_shareram_r, arm7_shareram_w) AM_BASE_MEMBER(pgm_state, arm7_shareram)
 	AM_RANGE(0x50000000, 0x500003ff) AM_RAM // uploads xor table to decrypt 68k rom here
 ADDRESS_MAP_END
 
 
 //5585G
-static unsigned char svg_ram_sel;
 
 static WRITE32_HANDLER( svg_arm7_ram_sel_w )
 {
-	svg_ram_sel=data&1;
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	state->svg_ram_sel = data & 1;
 }
 
 static READ32_HANDLER( svg_arm7_shareram_r )
 {
-	unsigned char ram_sel=svg_ram_sel&1;
-
-	return svg_shareram[ram_sel][offset];
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	return state->svg_shareram[state->svg_ram_sel & 1][offset];
 }
 
 static WRITE32_HANDLER( svg_arm7_shareram_w )
 {
-	unsigned char ram_sel=svg_ram_sel&1;
-	COMBINE_DATA(&svg_shareram[ram_sel][offset]);
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->svg_shareram[state->svg_ram_sel & 1][offset]);
 }
 
 static READ16_HANDLER( svg_m68k_ram_r )
 {
-	unsigned char ram_sel=(svg_ram_sel&1)^1;
-	UINT16 *share16 = (UINT16 *)(svg_shareram[ram_sel]);
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	int ram_sel = (state->svg_ram_sel & 1) ^ 1;
+	UINT16 *share16 = (UINT16 *)(state->svg_shareram[ram_sel & 1]);
+
 	return share16[BYTE_XOR_LE(offset)];
 }
 
 static WRITE16_HANDLER( svg_m68k_ram_w )
 {
-	unsigned char ram_sel=(svg_ram_sel&1)^1;
-	UINT16 *share16 = (UINT16 *)(svg_shareram[ram_sel]);
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	int ram_sel = (state->svg_ram_sel & 1) ^ 1;
+	UINT16 *share16 = (UINT16 *)(state->svg_shareram[ram_sel & 1]);
+
 	COMBINE_DATA(&share16[BYTE_XOR_LE(offset)]);
 }
 
@@ -889,15 +925,18 @@ static READ16_HANDLER( svg_68k_nmi_r )
 
 static WRITE16_HANDLER( svg_68k_nmi_w )
 {
-	generic_pulse_irq_line(cputag_get_cpu(space->machine, "prot"), ARM7_FIRQ_LINE);
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	generic_pulse_irq_line(state->prot, ARM7_FIRQ_LINE);
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(200));
-	cpu_spinuntil_time(space->cpu, cputag_clocks_to_attotime(space->machine, "prot", 200)); // give the arm time to respond (just boosting the interleave doesn't help)
+	cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(state->prot, 200)); // give the arm time to respond (just boosting the interleave doesn't help)
 }
 
 static WRITE16_HANDLER( svg_latch_68k_w )
 {
-	if (PGMARM7LOGERROR) logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu) );
-	COMBINE_DATA(&kov2_latchdata_68k_w);
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	if (PGMARM7LOGERROR) 
+		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu));
+	COMBINE_DATA(&state->kov2_latchdata_68k_w);
 }
 
 static ADDRESS_MAP_START( svg_68k_mem, ADDRESS_SPACE_PROGRAM, 16)
@@ -908,12 +947,12 @@ static ADDRESS_MAP_START( svg_68k_mem, ADDRESS_SPACE_PROGRAM, 16)
 
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) /* Main Ram */
 
-//  AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(pgm_bg_videoram_w) AM_BASE(&pgm_bg_videoram) /* Backgrounds */
-//  AM_RANGE(0x904000, 0x905fff) AM_RAM_WRITE(pgm_tx_videoram_w) AM_BASE(&pgm_tx_videoram) /* Text Layer */
-//  AM_RANGE(0x907000, 0x9077ff) AM_RAM AM_BASE(&pgm_rowscrollram)
-	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_RAM_WRITE(pgm_videoram_w) AM_BASE(&pgm_videoram) /* IGS023 VIDEO CHIP */
+//  AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(pgm_bg_videoram_w) AM_BASE_MEMBER(pgm_state, bg_videoram) /* Backgrounds */
+//  AM_RANGE(0x904000, 0x905fff) AM_RAM_WRITE(pgm_tx_videoram_w) AM_BASE_MEMBER(pgm_state, tx_videoram) /* Text Layer */
+//  AM_RANGE(0x907000, 0x9077ff) AM_RAM AM_BASE_MEMBER(pgm_state, rowscrollram)
+	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_RAM_WRITE(pgm_videoram_w) AM_BASE_MEMBER(pgm_state, videoram) /* IGS023 VIDEO CHIP */
 	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE(&pgm_videoregs) /* Video Regs inc. Zoom Table */
+	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE_MEMBER(pgm_state, videoregs) /* Video Regs inc. Zoom Table */
 
 	AM_RANGE(0xc00002, 0xc00003) AM_READWRITE(soundlatch_word_r, m68k_l1_w)
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(soundlatch2_word_r, soundlatch2_word_w)
@@ -1265,18 +1304,44 @@ GFXDECODE_END
    is the source? maybe the protection device? */
 static INTERRUPT_GEN( drgw_interrupt )
 {
-	if( cpu_getiloops(device) == 0 )
+	if (cpu_getiloops(device) == 0)
 		cpu_set_input_line(device, 6, HOLD_LINE);
 	else
 		cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
-static MACHINE_RESET ( pgm )
+static MACHINE_START( pgm )
 {
+	pgm_state *state = (pgm_state *)machine->driver_data;
+
+	mame_get_base_datetime(machine, &state->systime);
+
+	state->soundcpu = devtag_get_device(machine, "soundcpu");
+	state->prot = devtag_get_device(machine, "prot");
+	state->ics = devtag_get_device(machine, "ics");
+
+	state_save_register_global(machine, state->cal_val);
+	state_save_register_global(machine, state->cal_mask);
+	state_save_register_global(machine, state->cal_com);
+	state_save_register_global(machine, state->cal_cnt);
+}
+
+static MACHINE_RESET( pgm )
+{
+	pgm_state *state = (pgm_state *)machine->driver_data;
+
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
+
+	state->cal_val = 0;
+	state->cal_mask = 0;
+	state->cal_com = 0;
+	state->cal_cnt = 0;
 }
 
 static MACHINE_DRIVER_START( pgm )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(pgm_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 20000000) /* 20 mhz! verified on real board */
@@ -1287,10 +1352,9 @@ static MACHINE_DRIVER_START( pgm )
 	MDRV_CPU_PROGRAM_MAP(z80_mem)
 	MDRV_CPU_IO_MAP(z80_io)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ics", ICS2115, 0)
-	MDRV_SOUND_CONFIG(pgm_ics2115_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
+	MDRV_MACHINE_START( pgm )
+	MDRV_MACHINE_RESET( pgm )
+	MDRV_NVRAM_HANDLER( pgm )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1302,12 +1366,16 @@ static MACHINE_DRIVER_START( pgm )
 
 	MDRV_GFXDECODE(pgm)
 	MDRV_PALETTE_LENGTH(0x1200/2)
-	MDRV_MACHINE_RESET ( pgm )
-	MDRV_NVRAM_HANDLER ( pgm )
 
 	MDRV_VIDEO_START(pgm)
 	MDRV_VIDEO_EOF(pgm)
 	MDRV_VIDEO_UPDATE(pgm)
+
+	/*sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("ics", ICS2115, 0)
+	MDRV_SOUND_CONFIG(pgm_ics2115_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( drgw2 )
@@ -1387,700 +1455,6 @@ static MACHINE_DRIVER_START( cavepgm )
 MACHINE_DRIVER_END
 #endif
 
-
-/*** Init Stuff **************************************************************/
-
-/* This function expands the 32x32 5-bit data into a format which is easier to
-   decode in MAME */
-
-static void expand_32x32x5bpp(running_machine *machine)
-{
-	UINT8 *src    = memory_region       ( machine, "gfx1" );
-	UINT8 *dst    = memory_region       ( machine, "gfx2" );
-	size_t  srcsize = memory_region_length( machine, "gfx1" );
-	int cnt, pix;
-
-	for (cnt = 0; cnt < srcsize/5 ; cnt ++)
-	{
-		pix =  ((src[0+5*cnt] >> 0)& 0x1f );							  dst[0+8*cnt]=pix;
-		pix =  ((src[0+5*cnt] >> 5)& 0x07) | ((src[1+5*cnt] << 3) & 0x18);dst[1+8*cnt]=pix;
-		pix =  ((src[1+5*cnt] >> 2)& 0x1f );		 					  dst[2+8*cnt]=pix;
-		pix =  ((src[1+5*cnt] >> 7)& 0x01) | ((src[2+5*cnt] << 1) & 0x1e);dst[3+8*cnt]=pix;
-		pix =  ((src[2+5*cnt] >> 4)& 0x0f) | ((src[3+5*cnt] << 4) & 0x10);dst[4+8*cnt]=pix;
-		pix =  ((src[3+5*cnt] >> 1)& 0x1f );							  dst[5+8*cnt]=pix;
-		pix =  ((src[3+5*cnt] >> 6)& 0x03) | ((src[4+5*cnt] << 2) & 0x1c);dst[6+8*cnt]=pix;
-		pix =  ((src[4+5*cnt] >> 3)& 0x1f );							  dst[7+8*cnt]=pix;
-	}
-}
-
-/* This function expands the sprite colour data (in the A Roms) from 3 pixels
-   in each word to a byte per pixel making it easier to use */
-
-UINT8 *pgm_sprite_a_region;
-size_t	pgm_sprite_a_region_allocate;
-
-static void expand_colourdata(running_machine *machine)
-{
-	UINT8 *src    = memory_region       ( machine, "gfx3" );
-	size_t  srcsize = memory_region_length( machine, "gfx3" );
-	int cnt;
-	size_t	needed = srcsize / 2 * 3;
-
-	/* work out how much ram we need to allocate to expand the sprites into
-       and be able to mask the offset */
-	pgm_sprite_a_region_allocate = 1;
-	while (pgm_sprite_a_region_allocate < needed)
-		pgm_sprite_a_region_allocate = pgm_sprite_a_region_allocate <<1;
-
-	pgm_sprite_a_region = auto_alloc_array(machine, UINT8, pgm_sprite_a_region_allocate);
-
-
-	for (cnt = 0 ; cnt < srcsize/2 ; cnt++)
-	{
-		UINT16 colpack;
-
-		colpack = ((src[cnt*2]) | (src[cnt*2+1] << 8));
-		pgm_sprite_a_region[cnt*3+0] = (colpack >> 0 ) & 0x1f;
-		pgm_sprite_a_region[cnt*3+1] = (colpack >> 5 ) & 0x1f;
-		pgm_sprite_a_region[cnt*3+2] = (colpack >> 10) & 0x1f;
-	}
-}
-
-static void pgm_basic_init(running_machine *machine)
-{
-	UINT8 *ROM = memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, "bank1",&ROM[0x100000]);
-
-	expand_32x32x5bpp(machine);
-	expand_colourdata(machine);
-
-	pgm_bg_videoram = &pgm_videoram[0];
-	pgm_tx_videoram = &pgm_videoram[0x4000/2];
-	pgm_rowscrollram = &pgm_videoram[0x7000/2];
-	kovsh_counter = 1;
-}
-
-static DRIVER_INIT( pgm )
-{
-	pgm_basic_init(machine);
-}
-
-/* Oriental Legend INIT */
-
-static DRIVER_INIT( orlegend )
-{
-	pgm_basic_init(machine);
-
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xC0400e, 0xC0400f, 0, 0, pgm_asic3_r, pgm_asic3_w);
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xC04000, 0xC04001, 0, 0, pgm_asic3_reg_w);
-}
-
-static void drgwld2_common_init(running_machine *machine)
-{
-	pgm_basic_init(machine);
-	pgm_dw2_decrypt(machine);
-	/*
-    Info from Elsemi
-    Here is how to "bypass" the dw2 hang protection, it fixes the mode
-    select and after failing in the 2nd stage (probably there are other checks
-    out there).
-    */
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd80000, 0xd80003, 0, 0, dw2_d80000_r);
-}
-
-static DRIVER_INIT( drgw2 )
-{	/* incomplete? */
-	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
-	drgwld2_common_init(machine);
-	/* These ROM patches are not hacks, the protection device
-       overlays the normal ROM code, this has been confirmed on a real PCB
-       although some addresses may be missing */
-	mem16[0x131098/2]=0x4e93;
-	mem16[0x13113e/2]=0x4e93;
-	mem16[0x1311ce/2]=0x4e93;
-}
-
-static DRIVER_INIT( drgw2c )
-{
-	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
-	drgwld2_common_init(machine);
-	/* These ROM patches are not hacks, the protection device
-       overlays the normal ROM code, this has been confirmed on a real PCB
-       although some addresses may be missing */
-	mem16[0x1303bc/2]=0x4e93;
-	mem16[0x130462/2]=0x4e93;
-	mem16[0x1304F2/2]=0x4e93;
-}
-
-static DRIVER_INIT( drgw2j )
-{
-	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
-	drgwld2_common_init(machine);
-	/* These ROM patches are not hacks, the protection device
-       overlays the normal ROM code, this has been confirmed on a real PCB
-       although some addresses may be missing */
-	mem16[0x1302C0/2]=0x4e93;
-	mem16[0x130366/2]=0x4e93;
-	mem16[0x1303F6/2]=0x4e93;
-}
-
-static DRIVER_INIT( kov )
-{
-	pgm_basic_init(machine);
- 	pgm_kov_decrypt(machine);
-}
-
-static DRIVER_INIT( pstar )
-{
-	pgm_basic_init(machine);
-	pgm_pstar_decrypt(machine);
-}
-
-static DRIVER_INIT( djlzz )
-{
-	pgm_basic_init(machine);
-	pgm_djlzz_decrypt(machine);
-}
-
-static DRIVER_INIT( kovsh )
-{
-	pgm_basic_init(machine);
-	pgm_kovsh_decrypt(machine);
-}
-
-static DRIVER_INIT( kovshp )
-{
-	pgm_basic_init(machine);
-	pgm_kovshp_decrypt(machine);
-}
-
-static DRIVER_INIT( oldsplus )
-{
-	pgm_basic_init(machine);
-	pgm_oldsplus_decrypt(machine);
-}
-
-static DRIVER_INIT( kov2 )
-{
-	pgm_basic_init(machine);
-	pgm_kov2_decrypt(machine);
-}
-
-static DRIVER_INIT( kov2p )
-{
-	pgm_basic_init(machine);
-	pgm_kov2p_decrypt(machine);
-}
-
-static DRIVER_INIT( martmast )
-{
-	pgm_basic_init(machine);
-	pgm_mm_decrypt(machine);
-}
-
-static DRIVER_INIT( ddp2 )
-{
-	pgm_basic_init(machine);
-	pgm_ddp2_decrypt(machine);
-}
-
-static void svg_basic_init(running_machine *machine)
-{
-	pgm_basic_init(machine);
-	svg_shareram[0]=auto_alloc_array(machine, UINT32, 0x10000/4);
-	svg_shareram[1]=auto_alloc_array(machine, UINT32, 0x10000/4);
-	svg_ram_sel=0;
-}
-
-static DRIVER_INIT( theglad )
-{
-	svg_basic_init(machine);
-	pgm_theglad_decrypt(machine);
-}
-
-static DRIVER_INIT( svg )
-{
-	svg_basic_init(machine);
-	pgm_svg_decrypt(machine);
-}
-
-static DRIVER_INIT( killbldp )
-{
-	svg_basic_init(machine);
-	pgm_killbldp_decrypt(machine);
-}
-
-static DRIVER_INIT( dmnfrnt )
-{
-	svg_basic_init(machine);
-	pgm_dfront_decrypt(machine);
-}
-
-static DRIVER_INIT( dw3 )
-{
-	pgm_basic_init(machine);
-
-//  memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xda0000, 0xdaffff, 0, 0, dw3_prot_r, dw3_prot_w);
-
- 	pgm_dw3_decrypt(machine);
-}
-
-/* Killing Blade uses some kind of DMA protection device which can copy data from a data rom.  The
-   MCU appears to have an internal ROM as if you remove the data ROM then the shared ram is filled
-   with a constant value.
-
-   The device can perform various decryption operations on the data it copies.  for now we're just
-   using a dump of the shared RAM instead.  This will be improved later.
-*/
-
-static int kb_cmd;
-static int reg;
-static int ptr=0;
-
-static WRITE16_HANDLER( killbld_prot_w )
-{
-//  mame_printf_debug("killbrd prot r\n");
-//  return 0;
-	offset&=0xf;
-
-	if(offset==0)
-		kb_cmd=data;
-	else //offset==2
-	{
-		logerror("%06X: ASIC25 W CMD %X  VAL %X",cpu_get_pc(space->cpu),kb_cmd,data);
-		if(kb_cmd==0)
-			reg=data;
-		else if(kb_cmd==2)
-		{
-
-			if(data==1)	//Execute cmd
-			{
-				UINT16 cmd=killbld_sharedprotram[0x200/2];
-				//mame_printf_debug("command %04x\n",cmd);
-				if(cmd==0x6d)	//Store values to asic ram
-				{
-					UINT32 p1=(killbld_sharedprotram[0x298/2] << 16) | killbld_sharedprotram[0x29a/2];
-					UINT32 p2=(killbld_sharedprotram[0x29c/2] << 16) | killbld_sharedprotram[0x29e/2];
-					static UINT32 Regs[0x10];
-					if((p2&0xFFFF)==0x9)	//Set value
-					{
-						int reg=(p2>>16)&0xFFFF;
-						if(reg&0x200)
-							Regs[reg&0xFF]=p1;
-					}
-					if((p2&0xFFFF)==0x6)	//Add value
-					{
-						int src1=(p1>>16)&0xFF;
-						int src2=(p1>>0)&0xFF;
-						int dst=(p2>>16)&0xFF;
-						Regs[dst]=Regs[src2]-Regs[src1];
-					}
-					if((p2&0xFFFF)==0x1)	//Add Imm?
-					{
-						int reg=(p2>>16)&0xFF;
-						int imm=(p1>>0)&0xFFFF;
-						Regs[reg]+=imm;
-					}
-					if((p2&0xFFFF)==0xa)	//Get value
-					{
-						int reg=(p1>>16)&0xFF;
-						killbld_sharedprotram[0x29c/2] = (Regs[reg]>>16)&0xffff;
-						killbld_sharedprotram[0x29e/2] = Regs[reg]&0xffff;
-					}
-				}
-				if(cmd==0x4f)	//memcpy with encryption / scrambling
-				{
-					UINT16 src=killbld_sharedprotram[0x290/2]>>1; // ?
-					UINT32 dst=killbld_sharedprotram[0x292/2];
-					UINT16 size=killbld_sharedprotram[0x294/2];
-					UINT16 mode=killbld_sharedprotram[0x296/2];
-
-
-				//  int a=1;
-				//  if(src==0x580)
-				//      int a=1;
-					/*
-                    P_SRC =0x300290 (offset from prot rom base)
-                    P_DST =0x300292 (words from 0x300000)
-                    P_SIZE=0x300294 (words)
-                    P_MODE=0x300296
-
-                    Mode 5 direct
-                    Mode 6 swap nibbles and bytes
-
-                    1,2,3 unk.
-                    */
-
-					//mame_printf_debug("src %04x dst %04x size %04x mode %04x\n",src,dst,size,mode);
-
-					//if (src&1) mame_printf_debug("odd offset\n");
-
-					mode &=0xf;  // what are the other bits?
-
-					if (mode == 1 || mode == 2 || mode == 3)
-					{
-						/* for now, cheat -- the scramble isn't understood, it might
-                           be state based */
-						int x;
-						UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
-						for (x=0;x<size;x++)
-						{
-							UINT16 dat;
-
-							dat = RAMDUMP[dst+x];
-							killbld_sharedprotram[dst+x] = dat;
-						}
-					}
-					else if (mode == 5)
-					{
-						/* mode 5 seems to be a straight copy */
-						int x;
-						UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
-						UINT16 *PROTROM = (UINT16*)memory_region(space->machine, "user1");
-						for (x=0;x<size;x++)
-						{
-							UINT16 dat;
-							dat = PROTROM[src+x];
-
-							if (RAMDUMP[dst+x] != dat)
-								mame_printf_debug("Mismatch! %04x %04x\n", RAMDUMP[dst+x], dat);
-
-							killbld_sharedprotram[dst+x] = dat;
-						}
-					}
-					else if (mode == 6)
-					{
-						/* mode 6 seems to swap bytes and nibbles */
-						int x;
-						UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
-						UINT16 *PROTROM = (UINT16*)memory_region(space->machine, "user1");
-						for (x=0;x<size;x++)
-						{
-							UINT16 dat;
-							dat = PROTROM[src+x];
-
-							dat = ((dat & 0xf000) >> 12)|
-								  ((dat & 0x0f00) >> 4)|
-								  ((dat & 0x00f0) << 4)|
-								  ((dat & 0x000f) << 12);
-
-
-							if (RAMDUMP[dst+x] != dat)
-								mame_printf_debug("Mismatch! Mode 6 %04x %04x\n", RAMDUMP[dst+x], dat);
-
-							killbld_sharedprotram[dst+x] = dat;
-						}
-					}
-					else
-					{
-						mame_printf_debug("unknown copy mode!\n");
-					}
-					/* hack.. it jumps here but there isn't valid code even when we do
-                       use what was in ram.. probably some more protection as the game
-                       still doesn't behave 100% correctly :-/
-
-                       the code is copied in 'mode 3' but even the code put here on
-                       the real ram dump is corrupt??? something _very_ strange is
-                       going on.. maybe more rom overlays, or ram overlays too??
-
-                    */
-					killbld_sharedprotram[0x2600/2]=0x4e75;
-
-
-				}
-				reg++;
-			}
-		}
-		else if(kb_cmd==4)
-			ptr=data;
-		else if(kb_cmd==0x20)
-			ptr++;
-	}
-}
-
-static READ16_HANDLER( killbld_prot_r )
-{
-//  mame_printf_debug("killbld prot w\n");
-	UINT16 res ;
-
-	offset&=0xf;
-	res=0;
-
-	if(offset==1)
-	{
-		if(kb_cmd==1)
-		{
-			res=reg&0x7f;
-		}
-		else if(kb_cmd==5)
-		{
-			UINT32 protvalue;
-			protvalue = 0x89911400|input_port_read(space->machine, "Region");
-			res=(protvalue>>(8*(ptr-1)))&0xff;
-		}
-	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X",cpu_get_pc(space->cpu),kb_cmd,res);
-	return res;
-}
-
-static MACHINE_RESET( killbld )
-{
-	int i;
-
-	MACHINE_RESET_CALL(pgm);
-
-	/* fill the protection ram with a5 */
-	for (i = 0;i < 0x4000/2;i++)
-		killbld_sharedprotram[i] = 0xa5a5;
-}
-
-
-static DRIVER_INIT( killbld )
-{
-	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
-
-	pgm_basic_init(machine);
- 	pgm_killbld_decrypt(machine);
-
-	/* this isn't a hack.. doing a rom dump while the game is running shows the
-       rom space to look like this.. there may be more overlays / enables tho */
-
-	/* the game actually performs a CRC check of the rom during the 'Please Wait'
-       screen, the checksum expected is that of the patched rom.  if the checksum
-       fails the please wait screen doesn't last as long and the region supplied
-       by the protection device is ignored and the attract sequence appears out
-       of order */
-	mem16[0x108a2c/2]=0xB6AA;
-	mem16[0x108a30/2]=0x6610;
-	mem16[0x108a32/2]=0x13c2;
-	mem16[0x108a34/2]=0x0080;
-	mem16[0x108a36/2]=0x9c76;
-	mem16[0x108a38/2]=0x23c3;
-	mem16[0x108a3a/2]=0x0080;
-	mem16[0x108a3c/2]=0x9c78;
-	mem16[0x108a3e/2]=0x1002;
-	mem16[0x108a40/2]=0x6054;
-	mem16[0x108a42/2]=0x5202;
-	mem16[0x108a44/2]=0x0c02;
-
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd40000, 0xd40003, 0, 0, killbld_prot_r, killbld_prot_w);
-}
-
-static DRIVER_INIT( puzzli2 )
-{
-	/* this protection emulation is wrong
-     it uses an arm with no external rom
-     an acts in a similar way to kov etc. */
-
-	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
-
-	pgm_basic_init(machine);
-
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x500000, 0x500003, 0, 0, ASIC28_r16, ASIC28_w16);
-
-	/* 0x4f0000 - ? is actually ram shared with the protection device,
-      the protection device provides the region code */
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
-
- 	pgm_puzzli2_decrypt(machine);
-
-	/* protection related? */
-	mem16[0x1548ec/2]=0x4e71;
-	mem16[0x1548fc/2]=0x4e71;
-	mem16[0x1549FA/2]=0x4e71;
-	mem16[0x154A0A/2]=0x4e71;
-	mem16[0x15496A/2]=0x4e71;
-	mem16[0x14cee0/2]=0x4e71;
-	mem16[0x1268c0/2]=0x4e71;
-	mem16[0x1268c2/2]=0x4e71;
-	mem16[0x1268c4/2]=0x4e71;
-	mem16[0x154948/2]=0x4e71;
-	mem16[0x13877a/2]=0x662c;
-
-	/* patch irq4 vector (irq4 should be disabled on this game? how?) */
-//  mem16[0x100070/2]=0x0012;
-//  mem16[0x100072/2]=0x5D78;
-}
-
-static UINT16 olds_bs,olds_cmd3;
-
-static UINT32 olds_prot_addr( UINT16 addr)
-{
-	UINT32 mode = addr&0xff;
-	UINT32 offset = addr >> 8;
-	UINT32 realaddr;
-
-	switch(mode)
-	{
-		case 0:
-		case 5:
-		case 0xA:
-			realaddr= 0x402A00+(offset<<2);
-			break;
-
-		case 2:
-		case 8:
-			realaddr= 0x402E00+(offset<<2);
-			break;
-
-		case 1:
-			realaddr= 0x40307E;
-			break;
-
-		case 3:
-			realaddr= 0x403090;
-			break;
-
-		case 4:
-			realaddr= 0x40309A;
-			break;
-
-		case 6:
-			realaddr= 0x4030A4;
-			break;
-
-		case 7:
-			realaddr= 0x403000;
-			break;
-
-		case 9:
-			realaddr= 0x40306E;
-			break;
-
-		default:
-			realaddr= 0;
-	}
-	return realaddr;
-}
-
-static UINT32 olds_read_reg( UINT16 addr)
-{
-	UINT32 protaddr = (olds_prot_addr(addr)-0x400000)/2;
-	return olds_sharedprotram[protaddr]<<16|olds_sharedprotram[protaddr+1];
-}
-
-static void olds_write_reg( UINT16 addr, UINT32 val)
-{
-	olds_sharedprotram[(olds_prot_addr(addr)-0x400000)/2]=val>>16;
-	olds_sharedprotram[(olds_prot_addr(addr)-0x400000)/2+1]=val&0xffff;
-}
-
-static MACHINE_RESET( olds )
-{
-	UINT16 *mem16 = (UINT16 *)memory_region(machine, "user2");
-	int i;
-
-	MACHINE_RESET_CALL(pgm);
-
-	/* populate shared protection ram with data read from pcb .. */
-
-	for(i=0;i<0x4000/2;i++)
-	{
-		olds_sharedprotram[i] = mem16[i];
-	}
-
-	//ROM:004008B4                 .word 0xFBA5
-	for(i=0;i<0x4000/2;i++)
-	{
-		if(olds_sharedprotram[i]==(0xffff-i))
-			olds_sharedprotram[i]=0x4e75;
-	}
-}
-
-static READ16_HANDLER( olds_r16 )
-{
-	UINT16 res ;
-	res = 0;
-
-	if(offset == 1)
-	{
-		if(kb_cmd == 1)
-			res = reg&0x7f;
-		if(kb_cmd == 2)
-			res = olds_bs|0x80;
-		if(kb_cmd == 3)
-			res = olds_cmd3;
-		else if(kb_cmd == 5)
-		{
-			UINT32 protvalue = 0x900000 | input_port_read(space->machine, "Region"); // region from protection device.
-			res = (protvalue>>(8 * (ptr-1))) & 0xff; // includes region 1 = taiwan , 2 = china, 3 = japan (title = orlegend special), 4 = korea, 5 = hongkong, 6 = world
-
-		}
-	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X\n",cpu_get_pc(space->cpu),kb_cmd,res);
-	return res;
-}
-
-static WRITE16_HANDLER( olds_w16 )
-{
-	if(offset==0)
-		kb_cmd=data;
-	else //offset==2
-	{
-		logerror("%06X: ASIC25 W CMD %X  VAL %X\n",cpu_get_pc(space->cpu),kb_cmd,data);
-		if(kb_cmd==0)
-			reg=data;
-		else if(kb_cmd==2)	//a bitswap=
-		{
-			int reg=0;
-			if(data&0x01)
-				reg|=0x40;
-			if(data&0x02)
-				reg|=0x80;
-			if(data&0x04)
-				reg|=0x20;
-			if(data&0x08)
-				reg|=0x10;
-			olds_bs=reg;
-		}
-		else if(kb_cmd==3)
-		{
-			UINT16 cmd=olds_sharedprotram[0x3026/2];
-			switch(cmd)
-			{
-				case 0x11:
-				case 0x12:
-						break;
-				case 0x64:
-					{
-						UINT16 cmd0 = olds_sharedprotram[0x3082/2];
-						UINT16 val0 = olds_sharedprotram[0x3050/2];	//CMD_FORMAT
-						{
-							if((cmd0&0xff)==0x2)
-								olds_write_reg(val0,olds_read_reg(val0)+0x10000);
-						}
-						break;
-					}
-
-				default:
-						break;
-			}
-			olds_cmd3=((data>>4)+1)&0x3;
-		}
-		else if(kb_cmd==4)
-			ptr=data;
-		else if(kb_cmd==0x20)
-		  ptr++;
-	}
-}
-
-static READ16_HANDLER( olds_prot_swap_r16 )
-{
-
-	if(cpu_get_pc(space->cpu)<0x100000)		//bios
-		return pgm_mainram[0x178F4/2];
-	else						//game
-		return pgm_mainram[0x178D8/2];
-
-}
-
-static DRIVER_INIT( olds )
-{
-	pgm_basic_init(machine);
-
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xdcb400, 0xdcb403, 0, 0, olds_r16, olds_w16);
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8178f4, 0x8178f5, 0, 0, olds_prot_swap_r16);
-}
 
 /*** Rom Loading *************************************************************/
 
@@ -4172,53 +3546,877 @@ ROM_END
 
 
 
+/*** Init Stuff **************************************************************/
+
+/* This function expands the 32x32 5-bit data into a format which is easier to
+   decode in MAME */
+
+static void expand_32x32x5bpp(running_machine *machine)
+{
+	UINT8 *src = memory_region( machine, "gfx1" );
+	UINT8 *dst = memory_region( machine, "gfx2" );
+	size_t  srcsize = memory_region_length( machine, "gfx1" );
+	int cnt, pix;
+
+	for (cnt = 0; cnt < srcsize/5 ; cnt ++)
+	{
+		pix = ((src[0 + 5 * cnt] >> 0)& 0x1f );					
+			dst[0 + 8 * cnt]=pix;
+		pix = ((src[0 + 5 * cnt] >> 5)& 0x07) | ((src[1 + 5 * cnt] << 3) & 0x18);
+			dst[1 + 8 * cnt]=pix;
+		pix = ((src[1 + 5 * cnt] >> 2)& 0x1f );		 		
+			dst[2 + 8 * cnt]=pix;
+		pix = ((src[1 + 5 * cnt] >> 7)& 0x01) | ((src[2 + 5 * cnt] << 1) & 0x1e);
+			dst[3 + 8 * cnt]=pix;
+		pix = ((src[2 + 5 * cnt] >> 4)& 0x0f) | ((src[3 + 5 * cnt] << 4) & 0x10);
+			dst[4 + 8 * cnt]=pix;
+		pix = ((src[3 + 5 * cnt] >> 1)& 0x1f );							  
+			dst[5 + 8 * cnt]=pix;
+		pix = ((src[3 + 5 * cnt] >> 6)& 0x03) | ((src[4 + 5 * cnt] << 2) & 0x1c);
+			dst[6 + 8 * cnt]=pix;
+		pix = ((src[4 + 5 * cnt] >> 3)& 0x1f );							  
+			dst[7 + 8 * cnt]=pix;
+	}
+}
+
+/* This function expands the sprite colour data (in the A Roms) from 3 pixels
+   in each word to a byte per pixel making it easier to use */
+
+static void expand_colourdata( running_machine *machine )
+{
+	pgm_state *state = (pgm_state *)machine->driver_data;
+	UINT8 *src = memory_region( machine, "gfx3" );
+	size_t srcsize = memory_region_length( machine, "gfx3" );
+	int cnt;
+	size_t needed = srcsize / 2 * 3;
+
+	/* work out how much ram we need to allocate to expand the sprites into
+       and be able to mask the offset */
+	state->sprite_a_region_size = 1;
+	while (state->sprite_a_region_size < needed)
+		state->sprite_a_region_size <<= 1;
+
+	state->sprite_a_region = auto_alloc_array(machine, UINT8, state->sprite_a_region_size);
+
+	for (cnt = 0 ; cnt < srcsize / 2 ; cnt++)
+	{
+		UINT16 colpack;
+
+		colpack = ((src[cnt * 2]) | (src[cnt * 2 + 1] << 8));
+		state->sprite_a_region[cnt * 3 + 0] = (colpack >> 0 ) & 0x1f;
+		state->sprite_a_region[cnt * 3 + 1] = (colpack >> 5 ) & 0x1f;
+		state->sprite_a_region[cnt * 3 + 2] = (colpack >> 10) & 0x1f;
+	}
+}
+
+static void pgm_basic_init( running_machine *machine )
+{
+	pgm_state *state = (pgm_state *)machine->driver_data;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	memory_set_bankptr(machine, "bank1", &ROM[0x100000]);
+
+	expand_32x32x5bpp(machine);
+	expand_colourdata(machine);
+
+	state->bg_videoram = &state->videoram[0];
+	state->tx_videoram = &state->videoram[0x4000/2];
+	state->rowscrollram = &state->videoram[0x7000/2];
+}
+
+static DRIVER_INIT( pgm )
+{
+	pgm_basic_init(machine);
+}
+
+/* Oriental Legend INIT */
+
+static DRIVER_INIT( orlegend )
+{
+	pgm_state *state = (pgm_state *)machine->driver_data;
+	pgm_basic_init(machine);
+
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xC0400e, 0xC0400f, 0, 0, pgm_asic3_r, pgm_asic3_w);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xC04000, 0xC04001, 0, 0, pgm_asic3_reg_w);
+
+	state->asic3_reg = 0;
+	state->asic3_latch[0] = 0;
+	state->asic3_latch[1] = 0;
+	state->asic3_latch[2] = 0;
+	state->asic3_x = 0;
+	state->asic3_y = 0;
+	state->asic3_z = 0;
+	state->asic3_h1 = 0;
+	state->asic3_h2 = 0;
+	state->asic3_hold = 0;
+
+	state_save_register_global(machine, state->asic3_reg);
+	state_save_register_global_array(machine, state->asic3_latch);
+	state_save_register_global(machine, state->asic3_x);
+	state_save_register_global(machine, state->asic3_y);
+	state_save_register_global(machine, state->asic3_z);
+	state_save_register_global(machine, state->asic3_h1);
+	state_save_register_global(machine, state->asic3_h2);
+	state_save_register_global(machine, state->asic3_hold);
+}
+
+static void drgwld2_common_init(running_machine *machine)
+{
+	pgm_basic_init(machine);
+	pgm_dw2_decrypt(machine);
+	/*
+    Info from Elsemi
+    Here is how to "bypass" the dw2 hang protection, it fixes the mode
+    select and after failing in the 2nd stage (probably there are other checks
+    out there).
+    */
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd80000, 0xd80003, 0, 0, dw2_d80000_r);
+}
+
+static DRIVER_INIT( drgw2 )
+{	/* incomplete? */
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
+	drgwld2_common_init(machine);
+	/* These ROM patches are not hacks, the protection device
+       overlays the normal ROM code, this has been confirmed on a real PCB
+       although some addresses may be missing */
+	mem16[0x131098 / 2] = 0x4e93;
+	mem16[0x13113e / 2] = 0x4e93;
+	mem16[0x1311ce / 2] = 0x4e93;
+}
+
+static DRIVER_INIT( drgw2c )
+{
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
+	drgwld2_common_init(machine);
+	/* These ROM patches are not hacks, the protection device
+       overlays the normal ROM code, this has been confirmed on a real PCB
+       although some addresses may be missing */
+	mem16[0x1303bc / 2] = 0x4e93;
+	mem16[0x130462 / 2] = 0x4e93;
+	mem16[0x1304f2 / 2] = 0x4e93;
+}
+
+static DRIVER_INIT( drgw2j )
+{
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
+	drgwld2_common_init(machine);
+	/* These ROM patches are not hacks, the protection device
+       overlays the normal ROM code, this has been confirmed on a real PCB
+       although some addresses may be missing */
+	mem16[0x1302c0 / 2] = 0x4e93;
+	mem16[0x130366 / 2] = 0x4e93;
+	mem16[0x1303f6 / 2] = 0x4e93;
+}
+
+static void kovsh_latch_init( running_machine *machine )
+{
+	pgm_state *state = (pgm_state *)machine->driver_data;
+
+	state->kovsh_highlatch_arm_w = 0;
+	state->kovsh_lowlatch_arm_w = 0;
+	state->kovsh_highlatch_68k_w = 0;
+	state->kovsh_lowlatch_68k_w = 0;
+	state->kovsh_counter = 1;
+
+	state_save_register_global(machine, state->kovsh_highlatch_arm_w);
+	state_save_register_global(machine, state->kovsh_lowlatch_arm_w);
+	state_save_register_global(machine, state->kovsh_highlatch_68k_w);
+	state_save_register_global(machine, state->kovsh_lowlatch_68k_w);
+	state_save_register_global(machine, state->kovsh_counter);
+}
+
+static DRIVER_INIT( kov )
+{
+	pgm_basic_init(machine);
+ 	pgm_kov_decrypt(machine);
+ 	kovsh_latch_init(machine);
+}
+
+static DRIVER_INIT( pstar )
+{
+	pgm_state *state = (pgm_state *)machine->driver_data;
+
+	pgm_basic_init(machine);
+	pgm_pstar_decrypt(machine);
+ 	kovsh_latch_init(machine);
+
+	state->pstars_key = 0;
+	state->pstars_int[0] = 0;
+	state->pstars_int[1] = 0;
+	state->pstars_val = 0;
+	state->pstar_e7 = 0;
+	state->pstar_b1 = 0;
+	state->pstar_ce = 0;
+	state->pstar_ram[0] = 0;
+	state->pstar_ram[1] = 0;
+	state->pstar_ram[2] = 0;
+	memset(state->pstars_regs, 0, 16);
+
+	state_save_register_global(machine, state->pstars_key);
+	state_save_register_global_array(machine, state->pstars_int);
+	state_save_register_global_array(machine, state->pstars_regs);
+	state_save_register_global(machine, state->pstars_val);
+	state_save_register_global(machine, state->pstar_e7);
+	state_save_register_global(machine, state->pstar_b1);
+	state_save_register_global(machine, state->pstar_ce);
+	state_save_register_global_array(machine, state->pstar_ram);
+}
+
+static DRIVER_INIT( djlzz )
+{
+	pgm_basic_init(machine);
+	pgm_djlzz_decrypt(machine);
+ 	kovsh_latch_init(machine);
+}
+
+static DRIVER_INIT( kovsh )
+{
+	pgm_basic_init(machine);
+	pgm_kovsh_decrypt(machine);
+ 	kovsh_latch_init(machine);
+}
+
+static DRIVER_INIT( kovshp )
+{
+	pgm_basic_init(machine);
+	pgm_kovshp_decrypt(machine);
+ 	kovsh_latch_init(machine);
+}
+
+static DRIVER_INIT( oldsplus )
+{
+	pgm_basic_init(machine);
+	pgm_oldsplus_decrypt(machine);
+ 	kovsh_latch_init(machine);
+}
+
+static void kov2_latch_init( running_machine *machine )
+{
+	pgm_state *state = (pgm_state *)machine->driver_data;
+
+	state->kov2_latchdata_68k_w = 0;
+	state->kov2_latchdata_arm_w = 0;
+
+	state_save_register_global(machine, state->kov2_latchdata_68k_w);
+	state_save_register_global(machine, state->kov2_latchdata_arm_w);
+}
+
+static DRIVER_INIT( kov2 )
+{
+	pgm_basic_init(machine);
+	pgm_kov2_decrypt(machine);
+ 	kov2_latch_init(machine);
+}
+
+static DRIVER_INIT( kov2p )
+{
+	pgm_basic_init(machine);
+	pgm_kov2p_decrypt(machine);
+ 	kov2_latch_init(machine);
+}
+
+static DRIVER_INIT( martmast )
+{
+	pgm_basic_init(machine);
+	pgm_mm_decrypt(machine);
+ 	kov2_latch_init(machine);
+}
+
+static DRIVER_INIT( ddp2 )
+{
+	pgm_basic_init(machine);
+	pgm_ddp2_decrypt(machine);
+ 	kov2_latch_init(machine);
+}
+
+static void svg_basic_init(running_machine *machine)
+{
+	pgm_state *state = (pgm_state *)machine->driver_data;
+
+	pgm_basic_init(machine);
+	state->svg_shareram[0] = auto_alloc_array(machine, UINT32, 0x10000 / 4);
+	state->svg_shareram[1] = auto_alloc_array(machine, UINT32, 0x10000 / 4);
+	state->svg_ram_sel = 0;
+
+	state_save_register_global_pointer(machine, state->svg_shareram[0], 0x10000 / 4);
+	state_save_register_global_pointer(machine, state->svg_shareram[1], 0x10000 / 4);
+	state_save_register_global(machine, state->svg_ram_sel);
+}
+
+static DRIVER_INIT( theglad )
+{
+	svg_basic_init(machine);
+	pgm_theglad_decrypt(machine);
+ 	kov2_latch_init(machine);
+}
+
+static DRIVER_INIT( svg )
+{
+	svg_basic_init(machine);
+	pgm_svg_decrypt(machine);
+ 	kov2_latch_init(machine);
+}
+
+static DRIVER_INIT( killbldp )
+{
+	svg_basic_init(machine);
+	pgm_killbldp_decrypt(machine);
+ 	kov2_latch_init(machine);
+}
+
+static DRIVER_INIT( dmnfrnt )
+{
+	svg_basic_init(machine);
+	pgm_dfront_decrypt(machine);
+ 	kov2_latch_init(machine);
+}
+
+static DRIVER_INIT( dw3 )
+{
+	pgm_basic_init(machine);
+
+//  memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xda0000, 0xdaffff, 0, 0, dw3_prot_r, dw3_prot_w);
+
+ 	pgm_dw3_decrypt(machine);
+}
+
+/* Killing Blade uses some kind of DMA protection device which can copy data from a data rom.  The
+   MCU appears to have an internal ROM as if you remove the data ROM then the shared ram is filled
+   with a constant value.
+
+   The device can perform various decryption operations on the data it copies.  for now we're just
+   using a dump of the shared RAM instead.  This will be improved later.
+*/
+
+
+static WRITE16_HANDLER( killbld_prot_w )
+{
+//  mame_printf_debug("killbrd prot r\n");
+//  return 0;
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	offset &= 0xf;
+
+	if (offset == 0)
+		state->kb_cmd = data;
+	else //offset==2
+	{
+		logerror("%06X: ASIC25 W CMD %X  VAL %X", cpu_get_pc(space->cpu), state->kb_cmd, data);
+		if (state->kb_cmd == 0)
+			state->kb_reg = data;
+		else if (state->kb_cmd == 2)
+		{
+			if (data == 1)	//Execute cmd
+			{
+				UINT16 cmd = state->sharedprotram[0x200/2];
+				//mame_printf_debug("command %04x\n", cmd);
+				if (cmd == 0x6d)	//Store values to asic ram
+				{
+					UINT32 p1 = (state->sharedprotram[0x298/2] << 16) | state->sharedprotram[0x29a/2];
+					UINT32 p2 = (state->sharedprotram[0x29c/2] << 16) | state->sharedprotram[0x29e/2];
+
+					if ((p2 & 0xffff) == 0x9)	//Set value
+					{
+						int reg = (p2 >> 16) & 0xffff;
+						if (reg & 0x200)
+							state->kb_regs[reg & 0xff] = p1;
+					}
+					if ((p2 & 0xffff) == 0x6)	//Add value
+					{
+						int src1 = (p1 >> 16) & 0xff;
+						int src2 = (p1 >> 0) & 0xff;
+						int dst = (p2 >> 16) & 0xff;
+						state->kb_regs[dst] = state->kb_regs[src2] - state->kb_regs[src1];
+					}
+					if ((p2 & 0xffff) == 0x1)	//Add Imm?
+					{
+						int reg = (p2 >> 16) & 0xff;
+						int imm = (p1 >> 0) & 0xffff;
+						state->kb_regs[reg] += imm;
+					}
+					if ((p2 & 0xffff) == 0xa)	//Get value
+					{
+						int reg = (p1 >> 16) & 0xFF;
+						state->sharedprotram[0x29c/2] = (state->kb_regs[reg] >> 16) & 0xffff;
+						state->sharedprotram[0x29e/2] = state->kb_regs[reg] & 0xffff;
+					}
+				}
+				if(cmd == 0x4f)	//memcpy with encryption / scrambling
+				{
+					UINT16 src = state->sharedprotram[0x290 / 2] >> 1; // ?
+					UINT32 dst = state->sharedprotram[0x292 / 2];
+					UINT16 size = state->sharedprotram[0x294 / 2];
+					UINT16 mode = state->sharedprotram[0x296 / 2];
+
+
+				//  int a=1;
+				//  if(src==0x580)
+				//      int a=1;
+					/*
+                    P_SRC =0x300290 (offset from prot rom base)
+                    P_DST =0x300292 (words from 0x300000)
+                    P_SIZE=0x300294 (words)
+                    P_MODE=0x300296
+
+                    Mode 5 direct
+                    Mode 6 swap nibbles and bytes
+
+                    1,2,3 unk.
+                    */
+
+					//mame_printf_debug("src %04x dst %04x size %04x mode %04x\n", src, dst, size, mode);
+
+					//if (src&1) mame_printf_debug("odd offset\n");
+
+					mode &=0xf;  // what are the other bits?
+
+					if (mode == 1 || mode == 2 || mode == 3)
+					{
+						/* for now, cheat -- the scramble isn't understood, it might
+                           be state based */
+						int x;
+						UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
+						for (x = 0; x < size; x++)
+						{
+							UINT16 dat;
+
+							dat = RAMDUMP[dst + x];
+							state->sharedprotram[dst + x] = dat;
+						}
+					}
+					else if (mode == 5)
+					{
+						/* mode 5 seems to be a straight copy */
+						int x;
+						UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
+						UINT16 *PROTROM = (UINT16*)memory_region(space->machine, "user1");
+						for (x = 0; x < size; x++)
+						{
+							UINT16 dat = PROTROM[src + x];
+
+							if (RAMDUMP[dst + x] != dat)
+								mame_printf_debug("Mismatch! %04x %04x\n", RAMDUMP[dst + x], dat);
+
+							state->sharedprotram[dst + x] = dat;
+						}
+					}
+					else if (mode == 6)
+					{
+						/* mode 6 seems to swap bytes and nibbles */
+						int x;
+						UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
+						UINT16 *PROTROM = (UINT16*)memory_region(space->machine, "user1");
+						for (x = 0; x < size; x++)
+						{
+							UINT16 dat = PROTROM[src + x];
+
+							dat = ((dat & 0xf000) >> 12)|
+								  ((dat & 0x0f00) >> 4)|
+								  ((dat & 0x00f0) << 4)|
+								  ((dat & 0x000f) << 12);
+
+							if (RAMDUMP[dst + x] != dat)
+								mame_printf_debug("Mismatch! Mode 6 %04x %04x\n", RAMDUMP[dst + x], dat);
+
+							state->sharedprotram[dst + x] = dat;
+						}
+					}
+					else
+					{
+						mame_printf_debug("unknown copy mode!\n");
+					}
+					/* hack.. it jumps here but there isn't valid code even when we do
+                       use what was in ram.. probably some more protection as the game
+                       still doesn't behave 100% correctly :-/
+
+                       the code is copied in 'mode 3' but even the code put here on
+                       the real ram dump is corrupt??? something _very_ strange is
+                       going on.. maybe more rom overlays, or ram overlays too??
+
+                    */
+					state->sharedprotram[0x2600 / 2] = 0x4e75;
+
+
+				}
+				state->kb_reg++;
+			}
+		}
+		else if (state->kb_cmd == 4)
+			state->kb_ptr = data;
+		else if (state->kb_cmd == 0x20)
+			state->kb_ptr++;
+	}
+}
+
+static READ16_HANDLER( killbld_prot_r )
+{
+//  mame_printf_debug("killbld prot w\n");
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	UINT16 res ;
+
+	offset &= 0xf;
+	res = 0;
+
+	if (offset == 1)
+	{
+		if (state->kb_cmd == 1)
+		{
+			res = state->kb_reg & 0x7f;
+		}
+		else if (state->kb_cmd == 5)
+		{
+			UINT32 protvalue = 0x89911400 | input_port_read(space->machine, "Region");
+			res = (protvalue >> (8 * (state->kb_ptr - 1))) & 0xff;
+		}
+	}
+	logerror("%06X: ASIC25 R CMD %X  VAL %X", cpu_get_pc(space->cpu), state->kb_cmd, res);
+	return res;
+}
+
+static MACHINE_RESET( killbld )
+{
+	pgm_state *state = (pgm_state *)machine->driver_data;
+	int i;
+
+	MACHINE_RESET_CALL(pgm);
+
+	/* fill the protection ram with a5 */
+	for (i = 0; i < 0x4000/2; i++)
+		state->sharedprotram[i] = 0xa5a5;
+}
+
+
+static DRIVER_INIT( killbld )
+{
+	pgm_state *state = (pgm_state *)machine->driver_data;
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
+
+	pgm_basic_init(machine);
+ 	pgm_killbld_decrypt(machine);
+
+	/* this isn't a hack.. doing a rom dump while the game is running shows the
+       rom space to look like this.. there may be more overlays / enables tho */
+
+	/* the game actually performs a CRC check of the rom during the 'Please Wait'
+       screen, the checksum expected is that of the patched rom.  if the checksum
+       fails the please wait screen doesn't last as long and the region supplied
+       by the protection device is ignored and the attract sequence appears out
+       of order */
+	mem16[0x108a2c / 2] = 0xb6aa;
+	mem16[0x108a30 / 2] = 0x6610;
+	mem16[0x108a32 / 2] = 0x13c2;
+	mem16[0x108a34 / 2] = 0x0080;
+	mem16[0x108a36 / 2] = 0x9c76;
+	mem16[0x108a38 / 2] = 0x23c3;
+	mem16[0x108a3a / 2] = 0x0080;
+	mem16[0x108a3c / 2] = 0x9c78;
+	mem16[0x108a3e / 2] = 0x1002;
+	mem16[0x108a40 / 2] = 0x6054;
+	mem16[0x108a42 / 2] = 0x5202;
+	mem16[0x108a44 / 2] = 0x0c02;
+
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd40000, 0xd40003, 0, 0, killbld_prot_r, killbld_prot_w);
+
+	state->kb_cmd = 0;
+	state->kb_reg = 0;
+	state->kb_ptr = 0;
+	memset(state->kb_regs, 0, 0x10);
+
+	state_save_register_global(machine, state->kb_cmd);
+	state_save_register_global(machine, state->kb_reg);
+	state_save_register_global(machine, state->kb_ptr);
+	state_save_register_global_array(machine, state->kb_regs);
+}
+
+static DRIVER_INIT( puzzli2 )
+{
+	/* this protection emulation is wrong
+     it uses an arm with no external rom
+     an acts in a similar way to kov etc. */
+
+	pgm_state *state = (pgm_state *)machine->driver_data;
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
+
+	pgm_basic_init(machine);
+ 	kovsh_latch_init(machine);
+
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x500000, 0x500003, 0, 0, asic28_r, asic28_w);
+
+	/* 0x4f0000 - ? is actually ram shared with the protection device,
+      the protection device provides the region code */
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
+
+ 	pgm_puzzli2_decrypt(machine);
+
+	/* protection related? */
+	mem16[0x1548ec / 2] = 0x4e71;
+	mem16[0x1548fc / 2] = 0x4e71;
+	mem16[0x1549fa / 2] = 0x4e71;
+	mem16[0x154a0a / 2] = 0x4e71;
+	mem16[0x15496a / 2] = 0x4e71;
+	mem16[0x14cee0 / 2] = 0x4e71;
+	mem16[0x1268c0 / 2] = 0x4e71;
+	mem16[0x1268c2 / 2] = 0x4e71;
+	mem16[0x1268c4 / 2] = 0x4e71;
+	mem16[0x154948 / 2] = 0x4e71;
+	mem16[0x13877a / 2] = 0x662c;
+
+	/* patch irq4 vector (irq4 should be disabled on this game? how?) */
+//  mem16[0x100070 / 2] = 0x0012;
+//  mem16[0x100072 / 2] = 0x5d78;
+
+	state->asic28_key = 0;
+	state->asic28_rcnt = 0;
+	memset(state->asic28_regs, 0, 10);
+	memset(state->asic_params, 0, 256);
+	memset(state->eoregs, 0, 16);
+
+	state_save_register_global(machine, state->asic28_key);
+	state_save_register_global(machine, state->asic28_rcnt);
+	state_save_register_global_array(machine, state->asic28_regs);
+	state_save_register_global_array(machine, state->asic_params);
+	state_save_register_global_array(machine, state->eoregs);
+}
+
+static UINT32 olds_prot_addr( UINT16 addr )
+{
+	UINT32 mode = addr & 0xff;
+	UINT32 offset = addr >> 8;
+	UINT32 realaddr;
+
+	switch(mode)
+	{
+		case 0x0:
+		case 0x5:
+		case 0xa:
+			realaddr = 0x402a00 + (offset << 2);
+			break;
+
+		case 0x2:
+		case 0x8:
+			realaddr = 0x402e00 + (offset << 2);
+			break;
+
+		case 0x1:
+			realaddr = 0x40307e;
+			break;
+
+		case 0x3:
+			realaddr = 0x403090;
+			break;
+
+		case 0x4:
+			realaddr = 0x40309a;
+			break;
+
+		case 0x6:
+			realaddr = 0x4030a4;
+			break;
+
+		case 0x7:
+			realaddr = 0x403000;
+			break;
+
+		case 0x9:
+			realaddr = 0x40306e;
+			break;
+
+		default:
+			realaddr = 0;
+	}
+	return realaddr;
+}
+
+static UINT32 olds_read_reg( running_machine *machine, UINT16 addr )
+{
+	pgm_state *state = (pgm_state *)machine->driver_data;
+	UINT32 protaddr = (olds_prot_addr(addr) - 0x400000) / 2;
+	return state->sharedprotram[protaddr] << 16 | state->sharedprotram[protaddr + 1];
+}
+
+static void olds_write_reg( running_machine *machine, UINT16 addr, UINT32 val )
+{
+	pgm_state *state = (pgm_state *)machine->driver_data;
+	state->sharedprotram[(olds_prot_addr(addr) - 0x400000) / 2]     = val >> 16;
+	state->sharedprotram[(olds_prot_addr(addr) - 0x400000) / 2 + 1] = val & 0xffff;
+}
+
+static MACHINE_RESET( olds )
+{
+	pgm_state *state = (pgm_state *)machine->driver_data;
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, "user2");
+	int i;
+
+	MACHINE_RESET_CALL(pgm);
+
+	/* populate shared protection ram with data read from pcb .. */
+	for (i = 0; i < 0x4000 / 2; i++)
+	{
+		state->sharedprotram[i] = mem16[i];
+	}
+
+	//ROM:004008B4                 .word 0xFBA5
+	for(i = 0; i < 0x4000 / 2; i++)
+	{
+		if (state->sharedprotram[i] == (0xffff - i))
+			state->sharedprotram[i] = 0x4e75;
+	}
+}
+
+static READ16_HANDLER( olds_r )
+{
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	UINT16 res = 0;
+
+	if (offset == 1)
+	{
+		if (state->kb_cmd == 1)
+			res = state->kb_reg & 0x7f;
+		if (state->kb_cmd == 2)
+			res = state->olds_bs | 0x80;
+		if (state->kb_cmd == 3)
+			res = state->olds_cmd3;
+		else if (state->kb_cmd == 5)
+		{
+			UINT32 protvalue = 0x900000 | input_port_read(space->machine, "Region"); // region from protection device.
+			res = (protvalue >> (8 * (state->kb_ptr - 1))) & 0xff; // includes region 1 = taiwan , 2 = china, 3 = japan (title = orlegend special), 4 = korea, 5 = hongkong, 6 = world
+
+		}
+	}
+	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", cpu_get_pc(space->cpu), state->kb_cmd, res);
+	return res;
+}
+
+static WRITE16_HANDLER( olds_w )
+{
+	pgm_state *state = (pgm_state *)space->machine->driver_data;
+	if (offset == 0)
+		state->kb_cmd = data;
+	else //offset==2
+	{
+		logerror("%06X: ASIC25 W CMD %X  VAL %X\n",cpu_get_pc(space->cpu), state->kb_cmd, data);
+		if (state->kb_cmd == 0)
+			state->kb_reg = data;
+		else if(state->kb_cmd == 2)	//a bitswap=
+		{
+			int reg = 0;
+			if (data & 0x01)
+				reg |= 0x40;
+			if (data & 0x02)
+				reg |= 0x80;
+			if (data & 0x04)
+				reg |= 0x20;
+			if (data & 0x08)
+				reg |= 0x10;
+			state->olds_bs = reg;
+		}
+		else if (state->kb_cmd == 3)
+		{
+			UINT16 cmd = state->sharedprotram[0x3026 / 2];
+			switch (cmd)
+			{
+				case 0x11:
+				case 0x12:
+						break;
+				case 0x64:
+					{
+						UINT16 cmd0 = state->sharedprotram[0x3082 / 2];
+						UINT16 val0 = state->sharedprotram[0x3050 / 2];	//CMD_FORMAT
+						{
+							if ((cmd0 & 0xff) == 0x2)
+								olds_write_reg(space->machine, val0, olds_read_reg(space->machine, val0) + 0x10000);
+						}
+						break;
+					}
+
+				default:
+						break;
+			}
+			state->olds_cmd3 = ((data >> 4) + 1) & 0x3;
+		}
+		else if (state->kb_cmd == 4)
+			state->kb_ptr = data;
+		else if(state->kb_cmd == 0x20)
+		  state->kb_ptr++;
+	}
+}
+
+static READ16_HANDLER( olds_prot_swap_r )
+{
+	if (cpu_get_pc(space->cpu) < 0x100000)		//bios
+		return pgm_mainram[0x178f4 / 2];
+	else						//game
+		return pgm_mainram[0x178d8 / 2];
+
+}
+
+static DRIVER_INIT( olds )
+{
+	pgm_state *state = (pgm_state *)machine->driver_data;
+	pgm_basic_init(machine);
+
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xdcb400, 0xdcb403, 0, 0, olds_r, olds_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8178f4, 0x8178f5, 0, 0, olds_prot_swap_r);
+
+	state->kb_cmd = 0;
+	state->kb_reg = 0;
+	state->kb_ptr = 0;
+	state->olds_bs = 0;
+	state->olds_cmd3 = 0;
+
+	state_save_register_global(machine, state->kb_cmd);
+	state_save_register_global(machine, state->kb_reg);
+	state_save_register_global(machine, state->kb_ptr);
+	state_save_register_global(machine, state->olds_bs);
+	state_save_register_global(machine, state->olds_cmd3);
+}
+
 /*** GAME ********************************************************************/
 
 GAME( 1997, pgm,      0,          pgm, pgm,      pgm,        ROT0,   "IGS", "PGM (Polygame Master) System BIOS", GAME_IS_BIOS_ROOT )
 
-GAME( 1997, orlegend, pgm,        pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 126)", GAME_IMPERFECT_SOUND  )
-GAME( 1997, orlegende, orlegend,   pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 112)", GAME_IMPERFECT_SOUND  )
-GAME( 1997, orlegendc, orlegend,   pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 112, Chinese Board)", GAME_IMPERFECT_SOUND  )
-GAME( 1997, orlegend111c, orlegend,   pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 111, Chinese Board)", GAME_IMPERFECT_SOUND  )
-GAME( 1997, orlegend105k, orlegend,   pgm, orld105k, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 105, Korean Board)", GAME_IMPERFECT_SOUND  )
-GAME( 1997, drgw2c,   drgw2,    drgw2, pgm,      drgw2c,     ROT0,   "IGS", "Zhong Guo Long II (ver. 100C, China)", GAME_IMPERFECT_SOUND )
-GAME( 1999, photoy2k, pgm,        kov, photoy2k, djlzz,      ROT0,   "IGS", "Photo Y2K (ver. 104)", GAME_IMPERFECT_SOUND ) /* region provided by protection device */
-GAME( 1999, raf102j,  photoy2k,   kov, photoy2k, djlzz,      ROT0,   "IGS", "Real and Fake / Photo Y2K (ver. 102, Japanese Board)", GAME_IMPERFECT_SOUND ) /* region provided by protection device */
-GAME( 1999, kovsh,    kov,        kov, sango,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 104)", GAME_IMPERFECT_SOUND )
-GAME( 2000, kov2,     pgm,       kov2, sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 100)", GAME_IMPERFECT_SOUND )
-GAME( 2000, kov2106,  kov2,      kov2, sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 106)", GAME_IMPERFECT_SOUND )
-GAME( 2001, martmast, pgm,       kov2, sango,    martmast,   ROT0,   "IGS", "Martial Masters (ver. 102)", GAME_IMPERFECT_SOUND )
-GAME( 2001, martmastc,martmast,  kov2, sango,    martmast,   ROT0,   "IGS", "Martial Masters (ver. 101, Chinese Board)", GAME_IMPERFECT_SOUND )
+GAME( 1997, orlegend, pgm,        pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 126)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1997, orlegende, orlegend,   pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 112)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1997, orlegendc, orlegend,   pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 112, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1997, orlegend111c, orlegend,   pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 111, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1997, orlegend105k, orlegend,   pgm, orld105k, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 105, Korean Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1997, drgw2c,   drgw2,    drgw2, pgm,      drgw2c,     ROT0,   "IGS", "Zhong Guo Long II (ver. 100C, China)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1999, photoy2k, pgm,        kov, photoy2k, djlzz,      ROT0,   "IGS", "Photo Y2K (ver. 104)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1999, raf102j,  photoy2k,   kov, photoy2k, djlzz,      ROT0,   "IGS", "Real and Fake / Photo Y2K (ver. 102, Japanese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1999, kovsh,    kov,        kov, sango,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 104)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2000, kov2,     pgm,       kov2, sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 100)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2000, kov2106,  kov2,      kov2, sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 106)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2001, martmast, pgm,       kov2, sango,    martmast,   ROT0,   "IGS", "Martial Masters (ver. 102)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2001, martmastc,martmast,  kov2, sango,    martmast,   ROT0,   "IGS", "Martial Masters (ver. 101, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 /* Playable but maybe imperfect protection emulation */
-GAME( 1997, drgw2,    pgm,       drgw2, pgm,     drgw2,      ROT0,   "IGS", "Dragon World II (ver. 110X, Export)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1997, drgw2j,   drgw2,     drgw2, pgm,     drgw2j,     ROT0,   "IGS", "Chuugokuryuu II (ver. 100J, Japan)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1998, killbldt, killbld, killbld, killbld, killbld,    ROT0,   "IGS", "The Killing Blade (ver. 109, Chinese Board)", GAME_IMPERFECT_SOUND ) // it's playable, but there are some things unclear about the protection
-GAME( 1998, olds,     pgm,       olds, olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 101, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1998, olds100,  olds,      olds, olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1998, olds100a, olds,      olds, olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (alt ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING  ) // grashes on some bosses, high score table etc.
+GAME( 1997, drgw2,    pgm,       drgw2, pgm,     drgw2,      ROT0,   "IGS", "Dragon World II (ver. 110X, Export)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1997, drgw2j,   drgw2,     drgw2, pgm,     drgw2j,     ROT0,   "IGS", "Chuugokuryuu II (ver. 100J, Japan)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, killbldt, killbld, killbld, killbld, killbld,    ROT0,   "IGS", "The Killing Blade (ver. 109, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // it's playable, but there are some things unclear about the protection
+GAME( 1998, olds,     pgm,       olds, olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 101, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, olds100,  olds,      olds, olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, olds100a, olds,      olds, olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (alt ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // grashes on some bosses, high score table etc.
 
 /* not working */
-GAME( 1998, drgw3,    pgm,        pgm, sango,    dw3,        ROT0,   "IGS", "Dragon World 3 (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1998, drgw3k,   drgw3,      pgm, sango,    dw3,        ROT0,   "IGS", "Dragon World 3 (ver. 106, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1998, killbld,  pgm,    killbld, killbld,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 104)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1999, kov,      pgm,        kov, sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 117)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 1999, kov115,   kov,        kov, sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 115)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 1999, kovj,     kov,        kov, sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 100, Japanese Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 1999, kovplus,  kov,        kov, sango,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (ver. 119)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 1999, kovplusa, kov,        kov, sango,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (alt ver. 119)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 1999, puzlstar, pgm,        kov, sango,    pstar,      ROT0,   "IGS", "Puzzle Star (ver. 100MG)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 2001, kov2p,    kov2,      kov2, sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M204XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 2001, kov2p205, kov2,      kov2, sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M205XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 2001, ddp2,     pgm,       kov2, ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 2001, ddp2a,    ddp2,      kov2, ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II (ver. 102)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 2001, puzzli2,  pgm,        kov, sango,    puzzli2,    ROT0,   "IGS", "Puzzli 2 Super (ver. 200)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 2002, dmnfrnt,  pgm,        svg, sango,    dmnfrnt,    ROT0,   "IGS", "Demon Front (ver. 102)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 2002, dmnfrnta, dmnfrnt,    svg, sango,    dmnfrnt,    ROT0,   "IGS", "Demon Front (ver. 105)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 2003, theglad,  pgm,        svg, sango,    theglad,    ROT0,   "IGS", "The Gladiator (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 2003, theglada, theglad,    svg, sango,    theglad,    ROT0,   "IGS", "The Gladiator (ver. 101)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 2004, oldsplus, pgm,        kov, olds,     oldsplus,   ROT0,   "IGS", "Oriental Legend Special Plus / Xi You Shi E Zhuan Super Plus", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 2004, kovshp,   kov,        kov, sango,    kovshp,     ROT0,   "IGS", "Knights of Valour Super Heroes Plus / Sangoku Senki Super Heroes Plus (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 2005, killbldp, pgm,        svg, sango,    killbldp,   ROT0,   "IGS", "The Killing Blade Plus (ver. 300)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 2004, happy6,   pgm,        svg, sango,    svg,        ROT0,   "IGS", "Happy 6-in-1 (ver. 101CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
-GAME( 2005, svg,      pgm,        svg, sango,    svg,        ROT0,   "IGS", "S.V.G. - Spectral vs Generation (ver. 200)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
+GAME( 1998, drgw3,    pgm,        pgm, sango,    dw3,        ROT0,   "IGS", "Dragon World 3 (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, drgw3k,   drgw3,      pgm, sango,    dw3,        ROT0,   "IGS", "Dragon World 3 (ver. 106, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, killbld,  pgm,    killbld, killbld,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 104)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1999, kov,      pgm,        kov, sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 117)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, kov115,   kov,        kov, sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 115)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, kovj,     kov,        kov, sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 100, Japanese Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, kovplus,  kov,        kov, sango,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (ver. 119)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, kovplusa, kov,        kov, sango,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (alt ver. 119)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, puzlstar, pgm,        kov, sango,    pstar,      ROT0,   "IGS", "Puzzle Star (ver. 100MG)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2001, kov2p,    kov2,      kov2, sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M204XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2001, kov2p205, kov2,      kov2, sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M205XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2001, ddp2,     pgm,       kov2, ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2001, ddp2a,    ddp2,      kov2, ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II (ver. 102)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2001, puzzli2,  pgm,        kov, sango,    puzzli2,    ROT0,   "IGS", "Puzzli 2 Super (ver. 200)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 2002, dmnfrnt,  pgm,        svg, sango,    dmnfrnt,    ROT0,   "IGS", "Demon Front (ver. 102)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2002, dmnfrnta, dmnfrnt,    svg, sango,    dmnfrnt,    ROT0,   "IGS", "Demon Front (ver. 105)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2003, theglad,  pgm,        svg, sango,    theglad,    ROT0,   "IGS", "The Gladiator (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2003, theglada, theglad,    svg, sango,    theglad,    ROT0,   "IGS", "The Gladiator (ver. 101)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, oldsplus, pgm,        kov, olds,     oldsplus,   ROT0,   "IGS", "Oriental Legend Special Plus / Xi You Shi E Zhuan Super Plus", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, kovshp,   kov,        kov, sango,    kovshp,     ROT0,   "IGS", "Knights of Valour Super Heroes Plus / Sangoku Senki Super Heroes Plus (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2005, killbldp, pgm,        svg, sango,    killbldp,   ROT0,   "IGS", "The Killing Blade Plus (ver. 300)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, happy6,   pgm,        svg, sango,    svg,        ROT0,   "IGS", "Happy 6-in-1 (ver. 101CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2005, svg,      pgm,        svg, sango,    svg,        ROT0,   "IGS", "S.V.G. - Spectral vs Generation (ver. 200)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
