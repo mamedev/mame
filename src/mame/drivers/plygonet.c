@@ -85,7 +85,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/dsp56k/dsp56k.h"
 #include "sound/k054539.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 
 VIDEO_START( polygonet );
 VIDEO_UPDATE( polygonet );
@@ -94,8 +94,6 @@ READ32_HANDLER( polygonet_ttl_ram_r );
 WRITE32_HANDLER( polygonet_ttl_ram_w );
 READ32_HANDLER( polygonet_roz_ram_r );
 WRITE32_HANDLER( polygonet_roz_ram_w );
-
-static int init_eeprom_count;
 
 /* 68k-side shared ram */
 static UINT32* shared_ram;
@@ -121,34 +119,16 @@ static const eeprom_interface eeprom_intf =
 	"0100110000000" /* unlock command */
 };
 
-static NVRAM_HANDLER( polygonet )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-		{
-			init_eeprom_count = 0;
-			eeprom_load(file);
-		}
-		else
-			init_eeprom_count = 10;
-	}
-}
-
-static READ32_HANDLER( polygonet_eeprom_r )
+static READ32_DEVICE_HANDLER( polygonet_eeprom_r )
 {
 	if (ACCESSING_BITS_0_15)
 	{
-		return 0x0200 | (eeprom_read_bit()<<8);
+		return 0x0200 | (eepromdev_read_bit(device)<<8);
 	}
 	else
 	{
-		UINT8 lowInputBits = input_port_read(space->machine, "IN1");
-		UINT8 highInputBits = input_port_read(space->machine, "IN0");
+		UINT8 lowInputBits = input_port_read(device->machine, "IN1");
+		UINT8 highInputBits = input_port_read(device->machine, "IN0");
 		return ((highInputBits << 24) | (lowInputBits << 16));
 	}
 
@@ -157,13 +137,13 @@ static READ32_HANDLER( polygonet_eeprom_r )
 }
 
 
-static WRITE32_HANDLER( polygonet_eeprom_w )
+static WRITE32_DEVICE_HANDLER( polygonet_eeprom_w )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		eeprom_write_bit((data & 0x01000000) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_set_cs_line((data & 0x02000000) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((data & 0x04000000) ? ASSERT_LINE : CLEAR_LINE);
+		eepromdev_write_bit(device, (data & 0x01000000) ? ASSERT_LINE : CLEAR_LINE);
+		eepromdev_set_cs_line(device, (data & 0x02000000) ? CLEAR_LINE : ASSERT_LINE);
+		eepromdev_set_clock_line(device, (data & 0x04000000) ? ASSERT_LINE : CLEAR_LINE);
 		return;
 	}
 
@@ -544,8 +524,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(plygonet_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x400000, 0x40001f) AM_RAM AM_BASE((UINT32**)&K053936_0_ctrl)
 	AM_RANGE(0x440000, 0x440fff) AM_READWRITE(polygonet_roz_ram_r, polygonet_roz_ram_w)
-	AM_RANGE(0x480000, 0x4bffff) AM_READ(polygonet_eeprom_r)
-	AM_RANGE(0x4C0000, 0x4fffff) AM_WRITE(polygonet_eeprom_w)
+	AM_RANGE(0x480000, 0x4bffff) AM_DEVREAD("eeprom", polygonet_eeprom_r)
+	AM_RANGE(0x4C0000, 0x4fffff) AM_DEVWRITE("eeprom", polygonet_eeprom_w)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(shared_ram_write) AM_BASE(&shared_ram)
 	AM_RANGE(0x504000, 0x504003) AM_WRITE(dsp_w_lines)
 	AM_RANGE(0x506000, 0x50600f) AM_READWRITE(dsp_host_interface_r, dsp_host_interface_w)
@@ -668,7 +648,8 @@ static MACHINE_DRIVER_START( plygonet )
 	MDRV_MACHINE_START(polygonet)
 
 	MDRV_GFXDECODE(plygonet)
-	MDRV_NVRAM_HANDLER(polygonet)
+
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
 	MDRV_QUANTUM_TIME(HZ(1200000))
@@ -765,7 +746,6 @@ static DRIVER_INIT(polygonet)
 	dsp56k_update_handler = memory_set_direct_update_handler(cputag_get_address_space(machine, "dsp", ADDRESS_SPACE_PROGRAM), plygonet_dsp56k_direct_handler);
 
     /* save states */
-	state_save_register_global(machine, init_eeprom_count);
 	state_save_register_global_pointer(machine, dsp56k_bank00_ram,    2 * 8 * dsp56k_bank00_size);
 	state_save_register_global_pointer(machine, dsp56k_bank01_ram,    2 * 8 * dsp56k_bank01_size);
 	state_save_register_global_pointer(machine, dsp56k_bank02_ram,    2 * 8 * dsp56k_bank02_size);

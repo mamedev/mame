@@ -1,7 +1,7 @@
 #include "driver.h"
 #include "video/konicdev.h"
 #include "cpu/konami/konami.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/k053260.h"
 #include "includes/simpsons.h"
 
@@ -16,44 +16,21 @@ int simpsons_firq_enabled;
 static int init_eeprom_count;
 
 
-static const eeprom_interface eeprom_intf =
-{
-	7,				/* address bits */
-	8,				/* data bits */
-	"011000",		/*  read command */
-	"011100",		/* write command */
-	0,				/* erase command */
-	"0100000000000",/* lock command */
-	"0100110000000" /* unlock command */
-};
-
 NVRAM_HANDLER( simpsons )
 {
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-		{
-			init_eeprom_count = 0;
-			eeprom_load(file);
-		}
-		else
-			init_eeprom_count = 10;
-	}
+	if (!read_or_write)
+		init_eeprom_count = file ? 0 : 10;
 }
 
-READ8_HANDLER( simpsons_eeprom_r )
+READ8_DEVICE_HANDLER( simpsons_eeprom_r )
 {
 	int res;
 
-	res = (eeprom_read_bit() << 4);
+	res = (eepromdev_read_bit(device) << 4);
 
 	res |= 0x20;//konami_eeprom_ack() << 5; /* add the ack */
 
-	res |= input_port_read(space->machine, "TEST") & 1; /* test switch */
+	res |= input_port_read(device->machine, "TEST") & 1; /* test switch */
 
 	if (init_eeprom_count)
 	{
@@ -63,16 +40,16 @@ READ8_HANDLER( simpsons_eeprom_r )
 	return res;
 }
 
-WRITE8_HANDLER( simpsons_eeprom_w )
+WRITE8_DEVICE_HANDLER( simpsons_eeprom_w )
 {
 	if ( data == 0xff )
 		return;
 
-	eeprom_write_bit(data & 0x80);
-	eeprom_set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
-	eeprom_set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	eepromdev_write_bit(device, data & 0x80);
+	eepromdev_set_cs_line(device, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+	eepromdev_set_clock_line(device, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
-	simpsons_video_banking( space->machine, data & 3 );
+	simpsons_video_banking( device->machine, data & 3 );
 
 	simpsons_firq_enabled = data & 0x04;
 }

@@ -70,6 +70,7 @@ Custom ICs - 053260        - sound chip (QFP80)
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "cpu/z80/z80.h"
 #include "video/konicdev.h"
+#include "machine/eepromdev.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
 #include "includes/simpsons.h"
@@ -85,7 +86,7 @@ Custom ICs - 053260        - sound chip (QFP80)
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1f80, 0x1f80) AM_READ_PORT("COIN")
-	AM_RANGE(0x1f81, 0x1f81) AM_READ(simpsons_eeprom_r)
+	AM_RANGE(0x1f81, 0x1f81) AM_DEVREAD("eeprom", simpsons_eeprom_r)
 	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("P1")
 	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P2")
 	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P3")
@@ -93,7 +94,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1fa0, 0x1fa7) AM_DEVWRITE("k053246", k053246_w)
 	AM_RANGE(0x1fb0, 0x1fbf) AM_DEVWRITE("k053251", k053251_w)
 	AM_RANGE(0x1fc0, 0x1fc0) AM_WRITE(simpsons_coin_counter_w)
-	AM_RANGE(0x1fc2, 0x1fc2) AM_WRITE(simpsons_eeprom_w)
+	AM_RANGE(0x1fc2, 0x1fc2) AM_DEVWRITE("eeprom", simpsons_eeprom_w)
 	AM_RANGE(0x1fc4, 0x1fc4) AM_READ(simpsons_sound_interrupt_r)
 	AM_RANGE(0x1fc6, 0x1fc7) AM_DEVREADWRITE("konami", simpsons_sound_r, k053260_w)
 	AM_RANGE(0x1fc8, 0x1fc9) AM_DEVREAD("k053246", k053246_r)
@@ -280,6 +281,17 @@ static const k053247_interface simpsons_k053246_intf =
 	simpsons_sprite_callback
 };
 
+static const eeprom_interface eeprom_intf =
+{
+	7,				/* address bits */
+	8,				/* data bits */
+	"011000",		/*  read command */
+	"011100",		/* write command */
+	0,				/* erase command */
+	"0100000000000",/* lock command */
+	"0100110000000" /* unlock command */
+};
+
 static MACHINE_DRIVER_START( simpsons )
 
 	/* basic machine hardware */
@@ -293,6 +305,8 @@ static MACHINE_DRIVER_START( simpsons )
 
 	MDRV_MACHINE_RESET(simpsons)
 	MDRV_NVRAM_HANDLER(simpsons)
+	
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
