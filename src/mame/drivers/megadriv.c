@@ -1431,7 +1431,6 @@ static void init_megadri6_io(running_machine *machine)
 	for (i=0; i<3; i++)
 	{
 		io_timeout[i] = timer_alloc(machine, io_timeout_timer_callback, (void*)(FPTR)i);
-		io_stage[i] = -1;
 	}
 }
 
@@ -1650,6 +1649,17 @@ static void megadrive_init_io(running_machine *machine)
 {
 	const input_port_token *ipt = machine->gamedrv->ipt;
 
+	if (ipt == INPUT_PORTS_NAME(megadri6))
+		init_megadri6_io(machine);
+
+	if (ipt == INPUT_PORTS_NAME(ssf2ghw))
+		init_megadri6_io(machine);
+}
+
+static void megadrive_reset_io(running_machine *machine)
+{
+	int i;
+
 	megadrive_io_data_regs[0] = 0x7f;
 	megadrive_io_data_regs[1] = 0x7f;
 	megadrive_io_data_regs[2] = 0x7f;
@@ -1660,11 +1670,10 @@ static void megadrive_init_io(running_machine *machine)
 	megadrive_io_tx_regs[1] = 0xff;
 	megadrive_io_tx_regs[2] = 0xff;
 
-	if (ipt == INPUT_PORTS_NAME(megadri6))
-		init_megadri6_io(machine);
-
-	if (ipt == INPUT_PORTS_NAME(ssf2ghw))
-		init_megadri6_io(machine);
+	for (i=0; i<3; i++)
+	{
+		io_stage[i] = -1;
+	}
 }
 
 /************* 6 buttons version **************************/
@@ -5803,6 +5812,11 @@ static int hazemdchoice_megadrive_region_export;
 static int hazemdchoice_megadrive_region_pal;
 static int hazemdchoice_megadriv_framerate;
 
+MACHINE_START( megadriv )
+{
+	megadrive_init_io(machine);
+}
+
 MACHINE_RESET( megadriv )
 {
 	/* default state of z80 = reset, with bus */
@@ -5853,7 +5867,7 @@ MACHINE_RESET( megadriv )
 
 	megadrive_imode = 0;
 
-	megadrive_init_io(machine);
+	megadrive_reset_io(machine);
 
 	frame_timer = devtag_get_device(machine, "frame_timer");
 	scanline_timer = devtag_get_device(machine, "scanline_timer");
@@ -6064,6 +6078,7 @@ MACHINE_DRIVER_START( megadriv )
 	MDRV_CPU_IO_MAP(megadriv_z80_io_map)
 	/* IRQ handled via the timers */
 
+	MDRV_MACHINE_START(megadriv)
 	MDRV_MACHINE_RESET(megadriv)
 
 	MDRV_TIMER_ADD("frame_timer", frame_timer_callback)
@@ -6114,6 +6129,7 @@ MACHINE_DRIVER_START( megadpal )
 	MDRV_CPU_IO_MAP(megadriv_z80_io_map)
 	/* IRQ handled via the timers */
 
+	MDRV_MACHINE_START(megadriv)
 	MDRV_MACHINE_RESET(megadriv)
 
 	MDRV_TIMER_ADD("frame_timer", frame_timer_callback)

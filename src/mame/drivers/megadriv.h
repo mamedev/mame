@@ -53,6 +53,7 @@ extern void (*megadrive_io_write_data_port_ptr)(running_machine *machine, int of
 extern UINT8 megadrive_io_data_regs[3];
 extern UINT8 megadrive_io_ctrl_regs[3];
 
+MACHINE_START( megadriv );
 MACHINE_RESET( megadriv );
 VIDEO_START( megadriv );
 VIDEO_UPDATE( megadriv );

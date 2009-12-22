@@ -15,11 +15,6 @@
 #include "sound/hc55516.h"
 
 
-/* timers */
-static emu_timer *scanline_timer;
-static emu_timer *scan240_timer;
-static emu_timer *scan254_timer;
-
 /* banking addresses set by the drivers */
 UINT8 *mayday_protection;
 
@@ -253,9 +248,9 @@ const pia6821_interface joust2_pia_1_intf =
  *
  *************************************/
 
-static TIMER_CALLBACK( williams_va11_callback )
+TIMER_DEVICE_CALLBACK( williams_va11_callback )
 {
-	const device_config *pia_1 = devtag_get_device(machine, "pia_1");
+	const device_config *pia_1 = devtag_get_device(timer->machine, "pia_1");
 	int scanline = param;
 
 	/* the IRQ signal comes into CB1, and is set to VA11 */
@@ -264,7 +259,7 @@ static TIMER_CALLBACK( williams_va11_callback )
 	/* set a timer for the next update */
 	scanline += 0x20;
 	if (scanline >= 256) scanline = 0;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_device_adjust_oneshot(timer, video_screen_get_time_until_pos(timer->machine->primary_screen, scanline, 0), scanline);
 }
 
 
@@ -277,18 +272,18 @@ static TIMER_CALLBACK( williams_count240_off_callback )
 }
 
 
-static TIMER_CALLBACK( williams_count240_callback )
+TIMER_DEVICE_CALLBACK( williams_count240_callback )
 {
-	const device_config *pia_1 = devtag_get_device(machine, "pia_1");
+	const device_config *pia_1 = devtag_get_device(timer->machine, "pia_1");
 
 	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
 	pia6821_ca1_w(pia_1, 0, 1);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, williams_count240_off_callback);
+	timer_set(timer->machine, video_screen_get_time_until_pos(timer->machine->primary_screen, 0, 0), NULL, 0, williams_count240_off_callback);
 
 	/* set a timer for next frame */
-	timer_adjust_oneshot(scan240_timer, video_screen_get_time_until_pos(machine->primary_screen, 240, 0), 0);
+	timer_device_adjust_oneshot(timer, video_screen_get_time_until_pos(timer->machine->primary_screen, 240, 0), 0);
 }
 
 
@@ -355,27 +350,35 @@ static void tshoot_main_irq(const device_config *device, int state)
  *
  *************************************/
 
+static MACHINE_START( williams_common )
+{
+	/* configure the memory bank */
+	memory_configure_bank(machine, "bank1", 0, 1, williams_videoram, 0);
+	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "maincpu") + 0x10000, 0);
+
+	state_save_register_global(machine, vram_bank);
+}
+
+
 static MACHINE_RESET( williams_common )
 {
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
-	scanline_timer = timer_alloc(machine, williams_va11_callback, NULL);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_device_adjust_oneshot(devtag_get_device(machine, "scan_timer"), video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 	/* also set a timer to go off on scanline 240 */
-	scan240_timer = timer_alloc(machine, williams_count240_callback, NULL);
-	timer_adjust_oneshot(scan240_timer, video_screen_get_time_until_pos(machine->primary_screen, 240, 0), 0);
+	timer_device_adjust_oneshot(devtag_get_device(machine, "240_timer"), video_screen_get_time_until_pos(machine->primary_screen, 240, 0), 0);
+}
 
-	state_save_register_global(machine, vram_bank);
+
+MACHINE_START( williams )
+{
+	MACHINE_START_CALL(williams_common);
 }
 
 
 MACHINE_RESET( williams )
 {
 	MACHINE_RESET_CALL(williams_common);
-
-	/* configure the memory bank */
-	memory_configure_bank(machine, "bank1", 0, 1, williams_videoram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "maincpu") + 0x10000, 0);
 }
 
 
@@ -386,10 +389,10 @@ MACHINE_RESET( williams )
  *
  *************************************/
 
-static TIMER_CALLBACK( williams2_va11_callback )
+TIMER_DEVICE_CALLBACK( williams2_va11_callback )
 {
-	const device_config *pia_0 = devtag_get_device(machine, "pia_0");
-	const device_config *pia_1 = devtag_get_device(machine, "pia_1");
+	const device_config *pia_0 = devtag_get_device(timer->machine, "pia_0");
+	const device_config *pia_1 = devtag_get_device(timer->machine, "pia_1");
 	int scanline = param;
 
 	/* the IRQ signal comes into CB1, and is set to VA11 */
@@ -399,7 +402,7 @@ static TIMER_CALLBACK( williams2_va11_callback )
 	/* set a timer for the next update */
 	scanline += 0x20;
 	if (scanline >= 256) scanline = 0;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	timer_device_adjust_oneshot(timer, video_screen_get_time_until_pos(timer->machine->primary_screen, scanline, 0), scanline);
 }
 
 
@@ -412,18 +415,18 @@ static TIMER_CALLBACK( williams2_endscreen_off_callback )
 }
 
 
-static TIMER_CALLBACK( williams2_endscreen_callback )
+TIMER_DEVICE_CALLBACK( williams2_endscreen_callback )
 {
-	const device_config *pia_0 = devtag_get_device(machine, "pia_0");
+	const device_config *pia_0 = devtag_get_device(timer->machine, "pia_0");
 
 	/* the /ENDSCREEN signal comes into CA1 */
 	pia6821_ca1_w(pia_0, 0, 0);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 8, 0), NULL, 0, williams2_endscreen_off_callback);
+	timer_set(timer->machine, video_screen_get_time_until_pos(timer->machine->primary_screen, 8, 0), NULL, 0, williams2_endscreen_off_callback);
 
 	/* set a timer for next frame */
-	timer_adjust_oneshot(scan254_timer, video_screen_get_time_until_pos(machine->primary_screen, 254, 0), 0);
+	timer_device_adjust_oneshot(timer, video_screen_get_time_until_pos(timer->machine->primary_screen, 254, 0), 0);
 }
 
 
@@ -441,27 +444,30 @@ static STATE_POSTLOAD( williams2_postload )
 }
 
 
-MACHINE_RESET( williams2 )
+MACHINE_START( williams2 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-
 	/* configure memory banks */
 	memory_configure_bank(machine, "bank1", 0, 1, williams_videoram, 0);
 	memory_configure_bank(machine, "bank1", 1, 4, memory_region(machine, "maincpu") + 0x10000, 0x10000);
+
+	/* register for save states */
+	state_save_register_global(machine, vram_bank);
+	state_save_register_postload(machine, williams2_postload, NULL);
+}
+
+
+MACHINE_RESET( williams2 )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* make sure our banking is reset */
 	williams2_bank_select_w(space, 0, 0);
 
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
-	scanline_timer = timer_alloc(machine, williams2_va11_callback, NULL);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_device_adjust_oneshot(devtag_get_device(machine, "scan_timer"), video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 	/* also set a timer to go off on scanline 254 */
-	scan254_timer = timer_alloc(machine, williams2_endscreen_callback, NULL);
-	timer_adjust_oneshot(scan254_timer, video_screen_get_time_until_pos(machine->primary_screen, 254, 0), 0);
-
-	state_save_register_global(machine, vram_bank);
-	state_save_register_postload(machine, williams2_postload, NULL);
+	timer_device_adjust_oneshot(devtag_get_device(machine, "254_timer"), video_screen_get_time_until_pos(machine->primary_screen, 254, 0), 0);
 }
 
 
@@ -720,17 +726,24 @@ static STATE_POSTLOAD( defender_postload )
 }
 
 
+MACHINE_START( defender )
+{
+	MACHINE_START_CALL(williams_common);
+
+	/* configure the banking and make sure it is reset to 0 */
+	memory_configure_bank(machine, "bank1", 0, 9, &memory_region(machine, "maincpu")[0x10000], 0x1000);
+
+	state_save_register_postload(machine, defender_postload, NULL);
+}
+
+
 MACHINE_RESET( defender )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	MACHINE_RESET_CALL(williams_common);
 
-	/* configure the banking and make sure it is reset to 0 */
-	memory_configure_bank(machine, "bank1", 0, 9, &memory_region(machine, "maincpu")[0x10000], 0x1000);
 	defender_bank_select_w(space, 0, 0);
-
-	state_save_register_postload(machine, defender_postload, NULL);
 }
 
 
@@ -817,9 +830,9 @@ WRITE8_HANDLER( sinistar_vram_select_w )
  *
  *************************************/
 
-MACHINE_RESET( blaster )
+MACHINE_START( blaster )
 {
-	MACHINE_RESET_CALL(williams_common);
+	MACHINE_START_CALL(williams_common);
 
 	/* banking is different for blaster */
 	memory_configure_bank(machine, "bank1", 0, 1, williams_videoram, 0);
@@ -829,6 +842,12 @@ MACHINE_RESET( blaster )
 	memory_configure_bank(machine, "bank2", 1, 16, memory_region(machine, "maincpu") + 0x10000, 0x0000);
 
 	state_save_register_global(machine, blaster_bank);
+}
+
+
+MACHINE_RESET( blaster )
+{
+	MACHINE_RESET_CALL(williams_common);
 }
 
 
@@ -934,7 +953,9 @@ static WRITE8_DEVICE_HANDLER( tshoot_lamp_w )
 
 MACHINE_START( joust2 )
 {
+	MACHINE_START_CALL(williams2);
 	williams_cvsd_init(machine);
+	state_save_register_global(machine, joust2_current_sound_data);
 }
 
 
@@ -945,7 +966,6 @@ MACHINE_RESET( joust2 )
 	/* standard init */
 	MACHINE_RESET_CALL(williams2);
 	pia6821_ca1_w(pia_3, 0, 1);
-	state_save_register_global(machine, joust2_current_sound_data);
 }
 
 

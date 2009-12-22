@@ -41,10 +41,20 @@ extern const pia6821_interface tshoot_pia_1_intf;
 extern const pia6821_interface tshoot_snd_pia_intf;
 extern const pia6821_interface joust2_pia_1_intf;
 
+/* timer callbacks */
+TIMER_DEVICE_CALLBACK( williams_va11_callback );
+TIMER_DEVICE_CALLBACK( williams_count240_callback );
+TIMER_DEVICE_CALLBACK( williams2_va11_callback );
+TIMER_DEVICE_CALLBACK( williams2_endscreen_callback );
+
 /* initialization */
+MACHINE_START( defender );
 MACHINE_RESET( defender );
+MACHINE_START( williams );
 MACHINE_RESET( williams );
+MACHINE_START( blaster );
 MACHINE_RESET( blaster );
+MACHINE_START( williams2 );
 MACHINE_RESET( williams2 );
 MACHINE_START( joust2 );
 MACHINE_RESET( joust2 );

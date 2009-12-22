@@ -122,6 +122,7 @@ static MACHINE_DRIVER_START( vertigo )
     MDRV_CPU_ADD("motor", M6805, 1000000)
     MDRV_CPU_PROGRAM_MAP(vertigo_motor)
     */
+	MDRV_MACHINE_START(vertigo)
 	MDRV_MACHINE_RESET(vertigo)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

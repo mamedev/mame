@@ -26,7 +26,7 @@ void sprint8_set_collision(running_machine *machine, int n)
 }
 
 
-static TIMER_CALLBACK( input_callback )
+static TIMER_DEVICE_CALLBACK( input_callback )
 {
 	static UINT8 dial[8];
 	static const char *const dialnames[] = { "DIAL1", "DIAL2", "DIAL3", "DIAL4", "DIAL5", "DIAL6", "DIAL7", "DIAL8" };
@@ -35,7 +35,7 @@ static TIMER_CALLBACK( input_callback )
 
 	for (i = 0; i < 8; i++)
 	{
-		UINT8 val = input_port_read(machine, dialnames[i]) >> 4;
+		UINT8 val = input_port_read(timer->machine, dialnames[i]) >> 4;
 
 		signed char delta = (val - dial[i]) & 15;
 
@@ -59,8 +59,6 @@ static MACHINE_RESET( sprint8 )
 {
 	collision_reset = 0;
 	collision_index = 0;
-
-	timer_pulse(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, input_callback);
 }
 
 
@@ -461,6 +459,8 @@ static MACHINE_DRIVER_START( sprint8 )
 	MDRV_CPU_PROGRAM_MAP(sprint8_map)
 
 	MDRV_MACHINE_RESET(sprint8)
+
+	MDRV_TIMER_ADD_PERIODIC("input_timer", input_callback, HZ(60))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

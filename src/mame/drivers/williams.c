@@ -1435,8 +1435,12 @@ static MACHINE_DRIVER_START( defender )
 	MDRV_CPU_ADD("soundcpu", M6808, SOUND_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(defender_sound_map)
 
+	MDRV_MACHINE_START(defender)
 	MDRV_MACHINE_RESET(defender)
 	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	MDRV_TIMER_ADD("scan_timer", williams_va11_callback)
+	MDRV_TIMER_ADD("240_timer", williams_count240_callback)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
@@ -1480,6 +1484,7 @@ static MACHINE_DRIVER_START( williams )
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
+	MDRV_MACHINE_START(williams)
 	MDRV_MACHINE_RESET(williams)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(6, 298-1, 7, 247-1)
@@ -1535,6 +1540,7 @@ static MACHINE_DRIVER_START( alienar )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(williams_map)
 
+	MDRV_MACHINE_START(williams)
 	MDRV_MACHINE_RESET(williams)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(6, 298-1, 7, 247-1)
@@ -1586,6 +1592,7 @@ static MACHINE_DRIVER_START( blaster )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(blaster_map)
 
+	MDRV_MACHINE_START(blaster)
 	MDRV_MACHINE_RESET(blaster)
 
 	/* video hardware */
@@ -1616,8 +1623,12 @@ static MACHINE_DRIVER_START( williams2 )
 	MDRV_CPU_ADD("soundcpu", M6808, MASTER_CLOCK/3)	/* yes, this is different from the older games */
 	MDRV_CPU_PROGRAM_MAP(williams2_sound_map)
 
+	MDRV_MACHINE_START(williams2)
 	MDRV_MACHINE_RESET(williams2)
 	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	MDRV_TIMER_ADD("scan_timer", williams2_va11_callback)
+	MDRV_TIMER_ADD("254_timer", williams2_endscreen_callback)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)

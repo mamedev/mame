@@ -203,6 +203,16 @@ READ16_HANDLER( vertigo_sio_r )
  *
  *************************************/
 
+MACHINE_START( vertigo )
+{
+	state_save_register_global(machine, irq_state);
+	state_save_register_global(machine, adc_result);
+	state_save_register_global(machine, irq4_time.seconds);
+	state_save_register_global(machine, irq4_time.attoseconds);
+
+	vertigo_vproc_init(machine);
+}
+
 MACHINE_RESET( vertigo )
 {
 	int i;
@@ -214,15 +224,10 @@ MACHINE_RESET( vertigo )
 		ttl74148_input_line_w(ttl74148, i, 1);
 
 	ttl74148_update(ttl74148);
-	vertigo_vproc_init(machine);
+	vertigo_vproc_reset(machine);
 
 	irq4_time = timer_get_time(machine);
 	irq_state = 7;
-
-	state_save_register_global(machine, irq_state);
-	state_save_register_global(machine, adc_result);
-	state_save_register_global(machine, irq4_time.seconds);
-	state_save_register_global(machine, irq4_time.attoseconds);
 }
 
 

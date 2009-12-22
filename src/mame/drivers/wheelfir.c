@@ -540,10 +540,10 @@ static INPUT_PORTS_START( wheelfir )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static emu_timer* frame_timer;
-static emu_timer* scanline_timer;
+static const device_config* frame_timer;
+static const device_config* scanline_timer;
 
-static TIMER_CALLBACK( frame_timer_callback )
+static TIMER_DEVICE_CALLBACK( frame_timer_callback )
 {
 	/* callback */
 }
@@ -570,15 +570,15 @@ static void render_background_to_render_buffer(int scanline)
 
 }
 
-static TIMER_CALLBACK( scanline_timer_callback )
+static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 {
-	timer_call_after_resynch(machine, NULL, 0, 0);
+	timer_call_after_resynch(timer->machine, NULL, 0, 0);
 
 	if (scanline_counter != (total_scanlines - 1))
 	{
 		scanline_counter++;
-		cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE); // raster IRQ, changes scroll values for road
-		timer_adjust_oneshot(scanline_timer, attotime_div(ATTOTIME_IN_HZ(60), total_scanlines), 0);
+		cputag_set_input_line(timer->machine, "maincpu", 5, HOLD_LINE); // raster IRQ, changes scroll values for road
+		timer_device_adjust_oneshot(timer, attotime_div(ATTOTIME_IN_HZ(60), total_scanlines), 0);
 
 		if (scanline_counter < 256)
 		{
@@ -587,7 +587,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 
 		if (scanline_counter == 256)
 		{
-			cputag_set_input_line(machine, "maincpu", 3, HOLD_LINE); // vblank IRQ?
+			cputag_set_input_line(timer->machine, "maincpu", 3, HOLD_LINE); // vblank IRQ?
 			toggle_bit = 0x8000; // must toggle..
 		}
 
@@ -609,16 +609,16 @@ static VIDEO_EOF( wheelfir )
 	scanline_counter = -1;
 	bitmap_fill(wheelfir_tmp_bitmap[0], video_screen_get_visible_area(machine->primary_screen),0);
 
-	timer_adjust_oneshot(frame_timer,  attotime_zero, 0);
-	timer_adjust_oneshot(scanline_timer,  attotime_zero, 0);
+	timer_device_adjust_oneshot(frame_timer,  attotime_zero, 0);
+	timer_device_adjust_oneshot(scanline_timer,  attotime_zero, 0);
 }
 
 static MACHINE_RESET(wheelfir)
 {
-	frame_timer = timer_alloc(machine, frame_timer_callback, NULL);
-	scanline_timer = timer_alloc(machine, scanline_timer_callback, NULL);
-	timer_adjust_oneshot(frame_timer, attotime_zero, 0);
-	timer_adjust_oneshot(scanline_timer,  attotime_zero, 0);
+	frame_timer = devtag_get_device(machine, "frame_timer");
+	scanline_timer = devtag_get_device(machine, "scan_timer");
+	timer_device_adjust_oneshot(frame_timer, attotime_zero, 0);
+	timer_device_adjust_oneshot(scanline_timer,  attotime_zero, 0);
 	scanline_counter = -1;
 }
 
@@ -640,6 +640,8 @@ static MACHINE_DRIVER_START( wheelfir )
 
 	MDRV_MACHINE_RESET (wheelfir)
 
+	MDRV_TIMER_ADD("frame_timer", frame_timer_callback)
+	MDRV_TIMER_ADD("scan_timer", scanline_timer_callback)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

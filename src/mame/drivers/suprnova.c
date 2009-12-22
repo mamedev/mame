@@ -449,17 +449,13 @@ static READ32_HANDLER( skns_hit_r )
 /* start old driver code */
 
 
-static TIMER_CALLBACK( interrupt_callback )
+static TIMER_DEVICE_CALLBACK( interrupt_callback )
 {
-	cputag_set_input_line(machine, "maincpu", param, HOLD_LINE);
+	cputag_set_input_line(timer->machine, "maincpu", param, HOLD_LINE);
 }
 
 static MACHINE_RESET(skns)
 {
-	timer_pulse(machine, ATTOTIME_IN_MSEC(2), NULL, 15, interrupt_callback);
-	timer_pulse(machine, ATTOTIME_IN_MSEC(8), NULL, 11, interrupt_callback);
-	timer_pulse(machine, cputag_clocks_to_attotime(machine, "maincpu", 1824), NULL, 9, interrupt_callback);
-
 	memory_set_bankptr(machine, "bank1",memory_region(machine, "user1"));
 }
 
@@ -841,6 +837,13 @@ static MACHINE_DRIVER_START(skns)
 
 	MDRV_MACHINE_RESET(skns)
 	MDRV_NVRAM_HANDLER(generic_1fill)
+
+	MDRV_TIMER_ADD_PERIODIC("int15_timer", interrupt_callback, MSEC(2))
+	MDRV_TIMER_PARAM(15)
+	MDRV_TIMER_ADD_PERIODIC("int11_timer", interrupt_callback, MSEC(8))
+	MDRV_TIMER_PARAM(11)
+	MDRV_TIMER_ADD_PERIODIC("int9_timer", interrupt_callback, HZ(28638000/1824))
+	MDRV_TIMER_PARAM(9)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
