@@ -155,6 +155,7 @@ VIDEO_START( suprslam )
 VIDEO_UPDATE( suprslam )
 {
 	suprslam_state *state = (suprslam_state *)screen->machine->driver_data;
+	tilemap_set_scrollx( state->screen_tilemap,0, state->screen_vregs[0x04/2] );
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	k053936_zoom_draw(state->k053936, bitmap, cliprect, state->bg_tilemap, 0, 0, 1);

@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( suprslam_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfd0000, 0xfdffff) AM_RAM
 	AM_RANGE(0xfe0000, 0xfe0fff) AM_RAM_WRITE(suprslam_screen_videoram_w) AM_BASE_MEMBER(suprslam_state, screen_videoram)
 	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(suprslam_bg_videoram_w) AM_BASE_MEMBER(suprslam_state, bg_videoram)
-	AM_RANGE(0xff2000, 0xff203f) AM_RAM // (layer) brightness control? Used on the title screen.
+	AM_RANGE(0xff2000, 0xff203f) AM_RAM AM_BASE_MEMBER(suprslam_state,screen_vregs)
 //	AM_RANGE(0xff3000, 0xff3001) AM_WRITENOP // sprite buffer trigger?
 	AM_RANGE(0xff8000, 0xff8fff) AM_DEVREADWRITE("k053936", k053936_linectrl_r, k053936_linectrl_w)
 	AM_RANGE(0xff9000, 0xff9001) AM_WRITE(sound_command_w)
