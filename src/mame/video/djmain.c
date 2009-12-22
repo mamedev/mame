@@ -4,7 +4,7 @@
  */
 
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 #define NUM_SPRITES	(0x800 / 16)
 #define NUM_LAYERS	2
@@ -14,10 +14,11 @@ UINT32 *djmain_obj_ram;
 
 static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	const device_config *k055555 = devtag_get_device(machine, "k055555");
 	int offs, pri_code;
 	int sortedlist[NUM_SPRITES];
 
-	machine->gfx[0]->color_base = K055555_read_register(K55_PALBASE_SUB2) * 0x400;
+	machine->gfx[0]->color_base = k055555_read_register(k055555, K55_PALBASE_SUB2) * 0x400;
 
 	for (offs = 0; offs < NUM_SPRITES; offs++)
 		sortedlist[offs] = -1;
@@ -128,35 +129,31 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 }
 
 
-static void game_tile_callback(int layer, int *code, int *color, int *flags)
+void djmain_tile_callback(running_machine* machine, int layer, int *code, int *color, int *flags)
 {
 }
 
 VIDEO_START( djmain )
 {
-	static int scrolld[NUM_LAYERS][4][2] = {
-	 	{{ 0, 0}, {0, 0}, {0, 0}, {0, 0}},
-	 	{{ 0, 0}, {0, 0}, {0, 0}, {0, 0}}
-	};
+	const device_config *k056832 = devtag_get_device(machine, "k056832");
 
-	K056832_vh_start(machine, "gfx2", K056832_BPP_4dj, 1, scrolld, game_tile_callback, 1);
-	K055555_vh_start(machine);
-
-	K056832_set_LayerOffset(0, -92, -27);
-	// K056832_set_LayerOffset(1, -87, -27);
-	K056832_set_LayerOffset(1, -88, -27);
+	k056832_set_layer_offs(k056832, 0, -92, -27);
+	// k056832_set_layer_offs(k056832, 1, -87, -27);
+	k056832_set_layer_offs(k056832, 1, -88, -27);
 }
 
 VIDEO_UPDATE( djmain )
 {
-	int enables = K055555_read_register(K55_INPUT_ENABLES);
+	const device_config *k056832 = devtag_get_device(screen->machine, "k056832");
+	const device_config *k055555 = devtag_get_device(screen->machine, "k055555");
+	int enables = k055555_read_register(k055555, K55_INPUT_ENABLES);
 	int pri[NUM_LAYERS + 1];
 	int order[NUM_LAYERS + 1];
 	int i, j;
 
 	for (i = 0; i < NUM_LAYERS; i++)
-		pri[i] = K055555_read_register(K55_PRIINP_0 + i * 3);
-	pri[i] = K055555_read_register(K55_PRIINP_10);
+		pri[i] = k055555_read_register(k055555, K55_PRIINP_0 + i * 3);
+	pri[i] = k055555_read_register(k055555, K55_PRIINP_10);
 
 	for (i = 0; i < NUM_LAYERS + 1; i++)
 		order[i] = i;
@@ -185,7 +182,7 @@ VIDEO_UPDATE( djmain )
 		else
 		{
 			if (enables & (K55_INP_VRAM_A << layer))
-				K056832_tilemap_draw_dj(screen->machine, bitmap, cliprect, layer, 0, 1 << i);
+				k056832_tilemap_draw_dj(k056832, bitmap, cliprect, layer, 0, 1 << i);
 		}
 	}
 	return 0;

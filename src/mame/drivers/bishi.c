@@ -88,12 +88,15 @@ Notes:
 
 #include "driver.h"
 #include "deprecat.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ymz280b.h"
 
 VIDEO_START(bishi);
 VIDEO_UPDATE(bishi);
+
+extern void bishi_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
+
 
 static UINT16 cur_control, cur_control2;
 
@@ -146,20 +149,17 @@ static READ16_HANDLER( bishi_mirror_r )
 
 static READ16_HANDLER( bishi_K056832_rom_r )
 {
+	const device_config *k056832 = devtag_get_device(space->machine, "k056832");
 	UINT16 ouroffs;
 
-	ouroffs = (offset>>1)*8;
-	if (offset&1)
-	{
+	ouroffs = (offset >> 1) * 8;
+	if (offset & 1)
 		ouroffs++;
-	}
 
 	if (cur_control2 & 0x1000)
-	{
 		ouroffs += 4;
-	}
 
-	return K056832_bishi_rom_word_r(space, ouroffs, mem_mask);
+	return k056832_bishi_rom_word_r(k056832, ouroffs, mem_mask);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -171,12 +171,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800008, 0x800009) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x810000, 0x810003) AM_WRITE(control2_w)		// bank switch for K056832 character ROM test
 	AM_RANGE(0x820000, 0x820001) AM_WRITENOP			// lamps (see lamp test in service menu)
-	AM_RANGE(0x830000, 0x83003f) AM_WRITE(K056832_word_w)
-	AM_RANGE(0x840000, 0x840007) AM_WRITE(K056832_b_word_w)	// VSCCS
-	AM_RANGE(0x850000, 0x85001f) AM_WRITE(K054338_word_w)	// CLTC
-	AM_RANGE(0x870000, 0x8700ff) AM_WRITE(K055555_word_w)	// PCU2
+	AM_RANGE(0x830000, 0x83003f) AM_DEVWRITE("k056832", k056832_word_w)
+	AM_RANGE(0x840000, 0x840007) AM_DEVWRITE("k056832", k056832_b_word_w)	// VSCCS
+	AM_RANGE(0x850000, 0x85001f) AM_DEVWRITE("k054338", k054338_word_w)	// CLTC
+	AM_RANGE(0x870000, 0x8700ff) AM_DEVWRITE("k055555", k055555_word_w)	// PCU2
 	AM_RANGE(0x880000, 0x880003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0xff00)
-	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(K056832_ram_word_r, K056832_ram_word_w)	// Graphic planes
+	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)	// Graphic planes
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xb04000, 0xb047ff) AM_READ(bishi_mirror_r)	// bug in the ram/rom test?
 	AM_RANGE(0xc00000, 0xc01fff) AM_READ(bishi_K056832_rom_r)
@@ -397,6 +397,23 @@ static const ymz280b_interface ymz280b_intf =
 	sound_irq_gen
 };
 
+
+static const k056832_interface bishi_k056832_intf =
+{
+	"gfx1", 0,
+	K056832_BPP_8,
+	1, 0,
+	KONAMI_ROM_DEINTERLEAVE_NONE,
+	bishi_tile_callback, "none"
+};
+
+static const k054338_interface bishi_k054338_intf =
+{
+	"screen",
+	0,
+	"none"
+};
+
 static MACHINE_DRIVER_START( bishi )
 
 	/* basic machine hardware */
@@ -421,6 +438,10 @@ static MACHINE_DRIVER_START( bishi )
 
 	MDRV_VIDEO_START(bishi)
 	MDRV_VIDEO_UPDATE(bishi)
+
+	MDRV_K056832_ADD("k056832", bishi_k056832_intf)
+	MDRV_K054338_ADD("k054338", bishi_k054338_intf)
+	MDRV_K055555_ADD("k055555")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

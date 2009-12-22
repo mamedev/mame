@@ -8,12 +8,12 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/konamiic.h"
-#include "includes/konamigx.h"
+#include "video/konicdev.h"
+//#include "includes/konamigx.h"
 
 static int layer_colorbase[4], layerpri[4];
 
-static void bishi_tile_callback(int layer, int *code, int *color, int *flags)
+void bishi_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags)
 {
 //  *code -= '0';
 //  *color = layer_colorbase[layer] | (*color>>2 & 0x0f);
@@ -25,19 +25,16 @@ static void bishi_tile_callback(int layer, int *code, int *color, int *flags)
 
 VIDEO_START(bishi)
 {
+	const device_config *k056832 = devtag_get_device(machine, "k056832");
+
 	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_RGB32);
 
-	K055555_vh_start(machine);
-	K054338_vh_start(machine);
+	k056832_set_layer_association(k056832, 0);
 
-	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 1, NULL, bishi_tile_callback, 0);
-
-	K056832_set_LayerAssociation(0);
-
-	K056832_set_LayerOffset(0, -2, 0);
-	K056832_set_LayerOffset(1,  2, 0);
-	K056832_set_LayerOffset(2,  4, 0);
-	K056832_set_LayerOffset(3,  6, 0);
+	k056832_set_layer_offs(k056832, 0, -2, 0);
+	k056832_set_layer_offs(k056832, 1,  2, 0);
+	k056832_set_layer_offs(k056832, 2,  4, 0);
+	k056832_set_layer_offs(k056832, 3,  6, 0);
 
 	// the 55555 is set to "0x10, 0x11, 0x12, 0x13", but these values are almost correct...
 	layer_colorbase[0] = 0x00;
@@ -67,18 +64,21 @@ static void sortlayers(int *layer,int *pri)
 
 VIDEO_UPDATE(bishi)
 {
+	const device_config *k056832 = devtag_get_device(screen->machine, "k056832");
+	const device_config *k054338 = devtag_get_device(screen->machine, "k054338");
+	const device_config *k055555 = devtag_get_device(screen->machine, "k055555");
 	int layers[4], i;/*, old;*/
 /*  int bg_colorbase, new_colorbase, plane, dirty; */
 	static const int pris[4] = { K55_PRIINP_0, K55_PRIINP_3, K55_PRIINP_6, K55_PRIINP_7 };
 	static const int enables[4] = { K55_INP_VRAM_A, K55_INP_VRAM_B, K55_INP_VRAM_C, K55_INP_VRAM_D };
 
-	K054338_update_all_shadows(screen->machine,0 );
-	K054338_fill_backcolor(screen->machine, bitmap, 0);
+	k054338_update_all_shadows(k054338, 0);
+	k054338_fill_backcolor(k054338, bitmap, 0);
 
 	for (i = 0; i < 4; i++)
 	{
 		layers[i] = i;
-		layerpri[i] = K055555_read_register(pris[i]);
+		layerpri[i] = k055555_read_register(k055555, pris[i]);
 	}
 
 	sortlayers(layers, layerpri);
@@ -87,9 +87,9 @@ VIDEO_UPDATE(bishi)
 
 	for (i = 0; i < 4; i++)
 	{
-		if (K055555_read_register(K55_INPUT_ENABLES) & enables[layers[i]])
+		if (k055555_read_register(k055555, K55_INPUT_ENABLES) & enables[layers[i]])
 		{
-			K056832_tilemap_draw(screen->machine, bitmap, cliprect, layers[i], 0, 1<<i);
+			k056832_tilemap_draw(k056832, bitmap, cliprect, layers[i], 0, 1 << i);
 		}
 	}
 	return 0;

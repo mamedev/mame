@@ -2437,7 +2437,6 @@ static MACHINE_DRIVER_START( punkshot )
 
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(punkshot)
 	MDRV_VIDEO_UPDATE(punkshot)
 
 	MDRV_K052109_ADD("k052109", tmnt_k052109_intf)
@@ -2523,7 +2522,6 @@ static MACHINE_DRIVER_START( blswhstl )
 
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(blswhstl)
 	MDRV_VIDEO_UPDATE(lgtnfght)
 	MDRV_VIDEO_EOF( blswhstl )
 
@@ -2778,7 +2776,6 @@ static MACHINE_DRIVER_START( sunsetbl )
 	MDRV_K053245_ADD("k053245", lgtnfght_k05324x_intf)
 	MDRV_K053251_ADD("k053251")
 
-	MDRV_VIDEO_START(sunsetbl)
 	MDRV_VIDEO_UPDATE(tmnt2)
 
 	/* sound hardware */
@@ -2815,7 +2812,6 @@ static MACHINE_DRIVER_START( thndrx2 )
 
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(thndrx2)
 	MDRV_VIDEO_UPDATE(thndrx2)
 
 	MDRV_K052109_ADD("k052109", tmnt_k052109_intf)
