@@ -80,7 +80,7 @@
 */
 
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "cpu/dsp56k/dsp56k.h"
@@ -123,7 +123,7 @@ static READ32_DEVICE_HANDLER( polygonet_eeprom_r )
 {
 	if (ACCESSING_BITS_0_15)
 	{
-		return 0x0200 | (eepromdev_read_bit(device)<<8);
+		return 0x0200 | (eepromdev_read_bit(device) << 8);
 	}
 	else
 	{
@@ -137,13 +137,11 @@ static READ32_DEVICE_HANDLER( polygonet_eeprom_r )
 }
 
 
-static WRITE32_DEVICE_HANDLER( polygonet_eeprom_w )
+static WRITE32_HANDLER( polygonet_eeprom_w )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		eepromdev_write_bit(device, (data & 0x01000000) ? ASSERT_LINE : CLEAR_LINE);
-		eepromdev_set_cs_line(device, (data & 0x02000000) ? CLEAR_LINE : ASSERT_LINE);
-		eepromdev_set_clock_line(device, (data & 0x04000000) ? ASSERT_LINE : CLEAR_LINE);
+		input_port_write(space->machine, "EEPROMOUT", data, 0xffffffff);
 		return;
 	}
 
@@ -522,10 +520,10 @@ static WRITE16_HANDLER( dsp56k_ram_bank04_write )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(plygonet_palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x400000, 0x40001f) AM_RAM AM_BASE((UINT32**)&K053936_0_ctrl)
+	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE16("k053936", k053936_ctrl_r, k053936_ctrl_w, 0xffffffff)
 	AM_RANGE(0x440000, 0x440fff) AM_READWRITE(polygonet_roz_ram_r, polygonet_roz_ram_w)
 	AM_RANGE(0x480000, 0x4bffff) AM_DEVREAD("eeprom", polygonet_eeprom_r)
-	AM_RANGE(0x4C0000, 0x4fffff) AM_DEVWRITE("eeprom", polygonet_eeprom_w)
+	AM_RANGE(0x4C0000, 0x4fffff) AM_WRITE(polygonet_eeprom_w)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(shared_ram_write) AM_BASE(&shared_ram)
 	AM_RANGE(0x504000, 0x504003) AM_WRITE(dsp_w_lines)
 	AM_RANGE(0x506000, 0x50600f) AM_READWRITE(dsp_host_interface_r, dsp_host_interface_w)
@@ -632,6 +630,11 @@ static MACHINE_START(polygonet)
 	//cputag_set_input_line(machine, "dsp", DSP56K_IRQ_MODB, CLEAR_LINE);
 }
 
+static const k053936_interface polygonet_k053936_intf =
+{
+	0, 0, 0	/* wrap, xoff, yoff */
+};
+
 static MACHINE_DRIVER_START( plygonet )
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -666,6 +669,8 @@ static MACHINE_DRIVER_START( plygonet )
 
 	MDRV_VIDEO_START(polygonet)
 	MDRV_VIDEO_UPDATE(polygonet)
+
+	MDRV_K053936_ADD("k053936", polygonet_k053936_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -703,6 +708,11 @@ static INPUT_PORTS_START( polygonet )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( polynetw )
@@ -725,6 +735,11 @@ static INPUT_PORTS_START( polynetw )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 INPUT_PORTS_END
 
 

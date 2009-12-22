@@ -8,7 +8,7 @@
 */
 
 #include "driver.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 /* TTL text plane stuff */
 
@@ -123,10 +123,11 @@ VIDEO_START( polygonet )
 
 VIDEO_UPDATE( polygonet )
 {
+	const device_config *k053936 = devtag_get_device(screen->machine, "k053936");
 	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
-	K053936_0_zoom_draw(bitmap, cliprect, roz_tilemap, 0, 0, 0);
+	k053936_zoom_draw(k053936, bitmap, cliprect, roz_tilemap, 0, 0, 0);
 
 	tilemap_draw(bitmap, cliprect, ttl_tilemap, 0, 1<<0);
 	return 0;
