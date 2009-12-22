@@ -46,14 +46,14 @@ In test mode (c) is 2000
 #define xxxx 0x90 /* Unknown */
 
 static const UINT8 cb2001_decryption_table[256] = {
-	0xe8,xxxx,0x94,xxxx,0x80,0x61,xxxx,xxxx, 0x3c,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 00 */
-//    pppp      ????      ???? ????            pppp
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,0xd3,0x3a,xxxx,0x89,xxxx, /* 10 */
-//                                             pppp     ????  pppp pppp      pppp ????
+	0xe8,xxxx,0x94,xxxx,0x80,0x61,0x12,xxxx, 0x3c,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 00 */
+//    pppp      ????      ???? ???? pppp       pppp
+	xxxx,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,0xd3,0x3a,0x14,0x89,xxxx, /* 10 */
+//                   pppp pppp                 pppp      ???? pppp pppp pppp pppp ????
 	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xb5,xxxx, xxxx,xxxx,xxxx,0x75,xxxx,xxxx,xxxx,xxxx, /* 20 */
-//         !!!!      ????      ???? pppp                      pppp
+//         !!!!      pppp      ???? pppp                      pppp
 	0x9d,xxxx,xxxx,xxxx,xxxx,xxxx,0xbe,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,0xbf,0x74, /* 30 */
-//    ????                          ????                 ????           ???? ???? pppp
+//    ????                          pppp                 ????           ???? ???? pppp
 	xxxx,0xea,xxxx,xxxx,xxxx,0xb0,xxxx,xxxx, xxxx,0xa2,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 40 */
 //         !!!!                gggg                 pppp
 	xxxx,xxxx,0x2c,xxxx,xxxx,xxxx,0x42,0xc0, xxxx,xxxx,xxxx,xxxx,0xeb,xxxx,xxxx,xxxx, /* 50 */
@@ -62,18 +62,18 @@ static const UINT8 cb2001_decryption_table[256] = {
 //                        pppp                      ????                pppp gggg
 	0xc3,xxxx,0x02,xxxx,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf2,xxxx,xxxx,0x43,xxxx,xxxx, /* 70 */
 //    pppp      pppp                pppp       pppp      ????           pppp
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x34, xxxx,xxxx,xxxx,xxxx,0x73,xxxx,xxxx,xxxx, /* 80 */
-//                                       ????                      pppp
+	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x34, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x2a,xxxx, /* 80 */
+//                                       ????            pppp      pppp      ????
 	xxxx,xxxx,0xe9,xxxx,xxxx,0xbe,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0xb9,xxxx,xxxx,xxxx, /* 90 */
-//              ????           pppp                                pppp
-	xxxx,xxxx,xxxx,0x06,0xaa,0x9c,xxxx,0xb8, xxxx,xxxx,0xfc,xxxx,xxxx,xxxx,xxxx,xxxx, /* A0 */
-//                   ???? ???? ????      !!!!            ????
+//              ????           p?p?                                pppp
+	xxxx,xxxx,xxxx,0x06,0xaa,0x9c,xxxx,0xb8, xxxx,xxxx,0xfc,xxxx,0x51,xxxx,xxxx,0x1a, /* A0 */
+//                   ???? ???? ????      !!!!            ????      pppp           pppp
 	0x75,xxxx,0xb4,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,0x03,xxxx,xxxx,xxxx,0x07,0xcf, /* B0 */
 //    ????      pppp                                     pppp      ????      ???? ????
-	xxxx,xxxx,0xee,xxxx,xxxx,0xe2,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x36,xxxx, /* C0 */
-//              ????           pppp                                          ????
-	xxxx,xxxx,0x46,xxxx,0x60,xxxx,xxxx,xxxx, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,0x8b, /* D0 */
-//              pppp      ????                 pppp                     ???? !!!! pppp
+	xxxx,0xec,0xee,xxxx,xxxx,0xe2,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x36,xxxx, /* C0 */
+//         pppp ????           pppp                                          ????
+	xxxx,xxxx,0x46,xxxx,0x60,xxxx,xxxx,0x47, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,0x8b, /* D0 */
+//              pppp      ????           pppp  pppp                     ???? !!!! pppp
 	0x8a,xxxx,xxxx,0xc6,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
 //    pppp           !!!!
 	xxxx,xxxx,0xfe,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* F0 */
@@ -101,10 +101,43 @@ cmast91:                      cb2001:
 
 cmv4                          cb2001                     (en -> de)
 
+.                             e025f mov dw,2h
+02b2 in a,($06)               e0262 in al,dw             (c1 -> ec)
+.                             e0263 xor al,d0h
+.                             e0265 and l,c0h
+02b4 bit 6,a                  e0267 test1 al,6h          (23 -> 0f)
+02b6 jp z,$41e2               e026b be e0270
+.                             e026d br e39fe
+02b9 bit 7,a                  e0270 test1 al,7h
+02bb jp z,$41e2               e0274 be e0279
+02be call $0ab2               .
+.                             e0276 br e6120             
+02c1 ld bc,$8000              e0279 mov cw,8000h
+
 029f ld b,$fc                 
 02a1 call $0c38               e0239 call 0e30b8h
-02a4 ld hl,$d023              e023d mov ix,90h
+02a4 ld hl,$d023              e023d mov ix,90h           (36 -> be)
 02a7 call $2b2d               e0240 call 0e32a6h
+  2b2d ld a,$01                 e32a6 mov al,1h
+  2b2f or a                     e32a8 and al,al
+  2b30 add a,(hl)               e32aa add al,b ptr [ix]
+  2b31 daa                      e32ac daa                (13 -> 27) not sure
+  2b32 ld (hl),a                e32ad mov b ptr [ix],al
+  2b33 push bc                  e32af push cw            (ac -> 51)
+  2b34 ld b,$03                 e32b0 mov cw,3h          (9c -> b9)
+  2b36 dec hl                   e32b3                               inc ix or dec ix?
+  2b37 ld a,(hl)                e32b4 mov al,b ptr [ix]  (e0 -> 8a)
+  2b38 adc a,$00                e32b6 adc al,0h          (1d -> 14)
+  2b3a daa                      e32b8 daa
+  2b3b ld (hl),a                e32b9 mov b ptr [ix],al
+  2b3c djnz $2b36               e32bb dbnz e32b3h        (c5 -> e2)
+  2b3e pop bc                   e32bd pop cw             (8a -> 59)
+  2b3f ret                      e32be ret
+  
+  2b40-2b4b                     e32bf-e32d1              (06 -> 12) (d7 -> 4f dec iy or 47 inc iy)
+  2b4c-2b57                     e32d2-e32e4              (af -> 1a)
+  .                             e32e5-                   (8e -> 2a) (14 -> 1c)
+
 02aa ld a,$01                 e0243 mov al,1h
 02ac ld ($d618),a             e0245 mov [72dh],al
 02af call $4a8e               e0248 call 0e66cbh
@@ -128,10 +161,10 @@ cmv4                          cb2001                     (en -> de)
   4aa8 ld d,$00                 e66eb mov ah,00h         (b2 -> b4)
   4aaa ld hl,$4b62              e66ed mov bw,67cbh       (6d -> bb)
   4aad add lh,de                e66f0 add bw,aw          (ba -> 03)
-  4aae ld e,(hl)                CE                                  prefix
+  4aae ld e,(hl)                .                                   prefix
   4aaf inc hl                   .
   4abo ld d,(hl)                .
-  4ab1 ex de,hl                 e66f3 mov bw,w ptr[bw]   (df -> 8b)
+  4ab1 ex de,hl                 e66f2 mov bw,w ptr ss[bw](df -> 8b)
   4ab2 xor a                    .
   4ab3 ld ($d618),a             e66f5 mov b ptr[72dh],ah (d8 -> 88)
   4ab6 ld ($d619),a             e66f9 mov b ptr[72eh],ah
