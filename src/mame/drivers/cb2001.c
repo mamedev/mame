@@ -46,17 +46,17 @@ In test mode (c) is 2000
 #define xxxx 0x90 /* Unknown */
 
 static const UINT8 cb2001_decryption_table[256] = {
-	0xe8,xxxx,xxxx,xxxx,xxxx,0x61,xxxx,xxxx, 0x3c,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 00 */
-//    pppp                     ????            pppp
+	0xe8,xxxx,0x94,xxxx,xxxx,0x61,xxxx,xxxx, 0x3c,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 00 */
+//    pppp      ????           ????            pppp
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,xxxx,0x3a,xxxx,0x89,xxxx, /* 10 */
 //                                             pppp     ????       pppp      pppp ????
-	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xbc,xxxx, xxxx,xxxx,xxxx,0x75,xxxx,xxxx,xxxx,xxxx, /* 20 */
+	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xb2,xxxx, xxxx,xxxx,xxxx,0x75,xxxx,xxxx,xxxx,xxxx, /* 20 */
 //         !!!!      ????      ???? ????                      pppp
 	0x9d,xxxx,xxxx,xxxx,xxxx,xxxx,0xbe,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,0xbf,0x74, /* 30 */
 //    ????                          ????                 ????           ???? ???? pppp
 	xxxx,0xea,xxxx,xxxx,xxxx,0xb0,xxxx,xxxx, xxxx,0xa2,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 40 */
 //         !!!!                gggg                 pppp
-	xxxx,xxxx,0x2a,xxxx,xxxx,xxxx,0x42,xxxx, xxxx,xxxx,xxxx,xxxx,0xeb,xxxx,xxxx,xxxx, /* 50 */
+	xxxx,xxxx,0x2c,xxxx,xxxx,xxxx,0x42,xxxx, xxxx,xxxx,xxxx,xxxx,0xeb,xxxx,xxxx,xxxx, /* 50 */
 //              pppp                ????                           pppp
 	xxxx,xxxx,xxxx,xxxx,0x22,xxxx,xxxx,xxxx, xxxx,0xa5,xxxx,xxxx,xxxx,0xbb,0xba,xxxx, /* 60 */
 //                        pppp                      ????                pppp gggg
@@ -70,7 +70,7 @@ static const UINT8 cb2001_decryption_table[256] = {
 //                   ???? ???? ????      !!!!            ????
 	0x75,xxxx,0xb4,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,0x03,xxxx,xxxx,xxxx,0x07,0xcf, /* B0 */
 //    ????      pppp                                     pppp      ????      ???? ????
-	xxxx,xxxx,0xee,xxxx,xxxx,0xe2,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xa4,xxxx, /* C0 */
+	xxxx,xxxx,0xee,xxxx,xxxx,0xe2,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x36,xxxx, /* C0 */
 //              ????           pppp                                          ????
 	xxxx,xxxx,0x46,xxxx,0x60,xxxx,xxxx,xxxx, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,0x8b, /* D0 */
 //              pppp      ????                 pppp                     ???? !!!! pppp
@@ -151,7 +151,7 @@ cmv4                          cb2001                     (en -> de)
   4ace cp $f0                   e671f cmp al,0f0h
   4ad0 jr nc,$4b14              e6721 bnc 0e676fh        (8c -> 73)
 
-  4add sub $50                  e672f sub al,50h         (52 -> 2a)
+  4add sub $50                  e672f sub al,50h         (52 -> 2c)
   4adf cp $50                   e6731 cmp al,50h
   4ae1 jr c,$4ae7               e6733 bc 0e6739          (78 -> 72)
   4ae3 ld b,$04                 e6735 26 04
