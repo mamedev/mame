@@ -180,6 +180,41 @@ static ADDRESS_MAP_START( cninja_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x308000, 0x308fff) AM_WRITENOP /* Bootleg only */
 ADDRESS_MAP_END
 
+static WRITE16_HANDLER( cninjabl_soundlatch_w )
+{
+	// todo:
+}
+
+static ADDRESS_MAP_START( cninjabl_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0bffff) AM_ROM
+
+	AM_RANGE(0x138000, 0x1387ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* bootleg sprite-ram (sprites rewritten here in new format) */
+
+	AM_RANGE(0x140000, 0x14000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x144000, 0x144fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
+	AM_RANGE(0x146000, 0x146fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
+	AM_RANGE(0x14c000, 0x14c7ff) AM_WRITEONLY AM_BASE(&deco16_pf1_rowscroll)
+	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
+
+	AM_RANGE(0x150000, 0x15000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control) // not used / incorrect on this
+	AM_RANGE(0x154000, 0x154fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
+	AM_RANGE(0x156000, 0x156fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
+	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
+	AM_RANGE(0x15e000, 0x15e7ff) AM_RAM AM_BASE(&deco16_pf4_rowscroll)
+
+	AM_RANGE(0x17ff22, 0x17ff23) AM_READ_PORT("DSW")
+	AM_RANGE(0x17ff28, 0x17ff29) AM_READ_PORT("IN1")
+	AM_RANGE(0x17ff2a, 0x17ff2b) AM_WRITE( cninjabl_soundlatch_w )
+	AM_RANGE(0x17ff2c, 0x17ff2d) AM_READ_PORT("IN0")
+
+	AM_RANGE(0x180000, 0x187fff) AM_RAM // more ram on bootleg?
+
+	AM_RANGE(0x190000, 0x190007) AM_READWRITE(cninja_irq_r, cninja_irq_w)
+	AM_RANGE(0x19c000, 0x19dfff) AM_RAM_WRITE(deco16_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+
+	AM_RANGE(0x1b4000, 0x1b4001) AM_WRITE(buffer_spriteram16_w) /* DMA flag */
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( edrandy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
@@ -588,6 +623,17 @@ static const gfx_layout charlayout =
 	16*8	/* every char takes 8 consecutive bytes */
 };
 
+static const gfx_layout charlayout_boot =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 16, 0, 24, 8 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	8*32
+};
+
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -633,6 +679,14 @@ static GFXDECODE_START( cninja )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,  512, 64 )	/* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,768, 32 )	/* Sprites 16x16 */
 GFXDECODE_END
+
+static GFXDECODE_START( cninjabl )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout_boot,  0, 32 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,0, 32 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,512, 64 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,768, 32 )	/* Sprites 16x16 */
+GFXDECODE_END
+
 
 static GFXDECODE_START( robocop2 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 32 )	/* Characters 8x8 */
@@ -784,6 +838,51 @@ static MACHINE_DRIVER_START( stoneage )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( cninjabl )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
+	MDRV_CPU_PROGRAM_MAP(cninjabl_map)
+	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
+
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
+	MDRV_CPU_PROGRAM_MAP(stoneage_s_map)
+
+	MDRV_MACHINE_RESET(cninja)
+
+	MDRV_TIMER_ADD("raster_timer", interrupt_gen)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(58)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+
+	MDRV_GFXDECODE(cninjabl)
+	MDRV_PALETTE_LENGTH(2048)
+
+	MDRV_VIDEO_START(stoneage)
+	MDRV_VIDEO_UPDATE(cninja)
+	MDRV_VIDEO_EOF(cninja)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ymsnd", YM2151, 32220000/9)
+	MDRV_SOUND_CONFIG(ym2151_interface2)
+	MDRV_SOUND_ROUTE(0, "mono", 0.45)
+	MDRV_SOUND_ROUTE(1, "mono", 0.45)
+
+	MDRV_SOUND_ADD("oki1", OKIM6295, 32220000/32)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( edrandy )
 
@@ -1138,6 +1237,38 @@ ROM_START( stoneage )
 	/* No extra Oki samples in the bootleg */
 	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASEFF )
 ROM_END
+
+ROM_START( cninjabl )
+	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "joe mac 3.68k", 0x00000, 0x80000,  CRC(dc931d80) SHA1(78103f74fb428c4735e77d99a143cdf28915ef26) )
+	ROM_LOAD16_WORD_SWAP( "joe mac 4.68k", 0x80000, 0x40000,  CRC(e8dfe0b5) SHA1(f7f883c19023bc68146aea5eaf98d2fdd606d5e3) )
+	ROM_IGNORE(0x40000) //  1xxxxxxxxxxxxxxxxxx = 0xFF
+	
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Sound CPU */
+	ROM_LOAD( "joe mac 5.z80",  0x00000,  0x10000, CRC(d791b9d7) SHA1(7842ab7e960b692bdbcadf5c64f09ddd1a3fb861) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x400000, "gfxtemp", 0 ) // the bootleg has the gfx in 2 roms
+	ROM_LOAD16_BYTE( "joe mac 1.gfx",  0x00000,  0x200000,  CRC(17ea5931) SHA1(cb686dea0d960d35ab3709f1f592598c2d757045) )
+	ROM_LOAD16_BYTE( "joe mac 2.gfx",  0x00001,  0x200000,  CRC(cc95317b) SHA1(ffa97dde954f73d8e0f6e55387b44f5bcc08242b) )
+
+	// split larger bootleg GFX roms into required regions
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_INVERT ) // chars
+	ROM_COPY( "gfxtemp", 0x000000, 0x000000, 0x020000 )
+
+	ROM_REGION( 0x080000, "gfx2", ROMREGION_INVERT ) // tiles 3
+	ROM_COPY( "gfxtemp", 0x080000, 0x000000, 0x080000 )
+
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT ) // tiles 2
+	ROM_COPY( "gfxtemp", 0x180000, 0x000000, 0x080000 )
+	ROM_COPY( "gfxtemp", 0x100000, 0x080000, 0x080000 )
+
+	ROM_REGION( 0x200000, "gfx4", 0 ) // sprites
+	ROM_COPY( "gfxtemp", 0x200000, 0x000000, 0x200000 )
+
+	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples */
+	ROM_LOAD( "joe mac 6.samples",  0x00000,  0x80000, CRC(dbecad83) SHA1(de34653606f12d2c606ff7d1cbce993521772884) ) // 1ST AND 2ND HALF IDENTICAL
+ROM_END
+
 
 ROM_START( edrandy ) /* World ver 3 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
@@ -1723,7 +1854,8 @@ GAME( 1991, cninja,   0,       cninja,   cninja,  cninja,   ROT0, "Data East Cor
 GAME( 1991, cninja1,  cninja,  cninja,   cninja,  cninja,   ROT0, "Data East Corporation", "Caveman Ninja (World ver 1)", 0 )
 GAME( 1991, cninjau,  cninja,  cninja,   cninjau, cninja,   ROT0, "Data East Corporation", "Caveman Ninja (US ver 4)", 0 )
 GAME( 1991, joemac,   cninja,  cninja,   cninja,  cninja,   ROT0, "Data East Corporation", "Tatakae Genshizin Joe & Mac (Japan ver 1)", 0 )
-GAME( 1991, stoneage, cninja,  stoneage, cninja,  stoneage, ROT0, "bootleg", "Stoneage", 0 )
+GAME( 1991, stoneage, cninja,  stoneage, cninja,  stoneage, ROT0, "bootleg", "Stoneage (bootleg of Caveman Ninja)", 0 )
+GAME( 1991, cninjabl, cninja,  cninjabl, cninja,  0,        ROT0, "bootleg", "Caveman Ninja (bootleg)", GAME_NOT_WORKING )
 GAME( 1991, robocop2, 0,       robocop2, robocop2,0,        ROT0, "Data East Corporation", "Robocop 2 (Euro/Asia v0.10)", 0 )
 GAME( 1991, robocop2u,robocop2,robocop2, robocop2,0,        ROT0, "Data East Corporation", "Robocop 2 (US v0.05)", 0 )
 GAME( 1991, robocop2j,robocop2,robocop2, robocop2,0,        ROT0, "Data East Corporation", "Robocop 2 (Japan v0.11)", 0 )
