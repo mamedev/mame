@@ -860,7 +860,10 @@ static WRITE8_HANDLER( sparkman_leds_w )
 */
 static WRITE8_HANDLER( sparkman_spritebank_w )
 {
-	suna8_spritebank = (data >> 1) & 1;
+	if(data == 0xf7) //???
+		suna8_spritebank = 0;
+	else
+		suna8_spritebank = (data) & 1;
 	if (data & ~0x02) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
