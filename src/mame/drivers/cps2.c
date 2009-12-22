@@ -1260,7 +1260,7 @@ static MACHINE_DRIVER_START( gigamn2 )
 
 	MDRV_DEVICE_REMOVE("audiocpu")
 
-//	MDRV_DEVICE_REMOVE("qsound")
+	MDRV_DEVICE_REMOVE("qsound")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/32)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
