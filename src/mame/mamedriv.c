@@ -6919,6 +6919,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Midway Zeus games */
 	DRIVER( mk4 )		/* (c) 1997 Midway (v3.0) Latest offical release */
 	DRIVER( mk4a )		/* (c) 1997 Midway (v2.1) */
+	DRIVER( mk4b )		/* (c) 1997 Midway (v1.0) */
 	DRIVER( invasnab )	/* (c) 1999 Midway (v5.0) Latest offical release */
 	DRIVER( invasnv4 )	/* (c) 1999 Midway (v4.0) */
 	DRIVER( crusnexo )	/* (c) 1999 Midway (v2.4) Latest offical release */
