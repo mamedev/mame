@@ -24,7 +24,6 @@
 #define OBJTYPE_ASTRING					OBJECT_TYPE('a','s','t','r')
 #define OBJTYPE_BITMAP					OBJECT_TYPE('b','i','t','m')
 #define OBJTYPE_TIMER					OBJECT_TYPE('t','i','m','r')
-#define OBJTYPE_STATEREG				OBJECT_TYPE('s','t','a','t')
 
 
 

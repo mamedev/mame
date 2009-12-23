@@ -144,7 +144,6 @@ void begin_resource_tracking(void)
 	pool_type_register(new_pool, OBJTYPE_ASTRING, "String", astring_destructor);
 	pool_type_register(new_pool, OBJTYPE_BITMAP, "Bitmap", bitmap_destructor);
 	pool_type_register(new_pool, OBJTYPE_TIMER, "Timer", timer_destructor);
-	pool_type_register(new_pool, OBJTYPE_STATEREG, "Save State Registration", state_destructor);
 
 	/* increment the tag counter */
 	resource_tracking_tag++;

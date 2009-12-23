@@ -166,13 +166,6 @@ void state_save_register_postload(running_machine *machine, state_postload_func 
 
 
 
-/* ----- registration freeing ----- */
-
-/* free all registrations that have been tagged with the current resource tag */
-void state_destructor(void *ptr, size_t size);
-
-
-
 /* ----- save state file processing ----- */
 
 /* check if a file is a valid save state */
