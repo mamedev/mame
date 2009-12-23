@@ -343,6 +343,13 @@ void eepromdev_set_data(const device_config *device, const UINT8 *data, int leng
 
 	assert(length <= ((1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8));
 	memcpy(eestate->data, data, length);
+/* temporary: write data to eeprom.bin when this happens so we capture it 
+   for adding to a region */
+{
+	FILE *f = fopen("eeprom.bin", "wb");
+	fwrite(eestate->data, 1, (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8, f);
+	fclose(f);
+}
 }
 
 void *eepromdev_get_data_pointer(const device_config *device, UINT32 *length, UINT32 *size)
@@ -375,6 +382,7 @@ static DEVICE_START(eeprom)
 {
 	eeprom_state *eestate = get_safe_token(device);
 	const eeprom_config *config;
+	UINT8 *region_base;
 
 	/* validate some basic stuff */
 	assert(device != NULL);
@@ -394,6 +402,22 @@ static DEVICE_START(eeprom)
 	memset(eestate->data, 0xff, (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8);
 	if ((config->default_data != NULL) && (config->default_data_size != 0))
 		eepromdev_set_data(device, config->default_data, config->default_data_size);
+	
+	region_base = memory_region(device->machine, device->tag);
+	if (region_base != NULL)
+	{
+		UINT32 region_length = memory_region_length(device->machine, device->tag);
+		UINT32 region_flags = memory_region_flags(device->machine, device->tag);
+		
+		if (region_length != (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8)
+			fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)", device->tag, (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8);
+		if (eestate->intf->data_bits == 8 && (region_flags & ROMREGION_WIDTHMASK) != ROMREGION_8BIT)
+			fatalerror("eeprom region '%s' needs to be an 8-bit region", device->tag);
+		if (eestate->intf->data_bits == 16 && ((region_flags & ROMREGION_WIDTHMASK) != ROMREGION_16BIT || (region_flags & ROMREGION_ENDIANMASK) != ROMREGION_BE))
+			fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region (flags=%08x)", device->tag, region_flags);
+		memcpy(eestate->data, region_base, region_length);
+	}
+	
 	eestate->serial_count = 0;
 	eestate->latch = 0;
 	eestate->reset_line = ASSERT_LINE;

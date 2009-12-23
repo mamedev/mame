@@ -1242,7 +1242,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 static UINT32 normalize_flags_for_cpu(running_machine *machine, UINT32 startflags, const char *rgntag)
 {
 	const device_config *device = cputag_get_cpu(machine, rgntag);
-	if (device != NULL)
+	if (device != NULL && cpu_get_databus_width(device, ADDRESS_SPACE_PROGRAM) != 0)
 	{
 		int buswidth;
 
