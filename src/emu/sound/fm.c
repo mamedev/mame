@@ -1567,7 +1567,6 @@ static int init_tables(void)
 			for (i=0; i<13; i++)
 				logerror(", [%02i] %4x", i*2, tl_tab[ x*2 /*+1*/ + i*2*TL_RES_LEN ]);
 			logerror("\n");
-		}
 	#endif
 	}
 	/*logerror("FM.C: TL_TAB_LEN = %i elements (%i bytes)\n",TL_TAB_LEN, (int)sizeof(tl_tab));*/

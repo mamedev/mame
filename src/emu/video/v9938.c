@@ -1607,6 +1607,8 @@ void v9938_update_mouse_state(int which, int mx_delta, int my_delta, int button_
 #define pre_loop \
     while ((cnt-=delta) > 0) {
 
+#define post_loop \
+    }
 
 /* Loop over DX, DY */
 #define post__x_y(MX) \
@@ -1618,7 +1620,7 @@ void v9938_update_mouse_state(int which, int mx_delta, int my_delta, int button_
         ANX=NX; \
       } \
     } \
-  }
+  post_loop
 
 /* Loop over DX, SY, DY */
 #define post__xyy(MX) \
@@ -1628,7 +1630,7 @@ void v9938_update_mouse_state(int which, int mx_delta, int my_delta, int button_
       else \
         ADX=DX; \
     } \
-  }
+  post_loop
 
 /* Loop over SX, DX, SY, DY */
 #define post_xxyy(MX) \
@@ -1641,7 +1643,7 @@ void v9938_update_mouse_state(int which, int mx_delta, int my_delta, int button_
         ANX=NX; \
       } \
     } \
-  }
+  post_loop
 
 /*************************************************************/
 /** Function prototypes                                     **/
@@ -1894,7 +1896,7 @@ void SrchEngine(void)
       VDPStatus[2]&=0xEF; /* Border not detected */ \
       break; \
     } \
-  }
+  post_loop
 
   switch (ScrMode) {
     default:
@@ -1952,7 +1954,8 @@ void LineEngine(void)
       ASX&=1023; /* Mask to 10 bits range */ \
       if (ADX++==NX || (DX&MX)) \
         break; \
-    }
+    post_loop
+
 #define post_lineymaj(MX) \
       DY+=TY; \
       if ((ASX-=NY)<0) { \
@@ -1962,7 +1965,7 @@ void LineEngine(void)
       ASX&=1023; /* Mask to 10 bits range */ \
       if (ADX++==NX || (DX&MX)) \
         break; \
-    }
+    post_loop
 
   if ((VDP[45]&0x01)==0)
     /* X-Axis is major direction */

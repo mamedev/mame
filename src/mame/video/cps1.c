@@ -2795,7 +2795,7 @@ VIDEO_UPDATE( cps1 )
 #if 0
 if (	(cps2_port(screen->machine, CPS2_OBJ_BASE) != 0x7080 && cps2_port(screen->machine, CPS2_OBJ_BASE) != 0x7000) ||
 		cps2_port(screen->machine, CPS2_OBJ_UK1) != 0x807d ||
-		(cps2_port(screen->machine, CPS2_OBJ_UK2) != 0x0000 && cps2_port(screen->machine, CPS2_OBJ_UK2) != 0x1101 && cps2_port(screen->machine, CPS2_OBJ_UK2) != 0x0001) ||
+		(cps2_port(screen->machine, CPS2_OBJ_UK2) != 0x0000 && cps2_port(screen->machine, CPS2_OBJ_UK2) != 0x1101 && cps2_port(screen->machine, CPS2_OBJ_UK2) != 0x0001))
 	popmessage("base %04x uk1 %04x uk2 %04x",
 			cps2_port(screen->machine, CPS2_OBJ_BASE),
 			cps2_port(screen->machine, CPS2_OBJ_UK1),

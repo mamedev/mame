@@ -1357,7 +1357,7 @@ void nvsram( offs_t offset, UINT16 data )
     if( i%16 == 0 )
       logerror( "%04X: ", offset );
     logerror( "%02X ", data );
-    ascii[i%16] = ( data > 0x20) ? data : '.' );
+    ascii[i%16] = (data > 0x20) ? data : '.';
     if( i%16 == 15 )
       logerror( "| %-16.16s\n", ascii );
   }

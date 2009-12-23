@@ -140,7 +140,7 @@ INLINE v810_state *get_safe_token(const device_config *device)
 #define D16(x) (((x)&0xffff)|(((x)&0x8000)?0xffff0000:0))
 #define D26(x,y) ((y)|((x&0x3ff)<<16 )|((x&0x200)?0xfc000000:0))
 #define D9(x) ((x&0x1ff)|((x&0x100)?0xfffffe00:0))
-#define SO(opcode) ((opcode)&0xfc00)>>10)
+#define SO(opcode) (((opcode)&0xfc00)>>10)
 
 #define CHECK_CY(x)	cpustate->PSW=(cpustate->PSW & ~8)|(((x) & (((UINT64)1) << 32)) ? 8 : 0)
 #define CHECK_OVADD(x,y,z)	cpustate->PSW=(cpustate->PSW & ~0x00000004) |(( ((x) ^ (z)) & ((y) ^ (z)) & 0x80000000) ? 4: 0)

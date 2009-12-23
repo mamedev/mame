@@ -1753,12 +1753,12 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	#define STV_VDP2_LNCLEN	((stv_vdp2_regs[0x0e8/4] >> 16)&0x0000ffff)
-	#define STV_VDP2_SPLCEN	((STV_VDP2_LNCLEN) & 0x0020) >> 5)
-	#define STV_VDP2_R0LCEN	((STV_VDP2_LNCLEN) & 0x0010) >> 4)
-	#define STV_VDP2_N3LCEN	((STV_VDP2_LNCLEN) & 0x0008) >> 3)
-	#define STV_VDP2_N2LCEN	((STV_VDP2_LNCLEN) & 0x0004) >> 2)
-	#define STV_VDP2_N1LCEN	((STV_VDP2_LNCLEN) & 0x0002) >> 1)
-	#define STV_VDP2_N0LCEN	((STV_VDP2_LNCLEN) & 0x0001) >> 0)
+	#define STV_VDP2_SPLCEN	((STV_VDP2_LNCLEN & 0x0020) >> 5)
+	#define STV_VDP2_R0LCEN	((STV_VDP2_LNCLEN & 0x0010) >> 4)
+	#define STV_VDP2_N3LCEN	((STV_VDP2_LNCLEN & 0x0008) >> 3)
+	#define STV_VDP2_N2LCEN	((STV_VDP2_LNCLEN & 0x0004) >> 2)
+	#define STV_VDP2_N1LCEN	((STV_VDP2_LNCLEN & 0x0002) >> 1)
+	#define STV_VDP2_N0LCEN	((STV_VDP2_LNCLEN & 0x0001) >> 0)
 
 /* 1800ea - Special Priority Mode
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\

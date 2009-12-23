@@ -128,6 +128,8 @@ int main(int argc, char *argv[])
 
 			if (!in_c_string && !in_cpp_comment)
 			{
+				int consume = TRUE;
+
 				/* track whether or not we are within a C-style comment */
 				if (!in_c_comment && ch == '/' && original[src] == '*')
 					in_c_comment = TRUE;
@@ -135,8 +137,17 @@ int main(int argc, char *argv[])
 					in_c_comment = FALSE;
 
 				/* track whether or not we are within a C++-style comment */
-				if (!in_c_comment && ch == '/' && original[src] == '/')
+				else if (!in_c_comment && ch == '/' && original[src] == '/')
 					in_cpp_comment = TRUE;
+				else
+					consume = FALSE;
+
+				if (consume)
+				{
+					modified[dst++] = ch;
+					col++;
+					ch = original[src++];
+				}
 			}
 		}
 

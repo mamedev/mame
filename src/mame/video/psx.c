@@ -1154,19 +1154,23 @@ INLINE void decode_tpage( running_machine *machine, struct PSXGPU *p_psxgpu, UIN
 #define FLATTEXTUREDRECTANGLEUPDATE \
 	n_u += n_du;
 
-#define TEXTURE4BIT( TXV, TXU ) \
+#define TEXTURE_LOOP \
 	while( n_distance > 0 ) \
-	{ \
+	{
+
+#define TEXTURE_ENDLOOP \
+	}	
+
+#define TEXTURE4BIT( TXV, TXU ) \
+	TEXTURE_LOOP \
 		n_bgr = p_clut[ ( *( m_p_p_vram[ n_ty + TXV ] + n_tx + ( TXU >> 2 ) ) >> ( ( TXU & 0x03 ) << 2 ) ) & 0x0f ];
 
 #define TEXTURE8BIT( TXV, TXU ) \
-	while( n_distance > 0 ) \
-	{ \
+	TEXTURE_LOOP \
 		n_bgr = p_clut[ ( *( m_p_p_vram[ n_ty + TXV ] + n_tx + ( TXU >> 1 ) ) >> ( ( TXU & 0x01 ) << 3 ) ) & 0xff ];
 
 #define TEXTURE15BIT( TXV, TXU ) \
-	while( n_distance > 0 ) \
-	{ \
+	TEXTURE_LOOP \
 		n_bgr = *( m_p_p_vram[ n_ty + TXV ] + n_tx + TXU );
 
 #define TEXTUREWINDOW4BIT( TXV, TXU ) TEXTURE4BIT( ( TXV & m_n_twh ), ( TXU & m_n_tww ) )
@@ -1174,22 +1178,19 @@ INLINE void decode_tpage( running_machine *machine, struct PSXGPU *p_psxgpu, UIN
 #define TEXTUREWINDOW15BIT( TXV, TXU ) TEXTURE15BIT( ( TXV & m_n_twh ), ( TXU & m_n_tww ) )
 
 #define TEXTUREINTERLEAVED4BIT( TXV, TXU ) \
-	while( n_distance > 0 ) \
-	{ \
+	TEXTURE_LOOP \
 		int n_xi = ( ( TXU >> 2 ) & ~0x3c ) + ( ( TXV << 2 ) & 0x3c ); \
 		int n_yi = ( TXV & ~0xf ) + ( ( TXU >> 4 ) & 0xf ); \
 		n_bgr = p_clut[ ( *( m_p_p_vram[ n_ty + n_yi ] + n_tx + n_xi ) >> ( ( TXU & 0x03 ) << 2 ) ) & 0x0f ];
 
 #define TEXTUREINTERLEAVED8BIT( TXV, TXU ) \
-	while( n_distance > 0 ) \
-	{ \
+	TEXTURE_LOOP \
 		int n_xi = ( ( TXU >> 1 ) & ~0x78 ) + ( ( TXU << 2 ) & 0x40 ) + ( ( TXV << 3 ) & 0x38 ); \
 		int n_yi = ( TXV & ~0x7 ) + ( ( TXU >> 5 ) & 0x7 ); \
 		n_bgr = p_clut[ ( *( m_p_p_vram[ n_ty + n_yi ] + n_tx + n_xi ) >> ( ( TXU & 0x01 ) << 3 ) ) & 0xff ];
 
 #define TEXTUREINTERLEAVED15BIT( TXV, TXU ) \
-	while( n_distance > 0 ) \
-	{ \
+	TEXTURE_LOOP \
 		int n_xi = TXU; \
 		int n_yi = TXV; \
 		n_bgr = *( m_p_p_vram[ n_ty + n_yi ] + n_tx + n_xi );
@@ -1209,7 +1210,7 @@ INLINE void decode_tpage( running_machine *machine, struct PSXGPU *p_psxgpu, UIN
 		p_vram++; \
 		PIXELUPDATE \
 		n_distance--; \
-	}
+	TEXTURE_ENDLOOP
 
 #define TRANSPARENTPIXEL( PIXELUPDATE ) \
 		if( n_bgr != 0 ) \
@@ -1232,7 +1233,7 @@ INLINE void decode_tpage( running_machine *machine, struct PSXGPU *p_psxgpu, UIN
 		p_vram++; \
 		PIXELUPDATE \
 		n_distance--; \
-	}
+	TEXTURE_ENDLOOP
 
 #define TEXTUREFILL( PIXELUPDATE, TXU, TXV ) \
 	if( n_distance > ( (INT32)m_n_drawarea_x2 - n_x ) + 1 ) \

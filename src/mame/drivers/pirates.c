@@ -146,6 +146,7 @@ static WRITE16_HANDLER( pirates_out_w )
 static CUSTOM_INPUT( prot_r )
 {
 //  static int prot = 0xa3;
+//  offs_t pc;
 	int bit;
 
 //  logerror("%s: IN1_r\n",cpuexec_describe_context(field->port->machine));
@@ -155,16 +156,17 @@ static CUSTOM_INPUT( prot_r )
        602e and 62a6 */
 	/* For Genix, see 6576 for setting values and 67c2,d3b4 and dbc2 for tests. */
 
-	if (cpu_get_pc(cputag_get_cpu(field->port->machine, "main")) == 0x6134)
+	pc = cpu_get_pc(cputag_get_cpu(field->port->machine, "main"));
+	if (pc == 0x6134)
 	{
 		bit = prot & 1;
 		prot = (prot >> 1) | (bit << 7);
 	}
-	else if (cputag_get_cpu(field->port->machine, "main")) == 0x6020)
+	else if (pc == 0x6020)
 		bit = 0;
-	else if (cputag_get_cpu(field->port->machine, "main")) == 0x6168)
+	else if (pc == 0x6168)
 		bit = 0;
-	else if (cputag_get_cpu(field->port->machine, "main")) == 0x61cc)
+	else if (pc == 0x61cc)
 		bit = 1;
 	else
 #endif
