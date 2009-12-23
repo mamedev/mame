@@ -4360,7 +4360,7 @@ ROM_START( ffightj2 )
 ROM_END
 
 /* B-Board 88622B */
-ROM_START( ffightjb )
+ROM_START( ffightjh )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "ff.23.bin",    0x00000, 0x80000, CRC(ae3dda7f) SHA1(5f08ce1e6b6b0d45994d3354d59ef79f489c7ad7) )
 	ROM_LOAD16_WORD_SWAP( "ff.22.bin",    0x80000, 0x80000, CRC(b2d5a3aa) SHA1(b60f7480d3d3ceebad4c21025394bacc154d7042) )
@@ -8811,7 +8811,7 @@ GAME( 1989, ffightub, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom"
 GAME( 1989, ffightj,  ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1989, ffightj1, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan 900305)", GAME_SUPPORTS_SAVE )
 GAME( 1989, ffightj2, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan 900112)", GAME_SUPPORTS_SAVE )
-GAME( 1989, ffightjb, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan, bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1989, ffightjh, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan, hack)", GAME_SUPPORTS_SAVE )
 GAME( 1990, 1941,     0,        cps1_10MHz, 1941,     cps1,     ROT270, "Capcom", "1941 - Counter Attack (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, 1941j,    1941,     cps1_10MHz, 1941,     cps1,     ROT270, "Capcom", "1941 - Counter Attack (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, mercs,    0,        cps1_10MHz, mercs,    cps1,     ROT270, "Capcom", "Mercs (World 900302)", GAME_SUPPORTS_SAVE )					// "ETC"
