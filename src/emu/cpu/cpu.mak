@@ -789,6 +789,21 @@ $(CPUOBJ)/pic16c5x/pic16c5x.o:	$(CPUSRC)/pic16c5x/pic16c5x.c \
 
 
 #-------------------------------------------------
+# Microchip PIC16C62x
+#-------------------------------------------------
+
+ifneq ($(filter PIC16C62X,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/pic16c62x
+CPUOBJS += $(CPUOBJ)/pic16c62x/pic16c62x.o
+DASMOBJS += $(CPUOBJ)/pic16c62x/16c62xdsm.o
+endif
+
+$(CPUOBJ)/pic16c62x/pic16c62x.o:	$(CPUSRC)/pic16c62x/pic16c62x.c \
+								$(CPUSRC)/pic16c62x/pic16c62x.h
+
+
+
+#-------------------------------------------------
 # MIPS R3000 (MIPS I/II) series
 # MIPS R4000 (MIPS III/IV) series
 # Sony PlayStation CPU (R3000-based + GTE)

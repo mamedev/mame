@@ -166,6 +166,7 @@ CPU_DISASSEMBLE( pdp1 );
 CPU_DISASSEMBLE( tx0_64kw );
 CPU_DISASSEMBLE( tx0_8kw );
 CPU_DISASSEMBLE( pic16c5x );
+CPU_DISASSEMBLE( pic16c62x );
 CPU_DISASSEMBLE( powerpc );
 CPU_DISASSEMBLE( rsp );
 CPU_DISASSEMBLE( s2650 );
@@ -291,6 +292,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "tx0_64kw",   _32be, -2, CPU_DISASSEMBLE_NAME(tx0_64kw) },
 	{ "tx0_8kw",    _32be, -2, CPU_DISASSEMBLE_NAME(tx0_8kw) },
 	{ "pic16c5x",   _16le, -1, CPU_DISASSEMBLE_NAME(pic16c5x) },
+	{ "pic16c62x",  _16le, -1, CPU_DISASSEMBLE_NAME(pic16c62x) },
 	{ "powerpc",    _32be,  0, CPU_DISASSEMBLE_NAME(powerpc) },
 	{ "rsp",        _32le,  0, CPU_DISASSEMBLE_NAME(rsp) },
 	{ "s2650",      _8bit,  0, CPU_DISASSEMBLE_NAME(s2650) },
