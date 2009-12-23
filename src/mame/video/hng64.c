@@ -33,7 +33,7 @@ UINT32 *hng64_tcram;
 
 UINT8 hng64_screen_dis;
 
-// 3d display buffers 
+// 3d display buffers
 // (Temporarily global - someday they will live with the proper bit-depth in the memory map)
 static float* depthBuffer3d;
 static UINT32* colorBuffer3d;
@@ -1705,24 +1705,24 @@ static float uToF(UINT16 input);
 static void setCameraTransformation(const UINT16* packet)
 {
 	/*//////////////
-	// PACKET FORMAT
-	// [0]  - 0001 ... ID
-	// [1]  - xxxx ... Extrinsic camera matrix
-	// [2]  - xxxx ... Extrinsic camera matrix
-	// [3]  - xxxx ... Extrinsic camera matrix
-	// [4]  - xxxx ... Extrinsic camera matrix
-	// [5]  - xxxx ... Extrinsic camera matrix
-	// [6]  - xxxx ... Extrinsic camera matrix
-	// [7]  - xxxx ... Extrinsic camera matrix
-	// [8]  - xxxx ... Extrinsic camera matrix
-	// [9]  - xxxx ... Extrinsic camera matrix
-	// [10] - xxxx ... Extrinsic camera matrix
-	// [11] - xxxx ... Extrinsic camera matrix
-	// [12] - xxxx ... Extrinsic camera matrix
-	// [13] - ???? ... ? Flips per-frame during fatfurwa 'HNG64'
-	// [14] - ???? ... ? Could be some floating-point values during buriki 'door run'
-	// [15] - ???? ... ? Same as 13 & 14
-	////////////*/
+    // PACKET FORMAT
+    // [0]  - 0001 ... ID
+    // [1]  - xxxx ... Extrinsic camera matrix
+    // [2]  - xxxx ... Extrinsic camera matrix
+    // [3]  - xxxx ... Extrinsic camera matrix
+    // [4]  - xxxx ... Extrinsic camera matrix
+    // [5]  - xxxx ... Extrinsic camera matrix
+    // [6]  - xxxx ... Extrinsic camera matrix
+    // [7]  - xxxx ... Extrinsic camera matrix
+    // [8]  - xxxx ... Extrinsic camera matrix
+    // [9]  - xxxx ... Extrinsic camera matrix
+    // [10] - xxxx ... Extrinsic camera matrix
+    // [11] - xxxx ... Extrinsic camera matrix
+    // [12] - xxxx ... Extrinsic camera matrix
+    // [13] - ???? ... ? Flips per-frame during fatfurwa 'HNG64'
+    // [14] - ???? ... ? Could be some floating-point values during buriki 'door run'
+    // [15] - ???? ... ? Same as 13 & 14
+    ////////////*/
 	// CAMERA TRANSFORMATION MATRIX
 	cameraMatrix[0]  = uToF(packet[1]);
 	cameraMatrix[4]  = uToF(packet[2]);
@@ -1743,31 +1743,31 @@ static void setCameraTransformation(const UINT16* packet)
 	cameraMatrix[13] = uToF(packet[11]);
 	cameraMatrix[14] = uToF(packet[12]);
 	cameraMatrix[15] = 1.0f;
-} 
+}
 
 // Operation 0011
 // Palette / Model flags?
 static void set3dFlags(const UINT16* packet)
 {
 	/*//////////////
-	// PACKET FORMAT
-	// [0]  - 0011 ... ID
-	// [1]  - ???? ... 
-	// [2]  - ???? ... 
-	// [3]  - ???? ... 
-	// [4]  - ???? ... 
-	// [5]  - ???? ... 
-	// [6]  - ???? ... ? Flip & flop around like mad during fatfurwa intro
-	// [7]  - ???? ... ? Flip & flop around like mad during fatfurwa intro
-	// [8]  - xx?? ... Palette offset & ??
-	// [9]  - ???? ... ? Very much used - seem to bounce around when characters are on screen
-	// [10] - ???? ... ? ''  ''
-	// [11] - ???? ... ? ''  ''
-	// [12] - ???? ... ? ''  ''
-	// [13] - ???? ... ? ''  ''
-	// [14] - ???? ... ? ''  ''
-	// [15] - ???? ... ? ''  ''
-	////////////*/
+    // PACKET FORMAT
+    // [0]  - 0011 ... ID
+    // [1]  - ???? ...
+    // [2]  - ???? ...
+    // [3]  - ???? ...
+    // [4]  - ???? ...
+    // [5]  - ???? ...
+    // [6]  - ???? ... ? Flip & flop around like mad during fatfurwa intro
+    // [7]  - ???? ... ? Flip & flop around like mad during fatfurwa intro
+    // [8]  - xx?? ... Palette offset & ??
+    // [9]  - ???? ... ? Very much used - seem to bounce around when characters are on screen
+    // [10] - ???? ... ? ''  ''
+    // [11] - ???? ... ? ''  ''
+    // [12] - ???? ... ? ''  ''
+    // [13] - ???? ... ? ''  ''
+    // [14] - ???? ... ? ''  ''
+    // [15] - ???? ... ? ''  ''
+    ////////////*/
 	paletteState3d  = (packet[8] & 0xff00) >> 8;
 	paletteState3d += ((hng64_3dregs[0x00/4] & 0x2000) >> 9); /* Palette is + 0x0800 in buriki. */
 	/* FIXME: Buriki One door colors in attract mode still aren't quite right, investigate... */
@@ -1778,24 +1778,24 @@ static void set3dFlags(const UINT16* packet)
 static void setCameraProjectionMatrix(const UINT16* packet)
 {
 	/*//////////////
-	// PACKET FORMAT
-	// [0]  - 0012 ... ID
-	// [1]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
-	// [2]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
-	// [3]  - ???? ... ? Contains a value
-	// [4]  - ???? ... ? Contains a value in buriki
-	// [5]  - ???? ... ? Contains a value
-	// [6]  - xxxx ... camera projection near
-	// [7]  - xxxx ... camera projection far
-	// [8]  - ???? ... ? Contains a value
-	// [9]  - ???? ... ? Contains a value
-	// [10] - xxxx ... camera projection right
-	// [11] - xxxx ... camera projection left
-	// [12] - xxxx ... camera projection top
-	// [13] - xxxx ... camera projection bottom
-	// [14] - ???? ... ? Gets data during buriki door-run
-	// [15] - ???? ... ? Gets data during buriki door-run
-	////////////*/
+    // PACKET FORMAT
+    // [0]  - 0012 ... ID
+    // [1]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
+    // [2]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
+    // [3]  - ???? ... ? Contains a value
+    // [4]  - ???? ... ? Contains a value in buriki
+    // [5]  - ???? ... ? Contains a value
+    // [6]  - xxxx ... camera projection near
+    // [7]  - xxxx ... camera projection far
+    // [8]  - ???? ... ? Contains a value
+    // [9]  - ???? ... ? Contains a value
+    // [10] - xxxx ... camera projection right
+    // [11] - xxxx ... camera projection left
+    // [12] - xxxx ... camera projection top
+    // [13] - xxxx ... camera projection bottom
+    // [14] - ???? ... ? Gets data during buriki door-run
+    // [15] - ???? ... ? Gets data during buriki door-run
+    ////////////*/
 
 	// This packet changes when fatfurwa 'How to play' is on the screen.
 	// Not too much, but if this is right, the aspect ratio is different...
@@ -1836,31 +1836,31 @@ static void setCameraProjectionMatrix(const UINT16* packet)
 void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct polygon* polys, int* numPolys)
 {
 	/*//////////////
-	// PACKET FORMAT
-	// [0]  - 0100 ... ID
-	// [1]  - xxxx ... Flags for sure (0118 for buriki characters, 
-	//                                 0010 for buriki door, 
-	//                                 0110 for fatfurwa hng64, 
-	//                                 0118|0108 for fatfurwa building intro,
-	//                                 0118|0108 for fatfurwa fighters infight,
-	//                                 0108->0118 for fatfurwa globe (transitions when players are selected,
-	//                                 00d8 for segfaulting geo in xrally & roadedge)
-	//                                (00!0 is thought to be for lighting maybe?)
-	// [2]  - xxxx ... offset into ROM
-	// [3]  - xxxx ... offset into ROM
-	// [4]  - xxxx ... Transformation matrix
-	// [5]  - xxxx ... Transformation matrix
-	// [6]  - xxxx ... Transformation matrix
-	// [7]  - xxxx ... Transformation matrix
-	// [8]  - xxxx ... Transformation matrix
-	// [9]  - xxxx ... Transformation matrix
-	// [10] - xxxx ... Transformation matrix
-	// [11] - xxxx ... Transformation matrix
-	// [12] - xxxx ... Transformation matrix
-	// [13] - ???? ... Transformation matrix
-	// [14] - ???? ... Transformation matrix
-	// [15] - ???? ... Transformation matrix
-	////////////*/
+    // PACKET FORMAT
+    // [0]  - 0100 ... ID
+    // [1]  - xxxx ... Flags for sure (0118 for buriki characters,
+    //                                 0010 for buriki door,
+    //                                 0110 for fatfurwa hng64,
+    //                                 0118|0108 for fatfurwa building intro,
+    //                                 0118|0108 for fatfurwa fighters infight,
+    //                                 0108->0118 for fatfurwa globe (transitions when players are selected,
+    //                                 00d8 for segfaulting geo in xrally & roadedge)
+    //                                (00!0 is thought to be for lighting maybe?)
+    // [2]  - xxxx ... offset into ROM
+    // [3]  - xxxx ... offset into ROM
+    // [4]  - xxxx ... Transformation matrix
+    // [5]  - xxxx ... Transformation matrix
+    // [6]  - xxxx ... Transformation matrix
+    // [7]  - xxxx ... Transformation matrix
+    // [8]  - xxxx ... Transformation matrix
+    // [9]  - xxxx ... Transformation matrix
+    // [10] - xxxx ... Transformation matrix
+    // [11] - xxxx ... Transformation matrix
+    // [12] - xxxx ... Transformation matrix
+    // [13] - ???? ... Transformation matrix
+    // [14] - ???? ... Transformation matrix
+    // [15] - ???? ... Transformation matrix
+    ////////////*/
 	int k, l, m;
 
 	UINT32  tempDWord;
@@ -1872,7 +1872,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	UINT32 address[4];
 	UINT32 megaOffset;
 	float eyeCoords[4];			// ObjectCoords transformed by the modelViewMatrix
-	// float clipCoords[4];		// EyeCoords transformed by the projectionMatrix
+	// float clipCoords[4];     // EyeCoords transformed by the projectionMatrix
 	float ndCoords[4];			// Normalized device coordinates/clipCoordinates (x/w, y/w, z/w)
 	float windowCoords[4];		// Mapped ndCoordinates to screen space
 	float cullRay[4];
@@ -1898,14 +1898,14 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 	// Debug - ajg
 	/*
-	printf("%08x : ", tempDWord*3*2);
-	for (k = 0; k < 7*3; k++)
-	{
-		printf("%04x ", threeDPointer[k]);
-		if ((k % 3) == 2) printf(" ");
-	}
-	printf("\n");
-	*/
+    printf("%08x : ", tempDWord*3*2);
+    for (k = 0; k < 7*3; k++)
+    {
+        printf("%04x ", threeDPointer[k]);
+        if ((k % 3) == 2) printf(" ");
+    }
+    printf("\n");
+    */
 
 	//////////////////////////////////////
 	// THE OBJECT TRANSFORMATION MATRIX //
@@ -1935,30 +1935,30 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	// EXTRACT DATA FROM THE ADDRESS POINTED TO IN THE FILE //
 	//////////////////////////////////////////////////////////
 	/*//////////////////////////////////////////////
-	// DIRECTLY-POINTED-TO FORMAT (7 words x 3 ROMs)
-	// [0]  - lower word of sub-address 1
-	// [1]  - lower word of sub-address 2
-	// [2]  - upper word of all sub-addresses
-	// [3]  - lower word of sub-address 3
-	// [4]  - lower word of sub-address 4
-	// [5]  - ???? always 0 ????
-	// [6]  - number of triangles in sub-address 1 block
-	// [7]  - number of triangles in sub-address 2 block
-	// [8]  - ???? always 0 ????
-	// [9]  - number of triangles in sub-address 3 block
-	// [10] - number of triangles in sub-address 4 block
-	// [11] - ? definitely used.
-	// [12] - ? definitely used.
-	// [13] - ? definitely used.
-	// [14] - ? definitely used.
-	// [15] - ???? always 0 ????
-	// [16] - ???? always 0 ????
-	// [17] - ???? always 0 ????
-	// [18] - ???? always 0 ????
-	// [19] - ???? always 0 ????
-	// [20] - ???? always 0 ????
-	//////////////////////////////////////////////*/
-    
+    // DIRECTLY-POINTED-TO FORMAT (7 words x 3 ROMs)
+    // [0]  - lower word of sub-address 1
+    // [1]  - lower word of sub-address 2
+    // [2]  - upper word of all sub-addresses
+    // [3]  - lower word of sub-address 3
+    // [4]  - lower word of sub-address 4
+    // [5]  - ???? always 0 ????
+    // [6]  - number of triangles in sub-address 1 block
+    // [7]  - number of triangles in sub-address 2 block
+    // [8]  - ???? always 0 ????
+    // [9]  - number of triangles in sub-address 3 block
+    // [10] - number of triangles in sub-address 4 block
+    // [11] - ? definitely used.
+    // [12] - ? definitely used.
+    // [13] - ? definitely used.
+    // [14] - ? definitely used.
+    // [15] - ???? always 0 ????
+    // [16] - ???? always 0 ????
+    // [17] - ???? always 0 ????
+    // [18] - ???? always 0 ????
+    // [19] - ???? always 0 ????
+    // [20] - ???? always 0 ????
+    //////////////////////////////////////////////*/
+
 	// There are 4 hunks per address.
 	address[0] = threeDPointer[0];
 	address[1] = threeDPointer[1];
@@ -2004,14 +2004,14 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// GATHER A SINGLE TRIANGLE'S INFORMATION //
 			////////////////////////////////////////////
 			/*/////////////////////////
-			// SINGLE POLY CHUNK FORMAT
-			// [0] ??-- - ???? unused ????
-			// [0] --xx - chunk type
-			// [1] x--- - 'texture type' (or UV-mapping style)?
-			// [1] -??- - ???? '18' for untextured buildings in fatfurwa ????
-			// [1] ---x - texture index
-			// [2] ???? - used in fatfurwa 'hng64' & everywhere in roadedge
-			/////////////////////////*/
+            // SINGLE POLY CHUNK FORMAT
+            // [0] ??-- - ???? unused ????
+            // [0] --xx - chunk type
+            // [1] x--- - 'texture type' (or UV-mapping style)?
+            // [1] -??- - ???? '18' for untextured buildings in fatfurwa ????
+            // [1] ---x - texture index
+            // [2] ???? - used in fatfurwa 'hng64' & everywhere in roadedge
+            /////////////////////////*/
 			UINT8 chunkLength = 0;
 			UINT8 chunkType = threeDPointer[0] & 0x00ff;
 
@@ -2022,8 +2022,8 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// Debug - ajg
 			//if ((threeDPointer[0] & 0xff00) != 0x0000)
 			//{
-			//	printf("!!! Doesn't appear to be a valid chunk !!!\n");
-			//	continue;
+			//  printf("!!! Doesn't appear to be a valid chunk !!!\n");
+			//  continue;
 			//}
 
 			// Get which texture this polygon refers to...
@@ -2049,16 +2049,16 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			switch(chunkType)
 			{
 			/*/////////////////////////
-			// CHUNK TYPE BITS - These are very likely incorrect.
-			// x--- ---- - 1 = Has only 1 vertex (part of a triangle fan/strip)
-			// -x-- ---- - 
-			// --x- ---- - 
-			// ---x ---- - 
-			// ---- x--- - 
-			// ---- -x-- - 1 = Has per-vert UVs
-			// ---- --x- - 
-			// ---- ---x - 1 = Has per-vert normals
-			/////////////////////////*/
+            // CHUNK TYPE BITS - These are very likely incorrect.
+            // x--- ---- - 1 = Has only 1 vertex (part of a triangle fan/strip)
+            // -x-- ---- -
+            // --x- ---- -
+            // ---x ---- -
+            // ---- x--- -
+            // ---- -x-- - 1 = Has per-vert UVs
+            // ---- --x- -
+            // ---- ---x - 1 = Has per-vert normals
+            /////////////////////////*/
 
 			// 33 word chunk, 3 vertices, per-vertex UVs & normals
 			case 0x05:	// 0000 0101
@@ -2125,7 +2125,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 					polys[*numPolys].vert[m].light[1] = polys[*numPolys].vert[m].texCoords[1] * 255.0f;
 					polys[*numPolys].vert[m].light[2] = polys[*numPolys].vert[m].texCoords[2] * 255.0f;
 				}
-                
+
 				// Redundantly called, but it works...
 				polys[*numPolys].faceNormal[0] = polys[*numPolys].vert[m].normal[0];
 				polys[*numPolys].faceNormal[1] = polys[*numPolys].vert[m].normal[1];
@@ -2219,79 +2219,79 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			case 0x2e:	// 0010 1110
 				/* There's something fishy about this guy - see 0x7a below.  Very likely not fixed-length */
 				/*
-				printf("0x2e : %08x\n", address[k]*3*2);
-				for (m = 0; m < 37; m++)
+                printf("0x2e : %08x\n", address[k]*3*2);
+                for (m = 0; m < 37; m++)
                     printf("%04x ", threeDPointer[m]);
-				printf("\n\n");
-				*/
+                printf("\n\n");
+                */
 				chunkLength = 36;
 			break;
 
 			/* This shouldn't exist. */
 			/* There's something funky going on with 0x2e - it's often well-behaved, except for
-			   when it "ends" with e67a.  Maybe this chunkLength thing isn't where it's at?
-			   Luckily the 0x7a is always at the end of a series of 2 chunks (2e,7a) so ignoring
-			   it won't kill us for now. */
+               when it "ends" with e67a.  Maybe this chunkLength thing isn't where it's at?
+               Luckily the 0x7a is always at the end of a series of 2 chunks (2e,7a) so ignoring
+               it won't kill us for now. */
 			case 0x7a:	// 0111 1010
 				/*
-				printf("0x7a : %08x (%d/%d)\n", mame_rand(machine), l, size[k]);
-				for (m = 0; m < 100; m++)
+                printf("0x7a : %08x (%d/%d)\n", mame_rand(machine), l, size[k]);
+                for (m = 0; m < 100; m++)
                     printf("%04x ", threeDPointer[m]);
-				printf("\n\n");
-				*/
+                printf("\n\n");
+                */
 				chunkLength = 0;
 			break;
 
 			case 0x24:	// 0010 0100
 				/*
-				printf("0x24 : %08x\n", address[k]*3*2);
-				for (m = 0; m < 49; m++)
+                printf("0x24 : %08x\n", address[k]*3*2);
+                for (m = 0; m < 49; m++)
                     printf("%04x ", threeDPointer[m]);
-				printf("\n\n");
-				*/
+                printf("\n\n");
+                */
 				chunkLength = 48;
 			break;
 
 			case 0xb6:	// 1011 0110
 				/*
-				printf("0xb6 : %08x\n", address[k]*3*2);
-				for (m = 0; m < 13; m++)
+                printf("0xb6 : %08x\n", address[k]*3*2);
+                for (m = 0; m < 13; m++)
                     printf("%04x ", threeDPointer[m]);
-				printf("\n\n");
-				*/
+                printf("\n\n");
+                */
 				chunkLength = 12;
 			break;
 
 			case 0x86:	// 1000 0110
 				/* Very likely not fixed-length since it leads into c6 & d6 */
 				/*
-				printf("0x86 : %08x\n", address[k]*3*2);
-				for (m = 0; m < 13; m++)
+                printf("0x86 : %08x\n", address[k]*3*2);
+                for (m = 0; m < 13; m++)
                     printf("%04x ", threeDPointer[m]);
-				printf("\n\n");
-				*/
+                printf("\n\n");
+                */
 				chunkLength = 12;
 			break;
 
 			/* Are c6 and d6 just insanely long? They aren't at the end of the numTris like 0x7a */
 			case 0xc6:	// 1100 0110
 				/*
-				printf("0xc6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]);
-				for (m = 0; m < 100; m++)
+                printf("0xc6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]);
+                for (m = 0; m < 100; m++)
                     printf("%04x ", threeDPointer[m]);
-				printf("\n\n");
-				*/
+                printf("\n\n");
+                */
 				chunkLength = 0;
 			break;
 
 			/* Are c6 and d6 just insanely long? They aren't at the end of numTris like 0x7a */
 			case 0xd6:	// 1101 0110
 				/*
-				printf("0xd6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]);
-				for (m = 0; m < 100; m++)
+                printf("0xd6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]);
+                for (m = 0; m < 100; m++)
                     printf("%04x ", threeDPointer[m]);
-				printf("\n\n");
-				*/
+                printf("\n\n");
+                */
 				chunkLength = 0;
 			break;
 #endif
@@ -2323,22 +2323,22 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// BACKFACE CULL //
 			// EMPIRICAL EVIDENCE SEEMS TO SHOW THE HNG64 HARDWARE DOES NOT BACKFACE CULL //
 			/*
-			float cullRay[4];
-			float cullNorm[4];
+            float cullRay[4];
+            float cullNorm[4];
 
-			// Cast a ray out of the camera towards the polygon's point in eyespace.
-			vecmatmul4(cullRay, modelViewMatrix, polys[*numPolys].vert[0].worldCoords);
-			normalize(cullRay);
-			// Dot product that with the normal to see if you're negative...
-			vecmatmul4(cullNorm, modelViewMatrix, polys[*numPolys].faceNormal);
+            // Cast a ray out of the camera towards the polygon's point in eyespace.
+            vecmatmul4(cullRay, modelViewMatrix, polys[*numPolys].vert[0].worldCoords);
+            normalize(cullRay);
+            // Dot product that with the normal to see if you're negative...
+            vecmatmul4(cullNorm, modelViewMatrix, polys[*numPolys].faceNormal);
 
-			float result = vecDotProduct(cullRay, cullNorm);
+            float result = vecDotProduct(cullRay, cullNorm);
 
-			if (result < 0.0f)
-				polys[*numPolys].visible = 1;
-			else
-				polys[*numPolys].visible = 0;
-			*/
+            if (result < 0.0f)
+                polys[*numPolys].visible = 1;
+            else
+                polys[*numPolys].visible = 0;
+            */
 
 			// BEHIND-THE-CAMERA CULL //
 			vecmatmul4(cullRay, modelViewMatrix, polys[*numPolys].vert[0].worldCoords);
@@ -2388,16 +2388,16 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			}
 
 			/*
-			// DEBUG
-			if (chunkLength == (9 << 1))
-			{
-				mame_printf_debug("Chunk : ");
-				for (int a = 0; a < chunkLength; a+=2)
-					mame_printf_debug("%.2x%.2x ", threeDPointer[a], threeDPointer[a+1]);
-				mame_printf_debug("\n");
-			}
-			// END DEBUG
-			*/
+            // DEBUG
+            if (chunkLength == (9 << 1))
+            {
+                mame_printf_debug("Chunk : ");
+                for (int a = 0; a < chunkLength; a+=2)
+                    mame_printf_debug("%.2x%.2x ", threeDPointer[a], threeDPointer[a+1]);
+                mame_printf_debug("\n");
+            }
+            // END DEBUG
+            */
 
 			// Advance to the next polygon chunk...
 			threeDPointer += chunkLength;
@@ -2529,7 +2529,7 @@ static void clear3d(running_machine *machine)
 	setIdentity(cameraMatrix);
 }
 
-/* 3D/framebuffer video registers 
+/* 3D/framebuffer video registers
  * ------------------------------
  *
  * UINT32 | Bits                                    | Use
@@ -2605,10 +2605,10 @@ static float uToF(UINT16 input)
 	return retVal;
 
 /*
-	if ((INT16)input < 0)
-		retVal = (float)((INT16)input) / 32768.0f;
-	else
-		retVal = (float)((INT16)input) / 32767.0f;
+    if ((INT16)input < 0)
+        retVal = (float)((INT16)input) / 32768.0f;
+    else
+        retVal = (float)((INT16)input) / 32767.0f;
 */
 }
 

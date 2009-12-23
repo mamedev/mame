@@ -104,7 +104,7 @@ VIDEO_START( gauntlet )
 
 	/* set up the base color for the playfield */
 	state->playfield_color_bank = state->vindctr2_screen_refresh ? 0 : 1;
-	
+
 	/* save states */
 	state_save_register_global(machine, state->playfield_tile_bank);
 	state_save_register_global(machine, state->playfield_color_bank);

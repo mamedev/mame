@@ -142,9 +142,9 @@ static READ8_HANDLER( pang_port5_r )
 	/* bit 3 is checked before updating the palette so it really seems to be vblank. */
 	/* Many games require two interrupts per frame and for these bits to toggle, */
 	/* otherwise music doesn't work. */
-	if (cpu_getiloops(space->cpu) & 1) 
+	if (cpu_getiloops(space->cpu) & 1)
 		bit |= 0x01;
-	else 
+	else
 		bit |= 0x08;
 
 	if (state->port5_kludge)	/* hack... music doesn't work otherwise */
@@ -215,7 +215,7 @@ static READ8_HANDLER( block_input_r )
 				delta = 0;
 			}
 		}
-		if (delta > 0x3f) 
+		if (delta > 0x3f)
 			delta = 0x3f;
 
 		return delta << 2;
@@ -224,7 +224,7 @@ static READ8_HANDLER( block_input_r )
 	{
 		int res = input_port_read(space->machine, portnames[offset]) & 0xf7;
 
-		if (state->dir[offset]) 
+		if (state->dir[offset])
 			res |= 0x08;
 
 		return res;
@@ -260,7 +260,7 @@ static READ8_HANDLER( mahjong_input_r )
 
 	for (i = 0; i < 5; i++)
 	{
-		if (state->keymatrix & (0x80 >> i)) 
+		if (state->keymatrix & (0x80 >> i))
 			return input_port_read(space->machine, keynames[offset][i]);
 	}
 
@@ -285,19 +285,19 @@ static READ8_HANDLER( input_r )
 		default:
 			return input_port_read(space->machine, portnames[offset]);
 		case 1:		/* Mahjong games */
-			if (offset) 
+			if (offset)
 				return mahjong_input_r(space, offset - 1);
-			else 
+			else
 				return input_port_read(space->machine, "IN0");
 			break;
 		case 2:		/* Block Block - dial control */
-			if (offset) 
+			if (offset)
 				return block_input_r(space, offset - 1);
-			else 
+			else
 				return input_port_read(space->machine, "IN0");
 			break;
 		case 3:		/* Super Pang - simulate START 1 press to initialize EEPROM */
-			if (offset || init_eeprom_count == 0) 
+			if (offset || init_eeprom_count == 0)
 				return input_port_read(space->machine, portnames[offset]);
 			else
 			{
@@ -1100,8 +1100,8 @@ static MACHINE_START( mitchell )
 	state_save_register_global(machine, state->dial_selected);
 	state_save_register_global(machine, state->keymatrix);
 	state_save_register_global_array(machine, state->dir);
-	state_save_register_global_array(machine, state->dial); 
-//	state_save_register_global(machine, init_eeprom_count); 
+	state_save_register_global_array(machine, state->dial);
+//  state_save_register_global(machine, init_eeprom_count);
 }
 
 static MACHINE_RESET( mitchell )

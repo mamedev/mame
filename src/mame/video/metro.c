@@ -934,7 +934,7 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 }
 #endif
 
-	if (has_zoom) 
+	if (has_zoom)
 		k053936_zoom_draw(k053936, bitmap, cliprect, metro_K053936_tilemap, 0, 0, 1);
 
 	for (pri = 3; pri >= 0; pri--)

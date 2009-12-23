@@ -86,7 +86,7 @@ static void recalc_irq(ics2115_state *chip)
 	for (i = 0; !irq && i<32; i++)
 		if (chip->voice[i].state & V_DONE)
 			irq = 1;
-	if (irq != chip->irq_on) 
+	if (irq != chip->irq_on)
 	{
 		chip->irq_on = irq;
 		if (chip->intf->irq_cb)
@@ -105,7 +105,7 @@ static STREAM_UPDATE( update )
 	memset(outputs[1], 0, samples*sizeof(*outputs[0]));
 
 	for (osc = 0; osc < 32; osc++)
-		if (chip->voice[osc].state & V_ON) 
+		if (chip->voice[osc].state & V_ON)
 		{
 			UINT32 adr = (chip->voice[osc].addrh << 16) | chip->voice[osc].addrl;
 			UINT32 end = (chip->voice[osc].endh << 16) | (chip->voice[osc].endl << 8);
@@ -119,7 +119,7 @@ static STREAM_UPDATE( update )
 			if (ICS2115LOGERROR) logerror("ICS2115: KEYRUN %02d adr=%08x end=%08x delta=%08x\n",
 					 osc, adr, end, delta);
 
-			for (i = 0; i < samples; i++) 
+			for (i = 0; i < samples; i++)
 			{
 				INT32 v = chip->rom[badr|(adr >> 12)];
 				if (conf & 1)
@@ -131,7 +131,7 @@ static STREAM_UPDATE( update )
 				outputs[0][i] += v;
 				outputs[1][i] += v;
 				adr += delta;
-				if (adr >= end) 
+				if (adr >= end)
 				{
 					if (ICS2115LOGERROR) logerror("ICS2115: KEYDONE %2d\n", osc);
 					adr -= (end-loop);
@@ -195,7 +195,7 @@ static void recalc_timer(ics2115_state *chip, int timer)
 		if (ICS2115LOGERROR) logerror("ICS2115: timer %d off\n", timer);
 	}
 
-	if (chip->timer[timer].period != period) 
+	if (chip->timer[timer].period != period)
 	{
 		chip->timer[timer].period = period;
 		if (period)
@@ -210,10 +210,10 @@ static void ics2115_reg_w(ics2115_state *chip, UINT8 reg, UINT8 data, int msb)
 {
 	running_machine *machine = chip->device->machine;
 
-	switch (reg) 
+	switch (reg)
 	{
 	case 0x00: // [osc] Oscillator Configuration
-		if (msb) 
+		if (msb)
 		{
 			chip->voice[chip->osc].conf = data;
 			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: conf = %02x\n", cpuexec_describe_context(machine), chip->osc,
@@ -241,7 +241,7 @@ static void ics2115_reg_w(ics2115_state *chip, UINT8 reg, UINT8 data, int msb)
 		break;
 
 	case 0x03: // [osc] Wavesample loop start address 3-0.3-0
-		if (msb) 
+		if (msb)
 		{
 			chip->voice[chip->osc].strtl = data;
 			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: strtl = %02x\n", cpuexec_describe_context(machine), chip->osc,
@@ -259,7 +259,7 @@ static void ics2115_reg_w(ics2115_state *chip, UINT8 reg, UINT8 data, int msb)
 		break;
 
 	case 0x05: // [osc] Wavesample loop end address 3-0.3-0
-		if (msb) 
+		if (msb)
 		{
 			chip->voice[chip->osc].endl = data;
 			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: endl = %02x\n", cpuexec_describe_context(machine), chip->osc,
@@ -268,7 +268,7 @@ static void ics2115_reg_w(ics2115_state *chip, UINT8 reg, UINT8 data, int msb)
 		break;
 
 	case 0x07: // [osc] Volume Start
-		if (msb) 
+		if (msb)
 		{
 			chip->voice[chip->osc].vstart = data;
 			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: vstart = %02x\n", cpuexec_describe_context(machine), chip->osc,
@@ -277,7 +277,7 @@ static void ics2115_reg_w(ics2115_state *chip, UINT8 reg, UINT8 data, int msb)
 		break;
 
 	case 0x08: // [osc] Volume End
-		if (msb) 
+		if (msb)
 		{
 			chip->voice[chip->osc].vend = data;
 			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: vend = %02x\n", cpuexec_describe_context(machine), chip->osc,
@@ -314,7 +314,7 @@ static void ics2115_reg_w(ics2115_state *chip, UINT8 reg, UINT8 data, int msb)
 
 
 	case 0x0c: // [osc] Pan
-		if (msb) 
+		if (msb)
 		{
 			chip->voice[chip->osc].pan = data;
 			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: pan = %02x\n", cpuexec_describe_context(machine), chip->osc,
@@ -323,7 +323,7 @@ static void ics2115_reg_w(ics2115_state *chip, UINT8 reg, UINT8 data, int msb)
 		break;
 
 	case 0x0d: // [osc] Volume Enveloppe Control
-		if (msb) 
+		if (msb)
 		{
 			chip->voice[chip->osc].vctl = data;
 			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: vctl = %02x\n", cpuexec_describe_context(machine), chip->osc,
@@ -332,7 +332,7 @@ static void ics2115_reg_w(ics2115_state *chip, UINT8 reg, UINT8 data, int msb)
 		break;
 
 	case 0x10: // [osc] Oscillator Control
-		if (msb) 
+		if (msb)
 		{
 			chip->voice[chip->osc].ctl = data;
 			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: ctl = %02x\n", cpuexec_describe_context(machine), chip->osc,
@@ -343,7 +343,7 @@ static void ics2115_reg_w(ics2115_state *chip, UINT8 reg, UINT8 data, int msb)
 		break;
 
 	case 0x11: // [osc] Wavesample static address 27-20
-		if (msb) 
+		if (msb)
 		{
 			chip->voice[chip->osc].saddr = data;
 			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: saddr = %02x\n", cpuexec_describe_context(machine), chip->osc,
@@ -352,7 +352,7 @@ static void ics2115_reg_w(ics2115_state *chip, UINT8 reg, UINT8 data, int msb)
 		break;
 
 	case 0x40: // Timer 1 Preset
-		if (!msb) 
+		if (!msb)
 		{
 			chip->timer[0].preset = data;
 			if (ICS2115LOGERROR) logerror("%s:ICS2115: t1preset = %d\n", cpuexec_describe_context(machine), chip->timer[0].preset);
@@ -361,7 +361,7 @@ static void ics2115_reg_w(ics2115_state *chip, UINT8 reg, UINT8 data, int msb)
 		break;
 
 	case 0x41: // Timer 2 Preset
-		if (!msb) 
+		if (!msb)
 		{
 			chip->timer[1].preset = data;
 			if (ICS2115LOGERROR) logerror("%s:ICS2115: t2preset = %d\n", cpuexec_describe_context(machine), chip->timer[1].preset);
@@ -370,7 +370,7 @@ static void ics2115_reg_w(ics2115_state *chip, UINT8 reg, UINT8 data, int msb)
 		break;
 
 	case 0x42: // Timer 1 Prescaler
-		if (!msb) 
+		if (!msb)
 		{
 			chip->timer[0].scale = data;
 			if (ICS2115LOGERROR) logerror("%s:ICS2115: t1scale = %d\n", cpuexec_describe_context(machine), chip->timer[0].scale);
@@ -379,7 +379,7 @@ static void ics2115_reg_w(ics2115_state *chip, UINT8 reg, UINT8 data, int msb)
 		break;
 
 	case 0x43: // Timer 2 Prescaler
-		if (!msb) 
+		if (!msb)
 		{
 			chip->timer[1].scale = data;
 			if (ICS2115LOGERROR) logerror("%s:ICS2115: t2scale = %d\n", cpuexec_describe_context(machine), chip->timer[1].scale);
@@ -388,7 +388,7 @@ static void ics2115_reg_w(ics2115_state *chip, UINT8 reg, UINT8 data, int msb)
 		break;
 
 	case 0x4a: // IRQ Enable
-		if (!msb) 
+		if (!msb)
 		{
 			chip->irq_en = data;
 			if (ICS2115LOGERROR) logerror("%s:ICS2115: irq_en = %02x\n", cpuexec_describe_context(machine), chip->irq_en);
@@ -397,7 +397,7 @@ static void ics2115_reg_w(ics2115_state *chip, UINT8 reg, UINT8 data, int msb)
 		break;
 
 	case 0x4f: // Oscillator Address being Programmed
-		if (!msb) 
+		if (!msb)
 		{
 			chip->osc = data & 31;
 			if (ICS2115LOGERROR) logerror("%s:ICS2115: oscnumber = %d\n", cpuexec_describe_context(machine), chip->osc);
@@ -413,7 +413,7 @@ static UINT16 ics2115_reg_r(ics2115_state *chip, UINT8 reg)
 {
 	running_machine *machine = chip->device->machine;
 
-	switch (reg) 
+	switch (reg)
 	{
 	case 0x0d: // [osc] Volume Enveloppe Control
 		if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: read vctl\n", cpuexec_describe_context(machine), chip->osc);
@@ -426,7 +426,7 @@ static UINT16 ics2115_reg_r(ics2115_state *chip, UINT8 reg)
 		int osc;
 		UINT8 res = 0xff;
 		for (osc = 0; osc < 32; osc++)
-			if (chip->voice[osc].state & V_DONE) 
+			if (chip->voice[osc].state & V_DONE)
 			{
 				chip->voice[osc].state &= ~V_DONE;
 				if (ICS2115LOGERROR) logerror("ICS2115: KEYOFF %2d\n", osc);
@@ -486,7 +486,7 @@ static DEVICE_START( ics2115 )
 	chip->ulaw = auto_alloc_array(device->machine, INT16, 256);
 	chip->stream = stream_create(device, 0, 2, 33075, chip, update);
 
-	for (i = 0; i < 256; i++) 
+	for (i = 0; i < 256; i++)
 	{
 		UINT8 c = ~i;
 		int v;
@@ -534,19 +534,19 @@ static DEVICE_START( ics2115 )
 READ8_DEVICE_HANDLER( ics2115_r )
 {
 	ics2115_state *chip = get_safe_token(device);
-	switch (offset) 
+	switch (offset)
 	{
-	case 0: 
+	case 0:
 		{
 		UINT8 res = 0;
-		if (chip->irq_on) 
+		if (chip->irq_on)
 		{
 			int i;
 			res |= 0x80;
 			if (chip->irq_en & chip->irq_pend & 3)
 				res |= 1; // Timer irq
 			for (i = 0; i < 32; i++)
-				if (chip->voice[i].state & V_DONE) 
+				if (chip->voice[i].state & V_DONE)
 				{
 					res |= 2;
 					break;
@@ -569,7 +569,7 @@ READ8_DEVICE_HANDLER( ics2115_r )
 WRITE8_DEVICE_HANDLER( ics2115_w )
 {
 	ics2115_state *chip = get_safe_token(device);
-	switch (offset) 
+	switch (offset)
 	{
 	case 1:
 		chip->reg = data;

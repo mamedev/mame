@@ -125,13 +125,13 @@ static WRITE16_HANDLER ( kof98_prot_w )
 	{
 	case 0x0090:
 		logerror ("%06x kof98 - protection 0x0090 old %04x %04x\n", cpu_get_pc(space->cpu), mem16[0x100/2], mem16[0x102/2]);
-		mem16[0x100/2] = 0x00c2; 
+		mem16[0x100/2] = 0x00c2;
 		mem16[0x102/2] = 0x00fd;
 		break;
 
 	case 0x00f0:
 		logerror ("%06x kof98 - protection 0x00f0 old %04x %04x\n", cpu_get_pc(space->cpu), mem16[0x100/2], mem16[0x102/2]);
-		mem16[0x100/2] = 0x4e45; 
+		mem16[0x100/2] = 0x4e45;
 		mem16[0x102/2] = 0x4f2d;
 		break;
 

@@ -659,8 +659,8 @@ static WRITE32_HANDLER( hng64_sysregs_w )
 
 	switch(offset*4)
 	{
-		//case 0x100c: Extremely likely to be involved with the ROZ groundplane.  
-		// 			   Probably tells the groundplane which scanline to start drawing at.
+		//case 0x100c: Extremely likely to be involved with the ROZ groundplane.
+		//             Probably tells the groundplane which scanline to start drawing at.
 
 		case 0x1084: //MIPS->MCU latch port
 			hng_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
@@ -877,7 +877,7 @@ static WRITE32_HANDLER( hng64_3d_2_w )
 static WRITE32_HANDLER( dl_w )
 {
 	int i;
-	UINT16 packet3d[16]; 
+	UINT16 packet3d[16];
 
 	COMBINE_DATA(&hng64_dl[offset]);
 
@@ -923,15 +923,15 @@ static WRITE32_HANDLER( dl_control_w )
 	//printf("\n");   // Debug - ajg
 	// TODO: put this back in.
 	/*
-	if (activeBuffer==0 || activeBuffer==1)
-		memcpy(&hng64_dls[activeBuffer][0],&hng64_dl[0],0x200);
+    if (activeBuffer==0 || activeBuffer==1)
+        memcpy(&hng64_dls[activeBuffer][0],&hng64_dl[0],0x200);
 
-	// Only if it's VALID (hack)
-	if (data & 1)
-		activeBuffer = 0;
-	if (data & 2)
-	    activeBuffer = 1;
-	*/
+    // Only if it's VALID (hack)
+    if (data & 1)
+        activeBuffer = 0;
+    if (data & 2)
+        activeBuffer = 1;
+    */
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1105,7 +1105,7 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(&hng64_tcram)	// Transition Control
 	AM_RANGE(0x20300000, 0x203001ff) AM_RAM_WRITE(dl_w) AM_BASE(&hng64_dl)	// 3d Display List
-//	AM_RANGE(0x20300200, 0x20300213) AM_RAM_WRITE(xxxx) AM_BASE(&xxxxxxxx)	// 3d Display List Upload?
+//  AM_RANGE(0x20300200, 0x20300213) AM_RAM_WRITE(xxxx) AM_BASE(&xxxxxxxx)  // 3d Display List Upload?
 	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)
 	AM_RANGE(0x20300218, 0x2030021b) AM_READ(unk_vreg_r)
 

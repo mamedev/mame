@@ -286,7 +286,7 @@ static MACHINE_DRIVER_START( polyplay )
 	MDRV_CPU_VBLANK_INT("screen", coin_interrupt)
 
 	MDRV_MACHINE_RESET(polyplay)
-	
+
 	MDRV_TIMER_ADD("timer", polyplay_timer_callback)
 
 

@@ -270,7 +270,7 @@ static const es5505_interface es5505_taito_f3_config =
 
 MACHINE_DRIVER_START( taito_f3_sound )
 	MDRV_TIMER_ADD("timer_68681", taito_en_timer_callback)
-	
+
 	MDRV_SOUND_RESET( taito_f3_soundsystem_reset )
 
 	MDRV_CPU_ADD("audiocpu",  M68000, 16000000)

@@ -6089,7 +6089,7 @@ MACHINE_DRIVER_START( megadriv )
 
 	MDRV_MACHINE_START(megadriv)
 	MDRV_MACHINE_RESET(megadriv)
-	
+
 	MDRV_IMPORT_FROM(megadriv_timers)
 
 	MDRV_SCREEN_ADD("megadriv", RASTER)

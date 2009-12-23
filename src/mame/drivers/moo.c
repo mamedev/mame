@@ -459,19 +459,19 @@ static const k056832_interface moo_k056832_intf =
 
 static const k053247_interface moo_k053247_intf =
 {
-	"screen", 
+	"screen",
 	"gfx2", 1,
-	NORMAL_PLANE_ORDER, 
-	-48+1, 23, 
+	NORMAL_PLANE_ORDER,
+	-48+1, 23,
 	KONAMI_ROM_DEINTERLEAVE_4,
 	moo_sprite_callback
 };
 
 static const k053247_interface bucky_k053247_intf =
 {
-	"screen", 
+	"screen",
 	"gfx2", 1,
-	NORMAL_PLANE_ORDER, 
+	NORMAL_PLANE_ORDER,
 	-48, 23,
 	KONAMI_ROM_DEINTERLEAVE_4,
 	moo_sprite_callback
@@ -479,8 +479,8 @@ static const k053247_interface bucky_k053247_intf =
 
 static const k054338_interface moo_k054338_intf =
 {
-	"screen", 
-	0, 
+	"screen",
+	0,
 	"none"
 };
 

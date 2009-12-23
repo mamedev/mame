@@ -229,7 +229,7 @@ static INTERRUPT_GEN(lethalen_interrupt)
 {
 	const device_config *k056832 = devtag_get_device(device->machine, "k056832");
 
-	if (k056832_is_irq_enabled(k056832, 0)) 
+	if (k056832_is_irq_enabled(k056832, 0))
 		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 

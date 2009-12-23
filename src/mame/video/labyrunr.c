@@ -277,11 +277,11 @@ VIDEO_UPDATE( labyrunr )
 		tilemap_set_scrollx(state->layer1, 0, ctrl_0 - 40);
 
 		tilemap_draw(bitmap, &finalclip0, state->layer0, 0, 1);
-		if(use_clip3[0]) 
+		if(use_clip3[0])
 			tilemap_draw(bitmap, &finalclip3, state->layer0, 0, 1);
 
 		tilemap_draw(bitmap, &finalclip1, state->layer1, 0, 1);
-		if(use_clip3[1]) 
+		if(use_clip3[1])
 			tilemap_draw(bitmap, &finalclip3, state->layer1, 0, 1);
 
 		k007121_sprites_draw(state->k007121, bitmap, cliprect, screen->machine->gfx[0], screen->machine->colortable, state->spriteram, (k007121_ctrlram_r(state->k007121, 6) & 0x30) * 2,40,0,(k007121_ctrlram_r(state->k007121, 3) & 0x40) >> 5);

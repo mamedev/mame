@@ -5,9 +5,9 @@ struct _crshrace_state
 	/* memory pointers */
 	UINT16 *  videoram1;
 	UINT16 *  videoram2;
-//	UINT16 *  spriteram1;	// currently this uses generic buffered spriteram
-//	UINT16 *  spriteram2;	// currently this uses generic buffered spriteram
-//  	UINT16 *  paletteram;	// currently this uses generic palette handling
+//  UINT16 *  spriteram1;   // currently this uses generic buffered spriteram
+//  UINT16 *  spriteram2;   // currently this uses generic buffered spriteram
+//      UINT16 *  paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap   *tilemap1, *tilemap2;

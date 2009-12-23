@@ -9,7 +9,7 @@
     -  Implement BOX and dirtybuffer
     -  Add support for non-English version (SAA505x), possibly merging
        src/mess/video/saa505x.c unsed by bbc.c in MESS
-    -  Investigate why supporting code 0 behavior breaks p2000t vscroll 
+    -  Investigate why supporting code 0 behavior breaks p2000t vscroll
        in MESS (but not supporting breaks malzak title background)
     -  x,y sizes should probably be calculated from the screen parameters
        rather than passed in the device interface
@@ -40,7 +40,7 @@ struct _saa5050_state
 	int         size;
 	int         rev;
 
-	UINT8 *     videoram; 
+	UINT8 *     videoram;
 	UINT16      flags;
 	UINT8	      forecol;
 	UINT8	      backcol;
@@ -159,8 +159,8 @@ PALETTE_INIT( saa5050 )
 
 	for ( i = 0; i < 8; i++ )
 	{
-		r = saa5050_colors[i * 3]; 
-		g = saa5050_colors[i * 3 + 1]; 
+		r = saa5050_colors[i * 3];
+		g = saa5050_colors[i * 3 + 1];
 		b = saa5050_colors[i * 3 + 2];
 		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
@@ -195,8 +195,8 @@ READ8_DEVICE_HANDLER( saa5050_videoram_r )
  *************************************/
 
 
-/* this should probably be put at the end of saa5050 update, 
-but p2000t in MESS does not seem to currently support it. 
+/* this should probably be put at the end of saa5050 update,
+but p2000t in MESS does not seem to currently support it.
 Hence, we leave it independent for the moment */
 void saa5050_frame_advance( const device_config *device )
 {
@@ -231,7 +231,7 @@ void saa5050_update( const device_config *device, bitmap_t *bitmap, const rectan
 			code = saa5050->videoram[ssy * saa5050->size + sx];
 			if (code < 32)
 			{
-				switch (code) 
+				switch (code)
 				{
 				case 0x00:
 #ifndef MESS

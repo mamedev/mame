@@ -201,7 +201,7 @@ static WRITE32_HANDLER( s1945_mcu_w )
 	data >>= 8 * suboff;
 	offset = offset * 4 + 4 + (3 - suboff);
 
-	switch (offset) 
+	switch (offset)
 	{
 	case 0x06:
 		state->s1945_mcu_inlatch = data;
@@ -218,7 +218,7 @@ static WRITE32_HANDLER( s1945_mcu_w )
 		state->s1945_mcu_bctrl = data;
 		break;
 	case 0x0b:
-		switch (data | (state->s1945_mcu_direction ? 0x100 : 0)) 
+		switch (data | (state->s1945_mcu_direction ? 0x100 : 0))
 		{
 		case 0x11c:
 			state->s1945_mcu_latching = 5;
@@ -231,12 +231,12 @@ static WRITE32_HANDLER( s1945_mcu_w )
 			break;
 		case 0x113:
 			state->s1945_mcu_mode = state->s1945_mcu_inlatch;
-			if (state->s1945_mcu_mode == 1) 
+			if (state->s1945_mcu_mode == 1)
 			{
 				state->s1945_mcu_latching &= ~1;
 				state->s1945_mcu_latch2 = 0x55;
-			} 
-			else 
+			}
+			else
 			{
 				// Go figure.
 				state->s1945_mcu_latching &= ~1;
@@ -264,17 +264,17 @@ static READ32_HANDLER( s1945_mcu_r )
 {
 	psikyo_state *state = (psikyo_state *)space->machine->driver_data;
 
-	switch (offset) 
+	switch (offset)
 	{
-	case 0: 
+	case 0:
 		{
 		UINT32 res;
-		if (state->s1945_mcu_control & 16) 
+		if (state->s1945_mcu_control & 16)
 		{
 			res = state->s1945_mcu_latching & 4 ? 0x0000ff00 : state->s1945_mcu_latch1 << 8;
 			state->s1945_mcu_latching |= 4;
-		} 
-		else 
+		}
+		else
 		{
 			res = state->s1945_mcu_latching & 1 ? 0x0000ff00 : state->s1945_mcu_latch2 << 8;
 			state->s1945_mcu_latching |= 1;

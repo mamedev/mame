@@ -52,9 +52,9 @@ static const char *const regfile[32] = { "Reg$00 (INDF)",    "Reg$01 (TMR0/OPTIO
 								 "Reg$18", "Reg$19", "Reg$1A", "Reg$1B", "Reg$1C", "Reg$1D", "Reg$1E", "Reg$1F (CMCON/VRCON)" };
 /* Registers bank 1 */
 /*static const char *const regfile1[32] = { "Reg$00 (INDF)",    "Reg$01 (OPTION)",    "Reg$02 (PCL)",  "Reg$03 (STATUS)", "Reg$04 (FSR)", "Reg$05 (TRISA)", "Reg$06 (TRISB)", "Reg$07",
-								 "Reg$08", "Reg$09", "Reg$0A (PCLATH)", "Reg$0B (INTCON)", "Reg$0C (PIE1)", "Reg$0D", "Reg$0E (PCON)", "Reg$0F",
-								 "Reg$10", "Reg$11", "Reg$12", "Reg$13", "Reg$14", "Reg$15", "Reg$16", "Reg$17",
-								 "Reg$18", "Reg$19", "Reg$1A", "Reg$1B", "Reg$1C", "Reg$1D", "Reg$1E", "Reg$1F (VRCON)" };
+                                 "Reg$08", "Reg$09", "Reg$0A (PCLATH)", "Reg$0B (INTCON)", "Reg$0C (PIE1)", "Reg$0D", "Reg$0E (PCON)", "Reg$0F",
+                                 "Reg$10", "Reg$11", "Reg$12", "Reg$13", "Reg$14", "Reg$15", "Reg$16", "Reg$17",
+                                 "Reg$18", "Reg$19", "Reg$1A", "Reg$1B", "Reg$1C", "Reg$1D", "Reg$1E", "Reg$1F (VRCON)" };
 static const char **regfile[2] = { regfile0, regfile1 };*/
 
 static const char *const dest[2] = { "W", "Reg" };

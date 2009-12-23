@@ -1900,7 +1900,7 @@ INLINE void emit_movsx_r32_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)						{ 
 INLINE void emit_movsx_r32_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)					{ emit_op_modrm_mem(emitptr, OP_MOVSX_Gv_Eb, OP_32BIT, dreg, MEMPARAMS); }
 INLINE void emit_movsx_r32_r16(x86code **emitptr, UINT8 dreg, UINT8 sreg)						{ emit_op_modrm_reg(emitptr, OP_MOVSX_Gv_Ew, OP_32BIT, dreg, sreg); }
 INLINE void emit_movsx_r32_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_MOVSX_Gv_Ew, OP_32BIT, dreg, MEMPARAMS); }
-INLINE void emit_movzx_r32_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)						
+INLINE void emit_movzx_r32_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)
 {
 #ifndef PTR64
 	if (sreg >= 4)

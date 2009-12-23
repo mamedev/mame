@@ -209,15 +209,15 @@ static ADDRESS_MAP_START( victor21_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x09007, 0x09007 ) AM_READ_PORT( "DSW2" )
 	AM_RANGE( 0x09008, 0x09008 ) AM_READ_PORT( "DSW3" )
 
-//	AM_RANGE( 0x09009, 0x09009 ) AM_WRITE( subsino_out_b_w )
-//	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE( subsino_out_a_w )
+//  AM_RANGE( 0x09009, 0x09009 ) AM_WRITE( subsino_out_b_w )
+//  AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE( subsino_out_a_w )
 
-//	AM_RANGE( 0x0900b, 0x0900b ) //"flash" status, bit 0
-//	AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
+//  AM_RANGE( 0x0900b, 0x0900b ) //"flash" status, bit 0
+//  AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
 
 	AM_RANGE( 0x0900e, 0x0900f ) AM_DEVWRITE( "ymsnd", ym2413_w )
 
-//	AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE( "oki", okim6295_w )
+//  AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE( "oki", okim6295_w )
 
 	AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE( subsino_tiles_offset_w )
 
@@ -251,7 +251,7 @@ static UINT8 flash_val,flash_packet,flash_packet_start;
 
 static READ8_HANDLER( flash_r )
 {
-//	printf("R %02x\n",flash_val);
+//  printf("R %02x\n",flash_val);
 
 	if(flash_val == 0xff)
 		return 0xd9;
@@ -308,13 +308,13 @@ static ADDRESS_MAP_START( crsbingo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0900a, 0x0900a ) AM_READ( hwcheck_r )
 
 	AM_RANGE( 0x09010, 0x09010 ) AM_READWRITE( flash_r, flash_w )
-//	AM_RANGE( 0x09011, 0x09011 ) //"flash" status, bit 0
-//	AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
+//  AM_RANGE( 0x09011, 0x09011 ) //"flash" status, bit 0
+//  AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
 	AM_RANGE( 0x0900c, 0x0900d ) AM_DEVWRITE( "ymsnd", ym2413_w )
 
-//	AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE( "oki", okim6295_w )
+//  AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE( "oki", okim6295_w )
 
-//	AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE( subsino_tiles_offset_w )
+//  AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE( subsino_tiles_offset_w )
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
 	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE( subsino_videoram_w ) AM_BASE( &videoram )
@@ -1486,7 +1486,7 @@ static DRIVER_INIT( victor5 )
 		}
 	}
 
-//	dump_decrypted(machine, decrypt);
+//  dump_decrypted(machine, decrypt);
 
 	memcpy(region, decrypt, 0x10000);
 }
@@ -1523,7 +1523,7 @@ static DRIVER_INIT( victor21 )
 		}
 	}
 
-//	dump_decrypted(machine, decrypt);
+//  dump_decrypted(machine, decrypt);
 
 	memcpy(region, decrypt, 0x10000);
 }
@@ -1556,7 +1556,7 @@ static DRIVER_INIT( crsbingo )
 		}
 	}
 
-//	dump_decrypted(machine, decrypt);
+//  dump_decrypted(machine, decrypt);
 
 	memcpy(region, decrypt, 0x10000);
 }
@@ -1588,7 +1588,7 @@ static DRIVER_INIT( sharkpy )
 		}
 	}
 
-//	dump_decrypted(machine, decrypt);
+//  dump_decrypted(machine, decrypt);
 
 	memcpy(region, decrypt, 0x10000);
 }

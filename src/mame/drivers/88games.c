@@ -34,7 +34,7 @@ static READ8_HANDLER( bankedram_r )
 {
 	_88games_state *state = (_88games_state *)space->machine->driver_data;
 
-	if (state->videobank) 
+	if (state->videobank)
 		return state->ram[offset];
 	else
 	{
@@ -49,9 +49,9 @@ static WRITE8_HANDLER( bankedram_w )
 {
 	_88games_state *state = (_88games_state *)space->machine->driver_data;
 
-	if (state->videobank) 
+	if (state->videobank)
 		state->ram[offset] = data;
-	else 
+	else
 		k051316_w(state->k051316, offset, data);
 }
 
@@ -112,7 +112,7 @@ static READ8_HANDLER( k052109_051960_r )
 		else
 			return k051960_r(state->k051960, offset - 0x3c00);
 	}
-	else 
+	else
 		return k052109_r(state->k052109, offset);
 }
 

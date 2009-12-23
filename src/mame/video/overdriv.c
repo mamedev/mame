@@ -51,17 +51,17 @@ void overdriv_zoom_callback_1(running_machine *machine, int *code,int *color,int
 
 VIDEO_START( overdriv )
 {
-//	const device_config *k051316_1 = devtag_get_device(machine, "k051316_1");
-//	const device_config *k051316_2 = devtag_get_device(machine, "k051316_2");
+//  const device_config *k051316_1 = devtag_get_device(machine, "k051316_1");
+//  const device_config *k051316_2 = devtag_get_device(machine, "k051316_2");
 
-//	K053251_vh_start(machine);
-//	K051316_vh_start_0(machine,"gfx2",4,TRUE,0,zoom_callback_0);
-//	K051316_vh_start_1(machine,"gfx3",4,FALSE,0,zoom_callback_1);
-//	K053247_vh_start(machine,"gfx1",77,22,NORMAL_PLANE_ORDER,overdriv_sprite_callback);
+//  K053251_vh_start(machine);
+//  K051316_vh_start_0(machine,"gfx2",4,TRUE,0,zoom_callback_0);
+//  K051316_vh_start_1(machine,"gfx3",4,FALSE,0,zoom_callback_1);
+//  K053247_vh_start(machine,"gfx1",77,22,NORMAL_PLANE_ORDER,overdriv_sprite_callback);
 
-//	k051316_wraparound_enable(k051316_1, 1);
-//	k051316_set_offset(k051316_1, 14, -1);
-//	k051316_set_offset(k051316_2, 15, 0);
+//  k051316_wraparound_enable(k051316_1, 1);
+//  k051316_set_offset(k051316_1, 14, -1);
+//  k051316_set_offset(k051316_2, 15, 0);
 }
 
 

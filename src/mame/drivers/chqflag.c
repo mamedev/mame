@@ -343,7 +343,7 @@ static const k051960_interface chqflag_k051960_intf =
 static const k051316_interface chqflag_k051316_intf_1 =
 {
 	"gfx2", 1,
-	4, FALSE, 0, 
+	4, FALSE, 0,
 	0, 7, 0,
 	chqflag_zoom_callback_0
 };
@@ -351,7 +351,7 @@ static const k051316_interface chqflag_k051316_intf_1 =
 static const k051316_interface chqflag_k051316_intf_2 =
 {
 	"gfx3", 2,
-	8, TRUE, 0xc0, 
+	8, TRUE, 0xc0,
 	1, 0, 0,
 	chqflag_zoom_callback_1
 };

@@ -283,7 +283,7 @@ static MACHINE_DRIVER_START( pkscramble )
 
 	MDRV_MACHINE_START(pkscramble)
 	MDRV_MACHINE_RESET(pkscramble)
-	
+
 	MDRV_TIMER_ADD("scan_timer", scanline_callback)
 
 	/* video hardware */

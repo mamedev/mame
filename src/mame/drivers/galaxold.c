@@ -2108,7 +2108,7 @@ static MACHINE_DRIVER_START( galaxold_base )
 	MDRV_CPU_PROGRAM_MAP(galaxold_map)
 
 	MDRV_MACHINE_RESET(galaxold)
-	
+
 	MDRV_7474_ADD("7474_9m_1", galaxold_7474_9m_1_callback)
 	MDRV_7474_ADD("7474_9m_2", galaxold_7474_9m_2_callback)
 

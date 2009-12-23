@@ -37,7 +37,7 @@ static void set_pens( running_machine *machine )
 		colortable_palette_set_color(machine->colortable, i >> 1, color);
 	}
 }
-	
+
 
 
 /***************************************************************************

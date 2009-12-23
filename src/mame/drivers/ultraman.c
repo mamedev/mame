@@ -179,7 +179,7 @@ static const k051960_interface ultraman_k051960_intf =
 static const k051316_interface ultraman_k051316_intf_0 =
 {
 	"gfx2", 1,
-	4, FALSE, 0, 
+	4, FALSE, 0,
 	0, 8, 0,
 	ultraman_zoom_callback_0
 };
@@ -187,7 +187,7 @@ static const k051316_interface ultraman_k051316_intf_0 =
 static const k051316_interface ultraman_k051316_intf_1 =
 {
 	"gfx3", 2,
-	4, FALSE, 0, 
+	4, FALSE, 0,
 	0, 8, 0,
 	ultraman_zoom_callback_1
 };
@@ -195,7 +195,7 @@ static const k051316_interface ultraman_k051316_intf_1 =
 static const k051316_interface ultraman_k051316_intf_2 =
 {
 	"gfx4", 3,
-	4, TRUE, 0, 
+	4, TRUE, 0,
 	0, 8, 0,
 	ultraman_zoom_callback_2
 };

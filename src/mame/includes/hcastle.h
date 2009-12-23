@@ -11,8 +11,8 @@ struct _hcastle_state
 	UINT8 *    pf1_videoram;
 	UINT8 *    pf2_videoram;
 	UINT8 *    paletteram;
-//	UINT8 *    spriteram;
-//	UINT8 *    spriteram2;
+//  UINT8 *    spriteram;
+//  UINT8 *    spriteram2;
 
 	/* video-related */
 	tilemap    *fg_tilemap, *bg_tilemap;

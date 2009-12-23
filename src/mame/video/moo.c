@@ -119,7 +119,7 @@ VIDEO_UPDATE(moo)
 				dirty = 1;
 			}
 		}
-		if (dirty) 
+		if (dirty)
 			k056832_mark_all_tmaps_dirty(k056832);
 	}
 

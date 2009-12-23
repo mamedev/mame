@@ -47,7 +47,7 @@ static MACHINE_START( cyberbal )
 {
 	cyberbal_state *state = (cyberbal_state *)machine->driver_data;
 	atarigen_init(machine);
-	
+
 	state_save_register_global(machine, state->fast_68k_int);
 	state_save_register_global(machine, state->io_68k_int);
 	state_save_register_global(machine, state->sound_data_from_68k);

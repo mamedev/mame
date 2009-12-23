@@ -300,11 +300,11 @@ void neogeo_acknowledge_interrupt( running_machine *machine, UINT16 data )
 {
 	neogeo_state *state = (neogeo_state *)machine->driver_data;
 
-	if (data & 0x01) 
+	if (data & 0x01)
 		state->irq3_pending = 0;
-	if (data & 0x02) 
+	if (data & 0x02)
 		state->display_position_interrupt_pending = 0;
-	if (data & 0x04) 
+	if (data & 0x04)
 		state->vblank_interrupt_pending = 0;
 
 	update_interrupts(machine);

@@ -200,7 +200,7 @@ static MACHINE_START( atarisy1 )
 {
 	atarisy1_state *state = (atarisy1_state *)machine->driver_data;
 	atarigen_init(machine);
-	
+
 	state_save_register_global(machine, state->joystick_int);
 	state_save_register_global(machine, state->joystick_int_enable);
 	state_save_register_global(machine, state->joystick_value);
@@ -766,7 +766,7 @@ static MACHINE_DRIVER_START( atarisy1 )
 	MDRV_MACHINE_START(atarisy1)
 	MDRV_MACHINE_RESET(atarisy1)
 	MDRV_NVRAM_HANDLER(atarigen)
-	
+
 	MDRV_TIMER_ADD("joystick_timer", delayed_joystick_int)
 	MDRV_TIMER_ADD("scan_timer", atarisy1_int3_callback)
 	MDRV_TIMER_ADD("int3off_timer", atarisy1_int3off_callback)

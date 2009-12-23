@@ -2,8 +2,8 @@
 
     rspdrc.c
 
-	Universal machine language-based Nintendo/SGI RSP emulator.
-	Written by Harmony of the MESS team.
+    Universal machine language-based Nintendo/SGI RSP emulator.
+    Written by Harmony of the MESS team.
 
     Copyright the MESS team.
     Released for general non-commercial use under the MAME license
@@ -2394,41 +2394,41 @@ INLINE void rsp_vcr(rsp_state *rsp, UINT32 op, INT16 *vres)
 	WRITEBACK_RESULT();
 }
 
-//	switch(EL)
-//	{
-//		case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */		/* 0, 1, 2, 3, 4, 5, 6, 7 - none */
-//			break;
-//		case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */		/* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
-//			break;
-//		case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */		/* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
-//			break;
-//		case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */		/* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
-//			break;
-//		case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */		/* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
-//			break;
-//		case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */		/* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
-//			break;
-//		case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */		/* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
-//			break;
-//		case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */		/* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
-//			break;
-//		case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */		/*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
-//			break;
-//		case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */		/*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
-//			break;
-//		case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */		/*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
-//			break;
-//		case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */		/*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
-//			break;
-//		case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */		/*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
-//			break;
-//		case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */		/*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
-//			break;
-//		case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */		/*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
-//			break;
-//		case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */		/*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
-//			break;
-//	}
+//  switch(EL)
+//  {
+//      case 0: /* 0, 1, 2, 3, 4, 5, 6, 7 - none */     /* 0, 1, 2, 3, 4, 5, 6, 7 - none */
+//          break;
+//      case 1: /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */     /* 0, 1, 2, 3, 4, 5, 6, 7 - ???  */
+//          break;
+//      case 2: /* 1, 3, 5, 7, 0, 2, 4, 6 - 0q   */     /* 0, 0, 2, 2, 4, 4, 6, 6 - 0q   */
+//          break;
+//      case 3: /* 0, 2, 4, 6, 1, 3, 5, 7 - 1q   */     /* 1, 1, 3, 3, 5, 5, 7, 7 - 1q   */
+//          break;
+//      case 4: /* 1, 2, 3, 5, 6, 7, 0, 4 - 0h   */     /* 0, 0, 0, 0, 4, 4, 4, 4 - 0h   */
+//          break;
+//      case 5: /* 0, 2, 3, 4, 6, 7, 1, 5 - 1h   */     /* 1, 1, 1, 1, 5, 5, 5, 5 - 1h   */
+//          break;
+//      case 6: /* 0, 1, 3, 4, 5, 7, 2, 6 - 2h   */     /* 2, 2, 2, 2, 6, 6, 6, 6 - 2h   */
+//          break;
+//      case 7: /* 0, 1, 2, 4, 5, 6, 3, 7 - 3h   */     /* 3, 3, 3, 3, 7, 7, 7, 7 - 3h   */
+//          break;
+//      case 8: /* 1, 2, 3, 4, 5, 6, 7, 0 - 0    */     /*  0, 0, 0, 0, 0, 0, 0, 0 - 0    */
+//          break;
+//      case 9: /* 0, 2, 3, 4, 5, 6, 7, 1 - 1    */     /*  1, 1, 1, 1, 1, 1, 1, 1 - 0    */
+//          break;
+//      case 10:/* 0, 1, 3, 4, 5, 6, 7, 2 - 2    */     /*  2, 2, 2, 2, 2, 2, 2, 2 - 0    */
+//          break;
+//      case 11:/* 0, 1, 2, 4, 5, 6, 7, 3 - 3    */     /*  3, 3, 3, 3, 3, 3, 3, 3 - 0    */
+//          break;
+//      case 12:/* 0, 1, 2, 3, 5, 6, 7, 4 - 4    */     /*  4, 4, 4, 4, 4, 4, 4, 4 - 0    */
+//          break;
+//      case 13:/* 0, 1, 2, 3, 4, 6, 7, 5 - 5    */     /*  5, 5, 5, 5, 5, 5, 5, 5 - 0    */
+//          break;
+//      case 14:/* 0, 1, 2, 3, 4, 5, 7, 6 - 6    */     /*  6, 6, 6, 6, 6, 6, 6, 6 - 0    */
+//          break;
+//      case 15:/* 0, 1, 2, 3, 4, 5, 6, 7 - 7    */     /*  7, 7, 7, 7, 7, 7, 7, 7 - 0    */
+//          break;
+//  }
 
 #define RSP_VMRG(E10, E11, E12, E13, E14, E15, E16, E17, E20, E21, E22, E23, E24, E25, E26, E27) \
 	if (COMPARE_FLAG(E10))					\
@@ -3622,7 +3622,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 	int override = FALSE;
 	drcuml_block *block;
 	jmp_buf errorbuf;
-	
+
 	profiler_mark_start(PROFILER_DRC_COMPILE);
 
 	/* get a description of this sequence */
@@ -3893,7 +3893,7 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 			UML_DLOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), QWORD_x1); 			// dload   i3,dmem,i0,qword_x1
 			UML_DROL(block, IREG(3), IREG(3), IREG(2));									// drol    i3,i3,i2
 			UML_DAND(block, IREG(1), IREG(1), IMM(0xffff));								// dand    i1,i1,0xffff
-			UML_DAND(block, IREG(3), IREG(3), IMM(U64(0xffffffffffff0000)));			// dand	   i3,i3,~0xffff
+			UML_DAND(block, IREG(3), IREG(3), IMM(U64(0xffffffffffff0000)));			// dand    i3,i3,~0xffff
 			UML_DOR(block, IREG(1), IREG(1), IREG(3));									// dor     i1,i1,i3
 			UML_DROR(block, IREG(1), IREG(1), IREG(2));									// dror    i1,i1,i2
 			UML_DSTORE(block, rsp->impstate->dmem, IREG(0), IREG(1), QWORD_x1); 		// dstore  dmem,i0,i1,qword_x1
@@ -3915,7 +3915,7 @@ static void static_generate_memory_accessor(rsp_state *rsp, int size, int iswrit
 			UML_DLOAD(block, IREG(3), rsp->impstate->dmem, IREG(0), QWORD_x1); 			// dload   i3,dmem,i0,qword_x1
 			UML_DROL(block, IREG(3), IREG(3), IREG(2));									// drol    i3,i3,i2
 			UML_DAND(block, IREG(1), IREG(1), IMM(0xffffffff));							// dand    i1,i1,0xffffffff
-			UML_DAND(block, IREG(3), IREG(3), IMM(U64(0xffffffff00000000)));			// dand	   i3,i3,~0xffffffff
+			UML_DAND(block, IREG(3), IREG(3), IMM(U64(0xffffffff00000000)));			// dand    i3,i3,~0xffffffff
 			UML_DOR(block, IREG(1), IREG(1), IREG(3));									// dor     i1,i1,i3
 			UML_DROR(block, IREG(1), IREG(1), IREG(2));									// dror    i1,i1,i2
 			UML_DSTORE(block, rsp->impstate->dmem, IREG(0), IREG(1), QWORD_x1); 		// dstore  dmem,i0,i1,qword_x1
@@ -4076,9 +4076,9 @@ static void generate_sequence_instruction(rsp_state *rsp, drcuml_block *block, c
 	/* if we hit an unmapped address, fatal error */
 	//if (desc->flags & OPFLAG_COMPILER_UNMAPPED)
 	//{
-	//	UML_MOV(block, MEM(&rsp->pc), IMM(desc->pc));								// mov     [pc],desc->pc
-	//	save_fast_iregs(rsp, block);
-	//	UML_EXIT(block, IMM(EXECUTE_UNMAPPED_CODE));								// exit    EXECUTE_UNMAPPED_CODE
+	//  UML_MOV(block, MEM(&rsp->pc), IMM(desc->pc));                               // mov     [pc],desc->pc
+	//  save_fast_iregs(rsp, block);
+	//  UML_EXIT(block, IMM(EXECUTE_UNMAPPED_CODE));                                // exit    EXECUTE_UNMAPPED_CODE
 	//}
 
 	/* otherwise, unless this is a virtual no-op, it's a regular instruction */
@@ -4587,7 +4587,7 @@ static int generate_cop2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			{
 				UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));	// mov     [arg0],desc->opptr.l
 				UML_CALLC(block, cfunc_mfc2, rsp);									// callc   cfunc_mfc2
-				//UML_SEXT(block, R32(RTREG), IREG(0), DWORD);						// dsext   <rtreg>,i0,dword
+				//UML_SEXT(block, R32(RTREG), IREG(0), DWORD);                      // dsext   <rtreg>,i0,dword
 			}
 			return TRUE;
 
@@ -4596,7 +4596,7 @@ static int generate_cop2(rsp_state *rsp, drcuml_block *block, compiler_state *co
 			{
 				UML_MOV(block, MEM(&rsp->impstate->arg0), IMM(desc->opptr.l[0]));	// mov     [arg0],desc->opptr.l
 				UML_CALLC(block, cfunc_cfc2, rsp);									// callc   cfunc_cfc2
-				//UML_SEXT(block, R32(RTREG), IREG(0), DWORD);						// dsext   <rtreg>,i0,dword
+				//UML_SEXT(block, R32(RTREG), IREG(0), DWORD);                      // dsext   <rtreg>,i0,dword
 			}
 			return TRUE;
 

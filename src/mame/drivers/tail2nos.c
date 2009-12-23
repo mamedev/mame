@@ -238,7 +238,7 @@ static const ym2608_interface ym2608_config =
 static const k051316_interface tail2nos_k051316_intf =
 {
 	"gfx3", 2,
-	-4, TRUE, 0, 
+	-4, TRUE, 0,
 	1, -89, -14,
 	tail2nos_zoom_callback
 };

@@ -240,9 +240,9 @@ VIDEO_UPDATE( hcastle )
 	state->pf1_bankbase = 0x0000;
 	state->pf2_bankbase = 0x4000 * ((state->gfx_bank & 2) >> 1);
 
-	if (ctrl_1_3 & 0x01) 
+	if (ctrl_1_3 & 0x01)
 		state->pf1_bankbase += 0x2000;
-	if (ctrl_2_3 & 0x01) 
+	if (ctrl_2_3 & 0x01)
 		state->pf2_bankbase += 0x2000;
 
 	if (state->pf1_bankbase != state->old_pf1)

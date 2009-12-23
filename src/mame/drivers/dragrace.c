@@ -346,7 +346,7 @@ static MACHINE_DRIVER_START( dragrace )
 
 	MDRV_MACHINE_START(dragrace)
 	MDRV_MACHINE_RESET(dragrace)
-	
+
 	MDRV_TIMER_ADD_PERIODIC("frame_timer", dragrace_frame_callback, HZ(60))
 
 	/* video hardware */

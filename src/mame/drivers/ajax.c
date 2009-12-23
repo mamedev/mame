@@ -204,7 +204,7 @@ static const k051960_interface ajax_k051960_intf =
 static const k051316_interface ajax_k051316_intf =
 {
 	"gfx3", 2,
-	7, FALSE, 0, 
+	7, FALSE, 0,
 	0, 0, 0,
 	ajax_zoom_callback
 };

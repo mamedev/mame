@@ -29,12 +29,12 @@ struct _psikyosh_state
 	UINT32 *       vidregs;
 	UINT32 *       ram;
 	UINT32 *       paletteram;
-//	UINT32 *       spriteram;	// currently this uses generic buffered spriteram
-//	size_t         spriteram_size;
+//  UINT32 *       spriteram;   // currently this uses generic buffered spriteram
+//  size_t         spriteram_size;
 
 	/* video-related */
 	bitmap_t       *zoom_bitmap, *z_bitmap;
-//	UINT8          alphatable[256];
+//  UINT8          alphatable[256];
 
 	/* misc */
 	UINT32         sample_offs;	// only used if ROMTEST = 1

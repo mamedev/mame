@@ -70,7 +70,7 @@ static WRITE16_HANDLER( protection_w )
 		[memory_read_byte(space, 0xffc006)]
 		[(memory_read_byte(space, 0xffc003) << 1) + (memory_read_word(space, 0xffc004) >> 8)];
 
-	switch (memory_read_byte(space, 0xffc684)) 
+	switch (memory_read_byte(space, 0xffc684))
 	{
 	case 1:
 		{
@@ -121,16 +121,16 @@ static WRITE16_HANDLER( protection_w )
 			int pos = memory_read_byte(space, 0xffc010);
 			pos = (pos + 1) & 3;
 			memory_write_byte(space, 0xffc010, pos);
-			if(!pos) 
+			if(!pos)
 			{
 				int d1 = memory_read_word(space, 0xffc682);
 				int off = memory_read_word(space, 0xffc00e);
-				if (off!=512) 
+				if (off!=512)
 				{
 					off++;
 					d1++;
-				} 
-				else 
+				}
+				else
 				{
 					off = 0;
 					d1 -= 512;

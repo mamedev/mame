@@ -99,7 +99,7 @@ INLINE pic16c62x_state *get_safe_token(const device_config *device)
 	assert(device->type == CPU);
 	assert(cpu_get_type(device) == CPU_PIC16C620 ||
 		   cpu_get_type(device) == CPU_PIC16C620A ||
-//		   cpu_get_type(device) == CPU_PIC16CR620A ||
+//         cpu_get_type(device) == CPU_PIC16CR620A ||
 		   cpu_get_type(device) == CPU_PIC16C621 ||
 		   cpu_get_type(device) == CPU_PIC16C621A ||
 		   cpu_get_type(device) == CPU_PIC16C622 ||
@@ -391,7 +391,7 @@ INLINE void STORE_REGFILE(pic16c62x_state *cpustate, offs_t addr, UINT8 data)	/*
 					M_WRTRAM(0x81, data);
 					break;
 		case 0x85:	if   (cpustate->TRISA != data)
-					{ 
+					{
 						cpustate->TRISA = data | 0xf0;
 						P_OUT(2,cpustate->TRISA);
 						P_OUT(0,cpustate->PORTA & (UINT8)(~cpustate->TRISA) & 0x0f);
@@ -399,11 +399,11 @@ INLINE void STORE_REGFILE(pic16c62x_state *cpustate, offs_t addr, UINT8 data)	/*
 					}
 					break;
 		case 0x86:	if   (cpustate->TRISB != data)
-					{ 
-						cpustate->TRISB = data; 
+					{
+						cpustate->TRISB = data;
 						P_OUT(3,cpustate->TRISB);
-						P_OUT(1,cpustate->PORTB & (UINT8)(~cpustate->TRISB)); 
-						M_WRTRAM(addr, data); 
+						P_OUT(1,cpustate->PORTB & (UINT8)(~cpustate->TRISB));
+						M_WRTRAM(addr, data);
 					}
 					break;
 		default:	M_WRTRAM(addr, data);

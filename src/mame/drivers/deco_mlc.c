@@ -409,7 +409,7 @@ static MACHINE_DRIVER_START( avengrgs )
 
 	MDRV_MACHINE_RESET(mlc)
 	MDRV_NVRAM_HANDLER(mlc) /* Actually 93c45 */
-	
+
 	MDRV_TIMER_ADD("int_timer", interrupt_gen)
 
 	/* video hardware */

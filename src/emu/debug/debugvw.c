@@ -2518,7 +2518,7 @@ static int memory_view_alloc(debug_view *view)
 	/* allocate memory */
 	memdata = alloc_clear_or_die(debug_view_memory);
 	memdata->subviewlist = subviews;
-	
+
 	/* allocate the expression data */
 	debug_view_expression_alloc(&memdata->expression);
 

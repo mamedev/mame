@@ -54,7 +54,7 @@ static READ8_HANDLER( bankedram_r )
 	case 1:
 		if (offset < 0x800)
 			return space->machine->generic.paletteram.u8[offset];
-		else 
+		else
 			return 0;
 		break;
 	default:

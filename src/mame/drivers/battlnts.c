@@ -382,10 +382,10 @@ static void shuffle( UINT8 *buf, int len )
 	int i;
 	UINT8 t;
 
-	if (len == 2) 
+	if (len == 2)
 		return;
 
-	if (len % 4) 
+	if (len % 4)
 		fatalerror("shuffle() - not modulo 4");	/* must not happen */
 
 	len /= 2;

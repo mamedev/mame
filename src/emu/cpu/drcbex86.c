@@ -528,7 +528,7 @@ INLINE void emit_combine_z_shl_flags(x86code **dst)
 
 
 /*-------------------------------------------------
-    reset_last_upper_lower_reg - reset the last 
+    reset_last_upper_lower_reg - reset the last
     upper/lower register state
 -------------------------------------------------*/
 
@@ -575,7 +575,7 @@ INLINE void set_last_upper_reg(drcbe_state *drcbe, x86code *dst, const drcuml_pa
 
 INLINE int can_skip_lower_load(drcbe_state *drcbe, x86code *dst, UINT32 *memptr, UINT8 reglo)
 {
-//	return FALSE;
+//  return FALSE;
 	return (dst == drcbe->last_lower_pc && memptr == drcbe->last_lower_addr && reglo == drcbe->last_lower_reg);
 }
 
@@ -587,7 +587,7 @@ INLINE int can_skip_lower_load(drcbe_state *drcbe, x86code *dst, UINT32 *memptr,
 
 INLINE int can_skip_upper_load(drcbe_state *drcbe, x86code *dst, UINT32 *memptr, UINT8 reghi)
 {
-//	return FALSE;
+//  return FALSE;
 	return (dst == drcbe->last_upper_pc && memptr == drcbe->last_upper_addr && reghi == drcbe->last_upper_reg);
 }
 
@@ -5658,7 +5658,7 @@ static x86code *op_and(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 			else if (dstp.type == DRCUML_PTYPE_MEMORY)
 				emit_mov_m32_imm(&dst, MABS(dstp.value + 4), 0);						// mov   dsthi,0
 		}
-		
+
 		/* AND with immediate 0xffffffff00000000 */
 		else if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value == U64(0xffffffff00000000) && inst->flags == 0)
 		{
@@ -5672,7 +5672,7 @@ static x86code *op_and(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 			else if (dstp.type == DRCUML_PTYPE_MEMORY)
 				emit_mov_m32_imm(&dst, MABS(dstp.value), 0);							// mov   dstlo,0
 		}
-		
+
 		/* AND with immediate <= 0xffffffff */
 		else if (src2p.type == DRCUML_PTYPE_IMMEDIATE && src2p.value <= 0xffffffff && inst->flags == 0)
 		{
@@ -5684,7 +5684,7 @@ static x86code *op_and(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 			else if (dstp.type == DRCUML_PTYPE_MEMORY)
 				emit_mov_m32_imm(&dst, MABS(dstp.value + 4), 0);						// mov   dsthi,0
 		}
-		
+
 		/* general case */
 		else
 		{

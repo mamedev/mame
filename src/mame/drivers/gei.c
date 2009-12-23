@@ -1038,7 +1038,7 @@ static MACHINE_DRIVER_START( gselect )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(getrivia)
-	
+
 	MDRV_DEVICE_REMOVE("ticket")
 
 	MDRV_CPU_MODIFY("maincpu")

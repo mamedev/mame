@@ -54,7 +54,7 @@ static READ8_HANDLER( k052109_051960_r )
 		else
 			return k051960_r(k051960, offset - 0x3c00);
 	}
-	else 
+	else
 		return k052109_r(k052109, offset);
 }
 
@@ -90,25 +90,25 @@ static WRITE8_HANDLER( bottom9_bankedram1_w )
 {
 	const device_config *k051316 = devtag_get_device(space->machine, "k051316");
 
-	if (k052109_selected) 
+	if (k052109_selected)
 		k052109_051960_w(space, offset, data);
-	else 
+	else
 		k051316_w(k051316, offset, data);
 }
 
 static READ8_HANDLER( bottom9_bankedram2_r )
 {
-	if (k052109_selected) 
+	if (k052109_selected)
 		return k052109_051960_r(space, offset + 0x2000);
-	else 	
+	else
 		return space->machine->generic.paletteram.u8[offset];
 }
 
 static WRITE8_HANDLER( bottom9_bankedram2_w )
 {
-	if (k052109_selected) 
+	if (k052109_selected)
 		k052109_051960_w(space, offset + 0x2000, data);
-	else 
+	else
 		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
 }
 
@@ -118,13 +118,13 @@ static WRITE8_HANDLER( bankswitch_w )
 	int offs;
 
 	/* bit 0 = RAM bank */
-	if ((data & 1) == 0) 
+	if ((data & 1) == 0)
 		popmessage("bankswitch RAM bank 0");
 
 	/* bit 1-4 = ROM bank */
-	if (data & 0x10) 
+	if (data & 0x10)
 		offs = 0x20000 + (data & 0x06) * 0x1000;
-	else 
+	else
 		offs = 0x10000 + (data & 0x0e) * 0x1000;
 
 	memory_set_bankptr(space->machine, "bank1",&RAM[offs]);
@@ -326,7 +326,7 @@ static const k051960_interface bottom9_k051960_intf =
 static const k051316_interface bottom9_k051316_intf =
 {
 	"gfx3", 2,
-	4, FALSE, 0, 
+	4, FALSE, 0,
 	0, 0, 0,
 	bottom9_zoom_callback
 };

@@ -32,8 +32,8 @@ typedef struct _neogeo_state neogeo_state;
 struct _neogeo_state
 {
 	/* memory pointers */
-//	UINT8      *memcard_data;	// this currently uses generic handlers
-//	UINT16     *save_ram;		// this currently uses generic handlers
+//  UINT8      *memcard_data;   // this currently uses generic handlers
+//  UINT16     *save_ram;       // this currently uses generic handlers
 
 	/* video-related */
 	UINT8      *sprite_gfx;

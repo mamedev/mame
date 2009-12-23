@@ -245,9 +245,9 @@ static READ8_HANDLER( devram_r )
 		case 0xff3:
 		{
 			int	x = (state->devram[0xff0] + state->devram[0xff1] * 256) * (state->devram[0xff2] + state->devram[0xff3] * 256);
-			if (offset == 0xff2)	
+			if (offset == 0xff2)
 				return (x & 0x00ff) >> 0;
-			else				
+			else
 				return (x & 0xff00) >> 8;
 		}	break;
 

@@ -49,7 +49,7 @@ static UINT8 k056800_host_reg_r( const device_config *device, int reg )
 {
 	k056800_state *k056800 = k056800_get_safe_token(device);
 	UINT8 value = k056800->host_reg[reg];
-	if (reg == 2) 
+	if (reg == 2)
 		value &= ~3; // suppress VOLWR busy flags
 
 	return value;

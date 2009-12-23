@@ -201,7 +201,7 @@ static MACHINE_START( badlands )
 	badlands_state *state = (badlands_state *)machine->driver_data;
 
 	atarigen_init(machine);
-	
+
 	state_save_register_global_array(machine, state->pedal_value);
 }
 

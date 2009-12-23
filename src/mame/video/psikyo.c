@@ -284,7 +284,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	for (offs = 0/2 ; offs < (0x800 - 2)/2 ; offs += 2/2)	// skip last "sprite"
 	{
 		UINT16 sprite = spritelist[BYTE_XOR_BE(offs)];
-		if (sprite == 0xffff)	
+		if (sprite == 0xffff)
 			break;
 	}
 
@@ -325,7 +325,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		/* 180-1ff are negative coordinates. Note that $80 pixels is
            the maximum extent of a sprite, which can therefore be moved
            out of screen without problems */
-		if (x >= 0x180)	
+		if (x >= 0x180)
 			x -= 0x200;
 
 		x += (nx * zoomx + 2) / 4;
@@ -400,14 +400,14 @@ static void draw_sprites_bootleg( running_machine *machine, bitmap_t *bitmap, co
 	int height = video_screen_get_height(machine->primary_screen);
 
 	/* Exit if sprites are disabled */
-	if (spritelist[BYTE_XOR_BE((0x800 - 2) / 2)] & 1)	
+	if (spritelist[BYTE_XOR_BE((0x800 - 2) / 2)] & 1)
 		return;
 
 	/* Look for "end of sprites" marker in the sprites list */
 	for (offs = 0/2 ; offs < (0x800 - 2)/2 ; offs += 2/2)	// skip last "sprite"
 	{
 		UINT16 sprite = spritelist[BYTE_XOR_BE(offs)];
-		if (sprite == 0xffff)	
+		if (sprite == 0xffff)
 			break;
 	}
 
@@ -514,13 +514,13 @@ static void draw_sprites_bootleg( running_machine *machine, bitmap_t *bitmap, co
 
 static int tilemap_width( int size )
 {
-	if (size == 0)	
+	if (size == 0)
 		return 0x80 * 16;
 	else if(size == 1)
 		return 0x40 * 16;
-	else if(size == 2) 
+	else if(size == 2)
 		return 0x20 * 16;
-	else		
+	else
 		return 0x10 * 16;
 }
 
@@ -578,7 +578,7 @@ VIDEO_UPDATE( psikyo )
 		psikyo_switch_banks(screen->machine, 1, (layer1_ctrl & 0x400) >> 10);
 	}
 
-	switch ((layer0_ctrl & 0x00c0) >> 6) 
+	switch ((layer0_ctrl & 0x00c0) >> 6)
 	{
 	case 0:	tm0size = 1;	break;
 	case 1:	tm0size = 2;	break;
@@ -586,7 +586,7 @@ VIDEO_UPDATE( psikyo )
 	default:	tm0size = 0;	break;
 	}
 
-	switch ((layer1_ctrl & 0x00c0) >> 6) 
+	switch ((layer1_ctrl & 0x00c0) >> 6)
 	{
 	case 0:	tm1size = 1;	break;
 	case 1:	tm1size = 2;	break;
@@ -594,22 +594,22 @@ VIDEO_UPDATE( psikyo )
 	default:	tm1size = 0;	break;
 	}
 
-	if (tm0size == 0) 
+	if (tm0size == 0)
 		tmptilemap0 = state->tilemap_0_size0;
-	else if (tm0size == 1) 
+	else if (tm0size == 1)
 		tmptilemap0 = state->tilemap_0_size1;
-	else if (tm0size == 2) 
+	else if (tm0size == 2)
 		tmptilemap0 = state->tilemap_0_size2;
-	else 
+	else
 		tmptilemap0 = state->tilemap_0_size3;
 
-	if (tm1size == 0) 
+	if (tm1size == 0)
 		tmptilemap1 = state->tilemap_1_size0;
-	else if (tm1size == 1) 
+	else if (tm1size == 1)
 		tmptilemap1 = state->tilemap_1_size1;
-	else if (tm1size == 2) 
+	else if (tm1size == 2)
 		tmptilemap1 = state->tilemap_1_size2;
-	else 
+	else
 		tmptilemap1 = state->tilemap_1_size3;
 
 	tilemap_set_enable(tmptilemap0, ~layer0_ctrl & 1);
@@ -752,7 +752,7 @@ VIDEO_UPDATE( psikyo_bootleg )
 		psikyo_switch_banks(screen->machine, 1, (layer1_ctrl & 0x400) >> 10);
 	}
 
-	switch ((layer0_ctrl & 0x00c0) >> 6) 
+	switch ((layer0_ctrl & 0x00c0) >> 6)
 	{
 	case 0:	tm0size = 1;	break;
 	case 1:	tm0size = 2;	break;
@@ -760,7 +760,7 @@ VIDEO_UPDATE( psikyo_bootleg )
 	default:	tm0size = 0;	break;
 	}
 
-	switch ((layer1_ctrl & 0x00c0) >> 6) 
+	switch ((layer1_ctrl & 0x00c0) >> 6)
 	{
 	case 0:	tm1size = 1;	break;
 	case 1:	tm1size = 2;	break;
@@ -768,22 +768,22 @@ VIDEO_UPDATE( psikyo_bootleg )
 	default:	tm1size = 0;	break;
 	}
 
-	if (tm0size == 0) 
+	if (tm0size == 0)
 		tmptilemap0 = state->tilemap_0_size0;
-	else if (tm0size == 1) 
+	else if (tm0size == 1)
 		tmptilemap0 = state->tilemap_0_size1;
-	else if (tm0size == 2) 
+	else if (tm0size == 2)
 		tmptilemap0 = state->tilemap_0_size2;
-	else 
+	else
 		tmptilemap0 = state->tilemap_0_size3;
 
-	if (tm1size == 0) 
+	if (tm1size == 0)
 		tmptilemap1 = state->tilemap_1_size0;
-	else if (tm1size == 1) 
+	else if (tm1size == 1)
 		tmptilemap1 = state->tilemap_1_size1;
-	else if (tm1size == 2) 
+	else if (tm1size == 2)
 		tmptilemap1 = state->tilemap_1_size2;
-	else 
+	else
 		tmptilemap1 = state->tilemap_1_size3;
 
 	tilemap_set_enable(tmptilemap0, ~layer0_ctrl & 1);

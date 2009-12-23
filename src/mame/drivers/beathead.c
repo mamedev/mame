@@ -425,7 +425,7 @@ static MACHINE_DRIVER_START( beathead )
 	MDRV_MACHINE_START(beathead)
 	MDRV_MACHINE_RESET(beathead)
 	MDRV_NVRAM_HANDLER(generic_1fill)
-	
+
 	MDRV_TIMER_ADD("scan_timer", scanline_callback)
 
 	/* video hardware */

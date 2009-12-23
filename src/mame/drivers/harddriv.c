@@ -264,8 +264,8 @@ A047046-01
 
 
 
-MULTISYNC                                                                                                 
-A046901                                                                                              
+MULTISYNC
+A046901
 |------------------------------------------------------------------------------------------------------|
 |                     |---------------------|     136078-4001.210R           136078-4009.210V          |
 |                     |---------------------|        136078-4003.210S           136078-1011.210W       |
@@ -1137,7 +1137,7 @@ static MACHINE_DRIVER_START( driver_nomsp )
 	MDRV_MACHINE_START(harddriv)
 	MDRV_MACHINE_RESET(harddriv)
 	MDRV_NVRAM_HANDLER(atarigen)
-	
+
 	MDRV_TIMER_ADD("duart_timer", hd68k_duart_callback)
 
 	/* video hardware */

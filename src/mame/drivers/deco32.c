@@ -1681,7 +1681,7 @@ static MACHINE_DRIVER_START( captaven )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(deco32)
-	
+
 	MDRV_TIMER_ADD("int_timer", interrupt_gen)
 
 	/* video hardware */

@@ -77,7 +77,7 @@ VIDEO_START( badlands )
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
-	
+
 	/* save states */
 	state_save_register_global(machine, state->playfield_tile_bank);
 }

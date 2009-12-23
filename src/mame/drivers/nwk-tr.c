@@ -1037,7 +1037,7 @@ static void sound_irq_callback(running_machine *machine, int irq)
 		generic_pulse_irq_line(cputag_get_cpu(machine, "audiocpu"), INPUT_LINE_IRQ2);
 }
 
-static const k056800_interface nwktr_k056800_interface = 
+static const k056800_interface nwktr_k056800_interface =
 {
 	sound_irq_callback
 };

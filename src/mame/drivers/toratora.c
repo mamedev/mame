@@ -139,7 +139,7 @@ static INTERRUPT_GEN( toratora_timer )
 	state->timer++;	/* timer counting at 16 Hz */
 
 	/* also, when the timer overflows (16 seconds) watchdog would kick in */
-	if (state->timer & 0x100) 
+	if (state->timer & 0x100)
 		popmessage("watchdog!");
 
 	if (state->last != (input_port_read(device->machine, "INPUT") & 0x0f))

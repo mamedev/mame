@@ -10,7 +10,7 @@ struct _sf_state
 	/* memory pointers */
 	UINT16 *    videoram;
 	UINT16 *    objectram;
-//	UINT16 *    paletteram;    // currently this uses generic palette handling
+//  UINT16 *    paletteram;    // currently this uses generic palette handling
 	size_t      videoram_size;
 
 	/* video-related */

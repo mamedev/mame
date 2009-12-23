@@ -284,12 +284,12 @@ static WRITE32_HANDLER( ps4_screen1_brt_w )
 {
 	psikyo4_state *state = (psikyo4_state *)space->machine->driver_data;
 
-	if (ACCESSING_BITS_0_7) 
+	if (ACCESSING_BITS_0_7)
 	{
 		/* Need seperate brightness for both screens if displaying together */
 		double brt1 = data & 0xff;
 
-		if (brt1 > 0x7f) 
+		if (brt1 > 0x7f)
 			brt1 = 0x7f; /* I reckon values must be clamped to 0x7f */
 
 		brt1 = (0x7f - brt1) / 127.0;
@@ -302,8 +302,8 @@ static WRITE32_HANDLER( ps4_screen1_brt_w )
 
 			state->oldbrt1 = brt1;
 		}
-	} 
-	else 
+	}
+	else
 	{
 		/* I believe this to be seperate rgb brightness due to strings in hotdebut, unused in 4 dumped games */
 		if((data & mem_mask) != 0)
@@ -315,12 +315,12 @@ static WRITE32_HANDLER( ps4_screen2_brt_w )
 {
 	psikyo4_state *state = (psikyo4_state *)space->machine->driver_data;
 
-	if (ACCESSING_BITS_0_7) 
+	if (ACCESSING_BITS_0_7)
 	{
 		/* Need seperate brightness for both screens if displaying together */
 		double brt2 = data & 0xff;
 
-		if (brt2 > 0x7f) 
+		if (brt2 > 0x7f)
 			brt2 = 0x7f; /* I reckon values must be clamped to 0x7f */
 
 		brt2 = (0x7f - brt2) / 127.0;
@@ -334,8 +334,8 @@ static WRITE32_HANDLER( ps4_screen2_brt_w )
 
 			state->oldbrt2 = brt2;
 		}
-	} 
-	else 
+	}
+	else
 	{
 		/* I believe this to be seperate rgb brightness due to strings in hotdebut, unused in 4 dumped games */
 		if((data & mem_mask) != 0)
@@ -353,7 +353,7 @@ static WRITE32_HANDLER( ps4_vidregs_w )
 	{
 		if (ACCESSING_BITS_0_15)	// Bank
 		{
-//			memory_set_bank(space->machine, "bank2", state->vidregs[offset] & 0x1fff);  /* Bank comes from vidregs */
+//          memory_set_bank(space->machine, "bank2", state->vidregs[offset] & 0x1fff);  /* Bank comes from vidregs */
 			memory_set_bankptr(space->machine, "bank2", memory_region(space->machine, "gfx1") + 0x2000 * (state->vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */		}
 	}
 #endif
@@ -728,8 +728,8 @@ static MACHINE_START( psikyo4 )
 	state->maincpu = devtag_get_device(machine, "maincpu");
 
 #if ROMTEST
-//	FIXME: Too many banks! it cannot be handled in this way, currently
-//	memory_configure_bank(machine, "bank2", 0, 0x2000, memory_region(machine, "gfx1"), 0x2000);
+//  FIXME: Too many banks! it cannot be handled in this way, currently
+//  memory_configure_bank(machine, "bank2", 0, 0x2000, memory_region(machine, "gfx1"), 0x2000);
 
 	state->sample_offs = 0;
 	state_save_register_global(machine, state->sample_offs);
@@ -1036,7 +1036,7 @@ PC  :00001B48: BT      $00001B3C
 */
 	psikyo4_state *state = (psikyo4_state *)space->machine->driver_data;
 
-	if (cpu_get_pc(space->cpu) == 0x00001b3e) 
+	if (cpu_get_pc(space->cpu) == 0x00001b3e)
 		cpu_spinuntil_int(space->cpu);
 
 	return state->ram[0x000020 / 4];
@@ -1055,7 +1055,7 @@ PC  :00001B54: BT      $00001B48
 */
 	psikyo4_state *state = (psikyo4_state *)space->machine->driver_data;
 
-	if (cpu_get_pc(space->cpu) == 0x00001b4a) 
+	if (cpu_get_pc(space->cpu) == 0x00001b4a)
 		cpu_spinuntil_int(space->cpu);
 
 	return state->ram[0x000020 / 4];
@@ -1074,7 +1074,7 @@ PC  :000029F8: BT      $000029EC
 */
 	psikyo4_state *state = (psikyo4_state *)space->machine->driver_data;
 
-	if (cpu_get_pc(space->cpu) == 0x000029ee) 
+	if (cpu_get_pc(space->cpu) == 0x000029ee)
 		cpu_spinuntil_int(space->cpu);
 
 	return state->ram[0x00001c / 4];

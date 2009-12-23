@@ -29,7 +29,7 @@ static UINT8 *ram;
 static INTERRUPT_GEN( surpratk_interrupt )
 {
 	const device_config *k052109 = devtag_get_device(device->machine, "k052109");
-	if (k052109_is_irq_enabled(k052109)) 
+	if (k052109_is_irq_enabled(k052109))
 		cpu_set_input_line(device,0,HOLD_LINE);
 }
 

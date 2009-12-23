@@ -282,7 +282,7 @@ static void asic3_compute_hold(running_machine *machine)
 	static const int modes[4] = { 1, 1, 3, 2 };
 	int mode = modes[input_port_read(machine, "Region") & 3];
 
-	switch (mode) 
+	switch (mode)
 	{
 	case 1:
 		state->asic3_hold =
@@ -317,7 +317,7 @@ READ16_HANDLER( pgm_asic3_r )
 	UINT8 res = 0;
 	/* region is supplied by the protection device */
 
-	switch (state->asic3_reg) 
+	switch (state->asic3_reg)
 	{
 	case 0x00: res = (state->asic3_latch[0] & 0xf7) | ((input_port_read(space->machine, "Region") << 3) & 0x08); break;
 	case 0x01: res = state->asic3_latch[1]; break;
@@ -363,14 +363,14 @@ WRITE16_HANDLER( pgm_asic3_w )
 	{
 		if (state->asic3_reg < 3)
 			state->asic3_latch[state->asic3_reg] = data << 1;
-		else if (state->asic3_reg == 0xa0) 
+		else if (state->asic3_reg == 0xa0)
 			state->asic3_hold = 0;
-		else if (state->asic3_reg == 0x40) 
+		else if (state->asic3_reg == 0x40)
 		{
 			state->asic3_h2 = state->asic3_h1;
 			state->asic3_h1 = data;
-		} 
-		else if (state->asic3_reg == 0x48) 
+		}
+		else if (state->asic3_reg == 0x48)
 		{
 			state->asic3_x = 0;
 			if (!(state->asic3_h2 & 0x0a))
@@ -381,8 +381,8 @@ WRITE16_HANDLER( pgm_asic3_w )
 				state->asic3_x |= 2;
 			if (!(state->asic3_h1 & 0x90))
 				state->asic3_x |= 1;
-		} 
-		else if(state->asic3_reg >= 0x80 && state->asic3_reg <= 0x87) 
+		}
+		else if(state->asic3_reg >= 0x80 && state->asic3_reg <= 0x87)
 		{
 			state->asic3_y = state->asic3_reg & 7;
 			state->asic3_z = data;
@@ -429,7 +429,7 @@ READ16_HANDLER( sango_protram_r )
 	// 4 = hong kong
 	// 5 = world
 
-	if (offset == 4)	
+	if (offset == 4)
 		return input_port_read(space->machine, "Region");
 
 	// otherwise it doesn't seem to use the ram for anything important, we return 0 to avoid test mode corruption

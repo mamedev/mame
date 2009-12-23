@@ -213,7 +213,7 @@ static INTERRUPT_GEN( punkshot_interrupt )
 {
 	const device_config *k052109 = devtag_get_device(device->machine, "k052109");
 
-	if (k052109_is_irq_enabled(k052109)) 
+	if (k052109_is_irq_enabled(k052109))
 		irq4_line_hold(device);
 }
 
@@ -221,7 +221,7 @@ static INTERRUPT_GEN( lgtnfght_interrupt )
 {
 	const device_config *k052109 = devtag_get_device(device->machine, "k052109");
 
-	if (k052109_is_irq_enabled(k052109)) 
+	if (k052109_is_irq_enabled(k052109))
 		irq5_line_hold(device);
 }
 
@@ -721,7 +721,7 @@ static ADDRESS_MAP_START( blswhstl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x700200, 0x700201) AM_WRITE(blswhstl_eeprom_w)
 	AM_RANGE(0x700300, 0x700301) AM_WRITE(blswhstl_700300_w)
-	AM_RANGE(0x700400, 0x700401) AM_WRITE(watchdog_reset16_w)	
+	AM_RANGE(0x700400, 0x700401) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x780600, 0x780603) AM_DEVREAD8("konami", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x780600, 0x780601) AM_DEVWRITE8("konami", k053260_w, 0x00ff)
 	AM_RANGE(0x780604, 0x780605) AM_WRITE(ssriders_soundkludge_w)
@@ -739,8 +739,8 @@ static WRITE16_HANDLER( K053251_glfgreat_w )
 	{
 		k053251_w(k053251, offset, (data >> 8) & 0xff);
 
-		/* FIXME: in the old code k052109 tilemaps were tilemaps 2,3,4 for k053251 
-		and got marked as dirty in the write above... how was the original hardware working?!? */
+		/* FIXME: in the old code k052109 tilemaps were tilemaps 2,3,4 for k053251
+        and got marked as dirty in the write above... how was the original hardware working?!? */
 		for (i = 0; i < 3; i++)
 		{
 			if (k053251_get_tmap_dirty(k053251, 2 + i))
@@ -781,7 +781,7 @@ static ADDRESS_MAP_START( prmrsocr_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(K053245_scattered_word_r, K053245_scattered_word_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE("k053936", k053936_linectrl_r, k053936_linectrl_w)	
+	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE("k053936", k053936_linectrl_r, k053936_linectrl_w)
 	AM_RANGE(0x110000, 0x11001f) AM_WRITE(K053244_word_noA1_w)				/* duplicate! */
 	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE("k053245", k053244_lsb_r, k053244_lsb_w)	/* duplicate! */
 	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE("k053936", k053936_ctrl_w)

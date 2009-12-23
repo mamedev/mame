@@ -1269,7 +1269,7 @@ static void deinterleave_gfx(running_machine *machine, const char *gfx_memory_re
 /***************************************************************************/
 
 typedef struct _k007121_state  k007121_state ;
-struct _k007121_state 
+struct _k007121_state
 {
 
 	UINT8    ctrlram[8];
@@ -1374,7 +1374,7 @@ void k007121_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 						  const UINT8 *source, int base_color, int global_x_offset, int bank_base, UINT32 pri_mask )
 {
 	k007121_state *k007121 = k007121_get_safe_token(device);
-//	const gfx_element *gfx = gfxs[chip];
+//  const gfx_element *gfx = gfxs[chip];
 	bitmap_t *priority_bitmap = gfx->machine->priority_bitmap;
 	int flipscreen = k007121->flipscreen;
 	int i, num, inc, offs[5];
@@ -1758,16 +1758,16 @@ INLINE void k007342_get_tile_info( const device_config *device, tile_data *tilei
 			flags);
 }
 
-static TILE_GET_INFO_DEVICE( k007342_get_tile_info0 ) 
-{ 
+static TILE_GET_INFO_DEVICE( k007342_get_tile_info0 )
+{
 	k007342_state *k007342 = k007342_get_safe_token(device);
-	k007342_get_tile_info(device, tileinfo, tile_index, 0, k007342->colorram_0, k007342->videoram_0); 
+	k007342_get_tile_info(device, tileinfo, tile_index, 0, k007342->colorram_0, k007342->videoram_0);
 }
 
-static TILE_GET_INFO_DEVICE( k007342_get_tile_info1 ) 
-{ 
+static TILE_GET_INFO_DEVICE( k007342_get_tile_info1 )
+{
 	k007342_state *k007342 = k007342_get_safe_token(device);
-	k007342_get_tile_info(device, tileinfo, tile_index, 1, k007342->colorram_1, k007342->videoram_1); 
+	k007342_get_tile_info(device, tileinfo, tile_index, 1, k007342->colorram_1, k007342->videoram_1);
 }
 
 
@@ -1835,7 +1835,7 @@ struct _k007420_state
 	UINT8        *ram;
 
 	int          banklimit;
-	int          flipscreen;	// current code uses the 7342 flipscreen!! 
+	int          flipscreen;	// current code uses the 7342 flipscreen!!
 	UINT8        regs[8];	// current code uses the 7342 regs!! (only [2])
 
 	k007420_callback callback;
@@ -1924,7 +1924,7 @@ void k007420_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 
 		/* 0x080 = normal scale, 0x040 = double size, 0x100 half size */
 		zoom = k007420->ram[offs + 5] | ((k007420->ram[offs + 4] & 0x03) << 8);
-		if (!zoom) 
+		if (!zoom)
 			continue;
 		zoom = 0x10000 * 128 / zoom;
 
@@ -1960,19 +1960,19 @@ void k007420_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 					int c = code;
 
 					sx = ox + 8 * x;
-					if (flipx) 
+					if (flipx)
 						c += xoffset[(w - 1 - x)];
-					else 
+					else
 						c += xoffset[x];
 
-					if (flipy) 
+					if (flipy)
 						c += yoffset[(h - 1 - y)];
-					else 
+					else
 						c += yoffset[y];
 
-					if (c & bankmask) 
-						continue; 
-					else 
+					if (c & bankmask)
+						continue;
+					else
 						c += bank;
 
 					drawgfx_transpen(bitmap,cliprect,gfx,
@@ -2004,19 +2004,19 @@ void k007420_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 
 					sx = ox + ((zoom * x + (1<<12)) >> 13);
 					zw = (ox + ((zoom * (x + 1) + (1 << 12)) >> 13)) - sx;
-					if (flipx) 
+					if (flipx)
 						c += xoffset[(w - 1 - x)];
-					else 
+					else
 						c += xoffset[x];
 
-					if (flipy) 
+					if (flipy)
 						c += yoffset[(h - 1 - y)];
-					else 
+					else
 						c += yoffset[y];
 
-					if (c & bankmask) 
-						continue; 
-					else 
+					if (c & bankmask)
+						continue;
+					else
 						c += bank;
 
 					drawgfxzoom_transpen(bitmap,cliprect,gfx,
@@ -2178,7 +2178,7 @@ READ8_DEVICE_HANDLER( k052109_r )
 
 		bank |= (k052109->charrombank_2[(color & 0x0c) >> 2] >> 2); // Surprise Attack uses this 2nd bank in the rom test
 
-	if (k052109->has_extra_video_ram) 
+	if (k052109->has_extra_video_ram)
 		code |= color << 8;	/* kludge for X-Men */
 	else
 		k052109->callback(device->machine, 0, bank, &code, &color, &flags, &priority);
@@ -2198,7 +2198,7 @@ WRITE8_DEVICE_HANDLER( k052109_w )
 
 	if ((offset & 0x1fff) < 0x1800) /* tilemap RAM */
 	{
-		if (offset >= 0x4000) 
+		if (offset >= 0x4000)
 			k052109->has_extra_video_ram = 1;  /* kludge for X-Men */
 
 		k052109->ram[offset] = data;
@@ -2232,9 +2232,9 @@ WRITE8_DEVICE_HANDLER( k052109_w )
 		{
 			int dirty = 0;
 
-			if (k052109->charrombank[0] != (data & 0x0f)) 
+			if (k052109->charrombank[0] != (data & 0x0f))
 				dirty |= 1;
-			if (k052109->charrombank[1] != ((data >> 4) & 0x0f)) 
+			if (k052109->charrombank[1] != ((data >> 4) & 0x0f))
 				dirty |= 2;
 
 			if (dirty)
@@ -2278,10 +2278,10 @@ WRITE8_DEVICE_HANDLER( k052109_w )
 		{
 			int dirty = 0;
 
-			if (k052109->charrombank[2] != (data & 0x0f)) 
+			if (k052109->charrombank[2] != (data & 0x0f))
 				dirty |= 1;
 
-			if (k052109->charrombank[3] != ((data >> 4) & 0x0f)) 
+			if (k052109->charrombank[3] != ((data >> 4) & 0x0f))
 				dirty |= 2;
 
 			if (dirty)
@@ -2565,7 +2565,7 @@ INLINE void k052109_get_tile_info( const device_config *device, tile_data *tilei
 	int flags = 0;
 	int priority = 0;
 	int bank = k052109->charrombank[(color & 0x0c) >> 2];
-	if (k052109->has_extra_video_ram) 
+	if (k052109->has_extra_video_ram)
 		bank = (color & 0x0c) >> 2;	/* kludge for X-Men */
 
 	color = (color & 0xf3) | ((bank & 0x03) << 2);
@@ -2576,11 +2576,11 @@ INLINE void k052109_get_tile_info( const device_config *device, tile_data *tilei
 	k052109->callback(device->machine, layer, bank, &code, &color, &flags, &priority);
 
 	/* if the callback set flip X but it is not enabled, turn it off */
-	if (!(k052109->tileflip_enable & 1)) 
+	if (!(k052109->tileflip_enable & 1))
 		flags &= ~TILE_FLIPX;
 
 	/* if flip Y is enabled and the attribute but is set, turn it on */
-	if (flipy && (k052109->tileflip_enable & 2)) 
+	if (flipy && (k052109->tileflip_enable & 2))
 		flags |= TILE_FLIPY;
 
 	SET_TILE_INFO_DEVICE(
@@ -2592,22 +2592,22 @@ INLINE void k052109_get_tile_info( const device_config *device, tile_data *tilei
 	tileinfo->category = priority;
 }
 
-static TILE_GET_INFO_DEVICE( k052109_get_tile_info0 ) 
-{ 
+static TILE_GET_INFO_DEVICE( k052109_get_tile_info0 )
+{
 	k052109_state *k052109 = k052109_get_safe_token(device);
-	k052109_get_tile_info(device, tileinfo, tile_index, 0, k052109->colorram_F, k052109->videoram_F, k052109->videoram2_F); 
+	k052109_get_tile_info(device, tileinfo, tile_index, 0, k052109->colorram_F, k052109->videoram_F, k052109->videoram2_F);
 }
 
-static TILE_GET_INFO_DEVICE( k052109_get_tile_info1 ) 
-{ 
+static TILE_GET_INFO_DEVICE( k052109_get_tile_info1 )
+{
 	k052109_state *k052109 = k052109_get_safe_token(device);
-	k052109_get_tile_info(device, tileinfo, tile_index, 1, k052109->colorram_A, k052109->videoram_A, k052109->videoram2_A); 
+	k052109_get_tile_info(device, tileinfo, tile_index, 1, k052109->colorram_A, k052109->videoram_A, k052109->videoram2_A);
 }
 
-static TILE_GET_INFO_DEVICE( k052109_get_tile_info2 ) 
-{ 
+static TILE_GET_INFO_DEVICE( k052109_get_tile_info2 )
+{
 	k052109_state *k052109 = k052109_get_safe_token(device);
-	k052109_get_tile_info(device, tileinfo, tile_index, 2, k052109->colorram_B, k052109->videoram_B, k052109->videoram2_B); 
+	k052109_get_tile_info(device, tileinfo, tile_index, 2, k052109->colorram_B, k052109->videoram_B, k052109->videoram2_B);
 }
 
 
@@ -2705,7 +2705,7 @@ static DEVICE_START( k052109 )
 	state_save_register_device_item_array(device, 0, k052109->dy);
 	state_save_register_device_item(device, 0, k052109->has_extra_video_ram);
 
-//	state_save_register_postload(machine, k052109_tileflip_reset, NULL);	// to be moved into the drivers
+//  state_save_register_postload(machine, k052109_tileflip_reset, NULL);    // to be moved into the drivers
 }
 
 static DEVICE_RESET( k052109 )
@@ -3000,7 +3000,7 @@ void k051960_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 		static const int height[8] = { 1, 1, 2, 2, 2, 4, 4, 8 };
 
 		offs = sortedlist[pri_code];
-		if (offs == -1) 
+		if (offs == -1)
 			continue;
 
 		code = k051960->ram[offs + 2] + ((k051960->ram[offs + 1] & 0x1f) << 8);
@@ -3010,7 +3010,7 @@ void k051960_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 		k051960->callback(device->machine, &code, &color, &pri, &shadow);
 
 		if (max_priority != -1)
-			if (pri < min_priority || pri > max_priority) 
+			if (pri < min_priority || pri > max_priority)
 				continue;
 
 		size = (k051960->ram[offs + 1] & 0xe0) >> 5;
@@ -3058,14 +3058,14 @@ void k051960_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 					int c = code;
 
 					sx = ox + 16 * x;
-					if (flipx) 
+					if (flipx)
 						c += xoffset[(w - 1 - x)];
-					else 
+					else
 						c += xoffset[x];
 
-					if (flipy) 
+					if (flipy)
 						c += yoffset[(h - 1 - y)];
-					else 
+					else
 						c += yoffset[y];
 
 					if (max_priority == -1)
@@ -3101,14 +3101,14 @@ void k051960_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 
 					sx = ox + ((zoomx * x + (1 << 11)) >> 12);
 					zw = (ox + ((zoomx * (x+1) + (1 << 11)) >> 12)) - sx;
-					if (flipx) 
+					if (flipx)
 						c += xoffset[(w - 1 - x)];
-					else 
+					else
 						c += xoffset[x];
 
-					if (flipy) 
+					if (flipy)
 						c += yoffset[(h - 1 - y)];
-					else 
+					else
 						c += yoffset[y];
 
 					if (max_priority == -1)
@@ -3299,7 +3299,7 @@ struct _k05324x_state
 
 	UINT8    regs[0x10];	// 053244
 	int      dx, dy;
-	int      rombank;		// 053244 
+	int      rombank;		// 053244
 	int      ramsize;
 	int      z_rejection;
 
@@ -3378,7 +3378,7 @@ void k053245_clear_buffer( const device_config *device )
 	k05324x_state *k053245 = k05324x_get_safe_token(device);
 	int i, e;
 
-	for (e = k053245->ramsize / 2, i = 0; i < e; i += 8) 
+	for (e = k053245->ramsize / 2, i = 0; i < e; i += 8)
 		k053245->buffer[i] = 0;
 }
 
@@ -3424,7 +3424,7 @@ WRITE8_DEVICE_HANDLER( k053244_w )
 
 	k053244->regs[offset] = data;
 
-	switch(offset) 
+	switch(offset)
 	{
 	case 0x05:
 //      if (data & 0xc8)
@@ -3433,7 +3433,7 @@ WRITE8_DEVICE_HANDLER( k053244_w )
 		/* bit 5 = unknown, Rollergames uses it */
 //      logerror("%s: write %02x to 053244 address 5\n", cpuexec_describe_context(device->machine), data);
 		break;
-	
+
 	case 0x06:
 		k053245_update_buffer(device);
 		break;
@@ -3528,10 +3528,10 @@ void k053245_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 		{
 			pri_code &= 0x007f;
 
-			if (offs && pri_code == k053245->z_rejection) 
+			if (offs && pri_code == k053245->z_rejection)
 				continue;
 
-			if (sortedlist[pri_code] == -1) 
+			if (sortedlist[pri_code] == -1)
 				sortedlist[pri_code] = offs;
 		}
 	}
@@ -3541,7 +3541,7 @@ void k053245_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 		int ox, oy, color, code, size, w, h, x, y, flipx, flipy, mirrorx, mirrory, shadow, zoomx, zoomy, pri;
 
 		offs = sortedlist[pri_code];
-		if (offs == -1) 
+		if (offs == -1)
 			continue;
 
 		/* the following changes the sprite draw order from
@@ -3590,25 +3590,25 @@ void k053245_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
           >0x40 reduce (0x80 = half size)
         */
 		zoomy = k053245->buffer[offs + 4];
-		if (zoomy > 0x2000) 
+		if (zoomy > 0x2000)
 			continue;
 
-		if (zoomy) 
+		if (zoomy)
 			zoomy = (0x400000 + zoomy / 2) / zoomy;
-		else 
+		else
 			zoomy = 2 * 0x400000;
 		if ((k053245->buffer[offs] & 0x4000) == 0)
 		{
 			zoomx = k053245->buffer[offs + 5];
-			if (zoomx > 0x2000) 
+			if (zoomx > 0x2000)
 				continue;
-			if (zoomx) 
+			if (zoomx)
 				zoomx = (0x400000 + zoomx / 2) / zoomx;
-			else 
+			else
 				zoomx = 2 * 0x400000;
 //          else zoomx = zoomy; /* workaround for TMNT2 */
 		}
-		else 
+		else
 			zoomx = zoomy;
 
 		ox = k053245->buffer[offs+3] + spriteoffsX;
@@ -3620,7 +3620,7 @@ void k053245_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 		flipx = k053245->buffer[offs] & 0x1000;
 		flipy = k053245->buffer[offs] & 0x2000;
 		mirrorx = k053245->buffer[offs + 6] & 0x0100;
-		if (mirrorx) 
+		if (mirrorx)
 			flipx = 0; // documented and confirmed
 
 		mirrory = k053245->buffer[offs + 6] & 0x0200;
@@ -3629,13 +3629,13 @@ void k053245_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 		if (flipscreenX)
 		{
 			ox = 512 - ox;
-			if (!mirrorx) 
+			if (!mirrorx)
 				flipx = !flipx;
 		}
 		if (flipscreenY)
 		{
 			oy = -oy;
-			if (!mirrory) 
+			if (!mirrory)
 				flipy = !flipy;
 		}
 
@@ -3782,10 +3782,10 @@ void k053245_sprites_draw_lethal( const device_config *device, bitmap_t *bitmap,
 		{
 			pri_code &= 0x007f;
 
-			if (offs && pri_code == k053245->z_rejection) 
+			if (offs && pri_code == k053245->z_rejection)
 				continue;
 
-			if (sortedlist[pri_code] == -1) 
+			if (sortedlist[pri_code] == -1)
 				sortedlist[pri_code] = offs;
 		}
 	}
@@ -3795,7 +3795,7 @@ void k053245_sprites_draw_lethal( const device_config *device, bitmap_t *bitmap,
 		int ox, oy, color, code, size, w, h, x, y, flipx, flipy, mirrorx, mirrory, shadow, zoomx, zoomy, pri;
 
 		offs = sortedlist[pri_code];
-		if (offs == -1) 
+		if (offs == -1)
 			continue;
 
 		/* the following changes the sprite draw order from
@@ -3844,24 +3844,24 @@ void k053245_sprites_draw_lethal( const device_config *device, bitmap_t *bitmap,
           >0x40 reduce (0x80 = half size)
         */
 		zoomy = k053245->buffer[offs + 4];
-		if (zoomy > 0x2000) 
+		if (zoomy > 0x2000)
 			continue;
-		if (zoomy) 
+		if (zoomy)
 			zoomy = (0x400000 + zoomy / 2) / zoomy;
-		else 
+		else
 			zoomy = 2 * 0x400000;
 		if ((k053245->buffer[offs] & 0x4000) == 0)
 		{
 			zoomx = k053245->buffer[offs + 5];
-			if (zoomx > 0x2000) 
+			if (zoomx > 0x2000)
 				continue;
-			if (zoomx) 
+			if (zoomx)
 				zoomx = (0x400000 + zoomx / 2) / zoomx;
-			else 
+			else
 				zoomx = 2 * 0x400000;
 //          else zoomx = zoomy; /* workaround for TMNT2 */
 		}
-		else 
+		else
 			zoomx = zoomy;
 
 		ox = k053245->buffer[offs + 3] + spriteoffsX;
@@ -3873,7 +3873,7 @@ void k053245_sprites_draw_lethal( const device_config *device, bitmap_t *bitmap,
 		flipx = k053245->buffer[offs] & 0x1000;
 		flipy = k053245->buffer[offs] & 0x2000;
 		mirrorx = k053245->buffer[offs + 6] & 0x0100;
-		if (mirrorx) 
+		if (mirrorx)
 			flipx = 0; // documented and confirmed
 		mirrory = k053245->buffer[offs + 6] & 0x0200;
 		shadow = k053245->buffer[offs + 6] & 0x0080;
@@ -4157,16 +4157,16 @@ int k053247_get_dy( const device_config *device )
 	return k053247->dy;
 }
 
-int k053246_read_register( const device_config *device, int regnum ) 
-{ 
+int k053246_read_register( const device_config *device, int regnum )
+{
 	k053247_state *k053247 = k053247_get_safe_token(device);
-	return(k053247->Kx46_regs[regnum]); 
+	return(k053247->Kx46_regs[regnum]);
 }
 
-int k053247_read_register( const device_config *device, int regnum ) 
-{ 
+int k053247_read_register( const device_config *device, int regnum )
+{
 	k053247_state *k053247 = k053247_get_safe_token(device);
-	return(k053247->Kx47_regs[regnum]); 
+	return(k053247->Kx47_regs[regnum]);
 }
 
 void k053247_set_sprite_offs( const device_config *device, int offsx, int offsy )
@@ -4319,7 +4319,7 @@ READ16_DEVICE_HANDLER( k055673_GX6bpp_rom_word_r )
 		case 7:
 			return ROM[romofs + 2];
 		default:
-//			LOG(("55673_rom_word_r: Unknown read offset %x (PC=%x)\n", offset, cpu_get_pc(space->cpu)));
+//          LOG(("55673_rom_word_r: Unknown read offset %x (PC=%x)\n", offset, cpu_get_pc(space->cpu)));
 			break;
 	}
 
@@ -4335,13 +4335,13 @@ READ8_DEVICE_HANDLER( k053246_r )
 
 		addr = (k053246->Kx46_regs[6] << 17) | (k053246->Kx46_regs[7] << 9) | (k053246->Kx46_regs[4] << 1) | ((offset & 1) ^ 1);
 		addr &= memory_region_length(device->machine, k053246->memory_region) - 1;
-//		if (VERBOSE)
-//			popmessage("%04x: offset %02x addr %06x", cpu_get_pc(space->cpu), offset, addr);
+//      if (VERBOSE)
+//          popmessage("%04x: offset %02x addr %06x", cpu_get_pc(space->cpu), offset, addr);
 		return memory_region(device->machine, k053246->memory_region)[addr];
 	}
 	else
 	{
-//		LOG(("%04x: read from unknown 053246 address %x\n", cpu_get_pc(space->cpu), offset));
+//      LOG(("%04x: read from unknown 053246 address %x\n", cpu_get_pc(space->cpu), offset));
 		return 0;
 	}
 }
@@ -4507,13 +4507,13 @@ void k053247_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 	if (zcode == -1)
 	{
 		for (; offs < 0x800; offs += 8)
-			if (k053246->ram[offs] & 0x8000) 
+			if (k053246->ram[offs] & 0x8000)
 				sortedlist[count++] = offs;
 	}
 	else
 	{
 		for (; offs < 0x800; offs += 8)
-			if ((k053246->ram[offs] & 0x8000) && ((k053246->ram[offs] & 0xff) != zcode)) 
+			if ((k053246->ram[offs] & 0x8000) && ((k053246->ram[offs] & 0xff) != zcode))
 				sortedlist[count++] = offs;
 	}
 
@@ -4532,11 +4532,11 @@ void k053247_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 			{
 				temp = sortedlist[x];
 				code = k053246->ram[temp] & 0xff;
-				if (zcode <= code) 
-				{ 
-					zcode = code; 
-					sortedlist[x] = offs; 
-					sortedlist[y] = offs = temp; 
+				if (zcode <= code)
+				{
+					zcode = code;
+					sortedlist[x] = offs;
+					sortedlist[y] = offs = temp;
 				}
 			}
 		}
@@ -4552,11 +4552,11 @@ void k053247_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 			{
 				temp = sortedlist[x];
 				code = k053246->ram[temp] & 0xff;
-				if (zcode >= code) 
-				{ 
-					zcode = code; 
-					sortedlist[x] = offs; 
-					sortedlist[y] = offs = temp; 
+				if (zcode >= code)
+				{
+					zcode = code;
+					sortedlist[x] = offs;
+					sortedlist[y] = offs = temp;
 				}
 			}
 		}
@@ -4607,23 +4607,23 @@ void k053247_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
           >0x40 reduce (0x80 = half size)
         */
 		y = zoomy = k053246->ram[offs + 4] & 0x3ff;
-		if (zoomy) 
-			zoomy = (0x400000 + (zoomy >> 1)) / zoomy; 
-		else 
+		if (zoomy)
+			zoomy = (0x400000 + (zoomy >> 1)) / zoomy;
+		else
 			zoomy = 0x800000;
 
 		if (!(temp & 0x4000))
 		{
 			x = zoomx = k053246->ram[offs + 5] & 0x3ff;
-			if (zoomx) 
+			if (zoomx)
 				zoomx = (0x400000 + (zoomx >> 1)) / zoomx;
-			else 
+			else
 				zoomx = 0x800000;
 		}
-		else 
-		{ 
-			zoomx = zoomy; 
-			x = y; 
+		else
+		{
+			zoomx = zoomy;
+			x = y;
 		}
 
 // ************************************************************************************
@@ -4639,7 +4639,7 @@ void k053247_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 		{
 			zoomx >>= 1;		// Fix sprite width to HALF size
 			ox = (ox >> 1) + 1;	// Fix sprite draw position
-			if (flipscreenx) 
+			if (flipscreenx)
 				ox += screen_width;
 			nozoom = 0;
 		}
@@ -4649,7 +4649,7 @@ void k053247_sprites_draw( const device_config *device, bitmap_t *bitmap, const 
 		flipx = temp & 0x1000;
 		flipy = temp & 0x2000;
 		mirrorx = shadow & 0x4000;
-		if (mirrorx) 
+		if (mirrorx)
 			flipx = 0; // documented and confirmed
 		mirrory = shadow & 0x8000;
 
@@ -5123,7 +5123,7 @@ READ8_DEVICE_HANDLER( k051316_rom_r )
 	if ((k051316->ctrlram[0x0e] & 0x01) == 0)
 	{
 		int addr = offset + (k051316->ctrlram[0x0c] << 11) + (k051316->ctrlram[0x0d] << 19);
-		if (k051316->bpp <= 4) 
+		if (k051316->bpp <= 4)
 			addr /= 2;
 		addr &= memory_region_length(device->machine, k051316->memory_region) - 1;
 
@@ -5307,7 +5307,7 @@ static DEVICE_START( k051316 )
 		total = memory_region_length(machine, intf->gfx_memory_region) / 256;
 		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout7, 7);
 		break;
-	
+
 	case 8:
 		total = memory_region_length(machine, intf->gfx_memory_region) / 256;
 		decode_gfx(machine, intf->gfx_num, memory_region(machine, intf->gfx_memory_region), total, &charlayout8, 8);
@@ -5474,10 +5474,10 @@ void k053936_zoom_draw( const device_config *device, bitmap_t *bitmap, const rec
 			incxx  =       (INT16)(lineaddr[2]);
 			incxy  =       (INT16)(lineaddr[3]);
 
-			if (k053936->ctrl[0x06] & 0x8000) 
+			if (k053936->ctrl[0x06] & 0x8000)
 				incxx *= 256;
 
-			if (k053936->ctrl[0x06] & 0x0080) 
+			if (k053936->ctrl[0x06] & 0x0080)
 				incxy *= 256;
 
 			startx -= k053936->offset[0] * incxx;
@@ -5503,16 +5503,16 @@ void k053936_zoom_draw( const device_config *device, bitmap_t *bitmap, const rec
 		incxx  =       (INT16)(k053936->ctrl[0x04]);
 		incxy  =       (INT16)(k053936->ctrl[0x05]);
 
-		if (k053936->ctrl[0x06] & 0x4000) 
-		{ 
-			incyx *= 256; 
-			incyy *= 256; 
+		if (k053936->ctrl[0x06] & 0x4000)
+		{
+			incyx *= 256;
+			incyy *= 256;
 		}
 
-		if (k053936->ctrl[0x06] & 0x0040) 
-		{ 
-			incxx *= 256; 
-			incxy *= 256; 
+		if (k053936->ctrl[0x06] & 0x0040)
+		{
+			incxx *= 256;
+			incxy *= 256;
 		}
 
 		startx -= k053936->offset[1] * incyx;
@@ -5775,16 +5775,16 @@ READ8_DEVICE_HANDLER( k054000_r )
 
 	//logerror("%04x: read 054000 address %02x\n", cpu_get_pc(space->cpu), offset);
 
-	if (offset != 0x18) 
+	if (offset != 0x18)
 		return 0;
 
 	Acx = (k054000->regs[0x01] << 16) | (k054000->regs[0x02] << 8) | k054000->regs[0x03];
 	Acy = (k054000->regs[0x09] << 16) | (k054000->regs[0x0a] << 8) | k054000->regs[0x0b];
 
 	/* TODO: this is a hack to make thndrx2 pass the startup check. It is certainly wrong. */
-	if (k054000->regs[0x04] == 0xff) 
+	if (k054000->regs[0x04] == 0xff)
 		Acx+=3;
-	if (k054000->regs[0x0c] == 0xff) 
+	if (k054000->regs[0x0c] == 0xff)
 		Acy+=3;
 
 	Aax = k054000->regs[0x06] + 1;
@@ -5887,11 +5887,11 @@ static int k051733_int_sqrt( UINT32 op )
 
 	while (step)
 	{
-		if (i * i == op) 
+		if (i * i == op)
 			return i;
-		else if (i * i > op) 
+		else if (i * i > op)
 			i -= step;
-		else 
+		else
 			i += step;
 		step >>= 1;
 	}
@@ -5917,26 +5917,26 @@ READ8_DEVICE_HANDLER( k051733_r )
 	switch (offset)
 	{
 		case 0x00:
-			if (op2) 
+			if (op2)
 				return (op1 / op2) >> 8;
-			else 
+			else
 				return 0xff;
 		case 0x01:
-			if (op2) 
+			if (op2)
 				return (op1 / op2) & 0xff;
-			else 
+			else
 				return 0xff;
 
 		/* this is completely unverified */
 		case 0x02:
-			if (op2) 	
+			if (op2)
 				return (op1 % op2) >> 8;
-			else 
+			else
 				return 0xff;
 		case 0x03:
-			if (op2) 
+			if (op2)
 				return (op1 % op2) & 0xff;
-			else 
+			else
 				return 0xff;
 
 		case 0x04:
@@ -6213,7 +6213,7 @@ INLINE void k056832_get_tile_info( const device_config *device, tile_data *tilei
 	if (k056832->layer_association)
 	{
 		layer = k056832->layer_assoc_with_page[pageIndex];
-		if (layer == -1) 
+		if (layer == -1)
 			layer = 0;	// use layer 0's palette info for unmapped pages
 	}
 	else
@@ -6913,7 +6913,7 @@ static int k056832_update_linemap( const device_config *device, bitmap_t *bitmap
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
 
-	if (k056832->page_tile_mode[page]) 
+	if (k056832->page_tile_mode[page])
 		return(0);
 	if (!k056832->linemap_enabled)
 		return(1);
@@ -6947,7 +6947,7 @@ static int k056832_update_linemap( const device_config *device, bitmap_t *bitmap
 		}
 		else
 		{
-			if (!(dirty[0] | dirty[1] | dirty[2] | dirty[3] | dirty[4] | dirty[5] | dirty[6] | dirty[7])) 
+			if (!(dirty[0] | dirty[1] | dirty[2] | dirty[3] | dirty[4] | dirty[5] | dirty[6] | dirty[7]))
 				return 0;
 		}
 
@@ -7078,8 +7078,8 @@ void k056832_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 		corr = k056832->regs[0x3c/2];
 		if (corr & 0x400)
 			corr |= 0xfffff800;
-	} 
-	else 
+	}
+	else
 		corr = 0;
 
 	dy += corr;
@@ -7091,8 +7091,8 @@ void k056832_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 		corr = k056832->regs[0x3a/2];
 		if (corr & 0x800)
 			corr |= 0xfffff000;
-	} 
-	else 
+	}
+	else
 		corr = 0;
 
 	corr -= k056832->layer_offs[layer][0];
@@ -7126,7 +7126,7 @@ void k056832_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 			ram16[0] = 0;
 			ram16[1] = dx;
 	}
-	if (flipy) 
+	if (flipy)
 		sdat_adv = -sdat_adv;
 
 	last_active = k056832->active_layer;
@@ -7186,10 +7186,10 @@ void k056832_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 					clipy = line_starty = 0;
 					line_endy = cliph;
 					sdat_start = cliph - 1;
-					if (scrollmode == 2) 
-					{ 
-						sdat_start &= ~7; 
-						line_starty -= ty & 7; 
+					if (scrollmode == 2)
+					{
+						sdat_start &= ~7;
+						line_starty -= ty & 7;
 					}
 				}
 			}
@@ -7224,12 +7224,12 @@ void k056832_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 
 			if (k056832->layer_association)
 			{
-				if (k056832->layer_assoc_with_page[pageIndex] != layer) 
+				if (k056832->layer_assoc_with_page[pageIndex] != layer)
 					continue;
 			}
 			else
 			{
-				if (k056832->layer_assoc_with_page[pageIndex] == -1) 
+				if (k056832->layer_assoc_with_page[pageIndex] == -1)
 					continue;
 
 				k056832->active_layer = layer;
@@ -7245,11 +7245,11 @@ void k056832_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 			}
 			else
 			{
-				if (!pageIndex) 
+				if (!pageIndex)
 					k056832->active_layer = 0;
 			}
 
-			if (k056832_update_linemap(device, bitmap, pageIndex, flags)) 
+			if (k056832_update_linemap(device, bitmap, pageIndex, flags))
 				continue;
 
 			tmap = k056832->tilemap[pageIndex];
@@ -7324,7 +7324,7 @@ void k056832_tilemap_draw( const device_config *device, bitmap_t *bitmap, const 
 				// the tilemaps are 512 pixels across.  Assume that if the limits were set as below that we
 				// want the tilemap to be drawn on the right hand side..  this is probably not the correct
 				// logic, but it works.
-				if ((drawrect.min_x>0) && (drawrect.max_x==511)) 
+				if ((drawrect.min_x>0) && (drawrect.max_x==511))
 					drawrect.max_x=cliprect->max_x;
 
 				tilemap_set_scrollx(tmap, 0, dx);
@@ -7381,8 +7381,8 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 		corr = k056832->regs[0x3c/2];
 		if (corr & 0x400)
 			corr |= 0xfffff800;
-	} 
-	else 
+	}
+	else
 		corr = 0;
 	dy += corr;
 	ay = (unsigned)(dy - k056832->layer_offs[layer][1]) % height;
@@ -7393,8 +7393,8 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 		corr = k056832->regs[0x3a/2];
 		if (corr & 0x800)
 			corr |= 0xfffff000;
-	} 
-	else 
+	}
+	else
 		corr = 0;
 
 	corr -= k056832->layer_offs[layer][0];
@@ -7427,7 +7427,7 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 			ram16[0] = 0;
 			ram16[1] = dx;
 	}
-	if (flipy) 
+	if (flipy)
 		sdat_adv = -sdat_adv;
 
 	last_active = k056832->active_layer;
@@ -7449,7 +7449,7 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 		}
 
 		// cull off-screen tilemaps
-		if ((sy + height <= ty) || (sy - height >= ty)) 
+		if ((sy + height <= ty) || (sy - height >= ty))
 			continue;
 
 		// switch frame of reference
@@ -7500,17 +7500,17 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 				pageIndex = (((rowstart + need_wrap) & 3) << 2) + ((colstart + c) & 3);
 			else
 				pageIndex = (((rowstart + r) & 3) << 2) + ((colstart + c) & 3);
-	
+
 			if (k056832->layer_association)
 			{
-				if (k056832->layer_assoc_with_page[pageIndex] != layer) 
+				if (k056832->layer_assoc_with_page[pageIndex] != layer)
 					continue;
 			}
 			else
 			{
 				if (k056832->layer_assoc_with_page[pageIndex] == -1) continue;
 				k056832->active_layer = layer;
-			}		
+			}
 
 			if (k056832->k055555 != NULL)		// are we using k055555 palette?
 			{
@@ -7522,19 +7522,19 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 			}
 			else
 			{
-				if (!pageIndex) 
+				if (!pageIndex)
 					k056832->active_layer = 0;
 			}
-	
-			if (k056832_update_linemap(device, bitmap, pageIndex, flags)) 
+
+			if (k056832_update_linemap(device, bitmap, pageIndex, flags))
 				continue;
-	
+
 			tmap = k056832->tilemap[pageIndex];
 			tilemap_set_scrolly(tmap, 0, ay);
-	
+
 			last_dx = 0x100000;
 			last_visible = 0;
-		
+
 			for (sdat_walk = sdat_start, line_y = line_starty; line_y < line_endy; sdat_walk += sdat_adv, line_y += line_height)
 			{
 				dminy = line_y;
@@ -7549,7 +7549,7 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 				drawrect.min_y = (dminy < cminy ) ? cminy : dminy;
 				drawrect.max_y = (dmaxy > cmaxy ) ? cmaxy : dmaxy;
 
-				dx = ((int)p_scroll_data[sdat_offs] << 16 | (int)p_scroll_data[sdat_offs + 1]) + corr;	
+				dx = ((int)p_scroll_data[sdat_offs] << 16 | (int)p_scroll_data[sdat_offs + 1]) + corr;
 
 				if (last_dx == dx) { if (last_visible) goto LINE_SHORTCIRCUIT; continue; }
 				last_dx = dx;
@@ -7558,7 +7558,7 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 				{
 					//sx = (unsigned)dx % width;
 					sx = (unsigned)dx & (width-1);
-	
+
 					//tx = c * K056832_PAGE_WIDTH;
 					tx = c << 9;
 
@@ -7587,11 +7587,11 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 						else { clipw = K056832_PAGE_WIDTH + tx; clipx = -tx; }
 					}
 				}
-				else 
-				{ 
-					clipw = K056832_PAGE_WIDTH; 
-					clipx = 0; 
-				}	
+				else
+				{
+					clipw = K056832_PAGE_WIDTH;
+					clipx = 0;
+				}
 
 				last_visible = 1;
 
@@ -7601,7 +7601,7 @@ void k056832_tilemap_draw_dj( const device_config *device, bitmap_t *bitmap, con
 				drawrect.min_x = (dminx < cminx ) ? cminx : dminx;
 				drawrect.max_x = (dmaxx > cmaxx ) ? cmaxx : dmaxx;
 
-				tilemap_set_scrollx(tmap, 0, dx);	
+				tilemap_set_scrollx(tmap, 0, dx);
 
 				LINE_SHORTCIRCUIT:
 					tilemap_draw(bitmap, &drawrect, tmap, flags, priority);
@@ -7678,7 +7678,7 @@ void k056832_postload( const device_config *device )
     DEVICE INTERFACE
 *****************************************************************************/
 
-/* TODO: understand which elements MUST be init here (to keep correct layer 
+/* TODO: understand which elements MUST be init here (to keep correct layer
    associations) and which ones can can be init at RESET, if any */
 static DEVICE_START( k056832 )
 {
@@ -7910,7 +7910,7 @@ static DEVICE_START( k056832 )
 		state_save_register_device_item(device, i, k056832->last_colorbase[i]);
 	}
 
-//	state_save_register_postload(device->machine, k056832_postload, NULL);
+//  state_save_register_postload(device->machine, k056832_postload, NULL);
 }
 
 /***************************************************************************/
@@ -8110,7 +8110,7 @@ void k054338_update_all_shadows( const device_config *device, int rushingheroes_
 	for (i = 0; i < 9; i++)
 	{
 		d = k054338->regs[K338_REG_SHAD1R + i] & 0x1ff;
-		if (d >= 0x100) 
+		if (d >= 0x100)
 			d -= 0x200;
 		k054338->shd_rgb[i] = d;
 	}
@@ -8184,11 +8184,11 @@ void k054338_fill_backcolor( const device_config *device, bitmap_t *bitmap, int 
 		pal_ptr += BGC_CBLK << 9;
 
 		// single color output from PCU2
-		if (!(BGC_SET & 2)) 
-		{ 
-			bgcolor = *pal_ptr; 
-			mode = 0; 
-		} 
+		if (!(BGC_SET & 2))
+		{
+			bgcolor = *pal_ptr;
+			mode = 0;
+		}
 		else bgcolor = 0;
 	}
 
@@ -8199,10 +8199,10 @@ void k054338_fill_backcolor( const device_config *device, bitmap_t *bitmap, int 
 		i = clipw = -clipw;
 		do
 		{
-			do 
-			{ 
-				dst_ptr[i] = dst_ptr[i+1] = dst_ptr[i+2] = dst_ptr[i+3] = bgcolor; 
-			} 
+			do
+			{
+				dst_ptr[i] = dst_ptr[i+1] = dst_ptr[i+2] = dst_ptr[i+3] = bgcolor;
+			}
 			while (i += 4);
 
 			dst_ptr += dst_pitch;
@@ -8221,10 +8221,10 @@ void k054338_fill_backcolor( const device_config *device, bitmap_t *bitmap, int 
 			i = clipw = -clipw;
 			do
 			{
-				do 
-				{ 
-					dst_ptr[i] = dst_ptr[i+1] = dst_ptr[i+2] = dst_ptr[i+3] = bgcolor; 
-				} 
+				do
+				{
+					dst_ptr[i] = dst_ptr[i+1] = dst_ptr[i+2] = dst_ptr[i+3] = bgcolor;
+				}
 				while (i += 4);
 
 				dst_ptr += dst_pitch;
@@ -8266,7 +8266,7 @@ int k054338_set_alpha_level( const device_config *device, int pblend )
 	mixset = regs[K338_REG_PBLEND + (pblend >> 1 & 1)] >> (~pblend << 3 & 8);
 	mixlv  = mixset & 0x1f;
 
-	if (k054338->alphainverted) 
+	if (k054338->alphainverted)
 		mixlv = 0x1f - mixlv;
 
 	if (!(mixset & 0x20))
@@ -8285,7 +8285,7 @@ int k054338_set_alpha_level( const device_config *device, int pblend )
 		}
 
 		// DUMMY
-		if (mixlv && mixlv < 0x1f) 
+		if (mixlv && mixlv < 0x1f)
 			mixlv = 0x10;
 
 		mixlv = (mixlv << 3) | (mixlv >> 2);
@@ -8395,7 +8395,7 @@ void k053250_dma( const device_config *device, int limiter )
 	current_frame = video_screen_get_frame_number(k053250->screen);
 	last_frame = k053250->frame;
 
-	if (limiter && current_frame == last_frame) 
+	if (limiter && current_frame == last_frame)
 		return; // make sure we only do DMA transfer once per frame
 
 	k053250->frame = current_frame;
@@ -8410,7 +8410,7 @@ WRITE16_DEVICE_HANDLER( k053250_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		// start LVC DMA transfer at the falling edge of control register's bit1
-		if (offset == 4 && !(data & 2) && (k053250->regs[4] & 2)) 
+		if (offset == 4 && !(data & 2) && (k053250->regs[4] & 2))
 			k053250_dma(device, 1);
 
 		k053250->regs[offset] = data;
@@ -8962,52 +8962,52 @@ static DEVICE_RESET( k053252 )
 
 
 // debug handlers
-READ16_DEVICE_HANDLER( k056832_word_r ) 
-{ 
+READ16_DEVICE_HANDLER( k056832_word_r )
+{
 	k056832_state *k056832 = k056832_get_safe_token(device);
-	return (k056832->regs[offset]); 
+	return (k056832->regs[offset]);
 }		// VACSET
 
-READ16_DEVICE_HANDLER( k056832_b_word_r ) 
-{ 
+READ16_DEVICE_HANDLER( k056832_b_word_r )
+{
 	k056832_state *k056832 = k056832_get_safe_token(device);
-	return (k056832->regsb[offset]); 
+	return (k056832->regsb[offset]);
 }	// VSCCS (board dependent)
 
-READ16_DEVICE_HANDLER( k053246_reg_word_r ) 
-{ 
+READ16_DEVICE_HANDLER( k053246_reg_word_r )
+{
 	k053247_state *k053247 = k053247_get_safe_token(device);
-	return(k053247->Kx46_regs[offset * 2] << 8 | k053247->Kx46_regs[offset * 2 + 1]); 
+	return(k053247->Kx46_regs[offset * 2] << 8 | k053247->Kx46_regs[offset * 2 + 1]);
 }	// OBJSET1
 
-READ16_DEVICE_HANDLER( k053247_reg_word_r ) 
-{ 
+READ16_DEVICE_HANDLER( k053247_reg_word_r )
+{
 	k053247_state *k053247 = k053247_get_safe_token(device);
-	return(k053247->Kx47_regs[offset]); 
+	return(k053247->Kx47_regs[offset]);
 }	// OBJSET2
 
-READ16_DEVICE_HANDLER( k054338_word_r ) 
-{ 
+READ16_DEVICE_HANDLER( k054338_word_r )
+{
 	k054338_state *k054338 = k054338_get_safe_token(device);
-	return(k054338->regs[offset]); 
+	return(k054338->regs[offset]);
 }		// CLTC
 
-READ16_DEVICE_HANDLER( k053251_lsb_r ) 
-{ 
+READ16_DEVICE_HANDLER( k053251_lsb_r )
+{
 	k053251_state *k053251 = k053251_get_safe_token(device);
-	return(k053251->ram[offset]); 
+	return(k053251->ram[offset]);
 }		// PCU1
 
-READ16_DEVICE_HANDLER( k053251_msb_r ) 
-{ 
+READ16_DEVICE_HANDLER( k053251_msb_r )
+{
 	k053251_state *k053251 = k053251_get_safe_token(device);
-	return(k053251->ram[offset] << 8); 
+	return(k053251->ram[offset] << 8);
 }		// PCU1
 
-READ16_DEVICE_HANDLER( k055555_word_r ) 
-{ 
+READ16_DEVICE_HANDLER( k055555_word_r )
+{
 	k055555_state *k055555 = k055555_get_safe_token(device);
-	return(k055555->regs[offset] << 8); 
+	return(k055555->regs[offset] << 8);
 }	// PCU2
 
 READ32_DEVICE_HANDLER( k056832_long_r )
@@ -9028,10 +9028,10 @@ READ32_DEVICE_HANDLER( k055555_long_r )
 	return (k055555_word_r(device, offset + 1, 0xffff) | k055555_word_r(device, offset, 0xffff) << 16);
 }
 
-READ16_DEVICE_HANDLER( k053244_reg_word_r ) 
-{ 
+READ16_DEVICE_HANDLER( k053244_reg_word_r )
+{
 	k05324x_state *k053244 = k05324x_get_safe_token(device);
-	return(k053244->regs[offset * 2] << 8 | k053244->regs[offset * 2 + 1]); 
+	return(k053244->regs[offset * 2] << 8 | k053244->regs[offset * 2 + 1]);
 }
 
 /*************************************************************************/

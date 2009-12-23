@@ -110,9 +110,9 @@ WRITE8_HANDLER( pang_videoram_w )
 {
 	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
 
-	if (state->video_bank) 
+	if (state->video_bank)
 		mgakuen_objram_w(space, offset, data);
-	else 
+	else
 		mgakuen_videoram_w(space, offset, data);
 }
 
@@ -120,9 +120,9 @@ READ8_HANDLER( pang_videoram_r )
 {
 	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
 
-	if (state->video_bank) 
+	if (state->video_bank)
 		return mgakuen_objram_r(space, offset);
-	else 
+	else
 		return mgakuen_videoram_r(space, offset);
 }
 
@@ -176,7 +176,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(space->cpu),data);
 	/* bit 3 is unknown (used, e.g. marukin pulses it on the title screen) */
 
 	/* bit 4 selects OKI M6295 bank */
-	if (state->oki != NULL && sound_get_type(state->oki) == SOUND_OKIM6295) 
+	if (state->oki != NULL && sound_get_type(state->oki) == SOUND_OKIM6295)
 		okim6295_set_bank_base(state->oki, (data & 0x10) ? 0x40000 : 0x00000);
 
 	/* bit 5 is palette RAM bank selector (doesn't apply to mgakuen) */
@@ -228,9 +228,9 @@ WRITE8_HANDLER( pang_paletteram_w )
 {
 	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
 
-	if (state->paletteram_bank) 
+	if (state->paletteram_bank)
 		paletteram_xxxxRRRRGGGGBBBB_le_w(space, offset + 0x800, data);
-	else 
+	else
 		paletteram_xxxxRRRRGGGGBBBB_le_w(space, offset, data);
 }
 
@@ -238,7 +238,7 @@ READ8_HANDLER( pang_paletteram_r )
 {
 	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
 
-	if (state->paletteram_bank) 
+	if (state->paletteram_bank)
 		return space->machine->generic.paletteram.u8[offset + 0x800];
 
 	return space->machine->generic.paletteram.u8[offset];

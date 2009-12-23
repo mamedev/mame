@@ -1629,7 +1629,7 @@ static void unshuffle( UINT64 *buf, int len )
 	int i;
 	UINT64 t;
 
-	if (len == 2) 
+	if (len == 2)
 		return;
 
 	assert(len % 4 == 0);   /* must not happen */
@@ -1953,7 +1953,7 @@ static void cps1_update_transmasks( running_machine *machine )
 		/* Get transparency registers */
 		if (state->game_config->priority[i] != -1)
 			mask = state->cps_b_regs[state->game_config->priority[i] / 2] ^ 0xffff;
-		else 
+		else
 			mask = 0xffff;	/* completely transparent if priority masks not defined (qad) */
 
 		tilemap_set_transmask(state->bg_tilemap[0], i, mask, 0x8000);
@@ -2038,7 +2038,7 @@ static VIDEO_START( cps )
 	state_save_register_global(machine, state->scanline1);
 	state_save_register_global(machine, state->scanline2);
 	state_save_register_global(machine, state->scancalls);
-#if 0	
+#if 0
 	/* these do not need to be saved, because they are recovered from cps_a_regs in cps1_postload */
 	state_save_register_global(machine, state->scroll1x);
 	state_save_register_global(machine, state->scroll1y);
@@ -2399,7 +2399,7 @@ static UINT16 *cps2_objbase( running_machine *machine )
 	int baseptr;
 	baseptr = 0x7000;
 
-	if (state->objram_bank & 1) 
+	if (state->objram_bank & 1)
 		baseptr ^= 0x0080;
 
 //popmessage("%04x %d", cps2_port(machine, CPS2_OBJ_BASE), state->objram_bank & 1);
@@ -2768,17 +2768,17 @@ VIDEO_UPDATE( cps1 )
 	{
 		cps1_render_layer(screen->machine, bitmap, cliprect, l0, 0);
 
-		if (l1 == 0) 
+		if (l1 == 0)
 			cps1_render_high_layer(screen->machine, bitmap, cliprect, l0); /* prepare mask for sprites */
 
 		cps1_render_layer(screen->machine, bitmap, cliprect, l1, 0);
 
-		if (l2 == 0) 
+		if (l2 == 0)
 			cps1_render_high_layer(screen->machine, bitmap, cliprect, l1); /* prepare mask for sprites */
 
 		cps1_render_layer(screen->machine, bitmap, cliprect, l2, 0);
 
-		if (l3 == 0) 
+		if (l3 == 0)
 			cps1_render_high_layer(screen->machine, bitmap, cliprect, l2); /* prepare mask for sprites */
 
 		cps1_render_layer(screen->machine, bitmap, cliprect, l3, 0);

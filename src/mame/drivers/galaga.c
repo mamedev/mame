@@ -1771,7 +1771,7 @@ static MACHINE_DRIVER_START( battles )
 	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(battles_mem4)
 	MDRV_CPU_VBLANK_INT("screen", battles_interrupt_4)
-	
+
 	MDRV_TIMER_ADD("battles_nmi", battles_nmi_generate)
 
 	MDRV_MACHINE_RESET(battles)

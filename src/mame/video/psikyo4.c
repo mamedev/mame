@@ -88,7 +88,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			tnum = (source[sprnum + 1] & 0x0007ffff) >> 00;
 
 			colr = (source[sprnum + 1] & 0x3f000000) >> 24;
-   			if (scr) 
+   			if (scr)
 				colr += 0x40; /* Use second copy of palette which is dimmed appropriately */
 
 			flipx = (source[sprnum + 1] & 0x40000000);
@@ -111,9 +111,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			if (flipy)	{ ystart = high - 1;  yend = -1;     yinc = -1; }
 			else		{ ystart = 0;         yend = high;   yinc = +1; }
 
-			for (j = ystart; j != yend; j += yinc) 
+			for (j = ystart; j != yend; j += yinc)
 			{
-				for (i = xstart; i != xend; i += xinc) 
+				for (i = xstart; i != xend; i += xinc)
 				{
 					drawgfx_transpen(bitmap, cliprect, gfx, tnum + loopnum, colr, flipx, flipy, xpos + 16 * i, ypos + 16 * j, 0);
 					loopnum++;
@@ -122,7 +122,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		}
 		/* end drawing */
 		listcntr++;
-		if (listdat & 0x4000) 
+		if (listdat & 0x4000)
 			break;
 	}
 }

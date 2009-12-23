@@ -353,7 +353,7 @@ static READ16_HANDLER( qsound_rom_r )
 {
 	UINT8 *rom = memory_region(space->machine, "user1");
 
-	if (rom) 
+	if (rom)
 		return rom[offset] | 0xff00;
 	else
 	{

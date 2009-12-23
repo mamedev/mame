@@ -1922,7 +1922,7 @@ static MACHINE_DRIVER_START(firebeat)
 	MDRV_MACHINE_START(firebeat)
 	MDRV_MACHINE_RESET(firebeat)
 	MDRV_NVRAM_HANDLER(firebeat)
-	
+
 	MDRV_RTC65271_ADD("rtc", NULL)
 
  	/* video hardware */

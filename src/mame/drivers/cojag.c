@@ -1116,7 +1116,7 @@ static MACHINE_DRIVER_START( cojagr3k )
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	MDRV_IDE_CONTROLLER_ADD("ide", jaguar_external_int)
-	
+
 	MDRV_TIMER_ADD("serial_timer", jaguar_serial_callback)
 
 	/* video hardware */

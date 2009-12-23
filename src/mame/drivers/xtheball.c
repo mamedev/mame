@@ -342,7 +342,7 @@ static MACHINE_DRIVER_START( xtheball )
 
 	MDRV_MACHINE_RESET(xtheball)
 	MDRV_NVRAM_HANDLER(generic_1fill)
-	
+
 	MDRV_TICKET_DISPENSER_ADD("ticket", 100, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */

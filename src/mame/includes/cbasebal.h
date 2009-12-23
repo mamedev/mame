@@ -9,7 +9,7 @@ struct _cbasebal_state
 {
 	/* memory pointers */
 	UINT8 *    spriteram;
-//	UINT8 *    paletteram;    // currently this uses generic palette handling
+//  UINT8 *    paletteram;    // currently this uses generic palette handling
 	size_t     spriteram_size;
 
 	/* video-related */

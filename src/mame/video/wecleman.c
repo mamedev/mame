@@ -1138,19 +1138,19 @@ VIDEO_UPDATE( hotchase )
 	bitmap_fill(bitmap, cliprect, black_pen);
 
 	/* Draw the background */
-	if (video_on) 
+	if (video_on)
 		k051316_zoom_draw(k051316_1, bitmap, cliprect, 0, 0);
 
 	/* Draw the road */
-	if (video_on) 
+	if (video_on)
 		hotchase_draw_road(screen->machine, bitmap, cliprect);
 
 	/* Draw the sprites */
-	if (video_on) 
+	if (video_on)
 		sprite_draw(bitmap,cliprect);
 
 	/* Draw the foreground (text) */
-	if (video_on) 
+	if (video_on)
 		k051316_zoom_draw(k051316_2, bitmap, cliprect, 0, 0);
 	return 0;
 }

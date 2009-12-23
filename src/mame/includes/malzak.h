@@ -9,8 +9,8 @@ typedef struct _malzak_state malzak_state;
 struct _malzak_state
 {
 	/* misc */
-//	int playfield_x[256];
-//	int playfield_y[256];
+//  int playfield_x[256];
+//  int playfield_y[256];
 	int playfield_code[256];
 	int malzak_x;
 	int malzak_y;

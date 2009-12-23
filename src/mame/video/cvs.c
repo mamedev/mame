@@ -148,7 +148,7 @@ VIDEO_START( cvs )
 			bit1 = (~generator >> 17) & 1;
 			bit2 = (generator >> 5) & 1;
 
-			if (bit1 ^ bit2) 
+			if (bit1 ^ bit2)
 				generator |= 1;
 
 			if (((~generator >> 16) & 1) && (generator & 0xfe) == 0xfe)

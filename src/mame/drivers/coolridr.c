@@ -213,9 +213,9 @@ Notes:
 
 *******************************************************************************************************
 
-Note: This hardware appears to have been designed as a test-bed for a new RLE based compression system 
-      used by the zooming sprites.  It is possible that Sega planned on using this for ST-V, but 
-      decided against it. Video/CPU part numbers give an interesting insight, since video hardware # 
+Note: This hardware appears to have been designed as a test-bed for a new RLE based compression system
+      used by the zooming sprites.  It is possible that Sega planned on using this for ST-V, but
+      decided against it. Video/CPU part numbers give an interesting insight, since video hardware #
       sits between Model 1 & Model 2.
 
                  Year on

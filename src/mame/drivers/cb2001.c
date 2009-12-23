@@ -111,10 +111,10 @@ cmv4                          cb2001                     (en -> de)
 02b9 bit 7,a                  e0270 test1 al,7h
 02bb jp z,$41e2               e0274 be e0279
 02be call $0ab2               .
-.                             e0276 br e6120             
+.                             e0276 br e6120
 02c1 ld bc,$8000              e0279 mov cw,8000h
 
-029f ld b,$fc                 
+029f ld b,$fc
 02a1 call $0c38               e0239 call 0e30b8h
 02a4 ld hl,$d023              e023d mov ix,90h           (36 -> be)
 02a7 call $2b2d               e0240 call 0e32a6h
@@ -133,7 +133,7 @@ cmv4                          cb2001                     (en -> de)
   2b3c djnz $2b36               e32bb dbnz e32b3h        (c5 -> e2)
   2b3e pop bc                   e32bd pop cw             (8a -> 59)
   2b3f ret                      e32be ret
-  
+
   2b40-2b4b                     e32bf-e32d1              (06 -> 12) (d7 -> 4f dec iy or 47 inc iy)
   2b4c-2b57                     e32d2-e32e4              (af -> 1a)
   .                             e32e5-                   (8e -> 2a) (14 -> 1c)
@@ -161,7 +161,7 @@ cmv4                          cb2001                     (en -> de)
   4aa8 ld d,$00                 e66eb mov ah,00h         (b2 -> b4)
   4aaa ld hl,$4b62              e66ed mov bw,67cbh       (6d -> bb)
   4aad add lh,de                e66f0 add bw,aw          (ba -> 03)
-  4aae ld e,(hl)                .                                   
+  4aae ld e,(hl)                .
   4aaf inc hl                   .
   4abo ld d,(hl)                .
   4ab1 ex de,hl                 e66f2 mov bw,w ptr ss[bw](df -> 8b)prefix not sure about prefix
@@ -285,7 +285,7 @@ static ADDRESS_MAP_START( cb2001_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cb2001_io, ADDRESS_SPACE_IO, 16 )
-//	ADDRESS_MAP_GLOBAL_MASK(0x00ff)
+//  ADDRESS_MAP_GLOBAL_MASK(0x00ff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("ppi8255_0", ppi8255_r, ppi8255_w, 0xffff)	/* Input Ports */
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE8("ppi8255_1", ppi8255_r, ppi8255_w, 0xffff)	/* DIP switches */
 	AM_RANGE(0x20, 0x21) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)

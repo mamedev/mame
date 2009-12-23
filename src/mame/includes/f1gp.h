@@ -16,7 +16,7 @@ struct _f1gp_state
 	UINT16 *  fgregs;
 	UINT16 *  rozregs;
 	UINT16 *  zoomdata;
-//  	UINT16 *  paletteram;    // currently this uses generic palette handling
+//      UINT16 *  paletteram;    // currently this uses generic palette handling
 	size_t    spr1cgram_size, spr2cgram_size;
 	size_t    spriteram_size;
 

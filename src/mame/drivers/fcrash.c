@@ -117,7 +117,7 @@ static void fcrash_update_transmasks( running_machine *machine )
 		/* Get transparency registers */
 		if (priority[i])
 			mask = state->cps_b_regs[priority[i] / 2] ^ 0xffff;
-		else 
+		else
 			mask = 0xffff;	/* completely transparent if priority masks not defined (mercs, qad) */
 
 		tilemap_set_transmask(state->bg_tilemap[0], i, mask, 0x8000);
@@ -278,17 +278,17 @@ static VIDEO_UPDATE( fcrash )
 
 	fcrash_render_layer(screen->machine, bitmap, cliprect, l0, 0);
 
-	if (l1 == 0) 
+	if (l1 == 0)
 		fcrash_render_high_layer(screen->machine, bitmap, cliprect, l0);
 
 	fcrash_render_layer(screen->machine, bitmap, cliprect, l1, 0);
 
-	if (l2 == 0) 
+	if (l2 == 0)
 		fcrash_render_high_layer(screen->machine, bitmap, cliprect, l1);
 
 	fcrash_render_layer(screen->machine, bitmap, cliprect, l2, 0);
 
-	if (l3 == 0) 
+	if (l3 == 0)
 		fcrash_render_high_layer(screen->machine, bitmap, cliprect, l2);
 
 	fcrash_render_layer(screen->machine, bitmap, cliprect, l3, 0);
@@ -359,17 +359,17 @@ static VIDEO_UPDATE( kodb )
 
 	fcrash_render_layer(screen->machine, bitmap, cliprect, l0, 0);
 
-	if (l1 == 0) 
+	if (l1 == 0)
 		fcrash_render_high_layer(screen->machine, bitmap, cliprect, l0);
 
 	fcrash_render_layer(screen->machine, bitmap, cliprect, l1, 0);
 
-	if (l2 == 0) 
+	if (l2 == 0)
 		fcrash_render_high_layer(screen->machine, bitmap, cliprect, l1);
 
 	fcrash_render_layer(screen->machine, bitmap, cliprect, l2, 0);
 
-	if (l3 == 0) 
+	if (l3 == 0)
 		fcrash_render_high_layer(screen->machine, bitmap, cliprect, l2);
 
 	fcrash_render_layer(screen->machine, bitmap, cliprect, l3, 0);

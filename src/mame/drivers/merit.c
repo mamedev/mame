@@ -1548,7 +1548,7 @@ ROM_START( trvwz3h )
 
 	ROM_REGION( 0x8000, "misc", 0 )
 	ROM_LOAD( "dec002.u13", 0x00000, 0x01f3, CRC(686d2ad0) SHA1(7aad0a1ed09942528eceaf4d7a5e1fd7601aeac7) ) /* PAL10L8CN */
-	ROM_LOAD( "sex-001_01", 0x00000, 0x8000, CRC(77a2a734) SHA1(7ba662d275b7914c9dcc9532116086e091e6cf88) ) /* These seem to be misplaced? Verfied good dumps, not */ 
+	ROM_LOAD( "sex-001_01", 0x00000, 0x8000, CRC(77a2a734) SHA1(7ba662d275b7914c9dcc9532116086e091e6cf88) ) /* These seem to be misplaced? Verfied good dumps, not */
 	ROM_LOAD( "sex-001_02", 0x00000, 0x8000, CRC(b064876b) SHA1(588300fb6603f334de41a9685b1fcf8c642b5c16) ) /* sure which set they actually belong to, maybe trvwzv */
 ROM_END
 

@@ -7626,16 +7626,16 @@ static DRIVER_INIT ( pzloop2 )
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x804000, 0x804001, 0, 0, joy_or_paddle_r);
 }
 
-static READ16_HANDLER( gigamn2_dummyqsound_r ) 
-{ 
+static READ16_HANDLER( gigamn2_dummyqsound_r )
+{
 	cps_state *state = (cps_state *)space->machine->driver_data;
-	return state->gigamn2_dummyqsound_ram[offset]; 
+	return state->gigamn2_dummyqsound_ram[offset];
 };
 
-static WRITE16_HANDLER( gigamn2_dummyqsound_w ) 
-{ 
+static WRITE16_HANDLER( gigamn2_dummyqsound_w )
+{
 	cps_state *state = (cps_state *)space->machine->driver_data;
-	state->gigamn2_dummyqsound_ram[offset] = data; 
+	state->gigamn2_dummyqsound_ram[offset] = data;
 };
 
 static DRIVER_INIT( gigamn2 )

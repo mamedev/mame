@@ -1331,7 +1331,7 @@ static MACHINE_DRIVER_START( impctawp )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-	
+
 	MDRV_TIMER_ADD( "duart_1_timer", duart_1_timer_event)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")

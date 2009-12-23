@@ -8284,6 +8284,7 @@ Other Sun games
 	DRIVER( kovshp )
 	DRIVER( oldsplus )
 	DRIVER( killbldp )
+	DRIVER( happy6 )
 	DRIVER( svg )
 
 	/* Spirit Tech. Corp. */

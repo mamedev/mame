@@ -364,7 +364,7 @@ static MACHINE_DRIVER_START( foodf )
 	MDRV_MACHINE_RESET(foodf)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 	MDRV_WATCHDOG_VBLANK_INIT(8)
-	
+
 	MDRV_TIMER_ADD("scan_timer", scanline_update)
 
 	/* video hardware */

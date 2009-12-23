@@ -1207,7 +1207,7 @@ static MACHINE_DRIVER_START( balsente )
 	MDRV_MACHINE_START(balsente)
 	MDRV_MACHINE_RESET(balsente)
 	MDRV_NVRAM_HANDLER(generic_0fill)
-	
+
 	MDRV_TIMER_ADD("scan_timer", balsente_interrupt_timer)
 	MDRV_TIMER_ADD("8253_0_timer", balsente_clock_counter_0_ff)
 	MDRV_TIMER_ADD("8253_1_timer", balsente_counter_callback)

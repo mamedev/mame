@@ -87,7 +87,7 @@
 				//{
 					//if (vibuffering)
 					//{
-					//	restore_filter16_buffer(&r, &g, &b, &ViBuffer[i][j], n64_vi_width);
+					//  restore_filter16_buffer(&r, &g, &b, &ViBuffer[i][j], n64_vi_width);
 					//}
 					//else
 					//{
@@ -99,7 +99,7 @@
 				{
 					//if (vibuffering)
 					//{
-					//	divot_filter16_buffer(&r, &g, &b, &ViBuffer[i][j]);
+					//  divot_filter16_buffer(&r, &g, &b, &ViBuffer[i][j]);
 					//}
 					//else
 					//{
@@ -109,35 +109,35 @@
 #endif
 
 				/*
-				if (gamma_dither)
-				{
-					dith = mame_rand(screen->machine) & 0x3f;
-				}
-				if (gamma)
-				{
-					if (gamma_dither)
-					{
-						r = gamma_dither_table[(r << 6)|dith];
-						g = gamma_dither_table[(g << 6)|dith];
-						b = gamma_dither_table[(b << 6)|dith];
-					}
-					else
-					{
-						r = gamma_table[r];
-						g = gamma_table[g];
-						b = gamma_table[b];
-					}
-				}
-				else if (gamma_dither)
-				{
-					if (r < 255)
-						r += (dith & 1);
-					if (g < 255)
-						g += (dith & 1);
-					if (b < 255)
-						b += (dith & 1);
-				}
-				*/
+                if (gamma_dither)
+                {
+                    dith = mame_rand(screen->machine) & 0x3f;
+                }
+                if (gamma)
+                {
+                    if (gamma_dither)
+                    {
+                        r = gamma_dither_table[(r << 6)|dith];
+                        g = gamma_dither_table[(g << 6)|dith];
+                        b = gamma_dither_table[(b << 6)|dith];
+                    }
+                    else
+                    {
+                        r = gamma_table[r];
+                        g = gamma_table[g];
+                        b = gamma_table[b];
+                    }
+                }
+                else if (gamma_dither)
+                {
+                    if (r < 255)
+                        r += (dith & 1);
+                    if (g < 255)
+                        g += (dith & 1);
+                    if (b < 255)
+                        b += (dith & 1);
+                }
+                */
 				pixels++;
 
 				final = (r << 16) | (g << 8) | b;

@@ -613,7 +613,7 @@ MACHINE_DRIVER_START( dcs_audio_2k )
 	MDRV_CPU_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(dcs_2k_program_map)
 	MDRV_CPU_DATA_MAP(dcs_2k_data_map)
-	
+
 	MDRV_TIMER_ADD("dcs_reg_timer", dcs_irq)
 	MDRV_TIMER_ADD("dcs_int_timer", internal_timer_callback)
 
@@ -655,7 +655,7 @@ MACHINE_DRIVER_START( dcs2_audio_2115 )
 	MDRV_CPU_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(dcs2_2115_program_map)
 	MDRV_CPU_DATA_MAP(dcs2_2115_data_map)
-	
+
 	MDRV_TIMER_ADD("dcs_reg_timer", dcs_irq)
 	MDRV_TIMER_ADD("dcs_sport_timer", sport0_irq)
 	MDRV_TIMER_ADD("dcs_int_timer", internal_timer_callback)

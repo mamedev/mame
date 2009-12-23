@@ -308,9 +308,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	int base_color = (k007121_ctrlram_r(k007121, 6) & 0x30) * 2;
 	const UINT8 *source;
 
-	if (bank == 0) 
+	if (bank == 0)
 		source = state->spriteram;
-	else 
+	else
 		source = state->spriteram_2;
 
 	k007121_sprites_draw(k007121, bitmap, cliprect, machine->gfx[bank], machine->colortable, source, base_color, 40, 0, -1);

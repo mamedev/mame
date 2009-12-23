@@ -156,7 +156,7 @@ Notes:
       D42832   - NEC D42832 32kx8 SRAM (DIP28)
       TMM2018  - Toshiba TMM2018 2kx8 SRAM (NDIP24)
       TMM2115  - Toshiba TMM2115 2kx8 SRAM (NDIP24)
-      TLP521-4 - Toshiba TLP521-4 Photocoupler Gallium Arsenide Infrared Diode & Photo−Transistor (DIP16)
+      TLP521-4 - Toshiba TLP521-4 Photocoupler Gallium Arsenide Infrared Diode & Photo???Transistor (DIP16)
       ADC0804  - National Semiconductor ADC0804 8-Bit Microprocessor Compatible A/D Converter (DIP20)
       ULN2003  - NEC uPA2003 7 High-Voltage, High-Current Darlington Transistor Arrays (DIP16)
       D4051    - NEC D4051 Single 8-Channel, Dual 4-Channel, Triple 2-Channel Analog Multiplexer/Demultiplexer with Logic Level Conversion (DIP16)

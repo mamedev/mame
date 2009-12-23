@@ -44,7 +44,7 @@ VIDEO_START( gijoe )
 
 	k056832_linemap_enable(k056832, 1);
 
-	for (i = 0; i < 4; i++) 
+	for (i = 0; i < 4; i++)
 		AVAC_occupancy[i] = 0;
 
 	AVAC_vrc = 0xffff;
@@ -84,8 +84,8 @@ VIDEO_UPDATE( gijoe )
 
 	if (vrc_mode)
 	{
-		for (dirty = 0xf000; dirty; dirty >>= 4) 
-			if ((AVAC_vrc & dirty) != (vrc_new & dirty)) 
+		for (dirty = 0xf000; dirty; dirty >>= 4)
+			if ((AVAC_vrc & dirty) != (vrc_new & dirty))
 				mask |= dirty;
 
 		AVAC_vrc = vrc_new;
@@ -105,18 +105,18 @@ VIDEO_UPDATE( gijoe )
 		dirty = 0;
 
 		colorbase_new = k053251_get_palette_index(k053251, K053251_CI[i]);
-		if (layer_colorbase[i] != colorbase_new) 
-		{ 
-			layer_colorbase[i] = colorbase_new; 
-			dirty = 1; 
+		if (layer_colorbase[i] != colorbase_new)
+		{
+			layer_colorbase[i] = colorbase_new;
+			dirty = 1;
 		}
-		if (AVAC_occupancy[i] & mask) 
+		if (AVAC_occupancy[i] & mask)
 			dirty = 1;
 
-		if (dirty) 
-		{ 	
-			AVAC_occupancy[i] = 0; 
-			k056832_mark_plane_dirty(k056832, i); 
+		if (dirty)
+		{
+			AVAC_occupancy[i] = 0;
+			k056832_mark_plane_dirty(k056832, i);
 		}
 	}
 

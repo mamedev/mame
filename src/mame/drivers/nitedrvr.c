@@ -143,7 +143,7 @@ static MACHINE_DRIVER_START( nitedrvr )
 
 	MDRV_MACHINE_START(nitedrvr)
 	MDRV_MACHINE_RESET(nitedrvr)
-	
+
 	MDRV_TIMER_ADD_PERIODIC("crash_timer", nitedrvr_crash_toggle_callback, NSEC(PERIOD_OF_555_ASTABLE_NSEC(RES_K(180), 330, CAP_U(1))))
 
 	// video hardware

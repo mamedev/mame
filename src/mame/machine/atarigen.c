@@ -69,7 +69,7 @@ INLINE const atarigen_screen_timer *get_screen_timer(const device_config *screen
 	for (i = 0; i < ARRAY_LENGTH(state->screen_timer); i++)
 		if (state->screen_timer[i].screen == screen)
 			return &state->screen_timer[i];
-	
+
 	fatalerror("Unexpected: no atarivc_eof_update_timer for screen '%s'\n", screen->tag);
 	return NULL;
 }
@@ -85,7 +85,7 @@ void atarigen_init(running_machine *machine)
 	atarigen_state *state = (atarigen_state *)machine->driver_data;
 	const device_config *screen;
 	int i;
-	
+
 	/* allocate timers for all screens */
 	assert(video_screen_count(machine->config) <= ARRAY_LENGTH(state->screen_timer));
 	for (i = 0, screen = video_screen_first(machine->config); screen != NULL; i++, screen = video_screen_next(screen))

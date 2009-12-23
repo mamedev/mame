@@ -143,7 +143,7 @@ static void xexex_objdma(running_machine *machine, int limiter)
 
 	counter = frame;
 	frame = video_screen_get_frame_number(machine->primary_screen);
-	if (limiter && counter == frame) 
+	if (limiter && counter == frame)
 		return; // make sure we only do DMA transfer once per frame
 
 	k053247_get_ram(k053246, &dst);
@@ -276,10 +276,10 @@ static TIMER_CALLBACK( dmaend_callback )
 	if (cur_control2 & 0x0040)
 	{
 		// foul-proof (CPU0 could be deactivated while we wait)
-		if (suspension_active) 
-		{ 
-			suspension_active = 0; 
-			cpuexec_trigger(machine, resume_trigger); 
+		if (suspension_active)
+		{
+			suspension_active = 0;
+			cpuexec_trigger(machine, resume_trigger);
 		}
 
 		// IRQ 5 is the "object DMA end interrupt" and shouldn't be triggered
@@ -292,10 +292,10 @@ static INTERRUPT_GEN( xexex_interrupt )
 {
 	const device_config *k053246 = devtag_get_device(device->machine, "k053246");
 
-	if (suspension_active) 
-	{ 
-		suspension_active = 0; 
-		cpuexec_trigger(device->machine, resume_trigger); 
+	if (suspension_active)
+	{
+		suspension_active = 0;
+		cpuexec_trigger(device->machine, resume_trigger);
 	}
 
 	switch (cpu_getiloops(device))

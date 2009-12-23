@@ -1027,7 +1027,7 @@ static MACHINE_DRIVER_START( midvcommon )
 	MDRV_MACHINE_START(midvunit)
 	MDRV_MACHINE_RESET(midvunit)
 	MDRV_NVRAM_HANDLER(generic_1fill)
-	
+
 	MDRV_TIMER_ADD("timer0", NULL)
 	MDRV_TIMER_ADD("timer1", NULL)
 

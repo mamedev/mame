@@ -37,7 +37,7 @@ struct _balsente_state
 	UINT16 *shrike_io;
 
 	/* 8253 counter state */
-	struct 
+	struct
 	{
 		const device_config *timer;
 		UINT8 timer_active;

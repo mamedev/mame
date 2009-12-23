@@ -1159,7 +1159,7 @@ INLINE void decode_tpage( running_machine *machine, struct PSXGPU *p_psxgpu, UIN
 	{
 
 #define TEXTURE_ENDLOOP \
-	}	
+	}
 
 #define TEXTURE4BIT( TXV, TXU ) \
 	TEXTURE_LOOP \

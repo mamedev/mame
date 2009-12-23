@@ -251,8 +251,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 	color = (attr & 0x18) >> 3;
 	flag = TILE_FLIPXY((attr & 0x06) >> 1);
 
-//	if((~attr & 0x20) || (~attr & 0x40))
-//		flag |= TILE_FORCE_LAYER0;
+//  if((~attr & 0x20) || (~attr & 0x40))
+//      flag |= TILE_FORCE_LAYER0;
 
 	//0x20? tile transparent pen 1?
 	//0x40? tile transparent pen 1?
@@ -266,7 +266,7 @@ static VIDEO_START( trvmadns )
 {
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-//	tilemap_set_transparent_pen(fg_tilemap,1);
+//  tilemap_set_transparent_pen(fg_tilemap,1);
 
 	gfx_element_set_source(machine->gfx[0], trvmadns_gfxram);
 }

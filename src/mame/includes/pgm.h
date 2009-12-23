@@ -3,7 +3,7 @@ typedef struct _pgm_state pgm_state;
 struct _pgm_state
 {
 	/* memory pointers */
-//	UINT16 *      mainram;	// currently this is also used by nvram handler
+//  UINT16 *      mainram;  // currently this is also used by nvram handler
 	UINT16 *      bg_videoram;
 	UINT16 *      tx_videoram;
 	UINT16 *      videoregs;
@@ -16,7 +16,7 @@ struct _pgm_state
 	UINT8  *      sprite_a_region;
 	size_t        sprite_a_region_size;
 	UINT16 *      spritebufferram; // buffered spriteram
-//	UINT16 *      paletteram;    // currently this uses generic palette handling
+//  UINT16 *      paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap       *bg_tilemap, *tx_tilemap;

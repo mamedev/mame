@@ -636,7 +636,7 @@ int cli_info_listsamples(core_options *options, const char *gamename)
 
 /*-------------------------------------------------
     cli_info_listdevices - output the list of
-    devices referenced by a given game or set of 
+    devices referenced by a given game or set of
     games
 -------------------------------------------------*/
 
@@ -654,11 +654,11 @@ int cli_info_listdevices(core_options *options, const char *gamename)
 		{
 			machine_config *config = machine_config_alloc(drivers[drvindex]->machine_config);
 			const device_config *device;
-			
+
 			if (count != 0)
 				printf("\n");
 			printf("Driver %s (%s):\n", drivers[drvindex]->name, drivers[drvindex]->description);
-			
+
 			/* iterate through devices */
 			for (device = config->devicelist.head; device != NULL; device = device->next)
 			{

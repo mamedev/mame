@@ -19,15 +19,15 @@ static void pgm_prepare_sprite( running_machine *machine, int wide, int high, in
 	UINT32 aoffset;
 	UINT16 msk;
 
-	aoffset = (bdata[(boffset + 3) & bdatasize] << 24) | (bdata[(boffset + 2) & bdatasize] << 16) | 
+	aoffset = (bdata[(boffset + 3) & bdatasize] << 24) | (bdata[(boffset + 2) & bdatasize] << 16) |
 				(bdata[(boffset + 1) & bdatasize] << 8) | (bdata[(boffset + 0) & bdatasize] << 0);
 	aoffset = aoffset >> 2; aoffset *= 3;
 
 	boffset += 4; /* because the first dword is the a data offset */
 
-	for (ycnt = 0 ; ycnt < high ; ycnt++) 
+	for (ycnt = 0 ; ycnt < high ; ycnt++)
 	{
-		for (xcnt = 0 ; xcnt < wide ; xcnt++) 
+		for (xcnt = 0 ; xcnt < wide ; xcnt++)
 		{
 			int x;
 
@@ -67,9 +67,9 @@ static void draw_sprite_line( running_machine *machine, int wide, UINT32* dest, 
 	while (xcnt < wide * 16)
 	{
 		UINT32 srcdat;
-		if (!(flip & 0x01)) 
+		if (!(flip & 0x01))
 			xoffset = xcnt;
-		else 
+		else
 			xoffset = (wide * 16) - xcnt - 1;
 
 		srcdat = state->sprite_temp_render[yoffset + xoffset];
@@ -82,9 +82,9 @@ static void draw_sprite_line( running_machine *machine, int wide, UINT32* dest, 
 			{
 				if ((xdrawpos >= 0) && (xdrawpos < 448))
 				{
-					if (pri) 
+					if (pri)
 						dest[xdrawpos] = srcdat | 0x8000 | 0x10000;
-					else 
+					else
 						dest[xdrawpos] = srcdat | 0x10000;
 				}
 			}
@@ -96,9 +96,9 @@ static void draw_sprite_line( running_machine *machine, int wide, UINT32* dest, 
 			{
 				if ((xdrawpos >= 0) && (xdrawpos < 448))
 				{
-					if (pri) 
+					if (pri)
 						dest[xdrawpos] = srcdat | 0x8000 | 0x10000;
-					else 
+					else
 						dest[xdrawpos] = srcdat | 0x10000;
 				}
 			}
@@ -115,9 +115,9 @@ static void draw_sprite_line( running_machine *machine, int wide, UINT32* dest, 
 			{
 				if ((xdrawpos >= 0) && (xdrawpos < 448))
 				{
-					if (pri) 
+					if (pri)
 						dest[xdrawpos] = srcdat | 0x8000 | 0x10000;
-					else 
+					else
 						dest[xdrawpos] = srcdat | 0x10000;
 				}
 			}
@@ -152,9 +152,9 @@ static void draw_sprite_new_zoomed( running_machine *machine, int wide, int high
 		{
 			ydrawpos = ypos + ycntdraw;
 
-			if (!(flip & 0x02)) 
+			if (!(flip & 0x02))
 				yoffset = (ycnt * (wide * 16));
-			else 
+			else
 				yoffset = ((high - ycnt - 1) * (wide * 16));
 
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
@@ -165,9 +165,9 @@ static void draw_sprite_new_zoomed( running_machine *machine, int wide, int high
 			ycntdraw++;
 
 			ydrawpos = ypos + ycntdraw;
-			if (!(flip & 0x02)) 
+			if (!(flip & 0x02))
 				yoffset = (ycnt * (wide * 16));
-			else 
+			else
 				yoffset = ((high - ycnt - 1) * (wide * 16));
 
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
@@ -177,7 +177,7 @@ static void draw_sprite_new_zoomed( running_machine *machine, int wide, int high
 			}
 			ycntdraw++;
 
-			if (ydrawpos ==224) 
+			if (ydrawpos ==224)
 				ycnt = high;
 		}
 		else if (yzoombit == 1 && ygrow == 0)
@@ -189,9 +189,9 @@ static void draw_sprite_new_zoomed( running_machine *machine, int wide, int high
 		{
 			ydrawpos = ypos + ycntdraw;
 
-			if (!(flip & 0x02)) 
+			if (!(flip & 0x02))
 				yoffset = (ycnt * (wide * 16));
-			else 
+			else
 				yoffset = ((high - ycnt - 1) * (wide * 16));
 
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
@@ -201,7 +201,7 @@ static void draw_sprite_new_zoomed( running_machine *machine, int wide, int high
 			}
 			ycntdraw++;
 
-			if (ydrawpos == 224) 
+			if (ydrawpos == 224)
 				ycnt = high;
 		}
 
@@ -325,7 +325,7 @@ static TILE_GET_INFO( get_pgm_bg_tilemap_tile_info )
 	int tileno, colour, flipyx;
 
 	tileno = state->bg_videoram[tile_index *2] & 0xffff;
-	if (tileno > 0x7ff) 
+	if (tileno > 0x7ff)
 		tileno += 0x1000; /* Tiles 0x800+ come from the GAME Roms */
 	colour = (state->bg_videoram[tile_index * 2 + 1] & 0x3e) >> 1;
 	flipyx = (state->bg_videoram[tile_index * 2 + 1] & 0xc0) >> 6;

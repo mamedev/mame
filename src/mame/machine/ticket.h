@@ -24,7 +24,7 @@ struct _ticket_config
 	MDRV_DEVICE_ADD(_tag, TICKET_DISPENSER, _clock) \
 	MDRV_DEVICE_CONFIG_DATA32(ticket_config, motorhigh, _motorhigh) \
 	MDRV_DEVICE_CONFIG_DATA32(ticket_config, statushigh, _statushigh)
-	
+
 
 READ8_DEVICE_HANDLER( ticket_dispenser_r );
 WRITE8_DEVICE_HANDLER( ticket_dispenser_w );

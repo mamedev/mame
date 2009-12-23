@@ -1843,7 +1843,7 @@ static MACHINE_DRIVER_START( model2o )
 
 	MDRV_MACHINE_RESET(model2o)
 	MDRV_NVRAM_HANDLER( model2 )
-	
+
 	MDRV_TIMER_ADD("timer0", model2_timer_cb)
 	MDRV_TIMER_PTR((FPTR)0)
 	MDRV_TIMER_ADD("timer1", model2_timer_cb)

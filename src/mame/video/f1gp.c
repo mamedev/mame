@@ -55,7 +55,7 @@ VIDEO_START( f1gp )
 	state->zoomdata = (UINT16 *)memory_region(machine, "gfx4");
 	gfx_element_set_source(machine->gfx[3], (UINT8 *)state->zoomdata);
 
-//	state_save_register_global_pointer(machine, state->zoomdata, memory_region_length(machine, "gfx4"));
+//  state_save_register_global_pointer(machine, state->zoomdata, memory_region_length(machine, "gfx4"));
 }
 
 
@@ -71,7 +71,7 @@ VIDEO_START( f1gpb )
 	state->zoomdata = (UINT16 *)memory_region(machine, "gfx4");
 	gfx_element_set_source(machine->gfx[3], (UINT8 *)state->zoomdata);
 
-//	state_save_register_global_pointer(machine, state->zoomdata, memory_region_length(machine, "gfx4"));
+//  state_save_register_global_pointer(machine, state->zoomdata, memory_region_length(machine, "gfx4"));
 }
 
 VIDEO_START( f1gp2 )
@@ -404,7 +404,7 @@ static void f1gp2_draw_sprites( running_machine *machine, bitmap_t *bitmap, cons
 		zoomx = 32 - zoomx;
 		zoomy = 32 - zoomy;
 
-		if (state->spritelist[attr_start + 2] & 0x20ff) 
+		if (state->spritelist[attr_start + 2] & 0x20ff)
 			color = mame_rand(machine);
 
 		for (y = 0; y <= ysize; y++)

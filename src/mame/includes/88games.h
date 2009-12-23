@@ -10,8 +10,8 @@ struct __88games_state
 	/* memory pointers */
 	UINT8 *      ram;
 	UINT8 *      banked_rom;
-//	UINT8 *      paletteram_1000;	// this currently uses generic palette handling
-//	UINT8 *      nvram;	// this currently uses generic nvram handling
+//  UINT8 *      paletteram_1000;   // this currently uses generic palette handling
+//  UINT8 *      nvram; // this currently uses generic nvram handling
 
 	/* video-related */
 	int          k88games_priority;

@@ -80,7 +80,7 @@ MACHINE_START( balsente )
 {
 	balsente_state *state = (balsente_state *)machine->driver_data;
 	int i;
-	
+
 	/* create the polynomial tables */
 	poly17_init(machine);
 

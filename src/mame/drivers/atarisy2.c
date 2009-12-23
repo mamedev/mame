@@ -226,7 +226,7 @@ static MACHINE_START( atarisy2 )
 {
 	atarisy2_state *state = (atarisy2_state *)machine->driver_data;
 	atarigen_init(machine);
-	
+
 	state_save_register_global(machine, state->interrupt_enable);
 	state_save_register_global(machine, state->tms5220_data);
 	state_save_register_global(machine, state->tms5220_data_strobe);

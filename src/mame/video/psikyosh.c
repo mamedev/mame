@@ -167,7 +167,7 @@ static void draw_bglayer( running_machine *machine, int layer, bitmap_t *bitmap,
 		scrolly  = (state->bgram[0x13f0 / 4 + (layer * 0x04) / 4] & 0x03ff0000) >> 16;
 	}
 
-	if (BG_TYPE(layer) == BG_SCROLL_0D) 
+	if (BG_TYPE(layer) == BG_SCROLL_0D)
 		scrollx += 0x08; /* quick kludge until using rowscroll */
 
 	gfx = BG_DEPTH_8BPP(layer) ? machine->gfx[1] : machine->gfx[0];
@@ -236,7 +236,7 @@ static void draw_bglayertext( running_machine *machine, int layer, bitmap_t *bit
 	if ((bank >= 0x0c) && (bank <= 0x1f)) /* shouldn't happen, 20 banks of 0x800 bytes */
 	{
 		offs = 0;
-		for (sy = 0; sy < size; sy++) 
+		for (sy = 0; sy < size; sy++)
 		{
 			for (sx = 0; sx < 32; sx++)
 			{
@@ -274,9 +274,9 @@ static void draw_bglayertext( running_machine *machine, int layer, bitmap_t *bit
 	if ((bank >= 0x0c) && (bank <= 0x1f)) /* shouldn't happen, 20 banks of 0x800 bytes */
 	{
 		offs = 0;
-		for (sy = 0; sy < size; sy++) 
+		for (sy = 0; sy < size; sy++)
 		{
-			for (sx = 0; sx < 32; sx++) 
+			for (sx = 0; sx < 32; sx++)
 			{
 				int tileno, colour;
 
@@ -445,7 +445,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 	int code_offset = 0;
 	int xtile, ytile, xpixel, ypixel;
 
-	if (!zoomx || !zoomy) 
+	if (!zoomx || !zoomy)
 		return;
 
 	profiler_mark_start(PROFILER_DRAWGFX);
@@ -583,7 +583,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 									for (x = sx; x < ex; x++)
 									{
 										int c = *source;
-										if (c != 0) 
+										if (c != 0)
 											*dest = pal[c];
 
 										dest++;
@@ -642,7 +642,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 									for (x = sx; x < ex; x++)
 									{
 										int c = *source;
-										if (c != 0) 
+										if (c != 0)
 											*dest = alpha_blend_r32(*dest, pal[c], alpha);
 
 										dest++;
@@ -850,7 +850,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 								for (x = sx; x < ex; x++)
 								{
 									int c = source[x_index >> 10];
-									if (c != 0) 
+									if (c != 0)
 										dest[x] = pal[c];
 									x_index += dx;
 								}
@@ -1075,12 +1075,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					int x, y;
 
 					sprintf(buf, "%X",xdim/16); /* Display Zoom in 16.16 */
-					if (machine->gamedrv->flags & ORIENTATION_SWAP_XY) 
+					if (machine->gamedrv->flags & ORIENTATION_SWAP_XY)
 					{
 						x = ypos;
 						y = video_screen_get_visible_area(machine->primary_screen)->max_x - xpos; /* ORIENTATION_FLIP_Y */
 					}
-					else 
+					else
 					{
 						x = xpos;
 						y = ypos;
@@ -1113,7 +1113,7 @@ VIDEO_START( psikyosh )
 		int i;
 		for (i = 0; i < 0xc0; i++)
 			alphatable[i] = 0xff;
-		for (i = 0; i < 0x40; i++) 
+		for (i = 0; i < 0x40; i++)
 		{
 			int alpha = ((0x3f - i) * 0xff) / 0x3f;
 			alphatable[i + 0xc0] = alpha;
@@ -1188,11 +1188,11 @@ VIDEO_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct prio
 
 	psikyosh_prelineblend(screen->machine, bitmap, cliprect);
 
-	for (i = 0; i <= 7; i++) 
+	for (i = 0; i <= 7; i++)
 	{
 		draw_sprites(screen->machine, bitmap, cliprect, i); // When same priority bg's have higher pri
 		draw_background(screen->machine, bitmap, cliprect, i);
-		if ((state->vidregs[2] & 0xf) == i) 
+		if ((state->vidregs[2] & 0xf) == i)
 			psikyosh_postlineblend(screen->machine, bitmap, cliprect);
 	}
 	return 0;

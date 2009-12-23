@@ -190,7 +190,7 @@ static MACHINE_START( hcastle )
 	state_save_register_global(machine, state->pf2_bankbase);
 	state_save_register_global(machine, state->pf1_bankbase);
 	state_save_register_global(machine, state->gfx_bank);
-	state_save_register_global(machine, state->old_pf1); 
+	state_save_register_global(machine, state->old_pf1);
 	state_save_register_global(machine, state->old_pf2);
 }
 
@@ -201,7 +201,7 @@ static MACHINE_RESET( hcastle )
 	state->pf2_bankbase = 0;
 	state->pf1_bankbase = 0;
 	state->gfx_bank = 0;
-	state->old_pf1 = -1; 
+	state->old_pf1 = -1;
 	state->old_pf2 = -1;
 }
 

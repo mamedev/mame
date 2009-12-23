@@ -12,7 +12,7 @@ struct _suprslam_state
 	UINT16 *    bg_videoram;
 	UINT16 *    sp_videoram;
 	UINT16 *    spriteram;
-//	UINT16 *    paletteram;	// this currently uses generic palette handling
+//  UINT16 *    paletteram; // this currently uses generic palette handling
 
 	/* video-related */
 	tilemap     *screen_tilemap, *bg_tilemap;

@@ -911,7 +911,7 @@ static void sound_irq_callback( running_machine *machine, int irq )
 	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
 }
 
-static const k056800_interface gticlub_k056800_interface = 
+static const k056800_interface gticlub_k056800_interface =
 {
 	sound_irq_callback
 };

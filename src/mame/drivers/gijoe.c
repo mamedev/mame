@@ -74,7 +74,7 @@ static READ16_HANDLER( control2_r )
 static WRITE16_HANDLER( control2_w )
 {
 	const device_config *k053246 = devtag_get_device(space->machine, "k053246");
-	if(ACCESSING_BITS_0_7) 
+	if(ACCESSING_BITS_0_7)
 	{
 		/* bit 0  is data */
 		/* bit 1  is cs (active low) */
@@ -128,7 +128,7 @@ static INTERRUPT_GEN( gijoe_interrupt )
 	const device_config *k056832 = devtag_get_device(device->machine, "k056832");
 
 	// global interrupt masking (*this game only)
-	if (!k056832_is_irq_enabled(k056832, 0)) 
+	if (!k056832_is_irq_enabled(k056832, 0))
 		return;
 
 	if (k053246_is_irq_enabled(k053246))
@@ -146,7 +146,7 @@ static INTERRUPT_GEN( gijoe_interrupt )
 
 static WRITE16_HANDLER( sound_cmd_w )
 {
-	if(ACCESSING_BITS_0_7) 
+	if(ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
 		soundlatch_w(space, 0, data);

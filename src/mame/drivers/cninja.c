@@ -753,7 +753,7 @@ static MACHINE_DRIVER_START( cninja )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(cninja)
-	
+
 	MDRV_TIMER_ADD("raster_timer", interrupt_gen)
 
 	/* video hardware */
@@ -1243,7 +1243,7 @@ ROM_START( cninjabl )
 	ROM_LOAD16_WORD_SWAP( "joe mac 3.68k", 0x00000, 0x80000,  CRC(dc931d80) SHA1(78103f74fb428c4735e77d99a143cdf28915ef26) )
 	ROM_LOAD16_WORD_SWAP( "joe mac 4.68k", 0x80000, 0x40000,  CRC(e8dfe0b5) SHA1(f7f883c19023bc68146aea5eaf98d2fdd606d5e3) )
 	ROM_IGNORE(0x40000) //  1xxxxxxxxxxxxxxxxxx = 0xFF
-	
+
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Sound CPU */
 	ROM_LOAD( "joe mac 5.z80",  0x00000,  0x10000, CRC(d791b9d7) SHA1(7842ab7e960b692bdbcadf5c64f09ddd1a3fb861) ) // 1ST AND 2ND HALF IDENTICAL
 

@@ -195,7 +195,7 @@ static void sound_irq_callback(running_machine *machine, int irq)
 		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_IRQ6, HOLD_LINE);
 }
 
-static const k056800_interface ultrsprt_k056800_interface = 
+static const k056800_interface ultrsprt_k056800_interface =
 {
 	sound_irq_callback
 };

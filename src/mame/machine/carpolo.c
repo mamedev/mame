@@ -259,7 +259,7 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 		static const char *const portnames[] = { "DIAL0", "DIAL1", "DIAL2", "DIAL3" };
 		const device_config *movement_flip_flop;
 		const device_config *dir_flip_flop;
-		
+
 		switch (player)
 		{
 			default:
@@ -526,7 +526,7 @@ MACHINE_START( carpolo )
 	ttl7474_1c_2 = devtag_get_device(machine, "7474_1c_2");
 	ttl7474_1a_1 = devtag_get_device(machine, "7474_1a_1");
 	ttl7474_1a_2 = devtag_get_device(machine, "7474_1a_2");
-	
+
 	ttl74148_3s = devtag_get_device(machine, "74148_3s");
 	ttl74153_1k = devtag_get_device(machine, "74153_1k");
 

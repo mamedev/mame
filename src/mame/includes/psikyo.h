@@ -14,9 +14,9 @@ struct _psikyo_state
 	UINT32 *       spritebuf1;
 	UINT32 *       spritebuf2;
 	UINT32 *       bootleg_spritebuffer;
-//  	UINT32 *       paletteram;	// currently this uses generic palette handling
-//	UINT32 *       spriteram;	// currently this uses generic buffered spriteram
-//	size_t         spriteram_size;
+//      UINT32 *       paletteram;  // currently this uses generic palette handling
+//  UINT32 *       spriteram;   // currently this uses generic buffered spriteram
+//  size_t         spriteram_size;
 
 	/* video-related */
 	tilemap        *tilemap_0_size0, *tilemap_0_size1, *tilemap_0_size2, *tilemap_0_size3;

@@ -100,7 +100,7 @@ struct _k056832_interface
 {
 	const char         *gfx_memory_region;
 	int                gfx_num;
-	int                bpp; 
+	int                bpp;
 	int                big;
 	int                djmain_hack;
 	int                deinterleave;
@@ -271,8 +271,8 @@ DEVICE_GET_INFO( k053252 );
     HELPERS FOR DRIVERS
 ***************************************************************************/
 
-enum 
-{ 
+enum
+{
 	KONAMI_ROM_DEINTERLEAVE_NONE = 0,
 	KONAMI_ROM_DEINTERLEAVE_2,
 	KONAMI_ROM_DEINTERLEAVE_2_HALF,
@@ -520,13 +520,13 @@ int k053251_get_tmap_dirty(const device_config *device, int tmap_num);
 void k053251_set_tmap_dirty(const device_config *device, int tmap_num, int data);
 void k053251_postload_reset_indexes(const device_config *device);
 
-enum 
-{ 
+enum
+{
 	K053251_CI0 = 0,
 	K053251_CI1,
 	K053251_CI2,
 	K053251_CI3,
-	K053251_CI4 
+	K053251_CI4
 };
 
 /**  Konami 054000 **/

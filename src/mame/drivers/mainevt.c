@@ -160,7 +160,7 @@ static READ8_HANDLER( k052109_051960_r )
 		else
 			return k051960_r(k051960, offset - 0x3c00);
 	}
-	else 
+	else
 		return k052109_r(k052109, offset);
 }
 

@@ -301,7 +301,7 @@ static WRITE16_HANDLER( pgm_videoram_w )
 		pgm_bg_videoram_w(space, offset, data, mem_mask);
 	else if (offset < 0x7000 / 2)
 		pgm_tx_videoram_w(space, offset - 0x4000 / 2, data, mem_mask);
-	else 
+	else
 		COMBINE_DATA(&state->videoram[offset / 2]);
 }
 
@@ -315,7 +315,7 @@ static READ32_HANDLER( arm7_latch_arm_r )
 {
 	pgm_state *state = (pgm_state *)space->machine->driver_data;
 
-	if (PGMARM7LOGERROR) 
+	if (PGMARM7LOGERROR)
 		logerror("ARM7: Latch read: %08x (%08x) (%06x)\n", state->kov2_latchdata_68k_w, mem_mask, cpu_get_pc(space->cpu));
 	return state->kov2_latchdata_68k_w;
 }
@@ -324,7 +324,7 @@ static WRITE32_HANDLER( arm7_latch_arm_w )
 {
 	pgm_state *state = (pgm_state *)space->machine->driver_data;
 
-	if (PGMARM7LOGERROR) 
+	if (PGMARM7LOGERROR)
 		logerror("ARM7: Latch write: %08x (%08x) (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu));
 
 	COMBINE_DATA(&state->kov2_latchdata_arm_w);
@@ -334,7 +334,7 @@ static READ32_HANDLER( arm7_shareram_r )
 {
 	pgm_state *state = (pgm_state *)space->machine->driver_data;
 
-	if (PGMARM7LOGERROR) 
+	if (PGMARM7LOGERROR)
 		logerror("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) (%06x)\n", offset << 2, state->arm7_shareram[offset], mem_mask, cpu_get_pc(space->cpu));
 	return state->arm7_shareram[offset];
 }
@@ -343,7 +343,7 @@ static WRITE32_HANDLER( arm7_shareram_w )
 {
 	pgm_state *state = (pgm_state *)space->machine->driver_data;
 
-	if (PGMARM7LOGERROR) 
+	if (PGMARM7LOGERROR)
 		logerror("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) (%06x)\n", offset << 2, data, mem_mask, cpu_get_pc(space->cpu));
 	COMBINE_DATA(&state->arm7_shareram[offset]);
 }
@@ -352,7 +352,7 @@ static READ16_HANDLER( arm7_latch_68k_r )
 {
 	pgm_state *state = (pgm_state *)space->machine->driver_data;
 
-	if (PGMARM7LOGERROR) 
+	if (PGMARM7LOGERROR)
 		logerror("M68K: Latch read: %04x (%04x) (%06x)\n", state->kov2_latchdata_arm_w & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu));
 	return state->kov2_latchdata_arm_w;
 }
@@ -361,7 +361,7 @@ static WRITE16_HANDLER( arm7_latch_68k_w )
 {
 	pgm_state *state = (pgm_state *)space->machine->driver_data;
 
-	if (PGMARM7LOGERROR) 
+	if (PGMARM7LOGERROR)
 		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu));
 	COMBINE_DATA(&state->kov2_latchdata_68k_w);
 
@@ -375,7 +375,7 @@ static READ16_HANDLER( arm7_ram_r )
 	pgm_state *state = (pgm_state *)space->machine->driver_data;
 	UINT16 *share16 = (UINT16 *)state->arm7_shareram;
 
-	if (PGMARM7LOGERROR) 
+	if (PGMARM7LOGERROR)
 		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, cpu_get_pc(space->cpu));
 	return share16[BYTE_XOR_LE(offset)];
 }
@@ -385,7 +385,7 @@ static WRITE16_HANDLER( arm7_ram_w )
 	pgm_state *state = (pgm_state *)space->machine->driver_data;
 	UINT16 *share16 = (UINT16 *)state->arm7_shareram;
 
-	if (PGMARM7LOGERROR) 
+	if (PGMARM7LOGERROR)
 		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, cpu_get_pc(space->cpu));
 	COMBINE_DATA(&share16[BYTE_XOR_LE(offset)]);
 }
@@ -401,7 +401,7 @@ static WRITE16_HANDLER ( z80_ram_w )
 		state->z80_mainram[offset * 2 + 1] = data;
 
 	if (pc != 0xf12 && pc != 0xde2 && pc != 0x100c50 && pc != 0x100b20)
-		if (PGMLOGERROR) 
+		if (PGMLOGERROR)
 			logerror("Z80: write %04x, %04x @ %04x (%06x)\n", offset * 2, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
@@ -409,7 +409,7 @@ static WRITE16_HANDLER ( z80_reset_w )
 {
 	pgm_state *state = (pgm_state *)space->machine->driver_data;
 
-	if (PGMLOGERROR) 
+	if (PGMLOGERROR)
 		logerror("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu));
 
 	if (data == 0x5050)
@@ -435,7 +435,7 @@ static WRITE16_HANDLER ( z80_reset_w )
 
 static WRITE16_HANDLER ( z80_ctrl_w )
 {
-	if (PGMLOGERROR) 
+	if (PGMLOGERROR)
 		logerror("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu));
 }
 
@@ -445,7 +445,7 @@ static WRITE16_HANDLER ( m68k_l1_w )
 
 	if(ACCESSING_BITS_0_7)
 	{
-		if (PGMLOGERROR) 
+		if (PGMLOGERROR)
 			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, cpu_get_pc(space->cpu));
 		soundlatch_w(space, 0, data);
 		cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE );
@@ -454,7 +454,7 @@ static WRITE16_HANDLER ( m68k_l1_w )
 
 static WRITE8_HANDLER( z80_l3_w )
 {
-	if (PGMLOGERROR) 
+	if (PGMLOGERROR)
 		logerror("SL 3 z80.w %02x (%04x)\n", data, cpu_get_pc(space->cpu));
 	soundlatch3_w(space, 0, data);
 }
@@ -465,7 +465,7 @@ static void sound_irq( const device_config *device, int level )
 	cpu_set_input_line(state->soundcpu, 0, level);
 }
 
-static const ics2115_interface pgm_ics2115_interface = 
+static const ics2115_interface pgm_ics2115_interface =
 {
 	sound_irq
 };
@@ -809,7 +809,7 @@ static READ16_HANDLER( kovsh_arm7_ram_r )
 	pgm_state *state = (pgm_state *)space->machine->driver_data;
 	UINT16 *share16 = (UINT16 *)state->arm7_shareram;
 
-	if (PGMARM7LOGERROR) 
+	if (PGMARM7LOGERROR)
 		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, cpu_get_pc(space->cpu));
 	return share16[BYTE_XOR_LE(offset << 1)];
 }
@@ -819,7 +819,7 @@ static WRITE16_HANDLER( kovsh_arm7_ram_w )
 	pgm_state *state = (pgm_state *)space->machine->driver_data;
 	UINT16 *share16 = (UINT16 *)state->arm7_shareram;
 
-	if (PGMARM7LOGERROR) 
+	if (PGMARM7LOGERROR)
 		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, cpu_get_pc(space->cpu));
 	COMBINE_DATA(&share16[BYTE_XOR_LE(offset << 1)]);
 }
@@ -934,7 +934,7 @@ static WRITE16_HANDLER( svg_68k_nmi_w )
 static WRITE16_HANDLER( svg_latch_68k_w )
 {
 	pgm_state *state = (pgm_state *)space->machine->driver_data;
-	if (PGMARM7LOGERROR) 
+	if (PGMARM7LOGERROR)
 		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu));
 	COMBINE_DATA(&state->kov2_latchdata_68k_w);
 }
@@ -3560,21 +3560,21 @@ static void expand_32x32x5bpp(running_machine *machine)
 
 	for (cnt = 0; cnt < srcsize/5 ; cnt ++)
 	{
-		pix = ((src[0 + 5 * cnt] >> 0)& 0x1f );					
+		pix = ((src[0 + 5 * cnt] >> 0)& 0x1f );
 			dst[0 + 8 * cnt]=pix;
 		pix = ((src[0 + 5 * cnt] >> 5)& 0x07) | ((src[1 + 5 * cnt] << 3) & 0x18);
 			dst[1 + 8 * cnt]=pix;
-		pix = ((src[1 + 5 * cnt] >> 2)& 0x1f );		 		
+		pix = ((src[1 + 5 * cnt] >> 2)& 0x1f );
 			dst[2 + 8 * cnt]=pix;
 		pix = ((src[1 + 5 * cnt] >> 7)& 0x01) | ((src[2 + 5 * cnt] << 1) & 0x1e);
 			dst[3 + 8 * cnt]=pix;
 		pix = ((src[2 + 5 * cnt] >> 4)& 0x0f) | ((src[3 + 5 * cnt] << 4) & 0x10);
 			dst[4 + 8 * cnt]=pix;
-		pix = ((src[3 + 5 * cnt] >> 1)& 0x1f );							  
+		pix = ((src[3 + 5 * cnt] >> 1)& 0x1f );
 			dst[5 + 8 * cnt]=pix;
 		pix = ((src[3 + 5 * cnt] >> 6)& 0x03) | ((src[4 + 5 * cnt] << 2) & 0x1c);
 			dst[6 + 8 * cnt]=pix;
-		pix = ((src[4 + 5 * cnt] >> 3)& 0x1f );							  
+		pix = ((src[4 + 5 * cnt] >> 3)& 0x1f );
 			dst[7 + 8 * cnt]=pix;
 	}
 }

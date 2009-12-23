@@ -80,9 +80,9 @@ static WRITE16_HANDLER( eeprom_w )
 
 static INTERRUPT_GEN( cpuA_interrupt )
 {
-	if (cpu_getiloops(device)) 
+	if (cpu_getiloops(device))
 		cpu_set_input_line(device, 5, HOLD_LINE);
-	else 
+	else
 		cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -90,7 +90,7 @@ static INTERRUPT_GEN( cpuB_interrupt )
 {
 	const device_config *k053246 = devtag_get_device(device->machine, "k053246");
 
-	if (k053246_is_irq_enabled(k053246)) 
+	if (k053246_is_irq_enabled(k053246))
 		cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
@@ -337,7 +337,7 @@ static MACHINE_DRIVER_START( overdriv )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 0*8, 32*8-1 )
 
-//	MDRV_GFXDECODE(overdriv)
+//  MDRV_GFXDECODE(overdriv)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(overdriv)

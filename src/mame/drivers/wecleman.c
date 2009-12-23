@@ -1110,7 +1110,7 @@ static INTERRUPT_GEN( hotchase_sound_timer )
 static const k051316_interface hotchase_k051316_intf_0 =
 {
 	"gfx2", 1,
-	4, FALSE, 0, 
+	4, FALSE, 0,
 	1, -0xb0 / 2, -16,
 	hotchase_zoom_callback_0
 };
@@ -1118,7 +1118,7 @@ static const k051316_interface hotchase_k051316_intf_0 =
 static const k051316_interface hotchase_k051316_intf_1 =
 {
 	"gfx3", 2,
-	4, FALSE, 0, 
+	4, FALSE, 0,
 	0, -0xb0 / 2, -16,
 	hotchase_zoom_callback_1
 };

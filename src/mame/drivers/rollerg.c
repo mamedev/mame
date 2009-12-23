@@ -50,9 +50,9 @@ static WRITE8_HANDLER( rollerg_0010_w )
 static READ8_HANDLER( rollerg_K051316_r )
 {
 	const device_config *k051316 = devtag_get_device(space->machine, "k051316");
-	if (readzoomroms) 
+	if (readzoomroms)
 		return k051316_rom_r(k051316, offset);
-	else 
+	else
 		return k051316_r(k051316, offset);
 }
 
@@ -233,7 +233,7 @@ static const k05324x_interface rollerg_k05324x_intf =
 static const k051316_interface rollerg_k051316_intf =
 {
 	"gfx2", 1,
-	4, FALSE, 0, 
+	4, FALSE, 0,
 	0, 22, 1,
 	rollerg_zoom_callback
 };

@@ -842,7 +842,7 @@ static MACHINE_DRIVER_START( sasuke )
 	MDRV_VIDEO_UPDATE(snk6502)
 
 	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / 16, mc6845_intf)
-	
+
 	MDRV_TIMER_ADD_PERIODIC("sasuke_timer", sasuke_update_counter, HZ(MASTER_CLOCK / 8))	// 1.4 MHz
 
 	// sound hardware

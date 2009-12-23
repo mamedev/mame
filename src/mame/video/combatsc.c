@@ -119,19 +119,19 @@ static TILE_GET_INFO( get_tile_info0 )
 	int bank = 4 * ((state->vreg & 0x0f) - 1);
 	int number, color;
 
-	if (bank < 0) 
+	if (bank < 0)
 		bank = 0;
 
-	if ((attributes & 0xb0) == 0) 
+	if ((attributes & 0xb0) == 0)
 		bank = 0;	/* text bank */
 
-	if (attributes & 0x80) 
+	if (attributes & 0x80)
 		bank += 1;
 
-	if (attributes & 0x10) 
+	if (attributes & 0x10)
 		bank += 2;
 
-	if (attributes & 0x20) 
+	if (attributes & 0x20)
 		bank += 4;
 
 	color = ((ctrl_6 & 0x10) * 2 + 16) + (attributes & 0x0f);
@@ -154,19 +154,19 @@ static TILE_GET_INFO( get_tile_info1 )
 	int bank = 4 * ((state->vreg >> 4) - 1);
 	int number, color;
 
-	if (bank < 0) 
+	if (bank < 0)
 		bank = 0;
 
-	if ((attributes & 0xb0) == 0) 
+	if ((attributes & 0xb0) == 0)
 		bank = 0;	/* text bank */
 
-	if (attributes & 0x80) 
+	if (attributes & 0x80)
 		bank += 1;
 
-	if (attributes & 0x10) 
+	if (attributes & 0x10)
 		bank += 2;
 
-	if (attributes & 0x20) 
+	if (attributes & 0x20)
 		bank += 4;
 
 	color = ((ctrl_6 & 0x10) * 2 + 16 + 4 * 16) + (attributes & 0x0f);
@@ -203,19 +203,19 @@ static TILE_GET_INFO( get_tile_info0_bootleg )
 	int bank = 4 * ((state->vreg & 0x0f) - 1);
 	int number, pal, color;
 
-	if (bank < 0) 
+	if (bank < 0)
 		bank = 0;
 
-	if ((attributes & 0xb0) == 0) 
+	if ((attributes & 0xb0) == 0)
 		bank = 0;	/* text bank */
 
-	if (attributes & 0x80) 
+	if (attributes & 0x80)
 		bank += 1;
 
-	if (attributes & 0x10) 
+	if (attributes & 0x10)
 		bank += 2;
 
-	if (attributes & 0x20) 
+	if (attributes & 0x20)
 		bank += 4;
 
 	pal = (bank == 0 || bank >= 0x1c || (attributes & 0x40)) ? 1 : 3;
@@ -236,19 +236,19 @@ static TILE_GET_INFO( get_tile_info1_bootleg )
 	int bank = 4*((state->vreg >> 4) - 1);
 	int number, pal, color;
 
-	if (bank < 0) 
+	if (bank < 0)
 		bank = 0;
 
-	if ((attributes & 0xb0) == 0) 
+	if ((attributes & 0xb0) == 0)
 		bank = 0;	/* text bank */
 
-	if (attributes & 0x80) 
+	if (attributes & 0x80)
 		bank += 1;
 
-	if (attributes & 0x10) 
+	if (attributes & 0x10)
 		bank += 2;
 
-	if (attributes & 0x20) 
+	if (attributes & 0x20)
 		bank += 4;
 
 	pal = (bank == 0 || bank >= 0x1c || (attributes & 0x40)) ? 5 : 7;
@@ -527,7 +527,7 @@ static void bootleg_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 	finish = source;
 	source += 0x400;
 	limit = (0x3400 - limit) / 8;
-	if (limit >= 0) 
+	if (limit >= 0)
 		finish = source - limit * 8;
 	source -= 8;
 

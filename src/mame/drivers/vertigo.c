@@ -114,7 +114,7 @@ static MACHINE_DRIVER_START( vertigo )
 	MDRV_IMPORT_FROM(exidy440_audio)
 
 	MDRV_PIT8254_ADD( "pit8254", vertigo_pit8254_config )
-	
+
 	MDRV_74148_ADD( "74148", vertigo_update_irq )
 
 	/* motor controller */

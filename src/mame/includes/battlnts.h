@@ -8,7 +8,7 @@ typedef struct _battlnts_state battlnts_state;
 struct _battlnts_state
 {
 	/* memory pointers */
-//	UINT8 *      paletteram;	// this currently uses generic palette handling
+//  UINT8 *      paletteram;    // this currently uses generic palette handling
 
 	/* video-related */
 	int spritebank;
