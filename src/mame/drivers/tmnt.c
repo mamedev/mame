@@ -67,7 +67,7 @@ Updates:
 #include "driver.h"
 #include "deprecat.h"
 #include "video/konicdev.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
@@ -93,6 +93,8 @@ extern void thndrx2_sprite_callback(running_machine *machine, int *code,int *col
 extern void lgtnfght_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
 extern void blswhstl_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
 extern void prmrsocr_sprite_callback(running_machine *machine, int *code,int *color,int *priority_mask);
+
+WRITE16_HANDLER( ssriders_eeprom_w );	/* in video/tmnt.c */
 
 static int tmnt_soundlatch;
 static int cuebrick_snd_irqlatch, cuebrick_nvram_bank;
@@ -361,9 +363,6 @@ static WRITE8_HANDLER( sound_arm_nmi_w )
 }
 
 
-
-
-
 static READ16_HANDLER( punkshot_kludge_r )
 {
 	/* I don't know what's going on here; at one point, the code reads location */
@@ -453,9 +452,6 @@ static WRITE16_HANDLER( ssriders_protection_w )
 
 ***************************************************************************/
 
-static int init_eeprom_count;
-
-
 static const eeprom_interface eeprom_intf =
 {
 	7,				/* address bits */
@@ -467,23 +463,6 @@ static const eeprom_interface eeprom_intf =
 	"0100110000000" /* unlock command */
 };
 
-static NVRAM_HANDLER( eeprom )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-		{
-			init_eeprom_count = 0;
-			eeprom_load(file);
-		}
-		else
-			init_eeprom_count = 10;
-	}
-}
 
 static READ16_HANDLER( blswhstl_coin_r )
 {
@@ -493,11 +472,7 @@ static READ16_HANDLER( blswhstl_coin_r )
 	/* bit 3 is service button */
 	/* bit 6 is ??? VBLANK? OBJMPX? */
 	res = input_port_read(space->machine, "COINS");
-	if (init_eeprom_count)
-	{
-		init_eeprom_count--;
-		res &= 0xf7;
-	}
+
 	toggle ^= 0x40;
 	return res ^ toggle;
 }
@@ -512,11 +487,7 @@ static READ16_HANDLER( ssriders_eeprom_r )
 	/* bit 2 is VBLANK (???) */
 	/* bit 7 is service button */
 	res = input_port_read(space->machine, "EEPROM");
-	if (init_eeprom_count)
-	{
-		init_eeprom_count--;
-		res &= 0x7f;
-	}
+
 	toggle ^= 0x04;
 	return res ^ toggle;
 }
@@ -531,11 +502,7 @@ static READ16_HANDLER( sunsetbl_eeprom_r )
 	/* bit 2 is VBLANK (???) */
 	/* bit 3 is service button */
 	res = input_port_read(space->machine, "EEPROM");
-	if (init_eeprom_count)
-	{
-		init_eeprom_count--;
-		res &= 0xf7;
-	}
+
 	toggle ^= 0x04;
 	return res ^ toggle;
 }
@@ -547,16 +514,11 @@ static WRITE16_HANDLER( blswhstl_eeprom_w )
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-		eeprom_write_bit(data & 0x01);
-		eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 	}
 }
 
-WRITE16_HANDLER( ssriders_eeprom_w );	/* in video/tmnt.c */
-
-
-static const eeprom_interface thndrx2_eeprom_interface =
+static const eeprom_interface thndrx2_eeprom_intf =
 {
 	7,				/* address bits */
 	8,				/* data bits */
@@ -566,37 +528,6 @@ static const eeprom_interface thndrx2_eeprom_interface =
 	"0100000000000",/* lock command */
 	"0100110000000" /* unlock command */
 };
-
-static NVRAM_HANDLER( thndrx2 )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &thndrx2_eeprom_interface);
-
-		if (file)
-		{
-			init_eeprom_count = 0;
-			eeprom_load(file);
-		}
-		else
-			init_eeprom_count = 10;
-	}
-}
-
-static READ16_HANDLER( thndrx2_in0_r )
-{
-	int res;
-
-	res = input_port_read(space->machine, "P1/COINS");
-	if (init_eeprom_count)
-	{
-		init_eeprom_count--;
-		res &= 0xf7ff;
-	}
-	return res;
-}
 
 static READ16_HANDLER( thndrx2_eeprom_r )
 {
@@ -622,9 +553,7 @@ static WRITE16_HANDLER( thndrx2_eeprom_w )
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-		eeprom_write_bit(data & 0x01);
-		eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 
 		/* bit 5 triggers IRQ on sound cpu */
 		if (last == 0 && (data & 0x20) != 0)
@@ -634,21 +563,6 @@ static WRITE16_HANDLER( thndrx2_eeprom_w )
 		/* bit 6 = enable char ROM reading through the video RAM */
 		k052109_set_rmrd_line(k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	}
-}
-
-
-static READ16_HANDLER( prmrsocr_IN0_r )
-{
-	/* bit 9 is service button */
-	int res;
-
-	res = input_port_read(space->machine, "P1/COINS");
-	if (init_eeprom_count)
-	{
-		init_eeprom_count--;
-		res &= 0xfdff;
-	}
-	return res;
 }
 
 static WRITE16_HANDLER( prmrsocr_eeprom_w )
@@ -663,9 +577,7 @@ static WRITE16_HANDLER( prmrsocr_eeprom_w )
 		/* bit 8 is data */
 		/* bit 9 is cs (active low) */
 		/* bit 10 is clock (active high) */
-		eeprom_write_bit(data & 0x0100);
-		eeprom_set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+		input_port_write(space->machine, "EEPROMOUT", data, 0xffff);
 	}
 }
 
@@ -849,7 +761,7 @@ static ADDRESS_MAP_START( glfgreat_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x110000, 0x11001f) AM_WRITE(K053244_word_noA1_w)				/* duplicate! */
 	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE("k053245", k053244_lsb_r, k053244_lsb_w)	/* duplicate! */
 	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE("k053936", k053936_ctrl_w)
-//	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE("k053251", k053251_msb_w)
+	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE("k053251", k053251_msb_w)
 	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(K053251_glfgreat_w)
 	AM_RANGE(0x120000, 0x120001) AM_READ_PORT("P1/P2")
 	AM_RANGE(0x120002, 0x120003) AM_READ_PORT("P3/P4")
@@ -873,9 +785,9 @@ static ADDRESS_MAP_START( prmrsocr_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x110000, 0x11001f) AM_WRITE(K053244_word_noA1_w)				/* duplicate! */
 	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE("k053245", k053244_lsb_r, k053244_lsb_w)	/* duplicate! */
 	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE("k053936", k053936_ctrl_w)
-//	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE("k053251", k053251_msb_w)
+	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE("k053251", k053251_msb_w)
 	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(K053251_glfgreat_w)
-	AM_RANGE(0x120000, 0x120001) AM_READ(prmrsocr_IN0_r)
+	AM_RANGE(0x120000, 0x120001) AM_READ_PORT("P1/COINS")
 	AM_RANGE(0x120002, 0x120003) AM_READ_PORT("P2/EEPROM")
 	AM_RANGE(0x12100c, 0x12100f) AM_WRITE(prmrsocr_sound_cmd_w)
 	AM_RANGE(0x121014, 0x121015) AM_READ(prmrsocr_sound_r)
@@ -1207,7 +1119,7 @@ static ADDRESS_MAP_START( thndrx2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("konami", k053260_w, 0x00ff)
 	AM_RANGE(0x500000, 0x50003f) AM_DEVREADWRITE("k054000", k054000_lsb_r, k054000_lsb_w)
 	AM_RANGE(0x500100, 0x500101) AM_WRITE(thndrx2_eeprom_w)
-	AM_RANGE(0x500200, 0x500201) AM_READ(thndrx2_in0_r)
+	AM_RANGE(0x500200, 0x500201) AM_READ_PORT("P1/COINS")
 	AM_RANGE(0x500202, 0x500203) AM_READ(thndrx2_eeprom_r)
 	AM_RANGE(0x500300, 0x500301) AM_WRITENOP	/* watchdog reset? irq enable? */
 	AM_RANGE(0x600000, 0x607fff) AM_READWRITE(K052109_word_noA12_r, K052109_word_noA12_w)
@@ -1802,9 +1714,14 @@ static INPUT_PORTS_START( blswhstl )
 	KONAMI16_LSB( 2, IPT_UNKNOWN, IPT_UNKNOWN )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM status? - always 1 */
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( glfgreat )
@@ -1893,13 +1810,18 @@ static INPUT_PORTS_START( ssriders )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM status? - always 1 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* ?? TMNT2: OBJMPX */
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )	/* ?? TMNT2: NVBLK */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* ?? TMNT2: IPL0 */
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ssridr4p )
@@ -1926,13 +1848,18 @@ static INPUT_PORTS_START( ssridr4p )
 	KONAMI16_LSB( 4, IPT_UNKNOWN, IPT_UNKNOWN )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM status? - always 1 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* ?? TMNT2: OBJMPX */
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )	/* ?? TMNT2: NVBLK */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* ?? TMNT2: IPL0 */
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 INPUT_PORTS_END
 
 /* Same as 'ssridr4p', but additional Start button for each player.
@@ -1961,13 +1888,18 @@ static INPUT_PORTS_START( ssrid4ps )
 	KONAMI16_LSB( 4, IPT_UNKNOWN, IPT_START4 )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM status? - always 1 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* ?? TMNT2: OBJMPX */
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )	/* ?? TMNT2: NVBLK */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* ?? TMNT2: IPL0 */
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 INPUT_PORTS_END
 
 /* Version for the bootleg, which has the service switch a little different */
@@ -1995,13 +1927,18 @@ static INPUT_PORTS_START( sunsetbl )
 	KONAMI16_LSB( 4, IPT_UNKNOWN, IPT_START4 )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM status? - always 1 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( qgakumon )
@@ -2042,13 +1979,18 @@ static INPUT_PORTS_START( qgakumon )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM status? - always 1 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* ?? TMNT2: OBJMPX */
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )	/* ?? TMNT2: NVBLK (needs to be ACTIVE_HIGH to avoid problems) */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* ?? TMNT2: IPL0 */
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( thndrx2 )
@@ -2065,7 +2007,7 @@ static INPUT_PORTS_START( thndrx2 )
 
 	PORT_START("P2/EEPROM")
 	KONAMI16_LSB( 2, IPT_UNKNOWN, IPT_START2 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM status? - always 1 */
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* VBLK?? */
@@ -2073,6 +2015,11 @@ static INPUT_PORTS_START( thndrx2 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( prmrsocr )
@@ -2097,7 +2044,7 @@ static INPUT_PORTS_START( prmrsocr )
 
 	PORT_START("P2/EEPROM")
 	KONAMI16_LSB( 2, IPT_UNKNOWN, IPT_START2 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM status? - always 1 */
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2105,6 +2052,11 @@ static INPUT_PORTS_START( prmrsocr )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 INPUT_PORTS_END
 
 
@@ -2508,7 +2460,7 @@ static MACHINE_DRIVER_START( blswhstl )
 	MDRV_CPU_PROGRAM_MAP(ssriders_audio_map)
 								/* NMIs are generated by the 053260 */
 
-	MDRV_NVRAM_HANDLER(eeprom)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -2624,7 +2576,7 @@ static MACHINE_DRIVER_START( prmrsocr )
 	MDRV_CPU_PROGRAM_MAP(prmrsocr_audio_map)
 								/* NMIs are generated by the 054539 */
 
-	MDRV_NVRAM_HANDLER(thndrx2)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", thndrx2_eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -2672,7 +2624,7 @@ static MACHINE_DRIVER_START( tmnt2 )
 	MDRV_CPU_PROGRAM_MAP(ssriders_audio_map)
 								/* NMIs are generated by the 053260 */
 
-	MDRV_NVRAM_HANDLER(eeprom)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -2717,7 +2669,7 @@ static MACHINE_DRIVER_START( ssriders )
 	MDRV_CPU_PROGRAM_MAP(ssriders_audio_map)
 								/* NMIs are generated by the 053260 */
 
-	MDRV_NVRAM_HANDLER(eeprom)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -2758,7 +2710,7 @@ static MACHINE_DRIVER_START( sunsetbl )
 	MDRV_CPU_PROGRAM_MAP(sunsetbl_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_NVRAM_HANDLER(eeprom)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -2798,7 +2750,7 @@ static MACHINE_DRIVER_START( thndrx2 )
 	MDRV_CPU_PROGRAM_MAP(thndrx2_audio_map)
 								/* NMIs are generated by the 053260 */
 
-	MDRV_NVRAM_HANDLER(thndrx2)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", thndrx2_eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)

@@ -1811,9 +1811,6 @@ static DEVICE_RESET( k007342 )
 	k007342_state *k007342 = k007342_get_safe_token(device);
 	int i;
 
-	memset(k007342->ram, 0, 0x2000);
-	memset(k007342->scroll_ram, 0, 0x0200);
-
 	k007342->int_enabled = 0;
 	k007342->flipscreen = 0;
 	k007342->scrollx[0] = 0;
@@ -2079,8 +2076,6 @@ static DEVICE_RESET( k007420 )
 {
 	k007420_state *k007420 = k007420_get_safe_token(device);
 	int i;
-
-	memset(k007420->ram, 0, 0x200);
 
 	k007420->flipscreen = 0;
 	for (i = 0; i < 8; i++)
@@ -2361,20 +2356,6 @@ int k052109_get_rmrd_line(const device_config *device )
 	return k052109->RMRD_line;
 }
 
-/* WIP to handle glfgreat & prmrsocr... */
-tilemap *k052109_get_tilemap(const device_config *device, int tmap_num)
-{
-	k052109_state *k052109 = k052109_get_safe_token(device);
-
-	assert(tmap_num < 3);
-	return k052109->tilemap[tmap_num];
-}
-
-void k052109_get_tmap( const device_config *device, tilemap **tilemap, int tmap_num )
-{
-	k052109_state *k052109 = k052109_get_safe_token(device);
-	*tilemap = k052109->tilemap[tmap_num];
-}
 
 void k052109_tilemap_mark_dirty( const device_config *device, int tmap_num )
 {
@@ -2736,8 +2717,6 @@ static DEVICE_RESET( k052109 )
 	k052109->irq_enabled = 0;
 
 	k052109->has_extra_video_ram = 0;
-
-	memset(k052109->ram, 0, 0x6000);
 
 	for (i = 0; i < 3; i++)
 		k052109->dx[i] = k052109->dy[i] = 0;
@@ -4087,9 +4066,6 @@ static DEVICE_RESET( k05324x )
 	k05324x_state *k05324x = k05324x_get_safe_token(device);
 	int i;
 
-	memset(k05324x->ram,  0, k05324x->ramsize / 2);
-	memset(k05324x->buffer,  0, k05324x->ramsize / 2);
-
 	k05324x->z_rejection = -1;
 	k05324x->rombank = 0;
 
@@ -5045,7 +5021,6 @@ static DEVICE_RESET( k053247 )
 	k053247->z_rejection = -1;
 	k053247->objcha_line = CLEAR_LINE;
 
-	memset(k053247->ram,  0, 0x1000);
 	memset(k053247->Kx46_regs, 0, 8);
 	memset(k053247->Kx47_regs, 0, 32);
 }
@@ -5365,16 +5340,15 @@ static DEVICE_START( k051316 )
 
 	state_save_register_device_item_pointer(device, 0, k051316->ram, 0x800);
 	state_save_register_device_item_array(device, 0, k051316->ctrlram);
+	state_save_register_device_item(device, 0, k051316->wraparound);
 }
 
 static DEVICE_RESET( k051316 )
 {
 	k051316_state *k051316 = k051316_get_safe_token(device);
 
-	memset(k051316->ram,  0, 0x800);
 	memset(k051316->ctrlram,  0, 0x10);
 }
-
 
 /***************************************************************************/
 /*                                                                         */
@@ -5600,7 +5574,6 @@ static DEVICE_RESET( k053936 )
 	k053936_state *k053936 = k053936_get_safe_token(device);
 
 	memset(k053936->ctrl, 0, 0x20);
-	memset(k053936->linectrl, 0, 0x4000);
 }
 
 /***************************************************************************/
@@ -5612,8 +5585,6 @@ static DEVICE_RESET( k053936 )
 typedef struct _k053251_state k053251_state;
 struct _k053251_state
 {
-	/* glfgreat wants to pass k052109 tilemaps to k053251... still in progress... */
-	tilemap  *tmaps[5];
 	int      dirty_tmap[5];
 
 	UINT8    ram[16];
@@ -5649,19 +5620,6 @@ void k053251_postload_reset_indexes( const device_config *device )
 	k053251->palette_index[4] = 16 * ((k053251->ram[10] >> 3) & 0x07);
 }
 
-void k053251_set_tilemaps( const device_config *device, tilemap *ci0, tilemap *ci1, tilemap *ci2, tilemap *ci3, tilemap *ci4 )
-{
-	k053251_state *k053251 = k053251_get_safe_token(device);
-
-	k053251->tmaps[0] = ci0;
-	k053251->tmaps[1] = ci1;
-	k053251->tmaps[2] = ci2;
-	k053251->tmaps[3] = ci3;
-	k053251->tmaps[4] = ci4;
-
-	k053251->tilemaps_set = (ci0 || ci1 || ci2 || ci3 || ci4) ? 1 : 0;
-}
-
 WRITE8_DEVICE_HANDLER( k053251_w )
 {
 	k053251_state *k053251 = k053251_get_safe_token(device);
@@ -5682,8 +5640,6 @@ WRITE8_DEVICE_HANDLER( k053251_w )
 				{
 					k053251->palette_index[i] = newind;
 					k053251->dirty_tmap[i] = 1;
-//					if (k053251->tmaps[i])
-//						tilemap_mark_all_tiles_dirty(k053251->tmaps[i]);				
 				}
 			}
 
@@ -5700,8 +5656,6 @@ WRITE8_DEVICE_HANDLER( k053251_w )
 				{
 					k053251->palette_index[3 + i] = newind;
 					k053251->dirty_tmap[3 + i] = 1;
-//					if (k053251->tmaps[3 + i])
-//						tilemap_mark_all_tiles_dirty(k053251->tmaps[3 + i]);				
 				}
 			}
 
@@ -5770,8 +5724,6 @@ static DEVICE_RESET( k053251 )
 
 	for (i = 0; i < 0x10; i++)
 		k053251->ram[i] = 0;
-
-	k053251_set_tilemaps(device, NULL, NULL, NULL, NULL, NULL);
 
 	for (i = 0; i < 5; i++)
 		k053251->dirty_tmap[i] = 0;
@@ -6179,7 +6131,7 @@ void k056832_mark_all_tmaps_dirty( const device_config *device )
 static void k056832_update_page_layout( const device_config *device )
 {
 	k056832_state *k056832 = k056832_get_safe_token(device);
-	int layer, rowstart, rowspan, colstart, colspan, r, c, pageIndex, setlayer;
+	int layer, rowstart, rowspan, colstart, colspan, r, c, page_idx, setlayer;
 
 	// enable layer association by default
 	k056832->layer_association = k056832->default_layer_association;
@@ -6199,9 +6151,9 @@ static void k056832_update_page_layout( const device_config *device )
 		k056832->layer_association = 0;
 
 	// disable all tilemaps
-	for (pageIndex = 0; pageIndex < K056832_PAGE_COUNT; pageIndex++)
+	for (page_idx = 0; page_idx < K056832_PAGE_COUNT; page_idx++)
 	{
-		k056832->layer_assoc_with_page[pageIndex] = -1;
+		k056832->layer_assoc_with_page[page_idx] = -1;
 	}
 
 
@@ -6219,9 +6171,9 @@ static void k056832_update_page_layout( const device_config *device )
 		{
 			for (c = 0; c < colspan; c++)
 			{
-				pageIndex = (((rowstart + r) & 3) << 2) + ((colstart + c) & 3);
-				if (!(k056832->djmain_hack==1) || k056832->layer_assoc_with_page[pageIndex] == -1)
-					k056832->layer_assoc_with_page[pageIndex] = setlayer;
+				page_idx = (((rowstart + r) & 3) << 2) + ((colstart + c) & 3);
+				if (!(k056832->djmain_hack==1) || k056832->layer_assoc_with_page[page_idx] == -1)
+					k056832->layer_assoc_with_page[page_idx] = setlayer;
 			}
 		}
 	}
@@ -6315,13 +6267,10 @@ static void k056832_change_rambank( const device_config *device )
 	int bank = k056832->regs[0x19];
 
 	if (k056832->regs[0] & 0x02)	// external linescroll enable
-	{
 		k056832->selected_page = K056832_PAGE_COUNT;
-	}
 	else
-	{
-		k056832->selected_page = ((bank>>1)&0xc)|(bank&3);
-	}
+		k056832->selected_page = ((bank >> 1) & 0xc) | (bank & 3);
+
 	k056832->selected_page_x4096 = k056832->selected_page << 12;
 
 	// refresh associated tilemaps
@@ -6342,13 +6291,9 @@ static void k056832_change_rombank( const device_config *device )
 	int bank;
 
 	if (k056832->uses_tile_banks)	/* Asterix */
-	{
 		bank = (k056832->regs[0x1a] >> 8) | (k056832->regs[0x1b] << 4) | (k056832->cur_tile_bank << 6);
-	}
 	else
-	{
 		bank = k056832->regs[0x1a] | (k056832->regs[0x1b] << 16);
-	}
 
 	k056832->cur_gfx_banks = bank % k056832->num_gfx_banks;
 }
@@ -7951,7 +7896,19 @@ static DEVICE_START( k056832 )
 	state_save_register_device_item_array(device, 0, k056832->all_lines_dirty);
 	state_save_register_device_item_array(device, 0, k056832->page_tile_mode);
 
-	/* FIXME: a couple of elements are still not registered */
+	for (i = 0; i < 8; i++)
+	{
+		state_save_register_device_item_array(device, i, k056832->layer_offs[i]);
+		state_save_register_device_item_array(device, i, k056832->lsram_page[i]);
+	}
+
+	for (i = 0; i < K056832_PAGE_COUNT; i++)
+	{
+		state_save_register_device_item_array(device, i, k056832->line_dirty[i]);
+		state_save_register_device_item(device, i, k056832->all_lines_dirty[i]);
+		state_save_register_device_item(device, i, k056832->page_tile_mode[i]);
+		state_save_register_device_item(device, i, k056832->last_colorbase[i]);
+	}
 
 //	state_save_register_postload(device->machine, k056832_postload, NULL);
 }
@@ -8919,16 +8876,12 @@ static DEVICE_START( k053250 )
 	state_save_register_device_item_array(device, 0, k053250->regs);
 	state_save_register_device_item(device, 0, k053250->page);
 	state_save_register_device_item(device, 0, k053250->frame);
-	state_save_register_device_item(device, 0, k053250->offsx);
-	state_save_register_device_item(device, 0, k053250->offsy);
 }
 
 static DEVICE_RESET( k053250 )
 {
 	k053250_state *k053250 = k053250_get_safe_token(device);
 	int i;
-
-	memset(k053250->ram, 0, 0x6000 / 2);
 
 	k053250->page = 0;
 	k053250->frame = -1;

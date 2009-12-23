@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "machine/eeprom.h"
 #include "video/konicdev.h"
 #include "includes/tmnt.h"
 
@@ -434,9 +433,7 @@ WRITE16_HANDLER( ssriders_eeprom_w )
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-		eeprom_write_bit(data & 0x01);
-		eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 
 		/* bits 3-4 control palette dimming */
 		/* 4 = DIMPOL = when set, negate SHAD */
@@ -663,30 +660,12 @@ popmessage("%04x",glfgreat_pixel);
 	else return glfgreat_pixel & 0xff;
 }
 
-static void glfgreat_update_dirtytile(running_machine *machine)
-{
-//	const device_config *k052109 = devtag_get_device(machine, "k052109");
-//	const device_config *k053251 = devtag_get_device(machine, "k053251");
-//	int i;
-//
-//	for (i = 0; i < 3; i++)
-//	{
-//		if (k053251_get_tmap_dirty(k053251, 2 + i))
-//		{
-//			k053251_set_tmap_dirty(k053251, 2 + i, 0);
-//			tilemap_mark_all_tiles_dirty(k052109_get_tilemap(k052109, i));
-//		}
-//	}
-}
-
 VIDEO_UPDATE( glfgreat )
 {
 	const device_config *k052109 = devtag_get_device(screen->machine, "k052109");
 	const device_config *k053251 = devtag_get_device(screen->machine, "k053251");
 	const device_config *k053245 = devtag_get_device(screen->machine, "k053245");
 	const device_config *k053936 = devtag_get_device(screen->machine, "k053936");
-
-	glfgreat_update_dirtytile(screen->machine);
 
 	bg_colorbase       = k053251_get_palette_index(k053251, K053251_CI0);
 	sprite_colorbase   = k053251_get_palette_index(k053251, K053251_CI1);

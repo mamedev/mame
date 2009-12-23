@@ -101,7 +101,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "cpu/tms57002/tms57002.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/k054539.h"
 #include "includes/konamigx.h"
 #include "machine/adc083x.h"
@@ -440,27 +440,7 @@ static WRITE32_HANDLER( esc_w )
 }
 
 /**********************************************************************************/
-/* NVRAM and EEPROM handlers */
-
-static int init_eeprom_count;
-
-static NVRAM_HANDLER(konamigx_93C46)
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C46);
-
-		if (file)
-		{
-			init_eeprom_count = 0;
-			eeprom_load(file);
-		}
-		else
-			init_eeprom_count = 10;
-	}
-}
+/* EEPROM handlers */
 
 static CUSTOM_INPUT( gx_rdport1_3_r )
 {
@@ -485,9 +465,7 @@ static WRITE32_HANDLER( eeprom_w )
           bit 0: eeprom data
         */
 
-		eeprom_write_bit((odata&0x01) ? 1 : 0);
-		eeprom_set_cs_line((odata&0x02) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((odata&0x04) ? ASSERT_LINE : CLEAR_LINE);
+		input_port_write(space->machine, "EEPROMOUT", odata, 0xff);
 
 		konamigx_wrport1_0 = odata;
 	}
@@ -912,20 +890,6 @@ static READ32_HANDLER( le2_gun_V_r )
 	return (p1y<<16)|p2y;
 }
 
-static READ32_HANDLER( service_r )
-{
-	int res = input_port_read(space->machine, "SERVICE");
-
-	if (init_eeprom_count)
-	{
-		init_eeprom_count--;
-		res &= ~0x08000000;
-	}
-
-	return res;
-}
-
-
 /**********************************************************************************/
 /* system or game dependent handlers */
 
@@ -1182,7 +1146,7 @@ static ADDRESS_MAP_START( gx_base_memmap, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xd58000, 0xd58003) AM_WRITE(control_w)
 	AM_RANGE(0xd5a000, 0xd5a003) AM_READ_PORT("SYSTEM_DSW")
 	AM_RANGE(0xd5c000, 0xd5c003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xd5e000, 0xd5e003) AM_READ(service_r)
+	AM_RANGE(0xd5e000, 0xd5e003) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xd80000, 0xd8001f) AM_WRITE(K054338_long_w)
 	AM_RANGE(0xda0000, 0xda1fff) AM_READWRITE(K056832_ram_long_r, K056832_ram_long_w)
 	AM_RANGE(0xda2000, 0xda3fff) AM_READWRITE(K056832_ram_long_r, K056832_ram_long_w)
@@ -1337,279 +1301,6 @@ static const k054539_interface k054539_config =
 
 
 /**********************************************************************************/
-/* hardware definitions */
-
-/* i think we could reduce the number of machine drivers with different visible areas by adjusting the sprite
-   positioning on a per game basis too */
-
-static const gfx_layout bglayout_8bpp =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
- 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
- 	16*128
-};
-
-// for scanrows on tilemap
-#if 0
-static const gfx_layout t1_charlayout6 =
-{
-	16, 16,
-	RGN_FRAC(1,1),
-	6,
-	{ 20, 16, 12, 8, 4, 0 },
-	{ 3, 2, 1, 0, 27, 26, 25, 24, 51, 50, 49, 48, 75, 74, 73, 72 },
-	{ 0, 12*8, 12*8*2, 12*8*3, 12*8*4, 12*8*5, 12*8*6, 12*8*7,
-	  12*8*8, 12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
-	16*16*6
-};
-
-static const gfx_layout t1_charlayout8 =
-{
-	16, 16,
-	RGN_FRAC(1,1),
-	8,
-	{ 28, 24, 20, 16, 12, 8, 4, 0 },
-	{ 3, 2, 1, 0, 35, 34, 33, 32, 67, 66, 65, 64, 99, 98, 97, 96 },
-	{ 0, 16*8, 16*8*2, 16*8*3, 16*8*4, 16*8*5, 16*8*6, 16*8*7,
-	  16*8*8, 16*8*9, 16*8*10, 16*8*11, 16*8*12, 16*8*13, 16*8*14, 16*8*15 },
-	16*16*8
-};
-#endif
-
-// for scancols on tilemap
-static const gfx_layout t1_charlayout6 =
-{
-	16, 16,
-	RGN_FRAC(1,1),
-	6,
-	{ 20, 16, 12, 8, 4, 0 },
-	{ 0, 12*8, 12*8*2, 12*8*3, 12*8*4, 12*8*5, 12*8*6, 12*8*7,
-	  12*8*8, 12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
-	{ 3, 2, 1, 0, 27, 26, 25, 24, 51, 50, 49, 48, 75, 74, 73, 72 },
-  16*16*6
-};
-
-static const gfx_layout t1_charlayout8 =
-{
-	16, 16,
-	RGN_FRAC(1,1),
-	8,
-	{ 28, 24, 20, 16, 12, 8, 4, 0 },
-	{ 0, 16*8, 16*8*2, 16*8*3, 16*8*4, 16*8*5, 16*8*6, 16*8*7,
-	  16*8*8, 16*8*9, 16*8*10, 16*8*11, 16*8*12, 16*8*13, 16*8*14, 16*8*15 },
-	{ 3, 2, 1, 0, 35, 34, 33, 32, 67, 66, 65, 64, 99, 98, 97, 96 },
-  16*16*8
-};
-
-/* type 1 (opengolf + racinfrc) use 6 and 8 bpp planar layouts for the 53936 */
-static GFXDECODE_START( opengolf )
-	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout8, 0x0000, 8 )
-	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 8 )
-GFXDECODE_END
-
-static GFXDECODE_START( racinfrc )
-	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout6, 0x0000, 8 )
-	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 8 )
-GFXDECODE_END
-
-/* type 3 & 4 games use a simple 8bpp decode for the 53936 */
-static GFXDECODE_START( type34 )
-	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1000, 8 )
-GFXDECODE_END
-
-static GFXDECODE_START( type4 )
-	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1800, 8 )
-GFXDECODE_END
-
-static MACHINE_DRIVER_START( konamigx )
-	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, 24000000)
-	MDRV_CPU_PROGRAM_MAP(gx_type2_map)
-	MDRV_CPU_VBLANK_INT("screen", konamigx_vbinterrupt)
-
-	MDRV_CPU_ADD("soundcpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(gxsndmap)
-	MDRV_CPU_PERIODIC_INT(irq2_line_hold, 480)
-
-	MDRV_CPU_ADD("dasp", TMS57002, 12500000)
-	MDRV_CPU_DATA_MAP(gxtmsmap)
-	MDRV_CPU_PERIODIC_INT(tms_sync, 48000)
-
-	MDRV_QUANTUM_TIME(HZ(1920))
-
-	MDRV_MACHINE_START(konamigx)
-	MDRV_MACHINE_RESET(konamigx)
-	MDRV_NVRAM_HANDLER(konamigx_93C46)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
-
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
-	/* These parameters are actual value written to the CCU.
-    tbyahhoo attract mode desync is caused by another matter. */
-
-//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
-
-	MDRV_PALETTE_LENGTH(8192)
-
-	MDRV_VIDEO_START(konamigx_5bpp)
-	MDRV_VIDEO_UPDATE(konamigx)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MDRV_SOUND_ADD("konami1", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	MDRV_SOUND_ADD("konami2", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( dragoonj )
-	MDRV_IMPORT_FROM(konamigx)
-	MDRV_CPU_REPLACE("maincpu", M68EC020, 26400000) // needs higher clock to stop sprite flickerings
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
-	MDRV_VIDEO_START(dragoonj)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( le2 )
-	MDRV_IMPORT_FROM(konamigx)
-	MDRV_VIDEO_START(le2)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( konamigx_6bpp )
-	MDRV_IMPORT_FROM(konamigx)
-	MDRV_VIDEO_START(konamigx_6bpp)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( konamigx_6bpp_2 )
-	MDRV_IMPORT_FROM(konamigx)
-	MDRV_VIDEO_START(konamigx_6bpp_2)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( opengolf )
-	MDRV_IMPORT_FROM(konamigx)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
-	MDRV_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
-	MDRV_GFXDECODE(opengolf)
-	MDRV_VIDEO_START(opengolf)
-
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gx_type1_map)
-
-	MDRV_ADC0834_ADD( "adc0834", konamigx_adc_interface )
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( racinfrc )
-	MDRV_IMPORT_FROM(konamigx)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
-	MDRV_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
-	MDRV_GFXDECODE(racinfrc)
-	MDRV_VIDEO_START(racinfrc)
-
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gx_type1_map)
-
-	MDRV_ADC0834_ADD( "adc0834", konamigx_adc_interface )
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( gxtype3 )
-	MDRV_IMPORT_FROM(konamigx)
-
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gx_type3_map)
-	MDRV_CPU_VBLANK_INT_HACK(konamigx_hbinterrupt, 262)
-
-	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
-
-	MDRV_VIDEO_START(konamigx_type3)
-	MDRV_PALETTE_LENGTH(16384)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE(576, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
-
-	MDRV_SCREEN_ADD("screen2", RASTER)
-	MDRV_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(576, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
-
-
-	MDRV_GFXDECODE(type34)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( gxtype4 )
-	MDRV_IMPORT_FROM(konamigx)
-
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gx_type4_map)
-	MDRV_CPU_VBLANK_INT_HACK(konamigx_hbinterrupt, 262)
-
-	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
-
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE(128*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 16, 32*8-1-16)
-
-	MDRV_SCREEN_ADD("screen2", RASTER)
-	MDRV_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(128*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 16, 32*8-1-16)
-
-
-	MDRV_PALETTE_LENGTH(8192)
-	MDRV_GFXDECODE(type4)
-	MDRV_VIDEO_START(konamigx_type4)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( gxtype4vsnet )
-	MDRV_IMPORT_FROM(gxtype4)
-
-	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
-
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE(128*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
-
-	MDRV_SCREEN_MODIFY("screen2")
-	MDRV_SCREEN_SIZE(128*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( gxtype4sd2 )
-	MDRV_IMPORT_FROM(gxtype4)
-
-	MDRV_VIDEO_START(konamigx_type4_sd2)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( winspike )
-	MDRV_IMPORT_FROM(konamigx)
-
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(38, 38+384-1, 16, 16+224-1)
-	MDRV_VIDEO_START(winspike)
-MACHINE_DRIVER_END
-
-/**********************************************************************************/
 /* port maps */
 
 /* here we collect players' inputs: they are shared among all the ports */
@@ -1667,7 +1358,7 @@ static INPUT_PORTS_START( common )
 	//      excpuint stat, objdma stat, eeprom do
 
 	// note: racin' force expects bit 1 of the eeprom port to toggle
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x000000fe, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gx_rdport1_3_r, NULL)
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1678,6 +1369,11 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )	/* DIP#1 & DIP#2 */
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 INPUT_PORTS_END
 
 
@@ -1953,6 +1649,281 @@ static INPUT_PORTS_START( type3 )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_DIPSETTING(          0x02000000, DEF_STR( High ) )
 INPUT_PORTS_END
+
+
+/**********************************************************************************/
+/* hardware definitions */
+
+/* i think we could reduce the number of machine drivers with different visible areas by adjusting the sprite
+   positioning on a per game basis too */
+
+static const gfx_layout bglayout_8bpp =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	8,
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
+ 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+ 	16*128
+};
+
+// for scanrows on tilemap
+#if 0
+static const gfx_layout t1_charlayout6 =
+{
+	16, 16,
+	RGN_FRAC(1,1),
+	6,
+	{ 20, 16, 12, 8, 4, 0 },
+	{ 3, 2, 1, 0, 27, 26, 25, 24, 51, 50, 49, 48, 75, 74, 73, 72 },
+	{ 0, 12*8, 12*8*2, 12*8*3, 12*8*4, 12*8*5, 12*8*6, 12*8*7,
+	  12*8*8, 12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
+	16*16*6
+};
+
+static const gfx_layout t1_charlayout8 =
+{
+	16, 16,
+	RGN_FRAC(1,1),
+	8,
+	{ 28, 24, 20, 16, 12, 8, 4, 0 },
+	{ 3, 2, 1, 0, 35, 34, 33, 32, 67, 66, 65, 64, 99, 98, 97, 96 },
+	{ 0, 16*8, 16*8*2, 16*8*3, 16*8*4, 16*8*5, 16*8*6, 16*8*7,
+	  16*8*8, 16*8*9, 16*8*10, 16*8*11, 16*8*12, 16*8*13, 16*8*14, 16*8*15 },
+	16*16*8
+};
+#endif
+
+// for scancols on tilemap
+static const gfx_layout t1_charlayout6 =
+{
+	16, 16,
+	RGN_FRAC(1,1),
+	6,
+	{ 20, 16, 12, 8, 4, 0 },
+	{ 0, 12*8, 12*8*2, 12*8*3, 12*8*4, 12*8*5, 12*8*6, 12*8*7,
+	  12*8*8, 12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
+	{ 3, 2, 1, 0, 27, 26, 25, 24, 51, 50, 49, 48, 75, 74, 73, 72 },
+  16*16*6
+};
+
+static const gfx_layout t1_charlayout8 =
+{
+	16, 16,
+	RGN_FRAC(1,1),
+	8,
+	{ 28, 24, 20, 16, 12, 8, 4, 0 },
+	{ 0, 16*8, 16*8*2, 16*8*3, 16*8*4, 16*8*5, 16*8*6, 16*8*7,
+	  16*8*8, 16*8*9, 16*8*10, 16*8*11, 16*8*12, 16*8*13, 16*8*14, 16*8*15 },
+	{ 3, 2, 1, 0, 35, 34, 33, 32, 67, 66, 65, 64, 99, 98, 97, 96 },
+  16*16*8
+};
+
+/* type 1 (opengolf + racinfrc) use 6 and 8 bpp planar layouts for the 53936 */
+static GFXDECODE_START( opengolf )
+	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout8, 0x0000, 8 )
+	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 8 )
+GFXDECODE_END
+
+static GFXDECODE_START( racinfrc )
+	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout6, 0x0000, 8 )
+	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 8 )
+GFXDECODE_END
+
+/* type 3 & 4 games use a simple 8bpp decode for the 53936 */
+static GFXDECODE_START( type34 )
+	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1000, 8 )
+GFXDECODE_END
+
+static GFXDECODE_START( type4 )
+	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1800, 8 )
+GFXDECODE_END
+
+static MACHINE_DRIVER_START( konamigx )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M68EC020, 24000000)
+	MDRV_CPU_PROGRAM_MAP(gx_type2_map)
+	MDRV_CPU_VBLANK_INT("screen", konamigx_vbinterrupt)
+
+	MDRV_CPU_ADD("soundcpu", M68000, 8000000)
+	MDRV_CPU_PROGRAM_MAP(gxsndmap)
+	MDRV_CPU_PERIODIC_INT(irq2_line_hold, 480)
+
+	MDRV_CPU_ADD("dasp", TMS57002, 12500000)
+	MDRV_CPU_DATA_MAP(gxtmsmap)
+	MDRV_CPU_PERIODIC_INT(tms_sync, 48000)
+
+	MDRV_QUANTUM_TIME(HZ(1920))
+
+	MDRV_MACHINE_START(konamigx)
+	MDRV_MACHINE_RESET(konamigx)
+
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
+
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
+	/* These parameters are actual value written to the CCU.
+    tbyahhoo attract mode desync is caused by another matter. */
+
+//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
+
+	MDRV_PALETTE_LENGTH(8192)
+
+	MDRV_VIDEO_START(konamigx_5bpp)
+	MDRV_VIDEO_UPDATE(konamigx)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MDRV_SOUND_ADD("konami1", K054539, 48000)
+	MDRV_SOUND_CONFIG(k054539_config)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MDRV_SOUND_ADD("konami2", K054539, 48000)
+	MDRV_SOUND_CONFIG(k054539_config)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( dragoonj )
+	MDRV_IMPORT_FROM(konamigx)
+	MDRV_CPU_REPLACE("maincpu", M68EC020, 26400000) // needs higher clock to stop sprite flickerings
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
+	MDRV_VIDEO_START(dragoonj)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( le2 )
+	MDRV_IMPORT_FROM(konamigx)
+	MDRV_VIDEO_START(le2)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( konamigx_6bpp )
+	MDRV_IMPORT_FROM(konamigx)
+	MDRV_VIDEO_START(konamigx_6bpp)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( konamigx_6bpp_2 )
+	MDRV_IMPORT_FROM(konamigx)
+	MDRV_VIDEO_START(konamigx_6bpp_2)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( opengolf )
+	MDRV_IMPORT_FROM(konamigx)
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
+	MDRV_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
+	MDRV_GFXDECODE(opengolf)
+	MDRV_VIDEO_START(opengolf)
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(gx_type1_map)
+
+	MDRV_ADC0834_ADD( "adc0834", konamigx_adc_interface )
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( racinfrc )
+	MDRV_IMPORT_FROM(konamigx)
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
+	MDRV_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
+	MDRV_GFXDECODE(racinfrc)
+	MDRV_VIDEO_START(racinfrc)
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(gx_type1_map)
+
+	MDRV_ADC0834_ADD( "adc0834", konamigx_adc_interface )
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( gxtype3 )
+	MDRV_IMPORT_FROM(konamigx)
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(gx_type3_map)
+	MDRV_CPU_VBLANK_INT_HACK(konamigx_hbinterrupt, 262)
+
+	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
+
+	MDRV_VIDEO_START(konamigx_type3)
+	MDRV_PALETTE_LENGTH(16384)
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_SIZE(576, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
+
+	MDRV_SCREEN_ADD("screen2", RASTER)
+	MDRV_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(576, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
+
+
+	MDRV_GFXDECODE(type34)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( gxtype4 )
+	MDRV_IMPORT_FROM(konamigx)
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(gx_type4_map)
+	MDRV_CPU_VBLANK_INT_HACK(konamigx_hbinterrupt, 262)
+
+	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
+
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_SIZE(128*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 16, 32*8-1-16)
+
+	MDRV_SCREEN_ADD("screen2", RASTER)
+	MDRV_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(128*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 16, 32*8-1-16)
+
+
+	MDRV_PALETTE_LENGTH(8192)
+	MDRV_GFXDECODE(type4)
+	MDRV_VIDEO_START(konamigx_type4)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( gxtype4vsnet )
+	MDRV_IMPORT_FROM(gxtype4)
+
+	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
+
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_SIZE(128*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
+
+	MDRV_SCREEN_MODIFY("screen2")
+	MDRV_SCREEN_SIZE(128*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( gxtype4sd2 )
+	MDRV_IMPORT_FROM(gxtype4)
+
+	MDRV_VIDEO_START(konamigx_type4_sd2)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( winspike )
+	MDRV_IMPORT_FROM(konamigx)
+
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_VISIBLE_AREA(38, 38+384-1, 16, 16+224-1)
+	MDRV_VIDEO_START(winspike)
+MACHINE_DRIVER_END
 
 
 /**********************************************************************************/

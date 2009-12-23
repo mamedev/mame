@@ -28,7 +28,7 @@
 #include "includes/konamigx.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/k054539.h"
 #include "includes/konamipt.h"
 
@@ -53,7 +53,6 @@ READ16_HANDLER(ddd_053936_tilerom_2_r);
 
 static UINT16 *gx_workram;
 
-static INT32 init_eeprom_count;
 static UINT8 mw_irq_control;
 
 static const eeprom_interface eeprom_intf =
@@ -69,7 +68,7 @@ static const eeprom_interface eeprom_intf =
 
 /* Gaiapolis and Polygonet Commanders use the ER5911,
    but the command formats are slightly different.  Why? */
-static const eeprom_interface eeprom_intf_gaia =
+static const eeprom_interface gaia_eeprom_intf =
 {
 	7,			/* address bits */
 	8,			/* data bits */
@@ -80,75 +79,11 @@ static const eeprom_interface eeprom_intf_gaia =
 	"0100110000000" /* unlock command */
 };
 
-static NVRAM_HANDLER(mystwarr)
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-		{
-			init_eeprom_count = 0;
-			eeprom_load(file);
-		}
-		else
-			init_eeprom_count = 10;
-	}
-}
-
-static NVRAM_HANDLER(gaiapols)
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf_gaia);
-
-		if (file)
-		{
-			init_eeprom_count = 0;
-			eeprom_load(file);
-		}
-		else
-			init_eeprom_count = 10;
-	}
-}
-
-static READ16_HANDLER( mweeprom_r )
+static READ16_HANDLER( eeprom_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		int res = input_port_read(space->machine, "IN1");
-
-		if (init_eeprom_count)
-		{
-			init_eeprom_count--;
-			res &= ~0x04;
-		}
-
-		return res;
-	}
-
-//  logerror("msb access to eeprom port\n");
-
-	return 0;
-}
-
-static READ16_HANDLER( vseeprom_r )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		int res = input_port_read(space->machine, "IN1");
-
-		if (init_eeprom_count)
-		{
-			init_eeprom_count--;
-			res &= ~0x08;
-		}
-
-		return res;
+		return input_port_read(space->machine, "IN1");
 	}
 
 //  logerror("msb access to eeprom port\n");
@@ -160,10 +95,7 @@ static WRITE16_HANDLER( mweeprom_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		eeprom_write_bit((data&0x0100) ? 1 : 0);
-		eeprom_set_cs_line((data&0x0200) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((data&0x0400) ? ASSERT_LINE : CLEAR_LINE);
-		return;
+		input_port_write(space->machine, "EEPROMOUT", data, 0xffff);
 	}
 
 //  logerror("unknown LSB write %x to eeprom\n", data);
@@ -184,10 +116,7 @@ static WRITE16_HANDLER( mmeeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		eeprom_write_bit((data&0x01) ? 1 : 0);
-		eeprom_set_cs_line((data&0x02) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((data&0x04) ? ASSERT_LINE : CLEAR_LINE);
-		return;
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 	}
 }
 
@@ -315,32 +244,6 @@ static WRITE16_HANDLER( irq_ack_w )
 	}
 }
 
-static READ16_HANDLER( mmcoins_r )
-{
-	int res = input_port_read(space->machine, "IN0");
-
-	if (init_eeprom_count)
-	{
-		init_eeprom_count--;
-		res &= ~0x10;
-	}
-
-	return res;
-}
-
-static READ16_HANDLER( dddcoins_r )
-{
-	int res = (input_port_read(space->machine, "IN0")<<8) | input_port_read(space->machine, "P1");
-
-	if (init_eeprom_count)
-	{
-		init_eeprom_count--;
-		res &= ~0x0800;
-	}
-
-	return res;
-}
-
 /* the interface with the 053247 is weird. The chip can address only 0x1000 bytes */
 /* of RAM, but they put 0x10000 there. The CPU can access them all. */
 static READ16_HANDLER( K053247_scattered_word_r )
@@ -385,8 +288,8 @@ static ADDRESS_MAP_START( mystwarr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x492000, 0x492001) AM_WRITENOP	// watchdog
 	AM_RANGE(0x494000, 0x494001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x494002, 0x494003) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x496000, 0x496001) AM_READ(mmcoins_r)
-	AM_RANGE(0x496002, 0x496003) AM_READ(mweeprom_r)
+	AM_RANGE(0x496000, 0x496001) AM_READ_PORT("IN0")
+	AM_RANGE(0x496002, 0x496003) AM_READ(eeprom_r)
 	AM_RANGE(0x49800c, 0x49800d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x49800e, 0x49800f) AM_WRITE(sound_cmd2_w)
 	AM_RANGE(0x498014, 0x498015) AM_READ(sound_status_r)
@@ -431,8 +334,8 @@ static ADDRESS_MAP_START( metamrph_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x270000, 0x27003f) AM_WRITE(K056832_word_w)
 	AM_RANGE(0x274000, 0x274001) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x274002, 0x274003) AM_READ_PORT("P2_P4")
-	AM_RANGE(0x278000, 0x278001) AM_READ(mmcoins_r)
-	AM_RANGE(0x278002, 0x278003) AM_READ(vseeprom_r)
+	AM_RANGE(0x278000, 0x278001) AM_READ_PORT("IN0")
+	AM_RANGE(0x278002, 0x278003) AM_READ(eeprom_r)
 	AM_RANGE(0x27c000, 0x27c001) AM_READNOP	// watchdog lives here
 	AM_RANGE(0x27c000, 0x27c001) AM_WRITE(mmeeprom_w)
 	AM_RANGE(0x300000, 0x301fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)
@@ -475,8 +378,8 @@ static ADDRESS_MAP_START( viostorm_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x270000, 0x27003f) AM_WRITE(K056832_word_w)
 	AM_RANGE(0x274000, 0x274001) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x274002, 0x274003) AM_READ_PORT("P2_P4")
-	AM_RANGE(0x278000, 0x278001) AM_READ(mmcoins_r)
-	AM_RANGE(0x278002, 0x278003) AM_READ(vseeprom_r)
+	AM_RANGE(0x278000, 0x278001) AM_READ_PORT("IN0")
+	AM_RANGE(0x278002, 0x278003) AM_READ(eeprom_r)
 	AM_RANGE(0x27c000, 0x27c001) AM_READNOP		// watchdog lives here
 	AM_RANGE(0x27c000, 0x27c001) AM_WRITE(mmeeprom_w)
 	AM_RANGE(0x300000, 0x301fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)
@@ -561,8 +464,8 @@ static ADDRESS_MAP_START( martchmp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x412000, 0x412001) AM_READWRITE(mccontrol_r,mccontrol_w)
 	AM_RANGE(0x414000, 0x414001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x414002, 0x414003) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x416000, 0x416001) AM_READ(mmcoins_r)						// coin
-	AM_RANGE(0x416002, 0x416003) AM_READ(mweeprom_r)					// eeprom read
+	AM_RANGE(0x416000, 0x416001) AM_READ_PORT("IN0")
+	AM_RANGE(0x416002, 0x416003) AM_READ(eeprom_r)					// eeprom read
 	AM_RANGE(0x418014, 0x418015) AM_READ(sound_status_r)				// z80 status
 	AM_RANGE(0x41800c, 0x41800d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x41800e, 0x41800f) AM_WRITE(sound_cmd2_w)
@@ -609,7 +512,7 @@ static ADDRESS_MAP_START( dadandrn_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x48a014, 0x48a015) AM_READ(sound_status_msb_r)
 	AM_RANGE(0x48a000, 0x48a01f) AM_RAM					// sound regs fall-through
 	AM_RANGE(0x48c000, 0x48c01f) AM_WRITE(K054338_word_w)
-	AM_RANGE(0x48e000, 0x48e001) AM_READ(dddcoins_r)	// bit 3 (0x8) is test switch
+	AM_RANGE(0x48e000, 0x48e001) AM_READ_PORT("IN0_P1")	// bit 3 (0x8) is test switch
 	AM_RANGE(0x48e020, 0x48e021) AM_READ(dddeeprom_r)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE(&gx_workram)
 	AM_RANGE(0x680000, 0x68003f) AM_READWRITE(K055550_word_r,K055550_word_w)
@@ -657,7 +560,7 @@ static ADDRESS_MAP_START( gaiapols_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x48a014, 0x48a015) AM_READ(sound_status_msb_r)
 	AM_RANGE(0x48a000, 0x48a01f) AM_RAM								// sound regs fall-through
 	AM_RANGE(0x48c000, 0x48c01f) AM_WRITE(K054338_word_w)
-	AM_RANGE(0x48e000, 0x48e001) AM_READ(dddcoins_r)				// bit 3 (0x8) is test switch
+	AM_RANGE(0x48e000, 0x48e001) AM_READ_PORT("IN0_P1")				// bit 3 (0x8) is test switch
 	AM_RANGE(0x48e020, 0x48e021) AM_READ(dddeeprom_r)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE(&gx_workram)
 	AM_RANGE(0x660000, 0x6600ff) AM_READWRITE(K054000_lsb_r,K054000_lsb_w)
@@ -723,6 +626,215 @@ static const k054539_interface k054539_config =
 {
 	"shared"
 };
+
+/**********************************************************************************/
+
+static INPUT_PORTS_START( mystwarr )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* game loops if this is set */
+	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
+	PORT_DIPNAME( 0x20, 0x20, "Coin Mechanism" )
+	PORT_DIPSETTING(    0x20, "Common" )
+	PORT_DIPSETTING(    0x00, "Independant" )
+	PORT_DIPNAME( 0x40, 0x40, "Number of Players" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1_P2")
+	KONAMI16_LSB(1, IPT_BUTTON3, IPT_START1 )
+	KONAMI16_MSB(2, IPT_BUTTON3, IPT_START2 )
+
+	PORT_START("P3_P4")
+	KONAMI16_LSB(3, IPT_BUTTON3, IPT_START3 )
+	KONAMI16_MSB(4, IPT_BUTTON3, IPT_START4 )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( metamrph )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
+	PORT_DIPNAME( 0x20, 0x20, "Coin Mechanism" )
+	PORT_DIPSETTING(    0x20, "Common" )
+	PORT_DIPSETTING(    0x00, "Independant" )
+	PORT_DIPNAME( 0x40, 0x40, "Number of Players" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPNAME( 0x80, 0x80, "Continuous Energy Increment" )
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+
+	PORT_START("P1_P3")
+	KONAMI16_LSB(1, IPT_BUTTON3, IPT_START1 )
+	KONAMI16_MSB(3, IPT_BUTTON3, IPT_START3 )
+
+	PORT_START("P2_P4")
+	KONAMI16_LSB(2, IPT_BUTTON3, IPT_START2 )
+	KONAMI16_MSB(4, IPT_BUTTON3, IPT_START4 )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( viostorm )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Coin Mechanism" )
+	PORT_DIPSETTING(    0x40, "Common" )
+	PORT_DIPSETTING(    0x00, "Independant" )
+	PORT_DIPNAME( 0x80, 0x80, "Number of Players" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x80, "2" )
+
+	PORT_START("P1_P3")
+	KONAMI16_LSB(1, IPT_BUTTON3, IPT_START1 )
+	KONAMI16_MSB(3, IPT_BUTTON3, IPT_START3 )
+
+	PORT_START("P2_P4")
+	KONAMI16_LSB(2, IPT_BUTTON3, IPT_START2 )
+	KONAMI16_MSB(4, IPT_BUTTON3, IPT_START4 )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dadandrn )
+	PORT_START("IN0_P1")
+	KONAMI8_B123_START(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x0800, IP_ACTIVE_LOW )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	KONAMI8_B123_START(2)
+
+	PORT_START("P3")
+	KONAMI8_B123_START(3)
+
+	PORT_START("P4")
+	KONAMI8_B123_START(4)
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( martchmp )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* game loops if this is set */
+	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1_P2")
+	KONAMI16_LSB(1, IPT_BUTTON3, IPT_START1 )
+	KONAMI16_MSB(2, IPT_BUTTON3, IPT_START2 )
+
+	PORT_START("P3_P4")
+	KONAMI16_LSB(3, IPT_BUTTON3, IPT_START3 )
+	KONAMI16_MSB(4, IPT_BUTTON3, IPT_START4 )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+INPUT_PORTS_END
 
 /**********************************************************************************/
 
@@ -858,7 +970,8 @@ static MACHINE_DRIVER_START( mystwarr )
 
 	MDRV_QUANTUM_TIME(HZ(1920))
 
-	MDRV_NVRAM_HANDLER(mystwarr)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+
 	MDRV_MACHINE_START(mystwarr)
 	MDRV_MACHINE_RESET(mystwarr)
 
@@ -966,7 +1079,8 @@ static MACHINE_DRIVER_START( gaiapols )
 
 	MDRV_GFXDECODE(gaiapols)
 
-	MDRV_NVRAM_HANDLER(gaiapols)
+	MDRV_DEVICE_REMOVE("eeprom")
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", gaia_eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_START(gaiapols)
@@ -1000,192 +1114,6 @@ static MACHINE_DRIVER_START( martchmp )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
 MACHINE_DRIVER_END
-
-/**********************************************************************************/
-
-static INPUT_PORTS_START( mystwarr )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* game loops if this is set */
-	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
-	PORT_DIPNAME( 0x20, 0x20, "Coin Mechanism" )
-	PORT_DIPSETTING(    0x20, "Common" )
-	PORT_DIPSETTING(    0x00, "Independant" )
-	PORT_DIPNAME( 0x40, 0x40, "Number of Players" )
-	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPSETTING(    0x40, "2" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P1_P2")
-	KONAMI16_LSB(1, IPT_BUTTON3, IPT_START1 )
-	KONAMI16_MSB(2, IPT_BUTTON3, IPT_START2 )
-
-	PORT_START("P3_P4")
-	KONAMI16_LSB(3, IPT_BUTTON3, IPT_START3 )
-	KONAMI16_MSB(4, IPT_BUTTON3, IPT_START4 )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( metamrph )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
-	PORT_DIPNAME( 0x20, 0x20, "Coin Mechanism" )
-	PORT_DIPSETTING(    0x20, "Common" )
-	PORT_DIPSETTING(    0x00, "Independant" )
-	PORT_DIPNAME( 0x40, 0x40, "Number of Players" )
-	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPSETTING(    0x40, "2" )
-	PORT_DIPNAME( 0x80, 0x80, "Continuous Energy Increment" )
-	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-
-	PORT_START("P1_P3")
-	KONAMI16_LSB(1, IPT_BUTTON3, IPT_START1 )
-	KONAMI16_MSB(3, IPT_BUTTON3, IPT_START3 )
-
-	PORT_START("P2_P4")
-	KONAMI16_LSB(2, IPT_BUTTON3, IPT_START2 )
-	KONAMI16_MSB(4, IPT_BUTTON3, IPT_START4 )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( viostorm )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Coin Mechanism" )
-	PORT_DIPSETTING(    0x40, "Common" )
-	PORT_DIPSETTING(    0x00, "Independant" )
-	PORT_DIPNAME( 0x80, 0x80, "Number of Players" )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x80, "2" )
-
-	PORT_START("P1_P3")
-	KONAMI16_LSB(1, IPT_BUTTON3, IPT_START1 )
-	KONAMI16_MSB(3, IPT_BUTTON3, IPT_START3 )
-
-	PORT_START("P2_P4")
-	KONAMI16_LSB(2, IPT_BUTTON3, IPT_START2 )
-	KONAMI16_MSB(4, IPT_BUTTON3, IPT_START4 )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( dadandrn )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P1")
-	KONAMI8_B123_START(1)
-
-	PORT_START("P2")
-	KONAMI8_B123_START(2)
-
-	PORT_START("P3")
-	KONAMI8_B123_START(3)
-
-	PORT_START("P4")
-	KONAMI8_B123_START(4)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( martchmp )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* game loops if this is set */
-	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P1_P2")
-	KONAMI16_LSB(1, IPT_BUTTON3, IPT_START1 )
-	KONAMI16_MSB(2, IPT_BUTTON3, IPT_START2 )
-
-	PORT_START("P3_P4")
-	KONAMI16_LSB(3, IPT_BUTTON3, IPT_START3 )
-	KONAMI16_MSB(4, IPT_BUTTON3, IPT_START4 )
-INPUT_PORTS_END
 
 /**********************************************************************************/
 

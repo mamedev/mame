@@ -364,12 +364,7 @@ int k052109_get_rmrd_line(const device_config *device);
 void k052109_tilemap_update(const device_config *device);
 int k052109_is_irq_enabled(const device_config *device);
 void k052109_set_layer_offsets(const device_config *device, int layer, int dx, int dy);
-
-// WIP code while trying to convert/cleanup glfgreat
-void k052109_get_tmap(const device_config *device, tilemap **tilemap, int tmap_num);
-tilemap *k052109_get_tilemap(const device_config *device, int tmap_num);
 void k052109_tilemap_mark_dirty(const device_config *device, int tmap_num);
-
 void k052109_tilemap_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int tmap_num, UINT32 flags, UINT8 priority);
 void k052109_postload_tileflip_reset( const device_config *device );	// this has to be added to POSTLOAD functions in each driver
 
@@ -521,8 +516,6 @@ WRITE16_DEVICE_HANDLER( k053251_lsb_w );
 WRITE16_DEVICE_HANDLER( k053251_msb_w );
 int k053251_get_priority(const device_config *device, int ci);
 int k053251_get_palette_index(const device_config *device, int ci);
-
-void k053251_set_tilemaps(const device_config *device, tilemap *ci0, tilemap *ci1, tilemap *ci2, tilemap *ci3, tilemap *ci4);
 int k053251_get_tmap_dirty(const device_config *device, int tmap_num);
 void k053251_set_tmap_dirty(const device_config *device, int tmap_num, int data);
 void k053251_postload_reset_indexes(const device_config *device);
