@@ -121,7 +121,7 @@ DISCRETE_SOUND_START(sprint2)
 	/* and are output thru a DAC                    */
 	/************************************************/
 
-	DISCRETE_ADJUSTMENT_TAG(NODE_20,
+	DISCRETE_ADJUSTMENT(NODE_20,
 				RES_K(260),	// R21 + R23 @ max
 				RES_K(10),	// R21 + R23 @ min
 				DISC_LOGADJ, "MOTOR1")
@@ -159,7 +159,7 @@ DISCRETE_SOUND_START(sprint2)
 	/************************************************/
 	/* Car2 motor sound                             */
 	/************************************************/
-	DISCRETE_ADJUSTMENT_TAG(NODE_40,
+	DISCRETE_ADJUSTMENT(NODE_40,
 				RES_K(260),	// R21 + R23 @ max
 				RES_K(10),	// R21 + R23 @ min
 				DISC_LOGADJ, "MOTOR2")
@@ -244,7 +244,7 @@ DISCRETE_SOUND_START(sprint1)
 	/* and are output thru a DAC                    */
 	/************************************************/
 
-	DISCRETE_ADJUSTMENT_TAG(NODE_20,
+	DISCRETE_ADJUSTMENT(NODE_20,
 				RES_K(260),	// R21 + R23 @ max
 				RES_K(10),	// R21 + R23 @ min
 				DISC_LOGADJ, "MOTOR")
@@ -368,7 +368,7 @@ DISCRETE_SOUND_START(dominos)
 	DISCRETE_INPUT_DATA (DOMINOS_AMP_DATA)					// IC C4
 	DISCRETE_INPUT_LOGIC(DOMINOS_ATTRACT_EN)
 
-	DISCRETE_ADJUSTMENT_TAG(DOMINOS_R23,
+	DISCRETE_ADJUSTMENT(DOMINOS_R23,
 				RES_K(60),	// R21 + R23 @ max
 				RES_K(10),	// R21 + R23 @ min
 				DISC_LINADJ, "R23")

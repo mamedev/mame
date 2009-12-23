@@ -451,7 +451,7 @@ static DISCRETE_SOUND_START(dkong2b)
 
 	DISCRETE_TASK_START(1)
 	/* Mixing - DAC */
-	DISCRETE_ADJUSTMENT_TAG(DS_ADJ_DAC, 0, 1, DISC_LINADJ, "VR2")
+	DISCRETE_ADJUSTMENT(DS_ADJ_DAC, 0, 1, DISC_LINADJ, "VR2")
 
 	/* Buffer DAC first to input stream 0 */
 	DISCRETE_INPUT_BUFFER(DS_DAC, 0)
@@ -647,7 +647,7 @@ static DISCRETE_SOUND_START(radarscp)
 	//DISCRETE_INPUT_DATA(DS_DAC)
 
 	/* Mixing - DAC */
-	DISCRETE_ADJUSTMENT_TAG(DS_ADJ_DAC, 0, 1, DISC_LINADJ, "VR2")
+	DISCRETE_ADJUSTMENT(DS_ADJ_DAC, 0, 1, DISC_LINADJ, "VR2")
 
 	/************************************************/
 	/* SIGNALS                                      */

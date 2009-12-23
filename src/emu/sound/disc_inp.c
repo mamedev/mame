@@ -174,14 +174,9 @@ static DISCRETE_RESET(dss_adjustment)
 
 	double min, max;
 
-	if (node->custom)
-	{
-		context->port = input_port_by_tag(&node->info->device->machine->portlist, (const char *)node->custom);
-		if (context->port == NULL)
-			fatalerror("DISCRETE_ADJUSTMENT_TAG - NODE_%d has invalid tag", NODE_BLOCKINDEX(node));
-	}
-	else
-		context->port = input_port_by_index(&node->info->device->machine->portlist, DSS_ADJUSTMENT__PORT);
+	context->port = input_port_by_tag(&node->info->device->machine->portlist, (const char *)node->custom);
+	if (context->port == NULL)
+		fatalerror("DISCRETE_ADJUSTMENT - NODE_%d has invalid tag", NODE_BLOCKINDEX(node));
 
 	context->lastpval = 0x7fffffff;
 	context->pmin     = DSS_ADJUSTMENT__PMIN;

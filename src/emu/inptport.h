@@ -1041,9 +1041,6 @@ void input_port_list_deinit(input_port_list *portlist);
 /* return the config that matches the given tag */
 const input_port_config *input_port_by_tag_slow(const input_port_list *portlist, const char *tag);
 
-/* return the config that matches the given tag */
-const input_port_config *input_port_by_index(const input_port_list *portlist, int index);
-
 /* return the field that matches the given tag and mask */
 const input_field_config *input_field_by_tag_and_mask(const input_port_list *portlist, const char *tag, input_port_value mask);
 

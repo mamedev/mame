@@ -771,25 +771,6 @@ const input_port_config *input_port_by_tag_slow(const input_port_list *portlist,
 
 
 /*-------------------------------------------------
-    input_port_by_index - return a pointer to the
-    port_config associated with the given port
-    index
--------------------------------------------------*/
-
-const input_port_config *input_port_by_index(const input_port_list *portlist, int index)
-{
-	const input_port_config *port;
-
-	/* loop over ports until we hit the index or run out */
-	for (port = portlist->head; port != NULL; port = port->next)
-		if (index-- == 0)
-			return port;
-
-	return NULL;
-}
-
-
-/*-------------------------------------------------
     input_field_by_tag_and_mask - return a pointer
     to the first field that intersects the given
     mask on the tagged port

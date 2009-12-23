@@ -172,7 +172,7 @@ static const discrete_mixer_desc sprint4_mixer =
 					SPRINT4_MOTOR_DATA_##_plr,					/* DATA */                          \
 					DEFAULT_TTL_V_LOGIC_1,						/* VDATA */                         \
 					&sprint4_motor_freq_DAC)					/* LADDER */                        \
-	DISCRETE_ADJUSTMENT_TAG(SPRINT4_PLAYER_MOTOR_NODE(2, _plr),                                     \
+	DISCRETE_ADJUSTMENT(SPRINT4_PLAYER_MOTOR_NODE(2, _plr),                                     \
 					RES_K(10) + RES_K(250),						/* MIN */                           \
 					RES_K(10),									/* MAX */                           \
 					DISC_LOGADJ,								/* LOGLIN */                        \
