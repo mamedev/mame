@@ -1491,7 +1491,6 @@ VIDEO_UPDATE( hng64 )
 	draw_sprites(screen->machine, bitmap,cliprect);
 
 	// 3d really shouldn't be last, but you don't see some cool stuff right now if it's put before sprites.
-	if (hng64_mcu_type != RACING_MCU) // disable on racing games until it stops crashing MAME!
 	{
 		int x, y;
 
@@ -1510,7 +1509,7 @@ VIDEO_UPDATE( hng64 )
 				src++;
 			}
 		}
-		//printf("\n");   /* Debug - ajg */
+		//printf("NEW FRAME!\n");   /* Debug - ajg */
 		clear3d(screen->machine);
 	}
 
@@ -1689,9 +1688,9 @@ static void vecmatmul4(float *product, const float *a, const float *b);
 
 static void performFrustumClip(struct polygon *p);
 static void drawShaded(running_machine *machine, struct polygon *p);
-//static void plot(INT32 x, INT32 y, INT32 color, bitmap_t *bitmap);
-//static void drawline2d(INT32 x0, INT32 y0, INT32 x1, INT32 y1, INT32 color, bitmap_t *bitmap);
-//static void DrawWireframe(struct polygon *p, bitmap_t *bitmap);
+//static void plot(running_machine *machine, INT32 x, INT32 y, UINT32 color);
+//static void drawline2d(running_machine *machine, INT32 x0, INT32 y0, INT32 x1, INT32 y1, UINT32 color);
+//static void DrawWireframe(running_machine *machine, struct polygon *p);
 
 static float uToF(UINT16 input);
 
@@ -2214,16 +2213,49 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				chunkLength = 12;
 				break;
 
-#if 0
 			// TODO: DECODE THESE GUYS //
 			case 0x2e:	// 0010 1110
+				for (m = 0; m < 3; m++)
+				{
+					polys[*numPolys].vert[m].worldCoords[0] = uToF(threeDPointer[3 + (9*m)]);
+					polys[*numPolys].vert[m].worldCoords[1] = uToF(threeDPointer[4 + (9*m)]);
+					polys[*numPolys].vert[m].worldCoords[2] = uToF(threeDPointer[5 + (9*m)]);
+					polys[*numPolys].vert[m].worldCoords[3] = 1.0f;
+					polys[*numPolys].n = 3;
+
+					// threeDPointer[6 + (9*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
+					polys[*numPolys].vert[m].texCoords[0] = uToF(threeDPointer[7 + (9*m)]);
+					polys[*numPolys].vert[m].texCoords[1] = uToF(threeDPointer[8 + (9*m)]);
+					polys[*numPolys].vert[m].texCoords[2] = 0.0f;
+					polys[*numPolys].vert[m].texCoords[3] = 1.0f;
+
+					polys[*numPolys].vert[m].normal[0] = uToF(threeDPointer[9  + (9*m)]);
+					polys[*numPolys].vert[m].normal[1] = uToF(threeDPointer[10 + (9*m)] );
+					polys[*numPolys].vert[m].normal[2] = uToF(threeDPointer[11 + (9*m)] );
+					polys[*numPolys].vert[m].normal[3] = 0.0f;
+
+					// !!! DUMB !!!
+					polys[*numPolys].vert[m].light[0] = polys[*numPolys].vert[m].texCoords[0] * 255.0f;
+					polys[*numPolys].vert[m].light[1] = polys[*numPolys].vert[m].texCoords[1] * 255.0f;
+					polys[*numPolys].vert[m].light[2] = polys[*numPolys].vert[m].texCoords[2] * 255.0f;
+				}
+
+				// Redundantly called, but it works...
+				polys[*numPolys].faceNormal[0] = uToF(threeDPointer[30]);
+				polys[*numPolys].faceNormal[1] = uToF(threeDPointer[31]);
+				polys[*numPolys].faceNormal[2] = uToF(threeDPointer[32]);
+				polys[*numPolys].faceNormal[3] = 0.0f;
+
+				// Missing another 3 words at the end here.
+
 				/* There's something fishy about this guy - see 0x7a below.  Very likely not fixed-length */
 				/*
                 printf("0x2e : %08x\n", address[k]*3*2);
                 for (m = 0; m < 37; m++)
                     printf("%04x ", threeDPointer[m]);
-                printf("\n\n");
-                */
+				printf("\n\n"); 
+				*/
+
 				chunkLength = 36;
 			break;
 
@@ -2262,6 +2294,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				chunkLength = 12;
 			break;
 
+#if 0
 			case 0x86:	// 1000 0110
 				/* Very likely not fixed-length since it leads into c6 & d6 */
 				/*
@@ -2297,7 +2330,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 #endif
 
 			default:
-				logerror("UNKNOWN geometry CHUNK TYPE : %02x\n", chunkType);
+				printf("UNKNOWN geometry CHUNK TYPE : %02x\n", chunkType);
 				chunkLength = 0;
 				break;
 			}
@@ -2475,7 +2508,7 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		{
 			if (polys[i].visible)
 			{
-				//DrawWireframe(&polys[i], bitmap);
+				//DrawWireframe(machine, &polys[i]);
 				drawShaded(machine, &polys[i]);
 			}
 		}
@@ -2786,15 +2819,14 @@ static void performFrustumClip(struct polygon *p)
 // wireframe rendering //
 /////////////////////////
 #ifdef UNUSED_FUNCTION
-static void plot(INT32 x, INT32 y, INT32 color, bitmap_t *bitmap)
+static void plot(running_machine *machine, INT32 x, INT32 y, UINT32 color)
 {
-	*BITMAP_ADDR32(bitmap, y, x) = MAKE_ARGB((UINT8)255, (UINT8)color, (UINT8)color, (UINT8)color);
+	UINT32* cb = &(colorBuffer3d[(y * video_screen_get_visible_area(machine->primary_screen)->max_x) + x]);
+	*cb = color;
 }
-#endif
 
-#ifdef UNUSED_FUNCTION
 // Stolen from http://en.wikipedia.org/wiki/Bresenham's_line_algorithm (no copyright denoted) - the non-optimized version
-static void drawline2d(INT32 x0, INT32 y0, INT32 x1, INT32 y1, INT32 color, bitmap_t *bitmap)
+static void drawline2d(running_machine *machine, INT32 x0, INT32 y0, INT32 x1, INT32 y1, UINT32 color)
 {
 #define SWAP(a,b) tmpswap = a; a = b; b = tmpswap;
 
@@ -2832,11 +2864,11 @@ static void drawline2d(INT32 x0, INT32 y0, INT32 x1, INT32 y1, INT32 color, bitm
 	{
 		if (steep)
 		{
-			plot(x0,y0,color, bitmap);
+			plot(machine, x0, y0, color);
 		}
 		else
 		{
-			plot(y0,x0,color, bitmap);
+			plot(machine, y0, x0, color);
 		}
 		while (e >= 0)
 		{
@@ -2849,17 +2881,16 @@ static void drawline2d(INT32 x0, INT32 y0, INT32 x1, INT32 y1, INT32 color, bitm
 	}
 #undef SWAP
 }
-#endif
 
-#ifdef UNUSED_FUNCTION
-static void DrawWireframe(struct polygon *p, bitmap_t *bitmap)
+static void DrawWireframe(running_machine *machine, struct polygon *p)
 {
 	int j;
 	for (j = 0; j < p->n; j++)
 	{
 		// mame_printf_debug("now drawing : %f %f %f, %f %f %f\n", p->vert[j].clipCoords[0], p->vert[j].clipCoords[1], p->vert[j].clipCoords[2], p->vert[(j+1)%p->n].clipCoords[0], p->vert[(j+1)%p->n].clipCoords[1], p->vert[(j+1)%p->n].clipCoords[2]);
 		// mame_printf_debug("%f %f %f %f\n", p->vert[j].clipCoords[0], p->vert[j].clipCoords[1], p->vert[(j+1)%p->n].clipCoords[0], p->vert[(j+1)%p->n].clipCoords[1]);
-		drawline2d(p->vert[j].clipCoords[0], p->vert[j].clipCoords[1], p->vert[(j+1)%p->n].clipCoords[0], p->vert[(j+1)%p->n].clipCoords[1], 255, bitmap);
+		UINT32 color = MAKE_ARGB((UINT8)255, (UINT8)255, (UINT8)0, (UINT8)0);
+		drawline2d(machine, p->vert[j].clipCoords[0], p->vert[j].clipCoords[1], p->vert[(j+1)%p->n].clipCoords[0], p->vert[(j+1)%p->n].clipCoords[1], color);
 	}
 
 	// SHOWS THE CLIPPING //
@@ -2873,7 +2904,6 @@ static void DrawWireframe(struct polygon *p, bitmap_t *bitmap)
     */
 }
 #endif
-
 
 ///////////////////////
 // polygon rendering //
