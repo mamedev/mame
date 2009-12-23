@@ -33,6 +33,7 @@
 #define CLIOPTION_LISTDEVICES			"listdevices"
 #define CLIOPTION_LISTROMS				"listroms"
 #define CLIOPTION_LISTSAMPLES			"listsamples"
+#define CLIOPTION_LISTDEVICES			"listdevices"
 #define CLIOPTION_VERIFYROMS			"verifyroms"
 #define CLIOPTION_VERIFYSAMPLES			"verifysamples"
 #define CLIOPTION_ROMIDENT				"romident"
@@ -54,5 +55,6 @@ int cli_info_listbrothers(core_options *options, const char *gamename);
 int cli_info_listcrc(core_options *options, const char *gamename);
 int cli_info_listroms(core_options *options, const char *gamename);
 int cli_info_listsamples(core_options *options, const char *gamename);
+int cli_info_listdevices(core_options *options, const char *gamename);
 
 #endif	/* __CLIFRONT_H__ */

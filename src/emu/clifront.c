@@ -93,9 +93,7 @@ static const options_entry cli_options[] =
 	{ "verifyroms",               "0",        OPTION_COMMAND,    "report romsets that have problems" },
 	{ "verifysamples",            "0",        OPTION_COMMAND,    "report samplesets that have problems" },
 	{ "romident",                 "0",        OPTION_COMMAND,    "compare files with known MAME roms" },
-#ifdef MESS
-	{ "listdevices",              "0",        OPTION_COMMAND,    "list available devices" },
-#endif
+	{ "listdevices;ld",           "0",        OPTION_COMMAND,    "list available devices" },
 
 	{ NULL }
 };
@@ -243,9 +241,7 @@ static int execute_commands(core_options *options, const char *exename, const ga
 		{ CLIOPTION_LISTCLONES,		cli_info_listclones },
 		{ CLIOPTION_LISTBROTHERS,	cli_info_listbrothers },
 		{ CLIOPTION_LISTCRC,		cli_info_listcrc },
-#ifdef MESS
-		{ CLIOPTION_LISTDEVICES,	info_listdevices },
-#endif
+		{ CLIOPTION_LISTDEVICES,	cli_info_listdevices },
 		{ CLIOPTION_LISTROMS,		cli_info_listroms },
 		{ CLIOPTION_LISTSAMPLES,	cli_info_listsamples },
 		{ CLIOPTION_VERIFYROMS,		info_verifyroms },
@@ -633,6 +629,67 @@ int cli_info_listsamples(core_options *options, const char *gamename)
 #else
 	mame_printf_error("Samples not supported in this build\n");
 #endif
+
+	return (count > 0) ? MAMERR_NONE : MAMERR_NO_SUCH_GAME;
+}
+
+
+/*-------------------------------------------------
+    cli_info_listdevices - output the list of
+    devices referenced by a given game or set of 
+    games
+-------------------------------------------------*/
+
+int cli_info_listdevices(core_options *options, const char *gamename)
+{
+	int count = 0;
+	int drvindex;
+
+	/* since we expand the machine driver, we need to set things up */
+	init_resource_tracking();
+
+	/* iterate over drivers */
+	for (drvindex = 0; drivers[drvindex] != NULL; drvindex++)
+		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
+		{
+			machine_config *config = machine_config_alloc(drivers[drvindex]->machine_config);
+			const device_config *device;
+			
+			if (count != 0)
+				printf("\n");
+			printf("Driver %s (%s):\n", drivers[drvindex]->name, drivers[drvindex]->description);
+			
+			/* iterate through devices */
+			for (device = config->devicelist.head; device != NULL; device = device->next)
+			{
+				switch (device->devclass)
+				{
+					case DEVICE_CLASS_AUDIO:		printf("  Audio: ");	break;
+					case DEVICE_CLASS_VIDEO:		printf("  Video: ");	break;
+					case DEVICE_CLASS_CPU_CHIP:		printf("    CPU: ");	break;
+					case DEVICE_CLASS_SOUND_CHIP:	printf("  Sound: ");	break;
+					case DEVICE_CLASS_TIMER:		printf("  Timer: ");	break;
+					default:						printf("  Other: ");	break;
+				}
+				printf("%s ('%s')", device_get_name(device), device->tag);
+				if (device->clock >= 1000000000)
+					printf(" @ %d.%02d GHz\n", device->clock / 1000000000, (device->clock / 10000000) % 100);
+				else if (device->clock >= 1000000)
+					printf(" @ %d.%02d MHz\n", device->clock / 1000000, (device->clock / 10000) % 100);
+				else if (device->clock >= 1000)
+					printf(" @ %d.%02d kHz\n", device->clock / 1000, (device->clock / 10) % 100);
+				else if (device->clock > 0)
+					printf(" @ %d Hz\n", device->clock);
+				else
+					printf("\n");
+			}
+
+			count++;
+			machine_config_free(config);
+		}
+
+	/* clean up our tracked resources */
+	exit_resource_tracking();
 
 	return (count > 0) ? MAMERR_NONE : MAMERR_NO_SUCH_GAME;
 }
