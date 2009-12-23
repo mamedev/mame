@@ -828,11 +828,44 @@ ADDRESS_MAP_END
                                 Spark Man
 ***************************************************************************/
 
-/* This is protection, there appears to be a tight correlation with the NMI. */
-static WRITE8_HANDLER( sparkman_nmi_w )
+/*
+Thrash protection code snippet:
+
+0B48: 3E 81         ld   a,$81
+0B4A: 32 BF C3      ld   ($C3BF),a
+0B4D: 21 10 D0      ld   hl,$C808
+0B50: 11 11 D0      ld   de,$C809
+0B53: ED 5F         ld   a,r  ;check this, pretty pointless
+0B55: 77            ld   (hl),a
+0B56: 01 80 00      ld   bc,$0080
+0B59: ED B0         ldir
+0B5B: 3E 18         ld   a,$18
+0B5D: 32 C4 C3      ld   ($C3C4),a
+0B60: 21 67 13      ld   hl,$0B67
+0B63: 22 00 D0      ld   ($C800),hl
+0B66: C9            ret
+
+*/
+
+static UINT8 suna8_trash_prot, *suna8_wram;
+
+/* This is a command-based protection. */
+static WRITE8_HANDLER( sparkman_cmd_prot_w )
 {
-	suna8_nmi_enable = data & 0xff;
-	//if (data & ~0x01) 	logerror("CPU #0 - PC %04X: unknown nmi bits: %02X\n",cpu_get_pc(space->cpu),data);
+	switch(data)
+	{
+		case 0xa6: suna8_nmi_enable = 1; break;
+		case 0x00: suna8_nmi_enable = 0; break;
+		case 0x18: suna8_trash_prot = 0; break;
+		case 0x81: suna8_trash_prot = 1; break;
+		default: logerror("CPU #0 - PC %04X: unknown protection command: %02X\n",cpu_get_pc(space->cpu),data);
+	}
+}
+
+static WRITE8_HANDLER( suna8_wram_w )
+{
+	if(!suna8_trash_prot)
+		suna8_wram[offset] = data;
 }
 
 /*
@@ -898,11 +931,11 @@ static ADDRESS_MAP_START( sparkman_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc200, 0xc200) AM_WRITE(sparkman_spritebank_w		)	// Sprite RAM Bank
 	AM_RANGE(0xc280, 0xc280) AM_WRITE(sparkman_rombank_w		)	// ROM Bank (?mirrored up to c2ff?)
 	AM_RANGE(0xc300, 0xc300) AM_WRITE(sparkman_flipscreen_w		)	// Flip Screen
-	AM_RANGE(0xc380, 0xc3bf) AM_WRITE(sparkman_nmi_w			)	// ? NMI related ?
+	AM_RANGE(0xc380, 0xc3ff) AM_WRITE(sparkman_cmd_prot_w		)	// Protection
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(sparkman_leds_w			)	// Leds + Coin Counter
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_w				)	// To Sound CPU
 	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram	)	// Palette (Banked??)
-	AM_RANGE(0xc800, 0xdfff) AM_RAM									// RAM
+	AM_RANGE(0xc800, 0xdfff) AM_RAM_WRITE(suna8_wram_w) AM_BASE(&suna8_wram)								// RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w	)	// Sprites (Banked)
 ADDRESS_MAP_END
 
