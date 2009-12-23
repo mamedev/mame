@@ -22,7 +22,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "video/konicdev.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
@@ -41,7 +41,7 @@ extern void overdriv_zoom_callback_1(running_machine *machine, int *code,int *co
 
 ***************************************************************************/
 
-static const UINT8 default_eeprom[128] =
+static const UINT8 overdriv_default_eeprom[128] =
 {
 	0x77,0x58,0xFF,0xFF,0x00,0x78,0x90,0x00,0x00,0x78,0x70,0x00,0x00,0x78,0x50,0x00,
 	0x54,0x41,0x4B,0x51,0x31,0x36,0x46,0x55,0x4A,0xFF,0x03,0x00,0x02,0x70,0x02,0x50,
@@ -65,21 +65,6 @@ static const eeprom_interface eeprom_intf =
 	"010011000000"	/* unlock command */
 };
 
-static NVRAM_HANDLER( overdriv )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-			eeprom_load(file);
-		else
-			eeprom_set_data(default_eeprom,sizeof(default_eeprom));
-	}
-}
-
 static WRITE16_HANDLER( eeprom_w )
 {
 //logerror("%06x: write %04x to eeprom_w\n",cpu_get_pc(space->cpu),data);
@@ -88,9 +73,7 @@ static WRITE16_HANDLER( eeprom_w )
 		/* bit 0 is data */
 		/* bit 1 is clock (active high) */
 		/* bit 2 is cs (active low) */
-		eeprom_write_bit(data & 0x01);
-		eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 	}
 }
 
@@ -162,7 +145,7 @@ static WRITE16_HANDLER( cpuB_ctrl_w )
 
 static READ8_DEVICE_HANDLER( overdriv_sound_r )
 {
-	return k053260_r(device,2 + offset);
+	return k053260_r(device, 2 + offset);
 }
 
 static WRITE16_HANDLER( overdriv_soundirq_w )
@@ -247,7 +230,7 @@ static INPUT_PORTS_START( overdriv )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")
@@ -262,6 +245,11 @@ static INPUT_PORTS_START( overdriv )
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(50)
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
 
@@ -336,7 +324,8 @@ static MACHINE_DRIVER_START( overdriv )
 	MDRV_QUANTUM_TIME(HZ(12000))
 
 	MDRV_MACHINE_RESET(overdriv)
-	MDRV_NVRAM_HANDLER(overdriv)
+
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf, 128, overdriv_default_eeprom)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

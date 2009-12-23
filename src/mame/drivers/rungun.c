@@ -40,7 +40,7 @@
 #include "video/konicdev.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/k054539.h"
 #include "includes/konamipt.h"
 
@@ -55,7 +55,6 @@ extern UINT16 *rng_936_videoram;
 extern void rng_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
 
 static UINT16 *rng_sysreg;
-static int init_eeprom_count;
 static int rng_z80_control;
 static int rng_sound_status;
 
@@ -69,24 +68,6 @@ static const eeprom_interface eeprom_intf =
 	"0100000000000",/* lock command */
 	"0100110000000" /* unlock command */
 };
-
-static NVRAM_HANDLER( rungun )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-		{
-			init_eeprom_count = 0;
-			eeprom_load(file);
-		}
-		else
-			init_eeprom_count = 10;
-	}
-}
 
 static READ16_HANDLER( rng_sysregs_r )
 {
@@ -124,12 +105,6 @@ static READ16_HANDLER( rng_sysregs_r )
 			if (ACCESSING_BITS_0_7)
 			{
 				data = input_port_read(space->machine, "DSW");
-
-				if (init_eeprom_count)
-				{
-					init_eeprom_count--;
-					data &= 0xf7;
-				}
 			}
 			return((rng_sysreg[0x06/2] & 0xff00) | data);
 	}
@@ -155,9 +130,7 @@ static WRITE16_HANDLER( rng_sysregs_w )
             */
 			if (ACCESSING_BITS_0_7)
 			{
-				eeprom_write_bit((data & 0x01) ? 1 : 0);
-				eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-				eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+				input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 			}
 
 			if (!(data & 0x40))
@@ -297,7 +270,7 @@ static INPUT_PORTS_START( rng )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x10, 0x00, "Monitors" )
@@ -315,6 +288,11 @@ static INPUT_PORTS_START( rng )
 	PORT_DIPNAME( 0x80, 0x80, "Bit7 (Unknown)" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 
 	PORT_START("P1")
 	KONAMI8_B123_START(1)
@@ -390,7 +368,8 @@ static MACHINE_DRIVER_START( rng )
 	MDRV_GFXDECODE(rungun)
 
 	MDRV_MACHINE_RESET(rng)
-	MDRV_NVRAM_HANDLER(rungun)
+
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_BEFORE_VBLANK)
@@ -624,7 +603,6 @@ static MACHINE_RESET( rng )
 
 	memset(rng_sysreg, 0, 0x20);
 
-	init_eeprom_count = 0;
 	rng_z80_control = 0;
 	rng_sound_status = 0;
 }

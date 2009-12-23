@@ -66,7 +66,7 @@ Unresolved Issues:
 #include "deprecat.h"
 #include "video/konicdev.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/k054539.h"
 #include "sound/2151intf.h"
 #include "sound/flt_vol.h"
@@ -84,7 +84,6 @@ static MACHINE_RESET( xexex );
 
 static UINT16 *xexex_workram;
 static UINT16 cur_control2;
-static int init_eeprom_count;
 static INT32 cur_sound_region, xexex_strip0x1a;
 static int suspension_active, resume_trigger;
 static emu_timer *dmadelay_timer;
@@ -101,25 +100,6 @@ static const eeprom_interface eeprom_intf =
 	"0100000000000",/* lock command */
 	"0100110000000" /* unlock command */
 };
-
-static NVRAM_HANDLER( xexex )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-		{
-			init_eeprom_count = 0;
-			eeprom_load(file);
-		}
-		else
-			init_eeprom_count = 10;
-	}
-}
-
 
 #if 0 // (for reference; do not remove)
 
@@ -211,24 +191,6 @@ static READ16_HANDLER( xexex_waitskip_r )
 }
 
 
-static READ16_HANDLER( control1_r )
-{
-	int res;
-
-	/* bit 0 is EEPROM data */
-	/* bit 1 is EEPROM ready */
-	/* bit 3 is service button */
-	res = input_port_read(space->machine, "EEPROM");
-
-	if (init_eeprom_count)
-	{
-		init_eeprom_count--;
-		res &= 0xf7;
-	}
-
-	return res;
-}
-
 static void parse_control2( running_machine *machine )
 {
 	const device_config *k053246 = devtag_get_device(machine, "k053246");
@@ -239,10 +201,7 @@ static void parse_control2( running_machine *machine )
 	/* bit 5  is enable irq 6 */
 	/* bit 6  is enable irq 5 */
 	/* bit 11 is watchdog */
-
-	eeprom_write_bit(cur_control2 & 0x01);
-	eeprom_set_cs_line((cur_control2 & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-	eeprom_set_clock_line((cur_control2 & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+	input_port_write(machine, "EEPROMOUT", cur_control2, 0xff);
 
 	/* bit 8 = enable sprite ROM reading */
 	k053246_set_objcha_line(k053246, (cur_control2 & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
@@ -393,7 +352,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1")
 	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2")
 	AM_RANGE(0x0dc000, 0x0dc001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0dc002, 0x0dc003) AM_READ(control1_r)
+	AM_RANGE(0x0dc002, 0x0dc003) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
 	AM_RANGE(0x180000, 0x181fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)
@@ -446,11 +405,16 @@ static INPUT_PORTS_START( xexex )
 	KONAMI16_LSB(2, IPT_UNKNOWN, IPT_START2 )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 INPUT_PORTS_END
 
 
@@ -511,7 +475,8 @@ static MACHINE_DRIVER_START( xexex )
 
 	MDRV_MACHINE_START(xexex)
 	MDRV_MACHINE_RESET(xexex)
-	MDRV_NVRAM_HANDLER(xexex)
+
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_BEFORE_VBLANK)
@@ -673,7 +638,6 @@ static MACHINE_START( xexex )
 	state_save_register_postload(machine, xexex_postload, NULL);
 
 	resume_trigger = 1000;
-	init_eeprom_count = 0;
 
 	dmadelay_timer = timer_alloc(machine, dmaend_callback, NULL);
 }

@@ -14,7 +14,6 @@ Added dsw locations and verified factory settings based on Guru's notes
 #include "cpu/z80/z80.h"
 #include "video/konicdev.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
-#include "machine/eeprom.h"
 #include "sound/3812intf.h"
 #include "sound/k053260.h"
 

@@ -90,7 +90,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "video/konicdev.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
 #include "includes/konamipt.h"
@@ -113,9 +113,6 @@ extern void vendetta_sprite_callback(running_machine *machine, int *code,int *co
 
 ***************************************************************************/
 
-static int init_eeprom_count;
-
-
 static const eeprom_interface eeprom_intf =
 {
 	7,				/* address bits */
@@ -127,39 +124,6 @@ static const eeprom_interface eeprom_intf =
 	"0100110000000" /* unlock command */
 };
 
-static NVRAM_HANDLER( vendetta )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-		{
-			init_eeprom_count = 0;
-			eeprom_load(file);
-		}
-		else
-			init_eeprom_count = 1000;
-	}
-}
-
-static READ8_HANDLER( vendetta_eeprom_r )
-{
-	int res = 0;
-
-	res |= 0x02;	//konami_eeprom_ack() << 5;     /* add the ack */
-
-	res |= input_port_read(space->machine, "EEPROM") & 0x0d;	/* test switch */
-
-	if (init_eeprom_count)
-	{
-		init_eeprom_count--;
-		res &= 0xfb;
-	}
-	return res;
-}
 
 static int irq_enabled;
 
@@ -178,9 +142,7 @@ static WRITE8_HANDLER( vendetta_eeprom_w )
 		return;
 
 	/* EEPROM */
-	eeprom_write_bit(data & 0x20);
-	eeprom_set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
-	eeprom_set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+	input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 
 	irq_enabled = ( data >> 6 ) & 1;
 
@@ -290,7 +252,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5fc1, 0x5fc1) AM_READ_PORT("P2")
 	AM_RANGE(0x5fc2, 0x5fc2) AM_READ_PORT("P3")
 	AM_RANGE(0x5fc3, 0x5fc3) AM_READ_PORT("P4")
-	AM_RANGE(0x5fd0, 0x5fd0) AM_READ(vendetta_eeprom_r) /* vblank, service */
+	AM_RANGE(0x5fd0, 0x5fd0) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x5fd1, 0x5fd1) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x5fe0, 0x5fe0) AM_WRITE(vendetta_5fe0_w)
 	AM_RANGE(0x5fe2, 0x5fe2) AM_WRITE(vendetta_eeprom_w)
@@ -311,7 +273,7 @@ static ADDRESS_MAP_START( esckids_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3f81, 0x3f81) AM_READ_PORT("P2")
 	AM_RANGE(0x3f82, 0x3f82) AM_READ_PORT("P3")				// ???  (But not used)
 	AM_RANGE(0x3f83, 0x3f83) AM_READ_PORT("P4")				// ???  (But not used)
-	AM_RANGE(0x3f92, 0x3f92) AM_READ(vendetta_eeprom_r)		// vblank, TEST SW on PCB
+	AM_RANGE(0x3f92, 0x3f92) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x3f93, 0x3f93) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x3fa0, 0x3fa7) AM_DEVWRITE("k053246", k053246_w)			// 053246 (Sprite)
 	AM_RANGE(0x3fb0, 0x3fbf) AM_DEVWRITE("k053251", k053251_w)			// 053251 (Priority Encoder)
@@ -370,11 +332,16 @@ static INPUT_PORTS_START( vendet4p )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* EEPROM ready */
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK ) /* not really vblank, object related. Its timed, otherwise sprites flicker */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vendetta )
@@ -421,11 +388,16 @@ static INPUT_PORTS_START( esckids )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* EEPROM ready */
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK ) /* not really vblank, object related. Its timed, otherwise sprites flicker */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( esckidsj )
@@ -499,7 +471,8 @@ static MACHINE_DRIVER_START( vendetta )
                             /* interrupts are triggered by the main CPU */
 
 	MDRV_MACHINE_RESET(vendetta)
-	MDRV_NVRAM_HANDLER(vendetta)
+
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

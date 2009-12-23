@@ -311,7 +311,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "machine/konppc.h"
 #include "video/voodoo.h"
 #include "machine/timekpr.h"
@@ -633,6 +633,7 @@ static READ8_HANDLER( sysreg_r )
 	UINT8 r = 0;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 	const device_config *adc12138 = devtag_get_device(space->machine, "adc12138");
+	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
 
 	switch (offset)
 	{
@@ -652,7 +653,7 @@ static READ8_HANDLER( sysreg_r )
                 0x02 = ADDOR (ADC DOR)
                 0x01 = ADDO (ADC DO)
             */
-			r = 0xf0 | (eeprom_read_bit() << 3);
+			r = 0xf0 | (eepromdev_read_bit(eeprom) << 3);
 			r |= adc1213x_do_r(adc12138, 0) | (adc1213x_eoc_r(adc12138, 0) << 2);
 			break;
 
@@ -692,9 +693,7 @@ static WRITE8_HANDLER( sysreg_w )
                 0x02 = LAMP1
                 0x01 = LAMP0
             */
-			eeprom_write_bit((data & 0x10) ? 1 : 0);
-			eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-			eeprom_set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+			input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 			mame_printf_debug("System register 0 = %02X\n", data);
 			break;
 
@@ -967,6 +966,11 @@ static INPUT_PORTS_START( hornet )
 	PORT_DIPNAME( 0x01, 0x01, "Monitor Type" ) PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING( 0x01, "24KHz" )
 	PORT_DIPSETTING( 0x00, "15KHz" )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sscope )
@@ -1014,6 +1018,11 @@ static INPUT_PORTS_START( sscope )
 	PORT_DIPNAME( 0x01, 0x01, "Monitor Type" ) PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING( 0x01, "24KHz" )
 	PORT_DIPSETTING( 0x00, "15KHz" )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
 INPUT_PORTS_END
 
 static const sharc_config sharc_cfg =
@@ -1064,11 +1073,6 @@ static MACHINE_RESET( hornet )
 		memory_set_bankptr(machine, "bank5", usr5);
 }
 
-static NVRAM_HANDLER( hornet )
-{
-	NVRAM_HANDLER_CALL(93C46);
-}
-
 static double adc12138_input_callback( const device_config *device, UINT8 input )
 {
 	return (double)0.0;
@@ -1114,7 +1118,7 @@ static MACHINE_DRIVER_START( hornet )
 	MDRV_MACHINE_START( hornet )
 	MDRV_MACHINE_RESET( hornet )
 
-	MDRV_NVRAM_HANDLER( hornet )
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	MDRV_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "screen")
 	MDRV_3DFX_VOODOO_CPU("dsp")

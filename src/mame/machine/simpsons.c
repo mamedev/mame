@@ -13,43 +13,14 @@ int simpsons_firq_enabled;
 
 ***************************************************************************/
 
-static int init_eeprom_count;
-
-
-NVRAM_HANDLER( simpsons )
+WRITE8_HANDLER( simpsons_eeprom_w )
 {
-	if (!read_or_write)
-		init_eeprom_count = file ? 0 : 10;
-}
-
-READ8_DEVICE_HANDLER( simpsons_eeprom_r )
-{
-	int res;
-
-	res = (eepromdev_read_bit(device) << 4);
-
-	res |= 0x20;//konami_eeprom_ack() << 5; /* add the ack */
-
-	res |= input_port_read(device->machine, "TEST") & 1; /* test switch */
-
-	if (init_eeprom_count)
-	{
-		init_eeprom_count--;
-		res &= 0xfe;
-	}
-	return res;
-}
-
-WRITE8_DEVICE_HANDLER( simpsons_eeprom_w )
-{
-	if ( data == 0xff )
+	if (data == 0xff)
 		return;
 
-	eepromdev_write_bit(device, data & 0x80);
-	eepromdev_set_cs_line(device, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
-	eepromdev_set_clock_line(device, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 
-	simpsons_video_banking( device->machine, data & 3 );
+	simpsons_video_banking(space->machine, data & 3);
 
 	simpsons_firq_enabled = data & 0x04;
 }

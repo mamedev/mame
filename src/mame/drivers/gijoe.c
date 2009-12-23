@@ -40,7 +40,7 @@ Known Issues
 #include "cpu/m68000/m68000.h"
 #include "video/konicdev.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/k054539.h"
 #include "includes/konamipt.h"
 
@@ -52,7 +52,6 @@ extern void gijoe_tile_callback(running_machine *machine, int layer, int *code, 
 
 static UINT16 *gijoe_workram;
 static UINT16 cur_control2;
-static int init_eeprom_count;
 static emu_timer *dmadelay_timer;
 
 static const eeprom_interface eeprom_intf =
@@ -66,41 +65,6 @@ static const eeprom_interface eeprom_intf =
 	"0100110000000" /* unlock command */
 };
 
-static NVRAM_HANDLER( gijoe )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-		{
-			init_eeprom_count = 0;
-			eeprom_load(file);
-		}
-		else
-			init_eeprom_count = 2720;
-	}
-}
-
-static READ16_HANDLER( control1_r )
-{
-	int res;
-
-	/* bit 8  is EEPROM data */
-	/* bit 9  is EEPROM ready */
-	/* bit 11 is service button */
-	res = input_port_read(space->machine, "START");
-
-	if (init_eeprom_count)
-	{
-		init_eeprom_count--;
-		res &= 0xf7ff;
-	}
-
-	return res;
-}
 
 static READ16_HANDLER( control2_r )
 {
@@ -118,10 +82,8 @@ static WRITE16_HANDLER( control2_w )
 		/* bit 3  (unknown: coin) */
 		/* bit 5  is enable irq 6 */
 		/* bit 7  (unknown: enable irq 5?) */
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 
-		eeprom_write_bit(data & 0x01);
-		eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 		cur_control2 = data;
 
 		/* bit 6 = enable sprite ROM reading */
@@ -234,7 +196,7 @@ static ADDRESS_MAP_START( gijoe_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1e0000, 0x1e0001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1e0002, 0x1e0003) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x1e4000, 0x1e4001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1e4002, 0x1e4003) AM_READ(control1_r)
+	AM_RANGE(0x1e4002, 0x1e4003) AM_READ_PORT("START")
 	AM_RANGE(0x1e8000, 0x1e8001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x1f0000, 0x1f0001) AM_DEVREAD("k053246", k053246_word_r)
 #if JOE_DEBUG
@@ -259,9 +221,14 @@ static INPUT_PORTS_START( gijoe )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_START3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_START4 )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	// EEPROM data
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_SPECIAL )	// EEPROM ready (always 1)
 	PORT_SERVICE_NO_TOGGLE( 0x0800, IP_ACTIVE_LOW )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1 )
@@ -329,7 +296,8 @@ static MACHINE_DRIVER_START( gijoe )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_START(gijoe)
-	MDRV_NVRAM_HANDLER(gijoe)
+
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_UPDATE_BEFORE_VBLANK)

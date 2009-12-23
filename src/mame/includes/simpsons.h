@@ -2,13 +2,11 @@
 
 extern int simpsons_firq_enabled;
 
-READ8_DEVICE_HANDLER( simpsons_eeprom_r );
-WRITE8_DEVICE_HANDLER( simpsons_eeprom_w );
+WRITE8_HANDLER( simpsons_eeprom_w );
 WRITE8_HANDLER( simpsons_coin_counter_w );
 READ8_HANDLER( simpsons_sound_interrupt_r );
 READ8_DEVICE_HANDLER( simpsons_sound_r );
 MACHINE_RESET( simpsons );
-NVRAM_HANDLER( simpsons );
 
 /*----------- defined in video/simpsons.c -----------*/
 

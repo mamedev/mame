@@ -169,7 +169,7 @@ maybe some priority issues / sprite placement issues..
 #include "cpu/m6809/m6809.h"
 #include "cpu/hd6309/hd6309.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/k054539.h"
 
 #define MAIN_CLOCK		XTAL_24MHz
@@ -189,7 +189,6 @@ WRITE8_HANDLER(lethalen_palette_control);
 extern void lethalen_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
 extern void lethalen_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
 
-static int init_eeprom_count;
 static UINT8 cur_control2;
 
 /* Default Eeprom for the parent.. otherwise it will always complain first boot */
@@ -211,28 +210,6 @@ static const eeprom_interface eeprom_intf =
 	"0100110000000" 	/* unlock command */
 };
 
-static NVRAM_HANDLER( lethalen )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-		{
-			init_eeprom_count = 0;
-			eeprom_load(file);
-		}
-		else
-		{
-			init_eeprom_count = 10;
-			eeprom_set_data(lethalen_default_eeprom,48);
-
-		}
-	}
-}
-
 static WRITE8_HANDLER( control2_w )
 {
 	/* bit 0 is data */
@@ -245,9 +222,7 @@ static WRITE8_HANDLER( control2_w )
 
 	cur_control2 = data;
 
-	eeprom_write_bit(cur_control2 & 0x01);
-	eeprom_set_cs_line((cur_control2 & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-	eeprom_set_clock_line((cur_control2 & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+	input_port_write(space->machine, "EEPROMOUT", cur_control2, 0xff);
 }
 
 static INTERRUPT_GEN(lethalen_interrupt)
@@ -532,7 +507,7 @@ static INPUT_PORTS_START( lethalen )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("DSW")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* it must be 1 ? */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -548,6 +523,11 @@ static INPUT_PORTS_START( lethalen )
 	PORT_DIPNAME( 0x0080, 0x0080, "Sound Output" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Mono ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Stereo ) )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 
 	PORT_START("LIGHT0_X")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
@@ -661,7 +641,7 @@ static MACHINE_DRIVER_START( lethalen )
 	MDRV_MACHINE_START(lethalen)
 	MDRV_MACHINE_RESET(lethalen)
 
-	MDRV_NVRAM_HANDLER(lethalen)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf, 48, lethalen_default_eeprom)
 
 	MDRV_GFXDECODE(lethal)
 

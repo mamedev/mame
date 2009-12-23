@@ -12,7 +12,7 @@ colour, including the word "Konami"
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
 #include "video/konicdev.h"
@@ -25,7 +25,6 @@ extern void asterix_tile_callback(running_machine *machine, int layer, int *code
 extern void asterix_sprite_callback(running_machine *machine, int *code, int *color, int *priority_mask);
 
 static UINT8 cur_control2;
-static int init_eeprom_count;
 
 static const eeprom_interface eeprom_intf =
 {
@@ -37,44 +36,6 @@ static const eeprom_interface eeprom_intf =
 	"1100000000000",/* lock command */
 	"1100110000000" /* unlock command */
 };
-
-static NVRAM_HANDLER( asterix )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-		{
-			init_eeprom_count = 0;
-			eeprom_load(file);
-		}
-		else
-			init_eeprom_count = 10;
-	}
-}
-
-static READ16_HANDLER( control1_r )
-{
-	int res;
-
-	/* bit 8  is EEPROM data */
-	/* bit 9  is EEPROM ready */
-	/* bit 10 is service button */
-	res = input_port_read(space->machine, "IN1");
-
-	if (init_eeprom_count)
-	{
-		init_eeprom_count--;
-		res &= 0xfbff;
-	}
-
-	return res;
-}
-
-
 
 #if 0
 static READ16_HANDLER( control2_r )
@@ -93,10 +54,7 @@ static WRITE16_HANDLER( control2_w )
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-
-		eeprom_write_bit(data & 0x01);
-		eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 
 		/* bit 5 is select tile bank */
 		k056832_set_tile_bank(k056832, (data & 0x20) >> 5);
@@ -191,7 +149,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE("k053244", k053244_lsb_r, k053244_lsb_w)
 	AM_RANGE(0x380000, 0x380001) AM_READ_PORT("IN0")
-	AM_RANGE(0x380002, 0x380003) AM_READ(control1_r)
+	AM_RANGE(0x380002, 0x380003) AM_READ_PORT("IN1")
 	AM_RANGE(0x380100, 0x380101) AM_WRITE(control2_w)
 	AM_RANGE(0x380200, 0x380203) AM_DEVREADWRITE8("konami", asterix_sound_r, k053260_w, 0x00ff)
 	AM_RANGE(0x380300, 0x380301) AM_WRITE(sound_irq_w)
@@ -226,10 +184,15 @@ static INPUT_PORTS_START( asterix )
 
 	PORT_START("IN1")
 	KONAMI16_LSB(2, IPT_UNKNOWN, IPT_START2)
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	// EEPROM data
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNUSED )	// EEPROM ready (always 1)
 	PORT_SERVICE_NO_TOGGLE(0x0400, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eepromdev_set_clock_line)
 INPUT_PORTS_END
 
 
@@ -261,7 +224,7 @@ static MACHINE_DRIVER_START( asterix )
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_NVRAM_HANDLER(asterix)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
