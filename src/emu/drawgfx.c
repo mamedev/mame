@@ -75,6 +75,143 @@ INLINE INT32 normalize_yscroll(bitmap_t *bitmap, INT32 yscroll)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    gfx_init - allocate memory for the graphics
+    elements referenced by a machine
+-------------------------------------------------*/
+
+void gfx_init(running_machine *machine)
+{
+	const gfx_decode_entry *gfxdecodeinfo = machine->config->gfxdecodeinfo;
+	int curgfx;
+
+	/* skip if nothing to do */
+	if (gfxdecodeinfo == NULL)
+		return;
+
+	/* loop over all elements */
+	for (curgfx = 0; curgfx < MAX_GFX_ELEMENTS && gfxdecodeinfo[curgfx].gfxlayout != NULL; curgfx++)
+	{
+		const gfx_decode_entry *gfxdecode = &gfxdecodeinfo[curgfx];
+		UINT32 region_length = 8 * memory_region_length(machine, gfxdecode->memory_region);
+		const UINT8 *region_base = memory_region(machine, gfxdecode->memory_region);
+		UINT32 xscale = (gfxdecode->xscale == 0) ? 1 : gfxdecode->xscale;
+		UINT32 yscale = (gfxdecode->yscale == 0) ? 1 : gfxdecode->yscale;
+		UINT32 *extpoffs, extxoffs[MAX_ABS_GFX_SIZE], extyoffs[MAX_ABS_GFX_SIZE];
+		const gfx_layout *gl = gfxdecode->gfxlayout;
+		int israw = (gl->planeoffset[0] == GFX_RAW);
+		int planes = gl->planes;
+		UINT32 width = gl->width;
+		UINT32 height = gl->height;
+		UINT32 total = gl->total;
+		UINT32 charincrement = gl->charincrement;
+		gfx_layout glcopy;
+		int j;
+
+		/* make a copy of the layout */
+		glcopy = *gfxdecode->gfxlayout;
+
+		/* copy the X and Y offsets into temporary arrays */
+		memcpy(extxoffs, glcopy.xoffset, sizeof(glcopy.xoffset));
+		memcpy(extyoffs, glcopy.yoffset, sizeof(glcopy.yoffset));
+
+		/* if there are extended offsets, copy them over top */
+		if (glcopy.extxoffs != NULL)
+			memcpy(extxoffs, glcopy.extxoffs, glcopy.width * sizeof(extxoffs[0]));
+		if (glcopy.extyoffs != NULL)
+			memcpy(extyoffs, glcopy.extyoffs, glcopy.height * sizeof(extyoffs[0]));
+
+		/* always use the extended offsets here */
+		glcopy.extxoffs = extxoffs;
+		glcopy.extyoffs = extyoffs;
+
+		extpoffs = glcopy.planeoffset;
+
+		/* expand X and Y by the scale factors */
+		if (xscale > 1)
+		{
+			width *= xscale;
+			for (j = width - 1; j >= 0; j--)
+				extxoffs[j] = extxoffs[j / xscale];
+		}
+		if (yscale > 1)
+		{
+			height *= yscale;
+			for (j = height - 1; j >= 0; j--)
+				extyoffs[j] = extyoffs[j / yscale];
+		}
+
+		/* if the character count is a region fraction, compute the effective total */
+		if (IS_FRAC(total))
+		{
+			assert(region_length != 0);
+			total = region_length / charincrement * FRAC_NUM(total) / FRAC_DEN(total);
+		}
+
+		/* for non-raw graphics, decode the X and Y offsets */
+		if (!israw)
+		{
+			/* loop over all the planes, converting fractions */
+			for (j = 0; j < planes; j++)
+			{
+				UINT32 value = extpoffs[j];
+				if (IS_FRAC(value))
+				{
+					assert(region_length != 0);
+					extpoffs[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
+				}
+			}
+
+			/* loop over all the X/Y offsets, converting fractions */
+			for (j = 0; j < width; j++)
+			{
+				UINT32 value = extxoffs[j];
+				if (IS_FRAC(value))
+				{
+					assert(region_length != 0);
+					extxoffs[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
+				}
+			}
+
+			for (j = 0; j < height; j++)
+			{
+				UINT32 value = extyoffs[j];
+				if (IS_FRAC(value))
+				{
+					assert(region_length != 0);
+					extyoffs[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
+				}
+			}
+		}
+
+		/* otherwise, just use the line modulo */
+		else
+		{
+			int base = gfxdecode->start;
+			int end = region_length/8;
+			int linemod = gl->yoffset[0];
+			while (total > 0)
+			{
+				int elementbase = base + (total - 1) * charincrement / 8;
+				int lastpixelbase = elementbase + height * linemod / 8 - 1;
+				if (lastpixelbase < end)
+					break;
+				total--;
+			}
+		}
+
+		/* update glcopy */
+		glcopy.width = width;
+		glcopy.height = height;
+		glcopy.total = total;
+
+		/* allocate the graphics */
+		machine->gfx[curgfx] = gfx_element_alloc(machine, &glcopy, (region_base != NULL) ? region_base + gfxdecode->start : NULL, gfxdecode->total_color_codes, gfxdecode->color_codes_start);
+	}
+}
+
+
+
+/*-------------------------------------------------
     gfx_element_alloc - allocate a gfx_element structure
     based on a given layout
 -------------------------------------------------*/

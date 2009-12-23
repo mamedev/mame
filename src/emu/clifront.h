@@ -33,7 +33,6 @@
 #define CLIOPTION_LISTDEVICES			"listdevices"
 #define CLIOPTION_LISTROMS				"listroms"
 #define CLIOPTION_LISTSAMPLES			"listsamples"
-#define CLIOPTION_LISTDEVICES			"listdevices"
 #define CLIOPTION_VERIFYROMS			"verifyroms"
 #define CLIOPTION_VERIFYSAMPLES			"verifysamples"
 #define CLIOPTION_ROMIDENT				"romident"

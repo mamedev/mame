@@ -174,9 +174,6 @@ static const UINT8 skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
 static void video_exit(running_machine *machine);
 static void init_buffered_spriteram(running_machine *machine);
 
-/* graphics decoding */
-static void allocate_graphics(running_machine *machine, const gfx_decode_entry *gfxdecodeinfo);
-
 static void realloc_screen_bitmaps(const device_config *screen);
 static STATE_POSTLOAD( video_screen_postload );
 
@@ -334,11 +331,6 @@ void video_init(running_machine *machine)
 	if (machine->config->video_attributes & VIDEO_BUFFERS_SPRITERAM)
 		init_buffered_spriteram(machine);
 
-	/* convert the gfx ROMs into character sets. This is done BEFORE calling the driver's */
-	/* palette_init() routine because it might need to check the machine->gfx[] data */
-	if (machine->config->gfxdecodeinfo != NULL)
-		allocate_graphics(machine, machine->config->gfxdecodeinfo);
-
 	/* call the PALETTE_INIT function */
 	if (machine->config->init_palette != NULL)
 		(*machine->config->init_palette)(machine, memory_region(machine, "proms"));
@@ -446,142 +438,6 @@ static void init_buffered_spriteram(running_machine *machine)
 
 		/* register for saving it */
 		state_save_register_global_pointer(machine, machine->generic.buffered_spriteram2.u8, machine->generic.spriteram2_size);
-	}
-}
-
-
-
-/***************************************************************************
-    GRAPHICS DECODING
-***************************************************************************/
-
-/*-------------------------------------------------
-    allocate_graphics - allocate memory for the
-    graphics
--------------------------------------------------*/
-
-static void allocate_graphics(running_machine *machine, const gfx_decode_entry *gfxdecodeinfo)
-{
-	int curgfx;
-
-	/* loop over all elements */
-	for (curgfx = 0; curgfx < MAX_GFX_ELEMENTS && gfxdecodeinfo[curgfx].gfxlayout != NULL; curgfx++)
-	{
-		const gfx_decode_entry *gfxdecode = &gfxdecodeinfo[curgfx];
-		UINT32 region_length = 8 * memory_region_length(machine, gfxdecode->memory_region);
-		const UINT8 *region_base = memory_region(machine, gfxdecode->memory_region);
-		UINT32 xscale = (gfxdecode->xscale == 0) ? 1 : gfxdecode->xscale;
-		UINT32 yscale = (gfxdecode->yscale == 0) ? 1 : gfxdecode->yscale;
-		UINT32 *extpoffs, extxoffs[MAX_ABS_GFX_SIZE], extyoffs[MAX_ABS_GFX_SIZE];
-		const gfx_layout *gl = gfxdecode->gfxlayout;
-		int israw = (gl->planeoffset[0] == GFX_RAW);
-		int planes = gl->planes;
-		UINT32 width = gl->width;
-		UINT32 height = gl->height;
-		UINT32 total = gl->total;
-		UINT32 charincrement = gl->charincrement;
-		gfx_layout glcopy;
-		int j;
-
-		/* make a copy of the layout */
-		glcopy = *gfxdecode->gfxlayout;
-
-		/* copy the X and Y offsets into temporary arrays */
-		memcpy(extxoffs, glcopy.xoffset, sizeof(glcopy.xoffset));
-		memcpy(extyoffs, glcopy.yoffset, sizeof(glcopy.yoffset));
-
-		/* if there are extended offsets, copy them over top */
-		if (glcopy.extxoffs != NULL)
-			memcpy(extxoffs, glcopy.extxoffs, glcopy.width * sizeof(extxoffs[0]));
-		if (glcopy.extyoffs != NULL)
-			memcpy(extyoffs, glcopy.extyoffs, glcopy.height * sizeof(extyoffs[0]));
-
-		/* always use the extended offsets here */
-		glcopy.extxoffs = extxoffs;
-		glcopy.extyoffs = extyoffs;
-
-		extpoffs = glcopy.planeoffset;
-
-		/* expand X and Y by the scale factors */
-		if (xscale > 1)
-		{
-			width *= xscale;
-			for (j = width - 1; j >= 0; j--)
-				extxoffs[j] = extxoffs[j / xscale];
-		}
-		if (yscale > 1)
-		{
-			height *= yscale;
-			for (j = height - 1; j >= 0; j--)
-				extyoffs[j] = extyoffs[j / yscale];
-		}
-
-		/* if the character count is a region fraction, compute the effective total */
-		if (IS_FRAC(total))
-		{
-			assert(region_length != 0);
-			total = region_length / charincrement * FRAC_NUM(total) / FRAC_DEN(total);
-		}
-
-		/* for non-raw graphics, decode the X and Y offsets */
-		if (!israw)
-		{
-			/* loop over all the planes, converting fractions */
-			for (j = 0; j < planes; j++)
-			{
-				UINT32 value = extpoffs[j];
-				if (IS_FRAC(value))
-				{
-					assert(region_length != 0);
-					extpoffs[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
-				}
-			}
-
-			/* loop over all the X/Y offsets, converting fractions */
-			for (j = 0; j < width; j++)
-			{
-				UINT32 value = extxoffs[j];
-				if (IS_FRAC(value))
-				{
-					assert(region_length != 0);
-					extxoffs[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
-				}
-			}
-
-			for (j = 0; j < height; j++)
-			{
-				UINT32 value = extyoffs[j];
-				if (IS_FRAC(value))
-				{
-					assert(region_length != 0);
-					extyoffs[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
-				}
-			}
-		}
-
-		/* otherwise, just use the line modulo */
-		else
-		{
-			int base = gfxdecode->start;
-			int end = region_length/8;
-			int linemod = gl->yoffset[0];
-			while (total > 0)
-			{
-				int elementbase = base + (total - 1) * charincrement / 8;
-				int lastpixelbase = elementbase + height * linemod / 8 - 1;
-				if (lastpixelbase < end)
-					break;
-				total--;
-			}
-		}
-
-		/* update glcopy */
-		glcopy.width = width;
-		glcopy.height = height;
-		glcopy.total = total;
-
-		/* allocate the graphics */
-		machine->gfx[curgfx] = gfx_element_alloc(machine, &glcopy, (region_base != NULL) ? region_base + gfxdecode->start : NULL, gfxdecode->total_color_codes, gfxdecode->color_codes_start);
 	}
 }
 

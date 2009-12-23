@@ -1530,6 +1530,9 @@ static void init_machine(running_machine *machine)
 	cpuexec_init(machine);
 	watchdog_init(machine);
 
+	/* allocate the gfx elements prior to device initialization */
+	gfx_init(machine);
+
 #ifdef MESS
 	/* first MESS initialization */
 	mess_predevice_init(machine);

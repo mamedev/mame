@@ -168,6 +168,9 @@ struct _gfx_decode_entry
 
 /* ----- graphics elements ----- */
 
+/* allocate memory for the graphics elements referenced by a machine */
+void gfx_init(running_machine *machine);
+
 /* allocate a gfx_element structure based on a given layout */
 gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, const UINT8 *srcdata, UINT32 total_colors, UINT32 color_base);
 
