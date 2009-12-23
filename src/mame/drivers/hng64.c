@@ -621,9 +621,9 @@ static READ32_HANDLER( hng64_sysregs_r )
 /* preliminary dma code, dma is used to copy program code -> ram */
 static INT32 hng_dma_start,hng_dma_dst,hng_dma_len;
 
-static void hng64_do_dma (const address_space *space)
+static void hng64_do_dma(const address_space *space)
 {
-	printf("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
+	//printf("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
 
 	while (hng_dma_len>=0)
 	{
@@ -920,6 +920,7 @@ static READ32_HANDLER( dl_r )
 // Some kind of buffering of the display lists, or 'render current buffer' write?
 static WRITE32_HANDLER( dl_control_w )
 {
+	//printf("\n");   // Debug - ajg
 	// TODO: put this back in.
 	/*
 	if (activeBuffer==0 || activeBuffer==1)
@@ -1744,6 +1745,7 @@ static DRIVER_INIT(hng64_fght)
 
 static DRIVER_INIT( fatfurwa )
 {
+	/* FILE* fp = fopen("/tmp/test.bin", "wb"); fwrite(memory_region(machine, "verts"), 1, 0x0c00000*2, fp); fclose(fp); */
 	DRIVER_INIT_CALL(hng64_fght);
 	hng64_mcu_type = FIGHT_MCU;
 }
@@ -2013,7 +2015,6 @@ ROM_START( sams64 )
 	ROM_LOAD( "002-tx03a.15", 0x0800000, 0x400000, CRC(68c313f7) SHA1(90ce8d0d19a994647c7167e3b256ff31647e575a) )
 	ROM_LOAD( "002-tx04a.16", 0x0c00000, 0x400000, CRC(f7dac24f) SHA1(1215354f28cbeb9fc38f6a7acae450ad5f34bb6a) )
 
-
 	/* X,Y,Z Vertex ROMs */
 	ROM_REGION( 0x1800000, "verts", 0 )
 	ROMX_LOAD( "002-vt01a.17", 0x0000000, 0x400000, CRC(403fd7fd) SHA1(9bdadbeb4cd13c4c4e89a1c233af9eaaa46f8fdf), ROM_GROUPWORD | ROM_SKIP(4) )
@@ -2268,7 +2269,7 @@ ROM_START( fatfurwa )
 	ROM_LOAD( "006tx04a.16",0x0c00000, 0x400000, CRC(82d61652) SHA1(28303ae9e2545a4cb0b5843f9e73407754f41e9e) )
 
 	/* X,Y,Z Vertex ROMs */
-	ROM_REGION16_BE( 0x0c00000, "verts", 0 )
+	ROM_REGION( 0x0c00000, "verts", 0 )
 	ROMX_LOAD( "006vt01a.17", 0x0000000, 0x400000, CRC(5c20ed4c) SHA1(df679f518292d70b9f23d2bddabf975d56b96910), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "006vt02a.18", 0x0000002, 0x400000, CRC(150eb717) SHA1(9acb067346eb386256047c0f1d24dc8fcc2118ca), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "006vt03a.19", 0x0000004, 0x400000, CRC(021cfcaf) SHA1(fb8b5f50d3490b31f0a4c3e6d3ae1b98bae41c97), ROM_GROUPWORD | ROM_SKIP(4) )
@@ -2340,7 +2341,7 @@ ROM_START( buriki )
 	ROM_LOAD( "007tx04a.16",0x0c00000, 0x400000, CRC(02aa3f46) SHA1(1fca89c70586f8ebcdf669ecac121afa5cdf623f) )
 
 	/* X,Y,Z Vertex ROMs */
-	ROM_REGION16_BE( 0x0c00000, "verts", 0 )
+	ROM_REGION( 0x0c00000, "verts", 0 )
 	ROMX_LOAD( "007vt01a.17", 0x0000000, 0x400000, CRC(f78a0376) SHA1(fde4ddd4bf326ae5f1ed10311c237b13b62e060c), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "007vt02a.18", 0x0000002, 0x400000, CRC(f365f608) SHA1(035fd9b829b7720c4aee6fdf204c080e6157994f), ROM_GROUPWORD | ROM_SKIP(4) )
 	ROMX_LOAD( "007vt03a.19", 0x0000004, 0x400000, CRC(ba05654d) SHA1(b7fe532732c0af7860c8eded3c5abd304d74e08e), ROM_GROUPWORD | ROM_SKIP(4) )

@@ -1510,8 +1510,8 @@ VIDEO_UPDATE( hng64 )
 				src++;
 			}
 		}
-		//printf("\n");   /* DEBUG */
-		clear3d(screen->machine);	/* TODO: Inline */
+		//printf("\n");   /* Debug - ajg */
+		clear3d(screen->machine);
 	}
 
 	if(0)
@@ -1636,7 +1636,7 @@ VIDEO_START( hng64 )
 	tilemap_set_transparent_pen(hng64_tilemap3_16x16,0);
 	tilemap_set_transparent_pen(hng64_tilemap3_16x16_alt,0);
 
-	// debug switch, turn on / off additive blending on a per-tilemap basis
+	// Debug switch, turn on / off additive blending on a per-tilemap basis
 	additive_tilemap_debug = 0;
 
 	// 3d Buffer Allocation
@@ -1694,7 +1694,6 @@ static void drawShaded(running_machine *machine, struct polygon *p);
 //static void DrawWireframe(struct polygon *p, bitmap_t *bitmap);
 
 static float uToF(UINT16 input);
-#define WORD_AT(BUFFER,OFFSET) ((BUFFER[OFFSET] << 8) | BUFFER[OFFSET+1])
 
 
 ////////////////////
@@ -1846,6 +1845,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	//                                 0118|0108 for fatfurwa fighters infight,
 	//                                 0108->0118 for fatfurwa globe (transitions when players are selected,
 	//                                 00d8 for segfaulting geo in xrally & roadedge)
+	//                                (00!0 is thought to be for lighting maybe?)
 	// [2]  - xxxx ... offset into ROM
 	// [3]  - xxxx ... offset into ROM
 	// [4]  - xxxx ... Transformation matrix
@@ -1863,10 +1863,11 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	////////////*/
 	int k, l, m;
 
-	UINT8 *threeDRoms;
-	UINT8 *threeDPointer;
-	UINT32 dword1;
-	UINT32 threeDOffset;
+	UINT32  tempDWord;
+	UINT32  threeDOffset;
+	UINT16* threeDRoms;
+	UINT16* threeDPointer;
+
 	UINT32 size[4];
 	UINT32 address[4];
 	UINT32 megaOffset;
@@ -1884,36 +1885,40 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	// GEOMETRY
 	setIdentity(objectMatrix);
 
-	threeDRoms = memory_region(machine, "verts");
-
-	/////////////////////////
-	// GET THE HEADER INFO //
-	/////////////////////////
+	/////////////////
+	// HEADER INFO //
+	/////////////////
 
 	// 3d ROM Offset
-	// FIXME: This decoding works for buriki and fatfurwa, but not for xrally.
-	dword1 = (((UINT32)packet[2]) << 16) | ((UINT32)packet[3]);
-	threeDOffset = dword1 & 0x000fffff;
-	threeDOffset = (threeDOffset << 1) * 3;
+	tempDWord = (((UINT32)packet[2]) << 16) | ((UINT32)packet[3]);
+	threeDOffset = tempDWord & 0xffffffff;
 
-	threeDPointer = &threeDRoms[threeDOffset];
+	threeDRoms = (UINT16*)(memory_region(machine, "verts"));
+	threeDPointer = &threeDRoms[threeDOffset * 3];
 
-	// I think this packet entry has something to do with lighting.
-	// It's 0 for the 66-byte lit globe in the character select and 0 for something in terry's hand.
-	// if (packet[1] & 0x0010)
+	// Debug - ajg
+	/*
+	printf("%08x : ", tempDWord*3*2);
+	for (k = 0; k < 7*3; k++)
+	{
+		printf("%04x ", threeDPointer[k]);
+		if ((k % 3) == 2) printf(" ");
+	}
+	printf("\n");
+	*/
 
-	//////////////////////////////////////////
-	// GET THE OBJECT TRANSFORMATION MATRIX //
-	//////////////////////////////////////////
-	objectMatrix[8 ] = uToF(packet[7]);
-	objectMatrix[4 ] = uToF(packet[8]);
-	objectMatrix[0 ] = uToF(packet[9]);
-	objectMatrix[3]  = 0.0f;
+	//////////////////////////////////////
+	// THE OBJECT TRANSFORMATION MATRIX //
+	//////////////////////////////////////
+	objectMatrix[8] = uToF(packet[7]);
+	objectMatrix[4] = uToF(packet[8]);
+	objectMatrix[0] = uToF(packet[9]);
+	objectMatrix[3] = 0.0f;
 
-	objectMatrix[9 ] = uToF(packet[10]);
-	objectMatrix[5 ] = uToF(packet[11]);
-	objectMatrix[1 ] = uToF(packet[12]);
-	objectMatrix[7]  = 0.0f;
+	objectMatrix[9] = uToF(packet[10]);
+	objectMatrix[5] = uToF(packet[11]);
+	objectMatrix[1] = uToF(packet[12]);
+	objectMatrix[7] = 0.0f;
 
 	objectMatrix[10] = uToF(packet[13]);
 	objectMatrix[6 ] = uToF(packet[14]);
@@ -1929,223 +1934,382 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 	//////////////////////////////////////////////////////////
 	// EXTRACT DATA FROM THE ADDRESS POINTED TO IN THE FILE //
 	//////////////////////////////////////////////////////////
+	/*//////////////////////////////////////////////
+	// DIRECTLY-POINTED-TO FORMAT (7 words x 3 ROMs)
+	// [0]  - lower word of sub-address 1
+	// [1]  - lower word of sub-address 2
+	// [2]  - upper word of all sub-addresses
+	// [3]  - lower word of sub-address 3
+	// [4]  - lower word of sub-address 4
+	// [5]  - ???? always 0 ????
+	// [6]  - number of triangles in sub-address 1 block
+	// [7]  - number of triangles in sub-address 2 block
+	// [8]  - ???? always 0 ????
+	// [9]  - number of triangles in sub-address 3 block
+	// [10] - number of triangles in sub-address 4 block
+	// [11] - ? definitely used.
+	// [12] - ? definitely used.
+	// [13] - ? definitely used.
+	// [14] - ? definitely used.
+	// [15] - ???? always 0 ????
+	// [16] - ???? always 0 ????
+	// [17] - ???? always 0 ????
+	// [18] - ???? always 0 ????
+	// [19] - ???? always 0 ????
+	// [20] - ???? always 0 ????
+	//////////////////////////////////////////////*/
+    
+	// There are 4 hunks per address.
+	address[0] = threeDPointer[0];
+	address[1] = threeDPointer[1];
+	megaOffset = threeDPointer[2];
 
-	// Okay, there are 4 hunks per address.  They all seem good too...
+	address[2] = threeDPointer[3];
+	address[3] = threeDPointer[4];
+	if (threeDPointer[5] != 0x0000) printf("ZOMG!  3dPointer[5] is non-zero!\n");
 
-	// First tell me how many 'chunks' are at each address...
-	size[0] = WORD_AT(threeDPointer, ( 6<<1));
-	size[1] = WORD_AT(threeDPointer, ( 7<<1));
-	size[2] = WORD_AT(threeDPointer, ( 9<<1));
-	size[3] = WORD_AT(threeDPointer, (10<<1));
+	size[0]    = threeDPointer[6];
+	size[1]    = threeDPointer[7];
+	if (threeDPointer[8] != 0x0000) printf("ZOMG!  3dPointer[8] is non-zero!\n");
 
-	megaOffset = ( WORD_AT(threeDRoms, (threeDOffset + 4)) ) << 16;
-	address[0] = megaOffset | WORD_AT(threeDPointer, (0<<1));
-	address[1] = megaOffset | WORD_AT(threeDPointer, (1<<1));
-	address[2] = megaOffset | WORD_AT(threeDPointer, (3<<1));
-	address[3] = megaOffset | WORD_AT(threeDPointer, (4<<1));
+	size[2]    = threeDPointer[9];
+	size[3]    = threeDPointer[10];
+	/*           ????         [11]; Used. */
 
-	// DEBUG
-	// mame_printf_debug("%.5x %.3x %.5x %.3x %.5x %.3x %.5x %.3x\n", address[0], size[0], address[1], size[1], address[2], size[2], address[3], size[3]);
-	// !! END DEBUG !!
+	/*           ????         [12]; Used. */
+	/*           ????         [13]; Used. */
+	/*           ????         [14]; Used. */
 
-	for (k = 0; k < 4; k++)										// For all 4 chunks
+	/*           ????         [15]; Used? */
+	/*           ????         [16]; Used? */
+	/*           ????         [17]; Used? */
+
+	/*           ????         [18]; Used? */
+	/*           ????         [19]; Used? */
+	/*           ????         [20]; Used? */
+
+	/* Concatenate the megaOffset with the addresses */
+	address[0] |= (megaOffset << 16);
+	address[1] |= (megaOffset << 16);
+	address[2] |= (megaOffset << 16);
+	address[3] |= (megaOffset << 16);
+
+	/* For all 4 polygon chunks */
+	for (k = 0; k < 4; k++)
 	{
-		threeDPointer = &threeDRoms[(address[k]<<1) * 3];
-
+		threeDPointer = &threeDRoms[address[k] * 3];
 		for (l = 0; l < size[k]; l++)
 		{
 			////////////////////////////////////////////
 			// GATHER A SINGLE TRIANGLE'S INFORMATION //
 			////////////////////////////////////////////
-			UINT8 triangleType = threeDPointer[1];
-
-			UINT8 numVertices = 3;
+			/*/////////////////////////
+			// SINGLE POLY CHUNK FORMAT
+			// [0] ??-- - ???? unused ????
+			// [0] --xx - chunk type
+			// [1] x--- - 'texture type' (or UV-mapping style)?
+			// [1] -??- - ???? '18' for untextured buildings in fatfurwa ????
+			// [1] ---x - texture index
+			// [2] ???? - used in fatfurwa 'hng64' & everywhere in roadedge
+			/////////////////////////*/
 			UINT8 chunkLength = 0;
+			UINT8 chunkType = threeDPointer[0] & 0x00ff;
 
-			// Some chunks only have 1 vertex (they act as a vertex fan)
-			if (triangleType == 0x97 ||
-				triangleType == 0x87 ||
-				triangleType == 0xd7 ||
-				triangleType == 0x96)
-				numVertices = 1;
+			// Debug - ajg
+			//printf("%d (%08x) : %04x %04x %04x ", k, address[k]*3*2, threeDPointer[0], threeDPointer[1], threeDPointer[2]);
+			//break;
+
+			// Debug - ajg
+			//if ((threeDPointer[0] & 0xff00) != 0x0000)
+			//{
+			//	printf("!!! Doesn't appear to be a valid chunk !!!\n");
+			//	continue;
+			//}
 
 			// Get which texture this polygon refers to...
-			// In fatfur it's 0xc for the smooth-shaded earth       - maybe this is for all things with alpha - check the hair at some point...
+			// In fatfur it's 0xc for the smooth-shaded earth - maybe this is for all things with alpha - check the hair at some point.
 			//                0x9 for the untextured buildings
 			//                0xd for the 'explosion' of the HNG64
 			//            and 0x8 everywhere else...
 			//        they're 0x8 in the buriki intro too (those are 66-byte chunks!)
-			polys[*numPolys].texType = ((threeDPointer[2] & 0xf0) >> 4);
+			polys[*numPolys].texType = ((threeDPointer[1] & 0xf000) >> 4 >> 8);
 
 			if (polys[*numPolys].texType == 0x8 || polys[*numPolys].texType == 0xc)		//  || polys[*numPolys].texType == 0x9
-				polys[*numPolys].texIndex = threeDPointer[3] & 0x0f;
+			{
+				polys[*numPolys].texIndex = threeDPointer[1] & 0x000f;
+			}
 			else
+			{
 				polys[*numPolys].texIndex = -1;
+			}
 
 			// Set the polygon's palette
 			polys[*numPolys].palIndex = paletteState3d;
 
-			for (m = 0; m < numVertices; m++)								// For all vertices of the chunk
+			switch(chunkType)
 			{
-				switch(triangleType)
+			/*/////////////////////////
+			// CHUNK TYPE BITS - These are very likely incorrect.
+			// x--- ---- - 1 = Has only 1 vertex (part of a triangle fan/strip)
+			// -x-- ---- - 
+			// --x- ---- - 
+			// ---x ---- - 
+			// ---- x--- - 
+			// ---- -x-- - 1 = Has per-vert UVs
+			// ---- --x- - 
+			// ---- ---x - 1 = Has per-vert normals
+			/////////////////////////*/
+
+			// 33 word chunk, 3 vertices, per-vertex UVs & normals
+			case 0x05:	// 0000 0101
+			case 0x0f:	// 0000 1111
+				for (m = 0; m < 3; m++)
 				{
-				// 42 byte chunk
-				case 0x04:
-				case 0x0e:
-					polys[*numPolys].vert[m].worldCoords[0] = uToF(WORD_AT(threeDPointer, ((3<<1) + (6<<1)*m)) );
-					polys[*numPolys].vert[m].worldCoords[1] = uToF(WORD_AT(threeDPointer, ((4<<1) + (6<<1)*m)) );
-					polys[*numPolys].vert[m].worldCoords[2] = uToF(WORD_AT(threeDPointer, ((5<<1) + (6<<1)*m)) );
+					polys[*numPolys].vert[m].worldCoords[0] = uToF(threeDPointer[3 + (9*m)]);
+					polys[*numPolys].vert[m].worldCoords[1] = uToF(threeDPointer[4 + (9*m)]);
+					polys[*numPolys].vert[m].worldCoords[2] = uToF(threeDPointer[5 + (9*m)]);
 					polys[*numPolys].vert[m].worldCoords[3] = 1.0f;
 					polys[*numPolys].n = 3;
 
-					// !! What is the first coordinate here (6) - maybe denotes size of chunk? !!
-					polys[*numPolys].vert[m].texCoords[0] = uToF(WORD_AT(threeDPointer, ((7<<1) + (6<<1)*m)) );
-					polys[*numPolys].vert[m].texCoords[1] = uToF(WORD_AT(threeDPointer, ((8<<1) + (6<<1)*m)) );
+					// threeDPointer[6 + (9*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
+					polys[*numPolys].vert[m].texCoords[0] = uToF(threeDPointer[7 + (9*m)]);
+					polys[*numPolys].vert[m].texCoords[1] = uToF(threeDPointer[8 + (9*m)]);
 					polys[*numPolys].vert[m].texCoords[2] = 0.0f;
 					polys[*numPolys].vert[m].texCoords[3] = 1.0f;
 
-					polys[*numPolys].vert[m].normal[0] = uToF(WORD_AT(threeDPointer, (21<<1) ));
-					polys[*numPolys].vert[m].normal[1] = uToF(WORD_AT(threeDPointer, (22<<1) ));
-					polys[*numPolys].vert[m].normal[2] = uToF(WORD_AT(threeDPointer, (23<<1) ));
+					polys[*numPolys].vert[m].normal[0] = uToF(threeDPointer[9  + (9*m)]);
+					polys[*numPolys].vert[m].normal[1] = uToF(threeDPointer[10 + (9*m)] );
+					polys[*numPolys].vert[m].normal[2] = uToF(threeDPointer[11 + (9*m)] );
 					polys[*numPolys].vert[m].normal[3] = 0.0f;
 
 					// !!! DUMB !!!
 					polys[*numPolys].vert[m].light[0] = polys[*numPolys].vert[m].texCoords[0] * 255.0f;
 					polys[*numPolys].vert[m].light[1] = polys[*numPolys].vert[m].texCoords[1] * 255.0f;
 					polys[*numPolys].vert[m].light[2] = polys[*numPolys].vert[m].texCoords[2] * 255.0f;
-
-					// Redundantly called, but it works...
-					polys[*numPolys].faceNormal[0] = polys[*numPolys].vert[m].normal[0];
-					polys[*numPolys].faceNormal[1] = polys[*numPolys].vert[m].normal[1];
-					polys[*numPolys].faceNormal[2] = polys[*numPolys].vert[m].normal[2];
-					polys[*numPolys].faceNormal[3] = 0.0f;
-
-					chunkLength = (24<<1);
-					break;
-
-				// 66 byte chunk
-				case 0x05:
-				case 0x0f:
-					polys[*numPolys].vert[m].worldCoords[0] = uToF(WORD_AT(threeDPointer, ((3<<1) + (9<<1)*m)) );
-					polys[*numPolys].vert[m].worldCoords[1] = uToF(WORD_AT(threeDPointer, ((4<<1) + (9<<1)*m)) );
-					polys[*numPolys].vert[m].worldCoords[2] = uToF(WORD_AT(threeDPointer, ((5<<1) + (9<<1)*m)) );
-					polys[*numPolys].vert[m].worldCoords[3] = 1.0f;
-					polys[*numPolys].n = 3;
-
-					// !! See above - (6) - why? !!
-					polys[*numPolys].vert[m].texCoords[0] = uToF(WORD_AT(threeDPointer, ((7<<1) + (9<<1)*m)) );
-					polys[*numPolys].vert[m].texCoords[1] = uToF(WORD_AT(threeDPointer, ((8<<1) + (9<<1)*m)) );
-					polys[*numPolys].vert[m].texCoords[2] = 0.0f;
-					polys[*numPolys].vert[m].texCoords[3] = 1.0f;
-
-					polys[*numPolys].vert[m].normal[0] = uToF(WORD_AT(threeDPointer, ((9<<1) + (9<<1)*m)) );
-					polys[*numPolys].vert[m].normal[1] = uToF(WORD_AT(threeDPointer, ((10<<1) + (9<<1)*m)) );
-					polys[*numPolys].vert[m].normal[2] = uToF(WORD_AT(threeDPointer, ((11<<1) + (9<<1)*m)) );
-					polys[*numPolys].vert[m].normal[3] = 0.0f;
-
-					// !!! DUMB !!!
-					polys[*numPolys].vert[m].light[0] = polys[*numPolys].vert[m].texCoords[0] * 255.0f;
-					polys[*numPolys].vert[m].light[1] = polys[*numPolys].vert[m].texCoords[1] * 255.0f;
-					polys[*numPolys].vert[m].light[2] = polys[*numPolys].vert[m].texCoords[2] * 255.0f;
-
-					// Redundantly called, but it works...
-					polys[*numPolys].faceNormal[0] = uToF(WORD_AT(threeDPointer, (30<<1) ));
-					polys[*numPolys].faceNormal[1] = uToF(WORD_AT(threeDPointer, (31<<1) ));
-					polys[*numPolys].faceNormal[2] = uToF(WORD_AT(threeDPointer, (32<<1) ));
-					polys[*numPolys].faceNormal[3] = 0.0f;
-
-					chunkLength = (33<<1);
-					break;
-
-				// 30 byte chunk
-				case 0x97:
-				case 0x87:
-				case 0xd7:
-
-					// Copy over the proper vertices from the previous triangle...
-					memcpy(&polys[*numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
-					memcpy(&polys[*numPolys].vert[2], &lastPoly.vert[2], sizeof(struct polyVert));
-
-					// Fill in the appropriate data...
-					polys[*numPolys].vert[0].worldCoords[0] = uToF(WORD_AT(threeDPointer, (3<<1) ));
-					polys[*numPolys].vert[0].worldCoords[1] = uToF(WORD_AT(threeDPointer, (4<<1) ));
-					polys[*numPolys].vert[0].worldCoords[2] = uToF(WORD_AT(threeDPointer, (5<<1) ));
-					polys[*numPolys].vert[0].worldCoords[3] = 1.0f;
-					polys[*numPolys].n = 3;
-
-					// !! See above - (6) - why? !!
-					polys[*numPolys].vert[0].texCoords[0] = uToF(WORD_AT(threeDPointer, (7<<1) ));
-					polys[*numPolys].vert[0].texCoords[1] = uToF(WORD_AT(threeDPointer, (8<<1) ));
-					polys[*numPolys].vert[0].texCoords[2] = 0.0f;
-					polys[*numPolys].vert[0].texCoords[3] = 1.0f;
-
-					polys[*numPolys].vert[0].normal[0] = uToF(WORD_AT(threeDPointer, (9<<1) ));
-					polys[*numPolys].vert[0].normal[1] = uToF(WORD_AT(threeDPointer, (10<<1) ));
-					polys[*numPolys].vert[0].normal[2] = uToF(WORD_AT(threeDPointer, (11<<1) ));
-					polys[*numPolys].vert[0].normal[3] = 0.0f;
-
-					polys[*numPolys].vert[0].light[0] = polys[*numPolys].vert[0].texCoords[0] * 255.0f;
-					polys[*numPolys].vert[0].light[1] = polys[*numPolys].vert[0].texCoords[1] * 255.0f;
-					polys[*numPolys].vert[0].light[2] = polys[*numPolys].vert[0].texCoords[2] * 255.0f;
-
-					polys[*numPolys].faceNormal[0] = uToF(WORD_AT(threeDPointer, (12<<1) ));
-					polys[*numPolys].faceNormal[1] = uToF(WORD_AT(threeDPointer, (13<<1) ));
-					polys[*numPolys].faceNormal[2] = uToF(WORD_AT(threeDPointer, (14<<1) ));
-					polys[*numPolys].faceNormal[3] = 0.0f;
-
-					chunkLength = (15<<1);
-					break;
-
-				// 18 byte chunk
-				case 0x96:
-
-					// Copy over the proper vertices from the previous triangle...
-					memcpy(&polys[*numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
-					memcpy(&polys[*numPolys].vert[2], &lastPoly.vert[2], sizeof(struct polyVert));
-
-					// !!! Too lazy to have finished this yet !!!
-
-					polys[*numPolys].vert[0].worldCoords[0] = uToF(WORD_AT(threeDPointer, (3<<1)));
-					polys[*numPolys].vert[0].worldCoords[1] = uToF(WORD_AT(threeDPointer, (4<<1)));
-					polys[*numPolys].vert[0].worldCoords[2] = uToF(WORD_AT(threeDPointer, (5<<1)));
-					polys[*numPolys].vert[0].worldCoords[3] = 1.0f;
-					polys[*numPolys].n = 3;
-
-					// !! See above - (6) - why? !!
-					polys[*numPolys].vert[0].texCoords[0] = uToF(WORD_AT(threeDPointer, (7<<1)));
-					polys[*numPolys].vert[0].texCoords[1] = uToF(WORD_AT(threeDPointer, (8<<1)));
-					polys[*numPolys].vert[0].texCoords[2] = 0.0f;
-					polys[*numPolys].vert[0].texCoords[3] = 1.0f;
-
-					// !!! DUMB !!!
-					polys[*numPolys].vert[0].light[0] = polys[*numPolys].vert[0].texCoords[0] * 255.0f;
-					polys[*numPolys].vert[0].light[1] = polys[*numPolys].vert[0].texCoords[1] * 255.0f;
-					polys[*numPolys].vert[0].light[2] = polys[*numPolys].vert[0].texCoords[2] * 255.0f;
-
-					// This normal could be right, but I'm not entirely sure - there is no normal in the 18 bytes!
-					polys[*numPolys].vert[0].normal[0] = lastPoly.faceNormal[0];
-					polys[*numPolys].vert[0].normal[1] = lastPoly.faceNormal[1];
-					polys[*numPolys].vert[0].normal[2] = lastPoly.faceNormal[2];
-					polys[*numPolys].vert[0].normal[3] = lastPoly.faceNormal[3];
-
-					polys[*numPolys].faceNormal[0] = lastPoly.faceNormal[0];
-					polys[*numPolys].faceNormal[1] = lastPoly.faceNormal[1];
-					polys[*numPolys].faceNormal[2] = lastPoly.faceNormal[2];
-					polys[*numPolys].faceNormal[3] = lastPoly.faceNormal[3];
-
-					chunkLength = (9<<1);
-					break;
-
-				default:
-					mame_printf_debug("UNKNOWN geometry CHUNK TYPE : %x\n", triangleType);
-					break;
 				}
+
+				// Redundantly called, but it works...
+				polys[*numPolys].faceNormal[0] = uToF(threeDPointer[30]);
+				polys[*numPolys].faceNormal[1] = uToF(threeDPointer[31]);
+				polys[*numPolys].faceNormal[2] = uToF(threeDPointer[32]);
+				polys[*numPolys].faceNormal[3] = 0.0f;
+
+				chunkLength = 33;
+				break;
+
+
+			// 24 word chunk, 3 vertices, per-vertex UVs
+			case 0x04:	// 0000 0100
+			case 0x0e:	// 0000 1110
+				for (m = 0; m < 3; m++)
+				{
+					polys[*numPolys].vert[m].worldCoords[0] = uToF(threeDPointer[3 + (6*m)]);
+					polys[*numPolys].vert[m].worldCoords[1] = uToF(threeDPointer[4 + (6*m)]);
+					polys[*numPolys].vert[m].worldCoords[2] = uToF(threeDPointer[5 + (6*m)]);
+					polys[*numPolys].vert[m].worldCoords[3] = 1.0f;
+					polys[*numPolys].n = 3;
+
+					// threeDPointer[6 + (6*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
+					polys[*numPolys].vert[m].texCoords[0] = uToF(threeDPointer[7 + (6*m)]);
+					polys[*numPolys].vert[m].texCoords[1] = uToF(threeDPointer[8 + (6*m)]);
+					polys[*numPolys].vert[m].texCoords[2] = 0.0f;
+					polys[*numPolys].vert[m].texCoords[3] = 1.0f;
+
+					polys[*numPolys].vert[m].normal[0] = uToF(threeDPointer[21]);
+					polys[*numPolys].vert[m].normal[1] = uToF(threeDPointer[22]);
+					polys[*numPolys].vert[m].normal[2] = uToF(threeDPointer[23]);
+					polys[*numPolys].vert[m].normal[3] = 0.0f;
+
+					// !!! DUMB !!!
+					polys[*numPolys].vert[m].light[0] = polys[*numPolys].vert[m].texCoords[0] * 255.0f;
+					polys[*numPolys].vert[m].light[1] = polys[*numPolys].vert[m].texCoords[1] * 255.0f;
+					polys[*numPolys].vert[m].light[2] = polys[*numPolys].vert[m].texCoords[2] * 255.0f;
+				}
+                
+				// Redundantly called, but it works...
+				polys[*numPolys].faceNormal[0] = polys[*numPolys].vert[m].normal[0];
+				polys[*numPolys].faceNormal[1] = polys[*numPolys].vert[m].normal[1];
+				polys[*numPolys].faceNormal[2] = polys[*numPolys].vert[m].normal[2];
+				polys[*numPolys].faceNormal[3] = 0.0f;
+
+				chunkLength = 24;
+				break;
+
+
+			// 15 word chunk, 1 vertex, per-vertex UVs & normals
+			case 0x97:	// 1001 0111
+			case 0x87:	// 1000 0111
+			case 0xd7:	// 1101 0111
+				// Copy over the proper vertices from the previous triangle...
+				memcpy(&polys[*numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
+				memcpy(&polys[*numPolys].vert[2], &lastPoly.vert[2], sizeof(struct polyVert));
+
+				// Fill in the appropriate data...
+				polys[*numPolys].vert[0].worldCoords[0] = uToF(threeDPointer[3]);
+				polys[*numPolys].vert[0].worldCoords[1] = uToF(threeDPointer[4]);
+				polys[*numPolys].vert[0].worldCoords[2] = uToF(threeDPointer[5]);
+				polys[*numPolys].vert[0].worldCoords[3] = 1.0f;
+				polys[*numPolys].n = 3;
+
+				// threeDPointer[6] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
+				polys[*numPolys].vert[0].texCoords[0] = uToF(threeDPointer[7]);
+				polys[*numPolys].vert[0].texCoords[1] = uToF(threeDPointer[8]);
+				polys[*numPolys].vert[0].texCoords[2] = 0.0f;
+				polys[*numPolys].vert[0].texCoords[3] = 1.0f;
+
+				polys[*numPolys].vert[0].normal[0] = uToF(threeDPointer[9]);
+				polys[*numPolys].vert[0].normal[1] = uToF(threeDPointer[10]);
+				polys[*numPolys].vert[0].normal[2] = uToF(threeDPointer[11]);
+				polys[*numPolys].vert[0].normal[3] = 0.0f;
+
+				polys[*numPolys].vert[0].light[0] = polys[*numPolys].vert[0].texCoords[0] * 255.0f;
+				polys[*numPolys].vert[0].light[1] = polys[*numPolys].vert[0].texCoords[1] * 255.0f;
+				polys[*numPolys].vert[0].light[2] = polys[*numPolys].vert[0].texCoords[2] * 255.0f;
+
+				polys[*numPolys].faceNormal[0] = uToF(threeDPointer[12]);
+				polys[*numPolys].faceNormal[1] = uToF(threeDPointer[13]);
+				polys[*numPolys].faceNormal[2] = uToF(threeDPointer[14]);
+				polys[*numPolys].faceNormal[3] = 0.0f;
+
+				chunkLength = 15;
+				break;
+
+
+			// 12 word chunk, 1 vertex, per-vertex UVs
+			case 0x96:	// 1001 0110
+				// Copy over the proper vertices from the previous triangle...
+				memcpy(&polys[*numPolys].vert[1], &lastPoly.vert[0], sizeof(struct polyVert));
+				memcpy(&polys[*numPolys].vert[2], &lastPoly.vert[2], sizeof(struct polyVert));
+
+				polys[*numPolys].vert[0].worldCoords[0] = uToF(threeDPointer[3]);
+				polys[*numPolys].vert[0].worldCoords[1] = uToF(threeDPointer[4]);
+				polys[*numPolys].vert[0].worldCoords[2] = uToF(threeDPointer[5]);
+				polys[*numPolys].vert[0].worldCoords[3] = 1.0f;
+				polys[*numPolys].n = 3;
+
+				// threeDPointer[6] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
+				polys[*numPolys].vert[0].texCoords[0] = uToF(threeDPointer[7]);
+				polys[*numPolys].vert[0].texCoords[1] = uToF(threeDPointer[8]);
+				polys[*numPolys].vert[0].texCoords[2] = 0.0f;
+				polys[*numPolys].vert[0].texCoords[3] = 1.0f;
+
+				// !!! DUMB !!!
+				polys[*numPolys].vert[0].light[0] = polys[*numPolys].vert[0].texCoords[0] * 255.0f;
+				polys[*numPolys].vert[0].light[1] = polys[*numPolys].vert[0].texCoords[1] * 255.0f;
+				polys[*numPolys].vert[0].light[2] = polys[*numPolys].vert[0].texCoords[2] * 255.0f;
+
+				// This normal could be right, but I'm not entirely sure - there is no normal in the 18 bytes!
+				polys[*numPolys].vert[0].normal[0] = lastPoly.faceNormal[0];
+				polys[*numPolys].vert[0].normal[1] = lastPoly.faceNormal[1];
+				polys[*numPolys].vert[0].normal[2] = lastPoly.faceNormal[2];
+				polys[*numPolys].vert[0].normal[3] = lastPoly.faceNormal[3];
+
+				polys[*numPolys].faceNormal[0] = lastPoly.faceNormal[0];
+				polys[*numPolys].faceNormal[1] = lastPoly.faceNormal[1];
+				polys[*numPolys].faceNormal[2] = lastPoly.faceNormal[2];
+				polys[*numPolys].faceNormal[3] = lastPoly.faceNormal[3];
+
+				// TODO: I'm not reading 3 necessary words here (maybe face normal) !!!
+
+				chunkLength = 12;
+				break;
+
+#if 0
+			// TODO: DECODE THESE GUYS //
+			case 0x2e:	// 0010 1110
+				/* There's something fishy about this guy - see 0x7a below.  Very likely not fixed-length */
+				/*
+				printf("0x2e : %08x\n", address[k]*3*2);
+				for (m = 0; m < 37; m++)
+                    printf("%04x ", threeDPointer[m]);
+				printf("\n\n");
+				*/
+				chunkLength = 36;
+			break;
+
+			/* This shouldn't exist. */
+			/* There's something funky going on with 0x2e - it's often well-behaved, except for
+			   when it "ends" with e67a.  Maybe this chunkLength thing isn't where it's at?
+			   Luckily the 0x7a is always at the end of a series of 2 chunks (2e,7a) so ignoring
+			   it won't kill us for now. */
+			case 0x7a:	// 0111 1010
+				/*
+				printf("0x7a : %08x (%d/%d)\n", mame_rand(machine), l, size[k]);
+				for (m = 0; m < 100; m++)
+                    printf("%04x ", threeDPointer[m]);
+				printf("\n\n");
+				*/
+				chunkLength = 0;
+			break;
+
+			case 0x24:	// 0010 0100
+				/*
+				printf("0x24 : %08x\n", address[k]*3*2);
+				for (m = 0; m < 49; m++)
+                    printf("%04x ", threeDPointer[m]);
+				printf("\n\n");
+				*/
+				chunkLength = 48;
+			break;
+
+			case 0xb6:	// 1011 0110
+				/*
+				printf("0xb6 : %08x\n", address[k]*3*2);
+				for (m = 0; m < 13; m++)
+                    printf("%04x ", threeDPointer[m]);
+				printf("\n\n");
+				*/
+				chunkLength = 12;
+			break;
+
+			case 0x86:	// 1000 0110
+				/* Very likely not fixed-length since it leads into c6 & d6 */
+				/*
+				printf("0x86 : %08x\n", address[k]*3*2);
+				for (m = 0; m < 13; m++)
+                    printf("%04x ", threeDPointer[m]);
+				printf("\n\n");
+				*/
+				chunkLength = 12;
+			break;
+
+			/* Are c6 and d6 just insanely long? They aren't at the end of the numTris like 0x7a */
+			case 0xc6:	// 1100 0110
+				/*
+				printf("0xc6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]);
+				for (m = 0; m < 100; m++)
+                    printf("%04x ", threeDPointer[m]);
+				printf("\n\n");
+				*/
+				chunkLength = 0;
+			break;
+
+			/* Are c6 and d6 just insanely long? They aren't at the end of numTris like 0x7a */
+			case 0xd6:	// 1101 0110
+				/*
+				printf("0xd6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]);
+				for (m = 0; m < 100; m++)
+                    printf("%04x ", threeDPointer[m]);
+				printf("\n\n");
+				*/
+				chunkLength = 0;
+			break;
+#endif
+
+			default:
+				logerror("UNKNOWN geometry CHUNK TYPE : %02x\n", chunkType);
+				chunkLength = 0;
+				break;
 			}
+
+			// Debug - ajg
+			//printf("(chunkLength %d)\n", chunkLength);
 
 			polys[*numPolys].visible = 1;
 
-			// Backup the last polygon (for tri strips)
+			// Backup the last polygon (for triangle fans [strips?])
 			memcpy(&lastPoly, &polys[*numPolys], sizeof(struct polygon));
+
 
 			////////////////////////////////////
 			// Project and clip               //
@@ -2155,7 +2319,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			setIdentity(modelViewMatrix);
 			matmul4(modelViewMatrix, modelViewMatrix, cameraMatrix);
 			matmul4(modelViewMatrix, modelViewMatrix, objectMatrix);
-
 
 			// BACKFACE CULL //
 			// EMPIRICAL EVIDENCE SEEMS TO SHOW THE HNG64 HARDWARE DOES NOT BACKFACE CULL //
@@ -2179,7 +2342,6 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 			// BEHIND-THE-CAMERA CULL //
 			vecmatmul4(cullRay, modelViewMatrix, polys[*numPolys].vert[0].worldCoords);
-
 			if (cullRay[2] > 0.0f)				// Camera is pointing down -Z
 			{
 				polys[*numPolys].visible = 0;
@@ -2230,8 +2392,8 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			if (chunkLength == (9 << 1))
 			{
 				mame_printf_debug("Chunk : ");
-				for (int ajg = 0; ajg < chunkLength; ajg+=2)
-					mame_printf_debug("%.2x%.2x ", threeDPointer[ajg], threeDPointer[ajg+1]);
+				for (int a = 0; a < chunkLength; a+=2)
+					mame_printf_debug("%.2x%.2x ", threeDPointer[a], threeDPointer[a+1]);
 				mame_printf_debug("\n");
 			}
 			// END DEBUG
@@ -2240,7 +2402,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			// Advance to the next polygon chunk...
 			threeDPointer += chunkLength;
 
-			(*numPolys)++;				// Add one more to the display list...
+			(*numPolys)++;
 		}
 	}
 }
@@ -2279,10 +2441,11 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 {
 	int i;
 
-	// A temporary place to put some polygons.
+	/* A temporary place to put some polygons.  This will optimize away if the compiler's any good. */
 	int numPolys = 0;
-	struct polygon* polys = malloc(sizeof(struct polygon) * (1024*5));	/* This will optimize globally if the compiler's any good */
+	struct polygon* polys = malloc(sizeof(struct polygon) * (1024*5));
 
+	//printf("packet type : %04x\n", packet[0]);
 	switch (packet[0])
 	{
 	case 0x0000:	// Appears to be a NOP.
@@ -2292,7 +2455,8 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		setCameraTransformation(packet);
 		break;
 
-	case 0x0010:	// Unknown (called twice for fatfurwa 'howto' frame)
+	case 0x0010:	// Unknown
+		// Called very interestingly per-frame in every game.  Floats for sure.  Light-related?
 		break;
 
 	case 0x0011:	// Palette / Model flags?
@@ -2304,7 +2468,6 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		break;
 
 	case 0x0100:	// Geometry
-		//printPacket(packet, 1);
 		recoverPolygonBlock(machine, packet, polys, &numPolys);
 
 		/* Immeditately rasterize the chunk's polygons into the display buffer */
@@ -2327,15 +2490,13 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		break;
 
 	case 0x1000:	// Unknown: Some sort of global flags?
-		//printPacket(packet, 1);
 		break;
 
-	case 0x1001:	// Unknown: Some sort of global flags?
-		//printPacket(packet, 1);
+	case 0x1001:	// Unknown: Some sort of global flags (a group of 4, actually)?
 		break;
 
 	default:
-		logerror("HNG64: Unknown 3d command %04x.\n", packet[0]);
+		printf("HNG64: Unknown 3d command %04x.\n", packet[0]);
 		break;
 	}
 
