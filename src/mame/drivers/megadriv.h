@@ -17,6 +17,8 @@ INPUT_PORTS_EXTERN( megadri6 );
 INPUT_PORTS_EXTERN( ssf2ghw );
 INPUT_PORTS_EXTERN( megdsvp );
 
+MACHINE_DRIVER_EXTERN( megadriv_timers );
+
 MACHINE_DRIVER_EXTERN( megdsvppal );
 MACHINE_DRIVER_EXTERN( megadriv );
 MACHINE_DRIVER_EXTERN( megadpal );

@@ -2246,6 +2246,9 @@ static MACHINE_DRIVER_START( multi32 )
 	MDRV_MACHINE_RESET(system32)
 	MDRV_NVRAM_HANDLER(system32)
 
+	MDRV_TIMER_ADD("v60_irq0", signal_v60_irq_callback)
+	MDRV_TIMER_ADD("v60_irq1", signal_v60_irq_callback)
+
 	/* video hardware */
 	MDRV_GFXDECODE(segas32)
 	MDRV_PALETTE_LENGTH(0x8000)

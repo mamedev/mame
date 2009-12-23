@@ -18,7 +18,7 @@
 #include "driver.h"
 #include "rtc65271.h"
 
-static void field_interrupts(void);
+static void field_interrupts(const device_config *device);
 static TIMER_CALLBACK( rtc_SQW_callback );
 static TIMER_CALLBACK( rtc_begin_update_callback );
 static TIMER_CALLBACK( rtc_end_update_callback );
@@ -30,29 +30,38 @@ update interrupt asserted) of the update cycle */
 cycle */
 /*#define UPDATE_CYCLE_DELAY ATTOTIME_IN_USEC(244)*/
 
-static struct
+typedef struct _rtc65271_state rtc65271_state;
+struct _rtc65271_state
 {
-	running_machine *machine;
-
 	/* 64 8-bit registers (10 clock registers, 4 control/status registers, and
     50 bytes of user RAM) */
 	UINT8 regs[64];
-	int cur_reg;
+	UINT8 cur_reg;
 
 	/* extended RAM: 4kbytes of battery-backed RAM (in pages of 32 bytes) */
-	UINT8 *xram;
-	int cur_xram_page;
+	UINT8 xram[4096];
+	UINT8 cur_xram_page;
 
 	/* update timer: called every second */
 	emu_timer *update_timer;
 
 	/* SQW timer: called every periodic clock half-period */
 	emu_timer *SQW_timer;
-	int SQW_internal_state;
+	UINT8 SQW_internal_state;
 
 	/* callback called when interrupt pin state changes (may be NULL) */
-	void (*interrupt_callback)(running_machine *machine, int state);
-} rtc;
+	void (*interrupt_callback)(const device_config *device, int state);
+};
+
+INLINE rtc65271_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == RTC65271);
+
+	return (rtc65271_state *)device->token;
+}
+
 
 enum
 {
@@ -185,8 +194,9 @@ static UINT8 BCD_to_binary(UINT8 data)
 /*
     load the SRAM and register contents from file
 */
-int rtc65271_file_load(running_machine *machine, mame_file *file)
+static int rtc65271_file_load(const device_config *device, mame_file *file)
 {
+	rtc65271_state *state = get_safe_token(device);
 	UINT8 buf;
 
 
@@ -199,66 +209,66 @@ int rtc65271_file_load(running_machine *machine, mame_file *file)
 	/* control registers */
 	if (mame_fread(file, &buf, 1) != 1)
 		return 1;
-	rtc.regs[reg_A] = buf & (reg_A_DV /*| reg_A_RS*/);
+	state->regs[reg_A] = buf & (reg_A_DV /*| reg_A_RS*/);
 	if (mame_fread(file, &buf, 1) != 1)
 		return 1;
-	rtc.regs[reg_B] = buf & (reg_B_SET | reg_B_DM | reg_B_24h | reg_B_DSE);
+	state->regs[reg_B] = buf & (reg_B_SET | reg_B_DM | reg_B_24h | reg_B_DSE);
 
 	/* alarm registers */
-	if (mame_fread(file, &rtc.regs[reg_alarm_second], 1) != 1)
+	if (mame_fread(file, &state->regs[reg_alarm_second], 1) != 1)
 		return 1;
-	if (mame_fread(file, &rtc.regs[reg_alarm_minute], 1) != 1)
+	if (mame_fread(file, &state->regs[reg_alarm_minute], 1) != 1)
 		return 1;
-	if (mame_fread(file, &rtc.regs[reg_alarm_hour], 1) != 1)
+	if (mame_fread(file, &state->regs[reg_alarm_hour], 1) != 1)
 		return 1;
 
 	/* user RAM */
-	if (mame_fread(file, rtc.regs+14, 50) != 50)
+	if (mame_fread(file, state->regs+14, 50) != 50)
 		return 1;
 
 	/* extended RAM */
-	if (mame_fread(file, rtc.xram, 4096) != 4096)
+	if (mame_fread(file, state->xram, 4096) != 4096)
 		return 1;
 
-	rtc.regs[reg_D] |= reg_D_VRT;	/* the data was backed up successfully */
-	/*rtc.dirty = FALSE;*/
+	state->regs[reg_D] |= reg_D_VRT;	/* the data was backed up successfully */
+	/*state->dirty = FALSE;*/
 
 	{
 		mame_system_time systime;
 
 		/* get the current date/time from the core */
-		mame_get_current_datetime(machine, &systime);
+		mame_get_current_datetime(device->machine, &systime);
 
 		/* set clock registers */
-		rtc.regs[reg_second] = systime.local_time.second;
-		rtc.regs[reg_minute] = systime.local_time.minute;
-		if (rtc.regs[reg_B] & reg_B_24h)
+		state->regs[reg_second] = systime.local_time.second;
+		state->regs[reg_minute] = systime.local_time.minute;
+		if (state->regs[reg_B] & reg_B_24h)
 			/* 24-hour mode */
-			rtc.regs[reg_hour] = systime.local_time.hour;
+			state->regs[reg_hour] = systime.local_time.hour;
 		else
 		{	/* 12-hour mode */
 			if (systime.local_time.hour >= 12)
 			{
-				rtc.regs[reg_hour] = 0x80;
+				state->regs[reg_hour] = 0x80;
 				systime.local_time.hour -= 12;
 			}
 			else
-				rtc.regs[reg_hour] = 0;
-			rtc.regs[reg_hour] |= systime.local_time.hour ? systime.local_time.hour : 12;
+				state->regs[reg_hour] = 0;
+			state->regs[reg_hour] |= systime.local_time.hour ? systime.local_time.hour : 12;
 		}
-		rtc.regs[reg_weekday] = systime.local_time.weekday + 1;
-		rtc.regs[reg_monthday] = systime.local_time.mday;
-		rtc.regs[reg_month] = systime.local_time.month + 1;
-		rtc.regs[reg_year] = systime.local_time.year % 100;
-		if (! (rtc.regs[reg_B] & reg_B_DM))
+		state->regs[reg_weekday] = systime.local_time.weekday + 1;
+		state->regs[reg_monthday] = systime.local_time.mday;
+		state->regs[reg_month] = systime.local_time.month + 1;
+		state->regs[reg_year] = systime.local_time.year % 100;
+		if (! (state->regs[reg_B] & reg_B_DM))
 		{	/* BCD mode */
-			rtc.regs[reg_second] = binary_to_BCD(rtc.regs[reg_second]);
-			rtc.regs[reg_minute] = binary_to_BCD(rtc.regs[reg_minute]);
-			rtc.regs[reg_hour] = (rtc.regs[reg_hour] & 0x80) | binary_to_BCD(rtc.regs[reg_hour] & 0x7f);
-			/*rtc.regs[reg_weekday] = binary_to_BCD(rtc.regs[reg_weekday]);*/
-			rtc.regs[reg_monthday] = binary_to_BCD(rtc.regs[reg_monthday]);
-			rtc.regs[reg_month] = binary_to_BCD(rtc.regs[reg_month]);
-			rtc.regs[reg_year] = binary_to_BCD(rtc.regs[reg_year]);
+			state->regs[reg_second] = binary_to_BCD(state->regs[reg_second]);
+			state->regs[reg_minute] = binary_to_BCD(state->regs[reg_minute]);
+			state->regs[reg_hour] = (state->regs[reg_hour] & 0x80) | binary_to_BCD(state->regs[reg_hour] & 0x7f);
+			/*state->regs[reg_weekday] = binary_to_BCD(state->regs[reg_weekday]);*/
+			state->regs[reg_monthday] = binary_to_BCD(state->regs[reg_monthday]);
+			state->regs[reg_month] = binary_to_BCD(state->regs[reg_month]);
+			state->regs[reg_year] = binary_to_BCD(state->regs[reg_year]);
 		}
 	}
 
@@ -268,8 +278,9 @@ int rtc65271_file_load(running_machine *machine, mame_file *file)
 /*
     save the SRAM and register contents to file
 */
-int rtc65271_file_save(mame_file *file)
+static int rtc65271_file_save(const device_config *device, mame_file *file)
 {
+	rtc65271_state *state = get_safe_token(device);
 	UINT8 buf;
 
 
@@ -279,50 +290,30 @@ int rtc65271_file_save(mame_file *file)
 		return 1;
 
 	/* control registers */
-	buf = rtc.regs[reg_A] & (reg_A_DV | reg_A_RS);
+	buf = state->regs[reg_A] & (reg_A_DV | reg_A_RS);
 	if (mame_fwrite(file, &buf, 1) != 1)
 		return 1;
-	buf = rtc.regs[reg_B] & (reg_B_SET | reg_B_DM | reg_B_24h | reg_B_DSE);
+	buf = state->regs[reg_B] & (reg_B_SET | reg_B_DM | reg_B_24h | reg_B_DSE);
 	if (mame_fwrite(file, &buf, 1) != 1)
 		return 1;
 
 	/* alarm registers */
-	if (mame_fwrite(file, &rtc.regs[reg_alarm_second], 1) != 1)
+	if (mame_fwrite(file, &state->regs[reg_alarm_second], 1) != 1)
 		return 1;
-	if (mame_fwrite(file, &rtc.regs[reg_alarm_minute], 1) != 1)
+	if (mame_fwrite(file, &state->regs[reg_alarm_minute], 1) != 1)
 		return 1;
-	if (mame_fwrite(file, &rtc.regs[reg_alarm_hour], 1) != 1)
+	if (mame_fwrite(file, &state->regs[reg_alarm_hour], 1) != 1)
 		return 1;
 
 	/* user RAM */
-	if (mame_fwrite(file, rtc.regs+14, 50) != 50)
+	if (mame_fwrite(file, state->regs+14, 50) != 50)
 		return 1;
 
 	/* extended RAM */
-	if (mame_fwrite(file, rtc.xram, 4096) != 4096)
+	if (mame_fwrite(file, state->xram, 4096) != 4096)
 		return 1;
 
 	return 0;
-}
-
-/*
-    Initialize clock
-
-    xram: pointer to 4kb RAM area
-    interrupt_callback: callback called when interrupt pin state changes (may
-        be NULL)
-*/
-void rtc65271_init(running_machine *machine, UINT8 *xram, void (*interrupt_callback)(running_machine *machine, int state))
-{
-	memset(&rtc, 0, sizeof(rtc));
-
-	rtc.machine = machine;
-	rtc.xram = xram;
-
-	rtc.update_timer = timer_alloc(machine, rtc_begin_update_callback, NULL);
-	timer_adjust_periodic(rtc.update_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
-	rtc.SQW_timer = timer_alloc(machine, rtc_SQW_callback, NULL);
-	rtc.interrupt_callback = interrupt_callback;
 }
 
 /*
@@ -331,55 +322,56 @@ void rtc65271_init(running_machine *machine, UINT8 *xram, void (*interrupt_callb
     xramsel: select RTC register if 0, XRAM if 1
     offset: address (A0-A5 pins)
 */
-UINT8 rtc65271_r(int xramsel, offs_t offset)
+UINT8 rtc65271_r(const device_config *device, int xramsel, offs_t offset)
 {
+	rtc65271_state *state = get_safe_token(device);
 	int reply;
 
 	if (xramsel)
 	{
 		if (offset & 0x20)
 			/* XRAM page register */
-			reply = rtc.cur_xram_page;
+			reply = state->cur_xram_page;
 		else
 			/* XRAM data */
-			reply = rtc.xram[(offset & 0x1f) + 0x0020*rtc.cur_xram_page];
+			reply = state->xram[(offset & 0x1f) + 0x0020*state->cur_xram_page];
 	}
 	else
 	{
 		if (offset & 0x01)
 			/* data register */
-			switch (rtc.cur_reg)
+			switch (state->cur_reg)
 			{
 			case reg_C:
-				reply = rtc.regs[rtc.cur_reg];
-				rtc.regs[rtc.cur_reg] = 0;
-				field_interrupts();
+				reply = state->regs[state->cur_reg];
+				state->regs[state->cur_reg] = 0;
+				field_interrupts(device);
 				break;
 			case reg_D:
-				reply = rtc.regs[rtc.cur_reg];
-				rtc.regs[rtc.cur_reg] = /*0*/reg_D_VRT;	/* set VRT flag so that the computer does not complain that the battery is low */
+				reply = state->regs[state->cur_reg];
+				state->regs[state->cur_reg] = /*0*/reg_D_VRT;	/* set VRT flag so that the computer does not complain that the battery is low */
 				break;
 
 			default:
-				reply = rtc.regs[rtc.cur_reg];
+				reply = state->regs[state->cur_reg];
 				break;
 			}
 		else
 			/* indirect address register */
-			reply = rtc.cur_reg;
+			reply = state->cur_reg;
 	}
 
 	return reply;
 }
 
-READ8_HANDLER( rtc65271_rtc_r )
+READ8_DEVICE_HANDLER( rtc65271_rtc_r )
 {
-	return rtc65271_r( 0, offset );
+	return rtc65271_r( device, 0, offset );
 }
 
-READ8_HANDLER( rtc65271_xram_r )
+READ8_DEVICE_HANDLER( rtc65271_xram_r )
 {
-	return rtc65271_r( 1, offset );
+	return rtc65271_r( device, 1, offset );
 }
 
 /*
@@ -388,63 +380,64 @@ READ8_HANDLER( rtc65271_xram_r )
     xramsel: select RTC register if 0, XRAM if 1
     offset: address (A0-A5 pins)
 */
-void rtc65271_w(int xramsel, offs_t offset, UINT8 data)
+void rtc65271_w(const device_config *device, int xramsel, offs_t offset, UINT8 data)
 {
+	rtc65271_state *state = get_safe_token(device);
 	if (xramsel)
 	{
 		if (offset & 0x20)
 			/* XRAM page register */
-			rtc.cur_xram_page = data & 0x7f;
+			state->cur_xram_page = data & 0x7f;
 		else
 			/* XRAM data */
-			rtc.xram[(offset & 0x1f) + 0x0020*rtc.cur_xram_page] = data;
+			state->xram[(offset & 0x1f) + 0x0020*state->cur_xram_page] = data;
 	}
 	else
 	{
 		if (offset & 0x01)
 			/* data register */
-			switch (rtc.cur_reg)
+			switch (state->cur_reg)
 			{
 			case reg_second:
 				/* the data sheet says bit 7 is read-only.  (I have no idea of
                 the reason why it is.) */
-				rtc.regs[reg_second] = data & 0x7f;
+				state->regs[reg_second] = data & 0x7f;
 				break;
 
 			case reg_A:
-				if ((data & reg_A_RS) != (rtc.regs[rtc.cur_reg] & reg_A_RS))
+				if ((data & reg_A_RS) != (state->regs[state->cur_reg] & reg_A_RS))
 				{
 					if (data & reg_A_RS)
 					{
 						attotime period = ATTOTIME_IN_HZ(SQW_freq_table[data & reg_A_RS]);
 						attotime half_period = attotime_div(period, 2);
-						attotime elapsed = timer_timeelapsed(rtc.update_timer);
+						attotime elapsed = timer_timeelapsed(state->update_timer);
 
 						if (attotime_compare(half_period, elapsed) > 0)
-							timer_adjust_oneshot(rtc.SQW_timer, attotime_sub(half_period, elapsed), 0);
+							timer_adjust_oneshot(state->SQW_timer, attotime_sub(half_period, elapsed), 0);
 						else
-							timer_adjust_oneshot(rtc.SQW_timer, half_period, 0);
+							timer_adjust_oneshot(state->SQW_timer, half_period, 0);
 					}
 					else
 					{
-						rtc.SQW_internal_state = 0;	/* right??? */
+						state->SQW_internal_state = 0;	/* right??? */
 
 						/* Stop the divider used for SQW and periodic interrupts. */
-						timer_adjust_oneshot(rtc.SQW_timer, attotime_never, 0);
+						timer_adjust_oneshot(state->SQW_timer, attotime_never, 0);
 					}
 				}
 				/* The UIP bit is read-only */
-				rtc.regs[reg_A] = (data & ~reg_A_UIP) | (rtc.regs[reg_A] & reg_A_UIP);
+				state->regs[reg_A] = (data & ~reg_A_UIP) | (state->regs[reg_A] & reg_A_UIP);
 				break;
 
 			case reg_B:
-				rtc.regs[rtc.cur_reg] = data;
+				state->regs[state->cur_reg] = data;
 				if (data & reg_B_SET)
 				{
 					/* if we are in SET mode, clear update cycle */
-					rtc.regs[reg_A] &= ~reg_A_UIP;
-					rtc.regs[reg_B] &= ~reg_B_UIE;	/* the data sheet tells this, but I wonder how much sense it makes */
-					field_interrupts();
+					state->regs[reg_A] &= ~reg_A_UIP;
+					state->regs[reg_B] &= ~reg_B_UIE;	/* the data sheet tells this, but I wonder how much sense it makes */
+					field_interrupts(device);
 				}
 				break;
 
@@ -453,38 +446,40 @@ void rtc65271_w(int xramsel, offs_t offset, UINT8 data)
 				break;
 
 			default:
-				rtc.regs[rtc.cur_reg] = data;
+				state->regs[state->cur_reg] = data;
 				break;
 			}
 		else
 			/* indirect address register */
-			rtc.cur_reg = data & 0x3f;
+			state->cur_reg = data & 0x3f;
 	}
 }
 
-WRITE8_HANDLER( rtc65271_rtc_w )
+WRITE8_DEVICE_HANDLER( rtc65271_rtc_w )
 {
-	rtc65271_w( 0, offset, data );
+	rtc65271_w( device, 0, offset, data );
 }
 
-WRITE8_HANDLER( rtc65271_xram_w )
+WRITE8_DEVICE_HANDLER( rtc65271_xram_w )
 {
-	rtc65271_w( 1, offset, data );
+	rtc65271_w( device, 1, offset, data );
 }
 
-static void field_interrupts(void)
+static void field_interrupts(const device_config *device)
 {
-	if (rtc.regs[reg_C] & rtc.regs[reg_B] & (reg_C_PF | reg_C_AF | reg_C_UF))
+	rtc65271_state *state = get_safe_token(device);
+
+	if (state->regs[reg_C] & state->regs[reg_B] & (reg_C_PF | reg_C_AF | reg_C_UF))
 	{
-		rtc.regs[reg_C] |= reg_C_IRQF;
-		if (rtc.interrupt_callback)
-			rtc.interrupt_callback(rtc.machine, 1);
+		state->regs[reg_C] |= reg_C_IRQF;
+		if (state->interrupt_callback)
+			state->interrupt_callback(device, 1);
 	}
 	else
 	{
-		rtc.regs[reg_C] &= ~reg_C_IRQF;
-		if (rtc.interrupt_callback)
-			rtc.interrupt_callback(rtc.machine, 0);
+		state->regs[reg_C] &= ~reg_C_IRQF;
+		if (state->interrupt_callback)
+			state->interrupt_callback(device, 0);
 	}
 }
 
@@ -499,18 +494,20 @@ static void field_interrupts(void)
 */
 static TIMER_CALLBACK( rtc_SQW_callback )
 {
+	const device_config *device = (const device_config *)ptr;
+	rtc65271_state *state = get_safe_token(device);
 	attotime half_period;
 
-	rtc.SQW_internal_state = ! rtc.SQW_internal_state;
-	if (! rtc.SQW_internal_state)
+	state->SQW_internal_state = ! state->SQW_internal_state;
+	if (! state->SQW_internal_state)
 	{
 		/* high-to-low??? transition -> interrupt (or should it be low-to-high?) */
-		rtc.regs[reg_C] |= reg_C_PF;
-		field_interrupts();
+		state->regs[reg_C] |= reg_C_PF;
+		field_interrupts(device);
 	}
 
-	half_period = attotime_div(ATTOTIME_IN_HZ(SQW_freq_table[rtc.regs[reg_A] & reg_A_RS]), 2);
-	timer_adjust_oneshot(rtc.SQW_timer, half_period, 0);
+	half_period = attotime_div(ATTOTIME_IN_HZ(SQW_freq_table[state->regs[reg_A] & reg_A_RS]), 2);
+	timer_adjust_oneshot(state->SQW_timer, half_period, 0);
 }
 
 /*
@@ -518,12 +515,15 @@ static TIMER_CALLBACK( rtc_SQW_callback )
 */
 static TIMER_CALLBACK( rtc_begin_update_callback )
 {
-	if (((rtc.regs[reg_A] & reg_A_DV) == 0x20) && ! (rtc.regs[reg_B] & reg_B_SET))
+	const device_config *device = (const device_config *)ptr;
+	rtc65271_state *state = get_safe_token(device);
+
+	if (((state->regs[reg_A] & reg_A_DV) == 0x20) && ! (state->regs[reg_B] & reg_B_SET))
 	{
-		rtc.regs[reg_A] |= reg_A_UIP;
+		state->regs[reg_A] |= reg_A_UIP;
 
 		/* schedule end of update cycle */
-		timer_set(machine, UPDATE_CYCLE_TIME, NULL, 0, rtc_end_update_callback);
+		timer_set(device->machine, UPDATE_CYCLE_TIME, (void *)device, 0, rtc_end_update_callback);
 	}
 }
 
@@ -538,14 +538,16 @@ static TIMER_CALLBACK( rtc_end_update_callback )
 		31,28,31, 30,31,30,
 		31,31,30, 31,30,31
 	};
+	const device_config *device = (const device_config *)ptr;
+	rtc65271_state *state = get_safe_token(device);
 	UINT8 (*increment)(UINT8 data);
 	int c59, c23, c12, c11, c29;
 
-	if (! (rtc.regs[reg_A] & reg_A_UIP))
+	if (! (state->regs[reg_A] & reg_A_UIP))
 		/* abort if update cycle has been canceled */
 		return;
 
-	if (rtc.regs[reg_B] & reg_B_DM)
+	if (state->regs[reg_B] & reg_B_DM)
 	{
 		/* binary mode */
 		increment = increment_binary;
@@ -567,95 +569,95 @@ static TIMER_CALLBACK( rtc_end_update_callback )
 	}
 
 	/* increment second */
-	if (rtc.regs[reg_second] < c59)
-		rtc.regs[reg_second] = (*increment)(rtc.regs[reg_second]);
+	if (state->regs[reg_second] < c59)
+		state->regs[reg_second] = (*increment)(state->regs[reg_second]);
 	else
 	{
-		rtc.regs[reg_second] = 0;
+		state->regs[reg_second] = 0;
 
 		/* increment minute */
-		if (rtc.regs[reg_minute] < c59)
-			rtc.regs[reg_minute] = (*increment)(rtc.regs[reg_minute]);
+		if (state->regs[reg_minute] < c59)
+			state->regs[reg_minute] = (*increment)(state->regs[reg_minute]);
 		else
 		{
-			rtc.regs[reg_minute] = 0;
+			state->regs[reg_minute] = 0;
 
 			/* increment hour */
-			if (rtc.regs[reg_B] & reg_B_24h)
+			if (state->regs[reg_B] & reg_B_24h)
 			{
 				/* 24 hour mode */
-				if (rtc.regs[reg_hour] < c23)
-					rtc.regs[reg_hour] = (*increment)(rtc.regs[reg_hour]);
+				if (state->regs[reg_hour] < c23)
+					state->regs[reg_hour] = (*increment)(state->regs[reg_hour]);
 				else
-					rtc.regs[reg_hour] = 0;
+					state->regs[reg_hour] = 0;
 			}
 			else
 			{
 				/* 12 hour mode */
-				if (rtc.regs[reg_hour] < c12)
+				if (state->regs[reg_hour] < c12)
 				{
-					if ((rtc.regs[reg_hour] & 0x7f) == c11)
-						rtc.regs[reg_hour] ^= 0x80;
-					rtc.regs[reg_hour] = ((*increment)(rtc.regs[reg_hour] & 0x7f) & 0x7f)
-											| (rtc.regs[reg_hour] & 0x80);
+					if ((state->regs[reg_hour] & 0x7f) == c11)
+						state->regs[reg_hour] ^= 0x80;
+					state->regs[reg_hour] = ((*increment)(state->regs[reg_hour] & 0x7f) & 0x7f)
+											| (state->regs[reg_hour] & 0x80);
 				}
 				else
-					rtc.regs[reg_hour] = 1 | (rtc.regs[reg_hour] & 0x80);
+					state->regs[reg_hour] = 1 | (state->regs[reg_hour] & 0x80);
 			}
 
 			/* increment day if needed */
-			if (rtc.regs[reg_hour] == ((rtc.regs[reg_B] & reg_B_24h) ? 0 : c12))
+			if (state->regs[reg_hour] == ((state->regs[reg_B] & reg_B_24h) ? 0 : c12))
 			{
 				/* increment day */
 				int days_in_month;
 
-				if (rtc.regs[reg_weekday] < 7)
-					rtc.regs[reg_weekday]++;
+				if (state->regs[reg_weekday] < 7)
+					state->regs[reg_weekday]++;
 				else
-					rtc.regs[reg_weekday] = 1;
+					state->regs[reg_weekday] = 1;
 
-				if ((rtc.regs[reg_month] != 2) || (rtc.regs[reg_year] & 0x03))
+				if ((state->regs[reg_month] != 2) || (state->regs[reg_year] & 0x03))
 				{
-					if (rtc.regs[reg_B] & reg_B_DM)
+					if (state->regs[reg_B] & reg_B_DM)
 					{
 						/* binary mode */
-						days_in_month = days_in_month_table[rtc.regs[reg_month] - 1];
+						days_in_month = days_in_month_table[state->regs[reg_month] - 1];
 					}
 					else
 					{
 						/* BCD mode */
-						days_in_month = binary_to_BCD(days_in_month_table[BCD_to_binary(rtc.regs[reg_month]) - 1]);
+						days_in_month = binary_to_BCD(days_in_month_table[BCD_to_binary(state->regs[reg_month]) - 1]);
 					}
 				}
 				else
 					days_in_month = c29;
 
-				if (rtc.regs[reg_monthday] < days_in_month)
-					rtc.regs[reg_monthday] = (*increment)(rtc.regs[reg_monthday]);
+				if (state->regs[reg_monthday] < days_in_month)
+					state->regs[reg_monthday] = (*increment)(state->regs[reg_monthday]);
 				else
 				{
 					/* increment month */
-					rtc.regs[reg_monthday] = 1;
+					state->regs[reg_monthday] = 1;
 
-					if (rtc.regs[reg_month] < c12)
-						rtc.regs[reg_month] = (*increment)(rtc.regs[reg_month]);
+					if (state->regs[reg_month] < c12)
+						state->regs[reg_month] = (*increment)(state->regs[reg_month]);
 					else
 					{
 						/* increment year */
-						rtc.regs[reg_month] = 1;
+						state->regs[reg_month] = 1;
 
-						if (rtc.regs[reg_B] & reg_B_DM)
+						if (state->regs[reg_B] & reg_B_DM)
 						{
 							/* binary mode */
-							if (rtc.regs[reg_year] < 99)
-								rtc.regs[reg_year]++;
+							if (state->regs[reg_year] < 99)
+								state->regs[reg_year]++;
 							else
-								rtc.regs[reg_year] = 0;
+								state->regs[reg_year] = 0;
 						}
 						else
 						{
 							/* BCD mode */
-							rtc.regs[reg_year] = increment_BCD(rtc.regs[reg_year]);
+							state->regs[reg_year] = increment_BCD(state->regs[reg_year]);
 						}
 					}
 				}
@@ -663,14 +665,56 @@ static TIMER_CALLBACK( rtc_end_update_callback )
 		}
 	}
 
-	rtc.regs[reg_A] &= ~reg_A_UIP;
-	rtc.regs[reg_C] |= reg_C_UF;
+	state->regs[reg_A] &= ~reg_A_UIP;
+	state->regs[reg_C] |= reg_C_UF;
 
 	/* test for alarm (values in range 0xc0-0xff mean "don't care") */
-	if ((((rtc.regs[reg_alarm_second] & 0xc0) == 0xc0) || (rtc.regs[reg_alarm_second] == rtc.regs[reg_second]))
-			&& (((rtc.regs[reg_alarm_minute] & 0xc0) == 0xc0) || (rtc.regs[reg_alarm_minute] == rtc.regs[reg_minute]))
-			&& (((rtc.regs[reg_alarm_hour] & 0xc0) == 0xc0) || (rtc.regs[reg_alarm_hour] == rtc.regs[reg_hour])))
-		rtc.regs[reg_C] |= reg_C_AF;
+	if ((((state->regs[reg_alarm_second] & 0xc0) == 0xc0) || (state->regs[reg_alarm_second] == state->regs[reg_second]))
+			&& (((state->regs[reg_alarm_minute] & 0xc0) == 0xc0) || (state->regs[reg_alarm_minute] == state->regs[reg_minute]))
+			&& (((state->regs[reg_alarm_hour] & 0xc0) == 0xc0) || (state->regs[reg_alarm_hour] == state->regs[reg_hour])))
+		state->regs[reg_C] |= reg_C_AF;
 
-	field_interrupts();
+	field_interrupts(device);
 }
+
+/*
+    Initialize clock
+
+    interrupt_callback: callback called when interrupt pin state changes (may
+        be NULL)
+*/
+
+static DEVICE_START( rtc65271 )
+{
+	rtc65271_config *config = (rtc65271_config *)device->inline_config;
+	rtc65271_state *state = get_safe_token(device);
+
+	state->update_timer = timer_alloc(device->machine, rtc_begin_update_callback, (void *)device);
+	timer_adjust_periodic(state->update_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
+	state->SQW_timer = timer_alloc(device->machine, rtc_SQW_callback, (void *)device);
+	state->interrupt_callback = config->interrupt_callback;
+
+	state_save_register_device_item_array(device, 0, state->regs);
+	state_save_register_device_item(device, 0, state->cur_reg);
+	state_save_register_device_item_array(device, 0, state->xram);
+	state_save_register_device_item(device, 0, state->cur_xram_page);
+	state_save_register_device_item(device, 0, state->SQW_internal_state);
+}
+
+
+static DEVICE_NVRAM( rtc65271 )
+{
+	if (read_or_write)
+		rtc65271_file_save(device, file);
+	else if (file)
+		rtc65271_file_load(device, file);
+}
+
+
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+
+#define DEVTEMPLATE_ID(p,s)		p##rtc65271##s
+#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_NVRAM | DT_HAS_INLINE_CONFIG
+#define DEVTEMPLATE_NAME		"RTC65271"
+#define DEVTEMPLATE_FAMILY		"RTC"
+#include "devtempl.h"

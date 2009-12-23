@@ -1370,6 +1370,8 @@ static MACHINE_DRIVER_START( segac )
 	MDRV_MACHINE_RESET(segac2)
 	MDRV_NVRAM_HANDLER(generic_randfill)
 
+	MDRV_IMPORT_FROM(megadriv_timers)
+
 	/* video hardware */
 	//MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
 

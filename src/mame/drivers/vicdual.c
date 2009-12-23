@@ -125,12 +125,6 @@ static INPUT_CHANGED( coin_changed )
  *
  *************************************/
 
-static int timer_started;
-static UINT32 timer_value;
-
-#define TIMER_HALF_PERIOD	ATTOTIME_IN_MSEC(4 / 2)	/* 4Mhz square wave */
-
-
 static int get_vcounter(running_machine *machine)
 {
 	int vcounter = video_screen_get_vpos(machine->primary_screen);
@@ -162,22 +156,10 @@ static CUSTOM_INPUT( vicdual_get_composite_blank_comp )
 }
 
 
-static TIMER_CALLBACK( vicdual_timer_callback )
-{
-	timer_value = timer_value ^ 1;
-}
-
-
 static CUSTOM_INPUT( vicdual_get_timer_value )
 {
-	/* start the timer, if this is the first call */
-	if (!timer_started)
-	{
-		timer_started = 1;
-		timer_pulse(field->port->machine, TIMER_HALF_PERIOD, NULL, 0, vicdual_timer_callback);
-	}
-
-	return timer_value;
+	/* return the state of the timer (old code claims "4MHz square wave", but it was toggled once every 2msec, or 500Hz) */
+	return attotime_to_ticks(timer_get_time(field->port->machine), 500) & 1;
 }
 
 

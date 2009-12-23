@@ -241,25 +241,6 @@ static UINT8 twinkle_spu_shared[0x400];	// SPU/PSX shared dual-ported RAM
 
 /* RTC */
 
-static UINT8 xram[ 4096 ];
-
-static NVRAM_HANDLER(twinkle)
-{
-	if (read_or_write)
-	{
-		rtc65271_file_save(file);
-	}
-	else
-	{
-		if (file != NULL)
-		{
-			rtc65271_file_load(machine, file);
-		}
-	}
-
-	NVRAM_HANDLER_CALL(i2cmem_0);
-}
-
 static UINT32 twinkle_unknown;
 
 static WRITE32_HANDLER( twinkle_unknown_w )
@@ -657,8 +638,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f260000, 0x1f260003) AM_WRITE(serial_w)
 	AM_RANGE(0x1f270000, 0x1f270003) AM_WRITE(security_w)
 	AM_RANGE(0x1f280000, 0x1f280003) AM_READ(security_r)
-	AM_RANGE(0x1f290000, 0x1f29007f) AM_READWRITE8(rtc65271_rtc_r, rtc65271_rtc_w, 0x00ff00ff)
-	AM_RANGE(0x1f2a0000, 0x1f2a007f) AM_READWRITE8(rtc65271_xram_r, rtc65271_xram_w, 0x00ff00ff)
+	AM_RANGE(0x1f290000, 0x1f29007f) AM_DEVREADWRITE8("rtc", rtc65271_rtc_r, rtc65271_rtc_w, 0x00ff00ff)
+	AM_RANGE(0x1f2a0000, 0x1f2a007f) AM_DEVREADWRITE8("rtc", rtc65271_xram_r, rtc65271_xram_w, 0x00ff00ff)
 	AM_RANGE(0x1f2b0000, 0x1f2b00ff) AM_WRITE(twinkle_output_w)
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_RAM /* scratchpad */
 	AM_RANGE(0x1f801000, 0x1f801007) AM_WRITENOP
@@ -894,8 +875,6 @@ static DRIVER_INIT( twinkle )
 	psx_dma_install_read_handler(5, scsi_dma_read);
 	psx_dma_install_write_handler(5, scsi_dma_write);
 
-	rtc65271_init(machine, xram, NULL);
-
 	i2cmem_init( machine, 0, I2CMEM_SLAVE_ADDRESS, 0, memory_region_length( machine, "user2" ), memory_region( machine, "user2" ) );
 	i2cmem_write( machine, 0, I2CMEM_E0, 0 );
 	i2cmem_write( machine, 0, I2CMEM_E1, 0 );
@@ -936,9 +915,10 @@ static MACHINE_DRIVER_START( twinkle )
 	MDRV_WATCHDOG_TIME_INIT(MSEC(1200)) /* check TD pin on LTC1232 */
 
 	MDRV_MACHINE_RESET( twinkle )
-	MDRV_NVRAM_HANDLER( twinkle )
+	MDRV_NVRAM_HANDLER( i2cmem_0 )
 
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
+	MDRV_RTC65271_ADD("rtc", NULL)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("mainscreen", RASTER)

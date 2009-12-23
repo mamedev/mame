@@ -2,12 +2,27 @@
     rtc65271.h: include file for rtc65271.c
 */
 
-extern int rtc65271_file_load(running_machine *machine, mame_file *file);
-extern int rtc65271_file_save(mame_file *file);
-extern void rtc65271_init(running_machine *machine, UINT8 *xram, void (*interrupt_callback)(running_machine *machine, int state));
-extern UINT8 rtc65271_r(int xramsel, offs_t offset);
-extern void rtc65271_w(int xramsel, offs_t offset, UINT8 data);
-extern READ8_HANDLER( rtc65271_rtc_r );
-extern READ8_HANDLER( rtc65271_xram_r );
-extern WRITE8_HANDLER( rtc65271_rtc_w );
-extern WRITE8_HANDLER( rtc65271_xram_w );
+typedef struct _rtc65271_config rtc65271_config;
+struct _rtc65271_config
+{
+	void (*interrupt_callback)(const device_config *device, int state);
+};
+
+
+#define MDRV_RTC65271_ADD(_tag, _callback) \
+	MDRV_DEVICE_ADD(_tag, RTC65271, 0) \
+	MDRV_DEVICE_CONFIG_DATAPTR(rtc65271_config, interrupt_callback, _callback)
+
+
+UINT8 rtc65271_r(const device_config *device, int xramsel, offs_t offset);
+void rtc65271_w(const device_config *device, int xramsel, offs_t offset, UINT8 data);
+
+READ8_DEVICE_HANDLER( rtc65271_rtc_r );
+READ8_DEVICE_HANDLER( rtc65271_xram_r );
+WRITE8_DEVICE_HANDLER( rtc65271_rtc_w );
+WRITE8_DEVICE_HANDLER( rtc65271_xram_w );
+
+
+/* device get info callback */
+#define RTC65271 DEVICE_GET_INFO_NAME(rtc65271)
+DEVICE_GET_INFO( rtc65271 );

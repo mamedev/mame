@@ -533,7 +533,7 @@ The same H8/3007 code "FC21 IOPR-0" at U49 is used for FUNCUBE 2,3,4 & 5
 #include "cpu/m68000/m68000.h"
 #include "machine/tmp68301.h"
 #include "cpu/h83002/h8.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/x1_010.h"
 #include "includes/seta.h"
 
@@ -600,40 +600,16 @@ ADDRESS_MAP_END
                         Mobile Suit Gundam EX Revue
 ***************************************************************************/
 
-static NVRAM_HANDLER(93C46_gundamex)
+static READ16_DEVICE_HANDLER( gundamex_eeprom_r )
 {
-	if (read_or_write)
-	{
-		eeprom_save(file);
-	}
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C46);
-		if (file)
-		{
-			eeprom_load(file);
-		}
-		else
-		{
-			UINT32 length, size;
-			UINT16 *dat;
-
-			dat = (UINT16 *)eeprom_get_data_pointer(&length, &size);
-			dat[0] = 0x7008;
-		}
-	}
+	return ((eepromdev_read_bit(device) & 1)) << 3;
 }
 
-static READ16_HANDLER( gundamex_eeprom_r )
+static WRITE16_DEVICE_HANDLER( gundamex_eeprom_w )
 {
-	return ((eeprom_read_bit() & 1)) << 3;
-}
-
-static WRITE16_HANDLER( gundamex_eeprom_w )
-{
-		eeprom_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_write_bit(data & 0x1);
-		eeprom_set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+		eepromdev_set_clock_line(device, (data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+		eepromdev_write_bit(device, data & 0x1);
+		eepromdev_set_cs_line(device, (data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( gundamex_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -655,7 +631,7 @@ static ADDRESS_MAP_START( gundamex_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM								// cleared
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)	// Video Registers
 	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
-	AM_RANGE(0xfffd0a, 0xfffd0b) AM_READWRITE(gundamex_eeprom_r,gundamex_eeprom_w)	// parallel data register
+	AM_RANGE(0xfffd0a, 0xfffd0b) AM_DEVREADWRITE("eeprom", gundamex_eeprom_r,gundamex_eeprom_w)	// parallel data register
 	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)	// TMP68301 Registers
 ADDRESS_MAP_END
 
@@ -2298,6 +2274,7 @@ static MACHINE_DRIVER_START( mj4simai )
 	MDRV_CPU_PROGRAM_MAP(mj4simai_map)
 	MDRV_CPU_VBLANK_INT("screen", seta2_interrupt)
 
+	MDRV_MACHINE_START( tmp68301 )
 	MDRV_MACHINE_RESET( tmp68301 )
 
 	/* video hardware */
@@ -2330,8 +2307,8 @@ static MACHINE_DRIVER_START( gundamex )
 	MDRV_IMPORT_FROM(mj4simai)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gundamex_map)
-
-	MDRV_NVRAM_HANDLER(93C46_gundamex)
+	
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2533,6 +2510,9 @@ ROM_START( gundamex )
 	ROM_REGION( 0x300000, "x1snd", 0 )	/* Samples */
 	/* Leave 1MB empty (addressable by the chip) */
 	ROM_LOAD( "ka001015.u28", 0x100000, 0x200000, CRC(ada2843b) SHA1(09d06026031bc7558da511c3c0e29187ea0a0099) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "eeprom.bin", 0x0000, 0x0080, CRC(80f8e248) SHA1(1a9787811e56d95f7acbedfb00225b6e7df265eb) )
 ROM_END
 
 ROM_START( grdians )

@@ -6068,6 +6068,15 @@ static NVRAM_HANDLER( megadriv )
 #endif
 
 
+MACHINE_DRIVER_START( megadriv_timers )
+	MDRV_TIMER_ADD("frame_timer", frame_timer_callback)
+	MDRV_TIMER_ADD("scanline_timer", scanline_timer_callback)
+	MDRV_TIMER_ADD("render_timer", render_timer_callback)
+	MDRV_TIMER_ADD("irq6_timer", irq6_on_callback)
+	MDRV_TIMER_ADD("irq4_timer", irq4_on_callback)
+MACHINE_DRIVER_END
+
+
 MACHINE_DRIVER_START( megadriv )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
 	MDRV_CPU_PROGRAM_MAP(megadriv_map)
@@ -6080,12 +6089,8 @@ MACHINE_DRIVER_START( megadriv )
 
 	MDRV_MACHINE_START(megadriv)
 	MDRV_MACHINE_RESET(megadriv)
-
-	MDRV_TIMER_ADD("frame_timer", frame_timer_callback)
-	MDRV_TIMER_ADD("scanline_timer", scanline_timer_callback)
-	MDRV_TIMER_ADD("render_timer", render_timer_callback)
-	MDRV_TIMER_ADD("irq6_timer", irq6_on_callback)
-	MDRV_TIMER_ADD("irq4_timer", irq4_on_callback)
+	
+	MDRV_IMPORT_FROM(megadriv_timers)
 
 	MDRV_SCREEN_ADD("megadriv", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
@@ -6132,11 +6137,7 @@ MACHINE_DRIVER_START( megadpal )
 	MDRV_MACHINE_START(megadriv)
 	MDRV_MACHINE_RESET(megadriv)
 
-	MDRV_TIMER_ADD("frame_timer", frame_timer_callback)
-	MDRV_TIMER_ADD("scanline_timer", scanline_timer_callback)
-	MDRV_TIMER_ADD("render_timer", render_timer_callback)
-	MDRV_TIMER_ADD("irq6_timer", irq6_on_callback)
-	MDRV_TIMER_ADD("irq4_timer", irq4_on_callback)
+	MDRV_IMPORT_FROM(megadriv_timers)
 
 	MDRV_SCREEN_ADD("megadriv", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)

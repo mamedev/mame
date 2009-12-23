@@ -1916,11 +1916,15 @@ static MACHINE_DRIVER_START( spi )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_START( sxx2f )
+{
+	z80_rom = auto_alloc_array(machine, UINT8, 0x40000);
+}
+
 static MACHINE_RESET( sxx2f )
 {
 	UINT8 *rom = memory_region(machine, "soundcpu");
 
-	z80_rom = auto_alloc_array(machine, UINT8, 0x40000);
 	memory_set_bankptr(machine, "bank4", z80_rom);
 	memory_set_bankptr(machine, "bank5", z80_rom);
 
@@ -1928,6 +1932,7 @@ static MACHINE_RESET( sxx2f )
 
 	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000068c, 0x0000068f, 0, 0, eeprom_w);
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000680, 0x00000683, 0, 0, sb_coin_r);
+
 	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), spi_irq_callback);
 
 	sb_coin_latch = 0;
@@ -1937,6 +1942,7 @@ static MACHINE_DRIVER_START( sxx2f ) /* Intel i386DX @ 25MHz, YMF271 @ 16.9344MH
 
 	MDRV_IMPORT_FROM(spi)
 
+	MDRV_MACHINE_START(sxx2f)
 	MDRV_MACHINE_RESET(sxx2f)
 	MDRV_NVRAM_HANDLER(sxx2f)
 
@@ -1956,6 +1962,7 @@ static MACHINE_DRIVER_START( sxx2g ) /* single board version using measured cloc
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
+	MDRV_MACHINE_START(sxx2f)
 	MDRV_MACHINE_RESET(sxx2f)
 	MDRV_NVRAM_HANDLER(sxx2f)
 
