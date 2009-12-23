@@ -1030,28 +1030,28 @@ static void I386OP(repeat)(i386_state *cpustate, int invert_flag)
 	opcode = FETCH(cpustate);
 	switch(opcode) {
 		case 0x26:
-	    cpustate->segment_override=1;
-		cpustate->segment_prefix=ES;
+	    cpustate->segment_override=ES;
+		cpustate->segment_prefix=1;
 		break;
 		case 0x2e:
-	    cpustate->segment_override=1;
-		cpustate->segment_prefix=CS;
+	    cpustate->segment_override=CS;
+		cpustate->segment_prefix=1;
 		break;
 		case 0x36:
-	    cpustate->segment_override=1;
-		cpustate->segment_prefix=SS;
+	    cpustate->segment_override=SS;
+		cpustate->segment_prefix=1;
 		break;
 		case 0x3e:
-	    cpustate->segment_override=1;
-		cpustate->segment_prefix=DS;
+	    cpustate->segment_override=DS;
+		cpustate->segment_prefix=1;
 		break;
 		case 0x64:
-	    cpustate->segment_override=1;
-		cpustate->segment_prefix=FS;
+	    cpustate->segment_override=FS;
+		cpustate->segment_prefix=1;
 		break;
 		case 0x65:
-	    cpustate->segment_override=1;
-		cpustate->segment_prefix=GS;
+	    cpustate->segment_override=GS;
+		cpustate->segment_prefix=1;
 		break;
 		case 0x66:
 		cpustate->operand_size ^= 1;

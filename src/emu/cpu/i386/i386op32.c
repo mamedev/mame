@@ -2923,6 +2923,33 @@ static void I386OP(group0FBA_32)(i386_state *cpustate)		// Opcode 0x0f ba
 	}
 }
 
+static void I386OP(lsl_r32_rm32)(i386_state *cpustate)  // Opcode 0x0f 0x03
+{
+	UINT8 modrm = FETCH(cpustate);
+	UINT32 limit;
+	I386_SREG seg;
+
+	if(PROTECTED_MODE)
+	{
+		memset(&seg, 0, sizeof(seg));
+		seg.selector = LOAD_RM32(modrm);
+		if(seg.selector == 0)
+		{
+			SetZF(0);  // not a valid segment
+		}
+		else
+		{
+			// TODO: check segment type
+			i386_load_protected_mode_segment(cpustate,&seg);
+			limit = seg.limit;
+			STORE_REG32(modrm,limit);
+			SetZF(1);
+		}
+	}
+	else
+		i386_trap(cpustate,6, 0);
+}
+
 static void I386OP(bound_r32_m32_m32)(i386_state *cpustate)	// Opcode 0x62
 {
 	UINT8 modrm;
