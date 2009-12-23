@@ -1199,6 +1199,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"ffightj",  CPS_B_04,     mapper_S224B },
 	{"ffightj1", CPS_B_02,     mapper_S224B },
 	{"ffightj2", CPS_B_01,     mapper_S224B },
+	{"ffightjb", CPS_B_01,     mapper_S224B },
 	{"1941",     CPS_B_05,     mapper_YI24B },
 	{"1941j",    CPS_B_05,     mapper_YI24B },
 	{"unsquad",  CPS_B_11,     mapper_AR24B },	/* CPSB ID not checked, but it's the same as sf2eg */
