@@ -85,7 +85,7 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
 
 #include "driver.h"
 #include "cpu/mips/r3000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "includes/policetr.h"
 #include "sound/bsmt2000.h"
 
@@ -155,9 +155,10 @@ static WRITE32_HANDLER( control_w )
 	/* handle EEPROM I/O */
 	if (ACCESSING_BITS_16_23)
 	{
-		eeprom_write_bit(data & 0x00800000);
-		eeprom_set_cs_line((data & 0x00200000) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_set_clock_line((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
+		const device_config *device = devtag_get_device(space->machine, "eeprom");
+		eepromdev_write_bit(device, data & 0x00800000);
+		eepromdev_set_cs_line(device, (data & 0x00200000) ? CLEAR_LINE : ASSERT_LINE);
+		eepromdev_set_clock_line(device, (data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	/* toggling BSMT off then on causes a reset */
@@ -257,18 +258,6 @@ static const eeprom_interface eeprom_interface_policetr =
 };
 
 
-static NVRAM_HANDLER( policetr )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_policetr);
-		if (file)	eeprom_load(file);
-	}
-}
-
-
 
 /*************************************
  *
@@ -354,7 +343,7 @@ static INPUT_PORTS_START( policetr )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM read */
+	PORT_BIT( 0x20000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	/* EEPROM read */
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -444,7 +433,7 @@ static MACHINE_DRIVER_START( policetr )
 	MDRV_CPU_PROGRAM_MAP(policetr_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_gen)
 
-	MDRV_NVRAM_HANDLER(policetr)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_interface_policetr)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -739,6 +728,6 @@ GAME( 1996, policetr10,  policetr, policetr, polict10, policetr, ROT0, "P & P Ma
 GAME( 1996, policetr13a, policetr, sshooter, policetr, plctr13b, ROT0, "P & P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
 GAME( 1996, policetr13b, policetr, sshooter, policetr, plctr13b, ROT0, "P & P Marketing", "Police Trainer (Rev 1.3B)", 0 )
 
-GAME( 1998, sshooter, 0,        sshooter, policetr, sshooter, ROT0, "P & P Marketing", "Sharpshooter (Rev 1.7)", 0 )
-GAME( 1998, sshooter12, sshooter, sshooter, sshoot11, sshoot12, ROT0, "P & P Marketing", "Sharpshooter (Rev 1.2)", 0 )
-GAME( 1998, sshooter11, sshooter, sshooter, sshoot11, sshoot12, ROT0, "P & P Marketing", "Sharpshooter (Rev 1.1)", 0 )
+GAME( 1998, sshooter,    0,        sshooter, policetr, sshooter, ROT0, "P & P Marketing", "Sharpshooter (Rev 1.7)", 0 )
+GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, sshoot12, ROT0, "P & P Marketing", "Sharpshooter (Rev 1.2)", 0 )
+GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, sshoot12, ROT0, "P & P Marketing", "Sharpshooter (Rev 1.1)", 0 )
