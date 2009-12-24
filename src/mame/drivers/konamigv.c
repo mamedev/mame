@@ -116,7 +116,7 @@ Notes:
 #include "cdrom.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "machine/intelfsh.h"
 #include "machine/am53cf96.h"
 #include "sound/psx.h"
@@ -134,32 +134,11 @@ static UINT32 btc_trackball_data[ 4 ];
 
 /* EEPROM handlers */
 
-static NVRAM_HANDLER( konamigv_93C46 )
+static WRITE32_DEVICE_HANDLER( eeprom_w )
 {
-	if( read_or_write )
-	{
-		eeprom_save( file );
-	}
-	else
-	{
-		eeprom_init( machine, &eeprom_interface_93C46 );
-
-		if( file )
-		{
-			eeprom_load( file );
-		}
-		else
-		{
-			eeprom_set_data( memory_region( machine, "user2" ), memory_region_length( machine, "user2" ) );
-		}
-	}
-}
-
-static WRITE32_HANDLER( eeprom_w )
-{
-	eeprom_write_bit((data&0x01) ? 1 : 0);
-	eeprom_set_clock_line((data&0x04) ? ASSERT_LINE : CLEAR_LINE);
-	eeprom_set_cs_line((data&0x02) ? CLEAR_LINE : ASSERT_LINE);
+	eepromdev_write_bit(device, (data&0x01) ? 1 : 0);
+	eepromdev_set_clock_line(device, (data&0x04) ? ASSERT_LINE : CLEAR_LINE);
+	eepromdev_set_cs_line(device, (data&0x02) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE32_HANDLER( mb89371_w )
@@ -177,7 +156,7 @@ static ADDRESS_MAP_START( konamigv_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f100000, 0x1f100003) AM_READ_PORT("P1")
 	AM_RANGE(0x1f100004, 0x1f100007) AM_READ_PORT("P2")
 	AM_RANGE(0x1f100008, 0x1f10000b) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x1f180000, 0x1f180003) AM_WRITE(eeprom_w)
+	AM_RANGE(0x1f180000, 0x1f180003) AM_DEVWRITE("eeprom", eeprom_w)
 	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE(mb89371_r, mb89371_w)
 	AM_RANGE(0x1f780000, 0x1f780003) AM_WRITENOP /* watchdog? */
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_RAM /* scratchpad */
@@ -356,7 +335,8 @@ static MACHINE_DRIVER_START( konamigv )
 
 	MDRV_MACHINE_START( konamigv )
 	MDRV_MACHINE_RESET( konamigv )
-	MDRV_NVRAM_HANDLER(konamigv_93C46)
+	
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -400,7 +380,7 @@ static INPUT_PORTS_START( konamigv )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00001000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM( eeprom_bit_r, NULL )
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE( "eeprom", eepromdev_read_bit )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -448,7 +428,6 @@ INPUT_PORTS_END
 
 static NVRAM_HANDLER( simpbowl )
 {
-	NVRAM_HANDLER_CALL(konamigv_93C46);
 	nvram_handler_intelflash( machine, 0, file, read_or_write );
 	nvram_handler_intelflash( machine, 1, file, read_or_write );
 	nvram_handler_intelflash( machine, 2, file, read_or_write );
@@ -631,7 +610,6 @@ static WRITE32_HANDLER( btc_trackball_w )
 
 static NVRAM_HANDLER( btchamp )
 {
-	NVRAM_HANDLER_CALL(konamigv_93C46);
 	nvram_handler_intelflash( machine, 0, file, read_or_write );
 }
 
@@ -793,13 +771,13 @@ INPUT_PORTS_END
 ROM_START( konamigv )
 	GV_BIOS
 
-	ROM_REGION( 0x0000080, "user2", ROMREGION_ERASE00 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", ROMREGION_ERASE00 ) /* default eeprom */
 ROM_END
 
 ROM_START( susume )
 	GV_BIOS
 
-	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "susume.25c",   0x000000, 0x000080, CRC(52f17df7) SHA1(b8ad7787b0692713439d7d9bebfa0c801c806006) )
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "gv027j1", 0, SHA1(ad474c60ee68202324a31cc106f2054dc465f4b7) )
@@ -808,7 +786,7 @@ ROM_END
 ROM_START( hyperath )
 	GV_BIOS
 
-	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "hyperath.25c", 0x000000, 0x000080, CRC(20a8c435) SHA1(a0f203a999757fba68b391c525ac4b9684a57ba9) )
 
 	DISK_REGION( "cdrom" )
@@ -818,7 +796,7 @@ ROM_END
 ROM_START( pbball96 )
 	GV_BIOS
 
-	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "pbball96.25c", 0x000000, 0x000080, CRC(405a7fc9) SHA1(e2d978f49748ba3c4a425188abcd3d272ec23907) )
 
 	DISK_REGION( "cdrom" )
@@ -828,7 +806,7 @@ ROM_END
 ROM_START( weddingr )
 	GV_BIOS
 
-	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "weddingr.25c", 0x000000, 0x000080, CRC(b90509a0) SHA1(41510a0ceded81dcb26a70eba97636d38d3742c3) )
 
 	DISK_REGION( "cdrom" )
@@ -838,7 +816,7 @@ ROM_END
 ROM_START( simpbowl )
 	GV_BIOS
 
-	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "simpbowl.25c", 0x000000, 0x000080, CRC(2c61050c) SHA1(16ae7f81cbe841c429c5c7326cf83e87db1782bf) )
 
 	DISK_REGION( "cdrom" )
@@ -848,7 +826,7 @@ ROM_END
 ROM_START( btchamp )
 	GV_BIOS
 
-	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "btchmp.25c", 0x000000, 0x000080, CRC(6d02ea54) SHA1(d3babf481fd89db3aec17f589d0d3d999a2aa6e1) )
 
 	DISK_REGION( "cdrom" )
@@ -858,7 +836,7 @@ ROM_END
 ROM_START( kdeadeye )
 	GV_BIOS
 
-	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "kdeadeye.25c", 0x000000, 0x000080, CRC(3935d2df) SHA1(cbb855c475269077803c380dbc3621e522efe51e) )
 
 	DISK_REGION( "cdrom" )
@@ -868,7 +846,7 @@ ROM_END
 ROM_START( nagano98 )
 	GV_BIOS
 
-	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "nagano98.25c",  0x000000, 0x000080, CRC(b64b7451) SHA1(a77a37e0cc580934d1e7e05d523bae0acd2c1480) )
 
 	DISK_REGION( "cdrom" )
@@ -878,7 +856,7 @@ ROM_END
 ROM_START( tokimosh )
 	GV_BIOS
 
-	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
         ROM_LOAD( "tokimosh.25c", 0x000000, 0x000080, CRC(e57b833f) SHA1(f18a0974a6be69dc179706643aab837ff61c2738) )
 
 	DISK_REGION( "cdrom" )
@@ -888,7 +866,7 @@ ROM_END
 ROM_START( tokimosp )
 	GV_BIOS
 
-	ROM_REGION( 0x0000080, "user2", 0 ) /* default eeprom */
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
 	ROM_LOAD( "tokimosp.25c", 0x000000, 0x000080, CRC(af4cdd87) SHA1(97041e287e4c80066043967450779b81b62b2b8e) )
 
 	DISK_REGION( "cdrom" )
