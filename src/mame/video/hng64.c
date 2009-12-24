@@ -2054,7 +2054,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
             // CHUNK TYPE BITS - These are very likely incorrect.
             // x--- ---- - 1 = Has only 1 vertex (part of a triangle fan/strip)
             // -x-- ---- -
-            // --x- ---- -
+            // --x- ---- - 1 = Contains (at least one?) quad(s)
             // ---x ---- -
             // ---- x--- -
             // ---- -x-- - 1 = Has per-vert UVs
@@ -2216,25 +2216,25 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				chunkLength = 12;
 				break;
 
-			// 36 word chunk, 3 vertices, per-vertex UVs & normals, per-face normal, and ???
+			// 36 word chunk, 3 vertices + 1 fan vertex (a quad), per-vertex UVs, per-face normals
 			case 0x2e:	// 0010 1110
 				for (m = 0; m < 3; m++)
 				{
-					polys[*numPolys].vert[m].worldCoords[0] = uToF(threeDPointer[3 + (9*m)]);
-					polys[*numPolys].vert[m].worldCoords[1] = uToF(threeDPointer[4 + (9*m)]);
-					polys[*numPolys].vert[m].worldCoords[2] = uToF(threeDPointer[5 + (9*m)]);
+					polys[*numPolys].vert[m].worldCoords[0] = uToF(threeDPointer[3 + (6*m)]);
+					polys[*numPolys].vert[m].worldCoords[1] = uToF(threeDPointer[4 + (6*m)]);
+					polys[*numPolys].vert[m].worldCoords[2] = uToF(threeDPointer[5 + (6*m)]);
 					polys[*numPolys].vert[m].worldCoords[3] = 1.0f;
 					polys[*numPolys].n = 3;
 
-					// threeDPointer[6 + (9*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-					polys[*numPolys].vert[m].texCoords[0] = uToF(threeDPointer[7 + (9*m)]);
-					polys[*numPolys].vert[m].texCoords[1] = uToF(threeDPointer[8 + (9*m)]);
+					// threeDPointer[6 + (6*m)] = ???
+					polys[*numPolys].vert[m].texCoords[0] = uToF(threeDPointer[7 + (6*m)]);
+					polys[*numPolys].vert[m].texCoords[1] = uToF(threeDPointer[8 + (6*m)]);
 					polys[*numPolys].vert[m].texCoords[2] = 0.0f;
 					polys[*numPolys].vert[m].texCoords[3] = 1.0f;
 
-					polys[*numPolys].vert[m].normal[0] = uToF(threeDPointer[9  + (9*m)]);
-					polys[*numPolys].vert[m].normal[1] = uToF(threeDPointer[10 + (9*m)] );
-					polys[*numPolys].vert[m].normal[2] = uToF(threeDPointer[11 + (9*m)] );
+					polys[*numPolys].vert[m].normal[0] = uToF(threeDPointer[21]);
+					polys[*numPolys].vert[m].normal[1] = uToF(threeDPointer[22]);
+					polys[*numPolys].vert[m].normal[2] = uToF(threeDPointer[23]);
 					polys[*numPolys].vert[m].normal[3] = 0.0f;
 
 					// !!! DUMB !!!
@@ -2243,19 +2243,38 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 					polys[*numPolys].vert[m].light[2] = polys[*numPolys].vert[m].texCoords[2] * 255.0f;
 				}
 
-				// Redundantly called, but it works...
-				polys[*numPolys].faceNormal[0] = uToF(threeDPointer[30]);
-				polys[*numPolys].faceNormal[1] = uToF(threeDPointer[31]);
-				polys[*numPolys].faceNormal[2] = uToF(threeDPointer[32]);
-				polys[*numPolys].faceNormal[3] = 0.0f;
+				// ??? Looks normalized
+				//polys[*numPolys].faceNormal[0] = uToF(threeDPointer[24]);
+				//polys[*numPolys].faceNormal[1] = uToF(threeDPointer[25]);
+				//polys[*numPolys].faceNormal[2] = uToF(threeDPointer[26]);
+				//polys[*numPolys].faceNormal[3] = 0.0f;
 
-				// Missing another 3 words at the end here.
+				polys[*numPolys].n = 3;
+
+				// uToF(threeDPointer[27]) - vertex #4 - System not capable yet
+				// uToF(threeDPointer[28]) - vertex #4 - System not capable yet
+				// uToF(threeDPointer[29]) - vertex #4 - System not capable yet
+
+				// threeDPointer[30]?
+				//polys[*numPolys].vert[2].texCoords[0] = uToF(threeDPointer[31]);	// System not capable yet
+				//polys[*numPolys].vert[2].texCoords[1] = uToF(threeDPointer[32]);	// System not capable yet
+				//polys[*numPolys].vert[2].texCoords[2] = 0.0f;
+				//polys[*numPolys].vert[2].texCoords[3] = 1.0f;
+
+				// ??? Looks normalized - always seems the same as [24,25,26]
+				//polys[*numPolys].faceNormal[0] = uToF(threeDPointer[33]);
+				//polys[*numPolys].faceNormal[1] = uToF(threeDPointer[34]);
+				//polys[*numPolys].faceNormal[2] = uToF(threeDPointer[35]);
+				//polys[*numPolys].faceNormal[3] = 0.0f;
 
 				/* There's something fishy about this guy - see 0x7a below.  Very likely not fixed-length */
 				/*
 				printf("0x2e : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
                 for (m = 0; m < 37; m++)
                     printf("%04x ", threeDPointer[m]);
+				printf("\n");
+                for (m = 0; m < 37; m++)
+                    printf("%3.4f ", uToF(threeDPointer[m]));
 				printf("\n\n"); 
 				*/
 				chunkLength = 36;
@@ -2270,7 +2289,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				/*
                 printf("0x7a : %08x (%d/%d)\n", mame_rand(machine), l, size[k]-1);
                 for (m = 0; m < 100; m++)
-                    printf("%04x ", threeDPointer[m]);
+				    printf("%04x ", threeDPointer[m]);
                 printf("\n\n");
                 */
 				chunkLength = 0;
