@@ -13,7 +13,6 @@ DRIVER_INIT ( stv );
 
 /*----------- defined in drivers/stvinit.c -----------*/
 
-NVRAM_HANDLER( stv );
 void install_stvbios_speedups(running_machine *machine);
 DRIVER_INIT(mausuke);
 DRIVER_INIT(puyosun);

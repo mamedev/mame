@@ -37,7 +37,7 @@
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/es5506.h"
 #include "includes/taito_f3.h"
 #include "audio/taito_en.h"
@@ -151,9 +151,10 @@ static WRITE32_HANDLER( superchs_input_w )
 
 			if (ACCESSING_BITS_0_7)
 			{
-				eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				eeprom_write_bit(data & 0x40);
-				eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				const device_config *device = devtag_get_device(space->machine, "eeprom");
+				eepromdev_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				eepromdev_write_bit(device, data & 0x40);
+				eepromdev_set_cs_line(device, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				return;
 			}
 
@@ -263,7 +264,7 @@ static INPUT_PORTS_START( superchs )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_CUSTOM(eeprom_bit_r, NULL)	/* reserved for EEROM */
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL )	PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	/* reserved for EEROM */
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_PLAYER(1)	/* seat center (cockpit only) */
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -359,32 +360,6 @@ static const eeprom_interface superchs_eeprom_interface =
 	"0100110000",	/* lock command */
 };
 
-static const UINT8 default_eeprom[128]={
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x00,0x53,0x00,0x2e,0x00,0x43,0x00,0x00,
-	0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0x00,0x01,0xff,0xff,0xff,0xff,0x00,0x01,
-	0x00,0x01,0x00,0x01,0x00,0x00,0x00,0x01,0xff,0xff,0x00,0x00,0x00,0x00,0x00,0x00,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,
-	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x00,0x80,0xff,0xff,0xff,0xff,
-	0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0xff
-};
-
-static NVRAM_HANDLER( superchs )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &superchs_eeprom_interface);
-
-		if (file)
-			eeprom_load(file);
-		else
-			eeprom_set_data(default_eeprom,128);  /* Default the wheel setup values */
-	}
-}
-
 static MACHINE_DRIVER_START( superchs )
 
 	/* basic machine hardware */
@@ -398,7 +373,7 @@ static MACHINE_DRIVER_START( superchs )
 
 	MDRV_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
 
-	MDRV_NVRAM_HANDLER(superchs)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", superchs_eeprom_interface)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -453,6 +428,9 @@ ROM_START( superchs )
 	ROM_LOAD16_BYTE( "d46-12.4", 0x000000, 0x200000, CRC(a24a53a8) SHA1(5d5fb87a94ceabda89360064d7d9b6d23c4c606b) )
 	ROM_RELOAD     (             0x400000, 0x200000 )
 	ROM_LOAD16_BYTE( "d46-11.5", 0x800000, 0x200000, CRC(d4ea0f56) SHA1(dc8d2ed3c11d0b6f9ebdfde805188884320235e6) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "eeprom-superchs.bin", 0x0000, 0x0080, CRC(230f0753) SHA1(4c692b35083da71ed866b233c7c9b152a914c95c) )
 ROM_END
 
 static READ32_HANDLER( main_cycle_r )

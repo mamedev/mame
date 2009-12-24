@@ -154,7 +154,7 @@ ToDo / Notes:
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "cpu/sh2/sh2.h"
 #include "machine/stvcd.h"
 #include "machine/scudsp.h"
@@ -474,7 +474,7 @@ static UINT8 stv_SMPC_r8 (const address_space *space, int offset)
 		return_data = input_port_read(space->machine, "DSW1");
 
 	if (offset == 0x77)//PDR2 read
-		return_data=  (0xfe | eeprom_read_bit());
+		return_data=  (0xfe | eepromdev_read_bit(devtag_get_device(space->machine, "eeprom")));
 
 //  if (offset == 0x33) //country code
 //      return_data = input_port_read(machine, "FAKE");
@@ -498,9 +498,10 @@ static void stv_SMPC_w8 (const address_space *space, int offset, UINT8 data)
 
 	if(offset == 0x75)
 	{
-		eeprom_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_write_bit(data & 0x10);
-		eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+		const device_config *device = devtag_get_device(space->machine, "eeprom");
+		eepromdev_set_clock_line(device, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		eepromdev_write_bit(device, data & 0x10);
+		eepromdev_set_cs_line(device, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 
 
 //      if (data & 0x01)
@@ -2742,7 +2743,8 @@ static MACHINE_DRIVER_START( stv )
 
 	MDRV_MACHINE_START(stv)
 	MDRV_MACHINE_RESET(stv)
-	MDRV_NVRAM_HANDLER(stv) /* Actually 93c45 */
+	
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom") /* Actually 93c45 */
 
 	MDRV_TIMER_ADD("scan_timer", hblank_in_irq)
 	MDRV_TIMER_ADD("t1_timer", timer1_irq)
@@ -3405,6 +3407,9 @@ ROM_START( shienryu )
 	ROM_LOAD16_WORD_SWAP( "mpr19631.7",    0x0200000, 0x0200000, CRC(3a4b1abc) SHA1(3b14b7fdebd4817da32ea374c15a38c695ffeff1) ) // good
 	ROM_LOAD16_WORD_SWAP( "mpr19632.2",    0x0400000, 0x0400000, CRC(985fae46) SHA1(f953bde91805b97b60d2ab9270f9d2933e064d95) ) // good
 	ROM_LOAD16_WORD_SWAP( "mpr19633.3",    0x0800000, 0x0400000, CRC(e2f0b037) SHA1(97861d09e10ce5d2b10bf5559574b3f489e28077) ) // good
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "eeprom-shienryu.bin", 0x0000, 0x0080, CRC(98db6925) SHA1(e78545e8f62d19f8e00197c62ff0e56f6c85e355) )
 ROM_END
 
 ROM_START( smleague ) /* only runs with the USA bios */
