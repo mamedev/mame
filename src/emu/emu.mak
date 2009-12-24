@@ -124,6 +124,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/8257dma.o \
 	$(EMUMACHINE)/8255ppi.o \
 	$(EMUMACHINE)/adc083x.o \
+	$(EMUMACHINE)/adc1038.o \
 	$(EMUMACHINE)/adc1213x.o \
  	$(EMUMACHINE)/am53cf96.o \
  	$(EMUMACHINE)/at28c16.o \
@@ -141,6 +142,8 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/i2cmemdev.o \
  	$(EMUMACHINE)/idectrl.o \
  	$(EMUMACHINE)/intelfsh.o \
+ 	$(EMUMACHINE)/k033906.o \
+ 	$(EMUMACHINE)/k056230.o \
 	$(EMUMACHINE)/latch8.o \
 	$(EMUMACHINE)/ldcore.o \
 	$(EMUMACHINE)/ldpr8210.o \

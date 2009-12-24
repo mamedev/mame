@@ -319,6 +319,7 @@
 #include "rendlay.h"
 #include "machine/adc1213x.h"
 #include "sound/k056800.h"
+#include "machine/k033906.h"
 
 static UINT8 led_reg0, led_reg1;
 static UINT32 *workram;
@@ -1100,6 +1101,16 @@ static const k056800_interface hornet_k056800_interface =
 	sound_irq_callback
 };
 
+static const k033906_interface hornet_k033906_intf_0 = 
+{
+	"voodoo0"
+};
+
+static const k033906_interface hornet_k033906_intf_1 = 
+{
+	"voodoo1"
+};
+
 static MACHINE_DRIVER_START( hornet )
 
 	/* basic machine hardware */
@@ -1124,6 +1135,8 @@ static MACHINE_DRIVER_START( hornet )
 	MDRV_3DFX_VOODOO_CPU("dsp")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
+
+	MDRV_K033906_ADD("k033906_1", hornet_k033906_intf_0)
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1191,6 +1204,8 @@ static MACHINE_DRIVER_START( hornet_2board )
 	MDRV_3DFX_VOODOO_CPU("dsp2")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_1)
+
+	MDRV_K033906_ADD("k033906_2", hornet_k033906_intf_1)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(65536)
@@ -1382,8 +1397,6 @@ static DRIVER_INIT(hornet)
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_HORNET);
 	set_cgboard_texture_bank(machine, 0, "bank5", memory_region(machine, "user5"));
 
-	K033906_init(machine);
-
 	led_reg0 = led_reg1 = 0x7f;
 
 	ppc4xx_spu_set_tx_handler(cputag_get_cpu(machine, "maincpu"), jamma_jvs_w);
@@ -1394,8 +1407,6 @@ static DRIVER_INIT(hornet_2board)
 	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HORNET);
 	set_cgboard_texture_bank(machine, 0, "bank5", memory_region(machine, "user5"));
 	set_cgboard_texture_bank(machine, 1, "bank6", memory_region(machine, "user5"));
-
-	K033906_init(machine);
 
 	led_reg0 = led_reg1 = 0x7f;
 

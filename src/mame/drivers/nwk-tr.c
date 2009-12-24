@@ -222,6 +222,7 @@ Thrill Drive 713A13  -       713A14  -
 #include "video/voodoo.h"
 #include "machine/timekpr.h"
 #include "sound/k056800.h"
+#include "machine/k033906.h"
 
 static UINT8 led_reg0, led_reg1;
 
@@ -1042,6 +1043,11 @@ static const k056800_interface nwktr_k056800_interface =
 	sound_irq_callback
 };
 
+static const k033906_interface nwktr_k033906_interface = 
+{
+	"voodoo"
+};
+
 static MACHINE_RESET( nwktr )
 {
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
@@ -1070,6 +1076,8 @@ static MACHINE_DRIVER_START( nwktr )
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 2)
 	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 2)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
+
+	MDRV_K033906_ADD("k033906_1", nwktr_k033906_interface)
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1105,8 +1113,6 @@ static DRIVER_INIT(nwktr)
 
 	sharc_dataram = auto_alloc_array(machine, UINT32, 0x100000/4);
 	led_reg0 = led_reg1 = 0x7f;
-
-	K033906_init(machine);
 
 	lanc2_init(machine);
 }

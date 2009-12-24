@@ -26,7 +26,6 @@ WRITE32_HANDLER( cgboard_1_comm_sharc_w );
 READ32_HANDLER( cgboard_1_shared_sharc_r );
 WRITE32_HANDLER( cgboard_1_shared_sharc_w );
 
-void K033906_init(running_machine *machine);
 READ32_HANDLER(K033906_0_r);
 WRITE32_HANDLER(K033906_0_w);
 READ32_HANDLER(K033906_1_r);
