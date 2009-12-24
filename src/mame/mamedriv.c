@@ -1692,6 +1692,7 @@ const game_driver * const drivers[] =
 	DRIVER( josvolly )	/* AA  (c) 1983 Taito Corporation */
 	DRIVER( gsword )	/* AC  (c) 1984 Taito Corporation */
 	DRIVER( gsword2 )	/* AC  (c) 1984 Taito Corporation */
+	DRIVER( cyclemb )	/* P0  (c) 1984 Taito Corporation [+ Seta] */
 	DRIVER( pitnrun )	/* PR  (c) 1984 Taito Corporation */
 	DRIVER( pitnruna )	/* PR  (c) 1984 Taito Corporation */
 	DRIVER( lkage )		/* A54 (c) 1984 Taito Corporation */

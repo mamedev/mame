@@ -1261,6 +1261,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/champbwl.o \
 	$(DRIVERS)/changela.o $(VIDEO)/changela.o \
 	$(DRIVERS)/crbaloon.o $(VIDEO)/crbaloon.o $(AUDIO)/crbaloon.o \
+	$(DRIVERS)/cyclemb.o \
 	$(DRIVERS)/darius.o $(VIDEO)/darius.o \
 	$(DRIVERS)/darkmist.o $(VIDEO)/darkmist.o \
 	$(DRIVERS)/exzisus.o $(VIDEO)/exzisus.o \
