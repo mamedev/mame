@@ -1677,7 +1677,7 @@ struct polygon
 
 	INT8 texIndex;				// Which texture to draw from (0x00-0x0f)
 	INT8 texType;				// How to index into the texture
-	UINT8 palIndex;				// Which palette to use when rasterizing
+	UINT32 palOffset;			// The base offset where this object's palette starts.
 };
 
 static void setIdentity(float *matrix);
@@ -1767,9 +1767,11 @@ static void set3dFlags(const UINT16* packet)
     // [14] - ???? ... ? ''  ''
     // [15] - ???? ... ? ''  ''
     ////////////*/
-	paletteState3d  = (packet[8] & 0xff00) >> 8;
-	paletteState3d += ((hng64_3dregs[0x00/4] & 0x2000) >> 9); /* Palette is + 0x0800 in buriki. */
+	paletteState3d = (packet[8] & 0xff00) >> 8;
 	/* FIXME: Buriki One door colors in attract mode still aren't quite right, investigate... */
+	/* FIXME: This really isn't correct - commenting out this line fixes the palette in roadedge snk intro */
+	/*        But Xrally likes the offset...  */
+	paletteState3d += ((hng64_3dregs[0x00/4] & 0x2000) >> 9); /* Palette is + 0x0800 in buriki. */
 }
 
 // Operation 0012
@@ -2042,8 +2044,9 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				polys[*numPolys].texIndex = -1;
 			}
 
-			// Set the polygon's palette
-			polys[*numPolys].palIndex = paletteState3d;
+			// Set the polygon's palette offset
+			// TODO: Figure this out for real.  It doesn't work like this in roadedge.
+			polys[*numPolys].palOffset = paletteState3d * 0x80;
 
 			switch(chunkType)
 			{
@@ -2059,7 +2062,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
             // ---- ---x - 1 = Has per-vert normals
             /////////////////////////*/
 
-			// 33 word chunk, 3 vertices, per-vertex UVs & normals
+			// 33 word chunk, 3 vertices, per-vertex UVs & normals, per-face normal
 			case 0x05:	// 0000 0101
 			case 0x0f:	// 0000 1111
 				for (m = 0; m < 3; m++)
@@ -2135,7 +2138,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				break;
 
 
-			// 15 word chunk, 1 vertex, per-vertex UVs & normals
+			// 15 word chunk, 1 vertex, per-vertex UVs & normals, face normal
 			case 0x97:	// 1001 0111
 			case 0x87:	// 1000 0111
 			case 0xd7:	// 1101 0111
@@ -2213,7 +2216,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 				chunkLength = 12;
 				break;
 
-			// TODO: DECODE THESE GUYS //
+			// 36 word chunk, 3 vertices, per-vertex UVs & normals, per-face normal, and ???
 			case 0x2e:	// 0010 1110
 				for (m = 0; m < 3; m++)
 				{
@@ -2250,12 +2253,11 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 				/* There's something fishy about this guy - see 0x7a below.  Very likely not fixed-length */
 				/*
-                printf("0x2e : %08x\n", address[k]*3*2);
+				printf("0x2e : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
                 for (m = 0; m < 37; m++)
                     printf("%04x ", threeDPointer[m]);
 				printf("\n\n"); 
 				*/
-
 				chunkLength = 36;
 			break;
 
@@ -2266,7 +2268,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
                it won't kill us for now. */
 			case 0x7a:	// 0111 1010
 				/*
-                printf("0x7a : %08x (%d/%d)\n", mame_rand(machine), l, size[k]);
+                printf("0x7a : %08x (%d/%d)\n", mame_rand(machine), l, size[k]-1);
                 for (m = 0; m < 100; m++)
                     printf("%04x ", threeDPointer[m]);
                 printf("\n\n");
@@ -2276,7 +2278,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 			case 0x24:	// 0010 0100
 				/*
-                printf("0x24 : %08x\n", address[k]*3*2);
+                printf("0x24 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
                 for (m = 0; m < 49; m++)
                     printf("%04x ", threeDPointer[m]);
                 printf("\n\n");
@@ -2286,7 +2288,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 
 			case 0xb6:	// 1011 0110
 				/*
-                printf("0xb6 : %08x\n", address[k]*3*2);
+                printf("0xb6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
                 for (m = 0; m < 13; m++)
                     printf("%04x ", threeDPointer[m]);
                 printf("\n\n");
@@ -2298,7 +2300,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			case 0x86:	// 1000 0110
 				/* Very likely not fixed-length since it leads into c6 & d6 */
 				/*
-                printf("0x86 : %08x\n", address[k]*3*2);
+                printf("0x86 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
                 for (m = 0; m < 13; m++)
                     printf("%04x ", threeDPointer[m]);
                 printf("\n\n");
@@ -2309,7 +2311,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			/* Are c6 and d6 just insanely long? They aren't at the end of the numTris like 0x7a */
 			case 0xc6:	// 1100 0110
 				/*
-                printf("0xc6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]);
+                printf("0xc6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
                 for (m = 0; m < 100; m++)
                     printf("%04x ", threeDPointer[m]);
                 printf("\n\n");
@@ -2320,7 +2322,7 @@ void recoverPolygonBlock(running_machine* machine, const UINT16* packet, struct 
 			/* Are c6 and d6 just insanely long? They aren't at the end of numTris like 0x7a */
 			case 0xd6:	// 1101 0110
 				/*
-                printf("0xd6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]);
+                printf("0xd6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
                 for (m = 0; m < 100; m++)
                     printf("%04x ", threeDPointer[m]);
                 printf("\n\n");
@@ -2493,6 +2495,7 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		break;
 
 	case 0x0011:	// Palette / Model flags?
+		//printPacket(packet, 1);
 		set3dFlags(packet);
 		break;
 
@@ -2516,16 +2519,18 @@ void hng64_command3d(running_machine* machine, const UINT16* packet)
 		numPolys = 0;
 		break;
 
-	case 0x0101:	// Unknown: Geometry?
+	case 0x0101:	// Geometry of a different type - bbust2.
 		break;
 
-	case 0x0102:	// Unknown: Geometry?
+	case 0x0102:	// Geometry of a different type - sams games.
 		break;
 
 	case 0x1000:	// Unknown: Some sort of global flags?
+		//printPacket(packet, 1);
 		break;
 
 	case 0x1001:	// Unknown: Some sort of global flags (a group of 4, actually)?
+		//printPacket(packet, 1);
 		break;
 
 	default:
@@ -2919,7 +2924,7 @@ static void DrawWireframe(running_machine *machine, struct polygon *p)
 /**     Output: none                                                **/
 /*********************************************************************/
 INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
-										  int Wrapping, int Filtering, int Function,
+										  int textureType, int palOffset, int texIndex,
 										  int x_start, int x_end, int y, float z_start, float z_delta,
 										  float w_start, float w_delta, float r_start, float r_delta,
 										  float g_start, float g_delta, float b_start, float b_delta,
@@ -2933,8 +2938,8 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 	UINT8 paletteEntry;
 	float t_coord, s_coord;
 
-	if (Function >= 0)
-		textureOffset = &gfx[Function * 1024 * 1024];
+	if (texIndex >= 0)
+		textureOffset = &gfx[texIndex * 1024 * 1024];
 	else
 		textureOffset = 0x00;
 
@@ -2947,9 +2952,9 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 			s_coord = s_start / w_start;
 
 			// GET THE TEXTURE INDEX
-			if (Function >= 0)
+			if (texIndex >= 0)
 			{
-				if (Wrapping == 0x8 || Wrapping == 0xc)
+				if (textureType == 0x8 || textureType == 0xc)
 					paletteEntry = textureOffset[(((int)(s_coord*1024.0f))*1024 + (int)(t_coord*1024.0f))];
 				else
 					paletteEntry = textureOffset[(((int)(s_coord*512.0f))*1024 + (int)(t_coord*512.0f))];
@@ -2960,8 +2965,8 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine,
 					// Greyscale texture - for Buriki...
 					// *BITMAP_ADDR32(Color, y, x_start) = MAKE_ARGB(255, (UINT8)paletteEntry, (UINT8)paletteEntry, (UINT8)paletteEntry);
 
-					// *BITMAP_ADDR32(Color, y, x_start) = machine->pens[(128*(Filtering))+paletteEntry];
-					*cb = machine->pens[(128*(Filtering))+paletteEntry];
+					// *BITMAP_ADDR32(Color, y, x_start) = machine->pens[palOffset + paletteEntry];
+					*cb = machine->pens[palOffset + paletteEntry];
 					*db = z_start;
 				}
 			}
@@ -3018,7 +3023,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 											float A[4], float B[4], float C[4],
 											float Ca[3], float Cb[3], float Cc[3], // PER-VERTEX RGB COLORS
 											float Ta[2], float Tb[2], float Tc[2], // PER-VERTEX (S,T) TEX-COORDS
-											int Wrapping, int Filtering, int Function)
+											int textureType, int palOffset, int texIndex)
 {
 	// Get our order of points by increasing y-coord
 	float *p_min = ((A[1] <= B[1]) && (A[1] <= C[1])) ? A : ((B[1] <= A[1]) && (B[1] <= C[1])) ? B : C;
@@ -3209,7 +3214,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 
 		// Pass the horizontal line to the filler, this could be put in the routine
 		// then interpolate for the next values of x and z
-		FillSmoothTexPCHorizontalLine(machine, Wrapping, Filtering, Function,
+		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, texIndex,
 			x_start, x_end, y_min, z_interp_x, z_delta_x, w_interp_x, w_delta_x,
 			r_interp_x, r_delta_x, g_interp_x, g_delta_x, b_interp_x, b_delta_x,
 			s_interp_x, s_delta_x, t_interp_x, t_delta_x);
@@ -3289,7 +3294,7 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine *machine,
 
 		// Pass the horizontal line to the filler, this could be put in the routine
 		// then interpolate for the next values of x and z
-		FillSmoothTexPCHorizontalLine(machine, Wrapping, Filtering, Function,
+		FillSmoothTexPCHorizontalLine(machine, textureType, palOffset, texIndex,
 			x_start, x_end, y_mid, z_interp_x, z_delta_x, w_interp_x, w_delta_x,
 			r_interp_x, r_delta_x, g_interp_x, g_delta_x, b_interp_x, b_delta_x,
 			s_interp_x, s_delta_x, t_interp_x, t_delta_x);
@@ -3325,7 +3330,7 @@ static void drawShaded(running_machine *machine, struct polygon *p)
 										p->vert[0].clipCoords, p->vert[j].clipCoords, p->vert[j+1].clipCoords,
 										p->vert[0].light,      p->vert[j].light,      p->vert[j+1].light,
 										p->vert[0].texCoords,  p->vert[j].texCoords,  p->vert[j+1].texCoords,
-										p->texType, p->palIndex, p->texIndex);
+										p->texType, p->palOffset, p->texIndex);
 
 	}
 }
