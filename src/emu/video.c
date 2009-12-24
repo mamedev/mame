@@ -405,7 +405,7 @@ static void video_exit(running_machine *machine)
 		bitmap_free(global.snap_bitmap);
 
 	/* print a final result if we have at least 5 seconds' worth of data */
-	if (global.overall_emutime.seconds >= 1)
+	if (global.overall_emutime.seconds >= 5)
 	{
 		osd_ticks_t tps = osd_ticks_per_second();
 		double final_real_time = (double)global.overall_real_seconds + (double)global.overall_real_ticks / (double)tps;
