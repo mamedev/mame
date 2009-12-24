@@ -283,7 +283,7 @@ Notes:
 
 #define MASTER_CLOCK   		(XTAL_40MHz)
 #define SOUND_CLOCK    		(XTAL_16MHz)
-#define MASTER_CLOCK_25MHz	(XTAL_25_1748MHz)	/* super hang-on only */
+#define MASTER_CLOCK_25MHz	(XTAL_25_1748MHz)
 
 
 
@@ -1083,7 +1083,7 @@ static MACHINE_DRIVER_START( outrundx )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/8, 400, 0, 320, 262, 0, 224)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
 
 	MDRV_VIDEO_START(outrun)
 	MDRV_VIDEO_UPDATE(outrun)
@@ -1132,8 +1132,8 @@ MACHINE_DRIVER_END
     Outrun
     CPU: 68000
      GAME BD  834-6065-02 (or 834-6065-04)
-     CPU BD   837-6063-02
-     VIDEO BD 837-6064-02
+     CPU BD   837-6063-02 (or 837-6095)
+     VIDEO BD 837-6064-02 (or 837-6096)
 
 Note: GAME BD 834-6065-01 (or 834-6065-03) & CPU BD  837-6063-01
       Use EPR-10331 to EPR-10334 for the Main 68000 code, it's unknown if they are the same... they are not currently dumped
