@@ -183,7 +183,7 @@ Notes:
 #include "cpu/v810/v810.h"
 #include "cpu/v60/v60.h"
 #include "deprecat.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/es5506.h"
 #include "includes/seta.h"
 
@@ -364,22 +364,6 @@ static NVRAM_HANDLER( ssv )
 			mame_fread(file, ssv_nvram, ssv_nvram_size);
 }
 
-static NVRAM_HANDLER( gdfs )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C46);
-
-		if (file) eeprom_load(file);
-		else
-		{
-			/* Set the EEPROM to Factory Defaults */
-		}
-	}
-}
-
 /***************************************************************************
 
 
@@ -477,19 +461,19 @@ ADDRESS_MAP_END
 static int gdfs_gfxram_bank, gdfs_lightgun_select;
 static UINT16 *gdfs_blitram;
 
-static READ16_HANDLER( gdfs_eeprom_r )
+static READ16_DEVICE_HANDLER( gdfs_eeprom_r )
 {
 	static const char *const gunnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
 
-	return (((gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read(space->machine, gunnames[gdfs_lightgun_select])) | (eeprom_read_bit() << 8);
+	return (((gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read(device->machine, gunnames[gdfs_lightgun_select])) | (eepromdev_read_bit(device) << 8);
 }
 
-static WRITE16_HANDLER( gdfs_eeprom_w )
+static WRITE16_DEVICE_HANDLER( gdfs_eeprom_w )
 {
 	static UINT16 data_old;
 
 	if (data & ~0x7b00)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(space->cpu),data);
+		logerror("%s - Unknown EEPROM bit written %04X\n",cpuexec_describe_context(device->machine),data);
 
 	if ( ACCESSING_BITS_8_15 )
 	{
@@ -497,13 +481,13 @@ static WRITE16_HANDLER( gdfs_eeprom_w )
 //      data & 0x0001 ?
 
 		// latch the bit
-		eeprom_write_bit(data & 0x4000);
+		eepromdev_write_bit(device, data & 0x4000);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
+		eepromdev_set_cs_line(device, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+		eepromdev_set_clock_line(device, (data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
 
 		if (!(data_old & 0x0800) && (data & 0x0800))	// rising clock
 			gdfs_lightgun_select = (data & 0x0300) >> 8;
@@ -600,8 +584,8 @@ static ADDRESS_MAP_START( gdfs_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(gdfs_tmapram_w) AM_BASE(&gdfs_tmapram)
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM
 	AM_RANGE(0x440000, 0x44003f) AM_RAM AM_BASE(&gdfs_tmapscroll)
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(gdfs_eeprom_w)
-	AM_RANGE(0x540000, 0x540001) AM_READ(gdfs_eeprom_r)
+	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE("eeprom", gdfs_eeprom_w)
+	AM_RANGE(0x540000, 0x540001) AM_DEVREAD("eeprom", gdfs_eeprom_r)
 	AM_RANGE(0x600000, 0x600fff) AM_RAM
 	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_BASE_GENERIC(spriteram2)
 	AM_RANGE(0x8c0000, 0x8c00ff) AM_READWRITE(gdfs_blitram_r, gdfs_blitram_w) AM_BASE(&gdfs_blitram)
@@ -2761,7 +2745,7 @@ static MACHINE_DRIVER_START( gdfs )
 	MDRV_CPU_PROGRAM_MAP(gdfs_map)
 	MDRV_CPU_VBLANK_INT_HACK(gdfs_interrupt,1+4)
 
-	MDRV_NVRAM_HANDLER(gdfs)
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
