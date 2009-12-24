@@ -415,7 +415,19 @@ static DEVICE_START(eeprom)
 			fatalerror("eeprom region '%s' needs to be an 8-bit region", device->tag);
 		if (eestate->intf->data_bits == 16 && ((region_flags & ROMREGION_WIDTHMASK) != ROMREGION_16BIT || (region_flags & ROMREGION_ENDIANMASK) != ROMREGION_BE))
 			fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region (flags=%08x)", device->tag, region_flags);
-		memcpy(eestate->data, region_base, region_length);
+		
+		if (eestate->intf->data_bits == 8)
+			memcpy(eestate->data, region_base, region_length);
+		else
+		{
+			int offs;
+			for (offs = 0; offs < region_length; offs += 2)
+			{
+				UINT16 data = *(UINT16 *)&region_base[offs];
+				eestate->data[offs + 0] = data >> 8;
+				eestate->data[offs + 1] = data & 0xff;
+			}
+		}
 	}
 
 	eestate->serial_count = 0;

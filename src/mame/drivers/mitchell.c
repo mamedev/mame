@@ -15,10 +15,6 @@
       you have to keep the player 1 start button pressed until the title screen
       appears. This forces the game to initialize the EEPROM, otherwise it will
       not work.
-      This is simulated with a kluge in input_r.
-      This doesn't work with spangj! The data written to EEPROM is wrong. This is
-      currently fixed by patching the ROM data so the EEPROM is right. It would be
-      better to just preload the correct EEPROM, without needing the input_r kludge.
 
     TODO:
     - understand what bits 0 and 3 of input port 0x05 are
@@ -78,7 +74,7 @@ mw-9.rom = ST M27C1001 / GFX
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "includes/cps1.h"	// needed for decoding functions only
 #include "includes/mitchell.h"
 #include "sound/okim6295.h"
@@ -104,29 +100,21 @@ static const eeprom_interface eeprom_intf =
 
 static UINT8 *nvram;
 static size_t nvram_size;
-static int init_eeprom_count;
 
 static NVRAM_HANDLER( mitchell )
 {
 	if (read_or_write)
 	{
-		eeprom_save(file);					/* EEPROM */
 		if (nvram_size)	/* Super Pang, Block Block */
 			mame_fwrite(file,nvram,nvram_size);	/* NVRAM */
 	}
 	else
 	{
-		eeprom_init(machine, &eeprom_intf);
-
 		if (file)
 		{
-			init_eeprom_count = 0;
-			eeprom_load(file);					/* EEPROM */
 			if (nvram_size)	/* Super Pang, Block Block */
 				mame_fread(file,nvram,nvram_size);	/* NVRAM */
 		}
-		else
-			init_eeprom_count = 1000;	/* for Super Pang */
 	}
 }
 
@@ -135,7 +123,7 @@ static READ8_HANDLER( pang_port5_r )
 	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
 	int bit;
 
-	bit = eeprom_read_bit() << 7;
+	bit = eepromdev_read_bit(devtag_get_device(space->machine, "eeprom")) << 7;
 
 	/* bits 0 and (sometimes) 3 are checked in the interrupt handler. */
 	/* Maybe they are vblank related, but I'm not sure. */
@@ -153,19 +141,19 @@ static READ8_HANDLER( pang_port5_r )
 	return (input_port_read(space->machine, "DSW0") & 0x76) | bit;
 }
 
-static WRITE8_HANDLER( eeprom_cs_w )
+static WRITE8_DEVICE_HANDLER( eeprom_cs_w )
 {
-	eeprom_set_cs_line(data ? CLEAR_LINE : ASSERT_LINE);
+	eepromdev_set_cs_line(device, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( eeprom_clock_w )
+static WRITE8_DEVICE_HANDLER( eeprom_clock_w )
 {
-	eeprom_set_clock_line(data ? CLEAR_LINE : ASSERT_LINE);
+	eepromdev_set_clock_line(device, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( eeprom_serial_w )
+static WRITE8_DEVICE_HANDLER( eeprom_serial_w )
 {
-	eeprom_write_bit(data);
+	eepromdev_write_bit(device, data);
 }
 
 
@@ -297,14 +285,7 @@ static READ8_HANDLER( input_r )
 				return input_port_read(space->machine, "IN0");
 			break;
 		case 3:		/* Super Pang - simulate START 1 press to initialize EEPROM */
-			if (offset || init_eeprom_count == 0)
-				return input_port_read(space->machine, portnames[offset]);
-			else
-			{
-				init_eeprom_count--;
-				return input_port_read(space->machine, "IN0") & ~0x08;
-			}
-			break;
+			return input_port_read(space->machine, portnames[offset]);
 	}
 }
 
@@ -357,8 +338,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mitchell_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)	/* Palette bank, layer enable, coin counters, more */
-	AM_RANGE(0x00, 0x02) AM_READ(input_r)			/* Super Pang needs a kludge to initialize EEPROM.
-                                                       The Mahjong games and Block Block need special input treatment */
+	AM_RANGE(0x00, 0x02) AM_READ(input_r)			/* The Mahjong games and Block Block need special input treatment */
 	AM_RANGE(0x01, 0x01) AM_WRITE(input_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)	/* Code bank register */
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ymsnd", ym2413_data_port_w)
@@ -366,9 +346,9 @@ static ADDRESS_MAP_START( mitchell_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r) AM_DEVWRITE("oki", okim6295_w)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP				/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)	/* Video RAM bank register */
-	AM_RANGE(0x08, 0x08) AM_WRITE(eeprom_cs_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(eeprom_clock_w)
-	AM_RANGE(0x18, 0x18) AM_WRITE(eeprom_serial_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE("eeprom", eeprom_cs_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE("eeprom", eeprom_clock_w)
+	AM_RANGE(0x18, 0x18) AM_DEVWRITE("eeprom", eeprom_serial_w)
 ADDRESS_MAP_END
 
 /* spangbl */
@@ -383,7 +363,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spangbl_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x02) AM_READ(input_r)	/* Super Pang needs a kludge to initialize EEPROM. */
+	AM_RANGE(0x00, 0x02) AM_READ(input_r)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ymsnd", ym2413_data_port_w)
@@ -391,9 +371,9 @@ static ADDRESS_MAP_START( spangbl_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP	/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)      /* Video RAM bank register */
-	AM_RANGE(0x08, 0x08) AM_WRITE(eeprom_cs_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(eeprom_clock_w)
-	AM_RANGE(0x18, 0x18) AM_WRITE(eeprom_serial_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE("eeprom", eeprom_cs_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE("eeprom", eeprom_clock_w)
+	AM_RANGE(0x18, 0x18) AM_DEVWRITE("eeprom", eeprom_serial_w)
 ADDRESS_MAP_END
 
 
@@ -1131,6 +1111,8 @@ static MACHINE_DRIVER_START( mgakuen )
 
 	MDRV_MACHINE_START(mitchell)
 	MDRV_MACHINE_RESET(mitchell)
+	
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1173,6 +1155,7 @@ static MACHINE_DRIVER_START( pang )
 	MDRV_MACHINE_RESET(mitchell)
 
 	MDRV_NVRAM_HANDLER(mitchell)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1312,6 +1295,7 @@ static MACHINE_DRIVER_START( marukin )
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	MDRV_NVRAM_HANDLER(mitchell)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1748,6 +1732,9 @@ ROM_START( spang )
 
 	ROM_REGION( 0x80000, "oki", 0 )	/* OKIM */
 	ROM_LOAD( "spe_01.rom",   0x00000, 0x20000, CRC(2d19c133) SHA1(b3ec226f35494dfc259e910895cec8a49dd2f846) )
+	
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "eeprom-spang.bin", 0x0000, 0x0080, CRC(deae1291) SHA1(f62f2ad99852903f1cea3f8c1f69fc11e4e7b48b) )
 ROM_END
 
 /*
@@ -1833,6 +1820,9 @@ ROM_START( spangj )
 
 	ROM_REGION( 0x80000, "oki", 0 )	/* OKIM */
 	ROM_LOAD( "01.d1",          0x00000, 0x20000, CRC(b96ea126) SHA1(83fa71994518d40b8938520faa8701c63b7f579e) )	// spj01_1d.bin
+	
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "eeprom-spangj.bin", 0x0000, 0x0080, CRC(237c00eb) SHA1(35a7fe793186e148c163adb04433b6a55ee21502) )
 ROM_END
 
 ROM_START( sbbros )
@@ -1855,6 +1845,9 @@ ROM_START( sbbros )
 
 	ROM_REGION( 0x80000, "oki", 0 )	/* OKIM */
 	ROM_LOAD( "01.d1",        0x00000, 0x20000, CRC(b96ea126) SHA1(83fa71994518d40b8938520faa8701c63b7f579e) )
+	
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "eeprom-sbbros.bin", 0x0000, 0x0080, CRC(ed69d3cd) SHA1(89eb0ca65ffe30f5cbe6427f767f1f0870c8a990) )
 ROM_END
 
 ROM_START( marukin )
@@ -2114,14 +2107,6 @@ static DRIVER_INIT( spangj )
 	nvram = &memory_region(machine, "maincpu")[0xe000];	/* NVRAM */
 	spangj_decode(machine);
 	configure_banks(machine);
-
-	/* fix data that will be written to nvram */
-	{
-		UINT8 *rom = memory_region(machine, "maincpu") + 0x10000;
-		rom[0x0183] = 0xcd;
-		rom[0x0184] = 0x81;
-		rom[0x0185] = 0x0e;
-	}
 }
 static DRIVER_INIT( sbbros )
 {
