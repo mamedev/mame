@@ -24,12 +24,14 @@ GP1 HDD data contents:
 #include "cpu/m68000/m68000.h"
 #include "machine/idectrl.h"
 #include "sound/k054539.h"
-#include "video/konamiic.h"
+#include "video/konicdev.h"
 
 VIDEO_START( qdrmfgp );
 VIDEO_START( qdrmfgp2 );
 VIDEO_UPDATE( qdrmfgp );
 
+extern void qdrmfgp_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
+extern void qdrmfgp2_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
 
 
 static UINT8 *sndram;
@@ -128,48 +130,57 @@ static WRITE16_HANDLER( gp2_control_w )
 
 static READ16_HANDLER( v_rom_r )
 {
+	const device_config *k056832 = devtag_get_device(space->machine, "k056832");
 	UINT8 *mem8 = memory_region(space->machine, "gfx1");
-	int bank = K056832_word_r(space, 0x34/2, 0xffff);
+	int bank = k056832_word_r(k056832, 0x34/2, 0xffff);
 
 	offset += bank * 0x800 * 4;
 
 	if (control & 0x8000)
 		offset += 0x800 * 2;
 
-	return (mem8[offset+1] << 8) + mem8[offset];
+	return (mem8[offset + 1] << 8) + mem8[offset];
 }
 
 
 static READ16_HANDLER( gp2_vram_r )
 {
-	if (offset < 0x1000/2)
-		return K056832_ram_word_r(space, offset*2+1, mem_mask);
+	const device_config *k056832 = devtag_get_device(space->machine, "k056832");
+
+	if (offset < 0x1000 / 2)
+		return k056832_ram_word_r(k056832, offset * 2 + 1, mem_mask);
 	else
-		return K056832_ram_word_r(space, (offset-0x1000/2)*2, mem_mask);
+		return k056832_ram_word_r(k056832, (offset - 0x1000 / 2) * 2, mem_mask);
 }
 
 static READ16_HANDLER( gp2_vram_mirror_r )
 {
-	if (offset < 0x1000/2)
-		return K056832_ram_word_r(space, offset*2, mem_mask);
+	const device_config *k056832 = devtag_get_device(space->machine, "k056832");
+
+	if (offset < 0x1000 / 2)
+		return k056832_ram_word_r(k056832, offset * 2, mem_mask);
 	else
-		return K056832_ram_word_r(space, (offset-0x1000/2)*2+1, mem_mask);
+		return k056832_ram_word_r(k056832, (offset - 0x1000 / 2) * 2 + 1, mem_mask);
 }
 
 static WRITE16_HANDLER( gp2_vram_w )
 {
-	if (offset < 0x1000/2)
-		K056832_ram_word_w(space, offset*2+1, data, mem_mask);
+	const device_config *k056832 = devtag_get_device(space->machine, "k056832");
+
+	if (offset < 0x1000 / 2)
+		k056832_ram_word_w(k056832, offset * 2 + 1, data, mem_mask);
 	else
-		K056832_ram_word_w(space, (offset-0x1000/2)*2, data, mem_mask);
+		k056832_ram_word_w(k056832, (offset - 0x1000 / 2) * 2, data, mem_mask);
 }
 
 static WRITE16_HANDLER( gp2_vram_mirror_w )
 {
-	if (offset < 0x1000/2)
-		K056832_ram_word_w(space, offset*2, data, mem_mask);
+	const device_config *k056832 = devtag_get_device(space->machine, "k056832");
+
+	if (offset < 0x1000 / 2)
+		k056832_ram_word_w(k056832, offset * 2, data, mem_mask);
 	else
-		K056832_ram_word_w(space, (offset-0x1000/2)*2+1, data, mem_mask);
+		k056832_ram_word_w(k056832, (offset - 0x1000 / 2) * 2 + 1, data, mem_mask);
 }
 
 
@@ -178,7 +189,7 @@ static WRITE16_HANDLER( gp2_vram_mirror_w )
 static READ16_HANDLER( sndram_r )
 {
 	if (ACCESSING_BITS_0_7)
-			return sndram[offset];
+		return sndram[offset];
 
 	return 0;
 }
@@ -334,21 +345,21 @@ static ADDRESS_MAP_START( qdrmfgp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&workram) 										/* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* backup ram */
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x300000, 0x30003f) AM_WRITE(K056832_word_w)										/* video reg */
-	AM_RANGE(0x320000, 0x32001f) AM_READWRITE(K053252_word_r,K053252_word_w)					/* ccu */
+	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("k056832", k056832_word_w)										/* video reg */
+	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE("k053252", k053252_word_r, k053252_word_w)					/* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")											/* battery power & service sw */
 	AM_RANGE(0x340000, 0x340001) AM_READ_PORT("340000")											/* inputport */
 	AM_RANGE(0x350000, 0x350001) AM_WRITENOP													/* unknown */
 	AM_RANGE(0x360000, 0x360001) AM_WRITENOP													/* unknown */
 	AM_RANGE(0x370000, 0x370001) AM_WRITE(gp_control_w)											/* control reg */
 	AM_RANGE(0x380000, 0x380001) AM_WRITENOP													/* Watchdog */
-	AM_RANGE(0x800000, 0x80045f) AM_DEVREADWRITE8("konami", k054539_r,k054539_w, 0x00ff)		/* sound regs */
-	AM_RANGE(0x880000, 0x881fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)			/* vram */
-	AM_RANGE(0x882000, 0x883fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)			/* vram (mirror) */
+	AM_RANGE(0x800000, 0x80045f) AM_DEVREADWRITE8("konami", k054539_r, k054539_w, 0x00ff)		/* sound regs */
+	AM_RANGE(0x880000, 0x881fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)			/* vram */
+	AM_RANGE(0x882000, 0x883fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)			/* vram (mirror) */
 	AM_RANGE(0x900000, 0x901fff) AM_READ(v_rom_r)												/* gfxrom through */
 	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE("ide", ide_std_r,ide_std_w)					/* IDE control regs */
 	AM_RANGE(0xa4000c, 0xa4000f) AM_DEVREADWRITE("ide", ide_alt_r,ide_alt_w)					/* IDE status control reg */
-	AM_RANGE(0xc00000, 0xcbffff) AM_READWRITE(sndram_r,sndram_w)								/* sound ram */
+	AM_RANGE(0xc00000, 0xcbffff) AM_READWRITE(sndram_r, sndram_w)								/* sound ram */
 ADDRESS_MAP_END
 
 
@@ -357,8 +368,8 @@ static ADDRESS_MAP_START( qdrmfgp2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x110fff) AM_RAM AM_BASE(&workram)										/* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* backup ram */
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x300000, 0x30003f) AM_WRITE(K056832_word_w)										/* video reg */
-	AM_RANGE(0x320000, 0x32001f) AM_READWRITE(K053252_word_r,K053252_word_w)					/* ccu */
+	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("k053252", k056832_word_w)										/* video reg */
+	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE("k053252", k053252_word_r, k053252_word_w)					/* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")											/* battery power & service */
 	AM_RANGE(0x340000, 0x340001) AM_READ_PORT("340000")											/* inputport */
 	AM_RANGE(0x350000, 0x350001) AM_WRITENOP													/* unknown */
@@ -366,10 +377,10 @@ static ADDRESS_MAP_START( qdrmfgp2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x370000, 0x370001) AM_WRITE(gp2_control_w)										/* control reg */
 	AM_RANGE(0x380000, 0x380001) AM_WRITENOP													/* Watchdog */
 	AM_RANGE(0x800000, 0x80045f) AM_DEVREADWRITE8("konami", k054539_r,k054539_w, 0x00ff)		/* sound regs */
-	AM_RANGE(0x880000, 0x881fff) AM_READWRITE(gp2_vram_r,gp2_vram_w)							/* vram */
-	AM_RANGE(0x89f000, 0x8a0fff) AM_READWRITE(gp2_vram_mirror_r,gp2_vram_mirror_w)				/* vram (mirror) */
+	AM_RANGE(0x880000, 0x881fff) AM_READWRITE(gp2_vram_r, gp2_vram_w)							/* vram */
+	AM_RANGE(0x89f000, 0x8a0fff) AM_READWRITE(gp2_vram_mirror_r, gp2_vram_mirror_w)				/* vram (mirror) */
 	AM_RANGE(0x900000, 0x901fff) AM_READ(v_rom_r)												/* gfxrom through */
-	AM_RANGE(0xa00000, 0xa0000f) AM_READ(gp2_ide_std_r)	AM_DEVWRITE("ide", ide_std_w)			/* IDE control regs */
+	AM_RANGE(0xa00000, 0xa0000f) AM_READ(gp2_ide_std_r) AM_DEVWRITE("ide", ide_std_w)			/* IDE control regs */
 	AM_RANGE(0xa4000c, 0xa4000f) AM_DEVREADWRITE("ide", ide_alt_r,ide_alt_w)					/* IDE status control reg */
 	AM_RANGE(0xc00000, 0xcbffff) AM_READWRITE(sndram_r,sndram_w)								/* sound ram */
 ADDRESS_MAP_END
@@ -581,6 +592,24 @@ static const k054539_interface k054539_config =
  *
  *************************************/
 
+static const k056832_interface qdrmfgp_k056832_intf =
+{
+	"gfx1", 0,
+	K056832_BPP_4dj,
+	1, 0,
+	KONAMI_ROM_DEINTERLEAVE_NONE,
+	qdrmfgp_tile_callback, "none"
+};
+
+static const k056832_interface qdrmfgp2_k056832_intf =
+{
+	"gfx1", 0,
+	K056832_BPP_4dj,
+	1, 0,
+	KONAMI_ROM_DEINTERLEAVE_NONE,
+	qdrmfgp2_tile_callback, "none"
+};
+
 static MACHINE_START( qdrmfgp )
 {
 	state_save_register_global(machine, control);
@@ -642,6 +671,9 @@ static MACHINE_DRIVER_START( qdrmfgp )
 	MDRV_VIDEO_START(qdrmfgp)
 	MDRV_VIDEO_UPDATE(qdrmfgp)
 
+	MDRV_K056832_ADD("k056832", qdrmfgp_k056832_intf)
+	MDRV_K053252_ADD("k053252")
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -676,6 +708,9 @@ static MACHINE_DRIVER_START( qdrmfgp2 )
 
 	MDRV_VIDEO_START(qdrmfgp2)
 	MDRV_VIDEO_UPDATE(qdrmfgp)
+
+	MDRV_K056832_ADD("k056832", qdrmfgp2_k056832_intf)
+	MDRV_K053252_ADD("k053252")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
