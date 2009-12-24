@@ -16,9 +16,9 @@ INTERRUPT_GEN( bang_interrupt );
 CUSTOM_INPUT( wrally2_analog_bit_r );
 WRITE16_HANDLER( wrally2_adc_clk );
 WRITE16_HANDLER( wrally2_adc_cs );
-WRITE16_HANDLER( gaelco2_eeprom_cs_w );
-WRITE16_HANDLER( gaelco2_eeprom_sk_w );
-WRITE16_HANDLER( gaelco2_eeprom_data_w );
+WRITE16_DEVICE_HANDLER( gaelco2_eeprom_cs_w );
+WRITE16_DEVICE_HANDLER( gaelco2_eeprom_sk_w );
+WRITE16_DEVICE_HANDLER( gaelco2_eeprom_data_w );
 READ16_HANDLER( snowboar_protection_r );
 WRITE16_HANDLER( snowboar_protection_w );
 

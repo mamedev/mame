@@ -9,7 +9,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "includes/gaelco2.h"
 
 /***************************************************************************
@@ -264,46 +264,22 @@ WRITE16_HANDLER( wrally2_adc_cs )
 
 ***************************************************************************/
 
-static const eeprom_interface gaelco2_eeprom_interface =
-{
-	8,				/* address bits */
-	16,				/* data bits */
-	"*110",			/* read command */
-	"*101",			/* write command */
-	"*111",			/* erase command */
-	"*10000xxxxxx",	/* lock command */
-	"*10011xxxxxx", /* unlock command */
-//  "*10001xxxxxx", /* write all */
-//  "*10010xxxxxx", /* erase all */
-};
-
-NVRAM_HANDLER( gaelco2 )
-{
-	if (read_or_write){
-		eeprom_save(file);
-	} else {
-		eeprom_init(machine, &gaelco2_eeprom_interface);
-
-		if (file) eeprom_load(file);
-	}
-}
-
-WRITE16_HANDLER( gaelco2_eeprom_cs_w )
+WRITE16_DEVICE_HANDLER( gaelco2_eeprom_cs_w )
 {
 	/* bit 0 is CS (active low) */
-	eeprom_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	eepromdev_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE16_HANDLER( gaelco2_eeprom_sk_w )
+WRITE16_DEVICE_HANDLER( gaelco2_eeprom_sk_w )
 {
 	/* bit 0 is SK (active high) */
-	eeprom_set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	eepromdev_set_clock_line(device, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_HANDLER( gaelco2_eeprom_data_w )
+WRITE16_DEVICE_HANDLER( gaelco2_eeprom_data_w )
 {
 	/* bit 0 is EEPROM data (DIN) */
-	eeprom_write_bit(data & 0x01);
+	eepromdev_write_bit(device, data & 0x01);
 }
 
 /***************************************************************************

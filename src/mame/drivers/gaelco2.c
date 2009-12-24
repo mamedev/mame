@@ -22,7 +22,7 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/gaelco.h"
 #include "rendlay.h"
 #include "includes/gaelco2.h"
@@ -225,9 +225,9 @@ static ADDRESS_MAP_START( bang_map, ADDRESS_SPACE_PROGRAM, 16 )
     AM_RANGE(0x300000, 0x300001) AM_READ_PORT("P1")
     AM_RANGE(0x300002, 0x300003) AM_READNOP 																	/* Random number generator? */
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(gaelco2_coin2_w)														/* Coin Counters */
-	AM_RANGE(0x300008, 0x300009) AM_WRITE(gaelco2_eeprom_data_w)												/* EEPROM data */
-	AM_RANGE(0x30000a, 0x30000b) AM_WRITE(gaelco2_eeprom_sk_w)													/* EEPROM serial clock */
-	AM_RANGE(0x30000c, 0x30000d) AM_WRITE(gaelco2_eeprom_cs_w)													/* EEPROM chip select */
+	AM_RANGE(0x300008, 0x300009) AM_DEVWRITE("eeprom", gaelco2_eeprom_data_w)												/* EEPROM data */
+	AM_RANGE(0x30000a, 0x30000b) AM_DEVWRITE("eeprom", gaelco2_eeprom_sk_w)													/* EEPROM serial clock */
+	AM_RANGE(0x30000c, 0x30000d) AM_DEVWRITE("eeprom", gaelco2_eeprom_cs_w)													/* EEPROM chip select */
     AM_RANGE(0x300010, 0x300011) AM_READ_PORT("P2")
     AM_RANGE(0x300020, 0x300021) AM_READ_PORT("COIN")
     AM_RANGE(0x310000, 0x310001) AM_READ(p1_gun_x) AM_WRITE(bang_clr_gun_int_w)									/* Gun 1P X */ /* CLR INT Gun */
@@ -252,7 +252,7 @@ static INPUT_PORTS_START( bang )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* bit 6 is EEPROM data (DOUT) */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	/* bit 6 is EEPROM data (DOUT) */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )	/* bit 7 is EEPROM ready */
 
 	PORT_START("LIGHT0_X")
@@ -274,13 +274,26 @@ static const gaelcosnd_interface bang_snd_interface =
 	{ 0*0x0200000, 1*0x0200000, 2*0x0200000, 3*0x0200000 }	/* start of each ROM bank */
 };
 
+static const eeprom_interface gaelco2_eeprom_interface =
+{
+	8,				/* address bits */
+	16,				/* data bits */
+	"*110",			/* read command */
+	"*101",			/* write command */
+	"*111",			/* erase command */
+	"*10000xxxxxx",	/* lock command */
+	"*10011xxxxxx", /* unlock command */
+//  "*10001xxxxxx", /* write all */
+//  "*10010xxxxxx", /* erase all */
+};
+
 static MACHINE_DRIVER_START( bang )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 30000000/2)			/* 15 MHz */
 	MDRV_CPU_PROGRAM_MAP(bang_map)
 	MDRV_CPU_VBLANK_INT_HACK(bang_interrupt, 6)
 
-	MDRV_NVRAM_HANDLER(gaelco2)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", gaelco2_eeprom_interface)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -906,9 +919,9 @@ static ADDRESS_MAP_START( snowboar_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_BASE(&gaelco2_vregs)																/* Video Registers */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("P1")
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(gaelco2_coin2_w)																	/* Coin Counters */
-	AM_RANGE(0x300008, 0x300009) AM_WRITE(gaelco2_eeprom_data_w)															/* EEPROM data */
-	AM_RANGE(0x30000a, 0x30000b) AM_WRITE(gaelco2_eeprom_sk_w)																/* EEPROM serial clock */
-	AM_RANGE(0x30000c, 0x30000d) AM_WRITE(gaelco2_eeprom_cs_w)																/* EEPROM chip select */
+	AM_RANGE(0x300008, 0x300009) AM_DEVWRITE("eeprom", gaelco2_eeprom_data_w)															/* EEPROM data */
+	AM_RANGE(0x30000a, 0x30000b) AM_DEVWRITE("eeprom", gaelco2_eeprom_sk_w)																/* EEPROM serial clock */
+	AM_RANGE(0x30000c, 0x30000d) AM_DEVWRITE("eeprom", gaelco2_eeprom_cs_w)																/* EEPROM chip select */
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("P2")
 	AM_RANGE(0x300020, 0x300021) AM_READ_PORT("COIN")
 	AM_RANGE(0x310000, 0x31ffff) AM_READWRITE(snowboar_protection_r,snowboar_protection_w) AM_BASE(&snowboar_protection)	/* Protection */
@@ -944,7 +957,7 @@ static INPUT_PORTS_START( snowboar )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* bit 6 is EEPROM data (DOUT) */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	/* bit 6 is EEPROM data (DOUT) */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	/* bit 7 is EEPROM ready */
 INPUT_PORTS_END
 
@@ -960,7 +973,7 @@ static MACHINE_DRIVER_START( snowboar )
 	MDRV_CPU_PROGRAM_MAP(snowboar_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_NVRAM_HANDLER(gaelco2)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", gaelco2_eeprom_interface)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -1202,7 +1215,7 @@ static MACHINE_DRIVER_START( wrally2 )
 	MDRV_CPU_PROGRAM_MAP(wrally2_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq6_line_hold)
 
-	MDRV_NVRAM_HANDLER(gaelco2)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", gaelco2_eeprom_interface)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

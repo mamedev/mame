@@ -29,7 +29,7 @@
 #include "driver.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/e132xs/e132xs.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 
@@ -59,43 +59,43 @@ static WRITE16_DEVICE_HANDLER( oki_w )
 		okim6295_w(device, 0, data);
 }
 
-static READ16_HANDLER( eeprom_r )
+static READ16_DEVICE_HANDLER( eeprom_r )
 {
 	if(offset)
-		return eeprom_read_bit();
+		return eepromdev_read_bit(device);
 	else
 		return 0;
 }
 
-static READ32_HANDLER( eeprom32_r )
+static READ32_DEVICE_HANDLER( eeprom32_r )
 {
-	return eeprom_read_bit();
+	return eepromdev_read_bit(device);
 }
 
-static WRITE16_HANDLER( eeprom_w )
+static WRITE16_DEVICE_HANDLER( eeprom_w )
 {
 	if(offset)
 	{
-		eeprom_write_bit(data & 0x01);
-		eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
-		eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		eepromdev_write_bit(device, data & 0x01);
+		eepromdev_set_cs_line(device, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
+		eepromdev_set_clock_line(device, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 
 		// data & 8?
 	}
 }
 
-static WRITE32_HANDLER( eeprom32_w )
+static WRITE32_DEVICE_HANDLER( eeprom32_w )
 {
-	eeprom_write_bit(data & 0x01);
-	eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
-	eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+	eepromdev_write_bit(device, data & 0x01);
+	eepromdev_set_cs_line(device, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
+	eepromdev_set_clock_line(device, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 }
 
-static WRITE32_HANDLER( finalgdr_eeprom_w )
+static WRITE32_DEVICE_HANDLER( finalgdr_eeprom_w )
 {
-	eeprom_write_bit(data & 0x4000);
-	eeprom_set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
-	eeprom_set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+	eepromdev_write_bit(device, data & 0x4000);
+	eepromdev_set_cs_line(device, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
+	eepromdev_set_clock_line(device, (data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static WRITE16_HANDLER( flipscreen_w )
@@ -226,40 +226,40 @@ static ADDRESS_MAP_START( vamphalf_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0c0, 0x0c3) AM_DEVREADWRITE("oki", oki_r, oki_w)
 	AM_RANGE(0x140, 0x143) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x146, 0x147) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
-	AM_RANGE(0x1c0, 0x1c3) AM_READ(eeprom_r)
+	AM_RANGE(0x1c0, 0x1c3) AM_DEVREAD("eeprom", eeprom_r)
 	AM_RANGE(0x240, 0x243) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x600, 0x603) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x604, 0x607) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x608, 0x60b) AM_WRITE(eeprom_w)
+	AM_RANGE(0x608, 0x60b) AM_DEVWRITE("eeprom", eeprom_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( misncrft_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x100, 0x103) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x200, 0x203) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x240, 0x243) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x3c0, 0x3c3) AM_WRITE(eeprom_w)
-	AM_RANGE(0x580, 0x583) AM_READ(eeprom_r)
+	AM_RANGE(0x3c0, 0x3c3) AM_DEVWRITE("eeprom", eeprom_w)
+	AM_RANGE(0x580, 0x583) AM_DEVREAD("eeprom", eeprom_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( coolmini_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x200, 0x203) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x300, 0x303) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x304, 0x307) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x308, 0x30b) AM_WRITE(eeprom_w)
+	AM_RANGE(0x308, 0x30b) AM_DEVWRITE("eeprom", eeprom_w)
 	AM_RANGE(0x4c0, 0x4c3) AM_DEVREADWRITE("oki", oki_r, oki_w)
 	AM_RANGE(0x540, 0x543) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x546, 0x547) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
-	AM_RANGE(0x7c0, 0x7c3) AM_READ(eeprom_r)
+	AM_RANGE(0x7c0, 0x7c3) AM_DEVREAD("eeprom", eeprom_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( suplup_io, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE(0x020, 0x023) AM_WRITE(eeprom_w)
+	AM_RANGE(0x020, 0x023) AM_DEVWRITE("eeprom", eeprom_w)
 	AM_RANGE(0x040, 0x043) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x060, 0x063) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x080, 0x083) AM_DEVREADWRITE("oki", oki_r, oki_w)
 	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x0c4, 0x0c7) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
-	AM_RANGE(0x100, 0x103) AM_READ(eeprom_r)
+	AM_RANGE(0x100, 0x103) AM_DEVREAD("eeprom", eeprom_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wyvernwg_io, ADDRESS_SPACE_IO, 32 )
@@ -268,8 +268,8 @@ static ADDRESS_MAP_START( wyvernwg_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x2800, 0x2803) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x3000, 0x3003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x5400, 0x5403) AM_WRITENOP // soundlatch
-	AM_RANGE(0x7000, 0x7003) AM_WRITE(eeprom32_w)
-	AM_RANGE(0x7c00, 0x7c03) AM_READ(eeprom32_r)
+	AM_RANGE(0x7000, 0x7003) AM_DEVWRITE("eeprom", eeprom32_w)
+	AM_RANGE(0x7c00, 0x7c03) AM_DEVREAD("eeprom", eeprom32_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( finalgdr_io, ADDRESS_SPACE_IO, 32 )
@@ -280,9 +280,9 @@ static ADDRESS_MAP_START( finalgdr_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x3800, 0x3803) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x0000ff00)
 	AM_RANGE(0x3c00, 0x3c03) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x4400, 0x4403) AM_READ(eeprom32_r)
+	AM_RANGE(0x4400, 0x4403) AM_DEVREAD("eeprom", eeprom32_r)
 	AM_RANGE(0x6000, 0x6003) AM_READNOP //?
-	AM_RANGE(0x6000, 0x6003) AM_WRITE(finalgdr_eeprom_w)
+	AM_RANGE(0x6000, 0x6003) AM_DEVWRITE("eeprom", finalgdr_eeprom_w)
 	AM_RANGE(0x6040, 0x6043) AM_WRITE(finalgdr_prot_w)
 	//AM_RANGE(0x6080, 0x6083) AM_WRITE(flipscreen32_w) //?
 	AM_RANGE(0x6060, 0x6063) AM_WRITE(finalgdr_prize_w)
@@ -293,8 +293,8 @@ static ADDRESS_MAP_START( jmpbreak_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0c0, 0x0c3) AM_NOP // ?
 	AM_RANGE(0x100, 0x103) AM_WRITENOP // ?
 	AM_RANGE(0x240, 0x243) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x280, 0x283) AM_WRITE(eeprom_w)
-	AM_RANGE(0x2c0, 0x2c3) AM_READ(eeprom_r)
+	AM_RANGE(0x280, 0x283) AM_DEVWRITE("eeprom", eeprom_w)
+	AM_RANGE(0x2c0, 0x2c3) AM_DEVREAD("eeprom", eeprom_r)
 	AM_RANGE(0x440, 0x443) AM_DEVREADWRITE("oki", oki_r, oki_w)
 	AM_RANGE(0x540, 0x543) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x680, 0x683) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
@@ -312,7 +312,7 @@ static ADDRESS_MAP_START( aoh_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aoh_io, ADDRESS_SPACE_IO, 32 )
-	AM_RANGE(0x0480, 0x0483) AM_WRITE(eeprom32_w)
+	AM_RANGE(0x0480, 0x0483) AM_DEVWRITE("eeprom", eeprom32_w)
 	AM_RANGE(0x0620, 0x0623) AM_DEVREADWRITE8("oki_2", okim6295_r, okim6295_w, 0x0000ff00)
 	AM_RANGE(0x0660, 0x0663) AM_DEVREADWRITE8("oki_1", okim6295_r, okim6295_w, 0x0000ff00)
 	AM_RANGE(0x0640, 0x0647) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x0000ff00)
@@ -568,7 +568,7 @@ static INPUT_PORTS_START( aoh )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL) // eeprom bit
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit) // eeprom bit
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -600,60 +600,16 @@ static GFXDECODE_START( vamphalf )
 GFXDECODE_END
 
 
-static const UINT8 suplup_default_nvram[128] = {
-	0xE8, 0xFE, 0xFF, 0xFF, 0x10, 0x80, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x96, 0x2D, 0xB4, 0x80, 0x00,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xAA, 0xAA
-};
-
-static const UINT8 misncrft_default_nvram[128] = {
-	0x67, 0xBE, 0x00, 0x01, 0x80, 0xFE, 0x04, 0x10, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xAA, 0xAA
-};
-
-static NVRAM_HANDLER( 93C46_vamphalf )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C46);
-		if (file)
-		{
-			eeprom_load(file);
-		}
-		else
-		{
-			if (!strcmp(machine->gamedrv->name,"suplup")) eeprom_set_data(suplup_default_nvram,128);
-			if (!strcmp(machine->gamedrv->name,"misncrft")) eeprom_set_data(misncrft_default_nvram,128);
-		}
-	}
-}
-
 static NVRAM_HANDLER( finalgdr )
 {
 	if (read_or_write)
 	{
-		eeprom_save(file);
 		mame_fwrite(file, finalgdr_backupram, 0x80*0x100);
 	}
 	else
 	{
-		eeprom_init(machine, &eeprom_interface_93C46);
 		if (file)
 		{
-			eeprom_load(file);
 			mame_fread(file, finalgdr_backupram, 0x80*0x100);
 		}
 	}
@@ -672,7 +628,7 @@ static MACHINE_DRIVER_START( common )
 	MDRV_CPU_PROGRAM_MAP(common_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_NVRAM_HANDLER(93C46_vamphalf)
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -787,7 +743,7 @@ static MACHINE_DRIVER_START( aoh )
 	MDRV_CPU_IO_MAP(aoh_io)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_NVRAM_HANDLER(93C46)
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -953,6 +909,9 @@ ROM_START( suplup ) /* version 4.0 / 990518 - also has 'Puzzle Bang Bang' title 
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(34a56987) SHA1(4d8983648a7f0acf43ff4c9c8aa6c8640ee2bbfe) )
+	
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* Default EEPROM */
+	ROM_LOAD( "eeprom-suplup.bin", 0x0000, 0x0080, CRC(e60c9883) SHA1(662dd8fb85eb97a8a4d53886198b269a5f6a6268) )
 ROM_END
 
 ROM_START( luplup ) /* version 3.0 / 990128 */
@@ -1296,6 +1255,9 @@ ROM_START( misncrft )
 
 	ROM_REGION( 0x80000, "wavetable", 0 )
 	ROM_LOAD( "qs1001a.u17", 0x00000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
+	
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "eeprom-misncrft.bin", 0x0000, 0x0080, CRC(9ad27077) SHA1(7f0e98eff9cf6e1b60c19fc1016b888e50b087e0) )
 ROM_END
 
 /*

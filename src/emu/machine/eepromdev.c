@@ -346,7 +346,10 @@ void eepromdev_set_data(const device_config *device, const UINT8 *data, int leng
 /* temporary: write data to eeprom.bin when this happens so we capture it
    for adding to a region */
 {
-	FILE *f = fopen("eeprom.bin", "wb");
+	char filename[40];
+	FILE *f;
+	sprintf(filename, "eeprom-%s.bin", device->machine->gamedrv->name);
+	f = fopen(filename, "wb");
 	fwrite(eestate->data, 1, (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8, f);
 	fclose(f);
 }

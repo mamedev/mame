@@ -32,7 +32,7 @@ EEPROM chip: 93C46
 
 #include "driver.h"
 #include "deprecat.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/saa1099.h"
 
@@ -45,26 +45,6 @@ extern VIDEO_UPDATE( xorworld );
 
 
 /****************************************************************
-                NVRAM load/save/init
-****************************************************************/
-static NVRAM_HANDLER( xorworld )
-{
-	if (read_or_write)
-	{
-		eeprom_save(file);
-	}
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C46);
-
-		if (file)
-		{
-			eeprom_load(file);
-		}
-	}
-}
-
-/****************************************************************
                 Init machine
 ****************************************************************/
 
@@ -74,22 +54,22 @@ static NVRAM_HANDLER( xorworld )
                 EEPROM read/write/control
 ****************************************************************/
 
-static WRITE16_HANDLER( eeprom_chip_select_w )
+static WRITE16_DEVICE_HANDLER( eeprom_chip_select_w )
 {
 	/* bit 0 is CS (active low) */
-	eeprom_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	eepromdev_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static WRITE16_HANDLER( eeprom_serial_clock_w )
+static WRITE16_DEVICE_HANDLER( eeprom_serial_clock_w )
 {
 	/* bit 0 is SK (active high) */
-	eeprom_set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	eepromdev_set_clock_line(device, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE16_HANDLER( eeprom_data_w )
+static WRITE16_DEVICE_HANDLER( eeprom_data_w )
 {
 	/* bit 0 is EEPROM data (DIN) */
-	eeprom_write_bit(data & 0x01);
+	eepromdev_write_bit(device, data & 0x01);
 }
 
 
@@ -100,9 +80,9 @@ static ADDRESS_MAP_START( xorworld_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW")
 	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x800002, 0x800003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
-	AM_RANGE(0xa00008, 0xa00009) AM_WRITE(eeprom_chip_select_w)
-	AM_RANGE(0xa0000a, 0xa0000b) AM_WRITE(eeprom_serial_clock_w)
-	AM_RANGE(0xa0000c, 0xa0000d) AM_WRITE(eeprom_data_w)
+	AM_RANGE(0xa00008, 0xa00009) AM_DEVWRITE("eeprom", eeprom_chip_select_w)
+	AM_RANGE(0xa0000a, 0xa0000b) AM_DEVWRITE("eeprom", eeprom_serial_clock_w)
+	AM_RANGE(0xa0000c, 0xa0000d) AM_DEVWRITE("eeprom", eeprom_data_w)
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM_WRITE(xorworld_videoram16_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0xffc800, 0xffc87f) AM_RAM	AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0xffc880, 0xffc881) AM_WRITENOP
@@ -125,7 +105,7 @@ static INPUT_PORTS_START( xorworld )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* used for accessing the NVRAM */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	/* used for accessing the NVRAM */
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( Normal ) )
@@ -207,7 +187,7 @@ static MACHINE_DRIVER_START( xorworld )
 
 	MDRV_QUANTUM_TIME(HZ(60))
 
-	MDRV_NVRAM_HANDLER(xorworld)
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	// video hardware
 
