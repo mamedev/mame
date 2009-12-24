@@ -46,20 +46,20 @@ In test mode (c) is 2000
 #define xxxx 0x90 /* Unknown */
 
 static const UINT8 cb2001_decryption_table[256] = {
-	0xe8,xxxx,0x94,xxxx,0x80,0x61,0x12,xxxx, 0x3c,xxxx,xxxx,0x23,xxxx,xxxx,xxxx,xxxx, /* 00 */
-//    pppp      ????      pppp ???? pppp       pppp           p?p?
-	xxxx,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,0xd3,0x3a,0x14,0x89,xxxx, /* 10 */
-//                   pppp pppp                 pppp      ???? pppp pppp pppp pppp ????
-	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xb5,xxxx, xxxx,xxxx,xxxx,0x75,xxxx,xxxx,xxxx,xxxx, /* 20 */
-//         !!!!      pppp      ???? pppp                      pppp
+	0xe8,xxxx,0x94,xxxx,0x80,0x61,0x12,0x27, 0x3c,xxxx,xxxx,0x23,xxxx,xxxx,xxxx,xxxx, /* 00 */
+//    pppp      ????      pppp ???? pppp p?p?  pppp           p?p?
+	xxxx,xxxx,xxxx,0x27,0x1c,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,0xd3,0x3a,0x14,0xbb,0x1f, /* 10 */
+//                   p?p? pppp                 pppp      ???? pppp pppp pppp pppp pppp
+	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xb5,xxxx, xxxx,xxxx,xxxx,0x75,0x33,xxxx,xxxx,xxxx, /* 20 */
+//         !!!!      pppp      ???? pppp                      pppp ????
 	0x9d,xxxx,xxxx,xxxx,xxxx,xxxx,0xbe,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,0xbf,0x74, /* 30 */
 //    ????                          pppp                 ????           ???? ???? pppp
-	xxxx,0xea,xxxx,xxxx,xxxx,0xb0,xxxx,xxxx, xxxx,0xa2,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 40 */
-//         !!!!                gggg                 pppp
+	xxxx,0xea,xxxx,xxxx,xxxx,0xb0,xxxx,xxxx, xxxx,0xa2,xxxx,xxxx,0xa3,xxxx,xxxx,xxxx, /* 40 */
+//         !!!!                gggg                 pppp           pppp
 	xxxx,xxxx,0x2c,xxxx,xxxx,xxxx,0x42,0xc0, xxxx,xxxx,xxxx,xxxx,0xeb,xxxx,xxxx,xxxx, /* 50 */
 //              pppp                ???? pppp                      pppp
-	xxxx,xxxx,xxxx,xxxx,0x22,xxxx,xxxx,xxxx, xxxx,0xa5,xxxx,xxxx,xxxx,0xbb,0xba,xxxx, /* 60 */
-//                        pppp                      ????                pppp gggg
+	xxxx,xxxx,xxxx,xxxx,0x22,xxxx,xxxx,xxxx, 0xa1,0xa5,xxxx,xxxx,xxxx,0xbb,0xba,xxxx, /* 60 */
+//                        pppp                 pppp ????                pppp gggg
 	0xc3,xxxx,0x02,xxxx,xxxx,xxxx,0x24,xxxx, 0x72,xxxx,0xf2,xxxx,xxxx,0x43,xxxx,xxxx, /* 70 */
 //    pppp      pppp                pppp       pppp      ????           pppp
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x34, xxxx,xxxx,0x59,xxxx,0x73,xxxx,0x2a,xxxx, /* 80 */
@@ -68,8 +68,8 @@ static const UINT8 cb2001_decryption_table[256] = {
 //              ????           p?p?                                pppp
 	xxxx,xxxx,xxxx,0x06,0xaa,0x9c,xxxx,0xb8, xxxx,xxxx,0xfc,xxxx,0x51,xxxx,xxxx,0x1a, /* A0 */
 //                   ???? ???? ????      !!!!            ????      pppp           pppp
-	0x75,xxxx,0xb4,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,0x03,xxxx,xxxx,xxxx,0x07,0xcf, /* B0 */
-//    ????      pppp                                     pppp      ????      ???? ????
+	0x75,xxxx,0xb4,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,0x03,xxxx,0x1e,xxxx,0x07,0xcf, /* B0 */
+//    ????      pppp                                     pppp      pppp      ???? ????
 	xxxx,0xec,0xee,xxxx,xxxx,0xe2,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x2e,xxxx, /* C0 */
 //         pppp ????           pppp                                          pppp
 	xxxx,xxxx,0x46,xxxx,0x60,xxxx,xxxx,0x47, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,0x8b, /* D0 */
@@ -81,6 +81,71 @@ static const UINT8 cb2001_decryption_table[256] = {
 };
 
 /* robiza's notes:
+
+e0022 a5         push psw ?
+e0023 d4         push r ?
+e0024 bc         push ds0 (bc -> 1e)
+e0025 a3         push ds1 ?
+e0026 dd         di ?
+e0027 a7 00 00   mov aw,0
+e002a 21 d8      mov ds0,aw
+e002c 21 c0      mov ds1,aw
+e002e 18 c0      xor al,al
+e0030 49 67 07   mov [767],al
+e0033 45 01      mov al,1
+e0035 49 d3 06   mov [6d3],al
+0089 call 2a9d                            e0038 00 67 30   call e30a2
+  .                                         e30a2 aa         clr1 dir
+  2a9d ld hl,d0b3                           e30a3 1e a6 04   mov bw,04a6 (1e -> bb, but in e66fd is different, bad dump?)
+  2aa0 inc (hl)                             e30a5 f2 07      inc b ptr[bw]
+  2aa1 inc hl                               e30a8 7d         inc bw
+  2aa2 inc (hl)                             e30a9 f2 07      inc b ptr[bw]
+  2aa3 ld a,(hl)                            e30ab e0 07      mov al,b ptr[bw]
+  2aa4 cp 3c                                e30ad 08 3c      cmp al,3c
+  2aa6 ret c                                e30af 78 06      bc e30b7
+
+0c4f ld a,(d44d)                            e003b mov al,[512]
+0c52 or a,a                                 e003e and al,al
+0c53 ret nz                                 e0040 be e0083
+0c54 ld hl,d461                             .
+0c57 ld a,(d476)                            e0042 mov aw,[4b9] (68 -> a1)
+0c5a or a                                   e0045 and aw,aw                       
+0c5b jr nz,0c6d                             e0047 be e0083
+0c5d ld a,(hl)                              .
+0c5e or a                                   e0049 and al,al
+0c5f jr nz,0c71                             e004b be e0054
+0c61 inc hl                                 e004d dec al
+0c62 inc (hl)                               e004f mov [4b9],aw (4c -> a3)
+0c63 ld a,(hl)                              .
+.                                           e0052 br e0083 
+.                                           e0054 and ah,ah
+.                                           e0056 be e007b
+0c64 cp 3c                                  e0058 mov al,3c
+0c66 jr c,c71                               .
+0c68 dec hl                                 e005a dec ah
+0c69 ld (hl),ff                             e005c mov [4b9],aw
+0c6b jr c71                                 .
+0c6d xor a                                  .
+0c6e ld (hl),a                              .
+0c6f inc (hl)                               .
+0c70 ld (hl),a                              .
+0c71 ld a,(d463)                            e005f mov aw,[4bb]
+0c74 or a                                   e0062 and aw,aw
+0c75 ret nz                                 e0064 bne e006b
+.                                           e0066 mov aw,1
+.                                           e0069 br e006e
+
+
+
+e00a6 be         pop ds1 ?
+e00a7 1f         pop ds0 (1f -> 1f)
+e00a8 05         pop r ?
+e0030 30         pop psw ?
+e00aa cb         ?
+e00ab 54         ?
+e00ac 23 92      fint
+e00ae bf         reti
+
 
 cmast91 and cmv4 seems similar to this cb2001:
 
@@ -134,7 +199,7 @@ cmv4                          cb2001                     (en -> de)
   2b3e pop bc                   e32bd pop cw             (8a -> 59)
   2b3f ret                      e32be ret
 
-  2b40-2b4b                     e32bf-e32d1              (06 -> 12) (d7 -> 4f dec iy or 47 inc iy)
+  2b40-2b4b                     e32bf-e32d1              (06 -> 12) (07 -> 27 not sure) (d7 -> 4f dec iy or 47 inc iy)
   2b4c-2b57                     e32d2-e32e4              (af -> 1a)
   .                             e32e5-                   (8e -> 2a) (14 -> 1c)
 
@@ -168,7 +233,7 @@ cmv4                          cb2001                     (en -> de)
   4ab2 xor a                    .
   4ab3 ld ($d618),a             e66f5 mov b ptr[72dh],ah (d8 -> 88)
   4ab6 ld ($d619),a             e66f9 mov b ptr[72eh],ah
-  4ab9 ld ($d61a),hl            e66fd mov w ptr[72fh],bw (1e -> 89)
+  4ab9 ld ($d61a),hl            e66fd mov w ptr[72fh],bw (1e -> 89) BAD DUMP, i think
   4abc jr $4ac9                 e6701 br 0e6712h
 
   4abe ld a,($d619)             e6703 mov al,[72eh]
@@ -191,7 +256,7 @@ cmv4                          cb2001                     (en -> de)
   4add sub $50                  e672f sub al,50h         (52 -> 2c)
   4adf cp $50                   e6731 cmp al,50h
   4ae1 jr c,$4ae7               e6733 bc 0e6739          (78 -> 72)
-  4ae3 ld b,$04                 e6735 mov ch,4h          (26 -> b5)
+  4ae3 ld b,$04                 e6735 mov ch,4h          (26 -> b5) but 26 in other place probably is mov sp,xxxx (BAD DUMP?)
   4ae5 sub $50                  e6737 sub al,50h
   4ae7 ld c,a                   e6739 mov cl,al
   4ae8 and $0f                  e673b and al,0fh         (76 -> 24)
