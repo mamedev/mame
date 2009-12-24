@@ -3504,7 +3504,7 @@ V-V                           TP-027
 	DRIVER( aafbb )		/* (c) 1989 Leland */
 	DRIVER( offroad )	/* (c) 1989 Leland */
 	DRIVER( offroadt )	/* (c) 1989 Leland */
-	DRIVER( offrdtp2 )	/* (c) 1989 Leland */
+	DRIVER( offroadt2p )/* (c) 1989 Leland */
 	DRIVER( pigout )	/* (c) 1990 Leland */
 	DRIVER( pigouta )	/* (c) 1990 Leland */
 	DRIVER( ataxx )		/* (c) 1990 Leland */

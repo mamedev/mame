@@ -62,15 +62,14 @@ void offroad_bankswitch(running_machine *machine);
 void ataxx_bankswitch(running_machine *machine);
 
 void leland_init_eeprom(running_machine *machine, UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type);
-void ataxx_init_eeprom(running_machine *machine, UINT8 default_val, const UINT16 *data, UINT8 serial_offset);
+void ataxx_init_eeprom(running_machine *machine, const UINT16 *data);
 
-READ8_HANDLER( ataxx_eeprom_r );
-WRITE8_HANDLER( ataxx_eeprom_w );
+READ8_DEVICE_HANDLER( ataxx_eeprom_r );
+WRITE8_DEVICE_HANDLER( ataxx_eeprom_w );
 
 WRITE8_HANDLER( leland_battery_ram_w );
 WRITE8_HANDLER( ataxx_battery_ram_w );
 NVRAM_HANDLER( leland );
-NVRAM_HANDLER( ataxx );
 
 READ8_HANDLER( leland_master_analog_key_r );
 WRITE8_HANDLER( leland_master_analog_key_w );

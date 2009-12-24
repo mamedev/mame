@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "cpu/i86/i86.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "cpu/z80/z80.h"
 #include "includes/leland.h"
 #include "sound/ay8910.h"
@@ -75,8 +75,6 @@ static UINT8 battery_ram_enable;
 static UINT8 *battery_ram;
 
 static UINT8 *extra_tram;
-
-static UINT8 eeprom_data[128*2];
 
 
 /* Internal routines */
@@ -679,16 +677,36 @@ void ataxx_bankswitch(running_machine *machine)
 
 void leland_init_eeprom(running_machine *machine, UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type)
 {
-	static const eeprom_interface eeprom_intf =
-	{
-		6,
-		16,
-		"110",
-		"101",
-		"111"
-	};
 	UINT8 xorval = (serial_type == SERIAL_TYPE_ADD_XOR || serial_type == SERIAL_TYPE_ENCRYPT_XOR) ? 0xff : 0x00;
+	UINT8 eeprom_data[64*2];
 	UINT32 serial;
+	
+	/*
+		NOTE: This code is just illustrative, and explains how to generate the 
+		serial numbers for the classic Leland games. We currently load default
+		EEPROM data from the ROMs rather than generating it.
+
+		Here are the input parameters for various games:
+		
+			game		default_val 	serial_offset	serial_type
+			cerberus	0x00			0				SERIAL_TYPE_NONE
+			mayhem		0x00			0x28			SERIAL_TYPE_ADD
+			powrplay	0xff			0x2d			SERIAL_TYPE_ADD_XOR
+			wseries		0xff			0x12			SERIAL_TYPE_ENCRYPT_XOR
+			alleymas	0xff			0x0c			SERIAL_TYPE_ENCRYPT_XOR
+			upyoural	0xff			0x0c			SERIAL_TYPE_ENCRYPT_XOR
+			dangerz		0xff			0x10			SERIAL_TYPE_ENCRYPT_XOR
+			basebal2	0xff			0x12			SERIAL_TYPE_ENCRYPT_XOR
+			dblplay		0xff			0x11			SERIAL_TYPE_ENCRYPT_XOR
+			strkzone	0xff			0x0f			SERIAL_TYPE_ENCRYPT_XOR
+			redlin2p	0xff			0x18			SERIAL_TYPE_ENCRYPT_XOR
+			quarterb	0xff			0x24			SERIAL_TYPE_ENCRYPT_XOR
+			viper		0xff			0x0c			SERIAL_TYPE_ENCRYPT_XOR
+			teamqb		0xff			0x1a			SERIAL_TYPE_ENCRYPT_XOR
+			aafb		0xff			0x1a			SERIAL_TYPE_ENCRYPT_XOR
+			offroad		0xff			0x00			SERIAL_TYPE_ENCRYPT_XOR
+			pigout		0xff			0x00			SERIAL_TYPE_ENCRYPT
+	*/
 
 	/* initialize everything to the default value */
 	memset(eeprom_data, default_val, sizeof(eeprom_data));
@@ -758,8 +776,6 @@ void leland_init_eeprom(running_machine *machine, UINT8 default_val, const UINT1
 			break;
 		}
 	}
-
-	eeprom_init(machine, &eeprom_intf);
 }
 
 
@@ -770,21 +786,19 @@ void leland_init_eeprom(running_machine *machine, UINT8 default_val, const UINT1
  *
  *************************************/
 
-void ataxx_init_eeprom(running_machine *machine, UINT8 default_val, const UINT16 *data, UINT8 serial_offset)
+void ataxx_init_eeprom(running_machine *machine, const UINT16 *data)
 {
-	static const eeprom_interface eeprom_intf =
-	{
-		7,
-		16,
-		"000001100",
-		"000001010",
-		0,
-		"0000010000000000",
-		"0000010011000000",
-		1
-	};
+	UINT8 eeprom_data[128*2];
+	UINT8 serial_offset = 0;
+	UINT8 default_val = 0;
 	UINT32 serial;
 
+	/*
+		NOTE: This code is just illustrative, and explains how to generate the 
+		serial numbers for the classic Leland games. We currently load default
+		EEPROM data from the ROMs rather than generating it.
+	*/
+	
 	/* initialize everything to the default value */
 	memset(eeprom_data, default_val, sizeof(eeprom_data));
 
@@ -835,8 +849,6 @@ void ataxx_init_eeprom(running_machine *machine, UINT8 default_val, const UINT16
 		sum ^= 0xffff;
 		eeprom_data[0x7f * 2 + 0] = (sum >> 8) & 0xff;
 		eeprom_data[0x7f * 2 + 1] = sum & 0xff;
-
-		eeprom_init(machine, &eeprom_intf);
 	}
 }
 
@@ -848,21 +860,21 @@ void ataxx_init_eeprom(running_machine *machine, UINT8 default_val, const UINT16
  *
  *************************************/
 
-READ8_HANDLER( ataxx_eeprom_r )
+READ8_DEVICE_HANDLER( ataxx_eeprom_r )
 {
-	int port = input_port_read(space->machine, "IN2");
-	if (LOG_EEPROM) logerror("%04X:EE read\n", cpu_get_pc(space->cpu));
-	return (port & ~0x01) | eeprom_read_bit();
+	int port = input_port_read(device->machine, "IN2");
+	if (LOG_EEPROM) logerror("%s:EE read\n", cpuexec_describe_context(device->machine));
+	return port;
 }
 
 
-WRITE8_HANDLER( ataxx_eeprom_w )
+WRITE8_DEVICE_HANDLER( ataxx_eeprom_w )
 {
-	if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", cpu_get_pc(space->cpu),
+	if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", cpuexec_describe_context(device->machine),
 			(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
-	eeprom_write_bit     ((data & 0x10) >> 4);
-	eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-	eeprom_set_cs_line  ((~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	eepromdev_write_bit     (device, (data & 0x10) >> 4);
+	eepromdev_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	eepromdev_set_cs_line   (device, (~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -902,41 +914,13 @@ WRITE8_HANDLER( ataxx_battery_ram_w )
 NVRAM_HANDLER( leland )
 {
 	if (read_or_write)
-	{
-		eeprom_save(file);
 		mame_fwrite(file, battery_ram, LELAND_BATTERY_RAM_SIZE);
-	}
 	else if (file)
-	{
-		eeprom_load(file);
 		mame_fread(file, battery_ram, LELAND_BATTERY_RAM_SIZE);
-	}
 	else
-	{
-		eeprom_set_data(eeprom_data, 64*2);
 		memset(battery_ram, 0x00, LELAND_BATTERY_RAM_SIZE);
-	}
 }
 
-
-NVRAM_HANDLER( ataxx )
-{
-	if (read_or_write)
-	{
-		eeprom_save(file);
-		mame_fwrite(file, battery_ram, LELAND_BATTERY_RAM_SIZE);
-	}
-	else if (file)
-	{
-		eeprom_load(file);
-		mame_fread(file, battery_ram, LELAND_BATTERY_RAM_SIZE);
-	}
-	else
-	{
-		eeprom_set_data(eeprom_data, 128*2);
-		memset(battery_ram, 0x00, LELAND_BATTERY_RAM_SIZE);
-	}
-}
 
 
 /*************************************
@@ -1179,7 +1163,6 @@ READ8_HANDLER( leland_master_input_r )
 		case 0x11:	/* /GIN1 */
 			result = input_port_read(space->machine, "IN3");
 			if (LOG_EEPROM) logerror("%04X:EE read\n", cpu_get_pc(space->cpu));
-			result = (result & ~0x01) | eeprom_read_bit();
 			break;
 
 		default:
@@ -1192,6 +1175,8 @@ READ8_HANDLER( leland_master_input_r )
 
 WRITE8_HANDLER( leland_master_output_w )
 {
+	const device_config *eeprom;
+	
 	switch (offset)
 	{
 		case 0x09:	/* /MCONT */
@@ -1200,11 +1185,12 @@ WRITE8_HANDLER( leland_master_output_w )
 			cputag_set_input_line(space->machine, "slave", INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			cputag_set_input_line(space->machine, "slave", 0, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
+			eeprom = devtag_get_device(space->machine, "eeprom");
 			if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", cpu_get_pc(space->cpu),
 					(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
-			eeprom_write_bit     ((data & 0x10) >> 4);
-			eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-			eeprom_set_cs_line  ((~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+			eepromdev_write_bit     (eeprom, (data & 0x10) >> 4);
+			eepromdev_set_clock_line(eeprom, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+			eepromdev_set_cs_line   (eeprom, (~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		case 0x0a:	/* /OGIA */
