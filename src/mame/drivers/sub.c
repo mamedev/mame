@@ -110,6 +110,8 @@ PCB2  (Top board, CPU board)
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
+#define MASTER_CLOCK			XTAL_18_432MHz
+
 static UINT8* sub_vid;
 static UINT8* sub_attr;
 static UINT8* sub_scrolly;
@@ -400,15 +402,15 @@ static INTERRUPT_GEN( subm_sound_irq )
 
 static MACHINE_DRIVER_START( sub )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
+	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(subm_map)
 	MDRV_CPU_IO_MAP(subm_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("soundcpu", Z80,4000000)		 /* ? MHz */
+	MDRV_CPU_ADD("soundcpu", Z80,MASTER_CLOCK/6)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(subm_sound_map)
 	MDRV_CPU_IO_MAP(subm_sound_io)
-	MDRV_CPU_PERIODIC_INT(subm_sound_irq, 60) //???
+	MDRV_CPU_PERIODIC_INT(subm_sound_irq, 120) //???
 
 
 	/* video hardware */
@@ -429,10 +431,10 @@ static MACHINE_DRIVER_START( sub )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 12000000/8) /* ? Mhz */
+	MDRV_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/6/2) /* ? Mhz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 12000000/8) /* ? Mhz */
+	MDRV_SOUND_ADD("ay2", AY8910, MASTER_CLOCK/6/2) /* ? Mhz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_DRIVER_END
 
@@ -441,11 +443,11 @@ ROM_START( sub )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "temp 1 pos b6 27128.bin",	  0x0000, 0x4000, CRC(6875b31d) SHA1(e7607e53687f1331cc97de939de144a7954ca3c3) )
 	ROM_LOAD( "temp 2 pos c6 27128.bin",	  0x4000, 0x4000, CRC(bc7f8f43) SHA1(088156a66acb2214c638d9d1ad18e9836b27eff0) )
-	ROM_LOAD( "temp 3 pos d6 2764.bin",		  0x8000, 0x2000, CRC(3546c226) SHA1(35e53c0db75c89e8e222d2139b841e77f5cc282c) )
+	ROM_LOAD( "temp 3 pos d6 2764.bin",	  0x8000, 0x2000, CRC(3546c226) SHA1(35e53c0db75c89e8e222d2139b841e77f5cc282c) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "m sound pos f14 2764.bin",	  0x0000, 0x2000, CRC(61536a97) SHA1(84effc2251bf7c91e0bb670a651117503de8940d) )
-	ROM_RELOAD( 							  0x2000, 0x2000 )
+	ROM_RELOAD( 0x2000, 0x2000 )
 
 	ROM_REGION( 0xc000, "gfx1", 0)
 	ROM_LOAD( "vram 1 pos f12 27128  version3.bin",	  0x0000, 0x4000, CRC(8d176ba0) SHA1(b0bf4af97e991545d6b38e8159eb909376e6df35) )
