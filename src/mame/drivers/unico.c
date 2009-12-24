@@ -24,7 +24,7 @@ Year + Game         PCB             Notes
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "includes/unico.h"
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
@@ -210,21 +210,21 @@ static WRITE32_HANDLER( zeropnt2_leds_w )
 	}
 }
 
-static WRITE32_HANDLER( zeropnt2_eeprom_w )
+static WRITE32_DEVICE_HANDLER( zeropnt2_eeprom_w )
 {
 	if (data & ~0xfe00000)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(space->cpu),data);
+		logerror("%s - Unknown EEPROM bit written %04X\n",cpuexec_describe_context(device->machine),data);
 
 	if ( ACCESSING_BITS_24_31 )
 	{
 		// latch the bit
-		eeprom_write_bit(data & 0x04000000);
+		eepromdev_write_bit(device, data & 0x04000000);
 
 		// reset line asserted: reset.
-		eeprom_set_cs_line((data & 0x01000000) ? CLEAR_LINE : ASSERT_LINE);
+		eepromdev_set_cs_line(device, (data & 0x01000000) ? CLEAR_LINE : ASSERT_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
+		eepromdev_set_clock_line(device, (data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -245,7 +245,7 @@ static ADDRESS_MAP_START( zeropnt2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x800154, 0x800157) AM_READ_PORT("DSW2")
 	AM_RANGE(0x80015c, 0x80015f) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0x8001e0, 0x8001e3) AM_WRITENOP									// ? IRQ Ack
-	AM_RANGE(0x8001f0, 0x8001f3) AM_WRITE(zeropnt2_eeprom_w)					// EEPROM
+	AM_RANGE(0x8001f0, 0x8001f3) AM_DEVWRITE("eeprom", zeropnt2_eeprom_w)					// EEPROM
 	AM_RANGE(0x904000, 0x907fff) AM_RAM_WRITE(unico_vram32_1_w) AM_BASE(&unico_vram32_1	)	// Layers
 	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(unico_vram32_2_w) AM_BASE(&unico_vram32_2	)	//
 	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(unico_vram32_0_w) AM_BASE(&unico_vram32_0	)	//
@@ -523,7 +523,7 @@ static INPUT_PORTS_START( zeropnt2 )
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	// EEPROM
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	// EEPROM
 
 	PORT_START("Y0")	/* $800140.b */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2)
@@ -595,17 +595,6 @@ static const eeprom_interface zeropnt2_eeprom_interface =
 //  "*10001xxxx"    // write all    1 00 01xxxx dddddddd
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
-
-static NVRAM_HANDLER( zeropnt2 )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &zeropnt2_eeprom_interface);
-		if (file)	eeprom_load(file);
-	}
-}
 
 
 /***************************************************************************
@@ -710,7 +699,7 @@ static MACHINE_DRIVER_START( zeropnt2 )
 
 	MDRV_MACHINE_RESET(zeropt)
 
-	MDRV_NVRAM_HANDLER(zeropnt2)
+	MDRV_EEPROM_NODEFAULT_ADD("eeprom", zeropnt2_eeprom_interface)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
