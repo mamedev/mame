@@ -25,6 +25,25 @@ Windows debugging options
 	the same time as -log to output the log data to both targets as well.
 	Default is OFF (-nooslog).
 
+-watchdog <duration> / -wdog <duration>
+
+	Enables an internal watchdog timer that will automatically kill the MAME
+	process if more than <duration> seconds passes without a frame update.
+	Keep in mind that some games sit for a while during load time without
+	updating the screen, so <duration> should be long enough to cover that.
+	10-30 seconds on a modern system should be plenty in general. By default
+	there is no watchdog.
+
+-debugger_font <fontname> / -dfont <fontname>
+
+	Specifies the name of the font to use for debugger windows. By default,
+	the font is Lucida Console.
+	
+-debugger_font_size <points> / -dfontsize <points>
+
+	Specifies the size of the font to use for debugger windows, in points.
+	By default, this is set to 9pt.
+	
 
 
 Windows performance options
@@ -44,12 +63,13 @@ Windows performance options
 	which can improve performance on hyperthreaded and multicore systems.
 	The default is OFF (-nomultithreading).
 	
--numprocessors <auto|value>
+-numprocessors <auto|value> / -np <auto|value>
 	Specify the number of processors to use for work queues. Specifying
 	"auto" will use the value reported by the system or environment 
 	variable OSDPROCESSORS. To avoid abuse, this value is internally limited
 	to 4 times the number of processors reported by the system. 
 	The default is "auto".
+
 
 
 Windows video options
@@ -79,7 +99,7 @@ Windows video options
 	physical monitor, aspect ratio, resolution, and view, which can be
 	set using the options below. The default is 1.
 
--[no]window
+-[no]window / -[no]w
 
 	Run MAME in either a window or full screen. The default is OFF
 	(-nowindow).

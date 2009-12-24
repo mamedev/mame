@@ -111,6 +111,7 @@ static av_revert_mm_thread_characteristics_ptr av_revert_mm_thread_characteristi
 static char mapfile_name[MAX_PATH];
 static LPTOP_LEVEL_EXCEPTION_FILTER pass_thru_filter;
 
+static HANDLE watchdog_reset_event;
 static HANDLE watchdog_exit_event;
 static HANDLE watchdog_thread;
 
@@ -359,8 +360,10 @@ void osd_init(running_machine *machine)
 	// if a watchdog thread is requested, create one
 	if (watchdog != 0)
 	{
+		watchdog_reset_event = CreateEvent(NULL, FALSE, FALSE, NULL);
+		assert_always(watchdog_reset_event != NULL, "Failed to create watchdog reset event");
 		watchdog_exit_event = CreateEvent(NULL, TRUE, FALSE, NULL);
-		assert_always(watchdog_exit_event != NULL, "Failed to create watchdog event");
+		assert_always(watchdog_exit_event != NULL, "Failed to create watchdog exit event");
 		watchdog_thread = CreateThread(NULL, 0, watchdog_thread_entry, (LPVOID)watchdog, 0, NULL);
 		assert_always(watchdog_thread != NULL, "Failed to create watchdog thread");
 	}
@@ -378,6 +381,10 @@ static void osd_exit(running_machine *machine)
 	{
 		SetEvent(watchdog_exit_event);
 		WaitForSingleObject(watchdog_thread, INFINITE);
+		CloseHandle(watchdog_reset_event);
+		CloseHandle(watchdog_exit_event);
+		CloseHandle(watchdog_thread);
+		watchdog_reset_event = NULL;
 		watchdog_exit_event = NULL;
 		watchdog_thread = NULL;
 	}
@@ -449,12 +456,45 @@ static int is_double_click_start(int argc)
 static DWORD WINAPI watchdog_thread_entry(LPVOID lpParameter)
 {
 	DWORD timeout = (int)(FPTR)lpParameter * 1000;
-	DWORD wait_result;
 
-	wait_result = WaitForSingleObject(watchdog_exit_event, timeout);
-	if (wait_result == WAIT_TIMEOUT)
-		TerminateProcess(GetCurrentProcess(), -1);
+	while (TRUE)
+	{
+		HANDLE handle_list[2];
+		DWORD wait_result;
+		
+		// wait for either a reset or an exit, or a timeout
+		handle_list[0] = watchdog_reset_event;
+		handle_list[1] = watchdog_exit_event;
+		wait_result = WaitForMultipleObjects(2, handle_list, FALSE, timeout);
+		
+		// on a reset, just loop around and re-wait
+		if (wait_result == WAIT_OBJECT_0 + 0)
+			continue;
+		
+		// on an exit, break out
+		if (wait_result == WAIT_OBJECT_0 + 1)
+			break;
+		
+		// on a timeout, kill the process
+		if (wait_result == WAIT_TIMEOUT)
+		{
+			fprintf(stderr, "Terminating due to watchdog timeout\n");
+			TerminateProcess(GetCurrentProcess(), -1);
+		}
+	}
 	return 0;
+}
+
+
+//============================================================
+//  winmain_watchdog_ping
+//============================================================
+
+void winmain_watchdog_ping(void)
+{
+	// if we have a watchdog, reset it
+	if (watchdog_reset_event != NULL)
+		SetEvent(watchdog_reset_event);
 }
 
 
