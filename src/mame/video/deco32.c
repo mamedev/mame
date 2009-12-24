@@ -1111,9 +1111,51 @@ static void print_debug_info(bitmap_t *bitmap)
 
 #endif
 
+static void deco32_setup_scroll(tilemap *pf_tilemap, UINT16 height, UINT8 control0, UINT8 control1, UINT16 sy, UINT16 sx, UINT32 *rowdata, UINT32 *coldata)
+{
+	int rows,offs;
+
+	/* Colscroll - not fully supported yet! */
+	if (control1&0x20 && coldata) {
+		sy+=coldata[0];
+		//popmessage("%08x",coldata[0]);
+	}
+
+	/* Rowscroll enable */
+	if (control1&0x40 && rowdata) {
+		tilemap_set_scroll_cols(pf_tilemap,1);
+		tilemap_set_scrolly( pf_tilemap,0, sy );
+
+		/* Several different rowscroll styles */
+		switch ((control0>>3)&0xf) {
+			case 0: rows=512; break;/* Every line of 512 height bitmap */
+			case 1: rows=256; break;
+			case 2: rows=128; break;
+			case 3: rows=64; break;
+			case 4: rows=32; break;
+			case 5: rows=16; break;
+			case 6: rows=8; break;
+			case 7: rows=4; break;
+			case 8: rows=2; break;
+			default: rows=1; break;
+		}
+		if (height<rows) rows/=2; /* 8x8 tile layers have half as many lines as 16x16 */
+
+		tilemap_set_scroll_rows(pf_tilemap,rows);
+		for (offs = 0;offs < rows;offs++)
+			tilemap_set_scrollx( pf_tilemap,offs, sx + rowdata[offs] );
+	}
+	else {
+		tilemap_set_scroll_rows(pf_tilemap,1);
+		tilemap_set_scroll_cols(pf_tilemap,1);
+		tilemap_set_scrollx( pf_tilemap, 0, sx );
+		tilemap_set_scrolly( pf_tilemap, 0, sy );
+	}
+}
+
 static void tilemap_raster_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, int pri)
 {
-	int ptr=0,sx0,sy0,sx1,sy1,start,end=0;
+	int ptr=0,start,end=0;
 	rectangle clip;
 	int overflow=deco32_raster_display_position;
 
@@ -1126,20 +1168,19 @@ static void tilemap_raster_draw(bitmap_t *bitmap, const rectangle *cliprect, int
 	deco32_raster_display_list[overflow++]=deco32_pf12_control[2];
 	deco32_raster_display_list[overflow++]=deco32_pf12_control[3];
 	deco32_raster_display_list[overflow++]=deco32_pf12_control[4];
-
+	
 	while (ptr<overflow) {
 		start=end;
 		end=deco32_raster_display_list[ptr++];
-		sx0=deco32_raster_display_list[ptr++];
-		sy0=deco32_raster_display_list[ptr++];
-		sx1=deco32_raster_display_list[ptr++];
-		sy1=deco32_raster_display_list[ptr++];
+		deco32_pf12_control[1]=deco32_raster_display_list[ptr++];
+		deco32_pf12_control[2]=deco32_raster_display_list[ptr++];
+		deco32_pf12_control[3]=deco32_raster_display_list[ptr++];
+		deco32_pf12_control[4]=deco32_raster_display_list[ptr++];
 
 		clip.min_y = start;
 		clip.max_y = end;
 
-		tilemap_set_scrollx(pf2_tilemap,0,sx1);
-		tilemap_set_scrolly(pf2_tilemap,0,sy1);
+		deco32_setup_scroll(pf2_tilemap, 512,(deco32_pf12_control[5]>>8)&0xff,(deco32_pf12_control[6]>>8)&0xff,deco32_pf12_control[4],deco32_pf12_control[3],deco32_pf2_rowscroll,deco32_pf2_rowscroll+0x200);
 		tilemap_draw(bitmap,&clip,pf2_tilemap,flags,pri);
 	}
 }
@@ -1183,47 +1224,7 @@ static void combined_tilemap_draw(running_machine* machine, bitmap_t *bitmap, co
 	}
 }
 
-static void deco32_setup_scroll(tilemap *pf_tilemap, UINT16 height, UINT8 control0, UINT8 control1, UINT16 sy, UINT16 sx, UINT32 *rowdata, UINT32 *coldata)
-{
-	int rows,offs;
 
-	/* Colscroll - not fully supported yet! */
-	if (control1&0x20 && coldata) {
-		sy+=coldata[0];
-		//popmessage("%08x",coldata[0]);
-	}
-
-	/* Rowscroll enable */
-	if (control1&0x40 && rowdata) {
-		tilemap_set_scroll_cols(pf_tilemap,1);
-		tilemap_set_scrolly( pf_tilemap,0, sy );
-
-		/* Several different rowscroll styles */
-		switch ((control0>>3)&0xf) {
-			case 0: rows=512; break;/* Every line of 512 height bitmap */
-			case 1: rows=256; break;
-			case 2: rows=128; break;
-			case 3: rows=64; break;
-			case 4: rows=32; break;
-			case 5: rows=16; break;
-			case 6: rows=8; break;
-			case 7: rows=4; break;
-			case 8: rows=2; break;
-			default: rows=1; break;
-		}
-		if (height<rows) rows/=2; /* 8x8 tile layers have half as many lines as 16x16 */
-
-		tilemap_set_scroll_rows(pf_tilemap,rows);
-		for (offs = 0;offs < rows;offs++)
-			tilemap_set_scrollx( pf_tilemap,offs, sx + rowdata[offs] );
-	}
-	else {
-		tilemap_set_scroll_rows(pf_tilemap,1);
-		tilemap_set_scroll_cols(pf_tilemap,1);
-		tilemap_set_scrollx( pf_tilemap, 0, sx );
-		tilemap_set_scrolly( pf_tilemap, 0, sy );
-	}
-}
 
 /******************************************************************************/
 
