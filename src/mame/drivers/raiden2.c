@@ -139,7 +139,7 @@ Current Problem(s) - in order of priority
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/okim6295.h"
 #include "machine/seicop.h"
 #include "includes/raiden2.h"
@@ -937,7 +937,7 @@ static ADDRESS_MAP_START( nzerotea_mem, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
 	AM_RANGE(0x006dc, 0x006dd) AM_READ(nzerotea_unknown_r)
 //  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
-	//AM_RANGE(0x00700, 0x00701) AM_WRITE(rdx_v33_eeprom_w)
+	//AM_RANGE(0x00700, 0x00701) AM_DEVWRITE("eeprom", rdx_v33_eeprom_w)
 	AM_RANGE(0x00740, 0x00741) AM_READ(nzerotea_unknown_r)
 	AM_RANGE(0x00744, 0x00745) AM_READ(r2_playerin_r)
 	AM_RANGE(0x0074c, 0x0074d) AM_READ(rdx_v33_system_r)
@@ -1977,6 +1977,9 @@ ROM_START( r2dx_v33 )
 
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPDX */
 	ROM_LOAD( "copx_d3.357",   0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-r2dx_v33.bin", 0x0000, 0x0080, CRC(ba454777) SHA1(101c5364e8664d17bfb1e759515d135a2673d67e) )
 ROM_END
 
 /*
@@ -2067,36 +2070,13 @@ static DRIVER_INIT (xsedae)
 }
 
 
-static const UINT8 r2_v33_default_eeprom_type1[32] =
-{
-	0x41, 0x52, 0x44, 0x49, 0x4E, 0x45, 0x49, 0x49, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x91, 0x80,
-	0x80, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
-};
-
-static NVRAM_HANDLER( rdx_v33 )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C46);
-
-		if (file) eeprom_load(file);
-		else
-		{
-			eeprom_set_data(r2_v33_default_eeprom_type1,32);
-		}
-	}
-}
-
-
-static WRITE16_HANDLER( rdx_v33_eeprom_w )
+static WRITE16_DEVICE_HANDLER( rdx_v33_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		eeprom_set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom_write_bit(data & 0x20);
-		eeprom_set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+		eepromdev_set_clock_line(device, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+		eepromdev_write_bit(device, data & 0x20);
+		eepromdev_set_cs_line(device, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
 		if (data&0xc7) logerror("eeprom_w extra bits used %04x\n",data);
 	}
@@ -2133,7 +2113,7 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
 	AM_RANGE(0x006dc, 0x006dd) AM_READ(rdx_v33_unknown2_r)
 //  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
-	AM_RANGE(0x00700, 0x00701) AM_WRITE(rdx_v33_eeprom_w)
+	AM_RANGE(0x00700, 0x00701) AM_DEVWRITE("eeprom", rdx_v33_eeprom_w)
 	AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
 	AM_RANGE(0x00744, 0x00745) AM_READ(r2_playerin_r)
 	AM_RANGE(0x0074c, 0x0074d) AM_READ(rdx_v33_system_r)
@@ -2177,7 +2157,7 @@ static INPUT_PORTS_START( rdx_v33 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0040, 0x0040, "Test Mode" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
@@ -2217,7 +2197,7 @@ static INPUT_PORTS_START( nzerotea )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0040, 0x0040, "Test Mode" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
@@ -2267,7 +2247,8 @@ static MACHINE_DRIVER_START( rdx_v33 )
 	MDRV_CPU_VBLANK_INT("screen", rdx_v33_interrupt)
 
 	MDRV_MACHINE_RESET(rdx_v33)
-	MDRV_NVRAM_HANDLER(rdx_v33)
+
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

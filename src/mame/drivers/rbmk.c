@@ -52,7 +52,7 @@ Notes:
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 
 static UINT16 *gms_vidram;
 static UINT16 *gms_vidram2;
@@ -80,15 +80,15 @@ static WRITE16_HANDLER( gms_write3 )
 
 }
 
-static WRITE16_HANDLER( eeprom_w )
+static WRITE16_DEVICE_HANDLER( eeprom_w )
 {
 	//bad ?
 	if( ACCESSING_BITS_0_7 )
 	{
-		eeprom_write_bit(data & 0x04);
-		eeprom_set_cs_line((data & 0x01) ? CLEAR_LINE:ASSERT_LINE );
+		eepromdev_write_bit(device, data & 0x04);
+		eepromdev_set_cs_line(device, (data & 0x01) ? CLEAR_LINE:ASSERT_LINE );
 
-		eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		eepromdev_set_clock_line(device, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( rbmk_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access
 	AM_RANGE(0x900000, 0x900fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_BASE(&gms_vidram)
-	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(eeprom_w)
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE("eeprom", eeprom_w)
 	AM_RANGE(0xC00000, 0xC00001) AM_READ_PORT("IN0") AM_WRITE(gms_write1)
 	AM_RANGE(0xC08000, 0xC08001) AM_READ_PORT("IN1") AM_WRITE(gms_write2)
 	AM_RANGE(0xC10000, 0xC10001) AM_READ_PORT("IN3")
@@ -293,7 +293,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 
 	PORT_START("IN4")	/* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
@@ -459,24 +459,6 @@ static VIDEO_UPDATE(rbmk)
 	return 0;
 }
 
-static NVRAM_HANDLER( syf )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C46);
-		if (file)
-		{
-			eeprom_load(file);
-		}
-		else
-		{
-			eeprom_set_data(memory_region(machine, "user2"),128);
-		}
-	}
-}
-
 
 
 static MACHINE_DRIVER_START( rbmk )
@@ -499,7 +481,7 @@ static MACHINE_DRIVER_START( rbmk )
 	MDRV_VIDEO_START(rbmk)
 	MDRV_VIDEO_UPDATE(rbmk)
 
-	MDRV_NVRAM_HANDLER(syf)
+	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
 
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -529,7 +511,7 @@ ROM_START( rbmk )
 	ROM_REGION( 0x80000, "gfx2", 0 ) /* 8x8 tiles? cards etc */
 	ROM_LOAD( "t1.u39", 0x00000, 0x80000, CRC(adf67429) SHA1(ab03c7f68403545f9e86a069581dc3fc3fa6b9c4) )
 
-	ROM_REGION( 0x80, "user2", 0 ) /* eeprom */
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* eeprom */
 	ROM_LOAD16_WORD_SWAP( "93c46.u51", 0x00, 0x080, CRC(4ca6ff01) SHA1(66c456eac5b0d1176ef9130baf2e746efdf30152) )
 ROM_END
 
