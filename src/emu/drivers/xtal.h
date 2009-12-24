@@ -135,6 +135,7 @@ enum
 	XTAL_26_686MHz 		= 26686000,		/* Typically used on 90's Taito PCBs to drive the custom chips */
 	XTAL_27MHz   		= 27000000,		/* Some Banpresto games macrossp, Irem M92 and 90's Toaplan games */
 	XTAL_27_164MHz  	= 27164000,		/* Typically used on 90's Taito PCBs to drive the custom chips */
+	XTAL_27_2109MHz		= 27210900,		/* LA Girl */
 	XTAL_28MHz   		= 28000000,
 	XTAL_28_37516MHz	= 28375160,		/* Amiga PAL systems */
 	XTAL_28_63636MHz  	= 28636360,		/* Later Leland games and Atari GT, Amiga NTSC , Raiden2 h/w */

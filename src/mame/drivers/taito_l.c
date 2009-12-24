@@ -1955,14 +1955,14 @@ static const ym2203_interface ym2203_interface_single =
 static MACHINE_DRIVER_START( fhawk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
 	MDRV_CPU_PROGRAM_MAP(fhawk_map)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(fhawk_3_map)
 
-	MDRV_CPU_ADD("slave", Z80, 12000000/3) 	/* verified on pcb */
+	MDRV_CPU_ADD("slave", Z80, XTAL_12MHz/3)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(fhawk_2_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,3) /* fixes slow down problems */
 
@@ -1989,7 +1989,7 @@ static MACHINE_DRIVER_START( fhawk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 3000000) /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)		/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface_triple)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
@@ -2021,7 +2021,7 @@ static MACHINE_DRIVER_START( champwr )
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
+	MDRV_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
@@ -2044,7 +2044,7 @@ static MACHINE_DRIVER_START( raimais )
 	MDRV_MACHINE_RESET(raimais)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("ymsnd", YM2610, 8000000) /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
+	MDRV_SOUND_REPLACE("ymsnd", YM2610, XTAL_8MHz)		/* verified on pcb (8Mhz OSC is also for the 2nd z80) */
 	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
@@ -2055,11 +2055,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kurikint )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
 	MDRV_CPU_PROGRAM_MAP(kurikint_map)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
-	MDRV_CPU_ADD("audiocpu",  Z80, 12000000/3) 	/* verified on pcb */
+	MDRV_CPU_ADD("audiocpu",  Z80, XTAL_12MHz/3)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(kurikint_2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -2086,7 +2086,7 @@ static MACHINE_DRIVER_START( kurikint )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 3000000) /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)		/* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
@@ -2107,7 +2107,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( plotting )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
 	MDRV_CPU_PROGRAM_MAP(plotting_map)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
@@ -2132,7 +2132,7 @@ static MACHINE_DRIVER_START( plotting )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 3330000) /* verified on pcb */
+	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_13_33056MHz/4)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface_single)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
@@ -2197,11 +2197,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( evilston )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 13330560/2) 	/* not verfied */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* not verified */
 	MDRV_CPU_PROGRAM_MAP(evilston_map)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 12000000/3) 	/* not verified */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)		/* not verified */
 	MDRV_CPU_PROGRAM_MAP(evilston_2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -2228,14 +2228,21 @@ static MACHINE_DRIVER_START( evilston )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 12000000/4) /* not verified */
+	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)		/* not verified */
 	MDRV_SOUND_ROUTE(0, "mono", 0.00)
 	MDRV_SOUND_ROUTE(1, "mono", 0.00)
 	MDRV_SOUND_ROUTE(2, "mono", 0.00)
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
 MACHINE_DRIVER_END
 
-
+static MACHINE_DRIVER_START( lagirl )
+	MDRV_IMPORT_FROM(plotting)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(cachat_map)
+	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_27_2109MHz/4)
+	MDRV_SOUND_REPLACE("ymsnd", YM2203, XTAL_27_2109MHz/8)
+	MDRV_MACHINE_RESET(cachat)
+MACHINE_DRIVER_END
 
 
 ROM_START( raimais )
