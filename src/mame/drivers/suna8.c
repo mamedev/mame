@@ -857,7 +857,10 @@ static WRITE8_HANDLER( sparkman_cmd_prot_w )
 		case 0xa6: suna8_nmi_enable = 1; break;
 		case 0x00: suna8_nmi_enable = 0; break;
 		case 0x18: suna8_trash_prot = 0; break;
+		case 0xce: suna8_trash_prot = 0; break;
 		case 0x81: suna8_trash_prot = 1; break;
+		case 0x99: suna8_trash_prot = 1; break;
+		case 0x54: suna8_spritebank = 1; break;
 		default: logerror("CPU #0 - PC %04X: unknown protection command: %02X\n",cpu_get_pc(space->cpu),data);
 	}
 }
@@ -875,15 +878,19 @@ static WRITE8_HANDLER( suna8_wram_w )
 static WRITE8_HANDLER( sparkman_flipscreen_w )
 {
 	flip_screen_set(space->machine, data & 0x01);
-	if (data & ~0x01) 	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(space->cpu),data);
+	//if (data & ~0x01) 	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE8_HANDLER( sparkman_leds_w )
 {
 	set_led_status(space->machine, 0, data & 0x01);
 	set_led_status(space->machine, 1, data & 0x02);
-	coin_counter_w(space->machine, 0, data & 0x04);
-	if (data & ~0x07)	logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(space->cpu),data);
+	//if (data & ~0x03)	logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(space->cpu),data);
+}
+
+static WRITE8_HANDLER( sparkman_coin_counter_w )
+{
+	coin_counter_w(space->machine, 0, data & 0x01);
 }
 
 /*
@@ -897,7 +904,7 @@ static WRITE8_HANDLER( sparkman_spritebank_w )
 		suna8_spritebank = 0;
 	else
 		suna8_spritebank = (data) & 1;
-	if (data & ~0x02) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	//if (data & ~0x02) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 /*
@@ -908,7 +915,7 @@ static WRITE8_HANDLER( sparkman_rombank_w )
 {
 	int bank = data & 0x0f;
 
-	if (data & ~0x0f) 	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
+	//if (data & ~0x0f) 	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 
 	memory_set_bank(space->machine, "bank1", bank);
 	suna8_rombank = data;
@@ -918,6 +925,13 @@ static READ8_HANDLER( sparkman_c0a3_r )
 {
 	return (video_screen_get_frame_number(space->machine->primary_screen) & 1) ? 0x80 : 0;
 }
+
+#if 0
+static WRITE8_HANDLER( sparkman_en_trash_w )
+{
+	suna8_trash_prot = 1;
+}
+#endif
 
 static ADDRESS_MAP_START( sparkman_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM									// ROM
@@ -932,7 +946,8 @@ static ADDRESS_MAP_START( sparkman_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc280, 0xc280) AM_WRITE(sparkman_rombank_w		)	// ROM Bank (?mirrored up to c2ff?)
 	AM_RANGE(0xc300, 0xc300) AM_WRITE(sparkman_flipscreen_w		)	// Flip Screen
 	AM_RANGE(0xc380, 0xc3ff) AM_WRITE(sparkman_cmd_prot_w		)	// Protection
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(sparkman_leds_w			)	// Leds + Coin Counter
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(sparkman_leds_w			)	// Leds
+	AM_RANGE(0xc480, 0xc480) AM_WRITE(sparkman_coin_counter_w   )   // Coin Counter
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_w				)	// To Sound CPU
 	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram	)	// Palette (Banked??)
 	AM_RANGE(0xc800, 0xdfff) AM_RAM_WRITE(suna8_wram_w) AM_BASE(&suna8_wram)								// RAM
