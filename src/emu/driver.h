@@ -182,12 +182,7 @@ struct _game_driver
 	const input_port_token *ipt;					/* pointer to array of input port tokens */
 	void				(*driver_init)(running_machine *machine); /* DRIVER_INIT callback */
 	const rom_entry *	rom;						/* pointer to list of ROMs for the game */
-
-#ifdef MESS
-	void (*sysconfig_ctor)(struct SystemConfigurationParamBlock *cfg);
 	const char *		compatible_with;
-#endif
-
 	UINT32				flags;						/* orientation and other flags; see defines below */
 	const char *		default_layout;				/* default internally defined layout */
 };
@@ -217,6 +212,7 @@ const game_driver GAME_NAME(NAME) =			\
 	INPUT_PORTS_NAME(INPUT),							\
 	DRIVER_INIT_NAME(INIT),						\
 	ROM_NAME(NAME),								\
+	NULL,									\
 	(MONITOR)|(FLAGS),						\
 	&LAYOUT[0]								\
 };
