@@ -1,6 +1,20 @@
 /***************************************************************************
 
+Cycle Mahbou (c) 1984 Taito Corporation / Seta
+
+appears to be a follow up of the gsword / josvolly HW
+
+preliminary driver by Angelo Salese
+
+TODO:
+- protection (two 8741);
+- colors;
+- fix remaining video issues;
+- sound;
+
 (wait until it completes the post test, then put 1 to be23)
+
+============================================================================
 
 Cycle Mahbou
 (c)1984 Taito/Seta
@@ -59,7 +73,7 @@ Dumped by Chack'n
 #include "sound/ay8910.h"
 
 static UINT8 *cyclemb_vram,*cyclemb_cram;
-static UINT8 *cyclemb_obj1_ram,*cyclemb_obj2_ram;
+static UINT8 *cyclemb_obj1_ram,*cyclemb_obj2_ram,*cyclemb_obj3_ram;
 
 static PALETTE_INIT( cyclemb )
 {
@@ -105,26 +119,48 @@ static VIDEO_UPDATE( cyclemb )
 		{
 			int attr = cyclemb_cram[count];
 			int tile = (cyclemb_vram[count]) | ((attr & 3)<<8);
-			int color = (attr & 0xfc) >> 2;
+			int color = ((attr & 0xf8) >> 3) ^ 0x1f;
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x*8),(y*8));
 			count++;
 		}
 	}
 
+	/*
+	bank 1
+	xxxx xxxx [0] sprite offset
+	---x xxxx [1] color offset
+	bank 2
+	xxxx xxxx [0] y offs
+	xxxx xxxx [1] x offs
+	bank 3
+	---- ---x [1] sprite enable flag?
+	*/
 	{
-		UINT8 x,y,col,fx,fy;
+		UINT8 col,fx,fy,region;
 		UINT16 spr_offs,i;
+		INT16 x,y;
 
 		for(i=0;i<0x40;i+=2)
 		{
-			y = 0xe0 - cyclemb_obj2_ram[i];
-			x = cyclemb_obj2_ram[i+1];
-			spr_offs = ((cyclemb_obj1_ram[i+1] & 0x60) << 3) | (cyclemb_obj1_ram[i+0]);
+			y = 0xf1 - cyclemb_obj2_ram[i];
+			x = cyclemb_obj2_ram[i+1] - 56;
+			spr_offs = (cyclemb_obj1_ram[i+0]);
 			col = (cyclemb_obj1_ram[i+1] & 0x1f);
-			fx = 0;
+			region = ((cyclemb_obj3_ram[i] & 0x10) >> 4) + 1;
+			if(region == 2)
+			{
+				spr_offs >>= 2;
+				spr_offs += ((cyclemb_obj3_ram[i+0] & 3) << 5);
+				y-=16;
+			}
+			if(cyclemb_obj3_ram[i+1] & 1)
+				x+=256;
+			//if(cyclemb_obj3_ram[i+1] & 2)
+//				x-=256;
+			fx = cyclemb_obj3_ram[i+0] & 4;
 			fy = 0;
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],spr_offs,col,0,0,x,y,0);
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[region],spr_offs,col,fx,0,x,y,0);
 		}
 	}
 
@@ -136,13 +172,21 @@ static WRITE8_HANDLER( cyclemb_bankswitch_w )
 	memory_set_bank(space->machine, "bank1", data & 3);
 }
 
-static READ8_HANDLER( mcu_status_r ) //sound status actually
+#if 0
+static WRITE8_HANDLER( sound_cmd_w )
+{
+	soundlatch_w(space, 0, data & 0xff);
+ 	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+}
+#endif
+
+static READ8_HANDLER( mcu_status_r )
 {
 	return 1;
 }
 
 
-static WRITE8_HANDLER( sound_cmd_w )
+static WRITE8_HANDLER( sound_cmd_w ) //actually ciom
 {
 	soundlatch_w(space, 0, data & 0xff);
  	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
@@ -155,7 +199,8 @@ static ADDRESS_MAP_START( cyclemb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(&cyclemb_cram)
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE(&cyclemb_obj1_ram) //ORAM1 (only a000-a3ff tested)
 	AM_RANGE(0xa800, 0xafff) AM_RAM AM_BASE(&cyclemb_obj2_ram) //ORAM2 (only a800-abff tested)
-	AM_RANGE(0xb000, 0xbfff) AM_RAM //WRAM
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_BASE(&cyclemb_obj3_ram) //ORAM3 (only b000-b3ff tested)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM //WRAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cyclemb_io, ADDRESS_SPACE_IO, 8 )
@@ -163,6 +208,7 @@ static ADDRESS_MAP_START( cyclemb_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(cyclemb_bankswitch_w)
 	AM_RANGE(0xc09e, 0xc09e) AM_READ(soundlatch2_r)
 	AM_RANGE(0xc09f, 0xc09f) AM_READ(mcu_status_r) AM_WRITE(sound_cmd_w)
+	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITENOP //flip screen
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cyclemb_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -178,6 +224,83 @@ static ADDRESS_MAP_START( cyclemb_sound_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cyclemb )
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x01, 0x01, "DSWB" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSWC")
+	PORT_DIPNAME( 0x01, 0x01, "DSWC" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -191,20 +314,40 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static const gfx_layout spritelayout =
+static const gfx_layout spritelayout_16x16 =
 {
 	16,16,
 	RGN_FRAC(1,1),
 	2,
 	{ 0, 4 },
-	{ 0,1,2,3,64,65,66,67,0+16*8,1+16*8,2+16*8,3+16*8,64+16*8,65+16*8,66+16*8,67+16*8 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,0*8+16*8*2,1*8+16*8*2,2*8+16*8*2,3*8+16*8*2,4*8+16*8*2,5*8+16*8*2,6*8+16*8*2,7*8+16*8*2 },
-	16*8*4
+	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
+			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3},
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
+	64*8
+};
+
+static const gfx_layout spritelayout_32x32 =
+{
+	32,32,
+	RGN_FRAC(1,1),
+	2,
+	{ 0, 4 },
+	{ 0, 1, 2, 3, 8*8+0, 8*8+1, 8*8+2, 8*8+3,
+			16*8+0, 16*8+1, 16*8+2, 16*8+3, 24*8+0, 24*8+1, 24*8+2, 24*8+3,
+			64*8+0, 64*8+1, 64*8+2, 64*8+3, 72*8+0, 72*8+1, 72*8+2, 72*8+3,
+			80*8+0, 80*8+1, 80*8+2, 80*8+3, 88*8+0, 88*8+1, 88*8+2, 88*8+3},
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8,
+			128*8, 129*8, 130*8, 131*8, 132*8, 133*8, 134*8, 135*8,
+			160*8, 161*8, 162*8, 163*8, 164*8, 165*8, 166*8, 167*8 },
+	64*8*4    /* every sprite takes (64*8=16x6)*4) bytes */
 };
 
 static GFXDECODE_START( cyclemb )
 	GFXDECODE_ENTRY( "tilemap_data", 0, charlayout,     0, 0x40 )
-	GFXDECODE_ENTRY( "sprite_data", 0, spritelayout,    0x80, 0x20 )
+	GFXDECODE_ENTRY( "sprite_data_1", 0, spritelayout_16x16,    0x80, 0x20 )
+	GFXDECODE_ENTRY( "sprite_data_2", 0, spritelayout_32x32,    0x80, 0x20 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( cyclemb )
@@ -224,9 +367,9 @@ static MACHINE_DRIVER_START( cyclemb )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(cyclemb)
-	MDRV_PALETTE_LENGTH(512)
+	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cyclemb)
 
 	MDRV_VIDEO_START(cyclemb)
@@ -261,13 +404,15 @@ ROM_START( cyclemb )
 	ROM_LOAD( "p0_21.3e",   0x0000, 0x2000, CRC(a7dab6d8) SHA1(c5802e76abd394a2ce1526815bfbfc12e5e57587) )
 	ROM_LOAD( "p0_20.3d",   0x2000, 0x2000, CRC(53e3a36e) SHA1(d95c1dfe216bb8b1f3e14c72a480eb2befa9d1dd) )
 
-	ROM_REGION( 0xc000, "sprite_data", ROMREGION_ERASEFF )
-	ROM_LOAD( "p0_7.1k",    0x000*0x40, 0x2000, CRC(6507d23f) SHA1(1640b25a6efa0976f13ed7838f31ef53c37c8d2d) )
-	ROM_LOAD( "p0_10.1n",   0x080*0x40, 0x2000, CRC(a98415db) SHA1(218a1d3ad27c30263daf87be87b4d5e06d5ac604) )
-	ROM_LOAD( "p0_11.1r",   0x100*0x40, 0x2000, CRC(626556fe) SHA1(ebd08a407fe466af14813bdeeb852d6816da932e) )
-	ROM_LOAD( "p0_12.1s",   0x180*0x40, 0x2000, CRC(1e08902c) SHA1(3d5f620580dc1fc43cd5f99b2a1e62a6d749f8b9) )
-	ROM_LOAD( "p0_13.1t",   0x200*0x40, 0x2000, CRC(086639c1) SHA1(3afbe76bb466d4c5916ef85d4cfc42e0c3f69883) )
-	ROM_LOAD( "p0_14.1u",   0x280*0x40, 0x2000, CRC(3f5fe2b6) SHA1(a7d1d0bc449f557ba827936b0fdbcccf7b1ee629) )
+	ROM_REGION( 0x2000, "sprite_data_1", ROMREGION_ERASEFF )
+	ROM_LOAD( "p0_7.1k",    0x0000, 0x2000, CRC(6507d23f) SHA1(1640b25a6efa0976f13ed7838f31ef53c37c8d2d) )
+
+	ROM_REGION( 0xc000, "sprite_data_2", ROMREGION_ERASEFF )
+	ROM_LOAD( "p0_10.1n",   0x4000, 0x2000, CRC(a98415db) SHA1(218a1d3ad27c30263daf87be87b4d5e06d5ac604) ) //ok
+	ROM_LOAD( "p0_11.1r",   0x0000, 0x2000, CRC(626556fe) SHA1(ebd08a407fe466af14813bdeeb852d6816da932e) ) //ok
+	ROM_LOAD( "p0_12.1s",   0x6000, 0x2000, CRC(1e08902c) SHA1(3d5f620580dc1fc43cd5f99b2a1e62a6d749f8b9) )
+	ROM_LOAD( "p0_13.1t",   0x2000, 0x2000, CRC(086639c1) SHA1(3afbe76bb466d4c5916ef85d4cfc42e0c3f69883) )
+	ROM_LOAD( "p0_14.1u",   0x8000, 0x2000, CRC(3f5fe2b6) SHA1(a7d1d0bc449f557ba827936b0fdbcccf7b1ee629) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "p0_3.11t",   0x0000, 0x100, CRC(be89c1f7) SHA1(7fb2d9fccf6c74130c3e0db4ea4269aeb45359e3) )
