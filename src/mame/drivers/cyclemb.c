@@ -1,20 +1,20 @@
-/***************************************************************************
+/***************************************************************************************************
 
-Cycle Mahbou (c) 1984 Taito Corporation / Seta
+	Cycle Mahbou (c) 1984 Taito Corporation / Seta
 
-appears to be a follow up of the gsword / josvolly HW
+	appears to be in the exact middle between the gsword / josvolly HW and the ppking / gladiator HW
 
-preliminary driver by Angelo Salese
+	preliminary driver by Angelo Salese
 
-TODO:
-- protection (two 8741);
-- colors;
-- fix remaining video issues;
-- sound;
+	TODO:
+	- protection (two 8741);
+	- colors;
+	- fix remaining video issues;
+	- sound;
 
-(wait until it completes the post test, then put 1 to be23)
+	(wait until it completes the post test, then put 1 to be23)
 
-============================================================================
+=====================================================================================================
 
 Cycle Mahbou
 (c)1984 Taito/Seta
@@ -66,7 +66,7 @@ Dumped by Chack'n
 27/Nov/2009
 28/Nov/2009
 
-***************************************************************************/
+****************************************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
@@ -120,8 +120,13 @@ static VIDEO_UPDATE( cyclemb )
 			int attr = cyclemb_cram[count];
 			int tile = (cyclemb_vram[count]) | ((attr & 3)<<8);
 			int color = ((attr & 0xf8) >> 3) ^ 0x1f;
+			int odd_line = y & 1 ? 0x40 : 0x00;
+			int scrollx = ((cyclemb_vram[(y/2)+odd_line]) + (cyclemb_cram[(y/2)+odd_line]<<8) + 48) & 0x1ff;
 
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x*8),(y*8));
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x*8)-scrollx,(y*8));
+			/* wrap-around */
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x*8)-scrollx+512,(y*8));
+
 			count++;
 		}
 	}
@@ -141,19 +146,31 @@ static VIDEO_UPDATE( cyclemb )
 		UINT16 spr_offs,i;
 		INT16 x,y;
 
+		/*
+		0x3b-0x3c-0x3d tire (0x13 0x00 / 0x17 0x00 )
+		0x3b- shirt (0x16 0x00)
+		0x20 tire stick (0x16 0x00)
+		0x2e go sign (0x11 0x00)
+		0x18 trampoline (0x13 0x00)
+		0x27 cone (0x13 0x00)
+		*/
+
 		for(i=0;i<0x40;i+=2)
 		{
 			y = 0xf1 - cyclemb_obj2_ram[i];
 			x = cyclemb_obj2_ram[i+1] - 56;
 			spr_offs = (cyclemb_obj1_ram[i+0]);
-			col = (cyclemb_obj1_ram[i+1] & 0x1f);
+			col = (cyclemb_obj1_ram[i+1] & 0x3f);
 			region = ((cyclemb_obj3_ram[i] & 0x10) >> 4) + 1;
+			if(region == 2 && spr_offs & 3)
+				continue;
 			if(region == 2)
 			{
 				spr_offs >>= 2;
 				spr_offs += ((cyclemb_obj3_ram[i+0] & 3) << 5);
 				y-=16;
 			}
+
 			if(cyclemb_obj3_ram[i+1] & 1)
 				x+=256;
 			//if(cyclemb_obj3_ram[i+1] & 2)
@@ -346,18 +363,18 @@ static const gfx_layout spritelayout_32x32 =
 
 static GFXDECODE_START( cyclemb )
 	GFXDECODE_ENTRY( "tilemap_data", 0, charlayout,     0, 0x40 )
-	GFXDECODE_ENTRY( "sprite_data_1", 0, spritelayout_16x16,    0x80, 0x20 )
-	GFXDECODE_ENTRY( "sprite_data_2", 0, spritelayout_32x32,    0x80, 0x20 )
+	GFXDECODE_ENTRY( "sprite_data_1", 0, spritelayout_16x16,    0x00, 0x40 )
+	GFXDECODE_ENTRY( "sprite_data_2", 0, spritelayout_32x32,    0x00, 0x40 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( cyclemb )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80,18000000/8)
+	MDRV_CPU_ADD("maincpu",Z80,18000000/4)
 	MDRV_CPU_PROGRAM_MAP(cyclemb_map)
 	MDRV_CPU_IO_MAP(cyclemb_io)
 	MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu",Z80,18000000/8)
+	MDRV_CPU_ADD("audiocpu",Z80,18000000/4)
 	MDRV_CPU_PROGRAM_MAP(cyclemb_sound_map)
 	MDRV_CPU_IO_MAP(cyclemb_sound_io)
 
@@ -408,8 +425,8 @@ ROM_START( cyclemb )
 	ROM_LOAD( "p0_7.1k",    0x0000, 0x2000, CRC(6507d23f) SHA1(1640b25a6efa0976f13ed7838f31ef53c37c8d2d) )
 
 	ROM_REGION( 0xc000, "sprite_data_2", ROMREGION_ERASEFF )
-	ROM_LOAD( "p0_10.1n",   0x4000, 0x2000, CRC(a98415db) SHA1(218a1d3ad27c30263daf87be87b4d5e06d5ac604) ) //ok
-	ROM_LOAD( "p0_11.1r",   0x0000, 0x2000, CRC(626556fe) SHA1(ebd08a407fe466af14813bdeeb852d6816da932e) ) //ok
+	ROM_LOAD( "p0_10.1n",   0x4000, 0x2000, CRC(a98415db) SHA1(218a1d3ad27c30263daf87be87b4d5e06d5ac604) )
+	ROM_LOAD( "p0_11.1r",   0x0000, 0x2000, CRC(626556fe) SHA1(ebd08a407fe466af14813bdeeb852d6816da932e) )
 	ROM_LOAD( "p0_12.1s",   0x6000, 0x2000, CRC(1e08902c) SHA1(3d5f620580dc1fc43cd5f99b2a1e62a6d749f8b9) )
 	ROM_LOAD( "p0_13.1t",   0x2000, 0x2000, CRC(086639c1) SHA1(3afbe76bb466d4c5916ef85d4cfc42e0c3f69883) )
 	ROM_LOAD( "p0_14.1u",   0x8000, 0x2000, CRC(3f5fe2b6) SHA1(a7d1d0bc449f557ba827936b0fdbcccf7b1ee629) )
