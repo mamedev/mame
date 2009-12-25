@@ -354,7 +354,7 @@ static MACHINE_DRIVER_START( xmen )
 
 	MDRV_MACHINE_START(xmen)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -432,7 +432,7 @@ static MACHINE_DRIVER_START( xmen6p )
 
 	MDRV_MACHINE_RESET(xmen6p)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

@@ -1847,7 +1847,7 @@ static MACHINE_DRIVER_START( bakubrkr )
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
 	MDRV_MACHINE_RESET(bakubrkr)
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)	// mangled sprites otherwise
@@ -2048,7 +2048,7 @@ static MACHINE_DRIVER_START( mgcrystl )
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
 	MDRV_MACHINE_RESET(mgcrystl)
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -2167,7 +2167,8 @@ static MACHINE_DRIVER_START( shogwarr )
 	MDRV_CPU_VBLANK_INT_HACK(shogwarr_interrupt,SHOGWARR_INTERRUPTS_NUM)
 
 	MDRV_MACHINE_RESET(shogwarr)
-	MDRV_EEPROM_93C46_ADD("eeprom", 128, shogwarr_default_eeprom)
+	MDRV_EEPROM_93C46_ADD("eeprom")
+	MDRV_EEPROM_DATA(shogwarr_default_eeprom, 128)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2220,7 +2221,8 @@ static MACHINE_DRIVER_START( brapboys )
 	MDRV_DEVICE_ADDRESS_MAP(0, brapboys_oki2_map)
 
 	MDRV_DEVICE_REMOVE("eeprom")
-	MDRV_EEPROM_93C46_ADD("eeprom", 128, brapboys_default_eeprom)
+	MDRV_EEPROM_93C46_ADD("eeprom")
+	MDRV_EEPROM_DATA(brapboys_default_eeprom, 128)
 MACHINE_DRIVER_END
 
 /***************************************************************************

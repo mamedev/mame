@@ -293,7 +293,7 @@ static MACHINE_DRIVER_START( bang )
 	MDRV_CPU_PROGRAM_MAP(bang_map)
 	MDRV_CPU_VBLANK_INT_HACK(bang_interrupt, 6)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", gaelco2_eeprom_interface)
+	MDRV_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -973,7 +973,7 @@ static MACHINE_DRIVER_START( snowboar )
 	MDRV_CPU_PROGRAM_MAP(snowboar_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", gaelco2_eeprom_interface)
+	MDRV_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -1215,7 +1215,7 @@ static MACHINE_DRIVER_START( wrally2 )
 	MDRV_CPU_PROGRAM_MAP(wrally2_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq6_line_hold)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", gaelco2_eeprom_interface)
+	MDRV_EEPROM_ADD("eeprom", gaelco2_eeprom_interface)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

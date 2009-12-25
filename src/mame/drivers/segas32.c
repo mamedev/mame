@@ -2166,7 +2166,7 @@ static MACHINE_DRIVER_START( system32 )
 
 	MDRV_MACHINE_RESET(system32)
 	
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_TIMER_ADD("v60_irq0", signal_v60_irq_callback)
 	MDRV_TIMER_ADD("v60_irq1", signal_v60_irq_callback)
@@ -2224,7 +2224,7 @@ static MACHINE_DRIVER_START( multi32 )
 
 	MDRV_MACHINE_RESET(system32)
 	
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_TIMER_ADD("v60_irq0", signal_v60_irq_callback)
 	MDRV_TIMER_ADD("v60_irq1", signal_v60_irq_callback)

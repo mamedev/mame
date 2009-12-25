@@ -315,7 +315,8 @@ static MACHINE_DRIVER_START( showhand )
 	MDRV_MACHINE_START(showhand)
 	MDRV_MACHINE_RESET(showhand)
 
-	MDRV_EEPROM_93C46_ADD("eeprom", sizeof(showhand_default_eeprom), showhand_default_eeprom)
+	MDRV_EEPROM_93C46_ADD("eeprom")
+	MDRV_EEPROM_DATA(showhand_default_eeprom, sizeof(showhand_default_eeprom))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

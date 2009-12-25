@@ -354,7 +354,7 @@ static MACHINE_DRIVER_START( groundfx )
 	MDRV_CPU_PROGRAM_MAP(groundfx_map)
 	MDRV_CPU_VBLANK_INT("screen", groundfx_interrupt)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", groundfx_eeprom_interface)
+	MDRV_EEPROM_ADD("eeprom", groundfx_eeprom_interface)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

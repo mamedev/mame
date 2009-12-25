@@ -1934,7 +1934,7 @@ static MACHINE_DRIVER_START( sxx2f ) /* Intel i386DX @ 25MHz, YMF271 @ 16.9344MH
 	MDRV_MACHINE_RESET(sxx2f)
 	
 	MDRV_NVRAM_HANDLER(0)
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 MACHINE_DRIVER_END
 
@@ -1956,7 +1956,7 @@ static MACHINE_DRIVER_START( sxx2g ) /* single board version using measured cloc
 	MDRV_MACHINE_RESET(sxx2f)
 
 	MDRV_NVRAM_HANDLER(0)
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 MACHINE_DRIVER_END
 
@@ -2205,7 +2205,7 @@ static MACHINE_DRIVER_START( seibu386 )
 
 	MDRV_MACHINE_RESET(seibu386)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2263,7 +2263,7 @@ static MACHINE_DRIVER_START( sys386f2 )
 
 	MDRV_MACHINE_RESET(seibu386)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

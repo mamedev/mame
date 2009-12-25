@@ -2248,7 +2248,7 @@ static MACHINE_DRIVER_START( rdx_v33 )
 
 	MDRV_MACHINE_RESET(rdx_v33)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

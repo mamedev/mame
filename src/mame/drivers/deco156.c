@@ -373,7 +373,7 @@ static MACHINE_DRIVER_START( hvysmsh )
 	MDRV_CPU_PROGRAM_MAP(hvysmsh_map)
 	MDRV_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
@@ -412,7 +412,7 @@ static MACHINE_DRIVER_START( wcvol95 )
 	MDRV_CPU_PROGRAM_MAP(wcvol95_map)
 	MDRV_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )

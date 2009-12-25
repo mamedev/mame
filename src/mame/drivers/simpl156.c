@@ -446,7 +446,7 @@ static MACHINE_DRIVER_START( chainrec )
 	MDRV_CPU_PROGRAM_MAP(chainrec_map)
 	MDRV_CPU_VBLANK_INT("screen", simpl156_vbl_interrupt)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")  // 93C45
+	MDRV_EEPROM_93C46_ADD("eeprom")  // 93C45
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -330,7 +330,7 @@ static MACHINE_DRIVER_START( eolith45 )
 
 	/* sound cpu */
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_interface_93C66)
+	MDRV_EEPROM_ADD("eeprom", eeprom_interface_93C66)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

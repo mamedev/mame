@@ -366,7 +366,7 @@ static MACHINE_DRIVER_START( inufuku )
 	MDRV_MACHINE_START(inufuku)
 	MDRV_MACHINE_RESET(inufuku)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

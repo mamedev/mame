@@ -404,7 +404,7 @@ static MACHINE_DRIVER_START( yumefuda )
 	MDRV_MACHINE_START(yumefuda)
 	MDRV_MACHINE_RESET(yumefuda)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_WATCHDOG_VBLANK_INIT(8) // timing is unknown
 

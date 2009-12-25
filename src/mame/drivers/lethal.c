@@ -641,7 +641,8 @@ static MACHINE_DRIVER_START( lethalen )
 	MDRV_MACHINE_START(lethalen)
 	MDRV_MACHINE_RESET(lethalen)
 
-	MDRV_EEPROM_ADD("eeprom", eeprom_intf, 48, lethalen_default_eeprom)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_DATA(lethalen_default_eeprom, 48)
 
 	MDRV_GFXDECODE(lethal)
 

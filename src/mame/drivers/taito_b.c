@@ -2444,7 +2444,7 @@ static MACHINE_DRIVER_START( pbobble )
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(mb87078)
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", taitob_eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", taitob_eeprom_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2485,7 +2485,7 @@ static MACHINE_DRIVER_START( spacedx )
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(mb87078)
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", taitob_eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", taitob_eeprom_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2564,7 +2564,7 @@ static MACHINE_DRIVER_START( qzshowby )
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(mb87078)
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", taitob_eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", taitob_eeprom_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

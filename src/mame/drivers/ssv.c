@@ -2745,7 +2745,7 @@ static MACHINE_DRIVER_START( gdfs )
 	MDRV_CPU_PROGRAM_MAP(gdfs_map)
 	MDRV_CPU_VBLANK_INT_HACK(gdfs_interrupt,1+4)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")

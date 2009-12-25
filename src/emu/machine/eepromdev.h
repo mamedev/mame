@@ -27,6 +27,7 @@ struct _eeprom_config
 	eeprom_interface *pinterface;
 	UINT8 *default_data;
 	int default_data_size;
+	UINT32 default_value;
 };
 
 /* 93C46 */
@@ -38,32 +39,22 @@ extern const eeprom_interface eepromdev_interface_93C66B;
 #define EEPROM DEVICE_GET_INFO_NAME(eeprom)
 DEVICE_GET_INFO(eeprom);
 
-#define MDRV_EEPROM_ADD(_tag, _interface, _data_size, _data) \
+#define MDRV_EEPROM_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, EEPROM, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(eeprom_config, pinterface, &_interface) \
-	MDRV_EEPROM_DATA(_data, _data_size)
+	MDRV_DEVICE_CONFIG_DATAPTR(eeprom_config, pinterface, &_interface)
 
-#define MDRV_EEPROM_93C46_ADD(_tag, _data_size, _data) \
-	MDRV_EEPROM_ADD(_tag, eepromdev_interface_93C46, _data_size, _data)
+#define MDRV_EEPROM_93C46_ADD(_tag) \
+	MDRV_EEPROM_ADD(_tag, eepromdev_interface_93C46)
 
-#define MDRV_EEPROM_93C66B_ADD(_tag, _data_size, _data) \
-	MDRV_EEPROM_ADD(_tag, eepromdev_interface_93C66B, _data_size, _data)
+#define MDRV_EEPROM_93C66B_ADD(_tag) \
+	MDRV_EEPROM_ADD(_tag, eepromdev_interface_93C66B)
 
 #define MDRV_EEPROM_DATA(_data, _size) \
 	MDRV_DEVICE_CONFIG_DATAPTR(eeprom_config, default_data, &_data) \
 	MDRV_DEVICE_CONFIG_DATA32(eeprom_config, default_data_size, _size)
 
-/* FIXME: many drivers do not need default_data / default_data_size and put them to 0 in the drivers seems a waste of code */
-extern UINT8 *eeprom_empty_default_data;
-
-#define MDRV_EEPROM_NODEFAULT_ADD(_tag, _interface) \
-	MDRV_EEPROM_ADD(_tag, _interface, 0, eeprom_empty_default_data)
-
-#define MDRV_EEPROM_93C46_NODEFAULT_ADD(_tag) \
-	MDRV_EEPROM_93C46_ADD(_tag, 0, eeprom_empty_default_data)
-
-#define MDRV_EEPROM_93C66B_NODEFAULT_ADD(_tag) \
-	MDRV_EEPROM_93C66B_ADD(_tag, 0, eeprom_empty_default_data)
+#define MDRV_EEPROM_DEFAULT_VALUE(_value) \
+	MDRV_DEVICE_CONFIG_DATA32(eeprom_config, default_value, 0x10000 | ((_value) & 0xffff))
 
 WRITE_LINE_DEVICE_HANDLER( eepromdev_write_bit );
 READ_LINE_DEVICE_HANDLER( eepromdev_read_bit );

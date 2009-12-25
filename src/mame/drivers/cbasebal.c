@@ -292,7 +292,7 @@ static MACHINE_DRIVER_START( cbasebal )
 	MDRV_MACHINE_START(cbasebal)
 	MDRV_MACHINE_RESET(cbasebal)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", cbasebal_eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", cbasebal_eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

@@ -4310,7 +4310,7 @@ static MACHINE_DRIVER_START( bbakraid )
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(toaplan2)
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", bbakraid_93C66_intf)
+	MDRV_EEPROM_ADD("eeprom", bbakraid_93C66_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -4340,7 +4340,8 @@ static MACHINE_DRIVER_START( bbakradu )
 	MDRV_IMPORT_FROM(bbakraid)
 
 	MDRV_DEVICE_REMOVE("eeprom")
-	MDRV_EEPROM_ADD("eeprom", bbakraid_93C66_intf, 512, bbakraid_unlim_default)
+	MDRV_EEPROM_ADD("eeprom", bbakraid_93C66_intf)
+	MDRV_EEPROM_DATA(bbakraid_unlim_default, 512)
 MACHINE_DRIVER_END
 
 

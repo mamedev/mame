@@ -399,7 +399,7 @@ static MACHINE_DRIVER_START( f3 )
 	MDRV_MACHINE_START(f3)
 	MDRV_MACHINE_RESET(f3)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -448,14 +448,16 @@ static MACHINE_DRIVER_START( f3_eeprom )
 	MDRV_IMPORT_FROM(f3)
 
 	MDRV_DEVICE_REMOVE("eeprom")
-	MDRV_EEPROM_93C46_ADD("eeprom", 128, recalh_eeprom)
+	MDRV_EEPROM_93C46_ADD("eeprom")
+	MDRV_EEPROM_DATA(recalh_eeprom, 128)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( f3_224b_eeprom )
 	MDRV_IMPORT_FROM(f3)
 
 	MDRV_DEVICE_REMOVE("eeprom")
-	MDRV_EEPROM_93C46_ADD("eeprom", 128, recalh_eeprom)
+	MDRV_EEPROM_93C46_ADD("eeprom")
+	MDRV_EEPROM_DATA(recalh_eeprom, 128)
 MACHINE_DRIVER_END
 
 static const gfx_layout bubsympb_sprite_layout =
@@ -497,7 +499,7 @@ static MACHINE_DRIVER_START( bubsympb )
 	MDRV_MACHINE_START(f3)
 	//MDRV_MACHINE_RESET(f3)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

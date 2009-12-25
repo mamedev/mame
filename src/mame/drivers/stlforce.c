@@ -199,7 +199,7 @@ static MACHINE_DRIVER_START( stlforce )
 	MDRV_CPU_PROGRAM_MAP(stlforce_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

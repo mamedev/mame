@@ -187,7 +187,7 @@ static MACHINE_DRIVER_START( xorworld )
 
 	MDRV_QUANTUM_TIME(HZ(60))
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	// video hardware
 

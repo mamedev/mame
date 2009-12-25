@@ -2837,7 +2837,7 @@ static MACHINE_DRIVER_START( pang3 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(cps1_12MHz)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", pang3_eeprom_interface)
+	MDRV_EEPROM_ADD("eeprom", pang3_eeprom_interface)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( qsound )
@@ -2855,7 +2855,7 @@ static MACHINE_DRIVER_START( qsound )
 
 	MDRV_MACHINE_START(qsound)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", qsound_eeprom_interface)
+	MDRV_EEPROM_ADD("eeprom", qsound_eeprom_interface)
 
 	/* sound hardware */
 	MDRV_DEVICE_REMOVE("mono")
@@ -2914,7 +2914,7 @@ static MACHINE_DRIVER_START( wofhfh )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(cps1_12MHz)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", qsound_eeprom_interface)
+	MDRV_EEPROM_ADD("eeprom", qsound_eeprom_interface)
 MACHINE_DRIVER_END
 
 /* incomplete */

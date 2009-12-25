@@ -213,7 +213,7 @@ static MACHINE_DRIVER_START( ultrsprt )
 
 	MDRV_QUANTUM_TIME(HZ(12000))
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 	MDRV_MACHINE_START(ultrsprt)
 
  	/* video hardware */

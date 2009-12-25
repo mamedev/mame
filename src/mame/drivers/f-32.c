@@ -133,7 +133,7 @@ static MACHINE_DRIVER_START( mosaicf2 )
 	MDRV_CPU_IO_MAP(mosaicf2_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

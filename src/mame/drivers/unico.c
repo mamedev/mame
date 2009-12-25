@@ -699,7 +699,7 @@ static MACHINE_DRIVER_START( zeropnt2 )
 
 	MDRV_MACHINE_RESET(zeropt)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", zeropnt2_eeprom_interface)
+	MDRV_EEPROM_ADD("eeprom", zeropnt2_eeprom_interface)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

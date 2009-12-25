@@ -970,7 +970,7 @@ static MACHINE_DRIVER_START( mystwarr )
 
 	MDRV_QUANTUM_TIME(HZ(1920))
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	MDRV_MACHINE_START(mystwarr)
 	MDRV_MACHINE_RESET(mystwarr)
@@ -1080,7 +1080,7 @@ static MACHINE_DRIVER_START( gaiapols )
 	MDRV_GFXDECODE(gaiapols)
 
 	MDRV_DEVICE_REMOVE("eeprom")
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", gaia_eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", gaia_eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_START(gaiapols)

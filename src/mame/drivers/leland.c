@@ -747,7 +747,7 @@ static MACHINE_DRIVER_START( leland )
 	MDRV_MACHINE_RESET(leland)
 	MDRV_NVRAM_HANDLER(leland)
 	
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(leland_video)

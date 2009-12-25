@@ -628,7 +628,7 @@ static MACHINE_DRIVER_START( common )
 	MDRV_CPU_PROGRAM_MAP(common_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -743,7 +743,7 @@ static MACHINE_DRIVER_START( aoh )
 	MDRV_CPU_IO_MAP(aoh_io)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

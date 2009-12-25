@@ -472,7 +472,7 @@ static MACHINE_DRIVER_START( vendetta )
 
 	MDRV_MACHINE_RESET(vendetta)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

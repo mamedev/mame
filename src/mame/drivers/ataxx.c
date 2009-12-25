@@ -328,7 +328,7 @@ static MACHINE_DRIVER_START( ataxx )
 	MDRV_MACHINE_START(ataxx)
 	MDRV_MACHINE_RESET(ataxx)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 	MDRV_NVRAM_HANDLER(leland)
 
 	/* video hardware */

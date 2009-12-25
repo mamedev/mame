@@ -692,7 +692,8 @@ static MACHINE_DRIVER_START( kickgoal )
 	MDRV_MACHINE_START(kickgoal)
 	MDRV_MACHINE_RESET(kickgoal)
 
-	MDRV_EEPROM_93C46_ADD("eeprom", 128, kickgoal_default_eeprom_type1)
+	MDRV_EEPROM_93C46_ADD("eeprom")
+	MDRV_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -733,7 +734,8 @@ static MACHINE_DRIVER_START( actionhw )
 	MDRV_MACHINE_START(kickgoal)
 	MDRV_MACHINE_RESET(kickgoal)
 
-	MDRV_EEPROM_93C46_ADD("eeprom", 128, kickgoal_default_eeprom_type1)
+	MDRV_EEPROM_93C46_ADD("eeprom")
+	MDRV_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

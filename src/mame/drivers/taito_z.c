@@ -3268,7 +3268,8 @@ static MACHINE_DRIVER_START( spacegun )
 
 	MDRV_MACHINE_START(taitoz)
 
-	MDRV_EEPROM_ADD("eeprom", spacegun_eeprom_intf, 128, spacegun_default_eeprom)
+	MDRV_EEPROM_ADD("eeprom", spacegun_eeprom_intf)
+	MDRV_EEPROM_DATA(spacegun_default_eeprom, 128)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

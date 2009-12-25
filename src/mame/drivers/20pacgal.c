@@ -289,7 +289,7 @@ static MACHINE_DRIVER_START( 20pacgal )
 	MDRV_MACHINE_START(20pacgal)
 	MDRV_MACHINE_RESET(20pacgal)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", _20pacgal_eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", _20pacgal_eeprom_intf)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(20pacgal_video)

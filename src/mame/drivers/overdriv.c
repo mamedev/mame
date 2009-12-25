@@ -325,7 +325,8 @@ static MACHINE_DRIVER_START( overdriv )
 
 	MDRV_MACHINE_RESET(overdriv)
 
-	MDRV_EEPROM_ADD("eeprom", eeprom_intf, 128, overdriv_default_eeprom)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_DATA(overdriv_default_eeprom, 128)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

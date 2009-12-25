@@ -577,7 +577,7 @@ static MACHINE_DRIVER_START( fromanc2 )
 	MDRV_MACHINE_START(fromanc2)
 	MDRV_MACHINE_RESET(fromanc2)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_GFXDECODE(fromanc2)
@@ -632,7 +632,7 @@ static MACHINE_DRIVER_START( fromancr )
 	MDRV_MACHINE_START(fromanc2)
 	MDRV_MACHINE_RESET(fromanc2)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_GFXDECODE(fromancr)
@@ -683,7 +683,7 @@ static MACHINE_DRIVER_START( fromanc4 )
 	MDRV_MACHINE_START(fromanc4)
 	MDRV_MACHINE_RESET(fromanc2)
 
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_GFXDECODE(fromancr)

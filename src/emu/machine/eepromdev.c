@@ -12,9 +12,6 @@
 #define SERIAL_BUFFER_LENGTH 40
 #define MEMORY_SIZE 1024
 
-/* FIXME: many drivers do not need default_data / default_data_size and put them to 0 in the drivers seems a waste of code */
-UINT8 *eeprom_empty_default_data = NULL;
-
 typedef struct _eeprom_state eeprom_state;
 struct _eeprom_state
 {
@@ -323,20 +320,6 @@ logerror("EEPROM read %04x from address %02x\n",eestate->data_bits,eestate->read
 }
 
 
-static void eepromdev_load(const device_config *device, mame_file *f)
-{
-	eeprom_state *eestate = get_safe_token(device);
-
-	mame_fread(f, eestate->data, (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8);
-}
-
-static void eepromdev_save(const device_config *device, mame_file *f)
-{
-	eeprom_state *eestate = get_safe_token(device);
-
-	mame_fwrite(f, eestate->data, (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8);
-}
-
 void eepromdev_set_data(const device_config *device, const UINT8 *data, int length)
 {
 	eeprom_state *eestate = get_safe_token(device);
@@ -369,23 +352,21 @@ void *eepromdev_get_data_pointer(const device_config *device, UINT32 *length, UI
 
 static DEVICE_NVRAM( eeprom )
 {
-	const eeprom_config *config = (const eeprom_config *)device->inline_config;
+	eeprom_state *eestate = get_safe_token(device);
 
 	if (read_or_write)
-		eepromdev_save(device, file);
-	else
-		if (file)
-			eepromdev_load(device, file);
-		else
-			if ((config->default_data != NULL) && (config->default_data_size != 0))
-				eepromdev_set_data(device, config->default_data, config->default_data_size);
+		mame_fwrite(file, eestate->data, (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8);
+	else if (file != NULL)
+		mame_fread(file, eestate->data, (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8);
 }
 
 static DEVICE_START(eeprom)
 {
 	eeprom_state *eestate = get_safe_token(device);
 	const eeprom_config *config;
+	UINT16 default_value;
 	UINT8 *region_base;
+	int offs;
 
 	/* validate some basic stuff */
 	assert(device != NULL);
@@ -398,14 +379,26 @@ static DEVICE_START(eeprom)
 	eestate->intf = config->pinterface;
 
 	if ((1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8 > MEMORY_SIZE)
-	{
 		fatalerror("EEPROM larger than eepromdev.c allows");
-	}
+	
+	/* initialize to the default value */
+	default_value = 0xffff;
+	if (config->default_value != 0)
+		default_value = config->default_value;
+	for (offs = 0; offs < (1 << eestate->intf->address_bits); offs++)
+		if (eestate->intf->data_bits == 8)
+			eestate->data[offs] = (UINT8)default_value;
+		else
+		{
+			eestate->data[offs * 2 + 0] = default_value >> 8;
+			eestate->data[offs * 2 + 1] = default_value & 0xff;
+		}
 
-	memset(eestate->data, 0xff, (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8);
-	if ((config->default_data != NULL) && (config->default_data_size != 0))
+	/* handle hard-coded data from the driver */
+	if (config->default_data != NULL)
 		eepromdev_set_data(device, config->default_data, config->default_data_size);
 
+	/* populate from a memory region if present */
 	region_base = memory_region(device->machine, device->tag);
 	if (region_base != NULL)
 	{
@@ -455,15 +448,10 @@ static DEVICE_START(eeprom)
 	state_save_register_device_item( device, 0, eestate->read_address);
 }
 
-static DEVICE_RESET(eeprom)
-{
-}
-
-
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
 #define DEVTEMPLATE_ID(p,s)		p##eeprom##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET | DT_HAS_NVRAM | DT_HAS_INLINE_CONFIG
+#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_NVRAM | DT_HAS_INLINE_CONFIG
 #define DEVTEMPLATE_NAME		"EEPROM"
 #define DEVTEMPLATE_FAMILY		"EEPROM"
 #include "devtempl.h"

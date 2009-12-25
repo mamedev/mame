@@ -433,7 +433,7 @@ static MACHINE_DRIVER_START( policetr )
 	MDRV_CPU_PROGRAM_MAP(policetr_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_gen)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_interface_policetr)
+	MDRV_EEPROM_ADD("eeprom", eeprom_interface_policetr)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

@@ -1213,7 +1213,7 @@ static MACHINE_DRIVER_START( cps2 )
 
 	MDRV_MACHINE_START(cps2)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", cps2_eeprom_interface)
+	MDRV_EEPROM_ADD("eeprom", cps2_eeprom_interface)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

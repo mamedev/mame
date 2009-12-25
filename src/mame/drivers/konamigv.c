@@ -336,7 +336,7 @@ static MACHINE_DRIVER_START( konamigv )
 	MDRV_MACHINE_START( konamigv )
 	MDRV_MACHINE_RESET( konamigv )
 	
-	MDRV_EEPROM_93C46_NODEFAULT_ADD("eeprom")
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

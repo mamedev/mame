@@ -1112,7 +1112,7 @@ static MACHINE_DRIVER_START( mgakuen )
 	MDRV_MACHINE_START(mitchell)
 	MDRV_MACHINE_RESET(mitchell)
 	
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1155,7 +1155,7 @@ static MACHINE_DRIVER_START( pang )
 	MDRV_MACHINE_RESET(mitchell)
 
 	MDRV_NVRAM_HANDLER(mitchell)
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1295,7 +1295,7 @@ static MACHINE_DRIVER_START( marukin )
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	MDRV_NVRAM_HANDLER(mitchell)
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

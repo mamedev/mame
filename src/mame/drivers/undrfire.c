@@ -706,7 +706,7 @@ static MACHINE_DRIVER_START( undrfire )
 	MDRV_CPU_PROGRAM_MAP(undrfire_map)
 	MDRV_CPU_VBLANK_INT("screen", undrfire_interrupt)
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", undrfire_eeprom_interface)
+	MDRV_EEPROM_ADD("eeprom", undrfire_eeprom_interface)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -740,7 +740,7 @@ static MACHINE_DRIVER_START( cbombers )
 
 	MDRV_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", undrfire_eeprom_interface)
+	MDRV_EEPROM_ADD("eeprom", undrfire_eeprom_interface)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

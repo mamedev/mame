@@ -369,7 +369,8 @@ static MACHINE_DRIVER_START( konamigq )
 
 	MDRV_MACHINE_START( konamigq )
 	MDRV_MACHINE_RESET( konamigq )
-	MDRV_EEPROM_93C46_ADD("eeprom", 128, konamigq_def_eeprom)
+	MDRV_EEPROM_93C46_ADD("eeprom")
+	MDRV_EEPROM_DATA(konamigq_def_eeprom, 128)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

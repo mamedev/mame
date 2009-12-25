@@ -373,7 +373,7 @@ static MACHINE_DRIVER_START( superchs )
 
 	MDRV_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
 
-	MDRV_EEPROM_NODEFAULT_ADD("eeprom", superchs_eeprom_interface)
+	MDRV_EEPROM_ADD("eeprom", superchs_eeprom_interface)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
