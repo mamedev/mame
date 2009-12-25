@@ -228,7 +228,7 @@ static READ8_HANDLER( gladiator_dsw2_r )
 	return BITSWAP8(orig, 2,3,4,5,6,7,1,0);
 }
 
-static READ8_HANDLER( gladiator_controll_r )
+static READ8_HANDLER( gladiator_controls_r )
 {
 	int coins = 0;
 
@@ -257,17 +257,17 @@ static READ8_HANDLER( gladiator_button3_r )
 	return 0;
 }
 
-static const struct TAITO8741interface gsword_8741interface=
+static const struct TAITO8741interface gladiator_8741interface=
 {
 	4,         /* 4 chips */
 	{TAITO8741_MASTER,TAITO8741_SLAVE,TAITO8741_PORT,TAITO8741_PORT},/* program mode */
 	{1,0,0,0},	/* serial port connection */
-	{gladiator_dsw1_r,gladiator_dsw2_r,gladiator_button3_r,gladiator_controll_r}	/* port handler */
+	{gladiator_dsw1_r,gladiator_dsw2_r,gladiator_button3_r,gladiator_controls_r}	/* port handler */
 };
 
 static MACHINE_RESET( gladiator )
 {
-	TAITO8741_start(&gsword_8741interface);
+	TAITO8741_start(&gladiator_8741interface);
 	/* 6809 bank memory set */
 	{
 		UINT8 *rom = memory_region(machine, "audiocpu") + 0x10000;
@@ -402,11 +402,11 @@ static ADDRESS_MAP_START( ppking_cpu3_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppking_cpu1_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(gladiatr_spritebuffer_w)
-	AM_RANGE(0x04, 0x04) AM_NOP	// WRITE(ppking_irq_patch_w)
-	AM_RANGE(0x9e, 0x9f) AM_READ(qx0_r) AM_WRITE(qx0_w)
-	AM_RANGE(0xbf, 0xbf) AM_NOP
+//	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(gladiatr_spritebuffer_w)
+	AM_RANGE(0xc004, 0xc004) AM_NOP	// WRITE(ppking_irq_patch_w)
+	AM_RANGE(0xc09e, 0xc09f) AM_READ(qx0_r) AM_WRITE(qx0_w)
+	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppking_cpu2_io, ADDRESS_SPACE_IO, 8 )
@@ -446,14 +446,14 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gladiatr_cpu1_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(gladiatr_spritebuffer_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(gladiatr_spritebank_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(gladiatr_bankswitch_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
-	AM_RANGE(0x07, 0x07) AM_WRITE(gladiatr_flipscreen_w)
-	AM_RANGE(0x9e, 0x9f) AM_READWRITE(TAITO8741_0_r, TAITO8741_0_w)
-	AM_RANGE(0xbf, 0xbf) AM_NOP	// watchdog_reset_w doesn't work
+//	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(gladiatr_spritebuffer_w)
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(gladiatr_spritebank_w)
+	AM_RANGE(0xc002, 0xc002) AM_WRITE(gladiatr_bankswitch_w)
+	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
+	AM_RANGE(0xc007, 0xc007) AM_WRITE(gladiatr_flipscreen_w)
+	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE(TAITO8741_0_r, TAITO8741_0_w)
+	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP	// watchdog_reset_w doesn't work
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gladiatr_cpu2_io, ADDRESS_SPACE_IO, 8 )
