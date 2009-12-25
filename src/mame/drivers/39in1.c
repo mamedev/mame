@@ -24,7 +24,7 @@
 #include "video/generic.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "machine/pxa255.h"
 #include "sound/dmadac.h"
 
@@ -748,7 +748,7 @@ static READ32_HANDLER( pxa255_gpio_r )
 	{
 		case PXA255_GPLR0:
 			verboselog( space->machine, 3, "pxa255_gpio_r: GPIO Pin-Level Register 0: %08x & %08x\n", gpio_regs.gplr0 | (1 << 1), mem_mask );
-			return gpio_regs.gplr0 | (1 << 1) | (eeprom_read_bit() << 5); // Must be on.  Probably a DIP switch.
+			return gpio_regs.gplr0 | (1 << 1) | (eepromdev_read_bit(devtag_get_device(space->machine, "eeprom")) << 5); // Must be on.  Probably a DIP switch.
 		case PXA255_GPLR1:
 			verboselog( space->machine, 3, "pxa255_gpio_r: *Not Yet Implemented* GPIO Pin-Level Register 1: %08x & %08x\n", gpio_regs.gplr1, mem_mask );
 			return 0xff9fffff;
@@ -839,6 +839,7 @@ static READ32_HANDLER( pxa255_gpio_r )
 
 static WRITE32_HANDLER( pxa255_gpio_w )
 {
+	const device_config *device;
 	switch(PXA255_GPIO_BASE_ADDR | (offset << 2))
 	{
 		case PXA255_GPLR0:
@@ -865,17 +866,18 @@ static WRITE32_HANDLER( pxa255_gpio_w )
 		case PXA255_GPSR0:
 			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Pin Output Set Register 0: %08x & %08x\n", data, mem_mask );
 			gpio_regs.gpsr0 |= data & gpio_regs.gpdr0;
+			device = devtag_get_device(space->machine, "eeprom");
 			if(data & 0x00000004)
 			{
-				eeprom_set_cs_line(CLEAR_LINE);
+				eepromdev_set_cs_line(device, CLEAR_LINE);
 			}
 			if(data & 0x00000008)
 			{
-				eeprom_set_clock_line(ASSERT_LINE);
+				eepromdev_set_clock_line(device, ASSERT_LINE);
 			}
 			if(data & 0x00000010)
 			{
-				eeprom_write_bit(1);
+				eepromdev_write_bit(device, 1);
 			}
 			break;
 		case PXA255_GPSR1:
@@ -889,17 +891,18 @@ static WRITE32_HANDLER( pxa255_gpio_w )
 		case PXA255_GPCR0:
 			verboselog( space->machine, 3, "pxa255_gpio_w: GPIO Pin Output Clear Register 0: %08x & %08x\n", data, mem_mask );
 			gpio_regs.gpsr0 &= ~(data & gpio_regs.gpdr0);
+			device = devtag_get_device(space->machine, "eeprom");
 			if(data & 0x00000004)
 			{
-				eeprom_set_cs_line(ASSERT_LINE);
+				eepromdev_set_cs_line(device, ASSERT_LINE);
 			}
 			if(data & 0x00000008)
 			{
-				eeprom_set_clock_line(CLEAR_LINE);
+				eepromdev_set_clock_line(device, CLEAR_LINE);
 			}
 			if(data & 0x00000010)
 			{
-				eeprom_write_bit(0);
+				eepromdev_write_bit(device, 0);
 			}
 			break;
 		case PXA255_GPCR1:
@@ -1479,30 +1482,6 @@ static MACHINE_START(39in1)
 	pxa255_start(machine);
 }
 
-static NVRAM_HANDLER( 39in1 )
-{
-	if(read_or_write)
-	{
-		//printf( "Saving\n" );
-		eeprom_save(file);
-	}
-	else
-	{
-		//printf( "Initting\n" );
-		eeprom_init(machine, &eeprom_interface_93C66B);
-		if(file)
-		{
-			//printf( "Loading from file\n" );
-			eeprom_load(file);
-		}
-		else
-		{
-			//printf( "Calling eeprom_set_data\n" );
-			eeprom_set_data(memory_region(machine, "eeprom"),0x200);
-		}
-	}
-}
-
 static MACHINE_DRIVER_START( 39in1 )
 	MDRV_CPU_ADD("maincpu", PXA255, 200000000)
 	MDRV_CPU_PROGRAM_MAP(39in1_map)
@@ -1519,7 +1498,7 @@ static MACHINE_DRIVER_START( 39in1 )
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_MACHINE_START(39in1)
-	MDRV_NVRAM_HANDLER(39in1)
+	MDRV_EEPROM_93C66B_ADD("eeprom")
 
 	MDRV_VIDEO_UPDATE(39in1)
 
@@ -1541,7 +1520,7 @@ ROM_START( 39in1 )
         ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
 
 	// EEPROM - contains security data
-	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "93c66_eeprom.bin", 0x000, 0x200, CRC(a423a969) SHA1(4c68654c81e70367209b9f6c712564aae89a3122) )
 ROM_END
 
@@ -1555,7 +1534,7 @@ ROM_START( 48in1 )
         ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
 
 	// EEPROM - contains security data
-	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "93c66_eeprom.bin", 0x000, 0x200, NO_DUMP )
 ROM_END
 
@@ -1569,7 +1548,7 @@ ROM_START( 48in1a )
         ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) )
 
 	// EEPROM - contains security data
-	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "93c66_eeprom.bin", 0x000, 0x200, NO_DUMP )
 ROM_END
 

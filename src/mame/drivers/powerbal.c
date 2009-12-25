@@ -15,7 +15,7 @@ Magic Sticks:
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/okim6295.h"
 #include "includes/playmark.h"
 
@@ -40,36 +40,15 @@ static const eeprom_interface eeprom_intf =
 	5				/* reset_delay (otherwise wbeachvl will hang when saving settings) */
 };
 
-static NVRAM_HANDLER( magicstk )
-{
-	if (read_or_write)
-	{
-		eeprom_save(file);
-	}
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-
-		if (file)
-			eeprom_load(file);
-		else
-		{
-			UINT8 init[128];
-			memset(init,0,128);
-			eeprom_set_data(init,128);
-		}
-	}
-}
-
-static WRITE16_HANDLER( magicstk_coin_eeprom_w )
+static WRITE16_DEVICE_HANDLER( magicstk_coin_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine, 0,data & 0x20);
+		coin_counter_w(device->machine, 0,data & 0x20);
 
-		eeprom_set_cs_line((data & 8) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom_write_bit(data & 2);
-		eeprom_set_clock_line((data & 4) ? CLEAR_LINE : ASSERT_LINE);
+		eepromdev_set_cs_line(device, (data & 8) ? CLEAR_LINE : ASSERT_LINE);
+		eepromdev_write_bit(device, data & 2);
+		eepromdev_set_clock_line(device, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -108,7 +87,7 @@ static ADDRESS_MAP_START( magicstk_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x098180, 0x09917f) AM_RAM_WRITE(magicstk_bgvideoram_w) AM_BASE(&magicstk_videoram)
 	AM_RANGE(0x0c2010, 0x0c2011) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c2012, 0x0c2013) AM_READ_PORT("IN1")
-	AM_RANGE(0x0c2014, 0x0c2015) AM_READ_PORT("IN2") AM_WRITE(magicstk_coin_eeprom_w)
+	AM_RANGE(0x0c2014, 0x0c2015) AM_READ_PORT("IN2") AM_DEVWRITE("eeprom", magicstk_coin_eeprom_w)
 	AM_RANGE(0x0c2016, 0x0c2017) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0c2018, 0x0c2019) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0c201c, 0x0c201d) AM_DEVWRITE("oki", oki_banking)
@@ -245,7 +224,7 @@ static INPUT_PORTS_START( magicstk )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	/* EEPROM data */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -342,7 +321,7 @@ static INPUT_PORTS_START( hotminda )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)	/* EEPROM data */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -518,7 +497,8 @@ static MACHINE_DRIVER_START( magicstk )
 	MDRV_CPU_PROGRAM_MAP(magicstk_main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_NVRAM_HANDLER(magicstk)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+	MDRV_EEPROM_DEFAULT_VALUE(0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
