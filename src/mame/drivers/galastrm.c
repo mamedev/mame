@@ -41,7 +41,7 @@ $305.b invincibility
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/es5506.h"
 #include "includes/taito_f3.h"
 #include "audio/taito_en.h"
@@ -132,9 +132,10 @@ popmessage(t);
 
 			if (ACCESSING_BITS_0_7)
 			{
-				eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				eeprom_write_bit(data & 0x40);
-				eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				const device_config *device = devtag_get_device(space->machine, "eeprom");
+				eepromdev_set_clock_line(device, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				eepromdev_write_bit(device, data & 0x40);
+				eepromdev_set_cs_line(device, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				return;
 			}
 			return;
@@ -208,7 +209,7 @@ static INPUT_PORTS_START( galastrm )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(frame_counter_r, NULL)
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -305,19 +306,6 @@ static const eeprom_interface galastrm_eeprom_interface =
 	"0100110000",	/* lock command */
 };
 
-static NVRAM_HANDLER( galastrm )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else {
-		eeprom_init(machine, &galastrm_eeprom_interface);
-		if (file)
-			eeprom_load(file);
-		else
-			eeprom_set_data(default_eeprom,128);  /* Default the gun setup values */
-	}
-}
-
 /***************************************************************************/
 
 static MACHINE_DRIVER_START( galastrm )
@@ -326,7 +314,7 @@ static MACHINE_DRIVER_START( galastrm )
 	MDRV_CPU_PROGRAM_MAP(galastrm_map)
 	MDRV_CPU_VBLANK_INT("screen", galastrm_interrupt) /* VBL */
 
-	MDRV_NVRAM_HANDLER(galastrm)
+	MDRV_EEPROM_ADD("eeprom", galastrm_eeprom_interface)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -380,6 +368,9 @@ ROM_START( galastrm )
 	ROM_CONTINUE( 0x600000, 0x040000 )
 	ROM_CONTINUE( 0x780000, 0x040000 )
 	ROM_CONTINUE( 0x700000, 0x040000 )
+	
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-galastrm.bin", 0x0000, 0x0080, CRC(94efa7a6) SHA1(5870b988cb364065e8bd779efbdadca8d3ffc17c) )
 ROM_END
 
 

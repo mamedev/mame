@@ -220,7 +220,7 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
@@ -321,44 +321,11 @@ static const eeprom_interface eeprom_intf =
 	0				/* reset_delay */
 };
 
-static void eeprom_handler(running_machine *machine, mame_file *file, int read_or_write)
-{
-	if (read_or_write)
-	{
-		if (file)
-		{
-			eeprom_save(file);
-		}
-	}
-	else
-	{
-		eeprom_init(machine, &eeprom_intf);
-		if (file)
-		{
-			eeprom_load(file);
-		}
-		else
-		{
-			// set default eeprom
-			UINT8 eepdata[0x200];
-			memset(eepdata, 0xff, 0x200);
-
-			if (mame_stricmp(machine->gamedrv->name, "slrasslt") == 0)
-			{
-				// magic number
-				eepdata[0x4] = 0x96;
-				eepdata[0x5] = 0x72;
-			}
-
-			eeprom_set_data(eepdata, 0x200);
-		}
-	}
-}
-
 static READ8_HANDLER( sysreg_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 	const device_config *adc1038 = devtag_get_device(space->machine, "adc1038");
+	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
 
 	switch (offset)
 	{
@@ -378,7 +345,7 @@ static READ8_HANDLER( sysreg_r )
 			// a = ADC readout
 			// e = EEPROM data out
 
-			UINT32 eeprom_bit = (eeprom_read_bit() << 1);
+			UINT32 eeprom_bit = (eepromdev_read_bit(eeprom) << 1);
 			UINT32 adc_bit = (adc1038_do_read(adc1038) << 2);
 			return (eeprom_bit | adc_bit);
 		}
@@ -393,6 +360,7 @@ static READ8_HANDLER( sysreg_r )
 static WRITE8_HANDLER( sysreg_w )
 {
 	const device_config *adc1038 = devtag_get_device(space->machine, "adc1038");
+	const device_config *eeprom = devtag_get_device(space->machine, "eeprom");
 
 	switch (offset)
 	{
@@ -405,9 +373,9 @@ static WRITE8_HANDLER( sysreg_w )
 			break;
 
 		case 3:
-			eeprom_write_bit((data & 0x01) ? 1 : 0);
-			eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
-			eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			eepromdev_write_bit(eeprom, (data & 0x01) ? 1 : 0);
+			eepromdev_set_clock_line(eeprom, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+			eepromdev_set_cs_line(eeprom, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 4:
@@ -523,11 +491,6 @@ static ADDRESS_MAP_START( hangplt_sharc1_map, ADDRESS_SPACE_DATA, 32 )
 ADDRESS_MAP_END
 
 /*****************************************************************************/
-
-static NVRAM_HANDLER(gticlub)
-{
-	eeprom_handler(machine, file, read_or_write);
-}
 
 static INPUT_PORTS_START( gticlub )
 	PORT_START("IN0")
@@ -816,7 +779,8 @@ static MACHINE_DRIVER_START( gticlub )
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
-	MDRV_NVRAM_HANDLER(gticlub)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+	
 	MDRV_MACHINE_START(gticlub)
 	MDRV_MACHINE_RESET(gticlub)
 
@@ -900,7 +864,8 @@ static MACHINE_DRIVER_START( hangplt )
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
-	MDRV_NVRAM_HANDLER(gticlub)
+	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+
 	MDRV_MACHINE_START(gticlub)
 	MDRV_MACHINE_RESET(hangplt)
 
@@ -1117,6 +1082,9 @@ ROM_START( slrasslt ) /* USA version UAA */
 	ROM_LOAD64_WORD( "792a14.13d", 0x000002, 0x200000, CRC(cf57e830) SHA1(607b4dec3b8180a63e29d9dab1ca28d7226dda1e) )
 	ROM_LOAD64_WORD( "792a15.9d",  0x000004, 0x200000, CRC(1c5531cb) SHA1(1b514f181c92e16d07bfe4719604f1e4caf15377) )
 	ROM_LOAD64_WORD( "792a16.4d",  0x000006, 0x200000, CRC(df89e392) SHA1(af37c5460d43bf8d8a1ab4213c4528083a7363c2) )
+
+	ROM_REGION16_BE(0x200, "eeprom", 0) /* default eeprom with magic number */
+	ROM_LOAD16_WORD( "eeprom-slrasslt.bin", 0x0000, 0x0200, CRC(924b4ed8) SHA1(247bf0c1394cbab3af03c26b9c016302b9b5723c) )
 ROM_END
 
 ROM_START( hangplt ) /* Japan version JAB */
