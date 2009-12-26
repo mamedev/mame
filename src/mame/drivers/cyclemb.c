@@ -71,6 +71,7 @@ Dumped by Chack'n
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "machine/tait8741.h"
 
 static UINT8 *cyclemb_vram,*cyclemb_cram;
 static UINT8 *cyclemb_obj1_ram,*cyclemb_obj2_ram,*cyclemb_obj3_ram;
@@ -197,6 +198,7 @@ static WRITE8_HANDLER( sound_cmd_w )
 }
 #endif
 
+#if 0
 static READ8_HANDLER( mcu_status_r )
 {
 	return 1;
@@ -208,6 +210,7 @@ static WRITE8_HANDLER( sound_cmd_w ) //actually ciom
 	soundlatch_w(space, 0, data & 0xff);
  	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
+#endif
 
 static ADDRESS_MAP_START( cyclemb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -223,8 +226,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cyclemb_io, ADDRESS_SPACE_IO, 8 )
 //	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(cyclemb_bankswitch_w)
-	AM_RANGE(0xc09e, 0xc09e) AM_READ(soundlatch2_r)
-	AM_RANGE(0xc09f, 0xc09f) AM_READ(mcu_status_r) AM_WRITE(sound_cmd_w)
+	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE(cyclemb_8741_0_r, cyclemb_8741_0_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITENOP //flip screen
 ADDRESS_MAP_END
 

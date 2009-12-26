@@ -11,7 +11,7 @@ Taito 8741 emulation
 #include "tait8741.h"
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x) do { if (VERBOSE) printf x; } while (0)
 
 /****************************************************************************
 
@@ -533,3 +533,93 @@ WRITE8_HANDLER( josvolly_8741_0_w ){ josvolly_8741_w(space,0,offset,data); }
 READ8_HANDLER( josvolly_8741_0_r ) { return josvolly_8741_r(space,0,offset); }
 WRITE8_HANDLER( josvolly_8741_1_w ) { josvolly_8741_w(space,1,offset,data); }
 READ8_HANDLER( josvolly_8741_1_r ) { return josvolly_8741_r(space,1,offset); }
+
+static void cyclemb_8741_w(const address_space *space, int num, int offset, int data)
+{
+	JV8741 *mcu = &i8741[num];
+
+	if(offset==1)
+	{
+		LOG(("%s:8741[%d] CW %02X\n", cpuexec_describe_context(space->machine), num, data));
+
+		/* read pointer */
+		mcu->cmd = data;
+		/* CMD */
+		switch(data)
+		{
+		case 0:
+			mcu->txd = data ^ 0x40;
+			mcu->sts |= 0x02;
+			break;
+		case 1:
+			mcu->txd = data ^ 0x40;
+			mcu->sts |= 0x02;
+#if 1
+			/* ?? */
+			mcu->rxd = 0;  /* SBSTS ( DIAG ) , killed */
+			mcu->sts |= 0x01; /* RD ready */
+#endif
+			break;
+		case 2:
+#if 1
+			mcu->rxd = input_port_read(space->machine, "DSW2");
+			mcu->sts |= 0x01; /* RD ready */
+#endif
+			break;
+		case 3: /* normal mode ? */
+			break;
+
+		case 0xf0: /* clear main sts ? */
+			mcu->txd = data ^ 0x40;
+			mcu->sts |= 0x02;
+			break;
+		}
+	}
+	else
+	{
+		/* data */
+		LOG(("%s:8741[%d] DW %02X\n", cpuexec_describe_context(space->machine), num, data));
+
+		mcu->txd = data ^ 0x40; /* parity reverce ? */
+		mcu->sts |= 0x02;     /* TXD busy         */
+#if 1
+		/* interrupt ? */
+		if(num == 0)
+		{
+			if(josvolly_nmi_enable)
+			{
+				cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+				josvolly_nmi_enable = 0;
+			}
+		}
+#endif
+	}
+	josvolly_8741_do(space->machine, num);
+}
+
+static INT8 cyclemb_8741_r(const address_space *space,int num,int offset)
+{
+	JV8741 *mcu = &i8741[num];
+	int ret;
+
+	if(offset==1)
+	{
+		if(mcu->rst)
+			mcu->rxd = input_port_read(space->machine, mcu->initReadPort); /* port in */
+		ret = mcu->sts;
+		LOG(("%s:8741[%d]       SR %02X\n",cpuexec_describe_context(space->machine),num,ret));
+	}
+	else
+	{
+		/* clear status port */
+		mcu->sts &= ~0x01; /* RD ready */
+		ret = mcu->rxd;
+		LOG(("%s:8741[%d]       DR %02X\n",cpuexec_describe_context(space->machine),num,ret));
+		mcu->rst = 0;
+	}
+	return ret;
+}
+
+
+WRITE8_HANDLER( cyclemb_8741_0_w ){ cyclemb_8741_w(space,0,offset,data); }
+READ8_HANDLER( cyclemb_8741_0_r ) { return cyclemb_8741_r(space,0,offset); }
