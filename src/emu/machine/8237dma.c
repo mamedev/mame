@@ -608,22 +608,6 @@ WRITE_LINE_DEVICE_HANDLER( i8237_eop_w )
 }
 
 
-/******************* Unfortunate hacks *******************/
-
-void i8237_run_transfer(const device_config *device, int channel)
-{
-	i8237_t	*i8237 = get_safe_token(device);
-
-	i8237->status |= 0x10 << channel;	/* reset DMA running flag */
-
-	popmessage("dma8237_run_transfer(): please do not use me anymore\n");
-
-	i8237->status &= ~(0x10 << channel);
-	i8237->status |=  (0x01 << channel);
-}
-
-
-
 static DEVICE_START( i8237 ) {
 	i8237_t	*i8237 = get_safe_token(device);
 	i8237_interface *intf = (i8237_interface *)device->static_config;

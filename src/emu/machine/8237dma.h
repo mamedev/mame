@@ -93,7 +93,4 @@ WRITE_LINE_DEVICE_HANDLER( i8237_eop_w );
 
 DEVICE_GET_INFO( i8237 );
 
-/* unfortunate hack for the interim for PC HDC */
-void i8237_run_transfer(const device_config *device, int channel);
-
 #endif
