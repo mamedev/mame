@@ -1324,7 +1324,7 @@ $(MAMEOBJ)/taito.a: \
 	$(MACHINE)/daikaiju.o \
 	$(AUDIO)/taitosnd.o \
 	$(AUDIO)/t5182.o \
-	$(VIDEO)/taitoic.o \
+	$(VIDEO)/taitoic.o $(VIDEO)/taiicdev.o \
 
 $(MAMEOBJ)/tatsumi.a: \
 	$(DRIVERS)/kingdrby.o \

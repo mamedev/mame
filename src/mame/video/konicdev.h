@@ -2,7 +2,7 @@
 
     konicdev.h
 
-    Implementation of various Konami custom IC used for video
+    Implementation of various Konami custom video ICs
 
 **************************************************************************/
 
@@ -125,6 +125,42 @@ struct _k053250_interface
 	int                xoff, yoff;
 };
 
+typedef struct _k001006_interface k001006_interface;
+struct _k001006_interface
+{
+	const char     *gfx_region;
+};
+
+typedef struct _k001005_interface k001005_interface;
+struct _k001005_interface
+{
+	const char     *screen;
+	const char     *cpu;
+	const char     *dsp;
+	const char     *k001006_1;
+	const char     *k001006_2;
+
+	const char     *gfx_memory_region;
+	int            gfx_index;
+};
+
+typedef struct _k001604_interface k001604_interface;
+struct _k001604_interface
+{
+	int            gfx_index_1;
+	int            gfx_index_2;
+	int            layer_size;
+	int            roz_size;
+
+	int            is_slrasslt;
+};
+
+typedef struct _k037122_interface k037122_interface;
+struct _k037122_interface
+{
+	const char     *screen;
+	int            gfx_index;
+};
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -148,6 +184,10 @@ DEVICE_GET_INFO( k055555 );
 DEVICE_GET_INFO( k054338 );
 DEVICE_GET_INFO( k053250 );
 DEVICE_GET_INFO( k053252 );
+DEVICE_GET_INFO( k001006 );
+DEVICE_GET_INFO( k001005 );
+DEVICE_GET_INFO( k001604 );
+DEVICE_GET_INFO( k037122 );
 
 
 /***************************************************************************
@@ -267,6 +307,34 @@ DEVICE_GET_INFO( k053252 );
 	MDRV_DEVICE_ADD(_tag, K053252, 0)
 
 
+#define K001006 DEVICE_GET_INFO_NAME( k001006 )
+
+#define MDRV_K001006_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, K001006, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
+
+
+#define K001005 DEVICE_GET_INFO_NAME( k001005 )
+
+#define MDRV_K001005_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, K001005, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
+
+
+#define K001604 DEVICE_GET_INFO_NAME( k001604 )
+
+#define MDRV_K001604_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, K001604, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
+
+
+#define K037122 DEVICE_GET_INFO_NAME( k037122 )
+
+#define MDRV_K037122_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, K037122, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
+
+
 /***************************************************************************
     HELPERS FOR DRIVERS
 ***************************************************************************/
@@ -366,7 +434,6 @@ int k052109_is_irq_enabled(const device_config *device);
 void k052109_set_layer_offsets(const device_config *device, int layer, int dx, int dy);
 void k052109_tilemap_mark_dirty(const device_config *device, int tmap_num);
 void k052109_tilemap_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, int tmap_num, UINT32 flags, UINT8 priority);
-void k052109_postload_tileflip_reset( const device_config *device );	// this has to be added to POSTLOAD functions in each driver
 
 
 /**  Konami 051960 / 051937  **/
@@ -518,7 +585,6 @@ int k053251_get_priority(const device_config *device, int ci);
 int k053251_get_palette_index(const device_config *device, int ci);
 int k053251_get_tmap_dirty(const device_config *device, int tmap_num);
 void k053251_set_tmap_dirty(const device_config *device, int tmap_num, int data);
-void k053251_postload_reset_indexes(const device_config *device);
 
 enum
 {
@@ -722,6 +788,43 @@ void k053250_dma(const device_config *device, int limiter);
 READ16_DEVICE_HANDLER( k053252_word_r );	// CCU registers
 WRITE16_DEVICE_HANDLER( k053252_word_w );
 WRITE32_DEVICE_HANDLER( k053252_long_w );
+
+
+/**  Konami 001006  **/
+UINT32 k001006_get_palette(const device_config *device, int index);
+
+READ32_DEVICE_HANDLER( k001006_r );
+WRITE32_DEVICE_HANDLER( k001006_w );
+
+
+/**  Konami 001005  **/
+void k001005_draw(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
+void k001005_swap_buffers(const device_config *device);
+void k001005_preprocess_texture_data(UINT8 *rom, int length, int gticlub);
+
+READ32_DEVICE_HANDLER( k001005_r );
+WRITE32_DEVICE_HANDLER( k001005_w );
+
+
+/**  Konami 001604  **/
+void k001604_draw_back_layer( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect );
+void k001604_draw_front_layer( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect );
+WRITE32_DEVICE_HANDLER( k001604_tile_w );
+READ32_DEVICE_HANDLER( k001604_tile_r );
+WRITE32_DEVICE_HANDLER( k001604_char_w );
+READ32_DEVICE_HANDLER( k001604_char_r );
+WRITE32_DEVICE_HANDLER( k001604_reg_w );
+READ32_DEVICE_HANDLER( k001604_reg_r );
+
+
+/**  Konami 037122  **/
+void k037122_tile_draw( const device_config *device, bitmap_t *bitmap, const rectangle *cliprect );
+READ32_DEVICE_HANDLER( k037122_sram_r );
+WRITE32_DEVICE_HANDLER( k037122_sram_w );
+READ32_DEVICE_HANDLER( k037122_char_r );
+WRITE32_DEVICE_HANDLER( k037122_char_w );
+READ32_DEVICE_HANDLER( k037122_reg_r );
+WRITE32_DEVICE_HANDLER( k037122_reg_w );
 
 
 // debug handlers
