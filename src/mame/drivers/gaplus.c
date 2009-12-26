@@ -157,78 +157,6 @@ TODO:
 #include "includes/gaplus.h"
 
 
-/***************************************************************************
-
-  Custom I/O initialization
-
-***************************************************************************/
-
-static READ8_HANDLER( in0_l )	{ return input_port_read(space->machine, "IN0"); }			// P1 joystick
-static READ8_HANDLER( in0_h )	{ return input_port_read(space->machine, "IN0") >> 4; }	// P2 joystick
-static READ8_HANDLER( in1_l )	{ return input_port_read(space->machine, "IN1"); }			// fire and start buttons
-static READ8_HANDLER( in1_h )	{ return input_port_read(space->machine, "IN1") >> 4; }	// coins
-static READ8_HANDLER( dipA_l )	{ return input_port_read(space->machine, "DSW0"); }		// dips A
-static READ8_HANDLER( dipA_h )	{ return input_port_read(space->machine, "DSW0") >> 4; }	// dips A
-static READ8_HANDLER( dipB_l )	{ return input_port_read(space->machine, "DSW1"); }		// dips B
-static READ8_HANDLER( dipB_h )	{ return input_port_read(space->machine, "DSW1") >> 4; }	// dips B
-static WRITE8_HANDLER( out_lamps0 )
-{
-	set_led_status(space->machine, 0,data & 1);
-	set_led_status(space->machine, 1,data & 2);
-	coin_lockout_global_w(space->machine, data & 4);
-	coin_counter_w(space->machine, 0,~data & 8);
-}
-static WRITE8_HANDLER( out_lamps1 )
-{
-	coin_counter_w(space->machine, 1,~data & 1);
-}
-
-/* chip #0: player inputs, buttons, coins */
-static const struct namcoio_interface intf0 =
-{
-	{ in1_h, in0_l, in0_h, in1_l },	/* port read handlers */
-	{ NULL, NULL }		/* port write handlers */
-};
-static const struct namcoio_interface intf0_lamps =
-{
-	{ in1_h, in0_l, in0_h, in1_l },	/* port read handlers */
-	{ out_lamps0, out_lamps1 }		/* port write handlers */
-};
-/* chip #1: dip switches */
-static const struct namcoio_interface intf1 =
-{
-	{ dipA_h, dipB_l, dipB_h, dipA_l },	/* port read handlers */
-	{ NULL, NULL }						/* port write handlers */
-};
-/* TODO: chip #2: test/cocktail, optional buttons */
-
-static void unpack_gfx(running_machine *machine);
-
-static DRIVER_INIT( 56_58 )
-{
-	unpack_gfx(machine);
-	namcoio_init(machine, 0, NAMCOIO_56XX, &intf0, NULL);
-	namcoio_init(machine, 1, NAMCOIO_58XX, &intf1, NULL);
-}
-
-static DRIVER_INIT( 56_58l )
-{
-	unpack_gfx(machine);
-	namcoio_init(machine, 0, NAMCOIO_56XX, &intf0_lamps, NULL);
-	namcoio_init(machine, 1, NAMCOIO_58XX, &intf1, NULL);
-}
-
-static DRIVER_INIT( 58_56 )
-{
-	unpack_gfx(machine);
-	namcoio_init(machine, 0, NAMCOIO_58XX, &intf0, NULL);
-	namcoio_init(machine, 1, NAMCOIO_56XX, &intf1, NULL);
-}
-
-
-/***************************************************************************/
-
-
 static READ8_HANDLER( gaplus_spriteram_r )
 {
     return gaplus_spriteram[offset];
@@ -280,17 +208,21 @@ static WRITE8_HANDLER( gaplus_irq_2_ctrl_w )
 static WRITE8_HANDLER( gaplus_sreset_w )
 {
 	int bit = !BIT(offset, 11);
-    cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-    cputag_set_input_line(space->machine, "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 	mappy_sound_enable(devtag_get_device(space->machine, "namco"), bit);
 }
 
 static WRITE8_HANDLER( gaplus_freset_w )
 {
+	const device_config *io58xx = devtag_get_device(space->machine, "58xx");
+	const device_config *io56xx = devtag_get_device(space->machine, "56xx");
 	int bit = !BIT(offset, 11);
+
 	logerror("%04x: freset %d\n",cpu_get_pc(space->cpu), bit);
-	namcoio_set_reset_line(0, bit ? CLEAR_LINE : ASSERT_LINE);
-	namcoio_set_reset_line(1, bit ? CLEAR_LINE : ASSERT_LINE);
+
+	namcoio_set_reset_line(io58xx, bit ? CLEAR_LINE : ASSERT_LINE);
+	namcoio_set_reset_line(io56xx, bit ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static MACHINE_RESET( gaplus )
@@ -300,13 +232,36 @@ static MACHINE_RESET( gaplus )
 	cputag_set_input_line(machine, "sub", 0, CLEAR_LINE);
 }
 
+static TIMER_CALLBACK( namcoio_run )
+{
+	const device_config *io58xx = devtag_get_device(machine, "58xx");
+	const device_config *io56xx = devtag_get_device(machine, "56xx");
+
+	switch (param)
+	{
+		case 0:
+			namco_customio_58xx_run(io58xx);
+			break;
+		case 1:
+			namco_customio_56xx_run(io56xx);
+			break;
+	}
+}
+
 static INTERRUPT_GEN( gaplus_interrupt_1 )
 {
+	const device_config *io58xx = devtag_get_device(device->machine, "58xx");
+	const device_config *io56xx = devtag_get_device(device->machine, "56xx");
+
 	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
 								// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
-	namcoio_set_irq_line(device->machine, 0, PULSE_LINE);
-	namcoio_set_irq_line(device->machine, 1, PULSE_LINE);
+	if (!namcoio_read_reset_line(io58xx))		/* give the cpu a tiny bit of time to write the command before processing it */
+		timer_set(device->machine, ATTOTIME_IN_USEC(50), NULL, 0, namcoio_run);
+
+	if (!namcoio_read_reset_line(io56xx))		/* give the cpu a tiny bit of time to write the command before processing it */
+		timer_set(device->machine, ATTOTIME_IN_USEC(50), NULL, 1, namcoio_run);
+
 }
 
 
@@ -315,8 +270,25 @@ static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w) AM_BASE(&gaplus_spriteram)	/* shared RAM with CPU #2 (includes sprite RAM) */
 	AM_RANGE(0x6000, 0x63ff) AM_READ(gaplus_snd_sharedram_r) 													/* shared RAM with CPU #3 */
 	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE("namco", gaplus_snd_sharedram_w) 										/* shared RAM with CPU #3 */
+	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE("56xx", namcoio_r, namcoio_w)													/* custom I/O chips interface */
+	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE("58xx", namcoio_r, namcoio_w)													/* custom I/O chips interface */
 	AM_RANGE(0x6820, 0x682f) AM_READWRITE(gaplus_customio_3_r, gaplus_customio_3_w) AM_BASE(&gaplus_customio_3)	/* custom I/O chip #3 interface */
-	AM_RANGE(0x6800, 0x6bff) AM_READWRITE(namcoio_r, namcoio_w)													/* custom I/O chips interface */
+	AM_RANGE(0x7000, 0x7fff) AM_WRITE(gaplus_irq_1_ctrl_w)														/* main CPU irq control */
+	AM_RANGE(0x7800, 0x7fff) AM_READ(watchdog_reset_r)															/* watchdog */
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(gaplus_sreset_w)	 														/* reset CPU #2 & #3, enable sound */
+	AM_RANGE(0x9000, 0x9fff) AM_WRITE(gaplus_freset_w)	 														/* reset I/O chips */
+	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(gaplus_starfield_control_w)				/* starfield control */
+	AM_RANGE(0xa000, 0xffff) AM_ROM																				/* ROM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( gaplusa_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(gaplus_videoram_r, gaplus_videoram_w) AM_BASE(&gaplus_videoram)		/* tilemap RAM (shared with CPU #2) */
+	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w) AM_BASE(&gaplus_spriteram)	/* shared RAM with CPU #2 (includes sprite RAM) */
+	AM_RANGE(0x6000, 0x63ff) AM_READ(gaplus_snd_sharedram_r) 													/* shared RAM with CPU #3 */
+	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE("namco", gaplus_snd_sharedram_w) 										/* shared RAM with CPU #3 */
+	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE("58xx", namcoio_r, namcoio_w)													/* custom I/O chips interface */
+	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE("56xx", namcoio_r, namcoio_w)													/* custom I/O chips interface */
+	AM_RANGE(0x6820, 0x682f) AM_READWRITE(gaplus_customio_3_r, gaplus_customio_3_w) AM_BASE(&gaplus_customio_3)	/* custom I/O chip #3 interface */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(gaplus_irq_1_ctrl_w)														/* main CPU irq control */
 	AM_RANGE(0x7800, 0x7fff) AM_READ(watchdog_reset_r)															/* watchdog */
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(gaplus_sreset_w)	 														/* reset CPU #2 & #3, enable sound */
@@ -516,6 +488,60 @@ static const samples_interface gaplus_samples_interface =
 
 
 
+/***************************************************************************
+
+  Custom I/O initialization
+
+***************************************************************************/
+
+static READ8_DEVICE_HANDLER( in0_l )	{ return input_port_read(device->machine, "IN0"); }			// P1 joystick
+static READ8_DEVICE_HANDLER( in0_h )	{ return input_port_read(device->machine, "IN0") >> 4; }	// P2 joystick
+static READ8_DEVICE_HANDLER( in1_l )	{ return input_port_read(device->machine, "IN1"); }			// fire and start buttons
+static READ8_DEVICE_HANDLER( in1_h )	{ return input_port_read(device->machine, "IN1") >> 4; }	// coins
+static READ8_DEVICE_HANDLER( dipA_l )	{ return input_port_read(device->machine, "DSW0"); }		// dips A
+static READ8_DEVICE_HANDLER( dipA_h )	{ return input_port_read(device->machine, "DSW0") >> 4; }	// dips A
+static READ8_DEVICE_HANDLER( dipB_l )	{ return input_port_read(device->machine, "DSW1"); }		// dips B
+static READ8_DEVICE_HANDLER( dipB_h )	{ return input_port_read(device->machine, "DSW1") >> 4; }	// dips B
+
+static WRITE8_DEVICE_HANDLER( out_lamps0 )
+{
+	set_led_status(device->machine, 0, data & 1);
+	set_led_status(device->machine, 1, data & 2);
+	coin_lockout_global_w(device->machine, data & 4);
+	coin_counter_w(device->machine, 0, ~data & 8);
+}
+
+static WRITE8_DEVICE_HANDLER( out_lamps1 )
+{
+	coin_counter_w(device->machine, 1, ~data & 1);
+}
+
+/* chip #0: player inputs, buttons, coins */
+static const namcoio_interface intf0 =
+{
+	{ DEVCB_HANDLER(in1_h), DEVCB_HANDLER(in0_l), DEVCB_HANDLER(in0_h), DEVCB_HANDLER(in1_l) },	/* port read handlers */
+	{ DEVCB_NULL, DEVCB_NULL },		/* port write handlers */
+	NULL	/* device */
+};
+
+static const namcoio_interface intf0_lamps =
+{
+	{ DEVCB_HANDLER(in1_h), DEVCB_HANDLER(in0_l), DEVCB_HANDLER(in0_h), DEVCB_HANDLER(in1_l) },	/* port read handlers */
+	{ DEVCB_HANDLER(out_lamps0), DEVCB_HANDLER(out_lamps1) },		/* port write handlers */
+	NULL	/* device */
+};
+
+/* chip #1: dip switches */
+static const namcoio_interface intf1 =
+{
+	{ DEVCB_HANDLER(dipA_h), DEVCB_HANDLER(dipB_l), DEVCB_HANDLER(dipB_h), DEVCB_HANDLER(dipA_l) },	/* port read handlers */
+	{ DEVCB_NULL, DEVCB_NULL },		/* port write handlers */
+	NULL	/* device */
+};
+
+/* TODO: chip #2: test/cocktail, optional buttons */
+
+
 static MACHINE_DRIVER_START( gaplus )
 
 	/* basic machine hardware */
@@ -533,6 +559,9 @@ static MACHINE_DRIVER_START( gaplus )
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* a high value to ensure proper synchronization of the CPUs */
 	MDRV_MACHINE_RESET(gaplus)
+
+	MDRV_NAMCO56XX_ADD("56xx", intf0_lamps)
+	MDRV_NAMCO58XX_ADD("58xx", intf1)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -560,6 +589,30 @@ static MACHINE_DRIVER_START( gaplus )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(gaplus_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( gaplusa )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(gaplus)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(gaplusa_cpu1_map)
+
+	MDRV_DEVICE_REMOVE("56xx")
+	MDRV_DEVICE_REMOVE("58xx")
+	MDRV_NAMCO56XX_ADD("56xx", intf1)
+	MDRV_NAMCO58XX_ADD("58xx", intf0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( gapluso )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(gaplus)
+
+	MDRV_DEVICE_REMOVE("56xx")
+	MDRV_DEVICE_REMOVE("58xx")
+	MDRV_NAMCO58XX_ADD("56xx", intf0)
+	MDRV_NAMCO56XX_ADD("58xx", intf1)
 MACHINE_DRIVER_END
 
 
@@ -802,7 +855,7 @@ ROM_START( galaga3m )
 ROM_END
 
 
-static void unpack_gfx(running_machine *machine)
+static DRIVER_INIT( gaplus )
 {
 	UINT8 *rom;
 	int i;
@@ -817,9 +870,9 @@ static void unpack_gfx(running_machine *machine)
 }
 
 
-GAME( 1984, gaplus,   0,        gaplus,   gaplus,   56_58l, ROT90, "Namco", "Gaplus (rev. D)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, galaga3,  gaplus,   gaplus,   gaplus,   56_58l, ROT90, "Namco", "Galaga 3 (rev. C)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, gapluso,  gaplus,   gaplus,   gapluso,  56_58,  ROT90, "Namco", "Gaplus (rev. B)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, gaplusa,  gaplus,   gaplus,   gapluso,  58_56,  ROT90, "Namco", "Gaplus (alternate hardware)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, galaga3a, gaplus,   gaplus,   galaga3a, 56_58l, ROT90, "Namco", "Galaga 3 (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, galaga3m, gaplus,   gaplus,   galaga3m, 56_58l, ROT90, "Namco", "Galaga 3 (set 3)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, gaplus,   0,        gaplus,   gaplus,   gaplus, ROT90, "Namco", "Gaplus (rev. D)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, galaga3,  gaplus,   gaplus,   gaplus,   gaplus, ROT90, "Namco", "Galaga 3 (rev. C)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, gapluso,  gaplus,   gapluso,  gapluso,  gaplus, ROT90, "Namco", "Gaplus (rev. B)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, gaplusa,  gaplus,   gaplusa,  gapluso,  gaplus, ROT90, "Namco", "Gaplus (alternate hardware)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, galaga3a, gaplus,   gaplus,   galaga3a, gaplus, ROT90, "Namco", "Galaga 3 (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, galaga3m, gaplus,   gaplus,   galaga3m, gaplus, ROT90, "Namco", "Galaga 3 (set 3)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "machine/namcoio.h"
 #include "sound/samples.h"
 #include "includes/gaplus.h"
 
@@ -25,7 +24,8 @@ WRITE8_HANDLER( gaplus_customio_3_w )
 	const device_config *samples = devtag_get_device(space->machine, "samples");
 	if ((offset == 0x09) && (data >= 0x0f))
 		sample_start(samples,0,0,0);
-    gaplus_customio_3[offset] = data;
+
+	gaplus_customio_3[offset] = data;
 }
 
 

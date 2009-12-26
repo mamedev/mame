@@ -110,85 +110,97 @@ TODO:
 
 #include "driver.h"
 #include "machine/namcoio.h"
-#include "machine/namco50.h"
-#include "machine/namco51.h"
-#include "machine/namco53.h"
-#include "audio/namco52.h"
-#include "audio/namco54.h"
 
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-struct namcoio
+
+typedef struct _namcoio_state namcoio_state;
+struct _namcoio_state
 {
-	INT32 type;
+	UINT8          ram[16];
+
+	devcb_resolved_read8    in[4];
+	devcb_resolved_write8   out[2];
+
+	int            reset;
+	INT32          lastcoins, lastbuttons;
+	INT32          credits;
+	INT32          coins[2];
+	INT32          coins_per_cred[2];
+	INT32          creds_per_coin[2];
+	INT32          in_count;
+
 	const device_config *device;
-	read8_space_func in[4];
-	write8_space_func out[2];
-	INT32 reset;
-	INT32 lastcoins,lastbuttons;
-	INT32 credits;
-	INT32 coins[2];
-	INT32 coins_per_cred[2];
-	INT32 creds_per_coin[2];
-	INT32 in_count;
 };
 
-static struct namcoio io[MAX_NAMCOIO];
+/*****************************************************************************
+    INLINE FUNCTIONS
+*****************************************************************************/
 
-static READ8_HANDLER( nop_r ) { return 0x0f; }
-static WRITE8_HANDLER( nop_w ) { }
-
-#define READ_PORT(m,n)	(io[chip].in[n](m,0) & 0x0f)
-#define WRITE_PORT(m,n,d)	io[chip].out[n](m,0,(d) & 0x0f)
-
-
-
-/***************************************************************************/
-
-
-static UINT8 namcoio_ram[MAX_NAMCOIO * 16];
-
-#define IORAM_READ(offset) (namcoio_ram[chip * 0x10 + (offset)] & 0x0f)
-#define IORAM_WRITE(offset,data) {namcoio_ram[chip * 0x10 + (offset)] = (data) & 0x0f;}
-
-
-static void handle_coins(running_machine *machine,int chip,int swap)
+INLINE namcoio_state *get_safe_token( const device_config *device )
 {
-	int val,toggled;
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == NAMCO56XX || device->type == NAMCO58XX || device->type == NAMCO59XX);
+
+	return (namcoio_state *)device->token;
+}
+
+INLINE const namcoio_interface *get_interface( const device_config *device )
+{
+	assert(device != NULL);
+	assert(device->type == NAMCO56XX || device->type == NAMCO58XX || device->type == NAMCO59XX);
+	return (const namcoio_interface *) device->static_config;
+}
+
+
+/*****************************************************************************
+    DEVICE HANDLERS
+*****************************************************************************/
+
+#define READ_PORT(n)	(devcb_call_read8(&namcoio->in[n], 0) & 0x0f)
+#define WRITE_PORT(n,d)	(devcb_call_write8(&namcoio->out[n], 0, (d) & 0x0f))
+
+#define IORAM_READ(offset) (namcoio->ram[offset] & 0x0f)
+#define IORAM_WRITE(offset,data) {namcoio->ram[offset] = (data) & 0x0f;}
+
+static void handle_coins( const device_config *device, int swap )
+{
+	namcoio_state *namcoio = get_safe_token(device);
+	int val, toggled;
 	int credit_add = 0;
 	int credit_sub = 0;
 	int button;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 //popmessage("%x %x %x %x %x %x %x %x",IORAM_READ(8),IORAM_READ(9),IORAM_READ(10),IORAM_READ(11),IORAM_READ(12),IORAM_READ(13),IORAM_READ(14),IORAM_READ(15));
 
-	val = ~READ_PORT(space,0);	// pins 38-41
-	toggled = val ^ io[chip].lastcoins;
-	io[chip].lastcoins = val;
+	val = ~READ_PORT(0);	// pins 38-41
+	toggled = val ^ namcoio->lastcoins;
+	namcoio->lastcoins = val;
 
 	/* check coin insertion */
 	if (val & toggled & 0x01)
 	{
-		io[chip].coins[0]++;
-		if (io[chip].coins[0] >= (io[chip].coins_per_cred[0] & 7))
+		namcoio->coins[0]++;
+		if (namcoio->coins[0] >= (namcoio->coins_per_cred[0] & 7))
 		{
-			credit_add = io[chip].creds_per_coin[0] - (io[chip].coins_per_cred[0] >> 3);
-			io[chip].coins[0] -= io[chip].coins_per_cred[0] & 7;
+			credit_add = namcoio->creds_per_coin[0] - (namcoio->coins_per_cred[0] >> 3);
+			namcoio->coins[0] -= namcoio->coins_per_cred[0] & 7;
 		}
-		else if (io[chip].coins_per_cred[0] & 8)
+		else if (namcoio->coins_per_cred[0] & 8)
 			credit_add = 1;
 	}
 	if (val & toggled & 0x02)
 	{
-		io[chip].coins[1]++;
-		if (io[chip].coins[1] >= (io[chip].coins_per_cred[1] & 7))
+		namcoio->coins[1]++;
+		if (namcoio->coins[1] >= (namcoio->coins_per_cred[1] & 7))
 		{
-			credit_add = io[chip].creds_per_coin[1] - (io[chip].coins_per_cred[1] >> 3);
-			io[chip].coins[1] -= io[chip].coins_per_cred[1] & 7;
+			credit_add = namcoio->creds_per_coin[1] - (namcoio->coins_per_cred[1] >> 3);
+			namcoio->coins[1] -= namcoio->coins_per_cred[1] & 7;
 		}
-		else if (io[chip].coins_per_cred[1] & 8)
+		else if (namcoio->coins_per_cred[1] & 8)
 			credit_add = 1;
 	}
 	if (val & toggled & 0x08)
@@ -196,9 +208,9 @@ static void handle_coins(running_machine *machine,int chip,int swap)
 		credit_add = 1;
 	}
 
-	val = ~READ_PORT(space,3);	// pins 30-33
-	toggled = val ^ io[chip].lastbuttons;
-	io[chip].lastbuttons = val;
+	val = ~READ_PORT(3);	// pins 30-33
+	toggled = val ^ namcoio->lastbuttons;
+	namcoio->lastbuttons = val;
 
 	/* check start buttons, only if the game allows */
 	if (IORAM_READ(9) == 0)
@@ -206,35 +218,34 @@ static void handle_coins(running_machine *machine,int chip,int swap)
 	{
 		if (val & toggled & 0x04)
 		{
-			if (io[chip].credits >= 1) credit_sub = 1;
+			if (namcoio->credits >= 1) credit_sub = 1;
 		}
 		else if (val & toggled & 0x08)
 		{
-			if (io[chip].credits >= 2) credit_sub = 2;
+			if (namcoio->credits >= 2) credit_sub = 2;
 		}
 	}
 
-	io[chip].credits += credit_add - credit_sub;
+	namcoio->credits += credit_add - credit_sub;
 
-	IORAM_WRITE(0 ^ swap, io[chip].credits / 10);	// BCD credits
-	IORAM_WRITE(1 ^ swap, io[chip].credits % 10);	// BCD credits
+	IORAM_WRITE(0 ^ swap, namcoio->credits / 10);	// BCD credits
+	IORAM_WRITE(1 ^ swap, namcoio->credits % 10);	// BCD credits
 	IORAM_WRITE(2 ^ swap, credit_add);	// credit increment (coin inputs)
 	IORAM_WRITE(3 ^ swap, credit_sub);	// credit decrement (start buttons)
-	IORAM_WRITE(4, ~READ_PORT(space,1));	// pins 22-25
+	IORAM_WRITE(4, ~READ_PORT(1));	// pins 22-25
 	button = ((val & 0x05) << 1) | (val & toggled & 0x05);
 	IORAM_WRITE(5, button);	// pins 30 & 32 normal and impulse
-	IORAM_WRITE(6, ~READ_PORT(space,2));	// pins 26-29
+	IORAM_WRITE(6, ~READ_PORT(2));	// pins 26-29
 	button = (val & 0x0a) | ((val & toggled & 0x0a) >> 1);
 	IORAM_WRITE(7, button);	// pins 31 & 33 normal and impulse
 }
 
 
-
-static void namco_customio_56XX_run(running_machine *machine, int chip)
+void namco_customio_56xx_run( const device_config *device )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	namcoio_state *namcoio = get_safe_token(device);
 
-	LOG(("execute 56XX %d mode %d\n",chip,IORAM_READ(8)));
+	LOG(("execute 56XX mode %d\n", IORAM_READ(8)));
 
 	switch (IORAM_READ(8))
 	{
@@ -242,22 +253,22 @@ static void namco_customio_56XX_run(running_machine *machine, int chip)
 			break;
 
 		case 1:	// read switch inputs
-			IORAM_WRITE(0, ~READ_PORT(space,0));	// pins 38-41
-			IORAM_WRITE(1, ~READ_PORT(space,1));	// pins 22-25
-			IORAM_WRITE(2, ~READ_PORT(space,2));	// pins 26-29
-			IORAM_WRITE(3, ~READ_PORT(space,3));	// pins 30-33
+			IORAM_WRITE(0, ~READ_PORT(0));	// pins 38-41
+			IORAM_WRITE(1, ~READ_PORT(1));	// pins 22-25
+			IORAM_WRITE(2, ~READ_PORT(2));	// pins 26-29
+			IORAM_WRITE(3, ~READ_PORT(3));	// pins 30-33
 
 //popmessage("%x %x %x %x %x %x %x %x",IORAM_READ(8),IORAM_READ(9),IORAM_READ(10),IORAM_READ(11),IORAM_READ(12),IORAM_READ(13),IORAM_READ(14),IORAM_READ(15));
 
-			WRITE_PORT(space,0,IORAM_READ(9));	// output to pins 13-16 (motos, pacnpal, gaplus)
-			WRITE_PORT(space,1,IORAM_READ(10));	// output to pins 17-20 (gaplus)
+			WRITE_PORT(0, IORAM_READ(9));	// output to pins 13-16 (motos, pacnpal, gaplus)
+			WRITE_PORT(1, IORAM_READ(10));	// output to pins 17-20 (gaplus)
 			break;
 
 		case 2:	// initialize coinage settings
-			io[chip].coins_per_cred[0] = IORAM_READ(9);
-			io[chip].creds_per_coin[0] = IORAM_READ(10);
-			io[chip].coins_per_cred[1] = IORAM_READ(11);
-			io[chip].creds_per_coin[1] = IORAM_READ(12);
+			namcoio->coins_per_cred[0] = IORAM_READ(9);
+			namcoio->creds_per_coin[0] = IORAM_READ(10);
+			namcoio->coins_per_cred[1] = IORAM_READ(11);
+			namcoio->creds_per_coin[1] = IORAM_READ(12);
 			// IORAM_READ(13) = 1; meaning unknown - possibly a 3rd coin input? (there's a IPT_UNUSED bit in port A)
 			// IORAM_READ(14) = 1; meaning unknown - possibly a 3rd coin input? (there's a IPT_UNUSED bit in port A)
 			// IORAM_READ(15) = 0; meaning unknown
@@ -265,58 +276,58 @@ static void namco_customio_56XX_run(running_machine *machine, int chip)
 
 		case 4:	// druaga, digdug chip #1: read dip switches and inputs
 				// superpac chip #0: process coin and start inputs, read switch inputs
-			handle_coins(machine,chip,0);
+			handle_coins(device, 0);
 			break;
 
 		case 7:	// bootup check (liblrabl only)
 			{
 				// liblrabl chip #1: 9-15 = f 1 2 3 4 0 0, expects 2 = e
 				// liblrabl chip #2: 9-15 = 0 1 4 5 5 0 0, expects 7 = 6
-				IORAM_WRITE(2,0xe);
-				IORAM_WRITE(7,0x6);
+				IORAM_WRITE(2, 0xe);
+				IORAM_WRITE(7, 0x6);
 			}
 			break;
 
 		case 8:	// bootup check
 			{
-				int i,sum;
+				int i, sum;
 
 				// superpac: 9-15 = f f f f f f f, expects 0-1 = 6 9. 0x69 = f+f+f+f+f+f+f.
 				// motos:    9-15 = f f f f f f f, expects 0-1 = 6 9. 0x69 = f+f+f+f+f+f+f.
 				// phozon:   9-15 = 1 2 3 4 5 6 7, expects 0-1 = 1 c. 0x1c = 1+2+3+4+5+6+7
 				sum = 0;
-				for (i = 9;i < 16;i++)
+				for (i = 9; i < 16; i++)
 					sum += IORAM_READ(i);
-				IORAM_WRITE(0,sum >> 4);
-				IORAM_WRITE(1,sum & 0xf);
+				IORAM_WRITE(0, sum >> 4);
+				IORAM_WRITE(1, sum & 0xf);
 			}
 			break;
 
 		case 9:	// read dip switches and inputs
-			WRITE_PORT(space,0,0);	// set pin 13 = 0
-			IORAM_WRITE(0, ~READ_PORT(space,0));	// pins 38-41, pin 13 = 0
-			IORAM_WRITE(2, ~READ_PORT(space,1));	// pins 22-25, pin 13 = 0
-			IORAM_WRITE(4, ~READ_PORT(space,2));	// pins 26-29, pin 13 = 0
-			IORAM_WRITE(6, ~READ_PORT(space,3));	// pins 30-33, pin 13 = 0
-			WRITE_PORT(space,0,1);	// set pin 13 = 1
-			IORAM_WRITE(1, ~READ_PORT(space,0));	// pins 38-41, pin 13 = 1
-			IORAM_WRITE(3, ~READ_PORT(space,1));	// pins 22-25, pin 13 = 1
-			IORAM_WRITE(5, ~READ_PORT(space,2));	// pins 26-29, pin 13 = 1
-			IORAM_WRITE(7, ~READ_PORT(space,3));	// pins 30-33, pin 13 = 1
+			WRITE_PORT(0, 0);	// set pin 13 = 0
+			IORAM_WRITE(0, ~READ_PORT(0));	// pins 38-41, pin 13 = 0
+			IORAM_WRITE(2, ~READ_PORT(1));	// pins 22-25, pin 13 = 0
+			IORAM_WRITE(4, ~READ_PORT(2));	// pins 26-29, pin 13 = 0
+			IORAM_WRITE(6, ~READ_PORT(3));	// pins 30-33, pin 13 = 0
+			WRITE_PORT(0, 1);	// set pin 13 = 1
+			IORAM_WRITE(1, ~READ_PORT(0));	// pins 38-41, pin 13 = 1
+			IORAM_WRITE(3, ~READ_PORT(1));	// pins 22-25, pin 13 = 1
+			IORAM_WRITE(5, ~READ_PORT(2));	// pins 26-29, pin 13 = 1
+			IORAM_WRITE(7, ~READ_PORT(3));	// pins 30-33, pin 13 = 1
 			break;
 
 		default:
-			logerror("Namco I/O %d: unknown I/O mode %d\n",chip,IORAM_READ(8));
+			logerror("Namco I/O unknown I/O mode %d\n", IORAM_READ(8));
 	}
 }
 
 
 
-static void namco_customio_59XX_run(running_machine *machine, int chip)
+void namco_customio_59xx_run( const device_config *device )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	namcoio_state *namcoio = get_safe_token(device);
 
-	LOG(("execute 59XX %d mode %d\n",chip,IORAM_READ(8)));
+	LOG(("execute 59XX mode %d\n", IORAM_READ(8)));
 
 	switch (IORAM_READ(8))
 	{
@@ -324,24 +335,24 @@ static void namco_customio_59XX_run(running_machine *machine, int chip)
 			break;
 
 		case 3:	// pacnpal chip #1: read dip switches and inputs
-			IORAM_WRITE(4, ~READ_PORT(space,0));	// pins 38-41, pin 13 = 0 ?
-			IORAM_WRITE(5, ~READ_PORT(space,2));	// pins 26-29 ?
-			IORAM_WRITE(6, ~READ_PORT(space,1));	// pins 22-25 ?
-			IORAM_WRITE(7, ~READ_PORT(space,3));	// pins 30-33
+			IORAM_WRITE(4, ~READ_PORT(0));	// pins 38-41, pin 13 = 0 ?
+			IORAM_WRITE(5, ~READ_PORT(2));	// pins 26-29 ?
+			IORAM_WRITE(6, ~READ_PORT(1));	// pins 22-25 ?
+			IORAM_WRITE(7, ~READ_PORT(3));	// pins 30-33
 			break;
 
 		default:
-			logerror("Namco I/O %d: unknown I/O mode %d\n",chip,IORAM_READ(8));
+			logerror("Namco I/O: unknown I/O mode %d\n", IORAM_READ(8));
 	}
 }
 
 
 
-static void namco_customio_58XX_run(running_machine *machine, int chip)
+void namco_customio_58xx_run( const device_config *device )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	namcoio_state *namcoio = get_safe_token(device);
 
-	LOG(("execute 58XX %d mode %d\n",chip,IORAM_READ(8)));
+	LOG(("execute 58XX mode %d\n", IORAM_READ(8)));
 
 	switch (IORAM_READ(8))
 	{
@@ -349,42 +360,42 @@ static void namco_customio_58XX_run(running_machine *machine, int chip)
 			break;
 
 		case 1:	// read switch inputs
-			IORAM_WRITE(4, ~READ_PORT(space,0));	// pins 38-41
-			IORAM_WRITE(5, ~READ_PORT(space,1));	// pins 22-25
-			IORAM_WRITE(6, ~READ_PORT(space,2));	// pins 26-29
-			IORAM_WRITE(7, ~READ_PORT(space,3));	// pins 30-33
+			IORAM_WRITE(4, ~READ_PORT(0));	// pins 38-41
+			IORAM_WRITE(5, ~READ_PORT(1));	// pins 22-25
+			IORAM_WRITE(6, ~READ_PORT(2));	// pins 26-29
+			IORAM_WRITE(7, ~READ_PORT(3));	// pins 30-33
 
 //popmessage("%x %x %x %x %x %x %x %x",IORAM_READ(8),IORAM_READ(9),IORAM_READ(10),IORAM_READ(11),IORAM_READ(12),IORAM_READ(13),IORAM_READ(14),IORAM_READ(15));
 
-			WRITE_PORT(space,0,IORAM_READ(9));	// output to pins 13-16 (toypop)
-			WRITE_PORT(space,1,IORAM_READ(10));	// output to pins 17-20 (toypop)
+			WRITE_PORT(0, IORAM_READ(9));	// output to pins 13-16 (toypop)
+			WRITE_PORT(1, IORAM_READ(10));	// output to pins 17-20 (toypop)
 			break;
 
 		case 2:	// initialize coinage settings
-			io[chip].coins_per_cred[0] = IORAM_READ(9);
-			io[chip].creds_per_coin[0] = IORAM_READ(10);
-			io[chip].coins_per_cred[1] = IORAM_READ(11);
-			io[chip].creds_per_coin[1] = IORAM_READ(12);
+			namcoio->coins_per_cred[0] = IORAM_READ(9);
+			namcoio->creds_per_coin[0] = IORAM_READ(10);
+			namcoio->coins_per_cred[1] = IORAM_READ(11);
+			namcoio->creds_per_coin[1] = IORAM_READ(12);
 			// IORAM_READ(13) = 1; meaning unknown - possibly a 3rd coin input? (there's a IPT_UNUSED bit in port A)
 			// IORAM_READ(14) = 0; meaning unknown - possibly a 3rd coin input? (there's a IPT_UNUSED bit in port A)
 			// IORAM_READ(15) = 0; meaning unknown
 			break;
 
 		case 3:	// process coin and start inputs, read switch inputs
-			handle_coins(machine,chip,2);
+			handle_coins(device, 2);
 			break;
 
 		case 4:	// read dip switches and inputs
-			WRITE_PORT(space,0,0);	// set pin 13 = 0
-			IORAM_WRITE(0, ~READ_PORT(space,0));	// pins 38-41, pin 13 = 0
-			IORAM_WRITE(2, ~READ_PORT(space,1));	// pins 22-25, pin 13 = 0
-			IORAM_WRITE(4, ~READ_PORT(space,2));	// pins 26-29, pin 13 = 0
-			IORAM_WRITE(6, ~READ_PORT(space,3));	// pins 30-33, pin 13 = 0
-			WRITE_PORT(space,0,1);	// set pin 13 = 1
-			IORAM_WRITE(1, ~READ_PORT(space,0));	// pins 38-41, pin 13 = 1
-			IORAM_WRITE(3, ~READ_PORT(space,1));	// pins 22-25, pin 13 = 1
-			IORAM_WRITE(5, ~READ_PORT(space,2));	// pins 26-29, pin 13 = 1
-			IORAM_WRITE(7, ~READ_PORT(space,3));	// pins 30-33, pin 13 = 1
+			WRITE_PORT(0, 0);	// set pin 13 = 0
+			IORAM_WRITE(0, ~READ_PORT(0));	// pins 38-41, pin 13 = 0
+			IORAM_WRITE(2, ~READ_PORT(1));	// pins 22-25, pin 13 = 0
+			IORAM_WRITE(4, ~READ_PORT(2));	// pins 26-29, pin 13 = 0
+			IORAM_WRITE(6, ~READ_PORT(3));	// pins 30-33, pin 13 = 0
+			WRITE_PORT(0, 1);	// set pin 13 = 1
+			IORAM_WRITE(1, ~READ_PORT(0));	// pins 38-41, pin 13 = 1
+			IORAM_WRITE(3, ~READ_PORT(1));	// pins 22-25, pin 13 = 1
+			IORAM_WRITE(5, ~READ_PORT(2));	// pins 26-29, pin 13 = 1
+			IORAM_WRITE(7, ~READ_PORT(3));	// pins 30-33, pin 13 = 1
 			break;
 
 		case 5:	// bootup check
@@ -402,17 +413,17 @@ static void namco_customio_58XX_run(running_machine *machine, int chip)
                to give Gaplus the F it expects.
             */
 			{
-				int i,n,rng,seed;
+				int i, n, rng, seed;
 				#define NEXT(n) ((((n) & 1) ? (n) ^ 0x90 : (n)) >> 1)
 
 				/* initialize the LFSR depending on the first two arguments */
 				n = (IORAM_READ(9) * 16 + IORAM_READ(10)) & 0x7f;
 				seed = 0x22;
-				for (i = 0;i < n;i++)
+				for (i = 0; i < n; i++)
 					seed = NEXT(seed);
 
 				/* calculate the answer */
-				for (i = 1;i < 8;i++)
+				for (i = 1; i < 8; i++)
 				{
 					n = 0;
 					rng = seed;
@@ -431,109 +442,113 @@ static void namco_customio_58XX_run(running_machine *machine, int chip)
 					rng = NEXT(rng);
 					if (rng & 1) { n ^= ~IORAM_READ(12); }
 
-					IORAM_WRITE(i,~n);
+					IORAM_WRITE(i, ~n);
 				}
-				IORAM_WRITE(0,0x0);
+				IORAM_WRITE(0, 0x0);
 				/* kludge for gaplus */
-				if (IORAM_READ(9) == 0xf) IORAM_WRITE(0,0xf);
+				if (IORAM_READ(9) == 0xf) IORAM_WRITE(0, 0xf);
 			}
 			break;
 
 		default:
-			logerror("Namco I/O %d: unknown I/O mode %d\n",chip,IORAM_READ(8));
+			logerror("Namco I/O: unknown I/O mode %d\n", IORAM_READ(8));
 	}
 }
 
 
 
-READ8_HANDLER( namcoio_r )
+READ8_DEVICE_HANDLER( namcoio_r )
 {
 	// RAM is 4-bit wide; Pac & Pal requires the | 0xf0 otherwise Easter egg doesn't work
+	namcoio_state *namcoio = get_safe_token(device);
 	offset &= 0x3f;
 
-	LOG(("%04x: I/O read %d: mode %d, offset %d = %02x\n", cpu_get_pc(space->cpu), offset / 16, namcoio_ram[(offset & 0x30) + 8], offset & 0x0f, namcoio_ram[offset]&0x0f));
+//	LOG(("%04x: I/O read: mode %d, offset %d = %02x\n", cpu_get_pc(space->cpu), offset / 16, namcoio_ram[(offset & 0x30) + 8], offset & 0x0f, namcoio_ram[offset]&0x0f));
 
-	return 0xf0 | namcoio_ram[offset];
+	return 0xf0 | namcoio->ram[offset];
 }
 
-WRITE8_HANDLER( namcoio_w )
+WRITE8_DEVICE_HANDLER( namcoio_w )
 {
+	namcoio_state *namcoio = get_safe_token(device);
 	offset &= 0x3f;
 	data &= 0x0f;	// RAM is 4-bit wide
 
-	LOG(("%04x: I/O write %d: offset %d = %02x\n", cpu_get_pc(space->cpu), offset / 16, offset & 0x0f, data));
+//	LOG(("%04x: I/O write %d: offset %d = %02x\n", cpu_get_pc(space->cpu), offset / 16, offset & 0x0f, data));
 
-	namcoio_ram[offset] = data;
+	namcoio->ram[offset] = data;
 }
 
-void namcoio_set_reset_line(int chipnum, int state)
+WRITE_LINE_DEVICE_HANDLER( namcoio_set_reset_line )
 {
-	io[chipnum].reset = (state == ASSERT_LINE) ? 1 : 0;
+	namcoio_state *namcoio = get_safe_token(device);
+	namcoio->reset = (state == ASSERT_LINE) ? 1 : 0;
 	if (state != CLEAR_LINE)
 	{
 		/* reset internal registers */
-		io[chipnum].credits = 0;
-		io[chipnum].coins[0] = 0;
-		io[chipnum].coins_per_cred[0] = 1;
-		io[chipnum].creds_per_coin[0] = 1;
-		io[chipnum].coins[1] = 0;
-		io[chipnum].coins_per_cred[1] = 1;
-		io[chipnum].creds_per_coin[1] = 1;
-		io[chipnum].in_count = 0;
+		namcoio->credits = 0;
+		namcoio->coins[0] = 0;
+		namcoio->coins_per_cred[0] = 1;
+		namcoio->creds_per_coin[0] = 1;
+		namcoio->coins[1] = 0;
+		namcoio->coins_per_cred[1] = 1;
+		namcoio->creds_per_coin[1] = 1;
+		namcoio->in_count = 0;
 	}
 }
 
-static TIMER_CALLBACK( namcoio_run )
+READ_LINE_DEVICE_HANDLER( namcoio_read_reset_line )
 {
-	switch (io[param].type)
-	{
-		case NAMCOIO_56XX:
-			namco_customio_56XX_run(machine, param);
-			break;
-		case NAMCOIO_58XX:
-			namco_customio_58XX_run(machine, param);
-			break;
-		case NAMCOIO_59XX:
-			namco_customio_59XX_run(machine, param);
-			break;
-	}
+	namcoio_state *namcoio = get_safe_token(device);
+	return namcoio->reset;
 }
 
-void namcoio_set_irq_line(running_machine *machine, int chipnum, int state)
+
+/*****************************************************************************
+    DEVICE INTERFACE
+*****************************************************************************/
+
+static DEVICE_START( namcoio )
 {
-	if (chipnum < MAX_NAMCOIO && state != CLEAR_LINE && !io[chipnum].reset)
-	{
-		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(machine, ATTOTIME_IN_USEC(50), NULL, chipnum, namcoio_run);
-	}
+	namcoio_state *namcoio = get_safe_token(device);
+	const namcoio_interface *intf = get_interface(device);
+
+	namcoio->device = intf->device;
+
+	devcb_resolve_read8(&namcoio->in[0], &intf->in[0], device);
+	devcb_resolve_read8(&namcoio->in[1], &intf->in[1], device);
+	devcb_resolve_read8(&namcoio->in[2], &intf->in[2], device);
+	devcb_resolve_read8(&namcoio->in[3], &intf->in[3], device);
+	devcb_resolve_write8(&namcoio->out[0], &intf->out[0], device);
+	devcb_resolve_write8(&namcoio->out[1], &intf->out[1], device);
+
+	state_save_register_device_item_array(device, 0, namcoio->ram);
+	state_save_register_device_item(device, 0, namcoio->reset);
+	state_save_register_device_item(device, 0, namcoio->lastcoins);
+	state_save_register_device_item(device, 0, namcoio->lastbuttons);
+	state_save_register_device_item(device, 0, namcoio->credits);
+	state_save_register_device_item_array(device, 0, namcoio->coins);
+	state_save_register_device_item_array(device, 0, namcoio->coins_per_cred);
+	state_save_register_device_item_array(device, 0, namcoio->creds_per_coin);
+	state_save_register_device_item(device, 0, namcoio->in_count);
+
 }
 
-static void namcoio_state_save(running_machine *machine, int chipnum)
+static DEVICE_RESET( namcoio )
 {
-	state_save_register_item_pointer(machine, "namcoio", NULL, chipnum, ((UINT8 *) (&namcoio_ram[chipnum * 16])), 16);
-	state_save_register_item(machine, "namcoio", NULL, chipnum, io[chipnum].reset);
-	state_save_register_item(machine, "namcoio", NULL, chipnum, io[chipnum].lastcoins);
-	state_save_register_item(machine, "namcoio", NULL, chipnum, io[chipnum].lastbuttons);
-	state_save_register_item(machine, "namcoio", NULL, chipnum, io[chipnum].credits);
-	state_save_register_item_array(machine, "namcoio", NULL, chipnum, io[chipnum].coins);
-	state_save_register_item_array(machine, "namcoio", NULL, chipnum, io[chipnum].coins_per_cred);
-	state_save_register_item_array(machine, "namcoio", NULL, chipnum, io[chipnum].creds_per_coin);
-	state_save_register_item(machine, "namcoio", NULL, chipnum, io[chipnum].in_count);
+	namcoio_state *namcoio = get_safe_token(device);
+	int i;
+
+	for (i = 0; i < 16; i++)
+		namcoio->ram[i] = 0;
+
+	namcoio_set_reset_line(device, PULSE_LINE);
 }
 
-void namcoio_init(running_machine *machine, int chipnum, int type, const struct namcoio_interface *intf, const char *device)
-{
-	if (chipnum < MAX_NAMCOIO)
-	{
-		io[chipnum].type = type;
-		io[chipnum].device = device ? devtag_get_device(machine, device) : NULL;
-		io[chipnum].in[0] = (intf && intf->in[0]) ? intf->in[0] : nop_r;
-		io[chipnum].in[1] = (intf && intf->in[1]) ? intf->in[1] : nop_r;
-		io[chipnum].in[2] = (intf && intf->in[2]) ? intf->in[2] : nop_r;
-		io[chipnum].in[3] = (intf && intf->in[3]) ? intf->in[3] : nop_r;
-		io[chipnum].out[0] = (intf && intf->out[0]) ? intf->out[0] : nop_w;
-		io[chipnum].out[1] = (intf && intf->out[1]) ? intf->out[1] : nop_w;
-		namcoio_state_save(machine, chipnum);
-		namcoio_set_reset_line(chipnum,PULSE_LINE);
-	}
-}
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+
+#define DEVTEMPLATE_ID(p,s)				p##namcoio##s
+#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
+#define DEVTEMPLATE_NAME				"Namco 56xx, 58xx & 59xx"
+#define DEVTEMPLATE_FAMILY				"Namco I/O"
+#include "devtempl.h"
