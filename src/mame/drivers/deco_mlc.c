@@ -97,7 +97,7 @@
 
 #include "driver.h"
 #include "includes/decocrpt.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/ymz280b.h"
 #include "includes/decoprot.h"
 #include "cpu/arm/arm.h"
@@ -136,21 +136,21 @@ static READ32_HANDLER(test3_r)
 	return 0xffffffff;
 }
 
-static WRITE32_HANDLER( avengrs_eprom_w )
+static WRITE32_DEVICE_HANDLER( avengrs_eprom_w )
 {
 	if (ACCESSING_BITS_8_15) {
 		UINT8 ebyte=(data>>8)&0xff;
 //      if (ebyte&0x80) {
-			eeprom_set_clock_line((ebyte & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-			eeprom_write_bit(ebyte & 0x1);
-			eeprom_set_cs_line((ebyte & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+			eepromdev_set_clock_line(device, (ebyte & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+			eepromdev_write_bit(device, ebyte & 0x1);
+			eepromdev_set_cs_line(device, (ebyte & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 //      }
 	}
 	else if (ACCESSING_BITS_0_7) {
 		//volume control todo
 	}
 	else
-		logerror("%08x:  eprom_w %08x mask %08x\n",cpu_get_pc(space->cpu),data,mem_mask);
+		logerror("%s:  eprom_w %08x mask %08x\n",cpuexec_describe_context(device->machine),data,mem_mask);
 }
 
 static WRITE32_HANDLER( avengrs_palette_w )
@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( decomlc_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0400000, 0x0400003) AM_READ_PORT("INPUTS") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0440000, 0x044001f) AM_READ(test3_r)	AM_MIRROR(0xff000000)
 	AM_RANGE(0x044001c, 0x044001f) AM_WRITENOP AM_MIRROR(0xff000000)
-	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(avengrs_eprom_w) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0500000, 0x0500003) AM_DEVWRITE("eeprom", avengrs_eprom_w) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0600000, 0x0600007) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0xff000000) AM_MIRROR(0xff000000)
 	AM_RANGE(0x070f000, 0x070ffff) AM_READ(stadhr96_prot_146_r) AM_MIRROR(0xff000000)
 //  AM_RANGE(0x070f000, 0x070ffff) AM_READ(stadhr96_prot_146_w) AM_BASE(&deco32_prot_ram)
@@ -313,7 +313,7 @@ static INPUT_PORTS_START( mlc )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eepromdev_read_bit)
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -382,25 +382,6 @@ static MACHINE_RESET( mlc )
 	raster_irq_timer = devtag_get_device(machine, "int_timer");
 }
 
-static NVRAM_HANDLER( mlc )
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C46); // actually 93C45
-
-		if (file) eeprom_load(file);
-		else
-		{
-			UINT8* defaultram = memory_region(machine, "defaults");
-
-			if (defaultram)
-				eeprom_set_data(defaultram, memory_region_length(machine, "defaults"));
-		}
-	}
-}
-
 static MACHINE_DRIVER_START( avengrgs )
 
 	/* basic machine hardware */
@@ -408,7 +389,7 @@ static MACHINE_DRIVER_START( avengrgs )
 	MDRV_CPU_PROGRAM_MAP(decomlc_map)
 
 	MDRV_MACHINE_RESET(mlc)
-	MDRV_NVRAM_HANDLER(mlc) /* Actually 93c45 */
+	MDRV_EEPROM_93C46_ADD("eeprom") /* Actually 93c45 */
 
 	MDRV_TIMER_ADD("int_timer", interrupt_gen)
 
@@ -441,7 +422,7 @@ static MACHINE_DRIVER_START( mlc )
 	MDRV_CPU_PROGRAM_MAP(decomlc_map)
 
 	MDRV_MACHINE_RESET(mlc)
-	MDRV_NVRAM_HANDLER(mlc) /* Actually 93c45 */
+	MDRV_EEPROM_93C46_ADD("eeprom") /* Actually 93c45 */
 
 	MDRV_TIMER_ADD("int_timer", interrupt_gen)
 
@@ -667,8 +648,8 @@ ROM_START( skullfng )
 	ROM_LOAD( "mch-06.6a",  0x200000, 0x200000, CRC(b2efe4ae) SHA1(5a9dab74c2ba73a65e8f1419b897467804734fa2) )
 	ROM_LOAD( "mch-07.11j", 0x400000, 0x200000, CRC(bc1a50a1) SHA1(3de191fbc92d2ae84e54263f1c70afec6ff7cc3c) )
 
-	ROM_REGION( 0x80, "defaults", ROMREGION_ERASE00 )
-	ROM_LOAD_OPTIONAL( "skullfng.eeprom",  0x00, 0x80, CRC(240d882e) SHA1(3c1a15ccac91d95b02a8c54b051aa64ff28ce2ab) )
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 )
+	ROM_LOAD( "skullfng.eeprom",  0x00, 0x80, CRC(240d882e) SHA1(3c1a15ccac91d95b02a8c54b051aa64ff28ce2ab) )
 ROM_END
 
 ROM_START( skullfngj )
@@ -691,8 +672,8 @@ ROM_START( skullfngj )
 	ROM_LOAD( "mch-06.6a",  0x200000, 0x200000, CRC(b2efe4ae) SHA1(5a9dab74c2ba73a65e8f1419b897467804734fa2) )
 	ROM_LOAD( "mch-07.11j", 0x400000, 0x200000, CRC(bc1a50a1) SHA1(3de191fbc92d2ae84e54263f1c70afec6ff7cc3c) )
 
-	ROM_REGION( 0x80, "defaults", ROMREGION_ERASE00 )
-	ROM_LOAD_OPTIONAL( "skullfng.eeprom",  0x00, 0x80, CRC(240d882e) SHA1(3c1a15ccac91d95b02a8c54b051aa64ff28ce2ab) )
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 )
+	ROM_LOAD( "skullfng.eeprom",  0x00, 0x80, CRC(240d882e) SHA1(3c1a15ccac91d95b02a8c54b051aa64ff28ce2ab) )
 ROM_END
 
 /***************************************************************************/

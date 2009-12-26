@@ -26,7 +26,7 @@ dip 1X8
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/eepromdev.h"
 #include "sound/ay8910.h"
 #include "machine/8255ppi.h"
 #include "video/mc6845.h"
@@ -63,21 +63,21 @@ static VIDEO_UPDATE(fortecar)
 
 static WRITE8_DEVICE_HANDLER( ppi0_portc_w )
 {
-	eeprom_write_bit(data & 0x04);
-	eeprom_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-	eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+	eepromdev_write_bit(device, data & 0x04);
+	eepromdev_set_cs_line(device, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	eepromdev_set_clock_line(device, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER( ppi0_portc_r )
 {
 //  popmessage("%s",cpuexec_describe_context(device->machine));
-	return (~(eeprom_read_bit()<<1) & 2);
+	return (~(eepromdev_read_bit(device)<<1) & 2);
 }
 
 static const ppi8255_interface ppi0intf =
 {
-	DEVCB_INPUT_PORT("DSW1"),	DEVCB_INPUT_PORT("IN2"),	DEVCB_HANDLER(ppi0_portc_r),
-	DEVCB_NULL,					DEVCB_NULL,					DEVCB_HANDLER(ppi0_portc_w)
+	DEVCB_INPUT_PORT("DSW1"),	DEVCB_INPUT_PORT("IN2"),	DEVCB_DEVICE_HANDLER("eeprom", ppi0_portc_r),
+	DEVCB_NULL,					DEVCB_NULL,					DEVCB_DEVICE_HANDLER("eeprom", ppi0_portc_w)
 };
 
 
@@ -277,33 +277,6 @@ static const mc6845_interface mc6845_intf =
 };
 
 //51f
-static const UINT8 default_eeprom[128]=
-{
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
-};
-
-static NVRAM_HANDLER(fortecar)
-{
-	if (read_or_write)
-		eeprom_save(file);
-	else
-	{
-		eeprom_init(machine, &eeprom_interface_93C46);
-
-		if (file)
-			eeprom_load(file);
-		else
-			eeprom_set_data(default_eeprom,128);
-	}
-}
-
 static MACHINE_DRIVER_START( fortecar )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,6000000)		 /* ? MHz */
@@ -320,7 +293,9 @@ static MACHINE_DRIVER_START( fortecar )
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
 
 	MDRV_MACHINE_RESET(fortecar)
-	MDRV_NVRAM_HANDLER(fortecar)
+
+	MDRV_EEPROM_93C46_ADD("eeprom")
+	MDRV_EEPROM_DEFAULT_VALUE(0)
 
 	MDRV_PPI8255_ADD("fcppi0", ppi0intf)
 
