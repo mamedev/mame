@@ -11,6 +11,7 @@
 	- colors;
 	- fix remaining video issues;
 	- sound;
+	- add flipscreen;
 
 	(wait until it completes the post test, then put 1 to be23)
 
@@ -163,8 +164,6 @@ static VIDEO_UPDATE( cyclemb )
 			spr_offs = (cyclemb_obj1_ram[i+0]);
 			col = (cyclemb_obj1_ram[i+1] & 0x3f);
 			region = ((cyclemb_obj3_ram[i] & 0x10) >> 4) + 1;
-			if(region == 2 && spr_offs & 3)
-				continue;
 			if(region == 2)
 			{
 				spr_offs >>= 2;
@@ -177,8 +176,8 @@ static VIDEO_UPDATE( cyclemb )
 			//if(cyclemb_obj3_ram[i+1] & 2)
 //				x-=256;
 			fx = cyclemb_obj3_ram[i+0] & 4;
-			fy = 0;
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[region],spr_offs,col,fx,0,x,y,0);
+			fy = cyclemb_obj3_ram[i+0] & 8;
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[region],spr_offs,col,fx,fy,x,y,0);
 		}
 	}
 
@@ -243,8 +242,8 @@ static ADDRESS_MAP_START( cyclemb_sound_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cyclemb )
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -269,8 +268,8 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x01, "DSWB" )
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )

@@ -552,7 +552,17 @@ static void cyclemb_8741_w(const address_space *space, int num, int offset, int 
 			mcu->sts |= 0x02;
 			break;
 		case 1:
-			mcu->txd = data ^ 0x40;
+			/*
+			status codes:
+			0x06 sub NG IOX2
+			0x05 sub NG IOX1
+			0x04 sub NG CIOS
+			0x03 sub NG OPN
+			0x02 sub NG ROM
+			0x01 sub NG RAM
+			0x00 ok
+			*/
+			mcu->txd = 0 ^ 0x40;
 			mcu->sts |= 0x02;
 #if 1
 			/* ?? */
@@ -567,6 +577,8 @@ static void cyclemb_8741_w(const address_space *space, int num, int offset, int 
 #endif
 			break;
 		case 3: /* normal mode ? */
+			mcu->rxd = input_port_read(space->machine, "DSW1");
+			mcu->sts |= 0x01; /* RD ready */
 			break;
 
 		case 0xf0: /* clear main sts ? */
@@ -605,7 +617,9 @@ static INT8 cyclemb_8741_r(const address_space *space,int num,int offset)
 	if(offset==1)
 	{
 		if(mcu->rst)
+		{
 			mcu->rxd = input_port_read(space->machine, mcu->initReadPort); /* port in */
+		}
 		ret = mcu->sts;
 		LOG(("%s:8741[%d]       SR %02X\n",cpuexec_describe_context(space->machine),num,ret));
 	}
