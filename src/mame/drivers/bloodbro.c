@@ -6,14 +6,12 @@ TAD Corporation 1990
 
 driver by Carlos A. Lozano Baides
 
-Coin inputs are handled by the sound CPU, so they don't work with sound
-disabled. Use the service switch instead.
-
 TODO:
 West Story:
-- sound
-- some bad sprites, probably bad ROMs.
+- sound (program rom is close to the original)
+- some bad sprites (2 bad sprite roms, should the actual decoded data match?, can they be reconstructed from the original?)
 - tilemap scroll
+- runs too fast? (vblank flag somewhere?)
 
 
 Sky Smasher  (c) 1990 Nihon System [Seibu hardware]
@@ -71,8 +69,8 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 3) 'weststry'
 
-  - This bootleg has been realised by Datsu in 1991. This "company" also
-    bootlegged "Toki" (another TAD game) in 1990.
+  - This bootleg has been released by Datsu in 1991. This "company" also
+    bootlegged "Toki" (another TAD game) in 1990, and several Sega titles.
 
   - When "Starting Coin" Dip Switch is set to "x2", you need 2 coins to start
     a game (but 1 coin to join), then 1 coin to continue.
@@ -209,7 +207,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(      0x0020, DEF_STR( Normal ) ) \
 	PORT_DIPSETTING(      0x0000, "x2" )
 
-static INPUT_PORTS_START( weststry_base )
+static INPUT_PORTS_START( bloodbro_base )
 	PORT_START("DSW")
 	BLOODBRO_COINAGE
 	/*  SW1:7,8 is listed as "ROM change option", "optional"
@@ -270,7 +268,7 @@ static INPUT_PORTS_START( weststry_base )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)	// "Fire"
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	// "Roll"
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)	// "Dynamite"
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* tested - check code at 0x0005fe - VBLANK ? */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* tested - check code at 0x0005fe - VBLANK ? (probably not) */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -284,7 +282,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( weststry )
-	PORT_INCLUDE( weststry_base )
+	PORT_INCLUDE( bloodbro_base )
 
 	PORT_START("COIN")	/* referenced by seibu sound board */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -292,7 +290,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( bloodbro )
-	PORT_INCLUDE( weststry_base )
+	PORT_INCLUDE( bloodbro_base )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
@@ -371,25 +369,12 @@ INPUT_PORTS_END
 static const gfx_layout textlayout =
 {
 	8,8,	/* 8*8 characters */
-	4096,	/* 4096 characters */
+	RGN_FRAC(1,2),	/* 4096 characters */
 	4,	/* 4 bits per pixel */
-	{ 0, 4, 0x10000*8, 0x10000*8+4 },
+	{ 0, 4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4 },
 	{ 3, 2, 1, 0, 8+3, 8+2, 8+1, 8+0},
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*8	/* every char takes 16 consecutive bytes */
-};
-
-static const gfx_layout backlayout =
-{
-	16,16,	/* 16*16 sprites  */
-	4096,	/* 4096 sprites */
-	4,	/* 4 bits per pixel */
-	{ 8, 12, 0, 4 },
-	{ 3, 2, 1, 0, 16+3, 16+2, 16+1, 16+0,
-             3+32*16, 2+32*16, 1+32*16, 0+32*16, 16+3+32*16, 16+2+32*16, 16+1+32*16, 16+0+32*16 },
-	{ 0*16, 2*16, 4*16, 6*16, 8*16, 10*16, 12*16, 14*16,
-			16*16, 18*16, 20*16, 22*16, 24*16, 26*16, 28*16, 30*16 },
-	128*8	/* every sprite takes 128 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
@@ -408,33 +393,20 @@ static const gfx_layout spritelayout =
 static const gfx_layout weststry_textlayout =
 {
 	8,8,	/* 8*8 sprites */
-	4096,	/* 4096 sprites */
+	RGN_FRAC(1,4),	/* 4096 sprites */
 	4,	/* 4 bits per pixel */
-	{ 0, 0x8000*8, 2*0x8000*8, 3*0x8000*8 },
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
         { 0, 1, 2, 3, 4, 5, 6, 7 },
         { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8	/* every sprite takes 8 consecutive bytes */
 };
 
-static const gfx_layout weststry_backlayout =
-{
-	16,16,	/* 16*16 sprites */
-	4096,	/* 4096 sprites */
-	4,	/* 4 bits per pixel */
-	{ 0*0x20000*8, 1*0x20000*8, 2*0x20000*8, 3*0x20000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-         	16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7},
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every sprite takes 32 consecutive bytes */
-};
-
 static const gfx_layout weststry_spritelayout =
 {
 	16,16,	/* 16*16 sprites */
-	8192,	/* 8192 sprites */
+	RGN_FRAC(1,4),	/* 8192 sprites */
 	4,	/* 4 bits per pixel */
-	{ 0*0x40000*8, 1*0x40000*8, 2*0x40000*8, 3*0x40000*8 },
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
          	16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
@@ -446,16 +418,16 @@ static const gfx_layout weststry_spritelayout =
 
 static GFXDECODE_START( bloodbro )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, textlayout,   0x70*16,  0x10 ) /* Text */
-	GFXDECODE_ENTRY( "gfx2", 0x00000, backlayout,   0x40*16,  0x10 ) /* Background */
-	GFXDECODE_ENTRY( "gfx2", 0x80000, backlayout,   0x50*16,  0x10 ) /* Foreground */
+	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout, 0x40*16,  0x10 ) /* Background */
+	GFXDECODE_ENTRY( "gfx2", 0x00000, spritelayout, 0x50*16,  0x10 ) /* Foreground */
 	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout, 0x00*16,  0x10 ) /* Sprites */
 GFXDECODE_END
 
 static GFXDECODE_START( weststry )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, weststry_textlayout,     16*16,  0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, weststry_backlayout,     48*16,  0x10 )
-	GFXDECODE_ENTRY( "gfx2", 0x80000, weststry_backlayout,     32*16,  0x10 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, weststry_spritelayout,    0*16,  0x10 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, weststry_textlayout,     0x10*16,  0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, weststry_spritelayout,   0x30*16,  0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, weststry_spritelayout,   0x20*16,  0x10 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, weststry_spritelayout,   0x00*16,  0x10 )
 GFXDECODE_END
 
 
@@ -605,29 +577,29 @@ ROM_START( weststry )
 	ROM_CONTINUE(            0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "gfx1", 0 ) // first half of these is blank
 	ROM_LOAD( "ws09.bin",    0x00000, 0x08000, CRC(f05b2b3e) SHA1(6570d795d68655ace9668f32dc0bf5c2d2372411) )	/* characters */
-	ROM_CONTINUE(            0x00000, 0x8000 )
+	ROM_CONTINUE(            0x00000, 0x08000 )
 	ROM_LOAD( "ws11.bin",    0x08000, 0x08000, CRC(2b10e3d2) SHA1(0f5045615b44e2300745fd3afac7f1441352cca5) )
-	ROM_CONTINUE(            0x08000, 0x8000 )
+	ROM_CONTINUE(            0x08000, 0x08000 )
 	ROM_LOAD( "ws10.bin",    0x10000, 0x08000, CRC(efdf7c82) SHA1(65392697f56473cfe90d9733b9c49f2da6f9b7e6) )
-	ROM_CONTINUE(            0x10000, 0x8000 )
+	ROM_CONTINUE(            0x10000, 0x08000 )
 	ROM_LOAD( "ws12.bin",    0x18000, 0x08000, CRC(af993578) SHA1(b250b562deeab3bb2c79002e5e1f0b6e17986848) )
-	ROM_CONTINUE(            0x18000, 0x8000 )
+	ROM_CONTINUE(            0x18000, 0x08000 )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "ws05.bin",    0x00000, 0x20000, CRC(007c8dc0) SHA1(f44576da3b89d6a889fdb564825ac6ce3bb4cffe) )	/* Background */
-	ROM_LOAD( "ws07.bin",    0x20000, 0x20000, CRC(0f0c8d9a) SHA1(f5fe9b5ee4c8ffd7caf5313d13fb5f6e181ed9b6) )
-	ROM_LOAD( "ws06.bin",    0x40000, 0x20000, CRC(459d075e) SHA1(24cd0bffe7c5bbccf653ced0b73579059603d187) )
-	ROM_LOAD( "ws08.bin",    0x60000, 0x20000, CRC(4d6783b3) SHA1(9870fe9570afeff179b6080581fd6bb187898ff0) )
-	ROM_LOAD( "ws01.bin",    0x80000, 0x20000, CRC(32bda4bc) SHA1(ed0c0740c7af513b341b2b7ff3e0bf6045e930e9) )	/* Foreground */
-	ROM_LOAD( "ws03.bin",    0xa0000, 0x20000, CRC(046b51f8) SHA1(25af752caebdec762582fc0130cf14546110bb54) )
-	ROM_LOAD( "ws02.bin",    0xc0000, 0x20000, CRC(ed9d682e) SHA1(0f79ea09a7af367d175081f72f2bc94f6caad463) )
+	ROM_LOAD( "ws01.bin",    0x20000, 0x20000, CRC(32bda4bc) SHA1(ed0c0740c7af513b341b2b7ff3e0bf6045e930e9) )	/* Foreground */
+	ROM_LOAD( "ws03.bin",    0x60000, 0x20000, CRC(046b51f8) SHA1(25af752caebdec762582fc0130cf14546110bb54) )
+	ROM_LOAD( "ws02.bin",    0xa0000, 0x20000, CRC(ed9d682e) SHA1(0f79ea09a7af367d175081f72f2bc94f6caad463) )
 	ROM_LOAD( "ws04.bin",    0xe0000, 0x20000, CRC(75f082e5) SHA1(b29f09a3cc9a0ac3f982be3981f5e895050c49e8) )
+	ROM_LOAD( "ws05.bin",    0x00000, 0x20000, CRC(007c8dc0) SHA1(f44576da3b89d6a889fdb564825ac6ce3bb4cffe) )	/* Background */
+	ROM_LOAD( "ws07.bin",    0x40000, 0x20000, CRC(0f0c8d9a) SHA1(f5fe9b5ee4c8ffd7caf5313d13fb5f6e181ed9b6) )
+	ROM_LOAD( "ws06.bin",    0x80000, 0x20000, CRC(459d075e) SHA1(24cd0bffe7c5bbccf653ced0b73579059603d187) )
+	ROM_LOAD( "ws08.bin",    0xc0000, 0x20000, CRC(4d6783b3) SHA1(9870fe9570afeff179b6080581fd6bb187898ff0) )
 
-	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_LOAD( "ws25.bin",    0x00000, 0x20000, CRC(8092e8e9) SHA1(eabe58ac0f88234b0dddf361f56aad509a83012e) )	/* sprites */
-	ROM_LOAD( "ws26.bin",    0x20000, 0x20000, CRC(f6a1f42c) SHA1(6d5503e1a9b00104970292d22301ed28893c5223) )
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT )
+	ROM_LOAD( "ws25.bin",    0x00000, 0x20000, BAD_DUMP CRC(8092e8e9) SHA1(eabe58ac0f88234b0dddf361f56aad509a83012e) )	/* sprites */
+	ROM_LOAD( "ws26.bin",    0x20000, 0x20000, BAD_DUMP CRC(f6a1f42c) SHA1(6d5503e1a9b00104970292d22301ed28893c5223) )
 	ROM_LOAD( "ws23.bin",    0x40000, 0x20000, CRC(43d58e24) SHA1(99e255faa9716d9102a1223419084fc209ab4024) )
 	ROM_LOAD( "ws24.bin",    0x60000, 0x20000, CRC(20a867ea) SHA1(d3985002931fd4180fc541d61a94371871f3709d) )
 	ROM_LOAD( "ws21.bin",    0x80000, 0x20000, CRC(e23d7296) SHA1(33bbced960be22efc7d2681e06a27feba09e0fc0) )
@@ -665,23 +637,11 @@ ROM_START( skysmash )
 	ROM_LOAD( "rom1",    0x00000, 0x20000, CRC(e69986f6) SHA1(de38bf2d5638cb40740882e1abccf7928e43a5a6) )
 ROM_END
 
-/* Driver Initialization */
-
-static DRIVER_INIT( weststry )
-{
-	UINT8 *gfx = memory_region(machine, "gfx3");
-	int len = memory_region_length(machine, "gfx3");
-	int i;
-
-	// invert sprite data
-	for (i = 0; i < len; i++)
-		gfx[i] = ~gfx[i];
-}
 
 /* Game Drivers */
 
 GAME( 1990, bloodbro, 0,        bloodbro, bloodbro, 0,        ROT0,   "Tad", "Blood Bros. (set 1)", GAME_NO_COCKTAIL )
 GAME( 1990, bloodbroa,bloodbro, bloodbro, bloodbro, 0,        ROT0,   "Tad", "Blood Bros. (set 2)", GAME_NO_COCKTAIL )
 GAME( 1990, bloodbrob,bloodbro, bloodbro, bloodbro, 0,        ROT0,   "Tad", "Blood Bros. (set 3)", GAME_NO_COCKTAIL )
-GAME( 1990, weststry, bloodbro, weststry, weststry, weststry, ROT0,   "bootleg", "West Story", GAME_NO_COCKTAIL | GAME_NO_SOUND )
+GAME( 1990, weststry, bloodbro, weststry, weststry, 0,        ROT0,   "[Tad] (Datsu bootleg)", "West Story (bootleg of Blood Bros.)", GAME_NO_COCKTAIL | GAME_NO_SOUND )
 GAME( 1990, skysmash, 0,        skysmash, skysmash, 0,        ROT270, "Nihon System", "Sky Smasher", 0 )

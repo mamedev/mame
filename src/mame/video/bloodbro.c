@@ -25,7 +25,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(
 			1,
 			code & 0xfff,
-			code >> 12,
+			(code >> 12),
 			0);
 }
 
@@ -34,8 +34,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int code = bloodbro_fgvideoram[tile_index];
 	SET_TILE_INFO(
 			2,
-			code & 0xfff,
-			code >> 12,
+			(code & 0xfff)+0x1000,
+			(code >> 12),
 			0);
 }
 
