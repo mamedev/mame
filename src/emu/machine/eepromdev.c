@@ -358,15 +358,61 @@ static DEVICE_NVRAM( eeprom )
 		mame_fwrite(file, eestate->data, (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8);
 	else if (file != NULL)
 		mame_fread(file, eestate->data, (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8);
+	else
+	{
+		const eeprom_config *config = (const eeprom_config *)device->inline_config;
+		UINT16 default_value = 0xffff;
+		int offs;
+
+		/* initialize to the default value */
+		if (config->default_value != 0)
+			default_value = config->default_value;
+		for (offs = 0; offs < (1 << eestate->intf->address_bits); offs++)
+			if (eestate->intf->data_bits == 8)
+				eestate->data[offs] = (UINT8)default_value;
+			else
+			{
+				eestate->data[offs * 2 + 0] = default_value >> 8;
+				eestate->data[offs * 2 + 1] = default_value & 0xff;
+			}
+
+		/* handle hard-coded data from the driver */
+		if (config->default_data != NULL)
+			memcpy(eestate->data, config->default_data, config->default_data_size);
+
+		/* populate from a memory region if present */
+		if (device->region != NULL)
+		{
+			UINT32 eeprom_length = (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8;
+			UINT32 region_flags = memory_region_flags(device->machine, device->tag);
+
+			if (device->regionbytes != eeprom_length)
+				fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)", device->tag, eeprom_length);
+			if (eestate->intf->data_bits == 8 && (region_flags & ROMREGION_WIDTHMASK) != ROMREGION_8BIT)
+				fatalerror("eeprom region '%s' needs to be an 8-bit region", device->tag);
+			if (eestate->intf->data_bits == 16 && ((region_flags & ROMREGION_WIDTHMASK) != ROMREGION_16BIT || (region_flags & ROMREGION_ENDIANMASK) != ROMREGION_BE))
+				fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region (flags=%08x)", device->tag, region_flags);
+			
+			if (eestate->intf->data_bits == 8)
+				memcpy(eestate->data, device->region, eeprom_length);
+			else
+			{
+				int offs;
+				for (offs = 0; offs < eeprom_length; offs += 2)
+				{
+					UINT16 data = *(UINT16 *)&device->region[offs];
+					eestate->data[offs + 0] = data >> 8;
+					eestate->data[offs + 1] = data & 0xff;
+				}
+			}
+		}
+	}
 }
 
 static DEVICE_START(eeprom)
 {
 	eeprom_state *eestate = get_safe_token(device);
 	const eeprom_config *config;
-	UINT16 default_value;
-	UINT8 *region_base;
-	int offs;
 
 	/* validate some basic stuff */
 	assert(device != NULL);
@@ -380,51 +426,6 @@ static DEVICE_START(eeprom)
 
 	if ((1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8 > MEMORY_SIZE)
 		fatalerror("EEPROM larger than eepromdev.c allows");
-	
-	/* initialize to the default value */
-	default_value = 0xffff;
-	if (config->default_value != 0)
-		default_value = config->default_value;
-	for (offs = 0; offs < (1 << eestate->intf->address_bits); offs++)
-		if (eestate->intf->data_bits == 8)
-			eestate->data[offs] = (UINT8)default_value;
-		else
-		{
-			eestate->data[offs * 2 + 0] = default_value >> 8;
-			eestate->data[offs * 2 + 1] = default_value & 0xff;
-		}
-
-	/* handle hard-coded data from the driver */
-	if (config->default_data != NULL)
-		eepromdev_set_data(device, config->default_data, config->default_data_size);
-
-	/* populate from a memory region if present */
-	region_base = memory_region(device->machine, device->tag);
-	if (region_base != NULL)
-	{
-		UINT32 region_length = memory_region_length(device->machine, device->tag);
-		UINT32 region_flags = memory_region_flags(device->machine, device->tag);
-
-		if (region_length != (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8)
-			fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)", device->tag, (1 << eestate->intf->address_bits) * eestate->intf->data_bits / 8);
-		if (eestate->intf->data_bits == 8 && (region_flags & ROMREGION_WIDTHMASK) != ROMREGION_8BIT)
-			fatalerror("eeprom region '%s' needs to be an 8-bit region", device->tag);
-		if (eestate->intf->data_bits == 16 && ((region_flags & ROMREGION_WIDTHMASK) != ROMREGION_16BIT || (region_flags & ROMREGION_ENDIANMASK) != ROMREGION_BE))
-			fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region (flags=%08x)", device->tag, region_flags);
-		
-		if (eestate->intf->data_bits == 8)
-			memcpy(eestate->data, region_base, region_length);
-		else
-		{
-			int offs;
-			for (offs = 0; offs < region_length; offs += 2)
-			{
-				UINT16 data = *(UINT16 *)&region_base[offs];
-				eestate->data[offs + 0] = data >> 8;
-				eestate->data[offs + 1] = data & 0xff;
-			}
-		}
-	}
 
 	eestate->serial_count = 0;
 	eestate->latch = 0;
