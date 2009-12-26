@@ -4001,36 +4001,36 @@ void tc0150rod_draw( const device_config *device, bitmap_t *bitmap, const rectan
 	int priority_switch_line = (road_ctrl & 0x00ff) - y_offs;
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed_once (machine, KEYCODE_X))
+	if (input_code_pressed_once (device->machine, KEYCODE_X))
 	{
 		dislayer[0] ^= 1;
 		popmessage("RoadA body: %01x",dislayer[0]);
 	}
 
-	if (input_code_pressed_once (machine, KEYCODE_C))
+	if (input_code_pressed_once (device->machine, KEYCODE_C))
 	{
 		dislayer[1] ^= 1;
 		popmessage("RoadA l-edge: %01x",dislayer[1]);
 	}
 
-	if (input_code_pressed_once (machine, KEYCODE_V))
+	if (input_code_pressed_once (device->machine, KEYCODE_V))
 	{
 		dislayer[2] ^= 1;
 		popmessage("RoadA r-edge: %01x",dislayer[2]);
 	}
 
-	if (input_code_pressed_once (machine, KEYCODE_B))
+	if (input_code_pressed_once (device->machine, KEYCODE_B))
 	{
 		dislayer[3] ^= 1;
 		popmessage("RoadB body: %01x",dislayer[3]);
 	}
 
-	if (input_code_pressed_once (machine, KEYCODE_N))
+	if (input_code_pressed_once (device->machine, KEYCODE_N))
 	{
 		dislayer[4] ^= 1;
 		popmessage("RoadB l-edge: %01x",dislayer[4]);
 	}
-	if (input_code_pressed_once (machine, KEYCODE_M))
+	if (input_code_pressed_once (device->machine, KEYCODE_M))
 	{
 		dislayer[5] ^= 1;
 		popmessage("RoadB r-edge: %01x",dislayer[5]);
